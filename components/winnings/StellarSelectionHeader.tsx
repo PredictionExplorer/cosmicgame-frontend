@@ -32,6 +32,11 @@ interface StellarSelectionHeaderProps {
   /** The participant, checksummed. */
   address: string;
   figures?: readonly PageHeaderFigure[];
+  /**
+   * Nothing selected yet: the page's empty state offers "How Stellar Selection works", so
+   * the related pages leave it out rather than show the same link twice.
+   */
+  empty?: boolean;
   actions?: ReactNode;
   children?: ReactNode;
 }
@@ -46,6 +51,7 @@ export function StellarSelectionHeader({
   kind,
   address,
   figures,
+  empty = false,
   actions,
   children,
 }: StellarSelectionHeaderProps) {
@@ -75,7 +81,9 @@ export function StellarSelectionHeader({
           href: `/user/stellar-selection-${sibling}/${address}`,
           label: t(`${GROUP[sibling]}.heading`),
         },
-        { href: STELLAR_SELECTION_FAQ_HREF, label: t('stellarSelectionPages.howItWorks') },
+        ...(empty
+          ? []
+          : [{ href: STELLAR_SELECTION_FAQ_HREF, label: t('stellarSelectionPages.howItWorks') }]),
       ]}
       actions={actions}
     >

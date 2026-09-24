@@ -97,6 +97,7 @@ const UserStellarSelectionETHPage = ({ address: rawAddress }: { address: string 
   ];
 
   const canRetrieve = isOwnPage && waiting.length > 0;
+  const empty = !isLoading && !isError && rows.length === 0;
 
   return (
     <PageShell variant="data" backdrop="signature">
@@ -105,6 +106,7 @@ const UserStellarSelectionETHPage = ({ address: rawAddress }: { address: string 
         address={address}
         // An address with nothing selected yet (or whose read failed) reads from its state alone.
         figures={isError || (!isLoading && rows.length === 0) ? undefined : figures}
+        empty={empty}
         actions={
           canRetrieve ? (
             <ChainGuard requireConnection>

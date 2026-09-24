@@ -16,7 +16,6 @@ import { buttonVariants } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
 import { PageShell } from '@/components/ui/page-shell';
-import { Skeleton, SkeletonArtPlate } from '@/components/ui/skeleton';
 import { useSignatureAlt } from '@/components/nft/signatureArt';
 import { AnchorTimeline } from '@/components/anchoring/AnchorTimeline';
 import { TokenPlate } from '@/components/anchoring/TokenPlate';
@@ -26,6 +25,8 @@ import {
   tokenDistributionsHref,
   type AnchorCollection,
 } from '@/components/anchoring/anchorLinks';
+
+import { AnchorActionSkeleton } from './AnchorActionSkeleton';
 
 /** A release record exists once the indexer has seen its event. */
 function isReleased(release: AnchorAction | null | undefined): release is AnchorAction {
@@ -89,7 +90,8 @@ function AnchorActionDetailPage({ IsRwalk, actionId }: { IsRwalk: number; action
       <PageHeader
         section="records"
         breadcrumbs={[{ label: t('overview.title'), href: '/anchoring' }]}
-        title={t('anchorActionDetail.breadcrumbs.action', { id: actionId })}
+        // "Anchor action #23": the title stands alone, without the trail.
+        title={t('anchorActionDetail.title', { id: actionId })}
         subtitle={t('anchorActionDetail.subtitle', { token: collectionName })}
         meta={status}
       />
@@ -299,32 +301,6 @@ function AnchorActionMissing({ actionId }: { actionId: number }) {
         </div>
       }
     />
-  );
-}
-
-/** The record's shape while it loads: the plate, the spec rows and the timeline. */
-function AnchorActionSkeleton() {
-  const t = useTranslations('common');
-  return (
-    <div
-      role="status"
-      aria-label={t('status.loading')}
-      className="grid gap-x-12 gap-y-10 lg:grid-cols-12"
-    >
-      <div className="lg:col-span-7" aria-hidden>
-        <SkeletonArtPlate />
-        <Skeleton className="mt-4 h-5 w-48" />
-        <Skeleton className="mt-2 h-3.5 w-28" />
-      </div>
-      <div className="space-y-4 lg:col-span-5" aria-hidden>
-        <Skeleton className="h-6 w-32" />
-        {Array.from({ length: 3 }, (_, index) => (
-          <Skeleton key={index} className="h-10 w-full" />
-        ))}
-        <Skeleton className="mt-8 h-6 w-32" />
-        <Skeleton className="h-24 w-full" />
-      </div>
-    </div>
   );
 }
 

@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
+import { AnchoringSteps } from '@/components/anchoring/AnchoringSteps';
 
 import MyAnchors from './MyAnchors';
 
@@ -31,7 +32,7 @@ export default async function Page({ params }: PageProps) {
   setRequestLocale(locale);
   return (
     <PageMessages namespaces={['anchoring', 'myPages', 'tables']}>
-      <MyAnchors />
+      <MyAnchors steps={<AnchoringSteps onMyAnchors />} />
     </PageMessages>
   );
 }

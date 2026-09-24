@@ -51,6 +51,7 @@
     "recipientSection": {
       "title": "周期获配者",
       "description": "周期收官时，以下每个角色都获得了一枚 Cosmic Signature NFT。",
+      "rolesInfo": "签名分配：写下收官之笔的参与者。时之勇士：连续保持坚守冠军身份时间最长的参与者。坚守冠军：连续保持“最近一笔落笔者”身份时间最长的参与者。CST 收官之笔：以 CST 完成本周期最后一次落笔的参与者。",
       "cards": {
         "signature": {
           "title": "签名分配"
@@ -68,7 +69,7 @@
     },
     "distribution": {
       "title": "分配流向",
-      "tooltip": "显示本周期发放的 ETH 在各条分配轨道间的占比。周期储备的其余部分滚入下一周期，不在此显示。",
+      "tooltip": "本周期收官时，各条轨道在周期储备中所占的比例，与“分配名录”页面显示的比例相同。未分配的部分滚入下一周期。",
       "total": "本周期共发放 {amount} ETH"
     },
     "statistics": {
@@ -94,7 +95,7 @@
         },
         "uniqueAnchorHolders": {
           "label": "独立锚定者",
-          "tooltip": "本周期内拥有已锚定代币的独立地址数量。"
+          "tooltip": "本周期内拥有已锚定 NFT 的独立地址数量。"
         },
         "totalContributed": {
           "label": "ETH 贡献",

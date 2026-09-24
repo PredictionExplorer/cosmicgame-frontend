@@ -6,10 +6,17 @@ import { readDashboard } from './publicDataReads';
 export interface QuerySeedEntry {
   /** Must equal the key of the client hook that reads it (hooks/useApiQuery.ts). */
   queryKey: QueryKey;
-  /** The server read's result; `null` (a failed read) seeds nothing. */
+  /** The server read's result; `null` (a failed read) seeds nothing, unless `absent` is set. */
   data: unknown;
   /** When the data was read (epoch ms); React Query dates the entry to it and refreshes it once stale. */
   at: number;
+  /**
+   * The API answered that it holds no such record, and the client hook reads
+   * that answer as `null` too (a cycle with no record yet): the query is
+   * seeded with `null`, so the server HTML already says so instead of showing
+   * a skeleton that collapses into the answer after hydration.
+   */
+  absent?: boolean;
 }
 
 /**
@@ -29,11 +36,13 @@ export function seedsDisabled(): boolean {
  */
 export function QuerySeed({ seeds, children }: { seeds: QuerySeedEntry[]; children: ReactNode }) {
   if (seedsDisabled()) return <>{children}</>;
-  const usable = seeds.filter((seed) => seed.data !== null && seed.data !== undefined);
+  const usable = seeds.filter(
+    (seed) => seed.absent === true || (seed.data !== null && seed.data !== undefined),
+  );
   if (usable.length === 0) return <>{children}</>;
   const client = new QueryClient();
-  for (const { queryKey, data, at } of usable) {
-    client.setQueryData(queryKey, data, { updatedAt: at });
+  for (const { queryKey, data, at, absent } of usable) {
+    client.setQueryData(queryKey, absent ? null : data, { updatedAt: at });
   }
   return <HydrationBoundary state={dehydrate(client)}>{children}</HydrationBoundary>;
 }

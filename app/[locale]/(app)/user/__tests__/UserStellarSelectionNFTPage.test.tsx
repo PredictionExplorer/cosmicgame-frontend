@@ -102,6 +102,18 @@ describe('UserStellarSelectionNFTPage', () => {
     expect(
       screen.getByRole('heading', { level: 2, name: 'No Stellar Selection NFTs yet' }),
     ).toBeInTheDocument();
+    // "How Stellar Selection works" is the empty state's action, not repeated among the
+    // header's related pages.
+    expect(document.querySelectorAll('a[href^="/faq#"]')).toHaveLength(1);
+  });
+
+  it('sets the participant’s address crumb in mono, as every address is', () => {
+    withRows([]);
+    render(<UserStellarSelectionNFTPage address={ADDRESS} />);
+    const crumb = screen
+      .getByRole('navigation', { name: 'common.accessibility.breadcrumb' })
+      .querySelector(`a[href="/user/${ADDRESS}"]`);
+    expect(crumb).toHaveClass('font-mono');
   });
 
   it('shows a failed read as an error with a retry, never as "no NFTs yet"', async () => {

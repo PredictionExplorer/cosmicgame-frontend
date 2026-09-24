@@ -8,6 +8,7 @@ import { useFormat } from '@/hooks/useFormat';
 import { PageHeaderFigures, type PageHeaderFigure } from '@/components/layout/PageHeader';
 import { Amount } from '@/components/ui/amount';
 import { DataTableWidth } from '@/components/ui/data-table';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { GlobalAnchorActionsTable } from '@/components/anchoring/GlobalAnchorActionsTable';
 import { GlobalAnchoredTokensTable } from '@/components/anchoring/GlobalAnchoredTokensTable';
@@ -30,18 +31,20 @@ export interface AnchoringDataState<T> {
 
 /** Props for the anchoring statistics section. */
 export interface AnchoringSectionProps {
-  cstStats: {
-    NumActiveStakers: number;
+  /** The dashboard's Cosmic Signature anchoring figures; missing while loading or when unread. */
+  cstStats?: {
+    NumActiveStakers?: number;
     NumDeposits?: number;
     TotalRewardEth?: number;
-    TotalTokensStaked: number;
     UnclaimedRewardEth?: number;
-  };
-  rwlkStats: {
-    NumActiveStakers: number;
+  } | null;
+  /** The dashboard's Random Walk anchoring figures; missing while loading or when unread. */
+  rwlkStats?: {
+    NumActiveStakers?: number;
     TotalTokensMinted?: number;
-    TotalTokensStaked: number;
-  };
+  } | null;
+  /** The dashboard is still loading: the figures hold skeletons, not dashes or zeros. */
+  statsLoading?: boolean;
   cstAnchorActions: AnchoringDataState<AnchorAction>;
   rwlkAnchorActions: AnchoringDataState<AnchorAction>;
   anchoredCSTokens: AnchoringDataState<AnchoredTokenInfo>;
@@ -83,27 +86,36 @@ function AnchoringTableSection<T>({
 }
 
 /**
- * The Cosmic Signature overview's five figures: 3 + 2 on a tablet, then one
- * row of five, never a lone fifth figure wrapped under four. The three
- * counts take less room than the two ETH amounts, and the columns pad a
- * little less than the page header's, so an amount keeps its line at
- * 1024px. A label that wraps pushes nothing: every value sits on the row's
- * bottom line.
+ * A tab's figure strip: a label that wraps pushes nothing, every value sits
+ * on the row's bottom line.
+ */
+const FIGURES_LAYOUT =
+  'mt-0 sm:mt-0 sm:[&>div]:flex sm:[&>div]:flex-col sm:[&>div>dt]:grow lg:[&>div]:px-6';
+
+/**
+ * The Cosmic Signature strip's four figures: 2 + 2 on a tablet, then one row
+ * of four from `lg`, never a lone fourth figure wrapped under three (the
+ * header strip's wrapping flex row does that at 1024px, and wider in
+ * Ukrainian). The two counts take less room than the two ETH amounts, and the
+ * columns pad a little less than the page header's, so an amount keeps its
+ * line at 1024px.
  */
 const CST_FIGURES_LAYOUT = cn(
-  'mt-0 sm:mt-0 sm:grid-cols-3 sm:[&>div]:flex sm:[&>div]:flex-col sm:[&>div>dt]:grow',
-  'lg:grid lg:grid-cols-[repeat(3,minmax(0,3fr))_repeat(2,minmax(0,5fr))] lg:[&>div]:px-5',
+  FIGURES_LAYOUT,
+  'sm:grid-cols-2 lg:grid lg:grid-cols-[repeat(2,minmax(0,4fr))_repeat(2,minmax(0,5fr))] lg:[&>div]:px-5',
 );
 
 /**
- * The anchoring statistics, one underline tab per NFT kind: an overview
- * figure strip (label over value, divided by hairlines, one row on a wide
- * screen instead of a single stacked column), its Definitions disclosure,
- * then the actions, anchored tokens and anchor-holders ledgers as sections.
+ * The anchoring statistics, one underline tab per NFT kind: the kind's own
+ * figures (the anchored counts of both kinds lead the page above the tabs),
+ * its Definitions disclosure, then the actions, anchored NFTs and
+ * anchor-holders ledgers as sections. While the dashboard loads each figure
+ * holds a skeleton; one it could not read is the Unavailable dash.
  */
 export function AnchoringSection({
   cstStats,
   rwlkStats,
+  statsLoading = false,
   cstAnchorActions,
   rwlkAnchorActions,
   anchoredCSTokens,
@@ -113,40 +125,32 @@ export function AnchoringSection({
 }: AnchoringSectionProps) {
   const t = useTranslations('statistics');
   const format = useFormat();
+  const pending = <Skeleton className="h-7 w-20" />;
   const count = (value: number | undefined) =>
-    typeof value === 'number' ? format.count(value) : null;
+    statsLoading ? pending : typeof value === 'number' ? format.count(value) : null;
+  const eth = (value: number | undefined) =>
+    statsLoading ? pending : typeof value === 'number' ? <Amount value={value} unit="ETH" /> : null;
 
   const cstFigures: PageHeaderFigure[] = [
     {
       id: 'activeHolders',
       label: t('anchoringPage.stats.activeHoldersCosmicSignature'),
-      value: count(cstStats.NumActiveStakers),
-    },
-    {
-      id: 'tokensAnchored',
-      label: t('anchoringPage.stats.tokensAnchored'),
-      value: count(cstStats.TotalTokensStaked),
+      value: count(cstStats?.NumActiveStakers),
     },
     {
       id: 'deposits',
       label: t('anchoringPage.stats.distributionDeposits'),
-      value: count(cstStats.NumDeposits),
+      value: count(cstStats?.NumDeposits),
     },
     {
       id: 'totalDistributions',
       label: t('anchoringPage.stats.totalDistributions'),
-      value:
-        typeof cstStats.TotalRewardEth === 'number' ? (
-          <Amount value={cstStats.TotalRewardEth} unit="ETH" />
-        ) : null,
+      value: eth(cstStats?.TotalRewardEth),
     },
     {
       id: 'unretrieved',
       label: t('anchoringPage.stats.unretrievedDistributions'),
-      value:
-        typeof cstStats.UnclaimedRewardEth === 'number' ? (
-          <Amount value={cstStats.UnclaimedRewardEth} unit="ETH" />
-        ) : null,
+      value: eth(cstStats?.UnclaimedRewardEth),
     },
   ];
 
@@ -154,17 +158,12 @@ export function AnchoringSection({
     {
       id: 'activeHolders',
       label: t('anchoringPage.stats.activeHoldersRandomWalk'),
-      value: count(rwlkStats.NumActiveStakers),
-    },
-    {
-      id: 'tokensAnchored',
-      label: t('anchoringPage.stats.tokensAnchored'),
-      value: count(rwlkStats.TotalTokensStaked),
+      value: count(rwlkStats?.NumActiveStakers),
     },
     {
       id: 'tokensImprinted',
       label: t('anchoringPage.stats.tokensImprinted'),
-      value: count(rwlkStats.TotalTokensMinted),
+      value: count(rwlkStats?.TotalTokensMinted),
     },
   ];
 
@@ -190,10 +189,6 @@ export function AnchoringSection({
               {
                 term: t('anchoringPage.stats.activeHoldersCosmicSignature'),
                 definition: t('anchoringTooltips.cstActiveAnchorHolders'),
-              },
-              {
-                term: t('anchoringPage.stats.tokensAnchored'),
-                definition: t('anchoringTooltips.cstTotalTokensAnchored'),
               },
               {
                 term: t('anchoringPage.stats.distributionDeposits'),
@@ -241,7 +236,7 @@ export function AnchoringSection({
 
       <TabsContent value="rwlk" className="mt-8 space-y-12 sm:space-y-16">
         <div>
-          <PageHeaderFigures figures={rwlkFigures} className="mt-0 sm:mt-0" />
+          <PageHeaderFigures figures={rwlkFigures} className={FIGURES_LAYOUT} />
           <DefinitionsDisclosure
             className="mt-6"
             label={t('shared.definitions')}
@@ -249,10 +244,6 @@ export function AnchoringSection({
               {
                 term: t('anchoringPage.stats.activeHoldersRandomWalk'),
                 definition: t('anchoringTooltips.rwlkActiveAnchorHolders'),
-              },
-              {
-                term: t('anchoringPage.stats.tokensAnchored'),
-                definition: t('anchoringTooltips.rwlkTotalTokensAnchored'),
               },
               {
                 term: t('anchoringPage.stats.tokensImprinted'),

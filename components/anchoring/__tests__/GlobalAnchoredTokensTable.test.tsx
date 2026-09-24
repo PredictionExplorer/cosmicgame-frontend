@@ -29,9 +29,47 @@ describe('GlobalAnchoredTokensTable', () => {
     expect(screen.getByTestId('art-frame')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: '#000002' })).toHaveAttribute('href', '/detail/2');
     expect(
-      screen.getByRole('link', { name: 'anchoring.anchorActionDetail.breadcrumbs.action(id=6)' }),
+      screen.getAllByRole('link', {
+        name: 'anchoring.anchorActionDetail.breadcrumbs.action(id=6)',
+      })[0],
     ).toHaveAttribute('href', '/anchor-action/0/6');
     expect(document.querySelector(`a[href="/user/${HOLDER}"]`)).toBeInTheDocument();
+  });
+
+  it('lists the newest anchored first, sortable by date and NFT, with no info button', () => {
+    const older = { ...cstRow, StakeEvtLogId: 1, StakeActionId: 1, TokenInfo: { TokenId: 0 } };
+    const newer = { ...cstRow, StakeEvtLogId: 2, StakeActionId: 9, StakeTimeStamp: 1_790_000_000 };
+    render(<GlobalAnchoredTokensTable list={[older, newer]} IsRWLK={false} />);
+    const numbers = screen.getAllByRole('link', { name: /^#0000/ }).map((link) => link.textContent);
+    expect(numbers).toEqual(['#000002', '#000000']);
+    expect(screen.queryAllByRole('button', { name: /explainColumn/ })).toHaveLength(0);
+    for (const header of ['tokenId', 'anchorDatetime']) {
+      expect(
+        screen.getByRole('button', {
+          name: new RegExp(`globalAnchoredTokens\\.headers\\.${header}\\.desktop`),
+        }),
+      ).toBeInTheDocument();
+    }
+  });
+
+  it('heads a phone record with the art, with no column label stacked above it', () => {
+    const { container } = render(<GlobalAnchoredTokensTable list={[cstRow]} IsRWLK={false} />);
+    const tokenCell = container.querySelector('td[data-label=""]');
+    expect(tokenCell).toHaveAttribute('data-stack', 'true');
+    expect(tokenCell?.querySelector('[data-testid="art-frame"]')).not.toBeNull();
+  });
+
+  it('orders NFTs anchored at the same moment by their action, newest first', () => {
+    // One transaction anchors several NFTs: the API lists them oldest action first.
+    const rows = [26, 27, 28].map((action) => ({
+      ...cstRow,
+      StakeEvtLogId: action,
+      StakeActionId: action,
+      TokenInfo: { TokenId: action },
+    }));
+    render(<GlobalAnchoredTokensTable list={rows} IsRWLK={false} />);
+    const numbers = screen.getAllByRole('link', { name: /^#0000/ }).map((link) => link.textContent);
+    expect(numbers).toEqual(['#000028', '#000027', '#000026']);
   });
 
   it('shows a Random Walk NFT by its render and links it to its own site', () => {
@@ -42,7 +80,9 @@ describe('GlobalAnchoredTokensTable', () => {
       'https://randomwalknft.com/detail/1826',
     );
     expect(
-      screen.getByRole('link', { name: 'anchoring.anchorActionDetail.breadcrumbs.action(id=33)' }),
+      screen.getAllByRole('link', {
+        name: 'anchoring.anchorActionDetail.breadcrumbs.action(id=33)',
+      })[0],
     ).toHaveAttribute('href', '/anchor-action/1/33');
   });
 

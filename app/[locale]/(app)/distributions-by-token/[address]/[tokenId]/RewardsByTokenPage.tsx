@@ -13,7 +13,12 @@ import { AddressChip } from '@/components/ui/address-chip';
 import { WallLabel } from '@/components/ui/art-frame';
 import { Amount } from '@/components/ui/amount';
 import { buttonVariants } from '@/components/ui/button';
-import { DataTable, TxProofLink, type DataTableColumn } from '@/components/ui/data-table';
+import {
+  DataTable,
+  TableLink,
+  TxProofLink,
+  type DataTableColumn,
+} from '@/components/ui/data-table';
 import { DateTime } from '@/components/ui/date-time';
 import { PageShell } from '@/components/ui/page-shell';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -56,6 +61,7 @@ export function depositsFromDetails(details: Record<string, unknown> | null | un
  */
 function RewardsByTokenPage({ address, tokenId }: { address: string; tokenId: number }) {
   const t = useTranslations('anchoring');
+  const tCommon = useTranslations('common');
   const format = useFormat();
   const query = useAnchorDistributionsByUserByTokenDetails(address, tokenId);
   const token = useCSTInfo(tokenId);
@@ -114,7 +120,13 @@ function RewardsByTokenPage({ address, tokenId }: { address: string; tokenId: nu
         kind: 'link',
         header: t('distributionsByToken.columns.cycle'),
         value: (row) => row.RoundNum,
-        href: (row) => `/allocation/${row.RoundNum}`,
+        // "Cycle #1", not a bare "1": a word-sized link, as every other ledger names a cycle.
+        cell: (row) => (
+          <TableLink href={`/allocation/${row.RoundNum}`}>
+            {tCommon('pageHeader.crumbs.cycle', { cycle: row.RoundNum })}
+          </TableLink>
+        ),
+        nowrap: true,
       },
       {
         id: 'deposit',
@@ -141,11 +153,14 @@ function RewardsByTokenPage({ address, tokenId }: { address: string; tokenId: nu
         sortable: true,
       },
     ],
-    [t],
+    [t, tCommon],
   );
 
-  const tokenTitle =
-    token.data?.TokenName?.trim() || t('art.signatureTitle', { id: formatId(tokenId) });
+  const tokenName = token.data?.TokenName?.trim() || null;
+  const tokenTitle = tokenName ?? t('art.signatureTitle', { id: formatId(tokenId) });
+  // An NFT with no deposit yet: the ledger's empty state says so once; zero figures above it
+  // would repeat it.
+  const noDeposits = !query.isLoading && !query.isError && deposits.length === 0;
 
   return (
     <PageShell variant="data">
@@ -154,25 +169,29 @@ function RewardsByTokenPage({ address, tokenId }: { address: string; tokenId: nu
         breadcrumbs={participantTrail}
         title={t('distributionsByToken.title', { id: formatId(tokenId) })}
         subtitle={t('distributionsByToken.subtitle')}
-        figures={figures}
+        figures={noDeposits ? undefined : figures}
       />
 
       <div className="mb-10 flex flex-col gap-5 border-b border-rule-faint pb-8 sm:flex-row sm:items-center sm:gap-6">
-        <Link href={`/detail/${tokenId}`} className="block w-full max-w-60 shrink-0 sm:w-48">
+        {/* The plate spans the column on a phone, and sits beside its label from `sm`. */}
+        <Link href={`/detail/${tokenId}`} className="block w-full shrink-0 sm:w-48">
           <TokenPlate
             collection="cosmicSignature"
             tokenId={tokenId}
             alt=""
-            sizes="(min-width: 640px) 12rem, 15rem"
+            sizes="(min-width: 640px) 12rem, 100vw"
           />
           <span className="sr-only">{tokenTitle}</span>
         </Link>
         <WallLabel
           title={tokenTitle}
           meta={[
-            <span key="id" className="font-mono">
-              {formatId(tokenId)}
-            </span>,
+            // An unnamed token's title already carries its number (as on its anchor actions).
+            tokenName ? (
+              <span key="id" className="font-mono">
+                {formatId(tokenId)}
+              </span>
+            ) : null,
             typeof token.data?.RoundNum === 'number'
               ? t('picker.cycle', { cycle: token.data.RoundNum })
               : null,

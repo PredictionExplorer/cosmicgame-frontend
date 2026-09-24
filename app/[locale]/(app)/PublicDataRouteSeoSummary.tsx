@@ -8,6 +8,7 @@ import { OUTBOUND_LINKS } from '@/config/siteNav';
 import { PageHeader, type PageHeaderFigure } from '@/components/layout/PageHeader';
 import type { PageSectionId } from '@/components/layout/pageSections';
 import { SnapshotStamp } from '@/components/layout/SnapshotStamp';
+import { AnchoringHeaderCount } from '@/components/anchoring/AnchoringHeaderCount';
 import { AddressChip } from '@/components/ui/address-chip';
 import { Amount } from '@/components/ui/amount';
 import { Badge } from '@/components/ui/badge';
@@ -17,7 +18,6 @@ import { sumAllocatedEth } from '@/utils/allocationRecords';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import { formatCount, formatPercent, sameAddress } from '@/utils/format';
 
-import { AnchoringFigure } from './PublicDataFigures';
 import {
   readAnchorCstActions,
   readAnchorEthDeposits,
@@ -306,40 +306,28 @@ async function getRouteFigures(
         readAnchorEthDeposits(),
         readAnchorStellarImprints(),
       ]);
+      // The counts render from the page's seeded client queries (anchoring/page.tsx), so a
+      // read that failed here is read again in the browser instead of cached as a dash, and
+      // the header never contradicts the ledgers.
       return {
         reads: [cstActions, rwalkActions, ethDeposits, stellarImprints],
-        // A figure whose server read failed is filled on the client from the
-        // page's own queries, so the header never contradicts the ledgers.
         // Three short counts: one row on phones.
         figures: [
           {
             key: 'actions',
-            value:
-              cstActions.data && rwalkActions.data ? (
-                count(cstActions.data.length + rwalkActions.data.length)
-              ) : (
-                <AnchoringFigure id="actions" />
-              ),
+            value: <AnchoringHeaderCount metric="actions" />,
             hasTooltip: true,
             compact: true,
           },
           {
             key: 'ethDeposits',
-            value: ethDeposits.data ? (
-              count(ethDeposits.data.length)
-            ) : (
-              <AnchoringFigure id="ethDeposits" />
-            ),
+            value: <AnchoringHeaderCount metric="ethDeposits" />,
             hasTooltip: true,
             compact: true,
           },
           {
             key: 'stellarImprints',
-            value: stellarImprints.data ? (
-              count(stellarImprints.data.length)
-            ) : (
-              <AnchoringFigure id="stellarImprints" />
-            ),
+            value: <AnchoringHeaderCount metric="stellarImprints" />,
             hasTooltip: true,
             compact: true,
           },

@@ -8,6 +8,8 @@ export interface BreadcrumbItem {
   label: string;
   /** Omit on the current page. */
   href?: string;
+  /** An identifier (an address): set in mono, as every other address is. */
+  mono?: boolean;
 }
 
 export interface BreadcrumbsProps {
@@ -38,14 +40,21 @@ export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
               {item.href ? (
                 <Link
                   href={item.href}
-                  className="inline-flex min-h-6 items-center transition-colors duration-fast hover:text-foreground hover:underline hover:underline-offset-4"
+                  className={cn(
+                    'inline-flex min-h-6 items-center transition-colors duration-fast hover:text-foreground hover:underline hover:underline-offset-4',
+                    item.mono && 'font-mono',
+                  )}
                 >
                   {item.label}
                 </Link>
               ) : (
                 <span
                   aria-current={isCurrent ? 'page' : undefined}
-                  className={cn('min-w-0 break-words', isCurrent && 'text-foreground')}
+                  className={cn(
+                    'min-w-0 break-words',
+                    isCurrent && 'text-foreground',
+                    item.mono && 'font-mono',
+                  )}
                 >
                   {item.label}
                 </span>

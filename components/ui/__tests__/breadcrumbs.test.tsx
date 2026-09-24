@@ -20,6 +20,11 @@ describe('Breadcrumbs', () => {
     expect(within(nav).getByText('Cycle #2')).toHaveAttribute('aria-current', 'page');
   });
 
+  it('sets an identifier crumb in mono', () => {
+    render(<Breadcrumbs items={[{ label: '0xA169…⁠63B6', href: '/user/0xA169', mono: true }]} />);
+    expect(screen.getByRole('link', { name: '0xA169…⁠63B6' })).toHaveClass('font-mono');
+  });
+
   it('renders nothing for an empty trail', () => {
     const { container } = render(<Breadcrumbs items={[]} />);
     expect(container).toBeEmptyDOMElement();

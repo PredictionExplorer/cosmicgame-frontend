@@ -44,7 +44,7 @@
         "cards": {
           "actions": {
             "label": "Anchor / release actions",
-            "tooltip": "Each time a Cosmic Signature or Random Walk NFT was anchored or released."
+            "tooltip": "Every anchor and release of a Cosmic Signature or Random Walk NFT since anchoring opened."
           },
           "ethDeposits": {
             "label": "ETH Anchor Distribution deposits",

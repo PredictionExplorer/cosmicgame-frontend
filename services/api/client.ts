@@ -444,6 +444,7 @@ export const flattenRoundInfo = (roundInfo: unknown) => {
     WinnerAddr: (MainPrize as Record<string, unknown>)?.WinnerAddr || '',
     AmountEth: (MainPrize as Record<string, unknown>)?.EthAmountEth || 0,
     TokenId: (MainPrize as Record<string, unknown>)?.NftTokenId ?? -1,
+    TokenSeed: (MainPrize as Record<string, unknown>)?.Seed,
     CSTAmountEth: (MainPrize as Record<string, unknown>)?.CstAmountEth || 0,
     CharityAddress: (CharityDeposit as Record<string, unknown>)?.CharityAddress || '',
     CharityAmountETH: (CharityDeposit as Record<string, unknown>)?.CharityAmountETH || 0,

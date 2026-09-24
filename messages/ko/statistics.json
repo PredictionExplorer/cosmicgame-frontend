@@ -19,7 +19,7 @@
     "anchoring": {
       "label": "앵커링",
       "title": "앵커링 통계",
-      "description": "Cosmic Signature NFT와 RandomWalk NFT의 앵커링 및 해제 작업, 현재 앵커링된 토큰, 고유 앵커링 보유자입니다."
+      "description": "Cosmic Signature NFT와 Random Walk NFT의 앵커링 및 해제 작업, 현재 앵커링된 NFT, 고유 앵커링 보유자입니다."
     },
     "activity": {
       "label": "활동",
@@ -252,11 +252,9 @@
     "cstActiveAnchorHolders": "현재 Cosmic Signature NFT를 한 개 이상 앵커링 중인 지갑입니다.",
     "cstAnchorDistributionDeposits": "Cosmic Signature NFT 앵커링 지급 풀에 ETH가 적립된 총 횟수를 나타냅니다.",
     "cstTotalAnchorDistributions": "Cosmic Signature NFT 앵커링 보유자에게 앵커링 지급으로 전달된 ETH 총액입니다.",
-    "cstTotalTokensAnchored": "현재 프로토콜에 앵커링된 Cosmic Signature NFT 수를 나타냅니다.",
     "cstUnretrievedAnchorDistributions": "Cosmic Signature NFT 앵커링 보유자에게 배분되었지만 아직 회수되지 않은 앵커링 지급입니다.",
     "rwlkActiveAnchorHolders": "현재 RandomWalk NFT를 한 개 이상 앵커링 중인 지갑입니다.",
     "rwlkTotalTokensImprinted": "앵커링 NFT 별빛 선정을 통해 RandomWalk NFT 앵커링 보유자에게 각인된 Cosmic Signature NFT와 짝지어진 CST를 모두 합한 값입니다.",
-    "rwlkTotalTokensAnchored": "현재 프로토콜에 앵커링된 RandomWalk NFT 수를 나타냅니다.",
     "cstGroup": "Cosmic Signature NFT 앵커링에서는 현재 앵커링된 Cosmic Signature NFT가 ETH 앵커링 지급을 나누어 받습니다.",
     "rwlkGroup": "Random Walk NFT 앵커링은 앵커링 NFT 별빛 선정 배분 자격을 부여합니다."
   },
@@ -278,17 +276,10 @@
   },
   "anchoringPage": {
     "snapshot": {
-      "poolLabel": "앵커링 지급 풀",
-      "poolTooltip": "Cosmic Signature NFT 앵커링 보유자를 위한 앵커링 지급 풀에 현재 배분된 ETH입니다.",
-      "poolCaption": "이번 사이클이 마감되면 적립되며, 이전 적립분 중 회수되지 않은 금액은 “미회수”에 표시됩니다.",
-      "perNftLabel": "Cosmic Signature NFT당 지급액",
-      "perNftTooltip": "앵커링된 Cosmic Signature NFT 한 개당 현재 ETH 앵커링 지급액으로, 온체인 풀을 인덱싱된 앵커링 NFT 총수로 나눈 값입니다.",
-      "perNftNoneAnchored": "인덱싱된 앵커링 Cosmic Signature NFT가 아직 없습니다",
       "activeHoldersLabel": "활성 앵커링 보유자",
       "activeHoldersTooltip": "현재 Cosmic Signature NFT 또는 Random Walk NFT를 한 개 이상 앵커링 중인 서로 다른 지갑 수입니다. 두 종류를 모두 앵커링한 지갑은 한 번만 셉니다."
     },
     "nowTitle": "현재 앵커링",
-    "description": "앵커링된 NFT는 Cosmic Signature의 핵심 요소입니다. Cosmic Signature NFT는 ETH 앵커링 지급을 나누어 받고, Random Walk NFT는 앵커링 NFT 별빛 선정에 참여합니다.",
     "historyLink": "앵커링 내역 보기",
     "tabs": {
       "cosmicSignature": "Cosmic Signature NFT",
@@ -304,18 +295,17 @@
       "activeHoldersRandomWalk": "활성 Random Walk NFT 앵커링 보유자 수",
       "distributionDeposits": "앵커링 지급 적립 횟수",
       "totalDistributions": "앵커링 지급 총액",
-      "tokensImprinted": "각인된 토큰 총수",
-      "tokensAnchored": "앵커링된 토큰 총수",
+      "tokensImprinted": "각인된 Cosmic Signature NFT",
       "unretrievedDistributions": "미회수 앵커링 지급"
     },
     "tables": {
       "actions": "앵커링 / 해제 작업",
-      "anchoredTokens": "앵커링된 토큰",
+      "anchoredTokens": "앵커링된 NFT",
       "uniqueHolders": "고유 앵커링 보유자"
     },
     "empty": {
       "actions": "아직 앵커링 작업이 없습니다",
-      "tokens": "현재 앵커링된 토큰이 없습니다",
+      "tokens": "현재 앵커링된 NFT가 없습니다",
       "holders": "아직 앵커링 보유자가 없습니다"
     }
   },
@@ -633,7 +623,6 @@
   },
   "recipientHistory": {
     "pageTitle": "내 배분 내역",
-    "subtitle": "지난 배분 회수 및 수령 내역 보기",
     "connectedDescription": "이 지갑이 사이클마다 받은 모든 배분과 각 배분의 회수 여부입니다.",
     "loadError": "배분 내역을 불러오지 못했습니다",
     "loadErrorDescription": "잠시 후 다시 시도해 주세요.",

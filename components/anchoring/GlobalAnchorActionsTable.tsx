@@ -3,7 +3,8 @@
 import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 
-import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
+import { DataTable, TableLink, TableTag, type DataTableColumn } from '@/components/ui/data-table';
 
 import { TokenCell } from './TokenCell';
 import { anchorActionHref } from './anchorLinks';
@@ -13,6 +14,7 @@ interface GlobalAnchorAction {
   EvtLogId: string | number;
   ActionId: number;
   TimeStamp: number;
+  TxHash?: string;
   ActionType: number;
   TokenId: number;
   StakerAddr: string;
@@ -25,9 +27,11 @@ interface GlobalAnchorActionsTableProps extends AnchoringLedgerProps {
 }
 
 /**
- * Every anchor and release across all anchor-holders for one collection.
- * Headers carry the full column names with a definition; phone records use
- * the short names. Each row leads to the action's record.
+ * Every anchor and release across all anchor-holders for one collection. The
+ * links say where they go, as in the anchored-NFT ledger below it: "Action
+ * #34" (tagged Anchor or Release) opens the action's record, and the date,
+ * with its up-right arrow, is the transaction's proof on the explorer. Only
+ * the one non-obvious column, the running total, carries a definition.
  */
 export const GlobalAnchorActionsTable = ({
   list,
@@ -41,28 +45,38 @@ export const GlobalAnchorActionsTable = ({
   const columns = useMemo<DataTableColumn<GlobalAnchorAction>[]>(
     () => [
       {
+        id: 'action',
+        kind: 'link',
+        header: t('tables.globalAnchorActions.headers.actionType.desktop'),
+        label: t('tables.globalAnchorActions.headers.actionType.desktop'),
+        value: (row) => row.ActionId,
+        cell: (row) => (
+          <span className="inline-flex flex-wrap items-center justify-end gap-x-2 gap-y-1 sm:justify-start">
+            {/* Beside its tag the link is not the whole value: it takes the 24px line itself. */}
+            <TableLink
+              href={anchorActionHref(collection, row.ActionId)}
+              className={TOUCH_TARGET_TEXT_LINK_CLASS}
+            >
+              {t('anchorActionDetail.breadcrumbs.action', { id: row.ActionId })}
+            </TableLink>
+            <TableTag>{row.ActionType === 1 ? t('common.release') : t('common.anchor')}</TableTag>
+          </span>
+        ),
+        nowrap: true,
+      },
+      {
         id: 'datetime',
         kind: 'datetime',
         header: t('tables.globalAnchorActions.headers.anchorDatetime.desktop'),
         label: t('tables.globalAnchorActions.headers.anchorDatetime.mobile'),
-        help: t('tables.globalAnchorActions.headers.anchorDatetime.tooltip'),
         value: (row) => row.TimeStamp,
-      },
-      {
-        id: 'type',
-        kind: 'text',
-        header: t('tables.globalAnchorActions.headers.actionType.desktop'),
-        label: t('tables.globalAnchorActions.headers.actionType.mobile'),
-        help: t('tables.globalAnchorActions.headers.actionType.tooltip'),
-        value: (row) => (row.ActionType === 1 ? t('common.release') : t('common.anchor')),
-        nowrap: true,
+        txHash: (row) => row.TxHash,
       },
       {
         id: 'token',
         kind: 'link',
         header: t('tables.globalAnchorActions.headers.tokenId.desktop'),
         label: t('tables.globalAnchorActions.headers.tokenId.mobile'),
-        help: t('tables.globalAnchorActions.headers.tokenId.tooltip'),
         value: (row) => row.TokenId,
         cell: (row) => <TokenCell collection={collection} tokenId={row.TokenId} />,
       },
@@ -71,7 +85,6 @@ export const GlobalAnchorActionsTable = ({
         kind: 'address',
         header: t('tables.globalAnchorActions.headers.holderAddress.desktop'),
         label: t('tables.globalAnchorActions.headers.holderAddress.mobile'),
-        help: t('tables.globalAnchorActions.headers.holderAddress.tooltip'),
         value: (row) => row.StakerAddr,
       },
       {
@@ -81,6 +94,8 @@ export const GlobalAnchorActionsTable = ({
         label: t('tables.globalAnchorActions.headers.nftCount.mobile'),
         help: t('tables.globalAnchorActions.headers.nftCount.tooltip'),
         value: (row) => row.NumStakedNFTs,
+        // A running total: the record's action, date, token and holder come first on a phone.
+        priority: 'secondary',
       },
     ],
     [collection, t],
@@ -92,8 +107,6 @@ export const GlobalAnchorActionsTable = ({
       columns={columns}
       ariaLabel={t('tables.globalAnchorActions.label')}
       getRowKey={(row) => row.EvtLogId}
-      getRowHref={(row) => anchorActionHref(collection, row.ActionId)}
-      getRowLabel={(row) => t('anchorActionDetail.breadcrumbs.action', { id: row.ActionId })}
       emptyTitle={t('common.empty.actions.title')}
       emptyDescription={t('common.empty.actions.description')}
       tableClassName="sm:min-w-[44rem] lg:min-w-0"

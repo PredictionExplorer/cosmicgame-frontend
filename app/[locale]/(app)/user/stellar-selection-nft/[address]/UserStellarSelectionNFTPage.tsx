@@ -99,6 +99,7 @@ function UserStellarSelectionNFTPage({ address: rawAddress }: { address: string 
         address={address}
         // An address with nothing selected yet (or whose read failed) reads from its state alone.
         figures={isError || (!isLoading && rows.length === 0) ? undefined : figures}
+        empty={!isLoading && !isError && rows.length === 0}
       />
 
       {isError ? (

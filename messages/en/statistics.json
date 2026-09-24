@@ -19,7 +19,7 @@
     "anchoring": {
       "label": "Anchoring",
       "title": "Anchoring statistics",
-      "description": "Anchor and release actions, currently anchored tokens, and unique anchor-holders for Cosmic Signature and Random Walk NFTs."
+      "description": "Anchor and release actions, currently anchored NFTs, and unique anchor-holders for Cosmic Signature and Random Walk NFTs."
     },
     "activity": {
       "label": "Activity",
@@ -252,11 +252,9 @@
     "cstActiveAnchorHolders": "Wallets currently anchoring at least one Cosmic Signature NFT.",
     "cstAnchorDistributionDeposits": "Total deposit events into the Cosmic Signature NFT Anchor Distribution pool.",
     "cstTotalAnchorDistributions": "Total ETH distributed as Anchor Distributions to Cosmic Signature NFT anchor-holders.",
-    "cstTotalTokensAnchored": "Number of Cosmic Signature NFTs currently anchored in the protocol.",
     "cstUnretrievedAnchorDistributions": "Anchor Distributions allocated but not yet retrieved by Cosmic Signature NFT anchor-holders.",
     "rwlkActiveAnchorHolders": "Wallets currently anchoring at least one Random Walk NFT.",
     "rwlkTotalTokensImprinted": "Total Cosmic Signature NFTs and paired CST imprinted for Random Walk NFT anchor-holders through Anchored-NFT Stellar Selection.",
-    "rwlkTotalTokensAnchored": "Number of Random Walk NFTs currently anchored in the protocol.",
     "cstGroup": "Cosmic Signature NFT anchoring shares ETH Anchor Distributions among currently anchored Cosmic Signature NFTs.",
     "rwlkGroup": "Random Walk NFT anchoring provides eligibility for Anchored-NFT Stellar Selection allocations."
   },
@@ -278,17 +276,10 @@
   },
   "anchoringPage": {
     "snapshot": {
-      "poolLabel": "Anchor Distribution pool",
-      "poolTooltip": "ETH currently allocated to the Anchor Distribution pool for Cosmic Signature NFT anchor-holders.",
-      "poolCaption": "Deposited when this cycle finalizes; earlier deposits not yet retrieved show as Unretrieved.",
-      "perNftLabel": "Distribution per Cosmic Signature NFT",
-      "perNftTooltip": "Current ETH Anchor Distribution per anchored Cosmic Signature NFT: on-chain pool divided by the indexed total of anchored NFTs.",
-      "perNftNoneAnchored": "No anchored Cosmic Signature NFTs indexed yet",
       "activeHoldersLabel": "Active anchor-holders",
       "activeHoldersTooltip": "Distinct wallets that currently anchor at least one Cosmic Signature or Random Walk NFT. A wallet anchoring both kinds counts once."
     },
     "nowTitle": "Anchoring now",
-    "description": "Anchored NFTs are a core part of Cosmic Signature: Cosmic Signature NFTs share ETH Anchor Distributions, while Random Walk NFTs participate in Anchored-NFT Stellar Selection.",
     "historyLink": "Anchor Distributions history",
     "tabs": {
       "cosmicSignature": "Cosmic Signature NFT",
@@ -304,18 +295,17 @@
       "activeHoldersRandomWalk": "Active Random Walk NFT anchor-holders",
       "distributionDeposits": "Number of Anchor Distribution deposits",
       "totalDistributions": "Total Anchor Distributions",
-      "tokensImprinted": "Total tokens imprinted",
-      "tokensAnchored": "Total tokens anchored",
+      "tokensImprinted": "Cosmic Signature NFTs imprinted",
       "unretrievedDistributions": "Unretrieved Anchor Distributions"
     },
     "tables": {
       "actions": "Anchor / release actions",
-      "anchoredTokens": "Anchored tokens",
+      "anchoredTokens": "Anchored NFTs",
       "uniqueHolders": "Unique anchor-holders"
     },
     "empty": {
       "actions": "No anchor actions yet",
-      "tokens": "No tokens currently anchored",
+      "tokens": "No NFTs anchored right now",
       "holders": "No anchor-holders yet"
     }
   },
@@ -633,7 +623,6 @@
   },
   "recipientHistory": {
     "pageTitle": "My Allocation History",
-    "subtitle": "View your past allocation retrievals and distributions",
     "connectedDescription": "Every allocation this wallet has received, cycle by cycle, and whether each was retrieved.",
     "loadError": "Failed to load allocation history",
     "loadErrorDescription": "Please try again in a moment.",

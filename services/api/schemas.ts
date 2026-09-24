@@ -195,6 +195,8 @@ export const RoundInfoSchema = z
     WinnerAddr: AddressSchema,
     AmountEth: z.number(),
     TokenId: z.number(),
+    /** The imprinted Signature's seed, hoisted by `flattenRoundInfo` from `MainPrize.Seed`. */
+    TokenSeed: z.union([z.string(), z.number()]).optional(),
     /**
      * Claim-transaction fields, hoisted by `flattenRoundInfo` from
      * `ClaimPrizeTx.Tx`. A cycle that has not been finalized has no claim

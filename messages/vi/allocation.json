@@ -51,6 +51,7 @@
     "recipientSection": {
       "title": "Người nhận của chu kỳ",
       "description": "Mỗi vai trò dưới đây đã nhận một Cosmic Signature NFT khi chu kỳ hoàn tất.",
+      "rolesInfo": "Phân bổ Signature: người tham gia đặt nét bút cuối cùng. Chiến binh Thời gian: giữ vị trí Quán quân Bền bỉ trong khoảng thời gian liên tục dài nhất. Quán quân Bền bỉ: giữ vị trí nét bút gần nhất trong khoảng thời gian liên tục dài nhất. Nét bút CST cuối cùng: người đặt nét bút cuối cùng của chu kỳ bằng CST.",
       "cards": {
         "signature": {
           "title": "Phân bổ Signature"
@@ -68,7 +69,7 @@
     },
     "distribution": {
       "title": "Cơ cấu phân bổ",
-      "tooltip": "Cách ETH được phân bổ trong chu kỳ này chia theo từng luồng phân bổ. Phần còn lại của dự trữ chu kỳ chuyển sang chu kỳ tiếp theo và không hiển thị ở đây.",
+      "tooltip": "Tỷ lệ của từng luồng trong dự trữ chu kỳ khi chu kỳ này hoàn tất, cùng cách chia như trang “Người nhận phân bổ”. Phần chưa được phân bổ chuyển sang chu kỳ tiếp theo.",
       "total": "Đã phân bổ {amount} ETH trong chu kỳ này"
     },
     "statistics": {
@@ -90,11 +91,11 @@
           "label": "NFT đính kèm"
         },
         "anchoredTokens": {
-          "label": "Token đang neo giữ"
+          "label": "NFT đang neo giữ"
         },
         "uniqueAnchorHolders": {
           "label": "Người neo giữ riêng biệt",
-          "tooltip": "Số địa chỉ riêng biệt có token neo giữ trong chu kỳ này."
+          "tooltip": "Số địa chỉ riêng biệt có NFT neo giữ trong chu kỳ này."
         },
         "totalContributed": {
           "label": "ETH đã đóng góp",
@@ -137,15 +138,15 @@
   },
   "missingCycle": {
     "open": {
-      "title": "Chu kỳ {cycle} vẫn đang diễn ra",
+      "title": "Chu kỳ #{cycle} vẫn đang diễn ra",
       "body": "Bản ghi phân bổ của chu kỳ sẽ xuất hiện ở đây sau khi chu kỳ hoàn tất."
     },
     "notStarted": {
-      "title": "Chu kỳ {cycle} chưa bắt đầu",
-      "body": "Các chu kỳ diễn ra lần lượt, và chu kỳ đang mở hiện nay là chu kỳ {live}."
+      "title": "Chu kỳ #{cycle} chưa bắt đầu",
+      "body": "Các chu kỳ diễn ra lần lượt, và chu kỳ đang mở hiện nay là chu kỳ #{live}."
     },
     "unknown": {
-      "title": "Chưa có bản ghi của chu kỳ {cycle}",
+      "title": "Chưa có bản ghi của chu kỳ #{cycle}",
       "body": "Chu kỳ có thể vẫn đang diễn ra, hoặc bản ghi vẫn đang được lập chỉ mục."
     },
     "currentCycle": "Theo dõi chu kỳ hiện tại"
@@ -165,20 +166,20 @@
       "status": "Đang tải chu kỳ đã hoàn tất"
     },
     "pending": {
-      "successTitle": "Chu kỳ {cycle} đã hoàn tất",
+      "successTitle": "Chu kỳ #{cycle} đã hoàn tất",
       "successBody": "Việc hoàn tất đã được ghi trên chuỗi. Bản ghi sẽ hiện ở đây ngay khi được lập chỉ mục; trang này tự cập nhật."
     },
     "links": {
-      "viewCycle": "Xem chu kỳ {cycle}",
+      "viewCycle": "Xem chu kỳ #{cycle}",
       "myAllocations": "Phân bổ của tôi",
       "allRecipients": "Người nhận phân bổ",
       "allCycles": "Tất cả chu kỳ"
     },
     "result": {
-      "title": "Phân bổ Signature của chu kỳ {cycle}",
-      "successTitle": "Chúc mừng! Phân bổ Signature của chu kỳ {cycle} là của bạn",
+      "title": "Phân bổ Signature của chu kỳ #{cycle}",
+      "successTitle": "Chúc mừng! Phân bổ Signature của chu kỳ #{cycle} là của bạn",
       "lede": "Những gì người đặt nét bút cuối cùng nhận được khi chu kỳ hoàn tất.",
-      "successLede": "Bạn đã đặt nét bút cuối cùng của chu kỳ {cycle}. ETH, CST và Cosmic Signature này đã có trong ví của bạn.",
+      "successLede": "Bạn đã đặt nét bút cuối cùng của chu kỳ #{cycle}. ETH, CST và Cosmic Signature này đã có trong ví của bạn.",
       "componentsTitle": "Phân bổ gồm những gì",
       "eth": "ETH",
       "cst": "CST",

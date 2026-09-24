@@ -44,7 +44,7 @@
         "cards": {
           "actions": {
             "label": "Thao tác neo giữ / gỡ neo",
-            "tooltip": "Mỗi lần một Cosmic Signature NFT hoặc Random Walk NFT được neo giữ hoặc gỡ neo."
+            "tooltip": "Mọi lượt neo giữ và gỡ neo Cosmic Signature NFT hoặc Random Walk NFT kể từ khi mở neo giữ."
           },
           "ethDeposits": {
             "label": "Số đợt nạp ETH phân phối neo giữ",

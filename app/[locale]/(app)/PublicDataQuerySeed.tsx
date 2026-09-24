@@ -62,7 +62,9 @@ async function getRouteSeeds(route: SeoSummaryRoute): Promise<QuerySeedEntry[]> 
         },
       ];
     }
-    // These pages read other data on the client (a cycle from the URL, contract state).
+    // These pages seed their own reads in their page.tsx (anchoring: its four ledgers;
+    // allocation-finalized: the cycle the URL names, or the index), or read contract state
+    // on the client (imprint).
     case 'anchoring':
     case 'imprint':
     case 'allocation-finalized':

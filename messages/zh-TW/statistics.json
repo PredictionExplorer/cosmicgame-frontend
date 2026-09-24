@@ -19,7 +19,7 @@
     "anchoring": {
       "label": "錨定",
       "title": "錨定統計",
-      "description": "檢視 Cosmic Signature NFT 與 Random Walk NFT 的錨定和解錨操作、目前已錨定代幣及獨立錨定者。"
+      "description": "檢視 Cosmic Signature NFT 與 Random Walk NFT 的錨定和解錨操作、目前已錨定的 NFT 及獨立錨定者。"
     },
     "activity": {
       "label": "活動",
@@ -252,11 +252,9 @@
     "cstActiveAnchorHolders": "目前至少錨定一枚 Cosmic Signature NFT 的錢包。",
     "cstAnchorDistributionDeposits": "Cosmic Signature NFT 錨定配發池的累計存入事件數。",
     "cstTotalAnchorDistributions": "向 Cosmic Signature NFT 錨定者配發的 ETH 總額。",
-    "cstTotalTokensAnchored": "協議中目前已錨定的 Cosmic Signature NFT 數量。",
     "cstUnretrievedAnchorDistributions": "已分配但尚未由 Cosmic Signature NFT 錨定者取回的錨定配發。",
     "rwlkActiveAnchorHolders": "目前至少錨定一枚 Random Walk NFT 的錢包。",
     "rwlkTotalTokensImprinted": "透過錨定 NFT 星選，為 Random Walk NFT 錨定者銘刻的 Cosmic Signature NFT 與配套 CST 總量。",
-    "rwlkTotalTokensAnchored": "協議中目前已錨定的 Random Walk NFT 數量。",
     "cstGroup": "Cosmic Signature NFT 錨定會在目前已錨定的 Cosmic Signature NFT 之間分配 ETH 錨定配發。",
     "rwlkGroup": "錨定 Random Walk NFT 可獲得錨定 NFT 星選資格。"
   },
@@ -278,17 +276,10 @@
   },
   "anchoringPage": {
     "snapshot": {
-      "poolLabel": "錨定配發池",
-      "poolTooltip": "目前分配至 Cosmic Signature NFT 錨定者配發池的 ETH。",
-      "poolCaption": "本週期收官時存入；此前已存入但尚未取回的部分計入「未取回」。",
-      "perNftLabel": "每枚 Cosmic Signature NFT 配發額",
-      "perNftTooltip": "目前每枚已錨定 Cosmic Signature NFT 對應的 ETH 錨定配發：鏈上配發池除以已索引的已錨定 NFT 總數。",
-      "perNftNoneAnchored": "尚未索引到已錨定的 Cosmic Signature NFT",
       "activeHoldersLabel": "活躍錨定者",
       "activeHoldersTooltip": "目前至少錨定一枚 Cosmic Signature NFT 或 Random Walk NFT 的不同錢包數；同時錨定兩類 NFT 的錢包只計一次。"
     },
     "nowTitle": "目前錨定",
-    "description": "已錨定 NFT 是 Cosmic Signature 的核心組成部分：Cosmic Signature NFT 共享 ETH 錨定配發；Random Walk NFT 則參與錨定 NFT 星選。",
     "historyLink": "檢視錨定歷史",
     "tabs": {
       "cosmicSignature": "Cosmic Signature NFT",
@@ -304,18 +295,17 @@
       "activeHoldersRandomWalk": "活躍 Random Walk NFT 錨定者數量",
       "distributionDeposits": "錨定配發存入次數",
       "totalDistributions": "錨定配發總額",
-      "tokensImprinted": "已銘刻代幣總數",
-      "tokensAnchored": "已錨定代幣總數",
+      "tokensImprinted": "已銘刻的 Cosmic Signature NFT",
       "unretrievedDistributions": "未取回錨定配發"
     },
     "tables": {
       "actions": "錨定與解錨操作",
-      "anchoredTokens": "已錨定代幣",
+      "anchoredTokens": "已錨定的 NFT",
       "uniqueHolders": "獨立錨定者"
     },
     "empty": {
       "actions": "暫無錨定操作",
-      "tokens": "目前暫無已錨定代幣",
+      "tokens": "目前暫無已錨定的 NFT",
       "holders": "暫無錨定者"
     }
   },
@@ -633,7 +623,6 @@
   },
   "recipientHistory": {
     "pageTitle": "我的分配歷史",
-    "subtitle": "檢視過去取回的分配與發放紀錄",
     "connectedDescription": "此錢包在各週期收到的每一筆分配，以及是否已取回。",
     "loadError": "未能載入分配歷史",
     "loadErrorDescription": "請稍後再試。",

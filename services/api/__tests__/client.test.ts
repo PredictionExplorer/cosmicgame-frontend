@@ -857,6 +857,7 @@ describe('client helper functions', () => {
         EthAmountEth: 1.5,
         NftTokenId: 42,
         CstAmountEth: 10,
+        Seed: '5084a87375896c7103ba17b57264f20de35d9e6eb545314680ad5e074dfc33ad',
       },
       CharityDeposit: {
         CharityAddress: '0xcharity',
@@ -900,6 +901,11 @@ describe('client helper functions', () => {
       expect(result).toHaveProperty('WinnerAddr', '0xwinner');
       expect(result).toHaveProperty('AmountEth', 1.5);
       expect(result).toHaveProperty('TokenId', 42);
+      // The imprinted Signature's seed: a finalized cycle's art without a token read.
+      expect(result).toHaveProperty(
+        'TokenSeed',
+        '5084a87375896c7103ba17b57264f20de35d9e6eb545314680ad5e074dfc33ad',
+      );
       expect(result).toHaveProperty('CharityAddress', '0xcharity');
       expect(result).toHaveProperty('CharityAmountETH', 0.5);
       expect(result).toHaveProperty('StakingDepositAmountEth', 0.3);

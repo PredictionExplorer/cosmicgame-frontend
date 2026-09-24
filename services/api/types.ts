@@ -230,6 +230,11 @@ export interface RoundInfo {
   WinnerAddr: string;
   AmountEth: number;
   TokenId: number;
+  /**
+   * The seed of the Signature the cycle imprinted (`MainPrize.Seed`): enough to
+   * draw it without reading the token or the whole collection.
+   */
+  TokenSeed?: string | number;
   TxHash: string;
   TimeStamp: number;
   DateTime: string;

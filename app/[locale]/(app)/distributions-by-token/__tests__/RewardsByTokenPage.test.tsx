@@ -97,9 +97,33 @@ describe('RewardsByTokenPage', () => {
     ).toBeInTheDocument();
   });
 
-  it('explains an empty record and leads back to the ledger', () => {
-    mockDetails.mockReturnValue({ data: {}, isLoading: false, isError: false, refetch: jest.fn() });
+  it('names each deposit’s cycle as a word-sized link', () => {
     render(<RewardsByTokenPage address={HOLDER} tokenId={0} />);
+    expect(
+      screen.getByRole('link', { name: 'common.pageHeader.crumbs.cycle(cycle=2)' }),
+    ).toHaveAttribute('href', '/allocation/2');
+  });
+
+  it('names an unnamed token once in its wall label, a named one with its number', () => {
+    const { unmount } = render(<RewardsByTokenPage address={HOLDER} tokenId={45} />);
+    // The title already reads "Cosmic Signature #000045": the number is not repeated.
+    expect(screen.getAllByText('anchoring.art.signatureTitle(id=#000045)').length).toBeGreaterThan(
+      0,
+    );
+    expect(screen.queryByText('#000045')).toBeNull();
+    unmount();
+    mockCstInfo.mockReturnValue({
+      data: { TokenId: 45, Seed: 'abc', RoundNum: 1, TokenName: 'Aurora' },
+      isLoading: false,
+    });
+    render(<RewardsByTokenPage address={HOLDER} tokenId={45} />);
+    expect(screen.getByText('#000045')).toBeInTheDocument();
+  });
+
+  it('explains an empty record once, with no zero figures above it', () => {
+    mockDetails.mockReturnValue({ data: {}, isLoading: false, isError: false, refetch: jest.fn() });
+    const { container } = render(<RewardsByTokenPage address={HOLDER} tokenId={0} />);
+    expect(container.querySelector('[data-figure]')).toBeNull();
     expect(
       screen.getByRole('heading', { name: 'anchoring.distributionsByToken.empty.title' }),
     ).toBeInTheDocument();

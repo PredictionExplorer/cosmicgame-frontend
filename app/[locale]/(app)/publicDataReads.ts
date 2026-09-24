@@ -1,4 +1,5 @@
 import { cache } from 'react';
+import { unstable_cache } from 'next/cache';
 import { createPublicClient, http, isAddress, type Address } from 'viem';
 
 import { activeChain } from '@/config/chains';
@@ -52,9 +53,35 @@ function timedRead<T>(read: () => Promise<T>): () => Promise<TimedRead<T>> {
   });
 }
 
+/** How long a shared read serves every request before one of them refreshes it. */
+const SHARED_READ_SECONDS = 60;
+
+/**
+ * A read shared across requests through Next's data cache as well: every
+ * request within `SHARED_READ_SECONDS` of it gets the same answer (then one
+ * request refreshes it while the others still get the last one). For reads a
+ * dynamic route makes on every request (/allocation-finalized reads the query
+ * string), and a prerender makes once per locale. `at` stays the time the
+ * data was read, not the time it was served. A failed read is not cached.
+ */
+function sharedTimedRead<T>(key: string, read: () => Promise<T>): () => Promise<TimedRead<T>> {
+  const shared = unstable_cache(
+    async () => ({ data: await read(), at: Date.now() }),
+    ['public-data', key],
+    { revalidate: SHARED_READ_SECONDS },
+  );
+  return cache(async () => {
+    try {
+      return await shared();
+    } catch {
+      return { data: null, at: Date.now() };
+    }
+  });
+}
+
 export const readDashboard = timedRead(() => get_dashboard_info());
-export const readRoundList = timedRead(() => get_round_list());
-export const readClaimHistory = timedRead(() => get_claim_history());
+export const readRoundList = sharedTimedRead('round-list', () => get_round_list());
+export const readClaimHistory = sharedTimedRead('claim-history', () => get_claim_history());
 export const readAnchorCstActions = timedRead(() => get_staking_cst_actions());
 export const readAnchorRwalkActions = timedRead(() => get_staking_rwalk_actions());
 export const readAnchorEthDeposits = timedRead(() => get_staking_cst_rewards());

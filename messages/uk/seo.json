@@ -44,7 +44,7 @@
         "cards": {
           "actions": {
             "label": "Дії закріплення / відкріплення",
-            "tooltip": "Кожне закріплення або відкріплення Cosmic Signature NFT чи Random Walk NFT."
+            "tooltip": "Усі закріплення та відкріплення Cosmic Signature і Random Walk NFT відтоді, як закріплення стало доступним."
           },
           "ethDeposits": {
             "label": "Депозити ETH надходжень за закріплення",

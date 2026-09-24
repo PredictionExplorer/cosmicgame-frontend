@@ -16,9 +16,11 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { locale, IsRwalk, actionId } = await params;
   const t = await getTranslations({ locale, namespace: 'meta' });
+  const tAnchoring = await getTranslations({ locale, namespace: 'anchoring' });
   return createPageMetadata(
     parent,
-    t('anchorAction.title'),
+    // Titled like its H1 ("Anchor action #23"), so every action's tab says which one it is.
+    tAnchoring('anchorActionDetail.title', { id: actionId }),
     t('anchorAction.description'),
     undefined,
     `/anchor-action/${IsRwalk}/${actionId}`,

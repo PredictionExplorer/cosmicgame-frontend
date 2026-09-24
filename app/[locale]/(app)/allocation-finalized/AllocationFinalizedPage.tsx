@@ -2,12 +2,13 @@
 
 import type { ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 import { usePublicClient } from 'wagmi';
 import { useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
+import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
+import { cn } from '@/lib/utils';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { AddressChip } from '@/components/ui/address-chip';
 import { Amount } from '@/components/ui/amount';
@@ -37,6 +38,8 @@ import { toFiniteNumber } from '@/utils/finiteNumber';
 import { sameAddress } from '@/utils/format';
 import { formatId } from '@/utils/format/ids';
 
+import { FinalizedSignatureSkeleton } from './FinalizedSignatureSkeleton';
+
 /** Poll interval while waiting for the next cycle to become active (chain activation time). */
 const ACTIVATION_POLL_MS = 4000;
 /** Poll interval while the indexer has not yet recorded the cycle a participant just finalized. */
@@ -44,33 +47,40 @@ const RECORD_POLL_MS = 5000;
 /** How many finalized cycles the page shows when no cycle is named. */
 const INDEX_CYCLES = 3;
 
-/** The cycle number of the `cycle` query parameter, or `null` when it is not one. */
-function cycleParam(raw: string | null): number | null {
-  if (raw === null || !/^\d+$/.test(raw)) return null;
-  const cycle = Number.parseInt(raw, 10);
-  return Number.isSafeInteger(cycle) ? cycle : null;
+interface AllocationFinalizedPageProps {
+  /** The cycle of `?cycle=N`, read on the server; `null` shows the index of the latest cycles. */
+  cycle: number | null;
+  /** The reader arrived from their own finalization (`?message=success`). */
+  isClaimSuccess: boolean;
+  /** The server-rendered header of the index. */
+  seoSummary?: ReactNode;
 }
 
 /**
  * The page a participant lands on after finalizing a cycle, and the public
  * record of any finalized cycle's Signature Allocation.
  *
- * - With `?cycle=N`: the cycle's new Signature on its plate (revealed as it
+ * - With a cycle: the cycle's new Signature on its plate (revealed as it
  *   arrives, on the moment it was received) beside what the Signature
  *   Allocation holds: ETH, CST, the NFT, attached NFTs and the recipient.
- *   Only the recipient, arriving from their own finalization, is
- *   congratulated; everyone else reads a neutral record.
+ *   Only the recipient's own wallet, arriving from their finalization, is
+ *   congratulated; everyone else, and anyone whose wallet is still
+ *   connecting, reads the neutral record.
  * - Without a cycle: the server-rendered summary and the latest finalized
  *   cycles, each shown by its Signature.
+ *
+ * The server reads the query and seeds the record, so the first HTML is the
+ * page. Every state of a cycle's record keeps the same header (title and
+ * lede) over a body of the same shape, so nothing moves while it loads.
  */
-const AllocationFinalizedPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
+const AllocationFinalizedPage = ({
+  cycle,
+  isClaimSuccess,
+  seoSummary,
+}: AllocationFinalizedPageProps) => {
   const t = useTranslations('allocation');
   const tCommon = useTranslations('common');
-  const searchParams = useSearchParams();
   const { account } = useActiveWeb3React();
-
-  const cycle = cycleParam(searchParams.get('cycle'));
-  const isClaimSuccess = searchParams.get('message') === 'success';
 
   const { data: allocationInfo, isLoading, isError, error, refetch } = useRoundInfo(cycle ?? -1);
   const missingCycle = useMissingCycle(cycle ?? 0);
@@ -111,14 +121,43 @@ const AllocationFinalizedPage = ({ seoSummary }: { seoSummary?: ReactNode }) => 
     { label: tCommon('pageHeader.crumbs.cycle', { cycle }), href: `/allocation/${cycle}` },
   ];
 
-  if (isLoading) {
+  // The neutral record's header: the loading and error states keep it, so the record lands
+  // under the same title and lede.
+  const recordHeader = (
+    <PageHeader
+      section="records"
+      breadcrumbs={trail}
+      title={t('finalized.result.title', { cycle })}
+      subtitle={t('finalized.result.lede')}
+    />
+  );
+
+  // Arriving from their own finalization, the participant waits for the indexer here: the
+  // same header while the first read loads and while the indexer catches up.
+  if (isClaimSuccess && (isLoading || (!allocationInfo && missing))) {
     return (
       <PageShell variant="data" backdrop="signature">
         <PageHeader
           section="records"
           breadcrumbs={trail}
-          title={t('finalized.result.title', { cycle })}
-        />
+          title={t('finalized.pending.successTitle', { cycle })}
+          subtitle={t('finalized.pending.successBody')}
+          related={[
+            { href: `/allocation/${cycle}`, label: t('finalized.links.viewCycle', { cycle }) },
+            { href: '/my-allocations', label: t('finalized.links.myAllocations') },
+          ]}
+        >
+          {nextCycleNotice}
+        </PageHeader>
+        <FinalizedSignatureSkeleton label={t('finalized.loading.status')} />
+      </PageShell>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <PageShell variant="data" backdrop="signature">
+        {recordHeader}
         <FinalizedSignatureSkeleton label={t('finalized.loading.status')} />
       </PageShell>
     );
@@ -127,11 +166,7 @@ const AllocationFinalizedPage = ({ seoSummary }: { seoSummary?: ReactNode }) => 
   if (isError && !missing) {
     return (
       <PageShell variant="data" backdrop="signature">
-        <PageHeader
-          section="records"
-          breadcrumbs={trail}
-          title={t('finalized.result.title', { cycle })}
-        />
+        {recordHeader}
         <ErrorState
           headingLevel={2}
           title={t('details.error.title')}
@@ -143,26 +178,6 @@ const AllocationFinalizedPage = ({ seoSummary }: { seoSummary?: ReactNode }) => 
   }
 
   if (!allocationInfo) {
-    // Arriving from their own finalization, the participant waits for the indexer here.
-    if (isClaimSuccess) {
-      return (
-        <PageShell variant="data" backdrop="signature">
-          <PageHeader
-            section="records"
-            breadcrumbs={trail}
-            title={t('finalized.pending.successTitle', { cycle })}
-            subtitle={t('finalized.pending.successBody')}
-            related={[
-              { href: `/allocation/${cycle}`, label: t('finalized.links.viewCycle', { cycle }) },
-              { href: '/my-allocations', label: t('finalized.links.myAllocations') },
-            ]}
-          >
-            {nextCycleNotice}
-          </PageHeader>
-          <FinalizedSignatureSkeleton label={t('finalized.loading.status')} />
-        </PageShell>
-      );
-    }
     return (
       <PageShell variant="data" backdrop="signature">
         <PageHeader
@@ -176,27 +191,23 @@ const AllocationFinalizedPage = ({ seoSummary }: { seoSummary?: ReactNode }) => 
     );
   }
 
-  const isRecipient = sameAddress(account, allocationInfo.WinnerAddr);
   // Congratulations belong to the participant who finalized: arriving from their own
-  // finalization, and, when a wallet is connected, holding the recipient's address.
-  const congratulate = isClaimSuccess && (!account || isRecipient);
+  // finalization with the recipient's wallet connected. A shared or bookmarked success link,
+  // another wallet, or one still reconnecting reads the neutral record.
+  const congratulate = isClaimSuccess && sameAddress(account, allocationInfo.WinnerAddr);
 
   return (
     <PageShell variant="data" backdrop="signature">
-      <PageHeader
-        section="records"
-        breadcrumbs={trail}
-        title={
-          congratulate
-            ? t('finalized.result.successTitle', { cycle: allocationInfo.RoundNum })
-            : t('finalized.result.title', { cycle: allocationInfo.RoundNum })
-        }
-        subtitle={
-          congratulate
-            ? t('finalized.result.successLede', { cycle: allocationInfo.RoundNum })
-            : t('finalized.result.lede')
-        }
-      />
+      {congratulate ? (
+        <PageHeader
+          section="records"
+          breadcrumbs={trail}
+          title={t('finalized.result.successTitle', { cycle: allocationInfo.RoundNum })}
+          subtitle={t('finalized.result.successLede', { cycle: allocationInfo.RoundNum })}
+        />
+      ) : (
+        recordHeader
+      )}
       <FinalizedSignature allocation={allocationInfo} reveal={congratulate}>
         {congratulate ? <NextSteps /> : null}
         {nextCycleNotice}
@@ -211,6 +222,8 @@ interface FinalizedAllocation {
   AmountEth: number;
   CSTAmountEth: number;
   TokenId: number;
+  /** The Signature's seed, from the record itself: the art needs no token read. */
+  TokenSeed?: string | number;
   TxHash: string;
   TimeStamp: number;
   RoundStats: { TotalDonatedNFTs?: unknown };
@@ -240,7 +253,11 @@ function FinalizedSignature({
   const name = typeof token?.TokenName === 'string' ? token.TokenName.trim() : '';
   const rendering = isRenderPending(allocation.TimeStamp, nowMs);
   const attached = toFiniteNumber(allocation.RoundStats?.TotalDonatedNFTs) ?? 0;
-  const sources = useMemo(() => signatureSources(signatureMedia(token?.Seed)), [token?.Seed]);
+  // The record carries its Signature's seed; the token read adds the name (and the seed when
+  // an older record lacks it).
+  const seed = token?.Seed ?? allocation.TokenSeed;
+  const artPending = seed === undefined && loadingToken;
+  const sources = useMemo(() => signatureSources(signatureMedia(seed)), [seed]);
 
   return (
     <section
@@ -252,7 +269,7 @@ function FinalizedSignature({
         {hasToken ? (
           <Link href={`/detail/${allocation.TokenId}`} tabIndex={-1} aria-hidden className="block">
             {/* The seed is on its way: a busy plate, never "Artwork unavailable". */}
-            {loadingToken ? (
+            {artPending ? (
               <PendingPlate busy />
             ) : (
               <SignatureReveal
@@ -279,10 +296,10 @@ function FinalizedSignature({
                 {name || t('formats.cosmicSignatureToken', { token: id.replace(/^#/, '') })}
               </Link>
             }
+            // The finalization moment is the spec sheet's "Finalized" row, not repeated here.
             meta={[
               name ? <span className="type-mono">{id}</span> : null,
-              t('formats.cycle', { cycle: allocation.RoundNum }),
-              allocation.TimeStamp ? <DateTime timestamp={allocation.TimeStamp} /> : null,
+              t('formats.cycleHash', { cycle: allocation.RoundNum }),
             ]}
           />
         ) : null}
@@ -293,9 +310,10 @@ function FinalizedSignature({
           {t('finalized.result.componentsTitle')}
         </h2>
         <SpecList className="mt-4">
+          {/* A spec sheet is a ledger: ETH at ledger precision, as the cycle's own distribution
+              legend prints it (the full value is on hover); CST as the cycle's cards print it. */}
           <SpecRow label={t('finalized.result.eth')}>
-            {/* The precision of the cycle's own page (its header figure); the full value is on hover. */}
-            <Amount value={allocation.AmountEth} unit="ETH" context="hero" />
+            <Amount value={allocation.AmountEth} unit="ETH" context="table" />
           </SpecRow>
           <SpecRow label={t('finalized.result.cst')}>
             <Amount value={allocation.CSTAmountEth} unit="CST" />
@@ -333,7 +351,7 @@ function FinalizedSignature({
             <TxExplorerLink
               hash={allocation.TxHash}
               label={t('finalized.result.viewTransaction')}
-              className="type-body-sm"
+              className={cn('type-body-sm', TOUCH_TARGET_TEXT_LINK_CLASS)}
             />
           ) : null}
         </div>
@@ -430,34 +448,6 @@ function NextSteps() {
   );
 }
 
-/** The layout of FinalizedSignature while it loads, so nothing moves when it arrives. */
-function FinalizedSignatureSkeleton({ label }: { label: string }) {
-  return (
-    <div
-      role="status"
-      aria-label={label}
-      className="grid gap-x-12 gap-y-10 lg:grid-cols-12 lg:items-start"
-    >
-      <div className="flex flex-col gap-4 lg:col-span-7">
-        <PendingPlate busy />
-        <Skeleton className="h-5 w-56" />
-        <Skeleton className="h-3.5 w-40" />
-      </div>
-      <div className="lg:col-span-5">
-        <Skeleton className="h-6 w-48" />
-        <div className="mt-4 divide-y divide-rule-faint border-y border-rule-faint">
-          {Array.from({ length: 5 }, (_, index) => (
-            <div key={index} className="flex min-h-[var(--row-h)] items-center justify-between">
-              <Skeleton className="h-3.5 w-24" />
-              <Skeleton className="h-4 w-32" />
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 /**
  * Without a cycle: the latest finalized cycles, each shown by the Signature it imprinted, and
  * the way to every cycle.
@@ -466,11 +456,14 @@ function FinalizedCycleIndex() {
   const t = useTranslations('allocation');
   const tDetail = useTranslations('detail');
   const { data: cycles, isLoading, isError, refetch } = useRoundList();
-  const signatures = useSignatureIndex();
   const latest = useMemo(
     () => [...(cycles ?? [])].sort((a, b) => b.RoundNum - a.RoundNum).slice(0, INDEX_CYCLES),
     [cycles],
   );
+  // Each record carries its Signature's seed; the collection is read only for one that lacks it.
+  const signatures = useSignatureIndex({
+    enabled: latest.some((round) => round.TokenSeed === undefined),
+  });
 
   let body: ReactNode;
   if (!cycles && isError) {
@@ -516,8 +509,8 @@ function FinalizedCycleIndex() {
                 <li key={round.RoundNum}>
                   <SignatureCard
                     tokenId={round.TokenId}
-                    seed={signatures.get(round.TokenId)?.seed}
-                    artState={signatures.state}
+                    seed={round.TokenSeed ?? signatures.get(round.TokenId)?.seed}
+                    artState={round.TokenSeed === undefined ? signatures.state : 'ready'}
                     href={`/allocation/${round.RoundNum}`}
                     title={t('formats.cycleHash', { cycle: round.RoundNum })}
                     meta={[

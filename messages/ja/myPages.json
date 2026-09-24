@@ -52,7 +52,7 @@
         "caption": "解除時に受け取ります。解除は取り消せません。"
       },
       "distributionPerNft": {
-        "label": "Cosmic Signature NFTあたりの配分",
+        "label": "係留NFTごと",
         "tooltip": "係留中のCosmic Signature NFT 1点あたりの現在のETH係留配分。係留プール全体（オンチェーン）を、インデックス済みの係留Cosmic Signature NFT数で割って計算します。",
         "noneAnchored": "係留中のCosmic Signature NFTはまだインデックスされていません"
       }

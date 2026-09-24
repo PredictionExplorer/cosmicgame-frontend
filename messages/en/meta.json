@@ -38,8 +38,8 @@
     "description": "Cosmic Signature NFT ownership, CST (ERC-20) balance distribution, total supply history, and assets attached to gestures."
   },
   "statisticsAnchoring": {
-    "title": "Anchoring Statistics",
-    "description": "Anchor and release actions, currently anchored tokens, and unique anchor-holders for Cosmic Signature and RandomWalk NFTs."
+    "title": "Anchoring statistics",
+    "description": "Anchor and release actions, currently anchored NFTs, and unique anchor-holders for Cosmic Signature and Random Walk NFTs."
   },
   "statisticsActivity": {
     "title": "Gesture Activity Statistics",
@@ -105,7 +105,6 @@
     "description": "Complete history of protocol parameter adjustments in Cosmic Signature. Track Gesture-Cost step-ups, cycle time additions, Anchor Distribution settings, and other coordination updates."
   },
   "distributionsByToken": {
-    "title": "Distributions by Token",
     "description": "Anchor Distribution details for a specific Cosmic Signature NFT — per-cycle ETH distribution history, retrieval status, and cumulative Anchor Distributions."
   },
   "mint": {
@@ -125,7 +124,6 @@
     "descriptionFor": "Detailed allocation information for Cosmic Signature cycle #{id} — recipient details, Signature Allocation distribution, Stellar Selection results, and attached NFT allocations."
   },
   "anchorAction": {
-    "title": "Anchor Action Detail",
     "description": "Details of a specific anchor action in Cosmic Signature — token type, anchored amounts, and distribution retrieval status."
   },
   "pageTerms": {

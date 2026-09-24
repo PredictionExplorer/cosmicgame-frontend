@@ -8,6 +8,8 @@ import { cn } from '@/lib/utils';
 const STEPS = ['anchor', 'receive', 'release'] as const;
 
 interface AnchoringStepsProps {
+  /** Rendered on My Anchors itself: the first step names the page without linking to it. */
+  onMyAnchors?: boolean;
   className?: string;
 }
 
@@ -16,7 +18,7 @@ interface AnchoringStepsProps {
  * NFT receives, and how it ends (releasing is permanent). Numbered with
  * hairlines between steps; the figures come from `content/protocol-facts.ts`.
  */
-export function AnchoringSteps({ className }: AnchoringStepsProps) {
+export function AnchoringSteps({ onMyAnchors = false, className }: AnchoringStepsProps) {
   const t = useTranslations('anchoring');
   const values = {
     percentage: protocolFacts.anchorDistributionPercentage,
@@ -35,11 +37,14 @@ export function AnchoringSteps({ className }: AnchoringStepsProps) {
             <p className="type-body-sm leading-relaxed text-muted-foreground">
               {t.rich(`steps.${step}.body`, {
                 ...values,
-                link: (chunks) => (
-                  <Link href="/my-anchors" className="link">
-                    {chunks}
-                  </Link>
-                ),
+                link: (chunks) =>
+                  onMyAnchors ? (
+                    <span className="text-foreground">{chunks}</span>
+                  ) : (
+                    <Link href="/my-anchors" className="link">
+                      {chunks}
+                    </Link>
+                  ),
               })}
             </p>
           </div>

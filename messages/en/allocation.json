@@ -51,6 +51,7 @@
     "recipientSection": {
       "title": "Cycle recipients",
       "description": "Each role received a Cosmic Signature NFT when the cycle was finalized.",
+      "rolesInfo": "Signature Allocation: the participant who made the Final Gesture. Chrono-Warrior: held the Endurance Champion position for the longest consecutive interval. Endurance Champion: stayed the most recent gesture maker for the longest consecutive interval. Final CST Gesture: made the cycle's last gesture with CST.",
       "cards": {
         "signature": {
           "title": "Signature Allocation"
@@ -68,7 +69,7 @@
     },
     "distribution": {
       "title": "Allocation distribution",
-      "tooltip": "How the ETH distributed this cycle splits across allocation tracks. The rest of the Cycle Reserve carries into the next cycle and is not shown here.",
+      "tooltip": "Each track's share of the Cycle Reserve when this cycle was finalized, the same split the Allocation Recipients page shows. What was not allocated carries into the next cycle.",
       "total": "{amount} ETH distributed this cycle"
     },
     "statistics": {
@@ -90,11 +91,11 @@
           "label": "Attached NFTs"
         },
         "anchoredTokens": {
-          "label": "Anchored tokens"
+          "label": "Anchored NFTs"
         },
         "uniqueAnchorHolders": {
           "label": "Unique anchor-holders",
-          "tooltip": "How many unique addresses had tokens anchored during this cycle."
+          "tooltip": "How many unique addresses had NFTs anchored during this cycle."
         },
         "totalContributed": {
           "label": "Contributed ETH",
@@ -137,15 +138,15 @@
   },
   "missingCycle": {
     "open": {
-      "title": "Cycle {cycle} is still open",
+      "title": "Cycle #{cycle} is still open",
       "body": "Its allocation record appears here once the cycle is finalized."
     },
     "notStarted": {
-      "title": "Cycle {cycle} hasn't started",
-      "body": "Cycles run one at a time, and Cycle {live} is the one open now."
+      "title": "Cycle #{cycle} hasn't started",
+      "body": "Cycles run one at a time, and Cycle #{live} is the one open now."
     },
     "unknown": {
-      "title": "No record of Cycle {cycle} yet",
+      "title": "No record of Cycle #{cycle} yet",
       "body": "The cycle may still be open, or its record is still being indexed."
     },
     "currentCycle": "Follow the current cycle"
@@ -165,20 +166,20 @@
       "status": "Loading the finalized cycle"
     },
     "pending": {
-      "successTitle": "Cycle {cycle} is finalized",
+      "successTitle": "Cycle #{cycle} is finalized",
       "successBody": "Your finalization is on-chain. Its record appears here as soon as it is indexed; this page updates by itself."
     },
     "links": {
-      "viewCycle": "View Cycle {cycle}",
+      "viewCycle": "View Cycle #{cycle}",
       "myAllocations": "My Allocations",
       "allRecipients": "Allocation Recipients",
       "allCycles": "All cycles"
     },
     "result": {
-      "title": "Cycle {cycle} Signature Allocation",
-      "successTitle": "Congratulations! The Cycle {cycle} Signature Allocation is yours",
+      "title": "Cycle #{cycle} Signature Allocation",
+      "successTitle": "Congratulations! The Cycle #{cycle} Signature Allocation is yours",
       "lede": "What the participant who made the Final Gesture received when the cycle was finalized.",
-      "successLede": "You made the Final Gesture of Cycle {cycle}. The ETH, the CST and this Signature are now in your wallet.",
+      "successLede": "You made the Final Gesture of Cycle #{cycle}. The ETH, the CST and this Signature are now in your wallet.",
       "componentsTitle": "What the allocation holds",
       "eth": "ETH",
       "cst": "CST",

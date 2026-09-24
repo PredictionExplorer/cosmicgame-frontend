@@ -51,6 +51,7 @@
     "recipientSection": {
       "title": "週期獲配者",
       "description": "週期收官時，以下每個角色都獲得了一枚 Cosmic Signature NFT。",
+      "rolesInfo": "簽名分配：寫下收官之筆的參與者。時之勇士：連續保持堅守冠軍身份時間最長的參與者。堅守冠軍：連續保持「最近一筆落筆者」身份時間最長的參與者。CST 收官之筆：以 CST 完成本週期最後一次落筆的參與者。",
       "cards": {
         "signature": {
           "title": "簽名分配"
@@ -68,7 +69,7 @@
     },
     "distribution": {
       "title": "分配流向",
-      "tooltip": "顯示本週期發放的 ETH 在各條分配軌道間的佔比。週期儲備的其餘部分滾入下一週期，不在此顯示。",
+      "tooltip": "本週期收官時，各條軌道在週期儲備中所佔的比例，與「分配名錄」頁面顯示的比例相同。未分配的部分滾入下一週期。",
       "total": "本週期共發放 {amount} ETH"
     },
     "statistics": {
@@ -94,7 +95,7 @@
         },
         "uniqueAnchorHolders": {
           "label": "獨立錨定者",
-          "tooltip": "本週期內擁有已錨定代幣的獨立地址數量。"
+          "tooltip": "本週期內擁有已錨定 NFT 的獨立地址數量。"
         },
         "totalContributed": {
           "label": "ETH 貢獻",

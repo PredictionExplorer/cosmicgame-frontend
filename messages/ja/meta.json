@@ -39,7 +39,7 @@
   },
   "statisticsAnchoring": {
     "title": "係留統計",
-    "description": "Cosmic Signature NFTとRandomWalk NFTの係留と解除の操作、現在係留中のトークン、ユニーク係留者。"
+    "description": "Cosmic Signature NFTとRandom Walk NFTの係留と解除の操作、現在係留中のNFT、ユニーク係留者。"
   },
   "statisticsActivity": {
     "title": "一筆の活動統計",
@@ -105,7 +105,6 @@
     "description": "Cosmic Signatureのプロトコルパラメーター調整の完全な履歴。一筆の費用の上げ幅、サイクル時間の追加、係留配分の設定、その他の調整の更新を追う。"
   },
   "distributionsByToken": {
-    "title": "トークン別の配分",
     "description": "特定のCosmic Signature NFTの係留配分の詳細——サイクルごとのETH配分の履歴、受け取り状況、累積の係留配分。"
   },
   "mint": {
@@ -125,7 +124,6 @@
     "descriptionFor": "Cosmic Signatureサイクル{id}の詳しい配分情報——受領者の詳細、シグネチャー配分の分布、星選の結果、添付されたNFTの配分。"
   },
   "anchorAction": {
-    "title": "係留操作の詳細",
     "description": "Cosmic Signatureの特定の係留操作の詳細——トークンの種類、係留数、配分の受け取り状況。"
   },
   "pageTerms": {

@@ -52,7 +52,7 @@
         "caption": "해제할 때 회수됩니다. 해제는 되돌릴 수 없습니다."
       },
       "distributionPerNft": {
-        "label": "Cosmic Signature NFT당 앵커링 지급",
+        "label": "앵커링 NFT 1개당",
         "tooltip": "앵커링된 Cosmic Signature NFT 1개당 현재 ETH 앵커링 지급으로, 온체인 앵커링 풀 총액을 인덱싱된 앵커링 Cosmic Signature NFT 수로 나누어 계산합니다.",
         "noneAnchored": "인덱싱된 앵커링 Cosmic Signature NFT가 아직 없습니다"
       }

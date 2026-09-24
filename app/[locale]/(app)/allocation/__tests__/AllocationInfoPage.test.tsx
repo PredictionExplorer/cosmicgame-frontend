@@ -373,13 +373,15 @@ describe('AllocationInfoPage', () => {
     it('shows each role by the Signature it received, its token and its recipient', () => {
       renderCycle();
       const signature = screen.getByTestId('recipient-card-signature');
-      expect(within(signature).getByRole('link', { name: '#000042' })).toHaveAttribute(
-        'href',
-        '/detail/42',
-      );
-      expect(within(signature).getByRole('heading', { level: 3 })).toHaveTextContent(
+      // The title is the way to the Signature, like every other card of a Signature; the
+      // token number beside it is plain text, so the card has one link to its token.
+      const heading = within(signature).getByRole('heading', { level: 3 });
+      expect(within(heading).getByRole('link')).toHaveAttribute('href', '/detail/42');
+      expect(heading).toHaveTextContent(
         'allocation.details.recipientSection.cards.signature.title',
       );
+      expect(within(signature).getByText('#000042')).toBeInTheDocument();
+      expect(within(signature).queryByRole('link', { name: '#000042' })).toBeNull();
       expect(within(signature).getByRole('link', { name: /0x1111/ })).toHaveAttribute(
         'href',
         `/user/${SIGNATURE_RECIPIENT}`,
@@ -389,12 +391,12 @@ describe('AllocationInfoPage', () => {
       }
     });
 
-    it('says what each role received: CST for every role, and the Chrono-Warrior its ETH', () => {
+    it('says what each role received by one rule: its ETH and its CST', () => {
       renderCycle();
       const signature = screen.getByTestId('recipient-card-signature');
       expect(signature).toHaveTextContent(/1,000.CST/);
-      // The Signature Allocation's ETH is the header's figure, not repeated on its card.
-      expect(signature).not.toHaveTextContent(/1\.5\d*.ETH/);
+      // The Signature Allocation's card names its ETH too, so the cards read as a set.
+      expect(signature).toHaveTextContent(/1\.5000.ETH/);
       const chrono = screen.getByTestId('recipient-card-chrono');
       expect(chrono).toHaveTextContent(/0\.2000.ETH/);
       expect(chrono).toHaveTextContent(/1,000.CST/);
@@ -409,15 +411,25 @@ describe('AllocationInfoPage', () => {
   });
 
   describe('split and statistics', () => {
-    it('splits the distributed ETH across the five tracks, each with its amount and share', () => {
+    it('splits the Cycle Reserve on the base /allocation uses, the remainder included', () => {
       renderCycle();
       const split = screen.getByTestId('allocation-split');
-      for (const track of ['signature', 'chrono', 'stellar', 'anchor', 'publicGoods']) {
-        expect(split.querySelector(`dt`)).not.toBeNull();
+      for (const track of [
+        'signature',
+        'chrono',
+        'stellar',
+        'anchor',
+        'publicGoods',
+        'nextCycle',
+      ]) {
         expect(split.querySelector(`div[data-track="${track}"]`)).not.toBeNull();
       }
-      // 1.5 of 2.5 distributed ETH is the Signature Allocation.
-      expect(split.querySelector('div[data-track="signature"]')).toHaveTextContent('60%');
+      // 1.5 ETH is the Signature Allocation's 25%: a 6 ETH reserve, not 60% of 2.5 distributed.
+      expect(split.querySelector('div[data-track="signature"]')).toHaveTextContent('25%');
+      // The 3.5 ETH the tracks did not take carried into the next cycle, marked approximate.
+      const next = split.querySelector('div[data-track="nextCycle"]');
+      expect(next).toHaveTextContent(/~3\.5000.ETH/);
+      expect(next).toHaveTextContent(/~58\.3/);
     });
 
     it('shows no ETH figure the split already carries (no public goods, anchor or stellar card)', () => {

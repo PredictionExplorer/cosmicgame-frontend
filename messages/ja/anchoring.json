@@ -183,6 +183,7 @@
     "confirm": "{count, plural, other {#件のNFTを解除}}"
   },
   "anchorActionDetail": {
+    "title": "係留操作 #{id}",
     "subtitle": "{token} NFTの係留操作",
     "errorTitle": "この係留操作を読み込めませんでした",
     "error": "係留の記録を一時的に取得できません。しばらくしてからもう一度お試しください。",
@@ -266,23 +267,18 @@
       "headers": {
         "anchorDatetime": {
           "desktop": "日時",
-          "mobile": "日時",
-          "tooltip": "係留または解除の操作がインデックスされた時刻。"
+          "mobile": "日時"
         },
         "actionType": {
-          "desktop": "操作",
-          "mobile": "種類",
-          "tooltip": "この行がNFTを係留したか解除したか。"
+          "desktop": "操作"
         },
         "tokenId": {
           "desktop": "NFT",
-          "mobile": "NFT",
-          "tooltip": "係留または解除の操作に関わるトークン。"
+          "mobile": "NFT"
         },
         "holderAddress": {
           "desktop": "係留者",
-          "mobile": "係留者",
-          "tooltip": "トークンを係留または解除したウォレットアドレス。"
+          "mobile": "係留者"
         },
         "nftCount": {
           "desktop": "全体の係留数",
@@ -295,24 +291,19 @@
       "label": "係留中のNFT",
       "headers": {
         "tokenId": {
-          "desktop": "NFT",
-          "mobile": "NFT",
-          "tooltip": "係留中のトークンの識別子。"
+          "desktop": "NFT"
         },
         "anchorDatetime": {
           "desktop": "係留日時",
-          "mobile": "日時",
-          "tooltip": "トークンが係留された時刻。"
+          "mobile": "日時"
         },
         "actionId": {
           "desktop": "係留操作",
-          "mobile": "操作",
-          "tooltip": "このトークンに結びついた係留操作の記録。"
+          "mobile": "操作"
         },
         "holderAddress": {
           "desktop": "係留者",
-          "mobile": "係留者",
-          "tooltip": "トークンを係留または解除したウォレットアドレス。"
+          "mobile": "係留者"
         }
       }
     },

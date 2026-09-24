@@ -57,7 +57,7 @@ describe('AnchorActionDetailPage', () => {
     expect(
       screen.getByRole('heading', {
         level: 1,
-        name: 'anchoring.anchorActionDetail.breadcrumbs.action(id=1)',
+        name: 'anchoring.anchorActionDetail.title(id=1)',
       }),
     ).toBeInTheDocument();
     expect(screen.getByTestId('anchor-status')).toHaveTextContent('anchoring.status.anchored');

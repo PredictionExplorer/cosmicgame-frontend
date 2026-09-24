@@ -138,6 +138,29 @@ test.describe('Statistics section pages', () => {
     await expect(rwalkTab).toHaveAttribute('aria-selected', 'true');
   });
 
+  test('anchoring page keeps the Cosmic Signature figures one row of four on a laptop', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(Boolean(isMobile), 'desktop geometry contract');
+    // At 1024px a wrapping flex row left the fourth figure alone on a second row (wider in uk).
+    await page.setViewportSize({ width: 1024, height: 900 });
+    for (const path of ['/statistics/anchoring', '/uk/statistics/anchoring']) {
+      await page.goto(path, { waitUntil: 'networkidle' });
+      const figures = page
+        .getByRole('tabpanel')
+        .first()
+        .locator('dl')
+        .first()
+        .locator(':scope > div');
+      await expect(figures).toHaveCount(4);
+      const tops = await figures.evaluateAll((items) =>
+        items.map((item) => Math.round(item.getBoundingClientRect().top)),
+      );
+      expect(new Set(tops).size, `${path}: figure rows ${tops.join(', ')}`).toBe(1);
+    }
+  });
+
   test('anchoring page renders anchor/release actions content', async ({ page }) => {
     await page.goto('/statistics/anchoring', { waitUntil: 'networkidle' });
     const actions = page.getByRole('heading', { name: 'Anchor / release actions' }).first();

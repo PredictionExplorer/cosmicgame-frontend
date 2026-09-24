@@ -101,6 +101,13 @@ console.warn = (...args: unknown[]) => {
   throw new Error(`Unexpected console.warn in test: ${msg.slice(0, 200)}`);
 };
 
+// Jest runs outside Next's server, which provides the data cache that
+// `unstable_cache` stores in: a shared server read (publicDataReads) calls
+// straight through, once per call, as an uncached read would.
+jest.mock('next/cache', () => ({
+  unstable_cache: <A extends unknown[], R>(read: (...args: A) => Promise<R>) => read,
+}));
+
 // Mock next/navigation for App Router. All routing hooks return no-op
 // defaults so individual tests can override per-case via jest.mock() without
 // importing the real next/navigation (which pulls React server components).

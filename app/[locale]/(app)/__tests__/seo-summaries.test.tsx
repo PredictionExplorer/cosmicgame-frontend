@@ -74,12 +74,28 @@ jest.mock('../../../../services/api/tokens', () => ({
   get_used_rwlk_nfts: jest.fn(),
 }));
 // lexicon-allow-end
+/**
+ * The anchoring header's counts read the page's seeded client queries
+ * (AnchoringHeaderCount): each list's state as the browser holds it.
+ */
+type MockAnchorList = { data: unknown[] | undefined; isLoading: boolean };
+type MockAnchorListId = 'cstActions' | 'rwlkActions' | 'deposits' | 'imprints';
+const mockAnchorLists: Record<MockAnchorListId, MockAnchorList> = {
+  cstActions: { data: [], isLoading: false },
+  rwlkActions: { data: [], isLoading: false },
+  deposits: { data: [], isLoading: false },
+  imprints: { data: [], isLoading: false },
+};
+/** Sets every anchoring list the header reads to the same state. */
+const setAnchorLists = (state: MockAnchorList) => {
+  for (const id of Object.keys(mockAnchorLists) as MockAnchorListId[]) mockAnchorLists[id] = state;
+};
 jest.mock('@/hooks/useApiQuery', () => ({
   useDashboardInfo: jest.fn(),
-  useCSTAnchorActions: jest.fn(() => mockClientList()),
-  useRWLKAnchorActions: jest.fn(() => mockClientList()),
-  useCSTAnchorDistributions: jest.fn(() => mockClientList()),
-  useGlobalRWLKAnchorImprints: jest.fn(() => mockClientList()),
+  useCSTAnchorActions: () => mockAnchorLists.cstActions,
+  useRWLKAnchorActions: () => mockAnchorLists.rwlkActions,
+  useCSTAnchorDistributions: () => mockAnchorLists.deposits,
+  useGlobalRWLKAnchorImprints: () => mockAnchorLists.imprints,
 }));
 jest.mock('../publicDataReads', () => ({
   ...jest.requireActual('../publicDataReads'),
@@ -87,12 +103,6 @@ jest.mock('../publicDataReads', () => ({
   readRandomWalkImprinted: () => mockRandomWalkImprinted(),
 }));
 
-/** The page's own client queries, which fill an anchoring figure the server lost. */
-const mockClientList = jest.fn((): { data?: unknown[]; isPending: boolean; isError: boolean } => ({
-  data: undefined,
-  isPending: true,
-  isError: false,
-}));
 const mockGameOwner = jest.fn(() =>
   Promise.resolve({ data: null as string | null, at: Date.UTC(2026, 8, 24) }),
 );
@@ -195,7 +205,7 @@ const figureValue = (id: string) => {
 
 describe('server-rendered page headers', () => {
   beforeEach(() => {
-    mockClientList.mockReturnValue({ data: undefined, isPending: true, isError: false });
+    setAnchorLists({ data: [], isLoading: false });
     mockRandomWalkImprinted.mockResolvedValue({ data: null, at: Date.UTC(2026, 8, 24) });
     mockGameOwner.mockResolvedValue({ data: null, at: Date.UTC(2026, 8, 24) });
     mockGetLocale.mockResolvedValue('en');
@@ -794,6 +804,11 @@ describe('server-rendered page headers', () => {
       mockRwalkImprints.mockResolvedValue(
         Array.from({ length: 20 }, () => ({})) as Rows<typeof get_staking_rwalk_mints_global>,
       );
+      // The page seeds its client queries from the same reads, and the counts render from them.
+      mockAnchorLists.cstActions = { data: [{}], isLoading: false };
+      mockAnchorLists.rwlkActions = { data: [{}], isLoading: false };
+      mockAnchorLists.deposits = { data: [{}], isLoading: false };
+      mockAnchorLists.imprints = { data: Array.from({ length: 20 }, () => ({})), isLoading: false };
 
       render(await PublicDataRouteSeoSummary({ route: 'anchoring' }));
 
@@ -809,7 +824,7 @@ describe('server-rendered page headers', () => {
       mockCstActions.mockRejectedValue(new Error('Network response was not OK'));
       mockCstRewards.mockRejectedValue(new Error('Network response was not OK'));
       mockRwalkImprints.mockRejectedValue(new Error('Network response was not OK'));
-      mockClientList.mockReturnValue({ data: [{}, {}], isPending: false, isError: false });
+      setAnchorLists({ data: [{}, {}], isLoading: false });
 
       render(await PublicDataRouteSeoSummary({ route: 'anchoring' }));
 
@@ -821,7 +836,7 @@ describe('server-rendered page headers', () => {
 
     it('says "Unavailable" only when the client read fails too', async () => {
       mockCstRewards.mockRejectedValue(new Error('Network response was not OK'));
-      mockClientList.mockReturnValue({ data: undefined, isPending: false, isError: true });
+      setAnchorLists({ data: undefined, isLoading: false });
 
       render(await PublicDataRouteSeoSummary({ route: 'anchoring' }));
 

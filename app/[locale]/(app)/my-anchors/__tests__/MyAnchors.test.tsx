@@ -119,6 +119,18 @@ describe('MyAnchors', () => {
     expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
   });
 
+  it('tells a visitor what anchoring would receive now, and how it works', () => {
+    mockAccount = null;
+    const { container } = render(<MyAnchors steps={<ol data-testid="steps" />} />);
+    expect(
+      screen.getByRole('heading', { name: 'anchoring.overview.howItWorks.title' }),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId('steps')).toBeInTheDocument();
+    // The live pool and what it means per anchored NFT: 1.9376 ETH over 33 NFTs.
+    expect(container.querySelector('[data-figure="pool"]')).toHaveTextContent('1.9376');
+    expect(container.querySelector('[data-figure="perNft"]')).toHaveTextContent('0.0587');
+  });
+
   it('puts the anchor-holder’s figures in the header, with the permanence caption', () => {
     const { container } = render(<MyAnchors />);
     expect(

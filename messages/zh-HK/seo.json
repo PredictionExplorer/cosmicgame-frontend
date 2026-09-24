@@ -44,7 +44,7 @@
         "cards": {
           "actions": {
             "label": "錨定／解錨操作",
-            "tooltip": "每一次錨定或解錨 Cosmic Signature NFT 與 Random Walk NFT 的操作。"
+            "tooltip": "自錨定開放以來，Cosmic Signature 與 Random Walk NFT 的每一次錨定與解錨。"
           },
           "ethDeposits": {
             "label": "ETH 錨定派發存入次數",

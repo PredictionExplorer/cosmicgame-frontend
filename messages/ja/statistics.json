@@ -19,7 +19,7 @@
     "anchoring": {
       "label": "係留",
       "title": "係留統計",
-      "description": "Cosmic Signature NFTとRandomWalk NFTの係留と解除の操作、現在係留中のトークン、ユニーク係留者。"
+      "description": "Cosmic Signature NFTとRandom Walk NFTの係留と解除の操作、現在係留中のNFT、ユニーク係留者。"
     },
     "activity": {
       "label": "活動",
@@ -252,11 +252,9 @@
     "cstActiveAnchorHolders": "Cosmic Signature NFTを少なくとも1点現在係留しているウォレット。",
     "cstAnchorDistributionDeposits": "Cosmic Signature NFT係留配分プールへの積立イベントの総数。",
     "cstTotalAnchorDistributions": "Cosmic Signature NFTの係留者へ係留配分として配られたETHの総額。",
-    "cstTotalTokensAnchored": "プロトコルに現在係留されているCosmic Signature NFTの数。",
     "cstUnretrievedAnchorDistributions": "配分されたが、Cosmic Signature NFTの係留者がまだ受け取っていない係留配分。",
     "rwlkActiveAnchorHolders": "RandomWalk NFTを少なくとも1点現在係留しているウォレット。",
     "rwlkTotalTokensImprinted": "係留NFT星選を通じてRandomWalk NFTの係留者のために刻印されたCosmic Signature NFTと、それに伴うCSTの総数。",
-    "rwlkTotalTokensAnchored": "プロトコルに現在係留されているRandomWalk NFTの数。",
     "cstGroup": "Cosmic Signature NFTの係留は、現在係留中のCosmic Signature NFTの間でETHの係留配分を分け合います。",
     "rwlkGroup": "Random Walk NFTの係留は、係留NFT星選の配分の対象資格を与えます。"
   },
@@ -278,17 +276,10 @@
   },
   "anchoringPage": {
     "snapshot": {
-      "poolLabel": "係留配分プール",
-      "poolTooltip": "Cosmic Signature NFTの係留者のために係留配分プールに現在配分されているETH。",
-      "poolCaption": "このサイクルの確定時に積み立てられます。以前の積立分でまだ受け取られていないものは「未受け取り」に表示されます。",
-      "perNftLabel": "Cosmic Signature NFTあたりの配分",
-      "perNftTooltip": "係留中のCosmic Signature NFT 1点あたりの現在のETH係留配分：オンチェーンのプールを、インデックス済みの係留NFT総数で割った値。",
-      "perNftNoneAnchored": "係留中のCosmic Signature NFTはまだインデックスされていません",
       "activeHoldersLabel": "活動中の係留者",
       "activeHoldersTooltip": "Cosmic Signature NFTまたはRandom Walk NFTを少なくとも1点現在係留している異なるウォレットの数です。両方を係留しているウォレットは1つとして数えます。"
     },
     "nowTitle": "現在の係留",
-    "description": "係留されたNFTはCosmic Signatureの中核です。Cosmic Signature NFTはETHの係留配分を分け合い、Random Walk NFTは係留NFT星選に参加します。",
     "historyLink": "係留の履歴を見る",
     "tabs": {
       "cosmicSignature": "Cosmic Signature NFT",
@@ -304,18 +295,17 @@
       "activeHoldersRandomWalk": "Random Walk NFTの活動中の係留者数",
       "distributionDeposits": "係留配分の積立回数",
       "totalDistributions": "係留配分の総額",
-      "tokensImprinted": "刻印されたトークンの総数",
-      "tokensAnchored": "係留中のトークンの総数",
+      "tokensImprinted": "刻印されたCosmic Signature NFT",
       "unretrievedDistributions": "未受け取りの係留配分"
     },
     "tables": {
       "actions": "係留 / 解除の操作",
-      "anchoredTokens": "係留中のトークン",
+      "anchoredTokens": "係留中のNFT",
       "uniqueHolders": "ユニーク係留者"
     },
     "empty": {
       "actions": "係留操作はまだありません",
-      "tokens": "現在係留中のトークンはありません",
+      "tokens": "現在係留中のNFTはありません",
       "holders": "係留者はまだいません"
     }
   },
@@ -633,7 +623,6 @@
   },
   "recipientHistory": {
     "pageTitle": "自分の配分履歴",
-    "subtitle": "過去の配分の受け取りと配分を見る",
     "connectedDescription": "このウォレットがサイクルごとに受け取ったすべての配分と、それぞれを受け取り済みかどうかです。",
     "loadError": "配分の履歴を読み込めませんでした",
     "loadErrorDescription": "しばらくしてからもう一度お試しください。",

@@ -19,7 +19,7 @@
     "anchoring": {
       "label": "Neo giữ",
       "title": "Thống kê neo giữ",
-      "description": "Thao tác neo giữ và gỡ neo, token đang neo giữ và người neo giữ riêng biệt của Cosmic Signature và RandomWalk NFT."
+      "description": "Thao tác neo giữ và gỡ neo, NFT đang neo giữ và người neo giữ riêng biệt của Cosmic Signature và Random Walk NFT."
     },
     "activity": {
       "label": "Hoạt động",
@@ -252,11 +252,9 @@
     "cstActiveAnchorHolders": "Các ví hiện đang neo giữ ít nhất một Cosmic Signature NFT.",
     "cstAnchorDistributionDeposits": "Tổng số sự kiện nạp vào quỹ phân phối neo giữ Cosmic Signature NFT.",
     "cstTotalAnchorDistributions": "Tổng ETH đã phân phối dưới dạng phân phối neo giữ cho những người neo giữ Cosmic Signature NFT.",
-    "cstTotalTokensAnchored": "Số Cosmic Signature NFT hiện đang neo giữ trong giao thức.",
     "cstUnretrievedAnchorDistributions": "Phân phối neo giữ đã phân bổ nhưng những người neo giữ Cosmic Signature NFT chưa nhận về.",
     "rwlkActiveAnchorHolders": "Các ví hiện đang neo giữ ít nhất một RandomWalk NFT.",
     "rwlkTotalTokensImprinted": "Tổng Cosmic Signature NFT và CST đi kèm đã khắc cho những người neo giữ RandomWalk NFT thông qua Tinh tuyển NFT neo giữ.",
-    "rwlkTotalTokensAnchored": "Số RandomWalk NFT hiện đang neo giữ trong giao thức.",
     "cstGroup": "Neo giữ Cosmic Signature NFT chia sẻ phân phối neo giữ ETH giữa các Cosmic Signature NFT hiện đang neo giữ.",
     "rwlkGroup": "Neo giữ Random Walk NFT mang lại diện nhận phân bổ Tinh tuyển NFT neo giữ."
   },
@@ -278,17 +276,10 @@
   },
   "anchoringPage": {
     "snapshot": {
-      "poolLabel": "Quỹ phân phối neo giữ",
-      "poolTooltip": "ETH hiện được phân bổ vào quỹ phân phối neo giữ cho những người neo giữ Cosmic Signature NFT.",
-      "poolCaption": "Được nạp khi chu kỳ này hoàn tất; các đợt nạp trước chưa nhận về hiển thị ở mục “Chưa nhận về”.",
-      "perNftLabel": "Phân phối mỗi Cosmic Signature NFT",
-      "perNftTooltip": "Phân phối neo giữ ETH hiện tại trên mỗi Cosmic Signature NFT đang neo giữ: quỹ trên chuỗi chia cho tổng số NFT neo giữ đã lập chỉ mục.",
-      "perNftNoneAnchored": "Chưa lập chỉ mục Cosmic Signature NFT nào đang neo giữ",
       "activeHoldersLabel": "Người neo giữ đang hoạt động",
       "activeHoldersTooltip": "Số ví khác nhau hiện neo giữ ít nhất một Cosmic Signature NFT hoặc Random Walk NFT. Ví neo giữ cả hai loại chỉ được tính một lần."
     },
     "nowTitle": "Neo giữ hiện tại",
-    "description": "NFT đang neo giữ là phần cốt lõi của Cosmic Signature: Cosmic Signature NFT chia sẻ phân phối neo giữ ETH, còn Random Walk NFT tham gia Tinh tuyển NFT neo giữ.",
     "historyLink": "Xem lịch sử neo giữ",
     "tabs": {
       "cosmicSignature": "Cosmic Signature NFT",
@@ -304,18 +295,17 @@
       "activeHoldersRandomWalk": "Số người neo giữ Random Walk NFT đang hoạt động",
       "distributionDeposits": "Số đợt nạp phân phối neo giữ",
       "totalDistributions": "Tổng phân phối neo giữ",
-      "tokensImprinted": "Tổng token đã khắc",
-      "tokensAnchored": "Tổng token đang neo giữ",
+      "tokensImprinted": "Cosmic Signature NFT đã khắc",
       "unretrievedDistributions": "Phân phối neo giữ chưa nhận về"
     },
     "tables": {
       "actions": "Thao tác neo giữ / gỡ neo",
-      "anchoredTokens": "Token đang neo giữ",
+      "anchoredTokens": "NFT đang neo giữ",
       "uniqueHolders": "Người neo giữ riêng biệt"
     },
     "empty": {
       "actions": "Chưa có thao tác neo giữ",
-      "tokens": "Hiện không có token nào đang neo giữ",
+      "tokens": "Hiện không có NFT nào đang neo giữ",
       "holders": "Chưa có người neo giữ"
     }
   },
@@ -633,7 +623,6 @@
   },
   "recipientHistory": {
     "pageTitle": "Lịch sử phân bổ của tôi",
-    "subtitle": "Xem các lần nhận về phân bổ và phân phối trước đây của bạn",
     "connectedDescription": "Mọi phân bổ mà ví này đã nhận qua từng chu kỳ, cùng trạng thái nhận về của từng khoản.",
     "loadError": "Không tải được lịch sử phân bổ",
     "loadErrorDescription": "Vui lòng thử lại sau ít phút.",
