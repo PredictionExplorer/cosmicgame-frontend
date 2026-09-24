@@ -65,7 +65,8 @@ export function GalleryList({ items, collectionTraits, onQuickView }: GalleryLis
 
   const columns: DataTableColumn<ListRow>[] = [
     {
-      // On a phone the picture leads its record, full width and unlabelled.
+      // On a phone the picture leads its record, unlabelled (at most 15rem, so
+      // the 640px thumbnail still covers it on a 2x screen).
       id: 'artwork',
       header: <span className="sr-only">{t('list.headers.artwork')}</span>,
       label: '',
@@ -119,7 +120,8 @@ export function GalleryList({ items, collectionTraits, onQuickView }: GalleryLis
       header: t('list.headers.palette'),
       value: (row) => trait(row, 'palette'),
       cell: (row) => (
-        <span className="flex min-w-0 flex-col gap-1.5">
+        // A phone record aligns its values to the end; the strip follows its name.
+        <span className="flex min-w-0 flex-col gap-1.5 max-sm:items-end">
           <span>{trait(row, 'palette')}</span>
           <HueStrip hues={row.entry?.hues} size="xs" className="max-w-24" />
         </span>

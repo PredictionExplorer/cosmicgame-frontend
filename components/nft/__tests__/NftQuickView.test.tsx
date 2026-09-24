@@ -57,7 +57,7 @@ describe('NftQuickView', () => {
     expect(screen.queryByTestId('nft-quick-view')).not.toBeInTheDocument();
   });
 
-  it('shows the artwork, badges, and trait sheet of the selected token', () => {
+  it('shows the artwork, the label and the trait sheet of the selected token', () => {
     render(
       <NftQuickView
         tokenId={1}
@@ -73,12 +73,17 @@ describe('NftQuickView', () => {
       '“NUMBA 1”, Cosmic Signature #000001: Orbit Ribbons structure, Glacial Split palette, spectral class B',
     );
     expect(art).toHaveAttribute('src', expect.stringContaining('/0xa1/images/web/full.webp'));
-    // Nothing is layered over the art: the hue strip sits under the plate.
+    // Nothing is layered over the art: the hue strip belongs to the trait sheet.
     expect(screen.getByTestId('art-frame')).not.toContainElement(
       screen.getAllByTestId('hue-strip')[0]!,
     );
     expect(screen.getAllByTestId('spectral-class-badge')[0]).toHaveTextContent('Class B');
-    expect(screen.getByTestId('rarity-rank-chip')).toBeInTheDocument();
+    // A named Signature's label carries its number and its rank as caption facts, not chips.
+    expect(screen.getByText('#000001')).toHaveClass('type-mono');
+    expect(screen.getByTestId('quick-view-rank')).toHaveTextContent(
+      `Rank 1 of ${collectionTraits.rarity.total}`,
+    );
+    expect(screen.queryByTestId('rarity-rank-chip')).not.toBeInTheDocument();
     expect(screen.getByTestId('trait-sheet')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Open full page/ })).toHaveAttribute(
       'href',
@@ -125,6 +130,21 @@ describe('NftQuickView', () => {
     expect(onNavigate).toHaveBeenLastCalledWith(43);
     fireEvent.click(screen.getByRole('button', { name: 'Next Signature' }));
     expect(onNavigate).toHaveBeenLastCalledWith(43);
+  });
+
+  it('names an unnamed Signature by its number once, and tags an anchored one', () => {
+    render(
+      <NftQuickView
+        tokenId={7}
+        items={[{ TokenId: 7, Seed: 'a7', TokenName: '', Staked: true }]}
+        onOpenChange={jest.fn()}
+        onNavigate={jest.fn()}
+        collectionTraits={collectionTraits}
+      />,
+    );
+    expect(screen.getByRole('heading', { name: 'Cosmic Signature #000007' })).toBeInTheDocument();
+    expect(screen.getAllByText(/#000007/)).toHaveLength(1);
+    expect(screen.getByText('Anchored')).toBeInTheDocument();
   });
 
   it('disables previous at the start of the list', () => {
