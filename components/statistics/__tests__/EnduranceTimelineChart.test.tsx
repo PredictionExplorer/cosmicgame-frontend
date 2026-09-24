@@ -49,6 +49,20 @@ describe('EnduranceTimelineChart', () => {
     expect(within(figure).getByText(/^Chrono-Warrior: /)).toBeInTheDocument();
   });
 
+  it('lays the time axis and every lane on the same columns, so they cannot drift apart', () => {
+    // Regression: on phones the axis spacer was w-36 while the lane labels were w-24, so the
+    // ticks sat 48px right of the bars they labelled.
+    const { container } = render(<EnduranceTimelineChart round={2} isLive label="Endurance" />);
+    const gantt = screen.getByRole('group', { name: 'Lead stints by participant' });
+    const axis = container.querySelector('[aria-hidden="true"].grid');
+    const columns = (element: Element | null) =>
+      [...(element?.classList ?? [])].filter((name) => name.startsWith('grid-cols-'));
+    expect(columns(axis)).toHaveLength(1);
+    for (const lane of within(gantt).getAllByRole('group')) {
+      expect(columns(lane)).toEqual(columns(axis));
+    }
+  });
+
   it('draws a lane per address with its title spelled out for assistive technology', () => {
     render(<EnduranceTimelineChart round={2} isLive label="Endurance" />);
     const gantt = screen.getByRole('group', { name: 'Lead stints by participant' });
