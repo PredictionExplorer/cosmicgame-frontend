@@ -340,6 +340,31 @@ describe('PageHeader', () => {
     );
   });
 
+  it('gives only third-party related pages the new-tab arrow', () => {
+    render(
+      <PageHeader
+        title="Public Goods"
+        related={[
+          { href: '/statistics', label: 'Statistics' },
+          { href: 'https://cosmicsignature.com/learn/protocol-guild-public-goods', label: 'Guide' },
+          { href: 'https://www.protocolguild.org', label: 'Protocol Guild' },
+        ]}
+        relatedLabel="Related"
+      />,
+    );
+    const icon = (name: string) =>
+      screen.getByRole('link', { name: new RegExp(`^${name}`) }).querySelector('svg');
+    // The other host (cosmicsignature.com) opens in this tab, like a page here.
+    expect(icon('Statistics')).toHaveClass('lucide-arrow-right');
+    expect(icon('Guide')).toHaveClass('lucide-arrow-right');
+    expect(screen.getByRole('link', { name: 'Guide' })).not.toHaveAttribute('target');
+    expect(icon('Protocol Guild')).toHaveClass('lucide-arrow-up-right');
+    expect(screen.getByRole('link', { name: /^Protocol Guild/ })).toHaveAttribute(
+      'target',
+      '_blank',
+    );
+  });
+
   it('keeps related pages off phones and draws them on the control radius', () => {
     render(
       <PageHeader

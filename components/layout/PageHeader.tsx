@@ -319,9 +319,10 @@ export function PageHeader({
         >
           <ul className={cn('flex flex-wrap gap-2', centered && 'justify-center')}>
             {related.map((link) => {
-              // Third-party pages open in a new tab and say so; the other host stays in this tab.
+              // Third-party pages open in a new tab and carry its arrow; the
+              // other Cosmic Signature host stays in this tab, like a page here.
               const kind = classifyHref(link.href, 'app');
-              const Icon = kind === 'internal' ? ArrowRight : ArrowUpRight;
+              const Icon = kind === 'external' ? ArrowUpRight : ArrowRight;
               return (
                 <li key={link.href}>
                   <SiteLink
