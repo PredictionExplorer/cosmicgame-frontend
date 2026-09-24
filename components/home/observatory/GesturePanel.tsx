@@ -870,6 +870,7 @@ export function GesturePanel({
                     {canGesture ? (
                       <Button
                         id={variant === 'card' ? 'gesture-submit' : 'gesture-submit-sheet'}
+                        variant="commit"
                         size="lg"
                         onClick={onSubmit}
                         className="h-auto min-h-12 w-full whitespace-normal border-0 px-3 py-2.5 text-sm font-semibold text-primary-foreground"

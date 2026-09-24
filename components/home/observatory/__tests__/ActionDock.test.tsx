@@ -46,6 +46,8 @@ describe('ActionDock', () => {
 
     const open = within(dock).getByTestId('dock-open-sheet');
     expect(open).toHaveTextContent('home.form.submit.eth(cost=0.01020)');
+    // The dock carries the one commit action of the view: the signature gradient.
+    expect(open).toHaveClass('bg-signature-gradient');
     await user.click(open);
     expect(baseProps.onOpenSheet).toHaveBeenCalledTimes(1);
   });
@@ -68,6 +70,7 @@ describe('ActionDock', () => {
     expect(reserveAmount(dock)).toHaveClass('whitespace-nowrap');
 
     // The dock never submits — it routes back to the one gesture panel.
+    expect(within(dock).getByTestId('dock-jump-to-panel')).toHaveClass('bg-signature-gradient');
     await user.click(within(dock).getByTestId('dock-jump-to-panel'));
     expect(baseProps.onJumpToPanel).toHaveBeenCalledTimes(1);
     expect(baseProps.onOpenSheet).not.toHaveBeenCalled();

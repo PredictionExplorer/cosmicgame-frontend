@@ -330,6 +330,8 @@ describe('GesturePanel', () => {
     expect(submit).toHaveTextContent(
       'home.form.submit.randomWalkWithToken(tokenId=42,cost=0.00510)',
     );
+    // Making the Gesture is the view's one commit action.
+    expect(submit).toHaveClass('bg-signature-gradient');
   });
 
   it('keeps CST prices, economics, and calibration visible without opening a disclosure', () => {
