@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import userEvent from '@testing-library/user-event';
 
 import { ApiReadError } from '@/services/api/readError';
@@ -5,6 +6,7 @@ import { ApiReadError } from '@/services/api/readError';
 import { act, checkA11y, render, screen, within } from '@/test-utils';
 
 import AllocationFinalizedPage from '../AllocationFinalizedPage';
+import { parseFinalizedSearch } from '../finalizedSearch';
 
 const RECIPIENT = '0x1234567890123456789012345678901234567890';
 const VISITOR = '0x9999999999999999999999999999999999999999';
@@ -47,10 +49,19 @@ jest.mock('../../../../../hooks/useCosmicGameContract', () => ({
   }),
 }));
 
-let mockSearchParams = new URLSearchParams('cycle=5');
+/** The page's query; the server reads it (page.tsx) and passes the page its cycle. */
+let query = new URLSearchParams('cycle=5');
+
+function Page({ seoSummary }: { seoSummary?: ReactNode }) {
+  return (
+    <AllocationFinalizedPage
+      {...parseFinalizedSearch(Object.fromEntries(query))}
+      seoSummary={seoSummary}
+    />
+  );
+}
 
 jest.mock('next/navigation', () => ({
-  useSearchParams: () => mockSearchParams,
   useRouter: () => ({
     replace: mockReplace,
     push: jest.fn(),
@@ -87,7 +98,7 @@ function roundInfoFails(status?: number) {
 beforeEach(() => {
   jest.clearAllMocks();
   mockAccount = null;
-  mockSearchParams = new URLSearchParams('cycle=5');
+  query = new URLSearchParams('cycle=5');
   mockGetBlock.mockResolvedValue({ timestamp: 50n });
   mockRoundActivationTime.mockResolvedValue(100n);
   roundInfo(undefined);
@@ -102,7 +113,7 @@ beforeEach(() => {
 describe('AllocationFinalizedPage', () => {
   it('holds the layout with a pending plate while the cycle loads', () => {
     roundInfo(undefined, true);
-    render(<AllocationFinalizedPage />);
+    render(<Page />);
     expect(
       screen.getByRole('heading', { level: 1, name: 'allocation.finalized.result.title(cycle=5)' }),
     ).toBeInTheDocument();
@@ -111,9 +122,33 @@ describe('AllocationFinalizedPage', () => {
     ).toBeInTheDocument();
   });
 
+  it('keeps the record header, lede included, from loading to loaded, so nothing moves', () => {
+    roundInfo(undefined, true);
+    const { rerender } = render(<Page />);
+    expect(screen.getByText('allocation.finalized.result.lede')).toBeInTheDocument();
+    roundInfo(ALLOCATION);
+    rerender(<Page />);
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'allocation.finalized.result.title(cycle=5)' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('allocation.finalized.result.lede')).toBeInTheDocument();
+  });
+
+  it('opens a finalization on the waiting header while the first read loads', () => {
+    query = new URLSearchParams('cycle=5&message=success');
+    roundInfo(undefined, true);
+    render(<Page />);
+    expect(
+      screen.getByRole('heading', {
+        level: 1,
+        name: 'allocation.finalized.pending.successTitle(cycle=5)',
+      }),
+    ).toBeInTheDocument();
+  });
+
   it('reads the cycle as a neutral record for any visitor', () => {
     roundInfo(ALLOCATION);
-    render(<AllocationFinalizedPage />);
+    render(<Page />);
     expect(
       screen.getByRole('heading', { level: 1, name: 'allocation.finalized.result.title(cycle=5)' }),
     ).toBeInTheDocument();
@@ -122,7 +157,7 @@ describe('AllocationFinalizedPage', () => {
 
   it('shows every part of the Signature Allocation: ETH, CST, the NFT, attached NFTs, the recipient', () => {
     roundInfo(ALLOCATION);
-    render(<AllocationFinalizedPage />);
+    render(<Page />);
     const section = screen.getByTestId('finalized-signature');
     // The precision of the cycle's own page, not six decimals.
     expect(section).toHaveTextContent('1.2346');
@@ -141,10 +176,10 @@ describe('AllocationFinalizedPage', () => {
   });
 
   it('congratulates the recipient arriving from their own finalization', () => {
-    mockSearchParams = new URLSearchParams('cycle=5&message=success');
+    query = new URLSearchParams('cycle=5&message=success');
     mockAccount = RECIPIENT;
     roundInfo(ALLOCATION);
-    render(<AllocationFinalizedPage />);
+    render(<Page />);
     expect(
       screen.getByRole('heading', {
         level: 1,
@@ -156,11 +191,31 @@ describe('AllocationFinalizedPage', () => {
     ).toBeInTheDocument();
   });
 
+  it('never congratulates a disconnected visitor holding a success link', () => {
+    query = new URLSearchParams('cycle=5&message=success');
+    mockAccount = null;
+    roundInfo(ALLOCATION);
+    render(<Page />);
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'allocation.finalized.result.title(cycle=5)' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/successLede/)).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'allocation.finalized.next.title' })).toBeNull();
+  });
+
+  it('names the cycle once in the wall label and leaves the date to the spec sheet', () => {
+    roundInfo(ALLOCATION);
+    render(<Page />);
+    const caption = screen.getByTestId('finalized-signature').querySelector('figcaption');
+    expect(caption).toHaveTextContent('allocation.formats.cycleHash(cycle=5)');
+    expect(caption?.querySelector('time')).toBeNull();
+  });
+
   it('never congratulates a connected visitor who is not the recipient', () => {
-    mockSearchParams = new URLSearchParams('cycle=5&message=success');
+    query = new URLSearchParams('cycle=5&message=success');
     mockAccount = VISITOR;
     roundInfo(ALLOCATION);
-    render(<AllocationFinalizedPage />);
+    render(<Page />);
     expect(
       screen.getByRole('heading', { level: 1, name: 'allocation.finalized.result.title(cycle=5)' }),
     ).toBeInTheDocument();
@@ -174,7 +229,7 @@ describe('AllocationFinalizedPage', () => {
       isLoading: false,
     });
     roundInfoFails(400);
-    render(<AllocationFinalizedPage />);
+    render(<Page />);
     expect(
       screen.getByRole('heading', {
         level: 1,
@@ -187,7 +242,7 @@ describe('AllocationFinalizedPage', () => {
 
   it('shows a failed read as an error with a retry, never as a missing record', async () => {
     roundInfoFails(503);
-    render(<AllocationFinalizedPage />);
+    render(<Page />);
     expect(screen.getByText('allocation.details.error.title')).toBeInTheDocument();
     expect(screen.queryByText(/missingCycle/)).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: /try again/i }));
@@ -196,16 +251,16 @@ describe('AllocationFinalizedPage', () => {
 
   it('shows a network failure as an error too', () => {
     roundInfoFails(undefined);
-    render(<AllocationFinalizedPage />);
+    render(<Page />);
     expect(screen.getByText('allocation.details.error.title')).toBeInTheDocument();
   });
 
   it('keeps asking for the record after a finalization until the indexer has it', () => {
     jest.useFakeTimers();
     try {
-      mockSearchParams = new URLSearchParams('cycle=0&message=success');
+      query = new URLSearchParams('cycle=0&message=success');
       roundInfoFails(400);
-      render(<AllocationFinalizedPage />);
+      render(<Page />);
       expect(
         screen.getByRole('heading', {
           level: 1,
@@ -222,7 +277,7 @@ describe('AllocationFinalizedPage', () => {
   });
 
   it('shows the latest finalized cycles by their Signatures when no cycle is named', () => {
-    mockSearchParams = new URLSearchParams('');
+    query = new URLSearchParams('');
     mockUseRoundList.mockReturnValue({
       data: [
         { RoundNum: 0, TokenId: 12, AmountEth: 6.17, TimeStamp: 1_600_000_000 },
@@ -230,7 +285,7 @@ describe('AllocationFinalizedPage', () => {
       ],
       isLoading: false,
     });
-    render(<AllocationFinalizedPage seoSummary={<h1>Summary</h1>} />);
+    render(<Page seoSummary={<h1>Summary</h1>} />);
     expect(screen.getByRole('heading', { level: 1, name: 'Summary' })).toBeInTheDocument();
     const cards = screen.getAllByRole('figure');
     expect(within(cards[0]!).getByRole('link', { name: /cycleHash\(cycle=1\)/ })).toHaveAttribute(
@@ -241,43 +296,43 @@ describe('AllocationFinalizedPage', () => {
   });
 
   it('links every cycle once from the index, never twice', () => {
-    mockSearchParams = new URLSearchParams('');
+    query = new URLSearchParams('');
     mockUseRoundList.mockReturnValue({
       data: [{ RoundNum: 0, TokenId: 12, AmountEth: 6.17, TimeStamp: 1_600_000_000 }],
       isLoading: false,
     });
-    render(<AllocationFinalizedPage seoSummary={<h1>Summary</h1>} />);
+    render(<Page seoSummary={<h1>Summary</h1>} />);
     expect(
       screen.getByRole('link', { name: 'allocation.finalized.links.allCycles' }),
     ).toHaveAttribute('href', '/allocation');
   });
 
   it('says so when no cycle is finalized yet, instead of a heading over an empty grid', () => {
-    mockSearchParams = new URLSearchParams('');
+    query = new URLSearchParams('');
     mockUseRoundList.mockReturnValue({ data: [], isLoading: false });
-    render(<AllocationFinalizedPage seoSummary={<h1>Summary</h1>} />);
+    render(<Page seoSummary={<h1>Summary</h1>} />);
     expect(screen.getByText('allocation.finalized.index.empty.title')).toBeInTheDocument();
     expect(screen.queryAllByRole('figure')).toHaveLength(0);
   });
 
   it('shows a failed cycle list as an error with a retry', async () => {
-    mockSearchParams = new URLSearchParams('');
+    query = new URLSearchParams('');
     const refetch = jest.fn();
     mockUseRoundList.mockReturnValue({ data: undefined, isLoading: false, isError: true, refetch });
-    render(<AllocationFinalizedPage seoSummary={<h1>Summary</h1>} />);
+    render(<Page seoSummary={<h1>Summary</h1>} />);
     expect(screen.getByText('allocation.finalized.index.error')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: /try again/i }));
     expect(refetch).toHaveBeenCalledTimes(1);
   });
 
   it('never calls the index art unavailable while the collection index loads', () => {
-    mockSearchParams = new URLSearchParams('');
+    query = new URLSearchParams('');
     mockUseRoundList.mockReturnValue({
       data: [{ RoundNum: 1, TokenId: 31, AmountEth: 11.06, TimeStamp: 1_700_000_000 }],
       isLoading: false,
     });
     mockUseCSTList.mockReturnValue({ data: undefined, isLoading: true });
-    render(<AllocationFinalizedPage seoSummary={<h1>Summary</h1>} />);
+    render(<Page seoSummary={<h1>Summary</h1>} />);
     expect(screen.getByTestId('pending-plate')).toHaveAttribute('aria-busy', 'true');
     expect(screen.queryByText('detail.image.artworkUnavailable')).not.toBeInTheDocument();
   });
@@ -285,15 +340,15 @@ describe('AllocationFinalizedPage', () => {
   it('holds the received Signature on a busy plate while its seed loads', () => {
     roundInfo(ALLOCATION);
     mockUseCSTInfo.mockReturnValue({ data: undefined, isLoading: true });
-    render(<AllocationFinalizedPage />);
+    render(<Page />);
     const section = screen.getByTestId('finalized-signature');
     expect(within(section).getByTestId('pending-plate')).toHaveAttribute('aria-busy', 'true');
     expect(within(section).queryByText('detail.image.artworkUnavailable')).not.toBeInTheDocument();
   });
 
   it('treats a cycle parameter that is not a number as no cycle', () => {
-    mockSearchParams = new URLSearchParams('cycle=abc');
-    render(<AllocationFinalizedPage />);
+    query = new URLSearchParams('cycle=abc');
+    render(<Page />);
     expect(mockUseRoundInfo).toHaveBeenCalledWith(-1);
     expect(
       screen.getByRole('heading', { name: 'allocation.finalized.index.title' }),
@@ -301,25 +356,25 @@ describe('AllocationFinalizedPage', () => {
   });
 
   it('passes 0 to useRoundInfo for the first cycle', () => {
-    mockSearchParams = new URLSearchParams('cycle=0');
-    render(<AllocationFinalizedPage />);
+    query = new URLSearchParams('cycle=0');
+    render(<Page />);
     expect(mockUseRoundInfo).toHaveBeenCalledWith(0);
   });
 
   it('has no accessibility violations', async () => {
     roundInfo(ALLOCATION);
-    const { container } = render(<AllocationFinalizedPage />);
+    const { container } = render(<Page />);
     await checkA11y(container);
   });
 
   it('says quietly that the next cycle is open, and never leaves the page', async () => {
-    mockSearchParams = new URLSearchParams('cycle=3&message=success');
+    query = new URLSearchParams('cycle=3&message=success');
     mockAccount = RECIPIENT;
     roundInfo({ ...ALLOCATION, RoundNum: 3 });
     mockRoundActivationTime.mockResolvedValue(100n);
     mockGetBlock.mockResolvedValue({ timestamp: 200n });
 
-    render(<AllocationFinalizedPage />);
+    render(<Page />);
 
     const notice = await screen.findByTestId('next-cycle-notice');
     expect(notice).toHaveAttribute('role', 'status');
@@ -330,12 +385,12 @@ describe('AllocationFinalizedPage', () => {
   });
 
   it('says nothing about the next cycle while it has not opened', async () => {
-    mockSearchParams = new URLSearchParams('cycle=3&message=success');
+    query = new URLSearchParams('cycle=3&message=success');
     roundInfoFails(400);
     mockRoundActivationTime.mockResolvedValue(1_000_000n);
     mockGetBlock.mockResolvedValue({ timestamp: 100n });
 
-    render(<AllocationFinalizedPage />);
+    render(<Page />);
 
     await act(async () => {
       await new Promise((r) => {
@@ -348,12 +403,12 @@ describe('AllocationFinalizedPage', () => {
   });
 
   it('never watches the next cycle when the page was not opened by a finalization', async () => {
-    mockSearchParams = new URLSearchParams('cycle=3');
+    query = new URLSearchParams('cycle=3');
     roundInfo({ ...ALLOCATION, RoundNum: 3 });
     mockRoundActivationTime.mockResolvedValue(1n);
     mockGetBlock.mockResolvedValue({ timestamp: 9_999_999n });
 
-    render(<AllocationFinalizedPage />);
+    render(<Page />);
 
     await act(async () => {
       await new Promise((r) => {
@@ -363,5 +418,29 @@ describe('AllocationFinalizedPage', () => {
 
     expect(mockRoundActivationTime).not.toHaveBeenCalled();
     expect(screen.queryByTestId('next-cycle-notice')).not.toBeInTheDocument();
+  });
+});
+
+describe('parseFinalizedSearch', () => {
+  it('reads a plain non-negative cycle and the success message', () => {
+    expect(parseFinalizedSearch({ cycle: '7', message: 'success' })).toEqual({
+      cycle: 7,
+      isClaimSuccess: true,
+    });
+    expect(parseFinalizedSearch({ cycle: '0' })).toEqual({ cycle: 0, isClaimSuccess: false });
+  });
+
+  it('treats anything else as no cycle, and a message without a cycle as no success', () => {
+    for (const cycle of ['abc', '-1', '1.5', '', '99999999999999999999']) {
+      expect(parseFinalizedSearch({ cycle }).cycle).toBeNull();
+    }
+    expect(parseFinalizedSearch({ message: 'success' })).toEqual({
+      cycle: null,
+      isClaimSuccess: false,
+    });
+  });
+
+  it('takes the first of repeated parameters', () => {
+    expect(parseFinalizedSearch({ cycle: ['3', '4'] }).cycle).toBe(3);
   });
 });

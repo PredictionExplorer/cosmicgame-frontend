@@ -17,7 +17,7 @@ export interface AllocationSplitSegment {
   percent: number | null;
   /** The ETH the track carried, when the split is of a real cycle. */
   amount?: number | null;
-  /** The share is approximate (the compounding remainder): shown with "~". */
+  /** The share and amount are approximate (the compounding remainder): shown with "~". */
   approximate?: boolean;
 }
 
@@ -106,7 +106,10 @@ export function AllocationSplitBar({
                   segment.amount === null || segment.amount === undefined ? (
                     <UnknownValue label={unavailableLabel} />
                   ) : (
-                    <Amount value={segment.amount} unit="ETH" context="table" />
+                    <span className="whitespace-nowrap">
+                      {segment.approximate ? '~' : null}
+                      <Amount value={segment.amount} unit="ETH" context="table" />
+                    </span>
                   )
                 ) : null}
                 <span

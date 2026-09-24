@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { getEnduranceChampions } from '@/utils';
+import { protocolFacts } from '@/content/protocol-facts';
 
 import { ALLOCATION_TRACK_COPY_KEYS, type AllocationTrackId } from '@/config/allocationTracks';
 import { Link } from '@/i18n/navigation';
@@ -28,7 +29,6 @@ import { PageShell } from '@/components/ui/page-shell';
 import { SectionHeader } from '@/components/ui/section-header';
 import { Skeleton, SkeletonTable } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Term } from '@/components/ui/term';
 import { TxExplorerLink } from '@/components/ui/tx-status';
 import GestureHistoryTable from '@/components/tables/GestureHistoryTable';
 import AnchoringRecipientTable from '@/components/tables/AnchoringRecipientTable';
@@ -44,6 +44,10 @@ import {
   AllocationSplitBar,
   type AllocationSplitSegment,
 } from '@/components/winnings/AllocationSplitBar';
+import {
+  cycleReserveSplit,
+  type DistributedTrackId,
+} from '@/components/winnings/cycleReserveSplit';
 import { useMissingCycle } from '@/components/winnings/missingCycle';
 import { SignatureCard } from '@/components/winnings/SignatureCard';
 import { useSignatureIndex, type SignatureArtState } from '@/components/winnings/useSignatureIndex';
@@ -63,26 +67,17 @@ import { countRecipients, STELLAR_SELECTION_RECORD_TYPES } from '@/utils/allocat
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import { formatAddress, formatAmount } from '@/utils/format';
 import { formatId } from '@/utils/format/ids';
-import type { GlossaryTermId } from '@/lib/glossary';
 
 /** The four roles a finalized cycle imprints a Signature for, in the order they are shown. */
 type RoleId = 'signature' | 'chrono' | 'endurance' | 'finalCst';
-
-/** Each role's glossary entry: the role's name explains itself. */
-const ROLE_TERMS = {
-  signature: 'signatureAllocation',
-  chrono: 'chronoWarrior',
-  endurance: 'enduranceChampion',
-  finalCst: 'finalCstGesture',
-} as const satisfies Record<RoleId, GlossaryTermId>;
 
 interface CycleRole {
   id: RoleId;
   address: string;
   tokenId: number;
   /**
-   * What the role received besides its Signature. The Signature Allocation's ETH is the
-   * header's figure, so its card names only the CST.
+   * What the role received besides its Signature. Every card follows the same rule, so the
+   * Signature Allocation's card names its ETH too, although the header repeats it.
    */
   eth: number | null;
   cst: number | null;
@@ -94,7 +89,7 @@ function cycleRoles(cycle: RoundInfo): CycleRole[] {
       id: 'signature',
       address: cycle.WinnerAddr,
       tokenId: cycle.TokenId,
-      eth: null,
+      eth: toFiniteNumber(cycle.AmountEth),
       cst: toFiniteNumber(cycle.CSTAmountEth),
     },
     {
@@ -131,12 +126,8 @@ function roleAmounts(role: CycleRole): ReactNode[] {
   ];
 }
 
-/** The ETH tracks a finalized cycle distributed, in the order every chart of the split uses. */
-const DISTRIBUTED_TRACKS = ['signature', 'chrono', 'stellar', 'anchor', 'publicGoods'] as const;
-
-function distributedEth(
-  cycle: RoundInfo,
-): Record<(typeof DISTRIBUTED_TRACKS)[number], number | null> {
+/** The ETH each distributed track of a finalized cycle carried, as the API reports it. */
+function distributedEth(cycle: RoundInfo): Record<DistributedTrackId, number | null> {
   return {
     signature: toFiniteNumber(cycle.AmountEth),
     chrono: toFiniteNumber(cycle.ChronoWarriorAmountEth),
@@ -607,16 +598,15 @@ function CycleRecord({
   const locale = useLocale();
   const format = useFormat();
 
-  const amounts = distributedEth(cycle);
-  const knownTotal = DISTRIBUTED_TRACKS.every((id) => amounts[id] !== null)
-    ? DISTRIBUTED_TRACKS.reduce((sum, id) => sum + (amounts[id] ?? 0), 0)
-    : null;
-  const segments: AllocationSplitSegment[] = DISTRIBUTED_TRACKS.map((id) => ({
-    id,
-    label: trackLabel(id),
-    definition: trackDefinition(id),
-    amount: amounts[id],
-    percent: knownTotal && amounts[id] !== null ? ((amounts[id] ?? 0) / knownTotal) * 100 : null,
+  // Shares of the Cycle Reserve, as /allocation draws the protocol split (25%, 8%, …, ~50%).
+  const split = cycleReserveSplit(distributedEth(cycle), protocolFacts.mainEthPercentage);
+  const knownTotal = split.distributed;
+  const segments: AllocationSplitSegment[] = split.shares.map((share) => ({
+    ...share,
+    label: trackLabel(share.id),
+    definition: trackDefinition(share.id),
+    // The remainder is derived from the reserve: shown as approximate.
+    approximate: share.id === 'nextCycle',
   }));
 
   const contributed = toFiniteNumber(cycle.RoundStats?.TotalDonatedAmountEth);
@@ -652,8 +642,9 @@ function CycleRecord({
       label: t('details.statistics.cards.totalContributed.label'),
       value:
         contributed === null ? null : (
+          // The label already names the unit ("Contributed ETH").
           <Link href={`/eth-contribution/round/${cycle.RoundNum}`} className="link-quiet">
-            <Amount value={contributed} unit="ETH" context="hero" />
+            <Amount value={contributed} unit="ETH" context="hero" showUnit={false} />
           </Link>
         ),
       info: t('details.statistics.cards.totalContributed.tooltip'),
@@ -664,10 +655,13 @@ function CycleRecord({
 
   return (
     <>
+      {/* One explanation of the four roles for the section; each card's title is the way to
+          its Signature, like every other card of a Signature. */}
       <CycleSection
         id="cycle-recipients"
         title={t('details.recipientSection.title')}
         description={t('details.recipientSection.description')}
+        info={t('details.recipientSection.rolesInfo')}
       >
         {artState === 'failed' ? (
           <ErrorState
@@ -690,17 +684,12 @@ function CycleRecord({
                     tokenId={role.tokenId}
                     seed={signatureSeed(role.tokenId)}
                     artState={artState}
-                    title={
-                      <Term id={ROLE_TERMS[role.id]}>
-                        {t(`details.recipientSection.cards.${role.id}.title`)}
-                      </Term>
-                    }
+                    title={t(`details.recipientSection.cards.${role.id}.title`)}
                     titleAs="h3"
-                    linkTitle={false}
                     meta={[
-                      <Link key="token" href={`/detail/${role.tokenId}`} className="link type-mono">
+                      <span key="token" className="type-mono">
                         {id}
-                      </Link>,
+                      </span>,
                       ...roleAmounts(role),
                     ]}
                     sizes="(min-width: 1024px) 18rem, 50vw"
@@ -709,9 +698,10 @@ function CycleRecord({
                     unavailableDetail={id}
                   >
                     {role.address ? (
-                      <p className="mt-1 flex flex-wrap items-center gap-2 type-caption text-subtle">
+                      <p className="mt-1 flex flex-wrap items-center gap-x-2 type-caption text-subtle">
                         <span>{t('details.recipientCard.recipient')}</span>
-                        <AddressChip address={role.address} />
+                        {/* A protocol name ("Cosmic Signature Protocol") wraps in the narrow card. */}
+                        <AddressChip address={role.address} wrapLabel />
                       </p>
                     ) : null}
                   </SignatureCard>
@@ -719,12 +709,10 @@ function CycleRecord({
                   <div className="flex flex-col gap-3">
                     <PendingPlate density="compact" label={artworkUnavailable} />
                     <h3 className="type-body-md font-medium text-foreground">
-                      <Term id={ROLE_TERMS[role.id]}>
-                        {t(`details.recipientSection.cards.${role.id}.title`)}
-                      </Term>
+                      {t(`details.recipientSection.cards.${role.id}.title`)}
                     </h3>
                     <WallLabelMeta items={roleAmounts(role)} />
-                    <AddressChip address={role.address} />
+                    <AddressChip address={role.address} wrapLabel />
                   </div>
                 )}
               </li>
