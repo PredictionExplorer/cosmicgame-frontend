@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, type ComponentType } from 'react';
+import { useMemo, useState, type ComponentType, type ReactNode } from 'react';
 import { ArrowDownLeft, ArrowRight, ArrowUpRight, Flame, type LucideProps } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { getAddress, isAddress } from 'viem';
@@ -69,14 +69,28 @@ function stringOrEmpty(value: unknown): string {
   return typeof value === 'string' ? value : '';
 }
 
-/** The activity word with its glyph: the direction reads before the amount does. */
-function ActivityCell({ activity }: { activity: TransferActivity }) {
+/**
+ * The activity word with its glyph: the direction reads before the amount
+ * does. On a phone, where the counterparty column is dropped to keep each
+ * record short, a transfer's other side follows under the word (the
+ * protocol's own imprints and consumptions need no second line).
+ */
+function ActivityCell({
+  activity,
+  counterparty,
+}: {
+  activity: TransferActivity;
+  counterparty?: ReactNode;
+}) {
   const t = useTranslations('myPages.transferHistory');
   const Icon = ACTIVITY_ICONS[activity];
   return (
-    <span className="inline-flex items-center gap-2 whitespace-nowrap">
-      <Icon aria-hidden className="size-4 shrink-0 text-subtle" />
-      {t(`activity.${activity}`)}
+    <span className="inline-flex flex-col items-end gap-0.5 sm:items-start">
+      <span className="inline-flex items-center gap-2 whitespace-nowrap">
+        <Icon aria-hidden className="size-4 shrink-0 text-subtle" />
+        {t(`activity.${activity}`)}
+      </span>
+      {counterparty ? <span className="type-caption sm:hidden">{counterparty}</span> : null}
     </span>
   );
 }
@@ -167,12 +181,20 @@ export function AddressTransferHistory({
       year: 'auto',
       sortable: true,
     };
+    const counterpartyChip = (other: string) => (
+      <AddressChip address={other} variant="plain" showCopy={false} currentAddress={address} />
+    );
     const activity: DataTableColumn<TransferEntry> = {
       id: 'activity',
       kind: 'text',
       header: t('columns.activity'),
       value: (entry) => t(`activity.${entry.activity}`),
-      cell: (entry) => <ActivityCell activity={entry.activity} />,
+      cell: (entry) => (
+        <ActivityCell
+          activity={entry.activity}
+          counterparty={entry.counterparty ? counterpartyChip(entry.counterparty) : null}
+        />
+      ),
     };
     // The protocol imprints and consumes: those rows name it rather than
     // print the zero address, and a transfer's other side is its address.
@@ -181,15 +203,12 @@ export function AddressTransferHistory({
       id: 'counterparty',
       kind: 'address',
       header: t('columns.counterparty'),
+      // On a phone the activity cell carries it instead.
+      priority: 'secondary',
       value: (entry) => entry.counterparty ?? protocolName,
       cell: (entry) =>
         entry.counterparty ? (
-          <AddressChip
-            address={entry.counterparty}
-            variant="plain"
-            showCopy={false}
-            currentAddress={address}
-          />
+          counterpartyChip(entry.counterparty)
         ) : (
           <span className="text-subtle">{protocolName}</span>
         ),
