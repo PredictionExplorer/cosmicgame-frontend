@@ -32,8 +32,7 @@
   },
   "attachedAssets": {
     "actions": {
-      "claim": "Забрати",
-      "claiming": "Забираємо…"
+      "claim": "Забрати"
     },
     "status": {
       "yes": "Так",
@@ -46,6 +45,7 @@
       "empty": "Долучених NFT ще немає.",
       "imageAlt": "NFT #{id}",
       "imageUnavailable": "Зображення недоступне",
+      "unknownToken": "Невідомий токен",
       "columns": {
         "datetime": "Дата й час",
         "contributorAddress": "Хто долучив",
@@ -54,7 +54,8 @@
         "tokenId": "ID токена",
         "tokenImage": "Зображення",
         "tokenUri": "URI токена"
-      }
+      },
+      "ariaLabel": "Долучені NFT"
     },
     "erc20": {
       "empty": "Долучених токенів ERC-20 ще немає.",
@@ -66,7 +67,8 @@
         "retrievedAmount": "Забрана сума",
         "recipient": "Отримувач",
         "retrieved": "Забрано"
-      }
+      },
+      "ariaLabel": "Долучені токени ERC-20"
     }
   },
   "loading": "Завантаження…",

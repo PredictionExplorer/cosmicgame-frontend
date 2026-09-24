@@ -501,7 +501,7 @@ export const LOCALE_SEO: Record<TranslatedLocale, LocaleSeoFixture> = {
     ],
     appSummaries: [
       { path: '/zh/statistics', summary: 'Cosmic Signature 协议统计' },
-      { path: '/zh/gallery', summary: '确定性 NFT 艺术' },
+      { path: '/zh/gallery', summary: '已铭刻 NFT' },
       { path: '/zh/anchoring', summary: '锚定派发' },
       { path: '/zh/allocation', summary: '分配历史' },
       { path: '/zh/eth-contribution', summary: '直接 ETH 贡献' },
@@ -518,7 +518,7 @@ export const LOCALE_SEO: Record<TranslatedLocale, LocaleSeoFixture> = {
     ],
     appSummaries: [
       { path: '/zh-TW/statistics', summary: 'Cosmic Signature 協議統計' },
-      { path: '/zh-TW/gallery', summary: '確定性 NFT 藝術' },
+      { path: '/zh-TW/gallery', summary: '已銘刻 NFT' },
       { path: '/zh-TW/anchoring', summary: '錨定配發' },
       { path: '/zh-TW/allocation', summary: '分配歷史' },
       { path: '/zh-TW/eth-contribution', summary: '直接 ETH 貢獻' },
@@ -535,7 +535,7 @@ export const LOCALE_SEO: Record<TranslatedLocale, LocaleSeoFixture> = {
     ],
     appSummaries: [
       { path: '/zh-HK/statistics', summary: 'Cosmic Signature 協議統計' },
-      { path: '/zh-HK/gallery', summary: '確定性 NFT 藝術' },
+      { path: '/zh-HK/gallery', summary: '已銘刻 NFT' },
       { path: '/zh-HK/anchoring', summary: '錨定派發' },
       { path: '/zh-HK/allocation', summary: '分配歷史' },
       { path: '/zh-HK/eth-contribution', summary: '直接 ETH 貢獻' },
@@ -552,7 +552,7 @@ export const LOCALE_SEO: Record<TranslatedLocale, LocaleSeoFixture> = {
     ],
     appSummaries: [
       { path: '/uk/statistics', summary: 'Статистика протоколу Cosmic Signature' },
-      { path: '/uk/gallery', summary: 'Детерміноване NFT-мистецтво' },
+      { path: '/uk/gallery', summary: 'Закарбовані NFT' },
       { path: '/uk/anchoring', summary: 'Надходження за закріплення' },
       { path: '/uk/allocation', summary: 'Отримувачі розподілів' },
       { path: '/uk/eth-contribution', summary: 'Прямі внески ETH' },
@@ -569,7 +569,7 @@ export const LOCALE_SEO: Record<TranslatedLocale, LocaleSeoFixture> = {
     ],
     appSummaries: [
       { path: '/ko/statistics', summary: 'Cosmic Signature 프로토콜 통계' },
-      { path: '/ko/gallery', summary: '결정론적 NFT 아트' },
+      { path: '/ko/gallery', summary: '각인된 NFT' },
       { path: '/ko/anchoring', summary: '앵커링 지급' },
       { path: '/ko/allocation', summary: '배분 수령자' },
       { path: '/ko/eth-contribution', summary: '직접 ETH 기여' },
@@ -586,7 +586,7 @@ export const LOCALE_SEO: Record<TranslatedLocale, LocaleSeoFixture> = {
     ],
     appSummaries: [
       { path: '/ja/statistics', summary: 'Cosmic Signatureプロトコル統計' },
-      { path: '/ja/gallery', summary: '決定論的NFTアート' },
+      { path: '/ja/gallery', summary: '刻印済みNFT' },
       { path: '/ja/anchoring', summary: '係留配分' },
       { path: '/ja/allocation', summary: '配分の受領者' },
       { path: '/ja/eth-contribution', summary: '直接ETH拠出' },
@@ -603,7 +603,7 @@ export const LOCALE_SEO: Record<TranslatedLocale, LocaleSeoFixture> = {
     ],
     appSummaries: [
       { path: '/vi/statistics', summary: 'Thống kê giao thức Cosmic Signature' },
-      { path: '/vi/gallery', summary: 'Nghệ thuật NFT tất định' },
+      { path: '/vi/gallery', summary: 'NFT đã khắc' },
       { path: '/vi/anchoring', summary: 'Phân phối neo giữ' },
       { path: '/vi/allocation', summary: 'Người nhận phân bổ' },
       { path: '/vi/eth-contribution', summary: 'Đóng góp ETH trực tiếp' },

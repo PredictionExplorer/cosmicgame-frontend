@@ -1,6 +1,6 @@
 {
   "gallery": {
-    "placeholder": "トークンIDまたは名前で検索…",
+    "placeholder": "番号または名前",
     "ariaLabel": "NFTを検索",
     "clear": "検索をクリア",
     "submit": "検索",

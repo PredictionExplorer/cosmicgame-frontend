@@ -6,37 +6,6 @@
   "jsonLd": {
     "name": "Cosmic Signature 갤러리"
   },
-  "intro": {
-    "badge": "제너러티브 아카이브",
-    "description": "Cosmic Signature NFT 하나하나는 온체인 시드에서 삼체 문제 물리 시뮬레이션을 거쳐 태어난 고유한 제너러티브 아트입니다. 일반적인 사이클에서는 새 NFT 24개가 각인됩니다. 역할 NFT가 4개, 참여자 대상 별빛 선정이 10개, RandomWalk NFT 앵커링 보유자를 위한 앵커링 NFT 별빛 선정이 10개입니다."
-  },
-  "featured": {
-    "viewAria": "Cosmic Signature {id} 보기",
-    "alt": "Cosmic Signature 작품 {id}",
-    "emptyHint": "NFT 데이터를 불러오면 컬렉션의 작품이 여기에 표시됩니다.",
-    "badgeImprint": "대표 각인",
-    "badgeArchive": "아카이브",
-    "awaitingMetadata": "메타데이터 대기 중"
-  },
-  "card": {
-    "alt": "Cosmic Signature {id}",
-    "unnamed": "이름 없음",
-    "age": {
-      "justNow": "방금",
-      "minutes": "{count}분 전",
-      "hours": "{count}시간 전",
-      "days": "{count}일 전",
-      "months": "{count}개월 전",
-      "years": "{count}년 전"
-    },
-    "tooltips": {
-      "round": "사이클 {round}에서 각인됨",
-      "anchored": "현재 앵커링되어 앵커링 지급을 받고 있음",
-      "customName": "이 NFT에는 고유한 이름이 붙어 있습니다",
-      "identifier": "이 COSMIC NFT의 고유 일련번호",
-      "mintedOn": "각인 일시: {date}"
-    }
-  },
   "filters": {
     "ariaLabel": "NFT 필터",
     "all": {
@@ -54,7 +23,6 @@
   },
   "sort": {
     "ariaLabel": "정렬 순서",
-    "tooltip": "NFT 표시 순서를 변경합니다",
     "newest": "최신순",
     "oldest": "오래된순",
     "cycleDesc": "사이클 높은 순",
@@ -84,13 +52,27 @@
     "list": "목록 보기"
   },
   "pagination": {
-    "showing": "전체 NFT <value>{total}</value>개 중 <value>{start}</value>~<value>{end}</value>번째 표시",
-    "perPage": "페이지당",
-    "perPageAria": "페이지당 항목 수",
-    "perPageTooltip": "페이지당 표시되는 NFT 수"
+    "perPage": "페이지당"
   },
   "empty": {
     "title": "NFT를 찾을 수 없습니다",
-    "description": "검색어나 필터를 조정해 다시 시도해 주세요."
+    "description": "이 필터에 맞는 시그니처가 없습니다. 필터를 지우면 전체 컬렉션을 볼 수 있습니다.",
+    "collectionTitle": "아직 시그니처가 없습니다",
+    "collectionDescription": "각 시그니처는 사이클이 마감되어 각인되면 이곳에 나타납니다."
+  },
+  "about": {
+    "title": "컬렉션 소개",
+    "description": "Cosmic Signature NFT 하나하나는 온체인 시드에서 삼체 문제 물리 시뮬레이션을 거쳐 태어난 고유한 제너러티브 아트입니다. 모든 시그니처는 프로토콜 기록으로 재현 가능하며, 특정 사이클의 맥락을 담고 있습니다. 일반적인 사이클에서는 새 NFT 24개가 각인됩니다. 역할 NFT가 4개, 참여자 대상 별빛 선정이 10개, RandomWalk NFT 앵커링 보유자를 위한 앵커링 NFT 별빛 선정이 10개입니다."
+  },
+  "toolbar": {
+    "filters": "필터",
+    "filtersWithCount": "필터 · {count}",
+    "show": "표시",
+    "showResults": "{count, plural, other {NFT #개 보기}}"
+  },
+  "results": {
+    "total": "{count, plural, other {NFT #개}}",
+    "filtered": "{total, plural, other {NFT #개 중 {count, number}개}}",
+    "regionLabel": "시그니처"
   }
 }

@@ -591,17 +591,33 @@
     "title": "Іменовані Cosmic Signature NFT",
     "subtitle": "Cosmic Signature NFT, яким власники дали власні імена",
     "emptyTitle": "Іменованих NFT немає",
-    "emptyDescription": "Жодному Cosmic Signature NFT ще не дали ім’я."
+    "emptyDescription": "Жодному Cosmic Signature NFT ще не дали ім’я.",
+    "galleryLink": "Переглянути їх у галереї"
   },
   "attachedNfts": {
     "title": "Долучені NFT від спільноти",
-    "subtitle": "NFT, які учасники спільноти долучили до жестів у різних циклах"
+    "subtitle": "NFT, які учасники спільноти долучили до жестів у різних циклах",
+    "loadErrorTitle": "Не вдалося завантажити долучені NFT",
+    "loadErrorMessage": "Не вдалося прочитати записи долучених NFT. Спробуйте ще раз.",
+    "emptyTitle": "Долучених NFT ще немає",
+    "emptyDescription": "Тут з’являються NFT, долучені до жестів. Кожен переходить до отримувача розподілу Сигнатури, коли цикл завершується.",
+    "card": {
+      "cycle": "Цикл {cycle}",
+      "attachedBy": "Хто долучив"
+    }
   },
   "usedRwlkNfts": {
     "title": "Використані Random Walk NFT",
     "subtitle": "Random Walk NFT, долучені до ETH-жестів для одноразового зменшення вартості жесту на 50%",
-    "loading": "Завантаження…",
-    "empty": "NFT ще немає."
+    "artAlt": "RandomWalk NFT {id}",
+    "loadErrorTitle": "Не вдалося завантажити використані RandomWalk NFT",
+    "loadError": "Не вдалося прочитати використані RandomWalk NFT. Спробуйте ще раз.",
+    "emptyTitle": "Використаних RandomWalk NFT ще немає",
+    "emptyDescription": "RandomWalk NFT з’являється тут, щойно ETH-жест використає його для одноразового зменшення вартості жесту.",
+    "card": {
+      "cycle": "Цикл {cycle}",
+      "usedBy": "Учасник"
+    }
   },
   "stellarSelectionEth": {
     "invalidAddress": "Недійсна адреса",

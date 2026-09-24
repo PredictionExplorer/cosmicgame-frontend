@@ -14,6 +14,7 @@ import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
 import { CodeSeoSummary } from '../code/CodeSeoSummary';
 import { ContractsSeoSummary } from '../contracts/ContractsSeoSummary';
 import { CurrentCycleSeoSummary } from '../current-cycle/CurrentCycleSeoSummary';
+import { GalleryAbout } from '../gallery/GalleryAbout';
 import { GallerySeoSummary } from '../gallery/GallerySeoSummary';
 import { StatisticsSeoSummary } from '../statistics/StatisticsSeoSummary';
 // lexicon-allow-start: test imports mirror sealed API module filenames.
@@ -355,6 +356,26 @@ describe('server-rendered page headers', () => {
     expect(figureValue('anchored')).toHaveTextContent('22');
     expect(figureValue('named')).toHaveTextContent('3');
     expect(screen.getByText(COMMON.snapshot)).toBeInTheDocument();
+    // The header stays short so the art reaches the first screen: its related
+    // pages sit in "About the collection" after the wall.
+    expect(
+      screen.queryByRole('navigation', { name: seoMessages.gallerySummary.relatedAria }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders the gallery’s closing section with the pages to read next', async () => {
+    render(await GalleryAbout({ locale: 'en' }));
+    expect(screen.getByRole('region')).toHaveAccessibleName(
+      screen.getByRole('heading', { level: 2 }).textContent ?? '',
+    );
+    const related = screen.getByRole('navigation', {
+      name: seoMessages.gallerySummary.relatedAria,
+    });
+    expect(
+      within(related)
+        .getAllByRole('link')
+        .map((link) => link.getAttribute('href')),
+    ).toEqual(['/how-it-works', '/code', '/statistics']);
   });
 
   it('renders the current-cycle header with live cycle figures', async () => {
@@ -778,10 +799,13 @@ describe('server-rendered page headers', () => {
         name: zhSeoMessages.gallerySummary.heading,
       }),
     ).toBeInTheDocument();
+    gallery.unmount();
+
+    const galleryAbout = render(await GalleryAbout({ locale: 'zh' }));
     expect(
       screen.getByRole('link', { name: zhSeoMessages.gallerySummary.links.code }),
     ).toHaveAttribute('href', '/code');
-    gallery.unmount();
+    galleryAbout.unmount();
 
     const currentCycle = render(await CurrentCycleSeoSummary());
     expect(

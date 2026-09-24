@@ -46,28 +46,28 @@ const RETIRED: Record<string, RetiredPattern> = {
     // (WCAG exempts inactive controls).
     pattern:
       /(?<!disabled:)(?<![\w-])text-(?:muted-foreground|white)\/(?:[0-5]?\d|60|\[0?\.[0-6]\d*\])(?![\w.])/g,
-    baseline: 63,
+    baseline: 48,
   },
   'text below the 12px floor': {
     use: 'type-caption (12px) or type-label (13px)',
     pattern: /(?<![\w-])text-\[(?:[5-9]|1[01])(?:\.\d+)?px\]/g,
-    baseline: 50,
+    baseline: 29,
   },
   'white-alpha surface or border': {
     use: 'bg-surface-sunken / bg-surface / bg-surface-raised, border-rule / border-rule-faint',
     pattern: /(?<![\w-])(?:bg|border(?:-[trblxy])?)-white\/(?:\[[\d.]+\]|\d+)/g,
-    baseline: 213,
+    baseline: 128,
   },
   'focus reset that replaces the shared outline': {
     use: 'the global :focus-visible outline (styles/focus-ring.css), focus-ring-inset or focus-ring-within',
     pattern: /focus-visible:outline-none/g,
-    baseline: 8,
+    baseline: 4,
   },
   'bold display face': {
     use: 'type-heading-3 / type-title (Inter 600) below 24px, a display tier above',
     pattern:
       /font-display(?=[^'"`]*\bfont-(?:bold|extrabold|black)\b)|\bfont-(?:bold|extrabold|black)\b(?=[^'"`]*\bfont-display\b)/g,
-    baseline: 11,
+    baseline: 8,
   },
 };
 

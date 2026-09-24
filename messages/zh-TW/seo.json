@@ -303,11 +303,12 @@
   },
   "gallerySummary": {
     "heading": "Cosmic Signature 畫廊",
-    "description": "瀏覽由確定性三體物理、鏈上種子、光譜渲染與演繹週期數據共同生成的 Cosmic Signature NFT。每件簽名作品都可從協議紀錄復現，並對應一個特定週期。",
+    "description": "瀏覽由確定性三體物理、鏈上種子、光譜渲染與演繹週期數據共同生成的 Cosmic Signature NFT。",
     "cards": {
       "imprinted": "已銘刻 NFT",
       "anchored": "已錨定 NFT",
-      "named": "已命名 NFT"
+      "named": "已命名 NFT",
+      "cycles": "已收官週期"
     },
     "relatedAria": "畫廊相關頁面",
     "links": {

@@ -1,100 +1,94 @@
 'use client';
 
-import { SlidersHorizontal } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { forwardRef } from 'react';
 
 import { cn } from '@/lib/utils';
-import { TOUCH_TARGET_HEIGHT_CLASS } from '@/lib/touch-target';
 
+import type { SortKey, StatusFilter, ViewMode } from '../galleryQuery';
+
+import { GalleryFiltersButton } from './GalleryFiltersButton';
 import { GallerySearchInput } from './GallerySearchInput';
-import { GalleryFilterChips, type FilterKey } from './GalleryFilterChips';
-import { GallerySortSelect, type SortKey } from './GallerySortSelect';
-import { GalleryViewToggle, type ViewMode } from './GalleryViewToggle';
+import { GallerySortSelect } from './GallerySortSelect';
+import { GalleryStatusFilter } from './GalleryStatusFilter';
+import { GalleryViewToggle } from './GalleryViewToggle';
 
-interface GalleryToolbarProps {
-  searchQuery: string;
-  onSearchChange: (query: string) => void;
-  onSearchSubmit: (query: string) => void;
-  filter: FilterKey;
-  onFilterChange: (filter: FilterKey) => void;
+export interface GalleryToolbarProps {
+  search: string;
+  onSearchCommit: (query: string) => void;
+  status: StatusFilter;
+  onStatusChange: (status: StatusFilter) => void;
   sort: SortKey;
   onSortChange: (sort: SortKey) => void;
-  viewMode: ViewMode;
-  onViewModeChange: (mode: ViewMode) => void;
-  resultCount?: number;
-  totalCount?: number;
-  /** Opens / closes the trait facets (rail on wide screens, sheet elsewhere). */
-  onToggleFacets?: () => void;
-  facetsOpen?: boolean;
-  activeTraitFilterCount?: number;
-  /** Hide trait-based sort orders while the trait index is unavailable. */
-  traitSortsAvailable?: boolean;
+  view: ViewMode;
+  onViewChange: (view: ViewMode) => void;
+  /** Opens the trait rail (desktop) or the filter sheet (below `lg`). */
+  onToggleFilters: () => void;
+  /** The rail is open. */
+  filtersOpen: boolean;
+  /** Active filters counted on the Filters button. */
+  activeFilterCount: number;
+  /** Hide trait-based orders while the trait index is unavailable. */
+  traitSortsAvailable: boolean;
+  className?: string;
 }
 
-/** Search, status filters, trait facet toggle, sort, and view mode for the gallery. */
-export function GalleryToolbar({
-  searchQuery,
-  onSearchChange,
-  onSearchSubmit,
-  filter,
-  onFilterChange,
-  sort,
-  onSortChange,
-  viewMode,
-  onViewModeChange,
-  resultCount,
-  totalCount,
-  onToggleFacets,
-  facetsOpen = false,
-  activeTraitFilterCount = 0,
-  traitSortsAvailable = true,
-}: GalleryToolbarProps) {
-  const tTraits = useTranslations('traits');
-
-  return (
-    <div className="space-y-4">
+/**
+ * The gallery's one control row. From `lg` it holds everything: search, the
+ * status filter, Filters, sort and view, and stays under the header while the
+ * grid scrolls. Below `lg` it is the search and the Filters button only (the
+ * sheet holds the rest), and it scrolls away with the page, so the art gets
+ * the screen.
+ */
+export const GalleryToolbar = forwardRef<HTMLDivElement, GalleryToolbarProps>(
+  (
+    {
+      search,
+      onSearchCommit,
+      status,
+      onStatusChange,
+      sort,
+      onSortChange,
+      view,
+      onViewChange,
+      onToggleFilters,
+      filtersOpen,
+      activeFilterCount,
+      traitSortsAvailable,
+      className,
+    },
+    ref,
+  ) => (
+    <div
+      ref={ref}
+      className={cn(
+        'flex items-center gap-2 lg:flex-wrap lg:gap-3',
+        'lg:sticky lg:top-[var(--sticky-offset)] lg:z-30 lg:-mx-3 lg:rounded-surface lg:px-3 lg:py-2 lg:glass',
+        className,
+      )}
+      data-testid="gallery-toolbar"
+    >
       <GallerySearchInput
-        value={searchQuery}
-        onChange={onSearchChange}
-        onSearch={onSearchSubmit}
-        resultCount={resultCount}
-        totalCount={totalCount}
-        className="max-w-2xl mx-auto"
+        value={search}
+        onCommit={onSearchCommit}
+        className="min-w-0 flex-1 lg:min-w-48 lg:max-w-xs"
       />
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-2">
-          {onToggleFacets ? (
-            <button
-              type="button"
-              onClick={onToggleFacets}
-              aria-pressed={facetsOpen}
-              aria-label={tTraits('facets.toggleAria')}
-              className={cn(
-                'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-200',
-                TOUCH_TARGET_HEIGHT_CLASS,
-                facetsOpen || activeTraitFilterCount > 0
-                  ? 'border-primary/25 bg-primary/10 text-primary'
-                  : 'border-white/[0.06] bg-white/[0.03] text-muted-foreground hover:bg-white/[0.06] hover:text-foreground',
-              )}
-              data-testid="facets-toggle"
-            >
-              <SlidersHorizontal className="h-3 w-3" aria-hidden />
-              {activeTraitFilterCount > 0
-                ? tTraits('facets.toggleWithCount', { count: activeTraitFilterCount })
-                : tTraits('facets.toggle')}
-            </button>
-          ) : null}
-          <GalleryFilterChips value={filter} onChange={onFilterChange} />
-        </div>
-        <div className="flex items-center gap-3">
+      <GalleryStatusFilter value={status} onChange={onStatusChange} className="max-lg:hidden" />
+      <div className="flex shrink-0 items-center gap-2 lg:ms-auto lg:gap-3">
+        <GalleryFiltersButton
+          activeCount={activeFilterCount}
+          pressed={filtersOpen}
+          onClick={onToggleFilters}
+        />
+        <div className="flex items-center gap-3 max-lg:hidden">
           <GallerySortSelect
             value={sort}
             onChange={onSortChange}
             traitSortsAvailable={traitSortsAvailable}
           />
-          <GalleryViewToggle value={viewMode} onChange={onViewModeChange} />
+          <GalleryViewToggle value={view} onChange={onViewChange} />
         </div>
       </div>
     </div>
-  );
-}
+  ),
+);
+GalleryToolbar.displayName = 'GalleryToolbar';

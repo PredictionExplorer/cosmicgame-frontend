@@ -6,37 +6,6 @@
   "jsonLd": {
     "name": "Cosmic Signature 畫廊"
   },
-  "intro": {
-    "badge": "生成藝術檔案",
-    "description": "每枚 Cosmic Signature NFT 都是獨一無二的生成藝術，由鏈上種子經三體問題物理模擬推演而成。通常每個週期會銘刻 24 枚新 NFT：4 枚角色 NFT，10 枚經參與者 NFT 星選發放，另有 10 枚經錨定 NFT 星選發放給 Random Walk NFT 錨定者。"
-  },
-  "featured": {
-    "viewAria": "檢視 Cosmic Signature {id}",
-    "alt": "Cosmic Signature 作品 {id}",
-    "emptyHint": "索引到 NFT 後，真實作品會隨即在此呈現。",
-    "badgeImprint": "精選銘刻",
-    "badgeArchive": "檔案",
-    "awaitingMetadata": "等待後設資料"
-  },
-  "card": {
-    "alt": "Cosmic Signature {id}",
-    "unnamed": "未命名",
-    "age": {
-      "justNow": "剛剛",
-      "minutes": "{count} 分鐘前",
-      "hours": "{count} 小時前",
-      "days": "{count} 天前",
-      "months": "{count} 個月前",
-      "years": "{count} 年前"
-    },
-    "tooltips": {
-      "round": "銘刻於第 {round} 個週期。",
-      "anchored": "目前已錨定，正在累積錨定配發。",
-      "customName": "這枚 NFT 已設定專屬名稱。",
-      "identifier": "這枚 COSMIC NFT 的唯一順序編號。",
-      "mintedOn": "銘刻於 {date}。"
-    }
-  },
   "filters": {
     "ariaLabel": "篩選 NFT",
     "all": {
@@ -54,7 +23,6 @@
   },
   "sort": {
     "ariaLabel": "排序方式",
-    "tooltip": "調整 NFT 的顯示順序。",
     "newest": "最新在前",
     "oldest": "最早在前",
     "cycleDesc": "週期（從高到低）",
@@ -84,13 +52,27 @@
     "list": "列表檢視"
   },
   "pagination": {
-    "showing": "共 <value>{total}</value> 枚 NFT，目前顯示第 <value>{start}</value> 至 <value>{end}</value> 枚",
-    "perPage": "每頁",
-    "perPageAria": "每頁顯示數量",
-    "perPageTooltip": "每頁顯示的 NFT 數量。"
+    "perPage": "每頁"
   },
   "empty": {
     "title": "未找到 NFT",
-    "description": "試試調整搜尋或篩選條件。"
+    "description": "沒有簽名符合這些篩選條件。清除篩選即可查看完整作品集。",
+    "collectionTitle": "尚無簽名",
+    "collectionDescription": "每件簽名會在其週期收官、完成銘刻後出現在這裡。"
+  },
+  "about": {
+    "title": "關於作品集",
+    "description": "每枚 Cosmic Signature NFT 都是獨一無二的生成藝術，由鏈上種子經三體問題物理模擬推演而成。所有簽名作品都可從協議紀錄復現，並各自對應一個特定週期。通常每個週期會銘刻 24 枚新 NFT：4 枚角色 NFT，10 枚經參與者 NFT 星選發放，另有 10 枚經錨定 NFT 星選發放給 Random Walk NFT 錨定者。"
+  },
+  "toolbar": {
+    "filters": "篩選",
+    "filtersWithCount": "篩選 · {count}",
+    "show": "顯示",
+    "showResults": "顯示 {count, number} 枚 NFT"
+  },
+  "results": {
+    "total": "{count, number} 枚 NFT",
+    "filtered": "{total, number} 枚 NFT 中的 {count, number} 枚",
+    "regionLabel": "簽名"
   }
 }

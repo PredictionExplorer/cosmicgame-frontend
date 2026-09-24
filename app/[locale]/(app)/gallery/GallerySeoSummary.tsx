@@ -9,9 +9,11 @@ import { formatCount } from '@/utils/format';
 import { readDashboard } from '../publicDataReads';
 
 /**
- * The gallery header, rendered on the server: the collection hub's H1, lede,
- * one figure row (imprinted, anchored, named) and related pages. It is the
- * page's only header; the gallery renders it first.
+ * The gallery header, rendered on the server: the collection hub's H1, a
+ * one-sentence lede and one figure row (imprinted, anchored, named, finalized
+ * cycles: a 2 × 2 grid on phones). It is the page's only header, and it stays
+ * short so the first plates reach the first screen; the related pages sit in
+ * "About the collection" after the wall (GalleryAbout).
  */
 export async function GallerySeoSummary({ actions }: { actions?: ReactNode } = {}) {
   const locale = await getLocale();
@@ -47,14 +49,14 @@ export async function GallerySeoSummary({ actions }: { actions?: ReactNode } = {
           label: t('gallerySummary.cards.named'),
           value: count(stats?.TotalNamedTokens),
         },
+        {
+          // Cycles are numbered from 0, so the current one's number is how many have finalized.
+          id: 'cycles',
+          label: t('gallerySummary.cards.cycles'),
+          value: count(dashboard.data?.CurRoundNum),
+        },
       ]}
       meta={dashboard.data ? <SnapshotStamp at={dashboard.at} /> : undefined}
-      related={[
-        { href: '/how-it-works', label: t('gallerySummary.links.learn') },
-        { href: '/code', label: t('gallerySummary.links.code') },
-        { href: '/statistics', label: t('gallerySummary.links.statistics') },
-      ]}
-      relatedLabel={t('gallerySummary.relatedAria')}
     />
   );
 }

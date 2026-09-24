@@ -6,37 +6,6 @@
   "jsonLd": {
     "name": "Галерея Cosmic Signature"
   },
-  "intro": {
-    "badge": "Генеративний архів",
-    "description": "Кожен Cosmic Signature NFT — унікальний твір генеративного мистецтва, створений з ончейн-сіду через фізичну симуляцію задачі трьох тіл. У типовому циклі закарбовується 24 нові NFT: чотири за особливі ролі, десять через зоряний відбір серед учасників і ще десять через зоряний відбір закріплених NFT серед власників закріплень RandomWalk NFT."
-  },
-  "featured": {
-    "viewAria": "Переглянути Cosmic Signature {id}",
-    "alt": "Твір Cosmic Signature {id}",
-    "emptyHint": "Твори колекції з’являться тут після оновлення даних NFT.",
-    "badgeImprint": "Вибране закарбування",
-    "badgeArchive": "Архів",
-    "awaitingMetadata": "Очікування метаданих"
-  },
-  "card": {
-    "alt": "Cosmic Signature {id}",
-    "unnamed": "Без імені",
-    "age": {
-      "justNow": "щойно",
-      "minutes": "{count}хв тому",
-      "hours": "{count}год тому",
-      "days": "{count}д тому",
-      "months": "{count} міс. тому",
-      "years": "{count} р. тому"
-    },
-    "tooltips": {
-      "round": "Закарбовано в циклі {round}",
-      "anchored": "Зараз закріплено; отримує надходження за закріплення",
-      "customName": "Цей NFT має власне ім’я",
-      "identifier": "Унікальний порядковий ідентифікатор цього Cosmic Signature NFT",
-      "mintedOn": "Закарбовано {date}"
-    }
-  },
   "filters": {
     "ariaLabel": "Фільтрувати NFT",
     "all": {
@@ -54,7 +23,6 @@
   },
   "sort": {
     "ariaLabel": "Порядок сортування",
-    "tooltip": "Змінити порядок показу NFT",
     "newest": "Спочатку нові",
     "oldest": "Спочатку старі",
     "cycleDesc": "Цикл (спадання)",
@@ -84,13 +52,27 @@
     "list": "Список"
   },
   "pagination": {
-    "showing": "Показано <value>{start}</value>–<value>{end}</value> з <value>{total}</value> NFT",
-    "perPage": "На сторінці",
-    "perPageAria": "Елементів на сторінці",
-    "perPageTooltip": "Кількість NFT на сторінці"
+    "perPage": "На сторінці"
   },
   "empty": {
     "title": "NFT не знайдено",
-    "description": "Спробуйте змінити пошуковий запит або фільтри."
+    "description": "Жодна Сигнатура не відповідає цим фільтрам. Очистьте їх, щоб побачити всю колекцію.",
+    "collectionTitle": "Сигнатур поки немає",
+    "collectionDescription": "Кожна Сигнатура з’являється тут, щойно її цикл завершено й її закарбовано."
+  },
+  "about": {
+    "title": "Про колекцію",
+    "description": "Кожен Cosmic Signature NFT — унікальний твір генеративного мистецтва, створений з ончейн-сіду через фізичну симуляцію задачі трьох тіл. Будь-хто може відтворити Сигнатуру із записів протоколу, і кожна належить конкретному циклу. У типовому циклі закарбовується 24 нові NFT: чотири за особливі ролі, десять через зоряний відбір серед учасників і ще десять через зоряний відбір закріплених NFT серед власників закріплень RandomWalk NFT."
+  },
+  "toolbar": {
+    "filters": "Фільтри",
+    "filtersWithCount": "Фільтри · {count}",
+    "show": "Показати",
+    "showResults": "{count, plural, one {Показати # NFT} few {Показати # NFT} many {Показати # NFT} other {Показати # NFT}}"
+  },
+  "results": {
+    "total": "{count, plural, one {# NFT} few {# NFT} many {# NFT} other {# NFT}}",
+    "filtered": "{count, number} з {total, plural, one {# NFT} few {# NFT} many {# NFT} other {# NFT}}",
+    "regionLabel": "Сигнатури"
   }
 }

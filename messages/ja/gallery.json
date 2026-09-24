@@ -6,37 +6,6 @@
   "jsonLd": {
     "name": "Cosmic Signatureギャラリー"
   },
-  "intro": {
-    "badge": "ジェネラティブ・アーカイブ",
-    "description": "各Cosmic Signature NFTは、オンチェーンのシードから三体問題の物理シミュレーションを経て導かれた、唯一のジェネラティブアート作品です。標準的なサイクルでは24点の新しいNFTが刻印されます。役割NFTが4点、参加者の星選NFTが10点、そしてRandomWalk NFTの係留者に向けた係留NFT星選が10点です。"
-  },
-  "featured": {
-    "viewAria": "Cosmic Signature {id}を見る",
-    "alt": "Cosmic Signatureのアートワーク{id}",
-    "emptyHint": "NFTのデータを取得すると、コレクションの作品がここに表示されます。",
-    "badgeImprint": "注目の刻印",
-    "badgeArchive": "アーカイブ",
-    "awaitingMetadata": "メタデータ待ち"
-  },
-  "card": {
-    "alt": "Cosmic Signature {id}",
-    "unnamed": "名前なし",
-    "age": {
-      "justNow": "たった今",
-      "minutes": "{count}分前",
-      "hours": "{count}時間前",
-      "days": "{count}日前",
-      "months": "{count}か月前",
-      "years": "{count}年前"
-    },
-    "tooltips": {
-      "round": "サイクル{round}で刻印",
-      "anchored": "現在係留中で、係留配分を受け取っています",
-      "customName": "このNFTには固有の名前があります",
-      "identifier": "このCOSMIC NFTの固有の連番",
-      "mintedOn": "{date}に刻印"
-    }
-  },
   "filters": {
     "ariaLabel": "NFTを絞り込む",
     "all": {
@@ -54,7 +23,6 @@
   },
   "sort": {
     "ariaLabel": "並び順",
-    "tooltip": "NFTの表示順を変更",
     "newest": "新しい順",
     "oldest": "古い順",
     "cycleDesc": "サイクル（大→小）",
@@ -84,13 +52,27 @@
     "list": "リスト表示"
   },
   "pagination": {
-    "showing": "<value>{total}</value>点中<value>{start}</value>〜<value>{end}</value>点のNFTを表示",
-    "perPage": "1ページあたり",
-    "perPageAria": "1ページあたりの件数",
-    "perPageTooltip": "1ページに表示するNFTの数"
+    "perPage": "1ページあたり"
   },
   "empty": {
     "title": "NFTが見つかりません",
-    "description": "条件を変更すると、ほかの作品が見つかる場合があります。"
+    "description": "この条件に合うシグネチャーはありません。条件をクリアすると、コレクション全体を表示します。",
+    "collectionTitle": "シグネチャーはまだありません",
+    "collectionDescription": "各シグネチャーは、サイクルが確定して刻印されるとここに表示されます。"
+  },
+  "about": {
+    "title": "コレクションについて",
+    "description": "各Cosmic Signature NFTは、オンチェーンのシードから三体問題の物理シミュレーションを経て導かれた、唯一のジェネラティブアート作品です。どの作品もプロトコルの記録から再現でき、それぞれが特定のサイクルに属します。標準的なサイクルでは24点の新しいNFTが刻印されます。役割NFTが4点、参加者の星選NFTが10点、そしてRandomWalk NFTの係留者に向けた係留NFT星選が10点です。"
+  },
+  "toolbar": {
+    "filters": "絞り込み",
+    "filtersWithCount": "絞り込み · {count}",
+    "show": "表示",
+    "showResults": "{count, plural, other {#点のNFTを表示}}"
+  },
+  "results": {
+    "total": "{count, plural, other {#点のNFT}}",
+    "filtered": "{total, plural, other {全#点中{count, number}点}}",
+    "regionLabel": "シグネチャー"
   }
 }

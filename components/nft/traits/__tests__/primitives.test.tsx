@@ -1,15 +1,14 @@
 import { TOKEN_1_METADATA_V2, TOKEN_7_METADATA_V2 } from '@/lib/nftMetadata/__fixtures__/metadata';
 import { normalizeTraitEntry, parseCosmicSignatureMetadata, scoreRarity } from '@/lib/nftMetadata';
 
-import { render, screen, checkA11y } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
-import { AllocationPill } from '../AllocationPill';
+import { AllocationLabel } from '../AllocationLabel';
 import { ChaosMeter } from '../ChaosMeter';
 import { FateGlyph } from '../FateGlyph';
 import { HueStrip } from '../HueStrip';
 import { RarityRankChip } from '../RarityRankChip';
 import { SpectralClassBadge } from '../SpectralClassBadge';
-import { TraitPill } from '../TraitPill';
 import {
   SPECTRAL_CLASS_COLORS,
   dominantHue,
@@ -53,12 +52,15 @@ describe('HueStrip', () => {
 });
 
 describe('SpectralClassBadge', () => {
-  it('renders the letter, label and colour, and nothing for unknown classes', () => {
+  it('renders the class name or letter after a dot in its colour, and nothing for unknown classes', () => {
     const { rerender } = render(<SpectralClassBadge value="B" withLabel />);
     const badge = screen.getByTestId('spectral-class-badge');
-    expect(badge).toHaveTextContent('B');
-    expect(badge).toHaveTextContent('Class B');
+    // The name once, not the letter and then the name.
+    expect(badge).toHaveTextContent(/^Class B$/);
     expect(badge).toHaveAttribute('aria-label', 'Spectral class B');
+    expect(badge.firstElementChild).toHaveStyle({ backgroundColor: SPECTRAL_CLASS_COLORS.B });
+    rerender(<SpectralClassBadge value="B" />);
+    expect(screen.getByTestId('spectral-class-badge')).toHaveTextContent(/^B$/);
     rerender(<SpectralClassBadge value="Q" />);
     expect(screen.queryByTestId('spectral-class-badge')).not.toBeInTheDocument();
   });
@@ -92,14 +94,22 @@ describe('FateGlyph', () => {
   });
 });
 
-describe('AllocationPill', () => {
+describe('AllocationLabel', () => {
+  it('reads as a value: glyph and name, no pill', async () => {
+    const { container } = render(<AllocationLabel value="Stellar Selection" />);
+    expect(screen.getByTestId('allocation-label')).not.toHaveClass('rounded-full');
+    await checkA11y(container);
+  });
+
   it('localizes known allocations and tolerates unknown ones', () => {
-    const { rerender } = render(<AllocationPill value="Endurance Champion" />);
-    expect(screen.getByTestId('allocation-pill')).toHaveTextContent('Endurance Champion');
-    rerender(<AllocationPill value="Brand New Role" iconless />);
-    expect(screen.getByTestId('allocation-pill')).toHaveTextContent('Brand New Role');
-    rerender(<AllocationPill value={undefined} />);
-    expect(screen.queryByTestId('allocation-pill')).not.toBeInTheDocument();
+    const { rerender } = render(<AllocationLabel value="Endurance Champion" />);
+    expect(screen.getByTestId('allocation-label')).toHaveTextContent('Endurance Champion');
+    expect(screen.getByTestId('allocation-label').querySelector('svg')).toBeInTheDocument();
+    rerender(<AllocationLabel value="Brand New Role" iconless />);
+    expect(screen.getByTestId('allocation-label')).toHaveTextContent('Brand New Role');
+    expect(screen.getByTestId('allocation-label').querySelector('svg')).toBeNull();
+    rerender(<AllocationLabel value={undefined} />);
+    expect(screen.queryByTestId('allocation-label')).not.toBeInTheDocument();
   });
 });
 
@@ -120,22 +130,5 @@ describe('RarityRankChip', () => {
   it('renders nothing when unranked', () => {
     render(<RarityRankChip rarity={null} total={2} />);
     expect(screen.queryByTestId('rarity-rank-chip')).not.toBeInTheDocument();
-  });
-});
-
-describe('TraitPill', () => {
-  it('renders the localized value with optional type and share', async () => {
-    const { container } = render(
-      <TraitPill
-        traitKey="structure"
-        value="Orbit Ribbons"
-        withType
-        share={{ count: 3, total: 48 }}
-      />,
-    );
-    expect(container).toHaveTextContent('Structure');
-    expect(container).toHaveTextContent('Orbit Ribbons');
-    expect(container).toHaveTextContent('3/48');
-    await checkA11y(container);
   });
 });

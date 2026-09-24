@@ -19,6 +19,13 @@ jest.mock('../gallery/GalleryPage', () => ({
 jest.mock('../gallery/GallerySeoSummary', () => ({
   GallerySeoSummary: () => <div data-testid="seo-summary" />,
 }));
+// The gallery's Suspense fallback and closing section: bodies, not structured data.
+jest.mock('../gallery/GalleryView', () => ({
+  GalleryView: () => <div data-testid="gallery-fallback" />,
+}));
+jest.mock('../gallery/GalleryAbout', () => ({
+  GalleryAbout: () => <section data-testid="gallery-about" />,
+}));
 jest.mock('../contracts/Contracts', () => ({
   __esModule: true,
   default: () => <div data-testid="page-body" />,
@@ -29,10 +36,12 @@ jest.mock('../contracts/ContractsSeoSummary', () => ({
 // The dashboard seed is an async server component (it awaits the API read).
 jest.mock('../QuerySeed', () => ({
   DashboardQuerySeed: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  QuerySeed: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
-// /contracts hands the body its server read; the JSON-LD does not depend on it.
+// /contracts and /gallery hand their bodies a server read; the JSON-LD does not depend on it.
 jest.mock('../publicDataReads', () => ({
   readDashboard: () => Promise.resolve({ data: null, at: 0 }),
+  readCollection: () => Promise.resolve({ data: null, at: 0 }),
 }));
 jest.mock('../code/CodeViewer', () => ({
   __esModule: true,

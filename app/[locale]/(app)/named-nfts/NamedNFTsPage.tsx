@@ -1,78 +1,52 @@
 'use client';
 
-import type { ReactNode } from 'react';
-import { useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useMemo, type ReactNode } from 'react';
+import { ArrowRight, Tag } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
+import { useCSTList, useNamedNFTs } from '@/hooks/useApiQuery';
+import { useCollectionTraits } from '@/hooks/useNftTraits';
 import { Link } from '@/i18n/navigation';
-import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
-import {
-  TablePrimary,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryContainer,
-  TablePrimaryHead,
-  TablePrimaryHeadCell,
-  TablePrimaryRow,
-} from '@/components/styled';
-import { useNamedNFTs } from '@/hooks/useApiQuery';
-import type { CSTTokenInfo } from '@/services/api';
-import { CustomPagination } from '@/components/common/CustomPagination';
-import { Spinner } from '@/components/ui/spinner';
-import { EmptyState } from '@/components/ui/empty-state';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { EmptyState } from '@/components/ui/empty-state';
 import { PageShell } from '@/components/ui/page-shell';
+import { SignatureWall, type SignatureWallItem } from '@/components/nft/SignatureWall';
 
-const NamedNFTRow = ({ nft }: { nft: CSTTokenInfo }) => {
-  const t = useTranslations('tables');
-  const locale = useLocale();
-  if (!nft) {
-    return <TablePrimaryRow />;
-  }
-
-  return (
-    <TablePrimaryRow>
-      <TablePrimaryCell label={t('columns.dateTimeCompact')}>
-        <HydrationSafeDateTime timestamp={nft.MintTimeStamp ?? nft.TimeStamp} locale={locale} />
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('statisticsColumns.namedNftTokenId')} align="center">
-        <Link href={`/detail/${nft.TokenId}`} className="text-inherit text-[inherit]">
-          {nft.TokenId}
-        </Link>
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.tokenName')}>{nft.TokenName ?? ''}</TablePrimaryCell>
-    </TablePrimaryRow>
-  );
-};
-
-const NamedNFTsTable = ({ list }: { list: CSTTokenInfo[] }) => {
-  const t = useTranslations('tables');
-  return (
-    <TablePrimaryContainer>
-      <TablePrimary>
-        <TablePrimaryHead>
-          <tr>
-            <TablePrimaryHeadCell align="left">{t('columns.dateTimeCompact')}</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>{t('statisticsColumns.namedNftTokenId')}</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="left">{t('columns.tokenName')}</TablePrimaryHeadCell>
-          </tr>
-        </TablePrimaryHead>
-        <TablePrimaryBody>
-          {list.map((nft, i: number) => (
-            <NamedNFTRow key={i} nft={nft} />
-          ))}
-        </TablePrimaryBody>
-      </TablePrimary>
-    </TablePrimaryContainer>
-  );
-};
-
-/** `seoSummary` is the server-rendered page header, the page's only header. */
+/**
+ * Named Signatures, hung as art: each on its plate with its name as the wall
+ * label's title. The named list carries names only; the seeds (and the
+ * anchored state) come from the collection list, the captions from the trait
+ * index, both shared with the gallery's cache.
+ *
+ * `seoSummary` is the server-rendered page header, the page's only header.
+ */
 const NamedNFTsPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('statistics');
-  const [curPage, setCurPage] = useState(1);
-  const perPage = 5;
-  const { data: list = [], isLoading: loading } = useNamedNFTs();
+  const { data: named = [], isLoading: namedLoading } = useNamedNFTs();
+  const { data: collection, isLoading: collectionLoading } = useCSTList();
+  const {
+    traits: collectionTraits,
+    isLoading: traitsLoading,
+    isError: traitsError,
+  } = useCollectionTraits();
+  const traitsForUi = traitsError ? null : traitsLoading ? undefined : (collectionTraits ?? null);
+
+  const items = useMemo<SignatureWallItem[]>(() => {
+    const byId = new Map((collection ?? []).map((token) => [token.TokenId, token]));
+    return named.map((token) => {
+      const record = byId.get(token.TokenId);
+      return {
+        tokenId: token.TokenId,
+        name: token.TokenName ?? record?.TokenName ?? null,
+        seed: record?.Seed ?? collectionTraits?.byId.get(token.TokenId)?.seed ?? null,
+        anchored: Boolean(record?.Staked),
+      };
+    });
+  }, [named, collection, collectionTraits]);
+
+  // A plate needs its seed: wait for either source rather than flash the
+  // "unavailable" state while they load.
+  const loading = namedLoading || (collectionLoading && traitsLoading);
 
   return (
     <PageShell variant="data" backdrop="signature">
@@ -84,28 +58,38 @@ const NamedNFTsPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
         />
       )}
 
-      <div>
-        {loading ? (
-          <div className="flex justify-center py-8">
-            <Spinner />
-          </div>
-        ) : list.length > 0 ? (
-          <>
-            <NamedNFTsTable list={list.slice((curPage - 1) * perPage, curPage * perPage)} />
-            <CustomPagination
-              page={curPage}
-              setPage={setCurPage}
-              totalLength={list.length}
-              perPage={perPage}
-            />
-          </>
-        ) : (
-          <EmptyState
-            title={t('namedNfts.emptyTitle')}
-            description={t('namedNfts.emptyDescription')}
+      {!loading && items.length === 0 ? (
+        <EmptyState
+          icon={<Tag aria-hidden />}
+          title={t('namedNfts.emptyTitle')}
+          description={t('namedNfts.emptyDescription')}
+          headingLevel={2}
+          variant="page"
+        />
+      ) : (
+        <>
+          <SignatureWall
+            items={items}
+            collectionTraits={traitsForUi}
+            loading={loading}
+            ariaLabel={t('namedNfts.title')}
           />
-        )}
-      </div>
+          {loading ? null : (
+            <p className="mt-10">
+              <Link
+                href="/gallery?show=named"
+                className="group inline-flex min-h-11 items-center gap-2 type-body-sm font-medium text-foreground link-quiet"
+              >
+                {t('namedNfts.galleryLink')}
+                <ArrowRight
+                  aria-hidden
+                  className="size-4 text-subtle transition-transform duration-[var(--duration-fast)] group-hover:translate-x-0.5"
+                />
+              </Link>
+            </p>
+          )}
+        </>
+      )}
     </PageShell>
   );
 };

@@ -114,6 +114,43 @@ beforeEach(() => {
 });
 
 describe('AttachedNFTAllocationShowcase', () => {
+  it('formats small and large amounts in the locale, with sensible precision', () => {
+    render(
+      <AttachedNFTAllocationShowcase
+        nfts={[]}
+        erc20Tokens={[
+          createErc20({ EvtLogId: 1, AmountDonatedEth: 0.000123456789 }),
+          createErc20({ EvtLogId: 2, AmountDonatedEth: 1234567.123456 }),
+          createErc20({
+            EvtLogId: 3,
+            AmountDonatedEth: undefined,
+            Amount: '2500000000000000000',
+          }),
+        ]}
+        cycleNumber={42}
+      />,
+    );
+
+    const amounts = screen.getAllByTestId('erc20-attached-amount');
+    expect(amounts[0]).toHaveTextContent('0.00012346 GLXY');
+    expect(amounts[1]).toHaveTextContent('1,234,567.1235 GLXY');
+    expect(amounts[2]).toHaveTextContent('2.5 GLXY');
+  });
+
+  it('says the amount is unknown instead of inventing one', () => {
+    render(
+      <AttachedNFTAllocationShowcase
+        nfts={[]}
+        erc20Tokens={[createErc20({ AmountDonatedEth: undefined, Amount: 'not-a-number' })]}
+        cycleNumber={42}
+      />,
+    );
+
+    expect(screen.getByTestId('erc20-attached-amount')).toHaveTextContent(
+      'currentCycle.showcase.erc20Card.unknownAmount',
+    );
+  });
+
   it('renders nothing when there are no attached assets', () => {
     const { container } = render(<AttachedNFTAllocationShowcase nfts={[]} cycleNumber={42} />);
     expect(container).toBeEmptyDOMElement();
@@ -128,8 +165,9 @@ describe('AttachedNFTAllocationShowcase', () => {
       screen.getByText('currentCycle.showcase.description.nftOnly(nftCount=1,cycle=42)'),
     ).toBeInTheDocument();
     expect(screen.getByText('currentCycle.showcase.badge')).toBeInTheDocument();
-    expect(screen.getByText('currentCycle.showcase.bonusReceipt.label')).toBeInTheDocument();
-    expect(screen.getByText('currentCycle.showcase.summary.previewAll')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.showcase.summary.assetsIncluded')).toBeInTheDocument();
+    // What the preview leaves out is counted under the assets, not in the facts.
+    expect(screen.queryByText(/summary\.preview/)).not.toBeInTheDocument();
     expectSingleRecipientRuleSummary();
   });
 
@@ -153,7 +191,7 @@ describe('AttachedNFTAllocationShowcase', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('currentCycle.showcase.heading')).toBeInTheDocument();
     expect(screen.getAllByTestId('nft-allocation-media')).toHaveLength(2);
-    expect(screen.getByTestId('erc20-attached-amount')).toHaveTextContent('1250.5 GLXY');
+    expect(screen.getByTestId('erc20-attached-amount')).toHaveTextContent('1,250.5 GLXY');
     expectSingleRecipientRuleSummary();
   });
 
@@ -189,9 +227,11 @@ describe('AttachedNFTAllocationShowcase', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('currentCycle.showcase.erc20Card.badge')).toBeInTheDocument();
     const amount = screen.getByTestId('erc20-attached-amount');
-    expect(amount).toHaveTextContent('1250.5 GLXY');
-    expect(amount.className).toContain('shadow-[0_0_70px_-34px');
-    expect(amount.querySelector('span')?.className).toContain('text-transparent');
+    expect(amount).toHaveTextContent('1,250.5 GLXY');
+    // A plain figure in the foreground colour: no glow, no gradient-clipped text.
+    expect(amount).toHaveAccessibleName('1,250.5 GLXY');
+    expect(amount.querySelector('span')).toHaveClass('type-figure-lg', 'text-foreground');
+    expect(amount.querySelector('span')?.className).not.toContain('text-transparent');
     expect(screen.getByText('Galaxy Credits')).toBeInTheDocument();
     expect(screen.queryByText('Pending finalization')).not.toBeInTheDocument();
     expect(screen.queryByText('Retrieved')).not.toBeInTheDocument();
@@ -221,7 +261,7 @@ describe('AttachedNFTAllocationShowcase', () => {
     ).toBeInTheDocument();
     const amounts = screen.getAllByTestId('erc20-attached-amount');
     expect(amounts).toHaveLength(2);
-    expect(amounts[0]).toHaveTextContent('1250.5 GLXY');
+    expect(amounts[0]).toHaveTextContent('1,250.5 GLXY');
     expect(amounts[1]).toHaveTextContent('5 GLXY');
     expectSingleRecipientRuleSummary();
   });
@@ -240,7 +280,7 @@ describe('AttachedNFTAllocationShowcase', () => {
     expect(screen.queryByText('Retrieved')).not.toBeInTheDocument();
     expect(screen.queryByText('Recipient')).not.toBeInTheDocument();
     expect(screen.getAllByRole('link', { name: /0xabcd/i })).toHaveLength(1);
-    expect(screen.getByTestId('erc20-attached-amount')).toHaveTextContent('1250.5 GLXY');
+    expect(screen.getByTestId('erc20-attached-amount')).toHaveTextContent('1,250.5 GLXY');
   });
 
   it('keeps recipient copy at the section level instead of repeating it per asset card', () => {
@@ -387,7 +427,7 @@ describe('AttachedNFTAllocationShowcase', () => {
     render(<AttachedNFTAllocationShowcase nfts={[createNft()]} cycleNumber={42} />);
 
     expect(
-      screen.getByText('currentCycle.showcase.nftCard.floorEstimate(price=0.420,currency=ETH)'),
+      screen.getByText('currentCycle.showcase.nftCard.floorEstimate(price=0.42,currency=ETH)'),
     ).toBeInTheDocument();
   });
 
@@ -402,8 +442,11 @@ describe('AttachedNFTAllocationShowcase', () => {
     expect(
       screen.getByText('currentCycle.showcase.remainder.nftOnly(nftCount=2)'),
     ).toBeInTheDocument();
+    // The facts count every attached asset; the remainder line says what is not shown.
     expect(
-      screen.getByText('currentCycle.showcase.summary.previewCount(visible=4,total=6)'),
+      screen.getByText(
+        /currentCycle\.showcase\.bonusReceipt\.(nftOnly|erc20Only)\((nft|erc20)Count=6\)/,
+      ),
     ).toBeInTheDocument();
     expectSingleRecipientRuleSummary();
   });
@@ -421,8 +464,11 @@ describe('AttachedNFTAllocationShowcase', () => {
     expect(
       screen.getByText('currentCycle.showcase.remainder.erc20Only(erc20Count=2)'),
     ).toBeInTheDocument();
+    // The facts count every attached asset; the remainder line says what is not shown.
     expect(
-      screen.getByText('currentCycle.showcase.summary.previewCount(visible=4,total=6)'),
+      screen.getByText(
+        /currentCycle\.showcase\.bonusReceipt\.(nftOnly|erc20Only)\((nft|erc20)Count=6\)/,
+      ),
     ).toBeInTheDocument();
     expectSingleRecipientRuleSummary();
   });

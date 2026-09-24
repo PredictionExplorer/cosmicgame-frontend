@@ -1,13 +1,12 @@
 'use client';
 
-import { useState } from 'react';
-import { SlidersHorizontal } from 'lucide-react';
+import { useId, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import type { CollectionTraits } from '@/hooks/useNftTraits';
 import type { CategoricalTraitKey, FacetOption } from '@/lib/nftMetadata';
 import { cn } from '@/lib/utils';
-import { toIntlLocale } from '@/utils/format';
+import { formatCount } from '@/utils/format';
 import { spectralClassColor, toSpectralClass, useTraitLabels } from '@/components/nft/traits';
 import {
   Accordion,
@@ -15,6 +14,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -26,7 +26,7 @@ import {
   type TraitFilterState,
 } from '../traitFilters';
 
-/** Facet order in the rail: the defining traits first, the sparse extras last. */
+/** Facet order: the defining traits first, the sparse extras last. */
 export const FACET_ORDER: readonly CategoricalTraitKey[] = [
   'structure',
   'palette',
@@ -61,8 +61,6 @@ export interface GalleryTraitFacetsProps {
   onChaosChange: (range: ChaosRange | null) => void;
   onClearAll: () => void;
   onRetry?: () => void;
-  /** Number of NFTs matching the current filters, shown in the header. */
-  matchCount?: number;
   className?: string;
 }
 
@@ -79,14 +77,13 @@ function FacetOptions({
 }) {
   const t = useTranslations('traits');
   const locale = useLocale();
-  const { valueLabel } = useTraitLabels();
+  const { typeLabel, valueLabel } = useTraitLabels();
   const [expanded, setExpanded] = useState(false);
   const visible = expanded ? options : options.slice(0, COLLAPSED_OPTION_COUNT);
   const hiddenCount = options.length - visible.length;
-  const intl = toIntlLocale(locale);
 
   return (
-    <ul className="space-y-0.5" aria-label={t(`types.${traitKey}`)}>
+    <ul className="space-y-px" aria-label={typeLabel(traitKey)}>
       {visible.map((option) => {
         const checked = selected.includes(option.value);
         const label = valueLabel(traitKey, option.value);
@@ -95,7 +92,8 @@ function FacetOptions({
           <li key={option.value}>
             <label
               className={cn(
-                'flex min-h-9 cursor-pointer items-center gap-2.5 rounded-md px-2 py-1 text-xs transition-colors hover:bg-white/[0.04]',
+                'flex min-h-9 cursor-pointer items-center gap-2.5 rounded-control px-2 type-body-sm transition-colors duration-[var(--duration-fast)] hover:bg-surface-raised',
+                'pointer-coarse:min-h-11',
                 checked ? 'text-foreground' : 'text-muted-foreground',
               )}
             >
@@ -107,16 +105,13 @@ function FacetOptions({
               {spectral ? (
                 <span
                   aria-hidden
-                  className="h-2 w-2 shrink-0 rounded-full"
-                  style={{
-                    backgroundColor: spectralClassColor(spectral),
-                    boxShadow: `0 0 6px ${spectralClassColor(spectral)}`,
-                  }}
+                  className="size-2 shrink-0 rounded-full"
+                  style={{ backgroundColor: spectralClassColor(spectral) }}
                 />
               ) : null}
               <span className="min-w-0 flex-1 truncate">{label}</span>
-              <span className="shrink-0 font-mono text-[10px] tabular-nums text-muted-foreground/60">
-                {option.count.toLocaleString(intl)}
+              <span className="shrink-0 type-caption tabular-nums text-subtle">
+                {formatCount(option.count, locale)}
               </span>
             </label>
           </li>
@@ -124,13 +119,14 @@ function FacetOptions({
       })}
       {hiddenCount > 0 || expanded ? (
         <li>
-          <button
-            type="button"
-            onClick={() => setExpanded((v) => !v)}
-            className="min-h-9 px-2 text-xs text-primary/80 transition-colors hover:text-primary"
+          <Button
+            variant="link"
+            size="sm"
+            onClick={() => setExpanded((open) => !open)}
+            className="h-9 px-2"
           >
             {expanded ? t('facets.showLess') : t('facets.showMore', { count: hiddenCount })}
-          </button>
+          </Button>
         </li>
       ) : null}
     </ul>
@@ -147,6 +143,8 @@ function ChaosRangeControl({
   onChange: (range: ChaosRange | null) => void;
 }) {
   const t = useTranslations('traits');
+  const locale = useLocale();
+  const labelId = useId();
   const current: ChaosRange = value ?? [bounds.min, bounds.max];
 
   function update(next: ChaosRange) {
@@ -160,15 +158,25 @@ function ChaosRangeControl({
   const disabled = bounds.min === bounds.max;
 
   return (
-    <div className="space-y-2 px-2" data-testid="chaos-range">
-      <div className="flex items-center justify-between text-xs text-muted-foreground">
-        <span>{t('facets.chaosRange')}</span>
-        <span className="font-mono tabular-nums text-foreground/80">
-          {t('facets.chaosValue', { min: current[0], max: current[1] })}
+    <div
+      role="group"
+      aria-labelledby={labelId}
+      className="space-y-3 px-2"
+      data-testid="chaos-range"
+    >
+      <div className="flex items-baseline justify-between gap-3">
+        <span id={labelId} className="type-label text-muted-foreground">
+          {t('facets.chaosRange')}
+        </span>
+        <span className="type-figure-sm text-foreground">
+          {t('facets.chaosValue', {
+            min: formatCount(current[0], locale),
+            max: formatCount(current[1], locale),
+          })}
         </span>
       </div>
-      <div className="grid grid-cols-2 gap-3">
-        <label className="flex flex-col gap-1 text-[10px] uppercase tracking-wider text-muted-foreground/70">
+      <div className="grid grid-cols-2 gap-4">
+        <label className="flex flex-col gap-1.5 type-caption text-subtle">
           {t('facets.chaosMin')}
           <input
             type="range"
@@ -178,10 +186,10 @@ function ChaosRangeControl({
             value={current[0]}
             disabled={disabled}
             onChange={(event) => update([Number(event.target.value), current[1]])}
-            className="h-1.5 w-full cursor-pointer accent-[rgb(var(--aurora-cyan-rgb))]"
+            className="h-6 w-full cursor-pointer accent-primary"
           />
         </label>
-        <label className="flex flex-col gap-1 text-[10px] uppercase tracking-wider text-muted-foreground/70">
+        <label className="flex flex-col gap-1.5 type-caption text-subtle">
           {t('facets.chaosMax')}
           <input
             type="range"
@@ -191,7 +199,7 @@ function ChaosRangeControl({
             value={current[1]}
             disabled={disabled}
             onChange={(event) => update([current[0], Number(event.target.value)])}
-            className="h-1.5 w-full cursor-pointer accent-[rgb(var(--chrono-rose-rgb))]"
+            className="h-6 w-full cursor-pointer accent-primary"
           />
         </label>
       </div>
@@ -200,9 +208,9 @@ function ChaosRangeControl({
 }
 
 /**
- * GalleryTraitFacets — the trait filter rail: one collapsible section per
- * categorical trait with collection counts, plus a chaos range. Rendered in
- * the desktop sidebar and inside the mobile filter sheet.
+ * GalleryTraitFacets — the trait filters: the chaos range, then one
+ * collapsible list per categorical trait with its collection counts. Shown in
+ * the desktop rail and in the filter sheet below `lg`.
  */
 export function GalleryTraitFacets({
   collectionTraits,
@@ -213,7 +221,6 @@ export function GalleryTraitFacets({
   onChaosChange,
   onClearAll,
   onRetry,
-  matchCount,
   className,
 }: GalleryTraitFacetsProps) {
   const t = useTranslations('traits');
@@ -222,50 +229,44 @@ export function GalleryTraitFacets({
   const activeCount = countActiveTraitFilters(selected, chaosRange);
 
   return (
-    <div className={cn('space-y-3', className)} data-testid="trait-facets">
-      <div className="flex items-center justify-between gap-2 px-2">
-        <h2 className="flex items-center gap-2 text-sm font-semibold">
-          <SlidersHorizontal className="h-4 w-4 text-muted-foreground" aria-hidden />
+    <div className={cn('space-y-4', className)} data-testid="trait-facets">
+      <div className="flex min-h-9 items-center justify-between gap-2 px-2">
+        <h2 className="flex items-center gap-2 type-title text-foreground">
           {t('facets.title')}
           {activeCount > 0 ? (
-            <span className="rounded-full bg-primary/15 px-1.5 py-0.5 font-mono text-[10px] text-primary">
-              {activeCount}
-            </span>
+            <Badge tone="accent" size="sm">
+              {formatCount(activeCount, locale)}
+            </Badge>
           ) : null}
         </h2>
         {activeCount > 0 ? (
-          <Button variant="ghost" size="sm" className="h-8 px-2 text-xs" onClick={onClearAll}>
+          <Button variant="ghost" size="sm" onClick={onClearAll}>
             {t('facets.clearAll')}
           </Button>
         ) : null}
       </div>
 
-      {matchCount !== undefined && activeCount > 0 ? (
-        <p className="px-2 text-xs text-muted-foreground">
-          {t('facets.matches', { count: matchCount.toLocaleString(toIntlLocale(locale)) })}
-        </p>
-      ) : null}
-
       {collectionTraits === undefined ? (
         <div
           role="status"
-          className="space-y-3 px-2"
           aria-busy="true"
           aria-label={t('facets.loading')}
+          className="space-y-5 px-2"
+          data-testid="facets-loading"
         >
-          {Array.from({ length: 5 }, (_, i) => (
-            <div key={i} className="space-y-2">
-              <Skeleton className="h-3 w-24" />
+          {Array.from({ length: 4 }, (_, index) => (
+            <div key={index} className="space-y-2.5">
+              <Skeleton className="h-3.5 w-24" />
               <Skeleton className="h-3 w-full" />
               <Skeleton className="h-3 w-5/6" />
             </div>
           ))}
         </div>
       ) : collectionTraits === null ? (
-        <div className="space-y-2 px-2 text-xs text-muted-foreground">
-          <p>{t('facets.unavailable')}</p>
+        <div className="space-y-3 px-2">
+          <p className="type-body-sm text-muted-foreground">{t('facets.unavailable')}</p>
           {onRetry ? (
-            <Button variant="outline" size="sm" className="h-8 text-xs" onClick={onRetry}>
+            <Button variant="outline" size="sm" onClick={onRetry}>
               {t('facets.retry')}
             </Button>
           ) : null}
@@ -273,10 +274,10 @@ export function GalleryTraitFacets({
       ) : (
         <>
           {collectionTraits.partial ? (
-            <p className="px-2 text-[11px] text-muted-foreground/70">
+            <p className="px-2 type-caption text-subtle">
               {t('facets.partial', {
-                indexed: collectionTraits.indexed,
-                total: collectionTraits.total,
+                indexed: formatCount(collectionTraits.indexed, locale),
+                total: formatCount(collectionTraits.total, locale),
               })}
             </p>
           ) : null}
@@ -293,18 +294,18 @@ export function GalleryTraitFacets({
               if (!options || options.length === 0) return null;
               const chosen = selected[key] ?? [];
               return (
-                <AccordionItem key={key} value={key} className="border-white/[0.06]">
-                  <AccordionTrigger className="px-2 py-2.5 text-xs hover:no-underline">
+                <AccordionItem key={key} value={key} className="border-rule-faint">
+                  <AccordionTrigger className="min-h-11 px-2 py-2 type-label text-foreground hover:no-underline">
                     <span className="flex items-center gap-2">
-                      <span className="font-medium">{typeLabel(key)}</span>
+                      {typeLabel(key)}
                       {chosen.length > 0 ? (
-                        <span className="rounded-full bg-primary/15 px-1.5 py-px font-mono text-[10px] text-primary">
-                          {chosen.length}
-                        </span>
+                        <Badge tone="accent" size="sm">
+                          {formatCount(chosen.length, locale)}
+                        </Badge>
                       ) : null}
                     </span>
                   </AccordionTrigger>
-                  <AccordionContent className="pb-2">
+                  <AccordionContent className="pb-3">
                     <FacetOptions
                       traitKey={key}
                       options={options}
@@ -312,13 +313,14 @@ export function GalleryTraitFacets({
                       onToggle={(value) => onToggleValue(key, value)}
                     />
                     {chosen.length > 0 ? (
-                      <button
-                        type="button"
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={() => onClearKey(key)}
-                        className="mt-1 min-h-9 px-2 text-[11px] text-muted-foreground transition-colors hover:text-foreground"
+                        className="mt-1 px-2"
                       >
                         {t('facets.clearFacet', { trait: typeLabel(key) })}
-                      </button>
+                      </Button>
                     ) : null}
                   </AccordionContent>
                 </AccordionItem>

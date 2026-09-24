@@ -2,25 +2,21 @@
 
 import { useMemo, useState, type KeyboardEvent } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
-import { ArrowLeft, ArrowRight, ExternalLink, ImageIcon, Play } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { ArrowLeft, ArrowRight, ImageIcon, Play } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 
-import { formatId, getSpectralSweepUrl } from '@/utils';
-
+import { getSpectralSweepUrl } from '@/utils/urls';
+import { formatCount } from '@/utils/format';
+import { formatId } from '@/utils/format/ids';
 import type { CollectionTraits } from '@/hooks/useNftTraits';
 import type { CategoricalTraitKey } from '@/lib/nftMetadata';
+import { AnchoringIcon } from '@/lib/conceptIcons';
 import { Link } from '@/i18n/navigation';
-import { ArtFrame } from '@/components/ui/art-frame';
+import { ArtFrame, WallLabelMeta } from '@/components/ui/art-frame';
 import { signatureMedia, useSignatureAlt } from '@/components/nft/signatureArt';
-import {
-  AllocationPill,
-  HueStrip,
-  RarityRankChip,
-  SpectralClassBadge,
-  TraitSheet,
-} from '@/components/nft/traits';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogHeader } from '@/components/ui/dialog';
+import { TraitSheet } from '@/components/nft/traits';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 
 /** The list fields the quick view needs for one token. */
@@ -28,6 +24,8 @@ export interface NftQuickViewItem {
   TokenId: number;
   Seed?: string | number;
   TokenName?: string;
+  /** Anchored right now: a quiet tag in the label. */
+  Staked?: boolean;
 }
 
 /** Props for {@link NftQuickView}. */
@@ -45,9 +43,14 @@ export interface NftQuickViewProps {
 }
 
 /**
- * NftQuickView — a dialog that shows a Signature's full-resolution artwork
- * next to its trait sheet without leaving the gallery. Arrow keys move
- * through the current page; the spectral sweep video is opt-in.
+ * NftQuickView — a Signature in focus without leaving the gallery. From `lg`
+ * the art hangs centred on the black ground of its own column (the plate
+ * never scrolls away), with the still / spectral sweep switch and previous /
+ * next beneath it; the label column scrolls on its own: the name, a caption
+ * (number, rarity, anchored), the way to the full page, and the same trait
+ * sheet the detail page shows. Below `lg` (where the trait tiles would be
+ * cramped beside the art) the two stack and the dialog scrolls. Arrow keys move through the current page; the sweep video is
+ * opt-in.
  */
 export function NftQuickView({
   tokenId,
@@ -59,6 +62,7 @@ export function NftQuickView({
 }: NftQuickViewProps) {
   const t = useTranslations('traits');
   const tDetail = useTranslations('detail');
+  const locale = useLocale();
   const signatureAlt = useSignatureAlt();
   // The sweep is remembered per token, so moving to another Signature
   // naturally falls back to its artwork without an effect.
@@ -75,12 +79,13 @@ export function NftQuickView({
 
   const open = tokenId !== null && item !== undefined;
   const id = item ? formatId(item.TokenId) : '';
+  const name = item?.TokenName?.trim() || null;
   const seed = item?.Seed ?? '';
   const entry = collectionTraits?.byId.get(item?.TokenId ?? -1) ?? null;
   const rarity = collectionTraits?.rarity.byId.get(item?.TokenId ?? -1) ?? null;
   const rarityTotal = collectionTraits?.rarity.total ?? 0;
   const media = signatureMedia(seed);
-  const alt = signatureAlt({ id, name: item?.TokenName, entry });
+  const alt = signatureAlt({ id, name, entry });
 
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     if (event.key === 'ArrowLeft' && previous) {
@@ -96,14 +101,13 @@ export function NftQuickView({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         onKeyDown={handleKeyDown}
-        className="max-h-[92vh] w-[calc(100vw-1.5rem)] max-w-5xl gap-0 overflow-y-auto border-rule bg-surface-raised p-0 shadow-float sm:rounded-surface"
+        className="flex max-h-[92dvh] w-[calc(100vw-1.5rem)] max-w-5xl flex-col gap-0 overflow-y-auto overscroll-contain border-rule bg-surface-raised p-0 shadow-float sm:rounded-surface lg:grid lg:h-[min(92dvh,46rem)] lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:overflow-hidden"
         data-testid="nft-quick-view"
       >
         {item ? (
-          <div className="grid md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
-            <div className="flex flex-col bg-art-ground md:sticky md:top-0 md:self-start">
-              {/* Nothing is layered over the art: the hue strip sits under the plate. */}
-              <div className="relative aspect-art w-full overflow-hidden bg-art-ground">
+          <>
+            <div className="flex shrink-0 flex-col bg-art-ground">
+              <div className="flex items-center lg:min-h-0 lg:flex-1">
                 {showSweep ? (
                   <video
                     key={String(seed)}
@@ -112,7 +116,7 @@ export function NftQuickView({
                     autoPlay
                     playsInline
                     loop
-                    className="h-full w-full object-contain"
+                    className="aspect-art w-full bg-art-ground object-contain"
                     data-testid="spectral-sweep-video"
                   />
                 ) : (
@@ -121,72 +125,86 @@ export function NftQuickView({
                     alt={alt}
                     unavailableLabel={tDetail('image.artworkUnavailable')}
                     unavailableDetail={id}
-                    sizes="(max-width: 768px) 100vw, 60vw"
-                    className="h-full rounded-none"
+                    sizes="(max-width: 1023px) 100vw, 36rem"
+                    // The plate sits on its own black ground: no print edge.
+                    className="rounded-none shadow-none after:hidden hover:shadow-none"
                     priority
                   />
                 )}
               </div>
-              <HueStrip hues={entry?.hues} size="sm" className="rounded-none" />
               <div className="flex flex-wrap items-center gap-2 p-3">
                 {seed ? (
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
-                    className="normal-case"
                     onClick={() => setSweepTokenId(showSweep ? null : tokenId)}
                     title={t('quickView.sweepNote')}
                   >
-                    {showSweep ? (
-                      <ImageIcon className="mr-1.5 h-3.5 w-3.5" aria-hidden />
-                    ) : (
-                      <Play className="mr-1.5 h-3.5 w-3.5" aria-hidden />
-                    )}
+                    {showSweep ? <ImageIcon aria-hidden /> : <Play aria-hidden />}
                     {showSweep ? t('quickView.hideSweep') : t('quickView.playSweep')}
                   </Button>
                 ) : null}
-                <div className="ml-auto flex items-center gap-2">
+                <div className="ms-auto flex items-center gap-1">
                   <Button
-                    variant="outline"
-                    size="sm"
+                    variant="ghost"
+                    size="icon"
                     disabled={!previous}
                     onClick={() => previous && onNavigate(previous.TokenId)}
                     aria-label={t('quickView.previous')}
-                    className="max-sm:min-w-11"
                   >
-                    <ArrowLeft className="h-4 w-4" aria-hidden />
+                    <ArrowLeft aria-hidden className="rtl:-scale-x-100" />
                   </Button>
                   <Button
-                    variant="outline"
-                    size="sm"
+                    variant="ghost"
+                    size="icon"
                     disabled={!next}
                     onClick={() => next && onNavigate(next.TokenId)}
                     aria-label={t('quickView.next')}
-                    className="max-sm:min-w-11"
                   >
-                    <ArrowRight className="h-4 w-4" aria-hidden />
+                    <ArrowRight aria-hidden className="rtl:-scale-x-100" />
                   </Button>
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-col gap-4 p-5 sm:p-6">
-              <DialogHeader className="space-y-2 pr-8 text-left">
-                <p className="type-mono text-subtle">{id}</p>
+            <div className="flex flex-col gap-6 p-5 sm:p-6 lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain">
+              <div className="pe-10">
                 {/* The Radix title itself: the shadcn wrapper's text-lg / font-semibold
                     defaults would outrank the display type (Clash at 24px, never bold). */}
                 <DialogPrimitive.Title className="type-heading-2 text-foreground [overflow-wrap:anywhere]">
-                  {item.TokenName && item.TokenName !== ''
-                    ? item.TokenName
-                    : t('quickView.title', { id })}
+                  {name ?? t('quickView.title', { id })}
                 </DialogPrimitive.Title>
-                <DialogDescription>{t('quickView.description')}</DialogDescription>
-              </DialogHeader>
-
-              <div className="flex flex-wrap items-center gap-2">
-                <SpectralClassBadge value={entry?.spectralClass} size="md" withLabel />
-                <RarityRankChip rarity={rarity} total={rarityTotal} size="md" verbose />
-                <AllocationPill value={entry?.allocation} size="md" />
+                <DialogDescription className="sr-only">
+                  {t('quickView.description')}
+                </DialogDescription>
+                <WallLabelMeta
+                  className="mt-2"
+                  items={[
+                    // An unnamed Signature already carries its number in the title.
+                    name ? <span className="type-mono">{id}</span> : null,
+                    rarity && rarityTotal > 0 ? (
+                      <span className="tabular-nums" data-testid="quick-view-rank">
+                        {t('rarity.rankOf', {
+                          rank: formatCount(rarity.rank, locale),
+                          total: formatCount(rarityTotal, locale),
+                        })}
+                      </span>
+                    ) : null,
+                    item.Staked ? (
+                      <span className="inline-flex items-center gap-1">
+                        <AnchoringIcon aria-hidden className="size-3.5" />
+                        {t('card.anchoredState')}
+                      </span>
+                    ) : null,
+                  ]}
+                />
+                <Link
+                  href={`/detail/${item.TokenId}`}
+                  className={buttonVariants({ variant: 'outline', size: 'sm', className: 'mt-4' })}
+                >
+                  {t('quickView.openDetail')}
+                  <ArrowRight aria-hidden className="rtl:-scale-x-100" />
+                </Link>
               </div>
 
               {collectionTraits === undefined ? (
@@ -218,17 +236,8 @@ export function NftQuickView({
               ) : (
                 <p className="type-body-sm text-muted-foreground">{t('panel.unavailable')}</p>
               )}
-
-              <div className="mt-auto flex flex-wrap items-center gap-2 pt-2">
-                <Button asChild size="sm" className="normal-case">
-                  <Link href={`/detail/${item.TokenId}`}>
-                    {t('quickView.openDetail')}
-                    <ExternalLink className="ml-1.5 h-3.5 w-3.5" aria-hidden />
-                  </Link>
-                </Button>
-              </div>
             </div>
-          </div>
+          </>
         ) : null}
       </DialogContent>
     </Dialog>

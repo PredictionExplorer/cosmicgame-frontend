@@ -21,7 +21,7 @@ import {
   get_system_events,
   get_system_modelist,
 } from '@/services/api/system';
-import { get_named_nfts, get_used_rwlk_nfts } from '@/services/api/tokens';
+import { get_cst_list, get_named_nfts, get_used_rwlk_nfts } from '@/services/api/tokens';
 
 /**
  * Server reads behind the public data pages' headers.
@@ -60,6 +60,8 @@ export const readMarketingRewards = timedRead(() => get_marketing_rewards());
 export const readDirectContributions = timedRead(() => get_donations_both());
 export const readAttachedNfts = timedRead(() => get_donations_nft_list());
 export const readNamedNfts = timedRead(() => get_named_nfts());
+/** Every imprinted Signature (the gallery's list, `useCSTList`). */
+export const readCollection = timedRead(() => get_cst_list());
 export const readUsedRwlkNfts = timedRead(() => get_used_rwlk_nfts());
 export const readPublicGoodsDeposits = timedRead(() => get_charity_cg_deposits());
 export const readVoluntaryPublicGoods = timedRead(() => get_charity_voluntary());

@@ -591,17 +591,33 @@
     "title": "이름 붙인 Cosmic Signature NFT",
     "subtitle": "직접 지은 이름이 붙은 Cosmic Signature NFT 둘러보기",
     "emptyTitle": "이름 붙인 NFT 없음",
-    "emptyDescription": "아직 이름이 붙은 Cosmic Signature NFT가 없습니다."
+    "emptyDescription": "아직 이름이 붙은 Cosmic Signature NFT가 없습니다.",
+    "galleryLink": "갤러리에서 보기"
   },
   "attachedNfts": {
     "title": "첨부된 NFT 기여",
-    "subtitle": "여러 사이클에 걸쳐 커뮤니티 구성원이 제스처에 첨부한 NFT"
+    "subtitle": "여러 사이클에 걸쳐 커뮤니티 구성원이 제스처에 첨부한 NFT",
+    "loadErrorTitle": "첨부된 NFT를 불러올 수 없습니다",
+    "loadErrorMessage": "첨부된 NFT 기록을 읽을 수 없습니다. 다시 시도해 주세요.",
+    "emptyTitle": "아직 첨부된 NFT가 없습니다",
+    "emptyDescription": "제스처에 첨부된 NFT가 여기에 표시됩니다. 각 NFT는 사이클이 마감되면 해당 사이클의 시그니처 배분 수령자에게 전달됩니다.",
+    "card": {
+      "cycle": "사이클 {cycle}",
+      "attachedBy": "첨부자"
+    }
   },
   "usedRwlkNfts": {
     "title": "사용된 Random Walk NFT",
     "subtitle": "일회성 50% 제스처 비용 할인을 위해 ETH 제스처에 첨부된 Random Walk NFT",
-    "loading": "불러오는 중…",
-    "empty": "아직 NFT가 없습니다."
+    "artAlt": "RandomWalk NFT {id}",
+    "loadErrorTitle": "사용된 RandomWalk NFT를 불러올 수 없습니다",
+    "loadError": "사용된 RandomWalk NFT를 읽을 수 없습니다. 다시 시도해 주세요.",
+    "emptyTitle": "아직 사용된 RandomWalk NFT가 없습니다",
+    "emptyDescription": "ETH 제스처가 일회성 제스처 비용 할인에 RandomWalk NFT를 사용하면 이곳에 표시됩니다.",
+    "card": {
+      "cycle": "사이클 {cycle}",
+      "usedBy": "참여자"
+    }
   },
   "stellarSelectionEth": {
     "invalidAddress": "유효하지 않은 주소",

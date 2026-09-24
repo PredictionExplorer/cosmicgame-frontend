@@ -42,7 +42,8 @@ describe('AttachedNFT', () => {
       Index: 44,
     };
     renderWithQuery(<AttachedNFT nft={mockData} />);
-    expect(screen.getByTestId('NFTTokenId')).toHaveTextContent(String(mockData.NFTTokenId));
+    // Without a name in its metadata, the work is titled by its number.
+    expect(screen.getByText(`#${mockData.NFTTokenId}`)).toBeInTheDocument();
 
     await waitFor(() => {
       const src = screen.getByAltText('Attached NFT').getAttribute('src') ?? '';
@@ -114,6 +115,8 @@ describe('AttachedNFT', () => {
         buildOpenSeaAssetUrl(mockData.TokenAddr, mockData.NFTTokenId, networkConfig.chainId),
       );
     });
-    expect(screen.getByTestId('NFTTokenId')).toHaveTextContent('#1');
+    expect(screen.getByText('#1')).toBeInTheDocument();
+    // The plate keeps its square frame and says the image is unavailable.
+    expect(screen.getByTestId('pending-plate')).toBeInTheDocument();
   });
 });

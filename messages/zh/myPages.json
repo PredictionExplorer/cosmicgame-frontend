@@ -274,7 +274,12 @@
       "ownedTitle": "持有的 Cosmic Signature NFT",
       "transferTitle": "转移 NFT",
       "transferSubtitle": "可选：将选中的 Cosmic Signature NFT 发送至其他钱包。",
-      "transferDescription": "仅在准备好将 NFT 发送至其他地址后，再从此钱包中选择要转移的 NFT。"
+      "figures": {
+        "owned": "此钱包中",
+        "anchored": "已锚定"
+      },
+      "emptyTitle": "此钱包中还没有签名",
+      "emptyDescription": "你在分配中获得或在市场上购入的签名会显示在这里。"
     },
     "table": {
       "empty": "暂无代币。",
@@ -321,12 +326,7 @@
     }
   },
   "nftTransfer": {
-    "defaultDescription": "选择一枚或多枚 Cosmic Signature NFT，并发送至其他钱包地址。",
-    "marketplacePrompt": "想买卖 NFT？可前往市场；如需直接转移，请在下方继续。",
-    "marketplace": "买卖 NFT",
     "sourceWallet": "来源钱包",
-    "ownedNfts": "持有的 NFT",
-    "selected": "已选择",
     "recipientAddress": "接收地址",
     "empty": "此钱包中没有 Cosmic Signature NFT。",
     "pickerTitle": "选择要转移的 NFT",
@@ -336,19 +336,11 @@
     "clear": "清除选择",
     "listAria": "Cosmic Signature NFT",
     "selectAria": "选择 NFT #{id}",
-    "nftLabel": "NFT #{id}",
-    "tokenId": "代币 ID",
-    "customName": "专属名称",
-    "noCustomName": "无专属名称",
-    "generationCycle": "生成周期",
     "cycle": "第 {cycle} 个周期",
     "cycleUnavailable": "暂无周期数据",
-    "status": "状态",
     "statusLabels": {
       "anchored": "已锚定，请先解锚再转移",
-      "ownerChanged": "持有者已变更，请刷新后再转移",
-      "selected": "已选择",
-      "transferable": "可转移"
+      "ownerChanged": "持有者已变更，请刷新后再转移"
     },
     "progress": {
       "transferred": "已转移 {completed} 枚，共 {total} 枚",
@@ -360,7 +352,6 @@
       "multiple": "{count} 笔转移已确认。",
       "viewLatest": "查看最新交易"
     },
-    "sendAria": "发送已选 NFT",
     "sending": "发送中…",
     "send": "发送已选 NFT",
     "viewHistory": "查看 NFT 转移记录",

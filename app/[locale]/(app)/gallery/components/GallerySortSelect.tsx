@@ -3,6 +3,7 @@
 import { ArrowDownUp } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
+import { cn } from '@/lib/utils';
 import {
   Select,
   SelectContent,
@@ -10,93 +11,65 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
-export type SortKey =
-  | 'newest'
-  | 'oldest'
-  | 'cycle-desc'
-  | 'cycle-asc'
-  | 'rarity'
-  | 'chaos-desc'
-  | 'chaos-asc'
-  | 'syzygies-desc';
+import { SORT_KEYS, TRAIT_SORT_KEYS, isSortKey, type SortKey } from '../galleryQuery';
 
-/** Sort orders that need the collection trait index to be meaningful. */
-export const TRAIT_SORT_KEYS: readonly SortKey[] = [
-  'rarity',
-  'chaos-desc',
-  'chaos-asc',
-  'syzygies-desc',
-];
-
-/** Every sort key, for URL parsing. */
-export const SORT_KEYS: readonly SortKey[] = [
-  'newest',
-  'oldest',
-  'cycle-desc',
-  'cycle-asc',
-  ...TRAIT_SORT_KEYS,
-];
-
-/** Narrows an arbitrary string (e.g. a URL param) to a {@link SortKey}. */
-export function isSortKey(value: string | null | undefined): value is SortKey {
-  return typeof value === 'string' && (SORT_KEYS as readonly string[]).includes(value);
-}
+/** Catalog key of each sort order's label (gallery.sort.*). */
+const SORT_LABEL_KEYS: Record<SortKey, string> = {
+  newest: 'newest',
+  oldest: 'oldest',
+  'cycle-desc': 'cycleDesc',
+  'cycle-asc': 'cycleAsc',
+  rarity: 'rarity',
+  'chaos-desc': 'chaosDesc',
+  'chaos-asc': 'chaosAsc',
+  'syzygies-desc': 'syzygiesDesc',
+};
 
 interface GallerySortSelectProps {
   value: SortKey;
   onChange: (sort: SortKey) => void;
   /** Hide trait-based orders while the trait index is unavailable. */
   traitSortsAvailable?: boolean;
+  /** Full width (the filter sheet) instead of the toolbar's fixed width. */
+  block?: boolean;
+  className?: string;
 }
 
-const sortOptions: { value: SortKey; labelKey: string }[] = [
-  { value: 'newest', labelKey: 'sort.newest' },
-  { value: 'oldest', labelKey: 'sort.oldest' },
-  { value: 'cycle-desc', labelKey: 'sort.cycleDesc' },
-  { value: 'cycle-asc', labelKey: 'sort.cycleAsc' },
-  { value: 'rarity', labelKey: 'sort.rarity' },
-  { value: 'chaos-desc', labelKey: 'sort.chaosDesc' },
-  { value: 'chaos-asc', labelKey: 'sort.chaosAsc' },
-  { value: 'syzygies-desc', labelKey: 'sort.syzygiesDesc' },
-];
-
+/** The sort order of the gallery, as a select with its arrows glyph. */
 export function GallerySortSelect({
   value,
   onChange,
   traitSortsAvailable = true,
+  block = false,
+  className,
 }: GallerySortSelectProps) {
   const t = useTranslations('gallery');
-  const options = traitSortsAvailable
-    ? sortOptions
-    : sortOptions.filter((opt) => !TRAIT_SORT_KEYS.includes(opt.value));
+  const options = SORT_KEYS.filter(
+    (key) => traitSortsAvailable || key === value || !TRAIT_SORT_KEYS.includes(key),
+  );
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <div className="flex items-center gap-2">
-          <ArrowDownUp className="h-4 w-4 text-muted-foreground shrink-0 hidden sm:block" />
-          <Select value={value} onValueChange={(v) => onChange(v as SortKey)}>
-            <SelectTrigger
-              className="w-[170px] h-9 text-xs border-white/[0.06] bg-white/[0.03]"
-              aria-label={t('sort.ariaLabel')}
-            >
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {options.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {t(opt.labelKey)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </TooltipTrigger>
-      <TooltipContent side="bottom">
-        <p>{t('sort.tooltip')}</p>
-      </TooltipContent>
-    </Tooltip>
+    <Select value={value} onValueChange={(next) => isSortKey(next) && onChange(next)}>
+      <SelectTrigger
+        aria-label={t('sort.ariaLabel')}
+        className={cn(
+          'justify-start [&>span]:flex-1 [&>span]:text-start',
+          block ? 'w-full' : 'w-auto min-w-48',
+          className,
+        )}
+        data-testid="gallery-sort"
+      >
+        <ArrowDownUp aria-hidden className="size-4 shrink-0 text-subtle" />
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent align="end">
+        {options.map((key) => (
+          <SelectItem key={key} value={key}>
+            {t(`sort.${SORT_LABEL_KEYS[key]}`)}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }

@@ -32,8 +32,7 @@
   },
   "attachedAssets": {
     "actions": {
-      "claim": "Nhận về",
-      "claiming": "Đang nhận về…"
+      "claim": "Nhận về"
     },
     "status": {
       "yes": "Có",
@@ -46,6 +45,7 @@
       "empty": "Chưa có NFT đính kèm.",
       "imageAlt": "NFT #{id}",
       "imageUnavailable": "Hình ảnh không khả dụng",
+      "unknownToken": "Token không xác định",
       "columns": {
         "datetime": "Thời điểm",
         "contributorAddress": "Địa chỉ người đóng góp",
@@ -54,7 +54,8 @@
         "tokenId": "Mã token",
         "tokenImage": "Hình token",
         "tokenUri": "URI token"
-      }
+      },
+      "ariaLabel": "NFT đính kèm"
     },
     "erc20": {
       "empty": "Chưa có token ERC20 đính kèm.",
@@ -66,7 +67,8 @@
         "retrievedAmount": "Số lượng đã nhận về",
         "recipient": "Người nhận",
         "retrieved": "Đã nhận về"
-      }
+      },
+      "ariaLabel": "Token ERC-20 đính kèm"
     }
   },
   "loading": "Đang tải…",

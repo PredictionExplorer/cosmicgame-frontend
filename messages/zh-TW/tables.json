@@ -32,8 +32,7 @@
   },
   "attachedAssets": {
     "actions": {
-      "claim": "取回",
-      "claiming": "取回中…"
+      "claim": "取回"
     },
     "status": {
       "yes": "是",
@@ -46,6 +45,7 @@
       "empty": "暫無已附加 NFT。",
       "imageAlt": "NFT #{id}",
       "imageUnavailable": "暫無影像",
+      "unknownToken": "未知代幣",
       "columns": {
         "datetime": "日期時間",
         "contributorAddress": "附加者地址",
@@ -54,7 +54,8 @@
         "tokenId": "代幣 ID",
         "tokenImage": "代幣影像",
         "tokenUri": "代幣 URI"
-      }
+      },
+      "ariaLabel": "已附加 NFT"
     },
     "erc20": {
       "empty": "暫無已附加 ERC-20 代幣。",
@@ -66,7 +67,8 @@
         "retrievedAmount": "已取回數量",
         "recipient": "獲配者",
         "retrieved": "已取回"
-      }
+      },
+      "ariaLabel": "已附加 ERC-20 代幣"
     }
   },
   "loading": "載入中…",

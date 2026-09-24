@@ -1,104 +1,94 @@
 'use client';
 
-import type { ReactNode } from 'react';
-import { useState } from 'react';
+import { useMemo, useRef, useState, type ReactNode } from 'react';
+import { ArrowUpRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { getExplorerUrl } from '@/utils';
-
-import { Link } from '@/i18n/navigation';
-import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
-import { PageHeader } from '@/components/layout/PageHeader';
-import { PageShell } from '@/components/ui/page-shell';
-import {
-  TablePrimary,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryContainer,
-  TablePrimaryHead,
-  TablePrimaryHeadCell,
-  TablePrimaryRow,
-} from '@/components/styled';
+import { SITE_ROUTE_ICONS } from '@/config/siteNavIcons';
+import { getRWLKImageUrl } from '@/utils/urls';
+import { formatCount } from '@/utils/format';
+import { formatId } from '@/utils/format/ids';
+import { toFiniteNumber } from '@/utils/finiteNumber';
 import { useUsedRWLKNFTs } from '@/hooks/useApiQuery';
-import { CustomPagination } from '@/components/common/CustomPagination';
+import type { UsedRWLKNFT } from '@/services/api/types';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { AddressChip } from '@/components/ui/address-chip';
+import { ArtFrame } from '@/components/ui/art-frame';
+import { TableLink } from '@/components/ui/data-table';
+import { DateTime } from '@/components/ui/date-time';
+import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
+import { PageShell } from '@/components/ui/page-shell';
+import { TablePagination } from '@/components/ui/pagination';
+import { SIGNATURE_GRID_CLASS, SignatureGridSkeleton } from '@/components/nft/SignatureGrid';
+import { cn } from '@/lib/utils';
 
-interface UsedRwlkNftRecord {
+/** One RandomWalk NFT a gesture used. */
+export interface UsedRwlkNftRecord {
   RWalkTokenId: number;
   BidderAddr: string;
   RoundNum: number;
-  TxHash: string;
-  TimeStamp: number;
-  [key: string]: unknown;
+  /** The gesture's transaction, when the indexer reports it. */
+  TxHash: string | null;
+  /** When the gesture landed (unix seconds), when reported. */
+  TimeStamp: number | null;
 }
 
-const UsedRwlkNftRow = ({ nft }: { nft: UsedRwlkNftRecord }) => {
-  const t = useTranslations('tables');
-  const locale = useLocale();
-  if (!nft) {
-    return <TablePrimaryRow />;
-  }
+/** Reads the indexer's loosely typed rows into records. */
+export function toUsedRwlkNftRecords(rows: readonly UsedRWLKNFT[]): UsedRwlkNftRecord[] {
+  return rows.map((row) => ({
+    RWalkTokenId: row.RWalkTokenId,
+    BidderAddr: row.BidderAddr,
+    RoundNum: row.RoundNum,
+    TxHash: typeof row.TxHash === 'string' && row.TxHash ? row.TxHash : null,
+    TimeStamp: toFiniteNumber(row.TimeStamp),
+  }));
+}
 
-  return (
-    <TablePrimaryRow>
-      <TablePrimaryCell label={t('columns.dateTimeCompact')}>
-        <a
-          className="text-inherit"
-          href={getExplorerUrl('tx', nft.TxHash)}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <HydrationSafeDateTime timestamp={nft.TimeStamp} locale={locale} />
-        </a>
-      </TablePrimaryCell>
+/** Newest use first; records without a time keep their order at the end. */
+export function newestFirst(records: readonly UsedRwlkNftRecord[]): UsedRwlkNftRecord[] {
+  return [...records].sort((a, b) => (b.TimeStamp ?? -1) - (a.TimeStamp ?? -1));
+}
 
-      <TablePrimaryCell label={t('columns.participantAddress')} align="center">
-        <Link href={`/user/${nft.BidderAddr}`} className="font-mono break-all text-inherit">
-          {nft.BidderAddr}
-        </Link>
-      </TablePrimaryCell>
+/** The RandomWalk project's page for one token. */
+function randomWalkHref(tokenId: number): string {
+  return `https://www.randomwalknft.com/detail/${tokenId}`;
+}
 
-      <TablePrimaryCell label={t('columns.cycle')} align="center">
-        <Link href={`/allocation/${nft.RoundNum}`} className="text-inherit">
-          {nft.RoundNum}
-        </Link>
-      </TablePrimaryCell>
+/** The token's black-ground thumbnail (files are named by the zero-padded id). */
+function randomWalkThumb(tokenId: number): string {
+  return getRWLKImageUrl(String(tokenId).padStart(6, '0'), 'black_thumb.jpg');
+}
 
-      <TablePrimaryCell label={t('statisticsColumns.namedNftTokenId')} align="center">
-        {nft.RWalkTokenId}
-      </TablePrimaryCell>
-    </TablePrimaryRow>
-  );
-};
+const PAGE_SIZE = 12;
 
-const UsedRwlkNftsTable = ({ list }: { list: UsedRwlkNftRecord[] }) => {
-  const t = useTranslations('tables');
-  return (
-    <TablePrimaryContainer>
-      <TablePrimary>
-        <TablePrimaryHead>
-          <tr>
-            <TablePrimaryHeadCell align="left">{t('columns.dateTimeCompact')}</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>{t('columns.participantAddress')}</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>{t('columns.cycle')}</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>{t('statisticsColumns.namedNftTokenId')}</TablePrimaryHeadCell>
-          </tr>
-        </TablePrimaryHead>
-        <TablePrimaryBody>
-          {list.map((nft, i: number) => (
-            <UsedRwlkNftRow key={i} nft={nft} />
-          ))}
-        </TablePrimaryBody>
-      </TablePrimary>
-    </TablePrimaryContainer>
-  );
-};
+/** The page's own glyph, as in the navigation. */
+const UsedRwlkIcon = SITE_ROUTE_ICONS.usedRwlkNfts;
 
-/** `seoSummary` is the server-rendered page header, the page's only header. */
+/** Three across from `md`, four from `xl`: a RandomWalk render reads well at about 300px. */
+const COLUMNS_CLASS = 'md:grid-cols-3 xl:grid-cols-4';
+const SIZES = '(min-width: 1280px) 19rem, (min-width: 768px) 33vw, 50vw';
+
+/** Plates in the first viewport, which load eagerly. */
+const EAGER_CARDS = 4;
+
+/**
+ * The RandomWalk NFTs gestures have used, hung as works: each on its black
+ * plate (RandomWalk renders share the Signatures' ratio and black ground),
+ * linked to its page on the RandomWalk site, with the cycle, when, and the
+ * participant whose gesture used it. Newest first, twelve a page.
+ *
+ * `seoSummary` is the server-rendered page header, the page's only header.
+ */
 const UsedRwlkNftsPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('statistics');
-  const perPage = 5;
-  const [curPage, setCurPage] = useState(1);
-  const { data: list = [], isLoading: loading } = useUsedRWLKNFTs();
+  const { data, isLoading, isError, refetch } = useUsedRWLKNFTs();
+  const records = useMemo(() => newestFirst(toUsedRwlkNftRecords(data ?? [])), [data]);
+  const [page, setPage] = useState(1);
+  const wallRef = useRef<HTMLDivElement>(null);
+  const pageCount = Math.max(1, Math.ceil(records.length / PAGE_SIZE));
+  const current = Math.min(page, pageCount);
+  const visible = records.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
 
   return (
     <PageShell variant="data" backdrop="signature">
@@ -110,27 +100,124 @@ const UsedRwlkNftsPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
         />
       )}
 
-      <div>
-        {loading ? (
-          <p className="text-lg font-semibold">{t('usedRwlkNfts.loading')}</p>
-        ) : list.length > 0 ? (
-          <>
-            <UsedRwlkNftsTable
-              list={list.slice((curPage - 1) * perPage, curPage * perPage) as UsedRwlkNftRecord[]}
-            />
-            <CustomPagination
-              page={curPage}
-              setPage={setCurPage}
-              totalLength={list.length}
-              perPage={perPage}
-            />
-          </>
-        ) : (
-          <p className="text-lg font-semibold">{t('usedRwlkNfts.empty')}</p>
-        )}
-      </div>
+      {isError ? (
+        <ErrorState
+          title={t('usedRwlkNfts.loadErrorTitle')}
+          message={t('usedRwlkNfts.loadError')}
+          headingLevel={2}
+          onRetry={() => void refetch()}
+        />
+      ) : isLoading ? (
+        <SignatureGridSkeleton count={8} className={COLUMNS_CLASS} />
+      ) : records.length === 0 ? (
+        <EmptyState
+          icon={<UsedRwlkIcon aria-hidden />}
+          title={t('usedRwlkNfts.emptyTitle')}
+          description={t('usedRwlkNfts.emptyDescription')}
+          headingLevel={2}
+          variant="page"
+        />
+      ) : (
+        <div ref={wallRef} className="scroll-mt-[var(--sticky-offset)]">
+          <ul
+            className={cn(SIGNATURE_GRID_CLASS, COLUMNS_CLASS)}
+            aria-label={t('usedRwlkNfts.title')}
+          >
+            {visible.map((record, index) => (
+              <li key={`${record.TxHash ?? 'record'}-${record.RWalkTokenId}`} className="min-w-0">
+                <UsedRandomWalkCard
+                  record={record}
+                  priority={current === 1 && index < EAGER_CARDS}
+                />
+              </li>
+            ))}
+          </ul>
+          <TablePagination
+            page={current}
+            pageSize={PAGE_SIZE}
+            total={records.length}
+            onPageChange={(next) => {
+              setPage(next);
+              wallRef.current?.scrollIntoView?.({ block: 'start' });
+            }}
+            className="mt-10 border-t border-rule-faint pt-5 sm:pl-0"
+          />
+        </div>
+      )}
     </PageShell>
   );
 };
+
+/**
+ * One used RandomWalk NFT: the plate and its number link to the token on the
+ * RandomWalk site (a new tab); the caption names the cycle (linked to its
+ * allocation), when the gesture landed and the participant, as the attached
+ * NFTs' labels do.
+ */
+function UsedRandomWalkCard({
+  record,
+  priority,
+}: {
+  record: UsedRwlkNftRecord;
+  priority: boolean;
+}) {
+  const t = useTranslations('statistics');
+  const tTables = useTranslations('tables');
+  const tDetail = useTranslations('detail');
+  const locale = useLocale();
+  const id = formatId(record.RWalkTokenId);
+
+  return (
+    <article className="min-w-0" data-testid="used-rwlk-nft">
+      <a
+        href={randomWalkHref(record.RWalkTokenId)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group block rounded-edge"
+      >
+        <ArtFrame
+          sources={[randomWalkThumb(record.RWalkTokenId)]}
+          alt={t('usedRwlkNfts.artAlt', { id })}
+          sizes={SIZES}
+          priority={priority}
+          unavailableLabel={tDetail('image.artworkUnavailable')}
+          unavailableDetail={id}
+          className="group-hover:after:shadow-[var(--art-edge-active)]"
+        />
+        {/* The plate's alt text already names the token. */}
+        <p
+          aria-hidden
+          className="mt-3 flex items-center gap-1 type-body-md font-medium tabular-nums text-foreground"
+        >
+          <span className="decoration-rule underline-offset-4 group-hover:underline">{id}</span>
+          <ArrowUpRight className="size-3.5 shrink-0 text-subtle" />
+        </p>
+        <span className="sr-only">{tTables('links.newTab')}</span>
+      </a>
+      {/* The space before each dot does not break, so a wrapped line ends with the dot. */}
+      <p className="mt-1.5 type-caption text-subtle">
+        <TableLink href={`/allocation/${record.RoundNum}`}>
+          {t('usedRwlkNfts.card.cycle', { cycle: formatCount(record.RoundNum, locale) })}
+        </TableLink>
+        {record.TimeStamp === null ? null : (
+          <>
+            {'\u00a0· '}
+            <DateTime timestamp={record.TimeStamp} />
+          </>
+        )}
+      </p>
+      {/* The address never breaks: in a narrow column it takes its own line. */}
+      <p className="mt-1 flex min-w-0 flex-wrap items-center gap-x-1.5 type-caption text-subtle">
+        <span className="shrink-0">{t('usedRwlkNfts.card.usedBy')}</span>
+        <AddressChip
+          address={record.BidderAddr}
+          variant="plain"
+          showCopy={false}
+          className="min-w-0"
+        />
+      </p>
+    </article>
+  );
+}
 
 export default UsedRwlkNftsPage;

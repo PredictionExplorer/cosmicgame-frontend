@@ -19,7 +19,7 @@ import { cn } from '@/lib/utils';
 import { toIntlLocale } from '@/utils/format';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 
-import { AllocationPill } from './AllocationPill';
+import { AllocationLabel } from './AllocationLabel';
 import { ChaosMeter } from './ChaosMeter';
 import { FateGlyph } from './FateGlyph';
 import { HueStrip } from './HueStrip';
@@ -124,11 +124,7 @@ export function TraitSheet({
         return selectable(key, entry.fate, <FateGlyph value={entry.fate} size="md" withLabel />);
       case 'allocation':
         if (!entry.allocation) return null;
-        return selectable(
-          key,
-          entry.allocation,
-          <AllocationPill value={entry.allocation} size="md" />,
-        );
+        return selectable(key, entry.allocation, <AllocationLabel value={entry.allocation} />);
       case 'chaos':
         if (typeof entry.chaos !== 'number') return null;
         return <ChaosMeter value={entry.chaos} max={entry.chaosMax} size="md" />;

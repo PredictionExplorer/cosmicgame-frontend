@@ -6,37 +6,6 @@
   "jsonLd": {
     "name": "Phòng trưng bày Cosmic Signature"
   },
-  "intro": {
-    "badge": "Kho lưu trữ tạo sinh",
-    "description": "Mỗi Cosmic Signature NFT là tác phẩm tạo sinh độc nhất, được tạo từ seed trên chuỗi bằng mô phỏng bài toán ba vật thể. Một chu kỳ điển hình khắc 24 NFT: bốn NFT dành cho các vai trò, mười NFT Tinh tuyển dành cho người tham gia và mười NFT qua Tinh tuyển NFT neo giữ dành cho người neo giữ RandomWalk NFT."
-  },
-  "featured": {
-    "viewAria": "Xem Cosmic Signature {id}",
-    "alt": "Tác phẩm Cosmic Signature {id}",
-    "emptyHint": "Tác phẩm trong bộ sưu tập sẽ xuất hiện tại đây sau khi dữ liệu NFT được cập nhật.",
-    "badgeImprint": "Tác phẩm nổi bật",
-    "badgeArchive": "Kho lưu trữ",
-    "awaitingMetadata": "Đang chờ siêu dữ liệu"
-  },
-  "card": {
-    "alt": "Cosmic Signature {id}",
-    "unnamed": "Chưa đặt tên",
-    "age": {
-      "justNow": "vừa xong",
-      "minutes": "{count} phút trước",
-      "hours": "{count} giờ trước",
-      "days": "{count} ngày trước",
-      "months": "{count} tháng trước",
-      "years": "{count} năm trước"
-    },
-    "tooltips": {
-      "round": "Được khắc trong chu kỳ {round}",
-      "anchored": "Đang neo giữ và nhận phân phối neo giữ",
-      "customName": "NFT này có tên tùy chỉnh",
-      "identifier": "Mã định danh tuần tự độc nhất của COSMIC NFT này",
-      "mintedOn": "Được khắc vào {date}"
-    }
-  },
   "filters": {
     "ariaLabel": "Lọc NFT",
     "all": {
@@ -54,7 +23,6 @@
   },
   "sort": {
     "ariaLabel": "Thứ tự sắp xếp",
-    "tooltip": "Thay đổi thứ tự hiển thị NFT",
     "newest": "Mới nhất trước",
     "oldest": "Cũ nhất trước",
     "cycleDesc": "Chu kỳ (cao → thấp)",
@@ -84,13 +52,27 @@
     "list": "Xem dạng danh sách"
   },
   "pagination": {
-    "showing": "Đang hiển thị <value>{start}</value>–<value>{end}</value> trong số <value>{total}</value> NFT",
-    "perPage": "Mỗi trang",
-    "perPageAria": "Số mục mỗi trang",
-    "perPageTooltip": "Số NFT hiển thị trên mỗi trang"
+    "perPage": "Mỗi trang"
   },
   "empty": {
     "title": "Không tìm thấy NFT nào",
-    "description": "Hãy thử điều chỉnh tìm kiếm hoặc bộ lọc để tìm điều bạn cần."
+    "description": "Không có Signature nào khớp với các bộ lọc này. Xóa bộ lọc để xem toàn bộ bộ sưu tập.",
+    "collectionTitle": "Chưa có Signature nào",
+    "collectionDescription": "Mỗi Signature xuất hiện ở đây khi chu kỳ của nó hoàn tất và nó được khắc."
+  },
+  "about": {
+    "title": "Về bộ sưu tập",
+    "description": "Mỗi Cosmic Signature NFT là tác phẩm tạo sinh độc nhất, được tạo từ seed trên chuỗi bằng mô phỏng bài toán ba vật thể. Ai cũng có thể tái tạo một Signature từ bản ghi giao thức, và mỗi Signature thuộc về một chu kỳ cụ thể. Một chu kỳ điển hình khắc 24 NFT: bốn NFT dành cho các vai trò, mười NFT Tinh tuyển dành cho người tham gia và mười NFT qua Tinh tuyển NFT neo giữ dành cho người neo giữ RandomWalk NFT."
+  },
+  "toolbar": {
+    "filters": "Bộ lọc",
+    "filtersWithCount": "Bộ lọc · {count}",
+    "show": "Hiển thị",
+    "showResults": "{count, plural, other {Hiển thị # NFT}}"
+  },
+  "results": {
+    "total": "{count, plural, other {# NFT}}",
+    "filtered": "{count, number} trong số {total, plural, other {# NFT}}",
+    "regionLabel": "Các Signature"
   }
 }

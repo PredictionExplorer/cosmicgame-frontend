@@ -591,17 +591,33 @@
     "title": "Named Cosmic Signature NFTs",
     "subtitle": "Browse Cosmic Signature NFTs that have been given custom names",
     "emptyTitle": "No named NFTs",
-    "emptyDescription": "No Cosmic Signature NFTs have been named yet."
+    "emptyDescription": "No Cosmic Signature NFTs have been named yet.",
+    "galleryLink": "See them in the gallery"
   },
   "attachedNfts": {
     "title": "Attached NFT Contributions",
-    "subtitle": "NFTs attached to gestures by community members across cycles"
+    "subtitle": "NFTs attached to gestures by community members across cycles",
+    "loadErrorTitle": "Attached NFTs could not be loaded",
+    "loadErrorMessage": "The attached NFT records could not be read. Try again.",
+    "emptyTitle": "No attached NFTs yet",
+    "emptyDescription": "NFTs attached to gestures appear here. Each goes to the cycle's Signature Allocation Recipient when the cycle finalizes.",
+    "card": {
+      "cycle": "Cycle {cycle}",
+      "attachedBy": "Attached by"
+    }
   },
   "usedRwlkNfts": {
     "title": "Used Random Walk NFTs",
     "subtitle": "Random Walk NFTs attached to ETH gestures for the one-time 50% Gesture Cost reduction",
-    "loading": "Loading...",
-    "empty": "No NFTs yet."
+    "artAlt": "RandomWalk NFT {id}",
+    "loadErrorTitle": "Used RandomWalk NFTs could not be loaded",
+    "loadError": "The used RandomWalk NFTs could not be read. Try again.",
+    "emptyTitle": "No RandomWalk NFTs used yet",
+    "emptyDescription": "A RandomWalk NFT appears here once an ETH gesture uses it for its one-time Gesture Cost reduction.",
+    "card": {
+      "cycle": "Cycle {cycle}",
+      "usedBy": "Used by"
+    }
   },
   "stellarSelectionEth": {
     "invalidAddress": "Invalid Address",

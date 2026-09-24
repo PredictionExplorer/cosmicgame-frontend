@@ -146,7 +146,6 @@
       "mixed": "本週期（#{cycle}）收官後，寫下收官之筆的參與者將一併獲得 {nftCount} 枚已附加 NFT 與 {erc20Count} 筆 ERC-20 代幣存入。"
     },
     "bonusReceipt": {
-      "label": "附加資產清單",
       "nftOnly": "{nftCount} 枚 ERC-721 代幣",
       "erc20Only": "{erc20Count} 筆 ERC-20 存入",
       "mixed": "{nftCount} 枚 ERC-721 代幣 + {erc20Count} 筆 ERC-20 存入"
@@ -155,9 +154,6 @@
       "assetsIncluded": "包含資產",
       "cycle": "週期",
       "cycleValue": "#{cycle}",
-      "preview": "預覽",
-      "previewAll": "全部可見",
-      "previewCount": "{visible} / {total}",
       "recipientRule": "獲配規則",
       "recipientRuleValue": "收官之筆"
     },

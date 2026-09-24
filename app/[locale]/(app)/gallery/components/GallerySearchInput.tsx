@@ -1,118 +1,76 @@
 'use client';
 
-import { useState, useEffect, useRef, type ChangeEvent, type KeyboardEvent } from 'react';
-import { Search, X } from 'lucide-react';
+import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { useTranslations } from 'next-intl';
 
-import { cn } from '@/lib/utils';
-import { TOUCH_TARGET_HEIGHT_CLASS, TOUCH_TARGET_ICON_CLASS } from '@/lib/touch-target';
+import { SearchField } from '@/components/ui/search-field';
+
+/** How long typing pauses before the search reaches the URL. */
+export const SEARCH_DEBOUNCE_MS = 300;
 
 interface GallerySearchInputProps {
+  /** The search in the URL. */
   value: string;
-  onChange: (query: string) => void;
-  onSearch: (query: string) => void;
-  resultCount?: number;
-  totalCount?: number;
+  /** Writes a search to the URL: after a pause in typing, on Enter, and on clear. */
+  onCommit: (query: string) => void;
   className?: string;
 }
 
-export function GallerySearchInput({
-  value,
-  onChange,
-  onSearch,
-  resultCount,
-  totalCount,
-  className,
-}: GallerySearchInputProps) {
+/**
+ * The gallery search: a token number (`47`, `#000047`) or a name. It filters
+ * as the reader types (after a short pause) and keeps the query in the URL,
+ * so Back returns to it. The field shows what the reader typed even while
+ * their last commit is still on its way to the URL.
+ */
+export function GallerySearchInput({ value, onCommit, className }: GallerySearchInputProps) {
   const t = useTranslations('search');
-  const [local, setLocal] = useState(value);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const [text, setText] = useState(value);
+  // The URL value last seen, and the value this field last sent. A URL change
+  // that is not our own commit (Back, "Clear all") replaces the text.
+  const [seen, setSeen] = useState(value);
+  const [sent, setSent] = useState<string | null>(null);
+  if (value !== seen) {
+    setSeen(value);
+    if (value !== sent) setText(value);
+  }
 
-  // Sync local back to prop when the parent resets externally (e.g. clear
-  // button on the toolbar). The lint rule discourages syncing prop → state
-  // via effects, but the alternative (`key={value}`) would remount the
-  // input on every keystroke since the parent updates value via the same
-  // debounce pipeline.
-  useEffect(() => {
-    setLocal(value);
-  }, [value]);
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => () => clearTimeout(timer.current), []);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const next = e.target.value;
-    setLocal(next);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (!next) {
-      onChange('');
+  const commit = (next: string) => {
+    clearTimeout(timer.current);
+    const trimmed = next.trim();
+    setSent(trimmed);
+    onCommit(trimmed);
+  };
+
+  const onValueChange = (next: string) => {
+    setText(next);
+    clearTimeout(timer.current);
+    if (next.trim() === '') {
+      commit('');
       return;
     }
-    debounceRef.current = setTimeout(() => onChange(next), 300);
+    timer.current = setTimeout(() => commit(next), SEARCH_DEBOUNCE_MS);
   };
 
-  const handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-      onSearch(local);
+  const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      commit(text);
     }
   };
 
-  const handleClear = () => {
-    setLocal('');
-    onChange('');
-  };
-
-  const handleSearchClick = () => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    onSearch(local);
-  };
-
-  const isFiltered =
-    resultCount !== undefined && totalCount !== undefined && resultCount !== totalCount;
-
   return (
-    <div className={cn('flex items-center gap-2', className)}>
-      <div className="relative flex-1">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
-        <input
-          type="text"
-          placeholder={t('gallery.placeholder')}
-          aria-label={t('gallery.ariaLabel')}
-          value={local}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-          className={cn(
-            'w-full h-10 rounded-lg border border-white/[0.06] bg-white/[0.03] pl-9 pr-9 text-sm ring-offset-background placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors',
-            TOUCH_TARGET_HEIGHT_CLASS,
-          )}
-        />
-        {local && (
-          <button
-            type="button"
-            onClick={handleClear}
-            aria-label={t('gallery.clear')}
-            className={cn(
-              'absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/50 hover:text-foreground transition-colors',
-              TOUCH_TARGET_ICON_CLASS,
-            )}
-          >
-            <X className="h-4 w-4" />
-          </button>
-        )}
-      </div>
-      <button
-        type="button"
-        onClick={handleSearchClick}
-        className={cn(
-          'h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity',
-          TOUCH_TARGET_HEIGHT_CLASS,
-        )}
-      >
-        {t('gallery.submit')}
-      </button>
-      {isFiltered && (
-        <span className="hidden sm:inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
-          {t('gallery.results', { count: resultCount })}
-        </span>
-      )}
-    </div>
+    <SearchField
+      value={text}
+      onValueChange={onValueChange}
+      onKeyDown={onKeyDown}
+      placeholder={t('gallery.placeholder')}
+      aria-label={t('gallery.ariaLabel')}
+      clearLabel={t('gallery.clear')}
+      containerClassName={className}
+      data-testid="gallery-search"
+    />
   );
 }

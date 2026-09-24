@@ -1,132 +1,124 @@
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
+import { SearchX } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import type { CollectionTraits } from '@/hooks/useNftTraits';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
+import { SkeletonTable } from '@/components/ui/skeleton';
+import { SignatureCard } from '@/components/nft/SignatureCard';
+import { SIGNATURE_GRID_CLASS, SignatureGridSkeleton } from '@/components/nft/SignatureGrid';
 
-import { GalleryNFTCard, type GalleryCardTraits, type GalleryNFTData } from './GalleryNFTCard';
-import { SkeletonGrid } from './GalleryNFTCardSkeleton';
-import { GalleryPagination } from './GalleryPagination';
-import type { ViewMode } from './GalleryViewToggle';
+import type { ViewMode } from '../galleryQuery';
+
+import { GalleryList } from './GalleryList';
+import type { GalleryNFTData } from './galleryTypes';
+
+/** Columns of the grid: three across once the plates can be ~300px wide. */
+export function gridColumnsClass(railOpen: boolean): string {
+  return railOpen ? 'xl:grid-cols-3' : 'md:grid-cols-3';
+}
+
+/** The plate's rendered width at each breakpoint, for the srcset choice. */
+function gridSizes(railOpen: boolean): string {
+  return railOpen
+    ? '(min-width: 1280px) 20rem, (min-width: 1024px) 22rem, 50vw'
+    : '(min-width: 1280px) 26rem, (min-width: 768px) 33vw, 50vw';
+}
+
+/** How many plates the first viewport shows, which load eagerly. */
+const EAGER_CARDS = 3;
 
 interface GalleryGridProps {
-  items: GalleryNFTData[];
-  totalItems: number;
+  items: readonly GalleryNFTData[];
   loading: boolean;
   viewMode: ViewMode;
-  currentPage: number;
-  perPage: number;
-  onPageChange: (page: number) => void;
-  onPerPageChange: (perPage: number) => void;
+  /** Skeleton plates while loading (the page size). */
+  skeletonCount: number;
+  railOpen: boolean;
   /** Collection trait index; `undefined` while it loads, `null` when unavailable. */
   collectionTraits?: CollectionTraits | null;
+  /** A filter narrows the view: the empty state offers to clear it. */
+  filtered: boolean;
+  onClearFilters: () => void;
   onQuickView?: (tokenId: number) => void;
 }
 
-/** Slices the collection index down to what one card needs. */
-export function cardTraitsFor(
-  collectionTraits: CollectionTraits | null | undefined,
-  tokenId: number,
-): GalleryCardTraits | undefined {
-  if (collectionTraits === undefined) return undefined;
-  if (collectionTraits === null) return { entry: null, rarity: null, rarityTotal: 0 };
-  return {
-    entry: collectionTraits.byId.get(tokenId) ?? null,
-    rarity: collectionTraits.rarity.byId.get(tokenId) ?? null,
-    rarityTotal: collectionTraits.rarity.total,
-  };
-}
-
-/** Column headings for the list layout; mirrors the row grid template. */
-function GalleryListHeader() {
-  const t = useTranslations('gallery');
-  return (
-    <div
-      role="presentation"
-      className={cn(
-        'hidden md:grid items-center gap-3 px-2.5 pr-12 pb-1 text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground/60',
-        'md:grid-cols-[6rem_minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_auto_auto_auto] lg:grid-cols-[6rem_minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_auto_auto_auto_auto_auto]',
-      )}
-    >
-      <span>{t('list.headers.artwork')}</span>
-      <span>{t('list.headers.token')}</span>
-      <span>{t('list.headers.structure')}</span>
-      <span>{t('list.headers.palette')}</span>
-      <span>
-        {t('list.headers.spectral')} · {t('list.headers.fate')}
-      </span>
-      <span className="hidden lg:block">{t('list.headers.chaos')}</span>
-      <span className="hidden lg:block">{t('list.headers.allocation')}</span>
-      <span className="text-right">{t('list.headers.cycle')}</span>
-      <span>{t('list.headers.age')}</span>
-    </div>
-  );
-}
-
-/** Paginated grid or list of gallery cards with loading and empty states. */
+/** The page of Signatures as a wall of plates or a ledger, with its loading and empty states. */
 export function GalleryGrid({
   items,
-  totalItems,
   loading,
   viewMode,
-  currentPage,
-  perPage,
-  onPageChange,
-  onPerPageChange,
+  skeletonCount,
+  railOpen,
   collectionTraits,
+  filtered,
+  onClearFilters,
   onQuickView,
 }: GalleryGridProps) {
   const t = useTranslations('gallery');
-  const totalPages = Math.ceil(totalItems / perPage);
+  const tTraits = useTranslations('traits');
 
   if (loading) {
-    return <SkeletonGrid count={perPage} variant={viewMode} />;
+    return viewMode === 'list' ? (
+      <SkeletonTable rows={Math.min(skeletonCount, 8)} columns={6} />
+    ) : (
+      <SignatureGridSkeleton count={skeletonCount} className={gridColumnsClass(railOpen)} />
+    );
   }
 
   if (items.length === 0) {
-    return <EmptyState title={t('empty.title')} description={t('empty.description')} />;
+    return filtered ? (
+      <EmptyState
+        icon={<SearchX aria-hidden />}
+        title={t('empty.title')}
+        description={t('empty.description')}
+        action={
+          <Button variant="outline" onClick={onClearFilters}>
+            {tTraits('facets.clearAll')}
+          </Button>
+        }
+        headingLevel={2}
+        className="rounded-surface border border-rule-faint"
+      />
+    ) : (
+      <EmptyState
+        title={t('empty.collectionTitle')}
+        description={t('empty.collectionDescription')}
+        headingLevel={2}
+        className="rounded-surface border border-rule-faint"
+      />
+    );
+  }
+
+  if (viewMode === 'list') {
+    return (
+      <GalleryList items={items} collectionTraits={collectionTraits} onQuickView={onQuickView} />
+    );
   }
 
   return (
-    <>
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={`${viewMode}-${currentPage}`}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className={cn(
-            viewMode === 'grid'
-              ? 'grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4'
-              : 'space-y-2',
-          )}
-        >
-          {viewMode === 'list' ? <GalleryListHeader /> : null}
-          {items.map((nft, i) => (
-            <GalleryNFTCard
-              key={nft.TokenId}
-              nft={nft}
-              index={i}
-              variant={viewMode}
-              traits={cardTraitsFor(collectionTraits, nft.TokenId)}
-              onQuickView={onQuickView}
-            />
-          ))}
-        </motion.div>
-      </AnimatePresence>
-
-      <GalleryPagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        totalItems={totalItems}
-        perPage={perPage}
-        onPageChange={onPageChange}
-        onPerPageChange={onPerPageChange}
-      />
-    </>
+    <ul className={cn(SIGNATURE_GRID_CLASS, gridColumnsClass(railOpen))} data-testid="gallery-grid">
+      {items.map((nft, index) => (
+        <li key={nft.TokenId} className="min-w-0">
+          <SignatureCard
+            tokenId={nft.TokenId}
+            seed={nft.Seed}
+            name={nft.TokenName}
+            entry={
+              collectionTraits === undefined
+                ? undefined
+                : (collectionTraits?.byId.get(nft.TokenId) ?? null)
+            }
+            anchored={Boolean(nft.Staked)}
+            sizes={gridSizes(railOpen)}
+            priority={index < EAGER_CARDS}
+            onQuickView={onQuickView}
+          />
+        </li>
+      ))}
+    </ul>
   );
 }

@@ -274,7 +274,12 @@
       "ownedTitle": "Cosmic Signature NFT tôi sở hữu",
       "transferTitle": "Chuyển giao NFT",
       "transferSubtitle": "Tùy chọn: gửi các Cosmic Signature NFT đã chọn đến một ví khác.",
-      "transferDescription": "Chỉ chọn NFT từ ví này khi bạn đã sẵn sàng gửi chúng đến địa chỉ khác."
+      "figures": {
+        "owned": "Trong ví này",
+        "anchored": "Đang neo giữ"
+      },
+      "emptyTitle": "Ví này chưa có Signature nào",
+      "emptyDescription": "Các Signature bạn nhận được qua phân bổ hoặc mua trên sàn sẽ hiện ở đây."
     },
     "table": {
       "empty": "Chưa có token nào.",
@@ -321,12 +326,7 @@
     }
   },
   "nftTransfer": {
-    "defaultDescription": "Chọn một hoặc nhiều Cosmic Signature NFT và gửi chúng đến một địa chỉ ví khác.",
-    "marketplacePrompt": "Muốn bán thay vì gửi trực tiếp? Hãy dùng sàn để niêm yết hoặc sưu tầm Cosmic Signature NFT.",
-    "marketplace": "Mua hoặc bán NFT",
     "sourceWallet": "Ví nguồn",
-    "ownedNfts": "NFT đang sở hữu",
-    "selected": "Đã chọn",
     "recipientAddress": "Địa chỉ người nhận",
     "empty": "Bạn không có Cosmic Signature NFT nào trong ví này.",
     "pickerTitle": "Chọn NFT để chuyển giao",
@@ -336,19 +336,11 @@
     "clear": "Bỏ chọn",
     "listAria": "Cosmic Signature NFT",
     "selectAria": "Chọn NFT #{id}",
-    "nftLabel": "NFT #{id}",
-    "tokenId": "Mã token",
-    "customName": "Tên tùy chỉnh",
-    "noCustomName": "Không có tên tùy chỉnh",
-    "generationCycle": "Chu kỳ tạo",
     "cycle": "Chu kỳ {cycle}",
     "cycleUnavailable": "Không có dữ liệu chu kỳ",
-    "status": "Trạng thái",
     "statusLabels": {
       "anchored": "Đang neo giữ - gỡ neo trước khi chuyển giao",
-      "ownerChanged": "Chủ sở hữu đã thay đổi - tải lại trước khi chuyển giao",
-      "selected": "Đã chọn",
-      "transferable": "Có thể chuyển giao"
+      "ownerChanged": "Chủ sở hữu đã thay đổi - tải lại trước khi chuyển giao"
     },
     "progress": {
       "transferred": "Đã chuyển giao {completed} trong {total} NFT",
@@ -360,7 +352,6 @@
       "multiple": "Đã xác nhận {count} lần chuyển giao.",
       "viewLatest": "Xem giao dịch mới nhất"
     },
-    "sendAria": "Gửi các NFT đã chọn",
     "sending": "Đang gửi…",
     "send": "Gửi NFT đã chọn",
     "viewHistory": "Xem lịch sử chuyển giao NFT",

@@ -138,15 +138,14 @@
   },
   "showcase": {
     "badge": "Included in Signature Allocation",
-    "heading": "Bonus assets attached to this cycle",
+    "heading": "Assets attached to this cycle",
     "cycleFallback": "current",
     "description": {
-      "nftOnly": "A compact receipt for the community-attached assets that travel with the Signature Allocation. The Final Gesture participant receives {nftCount, plural, one {the attached NFT} other {all {nftCount} attached NFTs}} when Cycle #{cycle} finalizes.",
-      "erc20Only": "A compact receipt for the community-attached assets that travel with the Signature Allocation. The Final Gesture participant receives {erc20Count, plural, one {the attached ERC-20 token deposit} other {all {erc20Count} attached ERC-20 token deposits}} when Cycle #{cycle} finalizes.",
-      "mixed": "A compact receipt for the community-attached assets that travel with the Signature Allocation. The Final Gesture participant receives {nftCount, plural, one {the attached NFT} other {all {nftCount} attached NFTs}} and {erc20Count, plural, one {the attached ERC-20 token deposit} other {all {erc20Count} attached ERC-20 token deposits}} when Cycle #{cycle} finalizes."
+      "nftOnly": "Assets the community attaches travel with the Signature Allocation. The Final Gesture participant receives {nftCount, plural, one {the attached NFT} other {all {nftCount} attached NFTs}} when Cycle #{cycle} finalizes.",
+      "erc20Only": "Assets the community attaches travel with the Signature Allocation. The Final Gesture participant receives {erc20Count, plural, one {the attached ERC-20 token deposit} other {all {erc20Count} attached ERC-20 token deposits}} when Cycle #{cycle} finalizes.",
+      "mixed": "Assets the community attaches travel with the Signature Allocation. The Final Gesture participant receives {nftCount, plural, one {the attached NFT} other {all {nftCount} attached NFTs}} and {erc20Count, plural, one {the attached ERC-20 token deposit} other {all {erc20Count} attached ERC-20 token deposits}} when Cycle #{cycle} finalizes."
     },
     "bonusReceipt": {
-      "label": "Bonus receipt",
       "nftOnly": "{nftCount, plural, one {{nftCount} ERC-721 token} other {{nftCount} ERC-721 tokens}}",
       "erc20Only": "{erc20Count, plural, one {{erc20Count} ERC-20 deposit} other {{erc20Count} ERC-20 deposits}}",
       "mixed": "{nftCount, plural, one {{nftCount} ERC-721 token} other {{nftCount} ERC-721 tokens}} + {erc20Count, plural, one {{erc20Count} ERC-20 deposit} other {{erc20Count} ERC-20 deposits}}"
@@ -155,9 +154,6 @@
       "assetsIncluded": "Assets included",
       "cycle": "Cycle",
       "cycleValue": "#{cycle}",
-      "preview": "Preview",
-      "previewAll": "All visible",
-      "previewCount": "{visible} of {total}",
       "recipientRule": "Recipient rule",
       "recipientRuleValue": "Final Gesture"
     },

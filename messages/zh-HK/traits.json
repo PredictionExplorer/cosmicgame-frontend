@@ -142,20 +142,16 @@
   },
   "card": {
     "chaosAria": "混沌度 {value}，上限 {max}",
-    "chaosShort": "混沌度 {value}",
-    "syzygiesAria": "{count} 次連珠",
-    "syzygiesShort": "{count} 次連珠",
     "hueStripAria": "三個天體的調色色相",
     "spectralAria": "光譜型 {value}",
     "fateAria": "命運：{value}",
     "quickView": "快速預覽",
     "quickViewAria": "快速預覽 Cosmic Signature {id}",
     "traitsPending": "特徵待發布",
-    "traitsPendingTooltip": "這枚簽名的特徵元數據尚未發佈。",
-    "cycleShort": "C{n}",
+    "traitSummary": "{structure} · {palette}",
     "cycleLong": "第 {n} 個週期",
-    "cycleTooltip": "銘刻於第 {n} 個週期。",
-    "viewCycle": "查看第 {n} 個週期"
+    "viewCycle": "查看第 {n} 個週期",
+    "anchoredState": "已錨定"
   },
   "rarity": {
     "rank": "#{rank}",
@@ -171,9 +167,6 @@
   },
   "facets": {
     "title": "特徵",
-    "toggle": "特徵",
-    "toggleWithCount": "特徵 · {count}",
-    "toggleAria": "按特徵篩選",
     "clearAll": "全部清除",
     "clearFacet": "清除{trait}",
     "activeAria": "已啟用的特徵篩選",
@@ -185,13 +178,11 @@
     "chaosValue": "{min} 至 {max}",
     "showMore": "再顯示 {count} 項",
     "showLess": "收起",
-    "sheetTitle": "按特徵篩選",
     "sheetDescription": "按每枚簽名的構圖、物理與來歷縮小檔案範圍。",
     "loading": "正在索引特徵…",
     "partial": "特徵索引仍在補全（{indexed}/{total}）",
     "unavailable": "特徵篩選暫不可用。",
-    "retry": "重試",
-    "matches": "{count} 枚 NFT 符合條件"
+    "retry": "重試"
   },
   "quickView": {
     "title": "Cosmic Signature {id}",
@@ -249,9 +240,8 @@
   },
   "dna": {
     "title": "作品集基因",
-    "subtitle": "檔案在各項核心特徵上的分佈。選擇某一段即可篩選畫廊。",
+    "subtitle": "作品集在各項核心特徵上的分佈。選擇一個特徵即可篩選畫廊。",
     "segmentAria": "{value}：{count} 枚 NFT。按此特徵篩選。",
-    "legendCount": "{count}",
     "loading": "正在讀取作品集特徵…"
   },
   "alt": {

@@ -141,12 +141,11 @@
     "heading": "이번 사이클에 첨부된 추가 자산",
     "cycleFallback": "현재",
     "description": {
-      "nftOnly": "시그니처 배분과 함께 전달되는 커뮤니티 첨부 자산을 간략히 정리한 내역입니다. 사이클 {cycle} 마감 시 최종 제스처를 남긴 참여자가 {nftCount, plural, other {첨부된 NFT #개를}} 받습니다.",
-      "erc20Only": "시그니처 배분과 함께 전달되는 커뮤니티 첨부 자산을 간략히 정리한 내역입니다. 사이클 {cycle} 마감 시 최종 제스처를 남긴 참여자가 {erc20Count, plural, other {첨부된 ERC-20 토큰 #건을}} 받습니다.",
-      "mixed": "시그니처 배분과 함께 전달되는 커뮤니티 첨부 자산을 간략히 정리한 내역입니다. 사이클 {cycle} 마감 시 최종 제스처를 남긴 참여자가 {nftCount, plural, other {첨부된 NFT #개와}} {erc20Count, plural, other {첨부된 ERC-20 토큰 #건을}} 받습니다."
+      "nftOnly": "커뮤니티가 첨부한 자산은 시그니처 배분과 함께 전달됩니다. 사이클 {cycle} 마감 시 최종 제스처를 남긴 참여자가 {nftCount, plural, other {첨부된 NFT #개를}} 받습니다.",
+      "erc20Only": "커뮤니티가 첨부한 자산은 시그니처 배분과 함께 전달됩니다. 사이클 {cycle} 마감 시 최종 제스처를 남긴 참여자가 {erc20Count, plural, other {첨부된 ERC-20 토큰 #건을}} 받습니다.",
+      "mixed": "커뮤니티가 첨부한 자산은 시그니처 배분과 함께 전달됩니다. 사이클 {cycle} 마감 시 최종 제스처를 남긴 참여자가 {nftCount, plural, other {첨부된 NFT #개와}} {erc20Count, plural, other {첨부된 ERC-20 토큰 #건을}} 받습니다."
     },
     "bonusReceipt": {
-      "label": "추가 자산 내역",
       "nftOnly": "{nftCount, plural, other {ERC-721 토큰 #개}}",
       "erc20Only": "{erc20Count, plural, other {ERC-20 적립 #건}}",
       "mixed": "{nftCount, plural, other {ERC-721 토큰 #개}} + {erc20Count, plural, other {ERC-20 적립 #건}}"
@@ -155,9 +154,6 @@
       "assetsIncluded": "포함 자산",
       "cycle": "사이클",
       "cycleValue": "{cycle}",
-      "preview": "미리 보기",
-      "previewAll": "전체 표시",
-      "previewCount": "{total}개 중 {visible}개",
       "recipientRule": "수령 기준",
       "recipientRuleValue": "최종 제스처"
     },

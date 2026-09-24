@@ -271,10 +271,15 @@
       "marketplace": "Buy or sell NFTs",
       "loadErrorTitle": "Failed to load tokens",
       "loadErrorMessage": "Failed to load Cosmic Signature NFTs.",
-      "ownedTitle": "Cosmic Signature NFTs I Own",
+      "ownedTitle": "Cosmic Signature NFTs I own",
       "transferTitle": "Transfer NFTs",
       "transferSubtitle": "Optional: send selected Cosmic Signature NFTs to another wallet.",
-      "transferDescription": "Select NFTs from this wallet only when you are ready to send them to another address."
+      "figures": {
+        "owned": "In this wallet",
+        "anchored": "Anchored"
+      },
+      "emptyTitle": "No Signatures in this wallet yet",
+      "emptyDescription": "Signatures you receive in an allocation or buy on the marketplace appear here."
     },
     "table": {
       "empty": "No tokens yet.",
@@ -321,12 +326,7 @@
     }
   },
   "nftTransfer": {
-    "defaultDescription": "Select one or more Cosmic Signature NFTs and send them to another wallet address.",
-    "marketplacePrompt": "Use the marketplace to buy or sell Cosmic Signature NFTs. To transfer directly to another wallet, continue below.",
-    "marketplace": "Buy or sell NFTs",
     "sourceWallet": "Source wallet",
-    "ownedNfts": "Owned NFTs",
-    "selected": "Selected",
     "recipientAddress": "Recipient address",
     "empty": "You do not have any Cosmic Signature NFTs in this wallet.",
     "pickerTitle": "Choose NFTs to transfer",
@@ -336,19 +336,11 @@
     "clear": "Clear selection",
     "listAria": "Cosmic Signature NFTs",
     "selectAria": "Select NFT #{id}",
-    "nftLabel": "NFT #{id}",
-    "tokenId": "Token ID",
-    "customName": "Custom name",
-    "noCustomName": "No custom name",
-    "generationCycle": "Generation cycle",
     "cycle": "Cycle {cycle}",
     "cycleUnavailable": "Cycle data not available",
-    "status": "Status",
     "statusLabels": {
-      "anchored": "Anchored - release before transfer",
-      "ownerChanged": "Owner changed - refresh before transfer",
-      "selected": "Selected",
-      "transferable": "Transferable"
+      "anchored": "Anchored: release it to send",
+      "ownerChanged": "Owner changed: refresh the page"
     },
     "progress": {
       "transferred": "Transferred {completed} of {total} NFTs",
@@ -360,9 +352,8 @@
       "multiple": "{count} transfers confirmed.",
       "viewLatest": "View latest transaction"
     },
-    "sendAria": "Send selected NFTs",
-    "sending": "Sending...",
-    "send": "Send Selected NFTs",
+    "sending": "Sending…",
+    "send": "Send selected NFTs",
     "viewHistory": "View NFT transfer history",
     "warning": {
       "title": "Recipient has no transaction history",

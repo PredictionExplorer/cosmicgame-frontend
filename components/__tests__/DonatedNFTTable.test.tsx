@@ -77,7 +77,8 @@ describe('AttachedNFTTable', () => {
     expect(interactive.getByText(shortenHex(mockData[0]!.DonorAddr, 6))).toBeInTheDocument();
     expect(interactive.getByText(String(mockData[0]!.RoundNum))).toBeInTheDocument();
     expect(interactive.getByText(shortenHex(mockData[0]!.TokenAddr, 6))).toBeInTheDocument();
-    expect(interactive.getByText(String(mockData[0]!.NFTTokenId))).toBeInTheDocument();
+    // Without a name in its metadata, the piece is titled by its number.
+    expect(interactive.getByText(`#${mockData[0]!.NFTTokenId}`)).toBeInTheDocument();
 
     await waitFor(() => {
       const src =
@@ -243,10 +244,11 @@ describe('AttachedNFTTable', () => {
     ];
 
     render(<AttachedNFTTable list={mockData} handleClaim={jest.fn()} claimingTokens={[17]} />);
-    expect(screen.getByTestId('Claim Button')).toBeDisabled();
-    expect(screen.getByTestId('Claim Button')).toHaveTextContent(
-      'tables.attachedAssets.actions.claiming',
-    );
+    // A pending retrieval keeps its label and focus beside a spinner, and ignores presses.
+    const button = screen.getByTestId('Claim Button');
+    expect(button).toHaveAttribute('aria-busy', 'true');
+    expect(button).toHaveAttribute('aria-disabled', 'true');
+    expect(button).toHaveTextContent('tables.attachedAssets.actions.claim');
   });
 
   it('has no accessibility violations', async () => {

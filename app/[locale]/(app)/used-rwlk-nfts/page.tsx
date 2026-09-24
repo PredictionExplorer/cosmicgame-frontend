@@ -35,7 +35,7 @@ export default async function Page({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
   return (
-    <PageMessages namespaces={['statistics', 'tables']}>
+    <PageMessages namespaces={['detail', 'statistics', 'tables']}>
       <PublicDataQuerySeed route="used-rwlk-nfts">
         <UsedRwlkNftsPage seoSummary={<PublicDataRouteSeoSummary route="used-rwlk-nfts" />} />
       </PublicDataQuerySeed>

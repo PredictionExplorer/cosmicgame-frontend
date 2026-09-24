@@ -1,204 +1,177 @@
-import { useState } from 'react';
+'use client';
+
+import { Check } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { getExplorerUrl, shortenHex } from '@/utils';
-
-import { Link } from '@/i18n/navigation';
-import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
-import {
-  TablePrimary,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryContainer,
-  TablePrimaryHead,
-  TablePrimaryHeadCell,
-  TablePrimaryRow,
-} from '@/components/styled';
-import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { CustomPagination } from '@/components/common/CustomPagination';
+import { getExplorerUrl } from '@/utils/urls';
+import { formatAddress, formatCount, formatNumber } from '@/utils/format';
+import { toFiniteNumber } from '@/utils/finiteNumber';
 import type { DonatedERC20Token } from '@/services/api/types';
 import { getDonatedErc20RawClaimAmount } from '@/utils/donatedErc20';
+import { Button } from '@/components/ui/button';
+import {
+  DataTable,
+  ExternalTableLink,
+  TableLink,
+  type DataTableColumn,
+} from '@/components/ui/data-table';
+import { DateTime } from '@/components/ui/date-time';
+import { UnknownValue } from '@/components/ui/unknown-value';
+
+import { useAttachedErc20Metadata } from './useAttachedErc20Metadata';
 
 export type { DonatedERC20Token };
 
-interface TokenRowProps {
-  token: DonatedERC20Token;
-  handleClaim: ((roundNum: number, tokenAddr: string, amount: string) => void) | null;
-}
-
-const TokenRow = ({ token, handleClaim }: TokenRowProps) => {
-  const t = useTranslations('tables');
-  const locale = useLocale();
-  if (!token) return <TablePrimaryRow />;
-
-  const donatedEth =
-    typeof token.AmountDonatedEth === 'number' && Number.isFinite(token.AmountDonatedEth)
-      ? token.AmountDonatedEth
-      : 0;
-  const claimedEth =
-    typeof token.AmountClaimedEth === 'number' && Number.isFinite(token.AmountClaimedEth)
-      ? token.AmountClaimedEth
-      : 0;
-
-  return (
-    <TablePrimaryRow>
-      <TablePrimaryCell label={t('attachedAssets.erc20.columns.datetime')}>
-        <a
-          className="text-inherit text-[inherit]"
-          href={getExplorerUrl('tx', token.TxHash)}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <HydrationSafeDateTime timestamp={token.TimeStamp} locale={locale} />
-        </a>
-      </TablePrimaryCell>
-
-      <TablePrimaryCell label={t('attachedAssets.erc20.columns.cycle')} align="center">
-        <Link
-          href={`/allocation/${token.RoundNum}`}
-          className="text-inherit text-[inherit]"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {token.RoundNum}
-        </Link>
-      </TablePrimaryCell>
-
-      <TablePrimaryCell label={t('attachedAssets.erc20.columns.tokenAddress')}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <a
-              href={getExplorerUrl('address', token.TokenAddr)}
-              className="text-inherit text-[inherit] font-mono break-all"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {shortenHex(token.TokenAddr, 6)}
-            </a>
-          </TooltipTrigger>
-          <TooltipContent>{token.TokenAddr}</TooltipContent>
-        </Tooltip>
-      </TablePrimaryCell>
-
-      <TablePrimaryCell label={t('attachedAssets.erc20.columns.attachedAmount')} align="center">
-        {donatedEth.toFixed(2)}
-      </TablePrimaryCell>
-
-      <TablePrimaryCell
-        label={t('attachedAssets.erc20.columns.retrievedAmount')}
-        align="center"
-        priority="secondary"
-      >
-        {claimedEth.toFixed(2)}
-      </TablePrimaryCell>
-
-      <TablePrimaryCell label={t('attachedAssets.erc20.columns.recipient')} priority="secondary">
-        {token.WinnerAddr ? (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                href={`/user/${token.WinnerAddr}`}
-                className="text-inherit text-[inherit] font-mono break-all"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {shortenHex(token.WinnerAddr, 6)}
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent>{token.WinnerAddr}</TooltipContent>
-          </Tooltip>
-        ) : (
-          <span className="text-muted-foreground">—</span>
-        )}
-      </TablePrimaryCell>
-
-      <TablePrimaryCell label={t('attachedAssets.erc20.columns.retrieved')} align="center">
-        {token.Claimed ? t('attachedAssets.status.yes') : t('attachedAssets.status.no')}
-      </TablePrimaryCell>
-
-      {handleClaim && (
-        <TablePrimaryCell label={t('attachedAssets.aria.actions')}>
-          {!token.Claimed && (
-            <Button
-              onClick={() =>
-                handleClaim(token.RoundNum, token.TokenAddr, getDonatedErc20RawClaimAmount(token))
-              }
-              data-testid="Claim Button"
-            >
-              {t('attachedAssets.actions.claim')}
-            </Button>
-          )}
-        </TablePrimaryCell>
-      )}
-    </TablePrimaryRow>
-  );
-};
-
 interface DonatedERC20TableProps {
   list: DonatedERC20Token[];
+  /** Retrieves one token; shows a Retrieve action on rows not yet retrieved. */
   handleClaim: ((roundNum: number, tokenAddr: string, amount: string) => void) | null;
+  /** Table heading level when the table stands under a section heading. */
+  headingLevel?: 2 | 3 | 4;
 }
 
-const DonatedERC20Table = ({ list, handleClaim }: DonatedERC20TableProps) => {
+/** Up to four decimals: ERC-20 amounts are arbitrary tokens, not ETH or CST. */
+const TOKEN_AMOUNT: Intl.NumberFormatOptions = { maximumFractionDigits: 4 };
+
+/** The token's symbol (read from its contract) linked to the contract on the explorer. */
+function TokenCell({ address }: { address: string }) {
+  const { data: metadata } = useAttachedErc20Metadata(address);
+  const symbol = metadata?.symbol?.trim();
+  return (
+    <span className="flex min-w-0 flex-col">
+      <ExternalTableLink
+        href={getExplorerUrl('address', address)}
+        className={symbol ? 'font-medium text-foreground' : 'type-mono'}
+      >
+        {symbol || formatAddress(address)}
+      </ExternalTableLink>
+      {symbol ? <span className="type-mono text-subtle">{formatAddress(address)}</span> : null}
+    </span>
+  );
+}
+
+/**
+ * The ERC-20 tokens attached to gestures, as a ledger: when, which cycle,
+ * the token, how much was attached and retrieved, and by whom. With
+ * `handleClaim` (the Recipient's own allocations) a row not yet retrieved
+ * offers Retrieve.
+ */
+const DonatedERC20Table = ({ list, handleClaim, headingLevel = 3 }: DonatedERC20TableProps) => {
   const t = useTranslations('tables');
-  const perPage = 5;
-  const [page, setPage] = useState<number>(1);
+  const locale = useLocale();
+  const amount = toFiniteNumber;
 
-  if (!list || list.length === 0) {
-    return <p>{t('attachedAssets.erc20.empty')}</p>;
+  const columns: DataTableColumn<DonatedERC20Token>[] = [
+    {
+      id: 'date',
+      header: t('attachedAssets.erc20.columns.datetime'),
+      kind: 'datetime',
+      value: (row) => row.TimeStamp,
+      txHash: (row) => row.TxHash,
+    },
+    {
+      id: 'cycle',
+      header: t('attachedAssets.erc20.columns.cycle'),
+      kind: 'count',
+      value: (row) => row.RoundNum,
+      cell: (row) => (
+        <TableLink href={`/allocation/${row.RoundNum}`}>
+          {formatCount(row.RoundNum, locale)}
+        </TableLink>
+      ),
+    },
+    {
+      id: 'token',
+      header: t('attachedAssets.erc20.columns.tokenAddress'),
+      value: (row) => row.TokenAddr,
+      cell: (row) => <TokenCell address={row.TokenAddr} />,
+    },
+    {
+      id: 'attached',
+      header: t('attachedAssets.erc20.columns.attachedAmount'),
+      kind: 'count',
+      value: (row) => amount(row.AmountDonatedEth),
+      cell: (row) => {
+        const value = amount(row.AmountDonatedEth);
+        return value === null ? (
+          <UnknownValue label={t('status.unavailable')} />
+        ) : (
+          formatNumber(value, locale, TOKEN_AMOUNT)
+        );
+      },
+    },
+    {
+      id: 'retrievedAmount',
+      header: t('attachedAssets.erc20.columns.retrievedAmount'),
+      kind: 'count',
+      value: (row) => amount(row.AmountClaimedEth),
+      priority: 'secondary',
+      cell: (row) => {
+        const value = amount(row.AmountClaimedEth);
+        return value === null ? (
+          <UnknownValue label={t('status.unavailable')} />
+        ) : (
+          formatNumber(value, locale, TOKEN_AMOUNT)
+        );
+      },
+    },
+    {
+      id: 'recipient',
+      header: t('attachedAssets.erc20.columns.recipient'),
+      kind: 'address',
+      value: (row) => row.WinnerAddr || null,
+      whenBlank: 'empty',
+      priority: 'secondary',
+    },
+    {
+      id: 'retrieved',
+      header: t('attachedAssets.erc20.columns.retrieved'),
+      kind: 'status',
+      value: (row) => (row.Claimed ? 1 : 0),
+      cell: (row) =>
+        row.Claimed ? (
+          <span className="inline-flex items-center gap-1.5 text-positive">
+            <Check aria-hidden className="size-4" />
+            {t('attachedAssets.status.yes')}
+          </span>
+        ) : (
+          <span className="text-muted-foreground">{t('attachedAssets.status.no')}</span>
+        ),
+    },
+  ];
+
+  if (handleClaim) {
+    columns.push({
+      id: 'retrieve',
+      header: <span className="sr-only">{t('attachedAssets.aria.actions')}</span>,
+      label: '',
+      align: 'end',
+      cell: (row) =>
+        row.Claimed ? null : (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              handleClaim(row.RoundNum, row.TokenAddr, getDonatedErc20RawClaimAmount(row))
+            }
+            data-testid="Claim Button"
+          >
+            {t('attachedAssets.actions.claim')}
+          </Button>
+        ),
+    });
   }
-
-  const pageSlice = list.slice((page - 1) * perPage, page * perPage);
 
   return (
     <>
       <div className="print:hidden">
-        <TablePrimaryContainer>
-          <TablePrimary>
-            <TablePrimaryHead>
-              <tr>
-                <TablePrimaryHeadCell align="left">
-                  {t('attachedAssets.erc20.columns.datetime')}
-                </TablePrimaryHeadCell>
-                <TablePrimaryHeadCell>
-                  {t('attachedAssets.erc20.columns.cycle')}
-                </TablePrimaryHeadCell>
-                <TablePrimaryHeadCell align="left">
-                  {t('attachedAssets.erc20.columns.tokenAddress')}
-                </TablePrimaryHeadCell>
-                <TablePrimaryHeadCell>
-                  {t('attachedAssets.erc20.columns.attachedAmount')}
-                </TablePrimaryHeadCell>
-                <TablePrimaryHeadCell priority="secondary">
-                  {t('attachedAssets.erc20.columns.retrievedAmount')}
-                </TablePrimaryHeadCell>
-                <TablePrimaryHeadCell priority="secondary">
-                  {t('attachedAssets.erc20.columns.recipient')}
-                </TablePrimaryHeadCell>
-                <TablePrimaryHeadCell>
-                  {t('attachedAssets.erc20.columns.retrieved')}
-                </TablePrimaryHeadCell>
-                {handleClaim && (
-                  <TablePrimaryHeadCell>
-                    <span className="sr-only">{t('attachedAssets.aria.actions')}</span>
-                  </TablePrimaryHeadCell>
-                )}
-              </tr>
-            </TablePrimaryHead>
-            <TablePrimaryBody>
-              {pageSlice.map((token, i) => (
-                <TokenRow key={page * perPage + i} token={token} handleClaim={handleClaim} />
-              ))}
-            </TablePrimaryBody>
-          </TablePrimary>
-        </TablePrimaryContainer>
-
-        <CustomPagination
-          page={page}
-          setPage={setPage}
-          totalLength={list.length}
-          perPage={perPage}
+        <DataTable
+          data={list}
+          columns={columns}
+          ariaLabel={t('attachedAssets.erc20.ariaLabel')}
+          getRowKey={(row, index) => `${row.EvtLogId}-${row.TxHash}-${row.TokenAddr}-${index}`}
+          emptyTitle={t('attachedAssets.erc20.empty')}
+          headingLevel={headingLevel}
         />
       </div>
       <AttachedERC20PrintFallback list={list} />
@@ -210,14 +183,18 @@ const DonatedERC20Table = ({ list, handleClaim }: DonatedERC20TableProps) => {
 function AttachedERC20PrintFallback({ list }: { list: DonatedERC20Token[] }) {
   const t = useTranslations('tables');
   const locale = useLocale();
+  const printAmount = (value: unknown) => {
+    const numeric = toFiniteNumber(value);
+    return numeric === null ? '—' : formatNumber(numeric, locale, TOKEN_AMOUNT);
+  };
 
   return (
     <div
       aria-hidden="true"
-      className="hidden rounded-md border-2 border-foreground/40 bg-background p-4 text-sm text-foreground shadow-none [print-color-adjust:exact] print:block"
+      className="hidden rounded-control border-2 border-foreground/40 bg-background p-4 text-sm text-foreground shadow-none [print-color-adjust:exact] print:block"
       data-attached-erc20-print
     >
-      <table className="w-full border-collapse border border-foreground/25 text-xs">
+      <table className="w-full border-collapse border border-foreground/25 type-caption">
         <thead>
           <tr>
             <th scope="col" className="border border-foreground/20 p-2 text-left font-semibold">
@@ -244,39 +221,29 @@ function AttachedERC20PrintFallback({ list }: { list: DonatedERC20Token[] }) {
           </tr>
         </thead>
         <tbody>
-          {list.map((token) => {
-            const donatedEth =
-              typeof token.AmountDonatedEth === 'number' && Number.isFinite(token.AmountDonatedEth)
-                ? token.AmountDonatedEth
-                : 0;
-            const claimedEth =
-              typeof token.AmountClaimedEth === 'number' && Number.isFinite(token.AmountClaimedEth)
-                ? token.AmountClaimedEth
-                : 0;
-            return (
-              <tr key={`${token.EvtLogId}-${token.TxHash}-${token.TokenAddr}`}>
-                <td className="border border-foreground/15 p-2">
-                  <HydrationSafeDateTime timestamp={token.TimeStamp} locale={locale} />
-                </td>
-                <td className="border border-foreground/15 p-2 text-center">{token.RoundNum}</td>
-                <td className="border border-foreground/15 p-2 font-mono break-all">
-                  {token.TokenAddr}
-                </td>
-                <td className="border border-foreground/15 p-2 text-center">
-                  {donatedEth.toFixed(2)}
-                </td>
-                <td className="border border-foreground/15 p-2 text-center">
-                  {claimedEth.toFixed(2)}
-                </td>
-                <td className="border border-foreground/15 p-2 font-mono break-all">
-                  {token.WinnerAddr || '—'}
-                </td>
-                <td className="border border-foreground/15 p-2 text-center">
-                  {token.Claimed ? t('attachedAssets.status.yes') : t('attachedAssets.status.no')}
-                </td>
-              </tr>
-            );
-          })}
+          {list.map((token) => (
+            <tr key={`${token.EvtLogId}-${token.TxHash}-${token.TokenAddr}`}>
+              <td className="border border-foreground/15 p-2">
+                <DateTime timestamp={token.TimeStamp} variant="full" />
+              </td>
+              <td className="border border-foreground/15 p-2 text-center">{token.RoundNum}</td>
+              <td className="border border-foreground/15 p-2 font-mono break-all">
+                {token.TokenAddr}
+              </td>
+              <td className="border border-foreground/15 p-2 text-center">
+                {printAmount(token.AmountDonatedEth)}
+              </td>
+              <td className="border border-foreground/15 p-2 text-center">
+                {printAmount(token.AmountClaimedEth)}
+              </td>
+              <td className="border border-foreground/15 p-2 font-mono break-all">
+                {token.WinnerAddr || '—'}
+              </td>
+              <td className="border border-foreground/15 p-2 text-center">
+                {token.Claimed ? t('attachedAssets.status.yes') : t('attachedAssets.status.no')}
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>

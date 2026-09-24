@@ -8,8 +8,8 @@
     "wildcard": "Wildcard",
     "finish": "Finish",
     "palette": "Palette",
-    "spectralClass": "Spectral Class",
-    "massBalance": "Mass Balance",
+    "spectralClass": "Spectral class",
+    "massBalance": "Mass balance",
     "fate": "Fate",
     "chaos": "Chaos",
     "syzygies": "Syzygies",
@@ -142,20 +142,16 @@
   },
   "card": {
     "chaosAria": "Chaos {value} of {max}",
-    "chaosShort": "Chaos {value}",
-    "syzygiesAria": "{count} syzygies",
-    "syzygiesShort": "{count} syzygies",
     "hueStripAria": "Palette hues of the three bodies",
     "spectralAria": "Spectral class {value}",
     "fateAria": "Fate: {value}",
     "quickView": "Quick view",
     "quickViewAria": "Quick view of Cosmic Signature {id}",
     "traitsPending": "Traits pending",
-    "traitsPendingTooltip": "Trait metadata has not been published for this Signature yet.",
-    "cycleShort": "C{n}",
+    "traitSummary": "{structure} · {palette}",
     "cycleLong": "Cycle {n}",
-    "cycleTooltip": "Imprinted in cycle {n}",
-    "viewCycle": "View cycle {n}"
+    "viewCycle": "View cycle {n}",
+    "anchoredState": "Anchored"
   },
   "rarity": {
     "rank": "#{rank}",
@@ -171,9 +167,6 @@
   },
   "facets": {
     "title": "Traits",
-    "toggle": "Traits",
-    "toggleWithCount": "Traits · {count}",
-    "toggleAria": "Filter by trait",
     "clearAll": "Clear all",
     "clearFacet": "Clear {trait}",
     "activeAria": "Active trait filters",
@@ -185,13 +178,11 @@
     "chaosValue": "{min} to {max}",
     "showMore": "Show {count} more",
     "showLess": "Show less",
-    "sheetTitle": "Filter by trait",
     "sheetDescription": "Narrow the archive by the composition, physics, and provenance of each Signature.",
     "loading": "Indexing traits…",
     "partial": "Trait index still filling in ({indexed} of {total})",
     "unavailable": "Trait filters are unavailable right now.",
-    "retry": "Retry",
-    "matches": "{count} NFTs match"
+    "retry": "Retry"
   },
   "quickView": {
     "title": "Cosmic Signature {id}",
@@ -249,9 +240,8 @@
   },
   "dna": {
     "title": "Collection DNA",
-    "subtitle": "The collection’s distribution across its defining traits. Select a segment to filter the gallery.",
+    "subtitle": "How the collection splits across its defining traits. Select a trait to narrow the gallery.",
     "segmentAria": "{value}: {count} NFTs. Filter by this trait.",
-    "legendCount": "{count}",
     "loading": "Reading the collection's traits…"
   },
   "alt": {
