@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { isValidElement, useEffect, useId, useRef, useState, type ReactNode } from 'react';
 
 import { TOUCH_TARGET_EXTENDED_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
@@ -15,11 +15,68 @@ export const LEDE_CLAMP_LINES = 3;
 export const LEDE_FULL_UP_TO_LINES = LEDE_CLAMP_LINES + 1;
 
 /**
- * `measuring` is the server render and the first client paint (clamped, with
- * the button), `full` a lede short enough to show whole, `clamped` a long
- * one behind "Read more".
+ * Width units per line of a phone lede: 16px body text in the 358px column
+ * of a 390px phone holds about 44 Latin characters, or 22 CJK ones.
+ */
+export const LEDE_UNITS_PER_LINE = 44;
+
+/**
+ * The server clamps a lede it estimates at more than three and a half lines.
+ * The clamped lede with its button is exactly as tall as four lines, so a
+ * lede that really takes four lines never moves whichever way the estimate
+ * went: only a lede estimated a line or more off (three against five) does.
+ */
+const LEDE_ESTIMATED_CLAMP_ABOVE_LINES = LEDE_CLAMP_LINES + 0.5;
+
+/**
+ * `full` is a lede short enough to show whole, `clamped` a long one behind
+ * "Read more". `measuring` is a lede whose text the server cannot read
+ * (rich content): it renders clamped, with the button, until measured.
  */
 type LedeFit = 'measuring' | 'full' | 'clamped';
+
+/**
+ * East Asian wide characters (Hangul, CJK, kana, full-width forms) take about
+ * twice the width of a Latin letter.
+ */
+const WIDE_CHARACTER =
+  /[\u1100-\u115f\u2e80-\u303e\u3041-\u33ff\u3400-\u4dbf\u4e00-\u9fff\ua960-\ua97f\uac00-\ud7a3\uf900-\ufaff\ufe30-\ufe4f\uff00-\uff60\uffe0-\uffe6]/u;
+
+/** Cyrillic letters run wider than Latin ones in the body face, and wrap sooner. */
+const CYRILLIC_CHARACTER = /\p{Script=Cyrillic}/u;
+
+/** The width of one character, in Latin-letter units. */
+function characterUnits(character: string): number {
+  if (WIDE_CHARACTER.test(character)) return 2;
+  if (CYRILLIC_CHARACTER.test(character)) return 1.15;
+  return 1;
+}
+
+/**
+ * The plain text of a lede: strings and numbers, through any element nesting.
+ * A component that renders its own text (a formatted amount) adds nothing,
+ * which only makes the estimate shorter.
+ */
+export function ledeText(node: ReactNode): string {
+  if (typeof node === 'string' || typeof node === 'number') return String(node);
+  if (Array.isArray(node)) return node.map((child: ReactNode) => ledeText(child)).join('');
+  if (isValidElement<{ children?: ReactNode }>(node)) return ledeText(node.props.children);
+  return '';
+}
+
+/**
+ * The fit of a lede estimated from its text alone, so the server's HTML
+ * already matches what the phone will measure: a Latin letter is one unit,
+ * a wide East Asian character two, and a line holds `LEDE_UNITS_PER_LINE`. Null when there is no text
+ * to go by. The client still measures and corrects the rare miss (a very
+ * narrow or wide phone, an unusual wrap).
+ */
+export function estimateLedeFit(text: string): Exclude<LedeFit, 'measuring'> | null {
+  if (!text.trim()) return null;
+  let units = 0;
+  for (const character of text) units += characterUnits(character);
+  return units / LEDE_UNITS_PER_LINE > LEDE_ESTIMATED_CLAMP_ABOVE_LINES ? 'clamped' : 'full';
+}
 
 /** How many lines the paragraph's full text takes at its current width. */
 function lineCount(element: HTMLElement): number {
@@ -65,9 +122,10 @@ export interface HeaderLedeProps {
  *   would take the line it saves.
  * - The clamp is scoped to `(scripting: enabled)`, so without script the lede
  *   is never cut and the button (which could not work) is hidden.
- * - Most ledes that clamp at all run well past three lines, so the server
- *   renders the clamped state and the client drops the button (and the
- *   clamp) once it measures a lede that fits: the common case never shifts.
+ * - The server decides from the text's length (`estimateLedeFit`), so a
+ *   short lede ships without the button and a long one with it: hydration
+ *   moves nothing. The client measures the real line count and corrects the
+ *   estimate only when it was wrong.
  */
 export function HeaderLede({
   children,
@@ -93,7 +151,7 @@ function ClampedLede({
   const id = useId();
   const ref = useRef<HTMLParagraphElement>(null);
   const [expanded, setExpanded] = useState(false);
-  const [fit, setFit] = useState<LedeFit>('measuring');
+  const [fit, setFit] = useState<LedeFit>(() => estimateLedeFit(ledeText(children)) ?? 'measuring');
 
   useEffect(() => {
     const element = ref.current;
@@ -124,10 +182,11 @@ function ClampedLede({
           aria-controls={id}
           aria-expanded={expanded}
           onClick={() => setExpanded((value) => !value)}
-          // A 44px hit area around a one-line control, without making the line taller.
+          // One lede line tall, so three clamped lines and the button take
+          // exactly the height of a four-line lede; a 44px hit area around it.
           data-touch-target="extended"
           className={cn(
-            'mt-1 inline-flex min-h-6 items-center type-label text-primary underline-offset-4 hover:underline sm:hidden [@media(scripting:none)]:hidden',
+            'flex h-6 w-fit items-center type-label text-primary underline-offset-4 hover:underline sm:hidden [@media(scripting:none)]:hidden',
             TOUCH_TARGET_EXTENDED_CLASS,
           )}
         >
