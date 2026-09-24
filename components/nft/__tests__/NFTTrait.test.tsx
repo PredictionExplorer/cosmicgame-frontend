@@ -461,15 +461,89 @@ describe('NFTTrait', () => {
     expect(mockRouterPush).not.toHaveBeenCalled();
   });
 
-  it('does not trigger keyboard nav when typing in input', () => {
-    withDashboard();
-    withNft({ CurOwnerAddr: '0xOwner' });
-    const { container } = render(<NFTTrait tokenId={5} />);
-    const input = container.querySelector('input');
-    if (input) {
-      fireEvent.keyDown(input, { key: 'ArrowLeft' });
-      expect(mockRouterPush).not.toHaveBeenCalled();
+  describe('arrow keys', () => {
+    /** Mounts extra markup in the page for the handler to see as the event target. */
+    function mount(html: string): HTMLElement {
+      const host = document.createElement('div');
+      host.innerHTML = html;
+      document.body.appendChild(host);
+      return host;
     }
+
+    afterEach(() => {
+      Reflect.deleteProperty(document, 'fullscreenElement');
+    });
+
+    it('walk the collection from the page itself', () => {
+      withDashboard();
+      withNft();
+      render(<NFTTrait tokenId={5} />);
+      fireEvent.keyDown(document.body, { key: 'ArrowRight' });
+      expect(mockRouterPush).toHaveBeenLastCalledWith('/detail/6');
+      fireEvent.keyDown(document.body, { key: 'ArrowLeft' });
+      expect(mockRouterPush).toHaveBeenLastCalledWith('/detail/4');
+    });
+
+    it('leave a field to the text cursor', () => {
+      withDashboard();
+      withNft();
+      render(<NFTTrait tokenId={5} />);
+      const host = mount('<label>Name <input type="text" /></label>');
+      fireEvent.keyDown(within(host).getByRole('textbox'), { key: 'ArrowLeft' });
+      expect(mockRouterPush).not.toHaveBeenCalled();
+      host.remove();
+    });
+
+    it('leave the Still / In motion segments and the viewer’s buttons alone', () => {
+      withDashboard();
+      withNft();
+      render(<NFTTrait tokenId={5} />);
+      const modes = screen.getByRole('group', { name: 'detail.viewer.modeLabel' });
+      const still = within(modes).getByRole('button', { name: /detail.viewer.still/ });
+      still.focus();
+      fireEvent.keyDown(still, { key: 'ArrowRight' });
+      fireEvent.keyDown(screen.getByRole('button', { name: /detail.viewer.fullscreen/ }), {
+        key: 'ArrowLeft',
+      });
+      expect(mockRouterPush).not.toHaveBeenCalled();
+    });
+
+    it('leave composite widgets (tabs, menus) to move their own selection', () => {
+      withDashboard();
+      withNft();
+      render(<NFTTrait tokenId={5} />);
+      const host = mount(
+        '<div role="tablist"><span role="tab" tabindex="-1">A</span></div>' +
+          '<div role="menu"><div role="menuitem" tabindex="-1">B</div></div>',
+      );
+      fireEvent.keyDown(within(host).getByRole('tab'), { key: 'ArrowRight' });
+      fireEvent.keyDown(within(host).getByRole('menuitem'), { key: 'ArrowLeft' });
+      expect(mockRouterPush).not.toHaveBeenCalled();
+      host.remove();
+    });
+
+    it('stay with the animation while it fills the screen', () => {
+      withDashboard();
+      withNft();
+      render(<NFTTrait tokenId={5} />);
+      const video = document.createElement('video');
+      Object.defineProperty(document, 'fullscreenElement', {
+        configurable: true,
+        get: () => video,
+      });
+      fireEvent.keyDown(document.body, { key: 'ArrowRight' });
+      fireEvent.keyDown(document.body, { key: 'ArrowLeft' });
+      expect(mockRouterPush).not.toHaveBeenCalled();
+    });
+
+    it('ignore modified presses (browser history and text selection)', () => {
+      withDashboard();
+      withNft();
+      render(<NFTTrait tokenId={5} />);
+      fireEvent.keyDown(document.body, { key: 'ArrowLeft', altKey: true });
+      fireEvent.keyDown(document.body, { key: 'ArrowRight', shiftKey: true });
+      expect(mockRouterPush).not.toHaveBeenCalled();
+    });
   });
 
   it('shows a localized success notification after a confirmed NFT transfer', async () => {

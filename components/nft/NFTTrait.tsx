@@ -94,27 +94,48 @@ const NAME_REFETCH_DELAY_MS = 3000;
 const PLATE_SIZES = '(min-width: 1280px) 880px, (min-width: 1024px) 62vw, 100vw';
 
 /**
- * Where the arrow keys belong to a control instead of the page: fields,
- * composite widgets that move their own selection, and open overlays.
+ * Focus inside any of these owns the arrow keys: fields, every focusable
+ * control (the Still / In motion segments, buttons, links, scrollable
+ * regions), composite widgets that move their own selection, and overlays.
+ * The page walks the collection only from the page itself.
  */
 const KEY_OWNING_SELECTOR = [
   'input',
   'textarea',
   'select',
-  '[contenteditable="true"]',
+  '[contenteditable]:not([contenteditable="false"])',
+  'button',
+  'a[href]',
+  'summary',
+  '[tabindex]:not([tabindex="-1"])',
+  '[role="button"]',
+  '[role="link"]',
+  '[role="group"]',
+  '[role="toolbar"]',
   '[role="tablist"]',
   '[role="radiogroup"]',
   '[role="menu"]',
+  '[role="menubar"]',
   '[role="listbox"]',
+  '[role="grid"]',
+  '[role="tree"]',
   '[role="slider"]',
   '[role="dialog"]',
   '[role="region"]',
 ].join(',');
 
+/** The animation (or anything else) fills the screen: arrows belong to it. */
+function isFullscreen(): boolean {
+  const doc = document as Document & { webkitFullscreenElement?: Element | null };
+  return Boolean(doc.fullscreenElement ?? doc.webkitFullscreenElement);
+}
+
+/** Whether an arrow key press walks the collection. */
 function isPageLevelArrow(event: KeyboardEvent): boolean {
   if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
     return false;
   }
+  if (isFullscreen()) return false;
   const target = event.target;
   return !(target instanceof Element && target.closest(KEY_OWNING_SELECTOR));
 }
@@ -220,7 +241,7 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
   const { previous: previousId, next: nextId } = neighbourIds(tokenId, totalImprints);
 
   // The arrow keys walk the collection, as the labelled links do: no read
-  // before navigating, and never while a control owns the arrow keys.
+  // before navigating, and never while a control or full screen owns them.
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (!isPageLevelArrow(event)) return;
