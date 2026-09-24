@@ -1,205 +1,76 @@
-import { render, screen, checkA11y } from '@/test-utils';
+import type { MarketingReward } from '@/services/api/types';
+
+import { render, screen, checkA11y, fireEvent } from '@/test-utils';
 
 import MarketingRewards from '../MarketingRewards';
 
 const mockUseMarketingRewards = jest.fn();
-const mockUseDashboardInfo = jest.fn();
 
-jest.mock('../../../../../hooks/useApiQuery', () => ({
+jest.mock('@/hooks/useApiQuery', () => ({
   useMarketingRewards: (...args: unknown[]) => mockUseMarketingRewards(...args),
-  useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
 }));
 
-jest.mock('framer-motion', () => {
-  const React = require('react');
-  const cache: Record<string, React.ForwardRefExoticComponent<unknown>> = {};
-  return {
-    motion: new Proxy(
-      {},
-      {
-        get: (_target: unknown, prop: string) => {
-          if (!cache[prop]) {
-            const Comp = React.forwardRef(function MotionProxy(
-              props: Record<string, unknown>,
-              ref: React.Ref<HTMLElement>,
-            ) {
-              const {
-                initial: _i,
-                animate: _a,
-                whileInView: _w,
-                viewport: _v,
-                transition: _t,
-                variants: _va,
-                ...rest
-              } = props;
-              return React.createElement(prop, { ...rest, ref });
-            });
-            Comp.displayName = `motion.${prop}`;
-            cache[prop] = Comp;
-          }
-          return cache[prop];
-        },
-      },
-    ),
-    useInView: () => true,
-  };
+const reward = (id: number, addr: string, amount: number): MarketingReward => ({
+  EvtLogId: id,
+  TxHash: `0x${String(id).padStart(64, '0')}`,
+  TimeStamp: 1_700_000_000 + id,
+  MarketerAddr: addr,
+  AmountEth: amount,
 });
 
-function MockHero() {
-  return <div data-testid="hero">Hero</div>;
-}
-jest.mock('../../../../../components/marketing/MarketingHero', () => ({
-  MarketingHero: MockHero,
-}));
-
-function MockStats(props: Record<string, unknown>) {
-  return (
-    <div
-      data-testid="stats"
-      data-total={props.totalAllocatedCst}
-      data-marketers={props.activeMarketers}
-      data-transactions={props.rewardTransactions}
-    >
-      Stats
-    </div>
-  );
-}
-jest.mock('../../../../../components/marketing/MarketingStats', () => ({
-  MarketingStats: MockStats,
-}));
-
-function MockHowItWorks() {
-  return <div data-testid="how-it-works">HowItWorks</div>;
-}
-jest.mock('../../../../../components/marketing/HowItWorks', () => ({
-  HowItWorks: MockHowItWorks,
-}));
-
-function MockLeaderboard({ rewards }: { rewards: unknown[] }) {
-  return <div data-testid="leaderboard">Leaderboard: {rewards.length}</div>;
-}
-jest.mock('../../../../../components/marketing/TopMarketersLeaderboard', () => ({
-  TopMarketersLeaderboard: MockLeaderboard,
-}));
-
-function MockHistory({ rewards }: { rewards: unknown[] }) {
-  return <div data-testid="history">History: {rewards.length}</div>;
-}
-jest.mock('../../../../../components/marketing/RewardsHistorySection', () => ({
-  RewardsHistorySection: MockHistory,
-}));
-
-function MockCTA() {
-  return <div data-testid="cta">CTA</div>;
-}
-jest.mock('../../../../../components/marketing/MarketingCTA', () => ({
-  MarketingCTA: MockCTA,
-}));
-
-beforeEach(() => {
-  jest.clearAllMocks();
-  mockUseDashboardInfo.mockReturnValue({
-    data: { MainStats: { TotalMktRewardsEth: 500, NumMktRewards: 25 } },
-    isLoading: false,
-  });
+const query = (overrides: Record<string, unknown> = {}) => ({
+  data: undefined,
+  isLoading: false,
+  isError: false,
+  refetch: jest.fn(),
+  ...overrides,
 });
 
-const sampleRewards = [
-  { EvtLogId: 1, TxHash: '0x1', TimeStamp: 1000, MarketerAddr: '0xAAA', AmountEth: 10 },
-  { EvtLogId: 2, TxHash: '0x2', TimeStamp: 2000, MarketerAddr: '0xBBB', AmountEth: 20 },
-];
+beforeEach(() => mockUseMarketingRewards.mockReset());
 
 describe('MarketingRewards', () => {
-  it('shows loading state when rewards are loading', () => {
-    mockUseMarketingRewards.mockReturnValue({ data: [], isLoading: true });
+  it('ranks the top contributors and lists every allocation from one read', () => {
+    mockUseMarketingRewards.mockReturnValue(
+      query({
+        data: [
+          reward(1, '0x1111111111111111111111111111111111111111', 10),
+          reward(2, '0x2222222222222222222222222222222222222222', 20),
+        ],
+      }),
+    );
     render(<MarketingRewards />);
-    expect(screen.getByLabelText('Loading outreach allocations')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'marketing.leaderboard.title' })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'marketing.history.title' })).toBeVisible();
+    expect(mockUseMarketingRewards).toHaveBeenCalledTimes(1);
   });
 
-  it('holds the figures’ place while the dashboard loads, and shows the ledgers', () => {
-    mockUseMarketingRewards.mockReturnValue({ data: sampleRewards, isLoading: false });
-    mockUseDashboardInfo.mockReturnValue({ data: null, isLoading: true });
-    render(<MarketingRewards />);
-    // Not "unavailable" figures while the read is still on its way.
-    expect(screen.queryByTestId('stats')).not.toBeInTheDocument();
-    expect(screen.getByTestId('leaderboard')).toHaveTextContent('Leaderboard: 2');
-    expect(screen.getByTestId('history')).toBeInTheDocument();
+  it('holds both ledgers’ places while the read is in flight', () => {
+    mockUseMarketingRewards.mockReturnValue(query({ isLoading: true }));
+    const { container } = render(<MarketingRewards />);
+    expect(screen.getByRole('heading', { name: 'marketing.leaderboard.title' })).toBeVisible();
+    expect(container.querySelectorAll('[aria-busy="true"]')).toHaveLength(2);
   });
 
-  it('renders all sections when loaded', () => {
-    mockUseMarketingRewards.mockReturnValue({ data: sampleRewards, isLoading: false });
+  it('says once that there are no allocations yet, without an empty ranking', () => {
+    mockUseMarketingRewards.mockReturnValue(query({ data: [] }));
     render(<MarketingRewards />);
-
-    expect(screen.getByTestId('hero')).toBeInTheDocument();
-    expect(screen.getByTestId('stats')).toBeInTheDocument();
-    expect(screen.getByTestId('how-it-works')).toBeInTheDocument();
-    expect(screen.getByTestId('leaderboard')).toBeInTheDocument();
-    expect(screen.getByTestId('history')).toBeInTheDocument();
-    expect(screen.getByTestId('cta')).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'marketing.leaderboard.title' })).toBeNull();
+    expect(screen.getByText('tables.empty.outreachAllocations')).toBeVisible();
   });
 
-  it('passes rewards data to leaderboard and history', () => {
-    mockUseMarketingRewards.mockReturnValue({ data: sampleRewards, isLoading: false });
+  it('reports a failed read once, with a retry', () => {
+    const refetch = jest.fn();
+    mockUseMarketingRewards.mockReturnValue(query({ isError: true, refetch }));
     render(<MarketingRewards />);
-
-    expect(screen.getByTestId('leaderboard')).toHaveTextContent('Leaderboard: 2');
-    expect(screen.getByTestId('history')).toHaveTextContent('History: 2');
-  });
-
-  it('passes dashboard stats to MarketingStats', () => {
-    mockUseMarketingRewards.mockReturnValue({ data: sampleRewards, isLoading: false });
-    render(<MarketingRewards />);
-
-    const stats = screen.getByTestId('stats');
-    expect(stats).toHaveAttribute('data-total', '500');
-    expect(stats).toHaveAttribute('data-transactions', '25');
-  });
-
-  it('computes unique active marketers', () => {
-    mockUseMarketingRewards.mockReturnValue({ data: sampleRewards, isLoading: false });
-    render(<MarketingRewards />);
-
-    const stats = screen.getByTestId('stats');
-    expect(stats).toHaveAttribute('data-marketers', '2');
-  });
-
-  it('handles null rewards gracefully', () => {
-    mockUseMarketingRewards.mockReturnValue({ data: null, isLoading: false });
-    render(<MarketingRewards />);
-
-    expect(screen.getByTestId('leaderboard')).toHaveTextContent('Leaderboard: 0');
-    expect(screen.getByTestId('history')).toHaveTextContent('History: 0');
-    // An unread list is an unknown contributor count, not 0 contributors.
-    expect(screen.getByTestId('stats')).not.toHaveAttribute('data-marketers');
-  });
-
-  it('passes unread dashboard stats as unknown, never as 0', () => {
-    // Regression: a failed dashboard read rendered "0 CST" and "0" transactions.
-    mockUseMarketingRewards.mockReturnValue({ data: [], isLoading: false });
-    mockUseDashboardInfo.mockReturnValue({ data: null, isLoading: false });
-    render(<MarketingRewards />);
-
-    const stats = screen.getByTestId('stats');
-    expect(stats).not.toHaveAttribute('data-total');
-    expect(stats).not.toHaveAttribute('data-transactions');
-    expect(stats).toHaveAttribute('data-marketers', '0');
-  });
-
-  it('renders what needs no data at once, and holds the rest in place while it loads', () => {
-    // The page used to wait behind one spinner until both reads landed.
-    mockUseMarketingRewards.mockReturnValue({ data: [], isLoading: true });
-    render(<MarketingRewards />);
-
-    expect(screen.getByTestId('hero')).toBeInTheDocument();
-    expect(screen.getByTestId('how-it-works')).toBeInTheDocument();
-    expect(screen.getByTestId('cta')).toBeInTheDocument();
-    expect(screen.queryByTestId('stats')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('leaderboard')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('history')).not.toBeInTheDocument();
+    expect(screen.getAllByText("The outreach allocations couldn't be loaded.")).toHaveLength(1);
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
+    expect(refetch).toHaveBeenCalledTimes(1);
   });
 
   it('has no accessibility violations', async () => {
-    mockUseMarketingRewards.mockReturnValue({ data: sampleRewards, isLoading: false });
+    mockUseMarketingRewards.mockReturnValue(
+      query({ data: [reward(1, '0x1111111111111111111111111111111111111111', 10)] }),
+    );
     const { container } = render(<MarketingRewards />);
     await checkA11y(container);
   });

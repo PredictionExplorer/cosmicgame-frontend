@@ -1,109 +1,49 @@
-import { TooltipProvider } from '@/components/ui/tooltip';
 import type { MarketingReward } from '@/services/api/types';
 
 import { render, screen, checkA11y } from '@/test-utils';
 
 import { RewardsHistorySection } from '../RewardsHistorySection';
 
-const renderWithTooltip = (ui: React.ReactElement) =>
-  render(<TooltipProvider>{ui}</TooltipProvider>);
-
-jest.mock('framer-motion', () => {
-  const React = require('react');
-  const cache: Record<string, React.ForwardRefExoticComponent<unknown>> = {};
-  return {
-    motion: new Proxy(
-      {},
-      {
-        get: (_target: unknown, prop: string) => {
-          if (!cache[prop]) {
-            const Comp = React.forwardRef(function MotionProxy(
-              props: Record<string, unknown>,
-              ref: React.Ref<HTMLElement>,
-            ) {
-              const {
-                initial: _i,
-                animate: _a,
-                whileInView: _w,
-                viewport: _v,
-                transition: _t,
-                variants: _va,
-                ...rest
-              } = props;
-              return React.createElement(prop, { ...rest, ref });
-            });
-            Comp.displayName = `motion.${prop}`;
-            cache[prop] = Comp;
-          }
-          return cache[prop];
-        },
-      },
-    ),
-    useInView: () => true,
-  };
-});
-
-jest.mock('../../../components/tables/GlobalMarketingRewardsTable', () => ({
-  GlobalMarketingRewardsTable: ({ list }: { list: unknown[] }) => (
-    <div data-testid="rewards-table">rows: {list.length}</div>
-  ),
-}));
-
-const makeReward = (id: number): MarketingReward => ({
+const reward = (id: number): MarketingReward => ({
   EvtLogId: id,
-  TxHash: `0x${id}`,
-  TimeStamp: Date.now() / 1000,
-  MarketerAddr: `0x${String(id).padStart(40, '0')}`,
-  AmountEth: id * 10,
+  TxHash: `0x${String(id).padStart(64, '0')}`,
+  TimeStamp: 1_700_000_000 + id,
+  MarketerAddr: '0x1234567890abcdef1234567890abcdef12345678',
+  AmountEth: 100 + id,
 });
 
 describe('RewardsHistorySection', () => {
-  it('renders the section heading', () => {
-    renderWithTooltip(<RewardsHistorySection rewards={[]} />);
-    expect(screen.getByText('Allocation History')).toBeInTheDocument();
+  it('titles and describes the ledger of every allocation', () => {
+    const { container } = render(<RewardsHistorySection rewards={[reward(1), reward(2)]} />);
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'marketing.history.title' }),
+    ).toBeVisible();
+    expect(screen.getByText('marketing.history.description')).toBeVisible();
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(2);
   });
 
-  it('shows empty state when no rewards', () => {
-    renderWithTooltip(<RewardsHistorySection rewards={[]} />);
-    expect(screen.getByText('No allocations yet')).toBeInTheDocument();
+  it('explains an empty history', () => {
+    render(<RewardsHistorySection rewards={[]} />);
+    expect(screen.getByText('tables.empty.outreachAllocations')).toBeVisible();
+    expect(screen.getByText('marketing.history.emptyDescription')).toBeVisible();
   });
 
-  it('renders the table when rewards exist', () => {
-    const rewards = [makeReward(1), makeReward(2)];
-    renderWithTooltip(<RewardsHistorySection rewards={rewards} />);
-    expect(screen.getByTestId('rewards-table')).toHaveTextContent('rows: 2');
+  it('holds its place while loading', () => {
+    const { container } = render(<RewardsHistorySection rewards={[]} loading />);
+    expect(container.querySelector('[aria-busy="true"]')).not.toBeNull();
+    expect(screen.queryByText('tables.empty.outreachAllocations')).toBeNull();
   });
 
-  it('displays the reward count', () => {
-    const rewards = [makeReward(1), makeReward(2), makeReward(3)];
-    renderWithTooltip(<RewardsHistorySection rewards={rewards} />);
-    expect(screen.getByText('3')).toBeInTheDocument();
-    expect(screen.getByText(/allocations$/)).toBeInTheDocument();
+  it('reports a failed read with a retry', () => {
+    const onRetry = jest.fn();
+    render(<RewardsHistorySection rewards={[]} error="Could not load" onRetry={onRetry} />);
+    expect(screen.getByText('Could not load')).toBeVisible();
+    screen.getByRole('button', { name: 'Try again' }).click();
+    expect(onRetry).toHaveBeenCalledTimes(1);
   });
 
-  it('uses singular form for one reward', () => {
-    renderWithTooltip(<RewardsHistorySection rewards={[makeReward(1)]} />);
-    expect(screen.getByText('1')).toBeInTheDocument();
-    expect(screen.getByText(/allocation$/)).toBeInTheDocument();
-  });
-
-  it('does not show count badge for empty list', () => {
-    renderWithTooltip(<RewardsHistorySection rewards={[]} />);
-    expect(screen.queryByText('Showing')).not.toBeInTheDocument();
-  });
-
-  it('has an info tooltip trigger', () => {
-    renderWithTooltip(<RewardsHistorySection rewards={[]} />);
-    expect(screen.getByLabelText('About allocation history')).toBeInTheDocument();
-  });
-
-  it('has no accessibility violations with rewards', async () => {
-    const { container } = renderWithTooltip(<RewardsHistorySection rewards={[makeReward(1)]} />);
-    await checkA11y(container);
-  });
-
-  it('has no accessibility violations when empty', async () => {
-    const { container } = renderWithTooltip(<RewardsHistorySection rewards={[]} />);
+  it('has no accessibility violations', async () => {
+    const { container } = render(<RewardsHistorySection rewards={[reward(1)]} />);
     await checkA11y(container);
   });
 });

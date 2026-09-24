@@ -278,11 +278,15 @@ test.describe('zh Sprint 7 — long-tail routes', () => {
     await openZh(page, '/zh/marketing');
     await expect(page.getByRole('heading', { level: 1, name: '推广分配' })).toBeVisible();
     await expect(page.getByRole('heading', { name: '推广分配记录', exact: true })).toBeVisible();
-    await expect(page.getByText('暂无推广分配')).toBeVisible();
+    await expect(page.getByText('暂无推广储备分配')).toBeVisible();
+    await expect(page.getByRole('link', { name: '发邮件联系推广团队' })).toHaveAttribute(
+      'href',
+      'mailto:marketing@cosmicsignature.com',
+    );
 
     await openZh(page, `/zh/marketing/${ADDRESS}`);
-    await expect(page.getByText('此参与者的推广分配', { exact: true })).toBeVisible();
-    await expect(page.getByText('暂无分配。')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: '获得的推广分配' })).toBeVisible();
+    await expect(page.getByText('暂无推广储备分配')).toBeVisible();
   });
 
   test('renders Chinese coordination, admin, and internal tools', async ({ page }) => {

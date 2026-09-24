@@ -1,79 +1,68 @@
 {
-  "loadingAria": "홍보 배분 불러오는 중",
-  "hero": {
-    "title": "Cosmic Signature를 <highlight>널리 알리면</highlight> CST 홍보 배분을 받습니다",
-    "description": "Cosmic Signature를 알리고, 검증된 홍보 활동마다 CST 홍보 배분을 받습니다.",
-    "learnHow": "참여 방법 보기"
-  },
-  "stats": {
-    "heading": "홍보 프로그램 통계",
-    "infoAria": "{label} 안내",
-    "valueAria": "{label}: {value}{suffix}",
-    "totalAllocations": {
-      "label": "총 홍보 배분",
-      "tooltip": "출범 이후 모든 홍보 기여자에게 전달된 CST 총량"
-    },
-    "activeContributors": {
-      "label": "활동 중인 홍보 기여자",
-      "tooltip": "홍보 배분을 받은 고유 지갑 주소 수"
-    },
-    "transactions": {
-      "label": "홍보 배분 트랜잭션",
-      "tooltip": "처리된 개별 홍보 배분 건수"
-    }
-  },
   "howItWorks": {
     "title": "참여 방법",
-    "infoAria": "참여 방법 안내",
-    "tooltip": "세 단계면 Cosmic Signature 홍보 배분을 받을 수 있습니다",
-    "stepInfoAria": "{title} 상세 안내",
     "steps": {
       "promote": {
         "title": "알리기",
         "description": "소셜 미디어, 블로그, 커뮤니티에서 Cosmic Signature를 소개합니다.",
-        "tooltip": "콘텐츠 제작, 추천 링크 공유, 블로그 글 작성, 영상 제작 등 Cosmic Signature를 알리는 활동이면 자격이 됩니다."
+        "detail": "콘텐츠 제작, 추천 링크 공유, 블로그 글 작성, 영상 제작 등 Cosmic Signature를 알리는 활동이면 자격이 됩니다."
       },
       "verify": {
         "title": "검증받기",
         "description": "팀이 홍보 활동을 검토하고 검증합니다.",
-        "tooltip": "홍보 팀이 홍보 활동의 도달 범위, 품질, 진정성을 평가한 뒤 홍보 배분을 승인합니다."
+        "detail": "홍보 팀이 홍보 활동의 도달 범위, 품질, 진정성을 평가한 뒤 홍보 배분을 승인합니다."
       },
       "receive": {
         "title": "CST 받기",
         "description": "CST 홍보 배분이 지갑으로 직접 전달됩니다.",
-        "tooltip": "검증이 끝나면 CST가 온체인으로 지갑 주소에 전송됩니다. 배분 규모는 홍보 활동의 영향력에 따라 달라집니다."
+        "detail": "검증이 끝나면 CST가 온체인으로 지갑 주소에 전송됩니다. 배분 규모는 홍보 활동의 영향력에 따라 달라집니다."
       }
-    }
+    },
+    "description": "Cosmic Signature를 알리는 일부터 지갑으로 CST를 받기까지 세 단계입니다."
   },
   "leaderboard": {
     "title": "주요 홍보 기여자",
-    "infoAria": "주요 홍보 기여자 안내",
-    "tooltip": "홍보 활동으로 받은 CST 총량 기준 순위",
     "empty": "아직 홍보 기여자가 없습니다.",
-    "rewardCountOne": "홍보 배분 {count}건",
-    "rewardCountOther": "홍보 배분 {count}건"
+    "description": "홍보 활동으로 받은 CST 총량 기준 순위입니다.",
+    "columns": {
+      "rank": "순위",
+      "contributor": "기여자",
+      "share": "비중",
+      "shareHelp": "지금까지 전달된 홍보 CST 전체에서 이 기여자가 받은 비중입니다.",
+      "received": "받은 CST",
+      "allocations": "배분 건수"
+    }
   },
   "history": {
     "title": "홍보 배분 내역",
-    "infoAria": "홍보 배분 내역 안내",
-    "tooltip": "모든 홍보 배분을 시간순으로 정리한 전체 기록",
-    "showingOne": "홍보 배분 <strong>{count}</strong>건 표시",
-    "showingOther": "홍보 배분 <strong>{count}</strong>건 표시",
-    "emptyTitle": "아직 전달된 홍보 배분이 없습니다",
-    "emptyDescription": "홍보 활동이 검증되고 배분이 전달되면 여기에 표시됩니다."
+    "emptyDescription": "홍보 활동이 검증되고 배분이 전달되면 여기에 표시됩니다.",
+    "description": "홍보 준비금에서 전달된 모든 배분과 각 트랜잭션 링크입니다."
   },
   "cta": {
-    "title": "함께 알릴 준비가 되셨나요?",
+    "title": "함께 알릴 준비가 되었습니까?",
     "description": "홍보 프로그램에 참여하면 Cosmic Signature를 세상에 알리고 CST 홍보 배분을 받을 수 있습니다.",
-    "contact": "홍보 팀에 문의",
-    "contactTooltip": "홍보 기회와 홍보 배분 구조를 상의할 수 있습니다",
-    "infoAria": "홍보 팀 문의 안내",
-    "infoTooltip": "팀이 홍보 자료 준비를 돕고 홍보 배분 단계를 안내합니다"
+    "contact": "홍보 팀에 이메일 보내기",
+    "note": "팀이 홍보 자료 준비를 돕고 배분이 정해지는 방식을 안내합니다.",
+    "copyEmail": "이메일 주소 복사",
+    "emailCopied": "이메일 주소를 복사했습니다"
   },
   "address": {
-    "invalid": "유효하지 않은 이더리움 주소",
-    "heading": "이 참여자의 홍보 배분",
-    "loading": "불러오는 중…"
+    "title": "받은 홍보 배분",
+    "lede": "이 주소가 홍보 준비금에서 받은 CST입니다.",
+    "profile": "참여자 프로필",
+    "figures": {
+      "total": "받은 CST",
+      "allocations": "배분 건수",
+      "first": "첫 배분",
+      "latest": "최근 배분"
+    },
+    "emptyDescription": "홍보 팀이 이 주소로 CST를 보내면 배분이 여기에 표시됩니다.",
+    "invalidAddress": {
+      "title": "잘못된 주소",
+      "description": "링크에 0x 뒤에 영문자와 숫자 40자가 이어지는 전체 주소가 필요합니다.",
+      "action": "전체 홍보 배분"
+    },
+    "smallNote": "흐리게 표시된 수량은 {amount} 미만의 배분으로, 이 정밀도에서는 표시되지 않습니다."
   },
   "transferForm": {
     "title": "CST 홍보 배분 전달",
@@ -82,5 +71,7 @@
     "ownerLabel": "소유자",
     "treasurerLabel": "재무 담당자",
     "historyLink": "홍보 준비금 전송 내역 보기"
-  }
+  },
+  "learnHow": "참여 방법 보기",
+  "loadError": "홍보 배분 내역을 불러오지 못했습니다."
 }

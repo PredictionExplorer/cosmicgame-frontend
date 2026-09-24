@@ -100,7 +100,7 @@ describe('MarketingCstRewardForm', () => {
     expect(screen.getByText('Outreach Reserve')).toBeInTheDocument();
     expect(screen.getByText('Treasurer')).toBeInTheDocument();
     expect(screen.getByText('Owner')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'View outreach reserve transfers' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'View Outreach Reserve transfers' })).toHaveAttribute(
       'href',
       `/cosmic-token-transfer/${TEST_MARKETING_WALLET}`,
     );

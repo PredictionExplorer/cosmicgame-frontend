@@ -1,63 +1,52 @@
-'use client';
-
-import { motion } from 'framer-motion';
-import { ExternalLink, Info } from 'lucide-react';
+import { Mail } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
-import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { cn } from '@/lib/utils';
-import { TOUCH_TARGET_EXTENDED_CLASS } from '@/lib/touch-target';
+import { buttonVariants } from '@/components/ui/button';
+import { CopyButton } from '@/components/ui/copy-button';
 
+/** Where outreach proposals go; shown in full so it can be read and copied. */
+export const OUTREACH_EMAIL = 'marketing@cosmicsignature.com';
+
+/**
+ * The invitation to join the outreach programme: one quiet band with the
+ * email as a mail link (a mail glyph, not an external-site arrow) and the
+ * address itself as selectable text with a copy button, for people whose
+ * device opens no mail app. Server-rendered but for the copy button.
+ */
 export function MarketingCTA() {
-  const t = useTranslations('marketing');
+  const t = useTranslations('marketing.cta');
 
   return (
-    <motion.section
-      initial={false}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-      aria-labelledby="cta-heading"
-      className="gradient-border-card rounded-2xl bg-white/[0.02] px-6 py-10 text-center sm:px-10 sm:py-12"
+    <section
+      aria-labelledby="outreach-cta-heading"
+      className="rounded-surface bg-surface px-6 py-10 sm:px-10 sm:py-12"
     >
-      <h2 id="cta-heading" className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-        {t('cta.title')}
-      </h2>
-      <p className="mx-auto mt-4 max-w-lg text-muted-foreground">{t('cta.description')}</p>
-      <div className="mt-8 inline-flex max-w-full items-center justify-center gap-3">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              asChild
-              size="lg"
-              className="h-auto min-w-0 max-w-full whitespace-normal px-5 py-3 text-center sm:px-8"
-            >
-              <a href="mailto:marketing@cosmicsignature.com">
-                {t('cta.contact')}
-                <ExternalLink className="ml-1.5 h-4 w-4" />
-              </a>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>{t('cta.contactTooltip')}</TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type="button"
-              aria-label={t('cta.infoAria')}
-              data-touch-target="extended"
-              className={cn(
-                'shrink-0 text-muted-foreground/60 hover:text-muted-foreground transition-colors',
-                TOUCH_TARGET_EXTENDED_CLASS,
-              )}
-            >
-              <Info className="h-4 w-4" />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent className="max-w-xs">{t('cta.infoTooltip')}</TooltipContent>
-        </Tooltip>
+      <div className="max-w-[var(--measure-lede)]">
+        <h2 id="outreach-cta-heading" className="type-section text-foreground">
+          {t('title')}
+        </h2>
+        <p className="mt-3 type-body-md text-muted-foreground">{t('description')}</p>
+        <p className="mt-2 type-body-sm text-subtle">{t('note')}</p>
       </div>
-    </motion.section>
+      <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-6">
+        <a
+          href={`mailto:${OUTREACH_EMAIL}`}
+          className={buttonVariants({ size: 'lg', className: 'self-start' })}
+        >
+          <Mail aria-hidden />
+          {t('contact')}
+        </a>
+        <p className="flex min-w-0 items-center gap-2">
+          <span className="select-all type-body-md text-foreground [overflow-wrap:anywhere]">
+            {OUTREACH_EMAIL}
+          </span>
+          <CopyButton
+            value={OUTREACH_EMAIL}
+            label={t('copyEmail')}
+            copiedLabel={t('emailCopied')}
+          />
+        </p>
+      </div>
+    </section>
   );
 }

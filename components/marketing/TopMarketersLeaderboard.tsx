@@ -1,144 +1,110 @@
 'use client';
 
 import { useMemo } from 'react';
-import { motion } from 'framer-motion';
-import { Info } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
-import { OutreachReserveIcon } from '@/lib/conceptIcons';
-import { cn } from '@/lib/utils';
-import { TOUCH_TARGET_EXTENDED_CLASS } from '@/lib/touch-target';
-import { AddressLink } from '@/components/common/AddressLink';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { formatPercent } from '@/utils/format';
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+import type { LedgerStateProps } from '@/components/tables/ledger-props';
 import type { MarketingReward } from '@/services/api/types';
-import { formatFixed } from '@/utils/format';
 
-interface AggregatedMarketer {
-  address: string;
-  totalEarned: number;
-  rewardCount: number;
+import { rankOutreachContributors, type OutreachContributor } from './outreachTotals';
+
+/** A share of the whole as a thin bar in the outreach track colour, beside its figure. */
+function ShareCell({ percent }: { percent: number }) {
+  const locale = useLocale();
+  return (
+    <span className="inline-flex items-center justify-end gap-3">
+      <span aria-hidden className="hidden h-1.5 w-24 rounded-pill bg-surface-sunken sm:block">
+        <span
+          className="block h-full rounded-pill bg-track-outreach"
+          style={{ width: `${Math.min(Math.max(percent, 0), 100)}%` }}
+        />
+      </span>
+      {formatPercent(percent, locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+    </span>
+  );
 }
 
-function aggregateMarketers(rewards: MarketingReward[]): AggregatedMarketer[] {
-  const map = new Map<string, AggregatedMarketer>();
-
-  for (const r of rewards) {
-    const existing = map.get(r.MarketerAddr);
-    if (existing) {
-      existing.totalEarned += r.AmountEth;
-      existing.rewardCount += 1;
-    } else {
-      map.set(r.MarketerAddr, {
-        address: r.MarketerAddr,
-        totalEarned: r.AmountEth,
-        rewardCount: 1,
-      });
-    }
-  }
-
-  return Array.from(map.values()).sort((a, b) => b.totalEarned - a.totalEarned);
+export interface TopMarketersLeaderboardProps extends LedgerStateProps {
+  rewards: readonly MarketingReward[];
+  /** How many contributors to rank. Default 5. */
+  limit?: number;
 }
 
-const rankStyles: Record<number, string> = {
-  0: 'from-yellow-400/30 to-yellow-600/10 border-yellow-500/30',
-  1: 'from-gray-300/20 to-gray-400/10 border-gray-400/20',
-  2: 'from-amber-600/20 to-amber-700/10 border-amber-600/20',
-};
+/**
+ * The top outreach contributors as a ledger: rank, contributor (to their
+ * outreach history), share of all outreach CST as a bar in the outreach
+ * track colour, CST received and allocation count. One neutral row style for
+ * every rank: this is a record, not a podium.
+ */
+export function TopMarketersLeaderboard({
+  rewards,
+  limit = 5,
+  ...state
+}: TopMarketersLeaderboardProps) {
+  const t = useTranslations('marketing.leaderboard');
+  const contributors = useMemo(
+    () => rankOutreachContributors(rewards).slice(0, limit),
+    [rewards, limit],
+  );
 
-export interface TopMarketersLeaderboardProps {
-  rewards: MarketingReward[];
-}
-
-export function TopMarketersLeaderboard({ rewards }: TopMarketersLeaderboardProps) {
-  const t = useTranslations('marketing');
-  const topMarketers = useMemo(() => aggregateMarketers(rewards).slice(0, 5), [rewards]);
+  const columns = useMemo<DataTableColumn<OutreachContributor>[]>(
+    () => [
+      {
+        id: 'rank',
+        kind: 'count',
+        header: t('columns.rank'),
+        value: (row) => row.rank,
+        width: '4rem',
+        cellClassName: 'text-subtle',
+        // Phone records keep the ranked order; a numbered line per record adds nothing.
+        priority: 'secondary',
+      },
+      {
+        id: 'contributor',
+        kind: 'address',
+        header: t('columns.contributor'),
+        value: (row) => row.address,
+        href: (row) => `/marketing/${row.address}`,
+      },
+      {
+        id: 'share',
+        kind: 'percent',
+        header: t('columns.share'),
+        help: t('columns.shareHelp'),
+        value: (row) => row.sharePercent,
+        cell: (row) => <ShareCell percent={row.sharePercent} />,
+      },
+      {
+        id: 'received',
+        kind: 'amount',
+        header: t('columns.received'),
+        unit: 'CST',
+        value: (row) => row.totalCst,
+      },
+      {
+        id: 'allocations',
+        kind: 'count',
+        header: t('columns.allocations'),
+        value: (row) => row.allocations,
+        priority: 'secondary',
+      },
+    ],
+    [t],
+  );
 
   return (
-    <section aria-labelledby="leaderboard-heading" className="py-8 sm:py-10">
-      <div className="mb-10 flex items-center justify-center gap-2">
-        <OutreachReserveIcon className="h-5 w-5 text-primary" aria-hidden />
-        <h2
-          id="leaderboard-heading"
-          className="font-display text-2xl font-bold tracking-tight sm:text-3xl"
-        >
-          {t('leaderboard.title')}
-        </h2>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type="button"
-              aria-label={t('leaderboard.infoAria')}
-              data-touch-target="extended"
-              className={cn(
-                'text-muted-foreground/60 hover:text-muted-foreground transition-colors',
-                TOUCH_TARGET_EXTENDED_CLASS,
-              )}
-            >
-              <Info className="h-4 w-4" />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent className="max-w-xs">{t('leaderboard.tooltip')}</TooltipContent>
-        </Tooltip>
-      </div>
-
-      {topMarketers.length === 0 ? (
-        <p className="text-center text-muted-foreground" role="status">
-          {t('leaderboard.empty')}
-        </p>
-      ) : (
-        <motion.div
-          initial={false}
-          whileInView="visible"
-          viewport={{ once: true, margin: '-40px' }}
-          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1 } } }}
-          className="mx-auto grid max-w-3xl gap-4"
-        >
-          {topMarketers.map((marketer, idx) => (
-            <motion.div
-              key={marketer.address}
-              variants={{
-                hidden: { opacity: 0, x: -20 },
-                visible: { opacity: 1, x: 0, transition: { duration: 0.4 } },
-              }}
-              className={cn(
-                'flex items-center gap-4 rounded-xl border bg-gradient-to-r p-4 sm:p-5',
-                rankStyles[idx] ?? 'from-white/[0.02] to-white/[0.01] border-white/[0.06]',
-              )}
-            >
-              <span
-                className={cn(
-                  'flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-display text-sm font-bold',
-                  idx === 0 && 'bg-yellow-500/20 text-yellow-400',
-                  idx === 1 && 'bg-gray-400/20 text-gray-300',
-                  idx === 2 && 'bg-amber-600/20 text-amber-500',
-                  idx > 2 && 'bg-white/[0.06] text-muted-foreground',
-                )}
-              >
-                {idx + 1}
-              </span>
-
-              <div className="min-w-0 flex-1">
-                <AddressLink address={marketer.address} url={`/marketing/${marketer.address}`} />
-              </div>
-
-              <div className="text-right">
-                <p className="font-display text-lg font-bold">
-                  {formatFixed(marketer.totalEarned, 2)}{' '}
-                  <span className="text-sm text-muted-foreground">CST</span>
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {t(
-                    marketer.rewardCount === 1
-                      ? 'leaderboard.rewardCountOne'
-                      : 'leaderboard.rewardCountOther',
-                    { count: marketer.rewardCount },
-                  )}
-                </p>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
-      )}
-    </section>
+    <DataTable
+      data={contributors}
+      columns={columns}
+      ariaLabel={t('title')}
+      title={t('title')}
+      description={t('description')}
+      getRowKey={(row) => row.address}
+      emptyTitle={t('empty')}
+      pageSize={Infinity}
+      {...state}
+    />
   );
 }

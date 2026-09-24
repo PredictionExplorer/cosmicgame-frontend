@@ -4,7 +4,10 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
-import { Button } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
+import { LedgerPage } from '@/components/ledger/LedgerPage';
+import { HowItWorks } from '@/components/marketing/HowItWorks';
+import { MarketingCTA } from '@/components/marketing/MarketingCTA';
 
 import { PublicDataQuerySeed } from '../PublicDataQuerySeed';
 import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
@@ -33,6 +36,12 @@ export async function generateMetadata(
 
 export const revalidate = 300;
 
+/**
+ * The Outreach Reserve: the server-rendered header with the programme's
+ * figures, how allocations work, the top contributors and every allocation,
+ * and how to take part. Only the two ledgers and the copy button run on the
+ * client.
+ */
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
@@ -41,21 +50,23 @@ export default async function Page({ params }: PageProps) {
   return (
     <PageMessages namespaces={['marketing', 'tables']}>
       <PublicDataQuerySeed route="marketing">
-        <MarketingRewards
-          seoSummary={
+        <LedgerPage
+          header={
             <PublicDataRouteSeoSummary
               route="marketing"
               actions={
-                <Button asChild variant="outline">
-                  <a href="#how-it-works">
-                    {t('hero.learnHow')}
-                    <ArrowDown aria-hidden />
-                  </a>
-                </Button>
+                <a href="#how-it-works" className={buttonVariants({ variant: 'outline' })}>
+                  {t('learnHow')}
+                  <ArrowDown aria-hidden />
+                </a>
               }
             />
           }
-        />
+        >
+          <HowItWorks />
+          <MarketingRewards />
+          <MarketingCTA />
+        </LedgerPage>
       </PublicDataQuerySeed>
     </PageMessages>
   );

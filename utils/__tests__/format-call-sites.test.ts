@@ -65,8 +65,6 @@ const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
   'components/home/observatory/LatestParticipantIntel.tsx': 1,
   'components/home/PublicGoodsImpactCard.tsx': 2,
   'components/home/RoundInfoSection.tsx': 1,
-  'components/marketing/MarketingStats.tsx': 1,
-  'components/marketing/TopMarketersLeaderboard.tsx': 1,
   'components/nft/traits/ChaosMeter.tsx': 1,
   'components/nft/traits/NftTraitPanel.tsx': 1,
   'components/nft/traits/palette.ts': 2,

@@ -32,7 +32,7 @@ describe('Sprint 7 focused catalogs', () => {
     expect(zhEthContribution.form.contributeEth).toBe('贡献 ETH');
     expect(zhEthContribution.detail.breadcrumbContributions).toBe('ETH 贡献');
     expect(zhPublicGoods.loadError).toBe('无法加载公共物品记录。');
-    expect(zhMarketing.stats.infoAria).toContain('说明');
+    expect(zhMarketing.cta.copyEmail).toBe('复制邮箱地址');
     expect(zhMarketing.transferForm.historyLink).toContain('推广储备');
     expect(zhCoordination.page.title).toBe('协调变更');
     expect(zhCoordination.events.publicGoodsPercentage).toBe('公共物品比例已变更');
@@ -43,9 +43,7 @@ describe('Sprint 7 focused catalogs', () => {
     expect(enEthContribution.form.title).toBe('Contribute ETH');
     expect(enEthContribution.form.submitAmount).toBe('Contribute {amount}');
     expect(enPublicGoods.loadError).toBe("The Public Goods records couldn't be loaded.");
-    expect(enMarketing.hero.title).toBe(
-      'Receive CST for <highlight>Spreading the Word</highlight>',
-    );
+    expect(enMarketing.cta.contact).toBe('Email the outreach team');
     expect(enCoordination.page.title).toBe('Coordination Changes');
     expect(enAdmin.settings.title).toBe('Administrative methods');
   });

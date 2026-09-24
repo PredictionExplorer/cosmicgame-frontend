@@ -611,8 +611,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: `/marketing/${address}`,
     host: 'app',
     cluster: 'long-tail',
-    expectedText: '此参与者的推广分配',
-    allowNoHeading: true,
+    expectedText: '获得的推广分配',
   },
   {
     id: 'coordination-changes',
