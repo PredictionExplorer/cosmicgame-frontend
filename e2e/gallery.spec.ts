@@ -68,14 +68,14 @@ test.describe('Gallery page', () => {
 
   test('clicking a card navigates to its detail page', async ({ page }) => {
     const firstCard = page.locator('a[href^="/detail/"]').first();
+    const empty = page.getByRole('heading', { name: 'No Signatures yet' });
+    // Wait for either state: isVisible() answers at once, which raced the wall.
+    await expect(firstCard.or(empty)).toBeVisible();
 
-    if (await firstCard.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await ensureVisible(firstCard);
-      await firstCard.click();
-      await expect(page).toHaveURL(/detail/);
-    } else {
-      await expect(page.getByRole('heading', { name: 'No Signatures yet' })).toBeVisible();
-    }
+    if (await empty.isVisible()) return;
+    await ensureVisible(firstCard);
+    await firstCard.click();
+    await expect(page).toHaveURL(/detail/);
   });
 });
 
