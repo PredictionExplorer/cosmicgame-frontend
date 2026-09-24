@@ -534,7 +534,12 @@
     "returnToCurrent": "Return to current UI",
     "monument": {
       "reserveLabel": "Signature Allocation",
-      "reserveExtras": "+ 1,000 CST · 1 Cosmic Signature NFT · attached assets",
+      "extras": {
+        "base": "+ 1,000 CST · 1 Cosmic Signature NFT",
+        "withNft": "+ 1,000 CST · 1 Cosmic Signature NFT · {nftCount, plural, one {# attached NFT} other {# attached NFTs}}",
+        "withErc20": "+ 1,000 CST · 1 Cosmic Signature NFT · {erc20Count, plural, one {# attached token deposit} other {# attached token deposits}}",
+        "withBoth": "+ 1,000 CST · 1 Cosmic Signature NFT · {nftCount, plural, one {# attached NFT} other {# attached NFTs}} · {erc20Count, plural, one {# attached token deposit} other {# attached token deposits}}"
+      },
       "calendarTitle": "Cosmic Signature Cycle #{number} opens",
       "calendarBody": "The next Performance Cycle opens for Gestures. The first Gesture starts the finalization clock.",
       "calendarCta": "Add the opening to your calendar"
@@ -578,18 +583,19 @@
     "console": {
       "title": "Make a Gesture",
       "methodLabel": "Gesture method",
-      "free": "Free",
       "reward": "Participation CST preview",
       "minAccepted": "Minimum accepted",
       "messageHint": "Messages travel on-chain with your gesture",
-      "finalizeOpensIn": "You can finalize the cycle in {duration}. Until then, only the participant who made the Final Gesture can."
-    },
-    "standings": {
-      "title": "Live standings",
-      "paidVia": "via {method}"
+      "finalizeOpensIn": "You can finalize the cycle in {duration}. Until then, only the participant who made the Final Gesture can.",
+      "holderWindow": "Only you can finalize for {duration}. After that, any participant can finalize and receive the Signature Allocation.",
+      "holderWindowEnded": "Your exclusive window has ended. Any participant can now finalize and receive the Signature Allocation.",
+      "randomWalkNote": "Half price with an unused Random Walk NFT"
     },
     "links": {
       "previousCycleDescription": "Recipients and allocations of the last finalized cycle"
+    },
+    "phaseGuide": {
+      "later": "Later"
     }
   },
   "observatory": {

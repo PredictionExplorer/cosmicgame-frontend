@@ -33,6 +33,9 @@ import { MethodSelector, type GestureMethod, type MethodOption } from './MethodS
 const MESSAGE_MAX_LENGTH = protocolFacts.gestureMessageMaxLength;
 const MESSAGE_COUNTER_WARN_AT = MESSAGE_MAX_LENGTH - 20;
 
+/** The holder's exclusive finalization window turns to attention in its last ten minutes. */
+const HOLDER_WINDOW_ATTENTION_MS = 10 * 60 * 1000;
+
 type GestureFormState = ReturnType<typeof useGestureForm>;
 
 /** The slice of the shared gesture-form state the console reads and writes. */
@@ -215,10 +218,11 @@ export function GestureConsole({
     hasEthQuote
       ? `${formatEthQuote(ethGestureBaseCost(ethPrice, method), locale)}${NBSP}ETH`
       : pending;
+  // At its floor the CST cost is 0 CST, never "free": gas still applies.
   const cstPriceLabel = !hasCstQuote
     ? pending
     : cstGestureData.isFree
-      ? t('deck.console.free')
+      ? t('calibration.floor')
       : formatAmount(cstGestureData.CSTPrice, { unit: 'CST', locale });
 
   const allOptions: MethodOption[] = [
@@ -227,7 +231,7 @@ export function GestureConsole({
       value: 'RandomWalk',
       label: t('form.method.randomWalk.label'),
       price: ethPriceLabel('RandomWalk'),
-      note: t('form.method.randomWalk.desc'),
+      note: t('deck.console.randomWalkNote'),
     },
     { value: 'CST', label: t('form.method.cst.label'), price: cstPriceLabel },
   ];
@@ -288,6 +292,10 @@ export function GestureConsole({
     finalize && !finalize.isLatestParticipant
       ? Math.max(0, finalize.openToAllAtMs - finalize.nowMs)
       : 0;
+  // The Final Gesture participant alone may finalize until the window closes.
+  const holderWindowMs = finalize?.isLatestParticipant
+    ? Math.max(0, finalize.openToAllAtMs - finalize.nowMs)
+    : 0;
 
   const titleClassName = 'type-heading-3 text-foreground';
 
@@ -543,7 +551,25 @@ export function GestureConsole({
                     >
                       {t('form.finalize')}
                     </Button>
-                    {finalizeWaitMs > 0 ? (
+                    {finalize.isLatestParticipant ? (
+                      <p
+                        className={cn(
+                          'type-caption',
+                          holderWindowMs > 0 && holderWindowMs <= HOLDER_WINDOW_ATTENTION_MS
+                            ? 'text-attention'
+                            : 'text-subtle',
+                        )}
+                        data-testid="finalize-holder-window"
+                      >
+                        {holderWindowMs > 0
+                          ? t('deck.console.holderWindow', {
+                              duration: formatDuration(Math.ceil(holderWindowMs / 1000), {
+                                locale,
+                              }),
+                            })
+                          : t('deck.console.holderWindowEnded')}
+                      </p>
+                    ) : finalizeWaitMs > 0 ? (
                       <p className="type-caption text-subtle" data-testid="finalize-wait">
                         {t('deck.console.finalizeOpensIn', {
                           duration: formatDuration(Math.ceil(finalizeWaitMs / 1000), { locale }),

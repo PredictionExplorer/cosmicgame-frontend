@@ -57,6 +57,30 @@ describe('MethodSelector', () => {
     expect(radios[2]).toHaveTextContent('CST250.52 CST');
   });
 
+  it('marks the chosen row along its start edge when stacked, its foot when side by side', () => {
+    renderSelector('RandomWalk');
+
+    const [eth, rwlk] = screen.getAllByRole('radio');
+    // Stacked rows (a narrow column): a start-edge rule and a ring, never a
+    // bottom rule that reads as a row divider.
+    expect(rwlk).toHaveClass('shadow-[inset_2px_0_0_hsl(var(--primary))]', 'ring-1');
+    // Side by side: the segmented control's foot rule, no ring.
+    expect(rwlk).toHaveClass(
+      '@min-[21rem]:shadow-[inset_0_-2px_0_hsl(var(--primary))]',
+      '@min-[21rem]:ring-0',
+    );
+    expect(eth).not.toHaveClass('ring-1');
+  });
+
+  it('lines the prices up across the segments whatever a label wraps to', () => {
+    renderSelector();
+
+    // Each segment shares the group's label, price and note rows.
+    screen.getAllByRole('radio').forEach((radio) => {
+      expect(radio).toHaveClass('@min-[21rem]:row-span-3', '@min-[21rem]:grid-rows-subgrid');
+    });
+  });
+
   it('marks only the selected method as checked, with one tab stop', () => {
     renderSelector('CST');
 

@@ -534,7 +534,12 @@
     "returnToCurrent": "Quay về giao diện hiện tại",
     "monument": {
       "reserveLabel": "Phân bổ Signature",
-      "reserveExtras": "+ 1.000 CST · 1 Cosmic Signature NFT · tài sản đính kèm",
+      "extras": {
+        "base": "+ 1.000 CST · 1 Cosmic Signature NFT",
+        "withNft": "+ 1.000 CST · 1 Cosmic Signature NFT · {nftCount, plural, other {# NFT đính kèm}}",
+        "withErc20": "+ 1.000 CST · 1 Cosmic Signature NFT · {erc20Count, plural, other {# khoản nạp token đính kèm}}",
+        "withBoth": "+ 1.000 CST · 1 Cosmic Signature NFT · {nftCount, plural, other {# NFT đính kèm}} · {erc20Count, plural, other {# khoản nạp token đính kèm}}"
+      },
       "calendarTitle": "Chu kỳ Cosmic Signature #{number} mở",
       "calendarBody": "Chu kỳ trình diễn tiếp theo mở cho nét bút. Nét bút đầu tiên khởi động đếm ngược hoàn tất.",
       "calendarCta": "Thêm thời điểm mở vào lịch của bạn"
@@ -578,18 +583,19 @@
     "console": {
       "title": "Đặt nét bút",
       "methodLabel": "Cách thanh toán",
-      "free": "Không tốn chi phí",
       "reward": "Xem trước CST tham gia",
       "minAccepted": "Mức chấp nhận tối thiểu",
       "messageHint": "Lời nhắn được ghi trên chuỗi cùng nét bút",
-      "finalizeOpensIn": "Bạn có thể hoàn tất chu kỳ sau {duration}. Trước đó, chỉ người tham gia đã đặt nét bút cuối cùng mới có thể hoàn tất."
-    },
-    "standings": {
-      "title": "Thứ hạng trực tiếp",
-      "paidVia": "qua {method}"
+      "finalizeOpensIn": "Bạn có thể hoàn tất chu kỳ sau {duration}. Trước đó, chỉ người tham gia đã đặt nét bút cuối cùng mới có thể hoàn tất.",
+      "holderWindow": "Chỉ bạn có thể hoàn tất chu kỳ trong {duration} tới. Sau đó, bất kỳ người tham gia nào cũng có thể hoàn tất và nhận phân bổ Signature.",
+      "holderWindowEnded": "Khoảng thời gian dành riêng cho bạn đã kết thúc. Giờ đây bất kỳ người tham gia nào cũng có thể hoàn tất và nhận phân bổ Signature.",
+      "randomWalkNote": "Nửa giá với một Random Walk NFT chưa dùng"
     },
     "links": {
       "previousCycleDescription": "Người nhận và phân bổ của chu kỳ vừa hoàn tất"
+    },
+    "phaseGuide": {
+      "later": "Sau đó"
     }
   },
   "observatory": {

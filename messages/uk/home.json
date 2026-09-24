@@ -534,7 +534,12 @@
     "returnToCurrent": "Повернутися до поточного інтерфейсу",
     "monument": {
       "reserveLabel": "Розподіл Сигнатури",
-      "reserveExtras": "+ 1 000 CST · 1 Cosmic Signature NFT · долучені активи",
+      "extras": {
+        "base": "+ 1 000 CST · 1 Cosmic Signature NFT",
+        "withNft": "+ 1 000 CST · 1 Cosmic Signature NFT · {nftCount, plural, one {# долучений NFT} few {# долучені NFT} many {# долучених NFT} other {# долученого NFT}}",
+        "withErc20": "+ 1 000 CST · 1 Cosmic Signature NFT · {erc20Count, plural, one {# долучений депозит токенів} few {# долучені депозити токенів} many {# долучених депозитів токенів} other {# долученого депозиту токенів}}",
+        "withBoth": "+ 1 000 CST · 1 Cosmic Signature NFT · {nftCount, plural, one {# долучений NFT} few {# долучені NFT} many {# долучених NFT} other {# долученого NFT}} · {erc20Count, plural, one {# долучений депозит токенів} few {# долучені депозити токенів} many {# долучених депозитів токенів} other {# долученого депозиту токенів}}"
+      },
       "calendarTitle": "Cosmic Signature: відкривається Цикл {number}",
       "calendarBody": "Наступний перформанс-цикл відкривається для жестів. Перший жест запускає відлік до завершення.",
       "calendarCta": "Додати відкриття в календар"
@@ -578,18 +583,19 @@
     "console": {
       "title": "Зробити жест",
       "methodLabel": "Спосіб оплати",
-      "free": "Без оплати",
       "reward": "Попередній розрахунок CST участі",
       "minAccepted": "Прийнятний мінімум",
       "messageHint": "Повідомлення мандрують ончейн разом із вашим жестом",
-      "finalizeOpensIn": "Ви зможете завершити цикл через {duration}. До того часу це може зробити лише учасник, який зробив завершальний жест."
-    },
-    "standings": {
-      "title": "Поточні позиції",
-      "paidVia": "через {method}"
+      "finalizeOpensIn": "Ви зможете завершити цикл через {duration}. До того часу це може зробити лише учасник, який зробив завершальний жест.",
+      "holderWindow": "Лише ви можете завершити цикл протягом {duration}. Після цього завершити його й отримати розподіл Сигнатури зможе будь-який учасник.",
+      "holderWindowEnded": "Ваш ексклюзивний проміжок завершився. Тепер будь-який учасник може завершити цикл і отримати розподіл Сигнатури.",
+      "randomWalkNote": "Удвічі дешевше з невикористаним Random Walk NFT"
     },
     "links": {
       "previousCycleDescription": "Отримувачі та розподіли останнього завершеного циклу"
+    },
+    "phaseGuide": {
+      "later": "Згодом"
     }
   },
   "observatory": {

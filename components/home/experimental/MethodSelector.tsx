@@ -11,7 +11,7 @@ export interface MethodOption {
   label: string;
   /** The live Gesture Cost of this method, or a placeholder while it loads. */
   price: ReactNode;
-  /** A short qualifier beside the price ("50% discount"). */
+  /** A short qualifier under the price ("Half price with …"), a few words at most. */
   note?: string;
 }
 
@@ -35,10 +35,14 @@ const COLUMNS: Record<number, string> = {
 
 /**
  * The gesture method as a segmented control: one sunken track, the chosen
- * method raised with a 2px primary rule, and every method showing its live
- * price inside its segment, so the choice and its cost are read together.
- * Where the column is narrow (a phone, the bottom sheet) the segments stack
- * as rows with the price at the end, so a price never wraps.
+ * method raised, and every method showing its live price inside its segment,
+ * so the choice and its cost are read together. Side by side, the segments
+ * share their rows (label, price, note), so the prices sit on one line even
+ * when a label wraps, and the chosen one carries a 2px primary rule along its
+ * foot. Where the column is narrow (a phone, the bottom sheet) the segments
+ * stack as rows with the price at the end, so a price never wraps, and the
+ * chosen row is marked along its start edge and ringed, never with a rule
+ * that could read as a row divider.
  *
  * It is a radio group: one tab stop, arrow keys move the selection (and
  * wrap), Home and End jump to the ends.
@@ -99,10 +103,10 @@ export function MethodSelector({
               data-method={option.value}
               className={cn(
                 'focus-ring-inset grid min-h-12 min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-0.5 rounded-[calc(var(--radius-control)-2px)] px-3 py-2 text-start',
-                '@min-[21rem]:min-h-16 @min-[21rem]:grid-cols-1 @min-[21rem]:content-start @min-[21rem]:items-start',
+                '@min-[21rem]:row-span-3 @min-[21rem]:min-h-16 @min-[21rem]:grid-cols-1 @min-[21rem]:grid-rows-subgrid @min-[21rem]:items-start',
                 'transition-[background-color,color,box-shadow] duration-[var(--duration-fast)] ease-[var(--ease-out-soft)]',
                 selected
-                  ? 'bg-surface-raised text-foreground shadow-[inset_0_-2px_0_hsl(var(--primary))]'
+                  ? 'bg-surface-raised text-foreground shadow-[inset_2px_0_0_hsl(var(--primary))] ring-1 ring-inset ring-primary/40 @min-[21rem]:shadow-[inset_0_-2px_0_hsl(var(--primary))] @min-[21rem]:ring-0'
                   : 'text-muted-foreground hover:bg-surface hover:text-foreground',
               )}
             >

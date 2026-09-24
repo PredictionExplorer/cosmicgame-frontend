@@ -534,7 +534,12 @@
     "returnToCurrent": "기존 UI로 돌아가기",
     "monument": {
       "reserveLabel": "시그니처 배분",
-      "reserveExtras": "+ 1,000 CST · Cosmic Signature NFT 1개 · 첨부 자산",
+      "extras": {
+        "base": "+ 1,000 CST · Cosmic Signature NFT 1개",
+        "withNft": "+ 1,000 CST · Cosmic Signature NFT 1개 · {nftCount, plural, other {첨부된 NFT #개}}",
+        "withErc20": "+ 1,000 CST · Cosmic Signature NFT 1개 · {erc20Count, plural, other {첨부된 토큰 적립 #건}}",
+        "withBoth": "+ 1,000 CST · Cosmic Signature NFT 1개 · {nftCount, plural, other {첨부된 NFT #개}} · {erc20Count, plural, other {첨부된 토큰 적립 #건}}"
+      },
       "calendarTitle": "Cosmic Signature 사이클 {number} 시작",
       "calendarBody": "다음 퍼포먼스 사이클이 제스처를 받기 시작합니다. 첫 제스처가 마감 카운트다운을 시작합니다.",
       "calendarCta": "시작 시각을 캘린더에 추가"
@@ -578,18 +583,19 @@
     "console": {
       "title": "제스처 남기기",
       "methodLabel": "제스처 방식",
-      "free": "비용 없음",
       "reward": "참여 CST 미리 보기",
       "minAccepted": "최소 허용 수량",
       "messageHint": "메시지는 제스처와 함께 온체인에 기록됩니다",
-      "finalizeOpensIn": "{duration} 후에는 누구나 사이클을 마감할 수 있습니다. 그전까지는 최종 제스처를 남긴 참여자만 마감할 수 있습니다."
-    },
-    "standings": {
-      "title": "실시간 현황",
-      "paidVia": "{method} 방식"
+      "finalizeOpensIn": "{duration} 후에는 누구나 사이클을 마감할 수 있습니다. 그전까지는 최종 제스처를 남긴 참여자만 마감할 수 있습니다.",
+      "holderWindow": "앞으로 {duration} 동안은 단독으로 마감할 수 있습니다. 이후에는 누구나 마감하고 시그니처 배분을 받을 수 있습니다.",
+      "holderWindowEnded": "단독 마감 시간이 끝났습니다. 이제 누구나 마감하고 시그니처 배분을 받을 수 있습니다.",
+      "randomWalkNote": "사용하지 않은 Random Walk NFT로 ETH 비용 절반"
     },
     "links": {
       "previousCycleDescription": "지난 마감 사이클의 수령자와 배분"
+    },
+    "phaseGuide": {
+      "later": "이후"
     }
   },
   "observatory": {
