@@ -41,17 +41,10 @@
     "tabs": {
       "label": "Bộ sưu tập",
       "cosmicSignature": "Cosmic Signature",
-      "randomWalk": "Random Walk"
+      "randomWalk": "Random Walk",
+      "anchoredCount": "{count, plural, other {Đã neo giữ #}}"
     },
     "stats": {
-      "cosmicSignature": {
-        "label": "Cosmic Signature NFT bạn đang neo giữ",
-        "tooltip": "Số Cosmic Signature NFT bạn hiện đang neo giữ. Neo giữ thêm Cosmic Signature NFT làm tăng phần phân phối neo giữ ETH của bạn."
-      },
-      "randomWalk": {
-        "label": "Random Walk NFT bạn đang neo giữ",
-        "tooltip": "Số Random Walk NFT bạn hiện đang neo giữ. Mỗi Random Walk NFT đang neo giữ thuộc diện Tinh tuyển NFT neo giữ."
-      },
       "unretrieved": {
         "label": "Phân phối chưa nhận về",
         "tooltip": "Phân phối neo giữ ETH được phân bổ cho các Cosmic Signature NFT bạn đang neo giữ nhưng chưa nhận về. Gỡ neo một Cosmic Signature NFT sẽ tự động nhận về các khoản phân phối đã tích lũy của nó. Gỡ neo không thể hoàn tác: NFT đã gỡ neo sẽ không thể neo giữ lại.",

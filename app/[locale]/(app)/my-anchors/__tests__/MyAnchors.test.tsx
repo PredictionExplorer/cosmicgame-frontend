@@ -129,15 +129,31 @@ describe('MyAnchors', () => {
     // 0.5 + 0.25 ETH still to retrieve, and 1.9376 / 33 per anchored NFT.
     expect(container).toHaveTextContent('0.7500');
     expect(container).toHaveTextContent('0.0587');
+    // Each metric once per page: the anchored counts live on the tabs only.
+    const figures = [...container.querySelectorAll('[data-figure]')].map((el) =>
+      el.getAttribute('data-figure'),
+    );
+    expect(figures).toEqual(['unretrieved', 'distributionPerNft']);
+  });
+
+  it('passes the distributions summary as unknown until it is read', () => {
+    mockQueries.distributions = { data: undefined, isLoading: false };
+    render(<MyAnchors />);
+    expect(cstProps?.anchorDistributions).toBeNull();
   });
 
   it('switches collections with short tabs that carry their counts', async () => {
     const user = userEvent.setup();
     render(<MyAnchors />);
-    const cst = screen.getByRole('tab', { name: /myPages\.anchors\.tabs\.cosmicSignature/ });
-    const rwlk = screen.getByRole('tab', { name: /myPages\.anchors\.tabs\.randomWalk/ });
-    expect(cst).toHaveTextContent('1');
-    expect(rwlk).toHaveTextContent('2');
+    // The bare number on screen; what it counts for a screen reader.
+    const cst = screen.getByRole('tab', {
+      name: 'myPages.anchors.tabs.cosmicSignature myPages.anchors.tabs.anchoredCount(count=1)',
+    });
+    const rwlk = screen.getByRole('tab', {
+      name: 'myPages.anchors.tabs.randomWalk myPages.anchors.tabs.anchoredCount(count=2)',
+    });
+    expect(cst.querySelector('[aria-hidden]')).toHaveTextContent(/^1$/);
+    expect(rwlk.querySelector('[aria-hidden]')).toHaveTextContent(/^2$/);
     await user.click(rwlk);
     expect(screen.getByTestId('rwlk-panel')).toBeInTheDocument();
   });
@@ -154,6 +170,18 @@ describe('MyAnchors', () => {
     await user.click(screen.getByRole('tab', { name: /randomWalk/ }));
     await waitFor(() => expect(rwlkProps?.availableTokenIds).toEqual([12, 1900]));
     expect(mockWalletOfOwner).toHaveBeenCalledWith([ACCOUNT]);
+  });
+
+  it('never shows the previous wallet’s Random Walk NFTs after switching accounts', async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(<MyAnchors />);
+    await user.click(screen.getByRole('tab', { name: /randomWalk/ }));
+    await waitFor(() => expect(rwlkProps?.availableTokenIds).toEqual([12, 1900]));
+
+    mockAccount = '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd';
+    mockWalletOfOwner.mockReturnValue(new Promise(() => {}));
+    rerender(<MyAnchors />);
+    expect(rwlkProps?.availableTokenIds).toBeNull();
   });
 
   it('routes each grid’s action to the anchoring hook and gives it the stage it started', async () => {

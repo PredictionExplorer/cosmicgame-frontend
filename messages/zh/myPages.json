@@ -41,17 +41,10 @@
     "tabs": {
       "label": "系列",
       "cosmicSignature": "Cosmic Signature",
-      "randomWalk": "Random Walk"
+      "randomWalk": "Random Walk",
+      "anchoredCount": "{count, plural, other {已锚定 # 枚}}"
     },
     "stats": {
-      "cosmicSignature": {
-        "label": "已锚定的 Cosmic Signature NFT",
-        "tooltip": "当前已锚定的 Cosmic Signature NFT 数量。锚定数量越多，分得的 ETH 锚定派发比例越高。"
-      },
-      "randomWalk": {
-        "label": "已锚定的 Random Walk NFT",
-        "tooltip": "当前已锚定的 Random Walk NFT 数量。每枚已锚定的 Random Walk NFT 均可参与锚定 NFT 星选。"
-      },
       "unretrieved": {
         "label": "未取回派发",
         "tooltip": "已分配至 Cosmic Signature NFT 但尚未取回的 ETH 锚定派发。解锚时，累积派发会自动取回。解锚不可撤销：解锚后的 NFT 无法再次锚定。",

@@ -14,6 +14,12 @@ interface AnchoredTokenContextValue {
 
 const AnchoredTokenContext = createContext<AnchoredTokenContextValue | undefined>(undefined);
 
+/**
+ * The lists while a read has no data (disconnected, loading or failed): one
+ * stable array, so effects that depend on a list do not re-run every render.
+ */
+const NO_TOKENS: AnchoredTokenInfo[] = [];
+
 interface AnchoredTokenProviderProps {
   children: ReactNode;
 }
@@ -34,8 +40,8 @@ export const AnchoredTokenProvider = ({ children }: AnchoredTokenProviderProps) 
     error: rwlkError,
   } = useAnchoredRWLKTokensByUser(account);
 
-  const cstokens = cstData ?? [];
-  const rwlktokens = rwlkData ?? [];
+  const cstokens = cstData ?? NO_TOKENS;
+  const rwlktokens = rwlkData ?? NO_TOKENS;
   const isLoading = cstLoading || rwlkLoading;
   const queryError = cstError || rwlkError;
   const error = queryError

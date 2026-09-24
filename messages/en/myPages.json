@@ -41,17 +41,10 @@
     "tabs": {
       "label": "Collection",
       "cosmicSignature": "Cosmic Signature",
-      "randomWalk": "Random Walk"
+      "randomWalk": "Random Walk",
+      "anchoredCount": "{count, plural, one {# anchored} other {# anchored}}"
     },
     "stats": {
-      "cosmicSignature": {
-        "label": "Your anchored Cosmic Signature NFTs",
-        "tooltip": "Number of Cosmic Signature NFTs you currently have anchored. Anchoring more Cosmic Signature NFTs increases your share of ETH Anchor Distributions."
-      },
-      "randomWalk": {
-        "label": "Your anchored Random Walk NFTs",
-        "tooltip": "Number of Random Walk NFTs you currently have anchored. Each anchored Random Walk NFT is eligible for Anchored-NFT Stellar Selection."
-      },
       "unretrieved": {
         "label": "Unretrieved Anchor Distributions",
         "tooltip": "ETH Anchor Distributions allocated to your anchored Cosmic Signature NFTs but not yet retrieved. Releasing a Cosmic Signature NFT anchor automatically retrieves its accumulated distributions. Releasing is permanent: a released NFT can never be anchored again.",

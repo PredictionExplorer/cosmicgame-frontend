@@ -45,6 +45,16 @@ describe('AnchoredTokenContext', () => {
     expect(result.current.rwlktokens).toEqual([]);
   });
 
+  it('hands out the same empty lists on every render while a read has no data', () => {
+    // Regression: a fresh [] per render re-ran effects keyed on the list (My Anchors'
+    // wallet read) after every state update when the anchored-NFT read failed.
+    const { result, rerender } = renderHook(() => useAnchoredToken(), { wrapper });
+    const first = result.current;
+    rerender();
+    expect(result.current.cstokens).toBe(first.cstokens);
+    expect(result.current.rwlktokens).toBe(first.rwlktokens);
+  });
+
   it('provides CST token data from the hook', () => {
     const cstData = [{ StakeActionId: 1, StakedTokenId: 10, StakeTimeStamp: 100 }];
     mockUseAnchoredCSTokensByUser.mockReturnValue({ data: cstData, refetch: mockRefetchCST });

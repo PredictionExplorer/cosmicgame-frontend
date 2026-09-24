@@ -35,7 +35,6 @@ import { RWLKAnchoringPanel, RWLK_GRIDS } from '@/components/anchoring/RWLKAncho
 const MyAnchors = () => {
   const t = useTranslations('myPages');
   const tWallet = useTranslations('wallet');
-  const format = useFormat();
   const { account } = useActiveWeb3React();
   const { anchor, release, handleError, rwalkContract, txStage } = useAnchorActions();
 
@@ -79,7 +78,12 @@ const MyAnchors = () => {
     };
 
   // Random Walk NFTs in the wallet that have never been anchored, read from the contract.
-  const [rwlkAvailable, setRwlkAvailable] = useState<readonly number[] | null>(null);
+  // Kept per account, so switching wallets never shows the previous wallet's NFTs.
+  const [rwlkOwned, setRwlkOwned] = useState<{
+    account: string;
+    ids: readonly number[];
+  } | null>(null);
+  const rwlkAvailable = account && rwlkOwned?.account === account ? rwlkOwned.ids : null;
   const rwlkActionList = rwlkActions.data;
   useEffect(() => {
     if (!account || !rwalkContract) return;
@@ -97,9 +101,9 @@ const MyAnchors = () => {
           .map(Number)
           .filter((id) => !everAnchored.has(id))
           .sort((a, b) => a - b);
-        if (!cancelled) setRwlkAvailable(ids);
+        if (!cancelled) setRwlkOwned({ account, ids });
       } catch (err) {
-        if (!cancelled) setRwlkAvailable([]);
+        if (!cancelled) setRwlkOwned({ account, ids: [] });
         handleError(err);
       }
     };
@@ -119,21 +123,11 @@ const MyAnchors = () => {
     dashboard.data?.MainStats?.StakeStatisticsCST?.TotalTokensStaked,
   );
 
+  // How many NFTs each collection has anchored is on its tab, so the header
+  // keeps only the figures no tab shows.
   const pending = <Skeleton className="h-7 w-20" />;
   const figures: PageHeaderFigure[] | undefined = account
     ? [
-        {
-          id: 'cosmicSignature',
-          label: t('anchors.stats.cosmicSignature.label'),
-          value: anchoredLoading ? pending : format.count(anchoredCst.length),
-          info: t('anchors.stats.cosmicSignature.tooltip'),
-        },
-        {
-          id: 'randomWalk',
-          label: t('anchors.stats.randomWalk.label'),
-          value: anchoredLoading ? pending : format.count(anchoredRwlk.length),
-          info: t('anchors.stats.randomWalk.tooltip'),
-        },
         {
           id: 'unretrieved',
           label: t('anchors.stats.unretrieved.label'),
@@ -182,15 +176,11 @@ const MyAnchors = () => {
           <TabsList aria-label={t('anchors.tabs.label')} className="max-sm:flex max-sm:w-full">
             <TabsTrigger value="cosmicSignature" className="max-sm:flex-1">
               {t('anchors.tabs.cosmicSignature')}
-              <span className="tabular-nums text-subtle">
-                {anchoredLoading ? null : format.count(anchoredCst.length)}
-              </span>
+              {anchoredLoading ? null : <AnchoredCount count={anchoredCst.length} />}
             </TabsTrigger>
             <TabsTrigger value="randomWalk" className="max-sm:flex-1">
               {t('anchors.tabs.randomWalk')}
-              <span className="tabular-nums text-subtle">
-                {anchoredLoading ? null : format.count(anchoredRwlk.length)}
-              </span>
+              {anchoredLoading ? null : <AnchoredCount count={anchoredRwlk.length} />}
             </TabsTrigger>
           </TabsList>
 
@@ -227,5 +217,22 @@ const MyAnchors = () => {
     </PageShell>
   );
 };
+
+/**
+ * A tab's count of anchored NFTs: the bare number on screen, and what it
+ * counts for a screen reader ("Cosmic Signature 16 anchored").
+ */
+function AnchoredCount({ count }: { count: number }) {
+  const t = useTranslations('myPages');
+  const format = useFormat();
+  return (
+    <>
+      <span aria-hidden className="tabular-nums text-subtle">
+        {format.count(count)}
+      </span>
+      <span className="sr-only">{` ${t('anchors.tabs.anchoredCount', { count })}`}</span>
+    </>
+  );
+}
 
 export default MyAnchors;
