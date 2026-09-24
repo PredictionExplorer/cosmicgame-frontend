@@ -1,102 +1,97 @@
-import '@testing-library/jest-dom';
+import userEvent from '@testing-library/user-event';
 
-import { convertTimestampToDateTime } from '@/utils';
+import type { CSTAnchorDistribution } from '@/services/api';
 
-import { render, screen, checkA11y } from '@/test-utils';
-
-const mockConvertTimestampToDateTime = jest.fn();
-jest.mock('@/utils', () => {
-  const actual = jest.requireActual<typeof import('@/utils')>('@/utils');
-  return {
-    ...actual,
-    convertTimestampToDateTime: (timestamp: number, showSecond?: boolean, locale?: string) => {
-      mockConvertTimestampToDateTime(timestamp, showSecond, locale);
-      return actual.convertTimestampToDateTime(timestamp, showSecond, locale);
-    },
-  };
-});
-
-jest.mock('../../../hooks/useApiQuery', () => ({
-  useCSTAnchorDistributionsByCycle: () => ({ data: [] }),
-}));
+import { checkA11y, render, screen } from '@/test-utils';
 
 import { GlobalAnchorDistributionsTable } from '../GlobalAnchorDistributionsTable';
 
-const createRow = (overrides = {}) => ({
+const mockByCycle = jest.fn();
+jest.mock('@/hooks/useApiQuery', () => ({
+  useCSTAnchorDistributionsByCycle: (cycle: number) => mockByCycle(cycle),
+}));
+
+jest.mock('@/components/tables/AnchoringRecipientTable', () => ({
+  __esModule: true,
+  default: ({ list, loading }: { list: unknown[]; loading?: boolean }) => (
+    <div data-testid="recipients">{loading ? 'loading' : `recipients: ${list.length}`}</div>
+  ),
+}));
+
+const deposit = (overrides: Partial<CSTAnchorDistribution> = {}): CSTAnchorDistribution => ({
   EvtLogId: 1,
-  TxHash: '0xabc123def456abc123def456abc123def456abc123def456abc123def456abc1',
-  TimeStamp: 1701346718,
-  RoundNum: 10,
+  RoundNum: 1,
   TokenId: 0,
-  NumStakedNFTs: 5,
-  TotalDepositAmountEth: 1.234567,
+  TxHash: '0xdeposit',
+  TimeStamp: 1_786_491_506,
+  NumStakedNFTs: 17,
+  TotalDepositAmountEth: 2.65478,
+  PendingToCollectEth: 2.65478,
   FullyClaimed: false,
-  PendingToCollectEth: 0.567891,
   ...overrides,
 });
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => {
+  mockByCycle.mockReturnValue({
+    data: [{}, {}],
+    isLoading: false,
+    error: null,
+    refetch: jest.fn(),
+  });
+});
 
 describe('GlobalAnchorDistributionsTable', () => {
-  it('renders empty state message', () => {
-    render(<GlobalAnchorDistributionsTable list={[]} />);
-    expect(screen.getByText('anchoring.common.empty.distributions')).toBeInTheDocument();
+  it('lists each cycle deposit with its NFTs, amount and what is unretrieved', () => {
+    render(<GlobalAnchorDistributionsTable list={[deposit()]} />);
+    expect(screen.getByRole('link', { name: '1' })).toHaveAttribute('href', '/allocation/1');
+    expect(screen.getByText('17')).toBeInTheDocument();
+    expect(screen.getAllByText('2.6548')).toHaveLength(2);
+    expect(screen.getByText('anchoring.common.no')).toBeInTheDocument();
   });
 
-  it('renders table headers', () => {
-    render(<GlobalAnchorDistributionsTable list={[createRow()]} />);
-    for (const header of [
-      'anchoring.tables.globalDistributions.columns.depositDatetime',
-      'anchoring.tables.globalDistributions.columns.cycle',
-      'anchoring.tables.globalDistributions.columns.totalAnchoredTokens',
-      'anchoring.tables.globalDistributions.columns.totalDepositedEth',
-      'anchoring.tables.globalDistributions.columns.fullyRetrieved',
-      'anchoring.tables.globalDistributions.columns.pendingEth',
-    ]) {
-      expect(screen.getAllByText(header).length).toBeGreaterThanOrEqual(1);
-    }
-  });
-
-  it('renders row data correctly', () => {
-    render(<GlobalAnchorDistributionsTable list={[createRow()]} />);
+  it('opens a cycle onto its anchor-holders with a stateful, named toggle', async () => {
+    const user = userEvent.setup();
+    render(<GlobalAnchorDistributionsTable list={[deposit()]} />);
+    const toggle = screen.getByRole('button', {
+      name: 'anchoring.tables.globalDistributions.showRecipients',
+    });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    // Recipients load only once the reader opens the cycle.
+    expect(mockByCycle).not.toHaveBeenCalled();
+    await user.click(toggle);
+    expect(mockByCycle).toHaveBeenCalledWith(1);
+    expect(screen.getByTestId('recipients')).toHaveTextContent('recipients: 2');
     expect(
-      screen.getAllByText(convertTimestampToDateTime(1701346718)).length,
-    ).toBeGreaterThanOrEqual(1);
-    expect(document.querySelector('time[datetime="2023-11-30T12:18:38.000Z"]')).toBeInTheDocument();
-    expect(screen.getAllByText('10').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('5').length).toBeGreaterThanOrEqual(1);
+      screen.getByRole('button', { name: 'anchoring.tables.globalDistributions.hideRecipients' }),
+    ).toHaveAttribute('aria-expanded', 'true');
   });
 
-  it('formats ETH amounts to 6 decimal places', () => {
+  it('shows the title, description and an empty state that says why', () => {
     render(
       <GlobalAnchorDistributionsTable
-        list={[createRow({ TotalDepositAmountEth: 1.5, PendingToCollectEth: 0.1 })]}
+        list={[]}
+        title="ETH Anchor Distributions"
+        description="Why"
       />,
     );
-    expect(screen.getByText('1.500000')).toBeInTheDocument();
-    expect(screen.getByText('0.100000')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'ETH Anchor Distributions' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 3, name: 'anchoring.common.empty.distributions.title' }),
+    ).toBeInTheDocument();
   });
 
-  it('displays FullyClaimed status', () => {
-    render(<GlobalAnchorDistributionsTable list={[createRow({ FullyClaimed: true })]} />);
-    expect(screen.getAllByText('anchoring.common.yes').length).toBeGreaterThanOrEqual(1);
-  });
-
-  it('renders round link', () => {
-    render(<GlobalAnchorDistributionsTable list={[createRow({ RoundNum: 7 })]} />);
-    const link = screen.getByText('7').closest('a');
-    expect(link).toHaveAttribute('href', '/allocation/7');
-  });
-
-  it('renders only first page of results (perPage=5)', () => {
-    const list = Array.from({ length: 8 }, (_, i) => createRow({ EvtLogId: i, RoundNum: 100 + i }));
-    render(<GlobalAnchorDistributionsTable list={list} />);
-    expect(screen.getByText('104')).toBeInTheDocument();
-    expect(screen.queryByText('105')).not.toBeInTheDocument();
+  it('offers a retry when the ledger fails to load', async () => {
+    const user = userEvent.setup();
+    const onRetry = jest.fn();
+    render(<GlobalAnchorDistributionsTable list={[]} error="Unavailable" onRetry={onRetry} />);
+    await user.click(screen.getByRole('button', { name: /try again/i }));
+    expect(onRetry).toHaveBeenCalled();
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<GlobalAnchorDistributionsTable list={[]} />);
+    const { container } = render(<GlobalAnchorDistributionsTable list={[deposit()]} />);
     await checkA11y(container);
   });
 });

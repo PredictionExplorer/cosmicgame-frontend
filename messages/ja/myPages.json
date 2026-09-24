@@ -37,10 +37,11 @@
   },
   "anchors": {
     "title": "自分の係留",
-    "subtitle": "係留中のNFTを管理し、Cosmic Signature NFTの配分を確認する",
+    "subtitle": "NFTを係留し、受け取る配分を確認し、準備ができたら解除します。",
     "tabs": {
-      "cosmicSignature": "Cosmic Signatureの係留",
-      "randomWalk": "Random Walkの係留"
+      "label": "コレクション",
+      "cosmicSignature": "Cosmic Signature",
+      "randomWalk": "Random Walk"
     },
     "stats": {
       "cosmicSignature": {
@@ -53,7 +54,8 @@
       },
       "unretrieved": {
         "label": "未受け取りの配分",
-        "tooltip": "係留中のCosmic Signature NFTに配分されたが、まだ受け取っていないETH係留配分。Cosmic Signature NFTの係留を解除すると、累積した配分を自動的に受け取ります。"
+        "tooltip": "係留中のCosmic Signature NFTに配分されたが、まだ受け取っていないETH係留配分。Cosmic Signature NFTの係留を解除すると、累積した配分を自動的に受け取ります。解除は取り消せず、解除したNFTは二度と係留できません。",
+        "caption": "解除時に受け取ります。解除は取り消せません。"
       },
       "distributionPerNft": {
         "label": "Cosmic Signature NFTあたりの配分",

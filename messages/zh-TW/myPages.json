@@ -37,10 +37,11 @@
   },
   "anchors": {
     "title": "我的錨定",
-    "subtitle": "管理已錨定 NFT，檢視 ETH 錨定配發",
+    "subtitle": "錨定你的 NFT，檢視它們獲得的配發，並在合適的時候解錨。",
     "tabs": {
-      "cosmicSignature": "Cosmic Signature NFT 錨定",
-      "randomWalk": "Random Walk NFT 錨定"
+      "label": "系列",
+      "cosmicSignature": "Cosmic Signature",
+      "randomWalk": "Random Walk"
     },
     "stats": {
       "cosmicSignature": {
@@ -53,7 +54,8 @@
       },
       "unretrieved": {
         "label": "未取回配發",
-        "tooltip": "已分配至 Cosmic Signature NFT 但尚未取回的 ETH 錨定配發。解錨時，累積配發會自動取回。"
+        "tooltip": "已分配至 Cosmic Signature NFT 但尚未取回的 ETH 錨定配發。解錨時，累積配發會自動取回。解錨不可撤銷：解錨後的 NFT 無法再次錨定。",
+        "caption": "解錨時取回。解錨不可撤銷。"
       },
       "distributionPerNft": {
         "label": "每枚 Cosmic Signature NFT 配發額",

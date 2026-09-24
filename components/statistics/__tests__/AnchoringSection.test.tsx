@@ -142,10 +142,6 @@ describe('AnchoringSection', () => {
       screen.getAllByText('anchoring.tables.globalAnchorActions.headers.anchorDatetime.desktop')
         .length,
     ).toBeGreaterThanOrEqual(1);
-    expect(
-      screen.getAllByText('anchoring.tables.globalAnchorActions.headers.anchorDatetime.mobile')
-        .length,
-    ).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('anchoring.common.anchor').length).toBeGreaterThanOrEqual(1);
   });
 

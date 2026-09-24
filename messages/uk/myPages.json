@@ -37,10 +37,11 @@
   },
   "anchors": {
     "title": "Мої закріплення",
-    "subtitle": "Керуйте закріпленими NFT і переглядайте надходження за Cosmic Signature NFT",
+    "subtitle": "Закріплюйте свої NFT, стежте за тим, що вони отримують, і відкріплюйте, коли будете готові.",
     "tabs": {
-      "cosmicSignature": "Закріплення Cosmic Signature",
-      "randomWalk": "Закріплення Random Walk"
+      "label": "Колекція",
+      "cosmicSignature": "Cosmic Signature",
+      "randomWalk": "Random Walk"
     },
     "stats": {
       "cosmicSignature": {
@@ -53,7 +54,8 @@
       },
       "unretrieved": {
         "label": "Незабрані надходження",
-        "tooltip": "Надходження за закріплення в ETH, нараховані на ваші закріплені Cosmic Signature NFT, але ще не забрані. Відкріплення Cosmic Signature NFT автоматично забирає накопичені надходження."
+        "tooltip": "Надходження за закріплення в ETH, нараховані на ваші закріплені Cosmic Signature NFT, але ще не забрані. Відкріплення Cosmic Signature NFT автоматично забирає накопичені надходження. Відкріплення незворотне: відкріплений NFT більше не можна закріпити.",
+        "caption": "Забирається під час відкріплення. Відкріплення незворотне."
       },
       "distributionPerNft": {
         "label": "Надходження на один Cosmic Signature NFT",

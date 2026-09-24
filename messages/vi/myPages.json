@@ -37,10 +37,11 @@
   },
   "anchors": {
     "title": "Neo giữ của tôi",
-    "subtitle": "Quản lý các NFT đang neo giữ và xem phân phối Cosmic Signature NFT",
+    "subtitle": "Neo giữ NFT của bạn, theo dõi những gì chúng nhận được và gỡ neo khi bạn sẵn sàng.",
     "tabs": {
-      "cosmicSignature": "Neo giữ Cosmic Signature",
-      "randomWalk": "Neo giữ Random Walk"
+      "label": "Bộ sưu tập",
+      "cosmicSignature": "Cosmic Signature",
+      "randomWalk": "Random Walk"
     },
     "stats": {
       "cosmicSignature": {
@@ -53,7 +54,8 @@
       },
       "unretrieved": {
         "label": "Phân phối chưa nhận về",
-        "tooltip": "Phân phối neo giữ ETH được phân bổ cho các Cosmic Signature NFT bạn đang neo giữ nhưng chưa nhận về. Gỡ neo một Cosmic Signature NFT sẽ tự động nhận về các khoản phân phối đã tích lũy của nó."
+        "tooltip": "Phân phối neo giữ ETH được phân bổ cho các Cosmic Signature NFT bạn đang neo giữ nhưng chưa nhận về. Gỡ neo một Cosmic Signature NFT sẽ tự động nhận về các khoản phân phối đã tích lũy của nó. Gỡ neo không thể hoàn tác: NFT đã gỡ neo sẽ không thể neo giữ lại.",
+        "caption": "Nhận về khi gỡ neo. Gỡ neo không thể hoàn tác."
       },
       "distributionPerNft": {
         "label": "Phân phối mỗi Cosmic Signature NFT",

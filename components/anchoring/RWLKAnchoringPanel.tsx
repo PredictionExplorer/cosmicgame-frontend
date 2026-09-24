@@ -1,99 +1,127 @@
+'use client';
+
+import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 
-import type { AnchoredTokenInfo, AnchorAction, AnchorDistributionImprint } from '@/services/api';
-import AnchorActionsTable from '@/components/anchoring/AnchorActionsTable';
-import { AnchoredTokensTable } from '@/components/anchoring/AnchoredTokensTable';
-import { RWLKNFTTable } from '@/components/tokens/RWLKNFTTable';
-import { RwalkAnchorDistributionImprintsTable } from '@/components/anchoring/RwalkAnchorDistributionImprintsTable';
-import { InfoTooltip } from '@/components/ui/info-tooltip';
+import type { TxResult } from '@/hooks/useTxFlow';
+import type { TxStage } from '@/lib/txStage';
+import type { AnchorAction, AnchorDistributionImprint, AnchoredTokenInfo } from '@/services/api';
+import { DateTime } from '@/components/ui/date-time';
+import { SectionHeader } from '@/components/ui/section-header';
 
-/** Props for the RWLK anchoring panel. */
+import AnchorActionsTable from './AnchorActionsTable';
+import { AnchorTokenGrid, type AnchorGridItem } from './AnchorTokenGrid';
+import { RwalkAnchorDistributionImprintsTable } from './RwalkAnchorDistributionImprintsTable';
+
+/** The grid ids of this panel, which own the page's one wallet flow in turn. */
+export const RWLK_GRIDS = { anchored: 'rwlk-anchored', available: 'rwlk-available' } as const;
+
 export interface RWLKAnchoringPanelProps {
-  account: string;
-  stakingActions: AnchorAction[];
-  rwlkImprints: AnchorDistributionImprint[];
-  userTokens: number[];
-  anchoredTokens: AnchoredTokenInfo[];
-  handleStake: (tokenId: number) => Promise<unknown>;
-  handleStakeMany: (tokenIds: number[]) => Promise<unknown>;
-  handleUnstake: (actionId: number) => Promise<unknown>;
-  handleUnstakeMany: (actionIds: number[]) => Promise<unknown>;
+  anchoredTokens: readonly AnchoredTokenInfo[];
+  /** Random Walk NFTs in the wallet that have never been anchored; `null` while they load. */
+  availableTokenIds: readonly number[] | null;
+  imprints: AnchorDistributionImprint[];
+  actions: AnchorAction[];
+  onAnchor: (tokenIds: number[]) => Promise<TxResult>;
+  onRelease: (actionIds: number[]) => Promise<TxResult>;
+  stageFor: (gridId: string) => TxStage;
+  walletBusy: boolean;
+  loading?: boolean;
 }
 
-function SectionHeader({ title, tooltip }: { title: string; tooltip: string }) {
-  return (
-    <div className="flex items-center gap-2 mb-4">
-      <h3 className="text-base font-semibold leading-none">{title}</h3>
-      <InfoTooltip content={tooltip} />
-    </div>
-  );
-}
-
-/** Displays RWLK anchor allocation imprints, actions, available tokens, and anchored tokens. */
+/**
+ * Random Walk anchoring for the connected wallet: what it has anchored, what
+ * it can still anchor, the Stellar Selection imprints its anchors received
+ * and the history of its actions. Random Walk anchors receive no ETH.
+ */
 export function RWLKAnchoringPanel({
-  account,
-  stakingActions,
-  rwlkImprints,
-  userTokens,
   anchoredTokens,
-  handleStake,
-  handleStakeMany,
-  handleUnstake,
-  handleUnstakeMany,
+  availableTokenIds,
+  imprints,
+  actions,
+  onAnchor,
+  onRelease,
+  stageFor,
+  walletBusy,
+  loading = false,
 }: RWLKAnchoringPanelProps) {
   const t = useTranslations('anchoring');
 
+  const anchoredItems = useMemo<AnchorGridItem[]>(
+    () =>
+      [...anchoredTokens]
+        .sort((a, b) => a.StakeTimeStamp - b.StakeTimeStamp)
+        .map((row) => ({
+          key: row.StakeActionId,
+          tokenId: row.StakedTokenId,
+          meta: [
+            <DateTime key="anchored" timestamp={row.StakeTimeStamp}>
+              {(date) => t('picker.anchoredOn', { date })}
+            </DateTime>,
+          ],
+        })),
+    [anchoredTokens, t],
+  );
+
+  const availableItems = useMemo<AnchorGridItem[]>(
+    () => (availableTokenIds ?? []).map((tokenId) => ({ key: tokenId, tokenId })),
+    [availableTokenIds],
+  );
+
   return (
-    <>
-      <div>
-        <SectionHeader
-          title={t('panels.shared.anchoredTokens')}
-          tooltip={t('panels.randomWalk.anchoredTooltip')}
-        />
-        <AnchoredTokensTable
-          list={anchoredTokens}
-          handleUnstake={async (actionId) => {
-            await handleUnstake(actionId);
-          }}
-          handleUnstakeMany={async (actionIds) => {
-            await handleUnstakeMany(actionIds);
-          }}
-          IsRwalk={true}
-        />
-      </div>
+    <div className="space-y-[var(--block-gap)] sm:space-y-16">
+      <AnchorTokenGrid
+        id={RWLK_GRIDS.anchored}
+        collection="randomWalk"
+        mode="release"
+        items={anchoredItems}
+        title={t('panels.shared.anchoredTokens')}
+        description={t('panels.randomWalk.anchoredDescription')}
+        emptyTitle={t('panels.shared.anchoredEmpty.title')}
+        emptyDescription={t('panels.shared.anchoredEmpty.description')}
+        onCommit={onRelease}
+        stage={stageFor(RWLK_GRIDS.anchored)}
+        walletBusy={walletBusy}
+        loading={loading}
+      />
 
-      <div className="mt-12">
-        <SectionHeader
-          title={t('panels.shared.available')}
-          tooltip={t('panels.randomWalk.availableTooltip')}
-        />
-        <RWLKNFTTable
-          list={userTokens}
-          ownerAddress={account}
-          handleStake={async (tokenId) => {
-            await handleStake(tokenId);
-          }}
-          handleStakeMany={async (tokenIds) => {
-            await handleStakeMany(tokenIds);
-          }}
-        />
-      </div>
+      <AnchorTokenGrid
+        id={RWLK_GRIDS.available}
+        collection="randomWalk"
+        mode="anchor"
+        items={availableItems}
+        title={t('panels.shared.available')}
+        description={t('panels.randomWalk.availableDescription')}
+        emptyTitle={t('panels.randomWalk.availableEmpty.title')}
+        emptyDescription={t('panels.randomWalk.availableEmpty.description')}
+        onCommit={onAnchor}
+        stage={stageFor(RWLK_GRIDS.available)}
+        walletBusy={walletBusy}
+        loading={loading || availableTokenIds === null}
+      />
 
-      <div className="mt-12">
+      <section aria-labelledby="rwlk-imprints-heading">
         <SectionHeader
+          headingId="rwlk-imprints-heading"
           title={t('panels.randomWalk.selection')}
-          tooltip={t('panels.randomWalk.selectionTooltip')}
+          description={t('panels.randomWalk.selectionDescription')}
         />
-        <RwalkAnchorDistributionImprintsTable list={rwlkImprints} />
-      </div>
+        <RwalkAnchorDistributionImprintsTable
+          list={imprints}
+          showRecipient={false}
+          loading={loading}
+          emptyTitle={t('panels.randomWalk.selectionEmpty')}
+        />
+      </section>
 
-      <div className="mt-12">
+      <section aria-labelledby="rwlk-history-heading">
         <SectionHeader
+          headingId="rwlk-history-heading"
           title={t('panels.shared.history')}
-          tooltip={t('panels.shared.historyTooltip')}
+          description={t('panels.shared.historyDescription')}
         />
-        <AnchorActionsTable list={stakingActions} IsRwalk={true} />
-      </div>
-    </>
+        <AnchorActionsTable list={actions} IsRwalk loading={loading} />
+      </section>
+    </div>
   );
 }

@@ -1,21 +1,9 @@
-import { useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+'use client';
 
-import { getExplorerUrl } from '@/utils';
+import { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 
-import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
-import { Link } from '@/i18n/navigation';
-import {
-  TablePrimary,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryContainer,
-  TablePrimaryHead,
-  TablePrimaryHeadCell,
-  TablePrimaryRow,
-} from '@/components/styled';
-import { CustomPagination } from '@/components/common/CustomPagination';
-import { formatFixed } from '@/utils/format';
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
 
 export interface CSTAnchorDistributionByDeposit {
   EvtLogId: number;
@@ -32,153 +20,113 @@ export interface CSTAnchorDistributionByDeposit {
   YourTokensStaked: number;
 }
 
-const CSTAnchorDistributionsByDepositRow = ({ row }: { row: CSTAnchorDistributionByDeposit }) => {
-  const t = useTranslations('anchoring');
-  const locale = useLocale();
+import type { AnchoringLedgerProps } from './ledgerProps';
 
-  if (!row) {
-    return <TablePrimaryRow />;
-  }
+interface CSTAnchorDistributionsByDepositTableProps extends AnchoringLedgerProps {
+  list: CSTAnchorDistributionByDeposit[];
+}
 
-  return (
-    <TablePrimaryRow className="border-b-0">
-      <TablePrimaryCell label={t('tables.distributionsByDeposit.columns.depositDatetime')}>
-        <a
-          href={getExplorerUrl('tx', row.TxHash)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-inherit"
-        >
-          <HydrationSafeDateTime timestamp={row.TimeStamp} locale={locale} />
-        </a>
-      </TablePrimaryCell>
-
-      <TablePrimaryCell
-        label={t('tables.distributionsByDeposit.columns.depositCycle')}
-        align="center"
-      >
-        <Link href={`/allocation/${row.DepositRoundNum}`} className="text-inherit">
-          {row.DepositRoundNum}
-        </Link>
-      </TablePrimaryCell>
-
-      <TablePrimaryCell label={t('tables.distributionsByDeposit.columns.depositId')} align="center">
-        {row.DepositId}
-      </TablePrimaryCell>
-      <TablePrimaryCell
-        label={t('tables.distributionsByDeposit.columns.totalDepositAmount')}
-        align="center"
-      >
-        {formatFixed(row.DepositAmountEth, 4)}
-      </TablePrimaryCell>
-      <TablePrimaryCell
-        label={t('tables.distributionsByDeposit.columns.totalRetrievedAmount')}
-        align="center"
-        priority="secondary"
-      >
-        {formatFixed(row.ClaimedAmountEth, 4)}
-      </TablePrimaryCell>
-      <TablePrimaryCell
-        label={t('tables.distributionsByDeposit.columns.yourRetrievableAmount')}
-        align="center"
-      >
-        {formatFixed(row.YourClaimableAmountEth, 4)}
-      </TablePrimaryCell>
-      <TablePrimaryCell
-        label={t('tables.distributionsByDeposit.columns.fullyRetrieved')}
-        align="center"
-      >
-        {row.FullyClaimed ? t('common.yes') : t('common.no')}
-      </TablePrimaryCell>
-      <TablePrimaryCell
-        label={t('tables.distributionsByDeposit.columns.totalAnchoredNfts')}
-        align="center"
-        priority="secondary"
-      >
-        {row.NumStakedNFTs}
-      </TablePrimaryCell>
-      <TablePrimaryCell
-        label={t('tables.distributionsByDeposit.columns.totalRetrievedTokens')}
-        align="center"
-        priority="secondary"
-      >
-        {row.NumTokensCollected}
-      </TablePrimaryCell>
-      <TablePrimaryCell
-        label={t('tables.distributionsByDeposit.columns.yourAnchoredTokens')}
-        align="center"
-      >
-        {row.YourTokensStaked}
-      </TablePrimaryCell>
-    </TablePrimaryRow>
-  );
-};
-
+/**
+ * Every ETH Anchor Distribution deposit an address shares in: the deposit,
+ * what has been retrieved from it, and this address's part. The totals across
+ * all anchor-holders drop out on phones.
+ */
 export const CSTAnchorDistributionsByDepositTable = ({
   list,
-}: {
-  list: CSTAnchorDistributionByDeposit[];
-}) => {
+  headingLevel = 3,
+  ...state
+}: CSTAnchorDistributionsByDepositTableProps) => {
   const t = useTranslations('anchoring');
-  const perPage = 5;
-  const [page, setPage] = useState(1);
 
-  if (list.length === 0) {
-    return <p className="text-muted-foreground">{t('common.empty.distributions')}</p>;
-  }
-
-  const startIndex = (page - 1) * perPage;
-  const endIndex = page * perPage;
-  const currentData = list.slice(startIndex, endIndex);
+  const columns = useMemo<DataTableColumn<CSTAnchorDistributionByDeposit>[]>(
+    () => [
+      {
+        id: 'datetime',
+        kind: 'datetime',
+        header: t('tables.distributionsByDeposit.columns.depositDatetime'),
+        value: (row) => row.TimeStamp,
+        txHash: (row) => row.TxHash,
+      },
+      {
+        id: 'cycle',
+        kind: 'link',
+        header: t('tables.distributionsByDeposit.columns.depositCycle'),
+        value: (row) => row.DepositRoundNum,
+        href: (row) => `/allocation/${row.DepositRoundNum}`,
+      },
+      {
+        id: 'deposit',
+        kind: 'text',
+        header: t('tables.distributionsByDeposit.columns.depositId'),
+        value: (row) => row.DepositId,
+        nowrap: true,
+        cellClassName: 'font-mono tabular-nums',
+        priority: 'secondary',
+      },
+      {
+        id: 'amount',
+        kind: 'amount',
+        header: t('tables.distributionsByDeposit.columns.totalDepositAmount'),
+        value: (row) => row.DepositAmountEth,
+        showUnit: false,
+      },
+      {
+        id: 'retrieved',
+        kind: 'amount',
+        header: t('tables.distributionsByDeposit.columns.totalRetrievedAmount'),
+        value: (row) => row.ClaimedAmountEth,
+        showUnit: false,
+        priority: 'secondary',
+      },
+      {
+        id: 'retrievable',
+        kind: 'amount',
+        header: t('tables.distributionsByDeposit.columns.yourRetrievableAmount'),
+        value: (row) => row.YourClaimableAmountEth,
+        showUnit: false,
+      },
+      {
+        id: 'fullyRetrieved',
+        kind: 'text',
+        header: t('tables.distributionsByDeposit.columns.fullyRetrieved'),
+        value: (row) => (row.FullyClaimed ? t('common.yes') : t('common.no')),
+        nowrap: true,
+      },
+      {
+        id: 'anchored',
+        kind: 'count',
+        header: t('tables.distributionsByDeposit.columns.totalAnchoredNfts'),
+        value: (row) => row.NumStakedNFTs,
+        priority: 'secondary',
+      },
+      {
+        id: 'retrievedTokens',
+        kind: 'count',
+        header: t('tables.distributionsByDeposit.columns.totalRetrievedTokens'),
+        value: (row) => row.NumTokensCollected,
+        priority: 'secondary',
+      },
+      {
+        id: 'yourTokens',
+        kind: 'count',
+        header: t('tables.distributionsByDeposit.columns.yourAnchoredTokens'),
+        value: (row) => row.YourTokensStaked,
+      },
+    ],
+    [t],
+  );
 
   return (
-    <>
-      <TablePrimaryContainer>
-        <TablePrimary>
-          <TablePrimaryHead>
-            <tr>
-              <TablePrimaryHeadCell align="left">
-                {t('tables.distributionsByDeposit.columns.depositDatetime')}
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>
-                {t('tables.distributionsByDeposit.columns.depositCycle')}
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>
-                {t('tables.distributionsByDeposit.columns.depositId')}
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>
-                {t('tables.distributionsByDeposit.columns.totalDepositAmount')}
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell priority="secondary">
-                {t('tables.distributionsByDeposit.columns.totalRetrievedAmount')}
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>
-                {t('tables.distributionsByDeposit.columns.yourRetrievableAmount')}
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>
-                {t('tables.distributionsByDeposit.columns.fullyRetrieved')}
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell priority="secondary">
-                {t('tables.distributionsByDeposit.columns.totalAnchoredNfts')}
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell priority="secondary">
-                {t('tables.distributionsByDeposit.columns.totalRetrievedTokens')}
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>
-                {t('tables.distributionsByDeposit.columns.yourAnchoredTokens')}
-              </TablePrimaryHeadCell>
-            </tr>
-          </TablePrimaryHead>
-
-          <TablePrimaryBody>
-            {currentData.map((row) => (
-              <CSTAnchorDistributionsByDepositRow row={row} key={row.EvtLogId} />
-            ))}
-          </TablePrimaryBody>
-        </TablePrimary>
-      </TablePrimaryContainer>
-
-      <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
-    </>
+    <DataTable
+      data={list}
+      columns={columns}
+      ariaLabel={t('tables.distributionsByDeposit.label')}
+      getRowKey={(row) => row.EvtLogId}
+      emptyTitle={t('common.empty.distributions.title')}
+      emptyDescription={t('common.empty.distributions.description')}
+      tableClassName="sm:min-w-[60rem] xl:min-w-0"
+      headingLevel={headingLevel}
+      {...state}
+    />
   );
 };

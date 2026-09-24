@@ -1,88 +1,133 @@
 {
   "common": {
-    "loading": "Завантаження…",
-    "processing": "Обробка…",
-    "releasing": "Відкріплення…",
     "anchor": "Закріпити",
     "release": "Відкріпити",
     "yes": "Так",
     "no": "Ні",
     "empty": {
-      "actions": "Дій ще немає.",
-      "distributions": "Надходжень ще немає.",
-      "allocations": "Розподілів ще немає.",
-      "tokens": "Токенів ще немає."
-    },
-    "actions": {
-      "releaseMany": "Відкріпити вибрані",
-      "cancel": "Скасувати"
-    },
-    "aria": {
-      "expandRow": "розгорнути рядок",
-      "actions": "Дії"
+      "actions": {
+        "title": "Дій закріплення ще немає",
+        "description": "Закріплення та відкріплення з’являться тут, щойно їх буде записано ончейн."
+      },
+      "distributions": {
+        "title": "Надходжень за закріплення ще немає",
+        "description": "Депозит з’являється тут щоразу, коли завершується цикл, поки Cosmic Signature NFT закріплені."
+      },
+      "retrieved": {
+        "title": "Ще нічого не забрано",
+        "description": "Надходження за закріплення з’являться тут, коли їх буде забрано через відкріплення."
+      },
+      "unretrieved": {
+        "title": "Незабраних надходжень немає",
+        "description": "Усі депозити надходжень за закріплення, у яких бере участь ця адреса, забрано."
+      },
+      "imprints": {
+        "title": "Закарбувань зоряного відбору ще немає",
+        "description": "Закарбування з’являється тут, коли закріплений Random Walk NFT обрано під час завершення циклу."
+      },
+      "tokens": {
+        "title": "Зараз нічого не закріплено",
+        "description": "NFT з’являються тут, поки вони закріплені."
+      }
     }
+  },
+  "art": {
+    "unavailable": "Твір недоступний",
+    "signatureTitle": "Cosmic Signature {id}",
+    "randomWalkTitle": "Random Walk {id}"
+  },
+  "status": {
+    "anchored": "Закріплено",
+    "released": "Відкріплено"
   },
   "overview": {
-    "errorTitle": "Не вдалося завантажити дані закріплення",
-    "errorMessage": "Не вдалося завантажити дані закріплення. Спробуйте пізніше.",
+    "errorTitle": "Не вдалося завантажити цей реєстр",
+    "errorMessage": "Записи закріплення тимчасово недоступні. Спробуйте ще раз за мить.",
     "title": "Надходження за закріплення",
-    "subtitle": "Загальна активність закріплення та історія надходжень",
-    "intro": {
-      "description": "Закріпіть свої Cosmic Signature NFT, щоб отримувати частку від {percentage}% резерву кожного циклу через надходження за закріплення в ETH. Закріпіть RandomWalk NFT, щоб узяти участь у зоряному відборі закріплених NFT.",
-      "flow": "{percentage}% на закріплення"
-    },
-    "stats": {
-      "pool": {
-        "label": "Пул надходжень за закріплення",
-        "tooltip": "Загальна сума ETH, яка зараз перебуває в пулі надходжень за закріплення; кожного циклу вона розподіляється пропорційно між власниками закріплених Cosmic Signature NFT.",
-        "caption": "Надходить до закріплених Cosmic Signature NFT, коли цей цикл завершується."
-      },
-      "cosmicSignatureAnchored": {
-        "label": "Закріплено Cosmic Signature NFT",
-        "tooltip": "Загальна кількість Cosmic Signature NFT, закріплених у протоколі зараз, за всіма власниками закріплень."
-      },
-      "randomWalkAnchored": {
-        "label": "Закріплено RWLK NFT",
-        "tooltip": "Загальна кількість закріплених зараз RandomWalk NFT. Закріплені RandomWalk NFT мають право на зоряний відбір закріплених NFT, який відбувається через випадковий відбір ончейн."
-      },
-      "distributionPerNft": {
-        "label": "Надходження на NFT",
-        "tooltip": "Надходження за закріплення в ETH на один Cosmic Signature NFT: баланс ончейн-пулу, поділений на кількість закріплених NFT за наявними даними.",
-        "noneAnchored": "Закріплених Cosmic Signature NFT ще не проіндексовано"
-      },
-      "activeHolders": {
-        "label": "Активні власники закріплень",
-        "tooltip": "Різні гаманці, які зараз мають щонайменше один закріплений Cosmic Signature NFT або RandomWalk NFT. Гаманець, що закріплює обидва види, враховано один раз."
-      }
-    },
-    "cta": {
-      "title": "Почати закріплення",
-      "description": "Закріпіть свої Cosmic Signature NFT, щоб отримувати частку пулу надходжень за закріплення кожного циклу."
-    },
-    "sections": {
-      "cosmicSignature": "Cosmic Signature NFT",
-      "randomWalk": "RandomWalk NFT"
+    "subtitle": "Закріплення в усій мережі та історія кожного надходження за закріплення.",
+    "start": "Почати закріплення",
+    "howItWorks": {
+      "title": "Як працює закріплення",
+      "description": "Закріплений NFT бере участь у кожному циклі, доки ви його не відкріпите."
     }
   },
-  "howItWorks": {
-    "title": "Як працює закріплення",
-    "intro": "Оберіть запитання, щоб дізнатися, як працює закріплення.",
+  "steps": {
+    "anchor": {
+      "title": "Закріпіть свої NFT",
+      "body": "На сторінці <link>Мої закріплення</link> виберіть Cosmic Signature або Random Walk NFT зі свого гаманця. Першого разу гаманець попросить дозволити контракту закріплення працювати з цією колекцією, а потім — підтвердити закріплення."
+    },
+    "receive": {
+      "title": "Отримуйте щоциклу",
+      "body": "Закріплені Cosmic Signature NFT ділять {percentage}% резерву кожного циклу в ETH. Закріплені Random Walk NFT беруть участь у зоряному відборі, який щоциклу обирає {selections} з них."
+    },
+    "release": {
+      "title": "Відкріпіть, щоб забрати",
+      "body": "Відкріплення повертає NFT у ваш гаманець разом з ETH, що на нього нараховано. Це незворотно: кожен NFT можна закріпити лише раз."
+    }
+  },
+  "flow": {
+    "caption": "Як кожен цикл доходить до закріплених NFT, із поточними даними",
+    "unavailable": "Недоступно",
+    "dividedBy": "поділено на",
+    "equals": "дорівнює",
+    "then": "далі",
+    "cosmicSignature": {
+      "title": "Cosmic Signature NFT ділять ETH",
+      "pool": {
+        "label": "Пул надходжень за закріплення",
+        "definition": "ETH, який цей цикл відкладає для закріплених Cosmic Signature NFT. Його вносять під час завершення циклу й ділять пропорційно до кількості NFT, закріплених кожним власником закріплення.",
+        "caption": "{percentage}% резерву цього циклу, вноситься під час завершення"
+      },
+      "anchored": {
+        "label": "Закріплені Cosmic Signature NFT",
+        "definition": "Cosmic Signature NFT, закріплені зараз усіма власниками закріплень."
+      },
+      "perNft": {
+        "label": "На один закріплений NFT",
+        "definition": "Пул, поділений на закріплені Cosmic Signature NFT, які враховує індексатор: скільки отримав би кожен, якби цикл завершився зараз.",
+        "caption": "Якби цикл завершився зараз",
+        "noneAnchored": "Індексатор ще не бачить закріплених Cosmic Signature NFT"
+      }
+    },
+    "randomWalk": {
+      "title": "Random Walk NFT беруть участь у зоряному відборі",
+      "anchored": {
+        "label": "Закріплені Random Walk NFT",
+        "definition": "Random Walk NFT, закріплені зараз. Кожен бере участь у зоряному відборі закріплених NFT під час кожного завершення."
+      },
+      "selections": {
+        "label": "Зоряних відборів щоциклу",
+        "caption": "Обираються ончейн; один NFT може бути обраний кілька разів"
+      },
+      "allocation": {
+        "label": "Кожен обраний отримує",
+        "caption": "і щойно закарбований Cosmic Signature NFT"
+      }
+    },
+    "holders": {
+      "label": "Активні власники закріплень",
+      "definition": "Унікальні гаманці, що закріпили принаймні один Cosmic Signature або Random Walk NFT. Гаманець, що закріпив обидва види, враховується один раз."
+    }
+  },
+  "questions": {
+    "title": "Запитання про закріплення",
+    "description": "Що відбувається із закріпленим NFT і що означає його відкріпити.",
     "items": {
       "whatIsAnchoring": {
         "question": "Що таке закріплення?",
-        "answer": "Закріплюючи NFT, ви передаєте його до контракту протоколу. Закріплені Cosmic Signature NFT отримують надходження за закріплення в ETH, а RandomWalk NFT беруть участь у зоряному відборі закріплених NFT. Відкріпити NFT й повернути його у свій гаманець можна будь-коли. Разом із Cosmic Signature NFT ви також забираєте накопичені ETH. Кожен NFT можна закріпити лише раз: після відкріплення повторне закріплення неможливе."
+        "answer": "Закріплюючи NFT, ви передаєте його до контракту протоколу. Закріплені Cosmic Signature NFT отримують надходження за закріплення в ETH, а Random Walk NFT беруть участь у зоряному відборі закріплених NFT. Відкріпити NFT й повернути його у свій гаманець можна будь-коли. Разом із Cosmic Signature NFT ви також забираєте накопичені ETH. Кожен NFT можна закріпити лише раз: після відкріплення повторне закріплення неможливе."
       },
       "cosmicSignature": {
-        "question": "Закріплення Cosmic Signature NFT",
+        "question": "Як працює закріплення Cosmic Signature NFT?",
         "answer": "Закріпіть свої Cosmic Signature NFT, щоб отримувати ETH із пулу надходжень за закріплення. Кожного циклу 6% резерву циклу розподіляється пропорційно між усіма власниками закріплених Cosmic Signature NFT — відповідно до кількості закріплених NFT. Надходження накопичуються автоматично, і ви забираєте їх під час відкріплення. Якщо на момент завершення циклу закріплених Cosmic Signature NFT немає, частка цього циклу залишається в резерві циклу."
       },
       "randomWalk": {
-        "question": "Закріплення RandomWalk (RWLK)",
-        "answer": "Закріпіть свої RandomWalk NFT, щоб узяти участь у зоряному відборі закріплених NFT. Кожного циклу серед закріплених RandomWalk NFT відбувається десять випадкових відборів ончейн; кожен обраний отримує 1 000 CST і один новозакарбований Cosmic Signature NFT. Вибір відбувається з повторенням, тому той самий власник закріплення може бути обраний кілька разів. Закріплені RandomWalk NFT не отримують ETH."
+        "question": "Як працює закріплення Random Walk NFT?",
+        "answer": "Закріпіть свої Random Walk NFT, щоб узяти участь у зоряному відборі закріплених NFT. Кожного циклу серед закріплених Random Walk NFT відбувається десять випадкових відборів ончейн; кожен обраний отримує 1 000 CST і один новозакарбований Cosmic Signature NFT. Вибір відбувається з повторенням, тому той самий власник закріплення може бути обраний кілька разів. Закріплені Random Walk NFT не отримують ETH."
       },
       "calculation": {
         "question": "Як обчислюються надходження?",
-        "answer": "Надходження за закріплення Cosmic Signature NFT пропорційні: якщо ви закріпили десяту частину всіх закріплених Cosmic Signature NFT, ви отримуєте десяту частину кожного депозиту надходжень в ETH. Закріплення RandomWalk NFT використовує ончейн-механізм випадкового відбору для зоряного відбору закріплених NFT, тож більша кількість закріплених RandomWalk NFT підвищує частоту вашого відбору, а не частку надходжень в ETH."
+        "answer": "Надходження за закріплення Cosmic Signature NFT пропорційні: якщо ви закріпили десяту частину всіх закріплених Cosmic Signature NFT, ви отримуєте десяту частину кожного депозиту надходжень в ETH. Закріплення Random Walk NFT використовує ончейн-механізм випадкового відбору для зоряного відбору закріплених NFT, тож більша кількість закріплених Random Walk NFT підвищує частоту вашого відбору, а не частку надходжень в ETH."
       },
       "anchorOnce": {
         "question": "Чи можна закріпити NFT знову після відкріплення?",
@@ -90,266 +135,305 @@
       }
     }
   },
+  "ledgers": {
+    "distributions": {
+      "title": "Надходження за закріплення в ETH",
+      "description": "Кожен завершений цикл вносить {percentage}% свого резерву для закріплених Cosmic Signature NFT. Розгорніть цикл, щоб побачити частку кожного власника закріплення."
+    },
+    "imprints": {
+      "title": "Закарбування зоряного відбору закріплених NFT",
+      "description": "Щоциклу обирається {count} закріплених Random Walk NFT. Кожне обрання закарбовує власнику закріплення Cosmic Signature NFT і {cst, number} CST."
+    }
+  },
+  "picker": {
+    "selectAll": "Вибрати всі ({count, number})",
+    "clearSelection": "Скасувати вибір",
+    "clear": "Очистити",
+    "selected": "{count, plural, one {Вибрано #} few {Вибрано #} many {Вибрано #} other {Вибрано #}}",
+    "selectionLabel": "Вибір: {title}",
+    "anchorSelected": "{count, plural, one {Закріпити # NFT} few {Закріпити # NFT} many {Закріпити # NFT} other {Закріпити # NFT}}",
+    "releaseSelected": "{count, plural, one {Відкріпити # NFT} few {Відкріпити # NFT} many {Відкріпити # NFT} other {Відкріпити # NFT}}",
+    "approvalNote": "Першого разу гаманець запитає двічі: спершу дозвіл контракту закріплення тримати NFT цієї колекції, потім — саме закріплення.",
+    "releaseNote": "Відкріплення незворотне. Ви підтвердите його на наступному екрані, перш ніж відкриється гаманець.",
+    "anchoredOn": "Закріплено {date}",
+    "accrued": "Нараховано {amount}",
+    "cycle": "Цикл {cycle}",
+    "open": "Відкрити {title}",
+    "opensNewTab": "(відкривається в новій вкладці)",
+    "settled": {
+      "anchored": "Закріплено · оновлення",
+      "released": "Відкріплено · оновлення"
+    }
+  },
+  "release": {
+    "title": "{count, plural, one {Відкріпити # закріплення?} few {Відкріпити # закріплення?} many {Відкріпити # закріплень?} other {Відкріпити # закріплення?}}",
+    "description": {
+      "cosmicSignature": "{count, plural, one {Відкріплення поверне цей NFT у ваш гаманець і забере нараховані на нього надходження за закріплення в ETH.} few {Відкріплення поверне ці NFT у ваш гаманець і забере нараховані на них надходження за закріплення в ETH.} many {Відкріплення поверне ці NFT у ваш гаманець і забере нараховані на них надходження за закріплення в ETH.} other {Відкріплення поверне ці NFT у ваш гаманець і забере нараховані на них надходження за закріплення в ETH.}}",
+      "randomWalk": "{count, plural, one {Відкріплення поверне цей NFT у ваш гаманець. Він вийде із зоряного відбору закріплених NFT.} few {Відкріплення поверне ці NFT у ваш гаманець. Вони вийдуть із зоряного відбору закріплених NFT.} many {Відкріплення поверне ці NFT у ваш гаманець. Вони вийдуть із зоряного відбору закріплених NFT.} other {Відкріплення поверне ці NFT у ваш гаманець. Вони вийдуть із зоряного відбору закріплених NFT.}}"
+    },
+    "tokensLabel": "NFT для відкріплення",
+    "more": "{count, plural, one {і ще #} few {і ще #} many {і ще #} other {і ще #}}",
+    "eth": {
+      "label": "ETH, який ви заберете",
+      "approximately": "Приблизно",
+      "unknown": "Недоступно",
+      "note": "Оцінка за індексованими депозитами. Контракт виплачує точну суму."
+    },
+    "warning": {
+      "title": "Це незворотно.",
+      "body": "Відкріплений NFT більше ніколи не можна буде закріпити."
+    },
+    "keep": "Залишити закріпленими",
+    "confirm": "{count, plural, one {Відкріпити # NFT} few {Відкріпити # NFT} many {Відкріпити # NFT} other {Відкріпити # NFT}}"
+  },
   "anchorActionDetail": {
     "subtitle": "Дія закріплення — {token} NFT",
-    "error": "Не вдалося завантажити деталі дії закріплення. Спробуйте пізніше.",
+    "errorTitle": "Не вдалося завантажити цю дію закріплення",
+    "error": "Записи закріплення тимчасово недоступні. Спробуйте ще раз за мить.",
     "breadcrumbs": {
       "action": "Дія #{id}"
     },
-    "empty": "Даних для цієї дії закріплення не знайдено.",
+    "empty": {
+      "title": "Запису дії #{id} немає",
+      "description": "Індексатор не має дії закріплення з таким номером. Можливо, він ще синхронізується, або посилання хибне.",
+      "browse": "Переглянути надходження за закріплення",
+      "statistics": "Статистика закріплення"
+    },
     "token": {
-      "title": "Токен",
-      "randomWalkDescription": "Random Walk NFT, використаний у цій дії.",
-      "cosmicSignatureDescription": "Cosmic Signature NFT, використаний у цій дії.",
-      "actionId": "ID дії",
-      "holderAddress": "Адреса власника закріплення",
-      "tokenId": "ID токена",
       "labels": {
-        "randomWalk": "RandomWalk",
+        "randomWalk": "Random Walk",
         "cosmicSignature": "Cosmic Signature"
       }
     },
-    "anchor": {
-      "title": "Закріплення",
-      "description": "Коли токени було закріплено в протоколі.",
-      "datetime": "Дата й час закріплення",
-      "tokenCount": "Кількість закріплених токенів"
+    "record": {
+      "title": "Запис",
+      "holder": "Власник закріплення",
+      "token": "Токен"
     },
-    "release": {
-      "title": "Відкріплення",
-      "description": "Коли токени було відкріплено.",
-      "datetime": "Дата й час відкріплення",
-      "tokenCount": "Кількість закріплених токенів"
+    "timeline": {
+      "title": "Хронологія",
+      "anchored": "Закріплено",
+      "anchoredCount": "Закріплено в колекції після цієї дії: {count}",
+      "released": "Відкріплено",
+      "retrieved": "Забрано {amount}",
+      "stillAnchored": "Досі закріплено",
+      "stillAnchoredCosmicSignature": "Ділить надходження за закріплення в ETH кожного циклу.",
+      "stillAnchoredRandomWalk": "Бере участь у зоряному відборі закріплених NFT кожного циклу."
+    },
+    "next": {
+      "title": "Далі",
+      "distributions": "Надходження за закріплення цього NFT",
+      "token": "Переглянути твір",
+      "allActions": "Усі дії закріплення"
     }
   },
   "distributionsByToken": {
     "title": "Деталі надходжень за закріплення для токена {tokenId}",
-    "subtitle": "Надходження для адреси {address}",
+    "subtitle": "Кожен депозит надходжень за закріплення в ETH, у якому цей NFT брав участь, поки був закріплений.",
+    "label": "Депозити надходжень за закріплення",
+    "error": "Не вдалося завантажити депозити цього NFT. Спробуйте ще раз за мить.",
+    "holder": "Власник закріплення",
+    "figures": {
+      "deposits": "Депозити",
+      "distributed": "Нараховано",
+      "unretrieved": "Не забрано",
+      "unretrievedCaption": "Забирається під час відкріплення"
+    },
     "details": {
       "anchorTitle": "Закріплення",
       "releaseTitle": "Відкріплення",
-      "anchoredDatetime": "Дата й час закріплення",
-      "releasedDatetime": "Дата й час відкріплення",
-      "anchoredNfts": "Кількість закріплених NFT",
-      "distribution": "Надходження"
+      "anchoredDatetime": "Закріплено",
+      "releasedDatetime": "Відкріплено",
+      "anchoredNfts": "Закріплено в колекції",
+      "distribution": "Забрано",
+      "action": "Дія закріплення",
+      "stillAnchored": "Досі закріплено: ETH забирається під час відкріплення.",
+      "show": "Показати закріплення",
+      "hide": "Сховати закріплення"
     },
     "columns": {
-      "details": "Деталі",
-      "depositDatetime": "Дата депозиту",
+      "depositDatetime": "Внесено",
       "cycle": "Цикл",
       "depositId": "ID депозиту",
-      "retrieved": "Забрано?",
+      "retrieved": "Забрано",
       "distributionEth": "Надходження (ETH)"
+    },
+    "empty": {
+      "title": "Надходжень за закріплення для цього NFT ще немає",
+      "description": "Депозит з’являється тут щоразу, коли завершується цикл, поки NFT закріплений.",
+      "action": "Переглянути надходження за закріплення"
     }
   },
   "tables": {
-    "availableTokens": {
-      "empty": "Немає доступних токенів.",
-      "selection": {
-        "all": "Вибрати все",
-        "currentPage": "Вибрати сторінку",
-        "none": "Зняти вибір"
-      },
-      "columns": {
-        "imprintDatetime": "Дата закарбування",
-        "ownerAddress": "Адреса власника",
-        "tokenId": "ID токена",
-        "tokenName": "Назва токена",
-        "cycle": "Цикл",
-        "recipientAddress": "Адреса отримувача"
-      },
-      "actions": {
-        "anchor": "Закріпити",
-        "anchoring": "Закріплення…",
-        "anchorMany": "Закріпити вибрані"
-      },
-      "aria": {
-        "actions": "Дії"
-      }
-    },
     "globalAnchorActions": {
+      "label": "Дії закріплення та відкріплення",
       "headers": {
         "anchorDatetime": {
-          "desktop": "Дата закріплення",
+          "desktop": "Дата",
           "mobile": "Дата",
           "tooltip": "Час, коли дію закріплення чи відкріплення було проіндексовано."
         },
         "actionType": {
-          "desktop": "Тип дії",
+          "desktop": "Дія",
           "mobile": "Тип",
           "tooltip": "Закріплення чи відкріплення NFT у цьому рядку."
         },
         "tokenId": {
-          "desktop": "ID токена",
-          "mobile": "Токен",
+          "desktop": "NFT",
+          "mobile": "NFT",
           "tooltip": "Токен, задіяний у дії закріплення чи відкріплення."
         },
         "holderAddress": {
-          "desktop": "Адреса власника",
+          "desktop": "Власник закріплення",
           "mobile": "Власник",
           "tooltip": "Адреса гаманця, який закріпив або відкріпив токени."
         },
         "nftCount": {
-          "desktop": "Кількість NFT",
+          "desktop": "Закріплено всього",
           "mobile": "NFT",
           "tooltip": "Кількість закріплених NFT після цієї дії."
         }
       }
     },
-    "retrievedDistributions": {
-      "columns": {
-        "depositDatetime": "Дата депозиту",
-        "depositId": "ID депозиту",
-        "cycle": "Цикл",
-        "depositAmountEth": "Сума депозиту (ETH)",
-        "retrievedAmountEth": "Забрано (ETH)"
-      }
-    },
-    "unretrievedDistributions": {
-      "columns": {
-        "depositDatetime": "Дата депозиту",
-        "depositId": "ID депозиту",
-        "anchoredTokens": "Закріплені токени (ви / всього)",
-        "unretrievedTokens": "Незабрані токени",
-        "depositAmountEth": "Сума депозиту (ETH)",
-        "distributionAmountEth": "Сума надходження (ETH)",
-        "unretrievedAmountEth": "Не забрано (ETH)"
-      },
-      "summary": "Ваші надходження, які можна забрати: {amount} ETH",
-      "releaseAll": "Відкріпити та забрати все",
-      "dialog": {
-        "title": "Відкріпити токени та забрати надходження",
-        "description": "Ця дія <strong>відкріпить усі ваші закріплені Cosmic Signature NFT</strong> і перекаже <amountStrong>{amount} ETH</amountStrong> накопичених надходжень у ваш гаманець.",
-        "warning": "<strong>Незворотна дія:</strong> після відкріплення ці Cosmic Signature NFT більше не можна буде закріпити. Продовжуйте лише тоді, коли вирішили остаточно припинити закріплення цих NFT.",
-        "confirm": "Відкріпити й забрати"
-      }
-    },
-    "distributionsByDeposit": {
-      "columns": {
-        "depositDatetime": "Дата депозиту",
-        "depositCycle": "Цикл депозиту",
-        "depositId": "ID депозиту",
-        "totalDepositAmount": "Сума депозиту",
-        "totalRetrievedAmount": "Забрано всього",
-        "yourRetrievableAmount": "Ви можете забрати",
-        "fullyRetrieved": "Забрано повністю?",
-        "totalAnchoredNfts": "Усього закріплених NFT",
-        "totalRetrievedTokens": "Забрані токени",
-        "yourAnchoredTokens": "Ваші закріплені токени"
-      }
-    },
-    "globalDistributions": {
-      "cycleDetails": "Надходження за закріплення в ETH — цикл {cycle}",
-      "columns": {
-        "depositDatetime": "Дата депозиту",
-        "cycle": "Цикл",
-        "totalAnchoredTokens": "Закріплені токени",
-        "totalDepositedEth": "Усього внесено (ETH)",
-        "fullyRetrieved": "Забрано повністю?",
-        "pendingEth": "Не забрано (ETH)"
-      }
-    },
-    "randomWalkImprints": {
-      "columns": {
-        "datetime": "Дата й час",
-        "recipient": "Отримувач",
-        "cycle": "Цикл",
-        "tokenId": "ID токена"
-      }
-    },
-    "tokenDistributions": {
-      "columns": {
-        "tokenId": "ID токена",
-        "retrievedEth": "Забрані надходження (ETH)",
-        "retrievableEth": "Можна забрати (ETH)"
-      }
-    },
-    "anchorActions": {
-      "columns": {
-        "datetime": "Дата дії",
-        "type": "Тип дії",
-        "tokenId": "ID токена",
-        "nftCount": "Кількість NFT"
-      }
-    },
-    "anchoredTokens": {
-      "selection": {
-        "all": "Вибрати все",
-        "currentPage": "Вибрати сторінку",
-        "none": "Зняти вибір"
-      },
-      "columns": {
-        "image": "Зображення",
-        "tokenId": "ID токена",
-        "actionId": "ID дії закріплення",
-        "datetime": "Дата закріплення",
-        "accumulatedDistributions": "Накопичені надходження"
-      }
-    },
     "globalAnchoredTokens": {
+      "label": "Закріплені NFT",
       "headers": {
+        "tokenId": {
+          "desktop": "NFT",
+          "mobile": "NFT",
+          "tooltip": "Ідентифікатор закріпленого токена."
+        },
         "anchorDatetime": {
-          "desktop": "Дата закріплення",
+          "desktop": "Закріплено",
           "mobile": "Дата",
           "tooltip": "Час, коли токен було закріплено."
         },
         "actionId": {
-          "desktop": "ID дії",
+          "desktop": "Дія закріплення",
           "mobile": "Дія",
           "tooltip": "Запис дії закріплення, пов’язаний із цим токеном."
         },
-        "tokenId": {
-          "desktop": "ID токена",
-          "mobile": "Токен",
-          "tooltip": "Ідентифікатор закріпленого токена."
-        },
         "holderAddress": {
-          "desktop": "Адреса власника",
+          "desktop": "Власник закріплення",
           "mobile": "Власник",
           "tooltip": "Адреса гаманця, який закріпив або відкріпив токени."
         }
+      }
+    },
+    "globalDistributions": {
+      "label": "Надходження за закріплення в ETH за циклами",
+      "showRecipients": "Показати отримувачів",
+      "hideRecipients": "Сховати отримувачів",
+      "recipientsError": "Не вдалося завантажити власників закріплень цього циклу.",
+      "columns": {
+        "cycle": "Цикл",
+        "depositDatetime": "Внесено",
+        "totalAnchoredTokens": "Закріплені NFT",
+        "totalDepositedEth": "Внесено (ETH)",
+        "pendingEth": "Не забрано (ETH)",
+        "fullyRetrieved": "Забрано повністю"
+      }
+    },
+    "randomWalkImprints": {
+      "label": "Закарбування зоряного відбору закріплених NFT",
+      "columns": {
+        "tokenId": "Закарбований NFT",
+        "recipient": "Отримувач",
+        "cycle": "Цикл",
+        "datetime": "Дата"
+      }
+    },
+    "anchorActions": {
+      "label": "Історія закріплень і відкріплень",
+      "columns": {
+        "datetime": "Дата",
+        "type": "Дія",
+        "tokenId": "NFT",
+        "nftCount": "Закріплено всього"
+      }
+    },
+    "tokenDistributions": {
+      "label": "Надходження за закріплення за NFT",
+      "columns": {
+        "tokenId": "NFT",
+        "retrievedEth": "Забрано (ETH)",
+        "retrievableEth": "Можна забрати (ETH)"
+      }
+    },
+    "retrievedDistributions": {
+      "label": "Забрані надходження за закріплення",
+      "columns": {
+        "depositDatetime": "Внесено",
+        "depositId": "ID депозиту",
+        "cycle": "Цикл",
+        "depositAmountEth": "Депозит (ETH)",
+        "retrievedAmountEth": "Забрано (ETH)"
+      }
+    },
+    "unretrievedDistributions": {
+      "label": "Незабрані надходження за закріплення",
+      "error": "Не вдалося завантажити незабрані надходження за закріплення. Спробуйте ще раз за мить.",
+      "anchoredOfTotal": "{count, number} / {total, number}",
+      "summary": "Ваші незабрані надходження за закріплення",
+      "releaseAll": "Відкріпити все й забрати",
+      "columns": {
+        "depositDatetime": "Внесено",
+        "depositId": "ID депозиту",
+        "anchoredTokens": "Закріплені NFT (ця адреса / усі)",
+        "unretrievedTokens": "Незабрані NFT",
+        "depositAmountEth": "Депозит (ETH)",
+        "distributionAmountEth": "Сума надходження (ETH)",
+        "unretrievedAmountEth": "Не забрано (ETH)"
+      }
+    },
+    "distributionsByDeposit": {
+      "label": "Надходження за закріплення за депозитами",
+      "columns": {
+        "depositDatetime": "Внесено",
+        "depositCycle": "Цикл",
+        "depositId": "ID депозиту",
+        "totalDepositAmount": "Депозит (ETH)",
+        "totalRetrievedAmount": "Забрано всіма (ETH)",
+        "yourRetrievableAmount": "Ця адреса може забрати (ETH)",
+        "fullyRetrieved": "Забрано повністю",
+        "totalAnchoredNfts": "Закріплені NFT",
+        "totalRetrievedTokens": "Забрані NFT",
+        "yourAnchoredTokens": "Закріплено цією адресою"
       }
     }
   },
   "panels": {
     "shared": {
-      "anchoredTokens": "Закріплені токени",
+      "anchoredTokens": "Закріплені",
       "available": "Доступні для закріплення",
       "history": "Історія закріплень і відкріплень",
-      "historyTooltip": "Хронологічний запис усіх ваших транзакцій закріплення та відкріплення."
+      "historyDescription": "Кожне закріплення та відкріплення з цього гаманця. Відкрийте будь-яке, щоб побачити запис.",
+      "anchoredEmpty": {
+        "title": "Ще нічого не закріплено",
+        "description": "Виберіть NFT у розділі «Доступні для закріплення», щоб почати."
+      }
     },
     "cosmicSignature": {
-      "anchoredTooltip": "Cosmic Signature NFT, які ви закріпили зараз. Ви отримуєте надходження за закріплення в ETH пропорційно до кількості закріплених Cosmic Signature NFT.",
-      "availableTooltip": "Cosmic Signature NFT у вашому гаманці, які можна закріпити, щоб почати отримувати надходження за закріплення в ETH.",
-      "distributions": "Надходження за закріплення",
-      "distributionsTooltip": "Надходження за закріплення в ETH, нараховані на кожен закріплений Cosmic Signature NFT. Незабрані надходження можна забрати, відкріпивши NFT."
+      "anchoredDescription": "Ці NFT ділять надходження за закріплення в ETH кожного циклу. Відкріплення повертає NFT разом з ETH і назавжди завершує його закріплення.",
+      "availableDescription": "Cosmic Signature NFT у вашому гаманці, які ще ніколи не закріплювали.",
+      "availableEmpty": {
+        "title": "Немає Cosmic Signature NFT для закріплення",
+        "description": "Тут з’являться Cosmic Signature NFT з вашого гаманця. Кожен NFT можна закріпити лише раз.",
+        "action": "Переглянути галерею"
+      },
+      "distributions": "Надходження за закріплення за NFT",
+      "distributionsDescription": "Скільки кожен закріплений вами NFT уже забрав і скільки ще можна забрати. Відкрийте будь-який, щоб побачити всі депозити."
     },
     "randomWalk": {
-      "anchoredTooltip": "RandomWalk NFT, які ви закріпили зараз. Кожен закріплений RandomWalk NFT бере участь у випадковому відборі ончейн у межах зоряного відбору закріплених NFT.",
-      "availableTooltip": "RandomWalk NFT у вашому гаманці, які можна закріпити для участі в зоряному відборі закріплених NFT — без надходжень за закріплення в ETH.",
-      "selection": "Зоряний відбір закріплених NFT",
-      "selectionTooltip": "Cosmic Signature NFT і супутні CST, закарбовані, коли цей гаманець обрано в зоряному відборі закріплених NFT через ончейн-механізм випадкового відбору."
-    }
-  },
-  "lifecycle": {
-    "ariaLabel": "Життєвий цикл закріплення",
-    "stages": {
-      "anchor": {
-        "label": "Закріплення",
-        "description": "NFT внесено в протокол"
+      "anchoredDescription": "Ці NFT беруть участь у зоряному відборі кожного циклу. Відкріплення повертає NFT і назавжди завершує його закріплення.",
+      "availableDescription": "Random Walk NFT у вашому гаманці, які ще ніколи не закріплювали.",
+      "availableEmpty": {
+        "title": "Немає Random Walk NFT для закріплення",
+        "description": "Тут з’являться Random Walk NFT з вашого гаманця, які ще ніколи не закріплювали."
       },
-      "active": {
-        "label": "Активне",
-        "description": "Отримує надходження кожного циклу"
-      },
-      "retrievable": {
-        "label": "Можна забрати",
-        "description": "Надходження доступні"
-      },
-      "retrieved": {
-        "label": "Забрано",
-        "description": "Повернуто у ваш гаманець"
-      }
+      "selection": "Закарбування зоряного відбору",
+      "selectionDescription": "Cosmic Signature NFT і CST, закарбовані цьому гаманцю, коли обирали його закріплені Random Walk NFT.",
+      "selectionEmpty": "Обрань ще не було"
     }
   }
 }

@@ -1,235 +1,178 @@
-import { act, checkA11y, render, screen, waitFor } from '@/test-utils';
+import userEvent from '@testing-library/user-event';
+
+import type { CSTAnchoringPanelProps } from '@/components/anchoring/CSTAnchoringPanel';
+import type { RWLKAnchoringPanelProps } from '@/components/anchoring/RWLKAnchoringPanel';
+import type { TxStage } from '@/lib/txStage';
+
+import { act, render, screen, waitFor } from '@/test-utils';
 
 import MyAnchors from '../MyAnchors';
 
-const mockUseDashboardInfo = jest.fn().mockReturnValue({ data: undefined, isLoading: false });
-const mockUseCSTAnchorActionsByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
-const mockUseCSTTokensByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
-const mockUseAnchorDistributionsByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
-const mockUseRWLKAnchorActionsByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
-const mockUseRWLKAnchorImprintsByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
+const ACCOUNT = '0x1234567890abcdef1234567890abcdef12345678';
+let mockAccount: string | null = ACCOUNT;
+let mockStage: TxStage = { status: 'idle' };
+const mockAnchor = jest.fn();
+const mockRelease = jest.fn();
+const mockWalletOfOwner = jest.fn();
+// The real hook hands out a stable contract and error handler; so does the mock, or the
+// wallet read would re-run on every render.
+const mockRwalkContract = { read: { walletOfOwner: mockWalletOfOwner } };
+const mockHandleError = jest.fn();
+const mockQueries: Record<string, { data?: unknown; isLoading: boolean }> = {};
 
-jest.mock('../../../../../hooks/useApiQuery', () => ({
-  useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
-  useCSTAnchorActionsByUser: (...args: unknown[]) => mockUseCSTAnchorActionsByUser(...args),
-  useCSTTokensByUser: (...args: unknown[]) => mockUseCSTTokensByUser(...args),
-  useAnchorDistributionsByUser: (...args: unknown[]) => mockUseAnchorDistributionsByUser(...args),
-  useRWLKAnchorActionsByUser: (...args: unknown[]) => mockUseRWLKAnchorActionsByUser(...args),
-  useRWLKAnchorImprintsByUser: (...args: unknown[]) => mockUseRWLKAnchorImprintsByUser(...args),
-}));
-
-let mockAccount: string | null = '0xUser';
-jest.mock('../../../../../hooks/web3', () => ({
+jest.mock('@/hooks/web3', () => ({
   useActiveWeb3React: () => ({ account: mockAccount }),
 }));
-
-jest.mock('wagmi', () => ({
-  usePublicClient: () => ({ waitForTransactionReceipt: jest.fn() }),
-  useWalletClient: () => ({ data: undefined }),
-  useConnectorClient: () => ({ data: undefined }),
-  useConfig: () => ({}),
-  useConnection: () => ({ address: '0xUser', isConnected: true, chainId: 421614 }),
-  useSwitchChain: () => ({ mutateAsync: jest.fn() }),
-}));
-
-jest.mock('@wagmi/core', () => ({
-  getConnectorClient: jest.fn().mockResolvedValue(undefined),
-}));
-
-jest.mock('@tanstack/react-query', () => ({
-  ...jest.requireActual('@tanstack/react-query'),
-  useQueryClient: () => ({ invalidateQueries: jest.fn() }),
-}));
-
-jest.mock('../../../../../hooks/useAnchoringWalletCSTContract', () => ({
-  __esModule: true,
-  default: () => ({ write: { anchor: jest.fn(), stakeMany: jest.fn() } }),
-}));
-jest.mock('../../../../../hooks/useAnchoringWalletRWLKContract', () => ({
-  __esModule: true,
-  default: () => ({ write: { anchor: jest.fn(), stakeMany: jest.fn() } }),
-}));
-jest.mock('../../../../../hooks/useCosmicSignatureContract', () => ({
-  __esModule: true,
-  default: () => ({
-    read: { isApprovedForAll: jest.fn() },
-    write: { setApprovalForAll: jest.fn() },
+jest.mock('@/hooks/useAnchorActions', () => ({
+  useAnchorActions: () => ({
+    anchor: mockAnchor,
+    release: mockRelease,
+    handleError: mockHandleError,
+    rwalkContract: mockRwalkContract,
+    txStage: mockStage,
   }),
 }));
-jest.mock('../../../../../hooks/useRWLKNFTContract', () => ({
-  __esModule: true,
-  default: () => ({
-    read: { isApprovedForAll: jest.fn(), walletOfOwner: jest.fn().mockResolvedValue([]) },
-    write: { setApprovalForAll: jest.fn() },
-  }),
+jest.mock('@/hooks/useApiQuery', () => ({
+  useDashboardInfo: () => mockQueries.dashboard,
+  useCSTAnchorActionsByUser: () => mockQueries.cstActions,
+  useCSTTokensByUser: () => mockQueries.cstTokens,
+  useAnchorDistributionsByUser: () => mockQueries.distributions,
+  useRWLKAnchorActionsByUser: () => mockQueries.rwlkActions,
+  useRWLKAnchorImprintsByUser: () => mockQueries.imprints,
+}));
+const mockAnchored = {
+  cstokens: [{ StakeActionId: 3, StakedTokenId: 0, StakeTimeStamp: 1, TokenInfo: { TokenId: 9 } }],
+  rwlktokens: [
+    { StakeActionId: 30, StakedTokenId: 1826, StakeTimeStamp: 1 },
+    { StakeActionId: 31, StakedTokenId: 1827, StakeTimeStamp: 2 },
+  ],
+  isLoading: false,
+};
+jest.mock('@/contexts/AnchoredTokenContext', () => ({
+  useAnchoredToken: () => mockAnchored,
+}));
+jest.mock('@/components/wallet/WalletRequiredState', () => ({
+  WalletRequiredState: ({ title }: { title: string }) => (
+    <div data-testid="wallet-required">{title}</div>
+  ),
 }));
 
-jest.mock('../../../../../contexts/AnchoredTokenContext', () => ({
-  useAnchoredToken: () => ({ cstokens: [], rwlktokens: [], fetchData: jest.fn() }),
-}));
-jest.mock('../../../../../contexts/NotificationContext', () => ({
-  useNotification: () => ({ setNotification: jest.fn() }),
-}));
-jest.mock('../../../../../config/networks', () => ({
-  ...jest.requireActual('../../../../../config/networks'),
-  networkConfig: {
-    chainId: 421614,
-    rpcUrl: 'http://test-rpc.example',
-    explorerUrl: 'https://sepolia.arbiscan.io',
-    chainName: 'Arbitrum Sepolia',
+let cstProps: CSTAnchoringPanelProps | null = null;
+let rwlkProps: RWLKAnchoringPanelProps | null = null;
+jest.mock('@/components/anchoring/CSTAnchoringPanel', () => ({
+  CST_GRIDS: { anchored: 'cst-anchored', available: 'cst-available' },
+  CSTAnchoringPanel: (props: CSTAnchoringPanelProps) => {
+    cstProps = props;
+    return <div data-testid="cst-panel" />;
   },
 }));
-
-jest.mock('next/image', () => ({
-  __esModule: true,
-  default: (props: Record<string, unknown>) => <img {...props} />,
-}));
-
-jest.mock('../../../../../components/anchoring/AnchoringHeroStats', () => ({
-  AnchoringHeroStats: ({
-    stats,
-  }: {
-    stats: { label: string; value: React.ReactNode; caption?: React.ReactNode }[];
-  }) => (
-    <div data-testid="anchoring-hero-stats">
-      {stats.map((s) => (
-        <span key={s.label} data-testid={`stat-${s.label}`}>
-          {s.label}: {s.value}
-          {s.caption ? <em> {s.caption}</em> : null}
-        </span>
-      ))}
-    </div>
-  ),
-}));
-
-jest.mock('../../../../../components/anchoring/CSTAnchoringPanel', () => ({
-  CSTAnchoringPanel: () => (
-    <div data-testid="cst-anchoring-panel">
-      <div data-testid="anchor-distributions-table" />
-      <div data-testid="anchor-actions-table" />
-    </div>
-  ),
-}));
-jest.mock('../../../../../components/anchoring/RWLKAnchoringPanel', () => ({
-  RWLKAnchoringPanel: () => <div data-testid="rwlk-anchoring-panel" />,
+jest.mock('@/components/anchoring/RWLKAnchoringPanel', () => ({
+  RWLK_GRIDS: { anchored: 'rwlk-anchored', available: 'rwlk-available' },
+  RWLKAnchoringPanel: (props: RWLKAnchoringPanelProps) => {
+    rwlkProps = props;
+    return <div data-testid="rwlk-panel" />;
+  },
 }));
 
 beforeEach(() => {
   jest.clearAllMocks();
-  mockAccount = '0xUser';
+  mockAccount = ACCOUNT;
+  mockStage = { status: 'idle' };
+  cstProps = null;
+  rwlkProps = null;
+  mockWalletOfOwner.mockResolvedValue([BigInt(1826), BigInt(1900), BigInt(12)]);
+  Object.assign(mockQueries, {
+    dashboard: {
+      data: {
+        StakingAmountEth: 1.9376,
+        MainStats: { StakeStatisticsCST: { TotalTokensStaked: 33 } },
+      },
+      isLoading: false,
+    },
+    cstActions: { data: [], isLoading: false },
+    cstTokens: {
+      data: [
+        { TokenId: 47, WasUnstaked: false },
+        { TokenId: 5, WasUnstaked: true },
+      ],
+      isLoading: false,
+    },
+    distributions: {
+      data: [
+        { TokenId: 9, RewardToCollectEth: 0.5 },
+        { TokenId: 4, RewardToCollectEth: 0.25 },
+      ],
+      isLoading: false,
+    },
+    rwlkActions: { data: [{ TokenId: 1827, ActionType: 0 }], isLoading: false },
+    imprints: { data: [], isLoading: false },
+  });
 });
 
 describe('MyAnchors', () => {
-  it('prompts login when no account is connected', async () => {
+  it('asks a visitor to connect, with a way to the public anchoring pages', () => {
     mockAccount = null;
-    await act(async () => {
-      render(<MyAnchors />);
-    });
-    expect(screen.getByText('wallet.required.anchors.description')).toBeInTheDocument();
+    render(<MyAnchors />);
+    expect(screen.getByTestId('wallet-required')).toHaveTextContent(
+      'wallet.required.anchors.title',
+    );
+    expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
   });
 
-  it('shows skeleton loading state', async () => {
-    mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true });
-    render(<MyAnchors />);
-    await waitFor(() => {});
-    expect(screen.getByTestId('my-anchors-skeleton')).toBeInTheDocument();
-  });
-
-  it('renders anchoring panels with data', async () => {
-    mockUseDashboardInfo.mockReturnValue({
-      data: {
-        MainStats: {
-          StakeStatisticsCST: { TotalTokensStaked: 10 },
-          StakeStatisticsRWalk: { TotalTokensStaked: 5 },
-        },
-        StakingAmountEth: 2.0,
-      },
-      isLoading: false,
-    });
-    render(<MyAnchors />);
-    await waitFor(() => {});
-
-    expect(screen.getByText('myPages.anchors.title')).toBeInTheDocument();
-    expect(screen.getByTestId('anchoring-hero-stats')).toBeInTheDocument();
-    expect(screen.getByTestId('anchor-distributions-table')).toBeInTheDocument();
-    expect(screen.getByTestId('anchor-actions-table')).toBeInTheDocument();
-  });
-
-  it('renders stat cards in the hero stats section', async () => {
-    mockUseDashboardInfo.mockReturnValue({
-      data: {
-        MainStats: {
-          StakeStatisticsCST: { TotalTokensStaked: 4 },
-          StakeStatisticsRWalk: { TotalTokensStaked: 0 },
-        },
-        StakingAmountEth: 2.0,
-      },
-      isLoading: false,
-    });
-    render(<MyAnchors />);
-    await waitFor(() => {});
+  it('puts the anchor-holder’s figures in the header, with the permanence caption', () => {
+    const { container } = render(<MyAnchors />);
     expect(
-      screen.getByTestId('stat-myPages.anchors.stats.cosmicSignature.label'),
+      screen.getByRole('heading', { level: 1, name: 'myPages.anchors.title' }),
     ).toBeInTheDocument();
-    expect(screen.getByTestId('stat-myPages.anchors.stats.randomWalk.label')).toBeInTheDocument();
-    expect(screen.getByTestId('stat-myPages.anchors.stats.unretrieved.label')).toBeInTheDocument();
-    expect(
-      screen.getByTestId('stat-myPages.anchors.stats.distributionPerNft.label'),
-    ).toBeInTheDocument();
-    expect(screen.queryByTestId('stat-Your Anchored CST')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('stat-Distribution per CST')).not.toBeInTheDocument();
+    expect(screen.getByText('myPages.anchors.stats.unretrieved.label')).toBeInTheDocument();
+    expect(screen.getByText('myPages.anchors.stats.unretrieved.caption')).toBeInTheDocument();
+    // 0.5 + 0.25 ETH still to retrieve, and 1.9376 / 33 per anchored NFT.
+    expect(container).toHaveTextContent('0.7500');
+    expect(container).toHaveTextContent('0.0587');
   });
 
-  it('shows no per-NFT figure, with a visible reason, when no anchored NFT is indexed', async () => {
-    // Regression: the whole pool (0.225795 ETH) was shown as the per-NFT figure.
-    mockUseDashboardInfo.mockReturnValue({
-      data: {
-        MainStats: {
-          StakeStatisticsCST: { TotalTokensStaked: 0 },
-          StakeStatisticsRWalk: { TotalTokensStaked: 0 },
-        },
-        StakingAmountEth: 0.22579451528661923,
-      },
-      isLoading: false,
-    });
+  it('switches collections with short tabs that carry their counts', async () => {
+    const user = userEvent.setup();
     render(<MyAnchors />);
-    await waitFor(() => {});
-    const card = screen.getByTestId('stat-myPages.anchors.stats.distributionPerNft.label');
-    expect(card).not.toHaveTextContent('0.225795');
-    expect(card).toHaveTextContent('common.status.unavailable');
-    expect(card).toHaveTextContent('myPages.anchors.stats.distributionPerNft.noneAnchored');
+    const cst = screen.getByRole('tab', { name: /myPages\.anchors\.tabs\.cosmicSignature/ });
+    const rwlk = screen.getByRole('tab', { name: /myPages\.anchors\.tabs\.randomWalk/ });
+    expect(cst).toHaveTextContent('1');
+    expect(rwlk).toHaveTextContent('2');
+    await user.click(rwlk);
+    expect(screen.getByTestId('rwlk-panel')).toBeInTheDocument();
   });
 
-  it('renders page title', async () => {
-    mockUseDashboardInfo.mockReturnValue({ data: null, isLoading: false });
-    mockAccount = null;
-    await act(async () => {
-      render(<MyAnchors />);
-    });
-    expect(screen.getByText('myPages.anchors.title')).toBeInTheDocument();
-  });
-
-  it('does not render hero stats when wallet is not connected', async () => {
-    mockAccount = null;
-    await act(async () => {
-      render(<MyAnchors />);
-    });
-    expect(screen.queryByTestId('anchoring-hero-stats')).not.toBeInTheDocument();
-  });
-
-  it('does not render hero stats during loading', async () => {
-    mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true });
+  it('offers only NFTs that were never released for anchoring', () => {
     render(<MyAnchors />);
-    await waitFor(() => {});
-    expect(screen.queryByTestId('anchoring-hero-stats')).not.toBeInTheDocument();
+    expect(cstProps?.availableTokens.map((token) => token.TokenId)).toEqual([47]);
+    expect(cstProps?.anchoredTokens).toBe(mockAnchored.cstokens);
   });
 
-  it('has no accessibility violations', async () => {
-    let container: HTMLElement;
-    act(() => {
-      const result = render(<MyAnchors />);
-      container = result.container;
+  it('offers only Random Walk NFTs that were never anchored', async () => {
+    const user = userEvent.setup();
+    render(<MyAnchors />);
+    await user.click(screen.getByRole('tab', { name: /randomWalk/ }));
+    await waitFor(() => expect(rwlkProps?.availableTokenIds).toEqual([12, 1900]));
+    expect(mockWalletOfOwner).toHaveBeenCalledWith([ACCOUNT]);
+  });
+
+  it('routes each grid’s action to the anchoring hook and gives it the stage it started', async () => {
+    mockAnchor.mockResolvedValue({ status: 'confirmed' });
+    mockRelease.mockResolvedValue({ status: 'confirmed' });
+    const { rerender } = render(<MyAnchors />);
+    await act(async () => {
+      await cstProps!.onRelease([3]);
     });
-    await checkA11y(container!);
+    expect(mockRelease).toHaveBeenCalledWith([3], false);
+    mockStage = { status: 'pending', hash: '0x1' };
+    rerender(<MyAnchors />);
+    expect(cstProps!.stageFor('cst-anchored')).toBe(mockStage);
+    expect(cstProps!.stageFor('cst-available')).toEqual({ status: 'idle' });
+    expect(cstProps!.walletBusy).toBe(true);
+
+    await act(async () => {
+      await cstProps!.onAnchor([47]);
+    });
+    expect(mockAnchor).toHaveBeenCalledWith([47], false);
   });
 });

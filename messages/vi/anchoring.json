@@ -1,88 +1,133 @@
 {
   "common": {
-    "loading": "Đang tải…",
-    "processing": "Đang xử lý…",
-    "releasing": "Đang gỡ neo…",
     "anchor": "Neo giữ",
     "release": "Gỡ neo",
     "yes": "Có",
     "no": "Không",
     "empty": {
-      "actions": "Chưa có thao tác nào.",
-      "distributions": "Chưa có phân phối nào.",
-      "allocations": "Chưa có phân bổ nào.",
-      "tokens": "Chưa có token nào."
-    },
-    "actions": {
-      "releaseMany": "Gỡ neo đã chọn",
-      "cancel": "Hủy"
-    },
-    "aria": {
-      "expandRow": "mở rộng hàng",
-      "actions": "Thao tác"
+      "actions": {
+        "title": "Chưa có thao tác neo giữ nào",
+        "description": "Các lần neo giữ và gỡ neo sẽ hiện ở đây sau khi được ghi nhận trên chuỗi."
+      },
+      "distributions": {
+        "title": "Chưa có phân phối neo giữ nào",
+        "description": "Mỗi lần một chu kỳ hoàn tất trong lúc có Cosmic Signature NFT đang neo giữ, một khoản nạp sẽ xuất hiện ở đây."
+      },
+      "retrieved": {
+        "title": "Chưa nhận về khoản nào",
+        "description": "Các phân phối neo giữ đã nhận về khi gỡ neo sẽ hiện ở đây."
+      },
+      "unretrieved": {
+        "title": "Không có phân phối neo giữ chưa nhận về",
+        "description": "Mọi khoản nạp phân phối neo giữ mà địa chỉ này tham gia đều đã được nhận về."
+      },
+      "imprints": {
+        "title": "Chưa có lượt khắc nào từ Tinh tuyển",
+        "description": "Khi một Random Walk NFT đang neo giữ được chọn lúc chu kỳ hoàn tất, lượt khắc tương ứng sẽ hiện ở đây."
+      },
+      "tokens": {
+        "title": "Hiện không có NFT nào đang neo giữ",
+        "description": "NFT sẽ hiện ở đây trong thời gian được neo giữ."
+      }
     }
+  },
+  "art": {
+    "unavailable": "Tác phẩm không khả dụng",
+    "signatureTitle": "Cosmic Signature {id}",
+    "randomWalkTitle": "Random Walk {id}"
+  },
+  "status": {
+    "anchored": "Đang neo giữ",
+    "released": "Đã gỡ neo"
   },
   "overview": {
-    "errorTitle": "Lỗi khi tải dữ liệu neo giữ",
-    "errorMessage": "Không tải được dữ liệu neo giữ. Vui lòng thử lại sau.",
+    "errorTitle": "Không tải được sổ ghi này",
+    "errorMessage": "Dữ liệu neo giữ tạm thời không khả dụng. Hãy thử lại sau giây lát.",
     "title": "Phân phối neo giữ",
-    "subtitle": "Tổng quan hoạt động neo giữ trong giao thức và lịch sử phân phối",
-    "intro": {
-      "description": "Neo giữ Cosmic Signature NFT để nhận phần tương ứng trong {percentage}% dự trữ dành cho phân phối neo giữ bằng ETH mỗi chu kỳ. Neo giữ RandomWalk NFT để thuộc diện Tinh tuyển NFT neo giữ.",
-      "flow": "Luồng neo giữ {percentage}%"
-    },
-    "stats": {
-      "pool": {
-        "label": "Quỹ phân phối neo giữ",
-        "tooltip": "Tổng ETH hiện được phân bổ vào quỹ phân phối neo giữ, phân phối theo tỷ lệ cho những người neo giữ Cosmic Signature NFT mỗi chu kỳ.",
-        "caption": "Được nạp cho các Cosmic Signature NFT đang neo giữ khi chu kỳ này hoàn tất."
-      },
-      "cosmicSignatureAnchored": {
-        "label": "Cosmic Signature NFT đang neo giữ",
-        "tooltip": "Tổng số Cosmic Signature NFT đang neo giữ trong toàn giao thức."
-      },
-      "randomWalkAnchored": {
-        "label": "RWLK NFT đang neo giữ",
-        "tooltip": "Tổng số RandomWalk NFT hiện đang neo giữ. RandomWalk NFT đang neo giữ thuộc diện Tinh tuyển NFT neo giữ thông qua lựa chọn ngẫu nhiên trên chuỗi."
-      },
-      "distributionPerNft": {
-        "label": "Phân phối mỗi NFT",
-        "tooltip": "ETH phân phối neo giữ cho mỗi Cosmic Signature NFT: số dư quỹ trên chuỗi chia cho tổng số NFT đang neo giữ đã được ghi nhận.",
-        "noneAnchored": "Chưa lập chỉ mục Cosmic Signature NFT nào đang neo giữ"
-      },
-      "activeHolders": {
-        "label": "Người neo giữ đang hoạt động",
-        "tooltip": "Số ví khác nhau hiện neo giữ ít nhất một Cosmic Signature NFT hoặc RandomWalk NFT. Ví neo giữ cả hai loại chỉ được tính một lần."
-      }
-    },
-    "cta": {
-      "title": "Bắt đầu neo giữ",
-      "description": "Neo giữ Cosmic Signature NFT của bạn để nhận một phần quỹ phân phối neo giữ của mỗi chu kỳ."
-    },
-    "sections": {
-      "cosmicSignature": "Cosmic Signature NFT",
-      "randomWalk": "RandomWalk NFT"
+    "subtitle": "Hoạt động neo giữ trên toàn giao thức và lịch sử của mọi phân phối neo giữ.",
+    "start": "Bắt đầu neo giữ",
+    "howItWorks": {
+      "title": "Neo giữ hoạt động như thế nào",
+      "description": "Khi được neo giữ, NFT tham gia mọi chu kỳ cho đến khi bạn gỡ neo."
     }
   },
-  "howItWorks": {
-    "title": "Neo giữ hoạt động như thế nào",
-    "intro": "Mới làm quen với neo giữ? Mở rộng bất kỳ mục nào bên dưới để tìm hiểu thêm.",
+  "steps": {
+    "anchor": {
+      "title": "Neo giữ NFT của bạn",
+      "body": "Trong <link>Neo giữ của tôi</link>, hãy chọn Cosmic Signature NFT hoặc Random Walk NFT trong ví. Lần đầu, ví sẽ yêu cầu bạn cấp quyền cho hợp đồng neo giữ của bộ sưu tập đó, sau đó mới xác nhận neo giữ."
+    },
+    "receive": {
+      "title": "Nhận mỗi chu kỳ",
+      "body": "Các Cosmic Signature NFT đang neo giữ cùng chia {percentage}% Dự trữ chu kỳ của mỗi chu kỳ bằng ETH. Các Random Walk NFT đang neo giữ tham gia một đợt Tinh tuyển chọn ra {selections} NFT trong số đó mỗi chu kỳ."
+    },
+    "release": {
+      "title": "Gỡ neo để nhận về",
+      "body": "Gỡ neo đưa NFT về ví của bạn cùng số ETH đã tích lũy. Việc này không thể hoàn tác: mỗi NFT chỉ có thể neo giữ một lần."
+    }
+  },
+  "flow": {
+    "caption": "Cách mỗi chu kỳ đến với các NFT đang neo giữ, kèm số liệu hiện tại",
+    "unavailable": "Không khả dụng",
+    "dividedBy": "chia cho",
+    "equals": "bằng",
+    "then": "tiếp theo",
+    "cosmicSignature": {
+      "title": "Cosmic Signature NFT cùng chia ETH",
+      "pool": {
+        "label": "Quỹ phân phối neo giữ",
+        "definition": "Lượng ETH mà chu kỳ này dành cho các Cosmic Signature NFT đang neo giữ. Khoản này được nạp khi chu kỳ hoàn tất và chia theo tỷ lệ số NFT mỗi người neo giữ đã neo.",
+        "caption": "{percentage}% Dự trữ chu kỳ của chu kỳ này, nạp khi hoàn tất"
+      },
+      "anchored": {
+        "label": "Cosmic Signature NFT đang neo giữ",
+        "definition": "Số Cosmic Signature NFT đang được neo giữ, tính trên mọi người neo giữ."
+      },
+      "perNft": {
+        "label": "Mỗi NFT đang neo giữ",
+        "definition": "Quỹ chia cho số Cosmic Signature NFT đang neo giữ mà bộ lập chỉ mục ghi nhận: mỗi NFT sẽ nhận được bao nhiêu nếu chu kỳ hoàn tất ngay bây giờ.",
+        "caption": "Nếu chu kỳ hoàn tất ngay bây giờ",
+        "noneAnchored": "Chưa lập chỉ mục được Cosmic Signature NFT nào đang neo giữ"
+      }
+    },
+    "randomWalk": {
+      "title": "Random Walk NFT tham gia Tinh tuyển",
+      "anchored": {
+        "label": "Random Walk NFT đang neo giữ",
+        "definition": "Các Random Walk NFT đang được neo giữ. Mỗi NFT tham gia Tinh tuyển NFT neo giữ ở mỗi lần hoàn tất."
+      },
+      "selections": {
+        "label": "Lượt Tinh tuyển mỗi chu kỳ",
+        "caption": "Chọn trên chuỗi; một NFT có thể được chọn nhiều lần"
+      },
+      "allocation": {
+        "label": "Mỗi lượt được chọn nhận",
+        "caption": "và một Cosmic Signature NFT vừa được khắc"
+      }
+    },
+    "holders": {
+      "label": "Người neo giữ đang hoạt động",
+      "definition": "Số ví khác nhau đang neo giữ ít nhất một Cosmic Signature NFT hoặc Random Walk NFT. Ví neo giữ cả hai loại chỉ được tính một lần."
+    }
+  },
+  "questions": {
+    "title": "Câu hỏi về neo giữ",
+    "description": "Điều gì xảy ra với NFT đang neo giữ, và gỡ neo có ý nghĩa gì.",
     "items": {
       "whatIsAnchoring": {
         "question": "Neo giữ là gì?",
-        "answer": "Neo giữ cho phép bạn dành riêng NFT cho giao thức. Neo giữ Cosmic Signature NFT nhận phân phối neo giữ bằng ETH, còn neo giữ RandomWalk NFT thì thuộc diện Tinh tuyển NFT neo giữ. Bạn có thể gỡ neo bất cứ lúc nào để NFT trở về ví của bạn; gỡ neo Cosmic Signature NFT cũng nhận về các khoản phân phối ETH đã tích lũy. Lưu ý quan trọng: mỗi NFT chỉ được neo giữ đúng một lần — sau khi gỡ neo, NFT đó không bao giờ có thể neo giữ lại."
+        "answer": "Neo giữ cho phép bạn dành riêng NFT cho giao thức. Neo giữ Cosmic Signature NFT nhận phân phối neo giữ bằng ETH, còn neo giữ Random Walk NFT thì thuộc diện Tinh tuyển NFT neo giữ. Bạn có thể gỡ neo bất cứ lúc nào để NFT trở về ví của bạn; gỡ neo Cosmic Signature NFT cũng nhận về các khoản phân phối ETH đã tích lũy. Lưu ý quan trọng: mỗi NFT chỉ được neo giữ đúng một lần — sau khi gỡ neo, NFT đó không bao giờ có thể neo giữ lại."
       },
       "cosmicSignature": {
-        "question": "Neo giữ Cosmic Signature NFT",
+        "question": "Neo giữ Cosmic Signature NFT hoạt động thế nào?",
         "answer": "Neo giữ Cosmic Signature NFT của bạn để nhận ETH từ quỹ phân phối neo giữ. Mỗi chu kỳ, 6% Dự trữ chu kỳ được phân phối theo tỷ lệ cho mọi người neo giữ Cosmic Signature NFT dựa trên số NFT họ đã neo giữ. Các khoản phân phối tích lũy tự động và được chi trả khi bạn gỡ neo. Nếu không có Cosmic Signature NFT nào đang neo giữ khi một chu kỳ hoàn tất, phần của chu kỳ đó ở lại trong Dự trữ chu kỳ."
       },
       "randomWalk": {
-        "question": "Neo giữ RandomWalk (RWLK)",
-        "answer": "Neo giữ RandomWalk NFT của bạn để tham gia Tinh tuyển NFT neo giữ. Mỗi chu kỳ, mười lượt chọn được thực hiện trong số các RandomWalk NFT đang neo giữ thông qua lựa chọn ngẫu nhiên trên chuỗi; mỗi lượt chọn nhận 1.000 CST và một Cosmic Signature NFT mới khắc. Các lượt chọn có hoàn lại, nên cùng một người neo giữ có thể được chọn nhiều lần. Neo giữ RandomWalk không nhận ETH."
+        "question": "Neo giữ Random Walk NFT hoạt động thế nào?",
+        "answer": "Neo giữ Random Walk NFT của bạn để tham gia Tinh tuyển NFT neo giữ. Mỗi chu kỳ, mười lượt chọn được thực hiện trong số các Random Walk NFT đang neo giữ thông qua lựa chọn ngẫu nhiên trên chuỗi; mỗi lượt chọn nhận 1.000 CST và một Cosmic Signature NFT mới khắc. Các lượt chọn có hoàn lại, nên cùng một người neo giữ có thể được chọn nhiều lần. Neo giữ Random Walk không nhận ETH."
       },
       "calculation": {
         "question": "Phân phối được tính như thế nào?",
-        "answer": "Phân phối neo giữ Cosmic Signature NFT tính theo tỷ lệ: nếu bạn neo giữ một phần mười tổng số Cosmic Signature NFT đang neo giữ, bạn nhận một phần mười của mỗi đợt nạp phân phối ETH. Neo giữ RandomWalk NFT dùng cơ chế lựa chọn ngẫu nhiên trên chuỗi cho Tinh tuyển NFT neo giữ, nên neo giữ thêm RandomWalk NFT làm tăng cơ hội được chọn thay vì tăng phần phân phối ETH."
+        "answer": "Phân phối neo giữ Cosmic Signature NFT tính theo tỷ lệ: nếu bạn neo giữ một phần mười tổng số Cosmic Signature NFT đang neo giữ, bạn nhận một phần mười của mỗi đợt nạp phân phối ETH. Neo giữ Random Walk NFT dùng cơ chế lựa chọn ngẫu nhiên trên chuỗi cho Tinh tuyển NFT neo giữ, nên neo giữ thêm Random Walk NFT làm tăng cơ hội được chọn thay vì tăng phần phân phối ETH."
       },
       "anchorOnce": {
         "question": "Tôi có thể neo giữ lại một NFT sau khi gỡ neo không?",
@@ -90,266 +135,305 @@
       }
     }
   },
+  "ledgers": {
+    "distributions": {
+      "title": "Phân phối neo giữ bằng ETH",
+      "description": "Mỗi chu kỳ đã hoàn tất nạp {percentage}% Dự trữ chu kỳ của nó cho các Cosmic Signature NFT đang neo giữ. Mở một chu kỳ để xem phần của từng người neo giữ."
+    },
+    "imprints": {
+      "title": "Lượt khắc từ Tinh tuyển NFT neo giữ",
+      "description": "Mỗi chu kỳ chọn ra {count} Random Walk NFT đang neo giữ. Mỗi lượt được chọn khắc một Cosmic Signature NFT và {cst, number} CST cho người neo giữ."
+    }
+  },
+  "picker": {
+    "selectAll": "Chọn tất cả ({count, number})",
+    "clearSelection": "Bỏ chọn",
+    "clear": "Xóa",
+    "selected": "{count, plural, other {Đã chọn #}}",
+    "selectionLabel": "Lựa chọn: {title}",
+    "anchorSelected": "{count, plural, other {Neo giữ # NFT}}",
+    "releaseSelected": "{count, plural, other {Gỡ neo # NFT}}",
+    "approvalNote": "Lần đầu, ví sẽ hỏi hai lần: trước tiên cho phép hợp đồng neo giữ giữ các NFT của bộ sưu tập này, sau đó xác nhận neo giữ.",
+    "releaseNote": "Gỡ neo không thể hoàn tác. Bạn sẽ xác nhận ở màn hình tiếp theo trước khi ví mở ra.",
+    "anchoredOn": "Neo giữ {date}",
+    "accrued": "Đã tích lũy {amount}",
+    "cycle": "Chu kỳ {cycle}",
+    "open": "Mở {title}",
+    "opensNewTab": "(mở trong thẻ mới)",
+    "settled": {
+      "anchored": "Đã neo giữ · đang cập nhật",
+      "released": "Đã gỡ neo · đang cập nhật"
+    }
+  },
+  "release": {
+    "title": "{count, plural, other {Gỡ neo # NFT?}}",
+    "description": {
+      "cosmicSignature": "{count, plural, other {Gỡ neo sẽ đưa # NFT đã chọn về ví của bạn và nhận về các phân phối neo giữ bằng ETH mà chúng đã tích lũy.}}",
+      "randomWalk": "{count, plural, other {Gỡ neo sẽ đưa # NFT đã chọn về ví của bạn. Chúng sẽ rời khỏi Tinh tuyển NFT neo giữ.}}"
+    },
+    "tokensLabel": "NFT sẽ gỡ neo",
+    "more": "{count, plural, other {và # NFT khác}}",
+    "eth": {
+      "label": "ETH bạn nhận về",
+      "approximately": "Khoảng",
+      "unknown": "Không khả dụng",
+      "note": "Ước tính từ các khoản nạp đã lập chỉ mục. Hợp đồng sẽ chi trả số chính xác."
+    },
+    "warning": {
+      "title": "Không thể hoàn tác.",
+      "body": "NFT đã gỡ neo sẽ không bao giờ được neo giữ lại."
+    },
+    "keep": "Tiếp tục neo giữ",
+    "confirm": "{count, plural, other {Gỡ neo # NFT}}"
+  },
   "anchorActionDetail": {
     "subtitle": "Thao tác neo giữ cho {token} NFT",
-    "error": "Không tải được chi tiết thao tác neo giữ. Vui lòng thử lại sau.",
+    "errorTitle": "Không tải được thao tác neo giữ này",
+    "error": "Dữ liệu neo giữ tạm thời không khả dụng. Hãy thử lại sau giây lát.",
     "breadcrumbs": {
       "action": "Thao tác #{id}"
     },
-    "empty": "Không tìm thấy dữ liệu cho thao tác neo giữ này.",
+    "empty": {
+      "title": "Không có bản ghi của thao tác #{id}",
+      "description": "Bộ lập chỉ mục chưa có thao tác neo giữ mang số này. Có thể dữ liệu vẫn đang được đồng bộ, hoặc liên kết bị sai.",
+      "browse": "Xem phân phối neo giữ",
+      "statistics": "Thống kê neo giữ"
+    },
     "token": {
-      "title": "Token",
-      "randomWalkDescription": "Random Walk NFT được dùng trong thao tác này.",
-      "cosmicSignatureDescription": "Cosmic Signature NFT được dùng trong thao tác này.",
-      "actionId": "Mã thao tác",
-      "holderAddress": "Địa chỉ người neo giữ",
-      "tokenId": "Mã token",
       "labels": {
-        "randomWalk": "RandomWalk",
+        "randomWalk": "Random Walk",
         "cosmicSignature": "Cosmic Signature"
       }
     },
-    "anchor": {
-      "title": "Neo giữ",
-      "description": "Thời điểm các token được neo giữ với giao thức.",
-      "datetime": "Thời điểm neo giữ",
-      "tokenCount": "Số token đang neo giữ"
+    "record": {
+      "title": "Bản ghi",
+      "holder": "Người neo giữ",
+      "token": "Token"
     },
-    "release": {
-      "title": "Gỡ neo",
-      "description": "Thời điểm neo được gỡ.",
-      "datetime": "Thời điểm gỡ neo",
-      "tokenCount": "Số token đang neo giữ"
+    "timeline": {
+      "title": "Dòng thời gian",
+      "anchored": "Đã neo giữ",
+      "anchoredCount": "Số NFT đang neo giữ trong bộ sưu tập sau thao tác này: {count}",
+      "released": "Đã gỡ neo",
+      "retrieved": "Đã nhận về {amount}",
+      "stillAnchored": "Vẫn đang neo giữ",
+      "stillAnchoredCosmicSignature": "Đang cùng chia phân phối neo giữ bằng ETH của mỗi chu kỳ.",
+      "stillAnchoredRandomWalk": "Đang tham gia Tinh tuyển NFT neo giữ của mỗi chu kỳ."
+    },
+    "next": {
+      "title": "Tiếp theo",
+      "distributions": "Phân phối neo giữ của NFT này",
+      "token": "Xem tác phẩm",
+      "allActions": "Tất cả thao tác neo giữ"
     }
   },
   "distributionsByToken": {
     "title": "Chi tiết phân phối neo giữ của token {tokenId}",
-    "subtitle": "Phân phối cho {address}",
+    "subtitle": "Mọi khoản nạp phân phối neo giữ bằng ETH mà NFT này đã tham gia trong thời gian được neo giữ.",
+    "label": "Khoản nạp phân phối neo giữ",
+    "error": "Không tải được các khoản nạp của NFT này. Hãy thử lại sau giây lát.",
+    "holder": "Người neo giữ",
+    "figures": {
+      "deposits": "Khoản nạp",
+      "distributed": "Đã phân phối",
+      "unretrieved": "Chưa nhận về",
+      "unretrievedCaption": "Nhận về khi gỡ neo"
+    },
     "details": {
       "anchorTitle": "Neo giữ",
       "releaseTitle": "Gỡ neo",
       "anchoredDatetime": "Thời điểm neo giữ",
       "releasedDatetime": "Thời điểm gỡ neo",
-      "anchoredNfts": "Số NFT đang neo giữ",
-      "distribution": "Phân phối"
+      "anchoredNfts": "Số đang neo giữ trong bộ sưu tập",
+      "distribution": "Đã nhận về",
+      "action": "Thao tác neo giữ",
+      "stillAnchored": "Vẫn đang neo giữ: ETH sẽ được nhận về khi gỡ neo.",
+      "show": "Hiện neo giữ",
+      "hide": "Ẩn neo giữ"
     },
     "columns": {
-      "details": "Chi tiết",
       "depositDatetime": "Thời điểm nạp",
       "cycle": "Chu kỳ",
       "depositId": "Mã khoản nạp",
-      "retrieved": "Đã nhận về?",
+      "retrieved": "Đã nhận về",
       "distributionEth": "Phân phối (ETH)"
+    },
+    "empty": {
+      "title": "NFT này chưa có phân phối neo giữ nào",
+      "description": "Mỗi lần một chu kỳ hoàn tất trong lúc NFT được neo giữ, một khoản nạp sẽ xuất hiện ở đây.",
+      "action": "Xem phân phối neo giữ"
     }
   },
   "tables": {
-    "availableTokens": {
-      "empty": "Không có token khả dụng.",
-      "selection": {
-        "all": "Chọn tất cả",
-        "currentPage": "Chọn trang hiện tại",
-        "none": "Bỏ chọn"
-      },
-      "columns": {
-        "imprintDatetime": "Thời điểm khắc",
-        "ownerAddress": "Địa chỉ chủ sở hữu",
-        "tokenId": "Mã token",
-        "tokenName": "Tên token",
-        "cycle": "Chu kỳ",
-        "recipientAddress": "Địa chỉ người nhận"
-      },
-      "actions": {
-        "anchor": "Neo giữ",
-        "anchoring": "Đang neo giữ…",
-        "anchorMany": "Neo giữ đã chọn"
-      },
-      "aria": {
-        "actions": "Thao tác"
-      }
-    },
     "globalAnchorActions": {
+      "label": "Thao tác neo giữ và gỡ neo",
       "headers": {
         "anchorDatetime": {
-          "desktop": "Thời điểm neo giữ",
+          "desktop": "Thời điểm",
           "mobile": "Thời điểm",
           "tooltip": "Dấu thời gian khi thao tác neo giữ hoặc gỡ neo được lập chỉ mục."
         },
         "actionType": {
-          "desktop": "Loại thao tác",
+          "desktop": "Thao tác",
           "mobile": "Loại",
           "tooltip": "Hàng này là thao tác neo giữ hay gỡ neo NFT."
         },
         "tokenId": {
-          "desktop": "Mã token",
-          "mobile": "Token",
+          "desktop": "NFT",
+          "mobile": "NFT",
           "tooltip": "Token liên quan đến thao tác neo giữ hoặc gỡ neo."
         },
         "holderAddress": {
-          "desktop": "Địa chỉ người neo giữ",
+          "desktop": "Người neo giữ",
           "mobile": "Người giữ",
           "tooltip": "Địa chỉ ví đã neo giữ hoặc gỡ neo token."
         },
         "nftCount": {
-          "desktop": "Số NFT",
+          "desktop": "Tổng đang neo giữ",
           "mobile": "NFT",
           "tooltip": "Số NFT đang neo giữ sau thao tác này."
         }
       }
     },
-    "retrievedDistributions": {
-      "columns": {
-        "depositDatetime": "Thời điểm nạp",
-        "depositId": "Mã khoản nạp",
-        "cycle": "Chu kỳ",
-        "depositAmountEth": "Số tiền nạp (ETH)",
-        "retrievedAmountEth": "Số tiền đã nhận (ETH)"
-      }
-    },
-    "unretrievedDistributions": {
-      "columns": {
-        "depositDatetime": "Thời điểm nạp",
-        "depositId": "Mã khoản nạp",
-        "anchoredTokens": "Token đang neo giữ (bạn / tổng)",
-        "unretrievedTokens": "Token chưa nhận về",
-        "depositAmountEth": "Số tiền nạp (ETH)",
-        "distributionAmountEth": "Số tiền phân phối (ETH)",
-        "unretrievedAmountEth": "Số tiền chưa nhận về (ETH)"
-      },
-      "summary": "Phân phối bạn có thể nhận về là {amount} ETH",
-      "releaseAll": "Gỡ neo và nhận về tất cả",
-      "dialog": {
-        "title": "Gỡ neo token và nhận về phân phối",
-        "description": "Thao tác này sẽ <strong>gỡ neo toàn bộ Cosmic Signature NFT bạn đang neo giữ</strong> và chuyển <amountStrong>{amount} ETH</amountStrong> phân phối tích lũy về ví của bạn.",
-        "warning": "<strong>Không thể hoàn tác:</strong> sau khi gỡ neo, những Cosmic Signature NFT này không thể neo giữ lại. Chỉ tiếp tục nếu bạn đã quyết định ngừng neo giữ các NFT này.",
-        "confirm": "Gỡ neo và nhận về"
-      }
-    },
-    "distributionsByDeposit": {
-      "columns": {
-        "depositDatetime": "Thời điểm nạp",
-        "depositCycle": "Chu kỳ nạp",
-        "depositId": "Mã khoản nạp",
-        "totalDepositAmount": "Tổng số tiền nạp",
-        "totalRetrievedAmount": "Tổng số tiền đã nhận về",
-        "yourRetrievableAmount": "Số tiền bạn có thể nhận về",
-        "fullyRetrieved": "Đã nhận về toàn bộ?",
-        "totalAnchoredNfts": "Tổng NFT đang neo giữ",
-        "totalRetrievedTokens": "Tổng token đã nhận về",
-        "yourAnchoredTokens": "Token bạn đang neo giữ"
-      }
-    },
-    "globalDistributions": {
-      "cycleDetails": "Phân phối neo giữ ETH của chu kỳ {cycle}",
-      "columns": {
-        "depositDatetime": "Thời điểm nạp",
-        "cycle": "Chu kỳ",
-        "totalAnchoredTokens": "Tổng token đang neo giữ",
-        "totalDepositedEth": "Tổng đã nạp (ETH)",
-        "fullyRetrieved": "Đã nhận về toàn bộ?",
-        "pendingEth": "Chờ nhận về (ETH)"
-      }
-    },
-    "randomWalkImprints": {
-      "columns": {
-        "datetime": "Thời điểm",
-        "recipient": "Người nhận",
-        "cycle": "Chu kỳ",
-        "tokenId": "Mã token"
-      }
-    },
-    "tokenDistributions": {
-      "columns": {
-        "tokenId": "Mã token",
-        "retrievedEth": "Phân phối đã nhận về (ETH)",
-        "retrievableEth": "Phân phối chờ nhận về (ETH)"
-      }
-    },
-    "anchorActions": {
-      "columns": {
-        "datetime": "Thời điểm thao tác",
-        "type": "Loại thao tác",
-        "tokenId": "Mã token",
-        "nftCount": "Số NFT"
-      }
-    },
-    "anchoredTokens": {
-      "selection": {
-        "all": "Chọn tất cả",
-        "currentPage": "Chọn trang hiện tại",
-        "none": "Bỏ chọn"
-      },
-      "columns": {
-        "image": "Hình token",
-        "tokenId": "Mã token",
-        "actionId": "Mã thao tác neo giữ",
-        "datetime": "Thời điểm neo giữ",
-        "accumulatedDistributions": "Phân phối tích lũy"
-      }
-    },
     "globalAnchoredTokens": {
+      "label": "NFT đang neo giữ",
       "headers": {
+        "tokenId": {
+          "desktop": "NFT",
+          "mobile": "NFT",
+          "tooltip": "Mã định danh của token đang neo giữ."
+        },
         "anchorDatetime": {
           "desktop": "Thời điểm neo giữ",
           "mobile": "Thời điểm",
           "tooltip": "Dấu thời gian khi token được neo giữ."
         },
         "actionId": {
-          "desktop": "Mã thao tác",
+          "desktop": "Thao tác neo giữ",
           "mobile": "Thao tác",
           "tooltip": "Bản ghi thao tác neo giữ liên kết với token này."
         },
-        "tokenId": {
-          "desktop": "Mã token",
-          "mobile": "Token",
-          "tooltip": "Mã định danh của token đang neo giữ."
-        },
         "holderAddress": {
-          "desktop": "Địa chỉ người neo giữ",
+          "desktop": "Người neo giữ",
           "mobile": "Người giữ",
           "tooltip": "Địa chỉ ví đã neo giữ hoặc gỡ neo token."
         }
+      }
+    },
+    "globalDistributions": {
+      "label": "Phân phối neo giữ bằng ETH theo chu kỳ",
+      "showRecipients": "Hiện người nhận",
+      "hideRecipients": "Ẩn người nhận",
+      "recipientsError": "Không tải được những người neo giữ của chu kỳ này.",
+      "columns": {
+        "cycle": "Chu kỳ",
+        "depositDatetime": "Thời điểm nạp",
+        "totalAnchoredTokens": "NFT đang neo giữ",
+        "totalDepositedEth": "Tổng đã nạp (ETH)",
+        "pendingEth": "Chưa nhận về (ETH)",
+        "fullyRetrieved": "Đã nhận về toàn bộ"
+      }
+    },
+    "randomWalkImprints": {
+      "label": "Lượt khắc từ Tinh tuyển NFT neo giữ",
+      "columns": {
+        "tokenId": "NFT được khắc",
+        "recipient": "Người nhận",
+        "cycle": "Chu kỳ",
+        "datetime": "Thời điểm"
+      }
+    },
+    "anchorActions": {
+      "label": "Lịch sử neo giữ và gỡ neo",
+      "columns": {
+        "datetime": "Thời điểm",
+        "type": "Thao tác",
+        "tokenId": "NFT",
+        "nftCount": "Tổng đang neo giữ"
+      }
+    },
+    "tokenDistributions": {
+      "label": "Phân phối neo giữ theo NFT",
+      "columns": {
+        "tokenId": "NFT",
+        "retrievedEth": "Đã nhận về (ETH)",
+        "retrievableEth": "Có thể nhận về (ETH)"
+      }
+    },
+    "retrievedDistributions": {
+      "label": "Phân phối neo giữ đã nhận về",
+      "columns": {
+        "depositDatetime": "Thời điểm nạp",
+        "depositId": "Mã khoản nạp",
+        "cycle": "Chu kỳ",
+        "depositAmountEth": "Số tiền nạp (ETH)",
+        "retrievedAmountEth": "Số tiền đã nhận về (ETH)"
+      }
+    },
+    "unretrievedDistributions": {
+      "label": "Phân phối neo giữ chưa nhận về",
+      "error": "Không tải được phân phối neo giữ chưa nhận về. Hãy thử lại sau giây lát.",
+      "anchoredOfTotal": "{count, number} / {total, number}",
+      "summary": "Phân phối neo giữ chưa nhận về của bạn",
+      "releaseAll": "Gỡ neo tất cả và nhận về",
+      "columns": {
+        "depositDatetime": "Thời điểm nạp",
+        "depositId": "Mã khoản nạp",
+        "anchoredTokens": "NFT đang neo giữ (địa chỉ này / tất cả)",
+        "unretrievedTokens": "NFT chưa nhận về",
+        "depositAmountEth": "Số tiền nạp (ETH)",
+        "distributionAmountEth": "Số tiền phân phối (ETH)",
+        "unretrievedAmountEth": "Số tiền chưa nhận về (ETH)"
+      }
+    },
+    "distributionsByDeposit": {
+      "label": "Phân phối neo giữ theo khoản nạp",
+      "columns": {
+        "depositDatetime": "Thời điểm nạp",
+        "depositCycle": "Chu kỳ nạp",
+        "depositId": "Mã khoản nạp",
+        "totalDepositAmount": "Khoản nạp (ETH)",
+        "totalRetrievedAmount": "Tất cả đã nhận về (ETH)",
+        "yourRetrievableAmount": "Địa chỉ này có thể nhận về (ETH)",
+        "fullyRetrieved": "Đã nhận về toàn bộ",
+        "totalAnchoredNfts": "NFT đang neo giữ",
+        "totalRetrievedTokens": "NFT đã nhận về",
+        "yourAnchoredTokens": "Địa chỉ này đang neo giữ"
       }
     }
   },
   "panels": {
     "shared": {
-      "anchoredTokens": "Token đang neo giữ",
+      "anchoredTokens": "Đang neo giữ",
       "available": "Có thể neo giữ",
       "history": "Lịch sử neo giữ / gỡ neo",
-      "historyTooltip": "Bản ghi theo thời gian của mọi giao dịch neo giữ và gỡ neo của bạn."
+      "historyDescription": "Mọi lần neo giữ và gỡ neo từ ví này. Mở một mục để xem bản ghi.",
+      "anchoredEmpty": {
+        "title": "Chưa neo giữ NFT nào",
+        "description": "Hãy chọn NFT trong mục “Có thể neo giữ” để bắt đầu."
+      }
     },
     "cosmicSignature": {
-      "anchoredTooltip": "Các Cosmic Signature NFT bạn đang neo giữ. Bạn nhận phân phối neo giữ ETH theo tỷ lệ số Cosmic Signature NFT đã neo giữ.",
-      "availableTooltip": "Các Cosmic Signature NFT trong ví có thể neo giữ để bắt đầu nhận phân phối neo giữ ETH.",
-      "distributions": "Phân phối neo giữ",
-      "distributionsTooltip": "Phân phối neo giữ ETH được phân bổ cho từng Cosmic Signature NFT đang neo giữ. Các khoản chưa nhận về có thể được nhận về bằng cách gỡ neo."
+      "anchoredDescription": "Các NFT này cùng chia phân phối neo giữ bằng ETH của mỗi chu kỳ. Gỡ neo sẽ trả NFT về cùng số ETH của nó và kết thúc vĩnh viễn việc neo giữ NFT đó.",
+      "availableDescription": "Các Cosmic Signature NFT trong ví của bạn chưa từng được neo giữ.",
+      "availableEmpty": {
+        "title": "Không có Cosmic Signature NFT nào để neo giữ",
+        "description": "Các Cosmic Signature NFT trong ví của bạn sẽ hiện ở đây. Mỗi NFT chỉ có thể neo giữ một lần.",
+        "action": "Xem phòng trưng bày"
+      },
+      "distributions": "Phân phối neo giữ theo NFT",
+      "distributionsDescription": "Mỗi NFT bạn đã neo giữ đã nhận về bao nhiêu và còn có thể nhận về bao nhiêu. Mở một NFT để xem từng khoản nạp."
     },
     "randomWalk": {
-      "anchoredTooltip": "Các RandomWalk NFT bạn đang neo giữ. Mỗi RandomWalk NFT đang neo giữ thuộc diện lựa chọn ngẫu nhiên trên chuỗi trong Tinh tuyển NFT neo giữ.",
-      "availableTooltip": "Các RandomWalk NFT trong ví có thể neo giữ để thuộc diện Tinh tuyển NFT neo giữ, không phải để nhận phân phối neo giữ ETH.",
-      "selection": "Tinh tuyển NFT neo giữ",
-      "selectionTooltip": "Cosmic Signature NFT và CST đi kèm được khắc khi ví này được chọn trong Tinh tuyển NFT neo giữ thông qua cơ chế lựa chọn ngẫu nhiên trên chuỗi."
-    }
-  },
-  "lifecycle": {
-    "ariaLabel": "Vòng đời neo giữ",
-    "stages": {
-      "anchor": {
-        "label": "Neo giữ",
-        "description": "NFT được nạp vào giao thức"
+      "anchoredDescription": "Các NFT này tham gia Tinh tuyển của mỗi chu kỳ. Gỡ neo sẽ trả NFT về và kết thúc vĩnh viễn việc neo giữ NFT đó.",
+      "availableDescription": "Các Random Walk NFT trong ví của bạn chưa từng được neo giữ.",
+      "availableEmpty": {
+        "title": "Không có Random Walk NFT nào để neo giữ",
+        "description": "Các Random Walk NFT trong ví của bạn chưa từng được neo giữ sẽ hiện ở đây."
       },
-      "active": {
-        "label": "Đang hoạt động",
-        "description": "Nhận phân phối theo từng chu kỳ"
-      },
-      "retrievable": {
-        "label": "Có thể nhận về",
-        "description": "Sẵn sàng để nhận về"
-      },
-      "retrieved": {
-        "label": "Đã nhận về",
-        "description": "Đã trả về ví của bạn"
-      }
+      "selection": "Lượt khắc từ Tinh tuyển",
+      "selectionDescription": "Cosmic Signature NFT và CST được khắc cho ví này khi các Random Walk NFT mà ví đang neo giữ được chọn.",
+      "selectionEmpty": "Chưa được chọn lần nào"
     }
   }
 }

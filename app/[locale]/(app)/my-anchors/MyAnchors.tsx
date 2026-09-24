@@ -1,151 +1,175 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
-import { Layers, TrendingUp } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
-import { AnchorDistributionIcon } from '@/lib/conceptIcons';
-import { PageShell } from '@/components/ui/page-shell';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { distributionPerAnchoredNft } from '@/utils/anchoringStats';
+import { IDLE_TX_STAGE, isTxBusy, type TxStage } from '@/lib/txStage';
+import type { TxResult } from '@/hooks/useTxFlow';
+import { useFormat } from '@/hooks/useFormat';
 import { useActiveWeb3React } from '@/hooks/web3';
+import { useAnchorActions } from '@/hooks/useAnchorActions';
 import {
-  useDashboardInfo,
+  useAnchorDistributionsByUser,
   useCSTAnchorActionsByUser,
   useCSTTokensByUser,
-  useAnchorDistributionsByUser,
+  useDashboardInfo,
   useRWLKAnchorActionsByUser,
   useRWLKAnchorImprintsByUser,
 } from '@/hooks/useApiQuery';
 import { useAnchoredToken } from '@/contexts/AnchoredTokenContext';
-import { useAnchorActions } from '@/hooks/useAnchorActions';
-import { CSTAnchoringPanel } from '@/components/anchoring/CSTAnchoringPanel';
-import { RWLKAnchoringPanel } from '@/components/anchoring/RWLKAnchoringPanel';
-import { AnchoringHeroStats } from '@/components/anchoring/AnchoringHeroStats';
-import type { AnchoringStatItem } from '@/components/anchoring/AnchoringHeroStats';
-import { StatCardSkeleton } from '@/components/ui/stat-card';
+import { PageHeader, type PageHeaderFigure } from '@/components/layout/PageHeader';
+import { Amount } from '@/components/ui/amount';
+import { PageShell } from '@/components/ui/page-shell';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { WalletRequiredState } from '@/components/wallet/WalletRequiredState';
-import { PageHeader } from '@/components/layout/PageHeader';
-import { UnknownValue } from '@/components/ui/unknown-value';
-import { distributionPerAnchoredNft, formatPerNftEth } from '@/utils/anchoringStats';
+import { CSTAnchoringPanel, CST_GRIDS } from '@/components/anchoring/CSTAnchoringPanel';
+import { RWLKAnchoringPanel, RWLK_GRIDS } from '@/components/anchoring/RWLKAnchoringPanel';
 
+/**
+ * The connected wallet's anchoring desk: its anchored and anchorable NFTs of
+ * both collections, chosen by their artwork, with the figures that matter to
+ * an anchor-holder in the header.
+ */
 const MyAnchors = () => {
   const t = useTranslations('myPages');
-  const tCommon = useTranslations('common');
   const tWallet = useTranslations('wallet');
-  const locale = useLocale();
+  const format = useFormat();
   const { account } = useActiveWeb3React();
-  const { anchor, release, handleError, rwalkContract } = useAnchorActions();
+  const { anchor, release, handleError, rwalkContract, txStage } = useAnchorActions();
 
-  const { data: dashboardData, isLoading: loadingDashboard } = useDashboardInfo();
-  const { data: cstAnchorActions = [], isLoading: loadingCSTActions } =
-    useCSTAnchorActionsByUser(account);
-  const { data: cstTokensRaw = [], isLoading: loadingCST } = useCSTTokensByUser(account);
-  const { data: anchorDistributions = [], isLoading: loadingRewards } =
-    useAnchorDistributionsByUser(account);
-  const { data: rwlkAnchorActions = [], isLoading: loadingRWLK } =
-    useRWLKAnchorActionsByUser(account);
-  const { data: rwlkImprints = [], isLoading: loadingMints } = useRWLKAnchorImprintsByUser(account);
-
-  const CSTokens = useMemo(() => cstTokensRaw.filter((x) => !x.WasUnstaked), [cstTokensRaw]);
-
-  const distributionPerCST = useMemo(
-    () =>
-      distributionPerAnchoredNft(
-        dashboardData?.StakingAmountEth,
-        dashboardData?.MainStats?.StakeStatisticsCST?.TotalTokensStaked,
-      ),
-    [dashboardData],
-  );
+  const dashboard = useDashboardInfo();
+  const cstActions = useCSTAnchorActionsByUser(account);
+  const cstTokens = useCSTTokensByUser(account);
+  const distributions = useAnchorDistributionsByUser(account);
+  const rwlkActions = useRWLKAnchorActionsByUser(account);
+  const rwlkImprints = useRWLKAnchorImprintsByUser(account);
+  const {
+    cstokens: anchoredCst,
+    rwlktokens: anchoredRwlk,
+    isLoading: anchoredLoading,
+  } = useAnchoredToken();
 
   const loading =
-    loadingDashboard ||
-    loadingCSTActions ||
-    loadingCST ||
-    loadingRewards ||
-    loadingRWLK ||
-    loadingMints;
+    cstActions.isLoading ||
+    cstTokens.isLoading ||
+    distributions.isLoading ||
+    rwlkActions.isLoading ||
+    rwlkImprints.isLoading ||
+    anchoredLoading;
 
-  const [rwlkTokens, setRwlkTokens] = useState<number[]>([]);
-
-  const { cstokens: anchoredCSTokens, rwlktokens: anchoredRWLKTokens } = useAnchoredToken();
-
-  const unclaimedRewardEth = useMemo(() => {
-    return anchorDistributions.reduce((sum, r) => sum + (r.RewardToCollectEth ?? 0), 0);
-  }, [anchorDistributions]);
-
-  const heroStats: AnchoringStatItem[] = useMemo(
-    () => [
-      {
-        label: t('anchors.stats.cosmicSignature.label'),
-        value: anchoredCSTokens.length.toLocaleString(locale),
-        tooltip: t('anchors.stats.cosmicSignature.tooltip'),
-        icon: <Layers className="h-4 w-4" />,
-      },
-      {
-        label: t('anchors.stats.randomWalk.label'),
-        value: anchoredRWLKTokens.length.toLocaleString(locale),
-        tooltip: t('anchors.stats.randomWalk.tooltip'),
-        icon: <Layers className="h-4 w-4" />,
-      },
-      {
-        label: t('anchors.stats.unretrieved.label'),
-        value: unclaimedRewardEth > 0 ? `${unclaimedRewardEth.toFixed(4)} ETH` : '0 ETH',
-        tooltip: t('anchors.stats.unretrieved.tooltip'),
-        icon: <AnchorDistributionIcon className="h-4 w-4" />,
-        featured: true,
-        gradient: true,
-      },
-      {
-        label: t('anchors.stats.distributionPerNft.label'),
-        value:
-          distributionPerCST.status === 'available' ? (
-            formatPerNftEth(distributionPerCST.perNftEth)
-          ) : (
-            <UnknownValue label={tCommon('status.unavailable')} />
-          ),
-        tooltip: t('anchors.stats.distributionPerNft.tooltip'),
-        caption:
-          distributionPerCST.status === 'noneAnchored'
-            ? t('anchors.stats.distributionPerNft.noneAnchored')
-            : undefined,
-        icon: <TrendingUp className="h-4 w-4" />,
-      },
-    ],
-    [
-      anchoredCSTokens,
-      anchoredRWLKTokens,
-      unclaimedRewardEth,
-      distributionPerCST,
-      locale,
-      t,
-      tCommon,
-    ],
+  // An NFT that was released can never be anchored again, so it is not offered.
+  const availableCst = useMemo(
+    () => (cstTokens.data ?? []).filter((token) => !token.WasUnstaked),
+    [cstTokens.data],
   );
 
+  // One wallet flow at a time: the grid that started it shows its progress.
+  const [txOwner, setTxOwner] = useState<string | null>(null);
+  const stageFor = useCallback(
+    (gridId: string): TxStage => (gridId === txOwner ? txStage : IDLE_TX_STAGE),
+    [txOwner, txStage],
+  );
+  const walletBusy = isTxBusy(txStage);
+  const runFor =
+    (gridId: string, action: (ids: number[]) => Promise<TxResult>) => (ids: number[]) => {
+      setTxOwner(gridId);
+      return action(ids);
+    };
+
+  // Random Walk NFTs in the wallet that have never been anchored, read from the contract.
+  const [rwlkAvailable, setRwlkAvailable] = useState<readonly number[] | null>(null);
+  const rwlkActionList = rwlkActions.data;
   useEffect(() => {
-    const fetchRWLKTokens = async () => {
-      if (!account || !rwalkContract) return;
+    if (!account || !rwalkContract) return;
+    let cancelled = false;
+    const read = async () => {
       try {
-        const anchoredIds = anchoredRWLKTokens.map((x) => x.StakedTokenId);
-        const userOwned = await rwalkContract.read.walletOfOwner?.([account]);
-        const rawIds = (userOwned as readonly bigint[]).map((t) => Number(t)).sort();
-        const filteredIds = rawIds.filter(
-          (id) =>
-            !anchoredIds.includes(id) &&
-            !rwlkAnchorActions.some((action) => action.ActionType !== 1 && action.TokenId === id),
-        );
-        setRwlkTokens(filteredIds);
+        const owned = (await rwalkContract.read.walletOfOwner?.([account])) as
+          | readonly bigint[]
+          | undefined;
+        const everAnchored = new Set([
+          ...anchoredRwlk.map((row) => row.StakedTokenId),
+          ...(rwlkActionList ?? []).map((action) => action.TokenId),
+        ]);
+        const ids = (owned ?? [])
+          .map(Number)
+          .filter((id) => !everAnchored.has(id))
+          .sort((a, b) => a - b);
+        if (!cancelled) setRwlkAvailable(ids);
       } catch (err) {
+        if (!cancelled) setRwlkAvailable([]);
         handleError(err);
       }
     };
-    fetchRWLKTokens();
-  }, [account, rwalkContract, anchoredRWLKTokens, rwlkAnchorActions, handleError]);
+    void read();
+    return () => {
+      cancelled = true;
+    };
+  }, [account, rwalkContract, anchoredRwlk, rwlkActionList, handleError]);
+
+  const unretrievedEth = useMemo(() => {
+    if (!distributions.data) return null;
+    return distributions.data.reduce((sum, row) => sum + (row.RewardToCollectEth ?? 0), 0);
+  }, [distributions.data]);
+
+  const perNft = distributionPerAnchoredNft(
+    dashboard.data?.StakingAmountEth,
+    dashboard.data?.MainStats?.StakeStatisticsCST?.TotalTokensStaked,
+  );
+
+  const pending = <Skeleton className="h-7 w-20" />;
+  const figures: PageHeaderFigure[] | undefined = account
+    ? [
+        {
+          id: 'cosmicSignature',
+          label: t('anchors.stats.cosmicSignature.label'),
+          value: anchoredLoading ? pending : format.count(anchoredCst.length),
+          info: t('anchors.stats.cosmicSignature.tooltip'),
+        },
+        {
+          id: 'randomWalk',
+          label: t('anchors.stats.randomWalk.label'),
+          value: anchoredLoading ? pending : format.count(anchoredRwlk.length),
+          info: t('anchors.stats.randomWalk.tooltip'),
+        },
+        {
+          id: 'unretrieved',
+          label: t('anchors.stats.unretrieved.label'),
+          value: distributions.isLoading ? (
+            pending
+          ) : unretrievedEth === null ? null : (
+            <Amount value={unretrievedEth} unit="ETH" context="card" />
+          ),
+          info: t('anchors.stats.unretrieved.tooltip'),
+          caption: t('anchors.stats.unretrieved.caption'),
+        },
+        {
+          id: 'distributionPerNft',
+          label: t('anchors.stats.distributionPerNft.label'),
+          value: dashboard.isLoading ? (
+            pending
+          ) : perNft.status === 'available' ? (
+            <Amount value={perNft.perNftEth} unit="ETH" context="card" />
+          ) : null,
+          info: t('anchors.stats.distributionPerNft.tooltip'),
+          caption:
+            perNft.status === 'noneAnchored'
+              ? t('anchors.stats.distributionPerNft.noneAnchored')
+              : undefined,
+        },
+      ]
+    : undefined;
 
   return (
-    <PageShell variant="data" backdrop="signature">
-      <PageHeader section="account" title={t('anchors.title')} subtitle={t('anchors.subtitle')} />
+    <PageShell variant="data" backdrop="subtle">
+      <PageHeader
+        section="account"
+        title={t('anchors.title')}
+        subtitle={t('anchors.subtitle')}
+        figures={figures}
+      />
 
       {!account ? (
         <WalletRequiredState
@@ -153,75 +177,52 @@ const MyAnchors = () => {
           description={tWallet('required.anchors.description')}
           publicLink={{ href: '/anchoring', label: tWallet('required.anchors.publicLink') }}
         />
-      ) : loading ? (
-        <div data-testid="my-anchors-skeleton">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <StatCardSkeleton key={i} />
-            ))}
-          </div>
-          <div className="space-y-3">
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-64 w-full" />
-          </div>
-        </div>
       ) : (
-        <>
-          <AnchoringHeroStats stats={heroStats} className="mb-10" />
+        <Tabs defaultValue="cosmicSignature">
+          <TabsList aria-label={t('anchors.tabs.label')} className="max-sm:flex max-sm:w-full">
+            <TabsTrigger value="cosmicSignature" className="max-sm:flex-1">
+              {t('anchors.tabs.cosmicSignature')}
+              <span className="tabular-nums text-subtle">
+                {anchoredLoading ? null : format.count(anchoredCst.length)}
+              </span>
+            </TabsTrigger>
+            <TabsTrigger value="randomWalk" className="max-sm:flex-1">
+              {t('anchors.tabs.randomWalk')}
+              <span className="tabular-nums text-subtle">
+                {anchoredLoading ? null : format.count(anchoredRwlk.length)}
+              </span>
+            </TabsTrigger>
+          </TabsList>
 
-          <Tabs defaultValue="cst" className="mt-0">
-            <TabsList className="w-full h-auto">
-              <TabsTrigger value="cst" className="flex-1 py-3">
-                <div className="flex items-center">
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary">
-                    <Layers className="h-5 w-5" />
-                  </span>
-                  <span className="text-lg font-semibold whitespace-nowrap normal-case ml-4">
-                    {t('anchors.tabs.cosmicSignature')}
-                  </span>
-                </div>
-              </TabsTrigger>
-              <TabsTrigger value="rwlk" className="flex-1 py-3">
-                <div className="flex items-center">
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-[rgb(var(--nebula-violet-rgb)/0.28)] bg-[rgb(var(--nebula-violet-rgb)/0.12)] text-[rgb(var(--nebula-violet-rgb))]">
-                    <Layers className="h-5 w-5" />
-                  </span>
-                  <span className="text-lg font-semibold whitespace-nowrap normal-case ml-4">
-                    {t('anchors.tabs.randomWalk')}
-                  </span>
-                </div>
-              </TabsTrigger>
-            </TabsList>
+          <TabsContent value="cosmicSignature" className="mt-10 sm:mt-12">
+            <CSTAnchoringPanel
+              account={account}
+              anchoredTokens={anchoredCst}
+              availableTokens={availableCst}
+              anchorDistributions={distributions.data ?? []}
+              actions={cstActions.data ?? []}
+              onAnchor={runFor(CST_GRIDS.available, (ids) => anchor(ids, false))}
+              onRelease={runFor(CST_GRIDS.anchored, (ids) => release(ids, false))}
+              stageFor={stageFor}
+              walletBusy={walletBusy}
+              loading={loading}
+            />
+          </TabsContent>
 
-            <TabsContent value="cst" className="p-6">
-              <CSTAnchoringPanel
-                account={account}
-                stakingActions={cstAnchorActions}
-                userTokens={CSTokens}
-                anchoredTokens={anchoredCSTokens}
-                anchorDistributions={anchorDistributions}
-                handleStake={(tokenId) => anchor(tokenId, false)}
-                handleStakeMany={(tokenIds) => anchor(tokenIds, false)}
-                handleUnstake={(actionId) => release(actionId, false)}
-                handleUnstakeMany={(actionIds) => release(actionIds, false)}
-              />
-            </TabsContent>
-
-            <TabsContent value="rwlk" className="p-6">
-              <RWLKAnchoringPanel
-                account={account}
-                stakingActions={rwlkAnchorActions}
-                rwlkImprints={rwlkImprints}
-                userTokens={rwlkTokens}
-                anchoredTokens={anchoredRWLKTokens}
-                handleStake={(tokenId) => anchor(tokenId, true)}
-                handleStakeMany={(tokenIds) => anchor(tokenIds, true)}
-                handleUnstake={(actionId) => release(actionId, true)}
-                handleUnstakeMany={(actionIds) => release(actionIds, true)}
-              />
-            </TabsContent>
-          </Tabs>
-        </>
+          <TabsContent value="randomWalk" className="mt-10 sm:mt-12">
+            <RWLKAnchoringPanel
+              anchoredTokens={anchoredRwlk}
+              availableTokenIds={rwlkAvailable}
+              imprints={rwlkImprints.data ?? []}
+              actions={rwlkActions.data ?? []}
+              onAnchor={runFor(RWLK_GRIDS.available, (ids) => anchor(ids, true))}
+              onRelease={runFor(RWLK_GRIDS.anchored, (ids) => release(ids, true))}
+              stageFor={stageFor}
+              walletBusy={walletBusy}
+              loading={loading}
+            />
+          </TabsContent>
+        </Tabs>
       )}
     </PageShell>
   );

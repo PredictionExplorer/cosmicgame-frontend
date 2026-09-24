@@ -34,7 +34,7 @@ export default async function Page({ params }: PageProps) {
   const { locale, IsRwalk, actionId } = await params;
   setRequestLocale(locale);
   return (
-    <PageMessages namespaces={['anchoring', 'detail']}>
+    <PageMessages namespaces={['anchoring', 'tables', 'traits']}>
       <AnchorActionDetailPage IsRwalk={Number(IsRwalk)} actionId={Number(actionId)} />
     </PageMessages>
   );
