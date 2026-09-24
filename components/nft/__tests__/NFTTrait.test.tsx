@@ -1,6 +1,11 @@
+import type { ReactNode } from 'react';
+import { render as renderWithoutProviders } from '@testing-library/react';
+import { renderToString } from 'react-dom/server';
 import { getAddress } from 'viem';
 
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { WalletUiProvider } from '@/contexts/WalletUiContext';
 
 import { render, screen, fireEvent, checkA11y, act, within } from '@/test-utils';
 
@@ -411,6 +416,43 @@ describe('NFTTrait', () => {
     expect(within(screen.getByTestId('hero-section')).getByTestId('owner-actions')).toBe(actions);
     // The checksummed wallet is the transfer's sender.
     expect(actions).toHaveAttribute('data-owner', getAddress(OWNER));
+  });
+
+  it('keeps the owner’s tools out of the server HTML, so hydration matches (regression)', async () => {
+    // A wallet that reconnected before hydration put the tools in the first
+    // client render: React logged a mismatch and rebuilt the whole page.
+    withDashboard();
+    withNft({ CurOwnerAddr: OWNER });
+    // The same providers on both sides, so only the page itself can differ.
+    const Providers = ({ children }: { children: ReactNode }) => (
+      <TooltipProvider delayDuration={0}>
+        <WalletUiProvider>{children}</WalletUiProvider>
+      </TooltipProvider>
+    );
+    const container = document.createElement('div');
+    container.innerHTML = renderToString(
+      <Providers>
+        <NFTTrait tokenId={5} />
+      </Providers>,
+    );
+    document.body.appendChild(container);
+    expect(container.querySelector('[data-testid="owner-actions"]')).toBeNull();
+
+    const errors = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    renderWithoutProviders(<NFTTrait tokenId={5} />, {
+      container,
+      hydrate: true,
+      wrapper: Providers,
+    });
+    await act(async () => undefined);
+    const hydrationErrors = errors.mock.calls.filter((call) =>
+      /hydrat/i.test(call.map(String).join(' ')),
+    );
+    errors.mockRestore();
+
+    expect(hydrationErrors).toEqual([]);
+    expect(screen.getByTestId('owner-actions')).toBeInTheDocument();
+    container.remove();
   });
 
   it('refreshes the token and its ownership history after a confirmed transfer', () => {

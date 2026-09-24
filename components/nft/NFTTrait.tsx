@@ -11,6 +11,7 @@ import { useRouter } from '@/i18n/navigation';
 import NameHistoryTable from '@/components/tables/NameHistoryTable';
 import { TransferHistoryTable } from '@/components/tables/TransferHistoryTable';
 import { useActiveWeb3React } from '@/hooks/web3';
+import { useHydrated } from '@/hooks/useHydrated';
 import type { CSTTokenInfo, CSTTransferRecord } from '@/services/api';
 import {
   useDashboardInfo,
@@ -177,6 +178,10 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
 
   const router = useRouter();
   const { account } = useActiveWeb3React();
+  // The server renders without a wallet: the owner's tools wait for
+  // hydration, so a wallet that reconnects first cannot change the first
+  // client render and make React discard the page's server HTML.
+  const hydrated = useHydrated();
   const { isMetaMaskConnected, isAddingNft, addCosmicSignatureNft } = useMetaMaskWatchAsset();
 
   const nameRefetchTimers = useRef(new Set<ReturnType<typeof setTimeout>>());
@@ -201,7 +206,11 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
 
   // The connected wallet, when it owns this token: the owner's tools appear.
   const owner =
-    account && nft?.CurOwnerAddr && sameAddress(account, nft.CurOwnerAddr) && isAddress(account)
+    hydrated &&
+    account &&
+    nft?.CurOwnerAddr &&
+    sameAddress(account, nft.CurOwnerAddr) &&
+    isAddress(account)
       ? getAddress(account)
       : null;
   const totalImprints = dashboard?.MainStats?.NumCSTokenMints ?? null;
@@ -246,7 +255,9 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
           sizes={PLATE_SIZES}
           navigation={<NFTNeighbourNav tokenId={tokenId} total={totalImprints} />}
           // Never taller than the screen leaves room for; full-bleed on phones.
-          className="mx-auto w-full max-w-[max(20rem,calc((100svh_-_var(--header-height)_-_11rem)_*_var(--art-ratio)))] max-sm:-mx-[var(--gutter)] max-sm:w-auto max-sm:max-w-none"
+          // Beside a taller column (the owner's tools open) the plate stays in
+          // view while the tools scroll, instead of leaving a band of ground.
+          className="mx-auto w-full max-w-[max(20rem,calc((100svh_-_var(--header-height)_-_11rem)_*_var(--art-ratio)))] max-sm:-mx-[var(--gutter)] max-sm:w-auto max-sm:max-w-none lg:sticky lg:top-[var(--sticky-offset)]"
           plateClassName="max-sm:rounded-none"
           controlsClassName="max-sm:px-[var(--gutter)]"
         />
