@@ -78,10 +78,14 @@ describe('AddressChip', () => {
   it('marks a plain address link at rest with a hairline underline, a chip without', () => {
     // Regression: plain links were no-underline in the text colour, so a
     // Recipient or Owner line gave no sign it opens a profile.
+    // `no-underline` beside it wins in the cascade and hides the hairline,
+    // so the plain link must not carry it.
     const { rerender } = render(<AddressChip address={ADDRESS} variant="plain" label={false} />);
     expect(screen.getByRole('link')).toHaveClass('link-entity');
+    expect(screen.getByRole('link')).not.toHaveClass('no-underline');
     rerender(<AddressChip address={ADDRESS} label={false} />);
     expect(screen.getByRole('link')).not.toHaveClass('link-entity');
+    expect(screen.getByRole('link')).toHaveClass('no-underline');
   });
 
   it('truncates a contract name by default and lets it wrap where asked', () => {

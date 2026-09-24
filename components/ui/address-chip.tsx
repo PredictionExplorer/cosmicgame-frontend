@@ -127,14 +127,16 @@ export function AddressChip({
     );
   }
 
-  // A chip is a muted pill; plain text takes the colour of the cell or sentence it sits in.
+  // A chip is a muted pill with no underline (the pill is its own cue);
+  // plain text takes the colour of the cell or sentence it sits in.
   const textClass = cn(
-    'inline-flex min-w-0 items-center no-underline transition-colors print:!text-foreground',
-    variant === 'chip' ? 'text-muted-foreground' : '[color:inherit]',
+    'inline-flex min-w-0 items-center transition-colors print:!text-foreground',
+    variant === 'chip' ? 'text-muted-foreground no-underline' : '[color:inherit]',
   );
   // A plain address that opens a profile says so at rest: a faint hairline
   // underline (the rule colour) that turns solid on hover and focus, the
-  // one entity-link look for records and ledgers. The pill is its own cue.
+  // one entity-link look for records and ledgers. It must not also carry
+  // `no-underline`, which wins over the utility in the cascade.
   const plainLinkClass = variant === 'plain' && 'link-entity';
 
   return (
