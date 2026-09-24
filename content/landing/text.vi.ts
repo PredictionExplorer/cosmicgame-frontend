@@ -31,7 +31,6 @@ export const landingTextVi = {
     primaryCtaLabel: 'Mở ứng dụng',
     secondaryCtaLabel: 'Cách một chu kỳ vận hành',
     art: {
-      formingLabel: 'Tín hiệu đang hình thành',
       viewAriaLabel: 'Xem Cosmic Signature {tokenLabel} trong ứng dụng',
       artworkAlt: 'Cosmic Signature {tokenLabel} — tác phẩm tạo sinh ba vật thể tất định',
       galleryCta: 'Duyệt toàn bộ phòng trưng bày',

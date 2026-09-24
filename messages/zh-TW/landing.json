@@ -63,6 +63,8 @@
     "pauseRotation": "暫停作品輪換",
     "resumeRotation": "繼續作品輪換",
     "playAnimation": "播放動畫",
-    "pauseAnimation": "暫停動畫"
+    "pauseAnimation": "暫停動畫",
+    "unavailable": "作品暫不可用",
+    "untitled": "簽名作品 {tokenLabel}"
   }
 }

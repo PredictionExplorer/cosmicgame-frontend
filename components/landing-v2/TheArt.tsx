@@ -9,8 +9,6 @@ import styles from './Landing.module.css';
 
 interface TheArtProps {
   art: LandingContent['art'];
-  /** Caption of the plate when the artwork cannot be shown. */
-  unavailableLabel: string;
 }
 
 /**
@@ -18,7 +16,7 @@ interface TheArtProps {
  * simulation on a plate that stays in view while the seven stages of the
  * pipeline scroll beside it, then the collection's figures in one strip.
  */
-export function TheArt({ art, unavailableLabel }: TheArtProps) {
+export function TheArt({ art }: TheArtProps) {
   const seed = art.stages[0];
   return (
     <LandingSection id="art" labelledBy="landing-art-heading">
@@ -35,7 +33,6 @@ export function TheArt({ art, unavailableLabel }: TheArtProps) {
             artworkAlt={art.showcase.artworkAlt}
             viewAriaLabel={art.showcase.viewAriaLabel}
             seedLabel={seed?.title ?? ''}
-            unavailableLabel={unavailableLabel}
           />
         </div>
         <ol className={styles.stages}>

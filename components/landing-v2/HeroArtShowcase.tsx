@@ -7,8 +7,10 @@ import { useLocale, useTranslations } from 'next-intl';
 import type { LandingHeroArtContent } from '@/content/landing';
 
 import { formatId } from '@/utils/format/ids';
+import { classifyHref } from '@/config/siteNav';
 import { APP_ORIGIN, localizeCrossHostHref } from '@/lib/hostRouting';
 import { cn } from '@/lib/utils';
+import { SiteLink } from '@/components/layout/SiteLink';
 import {
   ART_PLATE_CLASS,
   ArtImage,
@@ -128,7 +130,11 @@ export function HeroArtShowcase({ art }: { art: LandingHeroArtContent }) {
   const count = artworks.length;
   const current = artworks[index % count] ?? artworks[0]!;
   const tokenLabel = formatId(current.TokenId);
-  const title = current.TokenName?.trim() || 'Cosmic Signature';
+  const unavailableLabel = t('unavailable');
+  /** The token's name, or the unnamed form ("Signature #000025"). */
+  const titleOf = (artwork: ShowcaseArtwork) =>
+    artwork.TokenName?.trim() || t('untitled', { tokenLabel: formatId(artwork.TokenId) });
+  const title = titleOf(current);
   const canRotate = motionAllowed && count > 1;
   const rotating = canRotate && !paused && !held && onScreen;
 
@@ -143,7 +149,9 @@ export function HeroArtShowcase({ art }: { art: LandingHeroArtContent }) {
     const nextIndex = (((index + direction) % count) + count) % count;
     show(nextIndex);
     const next = artworks[nextIndex]!;
-    setAnnouncement(`${next.TokenName?.trim() || 'Cosmic Signature'} ${formatId(next.TokenId)}`);
+    setAnnouncement(
+      next.TokenName?.trim() ? `${titleOf(next)} ${formatId(next.TokenId)}` : titleOf(next),
+    );
   };
 
   useEffect(() => {
@@ -191,8 +199,9 @@ export function HeroArtShowcase({ art }: { art: LandingHeroArtContent }) {
       onFocus={() => setHeld(true)}
       onBlur={releaseFocus}
     >
-      <a
+      <SiteLink
         href={detailHref}
+        kind={classifyHref(detailHref, 'landing')}
         aria-label={art.viewAriaLabel.replace('{tokenLabel}', tokenLabel)}
         data-testid="hero-art-link"
         className={cn(ART_PLATE_CLASS, 'block w-full')}
@@ -202,7 +211,7 @@ export function HeroArtShowcase({ art }: { art: LandingHeroArtContent }) {
             key={`previous-${previousArtwork.TokenId}`}
             artwork={previousArtwork}
             alt=""
-            unavailableLabel={art.formingLabel}
+            unavailableLabel={unavailableLabel}
             priority={false}
             entering={false}
           />
@@ -211,15 +220,17 @@ export function HeroArtShowcase({ art }: { art: LandingHeroArtContent }) {
           key={current.TokenId}
           artwork={current}
           alt={art.artworkAlt.replace('{tokenLabel}', tokenLabel)}
-          unavailableLabel={art.formingLabel}
+          unavailableLabel={unavailableLabel}
           priority={index === 0}
           entering={previousArtwork !== null}
           onEntered={clearPrevious}
         />
-      </a>
+      </SiteLink>
       <figcaption className={styles.wallLabel}>
-        <div className="min-w-0">
-          <p className="type-body-md font-medium text-foreground">{title}</p>
+        <div className={styles.wallLabelText}>
+          <p className="type-body-md font-medium text-foreground [overflow-wrap:anywhere]">
+            {title}
+          </p>
           <WallLabelMeta
             items={[
               <span key="id" className="type-mono">
@@ -232,15 +243,16 @@ export function HeroArtShowcase({ art }: { art: LandingHeroArtContent }) {
           />
         </div>
         <div className={styles.wallControls}>
-          <a
+          <SiteLink
             href={galleryHref}
+            kind={classifyHref(galleryHref, 'landing')}
             className="link-quiet type-body-sm hidden min-h-10 items-center gap-1.5 text-muted-foreground transition-colors duration-150 hover:text-foreground sm:inline-flex"
           >
             {art.galleryCta}
             <ArrowRight aria-hidden className="size-4 text-subtle" />
-          </a>
+          </SiteLink>
           {count > 1 ? (
-            <div className="flex items-center">
+            <div className={cn('flex items-center', styles.scriptedControl)}>
               <Button
                 type="button"
                 variant="ghost"

@@ -15,14 +15,13 @@ import styles from './Landing.module.css';
 interface ClosingBandProps {
   closing: LandingContent['closing'];
   showcase: LandingContent['art']['showcase'];
-  unavailableLabel: string;
 }
 
 /**
  * The page's last word: the newest Signatures and the way back into the app,
  * so a visitor who read to the end has a next step that is not the footer.
  */
-export function ClosingBand({ closing, showcase, unavailableLabel }: ClosingBandProps) {
+export function ClosingBand({ closing, showcase }: ClosingBandProps) {
   const locale = useLocale();
   const gallery = closing.galleryCta;
   return (
@@ -51,7 +50,6 @@ export function ClosingBand({ closing, showcase, unavailableLabel }: ClosingBand
         count={6}
         artworkAlt={showcase.artworkAlt}
         viewAriaLabel={showcase.viewAriaLabel}
-        unavailableLabel={unavailableLabel}
         sizes="(min-width: 64rem) 25rem, 50vw"
         className={styles.recentPlates}
       />

@@ -29,7 +29,6 @@ export const landingTextKo = {
     primaryCtaLabel: '앱 열기',
     secondaryCtaLabel: '사이클 작동 원리',
     art: {
-      formingLabel: '신호 형성 중',
       viewAriaLabel: '앱에서 Cosmic Signature {tokenLabel} 보기',
       artworkAlt: 'Cosmic Signature {tokenLabel}: 결정론적 삼체 제너러티브 아트 작품',
       galleryCta: '전체 갤러리 둘러보기',

@@ -29,7 +29,6 @@ export const landingTextZh = {
     primaryCtaLabel: '打开应用',
     secondaryCtaLabel: '了解周期如何运作',
     art: {
-      formingLabel: '信号生成中',
       viewAriaLabel: '在应用中查看 Cosmic Signature {tokenLabel}',
       artworkAlt: 'Cosmic Signature {tokenLabel} —— 确定性三体生成艺术作品',
       galleryCta: '浏览完整画廊',

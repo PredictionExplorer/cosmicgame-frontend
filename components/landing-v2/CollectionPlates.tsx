@@ -4,8 +4,10 @@ import { useMemo } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { formatId } from '@/utils/format/ids';
+import { classifyHref } from '@/config/siteNav';
 import { APP_ORIGIN, localizeCrossHostHref } from '@/lib/hostRouting';
 import { cn } from '@/lib/utils';
+import { SiteLink } from '@/components/layout/SiteLink';
 import { ArtFrame, PendingPlate, WallLabelMeta } from '@/components/ui/art-frame';
 
 import { showcaseArtworks, showcaseSources, type ShowcaseArtwork } from './showcase-art';
@@ -13,34 +15,31 @@ import { useLandingShowcaseTokens, type LandingShowcase } from './useLandingShow
 import styles from './Landing.module.css';
 
 /**
- * Which Signatures a collection strip shows.
+ * Which Signatures a collection strip shows, newest first.
  *
  * - `recent`: the newest imprints.
- * - `anchored`: Signatures anchored to the protocol right now, newest first.
- *
- * Either list is topped up with the newest remaining pieces (the bundled
- * featured ones included), so a strip is always full once the collection
- * answers, and shows the bundled pieces before it does.
+ * - `anchored`: only Signatures the collection reports as anchored right
+ *   now. The strip is never topped up with pieces that are not anchored.
  */
 export type CollectionPick = 'recent' | 'anchored';
 
+/**
+ * The plates of a strip. While the collection loads, every place waits
+ * (`null`, a skeleton plate): only the collection knows which pieces are the
+ * newest or anchored. When it cannot be read, the strip is empty and not
+ * drawn; when it has fewer matches than `count`, only those are shown.
+ */
 export function pickCollection(
   showcase: LandingShowcase,
   pick: CollectionPick,
   count: number,
 ): readonly (ShowcaseArtwork | null)[] {
-  const artworks = showcaseArtworks(showcase.tokens);
-  const newestFirst = [...artworks].sort((a, b) => b.TokenId - a.TokenId);
-  const preferred = pick === 'anchored' ? newestFirst.filter((art) => art.Staked) : newestFirst;
-  const picked = [...preferred];
-  for (const art of newestFirst) {
-    if (picked.length >= count) break;
-    if (!picked.includes(art)) picked.push(art);
-  }
-  const shown: (ShowcaseArtwork | null)[] = picked.slice(0, count);
-  // Until the collection answers, the places the bundled pieces cannot fill wait.
-  while (shown.length < count && showcase.status === 'loading') shown.push(null);
-  return shown;
+  if (showcase.status === 'loading') return Array.from({ length: count }, () => null);
+  if (showcase.status === 'failed') return [];
+  const newestFirst = [...showcaseArtworks(showcase.tokens)].sort((a, b) => b.TokenId - a.TokenId);
+  const matching =
+    pick === 'anchored' ? newestFirst.filter((art) => art.Staked === true) : newestFirst;
+  return matching.slice(0, count);
 }
 
 interface CollectionPlatesProps {
@@ -50,7 +49,8 @@ interface CollectionPlatesProps {
   artworkAlt: string;
   /** Template with `{tokenLabel}`. */
   viewAriaLabel: string;
-  unavailableLabel: string;
+  /** Caption of a plate whose artwork cannot load; defaults to "Artwork unavailable". */
+  unavailableLabel?: string;
   /** The plates' rendered width, for the srcset choice. */
   sizes: string;
   className?: string;
@@ -59,6 +59,8 @@ interface CollectionPlatesProps {
 /**
  * A set of Signatures from the collection, each a plate that opens its page
  * in the app, with a one-line wall label (token number and cycle) beneath.
+ * Renders nothing when the collection cannot be read or has no match, so a
+ * layout around it should read well without it.
  */
 export function CollectionPlates({
   pick,
@@ -70,12 +72,19 @@ export function CollectionPlates({
   className,
 }: CollectionPlatesProps) {
   const locale = useLocale();
+  const t = useTranslations('landing.artwork');
   const timerT = useTranslations('landing.timer');
   const showcase = useLandingShowcaseTokens();
   const plates = useMemo(() => pickCollection(showcase, pick, count), [showcase, pick, count]);
 
+  if (plates.length === 0) return null;
+
   return (
-    <ul className={cn(styles.collection, className)} data-testid={`collection-${pick}`}>
+    <ul
+      className={cn(styles.collection, className)}
+      data-testid={`collection-${pick}`}
+      aria-busy={showcase.status === 'loading' || undefined}
+    >
       {plates.map((artwork, index) => {
         if (!artwork) {
           return (
@@ -85,10 +94,12 @@ export function CollectionPlates({
           );
         }
         const tokenLabel = formatId(artwork.TokenId);
+        const detailHref = localizeCrossHostHref(`${APP_ORIGIN}/detail/${artwork.TokenId}`, locale);
         return (
           <li key={artwork.TokenId} className={styles.collectionItem}>
-            <a
-              href={localizeCrossHostHref(`${APP_ORIGIN}/detail/${artwork.TokenId}`, locale)}
+            <SiteLink
+              href={detailHref}
+              kind={classifyHref(detailHref, 'landing')}
               aria-label={viewAriaLabel.replace('{tokenLabel}', tokenLabel)}
               className="block rounded-edge"
             >
@@ -96,11 +107,11 @@ export function CollectionPlates({
                 sources={showcaseSources(artwork)}
                 alt={artworkAlt.replace('{tokenLabel}', tokenLabel)}
                 sizes={sizes}
-                unavailableLabel={unavailableLabel}
+                unavailableLabel={unavailableLabel ?? t('unavailable')}
                 unavailableDetail={tokenLabel}
                 density="compact"
               />
-            </a>
+            </SiteLink>
             <WallLabelMeta
               className="mt-2"
               items={[

@@ -16,14 +16,13 @@ import styles from './Landing.module.css';
 interface AnchoringProps {
   anchoring: LandingContent['anchoring'];
   showcase: LandingContent['art']['showcase'];
-  unavailableLabel: string;
 }
 
 /**
  * Anchoring: Signatures anchored to the protocol right now beside the rule in
  * two sentences and four short facts, and the way to anchor in the app.
  */
-export function Anchoring({ anchoring, showcase, unavailableLabel }: AnchoringProps) {
+export function Anchoring({ anchoring, showcase }: AnchoringProps) {
   const locale = useLocale();
   const { cta } = anchoring;
   return (
@@ -34,7 +33,6 @@ export function Anchoring({ anchoring, showcase, unavailableLabel }: AnchoringPr
           count={3}
           artworkAlt={showcase.artworkAlt}
           viewAriaLabel={showcase.viewAriaLabel}
-          unavailableLabel={unavailableLabel}
           sizes="(min-width: 64rem) 36rem, 100vw"
           className={styles.anchoredPlates}
         />

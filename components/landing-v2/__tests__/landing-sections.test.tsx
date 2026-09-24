@@ -5,6 +5,7 @@ import { landingContentEn } from '@/content/landing';
 import { AllocationTracks } from '@/components/landing-v2/AllocationTracks';
 import { Anchoring } from '@/components/landing-v2/Anchoring';
 import { ClosingBand } from '@/components/landing-v2/ClosingBand';
+import { pickCollection } from '@/components/landing-v2/CollectionPlates';
 import { CosmicCouncil } from '@/components/landing-v2/CosmicCouncil';
 import { LandingFAQ } from '@/components/landing-v2/LandingFAQ';
 import { PublicGoods } from '@/components/landing-v2/PublicGoods';
@@ -24,7 +25,6 @@ jest.mock('@/components/landing-v2/useLandingShowcaseTokens', () => ({
 
 const mockShowcase = jest.mocked(useLandingShowcaseTokens);
 const content = landingContentEn;
-const UNAVAILABLE = content.hero.art.formingLabel;
 
 function collection(count: number, anchored: readonly number[] = []): LandingShowcase {
   return {
@@ -51,25 +51,15 @@ describe('landing sections', () => {
     // left the Allocation Tracks, Anchoring, Public Goods, Council and
     // Verifiability blank until an IntersectionObserver fired.
     const sections = [
-      <TheArt key="art" art={content.art} unavailableLabel={UNAVAILABLE} />,
+      <TheArt key="art" art={content.art} />,
       <TheCycle key="cycle" cycle={content.cycle} />,
       <AllocationTracks key="tracks" tracks={content.tracks} />,
       <PublicGoods key="pg" publicGoods={content.publicGoods} />,
-      <Anchoring
-        key="anchoring"
-        anchoring={content.anchoring}
-        showcase={content.art.showcase}
-        unavailableLabel={UNAVAILABLE}
-      />,
+      <Anchoring key="anchoring" anchoring={content.anchoring} showcase={content.art.showcase} />,
       <CosmicCouncil key="council" council={content.council} />,
       <Verifiability key="verifiability" verifiability={content.verifiability} />,
       <LandingFAQ key="faq" faq={content.faq} />,
-      <ClosingBand
-        key="closing"
-        closing={content.closing}
-        showcase={content.art.showcase}
-        unavailableLabel={UNAVAILABLE}
-      />,
+      <ClosingBand key="closing" closing={content.closing} showcase={content.art.showcase} />,
     ];
     for (const section of sections) {
       const { container, unmount } = render(section);
@@ -100,28 +90,72 @@ describe('landing sections', () => {
     });
   });
 
+  describe('pickCollection', () => {
+    it('keeps anchored Signatures only, including a featured one the collection reports', () => {
+      const showcase: LandingShowcase = {
+        status: 'ready',
+        tokens: [
+          { TokenId: 30, Seed: 'aa', Staked: false },
+          { TokenId: 24, Seed: FEATURED_LANDING_ART[1].Seed, Staked: true },
+          { TokenId: 23, Seed: FEATURED_LANDING_ART[0].Seed, Staked: false },
+        ],
+      };
+      expect(pickCollection(showcase, 'anchored', 3).map((art) => art?.TokenId)).toEqual([24]);
+      expect(pickCollection(showcase, 'recent', 2).map((art) => art?.TokenId)).toEqual([30, 24]);
+    });
+
+    it('waits at the full count while loading and shows nothing when the read fails', () => {
+      expect(pickCollection({ tokens: [], status: 'loading' }, 'anchored', 3)).toEqual([
+        null,
+        null,
+        null,
+      ]);
+      expect(pickCollection({ tokens: [], status: 'failed' }, 'recent', 6)).toEqual([]);
+    });
+  });
+
   describe('<Anchoring />', () => {
+    const renderAnchoring = () =>
+      render(<Anchoring anchoring={content.anchoring} showcase={content.art.showcase} />);
+
     it('shows Signatures that are anchored right now, newest first', () => {
-      mockShowcase.mockReturnValue(collection(8, [55, 54]));
-      render(
-        <Anchoring
-          anchoring={content.anchoring}
-          showcase={content.art.showcase}
-          unavailableLabel={UNAVAILABLE}
-        />,
-      );
-      // The two anchored pieces lead; the newest piece fills the third place.
-      expect(plateIds(screen.getByTestId('collection-anchored'))).toEqual(['55', '54', '60']);
+      mockShowcase.mockReturnValue(collection(8, [58, 55, 54, 53]));
+      renderAnchoring();
+      expect(plateIds(screen.getByTestId('collection-anchored'))).toEqual(['58', '55', '54']);
+    });
+
+    it('never tops the anchored plates up with pieces that are not anchored', () => {
+      // Regression: fewer than three anchored pieces were padded with the
+      // newest imprints, presented as anchored.
+      mockShowcase.mockReturnValue(collection(8, [55]));
+      renderAnchoring();
+      const strip = screen.getByTestId('collection-anchored');
+      expect(plateIds(strip)).toEqual(['55']);
+      expect(within(strip).queryAllByTestId('pending-plate')).toHaveLength(0);
+    });
+
+    it('waits with skeleton plates, not bundled art, until the collection answers', () => {
+      // Regression: the bundled #24 and #23 stood in as "anchored" pieces.
+      renderAnchoring();
+      const strip = screen.getByTestId('collection-anchored');
+      expect(within(strip).queryAllByRole('link')).toHaveLength(0);
+      expect(within(strip).getAllByTestId('pending-plate')).toHaveLength(3);
+    });
+
+    it('drops the plates, keeping the words, when nothing anchored can be shown', () => {
+      mockShowcase.mockReturnValue({ tokens: [], status: 'failed' });
+      const { unmount } = renderAnchoring();
+      expect(screen.queryByTestId('collection-anchored')).not.toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: content.anchoring.heading })).toBeInTheDocument();
+      unmount();
+
+      mockShowcase.mockReturnValue(collection(8));
+      renderAnchoring();
+      expect(screen.queryByTestId('collection-anchored')).not.toBeInTheDocument();
     });
 
     it('keeps the rule to two sentences and glosses Random Walk NFTs', () => {
-      render(
-        <Anchoring
-          anchoring={content.anchoring}
-          showcase={content.art.showcase}
-          unavailableLabel={UNAVAILABLE}
-        />,
-      );
+      renderAnchoring();
       expect(content.anchoring.body.match(/\.(\s|$)/g)).toHaveLength(2);
       expect(screen.getByText(/from the companion collection/)).toBeInTheDocument();
       expect(screen.getByRole('link', { name: content.anchoring.cta.label })).toHaveAttribute(
@@ -164,13 +198,7 @@ describe('landing sections', () => {
   describe('<ClosingBand />', () => {
     it('ends the page with the newest Signatures and the way back into the app', () => {
       mockShowcase.mockReturnValue(collection(8));
-      render(
-        <ClosingBand
-          closing={content.closing}
-          showcase={content.art.showcase}
-          unavailableLabel={UNAVAILABLE}
-        />,
-      );
+      render(<ClosingBand closing={content.closing} showcase={content.art.showcase} />);
       expect(plateIds(screen.getByTestId('collection-recent'))).toEqual([
         '60',
         '59',
@@ -188,19 +216,21 @@ describe('landing sections', () => {
       );
     });
 
-    it('shows the bundled pieces and waiting plates before the collection answers', () => {
-      render(
-        <ClosingBand
-          closing={content.closing}
-          showcase={content.art.showcase}
-          unavailableLabel={UNAVAILABLE}
-        />,
-      );
+    it('holds six skeleton plates until the collection answers', () => {
+      render(<ClosingBand closing={content.closing} showcase={content.art.showcase} />);
       const strip = screen.getByTestId('collection-recent');
-      expect(plateIds(strip)).toEqual(
-        [...FEATURED_LANDING_ART].reverse().map((art) => String(art.TokenId)),
-      );
-      expect(within(strip).getAllByTestId('pending-plate')).toHaveLength(4);
+      expect(within(strip).queryAllByRole('link')).toHaveLength(0);
+      expect(within(strip).getAllByTestId('pending-plate')).toHaveLength(6);
+    });
+
+    it('drops the strip, not the way back, when the collection cannot be read', () => {
+      // Regression: two bundled plates sat in a six-plate grid with empty columns.
+      mockShowcase.mockReturnValue({ tokens: [], status: 'failed' });
+      render(<ClosingBand closing={content.closing} showcase={content.art.showcase} />);
+      expect(screen.queryByTestId('collection-recent')).not.toBeInTheDocument();
+      expect(
+        screen.getByRole('link', { name: content.closing.galleryCta.label }),
+      ).toBeInTheDocument();
     });
   });
 });

@@ -31,7 +31,6 @@ export const landingTextJa = {
     primaryCtaLabel: 'アプリを開く',
     secondaryCtaLabel: 'サイクルの仕組み',
     art: {
-      formingLabel: '作品を読み込み中',
       viewAriaLabel: 'Cosmic Signature {tokenLabel}をアプリで見る',
       artworkAlt: 'Cosmic Signature {tokenLabel}——決定論的な三体ジェネラティブアートワーク',
       galleryCta: 'ギャラリー全体を見る',

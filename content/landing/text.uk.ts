@@ -29,7 +29,6 @@ export const landingTextUk = {
     primaryCtaLabel: 'Відкрити застосунок',
     secondaryCtaLabel: 'Як працює цикл',
     art: {
-      formingLabel: 'Сигнал формується',
       viewAriaLabel: 'Переглянути Cosmic Signature {tokenLabel} у застосунку',
       artworkAlt:
         'Cosmic Signature {tokenLabel} — детермінований генеративний твір на основі задачі трьох тіл',

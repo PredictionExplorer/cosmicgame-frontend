@@ -9,6 +9,12 @@ import {
   type LandingShowcase,
 } from '@/components/landing-v2/useLandingShowcaseTokens';
 
+// CSS module class names as written, so a test can see which class an element carries.
+jest.mock(
+  '@/components/landing-v2/Landing.module.css',
+  () => new Proxy({}, { get: (_target, key) => (key === '__esModule' ? false : key) }),
+);
+
 jest.mock('@/components/landing-v2/useLandingShowcaseTokens', () => ({
   ...jest.requireActual('@/components/landing-v2/useLandingShowcaseTokens'),
   useLandingShowcaseTokens: jest.fn(),
@@ -118,7 +124,8 @@ describe('<HeroArtShowcase />', () => {
   it('captions the plate with a wall label: the name, then the token number and cycle', () => {
     render(<HeroArtShowcase art={art} />);
     const caption = screen.getByTestId('hero-art-showcase').querySelector('figcaption')!;
-    expect(caption).toHaveTextContent('Cosmic Signature');
+    // An unnamed token takes the unnamed form, "Signature #000023".
+    expect(caption).toHaveTextContent('landing.artwork.untitled(tokenLabel=#000023)');
     expect(caption).toHaveTextContent('#000023');
     expect(caption).toHaveTextContent('landing.timer.cycle.numbered(number=0)');
     expect(screen.getByRole('link', { name: /Browse the full gallery/ })).toHaveAttribute(
@@ -207,7 +214,8 @@ describe('<HeroArtShowcase />', () => {
     fireEvent.error(currentImage());
     expectArtwork(42, '/cosmicsignature/0xfeedbeef.png');
     fireEvent.error(currentImage());
-    expect(screen.getByText(art.formingLabel)).toBeInTheDocument();
+    // The terminal state says the art is unavailable, never that it is still coming.
+    expect(screen.getByText('landing.artwork.unavailable')).toBeInTheDocument();
     expect(screen.getByTestId('hero-art-link')).toHaveAttribute(
       'href',
       'https://app.cosmicsignature.com/detail/42',
@@ -224,7 +232,32 @@ describe('<HeroArtShowcase />', () => {
       .querySelector('[aria-live="polite"]') as HTMLElement;
     expect(region).toBeEmptyDOMElement();
     next();
-    expect(region).toHaveTextContent('Cosmic Signature #000024');
+    expect(region).toHaveTextContent('landing.artwork.untitled(tokenLabel=#000024)');
+  });
+
+  it('titles a named Signature by its name', () => {
+    mockShowcase.mockReturnValue({
+      status: 'ready',
+      tokens: [{ TokenId: 42, Seed: 'feedbeef', RoundNum: 3, TokenName: ' Orbit Song ' }],
+    });
+    render(<HeroArtShowcase art={art} />);
+    const region = screen
+      .getByTestId('hero-art-showcase')
+      .querySelector('[aria-live="polite"]') as HTMLElement;
+    previous();
+    const caption = screen.getByTestId('hero-art-showcase').querySelector('figcaption')!;
+    expect(caption.querySelector('p')).toHaveTextContent(/^Orbit Song$/);
+    expect(region).toHaveTextContent('Orbit Song #000042');
+  });
+
+  it('offers the rotation controls only where JavaScript runs', () => {
+    render(<HeroArtShowcase art={art} />);
+    const controls = screen.getByRole('button', { name: 'landing.artwork.next' }).parentElement!;
+    // Landing.module.css hides this class under @media (scripting: none).
+    expect(controls).toHaveClass('scriptedControl');
+    expect(screen.getByRole('link', { name: /Browse the full gallery/ })).not.toHaveClass(
+      'scriptedControl',
+    );
   });
 
   it('contains no banned lexicon terms in the rendered DOM', () => {

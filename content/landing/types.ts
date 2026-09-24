@@ -13,8 +13,6 @@ export interface LandingMetaContent {
 
 /** Copy around the hero's artwork; the token itself comes from the collection. */
 export interface LandingHeroArtContent {
-  /** Caption of the plate when an artwork cannot be shown. */
-  readonly formingLabel: string;
   /** Serializable template. Replace `{tokenLabel}` with the formatted token identifier. */
   readonly viewAriaLabel: string;
   /** Serializable template. Replace `{tokenLabel}` with the formatted token identifier. */

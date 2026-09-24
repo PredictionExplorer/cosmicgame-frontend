@@ -29,7 +29,6 @@ export const landingTextEn = {
     primaryCtaLabel: 'Open the app',
     secondaryCtaLabel: 'How a cycle works',
     art: {
-      formingLabel: 'Signal forming',
       viewAriaLabel: 'View Cosmic Signature {tokenLabel} in the app',
       artworkAlt: 'Cosmic Signature {tokenLabel} — deterministic three-body generative artwork',
       galleryCta: 'Browse the full gallery',

@@ -63,6 +63,8 @@
     "pauseRotation": "作品の切り替えを一時停止",
     "resumeRotation": "作品の切り替えを再開",
     "playAnimation": "アニメーションを再生",
-    "pauseAnimation": "アニメーションを一時停止"
+    "pauseAnimation": "アニメーションを一時停止",
+    "unavailable": "アートワークを利用できません",
+    "untitled": "シグネチャー{tokenLabel}"
   }
 }

@@ -63,6 +63,8 @@
     "pauseRotation": "작품 전환 일시 정지",
     "resumeRotation": "작품 전환 다시 시작",
     "playAnimation": "애니메이션 재생",
-    "pauseAnimation": "애니메이션 일시 정지"
+    "pauseAnimation": "애니메이션 일시 정지",
+    "unavailable": "작품을 불러올 수 없습니다",
+    "untitled": "시그니처 {tokenLabel}"
   }
 }

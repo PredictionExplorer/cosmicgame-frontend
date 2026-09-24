@@ -31,30 +31,21 @@ export default async function LandingPage({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
   const content = getLandingContent(locale);
-  const unavailableLabel = content.hero.art.formingLabel;
 
   return (
     <main id="main" tabIndex={-1} className={styles.page}>
       <Hero hero={content.hero} />
-      <TheArt art={content.art} unavailableLabel={unavailableLabel} />
+      <TheArt art={content.art} />
       <TheCycle cycle={content.cycle} />
       <AllocationTracks tracks={content.tracks} />
       <PublicGoods publicGoods={content.publicGoods} />
-      <Anchoring
-        anchoring={content.anchoring}
-        showcase={content.art.showcase}
-        unavailableLabel={unavailableLabel}
-      />
+      <Anchoring anchoring={content.anchoring} showcase={content.art.showcase} />
       <LandingPair>
         <CosmicCouncil council={content.council} />
         <Verifiability verifiability={content.verifiability} />
       </LandingPair>
       <LandingFAQ faq={content.faq} />
-      <ClosingBand
-        closing={content.closing}
-        showcase={content.art.showcase}
-        unavailableLabel={unavailableLabel}
-      />
+      <ClosingBand closing={content.closing} showcase={content.art.showcase} />
     </main>
   );
 }

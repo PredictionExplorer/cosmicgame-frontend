@@ -63,6 +63,8 @@
     "pauseRotation": "Pause the artwork rotation",
     "resumeRotation": "Resume the artwork rotation",
     "playAnimation": "Play the animation",
-    "pauseAnimation": "Pause the animation"
+    "pauseAnimation": "Pause the animation",
+    "unavailable": "Artwork unavailable",
+    "untitled": "Signature {tokenLabel}"
   }
 }

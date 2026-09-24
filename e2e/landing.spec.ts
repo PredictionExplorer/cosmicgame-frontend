@@ -372,6 +372,23 @@ test.describe('Landing page @ cosmicsignature.com', () => {
     }
   });
 
+  test('requests the animation only once The Art nears the screen', async ({ page }) => {
+    // Regression: the 3 MB mp4 downloaded on every desktop load, before the
+    // visitor scrolled anywhere near The Art.
+    await page.setViewportSize({ width: 1440, height: 900 });
+    const videoRequests: string[] = [];
+    await page.route('**/*.mp4', (route) => {
+      videoRequests.push(route.request().url());
+      return route.abort();
+    });
+    await page.goto('/', { waitUntil: 'load' });
+    await page.waitForLoadState('networkidle');
+    expect(videoRequests).toEqual([]);
+
+    await page.locator('#art figure').scrollIntoViewIfNeeded();
+    await expect.poll(() => videoRequests.length).toBeGreaterThan(0);
+  });
+
   test('cross-domain links to Protocol Guild and social open in a new tab with rel="noopener"', async ({
     page,
   }) => {
@@ -476,6 +493,11 @@ test.describe('Landing page @ cosmicsignature.com', () => {
       await expect(page.locator('main noscript p')).toContainText(
         'The live clock needs JavaScript.',
       );
+      // Controls that need JavaScript are not offered; the links still work.
+      for (const name of [/next artwork/i, /previous artwork/i, /play the animation/i]) {
+        await expect(page.getByRole('button', { name })).toBeHidden();
+      }
+      await expect(page.getByTestId('hero-art-link')).toBeVisible();
     } finally {
       await context.close();
     }

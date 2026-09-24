@@ -63,6 +63,8 @@
     "pauseRotation": "Призупинити зміну творів",
     "resumeRotation": "Відновити зміну творів",
     "playAnimation": "Відтворити анімацію",
-    "pauseAnimation": "Призупинити анімацію"
+    "pauseAnimation": "Призупинити анімацію",
+    "unavailable": "Твір недоступний",
+    "untitled": "Сигнатура {tokenLabel}"
   }
 }
