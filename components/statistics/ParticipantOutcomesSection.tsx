@@ -104,7 +104,14 @@ export const ParticipantOutcomesSection = () => {
         sortable: true,
         cell: (row) => (
           <span className="inline-flex flex-col items-end">
-            <span>{format.amount(row.TotalEthSpentEth, { unit: 'ETH', withUnit: false })}</span>
+            {/* Table precision, as Received and Net beside it: zero reads "0.0000". */}
+            <span>
+              {format.amount(row.TotalEthSpentEth, {
+                unit: 'ETH',
+                context: 'table',
+                withUnit: false,
+              })}
+            </span>
             {row.TotalCstSpentEth > 0 ? (
               <span className="type-caption text-muted-foreground">
                 {format.amount(row.TotalCstSpentEth, { unit: 'CST' })}
