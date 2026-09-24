@@ -1,12 +1,13 @@
+import type { ReactNode } from 'react';
 import { toast } from 'sonner';
 import userEvent from '@testing-library/user-event';
 
 import { TEST_APP_CONTRACT_ADDRESSES } from '@/test-utils/contractAddressesFixture';
+import { createFakeTxFlow } from '@/test-utils/txFlow';
 
-import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import type { CSTTokenInfo } from '@/services/api/types';
 
-import { checkA11y, fireEvent, render, screen, waitFor } from '@/test-utils';
+import { checkA11y, fireEvent, render, screen, waitFor, within } from '@/test-utils';
 
 import { CosmicSignatureNftTransferForm } from '../CosmicSignatureNftTransferForm';
 
@@ -16,8 +17,7 @@ const RECIPIENT = '0x3333333333333333333333333333333333333333';
 const TX_HASH_1 = '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
 const TX_HASH_2 = '0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
 
-const mockWriteContract = jest.fn();
-const mockWaitForTransactionReceipt = jest.fn();
+const mockTx = createFakeTxFlow(SOURCE);
 const mockInvalidateQueries = jest.fn();
 const mockEthereumRequest = jest.fn();
 const mockReportError = jest.fn();
@@ -26,20 +26,13 @@ let mockAccount = SOURCE;
 let mockActive = true;
 let mockContractAddresses = TEST_APP_CONTRACT_ADDRESSES;
 
-jest.mock('@wagmi/core', () => ({
-  writeContract: (...args: unknown[]) => mockWriteContract(...args),
+jest.mock('@/hooks/useTxFlow', () => ({
+  useTxFlow: () => mockTx.flow,
+  useTxStageLabel: () => () => null,
 }));
 
-const mockEnsureCorrectChain = jest.fn().mockResolvedValue(true);
-jest.mock('@/hooks/useRequireChain', () => ({
-  useRequireChain: () => ({ ensureCorrectChain: mockEnsureCorrectChain }),
-}));
-
-jest.mock('wagmi', () => ({
-  useConfig: () => ({ id: 'test-config' }),
-  usePublicClient: () => ({
-    waitForTransactionReceipt: (...args: unknown[]) => mockWaitForTransactionReceipt(...args),
-  }),
+jest.mock('@/components/wallet/NetworkGuard', () => ({
+  ChainGuard: ({ children }: { children: ReactNode }) => <>{children}</>,
 }));
 
 jest.mock('@tanstack/react-query', () => {
@@ -98,7 +91,7 @@ function createToken(overrides: Partial<CSTTokenInfo> = {}): CSTTokenInfo {
 }
 
 function renderForm(tokens: CSTTokenInfo[] = [createToken()]) {
-  render(
+  return render(
     <CosmicSignatureNftTransferForm
       sourceAddress={SOURCE}
       tokens={tokens}
@@ -123,21 +116,27 @@ function selectToken(nameOrId: string | RegExp) {
   fireEvent.click(getTokenRow(nameOrId));
 }
 
+const sendButton = () => screen.getByRole('button', { name: /myPages\.nftTransfer\.send$/ });
+
 function submitForm() {
-  const button = screen.getByRole('button', { name: 'myPages.nftTransfer.sendAria' });
-  const form = button.closest('form');
+  const form = sendButton().closest('form');
   expect(form).not.toBeNull();
   fireEvent.submit(form!);
 }
 
+const summary = (selected: number, total: number) =>
+  `myPages.nftTransfer.pickerSummary(selected=${selected},total=${total})`;
+
 describe('CosmicSignatureNftTransferForm', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockTx.reset();
     mockAccount = SOURCE;
     mockActive = true;
     mockContractAddresses = TEST_APP_CONTRACT_ADDRESSES;
-    mockWriteContract.mockResolvedValueOnce(TX_HASH_1).mockResolvedValueOnce(TX_HASH_2);
-    mockWaitForTransactionReceipt.mockResolvedValue({ status: 'success' });
+    // A reset, not a clear: a test that sends fewer transfers leaves queued hashes behind.
+    mockTx.writeContract.mockReset();
+    mockTx.writeContract.mockResolvedValueOnce(TX_HASH_1).mockResolvedValueOnce(TX_HASH_2);
     mockInvalidateQueries.mockResolvedValue(undefined);
     mockEthereumRequest.mockResolvedValue('0x1');
     Object.defineProperty(window, 'ethereum', {
@@ -146,66 +145,53 @@ describe('CosmicSignatureNftTransferForm', () => {
     });
   });
 
-  it('renders source wallet, owned NFTs, selectable rows, and history link', () => {
+  it('shows the source wallet, every NFT on its plate, and the history link', () => {
     renderForm([
       createToken({ TokenId: 1, TokenName: 'Alpha' }),
       createToken({ TokenId: 2, TokenName: 'Beta', EvtLogId: 2 }),
     ]);
 
-    expect(screen.getAllByText('0x1111…\u20601111')).toHaveLength(1);
+    expect(screen.getByText('myPages.nftTransfer.sourceWallet')).toBeInTheDocument();
     expect(screen.getByText('Alpha')).toBeInTheDocument();
     expect(screen.getByText('Beta')).toBeInTheDocument();
     expect(screen.getAllByLabelText(/myPages\.nftTransfer\.selectAria/)).toHaveLength(2);
-    expect(screen.queryByLabelText('Select Cosmic Signature NFTs')).not.toBeInTheDocument();
-    expect(screen.getAllByRole('button', { name: 'myPages.nftTransfer.selectAll' })).toHaveLength(
-      1,
-    );
+    // Each tile draws its artwork on a plate (here the designed unavailable
+    // plate: no seed), decorative because the caption names the piece.
+    const plate = within(getTokenRow('Alpha')).getByTestId('pending-plate');
+    expect(plate).not.toHaveAttribute('role');
     expect(screen.getByRole('link', { name: 'myPages.nftTransfer.viewHistory' })).toHaveAttribute(
       'href',
       `/cosmic-signature-transfer/${SOURCE}`,
     );
   });
 
-  it('links sellers to the Cosmic Signature marketplace', () => {
-    renderForm();
-
-    expect(screen.getByRole('link', { name: 'nav.ecosystem.axiomZero.ariaLabel' })).toHaveAttribute(
-      'href',
-      COSMIC_SIGNATURE_MARKETPLACE_URL,
-    );
-  });
-
-  it('renders clear NFT metadata labels and values', () => {
+  it('captions each NFT with its name or number and its cycle', () => {
     renderForm([
       createToken({ TokenId: 1, TokenName: 'Alpha', RoundNum: 42 }),
       createToken({ TokenId: 2, TokenName: '', RoundNum: undefined, EvtLogId: 2 }),
     ]);
 
-    expect(screen.getAllByText('myPages.nftTransfer.customName')).toHaveLength(2);
-    expect(screen.getAllByText('myPages.nftTransfer.generationCycle')).toHaveLength(2);
-    expect(getTokenRow('Alpha')).toHaveTextContent('myPages.nftTransfer.cycle(cycle=42)');
-    expect(getTokenRow('myPages.nftTransfer.noCustomName')).toHaveTextContent(
-      'myPages.nftTransfer.cycleUnavailable',
-    );
-    expect(screen.queryByText('Unnamed')).not.toBeInTheDocument();
-    expect(screen.queryByText('Unknown')).not.toBeInTheDocument();
+    expect(getTokenRow('Alpha')).toHaveTextContent('#000001');
+    expect(
+      within(getTokenRow('Alpha')).getByRole('link', {
+        name: 'myPages.nftTransfer.cycle(cycle=42)',
+      }),
+    ).toHaveAttribute('href', '/allocation/42');
+    expect(getTokenRow('#000002')).toHaveTextContent('myPages.nftTransfer.cycleUnavailable');
   });
 
   it('treats cycle 0 as a real generation cycle', () => {
     renderForm([createToken({ TokenId: 1, TokenName: 'Deployment NFT', RoundNum: 0 })]);
 
-    const row = getTokenRow('Deployment NFT');
-    expect(row).toHaveTextContent('myPages.nftTransfer.cycle(cycle=0)');
     expect(
       screen.getByRole('link', { name: 'myPages.nftTransfer.cycle(cycle=0)' }),
     ).toHaveAttribute('href', '/allocation/0');
     expect(screen.queryByText('myPages.nftTransfer.cycleUnavailable')).not.toBeInTheDocument();
   });
 
-  it('does not repeat owner addresses inside NFT rows', () => {
+  it('does not repeat owner addresses inside the picker', () => {
     renderForm([
       createToken({ TokenId: 1, TokenName: 'Alpha', EvtLogId: 1 }),
-      createToken({ TokenId: 2, TokenName: 'Beta', EvtLogId: 2 }),
       createToken({
         TokenId: 3,
         TokenName: 'Stale owner',
@@ -214,10 +200,8 @@ describe('CosmicSignatureNftTransferForm', () => {
       }),
     ]);
 
-    expect(screen.queryByText('Current Owner')).not.toBeInTheDocument();
-    expect(screen.getByTestId('nft-transfer-picker')).not.toHaveTextContent('0x1111…\u20601111');
-    expect(screen.getByTestId('nft-transfer-picker')).not.toHaveTextContent('0x222222....222222');
-    expect(document.querySelector(`a[href="/user/${SOURCE}"]`)).toBeNull();
+    expect(screen.getByTestId('nft-transfer-picker')).not.toHaveTextContent(/0x1111/);
+    expect(screen.getByTestId('nft-transfer-picker')).not.toHaveTextContent(/0x2222/);
     expect(document.querySelector(`a[href="/user/${OTHER_SOURCE}"]`)).toBeNull();
   });
 
@@ -231,7 +215,7 @@ describe('CosmicSignatureNftTransferForm', () => {
     expect(input).toHaveValue(RECIPIENT);
   });
 
-  it('selects and unselects NFTs from row clicks', async () => {
+  it('selects and unselects NFTs from a click anywhere on the tile', async () => {
     const user = userEvent.setup();
     renderForm([
       createToken({ TokenId: 1, TokenName: 'Alpha' }),
@@ -241,17 +225,12 @@ describe('CosmicSignatureNftTransferForm', () => {
     await user.click(getTokenRow('Alpha'));
 
     expect(screen.getByLabelText('myPages.nftTransfer.selectAria(id=1)')).toBeChecked();
-    expect(
-      screen.getByText('myPages.nftTransfer.pickerSummary(selected=1,total=2)'),
-    ).toBeInTheDocument();
-    expect(getTokenRow('Alpha')).toHaveTextContent('myPages.nftTransfer.statusLabels.selected');
+    expect(screen.getByText(summary(1, 2))).toBeInTheDocument();
 
     await user.click(getTokenRow('Alpha'));
 
     expect(screen.getByLabelText('myPages.nftTransfer.selectAria(id=1)')).not.toBeChecked();
-    expect(
-      screen.getByText('myPages.nftTransfer.pickerSummary(selected=0,total=2)'),
-    ).toBeInTheDocument();
+    expect(screen.getByText(summary(0, 2))).toBeInTheDocument();
   });
 
   it('selects and unselects NFTs from the checkbox without double toggling', async () => {
@@ -262,16 +241,24 @@ describe('CosmicSignatureNftTransferForm', () => {
     await user.click(checkbox);
 
     expect(checkbox).toBeChecked();
-    expect(
-      screen.getByText('myPages.nftTransfer.pickerSummary(selected=1,total=1)'),
-    ).toBeInTheDocument();
+    expect(screen.getByText(summary(1, 1))).toBeInTheDocument();
 
     await user.click(checkbox);
 
     expect(checkbox).not.toBeChecked();
-    expect(
-      screen.getByText('myPages.nftTransfer.pickerSummary(selected=0,total=1)'),
-    ).toBeInTheDocument();
+    expect(screen.getByText(summary(0, 1))).toBeInTheDocument();
+  });
+
+  it('follows the cycle link without toggling the tile', async () => {
+    const user = userEvent.setup();
+    renderForm();
+
+    const link = screen.getByRole('link', { name: 'myPages.nftTransfer.cycle(cycle=5)' });
+    // jsdom cannot navigate; the router would.
+    link.addEventListener('click', (event) => event.preventDefault());
+    await user.click(link);
+
+    expect(screen.getByLabelText('myPages.nftTransfer.selectAria(id=1)')).not.toBeChecked();
   });
 
   it('bulk-selects only transferable NFTs and clears selection', async () => {
@@ -292,19 +279,15 @@ describe('CosmicSignatureNftTransferForm', () => {
     expect(screen.getByLabelText('myPages.nftTransfer.selectAria(id=1)')).toBeChecked();
     expect(screen.getByLabelText('myPages.nftTransfer.selectAria(id=2)')).not.toBeChecked();
     expect(screen.getByLabelText('myPages.nftTransfer.selectAria(id=3)')).not.toBeChecked();
-    expect(
-      screen.getByText('myPages.nftTransfer.pickerSummary(selected=1,total=1)'),
-    ).toBeInTheDocument();
+    expect(screen.getByText(summary(1, 1))).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'myPages.nftTransfer.clear' }));
 
     expect(screen.getByLabelText('myPages.nftTransfer.selectAria(id=1)')).not.toBeChecked();
-    expect(
-      screen.getByText('myPages.nftTransfer.pickerSummary(selected=0,total=1)'),
-    ).toBeInTheDocument();
+    expect(screen.getByText(summary(0, 1))).toBeInTheDocument();
   });
 
-  it('keeps picker controls usable when NFTs include owner metadata', async () => {
+  it('selects the current page and keeps the typed recipient', async () => {
     const user = userEvent.setup();
     renderForm([
       createToken({ TokenId: 1, TokenName: 'Alpha', EvtLogId: 1 }),
@@ -317,7 +300,21 @@ describe('CosmicSignatureNftTransferForm', () => {
     expect(screen.getByLabelText('myPages.nftTransfer.recipientAddress')).toHaveValue(RECIPIENT);
     expect(screen.getByLabelText('myPages.nftTransfer.selectAria(id=1)')).toBeChecked();
     expect(screen.getByLabelText('myPages.nftTransfer.selectAria(id=2)')).toBeChecked();
-    expect(screen.getByRole('button', { name: 'myPages.nftTransfer.sendAria' })).toBeEnabled();
+    expect(sendButton()).toBeEnabled();
+  });
+
+  it('pages a large collection eight at a time', async () => {
+    const user = userEvent.setup();
+    renderForm(
+      Array.from({ length: 10 }, (_, i) =>
+        createToken({ TokenId: i + 1, TokenName: `Piece ${i + 1}`, EvtLogId: i + 1 }),
+      ),
+    );
+
+    expect(screen.getAllByTestId(/^nft-row-/)).toHaveLength(8);
+    await user.click(screen.getByRole('button', { name: 'tables.pagination.nextAria' }));
+    expect(screen.getAllByTestId(/^nft-row-/)).toHaveLength(2);
+    expect(screen.getByText('Piece 10')).toBeInTheDocument();
   });
 
   it('shows anchored NFTs but keeps them unselectable', () => {
@@ -327,8 +324,9 @@ describe('CosmicSignatureNftTransferForm', () => {
     ]);
 
     selectToken('Anchored');
-    expect(screen.getByText('myPages.nftTransfer.statusLabels.anchored')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'myPages.nftTransfer.sendAria' })).toBeDisabled();
+    expect(getTokenRow('Anchored')).toHaveTextContent('myPages.nftTransfer.statusLabels.anchored');
+    expect(screen.getByLabelText('myPages.nftTransfer.selectAria(id=2)')).toBeDisabled();
+    expect(sendButton()).toBeDisabled();
   });
 
   it('keeps stale-owner NFTs unselectable', async () => {
@@ -345,7 +343,15 @@ describe('CosmicSignatureNftTransferForm', () => {
 
     expect(screen.getByText('myPages.nftTransfer.statusLabels.ownerChanged')).toBeInTheDocument();
     expect(screen.getByLabelText('myPages.nftTransfer.selectAria(id=1)')).not.toBeChecked();
-    expect(screen.getByRole('button', { name: 'myPages.nftTransfer.sendAria' })).toBeDisabled();
+    expect(sendButton()).toBeDisabled();
+  });
+
+  it('says so when the wallet holds no NFTs', () => {
+    renderForm([]);
+
+    expect(screen.getByText('myPages.nftTransfer.empty')).toBeInTheDocument();
+    expect(screen.queryByTestId('nft-transfer-picker')).not.toBeInTheDocument();
+    expect(sendButton()).toBeDisabled();
   });
 
   it('rejects an invalid recipient before writing', () => {
@@ -356,7 +362,7 @@ describe('CosmicSignatureNftTransferForm', () => {
     submitForm();
 
     expect(toast.error).toHaveBeenCalledWith('toasts.transfer.common.invalidRecipient');
-    expect(mockWriteContract).not.toHaveBeenCalled();
+    expect(mockTx.flow.run).not.toHaveBeenCalled();
   });
 
   it('rejects sending to the connected wallet', () => {
@@ -367,7 +373,7 @@ describe('CosmicSignatureNftTransferForm', () => {
     submitForm();
 
     expect(toast.error).toHaveBeenCalledWith('toasts.transfer.nft.recipientMustDiffer');
-    expect(mockWriteContract).not.toHaveBeenCalled();
+    expect(mockTx.flow.run).not.toHaveBeenCalled();
   });
 
   it('requires the connected account to match the source wallet', () => {
@@ -379,10 +385,10 @@ describe('CosmicSignatureNftTransferForm', () => {
     submitForm();
 
     expect(toast.error).toHaveBeenCalledWith('toasts.transfer.nft.sourceWalletRequired');
-    expect(mockWriteContract).not.toHaveBeenCalled();
+    expect(mockTx.flow.run).not.toHaveBeenCalled();
   });
 
-  it('sends selected NFTs sequentially and invalidates related queries', async () => {
+  it('sends the selected NFTs one transaction at a time and refreshes both wallets', async () => {
     renderForm([
       createToken({ TokenId: 1, TokenName: 'Alpha', EvtLogId: 1 }),
       createToken({ TokenId: 2, TokenName: 'Beta', EvtLogId: 2 }),
@@ -394,69 +400,90 @@ describe('CosmicSignatureNftTransferForm', () => {
 
     submitForm();
 
-    await waitFor(() => expect(mockWriteContract).toHaveBeenCalledTimes(2));
-    expect(mockWriteContract).toHaveBeenNthCalledWith(
+    await waitFor(() => expect(mockTx.writeContract).toHaveBeenCalledTimes(2));
+    expect(mockTx.writeContract).toHaveBeenNthCalledWith(
       1,
-      expect.objectContaining({ id: 'test-config' }),
       expect.objectContaining({
         address: TEST_APP_CONTRACT_ADDRESSES.cosmicSignature,
         functionName: 'transferFrom',
         args: [SOURCE, RECIPIENT, 1n],
         account: SOURCE,
-        chainId: 421614,
       }),
     );
-    expect(mockWriteContract).toHaveBeenNthCalledWith(
+    expect(mockTx.writeContract).toHaveBeenNthCalledWith(
       2,
-      expect.objectContaining({ id: 'test-config' }),
-      expect.objectContaining({
-        args: [SOURCE, RECIPIENT, 2n],
-      }),
+      expect.objectContaining({ args: [SOURCE, RECIPIENT, 2n] }),
     );
-    expect(mockWaitForTransactionReceipt).toHaveBeenCalledWith({ hash: TX_HASH_1 });
-    expect(mockWaitForTransactionReceipt).toHaveBeenCalledWith({ hash: TX_HASH_2 });
+
+    // One success toast for the run, on its last transfer; each failure names its token.
+    expect(mockTx.runs.map((run) => run.successMessage)).toEqual([
+      null,
+      'toasts.transfer.nft.confirmed(count=2)',
+    ]);
+    expect(mockTx.runs.map((run) => run.failureMessage)).toEqual([
+      'toasts.transfer.nft.failedToken(tokenId=1)',
+      'toasts.transfer.nft.failedToken(tokenId=2)',
+    ]);
+    expect(mockTx.runs[0]!.errorContext).toBe('Cosmic Signature NFT transfer');
 
     await waitFor(() =>
-      expect(toast.success).toHaveBeenCalledWith('toasts.transfer.nft.confirmed(count=2)'),
+      expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['cstInfo', 2] }),
     );
-    expect(mockInvalidateQueries).toHaveBeenCalledWith({
-      queryKey: ['cstTokensByUser', SOURCE],
-    });
-    expect(mockInvalidateQueries).toHaveBeenCalledWith({
-      queryKey: ['cstTokensByUser', RECIPIENT],
-    });
-    expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['cstTransfers', SOURCE] });
-    expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['cstTransfers', RECIPIENT] });
-    expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['cstInfo', 1] });
-    expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['cstInfo', 2] });
+    for (const queryKey of [
+      ['cstTokensByUser', SOURCE],
+      ['cstTokensByUser', RECIPIENT],
+      ['cstTransfers', SOURCE],
+      ['cstTransfers', RECIPIENT],
+      ['cstInfo', 1],
+    ]) {
+      expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey });
+    }
+    expect(
+      await screen.findByText('myPages.nftTransfer.confirmation.multiple(count=2)'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /myPages\.nftTransfer\.confirmation\.viewLatest/ }),
+    ).toHaveAttribute('href', expect.stringContaining(TX_HASH_2));
+    expect(screen.getByLabelText('myPages.nftTransfer.recipientAddress')).toHaveValue('');
   });
 
-  it('keeps successful transfers and reports the failed token when a later transfer fails', async () => {
-    mockWriteContract.mockReset();
-    mockWriteContract.mockResolvedValueOnce(TX_HASH_1).mockRejectedValueOnce(new Error('boom'));
+  it('keeps the confirmed transfers and stops at the one that fails', async () => {
+    mockTx.writeContract.mockReset();
+    mockTx.writeContract
+      .mockResolvedValueOnce(TX_HASH_1)
+      .mockRejectedValueOnce(new Error('boom'))
+      .mockResolvedValueOnce(TX_HASH_2);
 
     renderForm([
       createToken({ TokenId: 1, TokenName: 'Alpha', EvtLogId: 1 }),
       createToken({ TokenId: 2, TokenName: 'Beta', EvtLogId: 2 }),
+      createToken({ TokenId: 3, TokenName: 'Gamma', EvtLogId: 3 }),
     ]);
     selectToken('Alpha');
     selectToken('Beta');
+    selectToken('Gamma');
     fillRecipient();
 
     submitForm();
 
+    expect(
+      await screen.findByText('myPages.nftTransfer.progress.stopped(id=2)'),
+    ).toBeInTheDocument();
+    expect(mockTx.writeContract).toHaveBeenCalledTimes(2);
+    expect(mockTx.lastFailureMessage()).toBe('toasts.transfer.nft.failedToken(tokenId=2)');
     await waitFor(() =>
-      expect(screen.getByText('myPages.nftTransfer.progress.stopped(id=2)')).toBeInTheDocument(),
+      expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['cstInfo', 1] }),
     );
-    expect(mockWriteContract).toHaveBeenCalledTimes(2);
-    expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['cstInfo', 1] });
     expect(mockInvalidateQueries).not.toHaveBeenCalledWith({ queryKey: ['cstInfo', 2] });
-    expect(toast.error).toHaveBeenCalledWith('toasts.transfer.nft.failedToken(tokenId=2)');
+    // The recipient stays for a retry; the unsent NFTs stay selected.
+    expect(screen.getByLabelText('myPages.nftTransfer.recipientAddress')).toHaveValue(RECIPIENT);
+    expect(screen.getByLabelText('myPages.nftTransfer.selectAria(id=2)')).toBeChecked();
+    expect(screen.getByLabelText('myPages.nftTransfer.selectAria(id=3)')).toBeChecked();
   });
 
-  it('shows an informational toast when the wallet rejects the first transaction', async () => {
-    mockWriteContract.mockReset();
-    mockWriteContract.mockRejectedValueOnce({ code: 4001 });
+  it('stops quietly when the wallet declines the first transaction', async () => {
+    mockTx.writeContract.mockReset();
+    mockTx.writeContract.mockRejectedValueOnce({ code: 4001 });
 
     renderForm();
     selectToken('Alpha');
@@ -464,31 +491,13 @@ describe('CosmicSignatureNftTransferForm', () => {
 
     submitForm();
 
-    await waitFor(() =>
-      expect(toast.info).toHaveBeenCalledWith('toasts.walletTransactionCancelled'),
-    );
+    await waitFor(() => expect(mockTx.flow.run).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(sendButton()).toBeEnabled());
     expect(mockInvalidateQueries).not.toHaveBeenCalled();
+    expect(screen.queryByText(/myPages\.nftTransfer\.progress\.stopped/)).not.toBeInTheDocument();
   });
 
-  it('stops on a reverted receipt and shows the localized token failure', async () => {
-    mockWaitForTransactionReceipt.mockResolvedValueOnce({ status: 'reverted' });
-    renderForm();
-    selectToken('Alpha');
-    fillRecipient();
-
-    submitForm();
-
-    await waitFor(() =>
-      expect(toast.error).toHaveBeenCalledWith('toasts.transfer.nft.failedToken(tokenId=1)'),
-    );
-    expect(mockReportError).toHaveBeenCalledWith(
-      expect.any(Error),
-      'Cosmic Signature NFT transfer',
-    );
-    expect(toast.success).not.toHaveBeenCalled();
-  });
-
-  it('asks for confirmation before transferring to an address with no transaction history', async () => {
+  it('asks for confirmation before sending to an address with no transaction history', async () => {
     mockEthereumRequest.mockResolvedValue('0x0');
 
     renderForm();
@@ -498,24 +507,34 @@ describe('CosmicSignatureNftTransferForm', () => {
     submitForm();
 
     expect(await screen.findByText('myPages.nftTransfer.warning.title')).toBeInTheDocument();
-    expect(mockWriteContract).not.toHaveBeenCalled();
+    expect(mockTx.flow.run).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByRole('button', { name: 'myPages.nftTransfer.warning.continue' }));
 
-    await waitFor(() => expect(mockWriteContract).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(mockTx.writeContract).toHaveBeenCalledTimes(1));
+  });
+
+  it('sends without asking when the history check fails', async () => {
+    mockEthereumRequest.mockRejectedValue(new Error('rpc down'));
+
+    renderForm();
+    selectToken('Alpha');
+    fillRecipient();
+
+    submitForm();
+
+    await waitFor(() => expect(mockTx.writeContract).toHaveBeenCalledTimes(1));
+    expect(mockReportError).toHaveBeenCalledWith(
+      expect.any(Error),
+      'check NFT transfer destination',
+    );
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(
-      <CosmicSignatureNftTransferForm
-        sourceAddress={SOURCE}
-        tokens={[
-          createToken({ TokenId: 1, TokenName: 'Alpha', EvtLogId: 1 }),
-          createToken({ TokenId: 2, TokenName: 'Anchored', EvtLogId: 2, Staked: true }),
-        ]}
-        historyHref={`/cosmic-signature-transfer/${SOURCE}`}
-      />,
-    );
+    const { container } = renderForm([
+      createToken({ TokenId: 1, TokenName: 'Alpha', EvtLogId: 1 }),
+      createToken({ TokenId: 2, TokenName: 'Anchored', EvtLogId: 2, Staked: true }),
+    ]);
 
     await checkA11y(container);
   });

@@ -328,11 +328,7 @@
   },
   "nftTransfer": {
     "defaultDescription": "Cosmic Signature NFTを1点以上選び、別のウォレットアドレスへ送ります。",
-    "marketplacePrompt": "NFTを売買する場合は、マーケットプレイスで出品や購入ができます。",
-    "marketplace": "NFTを売買する",
     "sourceWallet": "送付元ウォレット",
-    "ownedNfts": "所有NFT",
-    "selected": "選択済み",
     "recipientAddress": "送付先アドレス",
     "empty": "このウォレットにCosmic Signature NFTはありません。",
     "pickerTitle": "移転するNFTを選ぶ",
@@ -342,19 +338,11 @@
     "clear": "選択を解除",
     "listAria": "Cosmic Signature NFT",
     "selectAria": "NFT #{id}を選択",
-    "nftLabel": "NFT #{id}",
-    "tokenId": "トークンID",
-    "customName": "カスタム名",
-    "noCustomName": "カスタム名なし",
-    "generationCycle": "生成サイクル",
     "cycle": "サイクル{cycle}",
     "cycleUnavailable": "サイクルのデータを利用できません",
-    "status": "状態",
     "statusLabels": {
       "anchored": "係留中——移転する前に解除してください",
-      "ownerChanged": "所有者が変わりました——移転する前に再読み込みしてください",
-      "selected": "選択済み",
-      "transferable": "移転可能"
+      "ownerChanged": "所有者が変わりました——移転する前に再読み込みしてください"
     },
     "progress": {
       "transferred": "{total}点のうち{completed}点のNFTを移転しました",
@@ -366,7 +354,6 @@
       "multiple": "{count}件の移転が確認されました。",
       "viewLatest": "最新のトランザクションを見る"
     },
-    "sendAria": "選択したNFTを送る",
     "sending": "送信中…",
     "send": "選択したNFTを送る",
     "viewHistory": "NFT移転履歴を見る",

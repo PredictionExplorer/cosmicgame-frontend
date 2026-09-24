@@ -328,11 +328,7 @@
   },
   "nftTransfer": {
     "defaultDescription": "選擇一枚或多枚 Cosmic Signature NFT，併發送至其他錢包地址。",
-    "marketplacePrompt": "想買賣 NFT？可前往市場；如需直接轉移，請在下方繼續。",
-    "marketplace": "買賣 NFT",
     "sourceWallet": "來源錢包",
-    "ownedNfts": "持有的 NFT",
-    "selected": "已選擇",
     "recipientAddress": "接收地址",
     "empty": "此錢包中沒有 Cosmic Signature NFT。",
     "pickerTitle": "選擇要轉移的 NFT",
@@ -342,19 +338,11 @@
     "clear": "清除選擇",
     "listAria": "Cosmic Signature NFT",
     "selectAria": "選擇 NFT #{id}",
-    "nftLabel": "NFT #{id}",
-    "tokenId": "代幣 ID",
-    "customName": "專屬名稱",
-    "noCustomName": "無專屬名稱",
-    "generationCycle": "生成週期",
     "cycle": "第 {cycle} 個週期",
     "cycleUnavailable": "暫無週期數據",
-    "status": "狀態",
     "statusLabels": {
       "anchored": "已錨定，請先解錨再轉移",
-      "ownerChanged": "持有者已變更，請重新整理後再轉移",
-      "selected": "已選擇",
-      "transferable": "可轉移"
+      "ownerChanged": "持有者已變更，請重新整理後再轉移"
     },
     "progress": {
       "transferred": "已轉移 {completed} 枚，共 {total} 枚",
@@ -366,7 +354,6 @@
       "multiple": "{count} 筆轉移已確認。",
       "viewLatest": "查看最新交易"
     },
-    "sendAria": "發送已選 NFT",
     "sending": "發送中…",
     "send": "發送已選 NFT",
     "viewHistory": "查看 NFT 轉移記錄",

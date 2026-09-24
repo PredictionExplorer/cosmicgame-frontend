@@ -179,7 +179,7 @@ function TransferSection({
           <ChevronDown
             aria-hidden
             className={cn(
-              'size-5 shrink-0 text-subtle transition-transform duration-base group-hover:text-foreground',
+              'size-5 shrink-0 text-subtle transition-transform duration-[var(--duration-base)] group-hover:text-foreground',
               open && 'rotate-180',
             )}
           />

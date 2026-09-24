@@ -328,11 +328,7 @@
   },
   "nftTransfer": {
     "defaultDescription": "Виберіть один або кілька Cosmic Signature NFT і надішліть їх на адресу іншого гаманця.",
-    "marketplacePrompt": "Хочете продати, а не надіслати напряму? Скористайтеся маркетплейсом, щоб виставити на продаж або придбати Cosmic Signature NFT.",
-    "marketplace": "Купити або продати NFT",
     "sourceWallet": "Гаманець-відправник",
-    "ownedNfts": "Ваші NFT",
-    "selected": "Вибрано",
     "recipientAddress": "Адреса отримувача",
     "empty": "У цьому гаманці немає Cosmic Signature NFT.",
     "pickerTitle": "Виберіть NFT для передачі",
@@ -342,19 +338,11 @@
     "clear": "Зняти вибір",
     "listAria": "Cosmic Signature NFT",
     "selectAria": "Вибрати NFT #{id}",
-    "nftLabel": "NFT #{id}",
-    "tokenId": "ID токена",
-    "customName": "Власне ім’я",
-    "noCustomName": "Без власного імені",
-    "generationCycle": "Цикл створення",
     "cycle": "Цикл {cycle}",
     "cycleUnavailable": "Дані циклу недоступні",
-    "status": "Статус",
     "statusLabels": {
       "anchored": "Закріплено — відкріпіть перед передачею",
-      "ownerChanged": "Власник змінився — оновіть перед передачею",
-      "selected": "Вибрано",
-      "transferable": "Можна передати"
+      "ownerChanged": "Власник змінився — оновіть перед передачею"
     },
     "progress": {
       "transferred": "Передано {completed} з {total} NFT",
@@ -366,7 +354,6 @@
       "multiple": "Підтверджено {count, plural, one {# передачу} few {# передачі} many {# передач} other {# передачі}}.",
       "viewLatest": "Переглянути останню транзакцію"
     },
-    "sendAria": "Надіслати вибрані NFT",
     "sending": "Надсилання…",
     "send": "Надіслати вибрані NFT",
     "viewHistory": "Переглянути історію передач NFT",
