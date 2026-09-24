@@ -33,6 +33,12 @@ Indian Type Foundry and distributed through Fontshare under the ITF Free Font Li
 (<https://www.fontshare.com/licenses/itf-ffl>), the same terms under which the site
 serves it as a web font.
 
+The site serves `public/fonts/noto-sans-kr/NotoSansKR-punctuation.ttf`, the five
+ASCII marks `! , . : ?` cut with `hb-subset` from `assets/fonts/NotoSansKR-400.subset.ttf`,
+as the web fallback of the Korean display punctuation alias (`styles/global.css`).
+It remains licensed under the SIL Open Font License 1.1; see
+[assets/fonts/OFL-NotoSansCJK.txt](assets/fonts/OFL-NotoSansCJK.txt).
+
 The Japanese and Korean white paper PDFs also embed regular (400) and bold (700)
 subsets of Noto Sans JP and Noto Sans KR. `npm run white-paper:pdf` generates these
 from the same pinned google/fonts sources, using each complete paper's glyph set.

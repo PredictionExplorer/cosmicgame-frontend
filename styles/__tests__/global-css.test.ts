@@ -1,7 +1,7 @@
 /**
  * @jest-environment node
  */
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 
 import postcss, { type AtRule, type ChildNode, type Root, type Rule } from 'postcss';
@@ -276,5 +276,23 @@ describe('overlay motion', () => {
       '--tw-enter-translate-y: calc(var(--spacing) * 2 * -1)',
     );
     expect(await declarationsFor('slide-out-to-left')).toContain('--tw-exit-translate-x: -100%');
+  });
+});
+
+describe('Korean display punctuation', () => {
+  it('falls back to the self-hosted cut where no Korean face is installed', () => {
+    // Regression: the alias listed local() faces only, so Android and Linux
+    // readers, whose Korean face goes by no listed name, got Clash's heavy
+    // square period back.
+    const name = globalCss.indexOf("font-family: 'CS Korean Display Punctuation'");
+    expect(name).toBeGreaterThan(-1);
+    const face = globalCss.slice(
+      globalCss.lastIndexOf('@font-face', name),
+      globalCss.indexOf('}', name),
+    );
+    const url = face.match(/url\('([^']+)'\) format\('truetype'\)/)?.[1];
+    expect(url).toBe('/fonts/noto-sans-kr/NotoSansKR-punctuation.ttf');
+    expect(face.trimEnd().indexOf('url(')).toBeGreaterThan(face.lastIndexOf('local('));
+    expect(existsSync(resolve(STYLES, '..', 'public', url!.slice(1)))).toBe(true);
   });
 });
