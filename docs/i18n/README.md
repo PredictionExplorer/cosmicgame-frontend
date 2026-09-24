@@ -343,8 +343,11 @@ migration:
 | `components/ui/date-picker.tsx` weekday labels `Su…Sa`           | zh: `日 一 二 三 四 五 六`; week starts Monday for zh                                  |
 | `react-countdown` renderers                                      | Localized unit labels via `formats.json`                                               |
 
-English output must remain byte-identical — every formatting change is guarded by
-existing unit tests plus new zh cases.
+That migration kept English output byte-identical. The formatting layer (§4.1) then
+changed English on purpose, to one standard for every locale: a number and its unit
+joined by U+00A0, the year on any date outside the current year, ETH at 4 decimals in
+cards, and grouped CST ("60,764.15 CST"). Every formatting change is guarded by unit
+tests in all eight locales (`utils/__tests__/format*.test.ts`).
 
 ### 4.1 The formatting layer
 
@@ -382,6 +385,15 @@ Every displayed number, amount, date, duration and address goes through
   table with `<TimeZoneNote>`.
 - Token amounts in messages are passed as strings from `formatAmount`; counts are passed
   as numbers and formatted by the message (`{count, number}` or `#`).
+- **Locale is never defaulted where it can be forgotten:** the legacy helpers
+  `formatEthValue`, `formatCSTValue` and `formatTableAmount` require it, and `<Amount>`,
+  `<DateTime>`, `<Duration>` and the hydration-safe date helpers fall back to
+  `useLocale()`, never to `'en'`.
+- **Guards:** `format-call-sites.test.ts` ratchets raw `toFixed`/`formatFixed` and private
+  amount formatters (each baseline entry must equal the file's current count, so it only
+  goes down); `format-known-addresses.test.ts` pins `formats.address.known.*` to the
+  /contracts names; `format-landing-entry.test.ts` keeps the landing on leaf modules
+  (`formatId` from `@/utils/format/ids`), never the `@/utils/format` barrel.
 
 ## 5. Fonts
 
