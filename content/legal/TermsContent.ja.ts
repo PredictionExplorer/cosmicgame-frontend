@@ -2,7 +2,7 @@ import { protocolFacts } from '@/content/protocol-facts';
 
 import type { TermsCopy } from './TermsContent';
 
-const cst = protocolFacts.specialAllocationCst.toLocaleString();
+const cst = protocolFacts.specialAllocationCst.toLocaleString('ja-JP');
 
 export const termsCopyJa = {
   title: '利用規約',
@@ -87,7 +87,7 @@ export const termsCopyJa = {
         {
           id: 'distribution',
           subtitle: '配分の実行',
-          text: `配分はスマートコントラクトのルールに従って自動的に配られます。標準的なサイクルでは、以下の配分トラック全体で${protocolFacts.typicalNftsPerCycle}点のCosmic Signature NFTと${protocolFacts.typicalCstImprintsPerCycle.toLocaleString()} CSTが刻印されます。`,
+          text: `配分はスマートコントラクトのルールに従って自動的に配られます。標準的なサイクルでは、以下の配分トラック全体で${protocolFacts.typicalNftsPerCycle}点のCosmic Signature NFTと${protocolFacts.typicalCstImprintsPerCycle.toLocaleString('ja-JP')} CSTが刻印されます。`,
         },
         {
           id: 'signature',
@@ -142,7 +142,7 @@ export const termsCopyJa = {
         {
           id: 'outreach',
           subtitle: '広報準備金',
-          text: `サイクルごとに${protocolFacts.outreachReserveCst.toLocaleString()} CSTが、広報配分とエコシステムの貢献者のために刻印されます。`,
+          text: `サイクルごとに${protocolFacts.outreachReserveCst.toLocaleString('ja-JP')} CSTが、広報配分とエコシステムの貢献者のために刻印されます。`,
         },
         {
           id: 'retrieval',

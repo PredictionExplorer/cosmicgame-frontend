@@ -85,27 +85,27 @@ export const termsCopyEn = {
         {
           id: 'distribution',
           subtitle: 'Allocation distribution',
-          text: `Allocations are distributed automatically according to the smart contract rules. In a typical cycle, ${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFTs and ${protocolFacts.typicalCstImprintsPerCycle.toLocaleString()} CST are imprinted across the allocation tracks below.`,
+          text: `Allocations are distributed automatically according to the smart contract rules. In a typical cycle, ${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFTs and ${protocolFacts.typicalCstImprintsPerCycle.toLocaleString('en-US')} CST are imprinted across the allocation tracks below.`,
         },
         {
           id: 'signature',
           subtitle: 'Signature Allocation',
-          text: `The participant who made the Final Gesture may retrieve ${protocolFacts.mainEthPercentage}% ETH, ${protocolFacts.specialAllocationCst.toLocaleString()} Recognition CST, one Cosmic Signature NFT, and attached tokens from the cycle, if any.`,
+          text: `The participant who made the Final Gesture may retrieve ${protocolFacts.mainEthPercentage}% ETH, ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} Recognition CST, one Cosmic Signature NFT, and attached tokens from the cycle, if any.`,
         },
         {
           id: 'chrono',
           subtitle: 'Chrono-Warrior',
-          text: `The participant who held the Endurance Champion position for the longest consecutive interval receives ${protocolFacts.chronoWarriorEthPercentage}% ETH, ${protocolFacts.specialAllocationCst.toLocaleString()} Recognition CST, and one Cosmic Signature NFT.`,
+          text: `The participant who held the Endurance Champion position for the longest consecutive interval receives ${protocolFacts.chronoWarriorEthPercentage}% ETH, ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} Recognition CST, and one Cosmic Signature NFT.`,
         },
         {
           id: 'endurance',
           subtitle: 'Endurance Champion',
-          text: `The participant with the longest uninterrupted most-recent-gesture interval receives ${protocolFacts.specialAllocationCst.toLocaleString()} Recognition CST and one Cosmic Signature NFT.`,
+          text: `The participant with the longest uninterrupted most-recent-gesture interval receives ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} Recognition CST and one Cosmic Signature NFT.`,
         },
         {
           id: 'final-cst',
           subtitle: 'Final CST Gesture',
-          text: `The participant who made the last CST gesture of the cycle receives ${protocolFacts.specialAllocationCst.toLocaleString()} Recognition CST and one Cosmic Signature NFT.`,
+          text: `The participant who made the last CST gesture of the cycle receives ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} Recognition CST and one Cosmic Signature NFT.`,
         },
         {
           id: 'eth-selection',
@@ -115,12 +115,12 @@ export const termsCopyEn = {
         {
           id: 'nft-selection',
           subtitle: 'NFT Stellar Selection',
-          text: `${protocolFacts.nftStellarSelectionRecipients} selected participants each receive ${protocolFacts.specialAllocationCst.toLocaleString()} Recognition CST and one Cosmic Signature NFT.`,
+          text: `${protocolFacts.nftStellarSelectionRecipients} selected participants each receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} Recognition CST and one Cosmic Signature NFT.`,
         },
         {
           id: 'anchored-selection',
           subtitle: 'Anchored-NFT Stellar Selection',
-          text: `${protocolFacts.anchoredRwlkNftSelectionRecipients} selected RandomWalk NFT anchor-holders each receive ${protocolFacts.specialAllocationCst.toLocaleString()} Recognition CST and one Cosmic Signature NFT.`,
+          text: `${protocolFacts.anchoredRwlkNftSelectionRecipients} selected RandomWalk NFT anchor-holders each receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} Recognition CST and one Cosmic Signature NFT.`,
         },
         {
           id: 'anchor-distribution',
@@ -140,7 +140,7 @@ export const termsCopyEn = {
         {
           id: 'outreach',
           subtitle: 'Outreach Reserve',
-          text: `${protocolFacts.outreachReserveCst.toLocaleString()} CST per cycle is imprinted for outreach distributions and ecosystem contributors.`,
+          text: `${protocolFacts.outreachReserveCst.toLocaleString('en-US')} CST per cycle is imprinted for outreach distributions and ecosystem contributors.`,
         },
         {
           id: 'retrieval',
