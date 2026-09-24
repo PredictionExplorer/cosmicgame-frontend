@@ -21,7 +21,10 @@ export function HeroSection({ hero }: { hero: HowItWorksContent['hero'] }) {
       subtitle={hero.paragraph}
     >
       <div className="mt-7 flex flex-col items-stretch gap-3 sm:mt-8 sm:flex-row sm:items-center">
-        <Link href={hero.primaryCta.href} className={buttonVariants({ size: 'lg' })}>
+        <Link
+          href={hero.primaryCta.href}
+          className={buttonVariants({ variant: 'commit', size: 'lg' })}
+        >
           {hero.primaryCta.label}
         </Link>
         <Link
