@@ -171,7 +171,6 @@ const AllocationFinalizedPage = ({ seoSummary }: { seoSummary?: ReactNode }) => 
           title={missingCycle.title}
           subtitle={missingCycle.body}
           actions={missingCycle.currentCycleLink}
-          related={[{ href: '/allocation', label: t('finalized.links.allRecipients') }]}
         />
       </PageShell>
     );

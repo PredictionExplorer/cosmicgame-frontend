@@ -345,7 +345,6 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
               )}
             </>
           }
-          related={recipientsLink}
         />
       </PageShell>
     );
