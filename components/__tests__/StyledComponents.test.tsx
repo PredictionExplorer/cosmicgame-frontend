@@ -120,12 +120,9 @@ describe('GradientText', () => {
     expect(el.tagName).toBe('SPAN');
   });
 
-  it('applies gradient classes', () => {
+  it('renders the shared signature gradient text', () => {
     render(<GradientText>gradient</GradientText>);
-    const el = screen.getByText('gradient');
-    expect(el).toHaveClass('bg-gradient-to-r');
-    expect(el).toHaveClass('bg-clip-text');
-    expect(el).toHaveClass('text-transparent');
+    expect(screen.getByText('gradient')).toHaveClass('text-gradient-signature');
   });
 
   it('renders as a custom element via as prop', () => {

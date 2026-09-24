@@ -99,9 +99,8 @@ describe('HowToPlayPage', () => {
   });
 
   it('renders section dividers between sections', () => {
-    const { container } = render(<HowToPlayPage content={howItWorksContentEn} />);
-    const dividers = container.querySelectorAll('[class*="bg-gradient-to-r"]');
-    expect(dividers.length).toBeGreaterThan(0);
+    render(<HowToPlayPage content={howItWorksContentEn} />);
+    expect(screen.getAllByRole('separator').length).toBeGreaterThan(0);
   });
 
   it('has no accessibility violations', async () => {
