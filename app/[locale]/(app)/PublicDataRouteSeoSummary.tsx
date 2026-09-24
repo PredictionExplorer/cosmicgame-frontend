@@ -10,7 +10,7 @@ import { SnapshotStamp } from '@/components/layout/SnapshotStamp';
 import { AddressChip } from '@/components/ui/address-chip';
 import { Amount } from '@/components/ui/amount';
 import { DateTime } from '@/components/ui/date-time';
-import { localizeCrossHostHref } from '@/lib/hostRouting';
+import { LANDING_ORIGIN, localizeCrossHostHref } from '@/lib/hostRouting';
 import { sumAllocatedEth } from '@/utils/allocationRecords';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import { NBSP, formatCount, formatPercent, sameAddress } from '@/utils/format';
@@ -53,6 +53,10 @@ export type SeoSummaryRoute =
 
 interface RouteDefinition {
   section: PageSectionId;
+  /**
+   * Related pages. Landing pages are built on `LANDING_ORIGIN`, so
+   * `localizeCrossHostHref` adds the reader's locale on every host.
+   */
   links: readonly { href: string; key: string }[];
 }
 
@@ -69,7 +73,7 @@ const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
     section: 'records',
     links: [
       { href: '/statistics/anchoring', key: 'statistics' },
-      { href: 'https://cosmicsignature.com/learn/anchoring-nfts', key: 'learn' },
+      { href: `${LANDING_ORIGIN}/learn/anchoring-nfts`, key: 'learn' },
       { href: '/gallery', key: 'gallery' },
     ],
   },
@@ -117,7 +121,7 @@ const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
     section: 'collection',
     links: [
       { href: '/gallery', key: 'gallery' },
-      { href: 'https://cosmicsignature.com/learn/three-body-nft-art', key: 'learn' },
+      { href: `${LANDING_ORIGIN}/learn/three-body-nft-art`, key: 'learn' },
       { href: '/code', key: 'code' },
     ],
   },
@@ -135,7 +139,7 @@ const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
       { href: '/security', key: 'security' },
       { href: '/audits', key: 'audits' },
       {
-        href: 'https://cosmicsignature.com/learn/cst-token-and-cosmic-council',
+        href: `${LANDING_ORIGIN}/learn/cst-token-and-cosmic-council`,
         key: 'learn',
       },
     ],
@@ -144,7 +148,7 @@ const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
     section: 'records',
     links: [
       {
-        href: 'https://cosmicsignature.com/learn/protocol-guild-public-goods',
+        href: `${LANDING_ORIGIN}/learn/protocol-guild-public-goods`,
         key: 'learn',
       },
       { href: '/public-goods-retrievals', key: 'retrievals' },

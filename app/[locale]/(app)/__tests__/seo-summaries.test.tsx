@@ -756,6 +756,15 @@ describe('server-rendered page headers', () => {
     expect(screen.queryByText(/initial HTML for search engines/i)).not.toBeInTheDocument();
   });
 
+  it('keeps the reader’s locale on related landing pages', async () => {
+    mockGetLocale.mockResolvedValue('zh');
+    render(await PublicDataRouteSeoSummary({ route: 'coordination-changes' }));
+    const learn = screen.getByRole('link', {
+      name: zhSeoMessages.publicData.routes['coordination-changes'].links.learn,
+    });
+    expect(learn.getAttribute('href')).toMatch(/\/zh\/learn\/cst-token-and-cosmic-council$/);
+  });
+
   it('renders all dedicated headers with Chinese headings and links', async () => {
     mockGetLocale.mockResolvedValue('zh');
 
