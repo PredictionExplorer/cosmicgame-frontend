@@ -190,6 +190,7 @@ export const privacyCopyEn = {
       oneYear: '1 year',
       twoYears: '2 years',
       untilCleared: 'Until you clear it',
+      untilTabClosed: 'Until you close the tab',
     },
     items: {
       themeCookie: 'Remembers your palette on both Cosmic Signature sites',
@@ -197,9 +198,10 @@ export const privacyCopyEn = {
       gaCookies: 'Tells repeat visits apart for Google Analytics',
       themeStorage: 'Remembers your palette on this site',
       attention: 'Remembers your finalization alert and sound settings',
-      explainer: 'Remembers that you closed the Cycle explainer',
-      observatory:
-        'Remembers a return visit to the experimental home, so its introduction starts collapsed',
+      artMotion: 'Remembers that you paused the artwork on the experimental home',
+      quizProgress:
+        'Keeps a quiz attempt in progress, so you can return to it after reading a reference',
+      quizBest: 'Remembers your best score on each quiz',
       wallet: 'Remembers which wallet you connected, so the app can reconnect it',
     },
   },

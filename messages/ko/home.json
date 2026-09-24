@@ -635,7 +635,8 @@
       "fullBreakdown": "전체 내역 보기",
       "nextCycleName": "다음 사이클 이월분",
       "nextCycleTooltip": "이 몫은 마감 시 배분되지 않고 준비금에 남아 다음 퍼포먼스 사이클의 출발점이 됩니다.",
-      "nextCycleDetail": "다음 사이클로 이월"
+      "nextCycleDetail": "다음 사이클로 이월",
+      "percentOfReserve": "준비금의 {percent}%"
     },
     "dock": {
       "aria": "사이클 빠른 작업",

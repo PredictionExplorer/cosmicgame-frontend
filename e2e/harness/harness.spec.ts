@@ -187,11 +187,13 @@ test('experimental UI submits a real gesture and receives the indexed chat messa
   await page.getByTestId('harness-persona-select').selectOption('Lyra');
   await page.getByRole('button', { name: 'Close harness panel' }).click();
 
-  const composer = page.getByTestId('composer-message-input');
+  // The page's own Gesture console (the phone sheet holds a second copy).
+  const gestureConsole = page.locator('#make-gesture');
+  const composer = gestureConsole.getByTestId('gesture-message-input');
   await expect(composer).toBeVisible({ timeout: 30_000 });
   const message = `Experimental UI roundtrip ${Date.now()}`;
   await composer.fill(message);
-  const submit = page.getByTestId('composer-gesture-submit');
+  const submit = gestureConsole.getByTestId('gesture-submit');
   await expect(submit).toBeVisible({ timeout: 30_000 });
   await submit.evaluate((element) => element.scrollIntoView({ block: 'center' }));
 

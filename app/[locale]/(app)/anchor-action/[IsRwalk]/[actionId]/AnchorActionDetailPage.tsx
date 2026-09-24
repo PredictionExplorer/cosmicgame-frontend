@@ -108,6 +108,7 @@ function AnchorActionBody({
   release: AnchorAction | null;
 }) {
   const t = useTranslations('anchoring');
+  const tTables = useTranslations('tables');
   const signatureAlt = useSignatureAlt();
   const isRwalk = collection === 'randomWalk';
   const { TokenId, StakerAddr } = anchor;
@@ -143,7 +144,7 @@ function AnchorActionBody({
         {isRwalk ? (
           <a href={tokenHref} target="_blank" rel="noopener noreferrer" className="block">
             {plate}
-            <span className="sr-only">{t('picker.opensNewTab')}</span>
+            <span className="sr-only">{tTables('links.newTab')}</span>
           </a>
         ) : (
           <Link href={tokenHref} className="block">
@@ -185,7 +186,7 @@ function AnchorActionBody({
                 >
                   {tokenId}
                   <ArrowUpRight aria-hidden className="ms-0.5 inline size-3.5 align-[-0.125em]" />
-                  <span className="sr-only">{t('picker.opensNewTab')}</span>
+                  <span className="sr-only">{tTables('links.newTab')}</span>
                 </a>
               ) : (
                 <Link href={tokenHref} className="link font-mono tabular-nums">
@@ -257,13 +258,13 @@ function NextLink({
   external?: boolean;
   children: ReactNode;
 }) {
-  const t = useTranslations('anchoring');
+  const tTables = useTranslations('tables');
   const Icon = external ? ArrowUpRight : ArrowRight;
   const content = (
     <>
       {children}
       <Icon aria-hidden className="ms-1 inline size-3.5 align-[-0.125em] text-subtle" />
-      {external ? <span className="sr-only">{t('picker.opensNewTab')}</span> : null}
+      {external ? <span className="sr-only">{tTables('links.newTab')}</span> : null}
     </>
   );
   return external ? (

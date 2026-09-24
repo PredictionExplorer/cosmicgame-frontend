@@ -1,6 +1,6 @@
 'use client';
 
-import { useSyncExternalStore, type HTMLAttributes, type ReactNode } from 'react';
+import type { HTMLAttributes, ReactNode } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import {
@@ -13,22 +13,12 @@ import {
   type DateTimeZone,
 } from '@/utils/format';
 import { cn } from '@/lib/utils';
+import { useHydrated } from '@/hooks/useHydrated';
 import { useNow } from '@/hooks/useNow';
 
-const subscribeToNothing = () => () => {};
-
-/**
- * `false` during SSR and the hydration pass, `true` afterwards. Date-times
- * render in UTC until then, so the server HTML and the first client render
- * agree, and switch to the reader's zone without a hydration mismatch.
- */
-function useHydrated(): boolean {
-  return useSyncExternalStore(
-    subscribeToNothing,
-    () => true,
-    () => false,
-  );
-}
+// Date-times render in UTC until hydration (`useHydrated`), so the server
+// HTML and the first client render agree, then switch to the reader's zone
+// without a hydration mismatch.
 
 /**
  * The compact date-time of a timestamp as a string: deterministic UTC during

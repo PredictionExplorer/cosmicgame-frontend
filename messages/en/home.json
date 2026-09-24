@@ -635,7 +635,8 @@
       "fullBreakdown": "View the full breakdown",
       "nextCycleName": "Next cycle seed",
       "nextCycleTooltip": "This share is not distributed at finalization — it stays in the reserve and seeds the next Performance Cycle.",
-      "nextCycleDetail": "compounds forward"
+      "nextCycleDetail": "compounds forward",
+      "percentOfReserve": "{percent}% of reserve"
     },
     "dock": {
       "aria": "Cycle quick actions",

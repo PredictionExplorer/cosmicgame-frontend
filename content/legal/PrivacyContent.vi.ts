@@ -213,6 +213,7 @@ export const privacyCopyVi = {
       oneYear: '1 năm',
       twoYears: '2 năm',
       untilCleared: 'Đến khi bạn xóa',
+      untilTabClosed: 'Cho đến khi bạn đóng thẻ',
     },
     items: {
       themeCookie: 'Ghi nhớ bảng màu của bạn trên cả hai trang Cosmic Signature',
@@ -220,9 +221,9 @@ export const privacyCopyVi = {
       gaCookies: 'Phân biệt các lượt truy cập lặp lại cho Google Analytics',
       themeStorage: 'Ghi nhớ bảng màu của bạn trên trang này',
       attention: 'Ghi nhớ cài đặt nhắc nhở và âm thanh của bạn',
-      explainer: 'Ghi nhớ rằng bạn đã đóng phần giải thích chu kỳ',
-      observatory:
-        'Ghi nhớ rằng bạn đã ghé trang chủ thử nghiệm, để phần giới thiệu được thu gọn ở lần sau',
+      artMotion: 'Ghi nhớ rằng bạn đã tạm dừng chuyển động của tác phẩm trên trang chủ thử nghiệm',
+      quizProgress: 'Giữ lượt trắc nghiệm đang làm dở, để bạn tiếp tục sau khi đọc phần tham khảo',
+      quizBest: 'Ghi nhớ kết quả tốt nhất của bạn ở mỗi bài trắc nghiệm',
       wallet: 'Ghi nhớ ví bạn đã kết nối để ứng dụng có thể kết nối lại',
     },
   },

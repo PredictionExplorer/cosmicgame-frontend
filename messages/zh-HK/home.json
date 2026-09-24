@@ -635,7 +635,8 @@
       "fullBreakdown": "查看完整分配明細",
       "nextCycleName": "下一週期儲備",
       "nextCycleTooltip": "這一份額不會在收官時發放——它留存於儲備之中，作為下一演繹週期的起始分配。",
-      "nextCycleDetail": "滾存至下一週期"
+      "nextCycleDetail": "滾存至下一週期",
+      "percentOfReserve": "佔儲備 {percent}%"
     },
     "dock": {
       "aria": "週期快捷操作",

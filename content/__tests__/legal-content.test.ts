@@ -14,9 +14,10 @@ import { privacyCopyZh } from '@/content/legal/PrivacyContent.zh';
 import type { PrivacyCopy } from '@/content/legal/PrivacyContent';
 import {
   activePrivacyStorage,
+  ART_MOTION_STORAGE_KEY,
   ATTENTION_STORAGE_KEY,
-  EXPLAINER_STORAGE_KEY,
-  OBSERVATORY_VISITED_STORAGE_KEY,
+  QUIZ_ATTEMPT_STORAGE_NAME,
+  QUIZ_BEST_STORAGE_NAME,
 } from '@/content/legal/privacyInventory';
 import { RISK_GROUP_IDS } from '@/content/legal/RiskContent';
 import { termsCopyEn } from '@/content/legal/TermsContent.en';
@@ -26,6 +27,8 @@ import { TRUST_CENTER_PAGES, TRUST_DOCUMENT_DATES } from '@/content/legal/trustC
 import { protocolFacts } from '@/content/protocol-facts';
 
 import { richTextLinks } from '@/components/legal/RichText';
+import { ART_MOTION_STORAGE_KEY as HOOK_ART_MOTION_KEY } from '@/components/home/experimental/useArtMotionPreference';
+import { attemptStorageKey, bestScoreStorageKey } from '@/components/quiz/quizProgress';
 import { ATTENTION_STORAGE_KEY as HOOK_ATTENTION_KEY } from '@/hooks/useAttentionPreferences';
 import { routing } from '@/i18n/routing';
 
@@ -191,22 +194,21 @@ describe('localized legal content', () => {
 
   it('pins the storage keys the privacy policy names to their sources', () => {
     expect(ATTENTION_STORAGE_KEY).toBe(HOOK_ATTENTION_KEY);
-    const explainer = readFileSync(
-      join(process.cwd(), 'components/home/CyclePhaseGuide.tsx'),
-      'utf8',
-    );
-    expect(explainer).toContain(`'${EXPLAINER_STORAGE_KEY}'`);
-    // The experimental home's returning-visitor marker was once missing from the policy.
-    const observatory = readFileSync(
-      join(process.cwd(), 'app/[locale]/(app)/experimental-ui/ExperimentalHomePage.tsx'),
-      'utf8',
-    );
-    expect(observatory).toContain(`'${OBSERVATORY_VISITED_STORAGE_KEY}'`);
+    // The experimental home's paused-art preference was once missing from the policy.
+    expect(ART_MOTION_STORAGE_KEY).toBe(HOOK_ART_MOTION_KEY);
+    // The quiz keys are built per tier (and per locale for an attempt): the
+    // policy names them by pattern.
+    const pattern = (name: string) =>
+      new RegExp(`^${name.replace(/[.:]/g, '\\$&').replace('*', '.+')}$`);
+    expect(attemptStorageKey('en', 'basic')).toMatch(pattern(QUIZ_ATTEMPT_STORAGE_NAME));
+    expect(attemptStorageKey('zh-TW', 'hard')).toMatch(pattern(QUIZ_ATTEMPT_STORAGE_NAME));
+    expect(bestScoreStorageKey('basic')).toMatch(pattern(QUIZ_BEST_STORAGE_NAME));
     expect(activePrivacyStorage().flatMap((entry) => entry.names)).toEqual(
       expect.arrayContaining([
         ATTENTION_STORAGE_KEY,
-        EXPLAINER_STORAGE_KEY,
-        OBSERVATORY_VISITED_STORAGE_KEY,
+        ART_MOTION_STORAGE_KEY,
+        QUIZ_ATTEMPT_STORAGE_NAME,
+        QUIZ_BEST_STORAGE_NAME,
       ]),
     );
   });
@@ -224,7 +226,7 @@ describe('localized legal content', () => {
           ),
         ),
     );
-    expect(keys).toEqual(expect.arrayContaining(['cosmic-observatory-visited']));
+    expect(keys).toEqual(expect.arrayContaining(['cosmic-experimental-art-paused']));
     for (const key of keys) expect(listed).toContain(key);
   });
 

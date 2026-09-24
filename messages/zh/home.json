@@ -635,7 +635,8 @@
       "fullBreakdown": "查看完整分配明细",
       "nextCycleName": "下一周期储备",
       "nextCycleTooltip": "这一份额不会在收官时发放——它留存于储备之中，作为下一演绎周期的起始分配。",
-      "nextCycleDetail": "滚存至下一周期"
+      "nextCycleDetail": "滚存至下一周期",
+      "percentOfReserve": "占储备 {percent}%"
     },
     "dock": {
       "aria": "周期快捷操作",

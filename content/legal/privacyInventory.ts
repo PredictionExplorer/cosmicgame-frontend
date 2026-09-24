@@ -18,10 +18,12 @@ import { GA_TRACKING_ID } from '@/utils/analytics';
 
 /** hooks/useAttentionPreferences.ts `ATTENTION_STORAGE_KEY`. */
 export const ATTENTION_STORAGE_KEY = 'cosmic-attention-preferences';
-/** components/home/CyclePhaseGuide.tsx `explainerStorageKey`. */
-export const EXPLAINER_STORAGE_KEY = 'cosmic-cycle-explainer-dismissed';
-/** app/[locale]/(app)/experimental-ui/ExperimentalHomePage.tsx `STORY_VISITED_STORAGE_KEY`. */
-export const OBSERVATORY_VISITED_STORAGE_KEY = 'cosmic-observatory-visited';
+/** components/home/experimental/useArtMotionPreference.ts `ART_MOTION_STORAGE_KEY`. */
+export const ART_MOTION_STORAGE_KEY = 'cosmic-experimental-art-paused';
+/** components/quiz/quizProgress.ts `attemptStorageKey()`: one per locale and tier. */
+export const QUIZ_ATTEMPT_STORAGE_NAME = 'quiz:v1:*';
+/** components/quiz/quizProgress.ts `bestScoreStorageKey()`: one per tier. */
+export const QUIZ_BEST_STORAGE_NAME = 'quiz:best:v1:*';
 
 export const PRIVACY_SERVICE_IDS = [
   'vercel',
@@ -99,8 +101,9 @@ export const PRIVACY_STORAGE_IDS = [
   'gaCookies',
   'themeStorage',
   'attention',
-  'explainer',
-  'observatory',
+  'artMotion',
+  'quizProgress',
+  'quizBest',
   'wallet',
 ] as const;
 
@@ -110,10 +113,16 @@ export interface PrivacyStorageEntry {
   readonly id: PrivacyStorageId;
   /** The cookie or key names, exactly as the browser shows them. */
   readonly names: readonly string[];
-  /** `browser`: localStorage or IndexedDB, which stay on the device and are never sent. */
+  /**
+   * `browser`: localStorage, sessionStorage or IndexedDB, which stay on the
+   * device and are never sent.
+   */
   readonly kind: 'cookie' | 'browser';
-  /** A cookie's fixed lifetime, or browser storage kept until the reader clears it. */
-  readonly lifetime: 'oneYear' | 'twoYears' | 'untilCleared';
+  /**
+   * A cookie's fixed lifetime, browser storage kept until the reader clears
+   * it, or sessionStorage, which the browser drops with the tab.
+   */
+  readonly lifetime: 'oneYear' | 'twoYears' | 'untilCleared' | 'untilTabClosed';
 }
 
 const STORAGE: Record<PrivacyStorageId, PrivacyStorageEntry & { readonly active: boolean }> = {
@@ -152,16 +161,23 @@ const STORAGE: Record<PrivacyStorageId, PrivacyStorageEntry & { readonly active:
     lifetime: 'untilCleared',
     active: true,
   },
-  explainer: {
-    id: 'explainer',
-    names: [EXPLAINER_STORAGE_KEY],
+  artMotion: {
+    id: 'artMotion',
+    names: [ART_MOTION_STORAGE_KEY],
     kind: 'browser',
     lifetime: 'untilCleared',
     active: true,
   },
-  observatory: {
-    id: 'observatory',
-    names: [OBSERVATORY_VISITED_STORAGE_KEY],
+  quizProgress: {
+    id: 'quizProgress',
+    names: [QUIZ_ATTEMPT_STORAGE_NAME],
+    kind: 'browser',
+    lifetime: 'untilTabClosed',
+    active: true,
+  },
+  quizBest: {
+    id: 'quizBest',
+    names: [QUIZ_BEST_STORAGE_NAME],
     kind: 'browser',
     lifetime: 'untilCleared',
     active: true,

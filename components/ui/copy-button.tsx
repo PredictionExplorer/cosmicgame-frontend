@@ -1,14 +1,10 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
 import { Check, Copy } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { TOUCH_TARGET_EXTENDED_CLASS } from '@/lib/touch-target';
-import { useClipboard } from '@/hooks/useClipboard';
-
-/** How long the check stays before the copy icon returns. */
-const COPIED_FEEDBACK_MS = 2_000;
+import { useCopyFeedback } from '@/hooks/useCopyFeedback';
 
 export interface CopyButtonProps {
   /** The text put on the clipboard. */
@@ -27,25 +23,10 @@ export interface CopyButtonProps {
  * that is not an address.
  */
 export function CopyButton({ value, label, copiedLabel, className }: CopyButtonProps) {
-  const { copy } = useClipboard();
-  const [copied, setCopied] = useState(false);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(
-    () => () => {
-      if (timer.current) clearTimeout(timer.current);
-    },
-    [],
-  );
-
-  const handleCopy = async () => {
-    // A refused copy says nothing rather than claim success; the value
-    // stays on screen to select by hand.
-    if (!(await copy(value))) return;
-    setCopied(true);
-    if (timer.current) clearTimeout(timer.current);
-    timer.current = setTimeout(() => setCopied(false), COPIED_FEEDBACK_MS);
-  };
+  // A refused copy says nothing rather than claim success; the value stays
+  // on screen to select by hand.
+  const { copied, copy } = useCopyFeedback();
+  const handleCopy = () => void copy(value);
 
   return (
     <>

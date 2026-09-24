@@ -635,7 +635,8 @@
       "fullBreakdown": "Xem chi tiết đầy đủ",
       "nextCycleName": "Dự trữ chu kỳ tiếp theo",
       "nextCycleTooltip": "Phần này không được phân phối khi hoàn tất — nó ở lại trong dự trữ và khởi đầu chu kỳ trình diễn tiếp theo.",
-      "nextCycleDetail": "tích lũy chuyển tiếp"
+      "nextCycleDetail": "tích lũy chuyển tiếp",
+      "percentOfReserve": "{percent}% dự trữ"
     },
     "dock": {
       "aria": "Thao tác nhanh của chu kỳ",

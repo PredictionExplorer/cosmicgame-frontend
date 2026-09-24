@@ -635,7 +635,8 @@
       "fullBreakdown": "内訳をすべて見る",
       "nextCycleName": "次サイクル繰越分",
       "nextCycleTooltip": "この分は確定時には配られません。準備金に残り、次のパフォーマンス・サイクルの種になります。",
-      "nextCycleDetail": "次のサイクルへ繰り越し"
+      "nextCycleDetail": "次のサイクルへ繰り越し",
+      "percentOfReserve": "準備金の{percent}%"
     },
     "dock": {
       "aria": "サイクルのクイックアクション",
