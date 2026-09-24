@@ -30,7 +30,10 @@ export function GestureCosts({ costs }: { costs: HowItWorksContent['costs'] }) {
         </dl>
         <p className="flex flex-wrap items-baseline gap-x-4 gap-y-2 border-t border-rule py-4 type-body-sm text-foreground sm:py-5">
           <span>{costs.note}</span>
-          <Link href={costs.riskLink.href} className="link inline-flex items-center gap-1.5">
+          <Link
+            href={costs.riskLink.href}
+            className="link inline-flex min-h-6 items-center gap-1.5"
+          >
             {costs.riskLink.label}
             <ArrowRight aria-hidden className="size-3.5" />
           </Link>

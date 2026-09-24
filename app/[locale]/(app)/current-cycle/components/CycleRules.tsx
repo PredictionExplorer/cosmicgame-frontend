@@ -53,7 +53,7 @@ export function CycleRules({ data, headingId }: { data: DashboardInfo; headingId
         headingId={headingId}
         title={t('sections.cycleRules.title')}
         actions={
-          <Link href="/how-it-works" className="link type-body-sm">
+          <Link href="/how-it-works" className="link inline-flex min-h-6 items-center type-body-sm">
             {t('rules.learnMore')}
           </Link>
         }

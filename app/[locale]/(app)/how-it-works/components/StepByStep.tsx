@@ -68,7 +68,7 @@ export function StepByStep({ stepByStep }: { stepByStep: HowItWorksContent['step
         {stepByStep.funding.text}{' '}
         <Link
           href={stepByStep.funding.link.href}
-          className="link inline-flex items-center gap-1.5 whitespace-nowrap"
+          className="link inline-flex min-h-6 items-center gap-1.5 whitespace-nowrap"
         >
           {stepByStep.funding.link.label}
           <ArrowRight aria-hidden className="size-3.5" />

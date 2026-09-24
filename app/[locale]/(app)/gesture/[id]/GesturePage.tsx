@@ -395,7 +395,11 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
             <>
               {methodBadge}
               <RecordTime timestamp={gestureInfo.TimeStamp} />
-              <TxExplorerLink hash={gestureInfo.TxHash} label={t('header.explorer')} />
+              <TxExplorerLink
+                hash={gestureInfo.TxHash}
+                label={t('header.explorer')}
+                className="min-h-6"
+              />
             </>
           }
           // Phones put the figures first and step through the cycle after the record.
@@ -517,7 +521,10 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
 
           {typeof cycle === 'number' ? (
             <p>
-              <Link href={cycleHref} className="link inline-flex items-center gap-1.5 type-body-sm">
+              <Link
+                href={cycleHref}
+                className="link inline-flex min-h-6 items-center gap-1.5 type-body-sm"
+              >
                 {t('nav.all', { cycle: formatCount(cycle, locale) })}
                 <ArrowRight aria-hidden className="size-3.5" />
               </Link>

@@ -5,6 +5,7 @@ import { ArrowRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
+import { TOUCH_TARGET_EXTENDED_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
 import { Amount } from '@/components/ui/amount';
 import { Badge } from '@/components/ui/badge';
@@ -80,7 +81,15 @@ export function CycleStatus({
   const figures: Figure[] = [
     {
       id: 'reserve',
-      label: <Term id="cycleReserve" />,
+      // A label on its own line, not a word in a sentence: on phones its
+      // hit area grows to 44px without moving the row.
+      label: (
+        <Term
+          id="cycleReserve"
+          data-touch-target="extended"
+          className={TOUCH_TARGET_EXTENDED_CLASS}
+        />
+      ),
       value: reserve === null ? unknown : <Amount value={reserve} unit="ETH" />,
     },
     {

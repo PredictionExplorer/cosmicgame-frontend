@@ -485,7 +485,10 @@ export function CycleTimeline({
         <div className="lg:col-span-5">
           <h3 className="type-heading-2 text-foreground">{payoff.heading}</h3>
           <p className="mt-4 type-body-md text-muted-foreground">{payoff.body}</p>
-          <Link href={payoff.link.href} className="link mt-6 inline-flex items-center gap-1.5">
+          <Link
+            href={payoff.link.href}
+            className="link mt-6 inline-flex min-h-6 items-center gap-1.5"
+          >
             {payoff.link.label}
             <ArrowRight aria-hidden className="size-4" />
           </Link>
