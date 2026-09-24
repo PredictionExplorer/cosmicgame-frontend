@@ -1,32 +1,36 @@
-import { type CSSProperties, useState } from 'react';
-import Image from 'next/image';
+'use client';
+
+import type { CSSProperties, ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
+import {
+  ArtImage,
+  PendingPlate,
+  SIGNATURE_ART_CLASS,
+  useArtSourceChain,
+  type ArtRendition,
+} from '@/components/ui/art-frame';
 
-const FALLBACK_SRC = '/images/qmark-preview.png';
-
-function shouldBypassOptimizer(src: string): boolean {
-  return src.startsWith('http');
-}
-
-interface NFTImageProps {
+export interface NFTImageProps {
   src?: string;
   /**
    * Optional next source to try if `src` fails to load (e.g. the full-resolution
    * image when a thumbnail has not been generated yet). On failure the chain is
-   * `src → fallbackSrc → placeholder`.
+   * `src → fallbackSrc → terminalFallbackSrc → unavailable state`.
    */
   fallbackSrc?: string;
   /**
-   * Final fallback image after all real sources fail. Set to `null` for showcase
-   * surfaces that should render a neutral state instead of placeholder artwork.
+   * A last image to try after every real source failed. Defaults to `null`:
+   * the designed unavailable state, so a missing render never looks like a
+   * real artwork. Pass an image only for non-Signature media that has an
+   * honest placeholder of its own.
    */
   terminalFallbackSrc?: string | null;
   alt?: string;
   style?: CSSProperties;
   className?: string;
-  /** Above-the-fold images should set priority to hint the image loader. */
+  /** Above-the-fold images: load eagerly at high fetch priority. */
   priority?: boolean;
   /** Override loading behavior. Defaults to 'lazy' for below-the-fold. */
   loading?: 'lazy' | 'eager';
@@ -42,14 +46,36 @@ interface NFTImageProps {
    * key would leak into the UI there.
    */
   unavailableLabel?: string;
+  /** A second caption line on the unavailable state, e.g. the token number. */
+  unavailableDetail?: ReactNode;
+  /**
+   * `signature`: a Cosmic Signature on its black plate at the native
+   * 3456:2234 ratio with object-fit: contain (SIGNATURE_ART_CLASS).
+   * `media` (default): the 16:9 box used by RandomWalk and third-party NFTs.
+   */
+  frame?: 'media' | 'signature';
+  /**
+   * Published renditions of `src`, e.g. the 640px thumbnail and the 3456px
+   * web image, so the browser picks by `sizes`. When set they replace `src`
+   * as the first step of the chain.
+   */
+  renditions?: readonly ArtRendition[];
+  /** `compact` draws the unavailable state as the mark alone, for small thumbnails. */
+  density?: 'full' | 'compact';
 }
 
+/**
+ * NFTImage — an NFT image with a fallback chain that ends in the designed
+ * unavailable state (never stock artwork). New Signature surfaces should use
+ * `ArtFrame` (components/ui/art-frame), which adds the plate and its edge;
+ * `frame="signature"` gives existing call sites the same native-ratio plate.
+ */
 const NFTImage = ({
   src,
   fallbackSrc,
-  terminalFallbackSrc = FALLBACK_SRC,
+  terminalFallbackSrc = null,
   // English default keeps server-safety for any future server-tree usage;
-  // translated call sites pass a localized alt (e.g. detail.image.defaultAlt).
+  // translated call sites pass a localized alt (e.g. detail.image.alt).
   alt = 'NFT',
   style,
   className,
@@ -57,68 +83,49 @@ const NFTImage = ({
   loading,
   sizes = '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px',
   unavailableLabel,
+  unavailableDetail,
+  frame = 'media',
+  renditions,
+  density = 'full',
 }: NFTImageProps) => {
   const t = useTranslations('detail');
-  // Resolution chain: primary src, optional fallback, then the configured terminal fallback.
-  const chain = [src, fallbackSrc, terminalFallbackSrc ?? undefined].filter(
-    (s): s is string => typeof s === 'string' && s.length > 0,
-  );
-  if (terminalFallbackSrc && chain[chain.length - 1] !== terminalFallbackSrc) {
-    chain.push(terminalFallbackSrc);
-  }
+  const chain = useArtSourceChain([
+    renditions && renditions.length > 0 ? renditions : src,
+    fallbackSrc,
+    terminalFallbackSrc,
+  ]);
+  const signature = frame === 'signature';
 
-  const [step, setStep] = useState(0);
-  const [prevKey, setPrevKey] = useState(`${src}|${fallbackSrc}|${terminalFallbackSrc ?? 'none'}`);
-  const [exhausted, setExhausted] = useState(chain.length === 0);
-
-  const key = `${src}|${fallbackSrc}|${terminalFallbackSrc ?? 'none'}`;
-  if (prevKey !== key) {
-    setPrevKey(key);
-    if (step !== 0) setStep(0);
-    const nextExhausted = chain.length === 0;
-    if (exhausted !== nextExhausted) setExhausted(nextExhausted);
-  }
-
-  const safeStep = Math.min(step, chain.length - 1);
-  const finalSrc = chain[safeStep] ?? FALLBACK_SRC;
-  const unoptimized = shouldBypassOptimizer(finalSrc);
-
-  if (exhausted || (terminalFallbackSrc === null && step >= chain.length)) {
+  if (chain.source === null) {
     return (
-      <div
-        role="img"
-        aria-label={alt}
-        className={cn(
-          'flex w-full aspect-video items-center justify-center rounded-inherit border border-white/[0.08] bg-white/[0.03] text-center text-xs uppercase tracking-[0.22em] text-muted-foreground',
-          className,
-        )}
+      <PendingPlate
+        label={unavailableLabel ?? t('image.artworkUnavailable')}
+        detail={unavailableDetail}
+        alt={alt}
+        density={density}
+        variant={signature ? 'signature' : 'media'}
+        className={cn('w-full', className)}
         style={style}
-      >
-        {unavailableLabel ?? t('image.artworkUnavailable')}
-      </div>
+      />
     );
   }
 
   return (
-    <Image
-      src={finalSrc}
-      onError={() => {
-        setStep((s) => {
-          const next = s + 1;
-          if (next >= chain.length && terminalFallbackSrc === null) {
-            setExhausted(true);
-          }
-          return Math.min(next, Math.max(chain.length - 1, 0));
-        });
-      }}
+    <ArtImage
+      source={chain.source}
       alt={alt}
-      width={800}
-      height={450}
-      priority={priority}
-      loading={loading ?? (priority ? 'eager' : 'lazy')}
       sizes={sizes}
-      unoptimized={unoptimized}
-      className={cn('w-full aspect-video object-contain align-middle', className)}
+      priority={priority}
+      loading={loading}
+      onError={chain.onError}
+      onLoad={chain.onLoad}
+      className={cn(
+        'w-full object-contain align-middle',
+        // tailwind-merge does not know the `aspect-art` theme value, so the
+        // two ratios must never both reach the class list.
+        signature ? SIGNATURE_ART_CLASS : 'aspect-video',
+        className,
+      )}
       style={style}
     />
   );
