@@ -62,6 +62,10 @@ describe('CycleClock', () => {
     ).toBeInTheDocument();
     // No tiles, ring or glow behind the figures.
     expect(figures.innerHTML).not.toMatch(/rounded-full|blur|animate-/);
+    // Regression: tailwind-merge dropped leading-none when the size class
+    // followed it, so the digits set at 1.5 line height and row 1 outgrew
+    // the 1280x720 first viewport.
+    expect(figures).toHaveClass('leading-none');
   });
 
   it('drops the day group, not the figure size, once less than a day remains', () => {
@@ -109,7 +113,7 @@ describe('CycleClock', () => {
     expect(screen.getByTestId('cycle-clock')).toHaveAttribute('data-phase', 'ready-to-finalize');
     const display = screen.getByTestId('clock-display');
     expect(display).toHaveTextContent('home.observatory.clock.state.ready');
-    expect(display).toHaveClass('text-positive');
+    expect(display).toHaveClass('text-positive', 'leading-tight');
     // The explanation stays visible at zero (it used to be screen-reader only).
     expect(screen.getByTestId('clock-status')).toHaveTextContent(
       'home.chrono.phase.readyToFinalize.status',
