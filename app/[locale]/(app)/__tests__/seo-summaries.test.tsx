@@ -365,7 +365,8 @@ describe('server-rendered page headers', () => {
         name: 'Current Cosmic Signature Performance Cycle',
       }),
     ).toBeInTheDocument();
-    expect(figureValue('cycle')).toHaveTextContent('42');
+    // The status block names the cycle; the header does not repeat its number.
+    expect(document.querySelector('[data-figure="cycle"]')).toBeNull();
     expect(figureValue('gestures')).toHaveTextContent('17');
     expect(figureValue('signatureAllocation')).toHaveTextContent('5.5000 ETH');
     // /current-cycle belongs to Explore, as in the navigation (config/siteNav).
@@ -388,7 +389,8 @@ describe('server-rendered page headers', () => {
       isLoading: true,
     } as unknown as ReturnType<typeof useDashboardInfo>);
     render(await CurrentCycleSeoSummary());
-    expect(figureValue('cycle')).toHaveTextContent('42');
+    // The status block names the cycle; the header does not repeat its number.
+    expect(document.querySelector('[data-figure="cycle"]')).toBeNull();
     expect(figureValue('gestures')).toHaveTextContent('17');
     expect(figureValue('signatureAllocation')).toHaveTextContent('5.5000 ETH');
   });

@@ -320,7 +320,6 @@
     "heading": "Chu kỳ trình diễn Cosmic Signature hiện tại",
     "description": "Theo dõi chu kỳ Cosmic Signature hiện tại: số nét bút, dự trữ, tài sản đính kèm, các luồng phân bổ và trạng thái hoàn tất.",
     "cards": {
-      "cycle": "Chu kỳ",
       "gestures": "Tổng số nét bút",
       "signatureAllocation": "Phân bổ Signature",
       "opened": "Ngày mở"

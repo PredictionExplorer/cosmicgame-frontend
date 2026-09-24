@@ -254,7 +254,12 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
       <Link
         href={`/gesture/${target.id}`}
         rel={direction === 'previous' ? 'prev' : 'next'}
-        className={buttonVariants({ variant: 'outline', size: 'sm' })}
+        // Phones: equal halves side by side, or equal full-width rows once
+        // the labels no longer fit two to a line (vi at 320px).
+        className={cn(
+          buttonVariants({ variant: 'outline', size: 'sm' }),
+          'max-sm:grow max-sm:basis-40',
+        )}
       >
         {direction === 'previous' ? <ArrowLeft aria-hidden /> : null}
         <span>
@@ -328,7 +333,7 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
           }
           actions={
             hasSteps ? (
-              <nav aria-label={t('nav.aria')} className="flex flex-wrap gap-2">
+              <nav aria-label={t('nav.aria')} className="flex flex-wrap gap-2 max-sm:w-full">
                 {stepLink('previous')}
                 {stepLink('next')}
               </nav>

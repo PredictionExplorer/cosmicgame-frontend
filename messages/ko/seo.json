@@ -320,7 +320,6 @@
     "heading": "현재 Cosmic Signature 퍼포먼스 사이클",
     "description": "진행 중인 사이클의 제스처 수, 준비금, 첨부 자산, 배분 경로, 마감 상태를 확인할 수 있습니다. 최신 데이터는 아래 화면에 표시됩니다.",
     "cards": {
-      "cycle": "사이클",
       "gestures": "총 제스처 수",
       "signatureAllocation": "시그니처 배분",
       "opened": "시작 시각"
