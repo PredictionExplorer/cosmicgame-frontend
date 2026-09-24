@@ -581,6 +581,30 @@ describe('HomePage', () => {
     expect(header.compareDocumentPosition(grid)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
   });
 
+  it('sets every region heading of the desk and the feed in one style', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({
+        CurRoundNum: 7,
+        CurNumBids: 42,
+        LastBidderAddr: '0x1111111111111111111111111111111111111111',
+      }),
+      isLoading: false,
+    });
+
+    render(<HomePage />);
+
+    // Position, not size, orders the regions: one tier for every desk H2, so
+    // no small heading sits above a larger neighbour (D040).
+    const regions = [screen.getByTestId('control-desk'), screen.getByTestId('home-feed-layout')];
+    const headings = regions.flatMap((region) =>
+      within(region).getAllByRole('heading', { level: 2 }),
+    );
+    expect(headings.length).toBeGreaterThanOrEqual(6);
+    for (const heading of headings) {
+      expect(heading).toHaveClass('type-heading-3');
+    }
+  });
+
   it('keeps all live decision information visible while allocation detail is collapsed', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData({ CurRoundNum: 7 }),

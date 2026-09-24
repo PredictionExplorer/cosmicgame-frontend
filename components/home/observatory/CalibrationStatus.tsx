@@ -182,7 +182,8 @@ export function CalibrationStatus({
       <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <div className="flex min-w-0 items-center gap-1.5">
           <CalibrationWindowIcon className="size-4 shrink-0 text-subtle" aria-hidden />
-          <h2 id="calibration-status-title" className="type-title min-w-0 text-foreground">
+          {/* The desk's one region-heading style (docs/design-system.md). */}
+          <h2 id="calibration-status-title" className="type-heading-3 min-w-0 text-foreground">
             {title}
           </h2>
           <InfoTooltip content={explanation} label={title} />

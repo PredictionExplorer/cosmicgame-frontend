@@ -17,7 +17,7 @@ import { ChainGuard } from '@/components/wallet/NetworkGuard';
 import { Link } from '@/i18n/navigation';
 import { buildCalendarInviteDataUri } from '@/lib/calendarInvite';
 import { getCycleState } from '@/lib/cycleState';
-import { TOUCH_TARGET_HEIGHT_CLASS } from '@/lib/touch-target';
+import { TOUCH_TARGET_HEIGHT_CLASS, TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
 import type { DashboardInfo } from '@/services/api';
 import { formatAmount, sameAddress } from '@/utils/format';
@@ -363,19 +363,29 @@ export function CycleClock({
         </p>
         {/* The fixed extras, then the attached assets when there are any. The
             dots hang in clipped gutters, so a wrapped line never starts or
-            ends on one. */}
-        <div className="mt-1 overflow-hidden">
+            ends on one. Every line is a 24px box, the attached-assets link's
+            target size, so the line keeps its height when that link arrives. */}
+        <div className="mt-0.5 overflow-hidden">
           <ul
             role="list"
             data-testid="clock-reserve-extras"
-            className="type-caption -ms-4 flex flex-wrap text-subtle"
+            className={cn(
+              'type-caption -ms-4 flex flex-wrap text-subtle',
+              TOUCH_TARGET_TEXT_LINK_CLASS,
+            )}
           >
             <li className="ps-4">{t('observatory.clock.reserveExtraCst')}</li>
             <li className={ITEM_SEPARATOR}>{t('observatory.clock.reserveExtraNft')}</li>
             {attachedAssetCount > 0 && (
               <li className={ITEM_SEPARATOR} data-testid="clock-reserve-attached">
                 {attachedAssetsHref ? (
-                  <a href={attachedAssetsHref} className="link-quiet text-primary">
+                  <a
+                    href={attachedAssetsHref}
+                    className={cn(
+                      'link-quiet inline-flex text-primary',
+                      TOUCH_TARGET_TEXT_LINK_CLASS,
+                    )}
+                  >
                     {t('observatory.clock.reserveAttached', { count: attachedAssetCount })}
                   </a>
                 ) : (

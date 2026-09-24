@@ -317,6 +317,9 @@ describe('GestureMessageChat', () => {
       <GestureMessageChat gestures={[]} isLoading onJoinCta={jest.fn()} />,
     );
     expect(screen.getByText('home.chat.history.loading').closest('[role="status"]')).not.toBeNull();
+    // The feed's own shape waits in skeleton rows; the words are for screen readers.
+    expect(screen.getByText('home.chat.history.loading')).toHaveClass('sr-only');
+    expect(screen.getByTestId('chat-loading').querySelectorAll('.animate-pulse').length).toBe(9);
     expect(screen.queryByText('home.chat.empty.title')).not.toBeInTheDocument();
     expect(screen.queryByText(/home\.chat\.messageCount/)).not.toBeInTheDocument();
 

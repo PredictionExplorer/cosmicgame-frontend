@@ -25,6 +25,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { LinkifiedText } from '@/components/ui/linkified-text';
 import { LiveStatus } from '@/components/ui/live-status';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Spinner } from '@/components/ui/spinner';
 import { tabsListVariants, tabsTriggerVariants } from '@/components/ui/tabs';
 import { TxExplorerLink } from '@/components/ui/tx-status';
@@ -42,6 +43,9 @@ import {
   EnduranceChampionIcon,
   FinalCstGestureIcon,
 } from '@/lib/conceptIcons';
+
+/** The loading feed: three message rows whose text runs to different lengths. */
+const CHAT_SKELETON_ROWS = ['72%', '88%', '56%'] as const;
 
 /** One glyph per kind of cycle event; the sentence carries the meaning. */
 const EVENT_ICON = {
@@ -657,12 +661,21 @@ export function GestureMessageChat({
           style={scrollMask ? { maskImage: scrollMask, WebkitMaskImage: scrollMask } : undefined}
         >
           {isLoading ? (
+            // The feed's own shape waits: message rows in skeleton, so nothing
+            // jumps when the history lands. The status is spoken once.
             <div
               role="status"
-              className="type-body-sm flex items-center gap-2 py-4 text-muted-foreground print:hidden"
+              data-testid="chat-loading"
+              className="divide-y divide-rule-faint print:hidden"
             >
-              <Spinner className="size-4" aria-hidden="true" />
-              {t('chat.history.loading')}
+              <span className="sr-only">{t('chat.history.loading')}</span>
+              {CHAT_SKELETON_ROWS.map((width) => (
+                <div key={width} aria-hidden className="py-3.5">
+                  <Skeleton className="h-3.5 w-28" />
+                  <Skeleton className="mt-2.5 h-4" style={{ width }} />
+                  <Skeleton className="mt-2.5 h-3 w-20" />
+                </div>
+              ))}
             </div>
           ) : error ? (
             <div role="status" className="space-y-3 py-4 print:hidden">
