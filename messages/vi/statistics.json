@@ -411,8 +411,7 @@
       "allClaimed": "Đã nhận về tất cả",
       "unclaimedCount": "{count} chưa nhận về",
       "viewUnclaimed": "Xem tài sản chưa nhận về",
-      "explore": "Khám phá",
-      "exploreAria": "Khám phá dữ liệu nhận về của chu kỳ {cycle}",
+      "cycleDetails": "Chi tiết chu kỳ {cycle}",
       "dialog": {
         "unclaimedTitle": "Tài sản chưa nhận về — Chu kỳ {cycle}",
         "expired": "Thời hạn nhận về đã qua. Bất kỳ ai cũng có thể nhận về các tài sản còn lại cho mình.",
@@ -420,7 +419,6 @@
         "asset": "Tài sản",
         "recipient": "Người nhận",
         "detail": "Chi tiết",
-        "exploreTitle": "Khám phá chu kỳ {cycle}",
         "exploreDescription": "Các giao dịch nhận về cùng thời gian mỗi người nhận đã mất, và các token đính kèm trong chu kỳ này.",
         "claimTransactions": "Giao dịch nhận về",
         "noClaims": "Không có lần nhận về nào được ghi nhận cho chu kỳ này.",

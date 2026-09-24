@@ -107,10 +107,13 @@ describe('ClaimsByRoundSection', () => {
   it('opens a cycle’s retrieval transactions, noting a retrieval by someone else', async () => {
     const user = userEvent.setup();
     render(<ClaimsByRoundSection />);
-    // Each row's Explore button names its cycle.
-    await user.click(screen.getByRole('button', { name: 'Explore Cycle 12 retrievals' }));
+    // Each row's details button names its cycle in its visible words, and
+    // the dialog it opens carries the same title.
+    const button = screen.getByRole('button', { name: 'Cycle 12 details' });
+    expect(button).not.toHaveAttribute('aria-label');
+    await user.click(button);
     expect(mockUseClaimDetailByRound).toHaveBeenLastCalledWith(12);
-    const dialog = screen.getByRole('dialog');
+    const dialog = screen.getByRole('dialog', { name: 'Cycle 12 details' });
     expect(within(dialog).getByText(/Retrieved after the deadline by 0x2222/)).toBeInTheDocument();
     expect(within(dialog).getByText('No tokens attached this cycle.')).toBeInTheDocument();
   });

@@ -411,8 +411,7 @@
       "allClaimed": "모두 회수됨",
       "unclaimedCount": "미회수 {count}건",
       "viewUnclaimed": "미회수 자산 보기",
-      "explore": "탐색",
-      "exploreAria": "사이클 {cycle} 회수 내역 탐색",
+      "cycleDetails": "사이클 {cycle} 상세 정보",
       "dialog": {
         "unclaimedTitle": "미회수 자산: 사이클 {cycle}",
         "expired": "회수 기간이 종료되었습니다. 이제 누구나 이 자산을 회수할 수 있습니다.",
@@ -420,7 +419,6 @@
         "asset": "자산",
         "recipient": "수령자",
         "detail": "상세",
-        "exploreTitle": "사이클 {cycle} 탐색",
         "exploreDescription": "수령자별 회수 소요 시간이 표시된 회수 트랜잭션과 이번 사이클에 첨부된 토큰입니다.",
         "claimTransactions": "회수 트랜잭션",
         "noClaims": "이 사이클에는 기록된 회수가 없습니다.",
