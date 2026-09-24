@@ -20,8 +20,7 @@ import type { DonatedErc20ClaimAmountSource } from '@/utils/donatedErc20';
 import { formatAddress, NBSP } from '@/utils/format';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import { getExplorerUrl } from '@/utils/urls';
-
-import { tokenClaimKey } from './retrieval';
+import { tokenClaimKey } from '@/utils/allocationRetrieval';
 
 /** One attached NFT waiting for this wallet (unclaimed donated NFT). */
 export interface AttachedNftRetrievalRow {

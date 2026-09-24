@@ -6,7 +6,7 @@ import {
   tokenClaimKey,
   uniqueRounds,
   unretrievedTokenClaims,
-} from '../retrieval';
+} from '../allocationRetrieval';
 
 describe('uniqueRounds', () => {
   it('lists each cycle once, ascending, and drops anything that is not a cycle number', () => {

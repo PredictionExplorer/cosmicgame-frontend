@@ -8,8 +8,7 @@ import { UnknownValue } from '@/components/ui/unknown-value';
 import { useFormat } from '@/hooks/useFormat';
 import { useNow } from '@/hooks/useNow';
 import { cn } from '@/lib/utils';
-
-import { deadlineState } from './retrieval';
+import { deadlineState } from '@/utils/allocationRetrieval';
 
 interface RetrievalDeadlineProps {
   /** The cycle's retrieval deadline, in Unix seconds; `undefined` while unknown. */

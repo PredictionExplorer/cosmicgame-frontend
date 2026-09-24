@@ -17,8 +17,7 @@ import { ChainGuard } from '@/components/wallet/NetworkGuard';
 import { useFormat } from '@/hooks/useFormat';
 import { useNow } from '@/hooks/useNow';
 import { useTxStageLabel } from '@/hooks/useTxStageLabel';
-
-import { deadlineState, type RetrievalPlan } from './retrieval';
+import { deadlineState, type RetrievalPlan } from '@/utils/allocationRetrieval';
 
 export interface RetrievalSummaryProps {
   /** What one transaction would retrieve; `null` while the lists load. */

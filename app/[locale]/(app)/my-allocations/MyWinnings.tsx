@@ -25,7 +25,7 @@ import {
   type EthAllocationRow,
 } from '@/components/winnings/EthAllocationsTable';
 import { RetrievalSummary } from '@/components/winnings/RetrievalSummary';
-import { buildRetrievalPlan, nextDeadline } from '@/components/winnings/retrieval';
+import { buildRetrievalPlan, nextDeadline } from '@/utils/allocationRetrieval';
 import { useRetrievalDeadlines } from '@/components/winnings/useRetrievalDeadlines';
 import { useApiData } from '@/contexts/ApiDataContext';
 import {

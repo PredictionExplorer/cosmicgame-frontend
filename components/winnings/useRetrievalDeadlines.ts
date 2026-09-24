@@ -1,8 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import useStellarSelectionWalletContract from '@/hooks/useStellarSelectionWalletContract';
-
-import { uniqueRounds } from './retrieval';
+import { uniqueRounds } from '@/utils/allocationRetrieval';
 
 /** Each cycle's retrieval deadline, in Unix seconds, keyed by cycle number. */
 export type RetrievalDeadlines = Readonly<Record<number, number>>;

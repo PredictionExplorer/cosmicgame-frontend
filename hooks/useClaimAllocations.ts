@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import type { Hash } from 'viem';
 
-import { tokenClaimKey, uniqueRounds, type TokenClaim } from '@/components/winnings/retrieval';
+import { tokenClaimKey, uniqueRounds, type TokenClaim } from '@/utils/allocationRetrieval';
 import { useApiData } from '@/contexts/ApiDataContext';
 import { useNotify } from '@/hooks/useNotify';
 import { useTxFlow, type TxResult } from '@/hooks/useTxFlow';

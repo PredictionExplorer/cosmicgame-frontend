@@ -2,7 +2,7 @@
  * What a wallet can retrieve from PrizesWallet, and by when: the pure rules
  * behind My Allocations' summary, its one "Retrieve everything" transaction
  * and every deadline badge. No React, so each rule is tested on its own
- * (components/winnings/__tests__/retrieval.test.ts).
+ * (utils/__tests__/allocationRetrieval.test.ts).
  *
  * PrizesWallet keeps one ETH balance per cycle and recipient, whatever
  * deposited it (Stellar Selection, Chrono-Warrior), so ETH is retrieved by
