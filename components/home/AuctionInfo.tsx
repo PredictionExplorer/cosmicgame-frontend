@@ -59,7 +59,7 @@ export function AuctionInfo({
         {compact ? (
           <p className="font-mono text-xs tabular-nums text-primary">
             {t('calibration.percentComplete', {
-              percent: formatCstProgressPercent(progress.percentComplete),
+              percent: formatCstProgressPercent(progress.percentComplete, locale),
             })}
           </p>
         ) : (
@@ -92,7 +92,7 @@ export function AuctionInfo({
               <span className="text-muted-foreground">{t('calibration.progressLabel')}</span>
               <span className="font-mono font-medium tabular-nums text-primary">
                 {t('calibration.percentComplete', {
-                  percent: formatCstProgressPercent(progress.percentComplete),
+                  percent: formatCstProgressPercent(progress.percentComplete, locale),
                 })}
               </span>
             </div>

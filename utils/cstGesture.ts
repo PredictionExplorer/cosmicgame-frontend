@@ -1,6 +1,7 @@
 import { formatEther } from 'viem';
 
 import type { CTPriceInfo } from '@/services/api/types';
+import { formatPercent } from '@/utils/format';
 
 export interface CstAuctionDurations {
   AuctionDuration: number;
@@ -164,10 +165,12 @@ export function deriveLiveCstGestureData(
   return { ...next, isFree: isCstGestureFree(next) };
 }
 
-export function formatCstProgressPercent(value: number): string {
-  if (!Number.isFinite(value)) return '0%';
-  const clamped = Math.min(100, Math.max(0, value));
-  if (clamped === 0 || clamped === 100 || Number.isInteger(clamped))
-    return `${clamped.toFixed(0)}%`;
-  return `${clamped.toFixed(1)}%`;
+/**
+ * Calibration Window progress for a compact readout: clamped to 0–100, one
+ * decimal only when useful ("50%", "50.3%"), in the locale's number style
+ * (vi "50,3%"). A non-finite value reads as "0%".
+ */
+export function formatCstProgressPercent(value: number, locale: string): string {
+  const clamped = Number.isFinite(value) ? Math.min(100, Math.max(0, value)) : 0;
+  return formatPercent(clamped, locale);
 }

@@ -339,10 +339,19 @@ describe('cstGesture utilities', () => {
   });
 
   it('formats compact progress with decimals only when useful', () => {
-    expect(formatCstProgressPercent(0)).toBe('0%');
-    expect(formatCstProgressPercent(50)).toBe('50%');
-    expect(formatCstProgressPercent(50.25)).toBe('50.3%');
-    expect(formatCstProgressPercent(100)).toBe('100%');
-    expect(formatCstProgressPercent(Number.NaN)).toBe('0%');
+    expect(formatCstProgressPercent(0, 'en')).toBe('0%');
+    expect(formatCstProgressPercent(50, 'en')).toBe('50%');
+    expect(formatCstProgressPercent(50.25, 'en')).toBe('50.3%');
+    expect(formatCstProgressPercent(100, 'en')).toBe('100%');
+    expect(formatCstProgressPercent(Number.NaN, 'en')).toBe('0%');
+  });
+
+  it('clamps progress and follows the locale number style', () => {
+    expect(formatCstProgressPercent(-3, 'en')).toBe('0%');
+    expect(formatCstProgressPercent(140, 'en')).toBe('100%');
+    // vi: comma decimal, so "45.3%" never reads as a thousands group.
+    expect(formatCstProgressPercent(45.3, 'vi')).toBe('45,3%');
+    // uk keeps the dot (style-guide-uk §4).
+    expect(formatCstProgressPercent(45.3, 'uk')).toBe('45.3%');
   });
 });
