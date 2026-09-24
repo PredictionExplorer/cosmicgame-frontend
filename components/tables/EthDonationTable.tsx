@@ -1,22 +1,10 @@
-import { useState, type FC } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+'use client';
 
-import { getExplorerUrl } from '@/utils';
+import { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 
-import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
-import { Link, useRouter } from '@/i18n/navigation';
-import { TABLE_ROW_LINK_CLASS } from '@/components/ui/responsive-table';
-import {
-  TablePrimary,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryContainer,
-  TablePrimaryHead,
-  TablePrimaryHeadCell,
-  TablePrimaryRow,
-} from '@/components/styled';
-import { CustomPagination } from '@/components/common/CustomPagination';
-import { AddressLink } from '@/components/common/AddressLink';
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+import type { LedgerStateProps } from '@/components/tables/ledger-props';
 
 export interface EthDonation {
   EvtLogId: string | number;
@@ -29,124 +17,91 @@ export interface EthDonation {
   AmountEth: number;
 }
 
-interface EthDonationRowProps {
-  row: EthDonation;
-  showType: boolean;
-}
-
-const EthDonationRow: FC<EthDonationRowProps> = ({ row, showType }) => {
-  const t = useTranslations('tables');
-  const locale = useLocale();
-  const router = useRouter();
-
-  if (!row) {
-    return <TablePrimaryRow />;
-  }
-
-  // `clickable` is exactly "this record has a detail page": rows of type 0 are
-  // bare transfers with nothing to show, and pages that hide the type column
-  // only ever list records that do have one.
-  const clickable = row.RecordType > 0 || !showType;
-  const detailHref = `/eth-contribution/detail/${row.CGRecordId}`;
-
-  const handleRowClick = () => {
-    router.push(detailHref);
-  };
-
-  return (
-    <TablePrimaryRow onActivate={clickable ? handleRowClick : undefined}>
-      <TablePrimaryCell label={t('columns.datetime')}>
-        {/*
-         * The datetime is the row's keyboard entry point, so it has to lead
-         * where a row click leads. Nesting it inside the explorer link instead
-         * would recreate the `nested-interactive` violation this replaced; the
-         * detail page carries the same explorer link on its own datetime, so
-         * the transaction stays one click away.
-         */}
-        {clickable ? (
-          <Link
-            href={detailHref}
-            className={TABLE_ROW_LINK_CLASS}
-            aria-label={t('ethContribution.viewContribution', { id: row.CGRecordId })}
-          >
-            <HydrationSafeDateTime timestamp={row.TimeStamp} locale={locale} />
-          </Link>
-        ) : (
-          <a
-            className="text-inherit"
-            href={getExplorerUrl('tx', row.TxHash)}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <HydrationSafeDateTime timestamp={row.TimeStamp} locale={locale} />
-          </a>
-        )}
-      </TablePrimaryCell>
-      {showType && (
-        <TablePrimaryCell label={t('columns.type')} align="center">
-          {row.RecordType ? t('ethContribution.withInfo') : t('ethContribution.simple')}
-        </TablePrimaryCell>
-      )}
-      <TablePrimaryCell label={t('columns.round')} align="center">
-        <Link
-          className="text-inherit"
-          href={`/allocation/${row.RoundNum}`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {row.RoundNum}
-        </Link>
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.contributor')} align="center">
-        <AddressLink address={row.DonorAddr} url={`/user/${row.DonorAddr}`} />
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.amountEth')} align="right">
-        {row.AmountEth.toFixed(2)}
-      </TablePrimaryCell>
-    </TablePrimaryRow>
-  );
-};
-
-interface EthDonationTableProps {
+interface EthDonationTableProps extends LedgerStateProps {
   list: EthDonation[];
+  /** Show whether each contribution carried a note. Default `true`. */
   showType?: boolean;
+  /** Show the cycle column; a page about one cycle hides it. Default `true`. */
+  showCycle?: boolean;
 }
 
-const EthDonationTable: FC<EthDonationTableProps> = ({ list, showType = true }) => {
+/**
+ * Direct ETH contributions to the Cycle Reserve. A contribution with a note
+ * leads to its detail page; a plain one links its date to the transaction.
+ * The cycle links to that cycle's contribution list.
+ */
+const EthDonationTable = ({
+  list,
+  showType = true,
+  showCycle = true,
+  ...state
+}: EthDonationTableProps) => {
   const t = useTranslations('tables');
-  const perPage = 5;
-  const [page, setPage] = useState(1);
 
-  if (list.length === 0) {
-    return <p>{t('empty.contributions')}</p>;
-  }
+  // A record has a detail page exactly when it carries a note (type > 0);
+  // pages that hide the type column only list records that do.
+  const hasDetail = useMemo(
+    () => (row: EthDonation) => row.RecordType > 0 || !showType,
+    [showType],
+  );
 
-  const startIndex = (page - 1) * perPage;
-  const endIndex = page * perPage;
-  const visibleRows = list.slice(startIndex, endIndex);
+  const columns = useMemo<DataTableColumn<EthDonation>[]>(() => {
+    const all: (DataTableColumn<EthDonation> | false)[] = [
+      {
+        id: 'datetime',
+        kind: 'datetime',
+        header: t('columns.datetime'),
+        value: (row) => row.TimeStamp,
+        // The detail page carries the transaction link for rows that have one;
+        // a second link in the same cell would nest inside the row link.
+        txHash: (row) => (hasDetail(row) ? null : row.TxHash),
+        year: 'always',
+        sortable: true,
+      },
+      showType && {
+        id: 'type',
+        kind: 'text',
+        header: t('columns.type'),
+        value: (row) =>
+          row.RecordType ? t('ethContribution.withInfo') : t('ethContribution.simple'),
+      },
+      showCycle && {
+        id: 'cycle',
+        kind: 'link',
+        header: t('columns.round'),
+        value: (row) => Number(row.RoundNum),
+        href: (row) => `/eth-contribution/round/${row.RoundNum}`,
+        sortable: true,
+      },
+      {
+        id: 'contributor',
+        kind: 'address',
+        header: t('columns.contributor'),
+        value: (row) => row.DonorAddr,
+      },
+      {
+        id: 'amount',
+        kind: 'amount',
+        header: t('columns.amountEth'),
+        value: (row) => row.AmountEth,
+        showUnit: false,
+        sortable: true,
+      },
+    ];
+    return all.filter((column): column is DataTableColumn<EthDonation> => Boolean(column));
+  }, [t, showType, showCycle, hasDetail]);
 
   return (
-    <>
-      <TablePrimaryContainer>
-        <TablePrimary>
-          <TablePrimaryHead>
-            <tr>
-              <TablePrimaryHeadCell align="left">{t('columns.datetime')}</TablePrimaryHeadCell>
-              {showType && <TablePrimaryHeadCell>{t('columns.type')}</TablePrimaryHeadCell>}
-              <TablePrimaryHeadCell>{t('columns.round')}</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>{t('columns.contributor')}</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">{t('columns.amountEth')}</TablePrimaryHeadCell>
-            </tr>
-          </TablePrimaryHead>
-          <TablePrimaryBody>
-            {visibleRows.map((row) => (
-              <EthDonationRow key={row.EvtLogId} row={row} showType={showType} />
-            ))}
-          </TablePrimaryBody>
-        </TablePrimary>
-      </TablePrimaryContainer>
-      <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
-    </>
+    <DataTable
+      data={list}
+      columns={columns}
+      ariaLabel={t('names.ethContributions')}
+      getRowKey={(row) => row.EvtLogId}
+      getRowHref={(row) => (hasDetail(row) ? `/eth-contribution/detail/${row.CGRecordId}` : null)}
+      getRowLabel={(row) => t('ethContribution.viewContribution', { id: row.CGRecordId })}
+      emptyTitle={t('empty.contributions')}
+      {...state}
+    />
   );
 };
 

@@ -7,10 +7,10 @@ import NameHistoryTable from '@/components/tables/NameHistoryTable';
 import { render, screen, checkA11y } from '@/test-utils';
 
 describe('NameHistoryTable', () => {
-  test('with no records', () => {
+  test('with no records shows the empty state', () => {
     render(<NameHistoryTable list={[]} />);
-    expect(screen.getByText('tables.columns.dateTimeCompact')).toBeInTheDocument();
-    expect(screen.getByText('tables.columns.tokenName')).toBeInTheDocument();
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    expect(screen.getByText('tables.empty.history')).toBeInTheDocument();
   });
 
   test('with mock data', async () => {

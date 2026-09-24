@@ -184,7 +184,10 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
               )}
             </DetailRow>
             <DetailRow label={t('detail.cycleNumberLabel')}>
-              <Link href={`/allocation/${donationInfo.RoundNum}`} className={detailLinkClass}>
+              <Link
+                href={`/eth-contribution/round/${donationInfo.RoundNum}`}
+                className={detailLinkClass}
+              >
                 {t('detail.cycleValue', { cycle: donationInfo.RoundNum })}
               </Link>
             </DetailRow>

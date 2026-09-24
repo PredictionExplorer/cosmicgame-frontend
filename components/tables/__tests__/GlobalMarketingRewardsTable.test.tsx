@@ -18,7 +18,7 @@ const createReward = (overrides = {}) => ({
 describe('GlobalMarketingRewardsTable', () => {
   it('renders empty state when list is empty', () => {
     render(<GlobalMarketingRewardsTable list={[]} />);
-    expect(screen.getByText('tables.empty.allocations')).toBeInTheDocument();
+    expect(screen.getByText('tables.empty.outreachAllocations')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
@@ -40,7 +40,9 @@ describe('GlobalMarketingRewardsTable', () => {
 
   it('formats amount to 2 decimal places with CST suffix', () => {
     render(<GlobalMarketingRewardsTable list={[createReward({ AmountEth: 100.1 })]} />);
-    expect(screen.getByText('100.10 CST')).toBeInTheDocument();
+    const amount = screen.getByText('100.10');
+    // The unit joins its number with a no-break space, so the two never split.
+    expect(amount.textContent).toBe('100.10\u00a0CST');
   });
 
   it('sets rel="noopener noreferrer" on all target="_blank" links', () => {
@@ -53,13 +55,13 @@ describe('GlobalMarketingRewardsTable', () => {
     }
   });
 
-  it('renders only first page of results (perPage=5)', () => {
-    const list = Array.from({ length: 8 }, (_, i) =>
+  it('shows 20 rows a page with the row range', () => {
+    const list = Array.from({ length: 25 }, (_, i) =>
       createReward({ EvtLogId: i, AmountEth: (i + 1) * 100 }),
     );
-    render(<GlobalMarketingRewardsTable list={list} />);
-    expect(screen.getByText('500.00 CST')).toBeInTheDocument();
-    expect(screen.queryByText('600.00 CST')).not.toBeInTheDocument();
+    const { container } = render(<GlobalMarketingRewardsTable list={list} />);
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(20);
+    expect(screen.getByText('tables.pagination.range(from=1,to=20,total=25)')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

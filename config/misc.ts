@@ -167,7 +167,7 @@ export const ADMIN_EVENTS = [
   {
     name: 'RoundStartCSTAuctionLengthChanged',
     messageKey: 'cstCalibrationLength',
-    type: 'number',
+    type: 'time',
     description: 'The length of the starting CST Calibration Window has been changed.',
   },
   {

@@ -1,74 +1,55 @@
-import { useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+'use client';
 
-import { getExplorerUrl } from '@/utils';
+import { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 
-import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
-import {
-  TablePrimary,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryContainer,
-  TablePrimaryHead,
-  TablePrimaryHeadCell,
-  TablePrimaryRow,
-} from '@/components/styled';
-import { CustomPagination } from '@/components/common/CustomPagination';
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+import type { LedgerStateProps } from '@/components/tables/ledger-props';
 import type { NameHistoryRecord } from '@/services/api';
 
-const NameHistoryRow = ({ record }: { record: NameHistoryRecord }) => {
+interface NameHistoryTableProps extends LedgerStateProps {
+  // Defaulted because the name history can be absent from the token payload.
+  list?: NameHistoryRecord[];
+}
+
+/** A token's names over time, each change linked to its transaction. */
+const NameHistoryTable = ({ list = [], ...state }: NameHistoryTableProps) => {
   const t = useTranslations('tables');
-  const locale = useLocale();
 
-  if (!record) {
-    return <TablePrimaryRow />;
-  }
-
-  const txUrl = getExplorerUrl('tx', record.TxHash);
-  const displayName = record.TokenName || t('nameHistory.removed');
-
-  return (
-    <TablePrimaryRow>
-      <TablePrimaryCell label={t('columns.dateTimeCompact')}>
-        <a href={txUrl} className="text-inherit" target="_blank" rel="noopener noreferrer">
-          <HydrationSafeDateTime timestamp={record.TimeStamp} locale={locale} />
-        </a>
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.tokenName')}>{displayName}</TablePrimaryCell>
-    </TablePrimaryRow>
+  const columns = useMemo<DataTableColumn<NameHistoryRecord>[]>(
+    () => [
+      {
+        id: 'datetime',
+        kind: 'datetime',
+        header: t('columns.dateTimeCompact'),
+        value: (row) => row.TimeStamp,
+        txHash: (row) => row.TxHash,
+      },
+      {
+        id: 'name',
+        kind: 'text',
+        header: t('columns.tokenName'),
+        value: (row) => row.TokenName || null,
+        cell: (row) =>
+          row.TokenName ? (
+            <span className="text-foreground">{row.TokenName}</span>
+          ) : (
+            <span className="text-subtle">{t('nameHistory.removed')}</span>
+          ),
+      },
+    ],
+    [t],
   );
-};
-
-// `list` is defaulted because the name history can be absent from the token
-// payload; without it a missing field would throw while slicing the page.
-const NameHistoryTable = ({ list = [] }: { list?: NameHistoryRecord[] }) => {
-  const t = useTranslations('tables');
-  const perPage = 5;
-  const [page, setPage] = useState(1);
-
-  const currentItems = list.slice((page - 1) * perPage, page * perPage);
 
   return (
-    <>
-      <TablePrimaryContainer>
-        <TablePrimary>
-          <TablePrimaryHead>
-            <tr>
-              <TablePrimaryHeadCell align="left">
-                {t('columns.dateTimeCompact')}
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">{t('columns.tokenName')}</TablePrimaryHeadCell>
-            </tr>
-          </TablePrimaryHead>
-          <TablePrimaryBody>
-            {currentItems.map((record) => (
-              <NameHistoryRow key={record.EvtLogId} record={record} />
-            ))}
-          </TablePrimaryBody>
-        </TablePrimary>
-      </TablePrimaryContainer>
-      <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
-    </>
+    <DataTable
+      data={list}
+      columns={columns}
+      ariaLabel={t('names.nameHistory')}
+      getRowKey={(row) => row.EvtLogId}
+      emptyTitle={t('empty.history')}
+      {...state}
+    />
   );
 };
 

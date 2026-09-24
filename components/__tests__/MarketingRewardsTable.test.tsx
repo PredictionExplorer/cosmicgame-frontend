@@ -36,7 +36,7 @@ beforeEach(() => jest.clearAllMocks());
 describe('MarketingRewardsTable', () => {
   it('renders "No allocations yet." when list is empty', () => {
     render(<MarketingRewardsTable list={[]} />);
-    expect(screen.getByText('tables.empty.allocations')).toBeInTheDocument();
+    expect(screen.getByText('tables.empty.outreachAllocations')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {

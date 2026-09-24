@@ -76,16 +76,18 @@ describe('SystemModesTable', () => {
     render(
       <SystemModesTable list={[createEvent({ RoundNum: 5, EvtLogId: 100, NextEvtLogId: 200 })]} />,
     );
-    const row = screen.getByText('5').closest('tr');
+    const row = screen.getByText('tables.allocation.cycle(cycle=5)').closest('tr');
     fireEvent.click(row!);
     expect(mockPush).toHaveBeenCalledWith('/system-event/5/100/200');
   });
 
-  it('renders only first page of results (perPage=5)', () => {
-    const list = Array.from({ length: 8 }, (_, i) => createEvent({ EvtLogId: i, RoundNum: i + 1 }));
-    render(<SystemModesTable list={list} />);
-    expect(screen.getByText('5')).toBeInTheDocument();
-    expect(screen.queryByText('6')).not.toBeInTheDocument();
+  it('shows 20 rows a page with the row range', () => {
+    const list = Array.from({ length: 25 }, (_, i) =>
+      createEvent({ EvtLogId: i, RoundNum: i + 1 }),
+    );
+    const { container } = render(<SystemModesTable list={list} />);
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(20);
+    expect(screen.getByText('tables.pagination.range(from=1,to=20,total=25)')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

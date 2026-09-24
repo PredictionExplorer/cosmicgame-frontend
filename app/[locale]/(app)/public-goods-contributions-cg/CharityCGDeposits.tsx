@@ -14,6 +14,7 @@ import { useCharityCGDeposits, useDashboardInfo } from '@/hooks/useApiQuery';
 
 const CharityCGDeposits = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('publicGoods');
+  const tTables = useTranslations('tables');
   const { data: charityCGDeposits = [], isLoading: loading } = useCharityCGDeposits();
   const { data: dashboardData } = useDashboardInfo(undefined, { poll: false });
 
@@ -27,13 +28,11 @@ const CharityCGDeposits = ({ seoSummary }: { seoSummary?: ReactNode }) => {
         {t('protocol.description')}
       </p>
       <PublicGoodsImpactCard data={dashboardData ?? null} variant="compact" className="mb-8" />
-      {loading ? (
-        <p className="text-lg font-semibold" role="status">
-          {t('loading')}
-        </p>
-      ) : (
-        <CharityDepositTable list={charityCGDeposits as PublicGoodsContributionEntry[]} />
-      )}
+      <CharityDepositTable
+        list={charityCGDeposits as PublicGoodsContributionEntry[]}
+        loading={loading}
+        title={tTables('names.publicGoodsContributions')}
+      />
     </PageShell>
   );
 };

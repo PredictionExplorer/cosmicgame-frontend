@@ -1,120 +1,88 @@
-import { useState } from 'react';
+'use client';
+
+import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 
-import {
-  TablePrimary,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryContainer,
-  TablePrimaryHead,
-  TablePrimaryHeadCell,
-  TablePrimaryRow,
-} from '@/components/styled';
-import { CustomPagination } from '@/components/common/CustomPagination';
-import { AddressLink } from '@/components/common/AddressLink';
-import { TableHeaderHelp } from '@/components/tables/TableHeaderHelp';
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+import type { LedgerStateProps } from '@/components/tables/ledger-props';
 import type { UniqueAnchorHolderRWLK } from '@/services/api/types';
 
 export type { UniqueAnchorHolderRWLK };
 
-const UniqueAnchorHoldersRWLKRow = ({ row }: { row: UniqueAnchorHolderRWLK }) => {
+interface UniqueAnchorHoldersRWLKTableProps extends LedgerStateProps {
+  list: UniqueAnchorHolderRWLK[];
+}
+
+/**
+ * Every wallet that has anchored a Random Walk NFT: its anchor and release
+ * actions and tokens. Headers carry the full column names; phone records use
+ * the short ones.
+ */
+export const UniqueAnchorHoldersRWLKTable = ({
+  list,
+  ...state
+}: UniqueAnchorHoldersRWLKTableProps) => {
   const t = useTranslations('tables');
 
-  if (!row) {
-    return <TablePrimaryRow />;
-  }
-
-  const {
-    StakerAddr = '',
-    NumStakeActions = 0,
-    NumUnstakeActions = 0,
-    TotalTokensStaked = 0,
-    TotalTokensMinted = 0,
-  } = row;
-
-  return (
-    <TablePrimaryRow>
-      <TablePrimaryCell label={t('columns.holder')}>
-        <AddressLink address={StakerAddr} url={`/user/${StakerAddr}`} />
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('uniqueAnchorHolders.anchors')} align="center">
-        {NumStakeActions}
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('uniqueAnchorHolders.releases')} align="center">
-        {NumUnstakeActions}
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('uniqueAnchorHolders.anchored')} align="center">
-        {TotalTokensStaked}
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('uniqueAnchorHolders.imprinted')} align="center">
-        {TotalTokensMinted}
-      </TablePrimaryCell>
-    </TablePrimaryRow>
+  const columns = useMemo<DataTableColumn<UniqueAnchorHolderRWLK>[]>(
+    () => [
+      {
+        id: 'holder',
+        kind: 'address',
+        header: t('columns.anchorHolderAddress'),
+        label: t('columns.holder'),
+        help: t('statisticsTooltips.anchorHolderAddress'),
+        value: (row) => row.StakerAddr,
+      },
+      {
+        id: 'anchors',
+        kind: 'count',
+        header: t('uniqueAnchorHolders.numAnchorActions'),
+        label: t('uniqueAnchorHolders.anchors'),
+        help: t('statisticsTooltips.numAnchorActions'),
+        value: (row) => row.NumStakeActions,
+        sortable: true,
+      },
+      {
+        id: 'releases',
+        kind: 'count',
+        header: t('uniqueAnchorHolders.numReleaseActions'),
+        label: t('uniqueAnchorHolders.releases'),
+        help: t('statisticsTooltips.numReleaseActions'),
+        value: (row) => row.NumUnstakeActions,
+        sortable: true,
+      },
+      {
+        id: 'anchored',
+        kind: 'count',
+        header: t('uniqueAnchorHolders.totalAnchoredTokens'),
+        label: t('uniqueAnchorHolders.anchored'),
+        help: t('statisticsTooltips.totalAnchoredTokens'),
+        value: (row) => row.TotalTokensStaked,
+        sortable: true,
+      },
+      {
+        id: 'imprinted',
+        kind: 'count',
+        header: t('uniqueAnchorHolders.totalImprintedTokens'),
+        label: t('uniqueAnchorHolders.imprinted'),
+        help: t('statisticsTooltips.totalImprintedTokens'),
+        value: (row) => row.TotalTokensMinted,
+        sortable: true,
+      },
+    ],
+    [t],
   );
-};
-
-export const UniqueAnchorHoldersRWLKTable = ({ list }: { list: UniqueAnchorHolderRWLK[] }) => {
-  const t = useTranslations('tables');
-  const perPage = 5;
-  const [page, setPage] = useState(1);
-  const responsiveHeaders = [
-    {
-      desktop: t('columns.anchorHolderAddress'),
-      mobile: t('columns.holder'),
-      align: 'left' as const,
-      tooltip: t('statisticsTooltips.anchorHolderAddress'),
-    },
-    {
-      desktop: t('uniqueAnchorHolders.numAnchorActions'),
-      mobile: t('uniqueAnchorHolders.anchors'),
-      tooltip: t('statisticsTooltips.numAnchorActions'),
-    },
-    {
-      desktop: t('uniqueAnchorHolders.numReleaseActions'),
-      mobile: t('uniqueAnchorHolders.releases'),
-      tooltip: t('statisticsTooltips.numReleaseActions'),
-    },
-    {
-      desktop: t('uniqueAnchorHolders.totalAnchoredTokens'),
-      mobile: t('uniqueAnchorHolders.anchored'),
-      tooltip: t('statisticsTooltips.totalAnchoredTokens'),
-    },
-    {
-      desktop: t('uniqueAnchorHolders.totalImprintedTokens'),
-      mobile: t('uniqueAnchorHolders.imprinted'),
-      tooltip: t('statisticsTooltips.totalImprintedTokens'),
-    },
-  ];
-
-  if (list.length === 0) {
-    return <p>{t('empty.anchorHolders')}</p>;
-  }
 
   return (
-    <>
-      <TablePrimaryContainer>
-        <TablePrimary className="sm:min-w-[720px] xl:min-w-0">
-          <TablePrimaryHead>
-            <tr>
-              {responsiveHeaders.map((header) => (
-                <TablePrimaryHeadCell key={header.desktop} align={header.align}>
-                  <TableHeaderHelp
-                    desktop={header.desktop}
-                    mobile={header.mobile}
-                    tooltip={header.tooltip}
-                  />
-                </TablePrimaryHeadCell>
-              ))}
-            </tr>
-          </TablePrimaryHead>
-          <TablePrimaryBody>
-            {list.slice((page - 1) * perPage, page * perPage).map((row) => (
-              <UniqueAnchorHoldersRWLKRow row={row} key={row.StakerAid} />
-            ))}
-          </TablePrimaryBody>
-        </TablePrimary>
-      </TablePrimaryContainer>
-      <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
-    </>
+    <DataTable
+      data={list}
+      columns={columns}
+      ariaLabel={t('names.rwlkAnchorHolders')}
+      getRowKey={(row) => row.StakerAid}
+      emptyTitle={t('empty.anchorHolders')}
+      tableClassName="sm:min-w-[45rem] xl:min-w-0"
+      {...state}
+    />
   );
 };

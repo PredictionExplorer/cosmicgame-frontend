@@ -39,21 +39,21 @@ describe('UniqueEthDonorsTable', () => {
   it('renders contributor data', () => {
     render(<UniqueEthDonorsTable list={[createDonor()]} />);
     expect(screen.getByText('5')).toBeInTheDocument();
-    expect(screen.getByText('1.23')).toBeInTheDocument();
+    expect(screen.getByText('1.2300')).toBeInTheDocument();
   });
 
-  it('formats TotalDonatedEth to 2 decimal places', () => {
+  it('shows ETH at the ledger precision', () => {
     render(<UniqueEthDonorsTable list={[createDonor({ TotalDonatedEth: 3.1 })]} />);
-    expect(screen.getByText('3.10')).toBeInTheDocument();
+    expect(screen.getByText('3.1000')).toBeInTheDocument();
   });
 
-  it('renders only first page of results (perPage=5)', () => {
-    const list = Array.from({ length: 8 }, (_, i) =>
+  it('shows 20 rows a page with the row range', () => {
+    const list = Array.from({ length: 25 }, (_, i) =>
       createDonor({ DonorAid: i, CountDonations: i + 1 }),
     );
-    render(<UniqueEthDonorsTable list={list} />);
-    expect(screen.getByText('5')).toBeInTheDocument();
-    expect(screen.queryByText('6')).not.toBeInTheDocument();
+    const { container } = render(<UniqueEthDonorsTable list={list} />);
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(20);
+    expect(screen.getByText('tables.pagination.range(from=1,to=20,total=25)')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

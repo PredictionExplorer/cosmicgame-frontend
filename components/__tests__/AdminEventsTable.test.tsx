@@ -8,9 +8,9 @@ import { render, screen, checkA11y } from '@/test-utils';
 import { AdminEventsTable, type AdminEventRow } from '@/components/tables/AdminEventsTable';
 
 describe('AdminEventsTable', () => {
-  test('with no records shows "No events yet."', () => {
+  test('with no records says no configuration changes were recorded', () => {
     render(<AdminEventsTable list={[]} />);
-    expect(screen.getByText('tables.empty.events')).toBeInTheDocument();
+    expect(screen.getByText('tables.adminEvents.empty')).toBeInTheDocument();
   });
 
   test('with mock data renders event rows', () => {
@@ -126,6 +126,43 @@ describe('AdminEventsTable', () => {
       );
 
       expect(screen.getByText('1h')).toBeInTheDocument();
+    });
+  });
+
+  describe('event values', () => {
+    const base: AdminEventRow = {
+      EvtLogId: '1',
+      RecordType: 2,
+      TransferType: 0,
+      TimeStamp: 1701346718,
+      TxHash: '0xdef789',
+      IntegerValue: 0,
+      AddressValue: '',
+      StringValue: '',
+    };
+
+    test('explains an event with an info button, not a warning icon', () => {
+      render(<AdminEventsTable list={[base]} />);
+      const explain = screen.getByRole('button', {
+        name: /statistics\.systemEvent\.explainEvent|Explain/,
+      });
+      expect(explain.querySelector('svg')).toHaveClass('lucide-info');
+      expect(document.querySelector('.lucide-circle-alert, .lucide-alert-circle')).toBeNull();
+    });
+
+    test('reads the CST Calibration Window length as a duration', () => {
+      // RoundStartCSTAuctionLengthChanged: seconds, not a bare number.
+      render(<AdminEventsTable list={[{ ...base, RecordType: 25, IntegerValue: 1800 }]} />);
+      expect(screen.getByText('30m')).toBeInTheDocument();
+      expect(screen.queryByText('1800')).not.toBeInTheDocument();
+    });
+
+    test('shows a dash for an empty text value instead of an empty link', () => {
+      const { container } = render(
+        <AdminEventsTable list={[{ ...base, RecordType: 31, StringValue: '' }]} />,
+      );
+      expect(container.querySelector('a[href=""]')).toBeNull();
+      expect(screen.getByText('tables.status.unavailable')).toBeInTheDocument();
     });
   });
 
