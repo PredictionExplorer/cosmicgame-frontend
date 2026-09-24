@@ -72,7 +72,7 @@ export default async function LearnIndexPage({ params }: PageProps) {
 
       <section
         aria-labelledby="learn-white-paper"
-        className="grid items-center gap-8 rounded-surface border border-rule bg-surface p-5 sm:p-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] lg:gap-12"
+        className="grid items-center gap-8 rounded-surface border border-rule bg-surface p-5 sm:p-8 md:grid-cols-[minmax(0,1fr)_minmax(0,17rem)] lg:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] lg:gap-12"
       >
         <div className="min-w-0">
           <p className="type-eyebrow text-secondary">{hub.whitePaper.eyebrow}</p>
@@ -106,7 +106,7 @@ export default async function LearnIndexPage({ params }: PageProps) {
         <SignaturePlate
           art={WHITE_PAPER_PLATE}
           href={localizeCrossHostHref(`${APP_ORIGIN}/detail/${WHITE_PAPER_PLATE.tokenId}`, locale)}
-          sizes="(min-width: 1024px) 28rem, (min-width: 640px) 80vw, 100vw"
+          sizes="(min-width: 1024px) 28rem, (min-width: 768px) 17rem, 100vw"
           copy={{
             alt: traits('quickView.title', { id: plateId }),
             title: traits('quickView.title', { id: plateId }),

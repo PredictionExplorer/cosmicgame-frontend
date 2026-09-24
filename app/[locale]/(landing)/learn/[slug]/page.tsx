@@ -181,7 +181,7 @@ export default async function LearnArticlePage({ params }: PageProps) {
             </div>
           ) : null}
 
-          <article id={ARTICLE_ID} aria-labelledby={TITLE_ID} className="min-w-0">
+          <article id={ARTICLE_ID} aria-labelledby={TITLE_ID} className="min-w-0 max-w-[46rem]">
             {article.sections.map((section, sectionIndex) => {
               const id = sectionId(sectionIndex);
               return (

@@ -353,7 +353,7 @@ export function QuizRunner({
         animate="animate"
         className="mt-6 rounded-surface border border-rule bg-surface"
       >
-        <div className="p-5 sm:p-8">
+        <div className="px-4 py-5 sm:p-8">
           <h2
             ref={headingRef}
             id={questionHeadingId}
@@ -376,7 +376,7 @@ export function QuizRunner({
                   data-state={state}
                   data-testid={`quiz-option-${index + 1}`}
                   className={cn(
-                    'flex w-full min-h-12 items-start gap-3 rounded-control border px-3.5 py-3 text-left transition-[background-color,border-color,color] duration-fast sm:px-4',
+                    'flex w-full min-h-12 items-start gap-3 rounded-control border px-3 py-3 text-left transition-[background-color,border-color,color] duration-fast sm:px-4',
                     state === 'open' &&
                       'border-rule text-foreground hover:border-input hover:bg-surface-raised',
                     state === 'correct' && 'border-positive bg-positive-surface text-foreground',
@@ -424,7 +424,7 @@ export function QuizRunner({
             data-testid="quiz-feedback"
             className="scroll-mt-[var(--sticky-offset)] border-t border-rule-faint"
           >
-            <div className="px-5 pt-5 sm:px-8 sm:pt-6">
+            <div className="px-4 pt-5 sm:px-8 sm:pt-6">
               <p
                 id={feedbackHeadingId}
                 className="flex items-start gap-2 type-title text-foreground"
@@ -459,7 +459,7 @@ export function QuizRunner({
             </div>
 
             {/* On a phone the explanation can outgrow the screen: the next step stays in reach. */}
-            <div className="sticky bottom-0 mt-5 flex flex-wrap items-center justify-between gap-x-4 gap-y-3 rounded-b-surface border-t border-rule-faint bg-surface px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:static sm:border-t-0 sm:px-8 sm:pb-6 sm:pt-0">
+            <div className="sticky bottom-0 mt-5 flex flex-wrap items-center justify-between gap-x-4 gap-y-3 rounded-b-surface border-t border-rule-faint bg-surface px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:static sm:border-t-0 sm:px-8 sm:pb-6 sm:pt-0">
               <ReferenceLink href={current.question.reference.href} newTabNote={ui.newTabNote}>
                 {ui.referenceLabel}
                 {': '}
