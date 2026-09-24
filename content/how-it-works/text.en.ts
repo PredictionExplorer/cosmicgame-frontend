@@ -113,7 +113,7 @@ export const howItWorksTextEn = {
         tooltip:
           'Arbitrum is a Layer 2 blockchain on Ethereum with lower gas fees and faster transactions.',
         highlights: [
-          'Click the "Connect Wallet" button at the top of the page.',
+          'Click the "Connect wallet" button at the top of the page.',
           'Use a wallet that supports the Arbitrum blockchain, such as MetaMask.',
           'Switch your network to Arbitrum when prompted, then approve permissions.',
           'Your wallet address will appear in the header once connected.',
