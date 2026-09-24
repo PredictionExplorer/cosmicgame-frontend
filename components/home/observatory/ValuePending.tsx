@@ -23,7 +23,8 @@ export function ValuePending({ ch = 8, label, className }: ValuePendingProps) {
   return (
     <span data-slot="value-pending" className={cn('inline-flex align-middle', className)}>
       <Skeleton as="span" className="inline-block h-[1em]" style={{ width: `${ch}ch` }} />
-      <span className="sr-only">{label ?? tCommon('status.loadingDots')}</span>
+      {/* The shared word with a true ellipsis, never three typed dots. */}
+      <span className="sr-only">{label ?? tCommon('status.loadingEllipsis')}</span>
     </span>
   );
 }

@@ -151,7 +151,7 @@ describe('GesturePanel', () => {
 
       // A skeleton with a spoken "Loading", never the text "Loading..." on screen.
       const cost = screen.getByTestId('panel-method-eth-cost');
-      expect(within(cost).getByText('Loading...')).toHaveClass('sr-only');
+      expect(within(cost).getByText('common.status.loadingEllipsis')).toHaveClass('sr-only');
       expect(cost.querySelector('[data-slot="value-pending"]')).not.toBeNull();
       expect(submitButton()).toBeDisabled();
     },
@@ -166,7 +166,9 @@ describe('GesturePanel', () => {
         submit={{ action: 'home.form.submit.action.cst', cost: null }}
       />,
     );
-    expect(screen.getByTestId('panel-method-cst-cost')).toHaveTextContent('Loading...');
+    expect(screen.getByTestId('panel-method-cst-cost')).toHaveTextContent(
+      'common.status.loadingEllipsis',
+    );
     expect(submitButton()).toBeDisabled();
   });
 
@@ -286,7 +288,9 @@ describe('GesturePanel', () => {
     render(<GesturePanel {...baseProps} form={makeForm({ isCstRewardLoading: true })} />);
     expect(screen.getByTestId('panel-cst-metric-reward')).not.toHaveTextContent(/\d/);
     expect(
-      within(screen.getByTestId('panel-cst-metric-reward')).getByText('Loading...'),
+      within(screen.getByTestId('panel-cst-metric-reward')).getByText(
+        'common.status.loadingEllipsis',
+      ),
     ).toHaveClass('sr-only');
   });
 
@@ -305,7 +309,7 @@ describe('GesturePanel', () => {
       const row = screen.getByTestId(testId);
       expect(row).toHaveTextContent('—');
       expect(row).toHaveTextContent('common.status.unavailable');
-      expect(within(row).queryByText('Loading...')).not.toBeInTheDocument();
+      expect(within(row).queryByText('common.status.loadingEllipsis')).not.toBeInTheDocument();
     }
   });
 

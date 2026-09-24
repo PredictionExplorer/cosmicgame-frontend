@@ -95,7 +95,7 @@ describe('AllocationLedger', () => {
     render(<AllocationLedger data={null} />);
     const signature = screen.getByTestId('ledger-track-signature');
     expect(signature).not.toHaveTextContent(/0\.0000/);
-    expect(within(signature).getByText('Loading...')).toBeInTheDocument();
+    expect(within(signature).getByText('common.status.loadingEllipsis')).toBeInTheDocument();
     expect(screen.queryByTestId('ledger-track-next-cycle')).not.toBeInTheDocument();
   });
 
