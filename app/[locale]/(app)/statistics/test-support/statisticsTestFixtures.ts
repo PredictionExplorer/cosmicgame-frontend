@@ -35,6 +35,7 @@ export function createDashboardInfo(overrides: Partial<DashboardInfo> = {}): Das
       NumUniqueStakersCST: 7,
       NumUniqueStakersRWalk: 3,
       TotalRaffleEthDeposits: 0.9879,
+      TotalChronoWarriorEthDeposits: 1.9757,
       TotalRaffleEthWithdrawn: 2.9636,
       TotalCSTConsumedEth: 84576.37,
       TotalMktRewardsEth: 3000,

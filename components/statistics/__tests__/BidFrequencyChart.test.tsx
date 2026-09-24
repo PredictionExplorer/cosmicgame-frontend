@@ -40,8 +40,11 @@ describe('BidFrequencyChart', () => {
   it('reads the range in one sentence and plots one bar per bucket', () => {
     render(<BidFrequencyChart label="Gesture frequency over time" />);
     const figure = screen.getByRole('figure', { name: 'Gesture frequency over time' });
+    // The opening-hour exclusion stands beside the total it changes.
     expect(
-      within(figure).getByText(/Gestures, .*: 1,274\. Busiest day: .*\(1,234\)\./),
+      within(figure).getByText(
+        /Gestures, .*: 1,274, not counting the first hour of each cycle\. Busiest day: .*\(1,234\)\./,
+      ),
     ).toBeInTheDocument();
     expect(screen.getByTestId('bar-chart')).toHaveAttribute('data-point-count', '2');
     // The opening hour's exclusion stays stated under the chart.

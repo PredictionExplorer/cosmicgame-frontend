@@ -68,12 +68,28 @@ describe('ParticipantOutcomesSection', () => {
     expect(screen.queryByText(/Biggest Spender|Net %/)).not.toBeInTheDocument();
   });
 
-  it('shows every allocation rate at one decimal and each count with its unit', () => {
+  it('cannot be re-ranked by the difference or by cycles with an allocation', () => {
+    // Regression: sorting by Net or by the allocation rate, with a "#" column counting
+    // the rows, turned the table into a gain board or a hit-rate ranking.
     render(<ParticipantOutcomesSection />);
     const table = screen.getByRole('table');
-    // Regression: "50%" here beside "100.0%" in the retrievals table.
-    expect(within(table).getAllByText('50.0%')).toHaveLength(2);
-    expect(within(table).getAllByText('0.0%')).toHaveLength(1);
+    const header = (name: RegExp) =>
+      within(table)
+        .getAllByRole('columnheader')
+        .find((cell) => name.test(cell.textContent ?? ''))!;
+    // A sortable header carries aria-sort; these two carry none.
+    expect(header(/^Net/)).not.toHaveAttribute('aria-sort');
+    expect(header(/^Cycles with an allocation/)).not.toHaveAttribute('aria-sort');
+    expect(header(/Gestures/)).toHaveAttribute('aria-sort');
+    expect(within(table).queryByRole('columnheader', { name: '#' })).toBeNull();
+  });
+
+  it('counts cycles with an allocation, never as a percentage, and each count with its unit', () => {
+    render(<ParticipantOutcomesSection />);
+    const table = screen.getByRole('table');
+    expect(within(table).getAllByText('1 of 2 cycles')).toHaveLength(2);
+    expect(within(table).getAllByText('0 of 2 cycles')).toHaveLength(1);
+    expect(within(table).queryByText(/%$/)).toBeNull();
     // The unit keeps its count on its line (a no-break space); the dot is visual only.
     const nft = within(table).getAllByText((_, el) => el?.textContent === '1\u00a0NFT')[0]!;
     expect(nft.parentElement!.textContent).toBe('1\u00a0NFT · 1\u00a0CST');

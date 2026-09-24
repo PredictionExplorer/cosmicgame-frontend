@@ -201,10 +201,33 @@ describe('StatisticsHubPanel', () => {
     expect(container.querySelector('[data-live-state]')).not.toBeInTheDocument();
   });
 
-  it('dates the opening of the cycle in UTC, the zone of its daily bars, and says so once', () => {
+  it('dates the opening of the cycle in UTC, the zone of its daily bars, named inline', () => {
     render(<StatisticsHubPanel />);
-    // The jest intl mock prints the formats key with its values.
-    expect(screen.getAllByText('formats.dateTime.timeZone(zone=UTC)')).toHaveLength(1);
+    const cycle = screen.getByRole('region', { name: 'Cycle 3 so far' });
+    const opened = within(cycle).getByText(hub.cycle.opened).parentElement!;
+    expect(opened.querySelector('time')).toHaveTextContent(/UTC$/);
+    // No separate "Time zone" line: the zone travels with the time.
+    expect(screen.queryByText(/formats\.dateTime\.timeZone/)).not.toBeInTheDocument();
+  });
+
+  it('sets retrievals from the Allocations Wallet beside deposits of the same scope', () => {
+    render(<StatisticsHubPanel />);
+    // The first match is the figure's label; the Definitions disclosure repeats it.
+    const row = (label: string) => screen.getAllByText(label)[0]!.parentElement!;
+    expect(row(metrics.stellarSelectionEthDeposited.label)).toHaveTextContent('0.9879 ETH');
+    expect(row(metrics.chronoWarriorEthDeposited.label)).toHaveTextContent('1.9757 ETH');
+    // Every retrieval from the wallet, both tracks: never set against one track alone.
+    expect(row(metrics.allocationsWalletEthRetrieved.label)).toHaveTextContent('2.9636 ETH');
+  });
+
+  it('closes with the related pages, the current cycle linked once from its own section', () => {
+    render(<StatisticsHubPanel />);
+    const related = screen.getByRole('navigation', { name: hub.seo.relatedPagesAria });
+    expect(within(related).getByRole('link', { name: hub.seo.links.contracts })).toHaveAttribute(
+      'href',
+      '/contracts',
+    );
+    expect(within(related).queryByRole('link', { name: hub.seo.links.currentCycle })).toBeNull();
   });
 
   it('keeps polling enabled on the hub dashboard query', () => {

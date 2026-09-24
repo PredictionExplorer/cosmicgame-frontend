@@ -69,7 +69,10 @@ describe('LastBidSpikeChart', () => {
       /^Spike on Sep 1, 2026/,
     );
     expect(screen.getByTestId('bar-chart')).toHaveAttribute('data-point-count', '2');
-    expect(screen.getByText('No spikes recently.')).toBeInTheDocument();
+    // The note says why an older spike is on screen, not that there are no spikes.
+    expect(
+      screen.getByText('No spike in recent activity; showing the latest one on record.'),
+    ).toBeInTheDocument();
   });
 
   it('names each spike by its date, and every one by its hour when two share a day', () => {

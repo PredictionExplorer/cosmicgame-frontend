@@ -26,6 +26,16 @@ export interface SectionShellProps {
   defaultOpen?: boolean;
   /** Mount the content only once the section is first opened (heavy charts, own queries). */
   lazy?: boolean;
+  /**
+   * What a folded section holds ("12 contracts"), shown under its title while
+   * it is closed, so a closed section never reads as an empty one.
+   */
+  collapsedSummary?: ReactNode;
+  /**
+   * The visible verbs beside a collapsible title's chevron. Visual only: the
+   * button's name stays the title and `aria-expanded` carries the state.
+   */
+  toggleLabels?: { show: string; hide: string };
   /** Marks the section busy while its content loads. */
   busy?: boolean;
   /** Anchor id, for links into the section. */
@@ -53,6 +63,8 @@ export function SectionShell({
   defaultOpen = true,
   collapsible = !defaultOpen,
   lazy = false,
+  collapsedSummary,
+  toggleLabels,
   busy = false,
   id,
   className,
@@ -98,10 +110,17 @@ export function SectionShell({
                   className="group inline-flex max-w-full items-start gap-2.5 rounded-edge text-left"
                 >
                   <span className="min-w-0">{title}</span>
-                  <ChevronDown
-                    aria-hidden
-                    className="mt-[0.3em] size-5 shrink-0 text-subtle transition-transform duration-base group-hover:text-foreground group-aria-expanded:rotate-180 motion-reduce:transition-none"
-                  />
+                  <span className="mt-[0.3em] inline-flex shrink-0 items-center gap-1 text-subtle group-hover:text-foreground">
+                    <ChevronDown
+                      aria-hidden
+                      className="size-5 transition-transform duration-base group-aria-expanded:rotate-180 motion-reduce:transition-none"
+                    />
+                    {toggleLabels ? (
+                      <span aria-hidden className="type-label">
+                        {open ? toggleLabels.hide : toggleLabels.show}
+                      </span>
+                    ) : null}
+                  </span>
                 </button>
               ) : (
                 title
@@ -115,6 +134,9 @@ export function SectionShell({
             <p className="mt-2 max-w-[var(--measure-lede)] type-body-sm text-muted-foreground">
               {description}
             </p>
+          ) : null}
+          {collapsedSummary && !open ? (
+            <p className="mt-2 type-body-sm text-muted-foreground">{collapsedSummary}</p>
           ) : null}
         </div>
         {actions && open ? (

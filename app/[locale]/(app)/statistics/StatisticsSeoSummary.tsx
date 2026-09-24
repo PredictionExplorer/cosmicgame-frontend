@@ -16,7 +16,8 @@ import { StatisticsSubNav } from './StatisticsSubNav';
  * figure row (the active cycle with its gestures, allocations distributed,
  * NFTs imprinted, contract balance), read from the same polled dashboard
  * query as the hub panel, so no metric appears twice. The figures start from
- * this request's server read, so the server HTML holds them.
+ * this request's server read, so the server HTML holds them. The related
+ * pages close the hub body instead, so the section tabs follow the figures.
  */
 export async function StatisticsSeoSummary() {
   const locale = await getLocale();
@@ -64,13 +65,6 @@ export async function StatisticsSeoSummary() {
           },
         ]}
         meta={<LiveStatus variant="inline" />}
-        related={[
-          { href: '/current-cycle', label: t('hub.seo.links.currentCycle') },
-          { href: '/how-it-works', label: t('hub.seo.links.howItWorks') },
-          { href: '/contracts', label: t('hub.seo.links.contracts') },
-          { href: '/faq', label: t('hub.seo.links.faq') },
-        ]}
-        relatedLabel={t('hub.seo.relatedPagesAria')}
       />
       <StatisticsSubNav />
     </>

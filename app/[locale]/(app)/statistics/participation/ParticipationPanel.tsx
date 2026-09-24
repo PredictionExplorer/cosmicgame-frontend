@@ -3,7 +3,13 @@
 import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 
-import { useUniqueDonors, useUniqueParticipants, useUniqueRecipients } from '@/hooks/useApiQuery';
+import {
+  useDashboardInfo,
+  useUniqueDonors,
+  useUniqueParticipants,
+  useUniqueRecipients,
+} from '@/hooks/useApiQuery';
+import { useHydrated } from '@/hooks/useHydrated';
 import { StatsSection } from '@/components/statistics/StatsSection';
 import {
   UniqueParticipantsTable,
@@ -15,13 +21,22 @@ import {
   type UniqueEthDonor,
 } from '@/components/tables/UniqueEthDonorsTable';
 
+import { dashboardCount } from '../dashboardCounts';
+
 /**
  * The participation ledgers: every participant by gesture count, every
  * allocation recipient, every ETH contributor. The header above carries the
- * four counts, so the body is the lists themselves, one section each.
+ * four counts, so the body is the lists themselves, one section each. Those
+ * counts size each list's skeleton to the table it becomes, and an empty
+ * list the header counts rows for reads as one that did not load.
  */
 const ParticipationPanel = () => {
   const t = useTranslations('statistics');
+  const hydrated = useHydrated();
+  const { data: dashboard } = useDashboardInfo(undefined, { poll: false });
+  // Read after hydration only: the server has no dashboard in this island.
+  const expected = (metric: Parameters<typeof dashboardCount>[1]) =>
+    hydrated ? dashboardCount(dashboard, metric) : null;
   const participantsQuery = useUniqueParticipants();
   const recipientsQuery = useUniqueRecipients();
   const donorsQuery = useUniqueDonors();
@@ -45,6 +60,7 @@ const ParticipationPanel = () => {
         isError={participantsQuery.isError}
         onRetry={() => participantsQuery.refetch()}
         isEmpty={uniqueParticipants.length === 0}
+        expectedCount={expected('uniqueParticipants')}
         emptyTitle={t('participation.empty.participantsTitle')}
         emptyDescription={t('participation.empty.participantsDescription')}
       >
@@ -58,6 +74,7 @@ const ParticipationPanel = () => {
         isError={recipientsQuery.isError}
         onRetry={() => recipientsQuery.refetch()}
         isEmpty={uniqueRecipients.length === 0}
+        expectedCount={expected('uniqueRecipients')}
         emptyTitle={t('participation.empty.recipientsTitle')}
         emptyDescription={t('participation.empty.recipientsDescription')}
       >
@@ -71,6 +88,7 @@ const ParticipationPanel = () => {
         isError={donorsQuery.isError}
         onRetry={() => donorsQuery.refetch()}
         isEmpty={uniqueDonors.length === 0}
+        expectedCount={expected('uniqueContributors')}
         emptyTitle={t('participation.empty.contributorsTitle')}
         emptyDescription={t('participation.empty.contributorsDescription')}
       >

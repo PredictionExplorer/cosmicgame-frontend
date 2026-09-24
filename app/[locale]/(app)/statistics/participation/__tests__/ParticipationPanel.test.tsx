@@ -3,12 +3,15 @@ import userEvent from '@testing-library/user-event';
 import { render, screen, checkA11y } from '@/test-utils';
 
 import ParticipationPanel from '../ParticipationPanel';
+import { createDashboardInfo } from '../../test-support/statisticsTestFixtures';
 
+const mockUseDashboardInfo = jest.fn();
 const mockUseUniqueParticipants = jest.fn();
 const mockUseUniqueRecipients = jest.fn();
 const mockUseUniqueDonors = jest.fn();
 
 jest.mock('../../../../../../hooks/useApiQuery', () => ({
+  useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
   useUniqueParticipants: (...args: unknown[]) => mockUseUniqueParticipants(...args),
   useUniqueRecipients: (...args: unknown[]) => mockUseUniqueRecipients(...args),
   useUniqueDonors: (...args: unknown[]) => mockUseUniqueDonors(...args),
@@ -41,6 +44,8 @@ function okQuery<T>(data: T) {
 
 beforeEach(() => {
   jest.clearAllMocks();
+  // Two contributors, as the header counts them; the lists below agree unless a test says not.
+  mockUseDashboardInfo.mockReturnValue(okQuery(createDashboardInfo()));
   mockUseUniqueParticipants.mockReturnValue(
     okQuery([
       { BidderAid: '1', BidderAddr: '0xaaa', NumBids: 2, MaxBidAmountEth: 0.1 },
@@ -97,9 +102,39 @@ describe('ParticipationPanel', () => {
   });
 
   it('shows empty states when lists are empty', () => {
+    mockUseDashboardInfo.mockReturnValue(
+      okQuery(
+        createDashboardInfo({
+          MainStats: { ...createDashboardInfo().MainStats, NumUniqueDonors: 0 },
+        }),
+      ),
+    );
     mockUseUniqueDonors.mockReturnValue(okQuery([]));
     render(<ParticipationPanel />);
     expect(screen.getByText('No ETH contributions yet')).toBeInTheDocument();
+  });
+
+  it('reads an empty list the header counts rows for as one that did not load', async () => {
+    // Regression: "No participants yet" under "Unique participants 4" turned a failed list
+    // read into a claim about the protocol.
+    const user = userEvent.setup();
+    const refetch = jest.fn();
+    mockUseUniqueDonors.mockReturnValue({ ...okQuery([]), refetch });
+    render(<ParticipationPanel />);
+    expect(screen.queryByText('No ETH contributions yet')).not.toBeInTheDocument();
+    expect(screen.getByText('This list did not load')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /try again/i }));
+    expect(refetch).toHaveBeenCalled();
+  });
+
+  it('sizes a loading list to the rows the header counts', () => {
+    mockUseUniqueDonors.mockReturnValue({ ...okQuery(undefined), isLoading: true });
+    render(<ParticipationPanel />);
+    const section = screen
+      .getByRole('heading', { name: 'Unique ETH contributors' })
+      .closest('section')!;
+    // Two contributors: two skeleton rows (from sm), not the default five.
+    expect(section.querySelectorAll('.min-h-\\[var\\(--row-h\\)\\]')).toHaveLength(2);
   });
 
   it('has no accessibility violations', async () => {

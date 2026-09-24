@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
 import { useDashboardInfo, useSystemModelist } from '@/hooks/useApiQuery';
+import { useHydrated } from '@/hooks/useHydrated';
 import { StatsSection } from '@/components/statistics/StatsSection';
 import { SectionShell } from '@/components/statistics/SectionShell';
 import { SkeletonChart } from '@/components/ui/skeleton';
@@ -27,15 +28,19 @@ import { SystemModesTable, type EventRow } from '@/components/tables/SystemModes
  * and the cycle activations log. The cycle charts mount only once the
  * dashboard names the live cycle: until then the section shows a chart
  * skeleton, and a failed read shows an error with a retry, never a chart's
- * "not started" or "select a cycle" state for a cycle that is live.
+ * "not started" or "select a cycle" state for a cycle that is live. The live
+ * cycle is read only after hydration, so the first client render matches the
+ * server's skeleton even when the dashboard query has already answered.
  */
 const ActivityPanel = () => {
   const t = useTranslations('statistics');
+  const hydrated = useHydrated();
   const dashboardQuery = useDashboardInfo(undefined, { poll: false });
   const systemModesQuery = useSystemModelist();
-  const liveCycle = dashboardQuery.data?.CurRoundNum ?? -1;
+  const liveCycle = hydrated ? (dashboardQuery.data?.CurRoundNum ?? -1) : -1;
   const scope = useCycleScope(liveCycle);
   const cycleKnown = liveCycle >= 0;
+  const dashboardFailed = hydrated && dashboardQuery.isError;
   const systemModeChanges = (systemModesQuery.data ?? []) as EventRow[];
   const title = (key: string) => t(`activity.sections.${key}`);
 
@@ -61,8 +66,8 @@ const ActivityPanel = () => {
         title={title('cycleTimelines')}
         description={t('activity.cycleTimelinesDescription')}
         actions={<CycleScopeControl scope={scope} />}
-        isLoading={!cycleKnown && !dashboardQuery.isError}
-        isError={!cycleKnown && dashboardQuery.isError}
+        isLoading={!cycleKnown && !dashboardFailed}
+        isError={!cycleKnown && dashboardFailed}
         onRetry={() => dashboardQuery.refetch()}
         skeleton={<SkeletonChart />}
       >
@@ -131,6 +136,11 @@ const ActivityPanel = () => {
         tooltip={t('sectionTooltips.cycleActivations')}
         defaultOpen={false}
         lazy
+        collapsedSummary={
+          systemModesQuery.data
+            ? t('activity.cycleActivationsCount', { count: systemModeChanges.length })
+            : null
+        }
         isLoading={systemModesQuery.isLoading}
         isError={systemModesQuery.isError}
         onRetry={() => systemModesQuery.refetch()}
