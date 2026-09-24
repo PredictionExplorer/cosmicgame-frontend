@@ -6,6 +6,7 @@ import {
   getTotalFaqQuestionCount,
   type FAQCategory,
 } from '@/content/faq';
+import faqMessagesEn from '@/messages/en/faq.json';
 
 const faqCategories: readonly FAQCategory[] = faqContentEn.categories;
 const popularQuestionIds = faqContentEn.popularQuestionIds;
@@ -215,6 +216,33 @@ describe('faq-data', () => {
     it('returns undefined for empty hash', () => {
       const result = findItemByHash('');
       expect(result).toBeUndefined();
+    });
+  });
+
+  describe('typography (D085)', () => {
+    const strings = (value: unknown): string[] =>
+      typeof value === 'string'
+        ? [value]
+        : value && typeof value === 'object'
+          ? Object.values(value).flatMap(strings)
+          : [];
+
+    it('writes English apostrophes and quotes as typographic marks', () => {
+      const copy = [
+        ...getAllItems().flatMap((item) => [item.question, item.answer]),
+        ...faqCategories.flatMap((category) => [category.title, category.description]),
+        ...strings(faqMessagesEn),
+      ];
+      for (const text of copy) {
+        expect(text).not.toMatch(/\w'\w/);
+        expect(text).not.toMatch(/"/);
+      }
+    });
+
+    it('names X one way, as the site footer does', () => {
+      const copy = [...getAllItems().map((item) => item.answer), ...strings(faqMessagesEn)];
+      for (const text of copy) expect(text).not.toMatch(/Twitter \/ X|X \/ Twitter/);
+      expect(faqMessagesEn.contact.x).toBe('X (Twitter)');
     });
   });
 });

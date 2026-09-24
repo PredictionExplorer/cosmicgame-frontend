@@ -129,21 +129,30 @@ describe('app/faq/page.tsx', () => {
       expect(screen.getByRole('heading', { name: /cosmic signature faq/i })).toBeInTheDocument();
     });
 
-    it('scrolls the popular allocation question to its canonical hash anchor', async () => {
+    it('scrolls a popular question to its anchor', async () => {
       const user = userEvent.setup();
       render(await Page(pageProps));
       const getElementById = jest.spyOn(document, 'getElementById');
-      const popular = screen.getByRole('link', { name: /What is the Signature Allocation\?/i });
-      expect(popular).toHaveAttribute('href', '#main-allocation');
+      const popular = screen.getByRole('link', { name: /How does Anchoring work\?/i });
+      expect(popular).toHaveAttribute('href', '#how-does-anchoring-work');
 
       await user.click(popular);
 
-      expect(getElementById).toHaveBeenCalledWith('main-allocation');
-      expect(getElementById).not.toHaveBeenCalledWith('what-is-the-main-allocation');
+      expect(getElementById).toHaveBeenCalledWith('how-does-anchoring-work');
       expect(Element.prototype.scrollIntoView).toHaveBeenCalledWith(
         expect.objectContaining({ block: 'start' }),
       );
       getElementById.mockRestore();
+    });
+
+    it('scrolls a shared legacy link to the question it names', async () => {
+      window.history.replaceState(null, '', '/faq#main-allocation');
+      const getElementById = jest.spyOn(document, 'getElementById');
+      render(await Page(pageProps));
+      expect(getElementById).toHaveBeenCalledWith('main-allocation');
+      expect(getElementById).not.toHaveBeenCalledWith('what-is-the-main-allocation');
+      getElementById.mockRestore();
+      window.history.replaceState(null, '', '/faq');
     });
 
     it('has no accessibility violations', async () => {

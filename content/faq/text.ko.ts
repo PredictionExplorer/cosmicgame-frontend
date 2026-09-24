@@ -362,7 +362,7 @@ export const faqTextKo = {
       'get-help': {
         question: '궁금한 점이 있을 때 어디에서 도움을 받을 수 있나요?',
         answer:
-          'Discord, X / Twitter, 지원 이메일로 문의할 수 있습니다. 공식 링크와 이메일 주소는 ‘Cosmic Signature 소개’ 페이지에서 확인해 주세요.',
+          'Discord, X (Twitter), 지원 이메일로 문의할 수 있습니다. 공식 링크와 이메일 주소는 ‘Cosmic Signature 소개’ 페이지에서 확인해 주세요.',
       },
       'stay-updated': {
         question: 'Cosmic Signature 소식은 어떻게 받아 볼 수 있나요?',

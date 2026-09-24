@@ -135,12 +135,17 @@ type FaqStructure = typeof FAQ_STRUCTURE;
 export type FAQCategoryId = FaqStructure[number]['id'];
 export type FAQItemId = FaqStructure[number]['items'][number]['id'];
 
+/**
+ * The questions most readers start with. None opens its category: a
+ * category's first question sits right under its heading, so listing it
+ * here too would repeat it one scroll down.
+ */
 // lexicon-allow-start — legacy public URL fragment IDs are immutable.
 export const FAQ_POPULAR_QUESTION_IDS = [
-  'what-is-cosmic-signature',
-  'what-is-the-main-allocation',
+  'how-does-the-bidding-game-work',
   'how-does-the-stellarSelection-work',
   'how-does-anchoring-work',
+  'how-to-get-eth-on-arbitrum',
 ] as const satisfies readonly FAQItemId[];
 // lexicon-allow-end
 

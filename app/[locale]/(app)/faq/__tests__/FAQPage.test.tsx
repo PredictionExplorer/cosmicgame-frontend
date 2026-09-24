@@ -4,7 +4,7 @@ import { faqContentEn } from '@/content/faq';
 
 import { GLOSSARY_TERM_IDS } from '@/lib/glossary';
 
-import { render, screen, checkA11y, waitFor } from '@/test-utils';
+import { render, screen, checkA11y, waitFor, within } from '@/test-utils';
 
 import FAQPage from '../FAQPage';
 
@@ -75,16 +75,35 @@ describe('FAQPage', () => {
     }
   });
 
-  it('opens a popular question’s answer in place and scrolls to it', async () => {
+  it('opens a popular question’s answer in place, scrolls to it and moves focus there (D289)', async () => {
     const user = userEvent.setup();
     render(<FAQPage content={faqContentEn} />);
-    await user.click(screen.getByRole('link', { name: /What is the Signature Allocation\?/ }));
+    await user.click(screen.getByRole('link', { name: /How do I get ETH on Arbitrum\?/ }));
 
-    expect(
-      screen.getByRole('button', { name: 'What is the Signature Allocation?', expanded: true }),
-    ).toBeInTheDocument();
+    const question = screen.getByRole('button', {
+      name: 'How do I get ETH on Arbitrum?',
+      expanded: true,
+    });
     expect(scrollIntoView).toHaveBeenCalled();
-    expect(scrollIntoView.mock.contexts.at(-1)).toBe(document.getElementById('main-allocation'));
+    expect(scrollIntoView.mock.contexts.at(-1)).toBe(
+      document.getElementById('how-to-get-eth-on-arbitrum'),
+    );
+    // The next Tab continues from the opened question, and its link is in the address bar.
+    expect(question).toHaveFocus();
+    expect(window.location.hash).toBe('#how-to-get-eth-on-arbitrum');
+  });
+
+  it('moves focus to the category a contents entry jumps to (D289)', async () => {
+    const user = userEvent.setup();
+    render(<FAQPage content={faqContentEn} />);
+    const nav = screen.getByRole('navigation', { name: 'FAQ categories' });
+    const category = faqContentEn.categories[2]!;
+    await user.click(within(nav).getByRole('link', { name: new RegExp(category.title) }));
+
+    const heading = screen.getByRole('heading', { level: 2, name: category.title });
+    expect(heading).toHaveFocus();
+    expect(heading).toHaveAttribute('tabindex', '-1');
+    expect(window.location.hash).toBe(`#faq-category-${category.id}`);
   });
 
   it('opens the answer a shared link points at', () => {

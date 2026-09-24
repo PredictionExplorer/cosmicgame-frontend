@@ -40,8 +40,8 @@
   },
   "contact": {
     "heading": "아직 궁금한 점이 남았나요?",
-    "description": "찾는 답이 없다면 아래 채널에서 커뮤니티에 문의해 주세요.",
-    "x": "Twitter / X",
+    "description": "Discord나 X에서 질문해 주세요. 커뮤니티와 팀이 모두 확인합니다.",
+    "x": "X (Twitter)",
     "discord": "Discord"
   },
   "tooltips": {

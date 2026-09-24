@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 
+import { OUTBOUND_LINKS, type OutboundLinkId } from '@/config/siteNav';
 import { cn } from '@/lib/utils';
 import { SiteLink } from '@/components/layout/SiteLink';
 import { buttonVariants } from '@/components/ui/button';
@@ -18,10 +19,15 @@ const DiscordIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-/** Community channels, the FAQ's last stop. */
+/** A community channel's address, as the site footer links it (config/siteNav). */
+function communityHref(id: OutboundLinkId): string {
+  return OUTBOUND_LINKS.find((link) => link.id === id)?.href ?? '';
+}
+
+/** Community channels, the FAQ's last stop: the same accounts the footer links. */
 export const FAQ_CONTACT_LINKS = {
-  x: 'https://x.com/RandomWalkNFT',
-  discord: 'https://discord.gg/bGnPn96Qwt',
+  x: communityHref('x'),
+  discord: communityHref('discord'),
 } as const;
 
 /**

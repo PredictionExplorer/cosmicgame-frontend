@@ -371,7 +371,7 @@ export const faqTextVi = {
       'get-help': {
         question: 'Tôi có thể được trợ giúp ở đâu khi có câu hỏi?',
         answer:
-          'Bạn có thể liên hệ cộng đồng và đội hỗ trợ qua Discord, X / Twitter hoặc email. Các liên kết chính thức nằm trên trang Giới thiệu.',
+          'Bạn có thể liên hệ cộng đồng và đội hỗ trợ qua Discord, X (Twitter) hoặc email. Các liên kết chính thức nằm trên trang Giới thiệu.',
       },
       'stay-updated': {
         question: 'Tôi theo dõi tin tức Cosmic Signature bằng cách nào?',

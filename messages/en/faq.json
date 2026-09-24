@@ -40,8 +40,8 @@
   },
   "contact": {
     "heading": "Still have a question?",
-    "description": "Can't find what you're looking for? Our community is always happy to help. Reach out on any of these channels and we'll get back to you as soon as possible.",
-    "x": "Twitter / X",
+    "description": "Ask in Discord or on X. The community and the team read both.",
+    "x": "X (Twitter)",
     "discord": "Discord"
   },
   "tooltips": {
@@ -55,7 +55,7 @@
     },
     "layer2": {
       "term": "Layer 2",
-      "content": "A secondary protocol built on top of Ethereum that processes transactions faster and cheaper while inheriting Ethereum's security."
+      "content": "A secondary protocol built on top of Ethereum that processes transactions faster and cheaper while inheriting Ethereum’s security."
     },
     "rollup": {
       "term": "rollup",
@@ -67,7 +67,7 @@
     },
     "renounceOwnership": {
       "term": "renouncing ownership",
-      "content": "An irreversible smart-contract action that permanently gives up the team's ability to change protocol parameters."
+      "content": "An irreversible smart-contract action that permanently gives up the team’s ability to change protocol parameters."
     }
   }
 }
