@@ -239,7 +239,7 @@
       "randomWalkGestureTooltip": "ETH 제스처에 RandomWalk NFT를 첨부하면 ETH 제스처 비용이 50% 할인됩니다",
       "cstGesture": "CST 제스처",
       "cstGestureTooltip": "CST로 남기는 제스처입니다. 비용은 실시간 보정 구간을 따라 내려가며, CST 제스처는 구간을 늘리고 ETH 제스처는 줄입니다.",
-      "free": "비용 없음",
+      "free": "0 CST",
       "cstWindow": "CST 보정 구간",
       "cstWindowProgressAria": "CST 보정 구간 진행률",
       "duration": "지속 시간 {duration}"
@@ -360,7 +360,7 @@
       "randomWalkWithToken": "ETH + RandomWalk 토큰 {tokenId} 제스처 남기기 ({cost} ETH)",
       "randomWalk": "ETH + RandomWalk로 제스처 남기기",
       "cst": "CST로 제스처 남기기 ({cost} CST)",
-      "cstFree": "CST로 제스처 남기기 (비용 없음)",
+      "cstFree": "CST로 제스처 남기기 (0 CST + 가스 비용)",
       "generic": "{method} 제스처 남기기",
       "sendsNote": "충돌 방지 여유분 {percent}%를 포함해 약 {amount} ETH를 보냅니다.",
       "action": {
@@ -392,14 +392,20 @@
     "firstGestureSubtitle": "이 시작 구간이 진행되는 동안 첫 ETH 제스처 비용이 내려갑니다.",
     "cstTitle": "CST 보정 구간",
     "cstSubtitle": "CST 비용은 이 동적 구간을 따라 내려갑니다. ETH 제스처는 구간을 약 {decreasePercent}% 줄이고, CST 제스처는 약 {increasePercent}% 늘립니다.",
-    "cstEndedMessage": "보정 구간이 끝났습니다. 지금은 비용 없이 제스처를 남길 수 있습니다.",
+    "cstEndedMessage": "CST 비용이 하한(0 CST)에 도달했습니다. 네트워크 가스 비용은 계속 적용됩니다.",
     "dynamicDuration": "현재 구간 길이",
     "progressLabel": "진행률",
     "percentComplete": "{percent} 진행",
     "progressAria": "{title} 진행률",
     "durationLabel": "보정 구간 길이",
     "elapsedLabel": "경과",
-    "remainingLabel": "남음"
+    "remainingLabel": "남음",
+    "costNow": "현재 비용",
+    "floor": "0 CST",
+    "reachesFloorIn": "{duration} 후 0 CST",
+    "windowEndsIn": "{duration} 후 구간 종료",
+    "windowDetails": "구간 길이: {duration}. 경과: {elapsed}.",
+    "floorIn": "{duration} 후"
   },
   "allocation": {
     "title": "배분 내역",
@@ -571,7 +577,7 @@
       "connectBody": "지갑을 연결하면 제스처를 남기고 제스처 채팅에 메시지를 올릴 수 있습니다.",
       "rwlkChip": "RWLK #{id}",
       "rwlkChoose": "RWLK: 토큰 선택",
-      "cstFree": "지금은 CST 제스처에 비용이 들지 않습니다"
+      "cstFree": "지금 CST 비용은 0입니다. 가스 비용은 적용됩니다."
     },
     "personal": {
       "title": "내 사이클 현황",

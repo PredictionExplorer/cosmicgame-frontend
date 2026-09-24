@@ -239,7 +239,7 @@
       "randomWalkGestureTooltip": "50% ETH Gesture Cost reduction when attaching a RandomWalk NFT to an ETH gesture",
       "cstGesture": "CST Gesture",
       "cstGestureTooltip": "Gesture with CST. Cost descends through the live Calibration Window, which CST gestures lengthen and ETH gestures shorten.",
-      "free": "FREE",
+      "free": "0 CST",
       "cstWindow": "CST Window",
       "cstWindowProgressAria": "CST Calibration Window progress",
       "duration": "Duration {duration}"
@@ -360,7 +360,7 @@
       "randomWalkWithToken": "Gesture with ETH + RandomWalk token {tokenId} ({cost} ETH)",
       "randomWalk": "Gesture with ETH + RandomWalk",
       "cst": "Gesture with CST ({cost} CST)",
-      "cstFree": "Gesture with CST (free)",
+      "cstFree": "Gesture with CST (0 CST + gas)",
       "generic": "Gesture with {method}",
       "sendsNote": "Sends about {amount} ETH, including the {percent}% collision buffer.",
       "action": {
@@ -392,14 +392,20 @@
     "firstGestureSubtitle": "The first ETH gesture cost descends while this opening window progresses.",
     "cstTitle": "CST Calibration Window",
     "cstSubtitle": "CST cost descends through this dynamic window. ETH gestures shorten it by about {decreasePercent}%; CST gestures lengthen it by about {increasePercent}%.",
-    "cstEndedMessage": "Calibration Window ended — you can gesture for free.",
+    "cstEndedMessage": "CST cost is at its floor (0 CST); network gas still applies.",
     "dynamicDuration": "Dynamic duration",
     "progressLabel": "Progress",
     "percentComplete": "{percent} complete",
     "progressAria": "{title} progress",
     "durationLabel": "Calibration Window duration",
     "elapsedLabel": "Elapsed",
-    "remainingLabel": "Remaining"
+    "remainingLabel": "Remaining",
+    "costNow": "Cost now",
+    "floor": "0 CST",
+    "reachesFloorIn": "0 CST in {duration}",
+    "windowEndsIn": "Window ends in {duration}",
+    "windowDetails": "Window length: {duration}. Elapsed: {elapsed}.",
+    "floorIn": "in {duration}"
   },
   "allocation": {
     "title": "Allocation breakdown",
@@ -571,7 +577,7 @@
       "connectBody": "Connect a wallet to make a Gesture and post a message to Gesture Chat.",
       "rwlkChip": "RWLK #{id}",
       "rwlkChoose": "RWLK: pick token",
-      "cstFree": "CST gestures are free right now"
+      "cstFree": "CST cost is 0 right now; gas applies."
     },
     "personal": {
       "title": "Your cycle standing",

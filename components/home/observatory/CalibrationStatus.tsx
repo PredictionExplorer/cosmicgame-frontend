@@ -1,21 +1,19 @@
 'use client';
 
 import { zeroAddress } from 'viem';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 import { protocolFacts } from '@/content/protocol-facts';
 
-import { Duration } from '@/components/ui/duration';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import type { EthGestureInfo } from '@/hooks/useGestureForm';
+import { useFormat } from '@/hooks/useFormat';
 import { CalibrationWindowIcon } from '@/lib/conceptIcons';
 import { cn } from '@/lib/utils';
 import type { DashboardInfo } from '@/services/api';
-import {
-  formatCstProgressPercent,
-  getCstAuctionProgress,
-  type CstGestureData,
-} from '@/utils/cstGesture';
+import { getCstAuctionProgress, type CstGestureData } from '@/utils/cstGesture';
+import { formatEthQuote } from '@/utils/gestureQuote';
+import { NBSP } from '@/utils/format';
 
 import { ValuePending } from './ValuePending';
 
@@ -26,14 +24,85 @@ export interface CalibrationStatusProps {
   className?: string;
 }
 
-const FIGURES = ['dynamicDuration', 'elapsedLabel', 'remainingLabel'] as const;
+/** Track colours by method: the same series as the method's segment and charts. */
+const TRACK_TONE = {
+  cst: 'text-method-cst',
+  eth: 'text-method-eth',
+} as const;
+
+interface PriceTrackProps {
+  /** Share of the window elapsed, 0–100. */
+  percent: number;
+  tone: keyof typeof TRACK_TONE;
+  /** Accessible reading: the cost now and when it reaches its floor. */
+  valueText: string;
+  label: string;
+}
 
 /**
- * The running Calibration Window, decision data even while another method is
- * selected: the opening ETH window before the first Gesture, then the CST
- * window. A 2px progress rule and three figures (duration, elapsed,
- * remaining). Before its timing arrives it renders the same structure with
- * the figures pending, so nothing reflows when they land.
+ * The price the participant decides on, as a line: the Gesture Cost descends
+ * linearly across the window, solid for the part already behind and dashed
+ * for the part to come, with a dot at now. It is the window's progress bar,
+ * drawn as the trend it represents.
+ */
+function PriceTrack({ percent, tone, valueText, label }: PriceTrackProps) {
+  const now = Math.min(100, Math.max(0, percent));
+  // The line falls 14 of the 16 units from the start to the floor.
+  const nowY = 1 + (14 * now) / 100;
+  return (
+    <div
+      role="progressbar"
+      aria-label={label}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={Math.round(now * 10) / 10}
+      aria-valuetext={valueText}
+      data-testid="calibration-track"
+      className={cn('relative h-4 min-w-0 flex-1', TRACK_TONE[tone])}
+    >
+      <svg
+        aria-hidden
+        viewBox="0 0 100 16"
+        preserveAspectRatio="none"
+        className="absolute inset-0 size-full overflow-visible"
+      >
+        <line
+          x1={now}
+          y1={nowY}
+          x2={100}
+          y2={15}
+          className="stroke-subtle"
+          strokeWidth={1}
+          strokeDasharray="2 3"
+          vectorEffect="non-scaling-stroke"
+        />
+        <line
+          x1={0}
+          y1={1}
+          x2={now}
+          y2={nowY}
+          stroke="currentColor"
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          vectorEffect="non-scaling-stroke"
+        />
+      </svg>
+      <span
+        aria-hidden
+        className="absolute size-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-current ring-2 ring-background"
+        style={{ left: `${now}%`, top: `${(nowY / 16) * 100}%` }}
+      />
+    </div>
+  );
+}
+
+/**
+ * The running Calibration Window as the price people decide on: the cost
+ * now, a descending track to its floor, and when it gets there. Before the
+ * first Gesture it is the opening ETH window; after it, the CST window. The
+ * window's length and elapsed time live in the explanation. Before the
+ * timing arrives the same structure renders with the figures pending, so
+ * nothing reflows when they land.
  */
 export function CalibrationStatus({
   data,
@@ -42,8 +111,7 @@ export function CalibrationStatus({
   className,
 }: CalibrationStatusProps) {
   const t = useTranslations('home');
-  const tCommon = useTranslations('common');
-  const locale = useLocale();
+  const format = useFormat();
   const firstGesture = data?.LastBidderAddr === zeroAddress;
   const title = t(firstGesture ? 'calibration.firstGestureTitle' : 'calibration.cstTitle');
   const subtitle = firstGesture
@@ -72,78 +140,93 @@ export function CalibrationStatus({
           SecondsElapsed: sample.SecondsElapsed,
         })
       : null;
+
+  // The cost now, only from a real quote (timing alone does not price it).
+  const costNow = firstGesture
+    ? ethGestureInfo && Number.isFinite(ethGestureInfo.ETHPrice)
+      ? `${formatEthQuote(ethGestureInfo.ETHPrice, format.locale)}${NBSP}ETH`
+      : null
+    : cstGestureData.source !== 'empty'
+      ? format.amount(cstGestureData.isFree ? 0 : cstGestureData.CSTPrice, { unit: 'CST' })
+      : null;
+  const remaining = progress ? format.duration(progress.secondsRemaining) : null;
+  // Spoken in full; shown under the track's "0 CST" end as "in 7h 25m".
+  const floorReading = remaining
+    ? firstGesture
+      ? t('calibration.windowEndsIn', { duration: remaining })
+      : t('calibration.reachesFloorIn', { duration: remaining })
+    : null;
+  const floorCaption = remaining
+    ? firstGesture
+      ? floorReading
+      : t('calibration.floorIn', { duration: remaining })
+    : null;
   const endedMessage =
     firstGesture || cstGestureData.source === 'empty'
       ? t('calibration.defaultEndedMessage')
       : t('calibration.cstEndedMessage');
-  const values = progress
-    ? {
-        dynamicDuration: progress.auctionDuration,
-        elapsedLabel: progress.secondsElapsed,
-        remainingLabel: progress.secondsRemaining,
-      }
-    : null;
+  const explanation = progress
+    ? `${subtitle} ${t('calibration.windowDetails', {
+        duration: format.duration(progress.auctionDuration),
+        elapsed: format.duration(progress.secondsElapsed),
+      })}`
+    : subtitle;
 
   return (
     <section
       aria-labelledby="calibration-status-title"
       data-testid="calibration-status"
-      className={cn('@container/calibration min-w-0', className)}
+      data-window={firstGesture ? 'eth' : 'cst'}
+      className={cn('min-w-0', className)}
     >
-      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <div className="flex min-w-0 items-center gap-1.5">
-          <CalibrationWindowIcon className="size-4 shrink-0 text-subtle" aria-hidden />
-          <h2 id="calibration-status-title" className="type-label text-foreground">
-            {title}
-          </h2>
-          <InfoTooltip content={subtitle} label={title} />
-        </div>
+      <div className="flex min-w-0 items-center gap-1.5">
+        <CalibrationWindowIcon className="size-4 shrink-0 text-subtle" aria-hidden />
+        <h2 id="calibration-status-title" className="type-label min-w-0 text-foreground">
+          {title}
+        </h2>
+        <InfoTooltip content={explanation} label={title} />
+      </div>
+
+      <div className="mt-2 flex min-w-0 items-center gap-3">
+        <span
+          data-testid="calibration-cost-now"
+          className="type-figure-sm shrink-0 text-foreground"
+        >
+          {costNow ?? <ValuePending ch={9} />}
+        </span>
         {progress ? (
-          <span className="type-caption tabular-nums text-subtle">
-            {t('calibration.percentComplete', {
-              percent: formatCstProgressPercent(progress.percentComplete, locale),
-            })}
-          </span>
-        ) : (
-          <span role="status" className="type-caption text-subtle">
-            {tCommon('status.loadingDots')}
-          </span>
-        )}
-      </div>
-
-      <div className="mt-2 h-0.5 w-full rounded-pill bg-rule">
-        {progress && !progress.isEnded && (
-          <div
-            role="progressbar"
-            aria-label={t('calibration.progressAria', { title })}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={Math.round(progress.percentComplete * 10) / 10}
-            className="h-full rounded-pill bg-primary transition-[width] duration-[var(--duration-slow)]"
-            style={{ width: `${progress.percentComplete}%` }}
+          <PriceTrack
+            percent={progress.percentComplete}
+            tone={firstGesture ? 'eth' : 'cst'}
+            label={t('calibration.progressAria', { title })}
+            valueText={[costNow, progress.isEnded ? endedMessage : floorReading]
+              .filter(Boolean)
+              .join(' · ')}
           />
+        ) : (
+          <span className="h-px min-w-0 flex-1 bg-rule" aria-hidden />
+        )}
+        {!firstGesture && (
+          <span className="type-caption shrink-0 text-subtle">{t('calibration.floor')}</span>
         )}
       </div>
 
-      <dl className="mt-2 grid gap-x-4 gap-y-1.5 @min-[22rem]/calibration:grid-cols-3">
-        {FIGURES.map((figure) => (
-          <div
-            key={figure}
-            className="flex min-w-0 items-baseline justify-between gap-3 @min-[22rem]/calibration:block"
-          >
-            <dt className="type-caption min-w-0 text-subtle">{t(`calibration.${figure}`)}</dt>
-            <dd className="@min-[22rem]/calibration:mt-0.5">
-              {values ? (
-                <Duration seconds={values[figure]} className="type-figure-sm text-foreground" />
-              ) : (
-                <ValuePending ch={8} className="type-figure-sm" />
-              )}
-            </dd>
-          </div>
-        ))}
-      </dl>
-
-      {progress?.isEnded && <p className="type-caption mt-2 text-positive">{endedMessage}</p>}
+      {progress?.isEnded ? (
+        <p data-testid="calibration-ended" className="type-caption mt-1.5 text-muted-foreground">
+          {endedMessage}
+        </p>
+      ) : (
+        <p className="type-caption mt-1.5 flex min-w-0 flex-wrap justify-between gap-x-3 text-subtle">
+          <span>{t('calibration.costNow')}</span>
+          {floorCaption ? (
+            <span data-testid="calibration-floor-in" className="tabular-nums text-muted-foreground">
+              {floorCaption}
+            </span>
+          ) : (
+            <ValuePending ch={12} />
+          )}
+        </p>
+      )}
     </section>
   );
 }

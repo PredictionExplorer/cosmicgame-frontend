@@ -239,7 +239,7 @@
       "randomWalkGestureTooltip": "Giảm 50% chi phí nét bút ETH khi đính kèm RandomWalk NFT vào nét bút ETH",
       "cstGesture": "Nét bút CST",
       "cstGestureTooltip": "Đặt nét bút bằng CST. Chi phí giảm dần qua cửa sổ hiệu chỉnh trực tiếp, vốn được nét bút CST kéo dài và nét bút ETH rút ngắn.",
-      "free": "KHÔNG TỐN CHI PHÍ",
+      "free": "0 CST",
       "cstWindow": "Cửa sổ CST",
       "cstWindowProgressAria": "Tiến độ cửa sổ hiệu chỉnh CST",
       "duration": "Thời lượng {duration}"
@@ -360,7 +360,7 @@
       "randomWalkWithToken": "Đặt nét bút bằng ETH + token RandomWalk {tokenId} ({cost} ETH)",
       "randomWalk": "Đặt nét bút bằng ETH + RandomWalk",
       "cst": "Đặt nét bút bằng CST ({cost} CST)",
-      "cstFree": "Đặt nét bút bằng CST (không tốn chi phí)",
+      "cstFree": "Đặt nét bút bằng CST (0 CST + phí gas)",
       "generic": "Đặt nét bút bằng {method}",
       "sendsNote": "Gửi khoảng {amount} ETH, gồm {percent}% dự phòng thay đổi chi phí.",
       "action": {
@@ -392,14 +392,20 @@
     "firstGestureSubtitle": "Chi phí nét bút ETH đầu tiên giảm dần trong cửa sổ mở đầu.",
     "cstTitle": "Cửa sổ hiệu chỉnh CST",
     "cstSubtitle": "Chi phí CST giảm dần trong cửa sổ này. Nét bút ETH rút ngắn thời lượng khoảng {decreasePercent}%; nét bút CST kéo dài khoảng {increasePercent}%.",
-    "cstEndedMessage": "Cửa sổ hiệu chỉnh đã kết thúc — bạn có thể đặt nét bút không tốn chi phí.",
+    "cstEndedMessage": "Chi phí CST đã chạm mức sàn (0 CST); phí gas của mạng vẫn áp dụng.",
     "dynamicDuration": "Thời lượng động",
     "progressLabel": "Tiến độ",
     "percentComplete": "Hoàn thành {percent}",
     "progressAria": "Tiến độ {title}",
     "durationLabel": "Thời lượng cửa sổ hiệu chỉnh",
     "elapsedLabel": "Đã trôi qua",
-    "remainingLabel": "Còn lại"
+    "remainingLabel": "Còn lại",
+    "costNow": "Chi phí hiện tại",
+    "floor": "0 CST",
+    "reachesFloorIn": "0 CST sau {duration}",
+    "windowEndsIn": "Cửa sổ kết thúc sau {duration}",
+    "windowDetails": "Độ dài cửa sổ: {duration}. Đã trôi qua: {elapsed}.",
+    "floorIn": "sau {duration}"
   },
   "allocation": {
     "title": "Chi tiết phân bổ",
@@ -571,7 +577,7 @@
       "connectBody": "Kết nối ví để đặt nét bút và đăng lời nhắn lên Trò chuyện nét bút.",
       "rwlkChip": "RWLK #{id}",
       "rwlkChoose": "RWLK: chọn token",
-      "cstFree": "Nét bút CST hiện không tốn chi phí"
+      "cstFree": "Chi phí CST hiện là 0; vẫn cần phí gas."
     },
     "personal": {
       "title": "Vị thế của bạn trong chu kỳ",

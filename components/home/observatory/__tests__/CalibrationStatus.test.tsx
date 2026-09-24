@@ -20,26 +20,59 @@ const makeProps = (lastAddress = '0x1234') => ({
 });
 
 describe('CalibrationStatus', () => {
-  it('shows opening ETH timing before the first Gesture', () => {
+  it('leads the CST window with the cost now and when it reaches its floor', () => {
+    render(<CalibrationStatus {...makeProps()} />);
+
+    const window = screen.getByRole('region', { name: 'home.calibration.cstTitle' });
+    expect(within(window).getByTestId('calibration-cost-now')).toHaveTextContent('20 CST');
+    expect(within(window).getByTestId('calibration-floor-in')).toHaveTextContent(
+      'home.calibration.floorIn(duration=45m)',
+    );
+    // The floor is named at the end of the track.
+    expect(within(window).getByText('home.calibration.floor')).toBeVisible();
+  });
+
+  it('draws the window as a descending price track with an accessible reading', () => {
+    render(<CalibrationStatus {...makeProps()} />);
+
+    const track = screen.getByRole('progressbar', {
+      name: 'home.calibration.progressAria(title=home.calibration.cstTitle)',
+    });
+    expect(track).toHaveAttribute('aria-valuenow', '25');
+    expect(track).toHaveAttribute(
+      'aria-valuetext',
+      '20\u00a0CST · home.calibration.reachesFloorIn(duration=45m)',
+    );
+    expect(track).toHaveClass('text-method-cst');
+  });
+
+  it('keeps the window length and elapsed time in the explanation', () => {
+    render(<CalibrationStatus {...makeProps()} />);
+    // The three abstract durations are no longer figures on the desk.
+    expect(screen.queryByText('home.calibration.dynamicDuration')).not.toBeInTheDocument();
+    expect(screen.queryByText('home.calibration.elapsedLabel')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /home\.calibration\.cstTitle/ })).toBeInTheDocument();
+  });
+
+  it('shows the opening ETH window before the first Gesture', () => {
     render(<CalibrationStatus {...makeProps(zeroAddress)} />);
 
     const window = screen.getByRole('region', { name: 'home.calibration.firstGestureTitle' });
-    expect(window).toBeVisible();
+    expect(within(window).getByTestId('calibration-cost-now')).toHaveTextContent('0.1 ETH');
     expect(within(window).getByRole('progressbar')).toHaveAttribute('aria-valuenow', '50');
-    expect(within(window).getByText('30m')).toBeVisible();
-    expect(within(window).getAllByText('15m')).toHaveLength(2);
+    expect(within(window).getByRole('progressbar')).toHaveClass('text-method-eth');
+    expect(within(window).getByTestId('calibration-floor-in')).toHaveTextContent(
+      'home.calibration.windowEndsIn(duration=15m)',
+    );
+    // The ETH window's floor is not zero, so none is named.
+    expect(within(window).queryByText('home.calibration.floor')).not.toBeInTheDocument();
   });
 
-  it('switches to CST timing once the first Gesture is present', () => {
+  it('switches to the CST window once the first Gesture is present', () => {
     const { rerender } = render(<CalibrationStatus {...makeProps(zeroAddress)} />);
     rerender(<CalibrationStatus {...makeProps()} />);
 
-    const window = screen.getByRole('region', { name: 'home.calibration.cstTitle' });
-    expect(window).toBeVisible();
-    expect(within(window).getByRole('progressbar')).toHaveAttribute('aria-valuenow', '25');
-    expect(within(window).getByText('1h')).toBeVisible();
-    expect(within(window).getByText('15m')).toBeVisible();
-    expect(within(window).getByText('45m')).toBeVisible();
+    expect(screen.getByRole('region', { name: 'home.calibration.cstTitle' })).toBeVisible();
     expect(screen.queryByRole('region', { name: 'home.calibration.firstGestureTitle' })).toBeNull();
   });
 
@@ -47,31 +80,17 @@ describe('CalibrationStatus', () => {
     ['dashboard', { ...makeProps(), data: null }],
     ['opening ETH sample', { ...makeProps(zeroAddress), ethGestureInfo: null }],
     ['CST timing sample', { ...makeProps(), cstGestureData: mapCTPriceInfo(null) }],
-  ])('shows an explicit loading state when the %s is missing', (_name, props) => {
-    render(<CalibrationStatus {...props} />);
+  ])('keeps its shape with pending figures when the %s is missing', (_name, props) => {
+    const { container } = render(<CalibrationStatus {...props} />);
 
     expect(screen.getByRole('region')).toBeVisible();
-    expect(screen.getByRole('status')).toHaveTextContent('Loading...');
+    expect(container.querySelector('[data-slot="value-pending"]')).not.toBeNull();
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
     expect(screen.queryByText('home.calibration.cstEndedMessage')).not.toBeInTheDocument();
+    expect(screen.queryByText(/\b0s\b/)).not.toBeInTheDocument();
   });
 
-  it('shows genuine completed timing without implying a quote has arrived', () => {
-    render(
-      <CalibrationStatus
-        {...makeProps()}
-        cstGestureData={mapCTPriceInfo(null, { AuctionDuration: 3600, SecondsElapsed: 4000 })}
-      />,
-    );
-
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
-    expect(screen.getByText('home.calibration.defaultEndedMessage')).toBeVisible();
-    expect(screen.getByText('home.calibration.dynamicDuration')).toBeVisible();
-    expect(screen.getByText('0s')).toBeVisible();
-    expect(screen.queryByText('home.calibration.cstEndedMessage')).not.toBeInTheDocument();
-  });
-
-  it('keeps live timing visible while the independently requested quote loads', () => {
+  it('never prices a window from timing alone', () => {
     render(
       <CalibrationStatus
         {...makeProps()}
@@ -79,8 +98,9 @@ describe('CalibrationStatus', () => {
       />,
     );
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '25');
-    expect(screen.getByText('45m')).toBeVisible();
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    const cost = screen.getByTestId('calibration-cost-now');
+    expect(cost.querySelector('[data-slot="value-pending"]')).not.toBeNull();
+    expect(cost).not.toHaveTextContent(/\d/);
   });
 
   it.each([0n, 20n * 10n ** 18n])(
@@ -89,23 +109,10 @@ describe('CalibrationStatus', () => {
       render(
         <CalibrationStatus {...makeProps()} cstGestureData={mapCTPriceInfo(null, null, price)} />,
       );
-      expect(screen.getByRole('status')).toBeVisible();
       expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
-      expect(screen.queryByText('0s')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('calibration-floor-in')).not.toBeInTheDocument();
     },
   );
-
-  it('accepts confirmed zero duration and elapsed time as real timing', () => {
-    render(
-      <CalibrationStatus
-        {...makeProps()}
-        cstGestureData={mapCTPriceInfo(null, { AuctionDuration: 0, SecondsElapsed: 0 })}
-      />,
-    );
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
-    expect(screen.getAllByText('0s')).toHaveLength(3);
-    expect(screen.getByText('home.calibration.dynamicDuration')).toBeVisible();
-  });
 
   it('does not display malformed timing from a priced sample', () => {
     render(
@@ -118,7 +125,6 @@ describe('CalibrationStatus', () => {
         })}
       />,
     );
-    expect(screen.getByRole('status')).toBeVisible();
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
   });
 
@@ -129,7 +135,6 @@ describe('CalibrationStatus', () => {
         ethGestureInfo={{ AuctionDuration: Number.NaN, SecondsElapsed: 900, ETHPrice: 0.1 }}
       />,
     );
-    expect(screen.getByRole('status')).toBeVisible();
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
   });
 
@@ -140,9 +145,8 @@ describe('CalibrationStatus', () => {
         ethGestureInfo={{ AuctionDuration: 1800, SecondsElapsed: -60, ETHPrice: 0.1 }}
       />,
     );
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0');
-    expect(screen.getAllByText('30m')).toHaveLength(2);
+    expect(screen.getByTestId('calibration-floor-in')).toHaveTextContent('duration=30m');
   });
 
   it('supports older snapshots that predate explicit timing availability', () => {
@@ -152,7 +156,7 @@ describe('CalibrationStatus', () => {
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '25');
   });
 
-  it('keeps completed window values visible with a confirmed zero-cost quote', () => {
+  it('says the cost is at its floor and gas still applies, in neutral text', () => {
     render(
       <CalibrationStatus
         {...makeProps()}
@@ -164,12 +168,24 @@ describe('CalibrationStatus', () => {
       />,
     );
 
-    expect(screen.getByText('home.calibration.cstEndedMessage')).toBeVisible();
-    expect(screen.getByText('home.calibration.dynamicDuration')).toBeVisible();
-    expect(screen.getByText('home.calibration.elapsedLabel')).toBeVisible();
-    expect(screen.getByText('home.calibration.remainingLabel')).toBeVisible();
-    expect(screen.getByText('0s')).toBeVisible();
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    const ended = screen.getByTestId('calibration-ended');
+    expect(ended).toHaveTextContent('home.calibration.cstEndedMessage');
+    expect(ended).toHaveClass('text-muted-foreground');
+    expect(ended.className).not.toMatch(/positive|emerald|green/);
+    expect(screen.getByTestId('calibration-cost-now')).toHaveTextContent('0 CST');
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '100');
+  });
+
+  it('closes a finished window without a quote with the generic message', () => {
+    render(
+      <CalibrationStatus
+        {...makeProps()}
+        cstGestureData={mapCTPriceInfo(null, { AuctionDuration: 3600, SecondsElapsed: 4000 })}
+      />,
+    );
+    expect(screen.getByTestId('calibration-ended')).toHaveTextContent(
+      'home.calibration.defaultEndedMessage',
+    );
   });
 
   it('has no accessibility violations while loading or displaying a live sample', async () => {

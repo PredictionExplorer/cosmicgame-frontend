@@ -239,7 +239,7 @@
       "randomWalkGestureTooltip": "RandomWalk NFTをETH一筆に添付すると、ETH一筆の費用が50%引き下げられます",
       "cstGesture": "CST一筆",
       "cstGestureTooltip": "CSTで一筆を入れます。費用はライブの調律期間を通じて下がり、CST一筆はその期間を長く、ETH一筆は短くします。",
-      "free": "費用なし",
+      "free": "0 CST",
       "cstWindow": "CST期間",
       "cstWindowProgressAria": "CST調律期間の進み具合",
       "duration": "長さ{duration}"
@@ -360,7 +360,7 @@
       "randomWalkWithToken": "ETH + RandomWalkトークン{tokenId}で一筆（{cost} ETH）",
       "randomWalk": "ETH + RandomWalkで一筆",
       "cst": "CSTで一筆（{cost} CST）",
-      "cstFree": "CSTで一筆（費用なし）",
+      "cstFree": "CSTで一筆（0 CSTとガス代）",
       "generic": "{method}で一筆",
       "sendsNote": "衝突防止の上乗せ分{percent}%を含め、約{amount} ETHを送ります。",
       "action": {
@@ -392,14 +392,20 @@
     "firstGestureSubtitle": "この開始期間が進むにつれて、最初のETH一筆の費用は下がります。",
     "cstTitle": "CST調律期間",
     "cstSubtitle": "CSTの費用は調律期間中に下がります。ETH一筆で期間が約{decreasePercent}%短くなり、CST一筆で約{increasePercent}%長くなります。",
-    "cstEndedMessage": "調律期間が終わりました。費用なしで一筆を入れられます。",
+    "cstEndedMessage": "CSTの費用は下限（0 CST）に達しました。ネットワークのガス代は引き続き必要です。",
     "dynamicDuration": "現在の期間の長さ",
     "progressLabel": "進み具合",
     "percentComplete": "{percent}完了",
     "progressAria": "{title}の進み具合",
     "durationLabel": "調律期間の長さ",
     "elapsedLabel": "経過",
-    "remainingLabel": "残り"
+    "remainingLabel": "残り",
+    "costNow": "現在の費用",
+    "floor": "0 CST",
+    "reachesFloorIn": "あと{duration}で0 CST",
+    "windowEndsIn": "あと{duration}で期間終了",
+    "windowDetails": "期間の長さ：{duration}。経過：{elapsed}。",
+    "floorIn": "あと{duration}"
   },
   "allocation": {
     "title": "配分の内訳",
@@ -571,7 +577,7 @@
       "connectBody": "ウォレットを接続すると、一筆を入れて一筆チャットにメッセージを投稿できます。",
       "rwlkChip": "RWLK #{id}",
       "rwlkChoose": "RWLK：トークンを選ぶ",
-      "cstFree": "CST一筆はいま費用なしです"
+      "cstFree": "現在のCST費用は0です。ガス代は必要です。"
     },
     "personal": {
       "title": "このサイクルでの位置",

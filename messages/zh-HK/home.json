@@ -239,7 +239,7 @@
       "randomWalkGestureTooltip": "ETH 落筆附加一枚 Random Walk NFT，落筆價格減半。",
       "cstGesture": "CST 落筆",
       "cstGestureTooltip": "以 CST 落筆。價格會隨校準窗口推進而下降；CST 落筆使窗口延長，ETH 落筆使其縮短。",
-      "free": "免費",
+      "free": "0 CST",
       "cstWindow": "CST 窗口",
       "cstWindowProgressAria": "CST 校準窗口進度",
       "duration": "時長 {duration}"
@@ -360,7 +360,7 @@
       "randomWalkWithToken": "以 ETH + Random Walk 代幣 {tokenId} 落筆（{cost} ETH）",
       "randomWalk": "以 ETH + Random Walk 落筆",
       "cst": "以 CST 落筆（{cost} CST）",
-      "cstFree": "以 CST 落筆（免費）",
+      "cstFree": "以 CST 落筆（0 CST + Gas 費）",
       "generic": "以 {method} 落筆",
       "sendsNote": "約發送 {amount} ETH，含 {percent}% 防碰撞餘量。",
       "action": {
@@ -392,14 +392,20 @@
     "firstGestureSubtitle": "窗口推進期間，首筆 ETH 落筆的價格會逐步下降。",
     "cstTitle": "CST 校準窗口",
     "cstSubtitle": "CST 價格會隨這一動態窗口推進而下降。ETH 落筆使窗口縮短約 {decreasePercent}%；CST 落筆則使其延長約 {increasePercent}%。",
-    "cstEndedMessage": "校準窗口已結束——現在可以免費落筆。",
+    "cstEndedMessage": "CST 費用已降至下限（0 CST）；仍需支付網絡 Gas 費。",
     "dynamicDuration": "動態時長",
     "progressLabel": "進度",
     "percentComplete": "已完成 {percent}",
     "progressAria": "{title}進度",
     "durationLabel": "校準窗口時長",
     "elapsedLabel": "已經過",
-    "remainingLabel": "剩餘"
+    "remainingLabel": "剩餘",
+    "costNow": "目前費用",
+    "floor": "0 CST",
+    "reachesFloorIn": "{duration} 後降至 0 CST",
+    "windowEndsIn": "{duration} 後窗口結束",
+    "windowDetails": "窗口時長：{duration}。已經過：{elapsed}。",
+    "floorIn": "{duration} 後"
   },
   "allocation": {
     "title": "分配一覽",
@@ -571,7 +577,7 @@
       "connectBody": "連接錢包即可落筆，並在落筆留言板中留言。",
       "rwlkChip": "RWLK #{id}",
       "rwlkChoose": "RWLK：選擇代幣",
-      "cstFree": "目前 CST 落筆免費"
+      "cstFree": "目前 CST 費用為 0；仍需支付 Gas 費。"
     },
     "personal": {
       "title": "你在本週期的位置",

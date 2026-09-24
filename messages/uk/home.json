@@ -239,7 +239,7 @@
       "randomWalkGestureTooltip": "Вартість ETH-жесту зменшується на 50%, якщо до нього долучити RandomWalk NFT",
       "cstGesture": "CST-жест",
       "cstGestureTooltip": "Жест за CST. Вартість знижується протягом поточного вікна калібрування, яке CST-жести подовжують, а ETH-жести скорочують.",
-      "free": "Без оплати",
+      "free": "0 CST",
       "cstWindow": "Вікно CST",
       "cstWindowProgressAria": "Перебіг вікна калібрування CST",
       "duration": "Тривалість {duration}"
@@ -360,7 +360,7 @@
       "randomWalkWithToken": "Зробити ETH-жест + RandomWalk {tokenId} ({cost} ETH)",
       "randomWalk": "Зробити ETH-жест + RandomWalk",
       "cst": "Зробити CST-жест ({cost} CST)",
-      "cstFree": "Зробити CST-жест (без оплати)",
+      "cstFree": "Зробити CST-жест (0 CST + газ)",
       "generic": "Зробити жест: {method}",
       "sendsNote": "Надсилає близько {amount} ETH з урахуванням {percent}% запасу на захист від зміни вартості.",
       "action": {
@@ -392,14 +392,20 @@
     "firstGestureSubtitle": "Вартість першого ETH-жесту знижується, доки триває це початкове вікно.",
     "cstTitle": "Вікно калібрування CST",
     "cstSubtitle": "Вартість CST знижується протягом цього динамічного вікна. ETH-жести скорочують його приблизно на {decreasePercent}%; CST-жести подовжують приблизно на {increasePercent}%.",
-    "cstEndedMessage": "Вікно калібрування завершилося — жест зараз нічого не коштує.",
+    "cstEndedMessage": "Вартість CST-жесту на нижній межі (0 CST); мережева плата за газ залишається.",
     "dynamicDuration": "Динамічна тривалість",
     "progressLabel": "Перебіг",
     "percentComplete": "Пройдено {percent}",
     "progressAria": "{title}: перебіг",
     "durationLabel": "Тривалість вікна калібрування",
     "elapsedLabel": "Минуло",
-    "remainingLabel": "Залишилося"
+    "remainingLabel": "Залишилося",
+    "costNow": "Вартість зараз",
+    "floor": "0 CST",
+    "reachesFloorIn": "0 CST через {duration}",
+    "windowEndsIn": "Вікно завершиться через {duration}",
+    "windowDetails": "Тривалість вікна: {duration}. Минуло: {elapsed}.",
+    "floorIn": "через {duration}"
   },
   "allocation": {
     "title": "Структура розподілу",
@@ -571,7 +577,7 @@
       "connectBody": "Під’єднайте гаманець, щоб зробити жест і написати повідомлення в чат жестів.",
       "rwlkChip": "RWLK {id}",
       "rwlkChoose": "RWLK: оберіть токен",
-      "cstFree": "CST-жести зараз нічого не коштують"
+      "cstFree": "Зараз вартість CST — 0; плата за газ залишається."
     },
     "personal": {
       "title": "Ваша позиція в циклі",
