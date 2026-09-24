@@ -170,21 +170,27 @@ function PanelOutbound({ panel }: { panel: HeaderPanelItem }) {
   const copy = useSiteNavCopy();
 
   if (panel.id === 'explore') {
+    // The eyebrow on its own row and the links on a 2 × 2 grid, so no label
+    // is left alone on a second line in any language.
     return (
-      <div className="flex flex-wrap items-center gap-x-1 gap-y-1 px-1 pt-1">
-        <span className="type-eyebrow px-1.5 text-subtle">{copy.sectionTitle('ecosystem')}</span>
-        {outboundLinks('ecosystem').map((link) => (
-          <DropdownMenuItem
-            key={link.id}
-            asChild
-            className="inline-flex cursor-pointer items-center gap-1 rounded-control px-2 py-1.5 text-sm text-muted-foreground no-underline data-[highlighted]:bg-muted data-[highlighted]:text-foreground focus:bg-muted"
-          >
-            <SiteLink href={link.href} kind="external">
-              {copy.outboundLabel(link.id)}
-            </SiteLink>
-          </DropdownMenuItem>
-        ))}
-      </div>
+      <DropdownMenuGroup className="px-1 pt-1">
+        <DropdownMenuLabel className="type-eyebrow px-1.5 pb-1 pt-0.5 font-medium text-subtle">
+          {copy.sectionTitle('ecosystem')}
+        </DropdownMenuLabel>
+        <div className="grid grid-cols-2 gap-x-2">
+          {outboundLinks('ecosystem').map((link) => (
+            <DropdownMenuItem
+              key={link.id}
+              asChild
+              className="flex min-w-0 cursor-pointer items-center gap-1 rounded-control px-1.5 py-1.5 text-sm text-muted-foreground no-underline data-[highlighted]:bg-muted data-[highlighted]:text-foreground focus:bg-muted"
+            >
+              <SiteLink href={link.href} kind="external">
+                <span className="truncate">{copy.outboundLabel(link.id)}</span>
+              </SiteLink>
+            </DropdownMenuItem>
+          ))}
+        </div>
+      </DropdownMenuGroup>
     );
   }
 
@@ -350,14 +356,18 @@ export function HeaderNavigation({
 }: HeaderNavigationProps) {
   const t = useTranslations('nav');
   return (
-    <nav aria-label={t('primaryLabel')} className={cn('h-full', className)}>
-      <ul
-        className={cn(
-          'flex h-full items-stretch gap-0.5',
-          liquid &&
-            'liquid-glass-control liquid-glass-static my-auto h-auto rounded-pill px-1.5 py-1',
-        )}
-      >
+    <nav aria-label={t('primaryLabel')} className={cn('relative h-full', className)}>
+      {/* The experimental route's glass pill is drawn behind the items, centred
+          on the header, so the items keep the header's full height and the
+          current mark still sits on the header's bottom rule. */}
+      {liquid ? (
+        <span
+          aria-hidden
+          data-testid="header-nav-pill"
+          className="liquid-glass-control liquid-glass-static pointer-events-none absolute inset-x-0 top-1/2 h-11 -translate-y-1/2 rounded-pill"
+        />
+      ) : null}
+      <ul className={cn('relative flex h-full items-stretch gap-0.5', liquid && 'px-1.5')}>
         {APP_HEADER_NAV.map((item) =>
           item.kind === 'link' ? (
             <HeaderLink key={item.route} item={item} location={location} />

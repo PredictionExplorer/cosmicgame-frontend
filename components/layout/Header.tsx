@@ -56,11 +56,19 @@ function SearchTrigger({ onOpen }: { onOpen: () => void }) {
     >
       <Search aria-hidden className="size-4 shrink-0" />
       <span className="hidden text-sm xl:inline">{t('search.trigger')}</span>
-      {shortcut ? (
-        <kbd className="type-caption ml-3 hidden h-6 items-center rounded-edge border border-rule px-1.5 font-sans text-subtle xl:inline-flex">
-          {shortcut}
-        </kbd>
-      ) : null}
+      {/* The glyph is known only on the client ("⌘K" or "Ctrl K"). The key cap
+          is always rendered at a width that fits either, invisible until
+          then, so the pill does not grow after hydration. */}
+      <kbd
+        aria-hidden
+        data-testid="search-shortcut"
+        className={cn(
+          'type-caption ml-3 hidden h-6 min-w-12 items-center justify-center rounded-edge border border-rule px-1.5 font-sans text-subtle xl:inline-flex',
+          !shortcut && 'invisible',
+        )}
+      >
+        {shortcut ?? '⌘K'}
+      </kbd>
     </button>
   );
 }
