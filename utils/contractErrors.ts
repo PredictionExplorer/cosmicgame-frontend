@@ -12,29 +12,29 @@ import { cosmicGameAbi } from '@/contracts/abis';
  * viem into their bundle.
  */
 
-/** Detects reads against addresses with no bytecode in local/e2e environments. */
+/**
+ * Detects reads against addresses with no bytecode in local/e2e environments.
+ *
+ * Walks the `cause` chain once, iteratively, with a visited set. Calling
+ * viem's `walk` with this function as the predicate re-walked every tail of
+ * the chain from every link, which grows exponentially with the chain's
+ * depth and froze the page on a deeply wrapped read error.
+ */
 export function isEmptyContractReadError(err: unknown): boolean {
-  if (!(err instanceof Error)) return false;
-
-  const message = err.message;
-  if (
-    message.includes('Cannot decode zero data ("0x")') ||
-    message.includes('returned no data ("0x")')
-  ) {
-    return true;
-  }
-
-  const walkable = err as Error & { cause?: unknown; walk?: (fn: (e: Error) => boolean) => Error };
-  if (typeof walkable.walk === 'function') {
-    try {
-      const inner = walkable.walk((e: Error) => isEmptyContractReadError(e));
-      if (inner) return true;
-    } catch {
-      /* ignore */
+  const seen = new Set<unknown>();
+  let current: unknown = err;
+  while (current instanceof Error && !seen.has(current)) {
+    seen.add(current);
+    const message = current.message;
+    if (
+      message.includes('Cannot decode zero data ("0x")') ||
+      message.includes('returned no data ("0x")')
+    ) {
+      return true;
     }
+    current = (current as Error & { cause?: unknown }).cause;
   }
-
-  return isEmptyContractReadError(walkable.cause);
+  return false;
 }
 
 const CUSTOM_ERROR_TRANSLATION_KEYS: Record<string, string> = {

@@ -70,12 +70,12 @@ test('more history does not push the rest of the mobile page down', async ({ pag
 
   await openChat(page, 120);
 
-  // The same number of newest messages leads, whatever the history holds.
-  expect((await chat.boundingBox())!.height).toBeCloseTo(originalChatHeight, -1);
-  expect((await page.getByTestId('cycle-phase-guide').boundingBox())!.y).toBeCloseTo(
-    originalGuideTop,
-    -1,
-  );
+  // The same number of newest messages leads, whatever the history holds;
+  // only the header's count line may change.
+  expect(Math.abs((await chat.boundingBox())!.height - originalChatHeight)).toBeLessThanOrEqual(24);
+  expect(
+    Math.abs((await page.getByTestId('cycle-phase-guide').boundingBox())!.y - originalGuideTop),
+  ).toBeLessThanOrEqual(24);
   await chat.scrollIntoViewIfNeeded();
   await expect(chat.getByTestId('gesture-message-meta')).toHaveCount(50);
   // Reveal what is loaded, then load older history.

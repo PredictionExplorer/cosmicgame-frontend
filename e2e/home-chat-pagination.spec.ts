@@ -52,11 +52,12 @@ test('keeps existing messages visible when loading older history fails and allow
   const chat = page.getByTestId('gesture-message-chat');
   await expect(chat.getByTestId('gesture-message-meta')).toHaveCount(50);
   await chat.getByRole('button', { name: 'Load older', exact: true }).click();
-  await expect(chat.getByRole('alert')).toHaveText('Could not load older messages.');
+  // A status, not an alert: the loaded history is still on screen.
+  await expect(chat.getByText('Could not load older messages.')).toBeVisible();
   await expect(chat.getByTestId('gesture-message-meta')).toHaveCount(50);
   await chat.getByRole('button', { name: 'Retry', exact: true }).click();
   await expect(chat.getByTestId('gesture-message-meta')).toHaveCount(100);
-  await expect(chat.getByRole('alert')).toHaveCount(0);
+  await expect(chat.getByText('Could not load older messages.')).toHaveCount(0);
   expect(api.requests.filter((url) => url.searchParams.get('cursor') === 'older-50')).toHaveLength(
     2,
   );
@@ -68,7 +69,7 @@ test('offers retry when the first page fails instead of showing an empty chat', 
   await mockPagedHomeGestureChatApi(page, { initialFailures: 2 });
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   const chat = page.getByTestId('gesture-message-chat');
-  await expect(chat.getByRole('alert')).toHaveText('Could not load chat.');
+  await expect(chat.getByText('Could not load chat.')).toBeVisible();
   await expect(chat.getByText('No messages or events yet')).toHaveCount(0);
   await chat.getByRole('button', { name: 'Retry', exact: true }).click();
   await expect(chat.getByTestId('gesture-message-meta')).toHaveCount(50);

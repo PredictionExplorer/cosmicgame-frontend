@@ -236,7 +236,7 @@ test.describe('home gesture chat', () => {
     const latest = page.getByTestId('latest-participant-intel');
     await expect(latest).toBeVisible();
     await expect(
-      latest.getByRole('link', { name: '0x3333333333333333333333333333333333333333' }),
+      latest.locator('a[href="/user/0x3333333333333333333333333333333333333333"]'),
     ).toBeVisible();
     await expect(page.getByTestId('latest-participant-paid-amount')).toContainText('20 CST');
     await expect(page.getByTestId('latest-participant-cst-received')).toContainText('100 CST');
@@ -256,12 +256,13 @@ test.describe('home gesture chat', () => {
     await expect(challenge).toContainText(home.observatory.ledger.challenge.title);
     await expect(challenge).toContainText(/Held\s*20m/);
     await expect(challenge).toContainText(/Chrono record\s*30m/);
-    await expect(challenge).toContainText(/Passes it in\s*10m 1s/);
+    // The hold keeps growing while the page is open, so the time left ticks down.
+    await expect(challenge).toContainText(/Passes it in\s*(10m( 1s)?|9m \d+s)/);
     await expect(challenge.getByRole('link')).toHaveCount(0);
     await expect(
       page
         .getByTestId('control-desk-endurance')
-        .getByRole('link', { name: '0x1111111111111111111111111111111111111111' }),
+        .locator('a[href="/user/0x1111111111111111111111111111111111111111"]'),
     ).toBeVisible();
   });
 
@@ -278,10 +279,10 @@ test.describe('home gesture chat', () => {
 
     const latest = page.getByTestId('latest-participant-intel');
     await expect(
-      latest.getByRole('link', { name: '0x3333333333333333333333333333333333333333' }),
+      latest.locator('a[href="/user/0x3333333333333333333333333333333333333333"]'),
     ).toBeVisible();
     await expect(
-      latest.getByRole('link', { name: '0x9999999999999999999999999999999999999999' }),
+      latest.locator('a[href="/user/0x9999999999999999999999999999999999999999"]'),
     ).toHaveCount(0);
     await expect(page.getByTestId('latest-participant-gesture-details')).toBeVisible();
     await expect(page.getByTestId('latest-participant-paid-amount')).toContainText('20 CST');
@@ -444,9 +445,14 @@ test.describe('home gesture chat', () => {
 
     // The dock never covers the form: it steps aside while the form is on
     // screen and returns once it has scrolled away.
+    // Aside, the dock slides away and leaves the accessibility tree and the
+    // tab order (aria-hidden and inert); Playwright counts a faded element
+    // as visible, so the attributes are the contract.
+    const dock = page.locator('[data-action-dock]');
     const dockAction = page.getByTestId('dock-open-sheet');
-    await expect(dockAction).toBeHidden();
+    await expect(dock).toHaveAttribute('aria-hidden', 'true');
     await page.getByTestId('home-feed-layout').scrollIntoViewIfNeeded();
+    await expect(dock).not.toHaveAttribute('aria-hidden', 'true');
     await expect(dockAction).toBeVisible();
     await dockAction.click();
 
@@ -540,10 +546,11 @@ test.describe('home gesture chat', () => {
     expect(metrics.scrollHeight).toBeGreaterThan(metrics.clientHeight + 20);
     expect(chatBox!.height).toBeLessThanOrEqual(viewport.height * 0.9);
 
+    await expect(oldest).not.toBeInViewport();
+    // Focusing may bring the region fully into view; from then on the page stays.
+    await scroll.focus();
     const headingBox = await heading.boundingBox();
     const pageScroll = await page.evaluate(() => window.scrollY);
-    await expect(oldest).not.toBeInViewport();
-    await scroll.focus();
     await page.keyboard.press('PageDown');
     await expect.poll(() => scroll.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
     expect(await page.evaluate(() => window.scrollY)).toBe(pageScroll);

@@ -176,6 +176,39 @@ describe('isEmptyContractReadError', () => {
   it('returns false for unrelated errors', () => {
     expect(isEmptyContractReadError(new Error('contract reverted'))).toBe(false);
   });
+
+  it('walks a deep cause chain once instead of exponentially (regression: frozen page)', () => {
+    type Walkable = Error & { cause?: unknown; walk?: (fn: (e: Error) => boolean) => unknown };
+    let inner: Walkable = new Error('root cause');
+    let visits = 0;
+    for (let depth = 0; depth < 40; depth += 1) {
+      const outer = new Error(`wrapper ${depth}`) as Walkable;
+      outer.cause = inner;
+      // viem-style walk: calls the predicate on every link of the chain.
+      outer.walk = (fn) => {
+        let link: unknown = outer;
+        while (link instanceof Error) {
+          visits += 1;
+          if (fn(link)) return link;
+          link = (link as Walkable).cause;
+        }
+        return null;
+      };
+      inner = outer;
+    }
+    const started = Date.now();
+    expect(isEmptyContractReadError(inner)).toBe(false);
+    expect(Date.now() - started).toBeLessThan(100);
+    expect(visits).toBe(0);
+  });
+
+  it('stops on a cyclic cause chain', () => {
+    const a = new Error('a') as Error & { cause?: unknown };
+    const b = new Error('b') as Error & { cause?: unknown };
+    a.cause = b;
+    b.cause = a;
+    expect(isEmptyContractReadError(a)).toBe(false);
+  });
 });
 
 describe('isTransientNetworkError', () => {

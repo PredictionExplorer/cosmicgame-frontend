@@ -96,7 +96,21 @@ function createQueryFreshnessStore(
   const cache = queryClient.getQueryCache();
   const fetchSuccessLog = getFetchSuccessLog(queryClient);
   return {
-    subscribe: (callback: () => void) => cache.subscribe(callback),
+    // The cache notifies synchronously, also when a component builds a query
+    // while rendering; deferring the callback keeps the indicator from
+    // updating in the middle of another component's render.
+    subscribe: (callback: () => void) => {
+      let active = true;
+      const unsubscribe = cache.subscribe(() => {
+        queueMicrotask(() => {
+          if (active) callback();
+        });
+      });
+      return () => {
+        active = false;
+        unsubscribe();
+      };
+    },
     getSnapshot: (): string => {
       let lastSuccessAtMs = 0;
       let lastAttemptFailed = false;
