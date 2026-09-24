@@ -399,11 +399,16 @@ interface WalletPillProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   withChevron: boolean;
   liquid: boolean;
   testId: string;
+  /**
+   * Visibility of the wrong-network badge: it shows only where the header's
+   * `WrongNetworkChip` does not (phones under 360px, and from 1024px).
+   */
+  badgeClassName?: string;
 }
 
 /** The connected wallet's trigger. Forwards ref and props for Radix `asChild`. */
 const WalletPill = forwardRef<HTMLButtonElement, WalletPillProps>(function WalletPill(
-  { address, hasUnclaimedRewards, withChevron, liquid, className, testId, ...rest },
+  { address, hasUnclaimedRewards, withChevron, liquid, className, testId, badgeClassName, ...rest },
   ref,
 ) {
   const t = useTranslations('wallet');
@@ -437,7 +442,7 @@ const WalletPill = forwardRef<HTMLButtonElement, WalletPillProps>(function Walle
         />
       ) : null}
       {withChevron ? <ChevronDown aria-hidden className="size-3.5 shrink-0 text-subtle" /> : null}
-      <WrongNetworkBadge className={withChevron ? undefined : 'min-[360px]:hidden'} />
+      <WrongNetworkBadge className={badgeClassName} />
     </button>
   );
 });
@@ -506,6 +511,7 @@ const ConnectWalletButton = ({
             withChevron={false}
             liquid={liquid}
             testId="wallet-account-trigger"
+            badgeClassName="min-[360px]:hidden"
             className={cn(mode === 'responsive' && 'md:hidden', className)}
           />
         </SheetTrigger>
@@ -523,6 +529,7 @@ const ConnectWalletButton = ({
             withChevron
             liquid={liquid}
             testId="wallet-menu-trigger"
+            badgeClassName={mode === 'responsive' ? 'hidden lg:inline-flex' : undefined}
             className={cn(mode === 'responsive' && 'hidden md:inline-flex', className)}
           />
         </DropdownMenuTrigger>
