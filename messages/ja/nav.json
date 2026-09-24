@@ -19,6 +19,7 @@
     "learn": "学ぶ",
     "trust": "信頼",
     "account": "アカウント",
+    "admin": "管理者",
     "ecosystem": "エコシステム",
     "community": "コミュニティ"
   },
@@ -276,6 +277,7 @@
       "transaction": "新しいタブでブロックエクスプローラーを開きます"
     },
     "empty": "「{query}」に一致する結果はありません。ページ名、アドレス、数字で検索してください。",
+    "resultCount": "{count, plural, other {#件の結果}}",
     "keys": {
       "move": "移動",
       "open": "開く",
@@ -284,9 +286,6 @@
   },
   "drawer": {
     "preferences": "設定"
-  },
-  "footer": {
-    "linksAndLanguages": "リンクと言語"
   },
   "ecosystem": {
     "uniswap": {

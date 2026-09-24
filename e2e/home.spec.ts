@@ -326,10 +326,13 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
       projectSite = drawer.getByRole('link', { name: 'Project Site' });
     } else {
       // On desktop it closes the Learn panel's first column.
-      await page.getByRole('button', { name: /^Learn$/ }).click();
-      projectSite = page.getByRole('menu', { name: 'Learn' }).getByRole('menuitem', {
-        name: /^Project Site/,
-      });
+      const learn = page
+        .getByRole('navigation', { name: 'Primary' })
+        .getByRole('button', { name: /^Learn$/ });
+      await learn.click();
+      projectSite = page
+        .locator(`[id="${await learn.getAttribute('aria-controls')}"]`)
+        .getByRole('link', { name: /^Project Site/ });
     }
     await expect(projectSite).toBeVisible();
     await expect(projectSite).toHaveAttribute('href', landingHome);

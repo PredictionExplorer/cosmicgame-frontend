@@ -7,7 +7,7 @@ import { render, screen, within, checkA11y } from '@/test-utils';
 
 /** The next-intl test mock renders `common` strings as their keys. */
 const HOME = 'common.breadcrumbs.home';
-const section = (id: string) => `common.pageHeader.sections.${id}`;
+const section = (id: string) => `nav.sections.${id}`;
 
 describe('PageHeader', () => {
   it('renders one H1 and the lede', () => {
@@ -69,10 +69,12 @@ describe('PageHeader', () => {
       expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('0xA169…63B6');
     });
 
-    it('names a section without a hub as plain text and leaves it out of trails', () => {
+    it('leads Records, which has no single ledger page, to its part of the site map', () => {
       const { rerender } = render(<PageHeader section="records" title="Allocation Recipients" />);
-      expect(screen.getByText(section('records'))).toBeInTheDocument();
-      expect(screen.queryByRole('link', { name: section('records') })).toBeNull();
+      expect(screen.getByRole('link', { name: section('records') })).toHaveAttribute(
+        'href',
+        '/site-map#records',
+      );
 
       rerender(
         <PageHeader
@@ -86,8 +88,7 @@ describe('PageHeader', () => {
         within(nav)
           .getAllByRole('link')
           .map((link) => link.getAttribute('href')),
-      ).toEqual(['/', '/allocation']);
-      expect(screen.queryByText(section('records'))).toBeNull();
+      ).toEqual(['/', '/site-map#records', '/allocation']);
     });
 
     it('skips the section crumb when the section hub is Home or already in the trail', () => {
@@ -204,6 +205,104 @@ describe('PageHeader', () => {
       expect(label.closest('dt')).not.toBeNull();
     });
 
+    it('shows an unknown figure as a dash with a visible "Unavailable" heard only once', () => {
+      render(
+        <PageHeader title="Ledger" figures={[{ id: 'total', label: 'Total', value: null }]} />,
+      );
+      const value = document.querySelector('[data-figure="total"] dd') as HTMLElement;
+      // Heard once, from the dash's sr-only label; the visible word is generated content.
+      expect(value).toHaveTextContent(/^—common\.status\.unavailable$/);
+      const caption = value.querySelector('[data-caption]');
+      expect(caption).toHaveAttribute('data-caption', 'common.status.unavailable');
+      expect(caption).toHaveAttribute('aria-hidden', 'true');
+      expect(caption).toHaveClass('after:content-[attr(data-caption)]');
+    });
+
+    it('puts wide figures after the pairs on phones, or lists every figure as rows', () => {
+      const figure = (id: string, size?: 'md') => ({ id, label: id, value: '1', size });
+      const { rerender } = render(
+        <PageHeader
+          title="Ledger"
+          figures={[figure('records'), figure('share'), figure('latest', 'md')]}
+        />,
+      );
+      expect(document.querySelector('dl')).toHaveAttribute('data-layout', 'grid');
+      // One wide figure takes the full row after the pair.
+      expect(document.querySelector('[data-figure="latest"]')).toHaveClass(
+        'max-sm:order-last',
+        'max-sm:col-span-2',
+      );
+      expect(document.querySelector('[data-figure="records"]')).not.toHaveClass(
+        'max-sm:col-span-2',
+      );
+
+      // Two wide figures (a date and an address) share the last row instead
+      // of taking a full row each.
+      rerender(
+        <PageHeader
+          title="Record"
+          figures={[figure('amount'), figure('cycle'), figure('from', 'md'), figure('date', 'md')]}
+        />,
+      );
+      for (const id of ['from', 'date']) {
+        const wide = document.querySelector(`[data-figure="${id}"]`);
+        expect(wide).toHaveClass('max-sm:order-last');
+        expect(wide).not.toHaveClass('max-sm:col-span-2');
+      }
+
+      // Three paired figures would leave a hole beside the third.
+      rerender(
+        <PageHeader
+          title="Ledger"
+          figures={[figure('records'), figure('total'), figure('share'), figure('latest', 'md')]}
+        />,
+      );
+      expect(document.querySelector('dl')).toHaveAttribute('data-layout', 'rows');
+    });
+
+    it('keeps a wrapped value at the end edge of its phone row', () => {
+      const figure = (id: string) => ({ id, label: id, value: '1' });
+      render(<PageHeader title="Ledger" figures={['a', 'b', 'c'].map(figure)} />);
+      expect(document.querySelector('[data-figure="a"] dd')).toHaveClass(
+        'max-sm:ms-auto',
+        'max-sm:text-right',
+      );
+    });
+
+    it('shares label, value and caption rows across figures, so values align however labels wrap', () => {
+      render(
+        <PageHeader
+          title="Ledger"
+          figures={[
+            { id: 'a', label: 'A label long enough to wrap', value: '1' },
+            { id: 'b', label: 'B', value: '2' },
+          ]}
+        />,
+      );
+      for (const id of ['a', 'b']) {
+        expect(document.querySelector(`[data-figure="${id}"]`)).toHaveClass(
+          'grid-rows-subgrid',
+          'row-span-3',
+        );
+        expect(document.querySelector(`[data-figure="${id}"] dd`)).toHaveClass('self-baseline');
+      }
+    });
+
+    it('sets three compact counts side by side on phones', () => {
+      const figure = (id: string, compact = true) => ({ id, label: id, value: '12', compact });
+      const { rerender } = render(
+        <PageHeader title="Anchoring" figures={['a', 'b', 'c'].map((id) => figure(id))} />,
+      );
+      expect(document.querySelector('dl')).toHaveAttribute('data-layout', 'strip');
+      expect(document.querySelector('dl')).toHaveClass('grid-cols-3', 'sm:grid-cols-3');
+
+      // One figure that is not a short count keeps the rows.
+      rerender(
+        <PageHeader title="Ledger" figures={[figure('a'), figure('b'), figure('total', false)]} />,
+      );
+      expect(document.querySelector('dl')).toHaveAttribute('data-layout', 'rows');
+    });
+
     it('lists an odd count as rows on phones, so no grid cell is left empty', () => {
       const figure = (id: string) => ({ id, label: id.toUpperCase(), value: '1' });
       const { rerender } = render(
@@ -217,16 +316,34 @@ describe('PageHeader', () => {
       expect(document.querySelector('dl')).toHaveClass('grid-cols-2', 'sm:grid-cols-4');
     });
 
-    it('names each figure info button after its label', () => {
+    it('makes an explained label its own trigger, named after the label, with no info icon', () => {
       render(
         <PageHeader
           title="Ledger"
           figures={[{ id: 'total', label: 'Total ETH', value: '1', info: 'The sum.' }]}
         />,
       );
-      expect(
-        screen.getByRole('button', { name: 'More information about Total ETH' }),
-      ).toBeInTheDocument();
+      const trigger = screen.getByRole('button', { name: 'More information about Total ETH' });
+      expect(trigger.tagName).toBe('SPAN');
+      expect(trigger).toHaveTextContent('Total ETH');
+      expect(trigger).toHaveAccessibleDescription('The sum.');
+      expect(document.querySelector('[data-slot="info-tooltip"]')).toBeNull();
+    });
+
+    it('gives an explained label a 44px touch target without growing the row', () => {
+      render(
+        <PageHeader
+          title="Ledger"
+          figures={[{ id: 'total', label: 'Total ETH', value: '1', info: 'The sum.' }]}
+        />,
+      );
+      const trigger = screen.getByRole('button', { name: 'More information about Total ETH' });
+      // A standalone trigger: on coarse pointers its own box grows to 44px
+      // and a negative margin hands the space back (touch-hit-area).
+      expect(trigger).toHaveAttribute('data-placement', 'standalone');
+      expect(trigger).toHaveClass('touch-hit-area');
+      // The value is positioned after it, so a linked value stays above the pad.
+      expect(document.querySelector('[data-figure="total"] dd')).toHaveClass('max-sm:relative');
     });
   });
 
@@ -254,6 +371,53 @@ describe('PageHeader', () => {
       'href',
       'https://cosmicsignature.com/learn',
     );
+  });
+
+  it('gives only third-party related pages the new-tab arrow', () => {
+    render(
+      <PageHeader
+        title="Public Goods"
+        related={[
+          { href: '/statistics', label: 'Statistics' },
+          { href: 'https://cosmicsignature.com/learn/protocol-guild-public-goods', label: 'Guide' },
+          { href: 'https://www.protocolguild.org', label: 'Protocol Guild' },
+        ]}
+        relatedLabel="Related"
+      />,
+    );
+    const icon = (name: string) =>
+      screen.getByRole('link', { name: new RegExp(`^${name}`) }).querySelector('svg');
+    // The other host (cosmicsignature.com) opens in this tab, like a page here.
+    expect(icon('Statistics')).toHaveClass('lucide-arrow-right');
+    expect(icon('Guide')).toHaveClass('lucide-arrow-right');
+    expect(screen.getByRole('link', { name: 'Guide' })).not.toHaveAttribute('target');
+    expect(icon('Protocol Guild')).toHaveClass('lucide-arrow-up-right');
+    expect(screen.getByRole('link', { name: /^Protocol Guild/ })).toHaveAttribute(
+      'target',
+      '_blank',
+    );
+  });
+
+  it('keeps related pages off phones and draws them on the control radius', () => {
+    render(
+      <PageHeader
+        title="Allocation"
+        related={[{ href: '/statistics', label: 'Statistics' }]}
+        relatedLabel="Related"
+      />,
+    );
+    expect(screen.getByRole('navigation', { name: 'Related' })).toHaveClass('max-sm:hidden');
+    const chip = screen.getByRole('link', { name: 'Statistics' });
+    expect(chip).toHaveClass('rounded-control', 'pointer-coarse:min-h-11');
+    expect(chip).not.toHaveClass('rounded-pill');
+  });
+
+  it('never clamps the lede of a reading page', () => {
+    const { rerender } = render(<PageHeader title="Risk" subtitle="The disclosure." />);
+    expect(screen.getByText('The disclosure.')).toHaveAttribute('data-lede-fit');
+    rerender(<PageHeader title="Risk" variant="reading" subtitle="The disclosure." />);
+    expect(screen.getByText('The disclosure.')).not.toHaveAttribute('data-lede-fit');
+    expect(screen.queryByRole('button', { name: 'common.pageHeader.readMore' })).toBeNull();
   });
 
   it('gives the H1 an id for aria-labelledby', () => {

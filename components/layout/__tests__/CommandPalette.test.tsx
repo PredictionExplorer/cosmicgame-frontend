@@ -46,15 +46,15 @@ describe('CommandPalette', () => {
     expect(screen.getByRole('listbox', { name: 'nav.search.listLabel' })).toBeInTheDocument();
   });
 
-  it('opens on "/" outside text fields only', async () => {
+  it('claims no single-character shortcut: "/" types a slash, anywhere (WCAG 2.1.4)', async () => {
     const user = userEvent.setup();
     render(<Harness />);
-    await user.click(screen.getByRole('textbox', { name: 'elsewhere' }));
     await user.keyboard('/');
     expect(screen.queryByRole('combobox')).toBeNull();
-    (document.activeElement as HTMLElement).blur();
+    await user.click(screen.getByRole('textbox', { name: 'elsewhere' }));
     await user.keyboard('/');
-    expect(await screen.findByRole('combobox')).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'elsewhere' })).toHaveValue('/');
+    expect(screen.queryByRole('combobox')).toBeNull();
   });
 
   it('opens when another surface requests search', async () => {
@@ -107,10 +107,39 @@ describe('CommandPalette', () => {
     expect(mockPush).toHaveBeenCalledWith('/faq');
   });
 
-  it('says so when nothing matches', async () => {
+  it('says so when nothing matches, outside the list', async () => {
     const { user, input } = await openPalette();
     await user.type(input, 'zzzz');
-    expect(screen.getByText('nav.search.empty(query=zzzz)')).toBeInTheDocument();
+    const message = screen.getAllByText('nav.search.empty(query=zzzz)')[0]!;
+    expect(message.closest('[role="listbox"]')).toBeNull();
+    expect(input).not.toHaveAttribute('aria-activedescendant');
+  });
+
+  it('announces the result count, or that nothing matches, once typing pauses', async () => {
+    const { user, input } = await openPalette();
+    const status = screen.getByRole('status');
+    expect(status).toBeEmptyDOMElement();
+    await user.type(input, 'faq');
+    await waitFor(() =>
+      expect(status).toHaveTextContent(/^nav\.search\.resultCount\(count=\d+\)$/),
+    );
+    await user.type(input, 'zzzz');
+    await waitFor(() => expect(status).toHaveTextContent('nav.search.empty(query=faqzzzz)'));
+  });
+
+  it('keys option ids by the option, so the active one is announced as the list narrows', async () => {
+    const { user, input } = await openPalette();
+    const before = input.getAttribute('aria-activedescendant');
+    await user.type(input, 'faq');
+    const after = input.getAttribute('aria-activedescendant');
+    expect(after).not.toBe(before);
+    expect(document.getElementById(after!)).toHaveTextContent(/nav\.routes\.faq\.label/);
+  });
+
+  it('offers a visible close control', async () => {
+    const { user } = await openPalette();
+    await user.click(screen.getByRole('button', { name: 'nav.search.keys.close' }));
+    await waitFor(() => expect(screen.queryByRole('combobox')).toBeNull());
   });
 
   it('has no accessibility violations', async () => {

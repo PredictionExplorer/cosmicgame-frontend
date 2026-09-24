@@ -1,4 +1,21 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+
+import { notFoundMetadata } from '@/components/layout/notFoundMetadata';
+
+interface PageProps {
+  params: Promise<{ locale: string }>;
+}
+
+/**
+ * "Page not found · Cosmic Signature" in the tab. The (app) not-found file
+ * heads the 404 the same way; this page's own metadata keeps the streamed
+ * head identical to it.
+ */
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  return notFoundMetadata(locale);
+}
 
 /**
  * Catch-all for unmatched URLs.

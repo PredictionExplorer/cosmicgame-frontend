@@ -15,10 +15,10 @@ export function TrustCenterTabs({
   current: TrustCenterPage;
   labels: Readonly<Record<TrustCenterPage, string>>;
 }) {
-  const common = useTranslations('common');
+  const nav = useTranslations('nav');
   return (
     <PageHeaderTabs
-      label={common('pageHeader.sections.trust')}
+      label={nav('sections.trust')}
       items={TRUST_CENTER_PAGES.map(({ id, href }) => ({
         href,
         label: labels[id],

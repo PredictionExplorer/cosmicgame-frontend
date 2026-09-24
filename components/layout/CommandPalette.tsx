@@ -19,6 +19,7 @@ import {
   PenLine,
   Search,
   UserRound,
+  X,
   type LucideIcon,
 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
@@ -70,6 +71,9 @@ const JUMP_ICONS: Record<JumpTarget['kind'], LucideIcon> = {
 
 const subscribeToNothing = () => () => {};
 
+/** How long typing must pause before the result count is announced. */
+const ANNOUNCE_DELAY_MS = 500;
+
 function platformShortcut(): string {
   const platform =
     (navigator as Navigator & { userAgentData?: { platform?: string } }).userAgentData?.platform ??
@@ -86,8 +90,10 @@ export function useCommandShortcutLabel(): string | null {
 }
 
 /**
- * Opens the palette on ⌘K / Ctrl+K anywhere, on "/" outside text fields,
- * and when another surface calls `requestSiteSearch()`.
+ * Opens the palette on ⌘K / Ctrl+K anywhere, and when another surface calls
+ * `requestSiteSearch()`. There is deliberately no single-character shortcut
+ * ("/"): one that cannot be turned off fires from speech input and stray
+ * keys (WCAG 2.1.4), and the modifier chord is always available.
  */
 export function useCommandPaletteShortcut(open: () => void) {
   useEffect(() => {
@@ -98,12 +104,8 @@ export function useCommandPaletteShortcut(open: () => void) {
   useEffect(() => {
     const onKeyDown = (event: globalThis.KeyboardEvent) => {
       if (event.defaultPrevented) return;
-      const target = event.target as HTMLElement | null;
-      const typing =
-        !!target && (target.isContentEditable || /^(input|textarea|select)$/i.test(target.tagName));
       const commandK = (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k';
-      const slash = event.key === '/' && !typing && !event.metaKey && !event.ctrlKey;
-      if (commandK || slash) {
+      if (commandK) {
         event.preventDefault();
         open();
       }
@@ -211,6 +213,32 @@ function usePaletteGroups(query: string): PaletteGroup[] {
 }
 
 /**
+ * What a screen reader hears once typing pauses: the number of results, or
+ * that nothing matches. A combobox's list changes silently otherwise.
+ */
+function useResultAnnouncement(query: string, count: number): string {
+  const t = useTranslations('nav');
+  const trimmed = query.trim();
+  const [announced, setAnnounced] = useState<{ query: string; text: string } | null>(null);
+  useEffect(() => {
+    if (!trimmed) return undefined;
+    const timer = window.setTimeout(
+      () =>
+        setAnnounced({
+          query: trimmed,
+          text:
+            count > 0 ? t('search.resultCount', { count }) : t('search.empty', { query: trimmed }),
+        }),
+      ANNOUNCE_DELAY_MS,
+    );
+    return () => window.clearTimeout(timer);
+  }, [count, trimmed, t]);
+  // Only the announcement for the query on screen; a new query clears the
+  // region until typing pauses again.
+  return trimmed && announced?.query === trimmed ? announced.text : '';
+}
+
+/**
  * The palette's contents. Mounted only while the dialog is open, so every
  * open starts with an empty query.
  */
@@ -226,12 +254,17 @@ function PaletteBody({ onClose }: { onClose: () => void }) {
   const groups = usePaletteGroups(query);
   const options = useMemo(() => groups.flatMap((group) => group.options), [groups]);
   const activeIndex = Math.min(active, Math.max(options.length - 1, 0));
-  const optionId = (index: number) => `${listId}-option-${index}`;
+  const announcement = useResultAnnouncement(query, options.length);
+  // Keyed by the option, not its position: as the query narrows, the active
+  // descendant changes whenever the option under it does, so it is announced.
+  const optionId = (option: PaletteOption) => `${listId}-${option.key}`;
+  const activeOption = options[activeIndex];
+  const activeId = activeOption ? optionId(activeOption) : undefined;
 
   useEffect(() => {
-    const option = document.getElementById(`${listId}-option-${activeIndex}`);
-    option?.scrollIntoView?.({ block: 'nearest' });
-  }, [activeIndex, listId]);
+    if (!activeId) return;
+    document.getElementById(activeId)?.scrollIntoView?.({ block: 'nearest' });
+  }, [activeId]);
 
   const choose = useCallback(
     (option: PaletteOption) => {
@@ -269,7 +302,7 @@ function PaletteBody({ onClose }: { onClose: () => void }) {
           aria-expanded
           aria-controls={listId}
           aria-autocomplete="list"
-          aria-activedescendant={options.length ? optionId(activeIndex) : undefined}
+          aria-activedescendant={activeId}
           aria-label={t('search.triggerLabel')}
           autoComplete="off"
           autoCorrect="off"
@@ -285,81 +318,92 @@ function PaletteBody({ onClose }: { onClose: () => void }) {
           placeholder={roomy ? t('search.placeholder') : t('search.placeholderShort')}
           className="focus-ring-none h-14 min-w-0 flex-1 bg-transparent text-base text-foreground outline-none placeholder:text-subtle"
         />
-        <span className="hidden sm:inline-flex">
-          <Kbd>Esc</Kbd>
-        </span>
+        {/* A visible way out on every device: a close button on phones, the Esc key cap from 640px. */}
+        <DialogPrimitive.Close
+          aria-label={t('search.keys.close')}
+          className="-mr-2 inline-flex size-11 shrink-0 items-center justify-center rounded-control text-subtle transition-colors duration-150 hover:bg-muted hover:text-foreground sm:mr-0 sm:size-auto sm:bg-transparent sm:hover:bg-transparent"
+        >
+          <X aria-hidden className="size-5 sm:hidden" />
+          <span aria-hidden className="hidden sm:inline-flex">
+            <Kbd>Esc</Kbd>
+          </span>
+        </DialogPrimitive.Close>
       </div>
 
+      <p role="status" className="sr-only">
+        {announcement}
+      </p>
+
+      {groups.length === 0 ? (
+        <p className="type-body-sm min-h-0 flex-1 px-5 py-10 text-center text-muted-foreground">
+          {t('search.empty', { query: query.trim() })}
+        </p>
+      ) : null}
       <div
         id={listId}
         role="listbox"
         aria-label={t('search.listLabel')}
+        hidden={groups.length === 0}
         className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-2"
       >
-        {groups.length === 0 ? (
-          <p className="type-body-sm px-3 py-8 text-center text-muted-foreground">
-            {t('search.empty', { query: query.trim() })}
-          </p>
-        ) : (
-          groups.map((group) => {
-            const headingId = `${listId}-${group.key}`;
-            return (
-              <div key={group.key} role="group" aria-labelledby={headingId} className="pb-1">
-                <div
-                  id={headingId}
-                  role="presentation"
-                  className="type-eyebrow px-3 pb-1.5 pt-3 text-subtle"
-                >
-                  {group.title}
-                </div>
-                {group.options.map((option, offset) => {
-                  const index = group.start + offset;
-                  const selected = index === activeIndex;
-                  const Icon = option.kind === 'external' ? ArrowUpRight : option.icon;
-                  return (
-                    <div
-                      key={option.key}
-                      id={optionId(index)}
-                      role="option"
-                      aria-selected={selected}
-                      onPointerMove={() => {
-                        if (!selected) setActive(index);
-                      }}
-                      onClick={() => choose(option)}
+        {groups.map((group) => {
+          const headingId = `${listId}-${group.key}`;
+          return (
+            <div key={group.key} role="group" aria-labelledby={headingId} className="pb-1">
+              <div
+                id={headingId}
+                role="presentation"
+                className="type-eyebrow px-3 pb-1.5 pt-3 text-subtle"
+              >
+                {group.title}
+              </div>
+              {group.options.map((option, offset) => {
+                const index = group.start + offset;
+                const selected = index === activeIndex;
+                const Icon = option.kind === 'external' ? ArrowUpRight : option.icon;
+                return (
+                  <div
+                    key={option.key}
+                    id={optionId(option)}
+                    role="option"
+                    aria-selected={selected}
+                    onPointerMove={() => {
+                      if (!selected) setActive(index);
+                    }}
+                    onClick={() => choose(option)}
+                    className={cn(
+                      'flex min-h-12 cursor-pointer items-center gap-3 rounded-control px-3 py-2',
+                      selected ? 'bg-muted' : 'bg-transparent',
+                    )}
+                  >
+                    <span
+                      aria-hidden
                       className={cn(
-                        'flex min-h-12 cursor-pointer items-center gap-3 rounded-control px-3 py-2',
-                        selected ? 'bg-muted' : 'bg-transparent',
+                        'flex size-8 shrink-0 items-center justify-center rounded-control border',
+                        selected
+                          ? 'border-primary/40 bg-primary/10 text-primary'
+                          : 'border-rule-faint bg-surface-sunken text-subtle',
                       )}
                     >
-                      <span
-                        aria-hidden
-                        className={cn(
-                          'flex size-8 shrink-0 items-center justify-center rounded-control border',
-                          selected
-                            ? 'border-primary/40 bg-primary/10 text-primary'
-                            : 'border-rule-faint bg-surface-sunken text-subtle',
-                        )}
-                      >
-                        <Icon className="size-4" />
+                      <Icon className="size-4" />
+                    </span>
+                    <span className="flex min-w-0 flex-1 flex-col">
+                      <span className="truncate text-sm font-medium text-foreground">
+                        {option.label}
                       </span>
-                      <span className="flex min-w-0 flex-1 flex-col">
-                        <span className="truncate text-sm font-medium text-foreground">
-                          {option.label}
-                        </span>
-                        <span className="type-caption truncate text-muted-foreground">
-                          {option.description}
-                        </span>
+                      <span className="type-caption truncate text-muted-foreground">
+                        {option.description}
                       </span>
-                      {selected ? (
-                        <CornerDownLeft aria-hidden className="size-4 shrink-0 text-subtle" />
-                      ) : null}
-                    </div>
-                  );
-                })}
-              </div>
-            );
-          })
-        )}
+                    </span>
+                    {selected ? (
+                      <CornerDownLeft aria-hidden className="size-4 shrink-0 text-subtle" />
+                    ) : null}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
       </div>
 
       <div

@@ -1,44 +1,22 @@
+import { SITE_SECTION_HUBS, SITE_SECTION_IDS, type SiteSectionId } from '@/config/siteNav';
+
 /**
- * The site's sections, for page wayfinding.
+ * The site's sections, for page wayfinding: the navigation taxonomy
+ * (`config/siteNav.ts`) plus `admin`, the operator tools, which the public
+ * navigation does not list.
  *
  * Every app page belongs to one section. `PageHeader` names it above the H1 —
  * as the eyebrow on a top-level page, as the first crumb after Home on a
- * record page — and links it to the section's hub when the section has one,
- * so every page is one click from the place it belongs to. Labels live in
- * `common.pageHeader.sections` (loaded on every app page with the chrome
- * catalog).
- *
- * The ids, labels and page assignments match the navigation taxonomy
- * (`config/siteNav.ts` on the navigation branch: participate, collection,
- * explore, records, learn, trust, account), so the header, the menus and the
- * site map name a page's section the same way. `admin` is the operator
- * tools, which the public navigation does not list.
+ * record page — and links it to the section's hub, so every page is one click
+ * from the place it belongs to. The ids, hubs and labels (`nav.sections`) are
+ * the navigation's own, so the header, the menus, the site map and every page
+ * header name a page's section the same way.
  */
-export const PAGE_SECTIONS = {
-  /** The Observatory and the pages where a participant acts: imprint. */
-  participate: { hub: '/' },
-  /** The artwork: gallery, named, attached and used NFTs. */
-  collection: { hub: '/gallery' },
-  /**
-   * The current cycle, the statistics hub and its section pages, participant
-   * profiles, gestures, transfers.
-   */
-  explore: { hub: '/statistics' },
-  /**
-   * Public ledgers: allocations, anchoring, outreach, contributions, Public
-   * Goods, coordination, and their record pages. No page lists every ledger,
-   * so the section has no hub: its eyebrow is plain text and a record trail
-   * goes straight to the ledger.
-   */
-  records: { hub: null },
-  /** How it works and the FAQ. */
-  learn: { hub: '/how-it-works' },
-  /** Security, audits, risk disclosures, contracts, source code, terms and privacy. */
-  trust: { hub: '/security' },
-  /** Pages about the connected wallet. */
-  account: { hub: '/my-statistics' },
-  /** Operator tools. */
-  admin: { hub: '/admin' },
-} as const satisfies Record<string, { readonly hub: string | null }>;
+export type PageSectionId = SiteSectionId | 'admin';
 
-export type PageSectionId = keyof typeof PAGE_SECTIONS;
+export const PAGE_SECTIONS: Readonly<Record<PageSectionId, { readonly hub: string }>> = {
+  ...(Object.fromEntries(
+    SITE_SECTION_IDS.map((id) => [id, { hub: SITE_SECTION_HUBS[id] }]),
+  ) as Record<SiteSectionId, { readonly hub: string }>),
+  admin: { hub: '/admin' },
+};

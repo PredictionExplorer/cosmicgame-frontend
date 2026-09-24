@@ -235,6 +235,15 @@ describe('<QuizRunner />', () => {
     fireEvent.click(screen.getByTestId('quiz-next'));
     expect(screen.getByTestId('quiz-progress')).toHaveTextContent('Question 2 of 2');
 
+    // A digit typed while focus is outside the question records nothing (WCAG 2.1.4).
+    const outside = document.createElement('button');
+    document.body.append(outside);
+    outside.focus();
+    fireEvent.keyDown(window, { key: '2' });
+    expect(screen.queryByTestId('quiz-feedback')).toBeNull();
+    outside.remove();
+    screen.getByRole('heading', { level: 2, name: 'Second stub prompt?' }).focus();
+
     // Answer question two correctly via the keyboard shortcut (option 2 = 'b').
     fireEvent.keyDown(window, { key: '2' });
     expect(screen.getByTestId('quiz-feedback')).toHaveTextContent('Second stub explanation.');

@@ -122,6 +122,7 @@ describe('GesturePage', () => {
         .map((link) => [link.textContent, link.getAttribute('href')]),
     ).toEqual([
       ['common.breadcrumbs.home', '/'],
+      ['nav.sections.records', '/site-map#records'],
       ['common.pageHeader.crumbs.allocationRecipients', '/allocation'],
       ['common.pageHeader.crumbs.cycle(cycle=5)', '/allocation/5'],
     ]);
@@ -137,7 +138,7 @@ describe('GesturePage', () => {
         .map((link) => [link.textContent, link.getAttribute('href')]),
     ).toEqual([
       ['common.breadcrumbs.home', '/'],
-      ['common.pageHeader.sections.explore', '/statistics'],
+      ['nav.sections.explore', '/statistics'],
       ['common.pageHeader.crumbs.cycle(cycle=5)', '/current-cycle'],
     ]);
     expect(screen.getByRole('link', { name: /gesture\.nav\.all/ })).toHaveAttribute(
@@ -151,7 +152,12 @@ describe('GesturePage', () => {
     mockUseDashboardInfo.mockReturnValueOnce({ data: undefined });
     renderGesture();
     const trail = screen.getByRole('navigation', { name: 'common.accessibility.breadcrumb' });
-    expect(within(trail).getAllByRole('link')).toHaveLength(1);
+    // Home and the Records section, but no cycle page yet.
+    expect(
+      within(trail)
+        .getAllByRole('link')
+        .map((link) => link.getAttribute('href')),
+    ).toEqual(['/', '/site-map#records']);
   });
 
   it('takes the cycle as finalized when the dashboard cannot be read', () => {

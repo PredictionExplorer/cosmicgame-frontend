@@ -1,6 +1,8 @@
 {
   "languageSwitcher": {
-    "label": "语言"
+    "label": "语言",
+    "current": "语言：{language}",
+    "currentShort": "语言：{language}，简称{short}"
   },
   "themeSwitcher": {
     "label": "配色",
@@ -39,16 +41,6 @@
     "gallery": "画廊"
   },
   "pageHeader": {
-    "sections": {
-      "participate": "参与",
-      "collection": "作品集",
-      "explore": "探索",
-      "records": "记录",
-      "learn": "学习",
-      "trust": "信任",
-      "account": "账户",
-      "admin": "管理"
-    },
     "snapshot": "数据快照：{date}",
     "lastReviewed": "最后审阅：{date}",
     "lastUpdated": "最后更新：{date}",

@@ -23,8 +23,8 @@ describe('HeroSection', () => {
 
   it('names the Learn section in the eyebrow without linking the hub to itself', () => {
     render(<HeroSection hero={hero} />);
-    expect(screen.getByText('common.pageHeader.sections.learn')).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'common.pageHeader.sections.learn' })).toBeNull();
+    expect(screen.getByText('nav.sections.learn')).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'nav.sections.learn' })).toBeNull();
   });
 
   it('leads to the gesture form and to the live cycle', () => {

@@ -63,7 +63,7 @@ const zhRoutes: ReadonlyArray<{
     path: '/zh/gallery',
     label: 'core dApp',
     assertAccessibleName: async (page) =>
-      expect(page.getByRole('textbox', { name: '搜索 NFT' })).toBeVisible(),
+      expect(page.getByRole('searchbox', { name: '搜索 NFT' })).toBeVisible(),
   },
   {
     path: '/zh/anchoring',
@@ -215,7 +215,7 @@ test.describe('A11y smoke (WCAG 2.1 AA)', () => {
       path: '/uk/gallery',
       label: 'core dApp',
       assertAccessibleName: async (page) =>
-        expect(page.getByRole('textbox', { name: 'Пошук NFT' })).toBeVisible(),
+        expect(page.getByRole('searchbox', { name: 'Пошук NFT' })).toBeVisible(),
     },
     {
       path: '/uk/anchoring',

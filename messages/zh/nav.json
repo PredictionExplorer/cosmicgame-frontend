@@ -19,6 +19,7 @@
     "learn": "学习",
     "trust": "信任",
     "account": "账户",
+    "admin": "管理",
     "ecosystem": "生态",
     "community": "社区"
   },
@@ -276,6 +277,7 @@
       "transaction": "在新标签页中打开区块浏览器"
     },
     "empty": "没有与“{query}”匹配的结果。请尝试页面名称、地址或数字。",
+    "resultCount": "{count, plural, other {# 个结果}}",
     "keys": {
       "move": "移动",
       "open": "打开",
@@ -284,9 +286,6 @@
   },
   "drawer": {
     "preferences": "偏好设置"
-  },
-  "footer": {
-    "linksAndLanguages": "链接与语言"
   },
   "ecosystem": {
     "uniswap": {

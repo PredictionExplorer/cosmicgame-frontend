@@ -24,8 +24,9 @@ test.describe('zh locale smoke', () => {
     await page.goto('/zh/gallery');
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
     await expect(page).toHaveURL(/\/zh\/gallery$/);
-    await expect(page.getByRole('textbox', { name: '搜索 NFT' })).toBeVisible();
-    await expect(page.getByRole('button', { name: '搜索', exact: true })).toBeVisible();
+    // The gallery filters as the visitor types: a search field and the filter control.
+    await expect(page.getByRole('searchbox', { name: '搜索 NFT' })).toBeVisible();
+    await expect(page.getByRole('button', { name: '筛选' }).first()).toBeVisible();
   });
 
   test('/zh/faq renders under the locale prefix', async ({ page }) => {
@@ -67,7 +68,7 @@ test.describe('zh locale smoke', () => {
       await expect(primary.getByText('探索', { exact: true })).toBeVisible();
       await expect(primary.getByText('学习', { exact: true })).toBeVisible();
       await primary.getByRole('button', { name: '学习' }).click();
-      await expect(page.getByRole('menuitem', { name: /关于 Cosmic Signature/ })).toHaveAttribute(
+      await expect(primary.getByRole('link', { name: /关于 Cosmic Signature/ })).toHaveAttribute(
         'href',
         'https://cosmicsignature.com/zh/about',
       );

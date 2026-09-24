@@ -7,10 +7,11 @@ import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 
 import { render, screen, checkA11y, within } from '@/test-utils';
 
-import NotFound, { generateMetadata } from '../not-found';
-import LandingNotFound, {
-  generateMetadata as generateLandingMetadata,
-} from '../../(landing)/landing-site/not-found';
+import { generateMetadata } from '../[...notFound]/page';
+import NotFound from '../not-found';
+import * as landingNotFoundModule from '../../(landing)/landing-site/not-found';
+
+const LandingNotFound = landingNotFoundModule.default;
 
 jest.mock('../../../../components/ui/page-shell', () => ({
   PageShell: ({ children }: { children: React.ReactNode }) => <main>{children}</main>,
@@ -61,10 +62,30 @@ describe('app 404 page', () => {
     await checkA11y(container);
   });
 
-  it('names the tab after the error instead of the site default', async () => {
-    const metadata = await generateMetadata();
+  it('names the tab after the error from the catch-all page, which knows the locale', async () => {
+    const metadata = await generateMetadata({ params: Promise.resolve({ locale: 'en' }) });
     expect(metadata.title).toEqual({ absolute: 'errors.notFound.title · Cosmic Signature' });
     expect(metadata.description).toBe('errors.notFound.description');
+    expect(metadata.robots).toEqual({ index: false, follow: true });
+  });
+
+  it('heads every 404 from the not-found files, with the locale from params, never headers', async () => {
+    const intl = await import('next-intl/server');
+    const getLocale = jest.spyOn(intl, 'getLocale');
+    const appModule = await import('../not-found');
+    const landingModule = await import('../../(landing)/not-found');
+    // Whatever calls notFound() (a segment layout rejecting an id included),
+    // this is the head crawlers get: the error's title and noindex, follow.
+    for (const generate of [appModule.generateMetadata, landingModule.generateMetadata]) {
+      const metadata = await generate({ params: Promise.resolve({ locale: 'ja' }) });
+      expect(metadata.title).toEqual({ absolute: 'errors.notFound.title · Cosmic Signature' });
+      expect(metadata.robots).toEqual({ index: false, follow: true });
+    }
+    // An unknown or missing locale falls back to the default instead of throwing.
+    const fallback = await appModule.generateMetadata({ params: Promise.resolve({}) });
+    expect(fallback.robots).toEqual({ index: false, follow: true });
+    expect(getLocale).not.toHaveBeenCalled();
+    getLocale.mockRestore();
   });
 });
 
@@ -80,7 +101,7 @@ describe('landing 404 page', () => {
     expect(screen.queryByRole('button', { name: 'nav.search.triggerLabel' })).toBeNull();
   });
 
-  it('uses the same absolute tab title as the app, outside the landing title template', async () => {
-    expect(await generateLandingMetadata()).toEqual(await generateMetadata());
+  it('shares the head of the landing 404 with the route-group not-found file', () => {
+    expect(landingNotFoundModule.generateMetadata).toBeInstanceOf(Function);
   });
 });

@@ -1,6 +1,5 @@
 'use client';
 
-import { useCallback, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
@@ -20,10 +19,10 @@ interface FAQSearchProps {
 }
 
 /**
- * The FAQ's own search, on the shared SearchField. "/" focuses it from
- * anywhere on the page outside a text field; ⌘K / Ctrl+K stays with the
- * site-wide command palette in the header. While a query is active, a
- * polite status line says how many questions match.
+ * The FAQ's own search, on the shared SearchField, right under the H1;
+ * ⌘K / Ctrl+K stays with the site-wide command palette in the header.
+ * While a query is active, a polite status line says how many questions
+ * match.
  */
 export function FAQSearch({
   value,
@@ -34,29 +33,13 @@ export function FAQSearch({
   className,
 }: FAQSearchProps) {
   const t = useTranslations('faq');
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey || e.defaultPrevented) return;
-    const target = e.target as HTMLElement | null;
-    const typing =
-      !!target && (target.isContentEditable || /^(input|textarea|select)$/i.test(target.tagName));
-    if (typing) return;
-    e.preventDefault();
-    inputRef.current?.focus();
-  }, []);
-
-  useEffect(() => {
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [handleKeyDown]);
-
+  // No "/" shortcut: a single-character key that cannot be turned off fires from speech
+  // input and stray keys (WCAG 2.1.4); the field sits under the H1, and ⌘K opens site search.
   const isFiltering = value.trim().length > 0 && activeQuery.trim().length > 0;
 
   return (
     <div className={cn('w-full max-w-xl', className)}>
       <SearchField
-        ref={inputRef}
         size="lg"
         value={value}
         onValueChange={onChange}

@@ -101,7 +101,9 @@ export function LanguageDirectory({ className, hideLabel = false }: LanguageDire
                 onClick={(event) => onClick(event, option)}
                 onAuxClick={(event) => onAuxClick(event, option)}
                 className={cn(
-                  'inline-flex min-h-10 min-w-10 items-center text-sm no-underline transition-colors duration-150',
+                  // `halt` sets full-width parentheses (繁體中文（台灣）) at half width, so a
+                  // native name keeps its own characters without wide gaps in the row.
+                  "inline-flex min-h-10 min-w-10 items-center text-sm no-underline transition-colors duration-150 [font-feature-settings:'halt']",
                   current
                     ? 'font-medium text-foreground underline decoration-primary/60 decoration-1 underline-offset-4'
                     : 'text-muted-foreground hover:text-foreground',

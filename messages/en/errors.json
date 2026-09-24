@@ -11,7 +11,7 @@
   "boundary": {
     "title": "Something went wrong",
     "description": "An unexpected error occurred.",
-    "retry": "Try Again"
+    "home": "Back to the home page"
   },
   "route": {
     "message": "This page could not be loaded. Try again, or come back in a moment.",

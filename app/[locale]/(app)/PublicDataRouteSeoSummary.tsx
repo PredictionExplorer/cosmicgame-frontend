@@ -1,21 +1,23 @@
 import type { ReactNode } from 'react';
 import { getLocale, getTranslations } from 'next-intl/server';
-import { isAddress } from 'viem';
+import { isAddress, zeroAddress } from 'viem';
 
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { OUTBOUND_LINKS } from '@/config/siteNav';
 import { PageHeader, type PageHeaderFigure } from '@/components/layout/PageHeader';
 import type { PageSectionId } from '@/components/layout/pageSections';
 import { SnapshotStamp } from '@/components/layout/SnapshotStamp';
 import { AddressChip } from '@/components/ui/address-chip';
 import { Amount } from '@/components/ui/amount';
+import { Badge } from '@/components/ui/badge';
 import { DateTime } from '@/components/ui/date-time';
 import { LANDING_ORIGIN, localizeCrossHostHref } from '@/lib/hostRouting';
 import { sumAllocatedEth } from '@/utils/allocationRecords';
 import { toFiniteNumber } from '@/utils/finiteNumber';
-import { NBSP, formatCount, formatPercent, sameAddress } from '@/utils/format';
-import { formatEthQuote } from '@/utils/gestureQuote';
+import { formatCount, formatPercent, sameAddress } from '@/utils/format';
 
+import { AnchoringFigure } from './PublicDataFigures';
 import {
   readAnchorCstActions,
   readAnchorEthDeposits,
@@ -26,10 +28,12 @@ import {
   readCoordinationEvents,
   readDashboard,
   readDirectContributions,
+  readGameOwner,
   readMarketingRewards,
   readNamedNfts,
   readPublicGoodsDeposits,
   readPublicGoodsRetrievals,
+  readRandomWalkImprinted,
   readRoundList,
   readUsedRwlkNfts,
   readVoluntaryPublicGoods,
@@ -59,6 +63,12 @@ interface RouteDefinition {
    */
   links: readonly { href: string; key: string }[];
 }
+
+/** The Learn guide to Public Goods and Protocol Guild. */
+const PUBLIC_GOODS_GUIDE = `${LANDING_ORIGIN}/learn/protocol-guild-public-goods`;
+
+/** Protocol Guild's own site, the Public Goods Vault's beneficiary. */
+const PROTOCOL_GUILD_URL = OUTBOUND_LINKS.find((link) => link.id === 'protocolGuild')!.href;
 
 const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
   allocation: {
@@ -145,30 +155,29 @@ const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
       },
     ],
   },
+  // The three Public Goods ledgers link each other through their tabs, so
+  // their related pages go where the tabs do not.
   'public-goods-contributions-cg': {
     section: 'records',
     links: [
-      {
-        href: `${LANDING_ORIGIN}/learn/protocol-guild-public-goods`,
-        key: 'learn',
-      },
-      { href: '/public-goods-retrievals', key: 'retrievals' },
+      { href: PUBLIC_GOODS_GUIDE, key: 'learn' },
       { href: '/statistics', key: 'statistics' },
+      { href: '/contracts', key: 'contracts' },
     ],
   },
   'public-goods-contributions-voluntary': {
     section: 'records',
     links: [
       { href: '/eth-contribution', key: 'direct' },
-      { href: '/public-goods-contributions-cg', key: 'protocol' },
+      { href: PUBLIC_GOODS_GUIDE, key: 'learn' },
       { href: '/risk-disclosures', key: 'risk' },
     ],
   },
   'public-goods-retrievals': {
     section: 'records',
     links: [
-      { href: '/public-goods-contributions-cg', key: 'protocol' },
-      { href: '/public-goods-contributions-voluntary', key: 'voluntary' },
+      { href: PUBLIC_GOODS_GUIDE, key: 'learn' },
+      { href: PROTOCOL_GUILD_URL, key: 'protocolGuild' },
       { href: '/contracts', key: 'contracts' },
     ],
   },
@@ -189,6 +198,8 @@ interface FigureSpec {
   hasTooltip?: boolean;
   /** A date: kept at figure-md beside the counts (see `PageHeaderFigure.size`). */
   size?: 'md';
+  /** A short count: three of them share one phone row (see `PageHeaderFigure.compact`). */
+  compact?: boolean;
 }
 
 interface RouteFigures {
@@ -236,29 +247,26 @@ function latestRow<T extends { TimeStamp?: unknown }>(rows: readonly T[]): T | n
   return latest;
 }
 
-/**
- * An ETH quote (five significant digits, like the gesture form's cost) set
- * the way `<Amount>` sets every ETH figure: tabular digits, the unit muted
- * and joined by a no-break space.
- */
-function EthQuote({ value, locale }: { value: number; locale: string }) {
-  return (
-    <data value={value} className="whitespace-nowrap tabular-nums">
-      {formatEthQuote(value, locale)}
-      {NBSP}
-      <span className="text-muted-foreground">ETH</span>
-    </data>
-  );
-}
-
-async function getRouteFigures(route: SeoSummaryRoute, locale: string): Promise<RouteFigures> {
+async function getRouteFigures(
+  route: SeoSummaryRoute,
+  locale: string,
+  /** The route's own copy, `publicData.routes.<route>.<key>`. */
+  copy: (key: string) => string,
+): Promise<RouteFigures> {
   const count = (value: number) => formatCount(value, locale);
   const eth = (value: number) => <Amount value={value} unit="ETH" locale={locale} />;
-  /** The newest row's date, "None yet" for an empty list, unknown when the read failed. */
+  /**
+   * The newest row's date, "None yet" for an empty list, unknown when the read
+   * failed. Always with its year, like the same date in the ledger below.
+   */
   const latestDate = (rows: readonly { TimeStamp?: unknown }[] | null) => {
     if (rows === null) return null;
     const seconds = latestTimestamp(rows);
-    return seconds === null ? NONE_YET : <DateTime timestamp={seconds} locale={locale} />;
+    return seconds === null ? (
+      NONE_YET
+    ) : (
+      <DateTime timestamp={seconds} locale={locale} year="always" />
+    );
   };
 
   switch (route) {
@@ -267,8 +275,10 @@ async function getRouteFigures(route: SeoSummaryRoute, locale: string): Promise<
       const rows = rounds.data;
       return {
         reads: [rounds],
+        // Self-evident counts carry no explanation; the two figures a reader
+        // could misread do.
         figures: [
-          { key: 'finalizedCycles', value: rows && count(rows.length), hasTooltip: true },
+          { key: 'finalizedCycles', value: rows && count(rows.length) },
           {
             key: 'recipients',
             value: rows && count(countDistinctAddresses(rows.map((row) => row.WinnerAddr))),
@@ -285,7 +295,6 @@ async function getRouteFigures(route: SeoSummaryRoute, locale: string): Promise<
                   0,
                 ),
               ),
-            hasTooltip: true,
           },
         ],
       };
@@ -299,23 +308,40 @@ async function getRouteFigures(route: SeoSummaryRoute, locale: string): Promise<
       ]);
       return {
         reads: [cstActions, rwalkActions, ethDeposits, stellarImprints],
+        // A figure whose server read failed is filled on the client from the
+        // page's own queries, so the header never contradicts the ledgers.
+        // Three short counts: one row on phones.
         figures: [
           {
             key: 'actions',
             value:
-              cstActions.data &&
-              rwalkActions.data &&
-              count(cstActions.data.length + rwalkActions.data.length),
+              cstActions.data && rwalkActions.data ? (
+                count(cstActions.data.length + rwalkActions.data.length)
+              ) : (
+                <AnchoringFigure id="actions" />
+              ),
+            hasTooltip: true,
+            compact: true,
           },
           {
             key: 'ethDeposits',
-            value: ethDeposits.data && count(ethDeposits.data.length),
+            value: ethDeposits.data ? (
+              count(ethDeposits.data.length)
+            ) : (
+              <AnchoringFigure id="ethDeposits" />
+            ),
             hasTooltip: true,
+            compact: true,
           },
           {
             key: 'stellarImprints',
-            value: stellarImprints.data && count(stellarImprints.data.length),
+            value: stellarImprints.data ? (
+              count(stellarImprints.data.length)
+            ) : (
+              <AnchoringFigure id="stellarImprints" />
+            ),
             hasTooltip: true,
+            compact: true,
           },
         ],
       };
@@ -346,19 +372,24 @@ async function getRouteFigures(route: SeoSummaryRoute, locale: string): Promise<
       };
     }
     case 'imprint': {
-      const dashboard = await readDashboard();
-      const cycle = toFiniteNumber(dashboard.data?.CurRoundNum);
-      const cost = toFiniteNumber(dashboard.data?.CurBidPriceEth);
+      // The page's own subject: how many Random Walk NFTs exist (read from
+      // the contract), what one is worth and how many have been used. What an
+      // imprint costs is the panel's to say, once, where it is paid.
+      const [imprinted, used] = await Promise.all([readRandomWalkImprinted(), readUsedRwlkNfts()]);
       return {
-        reads: [dashboard],
+        reads: [imprinted, used],
         figures: [
-          { key: 'cycle', value: cycle === null ? null : count(cycle) },
-          // The same quote format as the home tabs and submit button (five significant digits).
-          { key: 'cost', value: cost === null ? null : <EthQuote value={cost} locale={locale} /> },
+          {
+            key: 'imprinted',
+            value: imprinted.data === null ? null : count(imprinted.data),
+            compact: true,
+          },
           {
             key: 'discount',
             value: formatPercent(protocolFacts.randomWalkDiscountPercentage, locale),
+            compact: true,
           },
+          { key: 'used', value: used.data && count(used.data.length), compact: true },
         ],
       };
     }
@@ -452,17 +483,31 @@ async function getRouteFigures(route: SeoSummaryRoute, locale: string): Promise<
       };
     }
     case 'coordination-changes': {
-      const events = await readCoordinationEvents();
+      const [events, owner] = await Promise.all([readCoordinationEvents(), readGameOwner()]);
       const rows = events.data;
       return {
-        reads: [events],
+        reads: [events, owner],
         figures: [
           { key: 'records', value: rows && count(rows.length) },
           { key: 'latest', value: latestDate(rows), size: 'md' },
+          // Who can still change the parameters: the page's key trust fact.
           {
-            key: 'parameters',
-            value: rows && count(new Set(rows.map((row) => row.RecordType)).size),
+            key: 'owner',
+            value:
+              owner.data === null ? null : sameAddress(owner.data, zeroAddress) ? (
+                <Badge tone="positive" dot>
+                  {copy('cards.owner.renounced')}
+                </Badge>
+              ) : (
+                <AddressChip
+                  address={owner.data}
+                  variant="plain"
+                  showCopy={false}
+                  className="type-figure-md"
+                />
+              ),
             hasTooltip: true,
+            size: 'md',
           },
         ],
       };
@@ -473,11 +518,12 @@ async function getRouteFigures(route: SeoSummaryRoute, locale: string): Promise<
       // The live contract share, or the documented one when the dashboard read failed.
       const share =
         toFiniteNumber(dashboard.data?.CharityPercentage) ?? protocolFacts.publicGoodsPercentage;
+      // The ETH total is the vault section's flow (contributed, in the vault,
+      // retrieved) below; the header does not repeat it.
       return {
         reads: [deposits],
         figures: [
           { key: 'records', value: rows && count(rows.length) },
-          { key: 'totalEth', value: rows && eth(sumAmountEth(rows)) },
           { key: 'share', value: formatPercent(share, locale), hasTooltip: true },
           { key: 'latest', value: latestDate(rows), size: 'md' },
         ],
@@ -486,6 +532,8 @@ async function getRouteFigures(route: SeoSummaryRoute, locale: string): Promise<
     case 'public-goods-contributions-voluntary': {
       const deposits = await readVoluntaryPublicGoods();
       const rows = deposits.data;
+      // With no contribution yet, three zeros would only repeat the empty state below.
+      if (rows !== null && rows.length === 0) return { reads: [deposits], figures: [] };
       return {
         reads: [deposits],
         figures: [
@@ -521,13 +569,18 @@ async function getRouteFigures(route: SeoSummaryRoute, locale: string): Promise<
               rows === null ? null : beneficiary === null ? (
                 NONE_YET
               ) : (
+                // A figure like its neighbours: the name (or hex) as figure text,
+                // linked to the address, not a small chip.
                 <AddressChip
                   address={beneficiary}
+                  variant="plain"
+                  showCopy={false}
                   label={sameAddress(beneficiary, beneficiaryAddress) ? beneficiaryName : undefined}
-                  className="type-figure-sm"
+                  className="type-figure-md"
                 />
               ),
             hasTooltip: true,
+            size: 'md',
           },
         ],
       };
@@ -568,7 +621,7 @@ export async function PublicDataRouteSeoSummary({
   const prefix = `publicData.routes.${route}`;
   const definition = routeDefinitions[route];
   const heading = t(`${prefix}.heading`);
-  const { figures, reads } = await getRouteFigures(route, locale);
+  const { figures, reads } = await getRouteFigures(route, locale, (key) => t(`${prefix}.${key}`));
   const readAt = snapshotTime(reads);
 
   const headerFigures: PageHeaderFigure[] = figures.map((figure) => {
@@ -584,6 +637,7 @@ export async function PublicDataRouteSeoSummary({
         ),
       info: figure.hasTooltip ? t(`${prefix}.cards.${figure.key}.tooltip`) : undefined,
       size: figure.size,
+      compact: figure.compact,
     };
   });
 

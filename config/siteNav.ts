@@ -214,6 +214,22 @@ export function routesInSection(section: SiteSectionId): readonly SiteRoute[] {
 }
 
 /**
+ * The page that stands for each section: where a page header's section
+ * eyebrow and crumb lead (components/layout/pageSections). Records has no
+ * single ledger page, so its hub is its part of the site map, which lists
+ * every ledger.
+ */
+export const SITE_SECTION_HUBS: Readonly<Record<SiteSectionId, string>> = {
+  participate: ROUTE_DEFINITIONS.observatory.path,
+  collection: ROUTE_DEFINITIONS.gallery.path,
+  explore: ROUTE_DEFINITIONS.statistics.path,
+  records: `${ROUTE_DEFINITIONS.siteMap.path}#records`,
+  learn: ROUTE_DEFINITIONS.howItWorks.path,
+  trust: ROUTE_DEFINITIONS.security.path,
+  account: ROUTE_DEFINITIONS.myStatistics.path,
+};
+
+/**
  * Sibling destinations that compact menus show as one row linking to the
  * first. Their copy lives at `nav.groups.<id>`.
  */

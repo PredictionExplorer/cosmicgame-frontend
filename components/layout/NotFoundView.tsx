@@ -17,11 +17,13 @@ import { SiteLink } from './SiteLink';
 import { SiteSearchButton } from './SiteSearchButton';
 
 /**
- * The 404 page of both hosts: a quiet orbit mark, the code as an eyebrow, a
- * plain heading and one sentence, the two places most visitors want (the
- * Observatory and the Gallery), search on the app, and a grid of useful
- * destinations. Server-rendered, so the recovery links are in the HTML;
- * they prefetch only on intent.
+ * The 404 page of both hosts: a quiet orbit mark above the text (never
+ * behind it), the code as an eyebrow, a plain heading and one sentence, the
+ * two places most visitors want (the Observatory and the Gallery), search on
+ * the app, and a grid of useful destinations. Server-rendered, so the
+ * recovery links are in the HTML; every link, the two actions included,
+ * prefetches only on intent, so a page most visitors leave does not download
+ * the home and gallery bundles.
  */
 export function NotFoundView({ host }: { host: SiteHost }) {
   const t = useTranslations('errors');
@@ -33,9 +35,9 @@ export function NotFoundView({ host }: { host: SiteHost }) {
   return (
     <section
       aria-labelledby="not-found-heading"
-      className="relative isolate mx-auto flex w-full max-w-5xl flex-col items-center py-10 text-center sm:py-16"
+      className="relative mx-auto flex w-full max-w-5xl flex-col items-center py-10 text-center sm:py-16"
     >
-      <BrandMark className="pointer-events-none absolute left-1/2 top-0 -z-10 size-64 -translate-x-1/2 opacity-[0.07] sm:size-80" />
+      <BrandMark className="mb-6 size-14 opacity-40 sm:size-16" />
       <p className="type-eyebrow text-subtle">{t('notFound.code')}</p>
       <h1 id="not-found-heading" className="type-display-sm mt-3 text-balance text-foreground">
         {t('notFound.title')}
@@ -48,6 +50,7 @@ export function NotFoundView({ host }: { host: SiteHost }) {
         <SiteLink
           href={observatory.href}
           kind={observatory.kind}
+          prefetch="intent"
           className={cn(
             buttonVariants({ variant: 'default', size: 'lg' }),
             'px-5 normal-case no-underline',
@@ -59,6 +62,7 @@ export function NotFoundView({ host }: { host: SiteHost }) {
         <SiteLink
           href={gallery.href}
           kind={gallery.kind}
+          prefetch="intent"
           className={cn(
             buttonVariants({ variant: 'outline', size: 'lg' }),
             'px-5 normal-case no-underline',

@@ -22,6 +22,14 @@ describe('CategoryNav', () => {
     expect(screen.getAllByRole('navigation', { name: 'FAQ categories' })).toHaveLength(1);
   });
 
+  it('stays above the page it pins over: a real z-index, not an unregistered token class', () => {
+    renderNav();
+    const nav = screen.getByRole('navigation', { name: 'FAQ categories' });
+    // `z-sticky-nav` generated no CSS, so a Button scrolling under the bar painted over it.
+    expect(nav).toHaveClass('sticky', 'z-30');
+    expect(nav.className).not.toMatch(/\bz-sticky-nav\b/);
+  });
+
   it('links every category and the glossary to its section', () => {
     renderNav();
     for (const entry of entries) {

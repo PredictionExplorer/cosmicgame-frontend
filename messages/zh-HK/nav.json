@@ -19,6 +19,7 @@
     "learn": "學習",
     "trust": "信任",
     "account": "帳戶",
+    "admin": "管理",
     "ecosystem": "生態",
     "community": "社區"
   },
@@ -276,6 +277,7 @@
       "transaction": "在新分頁中打開區塊瀏覽器"
     },
     "empty": "沒有與「{query}」相符的結果。請嘗試頁面名稱、地址或數字。",
+    "resultCount": "{count, plural, other {# 個結果}}",
     "keys": {
       "move": "移動",
       "open": "打開",
@@ -284,9 +286,6 @@
   },
   "drawer": {
     "preferences": "偏好設定"
-  },
-  "footer": {
-    "linksAndLanguages": "連結與語言"
   },
   "ecosystem": {
     "uniswap": {

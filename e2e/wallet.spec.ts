@@ -34,7 +34,7 @@ async function openSheetFromDock(page: Page) {
 }
 
 async function openMobileMenuIfNeeded(page: Page) {
-  const menuButton = page.locator('role=button[name="menu"]');
+  const menuButton = page.getByRole('banner').getByRole('button', { name: /^Open menu/ });
   if (await menuButton.isVisible()) {
     await menuButton.click();
     await page.waitForTimeout(300);
@@ -117,10 +117,14 @@ declare global {
 test.describe('Wallet connection state (disconnected)', () => {
   test('Connect Wallet button is visible on home page', async ({ page }) => {
     await page.goto('/', { waitUntil: 'networkidle' });
-    await openMobileMenuIfNeeded(page);
-    // RainbowKit may show "Connect Wallet" on desktop or shorter text/icon on mobile
-    const connectBtn = page.getByRole('button', { name: /connect/i }).first();
-    await connectBtn.scrollIntoViewIfNeeded();
+    // The header keeps the wallet control at every width ("Connect Wallet" on
+    // desktop, "Connect" beside the menu button on phones); the drawer holds
+    // navigation and preferences, not the wallet.
+    const connectBtn = page
+      .getByRole('banner')
+      .getByRole('button', { name: /connect/i })
+      .filter({ visible: true })
+      .first();
     await expect(connectBtn).toBeVisible();
   });
 
@@ -234,7 +238,8 @@ test.describe('Wallet connection state (disconnected)', () => {
       const counter = panel.getByTestId('gesture-message-char-count');
       const count = `${draft.length}/${protocolFacts.gestureMessageMaxLength}`;
       await expect(counter).toHaveText(count);
-      await expect(message).toHaveAccessibleDescription(count);
+      // The count leads the description; the on-chain note follows it.
+      await expect(message).toHaveAccessibleDescription(new RegExp(`^${count}\\b`));
       await message.locator('..').screenshot({
         path: testInfo.outputPath(`message-${theme}-focused.png`),
         animations: 'disabled',
@@ -267,8 +272,11 @@ test.describe('Wallet connection state (disconnected)', () => {
     );
     const tokenPicker = panel.getByTestId('panel-rwlk-picker');
     await expect(tokenPicker.getByRole('heading', { name: home.form.rwlk.title })).toBeVisible();
-    // Without a wallet there is nothing to search: the picker says what lists the NFTs.
-    await expect(tokenPicker.getByText(home.form.rwlk.connect)).toBeVisible();
+    // The mock wallet's NFTs cannot be read, and there is nothing to search: the picker
+    // says why (no wallet, or a read that failed) instead of showing an empty grid.
+    await expect(
+      tokenPicker.getByText(home.form.rwlk.connect).or(tokenPicker.getByText(home.form.rwlk.error)),
+    ).toBeVisible();
     await expect(tokenPicker.getByPlaceholder(home.rwlkGrid.searchPlaceholder)).toHaveCount(0);
     await expect(message).toHaveValue(draft);
     await expect(
@@ -278,7 +286,11 @@ test.describe('Wallet connection state (disconnected)', () => {
     // Message, advanced options and the action share the form's main column;
     // from 1024px the wallet's standing sits beside the form, outside it.
     const messageBox = (await panel.getByTestId('gesture-panel-message').boundingBox())!;
-    const actionBox = (await panel.getByTestId('gesture-panel-action').boundingBox())!;
+    // The sheet pins its action row as a full-bleed footer; its button keeps to
+    // the form's column.
+    const actionBox = (await (
+      isMobile ? panel.locator('#gesture-submit-sheet') : panel.getByTestId('gesture-panel-action')
+    ).boundingBox())!;
     const collapsedBox = (await advanced.boundingBox())!;
     expect(collapsedBox.x).toBeCloseTo(messageBox.x, 0);
     expect(collapsedBox.width).toBeCloseTo(messageBox.width, 0);
@@ -321,7 +333,9 @@ test.describe('Wallet connection state (disconnected)', () => {
     await expect(advancedTrigger).toHaveAttribute('aria-expanded', 'false');
     await expect(advanced.getByRole('region')).toBeHidden();
     await expect(message).toHaveValue(revisedDraft);
-    await expect(tokenPicker.getByText(home.form.rwlk.connect)).toBeVisible();
+    await expect(
+      tokenPicker.getByText(home.form.rwlk.connect).or(tokenPicker.getByText(home.form.rwlk.error)),
+    ).toBeVisible();
     await advancedTrigger.click();
     await expect(acceptAnyReward).toBeChecked();
     await expect(message).toHaveValue(revisedDraft);
@@ -402,11 +416,9 @@ test.describe('Wallet connection state (disconnected)', () => {
     // Phones host the one gesture panel in a bottom sheet behind the dock;
     // desktop renders it inline in the stage.
     const isMobile = await page.evaluate(() => window.innerWidth < 1024);
-    if (isMobile) {
-      const dock = page.getByTestId('dock-open-sheet');
-      await expect(dock).toBeVisible({ timeout: 15000 });
-      await dock.click();
-    }
+    // The dock steps aside while the in-page gesture form is on screen, so it is
+    // reached from further down the page, as a reader scrolling past the form would.
+    if (isMobile) await openSheetFromDock(page);
     const panel = page
       .locator(
         isMobile
@@ -418,13 +430,10 @@ test.describe('Wallet connection state (disconnected)', () => {
 
     const prompt = panel.getByTestId('connect-to-gesture');
     await expect(prompt).toBeVisible();
-    // The compact desktop panel keeps its explanation for assistive technology;
-    // the mobile sheet also renders the full visible heading.
-    await expect(prompt).toContainText(home.orientation.connectHelp);
-    if (isMobile) {
-      await expect(prompt.getByRole('heading', { name: home.form.connect.title })).toBeVisible();
-    }
+    // Both variants lead with the connect action and say, visibly, what it is for;
+    // the form's own heading names the task, so the prompt adds none.
     await expect(prompt.getByRole('button', { name: /connect/i })).toBeVisible();
+    await expect(prompt.getByText(home.orientation.connectHelp, { exact: true })).toBeVisible();
   });
 
   test('my-tokens page handles no wallet gracefully', async ({ page }) => {

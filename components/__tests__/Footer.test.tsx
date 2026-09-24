@@ -9,7 +9,16 @@ import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
 
 import { render, screen, checkA11y, within } from '@/test-utils';
 
+const mockPathname = jest.spyOn(jest.requireMock('next/navigation'), 'usePathname');
+
+/** The phone fold, scoped to browsers that report script (without it every group is open). */
+const FOLDED = 'max-sm:[@media(scripting:enabled)]:hidden';
+
 describe('Footer', () => {
+  beforeEach(() => {
+    mockPathname.mockReturnValue('/');
+  });
+
   it('links the wordmark lockup home', () => {
     render(<Footer />);
     const home = screen.getByRole('link', { name: 'nav.brand.homeLabel' });
@@ -95,15 +104,15 @@ describe('Footer', () => {
     }
   });
 
-  it('folds each group on phones with CSS, so the server HTML needs no correction', () => {
+  it('folds each group on phones with CSS, and only while script can open it', () => {
     render(<Footer />);
     const toggles = screen.getAllByRole('button', { expanded: false });
-    // Six sections, and one fold for the ecosystem, community and language rows.
-    expect(toggles).toHaveLength(FOOTER_SECTIONS.length + 1);
+    // Six sections, the ecosystem and the community.
+    expect(toggles).toHaveLength(FOOTER_SECTIONS.length + 2);
     for (const toggle of toggles) {
       const panel = document.getElementById(toggle.getAttribute('aria-controls') ?? '');
-      expect(panel).toHaveClass('max-sm:hidden');
-      expect(toggle).toHaveClass('sm:hidden');
+      expect(panel).toHaveClass(FOLDED);
+      expect(toggle).toHaveClass('sm:hidden', '[@media(scripting:none)]:hidden');
     }
     // Folded groups keep their links in the markup for crawlers.
     expect(screen.getByRole('link', { name: 'nav.routes.gallery.label' })).toHaveAttribute(
@@ -118,27 +127,40 @@ describe('Footer', () => {
     const panel = document.getElementById(toggle.getAttribute('aria-controls') ?? '');
     await userEvent.setup().click(toggle);
     expect(toggle).toHaveAttribute('aria-expanded', 'true');
-    expect(panel).not.toHaveClass('max-sm:hidden');
+    expect(panel).not.toHaveClass(FOLDED);
     expect(within(panel!).getByRole('link', { name: 'nav.routes.siteMap.label' })).toBeVisible();
   });
 
-  it('keeps the ecosystem, community and language rows in one phone fold', async () => {
+  it('folds the ecosystem and community rows, and always shows the languages', async () => {
     render(<Footer />);
-    const toggle = screen.getByRole('button', { name: 'nav.footer.linksAndLanguages' });
-    // From 640px the fold's own heading is for screen readers only.
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'nav.footer.linksAndLanguages' }),
-    ).toHaveClass('sm:sr-only');
-    const panel = document.getElementById(toggle.getAttribute('aria-controls') ?? '')!;
-    for (const name of [
-      'nav.sections.ecosystem',
-      'nav.sections.community',
-      'common.languageSwitcher.label',
-    ]) {
-      expect(within(panel).getByRole('heading', { level: 3, name })).toBeInTheDocument();
+    for (const name of ['nav.sections.ecosystem', 'nav.sections.community']) {
+      const toggle = screen.getByRole('button', { name });
+      const panel = document.getElementById(toggle.getAttribute('aria-controls') ?? '')!;
+      expect(panel).toHaveClass(FOLDED);
+      await userEvent.setup().click(toggle);
+      expect(panel).not.toHaveClass(FOLDED);
     }
-    await userEvent.setup().click(toggle);
-    expect(panel).not.toHaveClass('max-sm:hidden');
+    // A visitor on the wrong edition finds the others without opening anything.
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'common.languageSwitcher.label' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'common.languageSwitcher.label' })).toBeNull();
+    const directory = screen.getByRole('navigation', { name: 'common.languageSwitcher.label' });
+    expect(directory.closest(`.${CSS.escape(FOLDED)}`)).toBeNull();
+  });
+
+  it('leaves the directory to the site map on /site-map, keeping languages and legal links', () => {
+    mockPathname.mockReturnValue('/site-map');
+    render(<Footer />);
+    expect(screen.queryByRole('navigation', { name: 'common.accessibility.footer' })).toBeNull();
+    expect(screen.queryByRole('button', { expanded: false })).toBeNull();
+    expect(
+      screen.getByRole('navigation', { name: 'common.languageSwitcher.label' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'nav.routes.terms.label' })).toHaveAttribute(
+      'href',
+      '/terms',
+    );
   });
 
   it('drops the tagline on phones and keeps the legal line clear of a fixed dock', () => {

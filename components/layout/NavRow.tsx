@@ -13,6 +13,10 @@ interface NavRowContentProps {
   current?: boolean;
   /** `tile`: a 32px icon tile (menus, site map). `inline`: a bare 16px icon (drawer). */
   iconStyle?: 'tile' | 'inline';
+  /** Classes for the icon (tile or bare glyph), e.g. to drop it on phones. */
+  iconClassName?: string;
+  /** Classes for the description line. */
+  descriptionClassName?: string;
 }
 
 /**
@@ -44,6 +48,8 @@ export function NavRowContent({
   aside,
   current = false,
   iconStyle = 'tile',
+  iconClassName,
+  descriptionClassName,
 }: NavRowContentProps) {
   return (
     <>
@@ -56,6 +62,7 @@ export function NavRowContent({
               current
                 ? 'border-primary/40 bg-primary/10 text-primary'
                 : 'border-rule-faint bg-surface-sunken text-subtle group-hover/row:text-foreground group-data-[highlighted]/row:text-foreground',
+              iconClassName,
             )}
           >
             <Icon className="size-4" />
@@ -66,6 +73,7 @@ export function NavRowContent({
             className={cn(
               'size-4 shrink-0 transition-colors duration-150',
               current ? 'text-primary' : 'text-subtle group-hover/row:text-foreground',
+              iconClassName,
             )}
           />
         )
@@ -80,7 +88,9 @@ export function NavRowContent({
           {label}
         </span>
         {description ? (
-          <span className="type-caption mt-0.5 text-muted-foreground">{description}</span>
+          <span className={cn('type-caption mt-0.5 text-muted-foreground', descriptionClassName)}>
+            {description}
+          </span>
         ) : null}
       </span>
       {aside ? <span className="type-caption ml-2 shrink-0 text-subtle">{aside}</span> : null}

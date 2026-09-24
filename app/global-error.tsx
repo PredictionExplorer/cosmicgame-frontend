@@ -34,14 +34,18 @@ const ERROR_CATALOGS: LocaleRecord<typeof enErrors> = {
  * this component owns `<html>`/`<body>` and cannot rely on the layout's
  * stylesheet or the next-intl provider — hence inline styles and a direct
  * catalog read instead of `useTranslations` (same trade-off as the
- * environment error screen in `providers.tsx`).
+ * environment error screen in `providers.tsx`). The inline colours read the
+ * palette tokens when the stylesheet is still there and fall back to the
+ * default palette (Midnight), so the page keeps the brand's ground, text and
+ * wordmark either way. `retry` re-fetches the root instead of re-rendering
+ * what just failed.
  */
 export default function GlobalError({
   error,
-  reset,
+  retry,
 }: {
   error: Error & { digest?: string };
-  reset: () => void;
+  retry: () => void;
 }) {
   useEffect(() => {
     reportError(error, 'global-error');
@@ -60,25 +64,46 @@ export default function GlobalError({
           justifyContent: 'center',
           margin: 0,
           padding: 24,
-          background: '#0a0a0a',
-          color: '#e5e5e5',
-          fontFamily: 'system-ui, sans-serif',
+          background: 'hsl(var(--background, 233 33% 5%))',
+          color: 'hsl(var(--foreground, 250 38% 97%))',
+          fontFamily: 'var(--body-font-stack, system-ui, sans-serif)',
+          lineHeight: 1.55,
           textAlign: 'center',
         }}
       >
         <div style={{ maxWidth: 480 }}>
-          <h1 style={{ fontSize: '1.25rem', marginBottom: 16 }}>{copy.title}</h1>
-          <p style={{ marginBottom: 24, opacity: 0.9 }}>{copy.message}</p>
+          <p
+            translate="no"
+            lang="en"
+            style={{
+              margin: '0 0 24px',
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              color: 'hsl(var(--primary, 254 100% 92%))',
+            }}
+          >
+            Cosmic Signature
+          </p>
+          <h1 style={{ margin: '0 0 12px', fontSize: '1.5rem', fontWeight: 600, lineHeight: 1.25 }}>
+            {copy.title}
+          </h1>
+          <p style={{ margin: '0 0 28px', color: 'hsl(var(--muted-foreground, 247 14% 75%))' }}>
+            {copy.message}
+          </p>
           <button
             type="button"
-            onClick={reset}
+            onClick={retry}
             style={{
-              padding: '8px 20px',
+              minHeight: 44,
+              padding: '10px 22px',
               borderRadius: 8,
-              border: '1px solid rgba(255,255,255,0.2)',
+              border: '1px solid hsl(var(--input, 246 14% 46%))',
               background: 'transparent',
               color: 'inherit',
               font: 'inherit',
+              fontWeight: 500,
               cursor: 'pointer',
             }}
           >

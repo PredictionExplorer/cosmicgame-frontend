@@ -100,10 +100,10 @@ export async function openTooltip(trigger: Locator): Promise<void> {
     return;
   }
 
-  if (coarsePointer) {
-    await trigger.click({ force: true });
-    await page.waitForTimeout(150);
-  }
+  // Last resort on every pointer: a click pins the card open. An inline explained
+  // label (a figure label, a glossary term) opens on hover or click, not on focus.
+  await trigger.click({ force: true });
+  await page.waitForTimeout(150);
 }
 
 export async function expectTooltipFullyVisible(page: Page, expected: RegExp): Promise<void> {

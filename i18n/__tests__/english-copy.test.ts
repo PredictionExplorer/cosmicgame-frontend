@@ -46,7 +46,6 @@ const CONTRACT_NAMES = new Set([
 const RANDOM_WALK_ALLOWLIST = new Set([
   'contracts:entries.randomWalk.description',
   'meta:statisticsAnchoring.description',
-  'seo:publicData.routes.used-rwlk-nfts.cards.used.label',
   'statistics:anchoringTooltips.rwlkActiveAnchorHolders',
   'statistics:anchoringTooltips.rwlkTotalTokensAnchored',
   'statistics:anchoringTooltips.rwlkTotalTokensImprinted',

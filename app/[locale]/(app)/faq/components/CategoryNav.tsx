@@ -43,8 +43,12 @@ export function CategoryNav({ entries, activeId, onSelect, className }: Category
     <nav
       aria-label={t('navigation.ariaLabel')}
       className={cn(
-        // Phones and tablets: a glass bar under the header, bleeding to the page gutters.
-        'glass sticky top-[var(--header-height)] z-sticky-nav -mx-4 border-b border-rule px-4 py-2 sm:-mx-6 sm:px-6',
+        // Phones and tablets: a glass bar under the header, bleeding to the page
+        // gutters. z-30 is the layer scale's sticky-nav step (styles/global.css):
+        // the theme's `--z-*` tokens generate no `z-*` utility, and without a
+        // z-index a positioned control scrolling under the bar (a Button) paints
+        // over it.
+        'glass sticky top-[var(--header-height)] z-30 -mx-4 border-b border-rule px-4 py-2 sm:-mx-6 sm:px-6',
         // Desktop: the contents column.
         'lg:top-[var(--sticky-offset)] lg:mx-0 lg:max-h-[calc(100dvh-var(--sticky-offset)-1.5rem)] lg:self-start lg:overflow-y-auto lg:border-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-none',
         className,

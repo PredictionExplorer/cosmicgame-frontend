@@ -48,7 +48,7 @@ describe('HeroSection', () => {
 
   it('names the Learn section in the eyebrow, linked to its hub', () => {
     render(<HeroSection {...defaultProps} />);
-    expect(screen.getByRole('link', { name: 'common.pageHeader.sections.learn' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'nav.sections.learn' })).toHaveAttribute(
       'href',
       '/how-it-works',
     );

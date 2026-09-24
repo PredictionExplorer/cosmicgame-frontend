@@ -58,17 +58,19 @@ function SearchTrigger({ onOpen }: { onOpen: () => void }) {
       <span className="hidden text-sm xl:inline">{t('search.trigger')}</span>
       {/* The glyph is known only on the client ("⌘K" or "Ctrl K"). The key cap
           is always rendered at a width that fits either, invisible until
-          then, so the pill does not grow after hydration. */}
+          then, so the pill does not grow after hydration. It is a hint, not
+          part of the label: drawn as generated content, so the button's
+          text is "Search" alone, inside its name (WCAG 2.5.3), and
+          aria-keyshortcuts announces the keys. */}
       <kbd
         aria-hidden
         data-testid="search-shortcut"
+        data-keys={shortcut ?? '⌘K'}
         className={cn(
-          'type-caption ml-3 hidden h-6 min-w-12 items-center justify-center rounded-edge border border-rule px-1.5 font-sans text-subtle xl:inline-flex',
+          'type-caption ml-3 hidden h-6 min-w-12 items-center justify-center rounded-edge border border-rule px-1.5 font-sans text-subtle after:content-[attr(data-keys)] xl:inline-flex',
           !shortcut && 'invisible',
         )}
-      >
-        {shortcut ?? '⌘K'}
-      </kbd>
+      />
     </button>
   );
 }
@@ -76,10 +78,12 @@ function SearchTrigger({ onOpen }: { onOpen: () => void }) {
 /**
  * The app header. From 1024px: the wordmark, the primary navigation
  * (Observatory, Gallery, Explore, Learn), search, preferences and the
- * wallet. Below it: a menu button that opens the drawer, the wordmark, and
- * the wallet; on phones the palette and language move into the drawer so
- * the wordmark keeps its place. Every breakpoint is CSS, so the server's
- * first paint already matches the viewport.
+ * wallet. Below it: the wordmark, the wallet and, at the end, the menu
+ * button that opens the drawer from the right (the landing header's side);
+ * on phones the palette and language move into the drawer so the wordmark
+ * keeps its place. The language control names the current language from
+ * 1280px. Every breakpoint is CSS, so the server's first paint already
+ * matches the viewport.
  */
 const Header = () => {
   const t = useTranslations('nav');
@@ -106,30 +110,6 @@ const Header = () => {
     <header className="fixed inset-x-0 top-0 z-50 h-[var(--header-height)] border-b border-rule glass print:static print:z-auto print:w-full">
       {systemMode > 0 ? <MaintenanceBanner mode={systemMode} /> : null}
       <div className="site-container flex h-full items-center gap-2 lg:gap-6">
-        <SiteDrawer
-          open={drawerOpen}
-          onOpenChange={setDrawerOpen}
-          location={location}
-          onOpenSearch={openSearch}
-          showAccount={!!summary.account}
-          badges={retrieveBadge ? { myAllocations: retrieveBadge } : undefined}
-          trigger={
-            <button
-              type="button"
-              aria-label={summary.hasRetrievable ? t('menuLabelWithAlert') : t('menuLabel')}
-              className="relative -ml-2 inline-flex size-11 shrink-0 items-center justify-center rounded-control text-foreground transition-colors duration-150 hover:bg-muted lg:hidden"
-            >
-              <Menu aria-hidden className="size-5" />
-              {summary.hasRetrievable ? (
-                <span
-                  aria-hidden
-                  className="absolute right-2 top-2 size-2 rounded-full bg-positive ring-2 ring-background"
-                />
-              ) : null}
-            </button>
-          }
-        />
-
         <Link
           href="/"
           aria-label={t('brand.homeLabel')}
@@ -149,10 +129,9 @@ const Header = () => {
           <SearchTrigger onOpen={openSearch} />
           <div className="hidden items-center gap-2 sm:flex">
             <ThemeSwitcher />
-            <LanguageSwitcher variant="compact" className="2xl:hidden" />
             <LanguageSwitcher
-              variant="pill"
-              className={cn('hidden 2xl:inline-flex', experimentalUi && 'liquid-glass-control')}
+              variant="responsive"
+              className={cn(experimentalUi && 'liquid-glass-control')}
             />
           </div>
           {/* From 1024px the wallet pill carries the wrong-network badge. */}
@@ -172,6 +151,29 @@ const Header = () => {
               className="whitespace-nowrap"
             />
           </div>
+          <SiteDrawer
+            open={drawerOpen}
+            onOpenChange={setDrawerOpen}
+            location={location}
+            onOpenSearch={openSearch}
+            showAccount={!!summary.account}
+            badges={retrieveBadge ? { myAllocations: retrieveBadge } : undefined}
+            trigger={
+              <button
+                type="button"
+                aria-label={summary.hasRetrievable ? t('menuLabelWithAlert') : t('menuLabel')}
+                className="relative -mr-2 inline-flex size-11 shrink-0 items-center justify-center rounded-control text-foreground transition-colors duration-150 hover:bg-muted lg:hidden"
+              >
+                <Menu aria-hidden className="size-5" />
+                {summary.hasRetrievable ? (
+                  <span
+                    aria-hidden
+                    className="absolute right-2 top-2 size-2 rounded-full bg-positive ring-2 ring-background"
+                  />
+                ) : null}
+              </button>
+            }
+          />
         </div>
       </div>
       <CommandPalette open={searchOpen} onOpenChange={setSearchOpen} />

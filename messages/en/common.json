@@ -1,6 +1,8 @@
 {
   "languageSwitcher": {
-    "label": "Language"
+    "label": "Language",
+    "current": "Language: {language}",
+    "currentShort": "Language: {language} ({short})"
   },
   "themeSwitcher": {
     "label": "Color scheme",
@@ -39,16 +41,6 @@
     "gallery": "Gallery"
   },
   "pageHeader": {
-    "sections": {
-      "participate": "Participate",
-      "collection": "Collection",
-      "explore": "Explore",
-      "records": "Records",
-      "learn": "Learn",
-      "trust": "Trust",
-      "account": "Account",
-      "admin": "Admin"
-    },
     "snapshot": "Snapshot · {date}",
     "lastReviewed": "Last reviewed {date}",
     "lastUpdated": "Last updated {date}",

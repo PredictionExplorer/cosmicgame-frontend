@@ -191,7 +191,10 @@ interface SiteDrawerProps {
  * disclosure (the everyday ones open, the rest collapsed unless the visitor
  * is inside them), a search entry at the top, and the palette and language
  * preferences pinned to the bottom so the phone header keeps its room for
- * the wordmark and the wallet.
+ * the wordmark and the wallet. It opens from the right, under the thumb,
+ * from a menu button at the header's end, the same side and anatomy as the
+ * landing's menu. Choosing a language is an explicit pick in a menu, never
+ * a change of page as a select is arrowed through.
  */
 export function SiteDrawer({
   open,
@@ -232,9 +235,9 @@ export function SiteDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetTrigger asChild>{trigger}</SheetTrigger>
       <SheetContent
-        side="left"
+        side="right"
         aria-describedby={undefined}
-        className="flex w-[min(22rem,100vw)] max-w-full flex-col gap-0 border-r border-rule bg-background p-0 sm:max-w-[22rem]"
+        className="flex w-[min(22rem,100vw)] max-w-full flex-col gap-0 border-l border-rule bg-background p-0 sm:max-w-[22rem]"
       >
         <SheetTitle className="sr-only">{t('drawerTitle')}</SheetTitle>
         <div className="flex h-[var(--header-height)] shrink-0 items-center border-b border-rule-faint pl-4 pr-16">
@@ -284,7 +287,7 @@ export function SiteDrawer({
         <div className="shrink-0 border-t border-rule-faint px-4 pb-[max(env(safe-area-inset-bottom),0.75rem)] pt-3">
           <p className="type-eyebrow text-subtle">{t('drawer.preferences')}</p>
           <PalettePicker className="mt-1 -ml-2.5" />
-          <LanguageSwitcher variant="select" className="mt-2 w-full" />
+          <LanguageSwitcher variant="drawer" className="mt-2" />
         </div>
       </SheetContent>
     </Sheet>

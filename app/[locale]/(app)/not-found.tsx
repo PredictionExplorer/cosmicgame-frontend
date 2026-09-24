@@ -1,15 +1,14 @@
-// Server component on purpose: the 404 page must arrive as crawler-visible
-// HTML (branded copy + recovery links), not hydrate client-side.
-import type { Metadata } from 'next';
-
+// Server component on purpose: the recovery links render from the server,
+// without client state.
 import { NotFoundView } from '@/components/layout/NotFoundView';
-import { notFoundMetadata } from '@/components/layout/notFoundMetadata';
 import { PageShell } from '@/components/ui/page-shell';
 
-/** "Page not found · Cosmic Signature" in the tab instead of the site default. */
-export function generateMetadata(): Promise<Metadata> {
-  return notFoundMetadata();
-}
+/**
+ * "Page not found · Cosmic Signature" and `noindex, follow` in the head of
+ * every app 404, whichever segment called `notFound()`: the locale comes
+ * from this segment's params, never from request headers.
+ */
+export { generateNotFoundMetadata as generateMetadata } from '@/components/layout/notFoundMetadata';
 
 export default function NotFound() {
   return (

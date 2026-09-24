@@ -19,6 +19,7 @@
     "learn": "Learn",
     "trust": "Trust",
     "account": "Account",
+    "admin": "Admin",
     "ecosystem": "Ecosystem",
     "community": "Community"
   },
@@ -276,6 +277,7 @@
       "transaction": "Opens the block explorer in a new tab"
     },
     "empty": "Nothing matches “{query}”. Try a page name, an address or a number.",
+    "resultCount": "{count, plural, one {# result} other {# results}}",
     "keys": {
       "move": "Move",
       "open": "Open",
@@ -284,9 +286,6 @@
   },
   "drawer": {
     "preferences": "Preferences"
-  },
-  "footer": {
-    "linksAndLanguages": "Links and languages"
   },
   "ecosystem": {
     "uniswap": {
