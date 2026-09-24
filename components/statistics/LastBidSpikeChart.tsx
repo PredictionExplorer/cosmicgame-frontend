@@ -23,10 +23,11 @@ import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
 import { SkeletonChart } from '@/components/ui/skeleton';
+import { SegmentedControl } from '@/components/ui/segmented-control';
 
 import { ChartFigure } from './charts/ChartFigure';
 import { ChartTooltipCard } from './charts/ChartTooltipCard';
-import { formatMonthDay } from './charts/labels';
+import { formatMonthDay, formatMonthDayHour } from './charts/labels';
 import { useCountAxis, useTimeAxis } from './charts/axes';
 import {
   CHART_MARGIN,
@@ -36,7 +37,6 @@ import {
   X_AXIS_PROPS,
   Y_AXIS_PROPS,
 } from './charts/theme';
-import { SegmentedControl } from './SegmentedControl';
 
 const CHART_HEIGHT = 280;
 const HOUR = 3_600;
@@ -176,14 +176,13 @@ export const LastBidSpikeChart: FC<LastBidSpikeChartProps> = ({ enabled = true, 
     [locale, t],
   );
 
-  // A chip names its spike by day; two spikes on one day also show the hour.
+  // A chip names its spike by day; when two spikes share a day, every chip
+  // shows its hour, so the row reads in one format.
   const days = spikes.map((item) => formatMonthDay(item.PeakTs, locale));
+  const withHour = new Set(days).size < days.length;
   const options = spikes.map((item, index) => ({
     value: String(index),
-    label:
-      days.indexOf(days[index]!) === days.lastIndexOf(days[index]!)
-        ? days[index]!
-        : `${days[index]!} ${String(new Date(item.PeakTs * 1000).getUTCHours()).padStart(2, '0')}:00`,
+    label: withHour ? formatMonthDayHour(item.PeakTs, locale) : days[index]!,
     ariaLabel: t('charts.spikes.optionAria', {
       date: formatUnixTsLabel(item.PeakTs, true, locale),
       peak: format.count(item.PeakNumBids),
@@ -224,6 +223,7 @@ export const LastBidSpikeChart: FC<LastBidSpikeChartProps> = ({ enabled = true, 
       controls={
         spikes.length > 0 ? (
           <SegmentedControl
+            scroll
             label={t('charts.spikes.count', { count: format.count(spikes.length) })}
             value={String(selectedIndex ?? 0)}
             onValueChange={(value) => setPicked(Number(value))}

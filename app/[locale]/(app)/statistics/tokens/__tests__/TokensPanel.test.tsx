@@ -131,10 +131,7 @@ describe('TokensPanel', () => {
       await user.click(screen.getByRole('radio', { name: 'Current cycle' }));
       // Fixture dashboard has CurRoundNum 3; two of the three NFTs are from round 3.
       expect(screen.getAllByTestId('attached-nft-card')).toHaveLength(2);
-      expect(screen.getByRole('radio', { name: 'Current cycle' })).toHaveAttribute(
-        'aria-checked',
-        'true',
-      );
+      expect(screen.getByRole('radio', { name: 'Current cycle' })).toBeChecked();
     });
 
     it('shows a scoped empty state when the current cycle has no attached NFTs', async () => {

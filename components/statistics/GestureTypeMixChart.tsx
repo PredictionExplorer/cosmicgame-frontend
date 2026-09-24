@@ -13,6 +13,7 @@ import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
 import { SkeletonChart } from '@/components/ui/skeleton';
+import { SegmentedControl } from '@/components/ui/segmented-control';
 
 import { ChartFigure } from './charts/ChartFigure';
 import { ChartLegend } from './charts/ChartLegend';
@@ -35,7 +36,6 @@ import {
   X_AXIS_PROPS,
   Y_AXIS_PROPS,
 } from './charts/theme';
-import { SegmentedControl } from './SegmentedControl';
 
 const CHART_HEIGHT = 300;
 

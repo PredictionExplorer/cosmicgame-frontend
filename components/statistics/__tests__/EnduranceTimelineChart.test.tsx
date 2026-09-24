@@ -113,7 +113,7 @@ describe('EnduranceTimelineChart', () => {
   it('switches to the records as lines', async () => {
     const user = userEvent.setup();
     render(<EnduranceTimelineChart round={2} isLive label="Endurance" />);
-    await user.click(screen.getByRole('radio', { name: 'Line chart' }));
+    await user.click(screen.getByRole('tab', { name: 'Line chart' }));
     expect(screen.getByTestId('composed-chart')).toBeInTheDocument();
     expect(screen.getByText('Endurance Champion record')).toBeInTheDocument();
   });

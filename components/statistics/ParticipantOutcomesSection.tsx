@@ -13,8 +13,7 @@ import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
 import { SkeletonTable } from '@/components/ui/skeleton';
-
-import { SegmentedControl } from './SegmentedControl';
+import { SegmentedControl } from '@/components/ui/segmented-control';
 
 /** The backend's order key for "most gestures first"; the table re-sorts client-side. */
 const GESTURE_ORDER = 'bids'; // lexicon-allow-backend-type

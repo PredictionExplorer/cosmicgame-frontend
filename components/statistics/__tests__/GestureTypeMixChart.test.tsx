@@ -50,8 +50,13 @@ describe('GestureTypeMixChart', () => {
     const intervals = within(screen.getByRole('radiogroup', { name: 'Sample every' })).getAllByRole(
       'radio',
     );
-    expect(intervals.map((radio) => radio.textContent)).toEqual(['1h', '6h', '12h', '1d']);
-    expect(intervals[0]).toHaveAttribute('aria-checked', 'true');
+    expect(intervals.map((radio) => radio.closest('label')?.textContent)).toEqual([
+      '1h',
+      '6h',
+      '12h',
+      '1d',
+    ]);
+    expect(intervals[0]).toBeChecked();
     // Twenty hours at one-hour windows, the empty ones kept.
     expect(screen.getByTestId('bar-chart')).toHaveAttribute('data-point-count', '21');
   });

@@ -29,8 +29,8 @@ import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
 import { SkeletonChart } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-import { SegmentedControl } from './SegmentedControl';
 import { ChartFigure } from './charts/ChartFigure';
 import { ChartLegend } from './charts/ChartLegend';
 import { ChartTooltipCard } from './charts/ChartTooltipCard';
@@ -507,51 +507,49 @@ const EnduranceTimelineChart: FC<EnduranceTimelineChartProps> = ({ round, isLive
     <EmptyState headingLevel={4} variant="inline" title={t('charts.endurance.empty')} />
   ) : null;
 
+  // Gantt or lines swaps the whole plot: a view switch, so Tabs, not a segmented choice.
   return (
-    <ChartFigure
-      label={label}
-      summary={
-        gantt.lanes.length > 0 ? (
-          <>
-            <span className="block">
-              {t('charts.endurance.championSummary', {
-                address: formatAddress(gantt.enduranceChampionAddress),
-                duration: formatSeconds(gantt.enduranceChampionStintSeconds, locale),
-              })}
-            </span>
-            <span className="block">
-              {t('charts.endurance.chronoSummary', {
-                address: formatAddress(gantt.chronoWarriorAddress),
-                duration: formatSeconds(gantt.chronoWarriorSeconds, locale),
-              })}
-            </span>
-          </>
-        ) : undefined
-      }
-      state={state}
-      note={t('charts.endurance.description')}
-      controls={
-        <SegmentedControl
-          label={t('charts.endurance.viewLabel')}
-          hideLabel
-          value={view}
-          onValueChange={setView}
-          options={[
-            { value: 'gantt', label: t('charts.endurance.gantt') },
-            { value: 'lines', label: t('charts.endurance.lineChart') },
-          ]}
-        />
-      }
-      table={<DataTable data={rows} columns={columns} ariaLabel={label} />}
-    >
-      <div data-testid="endurance-timeline-chart">
-        {view === 'gantt' ? (
-          <EnduranceGanttView gantt={gantt} />
-        ) : (
-          <EnduranceLineView points={timeline.points} />
-        )}
-      </div>
-    </ChartFigure>
+    <Tabs value={view} onValueChange={(next) => setView(next as 'gantt' | 'lines')}>
+      <ChartFigure
+        label={label}
+        summary={
+          gantt.lanes.length > 0 ? (
+            <>
+              <span className="block">
+                {t('charts.endurance.championSummary', {
+                  address: formatAddress(gantt.enduranceChampionAddress),
+                  duration: formatSeconds(gantt.enduranceChampionStintSeconds, locale),
+                })}
+              </span>
+              <span className="block">
+                {t('charts.endurance.chronoSummary', {
+                  address: formatAddress(gantt.chronoWarriorAddress),
+                  duration: formatSeconds(gantt.chronoWarriorSeconds, locale),
+                })}
+              </span>
+            </>
+          ) : undefined
+        }
+        state={state}
+        note={t('charts.endurance.description')}
+        controls={
+          <TabsList aria-label={t('charts.endurance.viewLabel')}>
+            <TabsTrigger value="gantt">{t('charts.endurance.gantt')}</TabsTrigger>
+            <TabsTrigger value="lines">{t('charts.endurance.lineChart')}</TabsTrigger>
+          </TabsList>
+        }
+        table={<DataTable data={rows} columns={columns} ariaLabel={label} />}
+      >
+        <div data-testid="endurance-timeline-chart">
+          <TabsContent value="gantt" className="mt-0">
+            <EnduranceGanttView gantt={gantt} />
+          </TabsContent>
+          <TabsContent value="lines" className="mt-0">
+            <EnduranceLineView points={timeline.points} />
+          </TabsContent>
+        </div>
+      </ChartFigure>
+    </Tabs>
   );
 };
 

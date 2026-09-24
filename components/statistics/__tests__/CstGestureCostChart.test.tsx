@@ -77,6 +77,17 @@ describe('CstGestureCostView', () => {
     );
   });
 
+  it('says when the highest cost came as a duration, not an axis tick', () => {
+    // Regression: the summary read "10.5d into the cycle".
+    const late = gestures.map((gesture, index) =>
+      index === 3 ? { ...gesture, TimeStamp: T0 + 10.5 * 86_400 } : gesture,
+    ) as GestureInfo[];
+    render(<CstGestureCostView gestures={late} label="CST cost" />);
+    expect(screen.getByRole('figure', { name: 'CST cost' })).toHaveTextContent(
+      /3,500(\.00)? CST, 10d 12h into the cycle\./,
+    );
+  });
+
   it('draws a hollow dot for a gesture that cost nothing', () => {
     const { container } = render(<CstGestureCostView gestures={gestures} label="CST cost" />);
     const fills = Array.from(container.querySelectorAll('circle')).map((c) =>

@@ -63,6 +63,15 @@ export function formatMonthDay(ts: number, locale: string): string {
 }
 
 /**
+ * A moment's short label, its date and UTC hour: "Aug 12 09:00",
+ * 8月12日 09:00 (the style guides' timestamp form, a space before the time).
+ */
+export function formatMonthDayHour(ts: number, locale: string): string {
+  const hours = String(utcDate(ts).getUTCHours()).padStart(2, '0');
+  return `${formatMonthDay(ts, locale)} ${hours}:00`;
+}
+
+/**
  * The label of a date-axis tick at `step`: "14:00" (a midnight reads as its
  * date), "Aug 12", or "Aug" ("Jan 2027" at a year change, and the year on the
  * first tick).

@@ -13,8 +13,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
 import { SkeletonNFTCard, SkeletonTable } from '@/components/ui/skeleton';
+import { SegmentedControl } from '@/components/ui/segmented-control';
 
-import { SegmentedControl } from './SegmentedControl';
 import { StatsSection } from './StatsSection';
 
 const ITEMS_PER_PAGE = 12;

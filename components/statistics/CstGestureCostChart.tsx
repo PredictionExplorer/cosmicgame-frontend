@@ -15,6 +15,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import {
   formatAddress,
   formatAmount,
+  formatDuration,
   formatHoursTick,
   formatSeconds,
   formatUnixTsLabel,
@@ -275,7 +276,8 @@ export const CstGestureCostView: FC<CstGestureCostViewProps> = ({ gestures, labe
         count: series.points.length,
         total: formatAmount(series.totalPaid, { unit: 'CST', locale }),
         max: formatAmount(series.maxPaid, { unit: 'CST', locale }),
-        when: formatHoursTick((series.maxTs - series.roundStart) / 3600, locale),
+        // A duration in the page's one form ("10d 12h"), not an axis tick ("10.5d").
+        when: formatDuration(series.maxTs - series.roundStart, { locale, maxUnits: 2 }),
       })}
       legend={
         <ChartLegend

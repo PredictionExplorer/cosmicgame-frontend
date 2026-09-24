@@ -65,15 +65,18 @@ describe('defaultSpikeIndex', () => {
 describe('LastBidSpikeChart', () => {
   it('opens on the latest spike when none is recent, never on an empty frame', () => {
     render(<LastBidSpikeChart label="Gesture spikes" />);
-    expect(screen.getByRole('radio', { checked: true })).toHaveTextContent('Sep 1');
+    expect(screen.getByRole('radio', { checked: true })).toHaveAccessibleName(
+      /^Spike on Sep 1, 2026/,
+    );
     expect(screen.getByTestId('bar-chart')).toHaveAttribute('data-point-count', '2');
     expect(screen.getByText('No spikes recently.')).toBeInTheDocument();
   });
 
-  it('names each spike by its date, adding the hour when two share a day', () => {
+  it('names each spike by its date, and every one by its hour when two share a day', () => {
     render(<LastBidSpikeChart label="Gesture spikes" />);
-    const names = screen.getAllByRole('radio').map((el) => el.textContent);
-    expect(names).toEqual(['Aug 12 09:00', 'Aug 12 15:00', 'Sep 1']);
+    const names = screen.getAllByRole('radio').map((el) => el.closest('label')?.textContent);
+    // Regression: "Sep 1" sat beside "Aug 12 09:00" in a second format.
+    expect(names).toEqual(['Aug 12 09:00', 'Aug 12 15:00', 'Sep 1 00:00']);
     expect(screen.getByRole('radiogroup', { name: /Spikes \(3\)/ })).toBeInTheDocument();
   });
 

@@ -99,14 +99,8 @@ describe('AttachedAssetsSection NFT scope', () => {
       'aria-selected',
       'true',
     );
-    expect(screen.getByRole('radio', { name: 'All cycles' })).toHaveAttribute(
-      'aria-checked',
-      'true',
-    );
-    expect(screen.getByRole('radio', { name: 'Current cycle' })).toHaveAttribute(
-      'aria-checked',
-      'false',
-    );
+    expect(screen.getByRole('radio', { name: 'All cycles' })).toBeChecked();
+    expect(screen.getByRole('radio', { name: 'Current cycle' })).not.toBeChecked();
   });
 
   it('narrows the grid to the current cycle when the scope changes', async () => {
@@ -118,10 +112,7 @@ describe('AttachedAssetsSection NFT scope', () => {
     await user.click(screen.getByRole('radio', { name: 'Current cycle' }));
 
     expect(nftCards()).toHaveLength(3);
-    expect(screen.getByRole('radio', { name: 'Current cycle' })).toHaveAttribute(
-      'aria-checked',
-      'true',
-    );
+    expect(screen.getByRole('radio', { name: 'Current cycle' })).toBeChecked();
   });
 
   it('returns to the first page when the scope changes', async () => {
@@ -331,10 +322,7 @@ describe('AttachedAssetsSection ERC-20 tab', () => {
     await openErc20Tab(user);
     await user.click(screen.getByRole('tab', { name: 'NFTs (ERC-721)' }));
 
-    expect(screen.getByRole('radio', { name: 'Current cycle' })).toHaveAttribute(
-      'aria-checked',
-      'true',
-    );
+    expect(screen.getByRole('radio', { name: 'Current cycle' })).toBeChecked();
     expect(nftCards()).toHaveLength(3);
   });
 });
