@@ -1,48 +1,50 @@
 'use client';
 
-import type { RefObject } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { zeroAddress } from 'viem';
-import { ArrowRight, PenLine, Settings2 } from 'lucide-react';
+import { ArrowRight, ChevronDown, PenLine, Settings2, Wallet } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { protocolFacts } from '@/content/protocol-facts';
-import { formatSeconds } from '@/utils';
 
-import ConnectWalletButton from '@/components/common/ConnectWalletButton';
 import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
-import { AuctionInfo } from '@/components/home/AuctionInfo';
 import PaginationRWLKGrid from '@/components/nft/PaginationRWLKGrid';
-import { CustomTextField } from '@/components/styled';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
+import { Amount } from '@/components/ui/amount';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { InfoTooltip } from '@/components/ui/info-tooltip';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { ExplainedTerm } from '@/components/ui/explain-popover';
 import { MessageTextarea } from '@/components/ui/message-textarea';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Spinner } from '@/components/ui/spinner';
-import { Surface } from '@/components/ui/surface';
-import { TOUCH_TARGET_HEIGHT_CLASS } from '@/lib/touch-target';
+import { TxStatus } from '@/components/ui/tx-status';
+import { UnknownValue } from '@/components/ui/unknown-value';
+import { ConnectWalletAction } from '@/components/wallet/ConnectWalletAction';
+import { FundingNotice } from '@/components/wallet/FundingNotice';
+import { ChainGuard } from '@/components/wallet/NetworkGuard';
+import type { EthGestureInfo, RwlkListStatus } from '@/hooks/useGestureForm';
+import { useTxStageLabel, type TxStage } from '@/hooks/useTxFlow';
 import { cn } from '@/lib/utils';
-import { formatCstAmount, type CstGestureData } from '@/utils/cstGesture';
-import {
-  MAX_COLLISION_BUFFER_PERCENT,
-  clampCollisionBufferPercent,
-  ethGestureBaseCost,
-  ethGestureSendAmount,
-  formatEthQuote,
-} from '@/utils/gestureQuote';
-import type { EthGestureInfo } from '@/hooks/useGestureForm';
 import type { DashboardInfo } from '@/services/api/types';
+import { formatAmountParts, formatDuration } from '@/utils/format';
+import type { CstGestureData } from '@/utils/cstGesture';
+import { ethGestureBaseCost, ethGestureSendAmount, formatEthQuote } from '@/utils/gestureQuote';
+
+import { GestureAdvanced } from './GestureAdvanced';
+import { ValuePending } from './ValuePending';
+import {
+  GESTURE_METHODS,
+  GestureMethodControl,
+  type GestureMethodValue,
+  type MethodCost,
+} from './GestureMethodControl';
+import type { GestureSubmitParts } from './gestureSubmitLabel';
 
 const MESSAGE_MAX_LENGTH = protocolFacts.gestureMessageMaxLength;
+
+/**
+ * The 56px commit button at full width, allowed to take a second line: a
+ * long label ("Під’єднати гаманець для жесту") wraps at 320px instead of
+ * running past the button's edge.
+ */
+const COMMIT_WRAP = 'h-auto w-full whitespace-normal py-2.5 text-balance @container/commit';
 const MESSAGE_COUNTER_WARN_AT = MESSAGE_MAX_LENGTH - 20;
 
 /**
@@ -72,6 +74,8 @@ export interface GesturePanelFormState {
   advancedExpanded: boolean;
   setAdvancedExpanded: (value: boolean) => void;
   rwlknftIds: number[];
+  /** Where the read of `rwlknftIds` stands; absent means it has been read. */
+  rwlkListStatus?: RwlkListStatus;
   ethGestureInfo: EthGestureInfo | null;
   gestureCstRewardAmount?: number | null;
   gestureCstRewardAmountMin?: number | null;
@@ -81,6 +85,12 @@ export interface GesturePanelFormState {
   acceptAnyCstReward?: boolean;
   setAcceptAnyCstReward?: (value: boolean) => void;
 }
+
+/** What the connected wallet spent this cycle, read from its indexed history. */
+export type CycleSpend =
+  | { status: 'loading' }
+  | { status: 'unknown' }
+  | { status: 'ready'; eth: number; cst: number };
 
 /** Wiring for the panel: live data, shared form state, and submit control. */
 export interface GesturePanelProps {
@@ -92,11 +102,13 @@ export interface GesturePanelProps {
   form: GesturePanelFormState;
   /** Live-derived CST state (elapsed seconds extrapolated between polls). */
   cstGestureData: CstGestureData;
-  /** The one shared submit label — the shown cost can never drift. */
-  submitLabel: string;
+  /** The one shared submit label, as verb and price — the shown cost can never drift. */
+  submit: GestureSubmitParts;
   canGesture: boolean;
   isGesturing: boolean;
-  /** True once the finalization clock has ended (submit hides, note stays accurate). */
+  /** The gesture transaction's lifecycle, shown under the commit button. */
+  txStage: TxStage;
+  /** True once the finalization clock has ended. */
   cycleTimerEnded: boolean;
   onSubmit: () => void;
   /** Method switch that also resets any picked RandomWalk token. */
@@ -106,33 +118,53 @@ export interface GesturePanelProps {
    * `sheet` renders the same panel inside the mobile bottom sheet.
    */
   variant?: 'card' | 'sheet';
-  /** Shares wide in-page space between method context and the message editor. */
-  layout?: 'stacked' | 'wide';
-  /** Removes the standalone card treatment inside the unified control desk/sheet. */
-  embedded?: boolean;
-  /** The surrounding dashboard already renders the live Calibration Window. */
-  calibrationExternal?: boolean;
+  /** What the connected wallet spent this cycle; omit while disconnected. */
+  cycleSpend?: CycleSpend | null;
+  /** Moves to the clock's Finalize action (the Last Gesture holder at zero). */
+  onGoToFinalize?: () => void;
+  /** Each increment opens the message editor and focuses it (the chat's join action). */
+  messageFocusRequest?: number;
   messageInputRef?: RefObject<HTMLTextAreaElement | null>;
   className?: string;
 }
 
-const METHOD_OPTIONS = [
-  { value: 'ETH', messageKey: 'eth' },
-  { value: 'RandomWalk', messageKey: 'randomWalk' },
-  { value: 'CST', messageKey: 'cst' },
-] as const;
+/** The ETH the form sends, in wei: the cost plus the collision buffer, then the NFT reduction. */
+function ethSendWei(priceWei: bigint, gestureType: string, bufferPercent: number): bigint {
+  const buffered = (priceWei * BigInt(100 + bufferPercent)) / 100n;
+  return gestureType === 'RandomWalk'
+    ? (buffered * BigInt(100 - protocolFacts.randomWalkDiscountPercentage)) / 100n
+    : buffered;
+}
 
-function formatCompactCstDelta(value: number): string {
-  return formatCstAmount(value)
-    .replace(/(\.\d*?)0+$/, '$1')
-    .replace(/\.$/, '');
+function SpecRow({
+  label,
+  value,
+  testId,
+  valueClassName,
+}: {
+  label: ReactNode;
+  value: ReactNode;
+  testId?: string;
+  valueClassName?: string;
+}) {
+  return (
+    <div data-testid={testId} className="flex min-w-0 items-baseline justify-between gap-4 py-2.5">
+      <dt className="type-label min-w-0 text-subtle">{label}</dt>
+      {/* The label wraps; the figure keeps its width, so it never overflows the row. */}
+      <dd className={cn('type-figure-sm shrink-0 text-end text-foreground', valueClassName)}>
+        {value}
+      </dd>
+    </div>
+  );
 }
 
 /**
- * The one gesture surface. Every way to participate — ETH, ETH + RandomWalk,
- * CST — lives here with its live cost, the on-chain message, asset
- * attachments, and the protections, so there is exactly one place to act and
- * one mental model to learn.
+ * The one gesture surface, in reading order: the method (each with its live
+ * price), what the Gesture imprints, an optional message, the optional
+ * settings, the not-refunded note beside what this wallet already spent, and
+ * the one commit action with its price. The decision and the action lead; the
+ * message recedes behind "Add a message" until it is wanted. The wallet's
+ * standing sits beside it on the desk (ControlDesk), not inside the form.
  */
 export function GesturePanel({
   data,
@@ -141,810 +173,512 @@ export function GesturePanel({
   account = null,
   form,
   cstGestureData,
-  submitLabel,
+  submit,
   canGesture,
   isGesturing,
+  txStage,
   cycleTimerEnded,
   onSubmit,
   onSelectGestureType,
   variant = 'card',
-  layout = 'stacked',
-  embedded = false,
-  calibrationExternal = false,
+  cycleSpend = null,
+  onGoToFinalize,
+  messageFocusRequest = 0,
   messageInputRef,
   className,
 }: GesturePanelProps) {
   const t = useTranslations('home');
-  const tCommon = useTranslations('common');
   const locale = useLocale();
-  const compactDesk = embedded && variant === 'card';
-  const wideLayout = layout === 'wide' && variant === 'card';
+  const stageLabel = useTxStageLabel();
+  const isSheet = variant === 'sheet';
+  const messageId = `gesture-message-${variant}`;
+  const messageRegionId = useId();
+  const advancedRegionId = useId();
+  const localMessageRef = useRef<HTMLTextAreaElement | null>(null);
 
   const {
     gestureType,
-    contributionType,
-    setContributionType,
     message,
     setMessage,
-    nftDonateAddress,
-    setNftDonateAddress,
-    nftId,
-    setNftId,
-    tokenDonateAddress,
-    setTokenDonateAddress,
-    tokenAmount,
-    setTokenAmount,
     rwlkId,
     setRwlkId,
     gestureCostPlus,
-    setBidPricePlus,
     advancedExpanded,
     setAdvancedExpanded,
     rwlknftIds,
+    rwlkListStatus = 'ready',
     ethGestureInfo,
     gestureCstRewardAmount = null,
     gestureCstRewardAmountMin = null,
     isCstRewardLoading = false,
-    cstRewardTolerancePercent = 1,
-    setCstRewardTolerancePercent,
     acceptAnyCstReward = false,
-    setAcceptAnyCstReward,
   } = form;
 
+  // The message recedes in the page form and opens in the sheet; a shared
+  // draft (typed in the other surface) keeps it open.
+  const [messageOpen, setMessageOpen] = useState(isSheet || message !== '');
+  const [handledFocusRequest, setHandledFocusRequest] = useState(messageFocusRequest);
+  if (messageFocusRequest !== handledFocusRequest) {
+    setHandledFocusRequest(messageFocusRequest);
+    if (messageFocusRequest > 0) setMessageOpen(true);
+  }
+  if (!messageOpen && message !== '') setMessageOpen(true);
+  useEffect(() => {
+    if (messageFocusRequest <= 0) return undefined;
+    const id = window.requestAnimationFrame(() =>
+      (messageInputRef?.current ?? localMessageRef.current)?.focus({ preventScroll: true }),
+    );
+    return () => window.cancelAnimationFrame(id);
+  }, [messageFocusRequest, messageInputRef]);
+
+  const setTextareaRef = (node: HTMLTextAreaElement | null) => {
+    localMessageRef.current = node;
+    if (messageInputRef) messageInputRef.current = node;
+  };
+
   const preview = !account;
-  const selectedMethod = METHOD_OPTIONS.find((option) => option.value === gestureType);
   const isFirstGesture = data?.LastBidderAddr === zeroAddress;
-  const showAllMethods = !isFirstGesture;
-  const visibleMethods = showAllMethods
-    ? METHOD_OPTIONS
-    : METHOD_OPTIONS.filter((option) => option.value === 'ETH');
+  const methods = isFirstGesture
+    ? GESTURE_METHODS.filter((method) => method.value === 'ETH')
+    : GESTURE_METHODS;
 
   const ethPrice = ethGestureInfo?.ETHPrice;
   const hasEthQuote = ethPrice != null && Number.isFinite(ethPrice) && ethPrice >= 0;
   const hasCstQuote = cstGestureData.source !== 'empty';
-  const quotePending = tCommon('status.loadingDots');
-  const methodCost: Record<(typeof METHOD_OPTIONS)[number]['value'], string> = {
+  const cstParts = hasCstQuote
+    ? formatAmountParts(cstGestureData.isFree ? 0 : cstGestureData.CSTPrice, {
+        unit: 'CST',
+        locale,
+      })
+    : null;
+  const costs: Record<GestureMethodValue, MethodCost | null> = {
     ETH: hasEthQuote
-      ? `${formatEthQuote(ethGestureBaseCost(ethPrice, 'ETH'), locale)} ETH`
-      : quotePending,
+      ? { value: formatEthQuote(ethGestureBaseCost(ethPrice, 'ETH'), locale), unit: 'ETH' }
+      : null,
     RandomWalk: hasEthQuote
-      ? `${formatEthQuote(ethGestureBaseCost(ethPrice, 'RandomWalk'), locale)} ETH`
-      : quotePending,
-    CST: !hasCstQuote
-      ? quotePending
-      : cstGestureData.isFree
-        ? t('status.metrics.free')
-        : `${formatCstAmount(cstGestureData.CSTPrice)} CST`,
+      ? { value: formatEthQuote(ethGestureBaseCost(ethPrice, 'RandomWalk'), locale), unit: 'ETH' }
+      : null,
+    CST: cstParts ? { value: cstParts.number, unit: 'CST' } : null,
   };
 
-  const currentCstGestureCost = cstGestureData.isFree ? 0 : cstGestureData.CSTPrice;
+  const ethMethod = gestureType === 'ETH' || gestureType === 'RandomWalk';
+  const currentCstCost = cstGestureData.isFree ? 0 : cstGestureData.CSTPrice;
   const hasCstReward = gestureCstRewardAmount != null && Number.isFinite(gestureCstRewardAmount);
-  const hasCstCost =
-    hasCstQuote && Number.isFinite(currentCstGestureCost) && currentCstGestureCost >= 0;
-  const netCstAmount =
-    hasCstReward && hasCstCost ? gestureCstRewardAmount - currentCstGestureCost : null;
-  const netCstLabel =
-    netCstAmount == null
-      ? t('form.reward.cstAmount', { amount: '--' })
-      : t('form.reward.cstAmount', {
-          amount: `${netCstAmount > 0 ? '+' : netCstAmount < 0 ? '-' : ''}${formatCompactCstDelta(
-            Math.abs(netCstAmount),
-          )}`,
-        });
-  const rewardPreviewTitle =
-    gestureType === 'CST' ? t('form.reward.economicsTitle') : t('form.reward.previewTitle');
-  const rewardPreviewDescription =
-    gestureType === 'CST'
-      ? t('form.reward.economicsDescription')
-      : t('form.reward.previewDescription');
-  const minAcceptedCstLabel =
-    !hasCstReward || isCstRewardLoading
-      ? t('form.reward.cstAmount', { amount: '--' })
-      : acceptAnyCstReward
-        ? t('form.reward.minAcceptedAny')
-        : t('form.reward.cstAmount', { amount: formatCstAmount(gestureCstRewardAmountMin) });
-  const minAcceptedCstTooltip = acceptAnyCstReward
-    ? t('form.reward.minAcceptedTooltipAny')
-    : t('form.reward.minAcceptedTooltip');
+  const hasCstCost = hasCstQuote && Number.isFinite(currentCstCost) && currentCstCost >= 0;
+  const netCst = hasCstReward && hasCstCost ? gestureCstRewardAmount - currentCstCost : null;
 
   const needsRwlkToken = gestureType === 'RandomWalk' && rwlkId === -1;
   const hasSelectedQuote = gestureType === 'CST' ? hasCstQuote : hasEthQuote;
-  const submitDisabled =
-    isGesturing || needsRwlkToken || gestureType === '' || !canGesture || !hasSelectedQuote;
+  const submitUnavailable = needsRwlkToken || gestureType === '' || !hasSelectedQuote;
+  const busyLabel = isGesturing ? stageLabel(txStage) : null;
 
-  const messageLabel = (
-    <>
-      {t('form.advanced.messageLabel')}{' '}
-      <span className="text-xs font-normal normal-case tracking-normal text-muted-foreground">
-        {t('form.advanced.messageOptionalHint', { maxLength: String(MESSAGE_MAX_LENGTH) })}
-      </span>
-    </>
-  );
-  const messageCounter = (
-    <span
-      id={`gesture-message-count-${variant}`}
-      data-testid="gesture-message-char-count"
-      className={cn(
-        'ml-auto shrink-0 text-xs tabular-nums',
-        message.length >= MESSAGE_COUNTER_WARN_AT ? 'text-amber-300' : 'text-muted-foreground',
-      )}
-    >
-      {message.length}/{MESSAGE_MAX_LENGTH}
-    </span>
-  );
-  const messageInput = (
-    <MessageTextarea
-      id={`gesture-message-${variant}`}
-      ref={messageInputRef}
-      data-testid="gesture-message-input"
-      aria-describedby={`gesture-message-count-${variant}`}
-      placeholder={t('form.advanced.messagePlaceholder')}
-      value={message}
-      maxLength={MESSAGE_MAX_LENGTH}
-      rows={3}
-      onChange={(e) => setMessage(e.target.value)}
-    />
-  );
+  const priceWei = ethGestureInfo?.ETHPriceWei;
+  const requiredWei =
+    account && ethMethod && priceWei != null
+      ? ethSendWei(priceWei, gestureType, gestureCostPlus)
+      : null;
+
+  // The running total earns its line once the wallet has spent something
+  // this cycle; before that the not-refunded note stands alone.
+  const showSpend =
+    cycleSpend != null &&
+    !(cycleSpend.status === 'ready' && cycleSpend.eth <= 0 && cycleSpend.cst <= 0);
+
+  const pendingValue = <ValuePending ch={9} />;
+  const cstAmount = (value: number | null) =>
+    value == null ? pendingValue : <Amount value={value} unit="CST" context="card" />;
 
   if (!loading && !isRoundActive) return null;
 
-  return (
-    <Surface
-      asChild
-      variant="plain"
-      radius={embedded ? 'none' : 'xl'}
-      padding="none"
-      className={cn(embedded && 'border-0 bg-transparent shadow-none', 'min-w-0', className)}
+  const decision = loading ? (
+    <div
+      className="space-y-4"
+      role="status"
+      aria-label={t('form.loadingAria')}
+      data-testid="gesture-panel-skeleton"
     >
-      <section
-        aria-labelledby={`gesture-panel-title-${variant}`}
-        data-testid="gesture-panel"
-        data-variant={variant}
-        id={variant === 'card' ? 'make-gesture' : undefined}
-        className="@container/gesture scroll-mt-24 focus:outline-none"
-        tabIndex={-1}
-      >
-        <div
-          className={cn(
-            'flex flex-col',
-            compactDesk ? 'gap-2 p-3' : embedded ? 'gap-3 p-3.5' : 'gap-3',
-            !embedded && (variant === 'card' ? 'p-4 sm:p-5' : 'p-1'),
-          )}
-        >
-          <div>
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-              <h2
-                id={`gesture-panel-title-${variant}`}
-                className={cn(
-                  'font-display font-bold tracking-tight',
-                  embedded ? 'text-base' : 'text-lg',
-                )}
-              >
-                {t('form.title')}
-              </h2>
-              {compactDesk && selectedMethod && (
-                <InfoTooltip content={t(`orientation.methods.${selectedMethod.messageKey}`)} />
-              )}
-              {compactDesk && !loading && gestureType === 'CST' && (
-                <UniswapTradeButton variant="compact" className="ml-auto" />
-              )}
-            </div>
-            <p className={cn('mt-0.5 text-xs text-muted-foreground', compactDesk && 'sr-only')}>
-              {t('form.subtitle')}
+      <Skeleton className="h-16 rounded-control" />
+      <Skeleton className="h-10" />
+      <Skeleton className="h-14 rounded-control" />
+    </div>
+  ) : (
+    <div data-testid="gesture-panel-layout" className="space-y-5">
+      <GestureMethodControl
+        methods={methods}
+        selected={gestureType}
+        costs={costs}
+        randomWalkEligible={rwlknftIds.length > 0}
+        onSelect={onSelectGestureType}
+        showLabel={isSheet}
+      />
+
+      {/* The method's explanation above already says what the NFT does;
+          the picker says only where the wallet's NFTs stand. */}
+      {gestureType === 'RandomWalk' && (
+        <div data-testid="panel-rwlk-picker" className="min-w-0">
+          <h3 id={`rwlk-picker-title-${variant}`} className="type-label text-foreground">
+            {t('form.rwlk.title')}
+          </h3>
+          {!account || rwlkListStatus === 'no-wallet' ? (
+            <p data-testid="panel-rwlk-connect" className="type-caption mt-1 text-subtle">
+              {t('form.rwlk.connect')}
             </p>
-          </div>
-
-          {loading ? (
-            <div
-              className="space-y-4"
+          ) : rwlkListStatus === 'error' ? (
+            <p
+              data-testid="panel-rwlk-error"
               role="status"
-              aria-label={t('form.loadingAria')}
-              data-testid="gesture-panel-skeleton"
+              className="type-caption mt-1 text-subtle"
             >
-              <div className="grid gap-2 grid-cols-3">
-                <Skeleton className="h-16 rounded-lg" />
-                <Skeleton className="h-16 rounded-lg" />
-                <Skeleton className="h-16 rounded-lg" />
-              </div>
-              <Skeleton className="h-20 rounded-lg" />
-              <Skeleton className="h-12 rounded-md" />
-            </div>
+              {t('form.rwlk.error')}
+            </p>
           ) : (
-            <div
-              data-testid="gesture-panel-layout"
-              className={cn(
-                'grid min-w-0 items-start',
-                compactDesk ? 'gap-2' : 'gap-3',
-                wideLayout && '@min-[44rem]/gesture:grid-cols-2 @min-[44rem]/gesture:gap-x-5',
-              )}
-            >
-              <div
-                data-testid="gesture-panel-context"
-                className={cn('flex min-w-0 flex-col', compactDesk ? 'gap-2' : 'gap-3')}
-              >
-                {/* Method picker: every way to gesture, each with its live cost. */}
-                <div>
-                  <Label
-                    className={cn(
-                      'mb-2 block text-xs font-medium uppercase tracking-wider text-muted-foreground',
-                      compactDesk && 'sr-only',
-                    )}
-                  >
-                    {t('form.methodLabel')}
-                  </Label>
-                  <div
-                    role="group"
-                    aria-label={t('form.methodLabel')}
-                    data-testid="panel-method-tabs"
-                    className={cn(
-                      'grid gap-2',
-                      visibleMethods.length === 1 ? 'grid-cols-1' : 'grid-cols-3',
-                    )}
-                  >
-                    {visibleMethods.map((option) => (
-                      <button
-                        key={option.value}
-                        type="button"
-                        data-testid={`panel-method-${option.messageKey}`}
-                        onClick={() => onSelectGestureType(option.value)}
-                        aria-pressed={gestureType === option.value}
-                        className={cn(
-                          'min-w-0 rounded-lg border px-2 text-center transition-all',
-                          compactDesk ? 'py-1.5' : embedded ? 'py-2' : 'min-h-20 py-3',
-                          gestureType === option.value
-                            ? 'border-primary/50 bg-primary/10 text-white'
-                            : 'border-white/[0.06] bg-white/[0.02] text-muted-foreground hover:bg-white/[0.04] hover:text-white',
-                        )}
-                      >
-                        <span className="block text-sm font-medium [overflow-wrap:anywhere]">
-                          {t(`form.method.${option.messageKey}.label`)}
-                        </span>
-                        {/* Wraps rather than truncating: at 320px the tab is
-                          ~76px wide and an ellipsis would hide the price —
-                          the one thing this control exists to show. */}
-                        <span
-                          data-testid={`panel-method-${option.messageKey}-cost`}
-                          className="mt-0.5 block font-mono text-xs leading-tight tabular-nums text-muted-foreground [overflow-wrap:anywhere]"
-                        >
-                          {methodCost[option.value]}
-                        </span>
-                        {!compactDesk && (
-                          <span className="mt-1 block text-[11px] text-muted-foreground">
-                            {t(`form.method.${option.messageKey}.desc`)}
-                          </span>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                  {!compactDesk && selectedMethod && (
-                    <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-                      {t(`orientation.methods.${selectedMethod.messageKey}`)}
-                    </p>
-                  )}
-                </div>
-
-                {/* Method context: calibration windows, token picker, CST trade. */}
-                {!calibrationExternal && isFirstGesture && hasEthQuote && (
-                  <AuctionInfo
-                    compact
-                    secondsElapsed={ethGestureInfo?.SecondsElapsed ?? 0}
-                    auctionDuration={ethGestureInfo?.AuctionDuration ?? 0}
-                    title={t('calibration.firstGestureTitle')}
-                    subtitle={t('calibration.firstGestureSubtitle')}
-                  />
-                )}
-
-                {!calibrationExternal && !isFirstGesture && hasCstQuote && (
-                  <AuctionInfo
-                    compact
-                    secondsElapsed={cstGestureData.SecondsElapsed}
-                    auctionDuration={cstGestureData.AuctionDuration}
-                    title={t('calibration.cstTitle')}
-                    subtitle={t('calibration.cstSubtitle', {
-                      decreasePercent: String(
-                        protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture,
-                      ),
-                      increasePercent: String(
-                        protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture,
-                      ),
-                    })}
-                    endedMessage={t('calibration.cstEndedMessage')}
-                  />
-                )}
-
-                {gestureType === 'CST' && !compactDesk && (
-                  <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-primary/15 bg-primary/[0.045] p-3">
-                    <p className="min-w-0 flex-1 text-xs text-muted-foreground">
-                      {t('form.cstTrade')}
-                    </p>
-                    <UniswapTradeButton variant="compact" />
-                  </div>
-                )}
-
-                {/* Participation CST economics for the chosen method. */}
-                {showAllMethods && (
-                  <div
-                    data-testid="panel-cst-reward"
-                    className={cn(
-                      'rounded-xl border border-emerald-400/15 bg-emerald-400/[0.045] text-sm',
-                      compactDesk ? 'p-2' : 'p-3',
-                    )}
-                  >
-                    <div className="flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
-                      <div className="flex min-w-0 items-center gap-1.5">
-                        <p className="text-xs font-medium text-muted-foreground">
-                          {rewardPreviewTitle}
-                        </p>
-                        <InfoTooltip content={rewardPreviewDescription} className="shrink-0" />
-                      </div>
-                      {gestureType !== 'CST' && (
-                        <p className="min-w-0 font-mono text-sm font-semibold tabular-nums text-emerald-300 [overflow-wrap:anywhere]">
-                          {isCstRewardLoading
-                            ? tCommon('status.loadingDots')
-                            : t('form.reward.cstAmount', {
-                                amount: formatCstAmount(gestureCstRewardAmount),
-                              })}
-                        </p>
-                      )}
-                    </div>
-                    {gestureType === 'CST' && (
-                      <dl
-                        data-testid="panel-cst-economics"
-                        className="mt-2 grid grid-cols-[repeat(3,minmax(0,1fr))] gap-1.5"
-                      >
-                        {[
-                          {
-                            key: 'reward',
-                            label: t('form.reward.rewardLabel'),
-                            value: isCstRewardLoading
-                              ? tCommon('status.loadingDots')
-                              : t('form.reward.cstAmount', {
-                                  amount: formatCstAmount(gestureCstRewardAmount),
-                                }),
-                            color: 'text-emerald-300',
-                          },
-                          {
-                            key: 'cost',
-                            label: t('form.reward.costLabel'),
-                            value: t('form.reward.cstAmount', {
-                              amount: hasCstCost ? formatCstAmount(currentCstGestureCost) : '--',
-                            }),
-                            color: 'text-foreground',
-                          },
-                          {
-                            key: 'net',
-                            label: t('form.reward.netLabel'),
-                            value: isCstRewardLoading ? tCommon('status.loadingDots') : netCstLabel,
-                            color:
-                              netCstAmount != null && netCstAmount > 0
-                                ? 'text-emerald-300'
-                                : netCstAmount != null && netCstAmount < 0
-                                  ? 'text-amber-200'
-                                  : 'text-muted-foreground',
-                          },
-                        ].map(({ key, label, value, color }) => (
-                          <div
-                            key={key}
-                            data-testid={`panel-cst-metric-${key}`}
-                            className="min-w-0 rounded-lg border border-white/[0.06] bg-white/[0.025] px-2 py-1.5"
-                          >
-                            <dt className="text-xs leading-tight text-muted-foreground [overflow-wrap:anywhere]">
-                              {label}
-                            </dt>
-                            <dd
-                              className={cn(
-                                'mt-1 font-mono text-xs font-semibold leading-snug tabular-nums [overflow-wrap:anywhere]',
-                                color,
-                              )}
-                            >
-                              {value}
-                            </dd>
-                          </div>
-                        ))}
-                      </dl>
-                    )}
-                    <p className="mt-1.5 flex min-w-0 items-start gap-1.5 text-xs text-muted-foreground">
-                      <span className="min-w-0 [overflow-wrap:anywhere]">
-                        {t('form.reward.minAccepted', { value: minAcceptedCstLabel })}
-                      </span>
-                      <InfoTooltip
-                        content={minAcceptedCstTooltip}
-                        ariaLabel={t('form.reward.minAcceptedAria')}
-                        maxWidth={320}
-                        side="top"
-                        className="mt-0.5 shrink-0 text-muted-foreground/60"
-                      />
-                    </p>
-                    {gestureType === 'CST' &&
-                      cstGestureData.source === 'contract' &&
-                      cstGestureData.apiAuctionDuration != null &&
-                      cstGestureData.apiAuctionDuration !== cstGestureData.AuctionDuration && (
-                        <p className="mt-2 text-xs text-amber-200/90">
-                          {t('form.reward.durationMismatch', {
-                            contractDuration: formatSeconds(cstGestureData.AuctionDuration, locale),
-                            apiDuration: formatSeconds(cstGestureData.apiAuctionDuration, locale),
-                          })}
-                        </p>
-                      )}
-                  </div>
-                )}
-
-                <p
-                  data-testid="participation-cost-note"
-                  className="text-xs leading-relaxed text-muted-foreground"
-                >
-                  {t('orientation.costsNote')}
-                </p>
-              </div>
-
-              {/* Drafting is available before connecting; only submission needs a wallet. */}
-              <div
-                data-testid="gesture-panel-message"
-                className="min-w-0 rounded-xl bg-primary/[0.05] p-3 ring-1 ring-inset ring-primary/20"
-              >
-                <div className="mb-2.5 flex items-center gap-2">
-                  <PenLine className="h-4 w-4 shrink-0 text-primary" aria-hidden />
-                  <Label
-                    htmlFor={`gesture-message-${variant}`}
-                    className="min-w-0 flex-1 text-sm font-semibold leading-snug text-foreground [overflow-wrap:anywhere]"
-                  >
-                    {messageLabel}
-                  </Label>
-                  <InfoTooltip
-                    content={t('form.advanced.messageTooltip')}
-                    ariaLabel={t('form.advanced.messageTooltipAria')}
-                    maxWidth={260}
-                  />
-                </div>
-                {messageInput}
-                <div className="mt-2 flex justify-end">{messageCounter}</div>
-              </div>
-
-              {/* Asset selection can grow; give it a full row before transaction options. */}
-              {gestureType === 'RandomWalk' && (
-                <div
-                  data-testid="panel-rwlk-picker"
-                  className={cn(
-                    'min-w-0 rounded-xl border border-white/[0.06] bg-white/[0.03] p-3',
-                    wideLayout && '@min-[44rem]/gesture:col-span-2',
-                  )}
-                >
-                  <div className="mb-2 flex items-center gap-2">
-                    <h3 className="text-sm font-semibold">{t('form.rwlk.title')}</h3>
-                    <InfoTooltip
-                      content={t('form.rwlk.tooltip')}
-                      ariaLabel={t('form.rwlk.tooltipAria')}
-                    />
-                  </div>
-                  <PaginationRWLKGrid
-                    compact={wideLayout}
-                    loading={false}
-                    data={rwlknftIds}
-                    selectedToken={rwlkId}
-                    setSelectedToken={setRwlkId}
-                  />
-                </div>
-              )}
-
-              {/* Advanced: attachments and transaction protections. */}
-              {!preview && (
-                <Accordion
-                  type="single"
-                  collapsible
-                  data-testid="gesture-panel-advanced"
-                  className={cn(
-                    'min-w-0',
-                    wideLayout && advancedExpanded && '@min-[44rem]/gesture:col-span-2',
-                  )}
-                  value={advancedExpanded ? 'advanced' : ''}
-                  onValueChange={(val) => !preview && setAdvancedExpanded(val === 'advanced')}
-                >
-                  <AccordionItem value="advanced" className="border-white/[0.06]">
-                    <AccordionTrigger
-                      disabled={preview}
-                      className={cn(
-                        'py-2.5 text-sm text-muted-foreground hover:text-white',
-                        TOUCH_TARGET_HEIGHT_CLASS,
-                      )}
-                    >
-                      <span className="flex items-center gap-2">
-                        <Settings2 className="h-4 w-4" />
-                        {t('form.advanced.title')}
-                      </span>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <div className="space-y-4 pt-1">
-                        <p className="text-xs text-muted-foreground">
-                          {t('form.advanced.attachIntro')}
-                        </p>
-                        {showAllMethods && (
-                          <div className="space-y-3 rounded-lg border border-white/[0.06] bg-white/[0.02] p-3.5">
-                            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                              {t('form.advanced.minCstProtection.title')}
-                            </p>
-                            <p className="text-xs leading-relaxed text-muted-foreground">
-                              {t('form.advanced.minCstProtection.body')}
-                            </p>
-                            <label className="flex items-start gap-2 rounded-md border border-white/[0.06] bg-white/[0.02] p-3 text-sm">
-                              <Checkbox
-                                checked={acceptAnyCstReward}
-                                disabled={preview || !setAcceptAnyCstReward}
-                                onChange={(e) => setAcceptAnyCstReward?.(e.currentTarget.checked)}
-                                aria-label={t('form.advanced.minCstProtection.acceptAnyAria')}
-                              />
-                              <span>
-                                <span className="block font-medium text-foreground">
-                                  {t('form.advanced.minCstProtection.acceptAnyTitle')}
-                                </span>
-                                <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">
-                                  {t('form.advanced.minCstProtection.acceptAnyBody')}
-                                </span>
-                              </span>
-                            </label>
-                            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2">
-                              <div className="flex shrink-0 items-center gap-2">
-                                <span className="whitespace-nowrap text-sm text-muted-foreground">
-                                  {t('form.advanced.minCstProtection.toleranceLabel')}
-                                </span>
-                                <div className="relative w-[4.75rem] shrink-0">
-                                  <CustomTextField
-                                    type="number"
-                                    placeholder="1"
-                                    value={cstRewardTolerancePercent}
-                                    min={0}
-                                    max={100}
-                                    step={0.1}
-                                    className="h-9 px-2.5 py-2 pr-7 text-sm tabular-nums"
-                                    disabled={
-                                      acceptAnyCstReward || preview || !setCstRewardTolerancePercent
-                                    }
-                                    onChange={(e) =>
-                                      setCstRewardTolerancePercent?.(Number(e.target.value))
-                                    }
-                                  />
-                                  <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
-                                    %
-                                  </span>
-                                </div>
-                              </div>
-                              <span className="min-w-0 font-mono text-sm tabular-nums text-muted-foreground">
-                                {t('form.advanced.minCstProtection.minAmount', {
-                                  amount: formatCstAmount(gestureCstRewardAmountMin),
-                                })}
-                              </span>
-                            </div>
-                            <p className="text-xs leading-relaxed text-muted-foreground">
-                              {t('form.advanced.minCstProtection.revertNote')}
-                            </p>
-                          </div>
-                        )}
-                        <RadioGroup
-                          value={contributionType}
-                          onValueChange={(value) => {
-                            setRwlkId(-1);
-                            setContributionType(value);
-                          }}
-                          className="flex flex-row flex-wrap gap-x-4 gap-y-2"
-                        >
-                          <label className="flex cursor-pointer items-center gap-1.5">
-                            <RadioGroupItem value="NFT" />
-                            <span className="text-sm">{t('form.advanced.attachNft')}</span>
-                          </label>
-                          <label className="flex cursor-pointer items-center gap-1.5">
-                            <RadioGroupItem value="Token" />
-                            <span className="text-sm">{t('form.advanced.attachToken')}</span>
-                          </label>
-                        </RadioGroup>
-                        {contributionType === 'Token' && (
-                          <div className="space-y-3">
-                            <div className="min-w-0">
-                              <Label className="mb-1 block text-xs text-muted-foreground">
-                                {t('form.advanced.tokenContractLabel')}
-                              </Label>
-                              <Input
-                                placeholder="0x..."
-                                value={tokenDonateAddress}
-                                onChange={(e) => setTokenDonateAddress(e.target.value)}
-                                disabled={preview}
-                                className="w-full font-mono text-sm"
-                                spellCheck={false}
-                                autoComplete="off"
-                              />
-                            </div>
-                            <div className="w-full max-w-[11rem]">
-                              <Label className="mb-1 block text-xs text-muted-foreground">
-                                {t('form.advanced.tokenAmountLabel')}
-                              </Label>
-                              <Input
-                                placeholder="0.0"
-                                type="number"
-                                value={tokenAmount}
-                                onChange={(e) => setTokenAmount(e.target.value)}
-                                disabled={preview}
-                                className="font-mono text-sm tabular-nums"
-                              />
-                            </div>
-                          </div>
-                        )}
-                        {contributionType === 'NFT' && (
-                          <div className="space-y-3">
-                            <div className="min-w-0">
-                              <Label className="mb-1 block text-xs text-muted-foreground">
-                                {t('form.advanced.nftContractLabel')}
-                              </Label>
-                              <Input
-                                placeholder="0x..."
-                                value={nftDonateAddress}
-                                onChange={(e) => setNftDonateAddress(e.target.value)}
-                                disabled={preview}
-                                className="w-full font-mono text-sm"
-                                spellCheck={false}
-                                autoComplete="off"
-                              />
-                            </div>
-                            <div className="w-full max-w-[7.5rem]">
-                              <Label className="mb-1 block text-xs text-muted-foreground">
-                                {t('form.advanced.nftIdLabel')}
-                              </Label>
-                              <Input
-                                placeholder={t('form.advanced.nftIdPlaceholder')}
-                                type="number"
-                                min={0}
-                                value={nftId}
-                                onChange={(e) => setNftId(e.target.value)}
-                                disabled={preview}
-                                className="font-mono text-sm tabular-nums"
-                              />
-                            </div>
-                          </div>
-                        )}
-                        {gestureType !== 'CST' && (
-                          <div className="space-y-3 rounded-lg border border-white/[0.06] bg-white/[0.02] p-3.5">
-                            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                              {t('form.advanced.collision.title')}
-                            </p>
-                            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2">
-                              <div className="flex shrink-0 items-center gap-2">
-                                <span className="whitespace-nowrap text-sm text-muted-foreground">
-                                  {t('form.advanced.collision.raiseBy')}
-                                </span>
-                                <div className="relative w-[4.25rem] shrink-0">
-                                  <CustomTextField
-                                    type="number"
-                                    placeholder="0"
-                                    value={gestureCostPlus}
-                                    min={0}
-                                    max={MAX_COLLISION_BUFFER_PERCENT}
-                                    step={1}
-                                    data-testid="collision-buffer-input"
-                                    className="h-9 px-2.5 py-2 pr-7 text-sm tabular-nums"
-                                    disabled={preview}
-                                    onChange={(e) => {
-                                      setBidPricePlus(clampCollisionBufferPercent(e.target.value));
-                                    }}
-                                  />
-                                  <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
-                                    %
-                                  </span>
-                                </div>
-                              </div>
-                              <span
-                                className="min-w-0 font-mono text-sm tabular-nums text-muted-foreground"
-                                data-testid="collision-send-amount"
-                              >
-                                {hasEthQuote
-                                  ? t('form.advanced.collision.approxCost', {
-                                      amount: formatEthQuote(
-                                        ethGestureSendAmount(
-                                          ethPrice,
-                                          gestureType,
-                                          gestureCostPlus,
-                                        ),
-                                        locale,
-                                      ),
-                                    })
-                                  : quotePending}
-                              </span>
-                            </div>
-                            <p className="text-xs leading-relaxed text-muted-foreground">
-                              {t('form.advanced.collision.note', {
-                                percent: String(gestureCostPlus),
-                              })}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              )}
-
-              {/* DOM order keeps optional protections before submission. Expanded
-                  settings use a full row; the editor and action stay adjacent otherwise. */}
-              <div
-                data-testid="gesture-panel-action"
-                className={cn('min-w-0', wideLayout && '@min-[44rem]/gesture:col-start-2')}
-              >
-                {account ? (
-                  <div className="space-y-2.5">
-                    {canGesture ? (
-                      <Button
-                        id={variant === 'card' ? 'gesture-submit' : 'gesture-submit-sheet'}
-                        variant="commit"
-                        size="lg"
-                        onClick={onSubmit}
-                        className="h-auto min-h-12 w-full whitespace-normal border-0 px-3 py-2.5 text-sm font-semibold text-primary-foreground"
-                        disabled={submitDisabled}
-                      >
-                        {isGesturing ? (
-                          <span className="flex items-center gap-2">
-                            <Spinner size="sm" /> {t('form.processing')}
-                          </span>
-                        ) : (
-                          <>
-                            <span className="min-w-0 [overflow-wrap:anywhere]">{submitLabel}</span>
-                            <ArrowRight className="h-5 w-5 shrink-0" />
-                          </>
-                        )}
-                      </Button>
-                    ) : (
-                      !cycleTimerEnded && (
-                        <p className="text-sm text-muted-foreground">
-                          {t('form.finalGestureMade')}
-                        </p>
-                      )
-                    )}
-                    {canGesture && gestureType !== 'CST' && hasEthQuote && gestureCostPlus > 0 ? (
-                      <p
-                        className="text-xs leading-relaxed text-muted-foreground"
-                        data-testid="gesture-send-amount"
-                      >
-                        {t('form.submit.sendsNote', {
-                          amount: formatEthQuote(
-                            ethGestureSendAmount(ethPrice, gestureType, gestureCostPlus),
-                            locale,
-                          ),
-                          percent: gestureCostPlus,
-                        })}
-                      </p>
-                    ) : null}
-                    {!compactDesk && (
-                      <p className="text-xs leading-relaxed text-muted-foreground">
-                        {t('observatory.panel.microcopy')}
-                      </p>
-                    )}
-                  </div>
-                ) : (
-                  <div
-                    data-testid="connect-to-gesture"
-                    className={cn(
-                      'flex flex-col items-stretch border-t border-white/10 [&_button]:w-full',
-                      compactDesk ? 'gap-2 pt-2' : 'gap-4 pt-5',
-                    )}
-                  >
-                    <div className={cn('min-w-0 flex-1', compactDesk && 'sr-only')}>
-                      {!compactDesk && (
-                        <h3 className="font-display text-base font-semibold tracking-tight">
-                          {t('form.connect.title')}
-                        </h3>
-                      )}
-                      <p className="text-xs leading-relaxed text-muted-foreground">
-                        {t('orientation.connectHelp')}
-                      </p>
-                    </div>
-                    <ConnectWalletButton
-                      isMobileView={false}
-                      loading={false}
-                      balance={{ ETH: 0, CosmicToken: 0, CosmicSignature: 0, RWLK: 0 }}
-                      stakedTokenCount={{ cst: 0, rwalk: 0 }}
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
+            <PaginationRWLKGrid
+              compact={!isSheet}
+              loading={rwlkListStatus === 'loading'}
+              data={rwlknftIds}
+              selectedToken={rwlkId}
+              setSelectedToken={setRwlkId}
+              labelledBy={`rwlk-picker-title-${variant}`}
+            />
           )}
         </div>
-      </section>
-    </Surface>
+      )}
+
+      {/* What this Gesture imprints, as spec rows: label left, figure right. */}
+      {!isFirstGesture && (
+        <dl
+          data-testid="panel-cst-reward"
+          className="divide-y divide-rule-faint border-y border-rule-faint"
+        >
+          {gestureType === 'CST' ? (
+            <>
+              <SpecRow
+                testId="panel-cst-metric-reward"
+                label={
+                  <ExplainedTerm definition={t('form.reward.economicsDescription')}>
+                    {t('form.reward.rewardLabel')}
+                  </ExplainedTerm>
+                }
+                value={cstAmount(isCstRewardLoading ? null : gestureCstRewardAmount)}
+              />
+              <SpecRow
+                testId="panel-cst-metric-cost"
+                label={t('form.reward.costLabel')}
+                value={hasCstCost ? cstAmount(currentCstCost) : pendingValue}
+              />
+              <SpecRow
+                testId="panel-cst-metric-net"
+                label={t('form.reward.netLabel')}
+                value={
+                  netCst == null || isCstRewardLoading ? (
+                    pendingValue
+                  ) : (
+                    <Amount value={netCst} unit="CST" context="card" signDisplay="exceptZero" />
+                  )
+                }
+              />
+            </>
+          ) : (
+            <SpecRow
+              testId="panel-cst-metric-reward"
+              label={
+                <ExplainedTerm definition={t('form.reward.previewDescription')}>
+                  {t('form.reward.previewTitle')}
+                </ExplainedTerm>
+              }
+              value={cstAmount(isCstRewardLoading ? null : gestureCstRewardAmount)}
+            />
+          )}
+          <SpecRow
+            testId="panel-cst-min-accepted"
+            label={
+              <ExplainedTerm
+                definition={
+                  acceptAnyCstReward
+                    ? t('form.reward.minAcceptedTooltipAny')
+                    : t('form.reward.minAcceptedTooltip')
+                }
+              >
+                {t('form.reward.minAcceptedLabel')}
+              </ExplainedTerm>
+            }
+            value={
+              acceptAnyCstReward ? (
+                <span className="type-body-sm text-muted-foreground">
+                  {t('form.reward.minAcceptedAny')}
+                </span>
+              ) : (
+                cstAmount(!hasCstReward || isCstRewardLoading ? null : gestureCstRewardAmountMin)
+              )
+            }
+          />
+        </dl>
+      )}
+      {gestureType === 'CST' &&
+        cstGestureData.source === 'contract' &&
+        cstGestureData.apiAuctionDuration != null &&
+        cstGestureData.apiAuctionDuration !== cstGestureData.AuctionDuration && (
+          <p className="type-caption text-attention">
+            {t('form.reward.durationMismatch', {
+              contractDuration: formatDuration(cstGestureData.AuctionDuration, { locale }),
+              apiDuration: formatDuration(cstGestureData.apiAuctionDuration, { locale }),
+            })}
+          </p>
+        )}
+
+      {/* The optional message recedes until wanted; drafting needs no wallet. */}
+      <div data-testid="gesture-panel-message" className="min-w-0">
+        {isSheet ? null : (
+          <button
+            type="button"
+            data-testid="gesture-message-toggle"
+            aria-expanded={messageOpen}
+            aria-controls={messageRegionId}
+            onClick={() => setMessageOpen((open) => !open)}
+            className="group inline-flex min-h-11 items-center gap-2 rounded-control text-start text-sm font-medium text-foreground sm:min-h-9"
+          >
+            <PenLine className="size-4 shrink-0 text-subtle" aria-hidden />
+            <span>
+              {t('form.message.add')}{' '}
+              {/* The hint moves to its own line whole rather than breaking inside. */}
+              <span className="type-caption font-normal whitespace-nowrap text-subtle">
+                {t('form.advanced.messageOptionalHint', { maxLength: String(MESSAGE_MAX_LENGTH) })}
+              </span>
+            </span>
+            <ChevronDown
+              className="size-4 shrink-0 text-subtle transition-transform duration-[var(--duration-base)] group-aria-expanded:rotate-180 motion-reduce:transition-none"
+              aria-hidden
+            />
+          </button>
+        )}
+        <div id={messageRegionId} hidden={!messageOpen} className={cn(!isSheet && 'mt-2')}>
+          <div className="flex items-baseline justify-between gap-3">
+            <label htmlFor={messageId} className="type-label text-muted-foreground">
+              {t('form.advanced.messageLabel')}
+              {isSheet && (
+                <>
+                  {' '}
+                  <span className="type-caption text-subtle">
+                    {t('form.advanced.messageOptionalHint', {
+                      maxLength: String(MESSAGE_MAX_LENGTH),
+                    })}
+                  </span>
+                </>
+              )}
+            </label>
+            <span
+              id={`${messageId}-count`}
+              data-testid="gesture-message-char-count"
+              className={cn(
+                'type-caption shrink-0 tabular-nums',
+                message.length >= MESSAGE_COUNTER_WARN_AT ? 'text-attention' : 'text-subtle',
+              )}
+            >
+              {message.length}/{MESSAGE_MAX_LENGTH}
+            </span>
+          </div>
+          <MessageTextarea
+            id={messageId}
+            ref={setTextareaRef}
+            data-testid="gesture-message-input"
+            aria-describedby={`${messageId}-count ${messageId}-note`}
+            placeholder={t('form.advanced.messagePlaceholder')}
+            value={message}
+            maxLength={MESSAGE_MAX_LENGTH}
+            rows={3}
+            onChange={(event) => setMessage(event.target.value)}
+            className="mt-1.5"
+          />
+          <p id={`${messageId}-note`} className="type-caption mt-1.5 text-subtle">
+            {t('form.advanced.messageTooltip')}
+          </p>
+        </div>
+      </div>
+
+      {/* Optional transaction settings, for a connected wallet. */}
+      {!preview && (
+        <div data-testid="gesture-panel-advanced" className="min-w-0">
+          <button
+            type="button"
+            id={`${advancedRegionId}-trigger`}
+            aria-expanded={advancedExpanded}
+            aria-controls={advancedRegionId}
+            onClick={() => setAdvancedExpanded(!advancedExpanded)}
+            className="group inline-flex min-h-11 items-center gap-2 rounded-control text-sm font-medium text-muted-foreground hover:text-foreground sm:min-h-9"
+          >
+            <Settings2 className="size-4 shrink-0 text-subtle" aria-hidden />
+            {t('form.advanced.title')}
+            <ChevronDown
+              className="size-4 shrink-0 text-subtle transition-transform duration-[var(--duration-base)] group-aria-expanded:rotate-180 motion-reduce:transition-none"
+              aria-hidden
+            />
+          </button>
+          <div
+            id={advancedRegionId}
+            role="region"
+            aria-labelledby={`${advancedRegionId}-trigger`}
+            hidden={!advancedExpanded}
+            className="mt-3"
+          >
+            {advancedExpanded && (
+              <GestureAdvanced
+                form={form}
+                showCstProtection={!isFirstGesture}
+                ethPrice={hasEthQuote ? ethPrice : null}
+                ethMethod={ethMethod}
+              />
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  const action = loading ? null : (
+    <div
+      data-testid="gesture-panel-action"
+      className={cn(
+        'space-y-3',
+        isSheet
+          ? 'sticky bottom-0 -mx-4 border-t border-rule-faint bg-surface-raised px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4'
+          : 'border-t border-rule-faint pt-5',
+      )}
+    >
+      {/* The sheet's action row stays pinned, so its note sets small. */}
+      <p
+        data-testid="participation-cost-note"
+        className={cn(isSheet ? 'type-caption' : 'type-body-sm', 'text-muted-foreground')}
+      >
+        {t('orientation.costsNote')}
+      </p>
+      {showSpend && cycleSpend && (
+        <p data-testid="personal-spent" className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+          <span className="type-label text-subtle">{t('observatory.standing.spent')}</span>{' '}
+          <span className="type-figure-sm text-foreground">
+            {cycleSpend.status === 'loading' ? (
+              <ValuePending ch={16} />
+            ) : cycleSpend.status === 'unknown' ? (
+              <UnknownValue label={t('observatory.standing.checkFailed')} />
+            ) : (
+              <>
+                {cycleSpend.eth > 0 ? (
+                  <Amount value={cycleSpend.eth} unit="ETH" context="card" />
+                ) : null}
+                {/* Two currencies side by side, never summed into one figure. */}
+                {cycleSpend.eth > 0 && cycleSpend.cst > 0 ? (
+                  <span className="px-1.5 text-subtle"> · </span>
+                ) : null}
+                {cycleSpend.cst > 0 ? (
+                  <Amount value={cycleSpend.cst} unit="CST" context="card" />
+                ) : null}
+              </>
+            )}
+          </span>
+        </p>
+      )}
+
+      {account ? (
+        canGesture ? (
+          <>
+            {ethMethod && <FundingNotice requiredWei={requiredWei} />}
+            <ChainGuard buttonClassName="w-full min-h-14">
+              <Button
+                id={isSheet ? 'gesture-submit-sheet' : 'gesture-submit'}
+                variant="commit"
+                size="xl"
+                onClick={onSubmit}
+                loading={isGesturing}
+                disabled={submitUnavailable}
+                className={COMMIT_WRAP}
+              >
+                {busyLabel ?? (
+                  // One line with a dot where the button is wide enough; in a
+                  // phone column the verb and the price stack, so no line
+                  // ever starts on the separator.
+                  <span className="flex min-w-0 flex-col items-center leading-tight @[24rem]/commit:flex-row @[24rem]/commit:items-baseline @[24rem]/commit:gap-x-2">
+                    <span>{submit.action}</span>{' '}
+                    {submit.cost && (
+                      <>
+                        <span aria-hidden className="hidden font-normal @[24rem]/commit:inline">
+                          ·
+                        </span>{' '}
+                        <span className="text-sm font-medium tabular-nums @[24rem]/commit:text-base @[24rem]/commit:font-semibold">
+                          {submit.cost}
+                        </span>
+                      </>
+                    )}
+                  </span>
+                )}
+              </Button>
+            </ChainGuard>
+            <TxStatus stage={txStage} variant="steps" />
+            {ethMethod && hasEthQuote && gestureCostPlus > 0 && !isGesturing ? (
+              <p className="type-caption text-subtle" data-testid="gesture-send-amount">
+                {t('form.submit.sendsNote', {
+                  amount: formatEthQuote(
+                    ethGestureSendAmount(ethPrice, gestureType, gestureCostPlus),
+                    locale,
+                  ),
+                  percent: gestureCostPlus,
+                })}
+              </p>
+            ) : null}
+          </>
+        ) : cycleTimerEnded ? (
+          <div data-testid="gesture-finalize-pointer" className="space-y-3">
+            <p className="type-body-sm text-foreground">{t('form.finalizeAtClock')}</p>
+            {onGoToFinalize && (
+              <Button variant="outline" onClick={onGoToFinalize} className="w-full">
+                {t('observatory.standing.goToFinalize')}
+                <ArrowRight aria-hidden />
+              </Button>
+            )}
+          </div>
+        ) : (
+          <p className="type-body-sm text-muted-foreground">{t('form.finalGestureMade')}</p>
+        )
+      ) : (
+        <div data-testid="connect-to-gesture" className="space-y-2">
+          <ConnectWalletAction
+            variant="commit"
+            size="xl"
+            warmOnVisible
+            // The icon flows with the label's first line, so a label that
+            // wraps on a phone never leaves it stranded beside two lines.
+            showIcon={false}
+            label={
+              <span>
+                <Wallet aria-hidden className="me-2 inline size-4 align-[-0.125em]" />
+                {t('form.connect.cta')}
+              </span>
+            }
+            className={COMMIT_WRAP}
+          />
+          <p className="type-caption text-center text-subtle">{t('orientation.connectHelp')}</p>
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <section
+      aria-labelledby={`gesture-panel-title-${variant}`}
+      data-testid="gesture-panel"
+      data-variant={variant}
+      id={isSheet ? undefined : 'make-gesture'}
+      className={cn('@container/gesture min-w-0 scroll-mt-24 focus:outline-none', className)}
+      tabIndex={-1}
+    >
+      <div className="min-w-0 space-y-3.5">
+        <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+          <h2 id={`gesture-panel-title-${variant}`} className="type-heading-3 text-foreground">
+            {t('form.title')}
+          </h2>
+          {!loading && gestureType === 'CST' && <UniswapTradeButton variant="compact" />}
+        </header>
+        {decision}
+        {action}
+      </div>
+    </section>
   );
 }

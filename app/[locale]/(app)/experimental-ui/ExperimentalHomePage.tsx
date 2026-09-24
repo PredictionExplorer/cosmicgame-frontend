@@ -23,7 +23,10 @@ import { useActiveWeb3React } from '@/hooks/web3';
 import { GestureMessageChat, type PendingChatMessage } from '@/components/home/GestureMessageChat';
 import { deriveFeedSystemEvents } from '@/components/home/deck/feedSystemEvents';
 import { ActionDock } from '@/components/home/observatory/ActionDock';
-import { getGestureSubmitLabel } from '@/components/home/observatory/gestureSubmitLabel';
+import {
+  getGestureSubmitLabel,
+  getGestureSubmitParts,
+} from '@/components/home/observatory/gestureSubmitLabel';
 import { AllocationTracksBoard } from '@/components/home/experimental/AllocationTracksBoard';
 import { CycleMonument } from '@/components/home/experimental/CycleMonument';
 import { CyclePhaseGuide } from '@/components/home/experimental/CyclePhaseGuide';
@@ -49,7 +52,7 @@ import { invalidateLiveGameQueries } from '@/hooks/useLiveGameDataRefresh';
 import { useNow } from '@/hooks/useNow';
 import { useRotatingIndex } from '@/hooks/useRotatingIndex';
 import { useTabTitleCountdown } from '@/hooks/useTabTitleCountdown';
-import { useTxStageLabel } from '@/hooks/useTxStageLabel';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import {
   trackChatJoinCtaClicked,
   trackFinalizeSubmitted,
@@ -325,7 +328,7 @@ const ExperimentalHomePage = ({
     cycleNumber: dashboardData?.CurRoundNum ?? null,
     notificationTitle: t('notifications.finalizationSoonTitle'),
     notificationBody: (minutesLeft) =>
-      t('notifications.finalizationSoonBody', { minutes: String(minutesLeft) }),
+      t('notifications.finalizationSoonBody', { minutes: minutesLeft }),
   });
   useGestureChime({
     account,
@@ -546,22 +549,20 @@ const ExperimentalHomePage = ({
   // The tab title ticks in the final window only when the viewer opted in.
   useTabTitleCountdown({ enabled: isFinalWindow, targetMs: allocationTime });
 
-  // The one label of every gesture submit (console, sheet and dock), so the
-  // quoted cost can never drift between them.
-  const submitLabel = getGestureSubmitLabel({
+  // The one quote behind every gesture submit (console, sheet and dock), so
+  // the cost shown can never drift between them. The shared dock sets the
+  // verb and the price on their own lines, and names the transaction stage
+  // or Finalize itself.
+  const submitQuote = {
     t,
     locale,
     gestureType,
     ethPrice: ethGestureInfo?.ETHPrice,
     rwlkId,
     cstGestureData: liveCstGestureData,
-  });
-  // The dock names what its console will do: the transaction stage while a
-  // Gesture is in flight, Finalize for the wallet whose move that is.
-  const stageLabel = useTxStageLabel();
-  const dockLabel =
-    (gestureForm.isGesturing ? stageLabel(gestureForm.gestureTxStage) : null) ??
-    (!canGesture && canClaim ? t('form.finalize') : submitLabel);
+  };
+  const submitLabel = getGestureSubmitLabel(submitQuote);
+  const submitParts = getGestureSubmitParts(submitQuote);
 
   const trackAmounts = useMemo(() => deriveAllocationTrackAmounts(data), [data]);
 
@@ -592,8 +593,9 @@ const ExperimentalHomePage = ({
   // Keyboard focus never lands under the dock.
   useFocusClearOfDock();
 
-  // The action dock: on desktop it appears once the monument has scrolled
-  // past; on phones it steps aside while the console itself is on screen.
+  // The action dock steps aside while the console itself is on screen; from
+  // 1024px it also waits until the monument has scrolled past.
+  const isDesktop = useMediaQuery('(min-width: 64rem)');
   const monumentRef = useRef<HTMLDivElement | null>(null);
   const consoleRef = useRef<HTMLDivElement | null>(null);
   const [monumentOutOfView, setMonumentOutOfView] = useState(false);
@@ -945,17 +947,23 @@ const ExperimentalHomePage = ({
       {/* The one persistent quick action: it routes to the console (the sheet
           on phones, a scroll on desktop) and never submits by itself. */}
       <ActionDock
-        stageOutOfView={monumentOutOfView}
+        stepAside={consoleInView || (isDesktop && !monumentOutOfView)}
         data={data}
         loading={loading}
         allocationTime={allocationTime}
         activationTime={activationTime}
         now={now}
         finalizationConfirmed={finalizationConfirmed}
-        submitLabel={dockLabel}
+        submit={submitParts}
+        isGesturing={gestureForm.isGesturing}
+        txStage={gestureForm.gestureTxStage}
+        account={account ?? null}
+        canClaim={canClaim}
+        isClaiming={isClaiming}
+        claimWait={claimWait}
+        onFinalize={() => void handleFinalize('dock')}
         onOpenSheet={openSheet}
         onJumpToPanel={scrollToConsole}
-        className={consoleInView ? 'hidden' : undefined}
       />
 
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>

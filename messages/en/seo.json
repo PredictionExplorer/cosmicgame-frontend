@@ -231,7 +231,7 @@
       "public-goods-contributions-cg": {
         "heading": "Protocol Public-Goods Contributions",
         "description": "Track automatic Cosmic Signature public-goods forwards from protocol cycles to the Public Goods Vault and its configured beneficiary — currently Protocol Guild.",
-        "source": "Cosmic Signature public public-goods APIs",
+        "source": "Cosmic Signature public-goods API",
         "links": {
           "learn": "Learn about public goods",
           "retrievals": "View public-goods retrievals",
@@ -256,7 +256,7 @@
       "public-goods-contributions-voluntary": {
         "heading": "Voluntary Public-Goods Contributions",
         "description": "Browse voluntary public-goods contributions from the Cosmic Signature community, including cycle context and contributor records.",
-        "source": "Cosmic Signature public public-goods APIs",
+        "source": "Cosmic Signature public-goods API",
         "links": {
           "direct": "View direct ETH contributions",
           "protocol": "Protocol public-goods contributions",
@@ -277,7 +277,7 @@
       "public-goods-retrievals": {
         "heading": "Public Goods Retrievals",
         "description": "Review retrievals from the Cosmic Signature Public Goods Vault, where cycle reserves forward support to the configured public-goods beneficiary — currently Protocol Guild.",
-        "source": "Cosmic Signature public public-goods APIs",
+        "source": "Cosmic Signature public-goods API",
         "links": {
           "protocol": "Protocol public-goods contributions",
           "voluntary": "Voluntary public-goods contributions",

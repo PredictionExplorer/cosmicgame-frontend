@@ -6,18 +6,19 @@ The Gesture Message Chat surfaces the optional messages participants attach when
 
 ## Product Behavior
 
-- The feed appears on the home page as a right-side panel on desktop and as a normal stacked section on smaller screens.
-- It shows only gestures from the current active cycle.
-- It shows only gestures whose `Message` field contains non-whitespace text.
+- The feed appears on the home page in the row after the decision desk: beside the cycle guide from 1024px, as a normal stacked section on smaller screens.
+- It shows only gestures from the current active cycle, and only gestures whose `Message` field contains non-whitespace text.
 - Messages are ordered newest first by gesture `TimeStamp`, with `EvtLogId` as a deterministic tiebreaker.
-- Each entry displays the participant address (with a copy-to-clipboard button), a gesture method badge (cost + ETH/CST, plus `+ RWLK` for RandomWalk gestures), a relative timestamp ("5 minutes ago") with the absolute date/time in a tooltip and `<time dateTime>`, and the message body.
-- The header subtitle shows loaded messages and displayed system events ("Cycle #7 · 3 messages"). It does not imply a cycle-wide total when older history is not loaded.
+- Messages lead. Each is a ruled row on one frame (no cards): the participant as an `AddressChip` (link to `/user/{address}`, copy button), a "You" tag on the connected wallet's own messages, the method and cost as a caption ("0.1021 ETH + RWLK"), the position linking to `/gesture/{EvtLogId}`, a relative age (`<DateTime variant="relative">`, the exact time on hover) and the body.
+- Cycle events derived from the history (records, first participants, milestones, the closing window, finalization) never outnumber messages on screen: the events between two messages fold into one line ("3 cycle events") that opens in place, and a lone event is one compact row (glyph, sentence, age). The **Messages / All activity** toggle lists every event instead. Event rows are never headings.
+- The header gives the title, one explanation of how to join, the cycle and counts ("Cycle #7 · 3 messages · 12 cycle events", or "Latest 50 messages and 50 cycle events" while older history exists) and a still freshness stamp (`LiveStatus variant="inline" still`) that reads "Updated 4s ago", "Reconnecting…" or "Updates delayed". A failed background refresh changes only the stamp; the history on screen stays. Only a failed first read shows the retry block, as a status rather than an alert.
+- The list is not a live region: new rows are not read aloud.
+- The newest message settles in with a 900ms `--live` rule when a Gesture lands.
+- A message sent with a confirmed Gesture shows at once as "Indexing". If the indexer has not echoed it after 90 seconds it reads "Still indexing" beside a link to its transaction; it gives way after 15 minutes (`usePendingChatMessages`).
 - The initial history window contains at most 50 messages and 50 derived system events. "Load older" reveals the next group, with loading/retry states and preserved reading position.
 - `http(s)` and `www.` URLs inside message bodies are clickable via `LinkifiedText` (`components/ui/linkified-text.tsx`). Because messages are permissionless on-chain content, clicking a link opens a leave-site confirmation dialog that shows the full destination URL before `window.open(..., 'noopener,noreferrer')`. Links are rendered as buttons (no `href`), so the confirm step cannot be bypassed with middle/modified clicks. URL detection lives in `utils/linkify.ts` and only accepts http(s) destinations with dotted hostnames.
 - The same linkified rendering is used for the message on the gesture detail page (`app/(app)/gesture/[id]/GesturePage.tsx`). Truncated table cells (e.g. `GestureHistoryTable`) stay plain text.
-- Participant addresses link to `/user/{address}` and gesture ids link to `/gesture/{EvtLogId}`.
-- Empty cycles show a friendly empty state instead of a blank panel. When the cycle is active, the empty state offers a "Make a Gesture" CTA that expands the gesture form's Advanced options (where the message field lives) and scrolls to the form.
-- The gesture form message textarea shows a live character counter (`n/280`) that turns amber near the limit.
+- Empty cycles show an empty state instead of a blank panel. When the cycle is active, it offers "Make a Gesture", which scrolls to the form and opens its message editor.
 
 ## Data Source
 
@@ -31,11 +32,7 @@ On paginated servers, SQL filters moderated messages before applying the page li
 
 ## Layout Notes
 
-The current-cycle controls come first. The next row pairs a capped, internally scrolling chat with the featured artwork at desktop widths. Attached assets follow in their own full-width responsive grid, before the art/story disclosure. Keeping asset receipts out of the narrow artwork column prevents a tall receipt list from leaving a large empty area below the chat.
-
-Asset cards use their available container width: wide cards place media beside details, while narrow cards stack them. Two or four previews use two columns, and larger groups use three columns on wide screens. All previewed assets and links remain accessible.
-
-On phones and tablets below the desktop breakpoint, the grid stacks and the message area scrolls within a maximum height of `min(28rem, 55svh)`. Short feeds shrink to their content; long histories cannot stretch the page. The small viewport unit keeps the reading area stable as mobile browser controls appear or disappear, and there is no minimum height forcing it beyond a short landscape viewport. The heading remains outside the scroller. Native scrolling, a named keyboard-focusable region, a visible focus ring, and contained vertical overscroll keep history accessible without moving the page when the feed reaches an edge. Compact padding, stacked participant metadata, safe text wrapping, and 44px touch targets keep the panel usable down to 320px. Print styles remove the height cap and expose the full history.
+On phones and tablets the feed is part of the page: it shows the newest eight rows and a "Show more" button, so it never scrolls inside the scrolling page. From 1024px it scrolls inside its frame, which fills its row beside the cycle guide (at least 24rem). Native scrolling, a named keyboard-focusable region and contained vertical overscroll keep history accessible. Print shows the full known history.
 
 ## Test Coverage
 

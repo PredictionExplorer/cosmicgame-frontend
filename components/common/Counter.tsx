@@ -143,7 +143,7 @@ const Counter = ({
                 'relative rounded-lg border overflow-hidden backdrop-blur-sm',
                 s.pad,
                 isCritical
-                  ? 'border-red-500/40 bg-red-500/[0.08] animate-urgency-pulse'
+                  ? 'border-red-500/40 bg-red-500/[0.08]'
                   : isUrgent
                     ? 'border-amber-500/30 bg-amber-500/[0.06]'
                     : isImpact

@@ -275,11 +275,11 @@ test('browser phase controls switch repeatedly and reflow inactive desktop state
   });
   await expect(page.getByTestId('control-desk-gesture')).toHaveCount(0);
   await expect(page.getByTestId('clock-finalize')).toHaveCount(0);
-  await expect(page.getByTestId('latest-participant-empty')).toBeVisible();
+  await expect(page.getByTestId('latest-participant-intel')).toHaveAttribute('data-empty', 'true');
 
   const [gridBox, latestBox] = await Promise.all([
     page.getByTestId('control-desk-grid').boundingBox(),
-    page.getByTestId('control-desk-latest').boundingBox(),
+    page.getByTestId('control-desk-standings').boundingBox(),
   ]);
   expect(gridBox).not.toBeNull();
   expect(latestBox).not.toBeNull();

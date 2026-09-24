@@ -33,6 +33,11 @@ export interface LiveStatusViewProps {
   variant?: LiveStatusVariant;
   /** Adds "The clock may have been extended since then." while delayed or offline. */
   clockCaveat?: boolean;
+  /**
+   * The live dot holds still instead of breathing: for a secondary freshness
+   * stamp on a page whose one breathing dot is elsewhere (the Cycle pill).
+   */
+  still?: boolean;
   className?: string;
 }
 
@@ -56,6 +61,7 @@ export function LiveStatusView({
   ageMs = 0,
   variant = 'chip',
   clockCaveat = false,
+  still = false,
   className,
 }: LiveStatusViewProps) {
   const t = useTranslations('common');
@@ -89,7 +95,10 @@ export function LiveStatusView({
   const dot = (
     <span
       aria-hidden
-      className={cn('relative inline-flex h-1.5 w-1.5 shrink-0 rounded-full', DOT_CLASS[state])}
+      className={cn(
+        'relative inline-flex h-1.5 w-1.5 shrink-0 rounded-full',
+        still && state === 'live' ? stateTone.liveDot : DOT_CLASS[state],
+      )}
     />
   );
 

@@ -412,13 +412,11 @@ body:has([data-maintenance-banner]) .home-control-shell {
 }
 
 /*
- * The home's phone action dock (`[data-action-dock]`, below 1024px) floats
- * 12px above the bottom edge and is about 64px tall.
+ * The home's action dock (`[data-action-dock]`) floats 12-16px above the
+ * bottom edge and is about 64px tall, at every width.
  */
-@media (max-width: 1023.98px) {
-  :root:has([data-action-dock]) {
-    --dock-clearance: 5.5rem;
-  }
+:root:has([data-action-dock]) {
+  --dock-clearance: 5.5rem;
 }
 
 @layer base {

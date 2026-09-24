@@ -307,6 +307,7 @@ export function useHomeGestureFeed(cycle: number, initialGestures?: GestureInfo[
     [scenario],
   );
   const snapshot = sample ?? query.data;
+  const hasHistory = Boolean(snapshot && !snapshot.invalidated);
   const chatGestures = useMemo(
     () => snapshot?.chatGestures ?? messagesFrom(seed).slice(0, CHAT_PAGE_SIZE),
     [snapshot, seed],
@@ -321,7 +322,12 @@ export function useHomeGestureFeed(cycle: number, initialGestures?: GestureInfo[
     chatGestures,
     mode: snapshot?.mode,
     isLoading: !sample && (query.isLoading || Boolean(snapshot?.invalidated && query.isFetching)),
-    error: sample ? null : query.error,
+    // The first read failed (or corrected history could not replace an
+    // invalidated one): nothing to show, so the panel offers a retry.
+    error: sample || hasHistory ? null : query.error,
+    // A background refresh failed while the last good history stays on
+    // screen: the panel's freshness stamp says so; the list is untouched.
+    refreshError: sample || !hasHistory ? null : query.error,
     hasMore:
       snapshot?.mode === 'paged'
         ? !!snapshot.nextCursor

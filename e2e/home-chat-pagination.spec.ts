@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Locator } from '@playwright/test';
 
 import { mockPagedHomeGestureChatApi } from './home-gesture-chat-fixtures';
 
@@ -6,9 +6,24 @@ test.beforeEach(async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
 });
 
+/** Below 1024px the feed shows its newest messages first; reveal what is loaded. */
+async function revealLoadedMessages(chat: Locator) {
+  const showMore = chat.getByRole('button', { name: 'Show more', exact: true });
+  while (await showMore.isVisible()) await showMore.click();
+}
+
+/** Reading position inside the chat's own scroller exists from 1024px only. */
+function skipOnPhones(projectName: string) {
+  test.skip(
+    projectName !== 'Desktop Chrome',
+    'the phone feed is part of the page; home-chat-layout.mobile.spec.ts covers it',
+  );
+}
+
 test('loads older message pages only on request and keeps the current reading position', async ({
   page,
-}) => {
+}, testInfo) => {
+  skipOnPhones(testInfo.project.name);
   const api = await mockPagedHomeGestureChatApi(page);
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   const chat = page.getByTestId('gesture-message-chat');
@@ -51,12 +66,14 @@ test('keeps existing messages visible when loading older history fails and allow
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   const chat = page.getByTestId('gesture-message-chat');
   await expect(chat.getByTestId('gesture-message-meta')).toHaveCount(50);
+  await revealLoadedMessages(chat);
   await chat.getByRole('button', { name: 'Load older', exact: true }).click();
-  await expect(chat.getByRole('alert')).toHaveText('Could not load older messages.');
+  // A status, not an alert: the loaded history is still on screen.
+  await expect(chat.getByText('Could not load older messages.')).toBeVisible();
   await expect(chat.getByTestId('gesture-message-meta')).toHaveCount(50);
   await chat.getByRole('button', { name: 'Retry', exact: true }).click();
   await expect(chat.getByTestId('gesture-message-meta')).toHaveCount(100);
-  await expect(chat.getByRole('alert')).toHaveCount(0);
+  await expect(chat.getByText('Could not load older messages.')).toHaveCount(0);
   expect(api.requests.filter((url) => url.searchParams.get('cursor') === 'older-50')).toHaveLength(
     2,
   );
@@ -68,7 +85,7 @@ test('offers retry when the first page fails instead of showing an empty chat', 
   await mockPagedHomeGestureChatApi(page, { initialFailures: 2 });
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   const chat = page.getByTestId('gesture-message-chat');
-  await expect(chat.getByRole('alert')).toHaveText('Could not load chat.');
+  await expect(chat.getByText('Could not load chat.')).toBeVisible();
   await expect(chat.getByText('No messages or events yet')).toHaveCount(0);
   await chat.getByRole('button', { name: 'Retry', exact: true }).click();
   await expect(chat.getByTestId('gesture-message-meta')).toHaveCount(50);
@@ -76,7 +93,8 @@ test('offers retry when the first page fails instead of showing an empty chat', 
 
 test('polls only new messages, preserves older reading position, and resets corrected history', async ({
   page,
-}) => {
+}, testInfo) => {
+  skipOnPhones(testInfo.project.name);
   const api = await mockPagedHomeGestureChatApi(page);
   const legacyRequests: string[] = [];
   page.on('request', (request) => {

@@ -51,7 +51,8 @@ describe('HomeObservatoryHero', () => {
       within(observatory).getByRole('heading', { name: 'home.hero.cycleNumber(number=7)' }),
     ).toBeInTheDocument();
     expect(within(observatory).getByText('42')).toBeInTheDocument();
-    expect(within(observatory).getByText('2.7500 ETH')).toBeInTheDocument();
+    // The allocation goes through the shared amount format, unit bound to the figure.
+    expect(observatory.textContent).toContain(`2.7500${String.fromCharCode(160)}ETH`);
     expect(within(observatory).getByText('7%')).toBeInTheDocument();
   });
 
@@ -140,7 +141,7 @@ describe('HomeObservatoryHero', () => {
       screen.getByText(
         'home.hero.phase.openingSoon.body(cycleLabel=home.hero.cycleNumber(number=7))',
       ),
-    ).toHaveClass('font-medium', 'text-foreground/90');
+    ).toHaveClass('type-body-lg', 'text-foreground');
     const cycleDetailLinks = screen.getAllByRole('link', { name: 'home.hero.viewCycleDetails' });
     expect(cycleDetailLinks.length).toBeGreaterThanOrEqual(2);
     for (const link of cycleDetailLinks) {

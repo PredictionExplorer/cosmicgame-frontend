@@ -371,6 +371,8 @@ describe('useGestureForm', () => {
     expect(result.current.ethGestureInfo).toEqual({
       AuctionDuration: 3600,
       ETHPrice: 0.01,
+      // The exact wei the funding check compares against the wallet balance.
+      ETHPriceWei: BigInt('10000000000000000'),
       SecondsElapsed: 1800,
     });
   });
@@ -392,6 +394,8 @@ describe('useGestureForm', () => {
     expect(result.current.ethGestureInfo).toEqual({
       AuctionDuration: 3600,
       ETHPrice: 0.01,
+      // The exact wei the funding check compares against the wallet balance.
+      ETHPriceWei: BigInt('10000000000000000'),
       SecondsElapsed: 1800,
     });
   });
@@ -619,6 +623,21 @@ describe('useGestureForm', () => {
     expect(result.current.rwlknftIds).toEqual([3, 1]);
   });
 
+  it("reports the wallet's Random Walk NFT list as loading until it is read", async () => {
+    const { result } = renderHook(() => useGestureForm());
+    // Read, not yet answered: never an empty list that looks final.
+    expect(result.current.rwlkListStatus).toBe('loading');
+    await waitFor(() => expect(result.current.rwlknftIds).toEqual([3, 1]));
+    expect(result.current.rwlkListStatus).toBe('ready');
+  });
+
+  it('reports a Random Walk NFT list that could not be read as failed, not empty', async () => {
+    mockRWLKContract.read.walletOfOwner.mockRejectedValue(new Error('rpc down'));
+    const { result } = renderHook(() => useGestureForm());
+    await waitFor(() => expect(result.current.rwlkListStatus).toBe('error'));
+    expect(mockReportError).toHaveBeenCalledWith(expect.any(Error), 'getRwlkNFTIds');
+  });
+
   it('ignores a walletOfOwner read that resolves after unmount', async () => {
     let resolveTokens!: (tokens: bigint[]) => void;
     mockRWLKContract.read.walletOfOwner.mockReturnValueOnce(
@@ -692,6 +711,8 @@ describe('useGestureForm', () => {
     expect(mockTx.runs[0]!.errorContext).toBe('gesture-eth');
     expect(mockTx.lastSuccessMessage()).toBe('toasts.gesture.confirmed');
     expect(result.current.isGesturing).toBe(false);
+    // The confirmed hash is readable at once, for the chat's explorer link.
+    expect(result.current.getLastGestureHash()).toMatch(/^0x/);
   });
 
   it('names the Participation CST the receipt shows was imprinted', async () => {

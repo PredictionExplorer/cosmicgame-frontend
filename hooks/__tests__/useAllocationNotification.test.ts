@@ -156,6 +156,139 @@ describe('useAllocationNotification', () => {
     expect(mockNotification).not.toHaveBeenCalled();
   });
 
+  it('re-reads the time left from the chain before it fires', async () => {
+    const { mockNotification } = setupNotificationMock('granted');
+    const verifyRemainingMs = jest.fn().mockResolvedValue(2 * 60_000 + 10_000);
+    renderHook(() =>
+      useAllocationNotification({
+        allocationTime: Date.now() + 4 * 60_000,
+        notificationTitle: WARNING_TITLE,
+        notificationBody: (minutes) => `${minutes} minutes left`,
+        verifyRemainingMs,
+      }),
+    );
+    enableAlert(5);
+
+    await act(async () => {
+      jest.advanceTimersByTime(1_000);
+    });
+
+    expect(verifyRemainingMs).toHaveBeenCalledTimes(1);
+    // The chain's reading, not the cached deadline, sets the minutes.
+    expect(mockNotification).toHaveBeenCalledWith(WARNING_TITLE, {
+      body: '3 minutes left',
+      tag: 'cosmic-cycle-current-finalize',
+    });
+  });
+
+  it('stays silent when the chain shows the deadline moved out of the window', async () => {
+    const { mockNotification } = setupNotificationMock('granted');
+    const verifyRemainingMs = jest.fn().mockResolvedValue(45 * 60_000);
+    renderHook(() =>
+      useAllocationNotification({
+        allocationTime: Date.now() + 2 * 60_000,
+        notificationTitle: WARNING_TITLE,
+        notificationBody: 'body',
+        verifyRemainingMs,
+      }),
+    );
+    enableAlert(5);
+
+    await act(async () => {
+      jest.advanceTimersByTime(1_000);
+    });
+    expect(verifyRemainingMs).toHaveBeenCalled();
+    expect(mockNotification).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['the cycle already finalized', 0],
+    ['the deadline moved well out of the window', 45 * 60_000],
+  ])('waits before reading the chain again when %s', async (_case, verifiedMs) => {
+    // Regression: only a failed read set a retry wait, so these outcomes raced
+    // both RPC nodes every second until the page's own deadline caught up.
+    const { mockNotification } = setupNotificationMock('granted');
+    const verifyRemainingMs = jest.fn().mockResolvedValue(verifiedMs);
+    renderHook(() =>
+      useAllocationNotification({
+        allocationTime: Date.now() + 2 * 60_000,
+        notificationTitle: WARNING_TITLE,
+        notificationBody: 'body',
+        verifyRemainingMs,
+      }),
+    );
+    enableAlert(5);
+
+    for (let second = 0; second < 10; second += 1) {
+      await act(async () => {
+        jest.advanceTimersByTime(1_000);
+      });
+    }
+    expect(verifyRemainingMs).toHaveBeenCalledTimes(1);
+    expect(mockNotification).not.toHaveBeenCalled();
+  });
+
+  it('reads again as soon as the chain says the window opens', async () => {
+    const { mockNotification } = setupNotificationMock('granted');
+    // The chain is 3s outside the 5-minute window; the page thinks it is inside.
+    const verifyRemainingMs = jest
+      .fn()
+      .mockResolvedValueOnce(5 * 60_000 + 3_000)
+      .mockResolvedValueOnce(5 * 60_000 - 1_000);
+    renderHook(() =>
+      useAllocationNotification({
+        allocationTime: Date.now() + 2 * 60_000,
+        notificationTitle: WARNING_TITLE,
+        notificationBody: 'body',
+        verifyRemainingMs,
+      }),
+    );
+    enableAlert(5);
+
+    await act(async () => {
+      jest.advanceTimersByTime(1_000);
+    });
+    expect(verifyRemainingMs).toHaveBeenCalledTimes(1);
+    for (let second = 0; second < 4; second += 1) {
+      await act(async () => {
+        jest.advanceTimersByTime(1_000);
+      });
+    }
+    expect(verifyRemainingMs).toHaveBeenCalledTimes(2);
+    expect(mockNotification).toHaveBeenCalledTimes(1);
+  });
+
+  it('retries a failed chain read later instead of alerting on a stale deadline', async () => {
+    const { mockNotification } = setupNotificationMock('granted');
+    const verifyRemainingMs = jest.fn().mockResolvedValueOnce(null).mockResolvedValueOnce(90_000);
+    renderHook(() =>
+      useAllocationNotification({
+        allocationTime: Date.now() + 3 * 60_000,
+        notificationTitle: WARNING_TITLE,
+        notificationBody: 'body',
+        verifyRemainingMs,
+      }),
+    );
+    enableAlert(5);
+
+    await act(async () => {
+      jest.advanceTimersByTime(1_000);
+    });
+    expect(mockNotification).not.toHaveBeenCalled();
+
+    // No second read inside the retry wait.
+    await act(async () => {
+      jest.advanceTimersByTime(5_000);
+    });
+    expect(verifyRemainingMs).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      jest.advanceTimersByTime(11_000);
+    });
+    expect(verifyRemainingMs).toHaveBeenCalledTimes(2);
+    expect(mockNotification).toHaveBeenCalledTimes(1);
+  });
+
   it('focuses the tab when the notification is clicked', () => {
     const { instances } = setupNotificationMock('granted');
     const focus = jest.spyOn(window, 'focus').mockImplementation(() => undefined);

@@ -1,14 +1,9 @@
 import type { GestureInfo } from '@/services/api/types';
-
-const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+import { isZeroAddress, sameAddress } from '@/utils/format';
 
 function cleanAddress(value: string | null | undefined): string | null {
-  if (!value || value.toLowerCase() === ZERO_ADDRESS) return null;
+  if (!value || isZeroAddress(value)) return null;
   return value;
-}
-
-function sameAddress(left: string | null | undefined, right: string | null | undefined): boolean {
-  return !!left && !!right && left.toLowerCase() === right.toLowerCase();
 }
 
 function timestampOf(gesture: GestureInfo): number {

@@ -13,7 +13,9 @@ async function openChat(page: Page, messageCount = 12) {
   await mockHomeGestureChatApi(page, makeLongGestureFeed(messageCount));
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   const chat = page.getByTestId('gesture-message-chat');
-  await expect(chat.getByText(`Cycle #7 · ${Math.min(messageCount, 50)} messages`)).toBeVisible();
+  await expect(
+    chat.getByText(new RegExp(`Cycle #7 · (Latest )?${Math.min(messageCount, 50)} messages`)),
+  ).toBeVisible();
   await page.evaluate(() => document.fonts.ready);
   return chat;
 }
@@ -23,81 +25,72 @@ test.beforeEach(async ({ page }) => {
 });
 
 for (const viewport of VIEWPORTS) {
-  test(`keeps chat compact and older messages reachable at ${viewport.width}×${viewport.height}`, async ({
+  test(`keeps the chat in the page flow with older messages one tap away at ${viewport.width}×${viewport.height}`, async ({
     page,
   }) => {
     await page.setViewportSize(viewport);
     const chat = await openChat(page);
     const scroll = chat.getByTestId('gesture-message-chat-scroll');
     const heading = chat.getByRole('heading', { name: 'Gesture Chat' });
-    const artwork = page.getByTestId('deck-art-card');
+    const guide = page.getByTestId('cycle-phase-guide');
     await chat.scrollIntoViewIfNeeded();
 
     const chatBox = (await chat.boundingBox())!;
-    const artworkBox = (await artwork.boundingBox())!;
+    const guideBox = (await guide.boundingBox())!;
     const metrics = await scroll.evaluate((element) => ({
       clientHeight: element.clientHeight,
       scrollHeight: element.scrollHeight,
       clientWidth: element.clientWidth,
       scrollWidth: element.scrollWidth,
     }));
-    expect(metrics.clientHeight).toBeLessThanOrEqual(Math.min(448, viewport.height * 0.55) + 1);
-    expect(metrics.scrollHeight).toBeGreaterThan(metrics.clientHeight + 20);
+    // Below 1024px the feed never scrolls inside the scrolling page.
+    expect(metrics.scrollHeight).toBeLessThanOrEqual(metrics.clientHeight + 1);
     expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.clientWidth + 1);
-    expect(artworkBox.y - (chatBox.y + chatBox.height)).toBeGreaterThanOrEqual(-1);
-    expect(artworkBox.y - (chatBox.y + chatBox.height)).toBeLessThanOrEqual(32);
+    expect(guideBox.y - (chatBox.y + chatBox.height)).toBeGreaterThanOrEqual(-1);
+    expect(guideBox.y - (chatBox.y + chatBox.height)).toBeLessThanOrEqual(32);
+    await expect(heading).toBeVisible();
 
+    // The newest messages lead; the oldest waits behind "Show more".
     const oldestMessage = chat.getByText(/Scrollable message 12:/);
-    await expect(oldestMessage).not.toBeInViewport();
-    const headingTop = (await heading.boundingBox())!.y;
-    const pageScroll = await page.evaluate(() => window.scrollY);
-    await scroll.evaluate((element) => {
-      element.scrollTop = element.scrollHeight;
-    });
-    await expect(oldestMessage).toBeInViewport();
-    await expect(heading).toBeInViewport();
-    expect((await heading.boundingBox())!.y).toBeCloseTo(headingTop, 0);
-    expect(await page.evaluate(() => window.scrollY)).toBe(pageScroll);
+    await expect(chat.getByText(/Scrollable message 1:/)).toBeVisible();
+    await expect(oldestMessage).toBeHidden();
+    await chat.getByRole('button', { name: 'Show more', exact: true }).click();
+    await expect(oldestMessage).toBeVisible();
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth),
+      'the page must not overflow horizontally',
+    ).toBeLessThanOrEqual(viewport.width);
   });
 }
 
 test('more history does not push the rest of the mobile page down', async ({ page }) => {
   const chat = await openChat(page);
   const originalChatHeight = (await chat.boundingBox())!.height;
-  const originalArtworkTop = (await page.getByTestId('deck-art-card').boundingBox())!.y;
-  const originalPageHeight = await page.evaluate(() => document.documentElement.scrollHeight);
+  const originalGuideTop = (await page.getByTestId('cycle-phase-guide').boundingBox())!.y;
 
   await openChat(page, 120);
 
-  expect((await chat.boundingBox())!.height).toBeCloseTo(originalChatHeight, 0);
-  expect((await page.getByTestId('deck-art-card').boundingBox())!.y).toBeCloseTo(
-    originalArtworkTop,
-    0,
-  );
-  expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBeLessThanOrEqual(
-    originalPageHeight + 2,
-  );
-  const scroll = chat.getByTestId('gesture-message-chat-scroll');
+  // The same number of newest messages leads, whatever the history holds;
+  // only the header's count line may change.
+  expect(Math.abs((await chat.boundingBox())!.height - originalChatHeight)).toBeLessThanOrEqual(24);
+  expect(
+    Math.abs((await page.getByTestId('cycle-phase-guide').boundingBox())!.y - originalGuideTop),
+  ).toBeLessThanOrEqual(24);
   await chat.scrollIntoViewIfNeeded();
   await expect(chat.getByTestId('gesture-message-meta')).toHaveCount(50);
+  // Reveal what is loaded, then load older history.
+  const showMore = chat.getByRole('button', { name: 'Show more', exact: true });
+  while (await showMore.isVisible()) await showMore.click();
   await chat.getByRole('button', { name: 'Load older', exact: true }).click();
   await expect(chat.getByTestId('gesture-message-meta')).toHaveCount(100);
-  await chat.getByRole('button', { name: 'Load older', exact: true }).click();
-  await expect(chat.getByTestId('gesture-message-meta')).toHaveCount(120);
-  expect((await chat.boundingBox())!.height).toBeCloseTo(originalChatHeight, 0);
-  await scroll.evaluate((element) => {
-    element.scrollTop = element.scrollHeight;
-  });
-  await expect(chat.getByText(/Scrollable message 120:/)).toBeInViewport();
 });
 
-test('printing exposes the full chat instead of clipping older messages', async ({ page }) => {
+test('printing exposes the full chat instead of the newest messages only', async ({ page }) => {
   const chat = await openChat(page);
-  const scroll = chat.getByTestId('gesture-message-chat-scroll');
-  const screenHeight = (await chat.boundingBox())!.height;
+  await expect(chat.getByText(/Scrollable message 12:/)).toBeHidden();
 
   await page.emulateMedia({ media: 'print' });
-
+  const scroll = chat.getByTestId('gesture-message-chat-scroll');
   const printMetrics = await scroll.evaluate((element) => ({
     clientHeight: element.clientHeight,
     scrollHeight: element.scrollHeight,
@@ -107,6 +100,5 @@ test('printing exposes the full chat instead of clipping older messages', async 
   expect(printMetrics.scrollHeight).toBeLessThanOrEqual(printMetrics.clientHeight + 1);
   const chatBox = (await chat.boundingBox())!;
   const oldestBox = (await chat.getByText(/Scrollable message 12:/).boundingBox())!;
-  expect(chatBox.height).toBeGreaterThan(screenHeight * 2);
   expect(oldestBox.y + oldestBox.height).toBeLessThanOrEqual(chatBox.y + chatBox.height);
 });

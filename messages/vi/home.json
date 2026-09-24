@@ -93,8 +93,8 @@
     }
   },
   "notifications": {
-    "finalizationSoonTitle": "Đặt nét bút ngay — chu kỳ có thể sớm hoàn tất",
-    "finalizationSoonBody": "Còn {minutes} phút đến khi chu kỳ có thể hoàn tất. Đặt nét bút để kéo dài chu kỳ và tham gia các phân bổ."
+    "finalizationSoonTitle": "Chu kỳ sắp có thể hoàn tất",
+    "finalizationSoonBody": "Còn {minutes, plural, other {# phút}} đến thời điểm hoàn tất chu kỳ. Một nét bút mới vẫn có thể lùi thời điểm này."
   },
   "chrono": {
     "sectionAria": "Thời điểm hoàn tất chu kỳ",
@@ -148,7 +148,7 @@
       "finalMinute": {
         "eyebrow": "Phút cuối",
         "label": "Phút cuối",
-        "status": "Phút cuối. Đang hiển thị từng phần mười giây.",
+        "status": "Còn chưa đến một phút. Một nét bút mới vẫn có thể kéo dài đồng hồ.",
         "tooltip": "Đếm ngược hoàn tất đang ở phút cuối. Nếu về không, chu kỳ sẽ sẵn sàng hoàn tất."
       },
       "confirming": {
@@ -173,9 +173,6 @@
       }
     },
     "cta": {
-      "finalize": "Hoàn tất chu kỳ",
-      "makeFirstGesture": "Đặt nét bút đầu tiên",
-      "makeGesture": "Đặt nét bút",
       "viewCycle": "Xem chu kỳ"
     }
   },
@@ -191,8 +188,8 @@
     },
     "steps": {
       "openingSoon": {
-        "label": "Sắp mở",
-        "detail": "Chu kỳ tiếp theo đã được lên lịch và đang chờ mở."
+        "label": "Mở chu kỳ",
+        "detail": "Mỗi chu kỳ mở vào thời điểm đã lên lịch."
       },
       "firstGesture": {
         "label": "Nét bút đầu tiên",
@@ -200,7 +197,7 @@
       },
       "open": {
         "label": "Chu kỳ mở",
-        "detail": "Nét bút định hình Signature và kéo dài thời gian."
+        "detail": "Mỗi nét bút giành vị trí gần nhất và có thể kéo dài đồng hồ."
       },
       "finalWindow": {
         "label": "Cửa sổ cuối",
@@ -208,7 +205,7 @@
       },
       "finalization": {
         "label": "Hoàn tất",
-        "detail": "Người đặt nét bút cuối cùng có thể khép lại chu kỳ."
+        "detail": "Khi về 0, người tham gia gần nhất có thể hoàn tất chu kỳ và nhận phân bổ Signature; sau một khoảng ngắn, ai cũng có thể hoàn tất."
       },
       "allocation": {
         "label": "Phân bổ",
@@ -230,7 +227,6 @@
     "readyToFinalize": "Chu kỳ sẵn sàng hoàn tất",
     "clockReachedZero": "Đếm ngược hoàn tất đã về không.",
     "metrics": {
-      "signatureAllocation": "Phân bổ Signature",
       "signatureTooltip": {
         "base": "Phần ETH của phân bổ Signature; người nhận cũng nhận 1.000 CST và một Cosmic Signature NFT.",
         "withNft": "Phần ETH của phân bổ Signature; người nhận cũng nhận 1.000 CST, một Cosmic Signature NFT và {nftCount, plural, other {toàn bộ # NFT đính kèm}}.",
@@ -243,7 +239,7 @@
       "randomWalkGestureTooltip": "Giảm 50% chi phí nét bút ETH khi đính kèm RandomWalk NFT vào nét bút ETH",
       "cstGesture": "Nét bút CST",
       "cstGestureTooltip": "Đặt nét bút bằng CST. Chi phí giảm dần qua cửa sổ hiệu chỉnh trực tiếp, vốn được nét bút CST kéo dài và nét bút ETH rút ngắn.",
-      "free": "KHÔNG TỐN CHI PHÍ",
+      "free": "0 CST",
       "cstWindow": "Cửa sổ CST",
       "cstWindowProgressAria": "Tiến độ cửa sổ hiệu chỉnh CST",
       "duration": "Thời lượng {duration}"
@@ -252,12 +248,12 @@
       "title": "Vị thế của bạn trong chu kỳ",
       "tooltip": "Hiển thị vị thế nét bút cuối cùng hiện tại và tần suất Tinh tuyển của bạn dựa trên các nét bút trong chu kỳ này.",
       "leader": {
-        "base": "Bạn đã đặt nét bút gần nhất. Nếu không ai đặt thêm, bạn nhận phân bổ Signature ({amount} ETH, 1.000 CST, 1 Cosmic Signature NFT).",
-        "withNft": "Bạn đã đặt nét bút gần nhất. Nếu không ai đặt thêm, bạn nhận phân bổ Signature ({amount} ETH, 1.000 CST, 1 Cosmic Signature NFT, cộng thêm {nftCount, plural, other {toàn bộ # NFT đính kèm}} bên dưới).",
-        "withErc20": "Bạn đã đặt nét bút gần nhất. Nếu không ai đặt thêm, bạn nhận phân bổ Signature ({amount} ETH, 1.000 CST, 1 Cosmic Signature NFT, cộng thêm {erc20Count, plural, other {toàn bộ # khoản nạp token ERC20 đính kèm}} bên dưới).",
-        "withBoth": "Bạn đã đặt nét bút gần nhất. Nếu không ai đặt thêm, bạn nhận phân bổ Signature ({amount} ETH, 1.000 CST, 1 Cosmic Signature NFT, cộng thêm {nftCount, plural, other {toàn bộ # NFT đính kèm}} và {erc20Count, plural, other {toàn bộ # khoản nạp token ERC20 đính kèm}} bên dưới)."
+        "base": "Bạn đã đặt nét bút gần nhất. Nếu không ai đặt thêm trước khi đồng hồ về 0, bạn có thể hoàn tất chu kỳ để nhận phân bổ Signature ({amount} ETH, 1.000 CST, 1 Cosmic Signature NFT).",
+        "withNft": "Bạn đã đặt nét bút gần nhất. Nếu không ai đặt thêm trước khi đồng hồ về 0, bạn có thể hoàn tất chu kỳ để nhận phân bổ Signature ({amount} ETH, 1.000 CST, 1 Cosmic Signature NFT, cộng thêm {nftCount, plural, other {toàn bộ # NFT đính kèm}} bên dưới).",
+        "withErc20": "Bạn đã đặt nét bút gần nhất. Nếu không ai đặt thêm trước khi đồng hồ về 0, bạn có thể hoàn tất chu kỳ để nhận phân bổ Signature ({amount} ETH, 1.000 CST, 1 Cosmic Signature NFT, cộng thêm {erc20Count, plural, other {toàn bộ # khoản nạp token ERC20 đính kèm}} bên dưới).",
+        "withBoth": "Bạn đã đặt nét bút gần nhất. Nếu không ai đặt thêm trước khi đồng hồ về 0, bạn có thể hoàn tất chu kỳ để nhận phân bổ Signature ({amount} ETH, 1.000 CST, 1 Cosmic Signature NFT, cộng thêm {nftCount, plural, other {toàn bộ # NFT đính kèm}} và {erc20Count, plural, other {toàn bộ # khoản nạp token ERC20 đính kèm}} bên dưới)."
       },
-      "notLeader": "Nét bút gần nhất thuộc về người khác. Bạn có thể đặt thêm nét bút để dẫn đầu; các nét bút trước vẫn được tính vào Tinh tuyển.",
+      "notLeader": "Người khác đang giữ Nét bút gần nhất. Các nét bút trước của bạn vẫn được tính vào Tinh tuyển.",
       "ethStellar": "ETH Tinh tuyển",
       "nftStellar": "NFT Tinh tuyển"
     },
@@ -291,8 +287,8 @@
         "desc": "Thanh toán bằng Ether"
       },
       "randomWalk": {
-        "label": "ETH + RWLK",
-        "desc": "Giảm 50%"
+        "label": "ETH + Random Walk",
+        "desc": "ETH + Random Walk giảm một nửa chi phí ETH và cần một Random Walk NFT chưa dùng."
       },
       "cst": {
         "label": "CST",
@@ -301,8 +297,10 @@
     },
     "rwlk": {
       "title": "Random Walk NFT của bạn",
-      "tooltipAria": "Về mức giảm chi phí nét bút với RandomWalk",
-      "tooltip": "Đính kèm một RandomWalk NFT vào nét bút ETH để được giảm 50% chi phí nét bút. Mỗi NFT chỉ dùng được một lần."
+      "connect": "Kết nối ví để xem danh sách Random Walk NFT trong ví.",
+      "error": "Không đọc được Random Walk NFT của ví này. Hãy thử lại sau ít phút.",
+      "tooltipAria": "Về mức giảm chi phí nét bút với Random Walk",
+      "tooltip": "Đính kèm một Random Walk NFT vào nét bút ETH để được giảm 50% chi phí nét bút. Mỗi NFT chỉ dùng được một lần."
     },
     "cstTrade": "Cần CST cho phương thức nét bút này? Hoán đổi ETH sang CST trên Arbitrum qua Uniswap.",
     "reward": {
@@ -321,7 +319,8 @@
       "minAcceptedTooltipAny": "Chọn “Chấp nhận mọi mức CST tham gia” sẽ đặt giới hạn tối thiểu là 0. Nét bút có thể được ghi nhận với bất kỳ lượng CST tham gia nào, kể cả 0.",
       "netPositive": "CST tham gia nhận được vượt chi phí CST nếu nét bút này được ghi nhận.",
       "netNegative": "Hầu hết nét bút CST tiêu nhiều CST hơn lượng nhận được.",
-      "durationMismatch": "Đang dùng thời lượng trên chuỗi ({contractDuration}) vì API báo {apiDuration}."
+      "durationMismatch": "Đang dùng thời lượng trên chuỗi ({contractDuration}) vì API báo {apiDuration}.",
+      "minAcceptedLabel": "Mức chấp nhận tối thiểu"
     },
     "preview": "Xem trước các tùy chọn nét bút trực tiếp tại đây. Kết nối ví để viết lời nhắn, đính kèm tài sản và gửi nét bút trên Arbitrum.",
     "advanced": {
@@ -354,16 +353,23 @@
         "raiseBy": "Tăng thêm",
         "approxCost": "≈ {amount} ETH",
         "note": "Cộng thêm {percent}% vào số tiền gửi để nét bút vẫn thành công nếu một nét bút khác trong cùng khối được ghi nhận trước. Hợp đồng chỉ thu chi phí nét bút hiện tại và hoàn lại phần còn lại trong cùng giao dịch, trừ khi khoản chênh lệch quá nhỏ so với phí gas."
-      }
+      },
+      "attachLabel": "Đính kèm tài sản",
+      "attachNone": "Không đính kèm"
     },
     "submit": {
       "eth": "Đặt nét bút bằng ETH ({cost} ETH)",
       "randomWalkWithToken": "Đặt nét bút bằng ETH + token RandomWalk {tokenId} ({cost} ETH)",
       "randomWalk": "Đặt nét bút bằng ETH + RandomWalk",
       "cst": "Đặt nét bút bằng CST ({cost} CST)",
-      "cstFree": "Đặt nét bút bằng CST (KHÔNG TỐN CHI PHÍ)",
+      "cstFree": "Đặt nét bút bằng CST (0 CST + phí gas)",
       "generic": "Đặt nét bút bằng {method}",
-      "sendsNote": "Gửi khoảng {amount} ETH, gồm {percent}% dự phòng thay đổi chi phí."
+      "sendsNote": "Gửi khoảng {amount} ETH, gồm {percent}% dự phòng thay đổi chi phí.",
+      "action": {
+        "eth": "Đặt nét bút bằng ETH",
+        "randomWalk": "Đặt nét bút bằng ETH + Random Walk",
+        "cst": "Đặt nét bút bằng CST"
+      }
     },
     "processing": "Đang xử lý…",
     "finalGestureMade": "Bạn đã đặt nét bút cuối cùng của chu kỳ này. Khi bộ đếm kết thúc, hãy dùng Hoàn tất chu kỳ bên dưới.",
@@ -372,8 +378,13 @@
     "finalizeWaitNote": "Vui lòng chờ người tham gia đặt nét bút cuối cùng hoàn tất chu kỳ.",
     "connect": {
       "title": "Kết nối để gửi nét bút",
-      "body": "Xem các phương thức và chi phí nét bút trực tiếp ở trên, rồi kết nối MetaMask hoặc ví khác để gửi trên Arbitrum."
-    }
+      "body": "Xem các phương thức và chi phí nét bút trực tiếp ở trên, rồi kết nối MetaMask hoặc ví khác để gửi trên Arbitrum.",
+      "cta": "Kết nối ví để đặt nét bút"
+    },
+    "message": {
+      "add": "Thêm lời nhắn"
+    },
+    "finalizeAtClock": "Bạn đang giữ Nét bút gần nhất. Hãy hoàn tất chu kỳ tại đồng hồ."
   },
   "calibration": {
     "defaultTitle": "Cửa sổ hiệu chỉnh",
@@ -383,14 +394,18 @@
     "firstGestureSubtitle": "Chi phí nét bút ETH đầu tiên giảm dần trong cửa sổ mở đầu.",
     "cstTitle": "Cửa sổ hiệu chỉnh CST",
     "cstSubtitle": "Chi phí CST giảm dần trong cửa sổ này. Nét bút ETH rút ngắn thời lượng khoảng {decreasePercent}%; nét bút CST kéo dài khoảng {increasePercent}%.",
-    "cstEndedMessage": "Cửa sổ hiệu chỉnh đã kết thúc — bạn có thể đặt nét bút không tốn chi phí.",
+    "cstEndedMessage": "Chi phí CST đã chạm mức sàn (0 CST); phí gas của mạng vẫn áp dụng.",
     "dynamicDuration": "Thời lượng động",
-    "progressLabel": "Tiến độ",
     "percentComplete": "Hoàn thành {percent}",
     "progressAria": "Tiến độ {title}",
-    "durationLabel": "Thời lượng cửa sổ hiệu chỉnh",
     "elapsedLabel": "Đã trôi qua",
-    "remainingLabel": "Còn lại"
+    "remainingLabel": "Còn lại",
+    "costNow": "Chi phí hiện tại",
+    "floor": "0 CST",
+    "reachesFloorIn": "0 CST sau {duration}",
+    "windowEndsIn": "Cửa sổ kết thúc sau {duration}",
+    "windowDetails": "Độ dài cửa sổ: {duration}. Đã trôi qua: {elapsed}.",
+    "floorIn": "sau {duration}"
   },
   "allocation": {
     "title": "Chi tiết phân bổ",
@@ -447,9 +462,7 @@
     }
   },
   "chat": {
-    "liveFeed": "Dòng trực tiếp",
     "title": "Trò chuyện nét bút",
-    "joinTooltipAria": "Cách tham gia Trò chuyện nét bút",
     "joinTooltip": "Muốn tham gia trò chuyện? Hãy đặt một nét bút và để lại lời nhắn tùy chọn. Lời nhắn đính kèm nét bút sẽ xuất hiện ở đây.",
     "currentCycle": "Chu kỳ hiện tại",
     "cycleNumber": "Chu kỳ #{number}",
@@ -465,35 +478,20 @@
       "cstFallback": "CST"
     },
     "history": {
-      "shown": "Số lượng chỉ tính các mục đang hiển thị.",
       "loadOlder": "Tải lịch sử cũ hơn",
       "loadingOlder": "Đang tải lịch sử cũ hơn…",
       "loading": "Đang tải trò chuyện…",
       "error": "Không tải được trò chuyện.",
       "olderError": "Không tải được tin nhắn cũ hơn.",
-      "retry": "Thử lại"
+      "retry": "Thử lại",
+      "showing": "{messages, plural, other {# lời nhắn}} và {events, plural, other {# sự kiện chu kỳ}} gần nhất",
+      "showMore": "Xem thêm"
     },
     "empty": {
       "title": "Chưa có lời nhắn hay sự kiện",
       "description": "Lời nhắn và các cột mốc của chu kỳ sẽ xuất hiện ở đây, mới nhất trước.",
-      "cta": "Đặt nét bút"
-    },
-    "eventTitles": {
-      "cycleOpen": "Chu kỳ đã mở",
-      "cycleStart": "Chu kỳ bắt đầu",
-      "enduranceGrowing": "Kỷ lục Bền bỉ đang kéo dài",
-      "enduranceRecord": "Kết thúc giữ vị trí dẫn đầu",
-      "chronoLead": "Kỷ lục Chiến binh Thời gian đang kéo dài",
-      "chronoReignEnded": "Kết thúc giữ danh hiệu Chiến binh Thời gian",
-      "finalCstLeader": "Nét bút CST mới nhất",
-      "newParticipant": "Người tham gia mới",
-      "gestureMilestone": "Cột mốc hoạt động",
-      "cstCalibrationReady": "Hiệu chỉnh CST hoàn tất",
-      "finalWindow": "Giai đoạn sắp kết thúc",
-      "clockExtended": "Đếm ngược được kéo dài",
-      "clockReopened": "Nét bút sau khi đồng hồ về không",
-      "finalizationAvailable": "Có thể hoàn tất",
-      "cycleFinalized": "Chu kỳ đã hoàn tất"
+      "cta": "Đặt nét bút",
+      "messagesFirst": "Chu kỳ này chưa có lời nhắn. Lời nhắn được gửi cùng nét bút."
     },
     "system": {
       "cycleStart": "Chu kỳ #{number} bắt đầu. Nét bút đầu tiên đã khởi động đếm ngược hoàn tất.",
@@ -513,14 +511,24 @@
       "cycleFinalized": "Chu kỳ #{number} đã hoàn tất. Người nhận phân bổ đã được xác định."
     },
     "pending": {
-      "aria": "Lời nhắn của bạn, đang xác nhận trên chuỗi",
-      "label": "Đang xác nhận"
+      "aria": "Lời nhắn của bạn đã được xác nhận trên chuỗi, đang lập chỉ mục",
+      "label": "Đang lập chỉ mục",
+      "stillIndexing": "Vẫn đang lập chỉ mục",
+      "viewTransaction": "Xem giao dịch"
     },
-    "eventCount": "{count, plural, =0 {Chưa có sự kiện} other {# sự kiện}}"
+    "eventCount": "{count, plural, =0 {Chưa có sự kiện} other {# sự kiện}}",
+    "you": "Bạn",
+    "viewLabel": "Hiển thị",
+    "view": {
+      "messages": "Lời nhắn",
+      "all": "Mọi hoạt động"
+    },
+    "eventGroup": "{count, plural, other {# sự kiện chu kỳ}}"
   },
   "deck": {
     "title": "Đài quan sát Cosmic Signature",
     "intro": "Đặt nét bút bằng ETH hoặc CST để trở thành người tham gia gần nhất. Khi đếm ngược về 0, người tham gia gần nhất có thể hoàn tất chu kỳ và nhận phân bổ Signature.",
+    "introShort": "Khi đếm ngược về 0, người tham gia gần nhất có thể hoàn tất chu kỳ và nhận phân bổ Signature.",
     "newHere": "Mới đến đây? Cách hoạt động",
     "experimentalUi": "Giao diện thử nghiệm",
     "returnToCurrent": "Quay về giao diện hiện tại",
@@ -550,10 +558,10 @@
       "titleNamed": "“{name}”"
     },
     "personal": {
-      "title": "Vị thế của bạn",
-      "leader": "Nét bút gần nhất thuộc về bạn",
+      "title": "Vị thế của bạn trong chu kỳ",
+      "leader": "Bạn đang giữ Nét bút gần nhất",
       "heldFor": "đã giữ {duration}",
-      "notLeader": "Nét bút gần nhất thuộc về người khác",
+      "notLeader": "Người khác đang giữ Nét bút gần nhất",
       "enduranceIn": "Kỷ lục Bền bỉ sau {duration}",
       "extending": "Đang nối dài kỷ lục Bền bỉ",
       "gestures": "{count, plural, =0 {Chưa có nét bút trong chu kỳ này} other {# nét bút trong chu kỳ này}}",
@@ -561,6 +569,11 @@
       "nothingWaiting": "Không có gì đang chờ nhận về",
       "cstPreview": "CST ước tính khi đặt nét bút lúc này: ~{amount}",
       "entryShare": "{share} số lượt Tinh tuyển của chu kỳ này"
+    },
+    "introByPhase": {
+      "openingSoon": "Chu kỳ tiếp theo mở khi đếm ngược này kết thúc. Nét bút đầu tiên của chu kỳ khởi động đếm ngược hoàn tất.",
+      "waitingFirstGesture": "Chu kỳ đã mở. Nét bút đầu tiên khởi động đếm ngược hoàn tất; khi đếm ngược về 0, người tham gia gần nhất có thể hoàn tất chu kỳ và nhận phân bổ Signature.",
+      "zero": "Đồng hồ đã về không. Người tham gia gần nhất giờ có thể hoàn tất chu kỳ và nhận phân bổ Signature; cho đến khi có người hoàn tất, một nét bút mới vẫn có thể kéo dài chu kỳ."
     },
     "console": {
       "title": "Đặt nét bút",
@@ -588,59 +601,94 @@
       "reserveLabel": "Phân bổ Signature",
       "reserveExtras": "+ 1.000 CST · 1 Cosmic Signature NFT · tài sản đính kèm",
       "reserveUsd": "≈ {amount} USD",
-      "notifyAria": "Thông báo cho tôi trước khi chu kỳ có thể hoàn tất",
-      "notifyLabel": "Nhắc tôi trước khi hoàn tất:",
-      "notifyMinutes": "{minutes} phút",
       "calendarTitle": "Chu kỳ Cosmic Signature #{number} mở",
       "calendarBody": "Chu kỳ trình diễn tiếp theo mở cho nét bút. Nét bút đầu tiên khởi động đếm ngược hoàn tất.",
-      "calendarCta": "Thêm thời điểm mở vào lịch của bạn"
+      "calendarCta": "Thêm thời điểm mở vào lịch của bạn",
+      "units": {
+        "days": "{count, plural, other {ngày}}",
+        "hours": "{count, plural, other {giờ}}",
+        "minutes": "{count, plural, other {phút}}",
+        "seconds": "{count, plural, other {giây}}"
+      },
+      "state": {
+        "ready": "Sẵn sàng hoàn tất",
+        "confirming": "Đang xác nhận"
+      },
+      "finalize": {
+        "exclusiveFor": "Chỉ bạn có thể hoàn tất trong",
+        "openIn": "Ai cũng có thể hoàn tất sau",
+        "openNow": "Giờ đây ai cũng có thể hoàn tất"
+      }
     },
     "standings": {
       "title": "Thứ hạng trực tiếp",
-      "tooltip": "Người đang giữ từng vai trò trong chu kỳ. Số liệu cập nhật liên tục; vai trò chỉ được xác định khi chu kỳ hoàn tất.",
-      "youBadge": "Bạn",
-      "latestName": "Nét bút mới nhất",
       "latestTooltip": "Người đặt nét bút gần nhất có thể nhận phân bổ Signature khi hoàn tất chu kỳ sau khi đếm ngược về 0.",
-      "held": "đã giữ {duration}",
-      "record": "kỷ lục {duration}",
-      "awaitingGesture": "Đang chờ nét bút đầu tiên",
-      "awaitingRecord": "Chưa có kỷ lục",
       "cstPlusNft": "1.000 CST + NFT"
     },
     "intel": {
-      "latestSubtitle": "Chi phí, lượng CST đã khắc và các phân bổ hiện có thể nhận từ nét bút gần nhất.",
-      "viewGesture": "Mở nét bút",
-      "inLineFor": "Phân bổ hiện có thể nhận khi hoàn tất",
-      "attachedNfts": "{count, plural, other {# NFT đính kèm}}",
-      "attachedTokens": "{count, plural, other {# khoản nạp token đính kèm}}",
-      "plusCycleAttachments": "Cộng thêm {assets} chu kỳ đang giữ.",
-      "enduranceChronoTitle": "Quán quân Bền bỉ và Chiến binh Thời gian",
-      "enduranceChronoSubtitle": "Các kỷ lục hiện tại và thời gian đang tiến gần đến kỷ lục.",
-      "liveRoleState": "Trạng thái vai trò trực tiếp"
-    },
-    "prices": {
-      "availableAfterFirst": "Sau nét bút đầu tiên",
-      "openDockHint": "Chi phí trực tiếp · mở thanh thao tác để tham gia"
+      "viewGesture": "Mở nét bút"
     },
     "ribbon": {
       "title": "Các luồng phân bổ",
       "subtitle": "Mọi thứ chu kỳ này phân phối khi hoàn tất",
       "tooltip": "Góc nhìn trực tiếp về mọi luồng phân bổ trong chu kỳ trình diễn hiện tại. Số lượng tăng theo dự trữ và được phân phối khi chu kỳ hoàn tất.",
       "fullBreakdown": "Xem chi tiết đầy đủ",
-      "stellarStatus": "mỗi nét bút là một lượt",
       "nextCycleName": "Dự trữ chu kỳ tiếp theo",
       "nextCycleTooltip": "Phần này không được phân phối khi hoàn tất — nó ở lại trong dự trữ và khởi đầu chu kỳ trình diễn tiếp theo.",
-      "nextCycleDetail": "tích lũy chuyển tiếp",
-      "percentOfReserve": "{percent}% dự trữ"
+      "nextCycleDetail": "tích lũy chuyển tiếp"
     },
     "dock": {
       "aria": "Thao tác nhanh của chu kỳ",
-      "reserve": "Dự trữ",
       "openPanelAria": "Mở bảng nét bút"
     },
     "panel": {
-      "microcopy": "Mỗi nét bút kéo dài đếm ngược hoàn tất, được tính vào Tinh tuyển và có thể khắc CST tham gia.",
       "sheetTitle": "Đặt nét bút"
+    },
+    "ledger": {
+      "columns": {
+        "holder": "Người giữ",
+        "time": "Thời gian giữ",
+        "allocation": "Phân bổ"
+      },
+      "passesIn": "Vượt kỷ lục Bền bỉ sau {duration}",
+      "extendsIn": "Nối dài kỷ lục Bền bỉ sau {duration}",
+      "chronoMayClose": "Ngừng tăng sau {duration} nếu lần giữ hiện tại tiếp tục",
+      "finalCstNote": "Chỉ thay đổi khi có nét bút CST",
+      "position": "Vị trí nét bút",
+      "challenge": {
+        "title": "Lần giữ Bền bỉ hiện tại",
+        "held": "Đến nay",
+        "record": "Kỷ lục Chiến binh Thời gian",
+        "passesIn": "Vượt sau"
+      },
+      "paid": "Đã trả",
+      "received": "Đã nhận"
+    },
+    "standing": {
+      "title": "Vị thế của bạn trong chu kỳ",
+      "position": "Vị thế",
+      "positionLatest": "Bạn đang giữ Nét bút gần nhất",
+      "positionOther": "Người khác đang giữ Nét bút gần nhất",
+      "positionNone": "Bạn chưa đặt nét bút nào trong chu kỳ này",
+      "positionTaken": "Vị trí của bạn đã bị thay thế",
+      "takenBy": "Người thay thế",
+      "dismiss": "Đóng",
+      "positionExclusive": "Chỉ bạn có thể hoàn tất",
+      "positionWindowEnded": "Khoảng thời gian dành riêng cho bạn đã kết thúc",
+      "goToFinalize": "Đến phần hoàn tất",
+      "thisCycle": "Chu kỳ này",
+      "gestures": "{count, plural, =0 {Bạn chưa có nét bút nào} other {# trên {total} nét bút}}",
+      "share": "{percent} số mục Tinh tuyển",
+      "updating": "Đang cập nhật sau nét bút của bạn",
+      "checkFailed": "Không thể kiểm tra",
+      "retry": "Thử lại",
+      "waiting": "Đang chờ nhận về",
+      "waitingNothing": "Không có",
+      "waitingNfts": "{count, plural, other {# NFT}}",
+      "retrieveHint": "Nhận về tại Phân bổ của tôi",
+      "connectBody": "Kết nối ví để xem vị thế của bạn, số nét bút của bạn trong chu kỳ này và những gì đang chờ nhận về.",
+      "spent": "Bạn đã chi trong chu kỳ này",
+      "landed": "Nét bút của bạn đã được ghi nhận. Bạn đang giữ Nét bút gần nhất."
     }
   },
   "cycleDetails": {
@@ -650,17 +698,14 @@
   "publicGoods": {
     "eyebrow": "Hàng hóa công",
     "heading": "Tài trợ những người đóng góp cốt lõi cho Ethereum.",
-    "thisCycle": "Chu kỳ này",
-    "body": "{percent}% của mỗi chu kỳ trình diễn được chuyển đến Protocol Guild, cơ chế tài trợ cho hơn 170 người đóng góp cốt lõi cho Ethereum.",
-    "cta": "Xem đóng góp hàng hóa công",
     "stats": {
-      "lifetime": "Tổng đã đóng góp",
-      "lifetimeTooltip": "Các khoản chuyển tự động của giao thức cộng với đóng góp hàng hóa công tự nguyện.",
       "vault": "Hiện có trong kho",
       "vaultTooltip": "ETH hiện được giữ trong Kho Hàng hóa công trước khi được nhận về.",
       "retrieved": "Đã nhận về",
       "retrievedTooltip": "Tổng ETH đã nhận về từ Kho Hàng hóa công cho các đơn vị thụ hưởng."
-    }
+    },
+    "projected": "Dự kiến chu kỳ này",
+    "projectedTooltip": "Dự trữ chu kỳ hiện tại × tỷ lệ Hàng hóa công {percent}. Khoản này được chuyển vào Kho Hàng hóa công khi chu kỳ hoàn tất, nên vẫn có thể thay đổi."
   },
   "latestNfts": {
     "title": "NFT mới nhất",
@@ -674,37 +719,38 @@
   },
   "rwlkGrid": {
     "searchPlaceholder": "Nhập mã NFT",
-    "searchAria": "Tìm RandomWalk NFT theo mã",
-    "tokenAria": "RandomWalk NFT {id}",
-    "empty": "Không tìm thấy NFT phù hợp"
+    "searchAria": "Tìm Random Walk NFT theo mã",
+    "tokenAria": "Random Walk NFT {id}",
+    "empty": "Không tìm thấy NFT phù hợp",
+    "none": "Ví này không có Random Walk NFT nào chưa dùng.",
+    "loading": "Đang đọc Random Walk NFT của ví này…"
   },
   "orientation": {
     "title": "Cách chu kỳ hoạt động",
-    "steps": {
-      "enter": {
-        "title": "Đặt nét bút",
-        "body": "Thanh toán bằng ETH hoặc CST. Ví nhận CST tham gia ngay lập tức."
-      },
-      "extend": {
-        "title": "Giữ vị trí gần nhất",
-        "body": "Mỗi nét bút mới thay thế người tham gia gần nhất và có thể kéo dài đếm ngược."
-      },
-      "finalize": {
-        "title": "Hoàn tất khi về 0",
-        "body": "Người tham gia gần nhất có thể hoàn tất để nhận phân bổ Signature. Vẫn có thể đặt nét bút cho đến khi giao dịch hoàn tất được xác nhận."
-      }
-    },
     "costsNote": "ETH hoặc CST đã dùng cho nét bút không được hoàn trả khi người khác thay thế vị trí của bạn. Phí gas giao dịch luôn được thanh toán bằng ETH.",
-    "standingsTitle": "Thêm cách tham gia",
-    "standingsDescription": "Khám phá kỷ lục Bền bỉ và Thời gian trong chu kỳ này.",
     "allocationsTitle": "Dự trữ chu kỳ được phân bổ ra sao",
     "allocationsDescription": "Xem mọi phân bổ, bao gồm Tinh tuyển và Hàng hóa công.",
     "storyTitle": "Nghệ thuật phía sau chu kỳ",
     "methods": {
       "eth": "Thanh toán chi phí nét bút hiện tại bằng ETH.",
       "cst": "Dùng CST sẵn có trong ví. Chi phí trực tiếp thay đổi theo thời gian.",
-      "randomWalk": "Dùng RandomWalk NFT đủ điều kiện để giảm chi phí nét bút ETH. NFT vẫn ở trong ví."
+      "randomWalk": "Dùng Random Walk NFT đủ điều kiện để giảm chi phí nét bút ETH. NFT vẫn ở trong ví."
     },
     "connectHelp": "Kết nối ví trên Arbitrum để xem lại và xác nhận nét bút."
+  },
+  "latestSignature": {
+    "title": "Signature mới nhất",
+    "gallery": "Phòng trưng bày",
+    "unnamed": "Cosmic Signature {id}",
+    "named": "“{name}”, Cosmic Signature {id}",
+    "imprintedIn": "Được khắc trong Chu kỳ #{number}",
+    "position": "{index} / {count}",
+    "newer": "Signature mới hơn",
+    "older": "Signature cũ hơn",
+    "none": "Chưa có Signature nào được khắc"
+  },
+  "announce": {
+    "newGesture": "Nét bút mới của {address}; người này hiện là người tham gia gần nhất.",
+    "placeTaken": "Vị trí của bạn đã bị thay thế: {address} hiện giữ Nét bút gần nhất."
   }
 }

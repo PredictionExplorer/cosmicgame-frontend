@@ -559,6 +559,28 @@ describe('useChampions', () => {
     expect(result.current.latestGesture.holdDuration).toBe(60);
   });
 
+  it('measures holds against the page clock before the ticker runs', () => {
+    // Regression (F007): the shared ticker reads 0 during server rendering and
+    // hydration, which painted a confident "0s" hold and 0% Endurance progress.
+    mockChampionQuery(snapshot(baseSnapshot));
+    mockUseNow.mockReturnValue(0);
+
+    const seeded = renderHook(() => useChampions(baseSnapshot, undefined, true, 1_100_000));
+    expect(seeded.result.current.latestGesture.isTimeKnown).toBe(true);
+    expect(seeded.result.current.latestGesture.holdDuration).toBe(200);
+
+    const unseeded = renderHook(() => useChampions(baseSnapshot));
+    expect(unseeded.result.current.latestGesture.isTimeKnown).toBe(false);
+  });
+
+  it('lets the live ticker take over from the page clock', () => {
+    mockChampionQuery(snapshot(baseSnapshot));
+    mockUseNow.mockReturnValue(1_200_000);
+
+    const { result } = renderHook(() => useChampions(baseSnapshot, undefined, true, 1_100_000));
+    expect(result.current.latestGesture.holdDuration).toBe(300);
+  });
+
   it('passes loading state through when data is unavailable', () => {
     mockUseSpecialAllocationSnapshot.mockReturnValue({
       snapshot: null,

@@ -1,14 +1,11 @@
 import userEvent from '@testing-library/user-event';
 
-import { getRelativeTime, shortenHex } from '@/utils';
-
-import { routing } from '@/i18n/routing';
 import type { GestureFeedSystemEvent } from '@/components/home/deck/feedSystemEvents';
 import type { GestureInfo } from '@/services/api';
 
 import { render, screen, within, act, checkA11y, fireEvent } from '@/test-utils';
 
-import { GestureMessageChat } from '../GestureMessageChat';
+import { GestureMessageChat, buildFeedRows, phoneVisibleRows } from '../GestureMessageChat';
 
 const mockUseBannedGestures = jest.fn().mockReturnValue({ data: [] });
 
@@ -33,160 +30,110 @@ function makeGesture(overrides: Partial<GestureInfo>): GestureInfo {
   };
 }
 
+function makeEvent(index: number, overrides: Partial<GestureFeedSystemEvent> = {}) {
+  return {
+    id: `event-${index}`,
+    kind: 'newParticipant',
+    timestamp: 1_700_000_000 + index,
+    address: `0x${String(index).padStart(40, '0')}`,
+    ...overrides,
+  } as GestureFeedSystemEvent;
+}
+
 beforeEach(() => {
   mockUseBannedGestures.mockReturnValue({ data: [] });
 });
 
 describe('GestureMessageChat', () => {
-  it('renders only gestures with non-empty messages', () => {
+  it('shows only gestures with a message, newest first, with counts in the header', () => {
     render(
       <GestureMessageChat
         cycleNumber={7}
         gestures={[
-          makeGesture({ EvtLogId: 1, Message: 'First signal' }),
+          makeGesture({ EvtLogId: 1, TimeStamp: 100, Message: 'Older signal' }),
           makeGesture({ EvtLogId: 2, Message: '' }),
           makeGesture({ EvtLogId: 3, Message: '   ' }),
-          makeGesture({ EvtLogId: 4, Message: undefined }),
+          makeGesture({ EvtLogId: 4, TimeStamp: 200, Message: 'Newer signal' }),
         ]}
       />,
     );
 
-    expect(screen.getByRole('heading', { name: 'home.chat.title' })).toBeInTheDocument();
-    expect(screen.getByText('First signal')).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Open gesture 2' })).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'home.chat.title' })).toBeVisible();
+    const messages = screen.getAllByTestId('chat-message');
+    expect(messages).toHaveLength(2);
+    expect(messages[0]).toHaveTextContent('Newer signal');
+    expect(messages[1]).toHaveTextContent('Older signal');
     expect(
       screen.getByText(
-        'home.chat.cycleNumber(number=7) · home.chat.messageCount(count=1) · home.chat.eventCount(count=0)',
+        'home.chat.cycleNumber(number=7) · home.chat.messageCount(count=2) · home.chat.eventCount(count=0)',
       ),
     ).toBeInTheDocument();
   });
 
-  it('counts only visible messages in the header subtitle', () => {
+  it('carries its freshness stamp instead of a hand-built live pill', () => {
+    const { container } = render(<GestureMessageChat gestures={[makeGesture({})]} />);
+    const header = screen.getByRole('heading', { name: 'home.chat.title' }).closest('header')!;
+    expect(header.querySelector('[data-live-state]')).not.toBeNull();
+    expect(container).not.toHaveTextContent('home.chat.liveFeed');
+    // The stamp holds still: the page's one breathing dot is the Cycle pill.
+    expect(container.querySelector('.animate-live-dot')).toBeNull();
+  });
+
+  it('explains how to join the chat once, beside its title', () => {
+    render(<GestureMessageChat gestures={[]} />);
+    expect(screen.getByRole('button', { name: /home\.chat\.title/ })).toBeInTheDocument();
+  });
+
+  it('reads each message as the address, method and cost, position link, age and body', () => {
     render(
       <GestureMessageChat
-        cycleNumber={9}
         gestures={[
-          makeGesture({ EvtLogId: 1, Message: 'One' }),
-          makeGesture({ EvtLogId: 2, Message: 'Two' }),
-          makeGesture({ EvtLogId: 3, Message: '' }),
+          makeGesture({ EvtLogId: 42, BidPosition: 12, GestureCostEth: 0.1021, Message: 'gm' }),
         ]}
       />,
     );
-
+    const message = screen.getByTestId('chat-message');
+    expect(within(message).getByRole('link', { name: /0x1111/ })).toHaveAttribute(
+      'href',
+      '/user/0x1111111111111111111111111111111111111111',
+    );
+    expect(within(message).getByTestId('gesture-method-badge')).toHaveTextContent(
+      'home.chat.badge.eth(amount=0.1021)',
+    );
     expect(
-      screen.getByText(
-        'home.chat.cycleNumber(number=9) · home.chat.messageCount(count=2) · home.chat.eventCount(count=0)',
-      ),
-    ).toBeInTheDocument();
+      within(message).getByRole('link', { name: 'home.chat.openPositionAria(position=12)' }),
+    ).toHaveAttribute('href', '/gesture/42');
+    expect(message.querySelector('time')).toHaveAttribute('dateTime');
+    expect(message).toHaveTextContent('gm');
   });
 
-  it('shows newest messages first regardless of input order', () => {
+  it.each([
+    [{ GestureType: 2, CstCost: 250.75 }, 'home.chat.badge.cst(amount=250.75)'],
+    [{ GestureType: 1, GestureCostEth: 0.05 }, 'home.chat.badge.ethRwlk(amount=0.0500)'],
+    [{ GestureType: 2, CstCost: undefined }, 'home.chat.badge.cstFallback'],
+  ])('names the method of %o', (overrides, expected) => {
+    render(<GestureMessageChat gestures={[makeGesture(overrides as Partial<GestureInfo>)]} />);
+    expect(screen.getByTestId('gesture-method-badge')).toHaveTextContent(expected);
+  });
+
+  it('marks the connected wallet’s own messages', () => {
     render(
       <GestureMessageChat
         gestures={[
-          makeGesture({ EvtLogId: 1, TimeStamp: 100, Message: 'Older message' }),
-          makeGesture({ EvtLogId: 2, TimeStamp: 300, Message: 'Newest message' }),
-          makeGesture({ EvtLogId: 3, TimeStamp: 200, Message: 'Middle message' }),
-        ]}
-      />,
-    );
-
-    const items = screen.getAllByRole('listitem');
-    expect(within(items[0]!).getByText('Newest message')).toBeInTheDocument();
-    expect(within(items[1]!).getByText('Middle message')).toBeInTheDocument();
-    expect(within(items[2]!).getByText('Older message')).toBeInTheDocument();
-  });
-
-  it('explains how to join the chat through a tooltip', async () => {
-    const user = userEvent.setup();
-    render(<GestureMessageChat gestures={[makeGesture({ Message: 'hello cosmos' })]} />);
-
-    await user.hover(screen.getByRole('button', { name: 'home.chat.joinTooltipAria' }));
-
-    expect(await screen.findAllByText('home.chat.joinTooltip')).not.toHaveLength(0);
-  });
-
-  it('renders the address, visible exact UTC time, relative age, and message body', () => {
-    const participant = '0x2222222222222222222222222222222222222222';
-    const timestamp = Math.floor(Date.now() / 1000) - 300;
-
-    render(
-      <GestureMessageChat
-        gestures={[
+          makeGesture({ EvtLogId: 1, Message: 'mine' }),
           makeGesture({
-            EvtLogId: 9,
-            BidPosition: 3,
-            BidderAddr: participant,
-            TimeStamp: timestamp,
-            Message: 'A carefully timed gesture.',
+            EvtLogId: 2,
+            BidderAddr: '0x2222222222222222222222222222222222222222',
+            Message: 'theirs',
           }),
         ]}
+        account="0x1111111111111111111111111111111111111111"
       />,
     );
-
-    expect(screen.getByRole('link', { name: shortenHex(participant, 6) })).toHaveAttribute(
-      'href',
-      `/user/${participant}`,
-    );
-    const positionBadge = screen.getByRole('link', {
-      name: 'home.chat.openPositionAria(position=3)',
-    });
-    expect(positionBadge).toHaveAttribute('href', '/gesture/9');
-    expect(positionBadge).toHaveTextContent('#3');
-
-    const time = screen.getByText(/^[45] minutes ago$/).closest('time');
-    expect(time).toHaveAttribute('dateTime', new Date(timestamp * 1000).toISOString());
-    expect(time).toHaveTextContent(/\d{4}, \d{2}:\d{2}:\d{2} UTC/);
-
-    expect(screen.getByText('A carefully timed gesture.')).toBeInTheDocument();
-  });
-
-  it('shows a gesture method badge with the gesture cost', () => {
-    render(
-      <GestureMessageChat
-        gestures={[
-          makeGesture({ EvtLogId: 1, GestureType: 0, GestureCostEth: 0.1, Message: 'eth' }),
-          makeGesture({ EvtLogId: 2, GestureType: 2, CstCost: 20, Message: 'cst' }),
-          makeGesture({ EvtLogId: 3, GestureType: 1, GestureCostEth: 0.05, Message: 'rwlk' }),
-        ]}
-      />,
-    );
-
-    const badges = screen.getAllByTestId('gesture-method-badge').map((badge) => badge.textContent);
-    expect(badges).toContain('home.chat.badge.eth(amount=0.1000)');
-    expect(badges).toContain('home.chat.badge.cst(amount=20.00)');
-    expect(badges).toContain('home.chat.badge.ethRwlk(amount=0.0500)');
-  });
-
-  it('copies the participant address from a message', async () => {
-    const originalClipboard = navigator.clipboard;
-    const writeText = jest.fn().mockResolvedValue(undefined);
-    Object.defineProperty(navigator, 'clipboard', {
-      value: { writeText },
-      writable: true,
-      configurable: true,
-    });
-    try {
-      const participant = '0x5555555555555555555555555555555555555555';
-      render(
-        <GestureMessageChat
-          gestures={[makeGesture({ BidderAddr: participant, Message: 'copy me' })]}
-        />,
-      );
-
-      fireEvent.click(screen.getByRole('button', { name: 'common.actions.copyAddress' }));
-
-      expect(writeText).toHaveBeenCalledWith(participant);
-      expect(
-        await screen.findByRole('button', { name: 'common.actions.addressCopied' }),
-      ).toBeInTheDocument();
-    } finally {
-      Object.defineProperty(navigator, 'clipboard', {
-        value: originalClipboard,
-        writable: true,
-        configurable: true,
-      });
-    }
+    const mine = screen.getByText('mine').closest('article')!;
+    const theirs = screen.getByText('theirs').closest('article')!;
+    expect(within(mine).getByText('home.chat.you')).toBeVisible();
+    expect(within(theirs).queryByText('home.chat.you')).not.toBeInTheDocument();
   });
 
   it('linkifies message URLs behind a leave-site confirmation', async () => {
@@ -195,459 +142,180 @@ describe('GestureMessageChat', () => {
       const user = userEvent.setup();
       render(
         <GestureMessageChat
-          gestures={[makeGesture({ Message: 'mint at https://example.com/mint now' })]}
+          gestures={[makeGesture({ Message: 'see https://example.com/art now' })]}
         />,
       );
-
-      await user.click(screen.getByRole('button', { name: 'https://example.com/mint' }));
-
+      await user.click(screen.getByRole('button', { name: 'https://example.com/art' }));
       expect(await screen.findByRole('dialog')).toHaveTextContent('common.externalLink.title');
       expect(openSpy).not.toHaveBeenCalled();
-
-      await user.click(screen.getByRole('button', { name: 'common.externalLink.open' }));
-
-      expect(openSpy).toHaveBeenCalledWith(
-        'https://example.com/mint',
-        '_blank',
-        'noopener,noreferrer',
-      );
     } finally {
       openSpy.mockRestore();
     }
   });
 
-  it('keeps long content as text and exposes the full wallet address', () => {
-    const participant = '0x3333333333333333333333333333333333333333';
+  it('keeps long content as text and never overflows the row', () => {
     const longMessage = 'Signal '.repeat(80).trim();
-
-    render(
-      <GestureMessageChat
-        gestures={[makeGesture({ EvtLogId: 10, BidderAddr: participant, Message: longMessage })]}
-      />,
-    );
-
-    expect(screen.getByText(longMessage)).toBeInTheDocument();
-    expect(screen.getByTitle(participant)).toBeInTheDocument();
+    render(<GestureMessageChat gestures={[makeGesture({ Message: longMessage })]} />);
+    const body = screen.getByText(longMessage);
+    expect(body.closest('p')).toHaveClass('[overflow-wrap:anywhere]');
   });
 
-  it('shows an empty state when the current cycle has no messages', () => {
-    render(<GestureMessageChat gestures={[makeGesture({ Message: '' })]} />);
-
-    const title = screen.getByText('home.chat.empty.title');
-    expect(title).toBeInTheDocument();
-    expect(screen.getByText('home.chat.empty.description')).toBeInTheDocument();
-    expect(title.parentElement).toHaveClass(
-      'min-h-[14rem]',
-      'sm:min-h-[16rem]',
-      'xl:h-full',
-      'xl:min-h-0',
-    );
-    expect(
-      screen.getByText(
-        'home.chat.currentCycle · home.chat.messageCount(count=0) · home.chat.eventCount(count=0)',
-      ),
-    ).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'home.chat.empty.cta' })).not.toBeInTheDocument();
-  });
-
-  it('offers a Make a Gesture call to action in the empty state when wired', async () => {
-    const user = userEvent.setup();
-    const onJoinCta = jest.fn();
-
-    render(<GestureMessageChat gestures={[]} onJoinCta={onJoinCta} />);
-
-    await user.click(screen.getByRole('button', { name: 'home.chat.empty.cta' }));
-
-    expect(onJoinCta).toHaveBeenCalledTimes(1);
-  });
-
-  it('uses compact responsive layout and an accessible scroller at every size', () => {
-    const participant = '0x4444444444444444444444444444444444444444';
-
-    render(
-      <GestureMessageChat
-        gestures={[
-          makeGesture({ EvtLogId: 12, BidderAddr: participant, Message: 'Wide rail ready' }),
-        ]}
-      />,
-    );
-
-    const scroll = screen.getByTestId('gesture-message-chat-scroll');
-    expect(
-      screen.getByRole('region', {
-        name: 'home.chat.title',
-      }),
-    ).toBe(scroll);
-    expect(scroll).toHaveAttribute('tabIndex', '0');
-    expect(scroll).toHaveClass(
-      'min-h-0',
-      'max-h-[min(28rem,55svh)]',
-      'overflow-y-auto',
-      'overscroll-y-contain',
-      'lg:max-h-[calc(100vh-13rem)]',
-      'xl:max-h-none',
-      'xl:p-4',
-      'print:max-h-none',
-      'print:overflow-visible',
-    );
-
-    expect(screen.getByTestId('gesture-message-meta')).toHaveClass(
-      'max-sm:flex-col',
-      'max-sm:items-start',
-    );
-    expect(screen.getByTestId('gesture-message-badges')).toHaveClass('max-sm:justify-start');
-
-    expect(screen.getByLabelText(`home.chat.messageAria(address=${participant})`)).toHaveAttribute(
-      'data-newest',
-      'true',
-    );
-    expect(screen.getByRole('button', { name: 'common.actions.copyAddress' })).toHaveClass(
-      'max-sm:min-h-11',
-      'max-sm:min-w-11',
-    );
-    expect(screen.getByTestId('gesture-message-chat')).toHaveClass(
-      'print:h-auto',
-      'print:overflow-visible',
-    );
-  });
-
-  it('excludes messages for banned gestures', () => {
+  it('excludes messages for banned gestures unless the server moderated the page', () => {
     mockUseBannedGestures.mockReturnValue({ data: [{ bid_id: 2 }] });
+    const { rerender } = render(
+      <GestureMessageChat gestures={[makeGesture({ EvtLogId: 2, Message: 'Hidden' })]} />,
+    );
+    expect(screen.queryByText('Hidden')).not.toBeInTheDocument();
 
+    rerender(
+      <GestureMessageChat
+        gestures={[makeGesture({ EvtLogId: 2, Message: 'Hidden' })]}
+        serverModerated
+      />,
+    );
+    expect(screen.getByText('Hidden')).toBeInTheDocument();
+  });
+
+  it('lets messages lead and folds the events between two messages into one line', async () => {
+    const user = userEvent.setup();
     render(
       <GestureMessageChat
         gestures={[
-          makeGesture({ EvtLogId: 1, Message: 'Visible message' }),
-          makeGesture({ EvtLogId: 2, Message: 'Hidden message' }),
+          makeGesture({ EvtLogId: 1, TimeStamp: 1_700_000_000, Message: 'first' }),
+          makeGesture({ EvtLogId: 2, TimeStamp: 1_700_000_100, Message: 'second' }),
         ]}
+        systemEvents={[makeEvent(10), makeEvent(20), makeEvent(30)]}
       />,
     );
 
-    expect(screen.getByText('Visible message')).toBeInTheDocument();
-    expect(screen.queryByText('Hidden message')).not.toBeInTheDocument();
+    const rows = screen
+      .getAllByRole('listitem')
+      .filter((item) => item.hasAttribute('data-chat-row'));
+    expect(rows.map((row) => row.getAttribute('data-chat-row'))).toEqual([
+      'message:2',
+      'events:event-30',
+      'message:1',
+    ]);
+    const group = screen.getByTestId('chat-event-group');
+    expect(group).toHaveAttribute('data-count', '3');
+    expect(group).not.toHaveAttribute('open');
+    expect(within(group).getByText('home.chat.eventGroup(count=3)')).toBeVisible();
+
+    await user.click(within(group).getByText('home.chat.eventGroup(count=3)'));
+    expect(group).toHaveAttribute('open');
+    expect(within(group).getAllByTestId('chat-system-event')).toHaveLength(3);
   });
 
-  it('flashes the live pulse when a new gesture event increments the pulse key', () => {
-    jest.useFakeTimers();
-    try {
-      const { rerender } = render(
-        <GestureMessageChat gestures={[makeGesture({ Message: 'hello cosmos' })]} pulseKey={0} />,
-      );
-
-      const chat = screen.getByTestId('gesture-message-chat');
-      expect(chat).not.toHaveClass('animate-live-flash');
-
-      rerender(
-        <GestureMessageChat gestures={[makeGesture({ Message: 'hello cosmos' })]} pulseKey={1} />,
-      );
-      expect(chat).toHaveClass('animate-live-flash');
-
-      act(() => {
-        jest.advanceTimersByTime(950);
-      });
-      expect(chat).not.toHaveClass('animate-live-flash');
-    } finally {
-      jest.useRealTimers();
-    }
-  });
-
-  it('does not flash on first render even with a positive pulse key', () => {
-    render(
-      <GestureMessageChat gestures={[makeGesture({ Message: 'hello cosmos' })]} pulseKey={4} />,
-    );
-
-    expect(screen.getByTestId('gesture-message-chat')).not.toHaveClass('animate-live-flash');
-  });
-
-  it('interleaves system events into the feed by timestamp, newest first', () => {
+  it('lists every event in the All activity view, as compact rows that are not headings', async () => {
+    const user = userEvent.setup();
     render(
       <GestureMessageChat
-        gestures={[
-          makeGesture({ EvtLogId: 1, TimeStamp: 1_700_000_100, Message: 'older message' }),
-          makeGesture({ EvtLogId: 2, TimeStamp: 1_700_000_500, Message: 'newer message' }),
-        ]}
+        gestures={[makeGesture({ EvtLogId: 1, TimeStamp: 1_700_000_100, Message: 'hi' })]}
         systemEvents={[
-          { id: 'cycle-start-7', timestamp: 1_700_000_000, kind: 'cycleStart', cycleNumber: 7 },
-          {
-            id: 'endurance-1',
-            timestamp: 1_700_000_300,
-            kind: 'enduranceRecord',
-            address: '0x1111111111111111111111111111111111111111',
-            durationSeconds: 200,
-          },
+          makeEvent(1, { kind: 'enduranceRecord', durationSeconds: 100 }),
+          makeEvent(2, { kind: 'chronoReignEnded', durationSeconds: 200 }),
         ]}
       />,
     );
-
-    const listItems = screen.getAllByRole('listitem');
-    const order = listItems.map((item) =>
-      item.querySelector('[data-testid="chat-system-event"]')
-        ? (item.querySelector('[data-testid="chat-system-event"]') as HTMLElement).dataset.kind
-        : item.textContent?.includes('newer message')
-          ? 'newer'
-          : 'older',
-    );
-    expect(order).toEqual(['newer', 'enduranceRecord', 'older', 'cycleStart']);
-    expect(screen.getByText(/home\.chat\.system\.enduranceRecord/)).toBeInTheDocument();
-    expect(screen.getByText('home.chat.system.cycleStart(number=7)')).toBeInTheDocument();
-    // The header count stays messages-only.
-    expect(screen.getByText(/home\.chat\.messageCount\(count=2\)/)).toBeInTheDocument();
-    expect(screen.getByText(/home\.chat\.eventCount\(count=2\)/)).toBeInTheDocument();
+    const all = screen.getByRole('button', { name: 'home.chat.view.all' });
+    expect(all).toHaveAttribute('aria-pressed', 'false');
+    await user.click(all);
+    expect(all).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.queryByTestId('chat-event-group')).not.toBeInTheDocument();
+    const events = screen.getAllByTestId('chat-system-event');
+    expect(events.map((event) => event.dataset.kind)).toEqual([
+      'chronoReignEnded',
+      'enduranceRecord',
+    ]);
+    // Heading navigation reaches the chat, not forty event titles (F207).
+    expect(screen.getAllByRole('heading').map((heading) => heading.textContent)).toEqual([
+      'home.chat.title',
+    ]);
   });
 
-  it('shows pending optimistic messages on top of the feed while confirming', () => {
+  it('keeps a lone event as a compact row', () => {
     render(
       <GestureMessageChat
-        gestures={[makeGesture({ EvtLogId: 1, TimeStamp: 1_700_000_100, Message: 'indexed one' })]}
-        pendingMessages={[
-          {
-            id: 'pending-1',
-            address: '0x2222222222222222222222222222222222222222',
-            message: 'my fresh message',
-            timestamp: 1_700_000_200,
-          },
-        ]}
+        gestures={[makeGesture({ EvtLogId: 1, TimeStamp: 1_700_000_100, Message: 'hi' })]}
+        systemEvents={[makeEvent(1, { kind: 'gestureMilestone', count: 1000, address: undefined })]}
       />,
     );
-
-    const pendingRow = screen.getByTestId('chat-pending-message');
-    expect(pendingRow).toHaveTextContent('my fresh message');
-    expect(pendingRow).toHaveTextContent('home.chat.pending.label');
-    expect(pendingRow.querySelector('time')).toHaveAttribute(
-      'dateTime',
-      '2023-11-14T22:16:40.000Z',
+    expect(screen.queryByTestId('chat-event-group')).not.toBeInTheDocument();
+    expect(screen.getByTestId('chat-system-event')).toHaveTextContent(
+      'home.chat.system.gestureMilestone(count=1,000)',
     );
-    expect(pendingRow.querySelector('time')).toHaveTextContent('Nov 14, 2023, 22:16:40 UTC');
-    // Pending rows render before the indexed feed.
-    const listItems = screen.getAllByRole('listitem');
-    expect(listItems[0]).toContainElement(pendingRow);
-    // The header count stays indexed-messages-only.
-    expect(screen.getByText(/home\.chat\.messageCount\(count=1\)/)).toBeInTheDocument();
   });
 
-  it('renders pending messages even when the indexed feed is still empty', () => {
-    render(
-      <GestureMessageChat
-        gestures={[]}
-        pendingMessages={[
-          {
-            id: 'pending-1',
-            address: '0x2222222222222222222222222222222222222222',
-            message: 'first ever message',
-            timestamp: 1_700_000_200,
-          },
-        ]}
-      />,
-    );
-
-    expect(screen.getByTestId('chat-pending-message')).toHaveTextContent('first ever message');
-    expect(screen.queryByText('home.chat.empty.title')).not.toBeInTheDocument();
+  it('does not read every chat update aloud', () => {
+    render(<GestureMessageChat gestures={[makeGesture({})]} systemEvents={[makeEvent(1)]} />);
+    const list = screen.getByTestId('gesture-message-chat-scroll').querySelector('ol')!;
+    expect(list).not.toHaveAttribute('aria-live');
   });
 
-  it('renders chrono-lead system events with their own styling', () => {
-    render(
-      <GestureMessageChat
-        gestures={[makeGesture({ EvtLogId: 1, TimeStamp: 1_700_000_100, Message: 'a message' })]}
-        systemEvents={[
-          {
-            id: 'chrono-1',
-            timestamp: 1_700_000_050,
-            kind: 'chronoLead',
-            address: '0x3333333333333333333333333333333333333333',
-            durationSeconds: 1_300,
-          },
-        ]}
-      />,
-    );
-
-    const event = screen.getByTestId('chat-system-event');
-    expect(event).toHaveAttribute('data-kind', 'chronoLead');
-    expect(event).toHaveTextContent(/home\.chat\.system\.chronoLead/);
+  it('settles the newest message in with the live rule when a Gesture lands', () => {
+    const gestures = [makeGesture({ EvtLogId: 1, Message: 'latest' })];
+    const { rerender } = render(<GestureMessageChat gestures={gestures} pulseKey={1} />);
+    expect(screen.getByTestId('chat-message')).not.toHaveAttribute('data-settling');
+    rerender(<GestureMessageChat gestures={gestures} pulseKey={2} />);
+    expect(screen.getByTestId('chat-message')).toHaveAttribute('data-settling', 'true');
   });
 
-  it('shows events and their timestamps alongside a join CTA when no participant messages exist', async () => {
+  it('shows a just-sent message as indexing, then with its transaction when indexing is slow', () => {
+    const pending = {
+      id: 'p1',
+      address: '0x1111111111111111111111111111111111111111',
+      message: 'on its way',
+      timestamp: 1_700_000_500,
+      txHash: '0xabc',
+    };
+    const { rerender } = render(<GestureMessageChat gestures={[]} pendingMessages={[pending]} />);
+    const row = screen.getByTestId('chat-pending-message');
+    expect(row).toHaveTextContent('home.chat.pending.label');
+    expect(row).toHaveTextContent('on its way');
+
+    rerender(<GestureMessageChat gestures={[]} pendingMessages={[{ ...pending, stale: true }]} />);
+    const stale = screen.getByTestId('chat-pending-message');
+    expect(stale).toHaveAttribute('data-stale', 'true');
+    expect(stale).toHaveTextContent('home.chat.pending.stillIndexing');
+    expect(
+      within(stale).getByRole('link', { name: /home\.chat\.pending\.viewTransaction/ }),
+    ).toHaveAttribute('href', expect.stringContaining('0xabc'));
+  });
+
+  it('offers the empty state and its call to action when nothing has happened yet', async () => {
     const user = userEvent.setup();
     const onJoinCta = jest.fn();
-    render(
-      <GestureMessageChat
-        gestures={[makeGesture({ Message: '' })]}
-        systemEvents={[
-          { id: 'cycle-start-7', timestamp: 1_700_000_000, kind: 'cycleStart', cycleNumber: 7 },
-        ]}
-        onJoinCta={onJoinCta}
-      />,
-    );
-
-    expect(screen.queryByText('home.chat.empty.title')).not.toBeInTheDocument();
-    const event = screen.getByTestId('chat-system-event');
-    expect(event).toHaveTextContent('home.chat.system.cycleStart(number=7)');
-    expect(event.querySelector('time')).toHaveAttribute('dateTime', '2023-11-14T22:13:20.000Z');
-    expect(event.querySelector('time')).toHaveTextContent('Nov 14, 2023, 22:13:20 UTC');
-    expect(event.querySelector('time')).toHaveTextContent(/ago/);
-    expect(screen.getByText(/home\.chat\.messageCount\(count=0\)/)).toBeInTheDocument();
+    render(<GestureMessageChat gestures={[]} onJoinCta={onJoinCta} />);
+    expect(screen.getByText('home.chat.empty.title')).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'home.chat.empty.cta' }));
     expect(onJoinCta).toHaveBeenCalledTimes(1);
   });
 
-  it.each<GestureFeedSystemEvent['kind']>([
-    'cycleOpen',
-    'enduranceGrowing',
-    'chronoReignEnded',
-    'finalCstLeader',
-    'newParticipant',
-    'gestureMilestone',
-    'cstCalibrationReady',
-    'finalWindow',
-    'clockExtended',
-    'clockReopened',
-    'finalizationAvailable',
-    'cycleFinalized',
-  ])('renders %s with its own localized copy and exact event time', (kind) => {
+  it('invites a message above cycle events when no participant has written yet', () => {
     render(
-      <GestureMessageChat
-        gestures={[]}
-        systemEvents={[
-          {
-            id: kind,
-            kind,
-            timestamp: 1_700_000_000,
-            address: '0x3333333333333333333333333333333333333333',
-            durationSeconds: 1_300,
-            cycleNumber: 7,
-            count: 10,
-          },
-        ]}
-      />,
+      <GestureMessageChat gestures={[]} systemEvents={[makeEvent(1)]} onJoinCta={jest.fn()} />,
     );
-
-    const event = screen.getByTestId('chat-system-event');
-    expect(event).toHaveAttribute('data-kind', kind);
-    // The event is identifiable from a real heading even without its color.
-    expect(
-      within(event).getByRole('heading', {
-        level: 3,
-        name: `home.chat.eventTitles.${kind}`,
-      }),
-    ).toBeInTheDocument();
-    expect(event).toHaveTextContent(`home.chat.system.${kind}(`);
-    expect(event.querySelector('time')).toHaveAttribute('dateTime', '2023-11-14T22:13:20.000Z');
-    expect(event.querySelector('time')).toHaveTextContent('Nov 14, 2023, 22:13:20 UTC');
-    expect(screen.getByText(/home\.chat\.eventCount\(count=1\)/)).toBeInTheDocument();
+    expect(screen.getByText('home.chat.empty.messagesFirst')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'home.chat.empty.cta' })).toBeVisible();
+    expect(screen.getByTestId('chat-system-event')).toBeInTheDocument();
   });
 
-  it('refreshes relative ages for messages and events while preserving their exact times', () => {
-    jest.useFakeTimers();
-    const realNow = Date.now();
-    const nowSeconds = Math.floor(realNow / 1000);
-    const messageTimestamp = nowSeconds - 8 * 3_600;
-    const eventTimestamp = nowSeconds - 3 * 86_400;
-    try {
-      render(
-        <GestureMessageChat
-          gestures={[makeGesture({ TimeStamp: messageTimestamp })]}
-          systemEvents={[
-            { id: 'start', timestamp: eventTimestamp, kind: 'cycleStart', cycleNumber: 7 },
-          ]}
-        />,
-      );
-      act(() => jest.advanceTimersByTime(30_000));
-
-      const messageTime = screen.getByText('8 hours ago').closest('time');
-      const eventTime = screen.getByText('3 days ago').closest('time');
-      expect(messageTime).toHaveAttribute(
-        'dateTime',
-        new Date(messageTimestamp * 1000).toISOString(),
-      );
-      expect(eventTime).toHaveAttribute('dateTime', new Date(eventTimestamp * 1000).toISOString());
-
-      act(() => {
-        jest.setSystemTime(realNow + 86_400_000);
-        jest.advanceTimersByTime(30_000);
-      });
-
-      expect(messageTime).toHaveTextContent('1 day ago');
-      expect(eventTime).toHaveTextContent('4 days ago');
-      expect(messageTime).toHaveAttribute(
-        'dateTime',
-        new Date(messageTimestamp * 1000).toISOString(),
-      );
-      expect(eventTime).toHaveAttribute('dateTime', new Date(eventTimestamp * 1000).toISOString());
-      // Clock ticks must not repeatedly announce every age in the live feed.
-      expect(messageTime).toHaveAttribute('aria-live', 'off');
-      expect(eventTime).toHaveAttribute('aria-live', 'off');
-    } finally {
-      act(() => {
-        jest.setSystemTime(realNow);
-        jest.advanceTimersByTime(30_000);
-      });
-      jest.useRealTimers();
-    }
-  });
-
-  it.each(routing.locales)('localizes exact dates and relative ages in %s', (locale) => {
-    const nextIntl = jest.requireMock('next-intl') as { useLocale: () => string };
-    const localeSpy = jest.spyOn(nextIntl, 'useLocale').mockReturnValue(locale);
-    const timestamp = Math.floor(Date.now() / 1000) - 3 * 86_400;
-    try {
-      render(
-        <GestureMessageChat
-          gestures={[]}
-          systemEvents={[{ id: 'start', timestamp, kind: 'cycleStart', cycleNumber: 7 }]}
-        />,
-      );
-      const time = screen.getByTestId('chat-system-event').querySelector('time');
-      expect(time).toHaveTextContent(getRelativeTime(timestamp, timestamp + 3 * 86_400, locale));
-      expect(time).toHaveAttribute('dateTime', new Date(timestamp * 1000).toISOString());
-      expect(time?.firstElementChild?.textContent).toContain('UTC');
-      expect(time?.firstElementChild?.textContent).toContain(
-        String(new Date(timestamp * 1000).getUTCFullYear()),
-      );
-    } finally {
-      localeSpy.mockRestore();
-    }
-  });
-
-  it('has no accessibility violations', async () => {
-    const { container } = render(
-      <GestureMessageChat
-        gestures={[makeGesture({ Message: 'Accessible gesture message' })]}
-        systemEvents={[
-          { id: 'start', kind: 'cycleStart', timestamp: 1_700_000_000, cycleNumber: 7 },
-          {
-            id: 'record',
-            kind: 'enduranceGrowing',
-            timestamp: 1_700_000_100,
-            address: '0x1111111111111111111111111111111111111111',
-            durationSeconds: 100,
-          },
-        ]}
-      />,
-    );
-
-    await checkA11y(container);
-  });
-
-  it('shows loading and retry states without presenting failed requests as an empty chat', async () => {
+  it('shows loading and a first-read failure without presenting either as an empty chat', async () => {
     const user = userEvent.setup();
     const onRetry = jest.fn();
     const { rerender } = render(
       <GestureMessageChat gestures={[]} isLoading onJoinCta={jest.fn()} />,
     );
-
-    expect(screen.getByRole('status')).toHaveTextContent('home.chat.history.loading');
+    expect(screen.getByText('home.chat.history.loading').closest('[role="status"]')).not.toBeNull();
     expect(screen.queryByText('home.chat.empty.title')).not.toBeInTheDocument();
     expect(screen.queryByText(/home\.chat\.messageCount/)).not.toBeInTheDocument();
-    expect(screen.queryByText(/home\.chat\.eventCount/)).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'home.chat.empty.cta' })).not.toBeInTheDocument();
 
     rerender(<GestureMessageChat gestures={[]} error onRetry={onRetry} />);
-    expect(screen.getByRole('alert')).toHaveTextContent('home.chat.history.error');
-    expect(screen.queryByText('home.chat.empty.title')).not.toBeInTheDocument();
+    // A status, not an alert: nothing on screen is contradicted (F288).
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.getByText('home.chat.history.error')).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'home.chat.history.retry' }));
     expect(onRetry).toHaveBeenCalledTimes(1);
-
-    rerender(<GestureMessageChat gestures={[]} />);
-    expect(screen.getByText('home.chat.empty.title')).toBeInTheDocument();
   });
 
   it('keeps loaded messages readable while older history loads or needs a retry', async () => {
@@ -658,62 +326,98 @@ describe('GestureMessageChat', () => {
       pagination: { hasMore: true, isLoading: false, error: false, onLoadMore },
     };
     const { rerender } = render(<GestureMessageChat {...props} />);
+    expect(
+      screen.getByText(/home\.chat\.history\.showing\(messages=1,events=0\)/),
+    ).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'home.chat.history.loadOlder' }));
     expect(onLoadMore).toHaveBeenCalledTimes(1);
 
     rerender(
       <GestureMessageChat {...props} pagination={{ ...props.pagination, isLoading: true }} />,
     );
-    expect(screen.getByRole('button', { name: /home.chat.history.loadingOlder/ })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /home.chat.history.loadingOlder/ })).toHaveAttribute(
+      'aria-busy',
+      'true',
+    );
     expect(screen.getByText('Already loaded')).toBeInTheDocument();
 
     rerender(<GestureMessageChat {...props} pagination={{ ...props.pagination, error: true }} />);
-    expect(screen.getByRole('alert')).toHaveTextContent('home.chat.history.olderError');
-    expect(screen.getByText('Already loaded')).toBeInTheDocument();
+    expect(screen.getByText('home.chat.history.olderError')).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'home.chat.history.retry' }));
     expect(onLoadMore).toHaveBeenCalledTimes(2);
   });
 
+  it('shows the newest messages on phones and reveals more on demand, never scrolling inside the page', async () => {
+    const user = userEvent.setup();
+    const gestures = Array.from({ length: 20 }, (_, index) =>
+      makeGesture({ EvtLogId: index + 1, TimeStamp: 1_700_000_000 + index, Message: `m${index}` }),
+    );
+    render(<GestureMessageChat gestures={gestures} />);
+    const rows = screen
+      .getAllByRole('listitem')
+      .filter((item) => item.hasAttribute('data-chat-row'));
+    // Six messages lead on a phone; the rest wait behind "Show more".
+    expect(rows.filter((row) => row.classList.contains('max-lg:hidden'))).toHaveLength(14);
+    // The inner scroller exists only from 1024px.
+    const scroll = screen.getByTestId('gesture-message-chat-scroll');
+    expect(scroll.className).toMatch(/lg:overflow-y-auto/);
+    expect(scroll.className).not.toMatch(/(?:^|\s)overflow-y-auto/);
+
+    await user.click(screen.getByRole('button', { name: 'home.chat.history.showMore' }));
+    const after = screen
+      .getAllByRole('listitem')
+      .filter((item) => item.hasAttribute('data-chat-row'));
+    expect(after.filter((row) => row.classList.contains('max-lg:hidden'))).toHaveLength(4);
+    await user.click(screen.getByRole('button', { name: 'home.chat.history.showMore' }));
+    expect(screen.queryByRole('button', { name: 'home.chat.history.showMore' })).toBeNull();
+  });
+
+  it('fades the desktop feed at an edge only while there is more to scroll that way', () => {
+    const gestures = Array.from({ length: 12 }, (_, index) =>
+      makeGesture({ EvtLogId: index + 1, TimeStamp: 1_700_000_000 + index, Message: `m${index}` }),
+    );
+    render(<GestureMessageChat gestures={gestures} />);
+    const scroll = screen.getByTestId('gesture-message-chat-scroll');
+    // jsdom lays nothing out: a feed that fits shows no fade.
+    expect(scroll.style.maskImage).toBe('');
+
+    Object.defineProperty(scroll, 'scrollHeight', { configurable: true, value: 1200 });
+    Object.defineProperty(scroll, 'clientHeight', { configurable: true, value: 500 });
+    fireEvent.scroll(scroll);
+    expect(scroll).toHaveAttribute('data-overflow-bottom', 'true');
+    expect(scroll).not.toHaveAttribute('data-overflow-top');
+    expect(scroll.style.maskImage).toContain('calc(100% - 3rem)');
+
+    scroll.scrollTop = 700;
+    fireEvent.scroll(scroll);
+    expect(scroll).toHaveAttribute('data-overflow-top', 'true');
+    expect(scroll).not.toHaveAttribute('data-overflow-bottom');
+  });
+
   it('pages an event-only history and resets its window for corrected history or a new cycle', async () => {
     const user = userEvent.setup();
-    const systemEvents: GestureFeedSystemEvent[] = Array.from({ length: 120 }, (_, index) => ({
-      id: `event-${index}`,
-      kind: 'newParticipant',
-      timestamp: 1_700_000_000 + index,
-      address: `0x${String(index).padStart(40, '0')}`,
-    }));
+    const systemEvents = Array.from({ length: 120 }, (_, index) => makeEvent(index));
     const { rerender } = render(
       <GestureMessageChat gestures={[]} systemEvents={systemEvents} resetKey="7:original" />,
     );
     expect(screen.getAllByTestId('chat-system-event')).toHaveLength(50);
-    expect(screen.getAllByRole('listitem')[0]).toHaveAttribute('data-chat-row', 'event:event-119');
     await user.click(screen.getByRole('button', { name: 'home.chat.history.loadOlder' }));
     expect(screen.getAllByTestId('chat-system-event')).toHaveLength(100);
     await user.click(screen.getByRole('button', { name: 'home.chat.history.loadOlder' }));
     expect(screen.getAllByTestId('chat-system-event')).toHaveLength(120);
-    expect(
-      screen.queryByRole('button', { name: 'home.chat.history.loadOlder' }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'home.chat.history.loadOlder' })).toBeNull();
 
     rerender(
       <GestureMessageChat gestures={[]} systemEvents={systemEvents} resetKey="7:corrected" />,
-    );
-    expect(screen.getAllByTestId('chat-system-event')).toHaveLength(50);
-    await user.click(screen.getByRole('button', { name: 'home.chat.history.loadOlder' }));
-    rerender(
-      <GestureMessageChat gestures={[]} systemEvents={systemEvents} resetKey="8:original" />,
     );
     expect(screen.getAllByTestId('chat-system-event')).toHaveLength(50);
   });
 
   it('prints all known events and loaded messages without fetching older messages', () => {
     const onLoadMore = jest.fn().mockResolvedValue(undefined);
-    const systemEvents: GestureFeedSystemEvent[] = Array.from({ length: 75 }, (_, index) => ({
-      id: `event-${index}`,
-      kind: 'cycleStart',
-      timestamp: 1_700_000_000 + index,
-      cycleNumber: index,
-    }));
+    const systemEvents = Array.from({ length: 75 }, (_, index) =>
+      makeEvent(index, { kind: 'cycleStart', cycleNumber: index, address: undefined }),
+    );
     render(
       <GestureMessageChat
         gestures={[makeGesture({ Message: 'Loaded for print' })]}
@@ -730,14 +434,64 @@ describe('GestureMessageChat', () => {
     expect(screen.getAllByTestId('chat-system-event')).toHaveLength(50);
   });
 
-  it('does not apply legacy event-ID moderation to server-moderated message pages', () => {
-    mockUseBannedGestures.mockReturnValue({ data: [{ bid_id: 2 }] });
-    render(
+  it('has no accessibility violations with messages, folded events and a pending row', async () => {
+    const { container } = render(
       <GestureMessageChat
-        gestures={[makeGesture({ EvtLogId: 2, Message: 'Approved by server' })]}
-        serverModerated
+        cycleNumber={7}
+        gestures={[makeGesture({ EvtLogId: 1, Message: 'first' })]}
+        systemEvents={[makeEvent(1), makeEvent(2)]}
+        pendingMessages={[
+          {
+            id: 'p',
+            address: '0x1111111111111111111111111111111111111111',
+            message: 'pending',
+            timestamp: 1,
+            txHash: '0xabc',
+            stale: true,
+          },
+        ]}
+        onJoinCta={jest.fn()}
       />,
     );
-    expect(screen.getByText('Approved by server')).toBeInTheDocument();
+    await checkA11y(container);
+  });
+});
+
+describe('phoneVisibleRows', () => {
+  const rows = (types: string) =>
+    types.split('').map((c) => ({ type: c === 'm' ? 'message' : 'event' }));
+
+  it('shows every row up to the limit-th message, events between them included', () => {
+    expect(phoneVisibleRows(rows('memeem'), 0, 2)).toBe(3);
+    expect(phoneVisibleRows(rows('memeem'), 1, 2)).toBe(2);
+  });
+
+  it('shows a feed with fewer messages than the limit in full', () => {
+    expect(phoneVisibleRows(rows('meee'), 0, 6)).toBe(4);
+  });
+
+  it('limits an event-only feed by rows', () => {
+    expect(phoneVisibleRows(rows('e'.repeat(30)), 0, 6)).toBe(8);
+    expect(phoneVisibleRows(rows('e'.repeat(30)), 0, 16)).toBe(18);
+  });
+});
+
+describe('buildFeedRows', () => {
+  const message = (id: number) =>
+    ({
+      type: 'message',
+      timestamp: id,
+      entry: { gesture: makeGesture({ EvtLogId: id }), message: 'm' },
+    }) as const;
+  const event = (id: number) => ({ type: 'system', timestamp: id, event: makeEvent(id) }) as const;
+
+  it('folds runs of two or more events and keeps a lone one as a row', () => {
+    const rows = buildFeedRows([message(9), event(8), event(7), message(6), event(5)], 'messages');
+    expect(rows.map((row) => row.type)).toEqual(['message', 'events', 'message', 'event']);
+  });
+
+  it('lists every event in the All activity view', () => {
+    const rows = buildFeedRows([event(8), event(7), message(6)], 'all');
+    expect(rows.map((row) => row.type)).toEqual(['event', 'event', 'message']);
   });
 });

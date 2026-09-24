@@ -2,12 +2,14 @@
 
 import { type SyntheticEvent, type ComponentProps, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { BookOpen, Wallet, Clock, Users } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { protocolFacts } from '@/content/protocol-facts';
-import { formatEthValue, formatSeconds, type EnduranceChampion } from '@/utils';
+import { type EnduranceChampion } from '@/utils';
 
+import { formatAmount, formatCount } from '@/utils/format';
+import { toFiniteNumber } from '@/utils/finiteNumber';
 import Allocation from '@/components/common/Allocation';
 import GestureHistory from '@/components/tables/GestureHistoryTable';
 import StellarSelectionHolderTable from '@/components/tables/StellarSelectionHolderTable';
@@ -16,8 +18,10 @@ import EnduranceChampionsTable from '@/components/tables/EnduranceChampionsTable
 import EthDonationTable from '@/components/tables/EthDonationTable';
 import { FundDistribution } from '@/components/tokens/FundDistribution';
 import { DonatedTokensSection } from '@/components/home/DonatedTokensSection';
-import { SectionDivider } from '@/components/ui/section-divider';
-import { InfoTooltip } from '@/components/ui/info-tooltip';
+import { Amount } from '@/components/ui/amount';
+import { Duration } from '@/components/ui/duration';
+import { SectionHeader } from '@/components/ui/section-header';
+import { UnknownValue } from '@/components/ui/unknown-value';
 import { useNow } from '@/hooks/useNow';
 import {
   Accordion,
@@ -74,13 +78,13 @@ export function RoundInfoSection({
     return addrs.size;
   }, [curGestureList]);
 
+  const tCommon = useTranslations('common');
   const nowMs = useNow(1000);
-
-  const roundDuration = useMemo(() => {
-    if (!data?.TsRoundStart) return '';
-    const elapsed = Math.floor(nowMs / 1000) - data.TsRoundStart;
-    return elapsed > 0 ? formatSeconds(elapsed, locale) : '';
-  }, [data, nowMs, locale]);
+  const elapsedSeconds =
+    data?.TsRoundStart && nowMs > 0 && Math.floor(nowMs / 1000) > data.TsRoundStart
+      ? Math.floor(nowMs / 1000) - data.TsRoundStart
+      : null;
+  const contractBalance = toFiniteNumber(data?.CosmicGameBalanceEth);
 
   // The ledgers sit straight under their section titles, like the Stellar
   // Selection and top-spender tables: the section is their one frame, so no
@@ -100,69 +104,108 @@ export function RoundInfoSection({
       </motion.div>
 
       {/* 2. Fund Distribution */}
-      <motion.div custom={1} variants={sectionFade} initial="hidden" animate="visible">
-        <div className="flex items-center gap-2 mb-6">
-          <SectionDivider title={t('sections.allocationTracks.title')} className="flex-1" />
-          <InfoTooltip content={t('sections.allocationTracks.tooltip')} />
-        </div>
+      <motion.section
+        aria-labelledby="cycle-allocation-tracks"
+        custom={1}
+        variants={sectionFade}
+        initial="hidden"
+        animate="visible"
+      >
+        <SectionHeader
+          headingId="cycle-allocation-tracks"
+          title={t('sections.allocationTracks.title')}
+          info={t('sections.allocationTracks.tooltip')}
+        />
         <FundDistribution data={data ?? undefined} />
-      </motion.div>
+      </motion.section>
 
       {/* 3. Stellar Selection Entries */}
-      <motion.div custom={2} variants={sectionFade} initial="hidden" animate="visible">
-        <div className="flex items-center gap-2 mb-6">
-          <SectionDivider title={t('sections.stellarSelectionEntries.title')} className="flex-1" />
-          <InfoTooltip content={t('sections.stellarSelectionEntries.tooltip')} />
-        </div>
+      <motion.section
+        aria-labelledby="cycle-stellar-selection"
+        custom={2}
+        variants={sectionFade}
+        initial="hidden"
+        animate="visible"
+      >
+        <SectionHeader
+          headingId="cycle-stellar-selection"
+          title={t('sections.stellarSelectionEntries.title')}
+          info={t('sections.stellarSelectionEntries.tooltip')}
+        />
         <StellarSelectionHolderTable
           list={curGestureList}
           numRaffleEthWinner={data?.NumRaffleEthWinnersBidding}
           numRaffleNFTWinner={data?.NumRaffleNFTWinnersBidding}
         />
-      </motion.div>
+      </motion.section>
 
       {/* 4. Top ETH Spenders */}
-      <motion.div custom={3} variants={sectionFade} initial="hidden" animate="visible">
-        <div className="flex items-center gap-2 mb-6">
-          <SectionDivider title={t('sections.topEthSpenders.title')} className="flex-1" />
-          <InfoTooltip content={t('sections.topEthSpenders.tooltip')} />
-        </div>
+      <motion.section
+        aria-labelledby="cycle-top-eth-spenders"
+        custom={3}
+        variants={sectionFade}
+        initial="hidden"
+        animate="visible"
+      >
+        <SectionHeader
+          headingId="cycle-top-eth-spenders"
+          title={t('sections.topEthSpenders.title')}
+          info={t('sections.topEthSpenders.tooltip')}
+        />
         <ETHSpentTable list={curGestureList as ComponentProps<typeof ETHSpentTable>['list']} />
-      </motion.div>
+      </motion.section>
 
       {/* 5. Endurance Champions */}
-      <motion.div custom={4} variants={sectionFade} initial="hidden" animate="visible">
-        <div className="flex items-center gap-2 mb-6">
-          <SectionDivider title={t('sections.enduranceChampions.title')} className="flex-1" />
-          <InfoTooltip content={t('sections.enduranceChampions.tooltip')} />
-        </div>
+      <motion.section
+        aria-labelledby="cycle-endurance-champions"
+        custom={4}
+        variants={sectionFade}
+        initial="hidden"
+        animate="visible"
+      >
+        <SectionHeader
+          headingId="cycle-endurance-champions"
+          title={t('sections.enduranceChampions.title')}
+          info={t('sections.enduranceChampions.tooltip')}
+        />
         <EnduranceChampionsTable
           championList={championList}
           lastBidderAddress={data?.LastBidderAddr ?? null}
         />
-      </motion.div>
+      </motion.section>
 
       {/* 6. Gesture History */}
-      <motion.div custom={5} variants={sectionFade} initial="hidden" animate="visible">
-        <div className="flex items-center gap-2 mb-6">
-          <SectionDivider
-            title={t('sections.gestureHistory.title', { n: data?.CurRoundNum ?? '' })}
-            className="flex-1"
-          />
-          <InfoTooltip content={t('sections.gestureHistory.tooltip')} />
-        </div>
+      <motion.section
+        aria-labelledby="cycle-gesture-history"
+        custom={5}
+        variants={sectionFade}
+        initial="hidden"
+        animate="visible"
+      >
+        <SectionHeader
+          headingId="cycle-gesture-history"
+          title={t('sections.gestureHistory.title', { n: data?.CurRoundNum ?? '' })}
+          info={t('sections.gestureHistory.tooltip')}
+        />
         <GestureHistory gestureHistory={curGestureList} showRound={false} />
-      </motion.div>
+      </motion.section>
 
       {/* 7. ETH Contributions (conditional) */}
       {ethDonations.length > 0 && (
-        <motion.div custom={6} variants={sectionFade} initial="hidden" animate="visible">
-          <div className="flex items-center gap-2 mb-6">
-            <SectionDivider title={t('sections.ethContributions.title')} className="flex-1" />
-            <InfoTooltip content={t('sections.ethContributions.tooltip')} />
-          </div>
+        <motion.section
+          aria-labelledby="cycle-eth-contributions"
+          custom={6}
+          variants={sectionFade}
+          initial="hidden"
+          animate="visible"
+        >
+          <SectionHeader
+            headingId="cycle-eth-contributions"
+            title={t('sections.ethContributions.title')}
+            info={t('sections.ethContributions.tooltip')}
+          />
           <EthDonationTable list={ethDonations} showType={false} />
-        </motion.div>
+        </motion.section>
       )}
 
       {/* 8. Attached Tokens */}
@@ -179,27 +222,32 @@ export function RoundInfoSection({
       </motion.div>
 
       {/* 9. Cycle Rules (collapsible) */}
-      <motion.div custom={8} variants={sectionFade} initial="hidden" animate="visible">
-        <div className="flex items-center gap-2 mb-4">
-          <SectionDivider title={t('sections.cycleRules.title')} className="flex-1" />
-          <InfoTooltip content={t('sections.cycleRules.tooltip')} />
-        </div>
-        <div className="gradient-border-card rounded-xl bg-white/[0.02]">
+      <motion.section
+        aria-labelledby="cycle-rules"
+        custom={8}
+        variants={sectionFade}
+        initial="hidden"
+        animate="visible"
+      >
+        <SectionHeader
+          headingId="cycle-rules"
+          title={t('sections.cycleRules.title')}
+          info={t('sections.cycleRules.tooltip')}
+        />
+        <div className="rounded-surface border border-rule-faint bg-surface/60">
           <Accordion type="single" collapsible>
             <AccordionItem value="rules" className="border-b-0">
               <AccordionTrigger className="px-5 py-4 hover:no-underline">
-                <div className="flex items-center gap-2">
-                  <BookOpen className="h-4 w-4 text-primary/60" />
-                  <span className="text-sm font-medium text-muted-foreground">
-                    {t('rules.howItWorks')}
-                  </span>
-                </div>
+                <span className="flex items-center gap-2">
+                  <BookOpen className="size-4 text-subtle" aria-hidden />
+                  <span className="type-title text-foreground">{t('rules.howItWorks')}</span>
+                </span>
               </AccordionTrigger>
               <AccordionContent className="px-5 pb-5">
-                <div className="text-sm text-muted-foreground space-y-3">
+                <div className="type-body-sm max-w-[var(--measure-prose)] space-y-3 text-muted-foreground">
                   <p>
                     {t.rich('rules.participation', {
-                      em: (chunks) => <span className="text-white font-medium">{chunks}</span>,
+                      em: (chunks) => <span className="font-medium text-foreground">{chunks}</span>,
                     })}
                   </p>
                   <p>
@@ -221,10 +269,11 @@ export function RoundInfoSection({
                   <p>
                     {t('rules.publicGoods', {
                       percent: data?.CharityPercentage ?? 0,
-                      amount: (
-                        (Number(data?.CosmicGameBalanceEth) || 0) *
-                        ((data?.CharityPercentage ?? 0) / 100)
-                      ).toFixed(4),
+                      amount: formatAmount(
+                        (toFiniteNumber(data?.CosmicGameBalanceEth) ?? 0) *
+                          ((data?.CharityPercentage ?? 0) / 100),
+                        { unit: 'ETH', locale, withUnit: false },
+                      ),
                     })}
                   </p>
                 </div>
@@ -232,54 +281,41 @@ export function RoundInfoSection({
             </AccordionItem>
           </Accordion>
         </div>
-      </motion.div>
+      </motion.section>
 
-      {/* 10. Round Summary Footer */}
+      {/* 10. Cycle summary: three figures on one frame, divided by hairlines. */}
       <motion.div custom={9} variants={sectionFade} initial="hidden" animate="visible">
-        <div
+        <dl
           data-testid="round-summary-footer"
-          className="gradient-border-card rounded-2xl bg-gradient-to-r from-primary/[0.04] via-accent/[0.04] to-primary/[0.04] p-6"
+          className="grid gap-5 rounded-surface border border-rule-faint bg-surface/60 p-5 sm:grid-cols-3 sm:gap-0 sm:divide-x sm:divide-rule-faint sm:p-6"
         >
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-                <Wallet className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                  {t('footer.contractBalance')}
-                </p>
-                <p className="text-sm font-bold text-white">
-                  {formatEthValue(Number(data?.CosmicGameBalanceEth) || 0, locale)}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary/10">
-                <Clock className="h-5 w-5 text-secondary" />
-              </div>
-              <div>
-                <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                  {t('footer.cycleDuration')}
-                </p>
-                <p className="text-sm font-bold text-white">
-                  {roundDuration || t('status.notStarted')}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10">
-                <Users className="h-5 w-5 text-accent" />
-              </div>
-              <div>
-                <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                  {t('footer.uniqueParticipants')}
-                </p>
-                <p className="text-sm font-bold text-white">{uniqueParticipants}</p>
-              </div>
-            </div>
+          <div className="min-w-0 sm:pe-6">
+            <dt className="type-label text-subtle">{t('footer.contractBalance')}</dt>
+            <dd className="type-figure-md mt-1 text-foreground">
+              {contractBalance == null ? (
+                <UnknownValue label={tCommon('status.unavailable')} />
+              ) : (
+                <Amount value={contractBalance} unit="ETH" context="card" />
+              )}
+            </dd>
           </div>
-        </div>
+          <div className="min-w-0 sm:px-6">
+            <dt className="type-label text-subtle">{t('footer.cycleDuration')}</dt>
+            <dd className="type-figure-md mt-1 text-foreground">
+              {elapsedSeconds != null ? (
+                <Duration seconds={elapsedSeconds} />
+              ) : (
+                <span className="type-body-md text-muted-foreground">{t('status.notStarted')}</span>
+              )}
+            </dd>
+          </div>
+          <div className="min-w-0 sm:ps-6">
+            <dt className="type-label text-subtle">{t('footer.uniqueParticipants')}</dt>
+            <dd className="type-figure-md mt-1 text-foreground">
+              {formatCount(uniqueParticipants, locale)}
+            </dd>
+          </div>
+        </dl>
       </motion.div>
     </div>
   );

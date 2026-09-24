@@ -73,6 +73,18 @@ describe('useTabTitleCountdown', () => {
     expect(document.title).toBe('02:00 \u00b7 Cosmic Signature');
   });
 
+  it('shows an ellipsis instead of counting toward a stale deadline', () => {
+    const targetMs = Date.now() + 90_000;
+    const { rerender } = renderHook(
+      ({ stale }: { stale: boolean }) => useTabTitleCountdown({ enabled: true, targetMs, stale }),
+      { initialProps: { stale: true } },
+    );
+    expect(document.title).toBe('\u2026 \u00b7 Cosmic Signature');
+
+    rerender({ stale: false });
+    expect(document.title).toBe('01:30 \u00b7 Cosmic Signature');
+  });
+
   it('clamps at zero instead of going negative', () => {
     renderHook(() => useTabTitleCountdown({ enabled: true, targetMs: Date.now() - 5_000 }));
     expect(document.title).toBe('00:00 \u00b7 Cosmic Signature');

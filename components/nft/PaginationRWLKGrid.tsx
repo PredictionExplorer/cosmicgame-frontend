@@ -1,10 +1,11 @@
-import { useState, useEffect, type FC, type ChangeEvent } from 'react';
+import { useMemo, useState, type FC, type ChangeEvent } from 'react';
 import { Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { formatId } from '@/utils';
 
 import { Input } from '@/components/ui/input';
+import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
 import {
   Pagination,
@@ -56,10 +57,13 @@ const PaginationRWLKGrid: FC<PaginationRWLKGridProps> = ({
   labelledBy,
 }) => {
   const t = useTranslations('home');
-  const [filteredData, setFilteredData] = useState<number[]>([]);
   const [itemsPerPage] = useState<number>(6);
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [requestedPage, setCurrentPage] = useState<number>(1);
   const [searchId, setSearchId] = useState<string>('');
+  const filteredData = useMemo(
+    () => data.filter((id) => searchId === '' || id === Number(searchId)),
+    [data, searchId],
+  );
 
   const handleCardClick = (tokenId: number) => {
     if (setSelectedToken) {
@@ -68,19 +72,38 @@ const PaginationRWLKGrid: FC<PaginationRWLKGridProps> = ({
     }
   };
 
-  useEffect(() => {
-    const filtered = data.filter((id) => searchId === '' || id === Number(searchId));
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setFilteredData(filtered);
-    setCurrentPage(1);
-  }, [data, searchId]);
-
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  // A shorter list (a search, a used NFT) never leaves the page past its end.
+  const currentPage = Math.min(requestedPage, Math.max(1, totalPages));
   const paginatedItems = filteredData.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
   );
 
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  // Nothing to search until the wallet's NFTs are read, and nothing to
+  // search when it holds none: then one sentence says so.
+  if (loading) {
+    return (
+      <div
+        role="status"
+        className={cn('flex items-center gap-2', compact ? 'mt-3' : 'mt-8')}
+        data-testid="rwlk-loading"
+      >
+        <Spinner className="size-4" aria-hidden />
+        <span className="type-caption text-subtle">{t('rwlkGrid.loading')}</span>
+      </div>
+    );
+  }
+  if (data.length === 0) {
+    return (
+      <p
+        data-testid="rwlk-none"
+        className={cn('type-caption text-subtle', compact ? 'mt-1' : 'mt-8')}
+      >
+        {t('rwlkGrid.none')}
+      </p>
+    );
+  }
 
   return (
     <div className={cn('@container/rwlk', compact ? 'mt-3' : 'mt-8')}>
@@ -92,7 +115,10 @@ const PaginationRWLKGrid: FC<PaginationRWLKGridProps> = ({
           aria-label={t('rwlkGrid.searchAria')}
           placeholder={t('rwlkGrid.searchPlaceholder')}
           className="pr-10"
-          onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchId(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+            setSearchId(e.target.value);
+            setCurrentPage(1);
+          }}
         />
         <Search
           aria-hidden
@@ -100,15 +126,8 @@ const PaginationRWLKGrid: FC<PaginationRWLKGridProps> = ({
         />
       </div>
 
-      {/* Loading Spinner */}
-      {loading && (
-        <div className="flex justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-secondary border-t-transparent" />
-        </div>
-      )}
-
       {/* Grid + Pagination */}
-      {!loading && filteredData.length > 0 && (
+      {filteredData.length > 0 && (
         <>
           <div
             role="group"
@@ -169,9 +188,11 @@ const PaginationRWLKGrid: FC<PaginationRWLKGridProps> = ({
         </>
       )}
 
-      {/* Empty State */}
-      {!loading && data.length === 0 && (
-        <p className="text-base text-center text-foreground">{t('rwlkGrid.empty')}</p>
+      {/* No NFT matches the search. */}
+      {filteredData.length === 0 && (
+        <p role="status" className="type-body-sm text-center text-muted-foreground">
+          {t('rwlkGrid.empty')}
+        </p>
       )}
     </div>
   );

@@ -1,6 +1,6 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
-import { toIntlLocale } from '@/utils/format';
+import { formatNumber } from '@/utils/format';
 
 /**
  * Quotes for the ETH a participant is about to send. Every surface that shows an ETH Gesture
@@ -17,24 +17,16 @@ export const MAX_COLLISION_BUFFER_PERCENT = 50;
 /** Buffer added to the RandomWalk imprint value so a cost rise before confirmation still succeeds. */
 export const IMPRINT_COST_BUFFER_PERCENT = 1;
 
-const quoteFormats = new Map<string, Intl.NumberFormat>();
-
 /**
- * Formats an ETH amount for a cost quote: five significant digits, no grouping, in the
- * locale's decimal separator ("0.10211", uk and vi "0,10211"), so a quote reads like every
- * other figure on the page.
+ * Formats an ETH amount for a cost quote: five significant digits, no grouping, with the
+ * format layer's decimal mark ("0.10211", uk "0.10211" per its style guide, vi "0,10211"),
+ * so a quote reads like every other figure on the page.
  */
 export function formatEthQuote(eth: number, locale: string = 'en'): string {
-  const intlLocale = toIntlLocale(locale);
-  let quoteFormat = quoteFormats.get(intlLocale);
-  if (!quoteFormat) {
-    quoteFormat = new Intl.NumberFormat(intlLocale, {
-      maximumSignificantDigits: QUOTE_SIGNIFICANT_DIGITS,
-      useGrouping: false,
-    });
-    quoteFormats.set(intlLocale, quoteFormat);
-  }
-  return quoteFormat.format(eth);
+  return formatNumber(eth, locale, {
+    maximumSignificantDigits: QUOTE_SIGNIFICANT_DIGITS,
+    useGrouping: false,
+  });
 }
 
 /** The ETH Gesture Cost for a gesture type: the RandomWalk NFT halves the ETH price. */

@@ -39,7 +39,6 @@ const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
   'app/[locale]/(app)/gesture/[id]/GesturePage.tsx': 2,
   'app/[locale]/(app)/my-allocations/MyWinnings.tsx': 1,
   'app/[locale]/(app)/my-anchors/MyAnchors.tsx': 1,
-  'app/[locale]/(app)/page.tsx': 1,
   'app/[locale]/(app)/user/stellar-selection-eth/[address]/UserStellarSelectionETHPage.tsx': 2,
   'components/anchoring/AnchorDistributionsTable.tsx': 2,
   'components/anchoring/AnchoredTokensTable.tsx': 1,
@@ -50,17 +49,6 @@ const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
   'components/attachments/AttachedERC20Table.tsx': 4,
   'components/attachments/DonatedNFTPrizeShowcase.tsx': 2,
   'components/common/Allocation.tsx': 5,
-  'components/home/AuctionInfo.tsx': 1,
-  'components/home/deck/DeckPersonalStrip.tsx': 3,
-  'components/home/HomeObservatoryHero.tsx': 1,
-  'components/home/observatory/AllocationLedger.tsx': 1,
-  'components/home/observatory/ChronoEnduranceIntel.tsx': 1,
-  'components/home/observatory/CycleClock.tsx': 1,
-  'components/home/observatory/GesturePriceStrip.tsx': 2,
-  'components/home/observatory/gestureSubmitLabel.ts': 1,
-  'components/home/observatory/LatestParticipantIntel.tsx': 1,
-  'components/home/PublicGoodsImpactCard.tsx': 2,
-  'components/home/RoundInfoSection.tsx': 1,
   'components/marketing/MarketingStats.tsx': 1,
   'components/marketing/TopMarketersLeaderboard.tsx': 1,
   'components/nft/traits/ChaosMeter.tsx': 1,
@@ -86,7 +74,6 @@ const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
 const LOCAL_AMOUNT_FORMATTER = /\b(?:function|const)\s+format(?:Eth|Cst|CST|EthValue|Amount)\b/;
 const LOCAL_AMOUNT_FORMATTER_BASELINE: readonly string[] = [
   'app/[locale]/(app)/gesture/[id]/GesturePage.tsx',
-  'components/home/HomeObservatoryHero.tsx',
 ];
 
 const fixedDecimalCount = (file: string): number =>

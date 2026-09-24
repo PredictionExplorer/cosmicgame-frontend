@@ -1,8 +1,8 @@
 import { useLocale, useTranslations } from 'next-intl';
 
-import { formatSeconds } from '@/utils';
-
+import { Duration } from '@/components/ui/duration';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
+import { CalibrationWindowIcon } from '@/lib/conceptIcons';
 import { cn } from '@/lib/utils';
 import { formatCstProgressPercent, getCstAuctionProgress } from '@/utils/cstGesture';
 
@@ -16,7 +16,12 @@ interface AuctionInfoProps {
   compact?: boolean;
 }
 
-/** Displays Calibration Window duration, remaining time, and progress without hardcoded timing assumptions. */
+/**
+ * A Calibration Window's timing on its own (the experimental console): its
+ * length, how much has elapsed and what remains, with a 2px progress rule.
+ * The home's CalibrationStatus leads with the cost instead. One hairline
+ * frame, figures in tabular Inter, and the ended state in neutral words.
+ */
 export function AuctionInfo({
   secondsElapsed,
   auctionDuration,
@@ -34,121 +39,68 @@ export function AuctionInfo({
     AuctionDuration: auctionDuration,
     SecondsElapsed: secondsElapsed,
   });
-  const progressLabel = t('calibration.progressAria', { title: resolvedTitle });
-  const progressValue = Number(progress.percentComplete.toFixed(1));
+  const percent = formatCstProgressPercent(progress.percentComplete, locale);
+  const figures = [
+    { label: 'dynamicDuration', value: progress.auctionDuration },
+    { label: 'elapsedLabel', value: progress.secondsElapsed },
+    { label: 'remainingLabel', value: progress.secondsRemaining },
+  ] as const;
 
   return (
     <section
       aria-label={resolvedTitle}
       className={cn(
-        // `@container`: the value grid sizes by this card, not the viewport —
-        // the card sits in the gesture panel and the side column, which stay
-        // narrow on wide screens.
-        '@container min-w-0 rounded-xl border border-primary/15 bg-primary/[0.045]',
+        // `@container`: the figures size by this card, not the viewport; the
+        // card sits in narrow columns on wide screens.
+        '@container min-w-0 rounded-surface border border-rule-faint bg-surface/60',
         compact ? 'p-3' : 'p-4',
       )}
     >
-      <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1">
-        <div className="min-w-0">
-          <div className="flex items-center gap-1.5">
-            <p className="text-xs font-medium text-primary">{resolvedTitle}</p>
-            {compact && <InfoTooltip content={resolvedSubtitle} label={resolvedTitle} />}
-          </div>
-          {!compact && <p className="mt-1 text-sm text-muted-foreground">{resolvedSubtitle}</p>}
+      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <div className="flex min-w-0 items-center gap-1.5">
+          <CalibrationWindowIcon className="size-4 shrink-0 text-subtle" aria-hidden />
+          <p className="type-label min-w-0 text-foreground">{resolvedTitle}</p>
+          <InfoTooltip content={resolvedSubtitle} label={resolvedTitle} />
         </div>
-        {compact ? (
-          <p className="font-mono text-xs tabular-nums text-primary">
-            {t('calibration.percentComplete', {
-              percent: formatCstProgressPercent(progress.percentComplete, locale),
-            })}
+        {!progress.isEnded && (
+          <p className="type-caption tabular-nums text-subtle">
+            {t('calibration.percentComplete', { percent })}
           </p>
-        ) : (
-          <div className="text-right">
-            <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-              {t('calibration.dynamicDuration')}
-            </p>
-            <p className="font-mono text-lg font-semibold tabular-nums text-white">
-              {formatSeconds(progress.auctionDuration, locale)}
-            </p>
-          </div>
         )}
       </div>
 
       {progress.isEnded ? (
-        <p
-          className={cn(
-            'font-medium text-emerald-300',
-            compact
-              ? 'mt-1.5 text-xs'
-              : 'mt-4 rounded-lg border border-emerald-400/20 bg-emerald-400/[0.06] px-3 py-2 text-sm',
-          )}
-        >
-          {resolvedEndedMessage}
-        </p>
+        <p className="type-caption mt-2 text-muted-foreground">{resolvedEndedMessage}</p>
       ) : (
-        <div className={compact ? 'mt-2' : 'mt-4 space-y-3'}>
-          {!compact && (
-            <div className="flex items-center justify-between gap-3 text-sm">
-              <span className="text-muted-foreground">{t('calibration.progressLabel')}</span>
-              <span className="font-mono font-medium tabular-nums text-primary">
-                {t('calibration.percentComplete', {
-                  percent: formatCstProgressPercent(progress.percentComplete, locale),
-                })}
-              </span>
-            </div>
-          )}
+        <div
+          role="progressbar"
+          aria-label={t('calibration.progressAria', { title: resolvedTitle })}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(progress.percentComplete * 10) / 10}
+          className="mt-2 h-0.5 w-full rounded-pill bg-rule"
+        >
           <div
-            role="progressbar"
-            aria-label={progressLabel}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={progressValue}
-            className={cn(
-              'overflow-hidden rounded-full bg-white/[0.08]',
-              compact ? 'h-1.5' : 'h-2.5',
-            )}
-          >
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-primary via-accent to-emerald-300 transition-all duration-500"
-              style={{ width: `${progress.percentComplete}%` }}
-            />
-          </div>
+            className="h-full rounded-pill bg-primary transition-[width] duration-[var(--duration-slow)] motion-reduce:transition-none"
+            style={{ width: `${progress.percentComplete}%` }}
+          />
         </div>
       )}
 
       <dl
         className={cn(
-          'grid',
-          // Narrow cards get full-width rows: three columns would split uk
-          // labels and push the no-wrap values into each other. A compact
-          // row reads label left, value right, so the card stays short.
-          compact
-            ? 'mt-2 grid-cols-1 gap-1 @min-[26rem]:grid-cols-3 @min-[26rem]:gap-3'
-            : 'mt-4 gap-3 @lg:grid-cols-3',
+          'mt-2 grid gap-x-4 gap-y-1.5',
+          compact ? '@min-[26rem]:grid-cols-3' : '@lg:grid-cols-3',
         )}
       >
-        {[
-          { label: compact ? 'dynamicDuration' : 'durationLabel', value: progress.auctionDuration },
-          { label: 'elapsedLabel', value: progress.secondsElapsed },
-          { label: 'remainingLabel', value: progress.secondsRemaining },
-        ].map(({ label, value }) => (
+        {figures.map(({ label, value }) => (
           <div
             key={label}
-            className={cn(
-              'min-w-0',
-              compact
-                ? 'flex items-baseline justify-between gap-3 @min-[26rem]:block'
-                : 'rounded-lg border border-white/[0.06] bg-white/[0.025] px-3 py-2',
-            )}
+            className="flex min-w-0 items-baseline justify-between gap-3 @min-[26rem]:block"
           >
-            <dt className="min-w-0 text-xs text-muted-foreground">{t(`calibration.${label}`)}</dt>
-            <dd
-              className={cn(
-                'whitespace-nowrap font-mono text-sm tabular-nums',
-                compact ? '@min-[26rem]:mt-1' : 'mt-1',
-              )}
-            >
-              {formatSeconds(value, locale)}
+            <dt className="type-caption min-w-0 text-subtle">{t(`calibration.${label}`)}</dt>
+            <dd className="@min-[26rem]:mt-0.5">
+              <Duration seconds={value} className="type-figure-sm text-foreground" />
             </dd>
           </div>
         ))}

@@ -21,7 +21,9 @@ const mockUseCurrentTime = jest.fn().mockReturnValue({
   data: Math.floor(Date.now() / 1000),
   isLoading: false,
 });
-const mockUseCSTInfo = jest.fn().mockReturnValue({ data: undefined });
+const mockUseLatestSignatures = jest
+  .fn()
+  .mockReturnValue({ signatures: [], isLoading: false, isError: false });
 
 jest.mock('../../../../hooks/useApiQuery', () => ({
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
@@ -29,7 +31,10 @@ jest.mock('../../../../hooks/useApiQuery', () => ({
   useDonationsERC20ByRound: (...args: unknown[]) => mockUseDonationsERC20ByRound(...args),
   useBannedGestures: (...args: unknown[]) => mockUseBannedGestures(...args),
   useCurrentTime: (...args: unknown[]) => mockUseCurrentTime(...args),
-  useCSTInfo: (...args: unknown[]) => mockUseCSTInfo(...args),
+}));
+
+jest.mock('@/hooks/useLatestSignatures', () => ({
+  useLatestSignatures: (...args: unknown[]) => mockUseLatestSignatures(...args),
 }));
 
 const mockEmptyGestures: unknown[] = [];
@@ -101,11 +106,13 @@ const mockGestureForm = {
   gestureCostPlus: 2,
   setBidPricePlus: jest.fn(),
   isGesturing: false,
+  gestureTxStage: { status: 'idle' } as { status: string },
   advancedExpanded: false,
   setAdvancedExpanded: jest.fn(),
   rwlknftIds: [] as number[],
   onGesture: jest.fn().mockResolvedValue(true),
   onGestureWithCST: jest.fn().mockResolvedValue(true),
+  getLastGestureHash: jest.fn(() => '0xfeed'),
 };
 
 jest.mock('../../../../hooks/useGestureForm', () => ({
@@ -229,6 +236,7 @@ jest.mock('../../../../hooks/web3', () => ({
 }));
 
 jest.mock('wagmi', () => ({
+  ...jest.requireActual('../../../../__mocks__/wagmi'),
   usePublicClient: () => ({ waitForTransactionReceipt: jest.fn() }),
   useWalletClient: () => ({ data: null }),
 }));
@@ -262,20 +270,20 @@ jest.mock('@tanstack/react-query', () => ({
 
 /* ── child components with their own suites ─────────────────────── */
 
-// Depends on ApiDataContext + champions reads; unit-tested in its own suite.
-const mockDeckPersonalStrip = jest.fn((props: { account: string; gestures: unknown[] }) => (
-  <div
-    data-testid="deck-personal-strip"
-    data-account={props.account}
-    data-gesture-count={props.gestures.length}
-  >
-    DeckPersonalStrip
-  </div>
-));
+// The wallet's cycle summary reads its full indexed history; the hooks have
+// their own suite, so the page is driven with their states directly.
+let mockParticipation: Record<string, unknown> = {
+  status: 'ready',
+  gestures: 2,
+  spentEth: 0.02,
+  spentCst: 0,
+};
+let mockRetrieve: Record<string, unknown> = { state: 'none' };
+const mockRefetchParticipation = jest.fn();
 
-jest.mock('../../../../components/home/deck/DeckPersonalStrip', () => ({
-  DeckPersonalStrip: (props: { account: string; gestures: unknown[] }) =>
-    mockDeckPersonalStrip(props),
+jest.mock('../../../../hooks/useCycleParticipation', () => ({
+  useCycleParticipation: () => ({ ...mockParticipation, refetch: mockRefetchParticipation }),
+  useRetrieveStatus: () => mockRetrieve,
 }));
 
 const attachedShowcaseRenderSpy = jest.fn();
@@ -343,6 +351,9 @@ beforeEach(() => {
   // Keep notification preferences isolated between tests.
   window.localStorage.clear();
   mockAccount = '0xUser';
+  mockUseChampions.mockImplementation(() => mockChampions);
+  mockParticipation = { status: 'ready', gestures: 2, spentEth: 0.02, spentCst: 0 };
+  mockRetrieve = { state: 'none' };
   mockUseEndgameChainSync.mockReturnValue({
     isConfirmationPending: false,
     isClaimedOnChain: false,
@@ -373,6 +384,7 @@ beforeEach(() => {
     rwlkId: -1,
     gestureCostPlus: 2,
     isGesturing: false,
+    gestureTxStage: { status: 'idle' },
     advancedExpanded: false,
     rwlknftIds: [],
   });
@@ -396,7 +408,7 @@ beforeEach(() => {
     data: Math.floor(Date.now() / 1000),
     isLoading: false,
   });
-  mockUseCSTInfo.mockReturnValue({ data: undefined });
+  mockUseLatestSignatures.mockReturnValue({ signatures: [], isLoading: false, isError: false });
 });
 
 /* ── helpers ────────────────────────────────────────────────────── */
@@ -581,21 +593,22 @@ describe('HomePage', () => {
     const desk = screen.getByTestId('control-desk');
     const clock = screen.getByTestId('cycle-clock');
     const latest = screen.getByTestId('latest-participant-intel');
-    const chrono = screen.getByTestId('chrono-endurance-intel');
+    const standings = screen.getByTestId('standings-ledger');
     const calibration = screen.getByTestId('control-desk-calibration');
     const panel = screen.getByTestId('gesture-panel');
     const ledger = screen.getByTestId('allocation-ledger');
 
     expect(desk).toContainElement(clock);
     expect(desk).toContainElement(latest);
-    expect(desk).toContainElement(chrono);
+    expect(desk).toContainElement(standings);
     expect(desk).toContainElement(calibration);
     expect(desk).toContainElement(panel);
-    expect(desk).toContainElement(ledger);
+    // The full allocation ledger follows the desk and the conversation.
+    expect(desk).not.toContainElement(ledger);
     expect(clock).toBeVisible();
     expect(panel).toBeVisible();
     expect(latest).toBeVisible();
-    expect(chrono).toBeVisible();
+    expect(standings).toBeVisible();
     expect(calibration).toBeVisible();
     expect(within(calibration).getByRole('region')).toHaveAccessibleName(
       'home.calibration.cstTitle',
@@ -603,10 +616,8 @@ describe('HomePage', () => {
     expect(screen.queryByTestId('standings-disclosure')).not.toBeInTheDocument();
     expect(ledger).not.toBeVisible();
     expect(clock).toHaveAttribute('data-phase', 'live');
-    expect(screen.getByTestId('clock-reserve')).toHaveTextContent('1.5000 ETH');
-    expect(screen.getByTestId('control-desk-chrono')).toHaveTextContent(
-      'home.allocation.amounts.eth(amount=0.8000)',
-    );
+    expect(screen.getByTestId('clock-reserve-amount')).toHaveTextContent('1.5000 ETH');
+    expect(screen.getByTestId('chrono-role-summary')).toHaveTextContent('0.8000 ETH');
   });
 
   it('shows what is at stake on the clock: reserve ETH, USD, and extras', () => {
@@ -619,7 +630,10 @@ describe('HomePage', () => {
 
     const reserve = screen.getByTestId('clock-reserve');
     expect(within(reserve).getByText('home.observatory.clock.reserveLabel')).toBeInTheDocument();
-    expect(within(reserve).getByText('2.7500 ETH')).toBeInTheDocument();
+    expect(screen.getByTestId('clock-reserve-amount').textContent).toBe(
+      `2.7500${String.fromCharCode(160)}ETH`,
+    );
+    expect(reserve.querySelector('[data-term="signatureAllocation"]')).not.toBeNull();
     // 2.75 ETH × mocked 2,000 USD.
     expect(screen.getByTestId('clock-reserve-usd')).toHaveTextContent('amount=5,500');
     expect(within(reserve).getByText('home.observatory.clock.reserveExtras')).toBeInTheDocument();
@@ -636,16 +650,8 @@ describe('HomePage', () => {
 
     await openDisclosure(user, 'allocations-disclosure');
 
-    expect(
-      within(screen.getByTestId('ledger-track-signature')).getByText(
-        'home.allocation.amounts.eth(amount=1.5000)',
-      ),
-    ).toBeInTheDocument();
-    expect(
-      within(screen.getByTestId('ledger-track-public-goods')).getByText(
-        'home.allocation.amounts.eth(amount=0.7000)',
-      ),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId('ledger-track-signature')).toHaveTextContent('1.5000 ETH');
+    expect(screen.getByTestId('ledger-track-public-goods')).toHaveTextContent('0.7000 ETH');
     // The full percentage set is present, so the rollover chip appears too.
     expect(screen.getByTestId('ledger-track-next-cycle')).toBeInTheDocument();
     expect(
@@ -682,10 +688,16 @@ describe('HomePage', () => {
     },
   );
 
-  it('shows the message editor alongside decision information and participant identities', () => {
+  it('keeps the optional message one step away beside decision information and identities', async () => {
+    const user = userEvent.setup();
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<HomePage />);
 
+    // The decision and the commit lead; the optional message recedes.
+    const toggle = screen.getByTestId('gesture-message-toggle');
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByTestId('gesture-message-input')).not.toBeVisible();
+    await user.click(toggle);
     expect(screen.getByTestId('gesture-message-input')).toBeVisible();
     for (const testId of [
       'cycle-clock',
@@ -743,11 +755,11 @@ describe('HomePage', () => {
     for (const link of within(intel).getAllByRole('link', { name: '0xBidder' })) {
       expect(link).toHaveAttribute('href', '/user/0xBidder');
     }
-    expect(screen.getByTestId('latest-participant-paid-amount')).toHaveTextContent('0.0500000 ETH');
-    expect(screen.getByTestId('latest-participant-cst-received')).toHaveTextContent('123.45 CST');
-    expect(screen.getByTestId('latest-participant-random-walk')).toHaveTextContent(
-      'tables.specialAllocation.yesToken',
+    expect(screen.getByTestId('latest-participant-paid-amount')).toHaveTextContent(
+      /home\.observatory\.ledger\.paid\s*0\.05 ETH/,
     );
+    expect(screen.getByTestId('latest-participant-cst-received')).toHaveTextContent('123.45 CST');
+    expect(screen.getByTestId('latest-participant-method')).toHaveTextContent('Random Walk');
     expect(screen.getByTestId('latest-participant-gesture-id')).toHaveTextContent('#7');
     expect(screen.getByTestId('latest-participant-attached-assets')).toHaveTextContent(
       'NFT + ERC20',
@@ -768,14 +780,14 @@ describe('HomePage', () => {
     render(<HomePage />);
 
     const challenge = screen.getByTestId('chrono-active-challenge');
-    expect(challenge).toHaveTextContent('tables.specialAllocation.activeEnduranceChallenge');
-    expect(challenge).toHaveTextContent('0xEndurance');
-    expect(screen.getByTestId('chrono-challenge-segment')).toHaveTextContent('20m');
-    expect(screen.getByTestId('chrono-challenge-record-to-beat')).toHaveTextContent('30m');
-    expect(screen.getByTestId('chrono-challenge-next-change')).toHaveTextContent('10m 1s');
-    expect(screen.getByTestId('chrono-role-summary')).toHaveTextContent(
-      'home.allocation.amounts.eth(amount=0.8000)',
-    );
+    expect(challenge).toHaveTextContent('home.observatory.ledger.challenge.title');
+    // Held 20m of a 30m record; it passes the record in 10m 1s.
+    expect(challenge).toHaveTextContent(/challenge\.held\s*20m/);
+    expect(challenge).toHaveTextContent(/challenge\.record\s*30m/);
+    expect(challenge).toHaveTextContent(/challenge\.passesIn\s*10m 1s/);
+    // The holder is named once, on the Endurance row, not again here.
+    expect(within(challenge).queryByRole('link')).not.toBeInTheDocument();
+    expect(screen.getByTestId('chrono-role-summary')).toHaveTextContent('0.8000 ETH');
   });
 
   it('keeps Last Gesture current when the special-recipient snapshot is stale', () => {
@@ -796,7 +808,7 @@ describe('HomePage', () => {
       isLoading: false,
     });
     mockUseHomeGestureFeed.mockReturnValue({ data: [freshGesture] });
-    mockUseChampions.mockImplementationOnce((_seed, evidence) => ({
+    mockUseChampions.mockImplementation((_seed, evidence) => ({
       ...mockChampions,
       latestGesture: {
         ...mockChampions.latestGesture,
@@ -820,9 +832,7 @@ describe('HomePage', () => {
       address: freshAddress,
       timestamp: freshGesture.TimeStamp,
     });
-    expect(screen.getByTestId('latest-participant-gesture-details')).toHaveTextContent(
-      '0.0700000 ETH',
-    );
+    expect(screen.getByTestId('latest-participant-gesture-details')).toHaveTextContent('0.07 ETH');
     expect(
       within(screen.getByTestId('latest-participant-intel')).getByRole('link', {
         name: freshAddress,
@@ -863,7 +873,7 @@ describe('HomePage', () => {
       latestGesture: previousGesture,
       chatGestures: [previousGesture],
     });
-    mockUseChampions.mockImplementationOnce((_seed, evidence) => ({
+    mockUseChampions.mockImplementation((_seed, evidence) => ({
       ...mockChampions,
       latestGesture: {
         ...mockChampions.latestGesture,
@@ -1006,7 +1016,7 @@ describe('HomePage', () => {
 
   /* ── Below the fold ─────────────────────────────────────────── */
 
-  it('keeps personal state and allocations inside the desk before feed and education', () => {
+  it('keeps personal state in the desk, then the chat beside the cycle guide, then detail', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
@@ -1020,25 +1030,33 @@ describe('HomePage', () => {
     render(<HomePage />);
 
     const desk = screen.getByTestId('control-desk');
-    const strip = screen.getByTestId('deck-personal-strip');
+    const strip = screen.getByTestId('cycle-standing');
     const feed = screen.getByTestId('home-feed-layout');
-    const ledger = screen.getByTestId('allocation-ledger');
+    const guide = screen.getByTestId('cycle-phase-guide');
+    const disclosure = screen.getByTestId('allocations-disclosure');
     const story = screen.getByTestId('home-story-section');
-    const phaseGuide = within(story).getByText('home.phaseGuide.title');
 
     expect(desk).toContainElement(strip);
-    expect(desk).toContainElement(ledger);
     expect(desk.compareDocumentPosition(feed)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
-    expect(story).toContainElement(phaseGuide);
-    expect(phaseGuide).not.toBeVisible();
+    // The phase stepper is promoted out of the story, beside the chat (F296).
+    expect(feed).toContainElement(guide);
+    expect(guide).toBeVisible();
+    expect(guide).toHaveAttribute('data-step', 'open');
+    expect(story).not.toContainElement(guide);
+    expect(feed.compareDocumentPosition(disclosure)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(disclosure.compareDocumentPosition(story)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    // No duplicate newcomer explainer and no public experimental link (F280).
+    expect(screen.queryByText('home.phaseGuide.explainer.title')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('experimental-ui-entry')).not.toBeInTheDocument();
     expect(screen.queryByText('home.allocation.title')).not.toBeInTheDocument();
   });
 
-  it('shows the personal strip for connected wallets only', () => {
+  it('states the wallet standing from its indexed history, beside the running spend', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
     });
+    // A partial feed never stands in for the wallet's own count.
     mockUseHomeGestureFeed.mockReturnValue({
       data: [
         { EvtLogId: 1, TimeStamp: 1700000000, BidderAddr: '0xUser', RoundNum: 5, Message: '' },
@@ -1046,21 +1064,45 @@ describe('HomePage', () => {
     });
 
     const { rerender } = render(<HomePage />);
-    const strip = screen.getByTestId('deck-personal-strip');
-    expect(strip).toHaveAttribute('data-account', '0xUser');
-    expect(strip).toHaveAttribute('data-gesture-count', '1');
+    expect(screen.getByTestId('personal-gesture-count')).toHaveTextContent(
+      'home.observatory.standing.gestures(count=2,total=10)',
+    );
+    // The spend sits beside the not-refunded note, ETH and CST never summed.
+    const spent = screen.getByTestId('personal-spent');
+    expect(spent).toHaveTextContent('home.observatory.standing.spent 0.0200 ETH');
+    expect(screen.getByTestId('gesture-panel-action')).toContainElement(spent);
 
     mockAccount = null;
     rerender(<HomePage />);
-    expect(screen.queryByTestId('deck-personal-strip')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('cycle-standing')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('personal-spent')).not.toBeInTheDocument();
+    expect(screen.getByTestId('cycle-standing-preview')).toBeInTheDocument();
   });
 
-  it('keeps artwork beside the feed and puts attachments in their own full-width section', () => {
+  it('never reports a confident zero while the wallet history is unknown', () => {
+    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+    mockParticipation = { status: 'loading' };
+    mockRetrieve = { state: 'loading' };
+
+    render(<HomePage />);
+    expect(screen.getByTestId('personal-gesture-count')).not.toHaveTextContent(/\d/);
+    expect(screen.getByTestId('personal-spent')).not.toHaveTextContent(/\d/);
+    expect(screen.getByTestId('personal-retrieve-status')).not.toHaveTextContent('waitingNothing');
+  });
+
+  it('hangs the newest Signature beside the form and gives attachments their own section', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData({ CurRoundNum: 7 }),
       isLoading: false,
     });
-    mockUseCSTInfo.mockReturnValue({ data: { Seed: 'abc123' } });
+    mockUseLatestSignatures.mockReturnValue({
+      signatures: [
+        { TokenId: 47, Seed: 'abc123', RoundNum: 6, TimeStamp: 1_786_491_506 },
+        { TokenId: 46, Seed: 'def456', RoundNum: 6, TimeStamp: 1_786_491_506 },
+      ],
+      isLoading: false,
+      isError: false,
+    });
     mockUseDonationsNFTByRound.mockReturnValue({ data: [{ RecordId: 1 }, { RecordId: 2 }] });
     mockUseDonationsERC20ByRound.mockReturnValue({
       data: [{ EvtLogId: 1, TokenAddr: '0xToken', AmountDonatedEth: 5 }],
@@ -1068,19 +1110,22 @@ describe('HomePage', () => {
 
     render(<HomePage />);
 
-    const rail = screen.getByTestId('home-depth-rail');
+    // The art is part of the desk: row 2, beside the form, above the fold.
+    const art = screen.getByTestId('latest-signature');
+    expect(screen.getByTestId('control-desk-art')).toContainElement(art);
+    expect(within(art).getByTestId('latest-signature-link')).toHaveAttribute('href', '/detail/47');
+    expect(within(art).getByText('home.latestSignature.imprintedIn(number=6)')).toBeVisible();
+    expect(
+      within(art).getByRole('link', { name: /home\.latestSignature\.gallery/ }),
+    ).toHaveAttribute('href', '/gallery');
+
     const actions = screen.getByTestId('home-feed-actions');
-    const art = screen.getByTestId('deck-art-card');
-    expect(screen.getByTestId('control-desk')).not.toContainElement(art);
-    expect(art).toBeVisible();
-    expect(rail).toContainElement(art);
     expect(actions).toContainElement(screen.getByTestId('cycle-details-link-card'));
     expect(screen.getByTestId('cycle-details-link-card')).toHaveAttribute('href', '/current-cycle');
     expect(screen.getByTestId('previous-cycle-link-card')).toHaveAttribute('href', '/allocation/6');
     expect(screen.queryByTestId('public-goods-impact-card')).not.toBeInTheDocument();
 
     const showcase = screen.getByTestId('attached-nft-showcase');
-    expect(rail).not.toContainElement(showcase);
     const assets = screen.getByTestId('home-attached-assets');
     expect(assets).toContainElement(showcase);
     expect(screen.getByTestId('home-feed-layout').compareDocumentPosition(assets)).toBe(
@@ -1090,11 +1135,15 @@ describe('HomePage', () => {
     expect(showcase).toHaveAttribute('data-erc20-count', '1');
     expect(showcase).toHaveAttribute('data-cycle', '7');
     expect(showcase).toHaveAttribute('data-variant', 'default');
+  });
 
-    // The rotating artwork links to its detail page.
-    expect(screen.getByTestId('deck-art-link')).toHaveAttribute(
-      'href',
-      expect.stringMatching(/^\/detail\/\d+$/),
+  it('reads the newest imprints keyed by the dashboard imprint count and the server seed', () => {
+    const seed = [{ TokenId: 47, Seed: 'abc123', RoundNum: 1 }];
+    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+    render(<HomePage initialLatestSignatures={seed as never} />);
+    expect(mockUseLatestSignatures).toHaveBeenCalledWith(
+      makeDashboardData().MainStats.NumCSTokenMints,
+      seed,
     );
   });
 
@@ -1111,63 +1160,44 @@ describe('HomePage', () => {
     expect(screen.queryByTestId('attached-nft-showcase')).not.toBeInTheDocument();
   });
 
-  it('reveals the story with a level-2 heading while preserving the single page H1', async () => {
+  it('tells the story behind the art in notes with level-3 headings under one page H1', async () => {
     const user = userEvent.setup();
-    mockUseDashboardInfo.mockReturnValue({
-      data: makeDashboardData({ CurRoundNum: 7, CurNumBids: 42, PrizeAmountEth: 2.75 }),
-      isLoading: false,
-    });
+    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
 
     render(<HomePage />);
 
-    const story = await openDisclosure(user, 'home-story-section');
-    expect(
-      within(story).getByRole('heading', { level: 2, name: 'home.hero.phase.live.headline' }),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole('heading', { level: 1, name: 'home.hero.phase.live.headline' }),
-    ).not.toBeInTheDocument();
-  });
-
-  it('starts the story collapsed without depending on a saved visit and toggles on demand', async () => {
-    const user = userEvent.setup();
-    mockUseDashboardInfo.mockReturnValue({
-      data: makeDashboardData(),
-      isLoading: false,
-    });
-
-    render(<HomePage />);
     const story = screen.getByTestId('home-story-section');
-    const headline = within(story).getByText('home.hero.phase.live.headline');
     expect(story).not.toHaveAttribute('open');
-    expect(headline).not.toBeVisible();
     expect(window.localStorage.getItem('cosmic-observatory-visited')).toBeNull();
+    const note = within(story).getByRole('heading', {
+      level: 3,
+      name: 'home.hero.story.gestures.title',
+    });
+    expect(note).not.toBeVisible();
 
     await openDisclosure(user, 'home-story-section');
-    expect(headline).toBeVisible();
-    expect(within(story).getByRole('link', { name: 'home.deck.experimentalUi' })).toHaveAttribute(
-      'href',
-      '/experimental-ui',
-    );
-    expect(screen.getByTestId('home-deck-header')).not.toContainElement(
-      screen.getByTestId('experimental-ui-entry'),
-    );
+    expect(note).toBeVisible();
+    expect(
+      within(story).getByRole('link', { name: /home\.latestSignature\.gallery/ }),
+    ).toHaveAttribute('href', '/gallery');
+    // The art hangs on the desk; the story does not repeat it.
+    expect(within(story).queryByRole('img')).not.toBeInTheDocument();
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
 
-    await user.click(within(story).getByText('home.orientation.storyTitle'));
+    // The notes sit under their own section heading for heading navigation.
+    expect(
+      within(story).getByRole('heading', { level: 2, name: 'home.orientation.storyTitle' }),
+    ).toBeInTheDocument();
+    await user.click(story.querySelector('summary')!);
     expect(story).not.toHaveAttribute('open');
-    expect(headline).not.toBeVisible();
   });
 
-  it('offers gallery discovery from one featured artwork instead of repeating the gallery', () => {
+  it('shows one plate of the newest Signature instead of repeating the gallery', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<HomePage />);
     expect(screen.queryByTestId('latest-nfts')).not.toBeInTheDocument();
-    expect(screen.getAllByTestId('deck-art-card')).toHaveLength(1);
-    expect(
-      within(screen.getByTestId('deck-art-card')).getByRole('link', {
-        name: 'home.deck.art.galleryCta',
-      }),
-    ).toHaveAttribute('href', '/gallery');
+    expect(screen.queryByTestId('deck-art-card')).not.toBeInTheDocument();
+    expect(screen.getAllByTestId('latest-signature')).toHaveLength(1);
   });
 
   it('sets the control desk on the full-strength atmosphere and starfield', () => {
@@ -1210,7 +1240,7 @@ describe('HomePage', () => {
     });
 
     render(<HomePage />);
-    expect(getPanelSubmitButton()).toHaveTextContent('home.form.submit.eth(cost=0.01)');
+    expect(getPanelSubmitButton()).toHaveTextContent('home.form.submit.action.eth · 0.01 ETH');
     await user.click(getPanelSubmitButton());
 
     // No notification-permission prompt in the middle of a gesture.
@@ -1220,15 +1250,15 @@ describe('HomePage', () => {
     expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['currentSpecialWinners'] });
     expect(mockGestureForm.setMessage).toHaveBeenCalledWith('');
 
-    // Optimistic dashboard cache bump: gesture count and last participant.
-    expect(mockSetQueryData).toHaveBeenCalledWith(['dashboardInfo'], expect.any(Function));
-    const updater = mockSetQueryData.mock.calls[0]![1] as (
-      current: Record<string, unknown> | null,
-    ) => Record<string, unknown> | null;
-    expect(updater(null)).toBeNull();
-    expect(updater({ CurNumBids: 10, LastBidderAddr: '0xBidder' })).toEqual(
-      expect.objectContaining({ CurNumBids: 11, LastBidderAddr: '0xUser' }),
+    // The confirmed Gesture shows on every surface at once, before the index
+    // catches up: the count, and the wallet holding the Last Gesture.
+    expect(mockSetQueryData).not.toHaveBeenCalledWith(['dashboardInfo'], expect.anything());
+    await waitFor(() =>
+      expect(screen.getByTestId('pulse-gesture-count')).toHaveTextContent(
+        'home.observatory.pulse.gestureCount(count=11)',
+      ),
     );
+    expect(screen.getByTestId('pulse-you-latest')).toBeInTheDocument();
   });
 
   it('submits a CST gesture through the CST interaction path', async () => {
@@ -1240,7 +1270,7 @@ describe('HomePage', () => {
     });
 
     render(<HomePage />);
-    expect(getPanelSubmitButton()).toHaveTextContent('home.form.submit.cst(cost=1.00)');
+    expect(getPanelSubmitButton()).toHaveTextContent('home.form.submit.action.cst · 1 CST');
     await user.click(getPanelSubmitButton());
 
     expect(mockGestureForm.onGestureWithCST).toHaveBeenCalledTimes(1);
@@ -1268,7 +1298,7 @@ describe('HomePage', () => {
     render(<HomePage />);
 
     // 9s elapsed + 30s since the sample crossed the 10s window: free now.
-    expect(getPanelSubmitButton()).toHaveTextContent('home.form.submit.cstFree');
+    expect(getPanelSubmitButton()).toHaveTextContent('home.form.submit.action.cst · 0 CST');
   });
 
   it('prevents ETH + RandomWalk gestures until the participant selects a token', async () => {
@@ -1285,7 +1315,7 @@ describe('HomePage', () => {
     // The token picker lives inline in the panel — no detour to a console.
     expect(screen.getByTestId('panel-rwlk-picker')).toBeInTheDocument();
     const gestureButton = getPanelSubmitButton();
-    expect(gestureButton).toHaveTextContent('home.form.submit.randomWalk');
+    expect(gestureButton).toHaveTextContent('home.form.submit.action.randomWalk · 0.005 ETH');
     expect(gestureButton).toBeDisabled();
     await user.click(gestureButton);
     expect(mockGestureForm.onGesture).not.toHaveBeenCalled();
@@ -1374,12 +1404,13 @@ describe('HomePage', () => {
     render(<HomePage />);
 
     expect(screen.queryByTestId('gesture-panel')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('action-dock-mobile')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('action-dock')).not.toBeInTheDocument();
     expect(screen.getByTestId('cycle-clock')).toHaveAttribute('data-phase', 'opening-soon');
     expect(screen.getByTestId('latest-participant-intel')).toBeVisible();
-    expect(screen.getByTestId('chrono-endurance-intel')).toBeVisible();
-    expect(screen.getByTestId('home-depth-rail')).toContainElement(
-      screen.getByTestId('deck-art-card'),
+    expect(screen.getByTestId('standings-ledger')).toBeVisible();
+    // Between cycles the art takes the form's place on the desk.
+    expect(screen.getByTestId('control-desk-art')).toContainElement(
+      screen.getByTestId('latest-signature'),
     );
     expect(screen.getByTestId('clock-calendar-link')).toBeInTheDocument();
     expect(screen.getByTestId('cycle-details-link-card')).toHaveAttribute('href', '/current-cycle');
@@ -1393,68 +1424,37 @@ describe('HomePage', () => {
     expect(document.getElementById('gesture-submit')).not.toBeInTheDocument();
   });
 
-  it('draws the final-window vignette only inside the last ten minutes', () => {
+  it('signals the final minutes with the phase word alone, never a pulsing overlay', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
     });
-    mockAllocationFinalize.allocationTime = Date.now() + 5 * 60_000; // final-ten
+    mockAllocationFinalize.allocationTime = Date.now() + 30_000; // final-minute
 
-    const { rerender } = render(<HomePage />);
-    expect(screen.getByTestId('cycle-clock')).toHaveAttribute('data-phase', 'final-ten');
-    expect(screen.getByTestId('final-window-vignette')).toBeInTheDocument();
-
-    mockAllocationFinalize.allocationTime = Date.now() + 13 * 60 * 60_000; // live
-    rerender(<HomePage />);
+    const { container } = render(<HomePage />);
+    expect(screen.getByTestId('cycle-clock')).toHaveAttribute('data-phase', 'final-minute');
+    expect(screen.getByTestId('pulse-phase-chip')).toHaveTextContent(
+      'home.chrono.phase.finalMinute.label',
+    );
+    // One calm cue: no full-viewport vignette and no pulsing digits.
     expect(screen.queryByTestId('final-window-vignette')).not.toBeInTheDocument();
+    expect(container.querySelector('.animate-urgency-pulse, .animate-pulse-glow')).toBeNull();
+    expect(screen.getByTestId('clock-figures').className).not.toMatch(/animate-/);
   });
 
-  it('passes the chosen notification threshold into the clock control', async () => {
-    const user = userEvent.setup();
+  it('keeps the finalization alert in one place: the attention menu beside the title', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
-    });
-
-    Object.defineProperty(window, 'Notification', {
-      value: { permission: 'granted', requestPermission: jest.fn().mockResolvedValue('granted') },
-      writable: true,
-      configurable: true,
     });
     render(<HomePage />);
 
-    const control = screen.getByTestId('clock-notify-control');
-    // Off by default: no chip is pressed until the viewer picks one.
-    expect(within(control).queryByRole('button', { pressed: true })).toBeNull();
-    await user.click(
-      within(control).getByRole('button', {
-        name: 'home.observatory.clock.notifyMinutes(minutes=60)',
-      }),
-    );
-
+    // The clock is type only; it carries no second set of alert chips.
+    expect(screen.queryByTestId('clock-notify-control')).not.toBeInTheDocument();
     expect(
-      JSON.parse(window.localStorage.getItem('cosmic-attention-preferences') ?? '{}'),
-    ).toMatchObject({ finalizationAlert: true, alertMinutes: 60 });
-    await waitFor(() =>
-      expect(
-        within(control).getByRole('button', {
-          name: 'home.observatory.clock.notifyMinutes(minutes=60)',
-        }),
-      ).toHaveAttribute('aria-pressed', 'true'),
-    );
-
-    // Picking the active threshold again turns the alert off.
-    await user.click(
-      within(control).getByRole('button', {
-        name: 'home.observatory.clock.notifyMinutes(minutes=60)',
-      }),
-    );
-    await waitFor(() =>
-      expect(within(control).queryByRole('button', { pressed: true })).toBeNull(),
-    );
+      within(screen.getByTestId('cycle-clock')).queryByRole('button', { pressed: true }),
+    ).toBeNull();
   });
-
-  /* ── Wallet states ──────────────────────────────────────────── */
 
   it('previews the panel with a connect prompt when the wallet is disconnected', async () => {
     mockAccount = null;
@@ -1550,9 +1550,8 @@ describe('HomePage', () => {
 
     render(<HomePage />);
 
-    expect(screen.getByTestId('deck-personal-strip')).toHaveAttribute('data-gesture-count', '60');
-    expect(mockDeckPersonalStrip).toHaveBeenCalledWith(
-      expect.objectContaining({ gestures: metadata }),
+    expect(screen.getByTestId('pulse-gesture-count')).toHaveTextContent(
+      'home.observatory.pulse.gestureCount(count=60)',
     );
     expect(screen.getByTestId('latest-participant-gesture-id')).toHaveTextContent('#60');
     const chat = screen.getByTestId('gesture-message-chat');
@@ -1767,7 +1766,7 @@ describe('HomePage', () => {
         render(<HomePage />);
 
         const input = screen.getByTestId('gesture-message-input');
-        expect(input).toBeVisible();
+        expect(input).not.toBeVisible();
 
         const chat = screen.getByTestId('gesture-message-chat');
         await user.click(within(chat).getByRole('button', { name: 'home.chat.empty.cta' }));
@@ -1776,8 +1775,12 @@ describe('HomePage', () => {
           behavior: reducedMotion ? 'instant' : 'smooth',
           block: 'start',
         });
+        await waitFor(() => expect(input).toHaveFocus());
         expect(input).toBeVisible();
-        expect(input).toHaveFocus();
+        expect(screen.getByTestId('gesture-message-toggle')).toHaveAttribute(
+          'aria-expanded',
+          'true',
+        );
         expect(screen.getAllByTestId('gesture-panel')).toHaveLength(1);
         expect(mockGestureForm.onGesture).not.toHaveBeenCalled();
       } finally {
@@ -1827,45 +1830,18 @@ describe('HomePage', () => {
     expect(screen.queryByTestId('chat-pending-message')).not.toBeInTheDocument();
   });
 
-  it('hero primary action only scrolls to the gesture panel when the cycle is active', async () => {
+  it('records a sent message with its confirmed transaction for the chat', async () => {
     const user = userEvent.setup();
-    const { scrollIntoView, restore } = mockScrollIntoView();
-    mockUseDashboardInfo.mockReturnValue({
-      data: makeDashboardData(),
-      isLoading: false,
-    });
-
-    try {
-      render(<HomePage />);
-
-      const story = await openDisclosure(user, 'home-story-section');
-      await user.click(within(story).getByRole('button', { name: /home\.hero\.phase\.live\.cta/ }));
-
-      expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' });
-      expect(document.getElementById('make-gesture')).toHaveFocus();
-      expect(mockGestureForm.onGesture).not.toHaveBeenCalled();
-      expect(mockGestureForm.onGestureWithCST).not.toHaveBeenCalled();
-    } finally {
-      restore();
-    }
-  });
-
-  it('respects reduced motion when the story action moves focus to the form', async () => {
-    const user = userEvent.setup();
-    const { scrollIntoView, restore } = mockScrollIntoView(true);
+    mockGestureForm.message = 'linked signal';
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+    mockUseHomeGestureFeed.mockReturnValue({ data: [] });
 
-    try {
-      render(<HomePage />);
-      const story = await openDisclosure(user, 'home-story-section');
-      await user.click(within(story).getByRole('button', { name: /home\.hero\.phase\.live\.cta/ }));
+    render(<HomePage />);
+    await user.click(getPanelSubmitButton());
 
-      expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'instant', block: 'start' });
-      expect(document.getElementById('make-gesture')).toHaveFocus();
-      expect(mockGestureForm.onGesture).not.toHaveBeenCalled();
-    } finally {
-      restore();
-    }
+    const row = await screen.findByTestId('chat-pending-message');
+    expect(row).toHaveTextContent('linked signal');
+    expect(mockGestureForm.getLastGestureHash).toHaveBeenCalled();
   });
 
   /* ── Action dock and mobile sheet ───────────────────────────── */
@@ -1878,12 +1854,14 @@ describe('HomePage', () => {
 
     render(<HomePage />);
 
-    expect(
-      within(screen.getByTestId('action-dock-mobile')).getByTestId('dock-open-sheet'),
-    ).toHaveTextContent('home.form.submit.eth(cost=0.01)');
-    // jest.setup's IntersectionObserver mock always reports out-of-view, so
-    // the page must have flipped the desktop dock through the observer path.
-    expect(screen.getByTestId('action-dock-desktop')).toBeInTheDocument();
+    const dock = screen.getByTestId('action-dock');
+    // Verb and price on two lines of one control; the same label as the form.
+    expect(within(dock).getByTestId('dock-open-sheet')).toHaveTextContent(
+      /home\.form\.submit\.action\.eth\s*0\.01 ETH/,
+    );
+    expect(within(dock).getByTestId('dock-jump-to-panel')).toHaveTextContent(
+      /home\.form\.submit\.action\.eth\s*0\.01 ETH/,
+    );
   });
 
   it('opens the bottom sheet hosting the same gesture panel from the dock', async () => {
@@ -1930,7 +1908,11 @@ describe('HomePage', () => {
     await user.click(sheetSubmit as HTMLButtonElement);
 
     expect(mockGestureForm.onGesture).toHaveBeenCalledTimes(1);
-    expect(screen.getAllByTestId('gesture-panel')).toHaveLength(1);
+    // It stays open on success long enough to show the confirmation, then closes.
+    expect(screen.getAllByTestId('gesture-panel')).toHaveLength(2);
+    await waitFor(() => expect(screen.getAllByTestId('gesture-panel')).toHaveLength(1), {
+      timeout: 3_000,
+    });
   });
 
   /* ── Live pulse and memo boundaries ─────────────────────────── */
@@ -2046,9 +2028,8 @@ describe('HomePage', () => {
 
     expect(screen.getByTestId('latest-participant-intel')).toBeVisible();
     expect(screen.getByTestId('allocation-ledger')).toBeVisible();
-    expect(screen.getByTestId('experimental-ui-entry')).toBeVisible();
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     expect(container.querySelectorAll('#allocation-breakdown')).toHaveLength(1);
-    await checkA11y(container, { rules: { 'heading-order': { enabled: false } } });
+    await checkA11y(container);
   });
 });

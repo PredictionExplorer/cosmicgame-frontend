@@ -19,8 +19,10 @@ jest.mock(
       return <div data-testid="erc20-table">{list.length} tokens</div>;
     },
 );
-jest.mock('../../../components/common/CustomPagination', () => ({
-  CustomPagination: () => <div data-testid="pagination" />,
+jest.mock('@/components/ui/pagination', () => ({
+  TablePagination: ({ total, pageSize }: { total: number; pageSize: number }) => (
+    <div data-testid="pagination" data-total={total} data-page-size={pageSize} />
+  ),
 }));
 
 import { DonatedTokensSection } from '../DonatedTokensSection';
@@ -85,7 +87,7 @@ describe('DonatedTokensSection', () => {
     render(
       <DonatedTokensSection {...defaultProps} donatedNFTs={[createNFT()]} donatedTokensTab={0} />,
     );
-    expect(screen.getByTestId('pagination')).toBeInTheDocument();
+    expect(screen.getByTestId('pagination')).toHaveAttribute('data-total', '1');
   });
 
   it('uses correct tab value prop', () => {

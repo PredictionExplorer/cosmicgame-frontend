@@ -5,7 +5,14 @@ import { event } from '@/utils/analytics';
  * one gesture panel, so the surface distinguishes its mounts (in-page card vs
  * mobile sheet) plus the clock's finalize action.
  */
-export type GestureSurface = 'panel' | 'sheet' | 'clock' | 'console' | 'composer' | 'mini-bar';
+export type GestureSurface =
+  | 'panel'
+  | 'sheet'
+  | 'clock'
+  | 'dock'
+  | 'console'
+  | 'composer'
+  | 'mini-bar';
 
 export function trackGestureSubmitted({
   source,

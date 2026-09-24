@@ -1,6 +1,6 @@
 import { render, screen, within, checkA11y } from '@/test-utils';
 
-import { PulseBar } from '../PulseBar';
+import { PulseBar, introForPhase } from '../PulseBar';
 
 const baseProps = {
   cycleNumber: 7,
@@ -28,6 +28,17 @@ describe('PulseBar', () => {
     expect(screen.getByTestId('pulse-last-gesture')).toHaveTextContent(
       'home.observatory.pulse.lastGestureAge(age=home.ticker.age.seconds(count=12))',
     );
+  });
+
+  it('lists the facts with decorative separators that never orphan at a wrap', () => {
+    render(<PulseBar {...baseProps} />);
+    const facts = screen.getByTestId('pulse-gesture-count').closest('ul');
+    expect(facts).not.toBeNull();
+    // The dots are pseudo-elements in a clipped gutter, not text nodes a
+    // wrapped line could end on (or a screen reader could read).
+    expect(facts!.textContent).not.toContain('·');
+    expect(facts!.parentElement).toHaveClass('overflow-hidden');
+    expect(within(facts!).getAllByRole('listitem').length).toBeGreaterThanOrEqual(3);
   });
 
   it('routes newcomers to the walkthrough', () => {
@@ -58,6 +69,61 @@ describe('PulseBar', () => {
     expect(screen.getByTestId('pulse-phase-chip')).toHaveTextContent(
       'home.chrono.phase.finalTen.label',
     );
+  });
+
+  it('never shows a count it does not know', () => {
+    render(<PulseBar {...baseProps} gestureCount={null} />);
+    const count = screen.getByTestId('pulse-gesture-count');
+    expect(count).not.toHaveTextContent(/\d/);
+    expect(count).toHaveTextContent('Loading...');
+  });
+
+  it('says so in the masthead while the wallet holds the Last Gesture', () => {
+    const { rerender } = render(<PulseBar {...baseProps} />);
+    expect(screen.queryByTestId('pulse-you-latest')).not.toBeInTheDocument();
+    rerender(<PulseBar {...baseProps} youHoldLatest />);
+    expect(screen.getByTestId('pulse-you-latest')).toHaveTextContent(
+      'home.observatory.standing.positionLatest',
+    );
+  });
+
+  it('explains the zero moment instead of the standing intro', () => {
+    const { rerender } = render(<PulseBar {...baseProps} phase="ready-to-finalize" />);
+    const intro = screen.getByTestId('pulse-intro');
+    expect(intro).toHaveTextContent('home.deck.introByPhase.zero');
+    // A moment's explanation is never clamped on phones.
+    expect(intro.className).not.toMatch(/line-clamp/);
+
+    rerender(<PulseBar {...baseProps} phase="confirming" />);
+    expect(screen.getByTestId('pulse-intro')).toHaveTextContent('home.deck.introByPhase.zero');
+
+    rerender(<PulseBar {...baseProps} phase="final-minute" />);
+    expect(screen.getByTestId('pulse-intro')).toHaveTextContent('home.deck.intro');
+  });
+
+  it('writes the standing intro to a phone’s length instead of clamping it mid-clause', () => {
+    render(<PulseBar {...baseProps} phase="live" />);
+    const intro = screen.getByTestId('pulse-intro');
+    expect(intro.className).not.toMatch(/line-clamp/);
+    expect(screen.getByTestId('pulse-intro-short')).toHaveTextContent('home.deck.introShort');
+    expect(screen.getByTestId('pulse-intro-short')).toHaveClass('sm:hidden');
+    expect(within(intro).getByText('home.deck.intro')).toHaveClass('max-sm:hidden');
+  });
+
+  it.each([
+    ['opening-soon', 'openingSoon'],
+    ['waiting-first-gesture', 'waitingFirstGesture'],
+    ['confirming', 'zero'],
+    ['ready-to-finalize', 'zero'],
+    ['live', 'default'],
+    ['approach', 'default'],
+    ['final-hour', 'default'],
+    ['final-ten', 'default'],
+    ['final-minute', 'default'],
+    ['loading', 'default'],
+    ['unavailable', 'default'],
+  ] as const)('reads the %s phase with the %s intro', (phase, intro) => {
+    expect(introForPhase(phase)).toBe(intro);
   });
 
   it('has no accessibility violations', async () => {

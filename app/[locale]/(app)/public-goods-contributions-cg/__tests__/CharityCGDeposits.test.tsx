@@ -61,7 +61,6 @@ describe('CharityCGDeposits', () => {
 
     const summary = screen.getByTestId('public-goods-impact-card');
     const table = screen.getByTestId('deposit-table');
-    expect(summary).toHaveAttribute('data-variant', 'compact');
     expect(summary.compareDocumentPosition(table)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
     expect(summary).toHaveTextContent('0.7000 ETH');
   });

@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Switch } from '@/components/ui/switch';
+import { tabsListVariants, tabsTriggerVariants } from '@/components/ui/tabs';
 import {
   ALERT_MINUTE_CHOICES,
   getNotificationPermission,
@@ -43,16 +44,13 @@ function PreferenceRow({
           <label
             htmlFor={id}
             className={cn(
-              'block text-sm font-medium',
+              'type-label block',
               disabled ? 'text-muted-foreground' : 'cursor-pointer text-foreground',
             )}
           >
             {label}
           </label>
-          <p
-            id={`${id}-description`}
-            className="mt-1 text-xs leading-relaxed text-muted-foreground"
-          >
+          <p id={`${id}-description`} className="type-caption mt-1 text-muted-foreground">
             {description}
           </p>
         </div>
@@ -118,7 +116,7 @@ export function AttentionMenu({ className }: AttentionMenuProps) {
           aria-label={t('attention.menuLabel')}
           data-testid="attention-menu-trigger"
           className={cn(
-            'relative rounded-full border border-border text-muted-foreground hover:text-foreground',
+            'relative rounded-full border border-rule text-muted-foreground hover:text-foreground',
             anyOn && 'text-foreground',
             className,
           )}
@@ -136,14 +134,14 @@ export function AttentionMenu({ className }: AttentionMenuProps) {
         align="end"
         collisionPadding={16}
         aria-labelledby={`${baseId}-title`}
-        className="w-[min(22rem,calc(100vw-2rem))] border-border p-4"
+        className="w-[min(22rem,calc(100vw-2rem))] p-4"
         data-testid="attention-menu"
       >
-        <h2 id={`${baseId}-title`} className="text-sm font-semibold text-foreground">
+        <h2 id={`${baseId}-title`} className="type-title text-foreground">
           {t('attention.title')}
         </h2>
-        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{t('attention.intro')}</p>
-        <div className="mt-4 divide-y divide-border">
+        <p className="type-caption mt-1 text-muted-foreground">{t('attention.intro')}</p>
+        <div className="mt-4 divide-y divide-rule-faint">
           <PreferenceRow
             id={`${baseId}-sound`}
             label={t('attention.sound.label')}
@@ -169,20 +167,16 @@ export function AttentionMenu({ className }: AttentionMenuProps) {
               <div
                 role="group"
                 aria-label={t('attention.alert.label')}
-                className="flex flex-wrap gap-1.5"
+                className={tabsListVariants({ variant: 'segmented' })}
               >
                 {ALERT_MINUTE_CHOICES.map((minutes) => (
                   <button
                     key={minutes}
                     type="button"
                     aria-pressed={preferences.alertMinutes === minutes}
+                    data-state={preferences.alertMinutes === minutes ? 'active' : 'inactive'}
                     onClick={() => onMinutesChange(minutes)}
-                    className={cn(
-                      'min-h-9 rounded-full border px-3 text-xs font-semibold tabular-nums transition-colors',
-                      preferences.alertMinutes === minutes
-                        ? 'border-primary/60 bg-primary/15 text-foreground'
-                        : 'border-border text-muted-foreground hover:text-foreground',
-                    )}
+                    className={cn(tabsTriggerVariants({ variant: 'segmented' }), 'tabular-nums')}
                   >
                     {t('attention.alert.minutes', { minutes })}
                   </button>

@@ -1,27 +1,40 @@
 import userEvent from '@testing-library/user-event';
 
+import { IDLE_TX_STAGE } from '@/lib/txStage';
+
 import { render, screen, within, checkA11y } from '@/test-utils';
 
 import { ActionDock } from '../ActionDock';
 
+const HOLDER = '0x1111111111111111111111111111111111111111';
+const OTHER = '0x2222222222222222222222222222222222222222';
+const NOW = Date.now();
+
 const makeData = (overrides: Record<string, unknown> = {}) =>
   ({
     CurRoundNum: 7,
-    LastBidderAddr: '0xBidder',
+    LastBidderAddr: OTHER,
     PrizeAmountEth: 2.75,
-    TsRoundStart: Math.floor(Date.now() / 1000) - 3600,
+    TsRoundStart: Math.floor(NOW / 1000) - 3600,
     ...overrides,
   }) as never;
 
 const baseProps = {
-  stageOutOfView: false,
+  stepAside: false,
   data: makeData(),
   loading: false,
-  allocationTime: Date.now() + 13 * 60 * 60_000,
+  allocationTime: NOW + 6 * 86_400_000 + 3_600_000,
   activationTime: 0,
-  now: Date.now(),
+  now: NOW,
   finalizationConfirmed: true,
-  submitLabel: 'home.form.submit.eth(cost=0.01020)',
+  submit: { action: 'home.form.submit.action.eth', cost: '0.10211 ETH' },
+  isGesturing: false,
+  txStage: IDLE_TX_STAGE,
+  account: HOLDER as string | null,
+  canClaim: false,
+  isClaiming: false,
+  claimWait: 0,
+  onFinalize: jest.fn(),
   onOpenSheet: jest.fn(),
   onJumpToPanel: jest.fn(),
 };
@@ -30,91 +43,125 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-/** The reserve as the formatting layer renders it: one no-break `<data>` value. */
-const reserveAmount = (container: HTMLElement) =>
-  within(container).getByText(
-    (_, element) => element?.tagName === 'DATA' && element.textContent === '2.7500\u00a0ETH',
-  );
-
 describe('ActionDock', () => {
-  it('keeps the phone dock present with the live price and reserve', async () => {
+  it('holds the clock, the Signature Allocation and one priced commit action', async () => {
     const user = userEvent.setup();
     render(<ActionDock {...baseProps} />);
 
-    const dock = screen.getByTestId('action-dock-mobile');
-    expect(reserveAmount(dock)).toHaveAttribute('value', '2.75');
+    const dock = screen.getByTestId('action-dock');
+    // The day unit comes from the locale, never a hard-coded "d" per locale.
+    expect(within(dock).getByRole('timer')).toHaveTextContent(/^6d.\d{2}:\d{2}:\d{2}$/);
+    expect(within(dock).getByText('home.observatory.clock.reserveLabel')).toBeInTheDocument();
+    expect(dock).not.toHaveTextContent('Reserve ');
 
     const open = within(dock).getByTestId('dock-open-sheet');
-    expect(open).toHaveTextContent('home.form.submit.eth(cost=0.01020)');
-    // The dock carries the one commit action of the view: the signature gradient.
     expect(open).toHaveClass('bg-signature-gradient');
+    // The verb and the price sit on their own lines, so the dock never grows.
+    expect(within(open).getByText('home.form.submit.action.eth')).toBeInTheDocument();
+    expect(within(open).getByText(/^0\.10211.ETH$/)).toBeInTheDocument();
     await user.click(open);
     expect(baseProps.onOpenSheet).toHaveBeenCalledTimes(1);
   });
 
-  it('keeps the dock countdown on one line', () => {
+  it('keeps the visible label as the button name, with the purpose as its description', () => {
     render(<ActionDock {...baseProps} />);
-    const dock = screen.getByTestId('action-dock-mobile');
-    const countdown = within(dock).getByText(/\d{2}:\d{2}:\d{2}/);
-    // Korean labels squeeze the countdown column; the digits must not wrap.
-    expect(countdown).toHaveClass('whitespace-nowrap');
+    const open = screen.getByTestId('dock-open-sheet');
+    expect(open).not.toHaveAttribute('aria-label');
+    expect(open).toHaveAccessibleName(/home\.form\.submit\.action\.eth/);
+    expect(open).toHaveAccessibleDescription('home.observatory.dock.openPanelAria');
   });
 
-  it('shows the desktop dock only after the stage scrolls away', async () => {
+  it('returns tablets and desktops to the one gesture panel instead of a sheet', async () => {
     const user = userEvent.setup();
-    const { rerender } = render(<ActionDock {...baseProps} />);
-    expect(screen.queryByTestId('action-dock-desktop')).not.toBeInTheDocument();
-
-    rerender(<ActionDock {...baseProps} stageOutOfView />);
-    const dock = screen.getByTestId('action-dock-desktop');
-    expect(reserveAmount(dock)).toHaveClass('whitespace-nowrap');
-
-    // The dock never submits — it routes back to the one gesture panel.
-    expect(within(dock).getByTestId('dock-jump-to-panel')).toHaveClass('bg-signature-gradient');
-    await user.click(within(dock).getByTestId('dock-jump-to-panel'));
+    render(<ActionDock {...baseProps} />);
+    const jump = screen.getByTestId('dock-jump-to-panel');
+    expect(jump).toHaveClass('hidden', 'md:inline-flex');
+    await user.click(jump);
     expect(baseProps.onJumpToPanel).toHaveBeenCalledTimes(1);
     expect(baseProps.onOpenSheet).not.toHaveBeenCalled();
   });
 
-  it('never squeezes the countdown, and lets a phase label truncate for the CTA', () => {
-    // Regression: a non-shrinking column kept "Awaiting first Gesture" at full
-    // width and crushed the CTA to ~40px at 320px (uk). The column may shrink
-    // to the no-wrap timer's width in countdown phases, and to nothing (the
-    // label truncates) in label phases.
-    const { rerender } = render(<ActionDock {...baseProps} />);
-    const column = () => screen.getByTestId('action-dock-mobile').firstElementChild;
-    expect(column()).toHaveClass('min-w-min');
-    expect(column()).not.toHaveClass('shrink-0');
-
-    rerender(
-      <ActionDock
-        {...baseProps}
-        data={makeData({ LastBidderAddr: '0x0000000000000000000000000000000000000000' })}
-      />,
-    );
-    expect(column()).toHaveClass('min-w-0');
-    expect(screen.getByText('home.chrono.phase.waitingFirstGesture.label')).toHaveClass('truncate');
-    expect(reserveAmount(screen.getByTestId('action-dock-mobile'))).toBeInTheDocument();
+  it('steps aside, out of the tab order, while the form it opens is on screen', () => {
+    const { container } = render(<ActionDock {...baseProps} stepAside />);
+    const layer = container.querySelector('[data-action-dock]');
+    expect(layer).toHaveAttribute('aria-hidden', 'true');
+    expect(layer).toHaveAttribute('inert');
+    expect(layer).toHaveClass('pointer-events-none', 'opacity-0');
   });
 
-  it('stays hidden while loading and between cycles', () => {
-    const { rerender } = render(<ActionDock {...baseProps} loading />);
-    expect(screen.queryByTestId('action-dock-mobile')).not.toBeInTheDocument();
-
-    rerender(
+  it('shows the transaction stage while a Gesture is in flight', () => {
+    render(
       <ActionDock
         {...baseProps}
-        loading={false}
-        activationTime={Math.floor(Date.now() / 1000) + 3600}
+        isGesturing
+        txStage={{ status: 'awaiting-signature', step: 1, total: 1 }}
       />,
     );
-    // Opening-soon is not an active round: nothing to gesture on yet.
-    expect(screen.queryByTestId('action-dock-mobile')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('action-dock-desktop')).not.toBeInTheDocument();
+    const open = screen.getByTestId('dock-open-sheet');
+    expect(open).toHaveAttribute('aria-busy', 'true');
+    expect(open).toHaveTextContent('toasts.tx.button.confirm');
+  });
+
+  it('says the wallet holds the Last Gesture instead of repeating the allocation', () => {
+    render(<ActionDock {...baseProps} data={makeData({ LastBidderAddr: HOLDER })} />);
+    expect(screen.getByTestId('action-dock-status')).toHaveTextContent(
+      'home.observatory.standing.positionLatest',
+    );
+  });
+
+  it('marks the moment another participant takes the place', () => {
+    render(<ActionDock {...baseProps} moment={{ kind: 'taken', by: OTHER, atMs: NOW }} />);
+    expect(screen.getByTestId('action-dock-status')).toHaveTextContent(
+      'home.observatory.standing.positionTaken',
+    );
+  });
+
+  it('turns into Finalize for the Last Gesture holder at zero', async () => {
+    const user = userEvent.setup();
+    render(
+      <ActionDock
+        {...baseProps}
+        data={makeData({ LastBidderAddr: HOLDER })}
+        allocationTime={NOW - 60_000}
+        canClaim
+        claimWait={NOW + 10 * 60_000}
+      />,
+    );
+
+    expect(screen.getByTestId('action-dock')).toHaveAttribute('data-phase', 'ready-to-finalize');
+    // The phase word is never cut to "Confirmi…".
+    expect(screen.getByTestId('action-dock-status')).toHaveTextContent(
+      'home.chrono.phase.readyToFinalize.label',
+    );
+    expect(screen.getByTestId('action-dock-status').innerHTML).not.toMatch(/truncate/);
+    const finalize = screen.getByTestId('dock-finalize');
+    await user.click(finalize);
+    expect(baseProps.onFinalize).toHaveBeenCalledTimes(1);
+    expect(screen.queryByTestId('dock-open-sheet')).not.toBeInTheDocument();
+  });
+
+  it('keeps the Gesture action for other wallets during the exclusive window', () => {
+    render(
+      <ActionDock
+        {...baseProps}
+        allocationTime={NOW - 60_000}
+        canClaim
+        claimWait={NOW + 10 * 60_000}
+      />,
+    );
+    expect(screen.queryByTestId('dock-finalize')).not.toBeInTheDocument();
+    expect(screen.getByTestId('dock-open-sheet')).toBeInTheDocument();
+  });
+
+  it('renders nothing between cycles', () => {
+    const { container } = render(
+      <ActionDock {...baseProps} activationTime={Math.floor(NOW / 1000) + 3600} />,
+    );
+    expect(container).toBeEmptyDOMElement();
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<ActionDock {...baseProps} stageOutOfView />);
+    const { container } = render(<ActionDock {...baseProps} />);
     await checkA11y(container);
   });
 });

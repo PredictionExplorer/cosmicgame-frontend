@@ -210,18 +210,27 @@ jest.mock('@/components/attachments/DonatedNFTPrizeShowcase', () => ({
   ),
 }));
 
-const mockActionDock = jest.fn(
-  (props: { submitLabel: string; onOpenSheet: () => void; className?: string }) => (
-    <div data-testid="action-dock" data-hidden={String(props.className === 'hidden')}>
-      <button type="button" data-testid="dock-open-sheet" onClick={props.onOpenSheet}>
-        {props.submitLabel}
+interface MockActionDockProps {
+  stepAside: boolean;
+  submit: { action: string; cost: string | null };
+  canClaim: boolean;
+  onFinalize: () => void;
+  onOpenSheet: () => void;
+}
+const mockActionDock = jest.fn((props: MockActionDockProps) => (
+  <div data-testid="action-dock" data-hidden={String(props.stepAside)}>
+    <button type="button" data-testid="dock-open-sheet" onClick={props.onOpenSheet}>
+      {props.submit.action} {props.submit.cost}
+    </button>
+    {props.canClaim && (
+      <button type="button" data-testid="dock-finalize" onClick={props.onFinalize}>
+        finalize
       </button>
-    </div>
-  ),
-);
+    )}
+  </div>
+));
 jest.mock('@/components/home/observatory/ActionDock', () => ({
-  ActionDock: (props: { submitLabel: string; onOpenSheet: () => void; className?: string }) =>
-    mockActionDock(props),
+  ActionDock: (props: MockActionDockProps) => mockActionDock(props),
 }));
 
 /* ── Fixtures ───────────────────────────────────────────────────── */
@@ -460,8 +469,14 @@ describe('ExperimentalHomePage', () => {
     mockAccount = '0xUser';
     renderPage();
 
+    // The dock quotes the same method and cost as the console, verb and price apart.
     expect(mockActionDock).toHaveBeenLastCalledWith(
-      expect.objectContaining({ submitLabel: 'home.form.submit.eth(cost=0.01)' }),
+      expect.objectContaining({
+        submit: {
+          action: 'home.form.submit.action.eth',
+          cost: expect.stringMatching(/^0\.01\u00a0ETH$/),
+        },
+      }),
     );
     await userEvent.click(screen.getByTestId('dock-open-sheet'));
     await waitFor(() => expect(screen.getAllByTestId('gesture-console')).toHaveLength(2));
@@ -501,9 +516,9 @@ describe('ExperimentalHomePage', () => {
     Object.assign(mockAllocationFinalize, { allocationTime: Date.now() - 1000 });
     renderPage();
 
-    // At zero the dock names the move that is this wallet's to make.
+    // At zero the dock can finalize for the wallet whose move that is.
     expect(mockActionDock).toHaveBeenLastCalledWith(
-      expect.objectContaining({ submitLabel: 'home.form.finalize' }),
+      expect.objectContaining({ canClaim: true, account: LATEST }),
     );
     await userEvent.click(screen.getByTestId('dock-open-sheet'));
     const sheet = await screen.findByRole('dialog');
@@ -526,8 +541,17 @@ describe('ExperimentalHomePage', () => {
     expect(screen.queryByTestId('gesture-submit')).not.toBeInTheDocument();
     expect(screen.getByTestId('finalize-submit')).toBeEnabled();
     expect(mockActionDock).toHaveBeenLastCalledWith(
-      expect.objectContaining({ submitLabel: 'home.form.finalize' }),
+      expect.objectContaining({ canClaim: true, account: checksummed.toLowerCase() }),
     );
+  });
+
+  it('lets the finalizer finalize straight from the dock', async () => {
+    mockAccount = LATEST;
+    Object.assign(mockAllocationFinalize, { allocationTime: Date.now() - 1000 });
+    renderPage();
+
+    await userEvent.click(screen.getByTestId('dock-finalize'));
+    await waitFor(() => expect(mockAllocationFinalize.onFinalize).toHaveBeenCalledTimes(1));
   });
 
   it('keeps the sheet open while the Gesture is signed and closes it once confirmed', async () => {
@@ -573,8 +597,12 @@ describe('ExperimentalHomePage', () => {
     });
     renderPage();
 
+    // The shared dock names the stage itself from these.
     expect(mockActionDock).toHaveBeenLastCalledWith(
-      expect.objectContaining({ submitLabel: 'toasts.tx.button.confirm' }),
+      expect.objectContaining({
+        isGesturing: true,
+        txStage: { status: 'awaiting-signature', step: 1, total: 1 },
+      }),
     );
   });
 

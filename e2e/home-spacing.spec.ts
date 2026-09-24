@@ -24,24 +24,31 @@ for (const viewport of [
 
       const feed = page.getByTestId('home-feed-layout');
       const chat = page.getByTestId('gesture-message-chat');
+      const allocations = page.getByTestId('allocations-disclosure');
       const attachments = page.getByTestId('attached-nft-showcase');
       await expect(attachments.locator('article')).toHaveCount(HOME_SPACING_ASSET_COUNT);
       await expect(chat.getByText('Spacing audit message 1:', { exact: false })).toBeVisible();
       await page.evaluate(async () => document.fonts.ready);
 
-      // The collection spans the page after the feed/art row. A rail-only
-      // collection would pass a generic document overflow or landmark check.
-      const [feedBox, chatBox, collectionBox] = await Promise.all([
+      // The collection spans the page after the chat/guide row and the
+      // allocation disclosure. A rail-only collection would pass a generic
+      // document overflow or landmark check.
+      const [feedBox, chatBox, allocationsBox, collectionBox] = await Promise.all([
         feed.boundingBox(),
         chat.boundingBox(),
+        allocations.boundingBox(),
         attachments.boundingBox(),
       ]);
       expect(feedBox).not.toBeNull();
       expect(chatBox).not.toBeNull();
+      expect(allocationsBox).not.toBeNull();
       expect(collectionBox).not.toBeNull();
       expect(Math.abs(collectionBox!.x - feedBox!.x)).toBeLessThanOrEqual(1);
       expect(Math.abs(collectionBox!.width - feedBox!.width)).toBeLessThanOrEqual(1);
       expect(collectionBox!.y).toBeGreaterThanOrEqual(feedBox!.y + feedBox!.height - 1);
+      expect(collectionBox!.y).toBeGreaterThanOrEqual(
+        allocationsBox!.y + allocationsBox!.height - 1,
+      );
 
       const spacing = await attachments.evaluate((element) => {
         const wrapper = element.parentElement!;
@@ -50,11 +57,11 @@ for (const viewport of [
           collectionMargin: Number.parseFloat(getComputedStyle(element).marginTop),
         };
       });
-      const sectionGap = collectionBox!.y - feedBox!.y - feedBox!.height;
+      const sectionGap = collectionBox!.y - allocationsBox!.y - allocationsBox!.height;
       expect(sectionGap).toBeLessThanOrEqual(spacing.wrapperMargin + spacing.collectionMargin + 2);
 
       if (viewport.width >= 1280) {
-        // The art card can share the row, but it must not reserve blank space
+        // The guide shares the row, but it must not reserve blank space
         // below the chat greater than the chat panel itself.
         expect(feedBox!.height - chatBox!.height).toBeLessThanOrEqual(chatBox!.height);
         const cards = await attachments.locator('article').evaluateAll((elements) =>

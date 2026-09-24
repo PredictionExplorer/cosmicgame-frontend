@@ -1,13 +1,11 @@
 'use client';
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import {
-  Check,
+  ChevronDown,
   CircleCheck,
   Clock3,
-  Copy,
-  Info,
   MessageCircle,
   Radio,
   Sparkles,
@@ -17,29 +15,26 @@ import {
 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import {
-  formatSeconds,
-  formatTableAmount,
-  getRelativeTime,
-  resolveGestureTypeCode,
-  shortenHex,
-} from '@/utils';
+import { formatSeconds, resolveGestureTypeCode } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
-import { getLocaleConfig } from '@/i18n/localeConfig';
+import { AddressChip } from '@/components/ui/address-chip';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { DateTime } from '@/components/ui/date-time';
 import { EmptyState } from '@/components/ui/empty-state';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { LinkifiedText } from '@/components/ui/linkified-text';
+import { LiveStatus } from '@/components/ui/live-status';
 import { Spinner } from '@/components/ui/spinner';
-import { Surface } from '@/components/ui/surface';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { tabsListVariants, tabsTriggerVariants } from '@/components/ui/tabs';
+import { TxExplorerLink } from '@/components/ui/tx-status';
 import type { GestureFeedSystemEvent } from '@/components/home/deck/feedSystemEvents';
 import { useBannedGestures } from '@/hooks/useApiQuery';
 import { useLivePulse } from '@/hooks/useLivePulse';
-import { useNow } from '@/hooks/useNow';
 import { cn } from '@/lib/utils';
-import { TOUCH_TARGET_ICON_CLASS, TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import type { GestureInfo } from '@/services/api';
+import { formatAddress, formatAmount, formatCount, sameAddress } from '@/utils/format';
 import {
   CalibrationWindowIcon,
   ChronoWarriorIcon,
@@ -48,28 +43,24 @@ import {
   FinalCstGestureIcon,
 } from '@/lib/conceptIcons';
 
-import styles from './GestureMessageChat.module.css';
-
-type EventTone = 'endurance' | 'chrono' | 'clock' | 'cycle' | 'calibration' | 'community' | 'cst';
-
-// Text labels and icon silhouettes carry the same distinctions as the color.
-const EVENT_PRESENTATION = {
-  cycleStart: { icon: Sparkles, tone: 'cycle' },
-  cycleOpen: { icon: CycleIcon, tone: 'cycle' },
-  enduranceGrowing: { icon: EnduranceChampionIcon, tone: 'endurance' },
-  enduranceRecord: { icon: EnduranceChampionIcon, tone: 'endurance' },
-  chronoLead: { icon: ChronoWarriorIcon, tone: 'chrono' },
-  chronoReignEnded: { icon: ChronoWarriorIcon, tone: 'chrono' },
-  finalCstLeader: { icon: FinalCstGestureIcon, tone: 'cst' },
-  newParticipant: { icon: Users, tone: 'community' },
-  gestureMilestone: { icon: Radio, tone: 'community' },
-  cstCalibrationReady: { icon: CalibrationWindowIcon, tone: 'calibration' },
-  finalWindow: { icon: Clock3, tone: 'clock' },
-  clockExtended: { icon: TimerReset, tone: 'clock' },
-  clockReopened: { icon: TimerReset, tone: 'clock' },
-  finalizationAvailable: { icon: CircleCheck, tone: 'cycle' },
-  cycleFinalized: { icon: CircleCheck, tone: 'cycle' },
-} satisfies Record<GestureFeedSystemEvent['kind'], { icon: LucideIcon; tone: EventTone }>;
+/** One glyph per kind of cycle event; the sentence carries the meaning. */
+const EVENT_ICON = {
+  cycleStart: Sparkles,
+  cycleOpen: CycleIcon,
+  enduranceGrowing: EnduranceChampionIcon,
+  enduranceRecord: EnduranceChampionIcon,
+  chronoLead: ChronoWarriorIcon,
+  chronoReignEnded: ChronoWarriorIcon,
+  finalCstLeader: FinalCstGestureIcon,
+  newParticipant: Users,
+  gestureMilestone: Radio,
+  cstCalibrationReady: CalibrationWindowIcon,
+  finalWindow: Clock3,
+  clockExtended: TimerReset,
+  clockReopened: TimerReset,
+  finalizationAvailable: CircleCheck,
+  cycleFinalized: CircleCheck,
+} satisfies Record<GestureFeedSystemEvent['kind'], LucideIcon>;
 
 /** A just-submitted message shown instantly while the indexer catches up. */
 export interface PendingChatMessage {
@@ -78,18 +69,23 @@ export interface PendingChatMessage {
   message: string;
   /** Submission time in Unix seconds, before its confirmed block time is known. */
   timestamp: number;
+  /** The confirmed Gesture's transaction, for its explorer link. */
+  txHash?: string | null;
+  /** The indexer has not echoed it for a while: say so and link the proof. */
+  stale?: boolean;
 }
+
+export type ChatView = 'messages' | 'all';
 
 interface GestureMessageChatProps {
   gestures: GestureInfo[];
   cycleNumber?: number;
   className?: string;
+  /** Changes when a Gesture lands: the newest message settles in. */
   pulseKey?: number;
   /** When provided, the empty state offers a "Make a Gesture" call to action. */
   onJoinCta?: () => void;
-  /**
-   * Derived cycle moments interleaved with participant messages by timestamp.
-   */
+  /** Derived cycle moments interleaved with participant messages by timestamp. */
   systemEvents?: GestureFeedSystemEvent[];
   /** Optimistic messages rendered on top of the feed until indexed. */
   pendingMessages?: PendingChatMessage[];
@@ -100,131 +96,63 @@ interface GestureMessageChatProps {
     onLoadMore: () => Promise<void>;
   };
   isLoading?: boolean;
+  /** The first read failed and there is no history to show. */
   error?: boolean;
   onRetry?: () => void;
   /** A new cycle or corrected history starts at the newest entries again. */
   resetKey?: string;
   /** Paged responses are already moderated against the backend's own row IDs. */
   serverModerated?: boolean;
+  /** The connected wallet: its own messages carry a "You" tag. */
+  account?: string | null;
 }
 
 const SYSTEM_EVENTS_PER_PAGE = 50;
+/** Messages a phone shows before "Show more"; the feed never scrolls inside the page. */
+const PHONE_MESSAGES = 6;
+const PHONE_MESSAGES_STEP = 10;
+/** Height of the fade at an edge of the desktop feed with more to scroll that way. */
+const SCROLL_FADE = '3rem';
+/** An event-only feed is limited by rows instead. */
+const PHONE_EVENT_ROWS = 8;
+
+/**
+ * How many leading rows a phone shows: every row up to and including the
+ * `messageLimit`-th message (pending rows count as messages), so messages
+ * lead and the events between them come along; an event-only feed shows its
+ * first rows.
+ */
+export function phoneVisibleRows(
+  rows: readonly { type: string }[],
+  pendingCount: number,
+  messageLimit: number,
+): number {
+  if (pendingCount >= messageLimit) return pendingCount;
+  let messages = pendingCount;
+  for (let index = 0; index < rows.length; index += 1) {
+    if (rows[index]!.type !== 'message') continue;
+    messages += 1;
+    if (messages === messageLimit) return pendingCount + index + 1;
+  }
+  const total = pendingCount + rows.length;
+  // Fewer messages than the limit: all of it, unless the feed is events alone,
+  // which grows by rows as "Show more" raises the limit.
+  return messages > 0 ? total : Math.min(total, PHONE_EVENT_ROWS + messageLimit - PHONE_MESSAGES);
+}
 
 interface GestureChatMessage {
   gesture: GestureInfo;
   message: string;
 }
 
-function GestureMessageTimestamp({
-  timestamp,
-  locale,
-  nowMs,
-}: {
-  timestamp: number;
-  locale: string;
-  nowMs: number;
-}) {
-  // An explicit UTC zone makes the exact time unambiguous and identical during
-  // server rendering and hydration, including dates spanning different years.
-  const formatter = useMemo(
-    () =>
-      new Intl.DateTimeFormat(getLocaleConfig(locale).intlLocale, {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hourCycle: 'h23',
-        timeZone: 'UTC',
-        timeZoneName: 'short',
-      }),
-    [locale],
-  );
-  const date = new Date(timestamp * 1000);
-  const isValid = Number.isFinite(date.getTime());
-  const absolute = isValid ? formatter.format(date) : '—';
-  const relativeLabel =
-    isValid && nowMs > 0 ? getRelativeTime(timestamp, Math.floor(nowMs / 1000), locale) : null;
+type FeedItem =
+  | { type: 'message'; timestamp: number; entry: GestureChatMessage }
+  | { type: 'system'; timestamp: number; event: GestureFeedSystemEvent };
 
-  return (
-    <time
-      dateTime={isValid ? date.toISOString() : undefined}
-      className={styles.timestamp}
-      aria-live="off"
-    >
-      <span>{absolute}</span>
-      {relativeLabel ? (
-        <>
-          <span aria-hidden="true">·</span>
-          <span className={styles.relativeAge}>{relativeLabel}</span>
-        </>
-      ) : null}
-    </time>
-  );
-}
-
-/**
- * Compact method badge descriptor: cost + unit message when known
- * (e.g. "0.1 ETH + RWLK"), else just the method fallback message.
- */
-function getGestureMethodBadge(
-  gesture: GestureInfo,
-  locale: string,
-): {
-  messageKey: 'eth' | 'ethFallback' | 'ethRwlk' | 'rwlkFallback' | 'cst' | 'cstFallback';
-  amount?: string;
-} {
-  const typeCode = resolveGestureTypeCode(gesture);
-  if (typeCode === 2) {
-    const cost =
-      typeof gesture.CstCost === 'number' && gesture.CstCost >= 0 ? gesture.CstCost : null;
-    return cost != null
-      ? { messageKey: 'cst', amount: formatTableAmount(cost, locale, 'CST') }
-      : { messageKey: 'cstFallback' };
-  }
-  const cost =
-    typeof gesture.GestureCostEth === 'number' && gesture.GestureCostEth >= 0
-      ? gesture.GestureCostEth
-      : null;
-  if (typeCode === 1) {
-    return cost != null
-      ? { messageKey: 'ethRwlk', amount: formatTableAmount(cost, locale) }
-      : { messageKey: 'rwlkFallback' };
-  }
-  return cost != null
-    ? { messageKey: 'eth', amount: formatTableAmount(cost, locale) }
-    : { messageKey: 'ethFallback' };
-}
-
-function CopyAddressButton({ address }: { address: string }) {
-  const t = useTranslations('common');
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(address);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  return (
-    <button
-      type="button"
-      onClick={handleCopy}
-      aria-label={copied ? t('actions.addressCopied') : t('actions.copyAddress')}
-      className={cn(
-        'inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-muted-foreground/50 transition-colors hover:bg-white/[0.06] hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-        TOUCH_TARGET_ICON_CLASS,
-      )}
-    >
-      {copied ? (
-        <Check className="h-3.5 w-3.5 text-emerald-400" />
-      ) : (
-        <Copy className="h-3.5 w-3.5" />
-      )}
-    </button>
-  );
-}
+type FeedRow =
+  | { type: 'message'; key: string; entry: GestureChatMessage }
+  | { type: 'event'; key: string; event: GestureFeedSystemEvent }
+  | { type: 'events'; key: string; events: GestureFeedSystemEvent[] };
 
 function getGestureChatMessages(
   gestures: GestureInfo[],
@@ -241,10 +169,6 @@ function getGestureChatMessages(
       return timeDiff !== 0 ? timeDiff : (b.gesture.EvtLogId ?? 0) - (a.gesture.EvtLogId ?? 0);
     });
 }
-
-type FeedItem =
-  | { type: 'message'; timestamp: number; entry: GestureChatMessage }
-  | { type: 'system'; timestamp: number; event: GestureFeedSystemEvent };
 
 /** Newest first; a message and a same-second system event keep the message on top. */
 function mergeFeedItems(
@@ -267,80 +191,257 @@ function mergeFeedItems(
   });
 }
 
-function SystemEventRow({
-  event,
-  locale,
-  nowMs,
-}: {
-  event: GestureFeedSystemEvent;
-  locale: string;
-  nowMs: number;
-}) {
-  const t = useTranslations('home');
-  const { icon: Icon, tone } = EVENT_PRESENTATION[event.kind];
-  const text = t(`chat.system.${event.kind}`, {
-    ...(event.cycleNumber != null ? { number: String(event.cycleNumber) } : {}),
-    ...(event.address ? { address: shortenHex(event.address, 4) } : {}),
-    ...(event.durationSeconds != null
-      ? { duration: formatSeconds(event.durationSeconds, locale) }
-      : {}),
-    ...(event.count != null ? { count: String(event.count) } : {}),
-  });
+function messageKey(gesture: GestureInfo, index: number): string {
+  return Number.isFinite(gesture.EvtLogId)
+    ? String(gesture.EvtLogId)
+    : `${gesture.BidderAddr}-${gesture.TimeStamp}-${index}`;
+}
 
+/**
+ * Messages lead. Between two messages, the cycle events that happened in
+ * between fold into one line ("3 cycle events") that opens in place; a lone
+ * event stays a compact row. The "All activity" view lists every event.
+ */
+export function buildFeedRows(items: FeedItem[], view: ChatView): FeedRow[] {
+  const rows: FeedRow[] = [];
+  let run: GestureFeedSystemEvent[] = [];
+  const flush = () => {
+    if (run.length === 0) return;
+    if (view === 'messages' && run.length > 1) {
+      rows.push({ type: 'events', key: `events:${run[0]!.id}`, events: run });
+    } else {
+      for (const event of run) rows.push({ type: 'event', key: `event:${event.id}`, event });
+    }
+    run = [];
+  };
+  items.forEach((item, index) => {
+    if (item.type === 'system') {
+      run.push(item.event);
+      return;
+    }
+    flush();
+    rows.push({
+      type: 'message',
+      key: `message:${messageKey(item.entry.gesture, index)}`,
+      entry: item.entry,
+    });
+  });
+  flush();
+  return rows;
+}
+
+/** The method and cost of a Gesture as one short tag ("0.1021 ETH + RWLK"). */
+function useMethodTag() {
+  const t = useTranslations('home');
+  const locale = useLocale();
+  return (gesture: GestureInfo): string => {
+    const typeCode = resolveGestureTypeCode(gesture);
+    if (typeCode === 2) {
+      const cost =
+        typeof gesture.CstCost === 'number' && gesture.CstCost >= 0 ? gesture.CstCost : null;
+      return cost != null
+        ? t('chat.badge.cst', {
+            amount: formatAmount(cost, { unit: 'CST', locale, context: 'table', withUnit: false }),
+          })
+        : t('chat.badge.cstFallback');
+    }
+    const cost =
+      typeof gesture.GestureCostEth === 'number' && gesture.GestureCostEth >= 0
+        ? gesture.GestureCostEth
+        : null;
+    const amount =
+      cost != null
+        ? formatAmount(cost, { unit: 'ETH', locale, context: 'table', withUnit: false })
+        : null;
+    if (typeCode === 1) {
+      return amount != null ? t('chat.badge.ethRwlk', { amount }) : t('chat.badge.rwlkFallback');
+    }
+    return amount != null ? t('chat.badge.eth', { amount }) : t('chat.badge.ethFallback');
+  };
+}
+
+function EventSentence({ event }: { event: GestureFeedSystemEvent }) {
+  const t = useTranslations('home');
+  const locale = useLocale();
+  return (
+    <>
+      {t(`chat.system.${event.kind}`, {
+        ...(event.cycleNumber != null ? { number: String(event.cycleNumber) } : {}),
+        ...(event.address ? { address: formatAddress(event.address) } : {}),
+        ...(event.durationSeconds != null
+          ? { duration: formatSeconds(event.durationSeconds, locale) }
+          : {}),
+        ...(event.count != null ? { count: formatCount(event.count, locale) } : {}),
+      })}
+    </>
+  );
+}
+
+/** A cycle event as one compact line: glyph, sentence, when. Never a heading. */
+function SystemEventRow({ event }: { event: GestureFeedSystemEvent }) {
+  const Icon = EVENT_ICON[event.kind];
   return (
     <div
       data-testid="chat-system-event"
       data-kind={event.kind}
-      data-tone={tone}
-      className={styles.eventCard}
+      className="flex min-w-0 items-start gap-3 py-2.5"
     >
-      <span className={styles.eventIcon} aria-hidden="true">
-        <Icon className="h-4 w-4" />
-      </span>
-      <div className="min-w-0 flex-1">
-        <h3 className={styles.eventTitle}>{t(`chat.eventTitles.${event.kind}`)}</h3>
-        <p className={styles.eventDescription}>{text}</p>
-        <GestureMessageTimestamp timestamp={event.timestamp} locale={locale} nowMs={nowMs} />
-      </div>
+      <Icon className="mt-0.5 size-4 shrink-0 text-subtle" aria-hidden />
+      <p className="type-body-sm min-w-0 flex-1 text-muted-foreground [overflow-wrap:anywhere]">
+        <EventSentence event={event} />
+      </p>
+      <DateTime
+        timestamp={event.timestamp}
+        variant="relative"
+        className="type-caption mt-0.5 shrink-0 text-subtle"
+      />
     </div>
   );
 }
 
-function PendingMessageRow({
-  pending,
-  locale,
-  nowMs,
+/** Several events between two messages: one line that opens in place. */
+function EventGroupRow({ events }: { events: GestureFeedSystemEvent[] }) {
+  const t = useTranslations('home');
+  const newest = events[0]!;
+  const Icon = EVENT_ICON[newest.kind];
+  return (
+    <details data-testid="chat-event-group" data-count={events.length} className="group/events">
+      <summary className="flex min-h-11 cursor-pointer list-none items-center gap-3 py-1.5 [&::-webkit-details-marker]:hidden">
+        <Icon className="size-4 shrink-0 text-subtle" aria-hidden />
+        <span className="type-label min-w-0 flex-1 text-muted-foreground">
+          {t('chat.eventGroup', { count: events.length })}
+        </span>
+        <DateTime
+          timestamp={newest.timestamp}
+          variant="relative"
+          className="type-caption shrink-0 text-subtle"
+        />
+        <ChevronDown
+          className="size-4 shrink-0 text-subtle transition-transform duration-[var(--duration-base)] group-open/events:rotate-180 motion-reduce:transition-none"
+          aria-hidden
+        />
+      </summary>
+      <ul role="list" className="ms-7 divide-y divide-rule-faint border-s border-rule-faint ps-3">
+        {events.map((event) => (
+          <li key={event.id}>
+            <SystemEventRow event={event} />
+          </li>
+        ))}
+      </ul>
+    </details>
+  );
+}
+
+function MessageRow({
+  entry,
+  isOwn,
+  settling,
+  methodTag,
 }: {
-  pending: PendingChatMessage;
-  locale: string;
-  nowMs: number;
+  entry: GestureChatMessage;
+  isOwn: boolean;
+  settling: boolean;
+  methodTag: string;
 }) {
   const t = useTranslations('home');
+  const { gesture, message } = entry;
+  const gestureId = Number.isFinite(gesture.EvtLogId) ? gesture.EvtLogId : null;
+  const position = typeof gesture.BidPosition === 'number' ? gesture.BidPosition : null;
+  return (
+    <article
+      data-testid="chat-message"
+      data-settling={settling || undefined}
+      aria-label={t('chat.messageAria', { address: formatAddress(gesture.BidderAddr) })}
+      className={cn(
+        'relative py-3.5',
+        // The newest message settles in with the live rule for 900ms.
+        "before:absolute before:inset-y-3 before:-start-3 before:w-0.5 before:rounded-full before:bg-live before:opacity-0 before:transition-opacity before:duration-[var(--duration-settle)] before:content-['']",
+        settling && 'before:opacity-100',
+      )}
+    >
+      <div
+        data-testid="gesture-message-meta"
+        className="flex min-w-0 items-center justify-between gap-3"
+      >
+        <span className="flex min-w-0 items-center gap-2">
+          <AddressChip address={gesture.BidderAddr} variant="plain" label={false} />
+          {isOwn && (
+            <Badge tone="accent" size="sm">
+              {t('chat.you')}
+            </Badge>
+          )}
+        </span>
+        <DateTime
+          timestamp={gesture.TimeStamp}
+          variant="relative"
+          className="type-caption shrink-0 text-subtle"
+        />
+      </div>
+      <p className="type-body-sm mt-1.5 whitespace-pre-wrap text-foreground [overflow-wrap:anywhere]">
+        <LinkifiedText text={message} />
+      </p>
+      {/* How the Gesture was made: the method and cost, and its place in the cycle. */}
+      <p className="type-caption mt-1.5 flex flex-wrap items-center gap-x-2 text-subtle">
+        <span data-testid="gesture-method-badge">{methodTag}</span>
+        {gestureId != null && (
+          <>
+            <span aria-hidden>·</span>
+            <Link
+              href={`/gesture/${gestureId}`}
+              className="link-quiet tabular-nums text-subtle hover:text-foreground"
+              aria-label={t('chat.openPositionAria', { position: String(position ?? gestureId) })}
+            >
+              #{position ?? gestureId}
+            </Link>
+          </>
+        )}
+      </p>
+    </article>
+  );
+}
 
+function PendingMessageRow({ pending }: { pending: PendingChatMessage }) {
+  const t = useTranslations('home');
   return (
     <article
       data-testid="chat-pending-message"
-      className={cn(styles.messageCard, styles.pendingCard)}
+      data-stale={pending.stale || undefined}
       aria-label={t('chat.pending.aria')}
+      className="py-3.5"
     >
-      <div className="flex items-center justify-between gap-3">
-        <span className="min-w-0 truncate font-mono text-sm font-semibold text-white/80">
-          {shortenHex(pending.address, 6)}
-        </span>
-        <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-primary/25 bg-primary/[0.08] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-primary">
-          <Spinner size="sm" className="h-3 w-3" />
-          {t('chat.pending.label')}
-        </span>
+      <div className="flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1">
+        <AddressChip address={pending.address} variant="plain" label={false} />
+        <Badge
+          tone="accent"
+          size="sm"
+          icon={pending.stale ? undefined : <Spinner size="sm" className="size-3" />}
+        >
+          {pending.stale ? t('chat.pending.stillIndexing') : t('chat.pending.label')}
+        </Badge>
+        {pending.txHash && (
+          <TxExplorerLink
+            hash={pending.txHash}
+            label={t('chat.pending.viewTransaction')}
+            className="type-caption ms-auto"
+          />
+        )}
       </div>
-      <GestureMessageTimestamp timestamp={pending.timestamp} locale={locale} nowMs={nowMs} />
-      <p className="mt-2.5 whitespace-pre-wrap break-words text-sm leading-relaxed text-foreground/80">
+      <p className="type-body-sm mt-1.5 whitespace-pre-wrap text-foreground [overflow-wrap:anywhere]">
         {pending.message}
       </p>
     </article>
   );
 }
 
-/** Displays current-cycle gesture messages as a moderated, newest-first chat feed. */
+/**
+ * The cycle's Gesture Chat: participants' messages lead, newest first, as
+ * ruled rows on one frame. Cycle events between two messages fold into one
+ * line that opens in place; "All activity" lists every event. On phones the
+ * feed is part of the page (the newest rows, then "Show more"); from 1024px
+ * it scrolls inside its frame. Its freshness stamp says when the feed last
+ * updated and turns to "Reconnecting" or "Updates delayed" when refreshes
+ * fail, while the history already on screen stays.
+ */
 export function GestureMessageChat({
   gestures,
   cycleNumber,
@@ -355,9 +456,11 @@ export function GestureMessageChat({
   onRetry,
   resetKey,
   serverModerated = false,
+  account = null,
 }: GestureMessageChatProps) {
   const t = useTranslations('home');
-  const locale = useLocale();
+  const titleId = useId();
+  const methodTag = useMethodTag();
   const { data: bannedGestures } = useBannedGestures();
   const bannedGestureIds = useMemo(
     () => new Set(serverModerated ? [] : (bannedGestures ?? []).map((gesture) => gesture.bid_id)),
@@ -367,21 +470,29 @@ export function GestureMessageChat({
     () => getGestureChatMessages(gestures, bannedGestureIds),
     [gestures, bannedGestureIds],
   );
+  const [view, setView] = useState<ChatView>('messages');
   const [eventWindow, setEventWindow] = useState({ key: resetKey, limit: SYSTEM_EVENTS_PER_PAGE });
   const eventLimit = eventWindow.key === resetKey ? eventWindow.limit : SYSTEM_EVENTS_PER_PAGE;
+  const [phoneWindow, setPhoneWindow] = useState({ key: resetKey, messages: PHONE_MESSAGES });
+  const phoneMessages = phoneWindow.key === resetKey ? phoneWindow.messages : PHONE_MESSAGES;
   const [isPrinting, setIsPrinting] = useState(false);
   const visibleEvents = useMemo(() => {
     const newestFirst = [...(systemEvents ?? [])].sort((a, b) => b.timestamp - a.timestamp);
     return isPrinting ? newestFirst : newestFirst.slice(0, eventLimit);
   }, [systemEvents, eventLimit, isPrinting]);
-  const feedItems = useMemo(
-    () => mergeFeedItems(messages, visibleEvents),
-    [messages, visibleEvents],
+  const rows = useMemo(
+    () => buildFeedRows(mergeFeedItems(messages, visibleEvents), view),
+    [messages, visibleEvents, view],
   );
   const pending = pendingMessages ?? [];
-  const hasFeedContent = feedItems.length > 0 || pending.length > 0;
+  const hasFeedContent = rows.length > 0 || pending.length > 0;
   const hasMoreEvents = (systemEvents?.length ?? 0) > eventLimit;
-  const hasOlderContent = hasMoreEvents || pagination?.hasMore;
+  const hasOlderContent = hasMoreEvents || Boolean(pagination?.hasMore);
+  const phoneRows = phoneVisibleRows(rows, pending.length, phoneMessages);
+  const hiddenOnPhones = !isPrinting && rows.length + pending.length > phoneRows;
+  const newestMessage = messages[0] ?? null;
+  const isSettling = useLivePulse(pulseKey);
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const previousResetKey = useRef(resetKey);
   const readingAnchor = useRef<{ key: string | null; offset: number } | null>(null);
@@ -404,6 +515,30 @@ export function GestureMessageChat({
     }
   }, []);
 
+  // From 1024px the feed scrolls inside its frame: each edge fades while there
+  // is more to read that way, so the last visible row never ends at a hard cut.
+  const [scrollEdges, setScrollEdges] = useState({ top: false, bottom: false });
+  const measureScrollEdges = useCallback(() => {
+    const scroll = scrollRef.current;
+    if (!scroll) return;
+    const max = scroll.scrollHeight - scroll.clientHeight;
+    const next = { top: scroll.scrollTop > 1, bottom: max - scroll.scrollTop > 1 };
+    setScrollEdges((current) =>
+      current.top === next.top && current.bottom === next.bottom ? current : next,
+    );
+  }, []);
+  useEffect(() => {
+    const scroll = scrollRef.current;
+    if (!scroll || typeof ResizeObserver === 'undefined') return undefined;
+    const resize = new ResizeObserver(measureScrollEdges);
+    resize.observe(scroll);
+    return () => resize.disconnect();
+  }, [measureScrollEdges]);
+  const handleScroll = useCallback(() => {
+    rememberReadingPosition();
+    measureScrollEdges();
+  }, [measureScrollEdges, rememberReadingPosition]);
+
   // Keep the row being read at the same position when fresh messages arrive or
   // older history is appended. This also covers browsers without scroll anchoring.
   useLayoutEffect(() => {
@@ -423,7 +558,8 @@ export function GestureMessageChat({
     }
     previousResetKey.current = resetKey;
     rememberReadingPosition();
-  }, [feedItems, pendingMessages, isPrinting, resetKey, rememberReadingPosition]);
+    measureScrollEdges();
+  }, [rows, pendingMessages, isPrinting, resetKey, rememberReadingPosition, measureScrollEdges]);
 
   // Printing renders known history only; it never starts a network request.
   useEffect(() => {
@@ -449,293 +585,217 @@ export function GestureMessageChat({
     }
     if (pagination?.hasMore || pagination?.error) void pagination.onLoadMore();
   };
-  const isPulsing = useLivePulse(pulseKey);
-  // 30s tick keeps minute-level relative timestamps fresh; 0 during SSR.
-  const nowMs = useNow(30_000);
+  const showMoreOnPhones = () =>
+    setPhoneWindow({ key: resetKey, messages: phoneMessages + PHONE_MESSAGES_STEP });
+
+  const scrollMask =
+    !isPrinting && (scrollEdges.top || scrollEdges.bottom)
+      ? `linear-gradient(to bottom, transparent 0, #000 ${scrollEdges.top ? SCROLL_FADE : '0px'}, #000 calc(100% - ${scrollEdges.bottom ? SCROLL_FADE : '0px'}), transparent 100%)`
+      : undefined;
+
+  const summary =
+    cycleNumber != null
+      ? t('chat.cycleNumber', { number: String(cycleNumber) })
+      : t('chat.currentCycle');
+  const counts =
+    isLoading || error
+      ? null
+      : hasOlderContent
+        ? t('chat.history.showing', { messages: messages.length, events: visibleEvents.length })
+        : [
+            t('chat.messageCount', { count: messages.length }),
+            t('chat.eventCount', { count: visibleEvents.length }),
+          ].join(' · ');
 
   return (
-    <Surface
-      asChild
-      variant="glass-bordered"
-      radius="xl"
-      padding="none"
+    // One landmark only: the history region below, named by the title. The
+    // frame itself is a plain container, so the two never share a name.
+    <div
+      data-testid="gesture-message-chat"
       className={cn(
-        'min-w-0 print:h-auto print:overflow-visible print:break-inside-avoid',
-        isPulsing && 'animate-live-flash',
+        'flex min-w-0 flex-col rounded-surface border border-rule-faint bg-surface/60 print:h-auto print:break-inside-avoid',
         className,
       )}
     >
-      <aside aria-labelledby="gesture-message-chat-title" data-testid="gesture-message-chat">
-        <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-primary/20 blur-3xl" />
-        <div className="pointer-events-none absolute -left-12 bottom-0 h-36 w-36 rounded-full bg-[rgb(var(--nebula-violet-rgb)/0.18)] blur-3xl" />
-
-        <div className="relative z-[1] flex h-full min-h-0 flex-col">
-          <div className="shrink-0 border-b border-white/[0.07] p-4 sm:p-5 xl:p-4">
-            <div className="flex items-start justify-between gap-2.5">
-              <div className="min-w-0">
-                <div className="mb-1.5 inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                  <span className="relative flex h-1.5 w-1.5">
-                    <span className="absolute inline-flex h-full w-full animate-live-dot rounded-full bg-emerald-400 opacity-75" />
-                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-300" />
-                  </span>
-                  {t('chat.liveFeed')}
-                </div>
-                <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
-                  <h2
-                    id="gesture-message-chat-title"
-                    className="font-display text-lg font-bold tracking-tight sm:text-xl xl:text-lg"
-                  >
-                    {t('chat.title')}
-                  </h2>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        type="button"
-                        aria-label={t('chat.joinTooltipAria')}
-                        className={cn(
-                          'inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.04] text-muted-foreground transition-colors hover:border-primary/25 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-                          TOUCH_TARGET_ICON_CLASS,
-                        )}
-                      >
-                        <Info className="h-3.5 w-3.5" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="max-w-[240px]">{t('chat.joinTooltip')}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-                <p className="mt-0.5 text-xs text-muted-foreground">
-                  {cycleNumber != null
-                    ? t('chat.cycleNumber', { number: String(cycleNumber) })
-                    : t('chat.currentCycle')}
-                  {messages.length > 0 || (!isLoading && !error) ? (
-                    <>
-                      {' \u00b7 '}
-                      {t('chat.messageCount', { count: messages.length })}
-                    </>
-                  ) : null}
-                  {visibleEvents.length > 0 || (!isLoading && !error) ? (
-                    <>
-                      {' \u00b7 '}
-                      {t('chat.eventCount', { count: visibleEvents.length })}
-                    </>
-                  ) : null}
-                </p>
-                {(pagination || hasMoreEvents) && !isLoading && !error ? (
-                  <p className="mt-1 text-xs text-muted-foreground print:hidden">
-                    {t('chat.history.shown')}
-                  </p>
-                ) : null}
-              </div>
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-primary/12 text-primary max-sm:hidden">
-                <MessageCircle className="h-5 w-5" />
-              </div>
-            </div>
+      <header className="flex shrink-0 flex-wrap items-start justify-between gap-x-4 gap-y-1 border-b border-rule-faint px-5 py-4 sm:px-6">
+        <div className="min-w-0">
+          <div className="flex items-center gap-1.5">
+            <h2 id={titleId} className="type-title text-foreground">
+              {t('chat.title')}
+            </h2>
+            <InfoTooltip content={t('chat.joinTooltip')} label={t('chat.title')} />
           </div>
+          <p className="type-caption mt-0.5 text-subtle">
+            {summary}
+            {counts ? ` · ${counts}` : null}
+          </p>
+        </div>
+        <LiveStatus
+          variant="inline"
+          still
+          queryKeys={[['homeGestureFeed']]}
+          className="mt-1 print:hidden"
+        />
+      </header>
 
+      {hasFeedContent && !isLoading && !error && (
+        <div className="shrink-0 border-b border-rule-faint px-5 py-2.5 sm:px-6 print:hidden">
           <div
-            ref={scrollRef}
-            data-testid="gesture-message-chat-scroll"
-            role="region"
-            aria-labelledby="gesture-message-chat-title"
-            tabIndex={0}
-            onScroll={isPrinting ? undefined : rememberReadingPosition}
-            // Keep history within a viewport-sized reading area on phones.
-            // svh stays stable as browser chrome opens/closes; desktop fills
-            // the sized panel. Native scrolling preserves touch and keyboard access.
-            className="relative z-[1] max-h-[min(28rem,55svh)] min-h-0 flex-1 overflow-y-auto overscroll-y-contain p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/60 sm:p-4 lg:max-h-[calc(100vh-13rem)] xl:max-h-none xl:p-4 xl:[scrollbar-gutter:stable] print:max-h-none print:overflow-visible print:[scrollbar-gutter:auto]"
+            role="group"
+            aria-label={t('chat.viewLabel')}
+            className={tabsListVariants({ variant: 'segmented' })}
           >
-            {isLoading ? (
-              <div
-                role="status"
-                className="flex items-center gap-2 p-3 text-sm text-muted-foreground print:hidden"
+            {(['messages', 'all'] as const).map((option) => (
+              <button
+                key={option}
+                type="button"
+                aria-pressed={view === option}
+                data-state={view === option ? 'active' : 'inactive'}
+                onClick={() => setView(option)}
+                className={tabsTriggerVariants({ variant: 'segmented' })}
               >
-                <Spinner className="h-4 w-4" aria-hidden="true" />
-                {t('chat.history.loading')}
-              </div>
-            ) : error ? (
-              <div className="space-y-3 p-3 print:hidden">
-                <p role="alert" className="text-sm text-muted-foreground">
-                  {t('chat.history.error')}
-                </p>
-                {onRetry ? (
-                  <Button variant="secondary" size="sm" onClick={onRetry}>
-                    {t('chat.history.retry')}
-                  </Button>
-                ) : null}
-              </div>
-            ) : null}
-            {!isLoading &&
-            !error &&
-            hasFeedContent &&
-            messages.length === 0 &&
-            pending.length === 0 &&
-            onJoinCta ? (
-              <div className="mb-3">
-                <Button variant="secondary" size="sm" onClick={onJoinCta}>
-                  {t('chat.empty.cta')}
+                {t(`chat.view.${option}`)}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* From 1024px the feed scrolls inside the frame; below it is part of the page. */}
+      <div className="relative min-h-0 lg:min-h-[24rem] lg:flex-1 print:min-h-0">
+        <div
+          ref={scrollRef}
+          data-testid="gesture-message-chat-scroll"
+          role="region"
+          aria-labelledby={titleId}
+          tabIndex={0}
+          onScroll={isPrinting ? undefined : handleScroll}
+          data-overflow-top={(!isPrinting && scrollEdges.top) || undefined}
+          data-overflow-bottom={(!isPrinting && scrollEdges.bottom) || undefined}
+          className="focus-ring-inset px-5 sm:px-6 lg:absolute lg:inset-0 lg:overflow-y-auto lg:overscroll-y-contain lg:[scrollbar-gutter:stable] print:static print:overflow-visible"
+          style={scrollMask ? { maskImage: scrollMask, WebkitMaskImage: scrollMask } : undefined}
+        >
+          {isLoading ? (
+            <div
+              role="status"
+              className="type-body-sm flex items-center gap-2 py-4 text-muted-foreground print:hidden"
+            >
+              <Spinner className="size-4" aria-hidden="true" />
+              {t('chat.history.loading')}
+            </div>
+          ) : error ? (
+            <div role="status" className="space-y-3 py-4 print:hidden">
+              <p className="type-body-sm text-muted-foreground">{t('chat.history.error')}</p>
+              {onRetry ? (
+                <Button variant="secondary" size="sm" onClick={onRetry}>
+                  {t('chat.history.retry')}
                 </Button>
-              </div>
-            ) : null}
-            {hasFeedContent ? (
-              <ol className="space-y-2.5 sm:space-y-3 xl:space-y-2.5" aria-live="polite">
-                {pending.map((entry) => (
-                  <li key={entry.id} data-chat-row={`pending:${entry.id}`}>
-                    <PendingMessageRow pending={entry} locale={locale} nowMs={nowMs} />
-                  </li>
-                ))}
-                {feedItems.map((item, index) => {
-                  if (item.type === 'system') {
-                    return (
-                      <li key={item.event.id} data-chat-row={`event:${item.event.id}`}>
-                        <SystemEventRow event={item.event} locale={locale} nowMs={nowMs} />
-                      </li>
-                    );
-                  }
-                  const { gesture, message } = item.entry;
-                  const isNewest = item.entry === messages[0];
-                  const gestureId = Number.isFinite(gesture.EvtLogId) ? gesture.EvtLogId : null;
-                  const gesturePosition =
-                    typeof gesture.BidPosition === 'number' ? gesture.BidPosition : null;
-                  const listItemKey =
-                    gestureId ?? `${gesture.BidderAddr}-${gesture.TimeStamp}-${index}`;
-                  const badge = getGestureMethodBadge(gesture, locale);
+              ) : null}
+            </div>
+          ) : null}
 
-                  return (
-                    <li key={listItemKey} data-chat-row={`message:${listItemKey}`}>
-                      <article
-                        className={styles.messageCard}
-                        data-newest={isNewest}
-                        aria-label={t('chat.messageAria', { address: gesture.BidderAddr })}
-                      >
-                        {/*
-                          Stacked on phones: the badge cluster is `shrink-0`
-                          while the address is `min-w-0` over `font-mono`
-                          (`overflow-wrap: anywhere`), so on one row the badges
-                          took their full width and squeezed the address to a
-                          single character column ~5px wide and 360px tall.
-                        */}
-                        <div
-                          data-testid="gesture-message-meta"
-                          className={cn(
-                            styles.messageMeta,
-                            'flex items-start justify-between gap-3 max-sm:flex-col max-sm:items-start max-sm:gap-2',
-                          )}
-                        >
-                          <div
-                            data-testid="gesture-message-participant"
-                            className="flex min-w-0 items-center gap-1"
-                          >
-                            <span className={styles.messageIcon} aria-hidden="true">
-                              <MessageCircle className="h-4 w-4" />
-                            </span>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Link
-                                  href={`/user/${gesture.BidderAddr}`}
-                                  className={cn(
-                                    'min-w-0 truncate font-mono text-sm font-semibold text-white underline-offset-4 hover:text-primary hover:underline',
-                                    TOUCH_TARGET_TEXT_LINK_CLASS,
-                                  )}
-                                  title={gesture.BidderAddr}
-                                >
-                                  {shortenHex(gesture.BidderAddr, 6)}
-                                </Link>
-                              </TooltipTrigger>
-                              <TooltipContent>{gesture.BidderAddr}</TooltipContent>
-                            </Tooltip>
-                            <CopyAddressButton address={gesture.BidderAddr} />
-                          </div>
-                          <div
-                            data-testid="gesture-message-badges"
-                            className={cn(
-                              styles.messageBadges,
-                              'flex shrink-0 flex-wrap items-center justify-end gap-1.5 max-sm:justify-start',
-                            )}
-                          >
-                            <span
-                              data-testid="gesture-method-badge"
-                              className="inline-flex items-center rounded-full border border-white/[0.08] bg-white/[0.035] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground"
-                            >
-                              {badge.amount != null
-                                ? t(`chat.badge.${badge.messageKey}`, { amount: badge.amount })
-                                : t(`chat.badge.${badge.messageKey}`)}
-                            </span>
-                            {gestureId != null ? (
-                              <Link
-                                href={`/gesture/${gestureId}`}
-                                className="inline-flex shrink-0 items-center gap-1 rounded-full border border-white/[0.08] bg-white/[0.035] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:border-primary/25 hover:text-primary"
-                                aria-label={t('chat.openPositionAria', {
-                                  position: String(gesturePosition ?? gestureId),
-                                })}
-                              >
-                                <Radio className="h-3 w-3" />#{gesturePosition ?? gestureId}
-                              </Link>
-                            ) : null}
-                          </div>
-                        </div>
+          {!isLoading &&
+          !error &&
+          hasFeedContent &&
+          messages.length === 0 &&
+          pending.length === 0 &&
+          onJoinCta ? (
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-rule-faint py-3">
+              <p className="type-body-sm text-muted-foreground">{t('chat.empty.messagesFirst')}</p>
+              <Button variant="secondary" size="sm" onClick={onJoinCta}>
+                {t('chat.empty.cta')}
+              </Button>
+            </div>
+          ) : null}
 
-                        <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-relaxed text-foreground/95">
-                          <LinkifiedText text={message} />
-                        </p>
-                        <GestureMessageTimestamp
-                          timestamp={gesture.TimeStamp}
-                          locale={locale}
-                          nowMs={nowMs}
-                        />
-                      </article>
-                    </li>
-                  );
-                })}
-              </ol>
-            ) : !isLoading && !error ? (
-              <EmptyState
-                icon={<MessageCircle className="h-8 w-8 text-muted-foreground/50" />}
-                title={t('chat.empty.title')}
-                description={t('chat.empty.description')}
-                action={
-                  onJoinCta ? (
-                    <Button variant="secondary" size="sm" onClick={onJoinCta}>
-                      {t('chat.empty.cta')}
-                    </Button>
-                  ) : undefined
-                }
-                className="min-h-[14rem] py-8 sm:min-h-[16rem] xl:h-full xl:min-h-0 xl:py-6"
-              />
-            ) : null}
-            {!isLoading &&
-            !error &&
-            (hasOlderContent || pagination?.error || pagination?.isLoading) ? (
-              <div className="mt-4 space-y-2 border-t border-white/[0.07] pt-3 print:hidden">
-                {pagination?.error ? (
-                  <p role="alert" className="text-sm text-muted-foreground">
-                    {t('chat.history.olderError')}
-                  </p>
-                ) : null}
+          {hasFeedContent && !isLoading && !error ? (
+            <ol role="list" className="divide-y divide-rule-faint">
+              {pending.map((entry, index) => (
+                <li
+                  key={entry.id}
+                  data-chat-row={`pending:${entry.id}`}
+                  className={cn(!isPrinting && index >= phoneRows && 'max-lg:hidden')}
+                >
+                  <PendingMessageRow pending={entry} />
+                </li>
+              ))}
+              {rows.map((row, index) => (
+                <li
+                  key={row.key}
+                  data-chat-row={row.key}
+                  className={cn(
+                    !isPrinting && pending.length + index >= phoneRows && 'max-lg:hidden',
+                  )}
+                >
+                  {row.type === 'message' ? (
+                    <MessageRow
+                      entry={row.entry}
+                      isOwn={sameAddress(row.entry.gesture.BidderAddr, account)}
+                      settling={isSettling && row.entry === newestMessage}
+                      methodTag={methodTag(row.entry.gesture)}
+                    />
+                  ) : row.type === 'event' ? (
+                    <SystemEventRow event={row.event} />
+                  ) : (
+                    <EventGroupRow events={row.events} />
+                  )}
+                </li>
+              ))}
+            </ol>
+          ) : !isLoading && !error ? (
+            <EmptyState
+              variant="inline"
+              headingLevel={3}
+              icon={<MessageCircle className="size-6 text-subtle" aria-hidden />}
+              title={t('chat.empty.title')}
+              description={t('chat.empty.description')}
+              action={
+                onJoinCta ? (
+                  <Button variant="secondary" size="sm" onClick={onJoinCta}>
+                    {t('chat.empty.cta')}
+                  </Button>
+                ) : undefined
+              }
+              className="py-10"
+            />
+          ) : null}
+
+          {!isLoading && !error && (hiddenOnPhones || hasOlderContent || pagination?.error) ? (
+            <div className="space-y-2 border-t border-rule-faint py-4 print:hidden">
+              {pagination?.error ? (
+                <p role="status" className="type-body-sm text-muted-foreground">
+                  {t('chat.history.olderError')}
+                </p>
+              ) : null}
+              {hiddenOnPhones ? (
                 <Button
                   type="button"
                   variant="secondary"
-                  className="min-h-11 w-full whitespace-normal"
-                  disabled={pagination?.isLoading}
+                  className="w-full whitespace-normal lg:hidden"
+                  onClick={showMoreOnPhones}
+                >
+                  {t('chat.history.showMore')}
+                </Button>
+              ) : null}
+              {hasOlderContent || pagination?.error ? (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  loading={pagination?.isLoading}
+                  className={cn('w-full whitespace-normal', hiddenOnPhones && 'max-lg:hidden')}
                   onClick={loadOlder}
                 >
-                  {pagination?.isLoading ? (
-                    <span role="status" className="flex items-center justify-center gap-2">
-                      <Spinner className="h-4 w-4" aria-hidden="true" />
-                      {t('chat.history.loadingOlder')}
-                    </span>
-                  ) : pagination?.error ? (
-                    t('chat.history.retry')
-                  ) : (
-                    t('chat.history.loadOlder')
-                  )}
+                  {pagination?.isLoading
+                    ? t('chat.history.loadingOlder')
+                    : pagination?.error
+                      ? t('chat.history.retry')
+                      : t('chat.history.loadOlder')}
                 </Button>
-              </div>
-            ) : null}
-          </div>
+              ) : null}
+            </div>
+          ) : null}
         </div>
-      </aside>
-    </Surface>
+      </div>
+    </div>
   );
 }

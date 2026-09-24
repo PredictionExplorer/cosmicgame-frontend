@@ -53,10 +53,8 @@ test.describe('experimental UI', () => {
     try {
       await currentHome.goto('/', { waitUntil: 'domcontentloaded' });
       await expect(currentHome.getByTestId('control-desk')).toBeVisible();
-      await expect(currentHome.getByTestId('experimental-ui-entry')).toHaveAttribute(
-        'href',
-        '/experimental-ui',
-      );
+      // The experiment is reached by its URL; the public home does not link it (F280).
+      await expect(currentHome.getByTestId('experimental-ui-entry')).toHaveCount(0);
     } finally {
       await currentHome.close();
     }
@@ -135,7 +133,7 @@ test.describe('experimental UI', () => {
     expect(Math.abs(rows.back - rows.newHere)).toBeLessThan(12);
 
     // The dock carries the clock and the priced action, and opens the same console.
-    await expect(page.getByTestId('action-dock-mobile')).toBeVisible();
+    await expect(page.getByTestId('action-dock')).toBeVisible();
     await page.getByTestId('dock-open-sheet').click();
     await expect(
       page.locator('[data-testid="gesture-console"][data-variant="sheet"]'),
@@ -148,7 +146,7 @@ test.describe('experimental UI', () => {
     test.skip(!isMobile, 'the dock floats over phones only');
     await page.setViewportSize({ width: 390, height: 844 });
     await openExperiment(page);
-    await expect(page.getByTestId('action-dock-mobile')).toBeVisible();
+    await expect(page.getByTestId('action-dock')).toBeVisible();
 
     // Tab to the art's Pause control, which first paints under the dock.
     const toggle = page.getByTestId('art-motion-toggle');

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useConfig, usePublicClient } from 'wagmi';
 import { writeContract } from '@wagmi/core';
@@ -48,6 +48,11 @@ type PreparedAttachment =
 export interface EthGestureInfo {
   AuctionDuration: number;
   ETHPrice: number;
+  /**
+   * The same price in wei, exact, for amounts that must match the wallet
+   * (the funding check before submit). Absent on hand-built quotes.
+   */
+  ETHPriceWei?: bigint;
   SecondsElapsed: number;
 }
 
@@ -74,6 +79,9 @@ function getLiveCstPreviewRefreshMs(): number {
   return CST_REWARD_PREVIEW_REFRESH_MS;
 }
 
+/** Where the list of the wallet's unused Random Walk NFTs stands. */
+export type RwlkListStatus = 'no-wallet' | 'loading' | 'ready' | 'error';
+
 export function useGestureForm() {
   const t = useTranslations('toasts');
   const locale = useLocale();
@@ -86,6 +94,10 @@ export function useGestureForm() {
   const { notify, notifyErrorFromEthers } = useNotify();
   const tx = useTxFlow();
   const uxScenario = useUxScenarioSnapshot();
+  // The hash of the last confirmed Gesture, read right after a submit resolves
+  // (a ref, so the caller's closure sees it without waiting for a render).
+  const lastGestureHashRef = useRef<`0x${string}` | null>(null);
+  const getLastGestureHash = useCallback(() => lastGestureHashRef.current, []);
 
   const { data: ctPriceData } = useCTPrice();
   const { data: bidEthPriceData } = useGestureEthCost();
@@ -105,6 +117,11 @@ export function useGestureForm() {
   const [isGesturing, setIsBidding] = useState(false);
   const [advancedExpanded, setAdvancedExpanded] = useState(false);
   const [rwlknftIds, setRwlknftIds] = useState<number[]>([]);
+  // Which wallet the list above was read for, and whether that read failed.
+  const [rwlkListSettled, setRwlkListSettled] = useState<{
+    account: string;
+    failed: boolean;
+  } | null>(null);
   const [contractCstDurations, setContractCstDurations] = useState<CstAuctionDurations | null>(
     null,
   );
@@ -120,9 +137,11 @@ export function useGestureForm() {
 
   const ethGestureInfo = useMemo<EthGestureInfo | null>(() => {
     if (!bidEthPriceData) return null;
+    const priceWei = BigInt(bidEthPriceData.ETHPrice);
     return {
       AuctionDuration: parseInt(bidEthPriceData.AuctionDuration),
-      ETHPrice: parseFloat(formatEther(BigInt(bidEthPriceData.ETHPrice))),
+      ETHPrice: parseFloat(formatEther(priceWei)),
+      ETHPriceWei: priceWei,
       SecondsElapsed: parseInt(bidEthPriceData.SecondsElapsed),
     };
   }, [bidEthPriceData]);
@@ -713,7 +732,9 @@ export function useGestureForm() {
         failureMessage: t('gesture.transaction.failed'),
         errorContext: 'gesture-eth',
       });
-      return result.status === 'confirmed';
+      if (result.status !== 'confirmed') return false;
+      lastGestureHashRef.current = result.hash;
+      return true;
     } finally {
       setIsBidding(false);
     }
@@ -798,7 +819,9 @@ export function useGestureForm() {
         failureMessage: t('gesture.transaction.failed'),
         errorContext: 'gesture-cst',
       });
-      return result.status === 'confirmed';
+      if (result.status !== 'confirmed') return false;
+      lastGestureHashRef.current = result.hash;
+      return true;
     } finally {
       setIsBidding(false);
     }
@@ -816,15 +839,26 @@ export function useGestureForm() {
           .filter((t: number) => !gesturedRWLKIds.includes(t))
           .reverse();
         setRwlknftIds(nftIds);
+        setRwlkListSettled({ account, failed: false });
       })
       .catch((e) => {
         if (cancelled) return;
         reportError(e, 'getRwlkNFTIds');
+        setRwlkListSettled({ account, failed: true });
       });
     return () => {
       cancelled = true;
     };
   }, [nftRWLKContract, account, usedRWLKData]);
+
+  /** The wallet's unused Random Walk NFTs: not read without a wallet, then loading, ready or failed. */
+  const rwlkListStatus: RwlkListStatus = !account
+    ? 'no-wallet'
+    : rwlkListSettled?.account !== account
+      ? 'loading'
+      : rwlkListSettled.failed
+        ? 'error'
+        : 'ready';
 
   const updateCstRewardTolerancePercent = useCallback((value: number) => {
     if (!Number.isFinite(value)) return;
@@ -866,7 +900,10 @@ export function useGestureForm() {
     advancedExpanded,
     setAdvancedExpanded,
     rwlknftIds,
+    rwlkListStatus,
     onGesture,
     onGestureWithCST,
+    /** The hash of the last confirmed Gesture, for its explorer link while it indexes. */
+    getLastGestureHash,
   } as const;
 }

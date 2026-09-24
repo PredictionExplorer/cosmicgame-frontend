@@ -4,9 +4,8 @@ import { cn } from '@/lib/utils';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import AttachedNFT from '@/components/attachments/AttachedNFT';
 import AttachedERC20Table from '@/components/attachments/AttachedERC20Table';
-import { CustomPagination } from '@/components/common/CustomPagination';
-import { SectionDivider } from '@/components/ui/section-divider';
-import { InfoTooltip } from '@/components/ui/info-tooltip';
+import { TablePagination } from '@/components/ui/pagination';
+import { SectionHeader } from '@/components/ui/section-header';
 import type { AttachedNFT as DonatedNFTType } from '@/services/api/types';
 import type { DonatedERC20Token } from '@/components/attachments/AttachedERC20Table';
 
@@ -20,7 +19,10 @@ interface DonatedTokensSectionProps {
   perPage: number;
 }
 
-/** Tabbed display of attached NFTs (grid) and ERC-20 tokens (table) for the current cycle, with pagination. */
+/**
+ * The cycle's attached tokens: NFTs as a paged grid and ERC-20 tokens as a
+ * ledger, behind underline tabs on one frame.
+ */
 export function DonatedTokensSection({
   donatedNFTs,
   donatedERC20Tokens,
@@ -39,27 +41,22 @@ export function DonatedTokensSection({
         : 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3';
 
   return (
-    <div>
-      <div className="flex items-center gap-2 mb-6">
-        <SectionDivider title={t('attachedTokens.title')} className="flex-1" />
-        <InfoTooltip content={t('attachedTokens.tooltip')} />
-      </div>
-      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden border-l-2 border-l-[hsl(271,98%,60%)]/40">
+    <section aria-labelledby="cycle-attached-tokens">
+      <SectionHeader
+        headingId="cycle-attached-tokens"
+        title={t('attachedTokens.title')}
+        info={t('attachedTokens.tooltip')}
+      />
+      <div className="overflow-hidden rounded-surface border border-rule-faint bg-surface/60">
         <Tabs
           value={String(donatedTokensTab)}
           onValueChange={(v) => onTabChange({} as React.SyntheticEvent, Number(v))}
         >
-          <div className="border-b border-white/[0.06]">
-            <TabsList className="w-full">
-              <TabsTrigger value="0" className="flex-1">
-                {t('attachedTokens.erc721Tab')}
-              </TabsTrigger>
-              <TabsTrigger value="1" className="flex-1">
-                {t('attachedTokens.erc20Tab')}
-              </TabsTrigger>
-            </TabsList>
-          </div>
-          <TabsContent value="0" className="p-6">
+          <TabsList variant="underline" className="w-full px-3 sm:px-4">
+            <TabsTrigger value="0">{t('attachedTokens.erc721Tab')}</TabsTrigger>
+            <TabsTrigger value="1">{t('attachedTokens.erc20Tab')}</TabsTrigger>
+          </TabsList>
+          <TabsContent value="0" className="p-5 sm:p-6">
             {donatedNFTs.length > 0 ? (
               <>
                 <div className={cn('grid gap-4', gridLayout)}>
@@ -69,22 +66,25 @@ export function DonatedTokensSection({
                     </div>
                   ))}
                 </div>
-                <CustomPagination
+                <TablePagination
                   page={curPage}
-                  setPage={setCurPage}
-                  totalLength={donatedNFTs.length}
-                  perPage={perPage}
+                  pageSize={perPage}
+                  total={donatedNFTs.length}
+                  onPageChange={setCurPage}
+                  className="mt-4"
                 />
               </>
             ) : (
-              <p className="text-muted-foreground text-sm">{t('attachedTokens.erc721Empty')}</p>
+              <p className="type-body-sm text-muted-foreground">
+                {t('attachedTokens.erc721Empty')}
+              </p>
             )}
           </TabsContent>
-          <TabsContent value="1" className="p-6">
+          <TabsContent value="1" className="p-5 sm:p-6">
             <AttachedERC20Table list={donatedERC20Tokens} handleClaim={null} />
           </TabsContent>
         </Tabs>
       </div>
-    </div>
+    </section>
   );
 }
