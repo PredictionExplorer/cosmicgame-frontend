@@ -17,11 +17,7 @@ import { isAddress } from 'viem';
 import { formatId } from '@/utils';
 
 import { useCollectionTraits, useNftMetadata } from '@/hooks/useNftTraits';
-import {
-  normalizeTraitEntry,
-  type CosmicSignatureMetadata,
-  type TraitTranslator,
-} from '@/lib/nftMetadata';
+import { normalizeTraitEntry, type CosmicSignatureMetadata } from '@/lib/nftMetadata';
 import { useRouter } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import {
@@ -58,7 +54,7 @@ import { NFTIdentity } from './NFTIdentity';
 import { NFTNeighbourNav, neighbourIds } from './NFTNeighbourNav';
 import { NFTShareMenu } from './NFTShareMenu';
 import { SignatureViewer } from './SignatureViewer';
-import { composeSignatureAlt, isRenderPending, signatureMedia } from './signatureArt';
+import { isRenderPending, signatureMedia, useSignatureAlt } from './signatureArt';
 import { NftTraitPanel } from './traits/NftTraitPanel';
 
 interface NFTDetailInfo extends CSTTokenInfo {
@@ -172,6 +168,8 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
   const tCommon = useTranslations('common');
   const tToasts = useTranslations('toasts');
   const tTraits = useTranslations('traits');
+  const signatureAlt = useSignatureAlt();
+  const titleId = useId();
   const locale = useLocale();
   const [openDialog, setOpenDialog] = useState(false);
   const [address, setAddress] = useState('');
@@ -427,16 +425,12 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
     (nameHistory.length > 0 ? nameHistory[0]?.TokenName : nft?.TokenName)?.trim() || null;
   const id = formatId(tokenId);
   const subject = currentName ?? tTraits('quickView.title', { id });
-  const alt = composeSignatureAlt(tTraits as unknown as TraitTranslator, {
-    id,
-    name: currentName,
-    entry: traitEntry,
-  });
+  const alt = signatureAlt({ id, name: currentName, entry: traitEntry });
 
   return (
     <div className="site-container">
       <section
-        aria-label={subject}
+        aria-labelledby={titleId}
         className="grid items-start gap-x-10 gap-y-8 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,20rem)] xl:grid-cols-[minmax(0,1fr)_minmax(18rem,22rem)] xl:gap-x-16"
         data-testid="hero-section"
       >
@@ -449,7 +443,7 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
           sizes={PLATE_SIZES}
           navigation={<NFTNeighbourNav tokenId={tokenId} total={totalImprints} />}
           // Never taller than the screen leaves room for; full-bleed on phones.
-          className="mx-auto w-full max-w-[max(20rem,calc((100svh_-_var(--header-height)_-_11rem)_*_3456_/_2234))] max-sm:-mx-[var(--gutter)] max-sm:w-auto max-sm:max-w-none"
+          className="mx-auto w-full max-w-[max(20rem,calc((100svh_-_var(--header-height)_-_11rem)_*_var(--art-ratio)))] max-sm:-mx-[var(--gutter)] max-sm:w-auto max-sm:max-w-none"
           plateClassName="max-sm:rounded-none"
           controlsClassName="max-sm:px-[var(--gutter)]"
         />
@@ -457,6 +451,7 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
         <NFTIdentity
           tokenId={tokenId}
           name={currentName}
+          titleId={titleId}
           nft={nft}
           entry={traitEntry}
           rarity={rarity}

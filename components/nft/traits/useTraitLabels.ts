@@ -23,9 +23,19 @@ export interface TraitLabels {
   spectralTone: (value: string | undefined | null) => string | null;
 }
 
+/**
+ * The `traits` catalog as the untyped `TraitTranslator` the label helpers in
+ * `@/lib/nftMetadata` take (their keys are composed at run time). The one
+ * place the typed next-intl translator is widened; client code calls this
+ * instead of casting.
+ */
+export function useTraitTranslator(): TraitTranslator {
+  return useTranslations('traits') as unknown as TraitTranslator;
+}
+
 /** Hook exposing the `traits` catalog through trait-aware label helpers. */
 export function useTraitLabels(): TraitLabels {
-  const t = useTranslations('traits') as unknown as TraitTranslator;
+  const t = useTraitTranslator();
   const typeLabel = useCallback((key: TraitKey) => resolveTraitTypeLabel(t, key), [t]);
   const typeHint = useCallback((key: TraitKey) => t(`hints.${key}`), [t]);
   const valueLabel = useCallback(

@@ -75,7 +75,8 @@ const NFTImage = ({
   fallbackSrc,
   terminalFallbackSrc = null,
   // English default keeps server-safety for any future server-tree usage;
-  // translated call sites pass a localized alt (e.g. detail.image.alt).
+  // Signature call sites pass the alt composed from the traits
+  // (useSignatureAlt in components/nft/signatureArt).
   alt = 'NFT',
   style,
   className,

@@ -295,6 +295,16 @@ describe('NFTTrait', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'MyToken' })).toBeInTheDocument();
   });
 
+  it('names the hero region by its H1', () => {
+    withDashboard();
+    withNft();
+    withNameHistory();
+    render(<NFTTrait tokenId={5} />);
+    expect(screen.getByRole('region', { name: 'MyToken' })).toBe(
+      screen.getByTestId('hero-section'),
+    );
+  });
+
   it('titles an unnamed token "Cosmic Signature #000005" at full contrast', () => {
     withDashboard();
     withNft({ TokenName: '' });

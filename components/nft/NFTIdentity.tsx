@@ -18,6 +18,8 @@ export interface NFTIdentityProps {
   tokenId: number;
   /** The token's current name; `null` for an unnamed Signature. */
   name: string | null;
+  /** `id` of the title's text, for an `aria-labelledby` on the hero around it. */
+  titleId?: string;
   nft: NFTSpecListProps['nft'];
   entry?: NftTraitEntry | null;
   rarity?: RarityInfo | null;
@@ -37,6 +39,7 @@ export interface NFTIdentityProps {
 export function NFTIdentity({
   tokenId,
   name,
+  titleId,
   nft,
   entry,
   rarity,
@@ -63,7 +66,7 @@ export function NFTIdentity({
       data-testid="token-identity"
     >
       <PageHeader
-        title={title}
+        title={<span id={titleId}>{title}</span>}
         breadcrumbs={[
           { label: tCommon('breadcrumbs.home'), href: '/' },
           { label: tCommon('breadcrumbs.gallery'), href: '/gallery' },

@@ -7,10 +7,10 @@ import { useTranslations } from 'next-intl';
 import { formatId, getSpectralSweepUrl } from '@/utils';
 
 import type { CollectionTraits } from '@/hooks/useNftTraits';
-import type { CategoricalTraitKey, TraitTranslator } from '@/lib/nftMetadata';
+import type { CategoricalTraitKey } from '@/lib/nftMetadata';
 import { Link } from '@/i18n/navigation';
 import { ArtFrame } from '@/components/ui/art-frame';
-import { composeSignatureAlt, signatureMedia } from '@/components/nft/signatureArt';
+import { signatureMedia, useSignatureAlt } from '@/components/nft/signatureArt';
 import {
   AllocationPill,
   HueStrip,
@@ -64,6 +64,7 @@ export function NftQuickView({
 }: NftQuickViewProps) {
   const t = useTranslations('traits');
   const tDetail = useTranslations('detail');
+  const signatureAlt = useSignatureAlt();
   // The sweep is remembered per token, so moving to another Signature
   // naturally falls back to its artwork without an effect.
   const [sweepTokenId, setSweepTokenId] = useState<number | null>(null);
@@ -84,11 +85,7 @@ export function NftQuickView({
   const rarity = collectionTraits?.rarity.byId.get(item?.TokenId ?? -1) ?? null;
   const rarityTotal = collectionTraits?.rarity.total ?? 0;
   const media = signatureMedia(seed);
-  const alt = composeSignatureAlt(t as unknown as TraitTranslator, {
-    id,
-    name: item?.TokenName,
-    entry,
-  });
+  const alt = signatureAlt({ id, name: item?.TokenName, entry });
 
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     if (event.key === 'ArrowLeft' && previous) {

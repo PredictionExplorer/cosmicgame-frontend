@@ -1,3 +1,5 @@
+import { useCallback } from 'react';
+
 import { getAssetsUrl, getThumbUrl, getWebImageUrl } from '@/utils';
 
 import {
@@ -7,6 +9,8 @@ import {
   type TraitTranslator,
 } from '@/lib/nftMetadata';
 import { ART_WIDTH, type ArtRendition, type ArtSource } from '@/components/ui/art-frame';
+
+import { useTraitTranslator } from './traits/useTraitLabels';
 
 /** Pixel width of the published `thumb_card.webp` thumbnail. */
 export const SIGNATURE_THUMB_WIDTH = 640;
@@ -102,4 +106,14 @@ export function composeSignatureAlt(t: TraitTranslator, { id, name, entry }: Sig
   return spectralClass
     ? t('alt.withTraitsAndClass', { subject, structure, palette, spectralClass })
     : t('alt.withTraits', { subject, structure, palette });
+}
+
+/**
+ * `composeSignatureAlt` bound to the active locale's `traits` catalog, for
+ * client components: `const signatureAlt = useSignatureAlt();` then
+ * `signatureAlt({ id, name, entry })`.
+ */
+export function useSignatureAlt(): (input: SignatureAltInput) => string {
+  const t = useTraitTranslator();
+  return useCallback((input: SignatureAltInput) => composeSignatureAlt(t, input), [t]);
 }
