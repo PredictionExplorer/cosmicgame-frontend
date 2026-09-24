@@ -12,6 +12,14 @@ import {
 } from '@/content/white-paper';
 
 import { Link } from '@/i18n/navigation';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage } from '@/utils/jsonLd';
 import { createPageMetadata } from '@/utils/seo';
@@ -73,51 +81,53 @@ function BlockView({ block }: { block: WhitePaperBlock }) {
           {block.text}
         </p>
       );
-    case 'table':
+    case 'table': {
+      const [firstColumn = ''] = block.table.columns;
       return (
         <div>
-          <div className="overflow-x-auto rounded-xl border border-white/10">
-            <table className="w-full min-w-[36rem] border-collapse text-left text-sm">
-              <thead>
-                <tr className="bg-white/[0.05]">
-                  {block.table.columns.map((column) => (
-                    <th
-                      key={column}
-                      scope="col"
-                      className="px-4 py-3 font-semibold tracking-tight text-white"
-                    >
-                      {column}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {block.table.rows.map((row) => (
-                  <tr key={row.join('|')} className="border-t border-white/[0.07] align-top">
-                    {row.map((cell, cellIndex) => (
-                      <td
-                        key={`${cellIndex}-${cell}`}
-                        className={
-                          cellIndex === 0
-                            ? 'px-4 py-3 font-medium text-white/85'
-                            : /^0x[0-9a-fA-F]{40}$/.test(cell)
-                              ? 'break-all px-4 py-3 font-mono text-xs leading-5 text-white/70'
-                              : 'px-4 py-3 leading-6 text-white/70'
-                        }
-                      >
-                        {cell}
-                      </td>
-                    ))}
-                  </tr>
+          {/*
+           * The shared static ledger: on a phone each row becomes a labelled
+           * record instead of a table cropped mid-word, and anything still too
+           * wide scrolls in a named, keyboard-reachable region with a fading
+           * edge (styles/tables.css).
+           */}
+          <Table label={firstColumn}>
+            <TableHeader>
+              <TableRow>
+                {block.table.columns.map((column) => (
+                  <TableHead key={column}>{column}</TableHead>
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {block.table.rows.map((row) => (
+                <TableRow key={row.join('|')}>
+                  {row.map((cell, cellIndex) => (
+                    <TableCell
+                      key={`${cellIndex}-${cell}`}
+                      label={block.table.columns[cellIndex]}
+                      stack={cellIndex > 0}
+                      className={
+                        cellIndex === 0
+                          ? 'font-medium text-foreground'
+                          : /^0x[0-9a-fA-F]{40}$/.test(cell)
+                            ? 'type-hash'
+                            : undefined
+                      }
+                    >
+                      {cell}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
           {block.table.footnote ? (
-            <p className="mt-2 text-sm text-white/45">{block.table.footnote}</p>
+            <p className="mt-2 type-caption text-subtle">{block.table.footnote}</p>
           ) : null}
         </div>
       );
+    }
   }
 }
 
