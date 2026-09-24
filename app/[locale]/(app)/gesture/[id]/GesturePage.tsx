@@ -297,7 +297,7 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
           }
           actions={
             hasSteps ? (
-              <nav aria-label={t('nav.aria')} className="flex gap-2">
+              <nav aria-label={t('nav.aria')} className="flex flex-wrap gap-2">
                 {stepLink('previous')}
                 {stepLink('next')}
               </nav>
