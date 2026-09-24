@@ -68,13 +68,13 @@
         },
         "cards": {
           "records": {
-            "label": "Outreach Allocation Records"
+            "label": "Outreach allocation records"
           },
           "allocatedCst": {
-            "label": "Outreach CST Allocated"
+            "label": "Outreach CST allocated"
           },
           "contributors": {
-            "label": "Unique Outreach Contributors"
+            "label": "Unique outreach contributors"
           }
         }
       },
@@ -110,13 +110,13 @@
         },
         "cards": {
           "records": {
-            "label": "Direct Contribution Records"
+            "label": "Direct contribution records"
           },
           "totalEth": {
-            "label": "Total Direct ETH Contributions"
+            "label": "Total direct ETH contributions"
           },
           "contributors": {
-            "label": "Unique Contributors"
+            "label": "Unique contributors"
           }
         }
       },
@@ -217,13 +217,13 @@
         },
         "cards": {
           "records": {
-            "label": "Coordination Change Records"
+            "label": "Coordination change records"
           },
           "latest": {
-            "label": "Latest Change"
+            "label": "Latest change"
           },
           "parameters": {
-            "label": "Parameters Changed",
+            "label": "Parameters changed",
             "tooltip": "How many distinct protocol parameters these records change. Only the contract owner can change them."
           }
         }
@@ -239,17 +239,17 @@
         },
         "cards": {
           "records": {
-            "label": "Protocol Contribution Records"
+            "label": "Protocol contribution records"
           },
           "totalEth": {
-            "label": "Protocol Public-Goods ETH"
+            "label": "Protocol public-goods ETH"
           },
           "share": {
-            "label": "Share of Each Cycle Reserve",
+            "label": "Share of each Cycle Reserve",
             "tooltip": "The share of each finalized Cycle Reserve that the protocol forwards to the Public Goods Vault."
           },
           "latest": {
-            "label": "Latest Contribution"
+            "label": "Latest contribution"
           }
         }
       },
@@ -264,13 +264,13 @@
         },
         "cards": {
           "records": {
-            "label": "Voluntary Contribution Records"
+            "label": "Voluntary contribution records"
           },
           "totalEth": {
-            "label": "Voluntary Public-Goods ETH"
+            "label": "Voluntary public-goods ETH"
           },
           "contributors": {
-            "label": "Contributor Wallets"
+            "label": "Contributor wallets"
           }
         }
       },
@@ -285,16 +285,16 @@
         },
         "cards": {
           "records": {
-            "label": "Public-Goods Retrieval Records"
+            "label": "Public-goods retrieval records"
           },
           "totalEth": {
-            "label": "Retrieved Public-Goods ETH"
+            "label": "Retrieved public-goods ETH"
           },
           "latest": {
-            "label": "Latest Retrieval"
+            "label": "Latest retrieval"
           },
           "beneficiary": {
-            "label": "Latest Beneficiary",
+            "label": "Latest beneficiary",
             "tooltip": "The address that received the most recent retrieval from the Public Goods Vault. The configured beneficiary is currently Protocol Guild."
           }
         }
