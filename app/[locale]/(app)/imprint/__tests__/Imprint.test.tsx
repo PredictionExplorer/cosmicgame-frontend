@@ -48,9 +48,12 @@ jest.mock('../../../../../hooks/useApiQuery', () => ({
   useUsedRWLKNFTs: () => mockUsed(),
 }));
 
-jest.mock('../../../../../components/nft/RandomWalkNFT', () => ({
-  __esModule: true,
-  default: ({ tokenId }: { tokenId: number }) => <div data-testid="rwlk-art">{tokenId}</div>,
+jest.mock('../../../../../components/nft/RandomWalkPlate', () => ({
+  RandomWalkPlate: ({ tokenId, alt }: { tokenId: number; alt: string }) => (
+    <div data-testid="rwlk-art" data-alt={alt}>
+      {tokenId}
+    </div>
+  ),
 }));
 
 jest.mock('../../../../../components/wallet/FundingNotice', () => ({
@@ -97,7 +100,7 @@ describe('Imprint', () => {
     expect(screen.getByRole('button', { name: 'Connect Wallet' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Imprint now' })).not.toBeInTheDocument();
     expect(
-      screen.getByText('Connect a wallet to imprint a Random Walk NFT. Connecting signs nothing.'),
+      screen.getByText('Connect a wallet to imprint a RandomWalk NFT. Connecting signs nothing.'),
     ).toBeInTheDocument();
   });
 
@@ -126,12 +129,12 @@ describe('Imprint', () => {
     await user.click(submit);
 
     const success = await screen.findByTestId('imprint-success');
-    expect(within(success).getByRole('heading')).toHaveTextContent('Random Walk NFT #004242');
+    expect(within(success).getByRole('heading')).toHaveTextContent('RandomWalk NFT #004242');
     expect(within(success).getByRole('link', { name: /Use it in a gesture/ })).toHaveAttribute(
       'href',
       '/?randomwalk=1&tokenId=4242#make-gesture',
     );
-    expect(mockTx.lastSuccessMessage()).toBe('Random Walk NFT #004242 is yours');
+    expect(mockTx.lastSuccessMessage()).toBe('RandomWalk NFT #004242 is yours');
     // The owned list refreshes to include it.
     expect(mockWalletOfOwner.mock.calls.length).toBeGreaterThan(1);
   });
@@ -145,6 +148,11 @@ describe('Imprint', () => {
     const items = within(list).getAllByRole('listitem');
     expect(items.map((item) => item.getAttribute('data-token'))).toEqual(['12', '7', '3']);
     expect(items[1]).toHaveTextContent('Used');
+    // Each plate is named by its token, with nothing drawn over the art.
+    expect(within(items[0]!).getByTestId('rwlk-art')).toHaveAttribute(
+      'data-alt',
+      'RandomWalk NFT #000012',
+    );
     expect(within(items[1]!).queryByRole('link')).toBeNull();
     expect(within(items[0]!).getByRole('link', { name: /Use in a gesture/ })).toHaveAttribute(
       'href',

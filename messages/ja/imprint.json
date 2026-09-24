@@ -4,25 +4,26 @@
     "imprint": "刻印"
   },
   "page": {
-    "title": "Random Walk NFTの刻印",
-    "subtitle": "Random Walk NFTを保有すると、ETH一筆の費用が50%引き下げられます",
+    "title": "RandomWalk NFTの刻印",
+    "subtitle": "RandomWalk NFTを保有すると、ETH一筆の費用が50%引き下げられます",
     "description": "各RandomWalk NFTはこの割引に一度だけ使えるので、最大の効果が出る瞬間を選んでください。この一筆への添付は、係留NFT星選の対象となるためのRandomWalk NFTの係留とは別のものです。",
     "currentCost": "現在の刻印費用",
     "costBreakdown": "コントラクト上の費用{base} ETHに、確定前に費用が上がっても刻印が成功するよう{percent}%を上乗せしています。",
     "submit": "今すぐ刻印",
-    "myNfts": "自分のRandom Walk NFT",
-    "panelAria": "Random Walk NFTの刻印",
-    "connect": "ウォレットを接続するとRandom Walk NFTを刻印できます。接続だけでは何も署名されません。",
+    "myNfts": "自分のRandomWalk NFT",
+    "panelAria": "RandomWalk NFTの刻印",
+    "tokenAlt": "RandomWalk NFT {id}",
+    "connect": "ウォレットを接続するとRandomWalk NFTを刻印できます。接続だけでは何も署名されません。",
     "why": {
       "title": "刻印で得られるもの"
     },
     "compare": {
-      "label": "Random Walk NFTを添えたETH一筆の費用",
+      "label": "RandomWalk NFTを添えたETH一筆の費用",
       "caption": "現在のETH一筆の費用から{percent}%割引。各NFTにつき一度だけです。"
     },
     "success": {
       "eyebrow": "刻印完了",
-      "title": "Random Walk NFT {id}を刻印しました",
+      "title": "RandomWalk NFT {id}を刻印しました",
       "description": "ETHの一筆に添えると、一度だけ一筆の費用が{percent}%割引されます。",
       "use": "一筆に使う",
       "again": "もう一つ刻印する"
@@ -31,7 +32,7 @@
       "used": "使用済み",
       "unused": "未使用",
       "use": "一筆に使う",
-      "empty": "このウォレットにはまだRandom Walk NFTがありません。"
+      "empty": "このウォレットにはまだRandomWalk NFTがありません。"
     }
   },
   "seo": {

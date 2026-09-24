@@ -21,7 +21,7 @@ import { PendingPlate } from '@/components/ui/art-frame';
 import { SkeletonDetailRows } from '@/components/ui/skeleton';
 import { TxExplorerLink } from '@/components/ui/tx-status';
 import { UnknownValue } from '@/components/ui/unknown-value';
-import RandomWalkNFT from '@/components/nft/RandomWalkNFT';
+import { RandomWalkPlate } from '@/components/nft/RandomWalkPlate';
 import NFTImage from '@/components/nft/NFTImage';
 import { resolveGestureType } from '@/components/tables/GestureMethodTag';
 import { useDashboardInfo, useGestureInfo } from '@/hooks/useApiQuery';
@@ -397,9 +397,12 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
               <h2 id="gesture-rwlk-heading" className="mb-4 type-heading-3 text-foreground">
                 {t('randomWalk.heading')}
               </h2>
-              <div className="max-w-xs">
-                <RandomWalkNFT tokenId={rwlkId} selectable={false} />
-              </div>
+              {/* The header's method badge already names the token number. */}
+              <RandomWalkPlate
+                tokenId={rwlkId}
+                alt={`${t('randomWalk.heading')} ${formatId(rwlkId)}`}
+                className="max-w-xs"
+              />
             </section>
           ) : null}
 

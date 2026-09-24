@@ -24,7 +24,7 @@ import { TxStatus } from '@/components/ui/tx-status';
 import { UnknownValue } from '@/components/ui/unknown-value';
 import { ChainGuard } from '@/components/wallet/NetworkGuard';
 import { FundingNotice } from '@/components/wallet/FundingNotice';
-import RandomWalkNFT from '@/components/nft/RandomWalkNFT';
+import { RandomWalkPlate } from '@/components/nft/RandomWalkPlate';
 import { useDashboardInfo, useUsedRWLKNFTs } from '@/hooks/useApiQuery';
 import { useTxFlow, useTxStageLabel } from '@/hooks/useTxFlow';
 import { useActiveWeb3React } from '@/hooks/web3';
@@ -124,9 +124,11 @@ const Imprint = ({ seoSummary }: { seoSummary?: ReactNode }) => {
         <h2 className="mt-2 type-heading-3 text-foreground">
           {t('page.success.title', { id: formatId(imprinted) })}
         </h2>
-        <div className="mt-5 max-w-60">
-          <RandomWalkNFT tokenId={imprinted} selectable={false} />
-        </div>
+        <RandomWalkPlate
+          tokenId={imprinted}
+          alt={t('page.tokenAlt', { id: formatId(imprinted) })}
+          className="mt-5 max-w-72"
+        />
         <p className="mt-5 type-body-sm text-muted-foreground">
           {t('page.success.description', { percent: discount })}
         </p>
@@ -239,7 +241,10 @@ const Imprint = ({ seoSummary }: { seoSummary?: ReactNode }) => {
                 const used = usedIds.has(tokenId);
                 return (
                   <li key={tokenId} data-token={tokenId}>
-                    <RandomWalkNFT tokenId={tokenId} selectable={false} />
+                    <RandomWalkPlate
+                      tokenId={tokenId}
+                      alt={t('page.tokenAlt', { id: formatId(tokenId) })}
+                    />
                     <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
                       <span className="type-mono text-foreground">{formatId(tokenId)}</span>
                       <Badge size="sm" tone={used ? 'neutral' : 'positive'}>

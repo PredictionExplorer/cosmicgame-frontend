@@ -12,6 +12,7 @@
     "submit": "铭刻",
     "myNfts": "我的 Random Walk NFT",
     "panelAria": "铭刻 Random Walk NFT",
+    "tokenAlt": "Random Walk NFT {id}",
     "connect": "连接钱包即可铭刻 Random Walk NFT。连接本身不会签署任何内容。",
     "why": {
       "title": "铭刻能带来什么"

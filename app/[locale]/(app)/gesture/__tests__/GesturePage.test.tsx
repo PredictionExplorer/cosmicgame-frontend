@@ -25,9 +25,12 @@ jest.mock('axios', () => ({
   get: jest.fn(() => Promise.resolve({ data: {} })),
 }));
 
-jest.mock('../../../../../components/nft/RandomWalkNFT', () => ({
-  __esModule: true,
-  default: ({ tokenId }: { tokenId: number }) => <div data-testid="rwlk-nft">{tokenId}</div>,
+jest.mock('../../../../../components/nft/RandomWalkPlate', () => ({
+  RandomWalkPlate: ({ tokenId, alt }: { tokenId: number; alt: string }) => (
+    <div data-testid="rwlk-nft" data-alt={alt}>
+      {tokenId}
+    </div>
+  ),
 }));
 
 jest.mock('../../../../../components/nft/NFTImage', () => ({
