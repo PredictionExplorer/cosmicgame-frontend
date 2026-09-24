@@ -709,17 +709,14 @@
   "publicGoods": {
     "eyebrow": "공공재",
     "heading": "이더리움 핵심 기여자를 위한 재원이 됩니다.",
-    "thisCycle": "이번 사이클",
-    "body": "모든 퍼포먼스 사이클의 {percent}%는 170명 이상의 이더리움 핵심 기여자를 위한 자금 지원 메커니즘인 Protocol Guild로 전달됩니다.",
-    "cta": "공공재 기여 보기",
     "stats": {
-      "lifetime": "누적 기여",
-      "lifetimeTooltip": "프로토콜의 자동 전달분과 자발적 공공재 기여를 합한 금액입니다.",
       "vault": "현재 금고 보관",
       "vaultTooltip": "회수 전 공공재 금고에 보관 중인 ETH입니다.",
       "retrieved": "회수 완료",
       "retrievedTooltip": "수령처를 위해 공공재 금고에서 회수된 ETH 총액입니다."
-    }
+    },
+    "projected": "이번 사이클 예상",
+    "projectedTooltip": "현재 사이클 준비금 × 공공재 비율 {percent}. 사이클이 마감될 때 공공재 금고로 지급되므로 아직 바뀔 수 있습니다."
   },
   "latestNfts": {
     "title": "최신 NFT",

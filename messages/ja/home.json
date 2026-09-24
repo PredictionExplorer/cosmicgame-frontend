@@ -709,17 +709,14 @@
   "publicGoods": {
     "eyebrow": "公共財",
     "heading": "Ethereumのコア貢献者を支える。",
-    "thisCycle": "このサイクル",
-    "body": "すべてのパフォーマンス・サイクルの{percent}%が、170人以上のEthereumコア貢献者の資金支援メカニズムであるProtocol Guildへ送られます。",
-    "cta": "公共財拠出を見る",
     "stats": {
-      "lifetime": "累計拠出額",
-      "lifetimeTooltip": "プロトコルからの自動送付と自発的な公共財拠出の合計。",
       "vault": "現在の金庫残高",
       "vaultTooltip": "受け取り前に公共財金庫に保管されているETH。",
       "retrieved": "受け取り済み",
       "retrievedTooltip": "受け手のために公共財金庫から受け取られたETHの総額。"
-    }
+    },
+    "projected": "このサイクルの見込み",
+    "projectedTooltip": "現在のサイクル準備金 × 公共財の割合{percent}。サイクル確定時に公共財金庫へ支払われるため、まだ変わる可能性があります。"
   },
   "latestNfts": {
     "title": "最新のNFT",

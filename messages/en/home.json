@@ -709,17 +709,14 @@
   "publicGoods": {
     "eyebrow": "Public Goods",
     "heading": "Funding Ethereum's core contributors.",
-    "thisCycle": "This cycle",
-    "body": "{percent}% of every Performance Cycle is forwarded to Protocol Guild, the funding mechanism for 170+ Ethereum core contributors.",
-    "cta": "View public-goods contributions",
     "stats": {
-      "lifetime": "Lifetime contributed",
-      "lifetimeTooltip": "Automatic protocol forwards plus voluntary public-goods contributions.",
       "vault": "In vault now",
       "vaultTooltip": "ETH currently held in the Public Goods Vault before retrieval.",
       "retrieved": "Already retrieved",
       "retrievedTooltip": "Total ETH retrieved from the Public Goods Vault for beneficiaries."
-    }
+    },
+    "projected": "Projected this cycle",
+    "projectedTooltip": "The current Cycle Reserve × the {percent} public-goods share. It is paid into the Public Goods Vault when the cycle finalizes, so it can still change."
   },
   "latestNfts": {
     "title": "Latest NFTs",

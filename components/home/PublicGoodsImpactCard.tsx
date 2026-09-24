@@ -1,201 +1,97 @@
 'use client';
 
-import { ArrowUpRight, Vault } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { getLandingContent } from '@/content/landing';
-import { formatEthValue } from '@/utils';
-
+import { Amount } from '@/components/ui/amount';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
+import { UnknownValue } from '@/components/ui/unknown-value';
 import { PublicGoodsIcon } from '@/lib/conceptIcons';
-import { Link } from '@/i18n/navigation';
-import type { DashboardInfo } from '@/services/api';
-import { StatCard } from '@/components/ui/stat-card';
 import { cn } from '@/lib/utils';
-import { formatFixed } from '@/utils/format';
+import type { DashboardInfo } from '@/services/api';
+import { toFiniteNumber } from '@/utils/finiteNumber';
+import { formatPercent } from '@/utils/format';
 
-interface PublicGoodsImpactCardProps {
+export interface PublicGoodsImpactCardProps {
   data: DashboardInfo | null;
-  variant?: 'default' | 'rail' | 'compact';
   className?: string;
 }
 
-const toNumber = (value: unknown): number => {
-  const parsed = Number(value ?? 0);
-  return Number.isFinite(parsed) ? parsed : 0;
-};
+function Figure({ value }: { value: number | null }) {
+  const t = useTranslations('common');
+  return value == null ? (
+    <UnknownValue label={t('status.unavailable')} />
+  ) : (
+    <Amount value={value} unit="ETH" context="card" />
+  );
+}
 
-export function PublicGoodsImpactCard({
-  data,
-  variant = 'default',
-  className,
-}: PublicGoodsImpactCardProps) {
+/**
+ * Public Goods at a glance, above the protocol's Public Goods ledger: what the
+ * vault holds and what has been retrieved, as settled figures, and apart from
+ * them the share this cycle is projected to add (the current Cycle Reserve
+ * times the public-goods share, paid when the cycle finalizes), labelled as
+ * a projection so it never reads as money already contributed (F264).
+ */
+export function PublicGoodsImpactCard({ data, className }: PublicGoodsImpactCardProps) {
   const t = useTranslations('home');
   const locale = useLocale();
-  const percentage = toNumber(data?.CharityPercentage);
+  const percentage = toFiniteNumber(data?.CharityPercentage);
 
-  if (!data || percentage <= 0) {
-    return null;
-  }
+  if (!data || percentage == null || percentage <= 0) return null;
 
-  const cycleReserveEth = toNumber(data.CosmicGameBalanceEth);
-  const currentCycleEth = (cycleReserveEth * percentage) / 100;
-  const protocolContributionsEth = toNumber(data.MainStats.SumCosmicGameDonationsEth);
-  const voluntaryContributionsEth = toNumber(data.SumVoluntaryDonationsEth);
-  const lifetimeContributedEth = protocolContributionsEth + voluntaryContributionsEth;
-  const vaultBalanceEth = toNumber(data.CharityBalanceEth);
-  const retrievedEth = toNumber(data.MainStats.SumWithdrawals);
-
-  if (variant === 'compact') {
-    // The compact card sits under the protocol Public Goods ledger, whose header
-    // already totals the contributions, so it leaves the lifetime sum out.
-    const stats = [
-      { label: t('publicGoods.thisCycle'), value: formatEthValue(currentCycleEth, locale) },
-      { label: t('publicGoods.stats.vault'), value: formatEthValue(vaultBalanceEth, locale) },
-      { label: t('publicGoods.stats.retrieved'), value: formatEthValue(retrievedEth, locale) },
-    ];
-
-    return (
-      <section
-        data-testid="public-goods-impact-card"
-        data-variant="compact"
-        aria-labelledby="public-goods-impact-heading"
-        className={cn(
-          'rounded-xl border border-[oklch(77.1%_0.163_161)]/20 bg-[rgb(var(--impact-green-rgb)/0.035)] p-4',
-          className,
-        )}
-      >
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-[rgb(var(--impact-green-rgb))]">
-              {t('publicGoods.eyebrow')}
-            </p>
-            <h2
-              id="public-goods-impact-heading"
-              className="mt-1 font-display text-base font-bold tracking-tight text-white"
-            >
-              {t('publicGoods.heading')}
-            </h2>
-          </div>
-        </div>
-        <dl className="mt-3 grid grid-cols-3 divide-x divide-white/[0.07] overflow-hidden rounded-lg border border-white/[0.07]">
-          {stats.map((stat) => (
-            <div key={stat.label} className="min-w-0 bg-black/10 p-2.5">
-              <dt className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                {stat.label}
-              </dt>
-              <dd className="mt-1 font-mono text-xs font-semibold tabular-nums text-foreground">
-                {stat.value}
-              </dd>
-            </div>
-          ))}
-        </dl>
-      </section>
-    );
-  }
+  const reserveEth = toFiniteNumber(data.CosmicGameBalanceEth);
+  const projectedEth = reserveEth != null ? (reserveEth * percentage) / 100 : null;
+  const vaultEth = toFiniteNumber(data.CharityBalanceEth);
+  const retrievedEth = toFiniteNumber(data.MainStats?.SumWithdrawals);
+  const projectedLabel = t('publicGoods.projected');
 
   return (
     <section
       data-testid="public-goods-impact-card"
-      data-variant={variant}
       aria-labelledby="public-goods-impact-heading"
-      className={cn(
-        'relative overflow-hidden rounded-2xl border border-[oklch(77.1%_0.163_161)]/20 glow-impact',
-        variant === 'rail' ? 'p-5 sm:p-6' : 'mt-10 p-6 sm:p-8',
-        className,
-      )}
-      style={{
-        background:
-          'linear-gradient(155deg, rgb(var(--impact-green-rgb) / 0.08) 0%, hsl(var(--primary) / 0.06) 45%, hsl(var(--card) / 0.9) 100%)',
-      }}
+      className={cn('rounded-surface border border-rule-faint bg-surface/60 p-5 sm:p-6', className)}
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(55%_65%_at_100%_0%,rgb(var(--impact-green-rgb)/0.16),transparent_70%)]"
-      />
-
-      <div
-        className={cn(
-          'relative grid gap-8',
-          variant === 'rail' ? 'gap-6' : 'lg:grid-cols-[1.1fr_0.9fr] lg:items-center',
-        )}
-      >
-        <div>
-          <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-[rgb(var(--impact-green-rgb))]">
-            {t('publicGoods.eyebrow')}
-          </p>
-          <h2
-            id="public-goods-impact-heading"
-            className={cn(
-              'mt-3 font-display font-bold tracking-tight text-white',
-              variant === 'rail' ? 'text-2xl' : 'text-2xl sm:text-3xl',
-            )}
-          >
-            {t('publicGoods.heading')}
-          </h2>
-          <div className="mt-6">
-            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
-              {t('publicGoods.thisCycle')}
-            </p>
-            <p
-              className={cn(
-                'mt-2 font-display font-bold leading-none text-gradient-aurora',
-                variant === 'rail' ? 'text-5xl' : 'text-5xl sm:text-6xl',
-              )}
-            >
-              {formatFixed(currentCycleEth, 4)} ETH
-            </p>
-          </div>
-          <p className="mt-5 max-w-2xl text-sm leading-relaxed text-white/75">
-            {t('publicGoods.body', {
-              percent: formatFixed(percentage, percentage % 1 === 0 ? 0 : 2),
-            })}
-          </p>
-          <Link
-            href="/public-goods-contributions-cg"
-            className="mt-6 inline-flex items-center gap-2 rounded-full border border-[oklch(77.1%_0.163_161)]/40 bg-[rgb(var(--impact-green-rgb)/0.10)] px-5 py-2.5 text-sm font-medium text-[rgb(var(--impact-green-rgb))] transition hover:bg-[rgb(var(--impact-green-rgb)/0.18)]"
-          >
-            {t('publicGoods.cta')}
-            <ArrowUpRight className="h-4 w-4" aria-hidden />
-          </Link>
-        </div>
-
-        <div
-          className={cn(
-            'grid gap-3',
-            variant === 'rail' ? 'sm:grid-cols-3 xl:grid-cols-1' : 'sm:grid-cols-3 lg:grid-cols-1',
-          )}
-        >
-          <StatCard
-            label={t('publicGoods.stats.lifetime')}
-            value={formatEthValue(lifetimeContributedEth, locale)}
-            icon={<PublicGoodsIcon className="h-4 w-4" />}
-            accent="impact"
-            tooltip={t('publicGoods.stats.lifetimeTooltip')}
-          />
-          <StatCard
-            label={t('publicGoods.stats.vault')}
-            value={formatEthValue(vaultBalanceEth, locale)}
-            icon={<Vault className="h-4 w-4" />}
-            accent="impact"
-            tooltip={t('publicGoods.stats.vaultTooltip')}
-          />
-          <StatCard
-            label={t('publicGoods.stats.retrieved')}
-            value={formatEthValue(retrievedEth, locale)}
-            icon={<ArrowUpRight className="h-4 w-4" />}
-            accent="impact"
-            tooltip={t('publicGoods.stats.retrievedTooltip')}
-          />
-        </div>
-      </div>
-
-      {/* Legal denial copy stays in the per-locale landing text modules
-          (content/landing/text.{en,zh}.ts): the message catalogs cannot carry
-          lexicon-allow pragmas, and the zh disclaimer there is already
-          reviewed legal copy. */}
-      <p className="relative mt-6 border-t border-white/10 pt-4 text-xs leading-relaxed text-white/45">
-        {getLandingContent(locale).publicGoods.disclaimer}
+      <p className="type-eyebrow flex items-center gap-2 text-subtle">
+        <PublicGoodsIcon className="size-4" aria-hidden />
+        {t('publicGoods.eyebrow')}
       </p>
+      <h2 id="public-goods-impact-heading" className="type-heading-3 mt-2 text-foreground">
+        {t('publicGoods.heading')}
+      </h2>
+
+      <dl className="mt-4 grid gap-x-8 gap-y-4 sm:grid-cols-[repeat(2,minmax(0,auto))_1fr]">
+        <div data-testid="public-goods-settled-vault" className="min-w-0">
+          <dt className="type-label text-subtle">{t('publicGoods.stats.vault')}</dt>
+          <dd className="type-figure-md mt-1 text-foreground">
+            <Figure value={vaultEth} />
+          </dd>
+        </div>
+        <div data-testid="public-goods-settled-retrieved" className="min-w-0">
+          <dt className="type-label text-subtle">{t('publicGoods.stats.retrieved')}</dt>
+          <dd className="type-figure-md mt-1 text-foreground">
+            <Figure value={retrievedEth} />
+          </dd>
+        </div>
+        {/* The projection stands apart from the settled figures: a dashed
+            rule and its own explanation, never a third settled total. */}
+        <div
+          data-testid="public-goods-projected"
+          className="min-w-0 border-t border-dashed border-rule pt-4 sm:justify-self-end sm:border-s sm:border-t-0 sm:ps-8 sm:pt-0"
+        >
+          <dt className="type-label flex items-center gap-1.5 text-subtle">
+            {projectedLabel}
+            <InfoTooltip
+              label={projectedLabel}
+              content={t('publicGoods.projectedTooltip', {
+                percent: formatPercent(percentage, locale),
+              })}
+            />
+          </dt>
+          <dd className="type-figure-md mt-1 text-muted-foreground">
+            <Figure value={projectedEth} />
+          </dd>
+        </div>
+      </dl>
     </section>
   );
 }

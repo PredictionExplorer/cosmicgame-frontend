@@ -30,7 +30,7 @@ const CharityCGDeposits = ({ seoSummary }: { seoSummary?: ReactNode }) => {
         />
       )}
       <RouteGroupNav group="publicGoods" current="publicGoodsProtocol" />
-      <PublicGoodsImpactCard data={dashboardData ?? null} variant="compact" className="mb-8" />
+      <PublicGoodsImpactCard data={dashboardData ?? null} className="mb-8" />
       <CharityDepositTable
         list={charityCGDeposits as PublicGoodsContributionEntry[]}
         loading={loading}

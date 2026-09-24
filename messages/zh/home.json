@@ -709,17 +709,14 @@
   "publicGoods": {
     "eyebrow": "公共物品",
     "heading": "资助以太坊核心贡献者。",
-    "thisCycle": "本周期",
-    "body": "每个演绎周期都会将 {percent}% 的储备转拨给 Protocol Guild——为 170 多位以太坊核心贡献者提供资助的机制。",
-    "cta": "查看公共物品资助",
     "stats": {
-      "lifetime": "累计资助",
-      "lifetimeTooltip": "协议自动转拨与自愿公共物品资助的总和。",
       "vault": "金库现存",
       "vaultTooltip": "当前存放于公共物品金库、尚未取回的 ETH。",
       "retrieved": "已取回",
       "retrievedTooltip": "已从公共物品金库为受益方取回的 ETH 总额。"
-    }
+    },
+    "projected": "本周期预计",
+    "projectedTooltip": "当前周期储备 × {percent} 公共物品份额。将在周期收官时存入公共物品金库，因此仍可能变化。"
   },
   "latestNfts": {
     "title": "最新 NFT",

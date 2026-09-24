@@ -709,17 +709,14 @@
   "publicGoods": {
     "eyebrow": "Hàng hóa công",
     "heading": "Tài trợ những người đóng góp cốt lõi cho Ethereum.",
-    "thisCycle": "Chu kỳ này",
-    "body": "{percent}% của mỗi chu kỳ trình diễn được chuyển đến Protocol Guild, cơ chế tài trợ cho hơn 170 người đóng góp cốt lõi cho Ethereum.",
-    "cta": "Xem đóng góp hàng hóa công",
     "stats": {
-      "lifetime": "Tổng đã đóng góp",
-      "lifetimeTooltip": "Các khoản chuyển tự động của giao thức cộng với đóng góp hàng hóa công tự nguyện.",
       "vault": "Hiện có trong kho",
       "vaultTooltip": "ETH hiện được giữ trong Kho Hàng hóa công trước khi được nhận về.",
       "retrieved": "Đã nhận về",
       "retrievedTooltip": "Tổng ETH đã nhận về từ Kho Hàng hóa công cho các đơn vị thụ hưởng."
-    }
+    },
+    "projected": "Dự kiến chu kỳ này",
+    "projectedTooltip": "Dự trữ chu kỳ hiện tại × tỷ lệ Hàng hóa công {percent}. Khoản này được chuyển vào Kho Hàng hóa công khi chu kỳ hoàn tất, nên vẫn có thể thay đổi."
   },
   "latestNfts": {
     "title": "NFT mới nhất",
