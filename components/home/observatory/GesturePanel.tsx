@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { zeroAddress } from 'viem';
-import { ArrowRight, ChevronDown, PenLine, Settings2 } from 'lucide-react';
+import { ArrowRight, ChevronDown, PenLine, Settings2, Wallet } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { protocolFacts } from '@/content/protocol-facts';
@@ -643,7 +643,15 @@ export function GesturePanel({
             variant="commit"
             size="xl"
             warmOnVisible
-            label={t('form.connect.cta')}
+            // The icon flows with the label's first line, so a label that
+            // wraps on a phone never leaves it stranded beside two lines.
+            showIcon={false}
+            label={
+              <span>
+                <Wallet aria-hidden className="me-2 inline size-4 align-[-0.125em]" />
+                {t('form.connect.cta')}
+              </span>
+            }
             className={COMMIT_WRAP}
           />
           <p className="type-caption text-center text-subtle">{t('orientation.connectHelp')}</p>

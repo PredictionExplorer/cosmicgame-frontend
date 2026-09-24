@@ -82,10 +82,12 @@ export function CyclePhaseGuide({ phase, cycleLinks, className }: CyclePhaseGuid
         {t('orientation.title')}
       </h2>
 
+      {/* The rail stays inside the frame's padding, so a step it cuts off
+          fades out before the edge instead of ending at the border. */}
       <ScrollRail
         activeSelector='[aria-current="step"]'
-        className="mt-4 max-lg:-mx-5 sm:max-lg:-mx-6"
-        trackClassName="max-lg:snap-x max-lg:snap-mandatory max-lg:scroll-px-5 max-lg:px-5 sm:max-lg:scroll-px-6 sm:max-lg:px-6 lg:flex-col lg:overflow-visible"
+        className="mt-4"
+        trackClassName="max-lg:snap-x max-lg:snap-mandatory lg:flex-col lg:overflow-visible"
       >
         <ol
           aria-label={t('phaseGuide.timelineAria')}
