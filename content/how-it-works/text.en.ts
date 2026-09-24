@@ -22,7 +22,7 @@ export const howItWorksTextEn = {
     heading: 'How Cosmic Signature works',
     paragraph:
       'Gesture. Endure. Shape the Signature. Participants make gestures during a Performance Cycle. When the Cycle Finalization Time expires, the cycle can be finalized and allocations distribute across more than ten tracks — including the Signature Allocation, Anchor Distributions, and Protocol Guild.',
-    primaryCtaLabel: 'Make a Gesture',
+    primaryCtaLabel: 'Make a gesture',
     secondaryCtaLabel: 'See the live cycle',
   },
   rewardBreakdown: {
@@ -175,7 +175,7 @@ export const howItWorksTextEn = {
     // The JSX original rendered a literal "\u2019" because unicode escapes are
     // not processed inside JSX text; this is the intentional fix to a real ’.
     body: 'Join the active Performance Cycle. Connect your wallet and make your first gesture to start imprinting CST and shaping the cycle’s Signature.',
-    primaryCtaLabel: 'Make a Gesture',
+    primaryCtaLabel: 'Make a gesture',
     faqCtaLabel: 'Browse the FAQ',
     discordCtaLabel: 'Discord',
     twitterCtaLabel: 'Twitter / X',

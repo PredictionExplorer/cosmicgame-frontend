@@ -252,7 +252,7 @@ describe('CurrentRoundPage', () => {
     expect(screen.queryByTestId('special-allocation-recipients')).not.toBeInTheDocument();
   });
 
-  it('points "Make a Gesture" at the home gesture form', () => {
+  it('points "Make a gesture" at the home gesture form', () => {
     setupLoaded();
     render(<CurrentRoundPage />);
     expect(

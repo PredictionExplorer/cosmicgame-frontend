@@ -24,7 +24,7 @@ describe('CallToAction', () => {
 
   it('offers the gesture form and the FAQ', () => {
     render(<CallToAction callToAction={callToAction} />);
-    expect(screen.getByRole('link', { name: 'Make a Gesture' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Make a gesture' })).toHaveAttribute(
       'href',
       '/#make-gesture',
     );

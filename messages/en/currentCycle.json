@@ -11,8 +11,8 @@
     "cta": {
       "viewHomeClock": "View the home clock",
       "finalizeCycle": "Finalize the cycle",
-      "makeFirstGesture": "Make the first Gesture",
-      "makeGesture": "Make a Gesture"
+      "makeFirstGesture": "Make the first gesture",
+      "makeGesture": "Make a gesture"
     },
     "countdown": {
       "opensAt": "Cycle {n} opens at {date}"

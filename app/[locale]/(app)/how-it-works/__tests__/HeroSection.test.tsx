@@ -29,7 +29,7 @@ describe('HeroSection', () => {
 
   it('leads to the gesture form and to the live cycle', () => {
     render(<HeroSection hero={hero} />);
-    expect(screen.getByRole('link', { name: 'Make a Gesture' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Make a gesture' })).toHaveAttribute(
       'href',
       '/#make-gesture',
     );
