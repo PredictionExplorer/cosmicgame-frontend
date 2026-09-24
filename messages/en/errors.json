@@ -40,18 +40,11 @@
   "apiFailure": "The service did not respond. Try again in a moment.",
   "unexpected": "Unexpected error. Please try again.",
   "notFound": {
-    "title": "404 — Page Not Found",
-    "description": "The page you’re looking for doesn’t exist or may have been moved. Cosmic Signature is a procedural on-chain art protocol on Arbitrum — explore the links below to find what you need.",
-    "returnHome": "Return Home",
-    "suggestedPages": "Suggested pages",
-    "popularPages": "Popular pages",
-    "links": {
-      "home": "Home — Active Cycle",
-      "gallery": "NFT Gallery",
-      "howItWorks": "How It Works",
-      "faq": "FAQ",
-      "statistics": "Statistics",
-      "anchoring": "Anchor Distributions"
-    }
+    "code": "Error 404",
+    "title": "Page not found",
+    "description": "The link may be mistyped, or the page may have moved. Pick up from one of these instead.",
+    "primaryCta": "Go to the Observatory",
+    "secondaryCta": "Browse the gallery",
+    "suggestedPages": "Suggested pages"
   }
 }

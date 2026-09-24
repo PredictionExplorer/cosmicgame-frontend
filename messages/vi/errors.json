@@ -40,18 +40,11 @@
   "apiFailure": "Dịch vụ không phản hồi. Hãy thử lại sau ít phút.",
   "unexpected": "Đã xảy ra lỗi ngoài dự kiến. Vui lòng thử lại.",
   "notFound": {
-    "title": "404 — Không tìm thấy trang",
-    "description": "Trang bạn tìm không tồn tại hoặc có thể đã được chuyển đi. Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum — hãy khám phá các liên kết bên dưới để tìm điều bạn cần.",
-    "returnHome": "Về trang chủ",
-    "suggestedPages": "Trang gợi ý",
-    "popularPages": "Trang phổ biến",
-    "links": {
-      "home": "Trang chủ — Chu kỳ đang diễn ra",
-      "gallery": "Phòng trưng bày NFT",
-      "howItWorks": "Cách hoạt động",
-      "faq": "Câu hỏi thường gặp",
-      "statistics": "Thống kê",
-      "anchoring": "Phân phối neo giữ"
-    }
+    "code": "Lỗi 404",
+    "title": "Không tìm thấy trang",
+    "description": "Đường dẫn có thể bị gõ sai, hoặc trang đã được chuyển đi. Hãy tiếp tục từ một trong các trang dưới đây.",
+    "primaryCta": "Đến Đài quan sát",
+    "secondaryCta": "Xem phòng trưng bày",
+    "suggestedPages": "Trang gợi ý"
   }
 }
