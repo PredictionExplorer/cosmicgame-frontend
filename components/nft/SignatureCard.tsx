@@ -13,6 +13,7 @@ import { ArtFrame, type ArtSource } from '@/components/ui/art-frame';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { signatureMedia, useSignatureAlt } from './signatureArt';
+import { useSignatureArtLabel } from './useSignatureArtLabel';
 import { useTraitLabels } from './traits/useTraitLabels';
 
 export interface SignatureCardProps {
@@ -28,6 +29,11 @@ export interface SignatureCardProps {
   entry?: NftTraitEntry | null;
   /** Anchored right now: a quiet anchor after the title. */
   anchored?: boolean;
+  /**
+   * When the token was imprinted (unix seconds): a missing render reads
+   * "Rendering" for the first hour, as on its own page.
+   */
+  imprintedAt?: number | null;
   /** The plate's rendered width at each breakpoint, for the srcset choice. */
   sizes: string;
   /** The first row of a grid in the first viewport: load eagerly. */
@@ -74,21 +80,24 @@ export function SignatureCard({
   name,
   entry,
   anchored = false,
+  imprintedAt,
   sizes,
   priority = false,
   extraMeta,
   onQuickView,
   className,
 }: SignatureCardProps) {
-  const tDetail = useTranslations('detail');
   const tTraits = useTranslations('traits');
+  const { label: unavailableLabel } = useSignatureArtLabel(imprintedAt);
   const signatureAlt = useSignatureAlt();
   const { valueLabel } = useTraitLabels();
   const id = formatId(tokenId);
   const trimmedName = name?.trim() || null;
   const alt = signatureAlt({ id, name: trimmedName, entry });
   const traitsLoading = entry === undefined;
-  const idFact = trimmedName ? { key: 'id', node: <span className="type-mono">{id}</span> } : null;
+  const idFact = trimmedName
+    ? { key: 'id', node: <span className="tabular-nums">{id}</span> }
+    : null;
   const structure = entry?.structure ? valueLabel('structure', entry.structure) : null;
   const palette = entry?.palette ? valueLabel('palette', entry.palette) : null;
   // One locale-aware pair: a palette name may itself hold a middle dot (uk).
@@ -112,7 +121,7 @@ export function SignatureCard({
           alt={alt}
           sizes={sizes}
           priority={priority}
-          unavailableLabel={tDetail('image.artworkUnavailable')}
+          unavailableLabel={unavailableLabel}
           unavailableDetail={id}
           className="group-hover:after:shadow-[var(--art-edge-active)]"
         />

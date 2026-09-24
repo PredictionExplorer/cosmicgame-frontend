@@ -10,6 +10,11 @@ import { render, screen, checkA11y, fireEvent } from '@/test-utils';
 
 import { NftQuickView } from '../NftQuickView';
 
+let mockReducedMotion = false;
+jest.mock('@/hooks/usePrefersReducedMotion', () => ({
+  usePrefersReducedMotion: () => mockReducedMotion,
+}));
+
 jest.mock('next/image', () => ({
   __esModule: true,
   default: (props: Record<string, unknown>) => {
@@ -44,6 +49,10 @@ const items = [
 ];
 
 describe('NftQuickView', () => {
+  beforeEach(() => {
+    mockReducedMotion = false;
+  });
+
   it('stays closed without a token', () => {
     render(
       <NftQuickView
@@ -79,7 +88,7 @@ describe('NftQuickView', () => {
     );
     expect(screen.getAllByTestId('spectral-class-badge')[0]).toHaveTextContent('Class B');
     // A named Signature's label carries its number and its rank as caption facts, not chips.
-    expect(screen.getByText('#000001')).toHaveClass('type-mono');
+    expect(screen.getByText('#000001')).toHaveClass('tabular-nums');
     expect(screen.getByTestId('quick-view-rank')).toHaveTextContent(
       `Rank 1 of ${collectionTraits.rarity.total}`,
     );
@@ -130,6 +139,45 @@ describe('NftQuickView', () => {
     expect(onNavigate).toHaveBeenLastCalledWith(43);
     fireEvent.click(screen.getByRole('button', { name: 'Next Signature' }));
     expect(onNavigate).toHaveBeenLastCalledWith(43);
+  });
+
+  it('leaves the arrow keys to the sweep video while it has focus', () => {
+    const onNavigate = jest.fn();
+    render(
+      <NftQuickView
+        tokenId={7}
+        items={items}
+        onOpenChange={jest.fn()}
+        onNavigate={onNavigate}
+        collectionTraits={collectionTraits}
+      />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: /Play spectral sweep/ }));
+    const video = screen.getByTestId('spectral-sweep-video');
+    fireEvent.keyDown(video, { key: 'ArrowLeft' });
+    fireEvent.keyDown(video, { key: 'ArrowRight' });
+    expect(onNavigate).not.toHaveBeenCalled();
+  });
+
+  it('plays the sweep on request, but waits for Play under reduced motion', () => {
+    const view = (
+      <NftQuickView
+        tokenId={1}
+        items={items}
+        onOpenChange={jest.fn()}
+        onNavigate={jest.fn()}
+        collectionTraits={collectionTraits}
+      />
+    );
+    const { unmount } = render(view);
+    fireEvent.click(screen.getByRole('button', { name: /Play spectral sweep/ }));
+    expect(screen.getByTestId('spectral-sweep-video')).toHaveAttribute('autoplay');
+    unmount();
+
+    mockReducedMotion = true;
+    render(view);
+    fireEvent.click(screen.getByRole('button', { name: /Play spectral sweep/ }));
+    expect(screen.getByTestId('spectral-sweep-video')).not.toHaveAttribute('autoplay');
   });
 
   it('names an unnamed Signature by its number once, and tags an anchored one', () => {

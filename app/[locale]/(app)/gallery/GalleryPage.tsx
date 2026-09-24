@@ -11,7 +11,7 @@ import { GalleryView } from './GalleryView';
  * query: the static HTML already holds the first page of plates, and the
  * client render replaces it in place (for the plain `/gallery`, identically).
  */
-export default function GalleryPage() {
+export default function GalleryPage({ snapshotCount = null }: { snapshotCount?: number | null }) {
   const searchParams = useSearchParams();
-  return <GalleryView search={searchParams.toString()} />;
+  return <GalleryView search={searchParams.toString()} snapshotCount={snapshotCount} />;
 }

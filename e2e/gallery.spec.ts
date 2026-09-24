@@ -68,14 +68,14 @@ test.describe('Gallery page', () => {
 
   test('clicking a card navigates to its detail page', async ({ page }) => {
     const firstCard = page.locator('a[href^="/detail/"]').first();
+    const empty = page.getByRole('heading', { name: 'No Signatures yet' });
+    // Wait for either state: isVisible() answers at once, which raced the wall.
+    await expect(firstCard.or(empty)).toBeVisible();
 
-    if (await firstCard.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await ensureVisible(firstCard);
-      await firstCard.click();
-      await expect(page).toHaveURL(/detail/);
-    } else {
-      await expect(page.getByRole('heading', { name: 'No Signatures yet' })).toBeVisible();
-    }
+    if (await empty.isVisible()) return;
+    await ensureVisible(firstCard);
+    await firstCard.click();
+    await expect(page).toHaveURL(/detail/);
   });
 });
 
@@ -97,5 +97,54 @@ test.describe('Gallery on a phone', () => {
     // The footer's primary action (the trait facets also have 'Show N more').
     await sheet.getByRole('button', { name: /^Show \d+ NFTs?$/ }).click();
     await expect(sheet).toBeHidden();
+  });
+});
+
+test.describe('Gallery on a laptop', () => {
+  test.use({ viewport: { width: 1280, height: 720 } });
+
+  test('focus moved back up stops below the sticky toolbar (WCAG 2.4.11)', async ({
+    page,
+    isMobile,
+  }) => {
+    // A phone emulated at laptop width scrolls its visual viewport instead.
+    test.skip(isMobile, 'A keyboard laptop check');
+    await page.goto('/gallery', { waitUntil: 'networkidle' });
+    const cards = page.getByTestId('signature-card');
+    const columns = await cards.evaluateAll((elements) => {
+      const top = elements[0]?.getBoundingClientRect().top ?? 0;
+      return elements.filter((element) => Math.abs(element.getBoundingClientRect().top - top) < 2)
+        .length;
+    });
+    test.skip((await cards.count()) <= columns * 2, 'Needs three rows of Signatures');
+
+    // The first link of the third row, scrolled to sit just under the header:
+    // the focusable before it (in the row above) is then out of view.
+    const start = cards
+      .nth(columns * 2)
+      .getByRole('link')
+      .first();
+    await start.focus();
+    await start.evaluate((element) => {
+      window.scrollTo({ top: element.getBoundingClientRect().top + window.scrollY - 90 });
+    });
+    const toolbar = page.getByTestId('gallery-toolbar');
+    await expect(toolbar).toHaveCSS('position', 'sticky');
+    // The toolbar publishes its reach once hydrated; scroll-padding adds it.
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          document.documentElement.style.getPropertyValue('--sticky-bar-clearance'),
+        ),
+      )
+      .toMatch(/^\d+px$/);
+
+    await page.keyboard.press('Shift+Tab');
+    const focusedTop = await page.evaluate(
+      () => document.activeElement?.getBoundingClientRect().top ?? Number.NaN,
+    );
+    const toolbarBox = await toolbar.boundingBox();
+    expect(toolbarBox).not.toBeNull();
+    expect(focusedTop).toBeGreaterThanOrEqual(toolbarBox!.y + toolbarBox!.height - 1);
   });
 });

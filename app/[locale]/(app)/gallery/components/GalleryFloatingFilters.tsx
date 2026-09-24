@@ -55,7 +55,9 @@ export function GalleryFloatingFilters({
 
   if (!visible) return null;
   return (
+    // A fixed bottom bar: focus scrolled into view clears it (--dock-clearance).
     <div
+      data-action-dock
       className={cn(
         'fixed inset-x-0 bottom-[max(1rem,env(safe-area-inset-bottom))] z-40 flex justify-center lg:hidden',
         'pointer-events-none motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-4 motion-safe:duration-[var(--duration-base)]',

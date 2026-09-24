@@ -1,6 +1,6 @@
 import { checkA11y, fireEvent, render, screen, within } from '@/test-utils';
 
-import DonatedERC20Table from '../AttachedERC20Table';
+import DonatedERC20Table, { attachedErc20Amount } from '../AttachedERC20Table';
 
 const mockMetadata = jest.fn();
 jest.mock('../useAttachedErc20Metadata', () => ({
@@ -35,6 +35,37 @@ beforeEach(() => {
   mockMetadata.mockReturnValue({ data: { symbol: 'GLXY', decimals: 18 } });
 });
 
+describe('attachedErc20Amount', () => {
+  it('adds what was retrieved to what is still held in a Recipient read', () => {
+    // The production record of a retrieved ARB attachment: 0 held, 2,000 retrieved.
+    expect(
+      attachedErc20Amount({ AmountDonated: '0', AmountDonatedEth: 0, AmountClaimedEth: 2000 }),
+    ).toBe(2000);
+    expect(
+      attachedErc20Amount({
+        AmountDonated: '2000000000000000000000',
+        AmountDonatedEth: 2000,
+        AmountClaimedEth: 0,
+      }),
+    ).toBe(2000);
+  });
+
+  it('reads the attached amount itself from a cycle read', () => {
+    expect(
+      attachedErc20Amount({ AmountEth: 2000, AmountDonatedEth: 2000, AmountClaimedEth: 0 }),
+    ).toBe(2000);
+  });
+
+  it('is unknown when the read reports no amount', () => {
+    expect(
+      attachedErc20Amount({
+        AmountDonatedEth: undefined as unknown as number,
+        AmountClaimedEth: 0,
+      }),
+    ).toBeNull();
+  });
+});
+
 describe('DonatedERC20Table', () => {
   it('says there is nothing attached instead of an empty ledger', () => {
     render(<DonatedERC20Table list={[]} handleClaim={null} />);
@@ -57,7 +88,7 @@ describe('DonatedERC20Table', () => {
   });
 
   it('names the token by its symbol, linked to its contract, and formats the amounts', () => {
-    render(<DonatedERC20Table list={[createToken()]} handleClaim={null} />);
+    render(<DonatedERC20Table list={[createToken({ AmountEth: 5.25 })]} handleClaim={null} />);
     expect(within(table()).getByRole('link', { name: /GLXY/ })).toHaveAttribute(
       'href',
       expect.stringContaining(TOKEN),
@@ -85,6 +116,24 @@ describe('DonatedERC20Table', () => {
       />,
     );
     expect(within(table()).getAllByText('tables.status.unavailable').length).toBeGreaterThan(0);
+  });
+
+  it('shows what a retrieved attachment was, not the 0 still held', () => {
+    render(
+      <DonatedERC20Table
+        list={[
+          createToken({
+            AmountDonated: '0',
+            AmountDonatedEth: 0,
+            AmountClaimedEth: 2000,
+            Claimed: true,
+          }),
+        ]}
+        handleClaim={null}
+      />,
+    );
+    // Attached and retrieved both read 2,000.
+    expect(within(table()).getAllByText('2,000')).toHaveLength(2);
   });
 
   it('marks a retrieved token', () => {

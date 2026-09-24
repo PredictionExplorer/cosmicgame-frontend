@@ -228,6 +228,7 @@
       "title": "내 NFT",
       "subtitle": "연결된 지갑에 있는 Cosmic Signature NFT",
       "marketplace": "NFT 구매 또는 판매",
+      "anchorLink": "NFT 앵커링",
       "loadErrorTitle": "토큰을 불러오지 못했습니다",
       "loadErrorMessage": "Cosmic Signature NFT를 불러오지 못했습니다.",
       "ownedTitle": "내가 보유한 Cosmic Signature NFT",

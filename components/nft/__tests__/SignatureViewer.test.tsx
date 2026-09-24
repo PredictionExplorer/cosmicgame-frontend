@@ -39,7 +39,6 @@ function renderViewer(overrides: Partial<Parameters<typeof SignatureViewer>[0]> 
       tokenLabel="#000025"
       unavailableLabel="Artwork unavailable"
       sizes="100vw"
-      navigation={<nav aria-label="Neighbours" />}
       {...overrides}
     />,
   );
@@ -60,7 +59,12 @@ describe('SignatureViewer', () => {
     expect(modeButton(/detail.viewer.still/)).toHaveAttribute('aria-pressed', 'true');
     expect(modeButton(/detail.viewer.motion/)).toHaveAttribute('aria-pressed', 'false');
     expect(screen.queryByTestId('signature-motion')).not.toBeInTheDocument();
-    expect(screen.getByRole('navigation', { name: 'Neighbours' })).toBeInTheDocument();
+  });
+
+  it('offers no animation beside a render that is still pending', () => {
+    renderViewer({ media: null, renderPending: true, unavailableLabel: 'Rendering' });
+    expect(screen.queryByRole('group', { name: 'detail.viewer.modeLabel' })).toBeNull();
+    expect(screen.getByText('Rendering')).toBeInTheDocument();
   });
 
   it('plays the animation in the same plate when In motion is chosen, with a pause control', async () => {

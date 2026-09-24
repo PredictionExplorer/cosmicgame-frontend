@@ -252,8 +252,8 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
           subject={subject}
           tokenLabel={id}
           unavailableLabel={renderPending ? t('image.rendering') : t('image.artworkUnavailable')}
+          renderPending={renderPending}
           sizes={PLATE_SIZES}
-          navigation={<NFTNeighbourNav tokenId={tokenId} total={totalImprints} />}
           // Never taller than the screen leaves room for; full-bleed on phones.
           // Beside a taller column (the owner's tools open) the plate stays in
           // view while the tools scroll, instead of leaving a band of ground.
@@ -283,12 +283,25 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
               </>
             }
           />
+          {/*
+           * The walk through the collection closes the wall label, so on a
+           * phone nothing stands between the art and its title.
+           */}
+          <NFTNeighbourNav tokenId={tokenId} total={totalImprints} className="-mt-4 sm:w-full" />
           {owner ? (
             <NFTOwnerActions
               tokenId={tokenId}
               owner={owner}
               currentName={currentName ?? ''}
               totalNamedTokens={dashboard?.MainStats?.TotalNamedTokens ?? null}
+              // The ledger's own rule: never anchored, not anchored now.
+              anchoringEligible={!nft?.Staked && !nft?.WasUnstaked}
+              onAnchored={() =>
+                // The indexer records the anchor a moment after the receipt.
+                scheduleNameRefetch(() => {
+                  void refetchCSTInfo();
+                })
+              }
               showMetaMaskAction={isMetaMaskConnected}
               addingToMetaMask={isAddingNft}
               onAddToMetaMask={() => void addCosmicSignatureNft(tokenId)}

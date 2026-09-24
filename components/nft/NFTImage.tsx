@@ -11,6 +11,7 @@ import {
   useArtSourceChain,
   type ArtRendition,
 } from '@/components/ui/art-frame';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export interface NFTImageProps {
   src?: string;
@@ -62,6 +63,12 @@ export interface NFTImageProps {
   renditions?: readonly ArtRendition[];
   /** `compact` draws the unavailable state as the mark alone, for small thumbnails. */
   density?: 'full' | 'compact';
+  /**
+   * The source is still being resolved (e.g. an attached NFT's metadata is
+   * loading): a quiet skeleton plate instead of the unavailable state, which
+   * would announce a broken image for art that is on its way.
+   */
+  pending?: boolean;
 }
 
 /**
@@ -88,6 +95,7 @@ const NFTImage = ({
   frame = 'media',
   renditions,
   density = 'full',
+  pending = false,
 }: NFTImageProps) => {
   const t = useTranslations('detail');
   const chain = useArtSourceChain([
@@ -96,6 +104,24 @@ const NFTImage = ({
     terminalFallbackSrc,
   ]);
   const signature = frame === 'signature';
+
+  if (pending && chain.source === null) {
+    return (
+      <Skeleton
+        role="img"
+        aria-label={alt}
+        aria-hidden={false}
+        aria-busy="true"
+        data-testid="pending-plate"
+        className={cn(
+          'w-full rounded-[inherit]',
+          signature ? 'aspect-art' : 'aspect-video',
+          className,
+        )}
+        style={style}
+      />
+    );
+  }
 
   if (chain.source === null) {
     return (

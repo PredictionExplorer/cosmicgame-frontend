@@ -46,6 +46,11 @@ jest.mock('@/components/ui/tx-status', () => ({
   TxStatus: () => null,
 }));
 
+const mockAnchor = jest.fn();
+jest.mock('@/hooks/useAnchorActions', () => ({
+  useAnchorActions: () => ({ anchor: mockAnchor, txStage: { status: 'idle' } }),
+}));
+
 const onTransferred = jest.fn();
 const onRenamed = jest.fn();
 const onAddToMetaMask = jest.fn();
@@ -87,6 +92,8 @@ beforeEach(() => {
   onTransferred.mockClear();
   onRenamed.mockClear();
   onAddToMetaMask.mockClear();
+  mockAnchor.mockReset();
+  mockAnchor.mockResolvedValue({ status: 'confirmed' });
   mockContracts = TEST_APP_CONTRACT_ADDRESSES;
   mockCheck = {
     status: 'ready',
@@ -97,6 +104,40 @@ beforeEach(() => {
 });
 
 describe('NFTOwnerActions', () => {
+  describe('anchoring', () => {
+    const anchorButton = () =>
+      screen.getByRole('button', { name: /detail\.ownerActions\.anchor\.button\(id=#000025\)/ });
+
+    it('offers to anchor a token that has never been anchored, and says it is once only', () => {
+      renderActions({ anchoringEligible: true });
+      expect(screen.getByText('detail.ownerActions.anchor.note')).toBeInTheDocument();
+      expect(anchorButton()).toBeEnabled();
+    });
+
+    it('offers nothing to anchor for a token already anchored or released', () => {
+      renderActions({ anchoringEligible: false });
+      expect(screen.queryByText('detail.ownerActions.anchor.note')).toBeNull();
+    });
+
+    it('anchors this token and hands the refresh to the page once confirmed', async () => {
+      const onAnchored = jest.fn();
+      const user = userEvent.setup();
+      renderActions({ anchoringEligible: true, onAnchored });
+      await user.click(anchorButton());
+      expect(mockAnchor).toHaveBeenCalledWith(25, false);
+      expect(onAnchored).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not refresh when the wallet declines', async () => {
+      mockAnchor.mockResolvedValue({ status: 'failed', error: new Error('rejected') });
+      const onAnchored = jest.fn();
+      const user = userEvent.setup();
+      renderActions({ anchoringEligible: true, onAnchored });
+      await user.click(anchorButton());
+      expect(onAnchored).not.toHaveBeenCalled();
+    });
+  });
+
   it('offers naming first and the transfer one tab away', () => {
     renderActions();
     expect(

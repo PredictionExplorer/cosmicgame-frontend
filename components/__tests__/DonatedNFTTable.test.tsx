@@ -81,12 +81,14 @@ describe('AttachedNFTTable', () => {
     expect(interactive.getByText(`#${mockData[0]!.NFTTokenId}`)).toBeInTheDocument();
 
     await waitFor(() => {
-      const src =
-        screen
-          .getByAltText('tables.attachedAssets.nft.imageAlt(id=13000081)')
-          .getAttribute('src') ?? '';
-      const decoded = new URL(src, 'http://localhost').searchParams.get('url') ?? src;
-      expect(decoded).toEqual(mockImageUrl);
+      // The table's image column, and the phone record's thumbnail beside the name.
+      const images = screen.getAllByAltText('tables.attachedAssets.nft.imageAlt(id=13000081)');
+      expect(images).toHaveLength(2);
+      for (const image of images) {
+        const src = image.getAttribute('src') ?? '';
+        const decoded = new URL(src, 'http://localhost').searchParams.get('url') ?? src;
+        expect(decoded).toEqual(mockImageUrl);
+      }
     });
 
     expect(screen.getByTestId('Claim Button')).toHaveTextContent(
@@ -113,7 +115,40 @@ describe('AttachedNFTTable', () => {
       />,
     );
 
-    expect(screen.getByText('tables.attachedAssets.nft.imageUnavailable')).toBeInTheDocument();
+    expect(
+      screen.getAllByText('tables.attachedAssets.nft.imageUnavailable').length,
+    ).toBeGreaterThan(0);
+  });
+
+  test('shows a skeleton, not the unavailable state, while the metadata loads', () => {
+    mockUseAttachedNftMetadata.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      isError: false,
+    });
+    render(
+      <AttachedNFTTable
+        list={[
+          {
+            RecordId: '1',
+            TxHash: '0xabc',
+            TimeStamp: 1700000000,
+            DonorAddr: '0x1111111111111111111111111111111111111111',
+            RoundNum: 1,
+            TokenAddr: '0x2222222222222222222222222222222222222222',
+            NFTTokenId: 7,
+            NFTTokenURI: 'ipfs://bafy/7',
+            Index: 0,
+          },
+        ]}
+        claimingTokens={[]}
+      />,
+    );
+
+    expect(screen.queryByText('tables.attachedAssets.nft.imageUnavailable')).toBeNull();
+    for (const plate of screen.getAllByTestId('pending-plate')) {
+      expect(plate).toHaveAttribute('aria-busy', 'true');
+    }
   });
 
   test('external links have rel="noopener noreferrer"', async () => {

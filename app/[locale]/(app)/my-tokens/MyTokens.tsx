@@ -9,6 +9,7 @@ import { useCSTTokensByUser } from '@/hooks/useApiQuery';
 import { useCollectionTraits } from '@/hooks/useNftTraits';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { Link } from '@/i18n/navigation';
+import { AnchoringIcon } from '@/lib/conceptIcons';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
 import { CosmicSignatureNftTransferForm } from '@/components/nft/CosmicSignatureNftTransferForm';
@@ -24,7 +25,8 @@ import { WalletRequiredState } from '@/components/wallet/WalletRequiredState';
 /**
  * My NFTs: the Signatures in the connected wallet, hung as a personal
  * collection (the art on its plates, how each one arrived in its caption),
- * with sending them to another wallet one quiet disclosure below.
+ * with sending them to another wallet one quiet disclosure below. While a
+ * Signature here has never been anchored, the header offers to anchor it.
  */
 export default function MyTokens() {
   const t = useTranslations('myPages');
@@ -58,6 +60,7 @@ export default function MyTokens() {
             seed: token.Seed,
             name: token.TokenName,
             anchored: Boolean(token.Staked),
+            imprintedAt: token.MintTimeStamp ?? token.TimeStamp,
             // How the Signature first arrived: Stellar Selection, the Final Gesture…
             extraMeta: allocation ? [valueLabel('allocation', allocation)] : undefined,
           };
@@ -67,6 +70,9 @@ export default function MyTokens() {
 
   const loaded = connected && !isLoading && !isError;
   const anchoredCount = tokens.filter((token) => token.Staked).length;
+  // The ledger's rule: an NFT can be anchored only once, so a released one
+  // cannot be anchored again.
+  const anchorableCount = tokens.filter((token) => !token.Staked && !token.WasUnstaked).length;
 
   return (
     <PageShell variant="data" backdrop="signature">
@@ -74,7 +80,17 @@ export default function MyTokens() {
         section="account"
         title={t('tokens.page.title')}
         subtitle={t('tokens.page.subtitle')}
-        actions={<NftMarketplaceButton variant="secondary" label={t('tokens.page.marketplace')} />}
+        actions={
+          <>
+            {loaded && anchorableCount > 0 ? (
+              <Link href="/my-anchors" className={buttonVariants({ variant: 'outline' })}>
+                <AnchoringIcon aria-hidden />
+                {t('tokens.page.anchorLink')}
+              </Link>
+            ) : null}
+            <NftMarketplaceButton variant="secondary" label={t('tokens.page.marketplace')} />
+          </>
+        }
         figures={
           loaded && tokens.length > 0
             ? [

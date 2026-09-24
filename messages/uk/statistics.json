@@ -643,6 +643,8 @@
   "namedNfts": {
     "title": "Іменовані Cosmic Signature NFT",
     "subtitle": "Cosmic Signature NFT, яким власники дали власні імена",
+    "loadErrorTitle": "Не вдалося завантажити іменовані NFT",
+    "loadErrorMessage": "Не вдалося прочитати записи іменованих NFT. Спробуйте ще раз.",
     "emptyTitle": "Іменованих NFT немає",
     "emptyDescription": "Жодному Cosmic Signature NFT ще не дали ім’я.",
     "galleryLink": "Переглянути їх у галереї"

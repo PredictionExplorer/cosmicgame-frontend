@@ -643,6 +643,8 @@
   "namedNfts": {
     "title": "已命名 Cosmic Signature NFT",
     "subtitle": "瀏覽由持有者自定義名稱的 Cosmic Signature NFT",
+    "loadErrorTitle": "無法載入已命名 NFT",
+    "loadErrorMessage": "無法讀取已命名 NFT 的記錄，請重試。",
     "emptyTitle": "暫無已命名 NFT",
     "emptyDescription": "尚未有持有者為 Cosmic Signature NFT 命名。",
     "galleryLink": "在畫廊中查看"

@@ -1,9 +1,10 @@
 'use client';
 
-import { useId, useState, type ReactNode } from 'react';
+import { useId, type ReactNode } from 'react';
 import { Check, Copy, ExternalLink } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
+import { useCopyFeedback } from '@/hooks/useCopyFeedback';
 import type { CollectionTraits } from '@/hooks/useNftTraits';
 import type { CosmicSignatureMetadata, NftTraitEntry } from '@/lib/nftMetadata';
 import { cn } from '@/lib/utils';
@@ -13,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-import { TRAIT_GRID_CLASS, TRAIT_TILE_CLASS } from './layout';
+import { TRAIT_GRID_CLASS, TRAIT_GRID_FILL_ROW_CLASS, TRAIT_TILE_CLASS } from './layout';
 import { RarityRankChip } from './RarityRankChip';
 import { TraitSheet } from './TraitSheet';
 import { hueColor } from './palette';
@@ -61,12 +62,9 @@ function HashValue({
   copyLabel: string;
   copiedLabel: string;
 }) {
-  const [copied, setCopied] = useState(false);
-  async function handleCopy() {
-    await navigator.clipboard.writeText(value);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
+  // A failed write (no permission, insecure context) leaves the copy icon.
+  const { copied, copy } = useCopyFeedback();
+  const handleCopy = () => void copy(value);
   return (
     <span className="flex items-start gap-2">
       <code className="min-w-0 flex-1 type-hash text-muted-foreground">{value}</code>
@@ -202,7 +200,7 @@ export function NftTraitPanel({
             groups={['composition']}
             hideHeadings
           />
-          <dl className={TRAIT_GRID_CLASS}>
+          <dl className={cn(TRAIT_GRID_CLASS, TRAIT_GRID_FILL_ROW_CLASS)}>
             {typeof palette?.dominant_wavelength_nm === 'number' ? (
               <Fact label={t('panel.dominantWavelength')}>
                 {t('panel.nanometres', { value: number(palette.dominant_wavelength_nm, 0) })}

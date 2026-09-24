@@ -84,6 +84,29 @@ describe('NFTDonationsPage', () => {
     expect(refetch).toHaveBeenCalled();
   });
 
+  it('never says the wall is empty under a header that counted records', () => {
+    const refetch = jest.fn();
+    mockUseDonationsNFTList.mockReturnValue(state({ data: [], refetch }));
+    render(<NFTDonationsPage snapshotCount={4} />);
+    expect(screen.queryByRole('heading', { name: 'No attached NFTs yet' })).toBeNull();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Attached NFTs could not be loaded' }),
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Try again/ }));
+    expect(refetch).toHaveBeenCalled();
+  });
+
+  it('follows the page it is given and reports a page change', () => {
+    const onPageChange = jest.fn();
+    mockUseDonationsNFTList.mockReturnValue(
+      state({ data: Array.from({ length: 14 }, (_, i) => record(i + 1, i)) }),
+    );
+    render(<NFTDonationsPage page={2} onPageChange={onPageChange} />);
+    expect(screen.getAllByTestId('attached-nft')).toHaveLength(2);
+    fireEvent.click(screen.getByRole('button', { name: 'tables.pagination.previousAria' }));
+    expect(onPageChange).toHaveBeenCalledWith(1);
+  });
+
   it('has no accessibility violations', async () => {
     mockUseDonationsNFTList.mockReturnValue(state({ data: [record(1, 100)] }));
     const { container } = render(<NFTDonationsPage />);

@@ -1,20 +1,22 @@
 import type { ReactNode } from 'react';
 import { notFound } from 'next/navigation';
 
-interface LayoutProps {
+import { parseTokenId } from './tokenId';
+
+interface TokenLayoutProps {
   children: ReactNode;
-  params: Promise<{ locale: string; id: string }>;
+  params: Promise<{ id: string }>;
 }
 
 /**
- * Rejects an id that can never name a token (`/detail/not-a-token`) before
- * the page's loading boundary starts streaming: a `notFound()` thrown under
- * `loading.tsx` arrives after the 200 status has been sent, which makes a
- * soft 404. The page keeps its own check for a well-formed id that names no
- * token.
+ * Turns a malformed token id away before the page's loading boundary
+ * streams: a `notFound()` inside that boundary arrives after the 200 status
+ * is sent, so `/detail/not-a-token` answered 200 (with a noindex tag) instead
+ * of a real 404. The check is synchronous, so the skeleton still shows at
+ * once on a click from a wall.
  */
-export default async function TokenIdGuard({ children, params }: LayoutProps) {
+export default async function TokenLayout({ children, params }: TokenLayoutProps) {
   const { id } = await params;
-  if (!/^\d+$/.test(id) || !Number.isSafeInteger(Number(id))) notFound();
+  if (parseTokenId(id) === null) notFound();
   return children;
 }

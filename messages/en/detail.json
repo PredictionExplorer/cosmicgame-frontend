@@ -3,9 +3,7 @@
     "title": "Invalid token ID"
   },
   "jsonLd": {
-    "productName": "Cosmic Signature NFT #{id}",
-    "productDescription": "Unique generative NFT from the Cosmic Signature procedural on-chain art protocol, rendered from three-body problem physics.",
-    "breadcrumbToken": "Token #{id}"
+    "productDescription": "Unique generative NFT from the Cosmic Signature procedural on-chain art protocol, rendered from three-body problem physics."
   },
   "badges": {
     "stellarSelectionRecipient": "Stellar Selection Recipient",
@@ -30,14 +28,18 @@
     "label": "Previous and next Signatures"
   },
   "sections": {
-    "nameHistory": "Name History",
-    "ownershipHistory": "Ownership History"
+    "nameHistory": "Name history",
+    "ownershipHistory": "Ownership history"
   },
   "ownerActions": {
     "title": "Manage your token",
     "tabs": {
       "name": "Name",
       "transfer": "Transfer"
+    },
+    "anchor": {
+      "button": "Anchor {id}",
+      "note": "Anchored, this Signature shares the Anchor Distribution of every finalized Cycle. Each NFT can be anchored only once, so releasing it later is final."
     },
     "metaMaskTooltip": "Prompt the MetaMask browser extension to display this NFT. NFT import is experimental and is not available in MetaMask Mobile.",
     "addToMetaMask": "Add NFT to MetaMask",

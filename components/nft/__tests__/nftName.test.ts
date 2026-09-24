@@ -1,4 +1,4 @@
-import { NFT_NAME_MAX_BYTES, truncateToBytes, utf8ByteLength } from '../nftName';
+import { NFT_NAME_MAX_BYTES, signatureTitle, truncateToBytes, utf8ByteLength } from '../nftName';
 
 describe('NFT names', () => {
   it('counts UTF-8 bytes the way the contract stores them', () => {
@@ -24,5 +24,18 @@ describe('NFT names', () => {
   it('never splits a character made of several code points', () => {
     const family = '👩‍👩‍👧'; // 18 bytes joined by zero-width joiners
     expect(truncateToBytes(`${'a'.repeat(20)}${family}`)).toBe('a'.repeat(20));
+  });
+});
+
+describe('signatureTitle', () => {
+  const t = (_key: 'quickView.title', values: { id: string }) => `Cosmic Signature ${values.id}`;
+
+  it('names a named Signature by its name', () => {
+    expect(signatureTitle(t, { id: '#000025', name: ' Twisted Mind ' })).toBe('Twisted Mind');
+  });
+
+  it('titles an unnamed Signature by its number', () => {
+    expect(signatureTitle(t, { id: '#000007', name: null })).toBe('Cosmic Signature #000007');
+    expect(signatureTitle(t, { id: '#000007', name: '  ' })).toBe('Cosmic Signature #000007');
   });
 });

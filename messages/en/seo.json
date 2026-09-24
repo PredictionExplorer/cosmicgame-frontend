@@ -130,13 +130,13 @@
         },
         "cards": {
           "records": {
-            "label": "Attached NFT Records"
+            "label": "Attached NFT records"
           },
           "contracts": {
-            "label": "Unique NFT Contracts"
+            "label": "Unique NFT contracts"
           },
           "contributors": {
-            "label": "Contributor Wallets"
+            "label": "Contributor wallets"
           }
         }
       },
@@ -174,10 +174,10 @@
         },
         "cards": {
           "named": {
-            "label": "Named Cosmic Signature NFTs"
+            "label": "Named NFTs"
           },
           "owners": {
-            "label": "Current Owners"
+            "label": "Current owners"
           },
           "imprinted": {
             "label": "Imprinted NFTs"

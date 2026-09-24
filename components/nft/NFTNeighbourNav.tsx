@@ -61,7 +61,7 @@ export function NFTNeighbourNav({ tokenId, total, className }: NFTNeighbourNavPr
         <Link href={`/detail/${previous}`} className={linkClass} data-testid="neighbour-previous">
           <ArrowLeft aria-hidden />
           <span className="sr-only">{tTraits('quickView.previous')}</span>
-          <span className="type-mono">{formatId(previous)}</span>
+          <span className="tabular-nums">{formatId(previous)}</span>
         </Link>
       ) : null}
       {next !== null ? (
@@ -72,12 +72,12 @@ export function NFTNeighbourNav({ tokenId, total, className }: NFTNeighbourNavPr
           data-testid="neighbour-next"
         >
           <span className="sr-only">{tTraits('quickView.next')}</span>
-          <span className="type-mono">{formatId(next)}</span>
+          <span className="tabular-nums">{formatId(next)}</span>
           <ArrowRight aria-hidden />
         </Link>
       ) : nextPending ? (
         <span aria-hidden className={cn(linkClass, 'invisible ml-auto')}>
-          <span className="type-mono">{formatId(tokenId + 1)}</span>
+          <span className="tabular-nums">{formatId(tokenId + 1)}</span>
           <ArrowRight />
         </span>
       ) : null}

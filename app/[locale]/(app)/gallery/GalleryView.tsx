@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 
 import { useCollectionTraits, type CollectionTraits } from '@/hooks/useNftTraits';
 import { useCSTList } from '@/hooks/useApiQuery';
+import { useStickyClearance } from '@/hooks/useStickyClearance';
 import type { CategoricalTraitKey } from '@/lib/nftMetadata';
 import { cn } from '@/lib/utils';
 import { usePathname, useRouter } from '@/i18n/navigation';
@@ -18,7 +19,7 @@ import { GalleryFilterSheet } from './components/GalleryFilterSheet';
 import { GalleryFloatingFilters } from './components/GalleryFloatingFilters';
 import { GalleryGrid } from './components/GalleryGrid';
 import { GalleryPagination } from './components/GalleryPagination';
-import { GalleryResultsBar } from './components/GalleryResultsBar';
+import { GALLERY_RESULT_COUNT_ID, GalleryResultsBar } from './components/GalleryResultsBar';
 import { GallerySortSelect } from './components/GallerySortSelect';
 import { GalleryStatusFilter } from './components/GalleryStatusFilter';
 import { GalleryToolbar } from './components/GalleryToolbar';
@@ -124,6 +125,17 @@ function matchesSearch(nft: GalleryNFTData, search: string, locale: string): boo
 export interface GalleryViewProps {
   /** The page's query string (without `?`); '' renders the default view. */
   search: string;
+  /**
+   * How many Signatures the header's server snapshot counted (`null` when it
+   * could not read them). An empty list under a non-zero snapshot is a read
+   * that failed, never "No Signatures yet".
+   */
+  snapshotCount?: number | null;
+}
+
+/** Moves focus to the result count, where the reader lands when the last filter goes. */
+function focusResultCount() {
+  document.getElementById(GALLERY_RESULT_COUNT_ID)?.focus();
 }
 
 /**
@@ -133,7 +145,7 @@ export interface GalleryViewProps {
  * component renders the default view on the server and the reader's view once
  * the URL is known.
  */
-export function GalleryView({ search }: GalleryViewProps) {
+export function GalleryView({ search, snapshotCount = null }: GalleryViewProps) {
   const t = useTranslations('gallery');
   const locale = useLocale();
   const router = useRouter();
@@ -159,6 +171,9 @@ export function GalleryView({ search }: GalleryViewProps) {
   const [quickViewId, setQuickViewId] = useState<number | null>(null);
   const toolbarRef = useRef<HTMLDivElement>(null);
   const resultsRef = useRef<HTMLElement>(null);
+  // From `lg` the toolbar sticks under the header: focus scrolled into view
+  // stops below it rather than under it.
+  useStickyClearance(toolbarRef);
 
   /** Replaces the URL: a filter, sort or view change is not a new history entry. */
   const update = useCallback(
@@ -282,8 +297,10 @@ export function GalleryView({ search }: GalleryViewProps) {
 
   // An empty grid would read as "no Signatures exist yet", which is a very
   // different statement from "the archive could not be read". A failed
-  // refetch keeps the collection already on screen.
-  if (isError && !nfts) {
+  // refetch keeps the collection already on screen, and an empty refresh
+  // under a header that counted Signatures is a failed read too.
+  const refreshFailed = !isLoading && collectionSize === 0 && (snapshotCount ?? 0) > 0;
+  if ((isError && !nfts) || refreshFailed) {
     return (
       <ErrorState
         title={t('error.title')}
@@ -357,7 +374,7 @@ export function GalleryView({ search }: GalleryViewProps) {
             total={collectionSize}
             filtered={filtered}
             onClearAll={onClearAll}
-            className="mt-4"
+            className="mt-3"
             chips={
               <GalleryActiveFilters
                 status={query.status}
@@ -368,6 +385,7 @@ export function GalleryView({ search }: GalleryViewProps) {
                 onClearSearch={() => onSearchCommit('')}
                 onRemoveTrait={onToggleTrait}
                 onClearChaos={() => onChaosChange(null)}
+                onEmptied={focusResultCount}
               />
             }
             end={
@@ -377,20 +395,20 @@ export function GalleryView({ search }: GalleryViewProps) {
             }
           />
 
-          {dnaOpen && !railOpen ? (
-            <div
-              id="gallery-dna-panel"
-              className="mt-4 hidden border-y border-rule-faint py-6 lg:block"
-            >
-              {dna}
-            </div>
-          ) : null}
+          {/* Mounted while closed, so the disclosure's aria-controls always resolves. */}
+          <div
+            id="gallery-dna-panel"
+            hidden={!dnaOpen || railOpen}
+            className="mt-4 border-y border-rule-faint py-6 max-lg:hidden"
+          >
+            {dnaOpen && !railOpen ? dna : null}
+          </div>
 
           <section
             ref={resultsRef}
             id={GALLERY_RESULTS_ID}
             aria-label={t('results.regionLabel')}
-            className="mt-6 scroll-mt-[calc(var(--sticky-offset)+4.5rem)] max-lg:scroll-mt-[var(--sticky-offset)]"
+            className="mt-5 scroll-mt-[calc(var(--sticky-offset)+4.5rem)] max-lg:scroll-mt-[var(--sticky-offset)]"
           >
             <GalleryGrid
               items={visibleItems}

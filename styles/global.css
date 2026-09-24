@@ -465,7 +465,8 @@ body:has([data-maintenance-banner]) .home-control-shell {
   html {
     color-scheme: dark;
     scroll-behavior: smooth;
-    scroll-padding-top: var(--sticky-offset);
+    /* A sticky bar under the header publishes its reach (useStickyClearance, WCAG 2.4.11). */
+    scroll-padding-top: calc(var(--sticky-offset) + var(--sticky-bar-clearance, 0px));
     /* Focus scrolled into view clears a fixed bottom bar (WCAG 2.4.11). */
     scroll-padding-bottom: calc(var(--dock-clearance) + env(safe-area-inset-bottom, 0px));
   }

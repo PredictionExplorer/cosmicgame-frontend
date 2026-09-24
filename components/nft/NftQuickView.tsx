@@ -13,7 +13,10 @@ import type { CategoricalTraitKey } from '@/lib/nftMetadata';
 import { AnchoringIcon } from '@/lib/conceptIcons';
 import { Link } from '@/i18n/navigation';
 import { ArtFrame, WallLabelMeta } from '@/components/ui/art-frame';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { signatureMedia, useSignatureAlt } from '@/components/nft/signatureArt';
+import { useSignatureArtLabel } from '@/components/nft/useSignatureArtLabel';
+import { prefersStillArt } from '@/components/nft/SignatureViewer';
 import { TraitSheet } from '@/components/nft/traits';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription } from '@/components/ui/dialog';
@@ -26,7 +29,28 @@ export interface NftQuickViewItem {
   TokenName?: string;
   /** Anchored right now: a quiet tag in the label. */
   Staked?: boolean;
+  /** Imprint time (unix seconds), for the "Rendering" state of a fresh token. */
+  TimeStamp?: number;
 }
+
+/**
+ * Where the arrow keys belong to the focused control rather than to the
+ * dialog's previous / next: the sweep's video controls, fields, sliders and
+ * composite widgets that move their own selection.
+ */
+const ARROW_OWNING_SELECTOR = [
+  'video',
+  'audio',
+  'input',
+  'textarea',
+  'select',
+  '[contenteditable]:not([contenteditable="false"])',
+  '[role="slider"]',
+  '[role="radiogroup"]',
+  '[role="tablist"]',
+  '[role="listbox"]',
+  '[role="menu"]',
+].join(',');
 
 /** Props for {@link NftQuickView}. */
 export interface NftQuickViewProps {
@@ -61,9 +85,9 @@ export function NftQuickView({
   onSelectTrait,
 }: NftQuickViewProps) {
   const t = useTranslations('traits');
-  const tDetail = useTranslations('detail');
   const locale = useLocale();
   const signatureAlt = useSignatureAlt();
+  const reducedMotion = usePrefersReducedMotion();
   // The sweep is remembered per token, so moving to another Signature
   // naturally falls back to its artwork without an effect.
   const [sweepTokenId, setSweepTokenId] = useState<number | null>(null);
@@ -86,8 +110,12 @@ export function NftQuickView({
   const rarityTotal = collectionTraits?.rarity.total ?? 0;
   const media = signatureMedia(seed);
   const alt = signatureAlt({ id, name, entry });
+  const { label: unavailableLabel } = useSignatureArtLabel(item?.TimeStamp);
 
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    const target = event.target;
+    if (target instanceof Element && target.closest(ARROW_OWNING_SELECTOR)) return;
+    if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
     if (event.key === 'ArrowLeft' && previous) {
       event.preventDefault();
       onNavigate(previous.TokenId);
@@ -113,7 +141,9 @@ export function NftQuickView({
                     key={String(seed)}
                     src={getSpectralSweepUrl(seed)}
                     controls
-                    autoPlay
+                    // Asked for, so it plays, unless the reader keeps motion off:
+                    // then it waits, paused, for the video's own Play.
+                    autoPlay={!prefersStillArt(reducedMotion)}
                     playsInline
                     loop
                     className="aspect-art w-full bg-art-ground object-contain"
@@ -123,7 +153,7 @@ export function NftQuickView({
                   <ArtFrame
                     sources={media ? [media.webImage, media.sourceImage] : []}
                     alt={alt}
-                    unavailableLabel={tDetail('image.artworkUnavailable')}
+                    unavailableLabel={unavailableLabel}
                     unavailableDetail={id}
                     sizes="(max-width: 1023px) 100vw, 36rem"
                     // The plate sits on its own black ground: no print edge.
@@ -181,7 +211,7 @@ export function NftQuickView({
                   className="mt-2"
                   items={[
                     // An unnamed Signature already carries its number in the title.
-                    name ? <span className="type-mono">{id}</span> : null,
+                    name ? <span className="tabular-nums">{id}</span> : null,
                     rarity && rarityTotal > 0 ? (
                       <span className="tabular-nums" data-testid="quick-view-rank">
                         {t('rarity.rankOf', {

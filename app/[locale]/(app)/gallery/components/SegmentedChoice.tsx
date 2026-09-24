@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, type KeyboardEvent, type ReactNode } from 'react';
+import { useId, useRef, type KeyboardEvent, type ReactNode } from 'react';
 
 import { cn } from '@/lib/utils';
 import { tabsListVariants, tabsTriggerVariants } from '@/components/ui/tabs';
@@ -11,7 +11,10 @@ export interface SegmentedOption<T extends string> {
   /** The visible label, or the accessible name of an icon-only option. */
   label: string;
   icon?: ReactNode;
-  /** A one-line explanation shown on hover (fine pointers). */
+  /**
+   * A one-line explanation: a hover hint for a mouse; in a `block` choice (the
+   * phone's filter sheet) the selected option's hint is a caption under it.
+   */
   hint?: string;
 }
 
@@ -32,7 +35,8 @@ export interface SegmentedChoiceProps<T extends string> {
  * SegmentedChoice — one choice from a short set, drawn as the segmented
  * track (`tabsListVariants`), with radio semantics: one tab stop, arrow keys
  * move and select, Home and End jump. For view choices that are not tab
- * panels (the gallery's status filter and view mode).
+ * panels (the gallery's status filter and view mode). A tap always selects:
+ * hints never stand between a touch and its option.
  */
 export function SegmentedChoice<T extends string>({
   value,
@@ -48,6 +52,9 @@ export function SegmentedChoice<T extends string>({
     0,
     options.findIndex((option) => option.value === value),
   );
+  const hintId = useId();
+  // The sheet explains the current choice in words a touch reader can see.
+  const caption = block && !iconOnly ? options[selectedIndex]?.hint : undefined;
 
   const select = (index: number) => {
     const option = options[index];
@@ -77,15 +84,16 @@ export function SegmentedChoice<T extends string>({
     select(next);
   };
 
-  return (
+  const group = (
     <div
       role="radiogroup"
       aria-label={label}
+      aria-describedby={caption ? hintId : undefined}
       className={cn(
         tabsListVariants({ variant: 'segmented' }),
         block && 'flex w-full',
         'shrink-0',
-        className,
+        caption ? undefined : className,
       )}
     >
       {options.map((option, index) => {
@@ -116,7 +124,7 @@ export function SegmentedChoice<T extends string>({
           </button>
         );
         const hint = option.hint ?? (iconOnly ? option.label : undefined);
-        return hint ? (
+        return hint && !caption ? (
           <Tooltip key={option.value}>
             <TooltipTrigger asChild>{button}</TooltipTrigger>
             <TooltipContent side="bottom">{hint}</TooltipContent>
@@ -125,6 +133,16 @@ export function SegmentedChoice<T extends string>({
           button
         );
       })}
+    </div>
+  );
+
+  if (!caption) return group;
+  return (
+    <div className={cn('space-y-2', className)}>
+      {group}
+      <p id={hintId} className="type-caption text-subtle">
+        {caption}
+      </p>
     </div>
   );
 }

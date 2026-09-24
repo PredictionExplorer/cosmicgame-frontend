@@ -3,9 +3,7 @@
     "title": "トークンIDが無効です"
   },
   "jsonLd": {
-    "productName": "Cosmic Signature NFT #{id}",
-    "productDescription": "Cosmic Signatureから生まれたジェネラティブNFT。三体問題の物理シミュレーションが、一点ごとに異なる軌跡を描きます。",
-    "breadcrumbToken": "トークン #{id}"
+    "productDescription": "Cosmic Signatureから生まれたジェネラティブNFT。三体問題の物理シミュレーションが、一点ごとに異なる軌跡を描きます。"
   },
   "badges": {
     "stellarSelectionRecipient": "星選の受領者",
@@ -38,6 +36,10 @@
     "tabs": {
       "name": "名前",
       "transfer": "移転"
+    },
+    "anchor": {
+      "button": "{id}を係留",
+      "note": "係留したNFTは、確定した各サイクルの係留配分を分け合います。係留は各NFTにつき一度しかできないため、係留解除は取り消せません。"
     },
     "metaMaskTooltip": "MetaMaskのブラウザー拡張機能にこのNFTを追加します。NFTのインポートは実験的な機能で、MetaMask Mobileには対応していません。",
     "addToMetaMask": "NFTをMetaMaskに追加",

@@ -643,6 +643,8 @@
   "namedNfts": {
     "title": "名前付きCosmic Signature NFT",
     "subtitle": "固有の名前が付けられたCosmic Signature NFTを見る",
+    "loadErrorTitle": "名前付きNFTを読み込めませんでした",
+    "loadErrorMessage": "名前付きNFTの記録を読み込めませんでした。もう一度お試しください。",
     "emptyTitle": "名前付きNFTはありません",
     "emptyDescription": "名前を付けられたCosmic Signature NFTはまだありません。",
     "galleryLink": "ギャラリーで見る"

@@ -97,6 +97,49 @@ describe('trait filter state helpers', () => {
 });
 
 describe('GalleryTraitFacets', () => {
+  it('hands focus to the trait heading when "Clear <trait>" removes itself', () => {
+    const props = {
+      collectionTraits,
+      chaosRange: null,
+      onToggleValue: jest.fn(),
+      onClearKey: jest.fn(),
+      onChaosChange: jest.fn(),
+      onClearAll: jest.fn(),
+    };
+    const { rerender } = render(
+      <GalleryTraitFacets {...props} selected={{ structure: ['Orbit Ribbons'] }} />,
+    );
+    const clear = screen.getByRole('button', { name: /^Clear (?!all)/ });
+    fireEvent.click(clear);
+    expect(props.onClearKey).toHaveBeenCalledWith('structure');
+    rerender(<GalleryTraitFacets {...props} selected={{}} />);
+    const trigger = document.querySelector<HTMLElement>('[data-facet="structure"] button');
+    expect(trigger).not.toBeNull();
+    expect(trigger).toHaveFocus();
+  });
+
+  it('hands focus to the first control of the panel when "Clear all" removes itself', () => {
+    const props = {
+      collectionTraits,
+      chaosRange: null,
+      onToggleValue: jest.fn(),
+      onClearKey: jest.fn(),
+      onChaosChange: jest.fn(),
+      onClearAll: jest.fn(),
+    };
+    const { rerender } = render(
+      <GalleryTraitFacets {...props} selected={{ fate: ['Ejection'] }} />,
+    );
+    const facets = screen.getByTestId('trait-facets');
+    const buttons = within(facets).getAllByRole('button');
+    // The header's Clear all is the panel's first button while a filter is on.
+    fireEvent.click(buttons[0]!);
+    expect(props.onClearAll).toHaveBeenCalled();
+    rerender(<GalleryTraitFacets {...props} selected={{}} />);
+    expect(document.activeElement).not.toBe(document.body);
+    expect(facets.contains(document.activeElement)).toBe(true);
+  });
+
   it('lists facet options with counts and toggles them', () => {
     const { props } = renderFacets();
     const option = screen.getByLabelText('Orbit Ribbons: 1 NFTs');

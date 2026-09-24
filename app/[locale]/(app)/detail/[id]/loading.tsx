@@ -1,9 +1,15 @@
-import { NftDetailSkeleton } from '@/components/ui/page-skeletons';
+import { NFTDetailSkeleton } from '@/components/nft/NFTDetailSkeleton';
+import { PageShell } from '@/components/ui/page-shell';
 
 /**
- * A Cosmic Signature NFT page while it renders on the server.
- * The skeleton keeps the page's shape, so nothing moves when it arrives.
+ * A Cosmic Signature NFT page while it renders on the server: the same
+ * skeleton, shell and (absent) backdrop as the page's own loading state, so a
+ * click from a wall never flashes a different layout before the page lands.
  */
 export default function NftDetailLoading() {
-  return <NftDetailSkeleton />;
+  return (
+    <PageShell variant="detail" backdrop="none" className="max-w-none px-0">
+      <NFTDetailSkeleton />
+    </PageShell>
+  );
 }

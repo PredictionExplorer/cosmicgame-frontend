@@ -27,12 +27,26 @@ describe('SignatureCard', () => {
     expect(card.textContent).toMatch(/Orbit Ribbons\u00a0· \S/);
   });
 
+  it('says "Rendering" for a fresh imprint without art, as its own page does', () => {
+    const imprintedAt = Math.floor(Date.now() / 1000) - 5 * 60;
+    render(<SignatureCard tokenId={420} imprintedAt={imprintedAt} sizes="400px" />);
+    expect(screen.getByTestId('pending-plate')).toHaveTextContent('detail.image.rendering');
+  });
+
+  it('says "Artwork unavailable" once the render window has passed', () => {
+    const imprintedAt = Math.floor(Date.now() / 1000) - 2 * 60 * 60;
+    render(<SignatureCard tokenId={420} imprintedAt={imprintedAt} sizes="400px" />);
+    expect(screen.getByTestId('pending-plate')).toHaveTextContent(
+      'detail.image.artworkUnavailable',
+    );
+  });
+
   it('puts the number in the caption of a named Signature', () => {
     render(
       <SignatureCard tokenId={25} seed="a1" name="Twisted Mind" entry={entry} sizes="400px" />,
     );
     expect(screen.getByText('Twisted Mind')).toBeInTheDocument();
-    expect(screen.getByText('#000025')).toHaveClass('type-mono');
+    expect(screen.getByText('#000025')).toHaveClass('tabular-nums');
   });
 
   it('is one link to the detail page, named by the alt text composed from the traits', () => {

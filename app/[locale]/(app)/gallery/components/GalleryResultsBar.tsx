@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
@@ -21,10 +21,13 @@ interface GalleryResultsBarProps {
   className?: string;
 }
 
+/** Id of the result count, where focus lands when the last filter goes. */
+export const GALLERY_RESULT_COUNT_ID = 'gallery-result-count';
+
 /**
  * The line between the toolbar and the grid: how many Signatures the view
  * shows (announced politely as filters change), the active filter chips and
- * "Clear all".
+ * "Clear all". "Clear all" removes itself, so it hands focus to the count.
  */
 export function GalleryResultsBar({
   count,
@@ -37,6 +40,14 @@ export function GalleryResultsBar({
 }: GalleryResultsBarProps) {
   const t = useTranslations('gallery');
   const tTraits = useTranslations('traits');
+  const countRef = useRef<HTMLParagraphElement>(null);
+  const clearing = useRef(false);
+
+  useEffect(() => {
+    if (filtered || !clearing.current) return;
+    clearing.current = false;
+    countRef.current?.focus();
+  }, [filtered]);
 
   return (
     <div
@@ -44,9 +55,12 @@ export function GalleryResultsBar({
       data-testid="gallery-results-bar"
     >
       <p
+        ref={countRef}
+        id={GALLERY_RESULT_COUNT_ID}
         role="status"
         aria-live="polite"
-        className="inline-flex min-h-8 items-center type-label tabular-nums text-muted-foreground"
+        tabIndex={-1}
+        className="inline-flex min-h-8 items-center rounded-edge type-label tabular-nums text-muted-foreground"
         data-testid="gallery-result-count"
       >
         {count === null
@@ -57,7 +71,15 @@ export function GalleryResultsBar({
       </p>
       {chips}
       {filtered ? (
-        <Button variant="quiet" size="sm" onClick={onClearAll} className="px-1.5">
+        <Button
+          variant="quiet"
+          size="sm"
+          onClick={() => {
+            clearing.current = true;
+            onClearAll();
+          }}
+          className="px-1.5"
+        >
           {tTraits('facets.clearAll')}
         </Button>
       ) : null}

@@ -3,9 +3,7 @@
     "title": "Недійсний ID токена"
   },
   "jsonLd": {
-    "productName": "Cosmic Signature NFT {id}",
-    "productDescription": "Унікальний генеративний NFT протоколу ончейн-мистецтва Cosmic Signature, створений за допомогою фізичної симуляції задачі трьох тіл.",
-    "breadcrumbToken": "Токен {id}"
+    "productDescription": "Унікальний генеративний NFT протоколу ончейн-мистецтва Cosmic Signature, створений за допомогою фізичної симуляції задачі трьох тіл."
   },
   "badges": {
     "stellarSelectionRecipient": "Отримувач зоряного відбору",
@@ -38,6 +36,10 @@
     "tabs": {
       "name": "Ім’я",
       "transfer": "Передача"
+    },
+    "anchor": {
+      "button": "Закріпити {id}",
+      "note": "Закріплений NFT ділить надходження за закріплення кожного завершеного циклу. Кожен NFT можна закріпити лише один раз, тож відкріплення остаточне."
     },
     "metaMaskTooltip": "Запропонувати розширенню MetaMask для браузера показати цей NFT. Імпорт NFT — експериментальна функція, недоступна в MetaMask Mobile.",
     "addToMetaMask": "Додати NFT у MetaMask",

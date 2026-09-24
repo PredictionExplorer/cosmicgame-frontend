@@ -4,6 +4,7 @@ import { useLocale, useTranslations } from 'next-intl';
 
 import { getExplorerUrl } from '@/utils/urls';
 import { formatAddress, formatCount } from '@/utils/format';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
   DataTable,
@@ -14,7 +15,11 @@ import {
 import { DateTime } from '@/components/ui/date-time';
 import NFTImage from '@/components/nft/NFTImage';
 
-import { getAttachedNftTokenId, resolveAttachedNftLink } from './attachedNftLinks';
+import {
+  getAttachedNftTokenId,
+  nameCarriesTokenId,
+  resolveAttachedNftLink,
+} from './attachedNftLinks';
 import { useAttachedNftMetadata } from './useAttachedNftMetadata';
 
 export interface NFTRecord {
@@ -48,26 +53,40 @@ function useRecordMetadata(nft: NFTRecord) {
   });
 }
 
-/** The attached NFT's image on a small black plate. */
-function AttachedNftThumb({ nft }: { nft: NFTRecord }) {
+/**
+ * The attached NFT's image on a small black plate: 64px in the table, 96px
+ * beside the name in a phone record. A skeleton while its metadata loads; the
+ * captioned unavailable state only once it has settled without an image.
+ */
+function AttachedNftThumb({ nft, className }: { nft: NFTRecord; className?: string }) {
   const t = useTranslations('tables');
-  const { data: metadata } = useRecordMetadata(nft);
+  const { data: metadata, isLoading } = useRecordMetadata(nft);
   return (
-    <div className="size-16 overflow-hidden rounded-edge bg-art-ground shadow-[var(--art-edge)] max-sm:size-40">
+    <div
+      className={cn(
+        'size-16 overflow-hidden rounded-edge bg-art-ground shadow-[var(--art-edge)]',
+        className,
+      )}
+    >
       <NFTImage
         src={metadata?.image}
         fallbackSrc={metadata?.imageFallback}
+        pending={isLoading}
         alt={t('attachedAssets.nft.imageAlt', { id: getAttachedNftTokenId(nft) ?? '' })}
         unavailableLabel={t('attachedAssets.nft.imageUnavailable')}
         density="compact"
-        sizes="(max-width: 639px) 10rem, 64px"
+        sizes="(max-width: 639px) 6rem, 64px"
         className="aspect-square h-full w-full bg-transparent object-contain"
       />
     </div>
   );
 }
 
-/** The NFT's name (or number) linked to its page, with its number under a name. */
+/**
+ * The NFT's name (or number) linked to its page, with its number under a
+ * name that does not already carry it. A phone record leads with the image
+ * beside it.
+ */
 function AttachedNftToken({ nft }: { nft: NFTRecord }) {
   const t = useTranslations('tables');
   const { data: metadata } = useRecordMetadata(nft);
@@ -77,15 +96,20 @@ function AttachedNftToken({ nft }: { nft: NFTRecord }) {
   const link = resolveAttachedNftLink({ nft, metadata });
   const title = name || number;
   return (
-    <span className="flex min-w-0 flex-col">
-      {link.href ? (
-        <ExternalTableLink href={link.href} className="font-medium text-foreground">
-          {title}
-        </ExternalTableLink>
-      ) : (
-        <span className="font-medium text-foreground">{title}</span>
-      )}
-      {name ? <span className="type-mono text-subtle">{number}</span> : null}
+    <span className="flex min-w-0 items-center gap-3">
+      <AttachedNftThumb nft={nft} className="size-24 shrink-0 sm:hidden" />
+      <span className="flex min-w-0 flex-col">
+        {link.href ? (
+          <ExternalTableLink href={link.href} className="font-medium text-foreground">
+            {title}
+          </ExternalTableLink>
+        ) : (
+          <span className="font-medium text-foreground">{title}</span>
+        )}
+        {name && !nameCarriesTokenId(name, tokenId) ? (
+          <span className="tabular-nums text-subtle">{number}</span>
+        ) : null}
+      </span>
     </span>
   );
 }
@@ -106,18 +130,21 @@ const DonatedNFTTable = ({
 
   const columns: DataTableColumn<NFTRecord>[] = [
     {
-      // On a phone the picture leads its record, full width and unlabelled.
+      // A phone record draws the picture beside the name (the token cell).
       id: 'image',
       header: <span className="sr-only">{t('attachedAssets.nft.columns.tokenImage')}</span>,
       label: '',
-      stack: true,
+      priority: 'secondary',
       value: (row) => getAttachedNftTokenId(row),
       width: '5.5rem',
       cell: (row) => <AttachedNftThumb nft={row} />,
     },
     {
+      // A phone record leads with the picture and the name, unlabelled.
       id: 'token',
       header: t('attachedAssets.nft.columns.tokenId'),
+      label: '',
+      stack: true,
       value: (row) => getAttachedNftTokenId(row),
       cell: (row) => <AttachedNftToken nft={row} />,
     },

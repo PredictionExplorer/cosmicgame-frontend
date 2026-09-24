@@ -12,7 +12,11 @@ import { DateTime } from '@/components/ui/date-time';
 import NFTImage from '@/components/nft/NFTImage';
 import { TableLink } from '@/components/ui/data-table';
 
-import { getAttachedNftTokenId, resolveAttachedNftLink } from './attachedNftLinks';
+import {
+  getAttachedNftTokenId,
+  nameCarriesTokenId,
+  resolveAttachedNftLink,
+} from './attachedNftLinks';
 import { useAttachedNftMetadata } from './useAttachedNftMetadata';
 
 type NFT = Partial<
@@ -31,6 +35,8 @@ interface AttachedNFTProps {
    * and by whom (the Attached NFT Contributions page).
    */
   showRecord?: boolean;
+  /** The first row of a wall in the first viewport: load the image eagerly. */
+  priority?: boolean;
   className?: string;
 }
 
@@ -51,16 +57,40 @@ function Caption({ facts, className }: { facts: readonly ReactNode[]; className?
 }
 
 /**
+ * The title with the external-link arrow bound to its last word, so a
+ * wrapped title keeps the arrow at the end of its text, never alone at the
+ * far edge of the card.
+ */
+function TitleWithArrow({ text, arrow }: { text: string; arrow: boolean }) {
+  if (!arrow) return <>{text}</>;
+  const cut = text.lastIndexOf(' ') + 1;
+  return (
+    <>
+      {text.slice(0, cut)}
+      <span className="whitespace-nowrap">
+        {text.slice(cut)}
+        <ArrowUpRight aria-hidden className="ms-1 inline size-3.5 align-[-0.125em] text-subtle" />
+      </span>
+    </>
+  );
+}
+
+/**
  * An NFT attached to a gesture, shown as a work on a black plate: the image
  * whole (object-contain) on a square ground, then its name or number and its
  * collection. The plate and title link to the NFT on its project's site,
  * OpenSea or the explorer (a new tab); `showRecord` adds the cycle, the date
  * and the contributor, each with its own link.
  */
-const AttachedNFT = ({ nft, showRecord = false, className }: AttachedNFTProps) => {
+const AttachedNFT = ({
+  nft,
+  showRecord = false,
+  priority = false,
+  className,
+}: AttachedNFTProps) => {
   const t = useTranslations('statistics');
   const locale = useLocale();
-  const { data: metadata } = useAttachedNftMetadata(nft.NFTTokenURI, {
+  const { data: metadata, isLoading } = useAttachedNftMetadata(nft.NFTTokenURI, {
     tokenAddr: nft.TokenAddr,
     tokenId: nft.NFTTokenId ?? nft.TokenId,
   });
@@ -92,6 +122,8 @@ const AttachedNFT = ({ nft, showRecord = false, className }: AttachedNFTProps) =
       <NFTImage
         src={metadata?.image}
         fallbackSrc={metadata?.imageFallback}
+        pending={isLoading}
+        priority={priority}
         alt={name ? t('attachedNftCard.imageAltNamed', { name }) : t('attachedNftCard.imageAlt')}
         density="compact"
         sizes="(min-width: 1024px) 18rem, (min-width: 640px) 33vw, 50vw"
@@ -101,16 +133,16 @@ const AttachedNFT = ({ nft, showRecord = false, className }: AttachedNFTProps) =
   );
   const label = (
     <div className="mt-3 min-w-0">
-      <p className="flex items-start gap-1 type-body-sm font-medium text-foreground [overflow-wrap:anywhere]">
-        <span className="line-clamp-2 decoration-rule underline-offset-4 group-hover:underline">
-          {name || number}
-        </span>
-        {link.href ? (
-          <ArrowUpRight aria-hidden className="mt-0.5 size-3.5 shrink-0 text-subtle" />
-        ) : null}
+      <p className="line-clamp-2 type-body-sm font-medium text-foreground decoration-rule underline-offset-4 [overflow-wrap:anywhere] group-hover:underline">
+        <TitleWithArrow text={name || number} arrow={Boolean(link.href)} />
       </p>
       <Caption
-        facts={[name ? <span className="type-mono">{number}</span> : null, collection]}
+        facts={[
+          name && !nameCarriesTokenId(name, tokenId) ? (
+            <span className="tabular-nums">{number}</span>
+          ) : null,
+          collection,
+        ]}
         className="mt-0.5 truncate"
       />
     </div>

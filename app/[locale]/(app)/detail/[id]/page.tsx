@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { getAssetsUrl, logoImgUrl } from '@/utils';
+import { formatId, getAssetsUrl, logoImgUrl } from '@/utils';
 
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import {
@@ -18,8 +18,10 @@ import type { CSTTokenInfo } from '@/services/api/types';
 import { createMetadata } from '@/utils/seo';
 import { JsonLd, nftProductJsonLd, breadcrumbJsonLd } from '@/utils/jsonLd';
 import { PageMessages } from '@/components/i18n/PageMessages';
+import { signatureTitle } from '@/components/nft/nftName';
 
 import DetailPage from './DetailPage';
+import { parseTokenId } from './tokenId';
 
 /**
  * ISR (was force-dynamic): token metadata is immutable once imprinted, so a
@@ -33,12 +35,6 @@ export const revalidate = 300;
 
 interface PageProps {
   params: Promise<{ locale: string; id: string }>;
-}
-
-function parseTokenId(id: string): number | null {
-  if (!/^\d+$/.test(id)) return null;
-  const tokenId = Number(id);
-  return Number.isSafeInteger(tokenId) ? tokenId : null;
 }
 
 function tokenImageUrl(seed: string | number | undefined): string {
@@ -128,7 +124,6 @@ export default async function Page({ params }: PageProps) {
     loadTokenMetadata(tokenId),
   ]);
 
-  const name = t('jsonLd.productName', { id });
   const description = t('jsonLd.productDescription');
   const pageUrl = localeHref(APP_ORIGIN, `/detail/${id}`, locale);
 
@@ -136,6 +131,9 @@ export default async function Page({ params }: PageProps) {
     notFound();
   }
 
+  // The page's own title (the H1 and the end of its trail): the name, or
+  // "Cosmic Signature #000025" for an unnamed Signature.
+  const title = signatureTitle(tTraits, { id: formatId(tokenId), name: tokenInfo?.TokenName });
   const imageUrl = tokenImageUrl(tokenInfo?.Seed);
   const traitEntry = metadata ? normalizeTraitEntry(metadata, tokenId) : null;
   const additionalProperty = traitEntry?.hasArtTraits
@@ -148,7 +146,7 @@ export default async function Page({ params }: PageProps) {
         <JsonLd
           data={nftProductJsonLd({
             tokenId,
-            name,
+            name: title,
             description,
             imageUrl,
             url: pageUrl,
@@ -161,7 +159,7 @@ export default async function Page({ params }: PageProps) {
             [
               { name: tCommon('breadcrumbs.home'), path: '/' },
               { name: tCommon('breadcrumbs.gallery'), path: '/gallery' },
-              { name: t('jsonLd.breadcrumbToken', { id }), path: `/detail/${id}` },
+              { name: title, path: `/detail/${id}` },
             ],
             localeHref(APP_ORIGIN, '/', locale),
           )}

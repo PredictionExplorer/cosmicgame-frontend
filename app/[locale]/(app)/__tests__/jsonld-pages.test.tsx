@@ -37,6 +37,7 @@ jest.mock('../contracts/ContractsSeoSummary', () => ({
 jest.mock('../QuerySeed', () => ({
   DashboardQuerySeed: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   QuerySeed: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  seedsDisabled: () => false,
 }));
 // /contracts and /gallery hand their bodies a server read; the JSON-LD does not depend on it.
 jest.mock('../publicDataReads', () => ({

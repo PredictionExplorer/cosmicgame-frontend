@@ -81,7 +81,7 @@ describe('UsedRwlkNftsPage', () => {
     const tokenLink = within(card).getByRole('link', { name: /RandomWalk NFT #000215/ });
     expect(tokenLink).toHaveAttribute('href', 'https://www.randomwalknft.com/detail/215');
     expect(tokenLink).toHaveAttribute('target', '_blank');
-    expect(within(card).getByRole('link', { name: 'Cycle 1' })).toHaveAttribute(
+    expect(within(card).getByRole('link', { name: 'Cycle #1' })).toHaveAttribute(
       'href',
       '/allocation/1',
     );
@@ -132,6 +132,15 @@ describe('UsedRwlkNftsPage', () => {
     ).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /Try again/ }));
     expect(refetch).toHaveBeenCalled();
+  });
+
+  it('never says nothing was used under a header that counted uses', () => {
+    mockUseUsedRWLKNFTs.mockReturnValue(state());
+    render(<UsedRwlkNftsPage snapshotCount={3} />);
+    expect(screen.queryByRole('heading', { name: 'No RandomWalk NFTs used yet' })).toBeNull();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Used RandomWalk NFTs could not be loaded' }),
+    ).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
