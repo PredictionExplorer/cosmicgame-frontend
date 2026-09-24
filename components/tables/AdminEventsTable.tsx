@@ -3,6 +3,8 @@
 import { useMemo, type ReactNode } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
+import { cn } from '@/lib/utils';
+import { TOUCH_TARGET_EXTENDED_CLASS } from '@/lib/touch-target';
 import { formatCount, formatPercent } from '@/utils/format';
 import { ADMIN_EVENTS } from '@/config/misc';
 import { AddressChip } from '@/components/ui/address-chip';
@@ -113,9 +115,15 @@ export const AdminEventsTable = ({ list, ...state }: AdminEventsTableProps) => {
             ? tStatistics(`systemEvent.adminEvents.${event.messageKey}`)
             : event?.description;
           // The name explains itself (a dotted underline, one tab stop)
-          // rather than carrying an info button after it on every row.
+          // rather than carrying an info button after it on every row. On a
+          // phone a transparent pad gives the word a 44px target without
+          // making the row taller.
           return explanation ? (
-            <ExplainedTerm definition={explanation} className="text-foreground">
+            <ExplainedTerm
+              definition={explanation}
+              data-touch-target="extended"
+              className={cn(TOUCH_TARGET_EXTENDED_CLASS, 'text-foreground')}
+            >
               {name}
             </ExplainedTerm>
           ) : (
