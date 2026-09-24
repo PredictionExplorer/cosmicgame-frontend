@@ -140,6 +140,30 @@ describe('GestureHistoryTable', () => {
     expect(headers).toContain('tables.columns.gestureCost');
   });
 
+  test('holds a finished cycle’s last gesture until the cycle ended', () => {
+    // Regression: on /allocation/N the newest gesture's hold kept ticking
+    // forever ("43d 4h 6m 3s" on cycle 1).
+    const gesture = (id: number, timeStamp: number) => ({
+      EvtLogId: id,
+      TimeStamp: timeStamp,
+      BidderAddr: '0x555eced709352759Ed0f1317dfC0a5FEf1310e60',
+      GestureType: 0,
+      EthPriceEth: 0.1,
+      RoundNum: 1,
+    });
+    const { container } = render(
+      <GestureHistoryTable
+        gestureHistory={[gesture(2, 1_700_000_600), gesture(1, 1_700_000_000)]}
+        showRound={false}
+        heldUntil={1_700_004_239}
+      />,
+    );
+    const holds = Array.from(container.querySelectorAll('td[data-kind="duration"]')).map((cell) =>
+      cell.textContent?.replace(/\s+/g, ' '),
+    );
+    expect(holds).toEqual(['1h 0m 39s', '10m']);
+  });
+
   test('uses localized alt text for the Random Walk NFT image', () => {
     render(
       <GestureHistoryTable
