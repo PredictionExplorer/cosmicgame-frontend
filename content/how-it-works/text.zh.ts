@@ -24,7 +24,7 @@ export const howItWorksTextZh = {
     headingAccent: '运作原理',
     paragraph:
       '落笔，坚守，塑造签名。参与者在演绎周期中落笔；收官倒计时归零后，周期即可收官，储备将沿十余条分配轨道发放——签名分配、锚定派发与 Protocol Guild 都在其中。',
-    primaryCtaLabel: '进入协议',
+    primaryCtaLabel: '落笔',
     secondaryCtaLabel: '了解更多',
   },
   overview: {
@@ -200,7 +200,7 @@ export const howItWorksTextZh = {
   callToAction: {
     heading: '准备落下第一笔了吗？',
     body: '加入当前演绎周期。连接钱包，落下第一笔，共同塑造这一周期的签名。',
-    primaryCtaLabel: '进入协议',
+    primaryCtaLabel: '落笔',
     discordCtaLabel: 'Discord',
     twitterCtaLabel: 'Twitter / X',
   },

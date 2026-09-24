@@ -30,7 +30,7 @@ export const landingTextEn = {
       'Take part in a living art protocol on Arbitrum. Every gesture helps shape the next Signature; every cycle distributes its reserves among participants and Ethereum’s public infrastructure.',
     biologyDisclaimer:
       'Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC mutational signatures in biology. It is an on-chain art protocol and app.',
-    primaryCtaLabel: 'Open the App',
+    primaryCtaLabel: 'Open the app',
     secondaryCtaLabel: 'Explore the Cycle',
     statisticsCtaLabel: 'Protocol statistics',
     galleryCtaLabel: 'NFT gallery',

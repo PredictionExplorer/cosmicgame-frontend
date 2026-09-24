@@ -193,7 +193,7 @@ describe('<EventHorizonCountdown />', () => {
     expect(screen.getByRole('timer')).toHaveAccessibleName(/landing\.timer\.countdownAria/);
     expect(screen.getByText(/landing\.timer\.gestureCount\(count=55\)/)).toBeInTheDocument();
     expect(screen.getByText('landing.timer.sameClock')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /landing\.timer\.openLiveCycle/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /nav\.cta\.openApp/i })).toHaveAttribute(
       'href',
       'https://app.cosmicsignature.com',
     );

@@ -24,7 +24,7 @@ export const howItWorksTextZhHk = {
     headingAccent: '運作原理',
     paragraph:
       '落筆，堅守，塑造簽名。參與者在演繹週期中落筆；收官倒數歸零後，週期即可收官，儲備將沿十餘條分配軌道發放——簽名分配、錨定派發與 Protocol Guild 都在其中。',
-    primaryCtaLabel: '進入協議',
+    primaryCtaLabel: '落筆',
     secondaryCtaLabel: '了解更多',
   },
   overview: {
@@ -199,7 +199,7 @@ export const howItWorksTextZhHk = {
   callToAction: {
     heading: '準備落下第一筆了嗎？',
     body: '加入目前演繹週期。連接錢包，落下第一筆，共同塑造這一週期的簽名。',
-    primaryCtaLabel: '進入協議',
+    primaryCtaLabel: '落筆',
     discordCtaLabel: 'Discord',
     twitterCtaLabel: 'Twitter / X',
   },

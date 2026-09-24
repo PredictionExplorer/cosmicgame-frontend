@@ -24,7 +24,7 @@ export const howItWorksTextUk = {
     headingAccent: 'Cosmic Signature',
     paragraph:
       'Жест за жестом учасники формують Сигнатуру протягом перформанс-циклу. Коли відлік дійде до нуля, цикл можна завершити. Тоді протокол виконає розподіли за понад десятьма напрямами, серед яких розподіл Сигнатури, надходження за закріплення та підтримка Protocol Guild.',
-    primaryCtaLabel: 'Відкрити протокол',
+    primaryCtaLabel: 'Зробити жест',
     secondaryCtaLabel: 'Дізнатися більше',
   },
   overview: {
@@ -217,7 +217,7 @@ export const howItWorksTextUk = {
     // The JSX original rendered a literal "\u2019" because unicode escapes are
     // not processed inside JSX text; this is the intentional fix to a real ’.
     body: 'Під’єднайте гаманець і зробіть жест у поточному перформанс-циклі, щоб долучитися до створення Сигнатури та мати змогу закарбувати CST участі.',
-    primaryCtaLabel: 'Відкрити протокол',
+    primaryCtaLabel: 'Зробити жест',
     discordCtaLabel: 'Discord',
     twitterCtaLabel: 'Twitter / X',
   },

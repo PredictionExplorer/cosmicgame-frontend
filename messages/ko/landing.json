@@ -58,7 +58,6 @@
       "waitingFirstGesture": "열려 있으며 첫 제스처를 기다리는 중",
       "synchronized": "프로토콜 시간에 동기화된 카운트다운"
     },
-    "openLiveCycle": "실시간 사이클 열기",
     "viewCstPool": "GeckoTerminal의 CST 풀",
     "eventHorizon": "사건의 지평선",
     "countdownAria": "{label}: {duration}",

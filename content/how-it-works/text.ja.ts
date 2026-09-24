@@ -26,7 +26,7 @@ export const howItWorksTextJa = {
     headingAccent: '仕組み',
     paragraph:
       '一筆を重ね、時間を見守り、シグネチャーを形づくります。確定時刻を過ぎるとサイクルを確定でき、準備金はシグネチャー配分、係留配分、Protocol Guildなど、10を超えるトラックへ配分されます。',
-    primaryCtaLabel: 'プロトコルを開く',
+    primaryCtaLabel: '一筆を入れる',
     secondaryCtaLabel: '詳しく知る',
   },
   overview: {
@@ -216,7 +216,7 @@ export const howItWorksTextJa = {
   callToAction: {
     heading: '最初の一筆を入れる準備はできましたか？',
     body: 'ウォレットを接続して、進行中のサイクルに最初の一筆を入れられます。一筆がシグネチャーを形づくり、経過時間に応じて参加CSTが刻印されることもあります。',
-    primaryCtaLabel: 'プロトコルを開く',
+    primaryCtaLabel: '一筆を入れる',
     discordCtaLabel: 'Discord',
     twitterCtaLabel: 'Twitter / X',
   },

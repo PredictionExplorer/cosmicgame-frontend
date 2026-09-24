@@ -24,7 +24,7 @@ export const howItWorksTextEn = {
     headingAccent: 'Works',
     paragraph:
       'Gesture. Endure. Shape the Signature. Participants make gestures during a Performance Cycle. When the Cycle Finalization Time expires, the cycle can be finalized and allocations distribute across more than ten tracks — including the Signature Allocation, Anchor Distributions, and Protocol Guild.',
-    primaryCtaLabel: 'Open the Protocol',
+    primaryCtaLabel: 'Make a Gesture',
     secondaryCtaLabel: 'Learn More',
   },
   overview: {
@@ -157,7 +157,7 @@ export const howItWorksTextEn = {
         tooltip: `Each Random Walk NFT can be used once for the ${protocolFacts.randomWalkDiscountPercentage}% ETH Gesture Cost reduction - choose your moment wisely.`,
         highlights: [
           `Choose ETH, optionally attach a Random Walk NFT for a ${protocolFacts.randomWalkDiscountPercentage}% ETH Gesture Cost reduction, or make a CST (ERC-20) gesture.`,
-          'Click "Gesture Now" and confirm the transaction in your wallet.',
+          'Press the gesture button, which names the method and the cost (for example "Gesture with ETH"), and confirm the transaction in your wallet.',
           'Your gesture extends the Cycle Finalization Time and updates the ETH/CST cost state.',
           'Every gesture records a Stellar Selection entry and may imprint dynamic Participation CST automatically.',
         ],
@@ -219,7 +219,7 @@ export const howItWorksTextEn = {
     // The JSX original rendered a literal "\u2019" because unicode escapes are
     // not processed inside JSX text; this is the intentional fix to a real ’.
     body: 'Join the active Performance Cycle. Connect your wallet and make your first gesture to start imprinting CST and shaping the cycle’s Signature.',
-    primaryCtaLabel: 'Open the Protocol',
+    primaryCtaLabel: 'Make a Gesture',
     discordCtaLabel: 'Discord',
     twitterCtaLabel: 'Twitter / X',
   },

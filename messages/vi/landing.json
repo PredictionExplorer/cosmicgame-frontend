@@ -58,7 +58,6 @@
       "waitingFirstGesture": "Đã mở và đang chờ nét bút đầu tiên",
       "synchronized": "Đếm ngược đồng bộ với thời gian giao thức"
     },
-    "openLiveCycle": "Mở chu kỳ trực tiếp",
     "viewCstPool": "Pool CST trên GeckoTerminal",
     "eventHorizon": "Chân trời sự kiện",
     "countdownAria": "{label}: {duration}",

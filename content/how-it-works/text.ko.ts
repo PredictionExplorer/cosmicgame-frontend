@@ -24,7 +24,7 @@ export const howItWorksTextKo = {
     headingAccent: '작동 원리',
     paragraph:
       '제스처를 남기고, 시간을 지켜보며, 시그니처를 함께 빚어냅니다. 참여자는 퍼포먼스 사이클 동안 제스처를 남기고, 사이클 마감 시각이 지나면 사이클을 마감할 수 있습니다. 배분은 시그니처 배분, 앵커링 지급, Protocol Guild를 비롯한 10개가 넘는 경로로 이루어집니다.',
-    primaryCtaLabel: '프로토콜 열기',
+    primaryCtaLabel: '제스처 남기기',
     secondaryCtaLabel: '자세히 알아보기',
   },
   overview: {
@@ -215,7 +215,7 @@ export const howItWorksTextKo = {
     // The JSX original rendered a literal "\u2019" because unicode escapes are
     // not processed inside JSX text; this is the intentional fix to a real ’.
     body: '지금 진행 중인 퍼포먼스 사이클에 참여해 주세요. 지갑을 연결하고 첫 제스처를 남기면 참여 CST가 각인될 수 있고, 사이클의 시그니처가 빚어지기 시작합니다.',
-    primaryCtaLabel: '프로토콜 열기',
+    primaryCtaLabel: '제스처 남기기',
     discordCtaLabel: 'Discord',
     twitterCtaLabel: 'Twitter / X',
   },
