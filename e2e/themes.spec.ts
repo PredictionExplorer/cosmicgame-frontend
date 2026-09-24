@@ -182,7 +182,7 @@ test('palette menu works with the keyboard and follows a language change', async
   await page.keyboard.press('Enter');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'classic-blue');
   await expect(trigger).toBeFocused();
-  await page.getByRole('button', { name: 'Language', exact: true }).click();
+  await page.getByRole('button', { name: 'Language: English', exact: true }).click();
   await page.getByRole('menuitemradio', { name: 'Українська', exact: true }).click();
   await expect(page.locator('html')).toHaveAttribute('lang', 'uk');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'classic-blue');

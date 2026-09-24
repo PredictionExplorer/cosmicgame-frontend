@@ -50,8 +50,9 @@ test.describe('Sprint 1 Chinese layout QA', () => {
       await expectNoHorizontalOverflow(page);
 
       await page.goto('/zh/gallery');
-      await expect(page.getByRole('textbox', { name: '搜索 NFT' })).toBeVisible();
-      await expect(page.getByRole('button', { name: '搜索', exact: true })).toBeVisible();
+      // The gallery filters as the visitor types: a search field and the filter control.
+      await expect(page.getByRole('searchbox', { name: '搜索 NFT' })).toBeVisible();
+      await expect(page.getByRole('button', { name: '筛选' }).first()).toBeVisible();
       await expectNoHorizontalOverflow(page);
 
       await page.goto('/zh/site-map');
@@ -71,7 +72,7 @@ test.describe('Sprint 1 Chinese layout QA', () => {
 
       await page.goto('/zh/allocation');
       const allocationChrome = page
-        .getByRole('list', { name: '按周期排列的获配者列表' })
+        .getByRole('table', { name: '已收官周期' })
         .or(page.getByText('暂无获配者', { exact: true }))
         .or(page.getByRole('status', { name: '正在加载周期分配' }));
       await expect(allocationChrome.first()).toBeVisible();
@@ -167,7 +168,7 @@ test.describe('Sprint 4 Chinese layout QA', () => {
 
       await page.goto('/zh/my-allocations');
       await expect(page.getByText('我的分配', { exact: true }).first()).toBeVisible();
-      await expect(page.getByText('连接钱包后即可查看并取回分配。', { exact: true })).toBeVisible();
+      await expect(page.getByText('连接钱包，查看你的分配', { exact: true })).toBeVisible();
       await expectNoHorizontalOverflow(page);
       await testInfo.attach(`zh-my-allocations-${viewport.name}`, {
         body: await page.screenshot({ fullPage: true }),
@@ -185,9 +186,7 @@ test.describe('Sprint 4 Chinese layout QA', () => {
 
       await page.goto('/zh/transfer-cst');
       await expect(page.getByRole('heading', { level: 1, name: '转账 CST' })).toBeVisible();
-      await expect(
-        page.getByText('连接钱包后即可从余额中转账 CST。', { exact: true }),
-      ).toBeVisible();
+      await expect(page.getByText('连接钱包，发送 CST', { exact: true })).toBeVisible();
       await expectNoHorizontalOverflow(page);
       await testInfo.attach(`zh-transfer-cst-${viewport.name}`, {
         body: await page.screenshot({ fullPage: true }),

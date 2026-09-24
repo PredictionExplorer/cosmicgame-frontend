@@ -65,22 +65,31 @@ async function expectLayoutViewportFits(page: import('@playwright/test').Page) {
   expect(clientWidth).toBe(viewportWidth);
 }
 
+/**
+ * Opens the navigation drawer from the menu button at the header's end. A tap
+ * before hydration is dropped, so it retries until the drawer is open.
+ */
+async function openDrawer(page: import('@playwright/test').Page) {
+  const menuButton = page.getByRole('banner').getByRole('button', { name: /^Open menu/ });
+  await expect(async () => {
+    await menuButton.click({ timeout: 5_000 });
+    await expect(page.getByRole('dialog')).toBeVisible({ timeout: 2_000 });
+  }).toPass({ timeout: 30_000 });
+}
+
 test.describe('Responsive - Mobile viewport', () => {
   test.use({ viewport: { width: 375, height: 667 } });
 
   test('hamburger menu is visible at 375px width', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
-    const menuButton = page.locator('role=button[name="menu"]');
+    const menuButton = page.getByRole('banner').getByRole('button', { name: /^Open menu/ });
     await menuButton.scrollIntoViewIfNeeded();
     await expect(menuButton).toBeVisible();
   });
 
   test('opening hamburger menu shows navigation', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
-    const menuButton = page.locator('role=button[name="menu"]');
-    await menuButton.scrollIntoViewIfNeeded();
-    await menuButton.click();
-    await page.waitForTimeout(500);
+    await openDrawer(page);
     const galleryLink = page.getByRole('dialog').locator('a[href="/gallery"]');
     await galleryLink.scrollIntoViewIfNeeded();
     await expect(galleryLink).toBeVisible();
@@ -88,10 +97,7 @@ test.describe('Responsive - Mobile viewport', () => {
 
   test('mobile menu navigation works', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
-    const menuButton = page.locator('role=button[name="menu"]');
-    await menuButton.scrollIntoViewIfNeeded();
-    await menuButton.click();
-    await page.waitForTimeout(500);
+    await openDrawer(page);
     const galleryLink = page.getByRole('dialog').locator('a[href="/gallery"]');
     await galleryLink.scrollIntoViewIfNeeded();
     await galleryLink.click();

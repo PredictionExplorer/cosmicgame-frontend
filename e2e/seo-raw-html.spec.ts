@@ -682,7 +682,8 @@ test.describe('raw HTML SEO', () => {
     });
     expect(response.status()).toBe(404);
     const html = await response.text();
-    expect(html).toContain('Page Not Found');
+    // The heading is written in sentence case ("Page not found").
+    expect(html).toMatch(/Page not found/i);
   });
 
   test('static content pages are CDN-cacheable (no forced dynamic rendering)', async ({

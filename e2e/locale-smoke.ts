@@ -18,7 +18,7 @@ export async function openLanguageMenu(page: Page, label: string): Promise<Locat
   await expect(async () => {
     const trigger = page
       .getByRole('banner')
-      .getByRole('button', { name: label })
+      .getByRole('button', { name: languageTriggerName(label) })
       .filter({ visible: true })
       .first();
     await trigger.click({ timeout: 5_000 });
@@ -35,7 +35,7 @@ export async function openLanguageMenu(page: Page, label: string): Promise<Locat
 export async function switchLanguage(page: Page, label: string, option: string): Promise<void> {
   const headerSwitcher = page
     .getByRole('banner')
-    .getByRole('button', { name: label, exact: true })
+    .getByRole('button', { name: languageTriggerName(label) })
     .filter({ visible: true });
   if ((await headerSwitcher.count()) > 0) {
     const menu = await openLanguageMenu(page, label);
@@ -44,15 +44,31 @@ export async function switchLanguage(page: Page, label: string, option: string):
   }
   const drawer = page.getByRole('dialog');
   await expect(async () => {
-    // The drawer trigger is the header's first control.
+    // The drawer opens from the menu button at the header's end.
     await page
       .getByRole('banner')
       .locator('button[aria-haspopup="dialog"]')
-      .first()
+      .last()
       .click({ timeout: 5_000 });
     await expect(drawer).toBeVisible({ timeout: 2_000 });
   }).toPass({ timeout: 30_000 });
-  await drawer.getByRole('combobox', { name: label }).selectOption({ label: option });
+  // The drawer's language control opens the same menu of explicit choices.
+  const menu = page.getByRole('menu');
+  await expect(async () => {
+    await drawer
+      .getByRole('button', { name: languageTriggerName(label) })
+      .click({ timeout: 5_000 });
+    await expect(menu).toBeVisible({ timeout: 2_000 });
+  }).toPass({ timeout: 30_000 });
+  await menu.getByRole('menuitemradio', { name: option, exact: true }).click();
+}
+
+/**
+ * Every language control is named "<label>: <current language>" ("Language:
+ * English", "语言：简体中文"), so the current language is part of its name.
+ */
+export function languageTriggerName(label: string): RegExp {
+  return new RegExp(`^${label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*[:：]`);
 }
 
 /**
@@ -120,7 +136,7 @@ export function defineLocaleSmoke(locale: TranslatedLocale): void {
         await expect(primary.getByText(chrome.nav.explore, { exact: true })).toBeVisible();
         await expect(primary.getByText(chrome.nav.learn, { exact: true })).toBeVisible();
         await primary.getByRole('button', { name: chrome.nav.learn }).click();
-        await expect(page.getByRole('menuitem', { name: chrome.nav.aboutPattern })).toHaveAttribute(
+        await expect(primary.getByRole('link', { name: chrome.nav.aboutPattern })).toHaveAttribute(
           'href',
           `https://cosmicsignature.com${prefix}/about`,
         );

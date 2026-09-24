@@ -14,6 +14,22 @@ async function usesDrawer(page: Page): Promise<boolean> {
   return page.evaluate(() => window.innerWidth < 1024);
 }
 
+/**
+ * Opens a header panel (Explore or Learn) and returns it: a disclosure, so a
+ * button with aria-expanded shows a panel of ordinary links.
+ */
+async function openHeaderPanel(page: Page, name: RegExp) {
+  const trigger = page
+    .getByRole('banner')
+    .getByRole('navigation', { name: 'Primary' })
+    .getByRole('button', { name });
+  await trigger.click();
+  await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+  const panel = page.locator(`[id="${await trigger.getAttribute('aria-controls')}"]`);
+  await expect(panel).toBeVisible();
+  return panel;
+}
+
 async function openDrawer(page: Page) {
   await page.getByRole('banner').getByRole('button', { name: 'Open menu' }).click();
   const drawer = page.getByRole('dialog', { name: 'Navigation' });
@@ -31,8 +47,7 @@ async function openEcosystemSurface(page: Page) {
     await drawer.getByText('Ecosystem', { exact: true }).click();
     return { surface: drawer, role: 'link' as const };
   }
-  await page.getByRole('button', { name: /^Explore$/ }).click();
-  return { surface: page.getByRole('menu', { name: 'Explore' }), role: 'menuitem' as const };
+  return { surface: await openHeaderPanel(page, /^Explore$/), role: 'link' as const };
 }
 
 test.describe('Header', () => {
@@ -91,29 +106,34 @@ test.describe('Header', () => {
   test('Explore panel describes destinations and lists Public Goods', async ({ page }) => {
     test.skip(await usesDrawer(page), 'Rich panels are a desktop affordance');
 
-    await page.getByRole('button', { name: /^Explore$/ }).click();
-    const menu = page.getByRole('menu');
-    await expect(menu.getByRole('menuitem', { name: /Current Cycle/ })).toBeVisible();
+    const panel = await openHeaderPanel(page, /^Explore$/);
+    await expect(panel.getByRole('link', { name: /Current Cycle/ })).toBeVisible();
     await expect(
-      menu.getByText('The live cycle in full: every gesture and standing'),
+      panel.getByText('The live cycle in full: every gesture and standing'),
     ).toBeVisible();
-    await expect(menu.getByRole('menuitem', { name: /^Statistics/ })).toHaveAttribute(
+    await expect(panel.getByRole('link', { name: /^Statistics/ })).toHaveAttribute(
       'href',
       '/statistics',
     );
-    await expect(menu.getByRole('menuitem', { name: /Public Goods/ })).toBeVisible();
+    await expect(panel.getByRole('link', { name: /Public Goods/ })).toBeVisible();
+
+    // Links, not menu items: Tab walks them, and Escape returns to the button.
+    await page.keyboard.press('Tab');
+    await expect(panel.locator('a:focus')).toHaveCount(1);
+    await page.keyboard.press('Escape');
+    await expect(panel).toBeHidden();
+    await expect(page.getByRole('button', { name: /^Explore$/ })).toBeFocused();
   });
 
   test('Learn panel reaches Security and Risk Disclosures', async ({ page }) => {
     test.skip(await usesDrawer(page), 'Rich panels are a desktop affordance');
 
-    await page.getByRole('button', { name: /^Learn$/ }).click();
-    const menu = page.getByRole('menu');
-    await expect(menu.getByRole('menuitem', { name: /^Security/ })).toHaveAttribute(
+    const panel = await openHeaderPanel(page, /^Learn$/);
+    await expect(panel.getByRole('link', { name: /^Security/ })).toHaveAttribute(
       'href',
       '/security',
     );
-    await expect(menu.getByRole('menuitem', { name: /^Risk Disclosures/ })).toHaveAttribute(
+    await expect(panel.getByRole('link', { name: /^Risk Disclosures/ })).toHaveAttribute(
       'href',
       '/risk-disclosures',
     );

@@ -34,7 +34,7 @@ async function openSheetFromDock(page: Page) {
 }
 
 async function openMobileMenuIfNeeded(page: Page) {
-  const menuButton = page.locator('role=button[name="menu"]');
+  const menuButton = page.getByRole('banner').getByRole('button', { name: /^Open menu/ });
   if (await menuButton.isVisible()) {
     await menuButton.click();
     await page.waitForTimeout(300);
@@ -234,7 +234,8 @@ test.describe('Wallet connection state (disconnected)', () => {
       const counter = panel.getByTestId('gesture-message-char-count');
       const count = `${draft.length}/${protocolFacts.gestureMessageMaxLength}`;
       await expect(counter).toHaveText(count);
-      await expect(message).toHaveAccessibleDescription(count);
+      // The count leads the description; the on-chain note follows it.
+      await expect(message).toHaveAccessibleDescription(new RegExp(`^${count}\\b`));
       await message.locator('..').screenshot({
         path: testInfo.outputPath(`message-${theme}-focused.png`),
         animations: 'disabled',
@@ -267,8 +268,11 @@ test.describe('Wallet connection state (disconnected)', () => {
     );
     const tokenPicker = panel.getByTestId('panel-rwlk-picker');
     await expect(tokenPicker.getByRole('heading', { name: home.form.rwlk.title })).toBeVisible();
-    // Without a wallet there is nothing to search: the picker says what lists the NFTs.
-    await expect(tokenPicker.getByText(home.form.rwlk.connect)).toBeVisible();
+    // The mock wallet's NFTs cannot be read, and there is nothing to search: the picker
+    // says why (no wallet, or a read that failed) instead of showing an empty grid.
+    await expect(
+      tokenPicker.getByText(home.form.rwlk.connect).or(tokenPicker.getByText(home.form.rwlk.error)),
+    ).toBeVisible();
     await expect(tokenPicker.getByPlaceholder(home.rwlkGrid.searchPlaceholder)).toHaveCount(0);
     await expect(message).toHaveValue(draft);
     await expect(
@@ -402,11 +406,9 @@ test.describe('Wallet connection state (disconnected)', () => {
     // Phones host the one gesture panel in a bottom sheet behind the dock;
     // desktop renders it inline in the stage.
     const isMobile = await page.evaluate(() => window.innerWidth < 1024);
-    if (isMobile) {
-      const dock = page.getByTestId('dock-open-sheet');
-      await expect(dock).toBeVisible({ timeout: 15000 });
-      await dock.click();
-    }
+    // The dock steps aside while the in-page gesture form is on screen, so it is
+    // reached from further down the page, as a reader scrolling past the form would.
+    if (isMobile) await openSheetFromDock(page);
     const panel = page
       .locator(
         isMobile

@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 
+import { switchLanguage } from './locale-smoke';
 import { dismissOpenTooltips, openTooltip } from './tooltip-helpers';
 import { mockZhQualityApi } from './zh-quality-mocks';
 import { ZH_ROUTE_FIXTURES } from './zh-route-inventory';
@@ -74,8 +75,12 @@ test.describe('Sprint 8 deterministic Chinese journeys', () => {
   test('supports Chinese FAQ search and hash deep links', async ({ page }) => {
     await page.goto('/zh/faq', { waitUntil: 'domcontentloaded' });
     const search = page.getByRole('searchbox', { name: '搜索常见问题' });
-    await search.fill('锚定');
-    await expect(page.getByText(/共 67 个问题，当前显示 \d+ 个/)).toBeVisible();
+    // A query typed before hydration is not seen by the page: type until it counts.
+    await expect(async () => {
+      await search.fill('');
+      await search.fill('锚定');
+      await expect(page.getByText(/共 67 个问题，当前显示 \d+ 个/)).toBeVisible({ timeout: 2_000 });
+    }).toPass({ timeout: 30_000 });
     await expect(page.getByRole('button', { name: '锚定如何运作？', exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: '清除搜索' })).toBeVisible();
 
@@ -105,13 +110,11 @@ test.describe('Sprint 8 deterministic Chinese journeys', () => {
       expect(new URL(href).pathname).toMatch(/^\/zh(?:\/|$)/);
     }
 
-    await page.locator('button[aria-label="语言"]:visible').first().click();
-    await page.getByRole('menuitemradio', { name: 'English' }).click();
+    await switchLanguage(page, '语言', 'English');
     await page.waitForURL((url) => url.pathname === `/learn/${learnSlug}`);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
 
-    await page.locator('button[aria-label="Language"]:visible').first().click();
-    await page.getByRole('menuitemradio', { name: '简体中文', exact: true }).click();
+    await switchLanguage(page, 'Language', '简体中文');
     await page.waitForURL((url) => url.pathname === `/zh/learn/${learnSlug}`);
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
   });
@@ -119,7 +122,7 @@ test.describe('Sprint 8 deterministic Chinese journeys', () => {
   test('navigates from a localized data list to deterministic cycle details', async ({ page }) => {
     await page.goto('/zh/allocation', { waitUntil: 'domcontentloaded' });
     await expect(page.getByText('分配名录', { exact: true }).first()).toBeVisible();
-    await expect(page.getByRole('list', { name: '按周期排列的获配者列表' })).toBeVisible();
+    await expect(page.getByRole('table', { name: '已收官周期' })).toBeVisible();
 
     const cycleLink = page.locator(`a[href="/zh/allocation/${cycle}"]:visible`).first();
     await expect(cycleLink).toBeVisible();
