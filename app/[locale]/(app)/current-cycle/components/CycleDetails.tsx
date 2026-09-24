@@ -29,10 +29,11 @@ export interface CycleDetailsProps {
 
 /**
  * Everything under the clock, one section per question: where the reserve
- * goes, where each participant stands, every gesture so far, direct ETH
- * contributions and attached assets (only when there are some), and the
- * rules the cycle runs on. Each section is an H2 on the page's one content
- * edge, with no box around it.
+ * goes and the assets attached to the Signature Allocation (only when there
+ * are some), where each participant stands, every gesture so far, direct ETH
+ * contributions (only when there are some), and the rules the cycle runs
+ * on. Each section is an H2 on the page's one content edge, with no box
+ * around it.
  */
 export function CycleDetails({
   data,
@@ -50,6 +51,13 @@ export function CycleDetails({
   return (
     <div className="space-y-[calc(var(--block-gap)*1.5)]">
       <CycleAllocations data={data} headingId="cycle-allocations-heading" />
+
+      {/* Attached assets travel with the Signature Allocation, so they follow the split. */}
+      <AttachedTokensSection
+        nfts={attachedNfts}
+        erc20Tokens={attachedErc20}
+        headingId="cycle-attached-heading"
+      />
 
       <CycleParticipants
         data={data}
@@ -91,12 +99,6 @@ export function CycleDetails({
           <EthDonationTable list={ethDonations} showType={false} headingLevel={3} />
         </section>
       ) : null}
-
-      <AttachedTokensSection
-        nfts={attachedNfts}
-        erc20Tokens={attachedErc20}
-        headingId="cycle-attached-heading"
-      />
 
       <CycleRules data={data} headingId="cycle-rules-heading" />
     </div>

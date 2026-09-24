@@ -45,26 +45,6 @@ jest.mock('../components/CycleDetails', () => ({
   ),
 }));
 
-jest.mock('../../../../../components/attachments/DonatedNFTPrizeShowcase', () => ({
-  AttachedNFTAllocationShowcase: ({
-    nfts,
-    erc20Tokens = [],
-    cycleNumber,
-  }: {
-    nfts: unknown[];
-    erc20Tokens?: unknown[];
-    cycleNumber?: number;
-  }) =>
-    nfts.length > 0 || erc20Tokens.length > 0 ? (
-      <section
-        data-testid="attached-nft-showcase"
-        data-count={nfts.length}
-        data-erc20-count={erc20Tokens.length}
-        data-cycle={cycleNumber}
-      />
-    ) : null,
-}));
-
 jest.mock('../components/CycleStandings', () => ({
   CycleStandings: (props: {
     latestParticipantAddress?: string | null;
@@ -287,22 +267,15 @@ describe('CurrentRoundPage', () => {
     expect(standings).toHaveAttribute('data-latest-address', PARTICIPANT);
   });
 
-  it('renders the attached-asset showcase only when the cycle has attached assets', () => {
+  it('hands the cycle’s attached assets to one section, with no second showcase', () => {
     setupLoaded();
-    const { unmount } = render(<CurrentRoundPage />);
-    expect(screen.queryByTestId('attached-nft-showcase')).not.toBeInTheDocument();
-    unmount();
-
     mockUseDonationsNFTByRound.mockReturnValue({ data: [{ RecordId: 1 }, { RecordId: 2 }] });
     mockUseDonationsERC20ByRound.mockReturnValue({
       data: [{ EvtLogId: 1, TokenAddr: '0xToken', AmountDonatedEth: 5 }],
     });
     render(<CurrentRoundPage />);
     expect(mockUseDonationsNFTByRound).toHaveBeenCalledWith(42);
-    const showcase = screen.getByTestId('attached-nft-showcase');
-    expect(showcase).toHaveAttribute('data-count', '2');
-    expect(showcase).toHaveAttribute('data-erc20-count', '1');
-    expect(showcase).toHaveAttribute('data-cycle', '42');
+    expect(screen.queryByTestId('attached-nft-showcase')).not.toBeInTheDocument();
     expect(screen.getByTestId('cycle-details')).toHaveAttribute('data-nfts', '2');
     expect(screen.getByTestId('cycle-details')).toHaveAttribute('data-erc20', '1');
   });

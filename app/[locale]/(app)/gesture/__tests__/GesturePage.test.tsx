@@ -1,5 +1,3 @@
-import axios from 'axios';
-
 import { render, screen, within, checkA11y } from '@/test-utils';
 
 import GesturePage from '../[id]/GesturePage';
@@ -21,8 +19,14 @@ jest.mock('../[id]/gestureNeighbours', () => ({
   useGestureNeighbours: () => mockNeighbours(),
 }));
 
-jest.mock('axios', () => ({
-  get: jest.fn(() => Promise.resolve({ data: {} })),
+const mockNftMetadata = jest.fn(
+  (): { isLoading: boolean; data: Record<string, string> | null | undefined } => ({
+    isLoading: false,
+    data: undefined,
+  }),
+);
+jest.mock('../../../../../components/attachments/useAttachedNftMetadata', () => ({
+  useAttachedNftMetadata: () => mockNftMetadata(),
 }));
 
 jest.mock('../../../../../components/nft/RandomWalkPlate', () => ({
@@ -242,20 +246,19 @@ describe('GesturePage', () => {
       NFTDonationTokenId: 8489,
       NFTTokenURI: 'https://example.org/token/8489',
     };
-    const mockGet = axios.get as jest.Mock;
 
-    it('lists only the metadata the token URI names', async () => {
-      mockGet.mockResolvedValueOnce({
+    it('lists only the metadata the token URI names', () => {
+      mockNftMetadata.mockReturnValue({
+        isLoading: false,
         data: {
           image: 'https://example.org/8489.png',
           name: 'Rexy #8489',
           collection_name: 'Rexy',
-          artist: '  ',
         },
       });
       renderGesture(attached);
 
-      expect(await screen.findByTestId('nft-image')).toHaveAttribute(
+      expect(screen.getByTestId('nft-image')).toHaveAttribute(
         'src',
         'https://example.org/8489.png',
       );
@@ -267,21 +270,16 @@ describe('GesturePage', () => {
       expect(screen.queryByText('gesture.nftPreview.platform')).not.toBeInTheDocument();
     });
 
-    it('holds a busy plate while the metadata loads, then the unavailable art when it fails', async () => {
-      let fail: (reason: Error) => void = () => undefined;
-      mockGet.mockReturnValueOnce(
-        new Promise((_, reject) => {
-          fail = reject;
-        }),
-      );
-      renderGesture(attached);
-
+    it('holds a busy plate while the metadata loads, then the unavailable art when it fails', () => {
+      mockNftMetadata.mockReturnValue({ isLoading: true, data: undefined });
+      const { unmount } = renderGesture(attached);
       expect(screen.getByTestId('pending-plate')).toHaveAttribute('aria-busy', 'true');
       expect(screen.queryByTestId('nft-image')).not.toBeInTheDocument();
+      unmount();
 
-      fail(new Error('CORS'));
-      const image = await screen.findByTestId('nft-image');
-      expect(image).not.toHaveAttribute('src');
+      mockNftMetadata.mockReturnValue({ isLoading: false, data: null });
+      renderGesture(attached);
+      expect(screen.getByTestId('nft-image')).not.toHaveAttribute('src');
       expect(screen.getByText('gesture.rows.nftId')).toBeInTheDocument();
       expect(screen.queryByText('gesture.nftPreview.collectionName')).not.toBeInTheDocument();
     });

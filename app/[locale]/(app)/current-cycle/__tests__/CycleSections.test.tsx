@@ -6,9 +6,8 @@ import { AttachedTokensSection, ATTACHED_NFTS_PER_PAGE } from '../components/Att
 import { CycleAllocations } from '../components/CycleAllocations';
 import { CycleRules } from '../components/CycleRules';
 
-jest.mock('../../../../../components/attachments/AttachedNFT', () => ({
-  __esModule: true,
-  default: ({ nft }: { nft: { RecordId: number } }) => (
+jest.mock('../components/AttachedNftPlate', () => ({
+  AttachedNftPlate: ({ nft }: { nft: { RecordId: number } }) => (
     <div data-testid="attached-nft">{nft.RecordId}</div>
   ),
 }));

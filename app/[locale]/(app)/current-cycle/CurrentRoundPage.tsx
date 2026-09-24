@@ -9,7 +9,6 @@ import { getEnduranceChampions } from '@/utils';
 import { PageShell } from '@/components/ui/page-shell';
 import { ErrorState } from '@/components/ui/error-state';
 import { Skeleton, SkeletonTable } from '@/components/ui/skeleton';
-import { AttachedNFTAllocationShowcase } from '@/components/attachments/DonatedNFTPrizeShowcase';
 import type { DonatedERC20Token } from '@/components/attachments/AttachedERC20Table';
 import type { EthDonation } from '@/components/tables/EthDonationTable';
 import type { AttachedNFT } from '@/services/api/types';
@@ -180,12 +179,6 @@ const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
             />
           ) : null}
         </section>
-
-        <AttachedNFTAllocationShowcase
-          nfts={attachedNfts}
-          erc20Tokens={attachedErc20}
-          cycleNumber={data.CurRoundNum}
-        />
 
         <CycleDetails
           data={data}

@@ -7,11 +7,12 @@ import { cn } from '@/lib/utils';
 import { SectionHeader } from '@/components/ui/section-header';
 import { TablePagination } from '@/components/ui/pagination';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import AttachedNFT from '@/components/attachments/AttachedNFT';
 import AttachedERC20Table, {
   type DonatedERC20Token,
 } from '@/components/attachments/AttachedERC20Table';
 import type { AttachedNFT as AttachedNFTRecord } from '@/services/api/types';
+
+import { AttachedNftPlate } from './AttachedNftPlate';
 
 /** Attached NFTs shown per page. */
 export const ATTACHED_NFTS_PER_PAGE = 12;
@@ -47,14 +48,14 @@ export function AttachedTokensSection({
   const gridLayout =
     nfts.length > 9
       ? 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4'
-      : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3';
+      : 'grid-cols-1 min-[400px]:grid-cols-2 lg:grid-cols-3';
 
   const nftPanel = (
     <>
-      <ul className={cn('grid gap-4', gridLayout)}>
-        {visibleNfts.map((nft) => (
-          <li key={nft.RecordId}>
-            <AttachedNFT nft={nft} />
+      <ul className={cn('grid gap-x-6 gap-y-10', gridLayout)}>
+        {visibleNfts.map((nft, index) => (
+          <li key={String(nft.RecordId ?? `${nft.TokenAddr}-${index}`)}>
+            <AttachedNftPlate nft={nft} />
           </li>
         ))}
       </ul>
@@ -69,7 +70,7 @@ export function AttachedTokensSection({
   const erc20Panel = <AttachedERC20Table list={erc20Tokens} handleClaim={null} />;
 
   return (
-    <section aria-labelledby={headingId}>
+    <section aria-labelledby={headingId} id="attached-assets" className="scroll-mt-24">
       <SectionHeader
         headingId={headingId}
         title={t('attachedTokens.title')}

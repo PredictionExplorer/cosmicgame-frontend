@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
-import axios from 'axios';
+import type { ReactNode } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -23,6 +22,7 @@ import { TxExplorerLink } from '@/components/ui/tx-status';
 import { UnknownValue } from '@/components/ui/unknown-value';
 import { RandomWalkPlate } from '@/components/nft/RandomWalkPlate';
 import NFTImage from '@/components/nft/NFTImage';
+import { useAttachedNftMetadata } from '@/components/attachments/useAttachedNftMetadata';
 import { resolveGestureType } from '@/components/tables/GestureMethodTag';
 import { useDashboardInfo, useGestureInfo } from '@/hooks/useApiQuery';
 import type { GestureInfo } from '@/services/api';
@@ -30,15 +30,6 @@ import { formatCount, formatNumber } from '@/utils/format';
 import { formatId } from '@/utils/format/ids';
 
 import { useGestureNeighbours } from './gestureNeighbours';
-
-interface NFTTokenURI {
-  image?: string;
-  collection_name?: string;
-  artist?: string;
-  platform?: string;
-  description?: string;
-  [key: string]: unknown;
-}
 
 /** The API's numeric gesture types (GestureMethodTag). */
 const CST_GESTURE = 2;
@@ -118,35 +109,6 @@ export function gestureTrail(
   };
 }
 
-/**
- * The attached NFT's metadata, read from its token URI in the browser.
- * `undefined` while it loads (or when there is no URI to read), `null` when
- * it could not be read. Third-party hosts often refuse cross-origin reads, so
- * a failure is a normal outcome, not an error to report.
- */
-function useAttachedNftMetadata(uri: string | undefined): NFTTokenURI | null | undefined {
-  const [result, setResult] = useState<{ uri: string; data: NFTTokenURI | null } | null>(null);
-
-  useEffect(() => {
-    if (!uri) return;
-    let cancelled = false;
-    axios
-      .get<NFTTokenURI>(uri)
-      .then(({ data }) => {
-        if (!cancelled) setResult({ uri, data: data && typeof data === 'object' ? data : null });
-      })
-      .catch(() => {
-        if (!cancelled) setResult({ uri, data: null });
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [uri]);
-
-  if (!uri) return null;
-  return result?.uri === uri ? result.data : undefined;
-}
-
 /** A metadata field when the token URI actually carries text for it. */
 function metadataText(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
@@ -179,7 +141,14 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
     poll: false,
   });
   const neighbours = useGestureNeighbours(gestureInfo?.RoundNum, gestureInfo?.BidPosition);
-  const tokenURI = useAttachedNftMetadata(gestureInfo?.NFTTokenURI);
+  // The shared reader races the IPFS gateways and falls back to the
+  // contract's own tokenURI, so third-party art resolves where a single
+  // cross-origin fetch would be refused.
+  const nftMetadata = useAttachedNftMetadata(gestureInfo?.NFTTokenURI, {
+    tokenAddr: gestureInfo?.NFTDonationTokenAddr,
+    tokenId: (gestureInfo?.NFTDonationTokenId ?? -1) >= 0 ? gestureInfo?.NFTDonationTokenId : null,
+  });
+  const tokenURI = nftMetadata.data ?? null;
 
   if (gestureId < 0) {
     return (
@@ -414,11 +383,12 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
               <div className="grid gap-8 sm:grid-cols-[minmax(0,15rem)_minmax(0,1fr)]">
                 {/* The media keeps its own ratio: the well does not stretch to the list beside it. */}
                 <div className="self-start overflow-hidden rounded-edge bg-art-ground">
-                  {tokenURI === undefined ? (
+                  {nftMetadata.isLoading ? (
                     <PendingPlate variant="media" busy />
                   ) : (
                     <NFTImage
-                      src={metadataText(tokenURI?.image) ?? undefined}
+                      src={tokenURI?.image}
+                      fallbackSrc={tokenURI?.imageFallback}
                       alt={
                         metadataText(tokenURI?.name) ??
                         `${t('sections.nft.title')} ${gestureInfo.NFTDonationTokenId}`
