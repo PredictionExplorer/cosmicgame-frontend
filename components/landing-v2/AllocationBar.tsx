@@ -2,24 +2,20 @@ import type { CSSProperties } from 'react';
 
 import type { LandingEthTrack } from '@/content/landing';
 
-import type { AllocationTrackId } from '@/config/allocationTracks';
+import { ALLOCATION_TRACK_COLORS, type AllocationTrackId } from '@/config/allocationTracks';
 import { cn } from '@/lib/utils';
 
 import styles from './Landing.module.css';
 
 /**
- * Each track's fill, from the palette-independent track tokens
- * (styles/themes.css). The remainder that compounds into the next cycle is
- * drawn hatched: it is carried forward, not paid out.
+ * A track's fill for a bar segment or legend swatch: the colour every chart
+ * of the split uses (config/allocationTracks), except that the remainder
+ * compounding into the next cycle is drawn hatched in its own hue — it is
+ * carried forward, not paid out.
  */
-export const TRACK_FILL: Readonly<Record<AllocationTrackId, string>> = {
-  signature: 'bg-track-signature',
-  chrono: 'bg-track-chrono',
-  stellar: 'bg-track-stellar-eth',
-  anchor: 'bg-track-anchoring',
-  publicGoods: 'bg-track-public-goods',
-  nextCycle: styles.hatched ?? '',
-};
+export function trackFill(id: AllocationTrackId): string {
+  return id === 'nextCycle' ? (styles.hatched ?? '') : ALLOCATION_TRACK_COLORS[id];
+}
 
 interface AllocationBarProps {
   /** The ETH tracks with their shares, e.g. `getLandingContent(locale).tracks.eth`. */
@@ -41,7 +37,7 @@ export function AllocationBar({ tracks, className }: AllocationBarProps) {
       {tracks.map((track) => (
         <span
           key={track.id}
-          className={cn(styles.segment, TRACK_FILL[track.id])}
+          className={cn(styles.segment, trackFill(track.id))}
           style={{ '--share': track.share } as CSSProperties}
           data-track={track.id}
           data-share={track.share}

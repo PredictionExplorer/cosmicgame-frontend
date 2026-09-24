@@ -23,6 +23,8 @@ describe('allocation tracks', () => {
     const colors = ALLOCATION_TRACK_IDS.map((id) => ALLOCATION_TRACK_COLORS[id]);
     expect(new Set(colors).size).toBe(ALLOCATION_TRACK_IDS.length);
     for (const color of colors) expect(color).not.toMatch(/#[0-9a-f]{3,8}/i);
+    // The named track tokens (styles/themes.css), not legacy chart or rgb aliases.
+    for (const color of colors) expect(color).toMatch(/^bg-track-[a-z-]+$/);
   });
 
   it('completes the distributed shares with the next-cycle remainder', () => {

@@ -3,7 +3,7 @@ import { render, screen, within } from '@testing-library/react';
 import { landingContentEn, landingContentZh } from '@/content/landing';
 import { protocolFacts } from '@/content/protocol-facts';
 
-import { ALLOCATION_TRACK_IDS } from '@/config/allocationTracks';
+import { ALLOCATION_TRACK_COLORS, ALLOCATION_TRACK_IDS } from '@/config/allocationTracks';
 import { AllocationTracks } from '@/components/landing-v2/AllocationTracks';
 
 const tracks = landingContentEn.tracks;
@@ -34,6 +34,15 @@ describe('<AllocationTracks />', () => {
     ]);
     // Decorative: the legend carries every figure for assistive technology.
     expect(screen.getByTestId('allocation-bar')).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('colours each track from the one map every chart of the split uses', () => {
+    // Regression: the landing kept its own colour map beside config/allocationTracks.
+    render(<AllocationTracks tracks={tracks} />);
+    const bar = screen.getByTestId('allocation-bar');
+    for (const id of ALLOCATION_TRACK_IDS.filter((track) => track !== 'nextCycle')) {
+      expect(bar.querySelector(`[data-track="${id}"]`)).toHaveClass(ALLOCATION_TRACK_COLORS[id]);
+    }
   });
 
   it('lists every ETH track with its share and purpose', () => {
