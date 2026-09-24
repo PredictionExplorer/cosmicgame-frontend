@@ -31,9 +31,10 @@ const cardVariants = cva(
         compact: 'px-4 py-3.5',
       },
       emphasis: {
-        // One edge, drawn by the gradient ring alone: a border underneath it
-        // read as a doubled outline.
-        true: 'gradient-border-card gradient-border-card-accent bg-primary/[0.04]',
+        // One edge, drawn by the gradient ring alone: a visible border under
+        // it read as a doubled outline. The transparent border keeps the card
+        // the same height as its neighbours in the row.
+        true: 'gradient-border-card gradient-border-card-accent border border-transparent bg-primary/[0.04]',
         false: 'border border-rule-faint bg-surface/60',
       },
     },

@@ -26,8 +26,8 @@ describe('StatCard', () => {
 
   it('draws emphasis as the signature ring alone, with no border underneath', () => {
     const { container } = render(<StatCard label="x" value="1" emphasis />);
-    expect(container.firstElementChild).toHaveClass('gradient-border-card');
-    expect(container.firstElementChild).not.toHaveClass('border');
+    expect(container.firstElementChild).toHaveClass('gradient-border-card', 'border-transparent');
+    expect(container.firstElementChild).not.toHaveClass('border-rule-faint');
   });
 
   it('maps the deprecated featured and gradient flags onto emphasis', () => {

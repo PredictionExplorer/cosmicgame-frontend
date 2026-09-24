@@ -59,7 +59,7 @@ export function InfoTooltip({
         // hit area (the pseudo-element) rather than the icon's box.
         data-touch-target="extended"
         className={cn(
-          'relative inline-flex shrink-0 cursor-help items-center justify-center rounded-full align-middle text-subtle',
+          'relative ml-0.5 inline-flex shrink-0 cursor-help items-center justify-center rounded-full align-middle text-subtle',
           'transition-colors duration-[var(--duration-fast)] ease-[var(--ease-out-soft)] hover:text-foreground data-[state=open]:text-foreground',
           "after:absolute after:left-1/2 after:top-1/2 after:size-6 after:-translate-x-1/2 after:-translate-y-1/2 after:content-[''] pointer-coarse:after:size-11",
           className,
