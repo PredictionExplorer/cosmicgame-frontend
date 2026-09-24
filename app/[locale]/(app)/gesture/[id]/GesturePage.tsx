@@ -26,7 +26,13 @@ import { useAttachedNftMetadata } from '@/components/attachments/useAttachedNftM
 import { resolveGestureType } from '@/components/tables/GestureMethodTag';
 import { useDashboardInfo, useGestureInfo } from '@/hooks/useApiQuery';
 import type { GestureInfo } from '@/services/api';
-import { formatCount, formatNumber } from '@/utils/format';
+import {
+  NBSP,
+  UNAVAILABLE_VALUE,
+  formatCount,
+  formatNumber,
+  formatTimeZoneLabel,
+} from '@/utils/format';
 import { formatId } from '@/utils/format/ids';
 
 import { useGestureNeighbours } from './gestureNeighbours';
@@ -112,6 +118,29 @@ export function gestureTrail(
 /** A metadata field when the token URI actually carries text for it. */
 function metadataText(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
+}
+
+/**
+ * A citable instant: the full date in UTC with the zone printed, so two
+ * readers quoting the record quote the same time (the explorer's zone too).
+ * The age and the full date stay on hover.
+ */
+function RecordTime({ timestamp }: { timestamp: number | null | undefined }) {
+  return (
+    <DateTime timestamp={timestamp} variant="full" timeZone="utc">
+      {(value) =>
+        value === UNAVAILABLE_VALUE ? (
+          value
+        ) : (
+          <>
+            {value}
+            {NBSP}
+            <span className="text-subtle">{formatTimeZoneLabel('utc')}</span>
+          </>
+        )
+      }
+    </DateTime>
+  );
 }
 
 /** One label / value line of the record. */
@@ -298,7 +327,7 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
           meta={
             <>
               {methodBadge}
-              <DateTime timestamp={gestureInfo.TimeStamp} variant="full" />
+              <RecordTime timestamp={gestureInfo.TimeStamp} />
               <TxExplorerLink hash={gestureInfo.TxHash} label={t('header.explorer')} />
             </>
           }
@@ -337,11 +366,7 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
                 />
               </RecordRow>
               <RecordRow label={t('rows.finalizationTime')}>
-                {finalizationTime === null ? (
-                  unknown
-                ) : (
-                  <DateTime timestamp={finalizationTime} variant="full" />
-                )}
+                {finalizationTime === null ? unknown : <RecordTime timestamp={finalizationTime} />}
               </RecordRow>
               <RecordRow label={t('rows.transaction')}>
                 <span className="type-hash text-muted-foreground">{gestureInfo.TxHash}</span>

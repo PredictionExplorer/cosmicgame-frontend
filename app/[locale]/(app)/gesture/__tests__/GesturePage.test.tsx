@@ -189,6 +189,16 @@ describe('GesturePage', () => {
     );
   });
 
+  it('prints its times in UTC with the zone, so every reader cites the same instant', () => {
+    const { container } = renderGesture();
+    const times = container.querySelectorAll('time');
+    expect(times).toHaveLength(2);
+    // 1_780_045_566 is 2026-05-29 09:06:06 UTC; 1_780_049_166 an hour later.
+    expect(times[0]).toHaveAttribute('dateTime', '2026-05-29T09:06:06.000Z');
+    expect(times[0]).toHaveTextContent(/09:06:06\sUTC$/);
+    expect(times[1]).toHaveTextContent(/10:06:06\sUTC$/);
+  });
+
   it('shows the method once, with the Random Walk NFT when one was used', () => {
     const { unmount } = renderGesture();
     expect(screen.getAllByTestId('gesture-method')[0]).toHaveTextContent('gesture.method.eth');
