@@ -275,6 +275,13 @@ describe('WallLabel', () => {
     expect(screen.getByText('Anchored')).toBeInTheDocument();
   });
 
+  it('trails each dot after its fact, so a wrapped line never starts with one', () => {
+    render(<WallLabelMeta items={['#000027', '3.5397 ETH', '1,000 CST']} />);
+    const facts = Array.from(screen.getByText('#000027').closest('p')?.children ?? []);
+    // Regression: the dot led each item, so a phone line read "· 1,000 CST".
+    expect(facts.map((fact) => fact.textContent)).toEqual(['#000027·', '3.5397 ETH·', '1,000 CST']);
+  });
+
   it('renders nothing for a caption line without facts', () => {
     const { container } = render(<WallLabelMeta items={[null, '', false]} />);
     expect(container).toBeEmptyDOMElement();

@@ -75,6 +75,15 @@ describe('AddressChip', () => {
     expect(link.getAttribute('title')).toMatch(/^formats\.address\.known\.publicGoods · 0x/);
   });
 
+  it('marks a plain address link at rest with a hairline underline, a chip without', () => {
+    // Regression: plain links were no-underline in the text colour, so a
+    // Recipient or Owner line gave no sign it opens a profile.
+    const { rerender } = render(<AddressChip address={ADDRESS} variant="plain" label={false} />);
+    expect(screen.getByRole('link')).toHaveClass('underline', 'decoration-[hsl(var(--rule))]');
+    rerender(<AddressChip address={ADDRESS} label={false} />);
+    expect(screen.getByRole('link')).not.toHaveClass('underline');
+  });
+
   it('truncates a contract name by default and lets it wrap where asked', () => {
     publishDashboardContractAddresses({ ...emptyContractAddresses(), charity: ADDRESS });
     const { rerender } = render(<AddressChip address={ADDRESS} variant="plain" />);
