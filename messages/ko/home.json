@@ -173,9 +173,6 @@
       }
     },
     "cta": {
-      "finalize": "사이클 마감",
-      "makeFirstGesture": "첫 제스처 남기기",
-      "makeGesture": "제스처 남기기",
       "viewCycle": "사이클 보기"
     }
   },
@@ -230,7 +227,6 @@
     "readyToFinalize": "사이클 마감 준비 완료",
     "clockReachedZero": "마감 카운트다운이 0에 도달했습니다.",
     "metrics": {
-      "signatureAllocation": "시그니처 배분",
       "signatureTooltip": {
         "base": "시그니처 배분의 ETH 부분입니다. 수령자는 1,000 CST와 Cosmic Signature NFT 1개도 함께 받습니다.",
         "withNft": "시그니처 배분의 ETH 부분입니다. 수령자는 1,000 CST, Cosmic Signature NFT 1개, 그리고 {nftCount, plural, other {첨부된 NFT #개}}도 함께 받습니다.",
@@ -541,8 +537,6 @@
       "reserveLabel": "시그니처 배분",
       "reserveExtras": "+ 1,000 CST · Cosmic Signature NFT 1개 · 첨부 자산",
       "youChip": "나",
-      "fullConsole": "전체 제스처 콘솔 열기",
-      "chooseRwlkToken": "아래 전체 콘솔에서 RandomWalk 토큰을 선택해 주세요",
       "microcopy": "제스처마다 마감 시각이 연장되고 별빛 선정 자격이 기록됩니다. 경과 시간에 따라 참여 CST가 각인될 수도 있습니다.",
       "notifyAria": "사이클 마감 전에 알림 받기",
       "notifyLabel": "마감 전 알림:",
@@ -603,7 +597,6 @@
     }
   },
   "mobileCta": {
-    "makeGesture": "제스처 남기기",
     "preview": "제스처 옵션 미리 보기"
   },
   "observatory": {
@@ -636,48 +629,26 @@
     },
     "standings": {
       "title": "실시간 현황",
-      "tooltip": "이 사이클의 각 경로를 지금 누가 지키고 있는지 보여 줍니다. 타이머는 실시간으로 흐르며, 현황은 사이클이 마감될 때 확정됩니다.",
-      "youBadge": "나",
-      "latestName": "최근 제스처",
       "latestTooltip": "현재 가장 최근 제스처를 남긴 참여자입니다. 이 상태로 사이클을 마감하면 시그니처 배분 수령자가 됩니다.",
-      "held": "{duration} 유지",
-      "record": "기록 {duration}",
-      "awaitingGesture": "첫 제스처 대기 중",
-      "awaitingRecord": "아직 기록 없음",
       "cstPlusNft": "1,000 CST + NFT"
     },
     "intel": {
-      "latestSubtitle": "최근 제스처의 비용, 각인된 CST, 현재 배분 대상인 항목을 확인할 수 있습니다.",
-      "viewGesture": "제스처 열기",
-      "inLineFor": "현재 배분 대상",
-      "attachedNfts": "{count, plural, other {첨부 NFT #개}}",
-      "attachedTokens": "{count, plural, other {첨부 토큰 적립 #건}}",
-      "plusCycleAttachments": "사이클이 보관 중인 {assets} 포함.",
-      "enduranceChronoTitle": "수호 챔피언과 시간의 전사",
-      "enduranceChronoSubtitle": "현재 선두 유지 기록과 기록 경신까지 남은 시간입니다.",
-      "liveRoleState": "현재 역할"
-    },
-    "prices": {
-      "availableAfterFirst": "첫 제스처 이후",
-      "openDockHint": "실시간 비용 · 참여는 하단 작업 바에서"
+      "viewGesture": "제스처 열기"
     },
     "ribbon": {
       "title": "배분 경로",
       "subtitle": "이 사이클의 마감 시 배분 내역",
       "tooltip": "현재 퍼포먼스 사이클의 모든 배분 경로를 실시간으로 보여 줍니다. 금액은 준비금과 함께 늘어나고, 사이클이 마감될 때 배분됩니다.",
       "fullBreakdown": "전체 내역 보기",
-      "stellarStatus": "제스처 하나가 자격 하나",
       "nextCycleName": "다음 사이클 이월분",
       "nextCycleTooltip": "이 몫은 마감 시 배분되지 않고 준비금에 남아 다음 퍼포먼스 사이클의 출발점이 됩니다.",
-      "nextCycleDetail": "다음 사이클로 이월",
-      "percentOfReserve": "준비금의 {percent}%"
+      "nextCycleDetail": "다음 사이클로 이월"
     },
     "dock": {
       "aria": "사이클 빠른 작업",
       "openPanelAria": "제스처 패널 열기"
     },
     "panel": {
-      "microcopy": "제스처마다 마감 시각이 연장되고 별빛 선정 자격이 기록됩니다. 경과 시간에 따라 참여 CST가 각인될 수도 있습니다.",
       "sheetTitle": "제스처 남기기"
     },
     "ledger": {
@@ -780,8 +751,6 @@
       }
     },
     "costsNote": "다른 참여자가 자리를 대신해도 제스처에 사용한 ETH 또는 CST는 반환되지 않습니다. 거래 가스비는 항상 ETH로 지불합니다.",
-    "standingsTitle": "더 많은 참여 방식",
-    "standingsDescription": "이번 사이클의 수호 챔피언과 시간의 전사 기록을 살펴봅니다.",
     "allocationsTitle": "사이클 준비금의 배분",
     "allocationsDescription": "별빛 선정과 공공재를 포함한 모든 배분을 확인합니다.",
     "storyTitle": "사이클에 담긴 예술",

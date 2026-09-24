@@ -173,9 +173,6 @@
       }
     },
     "cta": {
-      "finalize": "Finalize cycle",
-      "makeFirstGesture": "Make the first Gesture",
-      "makeGesture": "Make a Gesture",
       "viewCycle": "View cycle"
     }
   },
@@ -230,7 +227,6 @@
     "readyToFinalize": "Cycle ready to finalize",
     "clockReachedZero": "The finalization clock reached zero.",
     "metrics": {
-      "signatureAllocation": "Signature Allocation",
       "signatureTooltip": {
         "base": "The ETH portion of the Signature Allocation. The recipient also receives 1,000 CST and a Cosmic Signature NFT.",
         "withNft": "The ETH portion of the Signature Allocation; the recipient also receives 1,000 CST, a Cosmic Signature NFT, and {nftCount, plural, one {the attached NFT} other {all # attached NFTs}}.",
@@ -541,8 +537,6 @@
       "reserveLabel": "Signature Allocation",
       "reserveExtras": "+ 1,000 CST · 1 Cosmic Signature NFT · attached assets",
       "youChip": "You",
-      "fullConsole": "Open the full gesture console",
-      "chooseRwlkToken": "Pick your RandomWalk token in the full console below",
       "microcopy": "Each gesture extends the finalization clock, may imprint Participation CST, and adds a Stellar Selection entry.",
       "notifyAria": "Notify me before the cycle can finalize",
       "notifyLabel": "Alert me before finalization:",
@@ -603,7 +597,6 @@
     }
   },
   "mobileCta": {
-    "makeGesture": "Make a Gesture",
     "preview": "Preview Gesture Options"
   },
   "observatory": {
@@ -636,48 +629,26 @@
     },
     "standings": {
       "title": "Live standings",
-      "tooltip": "Who holds each competitive track of this cycle right now. Timers run live; standings lock in only when the cycle finalizes.",
-      "youBadge": "You",
-      "latestName": "Latest Gesture",
       "latestTooltip": "The most recent participant. After the clock reaches zero, the participant who made the Final Gesture may finalize the cycle and receive the Signature Allocation.",
-      "held": "held {duration}",
-      "record": "record {duration}",
-      "awaitingGesture": "Awaiting the first Gesture",
-      "awaitingRecord": "No record yet",
       "cstPlusNft": "1,000 CST + NFT"
     },
     "intel": {
-      "latestSubtitle": "What the latest Gesture cost, imprinted, and is currently positioned to receive.",
-      "viewGesture": "Open Gesture",
-      "inLineFor": "Currently in line for at finalization",
-      "attachedNfts": "{count, plural, one {# attached NFT} other {# attached NFTs}}",
-      "attachedTokens": "{count, plural, one {# attached token deposit} other {# attached token deposits}}",
-      "plusCycleAttachments": "Plus {assets} held by the cycle.",
-      "enduranceChronoTitle": "Endurance & Chrono",
-      "enduranceChronoSubtitle": "The standing records and the active challenge changing them now.",
-      "liveRoleState": "Live role state"
-    },
-    "prices": {
-      "availableAfterFirst": "After first Gesture",
-      "openDockHint": "Live costs · open the action dock to participate"
+      "viewGesture": "Open Gesture"
     },
     "ribbon": {
       "title": "Allocation Tracks",
       "subtitle": "Everything this cycle distributes at finalization",
       "tooltip": "Live view of every allocation track in the current Performance Cycle. Amounts grow with the reserve and distribute when the cycle finalizes.",
       "fullBreakdown": "View the full breakdown",
-      "stellarStatus": "every Gesture is an entry",
       "nextCycleName": "Next cycle seed",
       "nextCycleTooltip": "This share is not distributed at finalization — it stays in the reserve and seeds the next Performance Cycle.",
-      "nextCycleDetail": "compounds forward",
-      "percentOfReserve": "{percent}% of reserve"
+      "nextCycleDetail": "compounds forward"
     },
     "dock": {
       "aria": "Cycle quick actions",
       "openPanelAria": "Open the gesture panel"
     },
     "panel": {
-      "microcopy": "Each gesture extends the finalization clock, may imprint Participation CST, and adds a Stellar Selection entry.",
       "sheetTitle": "Make a Gesture"
     },
     "ledger": {
@@ -780,8 +751,6 @@
       }
     },
     "costsNote": "ETH or CST spent on a Gesture is not refunded when another participant takes your place. Transaction gas is always paid in ETH.",
-    "standingsTitle": "More ways to participate",
-    "standingsDescription": "Explore the Endurance and Chrono records for this cycle.",
     "allocationsTitle": "Where the cycle reserve goes",
     "allocationsDescription": "See every allocation, including Stellar Selection and public goods.",
     "storyTitle": "The art behind the cycle",

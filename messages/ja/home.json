@@ -173,9 +173,6 @@
       }
     },
     "cta": {
-      "finalize": "サイクルを確定",
-      "makeFirstGesture": "最初の一筆を入れる",
-      "makeGesture": "一筆を入れる",
       "viewCycle": "サイクルを見る"
     }
   },
@@ -230,7 +227,6 @@
     "readyToFinalize": "サイクルを確定できます",
     "clockReachedZero": "確定までの時計がゼロになりました。",
     "metrics": {
-      "signatureAllocation": "シグネチャー配分",
       "signatureTooltip": {
         "base": "シグネチャー配分のETH部分。受領者は1,000 CSTとCosmic Signature NFTも受け取ります。",
         "withNft": "シグネチャー配分のETH部分。受領者は1,000 CST、Cosmic Signature NFT、そして{nftCount, plural, other {添付された#点のNFTすべて}}も受け取ります。",
@@ -541,8 +537,6 @@
       "reserveLabel": "シグネチャー配分",
       "reserveExtras": "+ 1,000 CST · Cosmic Signature NFT 1点 · 添付されたアセット",
       "youChip": "自分",
-      "fullConsole": "一筆のフルコンソールを開く",
-      "chooseRwlkToken": "下のフルコンソールでRandomWalkトークンを選んでください",
       "microcopy": "一筆ごとに確定時刻が延び、星選の対象として記録されます。経過時間に応じて参加CSTが刻印されることもあります。",
       "notifyAria": "サイクルが確定できるようになる前に通知する",
       "notifyLabel": "確定前に通知：",
@@ -603,7 +597,6 @@
     }
   },
   "mobileCta": {
-    "makeGesture": "一筆を入れる",
     "preview": "一筆の選択肢をプレビュー"
   },
   "observatory": {
@@ -636,48 +629,26 @@
     },
     "standings": {
       "title": "ライブ順位",
-      "tooltip": "各配分トラックの現在の対象者を表示しています。保持時間は随時更新され、順位はサイクルの確定時に決まります。",
-      "youBadge": "自分",
-      "latestName": "最新の一筆",
       "latestTooltip": "現在、最新の一筆を入れた参加者です。この状態でサイクルを確定すると、シグネチャー配分の受領者になります。",
-      "held": "保持{duration}",
-      "record": "記録{duration}",
-      "awaitingGesture": "最初の一筆を待っています",
-      "awaitingRecord": "記録はまだありません",
       "cstPlusNft": "1,000 CST + NFT"
     },
     "intel": {
-      "latestSubtitle": "最新の一筆の費用、刻印されたCST、現在対象となっている配分を確認できます。",
-      "viewGesture": "一筆を開く",
-      "inLineFor": "現在の配分対象",
-      "attachedNfts": "{count, plural, other {添付されたNFT #点}}",
-      "attachedTokens": "{count, plural, other {添付されたトークン#件}}",
-      "plusCycleAttachments": "さらに、サイクルが保持する{assets}。",
-      "enduranceChronoTitle": "持久と時の戦士",
-      "enduranceChronoSubtitle": "現在の保持記録と、記録を更新するまでの時間を確認できます。",
-      "liveRoleState": "現在の役割"
-    },
-    "prices": {
-      "availableAfterFirst": "最初の一筆の後",
-      "openDockHint": "現在の費用を表示中。参加するには操作パネルを開いてください。"
+      "viewGesture": "一筆を開く"
     },
     "ribbon": {
       "title": "配分トラック",
       "subtitle": "このサイクルの確定時に配分されるもの",
       "tooltip": "現在のパフォーマンス・サイクルのすべての配分トラックのライブ表示。金額は準備金とともに増え、サイクルが確定したときに配られます。",
       "fullBreakdown": "内訳をすべて見る",
-      "stellarStatus": "一筆はすべて対象になります",
       "nextCycleName": "次サイクル繰越分",
       "nextCycleTooltip": "この分は確定時には配られません。準備金に残り、次のパフォーマンス・サイクルの種になります。",
-      "nextCycleDetail": "次のサイクルへ繰り越し",
-      "percentOfReserve": "準備金の{percent}%"
+      "nextCycleDetail": "次のサイクルへ繰り越し"
     },
     "dock": {
       "aria": "サイクルのクイックアクション",
       "openPanelAria": "一筆のパネルを開く"
     },
     "panel": {
-      "microcopy": "一筆ごとに確定時刻が延び、星選の対象として記録されます。経過時間に応じて参加CSTが刻印されることもあります。",
       "sheetTitle": "一筆を入れる"
     },
     "ledger": {
@@ -780,8 +751,6 @@
       }
     },
     "costsNote": "別の参加者が最新になっても、一筆に使ったETHまたはCSTは返金されません。トランザクションのガス代は常にETHで支払います。",
-    "standingsTitle": "ほかの参加の形",
-    "standingsDescription": "このサイクルの持久チャンピオンと時の戦士の記録を見られます。",
     "allocationsTitle": "サイクルの準備金の行き先",
     "allocationsDescription": "星選と公共財を含むすべての配分を確認できます。",
     "storyTitle": "サイクルから生まれるアート",

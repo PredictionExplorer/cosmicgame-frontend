@@ -173,9 +173,6 @@
       }
     },
     "cta": {
-      "finalize": "收官",
-      "makeFirstGesture": "落下第一笔",
-      "makeGesture": "落笔",
       "viewCycle": "查看周期"
     }
   },
@@ -230,7 +227,6 @@
     "readyToFinalize": "周期已可收官",
     "clockReachedZero": "收官倒计时已归零。",
     "metrics": {
-      "signatureAllocation": "签名分配",
       "signatureTooltip": {
         "base": "签名分配中的 ETH 部分；获配者还将获得 1,000 CST 与一枚 Cosmic Signature NFT。",
         "withNft": "签名分配中的 ETH 部分；获配者还将获得 1,000 CST、一枚 Cosmic Signature NFT，以及 {nftCount, number} 枚已附加 NFT。",
@@ -541,8 +537,6 @@
       "reserveLabel": "签名分配",
       "reserveExtras": "+ 1,000 CST · 1 枚 Cosmic Signature NFT · 附加资产",
       "youChip": "你",
-      "fullConsole": "打开完整落笔控制台",
-      "chooseRwlkToken": "请在下方完整控制台中选择你的 Random Walk 代币",
       "microcopy": "每次落笔都会延长收官倒计时、增加一次星选资格，并可能铭刻参与 CST。",
       "notifyAria": "在周期可收官前提醒我",
       "notifyLabel": "收官前提醒：",
@@ -603,7 +597,6 @@
     }
   },
   "mobileCta": {
-    "makeGesture": "落笔",
     "preview": "预览落笔选项"
   },
   "observatory": {
@@ -636,48 +629,26 @@
     },
     "standings": {
       "title": "实时席位",
-      "tooltip": "本周期各条分配轨道的当前人选。计时持续更新，人选在周期收官时才会确定。",
-      "youBadge": "你",
-      "latestName": "最新落笔",
       "latestTooltip": "最新落笔者。周期收官时，仍保持这一位置的参与者可获得签名分配。",
-      "held": "已保持 {duration}",
-      "record": "纪录 {duration}",
-      "awaitingGesture": "等待第一笔",
-      "awaitingRecord": "暂无纪录",
       "cstPlusNft": "1,000 CST + NFT"
     },
     "intel": {
-      "latestSubtitle": "最近一笔的实际支出、铭刻所得，以及当前对应的待定分配。",
-      "viewGesture": "查看这次落笔",
-      "inLineFor": "若此刻收官，当前对应",
-      "attachedNfts": "{count, plural, other {# 件附加 NFT}}",
-      "attachedTokens": "{count, plural, other {# 笔附加代币存入}}",
-      "plusCycleAttachments": "另含本周期持有的 {assets}。",
-      "enduranceChronoTitle": "坚守与时之勇士",
-      "enduranceChronoSubtitle": "现存纪录，以及此刻正在改变纪录的坚守进程。",
-      "liveRoleState": "实时席位状态"
-    },
-    "prices": {
-      "availableAfterFirst": "首笔后开放",
-      "openDockHint": "实时价格 · 从底部操作栏进入"
+      "viewGesture": "查看这次落笔"
     },
     "ribbon": {
       "title": "分配轨道",
       "subtitle": "本周期收官时发放的全部内容",
       "tooltip": "当前演绎周期各条分配轨道的实时一览。金额随储备增长，并在周期收官时发放。",
       "fullBreakdown": "查看完整分配明细",
-      "stellarStatus": "每一次落笔都是一份星选资格",
       "nextCycleName": "下一周期储备",
       "nextCycleTooltip": "这一份额不会在收官时发放——它留存于储备之中，作为下一演绎周期的起始分配。",
-      "nextCycleDetail": "滚存至下一周期",
-      "percentOfReserve": "占储备 {percent}%"
+      "nextCycleDetail": "滚存至下一周期"
     },
     "dock": {
       "aria": "周期快捷操作",
       "openPanelAria": "打开落笔面板"
     },
     "panel": {
-      "microcopy": "每次落笔都会延长收官倒计时、增加一次星选资格，并可能铭刻参与 CST。",
       "sheetTitle": "落笔"
     },
     "ledger": {
@@ -780,8 +751,6 @@
       }
     },
     "costsNote": "其他参与者取代你的位置时，落笔所花费的 ETH 或 CST 不会退还。交易 Gas 费始终使用 ETH 支付。",
-    "standingsTitle": "更多参与方式",
-    "standingsDescription": "了解本周期的坚守与时之勇士纪录。",
     "allocationsTitle": "周期储备如何分配",
     "allocationsDescription": "查看全部分配，包括星选与公共物品。",
     "storyTitle": "周期背后的艺术",

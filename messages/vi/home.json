@@ -173,9 +173,6 @@
       }
     },
     "cta": {
-      "finalize": "Hoàn tất chu kỳ",
-      "makeFirstGesture": "Đặt nét bút đầu tiên",
-      "makeGesture": "Đặt nét bút",
       "viewCycle": "Xem chu kỳ"
     }
   },
@@ -230,7 +227,6 @@
     "readyToFinalize": "Chu kỳ sẵn sàng hoàn tất",
     "clockReachedZero": "Đếm ngược hoàn tất đã về không.",
     "metrics": {
-      "signatureAllocation": "Phân bổ Signature",
       "signatureTooltip": {
         "base": "Phần ETH của phân bổ Signature; người nhận cũng nhận 1.000 CST và một Cosmic Signature NFT.",
         "withNft": "Phần ETH của phân bổ Signature; người nhận cũng nhận 1.000 CST, một Cosmic Signature NFT và {nftCount, plural, other {toàn bộ # NFT đính kèm}}.",
@@ -541,8 +537,6 @@
       "reserveLabel": "Phân bổ Signature",
       "reserveExtras": "+ 1.000 CST · 1 Cosmic Signature NFT · tài sản đính kèm",
       "youChip": "Bạn",
-      "fullConsole": "Mở bảng điều khiển nét bút đầy đủ",
-      "chooseRwlkToken": "Chọn token RandomWalk của bạn trong bảng điều khiển đầy đủ bên dưới",
       "microcopy": "Mỗi nét bút kéo dài đếm ngược hoàn tất, được tính vào Tinh tuyển và có thể khắc CST tham gia.",
       "notifyAria": "Thông báo cho tôi trước khi chu kỳ có thể hoàn tất",
       "notifyLabel": "Nhắc tôi trước khi hoàn tất:",
@@ -603,7 +597,6 @@
     }
   },
   "mobileCta": {
-    "makeGesture": "Đặt nét bút",
     "preview": "Xem trước tùy chọn nét bút"
   },
   "observatory": {
@@ -636,48 +629,26 @@
     },
     "standings": {
       "title": "Thứ hạng trực tiếp",
-      "tooltip": "Người đang giữ từng vai trò trong chu kỳ. Số liệu cập nhật liên tục; vai trò chỉ được xác định khi chu kỳ hoàn tất.",
-      "youBadge": "Bạn",
-      "latestName": "Nét bút mới nhất",
       "latestTooltip": "Người đặt nét bút gần nhất có thể nhận phân bổ Signature khi hoàn tất chu kỳ sau khi đếm ngược về 0.",
-      "held": "đã giữ {duration}",
-      "record": "kỷ lục {duration}",
-      "awaitingGesture": "Đang chờ nét bút đầu tiên",
-      "awaitingRecord": "Chưa có kỷ lục",
       "cstPlusNft": "1.000 CST + NFT"
     },
     "intel": {
-      "latestSubtitle": "Chi phí, lượng CST đã khắc và các phân bổ hiện có thể nhận từ nét bút gần nhất.",
-      "viewGesture": "Mở nét bút",
-      "inLineFor": "Phân bổ hiện có thể nhận khi hoàn tất",
-      "attachedNfts": "{count, plural, other {# NFT đính kèm}}",
-      "attachedTokens": "{count, plural, other {# khoản nạp token đính kèm}}",
-      "plusCycleAttachments": "Cộng thêm {assets} chu kỳ đang giữ.",
-      "enduranceChronoTitle": "Quán quân Bền bỉ và Chiến binh Thời gian",
-      "enduranceChronoSubtitle": "Các kỷ lục hiện tại và thời gian đang tiến gần đến kỷ lục.",
-      "liveRoleState": "Trạng thái vai trò trực tiếp"
-    },
-    "prices": {
-      "availableAfterFirst": "Sau nét bút đầu tiên",
-      "openDockHint": "Chi phí trực tiếp · mở thanh thao tác để tham gia"
+      "viewGesture": "Mở nét bút"
     },
     "ribbon": {
       "title": "Các luồng phân bổ",
       "subtitle": "Mọi thứ chu kỳ này phân phối khi hoàn tất",
       "tooltip": "Góc nhìn trực tiếp về mọi luồng phân bổ trong chu kỳ trình diễn hiện tại. Số lượng tăng theo dự trữ và được phân phối khi chu kỳ hoàn tất.",
       "fullBreakdown": "Xem chi tiết đầy đủ",
-      "stellarStatus": "mỗi nét bút là một lượt",
       "nextCycleName": "Dự trữ chu kỳ tiếp theo",
       "nextCycleTooltip": "Phần này không được phân phối khi hoàn tất — nó ở lại trong dự trữ và khởi đầu chu kỳ trình diễn tiếp theo.",
-      "nextCycleDetail": "tích lũy chuyển tiếp",
-      "percentOfReserve": "{percent}% dự trữ"
+      "nextCycleDetail": "tích lũy chuyển tiếp"
     },
     "dock": {
       "aria": "Thao tác nhanh của chu kỳ",
       "openPanelAria": "Mở bảng nét bút"
     },
     "panel": {
-      "microcopy": "Mỗi nét bút kéo dài đếm ngược hoàn tất, được tính vào Tinh tuyển và có thể khắc CST tham gia.",
       "sheetTitle": "Đặt nét bút"
     },
     "ledger": {
@@ -780,8 +751,6 @@
       }
     },
     "costsNote": "ETH hoặc CST đã dùng cho nét bút không được hoàn trả khi người khác thay thế vị trí của bạn. Phí gas giao dịch luôn được thanh toán bằng ETH.",
-    "standingsTitle": "Thêm cách tham gia",
-    "standingsDescription": "Khám phá kỷ lục Bền bỉ và Thời gian trong chu kỳ này.",
     "allocationsTitle": "Dự trữ chu kỳ được phân bổ ra sao",
     "allocationsDescription": "Xem mọi phân bổ, bao gồm Tinh tuyển và Hàng hóa công.",
     "storyTitle": "Nghệ thuật phía sau chu kỳ",
