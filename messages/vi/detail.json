@@ -33,29 +33,22 @@
     "nameHistory": "Lịch sử tên",
     "ownershipHistory": "Lịch sử sở hữu"
   },
-  "transferDialog": {
-    "title": "Xác nhận chuyển giao",
-    "description": "Địa chỉ người nhận dường như chưa có lịch sử giao dịch. Hãy kiểm tra kỹ địa chỉ trước khi xác nhận chuyển token.",
-    "confirm": "Có, chuyển giao"
-  },
   "ownerActions": {
     "title": "Quản lý token của bạn",
-    "titleTooltip": "Chủ sở hữu hiện tại có thể thêm token vào MetaMask, chuyển giao hoặc đặt tên token.",
-    "metaMaskHeading": "Hiển thị trong MetaMask",
+    "tabs": {
+      "name": "Đặt tên",
+      "transfer": "Chuyển giao"
+    },
     "metaMaskTooltip": "Yêu cầu tiện ích MetaMask trên trình duyệt hiển thị NFT này. Tính năng nhập NFT đang thử nghiệm và chưa có trên MetaMask Mobile.",
     "addToMetaMask": "Thêm NFT vào MetaMask",
     "addingToMetaMask": "Đang thêm NFT vào MetaMask…",
-    "transferHeading": "Chuyển giao",
-    "transferTooltip": "Gửi token này đến một địa chỉ Ethereum khác. Kiểm tra kỹ địa chỉ trước khi xác nhận — việc chuyển giao không thể đảo ngược.",
-    "recipientPlaceholder": "Địa chỉ người nhận (0x…)",
-    "transferButton": "Chuyển giao",
-    "nameHeading": "Đặt tên token",
-    "renameHeading": "Đổi tên token",
-    "nameTooltip": "Đặt cho token một tên tùy chỉnh (tối đa 32 byte). Token đã đặt tên xuất hiện trên trang NFT đã đặt tên.",
+    "nameLabel": "Tên",
+    "nameHint": "Tối đa {max} byte, được ghi trên chuỗi và ai cũng xem được.",
     "namePlaceholder": "Nhập tên token",
     "setName": "Đặt tên",
     "changeName": "Đổi tên",
     "clearName": "Xóa",
+    "transferButton": "Chuyển giao {id}",
     "namedTokensCount": "Hiện có {count} token đã được đặt tên.",
     "viewAllNamedTokens": "Xem tất cả token đã đặt tên"
   },

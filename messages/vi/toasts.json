@@ -101,9 +101,6 @@
     "retrieving": "Đang nhận về…"
   },
   "transfer": {
-    "common": {
-      "invalidRecipient": "Nhập một địa chỉ người nhận hợp lệ."
-    },
     "cst": {
       "tokenUnavailable": "Địa chỉ token CST chưa có sẵn.",
       "confirmed": "Đã xác nhận chuyển CST.",
@@ -114,8 +111,6 @@
       "selectOne": "Chọn ít nhất một NFT có thể chuyển giao.",
       "confirmed": "{count, plural, other {Đã xác nhận # lần chuyển giao NFT.}}",
       "detailTransferConfirmed": "Đã xác nhận chuyển giao NFT.",
-      "recipientCheckFailed": "Không kiểm tra được địa chỉ người nhận. Hãy kiểm tra ví và kết nối mạng, rồi thử lại.",
-      "failed": "Không thể gửi các NFT đã chọn. Vui lòng thử lại.",
       "failedToken": "Chưa gửi được NFT {tokenId}. Hãy kiểm tra ví rồi thử lại.",
       "nameSet": "Đã đổi tên token.",
       "nameCleared": "Đã xóa tên token.",

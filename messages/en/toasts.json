@@ -101,9 +101,6 @@
     "retrieving": "Retrieving..."
   },
   "transfer": {
-    "common": {
-      "invalidRecipient": "Enter a valid recipient address."
-    },
     "cst": {
       "tokenUnavailable": "CST token address is not available yet.",
       "confirmed": "CST transfer confirmed.",
@@ -114,8 +111,6 @@
       "selectOne": "Select at least one transferable NFT.",
       "confirmed": "{count, plural, one {NFT transfer confirmed.} other {# NFT transfers confirmed.}}",
       "detailTransferConfirmed": "NFT transfer confirmed.",
-      "recipientCheckFailed": "Could not check the recipient address. Check your wallet and network connection, then try again.",
-      "failed": "Unable to send selected NFTs. Please try again.",
       "failedToken": "NFT {tokenId} wasn't sent. Check your wallet and try again.",
       "nameSet": "Token name updated.",
       "nameCleared": "Token name cleared.",

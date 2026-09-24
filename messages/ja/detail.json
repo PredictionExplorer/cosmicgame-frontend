@@ -33,29 +33,22 @@
     "nameHistory": "名前の履歴",
     "ownershipHistory": "所有権の履歴"
   },
-  "transferDialog": {
-    "title": "移転の確認",
-    "description": "送付先アドレスにはトランザクション履歴が見つかりません。送付先に間違いがないか、もう一度確認してください。",
-    "confirm": "はい、移転します"
-  },
   "ownerActions": {
     "title": "トークンを管理する",
-    "titleTooltip": "このトークンの所有者は、名前の設定や送付、MetaMaskへの表示追加ができます。",
-    "metaMaskHeading": "MetaMaskに表示",
+    "tabs": {
+      "name": "名前",
+      "transfer": "移転"
+    },
     "metaMaskTooltip": "MetaMaskのブラウザー拡張機能にこのNFTを追加します。NFTのインポートは実験的な機能で、MetaMask Mobileには対応していません。",
     "addToMetaMask": "NFTをMetaMaskに追加",
     "addingToMetaMask": "NFTをMetaMaskに追加しています…",
-    "transferHeading": "移転",
-    "transferTooltip": "このトークンを別のEthereumアドレスへ送ります。確認する前にアドレスをもう一度確かめてください。移転は取り消せません。",
-    "recipientPlaceholder": "送付先アドレス（0x…）",
-    "transferButton": "移転",
-    "nameHeading": "トークンに名前を付ける",
-    "renameHeading": "トークン名を変更",
-    "nameTooltip": "トークンに任意の名前を付けられます（最大32バイト）。名前付きトークンは名前付きNFTのページに表示されます。",
+    "nameLabel": "名前",
+    "nameHint": "最大{max}バイトまで。オンチェーンに記録され、誰でも見られます。",
     "namePlaceholder": "トークン名を入力",
     "setName": "名前を設定",
     "changeName": "名前を変更",
     "clearName": "クリア",
+    "transferButton": "{id}を移転",
     "namedTokensCount": "名前の付いたトークンは{count}件あります。",
     "viewAllNamedTokens": "名前付きトークンをすべて見る"
   },

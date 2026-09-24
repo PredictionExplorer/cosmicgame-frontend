@@ -101,9 +101,6 @@
     "retrieving": "取回中…"
   },
   "transfer": {
-    "common": {
-      "invalidRecipient": "請輸入有效的接收地址。"
-    },
     "cst": {
       "tokenUnavailable": "CST 代幣地址暫不可用。",
       "confirmed": "CST 轉帳已確認。",
@@ -114,8 +111,6 @@
       "selectOne": "請至少選擇一枚可轉移的 NFT。",
       "confirmed": "{count, number} 筆 NFT 轉移已確認。",
       "detailTransferConfirmed": "NFT 轉移已確認。",
-      "recipientCheckFailed": "未能校驗接收地址。請檢查錢包與網絡連接後重試。",
-      "failed": "未能發送所選 NFT。請檢查錢包與網絡連接後重試。",
       "failedToken": "NFT {tokenId} 未能發送，請檢查錢包後再試。",
       "nameSet": "代幣名稱已成功更改。",
       "nameCleared": "代幣名稱已成功清除。",

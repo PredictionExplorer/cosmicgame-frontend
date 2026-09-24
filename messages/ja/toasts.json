@@ -101,9 +101,6 @@
     "retrieving": "受け取り中…"
   },
   "transfer": {
-    "common": {
-      "invalidRecipient": "有効な送付先アドレスを入力してください。"
-    },
     "cst": {
       "tokenUnavailable": "CSTトークンのアドレスはまだ利用できません。",
       "confirmed": "CSTの送付が確認されました。",
@@ -114,8 +111,6 @@
       "selectOne": "移転できるNFTを少なくとも1点選んでください。",
       "confirmed": "{count, plural, other {#件のNFT移転が確認されました。}}",
       "detailTransferConfirmed": "NFTの移転が確認されました。",
-      "recipientCheckFailed": "送付先アドレスを確認できませんでした。ウォレットとネットワーク接続を確認してから、もう一度お試しください。",
-      "failed": "選択したNFTを送れませんでした。もう一度お試しください。",
       "failedToken": "NFT {tokenId}を送れませんでした。ウォレットを確認して、もう一度お試しください。",
       "nameSet": "トークン名を変更しました。",
       "nameCleared": "トークン名をクリアしました。",
