@@ -229,9 +229,9 @@ describe('bundle budget core', () => {
 
   it('keeps the ratcheted budgets — raising one deserves a design conversation', () => {
     // Measured after the RES-100 work: app home ~610 KB (wallet stack now
-    // lazy), landing ~290 KB (zod/axios removed from the marketing host).
+    // lazy); landing ~253 KB once the three.js hero was removed.
     expect(DEFAULT_BUDGET_KB).toBe(640);
-    expect(DEFAULT_LANDING_BUDGET_KB).toBe(320);
+    expect(DEFAULT_LANDING_BUDGET_KB).toBe(270);
   });
 
   describe('directory fallback', () => {
