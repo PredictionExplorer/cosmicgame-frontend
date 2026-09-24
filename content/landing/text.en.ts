@@ -138,22 +138,22 @@ export const landingTextEn = {
         body: 'Split across three randomly selected participants. Selection frequency scales with gestures made.',
       },
       'participant-nft-stellar-selection': {
-        percent: '10 NFTs',
+        amount: '10 NFTs',
         title: 'NFT Stellar Selection — Participants',
         body: `Ten randomly selected participants each receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and one Cosmic Signature NFT.`,
       },
       'anchored-nft-stellar-selection': {
-        percent: '10 NFTs',
+        amount: '10 NFTs',
         title: 'Anchored-NFT Stellar Selection',
         body: `Ten randomly selected Random Walk NFT anchor-holders each receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and one Cosmic Signature NFT.`,
       },
       'endurance-champion': {
-        percent: `${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST`,
+        amount: `${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST`,
         title: 'Endurance Champion Allocation',
         body: '1,000 Recognition CST and one Cosmic Signature NFT to the participant with the longest unbroken endurance window.',
       },
       'final-cst-gesture': {
-        percent: `${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST`,
+        amount: `${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST`,
         title: 'Final CST Gesture Allocation',
         body: '1,000 Recognition CST and one Cosmic Signature NFT to the participant who made the last CST gesture of the cycle.',
       },

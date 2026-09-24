@@ -140,22 +140,22 @@ export const landingTextJa = {
         body: '無作為に選ばれた3人の参加者で分け合います。選ばれる頻度は入れた一筆の数に応じて高まります。',
       },
       'participant-nft-stellar-selection': {
-        percent: 'NFT 10点',
+        amount: 'NFT 10点',
         title: 'NFT星選——参加者',
         body: `無作為に選ばれた10人の参加者が、それぞれ${cst} CSTとCosmic Signature NFT 1点を受け取ります。`,
       },
       'anchored-nft-stellar-selection': {
-        percent: 'NFT 10点',
+        amount: 'NFT 10点',
         title: '係留NFT星選',
         body: `無作為に選ばれた10人のRandom Walk NFT係留者が、それぞれ${cst} CSTとCosmic Signature NFT 1点を受け取ります。`,
       },
       'endurance-champion': {
-        percent: `${cst} CST`,
+        amount: `${cst} CST`,
         title: '持久チャンピオン配分',
         body: '最新の一筆を入れた参加者として最も長く先頭を保持した参加者に、1,000 CSTの功労CSTとCosmic Signature NFT 1点が配分されます。',
       },
       'final-cst-gesture': {
-        percent: `${cst} CST`,
+        amount: `${cst} CST`,
         title: '最後のCST一筆配分',
         body: 'サイクルで最後のCST一筆を入れた参加者に、1,000 CSTの功労CSTとCosmic Signature NFT 1点が配分されます。',
       },

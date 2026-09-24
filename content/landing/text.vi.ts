@@ -140,22 +140,22 @@ export const landingTextVi = {
         body: 'Chia cho ba người tham gia được chọn ngẫu nhiên. Tần suất được chọn tăng theo số nét bút đã đặt.',
       },
       'participant-nft-stellar-selection': {
-        percent: '10 NFT',
+        amount: '10 NFT',
         title: 'NFT Tinh tuyển — Người tham gia',
         body: `Mười người tham gia được chọn ngẫu nhiên, mỗi người nhận ${cstAmount} CST và một Cosmic Signature NFT.`,
       },
       'anchored-nft-stellar-selection': {
-        percent: '10 NFT',
+        amount: '10 NFT',
         title: 'Tinh tuyển NFT neo giữ',
         body: `Mười người neo giữ Random Walk NFT được chọn ngẫu nhiên, mỗi người nhận ${cstAmount} CST và một Cosmic Signature NFT.`,
       },
       'endurance-champion': {
-        percent: `${cstAmount} CST`,
+        amount: `${cstAmount} CST`,
         title: 'Phân bổ Quán quân Bền bỉ',
         body: '1.000 CST ghi nhận và một Cosmic Signature NFT dành cho người giữ vị trí người đặt nét bút gần nhất lâu nhất trong một khoảng liên tục.',
       },
       'final-cst-gesture': {
-        percent: `${cstAmount} CST`,
+        amount: `${cstAmount} CST`,
         title: 'Phân bổ nét bút CST cuối cùng',
         body: '1.000 CST ghi nhận và một Cosmic Signature NFT dành cho người tham gia đặt nét bút CST cuối cùng của chu kỳ.',
       },

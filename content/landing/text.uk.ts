@@ -139,22 +139,22 @@ export const landingTextUk = {
         body: 'Ділиться між трьома випадково відібраними учасниками. Частота відбору зростає з кількістю зроблених жестів.',
       },
       'participant-nft-stellar-selection': {
-        percent: '10 NFT',
+        amount: '10 NFT',
         title: 'Зоряний відбір NFT серед учасників',
         body: `Десять випадково відібраних учасників отримують по ${protocolFacts.specialAllocationCst.toLocaleString('uk-UA')} CST і по одному Cosmic Signature NFT.`,
       },
       'anchored-nft-stellar-selection': {
-        percent: '10 NFT',
+        amount: '10 NFT',
         title: 'Зоряний відбір закріплених NFT',
         body: `Десять випадково відібраних власників закріплених Random Walk NFT отримують по ${protocolFacts.specialAllocationCst.toLocaleString('uk-UA')} CST і по одному Cosmic Signature NFT.`,
       },
       'endurance-champion': {
-        percent: `${protocolFacts.specialAllocationCst.toLocaleString('uk-UA')} CST`,
+        amount: `${protocolFacts.specialAllocationCst.toLocaleString('uk-UA')} CST`,
         title: 'Розподіл Чемпіона витривалості',
         body: '1 000 CST визнання та один Cosmic Signature NFT — учасникові з найдовшим безперервним періодом лідерства.',
       },
       'final-cst-gesture': {
-        percent: `${protocolFacts.specialAllocationCst.toLocaleString('uk-UA')} CST`,
+        amount: `${protocolFacts.specialAllocationCst.toLocaleString('uk-UA')} CST`,
         title: 'Розподіл завершального CST-жесту',
         body: '1 000 CST визнання та один Cosmic Signature NFT — учасникові, який зробив останній CST-жест циклу.',
       },

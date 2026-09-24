@@ -179,12 +179,15 @@ export interface LandingStageText {
 
 /**
  * Copy for one allocation track. Tracks without a fixed share in the
- * skeleton (the compounding remainder, the CST and NFT tracks) write their
- * own figure, because its wording differs across locales.
+ * skeleton write their own figure, because its wording differs across
+ * locales: the compounding remainder its approximate `percent` ("~50%"),
+ * each CST and NFT track its `amount` ("1,000 CST", "10 NFTs").
  */
 type LandingTrackItemText<Item> = Item extends { readonly share: number }
   ? { readonly title: string; readonly body: string }
-  : { readonly percent: string; readonly title: string; readonly body: string };
+  : Item extends { readonly track: AllocationTrackId }
+    ? { readonly percent: string; readonly title: string; readonly body: string }
+    : { readonly amount: string; readonly title: string; readonly body: string };
 
 /**
  * Copy for one public-goods table row. The `value` string is required here

@@ -16,7 +16,12 @@ import type { LandingContent, LandingEthTrack, LandingFixedTrack } from './types
 export * from './types';
 export * from './structure';
 
-type TrackText = { readonly percent?: string; readonly title: string; readonly body: string };
+type TrackText = {
+  readonly percent?: string;
+  readonly amount?: string;
+  readonly title: string;
+  readonly body: string;
+};
 
 /** Composes the locale-independent skeleton with one locale's copy. */
 function buildLandingContent(text: LandingText, locale: AppLocale): LandingContent {
@@ -53,7 +58,7 @@ function buildLandingContent(text: LandingText, locale: AppLocale): LandingConte
   });
   const fixed = LANDING_STRUCTURE.tracks.fixed.map((item): LandingFixedTrack => {
     const itemText = trackTexts[item.id]!;
-    return { id: item.id, amount: itemText.percent!, title: itemText.title, body: itemText.body };
+    return { id: item.id, amount: itemText.amount!, title: itemText.title, body: itemText.body };
   });
 
   return {

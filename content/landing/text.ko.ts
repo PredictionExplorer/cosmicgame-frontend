@@ -138,22 +138,22 @@ export const landingTextKo = {
         body: '무작위로 선정된 참여자 3명이 나누어 받습니다. 선정 빈도는 남긴 제스처 수에 따라 늘어납니다.',
       },
       'participant-nft-stellar-selection': {
-        percent: 'NFT 10개',
+        amount: 'NFT 10개',
         title: '참여자 대상 NFT 별빛 선정',
         body: `무작위로 선정된 참여자 10명이 각각 ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST와 Cosmic Signature NFT 1개를 받습니다.`,
       },
       'anchored-nft-stellar-selection': {
-        percent: 'NFT 10개',
+        amount: 'NFT 10개',
         title: '앵커링 NFT 별빛 선정',
         body: `무작위로 선정된 Random Walk NFT 앵커링 보유자 10명이 각각 ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST와 Cosmic Signature NFT 1개를 받습니다.`,
       },
       'endurance-champion': {
-        percent: `${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST`,
+        amount: `${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST`,
         title: '수호 챔피언 배분',
         body: '가장 오랫동안 끊기지 않고 선두를 지킨 참여자에게 공로 CST 1,000개와 Cosmic Signature NFT 1개가 배분됩니다.',
       },
       'final-cst-gesture': {
-        percent: `${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST`,
+        amount: `${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST`,
         title: '최종 CST 제스처 배분',
         body: '사이클에서 마지막으로 CST 제스처를 남긴 참여자에게 공로 CST 1,000개와 Cosmic Signature NFT 1개가 배분됩니다.',
       },

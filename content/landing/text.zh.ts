@@ -138,22 +138,22 @@ export const landingTextZh = {
         body: '由程序化随机选出的 3 位参与者均分；入选频次随落笔次数增加。',
       },
       'participant-nft-stellar-selection': {
-        percent: '10 枚 NFT',
+        amount: '10 枚 NFT',
         title: '参与者 NFT 星选',
         body: `程序化随机选出 10 位参与者，每位获配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 与 1 枚 Cosmic Signature NFT。`,
       },
       'anchored-nft-stellar-selection': {
-        percent: '10 枚 NFT',
+        amount: '10 枚 NFT',
         title: '锚定 NFT 星选',
         body: `程序化随机选出 10 位 Random Walk NFT 锚定者，每位获配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 与 1 枚 Cosmic Signature NFT。`,
       },
       'endurance-champion': {
-        percent: `${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST`,
+        amount: `${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST`,
         title: '坚守冠军分配',
         body: '连续坚守时间最长的参与者获配 1,000 表彰 CST 与 1 枚 Cosmic Signature NFT。',
       },
       'final-cst-gesture': {
-        percent: `${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST`,
+        amount: `${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST`,
         title: 'CST 收官之笔分配',
         body: '本周期最后一次使用 CST 落笔的参与者获配 1,000 表彰 CST 与 1 枚 Cosmic Signature NFT。',
       },
