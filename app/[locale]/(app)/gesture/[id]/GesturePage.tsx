@@ -17,6 +17,7 @@ import { DateTime } from '@/components/ui/date-time';
 import { EmptyState } from '@/components/ui/empty-state';
 import { LinkifiedText } from '@/components/ui/linkified-text';
 import { PageShell } from '@/components/ui/page-shell';
+import { PendingPlate } from '@/components/ui/art-frame';
 import { SkeletonDetailRows } from '@/components/ui/skeleton';
 import { TxExplorerLink } from '@/components/ui/tx-status';
 import { UnknownValue } from '@/components/ui/unknown-value';
@@ -117,6 +118,40 @@ export function gestureTrail(
   };
 }
 
+/**
+ * The attached NFT's metadata, read from its token URI in the browser.
+ * `undefined` while it loads (or when there is no URI to read), `null` when
+ * it could not be read. Third-party hosts often refuse cross-origin reads, so
+ * a failure is a normal outcome, not an error to report.
+ */
+function useAttachedNftMetadata(uri: string | undefined): NFTTokenURI | null | undefined {
+  const [result, setResult] = useState<{ uri: string; data: NFTTokenURI | null } | null>(null);
+
+  useEffect(() => {
+    if (!uri) return;
+    let cancelled = false;
+    axios
+      .get<NFTTokenURI>(uri)
+      .then(({ data }) => {
+        if (!cancelled) setResult({ uri, data: data && typeof data === 'object' ? data : null });
+      })
+      .catch(() => {
+        if (!cancelled) setResult({ uri, data: null });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [uri]);
+
+  if (!uri) return null;
+  return result?.uri === uri ? result.data : undefined;
+}
+
+/** A metadata field when the token URI actually carries text for it. */
+function metadataText(value: unknown): string | null {
+  return typeof value === 'string' && value.trim() ? value.trim() : null;
+}
+
 /** One label / value line of the record. */
 function RecordRow({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -144,21 +179,7 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
     poll: false,
   });
   const neighbours = useGestureNeighbours(gestureInfo?.RoundNum, gestureInfo?.BidPosition);
-  const [tokenURI, setTokenURI] = useState<NFTTokenURI | null>(null);
-
-  useEffect(() => {
-    if (!gestureInfo?.NFTTokenURI) return;
-    let cancelled = false;
-    axios
-      .get<NFTTokenURI>(gestureInfo.NFTTokenURI)
-      .then(({ data }) => {
-        if (!cancelled) setTokenURI(data);
-      })
-      .catch(() => undefined);
-    return () => {
-      cancelled = true;
-    };
-  }, [gestureInfo?.NFTTokenURI]);
+  const tokenURI = useAttachedNftMetadata(gestureInfo?.NFTTokenURI);
 
   if (gestureId < 0) {
     return (
@@ -255,6 +276,17 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
     );
   };
   const hasSteps = !!(neighbours.previous || neighbours.next);
+  const nftMetadataRows = (
+    [
+      ['collectionName', t('nftPreview.collectionName'), tokenURI?.collection_name],
+      ['artist', t('nftPreview.artist'), tokenURI?.artist],
+      ['platform', t('nftPreview.platform'), tokenURI?.platform],
+      ['description', t('nftPreview.description'), tokenURI?.description],
+    ] as const
+  ).flatMap(([key, label, raw]) => {
+    const value = metadataText(raw);
+    return value ? [{ key, label, value }] : [];
+  });
 
   return (
     <PageShell variant="detail" backdrop="signature" className="max-sm:pb-16">
@@ -377,10 +409,22 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
                 {t('sections.nft.title')}
               </h2>
               <div className="grid gap-8 sm:grid-cols-[minmax(0,15rem)_minmax(0,1fr)]">
-                <div className="overflow-hidden rounded-edge bg-art-ground">
-                  <NFTImage src={tokenURI?.image} className="bg-contain" />
+                {/* The media keeps its own ratio: the well does not stretch to the list beside it. */}
+                <div className="self-start overflow-hidden rounded-edge bg-art-ground">
+                  {tokenURI === undefined ? (
+                    <PendingPlate variant="media" busy />
+                  ) : (
+                    <NFTImage
+                      src={metadataText(tokenURI?.image) ?? undefined}
+                      alt={
+                        metadataText(tokenURI?.name) ??
+                        `${t('sections.nft.title')} ${gestureInfo.NFTDonationTokenId}`
+                      }
+                      className="bg-contain"
+                    />
+                  )}
                 </div>
-                <dl className="divide-y divide-rule-faint border-y border-rule">
+                <dl className="self-start divide-y divide-rule-faint border-y border-rule">
                   <RecordRow label={t('rows.nftContract')}>
                     <AddressChip
                       address={gestureInfo.NFTDonationTokenAddr as string}
@@ -391,22 +435,17 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
                   <RecordRow label={t('rows.nftId')}>
                     <span className="type-mono">{gestureInfo.NFTDonationTokenId}</span>
                   </RecordRow>
-                  <RecordRow label={t('nftPreview.collectionName')}>
-                    {tokenURI?.collection_name ?? unknown}
-                  </RecordRow>
-                  <RecordRow label={t('nftPreview.artist')}>
-                    {tokenURI?.artist ?? unknown}
-                  </RecordRow>
-                  <RecordRow label={t('nftPreview.platform')}>
-                    {tokenURI?.platform ?? unknown}
-                  </RecordRow>
-                  {tokenURI?.description ? (
-                    <RecordRow label={t('nftPreview.description')}>
-                      <span className="whitespace-pre-wrap text-muted-foreground">
-                        {tokenURI.description}
-                      </span>
+                  {/* Collection, artist and platform are optional metadata: a row
+                      appears only when the token URI names it. */}
+                  {nftMetadataRows.map(({ key, label, value }) => (
+                    <RecordRow key={key} label={label}>
+                      {key === 'description' ? (
+                        <span className="whitespace-pre-wrap text-muted-foreground">{value}</span>
+                      ) : (
+                        value
+                      )}
                     </RecordRow>
-                  ) : null}
+                  ))}
                 </dl>
               </div>
             </section>

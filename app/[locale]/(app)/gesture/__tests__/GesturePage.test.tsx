@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 import { render, screen, within, checkA11y } from '@/test-utils';
 
 import GesturePage from '../[id]/GesturePage';
@@ -229,6 +231,57 @@ describe('GesturePage', () => {
     });
     expect(screen.getByText('gesture.rows.erc20')).toBeInTheDocument();
     expect(screen.getByText('2,000')).toBeInTheDocument();
+  });
+
+  describe('attached NFT', () => {
+    const attached = {
+      NFTDonationTokenAddr: '0x2222222222222222222222222222222222222222',
+      NFTDonationTokenId: 8489,
+      NFTTokenURI: 'https://example.org/token/8489',
+    };
+    const mockGet = axios.get as jest.Mock;
+
+    it('lists only the metadata the token URI names', async () => {
+      mockGet.mockResolvedValueOnce({
+        data: {
+          image: 'https://example.org/8489.png',
+          name: 'Rexy #8489',
+          collection_name: 'Rexy',
+          artist: '  ',
+        },
+      });
+      renderGesture(attached);
+
+      expect(await screen.findByTestId('nft-image')).toHaveAttribute(
+        'src',
+        'https://example.org/8489.png',
+      );
+      expect(screen.getByTestId('nft-image')).toHaveAttribute('alt', 'Rexy #8489');
+      expect(screen.getByText('gesture.nftPreview.collectionName')).toBeInTheDocument();
+      expect(screen.getByText('Rexy')).toBeInTheDocument();
+      // No dash rows for fields the metadata does not carry.
+      expect(screen.queryByText('gesture.nftPreview.artist')).not.toBeInTheDocument();
+      expect(screen.queryByText('gesture.nftPreview.platform')).not.toBeInTheDocument();
+    });
+
+    it('holds a busy plate while the metadata loads, then the unavailable art when it fails', async () => {
+      let fail: (reason: Error) => void = () => undefined;
+      mockGet.mockReturnValueOnce(
+        new Promise((_, reject) => {
+          fail = reject;
+        }),
+      );
+      renderGesture(attached);
+
+      expect(screen.getByTestId('pending-plate')).toHaveAttribute('aria-busy', 'true');
+      expect(screen.queryByTestId('nft-image')).not.toBeInTheDocument();
+
+      fail(new Error('CORS'));
+      const image = await screen.findByTestId('nft-image');
+      expect(image).not.toHaveAttribute('src');
+      expect(screen.getByText('gesture.rows.nftId')).toBeInTheDocument();
+      expect(screen.queryByText('gesture.nftPreview.collectionName')).not.toBeInTheDocument();
+    });
   });
 
   it('steps to the previous and next gesture of the cycle', () => {
