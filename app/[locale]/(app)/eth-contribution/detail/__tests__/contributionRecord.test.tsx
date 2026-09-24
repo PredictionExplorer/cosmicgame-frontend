@@ -1,5 +1,4 @@
-import { get_donations_with_info_by_id } from '@/services/api/donations';
-import type { ETHDonation } from '@/services/api/types';
+import api, { type ETHDonation } from '@/services/api';
 import { useDonationsWithInfoById } from '@/hooks/useApiQuery';
 
 import { renderWithQuery, screen } from '@/test-utils';
@@ -10,12 +9,17 @@ import { contributionSeeds, readContribution } from '../[id]/contributionRecord'
 // The real cache: the shared test mock stubs the client this test reads.
 jest.mock('@tanstack/react-query', () => jest.requireActual('@tanstack/react-query'));
 jest.mock('../../../publicDataReads', () => ({ readDashboard: jest.fn() }));
-jest.mock('@/services/api/donations', () => ({
-  ...jest.requireActual('@/services/api/donations'),
-  get_donations_with_info_by_id: jest.fn(),
-}));
+// The record read, for the server helper and the page's client hook alike.
+jest.mock('@/services/api', () => {
+  const actual = jest.requireActual('@/services/api');
+  return {
+    __esModule: true,
+    ...actual,
+    default: { ...actual.default, get_donations_with_info_by_id: jest.fn() },
+  };
+});
 
-const mockRead = get_donations_with_info_by_id as jest.Mock;
+const mockRead = api.get_donations_with_info_by_id as jest.Mock;
 
 const RECORD: ETHDonation = {
   EvtLogId: 18955,

@@ -1,7 +1,6 @@
 import { cache } from 'react';
 
-import { get_donations_with_info_by_id } from '@/services/api/donations';
-import type { ETHDonation } from '@/services/api/types';
+import api, { type ETHDonation } from '@/services/api';
 
 import { seedsDisabled, type QuerySeedEntry } from '../../../QuerySeed';
 
@@ -27,7 +26,7 @@ export type ContributionRead =
 export const readContribution = cache(async (id: number): Promise<ContributionRead> => {
   if (seedsDisabled() || !Number.isInteger(id) || id < 0) return { status: 'unknown' };
   try {
-    const record = await get_donations_with_info_by_id(id);
+    const record = await api.get_donations_with_info_by_id(id);
     return record ? { status: 'found', record, at: Date.now() } : { status: 'missing' };
   } catch {
     return { status: 'unknown' };

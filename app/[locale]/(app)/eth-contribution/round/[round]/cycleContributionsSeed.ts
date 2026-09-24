@@ -1,4 +1,4 @@
-import { get_donations_both_by_round } from '@/services/api/donations';
+import api from '@/services/api';
 
 import { seedsDisabled, type QuerySeedEntry } from '../../../QuerySeed';
 
@@ -11,7 +11,7 @@ import { seedsDisabled, type QuerySeedEntry } from '../../../QuerySeed';
 export async function readCycleContributionsSeed(round: number): Promise<QuerySeedEntry[]> {
   if (seedsDisabled() || !Number.isInteger(round) || round < 0) return [];
   try {
-    const data = await get_donations_both_by_round(round);
+    const data = await api.get_donations_both_by_round(round);
     return [{ queryKey: ['donationsBothByRound', round], data, at: Date.now() }];
   } catch {
     return [];

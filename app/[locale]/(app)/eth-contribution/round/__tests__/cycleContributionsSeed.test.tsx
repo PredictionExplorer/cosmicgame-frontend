@@ -1,4 +1,4 @@
-import { get_donations_both_by_round } from '@/services/api/donations';
+import api from '@/services/api';
 import { useDonationsBothByRound } from '@/hooks/useApiQuery';
 
 import { renderWithQuery, screen } from '@/test-utils';
@@ -9,12 +9,17 @@ import { readCycleContributionsSeed } from '../[round]/cycleContributionsSeed';
 // The real cache: the shared test mock stubs the client this test reads.
 jest.mock('@tanstack/react-query', () => jest.requireActual('@tanstack/react-query'));
 jest.mock('../../../publicDataReads', () => ({ readDashboard: jest.fn() }));
-jest.mock('@/services/api/donations', () => ({
-  ...jest.requireActual('@/services/api/donations'),
-  get_donations_both_by_round: jest.fn(),
-}));
+// The cycle read, for the server helper and the page's client hook alike.
+jest.mock('@/services/api', () => {
+  const actual = jest.requireActual('@/services/api');
+  return {
+    __esModule: true,
+    ...actual,
+    default: { ...actual.default, get_donations_both_by_round: jest.fn() },
+  };
+});
 
-const mockRead = get_donations_both_by_round as jest.Mock;
+const mockRead = api.get_donations_both_by_round as jest.Mock;
 const ROWS = [{ EvtLogId: 1, DonorAddr: '0xAA', AmountEth: 1.5, RoundNum: 1 }];
 
 const previous = process.env.PLAYWRIGHT;
