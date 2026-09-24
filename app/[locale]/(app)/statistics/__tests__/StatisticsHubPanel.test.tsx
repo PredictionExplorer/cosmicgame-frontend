@@ -56,6 +56,19 @@ describe('StatisticsHubPanel', () => {
     expect(screen.getByText('36.1595 ETH')).toBeInTheDocument();
   });
 
+  it('gives each headline figure its own pictogram', () => {
+    render(<StatisticsHubPanel />);
+    // Allocations Distributed and NFTs Imprinted sit side by side: one
+    // concept, one glyph, and never the same glyph for two concepts.
+    const headline = screen.getByTestId('statistics-hub').firstElementChild;
+    const glyphs = [...(headline?.querySelectorAll('svg') ?? [])].map(
+      (svg) => [...svg.classList].find((name) => name.startsWith('lucide-')) ?? '',
+    );
+    expect(glyphs).toHaveLength(4);
+    expect(new Set(glyphs).size).toBe(glyphs.length);
+    expect(glyphs).toEqual(expect.arrayContaining(['lucide-layers', 'lucide-stamp']));
+  });
+
   it('renders an explore card linking to every section page', () => {
     render(<StatisticsHubPanel />);
     const nav = screen.getByRole('navigation', { name: 'Statistics section pages' });

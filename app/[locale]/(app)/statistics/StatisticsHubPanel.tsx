@@ -1,12 +1,18 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { ArrowRight, Hash, Layers, Lock, Wallet } from 'lucide-react';
+import { ArrowRight, Lock, Wallet } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { formatCSTValue, formatCount, formatEthValue } from '@/utils';
 
-import { AllocationIcon, CstTokenIcon, PublicGoodsIcon } from '@/lib/conceptIcons';
+import {
+  AllocationIcon,
+  CstTokenIcon,
+  CycleIcon,
+  ImprintIcon,
+  PublicGoodsIcon,
+} from '@/lib/conceptIcons';
 import { Link } from '@/i18n/navigation';
 import { useCTStatistics, useDashboardInfo } from '@/hooks/useApiQuery';
 import type { DashboardInfo } from '@/services/api/types';
@@ -146,7 +152,7 @@ const StatisticsHubPanel = () => {
         <StatCard
           label={t('metrics.totalCycles.label')}
           value={formatCount(data.CurRoundNum, locale)}
-          icon={<Hash className="h-4 w-4" />}
+          icon={<CycleIcon className="h-4 w-4" />}
           tooltip={t('metrics.totalCycles.tooltip')}
         />
         <StatCard
@@ -158,7 +164,7 @@ const StatisticsHubPanel = () => {
         <StatCard
           label={t('metrics.cosmicSignatureNftsImprinted.shortLabel')}
           value={formatCount(data.MainStats.NumCSTokenMints, locale)}
-          icon={<Layers className="h-4 w-4" />}
+          icon={<ImprintIcon className="h-4 w-4" />}
           tooltip={t('metrics.cosmicSignatureNftsImprinted.tooltip')}
         />
         <StatCard
