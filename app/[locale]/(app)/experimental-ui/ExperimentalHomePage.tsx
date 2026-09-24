@@ -669,7 +669,6 @@ const ExperimentalHomePage = ({
       <PageShell
         variant="data"
         backdrop="hero"
-        data-experimental-ui
         className="max-w-none px-0 sm:px-0 max-lg:pb-28 max-sm:pb-28"
       >
         <Container>
@@ -706,7 +705,7 @@ const ExperimentalHomePage = ({
                 </>
               }
               related={[{ href: '/how-it-works', label: t('deck.newHere') }]}
-              className="mb-8 pb-8 sm:mb-10 sm:pb-8"
+              className="mb-8 pb-6 sm:mb-10 sm:pb-8"
             />
           </div>
 
