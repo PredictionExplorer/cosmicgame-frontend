@@ -106,10 +106,12 @@ test.describe('Gesture detail page', () => {
   }) => {
     // The production API answers an id it does not hold with 400, not 404.
     let reads = 0;
+    // lexicon-allow-start: mocked backend route is a sealed API contract.
     await page.route('**/api/cosmicgame/bid/info/40000', (route) => {
       reads += 1;
       return route.fulfill({ status: 400, json: { error: 'record not found' } });
     });
+    // lexicon-allow-end
 
     await page.goto('/gesture/40000', { waitUntil: 'networkidle' });
 
