@@ -352,7 +352,7 @@ const EnduranceGanttView = memo(function EnduranceGanttView({ gantt }: { gantt: 
                       }}
                       onMouseEnter={() => setReadout({ lane, stint })}
                       className={cn(
-                        'absolute inset-y-1 min-w-[2px] rounded-[1px] transition-opacity duration-fast focus-ring-inset',
+                        'absolute inset-y-1 min-w-[2px] rounded-edge transition-opacity duration-fast focus-ring-inset',
                         active || stint.isEnduranceChampion ? 'opacity-100' : 'opacity-75',
                       )}
                       style={{

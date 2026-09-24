@@ -51,6 +51,9 @@ export function retrievedShare(cycle: Pick<RoundClaimSummary, 'TotalAwarded' | '
   return Math.min(1, Math.max(0, (cycle.TotalAwarded - cycle.TotalUnclaimed) / cycle.TotalAwarded));
 }
 
+/** A dialog header that reads left to right and keeps clear of the close button in its corner. */
+const DIALOG_HEADER_CLASS = 'pr-12 text-left';
+
 const UnretrievedDialog = ({
   cycle,
   nowSec,
@@ -85,7 +88,7 @@ const UnretrievedDialog = ({
       <DialogContent className="max-w-xl">
         {cycle ? (
           <>
-            <DialogHeader>
+            <DialogHeader className={DIALOG_HEADER_CLASS}>
               <DialogTitle>
                 {t('performance.claims.dialog.unclaimedTitle', { cycle: cycle.RoundNum })}
               </DialogTitle>
@@ -190,7 +193,7 @@ const CycleDetailDialog = ({ round, onClose }: { round: number | null; onClose: 
   return (
     <Dialog open={round != null} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-4xl">
-        <DialogHeader>
+        <DialogHeader className={DIALOG_HEADER_CLASS}>
           <DialogTitle>
             {t('performance.claims.dialog.exploreTitle', { cycle: round ?? 0 })}
           </DialogTitle>
