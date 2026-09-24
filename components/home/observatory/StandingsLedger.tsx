@@ -340,7 +340,7 @@ function GestureFacts({ gesture, pending }: { gesture: GestureInfo | null; pendi
       label: tTables('specialAllocation.gestureTime'),
       value:
         typeof gesture.TimeStamp === 'number' && gesture.TimeStamp > 0 ? (
-          <DateTime timestamp={gesture.TimeStamp} />
+          <DateTime timestamp={gesture.TimeStamp} showZone />
         ) : (
           <UnknownValue label={unavailable} />
         ),

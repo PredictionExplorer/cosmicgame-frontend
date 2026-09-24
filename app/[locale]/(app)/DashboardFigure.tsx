@@ -47,7 +47,7 @@ export function DashboardFigure({
     case 'balance':
       return <Amount value={value} unit="ETH" />;
     case 'opened':
-      return <DateTime timestamp={value} />;
+      return <DateTime timestamp={value} showZone />;
     default:
       return format.count(value);
   }

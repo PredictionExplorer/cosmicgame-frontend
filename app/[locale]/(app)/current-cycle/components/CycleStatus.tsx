@@ -162,7 +162,7 @@ export function CycleStatus({
         </p>
         {state.isOpeningSoon && state.activationTime ? (
           <p className="mt-1 type-body-sm text-muted-foreground">
-            <DateTime timestamp={state.activationTime}>
+            <DateTime timestamp={state.activationTime} showZone>
               {(date) => t('hero.countdown.opensAt', { n: data.CurRoundNum, date })}
             </DateTime>
           </p>
