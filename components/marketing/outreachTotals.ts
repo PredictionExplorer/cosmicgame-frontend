@@ -6,8 +6,12 @@ import type { MarketingReward } from '@/services/api/types';
  */
 export const SMALL_ALLOCATION_CST = 0.01;
 
-/** An allocation too small to show at table precision, 0 included. */
-export const isSmallAllocation = (amountCst: number) => amountCst < SMALL_ALLOCATION_CST;
+/**
+ * An allocation too small to show at table precision ("<0.01"). A true zero
+ * is not one: it prints as a plain zero.
+ */
+export const isSmallAllocation = (amountCst: number) =>
+  amountCst > 0 && amountCst < SMALL_ALLOCATION_CST;
 
 /** One outreach contributor's totals, ranked. */
 export interface OutreachContributor {

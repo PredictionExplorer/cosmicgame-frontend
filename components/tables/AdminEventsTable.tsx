@@ -9,7 +9,7 @@ import { AddressChip } from '@/components/ui/address-chip';
 import { DataTable, ExternalTableLink, type DataTableColumn } from '@/components/ui/data-table';
 import { DateTime } from '@/components/ui/date-time';
 import { Duration } from '@/components/ui/duration';
-import { InfoTooltip } from '@/components/ui/info-tooltip';
+import { ExplainedTerm } from '@/components/ui/explain-popover';
 import { UnknownValue } from '@/components/ui/unknown-value';
 import type { LedgerStateProps } from '@/components/tables/ledger-props';
 import type { AdminEventRow } from '@/services/api/types';
@@ -27,15 +27,36 @@ interface AdminEventsTableProps extends LedgerStateProps {
 }
 
 /**
- * Configuration changes recorded on chain: which parameter changed, when
- * (linked to its transaction) and its new value, formatted by what the
- * parameter measures (a duration, a percentage, an address, a date).
+ * For each change, the change to the same parameter just before it in the
+ * list (by event order), so a row can say what the value was. The first
+ * change of a parameter in the list has none.
+ */
+export function previousChanges(list: readonly AdminEventRow[]): Map<string, AdminEventRow> {
+  const byOrder = [...list].sort((a, b) => Number(a.EvtLogId) - Number(b.EvtLogId));
+  const latest = new Map<number, AdminEventRow>();
+  const previous = new Map<string, AdminEventRow>();
+  for (const row of byOrder) {
+    const before = latest.get(row.RecordType);
+    if (before) previous.set(String(row.EvtLogId), before);
+    latest.set(row.RecordType, row);
+  }
+  return previous;
+}
+
+/**
+ * Configuration changes recorded on chain, newest first: which parameter
+ * changed (the name explains itself on hover, focus or tap), when (linked to
+ * its transaction), and its new value next to the value it replaced,
+ * formatted by what the parameter measures (a duration, a percentage, an
+ * address, a date).
  */
 export const AdminEventsTable = ({ list, ...state }: AdminEventsTableProps) => {
   const t = useTranslations('tables');
   const tCoordination = useTranslations('coordination');
   const tStatistics = useTranslations('statistics');
   const locale = useLocale();
+
+  const previous = useMemo(() => previousChanges(list), [list]);
 
   const columns = useMemo<DataTableColumn<AdminEventRow>[]>(() => {
     const eventOf = (row: AdminEventRow): AdminEvent | undefined =>
@@ -45,7 +66,7 @@ export const AdminEventsTable = ({ list, ...state }: AdminEventsTableProps) => {
       return event?.messageKey ? tCoordination(`events.${event.messageKey}`) : t('status.unknown');
     };
 
-    const newValue = (row: AdminEventRow): ReactNode => {
+    const valueOf = (row: AdminEventRow): ReactNode => {
       const event = eventOf(row);
       if (row.RecordType === 0) return t('status.undefined');
       switch (event?.type) {
@@ -91,17 +112,14 @@ export const AdminEventsTable = ({ list, ...state }: AdminEventsTableProps) => {
           const explanation = event?.messageKey
             ? tStatistics(`systemEvent.adminEvents.${event.messageKey}`)
             : event?.description;
-          return (
-            <span className="inline-flex max-w-full items-center gap-1.5 text-foreground">
-              <span>{name}</span>
-              {explanation ? (
-                <InfoTooltip
-                  content={explanation}
-                  ariaLabel={tStatistics('systemEvent.explainEvent', { event: name })}
-                  iconClassName="size-3.5"
-                />
-              ) : null}
-            </span>
+          // The name explains itself (a dotted underline, one tab stop)
+          // rather than carrying an info button after it on every row.
+          return explanation ? (
+            <ExplainedTerm definition={explanation} className="text-foreground">
+              {name}
+            </ExplainedTerm>
+          ) : (
+            <span className="text-foreground">{name}</span>
           );
         },
       },
@@ -110,6 +128,9 @@ export const AdminEventsTable = ({ list, ...state }: AdminEventsTableProps) => {
         kind: 'datetime',
         header: t('columns.datetime'),
         value: (row) => row.TimeStamp,
+        // Changes made in one transaction share a timestamp; the event
+        // order keeps them in the order they were applied.
+        compare: (a, b) => a.TimeStamp - b.TimeStamp || Number(a.EvtLogId) - Number(b.EvtLogId),
         txHash: (row) => row.TxHash,
         year: 'always',
         sortable: true,
@@ -119,10 +140,22 @@ export const AdminEventsTable = ({ list, ...state }: AdminEventsTableProps) => {
         kind: 'text',
         header: t('columns.newValue'),
         value: (row) => row.RecordType,
-        cell: newValue,
+        cell: valueOf,
+      },
+      {
+        id: 'previousValue',
+        kind: 'text',
+        header: t('columns.previousValue'),
+        value: (row) => (previous.has(String(row.EvtLogId)) ? row.RecordType : null),
+        cell: (row) => {
+          const before = previous.get(String(row.EvtLogId));
+          return before ? <span className="text-subtle">{valueOf(before)}</span> : null;
+        },
+        hideWhenEmpty: true,
+        priority: 'secondary',
       },
     ];
-  }, [t, tCoordination, tStatistics, locale]);
+  }, [t, tCoordination, tStatistics, locale, previous]);
 
   return (
     <DataTable
@@ -131,6 +164,7 @@ export const AdminEventsTable = ({ list, ...state }: AdminEventsTableProps) => {
       ariaLabel={t('names.parameterChanges')}
       getRowKey={(row) => row.EvtLogId}
       emptyTitle={t('adminEvents.empty')}
+      initialSort={{ id: 'datetime', direction: 'desc' }}
       layout="cards"
       {...state}
     />

@@ -380,6 +380,7 @@ export function AddressTransferHistory({
         columns={columns}
         ariaLabel={t(`${asset}.title`)}
         getRowKey={(entry) => entry.key}
+        initialSort={{ id: 'date', direction: 'desc' }}
         loading={query.isLoading}
         error={query.isError ? t('error') : undefined}
         onRetry={() => void query.refetch()}

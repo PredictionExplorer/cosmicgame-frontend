@@ -14,9 +14,11 @@ interface UniqueAnchorHoldersCSTTableProps extends LedgerStateProps {
 }
 
 /**
- * Every wallet that has anchored a Cosmic Signature NFT: its anchor and
- * release actions, tokens, and Anchor Distribution received and unretrieved.
- * Headers carry the full column names; phone records use the short ones.
+ * Every wallet that has anchored a Cosmic Signature NFT, most anchored now
+ * first: its anchor and release actions, the NFTs it keeps anchored, and
+ * the Anchor Distribution it has received and not yet retrieved. Each
+ * column has one short name, the header on a wide screen and the label in
+ * a phone record, and the ETH columns say "(ETH)" in both.
  */
 export const UniqueAnchorHoldersCSTTable = ({
   list,
@@ -29,35 +31,27 @@ export const UniqueAnchorHoldersCSTTable = ({
       {
         id: 'holder',
         kind: 'address',
-        header: t('columns.anchorHolderAddress'),
-        label: t('columns.holder'),
-        help: t('statisticsTooltips.anchorHolderAddress'),
+        header: t('columns.anchorHolder'),
         value: (row) => row.StakerAddr,
       },
       {
         id: 'anchors',
         kind: 'count',
-        header: t('uniqueAnchorHolders.numAnchorActions'),
-        label: t('uniqueAnchorHolders.anchors'),
-        help: t('statisticsTooltips.numAnchorActions'),
+        header: t('uniqueAnchorHolders.anchors'),
         value: (row) => row.NumStakeActions,
         sortable: true,
       },
       {
         id: 'releases',
         kind: 'count',
-        header: t('uniqueAnchorHolders.numReleaseActions'),
-        label: t('uniqueAnchorHolders.releases'),
-        help: t('statisticsTooltips.numReleaseActions'),
+        header: t('uniqueAnchorHolders.releases'),
         value: (row) => row.NumUnstakeActions,
         sortable: true,
       },
       {
         id: 'imprinted',
         kind: 'count',
-        header: t('uniqueAnchorHolders.totalImprintedTokens'),
-        label: t('uniqueAnchorHolders.imprinted'),
-        help: t('statisticsTooltips.totalImprintedTokens'),
+        header: t('uniqueAnchorHolders.imprinted'),
         // The CST endpoint omits this field; the column is dropped rather
         // than filled with confident zeros.
         value: (row) => row.TotalTokensMinted,
@@ -67,18 +61,15 @@ export const UniqueAnchorHoldersCSTTable = ({
       {
         id: 'anchored',
         kind: 'count',
-        header: t('uniqueAnchorHolders.totalAnchoredTokens'),
-        label: t('uniqueAnchorHolders.anchored'),
-        help: t('statisticsTooltips.totalAnchoredTokens'),
+        header: t('uniqueAnchorHolders.anchored'),
+        // The API's count of NFTs anchored right now: anchors minus releases.
         value: (row) => row.TotalTokensStaked,
         sortable: true,
       },
       {
         id: 'distributed',
         kind: 'amount',
-        header: t('uniqueAnchorHolders.totalDistributionEth'),
-        label: t('uniqueAnchorHolders.distributed'),
-        help: t('statisticsTooltips.totalDistributionEth'),
+        header: t('uniqueAnchorHolders.distributedEth'),
         value: (row) => row.TotalRewardEth,
         showUnit: false,
         sortable: true,
@@ -86,9 +77,7 @@ export const UniqueAnchorHoldersCSTTable = ({
       {
         id: 'unretrieved',
         kind: 'amount',
-        header: t('uniqueAnchorHolders.unretrievedDistributionEth'),
-        label: t('uniqueAnchorHolders.unretrieved'),
-        help: t('statisticsTooltips.unretrievedDistributionEth'),
+        header: t('uniqueAnchorHolders.unretrievedEth'),
         value: (row) => row.UnclaimedRewardEth,
         showUnit: false,
         sortable: true,
@@ -104,7 +93,8 @@ export const UniqueAnchorHoldersCSTTable = ({
       ariaLabel={t('names.cstAnchorHolders')}
       getRowKey={(row) => row.StakerAid}
       emptyTitle={t('empty.anchorHolders')}
-      tableClassName="sm:min-w-[52rem] xl:min-w-0"
+      initialSort={{ id: 'anchored', direction: 'desc' }}
+      tableClassName="sm:min-w-[44rem] xl:min-w-0"
       {...state}
     />
   );

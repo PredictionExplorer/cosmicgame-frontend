@@ -13,7 +13,11 @@ interface UniqueParticipantsTableProps extends LedgerStateProps {
   list: Participant[];
 }
 
-/** Every wallet that has made a gesture, with its gesture count and largest ETH gesture. */
+/**
+ * Every wallet that has made a gesture, with its gesture count and largest
+ * ETH gesture. The headers say what each column holds, so none needs an
+ * explanation of its own.
+ */
 export const UniqueParticipantsTable = ({ list, ...state }: UniqueParticipantsTableProps) => {
   const t = useTranslations('tables');
 
@@ -22,15 +26,13 @@ export const UniqueParticipantsTable = ({ list, ...state }: UniqueParticipantsTa
       {
         id: 'participant',
         kind: 'address',
-        header: t('columns.participantAddress'),
-        help: t('statisticsTooltips.participantAddress'),
+        header: t('columns.participant'),
         value: (row) => row.BidderAddr,
       },
       {
         id: 'gestures',
         kind: 'count',
-        header: t('columns.numberOfGestures'),
-        help: t('statisticsTooltips.numberOfGestures'),
+        header: t('columns.gestureCount'),
         value: (row) => row.NumBids,
         sortable: true,
       },
@@ -38,7 +40,6 @@ export const UniqueParticipantsTable = ({ list, ...state }: UniqueParticipantsTa
         id: 'maxGesture',
         kind: 'amount',
         header: t('columns.maxGestureEth'),
-        help: t('statisticsTooltips.maxGestureEth'),
         // A wallet that only ever gestured with CST has no ETH gesture: the
         // API reports a negative sentinel, which reads as none, not as dust.
         value: (row) => (row.MaxBidAmountEth >= 0 ? row.MaxBidAmountEth : null),

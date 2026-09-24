@@ -26,16 +26,14 @@ describe('Sprint 5 bilingual catalogs', () => {
     expect(enStatistics.metrics.contractBalance.label).toBe('Contract balance');
     expect(enStatistics.metrics.cosmicSignatureNftsImprinted.shortLabel).toBe('NFTs imprinted');
     expect(enStatistics.sectionTooltips.enduranceTimeline).toContain('The widest bar');
-    expect(enTables.statisticsTooltips.systemEnded).toBe(
-      'Timestamp when the next system event replaced this one.',
-    );
+    expect(enTables.statisticsTooltips.allocationsSumEth).toContain('Allocations (all kinds)');
   });
 
   it('provides natural Chinese statistics and table copy', () => {
     expect(zhStatistics.metrics.activePerformanceCycle.label).toBe('当前演绎周期');
     expect(zhStatistics.metrics.uniqueRecipients.label).toBe('独立获配者');
     expect(zhStatistics.charts.frequency.openingExcluded).toContain('首小时');
-    expect(zhTables.statisticsTooltips.systemEnded).toContain('下一系统事件');
+    expect(zhTables.statisticsTooltips.allocationsSumEth).toContain('获配次数（全部类型）');
     expect(zhFormats.durationCompact.hours).toBe('小时');
   });
 

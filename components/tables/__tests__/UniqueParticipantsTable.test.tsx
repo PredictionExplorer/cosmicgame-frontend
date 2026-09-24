@@ -1,5 +1,4 @@
 import '@testing-library/jest-dom';
-import userEvent from '@testing-library/user-event';
 
 import { UniqueParticipantsTable } from '@/components/tables/UniqueParticipantsTable';
 
@@ -19,26 +18,21 @@ describe('UniqueParticipantsTable', () => {
     expect(screen.getByText('tables.empty.participants')).toBeInTheDocument();
   });
 
-  it('renders table headers', () => {
+  it('renders short table headers', () => {
     render(<UniqueParticipantsTable list={[createParticipant()]} />);
-    expect(screen.getAllByText('tables.columns.participantAddress').length).toBeGreaterThanOrEqual(
-      1,
-    );
-    expect(screen.getAllByText('tables.columns.numberOfGestures').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('tables.columns.maxGestureEth').length).toBeGreaterThanOrEqual(1);
+    const headers = screen.getAllByRole('columnheader').map((header) => header.textContent);
+    expect(headers).toEqual([
+      'tables.columns.participant',
+      'tables.columns.gestureCount',
+      'tables.columns.maxGestureEth',
+    ]);
   });
 
-  it('renders localized header help for confusing columns', async () => {
-    const user = userEvent.setup();
+  it('carries no info button on headers that say what they hold', () => {
     render(<UniqueParticipantsTable list={[createParticipant()]} />);
-    const triggers = screen.getAllByRole('button', {
-      name: /^tables\.tableHeaderHelp\.explainColumn/,
-    });
-    expect(triggers.length).toBeGreaterThanOrEqual(3);
-    await user.hover(triggers[1]!);
-    expect(await screen.findByRole('tooltip')).toHaveTextContent(
-      'tables.statisticsTooltips.numberOfGestures',
-    );
+    expect(
+      screen.queryAllByRole('button', { name: /^tables\.tableHeaderHelp\.explainColumn/ }),
+    ).toHaveLength(0);
   });
 
   it('renders participant data', () => {
@@ -69,7 +63,8 @@ describe('UniqueParticipantsTable', () => {
         ]}
       />,
     );
-    expect(screen.getByText('0')).toBeInTheDocument();
+    // Zero keeps the column's four digits, so the decimals line up.
+    expect(screen.getByText('0.0000')).toBeInTheDocument();
     expect(screen.getByText('<0.0001')).toBeInTheDocument();
   });
 

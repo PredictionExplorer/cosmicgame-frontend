@@ -48,8 +48,8 @@ describe('rankOutreachContributors', () => {
 });
 
 describe('isSmallAllocation', () => {
-  it('marks what a table would show as <0.01, and 0', () => {
-    expect(isSmallAllocation(0)).toBe(true);
+  it('marks what a table would show as <0.01, but not a true zero', () => {
+    expect(isSmallAllocation(0)).toBe(false);
     expect(isSmallAllocation(3e-15)).toBe(true);
     expect(isSmallAllocation(0.009)).toBe(true);
     expect(isSmallAllocation(0.01)).toBe(false);
@@ -70,7 +70,8 @@ describe('summarizeOutreachAllocations', () => {
       // 3e-15 is below a double's precision at this magnitude.
       totalCst: 2_999,
       allocations: 4,
-      smallAllocations: 2,
+      // 3e-15 reads "<0.01"; the true zero is not dust.
+      smallAllocations: 1,
       first: 1_700_000_100,
       latest: 1_700_000_300,
     });

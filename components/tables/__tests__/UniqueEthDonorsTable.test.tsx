@@ -23,17 +23,17 @@ describe('UniqueEthDonorsTable', () => {
     expect(screen.getByText('tables.empty.contributors')).toBeInTheDocument();
   });
 
-  it('renders table headers', () => {
+  it('renders short table headers with no info buttons', () => {
     render(<UniqueEthDonorsTable list={[createDonor()]} />);
-    expect(screen.getAllByText('tables.columns.contributorAddress').length).toBeGreaterThanOrEqual(
-      1,
-    );
+    const headers = screen.getAllByRole('columnheader').map((header) => header.textContent);
+    expect(headers).toEqual([
+      'tables.columns.contributor',
+      'tables.columns.numberOfContributions',
+      'tables.columns.totalContributedEth',
+    ]);
     expect(
-      screen.getAllByText('tables.columns.numberOfContributions').length,
-    ).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('tables.columns.totalContributedEth').length).toBeGreaterThanOrEqual(
-      1,
-    );
+      screen.queryAllByRole('button', { name: /^tables\.tableHeaderHelp\.explainColumn/ }),
+    ).toHaveLength(0);
   });
 
   it('renders contributor data', () => {

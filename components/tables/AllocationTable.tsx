@@ -14,15 +14,19 @@ interface AllocationTableProps extends LedgerStateProps {
 
 /**
  * Every finalized cycle in one aligned ledger: who received the Signature
- * Allocation, the ETH each allocation track carried, and the cycle's
- * gestures and NFTs. Each row leads to that cycle's allocation page; every
- * explanation sits once on its column header.
+ * Allocation, the ETH each allocation track carried (the same tracks, in
+ * the same order, as the reserve split above it), and the cycle's gestures
+ * and NFTs. The ETH and NFT columns sit under one group heading each, so a
+ * sub-header needs neither the unit nor the shared word and stays on one or
+ * two lines. Each row leads to that cycle's allocation page.
  */
 export const AllocationTable = ({ list, ...state }: AllocationTableProps) => {
   const t = useTranslations('tables');
 
-  const columns = useMemo<DataTableColumn<RoundInfo>[]>(
-    () => [
+  const columns = useMemo<DataTableColumn<RoundInfo>[]>(() => {
+    const ethGroup = t('allocation.groups.eth');
+    const nftGroup = t('allocation.groups.nfts');
+    return [
       {
         id: 'cycle',
         kind: 'text',
@@ -36,20 +40,25 @@ export const AllocationTable = ({ list, ...state }: AllocationTableProps) => {
         id: 'finalized',
         kind: 'datetime',
         header: t('allocation.columns.finalized'),
-        value: (cycle) => cycle.TimeStamp,
+        value: (cycle) => cycle.TimeStamp || null,
         txHash: (cycle) => cycle.TxHash,
+        // A finalized cycle always has a date and a recipient: a missing one
+        // could not be read, and says so.
+        whenBlank: 'unknown',
       },
       {
         id: 'recipient',
         kind: 'address',
         header: t('columns.recipient'),
-        help: t('allocation.allocationHelp'),
         value: (cycle) => cycle.WinnerAddr || null,
+        whenBlank: 'unknown',
       },
       {
         id: 'signature',
         kind: 'amount',
-        header: t('allocation.columns.signatureEth'),
+        group: ethGroup,
+        header: t('allocation.columns.signature'),
+        label: t('allocation.columns.signatureEth'),
         value: (cycle) => toFiniteNumber(cycle.AmountEth),
         showUnit: false,
         sortable: true,
@@ -57,7 +66,9 @@ export const AllocationTable = ({ list, ...state }: AllocationTableProps) => {
       {
         id: 'chrono',
         kind: 'amount',
-        header: t('allocation.columns.chronoEth'),
+        group: ethGroup,
+        header: t('allocation.columns.chrono'),
+        label: t('allocation.columns.chronoEth'),
         value: (cycle) => toFiniteNumber(cycle.ChronoWarriorAmountEth),
         showUnit: false,
         hideWhenEmpty: true,
@@ -65,45 +76,55 @@ export const AllocationTable = ({ list, ...state }: AllocationTableProps) => {
       {
         id: 'stellar',
         kind: 'amount',
-        header: t('allocation.columns.stellarEth'),
-        help: t('allocation.stellarHelp'),
+        group: ethGroup,
+        header: t('allocation.columns.stellar'),
+        label: t('allocation.columns.stellarEth'),
         value: (cycle) => toFiniteNumber(cycle.RoundStats?.TotalRaffleEthDepositsEth),
         showUnit: false,
       },
       {
         id: 'anchor',
         kind: 'amount',
-        header: t('allocation.columns.anchorEth'),
-        help: t('allocation.anchorHelp'),
+        group: ethGroup,
+        header: t('allocation.columns.anchor'),
+        label: t('allocation.columns.anchorEth'),
         value: (cycle) => toFiniteNumber(cycle.StakingDepositAmountEth),
+        showUnit: false,
+      },
+      {
+        id: 'publicGoods',
+        kind: 'amount',
+        group: ethGroup,
+        header: t('allocation.columns.publicGoods'),
+        label: t('allocation.columns.publicGoodsEth'),
+        value: (cycle) => toFiniteNumber(cycle.CharityAmountETH),
         showUnit: false,
       },
       {
         id: 'gestures',
         kind: 'count',
         header: t('allocation.gestures'),
-        help: t('allocation.gesturesHelp'),
         value: (cycle) => toFiniteNumber(cycle.RoundStats?.TotalBids),
         sortable: true,
       },
       {
         id: 'attachedNfts',
         kind: 'count',
-        header: t('allocation.columns.nftsAttached'),
-        help: t('allocation.nftsHelp'),
+        group: nftGroup,
+        header: t('allocation.columns.attached'),
+        label: t('allocation.columns.nftsAttached'),
         value: (cycle) => toFiniteNumber(cycle.RoundStats?.TotalDonatedNFTs),
-        priority: 'secondary',
       },
       {
         id: 'stellarNfts',
         kind: 'count',
-        header: t('allocation.columns.nftsViaStellar'),
-        help: t('allocation.distributedHelp'),
+        group: nftGroup,
+        header: t('allocation.columns.stellar'),
+        label: t('allocation.columns.nftsViaStellar'),
         value: (cycle) => toFiniteNumber(cycle.RoundStats?.TotalRaffleNFTs),
       },
-    ],
-    [t],
-  );
+    ];
+  }, [t]);
 
   return (
     <DataTable
@@ -112,10 +133,9 @@ export const AllocationTable = ({ list, ...state }: AllocationTableProps) => {
       ariaLabel={t('allocation.listAria')}
       getRowKey={(cycle, index) => cycle.RoundNum ?? `cycle-${index}`}
       getRowHref={(cycle) => `/allocation/${cycle.RoundNum}`}
-      getRowLabel={(cycle) => t('allocation.openDetails', { cycle: cycle.RoundNum })}
       emptyTitle={t('empty.recipientCyclesTitle')}
       emptyDescription={t('empty.recipientCyclesDescription')}
-      tableClassName="md:min-w-[60rem]"
+      tableClassName="md:min-w-[64rem]"
       {...state}
     />
   );

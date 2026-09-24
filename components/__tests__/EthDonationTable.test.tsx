@@ -54,14 +54,49 @@ describe('EthDonationTable', () => {
     expect(screen.getByText('0.5000')).toBeInTheDocument();
   });
 
-  it('shows contribution type when showType is true', () => {
-    render(<EthDonationTable list={[createDonation({ RecordType: 0 })]} showType={true} />);
-    expect(screen.getByText('tables.ethContribution.simple')).toBeInTheDocument();
+  it('says in the Note column which contributions carry a note, in the form’s words', () => {
+    render(
+      <EthDonationTable
+        list={[
+          createDonation({ RecordType: 1, EvtLogId: '1', CGRecordId: '100' }),
+          createDonation({ RecordType: 0, EvtLogId: '2', CGRecordId: '101' }),
+        ]}
+        showType={true}
+      />,
+    );
+    expect(screen.getByRole('columnheader', { name: 'tables.columns.note' })).toBeInTheDocument();
+    expect(screen.getByText('tables.ethContribution.withNote')).toBeInTheDocument();
+    // No note reads as a dash that says "None", not a sentence per row.
+    expect(screen.getByText('tables.status.none')).toBeInTheDocument();
+    expect(screen.queryByText(/ethContribution\.(simple|withInfo)/)).not.toBeInTheDocument();
   });
 
-  it('shows "Contribution with info" for RecordType > 0', () => {
-    render(<EthDonationTable list={[createDonation({ RecordType: 1 })]} showType={true} />);
-    expect(screen.getByText('tables.ethContribution.withInfo')).toBeInTheDocument();
+  it('names a contribution’s record link by its date, then the record it opens', () => {
+    render(<EthDonationTable list={[createDonation({ RecordType: 1, CGRecordId: '7' })]} />);
+    const link = screen.getByRole('link', {
+      name: /^\S.* tables\.ethContribution\.viewContribution\(id=7\)$/,
+    });
+    expect(link).toHaveAttribute('href', '/eth-contribution/detail/7');
+    expect(link).not.toHaveAttribute('aria-label');
+  });
+
+  it('shows the newest contribution first, and says so on the Date header', () => {
+    render(
+      <EthDonationTable
+        list={[
+          createDonation({ EvtLogId: '1', TimeStamp: 1_700_000_000, AmountEth: 1 }),
+          createDonation({ EvtLogId: '2', TimeStamp: 1_700_100_000, AmountEth: 2 }),
+        ]}
+      />,
+    );
+    expect(screen.getByRole('columnheader', { name: /tables\.columns\.datetime/ })).toHaveAttribute(
+      'aria-sort',
+      'descending',
+    );
+    const amounts = [...document.querySelectorAll('tbody td[data-kind="amount"]')].map(
+      (cell) => cell.textContent,
+    );
+    expect(amounts).toEqual(['2.0000', '1.0000']);
   });
 
   it('sets rel="noopener noreferrer" on all target="_blank" links', () => {

@@ -13,7 +13,13 @@ interface UniqueRecipientsTableProps extends LedgerStateProps {
   list: Recipient[];
 }
 
-/** Every wallet that has received an allocation, with counts and ETH totals. */
+/**
+ * Every wallet that has received an allocation: how many allocations of
+ * every kind (ETH, CST and NFTs alike), its largest Signature Allocation,
+ * and the ETH it has received in all. The count and the ETH sum measure
+ * different things, so a wallet with eight NFT and CST allocations reads
+ * "8" beside "0" ETH; the headers and the one explanation on the sum say so.
+ */
 export const UniqueRecipientsTable = ({ list, ...state }: UniqueRecipientsTableProps) => {
   const t = useTranslations('tables');
 
@@ -22,15 +28,13 @@ export const UniqueRecipientsTable = ({ list, ...state }: UniqueRecipientsTableP
       {
         id: 'recipient',
         kind: 'address',
-        header: t('columns.recipientAddress'),
-        help: t('statisticsTooltips.recipientAddress'),
+        header: t('columns.recipient'),
         value: (row) => row.WinnerAddr,
       },
       {
         id: 'allocations',
         kind: 'count',
         header: t('columns.allocationsReceived'),
-        help: t('statisticsTooltips.allocationsReceived'),
         // A count missing from the payload reads as unavailable, never as 0.
         value: (row) => (typeof row.AllocationsCount === 'number' ? row.AllocationsCount : null),
         sortable: true,

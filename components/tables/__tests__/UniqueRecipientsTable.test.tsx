@@ -21,7 +21,7 @@ describe('UniqueRecipientsTable', () => {
 
   it('renders table headers', () => {
     render(<UniqueRecipientsTable list={[createRecipient()]} />);
-    expect(screen.getAllByText('tables.columns.recipientAddress').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.recipient').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('tables.columns.allocationsReceived').length).toBeGreaterThanOrEqual(
       1,
     );
@@ -29,6 +29,17 @@ describe('UniqueRecipientsTable', () => {
     expect(screen.getAllByText('tables.columns.allocationsSumEth').length).toBeGreaterThanOrEqual(
       1,
     );
+  });
+
+  it('explains only the derived figures: the largest allocation and the ETH sum', () => {
+    render(<UniqueRecipientsTable list={[createRecipient()]} />);
+    const triggers = screen.getAllByRole('button', {
+      name: /^tables\.tableHeaderHelp\.explainColumn/,
+    });
+    expect(triggers.map((trigger) => trigger.getAttribute('aria-label'))).toEqual([
+      'tables.tableHeaderHelp.explainColumn(column=tables.columns.maxAllocationEth)',
+      'tables.tableHeaderHelp.explainColumn(column=tables.columns.allocationsSumEth)',
+    ]);
   });
 
   it('renders recipient data', () => {

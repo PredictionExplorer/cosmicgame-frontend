@@ -11,6 +11,16 @@ import { TransferHistoryTable } from '@/components/tables/TransferHistoryTable';
 
 import { checkA11y, render, screen } from '@/test-utils';
 
+let mockPhone = false;
+jest.mock('../../../components/ui/data-table/use-page-size', () => ({
+  ...jest.requireActual('../../../components/ui/data-table/use-page-size'),
+  usePhoneLayout: () => mockPhone,
+}));
+
+beforeEach(() => {
+  mockPhone = false;
+});
+
 jest.mock('../../../contexts/ContractAddressesContext', () => ({
   useContractAddresses: () => ({
     stakingCst: TEST_STAKING_CST_LABEL,
@@ -38,6 +48,31 @@ const createRecord = (overrides = {}) => ({
   FromAddr: '0x1111111111111111111111111111111111111111',
   ToAddr: '0x2222222222222222222222222222222222222222',
   ...overrides,
+});
+
+describe('TransferHistoryTable on a phone', () => {
+  it('stays a table of one line per transfer: the date, then From → To', () => {
+    mockPhone = true;
+    const { container } = render(<TransferHistoryTable list={[createRecord()]} />);
+    expect(screen.getByRole('table')).toHaveAttribute('data-layout', 'compact');
+    const headers = screen.getAllByRole('columnheader').map((header) => header.textContent);
+    expect(headers).toEqual([
+      'tables.columns.dateTimeCompact',
+      'tables.columns.from → tables.columns.to',
+    ]);
+    const route = container.querySelectorAll('tbody td')[1];
+    // Both addresses link to their participant pages, and a screen reader
+    // hears "From … To …" rather than an arrow.
+    const links = [...(route?.querySelectorAll('a') ?? [])].map((a) => a.getAttribute('href'));
+    expect(links).toEqual([
+      '/user/0x1111111111111111111111111111111111111111',
+      '/user/0x2222222222222222222222222222222222222222',
+    ]);
+    const spoken = [...(route?.querySelectorAll('.sr-only:not([role])') ?? [])].map(
+      (node) => node.textContent,
+    );
+    expect(spoken).toEqual(['tables.columns.from', 'tables.columns.to']);
+  });
 });
 
 describe('TransferHistoryTable', () => {

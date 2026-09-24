@@ -1,5 +1,4 @@
 import '@testing-library/jest-dom';
-import userEvent from '@testing-library/user-event';
 
 import { shortenHex } from '@/utils';
 
@@ -25,42 +24,70 @@ describe('UniqueAnchorHoldersCSTTable', () => {
     expect(screen.getByText('tables.empty.anchorHolders')).toBeInTheDocument();
   });
 
-  it('renders table headers', () => {
-    render(<UniqueAnchorHoldersCSTTable list={[createAnchorHolder()]} />);
-    expect(screen.getAllByText('tables.columns.anchorHolderAddress').length).toBeGreaterThanOrEqual(
-      1,
+  it('names each column once, the same on the header and in a phone record', () => {
+    const { container } = render(<UniqueAnchorHoldersCSTTable list={[createAnchorHolder()]} />);
+    // The sorted header's arrow is joined to its label by U+2060.
+    const headers = screen
+      .getAllByRole('columnheader')
+      .map((header) => header.textContent?.replace(/\u2060/g, ''));
+    expect(headers).toEqual([
+      'tables.columns.anchorHolder',
+      'tables.uniqueAnchorHolders.anchors',
+      'tables.uniqueAnchorHolders.releases',
+      'tables.uniqueAnchorHolders.imprinted',
+      'tables.uniqueAnchorHolders.anchored',
+      'tables.uniqueAnchorHolders.distributedEth',
+      'tables.uniqueAnchorHolders.unretrievedEth',
+    ]);
+    const labels = [...container.querySelectorAll('tbody tr:first-child td')].map((cell) =>
+      cell.getAttribute('data-label'),
     );
+    expect(labels).toEqual(headers);
+    // No explanation on a column whose header says what it holds.
     expect(
-      screen.getAllByText('tables.uniqueAnchorHolders.numAnchorActions').length,
-    ).toBeGreaterThanOrEqual(1);
-    expect(
-      screen.getAllByText('tables.uniqueAnchorHolders.numReleaseActions').length,
-    ).toBeGreaterThanOrEqual(1);
-    expect(
-      screen.getAllByText('tables.uniqueAnchorHolders.totalImprintedTokens').length,
-    ).toBeGreaterThanOrEqual(1);
-    expect(
-      screen.getAllByText('tables.uniqueAnchorHolders.totalAnchoredTokens').length,
-    ).toBeGreaterThanOrEqual(1);
-    expect(
-      screen.getAllByText('tables.uniqueAnchorHolders.totalDistributionEth').length,
-    ).toBeGreaterThanOrEqual(1);
-    expect(
-      screen.getAllByText('tables.uniqueAnchorHolders.unretrievedDistributionEth').length,
-    ).toBeGreaterThanOrEqual(1);
+      screen.queryAllByRole('button', { name: /^tables\.tableHeaderHelp\.explainColumn/ }),
+    ).toHaveLength(0);
   });
 
-  it('adds localized help to anchor-holder table headers', async () => {
-    const user = userEvent.setup();
-    render(<UniqueAnchorHoldersCSTTable list={[createAnchorHolder()]} />);
-    const triggers = screen.getAllByRole('button', {
-      name: /^tables\.tableHeaderHelp\.explainColumn/,
-    });
-    expect(triggers.length).toBeGreaterThanOrEqual(7);
-    await user.hover(triggers[3]!);
-    expect(await screen.findByRole('tooltip')).toHaveTextContent(
-      'tables.statisticsTooltips.totalImprintedTokens',
+  it('lists the most anchored first, whatever order the API sends', () => {
+    const { container } = render(
+      <UniqueAnchorHoldersCSTTable
+        list={[
+          createAnchorHolder({
+            StakerAid: 1,
+            StakerAddr: `0x${'1'.repeat(40)}`,
+            TotalTokensStaked: 9,
+          }),
+          createAnchorHolder({
+            StakerAid: 2,
+            StakerAddr: `0x${'2'.repeat(40)}`,
+            TotalTokensStaked: 16,
+          }),
+          createAnchorHolder({
+            StakerAid: 3,
+            StakerAddr: `0x${'3'.repeat(40)}`,
+            TotalTokensStaked: 1,
+          }),
+        ]}
+      />,
     );
+    const anchored = [...container.querySelectorAll('tbody tr')].map(
+      (row) => row.querySelectorAll('td')[4]?.textContent,
+    );
+    expect(anchored).toEqual(['16', '9', '1']);
+    expect(
+      screen.getByRole('columnheader', { name: 'tables.uniqueAnchorHolders.anchored' }),
+    ).toHaveAttribute('aria-sort', 'descending');
+  });
+
+  it('keeps four decimals for a zero distribution, so the column lines up', () => {
+    render(
+      <UniqueAnchorHoldersCSTTable
+        list={[createAnchorHolder({ TotalRewardEth: 0, UnclaimedRewardEth: 0.1562 })]}
+      />,
+    );
+    expect(screen.getByText('0.0000')).toBeInTheDocument();
+    expect(screen.getByText('0.1562')).toBeInTheDocument();
   });
 
   it('renders anchor-holder data', () => {

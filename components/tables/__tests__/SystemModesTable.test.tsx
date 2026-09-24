@@ -1,6 +1,5 @@
 import '@testing-library/jest-dom';
 import { fireEvent } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 
 import { convertTimestampToDateTime } from '@/utils';
 
@@ -37,17 +36,19 @@ describe('SystemModesTable', () => {
     expect(screen.getAllByText('tables.columns.ended').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('adds localized help to system event headers', async () => {
-    const user = userEvent.setup();
+  it('carries no info button on headers that say what they hold', () => {
     render(<SystemModesTable list={[createEvent()]} />);
-    const triggers = screen.getAllByRole('button', {
-      name: /^tables\.tableHeaderHelp\.explainColumn/,
+    expect(
+      screen.queryAllByRole('button', { name: /^tables\.tableHeaderHelp\.explainColumn/ }),
+    ).toHaveLength(0);
+  });
+
+  it('names each row link by what it shows, then where it leads', () => {
+    render(<SystemModesTable list={[createEvent({ RoundNum: 5 })]} />);
+    const link = screen.getByRole('link', {
+      name: 'tables.allocation.cycle(cycle=5) tables.systemModes.viewEvent',
     });
-    expect(triggers.length).toBeGreaterThanOrEqual(3);
-    await user.hover(triggers[2]!);
-    expect(await screen.findByRole('tooltip')).toHaveTextContent(
-      'tables.statisticsTooltips.systemEnded',
-    );
+    expect(link).toHaveAttribute('href', '/system-event/5/100/200');
   });
 
   it('shows "Deployment" for RoundNum 0', () => {
