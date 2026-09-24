@@ -129,6 +129,47 @@ describe('BanGestureTable', () => {
     expect(mockGetBannedGestures).toHaveBeenCalled();
   });
 
+  // A network failure on the hidden list once escaped as an unhandled rejection.
+  it('keeps the list and reports it when the hidden list cannot be read', async () => {
+    const { reportError } = jest.requireMock('../../../utils/errors') as {
+      reportError: jest.Mock;
+    };
+    const failure = new Error('network down');
+    mockGetBannedGestures.mockRejectedValueOnce(failure);
+    await act(async () => {
+      render(<BanGestureTable gestureHistory={[createGestureHistory()]} />);
+    });
+    expect(reportError).toHaveBeenCalledWith(failure, 'load hidden gestures');
+    expect(screen.getAllByText('Hello world').length).toBeGreaterThanOrEqual(1);
+  });
+
+  // After a successful Hide, a failed refresh once showed the "could not hide" toast.
+  it('reports a successful hide even when the refresh after it fails', async () => {
+    const user = userEvent.setup();
+    render(
+      <BanGestureTable
+        gestureHistory={[createGestureHistory({ EvtLogId: 7 })]}
+        moderatorAddress={MODERATOR}
+      />,
+    );
+    const banButton = await screen.findByRole('button', { name: 'tables.banGesture.ban' });
+    mockGetBannedGestures.mockRejectedValueOnce(new Error('network down'));
+    await user.click(banButton);
+
+    await waitFor(() =>
+      expect(mockSetNotification).toHaveBeenCalledWith(
+        expect.objectContaining({ type: 'success', text: 'tables.banGesture.banned' }),
+      ),
+    );
+    expect(mockSetNotification).not.toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'error' }),
+    );
+    // The change shows at once, without waiting for the list to be read again.
+    expect(
+      await screen.findByRole('button', { name: 'tables.banGesture.unban' }),
+    ).toBeInTheDocument();
+  });
+
   it('Ban click calls api.ban_bid with EvtLogId and account', async () => {
     const user = userEvent.setup();
     render(

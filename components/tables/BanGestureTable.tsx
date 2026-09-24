@@ -56,7 +56,9 @@ const MODERATION_PAGE_SIZE = 25;
 /**
  * Hides a gesture's message from public view, or restores it. The button
  * keeps its label beside a spinner while the request runs and ignores
- * further presses until it settles.
+ * further presses until it settles. Only the hide or restore request can
+ * fail the action: once it succeeds the change is reported and applied,
+ * whatever happens to the list refresh that follows.
  */
 function ModerationAction({
   gesture,
@@ -67,7 +69,8 @@ function ModerationAction({
   gesture: GestureHistory;
   hidden: boolean;
   moderatorAddress: string;
-  onChanged: () => Promise<void> | void;
+  /** The request succeeded: the gesture is now hidden (`true`) or visible. */
+  onChanged: (id: number, hidden: boolean) => void;
 }) {
   const t = useTranslations('tables');
   const { setNotification } = useNotification();
@@ -78,18 +81,19 @@ function ModerationAction({
     try {
       if (hidden) await api.unban_gesture(gesture.EvtLogId);
       else await api.ban_bid(gesture.EvtLogId, moderatorAddress);
-      await onChanged();
-      setNotification({
-        visible: true,
-        type: 'success',
-        text: t(hidden ? 'banGesture.unbanned' : 'banGesture.banned'),
-      });
     } catch (error) {
       reportError(error, hidden ? 'unban gesture' : 'ban gesture');
       setNotification({ visible: true, type: 'error', text: t('banGesture.error') });
-    } finally {
       setBusy(false);
+      return;
     }
+    setBusy(false);
+    onChanged(gesture.EvtLogId, !hidden);
+    setNotification({
+      visible: true,
+      type: 'success',
+      text: t(hidden ? 'banGesture.unbanned' : 'banGesture.banned'),
+    });
   };
 
   return (
@@ -126,10 +130,29 @@ const BanGestureTable = ({
   const [cycle, setCycle] = useState<string>(ALL_CYCLES);
   const [query, setQuery] = useState('');
 
+  /** Reads the hidden list; a failed read keeps the list as it is and is reported. */
   const refreshHidden = useCallback(async () => {
-    const hidden = await api.get_banned_bids();
-    setHiddenIds(new Set(hidden.map((entry: { bid_id: number }) => entry.bid_id)));
+    try {
+      const hidden = await api.get_banned_bids();
+      setHiddenIds(new Set(hidden.map((entry: { bid_id: number }) => entry.bid_id)));
+    } catch (error) {
+      reportError(error, 'load hidden gestures');
+    }
   }, []);
+
+  /** Applies a confirmed change at once, then re-reads the list to reconcile. */
+  const applyChange = useCallback(
+    (id: number, hidden: boolean) => {
+      setHiddenIds((current) => {
+        const next = new Set(current);
+        if (hidden) next.add(id);
+        else next.delete(id);
+        return next;
+      });
+      void refreshHidden();
+    },
+    [refreshHidden],
+  );
 
   useEffect(() => {
     // The hidden list is small; it loads once and after every change.
@@ -242,12 +265,12 @@ const BanGestureTable = ({
             gesture={gesture}
             hidden={hiddenIds.has(gesture.EvtLogId)}
             moderatorAddress={moderatorAddress}
-            onChanged={refreshHidden}
+            onChanged={applyChange}
           />
         ),
       },
     ];
-  }, [t, hiddenIds, refreshHidden, moderatorAddress]);
+  }, [t, hiddenIds, applyChange, moderatorAddress]);
 
   const toolbar = (
     <div className="mb-4 space-y-4">
