@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { Amount } from '@/components/ui/amount';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { DateTime } from '@/components/ui/date-time';
 import { Duration } from '@/components/ui/duration';
 import { ExplainedTerm } from '@/components/ui/explain-popover';
 import { LiveStatusView } from '@/components/ui/live-status';
@@ -16,7 +17,7 @@ import { Term } from '@/components/ui/term';
 import { UnknownValue } from '@/components/ui/unknown-value';
 import { useLiveFreshness } from '@/hooks/useLiveFreshness';
 import type { DashboardInfo } from '@/services/api/types';
-import { formatCount, formatDateTime } from '@/utils/format';
+import { formatCount } from '@/utils/format';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 
 import type { CyclePhaseView } from '../cyclePhase';
@@ -161,10 +162,9 @@ export function CycleStatus({
         </p>
         {state.isOpeningSoon && state.activationTime ? (
           <p className="mt-1 type-body-sm text-muted-foreground">
-            {t('hero.countdown.opensAt', {
-              n: data.CurRoundNum,
-              date: formatDateTime(state.activationTime, { locale, now: nowMs }),
-            })}
+            <DateTime timestamp={state.activationTime}>
+              {(date) => t('hero.countdown.opensAt', { n: data.CurRoundNum, date })}
+            </DateTime>
           </p>
         ) : null}
         {clockStale && remainingSeconds !== null ? (
