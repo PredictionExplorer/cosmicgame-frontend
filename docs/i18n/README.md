@@ -428,6 +428,14 @@ action, Chinese renders in unstyled system fallback.
   `lang` differs from the page's (the language menu's endonyms) re-declare the text stack
   with their language's cut (`:where([lang]:not(html)):lang(ja)` …), so 日本語 takes
   Japanese forms on an English page.
+- **Chinese headings break at phrases.** No browser segments Chinese (`auto-phrase` is
+  Japanese-only), so Chinese headings use `word-break: keep-all` (lines turn at
+  punctuation and spaces) with `overflow-wrap: anywhere` as the net. A clause longer than
+  about nine characters (one display line at 320px) carries authored zero-width spaces
+  (`\u200B`, `PHRASE_BREAK` in `lib/phrases.ts`) between its phrases, never inside a word
+  or before a mark, and renders through `<PhrasedText>`, which glues each mark to its
+  character so an overflow break cannot start a line with 。. `lib/__tests__/phrases.test.ts`
+  checks the landing headings; the zh and locale site-QA specs check every heading line.
 - Chinese ellipses and dashes: Inter leads the text stack and carries `…` and `—`, so the
   zh, zh-TW and zh-HK text stacks start with a `local()` alias limited to those code points
   (plus `“”` for zh) that resolves to the platform's regional CJK face.

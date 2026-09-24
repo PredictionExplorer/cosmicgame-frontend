@@ -225,8 +225,16 @@ the CJK faces.
   wrapping. Eyebrows and tracking utilities drop their Latin tracking.
 - **Chinese**: headings use `word-break: keep-all`, so a balanced heading turns its line
   at punctuation (十余条轨道， / 让周期储备循轨而行。) instead of inside a word; a clause too long
-  for the line still wraps through `overflow-wrap: anywhere`. Placeholders are set in the
-  CJK stack, so 搜索问题…… shows the centred Chinese ellipsis.
+  for the line still wraps through `overflow-wrap: anywhere`. That overflow break ignores
+  the line-start rules, so display copy follows the BudouX model: a clause longer than
+  about nine characters carries authored break points (`\u200B`, `PHRASE_BREAK` in
+  `lib/phrases.ts`) between its phrases (都有一部分\u200B流向\u200B以太坊\u200B核心贡献者。),
+  and the heading renders through `<PhrasedText>` (`components/ui/phrased-text.tsx`),
+  which glues each closing mark to the character before it and each opening mark to the
+  one after, so no line starts with 。 or ， even at an overflow. The zero-width space
+  stays in the text: unlike `<wbr>` it adds no pause to Chrome's accessible name. The
+  e2e site QA fails on any heading line that starts with a closing mark. Placeholders are
+  set in the CJK stack.
 - **Japanese**: headings, ledes, body copy (`type-body-md`, `type-body-sm`), labels,
   eyebrows, captions, buttons, tabs, summaries and definition lists use
   `word-break: auto-phrase`, and the document uses `line-break: strict`.

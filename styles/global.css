@@ -533,6 +533,12 @@ body:has([data-maintenance-banner]) .home-control-shell {
    * long for the line still wraps through `overflow-wrap: anywhere`, which
    * also keeps the heading's min-content from widening its column. Korean
    * keeps its document-wide keep-all and Japanese its auto-phrase below.
+   *
+   * That overflow break ignores the line-start rules: a clause that just
+   * misses the line splits a word or pushes its 。 onto a line of its own.
+   * Long display copy therefore carries authored break points (zero-width
+   * spaces, as BudouX inserts), and <PhrasedText> (lib/phrases.ts) glues
+   * each mark to its character, so no line ever starts with 。 or ，.
    */
   :is(h1, h2, h3, [class*='type-display-'], [class*='type-heading-'], .type-section):lang(zh) {
     word-break: keep-all;

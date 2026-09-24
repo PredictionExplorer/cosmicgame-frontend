@@ -2,7 +2,10 @@ import { protocolFacts } from '@/content/protocol-facts';
 
 import type { LandingText } from './structure';
 
-/** 中文着陆页文案，以 structure.ts 中的骨架为键。 */
+/**
+ * 中文着陆页文案，以 structure.ts 中的骨架为键。标题中的 \u200B 标出可换行的短语边界
+ * （lib/phrases.ts），不会显示。
+ */
 export const landingTextZh = {
   meta: {
     title: 'Cosmic Signature · Arbitrum 上的程序化链上艺术协议',
@@ -24,7 +27,7 @@ export const landingTextZh = {
     eyebrow: '程序化链上艺术协议 · Arbitrum',
     headline: '每一次落笔， 都在塑造艺术。',
     headlineLead: '每一次落笔，',
-    headlineAccent: '都在塑造艺术。',
+    headlineAccent: '都在塑造\u200B艺术。',
     subhead: `使用 ETH 或 CST 落笔，延长周期的收官倒计时。倒计时归零后，完成收官即可铭刻新的签名作品并分配周期储备，其中 ${protocolFacts.publicGoodsPercentage}% 转拨给以太坊核心贡献者。`,
     primaryCtaLabel: '打开应用',
     secondaryCtaLabel: '了解周期如何运作',
@@ -37,7 +40,7 @@ export const landingTextZh = {
 
   cycle: {
     eyebrow: '周期',
-    heading: '从开启到收官，读懂完整的演绎周期。',
+    heading: '从开启到收官，读懂完整的\u200B演绎周期。',
     steps: {
       gesture: {
         title: '落笔',
@@ -58,7 +61,7 @@ export const landingTextZh = {
 
   art: {
     eyebrow: '艺术',
-    heading: '三体轨迹，由链上种子生成。',
+    heading: '三体轨迹，由链上种子\u200B生成。',
     description:
       '每枚 Cosmic Signature NFT 都呈现 3 个天体在牛顿引力下的运动轨迹。三体运动天生混沌。没有 AI，没有训练数据，只有确定性的物理。同一种子生成的画面逐像素一致。',
     showcase: {
@@ -106,7 +109,7 @@ export const landingTextZh = {
 
   tracks: {
     eyebrow: '分配轨道',
-    heading: '十余条轨道，让周期储备循轨而行。',
+    heading: '十余条轨道，让周期储备\u200B循轨而行。',
     description:
       '周期收官后，协议会沿各条分配轨道发放 ETH 与 CST 储备，以表彰坚守、时机、投入与参与。约一半 ETH 储备会滚入下一周期。',
     ethLabel: '每个周期储备中的 ETH',
@@ -175,7 +178,7 @@ export const landingTextZh = {
 
   publicGoods: {
     eyebrow: '公共物品',
-    heading: '每个周期的储备，都有一部分流向以太坊核心贡献者。',
+    heading: '每个周期的储备，都有一部分\u200B流向\u200B以太坊\u200B核心贡献者。',
     body: `每个演绎周期都会将 ETH 储备中的固定份额转拨给 Protocol Guild——为 170 多位以太坊核心贡献者提供资助的集体机制。协议使用得越多，流向以太坊底层基础设施的资源也越多。`,
     disclaimerHeading: '免责声明',
     // lexicon-allow-start: 明确否认慈善捐赠及相关税务定性。
@@ -294,7 +297,7 @@ export const landingTextZh = {
   },
   closing: {
     eyebrow: '作品集',
-    heading: '每个周期，都为作品集添上新作。',
+    heading: '每个周期，都为作品集\u200B添上新作。',
     body: '关注实时周期、落笔参与，或浏览迄今铭刻的每一幅签名作品。',
   },
 

@@ -2,7 +2,10 @@ import { protocolFacts } from '@/content/protocol-facts';
 
 import type { LandingText } from './structure';
 
-/** 中文著陸頁文案，以 structure.ts 中的骨架為鍵。 */
+/**
+ * 中文著陸頁文案，以 structure.ts 中的骨架為鍵。標題中的 \u200B 標出可換行的短語邊界
+ * （lib/phrases.ts），不會顯示。
+ */
 export const landingTextZhTw = {
   meta: {
     title: 'Cosmic Signature · Arbitrum 上的程序化鏈上藝術協議',
@@ -24,7 +27,7 @@ export const landingTextZhTw = {
     eyebrow: '程序化鏈上藝術協議 · Arbitrum',
     headline: '每一次落筆， 都在形塑藝術。',
     headlineLead: '每一次落筆，',
-    headlineAccent: '都在形塑藝術。',
+    headlineAccent: '都在形塑\u200B藝術。',
     subhead: `使用 ETH 或 CST 落筆，延長週期的收官倒數。倒數歸零後，完成收官即可銘刻新的簽名作品並分配週期儲備，其中 ${protocolFacts.publicGoodsPercentage}% 轉撥給以太坊核心貢獻者。`,
     primaryCtaLabel: '開啟應用程式',
     secondaryCtaLabel: '了解週期如何運作',
@@ -37,7 +40,7 @@ export const landingTextZhTw = {
 
   cycle: {
     eyebrow: '週期',
-    heading: '從開啟到收官，讀懂完整的演繹週期。',
+    heading: '從開啟到收官，讀懂完整的\u200B演繹週期。',
     steps: {
       gesture: {
         title: '落筆',
@@ -58,7 +61,7 @@ export const landingTextZhTw = {
 
   art: {
     eyebrow: '藝術',
-    heading: '三體軌跡，由鏈上種子生成。',
+    heading: '三體軌跡，由鏈上種子\u200B生成。',
     description:
       '每枚 Cosmic Signature NFT 都呈現 3 個天體在牛頓引力下的運動軌跡。三體運動天生混沌。沒有 AI，沒有訓練資料，只有確定性的物理。同一種子生成的畫面逐畫素一致。',
     showcase: {
@@ -106,7 +109,7 @@ export const landingTextZhTw = {
 
   tracks: {
     eyebrow: '分配軌道',
-    heading: '十餘條軌道，讓週期儲備循軌而行。',
+    heading: '十餘條軌道，讓週期儲備\u200B循軌而行。',
     description:
       '週期收官後，協議會沿各條分配軌道發放 ETH 與 CST 儲備，以表彰堅守、時機、投入與參與。約一半 ETH 儲備會滾入下一週期。',
     ethLabel: '每個週期儲備中的 ETH',
@@ -175,7 +178,7 @@ export const landingTextZhTw = {
 
   publicGoods: {
     eyebrow: '公共財',
-    heading: '每個週期的儲備，都有一部分流向以太坊核心貢獻者。',
+    heading: '每個週期的儲備，都有一部分\u200B流向\u200B以太坊\u200B核心貢獻者。',
     body: `每個演繹週期都會將 ETH 儲備中的固定份額轉撥給 Protocol Guild——為 170 多位以太坊核心貢獻者提供資助的集體機制。協議使用得越多，流向以太坊底層基礎設施的資源也越多。`,
     disclaimerHeading: '免責聲明',
     // lexicon-allow-start: 明確否認慈善捐贈及相關稅務定性。
@@ -294,7 +297,7 @@ export const landingTextZhTw = {
   },
   closing: {
     eyebrow: '作品集',
-    heading: '每個週期，都為作品集增添新作。',
+    heading: '每個週期，都為作品集\u200B增添新作。',
     body: '關注即時週期、落筆參與，或瀏覽至今銘刻的每一幅簽名作品。',
   },
 
