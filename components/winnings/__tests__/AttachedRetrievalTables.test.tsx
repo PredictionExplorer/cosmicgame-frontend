@@ -63,6 +63,49 @@ describe('AttachedNftRetrievalTable', () => {
   });
 });
 
+describe('one ledger for a whole history', () => {
+  it('reads retrieved rows as such, and waiting rows as not retrieved where the viewer may not retrieve', () => {
+    renderWithQuery(
+      <AttachedNftRetrievalTable
+        rows={[NFT, { ...NFT, Index: 5, NFTTokenId: 99, Claimed: true }]}
+        ariaLabel="Attached NFTs"
+      />,
+    );
+    expect(screen.queryByRole('button', { name: /retrieveItem/ })).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('columnheader', { name: 'myPages.ethAllocations.columns.status' }),
+    ).toBeInTheDocument();
+    const [, waiting, retrieved] = screen.getAllByRole('row');
+    expect(waiting).toHaveTextContent('myPages.ethAllocations.status.waiting');
+    expect(retrieved).toHaveTextContent('myPages.ethAllocations.status.retrieved');
+  });
+
+  it('shows a retrieved token by the amount attached, with no action', () => {
+    renderWithQuery(
+      <AttachedTokenRetrievalTable
+        rows={[{ ...TOKEN, Claimed: true, AmountDonatedEth: 40, DonateClaimDiffEth: '0' }]}
+        ariaLabel="Attached tokens"
+        onRetrieve={jest.fn()}
+      />,
+    );
+    const row = screen.getAllByRole('row')[1]!;
+    expect(row).toHaveTextContent('40 ARB');
+    expect(row).toHaveTextContent('myPages.ethAllocations.status.retrieved');
+    expect(within(row).queryByRole('button')).not.toBeInTheDocument();
+  });
+
+  it('shows an unreadable amount as unknown, never blank', () => {
+    renderWithQuery(
+      <AttachedTokenRetrievalTable
+        rows={[{ ...TOKEN, DonateClaimDiffEth: undefined }]}
+        ariaLabel="Attached tokens"
+        onRetrieve={jest.fn()}
+      />,
+    );
+    expect(screen.getAllByRole('row')[1]).toHaveTextContent('common.status.unavailable');
+  });
+});
+
 describe('AttachedTokenRetrievalTable', () => {
   it('shows the amount left with the token symbol and retrieves the row', async () => {
     const onRetrieve = jest.fn();

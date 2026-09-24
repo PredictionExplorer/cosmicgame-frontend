@@ -1,12 +1,13 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 
 import NFTImage from '@/components/nft/NFTImage';
 import { useAttachedErc20Metadata } from '@/components/attachments/useAttachedErc20Metadata';
 import { useAttachedNftMetadata } from '@/components/attachments/useAttachedNftMetadata';
 import { PendingPlate } from '@/components/ui/art-frame';
+import { Badge } from '@/components/ui/badge';
 import { UnknownValue } from '@/components/ui/unknown-value';
 import { Button } from '@/components/ui/button';
 import {
@@ -33,6 +34,8 @@ export interface AttachedNftRetrievalRow {
   DonorAddr?: string;
   TimeStamp?: number;
   TxHash?: string;
+  /** Already retrieved: the row shows so instead of an action (a wallet's whole history). */
+  Claimed?: boolean;
 }
 
 /** One attached ERC-20 token waiting for this wallet (raw amounts for the retrieve call). */
@@ -46,6 +49,8 @@ export interface AttachedTokenRetrievalRow extends DonatedErc20ClaimAmountSource
   DonateClaimDiffEth?: string | number;
   AmountDonatedEth?: number;
   AmountClaimedEth?: number;
+  /** Already retrieved: the row shows so instead of an action. */
+  Claimed?: boolean;
 }
 
 function nftTokenId(row: AttachedNftRetrievalRow): string {
@@ -109,11 +114,16 @@ function AttachedTokenIdentity({ address }: { address: string }) {
   );
 }
 
+/** What the row is worth: what is left to retrieve, or, once retrieved, what was attached. */
+function tokenAmount(row: AttachedTokenRetrievalRow): number | null {
+  return toFiniteNumber(row.Claimed ? row.AmountDonatedEth : row.DonateClaimDiffEth);
+}
+
 function TokenAmount({ row }: { row: AttachedTokenRetrievalRow }) {
   const format = useFormat();
   const tCommon = useTranslations('common');
   const { data: metadata } = useAttachedErc20Metadata(row.TokenAddr);
-  const amount = toFiniteNumber(row.DonateClaimDiffEth);
+  const amount = tokenAmount(row);
   if (amount === null) return <UnknownValue label={tCommon('status.unavailable')} />;
   return (
     <span className="whitespace-nowrap tabular-nums">
@@ -128,6 +138,9 @@ function TokenAmount({ row }: { row: AttachedTokenRetrievalRow }) {
   );
 }
 
+/** A stable empty list, so the columns are not rebuilt on every render. */
+const NOTHING_RETRIEVING: readonly never[] = [];
+
 interface RetrievalTableProps<T> {
   rows: readonly T[];
   ariaLabel: string;
@@ -135,20 +148,62 @@ interface RetrievalTableProps<T> {
 }
 
 /**
- * The NFTs attached to gestures that wait for this wallet: each one's image,
- * name and collection, the cycle, who attached it, and a quiet "Retrieve"
- * that shows its own pending state.
+ * The last column's header: "Action" for screen readers where each row has
+ * its button (the button names itself, so a phone record needs no label),
+ * a visible "Status" where the rows only say whether they were retrieved.
+ */
+function actionHeader(
+  t: ReturnType<typeof useTranslations<'myPages'>>,
+  canRetrieve: boolean,
+): Pick<DataTableColumn<unknown>, 'header' | 'label'> {
+  return canRetrieve
+    ? { header: <span className="sr-only">{t('attached.columns.action')}</span>, label: '' }
+    : { header: t('ethAllocations.columns.status') };
+}
+
+/**
+ * The last cell of a row: "Retrieved" once it is, else the row's own
+ * "Retrieve" where the viewer may retrieve (their own wallet), else "Not
+ * retrieved".
+ */
+function RetrievalAction({
+  claimed,
+  action,
+}: {
+  claimed: boolean | undefined;
+  /** The row's retrieve button, or `null` on someone else's wallet. */
+  action: ReactNode;
+}) {
+  const t = useTranslations('myPages');
+  if (claimed) {
+    return (
+      <Badge size="sm" tone="positive" dot>
+        {t('ethAllocations.status.retrieved')}
+      </Badge>
+    );
+  }
+  return action ?? <Badge size="sm">{t('ethAllocations.status.waiting')}</Badge>;
+}
+
+/**
+ * The NFTs attached to gestures for a wallet: each one's image, name and
+ * collection, the cycle, who attached it, and a quiet "Retrieve" that shows
+ * its own pending state. This is the one retrieval ledger for attached NFTs:
+ * without `onRetrieve` (someone else's wallet) the rows read "Not
+ * retrieved", and rows marked `Claimed` read "Retrieved", so a wallet's
+ * whole history fits.
  */
 export function AttachedNftRetrievalTable({
   rows,
   ariaLabel,
   headingLevel,
   onRetrieve,
-  retrieving,
+  retrieving = NOTHING_RETRIEVING,
 }: RetrievalTableProps<AttachedNftRetrievalRow> & {
-  onRetrieve: (index: number) => void;
+  /** Retrieve one NFT by its PrizesWallet index; omit where the viewer may not. */
+  onRetrieve?: (index: number) => void;
   /** PrizesWallet indexes being retrieved. */
-  retrieving: readonly number[];
+  retrieving?: readonly number[];
 }) {
   const t = useTranslations('myPages');
   const columns = useMemo<DataTableColumn<AttachedNftRetrievalRow>[]>(
@@ -189,22 +244,27 @@ export function AttachedNftRetrievalTable({
       },
       {
         id: 'action',
-        header: <span className="sr-only">{t('attached.columns.action')}</span>,
-        // The button names itself; a phone record needs no label beside it.
-        label: '',
+        ...actionHeader(t, Boolean(onRetrieve)),
         align: 'end',
         cell: (row) => (
-          <Button
-            variant="outline"
-            size="sm"
-            loading={retrieving.includes(row.Index)}
-            onClick={() => onRetrieve(row.Index)}
-            aria-label={t('attached.retrieveItem', {
-              item: t('attached.tokenNumber', { id: nftTokenId(row) }),
-            })}
-          >
-            {t('attached.retrieve')}
-          </Button>
+          <RetrievalAction
+            claimed={row.Claimed}
+            action={
+              onRetrieve ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  loading={retrieving.includes(row.Index)}
+                  onClick={() => onRetrieve(row.Index)}
+                  aria-label={t('attached.retrieveItem', {
+                    item: t('attached.tokenNumber', { id: nftTokenId(row) }),
+                  })}
+                >
+                  {t('attached.retrieve')}
+                </Button>
+              ) : null
+            }
+          />
         ),
       },
     ],
@@ -222,19 +282,22 @@ export function AttachedNftRetrievalTable({
 }
 
 /**
- * The ERC-20 tokens attached to gestures that wait for this wallet: the
- * token, the cycle, the amount left to retrieve and a quiet "Retrieve".
+ * The ERC-20 tokens attached to gestures for a wallet: the token, the cycle,
+ * the amount left to retrieve (or, once retrieved, the amount attached) and
+ * a quiet "Retrieve". Like the NFT ledger it covers a wallet's whole history
+ * and reads "Not retrieved" where the viewer may not retrieve.
  */
 export function AttachedTokenRetrievalTable({
   rows,
   ariaLabel,
   headingLevel,
   onRetrieve,
-  retrieving,
+  retrieving = NOTHING_RETRIEVING,
 }: RetrievalTableProps<AttachedTokenRetrievalRow> & {
-  onRetrieve: (row: AttachedTokenRetrievalRow) => void;
+  /** Retrieve one token row (raw base units); omit where the viewer may not. */
+  onRetrieve?: (row: AttachedTokenRetrievalRow) => void;
   /** `tokenClaimKey`s of the tokens being retrieved. */
-  retrieving: readonly string[];
+  retrieving?: readonly string[];
 }) {
   const t = useTranslations('myPages');
   const columns = useMemo<DataTableColumn<AttachedTokenRetrievalRow>[]>(
@@ -261,25 +324,30 @@ export function AttachedTokenRetrievalTable({
         id: 'amount',
         kind: 'amount',
         header: t('attached.columns.amount'),
-        value: (row) => toFiniteNumber(row.DonateClaimDiffEth),
+        value: (row) => tokenAmount(row),
         cell: (row) => <TokenAmount row={row} />,
       },
       {
         id: 'action',
-        header: <span className="sr-only">{t('attached.columns.action')}</span>,
-        // The button names itself; a phone record needs no label beside it.
-        label: '',
+        ...actionHeader(t, Boolean(onRetrieve)),
         align: 'end',
         cell: (row) => (
-          <Button
-            variant="outline"
-            size="sm"
-            loading={retrieving.includes(tokenClaimKey(row.RoundNum, row.TokenAddr))}
-            onClick={() => onRetrieve(row)}
-            aria-label={t('attached.retrieveItem', { item: formatAddress(row.TokenAddr) })}
-          >
-            {t('attached.retrieve')}
-          </Button>
+          <RetrievalAction
+            claimed={row.Claimed}
+            action={
+              onRetrieve ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  loading={retrieving.includes(tokenClaimKey(row.RoundNum, row.TokenAddr))}
+                  onClick={() => onRetrieve(row)}
+                  aria-label={t('attached.retrieveItem', { item: formatAddress(row.TokenAddr) })}
+                >
+                  {t('attached.retrieve')}
+                </Button>
+              ) : null
+            }
+          />
         ),
       },
     ],
