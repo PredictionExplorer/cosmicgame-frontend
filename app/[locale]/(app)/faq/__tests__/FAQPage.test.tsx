@@ -31,6 +31,16 @@ beforeEach(() => {
 const searchbox = () =>
   screen.getByRole('searchbox', { name: /search frequently asked questions/i });
 
+/**
+ * Enters a query as one input event. Typing it key by key re-renders all 67
+ * answers per keystroke, which is slow enough to time out on a busy machine;
+ * FAQSearch's own tests cover typing.
+ */
+async function searchFor(user: ReturnType<typeof userEvent.setup>, query: string) {
+  await user.click(searchbox());
+  await user.paste(query);
+}
+
 describe('FAQPage', () => {
   it('renders the hero heading', () => {
     render(<FAQPage content={faqContentEn} />);
@@ -117,7 +127,7 @@ describe('FAQPage', () => {
   it('shows a deep-linked question even when a search would hide it', async () => {
     const user = userEvent.setup();
     render(<FAQPage content={faqContentEn} />);
-    await user.type(searchbox(), 'Endurance Champion');
+    await searchFor(user, 'Endurance Champion');
     await screen.findByText(/Showing \d+ of \d+ questions/i, {}, { timeout: 10_000 });
     expect(
       screen.queryByRole('button', { name: 'What is the Signature Allocation?' }),
@@ -128,10 +138,11 @@ describe('FAQPage', () => {
     window.dispatchEvent(new HashChangeEvent('hashchange'));
 
     expect(
-      await screen.findByRole('button', {
-        name: 'What is the Signature Allocation?',
-        expanded: true,
-      }),
+      await screen.findByRole(
+        'button',
+        { name: 'What is the Signature Allocation?', expanded: true },
+        { timeout: 10_000 },
+      ),
     ).toBeInTheDocument();
     expect(searchbox()).toHaveValue('');
   }, 30_000);
@@ -141,7 +152,7 @@ describe('FAQPage', () => {
     render(<FAQPage content={faqContentEn} />);
     expect(screen.getByText('Popular questions')).toBeInTheDocument();
 
-    await user.type(searchbox(), 'Endurance Champion');
+    await searchFor(user, 'Endurance Champion');
     await screen.findByText(/Showing \d+ of \d+ questions/i, {}, { timeout: 10_000 });
     await waitFor(() => expect(screen.queryByText('Popular questions')).not.toBeInTheDocument());
     expect(screen.queryByRole('navigation', { name: 'FAQ categories' })).not.toBeInTheDocument();
@@ -150,7 +161,7 @@ describe('FAQPage', () => {
   it('offers to clear a search that matches nothing', async () => {
     const user = userEvent.setup();
     render(<FAQPage content={faqContentEn} />);
-    await user.type(searchbox(), 'xyznonexistentquestion123');
+    await searchFor(user, 'xyznonexistentquestion123');
 
     const clear = await screen.findByRole(
       'button',
@@ -169,5 +180,6 @@ describe('FAQPage', () => {
         region: { enabled: false },
       },
     });
-  });
+    // axe walks all 67 answers and the glossary.
+  }, 30_000);
 });
