@@ -43,11 +43,19 @@ const catalogTooltipPaths = [...enCatalog.keys()].filter(
   (path) => /tooltip/i.test(path) && !/tooltipAria/i.test(path),
 );
 
-const enLongFormTooltips = asMap(
-  flattenStrings(howItWorksContentEn, 'howItWorks').filter(({ path }) => /tooltip/i.test(path)),
+// The explainer's long-form copy. Its rules once sat in hover cards on the
+// headings; they now live in the visible descriptions, bodies and step
+// highlights, so those are the fields that must be complete and Chinese.
+const LONG_FORM_FIELD = /(?:\.description|\.body|\.paragraph|\.highlights\[\d+\])$/;
+const enLongForm = asMap(
+  flattenStrings(howItWorksContentEn, 'howItWorks').filter(({ path }) =>
+    LONG_FORM_FIELD.test(path),
+  ),
 );
-const zhLongFormTooltips = asMap(
-  flattenStrings(howItWorksContentZh, 'howItWorks').filter(({ path }) => /tooltip/i.test(path)),
+const zhLongForm = asMap(
+  flattenStrings(howItWorksContentZh, 'howItWorks').filter(({ path }) =>
+    LONG_FORM_FIELD.test(path),
+  ),
 );
 
 const immutableAccessibleLabel =
@@ -71,13 +79,13 @@ describe('Sprint 8 catalog quality gates', () => {
     }
   });
 
-  it('keeps structured long-form tooltip fields exhaustive and Chinese', () => {
-    expect(zhLongFormTooltips.keys()).toEqual(enLongFormTooltips.keys());
-    expect(zhLongFormTooltips.size).toBeGreaterThanOrEqual(10);
+  it('keeps the explainer’s structured long-form fields exhaustive and Chinese', () => {
+    expect([...zhLongForm.keys()]).toEqual([...enLongForm.keys()]);
+    expect(zhLongForm.size).toBeGreaterThanOrEqual(10);
 
-    for (const [path, zh] of zhLongFormTooltips) {
+    for (const [path, zh] of zhLongForm) {
       expect(zh).not.toBe('');
-      expect(zh).not.toBe(enLongFormTooltips.get(path));
+      expect(zh).not.toBe(enLongForm.get(path));
       expect(zh).toMatch(/[\u3400-\u9fff]/);
     }
   });
