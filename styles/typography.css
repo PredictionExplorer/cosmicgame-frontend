@@ -12,7 +12,8 @@
  *            --display-tracking-scale, --display-word-spacing).
  *   Text     Inter 400/500/600: body, labels, buttons and every heading of
  *            24px or less (type-heading-3, type-title).
- *   Figures  Inter with tabular, lining numerals and a slashed zero.
+ *   Figures  Inter with tabular, lining numerals (no slashed zero; see the
+ *            figure tiers below).
  *   Ids      JetBrains Mono, only for addresses, hashes, seeds and token
  *            numbers (type-hash, type-mono).
  *

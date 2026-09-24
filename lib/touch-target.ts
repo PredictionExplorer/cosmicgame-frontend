@@ -1,8 +1,11 @@
 /**
- * Touch target sizing for phones (WCAG 2.5.5, verified by
+ * Touch target sizing (WCAG 2.5.5 and 2.5.8, verified by
  * `e2e/mobile-tap-targets.mobile.spec.ts`).
  *
- * Everything here is scoped below `sm` so pointer layouts keep their density.
+ * The box-growing classes are scoped below `sm`, so pointer layouts keep
+ * their density; the extended pad follows the pointer instead (coarse
+ * pointers, whatever the width), like InfoTooltip's 44px button and the
+ * touch-hit-area utility in styles/global.css.
  *
  * These use `min-*` rather than `h-*`/`w-*` on purpose. A control is very often
  * a flex item, and along a flex container's main axis `flex-basis` supersedes
@@ -37,8 +40,8 @@ export const TOUCH_TARGET_HEIGHT_CLASS = 'min-h-11 sm:min-h-0';
 export const TOUCH_TARGET_TEXT_LINK_CLASS = 'max-sm:leading-6';
 
 /**
- * Extends a control's hit area to 44x44 with a transparent pseudo-element,
- * leaving layout untouched. Pair it with `data-touch-target="extended"` so the
+ * Extends a control's hit area to 44x44 on coarse pointers with a transparent
+ * pseudo-element, leaving layout untouched. Pair it with `data-touch-target="extended"` so the
  * audit measures the pseudo-element rather than the control's own box.
  *
  * The content utility must be written in the single-quote form. Tailwind does

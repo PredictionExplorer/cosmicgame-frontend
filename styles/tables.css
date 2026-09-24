@@ -44,7 +44,7 @@
 }
 
 .cs-table td[data-numeric] {
-  font-variant-numeric: tabular-nums lining-nums slashed-zero;
+  font-variant-numeric: tabular-nums lining-nums;
 }
 
 .cs-table :is(th, td)[data-nowrap] {

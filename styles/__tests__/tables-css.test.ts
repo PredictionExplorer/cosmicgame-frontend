@@ -56,7 +56,7 @@ describe('styles/tables.css', () => {
 
   it('sets numeric cells in tabular, lining figures', () => {
     expect(declaration(topRules, '.cs-table td[data-numeric]', 'font-variant-numeric')).toBe(
-      'tabular-nums lining-nums slashed-zero',
+      'tabular-nums lining-nums',
     );
   });
 

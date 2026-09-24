@@ -213,7 +213,7 @@ interface ColumnProps {
   /** Default `start`. */
   align?: ColumnAlign;
   priority?: ColumnPriority;
-  /** Numbers: tabular, lining figures with a slashed zero. */
+  /** Numbers: tabular, lining figures. */
   numeric?: boolean;
   /** Keep the value on one line (dates, amounts, short ids). */
   nowrap?: boolean;
