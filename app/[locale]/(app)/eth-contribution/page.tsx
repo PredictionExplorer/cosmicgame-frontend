@@ -42,7 +42,7 @@ export default async function Page({ params }: PageProps) {
   const t = await getTranslations({ locale, namespace: 'ethContribution' });
 
   return (
-    <PageMessages namespaces={['ethContribution', 'marketing', 'tables']}>
+    <PageMessages namespaces={['ethContribution', 'tables']}>
       <PublicDataQuerySeed route="eth-contribution">
         <EthDonations
           formId={FORM_ID}
