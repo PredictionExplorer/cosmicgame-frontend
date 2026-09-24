@@ -73,7 +73,7 @@ export const learnTextEn = {
     },
     quizCta: {
       heading: 'Think you know the protocol?',
-      body: 'One hundred questions in three tiers, drawn from the white paper. Every answer explains the rule behind it and points to the section that settles it.',
+      body: 'One hundred questions in three tiers, based on the white paper. Every answer explains the rule behind it and points to the section that settles it.',
       linkLabel: 'Take the quiz',
     },
   },

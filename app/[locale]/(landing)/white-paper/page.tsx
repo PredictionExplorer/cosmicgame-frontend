@@ -12,7 +12,9 @@ import {
   type WhitePaperSection,
   type WhitePaperSubsection,
 } from '@/content/white-paper';
+import { getLandingContent } from '@/content/landing';
 
+import { AllocationBar, AllocationKey } from '@/components/landing-v2/AllocationBar';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { buttonVariants } from '@/components/ui/button';
 import {
@@ -39,7 +41,6 @@ import { readingMinutes } from '@/components/reading/readingTime';
 import { SignaturePlate } from '@/components/reading/SignaturePlate';
 import { SIGNATURE_PLATES } from '@/components/reading/signaturePlates';
 import { fillTemplate } from '@/components/reading/template';
-import { AllocationSplit } from '@/components/white-paper/AllocationSplit';
 import { CycleTimeline } from '@/components/white-paper/CycleTimeline';
 import { referenceTargets, withReferences } from '@/components/white-paper/crossReferences';
 import { APP_ORIGIN, LANDING_ORIGIN, localeHref, localizeCrossHostHref } from '@/lib/hostRouting';
@@ -128,6 +129,11 @@ function paperText(content: WhitePaperContent): string[] {
   ];
 }
 
+/** A cell that is a figure ("25%", "1.73", "~50%"), set at the end in tabular numerals. */
+function isFigure(cell: string): boolean {
+  return /^[~≈]?\s?[\d][\d.,\u00a0\u202f ]*%?$/u.test(cell.trim());
+}
+
 interface BlockContext {
   /** The id of the heading the block sits under, which names its tables. */
   headingId: string;
@@ -163,31 +169,45 @@ function BlockView({ block, context }: { block: WhitePaperBlock; context: BlockC
       );
     case 'note':
       return <Callout label={context.reading.noteLabel}>{context.renderText(block.text)}</Callout>;
-    case 'table':
+    case 'table': {
+      const { columns, rows } = block.table;
+      const numeric = columns.map(
+        (_column, index) => index > 0 && rows.every((row) => isFigure(row[index] ?? '')),
+      );
       return (
         <div className={BREAKOUT_CLASS}>
           {/*
-           * The shared static ledger: on a phone each row becomes a labelled
-           * record instead of a table cropped mid-word, and anything still too
-           * wide scrolls in a keyboard-reachable region with a fading edge
-           * (styles/tables.css). The section heading names the table.
+           * The shared static ledger: on a phone each row becomes a record
+           * titled by its first cell (the row's own name, so it carries no
+           * column label), and anything still too wide scrolls in a
+           * keyboard-reachable region with a fading edge (styles/tables.css).
+           * Figures align at the end in tabular numerals, and a two-column
+           * table is held to the prose measure so its values sit near their
+           * names. The section heading names the table.
            */}
-          <Table labelledBy={context.headingId}>
+          <Table
+            labelledBy={context.headingId}
+            containerClassName={columns.length <= 2 ? 'max-w-[var(--measure-prose)]' : undefined}
+          >
             <TableHeader>
               <TableRow>
-                {block.table.columns.map((column) => (
-                  <TableHead key={column}>{column}</TableHead>
+                {columns.map((column, index) => (
+                  <TableHead key={column} align={numeric[index] ? 'end' : 'start'}>
+                    {column}
+                  </TableHead>
                 ))}
               </TableRow>
             </TableHeader>
             <TableBody>
-              {block.table.rows.map((row) => (
+              {rows.map((row) => (
                 <TableRow key={row.join('|')}>
                   {row.map((cell, cellIndex) => (
                     <TableCell
                       key={`${cellIndex}-${cell}`}
-                      label={block.table.columns[cellIndex]}
-                      stack={cellIndex > 0}
+                      label={cellIndex === 0 ? undefined : columns[cellIndex]}
+                      stack={cellIndex === 0 || !numeric[cellIndex]}
+                      align={numeric[cellIndex] ? 'end' : 'start'}
+                      numeric={numeric[cellIndex]}
                       className={
                         cellIndex === 0
                           ? 'font-medium text-foreground'
@@ -210,6 +230,7 @@ function BlockView({ block, context }: { block: WhitePaperBlock; context: BlockC
           ) : null}
         </div>
       );
+    }
   }
 }
 
@@ -322,8 +343,15 @@ export default async function WhitePaperPage({ params }: PageProps) {
     .flatMap((section) => section.subsections ?? [])
     .find((subsection) => subsection.id === 'distribution-at-finalization')
     ?.blocks.find((block) => block.kind === 'table');
-  const allocationLabels =
-    allocationTable?.kind === 'table' ? allocationTable.table.rows.map((row) => row[0] ?? '') : [];
+  // The split as every page draws it (the landing's bar, the same order and
+  // colours), keyed with this paper's own track names: the §5.1 table lists
+  // the tracks in the bar's order and carries the figures.
+  const allocationTracks = getLandingContent(locale).tracks.eth.map((track, index) => ({
+    ...track,
+    title:
+      (allocationTable?.kind === 'table' ? allocationTable.table.rows[index]?.[0] : undefined) ??
+      track.title,
+  }));
 
   // Figures in the reading order of the sections they illustrate, numbered in that order.
   const figureList: ReadonlyArray<{
@@ -342,7 +370,12 @@ export default async function WhitePaperPage({ params }: PageProps) {
       sectionId: 'distribution-at-finalization',
       title: figures.allocation.title,
       caption: figures.allocation.caption,
-      body: <AllocationSplit labels={allocationLabels} locale={locale} />,
+      body: (
+        <>
+          <AllocationBar tracks={allocationTracks} density="inline" />
+          <AllocationKey tracks={allocationTracks} />
+        </>
+      ),
     },
     {
       sectionId: 'the-art',
@@ -380,7 +413,7 @@ export default async function WhitePaperPage({ params }: PageProps) {
         titleId={`figure-${figure.sectionId}-title`}
         label={fillTemplate(reading.figureTemplate, { number: index + 1 })}
         title={figure.title}
-        caption={figure.caption}
+        caption={renderText(figure.caption)}
       >
         {figure.body}
       </NumberedFigure>,

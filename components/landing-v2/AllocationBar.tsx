@@ -20,6 +20,8 @@ export function trackFill(id: AllocationTrackId): string {
 interface AllocationBarProps {
   /** The ETH tracks with their shares, e.g. `getLandingContent(locale).tracks.eth`. */
   tracks: readonly LandingEthTrack[];
+  /** `hero`: the landing's Allocation Tracks. `inline`: a figure inside reading text. */
+  density?: 'hero' | 'inline';
   className?: string;
 }
 
@@ -27,13 +29,19 @@ interface AllocationBarProps {
  * The ETH split of a Cycle Reserve as one bar drawn to scale against 100%:
  * each segment grows by its share, in the order and colours every chart of
  * the split uses (config/allocationTracks), with the share inside the
- * segment wherever it fits. Decorative (`aria-hidden`): pair it with a
- * legend or table that carries the figures. Server-safe, for any landing-host
- * page (the landing's Allocation Tracks, the white paper's allocation table).
+ * segment wherever it fits and the compounding remainder hatched.
+ * Decorative (`aria-hidden`): pair it with a legend, an AllocationKey or a
+ * table that carries the figures. Server-safe, for any landing-host page
+ * (the landing's Allocation Tracks, the white paper's §5.1 figure).
  */
-export function AllocationBar({ tracks, className }: AllocationBarProps) {
+export function AllocationBar({ tracks, density = 'hero', className }: AllocationBarProps) {
   return (
-    <div className={cn(styles.bar, className)} aria-hidden="true" data-testid="allocation-bar">
+    <div
+      className={cn(styles.bar, density === 'inline' && styles.barInline, className)}
+      aria-hidden="true"
+      data-testid="allocation-bar"
+      data-density={density}
+    >
       {tracks.map((track) => (
         <span
           key={track.id}
@@ -46,5 +54,28 @@ export function AllocationBar({ tracks, className }: AllocationBarProps) {
         </span>
       ))}
     </div>
+  );
+}
+
+interface AllocationKeyProps {
+  tracks: readonly LandingEthTrack[];
+  className?: string;
+}
+
+/**
+ * The bar's key: each track's swatch and name in the bar's order. It names
+ * the colours and leaves the figures to the bar and to the table or legend
+ * that carries them, so a figure never repeats a table's numbers.
+ */
+export function AllocationKey({ tracks, className }: AllocationKeyProps) {
+  return (
+    <ul className={cn(styles.key, className)}>
+      {tracks.map((track) => (
+        <li key={track.id} className={styles.keyItem}>
+          <span aria-hidden="true" className={cn(styles.swatch, trackFill(track.id))} />
+          <span className="type-body-sm text-muted-foreground">{track.title}</span>
+        </li>
+      ))}
+    </ul>
   );
 }

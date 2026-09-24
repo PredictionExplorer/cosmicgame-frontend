@@ -257,9 +257,9 @@ export const whitePaperTextZhHk = {
                     '在位最久的堅守冠軍（見第 5.2 節）。',
                   ],
                   [
-                    '公共物品分配',
-                    `${protocolFacts.publicGoodsPercentage}%`,
-                    'Protocol Guild，經公共物品金庫轉撥。',
+                    'ETH 星選',
+                    `${protocolFacts.stellarSelectionEthPercentage}%`,
+                    `從本週期落筆資格池中選出 ${protocolFacts.ethStellarSelectionRecipients} 次，均分該份額。`,
                   ],
                   [
                     '錨定派發',
@@ -267,9 +267,9 @@ export const whitePaperTextZhHk = {
                     '已錨定的 Cosmic Signature NFT，按比例分攤。',
                   ],
                   [
-                    'ETH 星選',
-                    `${protocolFacts.stellarSelectionEthPercentage}%`,
-                    `從本週期落筆資格池中選出 ${protocolFacts.ethStellarSelectionRecipients} 次，均分該份額。`,
+                    '公共物品分配',
+                    `${protocolFacts.publicGoodsPercentage}%`,
+                    'Protocol Guild，經公共物品金庫轉撥。',
                   ],
                   [
                     '滾動儲備',
@@ -894,7 +894,7 @@ export const whitePaperTextZhHk = {
   figures: {
     cycle: {
       title: '一個演繹週期：由開場到下一週期',
-      caption: '時長為上線參數；具體規則見第 3 節。',
+      caption: '時長為上線參數；具體規則見第 3.1 至 3.3 節。',
       steps: [
         {
           label: '開場',

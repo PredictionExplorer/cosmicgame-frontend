@@ -260,9 +260,9 @@ export const whitePaperTextEn = {
                     'The longest-reigning Endurance Champion (Section 5.2).',
                   ],
                   [
-                    'Public Goods Allocation',
-                    `${protocolFacts.publicGoodsPercentage}%`,
-                    'Protocol Guild, via the Public Goods Vault.',
+                    'ETH Stellar Selection',
+                    `${protocolFacts.stellarSelectionEthPercentage}%`,
+                    `${protocolFacts.ethStellarSelectionRecipients} entries selected from the cycle\u2019s gesture pool, sharing the amount equally.`,
                   ],
                   [
                     'Anchor Distribution',
@@ -270,9 +270,9 @@ export const whitePaperTextEn = {
                     'Anchored Cosmic Signature NFTs, pro rata.',
                   ],
                   [
-                    'ETH Stellar Selection',
-                    `${protocolFacts.stellarSelectionEthPercentage}%`,
-                    `${protocolFacts.ethStellarSelectionRecipients} entries drawn from the cycle\u2019s gesture pool, sharing the amount equally.`,
+                    'Public Goods Allocation',
+                    `${protocolFacts.publicGoodsPercentage}%`,
+                    'Protocol Guild, via the Public Goods Vault.',
                   ],
                   [
                     'Compounding Cycle Reserve',
@@ -316,12 +316,12 @@ export const whitePaperTextEn = {
                   [
                     'NFT Stellar Selection',
                     `${cst(protocolFacts.specialAllocationCst)} CST and one NFT, ${protocolFacts.nftStellarSelectionRecipients} times`,
-                    `${protocolFacts.nftStellarSelectionRecipients} entries drawn from the gesture pool.`,
+                    `${protocolFacts.nftStellarSelectionRecipients} entries selected from the gesture pool.`,
                   ],
                   [
                     'Anchored-NFT Stellar Selection',
                     `${cst(protocolFacts.specialAllocationCst)} CST and one NFT, ${protocolFacts.anchoredRwlkNftSelectionRecipients} times`,
-                    `${protocolFacts.anchoredRwlkNftSelectionRecipients} draws across anchored Random Walk NFTs.`,
+                    `${protocolFacts.anchoredRwlkNftSelectionRecipients} selections across anchored Random Walk NFTs.`,
                   ],
                   [
                     'Outreach Reserve',
@@ -355,15 +355,15 @@ export const whitePaperTextEn = {
           blocks: [
             {
               kind: 'paragraph',
-              text: `Each gesture records one entry in the cycle\u2019s participant Selection pool. At finalization, the contract draws ${protocolFacts.ethStellarSelectionRecipients} entries for the ETH Stellar Selection, which share ${protocolFacts.stellarSelectionEthPercentage}% of the reserve equally, and ${protocolFacts.nftStellarSelectionRecipients} entries for the NFT Stellar Selection. Draws are made with replacement, so the same participant can be drawn more than once, and entries scale with gestures made: selection frequency is proportional to participation.`,
+              text: `Each gesture records one entry in the cycle\u2019s participant Selection pool. At finalization, the contract selects ${protocolFacts.ethStellarSelectionRecipients} entries for the ETH Stellar Selection, which share ${protocolFacts.stellarSelectionEthPercentage}% of the reserve equally, and ${protocolFacts.nftStellarSelectionRecipients} entries for the NFT Stellar Selection. Selections are made with replacement, so the same participant can be selected more than once, and entries scale with gestures made: selection frequency is proportional to participation.`,
             },
             {
               kind: 'paragraph',
-              text: `A separate Anchored-NFT Stellar Selection runs across anchored Random Walk NFTs: ${protocolFacts.anchoredRwlkNftSelectionRecipients} draws, weighted by the number of NFTs each holder has anchored. This track distributes CST and Cosmic Signature NFTs only; it carries no ETH.`,
+              text: `A separate Anchored-NFT Stellar Selection runs across anchored Random Walk NFTs: ${protocolFacts.anchoredRwlkNftSelectionRecipients} selections, weighted by the number of NFTs each holder has anchored. This track distributes CST and Cosmic Signature NFTs only; it carries no ETH.`,
             },
             {
               kind: 'paragraph',
-              text: 'The randomness behind these draws is constructed on-chain at finalization. Section 11.3 describes its sources and its limits.',
+              text: 'The randomness behind these selections is constructed on-chain at finalization. Section 11.3 describes its sources and its limits.',
             },
           ],
         },
@@ -522,7 +522,7 @@ export const whitePaperTextEn = {
         },
         {
           kind: 'paragraph',
-          text: `Random Walk NFTs anchor separately and for a different purpose: anchored Random Walk NFTs receive draws in the Anchored-NFT Stellar Selection (Section 5.3), ${protocolFacts.anchoredRwlkNftSelectionRecipients} per cycle, each carrying ${cst(protocolFacts.specialAllocationCst)} CST and a Cosmic Signature NFT. Random Walk anchoring carries no ETH distributions. The same once-ever rule applies.`,
+          text: `Random Walk NFTs anchor separately and for a different purpose: anchored Random Walk NFTs take part in the Anchored-NFT Stellar Selection (Section 5.3), ${protocolFacts.anchoredRwlkNftSelectionRecipients} per cycle, each carrying ${cst(protocolFacts.specialAllocationCst)} CST and a Cosmic Signature NFT. Random Walk anchoring carries no ETH distributions. The same once-ever rule applies.`,
         },
       ],
     },
@@ -602,11 +602,11 @@ export const whitePaperTextEn = {
           blocks: [
             {
               kind: 'paragraph',
-              text: 'The protocol needs randomness twice: for Selection draws at finalization and for each new NFT\u2019s seed. It builds a seed on-chain by folding together the previous block hash, the current base fee, and Arbitrum-specific entropy from the ArbSys and ArbGasInfo precompiles: the previous Arbitrum block hash, the gas backlog, and L1 pricing counters. Individual values are then drawn from that seed with keccak256. The precompile calls are failure-tolerant; if one is unavailable, the construction falls back to the remaining sources.',
+              text: 'The protocol needs randomness twice: for the Stellar Selections at finalization and for each new NFT\u2019s seed. It builds a seed on-chain by folding together the previous block hash, the current base fee, and Arbitrum-specific entropy from the ArbSys and ArbGasInfo precompiles: the previous Arbitrum block hash, the gas backlog, and L1 pricing counters. Individual values are then derived from that seed with keccak256. The precompile calls are failure-tolerant; if one is unavailable, the construction falls back to the remaining sources.',
             },
             {
               kind: 'paragraph',
-              text: 'This is deliberate minimalism: no oracle, no external committee, no callback that could strand a cycle. The trade-off is stated plainly. A sequencer could in principle influence block-level inputs, and the design bounds what that influence could reach. Selection draws and art seeds are the only consumers of randomness; the countdown, the Gesture Cost sequence, and every percentage in Section 5 are deterministic. The construction is consumed once per finalization, and finalization is a public transaction anyone can submit.',
+              text: 'This is deliberate minimalism: no oracle, no external committee, no callback that could strand a cycle. The trade-off is stated plainly. A sequencer could in principle influence block-level inputs, and the design bounds what that influence could reach. Stellar Selections and art seeds are the only consumers of randomness; the countdown, the Gesture Cost sequence, and every percentage in Section 5 are deterministic. The construction is consumed once per finalization, and finalization is a public transaction anyone can submit.',
             },
           ],
         },
@@ -734,7 +734,7 @@ export const whitePaperTextEn = {
               kind: 'list',
               items: [
                 'Smart contract risk. The contracts are reviewed, formally analyzed, and source-verified, and none of that is a guarantee. Unknown defects can exist in any software that holds value.',
-                'Randomness limits. Selection draws use block-derived entropy (Section 11.3). A sequencer could in principle influence it; the design bounds the consequences but cannot eliminate them.',
+                'Randomness limits. Stellar Selections use block-derived entropy (Section 11.3). A sequencer could in principle influence it; the design bounds the consequences but cannot eliminate them.',
                 `Timing responsibilities. The ${protocolFacts.finalGestureExclusivityHours}-hour finalization window and the ${protocolFacts.secondaryRetrievalTimeoutWeeks}-week escrow timeout are real deadlines. Allocations left unretrieved past them become available to others, by design.`,
                 'Parameter changes. Until the decentralization step completes, parameters can change between cycles as described in Section 13. Every change is public before the next cycle begins.',
                 'Asset volatility. The values of ETH, CST, and NFTs move. Participation costs real money; treat gestures as expenditure on participation and art, not as a path to financial gain.',
@@ -920,7 +920,7 @@ export const whitePaperTextEn = {
   figures: {
     cycle: {
       title: 'A Performance Cycle, from opening to the next cycle',
-      caption: 'Durations are launch values; Section 3 gives the exact rules.',
+      caption: 'Durations are launch values; Sections 3.1 through 3.3 give the exact rules.',
       steps: [
         {
           label: 'Opening',

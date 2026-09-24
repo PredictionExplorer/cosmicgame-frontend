@@ -7,9 +7,9 @@ import {
   type WhitePaperSectionStructure,
 } from '@/content/white-paper';
 import { protocolFacts } from '@/content/protocol-facts';
+import { getLandingContent } from '@/content/landing';
 
 import { routing } from '@/i18n/routing';
-import { ALLOCATION_SPLIT_TRACKS } from '@/components/white-paper/AllocationSplit';
 
 /**
  * Structural guard for the white paper.
@@ -80,7 +80,7 @@ describe('localized white-paper content', () => {
 
 describe('web edition of the white paper', () => {
   it.each(routing.locales)(
-    '%s: the §5.1 table lists the ETH tracks in the figure order',
+    '%s: the §5.1 table lists the ETH tracks in the order every chart of the split draws them',
     (locale) => {
       const table = getWhitePaperContent(locale)
         .sections.flatMap((section) => section.subsections ?? [])
@@ -88,10 +88,12 @@ describe('web edition of the white paper', () => {
         ?.blocks.find((block) => block.kind === 'table');
       expect(table?.kind).toBe('table');
       if (table?.kind !== 'table') return;
-      // The figure takes its track names from this table's first column, row by row.
-      expect(table.table.rows).toHaveLength(ALLOCATION_SPLIT_TRACKS.length);
+      // The figure draws the landing's bar (config/allocationTracks order) and
+      // keys it with this table's first column, row by row.
+      const tracks = getLandingContent(locale).tracks.eth;
+      expect(table.table.rows).toHaveLength(tracks.length);
       table.table.rows.forEach((row, index) => {
-        expect(row[1]).toContain(String(ALLOCATION_SPLIT_TRACKS[index]!.share));
+        expect(row[1]).toContain(String(tracks[index]!.share));
       });
     },
   );

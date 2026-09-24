@@ -268,9 +268,9 @@ export const whitePaperTextJa = {
                     '最も長く在位した持久チャンピオン（第5.2節）。',
                   ],
                   [
-                    '公共財配分',
-                    `${protocolFacts.publicGoodsPercentage}%`,
-                    '公共財金庫を通じてProtocol Guildへ。',
+                    'ETH星選',
+                    `${protocolFacts.stellarSelectionEthPercentage}%`,
+                    `サイクルの一筆のプールから選ばれた${protocolFacts.ethStellarSelectionRecipients}件の対象が、金額を等しく分け合う。`,
                   ],
                   [
                     '係留配分',
@@ -278,9 +278,9 @@ export const whitePaperTextJa = {
                     '係留中のCosmic Signature NFTへ、比例して。',
                   ],
                   [
-                    'ETH星選',
-                    `${protocolFacts.stellarSelectionEthPercentage}%`,
-                    `サイクルの一筆のプールから選ばれた${protocolFacts.ethStellarSelectionRecipients}件の対象が、金額を等しく分け合う。`,
+                    '公共財配分',
+                    `${protocolFacts.publicGoodsPercentage}%`,
+                    '公共財金庫を通じてProtocol Guildへ。',
                   ],
                   [
                     '累積準備金',
@@ -914,7 +914,7 @@ export const whitePaperTextJa = {
   figures: {
     cycle: {
       title: 'パフォーマンス・サイクルの流れ：開始から次のサイクルまで',
-      caption: '時間は開始時のパラメーターです。正確なルールは第3節にあります。',
+      caption: '時間は開始時のパラメーターです。正確なルールは第3.1節から第3.3節にあります。',
       steps: [
         {
           label: '開始',

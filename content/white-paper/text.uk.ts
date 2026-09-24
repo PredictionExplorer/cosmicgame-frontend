@@ -272,9 +272,9 @@ export const whitePaperTextUk = {
                     'Чемпіон витривалості, який найдовше утримував титул (розділ 5.2).',
                   ],
                   [
-                    'Розподіл на суспільні блага',
-                    `${protocolFacts.publicGoodsPercentage}%`,
-                    'Protocol Guild через сховище суспільних благ.',
+                    'Зоряний відбір ETH',
+                    `${protocolFacts.stellarSelectionEthPercentage}%`,
+                    `${protocolFacts.ethStellarSelectionRecipients} записи, обрані з пулу жестів циклу; сума ділиться між ними порівну.`,
                   ],
                   [
                     'Надходження за закріплення',
@@ -282,9 +282,9 @@ export const whitePaperTextUk = {
                     'Закріплені Cosmic Signature NFT, пропорційно.',
                   ],
                   [
-                    'Зоряний відбір ETH',
-                    `${protocolFacts.stellarSelectionEthPercentage}%`,
-                    `${protocolFacts.ethStellarSelectionRecipients} записи, обрані з пулу жестів циклу; сума ділиться між ними порівну.`,
+                    'Розподіл на суспільні блага',
+                    `${protocolFacts.publicGoodsPercentage}%`,
+                    'Protocol Guild через сховище суспільних благ.',
                   ],
                   [
                     'Накопичувальний резерв',
@@ -935,7 +935,7 @@ export const whitePaperTextUk = {
   figures: {
     cycle: {
       title: 'Перформанс-цикл від відкриття до наступного циклу',
-      caption: 'Тривалості наведено для параметрів запуску; точні правила — у розділі 3.',
+      caption: 'Тривалості наведено для параметрів запуску; точні правила — у розділах 3.1–3.3.',
       steps: [
         {
           label: 'Відкриття',

@@ -269,13 +269,13 @@ export const basicQuestionsTextEn = {
   'stellar-selection-what': {
     prompt: 'What are Stellar Selections?',
     options: {
-      a: 'Per-gesture entries recorded during the cycle, from which the contract draws recipients at finalization.',
+      a: 'Per-gesture entries recorded during the cycle, from which the contract selects recipients at finalization.',
       b: 'A leaderboard ranking participants by activity.',
       c: 'Rarity tiers assigned to the NFT artwork.',
       d: 'A scheme for naming constellations in the art.',
     },
     explanation:
-      'Each gesture records one entry in the cycle\u2019s Selection pool. At finalization the contract draws entries for the ETH and NFT Stellar Selections, so selection frequency is proportional to participation. It is a distribution mechanism, not a ranking.',
+      'Each gesture records one entry in the cycle\u2019s Selection pool. At finalization the contract selects entries for the ETH and NFT Stellar Selections, so selection frequency is proportional to participation. It is a distribution mechanism, not a ranking.',
     referenceLabel: 'White paper \u00a75.3 \u2014 Stellar Selections',
   },
   'ecosystem-optionality': {

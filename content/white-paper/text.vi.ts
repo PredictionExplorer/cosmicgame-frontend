@@ -274,9 +274,9 @@ export const whitePaperTextVi = {
                     'Quán quân Bền bỉ giữ vị trí lâu nhất (Mục 5.2).',
                   ],
                   [
-                    'Phân bổ Hàng hóa công',
-                    `${protocolFacts.publicGoodsPercentage}%`,
-                    'Protocol Guild, qua Kho Hàng hóa công.',
+                    'ETH Tinh tuyển',
+                    `${protocolFacts.stellarSelectionEthPercentage}%`,
+                    `${protocolFacts.ethStellarSelectionRecipients} lượt được chọn từ quỹ nét bút của chu kỳ, chia đều số tiền.`,
                   ],
                   [
                     'Phân phối neo giữ',
@@ -284,9 +284,9 @@ export const whitePaperTextVi = {
                     'Các Cosmic Signature NFT đang neo giữ, theo tỷ lệ.',
                   ],
                   [
-                    'ETH Tinh tuyển',
-                    `${protocolFacts.stellarSelectionEthPercentage}%`,
-                    `${protocolFacts.ethStellarSelectionRecipients} lượt được chọn từ quỹ nét bút của chu kỳ, chia đều số tiền.`,
+                    'Phân bổ Hàng hóa công',
+                    `${protocolFacts.publicGoodsPercentage}%`,
+                    'Protocol Guild, qua Kho Hàng hóa công.',
                   ],
                   [
                     'Dự trữ tích lũy',
@@ -931,7 +931,7 @@ export const whitePaperTextVi = {
   figures: {
     cycle: {
       title: 'Một chu kỳ trình diễn, từ lúc mở đến chu kỳ tiếp theo',
-      caption: 'Thời lượng là tham số lúc ra mắt; Mục 3 nêu các quy tắc chính xác.',
+      caption: 'Thời lượng là tham số lúc ra mắt; các mục 3.1 đến 3.3 nêu các quy tắc chính xác.',
       steps: [
         {
           label: 'Mở chu kỳ',

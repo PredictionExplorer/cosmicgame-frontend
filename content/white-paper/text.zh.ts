@@ -257,9 +257,9 @@ export const whitePaperTextZh = {
                     '在位最久的坚守冠军（见第 5.2 节）。',
                   ],
                   [
-                    '公共物品分配',
-                    `${protocolFacts.publicGoodsPercentage}%`,
-                    'Protocol Guild，经公共物品金库转拨。',
+                    'ETH 星选',
+                    `${protocolFacts.stellarSelectionEthPercentage}%`,
+                    `从本周期落笔资格池中选出 ${protocolFacts.ethStellarSelectionRecipients} 次，均分该份额。`,
                   ],
                   [
                     '锚定派发',
@@ -267,9 +267,9 @@ export const whitePaperTextZh = {
                     '已锚定的 Cosmic Signature NFT，按比例分摊。',
                   ],
                   [
-                    'ETH 星选',
-                    `${protocolFacts.stellarSelectionEthPercentage}%`,
-                    `从本周期落笔资格池中选出 ${protocolFacts.ethStellarSelectionRecipients} 次，均分该份额。`,
+                    '公共物品分配',
+                    `${protocolFacts.publicGoodsPercentage}%`,
+                    'Protocol Guild，经公共物品金库转拨。',
                   ],
                   [
                     '滚动储备',
@@ -894,7 +894,7 @@ export const whitePaperTextZh = {
   figures: {
     cycle: {
       title: '一个演绎周期：从开场到下一周期',
-      caption: '时长为上线参数；具体规则见第 3 节。',
+      caption: '时长为上线参数；具体规则见第 3.1 至 3.3 节。',
       steps: [
         {
           label: '开场',

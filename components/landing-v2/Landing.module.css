@@ -467,6 +467,29 @@ html:is(:lang(zh), :lang(ja)) .headline {
   white-space: nowrap;
 }
 
+/* Inside reading text (the white paper's figure): the same bar, a quieter height. */
+.barInline {
+  height: 2.25rem;
+}
+
+.barInline .segment {
+  padding: 0.375rem;
+}
+
+/* The bar's key: swatch and name per track, wrapping in rows. */
+.key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem 1.5rem;
+  margin-top: 1rem;
+}
+
+.keyItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 /* A share too narrow for its figure shows the colour alone; the legend reads it. */
 @container (width < 2.5rem) {
   .segmentLabel {

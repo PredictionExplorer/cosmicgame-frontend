@@ -60,6 +60,32 @@ describe('white paper cross-references', () => {
     );
   });
 
+  it.each([
+    ['en', 'Sections 3 through 5 specify cycles.', 'Sections 3 through 5'],
+    ['en', 'Sections 12 and 13 record the history.', 'Sections 12 and 13'],
+    ['zh', '第 3 至 5 节规定周期。', '第 3 至 5 节'],
+    ['zh-TW', '第 12、13 節記錄歷史。', '第 12、13 節'],
+    ['uk', 'Розділи 3–5 визначають цикли.', 'Розділи 3–5'],
+    ['uk', 'у розділах 12 і 13', 'розділах 12 і 13'],
+    ['ko', '3~5절은 사이클을 명세합니다.', '3~5절'],
+    ['vi', 'Các mục 7 đến 10 nói về CST.', 'Các mục 7 đến 10'],
+  ])('%s: links a range or pair to its first section as one link', (locale, text, linked) => {
+    const localeTargets = referenceTargets(getWhitePaperContent(locale));
+    const links = splitReferences(text, locale, localeTargets).filter(
+      (part) => typeof part !== 'string',
+    );
+    expect(links).toHaveLength(1);
+    expect(links[0]?.text).toBe(linked);
+  });
+
+  it('links the subsection range a figure caption names', () => {
+    expect(
+      splitReferences('Sections 3.1 through 3.3 give the exact rules.', 'en', targets).find(
+        (part) => typeof part !== 'string',
+      ),
+    ).toEqual({ text: 'Sections 3.1 through 3.3', id: 'eth-calibration-window' });
+  });
+
   it.each(routing.locales)('%s: finds the paper’s references in its own wording', (locale) => {
     const localeTargets = referenceTargets(getWhitePaperContent(locale));
     const links = paperTexts(locale)
