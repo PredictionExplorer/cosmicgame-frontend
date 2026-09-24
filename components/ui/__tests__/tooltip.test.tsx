@@ -184,7 +184,7 @@ describe('InfoTooltip', () => {
     render(<InfoTooltip content="Extra context" label="Total Cycles" />);
 
     const trigger = screen.getByRole('button', { name: 'More information about Total Cycles' });
-    expect(trigger).toHaveAttribute('aria-description', 'Extra context');
+    expect(trigger).toHaveAccessibleDescription('Extra context');
   });
 
   it('never truncates the explanation into the accessible name', () => {
@@ -193,7 +193,10 @@ describe('InfoTooltip', () => {
     render(<InfoTooltip content={longContent} />);
 
     const trigger = screen.getByRole('button', { name: 'More information' });
-    expect(trigger).toHaveAttribute('aria-description', longContent);
+    // aria-describedby, not the ARIA 1.3 aria-description some browsers and
+    // screen readers do not expose: the text is always announced.
+    expect(trigger).toHaveAccessibleDescription(longContent);
+    expect(trigger).not.toHaveAttribute('aria-description');
   });
 
   it('allows callers to customize the trigger label', () => {
@@ -202,13 +205,17 @@ describe('InfoTooltip', () => {
     expect(screen.getByRole('button', { name: 'Explain cycle timing' })).toBeInTheDocument();
   });
 
-  it('keeps a 24px hit area at every width and 44px on coarse pointers', () => {
-    render(<InfoTooltip content="Extra context" label="Total Cycles" />);
+  it('is a 24px button at every width, with a 44px hit area on coarse pointers', () => {
+    render(<InfoTooltip content="Extra context" label="Total Cycles" className="ml-1.5" />);
 
     const trigger = screen.getByRole('button', { name: 'More information about Total Cycles' });
-    expect(trigger).toHaveClass('after:size-6', 'pointer-coarse:after:size-11');
+    // The button's own box is 24px, which is what automated audits measure;
+    // the 16px icon beside it keeps the row's layout and the caller's margin.
+    expect(trigger).toHaveClass('size-6', 'pointer-coarse:after:size-11');
     expect(trigger.className).not.toMatch(/sm:after:hidden/);
-    expect(trigger).toHaveClass('text-subtle');
+    const wrapper = trigger.closest('[data-slot="info-tooltip"]');
+    expect(wrapper).toHaveClass('text-subtle', 'ml-1.5');
+    expect(wrapper?.querySelector('svg')).toHaveClass('size-4');
   });
 
   it('opens from the accessible button on touch', async () => {

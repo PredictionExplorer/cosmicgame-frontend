@@ -12,15 +12,17 @@ export async function dismissOpenTooltips(page: Page): Promise<void> {
 }
 
 export function tooltipTriggerForLabel(page: Page, label: string): Locator {
+  // InfoTooltip is a <button>; a Term or StatCard label is an inline
+  // <span role="button"> so it wraps with its sentence.
   const tooltipButtonSelector = [
-    'button[aria-label^="More information"]',
+    ':is(button, [role="button"])[aria-label^="More information"]',
     'button[aria-label^="Explain column:"]',
   ].join(', ');
 
   return page
     .getByText(label, { exact: true })
     .first()
-    .locator('xpath=ancestor::*[.//button][1]')
+    .locator('xpath=ancestor::*[.//button or .//*[@role="button"]][1]')
     .locator(tooltipButtonSelector)
     .first();
 }

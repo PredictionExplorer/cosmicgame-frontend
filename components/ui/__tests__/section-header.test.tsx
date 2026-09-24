@@ -41,7 +41,7 @@ describe('SectionHeader', () => {
     render(<SectionHeader title="Reserve split" info="Every track draws a fixed share." />);
     expect(
       screen.getByRole('button', { name: 'More information about Reserve split' }),
-    ).toHaveAttribute('aria-description', 'Every track draws a fixed share.');
+    ).toHaveAccessibleDescription('Every track draws a fixed share.');
   });
 
   it('has no accessibility violations', async () => {

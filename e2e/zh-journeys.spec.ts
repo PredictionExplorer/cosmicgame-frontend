@@ -33,7 +33,7 @@ test.describe('Sprint 8 deterministic Chinese journeys', () => {
 
     const tooltipTrigger = page
       .locator(
-        'button[aria-label^="更多信息"]:visible, button[aria-label^="查看“"]:visible, button[aria-label^="说明“"]:visible',
+        ':is(button, [role="button"])[aria-label^="更多信息"]:visible, :is(button, [role="button"])[aria-label^="查看“"]:visible, button[aria-label^="说明“"]:visible',
       )
       .first();
     await openTooltip(tooltipTrigger);
@@ -56,7 +56,7 @@ test.describe('Sprint 8 deterministic Chinese journeys', () => {
 
     const trigger = page
       .locator(
-        'button[aria-label^="更多信息"]:visible, button[aria-label^="查看“"]:visible, button[aria-label^="说明“"]:visible',
+        ':is(button, [role="button"])[aria-label^="更多信息"]:visible, :is(button, [role="button"])[aria-label^="查看“"]:visible, button[aria-label^="说明“"]:visible',
       )
       .first();
     await openTooltip(trigger);

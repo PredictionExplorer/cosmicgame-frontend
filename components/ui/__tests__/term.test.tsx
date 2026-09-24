@@ -4,8 +4,10 @@ import { join } from 'node:path';
 
 import userEvent from '@testing-library/user-event';
 
-import { GLOSSARY_TERM_IDS, Term } from '@/components/ui/term';
+import { ExplainedTerm } from '@/components/ui/explain-popover';
+import { Term } from '@/components/ui/term';
 import { routing } from '@/i18n/routing';
+import { GLOSSARY_TERM_IDS } from '@/lib/glossary';
 
 import { checkA11y, fireEvent, render, screen, waitFor } from '@/test-utils';
 
@@ -26,10 +28,40 @@ describe('Term', () => {
     );
 
     const term = screen.getByRole('button', { name: 'Calibration Window' });
-    expect(term).toHaveAttribute('aria-description', enGlossary.terms.calibrationWindow.short);
+    expect(term).toHaveAccessibleDescription(enGlossary.terms.calibrationWindow.short);
     expect(term).toHaveAttribute('data-term', 'calibrationWindow');
     expect(term).not.toHaveAttribute('aria-expanded');
     expect(term.className).toMatch(/decoration-dotted/);
+  });
+
+  it('keeps the description out of the reading order', () => {
+    render(
+      <p>
+        Each <Term id="gesture" /> counts.
+      </p>,
+    );
+    const term = screen.getByRole('button', { name: 'Gesture' });
+    const description = document.getElementById(term.getAttribute('aria-describedby') ?? '');
+    expect(description).toHaveTextContent(enGlossary.terms.gesture.short);
+    // Referenced directly, hidden text still describes the trigger, and
+    // browse mode does not read the definition a second time.
+    expect(description).toHaveAttribute('hidden');
+  });
+
+  it('wraps with the sentence: an inline span, never an atomic button box', () => {
+    render(
+      <p>
+        Holders of <Term id="cycleFinalizationTime">the Cycle Finalization Time</Term> extend it.
+      </p>,
+    );
+    const term = screen.getByRole('button', { name: 'the Cycle Finalization Time' });
+    // A <button> is laid out as one inline-block, so a multi-word term would
+    // jump whole to the next line (jsdom's UA sheet reports the same); a
+    // span breaks across line boxes with the text around it.
+    expect(term.tagName).toBe('SPAN');
+    expect(getComputedStyle(term).display).not.toBe('inline-block');
+    expect(term.className).not.toMatch(/(^|\s)(inline-block|inline-flex|block|flex|grid)(\s|$)/);
+    expect(term).toHaveAttribute('tabindex', '0');
   });
 
   it('keeps the sentence’s own wording for an inflected term', () => {
@@ -53,6 +85,8 @@ describe('Term', () => {
         enGlossary.terms.enduranceChampion.long,
       ),
     );
+    // The card renders in a portal, so the long definition is announced.
+    expect(screen.getByRole('status')).toHaveTextContent(enGlossary.terms.enduranceChampion.long);
 
     // A pinned card survives the pointer leaving.
     await user.unhover(term);
@@ -68,7 +102,7 @@ describe('Term', () => {
     expect(await screen.findByRole('tooltip')).toHaveTextContent(enGlossary.terms.anchoring.long);
   });
 
-  it('opens from the keyboard and closes on Escape', async () => {
+  it('opens from the keyboard with Enter and closes on Escape', async () => {
     const user = userEvent.setup();
     render(<Term id="retrieve" />);
     await user.tab();
@@ -82,28 +116,20 @@ describe('Term', () => {
     expect(term).toHaveFocus();
   });
 
-  it('explains an ad hoc word outside the glossary', async () => {
-    render(
-      <Term definition="A widely used Ethereum token standard." announce="text">
-        ERC-20
-      </Term>,
-    );
-    const term = screen.getByRole('button', { name: 'ERC-20' });
-    fireEvent.click(term);
-    const card = await screen.findByRole('tooltip');
-    expect(card).toHaveTextContent('ERC-20');
-    expect(card).toHaveTextContent('A widely used Ethereum token standard.');
-  });
+  it('toggles with Space, without scrolling the page', async () => {
+    const user = userEvent.setup();
+    render(<Term id="imprint" />);
+    await user.tab();
+    const term = screen.getByRole('button', { name: 'Imprint' });
 
-  it('names a figure label as more information about it', () => {
-    render(
-      <Term definition="Gestures made across every Cycle." announce="moreInformation">
-        Gestures made
-      </Term>,
-    );
-    expect(
-      screen.getByRole('button', { name: 'More information about Gestures made' }),
-    ).toHaveTextContent('Gestures made');
+    const space = new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true });
+    term.dispatchEvent(space);
+    expect(space.defaultPrevented).toBe(true);
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(enGlossary.terms.imprint.long);
+
+    await user.keyboard(' ');
+    await waitFor(() => expect(screen.queryByRole('tooltip')).not.toBeInTheDocument());
+    expect(term).toHaveFocus();
   });
 
   it('has no accessibility violations', async () => {
@@ -116,8 +142,40 @@ describe('Term', () => {
   });
 });
 
+describe('ExplainedTerm', () => {
+  it('explains an ad hoc word outside the glossary', async () => {
+    render(
+      <ExplainedTerm definition="A widely used Ethereum token standard.">ERC-20</ExplainedTerm>,
+    );
+    const term = screen.getByRole('button', { name: 'ERC-20' });
+    expect(term).toHaveAccessibleDescription('A widely used Ethereum token standard.');
+    fireEvent.click(term);
+    const card = await screen.findByRole('tooltip');
+    expect(card).toHaveTextContent('ERC-20');
+    expect(card).toHaveTextContent('A widely used Ethereum token standard.');
+  });
+
+  it('names a figure label as more information about it', () => {
+    render(
+      <ExplainedTerm definition="Gestures made across every Cycle." announce="moreInformation">
+        Gestures made
+      </ExplainedTerm>,
+    );
+    expect(
+      screen.getByRole('button', { name: 'More information about Gestures made' }),
+    ).toHaveTextContent('Gestures made');
+  });
+
+  it('adds no live region when there is nothing longer to announce', () => {
+    render(<ExplainedTerm definition="Layer 2 network.">Arbitrum</ExplainedTerm>);
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+  });
+});
+
 describe('glossary catalog', () => {
   const messagesDir = join(__dirname, '..', '..', '..', 'messages');
+  /** The source catalog is written to the tighter budget; translations may run longer. */
+  const shortBudget = (locale: string) => (locale === routing.defaultLocale ? 160 : 180);
 
   it('defines every term in every locale with a term, a short and a long definition', () => {
     for (const locale of routing.locales) {
@@ -131,7 +189,7 @@ describe('glossary catalog', () => {
         expect(entry?.short.trim()).toBeTruthy();
         expect(entry?.long.trim()).toBeTruthy();
         // The hover card stays a glance: one or two sentences.
-        expect(entry?.short.length).toBeLessThanOrEqual(locale === 'en' ? 160 : 180);
+        expect(entry?.short.length).toBeLessThanOrEqual(shortBudget(locale));
       }
     }
   });

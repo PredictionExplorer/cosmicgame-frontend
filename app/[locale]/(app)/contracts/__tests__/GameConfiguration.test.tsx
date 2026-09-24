@@ -150,7 +150,9 @@ describe('GameConfiguration tooltips', () => {
     if (!row) {
       throw new Error(`Could not find tooltip row for label "${label}"`);
     }
-    const trigger = row.querySelector<HTMLElement>('button[aria-label^="More information"]');
+    const trigger = row.querySelector<HTMLElement>(
+      'button[aria-label^="More information"], [role="button"][aria-label^="More information"]',
+    );
     if (!trigger) {
       throw new Error(`Could not find tooltip trigger next to label "${label}"`);
     }

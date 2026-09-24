@@ -167,7 +167,7 @@ jest.mock('next-intl', () => {
         if (typeof message === 'string') return interpolate(message, values);
       }
       if (namespace === 'tooltips') {
-        if (key === 'moreInformation') return `More information: ${String(values?.content ?? '')}`;
+        if (key === 'moreInformation') return 'More information';
         if (key === 'moreInformationAbout') {
           return `More information about ${String(values?.label ?? '')}`;
         }

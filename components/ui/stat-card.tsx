@@ -5,7 +5,7 @@ import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Term } from '@/components/ui/term';
+import { ExplainedTerm } from '@/components/ui/explain-popover';
 import { formatFixed } from '@/utils/format';
 
 /** @deprecated Icon tints are gone: colour belongs to the art and to live state. */
@@ -66,9 +66,9 @@ interface StatCardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children' 
   /** A 16px concept icon (lib/conceptIcons) beside the label. */
   icon?: ReactNode;
   /**
-   * What the figure means. The label becomes a `<Term>`: a dotted underline
-   * that opens the explanation on hover, click or tap, named "More information
-   * about {label}", instead of an extra ⓘ icon and tab stop.
+   * What the figure means. The label becomes an `<ExplainedTerm>`: a dotted
+   * underline that opens the explanation on hover, click or tap, named "More
+   * information about {label}", instead of an extra ⓘ icon and tab stop.
    */
   tooltip?: string;
   /**
@@ -109,8 +109,8 @@ interface StatCardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children' 
  * at a syllable rather than chopped mid-word in a narrow column), the value
  * in tabular Inter figures, and an optional caption or trend.
  *
- * Server-safe: no client hooks of its own (the `<Term>` label is a client
- * island only when `tooltip` is set). Lay rows out with `<StatGrid>`.
+ * Server-safe: no client hooks of its own (the `<ExplainedTerm>` label is a
+ * client island only when `tooltip` is set). Lay rows out with `<StatGrid>`.
  */
 export function StatCard({
   label,
@@ -154,9 +154,9 @@ export function StatCard({
           )}
         >
           {tooltip ? (
-            <Term definition={tooltip} announce="moreInformation">
+            <ExplainedTerm definition={tooltip} announce="moreInformation">
               {label}
-            </Term>
+            </ExplainedTerm>
           ) : (
             label
           )}

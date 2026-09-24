@@ -27,7 +27,6 @@ export const APP_CHROME_NAMESPACES = [
   'footer',
   'forms',
   'formats',
-  'glossary',
   'nav',
   'search',
   'toasts',

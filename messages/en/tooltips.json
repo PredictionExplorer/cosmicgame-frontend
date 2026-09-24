@@ -1,5 +1,5 @@
 {
-  "moreInformation": "More information: {content}",
+  "moreInformation": "More information",
   "moreInformationAbout": "More information about {label}",
   "explainColumn": "Explain column: {column}"
 }

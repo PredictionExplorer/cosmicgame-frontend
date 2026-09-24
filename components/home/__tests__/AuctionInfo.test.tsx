@@ -19,7 +19,10 @@ describe('AuctionInfo', () => {
     expect(screen.getByText('4050s')).toBeVisible();
     expect(screen.getByText('home.calibration.percentComplete(percent=25%)')).toBeVisible();
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '25');
-    expect(screen.queryByText('home.calibration.defaultSubtitle')).toBeNull();
+    // The subtitle survives only as the ⓘ button's hidden description.
+    expect(
+      screen.queryByText('home.calibration.defaultSubtitle', { ignore: '[hidden], script, style' }),
+    ).toBeNull();
     expect(
       screen.getByRole('button', {
         name: 'More information about home.calibration.defaultTitle',
