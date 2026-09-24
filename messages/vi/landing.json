@@ -7,7 +7,7 @@
     },
     "phases": {
       "loading": {
-        "title": "Đang đồng bộ thời gian chu kỳ"
+        "title": "Đang đọc thời điểm hoàn tất chu kỳ"
       },
       "openingSoon": {
         "title": "{cycle} sắp mở"
@@ -22,12 +22,18 @@
       "finalHour": {
         "title": "{cycle} đang bước vào giờ cuối"
       },
-      "nearHorizon": {
-        "title": "{cycle} sắp đến thời điểm hoàn tất"
+      "finalMinutes": {
+        "title": "{cycle}: những phút cuối"
       },
       "ready": {
         "title": "{cycle} đã sẵn sàng hoàn tất",
-        "body": "Đếm ngược đã về 0. Giao thức đã sẵn sàng hoàn tất chu kỳ và khắc Signature."
+        "state": "Sẵn sàng hoàn tất",
+        "body": "Một nét bút mới vẫn có thể kéo dài chu kỳ. Người tham gia có nét bút cuối cùng có thể hoàn tất chu kỳ ngay bây giờ."
+      },
+      "confirming": {
+        "title": "{cycle} đã đếm ngược về 0",
+        "state": "Đang xác nhận",
+        "body": "Đang kiểm tra xem nét bút vừa được ghi nhận có kéo dài chu kỳ hay không."
       },
       "unavailable": {
         "title": "Đồng hồ chu kỳ trực tiếp không khả dụng",
@@ -41,10 +47,10 @@
     "cycleClock": "Đồng hồ chu kỳ",
     "gestureCount": "{count, plural, other {# nét bút}}",
     "units": {
-      "days": "ngày",
-      "hours": "giờ",
-      "minutes": "phút",
-      "seconds": "giây"
+      "days": "{count, plural, other {ngày}}",
+      "hours": "{count, plural, other {giờ}}",
+      "minutes": "{count, plural, other {phút}}",
+      "seconds": "{count, plural, other {giây}}"
     },
     "duration": {
       "days": "{count, plural, other {# ngày}}",

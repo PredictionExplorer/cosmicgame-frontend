@@ -1,13 +1,6 @@
 'use client';
 
-import {
-  Fragment,
-  useEffect,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  type CSSProperties,
-} from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -17,14 +10,12 @@ import { getLiveDataPollIntervalMs } from '@/lib/pollingCadence';
 import { cn } from '@/lib/utils';
 import { SiteLink } from '@/components/layout/SiteLink';
 import { buttonVariants } from '@/components/ui/button';
+import { CountdownFigures, type CountdownGroup } from '@/components/ui/countdown-figures';
 import { LiveStatusView } from '@/components/ui/live-status-view';
 
 import {
   getLandingCycleTimerSnapshot,
   mergeLandingCyclePoll,
-  padClock,
-  type ClockShard,
-  type ClockUnit,
   type LandingCyclePoll,
   type LandingCycleReading,
   type LandingCycleTimerSnapshot,
@@ -41,8 +32,6 @@ import styles from './EventHorizonCountdown.module.css';
 
 /** The base cadence; it quickens near the deadline (lib/pollingCadence). */
 export const POLL_INTERVAL_MS = 12_000;
-
-const CLOCK_UNITS: readonly ClockUnit[] = ['days', 'hours', 'minutes', 'seconds'];
 
 /** One poll of the three reads; each helper answers null on failure and never throws. */
 async function pollLandingCycle(): Promise<LandingCyclePoll> {
@@ -125,58 +114,15 @@ function useLandingCycleReading() {
   return { reading, nowMs, online };
 }
 
-/**
- * The clock as type: tabular figures joined by hairline colons, each unit
- * captioned beneath. The type scales with the room it has (a container
- * query over the digit count), so a three-digit day count still fits one
- * row on a 320px phone. `placeholder` draws the same structure with dashes
- * while the first reading is on its way, so nothing reflows when it lands.
- */
-function ClockFigures({
-  shards,
-  labels,
-  placeholder = false,
-}: {
-  shards: readonly ClockShard[];
-  labels: Readonly<Record<ClockUnit, string>>;
-  placeholder?: boolean;
-}) {
-  const digits = shards.reduce((total, shard) => total + padClock(shard.value).length, 0);
-  return (
-    <div
-      className={cn(styles.units, placeholder && styles.placeholder)}
-      style={{ '--clock-digits': digits } as CSSProperties}
-      data-testid={placeholder ? 'countdown-placeholder' : 'countdown-units'}
-      aria-hidden="true"
-    >
-      {shards.map((shard, index) => (
-        <Fragment key={shard.unit}>
-          {index > 0 ? <span className={styles.colon}>:</span> : null}
-          <span className={styles.unit} data-countdown-unit={placeholder ? undefined : shard.unit}>
-            <span
-              className={cn('type-figure-xl', styles.value)}
-              data-testid={placeholder ? undefined : 'countdown-value'}
-            >
-              {placeholder ? '––' : padClock(shard.value)}
-            </span>
-            <span className={cn('type-caption text-subtle', styles.unitLabel)}>
-              {labels[shard.unit]}
-            </span>
-          </span>
-        </Fragment>
-      ))}
-    </div>
-  );
-}
-
 type PhaseCopyKey =
   | 'loading'
   | 'openingSoon'
   | 'waitingFirstGesture'
   | 'approach'
   | 'finalHour'
-  | 'nearHorizon'
+  | 'finalMinutes'
   | 'ready'
+  | 'confirming'
   | 'unavailable'
   | 'live';
 
@@ -190,10 +136,10 @@ function phaseCopyKey(phase: LandingCycleTimerSnapshot['phase']): PhaseCopyKey {
       return 'finalHour';
     case 'final-ten':
     case 'final-minute':
-      return 'nearHorizon';
+      return 'finalMinutes';
     case 'ready-to-finalize':
-    case 'confirming':
       return 'ready';
+    case 'confirming':
     case 'approach':
     case 'unavailable':
     case 'loading':
@@ -202,20 +148,46 @@ function phaseCopyKey(phase: LandingCycleTimerSnapshot['phase']): PhaseCopyKey {
   }
 }
 
+/** Phases whose readout is a sentence instead of figures. */
+const STATEMENT_PHASES: ReadonlySet<PhaseCopyKey> = new Set([
+  'waitingFirstGesture',
+  'ready',
+  'confirming',
+  'unavailable',
+]);
+
+function subscribeNever(): () => void {
+  return () => {};
+}
+
+/** False in the server HTML and during hydration, true once the page runs. */
+function useHydrated(): boolean {
+  return useSyncExternalStore(
+    subscribeNever,
+    () => true,
+    () => false,
+  );
+}
+
 /**
  * The landing's live cycle clock: the same Cycle Finalization Time as the
- * app, read without the wallet stack. It never discards its last good
- * reading: a failed poll keeps the clock counting from that reading and the
- * freshness stamp says how old it is ("Reconnecting…", "Updates delayed ·
- * last update 2m ago", with the caveat that the clock may have moved). Only
- * when no reading ever arrived does it say the clock is unavailable, and
- * then it sends the visitor to the app instead of showing a dead instrument.
+ * app, read without the wallet stack and drawn with the same
+ * CountdownFigures. It never discards its last good reading: a failed poll
+ * keeps the clock counting from that reading and the freshness stamp says
+ * how old it is ("Reconnecting…", "Updates delayed · last update 2m ago",
+ * with the caveat that the clock may have moved). Only when no reading ever
+ * arrived does it say the clock is unavailable, and then it sends the
+ * visitor to the app instead of showing a dead instrument. At zero nothing
+ * shrinks: the state takes the figures' place at their size, with what can
+ * still happen beneath it. The server HTML calls the band a cycle clock; it
+ * becomes the live clock once the page runs.
  */
 export function EventHorizonCountdown() {
   const locale = useLocale();
   const formatT = useTranslations('formats');
   const timerT = useTranslations('landing.timer');
   const navT = useTranslations('nav');
+  const hydrated = useHydrated();
   const { reading, nowMs, online } = useLandingCycleReading();
 
   const snapshot = getLandingCycleTimerSnapshot({
@@ -244,14 +216,16 @@ export function EventHorizonCountdown() {
       : timerT('cycle.numbered', { number: snapshot.cycleNumber });
   const copyKey = phaseCopyKey(phase);
   const title = timerT(`phases.${copyKey}.title`, { cycle: cycleLabel });
-  const body =
-    copyKey === 'waitingFirstGesture' || copyKey === 'ready' || copyKey === 'unavailable'
-      ? timerT(`phases.${copyKey}.body`)
-      : null;
+  const body = STATEMENT_PHASES.has(copyKey) ? timerT(`phases.${copyKey}.body`) : null;
+  const stateWord =
+    copyKey === 'ready' || copyKey === 'confirming' ? timerT(`phases.${copyKey}.state`) : null;
 
-  const unitLabels = Object.fromEntries(
-    CLOCK_UNITS.map((unit) => [unit, timerT(`units.${unit}`)]),
-  ) as Record<ClockUnit, string>;
+  // The same plural captions as the app's clock: "01 hour", "02 hours".
+  const groups: CountdownGroup[] = snapshot.shards.map((shard) => ({
+    id: shard.unit,
+    value: shard.value,
+    label: timerT(`units.${shard.unit}`, { count: shard.value }),
+  }));
   const timerLabel = showCountdown
     ? timerT('countdownAria', {
         label: title,
@@ -276,7 +250,7 @@ export function EventHorizonCountdown() {
       <div className={styles.panel}>
         <div className={styles.context}>
           <p className="type-eyebrow text-subtle">
-            {unavailable ? timerT('cycleClock') : timerT('liveClock')}
+            {hydrated && !unavailable ? timerT('liveClock') : timerT('cycleClock')}
           </p>
           <h2 className={cn('type-heading-1', styles.title, loading && styles.pending)}>{title}</h2>
           {gestureCount !== null && gestureCount > 0 ? (
@@ -287,17 +261,34 @@ export function EventHorizonCountdown() {
         </div>
 
         <div className={styles.readout}>
-          <div role="timer" aria-live="off" aria-label={timerLabel}>
-            {showCountdown ? (
-              <ClockFigures shards={snapshot.shards} labels={unitLabels} />
-            ) : loading ? (
-              <ClockFigures shards={snapshot.shards} labels={unitLabels} placeholder />
+          <div role="timer" aria-live="off" aria-label={timerLabel} className={styles.timer}>
+            {showCountdown || loading ? (
+              <CountdownFigures
+                groups={groups}
+                size="hero"
+                align="start"
+                tone={loading ? 'placeholder' : freshness === 'live' ? 'live' : 'stale'}
+                className={styles.figures}
+                data-testid={loading ? 'countdown-placeholder' : 'countdown-units'}
+              />
             ) : (
-              <p className={cn('type-body-md text-muted-foreground', styles.statement)}>{body}</p>
+              <div className={styles.statement}>
+                {stateWord ? (
+                  <p className={cn('type-figure-xl', styles.stateWord)}>{stateWord}</p>
+                ) : null}
+                <p
+                  className={cn(
+                    stateWord ? 'type-body-sm mt-3' : 'type-body-md',
+                    'text-muted-foreground',
+                  )}
+                >
+                  {body}
+                </p>
+              </div>
             )}
           </div>
           <noscript>
-            <p className={cn('type-body-sm text-muted-foreground', styles.noscript)}>
+            <p className={cn('type-body-md text-muted-foreground', styles.noscript)}>
               {timerT('noscript')}
             </p>
           </noscript>
