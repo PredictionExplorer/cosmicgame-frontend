@@ -151,10 +151,10 @@ describe('global typography guarantees', () => {
   });
 
   it('keeps the starfield out from behind the widest hero content, the home desk', () => {
-    // The home is the one `hero` backdrop page; its desk grows to
-    // `xl:max-w-[…rem]`, wider than the 83rem data shell.
+    // The home is the one `hero` backdrop page; its desk sits on the site's
+    // content edge, `w-[min(100%-2*var(--gutter),…rem)]`.
     const home = readFileSync(resolve(STYLES, '..', 'app/[locale]/(app)/HomePage.tsx'), 'utf8');
-    const desk = Number(/xl:max-w-\[([\d.]+)rem\]/.exec(home)?.[1]);
+    const desk = Number(/w-\[min\(100%-2\*var\(--gutter\),([\d.]+)rem\)\]/.exec(home)?.[1]);
     const column = Number(/var\(--starfield-column, ([\d.]+)rem\)/.exec(globalCss)?.[1]);
     expect(desk).toBeGreaterThan(0);
     expect(column).toBeGreaterThanOrEqual(desk);
