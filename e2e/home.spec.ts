@@ -69,11 +69,14 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
   });
 
   test('shows cycle info', async ({ page }) => {
-    await openDisclosure(page, 'home-story-section');
-    const cycleInfo = page.getByRole('region', { name: 'Current cycle observatory' });
-    await ensureVisible(cycleInfo);
-    await expect(cycleInfo).toBeVisible();
-    await expect(cycleInfo.getByRole('heading', { name: /Cycle #/ })).toBeVisible();
+    const clock = page.getByRole('region', { name: 'Cycle Finalization Time' });
+    await ensureVisible(clock);
+    await expect(clock).toBeVisible();
+    await expect(page.getByTestId('home-deck-header').getByText(/Cycle #\d+/)).toBeVisible();
+    // Where the cycle is now, beside the chat.
+    const guide = page.getByRole('region', { name: 'How this cycle works' });
+    await ensureVisible(guide);
+    await expect(guide.locator('[aria-current="step"]')).toHaveCount(1);
   });
 
   test('links to trade CST on Uniswap', async ({ page }) => {
@@ -227,14 +230,18 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     }
   });
 
-  test('features one artwork panel with a path to the gallery', async ({ page }) => {
-    const artwork = page.getByTestId('deck-art-card');
+  test('hangs the newest Signature on the desk with a path to the gallery', async ({ page }) => {
+    const artwork = page.getByTestId('latest-signature');
     await expect(artwork).toHaveCount(1);
     await ensureVisible(artwork);
     await expect(artwork).toBeVisible();
-    await expect(artwork.getByRole('link', { name: 'Gallery' })).toHaveAttribute(
+    await expect(artwork.getByRole('link', { name: /Gallery/ })).toHaveAttribute(
       'href',
       '/gallery',
+    );
+    await expect(artwork.getByTestId('latest-signature-link')).toHaveAttribute(
+      'href',
+      /^\/detail\/\d+$/,
     );
     await expect(page.getByText('Latest NFTs', { exact: true })).toHaveCount(0);
   });

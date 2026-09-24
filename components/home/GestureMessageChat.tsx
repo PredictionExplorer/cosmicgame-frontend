@@ -108,9 +108,35 @@ interface GestureMessageChatProps {
 }
 
 const SYSTEM_EVENTS_PER_PAGE = 50;
-/** Rows a phone shows before "Show more"; it never scrolls inside the page. */
-const PHONE_ROWS = 8;
-const PHONE_ROWS_STEP = 12;
+/** Messages a phone shows before "Show more"; the feed never scrolls inside the page. */
+const PHONE_MESSAGES = 6;
+const PHONE_MESSAGES_STEP = 10;
+/** An event-only feed is limited by rows instead. */
+const PHONE_EVENT_ROWS = 8;
+
+/**
+ * How many leading rows a phone shows: every row up to and including the
+ * `messageLimit`-th message (pending rows count as messages), so messages
+ * lead and the events between them come along; an event-only feed shows its
+ * first rows.
+ */
+export function phoneVisibleRows(
+  rows: readonly { type: string }[],
+  pendingCount: number,
+  messageLimit: number,
+): number {
+  if (pendingCount >= messageLimit) return pendingCount;
+  let messages = pendingCount;
+  for (let index = 0; index < rows.length; index += 1) {
+    if (rows[index]!.type !== 'message') continue;
+    messages += 1;
+    if (messages === messageLimit) return pendingCount + index + 1;
+  }
+  const total = pendingCount + rows.length;
+  // Fewer messages than the limit: all of it, unless the feed is events alone,
+  // which grows by rows as "Show more" raises the limit.
+  return messages > 0 ? total : Math.min(total, PHONE_EVENT_ROWS + messageLimit - PHONE_MESSAGES);
+}
 
 interface GestureChatMessage {
   gesture: GestureInfo;
@@ -445,8 +471,8 @@ export function GestureMessageChat({
   const [view, setView] = useState<ChatView>('messages');
   const [eventWindow, setEventWindow] = useState({ key: resetKey, limit: SYSTEM_EVENTS_PER_PAGE });
   const eventLimit = eventWindow.key === resetKey ? eventWindow.limit : SYSTEM_EVENTS_PER_PAGE;
-  const [phoneWindow, setPhoneWindow] = useState({ key: resetKey, rows: PHONE_ROWS });
-  const phoneRows = phoneWindow.key === resetKey ? phoneWindow.rows : PHONE_ROWS;
+  const [phoneWindow, setPhoneWindow] = useState({ key: resetKey, messages: PHONE_MESSAGES });
+  const phoneMessages = phoneWindow.key === resetKey ? phoneWindow.messages : PHONE_MESSAGES;
   const [isPrinting, setIsPrinting] = useState(false);
   const visibleEvents = useMemo(() => {
     const newestFirst = [...(systemEvents ?? [])].sort((a, b) => b.timestamp - a.timestamp);
@@ -460,6 +486,7 @@ export function GestureMessageChat({
   const hasFeedContent = rows.length > 0 || pending.length > 0;
   const hasMoreEvents = (systemEvents?.length ?? 0) > eventLimit;
   const hasOlderContent = hasMoreEvents || Boolean(pagination?.hasMore);
+  const phoneRows = phoneVisibleRows(rows, pending.length, phoneMessages);
   const hiddenOnPhones = !isPrinting && rows.length + pending.length > phoneRows;
   const newestMessage = messages[0] ?? null;
   const isSettling = useLivePulse(pulseKey);
@@ -532,7 +559,7 @@ export function GestureMessageChat({
     if (pagination?.hasMore || pagination?.error) void pagination.onLoadMore();
   };
   const showMoreOnPhones = () =>
-    setPhoneWindow({ key: resetKey, rows: phoneRows + PHONE_ROWS_STEP });
+    setPhoneWindow({ key: resetKey, messages: phoneMessages + PHONE_MESSAGES_STEP });
 
   const summary =
     cycleNumber != null

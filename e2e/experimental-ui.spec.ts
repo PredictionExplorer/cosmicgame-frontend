@@ -46,10 +46,8 @@ test.describe('experimental UI', () => {
     try {
       await currentHome.goto('/', { waitUntil: 'domcontentloaded' });
       await expect(currentHome.getByTestId('control-desk')).toBeVisible();
-      await expect(currentHome.getByTestId('experimental-ui-entry')).toHaveAttribute(
-        'href',
-        '/experimental-ui',
-      );
+      // The experiment is reached by its URL; the public home does not link it (F280).
+      await expect(currentHome.getByTestId('experimental-ui-entry')).toHaveCount(0);
     } finally {
       await currentHome.close();
     }

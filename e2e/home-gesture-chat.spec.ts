@@ -86,9 +86,9 @@ async function expectCommentFormReachable(page: Page) {
 }
 
 /**
- * The form spans the whole desk row under the clock and the standings, with
- * the wallet standing beside its main column rather than a narrow stacked
- * form and an empty sidebar band. The three methods sit side by side.
+ * Row 1 is the cycle column beside the standings. Row 2 is the form (8 of 12
+ * columns) with, beside it on the wall, the newest Signature over the
+ * wallet's standing. The three methods sit side by side.
  */
 async function expectEfficientDesktopLayout(page: Page) {
   const grid = page.getByTestId('control-desk-grid');
@@ -96,16 +96,19 @@ async function expectEfficientDesktopLayout(page: Page) {
   const standings = page.getByTestId('control-desk-standings');
   const form = page.getByTestId('control-desk-gesture');
   const methods = page.getByTestId('panel-method-tabs');
-  const standing = form.getByTestId('gesture-panel-standing');
-  const [gridBox, cycleBox, standingsBox, formBox, methodsBox, standingBox] = await Promise.all([
-    grid.boundingBox(),
-    cycle.boundingBox(),
-    standings.boundingBox(),
-    form.boundingBox(),
-    methods.boundingBox(),
-    standing.boundingBox(),
-  ]);
-  for (const box of [gridBox, cycleBox, standingsBox, formBox, methodsBox, standingBox]) {
+  const art = page.getByTestId('control-desk-art');
+  const standing = page.getByTestId('control-desk-standing');
+  const [gridBox, cycleBox, standingsBox, formBox, methodsBox, artBox, standingBox] =
+    await Promise.all([
+      grid.boundingBox(),
+      cycle.boundingBox(),
+      standings.boundingBox(),
+      form.boundingBox(),
+      methods.boundingBox(),
+      art.boundingBox(),
+      standing.boundingBox(),
+    ]);
+  for (const box of [gridBox, cycleBox, standingsBox, formBox, methodsBox, artBox, standingBox]) {
     expect(box).not.toBeNull();
   }
 
@@ -113,9 +116,9 @@ async function expectEfficientDesktopLayout(page: Page) {
   expect(Math.abs(cycleBox!.y - standingsBox!.y)).toBeLessThanOrEqual(1);
   expect(cycleBox!.x + cycleBox!.width).toBeLessThanOrEqual(standingsBox!.x);
 
-  // The form spans the row beneath them.
+  // The form starts row 2 at the desk's edge and takes most of it.
   expect(Math.abs(formBox!.x - gridBox!.x)).toBeLessThanOrEqual(1);
-  expect(Math.abs(formBox!.width - gridBox!.width)).toBeLessThanOrEqual(1);
+  expect(formBox!.width).toBeGreaterThan(gridBox!.width * 0.6);
   const gap = await grid.evaluate((element) => Number.parseFloat(getComputedStyle(element).rowGap));
   const rowBottom = Math.max(
     cycleBox!.y + cycleBox!.height,
@@ -125,10 +128,12 @@ async function expectEfficientDesktopLayout(page: Page) {
   expect(formGap).toBeGreaterThanOrEqual(0);
   expect(formGap).toBeLessThanOrEqual(gap + 2);
 
-  // The standing column sits beside the methods, in the same band.
-  expect(methodsBox!.x + methodsBox!.width).toBeLessThanOrEqual(standingBox!.x);
-  expect(standingBox!.y).toBeLessThan(methodsBox!.y + methodsBox!.height);
-  expect(methodsBox!.width).toBeGreaterThanOrEqual(formBox!.width * 0.45);
+  // Beside it, the art starts the same row and the standing follows under it.
+  expect(formBox!.x + formBox!.width).toBeLessThanOrEqual(artBox!.x);
+  expect(Math.abs(artBox!.y - formBox!.y)).toBeLessThanOrEqual(1);
+  expect(standingBox!.x).toBeCloseTo(artBox!.x, 0);
+  expect(standingBox!.y).toBeGreaterThanOrEqual(artBox!.y + artBox!.height - 1);
+  expect(methodsBox!.width).toBeGreaterThanOrEqual(formBox!.width * 0.8);
 
   // Every method on one line, each with its price.
   const tops = await methods
@@ -494,7 +499,9 @@ test.describe('home gesture chat', () => {
     await expect(page.getByTestId('control-desk-calibration')).toBeVisible();
   });
 
-  test('keeps long chat history within a scrollable reading area', async ({ page }, testInfo) => {
+  test('keeps long chat history readable: scrolling in its frame on desktop, in the page on phones', async ({
+    page,
+  }, testInfo) => {
     await page.unroute('**/api/cosmicgame/**');
     await mockHomeGestureChatApi(page, makeLongGestureFeed());
     await page.goto('/', { waitUntil: 'domcontentloaded' });
@@ -504,6 +511,22 @@ test.describe('home gesture chat', () => {
     const heading = chat.getByRole('heading', { name: 'Gesture Chat' });
     await expect(chat.getByText('Cycle #7 · 12 messages')).toBeVisible();
     await chat.scrollIntoViewIfNeeded();
+    const oldest = chat.getByText(/Scrollable message 12:/);
+
+    if (testInfo.project.name !== 'Desktop Chrome') {
+      // Phones: the newest messages, then "Show more"; no scroll box in the page.
+      const metrics = await scroll.evaluate((element) => ({
+        clientHeight: element.clientHeight,
+        scrollHeight: element.scrollHeight,
+        overflowY: window.getComputedStyle(element).overflowY,
+      }));
+      expect(metrics.overflowY).toBe('visible');
+      expect(metrics.scrollHeight).toBeLessThanOrEqual(metrics.clientHeight + 1);
+      await expect(oldest).toBeHidden();
+      await chat.getByRole('button', { name: 'Show more', exact: true }).click();
+      await expect(oldest).toBeVisible();
+      return;
+    }
 
     const viewport = page.viewportSize()!;
     const chatBox = await chat.boundingBox();
@@ -515,26 +538,20 @@ test.describe('home gesture chat', () => {
     expect(chatBox).not.toBeNull();
     expect(metrics.overflowY).toBe('auto');
     expect(metrics.scrollHeight).toBeGreaterThan(metrics.clientHeight + 20);
-    if (testInfo.project.name === 'Desktop Chrome') {
-      expect(chatBox!.height).toBeLessThanOrEqual(viewport.height * 0.75);
-    } else {
-      expect(metrics.clientHeight).toBeLessThanOrEqual(Math.min(448, viewport.height * 0.55) + 1);
-    }
+    expect(chatBox!.height).toBeLessThanOrEqual(viewport.height * 0.9);
 
     const headingBox = await heading.boundingBox();
     const pageScroll = await page.evaluate(() => window.scrollY);
-    await expect(chat.getByText(/Scrollable message 12:/)).not.toBeInViewport();
-    if (testInfo.project.name === 'Desktop Chrome') {
-      await scroll.focus();
-      await page.keyboard.press('PageDown');
-      await expect.poll(() => scroll.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
-      expect(await page.evaluate(() => window.scrollY)).toBe(pageScroll);
-    }
+    await expect(oldest).not.toBeInViewport();
+    await scroll.focus();
+    await page.keyboard.press('PageDown');
+    await expect.poll(() => scroll.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
+    expect(await page.evaluate(() => window.scrollY)).toBe(pageScroll);
     await scroll.evaluate((element) => {
       element.scrollTop = element.scrollHeight;
     });
     expect(await scroll.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
-    await expect(chat.getByText(/Scrollable message 12:/)).toBeInViewport();
+    await expect(oldest).toBeInViewport();
     await expect(heading).toBeInViewport();
     expect((await heading.boundingBox())!.y).toBeCloseTo(headingBox!.y, 0);
     expect(await page.evaluate(() => window.scrollY)).toBe(pageScroll);
@@ -549,57 +566,56 @@ test.describe('home gesture chat', () => {
     const latest = page.getByTestId('latest-participant-intel');
     const chrono = page.getByTestId('standings-ledger');
     const ledger = page.getByTestId('allocation-ledger');
+    const guide = page.getByTestId('cycle-phase-guide');
     const cycleDetails = page.locator('[data-testid="cycle-details-link-card"]:visible').first();
-    const artwork = page.locator('[data-testid="deck-art-card"]:visible').first();
+    const artwork = page.locator('[data-testid="latest-signature"]:visible').first();
     await expect(chat.getByText('Cycle #7 · 2 messages')).toBeVisible();
     await expect(chat).toBeVisible();
     await expect(latest).toBeVisible();
     await expect(chrono).toBeVisible();
     await expect(ledger).toBeHidden();
     await expect(panel).toBeVisible();
+    await expect(guide).toBeVisible();
     await expect(cycleDetails).toBeVisible();
     await expect(artwork).toBeVisible();
     await expect(page.getByTestId('public-goods-impact-card')).toHaveCount(0);
 
     const viewport = page.viewportSize();
     const clockBox = await clock.boundingBox();
-    const cycleDetailsBox = await cycleDetails.boundingBox();
     const artworkBox = await artwork.boundingBox();
     const panelBox = await panel.boundingBox();
+    const guideBox = await guide.boundingBox();
     const box = await chat.boundingBox();
-    expect(viewport).not.toBeNull();
-    expect(clockBox).not.toBeNull();
-    expect(box).not.toBeNull();
-    expect(cycleDetailsBox).not.toBeNull();
-    expect(artworkBox).not.toBeNull();
-    expect(panelBox).not.toBeNull();
-    expect(cycleDetailsBox!.y + cycleDetailsBox!.height).toBeLessThanOrEqual(box!.y + 2);
+    for (const measured of [viewport, clockBox, artworkBox, panelBox, guideBox, box]) {
+      expect(measured).not.toBeNull();
+    }
+    // The cycle links live in the guide beside the chat, never floating above it.
+    await expect(guide).toContainText('View full cycle details');
     expect(panelBox!.y + panelBox!.height).toBeLessThanOrEqual(box!.y + 2);
 
     if (testInfo.project.name !== 'Desktop Chrome') {
       expect(box!.width).toBeLessThanOrEqual(viewport!.width);
       expect(box!.x).toBeGreaterThanOrEqual(0);
-      // Decision information precedes the artwork on phones as well.
+      // Decision information first; then the art, then the conversation.
       expect(clockBox!.y + clockBox!.height).toBeLessThanOrEqual(panelBox!.y + 2);
-      expect(box!.y + box!.height).toBeLessThanOrEqual(artworkBox!.y + 2);
+      expect(artworkBox!.y + artworkBox!.height).toBeLessThanOrEqual(box!.y + 2);
+      expect(box!.y + box!.height).toBeLessThanOrEqual(guideBox!.y + 2);
 
-      const participantBox = await chat
-        .getByTestId('gesture-message-participant')
-        .first()
-        .boundingBox();
-      const badgesBox = await chat.getByTestId('gesture-message-badges').first().boundingBox();
-      expect(participantBox).not.toBeNull();
-      expect(badgesBox).not.toBeNull();
-      expect(badgesBox!.y).toBeGreaterThanOrEqual(participantBox!.y + participantBox!.height - 1);
+      // Who and when share a line; how the Gesture was made follows the body.
+      const metaBox = await chat.getByTestId('gesture-message-meta').first().boundingBox();
+      const methodBox = await chat.getByTestId('gesture-method-badge').first().boundingBox();
+      expect(metaBox).not.toBeNull();
+      expect(methodBox).not.toBeNull();
+      expect(methodBox!.y).toBeGreaterThanOrEqual(metaBox!.y + metaBox!.height - 1);
       return;
     }
 
-    // The full-width form follows the clock and the standings; the feed follows the desk.
+    // Desktop: the form and the art share row 2; the chat and the guide share row 3.
     expect(clockBox!.y + clockBox!.height).toBeLessThanOrEqual(panelBox!.y + 2);
     await expectEfficientDesktopLayout(page);
-    expect(panelBox!.y + panelBox!.height).toBeLessThanOrEqual(artworkBox!.y + 2);
-    expect(box!.x + box!.width).toBeLessThanOrEqual(artworkBox!.x + 2);
-    // Without attachments, the feed uses the available page width.
+    expect(artworkBox!.y).toBeLessThan(panelBox!.y + panelBox!.height);
+    expect(box!.x + box!.width).toBeLessThanOrEqual(guideBox!.x + 2);
+    expect(Math.abs(box!.y - guideBox!.y)).toBeLessThanOrEqual(1);
     expect(box!.x).toBeLessThan(viewport!.width / 2);
     expect(box!.width).toBeGreaterThan(320);
   });

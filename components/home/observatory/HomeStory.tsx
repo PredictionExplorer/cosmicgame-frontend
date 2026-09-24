@@ -1,6 +1,8 @@
 import { ArrowRight, ChevronDown } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
+import { SiteLink } from '@/components/layout/SiteLink';
+import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 import { Link } from '@/i18n/navigation';
 import { CstTokenIcon, GestureIcon, PublicGoodsIcon } from '@/lib/conceptIcons';
 import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
@@ -30,6 +32,7 @@ export interface HomeStoryProps {
  */
 export function HomeStory({ className }: HomeStoryProps) {
   const t = useTranslations('home');
+  const tNav = useTranslations('nav');
   return (
     <details data-testid="home-story-section" className={cn('group/story', DESK_FRAME, className)}>
       <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 type-title text-foreground sm:px-6 [&::-webkit-details-marker]:hidden">
@@ -69,6 +72,10 @@ export function HomeStory({ className }: HomeStoryProps) {
             {t('hero.console.parameters')}
             <ArrowRight className="size-3.5" aria-hidden />
           </Link>
+          {/* CST pays for Gestures; where to get it is part of the story. */}
+          <SiteLink href={CST_UNISWAP_SWAP_URL} kind="external" className={LINK_CLASS}>
+            {tNav('ecosystem.uniswap.defaultLabel')}
+          </SiteLink>
         </div>
       </div>
     </details>

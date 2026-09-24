@@ -5,7 +5,7 @@ import type { GestureInfo } from '@/services/api';
 
 import { render, screen, within, act, checkA11y } from '@/test-utils';
 
-import { GestureMessageChat, buildFeedRows } from '../GestureMessageChat';
+import { GestureMessageChat, buildFeedRows, phoneVisibleRows } from '../GestureMessageChat';
 
 const mockUseBannedGestures = jest.fn().mockReturnValue({ data: [] });
 
@@ -347,7 +347,7 @@ describe('GestureMessageChat', () => {
     expect(onLoadMore).toHaveBeenCalledTimes(2);
   });
 
-  it('shows the newest rows on phones and reveals more on demand, never scrolling inside the page', async () => {
+  it('shows the newest messages on phones and reveals more on demand, never scrolling inside the page', async () => {
     const user = userEvent.setup();
     const gestures = Array.from({ length: 20 }, (_, index) =>
       makeGesture({ EvtLogId: index + 1, TimeStamp: 1_700_000_000 + index, Message: `m${index}` }),
@@ -356,7 +356,8 @@ describe('GestureMessageChat', () => {
     const rows = screen
       .getAllByRole('listitem')
       .filter((item) => item.hasAttribute('data-chat-row'));
-    expect(rows.filter((row) => row.classList.contains('max-lg:hidden'))).toHaveLength(12);
+    // Six messages lead on a phone; the rest wait behind "Show more".
+    expect(rows.filter((row) => row.classList.contains('max-lg:hidden'))).toHaveLength(14);
     // The inner scroller exists only from 1024px.
     const scroll = screen.getByTestId('gesture-message-chat-scroll');
     expect(scroll.className).toMatch(/lg:overflow-y-auto/);
@@ -366,7 +367,8 @@ describe('GestureMessageChat', () => {
     const after = screen
       .getAllByRole('listitem')
       .filter((item) => item.hasAttribute('data-chat-row'));
-    expect(after.filter((row) => row.classList.contains('max-lg:hidden'))).toHaveLength(0);
+    expect(after.filter((row) => row.classList.contains('max-lg:hidden'))).toHaveLength(4);
+    await user.click(screen.getByRole('button', { name: 'home.chat.history.showMore' }));
     expect(screen.queryByRole('button', { name: 'home.chat.history.showMore' })).toBeNull();
   });
 
@@ -430,6 +432,25 @@ describe('GestureMessageChat', () => {
       />,
     );
     await checkA11y(container);
+  });
+});
+
+describe('phoneVisibleRows', () => {
+  const rows = (types: string) =>
+    types.split('').map((c) => ({ type: c === 'm' ? 'message' : 'event' }));
+
+  it('shows every row up to the limit-th message, events between them included', () => {
+    expect(phoneVisibleRows(rows('memeem'), 0, 2)).toBe(3);
+    expect(phoneVisibleRows(rows('memeem'), 1, 2)).toBe(2);
+  });
+
+  it('shows a feed with fewer messages than the limit in full', () => {
+    expect(phoneVisibleRows(rows('meee'), 0, 6)).toBe(4);
+  });
+
+  it('limits an event-only feed by rows', () => {
+    expect(phoneVisibleRows(rows('e'.repeat(30)), 0, 6)).toBe(8);
+    expect(phoneVisibleRows(rows('e'.repeat(30)), 0, 16)).toBe(18);
   });
 });
 
