@@ -94,7 +94,8 @@ describe('AdminPage', () => {
     expect(screen.getByTestId('moderation-read-only')).toHaveTextContent(
       'Read-only. Connect the moderator wallet to hide or restore messages.',
     );
-    expect(screen.getByRole('button', { name: /wallet\.connect/ })).toBeInTheDocument();
+    // The site header's Connect is the one way in; the notice adds no second button.
+    expect(screen.queryByRole('button', { name: /wallet\.connect/ })).not.toBeInTheDocument();
   });
 
   it('hands the connected wallet to the table as the moderator', () => {
