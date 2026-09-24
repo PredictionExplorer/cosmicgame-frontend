@@ -15,6 +15,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
+import { PhrasedText } from '@/components/ui/phrased-text';
 
 import {
   EXPLAINED_AD_HOC_KEYS,
@@ -163,9 +164,14 @@ export const FAQCategorySection = forwardRef<HTMLElement, FAQCategoryProps>(
               >
                 <AccordionTrigger className="gap-6 py-5 text-start type-title text-foreground hover:no-underline hover:text-primary [&>svg]:size-5 [&>svg]:text-subtle">
                   {/* One flex item: a highlighted match stays inline in the question
-                      (the trigger is a flex row) and in its accessible name. */}
+                      (the trigger is a flex row) and in its accessible name. A
+                      Chinese question keeps its ？ on the line of its last word. */}
                   <span className="min-w-0">
-                    {searching ? highlightMatches(item.question, searchQuery) : item.question}
+                    {searching ? (
+                      highlightMatches(item.question, searchQuery)
+                    ) : (
+                      <PhrasedText>{item.question}</PhrasedText>
+                    )}
                   </span>
                 </AccordionTrigger>
                 <AccordionContent hiddenUntilFound={!open} className="pb-6">

@@ -70,6 +70,19 @@ const body = (anchor: string) =>
   document.getElementById(anchor)?.querySelector<HTMLElement>('[role="region"]') ?? null;
 
 describe('FAQCategorySection', () => {
+  it('keeps a Chinese question mark on the line of its last word', () => {
+    // Regression: a wrapping question put "？" at the start of a line.
+    const question = '可以复刻代码并搭建自己的网站吗？';
+    renderFAQCategory({
+      category: { ...mockCategory, items: [{ id: 'zh', question, answer: '可以。' }] },
+    });
+    // The glue adds no characters: the question reads as written.
+    const trigger = screen.getByText(
+      (_, element) => element?.tagName === 'BUTTON' && element.textContent === question,
+    );
+    expect(trigger.querySelector('.whitespace-nowrap')).toHaveTextContent('吗？');
+  });
+
   it('renders the category heading and description', () => {
     renderFAQCategory();
     expect(screen.getByRole('heading', { level: 2, name: 'Test Category' })).toBeInTheDocument();

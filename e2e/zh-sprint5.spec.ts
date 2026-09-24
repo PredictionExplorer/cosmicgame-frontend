@@ -296,9 +296,11 @@ test.describe('zh Sprint 5 — statistics, tables, and formatting', () => {
       `/zh/system-event/${CYCLE}/100/200`,
       `第 ${CYCLE} 个周期前的配置 · Cosmic Signature`,
     );
-    const eventTooltipTrigger = page.getByRole('button', {
-      name: '说明“公共物品比例已变更”事件',
-    });
+    // The event's name explains itself in place (no ⓘ per row): the name is the trigger.
+    const eventTooltipTrigger = page
+      .getByRole('main')
+      .getByRole('button', { name: '公共物品比例已变更', exact: true })
+      .first();
     await openTooltip(eventTooltipTrigger);
     await expectTooltipFullyVisible(page, /分配至公共物品金库的资金比例已变更/);
   });

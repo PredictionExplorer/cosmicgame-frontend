@@ -293,6 +293,21 @@ describe('font configuration policy', () => {
     expect(css.slice(koIndex, css.indexOf('}', koIndex))).toContain('word-break: keep-all');
   });
 
+  it('lets a Chinese heading clause wrap wherever its keep-all reaches', () => {
+    // Regression: the base-layer rule's `anywhere` lost to the type tiers'
+    // `overflow-wrap: break-word` (utilities layer), and a type-title inside
+    // an h3 inherited keep-all alone, so /zh/faq overflowed a 320px phone.
+    // The fix sits in the utilities layer, so the tiers cannot outrank it.
+    const utilities = [...cssWithoutComments.matchAll(/@layer utilities\s*\{/g)].map((match) =>
+      cssWithoutComments.slice(match.index, cssWithoutComments.indexOf('\n}', match.index)),
+    );
+    expect(
+      utilities.some((block) =>
+        /:lang\(zh\) \*\s*\{\s*overflow-wrap:\s*anywhere;\s*\}/.test(block),
+      ),
+    ).toBe(true);
+  });
+
   it('never breaks Korean monospace text between characters', () => {
     // A document-wide `break-all` on .font-mono split the live countdown
     // ("22:22:5 / 9") and durations ("25 / 초"). keep-all still lets

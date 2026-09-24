@@ -218,7 +218,9 @@ test.describe('proxy middleware', () => {
         expect(res.status()).toBe(200);
         const body = await res.text();
         expect(body).toContain(`lang="${locale}"`);
-        expect(body).toContain(chrome.landingText);
+        // The text, not its markup: a CJK headline glues each closing mark to
+        // its character in a nowrap span (PhrasedText).
+        expect(body.replace(/<[^>]+>/g, '')).toContain(chrome.landingText);
         await ctx.dispose();
       });
 

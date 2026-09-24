@@ -168,8 +168,10 @@ test.describe('Header', () => {
     await expect(banner.getByRole('button', { name: /language/i })).toBeHidden();
 
     const drawer = await openDrawer(page);
+    // Each section is a disclosure named by its summary ("Learn" is also the
+    // Learn hub's link inside its section).
     for (const section of ['Participate', 'Collection', 'Explore', 'Records', 'Learn', 'Trust']) {
-      await expect(drawer.getByText(section, { exact: true })).toBeVisible();
+      await expect(drawer.locator('summary').getByText(section, { exact: true })).toBeVisible();
     }
     await expect(drawer.getByRole('link', { name: 'Observatory' })).toHaveAttribute(
       'aria-current',

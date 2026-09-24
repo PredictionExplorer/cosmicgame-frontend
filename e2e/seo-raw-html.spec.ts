@@ -288,7 +288,9 @@ test.describe('raw HTML SEO', () => {
       if (page.richH1) {
         expect(extractH1Text(html)).toBe(page.h1);
       } else {
-        expect(html).toContain(page.h1);
+        // Tag-agnostic: a Chinese or Japanese heading glues each closing mark
+        // to its character in a nowrap span (PhrasedText).
+        expect(extractH1Text(html)).toContain(page.h1);
       }
       expect(countMatches(html, /<h1[\s>]/g)).toBe(1);
       expect(html).not.toMatch(/name="robots"[^>]+content="[^"]*noindex/i);
@@ -327,7 +329,7 @@ test.describe('raw HTML SEO', () => {
         expect(html).toMatch(/hreflang="en"/i);
         expect(html).toMatch(new RegExp(`hreflang="${locale}"`, 'i'));
         expect(html).toContain(`"inLanguage":"${seo.inLanguage}"`);
-        expect(html).toContain(page.h1);
+        expect(extractH1Text(html)).toContain(page.h1);
       }
     });
 

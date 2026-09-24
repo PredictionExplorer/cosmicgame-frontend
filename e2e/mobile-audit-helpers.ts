@@ -208,7 +208,11 @@ export async function collectOverflowViolations(page: Page): Promise<OverflowVio
           }
         }
 
-        // 2. The text fits its own box but an ancestor cuts it off.
+        // 2. The text fits its own box but an ancestor cuts it off. Measured on
+        // the text's line boxes, not the element's box: a standalone explained
+        // term grows a transparent 44px hit area (touch-hit-area padding that a
+        // negative margin hands back), which may reach into a clipped gutter
+        // while every word stays visible.
         for (let parent = el.parentElement; parent; parent = parent.parentElement) {
           const parentStyle = window.getComputedStyle(parent);
           const parentOverflow = parentStyle.overflowX;
@@ -222,7 +226,7 @@ export async function collectOverflowViolations(page: Page): Promise<OverflowVio
           const parentRect = parent.getBoundingClientRect();
           const contentLeft = parentRect.left + parent.clientLeft;
           const contentRight = contentLeft + parent.clientWidth;
-          const spill = Math.max(rect.right - contentRight, contentLeft - rect.left);
+          const spill = textSpill(el, contentLeft, contentRight);
           if (spill > tolerance) {
             violations.push({ type: 'clipped', selector: describe(el), overflowBy: spill, text });
           }

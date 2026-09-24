@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import { mockZhQualityApi } from './zh-quality-mocks';
+import { ZH_ROUTE_FIXTURES } from './zh-route-inventory';
 
 declare global {
   interface Window {
@@ -87,6 +88,18 @@ test.describe('Sprint 8 Chinese font and performance guard', () => {
         const loadedWidth = probe.getBoundingClientRect().width;
         window.__sprint8Performance!.fontWidthShift =
           fallbackWidth === 0 ? 0 : Math.abs(loadedWidth - fallbackWidth) / fallbackWidth;
+      });
+      // The home is ISR: its HTML carries the live backend's seed, which the
+      // mocked cycle then replaces on hydration (a different phase and
+      // gesture count, so a different header). That swap is data, not type,
+      // so the settled window opens once the mocked cycle is on screen.
+      await expect(page.getByTestId('home-deck-header')).toContainText(
+        `第 ${ZH_ROUTE_FIXTURES.cycle} 个周期`,
+      );
+      await page.evaluate(async () => {
+        await new Promise<void>((resolve) =>
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+        );
         window.__sprint8Performance!.initialCls = window.__sprint8Performance!.cls;
         window.__sprint8Performance!.cls = 0;
       });

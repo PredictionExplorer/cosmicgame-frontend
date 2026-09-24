@@ -631,6 +631,24 @@ body:has([data-maintenance-banner]) .home-control-shell {
 }
 
 /*
+ * Chinese headings, continued. The base-layer rule above gives them
+ * `keep-all` and `overflow-wrap: anywhere`, but every type tier sets
+ * `overflow-wrap: break-word` from the utilities layer, which wins, and a
+ * tier inside a heading (the FAQ question's type-title button) inherits the
+ * keep-all without the anywhere. Keep-all with break-word leaves a Han clause
+ * no break at all: its min-content widened the FAQ past a 320px phone. In
+ * the utilities layer, after the tiers and with a two-part selector that
+ * outranks their single class, this restores `anywhere` wherever the
+ * heading's keep-all reaches.
+ */
+@layer utilities {
+  :is(h1, h2, h3, [class*='type-display-'], [class*='type-heading-'], .type-section):lang(zh),
+  :is(h1, h2, h3, [class*='type-display-'], [class*='type-heading-'], .type-section):lang(zh) * {
+    overflow-wrap: anywhere;
+  }
+}
+
+/*
  * Display-face guard. Clash Display is drawn for 500; at 600-700 with
  * `tracking-tight` its narrow space closes up and small headings read as
  * one word. Until every call site moves to type-heading-3 / type-title
