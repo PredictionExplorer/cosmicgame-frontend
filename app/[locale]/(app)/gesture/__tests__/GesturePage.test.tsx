@@ -131,6 +131,7 @@ describe('GesturePage', () => {
         .map((link) => [link.textContent, link.getAttribute('href')]),
     ).toEqual([
       ['common.breadcrumbs.home', '/'],
+      ['common.pageHeader.sections.explore', '/statistics'],
       ['common.pageHeader.crumbs.cycle(cycle=5)', '/current-cycle'],
     ]);
   });

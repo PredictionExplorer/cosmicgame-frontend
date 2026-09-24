@@ -87,22 +87,22 @@ type CommonTranslate = (key: string, values?: Record<string, string | number>) =
 
 /**
  * A gesture sits under its cycle, and its trail repeats that cycle page's own:
- * the live cycle is /current-cycle (Participate, whose hub is Home), a
- * finalized one is its record under Allocation Recipients. Until the
- * dashboard says which cycle is live, the trail stops at Home rather than
- * guess; if the dashboard cannot be read, the cycle is taken as finalized.
+ * the live cycle is /current-cycle (Explore), a finalized one is its record
+ * under Allocation Recipients. Until the dashboard says which cycle is live,
+ * the trail stops at Home rather than guess; if the dashboard cannot be read,
+ * the cycle is taken as finalized.
  */
 export function gestureTrail(
   cycle: number | undefined,
   liveCycle: number | undefined | null,
   dashboardFailed: boolean,
   t: CommonTranslate,
-): { section: 'participate' | 'records'; trail: BreadcrumbItem[] } {
+): { section: 'explore' | 'records'; trail: BreadcrumbItem[] } {
   if (typeof cycle !== 'number' || cycle < 0) return { section: 'records', trail: [] };
   const cycleLabel = t('pageHeader.crumbs.cycle', { cycle });
   if (!dashboardFailed && typeof liveCycle !== 'number') return { section: 'records', trail: [] };
   if (liveCycle === cycle) {
-    return { section: 'participate', trail: [{ label: cycleLabel, href: '/current-cycle' }] };
+    return { section: 'explore', trail: [{ label: cycleLabel, href: '/current-cycle' }] };
   }
   return {
     section: 'records',

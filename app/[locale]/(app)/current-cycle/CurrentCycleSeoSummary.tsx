@@ -24,7 +24,7 @@ export async function CurrentCycleSeoSummary() {
 
   return (
     <PageHeader
-      section="participate"
+      section="explore"
       title={t('currentCycleSummary.heading')}
       titleId="current-cycle-heading"
       subtitle={t('currentCycleSummary.description')}

@@ -368,9 +368,10 @@ describe('server-rendered page headers', () => {
     expect(figureValue('cycle')).toHaveTextContent('42');
     expect(figureValue('gestures')).toHaveTextContent('17');
     expect(figureValue('signatureAllocation')).toHaveTextContent('5.5000 ETH');
-    expect(screen.getByRole('link', { name: COMMON.section('participate') })).toHaveAttribute(
+    // /current-cycle belongs to Explore, as in the navigation (config/siteNav).
+    expect(screen.getByRole('link', { name: COMMON.section('explore') })).toHaveAttribute(
       'href',
-      '/',
+      '/statistics',
     );
     // The gestures and Signature Allocation figures define themselves behind an info button.
     const cards = seoMessages.currentCycleSummary.cards;

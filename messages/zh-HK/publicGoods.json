@@ -1,18 +1,14 @@
 {
   "protocol": {
     "title": "協議公共物品資助",
-    "subtitle": "Cosmic Signature 協議自動轉入公共物品金庫的資金",
-    "description": "週期收官時，協議會將一定比例的週期儲備轉入公共物品金庫，由金庫為目前設定的公共物品受益方保管。"
+    "subtitle": "Cosmic Signature 協議自動轉入公共物品金庫的資金"
   },
   "voluntary": {
     "title": "自願公共物品資助",
-    "subtitle": "社區成員自願轉入公共物品金庫的資金",
-    "description": "除協議自動轉撥外，社區成員也可自願向公共物品金庫貢獻資金。這些鏈上記錄展現了 Cosmic Signature 社區對公共物品建設的持續支持。"
+    "subtitle": "社區成員自願轉入公共物品金庫的資金"
   },
   "retrievals": {
     "title": "公共物品取回",
-    "subtitle": "從公共物品金庫取回的資金",
-    "description": "查看 Cosmic Signature 公共物品金庫轉撥給目前設定受益方的資金記錄。"
-  },
-  "loading": "載入中…"
+    "subtitle": "從公共物品金庫取回的資金"
+  }
 }

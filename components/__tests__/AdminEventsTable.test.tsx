@@ -146,7 +146,10 @@ describe('AdminEventsTable', () => {
       const explain = screen.getByRole('button', {
         name: /statistics\.systemEvent\.explainEvent|Explain/,
       });
-      expect(explain.querySelector('svg')).toHaveClass('lucide-info');
+      // InfoTooltip draws the ⓘ beside its button, inside the same wrapper.
+      expect(explain.closest('[data-slot="info-tooltip"]')?.querySelector('svg')).toHaveClass(
+        'lucide-info',
+      );
       expect(document.querySelector('.lucide-circle-alert, .lucide-alert-circle')).toBeNull();
     });
 

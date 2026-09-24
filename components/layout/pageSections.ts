@@ -15,11 +15,14 @@
  * tools, which the public navigation does not list.
  */
 export const PAGE_SECTIONS = {
-  /** The Observatory and the pages where a participant acts: current cycle, imprint. */
+  /** The Observatory and the pages where a participant acts: imprint. */
   participate: { hub: '/' },
   /** The artwork: gallery, named, attached and used NFTs. */
   collection: { hub: '/gallery' },
-  /** The statistics hub and its section pages, participant profiles, gestures, transfers. */
+  /**
+   * The current cycle, the statistics hub and its section pages, participant
+   * profiles, gestures, transfers.
+   */
   explore: { hub: '/statistics' },
   /**
    * Public ledgers: allocations, anchoring, outreach, contributions, Public
