@@ -65,8 +65,7 @@ test.describe('Sprint 8 deterministic Chinese journeys', () => {
 
     await page.locator('a[href="/zh/my-anchors"]:visible').first().click();
     await expect(page).toHaveURL(/\/zh\/my-anchors$/);
-    await expect(page.getByText('未连接钱包', { exact: true })).toBeVisible();
-    await expect(page.getByText('连接钱包后即可管理锚定。', { exact: true })).toBeVisible();
+    await expect(page.getByText('连接钱包，管理你的锚定', { exact: true })).toBeVisible();
   });
 
   test('supports Chinese FAQ search and hash deep links', async ({ page }) => {

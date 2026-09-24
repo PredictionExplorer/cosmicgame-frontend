@@ -131,8 +131,9 @@ const roundInfo = {
   AllPrizes: [],
 };
 
+// The server's own field name (see get_staking_cst_actions_info).
 const anchorAction = {
-  CombinedAnchorRecordInfo: {
+  CombinedStakingRecordInfo: {
     Stake: {
       Tx: mockTransaction(7_300),
       ActionId: SPRINT4_MOCK_ACTION_ID,

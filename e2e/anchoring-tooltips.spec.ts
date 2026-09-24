@@ -2,27 +2,27 @@ import { test } from '@playwright/test';
 
 import { expectAllLabelTooltips } from './tooltip-helpers';
 
+// The terms of the hub's Anchor Distribution flow, in reading order.
 const ANCHORING_TOOLTIPS = [
   {
-    label: 'Anchor Distribution Pool',
-    expected: /Total ETH currently allocated to the Anchor Distribution pool/,
+    label: 'Anchor Distribution pool',
+    expected: /The ETH this cycle sets aside for anchored Cosmic Signature NFTs/,
   },
   {
-    label: 'Cosmic Signature NFTs Anchored',
-    expected: /Cosmic Signature NFTs currently anchored/,
+    label: 'Anchored Cosmic Signature NFTs',
+    expected: /Cosmic Signature NFTs anchored right now, across every anchor-holder/,
   },
   {
-    label: 'RWLK NFTs Anchored',
-    expected: /RandomWalk NFTs currently anchored/,
+    label: 'Per anchored NFT',
+    expected: /The pool divided by the anchored Cosmic Signature NFTs/,
   },
   {
-    label: 'Distribution per NFT',
-    expected: /Current ETH Anchor Distribution per anchored Cosmic Signature NFT/,
+    label: 'Anchored Random Walk NFTs',
+    expected: /Random Walk NFTs anchored right now/,
   },
   {
-    label: 'Active Anchor-holders',
-    expected:
-      /Distinct wallets that currently anchor at least one Cosmic Signature or RandomWalk NFT/,
+    label: 'Active anchor-holders',
+    expected: /Distinct wallets that anchor at least one Cosmic Signature or Random Walk NFT/,
   },
 ];
 
@@ -32,7 +32,7 @@ test.describe('/anchoring tooltips', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
   });
 
-  test('opens anchoring overview tooltips', async ({ page }) => {
+  test('opens the Anchor Distribution flow tooltips', async ({ page }) => {
     await expectAllLabelTooltips(page, ANCHORING_TOOLTIPS);
   });
 });
