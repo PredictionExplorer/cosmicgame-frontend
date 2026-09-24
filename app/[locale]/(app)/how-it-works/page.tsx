@@ -6,7 +6,6 @@ import { getHowItWorksContent } from '@/content/how-it-works';
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage, webPageJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
-import { PageMessages } from '@/components/i18n/PageMessages';
 
 import HowToPlayPage from './HowToPlayPage';
 
@@ -57,11 +56,7 @@ export default async function Page({ params }: PageProps) {
           ),
         ]}
       />
-      {/* The payoff plate imports the Signature media helpers, whose module
-          also exports the traits-labelled alt text hook. */}
-      <PageMessages namespaces={['traits']}>
-        <HowToPlayPage content={content} unavailableLabel={tDetail('image.artworkUnavailable')} />
-      </PageMessages>
+      <HowToPlayPage content={content} unavailableLabel={tDetail('image.artworkUnavailable')} />
     </>
   );
 }

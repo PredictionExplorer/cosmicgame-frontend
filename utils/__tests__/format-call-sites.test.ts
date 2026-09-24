@@ -48,7 +48,6 @@ const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
   'components/anchoring/UnretrievedCSTAnchorDistributionsTable.tsx': 5,
   'components/attachments/AttachedERC20Table.tsx': 4,
   'components/attachments/DonatedNFTPrizeShowcase.tsx': 2,
-
   'components/home/AuctionInfo.tsx': 1,
   'components/home/deck/DeckPersonalStrip.tsx': 3,
   'components/home/experimental/Allocation.tsx': 5,
@@ -65,7 +64,6 @@ const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
   'components/home/observatory/gestureSubmitLabel.ts': 1,
   'components/home/observatory/LatestParticipantIntel.tsx': 1,
   'components/home/PublicGoodsImpactCard.tsx': 2,
-
   'components/marketing/MarketingStats.tsx': 1,
   'components/marketing/TopMarketersLeaderboard.tsx': 1,
   'components/nft/traits/ChaosMeter.tsx': 1,

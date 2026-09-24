@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 import { ArtFrame, WallLabel } from '@/components/ui/art-frame';
 import { ExplainedTerm } from '@/components/ui/explain-popover';
 import { SectionHeader } from '@/components/ui/section-header';
-import { signatureMedia, signatureSources } from '@/components/nft/signatureArt';
+import { signatureMedia, signatureSources } from '@/components/nft/signatureMedia';
 import { formatId } from '@/utils/format/ids';
 
 /**
