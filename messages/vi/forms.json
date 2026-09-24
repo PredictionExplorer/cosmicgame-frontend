@@ -27,7 +27,8 @@
       },
       "check": {
         "checking": "Đang kiểm tra địa chỉ này trên {network}…",
-        "failed": "Không kiểm tra được địa chỉ này trên {network}. Bạn vẫn có thể gửi.",
+        "failed": "Không kiểm tra được địa chỉ này trên {network}.",
+        "checked": "Đã kiểm tra trên {network}.",
         "active": "{count, plural, other {Đang hoạt động trên {network}: đã gửi # giao dịch.}}",
         "fresh": "Địa chỉ mới: chưa từng gửi giao dịch nào trên {network}.",
         "contract": "Địa chỉ này là một hợp đồng, có thể không chuyển tiếp được token.",
@@ -54,7 +55,8 @@
       "to": "Đến",
       "final": "Không thể hoàn tác sau khi gửi: token gửi nhầm địa chỉ sẽ không thể khôi phục.",
       "acknowledge": "Tôi đã kiểm tra địa chỉ này và muốn gửi đến đó.",
-      "acknowledgeRequired": "Hãy xác nhận bạn đã kiểm tra địa chỉ để tiếp tục."
+      "acknowledgeRequired": "Hãy xác nhận bạn đã kiểm tra địa chỉ để tiếp tục.",
+      "checking": "Đang kiểm tra địa chỉ…"
     }
   }
 }

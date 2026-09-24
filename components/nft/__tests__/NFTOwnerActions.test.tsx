@@ -50,8 +50,8 @@ const onTransferred = jest.fn();
 const onRenamed = jest.fn();
 const onAddToMetaMask = jest.fn();
 
-function renderActions(overrides: Partial<NFTOwnerActionsProps> = {}) {
-  return render(
+function actions(overrides: Partial<NFTOwnerActionsProps> = {}) {
+  return (
     <NFTOwnerActions
       tokenId={25}
       owner={OWNER}
@@ -63,8 +63,12 @@ function renderActions(overrides: Partial<NFTOwnerActionsProps> = {}) {
       onTransferred={onTransferred}
       onRenamed={onRenamed}
       {...overrides}
-    />,
+    />
   );
+}
+
+function renderActions(overrides: Partial<NFTOwnerActionsProps> = {}) {
+  return render(actions(overrides));
 }
 
 const nameField = () => screen.getByLabelText('detail.ownerActions.nameLabel');
@@ -232,6 +236,33 @@ describe('NFTOwnerActions', () => {
       await user.click(screen.getByLabelText('forms.transfer.review.acknowledge'));
       await user.click(transferButton());
       await waitFor(() => expect(mockTx.writeContract).toHaveBeenCalledTimes(1));
+    });
+
+    it('holds the transfer until the recipient check answers (regression)', async () => {
+      // A submit made while the field still said "Checking…" went straight to
+      // the wallet, before the new-address warning could ask for a checkbox.
+      mockCheck = { status: 'checking' };
+      const user = userEvent.setup();
+      const { rerender } = renderActions();
+      await openTransfer(user);
+      await user.type(recipientField(), RECIPIENT);
+
+      const checking = screen.getByRole('button', { name: /forms\.transfer\.review\.checking/ });
+      expect(checking).toHaveAttribute('aria-busy', 'true');
+      await user.click(checking);
+      await user.type(recipientField(), '{Enter}');
+      expect(mockTx.writeContract).not.toHaveBeenCalled();
+
+      mockCheck = {
+        status: 'ready',
+        facts: { transactionCount: 0, isContract: false },
+        known: null,
+        warning: 'fresh',
+      };
+      rerender(actions());
+      await user.click(transferButton());
+      expect(screen.getByText('forms.transfer.review.acknowledgeRequired')).toBeInTheDocument();
+      expect(mockTx.writeContract).not.toHaveBeenCalled();
     });
 
     it('names the token when the transfer fails', async () => {

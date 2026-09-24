@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState, type FormEvent, type ReactNode } from 'react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useQueryClient } from '@tanstack/react-query';
 import type { Address, Hash } from 'viem';
 
@@ -15,7 +15,7 @@ import { ChainGuard } from '@/components/wallet/NetworkGuard';
 
 import { AmountField } from './AmountField';
 import { RecipientField } from './RecipientField';
-import { TransferReview, needsAcknowledgement } from './TransferReview';
+import { TransferReview, transferGate } from './TransferReview';
 import { parseTokenAmount, toPlainDecimal } from './amount';
 import { parseRecipient } from './recipient';
 import { CST_BALANCE_QUERY_KEY, CST_DECIMALS, useCstBalance } from './useCstBalance';
@@ -83,6 +83,7 @@ export function CstSendForm({
   className,
 }: CstSendFormProps) {
   const locale = useLocale();
+  const tReview = useTranslations('forms.transfer.review');
   const queryClient = useQueryClient();
   const { run, stage, isBusy } = useTxFlow();
   const stageLabel = useTxStageLabel();
@@ -106,7 +107,7 @@ export function CstSendForm({
     decimalMark: decimalMarkFor(locale) === ',' ? ',' : '.',
   });
   const check = useRecipientFacts(recipient.address);
-  const mustAcknowledge = needsAcknowledgement(check);
+  const gate = transferGate(check, acknowledged);
   const sendable = amount.error === null ? amount.wei : null;
   const transfer: CstTransfer | null =
     recipient.address && sendable !== null
@@ -139,7 +140,10 @@ export function CstSendForm({
       return;
     }
     if (!transfer) return;
-    if (mustAcknowledge && !acknowledged) {
+    // Never race the recipient check: its answer decides whether the send
+    // needs an acknowledgement. The button says it is checking meanwhile.
+    if (gate === 'checking') return;
+    if (gate === 'acknowledge') {
       setAcknowledgementMissing(true);
       acknowledgementRef.current?.focus();
       return;
@@ -167,6 +171,7 @@ export function CstSendForm({
   };
 
   const busyLabel = isBusy ? stageLabel(stage) : null;
+  const checkingRecipient = !isBusy && recipient.address !== null && gate === 'checking';
 
   return (
     <form noValidate onSubmit={handleSubmit} className={cn('flex flex-col gap-6', className)}>
@@ -177,6 +182,7 @@ export function CstSendForm({
         onBlur={() => setTouched((current) => ({ ...current, recipient: true }))}
         error={touched.recipient ? recipient.error : null}
         check={check}
+        reviewShown={transfer !== null}
         disabled={isBusy}
       />
 
@@ -215,10 +221,15 @@ export function CstSendForm({
             type="submit"
             variant="commit"
             size="lg"
-            loading={isBusy}
+            loading={isBusy || checkingRecipient}
             className="w-full sm:w-auto sm:self-start"
           >
-            {busyLabel ?? (amountLabel ? submitLabel(amountLabel) : idleLabel)}
+            {busyLabel ??
+              (checkingRecipient
+                ? tReview('checking')
+                : amountLabel
+                  ? submitLabel(amountLabel)
+                  : idleLabel)}
           </Button>
         </ChainGuard>
         <TxStatus stage={stage} />

@@ -19,6 +19,12 @@ export interface RecipientFieldProps {
   error: RecipientError | null;
   /** What the chain says about the typed address, shown while there is no error. */
   check: RecipientCheck;
+  /**
+   * The `TransferReview` is on screen and says any warning (new, contract,
+   * protocol, not checked) with its acknowledgement, so this hint only
+   * reports that the check ran instead of repeating the sentence.
+   */
+  reviewShown?: boolean;
   disabled?: boolean;
   id?: string;
   inputRef?: Ref<HTMLInputElement>;
@@ -28,7 +34,9 @@ export interface RecipientFieldProps {
  * The recipient of an irreversible transfer: a monospace field that refuses
  * a malformed or mistyped (checksum) address, and one line under it with
  * what the chain knows about the address — active, new, a contract or a
- * protocol contract — so a typo is caught before the tokens leave.
+ * protocol contract — so a typo is caught before the tokens leave. Once the
+ * review is on screen, a warning moves there (said once, next to its
+ * acknowledgement) and this line only says the address was checked.
  */
 export function RecipientField({
   value,
@@ -36,6 +44,7 @@ export function RecipientField({
   onBlur,
   error,
   check,
+  reviewShown = false,
   disabled,
   id,
   inputRef,
@@ -55,6 +64,7 @@ export function RecipientField({
       );
       break;
     case 'failed':
+      if (reviewShown) break;
       hint = (
         <span className="inline-flex items-start gap-1.5">
           <Info aria-hidden className="mt-0.5 size-3.5 shrink-0" />
@@ -64,6 +74,10 @@ export function RecipientField({
       break;
     case 'ready': {
       const warning = check.warning;
+      if (warning && reviewShown) {
+        hint = <span>{t('check.checked', { network })}</span>;
+        break;
+      }
       const sentence =
         warning === 'protocol'
           ? t('check.protocol', { name: tFormats(`address.known.${check.known}`) })

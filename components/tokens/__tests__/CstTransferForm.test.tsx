@@ -174,12 +174,75 @@ describe('CstTransferForm', () => {
     render(<CstTransferForm source={SOURCE} />);
     fill(TEST_APP_CONTRACT_ADDRESSES.cosmicToken, '1');
 
+    // Said once, in the review beside its acknowledgement; the field only says it checked.
     expect(
       screen.getAllByText(
         /forms\.transfer\.recipient\.check\.protocol\(name=formats\.address\.known\.cst\)/,
       ),
-    ).not.toHaveLength(0);
+    ).toHaveLength(1);
+    expect(screen.getByTestId('transfer-review').textContent?.includes('check.protocol')).toBe(
+      true,
+    );
+    expect(screen.getByText(/^forms\.transfer\.recipient\.check\.checked/)).toBeInTheDocument();
     expect(screen.getByLabelText('forms.transfer.review.acknowledge')).toBeInTheDocument();
+  });
+
+  it('warns under the field while there is no review yet', () => {
+    mockCheck = {
+      status: 'ready',
+      facts: { transactionCount: 0, isContract: false },
+      known: null,
+      warning: 'fresh',
+    };
+    render(<CstTransferForm source={SOURCE} />);
+    fireEvent.change(recipientField(), { target: { value: RECIPIENT } });
+
+    expect(screen.queryByTestId('transfer-review')).not.toBeInTheDocument();
+    expect(screen.getByText(/^forms\.transfer\.recipient\.check\.fresh/)).toBeInTheDocument();
+  });
+
+  it('holds the send until the recipient check answers (regression)', async () => {
+    // A submit made while the field still said "Checking…" went straight to
+    // the wallet, and the new-address warning appeared only afterwards.
+    mockCheck = { status: 'checking' };
+    const { container, rerender } = render(<CstTransferForm source={SOURCE} />);
+    fill(RECIPIENT, '1');
+
+    const button = screen.getByRole('button', { name: /forms\.transfer\.review\.checking/ });
+    expect(button).toHaveAttribute('aria-busy', 'true');
+    fireEvent.click(button);
+    fireEvent.submit(container.querySelector('form')!);
+    await Promise.resolve();
+    expect(mockTx.writeContract).not.toHaveBeenCalled();
+
+    // The check answers: a new address, so the acknowledgement is required.
+    mockCheck = {
+      status: 'ready',
+      facts: { transactionCount: 0, isContract: false },
+      known: null,
+      warning: 'fresh',
+    };
+    rerender(<CstTransferForm source={SOURCE} />);
+    fireEvent.click(sendButton());
+    expect(
+      await screen.findByText('forms.transfer.review.acknowledgeRequired'),
+    ).toBeInTheDocument();
+    expect(mockTx.writeContract).not.toHaveBeenCalled();
+  });
+
+  it('asks for an acknowledgement when the address could not be checked', async () => {
+    mockCheck = { status: 'failed' };
+    render(<CstTransferForm source={SOURCE} />);
+    fill(RECIPIENT, '1');
+
+    fireEvent.click(sendButton());
+    const acknowledgement = await screen.findByLabelText('forms.transfer.review.acknowledge');
+    expect(acknowledgement).toHaveFocus();
+    expect(mockTx.writeContract).not.toHaveBeenCalled();
+
+    fireEvent.click(acknowledgement);
+    fireEvent.click(sendButton());
+    await waitFor(() => expect(mockTx.writeContract).toHaveBeenCalledTimes(1));
   });
 
   it('says so when the balance cannot be read, and still validates the rest', () => {

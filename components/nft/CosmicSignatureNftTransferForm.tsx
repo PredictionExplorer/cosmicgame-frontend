@@ -18,7 +18,7 @@ import { formatId, sameAddress } from '@/utils/format';
 import type { CSTTokenInfo } from '@/services/api';
 import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
 import { RecipientField } from '@/components/tokens/transfer/RecipientField';
-import { TransferReview, needsAcknowledgement } from '@/components/tokens/transfer/TransferReview';
+import { TransferReview, transferGate } from '@/components/tokens/transfer/TransferReview';
 import { parseRecipient } from '@/components/tokens/transfer/recipient';
 import { useRecipientFacts } from '@/components/tokens/transfer/useRecipientFacts';
 import { Badge } from '@/components/ui/badge';
@@ -74,6 +74,7 @@ export function CosmicSignatureNftTransferForm({
 }: CosmicSignatureNftTransferFormProps) {
   const t = useTranslations('myPages.nftTransfer');
   const tToast = useTranslations('toasts');
+  const tReview = useTranslations('forms.transfer.review');
   const queryClient = useQueryClient();
   const { cosmicSignature } = useContractAddresses();
   const { notify } = useNotify();
@@ -96,6 +97,7 @@ export function CosmicSignatureNftTransferForm({
 
   const recipient = parseRecipient(recipientText, { from: source });
   const check = useRecipientFacts(recipient.address);
+  const gate = transferGate(check, acknowledged);
 
   const transferableIds = tokens
     .filter((token) => !disabledReason(token, source))
@@ -180,7 +182,10 @@ export function CosmicSignatureNftTransferForm({
       recipientRef.current?.focus();
       return;
     }
-    if (needsAcknowledgement(check) && !acknowledged) {
+    // Never race the recipient check: its answer decides whether the send
+    // needs an acknowledgement. The button says it is checking meanwhile.
+    if (gate === 'checking') return;
+    if (gate === 'acknowledge') {
       setAcknowledgementMissing(true);
       acknowledgementRef.current?.focus();
       return;
@@ -190,6 +195,8 @@ export function CosmicSignatureNftTransferForm({
 
   const idsLabel = selected.map((id) => formatId(id)).join(', ');
   const busyLabel = isBusy ? stageLabel(stage) : null;
+  const reviewShown = recipient.address !== null && selected.length > 0;
+  const checkingRecipient = !isBusy && recipient.address !== null && gate === 'checking';
 
   return (
     <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-8">
@@ -343,10 +350,11 @@ export function CosmicSignatureNftTransferForm({
         onBlur={() => setRecipientTouched(true)}
         error={recipientTouched ? recipient.error : null}
         check={check}
+        reviewShown={reviewShown}
         disabled={isBusy}
       />
 
-      {recipient.address && selected.length > 0 ? (
+      {recipient.address && reviewShown ? (
         <TransferReview
           sending={
             <span className="flex flex-col items-end gap-0.5">
@@ -374,11 +382,15 @@ export function CosmicSignatureNftTransferForm({
             type="submit"
             variant="commit"
             size="lg"
-            loading={isBusy}
+            loading={isBusy || checkingRecipient}
             className="w-full sm:w-auto sm:self-start"
           >
             {busyLabel ??
-              (selected.length > 0 ? t('sendCount', { count: selected.length }) : t('send'))}
+              (checkingRecipient
+                ? tReview('checking')
+                : selected.length > 0
+                  ? t('sendCount', { count: selected.length })
+                  : t('send'))}
           </Button>
         </ChainGuard>
         {progress && progress.total > 1 ? (

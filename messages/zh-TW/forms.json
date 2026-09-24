@@ -27,7 +27,8 @@
       },
       "check": {
         "checking": "正在 {network} 上核查該地址…",
-        "failed": "暫時無法在 {network} 上核查該地址，仍可傳送。",
+        "failed": "暫時無法在 {network} 上核查該地址。",
+        "checked": "已在 {network} 上核查。",
         "active": "{count, plural, other {已在 {network} 上傳送過 # 筆交易。}}",
         "fresh": "新地址：從未在 {network} 上傳送過交易。",
         "contract": "該地址是合約，可能無法再轉出收到的代幣。",
@@ -54,7 +55,8 @@
       "to": "接收方",
       "final": "傳送後無法撤銷：傳送到錯誤地址的資產無法找回。",
       "acknowledge": "我已核對該地址，確認傳送。",
-      "acknowledgeRequired": "請先確認已核對地址。"
+      "acknowledgeRequired": "請先確認已核對地址。",
+      "checking": "正在核查地址…"
     }
   }
 }

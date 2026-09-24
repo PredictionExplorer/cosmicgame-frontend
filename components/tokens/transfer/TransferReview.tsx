@@ -26,17 +26,41 @@ export interface TransferReviewProps {
   className?: string;
 }
 
-/** Whether a transfer to this recipient must be acknowledged before it is sent. */
+/**
+ * Whether a transfer to this recipient must be acknowledged before it is
+ * sent: the chain flagged it (new, a contract, a protocol contract), or the
+ * check could not run, so nothing vouches for it.
+ */
 export function needsAcknowledgement(check: RecipientCheck): boolean {
-  return check.status === 'ready' && check.warning !== null;
+  return check.status === 'failed' || (check.status === 'ready' && check.warning !== null);
+}
+
+/**
+ * Where an otherwise valid transfer stands before the wallet opens:
+ *
+ * - `checking`: the recipient check has not answered yet, so nobody knows
+ *   whether it needs an acknowledgement; the send waits (the commit button
+ *   says so) instead of racing the check
+ * - `acknowledge`: the review shows a warning that is not yet acknowledged
+ * - `ready`: the wallet may open
+ */
+export type TransferGate = 'checking' | 'acknowledge' | 'ready';
+
+export function transferGate(check: RecipientCheck, acknowledged: boolean): TransferGate {
+  // `idle` means there is no address to check yet, so there is nothing to send.
+  if (check.status === 'checking' || check.status === 'idle') return 'checking';
+  if (needsAcknowledgement(check) && !acknowledged) return 'acknowledge';
+  return 'ready';
 }
 
 /**
  * The review of an irreversible transfer, shown above the send button as
  * soon as the recipient and amount are valid: what leaves, the full
  * recipient address (the short form hides a typo in the middle), and —
- * when the address is new, a contract or a protocol contract — a warning
- * that must be acknowledged before the wallet opens.
+ * when the address is new, a contract or a protocol contract, or could not
+ * be checked — a warning that must be acknowledged before the wallet opens.
+ * The warning is said here only: the recipient field's hint just reports
+ * that the check ran (see `RecipientField`'s `reviewShown`).
  */
 export function TransferReview({
   sending,
@@ -53,16 +77,20 @@ export function TransferReview({
   const tFormats = useTranslations('formats');
   const headingId = useId();
   const acknowledgeId = useId();
-  const warning = check.status === 'ready' ? check.warning : null;
+  const network = REQUIRED_CHAIN_NAME;
+  const mustAcknowledge = needsAcknowledgement(check);
 
-  const warningSentence =
-    check.status !== 'ready' || !warning
-      ? null
-      : warning === 'protocol'
+  let warningSentence: string | null = null;
+  if (check.status === 'failed') {
+    warningSentence = tRecipient('check.failed', { network });
+  } else if (check.status === 'ready' && check.warning) {
+    warningSentence =
+      check.warning === 'protocol'
         ? tRecipient('check.protocol', { name: tFormats(`address.known.${check.known}`) })
-        : warning === 'contract'
+        : check.warning === 'contract'
           ? tRecipient('check.contract')
-          : tRecipient('check.fresh', { network: REQUIRED_CHAIN_NAME });
+          : tRecipient('check.fresh', { network });
+  }
 
   return (
     <section
@@ -93,7 +121,7 @@ export function TransferReview({
 
       <p className="mt-2 type-caption text-subtle">{t('final')}</p>
 
-      {warning ? (
+      {mustAcknowledge ? (
         <div className="mt-3 flex items-start gap-3">
           <Checkbox
             id={acknowledgeId}

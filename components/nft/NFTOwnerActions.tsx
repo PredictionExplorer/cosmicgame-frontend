@@ -13,7 +13,7 @@ import { useNotify } from '@/hooks/useNotify';
 import { useTxFlow, useTxStageLabel } from '@/hooks/useTxFlow';
 import { formatId } from '@/utils/format';
 import { RecipientField } from '@/components/tokens/transfer/RecipientField';
-import { TransferReview, needsAcknowledgement } from '@/components/tokens/transfer/TransferReview';
+import { TransferReview, transferGate } from '@/components/tokens/transfer/TransferReview';
 import { parseRecipient } from '@/components/tokens/transfer/recipient';
 import { useRecipientFacts } from '@/components/tokens/transfer/useRecipientFacts';
 import { Button } from '@/components/ui/button';
@@ -66,6 +66,7 @@ export function NFTOwnerActions({
 }: NFTOwnerActionsProps) {
   const t = useTranslations('detail.ownerActions');
   const tToasts = useTranslations('toasts');
+  const tReview = useTranslations('forms.transfer.review');
   const headingId = useId();
   const { cosmicSignature } = useContractAddresses();
   const { notify } = useNotify();
@@ -83,6 +84,8 @@ export function NFTOwnerActions({
 
   const recipient = parseRecipient(recipientText, { from: owner });
   const check = useRecipientFacts(recipient.address);
+  const gate = transferGate(check, acknowledged);
+  const checkingRecipient = !isBusy && recipient.address !== null && gate === 'checking';
   const id = formatId(tokenId);
   const named = currentName.trim() !== '';
 
@@ -155,7 +158,10 @@ export function NFTOwnerActions({
       recipientRef.current?.focus();
       return;
     }
-    if (needsAcknowledgement(check) && !acknowledged) {
+    // Never race the recipient check: its answer decides whether the send
+    // needs an acknowledgement. The button says it is checking meanwhile.
+    if (gate === 'checking') return;
+    if (gate === 'acknowledge') {
       setAcknowledgementMissing(true);
       acknowledgementRef.current?.focus();
       return;
@@ -265,6 +271,7 @@ export function NFTOwnerActions({
               onBlur={() => setRecipientTouched(true)}
               error={recipientTouched ? recipient.error : null}
               check={check}
+              reviewShown={recipient.address !== null}
               disabled={isBusy}
             />
             {recipient.address ? (
@@ -284,11 +291,12 @@ export function NFTOwnerActions({
             <ChainGuard requireConnection buttonClassName="w-full">
               <Button
                 type="submit"
-                loading={pending === 'transfer'}
+                loading={pending === 'transfer' || checkingRecipient}
                 disabled={isBusy && pending !== 'transfer'}
                 className="w-full"
               >
-                {busyLabel('transfer') ?? t('transferButton', { id })}
+                {busyLabel('transfer') ??
+                  (checkingRecipient ? tReview('checking') : t('transferButton', { id }))}
               </Button>
             </ChainGuard>
             {pending === 'transfer' ? <TxStatus stage={stage} /> : null}

@@ -27,7 +27,8 @@
       },
       "check": {
         "checking": "Checking this address on {network}…",
-        "failed": "Couldn't check this address on {network}. You can still send.",
+        "failed": "Couldn't check this address on {network}.",
+        "checked": "Checked on {network}.",
         "active": "{count, plural, one {Active on {network}: # transaction sent.} other {Active on {network}: # transactions sent.}}",
         "fresh": "New address: it has never sent a transaction on {network}.",
         "contract": "This address is a contract, which may not be able to move tokens on.",
@@ -54,7 +55,8 @@
       "to": "To",
       "final": "Transfers are final: tokens sent to a wrong address can't be recovered.",
       "acknowledge": "I've checked this address and want to send to it.",
-      "acknowledgeRequired": "Confirm that you've checked the address to continue."
+      "acknowledgeRequired": "Confirm that you've checked the address to continue.",
+      "checking": "Checking the address…"
     }
   }
 }

@@ -70,14 +70,18 @@ function token(overrides: Partial<CSTTokenInfo> = {}): CSTTokenInfo {
   };
 }
 
-function renderForm(tokens: CSTTokenInfo[]) {
-  return render(
+function form(tokens: CSTTokenInfo[]) {
+  return (
     <CosmicSignatureNftTransferForm
       sourceAddress={SOURCE}
       tokens={tokens}
       historyHref={`/cosmic-signature-transfer/${SOURCE}`}
-    />,
+    />
   );
+}
+
+function renderForm(tokens: CSTTokenInfo[]) {
+  return render(form(tokens));
 }
 
 const row = (id: number) => screen.getByTestId(`nft-row-${id}`);
@@ -242,6 +246,36 @@ describe('CosmicSignatureNftTransferForm', () => {
     fireEvent.click(screen.getByLabelText('forms.transfer.review.acknowledge'));
     fireEvent.click(sendButton());
     await waitFor(() => expect(mockTx.writeContract).toHaveBeenCalledTimes(1));
+  });
+
+  it('holds the batch until the recipient check answers (regression)', async () => {
+    // A submit made while the field still said "Checking…" went straight to
+    // the wallet, before the new-address warning could ask for a checkbox.
+    mockCheck = { status: 'checking' };
+    const tokens = [token({ TokenId: 1 })];
+    const { container, rerender } = renderForm(tokens);
+    fireEvent.click(checkbox(1));
+    fireEvent.change(recipientField(), { target: { value: RECIPIENT } });
+
+    const checking = screen.getByRole('button', { name: /forms\.transfer\.review\.checking/ });
+    expect(checking).toHaveAttribute('aria-busy', 'true');
+    fireEvent.click(checking);
+    fireEvent.submit(container.querySelector('form')!);
+    await Promise.resolve();
+    expect(mockTx.writeContract).not.toHaveBeenCalled();
+
+    mockCheck = {
+      status: 'ready',
+      facts: { transactionCount: 0, isContract: true },
+      known: null,
+      warning: 'contract',
+    };
+    rerender(form(tokens));
+    fireEvent.click(sendButton());
+    expect(
+      await screen.findByText('forms.transfer.review.acknowledgeRequired'),
+    ).toBeInTheDocument();
+    expect(mockTx.writeContract).not.toHaveBeenCalled();
   });
 
   it('says so when the wallet holds no NFTs', () => {
