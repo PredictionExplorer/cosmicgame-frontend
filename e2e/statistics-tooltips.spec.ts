@@ -111,11 +111,14 @@ test.describe('/statistics tooltips', () => {
         'Recipient Address',
       );
 
-      const renderedLabels = await firstRecipientRow
-        .locator('td')
-        .evaluateAll((cells) =>
-          cells.map((cell) => getComputedStyle(cell, '::before').content.replace(/^"|"$/g, '')),
-        );
+      const renderedLabels = await firstRecipientRow.locator('td').evaluateAll((cells) =>
+        // The label is drawn with empty alternative text
+        // (`"Recipient Address" / ""`): read the drawn string only.
+        cells.map(
+          (cell) =>
+            /^"((?:[^"\\]|\\.)*)"/.exec(getComputedStyle(cell, '::before').content)?.[1] ?? '',
+        ),
+      );
       expect(renderedLabels).toEqual(
         expect.arrayContaining(['Recipient Address', 'Allocations Received']),
       );

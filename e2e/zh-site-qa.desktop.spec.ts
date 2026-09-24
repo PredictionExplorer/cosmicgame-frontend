@@ -163,6 +163,7 @@ async function expectChineseTypography(page: Page, route: ZhRouteInventoryEntry)
       headingFound: Boolean(heading),
       letterSpacing: headingStyle?.letterSpacing ?? '',
       wordBreak: headingStyle?.wordBreak ?? '',
+      overflowWrap: headingStyle?.overflowWrap ?? '',
       lineBreak: headingStyle?.lineBreak ?? '',
     };
   });
@@ -173,7 +174,12 @@ async function expectChineseTypography(page: Page, route: ZhRouteInventoryEntry)
   }
   if (typography.headingFound) {
     expect(['normal', '0px']).toContain(typography.letterSpacing);
-    expect(typography.wordBreak).not.toBe('keep-all');
+    // Headings break Han text at punctuation (keep-all), so a line turns at a
+    // comma rather than inside 周期; a clause too long for its line must
+    // still wrap, so keep-all always comes with an overflow-wrap safety net.
+    if (typography.wordBreak === 'keep-all') {
+      expect(['anywhere', 'break-word']).toContain(typography.overflowWrap);
+    }
     expect(typography.lineBreak).not.toBe('anywhere');
   }
 }

@@ -36,6 +36,11 @@ async function openDisclosure(root: Locator, title: string): Promise<void> {
 async function navigateTo(page: Page, href: string): Promise<void> {
   const destination = DESTINATIONS[href];
   if (!destination) throw new Error(`No navigation entry for ${href}`);
+  // Menus and the drawer animate out: one still closing from the last
+  // navigation reads as open, and its links detach mid-click. Let it go first.
+  await expect(
+    page.locator('[role="menu"][data-state="closed"], [role="dialog"][data-state="closed"]'),
+  ).toHaveCount(0);
 
   let link: Locator;
   if (await usesDrawer(page)) {
