@@ -681,12 +681,20 @@ function CycleRecord({
             className="mb-6"
           />
         ) : null}
-        <ul className="grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-4">
+        {/* Each card spans four shared rows (plate, role, amounts, recipient),
+            so a role whose amounts wrap on a phone does not push its
+            recipient line below its neighbour's. The cards' bottom padding
+            spaces the rows of cards; the list hands the last one back. */}
+        <ul className="-mb-7 grid grid-cols-2 gap-x-4 gap-y-1 sm:-mb-9 sm:gap-x-6 lg:grid-cols-4">
           {roles.map((role, index) => {
             const hasToken = role.tokenId >= 0;
             const id = hasToken ? formatId(role.tokenId) : null;
             return (
-              <li key={role.id} data-testid={`recipient-card-${role.id}`}>
+              <li
+                key={role.id}
+                data-testid={`recipient-card-${role.id}`}
+                className="row-span-4 grid grid-rows-subgrid pb-7 sm:pb-9"
+              >
                 {hasToken ? (
                   <SignatureCard
                     tokenId={role.tokenId}
@@ -709,6 +717,7 @@ function CycleRecord({
                     priority={index < 2}
                     unavailableLabel={artworkUnavailable}
                     unavailableDetail={id}
+                    subgrid
                   >
                     {role.address ? (
                       <p className="mt-1 flex flex-wrap items-center gap-2 type-caption text-subtle">
@@ -718,8 +727,8 @@ function CycleRecord({
                     ) : null}
                   </SignatureCard>
                 ) : (
-                  <div className="flex flex-col gap-3">
-                    <PendingPlate density="compact" label={artworkUnavailable} />
+                  <div className="row-span-4 grid grid-rows-subgrid">
+                    <PendingPlate density="compact" label={artworkUnavailable} className="mb-2" />
                     <h3 className="type-body-md font-medium text-foreground">
                       <Term id={ROLE_TERMS[role.id]}>
                         {t(`details.recipientSection.cards.${role.id}.title`)}
