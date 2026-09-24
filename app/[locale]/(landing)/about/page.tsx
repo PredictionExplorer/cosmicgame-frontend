@@ -16,6 +16,7 @@ import {
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import {
+  ABOUT_PLATE_TOKEN_ID,
   ABOUT_RESOURCE_GROUPS,
   getAboutContent,
   type AboutResourceGroupId,
@@ -46,8 +47,7 @@ interface PageProps {
   params: Promise<{ locale: string }>;
 }
 
-/** The Signature that introduces the protocol. */
-const ABOUT_PLATE = SIGNATURE_PLATES[2];
+const ABOUT_PLATE = SIGNATURE_PLATES[ABOUT_PLATE_TOKEN_ID];
 
 const RESOURCE_ICONS: Readonly<Record<AboutResourceId, LucideIcon>> = {
   app: AppWindow,

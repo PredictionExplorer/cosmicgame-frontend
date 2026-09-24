@@ -1,15 +1,17 @@
+import { ABOUT_PLATE_TOKEN_ID, getAboutContent } from '@/content/about';
+
 import { COSMIC_OG_SIZE } from '@/lib/og/CosmicOgCard';
-import { latestArtworkCard, ogImageMetadata } from '@/lib/og/cards';
-import { getOgCopy } from '@/lib/og/copy';
+import { ogImageMetadata } from '@/lib/og/cards';
+
+import { readingShareCard } from '../readingCard';
 
 /**
- * About defines page-level Open Graph metadata, so its co-located card keeps
- * the route-specific metadata object from replacing the brand card.
+ * About's own card: its title beside the Signature that opens the page, so
+ * the page no longer unfurls as the landing's brand card. About defines
+ * page-level Open Graph metadata, so the card must be co-located here.
  */
 export const contentType = 'image/png';
 export const size = COSMIC_OG_SIZE;
-// The card shows the newest Signature; regenerate as new ones are imprinted.
-export const revalidate = 3600;
 
 interface ImageProps {
   params: Promise<{ locale: string }>;
@@ -17,10 +19,11 @@ interface ImageProps {
 
 export async function generateImageMetadata({ params }: ImageProps) {
   const { locale } = await params;
-  return ogImageMetadata(getOgCopy(locale, 'default').alt);
+  return ogImageMetadata(getAboutContent(locale).heading);
 }
 
 export default async function Image({ params }: ImageProps) {
   const { locale } = await params;
-  return latestArtworkCard(locale, 'default', 'landing');
+  const { eyebrow, heading } = getAboutContent(locale);
+  return readingShareCard(locale, { eyebrow, title: heading }, ABOUT_PLATE_TOKEN_ID);
 }

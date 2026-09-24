@@ -2,6 +2,12 @@ import { APP_ORIGIN } from '@/lib/hostRouting';
 
 export const ABOUT_PATH = '/about';
 
+/**
+ * The Signature that introduces the protocol, on the page and its share card:
+ * a token id in components/reading/signaturePlates.
+ */
+export const ABOUT_PLATE_TOKEN_ID = 2;
+
 export const ABOUT_RESOURCE_HREFS = {
   app: APP_ORIGIN,
   contracts: `${APP_ORIGIN}/contracts`,

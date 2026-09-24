@@ -79,7 +79,7 @@ describe('Learn guide share cards', () => {
     expect(lastCard().title).toBe(getOgCopy('en', 'default').title);
   });
 
-  it('gives the white paper and the quiz cards of their own', async () => {
+  it('gives the white paper, the quiz and About cards of their own', async () => {
     const whitePaper = require('../../white-paper/opengraph-image') as {
       default: (props: { params: Promise<{ locale: string }> }) => Promise<unknown>;
     };
@@ -96,5 +96,15 @@ describe('Learn guide share cards', () => {
     const quiz = require('../../quiz/opengraph-image') as typeof whitePaper;
     await quiz.default({ params: Promise.resolve({ locale: 'en' }) });
     expect(lastCard().title).toBe('How well do you know Cosmic Signature?');
+
+    const about = require('../../about/opengraph-image') as typeof whitePaper;
+    await about.default({ params: Promise.resolve({ locale: 'en' }) });
+    expect(lastCard()).toEqual(
+      expect.objectContaining({
+        eyebrow: 'ABOUT THE PROTOCOL',
+        title: 'About Cosmic Signature',
+        art: [expect.objectContaining({ label: 'Signature #000002 · Cycle 0' })],
+      }),
+    );
   });
 });
