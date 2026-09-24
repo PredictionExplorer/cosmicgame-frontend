@@ -818,7 +818,7 @@ describe('HomePage', () => {
     // reign so far (20m) against the 30m record, passed in 10m 1s.
     const chrono = screen.getByTestId('chrono-role-summary');
     const challenge = within(chrono).getByTestId('chrono-active-challenge');
-    expect(challenge).toHaveTextContent(/challenge\.reign\s*20m/);
+    expect(challenge).toHaveTextContent(/challenge\.reign\s*00:20:00/);
     expect(challenge).toHaveTextContent(/challenge\.passesIn\s*00:10:01/);
     expect(chrono).toHaveTextContent('30m');
     // The holder is named once, on the Endurance row, not again here.

@@ -283,11 +283,11 @@ test.describe('home gesture chat', () => {
     await expect(chrono).toContainText(/30m/);
     const challenge = chrono.getByTestId('chrono-active-challenge');
     await expect(challenge).toBeVisible();
-    await expect(challenge.getByTestId('chrono-challenge-segment')).toContainText(
-      new RegExp(`${home.observatory.ledger.challenge.reign}\\s*20m`),
-    );
     // The reign keeps growing while the page is open, so the time left ticks
-    // down, read as a clock whose width holds while it ticks.
+    // down; both read as clocks whose width holds while they tick.
+    await expect(challenge.getByTestId('chrono-challenge-segment')).toContainText(
+      new RegExp(`${home.observatory.ledger.challenge.reign}\\s*00:(20|21):\\d\\d`),
+    );
     await expect(challenge.getByTestId('chrono-challenge-next-change')).toContainText(
       new RegExp(`${home.observatory.ledger.challenge.passesIn}\\s*00:(10:0[01]|09:\\d\\d)`),
     );

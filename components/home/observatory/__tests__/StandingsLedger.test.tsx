@@ -135,7 +135,7 @@ describe('StandingsLedger', () => {
     const latest = screen.getByTestId('latest-participant-intel');
     expect(visibleText(latest)).not.toMatch(/\b0s\b/);
     // The hold and its progress both read as pending (a skeleton and a spoken "Loading").
-    expect(within(latest).getAllByText('Loading...')).toHaveLength(2);
+    expect(within(latest).getAllByText('common.status.loadingEllipsis')).toHaveLength(2);
     expect(within(latest).queryByRole('progressbar')).not.toBeInTheDocument();
   });
 
@@ -219,8 +219,9 @@ describe('StandingsLedger', () => {
     render(<StandingsLedger {...baseProps} />);
     const chrono = screen.getByTestId('chrono-role-summary');
     const challenge = within(chrono).getByTestId('chrono-active-challenge');
+    // Both lines read as clocks, so the stacked figures share one format.
     expect(within(challenge).getByTestId('chrono-challenge-segment')).toHaveTextContent(
-      /home\.observatory\.ledger\.challenge\.reign\s*50m/,
+      /home\.observatory\.ledger\.challenge\.reign\s*00:50:00/,
     );
     expect(within(challenge).getByTestId('chrono-challenge-next-change')).toHaveTextContent(
       /home\.observatory\.ledger\.challenge\.passesIn\s*01:10:01/,

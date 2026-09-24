@@ -284,17 +284,17 @@ interface LedgerFact {
   key: string;
   testId?: string;
   label: string;
-  /** A duration in seconds: a countdown reads as a clock, an elapsed hold in units. */
+  /** A duration in seconds: a reign so far or the time left until a change. */
   seconds: number;
-  countdown?: boolean;
 }
 
 /**
  * What changes a row next, as label and figure lines: the label wraps and
  * the figure sits in its own column and never does, so a ticking figure can
  * never re-wrap the line and move the desk (the ledger is measured against
- * the rows of the page, not its own content). Countdowns read as a clock
- * ("8d 06:56:51"), whose width holds while it ticks.
+ * the rows of the page, not its own content). Every figure reads as a clock
+ * ("1d 01:12:05" over "8d 00:24:38"), so stacked lines share one format,
+ * their digits align, and a width holds while it ticks.
  */
 function LedgerFacts({ facts }: { facts: LedgerFact[] }) {
   return (
@@ -307,7 +307,7 @@ function LedgerFacts({ facts }: { facts: LedgerFact[] }) {
         >
           <dt className="type-caption min-w-0 text-muted-foreground">{fact.label}</dt>
           <dd className="type-caption min-w-0 text-end text-foreground">
-            <Duration seconds={fact.seconds} variant={fact.countdown ? 'clock' : 'compact'} />
+            <Duration seconds={fact.seconds} variant="clock" />
           </dd>
         </div>
       ))}
@@ -550,7 +550,6 @@ export function StandingsLedger({
           latest.isCurrentEnduranceChampion ? 'ledger.extendsRecordIn' : 'ledger.passesRecordIn',
         ),
         seconds: latest.secondsUntilEnduranceChampion,
-        countdown: true,
       },
     };
   })();
@@ -575,7 +574,6 @@ export function StandingsLedger({
       testId: 'chrono-challenge-next-change',
       label: t('ledger.challenge.passesIn'),
       seconds: chronoChallenge.startsGrowingIn,
-      countdown: true,
     });
   }
   const challengePercent =
@@ -736,7 +734,6 @@ export function StandingsLedger({
                           key: 'stops',
                           label: t('ledger.chronoStopsIn'),
                           seconds: chrono.willStopGrowingIn,
-                          countdown: true,
                         },
                       ]}
                     />
