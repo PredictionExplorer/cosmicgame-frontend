@@ -1,7 +1,7 @@
 'use client';
 
 import type { ComponentType, ReactNode } from 'react';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, Check, Copy } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { pickByLocale, type LocaleRecord } from '@/i18n/locale';
@@ -15,6 +15,7 @@ import { EXPLORER_NAME } from '@/lib/chainGuard';
 import { cn } from '@/lib/utils';
 import { formatAddress } from '@/utils/format';
 import { getExplorerUrl } from '@/utils/urls';
+import { useCopyFeedback } from '@/hooks/useCopyFeedback';
 import { useFormat } from '@/hooks/useFormat';
 import { PageHeader, type PageHeaderFigure } from '@/components/layout/PageHeader';
 import { useParticipantTrail } from '@/components/layout/participantTrail';
@@ -45,6 +46,35 @@ const CYCLE_LIST_SEPARATOR: LocaleRecord<string> = {
   vi: ', ',
 };
 
+/**
+ * "Copy address" beside the H1 that names the address, so the full address
+ * is one tap from its short form rather than a chip below the figures.
+ */
+function CopyAddressAction({ address }: { address: string }) {
+  const tCommon = useTranslations('common');
+  const { copied, copy } = useCopyFeedback();
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => void copy(address)}
+        title={address}
+        className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'px-3')}
+      >
+        {copied ? (
+          <Check aria-hidden className="text-positive" />
+        ) : (
+          <Copy aria-hidden className="text-subtle" />
+        )}
+        {copied ? tCommon('actions.copied') : tCommon('actions.copyAddress')}
+      </button>
+      <span role="status" className="sr-only">
+        {copied ? tCommon('actions.copied') : ''}
+      </span>
+    </>
+  );
+}
+
 export interface ProfileHeaderProps {
   address: string;
   isOwnProfile: boolean;
@@ -57,8 +87,9 @@ export interface ProfileHeaderProps {
 
 /**
  * A participant's identity header: who (the address as the H1 on another
- * participant's page, with copy and explorer links), their recognitions from
- * allocation records as tags, and one row of figures that puts what the
+ * participant's page, with "Copy address" and the explorer link beside it;
+ * your own wallet's address as a chip on your own page), their recognitions
+ * from allocation records as tags, and one row of figures that puts what the
  * address spent on gestures beside what it received, in neutral ink.
  */
 export function ProfileHeader({
@@ -120,9 +151,13 @@ export function ProfileHeader({
   const separator = pickByLocale(CYCLE_LIST_SEPARATOR, format.locale);
   const titles = allocations?.titles ?? [];
 
+  // Another participant's page names the address in its H1 and copies it from beside it;
+  // your own page's H1 is "My statistics", so the wallet's address sits here.
   const identity = (
-    <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-3 sm:mt-6">
-      <AddressChip address={address} display="responsive" label={false} href={false} />
+    <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-3 empty:hidden sm:mt-6">
+      {isOwnProfile ? (
+        <AddressChip address={address} display="responsive" label={false} href={false} />
+      ) : null}
       {titles.length > 0 ? (
         <ul aria-label={t('statistics.titles.label')} className="flex flex-wrap gap-2">
           {titles.map(({ title, cycles }) => {
@@ -178,7 +213,16 @@ export function ProfileHeader({
             ),
             subtitle: t('statistics.page.userSubtitle'),
           })}
-      actions={explorerLink}
+      actions={
+        isOwnProfile ? (
+          explorerLink
+        ) : (
+          <>
+            <CopyAddressAction address={address} />
+            {explorerLink}
+          </>
+        )
+      }
       figures={figures}
     >
       {identity}

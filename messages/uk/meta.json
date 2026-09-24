@@ -176,7 +176,7 @@
   },
   "myStatistics": {
     "title": "Моя статистика",
-    "description": "Історія жестів, розподіли, NFT і стан закріплень вашого гаманця в Cosmic Signature."
+    "description": "Ваші жести, розподіли, NFT і закріплення в кожному перформанс-циклі."
   },
   "myTokens": {
     "title": "Мої NFT",
@@ -216,7 +216,7 @@
   },
   "userProfile": {
     "title": "Інформація про учасника {address}",
-    "description": "Інформація про учасника {address}",
+    "description": "Жести, розподіли та закріплення учасника {address}.",
     "invalidAddress": "Недійсна адреса"
   },
   "admin": {

@@ -176,7 +176,7 @@
   },
   "myStatistics": {
     "title": "My Statistics",
-    "description": "Track your performance with Cosmic Signature's My Statistics page. View detailed gesture history, anchor status, distributions, and more. Stay informed and optimize your participation in our on-chain protocol."
+    "description": "Your gestures, allocations, NFTs and anchors across every Performance Cycle."
   },
   "myTokens": {
     "title": "My NFTs",
@@ -216,7 +216,7 @@
   },
   "userProfile": {
     "title": "Participant {address}",
-    "description": "Information for User {address}",
+    "description": "Gestures, allocations and anchors of participant {address}.",
     "invalidAddress": "Invalid Address"
   },
   "admin": {

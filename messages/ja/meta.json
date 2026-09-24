@@ -176,7 +176,7 @@
   },
   "myStatistics": {
     "title": "自分の統計",
-    "description": "一筆の履歴、係留の状態、受け取った配分など、Cosmic Signatureでの活動を詳しく確認できます。"
+    "description": "すべてのパフォーマンス・サイクルにわたる一筆、配分、NFT、係留の記録です。"
   },
   "myTokens": {
     "title": "自分のNFT",
@@ -216,7 +216,7 @@
   },
   "userProfile": {
     "title": "ユーザー{address}の情報",
-    "description": "ユーザー{address}の情報",
+    "description": "参加者{address}の一筆、配分、係留の記録です。",
     "invalidAddress": "無効なアドレス"
   },
   "admin": {

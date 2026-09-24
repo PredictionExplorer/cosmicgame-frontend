@@ -243,16 +243,9 @@ test.describe('zh Sprint 5 — statistics, tables, and formatting', () => {
         '已使用的 Random Walk NFT · Cosmic Signature',
       ],
       [`/zh/user/${ADDRESS}`, '落笔花费', undefined],
-      [
-        `/zh/user/stellar-selection-eth/${ADDRESS}`,
-        '此参与者获配的星选 ETH',
-        '星选 ETH · Cosmic Signature',
-      ],
-      [
-        `/zh/user/stellar-selection-nft/${ADDRESS}`,
-        '此参与者获配的星选 NFT',
-        '星选 NFT · Cosmic Signature',
-      ],
+      // The record pages name their track in the H1 ("星选 · ETH"); the participant is the trail.
+      [`/zh/user/stellar-selection-eth/${ADDRESS}`, '星选 · ETH', '星选 ETH · Cosmic Signature'],
+      [`/zh/user/stellar-selection-nft/${ADDRESS}`, '星选 · NFT', '星选 NFT · Cosmic Signature'],
       [
         `/zh/system-event/${CYCLE}/100/200`,
         `第 ${CYCLE} 个周期前的配置`,
@@ -280,9 +273,9 @@ test.describe('zh Sprint 5 — statistics, tables, and formatting', () => {
     await openTooltip(tooltipTrigger);
     await expectTooltipFullyVisible(page, /当前索引的演绎周期编号/);
     await dismissOpenTooltips(page);
-
-    await openZhRoute(page, '/zh/named-nfts', '已命名 NFT · Cosmic Signature');
-    await expect(page.getByText(/1月1日 \d{2}:34/, { exact: true })).toBeVisible();
+    // The cycle's opening, in the zh calendar style with its zone named inline. (The named
+    // NFTs page this used to check is a gallery of plates now, with no dates.)
+    await expect(page.getByText('2026年1月1日 11:34（UTC）', { exact: true })).toBeVisible();
 
     await openZhRoute(page, '/zh/statistics/tokens', '代币分布统计 · Cosmic Signature');
     // The supply summary dates the reading in the zh calendar style.

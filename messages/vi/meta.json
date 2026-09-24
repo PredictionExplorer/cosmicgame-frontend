@@ -176,7 +176,7 @@
   },
   "myStatistics": {
     "title": "Thống kê của tôi",
-    "description": "Theo dõi lịch sử nét bút, phân bổ, NFT và trạng thái neo giữ của ví trong Cosmic Signature."
+    "description": "Nét bút, phân bổ, NFT và neo giữ của bạn qua mọi chu kỳ trình diễn."
   },
   "myTokens": {
     "title": "NFT của tôi",
@@ -216,7 +216,7 @@
   },
   "userProfile": {
     "title": "Thông tin người dùng {address}",
-    "description": "Thông tin người dùng {address}",
+    "description": "Nét bút, phân bổ và neo giữ của người tham gia {address}.",
     "invalidAddress": "Địa chỉ không hợp lệ"
   },
   "admin": {

@@ -64,7 +64,7 @@
   },
   "myStatistics": {
     "title": "我的統計",
-    "description": "查看 Cosmic Signature 中的落筆記錄、獲配記錄、錨定狀態、代幣持有情況與可取回資產。"
+    "description": "你在每個演繹週期中的落筆、分配、NFT 與錨定。"
   },
   "myTokens": {
     "title": "我的 NFT",
@@ -128,7 +128,7 @@
   },
   "userProfile": {
     "title": "參與者 {address} 的資訊",
-    "description": "查看參與者 {address} 的 Cosmic Signature 統計與活動。",
+    "description": "參與者 {address} 的落筆、分配與錨定。",
     "invalidAddress": "無效地址"
   },
   "userStellarSelectionEth": {
