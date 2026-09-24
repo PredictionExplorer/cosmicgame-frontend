@@ -137,6 +137,10 @@ export function defineLocaleSmoke(locale: TranslatedLocale): void {
       await expect(
         main.getByRole('heading', { level: 2, name: chrome.siteMap.section, exact: true }),
       ).toBeVisible();
+      // Phones fold each section behind its heading; open them all.
+      for (const toggle of await main.locator('button[aria-expanded="false"]:visible').all()) {
+        await toggle.click();
+      }
       await expect(main.getByRole('link', { name: chrome.nav.aboutPattern })).toHaveAttribute(
         'href',
         `https://cosmicsignature.com${prefix}/about`,

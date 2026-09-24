@@ -1,7 +1,4 @@
-'use client';
-
-import { useId, useState, type ReactNode } from 'react';
-import { ChevronDown } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import {
@@ -20,74 +17,18 @@ import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 
 import { LanguageDirectory } from './LanguageDirectory';
+import { PhoneFold } from './PhoneFold';
 import { SiteLink } from './SiteLink';
-import { useSiteNavCopy } from './useSiteNav';
+import { useSiteNavCopy } from './siteNavCopy';
 import { Wordmark } from './Wordmark';
 
 const LINK_CLASS =
   'link-quiet inline-flex min-h-10 max-w-full items-center gap-1 py-1 text-sm text-muted-foreground transition-colors duration-150 hover:text-foreground sm:min-h-8';
 
-/**
- * One group of the footer. From 640px it is a heading over its links; on
- * phones the links fold behind a toggle on the heading row. The folding is
- * CSS (`max-sm:hidden`), not `<details>`: the server's HTML is already right
- * at every width, so nothing shifts when the page hydrates, and the links
- * stay in the markup as the crawl path for the client-only header menus.
- */
-function FooterGroup({
-  title,
-  layout = 'column',
-  children,
-  className,
-}: {
-  title: string;
-  /** `row`: heading and links on one line from 640px (ecosystem, community, language). */
-  layout?: 'column' | 'row';
-  children: ReactNode;
-  className?: string;
-}) {
-  const [open, setOpen] = useState(false);
-  const headingId = useId();
-  const panelId = useId();
-  return (
-    <div
-      className={cn(
-        'relative min-w-0 border-b border-rule-faint sm:border-b-0',
-        layout === 'row' && 'sm:flex sm:items-baseline sm:gap-6',
-        className,
-      )}
-    >
-      <h2
-        id={headingId}
-        className={cn(
-          'type-eyebrow flex min-h-12 items-center pr-10 text-subtle sm:min-h-0 sm:pr-0',
-          layout === 'column' ? 'sm:pb-3' : 'sm:min-w-32 sm:shrink-0',
-        )}
-      >
-        {title}
-      </h2>
-      <button
-        type="button"
-        aria-expanded={open}
-        aria-controls={panelId}
-        aria-labelledby={headingId}
-        onClick={() => setOpen((value) => !value)}
-        className="absolute inset-x-0 top-0 flex h-12 items-center justify-end rounded-control text-subtle sm:hidden"
-      >
-        <ChevronDown
-          aria-hidden
-          className={cn(
-            'size-4 transition-transform duration-200 motion-reduce:transition-none',
-            open && 'rotate-180',
-          )}
-        />
-      </button>
-      <div id={panelId} className={cn('min-w-0 pb-4 sm:pb-0', !open && 'max-sm:hidden')}>
-        {children}
-      </div>
-    </div>
-  );
-}
+/** A phone fold's heading row: 44px, the touch target the toggle over it needs. */
+const FOLD_HEADING_CLASS =
+  'type-eyebrow flex min-h-11 items-center pr-10 text-subtle sm:min-h-0 sm:pr-0';
+const FOLD_TOGGLE_CLASS = 'h-11';
 
 /** A route as a footer link; sibling groups collapse to one row. */
 function footerEntries(section: (typeof FOOTER_SECTIONS)[number]) {
@@ -109,11 +50,26 @@ function footerEntries(section: (typeof FOOTER_SECTIONS)[number]) {
   return entries;
 }
 
+/**
+ * One row of the "links and languages" group: a small heading, then its
+ * links; heading and links share a line from 640px.
+ */
+function FooterRow({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <div className="min-w-0 pb-3 sm:flex sm:items-baseline sm:gap-6 sm:pb-0">
+      <h3 className="type-eyebrow pb-1 pt-1 text-subtle sm:min-w-32 sm:shrink-0 sm:pb-0 sm:pt-0">
+        {title}
+      </h3>
+      {children}
+    </div>
+  );
+}
+
 function OutboundRow({ group }: { group: OutboundGroupId }) {
   const copy = useSiteNavCopy();
   return (
-    <FooterGroup title={copy.sectionTitle(group)} layout="row">
-      <ul className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-x-5">
+    <FooterRow title={copy.sectionTitle(group)}>
+      <ul className="grid grid-cols-2 gap-x-4 sm:flex sm:flex-wrap sm:gap-x-5">
         {outboundLinks(group).map((link) => (
           <li key={link.id} className="min-w-0">
             <SiteLink href={link.href} kind="external" className={LINK_CLASS}>
@@ -122,7 +78,7 @@ function OutboundRow({ group }: { group: OutboundGroupId }) {
           </li>
         ))}
       </ul>
-    </FooterGroup>
+    </FooterRow>
   );
 }
 
@@ -142,10 +98,16 @@ interface SiteFooterProps {
 
 /**
  * The one footer both hosts render, from the navigation taxonomy
- * (config/siteNav.ts): six section columns, the ecosystem and community
- * rows, the language directory and the legal line. Directory links prefetch
- * on intent only, so scrolling to the footer no longer downloads every
- * route. On phones each group folds behind its heading.
+ * (config/siteNav.ts): six section columns, the ecosystem, community and
+ * language rows, and the legal line. Directory links prefetch on intent
+ * only, so scrolling to the footer no longer downloads every route.
+ *
+ * A server component wherever its parent is one (the landing shell gets it
+ * as a slot); only the phone folds (`PhoneFold`), the links and the language
+ * directory hydrate. On phones the six sections fold behind their headings
+ * and the ecosystem, community and language rows share one more fold, the
+ * tagline gives way, and the legal line keeps clear of a fixed action dock
+ * (`--dock-clearance`, set in styles/global.css while one is on the page).
  */
 export function SiteFooter({ host, tagline, copyright, colophon, action, meta }: SiteFooterProps) {
   const t = useTranslations('common');
@@ -158,7 +120,7 @@ export function SiteFooter({ host, tagline, copyright, colophon, action, meta }:
   return (
     <footer className="relative mt-auto border-t border-rule bg-background">
       <div className="site-container">
-        <div className="flex flex-col gap-6 pb-8 pt-10 sm:flex-row sm:items-center sm:justify-between sm:pt-14">
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4 pb-6 pt-8 sm:pb-8 sm:pt-14">
           <div className="min-w-0">
             <Link
               href={home.path}
@@ -167,7 +129,9 @@ export function SiteFooter({ host, tagline, copyright, colophon, action, meta }:
             >
               <Wordmark size="lg" />
             </Link>
-            <p className="type-body-sm mt-3 max-w-md text-muted-foreground">{tagline}</p>
+            <p className="type-body-sm mt-3 max-w-md text-muted-foreground max-sm:hidden">
+              {tagline}
+            </p>
           </div>
           {action ? <div className="shrink-0">{action}</div> : null}
         </div>
@@ -177,7 +141,14 @@ export function SiteFooter({ host, tagline, copyright, colophon, action, meta }:
           className="grid border-t border-rule-faint sm:grid-cols-3 sm:gap-x-6 sm:gap-y-10 sm:pt-10 lg:grid-cols-6"
         >
           {FOOTER_SECTIONS.map((section) => (
-            <FooterGroup key={section} title={copy.sectionTitle(section)}>
+            <PhoneFold
+              key={section}
+              heading={copy.sectionTitle(section)}
+              headingClassName={cn(FOLD_HEADING_CLASS, 'sm:pb-3')}
+              toggleClassName={FOLD_TOGGLE_CLASS}
+              className="border-b border-rule-faint sm:border-b-0"
+              panelClassName="pb-3 sm:pb-0"
+            >
               <ul>
                 {footerEntries(section).map(({ key, route, group }) => {
                   const target = resolveRouteHref(route, host, locale);
@@ -195,27 +166,34 @@ export function SiteFooter({ host, tagline, copyright, colophon, action, meta }:
                   );
                 })}
               </ul>
-            </FooterGroup>
+            </PhoneFold>
           ))}
         </nav>
 
-        <div className="grid border-rule-faint sm:mt-10 sm:gap-y-3 sm:border-t sm:py-6">
+        {/* From 640px three rows under the directory; on phones one fold. */}
+        <PhoneFold
+          heading={navT('footer.linksAndLanguages')}
+          headingClassName={cn(FOLD_HEADING_CLASS, 'sm:sr-only')}
+          toggleClassName={FOLD_TOGGLE_CLASS}
+          className="border-b border-rule-faint sm:mt-10 sm:border-b-0 sm:border-t sm:py-6"
+          panelClassName="pb-1 sm:grid sm:gap-y-3 sm:pb-0"
+        >
           <OutboundRow group="ecosystem" />
           <OutboundRow group="community" />
-          <FooterGroup title={t('languageSwitcher.label')} layout="row">
+          <FooterRow title={t('languageSwitcher.label')}>
             <LanguageDirectory
               hideLabel
               className="max-sm:[&_ul]:grid max-sm:[&_ul]:grid-cols-2 max-sm:[&_ul]:gap-x-4 sm:[&_a]:min-h-8"
             />
-          </FooterGroup>
-        </div>
+          </FooterRow>
+        </PhoneFold>
 
-        <div className="flex flex-col gap-4 border-rule-faint py-6 sm:flex-row sm:items-center sm:justify-between sm:border-t">
+        <div className="flex flex-col gap-3 border-rule-faint pb-[calc(1.5rem+var(--dock-clearance,0px))] pt-5 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:border-t sm:pt-6">
           <div className="type-caption flex flex-col gap-1 text-subtle">
             <p>{copyright.replace('{year}', String(new Date().getFullYear()))}</p>
             {meta}
           </div>
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-0">
             {LEGAL_ROUTE_IDS.map((id) => {
               const target = resolveRouteHref(getSiteRoute(id), host, locale);
               return (
@@ -224,7 +202,7 @@ export function SiteFooter({ host, tagline, copyright, colophon, action, meta }:
                   href={target.href}
                   kind={target.kind}
                   prefetch="intent"
-                  className="link-quiet type-caption inline-flex min-h-10 items-center text-muted-foreground hover:text-foreground sm:min-h-8"
+                  className="link-quiet type-caption inline-flex min-h-8 items-center text-muted-foreground hover:text-foreground"
                 >
                   {copy.routeLabel(id)}
                 </SiteLink>
@@ -234,7 +212,7 @@ export function SiteFooter({ host, tagline, copyright, colophon, action, meta }:
               href={security.href}
               kind={security.kind}
               prefetch="intent"
-              className="type-eyebrow inline-flex min-h-10 items-center text-subtle transition-colors duration-150 hover:text-foreground sm:min-h-8"
+              className="type-eyebrow inline-flex min-h-8 items-center text-subtle transition-colors duration-150 hover:text-foreground"
             >
               {colophon}
             </SiteLink>

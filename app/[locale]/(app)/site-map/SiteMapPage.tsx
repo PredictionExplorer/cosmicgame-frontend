@@ -23,6 +23,7 @@ import {
 } from '@/config/siteNavIcons';
 import { HostDivider, NavRowContent } from '@/components/layout/NavRow';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { PhoneFold } from '@/components/layout/PhoneFold';
 import { SiteLink } from '@/components/layout/SiteLink';
 import { useSiteNavCopy } from '@/components/layout/useSiteNav';
 import { PageShell } from '@/components/ui/page-shell';
@@ -37,6 +38,12 @@ export interface SiteMapArticle {
 const ROW_CLASS =
   'group/row flex items-center gap-3 rounded-control px-2 py-2 no-underline transition-colors duration-150 hover:bg-muted sm:px-3';
 
+/**
+ * One section of the map. From 640px its rows are always listed; on phones
+ * they fold behind the section's heading (its one-line description stays),
+ * so the page reads as nine sections instead of six screens of rows. The
+ * rows stay in the HTML either way, as the crawl path for the header menus.
+ */
 function SiteMapSection({
   id,
   title,
@@ -54,14 +61,26 @@ function SiteMapSection({
   return (
     <section
       aria-labelledby={headingId}
-      className="mb-10 break-inside-avoid border-t border-rule pt-6"
+      className="break-inside-avoid border-t border-rule max-sm:border-rule-faint sm:mb-10 sm:pt-6"
     >
-      <h2 id={headingId} className="type-heading-3 flex items-center gap-2.5 text-foreground">
-        <Icon aria-hidden className="size-5 text-primary" />
-        {title}
-      </h2>
-      <p className="type-body-sm mt-1.5 text-muted-foreground">{description}</p>
-      <ul className="mt-4 flex flex-col gap-0.5">{children}</ul>
+      <PhoneFold
+        headingId={headingId}
+        heading={
+          <>
+            <Icon aria-hidden className="size-5 shrink-0 text-primary" />
+            {title}
+          </>
+        }
+        headingClassName="type-heading-3 flex items-center gap-2.5 text-foreground max-sm:min-h-12 max-sm:pr-10"
+        lead={
+          <p className="type-body-sm mt-1.5 text-muted-foreground max-sm:mt-0 max-sm:pb-4">
+            {description}
+          </p>
+        }
+        panelClassName="max-sm:pb-4"
+      >
+        <ul className="mt-4 flex flex-col gap-0.5 max-sm:mt-0">{children}</ul>
+      </PhoneFold>
     </section>
   );
 }
@@ -163,7 +182,7 @@ const SiteMapPage = ({ articles = [] }: SiteMapPageProps) => {
         subtitle={t('page.subtitle')}
         breadcrumbs={[{ label: t('page.home'), href: '/' }, { label: t('page.title') }]}
         align="left"
-        className="mb-10"
+        className="mb-10 max-sm:mb-4"
       />
 
       <div className="gap-x-12 md:columns-2 xl:columns-3">

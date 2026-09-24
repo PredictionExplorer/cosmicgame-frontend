@@ -108,7 +108,7 @@ export function ActionDock({
   return (
     <div className={cn('print:hidden', className)}>
       {/* Phones: the dock is the permanent bridge to the gesture panel. */}
-      <div className="fixed inset-x-3 bottom-3 z-40 lg:hidden">
+      <div data-action-dock className="fixed inset-x-3 bottom-3 z-40 lg:hidden">
         <section
           aria-label={t('observatory.dock.aria')}
           data-testid="action-dock-mobile"

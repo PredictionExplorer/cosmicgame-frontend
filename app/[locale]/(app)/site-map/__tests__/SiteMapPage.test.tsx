@@ -1,3 +1,5 @@
+import userEvent from '@testing-library/user-event';
+
 import { OUTBOUND_LINKS, SITE_ROUTES, SITE_SECTION_IDS, siteHostLabel } from '@/config/siteNav';
 import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { appSitemapRoutes } from '@/lib/seoRoutes';
@@ -84,6 +86,29 @@ describe('SiteMapPage', () => {
       const href = path === '' ? '/' : path;
       expect(document.querySelector(`a[href="${href}"]`)).not.toBeNull();
     }
+  });
+
+  it('folds each section on phones with CSS, keeping its line and its links in the HTML', async () => {
+    render(<SiteMapPage articles={ARTICLES} />);
+    const toggles = screen.getAllByRole('button', { expanded: false });
+    // Every section of the taxonomy, plus the ecosystem and community.
+    expect(toggles).toHaveLength(SITE_SECTION_IDS.length + 2);
+    for (const toggle of toggles) {
+      expect(toggle).toHaveClass('sm:hidden');
+      const panel = document.getElementById(toggle.getAttribute('aria-controls') ?? '')!;
+      expect(panel).toHaveClass('max-sm:hidden');
+      expect(within(panel).getAllByRole('link').length).toBeGreaterThan(0);
+    }
+    expect(screen.getByText('siteMap.sections.learn')).not.toHaveClass('max-sm:hidden');
+
+    const learn = screen.getByRole('button', { name: /nav\.sections\.learn/ });
+    await userEvent.setup().click(learn);
+    expect(learn).toHaveAttribute('aria-expanded', 'true');
+    expect(document.getElementById(learn.getAttribute('aria-controls') ?? '')).not.toHaveClass(
+      'max-sm:hidden',
+    );
+    // The section landmark is still named by its heading.
+    expect(screen.getByRole('region', { name: /nav\.sections\.learn/ })).toBeInTheDocument();
   });
 
   it('does not expose the hidden outreach transfer tool', () => {

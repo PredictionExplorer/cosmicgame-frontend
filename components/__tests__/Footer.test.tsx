@@ -7,7 +7,6 @@ import { FOOTER_SECTIONS, OUTBOUND_LINKS, footerRoutes } from '@/config/siteNav'
 import { LOCALE_LABELS, routing } from '@/i18n/routing';
 import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
 
-
 import { render, screen, checkA11y, within } from '@/test-utils';
 
 describe('Footer', () => {
@@ -99,8 +98,8 @@ describe('Footer', () => {
   it('folds each group on phones with CSS, so the server HTML needs no correction', () => {
     render(<Footer />);
     const toggles = screen.getAllByRole('button', { expanded: false });
-    // Six sections, ecosystem, community and language.
-    expect(toggles).toHaveLength(FOOTER_SECTIONS.length + 3);
+    // Six sections, and one fold for the ecosystem, community and language rows.
+    expect(toggles).toHaveLength(FOOTER_SECTIONS.length + 1);
     for (const toggle of toggles) {
       const panel = document.getElementById(toggle.getAttribute('aria-controls') ?? '');
       expect(panel).toHaveClass('max-sm:hidden');
@@ -121,6 +120,33 @@ describe('Footer', () => {
     expect(toggle).toHaveAttribute('aria-expanded', 'true');
     expect(panel).not.toHaveClass('max-sm:hidden');
     expect(within(panel!).getByRole('link', { name: 'nav.routes.siteMap.label' })).toBeVisible();
+  });
+
+  it('keeps the ecosystem, community and language rows in one phone fold', async () => {
+    render(<Footer />);
+    const toggle = screen.getByRole('button', { name: 'nav.footer.linksAndLanguages' });
+    // From 640px the fold's own heading is for screen readers only.
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'nav.footer.linksAndLanguages' }),
+    ).toHaveClass('sm:sr-only');
+    const panel = document.getElementById(toggle.getAttribute('aria-controls') ?? '')!;
+    for (const name of [
+      'nav.sections.ecosystem',
+      'nav.sections.community',
+      'common.languageSwitcher.label',
+    ]) {
+      expect(within(panel).getByRole('heading', { level: 3, name })).toBeInTheDocument();
+    }
+    await userEvent.setup().click(toggle);
+    expect(panel).not.toHaveClass('max-sm:hidden');
+  });
+
+  it('drops the tagline on phones and keeps the legal line clear of a fixed dock', () => {
+    render(<Footer />);
+    expect(screen.getByText('footer.tagline')).toHaveClass('max-sm:hidden');
+    const legal = screen.getByRole('link', { name: 'footer.colophon' }).parentElement!
+      .parentElement!;
+    expect(legal.className).toContain('var(--dock-clearance');
   });
 
   it('does not expose admin or internal tools', () => {

@@ -6,6 +6,7 @@ import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server
 
 import { getLandingContent } from '@/content/landing';
 
+import { LandingFooter } from '@/components/landing-v2/LandingFooter';
 import { routing } from '@/i18n/routing';
 import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { LANDING_CHROME_NAMESPACES, pickMessages } from '@/lib/i18n/clientMessages';
@@ -109,7 +110,7 @@ export default async function LandingRootLayout({ children, params }: LayoutProp
       }
     >
       <NextIntlClientProvider messages={chromeMessages}>
-        <LandingShell footer={footer} sections={sections}>
+        <LandingShell footer={<LandingFooter footer={footer} />} sections={sections}>
           {children}
         </LandingShell>
       </NextIntlClientProvider>

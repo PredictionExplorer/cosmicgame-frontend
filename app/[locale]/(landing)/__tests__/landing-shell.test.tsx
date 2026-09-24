@@ -2,6 +2,7 @@ import '@testing-library/jest-dom';
 
 import { getLandingContent } from '@/content/landing';
 
+import { LandingFooter } from '@/components/landing-v2/LandingFooter';
 import { routing } from '@/i18n/routing';
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 
@@ -17,7 +18,10 @@ const SECTIONS = { cycle: 'The Cycle', art: 'The Art', tracks: 'Allocation Track
 function renderShell(locale = 'en') {
   mockLocale.mockReturnValue(locale);
   return render(
-    <LandingShell footer={getLandingContent(locale).footer} sections={SECTIONS}>
+    <LandingShell
+      footer={<LandingFooter footer={getLandingContent(locale).footer} />}
+      sections={SECTIONS}
+    >
       <main id="main" tabIndex={-1}>
         <h1>Page content</h1>
       </main>
@@ -73,8 +77,9 @@ describe('Landing chrome', () => {
     expect(
       within(navigation).getByRole('link', { name: 'nav.routes.learnHub.label' }),
     ).toHaveAttribute('aria-current', 'true');
+    // Beside the wordmark, About goes by its compact name.
     expect(
-      within(navigation).getByRole('link', { name: 'nav.routes.about.label' }),
+      within(navigation).getByRole('link', { name: 'nav.routes.about.short' }),
     ).not.toHaveAttribute('aria-current');
   });
 
@@ -99,7 +104,10 @@ describe('Landing chrome', () => {
     mockPathname.mockReturnValue('/');
     mockLocale.mockReturnValue('en');
     render(
-      <LandingShell footer={getLandingContent('en').footer} sections={SECTIONS}>
+      <LandingShell
+        footer={<LandingFooter footer={getLandingContent('en').footer} />}
+        sections={SECTIONS}
+      >
         <main id="main" tabIndex={-1}>
           <section aria-labelledby="landing-headline">
             <h1 id="landing-headline">Hero</h1>

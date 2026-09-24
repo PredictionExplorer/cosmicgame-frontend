@@ -34,11 +34,8 @@ import { CookiesProvider } from 'react-cookie';
 import { Toaster } from 'sonner';
 import { MotionConfig } from 'framer-motion';
 
-import type { LandingContent } from '@/content/landing/types';
-
 import { NOTIFICATION_AUTO_HIDE_MS } from '@/config/constants';
 import ErrorBoundary from '@/components/layout/ErrorBoundary';
-import { LandingFooter } from '@/components/landing-v2/LandingFooter';
 import { LandingHeader, type LandingSectionLabels } from '@/components/landing-v2/LandingHeader';
 import { SkipLink } from '@/components/ui/skip-link';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -50,7 +47,11 @@ export function LandingShell({
   sections,
 }: {
   children: ReactNode;
-  footer: LandingContent['footer'];
+  /**
+   * The footer, rendered by the (server) landing layout: `<LandingFooter>`.
+   * A slot keeps the footer's directory out of this client bundle.
+   */
+  footer: ReactNode;
   /** The home page's section names, linked from the header on every page. */
   sections?: LandingSectionLabels;
 }) {
@@ -69,7 +70,7 @@ export function LandingShell({
               <div className="min-w-0 flex-1">
                 <ErrorBoundary>{children}</ErrorBoundary>
               </div>
-              <LandingFooter footer={footer} />
+              {footer}
             </div>
             <Toaster
               position="top-right"
