@@ -206,6 +206,7 @@ export function AllocationTracksBoard({ data, className }: AllocationTracksBoard
     >
       <SectionHeader
         as="h2"
+        size="panel"
         headingId="allocation-tracks-title"
         title={t('deck.board.title')}
         description={t('deck.board.subtitle')}
