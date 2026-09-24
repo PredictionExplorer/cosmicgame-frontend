@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
+import { waitForStableLayout } from './mobile-audit-helpers';
 import { dismissOpenTooltips, expectTooltipFullyVisible, openTooltip } from './tooltip-helpers';
 
 const ADDRESS = '0x1111111111111111111111111111111111111111';
@@ -267,6 +268,10 @@ test.describe('zh Sprint 5 — statistics, tables, and formatting', () => {
       '/zh/statistics',
       '统计：演绎周期、落笔、NFT 与 CST · Cosmic Signature',
     );
+    // The figure's explanation is a client island: a hover that lands before it hydrates
+    // opens nothing, so the page settles first (it used to be torn down and rebuilt by a
+    // hydration mismatch, which detached the trigger instead).
+    await waitForStableLayout(page);
     // The header figure's explanation is named after its label.
     const tooltipTrigger = page.getByRole('button', { name: '查看“当前演绎周期”的更多信息' });
     await tooltipTrigger.scrollIntoViewIfNeeded();
