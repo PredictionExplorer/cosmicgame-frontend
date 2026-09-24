@@ -34,7 +34,7 @@ export const TraitPill = React.forwardRef<HTMLSpanElement, TraitPillProps>(
           share ? (
             <>
               {valueLabel(traitKey, value)}
-              <span aria-hidden className="ml-1 text-muted-foreground/60">
+              <span aria-hidden className="ml-1 text-subtle">
                 {share.count}/{share.total}
               </span>
             </>

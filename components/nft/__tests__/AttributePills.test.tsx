@@ -32,7 +32,7 @@ describe('AttributePill', () => {
   });
 
   it.each([
-    ['neutral', 'border-white/[0.08]'],
+    ['neutral', 'border-rule'],
     ['aurora', 'border-[rgb(var(--aurora-cyan-rgb)/0.25)]'],
     ['nebula', 'border-[rgb(var(--nebula-violet-rgb)/0.25)]'],
     ['solar', 'border-[rgb(var(--solar-gold-rgb)/0.25)]'],

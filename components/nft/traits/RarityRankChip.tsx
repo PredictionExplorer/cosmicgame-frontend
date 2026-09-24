@@ -32,7 +32,7 @@ function tierClass(rank: number, total: number): string {
   if (percentile <= 0.25) {
     return 'border-[rgb(var(--nebula-violet-rgb)/0.35)] bg-[rgb(var(--nebula-violet-rgb)/0.14)] text-[#C77DFF]';
   }
-  return 'border-white/[0.08] bg-black/40 text-white/75';
+  return 'border-rule bg-art-ground/40 text-muted-foreground';
 }
 
 /**
@@ -65,7 +65,7 @@ export function RarityRankChip({
           role="img"
           className={cn(
             'inline-flex items-center gap-1 rounded-md border font-mono tabular-nums backdrop-blur-sm cursor-help',
-            size === 'sm' ? 'px-1.5 py-0.5 text-[10px]' : 'px-2 py-1 text-xs',
+            size === 'sm' ? 'px-1.5 py-0.5 type-caption' : 'px-2 py-1 text-xs',
             tierClass(rarity.rank, total),
             className,
           )}

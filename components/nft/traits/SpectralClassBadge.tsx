@@ -19,7 +19,7 @@ export interface SpectralClassBadgeProps {
 }
 
 const sizes: Record<NonNullable<SpectralClassBadgeProps['size']>, string> = {
-  sm: 'h-5 min-w-5 px-1 text-[10px]',
+  sm: 'h-5 min-w-5 px-1 type-caption',
   md: 'h-6 min-w-6 px-1.5 text-xs',
   lg: 'h-8 min-w-8 px-2 text-sm',
 };

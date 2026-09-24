@@ -72,7 +72,7 @@ const LatestNFTs = () => {
             </div>
           </>
         ) : (
-          <div className="mx-auto mt-8 max-w-lg rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 text-center">
+          <div className="mx-auto mt-8 max-w-lg rounded-surface border border-rule bg-surface p-6 text-center">
             <h3 className="font-display text-lg font-semibold text-foreground">
               {t('latestNfts.empty.title')}
             </h3>
