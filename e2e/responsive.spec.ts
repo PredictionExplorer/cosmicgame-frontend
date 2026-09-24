@@ -1,5 +1,35 @@
 import { test, expect } from '@playwright/test';
 
+import { MOBILE_AUDIT_SAMPLE_TEXT, mockMobileAuditApi } from './mobile-audit-fixtures';
+
+// lexicon-allow-start: the fixture mirrors sealed backend wire keys.
+/** A participant with history in every profile section, at the widest figures the UI takes. */
+const POPULATED_PROFILE = {
+  UserInfo: {
+    Address: MOBILE_AUDIT_SAMPLE_TEXT.longAddress,
+    NumBids: 12_345,
+    NumPrizes: 87,
+    MaxBidAmount: 1.2345678,
+    MaxWinAmount: 123.4567891,
+    CosmicSignatureNumTransfers: 42,
+    TotalCSTokensWon: 1_234_567.891,
+    SumRaffleEthWinnings: 12.3456789,
+    SumRaffleEthWithdrawal: 98.7654321,
+    UnclaimedNFTs: 3,
+    NumRaffleEthWinnings: 64,
+    RaffleNFTsCount: 21,
+    RewardNFTsCount: 9,
+    StakingStatisticsRWalk: {
+      TotalNumStakeActions: 30,
+      TotalNumUnstakeActions: 12,
+      TotalTokensStaked: 18,
+      TotalTokensMinted: 5,
+    },
+  },
+  Gestures: [],
+};
+// lexicon-allow-end
+
 async function expectNoHorizontalPageOverflow(page: import('@playwright/test').Page) {
   const { bodyWidth, viewportWidth } = await page.evaluate(() => ({
     bodyWidth: document.body.scrollWidth,
@@ -90,11 +120,22 @@ test.describe('Responsive - Mobile viewport', () => {
   test('a participant profile never widens the phone layout viewport', async ({ page }) => {
     // Regression (F139): a wide child on a populated profile widened the layout viewport,
     // so the fixed header pushed Connect off screen while scrollWidth still looked fine.
-    const response = await page.goto('/user/0xA169574D0d353E3010997A3E64846b7D1B2a63B6', {
+    // Deterministic: the dense table fixtures plus a populated user/info, not a live address.
+    await mockMobileAuditApi(page);
+    await page.route('**/api/cosmicgame/**', async (route) => {
+      if (!new URL(route.request().url()).pathname.includes('/user/info/')) {
+        await route.fallback();
+        return;
+      }
+      await route.fulfill({ json: POPULATED_PROFILE });
+    });
+    const response = await page.goto(`/user/${MOBILE_AUDIT_SAMPLE_TEXT.longAddress}`, {
       waitUntil: 'networkidle',
     });
     expect(response?.status()).toBe(200);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    // Populated: the fixture's gesture count is on the page.
+    await expect(page.getByText('12,345').first()).toBeVisible();
     await expectLayoutViewportFits(page);
   });
 
