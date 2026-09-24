@@ -15,20 +15,11 @@ import { DateTime } from '@/components/ui/date-time';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
 
-interface SystemEventPageProps {
-  /** The cycle the window opened before; 0 is the protocol's first setup. */
-  round: number;
-  /** The first and last event log ids of the window (from the mode change list). */
-  start: number;
-  end: number;
-}
+import { isValidWindow, type SystemEventWindow } from './systemEventWindow';
+
+type SystemEventPageProps = SystemEventWindow;
 
 const NO_EVENTS: AdminEventRow[] = [];
-
-/** A window the link can actually name: whole, non-negative, in order. */
-function isValidWindow({ round, start, end }: SystemEventPageProps): boolean {
-  return [round, start, end].every((n) => Number.isSafeInteger(n) && n >= 0) && start <= end;
-}
 
 /** The earliest and latest change of the window, in seconds. */
 function changeSpan(rows: readonly AdminEventRow[]): { first: number; latest: number } | null {

@@ -4,7 +4,10 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
+import { QuerySeed } from '../../../../QuerySeed';
+
 import SystemEventPage from './SystemEventPage';
+import { readSystemEventsSeed } from './systemEventsSeed';
 
 export async function generateMetadata(
   { params }: { params: Promise<{ locale: string; round: string; start: string; end: string }> },
@@ -35,9 +38,14 @@ export default async function Page({
 }) {
   const { locale, round, start, end } = await params;
   setRequestLocale(locale);
+  const window = { round: Number(round), start: Number(start), end: Number(end) };
+  // The window's first read, so its changes are in the HTML (no layout shift).
+  const seeds = await readSystemEventsSeed(window);
   return (
     <PageMessages namespaces={['coordination', 'statistics', 'tables']}>
-      <SystemEventPage round={Number(round)} start={Number(start)} end={Number(end)} />
+      <QuerySeed seeds={seeds}>
+        <SystemEventPage {...window} />
+      </QuerySeed>
     </PageMessages>
   );
 }
