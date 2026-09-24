@@ -11,8 +11,21 @@ jest.mock('@rainbow-me/rainbowkit');
 
 jest.mock('../../../nft/PaginationRWLKGrid', () => ({
   __esModule: true,
-  default: ({ selectedToken, labelledBy }: { selectedToken: number; labelledBy?: string }) => (
-    <div data-testid="rwlk-grid" data-selected={selectedToken} data-labelledby={labelledBy}>
+  default: ({
+    selectedToken,
+    labelledBy,
+    loading,
+  }: {
+    selectedToken: number;
+    labelledBy?: string;
+    loading: boolean;
+  }) => (
+    <div
+      data-testid="rwlk-grid"
+      data-selected={selectedToken}
+      data-labelledby={labelledBy}
+      data-loading={loading}
+    >
       RWLK grid
     </div>
   ),
@@ -178,7 +191,10 @@ describe('GesturePanel', () => {
     render(<GesturePanel {...baseProps} form={makeForm({ rwlknftIds: [] })} />);
 
     const rwlk = screen.getByTestId('panel-method-randomWalk');
-    expect(rwlk).toHaveClass('border-dashed');
+    // Subordinate by its muted price and its description, never by a dashed
+    // outline that reads as a broken or drop-zone state.
+    expect(rwlk.className).not.toMatch(/border-dashed/);
+    expect(screen.getByTestId('panel-method-randomWalk-cost')).toHaveClass('text-subtle');
     expect(rwlk).toHaveAccessibleDescription('home.form.method.randomWalk.desc');
     expect(screen.getByTestId('panel-method-explanation')).toHaveTextContent(
       'home.form.method.randomWalk.desc',
@@ -187,7 +203,8 @@ describe('GesturePanel', () => {
 
   it('treats ETH + Random Walk as a peer when the wallet holds an eligible NFT', () => {
     render(<GesturePanel {...baseProps} form={makeForm({ rwlknftIds: [7] })} />);
-    expect(screen.getByTestId('panel-method-randomWalk')).not.toHaveClass('border-dashed');
+    expect(screen.getByTestId('panel-method-randomWalk-cost')).toHaveClass('text-muted-foreground');
+    expect(screen.getByTestId('panel-method-randomWalk')).not.toHaveAccessibleDescription();
     expect(screen.getByTestId('panel-method-explanation')).toHaveTextContent(
       'home.orientation.methods.eth',
     );
@@ -205,6 +222,41 @@ describe('GesturePanel', () => {
       <GesturePanel {...baseProps} form={makeForm({ gestureType: 'RandomWalk', rwlkId: 42 })} />,
     );
     expect(submitButton()).toBeEnabled();
+  });
+
+  it('asks a visitor without a wallet to connect one instead of offering an empty search', () => {
+    render(
+      <GesturePanel
+        {...baseProps}
+        account={null}
+        form={makeForm({ gestureType: 'RandomWalk', rwlkListStatus: 'no-wallet' })}
+      />,
+    );
+    const picker = screen.getByTestId('panel-rwlk-picker');
+    expect(within(picker).getByText('home.form.rwlk.connect')).toBeVisible();
+    expect(screen.queryByTestId('rwlk-grid')).not.toBeInTheDocument();
+    // The method's own explanation already says what the NFT does.
+    expect(within(picker).queryByText('home.form.rwlk.tooltip')).not.toBeInTheDocument();
+  });
+
+  it("waits for the wallet's NFTs, and says so when they cannot be read", () => {
+    const { rerender } = render(
+      <GesturePanel
+        {...baseProps}
+        form={makeForm({ gestureType: 'RandomWalk', rwlkListStatus: 'loading' })}
+      />,
+    );
+    expect(screen.getByTestId('rwlk-grid')).toHaveAttribute('data-loading', 'true');
+
+    rerender(
+      <GesturePanel
+        {...baseProps}
+        form={makeForm({ gestureType: 'RandomWalk', rwlkListStatus: 'error' })}
+      />,
+    );
+    expect(screen.getByTestId('panel-rwlk-error')).toHaveAttribute('role', 'status');
+    expect(screen.getByTestId('panel-rwlk-error')).toHaveTextContent('home.form.rwlk.error');
+    expect(screen.queryByTestId('rwlk-grid')).not.toBeInTheDocument();
   });
 
   /* ── What the Gesture imprints ──────────────────────────────── */

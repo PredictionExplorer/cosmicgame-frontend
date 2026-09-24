@@ -297,8 +297,10 @@
     },
     "rwlk": {
       "title": "Random Walk NFT của bạn",
-      "tooltipAria": "Về mức giảm chi phí nét bút với RandomWalk",
-      "tooltip": "Đính kèm một RandomWalk NFT vào nét bút ETH để được giảm 50% chi phí nét bút. Mỗi NFT chỉ dùng được một lần."
+      "connect": "Kết nối ví để xem danh sách Random Walk NFT trong ví.",
+      "error": "Không đọc được Random Walk NFT của ví này. Hãy thử lại sau ít phút.",
+      "tooltipAria": "Về mức giảm chi phí nét bút với Random Walk",
+      "tooltip": "Đính kèm một Random Walk NFT vào nét bút ETH để được giảm 50% chi phí nét bút. Mỗi NFT chỉ dùng được một lần."
     },
     "cstTrade": "Cần CST cho phương thức nét bút này? Hoán đổi ETH sang CST trên Arbitrum qua Uniswap.",
     "reward": {
@@ -728,9 +730,11 @@
   },
   "rwlkGrid": {
     "searchPlaceholder": "Nhập mã NFT",
-    "searchAria": "Tìm RandomWalk NFT theo mã",
-    "tokenAria": "RandomWalk NFT {id}",
-    "empty": "Không tìm thấy NFT phù hợp"
+    "searchAria": "Tìm Random Walk NFT theo mã",
+    "tokenAria": "Random Walk NFT {id}",
+    "empty": "Không tìm thấy NFT phù hợp",
+    "none": "Ví này không có Random Walk NFT nào chưa dùng.",
+    "loading": "Đang đọc Random Walk NFT của ví này…"
   },
   "orientation": {
     "title": "Cách chu kỳ hoạt động",
@@ -741,7 +745,7 @@
     "methods": {
       "eth": "Thanh toán chi phí nét bút hiện tại bằng ETH.",
       "cst": "Dùng CST sẵn có trong ví. Chi phí trực tiếp thay đổi theo thời gian.",
-      "randomWalk": "Dùng RandomWalk NFT đủ điều kiện để giảm chi phí nét bút ETH. NFT vẫn ở trong ví."
+      "randomWalk": "Dùng Random Walk NFT đủ điều kiện để giảm chi phí nét bút ETH. NFT vẫn ở trong ví."
     },
     "connectHelp": "Kết nối ví trên Arbitrum để xem lại và xác nhận nét bút."
   },

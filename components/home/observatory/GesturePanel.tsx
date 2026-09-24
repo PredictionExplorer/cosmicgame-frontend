@@ -19,7 +19,7 @@ import { UnknownValue } from '@/components/ui/unknown-value';
 import { ConnectWalletAction } from '@/components/wallet/ConnectWalletAction';
 import { FundingNotice } from '@/components/wallet/FundingNotice';
 import { ChainGuard } from '@/components/wallet/NetworkGuard';
-import type { EthGestureInfo } from '@/hooks/useGestureForm';
+import type { EthGestureInfo, RwlkListStatus } from '@/hooks/useGestureForm';
 import { useTxStageLabel, type TxStage } from '@/hooks/useTxFlow';
 import { cn } from '@/lib/utils';
 import type { DashboardInfo } from '@/services/api/types';
@@ -74,6 +74,8 @@ export interface GesturePanelFormState {
   advancedExpanded: boolean;
   setAdvancedExpanded: (value: boolean) => void;
   rwlknftIds: number[];
+  /** Where the read of `rwlknftIds` stands; absent means it has been read. */
+  rwlkListStatus?: RwlkListStatus;
   ethGestureInfo: EthGestureInfo | null;
   gestureCstRewardAmount?: number | null;
   gestureCstRewardAmountMin?: number | null;
@@ -204,6 +206,7 @@ export function GesturePanel({
     advancedExpanded,
     setAdvancedExpanded,
     rwlknftIds,
+    rwlkListStatus = 'ready',
     ethGestureInfo,
     gestureCstRewardAmount = null,
     gestureCstRewardAmountMin = null,
@@ -309,22 +312,35 @@ export function GesturePanel({
         showLabel={isSheet}
       />
 
+      {/* The method's explanation above already says what the NFT does;
+          the picker says only where the wallet's NFTs stand. */}
       {gestureType === 'RandomWalk' && (
         <div data-testid="panel-rwlk-picker" className="min-w-0">
           <h3 id={`rwlk-picker-title-${variant}`} className="type-label text-foreground">
             {t('form.rwlk.title')}
           </h3>
-          <p className="type-caption mt-1 text-subtle">{t('form.rwlk.tooltip')}</p>
-          <div className="mt-3">
+          {!account || rwlkListStatus === 'no-wallet' ? (
+            <p data-testid="panel-rwlk-connect" className="type-caption mt-1 text-subtle">
+              {t('form.rwlk.connect')}
+            </p>
+          ) : rwlkListStatus === 'error' ? (
+            <p
+              data-testid="panel-rwlk-error"
+              role="status"
+              className="type-caption mt-1 text-subtle"
+            >
+              {t('form.rwlk.error')}
+            </p>
+          ) : (
             <PaginationRWLKGrid
               compact={!isSheet}
-              loading={false}
+              loading={rwlkListStatus === 'loading'}
               data={rwlknftIds}
               selectedToken={rwlkId}
               setSelectedToken={setRwlkId}
               labelledBy={`rwlk-picker-title-${variant}`}
             />
-          </div>
+          )}
         </div>
       )}
 

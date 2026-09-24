@@ -25,19 +25,34 @@ jest.mock(
 import PaginationRWLKGrid from '../PaginationRWLKGrid';
 
 describe('PaginationRWLKGrid', () => {
-  it('renders loading spinner', () => {
-    const { container } = render(<PaginationRWLKGrid loading={true} data={[]} />);
-    expect(container.querySelector('.animate-spin')).toBeInTheDocument();
+  it('says the wallet’s NFTs are loading, with nothing to search yet', () => {
+    render(<PaginationRWLKGrid loading={true} data={[]} />);
+    expect(screen.getByRole('status')).toHaveTextContent('home.rwlkGrid.loading');
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
+    expect(screen.queryByText('home.rwlkGrid.empty')).not.toBeInTheDocument();
   });
 
-  it('renders empty state when no data', () => {
+  it('says a wallet without NFTs holds none, never that a search found nothing', () => {
     render(<PaginationRWLKGrid loading={false} data={[]} />);
-    expect(screen.getByText('home.rwlkGrid.empty')).toBeInTheDocument();
+    expect(screen.getByText('home.rwlkGrid.none')).toBeInTheDocument();
+    expect(screen.queryByText('home.rwlkGrid.empty')).not.toBeInTheDocument();
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
   });
 
   it('renders search input', () => {
-    render(<PaginationRWLKGrid loading={false} data={[]} />);
+    render(<PaginationRWLKGrid loading={false} data={[10]} />);
     expect(screen.getByPlaceholderText('home.rwlkGrid.searchPlaceholder')).toBeInTheDocument();
+    // The first paint already lists the NFTs: no "no match" flash.
+    expect(screen.queryByText('home.rwlkGrid.empty')).not.toBeInTheDocument();
+  });
+
+  it('says so when a search matches no NFT', () => {
+    render(<PaginationRWLKGrid loading={false} data={[10, 20]} />);
+    fireEvent.change(screen.getByPlaceholderText('home.rwlkGrid.searchPlaceholder'), {
+      target: { value: '99' },
+    });
+    expect(screen.queryAllByTestId('rwlk-card')).toHaveLength(0);
+    expect(screen.getByRole('status')).toHaveTextContent('home.rwlkGrid.empty');
   });
 
   it('renders RWLK NFT cards when data is provided', () => {
@@ -147,10 +162,9 @@ describe('PaginationRWLKGrid', () => {
   });
 
   it('labels the search field and keeps its icon out of the accessibility tree', () => {
-    const { container } = render(<PaginationRWLKGrid loading={false} data={[]} />);
+    const { container } = render(<PaginationRWLKGrid loading={false} data={[10]} />);
     expect(screen.getByRole('searchbox', { name: 'home.rwlkGrid.searchAria' })).toBeInTheDocument();
     expect(container.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
-    expect(container.querySelector('img')).toBeNull();
   });
 
   it('search input filters displayed items', () => {
@@ -214,6 +228,11 @@ describe('PaginationRWLKGrid', () => {
 
   it('has no accessibility violations', async () => {
     const { container } = render(<PaginationRWLKGrid loading={false} data={[]} />);
+    await checkA11y(container);
+  });
+
+  it('has no accessibility violations while loading', async () => {
+    const { container } = render(<PaginationRWLKGrid loading data={[]} />);
     await checkA11y(container);
   });
 

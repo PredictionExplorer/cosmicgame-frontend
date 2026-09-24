@@ -267,9 +267,9 @@ test.describe('Wallet connection state (disconnected)', () => {
     );
     const tokenPicker = panel.getByTestId('panel-rwlk-picker');
     await expect(tokenPicker.getByRole('heading', { name: home.form.rwlk.title })).toBeVisible();
-    const tokenSearch = tokenPicker.getByPlaceholder(home.rwlkGrid.searchPlaceholder);
-    await tokenSearch.fill('42');
-    await expect(tokenSearch).toHaveValue('42');
+    // Without a wallet there is nothing to search: the picker says what lists the NFTs.
+    await expect(tokenPicker.getByText(home.form.rwlk.connect)).toBeVisible();
+    await expect(tokenPicker.getByPlaceholder(home.rwlkGrid.searchPlaceholder)).toHaveCount(0);
     await expect(message).toHaveValue(draft);
     await expect(
       panel.locator(isMobile ? '#gesture-submit-sheet' : '#gesture-submit'),
@@ -296,7 +296,6 @@ test.describe('Wallet connection state (disconnected)', () => {
     expect(expandedBox.x).toBeCloseTo(messageBox.x, 0);
     expect(expandedBox.width).toBeCloseTo(messageBox.width, 0);
     await expect(message).toHaveValue(draft);
-    await expect(tokenSearch).toHaveValue('42');
 
     // The visible label is the checkbox's name.
     const acceptAnyReward = advanced.getByRole('checkbox', {
@@ -322,7 +321,7 @@ test.describe('Wallet connection state (disconnected)', () => {
     await expect(advancedTrigger).toHaveAttribute('aria-expanded', 'false');
     await expect(advanced.getByRole('region')).toBeHidden();
     await expect(message).toHaveValue(revisedDraft);
-    await expect(tokenSearch).toHaveValue('42');
+    await expect(tokenPicker.getByText(home.form.rwlk.connect)).toBeVisible();
     await advancedTrigger.click();
     await expect(acceptAnyReward).toBeChecked();
     await expect(message).toHaveValue(revisedDraft);

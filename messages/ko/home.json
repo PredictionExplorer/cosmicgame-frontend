@@ -297,8 +297,10 @@
     },
     "rwlk": {
       "title": "내 Random Walk NFT",
-      "tooltipAria": "RandomWalk 제스처 할인 안내",
-      "tooltip": "ETH 제스처에 RandomWalk NFT를 첨부하면 제스처 비용이 50% 할인됩니다. 각 NFT는 한 번만 사용할 수 있습니다."
+      "connect": "지갑을 연결하면 보유한 Random Walk NFT 목록이 표시됩니다.",
+      "error": "이 지갑의 Random Walk NFT를 읽지 못했습니다. 잠시 후 다시 시도하십시오.",
+      "tooltipAria": "Random Walk 제스처 할인 안내",
+      "tooltip": "ETH 제스처에 Random Walk NFT를 첨부하면 제스처 비용이 50% 할인됩니다. 각 NFT는 한 번만 사용할 수 있습니다."
     },
     "cstTrade": "이 제스처 방식에 필요한 CST가 부족하다면 Uniswap을 통해 Arbitrum에서 ETH를 CST로 교환할 수 있습니다.",
     "reward": {
@@ -728,9 +730,11 @@
   },
   "rwlkGrid": {
     "searchPlaceholder": "NFT ID 입력",
-    "searchAria": "ID로 RandomWalk NFT 검색",
-    "tokenAria": "RandomWalk NFT {id}",
-    "empty": "검색 결과가 없습니다"
+    "searchAria": "ID로 Random Walk NFT 검색",
+    "tokenAria": "Random Walk NFT {id}",
+    "empty": "검색 결과가 없습니다",
+    "none": "이 지갑에는 사용하지 않은 Random Walk NFT가 없습니다.",
+    "loading": "이 지갑의 Random Walk NFT 읽는 중…"
   },
   "orientation": {
     "title": "사이클 작동 원리",
@@ -741,7 +745,7 @@
     "methods": {
       "eth": "현재 제스처 비용을 ETH로 지불합니다.",
       "cst": "지갑에 있는 CST를 사용합니다. 실시간 비용은 시간에 따라 달라집니다.",
-      "randomWalk": "사용 가능한 RandomWalk NFT로 ETH 제스처 비용을 줄입니다. NFT는 지갑에 그대로 남습니다."
+      "randomWalk": "사용 가능한 Random Walk NFT로 ETH 제스처 비용을 줄입니다. NFT는 지갑에 그대로 남습니다."
     },
     "connectHelp": "Arbitrum 지갑을 연결하면 제스처를 검토하고 확인할 수 있습니다."
   },

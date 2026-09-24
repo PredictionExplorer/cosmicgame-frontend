@@ -297,8 +297,10 @@
     },
     "rwlk": {
       "title": "Your Random Walk NFTs",
-      "tooltipAria": "About RandomWalk gesture discounts",
-      "tooltip": "Attach a RandomWalk NFT to an ETH gesture to receive a 50% Gesture Cost reduction. Each NFT can only be used once."
+      "connect": "Connect a wallet to list the Random Walk NFTs it holds.",
+      "error": "Could not read this wallet’s Random Walk NFTs. Try again in a moment.",
+      "tooltipAria": "About Random Walk Gesture discounts",
+      "tooltip": "Attach a Random Walk NFT to an ETH Gesture to receive a 50% Gesture Cost reduction. Each NFT can only be used once."
     },
     "cstTrade": "Need CST for this gesture method? Trade ETH for CST on Arbitrum through Uniswap.",
     "reward": {
@@ -728,9 +730,11 @@
   },
   "rwlkGrid": {
     "searchPlaceholder": "Enter NFT ID",
-    "searchAria": "Find a RandomWalk NFT by ID",
-    "tokenAria": "RandomWalk NFT {id}",
-    "empty": "No matching NFT found"
+    "searchAria": "Find a Random Walk NFT by ID",
+    "tokenAria": "Random Walk NFT {id}",
+    "empty": "No matching NFT found",
+    "none": "This wallet holds no unused Random Walk NFT.",
+    "loading": "Reading this wallet’s Random Walk NFTs…"
   },
   "orientation": {
     "title": "How this cycle works",
@@ -741,7 +745,7 @@
     "methods": {
       "eth": "Pay the current Gesture Cost in ETH.",
       "cst": "Use CST already in your wallet. The live cost changes over time.",
-      "randomWalk": "Use an eligible RandomWalk NFT for a reduced ETH Gesture Cost. The NFT stays in your wallet."
+      "randomWalk": "Use an eligible Random Walk NFT for a reduced ETH Gesture Cost. The NFT stays in your wallet."
     },
     "connectHelp": "Connect a wallet on Arbitrum to review and confirm your Gesture."
   },

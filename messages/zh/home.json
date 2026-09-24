@@ -297,6 +297,8 @@
     },
     "rwlk": {
       "title": "你的 Random Walk NFT",
+      "connect": "连接钱包后，即可列出其中的 Random Walk NFT。",
+      "error": "未能读取此钱包的 Random Walk NFT，请稍后重试。",
       "tooltipAria": "了解 Random Walk 落笔价格减半规则",
       "tooltip": "ETH 落笔附加一枚 Random Walk NFT，落笔价格即减半。每枚 NFT 仅可使用一次。"
     },
@@ -728,9 +730,11 @@
   },
   "rwlkGrid": {
     "searchPlaceholder": "输入 NFT ID",
-    "searchAria": "按 ID 查找 RandomWalk NFT",
-    "tokenAria": "RandomWalk NFT 编号 {id}",
-    "empty": "未找到匹配的 NFT"
+    "searchAria": "按 ID 查找 Random Walk NFT",
+    "tokenAria": "Random Walk NFT 编号 {id}",
+    "empty": "未找到匹配的 NFT",
+    "none": "此钱包没有未使用过的 Random Walk NFT。",
+    "loading": "正在读取此钱包的 Random Walk NFT…"
   },
   "orientation": {
     "title": "周期如何运作",
@@ -741,7 +745,7 @@
     "methods": {
       "eth": "用 ETH 支付当前落笔价格。",
       "cst": "使用钱包中已有的 CST。实时价格会随时间变化。",
-      "randomWalk": "使用符合条件的 RandomWalk NFT，降低 ETH 落笔价格。NFT 仍保留在钱包中。"
+      "randomWalk": "使用符合条件的 Random Walk NFT，降低 ETH 落笔价格。NFT 仍保留在钱包中。"
     },
     "connectHelp": "连接 Arbitrum 钱包，查看并确认你的落笔。"
   },

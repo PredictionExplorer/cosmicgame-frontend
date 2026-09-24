@@ -297,8 +297,10 @@
     },
     "rwlk": {
       "title": "Ваші Random Walk NFT",
-      "tooltipAria": "Про знижки RandomWalk на жести",
-      "tooltip": "Долучіть RandomWalk NFT до ETH-жесту, щоб зменшити вартість жесту на 50%. Кожен NFT можна використати лише раз."
+      "connect": "Під’єднайте гаманець, щоб побачити Random Walk NFT у ньому.",
+      "error": "Не вдалося прочитати Random Walk NFT цього гаманця. Спробуйте трохи згодом.",
+      "tooltipAria": "Про знижки Random Walk на жести",
+      "tooltip": "Долучіть Random Walk NFT до ETH-жесту, щоб зменшити вартість жесту на 50%. Кожен NFT можна використати лише раз."
     },
     "cstTrade": "Потрібні CST для цього способу жесту? Обміняйте ETH на CST через Uniswap у мережі Arbitrum.",
     "reward": {
@@ -728,9 +730,11 @@
   },
   "rwlkGrid": {
     "searchPlaceholder": "Введіть ID NFT",
-    "searchAria": "Знайти RandomWalk NFT за ID",
-    "tokenAria": "RandomWalk NFT {id}",
-    "empty": "Нічого не знайдено"
+    "searchAria": "Знайти Random Walk NFT за ID",
+    "tokenAria": "Random Walk NFT {id}",
+    "empty": "Нічого не знайдено",
+    "none": "У цьому гаманці немає невикористаних Random Walk NFT.",
+    "loading": "Читаємо Random Walk NFT цього гаманця…"
   },
   "orientation": {
     "title": "Як працює цикл",
@@ -741,7 +745,7 @@
     "methods": {
       "eth": "Сплатіть поточну вартість жесту в ETH.",
       "cst": "Використайте CST у гаманці. Поточна вартість змінюється з часом.",
-      "randomWalk": "Використайте придатний RandomWalk NFT для зменшення вартості ETH-жесту. NFT залишається в гаманці."
+      "randomWalk": "Використайте придатний Random Walk NFT для зменшення вартості ETH-жесту. NFT залишається в гаманці."
     },
     "connectHelp": "Під’єднайте гаманець у мережі Arbitrum, щоб переглянути та підтвердити жест."
   },

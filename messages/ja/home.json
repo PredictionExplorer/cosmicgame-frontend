@@ -297,8 +297,10 @@
     },
     "rwlk": {
       "title": "自分のRandom Walk NFT",
-      "tooltipAria": "RandomWalkによる一筆の割引について",
-      "tooltip": "RandomWalk NFTをETH一筆に添付すると、一筆の費用が50%引き下げられます。各NFTは一度しか使えません。"
+      "connect": "ウォレットを接続すると、保有しているRandom Walk NFTが一覧表示されます。",
+      "error": "このウォレットのRandom Walk NFTを読み込めませんでした。しばらくしてからもう一度お試しください。",
+      "tooltipAria": "Random Walkによる一筆の割引について",
+      "tooltip": "Random Walk NFTをETH一筆に添付すると、一筆の費用が50%引き下げられます。各NFTは一度しか使えません。"
     },
     "cstTrade": "この方法で一筆を入れるにはCSTが必要ですか？Uniswapを通じてArbitrum上でETHをCSTに交換できます。",
     "reward": {
@@ -728,9 +730,11 @@
   },
   "rwlkGrid": {
     "searchPlaceholder": "NFT IDを入力",
-    "searchAria": "IDでRandomWalk NFTを検索",
-    "tokenAria": "RandomWalk NFT {id}",
-    "empty": "見つかりませんでした"
+    "searchAria": "IDでRandom Walk NFTを検索",
+    "tokenAria": "Random Walk NFT {id}",
+    "empty": "見つかりませんでした",
+    "none": "このウォレットには未使用のRandom Walk NFTがありません。",
+    "loading": "このウォレットのRandom Walk NFTを読み込み中…"
   },
   "orientation": {
     "title": "サイクルの仕組み",
@@ -741,7 +745,7 @@
     "methods": {
       "eth": "現在の一筆の費用をETHで支払います。",
       "cst": "ウォレット内のCSTを使います。現在のコストは時間とともに変わります。",
-      "randomWalk": "対象のRandomWalk NFTでETH一筆の費用を減らせます。NFTはウォレットに残ります。"
+      "randomWalk": "対象のRandom Walk NFTでETH一筆の費用を減らせます。NFTはウォレットに残ります。"
     },
     "connectHelp": "Arbitrumのウォレットを接続して、一筆の内容を確認できます。"
   },
