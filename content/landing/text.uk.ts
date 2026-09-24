@@ -323,58 +323,8 @@ export const landingTextUk = {
   },
 
   footer: {
-    brandName: 'Cosmic Signature',
-    logoAlt: 'Cosmic Signature',
     tagline: 'Процедурний протокол ончейн-мистецтва на Arbitrum.',
-    columns: {
-      protocol: {
-        heading: 'Протокол',
-        links: {
-          app: 'Відкрити застосунок',
-          about: 'Про проєкт',
-          learn: 'Навчальний центр',
-          quiz: 'Тест знань',
-          'how-it-works': 'Документація',
-          contracts: 'Контракти',
-          code: 'Вихідний код',
-          audits: 'Аудит безпеки',
-        },
-      },
-      ecosystem: {
-        heading: 'Екосистема',
-        links: {
-          marketplace: 'Маркетплейс Axiom Zero',
-          predictions: 'Прогнози Chaos Zero',
-          uniswap: 'CST на Uniswap',
-          geckoterminal: 'Пул CST (GeckoTerminal)',
-        },
-      },
-      community: {
-        heading: 'Спільнота',
-        links: {
-          twitter: 'X / Twitter',
-          discord: 'Discord',
-          github: 'GitHub',
-          'protocol-guild': 'Protocol Guild',
-        },
-      },
-      legal: {
-        heading: 'Правова інформація',
-        links: {
-          terms: 'Умови',
-          privacy: 'Конфіденційність',
-          faq: 'Поширені запитання',
-        },
-      },
-    },
     copyright: '© {year} Cosmic Signature. Власні матеріали проєкту: CC0 1.0.',
     colophon: 'CC0 1.0 · Публічно верифіковано · Відтворюване мистецтво',
-  },
-
-  notFound: {
-    heading: 'Сторінку не знайдено.',
-    description:
-      'Сторінки не існує або її перенесено. Поверніться на головну, щоб продовжити знайомство з проєктом.',
-    ctaLabel: 'На головну',
   },
 } satisfies LandingText;

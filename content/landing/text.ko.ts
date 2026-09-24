@@ -323,57 +323,8 @@ export const landingTextKo = {
   },
 
   footer: {
-    brandName: 'Cosmic Signature',
-    logoAlt: 'Cosmic Signature',
     tagline: 'Arbitrum 위의 절차적 온체인 아트 프로토콜.',
-    columns: {
-      protocol: {
-        heading: '프로토콜',
-        links: {
-          app: '앱 열기',
-          about: '소개',
-          learn: '학습 센터',
-          quiz: '지식 퀴즈',
-          'how-it-works': '문서',
-          contracts: '컨트랙트',
-          code: '소스 코드',
-          audits: '보안 감사',
-        },
-      },
-      ecosystem: {
-        heading: '생태계',
-        links: {
-          marketplace: 'Axiom Zero 마켓플레이스',
-          predictions: 'Chaos Zero 예측',
-          uniswap: 'Uniswap에서 CST 거래',
-          geckoterminal: 'GeckoTerminal에서 CST 풀 보기',
-        },
-      },
-      community: {
-        heading: '커뮤니티',
-        links: {
-          twitter: 'X / Twitter',
-          discord: 'Discord',
-          github: 'GitHub',
-          'protocol-guild': 'Protocol Guild',
-        },
-      },
-      legal: {
-        heading: '법적 고지',
-        links: {
-          terms: '이용약관',
-          privacy: '개인정보 처리방침',
-          faq: '자주 묻는 질문',
-        },
-      },
-    },
     copyright: '© {year} Cosmic Signature. 프로젝트 소유 자료: CC0 1.0.',
     colophon: 'CC0 1.0 · 공개 검증 가능 · 재현 가능한 아트',
-  },
-
-  notFound: {
-    heading: '별 지도 밖입니다.',
-    description: '요청한 페이지를 찾을 수 없습니다. 시그니처의 세계로 돌아가 주세요.',
-    ctaLabel: '시그니처로 돌아가기',
   },
 } satisfies LandingText;

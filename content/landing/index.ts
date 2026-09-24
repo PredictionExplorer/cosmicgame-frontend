@@ -9,7 +9,7 @@ import { landingTextVi } from './text.vi';
 import { landingTextZh } from './text.zh';
 import { landingTextZhHk } from './text.zh-HK';
 import { landingTextZhTw } from './text.zh-TW';
-import type { LandingContent, LandingFooterColumn, LandingTrackItem } from './types';
+import type { LandingContent, LandingTrackItem } from './types';
 
 export * from './types';
 export * from './structure';
@@ -28,9 +28,6 @@ function buildLandingContent(text: LandingText): LandingContent {
   >;
   const tableRowTexts = text.publicGoods.card.tableRows as Readonly<
     Record<string, { label: string; value?: string }>
-  >;
-  const footerColumnTexts = text.footer.columns as Readonly<
-    Record<string, { heading: string; links: Readonly<Record<string, string>> }>
   >;
 
   return {
@@ -127,27 +124,9 @@ function buildLandingContent(text: LandingText): LandingContent {
     verifiability: text.verifiability,
     faq: text.faq,
     footer: {
-      brandName: text.footer.brandName,
-      logoAlt: text.footer.logoAlt,
       tagline: text.footer.tagline,
-      columns: LANDING_STRUCTURE.footer.columns.map((column): LandingFooterColumn => {
-        const columnText = footerColumnTexts[column.id]!;
-        return {
-          heading: columnText.heading,
-          links: column.links.map((link) => ({
-            label: columnText.links[link.id]!,
-            href: link.href,
-          })),
-        };
-      }),
       copyright: text.footer.copyright,
       colophon: text.footer.colophon,
-    },
-    notFound: {
-      code: LANDING_STRUCTURE.notFound.code,
-      heading: text.notFound.heading,
-      description: text.notFound.description,
-      cta: { label: text.notFound.ctaLabel, href: LANDING_STRUCTURE.notFound.ctaHref },
     },
   };
 }

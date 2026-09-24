@@ -1,9 +1,5 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
-import { CST_GECKOTERMINAL_POOL_URL } from '@/config/geckoterminal';
-import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
-import { CHAOS_ZERO_PREDICTIONS_URL } from '@/config/predictions';
-import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 import { APP_ORIGIN } from '@/lib/hostRouting';
 
 import type {
@@ -56,16 +52,6 @@ interface LandingTableRowStructure {
   readonly id: string;
   /** Present only when the value string is byte-identical across locales. */
   readonly value?: string;
-}
-
-interface LandingFooterLinkStructure {
-  readonly id: string;
-  readonly href: string;
-}
-
-interface LandingFooterColumnStructure {
-  readonly id: string;
-  readonly links: readonly LandingFooterLinkStructure[];
 }
 
 export const LANDING_STRUCTURE = {
@@ -127,53 +113,6 @@ export const LANDING_STRUCTURE = {
     ],
     ctaHref: 'https://protocol-guild.readthedocs.io',
   },
-  footer: {
-    columns: [
-      {
-        id: 'protocol',
-        links: [
-          { id: 'app', href: APP_ORIGIN },
-          { id: 'about', href: '/about' },
-          { id: 'learn', href: '/learn' },
-          { id: 'quiz', href: '/quiz' },
-          { id: 'how-it-works', href: `${APP_ORIGIN}/how-it-works` },
-          { id: 'contracts', href: `${APP_ORIGIN}/contracts` },
-          { id: 'code', href: `${APP_ORIGIN}/code` },
-          { id: 'audits', href: `${APP_ORIGIN}/audits` },
-        ],
-      },
-      {
-        id: 'ecosystem',
-        links: [
-          { id: 'marketplace', href: COSMIC_SIGNATURE_MARKETPLACE_URL },
-          { id: 'predictions', href: CHAOS_ZERO_PREDICTIONS_URL },
-          { id: 'uniswap', href: CST_UNISWAP_SWAP_URL },
-          { id: 'geckoterminal', href: CST_GECKOTERMINAL_POOL_URL },
-        ],
-      },
-      {
-        id: 'community',
-        links: [
-          { id: 'twitter', href: 'https://x.com/CosmicSignature' },
-          { id: 'discord', href: 'https://discord.gg/bGnPn96Qwt' },
-          { id: 'github', href: 'https://github.com/PredictionExplorer' },
-          { id: 'protocol-guild', href: 'https://protocol-guild.readthedocs.io' },
-        ],
-      },
-      {
-        id: 'legal',
-        links: [
-          { id: 'terms', href: `${APP_ORIGIN}/terms` },
-          { id: 'privacy', href: `${APP_ORIGIN}/privacy` },
-          { id: 'faq', href: '#faq' },
-        ],
-      },
-    ],
-  },
-  notFound: {
-    code: '404',
-    ctaHref: '/',
-  },
 } as const satisfies {
   readonly hero: {
     readonly primaryCtaHref: string;
@@ -193,8 +132,6 @@ export const LANDING_STRUCTURE = {
     readonly cardTableRows: readonly LandingTableRowStructure[];
     readonly ctaHref: string;
   };
-  readonly footer: { readonly columns: readonly LandingFooterColumnStructure[] };
-  readonly notFound: { readonly code: string; readonly ctaHref: string };
 };
 
 type LandingStructure = typeof LANDING_STRUCTURE;
@@ -204,7 +141,6 @@ type ArtStageStructure = LandingStructure['art']['stages'][number];
 type ArtFactStructure = LandingStructure['art']['facts'][number];
 type TrackItemStructure = LandingStructure['tracks']['items'][number];
 type TableRowStructure = LandingStructure['publicGoods']['cardTableRows'][number];
-type FooterColumnStructure = LandingStructure['footer']['columns'][number];
 
 export type LandingCycleStageId = CycleStageStructure['id'];
 export type LandingArtStageId = ArtStageStructure['id'];
@@ -315,23 +251,8 @@ export type LandingText = {
   readonly verifiability: LandingVerifiabilityContent;
   readonly faq: LandingFaqContent;
   readonly footer: {
-    readonly brandName: string;
-    readonly logoAlt: string;
     readonly tagline: string;
-    readonly columns: {
-      readonly [Column in FooterColumnStructure as Column['id']]: {
-        readonly heading: string;
-        readonly links: {
-          readonly [Link in Column['links'][number] as Link['id']]: string;
-        };
-      };
-    };
     readonly copyright: string;
     readonly colophon: string;
-  };
-  readonly notFound: {
-    readonly heading: string;
-    readonly description: string;
-    readonly ctaLabel: string;
   };
 };

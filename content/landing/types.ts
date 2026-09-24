@@ -171,21 +171,24 @@ export interface LandingFaqContent {
   readonly items: readonly LandingFaqItem[];
 }
 
+/**
+ * @deprecated The landing footer renders the shared navigation taxonomy
+ * (config/siteNav.ts via SiteFooter); landing copy no longer has columns.
+ */
 export interface LandingFooterColumn {
   readonly heading: string;
   readonly links: readonly LandingLink[];
 }
 
+/** The landing footer's own copy; its links come from config/siteNav.ts. */
 export interface LandingFooterContent {
-  readonly brandName: string;
-  readonly logoAlt: string;
   readonly tagline: string;
-  readonly columns: readonly LandingFooterColumn[];
   /** Serializable template. Replace `{year}` with the current four-digit year. */
   readonly copyright: string;
   readonly colophon: string;
 }
 
+/** @deprecated The landing 404 renders NotFoundView with `errors.notFound` copy. */
 export interface LandingNotFoundContent {
   readonly code: string;
   readonly heading: string;
@@ -205,5 +208,4 @@ export interface LandingContent {
   readonly verifiability: LandingVerifiabilityContent;
   readonly faq: LandingFaqContent;
   readonly footer: LandingFooterContent;
-  readonly notFound: LandingNotFoundContent;
 }

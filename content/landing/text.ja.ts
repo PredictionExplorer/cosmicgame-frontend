@@ -326,57 +326,8 @@ export const landingTextJa = {
   },
 
   footer: {
-    brandName: 'Cosmic Signature',
-    logoAlt: 'Cosmic Signature',
     tagline: 'Arbitrum上のプロシージャル・オンチェーンアート・プロトコル。',
-    columns: {
-      protocol: {
-        heading: 'プロトコル',
-        links: {
-          app: 'アプリを開く',
-          about: '概要',
-          learn: '学ぶ',
-          quiz: 'クイズ',
-          'how-it-works': 'ドキュメント',
-          contracts: 'コントラクト',
-          code: 'ソースコード',
-          audits: 'セキュリティ監査',
-        },
-      },
-      ecosystem: {
-        heading: 'エコシステム',
-        links: {
-          marketplace: 'Axiom Zeroマーケットプレイス',
-          predictions: 'Chaos Zeroの予測',
-          uniswap: 'UniswapでCSTを取引',
-          geckoterminal: 'GeckoTerminalでCSTプールを見る',
-        },
-      },
-      community: {
-        heading: 'コミュニティ',
-        links: {
-          twitter: 'X / Twitter',
-          discord: 'Discord',
-          github: 'GitHub',
-          'protocol-guild': 'Protocol Guild',
-        },
-      },
-      legal: {
-        heading: '法的情報',
-        links: {
-          terms: '利用規約',
-          privacy: 'プライバシー',
-          faq: 'よくある質問',
-        },
-      },
-    },
     copyright: '© {year} Cosmic Signature. プロジェクト所有の素材：CC0 1.0。',
     colophon: 'CC0 1.0 · 公開検証可能 · 再現可能なアート',
-  },
-
-  notFound: {
-    heading: '星図の外へ。',
-    description: 'お探しのページは見つかりませんでした。シグネチャーの世界へ戻りましょう。',
-    ctaLabel: 'シグネチャーへ戻る',
   },
 } satisfies LandingText;

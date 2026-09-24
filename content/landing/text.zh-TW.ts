@@ -326,57 +326,8 @@ export const landingTextZhTw = {
   },
 
   footer: {
-    brandName: 'Cosmic Signature',
-    logoAlt: 'Cosmic Signature',
     tagline: 'Arbitrum 上的程序化鏈上藝術協議。',
-    columns: {
-      protocol: {
-        heading: '協議',
-        links: {
-          app: '開啟應用程式',
-          about: '關於',
-          learn: '學習',
-          quiz: '知識測驗',
-          'how-it-works': '文件',
-          contracts: '合約',
-          code: '原始碼',
-          audits: '安全審計',
-        },
-      },
-      ecosystem: {
-        heading: '生態',
-        links: {
-          marketplace: 'Axiom Zero 市場',
-          predictions: 'Chaos Zero 預測',
-          uniswap: '在 Uniswap 交易 CST',
-          geckoterminal: '在 GeckoTerminal 檢視 CST 池',
-        },
-      },
-      community: {
-        heading: '社群',
-        links: {
-          twitter: 'X / Twitter',
-          discord: 'Discord',
-          github: 'GitHub',
-          'protocol-guild': 'Protocol Guild',
-        },
-      },
-      legal: {
-        heading: '法律',
-        links: {
-          terms: '服務條款',
-          privacy: '隱私權政策',
-          faq: '常見問題',
-        },
-      },
-    },
     copyright: '© {year} Cosmic Signature。專案自有材料採用 CC0 1.0。',
     colophon: 'CC0 1.0 · 公開可驗證 · 可復現藝術',
-  },
-
-  notFound: {
-    heading: '偏離星圖。',
-    description: '這個座標已漂出協議疆界。返回簽名，重新啟程。',
-    ctaLabel: '返回簽名',
   },
 } satisfies LandingText;

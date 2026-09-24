@@ -326,57 +326,8 @@ export const landingTextZh = {
   },
 
   footer: {
-    brandName: 'Cosmic Signature',
-    logoAlt: 'Cosmic Signature',
     tagline: 'Arbitrum 上的程序化链上艺术协议。',
-    columns: {
-      protocol: {
-        heading: '协议',
-        links: {
-          app: '打开应用',
-          about: '关于',
-          learn: '学习',
-          quiz: '知识测验',
-          'how-it-works': '文档',
-          contracts: '合约',
-          code: '源代码',
-          audits: '安全审计',
-        },
-      },
-      ecosystem: {
-        heading: '生态',
-        links: {
-          marketplace: 'Axiom Zero 市场',
-          predictions: 'Chaos Zero 预测',
-          uniswap: '在 Uniswap 交易 CST',
-          geckoterminal: '在 GeckoTerminal 查看 CST 池',
-        },
-      },
-      community: {
-        heading: '社区',
-        links: {
-          twitter: 'X / Twitter',
-          discord: 'Discord',
-          github: 'GitHub',
-          'protocol-guild': 'Protocol Guild',
-        },
-      },
-      legal: {
-        heading: '法律',
-        links: {
-          terms: '服务条款',
-          privacy: '隐私政策',
-          faq: '常见问题',
-        },
-      },
-    },
     copyright: '© {year} Cosmic Signature。项目自有材料采用 CC0 1.0。',
     colophon: 'CC0 1.0 · 公开可验证 · 可复现艺术',
-  },
-
-  notFound: {
-    heading: '偏离星图。',
-    description: '这个坐标已漂出协议疆界。返回签名，重新启程。',
-    ctaLabel: '返回签名',
   },
 } satisfies LandingText;

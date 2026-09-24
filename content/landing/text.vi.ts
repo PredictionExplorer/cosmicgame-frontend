@@ -324,58 +324,8 @@ export const landingTextVi = {
   },
 
   footer: {
-    brandName: 'Cosmic Signature',
-    logoAlt: 'Cosmic Signature',
     tagline: 'Giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum.',
-    columns: {
-      protocol: {
-        heading: 'Giao thức',
-        links: {
-          app: 'Mở ứng dụng',
-          about: 'Giới thiệu',
-          learn: 'Học',
-          quiz: 'Trắc nghiệm',
-          'how-it-works': 'Tài liệu',
-          contracts: 'Hợp đồng',
-          code: 'Mã nguồn',
-          audits: 'Kiểm toán bảo mật',
-        },
-      },
-      ecosystem: {
-        heading: 'Hệ sinh thái',
-        links: {
-          marketplace: 'Sàn Axiom Zero',
-          predictions: 'Dự đoán Chaos Zero',
-          uniswap: 'Giao dịch CST trên Uniswap',
-          geckoterminal: 'Xem pool CST trên GeckoTerminal',
-        },
-      },
-      community: {
-        heading: 'Cộng đồng',
-        links: {
-          twitter: 'X / Twitter',
-          discord: 'Discord',
-          github: 'GitHub',
-          'protocol-guild': 'Protocol Guild',
-        },
-      },
-      legal: {
-        heading: 'Pháp lý',
-        links: {
-          terms: 'Điều khoản',
-          privacy: 'Quyền riêng tư',
-          faq: 'Câu hỏi thường gặp',
-        },
-      },
-    },
     copyright: '© {year} Cosmic Signature. Tài liệu thuộc dự án: CC0 1.0.',
     colophon: 'CC0 1.0 · Có thể xác minh công khai · Nghệ thuật tái tạo được',
-  },
-
-  notFound: {
-    heading: 'Không tìm thấy trang.',
-    description:
-      'Trang này không tồn tại hoặc đã được chuyển đi. Hãy trở về trang chủ để tiếp tục khám phá.',
-    ctaLabel: 'Về trang chủ',
   },
 } satisfies LandingText;
