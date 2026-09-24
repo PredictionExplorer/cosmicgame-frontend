@@ -12,7 +12,7 @@ import {
 } from '@/components/reading/prose';
 import { branchOf, findEntry, flattenContents } from '@/components/reading/contents';
 import { readingMinutes } from '@/components/reading/readingTime';
-import { fillTemplate } from '@/components/reading/template';
+import { fillTemplate, renderTemplate } from '@/components/reading/template';
 
 /** The white paper's lists, by the section or subsection they sit in. */
 function listsOf(locale: string): Record<string, readonly string[][]> {
@@ -124,6 +124,15 @@ describe('reading parts', () => {
   it('fills content templates and leaves unknown placeholders visible', () => {
     expect(fillTemplate('Figure {number}', { number: 2 })).toBe('Figure 2');
     expect(fillTemplate('{a} and {b}', { a: 'x' })).toBe('x and {b}');
+  });
+
+  it("renders element values in place, with the locale's own punctuation around them", () => {
+    const { container } = render(
+      <p>{renderTemplate('到達点：{rank}（{missing}）', { rank: <strong>観測者</strong> })}</p>,
+    );
+    expect(container.querySelector('p')?.innerHTML).toBe(
+      '到達点：<strong>観測者</strong>（{missing}）',
+    );
   });
 });
 

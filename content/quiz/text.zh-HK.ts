@@ -52,13 +52,14 @@ export const quizTextZhHk = {
     streakTemplate: '連對 {count} 題',
     explanationHeading: '為什麼',
     funFactHeading: '你知道嗎？',
-    referenceLabel: '深入閱讀',
+    referenceTemplate: '深入閱讀：{section}',
     nextLabel: '下一題',
     finishLabel: '查看結果',
     summary: {
       eyebrow: '作答完成',
       scoreTemplate: '答對 {correct} 題，共 {total} 題',
       rankLabel: '理解程度',
+      rankTemplate: '理解程度：{rank}',
       ranks: {
         observer: {
           name: '觀察者',

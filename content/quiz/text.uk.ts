@@ -52,13 +52,14 @@ export const quizTextUk = {
     streakTemplate: 'Серія: {count} поспіль',
     explanationHeading: 'Чому',
     funFactHeading: 'Чи знали ви?',
-    referenceLabel: 'Глибше',
+    referenceTemplate: 'Глибше: {section}',
     nextLabel: 'Наступне запитання',
     finishLabel: 'Переглянути результат',
     summary: {
       eyebrow: 'Тест завершено',
       scoreTemplate: 'Правильно: {correct} з {total}',
       rankLabel: 'Ваш рівень',
+      rankTemplate: 'Ваш рівень: {rank}',
       ranks: {
         observer: {
           name: 'Спостерігач',

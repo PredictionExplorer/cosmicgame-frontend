@@ -7,7 +7,9 @@ import { ArrowRight, ArrowUpRight, BookOpen, Check, RotateCcw, Sparkles, X } fro
 import type { QuizRunnerUi, QuizTier } from '@/content/quiz';
 
 import { Button } from '@/components/ui/button';
+import { renderTemplate } from '@/components/reading/template';
 import { Link } from '@/i18n/navigation';
+import { getLocaleConfig } from '@/i18n/localeConfig';
 import { fadeRise, slideInRight, useMotionVariants } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 import { revealElement, revealTop } from '@/components/reading/scrolling';
@@ -306,6 +308,8 @@ export function QuizRunner({
     (option) => option.id === current.question.correctOptionId,
   );
   const correctLetter = OPTION_LABELS[correctIndex] ?? '';
+  // Chinese and Japanese sentences follow one another without a space.
+  const sentenceGap = getLocaleConfig(locale).wordSpacing ? ' ' : '';
   const isLast = attempt.currentIndex + 1 >= attempt.questions.length;
   const questionHeadingId = `quiz-question-${current.question.id}`;
   const feedbackHeadingId = `${questionHeadingId}-feedback`;
@@ -439,7 +443,7 @@ export function QuizRunner({
                   {feedbackText}
                   {currentAnswer.correct
                     ? null
-                    : ` ${fillTemplate(ui.correctAnswerTemplate, { letter: correctLetter })}`}
+                    : `${sentenceGap}${fillTemplate(ui.correctAnswerTemplate, { letter: correctLetter })}`}
                 </span>
               </p>
 
@@ -461,9 +465,7 @@ export function QuizRunner({
             {/* On a phone the explanation can outgrow the screen: the next step stays in reach. */}
             <div className="sticky bottom-0 mt-5 flex flex-wrap items-center justify-between gap-x-4 gap-y-3 rounded-b-surface border-t border-rule-faint bg-surface px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:static sm:border-t-0 sm:px-8 sm:pb-6 sm:pt-0">
               <ReferenceLink href={current.question.reference.href} newTabNote={ui.newTabNote}>
-                {ui.referenceLabel}
-                {': '}
-                {current.question.reference.label}
+                {fillTemplate(ui.referenceTemplate, { section: current.question.reference.label })}
               </ReferenceLink>
               <Button onClick={advance} data-testid="quiz-next" className="max-sm:w-full">
                 {isLast ? ui.finishLabel : ui.nextLabel}
@@ -612,9 +614,9 @@ function QuizSummary({
           {fillTemplate(ui.summary.scoreTemplate, { correct: correctCount, total })}
         </h2>
         <p className="mt-3 type-body-md text-muted-foreground">
-          {ui.summary.rankLabel}
-          {': '}
-          <span className="font-semibold text-foreground">{rank.name}</span>
+          {renderTemplate(ui.summary.rankTemplate, {
+            rank: <span className="font-semibold text-foreground">{rank.name}</span>,
+          })}
         </p>
         <p className="mt-1 max-w-[var(--measure-lede)] type-body-md text-muted-foreground">
           {rank.line}

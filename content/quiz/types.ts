@@ -104,14 +104,18 @@ export interface QuizRunnerUi {
   readonly streakTemplate: string;
   readonly explanationHeading: string;
   readonly funFactHeading: string;
-  readonly referenceLabel: string;
+  /** `{section}` placeholder: the reference link after an answer ("Go deeper: {section}"). */
+  readonly referenceTemplate: string;
   readonly nextLabel: string;
   readonly finishLabel: string;
   readonly summary: {
     readonly eyebrow: string;
     /** `{correct}` and `{total}` placeholders. */
     readonly scoreTemplate: string;
+    /** Names the rank ladder in the summary. */
     readonly rankLabel: string;
+    /** `{rank}` placeholder: the rank reached ("Your standing: {rank}"). */
+    readonly rankTemplate: string;
     readonly ranks: {
       readonly observer: QuizMasteryRank;
       readonly participant: QuizMasteryRank;

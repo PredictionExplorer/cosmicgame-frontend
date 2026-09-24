@@ -52,13 +52,14 @@ export const quizTextEn = {
     streakTemplate: '{count} correct in a row',
     explanationHeading: 'Why',
     funFactHeading: 'Did you know?',
-    referenceLabel: 'Go deeper',
+    referenceTemplate: 'Go deeper: {section}',
     nextLabel: 'Next question',
     finishLabel: 'See your results',
     summary: {
       eyebrow: 'Quiz complete',
       scoreTemplate: '{correct} of {total} correct',
       rankLabel: 'Your standing',
+      rankTemplate: 'Your standing: {rank}',
       ranks: {
         observer: {
           name: 'Observer',

@@ -52,13 +52,14 @@ export const quizTextZh = {
     streakTemplate: '连对 {count} 题',
     explanationHeading: '为什么',
     funFactHeading: '你知道吗？',
-    referenceLabel: '深入阅读',
+    referenceTemplate: '深入阅读：{section}',
     nextLabel: '下一题',
     finishLabel: '查看结果',
     summary: {
       eyebrow: '作答完成',
       scoreTemplate: '答对 {correct} 题，共 {total} 题',
       rankLabel: '理解程度',
+      rankTemplate: '理解程度：{rank}',
       ranks: {
         observer: {
           name: '观察者',

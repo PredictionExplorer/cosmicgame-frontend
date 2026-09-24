@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
 
-import { quizContentEn } from '@/content/quiz';
+import { getQuizContent, quizContentEn } from '@/content/quiz';
 import type { QuizTier } from '@/content/quiz';
 
 import { QuizRunner, type QuizRunnerProps } from '@/components/quiz/QuizRunner';
@@ -196,6 +196,28 @@ describe('<QuizRunner />', () => {
     // Next moves focus to the new question's heading.
     fireEvent.click(screen.getByTestId('quiz-next'));
     expect(screen.getByRole('heading', { level: 2, name: 'Second stub prompt?' })).toHaveFocus();
+  });
+
+  it("joins label and value with the locale's own punctuation", () => {
+    const ja = getQuizContent('ja').ui;
+    render(<QuizRunner {...props} ui={ja} locale="ja" />);
+    fireEvent.click(screen.getByTestId('quiz-begin'));
+    fireEvent.click(screen.getByTestId('quiz-option-2'));
+
+    // Japanese sentences run on without a space, and the reference label
+    // takes a full-width colon: no hard-coded ' ' or ': ' in between.
+    const status = screen.getByTestId('quiz-feedback-status').textContent ?? '';
+    expect(status).toMatch(/。正解はAです。$/);
+    expect(screen.getByRole('link', { name: /White paper — Gestures/ }).textContent).toContain(
+      'さらに深く：White paper — Gestures',
+    );
+
+    fireEvent.click(screen.getByTestId('quiz-next'));
+    fireEvent.click(screen.getByTestId('quiz-option-2'));
+    fireEvent.click(screen.getByTestId('quiz-next'));
+    expect(screen.getByTestId('quiz-summary')).toHaveTextContent(
+      `到達点：${ja.summary.ranks.participant.name}`,
+    );
   });
 
   it('walks a full attempt: feedback, explanation, reference, summary and review', () => {

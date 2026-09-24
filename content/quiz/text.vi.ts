@@ -52,13 +52,14 @@ export const quizTextVi = {
     streakTemplate: '{count} câu đúng liên tiếp',
     explanationHeading: 'Vì sao',
     funFactHeading: 'Bạn có biết?',
-    referenceLabel: 'Đi sâu hơn',
+    referenceTemplate: 'Đi sâu hơn: {section}',
     nextLabel: 'Câu tiếp theo',
     finishLabel: 'Xem kết quả',
     summary: {
       eyebrow: 'Đã hoàn thành',
       scoreTemplate: 'Đúng {correct} trên {total}',
       rankLabel: 'Mức độ hiểu biết',
+      rankTemplate: 'Mức độ hiểu biết: {rank}',
       ranks: {
         observer: {
           name: 'Người quan sát',

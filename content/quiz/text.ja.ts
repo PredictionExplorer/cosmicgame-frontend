@@ -52,13 +52,14 @@ export const quizTextJa = {
     streakTemplate: '{count}問連続正解',
     explanationHeading: 'なぜ',
     funFactHeading: 'ご存じでしたか？',
-    referenceLabel: 'さらに深く',
+    referenceTemplate: 'さらに深く：{section}',
     nextLabel: '次の問題',
     finishLabel: '結果を見る',
     summary: {
       eyebrow: '読了',
       scoreTemplate: '{total}問中{correct}問正解',
       rankLabel: '到達点',
+      rankTemplate: '到達点：{rank}',
       ranks: {
         observer: {
           name: '観測者',

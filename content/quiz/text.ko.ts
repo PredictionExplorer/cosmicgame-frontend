@@ -52,13 +52,14 @@ export const quizTextKo = {
     streakTemplate: '{count}문항 연속 정답',
     explanationHeading: '이유',
     funFactHeading: '알고 있었나요?',
-    referenceLabel: '더 깊이 읽기',
+    referenceTemplate: '더 깊이 읽기: {section}',
     nextLabel: '다음 문항',
     finishLabel: '결과 보기',
     summary: {
       eyebrow: '풀이 완료',
       scoreTemplate: '{total}문항 중 {correct}문항 정답',
       rankLabel: '내 등급',
+      rankTemplate: '내 등급: {rank}',
       ranks: {
         observer: {
           name: '관측자',
