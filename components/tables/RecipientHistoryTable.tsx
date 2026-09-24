@@ -454,6 +454,8 @@ export default function RecipientHistoryTable({
           emptyTitle={t('empty.history')}
           pageSize={perPage}
           layout="cards"
+          // The sources and the summary each keep one line on a wide screen.
+          width="fill"
           renderDetails={(group) => (
             <ul className="divide-y divide-rule-faint">
               {group.records.map((record, index) => (

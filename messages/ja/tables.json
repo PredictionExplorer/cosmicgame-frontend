@@ -399,7 +399,7 @@
     "isAnchorHolder": "係留者か"
   },
   "statisticsTooltips": {
-    "maxAllocationEth": "最後の一筆によってこの受領者が受け取ったシグネチャー配分の最大値です。受け取ったことがなければ0です。時の戦士と星選のETHは合計にのみ含まれます。",
+    "maxAllocationEth": "最後の一筆によってこの受領者が受け取ったシグネチャー配分の最大値です。受け取ったことがなければダッシュで表示されます。時の戦士と星選のETHは受け取ったETHにのみ含まれます。",
     "allocationsSumEth": "この受領者が受け取ったすべてのETH配分です。NFTとCSTの配分は「配分（すべての種類）」に数えられますが、このETHには加算されません。",
     "cstBalance": "このウォレットの現在のCST（ERC-20）残高。",
     "attachedNftContractAddress": "一筆に添付されたトークンのERC-721コントラクトアドレス。",

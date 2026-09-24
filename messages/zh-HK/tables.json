@@ -399,7 +399,7 @@
     "isAnchorHolder": "錨定者"
   },
   "statisticsTooltips": {
-    "maxAllocationEth": "此獲配者因寫下收官之筆而獲得的最高一筆簽名分配；從未獲得則為 0。時之勇士與星選的 ETH 只計入總額。",
+    "maxAllocationEth": "此獲配者因寫下收官之筆而獲得的最高一筆簽名分配；從未獲得則顯示短橫線。時之勇士與星選的 ETH 只計入獲配 ETH。",
     "allocationsSumEth": "此獲配者獲得的全部 ETH 分配。NFT 與 CST 分配計入「獲配次數（全部類型）」，但不計入此處的 ETH。",
     "cstBalance": "此錢包目前的 CST（ERC-20）餘額。",
     "attachedNftContractAddress": "隨落筆附加的代幣所屬 ERC-721 合約地址。",

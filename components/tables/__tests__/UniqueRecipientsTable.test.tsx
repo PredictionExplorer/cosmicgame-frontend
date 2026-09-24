@@ -63,6 +63,17 @@ describe('UniqueRecipientsTable', () => {
     expect(screen.getByText('0.2000')).toBeInTheDocument();
   });
 
+  it('shows a dash, not 0.0000, for a wallet that never received a Signature Allocation', () => {
+    render(
+      <UniqueRecipientsTable
+        list={[createRecipient({ AllocationsCount: 8, MaxWinAmountEth: 0, PrizesSum: 0 })]}
+      />,
+    );
+    expect(screen.getByText('tables.status.none')).toBeInTheDocument();
+    // The ETH sum is a real zero and keeps the column's digits.
+    expect(screen.getByText('0.0000')).toBeInTheDocument();
+  });
+
   it('shows 20 rows a page with the row range', () => {
     const list = Array.from({ length: 25 }, (_, i) =>
       createRecipient({ WinnerAid: String(i), AllocationsCount: i + 1 }),

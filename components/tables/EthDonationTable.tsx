@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { MessageSquare } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
-import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+import { DataTable, TableLink, type DataTableColumn } from '@/components/ui/data-table';
 import { UnknownValue } from '@/components/ui/unknown-value';
 import type { LedgerStateProps } from '@/components/tables/ledger-props';
 
@@ -83,7 +83,13 @@ const EthDonationTable = ({
         kind: 'link',
         header: t('columns.round'),
         value: (row) => Number(row.RoundNum),
-        href: (row) => `/eth-contribution/round/${row.RoundNum}`,
+        // "Cycle 5", not a bare "5": a word-wide target that says where it leads.
+        cell: (row) => (
+          <TableLink href={`/eth-contribution/round/${row.RoundNum}`}>
+            {t('allocation.cycle', { cycle: String(row.RoundNum) })}
+          </TableLink>
+        ),
+        nowrap: true,
         sortable: true,
       },
       {

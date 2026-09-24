@@ -44,9 +44,12 @@ describe('EthDonationTable', () => {
     expect(screen.getByText(convertTimestampToDateTime(donation.TimeStamp))).toBeInTheDocument();
   });
 
-  it('renders round number', () => {
+  it('names the cycle as "Cycle 5", linked to that cycle’s contributions', () => {
     render(<EthDonationTable list={[createDonation({ RoundNum: '5' })]} />);
-    expect(screen.getByText('5')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'tables.allocation.cycle(cycle=5)' })).toHaveAttribute(
+      'href',
+      '/eth-contribution/round/5',
+    );
   });
 
   it('renders amount', () => {
@@ -119,7 +122,7 @@ describe('EthDonationTable', () => {
 
   it('links the cycle to its contribution list in the same tab', () => {
     render(<EthDonationTable list={[createDonation({ RoundNum: '5' })]} />);
-    const roundLink = screen.getByText('5');
+    const roundLink = screen.getByText('tables.allocation.cycle(cycle=5)');
     expect(roundLink.closest('a')).toHaveAttribute('href', '/eth-contribution/round/5');
     expect(roundLink.closest('a')).not.toHaveAttribute('target');
   });

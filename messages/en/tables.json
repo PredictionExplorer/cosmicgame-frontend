@@ -399,7 +399,7 @@
     "isAnchorHolder": "Is Anchor-holder"
   },
   "statisticsTooltips": {
-    "maxAllocationEth": "Largest Signature Allocation this recipient received for making a Final Gesture; 0 if it never received one. Chrono-Warrior and Stellar Selection ETH count only toward the sum.",
+    "maxAllocationEth": "Largest Signature Allocation this recipient received for making a Final Gesture; a dash if it never received one. Chrono-Warrior and Stellar Selection ETH count only toward the ETH received.",
     "allocationsSumEth": "Every ETH allocation this recipient has received. NFT and CST allocations count toward Allocations (all kinds) but add no ETH here.",
     "cstBalance": "Current CST ERC-20 balance for this wallet.",
     "attachedNftContractAddress": "ERC-721 contract address for tokens attached to gestures.",

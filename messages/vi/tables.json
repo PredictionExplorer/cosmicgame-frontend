@@ -399,7 +399,7 @@
     "isAnchorHolder": "Là người neo giữ"
   },
   "statisticsTooltips": {
-    "maxAllocationEth": "Phân bổ Signature lớn nhất người nhận này nhận được nhờ đặt nét bút cuối cùng; bằng 0 nếu chưa từng nhận. ETH Chiến binh Thời gian và Tinh tuyển chỉ được tính vào tổng.",
+    "maxAllocationEth": "Phân bổ Signature lớn nhất người nhận này nhận được nhờ đặt nét bút cuối cùng; hiển thị dấu gạch nếu chưa từng nhận. ETH Chiến binh Thời gian và Tinh tuyển chỉ được tính vào ETH đã nhận.",
     "allocationsSumEth": "Mọi phân bổ ETH mà người nhận này đã nhận. Phân bổ NFT và CST được tính vào “Phân bổ (mọi loại)” nhưng không cộng thêm ETH ở đây.",
     "cstBalance": "Số dư CST ERC-20 hiện tại của ví này.",
     "attachedNftContractAddress": "Địa chỉ hợp đồng ERC-721 của các token đính kèm vào nét bút.",

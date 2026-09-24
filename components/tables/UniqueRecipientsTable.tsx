@@ -44,7 +44,10 @@ export const UniqueRecipientsTable = ({ list, ...state }: UniqueRecipientsTableP
         kind: 'amount',
         header: t('columns.maxAllocationEth'),
         help: t('statisticsTooltips.maxAllocationEth'),
-        value: (row) => row.MaxWinAmountEth,
+        // 0 means the wallet never received one (its allocations came from
+        // other tracks): a dash that says "None", not a column of zeros.
+        value: (row) => (row.MaxWinAmountEth > 0 ? row.MaxWinAmountEth : null),
+        blankLabel: t('status.none'),
         showUnit: false,
         sortable: true,
       },

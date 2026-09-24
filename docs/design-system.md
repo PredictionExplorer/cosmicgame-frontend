@@ -338,6 +338,30 @@ its cells as one `data-align`, so the two cannot disagree.
 `cell` replaces the renderer while the kind keeps the alignment. `value` is what sorts,
 and blank values sort last in both directions. Give `align` only to an unusual column.
 
+**Headers.** A header says what its column holds in a few sentence-case words
+("Anchored now", "Distributed (ETH)"), and the same words label the value in a phone
+record: give `label` only when the header is not a string or sits under a group. Keep
+`help` for a derived figure whose header cannot say how it is computed ("ETH received",
+"Largest Signature Allocation"); a column that names an address or a plain count needs
+none. Consecutive columns that share a word or a unit take a `group` heading, a row
+above that spans them ("ETH by track" over Signature Allocation, Chrono-Warrior, …), so
+each sub-header stays on one or two lines; give each grouped column a `label` that reads
+alone ("Chrono-Warrior (ETH)") for its phone record.
+
+**Width.** With `width="auto"` (the default) a short ledger stops at a reading width,
+three columns at 48rem and four at 56rem, so a row is not a 1,200px scan from its
+address to its figure. `width="fill"` runs the full width (a moderation list whose
+message takes what is left).
+
+**Amounts.** An amount column prints the table precision (ETH 4 digits, CST 2), zero
+included ("0.0000" under "0.1562"). Dust too small for it reads as a bound ("<0.0001")
+in the subtle tier, with the exact value on hover.
+
+**Free text.** A message in a cell goes through `ClampedText`
+(`components/tables/ClampedText`): two lines from `sm` with a "Show all" disclosure,
+the whole text in a phone record, and `overflow-wrap: anywhere`, so a run with no
+spaces never widens its column. Never hide the rest of a value behind a hover tooltip.
+
 **Phones.** Below 40em each row becomes a record in a stacked list: records are divided
 by one `--rule`, with no box, fill or rule inside them. The label (the column header in
 sentence case, 13px, `text-subtle`) sits at the start and the 14px value at the end, and
@@ -374,12 +398,28 @@ Enter or when the field is left, never per keystroke.
 other direction, and back to the table's own order (`initialSort`). When the table's
 own order already sorts that column, a click turns it around, so every click changes
 something. A sorted header's arrow sits in the label's line of text, so a wrapping label
-keeps it beside the words.
+keeps it beside the words. An unsorted sortable header shows a faint two-way arrow in
+its padding on hover and keyboard focus, so nothing moves. A ledger that arrives in an
+order (newest first, most anchored first) declares it with `initialSort`, so its header
+shows the arrow and the reader knows the order.
 
 **Links.** `getRowHref` makes the first column's value (or `rowLinkColumn`'s) a real
-same-tab link, and a click anywhere else on the row follows it too. `TableLink` covers
-other internal links in a cell and `TxProofLink` covers explorer proof (a new tab,
-announced). Addresses go through the `address` kind, never a hand-built explorer URL.
+same-tab link, and a click anywhere else on the row follows it too. `getRowLabel` adds
+the words a screen reader hears after the link's visible text ("Sep 24, 07:31:51" then
+"Gesture #1143", the number the destination shows); it never replaces them, so the name
+always starts with what a voice user sees (WCAG 2.5.3). Leave it out when the visible
+text already names the destination ("Cycle 12"). `TableLink` covers other internal links
+in a cell and `TxProofLink` covers explorer proof (a new tab, announced). Addresses go
+through the `address` kind, never a hand-built explorer URL. A cycle number reads
+"Cycle 12", never a bare "12", and takes its destination from `useCycleHref`
+(`components/tables/useCycleHref`): the live cycle leads to /current-cycle, a finalized
+one to its allocation record. A dense ledger whose every row carries several links
+passes `links="quiet"`: they keep their ink and underline only on hover and focus.
+
+**Notes.** `notice` is a line under the title that shows in every state, loading and
+error included (a read-only notice), so it never moves the table when rows arrive.
+`caption` puts a note beside the row range, after the time zone ("Muted amounts are
+allocations of less than 0.01 CST"); keep it to one line of `type-caption`.
 
 **One frame.** A table inside a panel or section uses the section's frame. Pass
 `variant="framed"` to `ResponsiveTableContainer` only for a table that stands alone.
