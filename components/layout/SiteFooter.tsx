@@ -1,6 +1,6 @@
 'use client';
 
-import { useSyncExternalStore, type MouseEvent, type ReactNode } from 'react';
+import { useId, useState, type ReactNode } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -24,66 +24,68 @@ import { SiteLink } from './SiteLink';
 import { useSiteNavCopy } from './useSiteNav';
 import { Wordmark } from './Wordmark';
 
-/** Below 640px the directory folds into disclosures; above it every group stays open. */
-const PHONE_QUERY = '(max-width: 639.98px)';
-
-const phoneQuery = () =>
-  typeof window.matchMedia === 'function' ? window.matchMedia(PHONE_QUERY) : null;
-
-function subscribeToPhoneQuery(onChange: () => void) {
-  const query = phoneQuery();
-  query?.addEventListener('change', onChange);
-  return () => query?.removeEventListener('change', onChange);
-}
-
-/** Folded on phones; the server and hydration render the open desktop layout. */
-function usePhoneFolding(): boolean {
-  return useSyncExternalStore(
-    subscribeToPhoneQuery,
-    () => phoneQuery()?.matches ?? false,
-    () => false,
-  );
-}
-
 const LINK_CLASS =
   'link-quiet inline-flex min-h-10 max-w-full items-center gap-1 py-1 text-sm text-muted-foreground transition-colors duration-150 hover:text-foreground sm:min-h-8';
 
 /**
- * One group of the footer: a `<details>` whose links are always in the HTML
- * (the crawl path for the client-only header menus). It is open from 640px,
- * where its summary reads as a plain heading, and folded on phones.
+ * One group of the footer. From 640px it is a heading over its links; on
+ * phones the links fold behind a toggle on the heading row. The folding is
+ * CSS (`max-sm:hidden`), not `<details>`: the server's HTML is already right
+ * at every width, so nothing shifts when the page hydrates, and the links
+ * stay in the markup as the crawl path for the client-only header menus.
  */
 function FooterGroup({
   title,
-  folded,
+  layout = 'column',
   children,
   className,
 }: {
   title: string;
-  folded: boolean;
+  /** `row`: heading and links on one line from 640px (ecosystem, community, language). */
+  layout?: 'column' | 'row';
   children: ReactNode;
   className?: string;
 }) {
-  const keepOpen = (event: MouseEvent<HTMLElement>) => {
-    if (!folded) event.preventDefault();
-  };
+  const [open, setOpen] = useState(false);
+  const headingId = useId();
+  const panelId = useId();
   return (
-    <details
-      open={!folded}
-      className={cn('group/footer min-w-0 border-b border-rule-faint sm:border-b-0', className)}
+    <div
+      className={cn(
+        'relative min-w-0 border-b border-rule-faint sm:border-b-0',
+        layout === 'row' && 'sm:flex sm:items-baseline sm:gap-6',
+        className,
+      )}
     >
-      <summary
-        onClick={keepOpen}
-        className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-2 sm:min-h-0 sm:cursor-default sm:pb-3 [&::-webkit-details-marker]:hidden"
+      <h2
+        id={headingId}
+        className={cn(
+          'type-eyebrow flex min-h-12 items-center pr-10 text-subtle sm:min-h-0 sm:pr-0',
+          layout === 'column' ? 'sm:pb-3' : 'sm:min-w-32 sm:shrink-0',
+        )}
       >
-        <h2 className="type-eyebrow text-subtle">{title}</h2>
+        {title}
+      </h2>
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls={panelId}
+        aria-labelledby={headingId}
+        onClick={() => setOpen((value) => !value)}
+        className="absolute inset-x-0 top-0 flex h-12 items-center justify-end rounded-control text-subtle sm:hidden"
+      >
         <ChevronDown
           aria-hidden
-          className="size-4 text-subtle transition-transform duration-200 group-open/footer:rotate-180 motion-reduce:transition-none sm:hidden"
+          className={cn(
+            'size-4 transition-transform duration-200 motion-reduce:transition-none',
+            open && 'rotate-180',
+          )}
         />
-      </summary>
-      <div className="pb-4 sm:pb-0">{children}</div>
-    </details>
+      </button>
+      <div id={panelId} className={cn('min-w-0 pb-4 sm:pb-0', !open && 'max-sm:hidden')}>
+        {children}
+      </div>
+    </div>
   );
 }
 
@@ -107,14 +109,10 @@ function footerEntries(section: (typeof FOOTER_SECTIONS)[number]) {
   return entries;
 }
 
-function OutboundRow({ group, folded }: { group: OutboundGroupId; folded: boolean }) {
+function OutboundRow({ group }: { group: OutboundGroupId }) {
   const copy = useSiteNavCopy();
   return (
-    <FooterGroup
-      title={copy.sectionTitle(group)}
-      folded={folded}
-      className="sm:flex sm:items-baseline sm:gap-6"
-    >
+    <FooterGroup title={copy.sectionTitle(group)} layout="row">
       <ul className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-x-5">
         {outboundLinks(group).map((link) => (
           <li key={link.id} className="min-w-0">
@@ -147,14 +145,13 @@ interface SiteFooterProps {
  * (config/siteNav.ts): six section columns, the ecosystem and community
  * rows, the language directory and the legal line. Directory links prefetch
  * on intent only, so scrolling to the footer no longer downloads every
- * route. On phones each group folds into a disclosure.
+ * route. On phones each group folds behind its heading.
  */
 export function SiteFooter({ host, tagline, copyright, colophon, action, meta }: SiteFooterProps) {
   const t = useTranslations('common');
   const navT = useTranslations('nav');
   const locale = useLocale();
   const copy = useSiteNavCopy();
-  const folded = usePhoneFolding();
   const security = resolveRouteHref(getSiteRoute('security'), host, locale);
   const home = host === 'app' ? getSiteRoute('observatory') : getSiteRoute('projectSite');
 
@@ -180,7 +177,7 @@ export function SiteFooter({ host, tagline, copyright, colophon, action, meta }:
           className="grid border-t border-rule-faint sm:grid-cols-3 sm:gap-x-6 sm:gap-y-10 sm:pt-10 lg:grid-cols-6"
         >
           {FOOTER_SECTIONS.map((section) => (
-            <FooterGroup key={section} title={copy.sectionTitle(section)} folded={folded}>
+            <FooterGroup key={section} title={copy.sectionTitle(section)}>
               <ul>
                 {footerEntries(section).map(({ key, route, group }) => {
                   const target = resolveRouteHref(route, host, locale);
@@ -202,12 +199,16 @@ export function SiteFooter({ host, tagline, copyright, colophon, action, meta }:
           ))}
         </nav>
 
-        <div className="grid border-rule-faint sm:mt-10 sm:gap-y-3 sm:border-t sm:pt-6">
-          <OutboundRow group="ecosystem" folded={folded} />
-          <OutboundRow group="community" folded={folded} />
+        <div className="grid border-rule-faint sm:mt-10 sm:gap-y-3 sm:border-t sm:py-6">
+          <OutboundRow group="ecosystem" />
+          <OutboundRow group="community" />
+          <FooterGroup title={t('languageSwitcher.label')} layout="row">
+            <LanguageDirectory
+              hideLabel
+              className="max-sm:[&_ul]:grid max-sm:[&_ul]:grid-cols-2 max-sm:[&_ul]:gap-x-4 sm:[&_a]:min-h-8"
+            />
+          </FooterGroup>
         </div>
-
-        <FooterLanguages folded={folded} />
 
         <div className="flex flex-col gap-4 border-rule-faint py-6 sm:flex-row sm:items-center sm:justify-between sm:border-t">
           <div className="type-caption flex flex-col gap-1 text-subtle">
@@ -241,22 +242,5 @@ export function SiteFooter({ host, tagline, copyright, colophon, action, meta }:
         </div>
       </div>
     </footer>
-  );
-}
-
-/** The language directory; a disclosure on phones, one open row above. */
-function FooterLanguages({ folded }: { folded: boolean }) {
-  const t = useTranslations('common');
-  if (!folded) {
-    return (
-      <div className="mt-6 border-t border-rule-faint py-5">
-        <LanguageDirectory />
-      </div>
-    );
-  }
-  return (
-    <FooterGroup title={t('languageSwitcher.label')} folded={folded}>
-      <LanguageDirectory hideLabel className="[&_ul]:grid [&_ul]:grid-cols-2 [&_ul]:gap-x-4" />
-    </FooterGroup>
   );
 }

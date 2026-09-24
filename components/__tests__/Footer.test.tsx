@@ -1,28 +1,14 @@
 import '@testing-library/jest-dom';
 
+import userEvent from '@testing-library/user-event';
+
 import Footer from '@/components/layout/Footer';
 import { FOOTER_SECTIONS, OUTBOUND_LINKS, footerRoutes } from '@/config/siteNav';
 import { LOCALE_LABELS, routing } from '@/i18n/routing';
 import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
 
-import { act, render, screen, checkA11y, within } from '@/test-utils';
 
-function mockMatchMedia(matches: boolean) {
-  const listeners = new Set<() => void>();
-  Object.defineProperty(window, 'matchMedia', {
-    configurable: true,
-    writable: true,
-    value: () => ({
-      matches,
-      addEventListener: (_: string, listener: () => void) => listeners.add(listener),
-      removeEventListener: (_: string, listener: () => void) => listeners.delete(listener),
-    }),
-  });
-}
-
-afterEach(() => {
-  delete (window as { matchMedia?: unknown }).matchMedia;
-});
+import { render, screen, checkA11y, within } from '@/test-utils';
 
 describe('Footer', () => {
   it('links the wordmark lockup home', () => {
@@ -110,24 +96,31 @@ describe('Footer', () => {
     }
   });
 
-  it('keeps every group open from 640px', () => {
-    mockMatchMedia(false);
-    const { container } = render(<Footer />);
-    const groups = container.querySelectorAll('details');
-    expect(groups.length).toBeGreaterThanOrEqual(FOOTER_SECTIONS.length);
-    groups.forEach((group) => expect(group).toHaveAttribute('open'));
+  it('folds each group on phones with CSS, so the server HTML needs no correction', () => {
+    render(<Footer />);
+    const toggles = screen.getAllByRole('button', { expanded: false });
+    // Six sections, ecosystem, community and language.
+    expect(toggles).toHaveLength(FOOTER_SECTIONS.length + 3);
+    for (const toggle of toggles) {
+      const panel = document.getElementById(toggle.getAttribute('aria-controls') ?? '');
+      expect(panel).toHaveClass('max-sm:hidden');
+      expect(toggle).toHaveClass('sm:hidden');
+    }
+    // Folded groups keep their links in the markup for crawlers.
+    expect(screen.getByRole('link', { name: 'nav.routes.gallery.label' })).toHaveAttribute(
+      'href',
+      '/gallery',
+    );
   });
 
-  it('folds the groups on phones while keeping every link in the markup', async () => {
-    mockMatchMedia(true);
-    const { container } = render(<Footer />);
-    await act(async () => {});
-    container
-      .querySelectorAll('details')
-      .forEach((group) => expect(group).not.toHaveAttribute('open'));
-    expect(
-      screen.getByRole('link', { name: 'nav.routes.gallery.label', hidden: true }),
-    ).toHaveAttribute('href', '/gallery');
+  it('names each phone toggle after its heading and unfolds on tap', async () => {
+    render(<Footer />);
+    const toggle = screen.getByRole('button', { name: 'nav.sections.trust' });
+    const panel = document.getElementById(toggle.getAttribute('aria-controls') ?? '');
+    await userEvent.setup().click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(panel).not.toHaveClass('max-sm:hidden');
+    expect(within(panel!).getByRole('link', { name: 'nav.routes.siteMap.label' })).toBeVisible();
   });
 
   it('does not expose admin or internal tools', () => {
