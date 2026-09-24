@@ -40,7 +40,7 @@
       "available": "Available: {amount}",
       "availableUnknown": "Balance unavailable",
       "max": "Max",
-      "maxAria": "Fill in the whole balance, {amount}",
+      "maxAria": "Max: fill in the whole balance, {amount}",
       "errors": {
         "required": "Enter an amount.",
         "format": "Enter a number, like {example}.",

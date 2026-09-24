@@ -40,7 +40,7 @@
       "available": "보낼 수 있는 수량: {amount}",
       "availableUnknown": "잔액을 확인할 수 없습니다",
       "max": "최대",
-      "maxAria": "잔액 전체 입력: {amount}",
+      "maxAria": "최대: 잔액 전체 입력, {amount}",
       "errors": {
         "required": "수량을 입력해 주세요.",
         "format": "{example}처럼 숫자로 입력해 주세요.",

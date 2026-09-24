@@ -40,7 +40,7 @@
       "available": "可用：{amount}",
       "availableUnknown": "暂时无法读取余额",
       "max": "最大",
-      "maxAria": "填入全部余额 {amount}",
+      "maxAria": "最大：填入全部余额 {amount}",
       "errors": {
         "required": "请输入数量。",
         "format": "请输入数字，例如 {example}。",

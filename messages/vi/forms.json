@@ -40,7 +40,7 @@
       "available": "Khả dụng: {amount}",
       "availableUnknown": "Không đọc được số dư",
       "max": "Tối đa",
-      "maxAria": "Điền toàn bộ số dư, {amount}",
+      "maxAria": "Tối đa: điền toàn bộ số dư, {amount}",
       "errors": {
         "required": "Hãy nhập số lượng.",
         "format": "Hãy nhập một số, ví dụ {example}.",

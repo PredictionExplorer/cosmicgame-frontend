@@ -40,7 +40,7 @@
       "available": "Доступно: {amount}",
       "availableUnknown": "Баланс недоступний",
       "max": "Макс.",
-      "maxAria": "Вписати весь баланс: {amount}",
+      "maxAria": "Макс. — вписати весь баланс: {amount}",
       "errors": {
         "required": "Введіть суму.",
         "format": "Введіть число, наприклад {example}.",

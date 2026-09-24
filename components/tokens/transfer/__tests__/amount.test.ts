@@ -1,4 +1,4 @@
-import { parseTokenAmount, toPlainDecimal } from '../amount';
+import { commaIsDecimal, parseTokenAmount, toPlainDecimal } from '../amount';
 
 const WEI = 1_000_000_000_000_000_000n;
 
@@ -41,19 +41,37 @@ describe('parseTokenAmount', () => {
     expect(parseTokenAmount('11', { max: null }).error).toBeNull();
   });
 
-  it('refuses a comma where the locale writes a dot, rather than guess', () => {
+  it('refuses a comma where it could group thousands, rather than guess', () => {
     // "1,000" is one thousand to an English reader and one to a Ukrainian one.
     expect(parseTokenAmount('1,000').error).toBe('format');
     expect(parseTokenAmount('0,5').error).toBe('format');
   });
 
-  it('reads a comma or a dot as the decimal mark where the locale writes a comma', () => {
-    expect(parseTokenAmount('0,5', { decimalMark: ',' }).wei).toBe(WEI / 2n);
-    expect(parseTokenAmount('0.5', { decimalMark: ',' }).wei).toBe(WEI / 2n);
-    expect(parseTokenAmount('1 000,25', { decimalMark: ',' }).wei).toBe(
+  it('reads a comma or a dot as the decimal mark where a comma cannot group', () => {
+    expect(parseTokenAmount('0,5', { decimalComma: true }).wei).toBe(WEI / 2n);
+    expect(parseTokenAmount('0.5', { decimalComma: true }).wei).toBe(WEI / 2n);
+    expect(parseTokenAmount('1 000,25', { decimalComma: true }).wei).toBe(
       1_000_250_000_000_000_000_000n,
     );
-    expect(parseTokenAmount('1.000,5', { decimalMark: ',' }).error).toBe('format');
+    expect(parseTokenAmount('1.000,5', { decimalComma: true }).error).toBe('format');
+  });
+});
+
+describe('commaIsDecimal', () => {
+  it('accepts a decimal comma in every locale that groups digits another way', () => {
+    // Regression: uk prints a dot decimal, so "1,5" on /uk/transfer-cst was
+    // refused, although a Ukrainian groups with spaces and writes 1,5 by hand.
+    expect(commaIsDecimal('uk')).toBe(true);
+    expect(commaIsDecimal('vi')).toBe(true);
+    expect(parseTokenAmount('1,5', { decimalComma: commaIsDecimal('uk') }).wei).toBe(
+      (3n * WEI) / 2n,
+    );
+  });
+
+  it('refuses it where a comma groups thousands', () => {
+    for (const locale of ['en', 'zh', 'zh-TW', 'zh-HK', 'ko', 'ja']) {
+      expect(commaIsDecimal(locale)).toBe(false);
+    }
   });
 });
 

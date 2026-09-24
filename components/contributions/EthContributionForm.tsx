@@ -15,9 +15,9 @@ import { useNotify } from '@/hooks/useNotify';
 import { useTxFlow, useTxStageLabel } from '@/hooks/useTxFlow';
 import { REQUIRED_CHAIN_NAME } from '@/lib/chainGuard';
 import { cn } from '@/lib/utils';
-import { decimalMarkFor, formatAmount } from '@/utils/format';
+import { formatAmount } from '@/utils/format';
 import { AmountField } from '@/components/tokens/transfer/AmountField';
-import { parseTokenAmount } from '@/components/tokens/transfer/amount';
+import { commaIsDecimal, parseTokenAmount } from '@/components/tokens/transfer/amount';
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
@@ -75,7 +75,7 @@ export function EthContributionForm({ id, onSuccess, className }: EthContributio
 
   const amount = parseTokenAmount(amountText, {
     max: balance?.value ?? null,
-    decimalMark: decimalMarkFor(locale) === ',' ? ',' : '.',
+    decimalComma: commaIsDecimal(locale),
   });
   const urlValid = isNoteUrl(note.url);
   const sendable = amount.error === null ? amount.wei : null;

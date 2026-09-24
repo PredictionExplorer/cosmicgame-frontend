@@ -40,7 +40,7 @@
       "available": "利用可能：{amount}",
       "availableUnknown": "残高を取得できません",
       "max": "最大",
-      "maxAria": "残高の全額を入力：{amount}",
+      "maxAria": "最大：残高の全額を入力（{amount}）",
       "errors": {
         "required": "数量を入力してください。",
         "format": "{example}のように数字で入力してください。",

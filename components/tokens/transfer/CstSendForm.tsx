@@ -6,7 +6,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import type { Address, Hash } from 'viem';
 
 import { cn } from '@/lib/utils';
-import { decimalMarkFor, formatAmount } from '@/utils/format';
+import { formatAmount } from '@/utils/format';
 import { useTxFlow, useTxStageLabel, type TxContext, type TxRunOptions } from '@/hooks/useTxFlow';
 import { Amount } from '@/components/ui/amount';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,7 @@ import { ChainGuard } from '@/components/wallet/NetworkGuard';
 import { AmountField } from './AmountField';
 import { RecipientField } from './RecipientField';
 import { TransferReview, transferGate } from './TransferReview';
-import { parseTokenAmount, toPlainDecimal } from './amount';
+import { commaIsDecimal, parseTokenAmount, toPlainDecimal } from './amount';
 import { parseRecipient } from './recipient';
 import { CST_BALANCE_QUERY_KEY, CST_DECIMALS, useCstBalance } from './useCstBalance';
 import { useRecipientFacts } from './useRecipientFacts';
@@ -104,7 +104,7 @@ export function CstSendForm({
   const amount = parseTokenAmount(amountText, {
     decimals: CST_DECIMALS,
     max: available,
-    decimalMark: decimalMarkFor(locale) === ',' ? ',' : '.',
+    decimalComma: commaIsDecimal(locale),
   });
   const check = useRecipientFacts(recipient.address);
   const gate = transferGate(check, acknowledged);
