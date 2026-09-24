@@ -34,15 +34,17 @@ function useHydrated(): boolean {
  * The compact date-time of a timestamp as a string: deterministic UTC during
  * SSR and hydration, then the browser's local time. For attributes and
  * composed strings; render `<DateTime>` wherever markup is possible.
+ * `locale` defaults to the active locale.
  */
 export function useHydrationSafeDateTime(
   timestamp: number,
   showSecond: boolean = false,
-  locale: string = 'en',
+  locale?: string,
 ): string {
+  const activeLocale = useLocale();
   const hydrated = useHydrated();
   return formatDateTime(timestamp, {
-    locale,
+    locale: locale ?? activeLocale,
     seconds: showSecond,
     timeZone: hydrated ? 'local' : 'utc',
   });

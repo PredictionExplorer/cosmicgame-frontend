@@ -9,6 +9,7 @@ export { useHydrationSafeDateTime, useHydrationSafeNowSeconds } from '@/componen
 interface HydrationSafeDateTimeProps {
   timestamp: number;
   showSecond?: boolean;
+  /** Defaults to the active locale, like `<DateTime>`. */
   locale?: string;
   children?: (value: string) => ReactNode;
 }
@@ -24,7 +25,7 @@ interface HydrationSafeDateTimeProps {
 export function HydrationSafeDateTime({
   timestamp,
   showSecond = false,
-  locale = 'en',
+  locale,
   children,
 }: HydrationSafeDateTimeProps) {
   return (

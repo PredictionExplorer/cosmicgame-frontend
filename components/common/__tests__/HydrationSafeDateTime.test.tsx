@@ -52,6 +52,24 @@ describe('HydrationSafeDateTime', () => {
     );
   });
 
+  it('follows the active locale when no locale is passed, like <DateTime>', () => {
+    const nextIntl = jest.requireMock('next-intl') as { useLocale: () => string };
+    jest.spyOn(nextIntl, 'useLocale').mockReturnValue('zh');
+    render(
+      <>
+        <HydrationSafeDateTime timestamp={TIMESTAMP} showSecond />
+        <span data-testid="string">
+          <StringProbe timestamp={TIMESTAMP} />
+        </span>
+      </>,
+    );
+    // The zh compact form ("1月1日 00:30:45"), in the runner's local zone after
+    // hydration, which may fall on 2025-12-31 and so carry the year.
+    const zhDateTime = /^(?:\d{4}年)?\d{1,2}月\d{1,2}日 \d{2}:\d{2}:45$/;
+    expect(document.querySelector('time')?.textContent).toMatch(zhDateTime);
+    expect(screen.getByTestId('string').textContent).toMatch(zhDateTime);
+  });
+
   it('still supports the render prop', () => {
     render(
       <HydrationSafeDateTime timestamp={TIMESTAMP}>
