@@ -1,6 +1,6 @@
 {
   "hero": {
-    "title": "Cosmic Signature Поширені запитання",
+    "title": "Поширені запитання про Cosmic Signature",
     "breadcrumb": "Поширені запитання",
     "subtitle": "Усе, що варто знати про Cosmic Signature — від перших кроків до тонкощів механіки протоколу.",
     "answerCount": "{count, plural, one {# відповідь} few {# відповіді} many {# відповідей} other {# відповіді}}",

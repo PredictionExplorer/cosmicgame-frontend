@@ -166,7 +166,7 @@ const publicPages: PublicPage[] = [
   {
     path: '/uk/faq',
     host: APP_HOST,
-    h1: 'Cosmic Signature Поширені запитання',
+    h1: 'Поширені запитання про Cosmic Signature',
     richH1: true,
     jsonLd: ['Organization', 'WebSite', 'WebApplication', 'FAQPage', 'BreadcrumbList'],
   },

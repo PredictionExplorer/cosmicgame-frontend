@@ -5,7 +5,7 @@ import type { FAQText } from './structure';
 /** English FAQ copy, keyed by the skeleton in structure.ts. */
 export const faqTextEn = {
   'getting-started': {
-    title: 'Getting Started',
+    title: 'Getting started',
     description: 'The basics of Cosmic Signature and how to participate',
     items: {
       'what-is-cosmic-signature': {
@@ -49,7 +49,7 @@ export const faqTextEn = {
     },
   },
   'allocations-and-rewards': {
-    title: 'Allocations & Distributions',
+    title: 'Allocations & distributions',
     description: 'What participants may receive when the cycle finalizes',
     items: {
       'what-is-the-main-allocation': {
@@ -103,7 +103,7 @@ export const faqTextEn = {
     },
   },
   'game-mechanics': {
-    title: 'Cycle Mechanics',
+    title: 'Cycle mechanics',
     description: 'Deep dive into gesture timing and protocol rules',
     items: {
       'how-does-price-increase': {
@@ -243,7 +243,7 @@ export const faqTextEn = {
     },
   },
   'arbitrum-and-technical': {
-    title: 'Arbitrum & Technical',
+    title: 'Arbitrum & technical',
     description: 'Network setup, wallets, and technical details',
     items: {
       'what-is-arbitrum': {
@@ -299,7 +299,7 @@ export const faqTextEn = {
     },
   },
   'trust-and-governance': {
-    title: 'Trust & Coordination',
+    title: 'Trust & coordination',
     description: 'Transparency, team control, and the open-source vision',
     items: {
       'team-controls': {

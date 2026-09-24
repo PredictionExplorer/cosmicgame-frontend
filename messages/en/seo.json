@@ -95,7 +95,7 @@
             "label": "Current ETH Gesture Cost"
           },
           "discount": {
-            "label": "RandomWalk Discount"
+            "label": "RandomWalk discount"
           }
         }
       },
@@ -321,7 +321,7 @@
     "description": "Follow the active Cosmic Signature Performance Cycle: gestures, the Cycle Reserve, attached assets, allocation tracks, and finalization status. The display below updates with live protocol data.",
     "cards": {
       "cycle": "Cycle",
-      "gestures": "Total Gestures",
+      "gestures": "Total gestures",
       "signatureAllocation": "Signature Allocation",
       "opened": "Opened"
     },

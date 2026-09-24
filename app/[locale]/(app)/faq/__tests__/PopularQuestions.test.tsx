@@ -31,8 +31,8 @@ describe('PopularQuestions', () => {
 
   it('names each question’s category', () => {
     render(<PopularQuestions content={faqContentEn} onQuestionClick={onQuestionClick} />);
-    expect(screen.getByText('Getting Started')).toBeInTheDocument();
-    expect(screen.getAllByText('Allocations & Distributions')).toHaveLength(3);
+    expect(screen.getByText('Getting started')).toBeInTheDocument();
+    expect(screen.getAllByText('Allocations & distributions')).toHaveLength(3);
   });
 
   it('opens the answer in place instead of jumping', async () => {

@@ -9,7 +9,7 @@ import {
 
 const CURRENT_CYCLE_TOOLTIPS = [
   {
-    label: 'Total Gestures',
+    label: 'Total gestures',
     expected: /Total gestures made in this cycle/,
   },
   {
@@ -36,8 +36,8 @@ test.describe('/current-cycle tooltips', () => {
     await expectAllLabelTooltips(page, CURRENT_CYCLE_TOOLTIPS);
   });
 
-  test('keeps the Total Gestures tooltip fully visible and portaled', async ({ page }) => {
-    const trigger = tooltipTriggerForLabel(page, 'Total Gestures');
+  test('keeps the Total gestures tooltip fully visible and portaled', async ({ page }) => {
+    const trigger = tooltipTriggerForLabel(page, 'Total gestures');
     await trigger.scrollIntoViewIfNeeded();
     await openTooltip(trigger);
 
