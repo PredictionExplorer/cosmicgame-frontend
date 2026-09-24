@@ -13,11 +13,22 @@ export interface QuerySeedEntry {
 }
 
 /**
+ * Whether seeding is off: under the e2e harness (`PLAYWRIGHT=1`), which mocks
+ * the public API in the browser. A fresh seed is not refetched on mount, so it
+ * would put live production rows where the specs expect their deterministic
+ * fixtures; without seeds the client reads the mocks, as it did before.
+ */
+export function seedsDisabled(): boolean {
+  return process.env.PLAYWRIGHT === '1';
+}
+
+/**
  * Hands server reads to the client's React Query cache, so a page's client
  * components render the data in the server HTML and never show a spinner for
  * data the server just read. Newer client data always wins over a seed.
  */
 export function QuerySeed({ seeds, children }: { seeds: QuerySeedEntry[]; children: ReactNode }) {
+  if (seedsDisabled()) return <>{children}</>;
   const usable = seeds.filter((seed) => seed.data !== null && seed.data !== undefined);
   if (usable.length === 0) return <>{children}</>;
   const client = new QueryClient();
