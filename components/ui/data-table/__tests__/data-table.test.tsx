@@ -363,13 +363,16 @@ describe('DataTable rows', () => {
         ]}
         getRowKey={(r) => r.id}
         getRowHref={(r) => `/records/${r.id}`}
-        getRowLabel={(r) => `Open record ${r.id}`}
+        getRowLabel={(r) => `Gesture #${r.id}`}
       />,
     );
 
-    const link = screen.getByRole('link', { name: 'Open record 1' });
+    // WCAG 2.5.3 Label in Name: the words a voice user sees start the link's
+    // name; the destination is appended, never substituted.
+    const link = screen.getByRole('link', { name: 'Record 1 Gesture #1' });
     expect(link).toHaveAttribute('href', '/records/1');
     expect(link).not.toHaveAttribute('target');
+    expect(link).not.toHaveAttribute('aria-label');
 
     await user.click(screen.getByText('1,200'));
     expect(mockPush).toHaveBeenCalledWith('/records/2');
@@ -571,6 +574,181 @@ describe('DataTable layout and naming', () => {
   it('is named by its aria label without a title', () => {
     render(<DataTable ariaLabel="Holders" data={rows} columns={columns} />);
     expect(screen.getByRole('table', { name: 'Holders' })).toBeInTheDocument();
+  });
+});
+
+describe('DataTable framing', () => {
+  const wrapper = (container: HTMLElement) =>
+    container.querySelector('[data-slot="data-table"]') as HTMLElement;
+
+  it('keeps a short ledger at a reading width instead of stretching it', () => {
+    const three = render(
+      <DataTable ariaLabel="Holders" data={rows} columns={columns.slice(0, 3)} />,
+    );
+    expect(wrapper(three.container)).toHaveClass('max-w-3xl');
+    three.unmount();
+
+    const four = render(<DataTable ariaLabel="Holders" data={rows} columns={columns} />);
+    expect(wrapper(four.container)).toHaveClass('max-w-4xl');
+    four.unmount();
+
+    const fill = render(
+      <DataTable ariaLabel="Holders" data={rows} columns={columns} width="fill" />,
+    );
+    expect(wrapper(fill.container).className).not.toMatch(/max-w-/);
+  });
+
+  it('lets a wide ledger run the full width', () => {
+    const { container } = render(
+      <DataTable
+        ariaLabel="Holders"
+        data={rows}
+        columns={[...columns, { id: 'id', kind: 'count', header: 'Id', value: (r) => r.id }]}
+      />,
+    );
+    expect(wrapper(container).className).not.toMatch(/max-w-/);
+  });
+
+  it('spans a group heading over the columns that share it', () => {
+    const { container } = render(
+      <DataTable
+        ariaLabel="Holders"
+        data={rows}
+        columns={[
+          columns[0]!,
+          { ...columns[1]!, group: 'Activity' },
+          { ...columns[2]!, group: 'Activity', label: 'Spent (ETH)' },
+          columns[3]!,
+        ]}
+      />,
+    );
+    const [groupRow] = [...container.querySelectorAll('thead tr')];
+    const cells = [...groupRow!.children].map((cell) => [
+      cell.tagName,
+      cell.textContent,
+      cell.getAttribute('colspan'),
+    ]);
+    expect(cells).toEqual([
+      ['TD', '', '1'],
+      ['TH', 'Activity', '2'],
+      ['TD', '', '1'],
+    ]);
+    expect(screen.getByRole('columnheader', { name: 'Activity' })).toHaveAttribute(
+      'scope',
+      'colgroup',
+    );
+  });
+
+  it('keeps a notice in every state, so it never moves the table', () => {
+    const notice = <p data-testid="notice">Read-only</p>;
+    const loading = render(
+      <DataTable ariaLabel="Holders" data={[]} columns={columns} loading notice={notice} />,
+    );
+    expect(screen.getByTestId('notice')).toBeInTheDocument();
+    loading.unmount();
+
+    const failed = render(
+      <DataTable ariaLabel="Holders" data={[]} columns={columns} error="Down" notice={notice} />,
+    );
+    expect(screen.getByTestId('notice')).toBeInTheDocument();
+    failed.unmount();
+
+    render(<DataTable ariaLabel="Holders" data={[]} columns={columns} notice={notice} />);
+    expect(screen.getByTestId('notice')).toBeInTheDocument();
+  });
+
+  it('puts a caption beside the row range, after the time zone', () => {
+    render(
+      <DataTable
+        ariaLabel="Holders"
+        data={rows}
+        columns={[
+          { id: 'when', kind: 'datetime', header: 'Date', value: () => 1_700_000_000 },
+          ...columns,
+        ]}
+        caption="Muted amounts are dust."
+      />,
+    );
+    const pager = document.querySelector('[data-slot="table-pagination"]');
+    expect(pager).toHaveTextContent(/formats\.dateTime\.timeZone.*·.*Muted amounts are dust\./);
+  });
+
+  it('underlines a quiet ledger’s links only on hover and focus', () => {
+    render(<DataTable ariaLabel="Holders" data={rows} columns={columns} links="quiet" />);
+    expect(screen.getByRole('table')).toHaveAttribute('data-links', 'quiet');
+  });
+
+  it('names the disclosure column on screen', () => {
+    render(
+      <DataTable
+        ariaLabel="Holders"
+        data={rows}
+        columns={columns}
+        renderDetails={() => 'More'}
+        detailsHeader="Records"
+      />,
+    );
+    const header = screen.getByRole('columnheader', { name: 'Records' });
+    expect(header.querySelector('.sr-only')).toBeNull();
+  });
+});
+
+describe('DataTable sort affordance', () => {
+  it('hints that an unsorted column can be sorted, in its padding, without moving the label', () => {
+    render(<DataTable ariaLabel="Holders" data={rows} columns={columns} />);
+    const sortable = screen.getByRole('columnheader', { name: /Gestures/ });
+    const hint = sortable.querySelector('[data-slot="sort-hint"]');
+    expect(hint).not.toBeNull();
+    expect(hint).toHaveAttribute('aria-hidden', 'true');
+    expect(hint).toHaveClass('absolute', 'opacity-0');
+    // A static column offers nothing to sort.
+    const fixed = screen.getByRole('columnheader', { name: 'Owner' });
+    expect(fixed.querySelector('[data-slot="sort-hint"]')).toBeNull();
+  });
+
+  it('shows the order the table starts in on its header', () => {
+    render(
+      <DataTable
+        ariaLabel="Holders"
+        data={rows}
+        columns={columns}
+        initialSort={{ id: 'gestures', direction: 'desc' }}
+      />,
+    );
+    const sorted = screen.getByRole('columnheader', { name: /Gestures/ });
+    expect(sorted).toHaveAttribute('aria-sort', 'descending');
+    expect(sorted.querySelector('[data-slot="sort-hint"]')).toBeNull();
+  });
+});
+
+describe('DataTable amounts', () => {
+  it('mutes dust and keeps a zero’s digits, so every decimal point lines up', () => {
+    render(
+      <DataTable
+        ariaLabel="Spent"
+        data={[
+          { id: 1, spent: 0.1562 },
+          { id: 2, spent: 0 },
+          { id: 3, spent: 0.00000001 },
+        ]}
+        columns={[
+          { id: 'id', kind: 'count', header: 'Id', value: (r) => r.id },
+          {
+            id: 'spent',
+            kind: 'amount',
+            header: 'Spent (ETH)',
+            value: (r) => r.spent,
+            showUnit: false,
+          },
+        ]}
+      />,
+    );
+    expect(screen.getByText('0.1562')).not.toHaveClass('text-subtle');
+    expect(screen.getByText('0.0000')).not.toHaveClass('text-subtle');
+    const dust = screen.getByText('<0.0001');
+    expect(dust).toHaveClass('text-subtle');
+    // The exact value is on hover.
+    expect(dust).toHaveAttribute('title', expect.stringContaining('0.00000001'));
   });
 
   it('has no accessibility violations', async () => {

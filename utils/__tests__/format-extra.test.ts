@@ -79,8 +79,8 @@ describe('formatUtcDateTimeStamp', () => {
 });
 
 describe('formatTableAmount', () => {
-  it('renders zero as a bare 0', () => {
-    expect(formatTableAmount(0, 'en')).toBe('0');
+  it('keeps the column digits for zero, so decimals line up', () => {
+    expect(formatTableAmount(0, 'en')).toBe('0.0000');
   });
 
   it('renders dust below display precision as a bounded value', () => {

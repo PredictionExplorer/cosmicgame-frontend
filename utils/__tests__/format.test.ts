@@ -106,7 +106,10 @@ describe('formatAmount', () => {
   });
 
   it('renders zero as a bare 0 and dust as a bound instead of a wall of zeros', () => {
-    expect(formatAmount(0, { unit: 'ETH', context: 'table', withUnit: false })).toBe('0');
+    // A ledger column keeps its digits for zero, so its decimal points line up.
+    expect(formatAmount(0, { unit: 'ETH', context: 'table', withUnit: false })).toBe('0.0000');
+    expect(formatAmount(0, { unit: 'CST', context: 'table', withUnit: false })).toBe('0.00');
+    expect(formatAmount(0, { unit: 'ETH', context: 'table', locale: 'vi' })).toBe(nb('0,0000~ETH'));
     expect(formatAmount(0, { unit: 'ETH' })).toBe(nb('0~ETH'));
     expect(formatAmount(-0, { unit: 'CST' })).toBe(nb('0~CST'));
     expect(formatAmount(0.0000001, { unit: 'ETH', context: 'table' })).toBe(nb('<0.0001~ETH'));
@@ -517,7 +520,7 @@ describe('legacy helpers delegate to the formatting layer', () => {
 
   it('formatTableAmount: unit-free fixed digits for ledger columns', () => {
     expect(formatTableAmount(2.65478, 'en')).toBe('2.6548');
-    expect(formatTableAmount(0, 'en')).toBe('0');
+    expect(formatTableAmount(0, 'en')).toBe('0.0000');
     expect(formatTableAmount(12.5, 'en', 'CST')).toBe('12.50');
     expect(formatTableAmount(null, 'en')).toBe(UNAVAILABLE_VALUE);
   });

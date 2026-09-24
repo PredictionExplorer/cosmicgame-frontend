@@ -41,7 +41,9 @@ describe('GlobalAnchorActionsTable', () => {
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('link', { name: 'anchoring.anchorActionDetail.breadcrumbs.action(id=10)' }),
+      screen.getByRole('link', {
+        name: /\S anchoring\.anchorActionDetail\.breadcrumbs\.action\(id=10\)$/,
+      }),
     ).toHaveAttribute('href', '/anchor-action/1/10');
   });
 
