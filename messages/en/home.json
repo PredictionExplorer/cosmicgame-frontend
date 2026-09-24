@@ -303,7 +303,7 @@
     "cstTrade": "Need CST for this gesture method? Trade ETH for CST on Arbitrum through Uniswap.",
     "reward": {
       "economicsTitle": "CST Gesture economics",
-      "previewTitle": "Participation CST",
+      "previewTitle": "Participation CST preview",
       "economicsDescription": "Net CST is the Participation CST reward minus the current CST gesture cost.",
       "previewDescription": "Estimated dynamic CST you receive if this gesture lands. The amount depends on time since the previous gesture, and every gesture method has two protections: maximum cost and minimum CST reward.",
       "rewardLabel": "Reward",
