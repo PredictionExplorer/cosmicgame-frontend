@@ -108,7 +108,12 @@ describe('ClaimsByRoundSection', () => {
   it('offers a retry when the cycles fail to load', async () => {
     const user = userEvent.setup();
     const refetch = jest.fn();
-    mockUseClaimsByRound.mockReturnValue({ data: undefined, isLoading: false, isError: true, refetch });
+    mockUseClaimsByRound.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      refetch,
+    });
     render(<ClaimsByRoundSection />);
     await user.click(screen.getByRole('button', { name: /try again|retry/i }));
     expect(refetch).toHaveBeenCalled();

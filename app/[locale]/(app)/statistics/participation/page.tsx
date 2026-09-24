@@ -78,7 +78,10 @@ export default async function Page({ params }: PageProps) {
               label: t('metrics.uniqueParticipants.label'),
               info: t('metrics.uniqueParticipants.tooltip'),
               value: (
-                <DashboardCountFigure metric="uniqueParticipants" seed={seed('uniqueParticipants')} />
+                <DashboardCountFigure
+                  metric="uniqueParticipants"
+                  seed={seed('uniqueParticipants')}
+                />
               ),
             },
             {

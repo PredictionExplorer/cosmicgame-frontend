@@ -234,7 +234,10 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
             >
               <div className="flex min-h-10 min-w-0 flex-col justify-center py-1 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
                 <span className="flex min-w-0 items-baseline gap-2">
-                  <span aria-hidden className="w-4 shrink-0 text-right type-caption text-subtle tabular-nums">
+                  <span
+                    aria-hidden
+                    className="w-4 shrink-0 text-right type-caption text-subtle tabular-nums"
+                  >
                     {row + 1}
                   </span>
                   <Link

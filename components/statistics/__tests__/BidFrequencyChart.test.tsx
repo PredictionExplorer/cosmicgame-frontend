@@ -40,7 +40,9 @@ describe('BidFrequencyChart', () => {
   it('reads the range in one sentence and plots one bar per bucket', () => {
     render(<BidFrequencyChart label="Gesture frequency over time" />);
     const figure = screen.getByRole('figure', { name: 'Gesture frequency over time' });
-    expect(within(figure).getByText(/Gestures, .*: 1,274\. Busiest day: .*\(1,234\)\./)).toBeInTheDocument();
+    expect(
+      within(figure).getByText(/Gestures, .*: 1,274\. Busiest day: .*\(1,234\)\./),
+    ).toBeInTheDocument();
     expect(screen.getByTestId('bar-chart')).toHaveAttribute('data-point-count', '2');
     // The opening hour's exclusion stays stated under the chart.
     expect(screen.getByText(/first hour after each cycle opens/i)).toBeInTheDocument();
@@ -48,7 +50,9 @@ describe('BidFrequencyChart', () => {
 
   it('puts round, grouped count ticks on the value axis', () => {
     render(<BidFrequencyChart label="Frequency" />);
-    const ticks = within(screen.getByTestId('y-axis')).getAllByText(/\d/).map((el) => el.textContent);
+    const ticks = within(screen.getByTestId('y-axis'))
+      .getAllByText(/\d/)
+      .map((el) => el.textContent);
     expect(ticks).toEqual(['0', '500', '1,000', '1,500']);
   });
 
@@ -82,7 +86,12 @@ describe('BidFrequencyChart', () => {
   it('offers a retry when the buckets fail to load', async () => {
     const user = userEvent.setup();
     const refetch = jest.fn();
-    mockUseBidFrequency.mockReturnValue({ data: undefined, isLoading: false, isError: true, refetch });
+    mockUseBidFrequency.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      refetch,
+    });
     render(<BidFrequencyChart label="Frequency" />);
     expect(screen.getByText('Failed to load gesture frequency')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /try again|retry/i }));

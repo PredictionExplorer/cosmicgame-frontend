@@ -63,7 +63,12 @@ export function ActiveAnchorHoldersFigure() {
   const cst = useUniqueCSTAnchorHolders();
   const rwlk = useUniqueRWLKAnchorHolders();
   const loading = cst.isLoading || rwlk.isLoading;
-  return <FigureValue value={loading ? undefined : countActiveAnchorHolders(cst.data, rwlk.data)} loading={loading} />;
+  return (
+    <FigureValue
+      value={loading ? undefined : countActiveAnchorHolders(cst.data, rwlk.data)}
+      loading={loading}
+    />
+  );
 }
 
 /** Wallets holding at least one Cosmic Signature NFT. */

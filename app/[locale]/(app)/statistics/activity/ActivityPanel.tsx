@@ -106,7 +106,11 @@ const ActivityPanel = () => {
             />
           </SectionShell>
 
-          <SectionShell headingLevel={3} title={title('cstCost')} tooltip={t('sectionTooltips.cstCost')}>
+          <SectionShell
+            headingLevel={3}
+            title={title('cstCost')}
+            tooltip={t('sectionTooltips.cstCost')}
+          >
             <CstGestureCostChart round={scope.cycle} label={title('cstCost')} />
           </SectionShell>
         </div>

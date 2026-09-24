@@ -281,7 +281,12 @@ export const CstGestureCostView: FC<CstGestureCostViewProps> = ({ gestures, labe
         <ChartLegend
           items={[
             { key: 'paid', label: t('charts.cstCost.priceLine'), color: PRICE_COLOR, shape: 'dot' },
-            { key: 'clock', label: t('charts.cstCost.clockLine'), color: CLOCK_COLOR, shape: 'dash' },
+            {
+              key: 'clock',
+              label: t('charts.cstCost.clockLine'),
+              color: CLOCK_COLOR,
+              shape: 'dash',
+            },
           ]}
         />
       }

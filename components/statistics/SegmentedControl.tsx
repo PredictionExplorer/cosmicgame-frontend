@@ -65,7 +65,8 @@ export function SegmentedControl<T extends string>({
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     const last = options.length - 1;
     let next: number | null = null;
-    if (event.key in KEY_STEP) next = (selected + KEY_STEP[event.key]! + options.length) % options.length;
+    if (event.key in KEY_STEP)
+      next = (selected + KEY_STEP[event.key]! + options.length) % options.length;
     else if (event.key === 'Home') next = 0;
     else if (event.key === 'End') next = last;
     if (next === null) return;

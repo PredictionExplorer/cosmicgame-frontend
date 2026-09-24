@@ -1,11 +1,4 @@
-import {
-  durationScale,
-  elapsedTicks,
-  linearScale,
-  niceStep,
-  timeStep,
-  timeTicks,
-} from '../ticks';
+import { durationScale, elapsedTicks, linearScale, niceStep, timeStep, timeTicks } from '../ticks';
 import { formatDateRange, formatMonthDay, formatTimeTick } from '../labels';
 
 const DAY = 86_400;
@@ -40,7 +33,15 @@ describe('chart ticks', () => {
 
   it('ends elapsed ticks inside the range on whole days', () => {
     expect(elapsedTicks(43 * DAY, 6)).toEqual([0, 14 * DAY, 28 * DAY, 42 * DAY]);
-    expect(elapsedTicks(43 * DAY, 8)).toEqual([0, 7 * DAY, 14 * DAY, 21 * DAY, 28 * DAY, 35 * DAY, 42 * DAY]);
+    expect(elapsedTicks(43 * DAY, 8)).toEqual([
+      0,
+      7 * DAY,
+      14 * DAY,
+      21 * DAY,
+      28 * DAY,
+      35 * DAY,
+      42 * DAY,
+    ]);
     expect(elapsedTicks(0)).toEqual([0]);
   });
 

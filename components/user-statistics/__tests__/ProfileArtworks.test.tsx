@@ -10,7 +10,10 @@ const token = (TokenId: number, extra: Partial<CSTTokenInfo> = {}): CSTTokenInfo
 describe('ProfileArtworks', () => {
   it('hangs each held Signature on its plate with a wall label, newest first', () => {
     render(
-      <ProfileArtworks tokens={[token(3), token(25, { TokenName: 'Twisted Mind' })]} loading={false} />,
+      <ProfileArtworks
+        tokens={[token(3), token(25, { TokenName: 'Twisted Mind' })]}
+        loading={false}
+      />,
     );
     const links = screen.getAllByRole('link');
     expect(links[0]).toHaveAttribute('href', '/detail/25');
@@ -24,7 +27,9 @@ describe('ProfileArtworks', () => {
     const tokens = Array.from({ length: 11 }, (_, i) => token(i + 1));
     render(<ProfileArtworks tokens={tokens} loading={false} />);
     expect(screen.getAllByRole('link')).toHaveLength(8);
-    fireEvent.click(screen.getByRole('button', { name: 'myPages.statistics.artworks.showAll(count=11)' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'myPages.statistics.artworks.showAll(count=11)' }),
+    );
     expect(screen.getAllByRole('link')).toHaveLength(11);
   });
 

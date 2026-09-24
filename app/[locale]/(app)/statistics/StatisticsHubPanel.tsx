@@ -85,11 +85,13 @@ function sectionFigures(
   return {
     participation: count('participants', main.NumUniqueBidders),
     tokens:
-      cstSupply === undefined ? null : cstSupply === null ? unknown : (
-        t('hub.figures.supply', {
-          amount: formatAmount(cstSupply, { unit: 'CST', context: 'hero', locale }),
-        })
-      ),
+      cstSupply === undefined
+        ? null
+        : cstSupply === null
+          ? unknown
+          : t('hub.figures.supply', {
+              amount: formatAmount(cstSupply, { unit: 'CST', context: 'hero', locale }),
+            }),
     anchoring: count(
       'anchored',
       cstAnchored === null || rwlkAnchored === null ? null : cstAnchored + rwlkAnchored,
@@ -254,7 +256,10 @@ const StatisticsHubPanel = () => {
               title={metric('totalSupplyErc20')}
               value={cstSupply === undefined ? count(null) : cst(cstSupply)}
             />
-            <StatisticsItem title={metric('totalCstConsumed')} value={cst(main.TotalCSTConsumedEth)} />
+            <StatisticsItem
+              title={metric('totalCstConsumed')}
+              value={cst(main.TotalCSTConsumedEth)}
+            />
             <StatisticsItem title={metric('cstGestures')} value={count(main.NumBidsCST)} />
             <StatisticsItem
               title={metric('randomWalkNftsUsed')}

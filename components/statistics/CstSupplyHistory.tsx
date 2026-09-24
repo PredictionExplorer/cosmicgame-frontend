@@ -1,7 +1,15 @@
 'use client';
 
 import { memo, useId, useMemo, useState, type FC } from 'react';
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { formatAmount, formatUnixTsLabel, supplyHistoryBootstrapRange } from '@/utils/format';
@@ -70,9 +78,7 @@ export function supplyByDate(records: readonly SupplyByDateRecord[]): SupplyPoin
 }
 
 /** The supply after every gesture, oldest first, numbered from the first gesture. */
-export function supplyByGesture(
-  records: readonly SupplyByGestureRecord[],
-): SupplyPoint[] {
+export function supplyByGesture(records: readonly SupplyByGestureRecord[]): SupplyPoint[] {
   return records
     .map((r) => {
       // The wire nests the transaction under `Tx`; older responses flatten it.
@@ -122,7 +128,11 @@ function SupplyTooltip({
   const when = formatUnixTsLabel(point.ts, view === 'gesture', locale);
   return (
     <ChartTooltipCard
-      title={view === 'gesture' ? `${t('charts.supply.gesture', { number: point.gesture ?? 0 })} · ${when}` : when}
+      title={
+        view === 'gesture'
+          ? `${t('charts.supply.gesture', { number: point.gesture ?? 0 })} · ${when}`
+          : when
+      }
       rows={[
         {
           key: 'supply',
@@ -292,7 +302,9 @@ export const CstSupplyHistory: FC<{ label: string }> = ({ label }) => {
     <ErrorState
       headingLevel={4}
       title={t('charts.supply.loadErrorTitle')}
-      message={t(view === 'gesture' ? 'charts.supply.loadGestureError' : 'charts.supply.loadDateError')}
+      message={t(
+        view === 'gesture' ? 'charts.supply.loadGestureError' : 'charts.supply.loadDateError',
+      )}
       onRetry={() => query.refetch()}
     />
   ) : points.length === 0 ? (

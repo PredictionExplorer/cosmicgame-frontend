@@ -60,7 +60,9 @@ describe('GestureTypeMixChart', () => {
     const user = userEvent.setup();
     render(<GestureTypeMixChart round={2} isLive label="Mix" />);
     await user.click(screen.getAllByRole('radio')[1]!);
-    expect(Number(screen.getByTestId('bar-chart').getAttribute('data-point-count'))).toBeLessThan(21);
+    expect(Number(screen.getByTestId('bar-chart').getAttribute('data-point-count'))).toBeLessThan(
+      21,
+    );
   });
 
   it('lists the non-empty windows as a table', async () => {

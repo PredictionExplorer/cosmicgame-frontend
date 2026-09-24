@@ -52,7 +52,9 @@ function series(kind: string) {
     const draw = typeof dot === 'function' ? (dot as (props: object) => React.ReactNode) : null;
     return (
       <svg data-testid={`${kind}-${String(dataKey)}`}>
-        {draw ? state.data.map((payload, index) => draw({ cx: index, cy: index, index, payload })) : null}
+        {draw
+          ? state.data.map((payload, index) => draw({ cx: index, cy: index, index, payload }))
+          : null}
       </svg>
     );
   };

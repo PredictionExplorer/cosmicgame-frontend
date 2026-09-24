@@ -1,6 +1,10 @@
 import type { ReactNode } from 'react';
 
-import { PageHeader, type PageHeaderFigure, type PageHeaderLink } from '@/components/layout/PageHeader';
+import {
+  PageHeader,
+  type PageHeaderFigure,
+  type PageHeaderLink,
+} from '@/components/layout/PageHeader';
 
 import { StatisticsSubNav } from './StatisticsSubNav';
 

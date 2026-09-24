@@ -221,7 +221,12 @@ export const CstCalibrationWindowView: FC<CstCalibrationWindowViewProps> = ({
         cell: (row) => formatHoursTick(row.hours, locale),
         sortable: true,
       },
-      { id: 'method', kind: 'text', header: t('charts.cstWindow.method'), value: (row) => row.method },
+      {
+        id: 'method',
+        kind: 'text',
+        header: t('charts.cstWindow.method'),
+        value: (row) => row.method,
+      },
       {
         id: 'participant',
         kind: 'address',
@@ -260,14 +265,24 @@ export const CstCalibrationWindowView: FC<CstCalibrationWindowViewProps> = ({
               color: SERIES_COLOR.measure,
               shape: 'line',
             },
-            { key: 'eth', label: t('charts.cstWindow.typeEth'), color: GESTURE_METHOD_COLOR.eth, shape: 'dot' },
+            {
+              key: 'eth',
+              label: t('charts.cstWindow.typeEth'),
+              color: GESTURE_METHOD_COLOR.eth,
+              shape: 'dot',
+            },
             {
               key: 'rwlk',
               label: t('charts.cstWindow.typeRandomWalk'),
               color: GESTURE_METHOD_COLOR.ethRandomWalk,
               shape: 'dot',
             },
-            { key: 'cst', label: t('charts.cstWindow.typeCst'), color: GESTURE_METHOD_COLOR.cst, shape: 'dot' },
+            {
+              key: 'cst',
+              label: t('charts.cstWindow.typeCst'),
+              color: GESTURE_METHOD_COLOR.cst,
+              shape: 'dot',
+            },
           ]}
         />
       }
@@ -294,7 +309,11 @@ type CstCalibrationWindowChartProps = {
 };
 
 /** Loads the cycle's gesture list and renders the Calibration Window chart. */
-const CstCalibrationWindowChart: FC<CstCalibrationWindowChartProps> = ({ round, isLive, label }) => {
+const CstCalibrationWindowChart: FC<CstCalibrationWindowChartProps> = ({
+  round,
+  isLive,
+  label,
+}) => {
   const t = useTranslations('statistics');
   const hasRound = round >= 0;
   const { data: gestures, isLoading, isError, refetch } = useGestureListByCycle(round, 'asc');
@@ -302,7 +321,9 @@ const CstCalibrationWindowChart: FC<CstCalibrationWindowChartProps> = ({ round, 
   const roundEndTs = !isLive && roundInfo?.TimeStamp ? roundInfo.TimeStamp : 0;
 
   if (!hasRound) {
-    return <EmptyState headingLevel={4} variant="inline" title={t('charts.cstWindow.selectCycle')} />;
+    return (
+      <EmptyState headingLevel={4} variant="inline" title={t('charts.cstWindow.selectCycle')} />
+    );
   }
   if (isLoading) return <SkeletonChart height={CHART_HEIGHT} bars={18} />;
   if (isError) {

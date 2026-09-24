@@ -47,7 +47,8 @@ export function ProfileOverview({
   const tCommon = useTranslations('common');
   const format = useFormat();
   const o = (key: string) => t(`statistics.overview.${key}`);
-  const stellarEthTotal = (userInfo.SumRaffleEthWinnings ?? 0) + (userInfo.SumRaffleEthWithdrawal ?? 0);
+  const stellarEthTotal =
+    (userInfo.SumRaffleEthWinnings ?? 0) + (userInfo.SumRaffleEthWithdrawal ?? 0);
 
   return (
     <SectionShell title={o('title')}>

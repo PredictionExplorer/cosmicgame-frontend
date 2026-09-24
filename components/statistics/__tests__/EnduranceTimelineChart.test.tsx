@@ -43,7 +43,9 @@ describe('EnduranceTimelineChart', () => {
   it('names the Endurance Champion and the Chrono-Warrior, one line each', () => {
     render(<EnduranceTimelineChart round={2} isLive label="Endurance" />);
     const figure = screen.getByRole('figure', { name: 'Endurance' });
-    expect(within(figure).getByText(/^Endurance champion: 0xb1b2….*held 1[67]h/i)).toBeInTheDocument();
+    expect(
+      within(figure).getByText(/^Endurance champion: 0xb1b2….*held 1[67]h/i),
+    ).toBeInTheDocument();
     expect(within(figure).getByText(/^Chrono-warrior: /)).toBeInTheDocument();
   });
 
@@ -52,7 +54,9 @@ describe('EnduranceTimelineChart', () => {
     const gantt = screen.getByRole('group', { name: 'Lead stints by participant' });
     const lanes = within(gantt).getAllByRole('group');
     expect(lanes).toHaveLength(2);
-    expect(within(gantt).getAllByText('Endurance Champion', { selector: '.sr-only' })).toHaveLength(1);
+    expect(within(gantt).getAllByText('Endurance Champion', { selector: '.sr-only' })).toHaveLength(
+      1,
+    );
   });
 
   it('keeps one tab stop across every stint and reads the focused one out', async () => {
@@ -96,7 +100,9 @@ describe('EnduranceTimelineChart', () => {
   });
 
   it('asks for a cycle, and says when the cycle has no lead yet', () => {
-    const { rerender } = render(<EnduranceTimelineChart round={-1} isLive={false} label="Endurance" />);
+    const { rerender } = render(
+      <EnduranceTimelineChart round={-1} isLive={false} label="Endurance" />,
+    );
     expect(screen.getByText('Select a cycle to inspect.')).toBeInTheDocument();
     mockUseGestureListByCycle.mockReturnValue(ok([]));
     rerender(<EnduranceTimelineChart round={2} isLive label="Endurance" />);

@@ -97,7 +97,10 @@ export function CycleRhythm() {
         height={64}
         className="mt-4"
       />
-      <div aria-hidden className="mt-1.5 flex justify-between type-caption text-subtle tabular-nums">
+      <div
+        aria-hidden
+        className="mt-1.5 flex justify-between type-caption text-subtle tabular-nums"
+      >
         <span>{formatMonthDay(series[0]!.day, format.locale)}</span>
         <span>{formatMonthDay(series[series.length - 1]!.day, format.locale)}</span>
       </div>

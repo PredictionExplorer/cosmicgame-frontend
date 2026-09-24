@@ -188,7 +188,9 @@ describe('UserStatisticsView', () => {
   it('shows this cycle’s Stellar Selection share as a plain count, never compounded', () => {
     render(<UserStatisticsView address={ADDRESS} isOwnProfile={false} />);
     // Two of the address's gestures are in cycle 2, out of the cycle's 20.
-    expect(screen.getByText('myPages.statistics.selection.share(mine=2,total=20)')).toBeInTheDocument();
+    expect(
+      screen.getByText('myPages.statistics.selection.share(mine=2,total=20)'),
+    ).toBeInTheDocument();
     expect(screen.getByText('10%')).toBeInTheDocument();
     // 1 - (18/20)^10 would read 65.1%; nothing on the profile compounds the share.
     expect(document.body).not.toHaveTextContent('65.1%');

@@ -22,7 +22,13 @@ export function useRovingStints(counts: readonly number[]) {
   // The remembered mark, or the first mark when the lanes changed under it.
   const position = useMemo<RovingPosition>(() => {
     if (current.item < (counts[current.row] ?? 0)) return current;
-    return { row: Math.max(0, counts.findIndex((count) => count > 0)), item: 0 };
+    return {
+      row: Math.max(
+        0,
+        counts.findIndex((count) => count > 0),
+      ),
+      item: 0,
+    };
   }, [counts, current]);
 
   const focus = useCallback((next: RovingPosition) => {

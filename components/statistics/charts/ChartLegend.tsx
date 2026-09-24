@@ -53,9 +53,20 @@ export function LegendSwatch({
  * keys in caption type, each drawn like its series. Recharts' own legend is
  * not used, so every chart's key looks the same.
  */
-export function ChartLegend({ items, className }: { items: readonly LegendItem[]; className?: string }) {
+export function ChartLegend({
+  items,
+  className,
+}: {
+  items: readonly LegendItem[];
+  className?: string;
+}) {
   return (
-    <ul className={cn('flex flex-wrap gap-x-5 gap-y-1.5 type-caption text-muted-foreground', className)}>
+    <ul
+      className={cn(
+        'flex flex-wrap gap-x-5 gap-y-1.5 type-caption text-muted-foreground',
+        className,
+      )}
+    >
       {items.map((item) => (
         <li key={item.key} className="inline-flex items-center gap-2">
           <LegendSwatch color={item.color} shape={item.shape} />

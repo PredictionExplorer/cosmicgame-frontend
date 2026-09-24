@@ -29,50 +29,50 @@ export async function StatisticsSeoSummary() {
 
   return (
     <>
-    <PageHeader
-      section="explore"
-      sectionHub
-      className={STATISTICS_HEADER_CLASS}
-      title={t('hub.seo.heading')}
-      titleId="statistics-heading"
-      subtitle={t('hub.seo.description')}
-      figures={[
-        {
-          id: 'activePerformanceCycle',
-          label: t('metrics.activePerformanceCycle.label'),
-          value: figure('cycle'),
-          info: t('metrics.activePerformanceCycle.tooltip'),
-          caption: <ActiveCycleGesturesCaption seed={seed('gestures')} />,
-        },
-        {
-          id: 'allocationsDistributed',
-          label: t('metrics.allocationsDistributed.label'),
-          value: figure('allocations'),
-          info: t('metrics.allocationsDistributed.tooltip'),
-        },
-        {
-          id: 'cosmicSignatureNftsImprinted',
-          label: t('metrics.cosmicSignatureNftsImprinted.shortLabel'),
-          value: figure('imprinted'),
-          info: t('metrics.cosmicSignatureNftsImprinted.tooltip'),
-        },
-        {
-          id: 'contractBalance',
-          label: t('metrics.contractBalance.label'),
-          value: figure('balance'),
-          info: t('metrics.contractBalance.tooltip'),
-        },
-      ]}
-      meta={<LiveStatus variant="inline" />}
-      related={[
-        { href: '/current-cycle', label: t('hub.seo.links.currentCycle') },
-        { href: '/how-it-works', label: t('hub.seo.links.howItWorks') },
-        { href: '/contracts', label: t('hub.seo.links.contracts') },
-        { href: '/faq', label: t('hub.seo.links.faq') },
-      ]}
-      relatedLabel={t('hub.seo.relatedPagesAria')}
-    />
-    <StatisticsSubNav />
+      <PageHeader
+        section="explore"
+        sectionHub
+        className={STATISTICS_HEADER_CLASS}
+        title={t('hub.seo.heading')}
+        titleId="statistics-heading"
+        subtitle={t('hub.seo.description')}
+        figures={[
+          {
+            id: 'activePerformanceCycle',
+            label: t('metrics.activePerformanceCycle.label'),
+            value: figure('cycle'),
+            info: t('metrics.activePerformanceCycle.tooltip'),
+            caption: <ActiveCycleGesturesCaption seed={seed('gestures')} />,
+          },
+          {
+            id: 'allocationsDistributed',
+            label: t('metrics.allocationsDistributed.label'),
+            value: figure('allocations'),
+            info: t('metrics.allocationsDistributed.tooltip'),
+          },
+          {
+            id: 'cosmicSignatureNftsImprinted',
+            label: t('metrics.cosmicSignatureNftsImprinted.shortLabel'),
+            value: figure('imprinted'),
+            info: t('metrics.cosmicSignatureNftsImprinted.tooltip'),
+          },
+          {
+            id: 'contractBalance',
+            label: t('metrics.contractBalance.label'),
+            value: figure('balance'),
+            info: t('metrics.contractBalance.tooltip'),
+          },
+        ]}
+        meta={<LiveStatus variant="inline" />}
+        related={[
+          { href: '/current-cycle', label: t('hub.seo.links.currentCycle') },
+          { href: '/how-it-works', label: t('hub.seo.links.howItWorks') },
+          { href: '/contracts', label: t('hub.seo.links.contracts') },
+          { href: '/faq', label: t('hub.seo.links.faq') },
+        ]}
+        relatedLabel={t('hub.seo.relatedPagesAria')}
+      />
+      <StatisticsSubNav />
     </>
   );
 }

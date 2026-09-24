@@ -360,7 +360,9 @@ const EnduranceGanttView = memo(function EnduranceGanttView({ gantt }: { gantt: 
                         width: pct(stint.durationHours / durHours),
                         minWidth: ringRecord ? 3 : 2,
                         backgroundColor: stintColor(stint, lane),
-                        boxShadow: ringRecord ? 'inset 0 0 0 1.5px hsl(var(--foreground))' : undefined,
+                        boxShadow: ringRecord
+                          ? 'inset 0 0 0 1.5px hsl(var(--foreground))'
+                          : undefined,
                       }}
                     />
                   );

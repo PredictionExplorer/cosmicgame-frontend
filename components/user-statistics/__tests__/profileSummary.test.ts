@@ -12,7 +12,10 @@ describe('summarizeGestures', () => {
   });
 
   it('reads the raw price fields when the normalized ones are missing', () => {
-    const summary = summarizeGestures([{ RoundNum: 1, EthPriceEth: 0.2 }, { RoundNum: 1, CstPriceEth: 10 }]);
+    const summary = summarizeGestures([
+      { RoundNum: 1, EthPriceEth: 0.2 },
+      { RoundNum: 1, CstPriceEth: 10 },
+    ]);
     expect(summary.ethSpent).toBeCloseTo(0.2);
     expect(summary.cstSpent).toBe(10);
   });

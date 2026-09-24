@@ -64,7 +64,9 @@ describe('CstCalibrationWindowView', () => {
   it('reads the window now and its range in one sentence', () => {
     render(<CstCalibrationWindowView gestures={gestures} isLive label="Window" />);
     const figure = screen.getByRole('figure', { name: 'Window' });
-    expect(figure).toHaveTextContent(/The window is .* now\. This cycle it has ranged from .* to .*\./);
+    expect(figure).toHaveTextContent(
+      /The window is .* now\. This cycle it has ranged from .* to .*\./,
+    );
   });
 
   it('reads the closing value of a finalized cycle', () => {
@@ -83,7 +85,9 @@ describe('CstCalibrationWindowView', () => {
 
   it('puts whole-minute ticks on a narrow window axis, each reading differently', () => {
     render(<CstCalibrationWindowView gestures={gestures} isLive label="Window" />);
-    const ticks = within(screen.getByTestId('y-axis')).getAllByText(/./).map((el) => el.textContent);
+    const ticks = within(screen.getByTestId('y-axis'))
+      .getAllByText(/./)
+      .map((el) => el.textContent);
     expect(ticks.length).toBeGreaterThan(1);
     // 9,960s–10,000s: minute steps past the hour read "2h 46m", never "2.8h" twice.
     for (const tick of ticks) expect(tick).toMatch(/^\d+h\s\d+m$/);
@@ -130,7 +134,12 @@ describe('CstCalibrationWindowChart', () => {
   it('offers a retry when the gesture list fails', async () => {
     const user = userEvent.setup();
     const refetch = jest.fn();
-    mockUseGestureListByCycle.mockReturnValue({ data: undefined, isLoading: false, isError: true, refetch });
+    mockUseGestureListByCycle.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      refetch,
+    });
     render(<CstCalibrationWindowChart round={2} isLive label="Window" />);
     expect(screen.getByText('Failed to load Calibration Window timeline')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /try again|retry/i }));

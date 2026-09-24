@@ -31,7 +31,15 @@ export function SparkBars({ values, label, color, height = 56, className }: Spar
       className={cn('block w-full', className)}
       style={{ height }}
     >
-      <line x1={0} x2={count} y1={height - 0.5} y2={height - 0.5} stroke="hsl(var(--rule))" strokeWidth={1} vectorEffect="non-scaling-stroke" />
+      <line
+        x1={0}
+        x2={count}
+        y1={height - 0.5}
+        y2={height - 0.5}
+        stroke="hsl(var(--rule))"
+        strokeWidth={1}
+        vectorEffect="non-scaling-stroke"
+      />
       {values.map((value, index) => {
         const barHeight = max > 0 ? Math.max(value > 0 ? 1.5 : 0, (value / max) * (height - 2)) : 0;
         return (

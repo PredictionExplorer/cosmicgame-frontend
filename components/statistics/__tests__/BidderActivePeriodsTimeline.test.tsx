@@ -49,9 +49,7 @@ const ok = <T,>(data: T) => ({ data, isLoading: false, isError: false, refetch: 
 beforeEach(() => {
   jest.clearAllMocks();
   mockUseBidTimeBounds.mockReturnValue(ok({ MinTs: START, MaxTs: END }));
-  mockUseTopBidderActivePeriods.mockReturnValue(
-    ok({ TopBidders: top, ActivePeriods: periods }),
-  );
+  mockUseTopBidderActivePeriods.mockReturnValue(ok({ TopBidders: top, ActivePeriods: periods }));
 });
 
 describe('BidderActivePeriodsTimeline', () => {

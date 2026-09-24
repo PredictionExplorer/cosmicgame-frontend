@@ -9,7 +9,11 @@ describe('SectionShell', () => {
   it('names the section by an H2 whose button folds the body away', async () => {
     const user = userEvent.setup();
     render(
-      <SectionShell title="Gesture spikes" description="One sentence." actions={<a href="#x">Act</a>}>
+      <SectionShell
+        title="Gesture spikes"
+        description="One sentence."
+        actions={<a href="#x">Act</a>}
+      >
         <p>Chart body</p>
       </SectionShell>,
     );

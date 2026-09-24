@@ -191,7 +191,8 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
     [cstAnchorDistributions],
   );
   const rwlkStats = userInfo?.StakingStatisticsRWalk;
-  const anchoredNow = (userInfoRaw?.CurrentlyStakedTokens?.length ?? 0) + (rwlkStats?.TotalTokensStaked ?? 0);
+  const anchoredNow =
+    (userInfoRaw?.CurrentlyStakedTokens?.length ?? 0) + (rwlkStats?.TotalTokensStaked ?? 0);
   const anchorActions =
     cstAnchorActions.length +
     (rwlkStats?.TotalNumStakeActions ?? 0) +
@@ -309,16 +310,16 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
             {loadingCSTActions || loadingRWLKActions || loadingStakingRewards ? (
               <SkeletonTable rows={4} columns={4} />
             ) : (
-            <UserAnchoringSection
-              address={address}
-              userInfo={userInfo}
-              cstAnchorActions={cstAnchorActions}
-              rwlkAnchorActions={rwlkAnchorActions}
-              cstAnchorDistributions={cstAnchorDistributions}
-              cstAnchorDistributionsByDeposit={cstAnchorDistributionsByDeposit}
-              retrievedCstAnchorDistributions={collectedCstStakingRewardsRaw ?? []}
-              rwlkImprints={rwlkImprints}
-            />
+              <UserAnchoringSection
+                address={address}
+                userInfo={userInfo}
+                cstAnchorActions={cstAnchorActions}
+                rwlkAnchorActions={rwlkAnchorActions}
+                cstAnchorDistributions={cstAnchorDistributions}
+                cstAnchorDistributionsByDeposit={cstAnchorDistributionsByDeposit}
+                retrievedCstAnchorDistributions={collectedCstStakingRewardsRaw ?? []}
+                rwlkImprints={rwlkImprints}
+              />
             )}
           </SectionShell>
 

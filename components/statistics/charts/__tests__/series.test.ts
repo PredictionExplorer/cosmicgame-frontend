@@ -68,8 +68,26 @@ describe('cycle rhythm', () => {
 
 describe('CST supply series', () => {
   const byDate = [
-    { Date: '20260812', DateTime: '', TimeStamp: T0 + DAY, NumBids: 4, MintAmountEth: 10, BurnAmountEth: 2, AmountEth: 8, TotalSupplyEth: 108 },
-    { Date: '20260811', DateTime: '', TimeStamp: T0, NumBids: 1, MintAmountEth: 100, BurnAmountEth: 0, AmountEth: 100, TotalSupplyEth: 100 },
+    {
+      Date: '20260812',
+      DateTime: '',
+      TimeStamp: T0 + DAY,
+      NumBids: 4,
+      MintAmountEth: 10,
+      BurnAmountEth: 2,
+      AmountEth: 8,
+      TotalSupplyEth: 108,
+    },
+    {
+      Date: '20260811',
+      DateTime: '',
+      TimeStamp: T0,
+      NumBids: 1,
+      MintAmountEth: 100,
+      BurnAmountEth: 0,
+      AmountEth: 100,
+      TotalSupplyEth: 100,
+    },
   ];
 
   it('orders the daily series and keeps the day’s flows', () => {
@@ -80,8 +98,20 @@ describe('CST supply series', () => {
 
   it('numbers gestures from the first and reads the nested transaction', () => {
     const points = supplyByGesture([
-      { Tx: { TimeStamp: T0 + 60, TxHash: '0xb' }, TotalSupplyEth: 5, MintAmountEth: 1, BurnAmountEth: 0, AmountEth: 1 },
-      { Tx: { TimeStamp: T0, TxHash: '0xa' }, TotalSupplyEth: 4, MintAmountEth: 4, BurnAmountEth: 0, AmountEth: 4 },
+      {
+        Tx: { TimeStamp: T0 + 60, TxHash: '0xb' },
+        TotalSupplyEth: 5,
+        MintAmountEth: 1,
+        BurnAmountEth: 0,
+        AmountEth: 1,
+      },
+      {
+        Tx: { TimeStamp: T0, TxHash: '0xa' },
+        TotalSupplyEth: 4,
+        MintAmountEth: 4,
+        BurnAmountEth: 0,
+        AmountEth: 4,
+      },
     ] as never);
     expect(points.map((p) => [p.gesture, p.supply, p.txHash])).toEqual([
       [1, 4, '0xa'],

@@ -21,7 +21,12 @@ export interface SelectionShareProps {
  * of selection (lib/selectionStanding.ts). The caption says how many
  * selections are drawn, with replacement, one entry per gesture.
  */
-export function SelectionShare({ share, cycle, ethSelections, nftSelections }: SelectionShareProps) {
+export function SelectionShare({
+  share,
+  cycle,
+  ethSelections,
+  nftSelections,
+}: SelectionShareProps) {
   const t = useTranslations('myPages');
   const format = useFormat();
   const percent = format.percent(share.share, { scale: 'ratio' });

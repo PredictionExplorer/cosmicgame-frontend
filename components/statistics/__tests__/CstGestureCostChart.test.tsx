@@ -18,10 +18,38 @@ const ADDR_A = '0xA1b2C3d4E5f60718293a4B5c6D7e8F9012345678';
 const ADDR_B = '0xB1b2C3d4E5f60718293a4B5c6D7e8F9012345678';
 
 const gestures = [
-  { TimeStamp: T0, GestureType: 0, BidderAddr: ADDR_A, CstPriceEth: -1e-18, PrizeTime: T0 + 7_200, TxHash: '0xeth1' },
-  { TimeStamp: T0 + 3_600, GestureType: 2, BidderAddr: ADDR_B, CstCost: 150, PrizeTime: T0 + 9_000, TxHash: '0xcst1' },
-  { TimeStamp: T0 + 7_200, GestureType: 2, BidderAddr: ADDR_B, CstCost: 0, PrizeTime: T0 + 12_000, TxHash: '0xcst2' },
-  { TimeStamp: T0 + 10_800, GestureType: 2, BidderAddr: ADDR_B, CstCost: 3_500, PrizeTime: T0 + 15_000, TxHash: '0xcst3' },
+  {
+    TimeStamp: T0,
+    GestureType: 0,
+    BidderAddr: ADDR_A,
+    CstPriceEth: -1e-18,
+    PrizeTime: T0 + 7_200,
+    TxHash: '0xeth1',
+  },
+  {
+    TimeStamp: T0 + 3_600,
+    GestureType: 2,
+    BidderAddr: ADDR_B,
+    CstCost: 150,
+    PrizeTime: T0 + 9_000,
+    TxHash: '0xcst1',
+  },
+  {
+    TimeStamp: T0 + 7_200,
+    GestureType: 2,
+    BidderAddr: ADDR_B,
+    CstCost: 0,
+    PrizeTime: T0 + 12_000,
+    TxHash: '0xcst2',
+  },
+  {
+    TimeStamp: T0 + 10_800,
+    GestureType: 2,
+    BidderAddr: ADDR_B,
+    CstCost: 3_500,
+    PrizeTime: T0 + 15_000,
+    TxHash: '0xcst3',
+  },
 ] as unknown as GestureInfo[];
 
 const ethOnly = [gestures[0]!] as GestureInfo[];
@@ -44,12 +72,16 @@ describe('CstGestureCostView', () => {
     render(<CstGestureCostView gestures={gestures} label="CST cost" />);
     expect(screen.getByTestId('composed-chart')).toHaveAttribute('data-point-count', '3');
     const figure = screen.getByRole('figure', { name: 'CST cost' });
-    expect(figure).toHaveTextContent(/consumed 3,650(\.00)? CST\. The highest cost was 3,500(\.00)? CST/);
+    expect(figure).toHaveTextContent(
+      /consumed 3,650(\.00)? CST\. The highest cost was 3,500(\.00)? CST/,
+    );
   });
 
   it('draws a hollow dot for a gesture that cost nothing', () => {
     const { container } = render(<CstGestureCostView gestures={gestures} label="CST cost" />);
-    const fills = Array.from(container.querySelectorAll('circle')).map((c) => c.getAttribute('fill'));
+    const fills = Array.from(container.querySelectorAll('circle')).map((c) =>
+      c.getAttribute('fill'),
+    );
     expect(fills).toEqual(['hsl(var(--method-cst))', 'none', 'hsl(var(--method-cst))']);
   });
 
@@ -97,7 +129,12 @@ describe('CstGestureCostChart', () => {
   it('offers a retry when the gesture list fails', async () => {
     const user = userEvent.setup();
     const refetch = jest.fn();
-    mockUseGestureListByCycle.mockReturnValue({ data: undefined, isLoading: false, isError: true, refetch });
+    mockUseGestureListByCycle.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      refetch,
+    });
     render(<CstGestureCostChart round={2} label="CST cost" />);
     expect(screen.getByText('Failed to load CST gesture costs')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /try again|retry/i }));

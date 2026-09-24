@@ -25,7 +25,11 @@ const EmbedEnduranceChart: FC<{ roundNum: number }> = ({ roundNum }) => {
   const title = t('embed.title', { cycle: roundNum });
 
   return (
-    <main id="main" tabIndex={-1} className="min-h-screen w-full bg-background px-4 py-5 sm:px-8 sm:py-7">
+    <main
+      id="main"
+      tabIndex={-1}
+      className="min-h-screen w-full bg-background px-4 py-5 sm:px-8 sm:py-7"
+    >
       <header className="mb-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b border-rule pb-4">
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="type-heading-3 text-foreground">{title}</h1>

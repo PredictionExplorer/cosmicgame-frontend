@@ -191,7 +191,9 @@ const CycleDetailDialog = ({ round, onClose }: { round: number | null; onClose: 
     <Dialog open={round != null} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-4xl">
         <DialogHeader>
-          <DialogTitle>{t('performance.claims.dialog.exploreTitle', { cycle: round ?? 0 })}</DialogTitle>
+          <DialogTitle>
+            {t('performance.claims.dialog.exploreTitle', { cycle: round ?? 0 })}
+          </DialogTitle>
           <DialogDescription>{t('performance.claims.dialog.exploreDescription')}</DialogDescription>
         </DialogHeader>
         {isLoading ? (

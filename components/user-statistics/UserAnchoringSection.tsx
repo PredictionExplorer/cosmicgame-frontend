@@ -109,7 +109,11 @@ export function UserAnchoringSection({
               <PageHeaderFigures
                 className="mt-0 sm:mt-0"
                 figures={[
-                  { id: 'anchors', label: s('stats.anchorActions'), value: format.count(anchorCount) },
+                  {
+                    id: 'anchors',
+                    label: s('stats.anchorActions'),
+                    value: format.count(anchorCount),
+                  },
                   {
                     id: 'releases',
                     label: s('stats.releaseActions'),

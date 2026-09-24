@@ -90,7 +90,9 @@ describe('LastBidSpikeChart', () => {
     const user = userEvent.setup();
     render(<LastBidSpikeChart label="Gesture spikes" />);
     await user.click(screen.getByRole('button', { name: 'View as table' }));
-    expect(within(screen.getByRole('table', { name: 'Gesture spikes' })).getByText('12')).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('table', { name: 'Gesture spikes' })).getByText('12'),
+    ).toBeInTheDocument();
   });
 
   it('says there are no spikes when the history has none', () => {

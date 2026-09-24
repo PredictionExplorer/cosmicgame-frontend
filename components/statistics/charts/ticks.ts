@@ -75,7 +75,8 @@ const DURATION_STEPS = [
 /** The smallest whole duration step that splits `span` seconds into at most `count` intervals. */
 export function durationStep(span: number, count: number): number {
   return (
-    DURATION_STEPS.find((step) => span / step <= count) ?? DURATION_STEPS[DURATION_STEPS.length - 1]!
+    DURATION_STEPS.find((step) => span / step <= count) ??
+    DURATION_STEPS[DURATION_STEPS.length - 1]!
   );
 }
 
