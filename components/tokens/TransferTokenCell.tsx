@@ -48,7 +48,8 @@ export function TransferTokenCell({ tokenId, seed, seedPending }: TransferTokenC
           className="w-14 shrink-0"
         />
       )}
-      <TableLink href={`/detail/${tokenId}`}>
+      {/* A 24px row: the number is the cell's one link, on a phone too. */}
+      <TableLink href={`/detail/${tokenId}`} className="inline-flex min-h-6 items-center">
         <span className="font-mono tabular-nums">{formatId(tokenId)}</span>
       </TableLink>
     </span>
