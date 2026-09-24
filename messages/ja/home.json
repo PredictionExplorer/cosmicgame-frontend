@@ -688,10 +688,10 @@
   },
   "rwlkGrid": {
     "searchPlaceholder": "NFT IDを入力",
-    "searchAria": "IDでRandomWalk NFTを検索",
-    "tokenAria": "RandomWalk NFT {id}",
-    "empty": "このウォレットには未使用のRandomWalk NFTがありません。",
-    "imprint": "RandomWalk NFTを刻印する"
+    "searchAria": "IDでRandom Walk NFTを検索",
+    "tokenAria": "Random Walk NFT {id}",
+    "empty": "このウォレットには未使用のRandom Walk NFTがありません。",
+    "imprint": "Random Walk NFTを刻印する"
   },
   "orientation": {
     "title": "サイクルの仕組み",

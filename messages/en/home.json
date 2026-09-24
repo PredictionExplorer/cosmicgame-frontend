@@ -688,10 +688,10 @@
   },
   "rwlkGrid": {
     "searchPlaceholder": "Enter NFT ID",
-    "searchAria": "Find a RandomWalk NFT by ID",
-    "tokenAria": "RandomWalk NFT {id}",
-    "empty": "This wallet holds no unused RandomWalk NFTs.",
-    "imprint": "Imprint a RandomWalk NFT"
+    "searchAria": "Find a Random Walk NFT by ID",
+    "tokenAria": "Random Walk NFT {id}",
+    "empty": "This wallet holds no unused Random Walk NFTs.",
+    "imprint": "Imprint a Random Walk NFT"
   },
   "orientation": {
     "title": "How this cycle works",

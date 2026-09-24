@@ -107,8 +107,8 @@
     "description": "특정 Cosmic Signature NFT의 앵커링 지급 상세 정보입니다. 사이클별 ETH 지급 내역, 회수 상태, 누적 앵커링 지급액을 확인할 수 있습니다."
   },
   "mint": {
-    "title": "RandomWalk NFT 각인",
-    "description": "Cosmic Signature에서 RandomWalk NFT를 각인합니다. 사용하지 않은 RandomWalk NFT는 ETH 제스처 하나에 첨부해 ETH 제스처 비용을 50% 할인받을 수 있습니다."
+    "title": "Random Walk NFT 각인",
+    "description": "Cosmic Signature에서 Random Walk NFT를 각인합니다. 사용하지 않은 Random Walk NFT는 ETH 제스처 하나에 첨부해 ETH 제스처 비용을 50% 할인받을 수 있습니다."
   },
   "systemEvent": {
     "title": "시스템 이벤트",

@@ -688,8 +688,8 @@
   },
   "rwlkGrid": {
     "searchPlaceholder": "輸入 NFT ID",
-    "searchAria": "依 ID 搜尋 RandomWalk NFT",
-    "tokenAria": "RandomWalk NFT 編號 {id}",
+    "searchAria": "依 ID 搜尋 Random Walk NFT",
+    "tokenAria": "Random Walk NFT 編號 {id}",
     "empty": "此錢包中沒有未使用的 Random Walk NFT。",
     "imprint": "銘刻一枚 Random Walk NFT"
   },

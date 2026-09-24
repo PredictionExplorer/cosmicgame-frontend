@@ -688,10 +688,10 @@
   },
   "rwlkGrid": {
     "searchPlaceholder": "Введіть ID NFT",
-    "searchAria": "Знайти RandomWalk NFT за ID",
-    "tokenAria": "RandomWalk NFT {id}",
-    "empty": "У цьому гаманці немає невикористаних RandomWalk NFT.",
-    "imprint": "Закарбувати RandomWalk NFT"
+    "searchAria": "Знайти Random Walk NFT за ID",
+    "tokenAria": "Random Walk NFT {id}",
+    "empty": "У цьому гаманці немає невикористаних Random Walk NFT.",
+    "imprint": "Закарбувати Random Walk NFT"
   },
   "orientation": {
     "title": "Як працює цикл",

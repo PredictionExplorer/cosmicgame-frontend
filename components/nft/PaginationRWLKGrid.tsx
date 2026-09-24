@@ -170,7 +170,7 @@ const PaginationRWLKGrid: FC<PaginationRWLKGridProps> = ({
         </>
       )}
 
-      {/* The wallet has no unused RandomWalk NFT: say so, and where to get one. */}
+      {/* The wallet has no unused Random Walk NFT: say so, and where to get one. */}
       {!loading && data.length === 0 && (
         <div data-testid="rwlk-grid-empty" className="py-4 text-center">
           <p className="type-body-sm text-muted-foreground">{t('rwlkGrid.empty')}</p>

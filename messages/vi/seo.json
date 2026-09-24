@@ -79,13 +79,13 @@
         }
       },
       "imprint": {
-        "heading": "Khắc RandomWalk NFT",
-        "description": "Khắc RandomWalk NFT để tham gia Cosmic Signature. Mỗi RandomWalk NFT chưa sử dụng có thể được đính kèm vào một nét bút ETH để giảm 50% chi phí nét bút.",
+        "heading": "Khắc Random Walk NFT",
+        "description": "Khắc Random Walk NFT để tham gia Cosmic Signature. Mỗi Random Walk NFT chưa sử dụng có thể được đính kèm vào một nét bút ETH để giảm 50% chi phí nét bút.",
         "source": "Các API cấu hình giao thức công khai của Cosmic Signature",
         "links": {
           "cycle": "Mở chu kỳ trình diễn đang diễn ra",
           "learn": "Tìm hiểu cách nét bút vận hành",
-          "used": "Xem các RandomWalk NFT đã sử dụng"
+          "used": "Xem các Random Walk NFT đã sử dụng"
         },
         "cards": {
           "cycle": {
@@ -95,7 +95,7 @@
             "label": "Chi phí nét bút ETH hiện tại"
           },
           "discount": {
-            "label": "Giảm giá RandomWalk"
+            "label": "Giảm giá Random Walk"
           }
         }
       },
@@ -190,7 +190,7 @@
         "description": "Xem các RandomWalk NFT đã được đính kèm vào nét bút ETH để hưởng mức giảm chi phí nét bút một lần.",
         "source": "Các API sử dụng RandomWalk công khai của Cosmic Signature",
         "links": {
-          "imprint": "Khắc RandomWalk NFT",
+          "imprint": "Khắc Random Walk NFT",
           "learn": "Tìm hiểu cách nét bút vận hành",
           "cycle": "Xem dữ liệu chu kỳ hiện tại"
         },

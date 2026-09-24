@@ -4,26 +4,26 @@
     "imprint": "Khắc"
   },
   "page": {
-    "title": "Khắc RandomWalk NFT",
-    "subtitle": "Sở hữu một RandomWalk NFT để được giảm 50% chi phí nét bút ETH",
-    "description": "Mỗi NFT chỉ áp dụng mức giảm này một lần, vì vậy thời điểm sử dụng tùy thuộc vào lựa chọn của bạn. Bạn cũng có thể neo giữ RandomWalk NFT để thuộc diện Tinh tuyển NFT neo giữ; đây là cơ chế riêng, không liên quan đến việc đính kèm NFT vào nét bút.",
+    "title": "Khắc Random Walk NFT",
+    "subtitle": "Sở hữu một Random Walk NFT để được giảm 50% chi phí nét bút ETH",
+    "description": "Mỗi NFT chỉ áp dụng mức giảm này một lần, vì vậy thời điểm sử dụng tùy thuộc vào lựa chọn của bạn. Bạn cũng có thể neo giữ Random Walk NFT để thuộc diện Tinh tuyển NFT neo giữ; đây là cơ chế riêng, không liên quan đến việc đính kèm NFT vào nét bút.",
     "currentCost": "Chi phí khắc hiện tại",
     "costBreakdown": "Chi phí trong hợp đồng {base} ETH, cộng thêm {percent}% dự phòng để lượt khắc vẫn thành công nếu chi phí tăng trước khi được xác nhận.",
     "submit": "Khắc ngay",
-    "myNfts": "RandomWalk NFT của tôi",
-    "panelAria": "Khắc RandomWalk NFT",
-    "tokenAlt": "RandomWalk NFT {id}",
-    "connect": "Kết nối ví để khắc RandomWalk NFT. Việc kết nối không ký bất cứ điều gì.",
+    "myNfts": "Random Walk NFT của tôi",
+    "panelAria": "Khắc Random Walk NFT",
+    "tokenAlt": "Random Walk NFT {id}",
+    "connect": "Kết nối ví để khắc Random Walk NFT. Việc kết nối không ký bất cứ điều gì.",
     "why": {
       "title": "Việc khắc mang lại gì cho bạn"
     },
     "compare": {
-      "label": "Chi phí nét bút ETH khi đính kèm RandomWalk NFT",
+      "label": "Chi phí nét bút ETH khi đính kèm Random Walk NFT",
       "caption": "Thấp hơn {percent}% so với chi phí nét bút ETH hiện tại, mỗi NFT một lần."
     },
     "success": {
       "eyebrow": "Đã khắc",
-      "title": "RandomWalk NFT {id} giờ là của bạn",
+      "title": "Random Walk NFT {id} giờ là của bạn",
       "description": "Đính kèm vào một nét bút ETH để được giảm {percent}% chi phí nét bút một lần.",
       "use": "Dùng cho một nét bút",
       "again": "Khắc thêm một NFT"
@@ -32,11 +32,11 @@
       "used": "Đã dùng",
       "unused": "Chưa dùng",
       "use": "Dùng cho nét bút",
-      "empty": "Ví này chưa có RandomWalk NFT nào.",
-      "error": "Không thể đọc RandomWalk NFT trong ví này."
+      "empty": "Ví này chưa có Random Walk NFT nào.",
+      "error": "Không thể đọc Random Walk NFT trong ví này."
     }
   },
   "seo": {
-    "heading": "Khắc RandomWalk NFT"
+    "heading": "Khắc Random Walk NFT"
   }
 }

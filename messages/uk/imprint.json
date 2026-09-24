@@ -4,26 +4,26 @@
     "imprint": "Закарбування"
   },
   "page": {
-    "title": "Закарбувати RandomWalk NFT",
-    "subtitle": "Маючи RandomWalk NFT, ви зменшуєте вартість ETH-жесту на 50%",
-    "description": "Скористатися цією знижкою можна лише раз для кожного NFT, тож момент обираєте ви. RandomWalk NFT також можна закріпити для участі в зоряному відборі закріплених NFT. Це окремий механізм, не пов’язаний із долученням NFT до жесту.",
+    "title": "Закарбувати Random Walk NFT",
+    "subtitle": "Маючи Random Walk NFT, ви зменшуєте вартість ETH-жесту на 50%",
+    "description": "Скористатися цією знижкою можна лише раз для кожного NFT, тож момент обираєте ви. Random Walk NFT також можна закріпити для участі в зоряному відборі закріплених NFT. Це окремий механізм, не пов’язаний із долученням NFT до жесту.",
     "currentCost": "Поточна вартість закарбування",
     "costBreakdown": "Вартість у контракті {base} ETH плюс {percent}% запасу, щоб закарбування пройшло, навіть якщо вартість зросте до підтвердження.",
     "submit": "Закарбувати",
-    "myNfts": "Мої RandomWalk NFT",
-    "panelAria": "Закарбувати RandomWalk NFT",
-    "tokenAlt": "RandomWalk NFT {id}",
-    "connect": "Під’єднайте гаманець, щоб закарбувати RandomWalk NFT. Під’єднання нічого не підписує.",
+    "myNfts": "Мої Random Walk NFT",
+    "panelAria": "Закарбувати Random Walk NFT",
+    "tokenAlt": "Random Walk NFT {id}",
+    "connect": "Під’єднайте гаманець, щоб закарбувати Random Walk NFT. Під’єднання нічого не підписує.",
     "why": {
       "title": "Що дає закарбування"
     },
     "compare": {
-      "label": "Вартість ETH-жесту з RandomWalk NFT",
+      "label": "Вартість ETH-жесту з Random Walk NFT",
       "caption": "На {percent}% менше за поточну вартість ETH-жесту, один раз для кожного NFT."
     },
     "success": {
       "eyebrow": "Закарбовано",
-      "title": "RandomWalk NFT {id} тепер ваш",
+      "title": "Random Walk NFT {id} тепер ваш",
       "description": "Долучіть його до ETH-жесту, щоб один раз зменшити вартість жесту на {percent}%.",
       "use": "Використати в жесті",
       "again": "Закарбувати ще один"
@@ -32,11 +32,11 @@
       "used": "Використано",
       "unused": "Не використано",
       "use": "Використати в жесті",
-      "empty": "У цьому гаманці ще немає RandomWalk NFT.",
-      "error": "Не вдалося прочитати RandomWalk NFT у цьому гаманці."
+      "empty": "У цьому гаманці ще немає Random Walk NFT.",
+      "error": "Не вдалося прочитати Random Walk NFT у цьому гаманці."
     }
   },
   "seo": {
-    "heading": "Закарбувати RandomWalk NFT"
+    "heading": "Закарбувати Random Walk NFT"
   }
 }

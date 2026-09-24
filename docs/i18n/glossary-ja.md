@@ -227,12 +227,12 @@ something lost), never 請求 (a bill or a legal claim).
 **刻印** (engraving, imprinting a mark) — the artwork is inscribed into the chain. Never
 ミント / 鋳造 (banned), never 発行 (issuance — paperwork register), never インプリント.
 
-| English                | 日本語               |
-| ---------------------- | -------------------- |
-| Imprint (verb)         | 刻印する             |
-| Imprinted at           | 刻印日時             |
-| Imprint RandomWalk NFT | RandomWalk NFTの刻印 |
-| premine                | 事前刻印             |
+| English                 | 日本語                |
+| ----------------------- | --------------------- |
+| Imprint (verb)          | 刻印する              |
+| Imprinted at            | 刻印日時              |
+| Imprint Random Walk NFT | Random Walk NFTの刻印 |
+| premine                 | 事前刻印              |
 
 ### Endurance Champion → 持久チャンピオン; Chrono-Warrior → 時の戦士
 

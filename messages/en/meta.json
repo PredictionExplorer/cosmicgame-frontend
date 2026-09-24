@@ -107,8 +107,8 @@
     "description": "Anchor Distribution details for a specific Cosmic Signature NFT — per-cycle ETH distribution history, retrieval status, and cumulative Anchor Distributions."
   },
   "mint": {
-    "title": "Imprint RandomWalk NFT",
-    "description": "Imprint a RandomWalk NFT on Cosmic Signature. Each unused RandomWalk NFT can be attached to one ETH gesture for a 50% ETH Gesture Cost discount."
+    "title": "Imprint Random Walk NFT",
+    "description": "Imprint a Random Walk NFT on Cosmic Signature. Each unused Random Walk NFT can be attached to one ETH gesture for a 50% ETH Gesture Cost discount."
   },
   "systemEvent": {
     "title": "System Events",

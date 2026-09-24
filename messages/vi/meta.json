@@ -107,8 +107,8 @@
     "description": "Chi tiết phân phối neo giữ của một Cosmic Signature NFT cụ thể — lịch sử phân phối ETH theo chu kỳ, trạng thái nhận về và phân phối neo giữ tích lũy."
   },
   "mint": {
-    "title": "Khắc RandomWalk NFT",
-    "description": "Khắc một RandomWalk NFT trên Cosmic Signature. Mỗi RandomWalk NFT chưa sử dụng có thể đính kèm vào một nét bút ETH để giảm 50% chi phí nét bút ETH."
+    "title": "Khắc Random Walk NFT",
+    "description": "Khắc một Random Walk NFT trên Cosmic Signature. Mỗi Random Walk NFT chưa sử dụng có thể đính kèm vào một nét bút ETH để giảm 50% chi phí nét bút ETH."
   },
   "systemEvent": {
     "title": "Sự kiện hệ thống",

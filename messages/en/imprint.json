@@ -4,26 +4,26 @@
     "imprint": "Imprint"
   },
   "page": {
-    "title": "Imprint RandomWalk NFT",
-    "subtitle": "Own a RandomWalk NFT and receive a 50% reduction in ETH Gesture Cost",
-    "description": "Each RandomWalk NFT gives this reduction once, so you choose the moment. This one-time use is separate from anchoring RandomWalk NFTs for Anchored-NFT Stellar Selection eligibility.",
+    "title": "Imprint Random Walk NFT",
+    "subtitle": "Own a Random Walk NFT and receive a 50% reduction in ETH Gesture Cost",
+    "description": "Each Random Walk NFT gives this reduction once, so you choose the moment. This one-time use is separate from anchoring Random Walk NFTs for Anchored-NFT Stellar Selection eligibility.",
     "currentCost": "Current imprint cost",
     "costBreakdown": "Contract cost {base} ETH, plus a {percent}% buffer so the imprint still succeeds if the cost rises before it confirms.",
     "submit": "Imprint now",
-    "myNfts": "Your RandomWalk NFTs",
-    "panelAria": "Imprint a RandomWalk NFT",
-    "tokenAlt": "RandomWalk NFT {id}",
-    "connect": "Connect a wallet to imprint a RandomWalk NFT. Connecting signs nothing.",
+    "myNfts": "Your Random Walk NFTs",
+    "panelAria": "Imprint a Random Walk NFT",
+    "tokenAlt": "Random Walk NFT {id}",
+    "connect": "Connect a wallet to imprint a Random Walk NFT. Connecting signs nothing.",
     "why": {
       "title": "What an imprint gives you"
     },
     "compare": {
-      "label": "ETH Gesture Cost with a RandomWalk NFT",
+      "label": "ETH Gesture Cost with a Random Walk NFT",
       "caption": "{percent}% off the current ETH Gesture Cost, once per NFT."
     },
     "success": {
       "eyebrow": "Imprinted",
-      "title": "RandomWalk NFT {id} is yours",
+      "title": "Random Walk NFT {id} is yours",
       "description": "Attach it to an ETH gesture for a one-time {percent}% reduction in the Gesture Cost.",
       "use": "Use it in a gesture",
       "again": "Imprint another"
@@ -32,11 +32,11 @@
       "used": "Used",
       "unused": "Unused",
       "use": "Use in a gesture",
-      "empty": "This wallet holds no RandomWalk NFTs yet.",
-      "error": "The RandomWalk NFTs in this wallet could not be read."
+      "empty": "This wallet holds no Random Walk NFTs yet.",
+      "error": "The Random Walk NFTs in this wallet could not be read."
     }
   },
   "seo": {
-    "heading": "Imprint RandomWalk NFT"
+    "heading": "Imprint Random Walk NFT"
   }
 }

@@ -83,8 +83,8 @@
         "tooltip": "サイクルの対象の中から無作為に選ばれた参加者が功労CSTとCosmic Signature NFTを受け取ります。"
       },
       "randomWalkAnchor": {
-        "name": "RandomWalk係留者",
-        "tooltip": "RandomWalk NFTの係留者は功労CSTとCosmic Signature NFTを受け取ることがあります。"
+        "name": "Random Walk係留者",
+        "tooltip": "Random Walk NFTの係留者は功労CSTとCosmic Signature NFTを受け取ることがあります。"
       },
       "endurance": {
         "name": "持久チャンピオン",

@@ -107,8 +107,8 @@
     "description": "特定のCosmic Signature NFTの係留配分の詳細——サイクルごとのETH配分の履歴、受け取り状況、累積の係留配分。"
   },
   "mint": {
-    "title": "RandomWalk NFTの刻印",
-    "description": "Cosmic SignatureでRandomWalk NFTを刻印する。未使用のRandomWalk NFTはそれぞれ1回のETH一筆に添付でき、ETH一筆の費用が50%割引されます。"
+    "title": "Random Walk NFTの刻印",
+    "description": "Cosmic SignatureでRandom Walk NFTを刻印する。未使用のRandom Walk NFTはそれぞれ1回のETH一筆に添付でき、ETH一筆の費用が50%割引されます。"
   },
   "systemEvent": {
     "title": "システムイベント",

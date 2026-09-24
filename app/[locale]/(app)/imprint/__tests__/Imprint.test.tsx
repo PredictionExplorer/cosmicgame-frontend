@@ -100,7 +100,7 @@ describe('Imprint', () => {
     expect(screen.getByRole('button', { name: 'Connect Wallet' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Imprint now' })).not.toBeInTheDocument();
     expect(
-      screen.getByText('Connect a wallet to imprint a RandomWalk NFT. Connecting signs nothing.'),
+      screen.getByText('Connect a wallet to imprint a Random Walk NFT. Connecting signs nothing.'),
     ).toBeInTheDocument();
   });
 
@@ -129,12 +129,12 @@ describe('Imprint', () => {
     await user.click(submit);
 
     const success = await screen.findByTestId('imprint-success');
-    expect(within(success).getByRole('heading')).toHaveTextContent('RandomWalk NFT #004242');
+    expect(within(success).getByRole('heading')).toHaveTextContent('Random Walk NFT #004242');
     expect(within(success).getByRole('link', { name: /Use it in a gesture/ })).toHaveAttribute(
       'href',
       '/?randomwalk=1&tokenId=4242#make-gesture',
     );
-    expect(mockTx.lastSuccessMessage()).toBe('RandomWalk NFT #004242 is yours');
+    expect(mockTx.lastSuccessMessage()).toBe('Random Walk NFT #004242 is yours');
     // The owned list refreshes to include it.
     expect(mockWalletOfOwner.mock.calls.length).toBeGreaterThan(1);
   });
@@ -151,7 +151,7 @@ describe('Imprint', () => {
     // Each plate is named by its token, with nothing drawn over the art.
     expect(within(items[0]!).getByTestId('rwlk-art')).toHaveAttribute(
       'data-alt',
-      'RandomWalk NFT #000012',
+      'Random Walk NFT #000012',
     );
     expect(within(items[1]!).queryByRole('link')).toBeNull();
     expect(within(items[0]!).getByRole('link', { name: /Use in a gesture/ })).toHaveAttribute(
@@ -166,7 +166,7 @@ describe('Imprint', () => {
     renderWithQuery(<Imprint />);
 
     // Not a skeleton forever: the failure is named, with a retry.
-    const title = await screen.findByText('The RandomWalk NFTs in this wallet could not be read.');
+    const title = await screen.findByText('The Random Walk NFTs in this wallet could not be read.');
     expect(title.tagName).toBe('H3');
 
     mockWalletOfOwner.mockResolvedValueOnce([5n]);
@@ -174,7 +174,7 @@ describe('Imprint', () => {
     const list = await screen.findByRole('list');
     expect(within(list).getAllByRole('listitem')).toHaveLength(1);
     expect(
-      screen.queryByText('The RandomWalk NFTs in this wallet could not be read.'),
+      screen.queryByText('The Random Walk NFTs in this wallet could not be read.'),
     ).not.toBeInTheDocument();
   });
 
