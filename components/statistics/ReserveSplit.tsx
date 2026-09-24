@@ -67,7 +67,8 @@ export function ReserveSplit({
           ) : null,
         )}
       </div>
-      <ul className="mt-5 grid gap-x-10 gap-y-2.5 sm:grid-cols-2 xl:grid-cols-3">
+      {/* Columns stop at 15rem, so a share sits near its label on a wide screen. */}
+      <ul className="mt-5 grid gap-x-10 gap-y-2.5 sm:grid-cols-[repeat(2,minmax(0,15rem))] xl:grid-cols-[repeat(3,minmax(0,15rem))]">
         {shares.map(({ id, percent }) => (
           <li key={id} className="flex items-baseline justify-between gap-4 type-body-sm">
             <span className="flex min-w-0 items-center gap-2 text-muted-foreground">
