@@ -20,11 +20,22 @@ jest.mock('next/navigation', () => ({
 }));
 jest.mock('../../../../../../../components/statistics/EnduranceTimelineChart', () => ({
   __esModule: true,
-  default: ({ round, isLive }: { round: number; isLive: boolean }) => (
-    <div data-testid="endurance-chart">
+  default: ({
+    round,
+    isLive,
+    laneLimit,
+  }: {
+    round: number;
+    isLive: boolean;
+    laneLimit?: number | null;
+  }) => (
+    <div data-testid="endurance-chart" data-lane-limit={String(laneLimit)}>
       {round}
       {isLive ? ' live' : ' final'}
     </div>
+  ),
+  EnduranceTimelineSkeleton: ({ lanes }: { lanes?: number }) => (
+    <div role="status" data-testid="endurance-skeleton" data-lanes={String(lanes)} />
   ),
 }));
 
@@ -74,6 +85,28 @@ describe('EmbedEnduranceChart', () => {
     rerender(<EmbedEnduranceChart roundNum={1} />);
     expect(screen.getByText('Final')).toBeInTheDocument();
     expect(screen.getByTestId('endurance-chart')).toHaveTextContent('1 final');
+  });
+
+  it('draws every lane: the embed is a page of its own, never a scroll box in one', () => {
+    mockUseDashboardInfo.mockReturnValue(dashboard({ data: { CurRoundNum: 3 } }));
+    render(<EmbedEnduranceChart roundNum={1} />);
+    expect(screen.getByTestId('endurance-chart')).toHaveAttribute('data-lane-limit', 'null');
+  });
+
+  it('puts the badge and the chart in the server render from the server read', () => {
+    // The client's dashboard has not answered: the server's live cycle decides.
+    mockUseDashboardInfo.mockReturnValue(dashboard({ isLoading: true }));
+    render(<EmbedEnduranceChart roundNum={1} seedLiveCycle={3} expectedLanes={19} />);
+    expect(screen.getByText('Final')).toBeInTheDocument();
+    expect(screen.getByTestId('endurance-chart')).toHaveTextContent('1 final');
+  });
+
+  it('never 404s from the server read alone, and sizes the wait to its lane count', () => {
+    mockUseDashboardInfo.mockReturnValue(dashboard({ isLoading: true }));
+    render(<EmbedEnduranceChart roundNum={4} seedLiveCycle={3} expectedLanes={19} />);
+    expect(mockNotFound).not.toHaveBeenCalled();
+    expect(screen.queryByText('Live cycle')).not.toBeInTheDocument();
+    expect(screen.getByTestId('endurance-skeleton')).toHaveAttribute('data-lanes', '19');
   });
 
   it('treats a cycle past the live one as not found, never as live', () => {

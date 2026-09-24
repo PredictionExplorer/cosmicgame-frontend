@@ -39,7 +39,11 @@
     "noDataTitle": "아직 데이터 없음",
     "sectionLoadErrorTitle": "{title} 데이터를 불러오지 못했습니다",
     "serviceError": "통계 서비스가 응답하지 않았습니다. 잠시 후 다시 시도해 주세요.",
-    "definitions": "용어 설명"
+    "definitions": "용어 설명",
+    "listMissingTitle": "목록을 불러오지 못했습니다",
+    "listMissingMessage": "이 페이지의 다른 수치로 보아 기록이 있어야 하지만 받지 못했습니다. 다시 시도해 주세요.",
+    "showSection": "펼치기",
+    "hideSection": "접기"
   },
   "hub": {
     "loadErrorTitle": "통계를 불러오지 못했습니다",
@@ -47,6 +51,7 @@
     "exploreTitle": "통계 탐색",
     "exploreAria": "통계 섹션 페이지",
     "protocolEconomyTitle": "프로토콜 경제",
+    "relatedTitle": "관련 페이지",
     "jsonLd": {
       "webPageName": "Cosmic Signature 프로토콜 통계",
       "webPageDescription": "Arbitrum 위 Cosmic Signature 프로토콜의 공개 통계입니다. 퍼포먼스 사이클 상태, 제스처, NFT, CST, 앵커링, 준비금, 배분 데이터를 포함합니다.",
@@ -120,9 +125,13 @@
       "label": "별빛 선정 ETH 적립",
       "tooltip": "인덱싱된 퍼포먼스 사이클에 걸쳐 별빛 선정 풀에 배분된 ETH 총액입니다."
     },
-    "stellarSelectionEthRetrieved": {
-      "label": "별빛 선정 ETH 회수",
-      "tooltip": "선정된 수령자가 별빛 선정 풀에서 회수한 ETH 총액입니다."
+    "chronoWarriorEthDeposited": {
+      "label": "시간의 전사 ETH 적립",
+      "tooltip": "인덱싱된 퍼포먼스 사이클에 걸쳐 시간의 전사에게 배분된 ETH 총액입니다. 수령자가 회수할 때까지 배분 지갑에 보관됩니다."
+    },
+    "allocationsWalletEthRetrieved": {
+      "label": "배분 지갑에서 회수한 ETH",
+      "tooltip": "수령자가 배분 지갑에서 회수한 ETH로, 별빛 선정 ETH와 시간의 전사 ETH를 모두 포함합니다."
     },
     "totalSupplyErc20": {
       "label": "총 공급량(ERC-20)",
@@ -274,6 +283,7 @@
       "cycleTimelines": "사이클 상세"
     },
     "emptyCycleActivations": "아직 인덱싱된 사이클 활성화가 없습니다",
+    "cycleActivationsCount": "인덱싱된 활성화 {count, number}회",
     "cycleTimelinesDescription": "사이클을 선택하면 제스처 방식 구성, 선두 유지 흐름, CST 보정 구간과 CST 비용의 변화를 볼 수 있습니다."
   },
   "anchoringPage": {
@@ -358,7 +368,8 @@
       "summaryNoSupply": "CST 보유 주소 {count, plural, other {#개}}, 잔액이 큰 순서입니다.",
       "share": "공급량 비중",
       "shareHelp": "이 잔액이 CST 총 공급량에서 차지하는 비중입니다."
-    }
+    },
+    "attachedContracts": "ERC-721 컨트랙트 {count, number}개"
   },
   "attachedAssets": {
     "scopeAria": "첨부된 NFT 범위",
@@ -387,7 +398,7 @@
       "empty": "이 필터에 해당하는 참여자가 아직 없습니다.",
       "columns": {
         "participant": "참여자",
-        "allocationRate": "배분율",
+        "cyclesWithAllocation": "배분을 받은 사이클",
         "gestures": "제스처",
         "spent": "지출(ETH)",
         "received": "수령(ETH)",
@@ -445,9 +456,8 @@
       "received": "배분으로 받은 ETH",
       "receivedMore": "지출보다 많은 ETH를 받은 참여자",
       "ofParticipants": "{whole}명 중 {part}명",
-      "rank": "순번",
       "netHelp": "배분으로 받은 ETH에서 제스처에 지출한 ETH를 뺀 값입니다. CST는 포함하지 않습니다.",
-      "rateHelp": "이 참여자가 참여한 사이클 중 배분을 한 번 이상 받은 사이클의 비율입니다.",
+      "cyclesHelp": "이 참여자가 참여한 사이클 중 배분을 한 번 이상 받은 사이클의 수입니다.",
       "cycles": "사이클 {whole, number}개 중 {part}개"
     }
   },
@@ -464,8 +474,8 @@
       "openingExcluded": "각 사이클 시작 후 첫 1시간 동안의 제스처는 제외했습니다. 시작 직후에는 활동이 유난히 집중되어 있어, 포함하면 이 차트가 왜곡되기 때문입니다.",
       "hour": "시간",
       "day": "날짜",
-      "summaryDaily": "{range} 제스처 {total}회. 가장 활발한 날: {date} ({peak}회).",
-      "summaryHourly": "{range} 제스처 {total}회. 가장 활발한 시간: {date} ({peak}회)."
+      "summaryDaily": "{range} 제스처 {total}회 (각 사이클 시작 후 첫 1시간 제외). 가장 활발한 날: {date} ({peak}회).",
+      "summaryHourly": "{range} 제스처 {total}회 (각 사이클 시작 후 첫 1시간 제외). 가장 활발한 시간: {date} ({peak}회)."
     },
     "spikes": {
       "count": "급증 ({count})",
@@ -478,7 +488,7 @@
       "loadErrorTitle": "제스처 급증을 불러오지 못했습니다",
       "loadErrorMessage": "급증 감지 데이터를 불러오지 못했습니다.",
       "empty": "인덱싱된 내역에서 감지된 제스처 급증이 없습니다.",
-      "noneRecent": "최근에는 급증이 없습니다.",
+      "noneRecent": "최근에는 급증이 없어 기록상 가장 최근의 급증을 표시합니다.",
       "selectEarlier": "위에서 급증 번호를 선택하면 과거로 이동해 이전 활동 급증을 살펴볼 수 있습니다.",
       "emptyWindow": "선택한 급증 구간에는 시간별 데이터가 없습니다.",
       "optionAria": "{date} 급증, 시간당 최대 {peak}회"
@@ -494,9 +504,10 @@
       "periods": "활동 구간",
       "longest": "최장 구간",
       "lastActive": "마지막 활동",
-      "summary": "{range} 가장 활발한 참여자 {count, number}명. 제스처 최다: {leader} ({gestures}회).",
+      "summary": "{range} 가장 활발한 참여자 {count, number}명. 제스처 최다: <who>{leader}</who> ({gestures}회).",
       "laneLabel": "{rank}위 {address}: 제스처 {gestures, number}회, 활동 구간 {periods, number}개",
-      "hint": "구간을 가리키거나 선택하면 상세 정보가 표시됩니다. 방향키로 구간 사이를 이동합니다."
+      "hint": "구간을 가리키거나 선택하면 상세 정보가 표시됩니다. 방향키로 구간 사이를 이동합니다.",
+      "hintTouch": "구간을 탭하면 상세 정보가 표시됩니다."
     },
     "typeRatio": {
       "totalGestures": "총 제스처 수",
@@ -537,8 +548,8 @@
       "loadErrorTitle": "선두 유지 기록을 불러오지 못했습니다",
       "loadErrorMessage": "이 사이클의 제스처 내역을 불러오지 못했습니다.",
       "empty": "이 사이클에는 아직 선두 기록이 없습니다.",
-      "championSummary": "수호 챔피언: {address} · {duration} 선두 유지",
-      "chronoSummary": "시간의 전사: {address} · {duration} 지위 유지",
+      "championSummary": "수호 챔피언: <who>{address}</who> · {duration} 선두 유지",
+      "chronoSummary": "시간의 전사: <who>{address}</who> · {duration} 지위 유지",
       "gantt": "간트",
       "lineChart": "선 차트",
       "openWindow": "새 창에서 열기",
@@ -546,6 +557,10 @@
       "ganttLabel": "참여자별 선두 유지 구간",
       "laneLabel": "{address}: 선두 유지 {count, number}회, 최장 {longest}",
       "hint": "구간을 가리키거나 선택하면 상세 정보가 표시됩니다. 방향키로 구간 사이를 이동합니다.",
+      "hintTouch": "구간을 탭하면 상세 정보가 표시됩니다.",
+      "lanesShown": "선두를 지킨 주소 {total, number}개 중 {shown, number}개 표시",
+      "showAllLanes": "{count, number}개 모두 표시",
+      "showFewerLanes": "상위 {count, number}개만 표시",
       "role": "칭호",
       "holds": "선두 유지 횟수",
       "longestHold": "최장 유지",

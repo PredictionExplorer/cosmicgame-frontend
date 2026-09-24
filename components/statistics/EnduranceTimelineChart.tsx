@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useMemo, useState, type FC } from 'react';
+import { memo, useId, useMemo, useState, type FC } from 'react';
 import {
   ComposedChart,
   Area,
@@ -24,11 +24,13 @@ import {
   type EnduranceTimelinePoint,
 } from '@/utils/endurance';
 import { useGestureListByCycle, useRoundInfo, useCurrentTime } from '@/hooks/useApiQuery';
+import { useHydrated } from '@/hooks/useHydrated';
 import { useNow } from '@/hooks/useNow';
+import { Button } from '@/components/ui/button';
 import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
-import { SkeletonChart } from '@/components/ui/skeleton';
+import { Skeleton, SkeletonChart } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import { ChartFigure } from './charts/ChartFigure';
@@ -46,13 +48,25 @@ import {
   Y_AXIS_PROPS,
   timelineMarkStyle,
 } from './charts/theme';
+import { SummaryAddress, useCoarsePointer, useTimelineReadout } from './charts/timeline';
 import { useRovingStints } from './charts/useRovingStints';
 
 const LINE_CHART_HEIGHT = 320;
-/** Lanes shown before the list scrolls inside its own frame. */
-const LANE_SCROLL_THRESHOLD = 14;
+/**
+ * Lanes a page shows before "Show all": the longest holders, which are the
+ * lanes a reader compares. The embed, a page of its own, shows every lane.
+ */
+export const DEFAULT_LANE_LIMIT = 14;
 
 const pct = (v: number): string => `${Math.max(0, Math.min(100, v * 100))}%`;
+
+/**
+ * The lane grid. From `sm` the address sits in a column beside its lane; on a
+ * phone it takes its own line above the lane, so the plot spans the width.
+ * The end padding keeps a focused stint's ring clear of the frame's edge.
+ */
+const LANE_GRID =
+  'grid grid-cols-1 gap-y-1 gap-x-3 pe-1 sm:grid-cols-[minmax(6.5rem,10rem)_minmax(0,1fr)] sm:gap-y-0';
 
 /** A stint's colour: the champion's record hold, the Chrono-Warrior's lane, or an ordinary lead. */
 function stintColor(stint: EnduranceStint, lane: EnduranceLane): string {
@@ -210,20 +224,30 @@ const EnduranceLineView = memo(function EnduranceLineView({
  * Who held the lead, and for how long: a lane per address on one time axis
  * (a shared grid, so the axis and the lanes cannot drift apart at any
  * width), each bar a hold from one gesture to the next. One tab stop; the
- * arrow keys step through holds and lanes, and the focused or hovered hold
- * reads out below.
+ * arrow keys step through holds and lanes; the hovered, tapped or focused
+ * hold reads out below. Past `laneLimit` lanes the rest wait behind "Show
+ * all", with the count in view, never in a scroll area of their own.
  */
-const EnduranceGanttView = memo(function EnduranceGanttView({ gantt }: { gantt: EnduranceGantt }) {
+const EnduranceGanttView = memo(function EnduranceGanttView({
+  gantt,
+  laneLimit,
+}: {
+  gantt: EnduranceGantt;
+  laneLimit: number | null;
+}) {
   const t = useTranslations('statistics');
   const locale = useLocale();
+  const coarse = useCoarsePointer();
+  const lanesId = useId();
+  const [showAll, setShowAll] = useState(false);
   const durHours = Math.max(gantt.roundDurationSeconds / 3600, 1 / 60);
   const axis = useElapsedHoursAxis(durHours);
-  const counts = useMemo(() => gantt.lanes.map((lane) => lane.stints.length), [gantt.lanes]);
+  const total = gantt.lanes.length;
+  const limited = laneLimit !== null && total > laneLimit && !showAll;
+  const lanes = limited ? gantt.lanes.slice(0, laneLimit) : gantt.lanes;
+  const counts = useMemo(() => lanes.map((lane) => lane.stints.length), [lanes]);
   const roving = useRovingStints(counts);
-  const [readout, setReadout] = useState<{ lane: EnduranceLane; stint: EnduranceStint } | null>(
-    null,
-  );
-  const manyLanes = gantt.lanes.length > LANE_SCROLL_THRESHOLD;
+  const readout = useTimelineReadout<{ lane: EnduranceLane; stint: EnduranceStint }>();
 
   const describe = (lane: EnduranceLane, stint: EnduranceStint) =>
     t('charts.endurance.stintAria', {
@@ -237,10 +261,6 @@ const EnduranceGanttView = memo(function EnduranceGanttView({ gantt }: { gantt: 
           ? t('charts.endurance.roleNewRecord')
           : '',
     });
-
-  // The end padding keeps a focused stint's ring, drawn outside the lane's
-  // last stint, clear of the scrolling frame's edge.
-  const grid = 'grid grid-cols-[minmax(6.5rem,10rem)_minmax(0,1fr)] gap-x-3 pe-1';
 
   return (
     <div className="space-y-3">
@@ -262,8 +282,8 @@ const EnduranceGanttView = memo(function EnduranceGanttView({ gantt }: { gantt: 
         ]}
       />
 
-      <div className={cn(grid, 'border-b border-rule pb-2')} aria-hidden>
-        <span />
+      <div className={cn(LANE_GRID, 'border-b border-rule pb-2')} aria-hidden>
+        <span className="hidden sm:block" />
         <div className="relative h-4 type-caption text-subtle tabular-nums">
           {axis.ticks.map((tick, index) => {
             const at = tick / durHours;
@@ -285,113 +305,198 @@ const EnduranceGanttView = memo(function EnduranceGanttView({ gantt }: { gantt: 
       </div>
 
       <div
-        className={cn(
-          manyLanes &&
-            'max-h-[34rem] overflow-y-auto overscroll-y-contain pb-6 [mask-image:linear-gradient(to_bottom,black_calc(100%-2rem),transparent)]',
-        )}
-        tabIndex={manyLanes ? -1 : undefined}
+        id={lanesId}
+        role="group"
+        aria-label={t('charts.endurance.ganttLabel')}
+        onKeyDown={roving.onKeyDown}
+        onMouseLeave={readout.onMouseLeave}
       >
-        <div
-          role="group"
-          aria-label={t('charts.endurance.ganttLabel')}
-          onKeyDown={roving.onKeyDown}
-          onMouseLeave={() => setReadout(null)}
-        >
-          {gantt.lanes.map((lane, row) => (
-            <div
-              key={lane.address}
-              role="group"
-              aria-label={t('charts.endurance.laneLabel', {
-                address: formatAddress(lane.address),
-                count: lane.stints.length,
-                longest: formatSeconds(lane.maxStintSeconds, locale),
-              })}
-              className={cn(
-                grid,
-                'border-b border-rule-faint py-1.5 transition-colors duration-fast',
-                TIMELINE_LANE_FOCUS_CLASS,
-              )}
-            >
-              {/* The address stays whole; a title's tags sit on their own line under it. */}
-              <div className="flex min-w-0 flex-col justify-center gap-1">
-                <span className="truncate type-mono text-foreground" title={lane.address}>
-                  {formatAddress(lane.address)}
-                </span>
-                {lane.isEnduranceChampion || lane.isChronoWarrior ? (
-                  <span className="flex flex-wrap gap-1">
-                    {lane.isEnduranceChampion ? (
-                      <RoleTag
-                        abbr={t('charts.endurance.enduranceChampionAbbr')}
-                        name={t('charts.endurance.enduranceChampion')}
-                        color={SERIES_COLOR.endurance}
-                      />
-                    ) : null}
-                    {lane.isChronoWarrior ? (
-                      <RoleTag
-                        abbr={t('charts.endurance.chronoWarriorAbbr')}
-                        name={t('charts.endurance.chronoWarrior')}
-                        color={SERIES_COLOR.chrono}
-                      />
-                    ) : null}
-                  </span>
-                ) : null}
-              </div>
-              {/* No clipping: a focused stint draws its ring outside itself. */}
-              <div className="relative min-h-6 self-center rounded-edge bg-surface-sunken">
-                {axis.ticks.slice(1).map((tick) => (
-                  <span
-                    key={tick}
-                    aria-hidden
-                    className="absolute inset-y-0 w-px bg-rule-faint"
-                    style={{ left: pct(tick / durHours) }}
-                  />
-                ))}
-                {lane.stints.map((stint, item) => {
-                  const ringRecord = stint.isRecord && !stint.isEnduranceChampion;
-                  const active = readout?.stint === stint;
-                  return (
-                    <span
-                      key={item}
-                      ref={roving.markRef(row, item)}
-                      role="img"
-                      aria-label={describe(lane, stint)}
-                      tabIndex={roving.isCurrent(row, item) ? 0 : -1}
-                      onFocus={() => {
-                        roving.setCurrent({ row, item });
-                        setReadout({ lane, stint });
-                      }}
-                      onMouseEnter={() => setReadout({ lane, stint })}
-                      className={cn(
-                        TIMELINE_MARK_CLASS,
-                        'inset-y-1 rounded-edge transition-opacity duration-fast',
-                        ringRecord ? '[--mark-min:3px]' : '[--mark-min:2px]',
-                        active || stint.isEnduranceChampion ? 'opacity-100' : 'opacity-75',
-                      )}
-                      style={{
-                        ...timelineMarkStyle(
-                          stint.startHours / durHours,
-                          stint.durationHours / durHours,
-                        ),
-                        backgroundColor: stintColor(stint, lane),
-                        boxShadow: ringRecord
-                          ? 'inset 0 0 0 1.5px hsl(var(--foreground))'
-                          : undefined,
-                      }}
+        {lanes.map((lane, row) => (
+          <div
+            key={lane.address}
+            role="group"
+            aria-label={t('charts.endurance.laneLabel', {
+              address: formatAddress(lane.address),
+              count: lane.stints.length,
+              longest: formatSeconds(lane.maxStintSeconds, locale),
+            })}
+            className={cn(
+              LANE_GRID,
+              'border-b border-rule-faint py-1.5 transition-colors duration-fast',
+              TIMELINE_LANE_FOCUS_CLASS,
+            )}
+          >
+            {/* The address stays whole; a title's tags sit beside it on a phone, under it from sm. */}
+            <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 sm:flex-col sm:flex-nowrap sm:items-start sm:justify-center">
+              <span className="truncate type-mono text-foreground" title={lane.address}>
+                {formatAddress(lane.address)}
+              </span>
+              {lane.isEnduranceChampion || lane.isChronoWarrior ? (
+                <span className="flex flex-wrap gap-1">
+                  {lane.isEnduranceChampion ? (
+                    <RoleTag
+                      abbr={t('charts.endurance.enduranceChampionAbbr')}
+                      name={t('charts.endurance.enduranceChampion')}
+                      color={SERIES_COLOR.endurance}
                     />
-                  );
-                })}
-              </div>
+                  ) : null}
+                  {lane.isChronoWarrior ? (
+                    <RoleTag
+                      abbr={t('charts.endurance.chronoWarriorAbbr')}
+                      name={t('charts.endurance.chronoWarrior')}
+                      color={SERIES_COLOR.chrono}
+                    />
+                  ) : null}
+                </span>
+              ) : null}
             </div>
-          ))}
-        </div>
+            {/* No clipping: a focused stint draws its ring outside itself. */}
+            <div className="relative min-h-6 self-center rounded-edge bg-surface-sunken">
+              {axis.ticks.slice(1).map((tick) => (
+                <span
+                  key={tick}
+                  aria-hidden
+                  className="absolute inset-y-0 w-px bg-rule-faint"
+                  style={{ left: pct(tick / durHours) }}
+                />
+              ))}
+              {lane.stints.map((stint, item) => {
+                const ringRecord = stint.isRecord && !stint.isEnduranceChampion;
+                const active = readout.active?.stint === stint;
+                return (
+                  <span
+                    key={item}
+                    ref={roving.markRef(row, item)}
+                    role="img"
+                    aria-label={describe(lane, stint)}
+                    tabIndex={roving.isCurrent(row, item) ? 0 : -1}
+                    {...readout.markHandlers({ lane, stint }, () =>
+                      roving.setCurrent({ row, item }),
+                    )}
+                    className={cn(
+                      TIMELINE_MARK_CLASS,
+                      'inset-y-1 rounded-edge transition-opacity duration-fast',
+                      ringRecord ? '[--mark-min:3px]' : '[--mark-min:2px]',
+                      active || stint.isEnduranceChampion ? 'opacity-100' : 'opacity-75',
+                    )}
+                    style={{
+                      ...timelineMarkStyle(
+                        stint.startHours / durHours,
+                        stint.durationHours / durHours,
+                      ),
+                      backgroundColor: stintColor(stint, lane),
+                      boxShadow: ringRecord
+                        ? 'inset 0 0 0 1.5px hsl(var(--foreground))'
+                        : undefined,
+                    }}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </div>
 
+      {laneLimit !== null && total > laneLimit ? (
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <p className="type-body-sm text-muted-foreground">
+            {t('charts.endurance.lanesShown', { shown: lanes.length, total })}
+          </p>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            aria-expanded={showAll}
+            aria-controls={lanesId}
+            onClick={() => setShowAll((value) => !value)}
+          >
+            {showAll
+              ? t('charts.endurance.showFewerLanes', { count: laneLimit })
+              : t('charts.endurance.showAllLanes', { count: total })}
+          </Button>
+        </div>
+      ) : null}
+
       <p aria-live="polite" className="min-h-5 type-body-sm text-muted-foreground">
-        {readout ? describe(readout.lane, readout.stint) : t('charts.endurance.hint')}
+        {readout.active
+          ? describe(readout.active.lane, readout.active.stint)
+          : t(coarse ? 'charts.endurance.hintTouch' : 'charts.endurance.hint')}
       </p>
     </div>
   );
 });
+
+/**
+ * The Gantt's shape while the cycle's gestures load, `lanes` lanes tall, so
+ * the frame does not jump when the real lanes arrive.
+ */
+function EnduranceGanttSkeleton({ lanes }: { lanes: number }) {
+  const t = useTranslations('common');
+  return (
+    <div role="status" aria-label={t('status.loading')} className="space-y-3">
+      <div className="flex flex-wrap gap-x-4 gap-y-2">
+        {[28, 24, 16, 20].map((width) => (
+          <Skeleton key={width} className="h-4" style={{ width: `${width}%` }} />
+        ))}
+      </div>
+      <div className={cn(LANE_GRID, 'border-b border-rule pb-2')}>
+        <span className="hidden sm:block" />
+        <span className="h-4" />
+      </div>
+      <div>
+        {Array.from({ length: lanes }).map((_, lane) => (
+          <div key={lane} className={cn(LANE_GRID, 'border-b border-rule-faint py-1.5')}>
+            <Skeleton className="my-0.5 h-4 w-28 self-center" />
+            <div className="relative min-h-6 rounded-edge bg-surface-sunken">
+              <Skeleton
+                className="absolute inset-y-1"
+                style={{ left: `${(lane * 17) % 55}%`, width: `${12 + ((lane * 29) % 40)}%` }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="min-h-5" />
+    </div>
+  );
+}
+
+/** Two lines of the figure's caption, held while the reading loads. */
+function SummaryPlaceholder() {
+  return (
+    <span aria-hidden className="block">
+      {['w-3/4', 'w-2/3'].map((width) => (
+        <span key={width} className="flex h-[1lh] items-center">
+          <Skeleton as="span" className={cn('block h-3', width)} />
+        </span>
+      ))}
+    </span>
+  );
+}
+
+/**
+ * The whole figure before anything is known (the embed, before the dashboard
+ * names the live cycle): the caption's two lines, the view switch, `lanes`
+ * lanes and the method note, in the finished figure's order and spacing.
+ */
+export function EnduranceTimelineSkeleton({ lanes = 8 }: { lanes?: number }) {
+  const t = useTranslations('statistics');
+  return (
+    <div className="min-w-0 space-y-4">
+      <div className="max-w-[var(--measure-prose)] type-body-md">
+        <SummaryPlaceholder />
+      </div>
+      <div aria-hidden className="flex flex-wrap items-center gap-x-6 gap-y-3">
+        <Skeleton className="h-10 w-44 rounded-control" />
+        <Skeleton className="ms-auto h-8 w-32 rounded-control" />
+      </div>
+      <EnduranceGanttSkeleton lanes={Math.max(1, lanes)} />
+      <p className="max-w-[var(--measure-prose)] type-caption text-subtle">
+        {t('charts.endurance.description')}
+      </p>
+    </div>
+  );
+}
 
 type LaneRow = {
   address: string;
@@ -407,6 +512,16 @@ type EnduranceTimelineChartProps = {
   isLive: boolean;
   /** Names the figure. */
   label: string;
+  /**
+   * Lanes shown before "Show all" (`DEFAULT_LANE_LIMIT`); `null` shows every
+   * lane, for the embed, which is a page of its own.
+   */
+  laneLimit?: number | null;
+  /**
+   * How many lanes the server counted for this cycle. The loading state then
+   * draws that many lanes, so the page keeps its height when they arrive.
+   */
+  expectedLanes?: number;
 };
 
 /**
@@ -415,9 +530,16 @@ type EnduranceTimelineChartProps = {
  * summary names the Endurance Champion and the Chrono-Warrior; the table
  * lists every address that held the lead.
  */
-const EnduranceTimelineChart: FC<EnduranceTimelineChartProps> = ({ round, isLive, label }) => {
+const EnduranceTimelineChart: FC<EnduranceTimelineChartProps> = ({
+  round,
+  isLive,
+  label,
+  laneLimit = DEFAULT_LANE_LIMIT,
+  expectedLanes,
+}) => {
   const t = useTranslations('statistics');
   const locale = useLocale();
+  const hydrated = useHydrated();
   const hasRound = round >= 0;
   const { data: gestures, isLoading, isError, refetch } = useGestureListByCycle(round, 'asc');
   const [view, setView] = useState<'gantt' | 'lines'>('gantt');
@@ -426,7 +548,8 @@ const EnduranceTimelineChart: FC<EnduranceTimelineChartProps> = ({ round, isLive
   const { data: roundInfo } = useRoundInfo(hasRound && !isLive ? round : -1);
   const { data: serverNow } = useCurrentTime();
   const clientNow = Math.floor(useNow(60_000) / 1000);
-  const nowSec = serverNow && serverNow > 0 ? serverNow : clientNow;
+  // "Now" is known only in the browser: until hydration the server's render is kept.
+  const nowSec = !hydrated ? 0 : serverNow && serverNow > 0 ? serverNow : clientNow;
   const roundEndTs = !isLive && roundInfo?.TimeStamp ? roundInfo.TimeStamp : 0;
   // Only the live round depends on "now"; quantize to whole minutes so the
   // chart redraws at most once a minute, never on the 12s poll tick.
@@ -492,10 +615,15 @@ const EnduranceTimelineChart: FC<EnduranceTimelineChartProps> = ({ round, isLive
     [t],
   );
 
+  const loading = hasRound && isLoading;
   const state = !hasRound ? (
     <EmptyState headingLevel={4} variant="inline" title={t('charts.endurance.selectCycle')} />
-  ) : isLoading ? (
-    <SkeletonChart height={LINE_CHART_HEIGHT} bars={18} />
+  ) : loading ? (
+    expectedLanes !== undefined && expectedLanes > 0 ? (
+      <EnduranceGanttSkeleton lanes={expectedLanes} />
+    ) : (
+      <SkeletonChart height={LINE_CHART_HEIGHT} bars={18} />
+    )
   ) : isError ? (
     <ErrorState
       headingLevel={4}
@@ -516,18 +644,22 @@ const EnduranceTimelineChart: FC<EnduranceTimelineChartProps> = ({ round, isLive
           gantt.lanes.length > 0 ? (
             <>
               <span className="block">
-                {t('charts.endurance.championSummary', {
+                {t.rich('charts.endurance.championSummary', {
                   address: formatAddress(gantt.enduranceChampionAddress),
                   duration: formatSeconds(gantt.enduranceChampionStintSeconds, locale),
+                  who: () => <SummaryAddress address={gantt.enduranceChampionAddress} />,
                 })}
               </span>
               <span className="block">
-                {t('charts.endurance.chronoSummary', {
+                {t.rich('charts.endurance.chronoSummary', {
                   address: formatAddress(gantt.chronoWarriorAddress),
                   duration: formatSeconds(gantt.chronoWarriorSeconds, locale),
+                  who: () => <SummaryAddress address={gantt.chronoWarriorAddress} />,
                 })}
               </span>
             </>
+          ) : loading ? (
+            <SummaryPlaceholder />
           ) : undefined
         }
         state={state}
@@ -542,7 +674,7 @@ const EnduranceTimelineChart: FC<EnduranceTimelineChartProps> = ({ round, isLive
       >
         <div data-testid="endurance-timeline-chart">
           <TabsContent value="gantt" className="mt-0">
-            <EnduranceGanttView gantt={gantt} />
+            <EnduranceGanttView gantt={gantt} laneLimit={laneLimit} />
           </TabsContent>
           <TabsContent value="lines" className="mt-0">
             <EnduranceLineView points={timeline.points} />

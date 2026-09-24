@@ -39,7 +39,11 @@
     "noDataTitle": "データはまだありません",
     "sectionLoadErrorTitle": "{title}を読み込めませんでした",
     "serviceError": "統計サービスから応答がありませんでした。しばらくしてからもう一度お試しください。",
-    "definitions": "用語の説明"
+    "definitions": "用語の説明",
+    "listMissingTitle": "一覧を読み込めませんでした",
+    "listMissingMessage": "このページの他の数値ではここに記録があるはずですが、取得できませんでした。もう一度お試しください。",
+    "showSection": "表示",
+    "hideSection": "閉じる"
   },
   "hub": {
     "loadErrorTitle": "統計を読み込めませんでした",
@@ -47,6 +51,7 @@
     "exploreTitle": "統計を探索",
     "exploreAria": "統計のセクションページ",
     "protocolEconomyTitle": "プロトコルの経済",
+    "relatedTitle": "関連ページ",
     "jsonLd": {
       "webPageName": "Cosmic Signatureプロトコル統計",
       "webPageDescription": "パフォーマンス・サイクルの状態、一筆、NFT、CST、係留、準備金、配分データを含む、Arbitrum上のCosmic Signatureプロトコルの公開統計。",
@@ -120,9 +125,13 @@
       "label": "星選ETHの積立",
       "tooltip": "インデックス済みのパフォーマンス・サイクルにわたって星選プールに配分されたETHの総額。"
     },
-    "stellarSelectionEthRetrieved": {
-      "label": "星選ETHの受け取り",
-      "tooltip": "選ばれた受領者が星選プールから受け取ったETHの総額。"
+    "chronoWarriorEthDeposited": {
+      "label": "時の戦士ETHの積立",
+      "tooltip": "インデックス済みのパフォーマンス・サイクルにわたって時の戦士に配分されたETHの総額。受領者が受け取るまで配分ウォレットに保管されます。"
+    },
+    "allocationsWalletEthRetrieved": {
+      "label": "配分ウォレットからの受け取りETH",
+      "tooltip": "受領者が配分ウォレットから受け取ったETHで、星選ETHと時の戦士ETHの両方を含みます。"
     },
     "totalSupplyErc20": {
       "label": "総供給量（ERC-20）",
@@ -274,6 +283,7 @@
       "cycleTimelines": "サイクルの詳細"
     },
     "emptyCycleActivations": "インデックス済みのサイクル有効化はまだありません",
+    "cycleActivationsCount": "インデックス済みの有効化{count, number}件",
     "cycleTimelinesDescription": "サイクルを選ぶと、一筆の方法の内訳、先頭の推移、CST調律期間とCSTコストの変化を確認できます。"
   },
   "anchoringPage": {
@@ -358,7 +368,8 @@
       "summaryNoSupply": "{count, plural, other {#件のアドレス}}がCSTを保有しています（残高の多い順）。",
       "share": "供給量に占める割合",
       "shareHelp": "この残高がCST総供給量に占める割合です。"
-    }
+    },
+    "attachedContracts": "ERC-721コントラクト{count, number}件"
   },
   "attachedAssets": {
     "scopeAria": "添付NFTの範囲",
@@ -387,7 +398,7 @@
       "empty": "この絞り込みに一致する参加者はまだいません。",
       "columns": {
         "participant": "参加者",
-        "allocationRate": "配分率",
+        "cyclesWithAllocation": "配分を受け取ったサイクル",
         "gestures": "筆数",
         "spent": "支出（ETH）",
         "received": "受領（ETH）",
@@ -445,9 +456,8 @@
       "received": "配分で受け取ったETH",
       "receivedMore": "支払いより多くのETHを受け取った参加者",
       "ofParticipants": "{whole}人中{part}人",
-      "rank": "順番",
       "netHelp": "配分で受け取ったETHから、一筆に支払ったETHを引いた額です。CSTは含みません。",
-      "rateHelp": "この参加者が参加したサイクルのうち、少なくとも一つの配分を受け取ったサイクルの割合です。",
+      "cyclesHelp": "この参加者が参加したサイクルのうち、少なくとも一つの配分を受け取ったサイクルの数です。",
       "cycles": "{whole, number}サイクル中{part}"
     }
   },
@@ -464,8 +474,8 @@
       "openingExcluded": "各サイクルの開始後1時間の一筆は除外しています。開始直後の活動は極端に集中するため、含めるとこのグラフが歪んでしまいます。",
       "hour": "時間",
       "day": "日付",
-      "summaryDaily": "{range}の一筆は{total}筆。最も活発な日：{date}（{peak}筆）。",
-      "summaryHourly": "{range}の一筆は{total}筆。最も活発な時間帯：{date}（{peak}筆）。"
+      "summaryDaily": "{range}の一筆は{total}筆（各サイクル開始後の最初の1時間を除く）。最も活発な日：{date}（{peak}筆）。",
+      "summaryHourly": "{range}の一筆は{total}筆（各サイクル開始後の最初の1時間を除く）。最も活発な時間帯：{date}（{peak}筆）。"
     },
     "spikes": {
       "count": "急増（{count}）",
@@ -478,7 +488,7 @@
       "loadErrorTitle": "一筆の急増を読み込めませんでした",
       "loadErrorMessage": "急増検出データを取得できませんでした。",
       "empty": "インデックス済みの履歴に一筆の急増は検出されていません。",
-      "noneRecent": "最近の急増はありません。",
+      "noneRecent": "最近の急増はないため、記録上で最も新しい急増を表示しています。",
       "selectEarlier": "上で急増の番号を選ぶと過去にさかのぼり、以前の活動の急増を調べられます。",
       "emptyWindow": "選択した急増の期間に時間別の集計はありません。",
       "optionAria": "{date}の急増、毎時最大{peak}筆"
@@ -494,9 +504,10 @@
       "periods": "活動期間",
       "longest": "最長の期間",
       "lastActive": "最終活動",
-      "summary": "{range}で最も活発な参加者{count, number}人。一筆が最も多いのは{leader}（{gestures}筆）。",
+      "summary": "{range}で最も活発な参加者{count, number}人。一筆が最も多いのは<who>{leader}</who>（{gestures}筆）。",
       "laneLabel": "{rank}位：{address}、{gestures, number}筆、活動期間{periods, number}件",
-      "hint": "期間を指すか選択すると詳細が表示されます。矢印キーで期間を移動できます。"
+      "hint": "期間を指すか選択すると詳細が表示されます。矢印キーで期間を移動できます。",
+      "hintTouch": "期間をタップすると詳細が表示されます。"
     },
     "typeRatio": {
       "totalGestures": "一筆の総数",
@@ -537,8 +548,8 @@
       "loadErrorTitle": "持久のタイムラインを読み込めませんでした",
       "loadErrorMessage": "このサイクルの一筆の履歴を取得できませんでした。",
       "empty": "このサイクルにはまだ先頭記録がありません",
-      "championSummary": "持久チャンピオン：{address}が{duration}保持",
-      "chronoSummary": "時の戦士：{address}が{duration}保持",
+      "championSummary": "持久チャンピオン：<who>{address}</who>が{duration}保持",
+      "chronoSummary": "時の戦士：<who>{address}</who>が{duration}保持",
       "gantt": "ガント",
       "lineChart": "折れ線グラフ",
       "openWindow": "新しいウィンドウで開く",
@@ -546,6 +557,10 @@
       "ganttLabel": "参加者ごとの先頭の保持区間",
       "laneLabel": "{address}：先頭の保持{count, number}回、最長{longest}",
       "hint": "保持区間を指すか選択すると詳細が表示されます。矢印キーで区間を移動できます。",
+      "hintTouch": "保持区間をタップすると詳細が表示されます。",
+      "lanesShown": "リードを保持したアドレス{total, number}件のうち{shown, number}件を表示",
+      "showAllLanes": "{count, number}件すべて表示",
+      "showFewerLanes": "上位{count, number}件のみ表示",
       "role": "称号",
       "holds": "先頭の保持回数",
       "longestHold": "最長の保持",

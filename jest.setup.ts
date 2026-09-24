@@ -204,17 +204,20 @@ jest.mock('next-intl', () => {
       if (namespace && catalogMessages[namespace]) {
         const message = resolveMessage(catalogMessages[namespace], key);
         if (typeof message === 'string') {
-          const strongMatch = message.match(/^(.*)<strong>\{(\w+)\}<\/strong>(.*)$/);
-          if (strongMatch && typeof values?.strong === 'function') {
-            const before = strongMatch[1] ?? '';
-            const valueName = strongMatch[2] ?? '';
-            const after = strongMatch[3] ?? '';
-            const renderStrong = values.strong as (chunks: string) => unknown;
+          // One tag around one placeholder (`<strong>{amount}</strong>`, `<who>{address}</who>`),
+          // rendered through the caller's tag function as next-intl does.
+          const tagMatch = message.match(/^(.*)<(\w+)>\{(\w+)\}<\/\2>(.*)$/);
+          const tagName = tagMatch?.[2] ?? '';
+          if (tagMatch && typeof values?.[tagName] === 'function') {
+            const before = tagMatch[1] ?? '';
+            const valueName = tagMatch[3] ?? '';
+            const after = tagMatch[4] ?? '';
+            const renderTag = values[tagName] as (chunks: string) => unknown;
             return React.createElement(
               React.Fragment,
               null,
               interpolate(before, values),
-              renderStrong(String(values?.[valueName] ?? `{${valueName}}`)),
+              renderTag(String(values?.[valueName] ?? `{${valueName}}`)),
               interpolate(after, values),
             );
           }

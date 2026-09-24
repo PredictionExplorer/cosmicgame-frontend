@@ -87,11 +87,13 @@ export const DOTS_MAX_POINTS = 40;
  * inside the lane at its right end. The lane must not clip (no
  * `overflow-hidden`): keyboard focus draws the shared ring outside the mark,
  * lifts it over its neighbours and widens a sliver to 6px, so the ring
- * reads as a ring rather than a line (WCAG 2.4.7). Pair it with
+ * reads as a ring rather than a line (WCAG 2.4.7). A transparent pad,
+ * 24px wide and a little taller than the mark, takes the pointer and the
+ * finger, so a 2px sliver is still a target (WCAG 2.5.8). Pair it with
  * `TIMELINE_LANE_FOCUS_CLASS` on the lane's row.
  */
 export const TIMELINE_MARK_CLASS =
-  'absolute left-[min(var(--mark-at),calc(100%-var(--mark-min)))] min-w-[var(--mark-min)] focus-visible:z-10 focus-visible:opacity-100 focus-visible:outline-solid focus-visible:[--mark-min:0.375rem]';
+  "absolute left-[min(var(--mark-at),calc(100%-var(--mark-min)))] min-w-[var(--mark-min)] cursor-pointer before:absolute before:-inset-y-1 before:left-1/2 before:w-6 before:-translate-x-1/2 before:content-[''] focus-visible:z-10 focus-visible:opacity-100 focus-visible:outline-solid focus-visible:[--mark-min:0.375rem]";
 
 /** The row of a timeline lane: tinted while one of its marks has keyboard focus. */
 export const TIMELINE_LANE_FOCUS_CLASS = 'has-[[role=img]:focus-visible]:bg-surface';

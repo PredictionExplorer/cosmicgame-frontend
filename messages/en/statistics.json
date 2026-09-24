@@ -39,7 +39,11 @@
     "noDataTitle": "No data yet",
     "sectionLoadErrorTitle": "Failed to load {title}",
     "serviceError": "The statistics service did not respond. Try again in a moment.",
-    "definitions": "Definitions"
+    "definitions": "Definitions",
+    "listMissingTitle": "This list did not load",
+    "listMissingMessage": "Other figures on this page show there are rows here, but none came back. Try again.",
+    "showSection": "Show",
+    "hideSection": "Hide"
   },
   "hub": {
     "loadErrorTitle": "Failed to load statistics",
@@ -47,6 +51,7 @@
     "exploreTitle": "Explore statistics",
     "exploreAria": "Statistics section pages",
     "protocolEconomyTitle": "Protocol economy",
+    "relatedTitle": "Related pages",
     "jsonLd": {
       "webPageName": "Cosmic Signature Protocol Statistics",
       "webPageDescription": "Public Cosmic Signature protocol statistics on Arbitrum, including Performance Cycle status, gestures, NFTs, CST, anchoring, reserves, and allocation data.",
@@ -120,9 +125,13 @@
       "label": "Stellar Selection ETH deposited",
       "tooltip": "Total ETH allocated into Stellar Selection pools across indexed Performance Cycles."
     },
-    "stellarSelectionEthRetrieved": {
-      "label": "Stellar Selection ETH retrieved",
-      "tooltip": "Total ETH retrieved by selected recipients from Stellar Selection pools."
+    "chronoWarriorEthDeposited": {
+      "label": "Chrono-Warrior ETH deposited",
+      "tooltip": "Total ETH allocated to Chrono-Warriors across indexed Performance Cycles, held in the Allocations Wallet until each recipient retrieves it."
+    },
+    "allocationsWalletEthRetrieved": {
+      "label": "ETH retrieved from the Allocations Wallet",
+      "tooltip": "ETH that recipients have retrieved from the Allocations Wallet across both of its tracks: Stellar Selection ETH and Chrono-Warrior ETH."
     },
     "totalSupplyErc20": {
       "label": "Total supply (ERC-20)",
@@ -274,6 +283,7 @@
       "cycleTimelines": "One cycle in detail"
     },
     "emptyCycleActivations": "No cycle activations indexed yet",
+    "cycleActivationsCount": "{count, plural, one {# activation indexed} other {# activations indexed}}",
     "cycleTimelinesDescription": "Choose a cycle to see how its gestures split between methods, who held the lead, and how the CST Calibration Window and CST cost moved."
   },
   "anchoringPage": {
@@ -358,7 +368,8 @@
       "summaryNoSupply": "{count, plural, one {# address holds} other {# addresses hold}} CST, largest balance first.",
       "share": "Share of supply",
       "shareHelp": "This balance as a share of the total CST supply."
-    }
+    },
+    "attachedContracts": "{count, plural, one {# ERC-721 contract} other {# ERC-721 contracts}}"
   },
   "attachedAssets": {
     "scopeAria": "Attached NFT scope",
@@ -387,7 +398,7 @@
       "empty": "No participants match this filter yet.",
       "columns": {
         "participant": "Participant",
-        "allocationRate": "Allocation rate",
+        "cyclesWithAllocation": "Cycles with an allocation",
         "gestures": "Gestures",
         "spent": "Spent (ETH)",
         "received": "Received (ETH)",
@@ -445,9 +456,8 @@
       "received": "ETH received in allocations",
       "receivedMore": "Received more ETH than spent",
       "ofParticipants": "{part} of {whole}",
-      "rank": "Position",
       "netHelp": "ETH received in allocations minus ETH spent on gestures. CST is not included.",
-      "rateHelp": "The share of the cycles this participant took part in where they received at least one allocation.",
+      "cyclesHelp": "How many of the cycles this participant took part in brought them at least one allocation.",
       "cycles": "{part} of {whole, plural, one {# cycle} other {# cycles}}"
     }
   },
@@ -464,8 +474,8 @@
       "openingExcluded": "Gestures in the first hour after each cycle opens are excluded — opening activity is unusually concentrated and would otherwise skew this chart.",
       "hour": "Hour",
       "day": "Day",
-      "summaryDaily": "Gestures, {range}: {total}. Busiest day: {date} ({peak}).",
-      "summaryHourly": "Gestures, {range}: {total}. Busiest hour: {date} ({peak})."
+      "summaryDaily": "Gestures, {range}: {total}, not counting the first hour of each cycle. Busiest day: {date} ({peak}).",
+      "summaryHourly": "Gestures, {range}: {total}, not counting the first hour of each cycle. Busiest hour: {date} ({peak})."
     },
     "spikes": {
       "count": "Spikes ({count})",
@@ -478,7 +488,7 @@
       "loadErrorTitle": "Failed to load gesture spikes",
       "loadErrorMessage": "Could not fetch spike detection data.",
       "empty": "No gesture spikes detected in indexed history.",
-      "noneRecent": "No spikes recently.",
+      "noneRecent": "No spike in recent activity; showing the latest one on record.",
       "selectEarlier": "Select a spike above to inspect an earlier period of activity.",
       "emptyWindow": "No hourly data for the selected spike window.",
       "optionAria": "Spike on {date}, peak of {peak} per hour"
@@ -494,9 +504,10 @@
       "periods": "Active periods",
       "longest": "Longest period",
       "lastActive": "Last active",
-      "summary": "{count, plural, one {The most active participant} other {The # most active participants}}, {range}. Most gestures: {leader} ({gestures}).",
+      "summary": "{count, plural, one {The most active participant} other {The # most active participants}}, {range}. Most gestures: <who>{leader}</who> ({gestures}).",
       "laneLabel": "{rank}. {address}: {gestures, plural, one {# gesture} other {# gestures}} in {periods, plural, one {# active period} other {# active periods}}",
-      "hint": "Point at or select a period for its details; arrow keys move between periods."
+      "hint": "Point at or select a period for its details; arrow keys move between periods.",
+      "hintTouch": "Tap a period for its details."
     },
     "typeRatio": {
       "totalGestures": "Total gestures",
@@ -537,8 +548,8 @@
       "loadErrorTitle": "Failed to load endurance timeline",
       "loadErrorMessage": "Could not fetch the gesture history for this cycle.",
       "empty": "No lead activity in this cycle yet.",
-      "championSummary": "Endurance Champion: {address} held {duration}",
-      "chronoSummary": "Chrono-Warrior: {address} reigned {duration}",
+      "championSummary": "Endurance Champion: <who>{address}</who> held {duration}",
+      "chronoSummary": "Chrono-Warrior: <who>{address}</who> reigned {duration}",
       "gantt": "Gantt",
       "lineChart": "Line chart",
       "openWindow": "Open in a new window",
@@ -546,6 +557,10 @@
       "ganttLabel": "Lead stints by participant",
       "laneLabel": "{address}: {count, plural, one {# stint} other {# stints}} in the lead, longest {longest}",
       "hint": "Point at or select a stint for its details; arrow keys move between stints.",
+      "hintTouch": "Tap a stint for its details.",
+      "lanesShown": "Showing {shown, number} of {total, number} addresses that held the lead",
+      "showAllLanes": "Show all {count, number}",
+      "showFewerLanes": "Show the top {count, number}",
       "role": "Title",
       "holds": "Stints in the lead",
       "longestHold": "Longest stint",
