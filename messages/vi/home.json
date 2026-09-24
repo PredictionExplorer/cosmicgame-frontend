@@ -93,8 +93,8 @@
     }
   },
   "notifications": {
-    "finalizationSoonTitle": "Đặt nét bút ngay — chu kỳ có thể sớm hoàn tất",
-    "finalizationSoonBody": "Còn {minutes} phút đến khi chu kỳ có thể hoàn tất. Đặt nét bút để kéo dài chu kỳ và tham gia các phân bổ."
+    "finalizationSoonTitle": "Chu kỳ sắp có thể hoàn tất",
+    "finalizationSoonBody": "Còn {minutes, plural, other {# phút}} đến thời điểm hoàn tất chu kỳ. Một nét bút mới vẫn có thể lùi thời điểm này."
   },
   "chrono": {
     "sectionAria": "Thời điểm hoàn tất chu kỳ",
@@ -148,7 +148,7 @@
       "finalMinute": {
         "eyebrow": "Phút cuối",
         "label": "Phút cuối",
-        "status": "Phút cuối. Đang hiển thị từng phần mười giây.",
+        "status": "Còn chưa đến một phút. Một nét bút mới vẫn có thể kéo dài đồng hồ.",
         "tooltip": "Đếm ngược hoàn tất đang ở phút cuối. Nếu về không, chu kỳ sẽ sẵn sàng hoàn tất."
       },
       "confirming": {
@@ -594,6 +594,11 @@
       "collapsedTitle": "Về Cosmic Signature",
       "collapsedSubtitle": "Câu chuyện, tác phẩm và cách mỗi chu kỳ trình diễn trở thành một Signature",
       "expand": "Mở rộng"
+    },
+    "introByPhase": {
+      "openingSoon": "Chu kỳ tiếp theo mở khi đếm ngược này kết thúc. Nét bút đầu tiên của chu kỳ khởi động đếm ngược hoàn tất.",
+      "waitingFirstGesture": "Chu kỳ đã mở. Nét bút đầu tiên khởi động đếm ngược hoàn tất; khi đếm ngược về 0, người tham gia gần nhất có thể hoàn tất chu kỳ và nhận phân bổ Signature.",
+      "zero": "Đồng hồ đã về không. Người tham gia gần nhất giờ có thể hoàn tất chu kỳ và nhận phân bổ Signature; cho đến khi có người hoàn tất, một nét bút mới vẫn có thể kéo dài chu kỳ."
     }
   },
   "mobileCta": {

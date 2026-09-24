@@ -93,8 +93,8 @@
     }
   },
   "notifications": {
-    "finalizationSoonTitle": "現在落筆——收官在即",
-    "finalizationSoonBody": "收官倒數將在 {minutes} 分鐘後歸零。現在落筆即可延長週期，並參與最終分配。"
+    "finalizationSoonTitle": "週期即將可以收官",
+    "finalizationSoonBody": "距週期收官時間還有 {minutes, plural, other {# 分鐘}}。新的一筆仍能延後截止時間。"
   },
   "chrono": {
     "sectionAria": "週期收官時間",
@@ -148,7 +148,7 @@
       "finalMinute": {
         "eyebrow": "最後一分鐘",
         "label": "最後一分鐘",
-        "status": "最後一分鐘，時鐘已精確到十分之一秒。",
+        "status": "剩餘不到一分鐘。新的一筆仍能延長倒數。",
         "tooltip": "收官倒數已進入最後一分鐘。一旦歸零，週期即進入可收官狀態。"
       },
       "confirming": {
@@ -594,6 +594,11 @@
       "collapsedTitle": "關於 Cosmic Signature",
       "collapsedSubtitle": "故事、作品，以及每個演繹週期如何凝成簽名",
       "expand": "展開"
+    },
+    "introByPhase": {
+      "openingSoon": "倒數結束後，下一週期開啟。週期內落下第一筆，收官倒數隨之啟動。",
+      "waitingFirstGesture": "週期已開啟。落下第一筆，收官倒數隨之啟動；倒數歸零後，最新落筆者可收官並獲得簽名分配。",
+      "zero": "倒數已歸零。最新落筆者現在可以收官並獲得簽名分配；在收官之前，新的一筆仍能延長週期。"
     }
   },
   "mobileCta": {

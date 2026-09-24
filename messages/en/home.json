@@ -93,8 +93,8 @@
     }
   },
   "notifications": {
-    "finalizationSoonTitle": "Gesture now — the cycle can finalize soon",
-    "finalizationSoonBody": "The Cycle Finalization Time expires in {minutes} minutes. Make a Gesture now to extend the cycle and take part in the final allocations."
+    "finalizationSoonTitle": "The cycle can finalize soon",
+    "finalizationSoonBody": "{minutes, plural, one {# minute} other {# minutes}} to the Cycle Finalization Time. A Gesture can still move the deadline."
   },
   "chrono": {
     "sectionAria": "Cycle Finalization Time",
@@ -148,7 +148,7 @@
       "finalMinute": {
         "eyebrow": "Final minute",
         "label": "Final minute",
-        "status": "Final minute. Tenths are live.",
+        "status": "Under a minute remains. A Gesture can still extend the clock.",
         "tooltip": "The finalization clock is in its last minute. If it reaches zero, the cycle becomes ready to finalize."
       },
       "confirming": {
@@ -594,6 +594,11 @@
       "collapsedTitle": "About Cosmic Signature",
       "collapsedSubtitle": "The story, the artwork, and how each Performance Cycle becomes a Signature",
       "expand": "Expand"
+    },
+    "introByPhase": {
+      "openingSoon": "The next cycle opens when this countdown ends. Its first Gesture starts the finalization clock.",
+      "waitingFirstGesture": "The cycle is open. Its first Gesture starts the finalization clock; after it reaches zero, the latest participant can finalize and receive the Signature Allocation.",
+      "zero": "The clock has reached zero. The latest participant can now finalize and receive the Signature Allocation; until someone does, a new Gesture can still extend the cycle."
     }
   },
   "mobileCta": {

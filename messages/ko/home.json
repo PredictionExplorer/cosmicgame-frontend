@@ -94,7 +94,7 @@
   },
   "notifications": {
     "finalizationSoonTitle": "사이클 마감 시각이 다가옵니다",
-    "finalizationSoonBody": "사이클 마감 시각까지 {minutes}분 남았습니다. 지금 제스처를 남기면 사이클을 연장하고 최종 배분에 참여할 수 있습니다."
+    "finalizationSoonBody": "사이클 마감 시각까지 {minutes, plural, other {#분}} 남았습니다. 새 제스처는 여전히 마감 시각을 늦출 수 있습니다."
   },
   "chrono": {
     "sectionAria": "사이클 마감 시각",
@@ -148,7 +148,7 @@
       "finalMinute": {
         "eyebrow": "마지막 1분",
         "label": "마지막 1분",
-        "status": "마감까지 1분 남았습니다. 남은 시간을 0.1초 단위로 표시합니다.",
+        "status": "1분이 채 남지 않았습니다. 새 제스처는 여전히 카운트다운을 연장할 수 있습니다.",
         "tooltip": "마감 카운트다운이 마지막 1분에 들어섰습니다. 0이 되면 사이클은 마감 준비 상태가 됩니다."
       },
       "confirming": {
@@ -594,6 +594,11 @@
       "collapsedTitle": "Cosmic Signature 소개",
       "collapsedSubtitle": "이야기와 작품, 그리고 퍼포먼스 사이클이 시그니처가 되는 과정",
       "expand": "펼치기"
+    },
+    "introByPhase": {
+      "openingSoon": "이 카운트다운이 끝나면 다음 사이클이 열립니다. 사이클의 첫 제스처가 마감 카운트다운을 시작합니다.",
+      "waitingFirstGesture": "사이클이 열려 있습니다. 첫 제스처가 마감 카운트다운을 시작하며, 시간이 끝나면 최근 참여자가 사이클을 마감하고 시그니처 배분을 받을 수 있습니다.",
+      "zero": "카운트다운이 0에 도달했습니다. 이제 최근 참여자가 사이클을 마감하고 시그니처 배분을 받을 수 있으며, 마감되기 전까지는 새 제스처로 사이클을 연장할 수 있습니다."
     }
   },
   "mobileCta": {

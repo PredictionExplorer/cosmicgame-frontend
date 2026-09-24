@@ -1,6 +1,6 @@
 import { render, screen, within, checkA11y } from '@/test-utils';
 
-import { PulseBar } from '../PulseBar';
+import { PulseBar, introForPhase } from '../PulseBar';
 
 const baseProps = {
   cycleNumber: 7,
@@ -85,6 +85,37 @@ describe('PulseBar', () => {
     expect(screen.getByTestId('pulse-you-latest')).toHaveTextContent(
       'home.observatory.standing.positionLatest',
     );
+  });
+
+  it('explains the zero moment instead of the standing intro', () => {
+    const { rerender } = render(<PulseBar {...baseProps} phase="ready-to-finalize" />);
+    const intro = screen.getByTestId('pulse-intro');
+    expect(intro).toHaveTextContent('home.deck.introByPhase.zero');
+    // A moment's explanation is never clamped on phones.
+    expect(intro.className).not.toMatch(/line-clamp/);
+
+    rerender(<PulseBar {...baseProps} phase="confirming" />);
+    expect(screen.getByTestId('pulse-intro')).toHaveTextContent('home.deck.introByPhase.zero');
+
+    rerender(<PulseBar {...baseProps} phase="final-minute" />);
+    expect(screen.getByTestId('pulse-intro')).toHaveTextContent('home.deck.intro');
+    expect(screen.getByTestId('pulse-intro').className).toMatch(/max-sm:line-clamp-2/);
+  });
+
+  it.each([
+    ['opening-soon', 'openingSoon'],
+    ['waiting-first-gesture', 'waitingFirstGesture'],
+    ['confirming', 'zero'],
+    ['ready-to-finalize', 'zero'],
+    ['live', 'default'],
+    ['approach', 'default'],
+    ['final-hour', 'default'],
+    ['final-ten', 'default'],
+    ['final-minute', 'default'],
+    ['loading', 'default'],
+    ['unavailable', 'default'],
+  ] as const)('reads the %s phase with the %s intro', (phase, intro) => {
+    expect(introForPhase(phase)).toBe(intro);
   });
 
   it('has no accessibility violations', async () => {

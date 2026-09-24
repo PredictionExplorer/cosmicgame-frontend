@@ -64,7 +64,7 @@ function getHeroPhaseView(phase: CyclePhase) {
         messageKey: 'openingSoon',
         headlineUsesCycleLabel: false,
         bodyUsesCycleLabel: true,
-        badgeDotClass: 'bg-[rgb(var(--impact-green-rgb))] animate-live-dot',
+        badgeDotClass: 'bg-positive',
         bodyClass: 'text-foreground',
       };
     case 'waiting-first-gesture':
@@ -72,7 +72,7 @@ function getHeroPhaseView(phase: CyclePhase) {
         messageKey: 'waitingFirstGesture',
         headlineUsesCycleLabel: true,
         bodyUsesCycleLabel: false,
-        badgeDotClass: 'bg-[rgb(var(--impact-green-rgb))] animate-live-dot',
+        badgeDotClass: 'bg-positive',
         bodyClass: 'text-foreground',
       };
     case 'confirming':
@@ -80,7 +80,7 @@ function getHeroPhaseView(phase: CyclePhase) {
         messageKey: 'confirming',
         headlineUsesCycleLabel: false,
         bodyUsesCycleLabel: false,
-        badgeDotClass: 'bg-primary animate-pulse-glow',
+        badgeDotClass: 'bg-muted-foreground',
         bodyClass: 'text-foreground',
       };
     case 'ready-to-finalize':
@@ -88,7 +88,7 @@ function getHeroPhaseView(phase: CyclePhase) {
         messageKey: 'readyToFinalize',
         headlineUsesCycleLabel: false,
         bodyUsesCycleLabel: false,
-        badgeDotClass: 'bg-[rgb(var(--impact-green-rgb))] animate-signature-pulse',
+        badgeDotClass: 'bg-positive',
         bodyClass: 'text-foreground',
       };
     case 'final-hour':
@@ -98,7 +98,7 @@ function getHeroPhaseView(phase: CyclePhase) {
         messageKey: 'finalWindow',
         headlineUsesCycleLabel: false,
         bodyUsesCycleLabel: false,
-        badgeDotClass: 'bg-[rgb(var(--chrono-rose-rgb))] animate-pulse-glow',
+        badgeDotClass: 'bg-attention',
         bodyClass: 'text-foreground',
       };
     case 'loading':
@@ -106,7 +106,7 @@ function getHeroPhaseView(phase: CyclePhase) {
         messageKey: 'loading',
         headlineUsesCycleLabel: false,
         bodyUsesCycleLabel: false,
-        badgeDotClass: 'bg-primary animate-cosmic-drift',
+        badgeDotClass: 'bg-muted-foreground',
         bodyClass: 'text-muted-foreground',
       };
     case 'unavailable':
@@ -124,7 +124,7 @@ function getHeroPhaseView(phase: CyclePhase) {
         messageKey: 'live',
         headlineUsesCycleLabel: false,
         bodyUsesCycleLabel: false,
-        badgeDotClass: 'bg-live animate-live-dot',
+        badgeDotClass: 'bg-live',
         bodyClass: 'text-muted-foreground',
       };
   }
@@ -328,7 +328,7 @@ export function HomeObservatoryHero({
                   <div className="flex items-center gap-3">
                     <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-primary/12 ring-1 ring-primary/20">
                       <Radio className="h-5 w-5 text-primary" />
-                      <span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-live animate-live-dot" />
+                      <span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-live" />
                     </div>
                     <div>
                       <p className="type-eyebrow text-muted-foreground">

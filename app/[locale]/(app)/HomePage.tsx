@@ -332,7 +332,7 @@ const HomePage = ({
     cycleNumber: dashboardData?.CurRoundNum ?? null,
     notificationTitle: t('notifications.finalizationSoonTitle'),
     notificationBody: (minutesLeft) =>
-      t('notifications.finalizationSoonBody', { minutes: String(minutesLeft) }),
+      t('notifications.finalizationSoonBody', { minutes: minutesLeft }),
   });
 
   // Chime only for a connected viewer who opted in, when their Gesture was
@@ -1012,15 +1012,6 @@ const HomePage = ({
           </div>
         </details>
       </PageShell>
-
-      {/* Endgame theater: full-viewport vignette during the final window. */}
-      {isFinalWindow && cycleState.phase !== 'final-hour' && (
-        <div
-          aria-hidden
-          data-testid="final-window-vignette"
-          className="pointer-events-none fixed inset-0 z-20 bg-[radial-gradient(ellipse_at_center,transparent_52%,rgb(var(--chrono-rose-rgb)/0.13)_80%,rgb(127_29_29/0.30))] motion-safe:animate-pulse-glow print:hidden"
-        />
-      )}
 
       {/* The one persistent quick-action surface: routes to the gesture
           panel (bottom sheet on phones, scroll from tablets up). */}

@@ -1414,20 +1414,22 @@ describe('HomePage', () => {
     expect(document.getElementById('gesture-submit')).not.toBeInTheDocument();
   });
 
-  it('draws the final-window vignette only inside the last ten minutes', () => {
+  it('signals the final minutes with the phase word alone, never a pulsing overlay', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
     });
-    mockAllocationFinalize.allocationTime = Date.now() + 5 * 60_000; // final-ten
+    mockAllocationFinalize.allocationTime = Date.now() + 30_000; // final-minute
 
-    const { rerender } = render(<HomePage />);
-    expect(screen.getByTestId('cycle-clock')).toHaveAttribute('data-phase', 'final-ten');
-    expect(screen.getByTestId('final-window-vignette')).toBeInTheDocument();
-
-    mockAllocationFinalize.allocationTime = Date.now() + 13 * 60 * 60_000; // live
-    rerender(<HomePage />);
+    const { container } = render(<HomePage />);
+    expect(screen.getByTestId('cycle-clock')).toHaveAttribute('data-phase', 'final-minute');
+    expect(screen.getByTestId('pulse-phase-chip')).toHaveTextContent(
+      'home.chrono.phase.finalMinute.label',
+    );
+    // One calm cue: no full-viewport vignette and no pulsing digits.
     expect(screen.queryByTestId('final-window-vignette')).not.toBeInTheDocument();
+    expect(container.querySelector('.animate-urgency-pulse, .animate-pulse-glow')).toBeNull();
+    expect(screen.getByTestId('clock-figures').className).not.toMatch(/animate-/);
   });
 
   it('keeps the finalization alert in one place: the attention menu beside the title', () => {

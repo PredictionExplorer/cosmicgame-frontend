@@ -275,7 +275,7 @@ const ExperimentalHomePage = ({
     cycleNumber: dashboardData?.CurRoundNum ?? null,
     notificationTitle: t('notifications.finalizationSoonTitle'),
     notificationBody: (minutesLeft) =>
-      t('notifications.finalizationSoonBody', { minutes: String(minutesLeft) }),
+      t('notifications.finalizationSoonBody', { minutes: minutesLeft }),
   });
 
   // The clock's alert chips switch the opt-in alert (and say why when the
