@@ -1,6 +1,7 @@
 'use client';
 
-import { memo, useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { memo, useState, useEffect, useMemo, useRef, useCallback, type ReactNode } from 'react';
+import { Title as DialogTitle } from '@radix-ui/react-dialog';
 import { zeroAddress } from 'viem';
 import { ArrowRight } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -16,7 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
 import { ErrorState } from '@/components/ui/error-state';
 import { PageShell } from '@/components/ui/page-shell';
-import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Surface } from '@/components/ui/surface';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { GestureMessageChat, type PendingChatMessage } from '@/components/home/GestureMessageChat';
@@ -35,6 +36,7 @@ import { StageArtwork, type StageToken } from '@/components/home/experimental/St
 import { StandingsLedger } from '@/components/home/experimental/StandingsLedger';
 import { useArtMotionPreference } from '@/components/home/experimental/useArtMotionPreference';
 import { useChampionsAtClock } from '@/components/home/experimental/useChampionsAtClock';
+import { useFocusClearOfDock } from '@/components/home/experimental/useFocusClearOfDock';
 import { AttachedNFTAllocationShowcase } from '@/components/attachments/DonatedNFTPrizeShowcase';
 import type { ArtStatus } from '@/components/ui/art-frame';
 import { useGestureForm } from '@/hooks/useGestureForm';
@@ -95,6 +97,11 @@ const MAX_UNAVAILABLE_SKIPS = 3;
 
 /** Roughly the sticky header: a region counts as gone once it passed under it. */
 const HEADER_ROOT_MARGIN = '-96px 0px 0px 0px';
+
+/** The sheet's console heading is the dialog's title: one visible name, not two. */
+function renderSheetTitle({ className, children }: { className: string; children: ReactNode }) {
+  return <DialogTitle className={className}>{children}</DialogTitle>;
+}
 
 interface ExperimentalHomePageProps {
   initialDashboardData?: DashboardInfo | null;
@@ -582,6 +589,9 @@ const ExperimentalHomePage = ({
     el.focus({ preventScroll: true });
   }, []);
 
+  // Keyboard focus never lands under the dock.
+  useFocusClearOfDock();
+
   // The action dock: on desktop it appears once the monument has scrolled
   // past; on phones it steps aside while the console itself is on screen.
   const monumentRef = useRef<HTMLDivElement | null>(null);
@@ -730,17 +740,32 @@ const ExperimentalHomePage = ({
               titleId="home-deck-title"
               subtitle={t('deck.intro')}
               actions={
-                <>
+                // Phones: the actions and the related link share one row
+                // (scrolling, with the edge fade the related row uses), so
+                // the header gives the art more of the first screen.
+                <div className="flex max-w-full items-center gap-2 scrollbar-none max-sm:-my-1 max-sm:-ms-1 max-sm:overflow-x-auto max-sm:py-1 max-sm:ps-1 max-sm:pe-8 max-sm:[mask-image:linear-gradient(to_right,black_calc(100%-2rem),transparent)]">
                   <AttentionMenu />
-                  <Button asChild variant="outline" size="sm">
+                  <Button asChild variant="outline" size="sm" className="shrink-0">
                     <Link href="/" data-testid="experimental-ui-return">
                       {t('deck.returnToCurrent')}
                     </Link>
                   </Button>
-                </>
+                  <Link
+                    href="/how-it-works"
+                    data-testid="experimental-ui-new-here"
+                    className="group inline-flex min-h-8 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-pill border border-rule px-3 type-label text-muted-foreground transition-colors duration-fast hover:border-input hover:text-foreground sm:hidden"
+                  >
+                    {t('deck.newHere')}
+                    <ArrowRight
+                      aria-hidden
+                      className="size-3.5 shrink-0 text-subtle transition-colors duration-fast group-hover:text-foreground"
+                    />
+                  </Link>
+                </div>
               }
+              // From sm the related link sits in the header's own row.
               related={[{ href: '/how-it-works', label: t('deck.newHere') }]}
-              className="mb-8 pb-6 sm:mb-10 sm:pb-8"
+              className="mb-8 pb-6 max-sm:[&>nav]:hidden sm:mb-10 sm:pb-8"
             />
           </div>
 
@@ -938,9 +963,9 @@ const ExperimentalHomePage = ({
           side="bottom"
           className="max-h-[85dvh] overflow-y-auto rounded-t-surface border-rule bg-surface-raised p-5 pb-8 lg:hidden"
         >
-          <SheetTitle className="sr-only">{t('deck.console.title')}</SheetTitle>
           <GestureConsole
             variant="sheet"
+            renderTitle={renderSheetTitle}
             {...consoleProps}
             onGesture={() => void handleSheetGesture()}
             finalize={{ ...finalizeState, onFinalize: () => void handleSheetFinalize() }}

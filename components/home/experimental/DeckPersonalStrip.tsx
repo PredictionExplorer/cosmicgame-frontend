@@ -73,8 +73,10 @@ export function DeckPersonalStrip({
     (apiData.NumDonatedNFTToClaim ?? 0) > 0 ||
     (apiData.UnretrievedAnchorDistribution ?? 0) > 0;
 
+  // A group inside the standings section, not a landmark of its own.
   return (
-    <section
+    <div
+      role="group"
       aria-labelledby={headingId}
       data-testid="deck-personal-strip"
       className={cn(
@@ -122,6 +124,6 @@ export function DeckPersonalStrip({
           <ArrowRight className="size-3.5 text-subtle" aria-hidden />
         </Link>
       )}
-    </section>
+    </div>
   );
 }

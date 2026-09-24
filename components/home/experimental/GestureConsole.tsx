@@ -104,6 +104,13 @@ interface GestureConsoleProps {
   onSelectGestureType: (value: string) => void;
   finalize?: ConsoleFinalize;
   messageInputRef?: RefObject<HTMLTextAreaElement | null>;
+  /**
+   * Renders the console's heading in place of its own h2. The sheet makes it
+   * the dialog's title, so the dialog is named by the heading it shows rather
+   * than by a second, hidden copy; the console then leaves the naming to the
+   * dialog.
+   */
+  renderTitle?: (title: { className: string; children: ReactNode }) => ReactNode;
   className?: string;
 }
 
@@ -158,6 +165,7 @@ export function GestureConsole({
   onSelectGestureType,
   finalize,
   messageInputRef,
+  renderTitle,
   className,
 }: GestureConsoleProps) {
   const t = useTranslations('home');
@@ -281,18 +289,24 @@ export function GestureConsole({
       ? Math.max(0, finalize.openToAllAtMs - finalize.nowMs)
       : 0;
 
+  const titleClassName = 'type-heading-3 text-foreground';
+
   return (
     <section
       id={isPage ? 'make-gesture' : undefined}
       tabIndex={-1}
-      aria-labelledby={ids.title}
+      aria-labelledby={renderTitle ? undefined : ids.title}
       data-testid="gesture-console"
       data-variant={variant}
       className={cn('min-w-0 scroll-mt-28 focus:outline-none', className)}
     >
-      <h2 id={ids.title} className="type-heading-3 text-foreground">
-        {t('deck.console.title')}
-      </h2>
+      {renderTitle ? (
+        renderTitle({ className: titleClassName, children: t('deck.console.title') })
+      ) : (
+        <h2 id={ids.title} className={titleClassName}>
+          {t('deck.console.title')}
+        </h2>
+      )}
 
       {loading ? (
         <ConsoleSkeleton label={t('form.loadingAria')} />

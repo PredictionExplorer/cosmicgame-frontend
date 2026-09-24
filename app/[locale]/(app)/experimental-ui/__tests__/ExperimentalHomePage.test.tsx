@@ -325,10 +325,12 @@ describe('ExperimentalHomePage', () => {
     ).toBeInTheDocument();
     expect(within(header).getByText('home.hero.cycleNumber(number=5)')).toBeInTheDocument();
     expect(within(header).getByTestId('experimental-ui-return')).toHaveAttribute('href', '/');
-    expect(within(header).getByRole('link', { name: /home\.deck\.newHere/ })).toHaveAttribute(
-      'href',
-      '/how-it-works',
-    );
+    // One link in the phone action row, one in the related row from sm; CSS
+    // shows exactly one of them at every width.
+    const newHere = within(header).getAllByRole('link', { name: /home\.deck\.newHere/ });
+    expect(newHere).toHaveLength(2);
+    newHere.forEach((link) => expect(link).toHaveAttribute('href', '/how-it-works'));
+    expect(within(header).getByTestId('experimental-ui-new-here')).toHaveClass('sm:hidden');
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
   });
 
@@ -430,6 +432,20 @@ describe('ExperimentalHomePage', () => {
     ).toBeInTheDocument();
   });
 
+  it('keeps region landmarks for the page’s sections, never nested', () => {
+    mockAccount = LATEST;
+    renderPage();
+
+    const regions = screen.getAllByRole('region');
+    for (const region of regions) {
+      expect(within(region).queryAllByRole('region')).toHaveLength(0);
+    }
+    expect(screen.getByRole('region', { name: 'home.deck.console.title' })).toBeInTheDocument();
+    // The clock and the Calibration Window are labelled groups inside it.
+    expect(screen.getByTestId('cycle-monument')).toHaveAttribute('role', 'group');
+    expect(screen.getByTestId('calibration-window')).toHaveAttribute('role', 'group');
+  });
+
   it('styles the previous-cycle link like the cycle-details link', () => {
     renderPage();
 
@@ -453,6 +469,11 @@ describe('ExperimentalHomePage', () => {
       .getAllByTestId('gesture-console')
       .find((node) => node.getAttribute('data-variant') === 'sheet');
     expect(sheetConsole).not.toHaveAttribute('id');
+    // The dialog is named by the one heading it shows, not by a hidden copy.
+    const sheet = screen.getByRole('dialog', { name: 'home.deck.console.title' });
+    expect(within(sheet).getAllByRole('heading', { name: 'home.deck.console.title' })).toHaveLength(
+      1,
+    );
   });
 
   it('submits a Gesture and shows its message in the chat before the indexer does', async () => {

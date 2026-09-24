@@ -85,8 +85,10 @@ export function CalibrationWindow({
     },
   ];
 
+  // A labelled group inside the console, not a landmark of its own.
   return (
-    <section
+    <div
+      role="group"
       aria-labelledby={titleId}
       aria-busy={!available || undefined}
       data-testid="calibration-window"
@@ -133,6 +135,6 @@ export function CalibrationWindow({
       {ended ? (
         <p className="mt-2 type-caption text-positive">{t('calibration.cstEndedMessage')}</p>
       ) : null}
-    </section>
+    </div>
   );
 }

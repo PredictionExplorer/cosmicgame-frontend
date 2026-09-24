@@ -175,8 +175,12 @@ export function CycleMonument({
 
   const calendarStart = cycleState.activationTime ?? 0;
 
+  // A group, not a region: the console it holds is the page's section, and
+  // regions nested three deep (clock › console › Calibration Window) only
+  // lengthen the landmark list.
   return (
-    <section
+    <div
+      role="group"
       aria-labelledby={headingId}
       data-testid="cycle-monument"
       data-phase={phase}
@@ -253,6 +257,6 @@ export function CycleMonument({
       </div>
 
       {children}
-    </section>
+    </div>
   );
 }
