@@ -270,7 +270,13 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
               label: t('figures.cost'),
               value:
                 cost.value === undefined ? null : (
-                  <Amount value={cost.value} unit={cost.unit} context="exact" />
+                  // An ETH price reads as the wallet quoted it; CST at two decimals, like the
+                  // Participation CST beside it (the exact amount is on hover).
+                  <Amount
+                    value={cost.value}
+                    unit={cost.unit}
+                    context={cost.unit === 'ETH' ? 'exact' : 'card'}
+                  />
                 ),
             },
             {

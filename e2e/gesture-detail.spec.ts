@@ -82,8 +82,9 @@ test.describe('Gesture detail page', () => {
 
     await page.goto('/gesture/18482', { waitUntil: 'networkidle' });
 
-    // The header figures: what was paid (exactly, as the wallet showed it) and what it imprinted.
-    await expect(page.locator('[data-figure="cost"]')).toContainText('411.527831 CST');
+    // The header figures: what was paid (CST at two decimals, the exact amount on hover)
+    // and what it imprinted.
+    await expect(page.locator('[data-figure="cost"]')).toContainText('411.53 CST');
     await expect(page.locator('[data-figure="participationCst"]')).toContainText(
       'Participation CST',
     );

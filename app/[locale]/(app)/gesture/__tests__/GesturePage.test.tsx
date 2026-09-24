@@ -174,15 +174,19 @@ describe('GesturePage', () => {
     );
   });
 
-  it('prices a CST gesture in CST', () => {
+  it('prices a CST gesture in CST, at two decimals like the Participation CST', () => {
     const { container } = renderGesture({
       GestureType: 2,
       GestureCostEth: -1e-18,
       EthPriceEth: -1e-18,
       CstPriceEth: 411.52783099128,
     });
-    expect(figure(container, 'cost')).toHaveTextContent('411.527831');
-    expect(figure(container, 'cost')).toHaveTextContent('CST');
+    expect(figure(container, 'cost')).toHaveTextContent('411.53 CST');
+    // The exact amount stays on hover.
+    expect(figure(container, 'cost')?.querySelector('data')).toHaveAttribute(
+      'title',
+      expect.stringContaining('411.52783099128'),
+    );
   });
 
   it('shows the method once, with the Random Walk NFT when one was used', () => {

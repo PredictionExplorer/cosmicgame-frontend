@@ -154,12 +154,16 @@ describe('CycleStandings', () => {
     expect(screen.queryByTestId('latest-participant-message')).not.toBeInTheDocument();
   });
 
-  it('quotes a CST gesture in CST', () => {
+  it('quotes a CST gesture in CST, at two decimals', () => {
     renderStandings({
-      latestGesture: makeLatestGesture({ GestureType: 2, GestureCostEth: 0, CstPriceEth: 25.5 }),
+      latestGesture: makeLatestGesture({
+        GestureType: 2,
+        GestureCostEth: 0,
+        CstPriceEth: 214.265224,
+      }),
     });
 
-    expect(screen.getByTestId('latest-participant-paid-amount')).toHaveTextContent('25.5 CST');
+    expect(screen.getByTestId('latest-participant-paid-amount')).toHaveTextContent('214.27 CST');
     expect(
       screen.getByTestId('latest-participant-gesture-details').querySelector('.bg-method-cst'),
     ).not.toBeNull();

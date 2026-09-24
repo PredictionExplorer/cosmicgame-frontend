@@ -312,7 +312,9 @@ function LastGesture({
           {paid === undefined ? (
             unknown
           ) : (
-            <Amount value={paid} unit={isCst ? 'CST' : 'ETH'} context="exact" />
+            // An ETH price reads as the wallet quoted it; CST at two decimals,
+            // like every CST figure beside it (the exact amount is on hover).
+            <Amount value={paid} unit={isCst ? 'CST' : 'ETH'} context={isCst ? 'card' : 'exact'} />
           )}
         </Spec>
         <Spec
