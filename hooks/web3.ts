@@ -1,4 +1,4 @@
-import { useAccount, useChainId } from 'wagmi';
+import { useChainId, useConnection } from 'wagmi';
 
 import { networkConfig } from '@/config/networks';
 import { UX_SCENARIO_DEMO_ACCOUNT, useUxScenarioSnapshot } from '@/lib/uxCycleScenarios';
@@ -13,7 +13,7 @@ import { UX_SCENARIO_DEMO_ACCOUNT, useUxScenarioSnapshot } from '@/lib/uxCycleSc
  * chain-sensitive UI on `useRequireChain` instead.
  */
 export function useActiveWeb3React() {
-  const { address, isConnected } = useAccount();
+  const { address, isConnected } = useConnection();
   const chainId = useChainId();
   const uxScenario = useUxScenarioSnapshot();
   const demoAccount = uxScenario ? (UX_SCENARIO_DEMO_ACCOUNT as `0x${string}`) : null;

@@ -8,7 +8,7 @@ import {
   reportError,
   reportErrorThrottled,
 } from '@/utils/errors';
-import { isContractRevertError, isEmptyContractReadError } from '@/utils/contractErrors';
+import { isEmptyContractReadError } from '@/utils/contractErrors';
 
 jest.mock('@sentry/nextjs', () => ({
   captureException: jest.fn(),
@@ -108,9 +108,19 @@ describe('isUserRejection', () => {
 });
 
 describe('getEthErrorMessage', () => {
-  it('extracts message from provider error data', () => {
+  it('extracts message from provider error data when asked to preserve it', () => {
     const err = { data: { message: 'execution reverted' } };
-    expect(getEthErrorMessage(err)).toBe('execution reverted');
+    expect(getEthErrorMessage(err, undefined, { preserveProviderMessage: true })).toBe(
+      'execution reverted',
+    );
+  });
+
+  it('never shows provider text by default, in any locale', () => {
+    const err = { data: { message: 'execution reverted: arbitrary developer text' } };
+    expect(getEthErrorMessage(err)).toBe('An error occurred');
+    expect(getEthErrorMessage(err, 'Transaction failed.', { locale: 'en' })).toBe(
+      'Transaction failed.',
+    );
   });
 
   it('returns fallback when data has no message', () => {
@@ -131,11 +141,14 @@ describe('getEthErrorMessage', () => {
     expect(getEthErrorMessage(err, '交易未能完成。', { locale: 'zh' })).toBe('交易未能完成。');
   });
 
-  it('preserves detailed provider diagnostics for English UI', () => {
+  it('preserves detailed provider diagnostics when explicitly requested', () => {
     const err = { data: { message: 'execution reverted: useful detail' } };
-    expect(getEthErrorMessage(err, 'Transaction failed.', { locale: 'en' })).toBe(
-      'execution reverted: useful detail',
-    );
+    expect(
+      getEthErrorMessage(err, 'Transaction failed.', {
+        locale: 'en',
+        preserveProviderMessage: true,
+      }),
+    ).toBe('execution reverted: useful detail');
   });
 
   it('returns fallback for null', () => {
@@ -144,34 +157,6 @@ describe('getEthErrorMessage', () => {
 
   it('returns fallback for string error', () => {
     expect(getEthErrorMessage('something broke')).toBe('An error occurred');
-  });
-});
-
-describe('isContractRevertError', () => {
-  it('returns true for Error with name ContractFunctionExecutionError', () => {
-    const err = new Error('The contract function "systemMode" reverted.');
-    err.name = 'ContractFunctionExecutionError';
-    expect(isContractRevertError(err)).toBe(true);
-  });
-
-  it('returns false for a plain Error', () => {
-    expect(isContractRevertError(new Error('generic'))).toBe(false);
-  });
-
-  it('returns false for null', () => {
-    expect(isContractRevertError(null)).toBe(false);
-  });
-
-  it('returns false for undefined', () => {
-    expect(isContractRevertError(undefined)).toBe(false);
-  });
-
-  it('returns false for a string', () => {
-    expect(isContractRevertError('ContractFunctionExecutionError')).toBe(false);
-  });
-
-  it('returns false for a non-Error object with matching name', () => {
-    expect(isContractRevertError({ name: 'ContractFunctionExecutionError' })).toBe(false);
   });
 });
 

@@ -55,12 +55,20 @@ export interface LocaleConfig {
   readonly lowercaseMidSentence: boolean;
   /**
    * Whether raw wallet/RPC provider diagnostics may be shown to the user.
-   * Providers return arbitrary English strings, so locales other than
-   * English hide them behind the translated fallback while the original
-   * error still flows to `reportError` (docs/i18n/README.md).
+   * Providers return arbitrary developer text (multi-paragraph viem dumps,
+   * revert data), so every locale shows its translated cause-plus-next-step
+   * sentence instead, while the original error still flows to `reportError`
+   * and the transaction toasts offer it behind "Copy details". English turns
+   * the raw text back on only for debugging (`DEBUG_PROVIDER_ERRORS`).
    */
   readonly showRawProviderErrors: boolean;
 }
+
+/**
+ * Local debugging aid: `NEXT_PUBLIC_DEBUG_PROVIDER_ERRORS=1` shows raw
+ * provider text in the English UI again. Inlined at build time.
+ */
+const DEBUG_PROVIDER_ERRORS = process.env.NEXT_PUBLIC_DEBUG_PROVIDER_ERRORS === '1';
 
 const LOCALE_CONFIG: LocaleRecord<LocaleConfig> = {
   en: {
@@ -73,7 +81,7 @@ const LOCALE_CONFIG: LocaleRecord<LocaleConfig> = {
     weekStartsMonday: false,
     ellipsis: '...',
     lowercaseMidSentence: true,
-    showRawProviderErrors: true,
+    showRawProviderErrors: DEBUG_PROVIDER_ERRORS,
   },
   zh: {
     intlLocale: 'zh-CN',

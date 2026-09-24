@@ -24,7 +24,7 @@ import { AnchoringHeroStats } from '@/components/anchoring/AnchoringHeroStats';
 import type { AnchoringStatItem } from '@/components/anchoring/AnchoringHeroStats';
 import { StatCardSkeleton } from '@/components/ui/stat-card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { EmptyState } from '@/components/ui/empty-state';
+import { WalletRequiredState } from '@/components/wallet/WalletRequiredState';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { UnknownValue } from '@/components/ui/unknown-value';
 import { distributionPerAnchoredNft, formatPerNftEth } from '@/utils/anchoringStats';
@@ -32,6 +32,7 @@ import { distributionPerAnchoredNft, formatPerNftEth } from '@/utils/anchoringSt
 const MyAnchors = () => {
   const t = useTranslations('myPages');
   const tCommon = useTranslations('common');
+  const tWallet = useTranslations('wallet');
   const locale = useLocale();
   const { account } = useActiveWeb3React();
   const { anchor, release, handleError, rwalkContract } = useAnchorActions();
@@ -156,9 +157,10 @@ const MyAnchors = () => {
       />
 
       {!account ? (
-        <EmptyState
-          title={t('shared.walletNotConnected')}
-          description={t('anchors.walletDescription')}
+        <WalletRequiredState
+          title={tWallet('required.anchors.title')}
+          description={tWallet('required.anchors.description')}
+          publicLink={{ href: '/anchoring', label: tWallet('required.anchors.publicLink') }}
         />
       ) : loading ? (
         <div data-testid="my-anchors-skeleton">

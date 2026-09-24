@@ -2,7 +2,6 @@
   "shared": {
     "home": "首页",
     "user": "用户",
-    "walletNotConnected": "未连接钱包",
     "loading": "加载中…",
     "unavailable": "暂不可用",
     "yes": "是",
@@ -18,7 +17,6 @@
     "eyebrow": "个人 · 分配",
     "title": "我的分配",
     "subtitle": "查看并取回所有未取回分配",
-    "walletDescription": "连接钱包后即可查看并取回分配。",
     "loadErrorTitle": "未能加载分配",
     "loadErrorMessage": "未能加载待取回分配数据，请稍后重试。",
     "sections": {
@@ -44,7 +42,6 @@
     "eyebrow": "个人 · 锚定",
     "title": "我的锚定",
     "subtitle": "管理已锚定 NFT，查看 ETH 锚定派发",
-    "walletDescription": "连接钱包后即可管理锚定。",
     "tabs": {
       "cosmicSignature": "Cosmic Signature NFT 锚定",
       "randomWalk": "Random Walk NFT 锚定"
@@ -276,7 +273,6 @@
       "title": "我的 NFT",
       "subtitle": "已连接钱包中的 Cosmic Signature NFT",
       "marketplace": "买卖 NFT",
-      "walletDescription": "连接钱包后即可查看并管理 NFT。",
       "loadErrorTitle": "未能加载代币",
       "loadErrorMessage": "未能加载 Cosmic Signature NFT。",
       "ownedTitle": "持有的 Cosmic Signature NFT",
@@ -308,7 +304,6 @@
     "page": {
       "title": "转账 CST",
       "subtitle": "将 Cosmic Signature CST 代币发送至其他地址。",
-      "walletDescription": "连接钱包后即可从余额中转账 CST。",
       "sourceLabel": "已连接钱包",
       "description": "从已连接钱包转账 CST。交易由钱包签名，并直接发送至 CST 代币合约。"
     },

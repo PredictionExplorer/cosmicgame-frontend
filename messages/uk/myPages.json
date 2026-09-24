@@ -2,7 +2,6 @@
   "shared": {
     "home": "Головна",
     "user": "Користувач",
-    "walletNotConnected": "Гаманець не під’єднано",
     "loading": "Завантаження…",
     "unavailable": "Недоступно",
     "yes": "Так",
@@ -18,7 +17,6 @@
     "eyebrow": "Особисте · Розподіли",
     "title": "Мої розподіли",
     "subtitle": "Перегляньте та заберіть усі свої незабрані розподіли",
-    "walletDescription": "Під’єднайте гаманець, щоб переглянути й забрати свої розподіли.",
     "loadErrorTitle": "Не вдалося завантажити",
     "loadErrorMessage": "Не вдалося завантажити дані про незабрані розподіли",
     "sections": {
@@ -44,7 +42,6 @@
     "eyebrow": "Особисте · Закріплення",
     "title": "Мої закріплення",
     "subtitle": "Керуйте закріпленими NFT і переглядайте надходження за Cosmic Signature NFT",
-    "walletDescription": "Під’єднайте гаманець, щоб керувати закріпленнями.",
     "tabs": {
       "cosmicSignature": "Закріплення Cosmic Signature",
       "randomWalk": "Закріплення Random Walk"
@@ -276,7 +273,6 @@
       "title": "Мої NFT",
       "subtitle": "Cosmic Signature NFT у під’єднаному гаманці",
       "marketplace": "Купити або продати NFT",
-      "walletDescription": "Під’єднайте гаманець, щоб переглядати свої NFT та керувати ними.",
       "loadErrorTitle": "Не вдалося завантажити токени",
       "loadErrorMessage": "Не вдалося завантажити Cosmic Signature NFT.",
       "ownedTitle": "Мої Cosmic Signature NFT",
@@ -308,7 +304,6 @@
     "page": {
       "title": "Переказати CST",
       "subtitle": "Надішліть свої токени CST Cosmic Signature на іншу адресу.",
-      "walletDescription": "Під’єднайте гаманець, щоб переказати CST зі свого балансу.",
       "sourceLabel": "Під’єднаний гаманець",
       "description": "Переказуйте CST зі свого під’єднаного гаманця. Транзакцію підписує ваш гаманець, і вона надсилається безпосередньо в контракт токена CST."
     },

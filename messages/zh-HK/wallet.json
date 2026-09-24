@@ -1,6 +1,9 @@
 {
   "connect": {
-    "button": "連接錢包"
+    "button": "連接錢包",
+    "opening": "正在開啟錢包列表…",
+    "restoring": "正在恢復錢包連接…",
+    "disclaimer": "連接錢包即表示你同意<terms>服務條款</terms>，並已知悉<risk>風險披露</risk>。落筆在 {network} 上進行，需要該網絡上的 ETH 支付落筆價格與網絡手續費。"
   },
   "groups": {
     "popular": "熱門",
@@ -29,10 +32,57 @@
     "addCstToMetaMask": "將 CST 添加至 MetaMask",
     "addingCstToMetaMask": "正在添加 CST…",
     "myAnchors": "我的錨定",
-    "winningHistory": "獲配記錄"
+    "winningHistory": "獲配記錄",
+    "viewOnExplorer": "在 {explorer} 上查看",
+    "switchWallet": "更換錢包",
+    "disconnect": "中斷連接"
   },
   "accessibility": {
     "copyAddress": "複製錢包地址",
     "addressCopied": "已複製錢包地址"
+  },
+  "network": {
+    "wrong": "網絡不符",
+    "switchTo": "切換至 {network}",
+    "switching": "切換中…",
+    "walletOn": "錢包目前處於 {current}，Cosmic Signature 運行於 {network}。",
+    "walletOnOther": "錢包目前處於其他網絡，Cosmic Signature 運行於 {network}。",
+    "connectedTo": "已連接 {network}"
+  },
+  "required": {
+    "hint": "連接只會向本頁面提供錢包地址。在錢包中確認交易之前，不會發送任何內容。",
+    "allocations": {
+      "title": "連接錢包，查看你的分配",
+      "description": "連接後，這裏會顯示你可取回的 ETH、錨定派發，以及附加的 NFT 與代幣。",
+      "publicLink": "瀏覽全部獲配者"
+    },
+    "anchors": {
+      "title": "連接錢包，管理你的錨定",
+      "description": "連接後，這裏會顯示你已錨定的 NFT、可錨定的 NFT 以及你的錨定派發。",
+      "publicLink": "了解錨定"
+    },
+    "nfts": {
+      "title": "連接錢包，查看你的 NFT",
+      "description": "連接後，這裏會顯示你錢包中的 Cosmic Signature NFT，你也可以將它們發送到其他地址。",
+      "publicLink": "瀏覽畫廊"
+    },
+    "statistics": {
+      "title": "連接錢包，查看你的統計",
+      "description": "連接後，這裏會顯示你在每個演繹週期中的落筆、分配與錨定。",
+      "publicLink": "查看參與統計"
+    },
+    "history": {
+      "title": "連接錢包，查看你的分配紀錄",
+      "description": "連接後，這裏會顯示你的錢包在每個演繹週期中獲得的全部分配。",
+      "publicLink": "瀏覽全部獲配者"
+    },
+    "transferCst": {
+      "title": "連接錢包，發送 CST",
+      "description": "連接後，這裏會顯示你的 CST 餘額、發送表格，以及你的轉帳紀錄連結。"
+    }
+  },
+  "funding": {
+    "short": "錢包在 {network} 上有 {available} ETH。本次落筆約需 {required} ETH 及網絡手續費。",
+    "howTo": "如何在 {network} 上取得 ETH"
   }
 }

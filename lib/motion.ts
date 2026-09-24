@@ -30,7 +30,8 @@ export const motionTokens = {
 
 const { duration, ease, offset, stagger } = motionTokens;
 
-const baseTransition: Transition = {
+/** The default transition: `base` duration on the `outExpo` curve. */
+export const baseTransition: Transition = {
   duration: duration.base,
   ease: ease.outExpo,
 };

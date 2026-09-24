@@ -71,7 +71,9 @@ describe('SystemEventPage', () => {
         error: new Error('Network response was not OK'),
       });
       render(<SystemEventPage start={0} end={100} round={1} />);
-      expect(screen.getByText('Network response was not OK')).toBeInTheDocument();
+      // The localized explanation, never the raw transport message.
+      expect(screen.getByText('Failed to load system events')).toBeInTheDocument();
+      expect(screen.queryByText('Network response was not OK')).not.toBeInTheDocument();
     });
 
     it('renders generic fallback when error.message is empty', () => {
@@ -131,7 +133,7 @@ describe('SystemEventPage', () => {
         error: new Error('Server error'),
       });
       render(<SystemEventPage start={0} end={100} round={1} />);
-      const errorEl = screen.getByText('Server error');
+      const errorEl = screen.getByText('Failed to load system events');
       expect(errorEl).toHaveClass('text-destructive');
     });
   });
@@ -186,7 +188,7 @@ describe('SystemEventPage', () => {
         error: new Error('temporary failure'),
       });
       const { rerender } = render(<SystemEventPage start={0} end={100} round={1} />);
-      expect(screen.getByText('temporary failure')).toBeInTheDocument();
+      expect(screen.getByText('Failed to load system events')).toBeInTheDocument();
       expect(screen.queryByTestId('events-table')).not.toBeInTheDocument();
 
       mockUseSystemEvents.mockReturnValue({

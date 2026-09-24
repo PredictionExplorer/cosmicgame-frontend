@@ -1,19 +1,15 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
-import { getConnectorClient } from '@wagmi/core';
-import { useConfig, useConnectorClient, usePublicClient, useWalletClient } from 'wagmi';
+import { useTranslations } from 'next-intl';
 import { useQueryClient } from '@tanstack/react-query';
+import type { Hash } from 'viem';
 
-import { activeChain } from '@/config/chains';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
-import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
-import getErrorMessage from '@/utils/alert';
-import { useNotification } from '@/contexts/NotificationContext';
 import { useAnchoredToken } from '@/contexts/AnchoredTokenContext';
-import { assertSuccessfulTransactionReceipt, assertTransactionHash } from '@/utils/transactions';
+import { useNotify } from '@/hooks/useNotify';
+import { useTxFlow, type TxResult } from '@/hooks/useTxFlow';
+import { REQUIRED_CHAIN_NAME } from '@/lib/chainGuard';
+import { assertTransactionHash } from '@/utils/transactions';
 
-import { useActiveWeb3React } from './web3';
-import { useRequireChain } from './useRequireChain';
 import useAnchoringWalletCSTContract from './useAnchoringWalletCSTContract';
 import useAnchoringWalletRWLKContract from './useAnchoringWalletRWLKContract';
 import useCosmicSignatureContract from './useCosmicSignatureContract';
@@ -31,50 +27,46 @@ const ANCHORING_QUERY_KEYS = [
   'stakingRWLKMintsByUser',
 ] as const;
 
+const NOT_RUN: TxResult = { status: 'aborted' };
+
+function hashOf(value: unknown): Hash {
+  const hash = value as Hash | undefined;
+  assertTransactionHash(hash);
+  return hash;
+}
+
 /**
- * Encapsulates approval, anchoring, and unstaking logic for both CST and RWLK tokens.
- * Handles contract calls, receipt waiting, query invalidation, and error reporting.
+ * Anchoring and releasing for Cosmic Signature and RandomWalk NFTs.
+ *
+ * Both run through `useTxFlow` (chain guard, one lifecycle toast, localized
+ * failures). Anchoring asks for the anchoring contract's operator approval
+ * first when the collection has none — shown as step 1 of 2 with a sentence
+ * explaining why the extra prompt appears. That approval is collection-wide
+ * by design: the anchoring contract holds every anchored NFT of the
+ * collection, and per-token approvals would cost one prompt per NFT.
  */
 export function useAnchorActions() {
   const t = useTranslations('toasts');
-  const locale = useLocale();
   const { stakingCst, stakingRwalk } = useContractAddresses();
-  const { account } = useActiveWeb3React();
-  const config = useConfig();
-  const publicClient = usePublicClient({ chainId: activeChain.id });
-  const { data: walletClient } = useWalletClient({ chainId: activeChain.id });
-  const { data: connectorClient } = useConnectorClient({ chainId: activeChain.id });
-
-  const { setNotification } = useNotification();
+  const { notify, notifyErrorFromEthers } = useNotify();
   const queryClient = useQueryClient();
   const { fetchData: fetchStakedTokens } = useAnchoredToken();
-  const { ensureCorrectChain } = useRequireChain();
+  const { run: runTx, stage: txStage } = useTxFlow();
 
   const cosmicSignatureContract = useCosmicSignatureContract();
   const rwalkContract = useRWLKNFTContract();
   const cstAnchoringContract = useAnchoringWalletCSTContract();
   const rwlkAnchoringContract = useAnchoringWalletRWLKContract();
 
+  /** Reports a failed read (e.g. listing owned tokens) with the anchoring fallback. */
   const handleError = useCallback(
-    (err: unknown) => {
-      if (isUserRejection(err)) {
-        setNotification({
-          text: t('walletTransactionCancelled'),
-          type: 'info',
-          visible: true,
-        });
-        return;
-      }
-      reportError(err, 'anchor action error');
-      const msg = getEthErrorMessage(err, t('anchor.failed'), { locale });
-      setNotification({ text: getErrorMessage(msg) || msg, type: 'error', visible: true });
-    },
-    [locale, setNotification, t],
+    (err: unknown) => notifyErrorFromEthers(err, t('anchor.failed')),
+    [notifyErrorFromEthers, t],
   );
 
   const invalidateAnchoringQueries = useCallback(() => {
     for (const key of ANCHORING_QUERY_KEYS) {
-      queryClient.invalidateQueries({ queryKey: [key] });
+      void queryClient.invalidateQueries({ queryKey: [key] });
     }
     fetchStakedTokens();
   }, [queryClient, fetchStakedTokens]);
@@ -91,8 +83,8 @@ export function useAnchorActions() {
 
   /**
    * Defers the post-receipt refresh, keeping the handle so an unmount between
-   * the receipt and the timeout cancels it instead of invalidating queries and
-   * notifying against a tree that is already gone.
+   * the receipt and the timeout cancels it instead of invalidating queries
+   * against a tree that is already gone.
    */
   const deferUntilIndexed = useCallback((task: () => void) => {
     const timers = pendingTimers.current;
@@ -103,194 +95,87 @@ export function useAnchorActions() {
     timers.add(timerId);
   }, []);
 
-  /** Same pattern as `useGestureForm`: hooks scoped to `activeChain`, then imperative fallback. */
-  const ensureSignerReady = useCallback(async () => {
-    const fromHooks = connectorClient ?? walletClient;
-    if (fromHooks) return fromHooks;
-    try {
-      return await getConnectorClient(config, { chainId: activeChain.id });
-    } catch {
-      return undefined;
-    }
-  }, [config, connectorClient, walletClient]);
-
-  const approveIfNeeded = useCallback(
-    async (
-      nftContract: NonNullable<typeof cosmicSignatureContract | typeof rwalkContract>,
-      walletAddress: string,
-    ) => {
-      if (!nftContract) throw new Error('Contract not initialized');
-      const isApprovedForAll = await nftContract.read.isApprovedForAll?.([account, walletAddress]);
-      if (!isApprovedForAll) {
-        const hash = await nftContract.write.setApprovalForAll?.([walletAddress, true]);
-        assertTransactionHash(hash);
-        const receipt = await publicClient?.waitForTransactionReceipt({ hash });
-        assertSuccessfulTransactionReceipt(receipt);
-      }
-    },
-    [account, publicClient],
-  );
-
   const anchor = useCallback(
-    async (tokenIds: number | number[], isRwalk: boolean) => {
-      try {
-        const nftContract = isRwalk ? rwalkContract : cosmicSignatureContract;
-        const anchoringContract = isRwalk ? rwlkAnchoringContract : cstAnchoringContract;
-        const walletAddress = isRwalk ? stakingRwalk : stakingCst;
+    async (tokenIds: number | number[], isRwalk: boolean): Promise<TxResult> => {
+      const nftContract = isRwalk ? rwalkContract : cosmicSignatureContract;
+      const anchoringContract = isRwalk ? rwlkAnchoringContract : cstAnchoringContract;
+      const anchoringWallet = isRwalk ? stakingRwalk : stakingCst;
 
-        if (!nftContract || !anchoringContract) {
-          setNotification({
-            visible: true,
-            text: t('wallet.connectCorrectNetwork'),
-            type: 'error',
-          });
-          return;
-        }
-
-        if (!account) {
-          setNotification({
-            visible: true,
-            text: t('wallet.connectCorrectNetwork'),
-            type: 'error',
-          });
-          return;
-        }
-
-        if (!(await ensureSignerReady())) {
-          setNotification({
-            visible: true,
-            text: t('anchor.walletNotReady'),
-            type: 'error',
-          });
-          return;
-        }
-
-        if (!(await ensureCorrectChain())) return;
-
-        await approveIfNeeded(nftContract, walletAddress);
-
-        const hash = Array.isArray(tokenIds)
-          ? await anchoringContract.write.stakeMany?.([tokenIds])
-          : await anchoringContract.write.stake?.([tokenIds]);
-
-        assertTransactionHash(hash);
-        const res = await publicClient?.waitForTransactionReceipt({ hash });
-        assertSuccessfulTransactionReceipt(res);
-
-        deferUntilIndexed(() => {
-          invalidateAnchoringQueries();
-          if (res) {
-            setNotification({
-              visible: true,
-              type: 'success',
-              text: t('anchor.anchored', {
-                count: Array.isArray(tokenIds) ? tokenIds.length : 1,
-              }),
-            });
-          }
-        });
-
-        return res;
-      } catch (err) {
-        handleError(err);
-        return err;
+      if (!nftContract || !anchoringContract || !anchoringWallet) {
+        notify('error', t('anchor.walletNotReady', { network: REQUIRED_CHAIN_NAME }));
+        return NOT_RUN;
       }
+      const count = Array.isArray(tokenIds) ? tokenIds.length : 1;
+
+      return runTx({
+        approvals: [
+          {
+            description: t('anchor.approval'),
+            isNeeded: async (ctx) =>
+              !(await nftContract.read.isApprovedForAll?.([ctx.account, anchoringWallet])),
+            write: async () =>
+              hashOf(await nftContract.write.setApprovalForAll?.([anchoringWallet, true])),
+          },
+        ],
+        write: async () =>
+          hashOf(
+            Array.isArray(tokenIds)
+              ? await anchoringContract.write.stakeMany?.([tokenIds])
+              : await anchoringContract.write.stake?.([tokenIds]),
+          ),
+        successMessage: t('anchor.anchored', { count }),
+        failureMessage: t('anchor.failed'),
+        errorContext: 'anchor',
+        onConfirmed: () => deferUntilIndexed(invalidateAnchoringQueries),
+      });
     },
     [
-      account,
-      ensureSignerReady,
-      ensureCorrectChain,
-      approveIfNeeded,
       cosmicSignatureContract,
-      rwalkContract,
       cstAnchoringContract,
-      rwlkAnchoringContract,
-      publicClient,
-      setNotification,
       deferUntilIndexed,
       invalidateAnchoringQueries,
-      handleError,
+      notify,
+      rwalkContract,
+      rwlkAnchoringContract,
       stakingCst,
       stakingRwalk,
       t,
+      runTx,
     ],
   );
 
   const release = useCallback(
-    async (actionIds: number | number[], isRwalk: boolean) => {
-      try {
-        const anchoringContract = isRwalk ? rwlkAnchoringContract : cstAnchoringContract;
-
-        if (!anchoringContract) {
-          setNotification({
-            visible: true,
-            text: t('wallet.connectCorrectNetwork'),
-            type: 'error',
-          });
-          return;
-        }
-
-        if (!account) {
-          setNotification({
-            visible: true,
-            text: t('wallet.connectCorrectNetwork'),
-            type: 'error',
-          });
-          return;
-        }
-
-        if (!(await ensureSignerReady())) {
-          setNotification({
-            visible: true,
-            text: t('anchor.walletNotReady'),
-            type: 'error',
-          });
-          return;
-        }
-
-        if (!(await ensureCorrectChain())) return;
-
-        const hash = Array.isArray(actionIds)
-          ? await anchoringContract.write.unstakeMany?.([actionIds])
-          : await anchoringContract.write.unstake?.([actionIds]);
-
-        assertTransactionHash(hash);
-        const res = await publicClient?.waitForTransactionReceipt({ hash });
-        assertSuccessfulTransactionReceipt(res);
-
-        deferUntilIndexed(() => {
-          invalidateAnchoringQueries();
-          if (res) {
-            setNotification({
-              visible: true,
-              type: 'success',
-              text: t('anchor.released', {
-                count: Array.isArray(actionIds) ? actionIds.length : 1,
-              }),
-            });
-          }
-        });
-
-        return res;
-      } catch (err) {
-        handleError(err);
-        return err;
+    async (actionIds: number | number[], isRwalk: boolean): Promise<TxResult> => {
+      const anchoringContract = isRwalk ? rwlkAnchoringContract : cstAnchoringContract;
+      if (!anchoringContract) {
+        notify('error', t('anchor.walletNotReady', { network: REQUIRED_CHAIN_NAME }));
+        return NOT_RUN;
       }
+      const count = Array.isArray(actionIds) ? actionIds.length : 1;
+
+      return runTx({
+        write: async () =>
+          hashOf(
+            Array.isArray(actionIds)
+              ? await anchoringContract.write.unstakeMany?.([actionIds])
+              : await anchoringContract.write.unstake?.([actionIds]),
+          ),
+        successMessage: t('anchor.released', { count }),
+        failureMessage: t('anchor.failed'),
+        errorContext: 'anchor-release',
+        onConfirmed: () => deferUntilIndexed(invalidateAnchoringQueries),
+      });
     },
     [
-      account,
-      ensureSignerReady,
-      ensureCorrectChain,
       cstAnchoringContract,
-      rwlkAnchoringContract,
-      publicClient,
-      setNotification,
       deferUntilIndexed,
       invalidateAnchoringQueries,
-      handleError,
+      notify,
+      rwlkAnchoringContract,
       t,
+      runTx,
     ],
   );
 
-  return { anchor, release, handleError, rwalkContract };
+  return { anchor, release, handleError, rwalkContract, txStage };
 }

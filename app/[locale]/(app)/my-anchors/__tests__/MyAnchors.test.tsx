@@ -28,8 +28,8 @@ jest.mock('wagmi', () => ({
   useWalletClient: () => ({ data: undefined }),
   useConnectorClient: () => ({ data: undefined }),
   useConfig: () => ({}),
-  useAccount: () => ({ address: '0xUser', isConnected: true, chainId: 421614 }),
-  useSwitchChain: () => ({ switchChainAsync: jest.fn() }),
+  useConnection: () => ({ address: '0xUser', isConnected: true, chainId: 421614 }),
+  useSwitchChain: () => ({ mutateAsync: jest.fn() }),
 }));
 
 jest.mock('@wagmi/core', () => ({
@@ -75,6 +75,8 @@ jest.mock('../../../../../config/networks', () => ({
   networkConfig: {
     chainId: 421614,
     rpcUrl: 'http://test-rpc.example',
+    explorerUrl: 'https://sepolia.arbiscan.io',
+    chainName: 'Arbitrum Sepolia',
   },
 }));
 
@@ -123,7 +125,7 @@ describe('MyAnchors', () => {
     await act(async () => {
       render(<MyAnchors />);
     });
-    expect(screen.getByText('myPages.anchors.walletDescription')).toBeInTheDocument();
+    expect(screen.getByText('wallet.required.anchors.description')).toBeInTheDocument();
   });
 
   it('shows skeleton loading state', async () => {

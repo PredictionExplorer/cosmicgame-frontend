@@ -50,6 +50,45 @@
     "nothingHere": "Nothing here yet",
     "unavailable": "Unavailable"
   },
+  "liveStatus": {
+    "connecting": "Connecting…",
+    "live": "Live",
+    "updated": "Updated {age}",
+    "reconnecting": "Reconnecting…",
+    "delayed": "Updates delayed · last update {age}",
+    "delayedCaveat": "Updates delayed · last update {age}. The clock may have been extended since then.",
+    "offline": "Offline",
+    "offlineDetail": "You’re offline. Last update {age}.",
+    "offlineCaveat": "You’re offline. Last update {age}. The clock may have been extended since then.",
+    "age": {
+      "justNow": "just now",
+      "seconds": "{count}s ago",
+      "minutes": "{count}m ago",
+      "hours": "{count}h ago",
+      "days": "{count}d ago"
+    },
+    "delayedShort": "Updates delayed"
+  },
+  "attention": {
+    "menuLabel": "Alerts and sound",
+    "title": "Alerts and sound",
+    "intro": "Everything here stays off until you turn it on. Choices are saved in this browser.",
+    "sound": {
+      "label": "Chime when a Gesture follows yours",
+      "description": "A short sound when another participant’s Gesture follows your latest one. Needs a connected wallet and this tab open."
+    },
+    "alert": {
+      "label": "Alert before finalization",
+      "description": "A browser notification before the Cycle Finalization Time. Keep this tab open.",
+      "minutes": "{minutes} min",
+      "blocked": "Notifications are blocked for this site. Allow them in your browser settings to use this alert.",
+      "unsupported": "This browser does not show notifications."
+    },
+    "tabTitle": {
+      "label": "Countdown in the tab title",
+      "description": "Shows the time left in the browser tab during the final hour of a cycle."
+    }
+  },
   "actions": {
     "copyAddress": "Copy address",
     "addressCopied": "Address copied",

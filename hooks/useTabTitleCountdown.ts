@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react';
 
+import { useAttentionPreferences } from '@/hooks/useAttentionPreferences';
+
 function formatRemaining(ms: number): string {
   const totalSeconds = Math.max(0, Math.ceil(ms / 1000));
   const minutes = Math.floor(totalSeconds / 60);
@@ -9,9 +11,11 @@ function formatRemaining(ms: number): string {
 
 /**
  * Mirrors the finalization countdown into the browser tab title during the
- * final window, so a player who tabbed away can see the clock closing from
- * anywhere. Captures the original title on activation and restores it on
- * deactivation (phase change, navigation, unmount).
+ * final window, so a participant who tabbed away can see the clock closing
+ * from anywhere — only when they turned "Countdown in the tab title" on in
+ * their attention preferences (off by default). Captures the original title
+ * on activation and restores it on deactivation (phase change, preference
+ * change, navigation, unmount).
  */
 export function useTabTitleCountdown({
   enabled,
@@ -21,9 +25,11 @@ export function useTabTitleCountdown({
   targetMs: number;
 }): void {
   const baseTitleRef = useRef<string | null>(null);
+  const { preferences } = useAttentionPreferences();
+  const active = enabled && preferences.tabTitle;
 
   useEffect(() => {
-    if (!enabled || typeof document === 'undefined') return undefined;
+    if (!active || typeof document === 'undefined') return undefined;
 
     if (baseTitleRef.current === null) {
       baseTitleRef.current = document.title;
@@ -43,5 +49,5 @@ export function useTabTitleCountdown({
         baseTitleRef.current = null;
       }
     };
-  }, [enabled, targetMs]);
+  }, [active, targetMs]);
 }

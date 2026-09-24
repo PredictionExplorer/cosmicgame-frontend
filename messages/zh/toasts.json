@@ -33,12 +33,11 @@
   },
   "network": {
     "unavailable": "网络暂不可用，请重新连接钱包。",
-    "switchForGesture": "请先将钱包切换至应用所用网络，再落笔。",
-    "wrongChain": "钱包尚未连接完成，或当前网络与应用不一致。请切换至应用所用网络后重试。"
+    "wrongChain": "钱包尚未连接完成，或当前处于其他网络。请切换至 {network} 后重试。"
   },
   "gesture": {
     "simulated": "模拟落笔已完成，计时延长 {seconds, number} 秒。",
-    "confirmed": "落笔已确认，周期继续推进。",
+    "confirmed": "落笔已记录，周期收官时间已延长。",
     "validation": {
       "notNftOwner": "当前钱包并未持有这枚 NFT。",
       "tokenDecimalsWarning": "此代币未实现 decimals()；将按 18 位小数处理。",
@@ -46,8 +45,8 @@
       "notErc721": "所选合约不符合 ERC-721 标准。",
       "notErc20": "所选合约不符合 ERC-20 标准。",
       "insufficientAttachedToken": "钱包中的代币余额不足，无法附加至本次落笔。",
-      "insufficientEth": "钱包中的 ETH 余额不足。",
-      "insufficientCst": "钱包中的 CST（ERC-20）余额不足。"
+      "insufficientEth": "本次落笔需要 {required} ETH 及网络手续费，钱包在 {network} 上仅有 {available} ETH。",
+      "insufficientCst": "本次落笔最多需要 {required} CST，钱包中有 {available} CST。"
     },
     "transaction": {
       "failed": "未能提交落笔。请检查钱包与网络连接，刷新当前落笔价格后重试。",
@@ -63,14 +62,20 @@
       "fundTransferFailed": "资金转移失败。",
       "ethCostChanged": "ETH 落笔价格已升至 {required} ETH，比提交时高 {increase} ETH。请重试。",
       "cstCostChanged": "交易处理期间，CST 落笔价格已变化。当前需 {required} CST，超过你设置的 {maximum} CST 上限。请刷新后重试。"
+    },
+    "confirmedWithCst": "落笔已记录，周期收官时间已延长，{cst} 参与 CST 已存入钱包。",
+    "approval": {
+      "token": "钱包将请求授权，允许协议随本次落笔转移恰好 {amount} 枚该代币。附带的代币将归属周期获配者，不会退回。",
+      "nft": "钱包将请求授权，允许协议随本次落笔转移 NFT #{tokenId}。附带的 NFT 将归属周期获配者，不会退回。"
     }
   },
   "anchor": {
-    "walletNotReady": "钱包尚未连接完成，或当前网络与应用不一致。请切换至应用所用网络后重试。",
+    "walletNotReady": "钱包尚未连接完成，或当前处于其他网络。请切换至 {network} 后重试。",
     "anchored": "{count, number} 枚 NFT 已锚定至协议。",
     "released": "已完成 {count, number} 项解锚操作。",
     "releasedWithDistributions": "已完成 {count, number} 项解锚操作，累积的 ETH 锚定派发已取回至钱包。",
-    "failed": "锚定交易未能完成。请检查钱包与网络连接后重试。"
+    "failed": "锚定交易未能完成。请检查钱包与网络连接后重试。",
+    "approval": "钱包将请求授权，允许锚定合约在锚定期间保管你的 NFT。每个合集只需授权一次。"
   },
   "allocation": {
     "retrieved": "分配已取回至钱包。"
@@ -87,7 +92,7 @@
   },
   "claim": {
     "walletNotConnected": "请连接钱包，并确认已切换至正确的网络。",
-    "failed": "未能取回分配。请检查钱包与网络连接后重试。",
+    "failed": "取回未完成。请检查钱包与网络后重试。",
     "stellarEthSuccess": "星选 ETH 已取回至钱包。",
     "nftSuccess": "已附加 NFT 已取回至钱包。",
     "nftsSuccess": "已将 {count, number} 枚已附加 NFT 取回至钱包。",
@@ -175,7 +180,7 @@
   "imprint": {
     "contractUnavailable": "Random Walk NFT 合约暂不可用。请连接钱包并切换至正确网络后重试。",
     "confirmed": "Random Walk NFT 铭刻已确认。",
-    "failed": "未能铭刻 Random Walk NFT。请检查钱包与网络连接后重试。",
+    "failed": "铭刻未完成。请检查钱包与网络后重试。",
     "imprinting": "铭刻中…"
   },
   "admin": {
@@ -184,5 +189,55 @@
       "unbanned": "落笔已取消屏蔽。",
       "failed": "未能更新落笔审核状态，请重试。"
     }
+  },
+  "regionLabel": "通知",
+  "close": "关闭通知",
+  "tx": {
+    "stage": {
+      "switchNetwork": "请在钱包中切换至 {network}",
+      "switchNetworkHint": "Cosmic Signature 运行在 {network} 上。请在钱包中批准切换以继续。",
+      "approve": "请在钱包中批准第 {step} 步（共 {total} 步）",
+      "approvalPending": "正在确认第 {step} 步授权（共 {total} 步）",
+      "confirm": "请在钱包中确认",
+      "confirmStep": "请在钱包中确认第 {step} 步（共 {total} 步）",
+      "confirmHint": "请在钱包中核对详情。确认之前不会发送任何内容。",
+      "pending": "正在等待 {network} 确认"
+    },
+    "button": {
+      "preparing": "准备中…",
+      "switchNetwork": "请在钱包中切换网络…",
+      "approve": "在钱包中批准 {step}/{total}…",
+      "approvalPending": "授权 {step}/{total} 确认中…",
+      "confirm": "在钱包中确认…",
+      "confirmStep": "在钱包中确认 {step}/{total}…",
+      "pending": "确认中…"
+    },
+    "steps": {
+      "signature": "签署",
+      "pending": "确认中",
+      "confirmed": "已确认"
+    },
+    "status": {
+      "confirmed": "已在链上确认。",
+      "cancelled": "已在钱包中取消，未发送任何内容。",
+      "cancelledInWallet": "已在钱包中取消。取消操作消耗了网络手续费，除此之外未发送任何内容。"
+    },
+    "confirmedRefresh": "已在链上确认。如果页面尚未更新，请刷新页面。",
+    "error": {
+      "insufficientFunds": "钱包在 {network} 上的 ETH 不足以支付本次交易及网络手续费。",
+      "wrongNetwork": "钱包当前处于其他网络。请切换至 {network} 后重试。",
+      "walletNotConnected": "请先连接钱包，然后重试。",
+      "walletBusy": "钱包中已有一个未完成的请求。请先在钱包中完成或关闭它，然后重试。",
+      "wouldRevert": "合约会拒绝这笔交易，因此没有发送。请刷新页面后重试。",
+      "reverted": "交易在链上执行失败，只消耗了网络手续费。请刷新页面后重试。",
+      "timeout": "仍在等待确认。重试之前，请先在 {explorer} 上查看这笔交易。",
+      "network": "无法连接网络。请检查网络连接后重试。"
+    },
+    "viewOnExplorer": "在 {explorer} 上查看",
+    "viewOnExplorerShort": "查看交易",
+    "copyDetails": "复制详情",
+    "detailsCopied": "错误详情已复制。",
+    "connectWallet": "连接钱包",
+    "busy": "请先完成正在进行的交易。"
   }
 }

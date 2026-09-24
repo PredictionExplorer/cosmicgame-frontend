@@ -28,9 +28,15 @@ import { AddCstToMetaMaskButton } from '@/components/common/AddCstToMetaMaskButt
 import { ChaosZeroButton } from '@/components/common/ChaosZeroButton';
 import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
 import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
-import { MobileWallet, NavLink } from '@/components/styled';
-import { Button } from '@/components/ui/button';
-import { useWalletUi } from '@/contexts/WalletUiContext';
+import { NavLink } from '@/components/styled';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { ConnectWalletAction } from '@/components/wallet/ConnectWalletAction';
+import { WrongNetworkBadge } from '@/components/wallet/NetworkGuard';
+import {
+  WalletAccountMenuItems,
+  WalletAccountPanel,
+  WalletNetworkMenuItems,
+} from '@/components/wallet/WalletAccountPanel';
 import { useActiveWeb3React } from '@/hooks/web3';
 
 interface Balance {
@@ -67,7 +73,6 @@ const ConnectWalletButton = ({
 }: ConnectWalletButtonProps) => {
   const t = useTranslations('wallet');
   const { account } = useActiveWeb3React();
-  const { requestConnectModal, warmConnectModal } = useWalletUi();
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -79,25 +84,52 @@ const ConnectWalletButton = ({
 
   if (account) {
     if (isMobileView) {
-      // The short address is one unbreakable word; below 360px the header
-      // leaves this pill about 80px, so it tightens instead of spilling out.
+      // Below the desktop header the pill opens the account panel (address,
+      // network, explorer, switch wallet, disconnect) instead of being inert.
       return (
-        <MobileWallet
-          label={shortenHex(account)}
-          className={cn('max-[359px]:px-2.5 max-[359px]:text-xs', className)}
-        />
+        <Popover>
+          <PopoverTrigger
+            className={cn(
+              'relative inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full border border-border bg-card/40 px-3 text-sm outline-none transition-colors hover:bg-card/70',
+              liquid && 'liquid-glass-control',
+              className,
+            )}
+            data-testid="wallet-account-trigger"
+          >
+            <Wallet className="h-4 w-4 text-muted-foreground" aria-hidden />
+            <span className="sr-only sm:not-sr-only sm:font-mono">{shortenHex(account)}</span>
+            {hasUnclaimedRewards && (
+              <span aria-hidden className="h-2 w-2 rounded-full bg-emerald-400" />
+            )}
+            {/* Under 360px the header has no room for the wrong-network chip. */}
+            <WrongNetworkBadge className="min-[360px]:hidden" />
+          </PopoverTrigger>
+          <PopoverContent
+            align="end"
+            collisionPadding={16}
+            aria-label={t('account.heading')}
+            className="w-[min(20rem,calc(100vw-2rem))] border-border"
+          >
+            <WalletAccountPanel />
+          </PopoverContent>
+        </Popover>
       );
     }
 
     return (
       <DropdownMenu>
         <DropdownMenuTrigger
+          data-testid="wallet-menu-trigger"
           className={cn(
-            'ml-auto inline-flex h-auto cursor-pointer items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.03] px-4 py-2 text-sm outline-none transition-colors hover:bg-white/[0.06]',
+            'relative ml-auto inline-flex h-auto cursor-pointer items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.03] px-4 py-2 text-sm outline-none transition-colors hover:bg-white/[0.06]',
             liquid && 'liquid-glass-control',
             className,
           )}
         >
+          {/* With the navigation in the bar there is no room for the
+              wrong-network chip: the pill carries the state, and the menu
+              opens on the switch. */}
+          <WrongNetworkBadge />
           <Wallet className="h-3.5 w-3.5 text-muted-foreground" />
           {shortenHex(account)}
           {hasUnclaimedRewards && (
@@ -126,6 +158,11 @@ const ConnectWalletButton = ({
                 <Copy className="h-3.5 w-3.5" />
               )}
             </button>
+          </div>
+
+          {/* Network state (and the switch, when the wallet is elsewhere) */}
+          <div className="px-1 pb-1">
+            <WalletNetworkMenuItems />
           </div>
 
           <DropdownMenuSeparator />
@@ -259,6 +296,13 @@ const ConnectWalletButton = ({
               </span>
             </div>
           </div>
+
+          <DropdownMenuSeparator />
+
+          {/* Explorer, switch wallet and disconnect */}
+          <div className="px-1 py-1">
+            <WalletAccountMenuItems />
+          </div>
         </DropdownMenuContent>
       </DropdownMenu>
     );
@@ -270,15 +314,10 @@ const ConnectWalletButton = ({
     // RainbowKit can render before intent. Hover/focus warms the chunk so
     // the click still feels instant.
     <div className="ml-auto">
-      <Button
-        onClick={requestConnectModal}
-        onPointerEnter={warmConnectModal}
-        onFocus={warmConnectModal}
+      <ConnectWalletAction
+        showIcon={false}
         className={cn('min-h-11 sm:min-h-0', liquid && 'liquid-glass-cta', className)}
-        data-testid="connect-wallet-button"
-      >
-        {t('connect.button')}
-      </Button>
+      />
     </div>
   );
 };

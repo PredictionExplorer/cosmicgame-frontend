@@ -1,168 +1,81 @@
-import { useEffect, useCallback, useRef, type MutableRefObject } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
-import { reportError } from '@/utils/errors';
+import { useAttentionPreferences } from '@/hooks/useAttentionPreferences';
 
 interface UseAllocationNotificationOptions {
+  /** Cycle Finalization Time (epoch ms); 0 while unknown. */
   allocationTime: number;
+  /** Cycle the alert is about; keys the notification so repeats replace it. */
+  cycleNumber?: number | null;
   notificationTitle?: string;
-  notificationBody?: string;
-  /**
-   * How far before the finalization deadline the notification fires.
-   * Defaults to 5 minutes (the historical behavior).
-   */
-  thresholdMs?: number;
+  /** Body copy, given the whole minutes left when the alert fires. */
+  notificationBody?: string | ((minutesLeft: number) => string);
 }
 
-const DEFAULT_NOTIFICATION_THRESHOLD_MS = 5 * 60 * 1000;
-
-const NOTIFICATION_SRC = '/audio/notification.wav';
-
-/** Ultra-short silent WAV so we can unlock playback even if `NOTIFICATION_SRC` is missing or blocked. */
-const SILENT_WAV_URI =
-  'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQQAAAAAAA==';
-
-/** Browsers only allow audio after a user gesture; `play()` from timers/effects gets NotAllowedError. */
-function isAutoplayPolicyError(error: unknown): boolean {
-  return error instanceof DOMException && error.name === 'NotAllowedError';
-}
+const CHECK_INTERVAL_MS = 1_000;
 
 /**
- * Runs inside a click/key handler: satisfies autoplay policy so later `play()` calls from
- * React effects (e.g. another user's bid refreshing the dashboard) can sound.
+ * The opt-in "alert before finalization" browser notification.
+ *
+ * Fires only when the viewer turned the alert on in their attention
+ * preferences (off by default) and the browser granted permission, once per
+ * approach to the deadline: `alertMinutes` before the Cycle Finalization
+ * Time, reporting the minutes actually left. A later gesture that pushes the
+ * deadline back out of the window re-arms it. Notifications for the same
+ * cycle replace each other instead of stacking, and a click focuses the tab.
  */
-async function unlockPlayback(notificationSoundRef: MutableRefObject<HTMLAudioElement | null>) {
-  try {
-    const el = new Audio(NOTIFICATION_SRC);
-    el.preload = 'auto';
-    el.volume = 0.001;
-    await el.play();
-    el.pause();
-    el.currentTime = 0;
-    el.volume = 1;
-    notificationSoundRef.current = el;
-    return;
-  } catch {
-    /* fall through — try silent clip / AudioContext */
-  }
-
-  try {
-    const silent = new Audio(SILENT_WAV_URI);
-    silent.volume = 0;
-    await silent.play();
-  } catch {
-    /* ignore */
-  }
-
-  try {
-    const AC =
-      window.AudioContext ||
-      (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!AC) return;
-    const ctx = new AC();
-    await ctx.resume();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    gain.gain.value = 0;
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.001);
-  } catch {
-    /* ignore */
-  }
-
-  try {
-    if (!notificationSoundRef.current) {
-      notificationSoundRef.current = new Audio(NOTIFICATION_SRC);
-    }
-  } catch {
-    /* ignore */
-  }
-}
-
 export function useAllocationNotification({
   allocationTime,
+  cycleNumber = null,
   notificationTitle,
   notificationBody,
-  thresholdMs = DEFAULT_NOTIFICATION_THRESHOLD_MS,
 }: UseAllocationNotificationOptions) {
-  const notificationSoundRef = useRef<HTMLAudioElement | null>(null);
-  const unlockOnceRef = useRef(false);
-  const permissionRequestedRef = useRef(false);
-
-  const primeAllocationSoundOnUserGesture = useCallback(async () => {
-    if (unlockOnceRef.current) return;
-    unlockOnceRef.current = true;
-    await unlockPlayback(notificationSoundRef);
-  }, []);
-
-  const requestNotificationPermission = useCallback(() => {
-    if (typeof window === 'undefined' || !('Notification' in window)) return;
-    // Only prompt in the default state. Calling requestPermission when denied
-    // spams the console ("permission has been blocked…") and has no effect.
-    if (Notification.permission !== 'default') return;
-    if (permissionRequestedRef.current) return;
-    permissionRequestedRef.current = true;
-    void Notification.requestPermission()
-      .then(() => {
-        /* granted / denied / dismissed — browser owns the outcome */
-      })
-      .catch(() => {
-        /* ignore: secure contexts / policy / user gesture requirements */
-      });
-  }, []);
-
-  const playAudio = useCallback(async () => {
-    try {
-      const el =
-        notificationSoundRef.current ??
-        (notificationSoundRef.current = new Audio(NOTIFICATION_SRC));
-      // eslint-disable-next-line react-hooks/immutability -- reset the owned audio element before playback.
-      el.currentTime = 0;
-      await el.play();
-    } catch (error) {
-      if (isAutoplayPolicyError(error)) return;
-      reportError(error, 'notification audio error');
-    }
-  }, []);
-
+  const { preferences } = useAttentionPreferences();
+  const enabled = preferences.finalizationAlert;
+  const thresholdMs = preferences.alertMinutes * 60 * 1000;
+  const firedRef = useRef(false);
+  // Copy changes with the locale and the per-second page tick; read it at send
+  // time instead of re-arming the interval on every render.
+  const copyRef = useRef({ notificationTitle, notificationBody });
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const onGesture = () => {
-      void primeAllocationSoundOnUserGesture();
-    };
-    window.addEventListener('pointerdown', onGesture, { capture: true, passive: true });
-    window.addEventListener('keydown', onGesture, { capture: true });
-    return () => {
-      window.removeEventListener('pointerdown', onGesture, { capture: true });
-      window.removeEventListener('keydown', onGesture, { capture: true });
-    };
-  }, [primeAllocationSoundOnUserGesture]);
+    copyRef.current = { notificationTitle, notificationBody };
+  });
+  const hasCopy = Boolean(notificationTitle && notificationBody);
 
   const sendNotification = useCallback((title: string, options: NotificationOptions) => {
-    if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification(title, options);
-    }
+    if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+    const notification = new Notification(title, options);
+    notification.onclick = () => {
+      window.focus();
+      notification.close();
+    };
   }, []);
 
   useEffect(() => {
-    if (!notificationTitle || !notificationBody) return;
-    const interval = setInterval(() => {
-      const now = Date.now();
-      if (allocationTime && now >= allocationTime - thresholdMs && now <= allocationTime) {
-        sendNotification(notificationTitle, {
-          body: notificationBody,
-        });
-        clearInterval(interval);
-      }
-      if (now > allocationTime) {
-        clearInterval(interval);
-      }
-    }, 1000);
-    return () => {
-      clearInterval(interval);
-    };
-  }, [allocationTime, notificationBody, notificationTitle, sendNotification, thresholdMs]);
+    if (!enabled || !hasCopy || !allocationTime) return undefined;
 
-  return { playAudio, requestNotificationPermission, sendNotification } as const;
+    const check = () => {
+      const remainingMs = allocationTime - Date.now();
+      if (remainingMs > thresholdMs) {
+        // Outside the window (or pushed back out by a new gesture): re-arm.
+        firedRef.current = false;
+        return;
+      }
+      if (remainingMs <= 0 || firedRef.current) return;
+      firedRef.current = true;
+      const { notificationTitle: title, notificationBody: body } = copyRef.current;
+      if (!title || !body) return;
+      const minutesLeft = Math.max(1, Math.ceil(remainingMs / 60_000));
+      sendNotification(title, {
+        body: typeof body === 'function' ? body(minutesLeft) : body,
+        tag: `cosmic-cycle-${cycleNumber ?? 'current'}-finalize`,
+      });
+    };
+
+    check();
+    const interval = setInterval(check, CHECK_INTERVAL_MS);
+    return () => clearInterval(interval);
+  }, [allocationTime, cycleNumber, enabled, hasCopy, sendNotification, thresholdMs]);
+
+  return { sendNotification, alertEnabled: enabled, alertMinutes: preferences.alertMinutes };
 }

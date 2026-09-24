@@ -31,7 +31,7 @@
 
 // lexicon-allow-start: backend wire-format field names mirror the Go server
 
-import { z } from 'zod';
+import * as z from 'zod';
 
 import { reportError } from '@/utils/errors';
 

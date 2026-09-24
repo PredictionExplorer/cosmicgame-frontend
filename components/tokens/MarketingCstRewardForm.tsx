@@ -15,6 +15,7 @@ import { getExplorerUrl, shortenHex } from '@/utils';
 import { activeChain } from '@/config/chains';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { useActiveWeb3React } from '@/hooks/web3';
+import { useRequireChain } from '@/hooks/useRequireChain';
 import { Link } from '@/i18n/navigation';
 import { getEthErrorMessage, isUserRejection, reportError } from '@/utils/errors';
 import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
@@ -69,6 +70,7 @@ export function MarketingCstRewardForm({
   const [txHash, setTxHash] = useState<`0x${string}` | null>(null);
 
   const config = useConfig();
+  const { ensureCorrectChain } = useRequireChain();
   const publicClient = usePublicClient({ chainId: activeChain.id });
   const queryClient = useQueryClient();
   const contractAddrs = useContractAddresses();
@@ -205,7 +207,15 @@ export function MarketingCstRewardForm({
     const validReward = validateReward();
     if (!validReward || !normalizedMarketingWallet) return;
 
+    // Busy first: the wallet's switch prompt can stay open for a while, and a
+    // second click must not send a second request (-32002). A wallet on
+    // another chain is asked to switch before the write (wagmi's
+    // writeContract would throw a chain mismatch instead).
     setSubmitting(true);
+    if (!(await ensureCorrectChain())) {
+      setSubmitting(false);
+      return;
+    }
     setTxHash(null);
     try {
       const hash = await writeContract(config, {

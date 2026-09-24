@@ -50,6 +50,45 @@
     "nothingHere": "아직 표시할 내용이 없습니다",
     "unavailable": "확인 불가"
   },
+  "liveStatus": {
+    "connecting": "연결 중…",
+    "live": "실시간",
+    "updated": "{age} 업데이트",
+    "reconnecting": "다시 연결하는 중…",
+    "delayed": "업데이트 지연 · 마지막 업데이트 {age}",
+    "delayedCaveat": "업데이트 지연 · 마지막 업데이트 {age}. 그 이후 마감 시각이 연장되었을 수 있습니다.",
+    "offline": "오프라인",
+    "offlineDetail": "네트워크에 연결되어 있지 않습니다. 마지막 업데이트: {age}.",
+    "offlineCaveat": "네트워크에 연결되어 있지 않습니다. 마지막 업데이트: {age}. 그 이후 마감 시각이 연장되었을 수 있습니다.",
+    "age": {
+      "justNow": "방금",
+      "seconds": "{count}초 전",
+      "minutes": "{count}분 전",
+      "hours": "{count}시간 전",
+      "days": "{count}일 전"
+    },
+    "delayedShort": "업데이트 지연"
+  },
+  "attention": {
+    "menuLabel": "알림과 소리",
+    "title": "알림과 소리",
+    "intro": "여기 있는 항목은 직접 켜기 전까지 모두 꺼져 있습니다. 선택은 이 브라우저에 저장됩니다.",
+    "sound": {
+      "label": "내 제스처 뒤에 새 제스처가 오면 알림음",
+      "description": "다른 참여자의 제스처가 내 최근 제스처 뒤에 이어지면 짧은 소리를 냅니다. 지갑 연결과 열린 탭이 필요합니다."
+    },
+    "alert": {
+      "label": "마감 전 알림",
+      "description": "사이클 마감 시각 전에 브라우저 알림을 보냅니다. 이 탭을 열어 두어야 합니다.",
+      "minutes": "{minutes}분",
+      "blocked": "이 사이트의 알림이 차단되어 있습니다. 브라우저 설정에서 알림을 허용해야 사용할 수 있습니다.",
+      "unsupported": "이 브라우저는 알림을 지원하지 않습니다."
+    },
+    "tabTitle": {
+      "label": "탭 제목에 카운트다운 표시",
+      "description": "사이클의 마지막 1시간 동안 브라우저 탭에 남은 시간을 표시합니다."
+    }
+  },
   "actions": {
     "copyAddress": "주소 복사",
     "addressCopied": "주소 복사됨",

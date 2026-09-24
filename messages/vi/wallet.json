@@ -1,6 +1,9 @@
 {
   "connect": {
-    "button": "Kết nối ví"
+    "button": "Kết nối ví",
+    "opening": "Đang mở danh sách ví…",
+    "restoring": "Đang khôi phục kết nối ví…",
+    "disclaimer": "Khi kết nối ví, bạn đồng ý với <terms>Điều khoản sử dụng</terms> và xác nhận đã đọc <risk>Công bố rủi ro</risk>. Nét bút diễn ra trên {network} và cần ETH trên mạng đó cho chi phí nét bút và phí mạng."
   },
   "groups": {
     "popular": "Phổ biến",
@@ -29,10 +32,57 @@
     "addCstToMetaMask": "Thêm CST vào MetaMask",
     "addingCstToMetaMask": "Đang thêm CST vào MetaMask…",
     "myAnchors": "Neo giữ của tôi",
-    "winningHistory": "Lịch sử nhận phân bổ"
+    "winningHistory": "Lịch sử nhận phân bổ",
+    "viewOnExplorer": "Xem trên {explorer}",
+    "switchWallet": "Đổi ví",
+    "disconnect": "Ngắt kết nối"
   },
   "accessibility": {
     "copyAddress": "Sao chép địa chỉ ví",
     "addressCopied": "Đã sao chép địa chỉ ví"
+  },
+  "network": {
+    "wrong": "Sai mạng",
+    "switchTo": "Chuyển sang {network}",
+    "switching": "Đang chuyển…",
+    "walletOn": "Ví đang ở {current}. Cosmic Signature chạy trên {network}.",
+    "walletOnOther": "Ví đang ở mạng khác. Cosmic Signature chạy trên {network}.",
+    "connectedTo": "Đã kết nối với {network}"
+  },
+  "required": {
+    "hint": "Kết nối chỉ chia sẻ địa chỉ ví với trang này. Không có gì được gửi cho đến khi bạn xác nhận giao dịch trong ví.",
+    "allocations": {
+      "title": "Kết nối ví để xem phân bổ của bạn",
+      "description": "Sau khi kết nối, ETH có thể nhận về, phân phối neo giữ cùng NFT và token đính kèm của bạn sẽ hiện ở đây.",
+      "publicLink": "Xem tất cả người nhận phân bổ"
+    },
+    "anchors": {
+      "title": "Kết nối ví để quản lý neo giữ",
+      "description": "Sau khi kết nối, NFT đang neo giữ, NFT có thể neo giữ và phân phối neo giữ của bạn sẽ hiện ở đây.",
+      "publicLink": "Tìm hiểu neo giữ"
+    },
+    "nfts": {
+      "title": "Kết nối ví để xem NFT của bạn",
+      "description": "Sau khi kết nối, các Cosmic Signature NFT trong ví của bạn sẽ hiện ở đây và bạn có thể gửi chúng đến địa chỉ khác.",
+      "publicLink": "Xem bộ sưu tập"
+    },
+    "statistics": {
+      "title": "Kết nối ví để xem thống kê của bạn",
+      "description": "Sau khi kết nối, nét bút, phân bổ và neo giữ của bạn trong mọi chu kỳ trình diễn sẽ hiện ở đây.",
+      "publicLink": "Xem thống kê tham gia"
+    },
+    "history": {
+      "title": "Kết nối ví để xem lịch sử phân bổ",
+      "description": "Sau khi kết nối, mọi phân bổ dành cho ví của bạn trong từng chu kỳ trình diễn sẽ hiện ở đây.",
+      "publicLink": "Xem tất cả người nhận phân bổ"
+    },
+    "transferCst": {
+      "title": "Kết nối ví để gửi CST",
+      "description": "Sau khi kết nối, số dư CST, biểu mẫu gửi và liên kết tới lịch sử chuyển của bạn sẽ hiện ở đây."
+    }
+  },
+  "funding": {
+    "short": "Ví có {available} ETH trên {network}. Nét bút này cần khoảng {required} ETH cộng phí mạng.",
+    "howTo": "Cách có ETH trên {network}"
   }
 }

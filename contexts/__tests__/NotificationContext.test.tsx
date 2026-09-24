@@ -215,11 +215,94 @@ describe('integration', () => {
 });
 
 describe('useNotification', () => {
-  it('throws when used outside of NotificationProvider', () => {
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    expect(() => renderHook(() => useNotification())).toThrow(
-      'useNotification must be used within a NotificationProvider',
+  it('falls back to a local dispatcher outside NotificationProvider', () => {
+    const { result } = renderHook(() => useNotification());
+
+    act(() => {
+      result.current.setNotification({ text: 'Standalone', type: 'warning', visible: true });
+    });
+
+    expect(mockToastWarning).toHaveBeenCalledWith('Standalone');
+  });
+});
+
+describe('technical details', () => {
+  it('offers a Copy details action and keeps the normal duration for a read error', () => {
+    const writeText = jest.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+    const { result } = renderHook(() => useNotification(), { wrapper });
+
+    act(() => {
+      result.current.setNotification({
+        text: 'Friendly sentence',
+        type: 'error',
+        visible: true,
+        details: 'InsufficientFundsError: insufficient funds',
+      });
+    });
+
+    expect(mockToastError).toHaveBeenCalledWith(
+      'Friendly sentence',
+      expect.objectContaining({
+        action: expect.objectContaining({ label: 'toasts.tx.copyDetails' }),
+      }),
     );
-    consoleSpy.mockRestore();
+    expect(mockToastError.mock.calls[0]![1]).not.toHaveProperty('duration');
+    const [, options] = mockToastError.mock.calls[0] as [
+      string,
+      { action: { onClick: (event: { preventDefault: () => void }) => void } },
+    ];
+    const preventDefault = jest.fn();
+    options.action.onClick({ preventDefault });
+    expect(preventDefault).toHaveBeenCalled();
+    expect(writeText).toHaveBeenCalledWith('InsufficientFundsError: insufficient funds');
+  });
+
+  it('shows a repeated read error once instead of stacking copies', () => {
+    const { result } = renderHook(() => useNotification(), { wrapper });
+    const failure = {
+      text: 'Could not load your NFTs.',
+      type: 'error' as const,
+      visible: true,
+      details: 'HttpRequestError: 429',
+    };
+
+    act(() => {
+      result.current.setNotification(failure);
+      result.current.setNotification(failure);
+    });
+
+    const [first, second] = mockToastError.mock.calls as [string, { id: string }][];
+    expect(first![1].id).toBeTruthy();
+    expect(second![1].id).toBe(first![1].id);
+  });
+
+  it('keeps a sticky failure open until dismissed', () => {
+    const { result } = renderHook(() => useNotification(), { wrapper });
+
+    act(() => {
+      result.current.setNotification({
+        text: 'Transfer did not go through.',
+        type: 'error',
+        visible: true,
+        details: 'TxRevertedError',
+        sticky: true,
+      });
+    });
+
+    expect(mockToastError).toHaveBeenCalledWith(
+      'Transfer did not go through.',
+      expect.objectContaining({ duration: Number.POSITIVE_INFINITY }),
+    );
+  });
+
+  it('replaces the toast with the same id instead of stacking another', () => {
+    const { result } = renderHook(() => useNotification(), { wrapper });
+
+    act(() => {
+      result.current.setNotification({ text: 'Once', type: 'info', visible: true, id: 'n1' });
+    });
+
+    expect(mockToastInfo).toHaveBeenCalledWith('Once', { id: 'n1' });
   });
 });

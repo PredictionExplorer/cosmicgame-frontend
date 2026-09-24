@@ -2,7 +2,6 @@
   "shared": {
     "home": "Trang chủ",
     "user": "Người dùng",
-    "walletNotConnected": "Chưa kết nối ví",
     "loading": "Đang tải…",
     "unavailable": "Không khả dụng",
     "yes": "Có",
@@ -18,7 +17,6 @@
     "eyebrow": "Cá nhân · Phân bổ",
     "title": "Phân bổ của tôi",
     "subtitle": "Xem và nhận về mọi phân bổ đang chờ của bạn",
-    "walletDescription": "Kết nối ví để xem và nhận về phân bổ của bạn.",
     "loadErrorTitle": "Không tải được",
     "loadErrorMessage": "Không tải được dữ liệu phân bổ đang chờ",
     "sections": {
@@ -44,7 +42,6 @@
     "eyebrow": "Cá nhân · Neo giữ",
     "title": "Neo giữ của tôi",
     "subtitle": "Quản lý các NFT đang neo giữ và xem phân phối Cosmic Signature NFT",
-    "walletDescription": "Vui lòng kết nối ví để quản lý neo giữ của bạn.",
     "tabs": {
       "cosmicSignature": "Neo giữ Cosmic Signature",
       "randomWalk": "Neo giữ Random Walk"
@@ -276,7 +273,6 @@
       "title": "NFT của tôi",
       "subtitle": "Các Cosmic Signature NFT trong ví đang kết nối",
       "marketplace": "Mua hoặc bán NFT",
-      "walletDescription": "Vui lòng kết nối ví để xem và quản lý NFT của bạn.",
       "loadErrorTitle": "Không tải được token",
       "loadErrorMessage": "Không tải được Cosmic Signature NFT.",
       "ownedTitle": "Cosmic Signature NFT tôi sở hữu",
@@ -308,7 +304,6 @@
     "page": {
       "title": "Chuyển CST",
       "subtitle": "Gửi token CST của Cosmic Signature đến một địa chỉ khác.",
-      "walletDescription": "Kết nối ví để chuyển CST từ số dư của bạn.",
       "sourceLabel": "Ví đang kết nối",
       "description": "Chuyển CST từ ví đang kết nối. Giao dịch được ví của bạn ký và gửi trực tiếp đến hợp đồng token CST."
     },

@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { useConfig, usePublicClient, useWalletClient, useConnectorClient } from 'wagmi';
-import { getConnectorClient, writeContract } from '@wagmi/core';
-import { formatEther, isAddress, maxUint256, parseEther, parseUnits } from 'viem';
+import { useConfig, usePublicClient } from 'wagmi';
+import { writeContract } from '@wagmi/core';
+import { formatEther, isAddress, parseEther, parseUnits, type TransactionReceipt } from 'viem';
 
 import { randomWalkNftAbi as NFT_ABI, cosmicTokenAbi as ERC20_ABI } from '@/contracts/abis';
 import { cosmicGameAbi } from '@/contracts/abis';
@@ -15,18 +15,8 @@ import { useActiveWeb3React } from '@/hooks/web3';
 import { activeChain } from '@/config/chains';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { ERC721_INTERFACE_ID, GESTURE_GAS_LIMIT } from '@/config/constants';
-import {
-  isTransientNetworkError,
-  isUserRejection,
-  reportError,
-  reportErrorThrottled,
-} from '@/utils/errors';
-import {
-  formatCustomContractError,
-  getContractErrorDescriptor,
-  isContractRevertError,
-} from '@/utils/contractErrors';
-import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
+import { isTransientNetworkError, reportError, reportErrorThrottled } from '@/utils/errors';
+import { getContractErrorDescriptor } from '@/utils/contractErrors';
 import {
   type CosmicGameGestureFunctionName,
   pickGestureWriteAbi,
@@ -34,14 +24,26 @@ import {
   withGestureArgsV1ThenV2,
 } from '@/utils/cosmicGameContractCompat';
 import { useNotify } from '@/hooks/useNotify';
-import { useRequireChain } from '@/hooks/useRequireChain';
+import { useTxFlow, type TxApprovalStep } from '@/hooks/useTxFlow';
 import { useCTPrice, useGestureEthCost, useUsedRWLKNFTs } from '@/hooks/useApiQuery';
-import { mapCTPriceInfo, type CstAuctionDurations, type CstGestureData } from '@/utils/cstGesture';
+import {
+  formatCstAmount,
+  mapCTPriceInfo,
+  type CstAuctionDurations,
+  type CstGestureData,
+} from '@/utils/cstGesture';
+import { REQUIRED_CHAIN_NAME } from '@/lib/chainGuard';
+import { sumImprintedTo } from '@/lib/receiptTransfers';
 import { clampCollisionBufferPercent } from '@/utils/gestureQuote';
 import { useUxScenarioSnapshot } from '@/lib/uxCycleScenarios';
 
 export type { CstGestureData } from '@/utils/cstGesture';
 export type CSTGestureData = CstGestureData;
+
+/** An asset that passed validation and will ride along with the gesture. */
+type PreparedAttachment =
+  | { kind: 'nft'; address: string; tokenId: number }
+  | { kind: 'token'; address: string; amountWei: bigint };
 
 export interface EthGestureInfo {
   AuctionDuration: number;
@@ -79,15 +81,10 @@ export function useGestureForm() {
   const config = useConfig();
   const { account } = useActiveWeb3React();
   const publicClient = usePublicClient({ chainId: activeChain.id });
-  const { data: connectorClient } = useConnectorClient({ chainId: activeChain.id });
-  const { data: walletClient } = useWalletClient({ chainId: activeChain.id });
-  const client = (connectorClient ?? walletClient) as ReturnType<typeof useWalletClient>['data'];
   const cosmicGameContract = useCosmicGameContract();
   const nftRWLKContract = useRWLKNFTContract();
   const { notify, notifyErrorFromEthers } = useNotify();
-  const { ensureCorrectChain } = useRequireChain({
-    switchFailedMessage: t('network.switchForGesture'),
-  });
+  const tx = useTxFlow();
   const uxScenario = useUxScenarioSnapshot();
 
   const { data: ctPriceData } = useCTPrice();
@@ -95,7 +92,9 @@ export function useGestureForm() {
   const { data: usedRWLKData } = useUsedRWLKNFTs();
 
   const [gestureType, setBidType] = useState('ETH');
-  const [contributionType, setContributionType] = useState('NFT');
+  // No attachment until the person picks one: opening Advanced to change
+  // another setting must not present empty NFT fields as the default.
+  const [contributionType, setContributionType] = useState('');
   const [message, setMessage] = useState('');
   const [nftDonateAddress, setNftDonateAddress] = useState('');
   const [nftId, setNftId] = useState('');
@@ -299,12 +298,9 @@ export function useGestureForm() {
     };
   }, [contractAddrs.cosmicGame, cosmicGameContract, publicClient, uxScenario]);
 
-  const handleTx = async (hashPromise: Promise<`0x${string}`>) => {
-    const hash = await hashPromise;
-    const receipt = await publicClient!.waitForTransactionReceipt({ hash });
-    assertSuccessfulTransactionReceipt(receipt);
-    notify('success', t('gesture.confirmed'));
-  };
+  const intlLocale = getLocaleConfig(locale).intlLocale;
+  const formatEthAmount = (wei: bigint) =>
+    Number(formatEther(wei)).toLocaleString(intlLocale, { maximumFractionDigits: 6 });
 
   const isContractAddress = async (address: string) => {
     if (!isAddress(address)) return false;
@@ -348,57 +344,70 @@ export function useGestureForm() {
     }
   };
 
-  const ensureNftApprovalForAll = async (nftAddress: string) => {
-    const approved = await publicClient!.readContract({
-      address: nftAddress as `0x${string}`,
-      abi: NFT_ABI,
-      functionName: 'isApprovedForAll',
-      args: [account as `0x${string}`, contractAddrs.prizesWallet as `0x${string}`],
-    });
-    if (!approved) {
-      const feeParams = await getFeeParams();
-      const hash = await writeContract(config, {
-        address: nftAddress as `0x${string}`,
-        abi: NFT_ABI,
-        functionName: 'setApprovalForAll',
-        args: [contractAddrs.prizesWallet as `0x${string}`, true],
-        account: account!,
-        chainId: activeChain.id,
-        ...feeParams,
-      });
-      const receipt = await publicClient!.waitForTransactionReceipt({ hash });
-      assertSuccessfulTransactionReceipt(receipt);
-    }
+  /**
+   * Whether the Allocations wallet may already move this one NFT: approved for
+   * the token itself, or (from an earlier, wider grant) for the collection.
+   */
+  const isNftApprovedForGesture = async (nftAddress: string, tokenId: number) => {
+    const operator = (contractAddrs.prizesWallet as string).toLowerCase();
+    const [approved, approvedForAll] = await Promise.all([
+      publicClient!
+        .readContract({
+          address: nftAddress as `0x${string}`,
+          abi: NFT_ABI,
+          functionName: 'getApproved',
+          args: [BigInt(tokenId)],
+        })
+        .catch(() => null),
+      publicClient!
+        .readContract({
+          address: nftAddress as `0x${string}`,
+          abi: NFT_ABI,
+          functionName: 'isApprovedForAll',
+          args: [account as `0x${string}`, contractAddrs.prizesWallet as `0x${string}`],
+        })
+        .catch(() => false),
+    ]);
+    return (
+      approvedForAll === true ||
+      (typeof approved === 'string' && approved.toLowerCase() === operator)
+    );
   };
 
-  const ensureErc20Allowance = async (
-    tokenAddress: string,
-    spender: string,
-    required: bigint,
-    options: { approveMax?: boolean } = {},
-  ) => {
-    if (required <= 0n) return;
-    const allowance = (await publicClient!.readContract({
-      address: tokenAddress as `0x${string}`,
-      abi: ERC20_ABI,
-      functionName: 'allowance',
-      args: [account as `0x${string}`, spender as `0x${string}`],
-    })) as bigint;
-
-    if (allowance >= required) return;
-    const approvalAmount = options.approveMax === false ? required : maxUint256;
+  /** Exact, per-token approval — never operator rights over the whole collection. */
+  const approveNftForGesture = async (nftAddress: string, tokenId: number) => {
     const feeParams = await getFeeParams();
-    const hash = await writeContract(config, {
-      address: tokenAddress as `0x${string}`,
-      abi: ERC20_ABI,
+    return writeContract(config, {
+      address: nftAddress as `0x${string}`,
+      abi: NFT_ABI,
       functionName: 'approve',
-      args: [spender as `0x${string}`, approvalAmount],
+      args: [contractAddrs.prizesWallet as `0x${string}`, BigInt(tokenId)],
       account: account!,
       chainId: activeChain.id,
       ...feeParams,
     });
-    const receipt = await publicClient!.waitForTransactionReceipt({ hash });
-    assertSuccessfulTransactionReceipt(receipt);
+  };
+
+  const readErc20Allowance = async (tokenAddress: string) =>
+    (await publicClient!.readContract({
+      address: tokenAddress as `0x${string}`,
+      abi: ERC20_ABI,
+      functionName: 'allowance',
+      args: [account as `0x${string}`, contractAddrs.prizesWallet as `0x${string}`],
+    })) as bigint;
+
+  /** Exactly the attached amount — never an unlimited allowance. */
+  const approveErc20Exactly = async (tokenAddress: string, amountWei: bigint) => {
+    const feeParams = await getFeeParams();
+    return writeContract(config, {
+      address: tokenAddress as `0x${string}`,
+      abi: ERC20_ABI,
+      functionName: 'approve',
+      args: [contractAddrs.prizesWallet as `0x${string}`, amountWei],
+      account: account!,
+      chainId: activeChain.id,
+      ...feeParams,
+    });
   };
 
   const getErc20Decimals = async (tokenAddress: string) => {
@@ -409,32 +418,29 @@ export function useGestureForm() {
         functionName: 'decimals',
       })) as number;
     } catch {
-      console.warn('decimals() not found, assuming 18.');
       notify('warning', t('gesture.validation.tokenDecimalsWarning'));
       return 18;
     }
   };
 
-  const hasEthBalance = async (amount: bigint) => {
+  /** Wallet ETH on the app chain, or null when it cannot be read (the wallet then decides). */
+  const readEthBalance = async (): Promise<bigint | null> => {
     try {
-      const bal = await publicClient!.getBalance({ address: account as `0x${string}` });
-      const ok = bal >= amount;
-      return ok;
+      return await publicClient!.getBalance({ address: account as `0x${string}` });
     } catch (e) {
       reportError(e, 'check ETH balance');
-      return false;
+      return null;
     }
   };
 
-  const hasCstBalance = async (amountWei: bigint) => {
+  /** Indexed CST balance, or null when the API cannot answer (the contract then decides). */
+  const readCstBalance = async (): Promise<bigint | null> => {
     try {
       const bal = await api.get_user_balance(account!);
-      if (!bal) return false;
-      const wallet = BigInt(bal.CosmicTokenBalance);
-      return wallet >= amountWei;
+      return bal ? BigInt(bal.CosmicTokenBalance) : null;
     } catch (e) {
       reportError(e, 'check CST balance');
-      return false;
+      return null;
     }
   };
 
@@ -449,59 +455,110 @@ export function useGestureForm() {
     return price;
   };
 
-  const withNftDonation = async (nftAddress: string, tokenId: number) => {
-    if (!nftAddress || nftAddress.trim() === '' || Number.isNaN(tokenId)) {
-      throw new Error('Missing attached NFT address or tokenId.');
+  /**
+   * Validates the attachment the form describes and returns what to attach,
+   * `null` for none, or `false` (after telling the person why) when the
+   * gesture must not be sent.
+   */
+  const prepareAttachment = async (): Promise<PreparedAttachment | null | false> => {
+    if (contributionType === 'NFT' && nftDonateAddress && nftId) {
+      const tokenId = Number(nftId);
+      if (Number.isNaN(tokenId)) throw new Error('Attached NFT token id is not a number.');
+      if (!(await isContractAddress(nftDonateAddress))) {
+        notify('error', t('gesture.validation.invalidContractAddress'));
+        return false;
+      }
+      if (!(await isERC721(nftDonateAddress))) {
+        notify('error', t('gesture.validation.notErc721'));
+        return false;
+      }
+      if (!(await ensureNftOwnership(nftDonateAddress, tokenId))) return false;
+      return { kind: 'nft', address: nftDonateAddress, tokenId };
     }
-    if (!(await isContractAddress(nftAddress))) {
-      notify('error', t('gesture.validation.invalidContractAddress'));
-      return false;
+
+    if (contributionType === 'Token' && tokenDonateAddress && tokenAmount) {
+      if (!(await isContractAddress(tokenDonateAddress))) {
+        notify('error', t('gesture.validation.invalidContractAddress'));
+        return false;
+      }
+      try {
+        const totalSupply = await publicClient!.readContract({
+          address: tokenDonateAddress as `0x${string}`,
+          abi: ERC20_ABI,
+          functionName: 'totalSupply',
+        });
+        if (!totalSupply) throw new Error('Not an ERC20');
+      } catch {
+        notify('error', t('gesture.validation.notErc20'));
+        return false;
+      }
+      const decimals = await getErc20Decimals(tokenDonateAddress);
+      const amountWei = parseUnits(tokenAmount, decimals);
+      const balance = (await publicClient!.readContract({
+        address: tokenDonateAddress as `0x${string}`,
+        abi: ERC20_ABI,
+        functionName: 'balanceOf',
+        args: [account as `0x${string}`],
+      })) as bigint;
+      if (balance < amountWei) {
+        notify('error', t('gesture.validation.insufficientAttachedToken'));
+        return false;
+      }
+      return { kind: 'token', address: tokenDonateAddress, amountWei };
     }
-    if (!(await isERC721(nftAddress))) {
-      notify('error', t('gesture.validation.notErc721'));
-      return false;
-    }
-    if (!(await ensureNftOwnership(nftAddress, tokenId))) return false;
-    await ensureNftApprovalForAll(nftAddress);
-    return true;
+
+    return null;
   };
 
-  const withTokenDonation = async (tokenAddress: string, amountStr: string) => {
-    if (!tokenAddress || !amountStr) {
-      throw new Error('Missing attached token address or amount.');
-    }
-    if (!(await isContractAddress(tokenAddress))) {
-      notify('error', t('gesture.validation.invalidContractAddress'));
-      return { ok: false as const };
-    }
+  /**
+   * The approval step for the prepared attachment (exact amount or the one
+   * NFT), shown as "Approve 1 of 2" with a sentence on why the wallet asks.
+   * Evaluated after `prepare`, so it reads the attachment that passed
+   * validation.
+   */
+  const attachmentApprovals = (
+    getAttachment: () => PreparedAttachment | null,
+  ): TxApprovalStep[] => [
+    {
+      description:
+        contributionType === 'NFT'
+          ? t('gesture.approval.nft', { tokenId: nftId })
+          : t('gesture.approval.token', { amount: tokenAmount }),
+      isNeeded: async () => {
+        const attachment = getAttachment();
+        if (!attachment) return false;
+        if (attachment.kind === 'nft') {
+          return !(await isNftApprovedForGesture(attachment.address, attachment.tokenId));
+        }
+        return (await readErc20Allowance(attachment.address)) < attachment.amountWei;
+      },
+      write: async () => {
+        const attachment = getAttachment();
+        if (!attachment) throw new Error('No attachment to approve.');
+        return attachment.kind === 'nft'
+          ? approveNftForGesture(attachment.address, attachment.tokenId)
+          : approveErc20Exactly(attachment.address, attachment.amountWei);
+      },
+    },
+  ];
 
-    try {
-      const ts = await publicClient!.readContract({
-        address: tokenAddress as `0x${string}`,
-        abi: ERC20_ABI,
-        functionName: 'totalSupply',
-      });
-      if (!ts) throw new Error('Not an ERC20');
-    } catch {
-      notify('error', t('gesture.validation.notErc20'));
-      return { ok: false as const };
+  const clearAttachment = (attachment: PreparedAttachment | null) => {
+    if (attachment?.kind === 'nft') {
+      setNftId('');
+      setNftDonateAddress('');
+    } else if (attachment?.kind === 'token') {
+      setTokenAmount('');
+      setTokenDonateAddress('');
     }
+  };
 
-    const decimals = await getErc20Decimals(tokenAddress);
-    const amountWei = parseUnits(amountStr, decimals);
-    const bal = (await publicClient!.readContract({
-      address: tokenAddress as `0x${string}`,
-      abi: ERC20_ABI,
-      functionName: 'balanceOf',
-      args: [account as `0x${string}`],
-    })) as bigint;
-
-    if (bal < amountWei) {
-      notify('error', t('gesture.validation.insufficientAttachedToken'));
-      return { ok: false as const };
-    }
-    await ensureErc20Allowance(tokenAddress, contractAddrs.prizesWallet, amountWei);
-    return { ok: true as const, amountWei, decimals };
+  /** "Gesture recorded…", with the Participation CST the receipt shows was imprinted. */
+  const gestureSuccessMessage = (receipt: TransactionReceipt) => {
+    const imprinted = sumImprintedTo(receipt.logs, contractAddrs.cosmicToken, account);
+    if (imprinted <= 0n) return t('gesture.confirmed');
+    return t('gesture.confirmedWithCst', {
+      cst: formatCstAmount(Number(formatEther(imprinted))),
+    });
   };
 
   const estimateDonationGas = async (
@@ -563,10 +620,10 @@ export function useGestureForm() {
     functionName: CosmicGameGestureFunctionName,
     args: readonly unknown[],
     signerAddress: `0x${string}`,
-    feeParams: Awaited<ReturnType<typeof getFeeParams>>,
     options?: { value?: bigint; gas?: bigint },
-  ) =>
-    withGestureArgsV1ThenV2(
+  ) => {
+    const feeParams = await getFeeParams();
+    return withGestureArgsV1ThenV2(
       functionName,
       args,
       async (callArgs) =>
@@ -583,239 +640,165 @@ export function useGestureForm() {
         }),
       { cstRewardAmountMinLimit: gestureCstRewardAmountMinLimitWei },
     );
+  };
 
   /**
-   * Submit an ETH bid (with optional NFT/token donation).
-   * Returns `true` on success so the caller can trigger a post-tx refresh.
+   * Submit an ETH gesture (with an optional attached NFT or token).
+   * Runs through `useTxFlow`: chain guard, pre-flight checks, the exact
+   * approval as step 1 of 2 when an asset is attached, and one lifecycle
+   * toast. Returns `true` once confirmed so the caller can refresh.
    */
   const onGesture = async (): Promise<boolean> => {
-    setIsBidding(true);
-    try {
-      if (!account) {
-        notify('error', t('wallet.connect'));
-        return false;
-      }
-      if (!(await ensureCorrectChain())) {
-        return false;
-      }
-      if (!cosmicGameContract) {
-        notify('error', t('wallet.connectCorrectNetwork'));
-        return false;
-      }
-
-      const ethGestureCost = await getNextEthGestureCostWithModifiers();
-
-      if (!(await hasEthBalance(ethGestureCost))) {
-        notify('error', t('gesture.validation.insufficientEth'));
-        return false;
-      }
-
-      const noDonation =
-        (contributionType === 'NFT' && (!nftDonateAddress || !nftId)) ||
-        (contributionType === 'Token' && (!tokenDonateAddress || !tokenAmount));
-
-      if (noDonation || !contributionType) {
-        const signerAddress =
-          (client as { account?: { address: `0x${string}` } } | undefined)?.account?.address ??
-          (account as `0x${string}`);
-        const feeParams = await getFeeParams();
-        const hash = await writeGesture('bidWithEth', [rwlkId, message], signerAddress, feeParams, {
-          value: ethGestureCost,
-          gas: GESTURE_GAS_LIMIT,
-        });
-        await handleTx(Promise.resolve(hash));
-        return true;
-      }
-
-      if (contributionType === 'NFT') {
-        const nftIdNum = Number(nftId);
-        const ok = await withNftDonation(nftDonateAddress!, nftIdNum);
-        if (!ok) {
-          return false;
-        }
-        const donateArgs = [rwlkId, message, nftDonateAddress, nftIdNum] as const;
-        const gas = await estimateDonationGas('bidWithEthAndDonateNft', donateArgs, ethGestureCost);
-        const signerAddress =
-          (client as { account?: { address: `0x${string}` } } | undefined)?.account?.address ??
-          (account as `0x${string}`);
-        const feeParams = await getFeeParams();
-        const hash = await writeGesture(
-          'bidWithEthAndDonateNft',
-          donateArgs,
-          signerAddress,
-          feeParams,
-          { value: ethGestureCost, gas },
-        );
-        await handleTx(Promise.resolve(hash));
-        setNftId('');
-        setNftDonateAddress('');
-      } else {
-        const res = await withTokenDonation(tokenDonateAddress!, tokenAmount!);
-        if (!res.ok) {
-          return false;
-        }
-        const donateArgs = [rwlkId, message, tokenDonateAddress, res.amountWei] as const;
-        const gas = await estimateDonationGas(
-          'bidWithEthAndDonateToken',
-          donateArgs,
-          ethGestureCost,
-        );
-        const signerAddress =
-          (client as { account?: { address: `0x${string}` } } | undefined)?.account?.address ??
-          (account as `0x${string}`);
-        const feeParams = await getFeeParams();
-        const hash = await writeGesture(
-          'bidWithEthAndDonateToken',
-          donateArgs,
-          signerAddress,
-          feeParams,
-          { value: ethGestureCost, gas },
-        );
-        await handleTx(Promise.resolve(hash));
-        setTokenAmount('');
-        setTokenDonateAddress('');
-      }
-      return true;
-    } catch (err: unknown) {
-      if (isUserRejection(err)) {
-        notify('info', t('walletTransactionCancelled'));
-        return false;
-      }
-      reportError(err, 'gesture-eth');
-      const descriptor = getContractErrorDescriptor(err, ethGestureInfo?.ETHPrice);
-      const localizedMessage = descriptor ? t(descriptor.key, descriptor.values) : null;
-      const detailed = getLocaleConfig(locale).showRawProviderErrors
-        ? formatCustomContractError(err)
-        : null;
-      const combined = [localizedMessage, detailed].filter(Boolean).join('\n\n');
-      if (combined) {
-        notify('error', combined);
-      } else {
-        notifyErrorFromEthers(err, t('gesture.transaction.failed'));
-      }
+    if (!account) {
+      notify('error', t('wallet.connect'));
       return false;
+    }
+    if (!cosmicGameContract) {
+      notify('error', t('wallet.connectCorrectNetwork'));
+      return false;
+    }
+
+    setIsBidding(true);
+    let ethGestureCost = 0n;
+    let attachment: PreparedAttachment | null = null;
+    try {
+      const result = await tx.run({
+        prepare: async () => {
+          ethGestureCost = await getNextEthGestureCostWithModifiers();
+          const balance = await readEthBalance();
+          if (balance !== null && balance < ethGestureCost) {
+            notify(
+              'error',
+              t('gesture.validation.insufficientEth', {
+                required: formatEthAmount(ethGestureCost),
+                available: formatEthAmount(balance),
+                network: REQUIRED_CHAIN_NAME,
+              }),
+            );
+            return false;
+          }
+          const prepared = await prepareAttachment();
+          if (prepared === false) return false;
+          attachment = prepared;
+          return true;
+        },
+        approvals: attachmentApprovals(() => attachment),
+        write: async (ctx) => {
+          const prepared: PreparedAttachment | null = attachment;
+          if (!prepared) {
+            return writeGesture('bidWithEth', [rwlkId, message], ctx.account, {
+              value: ethGestureCost,
+              gas: GESTURE_GAS_LIMIT,
+            });
+          }
+          const [functionName, args] =
+            prepared.kind === 'nft'
+              ? ([
+                  'bidWithEthAndDonateNft',
+                  [rwlkId, message, prepared.address, prepared.tokenId],
+                ] as const)
+              : ([
+                  'bidWithEthAndDonateToken',
+                  [rwlkId, message, prepared.address, prepared.amountWei],
+                ] as const);
+          const gas = await estimateDonationGas(functionName, args, ethGestureCost);
+          return writeGesture(functionName, args, ctx.account, { value: ethGestureCost, gas });
+        },
+        successMessage: gestureSuccessMessage,
+        onConfirmed: () => clearAttachment(attachment),
+        describeError: (err) => {
+          const descriptor = getContractErrorDescriptor(err, ethGestureInfo?.ETHPrice);
+          return descriptor ? t(descriptor.key, descriptor.values) : null;
+        },
+        failureMessage: t('gesture.transaction.failed'),
+        errorContext: 'gesture-eth',
+      });
+      return result.status === 'confirmed';
     } finally {
       setIsBidding(false);
     }
   };
 
   /**
-   * Submit a CST bid (with optional NFT/token donation).
-   * Returns `true` on success so the caller can trigger a post-tx refresh.
+   * Submit a CST gesture (with an optional attached NFT or token). Same flow
+   * as `onGesture`; the CST cost is burned by the game directly, so no CST
+   * approval is ever requested.
    */
   const onGestureWithCST = async (): Promise<boolean> => {
-    setIsBidding(true);
-    let submittedCstPriceMaxLimit: bigint | null = null;
-    try {
-      if (!account) {
-        notify('error', t('wallet.connect'));
-        return false;
-      }
-      if (!(await ensureCorrectChain())) {
-        return false;
-      }
-      let signerClient = client;
-      if (!signerClient) {
-        // Unpinned: the chain was already aligned by ensureCorrectChain(), and
-        // MetaMask's connector chain can lag right after a switch. Pinning `chainId` here
-        // would throw `ConnectorChainMismatchError`. We only need the account address.
-        signerClient =
-          ((await getConnectorClient(config)) as unknown as typeof signerClient) ?? undefined;
-      }
-      if (!signerClient) {
-        notify('error', t('wallet.stillConnecting'));
-        return false;
-      }
-      if (!cosmicGameContract) {
-        notify('error', t('wallet.connectCorrectNetwork'));
-        return false;
-      }
-      const signerAddress =
-        (signerClient as { account?: { address: `0x${string}` } } | undefined)?.account?.address ??
-        (account as `0x${string}`);
-
-      const priceMaxLimit =
-        ((await cosmicGameContract.read.getNextCstBidPrice?.()) as bigint | undefined) ??
-        cstGestureData.CSTPriceWei;
-      submittedCstPriceMaxLimit = priceMaxLimit;
-
-      if (priceMaxLimit > 0n) {
-        if (!(await hasCstBalance(priceMaxLimit))) {
-          notify('error', t('gesture.validation.insufficientCst'));
-          return false;
-        }
-        // No ERC-20 approval needed: the game burns the bidder's CST directly via the
-        // privileged `CosmicSignatureToken.burn(account, value)` (_onlyGame), which calls
-        // `_burn` without touching allowance. An `approve` here would be a pointless extra tx.
-      }
-
-      const noDonation =
-        (contributionType === 'NFT' && (!nftDonateAddress || !nftId)) ||
-        (contributionType === 'Token' && (!tokenDonateAddress || !tokenAmount));
-
-      if (noDonation || !contributionType) {
-        const feeParams = await getFeeParams();
-        const hash = await writeGesture(
-          'bidWithCst',
-          [priceMaxLimit, message],
-          signerAddress,
-          feeParams,
-        );
-        await handleTx(Promise.resolve(hash));
-        return true;
-      }
-
-      if (contributionType === 'NFT') {
-        const nftIdNum = Number(nftId);
-        const ok = await withNftDonation(nftDonateAddress!, nftIdNum);
-        if (!ok) return false;
-        const feeParams = await getFeeParams();
-        const hash = await writeGesture(
-          'bidWithCstAndDonateNft',
-          [priceMaxLimit, message, nftDonateAddress, nftIdNum],
-          signerAddress,
-          feeParams,
-        );
-        await handleTx(Promise.resolve(hash));
-        setNftId('');
-        setNftDonateAddress('');
-      } else {
-        const res = await withTokenDonation(tokenDonateAddress!, tokenAmount!);
-        if (!res.ok) return false;
-        const feeParams = await getFeeParams();
-        const hash = await writeGesture(
-          'bidWithCstAndDonateToken',
-          [priceMaxLimit, message, tokenDonateAddress, res.amountWei],
-          signerAddress,
-          feeParams,
-        );
-        await handleTx(Promise.resolve(hash));
-        setTokenAmount('');
-        setTokenDonateAddress('');
-      }
-      return true;
-    } catch (err: unknown) {
-      if (isUserRejection(err)) {
-        notify('info', t('walletTransactionCancelled'));
-        return false;
-      }
-      reportError(err, 'gesture-cst');
-      const descriptor = getContractErrorDescriptor(err, {
-        gestureCurrency: 'CST',
-        displayedPriceWei: submittedCstPriceMaxLimit,
-      });
-      const localizedMessage = descriptor ? t(descriptor.key, descriptor.values) : null;
-      const detailed = getLocaleConfig(locale).showRawProviderErrors
-        ? formatCustomContractError(err)
-        : null;
-      if (localizedMessage || detailed) {
-        notify('error', [localizedMessage, detailed].filter(Boolean).join('\n\n'));
-      } else if (isContractRevertError(err)) {
-        notify('error', t('gesture.transaction.cstReverted'));
-      } else {
-        notifyErrorFromEthers(err, t('gesture.transaction.failed'));
-      }
+    if (!account) {
+      notify('error', t('wallet.connect'));
       return false;
+    }
+    if (!cosmicGameContract) {
+      notify('error', t('wallet.connectCorrectNetwork'));
+      return false;
+    }
+
+    setIsBidding(true);
+    let priceMaxLimit: bigint | null = null;
+    let attachment: PreparedAttachment | null = null;
+    try {
+      const result = await tx.run({
+        prepare: async () => {
+          const limit =
+            ((await cosmicGameContract.read.getNextCstBidPrice?.()) as bigint | undefined) ??
+            cstGestureData.CSTPriceWei;
+          priceMaxLimit = limit;
+          if (limit > 0n) {
+            // No ERC-20 approval: the game burns the participant's CST through
+            // the privileged `CosmicSignatureToken.burn(account, value)`.
+            const balance = await readCstBalance();
+            if (balance !== null && balance < limit) {
+              notify(
+                'error',
+                t('gesture.validation.insufficientCst', {
+                  required: formatCstAmount(Number(formatEther(limit))),
+                  available: formatCstAmount(Number(formatEther(balance))),
+                }),
+              );
+              return false;
+            }
+          }
+          const prepared = await prepareAttachment();
+          if (prepared === false) return false;
+          attachment = prepared;
+          return true;
+        },
+        approvals: attachmentApprovals(() => attachment),
+        write: async (ctx) => {
+          const limit = priceMaxLimit ?? 0n;
+          const prepared: PreparedAttachment | null = attachment;
+          if (!prepared) {
+            return writeGesture('bidWithCst', [limit, message], ctx.account);
+          }
+          return prepared.kind === 'nft'
+            ? writeGesture(
+                'bidWithCstAndDonateNft',
+                [limit, message, prepared.address, prepared.tokenId],
+                ctx.account,
+              )
+            : writeGesture(
+                'bidWithCstAndDonateToken',
+                [limit, message, prepared.address, prepared.amountWei],
+                ctx.account,
+              );
+        },
+        successMessage: gestureSuccessMessage,
+        onConfirmed: () => clearAttachment(attachment),
+        describeError: (err, info) => {
+          const descriptor = getContractErrorDescriptor(err, {
+            gestureCurrency: 'CST',
+            displayedPriceWei: priceMaxLimit,
+          });
+          if (descriptor) return t(descriptor.key, descriptor.values);
+          return info.kind === 'would-revert' || info.kind === 'reverted'
+            ? t('gesture.transaction.cstReverted')
+            : null;
+        },
+        failureMessage: t('gesture.transaction.failed'),
+        errorContext: 'gesture-cst',
+      });
+      return result.status === 'confirmed';
     } finally {
       setIsBidding(false);
     }
@@ -878,6 +861,8 @@ export function useGestureForm() {
     gestureCostPlus,
     setBidPricePlus,
     isGesturing,
+    /** Lifecycle of the latest gesture transaction, for button labels and `TxStatus`. */
+    gestureTxStage: tx.stage,
     advancedExpanded,
     setAdvancedExpanded,
     rwlknftIds,

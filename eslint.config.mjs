@@ -72,7 +72,27 @@ const config = [
               message:
                 "Import locale-aware navigation from '@/i18n/navigation' (useSearchParams and notFound stay on next/navigation).",
             },
+            // wagmi 3 renamed the account hooks; the old names are deprecated
+            // aliases (AGENTS.md: heed deprecation notices).
+            {
+              name: 'wagmi',
+              importNames: ['useAccount', 'useAccountEffect', 'useSwitchAccount'],
+              message:
+                'Deprecated in wagmi 3: use useConnection, useConnectionEffect or useSwitchConnection.',
+            },
           ],
+        },
+      ],
+      // `{ z }` and the default export are Zod's materialized namespace, which
+      // drags its ~50 locale tables (~40 KB gzip) into the shared client
+      // chunk of every app page; `import * as z from 'zod'` lets Turbopack
+      // tree-shake them.
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            "ImportDeclaration[source.value='zod'] > :matches(ImportSpecifier[imported.name='z'], ImportDefaultSpecifier)",
+          message: "Use `import * as z from 'zod'` so unused Zod locales stay out of the bundle.",
         },
       ],
     },

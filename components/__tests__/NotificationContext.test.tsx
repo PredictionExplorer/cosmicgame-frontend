@@ -127,13 +127,10 @@ describe('NotificationContext', () => {
     expect(toast.info).toHaveBeenCalledWith('From fn');
   });
 
-  it('throws when useNotification is used outside NotificationProvider', () => {
-    const originalError = console.error;
-    console.error = jest.fn();
-    expect(() => render(<TestConsumer />)).toThrow(
-      'useNotification must be used within a NotificationProvider',
-    );
-    console.error = originalError;
+  it('still toasts when useNotification is used outside NotificationProvider', () => {
+    render(<TestConsumer />);
+    fireEvent.click(screen.getByText('Trigger Error'));
+    expect(toast.error).toHaveBeenCalledWith('Error!');
   });
 
   it('has no accessibility violations', async () => {

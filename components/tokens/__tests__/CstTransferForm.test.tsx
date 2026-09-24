@@ -25,6 +25,11 @@ jest.mock('@wagmi/core', () => ({
   writeContract: (...args: unknown[]) => mockWriteContract(...args),
 }));
 
+const mockEnsureCorrectChain = jest.fn().mockResolvedValue(true);
+jest.mock('@/hooks/useRequireChain', () => ({
+  useRequireChain: () => ({ ensureCorrectChain: mockEnsureCorrectChain }),
+}));
+
 jest.mock('wagmi', () => ({
   useConfig: () => ({ id: 'test-config' }),
   usePublicClient: () => ({
@@ -116,6 +121,7 @@ describe('CstTransferForm', () => {
     mockWriteContract.mockResolvedValue(TX_HASH);
     mockWaitForTransactionReceipt.mockResolvedValue({ status: 'success' });
     mockInvalidateQueries.mockResolvedValue(undefined);
+    mockEnsureCorrectChain.mockResolvedValue(true);
   });
 
   it('renders source wallet, balance, and transfer history link', async () => {
@@ -226,6 +232,36 @@ describe('CstTransferForm', () => {
     expect(
       screen.getByRole('button', { name: 'myPages.transferCst.form.sendAria' }),
     ).toBeDisabled();
+  });
+
+  it('asks a wallet on another chain to switch first, and sends nothing when it does not', async () => {
+    mockEnsureCorrectChain.mockResolvedValueOnce(false);
+    await renderReadyForm();
+    fillTransferForm('12.5');
+
+    submitTransferForm();
+
+    await waitFor(() => expect(mockEnsureCorrectChain).toHaveBeenCalledTimes(1));
+    expect(mockWriteContract).not.toHaveBeenCalled();
+  });
+
+  it('stays busy while the wallet shows its switch prompt, so a second click sends nothing', async () => {
+    let answerSwitch!: (switched: boolean) => void;
+    mockEnsureCorrectChain.mockImplementationOnce(
+      () => new Promise<boolean>((resolve) => (answerSwitch = resolve)),
+    );
+    await renderReadyForm();
+    fillTransferForm('12.5');
+
+    submitTransferForm();
+    const button = screen.getByRole('button', { name: 'myPages.transferCst.form.sendAria' });
+    await waitFor(() => expect(button).toBeDisabled());
+    fireEvent.click(button);
+    expect(mockEnsureCorrectChain).toHaveBeenCalledTimes(1);
+
+    answerSwitch(false);
+    await waitFor(() => expect(button).not.toBeDisabled());
+    expect(mockWriteContract).not.toHaveBeenCalled();
   });
 
   it('calls standard ERC-20 transfer, waits for receipt, and invalidates related queries', async () => {

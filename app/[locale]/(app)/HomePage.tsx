@@ -11,6 +11,7 @@ import { Link } from '@/i18n/navigation';
 import { reportError } from '@/utils/errors';
 import { useNotify } from '@/hooks/useNotify';
 import { ErrorState } from '@/components/ui/error-state';
+import { AttentionMenu } from '@/components/ui/attention-menu';
 import { PageShell } from '@/components/ui/page-shell';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { useActiveWeb3React } from '@/hooks/web3';
@@ -38,6 +39,8 @@ import { useChampions } from '@/hooks/useChampions';
 import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
 import { useEndgameChainSync } from '@/hooks/useEndgameChainSync';
 import { useAllocationNotification } from '@/hooks/useAllocationNotification';
+import { useFinalizationAlertChoice } from '@/hooks/useFinalizationAlertChoice';
+import { useGestureChime } from '@/hooks/useGestureChime';
 import { invalidateLiveGameQueries } from '@/hooks/useLiveGameDataRefresh';
 import { useNow } from '@/hooks/useNow';
 import { useRotatingIndex } from '@/hooks/useRotatingIndex';
@@ -80,10 +83,6 @@ const MemoHomeObservatoryHero = memo(HomeObservatoryHero);
 const MemoGestureMessageChat = memo(GestureMessageChat);
 const MemoAttachedNFTAllocationShowcase = memo(AttachedNFTAllocationShowcase);
 const MemoDeckArtCard = memo(DeckArtCard);
-
-/** Chosen "notify me before finalization" threshold, in minutes. */
-const NOTIFY_THRESHOLD_STORAGE_KEY = 'cosmic-notify-threshold-min';
-const DEFAULT_NOTIFY_THRESHOLD_MIN = 5;
 
 /** Pending optimistic chat rows expire if the indexer never echoes them. */
 const PENDING_MESSAGE_EXPIRY_MS = 90_000;
@@ -252,48 +251,29 @@ const HomePage = ({
   });
   const ethUsdPrice = useTokenPrice();
 
-  // "Notify me before finalization" threshold, persisted per browser. Starts
-  // at the default for hydration consistency; the effect restores the choice.
-  const [notifyThresholdMin, setNotifyThresholdMin] = useState(DEFAULT_NOTIFY_THRESHOLD_MIN);
-  useEffect(() => {
-    const stored = Number(window.localStorage.getItem(NOTIFY_THRESHOLD_STORAGE_KEY));
-    if (Number.isFinite(stored) && stored > 0) setNotifyThresholdMin(stored);
-  }, []);
-
-  const { playAudio, requestNotificationPermission } = useAllocationNotification({
+  // Attention settings (chime, alert before finalization, tab-title
+  // countdown) are opt-in per browser: nothing sounds or notifies until the
+  // viewer turns it on (useAttentionPreferences).
+  useAllocationNotification({
     allocationTime: allocationFinalize.allocationTime,
+    cycleNumber: dashboardData?.CurRoundNum ?? null,
     notificationTitle: t('notifications.finalizationSoonTitle'),
-    notificationBody: t('notifications.finalizationSoonBody', {
-      minutes: String(notifyThresholdMin),
-    }),
-    thresholdMs: notifyThresholdMin * 60 * 1000,
+    notificationBody: (minutesLeft) =>
+      t('notifications.finalizationSoonBody', { minutes: String(minutesLeft) }),
   });
 
-  const handleNotifyThresholdChange = useCallback(
-    (minutes: number) => {
-      setNotifyThresholdMin(minutes);
-      window.localStorage.setItem(NOTIFY_THRESHOLD_STORAGE_KEY, String(minutes));
-      // Choosing a threshold is a clear opt-in signal — the right moment to
-      // ask the browser for notification permission.
-      requestNotificationPermission();
-    },
-    [requestNotificationPermission],
-  );
+  // The clock's alert chips switch the opt-in alert (and say why when the
+  // browser blocks notifications).
+  const { thresholdMinutes: notifyThresholdMin, onThresholdChange: handleNotifyThresholdChange } =
+    useFinalizationAlertChoice();
 
-  const prevGestureCountRef = useRef<number>(0);
-  useEffect(() => {
-    if (dashboardData && prevGestureCountRef.current > 0) {
-      if (
-        account !== dashboardData.LastBidderAddr &&
-        dashboardData.CurNumBids > prevGestureCountRef.current
-      ) {
-        playAudio();
-      }
-    }
-    if (dashboardData) {
-      prevGestureCountRef.current = dashboardData.CurNumBids;
-    }
-  }, [dashboardData, account, playAudio]);
+  // Chime only for a connected viewer who opted in, when their Gesture was
+  // just followed by someone else's.
+  useGestureChime({
+    account,
+    lastGestureAddress: dashboardData?.LastBidderAddr,
+    gestureCount: dashboardData?.CurNumBids,
+  });
 
   const {
     gestureType,
@@ -421,7 +401,6 @@ const HomePage = ({
 
   const handleGesture = useCallback(
     async (source: GestureSurface = 'panel') => {
-      requestNotificationPermission();
       const trimmedMessage = gestureForm.message.trim();
       if (uxScenario) {
         const nextScenario = simulateUxScenarioGesture({
@@ -457,7 +436,6 @@ const HomePage = ({
       onGestureWithCST,
       optimisticallyRecordGesture,
       recordPendingMessage,
-      requestNotificationPermission,
       setMessage,
       tToast,
       uxScenario,
@@ -676,6 +654,7 @@ const HomePage = ({
               phase={cycleState.phase}
               gestureCount={data?.CurNumBids ?? 0}
               lastGestureAge={lastGestureAge}
+              aside={<AttentionMenu />}
             />
           }
           clock={

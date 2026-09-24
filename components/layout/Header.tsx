@@ -21,6 +21,7 @@ import getNAVs, { type NavDescriptor } from '@/config/nav';
 import { getEcosystemDestinations } from '@/config/ecosystem';
 import { AddCstToMetaMaskButton } from '@/components/common/AddCstToMetaMaskButton';
 import ConnectWalletButton from '@/components/common/ConnectWalletButton';
+import { WrongNetworkChip } from '@/components/wallet/NetworkGuard';
 import ListNavItem from '@/components/common/ListNavItem';
 import { EcosystemDock } from '@/components/layout/EcosystemDock';
 import { BrandMark } from '@/components/layout/BrandMark';
@@ -289,6 +290,7 @@ const Header: FC = () => {
             variant={mobileView ? 'compact' : 'pill'}
             className={experimentalUi ? 'liquid-glass-control' : undefined}
           />
+          <WrongNetworkChip />
           <div className="min-w-0 max-w-48">
             <ConnectWalletButton
               isMobileView={mobileView}

@@ -1,6 +1,9 @@
 {
   "connect": {
-    "button": "ウォレットを接続"
+    "button": "ウォレットを接続",
+    "opening": "ウォレット一覧を開いています…",
+    "restoring": "ウォレットの接続を復元しています…",
+    "disclaimer": "ウォレットを接続すると、<terms>利用規約</terms>に同意し、<risk>リスク開示</risk>を確認したものとみなされます。一筆は{network}で行われ、一筆の費用とネットワーク手数料のために{network}上のETHが必要です。"
   },
   "groups": {
     "popular": "人気",
@@ -29,10 +32,57 @@
     "addCstToMetaMask": "CSTをMetaMaskに追加",
     "addingCstToMetaMask": "CSTをMetaMaskに追加しています…",
     "myAnchors": "自分の係留",
-    "winningHistory": "受領履歴"
+    "winningHistory": "受領履歴",
+    "viewOnExplorer": "{explorer}で見る",
+    "switchWallet": "ウォレットを変更",
+    "disconnect": "接続を解除"
   },
   "accessibility": {
     "copyAddress": "ウォレットアドレスをコピー",
     "addressCopied": "ウォレットアドレスをコピーしました"
+  },
+  "network": {
+    "wrong": "別のネットワーク",
+    "switchTo": "{network}に切り替え",
+    "switching": "切り替え中…",
+    "walletOn": "ウォレットは{current}にあります。Cosmic Signatureは{network}で動いています。",
+    "walletOnOther": "ウォレットは別のネットワークにあります。Cosmic Signatureは{network}で動いています。",
+    "connectedTo": "{network}に接続中"
+  },
+  "required": {
+    "hint": "接続すると、このページにウォレットのアドレスが共有されます。ウォレットでトランザクションを確認するまで、何も送信されません。",
+    "allocations": {
+      "title": "ウォレットを接続すると、自分の配分を確認できます",
+      "description": "接続すると、受け取れるETH、係留配分、添付されたNFTとトークンがここに表示されます。",
+      "publicLink": "すべての配分の受領者を見る"
+    },
+    "anchors": {
+      "title": "ウォレットを接続すると、係留を管理できます",
+      "description": "接続すると、係留中のNFT、係留できるNFT、係留配分がここに表示されます。",
+      "publicLink": "係留について見る"
+    },
+    "nfts": {
+      "title": "ウォレットを接続すると、自分のNFTを確認できます",
+      "description": "接続すると、ウォレット内のCosmic Signature NFTがここに表示され、別のアドレスに送ることもできます。",
+      "publicLink": "ギャラリーを見る"
+    },
+    "statistics": {
+      "title": "ウォレットを接続すると、自分の統計を確認できます",
+      "description": "接続すると、すべてのパフォーマンス・サイクルでの一筆、配分、係留がここに表示されます。",
+      "publicLink": "参加の統計を見る"
+    },
+    "history": {
+      "title": "ウォレットを接続すると、配分の履歴を確認できます",
+      "description": "接続すると、すべてのパフォーマンス・サイクルでのウォレットへの配分がここに表示されます。",
+      "publicLink": "すべての配分の受領者を見る"
+    },
+    "transferCst": {
+      "title": "ウォレットを接続すると、CSTを送れます",
+      "description": "接続すると、CSTの残高、送付フォーム、送付履歴へのリンクがここに表示されます。"
+    }
+  },
+  "funding": {
+    "short": "{network}上のウォレット残高は{available} ETHです。この一筆には約{required} ETHとネットワーク手数料が必要です。",
+    "howTo": "{network}でETHを用意する方法"
   }
 }

@@ -26,10 +26,22 @@ describe('MyStatistics', () => {
     expect(screen.getByTestId('user-stats')).toHaveTextContent('address=0xDEADBEEF');
   });
 
-  it('passes null when no account connected', () => {
+  it('asks to connect instead of reporting "no activity" when no wallet is connected', () => {
     mockUseActiveWeb3React.mockReturnValue({ account: undefined });
     render(<MyStatistics />);
-    expect(screen.getByTestId('user-stats')).toHaveTextContent('address=null');
+    expect(screen.queryByTestId('user-stats')).not.toBeInTheDocument();
+    expect(screen.getByText('myPages.statistics.page.ownTitle')).toBeInTheDocument();
+    expect(screen.getByText('wallet.required.statistics.title')).toBeInTheDocument();
+    expect(screen.getByTestId('connect-wallet-button')).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /wallet\.required\.statistics\.publicLink/ }),
+    ).toHaveAttribute('href', '/statistics/participation');
+  });
+
+  it('has no accessibility violations while disconnected', async () => {
+    mockUseActiveWeb3React.mockReturnValue({ account: undefined });
+    const { container } = render(<MyStatistics />);
+    await checkA11y(container);
   });
 
   it('passes isOwnProfile=true to UserStatisticsView', () => {

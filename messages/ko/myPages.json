@@ -2,7 +2,6 @@
   "shared": {
     "home": "홈",
     "user": "사용자",
-    "walletNotConnected": "지갑이 연결되지 않았습니다",
     "loading": "불러오는 중…",
     "unavailable": "확인 불가",
     "yes": "예",
@@ -18,7 +17,6 @@
     "eyebrow": "개인 · 배분",
     "title": "내 배분",
     "subtitle": "아직 회수하지 않은 배분을 한곳에서 확인하고 회수합니다",
-    "walletDescription": "지갑을 연결하면 배분을 확인하고 회수할 수 있습니다.",
     "loadErrorTitle": "불러오지 못했습니다",
     "loadErrorMessage": "미회수 배분 데이터를 불러오지 못했습니다",
     "sections": {
@@ -44,7 +42,6 @@
     "eyebrow": "개인 · 앵커링",
     "title": "내 앵커링",
     "subtitle": "앵커링된 NFT를 관리하고 Cosmic Signature NFT 앵커링 지급을 확인합니다",
-    "walletDescription": "앵커링을 관리하려면 지갑을 연결해 주세요.",
     "tabs": {
       "cosmicSignature": "Cosmic Signature 앵커링",
       "randomWalk": "Random Walk 앵커링"
@@ -276,7 +273,6 @@
       "title": "내 NFT",
       "subtitle": "연결된 지갑에 있는 Cosmic Signature NFT",
       "marketplace": "NFT 구매 또는 판매",
-      "walletDescription": "NFT를 확인하고 관리하려면 지갑을 연결해 주세요.",
       "loadErrorTitle": "토큰을 불러오지 못했습니다",
       "loadErrorMessage": "Cosmic Signature NFT를 불러오지 못했습니다.",
       "ownedTitle": "내가 보유한 Cosmic Signature NFT",
@@ -308,7 +304,6 @@
     "page": {
       "title": "CST 전송",
       "subtitle": "Cosmic Signature CST 토큰을 다른 주소로 보냅니다.",
-      "walletDescription": "지갑을 연결하면 내 잔액에서 CST를 전송할 수 있습니다.",
       "sourceLabel": "연결된 지갑",
       "description": "연결된 지갑에서 CST를 전송합니다. 트랜잭션은 지갑에서 서명되어 CST 토큰 컨트랙트로 바로 전송됩니다."
     },

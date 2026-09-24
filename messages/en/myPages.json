@@ -2,7 +2,6 @@
   "shared": {
     "home": "Home",
     "user": "User",
-    "walletNotConnected": "Wallet not connected",
     "loading": "Loading...",
     "unavailable": "Unavailable",
     "yes": "Yes",
@@ -18,7 +17,6 @@
     "eyebrow": "Personal · Allocations",
     "title": "My Allocations",
     "subtitle": "View and retrieve all your pending allocations",
-    "walletDescription": "Connect your wallet to view and retrieve your allocations.",
     "loadErrorTitle": "Unable to load allocations",
     "loadErrorMessage": "Pending allocations could not be loaded. Please try again.",
     "sections": {
@@ -44,7 +42,6 @@
     "eyebrow": "Personal · Anchors",
     "title": "My Anchors",
     "subtitle": "Manage your anchored NFTs and view Cosmic Signature NFT distributions",
-    "walletDescription": "Please connect your wallet to manage your anchors.",
     "tabs": {
       "cosmicSignature": "Cosmic Signature Anchoring",
       "randomWalk": "Random Walk Anchoring"
@@ -276,7 +273,6 @@
       "title": "My NFTs",
       "subtitle": "Cosmic Signature NFTs in your connected wallet",
       "marketplace": "Buy or sell NFTs",
-      "walletDescription": "Please connect your wallet to view and manage your NFTs.",
       "loadErrorTitle": "Failed to load tokens",
       "loadErrorMessage": "Failed to load Cosmic Signature NFTs.",
       "ownedTitle": "Cosmic Signature NFTs I Own",
@@ -308,7 +304,6 @@
     "page": {
       "title": "Transfer CST",
       "subtitle": "Send your Cosmic Signature CST tokens to another address.",
-      "walletDescription": "Connect your wallet to transfer CST from your own balance.",
       "sourceLabel": "Connected wallet",
       "description": "Transfer CST from your connected wallet. The transaction is signed by your wallet and sent directly to the CST token contract."
     },

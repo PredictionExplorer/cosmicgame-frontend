@@ -7,15 +7,15 @@ import { WagmiProvider } from 'wagmi';
 import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { CookiesProvider } from 'react-cookie';
-import { Toaster } from 'sonner';
+import { MotionConfig } from 'framer-motion';
 
 import { usePathname } from '@/i18n/navigation';
 import { wagmiConfig } from '@/config/wagmi';
 import { networkConfig, getEnvValidation } from '@/config/networks';
-import { NOTIFICATION_AUTO_HIDE_MS } from '@/config/constants';
 import ErrorBoundary from '@/components/layout/ErrorBoundary';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import { AppToaster } from '@/components/ui/app-toaster';
 import { SkipLink } from '@/components/ui/skip-link';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { AnchoredTokenProvider } from '@/contexts/AnchoredTokenContext';
@@ -28,6 +28,7 @@ import { useLiveGameDataRefresh } from '@/hooks/useLiveGameDataRefresh';
 import { reportError } from '@/utils/errors';
 import { installGlobalErrorHandlers } from '@/utils/globalErrorHandlers';
 import { getClientBuildInfo } from '@/lib/buildInfo';
+import { baseTransition } from '@/lib/motion';
 import { getApiBase, getApiOrigin, getRpcUrl } from '@/lib/serverRotation';
 
 // NOTE: RainbowKit (provider, modal, stylesheet) is intentionally NOT
@@ -194,53 +195,40 @@ export function Providers({
         <ContractAddressesProvider>
           <LiveGameDataRefresh />
           <WalletUiProvider>
-            <ErrorBoundary>
-              <CookiesProvider>
-                <AnchoredTokenProvider>
-                  <SystemModeProvider>
-                    <ApiDataProvider>
-                      <NotificationProvider>
-                        <TooltipProvider delayDuration={200} skipDelayDuration={300}>
-                          <div
-                            className={chrome ? 'site-shell flex min-h-screen flex-col' : undefined}
-                          >
-                            {!bareEmbed && <SkipLink />}
-                            {chrome && <Header />}
-                            <div className={chrome ? 'min-w-0 flex-1' : undefined}>
-                              <ErrorBoundary>{children}</ErrorBoundary>
+            {/* Framer Motion defaults for the app host: honour the OS "reduce
+                motion" setting (transforms and layout animations are skipped;
+                opacity still fades) and use the shared transition token
+                wherever a component sets none. The landing shell does the same. */}
+            <MotionConfig reducedMotion="user" transition={baseTransition}>
+              <ErrorBoundary>
+                <CookiesProvider>
+                  <AnchoredTokenProvider>
+                    <SystemModeProvider>
+                      <ApiDataProvider>
+                        <NotificationProvider>
+                          <TooltipProvider delayDuration={200} skipDelayDuration={300}>
+                            <div
+                              className={
+                                chrome ? 'site-shell flex min-h-screen flex-col' : undefined
+                              }
+                            >
+                              {!bareEmbed && <SkipLink />}
+                              {chrome && <Header />}
+                              <div className={chrome ? 'min-w-0 flex-1' : undefined}>
+                                <ErrorBoundary>{children}</ErrorBoundary>
+                              </div>
+                              {chrome && <Footer />}
                             </div>
-                            {chrome && <Footer />}
-                          </div>
-                        </TooltipProvider>
-                      </NotificationProvider>
-                    </ApiDataProvider>
-                  </SystemModeProvider>
-                </AnchoredTokenProvider>
-              </CookiesProvider>
-            </ErrorBoundary>
+                          </TooltipProvider>
+                        </NotificationProvider>
+                      </ApiDataProvider>
+                    </SystemModeProvider>
+                  </AnchoredTokenProvider>
+                </CookiesProvider>
+              </ErrorBoundary>
+            </MotionConfig>
             {HarnessPanel ? <HarnessPanel /> : null}
-            <Toaster
-              position="top-right"
-              theme="dark"
-              richColors
-              closeButton
-              toastOptions={{
-                duration: NOTIFICATION_AUTO_HIDE_MS,
-                className:
-                  'border border-white/[0.08] bg-card/95 backdrop-blur-md shadow-[var(--elevation-3)]',
-                classNames: {
-                  toast: 'group',
-                  title: 'type-body-md text-foreground',
-                  description: 'type-body-sm text-muted-foreground',
-                  actionButton: 'bg-primary text-primary-foreground',
-                  cancelButton: 'bg-muted text-muted-foreground',
-                  success: 'border-[rgb(var(--impact-green-rgb)/0.4)]',
-                  error: 'border-[rgb(var(--chrono-rose-rgb)/0.4)]',
-                  warning: 'border-[rgb(var(--solar-gold-rgb)/0.4)]',
-                  info: 'border-[rgb(var(--aurora-cyan-rgb)/0.4)]',
-                },
-              }}
-            />
+            <AppToaster />
           </WalletUiProvider>
         </ContractAddressesProvider>
       </QueryClientProvider>

@@ -1,6 +1,5 @@
 'use client';
 
-import { SendHorizontal } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -13,7 +12,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { EmptyState } from '@/components/ui/empty-state';
+import { WalletRequiredState } from '@/components/wallet/WalletRequiredState';
 import { ErrorState } from '@/components/ui/error-state';
 import { PageShell } from '@/components/ui/page-shell';
 import { Spinner } from '@/components/ui/spinner';
@@ -22,6 +21,7 @@ import { useActiveWeb3React } from '@/hooks/web3';
 
 function MyWallet() {
   const t = useTranslations('myPages');
+  const tWallet = useTranslations('wallet');
   const { account, active } = useActiveWeb3React();
   const {
     data: tokensRaw,
@@ -39,10 +39,10 @@ function MyWallet() {
       />
 
       {!active || !account ? (
-        <EmptyState
-          icon={<SendHorizontal className="h-8 w-8 text-muted-foreground/50" />}
-          title={t('shared.walletNotConnected')}
-          description={t('tokens.page.walletDescription')}
+        <WalletRequiredState
+          title={tWallet('required.nfts.title')}
+          description={tWallet('required.nfts.description')}
+          publicLink={{ href: '/gallery', label: tWallet('required.nfts.publicLink') }}
         />
       ) : loading ? (
         <div className="flex justify-center py-8">

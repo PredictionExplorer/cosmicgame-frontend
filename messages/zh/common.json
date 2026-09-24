@@ -50,6 +50,45 @@
     "nothingHere": "暂无内容",
     "unavailable": "暂不可用"
   },
+  "liveStatus": {
+    "connecting": "连接中…",
+    "live": "实时",
+    "updated": "{age}更新",
+    "reconnecting": "重新连接中…",
+    "delayed": "更新延迟 · 最后更新：{age}",
+    "delayedCaveat": "更新延迟 · 最后更新：{age}。此后倒计时可能已被延长。",
+    "offline": "离线",
+    "offlineDetail": "网络已断开。最后更新：{age}。",
+    "offlineCaveat": "网络已断开。最后更新：{age}。此后倒计时可能已被延长。",
+    "age": {
+      "justNow": "刚刚",
+      "seconds": "{count} 秒前",
+      "minutes": "{count} 分钟前",
+      "hours": "{count} 小时前",
+      "days": "{count} 天前"
+    },
+    "delayedShort": "更新延迟"
+  },
+  "attention": {
+    "menuLabel": "提醒与声音",
+    "title": "提醒与声音",
+    "intro": "以下选项默认全部关闭，开启后仅保存在此浏览器中。",
+    "sound": {
+      "label": "有人在你之后落笔时播放提示音",
+      "description": "其他参与者在你最近一次落笔之后落笔时，播放一声短提示音。需要连接钱包并保持此标签页打开。"
+    },
+    "alert": {
+      "label": "收官前提醒",
+      "description": "在周期收官时间之前发送浏览器通知。请保持此标签页打开。",
+      "minutes": "{minutes} 分钟",
+      "blocked": "此网站的通知已被屏蔽。如需使用提醒，请在浏览器设置中允许通知。",
+      "unsupported": "此浏览器不支持通知。"
+    },
+    "tabTitle": {
+      "label": "在标签页标题中显示倒计时",
+      "description": "在周期的最后一小时，于浏览器标签页中显示剩余时间。"
+    }
+  },
   "actions": {
     "copyAddress": "复制地址",
     "addressCopied": "已复制地址",
