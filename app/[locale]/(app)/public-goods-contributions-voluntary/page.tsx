@@ -37,7 +37,7 @@ export default async function Page({ params }: PageProps) {
   setRequestLocale(locale);
 
   return (
-    <PageMessages namespaces={['marketing', 'publicGoods', 'tables']}>
+    <PageMessages namespaces={['publicGoods', 'tables']}>
       <PublicDataQuerySeed route="public-goods-contributions-voluntary">
         <CharityDepositsVoluntary
           header={

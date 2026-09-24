@@ -1,3 +1,10 @@
 {
-  "loadError": "無法載入公共財紀錄。"
+  "loadError": "無法載入公共財紀錄。",
+  "vault": {
+    "description": "每個週期收官時，週期儲備中的公共財份額轉入金庫，並在此等待為 {beneficiary} 取回。",
+    "due": "本週期應轉入",
+    "dueCaption": "目前週期儲備的 {percent}",
+    "inVault": "金庫現存",
+    "retrieved": "累計已取回"
+  }
 }

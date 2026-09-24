@@ -84,24 +84,54 @@ describe('CharityCGDeposits', () => {
     expect(mockRefetch).toHaveBeenCalledTimes(1);
   });
 
-  it('puts the compact Public Goods summary above the protocol-forward table', () => {
-    mockUseDashboardInfo.mockReturnValue({
-      data: {
-        CharityPercentage: 7,
-        CosmicGameBalanceEth: 10,
-        CharityBalanceEth: 0.5,
-        SumVoluntaryDonationsEth: 0.8,
-        MainStats: { SumCosmicGameDonationsEth: 1.2, SumWithdrawals: 0.4 },
-      },
+  describe('the Public Goods Vault', () => {
+    const dashboard = {
+      CharityPercentage: 7,
+      CosmicGameBalanceEth: 10,
+      CharityBalanceEth: 0.5,
+      MainStats: { SumWithdrawals: 0.4 },
+    };
+
+    /** The figure whose label is `label`, as the text of its group. */
+    const figure = (label: string) =>
+      screen.getByText(label, { selector: 'span' }).closest('[data-figure]');
+
+    it('sits above the forwards it receives', () => {
+      mockUseDashboardInfo.mockReturnValue({ data: dashboard, isLoading: false });
+      render(<CharityCGDeposits header={HEADER} />);
+      const vault = screen.getByRole('region', { name: 'formats.address.known.publicGoods' });
+      expect(vault.compareDocumentPosition(screen.getByTestId('deposit-table'))).toBe(
+        Node.DOCUMENT_POSITION_FOLLOWING,
+      );
+      expect(vault).toHaveTextContent('retrieved for Protocol Guild');
     });
 
-    render(<CharityCGDeposits header={HEADER} />);
+    it("shows the live cycle's share, the balance and what has been retrieved", () => {
+      mockUseDashboardInfo.mockReturnValue({ data: dashboard, isLoading: false });
+      render(<CharityCGDeposits header={HEADER} />);
+      expect(figure('Due from this cycle')).toHaveTextContent('0.70');
+      expect(figure('Due from this cycle')).toHaveTextContent('7% of the Cycle Reserve so far');
+      expect(figure('In the vault now')).toHaveTextContent('0.50');
+      expect(figure('Retrieved so far')).toHaveTextContent('0.40');
+    });
 
-    const summary = screen.getByTestId('public-goods-impact-card');
-    const table = screen.getByTestId('deposit-table');
-    expect(summary).toHaveAttribute('data-variant', 'compact');
-    expect(summary.compareDocumentPosition(table)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
-    expect(summary).toHaveTextContent('0.7000 ETH');
+    it('marks a figure it could not read as unavailable, never 0', () => {
+      mockUseDashboardInfo.mockReturnValue({
+        data: { ...dashboard, CharityBalanceEth: undefined },
+        isLoading: false,
+      });
+      render(<CharityCGDeposits header={HEADER} />);
+      expect(figure('In the vault now')).not.toHaveTextContent('0');
+      expect(figure('Due from this cycle')).toHaveTextContent('0.70');
+    });
+
+    it('holds each figure with a placeholder while the dashboard loads', () => {
+      mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true });
+      const { container } = render(<CharityCGDeposits header={HEADER} />);
+      const vault = screen.getByRole('region', { name: 'formats.address.known.publicGoods' });
+      expect(vault.querySelectorAll('[data-slot="skeleton"], .animate-pulse').length).toBe(3);
+      expect(container).not.toHaveTextContent('ETH');
+    });
   });
 
   it('has no accessibility violations', async () => {
