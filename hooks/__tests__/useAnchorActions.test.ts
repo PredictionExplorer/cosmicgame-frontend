@@ -179,6 +179,14 @@ describe('useAnchorActions', () => {
       expect(mockTx.lastSuccessMessage()).toBe('toasts.anchor.released');
     });
 
+    it('says a Cosmic Signature release also retrieved its Anchor Distributions', async () => {
+      const { result } = renderHook(() => useAnchorActions());
+      await act(async () => {
+        await result.current.release(3, false);
+      });
+      expect(mockTx.lastSuccessMessage()).toBe('toasts.anchor.releasedWithDistributions');
+    });
+
     it('names the network when the anchoring contract is not available', async () => {
       mockRwlkAnchoring = null;
       const { result } = renderHook(() => useAnchorActions());

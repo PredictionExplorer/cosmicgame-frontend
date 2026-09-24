@@ -77,8 +77,10 @@ describe('WinningHistory', () => {
       screen.getByRole('heading', { name: 'wallet.required.history.title' }),
     ).toBeInTheDocument();
     expect(screen.getByText('wallet.required.history.description')).toBeInTheDocument();
-    // The connected view's intro is not repeated above the prompt.
+    // The connected view's intro is not repeated above the prompt, and no stub lede stands
+    // in for it: the prompt alone says what the page shows.
     expect(screen.queryByText(/cycle by cycle/)).not.toBeInTheDocument();
+    expect(document.querySelector('header p.type-lede')).toBeNull();
   });
 
   it('shows loading state', () => {

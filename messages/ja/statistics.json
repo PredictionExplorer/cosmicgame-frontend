@@ -625,7 +625,6 @@
   },
   "recipientHistory": {
     "pageTitle": "自分の配分履歴",
-    "subtitle": "過去の配分の受け取りと配分を見る",
     "connectedDescription": "このウォレットがサイクルごとに受け取ったすべての配分と、それぞれを受け取り済みかどうかです。",
     "loadError": "配分の履歴を読み込めませんでした",
     "loadErrorDescription": "しばらくしてからもう一度お試しください。",

@@ -17,8 +17,10 @@ jest.mock('../AnchorTokenGrid', () => ({
   },
 }));
 jest.mock('../AnchorDistributionsTable', () => ({
-  AnchorDistributionsTable: ({ address }: { address: string }) => (
-    <div data-testid="distributions">{address}</div>
+  AnchorDistributionsTable: ({ address, error }: { address: string; error?: string }) => (
+    <div data-testid="distributions" data-error={error}>
+      {address}
+    </div>
   ),
 }));
 jest.mock('../AnchorActionsTable', () => ({
@@ -85,6 +87,20 @@ describe('CSTAnchoringPanel', () => {
       expect(item.accruedEth).toBeNull();
       expect(item.detail).toBeNull();
     }
+  });
+
+  it('says a failed summary read is unavailable, never an empty history', () => {
+    renderPanel({
+      anchorDistributions: null,
+      distributionsError: true,
+      onRetryDistributions: jest.fn(),
+    });
+    const details = grids[CST_GRIDS.anchored]!.items.map((item) => item.detail);
+    expect(details).toEqual(['common.status.unavailable', 'common.status.unavailable']);
+    expect(screen.getByTestId('distributions')).toHaveAttribute(
+      'data-error',
+      'anchoring.overview.errorMessage',
+    );
   });
 
   it('offers the wallet’s NFTs to anchor by token id, with their cycle', () => {

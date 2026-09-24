@@ -625,7 +625,6 @@
   },
   "recipientHistory": {
     "pageTitle": "My Allocation History",
-    "subtitle": "View your past allocation retrievals and distributions",
     "connectedDescription": "Every allocation this wallet has received, cycle by cycle, and whether each was retrieved.",
     "loadError": "Failed to load allocation history",
     "loadErrorDescription": "Please try again in a moment.",

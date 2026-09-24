@@ -18,7 +18,7 @@ export function useParticipantTrail(address?: string | null): BreadcrumbItem[] {
     { label: t('pageHeader.crumbs.participants'), href: '/statistics/participation' },
   ];
   if (address && isAddress(address, { strict: false })) {
-    trail.push({ label: formatAddress(address), href: `/user/${address}` });
+    trail.push({ label: formatAddress(address), href: `/user/${address}`, mono: true });
   }
   return trail;
 }

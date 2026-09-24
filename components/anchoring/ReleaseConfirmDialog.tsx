@@ -132,7 +132,8 @@ export function ReleaseConfirmDialog({
           </dl>
         ) : null}
 
-        <div className="flex gap-3 rounded-control border-s-2 border-critical bg-critical-surface px-3.5 py-3">
+        {/* A tinted well with its icon: no side rule, which a rounded box draws as a curve. */}
+        <div className="flex gap-3 rounded-control bg-critical-surface px-3.5 py-3">
           <OctagonAlert aria-hidden className="mt-0.5 size-4 shrink-0 text-critical" />
           <p className="type-body-sm text-foreground">
             {/* One message, so each locale sets its own spacing after the lead sentence. */}

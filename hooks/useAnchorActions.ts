@@ -166,7 +166,11 @@ export function useAnchorActions() {
               ? await anchoringContract.write.unstakeMany?.([actionIds])
               : await anchoringContract.write.unstake?.([actionIds]),
           ),
-        successMessage: t('anchor.released', { count }),
+        // Releasing a Cosmic Signature NFT also retrieves its accumulated ETH Anchor
+        // Distributions: the toast says so. A Random Walk NFT has none to retrieve.
+        successMessage: isRwalk
+          ? t('anchor.released', { count })
+          : t('anchor.releasedWithDistributions', { count }),
         failureMessage: t('anchor.failed'),
         errorContext: 'anchor-release',
         onConfirmed: () => deferUntilIndexed(invalidateAnchoringQueries),

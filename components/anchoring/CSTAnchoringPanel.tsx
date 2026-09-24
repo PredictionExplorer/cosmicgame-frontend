@@ -29,6 +29,12 @@ export interface CSTAnchoringPanelProps {
    * so an anchored NFT without a row has accrued 0 ETH.
    */
   anchorDistributions: readonly RewardsByToken[] | null;
+  /**
+   * The summary could not be read: its ledger shows an error with a retry, and each anchored
+   * NFT says its accrued ETH is unavailable, instead of reading as an empty history.
+   */
+  distributionsError?: boolean;
+  onRetryDistributions?: () => void;
   actions: AnchorAction[];
   /** Anchors token ids; resolves with the transaction's outcome. */
   onAnchor: (tokenIds: number[]) => Promise<TxResult>;
@@ -50,6 +56,8 @@ export function CSTAnchoringPanel({
   anchoredTokens,
   availableTokens,
   anchorDistributions,
+  distributionsError = false,
+  onRetryDistributions,
   actions,
   onAnchor,
   onRelease,
@@ -58,6 +66,7 @@ export function CSTAnchoringPanel({
   loading = false,
 }: CSTAnchoringPanelProps) {
   const t = useTranslations('anchoring');
+  const tCommon = useTranslations('common');
   const format = useFormat();
 
   const accruedByToken = useMemo(
@@ -90,14 +99,16 @@ export function CSTAnchoringPanel({
               meta: [<AnchoredOn key="anchored" timestamp={row.StakeTimeStamp} />],
               detail:
                 accruedEth === null
-                  ? null
+                  ? distributionsError
+                    ? tCommon('status.unavailable')
+                    : null
                   : t('picker.accrued', {
                       amount: format.amount(accruedEth, { unit: 'ETH', context: 'card' }),
                     }),
             },
           ];
         }),
-    [accruedByToken, anchoredTokens, format, t],
+    [accruedByToken, anchoredTokens, distributionsError, format, t, tCommon],
   );
 
   const availableItems = useMemo<AnchorGridItem[]>(
@@ -161,6 +172,9 @@ export function CSTAnchoringPanel({
           list={[...(anchorDistributions ?? [])]}
           address={account}
           loading={loading}
+          error={distributionsError ? t('overview.errorMessage') : undefined}
+          errorTitle={t('overview.errorTitle')}
+          onRetry={onRetryDistributions}
         />
       </section>
 

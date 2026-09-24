@@ -625,7 +625,6 @@
   },
   "recipientHistory": {
     "pageTitle": "Lịch sử phân bổ của tôi",
-    "subtitle": "Xem các lần nhận về phân bổ và phân phối trước đây của bạn",
     "connectedDescription": "Mọi phân bổ mà ví này đã nhận qua từng chu kỳ, cùng trạng thái nhận về của từng khoản.",
     "loadError": "Không tải được lịch sử phân bổ",
     "loadErrorDescription": "Vui lòng thử lại sau ít phút.",

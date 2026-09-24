@@ -625,7 +625,6 @@
   },
   "recipientHistory": {
     "pageTitle": "我的分配歷史",
-    "subtitle": "查看過去取回的分配與發放記錄",
     "connectedDescription": "此錢包在各週期收到的每一筆分配，以及是否已取回。",
     "loadError": "未能載入分配歷史",
     "loadErrorDescription": "請稍後再試。",

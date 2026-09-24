@@ -625,7 +625,6 @@
   },
   "recipientHistory": {
     "pageTitle": "내 배분 내역",
-    "subtitle": "지난 배분 회수 및 수령 내역 보기",
     "connectedDescription": "이 지갑이 사이클마다 받은 모든 배분과 각 배분의 회수 여부입니다.",
     "loadError": "배분 내역을 불러오지 못했습니다",
     "loadErrorDescription": "잠시 후 다시 시도해 주세요.",

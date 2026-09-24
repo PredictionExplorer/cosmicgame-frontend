@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { distributionPerAnchoredNft } from '@/utils/anchoringStats';
@@ -18,22 +18,35 @@ import {
   useRWLKAnchorImprintsByUser,
 } from '@/hooks/useApiQuery';
 import { useAnchoredToken } from '@/contexts/AnchoredTokenContext';
-import { PageHeader, type PageHeaderFigure } from '@/components/layout/PageHeader';
+import {
+  PageHeader,
+  PageHeaderFigures,
+  type PageHeaderFigure,
+} from '@/components/layout/PageHeader';
 import { Amount } from '@/components/ui/amount';
 import { PageShell } from '@/components/ui/page-shell';
+import { SectionHeader } from '@/components/ui/section-header';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { WalletRequiredState } from '@/components/wallet/WalletRequiredState';
 import { CSTAnchoringPanel, CST_GRIDS } from '@/components/anchoring/CSTAnchoringPanel';
 import { RWLKAnchoringPanel, RWLK_GRIDS } from '@/components/anchoring/RWLKAnchoringPanel';
 
+interface MyAnchorsProps {
+  /** "How anchoring works", rendered on the server: shown to a visitor who is not connected. */
+  steps?: ReactNode;
+}
+
 /**
  * The connected wallet's anchoring desk: its anchored and anchorable NFTs of
  * both collections, chosen by their artwork, with the figures that matter to
- * an anchor-holder in the header.
+ * an anchor-holder in the header. Not connected, the page still says what
+ * anchoring is and what an anchored NFT would receive right now, under the
+ * one way to connect.
  */
-const MyAnchors = () => {
+const MyAnchors = ({ steps }: MyAnchorsProps) => {
   const t = useTranslations('myPages');
+  const tAnchoring = useTranslations('anchoring');
   const tWallet = useTranslations('wallet');
   const { account } = useActiveWeb3React();
   const { anchor, release, handleError, rwalkContract, txStage } = useAnchorActions();
@@ -166,11 +179,51 @@ const MyAnchors = () => {
       />
 
       {!account ? (
-        <WalletRequiredState
-          title={tWallet('required.anchors.title')}
-          description={tWallet('required.anchors.description')}
-          publicLink={{ href: '/anchoring', label: tWallet('required.anchors.publicLink') }}
-        />
+        <>
+          <WalletRequiredState
+            title={tWallet('required.anchors.title')}
+            description={tWallet('required.anchors.description')}
+            publicLink={{ href: '/anchoring', label: tWallet('required.anchors.publicLink') }}
+          />
+          <section
+            aria-labelledby="my-anchors-how"
+            className="mt-[var(--block-gap)] grid gap-x-12 gap-y-8 border-t border-rule-faint pt-[var(--block-gap)] lg:grid-cols-12"
+          >
+            <div className="lg:col-span-5">
+              <SectionHeader
+                headingId="my-anchors-how"
+                title={tAnchoring('overview.howItWorks.title')}
+                description={tAnchoring('overview.howItWorks.description')}
+              />
+              <PageHeaderFigures
+                className="mt-0 sm:mt-2"
+                figures={[
+                  {
+                    id: 'pool',
+                    label: tAnchoring('flow.cosmicSignature.pool.label'),
+                    info: tAnchoring('flow.cosmicSignature.pool.definition'),
+                    value: dashboard.isLoading ? (
+                      pending
+                    ) : typeof dashboard.data?.StakingAmountEth === 'number' ? (
+                      <Amount value={dashboard.data.StakingAmountEth} unit="ETH" context="card" />
+                    ) : null,
+                  },
+                  {
+                    id: 'perNft',
+                    label: tAnchoring('flow.cosmicSignature.perNft.label'),
+                    info: tAnchoring('flow.cosmicSignature.perNft.definition'),
+                    value: dashboard.isLoading ? (
+                      pending
+                    ) : perNft.status === 'available' ? (
+                      <Amount value={perNft.perNftEth} unit="ETH" context="card" />
+                    ) : null,
+                  },
+                ]}
+              />
+            </div>
+            <div className="lg:col-span-7">{steps}</div>
+          </section>
+        </>
       ) : (
         <Tabs defaultValue="cosmicSignature">
           <TabsList aria-label={t('anchors.tabs.label')} className="max-sm:flex max-sm:w-full">
@@ -190,6 +243,8 @@ const MyAnchors = () => {
               anchoredTokens={anchoredCst}
               availableTokens={availableCst}
               anchorDistributions={distributions.data ?? null}
+              distributionsError={distributions.isError}
+              onRetryDistributions={() => void distributions.refetch()}
               actions={cstActions.data ?? []}
               onAnchor={runFor(CST_GRIDS.available, (ids) => anchor(ids, false))}
               onRelease={runFor(CST_GRIDS.anchored, (ids) => release(ids, false))}
