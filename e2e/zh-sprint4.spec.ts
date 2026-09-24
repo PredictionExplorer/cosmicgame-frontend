@@ -156,7 +156,7 @@ test.describe('zh Sprint 4 — transactions and holdings routes', () => {
     await openZhRoute(
       page,
       `/zh/cosmic-signature-transfer/${SPRINT4_MOCK_ADDRESS}`,
-      'Cosmic Signature NFT 转移记录 · Cosmic Signature',
+      'NFT 转移记录 · Cosmic Signature',
     );
     await expect(
       page.getByRole('heading', { level: 1, name: 'Cosmic Signature NFT 转移记录' }),
@@ -168,7 +168,7 @@ test.describe('zh Sprint 4 — transactions and holdings routes', () => {
     await openZhRoute(
       page,
       `/zh/cosmic-token-transfer/${SPRINT4_MOCK_ADDRESS}`,
-      'Cosmic Signature CST 转账记录 · Cosmic Signature',
+      'CST 转账记录 · Cosmic Signature',
     );
     await expect(
       page.getByRole('heading', { level: 1, name: 'Cosmic Signature CST 转账记录' }),

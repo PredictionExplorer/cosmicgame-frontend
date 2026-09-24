@@ -37,6 +37,8 @@
     "lexicon:scan": "tsx scripts/lexicon-scan.ts",
     "white-paper:pdf": "tsx scripts/generate-white-paper-pdf.ts",
     "og:fonts": "tsx scripts/build-og-fonts.ts",
+    "seo:share-check": "tsx scripts/share-metadata-check.ts",
+    "brand:icons": "tsx scripts/build-brand-icons.ts",
     "prepare": "husky"
   },
   "dependencies": {
@@ -93,6 +95,7 @@
     "react-snap-carousel": "^0.5.1",
     "react-transition-group": "^4.4.2",
     "recharts": "^3.8.0",
+    "sharp": "^0.35.4",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.5.0",
     "tailwindcss": "^4.2.1",

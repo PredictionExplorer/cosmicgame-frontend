@@ -1,5 +1,6 @@
 import zhMeta from '@/messages/zh/meta.json';
 import { expectedLanguageAlternates } from '@/test-utils/i18n';
+import { documentTitleOf, resolvingMetadata } from '@/test-utils/metadata';
 
 import { APP_ORIGIN } from '@/lib/hostRouting';
 
@@ -94,7 +95,7 @@ describe('Sprint 7 route metadata', () => {
   it.each(localizedRoutes)(
     '$path emits zh canonical, hreflang, and OG locale',
     async ({ path, build }) => {
-      const metadata = await build({ params: zhParams() });
+      const metadata = await build({ params: zhParams() }, resolvingMetadata());
       expect(metadata.alternates).toEqual({
         canonical: `${APP_ORIGIN}/zh${path}`,
         languages: expectedLanguageAlternates(APP_ORIGIN, path),
@@ -117,7 +118,7 @@ describe('Sprint 7 route metadata', () => {
     );
 
     for (const { build } of noindexRoutes) {
-      const metadata = await build({ params: zhParams() });
+      const metadata = await build({ params: zhParams() }, resolvingMetadata());
       expect(metadata.robots).toEqual(expect.objectContaining({ index: false }));
     }
   });
@@ -153,12 +154,12 @@ describe('Sprint 7 route metadata', () => {
       params: Promise.resolve({ locale: 'zh', id: '42' }),
     });
 
-    expect(en.title).toBe('Cycle #42 Allocation Information | Cosmic Signature');
+    expect(documentTitleOf(en)).toBe('Cycle #42 Allocation Information · Cosmic Signature');
     expect(en.description).toContain('cycle #42');
     expect(en.alternates?.canonical).toBe(`${APP_ORIGIN}/allocation/42`);
     expect(en.robots).toEqual(expect.objectContaining({ index: true }));
 
-    expect(zh.title).toBe('第 42 个周期分配详情 · Cosmic Signature');
+    expect(documentTitleOf(zh)).toBe('第 42 个周期分配详情 · Cosmic Signature');
     expect(zh.description).toContain('第 42 个');
     expect(zh.alternates).toEqual({
       canonical: `${APP_ORIGIN}/zh/allocation/42`,

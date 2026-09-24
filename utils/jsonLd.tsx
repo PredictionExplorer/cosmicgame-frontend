@@ -1,5 +1,7 @@
 import { getLocaleConfig } from '@/i18n/localeConfig';
 import { APP_ORIGIN, LANDING_ORIGIN } from '@/lib/hostRouting';
+import { BRAND_ICON_PATHS } from '@/lib/og/brandIcons';
+import { SITE_NAME } from '@/utils/seo';
 
 interface FAQItem {
   question: string;
@@ -13,8 +15,17 @@ export function jsonLdInLanguage(locale: string): string {
 
 const SITE_URL = LANDING_ORIGIN;
 const APP_URL = APP_ORIGIN;
-const SITE_NAME = 'Cosmic Signature';
-const SITE_LOGO_URL = `${SITE_URL}/images/logo.svg`;
+/** The orbit mark on the Midnight plate: square, opaque, 512px (`npm run brand:icons`). */
+const SITE_LOGO_URL = `${SITE_URL}${BRAND_ICON_PATHS.logo512}`;
+/**
+ * A real Signature standing for the protocol's art: #23, bundled with the
+ * landing page (provenance in public/images/landing/README.md).
+ */
+export const ART_SPECIMEN = {
+  url: `${SITE_URL}/images/landing/signature-23.webp`,
+  width: 960,
+  height: 621,
+} as const;
 
 const PROTOCOL_DESCRIPTION =
   'Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Every gesture shapes the cycle\u2019s final Signature, and the protocol distributes its reserves across more than ten allocation tracks \u2014 including Protocol Guild.';
@@ -187,7 +198,13 @@ export function artProtocolJsonLd(options: ArtProtocolJsonLdOptions = {}) {
     '@id': `${SITE_URL}/#art-protocol`,
     name: SITE_NAME,
     url: options.url ?? `${SITE_URL}/`,
-    image: SITE_LOGO_URL,
+    image: {
+      '@type': 'ImageObject',
+      contentUrl: ART_SPECIMEN.url,
+      url: ART_SPECIMEN.url,
+      width: ART_SPECIMEN.width,
+      height: ART_SPECIMEN.height,
+    },
     license: 'https://creativecommons.org/publicdomain/zero/1.0/',
     creditText: options.creditText ?? 'Cosmic Signature Protocol',
     description: options.description ?? PROTOCOL_DESCRIPTION,

@@ -18,7 +18,6 @@ export const landingTextKo = {
       '공공재',
       'Protocol Guild',
       'CC0',
-      '정형 검증',
     ],
   },
 

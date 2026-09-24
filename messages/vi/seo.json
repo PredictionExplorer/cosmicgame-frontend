@@ -358,70 +358,87 @@
     }
   },
   "og": {
+    "shared": {
+      "cycle": "Chu kỳ {cycle}",
+      "plateCaption": "{name} · {cycle}"
+    },
     "default": {
       "alt": "Cosmic Signature — Mỗi nét bút đều định hình Signature.",
-      "eyebrow": "Cosmic Signature",
       "title": "Mỗi nét bút đều định hình Signature.",
       "subhead": "Giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum.",
-      "chips": ["CC0", "Đã xác minh trên chuỗi", "7% Protocol Guild"]
+      "fact": "CC0 · Mã nguồn mở · 7% cho Protocol Guild"
     },
     "gallery": {
       "alt": "Cosmic Signature — Phòng trưng bày",
       "eyebrow": "Phòng trưng bày",
       "title": "Nghệ thuật ba vật thể từ seed trên chuỗi.",
       "subhead": "Mỗi Signature là một mô phỏng ba vật thể tất định, được kết xuất quang phổ. Cùng seed, cùng điểm ảnh.",
-      "chips": ["CC0", "Tất định", "Nghệ thuật tái tạo được"]
+      "fact": "CC0 · Tất định · Tái tạo được"
     },
     "currentCycle": {
       "alt": "Cosmic Signature — Chu kỳ trình diễn, trực tiếp.",
       "eyebrow": "Chu kỳ hiện tại",
       "title": "Chu kỳ trình diễn, trực tiếp.",
       "subhead": "Lịch sử nét bút, bảng xếp hạng, đóng góp đính kèm và phân phối phân bổ — theo thời gian thực.",
-      "chips": ["Trực tiếp", "Arbitrum One", "Trên chuỗi"]
+      "fact": "Trực tiếp trên Arbitrum One"
     },
     "anchoring": {
       "alt": "Cosmic Signature — Neo giữ",
       "eyebrow": "Neo giữ",
-      "title": "Neo giữ một Signature. Nhận một phần mỗi chu kỳ.",
-      "subhead": "Cosmic Signature NFT đang neo giữ nhận phần phân phối neo giữ theo tỷ lệ mỗi chu kỳ. Gỡ neo bất cứ lúc nào.",
-      "chips": ["Không khóa", "ETH mỗi chu kỳ", "Tinh tuyển"]
+      "title": "Neo giữ một Signature qua mọi chu kỳ.",
+      "subhead": "Cosmic Signature NFT đang neo giữ tham gia phân phối neo giữ của mỗi chu kỳ theo tỷ lệ. Gỡ neo bất cứ lúc nào.",
+      "fact": "CC0 · Gỡ neo bất cứ lúc nào · Phân phối neo giữ"
     },
     "faq": {
       "alt": "Cosmic Signature — Câu hỏi thường gặp",
       "eyebrow": "Câu hỏi thường gặp",
       "title": "Những câu hỏi đáng được trả lời thẳng thắn.",
       "subhead": "Chu kỳ trình diễn, nét bút, phân bổ, neo giữ, điều phối giao thức.",
-      "chips": ["CC0", "Đã xác minh trên chuỗi", "7% Protocol Guild"]
+      "fact": "CC0 · Mã nguồn mở · 7% cho Protocol Guild"
     },
     "howItWorks": {
       "alt": "Cosmic Signature — Cách hoạt động",
       "eyebrow": "Cách hoạt động",
       "title": "Từ hiệu chỉnh đến phân bổ, qua bốn giai đoạn.",
       "subhead": "Mở chu kỳ. Đặt nét bút. Hoàn tất. Giao thức phân phối dự trữ.",
-      "chips": ["Hiệu chỉnh", "Nét bút", "Phân bổ"]
+      "fact": "Hiệu chỉnh · Nét bút · Phân bổ"
     },
     "gesture": {
       "alt": "Cosmic Signature — Nét bút",
+      "altWithValue": "Cosmic Signature — Nét bút #{position} trong chu kỳ {cycle}",
       "eyebrow": "Nét bút",
-      "eyebrowWithValue": "Vị trí nét bút #{value}",
       "title": "Một dấu khắc trên Signature.",
+      "titleWithValue": "Nét bút #{position} · Chu kỳ {cycle}",
       "subhead": "Mỗi nét bút kéo dài chu kỳ, định hình Signature và có thể khắc CST tham gia.",
-      "chips": ["CC0", "Đã xác minh trên chuỗi", "7% Protocol Guild"]
+      "methods": {
+        "eth": "Nét bút ETH",
+        "ethRandomWalk": "Nét bút ETH + RandomWalk",
+        "cst": "Nét bút CST"
+      }
     },
     "allocation": {
       "alt": "Cosmic Signature — Cơ cấu phân bổ",
+      "altWithValue": "Cosmic Signature — Phân bổ của chu kỳ {cycle}",
       "eyebrow": "Phân bổ",
-      "eyebrowWithValue": "Chu kỳ #{value}",
       "title": "Cơ cấu phân bổ",
-      "subhead": "Dự trữ chu kỳ đã được phân phối qua hơn mười luồng phân bổ như thế nào.",
-      "chips": ["Signature", "Chiến binh Thời gian", "Neo giữ"]
+      "titleWithValue": "Phân bổ chu kỳ {cycle}",
+      "subhead": "Dự trữ chu kỳ đã được phân phối qua hơn mười luồng phân bổ như thế nào."
     },
     "participant": {
       "alt": "Cosmic Signature — Người tham gia",
+      "altWithValue": "Cosmic Signature — Người tham gia {address}",
       "eyebrow": "Người tham gia",
       "title": "Người tham gia",
-      "subhead": "Nét bút, phân bổ, neo giữ và đóng góp qua mọi chu kỳ trình diễn.",
-      "chips": ["Nét bút", "Phân bổ", "Neo giữ"]
+      "subhead": "Nét bút, phân bổ, neo giữ và đóng góp qua mọi chu kỳ trình diễn."
+    },
+    "token": {
+      "alt": "{subject}, tác phẩm ba vật thể tất định",
+      "altWithTraits": "{subject}: cấu trúc {structure}, bảng màu {palette}",
+      "altSubject": "Cosmic Signature #{id}",
+      "altSubjectNamed": "“{name}”, Cosmic Signature #{id}",
+      "altInCycle": "{subject} thuộc chu kỳ {cycle}",
+      "title": "Signature {number}",
+      "subhead": "Mô phỏng ba vật thể tất định: seed lưu trên chuỗi, kết xuất bằng trình kết xuất mã nguồn mở."
     }
   }
 }

@@ -1,7 +1,7 @@
-import type { Metadata } from 'next';
+import type { Metadata, ResolvingMetadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { createMetadata } from '@/utils/seo';
+import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
 import AnchorActionDetailPage from './AnchorActionDetailPage';
@@ -10,10 +10,14 @@ interface PageProps {
   params: Promise<{ locale: string; IsRwalk: string; actionId: string }>;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: PageProps,
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
   const { locale, IsRwalk, actionId } = await params;
   const t = await getTranslations({ locale, namespace: 'meta' });
-  return createMetadata(
+  return createPageMetadata(
+    parent,
     t('anchorAction.title'),
     t('anchorAction.description'),
     undefined,

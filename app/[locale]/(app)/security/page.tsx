@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, ResolvingMetadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { getSecurityCopy } from '@/content/legal';
@@ -7,18 +7,26 @@ import { TrustPageContent } from '@/content/legal/TrustPageContent';
 import { PageShell } from '@/components/ui/page-shell';
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage, webPageJsonLd } from '@/utils/jsonLd';
-import { createMetadata } from '@/utils/seo';
+import { createPageMetadata } from '@/utils/seo';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: PageProps,
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'meta' });
-  return createMetadata(t('security.title'), t('security.description'), undefined, '/security', {
-    locale,
-  });
+  return createPageMetadata(
+    parent,
+    t('security.title'),
+    t('security.description'),
+    undefined,
+    '/security',
+    { locale },
+  );
 }
 
 export default async function SecurityPage({ params }: PageProps) {

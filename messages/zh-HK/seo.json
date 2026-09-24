@@ -358,70 +358,87 @@
     }
   },
   "og": {
+    "shared": {
+      "cycle": "第 {cycle} 個週期",
+      "plateCaption": "{name} · {cycle}"
+    },
     "default": {
       "alt": "Cosmic Signature · 每一筆，都在塑造簽名",
-      "eyebrow": "Cosmic Signature",
       "title": "每一筆，都在塑造簽名。",
       "subhead": "運行於 Arbitrum 的程序化鏈上藝術協議。",
-      "chips": ["CC0", "鏈上已驗證", "7% Protocol Guild"]
+      "fact": "CC0 · 開源 · 7% 轉撥至 Protocol Guild"
     },
     "gallery": {
       "alt": "Cosmic Signature · 畫廊",
       "eyebrow": "畫廊",
-      "title": "三體軌跡，鏈上呈現。",
-      "subhead": "每件簽名作品都源自確定性的三體模擬與光譜渲染；種子相同，像素完全一致。",
-      "chips": ["CC0", "確定性", "可復現藝術"]
+      "title": "三體軌跡，以鏈上種子生成。",
+      "subhead": "每件簽名作品都是一次確定性三體模擬，由鏈上種子經光譜渲染而成；種子相同，像素完全一致。",
+      "fact": "CC0 · 確定性 · 可復現"
     },
     "currentCycle": {
       "alt": "Cosmic Signature · 即時演繹週期",
       "eyebrow": "目前週期",
       "title": "演繹週期，正在進行。",
       "subhead": "落筆歷史、排行榜、已附加貢獻與分配軌道，即時呈現。",
-      "chips": ["即時", "Arbitrum One", "鏈上"]
+      "fact": "即時運行於 Arbitrum One"
     },
     "anchoring": {
       "alt": "Cosmic Signature · 錨定",
       "eyebrow": "錨定",
-      "title": "錨定一枚簽名，逐週期獲得派發。",
-      "subhead": "已錨定的 Cosmic Signature NFT 按比例分享每週期錨定派發，並可隨時解錨。",
-      "chips": ["無鎖定期", "逐週期 ETH", "星選"]
+      "title": "錨定一枚簽名，參與每個週期。",
+      "subhead": "已錨定的 Cosmic Signature NFT 按比例參與每個週期的錨定派發，可隨時解錨。",
+      "fact": "CC0 · 隨時解錨 · 錨定派發"
     },
     "faq": {
       "alt": "Cosmic Signature · 常見問題",
       "eyebrow": "常見問題",
       "title": "值得直截了當回答的問題。",
       "subhead": "演繹週期、落筆、分配、錨定與協議協調。",
-      "chips": ["CC0", "鏈上已驗證", "7% Protocol Guild"]
+      "fact": "CC0 · 開源 · 7% 轉撥至 Protocol Guild"
     },
     "howItWorks": {
       "alt": "Cosmic Signature · 運作原理",
       "eyebrow": "運作原理",
       "title": "從校準到分配，共分四步。",
       "subhead": "開啟週期，落下一筆，完成收官，由協議發放週期儲備。",
-      "chips": ["校準", "落筆", "分配"]
+      "fact": "校準 · 落筆 · 分配"
     },
     "gesture": {
       "alt": "Cosmic Signature · 落筆",
+      "altWithValue": "Cosmic Signature · 第 {cycle} 個週期的落筆 #{position}",
       "eyebrow": "落筆",
-      "eyebrowWithValue": "落筆序號 #{value}",
       "title": "一筆，銘入簽名。",
-      "subhead": "每一筆都會延長收官倒數、繼續塑造簽名，並可能銘刻參與 CST。",
-      "chips": ["CC0", "鏈上已驗證", "7% Protocol Guild"]
+      "titleWithValue": "落筆 #{position} · 第 {cycle} 個週期",
+      "subhead": "每一筆都會延長週期、塑造簽名，並可能銘刻參與 CST。",
+      "methods": {
+        "eth": "ETH 落筆",
+        "ethRandomWalk": "ETH + Random Walk 落筆",
+        "cst": "CST 落筆"
+      }
     },
     "allocation": {
       "alt": "Cosmic Signature · 分配明細",
+      "altWithValue": "Cosmic Signature · 第 {cycle} 個週期的分配",
       "eyebrow": "分配",
-      "eyebrowWithValue": "週期 #{value}",
       "title": "分配明細",
-      "subhead": "查看週期儲備如何沿十餘條分配軌道發放。",
-      "chips": ["簽名分配", "時之勇士", "錨定"]
+      "titleWithValue": "第 {cycle} 個週期的分配",
+      "subhead": "查看週期儲備如何沿十餘條分配軌道發放。"
     },
     "participant": {
       "alt": "Cosmic Signature · 參與者",
+      "altWithValue": "Cosmic Signature · 參與者 {address}",
       "eyebrow": "參與者",
       "title": "參與者",
-      "subhead": "彙集各演繹週期中的落筆、分配、錨定與貢獻記錄。",
-      "chips": ["落筆", "分配", "錨定"]
+      "subhead": "彙集各演繹週期中的落筆、分配、錨定與貢獻記錄。"
+    },
+    "token": {
+      "alt": "{subject}，一件確定性三體藝術作品",
+      "altWithTraits": "{subject}：結構為{structure}，調色為{palette}",
+      "altSubject": "Cosmic Signature #{id}",
+      "altSubjectNamed": "Cosmic Signature #{id}《{name}》",
+      "altInCycle": "第 {cycle} 個週期的 {subject}",
+      "title": "簽名 {number}",
+      "subhead": "確定性三體模擬：種子源自鏈上，由開源渲染器渲染。"
     }
   }
 }

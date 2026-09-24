@@ -59,7 +59,6 @@ describe('Root layout metadata (shared by both route groups)', () => {
   it('shares copy defaults while keeping host-specific origins', () => {
     expect(landingMetadata.title).toEqual(metadata.title);
     expect(landingMetadata.description).toBe(metadata.description);
-    expect(landingMetadata.keywords).toEqual(metadata.keywords);
     expect(landingViewport).toBe(viewport);
     expect(metadata.metadataBase).toEqual(new URL('https://app.cosmicsignature.com'));
     expect(landingMetadata.metadataBase).toEqual(new URL('https://cosmicsignature.com'));
@@ -143,25 +142,39 @@ describe('Root layout metadata (shared by both route groups)', () => {
     expect((metadata.description as string).length).toBeLessThanOrEqual(320);
   });
 
-  it('exposes a robust keywords array', () => {
-    expect(Array.isArray(metadata.keywords)).toBe(true);
-    const keywords = metadata.keywords as readonly string[];
-    expect(keywords).toEqual(
-      expect.arrayContaining(['Cosmic Signature', 'Arbitrum', 'Protocol Guild', 'CC0']),
-    );
+  // One English keyword list served on every locale helped no search engine
+  // and carried a blanket "formally verified" claim; the landing home sets
+  // its own localized list.
+  it('sets no site-wide keywords', async () => {
+    expect(metadata.keywords).toBeUndefined();
+    expect(landingMetadata.keywords).toBeUndefined();
+    expect((await generateMetadata(paramsFor('ja'))).keywords).toBeUndefined();
   });
 
-  it('declares the same cache-busted SVG and ICO favicons for both hosts', () => {
+  it('declares the same cache-busted favicons and touch icon for both hosts', () => {
     const icons = metadata.icons as {
       icon: Array<{ url: string; type?: string; sizes?: string }>;
+      apple: Array<{ url: string; type?: string; sizes?: string }>;
     };
     const landingIcons = landingMetadata.icons as typeof icons;
 
     expect(landingIcons).toEqual(icons);
+    // The ICO names its sizes (not `any`) so SVG-capable browsers pick the SVG.
     expect(icons.icon).toEqual([
-      { url: '/favicon.svg?v=20260825', type: 'image/svg+xml' },
-      { url: '/favicon.ico?v=20260825', sizes: 'any' },
+      { url: '/favicon.ico?v=20260923', sizes: '16x16 32x32 48x48' },
+      { url: '/favicon.svg?v=20260923', type: 'image/svg+xml' },
     ]);
+    expect(icons.apple).toEqual([
+      { url: '/apple-touch-icon.png?v=20260923', sizes: '180x180', type: 'image/png' },
+    ]);
+  });
+
+  // F312: installing from the marketing host turned the landing into a
+  // chromeless "app"; only the dApp links a (localized) manifest.
+  it('links the localized web manifest on the app host only', async () => {
+    expect(metadata.manifest).toBe('/en/manifest.webmanifest');
+    expect((await generateMetadata(paramsFor('ja'))).manifest).toBe('/ja/manifest.webmanifest');
+    expect(landingMetadata.manifest).toBeUndefined();
   });
 
   it('declares the Google Search Console verification token', () => {

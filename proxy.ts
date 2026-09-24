@@ -18,9 +18,11 @@ export const config = {
   matcher: [
     /*
      * Run on all paths except Next assets and public files. The negative
-     * lookahead exclusions here are the standard Vercel recipe.
+     * lookahead exclusions here are the standard Vercel recipe. The web
+     * manifest is localized (`/[locale]/manifest.webmanifest`), so the legacy
+     * `/manifest.webmanifest` goes through next-intl to the English one.
      */
-    '/((?!_next/static|_next/image|_next/data|favicon.ico|paint-worklet.js|robots.txt|sitemap.xml|sitemap-nfts.xml|llms(?:-full)?\\.txt|manifest.webmanifest|fonts|audio|images|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|avif|woff|woff2|ttf|eot|map|pdf)$).*)',
+    '/((?!_next/static|_next/image|_next/data|favicon.ico|paint-worklet.js|robots.txt|sitemap.xml|sitemap-nfts.xml|llms(?:-full)?\\.txt|fonts|audio|images|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|avif|woff|woff2|ttf|eot|map|pdf)$).*)',
   ],
 };
 
@@ -85,8 +87,12 @@ export default function middleware(req: NextRequest) {
   // including `/en/` under the public `as-needed` locale policy. Sending these
   // through next-intl would redirect English images to an unprefixed path, and
   // the hidden landing-site image would be canonicalized to `/`. Serve the
-  // generated endpoint at the exact URL emitted in og:image instead.
-  if (locale !== undefined && /\/opengraph-image(?:[-/]|$)/.test(publicPath)) {
+  // generated endpoint at the exact URL emitted in og:image instead. The app
+  // layout links its locale's web manifest the same way.
+  if (
+    locale !== undefined &&
+    (/\/opengraph-image(?:[-/]|$)/.test(publicPath) || publicPath === '/manifest.webmanifest')
+  ) {
     return NextResponse.next();
   }
 

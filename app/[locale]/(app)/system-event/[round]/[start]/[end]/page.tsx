@@ -1,19 +1,19 @@
-import type { Metadata } from 'next';
+import type { Metadata, ResolvingMetadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { createMetadata } from '@/utils/seo';
+import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
 import SystemEventPage from './SystemEventPage';
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string; round: string; start: string; end: string }>;
-}): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: { params: Promise<{ locale: string; round: string; start: string; end: string }> },
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
   const { locale, round, start, end } = await params;
   const t = await getTranslations({ locale, namespace: 'meta' });
-  return createMetadata(
+  return createPageMetadata(
+    parent,
     t('systemEvent.title'),
     t('systemEvent.description'),
     undefined,

@@ -18,7 +18,6 @@ export const landingTextZhHk = {
       '公共物品',
       'Protocol Guild',
       'CC0',
-      '經形式化驗證',
     ],
   },
 

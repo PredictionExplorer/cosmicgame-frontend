@@ -1,569 +1,404 @@
 import { isValidElement, type ReactElement, type ReactNode } from 'react';
 
-import { COSMIC_OG_SIZE, CosmicOgCard, type CosmicOgCardProps } from '@/lib/og/CosmicOgCard';
+import { getLocaleConfig } from '@/i18n/localeConfig';
+import { loadGesture, loadLatestArtworks, loadTokenArtwork, type OgArtwork } from '@/lib/og/art';
+import {
+  COSMIC_OG_SIZE,
+  CosmicOgCard,
+  planCosmicOgCard,
+  type CosmicOgCardProps,
+} from '@/lib/og/CosmicOgCard';
+import { getOgFontConfig, getOgTypography } from '@/lib/og/fonts';
+import { createOgMeasure, type OgMeasure } from '@/lib/og/measure';
+import { OG_COLORS } from '@/lib/og/palette';
 
 /**
- * `next/og`'s ImageResponse runs only on the edge runtime; we cannot
- * exercise its real renderer in jsdom. Stub it with a constructor that
- * captures its arguments so we can assert that each route module's
- * default function returns a value, and that we passed the brand
- * template plus the expected size.
+ * `next/og`'s ImageResponse rasterizes through satori + resvg/sharp, which
+ * cannot run under jsdom. The stub captures the element and options so the
+ * route modules can be checked for the card they compose; the real renderer
+ * is exercised by the dev-server screenshots (`/[locale]/opengraph-image…`).
  */
 type Captured = {
   element: ReactElement<CosmicOgCardProps>;
-  size: { width: number; height: number };
+  options: { width: number; height: number; fonts: Array<{ name: string; weight: number }> };
 };
 const mockImageResponseCalls: Captured[] = [];
 
 jest.mock('next/og', () => ({
   __esModule: true,
   ImageResponse: class MockImageResponse {
-    constructor(element: unknown, size: unknown) {
+    constructor(element: unknown, options: unknown) {
       mockImageResponseCalls.push({
         element: element as ReactElement<CosmicOgCardProps>,
-        size: size as { width: number; height: number },
+        options: options as Captured['options'],
       });
     }
   },
 }));
 
+jest.mock('@/lib/og/art', () => ({
+  OG_DATA_REVALIDATE_SECONDS: 3600,
+  OG_FETCH_TIMEOUT_MS: 8000,
+  loadCycleArtwork: jest.fn(async () => null),
+  loadGesture: jest.fn(async () => null),
+  loadLatestArtworks: jest.fn(async () => []),
+  loadParticipantArtworks: jest.fn(async () => []),
+  loadTokenArtwork: jest.fn(async () => null),
+  loadTokenInfo: jest.fn(async () => null),
+}));
+
+const ART: OgArtwork = { tokenId: 47, name: null, cycle: 1, src: 'data:image/png;base64,AAAA' };
+
 beforeEach(() => {
   mockImageResponseCalls.length = 0;
+  (loadLatestArtworks as jest.Mock).mockResolvedValue([ART]);
 });
 
-/** Recursively walks a React tree and gathers every string/number child. */
+/** Every string and number child in a React tree, components expanded. */
 function collectStrings(node: ReactNode): string[] {
   if (node == null || typeof node === 'boolean') return [];
   if (typeof node === 'string') return [node];
   if (typeof node === 'number') return [String(node)];
   if (Array.isArray(node)) return node.flatMap(collectStrings);
-  if (isValidElement(node)) {
-    const props = (node as ReactElement<{ children?: ReactNode }>).props;
-    return collectStrings(props?.children);
-  }
+  if (isValidElement(node)) return collectStrings(expand(node));
   return [];
 }
 
-function lastCardProps(): CosmicOgCardProps {
+/** Renders function components (the card is pure) down to host elements. */
+function expand(element: ReactElement): ReactNode {
+  if (typeof element.type === 'function') {
+    return expand(
+      (element.type as (props: unknown) => ReactElement)(element.props) as ReactElement,
+    );
+  }
+  const props = element.props as { children?: ReactNode };
+  return props.children;
+}
+
+/** Every host element's inline style in a React tree. */
+function collectStyles(node: ReactNode, out: Array<Record<string, unknown>> = []) {
+  if (Array.isArray(node)) node.forEach((child) => collectStyles(child, out));
+  else if (isValidElement(node)) {
+    if (typeof node.type === 'function') {
+      collectStyles((node.type as (props: unknown) => ReactNode)(node.props), out);
+    } else {
+      const props = node.props as { style?: Record<string, unknown>; children?: ReactNode };
+      if (props.style) out.push(props.style);
+      collectStyles(props.children, out);
+    }
+  }
+  return out;
+}
+
+function collectImages(node: ReactNode, out: string[] = []): string[] {
+  if (Array.isArray(node)) node.forEach((child) => collectImages(child, out));
+  else if (isValidElement(node)) {
+    if (typeof node.type === 'function') {
+      collectImages((node.type as (props: unknown) => ReactNode)(node.props), out);
+    } else {
+      const props = node.props as { src?: string; children?: ReactNode };
+      if (node.type === 'img' && props.src) out.push(props.src);
+      collectImages(props.children, out);
+    }
+  }
+  return out;
+}
+
+/** Each locale's measure, built from the faces its cards embed. */
+const measures = new Map<string, OgMeasure>();
+beforeAll(async () => {
+  for (const locale of ['en', 'uk', 'ko', 'ja']) {
+    measures.set(locale, createOgMeasure(await getOgFontConfig(locale)));
+  }
+});
+
+const forLocale = (locale: string): Partial<CosmicOgCardProps> => ({
+  typography: getOgTypography(locale),
+  measure: measures.get(locale)!,
+  ellipsis: getLocaleConfig(locale).ellipsis,
+});
+
+const base = (overrides: Partial<CosmicOgCardProps> = {}): CosmicOgCardProps => ({
+  ...(forLocale('en') as Pick<CosmicOgCardProps, 'typography' | 'measure' | 'ellipsis'>),
+  markSrc: 'data:image/svg+xml;base64,MARK',
+  title: 'A Headline.',
+  domain: 'app.cosmicsignature.com',
+  ...overrides,
+});
+
+const card = (props: CosmicOgCardProps) => <CosmicOgCard {...props} />;
+
+function lastCard() {
   const last = mockImageResponseCalls[mockImageResponseCalls.length - 1];
   expect(last).toBeDefined();
   expect(last!.element.type).toBe(CosmicOgCard);
-  return last!.element.props;
+  return last!;
 }
 
-function lastCardSize(): { width: number; height: number } {
-  const last = mockImageResponseCalls[mockImageResponseCalls.length - 1];
-  expect(last).toBeDefined();
-  return last!.size;
-}
-
-// ---------------------------------------------------------------------------
-// CosmicOgCard component
-// ---------------------------------------------------------------------------
-
-describe('CosmicOgCard component', () => {
-  it('returns a React element when called with the minimum required props', () => {
-    const el = CosmicOgCard({ title: 'Hello world.' });
-    expect(isValidElement(el)).toBe(true);
+describe('CosmicOgCard', () => {
+  it('draws the wordmark: the orbit mark and the brand in Clash Display', () => {
+    const tree = card(base());
+    expect(collectStrings(tree)).toContain('Cosmic Signature');
+    expect(collectImages(tree)).toContain('data:image/svg+xml;base64,MARK');
+    expect(collectStyles(tree).some((style) => style.fontFamily === "'Clash Display'")).toBe(true);
   });
 
-  it('renders the supplied title in the tree', () => {
-    const strings = collectStrings(CosmicOgCard({ title: 'A Headline.' }));
-    expect(strings).toContain('A Headline.');
+  it('lays out text, plate and strip cards by how many artworks it has', () => {
+    const plate = { src: 'data:image/png;base64,ART', label: 'Signature #000047 · Cycle 1' };
+    const text = card(base({ eyebrow: 'FAQ', subhead: 'Sub.', fact: 'CC0 · Open source' }));
+    expect(collectStrings(text)).toEqual(
+      expect.arrayContaining(['FAQ', 'A Headline.', 'Sub.', 'CC0 · Open source']),
+    );
+    expect(collectImages(text)).toHaveLength(1);
+
+    const single = card(base({ art: [plate], fact: 'Not drawn' }));
+    expect(collectImages(single)).toContain('data:image/png;base64,ART');
+    expect(collectStrings(single)).toContain('Signature #000047 · Cycle 1');
+    expect(collectStrings(single)).not.toContain('Not drawn');
+
+    const strip = card(
+      base({
+        art: [
+          { src: 'a', number: '#000047' },
+          { src: 'b', number: '#000046' },
+          { src: 'c', number: '#000045' },
+          { src: 'd', number: '#000044' },
+        ],
+      }),
+    );
+    expect(collectImages(strip)).toEqual(['data:image/svg+xml;base64,MARK', 'a', 'b', 'c']);
+    expect(collectStrings(strip)).toEqual(expect.arrayContaining(['#000047', '#000045']));
   });
 
-  it('uses the default eyebrow "Cosmic Signature" when none is provided', () => {
-    const strings = collectStrings(CosmicOgCard({ title: 'X' }));
-    expect(strings).toContain('Cosmic Signature');
+  // A participant with two Signatures used to leave the strip's right third empty.
+  it('spreads two plates across the full measure of the strip', () => {
+    const widths = (count: number) =>
+      collectStyles(
+        card(base({ art: Array.from({ length: count }, (_, index) => ({ src: `p${index}` })) })),
+      )
+        .filter((style) => style.background === OG_COLORS.plate)
+        .map((style) => style.width as number);
+    const [two, three] = [widths(2), widths(3)];
+    expect(two).toHaveLength(2);
+    expect(three).toHaveLength(3);
+    const span = (plates: number[]) => plates.reduce((sum, width) => sum + width, 0);
+    // Both rows fill the 1072px measure, less the 20px gutters between plates.
+    expect(span(two) + 20).toBeGreaterThan(1070);
+    expect(span(three) + 40).toBeGreaterThan(1070);
   });
 
-  it('uses a custom eyebrow when provided', () => {
-    const strings = collectStrings(CosmicOgCard({ eyebrow: 'FAQ', title: 'X' }));
-    expect(strings).toContain('FAQ');
-    expect(strings).not.toContain('Cosmic Signature');
+  it('paints the Midnight ground and pure-black plates, never the retired gradient', () => {
+    const styles = collectStyles(card(base({ art: [{ src: 'x' }] })));
+    expect(styles[0]).toEqual(expect.objectContaining({ backgroundColor: '#090A11' }));
+    expect(styles.some((style) => style.background === OG_COLORS.plate)).toBe(true);
+    const paint = JSON.stringify(styles);
+    expect(paint).not.toMatch(/#0D0521|#1A0B3E|0, 229, 255|Helvetica/);
   });
 
-  it('omits the subhead element when none is provided', () => {
-    const strings = collectStrings(CosmicOgCard({ title: 'X' }));
-    expect(strings).not.toContain('Some subhead');
+  // F311: text at embed size stays legible.
+  it('keeps every line of text at 28px or larger', () => {
+    for (const art of [
+      [],
+      [{ src: 'x', label: 'L' }],
+      [{ src: 'a', number: '#1' }, { src: 'b' }],
+    ]) {
+      const sizes = collectStyles(
+        card(base({ eyebrow: 'E', subhead: 'S', fact: 'F', art })),
+      ).flatMap((style) => (typeof style.fontSize === 'number' ? [style.fontSize] : []));
+      expect(sizes.length).toBeGreaterThan(3);
+      expect(Math.min(...sizes)).toBeGreaterThanOrEqual(28);
+    }
   });
 
-  it('renders the subhead when provided', () => {
-    const strings = collectStrings(CosmicOgCard({ title: 'X', subhead: 'A nice subhead.' }));
-    expect(strings).toContain('A nice subhead.');
-  });
-
-  it('omits the subhead when an empty string is passed (falsy guard)', () => {
-    const strings = collectStrings(CosmicOgCard({ title: 'X', subhead: '' }));
-    expect(strings.filter((s) => s === '')).toHaveLength(0);
-  });
-
-  it('uses the three default chip labels', () => {
-    const strings = collectStrings(CosmicOgCard({ title: 'X' }));
-    expect(strings).toEqual(
-      expect.arrayContaining(['CC0', 'Verified On-Chain', '7% Protocol Guild']),
+  // F225: English titles used to fall through to next/og's Geist Regular.
+  it('sets titles in the locale’s display face at the site’s heading weight', () => {
+    const titleStyle = (locale: string, overrides: Partial<CosmicOgCardProps> = {}) =>
+      collectStyles(
+        card(base({ typography: getOgTypography(locale), title: 'T', ...overrides })),
+      ).find((style) => typeof style.fontSize === 'number' && style.fontSize >= 40);
+    expect(titleStyle('en')).toEqual(
+      expect.objectContaining({
+        fontFamily: "'Clash Display', 'Inter'",
+        fontWeight: 500,
+        letterSpacing: '-0.03em',
+      }),
+    );
+    expect(titleStyle('uk')).toEqual(
+      expect.objectContaining({ fontFamily: "'Onest'", fontWeight: 500 }),
+    );
+    expect(titleStyle('ja')).toEqual(
+      expect.objectContaining({
+        fontFamily: "'Clash Display', 'Noto Sans JP'",
+        fontWeight: 700,
+        letterSpacing: 0,
+      }),
+    );
+    expect(titleStyle('en', { monoTitle: true })).toEqual(
+      expect.objectContaining({ fontFamily: "'JetBrains Mono'" }),
     );
   });
 
-  it('avoids unsupported audit claims in the default chips', () => {
-    // Audit/formal-verification status lives on /audits; social cards must
-    // not assert it as a blanket fact.
-    const strings = collectStrings(CosmicOgCard({ title: 'X' }));
-    expect(strings).not.toContain('Formally Verified');
-    expect(strings).not.toContain('Audited Contracts');
+  // F228: every line is set by the card, a Korean word or Japanese phrase whole.
+  it('draws the laid-out lines, Korean words and Japanese phrases whole', () => {
+    const koTitle = '모든 제스처가 시그니처를 빚어냅니다.';
+    const ko = planCosmicOgCard(base({ ...forLocale('ko'), title: koTitle, art: [{ src: 'x' }] }));
+    expect(ko.stack.title.lines.length).toBeGreaterThan(1);
+    expect(ko.stack.title.lines.join(' ')).toBe(koTitle);
+    const jaTitle = '三体の軌跡を、オンチェーンで描く。';
+    const ja = planCosmicOgCard(base({ ...forLocale('ja'), title: jaTitle, art: [{ src: 'x' }] }));
+    expect(ja.stack.title.lines.join('')).toBe(jaTitle);
+    for (const line of ja.stack.title.lines) {
+      expect(line).not.toMatch(/^[\p{Script=Hiragana}、。ー]/u);
+    }
+    // A CJK title's word spaces are the script face's, drawn as gaps: Clash
+    // Display's hairline space ran 사이클 1 배분 together.
+    const koPlan = planCosmicOgCard(base({ ...forLocale('ko'), title: koTitle }));
+    expect(koPlan.stack.title.wordGap).toBeCloseTo(0.227 * koPlan.stack.title.size, 0);
+    const strings = collectStrings(card(base({ ...forLocale('ko'), title: koTitle })));
+    for (const word of koTitle.split(' ')) expect(strings).toContain(word);
+    const en = planCosmicOgCard(base({ title: 'A Headline.' }));
+    expect(en.stack.title.wordGap).toBeUndefined();
+    expect(collectStrings(card(base({ title: 'A Headline.' })))).toContain('A Headline.');
   });
 
-  it('uses custom chips and drops the defaults', () => {
-    const strings = collectStrings(CosmicOgCard({ title: 'X', chips: ['Alpha', 'Beta', 'Gamma'] }));
-    expect(strings).toEqual(expect.arrayContaining(['Alpha', 'Beta', 'Gamma']));
-    expect(strings).not.toContain('CC0');
-    expect(strings).not.toContain('Verified On-Chain');
-  });
-
-  it('handles an empty chips array without throwing', () => {
-    expect(() => CosmicOgCard({ title: 'X', chips: [] })).not.toThrow();
-  });
-
-  it('uses the default canonical domain footer text', () => {
-    const strings = collectStrings(CosmicOgCard({ title: 'X' }));
-    expect(strings).toContain('cosmicsignature.com');
-  });
-
-  it('uses a custom footer end when provided', () => {
-    const strings = collectStrings(
-      CosmicOgCard({ title: 'X', footerEnd: 'app.cosmicsignature.com' }),
-    );
-    expect(strings).toContain('app.cosmicsignature.com');
-    expect(strings).not.toContain('cosmicsignature.com');
-  });
-
-  // Inline style assertions guard against accidental Tailwind/CSS-class
-  // refactors. Satori only renders inline `style`, so any class-based
-  // styling silently produces a blank PNG.
-  it('uses inline styles on the root element (Satori has no CSS class support)', () => {
-    const el = CosmicOgCard({ title: 'X' }) as ReactElement<{ style: Record<string, unknown> }>;
-    expect(el.props.style).toEqual(expect.objectContaining({ display: 'flex', padding: '80px' }));
-  });
-
-  it('uses the Helvetica fallback font (Satori does not load custom fonts here)', () => {
-    const el = CosmicOgCard({ title: 'X' }) as ReactElement<{ style: { fontFamily: string } }>;
-    expect(el.props.style.fontFamily).toMatch(/Helvetica/);
-  });
-
-  it('paints the deep-space gradient background', () => {
-    const el = CosmicOgCard({ title: 'X' }) as ReactElement<{
-      style: { background: string };
-    }>;
-    expect(el.props.style.background).toContain('radial-gradient');
-    expect(el.props.style.background).toContain(
-      'linear-gradient(180deg, #0D0521 0%, #1A0B3E 100%)',
-    );
+  it('cuts text it cannot fit at a whole word, with the locale’s ellipsis', () => {
+    const name = 'An Owner-Given Name Far Longer Than Any Plate Label Could Ever Hold';
+    const plan = planCosmicOgCard(base({ art: [{ src: 'x', label: `${name} · Cycle 1` }] }));
+    expect(plan.layout).toBe('plate');
+    if (plan.layout !== 'plate') return;
+    expect(plan.label?.lines).toHaveLength(1);
+    expect(plan.label?.lines[0]).toMatch(/^An Owner-Given Name .*\w\.\.\.$/);
+    expect(plan.label?.width).toBeLessThanOrEqual(600);
   });
 });
 
 describe('COSMIC_OG_SIZE', () => {
-  it('is the canonical 1200x630 OpenGraph card size', () => {
+  it('is the canonical 1200x630 Open Graph card size', () => {
     expect(COSMIC_OG_SIZE).toEqual({ width: 1200, height: 630 });
   });
 });
 
-// ---------------------------------------------------------------------------
-// Static-tier opengraph-image route modules
-// ---------------------------------------------------------------------------
-
-type OgModule = {
-  contentType: string;
+type RouteModule = {
+  default: (props: { params: Promise<Record<string, string>> }) => Promise<unknown>;
+  generateImageMetadata: (props: {
+    params: Promise<Record<string, string>>;
+  }) => Promise<
+    Array<{ id: string; alt: string; size: { width: number; height: number }; contentType: string }>
+  >;
   size: { width: number; height: number };
-  generateImageMetadata: (args: {
-    params: Promise<{ locale: string; id?: string; address?: string }>;
-  }) => Promise<Array<{ alt: string }>>;
-  default: (...args: unknown[]) => unknown;
+  contentType: string;
+  revalidate?: number;
 };
 
-const STATIC_OG_MODULES: ReadonlyArray<readonly [string, () => Promise<unknown>]> = [
-  ['app/opengraph-image', () => import('@/app/[locale]/(app)/opengraph-image')],
-  [
-    'app/landing-site/opengraph-image',
-    () => import('@/app/[locale]/(landing)/landing-site/opengraph-image'),
-  ],
-  ['app/faq/opengraph-image', () => import('@/app/[locale]/(app)/faq/opengraph-image')],
-  [
-    'app/how-it-works/opengraph-image',
-    () => import('@/app/[locale]/(app)/how-it-works/opengraph-image'),
-  ],
-  ['app/gallery/opengraph-image', () => import('@/app/[locale]/(app)/gallery/opengraph-image')],
-  ['app/anchoring/opengraph-image', () => import('@/app/[locale]/(app)/anchoring/opengraph-image')],
-  [
-    'app/current-cycle/opengraph-image',
-    () => import('@/app/[locale]/(app)/current-cycle/opengraph-image'),
-  ],
-  ['app/about/opengraph-image', () => import('@/app/[locale]/(landing)/about/opengraph-image')],
-  ['app/learn/opengraph-image', () => import('@/app/[locale]/(landing)/learn/opengraph-image')],
-];
+const load = (path: string) => require(path) as RouteModule;
 
-const DYNAMIC_OG_MODULES: ReadonlyArray<readonly [string, () => Promise<unknown>]> = [
-  [
-    'app/allocation/[id]/opengraph-image',
-    () => import('@/app/[locale]/(app)/allocation/[id]/opengraph-image'),
-  ],
-  [
-    'app/gesture/[id]/opengraph-image',
-    () => import('@/app/[locale]/(app)/gesture/[id]/opengraph-image'),
-  ],
-  [
-    'app/user/[address]/opengraph-image',
-    () => import('@/app/[locale]/(app)/user/[address]/opengraph-image'),
-  ],
-];
+const STATIC_ROUTES = {
+  appHome: '../../app/[locale]/(app)/opengraph-image',
+  landingGroup: '../../app/[locale]/(landing)/opengraph-image',
+  landingHome: '../../app/[locale]/(landing)/landing-site/opengraph-image',
+  about: '../../app/[locale]/(landing)/about/opengraph-image',
+  learn: '../../app/[locale]/(landing)/learn/opengraph-image',
+  gallery: '../../app/[locale]/(app)/gallery/opengraph-image',
+  currentCycle: '../../app/[locale]/(app)/current-cycle/opengraph-image',
+  anchoring: '../../app/[locale]/(app)/anchoring/opengraph-image',
+  faq: '../../app/[locale]/(app)/faq/opengraph-image',
+  howItWorks: '../../app/[locale]/(app)/how-it-works/opengraph-image',
+} as const;
 
-describe('static-tier opengraph-image module shape', () => {
-  it.each(STATIC_OG_MODULES)('%s exports the canonical image fields', async (_label, load) => {
-    const mod = (await load()) as OgModule;
-    expect(mod.contentType).toBe('image/png');
-    expect(mod.size).toEqual(COSMIC_OG_SIZE);
-    const [metadata] = await mod.generateImageMetadata({
-      params: Promise.resolve({ locale: 'en' }),
-    });
-    expect(typeof metadata?.alt).toBe('string');
-    expect(metadata?.alt.length).toBeGreaterThan(0);
-    expect(typeof mod.default).toBe('function');
-  });
+const params = (values: Record<string, string>) => ({ params: Promise.resolve(values) });
 
-  it.each(STATIC_OG_MODULES)(
-    '%s default() invokes ImageResponse with CosmicOgCard',
-    async (_label, load) => {
-      const mod = (await load()) as OgModule;
-      await mod.default({ params: Promise.resolve({ locale: 'en' }) });
-      expect(mockImageResponseCalls).toHaveLength(1);
-      expect(lastCardSize()).toEqual(COSMIC_OG_SIZE);
-      expect(lastCardProps().title.length).toBeGreaterThan(0);
-    },
-  );
-
-  it.each(STATIC_OG_MODULES)('%s alt text mentions the brand', async (_label, load) => {
-    const mod = (await load()) as OgModule;
-    const [metadata] = await mod.generateImageMetadata({
-      params: Promise.resolve({ locale: 'en' }),
-    });
-    expect(metadata?.alt).toMatch(/Cosmic Signature/);
-  });
-});
-
-describe('static-tier opengraph-image content', () => {
-  it('app/opengraph-image renders the brand-line headline', async () => {
-    const mod = (await import('@/app/[locale]/(app)/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ locale: 'en' }) });
-    const props = lastCardProps();
-    expect(props.eyebrow).toBe('Cosmic Signature');
-    expect(props.title).toBe('Every Gesture Shapes the Signature.');
-    expect(props.subhead).toMatch(/procedural on-chain art protocol/i);
-  });
-
-  it('faq card uses the FAQ eyebrow', async () => {
-    const mod = (await import('@/app/[locale]/(app)/faq/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ locale: 'en' }) });
-    const props = lastCardProps();
-    expect(props.eyebrow).toBe('FAQ');
-    expect(props.title).toMatch(/answering plainly/i);
-  });
-
-  it('how-it-works card uses the four-stage subhead and three short chips', async () => {
-    const mod = (await import('@/app/[locale]/(app)/how-it-works/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ locale: 'en' }) });
-    const props = lastCardProps();
-    expect(props.eyebrow).toBe('How It Works');
-    expect(props.title).toMatch(/four stages/i);
-    expect(props.chips).toBeDefined();
-    expect(props.chips!.length).toBeLessThanOrEqual(3);
-  });
-
-  it('gallery card mentions three-body trajectories', async () => {
-    const mod = (await import('@/app/[locale]/(app)/gallery/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ locale: 'en' }) });
-    const props = lastCardProps();
-    expect(props.eyebrow).toBe('Gallery');
-    expect(props.title).toMatch(/three-body trajectories/i);
-  });
-
-  it('anchoring card surfaces the per-cycle share message', async () => {
-    const mod = (await import('@/app/[locale]/(app)/anchoring/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ locale: 'en' }) });
-    const props = lastCardProps();
-    expect(props.eyebrow).toBe('Anchoring');
-    expect(props.title).toMatch(/each cycle/i);
-  });
-
-  it('current-cycle card frames the live cycle', async () => {
-    const mod = (await import('@/app/[locale]/(app)/current-cycle/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ locale: 'en' }) });
-    const props = lastCardProps();
-    expect(props.eyebrow).toBe('Current Cycle');
-    expect(props.title).toMatch(/Performance Cycle/);
-  });
-
-  it('about card matches the landing-site card exactly', async () => {
-    const root =
-      (await import('@/app/[locale]/(landing)/landing-site/opengraph-image')) as OgModule;
-    const about = (await import('@/app/[locale]/(landing)/about/opengraph-image')) as OgModule;
-
-    await root.default({ params: Promise.resolve({ locale: 'en' }) });
-    const rootProps = lastCardProps();
-
-    await about.default({ params: Promise.resolve({ locale: 'en' }) });
-    const aboutProps = lastCardProps();
-
-    expect(aboutProps.eyebrow).toBe(rootProps.eyebrow);
-    expect(aboutProps.title).toBe(rootProps.title);
-    expect(aboutProps.subhead).toBe(rootProps.subhead);
-  });
-
-  it('learn card uses the localized landing visual', async () => {
-    const mod = (await import('@/app/[locale]/(landing)/learn/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ locale: 'zh' }) });
-    expect(lastCardProps().title).toMatch(/[\u3400-\u9fff]/);
-  });
-});
-
-// ---------------------------------------------------------------------------
-// Dynamic-tier opengraph-image route modules
-// ---------------------------------------------------------------------------
-
-describe('dynamic-tier opengraph-image module shape', () => {
-  it.each(DYNAMIC_OG_MODULES)('%s exports the canonical image fields', async (_label, load) => {
-    const mod = (await load()) as OgModule;
-    expect(mod.contentType).toBe('image/png');
-    expect(mod.size).toEqual(COSMIC_OG_SIZE);
-    const [metadata] = await mod.generateImageMetadata({
-      params: Promise.resolve({ locale: 'en' }),
-    });
-    expect(typeof metadata?.alt).toBe('string');
-    expect(metadata?.alt).toMatch(/Cosmic Signature/);
-    expect(typeof mod.default).toBe('function');
-  });
-});
-
-describe('allocation/[id] dynamic OG card', () => {
-  // Format: [id, expected eyebrow]
-  const cases: ReadonlyArray<readonly [string, string]> = [
-    ['0', 'Cycle #0'],
-    ['1', 'Cycle #1'],
-    ['42', 'Cycle #42'],
-    ['999999', 'Cycle #999999'],
-    ['  42  ', 'Allocation'],
-    ['12abc', 'Allocation'],
-    ['12.9', 'Allocation'],
-    ['042', 'Allocation'],
-    [String(Number.MAX_SAFE_INTEGER + 1), 'Allocation'],
-    ['-1', 'Allocation'], // negative falls back to generic eyebrow
-    ['abc', 'Allocation'],
-    ['', 'Allocation'],
-    ['NaN', 'Allocation'],
-    ['Infinity', 'Allocation'], // parseInt('Infinity') === NaN
-  ];
-
-  it.each(cases)('id=%j -> eyebrow=%j', async (id, expected) => {
-    const mod = (await import('@/app/[locale]/(app)/allocation/[id]/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ locale: 'en', id }) });
-    expect(lastCardProps().eyebrow).toBe(expected);
-    expect(lastCardProps().title).toMatch(/allocation distribution/i);
-  });
-
-  it('preserves the size constant on every render', async () => {
-    const mod = (await import('@/app/[locale]/(app)/allocation/[id]/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ locale: 'en', id: '7' }) });
-    expect(lastCardSize()).toEqual(COSMIC_OG_SIZE);
-  });
-});
-
-describe('gesture/[id] dynamic OG card', () => {
-  // The route param is an event-log id; the card resolves the human-facing
-  // gesture position via the API, falling back to a plain "Gesture" eyebrow.
-  const ORIGINAL_API_URL = process.env.NEXT_PUBLIC_API_URL;
-  const originalFetch = global.fetch;
-
-  afterEach(() => {
-    if (ORIGINAL_API_URL === undefined) {
-      delete process.env.NEXT_PUBLIC_API_URL;
-    } else {
-      process.env.NEXT_PUBLIC_API_URL = ORIGINAL_API_URL;
-    }
-    global.fetch = originalFetch;
-  });
-
-  /** Configures an API base URL and a `fetch` stub returning the given response. */
-  function stubApi(response: { ok: boolean; body: unknown }): jest.Mock {
-    process.env.NEXT_PUBLIC_API_URL = 'http://api.test/api/cosmicgame';
-    const fetchMock = jest.fn(async () => ({
-      ok: response.ok,
-      json: async () => response.body,
-    }));
-    global.fetch = fetchMock as unknown as typeof fetch;
-    return fetchMock;
-  }
-
-  it('labels the resolved gesture position from the API', async () => {
-    const fetchMock = stubApi({ ok: true, body: { BidInfo: { BidPosition: 410 } } });
-
-    const mod = (await import('@/app/[locale]/(app)/gesture/[id]/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ locale: 'en', id: '23514' }) });
-
-    expect(fetchMock).toHaveBeenCalledWith(
-      expect.stringContaining('/info/23514'),
-      expect.anything(),
-    );
-    expect(lastCardProps().eyebrow).toBe('Gesture Position #410');
-    expect(lastCardProps().title).toMatch(/imprint on the signature/i);
-  });
-
-  it('treats position 0 as a valid position', async () => {
-    stubApi({ ok: true, body: { BidInfo: { BidPosition: 0 } } });
-    const mod = (await import('@/app/[locale]/(app)/gesture/[id]/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ locale: 'en', id: '7' }) });
-    expect(lastCardProps().eyebrow).toBe('Gesture Position #0');
-  });
-
-  it('trims and parses the route id before requesting', async () => {
-    const fetchMock = stubApi({ ok: true, body: { BidInfo: { BidPosition: 9 } } });
-    const mod = (await import('@/app/[locale]/(app)/gesture/[id]/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ locale: 'en', id: '  3  ' }) });
-    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('/info/3'), expect.anything());
-    expect(lastCardProps().eyebrow).toBe('Gesture Position #9');
-  });
-
-  const invalidIds: ReadonlyArray<string> = ['-5', 'hello', '', 'NaN'];
-  it.each(invalidIds)(
-    'falls back to "Gesture" for invalid id %j without calling the API',
-    async (id) => {
-      const fetchMock = stubApi({ ok: true, body: { BidInfo: { BidPosition: 1 } } });
-      const mod = (await import('@/app/[locale]/(app)/gesture/[id]/opengraph-image')) as OgModule;
-      await mod.default({ params: Promise.resolve({ locale: 'en', id }) });
-      expect(fetchMock).not.toHaveBeenCalled();
-      expect(lastCardProps().eyebrow).toBe('Gesture');
-    },
-  );
-
-  it('falls back to "Gesture" on a non-OK API response', async () => {
-    stubApi({ ok: false, body: {} });
-    const mod = (await import('@/app/[locale]/(app)/gesture/[id]/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ locale: 'en', id: '12' }) });
-    expect(lastCardProps().eyebrow).toBe('Gesture');
-  });
-
-  it('falls back to "Gesture" when the position is absent from the response', async () => {
-    stubApi({ ok: true, body: { BidInfo: {} } });
-    const mod = (await import('@/app/[locale]/(app)/gesture/[id]/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ locale: 'en', id: '12' }) });
-    expect(lastCardProps().eyebrow).toBe('Gesture');
-  });
-
-  it('falls back to "Gesture" when the lookup throws', async () => {
-    process.env.NEXT_PUBLIC_API_URL = 'http://api.test/api/cosmicgame';
-    global.fetch = jest.fn(async () => {
-      throw new Error('network down');
-    }) as unknown as typeof fetch;
-    const mod = (await import('@/app/[locale]/(app)/gesture/[id]/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ locale: 'en', id: '12' }) });
-    expect(lastCardProps().eyebrow).toBe('Gesture');
-  });
-
-  it('falls back to "Gesture" when no API base URL is configured', async () => {
-    delete process.env.NEXT_PUBLIC_API_URL;
-    const fetchMock = jest.fn();
-    global.fetch = fetchMock as unknown as typeof fetch;
-    const mod = (await import('@/app/[locale]/(app)/gesture/[id]/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ locale: 'en', id: '12' }) });
-    expect(fetchMock).not.toHaveBeenCalled();
-    expect(lastCardProps().eyebrow).toBe('Gesture');
-  });
-});
-
-describe('user/[address] dynamic OG card', () => {
-  // Format: [address, expected title]
-  const VALID_ADDR = '0x1234567890abcdef1234567890abcdef12345678';
-  const expectedTruncated = '0x1234 5678';
-
-  const cases: ReadonlyArray<readonly [string, string]> = [
-    [VALID_ADDR, expectedTruncated],
-    [VALID_ADDR.toUpperCase(), expectedTruncated], // mixed case is normalized
-    [`  ${VALID_ADDR}  `, expectedTruncated], // surrounding whitespace trimmed
-    // The normal-space separator is guaranteed to exist in the embedded subset.
-    ['0xABCDEF1234567890ABCDEF1234567890ABCDEF12', '0xabcd ef12'],
-    ['0x1234', 'Participant'], // wrong length
-    [VALID_ADDR.slice(2), 'Participant'], // missing 0x prefix
-    [`0x${'Z'.repeat(40)}`, 'Participant'], // invalid hex chars
-    [`0x${'1'.repeat(41)}`, 'Participant'], // too long
-    ['', 'Participant'],
-    ['not-an-address', 'Participant'],
-    ['0x', 'Participant'],
-  ];
-
-  it.each(cases)('address=%j -> title=%j', async (address, expectedTitle) => {
-    const mod = (await import('@/app/[locale]/(app)/user/[address]/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ locale: 'en', address }) });
-    expect(lastCardProps().title).toBe(expectedTitle);
-  });
-
-  it('always uses the "Participant" eyebrow regardless of the address', async () => {
-    const mod = (await import('@/app/[locale]/(app)/user/[address]/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ locale: 'en', address: VALID_ADDR }) });
-    expect(lastCardProps().eyebrow).toBe('Participant');
-
-    await mod.default({ params: Promise.resolve({ locale: 'en', address: 'garbage' }) });
-    expect(lastCardProps().eyebrow).toBe('Participant');
-  });
-
-  it('uses the exact subset-safe normal-space participant title', async () => {
-    const mod = (await import('@/app/[locale]/(app)/user/[address]/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ locale: 'en', address: VALID_ADDR }) });
-    expect(lastCardProps().title).toBe('0x1234 5678');
-  });
-});
-
-// ---------------------------------------------------------------------------
-// Cross-cutting invariants
-// ---------------------------------------------------------------------------
-
-describe('cross-cutting OG invariants', () => {
-  const ALL_OG_MODULES = [...STATIC_OG_MODULES, ...DYNAMIC_OG_MODULES];
-
-  it.each(ALL_OG_MODULES)('%s emits image/png', async (_label, load) => {
-    const mod = (await load()) as OgModule;
-    expect(mod.contentType).toBe('image/png');
-  });
-
-  it.each(ALL_OG_MODULES)('%s uses COSMIC_OG_SIZE', async (_label, load) => {
-    const mod = (await load()) as OgModule;
-    expect(mod.size).toBe(COSMIC_OG_SIZE);
-  });
-
-  it('every module imports the same shared template', async () => {
-    // Touching the dynamic and static lists from the same suite catches
-    // regressions where someone hand-rolls a card instead of reusing
-    // CosmicOgCard.
-    const types = new Set<unknown>();
-    for (const [, load] of STATIC_OG_MODULES) {
-      const mod = (await load()) as OgModule;
-      await mod.default({ params: Promise.resolve({ locale: 'en' }) });
-      types.add(lastCardProps().title);
-    }
-    for (const [, load] of DYNAMIC_OG_MODULES) {
-      const mod = (await load()) as OgModule;
-      await mod.default({
-        params: Promise.resolve({
-          locale: 'en',
-          id: '1',
-          address: '0x' + 'a'.repeat(40),
+describe('opengraph-image routes', () => {
+  it.each(Object.entries(STATIC_ROUTES))(
+    '%s exports a 1200×630 PNG route with alt text',
+    async (_name, path) => {
+      const route = load(path);
+      expect(route.size).toEqual({ width: 1200, height: 630 });
+      expect(route.contentType).toBe('image/png');
+      const [metadata] = await route.generateImageMetadata(params({ locale: 'en' }));
+      expect(metadata).toEqual(
+        expect.objectContaining({
+          id: 'default',
+          contentType: 'image/png',
+          alt: expect.any(String),
         }),
-      });
-      types.add(lastCardProps().title);
+      );
+      await route.default(params({ locale: 'en' }));
+      expect(lastCard().options).toEqual(expect.objectContaining({ width: 1200, height: 630 }));
+    },
+  );
+
+  it('brand cards on both hosts show the newest Signature and regenerate hourly', async () => {
+    for (const path of [STATIC_ROUTES.appHome, STATIC_ROUTES.landingGroup, STATIC_ROUTES.about]) {
+      const route = load(path);
+      expect(route.revalidate).toBe(3600);
+      await route.default(params({ locale: 'en' }));
+      expect(lastCard().element.props).toEqual(
+        expect.objectContaining({
+          title: 'Every Gesture Shapes the Signature.',
+          art: [expect.objectContaining({ label: 'Signature #000047 · Cycle 1' })],
+        }),
+      );
     }
-    // Each module produced exactly one CosmicOgCard call (no duplicates,
-    // no missed calls). Ten modules total.
-    expect(mockImageResponseCalls.length).toBe(
-      STATIC_OG_MODULES.length + DYNAMIC_OG_MODULES.length,
+    await load(STATIC_ROUTES.landingHome).default(params({ locale: 'en' }));
+    expect(lastCard().element.props.domain).toBe('cosmicsignature.com');
+    await load(STATIC_ROUTES.appHome).default(params({ locale: 'en' }));
+    expect(lastCard().element.props.domain).toBe('app.cosmicsignature.com');
+  });
+
+  it('embeds the locale’s faces and uppercases eyebrows in cased scripts', async () => {
+    await load(STATIC_ROUTES.faq).default(params({ locale: 'uk' }));
+    const { element, options } = lastCard();
+    expect(element.props.eyebrow).toBe('ПОШИРЕНІ ЗАПИТАННЯ');
+    expect(options.fonts.map((font) => font.name)).toEqual(
+      expect.arrayContaining(['Onest', 'Inter', 'Clash Display', 'JetBrains Mono']),
     );
-    for (const call of mockImageResponseCalls) {
-      expect(call.element.type).toBe(CosmicOgCard);
-    }
+    await load(STATIC_ROUTES.faq).default(params({ locale: 'zh-TW' }));
+    expect(lastCard().element.props.eyebrow).toBe('常見問題');
+  });
+
+  it('text routes carry their fact line instead of chips', async () => {
+    await load(STATIC_ROUTES.howItWorks).default(params({ locale: 'en' }));
+    expect(lastCard().element.props.fact).toBe('Calibration · Gestures · Allocations');
+    expect(lastCard().element.props.art).toBeUndefined();
+  });
+
+  it('the token route renders the token, with trait-free alt text offline', async () => {
+    (loadTokenArtwork as jest.Mock).mockResolvedValue({
+      ...ART,
+      tokenId: 24,
+      name: 'Twisted Mind',
+    });
+    const route = load('../../app/[locale]/(app)/detail/[id]/opengraph-image');
+    expect(route.revalidate).toBe(3600);
+    await route.default(params({ locale: 'en', id: '24' }));
+    // F226: a named piece's card carries its number and cycle above the name.
+    expect(lastCard().element.props).toEqual(
+      expect.objectContaining({ title: 'Twisted Mind', eyebrow: '#000024 · CYCLE 1' }),
+    );
+    expect(collectStrings(card(lastCard().element.props))).toEqual(
+      expect.arrayContaining(['#000024 · CYCLE 1', 'Twisted Mind']),
+    );
+    const [metadata] = await route.generateImageMetadata(params({ locale: 'en', id: '24' }));
+    expect(metadata?.alt).toMatch(/^Cosmic Signature #24/);
+  });
+
+  it('the gesture route falls back to the generic headline when the record is unknown', async () => {
+    (loadGesture as jest.Mock).mockResolvedValue(null);
+    const route = load('../../app/[locale]/(app)/gesture/[id]/opengraph-image');
+    await route.default(params({ locale: 'en', id: 'x' }));
+    expect(lastCard().element.props.title).toBe('An imprint on the Signature.');
+  });
+
+  it('the allocation and participant routes put the value in the headline', async () => {
+    await load('../../app/[locale]/(app)/allocation/[id]/opengraph-image').default(
+      params({ locale: 'en', id: '7' }),
+    );
+    expect(lastCard().element.props.title).toBe('Cycle 7 allocations');
+    await load('../../app/[locale]/(app)/user/[address]/opengraph-image').default(
+      params({ locale: 'en', address: '0x7406B34d25A9B7841CAC133E3173919e0af6Bc6c' }),
+    );
+    expect(lastCard().element.props).toEqual(
+      expect.objectContaining({ title: '0x7406...Bc6c', monoTitle: true }),
+    );
   });
 });

@@ -20,7 +20,6 @@ export const landingTextJa = {
       '公共財',
       'Protocol Guild',
       'CC0',
-      '形式検証済み',
     ],
   },
 

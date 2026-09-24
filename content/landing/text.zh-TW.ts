@@ -18,7 +18,6 @@ export const landingTextZhTw = {
       '公共財',
       'Protocol Guild',
       'CC0',
-      '經形式化驗證',
     ],
   },
 

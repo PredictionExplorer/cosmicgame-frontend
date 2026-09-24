@@ -18,7 +18,6 @@ export const landingTextEn = {
       'public goods',
       'Protocol Guild',
       'CC0',
-      'formally verified',
     ],
   },
 

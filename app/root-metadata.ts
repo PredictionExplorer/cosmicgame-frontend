@@ -2,13 +2,9 @@ import type { Metadata, Viewport } from 'next';
 
 import { getLocaleConfig } from '@/i18n/localeConfig';
 import { LANDING_ORIGIN } from '@/lib/hostRouting';
+import { BRAND_ICON_URLS } from '@/lib/og/brandIcons';
+import { SITE_NAME, X_HANDLE } from '@/utils/seo';
 import { DEFAULT_SITE_THEME, THEME_CHROME } from '@/lib/theme/config';
-
-// Browsers cache favicons separately from normal HTTP cache entries and per
-// origin. Increment this value whenever either favicon asset is replaced.
-export const FAVICON_VERSION = '20260825';
-export const FAVICON_SVG_URL = `/favicon.svg?v=${FAVICON_VERSION}`;
-export const FAVICON_ICO_URL = `/favicon.ico?v=${FAVICON_VERSION}`;
 
 export interface RootMetadataCopy {
   defaultTitle: string;
@@ -19,13 +15,15 @@ export interface RootMetadataCopy {
 export interface RootMetadataOptions {
   origin: string;
   canonical: string;
+  /** The web app manifest to link; only the app host installs, so the landing passes none. */
+  manifest?: string;
 }
 
 // Default OG/Twitter title is intentionally punchier than the document
 // title — most embed cards crop after ~70 chars and we want the
 // brand-line tagline visible in Discord/Slack/X previews.
 const englishRootMetadataCopy: RootMetadataCopy = {
-  defaultTitle: 'Cosmic Signature',
+  defaultTitle: SITE_NAME,
   defaultOgTitle: 'Cosmic Signature \u2014 Every Gesture Shapes the Signature.',
   defaultDescription:
     'A procedural on-chain art protocol on Arbitrum. Every gesture you make shapes the cycle\u2019s final Signature. When the cycle finalizes, the protocol distributes its reserves across more than ten allocation tracks \u2014 including Protocol Guild, the funding mechanism for 170+ Ethereum core contributors.',
@@ -48,18 +46,23 @@ export function openGraphLocale(locale: string): string {
  */
 export function createRootMetadata(
   copy: RootMetadataCopy,
-  { origin, canonical }: RootMetadataOptions,
+  { origin, canonical, manifest }: RootMetadataOptions,
 ): Metadata {
   return {
     metadataBase: new URL(origin),
     title: { default: copy.defaultTitle, template: '%s' },
     description: copy.defaultDescription,
+    // The ICO is declared with its sizes, not `any`, so browsers that read
+    // SVG favicons choose the SVG; iOS takes the apple-touch icon
+    // (lib/og/brandIcons.ts, `npm run brand:icons`).
     icons: {
       icon: [
-        { url: FAVICON_SVG_URL, type: 'image/svg+xml' },
-        { url: FAVICON_ICO_URL, sizes: 'any' },
+        { url: BRAND_ICON_URLS.faviconIco, sizes: '16x16 32x32 48x48' },
+        { url: BRAND_ICON_URLS.faviconSvg, type: 'image/svg+xml' },
       ],
+      apple: [{ url: BRAND_ICON_URLS.appleTouchIcon, sizes: '180x180', type: 'image/png' }],
     },
+    ...(manifest ? { manifest } : {}),
     verification: {
       google: 'ZUw5gzqw7CFIEZgCJ2pLy-MhDe7Fdotpc31fS75v3dE',
     },
@@ -79,36 +82,20 @@ export function createRootMetadata(
     },
     openGraph: {
       type: 'website',
-      siteName: copy.defaultTitle,
+      siteName: SITE_NAME,
       title: copy.defaultOgTitle,
       description: copy.defaultDescription,
       locale: 'en_US',
     },
     twitter: {
       card: 'summary_large_image',
-      site: '@CosmicSignature',
+      site: X_HANDLE,
       title: copy.defaultOgTitle,
       description: copy.defaultDescription,
     },
-    keywords: [
-      'Cosmic Signature',
-      'NFT',
-      'procedural art protocol',
-      'Arbitrum',
-      'Ethereum',
-      'generative art',
-      'three-body problem',
-      'anchoring',
-      'CC0',
-      'formally verified',
-      'on-chain art',
-      'public goods',
-      'Protocol Guild',
-      'ERC-721',
-      'RandomWalkNFT',
-      'Cosmic Signature CST Token',
-      'CST',
-    ],
+    // No site-wide `keywords`: one English list served on every locale's
+    // pages helped no search engine, and the landing home sets its own
+    // localized list (content/landing).
   };
 }
 
