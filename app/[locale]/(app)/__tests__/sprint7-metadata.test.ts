@@ -31,6 +31,12 @@ jest.mock('../eth-contribution/detail/[id]/EthDonationDetailPage', () => ({
   __esModule: true,
   default: () => null,
 }));
+// The record page reads its record on the server; the tab titles follow what it found.
+const mockReadContribution = jest.fn();
+jest.mock('../eth-contribution/detail/[id]/contributionRecord', () => ({
+  readContribution: (...args: unknown[]) => mockReadContribution(...args),
+  contributionSeeds: () => [],
+}));
 jest.mock('../eth-contribution/round/[round]/EthDonationByRoundPage', () => ({
   __esModule: true,
   default: () => null,
@@ -92,6 +98,11 @@ const zhParams = () =>
   });
 
 describe('Sprint 7 route metadata', () => {
+  beforeEach(() => {
+    mockReadContribution.mockReset();
+    mockReadContribution.mockResolvedValue({ status: 'unknown' });
+  });
+
   it.each(localizedRoutes)(
     '$path emits zh canonical, hreflang, and OG locale',
     async ({ path, build }) => {
@@ -154,6 +165,11 @@ describe('Sprint 7 route metadata', () => {
     ) => documentTitleOf(await build({ params: params(extra) }, resolvingMetadata()));
 
     expect(await titleOf(generateEthContributionDetailMetadata)).toMatch(/^贡献 #7/);
+    // A record the server read found missing is not titled as if it existed,
+    // matching the H1 (regression: tab "Contribution #7" over "Contribution not found").
+    mockReadContribution.mockResolvedValue({ status: 'missing' });
+    expect(await titleOf(generateEthContributionDetailMetadata)).toMatch(/^未找到该贡献/);
+    expect(mockReadContribution).toHaveBeenLastCalledWith(7);
     expect(await titleOf(generateEthContributionCycleMetadata)).toMatch(/^第 7 个周期的贡献/);
     expect(
       await titleOf(generateOutreachAddressMetadata, {
