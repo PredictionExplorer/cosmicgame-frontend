@@ -65,7 +65,7 @@ export function ProfileOverview({
                 <UnknownValue label={tCommon('status.unavailable')} />
               ) : (
                 // "Cycle 0", as the profile's badges and pool name a cycle.
-                t('statistics.overview.gestures.firstCycleValue', { cycle: gestures.firstCycle })
+                t('shared.cycleNumber', { cycle: gestures.firstCycle })
               )
             }
           />

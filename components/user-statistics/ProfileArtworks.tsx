@@ -44,7 +44,6 @@ export function ProfileArtworks({ tokens, anchored = [], loading }: ProfileArtwo
   const t = useTranslations('myPages');
   const tTraits = useTranslations('traits');
   const tDetail = useTranslations('detail');
-  const tCommon = useTranslations('common');
   const signatureAlt = useSignatureAlt();
   const [showAll, setShowAll] = useState(false);
 
@@ -109,7 +108,8 @@ export function ProfileArtworks({ tokens, anchored = [], loading }: ProfileArtwo
                     meta={[
                       name ? <span className="font-mono">{id}</span> : null,
                       typeof token.RoundNum === 'number' && token.RoundNum >= 0
-                        ? tCommon('pageHeader.crumbs.cycle', { cycle: token.RoundNum })
+                        ? // "Cycle 0", as the profile's badges, pool and overview name a cycle.
+                          t('shared.cycleNumber', { cycle: token.RoundNum })
                         : null,
                     ]}
                     tags={

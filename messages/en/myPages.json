@@ -9,6 +9,7 @@
     "to": "To",
     "tokenId": "Token ID",
     "cycle": "Cycle",
+    "cycleNumber": "Cycle {cycle}",
     "recipient": "Recipient"
   },
   "allocations": {
@@ -121,7 +122,6 @@
         "title": "Gestures",
         "largest": "Largest ETH gesture",
         "firstCycle": "First cycle",
-        "firstCycleValue": "Cycle {cycle}",
         "latest": "Latest gesture"
       },
       "stellarSelection": {

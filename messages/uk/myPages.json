@@ -9,6 +9,7 @@
     "to": "Кому",
     "tokenId": "ID токена",
     "cycle": "Цикл",
+    "cycleNumber": "Цикл {cycle}",
     "recipient": "Отримувач"
   },
   "allocations": {
@@ -121,7 +122,6 @@
         "title": "Жести",
         "largest": "Найбільший жест в ETH",
         "firstCycle": "Перший цикл",
-        "firstCycleValue": "Цикл {cycle}",
         "latest": "Останній жест"
       },
       "stellarSelection": {

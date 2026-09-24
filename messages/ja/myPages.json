@@ -9,6 +9,7 @@
     "to": "送付先",
     "tokenId": "トークンID",
     "cycle": "サイクル",
+    "cycleNumber": "サイクル{cycle}",
     "recipient": "受領者"
   },
   "allocations": {
@@ -121,7 +122,6 @@
         "title": "一筆",
         "largest": "最大のETHの一筆",
         "firstCycle": "最初のサイクル",
-        "firstCycleValue": "サイクル{cycle}",
         "latest": "直近の一筆"
       },
       "stellarSelection": {

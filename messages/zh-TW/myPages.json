@@ -9,6 +9,7 @@
     "to": "接收方",
     "tokenId": "代幣 ID",
     "cycle": "週期",
+    "cycleNumber": "第 {cycle} 個週期",
     "recipient": "獲配者"
   },
   "allocations": {
@@ -121,7 +122,6 @@
         "title": "落筆",
         "largest": "最大一筆 ETH 落筆",
         "firstCycle": "首個週期",
-        "firstCycleValue": "第 {cycle} 個週期",
         "latest": "最近落筆"
       },
       "stellarSelection": {

@@ -9,6 +9,7 @@
     "to": "받는 주소",
     "tokenId": "토큰 ID",
     "cycle": "사이클",
+    "cycleNumber": "사이클 {cycle}",
     "recipient": "수령자"
   },
   "allocations": {
@@ -121,7 +122,6 @@
         "title": "제스처",
         "largest": "최대 ETH 제스처",
         "firstCycle": "첫 사이클",
-        "firstCycleValue": "사이클 {cycle}",
         "latest": "최근 제스처"
       },
       "stellarSelection": {
