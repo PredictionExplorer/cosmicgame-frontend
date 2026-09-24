@@ -2,7 +2,24 @@
   "page": {
     "title": "协调变更",
     "subtitle": "协议参数变更与管理事件记录",
-    "description": "在周期开启窗口内，合约所有者可以调整 Cosmic Signature 的协议参数。此记录完整公开每次变更，包括落笔价格上调、时间增量和锚定派发设置。所有权一旦放弃，全部参数都将永久保持不变。"
+    "description": "在周期开启窗口内，合约所有者可以调整 Cosmic Signature 的协议参数。此记录完整公开每次变更，包括落笔价格上调、时间增量和锚定派发设置。所有权一旦放弃，全部参数都将永久保持不变。",
+    "loadError": "未能加载协调变更。"
+  },
+  "systemEvent": {
+    "title": "第 {cycle} 个周期前的配置",
+    "titleInitial": "初始配置",
+    "lede": "第 {cycle} 个周期开启前，合约所有者变更的协议参数，每项均附新值与交易。",
+    "ledeInitial": "首个周期开启前，合约所有者设定的协议参数，每项均附取值与交易。",
+    "figures": {
+      "changes": "变更数",
+      "first": "首次变更",
+      "latest": "最近变更"
+    },
+    "allChanges": "全部协调变更",
+    "loadError": "未能加载配置变更。",
+    "emptyDescription": "在此期间，协议沿用了原有设置。",
+    "invalidTitle": "该配置期间不存在",
+    "invalidDescription": "链接中的周期或事件范围无效。"
   },
   "events": {
     "undefined": "未定义",

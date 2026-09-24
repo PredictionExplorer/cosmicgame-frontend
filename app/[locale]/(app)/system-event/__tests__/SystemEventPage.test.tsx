@@ -1,22 +1,42 @@
 import { reportError } from '@/utils/errors';
 
-import { checkA11y, render, screen } from '@/test-utils';
+import { checkA11y, render, screen, within } from '@/test-utils';
 
 import SystemEventPage from '../[round]/[start]/[end]/SystemEventPage';
 
-const mockUseSystemEvents = jest.fn().mockReturnValue({
-  data: undefined,
-  isLoading: false,
-  error: null,
-});
+const mockRefetch = jest.fn();
+const mockUseSystemEvents = jest.fn();
 
 jest.mock('../../../../../hooks/useApiQuery', () => ({
   useSystemEvents: (...args: unknown[]) => mockUseSystemEvents(...args),
 }));
 
 jest.mock('../../../../../components/tables/AdminEventsTable', () => ({
-  AdminEventsTable: ({ list }: { list: unknown[] }) => (
-    <div data-testid="events-table">events: {list.length}</div>
+  AdminEventsTable: ({
+    list,
+    loading,
+    error,
+    onRetry,
+    emptyDescription,
+  }: {
+    list: unknown[];
+    loading?: boolean;
+    error?: string;
+    onRetry?: () => void;
+    emptyDescription?: string;
+  }) => (
+    <div data-testid="events-table" data-loading={loading ? 'true' : undefined}>
+      events: {list.length}
+      {error ? (
+        <p role="alert">
+          {error}
+          <button type="button" onClick={onRetry}>
+            Try again
+          </button>
+        </p>
+      ) : null}
+      {list.length === 0 && !loading && !error ? <p>{emptyDescription}</p> : null}
+    </div>
   ),
 }));
 
@@ -26,185 +46,143 @@ jest.mock('../../../../../utils/errors', () => ({
 
 const mockReportError = reportError as jest.Mock;
 
+/** 2024-01-02 03:04:05 UTC and a day later. */
+const FIRST = 1_704_164_645;
+const LATEST = FIRST + 86_400;
+
+const rows = [
+  { EvtLogId: 101, RecordType: 1, TimeStamp: LATEST, TxHash: '0xb' },
+  { EvtLogId: 100, RecordType: 2, TimeStamp: FIRST, TxHash: '0xa' },
+];
+
+function mockEvents(state: { data?: unknown[]; isLoading?: boolean; error?: Error | null }) {
+  mockUseSystemEvents.mockReturnValue({
+    data: state.data,
+    isLoading: state.isLoading ?? false,
+    error: state.error ?? null,
+    refetch: mockRefetch,
+  });
+}
+
 beforeEach(() => jest.clearAllMocks());
 
 describe('SystemEventPage', () => {
-  it('shows loading state', () => {
-    mockUseSystemEvents.mockReturnValue({ data: undefined, isLoading: true, error: null });
-    render(<SystemEventPage start={0} end={100} round={1} />);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+  it('names the window by its cycle, never by its event log ids', () => {
+    mockEvents({ data: rows });
+    render(<SystemEventPage round={5} start={100} end={200} />);
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Configuration before cycle 5' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/The protocol parameters the contract owner changed before cycle 5 opened/),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/100/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/200/)).not.toBeInTheDocument();
   });
 
-  it('renders events table after loading', () => {
-    mockUseSystemEvents.mockReturnValue({
-      data: [{ id: 1 }, { id: 2 }],
-      isLoading: false,
-      error: null,
-    });
-    render(<SystemEventPage start={0} end={100} round={1} />);
-    expect(screen.getByTestId('events-table')).toHaveTextContent('events: 2');
+  it('calls the first window the initial configuration', () => {
+    mockEvents({ data: rows });
+    render(<SystemEventPage round={0} start={0} end={100} />);
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Initial configuration' }),
+    ).toBeInTheDocument();
   });
 
-  it('shows round-specific title when round > 0', () => {
-    mockUseSystemEvents.mockReturnValue({ data: [], isLoading: false, error: null });
-    render(<SystemEventPage start={0} end={100} round={5} />);
-    expect(screen.getByText('System Configuration Made Before Cycle 5')).toBeInTheDocument();
-  });
-
-  it('shows deployment title when round is 0', () => {
-    mockUseSystemEvents.mockReturnValue({ data: [], isLoading: false, error: null });
-    render(<SystemEventPage start={0} end={100} round={0} />);
-    expect(screen.getByText('System Configuration Made Before Deployment')).toBeInTheDocument();
-  });
-
-  it('passes correct args to useSystemEvents', () => {
-    mockUseSystemEvents.mockReturnValue({ data: [], isLoading: false, error: null });
-    render(<SystemEventPage start={10} end={20} round={1} />);
+  it('reads the window it names', () => {
+    mockEvents({ data: [] });
+    render(<SystemEventPage round={1} start={10} end={20} />);
     expect(mockUseSystemEvents).toHaveBeenCalledWith(10, 20);
   });
 
-  describe('error handling', () => {
-    it('renders error message when query returns an error', () => {
-      mockUseSystemEvents.mockReturnValue({
-        data: undefined,
-        isLoading: false,
-        error: new Error('Network response was not OK'),
-      });
-      render(<SystemEventPage start={0} end={100} round={1} />);
-      // The localized explanation, never the raw transport message.
-      expect(screen.getByText('Failed to load system events')).toBeInTheDocument();
-      expect(screen.queryByText('Network response was not OK')).not.toBeInTheDocument();
-    });
-
-    it('renders generic fallback when error.message is empty', () => {
-      mockUseSystemEvents.mockReturnValue({
-        data: undefined,
-        isLoading: false,
-        error: new Error(''),
-      });
-      render(<SystemEventPage start={0} end={100} round={1} />);
-      expect(screen.getByText('Failed to load system events')).toBeInTheDocument();
-    });
-
-    it('does not render loading text when in error state', () => {
-      mockUseSystemEvents.mockReturnValue({
-        data: undefined,
-        isLoading: false,
-        error: new Error('fail'),
-      });
-      render(<SystemEventPage start={0} end={100} round={1} />);
-      expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
-    });
-
-    it('does not render the events table when in error state', () => {
-      mockUseSystemEvents.mockReturnValue({
-        data: undefined,
-        isLoading: false,
-        error: new Error('fail'),
-      });
-      render(<SystemEventPage start={0} end={100} round={1} />);
-      expect(screen.queryByTestId('events-table')).not.toBeInTheDocument();
-    });
-
-    it('still shows round title when in error state (round > 0)', () => {
-      mockUseSystemEvents.mockReturnValue({
-        data: undefined,
-        isLoading: false,
-        error: new Error('fail'),
-      });
-      render(<SystemEventPage start={0} end={100} round={3} />);
-      expect(screen.getByText('System Configuration Made Before Cycle 3')).toBeInTheDocument();
-    });
-
-    it('still shows deployment title when in error state (round === 0)', () => {
-      mockUseSystemEvents.mockReturnValue({
-        data: undefined,
-        isLoading: false,
-        error: new Error('fail'),
-      });
-      render(<SystemEventPage start={0} end={100} round={0} />);
-      expect(screen.getByText('System Configuration Made Before Deployment')).toBeInTheDocument();
-    });
-
-    it('applies text-destructive styling to the error message', () => {
-      mockUseSystemEvents.mockReturnValue({
-        data: undefined,
-        isLoading: false,
-        error: new Error('Server error'),
-      });
-      render(<SystemEventPage start={0} end={100} round={1} />);
-      const errorEl = screen.getByText('Failed to load system events');
-      expect(errorEl).toHaveClass('text-destructive');
-    });
+  it('counts the changes and dates the first and the latest', () => {
+    mockEvents({ data: rows });
+    render(<SystemEventPage round={1} start={100} end={200} />);
+    expect(screen.getByTestId('events-table')).toHaveTextContent('events: 2');
+    const changes = screen.getByText('Changes', { selector: 'span' }).closest('div');
+    expect(changes).toHaveTextContent('2');
+    const first = screen.getByText('First change', { selector: 'span' }).closest('div');
+    expect(within(first as HTMLElement).getByText(/2024/)).toBeInTheDocument();
+    expect(screen.getByText('Latest change', { selector: 'span' })).toBeInTheDocument();
   });
 
-  describe('reportError integration', () => {
-    it('calls reportError with the error and context when error is present', () => {
-      const error = new Error('Network response was not OK');
-      mockUseSystemEvents.mockReturnValue({
-        data: undefined,
-        isLoading: false,
-        error,
-      });
-      render(<SystemEventPage start={0} end={100} round={1} />);
-      expect(mockReportError).toHaveBeenCalledWith(error, 'fetch system events');
+  it('leaves the dates out of a window with no changes, and says why it is empty', () => {
+    mockEvents({ data: [] });
+    render(<SystemEventPage round={1} start={100} end={200} />);
+    expect(screen.queryByText('First change')).not.toBeInTheDocument();
+    expect(
+      screen.getByText('The protocol kept its existing settings through this window.'),
+    ).toBeInTheDocument();
+  });
+
+  it('keeps the header while the list loads and hands the table its loading state', () => {
+    mockEvents({ isLoading: true });
+    render(<SystemEventPage round={1} start={100} end={200} />);
+    expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
+    expect(screen.getByTestId('events-table')).toHaveAttribute('data-loading', 'true');
+  });
+
+  it('links back to every coordination change', () => {
+    mockEvents({ data: rows });
+    render(<SystemEventPage round={1} start={100} end={200} />);
+    const links = screen.getAllByRole('link', { name: /All coordination changes/ });
+    expect(links[0]).toHaveAttribute('href', '/coordination-changes');
+    expect(
+      screen.getByRole('link', { name: 'nav.routes.coordinationChanges.label' }),
+    ).toHaveAttribute('href', '/coordination-changes');
+  });
+
+  describe('a failed read', () => {
+    it('explains it in the page language, never the transport message, and retries', () => {
+      mockEvents({ error: new Error('Network response was not OK') });
+      render(<SystemEventPage round={3} start={100} end={200} />);
+      expect(screen.getByRole('alert')).toHaveTextContent(
+        'The configuration changes could not be loaded.',
+      );
+      expect(screen.queryByText(/Network response/)).not.toBeInTheDocument();
+      expect(
+        screen.getByRole('heading', { level: 1, name: 'Configuration before cycle 3' }),
+      ).toBeInTheDocument();
+      screen.getByRole('button', { name: 'Try again' }).click();
+      expect(mockRefetch).toHaveBeenCalled();
     });
 
-    it('does not call reportError when there is no error', () => {
-      mockUseSystemEvents.mockReturnValue({ data: [], isLoading: false, error: null });
-      render(<SystemEventPage start={0} end={100} round={1} />);
+    it('reports each new error once', () => {
+      const first = new Error('first');
+      const second = new Error('second');
+      mockEvents({ error: first });
+      const { rerender } = render(<SystemEventPage round={1} start={100} end={200} />);
+      expect(mockReportError).toHaveBeenCalledWith(first, 'fetch system events');
+
+      mockEvents({ error: second });
+      rerender(<SystemEventPage round={1} start={100} end={200} />);
+      expect(mockReportError).toHaveBeenCalledTimes(2);
+      expect(mockReportError).toHaveBeenLastCalledWith(second, 'fetch system events');
+    });
+
+    it('does not report a successful read', () => {
+      mockEvents({ data: rows });
+      render(<SystemEventPage round={1} start={100} end={200} />);
       expect(mockReportError).not.toHaveBeenCalled();
     });
-
-    it('calls reportError again when the error changes', () => {
-      const error1 = new Error('first');
-      const error2 = new Error('second');
-
-      mockUseSystemEvents.mockReturnValue({
-        data: undefined,
-        isLoading: false,
-        error: error1,
-      });
-      const { rerender } = render(<SystemEventPage start={0} end={100} round={1} />);
-      expect(mockReportError).toHaveBeenCalledTimes(1);
-      expect(mockReportError).toHaveBeenCalledWith(error1, 'fetch system events');
-
-      mockUseSystemEvents.mockReturnValue({
-        data: undefined,
-        isLoading: false,
-        error: error2,
-      });
-      rerender(<SystemEventPage start={0} end={100} round={1} />);
-      expect(mockReportError).toHaveBeenCalledTimes(2);
-      expect(mockReportError).toHaveBeenLastCalledWith(error2, 'fetch system events');
-    });
   });
 
-  describe('recovery', () => {
-    it('renders the table again when error clears', () => {
-      mockUseSystemEvents.mockReturnValue({
-        data: undefined,
-        isLoading: false,
-        error: new Error('temporary failure'),
-      });
-      const { rerender } = render(<SystemEventPage start={0} end={100} round={1} />);
-      expect(screen.getByText('Failed to load system events')).toBeInTheDocument();
-      expect(screen.queryByTestId('events-table')).not.toBeInTheDocument();
-
-      mockUseSystemEvents.mockReturnValue({
-        data: [{ id: 1 }],
-        isLoading: false,
-        error: null,
-      });
-      rerender(<SystemEventPage start={0} end={100} round={1} />);
-      expect(screen.queryByText('temporary failure')).not.toBeInTheDocument();
-      expect(screen.getByTestId('events-table')).toHaveTextContent('events: 1');
-    });
+  it.each([
+    ['a range that runs backwards', { round: 1, start: 200, end: 100 }],
+    ['a range that is not a number', { round: 1, start: Number.NaN, end: 100 }],
+    ['a negative cycle', { round: -1, start: 0, end: 100 }],
+  ])('refuses %s without reading anything', (_, props) => {
+    mockEvents({ data: rows });
+    render(<SystemEventPage {...props} />);
+    expect(mockUseSystemEvents).toHaveBeenCalledWith(-1, -1);
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'This configuration window does not exist' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByTestId('events-table')).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
-    mockUseSystemEvents.mockReturnValue({ data: [], isLoading: false, error: null });
-    const { container } = render(<SystemEventPage start={0} end={100} round={1} />);
+    mockEvents({ data: rows });
+    const { container } = render(<SystemEventPage round={1} start={100} end={200} />);
     await checkA11y(container);
   });
 });
