@@ -43,13 +43,14 @@ describe('StatCard', () => {
 
   it.each([
     ['hero', 'type-figure-lg'],
-    ['md', 'text-2xl'],
+    ['md', 'type-figure-md'],
     ['compact', 'text-base'],
   ] as const)('sets the %s figure in tabular Inter', (size, sizeClass) => {
     render(<StatCard label="Gestures" value="1,135" size={size} />);
     const value = screen.getByText('1,135');
     expect(value).toHaveClass(sizeClass);
-    if (size !== 'hero') expect(value).toHaveClass('tabular-nums', 'slashed-zero');
+    // The type-figure tokens carry the numerals; compact sets them itself.
+    if (size === 'compact') expect(value).toHaveClass('tabular-nums', 'slashed-zero');
   });
 
   it('keeps the label in sentence case and hyphenates it instead of chopping a word', () => {
@@ -74,6 +75,18 @@ describe('StatCard', () => {
     const definitions = screen.getAllByRole('definition');
     expect(definitions[0]).toHaveTextContent('2');
     expect(screen.getByText('The cycle that is open now.')).toHaveClass('sr-only');
+  });
+
+  it('keeps a loading definition card to <dt> and <dd> children', () => {
+    const { container } = render(
+      <dl>
+        <StatCard label="Active Performance Cycle" value="2" semantics="definition" loading />
+      </dl>,
+    );
+    const group = container.querySelector('dl > div');
+    const childTags = [...(group?.children ?? [])].map((child) => child.tagName);
+    expect(childTags).toEqual(['DT', 'DD']);
+    expect(group?.querySelector('dd')).toHaveAttribute('aria-busy', 'true');
   });
 
   it('lays out compact cards two across from the smallest phone', () => {

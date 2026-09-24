@@ -35,9 +35,9 @@ const badgeVariants = cva(
       },
       size: {
         /** 12px: table cells, wall labels, dense rows. */
-        sm: 'min-h-5 px-1.5 py-px type-caption font-medium',
+        sm: 'min-h-5 px-1.5 py-px',
         /** 13px: page headers and cards. */
-        md: 'min-h-6 px-2 py-0.5 type-label',
+        md: 'min-h-6 px-2 py-0.5',
       },
       shape: {
         tag: 'rounded-edge',
@@ -48,13 +48,20 @@ const badgeVariants = cva(
         true: 'whitespace-nowrap font-mono tabular-nums slashed-zero [overflow-wrap:normal]',
         false: '',
       },
-      /** Uppercase tracked status for an overline position. CJK stays uncased. */
+      /**
+       * Uppercase tracked status for an overline position: the `type-eyebrow`
+       * face, whose own :lang() rule sets Chinese, Japanese and Korean as a
+       * plain label, so a new locale needs no change here.
+       */
       overline: {
-        true: 'uppercase tracking-[0.08em] [&:lang(ja)]:tracking-normal [&:lang(ko)]:tracking-normal [&:lang(zh)]:tracking-normal',
+        true: 'type-eyebrow',
         false: '',
       },
     },
     compoundVariants: [
+      // One type utility per badge: the size's face, or the eyebrow's.
+      { size: 'sm', overline: false, class: 'type-caption font-medium' },
+      { size: 'md', overline: false, class: 'type-label' },
       { size: 'sm', shape: 'pill', class: 'px-2' },
       { size: 'md', shape: 'pill', class: 'px-2.5' },
     ],

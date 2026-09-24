@@ -44,7 +44,7 @@ const cardVariants = cva(
 
 const VALUE_CLASS: Record<StatCardSize, string> = {
   hero: 'type-figure-lg',
-  md: 'font-sans text-2xl font-medium leading-tight tracking-[-0.01em] tabular-nums lining-nums slashed-zero',
+  md: 'type-figure-md',
   compact: 'font-sans text-base font-medium leading-snug tabular-nums lining-nums slashed-zero',
 };
 
@@ -56,7 +56,7 @@ const VALUE_GAP: Record<StatCardSize, string> = {
 
 const SKELETON_CLASS: Record<StatCardSize, string> = {
   hero: 'h-9 w-3/5',
-  md: 'h-7 w-2/3',
+  md: 'h-6.5 w-2/3',
   compact: 'h-5 w-1/2',
 };
 
@@ -72,8 +72,9 @@ interface StatCardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children' 
    */
   tooltip?: string;
   /**
-   * `hero` (32px figure) for the one headline figure of a page, `md` (24px)
-   * for figure rows, `compact` (16px) for rows inside a panel.
+   * `hero` (32px, `type-figure-lg`) for the one headline figure of a page,
+   * `md` (20px, `type-figure-md`) for figure rows, `compact` (16px) for rows
+   * inside a panel.
    */
   size?: StatCardSize;
   /**
@@ -175,7 +176,11 @@ export function StatCard({
         ) : null}
       </LabelTag>
       {loading ? (
-        <Skeleton className={cn(VALUE_GAP[size], SKELETON_CLASS[size])} />
+        // The placeholder sits in the value's own element, so a definition
+        // card keeps only <dt> and <dd> children inside its <dl> group.
+        <ValueTag aria-busy className={cn('relative z-[1]', VALUE_GAP[size])}>
+          <Skeleton className={SKELETON_CLASS[size]} />
+        </ValueTag>
       ) : (
         <ValueTag
           className={cn(

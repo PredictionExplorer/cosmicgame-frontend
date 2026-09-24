@@ -43,6 +43,19 @@ describe('Badge', () => {
     expect(screen.getByText('Medium')).toHaveClass('type-label');
   });
 
+  it('sets an overline status in the eyebrow face, whose own rule uncases CJK', () => {
+    render(
+      <Badge size="sm" overline>
+        Live
+      </Badge>,
+    );
+    const badge = screen.getByText('Live');
+    expect(badge).toHaveClass('type-eyebrow');
+    // One type utility per badge, and no per-language rules of its own.
+    expect(badge).not.toHaveClass('type-caption');
+    expect(badge.className).not.toMatch(/:lang\(/);
+  });
+
   it('draws a dot that breathes only while live', () => {
     const { container } = render(
       <>
