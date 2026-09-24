@@ -462,9 +462,7 @@
     }
   },
   "chat": {
-    "liveFeed": "ライブフィード",
     "title": "一筆チャット",
-    "joinTooltipAria": "一筆チャットへの参加方法",
     "joinTooltip": "チャットに参加しますか？一筆を入れて、任意のメッセージを添えてください。一筆に添えられたメッセージはここに表示されます。",
     "currentCycle": "現在のサイクル",
     "cycleNumber": "サイクル{number}",
@@ -480,35 +478,20 @@
       "cstFallback": "CST"
     },
     "history": {
-      "shown": "表示中の履歴の件数です。",
       "loadOlder": "過去の履歴を読み込む",
       "loadingOlder": "過去の履歴を読み込み中…",
       "loading": "チャットを読み込み中…",
       "error": "チャットを読み込めませんでした。",
       "olderError": "過去のメッセージを読み込めませんでした。",
-      "retry": "再試行"
+      "retry": "再試行",
+      "showing": "最新のメッセージ{messages, plural, other {#件}}とサイクルのイベント{events, plural, other {#件}}",
+      "showMore": "さらに表示"
     },
     "empty": {
       "title": "メッセージやイベントはまだありません",
       "description": "メッセージとサイクルの節目が、新しいものから順にここに表示されます。",
-      "cta": "一筆を入れる"
-    },
-    "eventTitles": {
-      "cycleOpen": "サイクル開放",
-      "cycleStart": "サイクル開始",
-      "enduranceGrowing": "持久記録の延長",
-      "enduranceRecord": "先頭保持の終了",
-      "chronoLead": "時の戦士の記録延長",
-      "chronoReignEnded": "時の戦士の保持期間終了",
-      "finalCstLeader": "最新のCST一筆",
-      "newParticipant": "新しい参加者",
-      "gestureMilestone": "活動の節目",
-      "cstCalibrationReady": "CST調律完了",
-      "finalWindow": "確定間近",
-      "clockExtended": "カウントダウン延長",
-      "clockReopened": "カウントダウン終了後の一筆",
-      "finalizationAvailable": "確定可能",
-      "cycleFinalized": "サイクル確定"
+      "cta": "一筆を入れる",
+      "messagesFirst": "このサイクルのメッセージはまだありません。メッセージは一筆と一緒に送られます。"
     },
     "system": {
       "cycleStart": "サイクル{number}が始まりました。最初の一筆が確定カウントダウンを開始しました。",
@@ -529,9 +512,18 @@
     },
     "pending": {
       "aria": "自分のメッセージ、オンチェーンで確認済み、反映中",
-      "label": "反映中"
+      "label": "反映中",
+      "stillIndexing": "まだ反映中",
+      "viewTransaction": "トランザクションを見る"
     },
-    "eventCount": "{count, plural, =0 {まだイベントはありません} other {#件のイベント}}"
+    "eventCount": "{count, plural, =0 {まだイベントはありません} other {#件のイベント}}",
+    "you": "自分",
+    "viewLabel": "表示",
+    "view": {
+      "messages": "メッセージ",
+      "all": "すべての動き"
+    },
+    "eventGroup": "{count, plural, other {サイクルのイベント#件}}"
   },
   "deck": {
     "title": "Cosmic Signature観測所",

@@ -112,6 +112,7 @@ const mockGestureForm = {
   rwlknftIds: [] as number[],
   onGesture: jest.fn().mockResolvedValue(true),
   onGestureWithCST: jest.fn().mockResolvedValue(true),
+  getLastGestureHash: jest.fn(() => '0xfeed'),
 };
 
 jest.mock('../../../../hooks/useGestureForm', () => ({
@@ -1834,6 +1835,20 @@ describe('HomePage', () => {
     });
     rerender(<HomePage />);
     expect(screen.queryByTestId('chat-pending-message')).not.toBeInTheDocument();
+  });
+
+  it('records a sent message with its confirmed transaction for the chat', async () => {
+    const user = userEvent.setup();
+    mockGestureForm.message = 'linked signal';
+    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+    mockUseHomeGestureFeed.mockReturnValue({ data: [] });
+
+    render(<HomePage />);
+    await user.click(getPanelSubmitButton());
+
+    const row = await screen.findByTestId('chat-pending-message');
+    expect(row).toHaveTextContent('linked signal');
+    expect(mockGestureForm.getLastGestureHash).toHaveBeenCalled();
   });
 
   it('hero primary action only scrolls to the gesture panel when the cycle is active', async () => {

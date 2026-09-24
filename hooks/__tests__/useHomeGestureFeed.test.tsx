@@ -251,6 +251,18 @@ it('removes invalidated message bodies even if loading the corrected history fai
   expect(result.current.chatGestures).toEqual([]);
 });
 
+it('keeps a failed background refresh apart from a failed first read', async () => {
+  const { wrapper } = harness();
+  const { result } = renderHook(() => useHomeGestureFeed(7), { wrapper });
+  await waitFor(() => expect(result.current.chatGestures).toHaveLength(50));
+  context.mockRejectedValue(new Error('Refresh unavailable'));
+  act(() => result.current.retry());
+  await waitFor(() => expect(result.current.refreshError).toBeTruthy(), { timeout: 3000 });
+  // The history on screen stays, and nothing claims the chat could not load.
+  expect(result.current.error).toBeNull();
+  expect(result.current.chatGestures).toHaveLength(50);
+});
+
 it('aborts in-flight older reads on cycle rollover and does not mix their results', async () => {
   const { wrapper } = harness();
   const { result, rerender } = renderHook(({ cycle }) => useHomeGestureFeed(cycle), {

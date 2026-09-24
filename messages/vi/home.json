@@ -462,9 +462,7 @@
     }
   },
   "chat": {
-    "liveFeed": "Dòng trực tiếp",
     "title": "Trò chuyện nét bút",
-    "joinTooltipAria": "Cách tham gia Trò chuyện nét bút",
     "joinTooltip": "Muốn tham gia trò chuyện? Hãy đặt một nét bút và để lại lời nhắn tùy chọn. Lời nhắn đính kèm nét bút sẽ xuất hiện ở đây.",
     "currentCycle": "Chu kỳ hiện tại",
     "cycleNumber": "Chu kỳ #{number}",
@@ -480,35 +478,20 @@
       "cstFallback": "CST"
     },
     "history": {
-      "shown": "Số lượng chỉ tính các mục đang hiển thị.",
       "loadOlder": "Tải lịch sử cũ hơn",
       "loadingOlder": "Đang tải lịch sử cũ hơn…",
       "loading": "Đang tải trò chuyện…",
       "error": "Không tải được trò chuyện.",
       "olderError": "Không tải được tin nhắn cũ hơn.",
-      "retry": "Thử lại"
+      "retry": "Thử lại",
+      "showing": "{messages, plural, other {# lời nhắn}} và {events, plural, other {# sự kiện chu kỳ}} gần nhất",
+      "showMore": "Xem thêm"
     },
     "empty": {
       "title": "Chưa có lời nhắn hay sự kiện",
       "description": "Lời nhắn và các cột mốc của chu kỳ sẽ xuất hiện ở đây, mới nhất trước.",
-      "cta": "Đặt nét bút"
-    },
-    "eventTitles": {
-      "cycleOpen": "Chu kỳ đã mở",
-      "cycleStart": "Chu kỳ bắt đầu",
-      "enduranceGrowing": "Kỷ lục Bền bỉ đang kéo dài",
-      "enduranceRecord": "Kết thúc giữ vị trí dẫn đầu",
-      "chronoLead": "Kỷ lục Chiến binh Thời gian đang kéo dài",
-      "chronoReignEnded": "Kết thúc giữ danh hiệu Chiến binh Thời gian",
-      "finalCstLeader": "Nét bút CST mới nhất",
-      "newParticipant": "Người tham gia mới",
-      "gestureMilestone": "Cột mốc hoạt động",
-      "cstCalibrationReady": "Hiệu chỉnh CST hoàn tất",
-      "finalWindow": "Giai đoạn sắp kết thúc",
-      "clockExtended": "Đếm ngược được kéo dài",
-      "clockReopened": "Nét bút sau khi đồng hồ về không",
-      "finalizationAvailable": "Có thể hoàn tất",
-      "cycleFinalized": "Chu kỳ đã hoàn tất"
+      "cta": "Đặt nét bút",
+      "messagesFirst": "Chu kỳ này chưa có lời nhắn. Lời nhắn được gửi cùng nét bút."
     },
     "system": {
       "cycleStart": "Chu kỳ #{number} bắt đầu. Nét bút đầu tiên đã khởi động đếm ngược hoàn tất.",
@@ -529,9 +512,18 @@
     },
     "pending": {
       "aria": "Lời nhắn của bạn đã được xác nhận trên chuỗi, đang lập chỉ mục",
-      "label": "Đang lập chỉ mục"
+      "label": "Đang lập chỉ mục",
+      "stillIndexing": "Vẫn đang lập chỉ mục",
+      "viewTransaction": "Xem giao dịch"
     },
-    "eventCount": "{count, plural, =0 {Chưa có sự kiện} other {# sự kiện}}"
+    "eventCount": "{count, plural, =0 {Chưa có sự kiện} other {# sự kiện}}",
+    "you": "Bạn",
+    "viewLabel": "Hiển thị",
+    "view": {
+      "messages": "Lời nhắn",
+      "all": "Mọi hoạt động"
+    },
+    "eventGroup": "{count, plural, other {# sự kiện chu kỳ}}"
   },
   "deck": {
     "title": "Đài quan sát Cosmic Signature",

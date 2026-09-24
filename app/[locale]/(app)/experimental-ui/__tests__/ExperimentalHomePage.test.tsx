@@ -850,14 +850,14 @@ describe('HomePage', () => {
       'newParticipant',
     ]);
     expect(events.every((event) => event.querySelector('time[datetime]'))).toBe(true);
-    const listItems = within(chat).getAllByRole('listitem');
+    // Messages lead; the events between them fold into one line (F169).
+    const listItems = within(chat)
+      .getAllByRole('listitem')
+      .filter((item) => item.hasAttribute('data-chat-row'));
     expect(listItems[0]).toHaveTextContent('second signal');
-    expect(listItems[1]).toHaveTextContent('home.chat.system.enduranceRecord');
-    expect(listItems[1]?.querySelector('time')).toHaveAttribute(
-      'dateTime',
-      '2023-11-14T22:23:20.000Z',
-    );
-    expect(listItems[1]?.querySelector('time')).toHaveTextContent('Nov 14, 2023, 22:23:20 UTC');
+    const record = events.find((event) => event.dataset.kind === 'enduranceRecord')!;
+    expect(record).toHaveTextContent('home.chat.system.enduranceRecord');
+    expect(record.querySelector('time')).toHaveAttribute('dateTime', '2023-11-14T22:23:20.000Z');
     expect(within(chat).getByText(/home\.chat\.messageCount\(count=2\)/)).toBeInTheDocument();
     expect(within(chat).getByText(/home\.chat\.eventCount\(count=6\)/)).toBeInTheDocument();
   });
@@ -1614,7 +1614,6 @@ describe('HomePage', () => {
     const event = within(chat).getByTestId('chat-system-event');
     expect(event).toHaveAttribute('data-kind', 'cycleStart');
     expect(event.querySelector('time')).toHaveAttribute('dateTime', '2023-11-14T22:13:20.000Z');
-    expect(event.querySelector('time')).toHaveTextContent('Nov 14, 2023, 22:13:20 UTC');
     expect(within(chat).getByRole('button', { name: 'home.chat.empty.cta' })).toBeVisible();
     expect(within(chat).getByText(/home\.chat\.messageCount\(count=0\)/)).toBeInTheDocument();
     expect(within(chat).getByText(/home\.chat\.eventCount\(count=1\)/)).toBeInTheDocument();
@@ -1971,7 +1970,6 @@ describe('HomePage', () => {
       });
 
       expect(latest).toHaveClass('animate-live-flash');
-      expect(screen.getByTestId('gesture-message-chat')).toHaveClass('animate-live-flash');
 
       act(() => {
         jest.advanceTimersByTime(950);

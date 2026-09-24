@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useConfig, usePublicClient } from 'wagmi';
 import { writeContract } from '@wagmi/core';
@@ -91,6 +91,10 @@ export function useGestureForm() {
   const { notify, notifyErrorFromEthers } = useNotify();
   const tx = useTxFlow();
   const uxScenario = useUxScenarioSnapshot();
+  // The hash of the last confirmed Gesture, read right after a submit resolves
+  // (a ref, so the caller's closure sees it without waiting for a render).
+  const lastGestureHashRef = useRef<`0x${string}` | null>(null);
+  const getLastGestureHash = useCallback(() => lastGestureHashRef.current, []);
 
   const { data: ctPriceData } = useCTPrice();
   const { data: bidEthPriceData } = useGestureEthCost();
@@ -720,7 +724,9 @@ export function useGestureForm() {
         failureMessage: t('gesture.transaction.failed'),
         errorContext: 'gesture-eth',
       });
-      return result.status === 'confirmed';
+      if (result.status !== 'confirmed') return false;
+      lastGestureHashRef.current = result.hash;
+      return true;
     } finally {
       setIsBidding(false);
     }
@@ -805,7 +811,9 @@ export function useGestureForm() {
         failureMessage: t('gesture.transaction.failed'),
         errorContext: 'gesture-cst',
       });
-      return result.status === 'confirmed';
+      if (result.status !== 'confirmed') return false;
+      lastGestureHashRef.current = result.hash;
+      return true;
     } finally {
       setIsBidding(false);
     }
@@ -875,5 +883,7 @@ export function useGestureForm() {
     rwlknftIds,
     onGesture,
     onGestureWithCST,
+    /** The hash of the last confirmed Gesture, for its explorer link while it indexes. */
+    getLastGestureHash,
   } as const;
 }

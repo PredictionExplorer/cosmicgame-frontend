@@ -462,9 +462,7 @@
     }
   },
   "chat": {
-    "liveFeed": "Live feed",
     "title": "Gesture Chat",
-    "joinTooltipAria": "How to join Gesture Chat",
     "joinTooltip": "Want to join the chat? Make a gesture and leave an optional message. Messages attached to gestures appear here.",
     "currentCycle": "Current cycle",
     "cycleNumber": "Cycle #{number}",
@@ -480,35 +478,20 @@
       "cstFallback": "CST"
     },
     "history": {
-      "shown": "Counts reflect the history shown.",
       "loadOlder": "Load older",
       "loadingOlder": "Loading older history…",
       "loading": "Loading chat…",
       "error": "Could not load chat.",
       "olderError": "Could not load older messages.",
-      "retry": "Retry"
+      "retry": "Retry",
+      "showing": "Latest {messages, plural, one {# message} other {# messages}} and {events, plural, one {# cycle event} other {# cycle events}}",
+      "showMore": "Show more"
     },
     "empty": {
       "title": "No messages or events yet",
       "description": "Messages and cycle milestones will appear here, newest first.",
-      "cta": "Make a Gesture"
-    },
-    "eventTitles": {
-      "cycleOpen": "Cycle open",
-      "cycleStart": "Cycle started",
-      "enduranceGrowing": "Endurance record growing",
-      "enduranceRecord": "Endurance hold complete",
-      "chronoLead": "Chrono-Warrior record growing",
-      "chronoReignEnded": "Chrono reign complete",
-      "finalCstLeader": "Latest CST Gesture",
-      "newParticipant": "New participant",
-      "gestureMilestone": "Activity milestone",
-      "cstCalibrationReady": "CST calibration complete",
-      "finalWindow": "Closing window",
-      "clockExtended": "Clock extended",
-      "clockReopened": "Gesture after zero",
-      "finalizationAvailable": "Ready to finalize",
-      "cycleFinalized": "Cycle finalized"
+      "cta": "Make a Gesture",
+      "messagesFirst": "No messages yet this cycle. A message travels with a Gesture."
     },
     "system": {
       "cycleStart": "Cycle #{number} began. The first Gesture started the finalization clock.",
@@ -529,9 +512,18 @@
     },
     "pending": {
       "aria": "Your message, confirmed on-chain and indexing",
-      "label": "Indexing"
+      "label": "Indexing",
+      "stillIndexing": "Still indexing",
+      "viewTransaction": "View transaction"
     },
-    "eventCount": "{count, plural, =0 {No events yet} one {# event} other {# events}}"
+    "eventCount": "{count, plural, =0 {No events yet} one {# event} other {# events}}",
+    "you": "You",
+    "viewLabel": "Show",
+    "view": {
+      "messages": "Messages",
+      "all": "All activity"
+    },
+    "eventGroup": "{count, plural, one {# cycle event} other {# cycle events}}"
   },
   "deck": {
     "title": "The Cosmic Signature Observatory",

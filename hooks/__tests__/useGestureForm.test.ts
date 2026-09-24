@@ -696,6 +696,8 @@ describe('useGestureForm', () => {
     expect(mockTx.runs[0]!.errorContext).toBe('gesture-eth');
     expect(mockTx.lastSuccessMessage()).toBe('toasts.gesture.confirmed');
     expect(result.current.isGesturing).toBe(false);
+    // The confirmed hash is readable at once, for the chat's explorer link.
+    expect(result.current.getLastGestureHash()).toMatch(/^0x/);
   });
 
   it('names the Participation CST the receipt shows was imprinted', async () => {

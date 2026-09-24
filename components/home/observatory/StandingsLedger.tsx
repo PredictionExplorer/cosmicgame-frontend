@@ -467,7 +467,7 @@ export function StandingsLedger({
         <h2 id="standings-ledger-title" className="type-title text-foreground">
           {t('standings.title')}
         </h2>
-        <LiveStatus variant="inline" queryKeys={[['currentSpecialWinners']]} />
+        <LiveStatus variant="inline" still queryKeys={[['currentSpecialWinners']]} />
       </header>
 
       {/* The column heads, once, for sighted readers; every value carries its own label. */}

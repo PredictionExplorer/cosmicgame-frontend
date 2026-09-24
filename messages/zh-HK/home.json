@@ -462,9 +462,7 @@
     }
   },
   "chat": {
-    "liveFeed": "即時動態",
     "title": "落筆留言板",
-    "joinTooltipAria": "如何加入落筆留言板",
     "joinTooltip": "想在這裏留言？落筆時附上一句話即可。隨落筆提交的留言都會顯示在這裏。",
     "currentCycle": "目前週期",
     "cycleNumber": "第 {number} 個週期",
@@ -480,35 +478,20 @@
       "cstFallback": "CST"
     },
     "history": {
-      "shown": "數量只包括目前顯示的記錄。",
       "loadOlder": "載入更早記錄",
       "loadingOlder": "正在載入更早記錄…",
       "loading": "正在載入聊天內容…",
       "error": "無法載入聊天內容。",
       "olderError": "無法載入更早的訊息。",
-      "retry": "重試"
+      "retry": "重試",
+      "showing": "最近 {messages, plural, other {# 條留言}}和 {events, plural, other {# 項週期事件}}",
+      "showMore": "顯示更多"
     },
     "empty": {
       "title": "暫無留言或事件",
       "description": "留言和週期重要事件會顯示在這裏，最新的排在最前。",
-      "cta": "落筆"
-    },
-    "eventTitles": {
-      "cycleOpen": "週期開放",
-      "cycleStart": "週期開始",
-      "enduranceGrowing": "堅守紀錄延長",
-      "enduranceRecord": "堅守時段結束",
-      "chronoLead": "時之勇士紀錄延長",
-      "chronoReignEnded": "時之勇士在位結束",
-      "finalCstLeader": "最新 CST 落筆",
-      "newParticipant": "新參與者",
-      "gestureMilestone": "活動里程碑",
-      "cstCalibrationReady": "CST 校準完成",
-      "finalWindow": "臨近收官",
-      "clockExtended": "倒數延長",
-      "clockReopened": "歸零後落筆",
-      "finalizationAvailable": "可收官",
-      "cycleFinalized": "週期已收官"
+      "cta": "落筆",
+      "messagesFirst": "本週期暫無留言。留言隨落筆一同上鏈。"
     },
     "system": {
       "cycleStart": "第 {number} 個週期開始了。第一筆啟動了收官倒數。",
@@ -529,9 +512,18 @@
     },
     "pending": {
       "aria": "你的留言已在鏈上確認，正在索引",
-      "label": "索引中"
+      "label": "索引中",
+      "stillIndexing": "仍在索引",
+      "viewTransaction": "查看交易"
     },
-    "eventCount": "{count, plural, =0 {暫無事件} other {# 項事件}}"
+    "eventCount": "{count, plural, =0 {暫無事件} other {# 項事件}}",
+    "you": "你",
+    "viewLabel": "顯示",
+    "view": {
+      "messages": "留言",
+      "all": "全部動態"
+    },
+    "eventGroup": "{count, plural, other {# 項週期事件}}"
   },
   "deck": {
     "title": "Cosmic Signature 觀測台",

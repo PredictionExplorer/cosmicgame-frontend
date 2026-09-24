@@ -42,6 +42,13 @@ describe('LiveStatusView', () => {
     expect(screen.getByRole('status').previousElementSibling).not.toHaveClass('animate-live-dot');
   });
 
+  it('holds a secondary stamp still while live, keeping the state in words', () => {
+    render(<LiveStatusView state="live" variant="inline" still />);
+    const status = screen.getByRole('status');
+    expect(status).toHaveTextContent('common.liveStatus.live');
+    expect(status.previousElementSibling).not.toHaveClass('animate-live-dot');
+  });
+
   it('shows the freshness stamp inline', () => {
     render(<LiveStatusView state="live" ageMs={12_000} variant="inline" />);
     expect(

@@ -16,7 +16,7 @@ import { PageShell } from '@/components/ui/page-shell';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { CyclePhaseGuide } from '@/components/home/CyclePhaseGuide';
-import { GestureMessageChat, type PendingChatMessage } from '@/components/home/GestureMessageChat';
+import { GestureMessageChat } from '@/components/home/GestureMessageChat';
 import { HomeObservatoryHero } from '@/components/home/HomeObservatoryHero';
 import { deriveFeedSystemEvents } from '@/components/home/deck/feedSystemEvents';
 import { ActionDock } from '@/components/home/observatory/ActionDock';
@@ -47,6 +47,7 @@ import { useGestureChime } from '@/hooks/useGestureChime';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { invalidateLiveGameQueries } from '@/hooks/useLiveGameDataRefresh';
 import { useNow } from '@/hooks/useNow';
+import { usePendingChatMessages } from '@/hooks/usePendingChatMessages';
 import { usePositionMoment } from '@/hooks/usePositionMoment';
 import { useLatestSignatures } from '@/hooks/useLatestSignatures';
 import { useTabTitleCountdown } from '@/hooks/useTabTitleCountdown';
@@ -92,9 +93,6 @@ const MemoLatestSignature = memo(LatestSignature);
 
 /** The deadline's own read: the tab title trusts it while it keeps arriving. */
 const DEADLINE_FRESHNESS_KEYS = [['allocationTime']] as const;
-
-/** Pending optimistic chat rows expire if the indexer never echoes them. */
-const PENDING_MESSAGE_EXPIRY_MS = 90_000;
 
 /** How long the wallet's own confirmed Gesture may stand in for an index that lags. */
 const OWN_GESTURE_OVERLAY_MS = 120_000;
@@ -355,6 +353,7 @@ const HomePage = ({
     rwlkId,
     onGesture,
     onGestureWithCST,
+    getLastGestureHash,
     setBidType,
     setMessage,
     setRwlkId,
@@ -459,43 +458,9 @@ const HomePage = ({
       .catch((e) => reportError(e, 'post-gesture chain sample'));
   }, [account, cosmicGame, offset, queryClient]);
 
-  // Optimistic chat rows: a just-sent message shows instantly and is removed
-  // once the indexer echoes the real gesture (or after a safety timeout).
-  const [pendingMessages, setPendingMessages] = useState<PendingChatMessage[]>([]);
-  const pendingExpiryTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
-  useEffect(() => {
-    const timers = pendingExpiryTimersRef.current;
-    return () => timers.forEach(clearTimeout);
-  }, []);
-
-  const recordPendingMessage = useCallback((address: string, message: string) => {
-    const id = `pending-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    setPendingMessages((prev) => [
-      ...prev,
-      { id, address, message, timestamp: Math.floor(Date.now() / 1000) },
-    ]);
-    pendingExpiryTimersRef.current.push(
-      setTimeout(() => {
-        setPendingMessages((prev) => prev.filter((entry) => entry.id !== id));
-      }, PENDING_MESSAGE_EXPIRY_MS),
-    );
-  }, []);
-
-  useEffect(() => {
-    setPendingMessages((prev) => {
-      if (prev.length === 0) return prev;
-      const next = prev.filter(
-        (entry) =>
-          !chatGestures.some(
-            (gesture) =>
-              gesture.BidderAddr?.toLowerCase() === entry.address.toLowerCase() &&
-              typeof gesture.Message === 'string' &&
-              gesture.Message.trim() === entry.message,
-          ),
-      );
-      return next.length === prev.length ? prev : next;
-    });
-  }, [chatGestures]);
+  // Optimistic chat rows until the indexer echoes them (F221).
+  const { pending: pendingMessages, record: recordPendingMessage } =
+    usePendingChatMessages(chatGestures);
 
   // Mobile bottom sheet: hosts the same gesture panel, opened from the dock,
   // so phones can act from anywhere on the page.
@@ -536,7 +501,7 @@ const HomePage = ({
       if (await (gestureType === 'CST' ? onGestureWithCST() : onGesture())) {
         trackGestureSubmitted({ source, method: gestureType, hasMessage: trimmedMessage !== '' });
         if (trimmedMessage && account) {
-          recordPendingMessage(account, trimmedMessage);
+          recordPendingMessage(account, trimmedMessage, getLastGestureHash());
         }
         recordConfirmedGesture();
         withPostTxRefresh();
@@ -552,6 +517,7 @@ const HomePage = ({
     [
       account,
       gestureForm.message,
+      getLastGestureHash,
       gestureType,
       notify,
       onGesture,
@@ -965,6 +931,7 @@ const HomePage = ({
                 isLoading={feed.isLoading}
                 error={Boolean(feed.error)}
                 onRetry={feed.retry}
+                account={account}
                 resetKey={feed.resetKey}
                 cycleNumber={round >= 0 ? round : undefined}
                 pulseKey={gesturePulseKey}
