@@ -89,6 +89,24 @@ describe('AnchorTokenGrid', () => {
     ).toBeInTheDocument();
   });
 
+  it('keeps focused controls clear of the selection bar while it is up', async () => {
+    // WCAG 2.2 2.4.11: the sticky bar covers the bottom of the viewport, so the
+    // root's scroll padding makes the browser scroll focus out from under it.
+    const user = userEvent.setup();
+    const root = document.documentElement;
+    const { unmount } = renderGrid();
+    expect(root.style.scrollPaddingBottom).toBe('');
+    await user.click(screen.getByRole('checkbox', { name: /Twisted Mind/ }));
+    expect(root.style.scrollPaddingBottom).toMatch(
+      /^calc\(\d+px \+ env\(safe-area-inset-bottom, 0px\) \+ 1rem \+ 0\.75rem\)$/,
+    );
+    await user.click(screen.getByRole('button', { name: 'anchoring.picker.clear' }));
+    expect(root.style.scrollPaddingBottom).toBe('');
+    await user.click(screen.getByRole('checkbox', { name: /Twisted Mind/ }));
+    unmount();
+    expect(root.style.scrollPaddingBottom).toBe('');
+  });
+
   it('selects every NFT at once and clears them', async () => {
     const user = userEvent.setup();
     renderGrid();

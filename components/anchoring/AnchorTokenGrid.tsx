@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, useState, type ReactNode } from 'react';
+import { useId, useRef, useState, type ReactNode } from 'react';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -24,6 +24,7 @@ import { ChainGuard } from '@/components/wallet/NetworkGuard';
 import { ReleaseConfirmDialog } from './ReleaseConfirmDialog';
 import { TokenPlate } from './TokenPlate';
 import { anchorTokenHref, type AnchorCollection } from './anchorLinks';
+import { useBottomScrollClearance } from './useBottomScrollClearance';
 
 /**
  * The ETH a release of these anchors retrieves, as the indexer reports it:
@@ -411,10 +412,14 @@ interface SelectionBarProps {
   action: ReactNode;
 }
 
+/** The bar's distance from the viewport's bottom edge (its `bottom` offset). */
+const SELECTION_BAR_INSET = 'env(safe-area-inset-bottom, 0px) + 1rem';
+
 /**
  * The floating bar of a selection: it sticks to the bottom of the viewport
  * while its section is on screen and rides along with the section otherwise,
- * so two grids on one page never stack two bars.
+ * so two grids on one page never stack two bars. While it is up, the page
+ * scrolls a focused control out from under it.
  */
 function SelectionBar({
   label,
@@ -426,10 +431,14 @@ function SelectionBar({
   action,
 }: SelectionBarProps) {
   const t = useTranslations('anchoring');
+  const ref = useRef<HTMLDivElement>(null);
+  useBottomScrollClearance(ref, `${SELECTION_BAR_INSET} + 0.75rem`);
   return (
     <div
+      ref={ref}
       role="region"
       aria-label={label}
+      data-selection-bar=""
       className={cn(
         'sticky bottom-[calc(env(safe-area-inset-bottom,0px)+1rem)] z-20 mt-8',
         'motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2',
