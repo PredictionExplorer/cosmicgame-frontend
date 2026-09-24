@@ -645,6 +645,8 @@
   "namedNfts": {
     "title": "名前付きCosmic Signature NFT",
     "subtitle": "固有の名前が付けられたCosmic Signature NFTを見る",
+    "loadErrorTitle": "名前付きNFTを読み込めませんでした",
+    "loadErrorMessage": "名前付きNFTの記録を読み込めませんでした。もう一度お試しください。",
     "emptyTitle": "名前付きNFTはありません",
     "emptyDescription": "名前を付けられたCosmic Signature NFTはまだありません。",
     "galleryLink": "ギャラリーで見る"
@@ -662,8 +664,8 @@
     }
   },
   "usedRwlkNfts": {
-    "title": "使用済みのRandom Walk NFT",
-    "subtitle": "一度だけの50%の一筆の費用の割引のためにETH一筆に添付されたRandom Walk NFT",
+    "title": "使用済みのRandomWalk NFT",
+    "subtitle": "一度だけの50%の一筆の費用の割引のためにETH一筆に添付されたRandomWalk NFT",
     "artAlt": "RandomWalk NFT {id}",
     "loadErrorTitle": "使用済みのRandomWalk NFTを読み込めませんでした",
     "loadError": "使用済みのRandomWalk NFTを読み込めませんでした。もう一度お試しください。",

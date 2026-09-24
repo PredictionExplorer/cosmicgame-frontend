@@ -58,6 +58,7 @@ export default function MyTokens() {
             seed: token.Seed,
             name: token.TokenName,
             anchored: Boolean(token.Staked),
+            imprintedAt: token.MintTimeStamp ?? token.TimeStamp,
             // How the Signature first arrived: Stellar Selection, the Final Gesture…
             extraMeta: allocation ? [valueLabel('allocation', allocation)] : undefined,
           };

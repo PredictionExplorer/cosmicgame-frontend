@@ -175,7 +175,7 @@
         },
         "cards": {
           "named": {
-            "label": "Cosmic Signature NFT đã đặt tên"
+            "label": "NFT đã đặt tên"
           },
           "owners": {
             "label": "Chủ sở hữu hiện tại"
@@ -190,7 +190,7 @@
         "description": "Xem các RandomWalk NFT đã được đính kèm vào nét bút ETH để hưởng mức giảm chi phí nét bút một lần.",
         "source": "Các API sử dụng RandomWalk công khai của Cosmic Signature",
         "links": {
-          "imprint": "Khắc Random Walk NFT",
+          "imprint": "Khắc RandomWalk NFT",
           "learn": "Tìm hiểu cách nét bút vận hành",
           "cycle": "Xem dữ liệu chu kỳ hiện tại"
         },

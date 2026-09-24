@@ -175,7 +175,7 @@
         },
         "cards": {
           "named": {
-            "label": "Іменовані Cosmic Signature NFT"
+            "label": "Іменовані NFT"
           },
           "owners": {
             "label": "Поточні власники"
@@ -190,7 +190,7 @@
         "description": "Перегляньте RandomWalk NFT, які вже долучено до ETH-жестів для одноразового зниження вартості жесту.",
         "source": "Публічні API використання RandomWalk Cosmic Signature",
         "links": {
-          "imprint": "Закарбувати Random Walk NFT",
+          "imprint": "Закарбувати RandomWalk NFT",
           "learn": "Дізнатися, як працюють жести",
           "cycle": "Переглянути дані поточного циклу"
         },

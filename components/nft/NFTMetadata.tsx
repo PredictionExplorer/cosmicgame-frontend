@@ -279,7 +279,7 @@ export function NFTSeed({ seed, headingLevel = 2, className }: NFTSeedProps) {
         </Heading>
         <InfoTooltip content={t('metadata.seedTooltip')} label={t('metadata.seed')} />
       </div>
-      <div className="flex max-w-full items-start gap-3 rounded-control bg-surface-sunken py-2.5 pl-4 pr-2 sm:w-fit">
+      <div className="flex max-w-full items-center gap-3 rounded-control bg-surface-sunken py-2.5 pl-4 pr-2 sm:w-fit">
         <p className="min-w-0 flex-1 py-1 type-hash text-foreground" data-testid="seed-value">
           {seedText}
         </p>

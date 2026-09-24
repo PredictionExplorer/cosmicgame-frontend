@@ -175,7 +175,7 @@
         },
         "cards": {
           "named": {
-            "label": "이름 붙인 Cosmic Signature NFT"
+            "label": "이름 붙인 NFT"
           },
           "owners": {
             "label": "현재 소유자"
@@ -190,7 +190,7 @@
         "description": "일회성 제스처 비용 할인을 위해 이미 ETH 제스처에 첨부된 RandomWalk NFT를 확인할 수 있습니다.",
         "source": "Cosmic Signature 공개 RandomWalk 사용 기록 API",
         "links": {
-          "imprint": "Random Walk NFT 각인",
+          "imprint": "RandomWalk NFT 각인",
           "learn": "제스처 알아보기",
           "cycle": "현재 사이클 데이터 보기"
         },

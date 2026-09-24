@@ -110,46 +110,6 @@ export function LedgerPageSkeleton({
   );
 }
 
-/** A Cosmic Signature NFT: the plate beside its wall label, then the figure row. */
-export function NftDetailSkeleton() {
-  return (
-    <PageShell variant="detail" backdrop="signature" className="max-w-none px-0">
-      <LoadingRegion className="container mx-auto px-4">
-        <Skeleton shine={false} className="mb-6 h-3.5 w-44" />
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
-          <div>
-            <SkeletonArtPlate />
-            <div aria-hidden className="mt-4 flex items-center justify-between gap-3">
-              <div className="flex gap-2">
-                <Skeleton className="h-10 w-24 rounded-control" />
-                <Skeleton className="h-10 w-36 rounded-control" />
-              </div>
-              <div className="flex gap-2">
-                <Skeleton className="size-10 rounded-control" />
-                <Skeleton className="size-10 rounded-control" />
-              </div>
-            </div>
-          </div>
-          <div aria-hidden className="space-y-4">
-            <Skeleton className="h-11 w-2/3 sm:h-14" />
-            <div className="flex flex-wrap gap-2">
-              <Skeleton className="h-6 w-20" />
-              <Skeleton className="h-6 w-40" />
-              <Skeleton className="h-6 w-28" />
-            </div>
-            <Skeleton className="h-10 w-48 rounded-control" />
-          </div>
-        </div>
-        <SkeletonStatGrid announce={false} className="mt-10" />
-        <div aria-hidden className={cn(panel, 'mt-8 p-4')}>
-          <Skeleton shine={false} className="h-3 w-16" />
-          <Skeleton className="mt-3 h-3.5 w-full max-w-2xl" />
-        </div>
-      </LoadingRegion>
-    </PageShell>
-  );
-}
-
 /** A participant's profile: header with the address, six figures, then the activity panel. */
 export function ProfileSkeleton() {
   return (

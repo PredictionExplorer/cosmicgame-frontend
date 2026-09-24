@@ -1,4 +1,4 @@
-import { checkA11y, render, screen, within } from '@/test-utils';
+import { checkA11y, fireEvent, render, screen, within } from '@/test-utils';
 
 import NamedNFTsPage from '../NamedNFTsPage';
 
@@ -79,6 +79,27 @@ describe('NamedNFTsPage', () => {
     render(<NamedNFTsPage />);
     expect(screen.getByRole('heading', { level: 2, name: 'No named NFTs' })).toBeInTheDocument();
     expect(screen.getByText('No Cosmic Signature NFTs have been named yet.')).toBeInTheDocument();
+  });
+
+  it('offers a retry instead of an empty wall when the list cannot be read', () => {
+    const refetch = jest.fn();
+    mockUseNamedNFTs.mockReturnValue({ data: undefined, isLoading: false, isError: true, refetch });
+    render(<NamedNFTsPage />);
+    expect(screen.queryByRole('heading', { name: 'No named NFTs' })).toBeNull();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Named NFTs could not be loaded' }),
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Try again/ }));
+    expect(refetch).toHaveBeenCalled();
+  });
+
+  it('never says nothing is named under a header that counted named NFTs', () => {
+    mockUseNamedNFTs.mockReturnValue({ data: [], isLoading: false, refetch: jest.fn() });
+    render(<NamedNFTsPage snapshotCount={3} />);
+    expect(screen.queryByRole('heading', { name: 'No named NFTs' })).toBeNull();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Named NFTs could not be loaded' }),
+    ).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

@@ -14,6 +14,7 @@ import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
 import { HueStrip, useTraitLabels } from '@/components/nft/traits';
 import { signatureCardSources } from '@/components/nft/SignatureCard';
 import { useSignatureAlt } from '@/components/nft/signatureArt';
+import { useSignatureArtLabel } from '@/components/nft/useSignatureArtLabel';
 
 import type { GalleryNFTData } from './galleryTypes';
 
@@ -34,6 +35,23 @@ function imprintTime(nft: GalleryNFTData): number | undefined {
   return nft.MintTimeStamp ?? nft.TimeStamp;
 }
 
+/** A row's 96px plate; a missing render reads "Rendering" in its first hour. */
+function ListArtwork({ row }: { row: ListRow }) {
+  const signatureAlt = useSignatureAlt();
+  const { label } = useSignatureArtLabel(imprintTime(row.nft));
+  const id = formatId(row.nft.TokenId);
+  return (
+    <ArtFrame
+      sources={signatureCardSources(row.nft.Seed)}
+      alt={signatureAlt({ id, name: row.nft.TokenName, entry: row.entry })}
+      sizes="(max-width: 639px) 15rem, 96px"
+      density="compact"
+      unavailableLabel={label}
+      className="w-24 max-sm:w-full max-sm:max-w-60"
+    />
+  );
+}
+
 /**
  * The gallery as a ledger: a 96px plate, the name and number, and the traits
  * as columns, for readers who compare pieces. The page already sorts and
@@ -41,9 +59,7 @@ function imprintTime(nft: GalleryNFTData): number | undefined {
  */
 export function GalleryList({ items, collectionTraits, onQuickView }: GalleryListProps) {
   const t = useTranslations('gallery');
-  const tDetail = useTranslations('detail');
   const tTraits = useTranslations('traits');
-  const signatureAlt = useSignatureAlt();
   const { valueLabel } = useTraitLabels();
 
   const rows = useMemo<ListRow[]>(
@@ -73,19 +89,7 @@ export function GalleryList({ items, collectionTraits, onQuickView }: GalleryLis
       stack: true,
       value: (row) => row.nft.TokenId,
       width: '7.5rem',
-      cell: (row) => {
-        const id = formatId(row.nft.TokenId);
-        return (
-          <ArtFrame
-            sources={signatureCardSources(row.nft.Seed)}
-            alt={signatureAlt({ id, name: row.nft.TokenName, entry: row.entry })}
-            sizes="(max-width: 639px) 15rem, 96px"
-            density="compact"
-            unavailableLabel={tDetail('image.artworkUnavailable')}
-            className="w-24 max-sm:w-full max-sm:max-w-60"
-          />
-        );
-      },
+      cell: (row) => <ListArtwork row={row} />,
     },
     {
       id: 'token',

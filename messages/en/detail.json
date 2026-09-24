@@ -30,8 +30,8 @@
     "label": "Previous and next Signatures"
   },
   "sections": {
-    "nameHistory": "Name History",
-    "ownershipHistory": "Ownership History"
+    "nameHistory": "Name history",
+    "ownershipHistory": "Ownership history"
   },
   "ownerActions": {
     "title": "Manage your token",

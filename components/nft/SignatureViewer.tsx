@@ -37,12 +37,16 @@ export interface SignatureViewerProps {
   subject: string;
   /** The formatted token number, shown on the unavailable plate. */
   tokenLabel: string;
-  /** Caption of the unavailable state. */
+  /** Caption of the unavailable state ("Rendering" while the render may still be on its way). */
   unavailableLabel: string;
+  /**
+   * The token was imprinted within the render window: until the still
+   * loads, there is no animation to offer either, so Still / In motion
+   * stays hidden.
+   */
+  renderPending?: boolean;
   /** The plate's rendered width at each breakpoint, for the srcset choice. */
   sizes: string;
-  /** Labelled previous and next links, placed at the end of the label row. */
-  navigation?: ReactNode;
   className?: string;
   /** Classes for the plate itself (e.g. no radius where it bleeds to the screen edge). */
   plateClassName?: string;
@@ -50,7 +54,11 @@ export interface SignatureViewerProps {
   controlsClassName?: string;
 }
 
-function prefersStillArt(reducedMotion: boolean): boolean {
+/**
+ * Whether art should stay still until asked: the reader's reduced-motion
+ * setting, or the site's own motion switch (`data-motion="reduced"`).
+ */
+export function prefersStillArt(reducedMotion: boolean): boolean {
   if (reducedMotion) return true;
   if (typeof document === 'undefined') return false;
   return document.documentElement.dataset.motion === 'reduced';
@@ -58,7 +66,7 @@ function prefersStillArt(reducedMotion: boolean): boolean {
 
 /**
  * SignatureViewer — the art on its plate with the label row beneath: Still /
- * In motion, play and pause, full screen, and the neighbouring Signatures.
+ * In motion, play and pause, and full screen.
  * The still is the default; the animation plays in the same plate only when
  * asked for (never on its own under reduced motion), pauses while scrolled
  * out of view or in a hidden tab, and falls back to the still if it cannot
@@ -71,8 +79,8 @@ export function SignatureViewer({
   subject,
   tokenLabel,
   unavailableLabel,
+  renderPending = false,
   sizes,
-  navigation,
   className,
   plateClassName,
   controlsClassName,
@@ -192,6 +200,12 @@ export function SignatureViewer({
   };
 
   const canOpenFullscreen = showMotion || (media !== null && artStatus !== 'unavailable');
+  // Offer the animation only for art that exists: never beside the
+  // unavailable plate, nor while a fresh imprint's render is still pending.
+  const showModes =
+    media !== null &&
+    artStatus !== 'unavailable' &&
+    (!renderPending || artStatus === 'loaded' || showMotion);
 
   return (
     <div className={cn('flex min-w-0 flex-col gap-3', className)} data-testid="signature-viewer">
@@ -244,7 +258,7 @@ export function SignatureViewer({
         )}
       >
         <div className="flex items-center gap-2 max-sm:w-full">
-          {media ? (
+          {showModes ? (
             <div
               role="group"
               aria-label={t('viewer.modeLabel')}
@@ -292,7 +306,6 @@ export function SignatureViewer({
             </Button>
           ) : null}
         </div>
-        {navigation ? <div className="max-sm:w-full sm:ml-auto">{navigation}</div> : null}
         {motionFailed ? (
           <p role="status" className="w-full type-caption text-subtle">
             {t('viewer.motionError')}

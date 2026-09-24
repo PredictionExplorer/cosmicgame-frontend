@@ -65,13 +65,13 @@ describe('UsedRwlkNftsPage', () => {
   it('renders the fallback header without a server summary', () => {
     mockUseUsedRWLKNFTs.mockReturnValue(state());
     render(<UsedRwlkNftsPage />);
-    expect(screen.getByRole('heading', { level: 1, name: 'Used Random Walk NFTs' })).toBeVisible();
+    expect(screen.getByRole('heading', { level: 1, name: 'Used RandomWalk NFTs' })).toBeVisible();
   });
 
   it('hangs each used RandomWalk NFT on a plate, with its page, cycle and participant', () => {
     mockUseUsedRWLKNFTs.mockReturnValue(state({ data: [record()] }));
     render(<UsedRwlkNftsPage />);
-    const wall = screen.getByRole('list', { name: 'Used Random Walk NFTs' });
+    const wall = screen.getByRole('list', { name: 'Used RandomWalk NFTs' });
     const card = within(wall).getByTestId('used-rwlk-nft');
     expect(within(card).getByAltText('RandomWalk NFT #000215')).toHaveAttribute(
       'src',
@@ -81,7 +81,7 @@ describe('UsedRwlkNftsPage', () => {
     const tokenLink = within(card).getByRole('link', { name: /RandomWalk NFT #000215/ });
     expect(tokenLink).toHaveAttribute('href', 'https://www.randomwalknft.com/detail/215');
     expect(tokenLink).toHaveAttribute('target', '_blank');
-    expect(within(card).getByRole('link', { name: 'Cycle 1' })).toHaveAttribute(
+    expect(within(card).getByRole('link', { name: 'Cycle #1' })).toHaveAttribute(
       'href',
       '/allocation/1',
     );

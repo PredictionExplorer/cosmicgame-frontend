@@ -6,6 +6,13 @@
  */
 export const TRAIT_GRID_CLASS = 'grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4';
 
+/**
+ * For a grid of one-column facts: the last one fills the rest of its row
+ * instead of leaving an empty cell (the third of three spans two columns).
+ */
+export const TRAIT_GRID_FILL_ROW_CLASS =
+  'max-lg:[&>*:last-child:nth-child(odd)]:col-span-2 lg:[&>*:last-child:nth-child(4n+3)]:col-span-2';
+
 /** The dense grid of the gallery quick view's narrow column. */
 export const TRAIT_GRID_DENSE_CLASS = 'grid grid-cols-2 gap-2 sm:grid-cols-3';
 

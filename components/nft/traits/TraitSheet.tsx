@@ -206,7 +206,7 @@ export function TraitSheet({
                       {typeLabel(key)}
                       <InfoTooltip content={typeHint(key)} iconClassName="h-3 w-3" />
                     </dt>
-                    <dd className="flex flex-wrap items-center gap-2 type-body-sm text-foreground">
+                    <dd className="flex flex-wrap items-baseline gap-2 type-body-sm text-foreground">
                       {value}
                       {share !== undefined && total ? (
                         <span

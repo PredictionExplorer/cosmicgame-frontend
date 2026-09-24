@@ -24,8 +24,10 @@ test.describe('zh locale smoke', () => {
     await page.goto('/zh/gallery');
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
     await expect(page).toHaveURL(/\/zh\/gallery$/);
-    await expect(page.getByRole('textbox', { name: '搜索 NFT' })).toBeVisible();
-    await expect(page.getByRole('button', { name: '搜索', exact: true })).toBeVisible();
+    // The search filters as the reader types (a search field, no submit
+    // button); Filters opens the rail or, on a phone, the sheet.
+    await expect(page.getByRole('searchbox', { name: '搜索 NFT' })).toBeVisible();
+    await expect(page.getByRole('button', { name: '筛选', exact: true })).toBeVisible();
   });
 
   test('/zh/faq renders under the locale prefix', async ({ page }) => {
@@ -82,6 +84,12 @@ test.describe('zh locale smoke', () => {
     await expect(
       siteMap.getByRole('heading', { level: 2, name: '信任', exact: true }),
     ).toBeVisible();
+    // Phones fold each group under its heading; About sits in Learn.
+    const learn = siteMap.getByRole('button', { name: '学习', exact: true });
+    if (await learn.isVisible()) {
+      await expect(learn).toHaveAttribute('aria-expanded', 'false');
+      await learn.click();
+    }
     await expect(siteMap.getByRole('link', { name: /关于 Cosmic Signature/ })).toHaveAttribute(
       'href',
       'https://cosmicsignature.com/zh/about',

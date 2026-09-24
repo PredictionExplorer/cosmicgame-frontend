@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-import { TRAIT_GRID_CLASS, TRAIT_TILE_CLASS } from './layout';
+import { TRAIT_GRID_CLASS, TRAIT_GRID_FILL_ROW_CLASS, TRAIT_TILE_CLASS } from './layout';
 import { RarityRankChip } from './RarityRankChip';
 import { TraitSheet } from './TraitSheet';
 import { hueColor } from './palette';
@@ -202,7 +202,7 @@ export function NftTraitPanel({
             groups={['composition']}
             hideHeadings
           />
-          <dl className={TRAIT_GRID_CLASS}>
+          <dl className={cn(TRAIT_GRID_CLASS, TRAIT_GRID_FILL_ROW_CLASS)}>
             {typeof palette?.dominant_wavelength_nm === 'number' ? (
               <Fact label={t('panel.dominantWavelength')}>
                 {t('panel.nanometres', { value: number(palette.dominant_wavelength_nm, 0) })}

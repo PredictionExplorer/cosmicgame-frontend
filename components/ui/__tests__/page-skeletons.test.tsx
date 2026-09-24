@@ -5,7 +5,6 @@ import { join } from 'node:path';
 import {
   CycleAllocationSkeleton,
   LedgerPageSkeleton,
-  NftDetailSkeleton,
   ProfileSkeleton,
   RecordDetailSkeleton,
 } from '@/components/ui/page-skeletons';
@@ -13,7 +12,6 @@ import {
 import { checkA11y, render, screen } from '@/test-utils';
 
 const SKELETONS = [
-  ['NftDetailSkeleton', () => <NftDetailSkeleton />],
   ['ProfileSkeleton', () => <ProfileSkeleton />],
   ['CycleAllocationSkeleton', () => <CycleAllocationSkeleton />],
   ['LedgerPageSkeleton', () => <LedgerPageSkeleton summaryRows={2} />],

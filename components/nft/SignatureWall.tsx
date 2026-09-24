@@ -15,6 +15,8 @@ export interface SignatureWallItem {
   seed?: string | number | null;
   name?: string | null;
   anchored?: boolean;
+  /** When the token was imprinted (unix seconds), for the "Rendering" state. */
+  imprintedAt?: number | null;
   /** Caption facts after the traits (how the token was received…). */
   extraMeta?: readonly ReactNode[];
 }
@@ -87,6 +89,7 @@ export function SignatureWall({
               seed={item.seed}
               name={item.name}
               anchored={item.anchored}
+              imprintedAt={item.imprintedAt}
               extraMeta={item.extraMeta}
               entry={
                 collectionTraits === undefined

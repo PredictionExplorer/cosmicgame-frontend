@@ -113,6 +113,7 @@ export function GalleryGrid({
                 : (collectionTraits?.byId.get(nft.TokenId) ?? null)
             }
             anchored={Boolean(nft.Staked)}
+            imprintedAt={nft.MintTimeStamp ?? nft.TimeStamp}
             sizes={gridSizes(railOpen)}
             priority={index < EAGER_CARDS}
             onQuickView={onQuickView}

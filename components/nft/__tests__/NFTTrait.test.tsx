@@ -250,7 +250,8 @@ describe('NFTTrait', () => {
     expect(
       within(breadcrumb).getByRole('link', { name: 'common.breadcrumbs.gallery' }),
     ).toHaveAttribute('href', '/gallery');
-    expect(within(breadcrumb).getByText('MyToken')).toHaveAttribute('aria-current', 'page');
+    // The trail stops at the gallery: the H1 names the Signature.
+    expect(within(breadcrumb).queryByText('MyToken')).toBeNull();
   });
 
   it('renders token identity with name', () => {
@@ -314,7 +315,7 @@ describe('NFTTrait', () => {
     expect(screen.getByTestId('art-frame')).toHaveClass('art-plate');
   });
 
-  it('offers Still / In motion, full screen and labelled neighbour links under the art', () => {
+  it('offers Still / In motion and full screen under the art, and labelled neighbour links', () => {
     withDashboard();
     withNft();
     withNameHistory();

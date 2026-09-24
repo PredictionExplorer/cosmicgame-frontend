@@ -175,7 +175,7 @@
         },
         "cards": {
           "named": {
-            "label": "名前付きCosmic Signature NFT"
+            "label": "名前付きNFT"
           },
           "owners": {
             "label": "現在の所有者"
@@ -190,7 +190,7 @@
         "description": "ETH一筆の割引に使用済みのRandomWalk NFTを確認できます。割引に使えるのは、各NFTにつき一度だけです。",
         "source": "Cosmic Signature公開RandomWalk使用API",
         "links": {
-          "imprint": "Random Walk NFTを刻印する",
+          "imprint": "RandomWalk NFTを刻印する",
           "learn": "一筆の仕組みを学ぶ",
           "cycle": "現在のサイクルデータを見る"
         },
