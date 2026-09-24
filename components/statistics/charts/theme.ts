@@ -10,18 +10,27 @@
  * - Series: named data, track and method tokens, never red (styles/themes.css).
  */
 
-/** Series colours for SVG `fill`/`stroke` and inline styles, by meaning. */
+/**
+ * Series colours for SVG `fill`/`stroke` and inline styles, by meaning. A
+ * hue keeps one meaning per page: the activity page draws the gesture
+ * methods (`GESTURE_METHOD_COLOR`: ETH violet, ETH with a RandomWalk NFT
+ * sky, CST gold) beside its counts and its lead timeline, so neither of those
+ * uses a method's hue.
+ */
 export const SERIES_COLOR = {
-  /** Gestures counted over time. */
-  gestures: 'hsl(var(--data-1))',
-  /** Distinct participants over time. */
-  participants: 'hsl(var(--data-2))',
+  /** Gestures counted over time, every method together: neutral, never a method's hue. */
+  gestures: 'hsl(var(--data-8))',
   /** CST total supply. */
   supply: 'hsl(var(--data-1))',
   /** An ordinary lead stint on the Endurance timeline. */
   lead: 'hsl(var(--data-8))',
-  /** The Endurance Champion's stint and record. */
-  endurance: 'hsl(var(--track-endurance))',
+  /**
+   * The Endurance Champion's stint and record. Not `--track-endurance`: that
+   * track shares its gold with the CST method, which the charts around the
+   * lead timeline draw, so the champion takes the one series hue no gesture
+   * method and no other timeline series uses.
+   */
+  endurance: 'hsl(var(--data-5))',
   /** The Chrono-Warrior's lane and record. */
   chrono: 'hsl(var(--track-chrono))',
   /** A reference series drawn behind the data (the allocation clock). */

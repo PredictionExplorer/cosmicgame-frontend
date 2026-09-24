@@ -260,7 +260,7 @@ export const LastBidSpikeChart: FC<LastBidSpikeChartProps> = ({ enabled = true, 
               <ReferenceArea
                 x1={alignHour(spike.StartTs) - HOUR / 2}
                 x2={alignHour(spike.EndTs) + HOUR / 2}
-                fill="hsl(var(--data-1) / 0.12)"
+                fill="hsl(var(--foreground) / 0.08)"
                 strokeOpacity={0}
               />
             ) : null}
