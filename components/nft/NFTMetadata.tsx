@@ -119,7 +119,10 @@ export function NFTSpecList({ nft, entry, rarity, rarityTotal = 0, className }: 
     >
       <SpecRow label={t('metadata.cycle')} testId="spec-cycle">
         {nft?.RoundNum != null ? (
-          <Link href={`/allocation/${nft.RoundNum}`} className="link-quiet">
+          <Link
+            href={`/allocation/${nft.RoundNum}`}
+            className="link-quiet inline-flex min-h-6 items-center"
+          >
             {t('metadata.roundNumber', { round: nft.RoundNum })}
           </Link>
         ) : (
@@ -132,19 +135,21 @@ export function NFTSpecList({ nft, entry, rarity, rarityTotal = 0, className }: 
         caption={nft?.TimeStamp ? <ImprintAge timestamp={nft.TimeStamp} /> : null}
         testId="spec-imprinted"
       >
+        {/* The full date may break between date and time: the value column is
+            about 150px wide on a 320px phone. */}
         {nft?.TimeStamp ? (
           nft.TxHash ? (
             <a
               href={getExplorerUrl('tx', nft.TxHash)}
               target="_blank"
               rel="noopener noreferrer"
-              className="link-quiet inline-flex items-center gap-1"
+              className="link-quiet inline-flex min-h-6 items-center gap-1"
             >
-              <DateTime timestamp={nft.TimeStamp} variant="full" />
+              <DateTime timestamp={nft.TimeStamp} variant="full" className="whitespace-normal" />
               <ArrowUpRight aria-hidden className="size-3.5 shrink-0 text-subtle" />
             </a>
           ) : (
-            <DateTime timestamp={nft.TimeStamp} variant="full" />
+            <DateTime timestamp={nft.TimeStamp} variant="full" className="whitespace-normal" />
           )
         ) : (
           unknown
@@ -201,7 +206,7 @@ export function NFTSpecList({ nft, entry, rarity, rarityTotal = 0, className }: 
           testId="spec-anchoring"
         >
           {anchoringEligible ? (
-            <Link href="/anchoring" className="link-quiet">
+            <Link href="/anchoring" className="link-quiet inline-flex min-h-6 items-center">
               {t('badges.eligibleForAnchoring')}
             </Link>
           ) : (

@@ -142,7 +142,7 @@ export function TraitSheet({
         return (
           <Link
             href={`/allocation/${entry.cycle}`}
-            className="link-quiet font-medium"
+            className="link-quiet inline-flex min-h-6 items-center font-medium"
             aria-label={t('card.viewCycle', { n: entry.cycle })}
           >
             {t('card.cycleLong', { n: entry.cycle })}

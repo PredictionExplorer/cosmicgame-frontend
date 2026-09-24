@@ -301,7 +301,7 @@ function ModeOption({ selected, disabled = false, onSelect, icon, label }: ModeO
       disabled={disabled}
       onClick={onSelect}
       className={cn(
-        'inline-flex h-10 items-center gap-1.5 rounded-[calc(var(--radius-control)-2px)] px-3 type-label transition-colors duration-[var(--duration-fast)] sm:h-8',
+        'inline-flex h-11 items-center gap-1.5 rounded-[calc(var(--radius-control)-2px)] px-3 type-label transition-colors duration-[var(--duration-fast)] sm:h-8',
         '[&_svg]:size-4 [&_svg]:shrink-0 disabled:cursor-not-allowed disabled:opacity-50',
         selected
           ? 'bg-surface-raised text-foreground shadow-[inset_0_-2px_0_hsl(var(--primary))]'

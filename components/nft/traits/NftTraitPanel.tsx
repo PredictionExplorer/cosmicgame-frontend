@@ -182,7 +182,7 @@ export function NftTraitPanel({
               key={value}
               value={value!}
               className={cn(
-                'relative shrink-0 whitespace-nowrap rounded-none bg-transparent px-0 pb-3 pt-2 type-body-sm font-medium text-muted-foreground focus-ring-inset hover:text-foreground',
+                'relative min-w-11 shrink-0 whitespace-nowrap rounded-none bg-transparent px-0 pb-3 pt-2 type-body-sm font-medium text-muted-foreground focus-ring-inset hover:text-foreground',
                 'data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none',
                 "after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-primary after:opacity-0 after:content-[''] data-[state=active]:after:opacity-100",
               )}
