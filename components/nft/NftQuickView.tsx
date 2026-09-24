@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState, type KeyboardEvent } from 'react';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { ArrowLeft, ArrowRight, ExternalLink, ImageIcon, Play } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -19,13 +20,7 @@ import {
   TraitSheet,
 } from '@/components/nft/traits';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 
 /** The list fields the quick view needs for one token. */
@@ -178,11 +173,13 @@ export function NftQuickView({
             <div className="flex flex-col gap-4 p-5 sm:p-6">
               <DialogHeader className="space-y-2 pr-8 text-left">
                 <p className="type-mono text-subtle">{id}</p>
-                <DialogTitle className="type-heading-2 text-foreground [overflow-wrap:anywhere]">
+                {/* The Radix title itself: the shadcn wrapper's text-lg / font-semibold
+                    defaults would outrank the display type (Clash at 24px, never bold). */}
+                <DialogPrimitive.Title className="type-heading-2 text-foreground [overflow-wrap:anywhere]">
                   {item.TokenName && item.TokenName !== ''
                     ? item.TokenName
                     : t('quickView.title', { id })}
-                </DialogTitle>
+                </DialogPrimitive.Title>
                 <DialogDescription>{t('quickView.description')}</DialogDescription>
               </DialogHeader>
 

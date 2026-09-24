@@ -86,6 +86,27 @@ describe('NftQuickView', () => {
     );
   });
 
+  it('sets the title in the 24px display tier, free of the dialog title defaults', () => {
+    render(
+      <NftQuickView
+        tokenId={1}
+        items={items}
+        onOpenChange={jest.fn()}
+        onNavigate={jest.fn()}
+        collectionTraits={collectionTraits}
+      />,
+    );
+    const title = screen.getByRole('heading', { name: 'NUMBA 1' });
+    // type-heading-2 is Clash at 24px and the display weight. tailwind-merge
+    // does not know the type-* utilities, so any size, weight, leading or
+    // tracking utility beside it would win in the cascade (18px bold).
+    expect(title).toHaveClass('type-heading-2');
+    expect(title.className).not.toMatch(
+      /\b(text-(xs|sm|base|lg|xl)|font-(semibold|bold)|leading-|tracking-)/,
+    );
+    expect(screen.getByRole('dialog')).toHaveAccessibleName('NUMBA 1');
+  });
+
   it('navigates with the arrow keys and buttons within the visible items', () => {
     const onNavigate = jest.fn();
     render(
