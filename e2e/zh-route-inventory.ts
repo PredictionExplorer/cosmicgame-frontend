@@ -444,7 +444,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: `/system-event/${cycle}/100/200`,
     host: 'app',
     cluster: 'statistics',
-    expectedText: `第 ${cycle} 个周期前的系统配置`,
+    expectedText: `第 ${cycle} 个周期前的配置`,
   },
 
   // Sprint 6 — FAQ, legal, trust, contracts, and source.

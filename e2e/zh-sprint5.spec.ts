@@ -259,7 +259,7 @@ test.describe('zh Sprint 5 — statistics, tables, and formatting', () => {
       ],
       [
         `/zh/system-event/${CYCLE}/100/200`,
-        `第 ${CYCLE} 个周期前的系统配置`,
+        `第 ${CYCLE} 个周期前的配置`,
         '系统事件 · Cosmic Signature',
       ],
     ];
