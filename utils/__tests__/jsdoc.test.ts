@@ -14,6 +14,7 @@ const UTIL_FILES = [
   'format/addresses.ts',
   'format/dates.ts',
   'format/durations.ts',
+  'format/ids.ts',
   'format/numbers.ts',
   'metadata.ts',
   'seo.ts',
@@ -59,9 +60,10 @@ function hasJSDocBefore(source: string, fnName: string): boolean {
     const match = pattern.exec(source);
     if (!match) continue;
 
-    const before = source.slice(0, match.index);
-    const trimmed = before.trimEnd();
-    return trimmed.endsWith('*/') && JSDOC_PATTERN.test(trimmed.slice(-500));
+    // The comment must end right before the export; it may be any length.
+    const trimmed = source.slice(0, match.index).trimEnd();
+    if (!trimmed.endsWith('*/')) return false;
+    return JSDOC_PATTERN.test(trimmed.slice(trimmed.lastIndexOf('/**')));
   }
   return false;
 }
@@ -78,10 +80,11 @@ const EXPECTED_COUNTS: Record<string, number> = {
   'contractWrite.ts': 1,
   'endurance.ts': 3,
   'errors.ts': 6,
-  'format.ts': 15,
+  'format.ts': 14,
   'format/addresses.ts': 6,
   'format/dates.ts': 10,
   'format/durations.ts': 6,
+  'format/ids.ts': 1,
   'format/numbers.ts': 7,
   'metadata.ts': 1,
   'seo.ts': 1,
