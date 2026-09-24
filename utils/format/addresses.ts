@@ -100,8 +100,9 @@ export function shortenHex(hex: string, _legacyLength?: number): string {
 }
 
 /**
- * The catalog label of each protocol contract: `formats` `address.known.<key>`,
- * named like the /contracts page entries so both read the same.
+ * The catalog label of each protocol contract: `formats` `address.known.<key>`.
+ * The keys and names match the /contracts page (`contracts.entries.<key>.name`)
+ * in every locale, pinned by utils/__tests__/format-known-addresses.test.ts.
  */
 const KNOWN_ADDRESS_LABELS = {
   cosmicGame: 'protocol',

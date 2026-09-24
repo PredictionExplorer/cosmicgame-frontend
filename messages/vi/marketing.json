@@ -73,8 +73,7 @@
   "address": {
     "invalid": "Địa chỉ Ethereum không hợp lệ",
     "heading": "Phân bổ truyền thông của người dùng",
-    "loading": "Đang tải…",
-    "outreachWallet": "Ví truyền thông"
+    "loading": "Đang tải…"
   },
   "transferForm": {
     "title": "Chi CST phân bổ",

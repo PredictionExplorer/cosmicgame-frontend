@@ -73,8 +73,7 @@
   "address": {
     "invalid": "유효하지 않은 이더리움 주소",
     "heading": "이 참여자의 홍보 배분",
-    "loading": "불러오는 중…",
-    "outreachWallet": "홍보 지갑"
+    "loading": "불러오는 중…"
   },
   "transferForm": {
     "title": "CST 홍보 배분 전달",
