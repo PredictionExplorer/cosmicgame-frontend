@@ -115,7 +115,7 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     await expect(
       clock
         .getByText(
-          /Gestures open when this countdown reaches zero|first Gesture starts the finalization clock|Cycle is live|less than one hour|Final minutes|Final minute|Finalization is ready/i,
+          /Gestures open when this countdown reaches zero|first Gesture starts the finalization clock|can extend the finalization clock|less than one hour|Final minutes|Final minute|Finalization is ready/i,
         )
         .first(),
     ).toBeVisible();

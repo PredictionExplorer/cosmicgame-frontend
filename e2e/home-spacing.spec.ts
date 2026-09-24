@@ -30,9 +30,10 @@ for (const viewport of [
       await expect(chat.getByText('Spacing audit message 1:', { exact: false })).toBeVisible();
       await page.evaluate(async () => document.fonts.ready);
 
-      // The collection spans the page after the chat/guide row and the
-      // allocation disclosure. A rail-only collection would pass a generic
-      // document overflow or landmark check.
+      // The collection spans the page right after the chat/guide row, above
+      // the closed disclosures, which read as one list of hairline rows. A
+      // rail-only collection would pass a generic document overflow or
+      // landmark check.
       const [feedBox, chatBox, allocationsBox, collectionBox] = await Promise.all([
         feed.boundingBox(),
         chat.boundingBox(),
@@ -46,8 +47,8 @@ for (const viewport of [
       expect(Math.abs(collectionBox!.x - feedBox!.x)).toBeLessThanOrEqual(1);
       expect(Math.abs(collectionBox!.width - feedBox!.width)).toBeLessThanOrEqual(1);
       expect(collectionBox!.y).toBeGreaterThanOrEqual(feedBox!.y + feedBox!.height - 1);
-      expect(collectionBox!.y).toBeGreaterThanOrEqual(
-        allocationsBox!.y + allocationsBox!.height - 1,
+      expect(allocationsBox!.y).toBeGreaterThanOrEqual(
+        collectionBox!.y + collectionBox!.height - 1,
       );
 
       const spacing = await attachments.evaluate((element) => {
@@ -57,7 +58,7 @@ for (const viewport of [
           collectionMargin: Number.parseFloat(getComputedStyle(element).marginTop),
         };
       });
-      const sectionGap = collectionBox!.y - allocationsBox!.y - allocationsBox!.height;
+      const sectionGap = collectionBox!.y - feedBox!.y - feedBox!.height;
       expect(sectionGap).toBeLessThanOrEqual(spacing.wrapperMargin + spacing.collectionMargin + 2);
 
       if (viewport.width >= 1280) {

@@ -611,7 +611,9 @@ export function GestureMessageChat({
           variant="inline"
           still
           queryKeys={[['homeGestureFeed']]}
-          className="mt-1 print:hidden"
+          // Its own line on phones, whatever the count line's length, so the
+          // header keeps one shape as the history grows.
+          className="mt-1 max-sm:w-full print:hidden"
         />
       </header>
 
@@ -741,7 +743,8 @@ export function GestureMessageChat({
           ) : null}
 
           {!isLoading && !error && (hiddenOnPhones || hasOlderContent || pagination?.error) ? (
-            <div className="space-y-2 border-t border-rule-faint py-4 print:hidden">
+            // A gap, not a margin: a button hidden at this width leaves no space.
+            <div className="flex flex-col gap-2 border-t border-rule-faint py-4 print:hidden">
               {pagination?.error ? (
                 <p role="status" className="type-body-sm text-muted-foreground">
                   {t('chat.history.olderError')}

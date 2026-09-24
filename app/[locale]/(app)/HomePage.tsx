@@ -624,13 +624,16 @@ const HomePage = ({
   // and it never duplicates that action. Below 1024px it therefore stays
   // until the form's action row (the commit or connect button) is on screen:
   // a phone that opens on the clock has an action in its first viewport even
-  // though the form's heading already shows at the bottom edge. From 1024px,
-  // where the dock would lie over the form's own method selector, it steps
-  // aside while any of the form is on screen. Until the observers report it
-  // stays aside, so the server HTML never paints a dock over the desk; jsdom
-  // has no IntersectionObserver.
+  // though the form's heading already shows at the bottom edge. It also
+  // steps aside while someone works in the form on screen (focus inside
+  // it), so it never lies over the field being filled. From 1024px, where
+  // the dock would lie over the form's own method selector, it steps aside
+  // while any of the form is on screen. Until the observers report it stays
+  // aside, so the server HTML never paints a dock over the desk; jsdom has
+  // no IntersectionObserver.
   const [formInView, setFormInView] = useState(true);
   const [actionInView, setActionInView] = useState(true);
+  const [formFocused, setFormFocused] = useState(false);
   const isDesktop = useMediaQuery('(min-width: 64rem)');
   useEffect(() => {
     if (typeof IntersectionObserver === 'undefined') return undefined;
@@ -656,7 +659,22 @@ const HomePage = ({
       actionObserver.disconnect();
     };
   }, [showPanel, loading]);
-  const dockAside = gestureSheetOpen || (isDesktop ? formInView : actionInView);
+  useEffect(() => {
+    const form = document.getElementById('make-gesture');
+    if (!form) return undefined;
+    const handleFocusIn = () => setFormFocused(true);
+    const handleFocusOut = (event: FocusEvent) => {
+      if (!form.contains(event.relatedTarget as Node | null)) setFormFocused(false);
+    };
+    form.addEventListener('focusin', handleFocusIn);
+    form.addEventListener('focusout', handleFocusOut);
+    return () => {
+      form.removeEventListener('focusin', handleFocusIn);
+      form.removeEventListener('focusout', handleFocusOut);
+    };
+  }, [showPanel, loading]);
+  const dockAside =
+    gestureSheetOpen || (isDesktop ? formInView : actionInView || (formFocused && formInView));
 
   // The source-aligned clock discovers milestones even between Gestures.
   // A 30-second bucket keeps this larger timeline out of the one-second
