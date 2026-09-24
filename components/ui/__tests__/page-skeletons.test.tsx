@@ -30,6 +30,15 @@ describe('record page skeletons', () => {
     expect(document.querySelector('main#main')).not.toBeNull();
   });
 
+  it('keeps a short ledger in the reading column under a full-width header', () => {
+    const { container } = render(
+      <LedgerPageSkeleton figures={3} rows={4} width="max-w-none" body="narrow" />,
+    );
+    const table = container.querySelector('[role="status"] > .max-w-3xl');
+    expect(table).not.toBeNull();
+    expect(screen.getByRole('status')).toHaveClass('max-w-none');
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(<RecordDetailSkeleton />);
     await checkA11y(container);

@@ -86,6 +86,7 @@ export function LedgerPageSkeleton({
   rows = 10,
   columns = 4,
   width = 'max-w-6xl',
+  body = 'full',
 }: {
   figures?: number;
   /** Spec-sheet rows in a summary card above the table. */
@@ -93,6 +94,11 @@ export function LedgerPageSkeleton({
   rows?: number;
   columns?: number;
   width?: 'max-w-5xl' | 'max-w-6xl' | 'max-w-none';
+  /**
+   * The table's column, as `LedgerPage`'s `width`: `narrow` keeps it in the
+   * 48rem reading column of a short ledger, under a full-width header.
+   */
+  body?: 'full' | 'narrow';
 }) {
   return (
     <PageShell variant="data" backdrop="signature" className="max-sm:pb-16">
@@ -102,7 +108,7 @@ export function LedgerPageSkeleton({
           <SkeletonStatGrid announce={false} count={figures} className="mb-10" />
         ) : null}
         {summaryRows > 0 ? <SkeletonSectionCard rows={summaryRows} /> : null}
-        <div className={cn(panel, 'p-2 sm:p-3')}>
+        <div className={cn(panel, 'p-2 sm:p-3', body === 'narrow' && 'max-w-3xl')}>
           <SkeletonTable announce={false} rows={rows} columns={columns} />
         </div>
       </LoadingRegion>
