@@ -68,6 +68,46 @@ describe('styles/tables.css', () => {
     ).toBe(false);
   });
 
+  it('stacks records as a list divided by one rule, with no box or fill', () => {
+    // docs/design-system.md → Tables: records are a stacked list with one
+    // --rule between them, not a card or a filled well per row.
+    expect(declaration(phoneRules, `${RECORD} tbody tr + tr`, 'border-top')).toBe(
+      '1px solid hsl(var(--rule))',
+    );
+    expect(declaration(phoneRules, `${RECORD} tbody tr`, 'background')).toBeUndefined();
+    expect(declaration(phoneRules, `${RECORD} tbody tr`, 'border-radius')).toBeUndefined();
+    // Lines inside a record carry no rules of their own.
+    expect(declaration(phoneRules, `${RECORD} tbody td`, 'border-bottom')).toBe('0');
+  });
+
+  it('keeps a focus outline inside the scroll container on phones', () => {
+    // The shared ring is 2px wide and 2px out (styles/tokens.css), and the
+    // container clips anything past its edge, so the outermost values keep
+    // at least a 0.25rem (4px) inset in both layouts.
+    const rem = (value: string | undefined) => Number.parseFloat(value ?? '0');
+    expect(
+      rem(declaration(phoneRules, `${RECORD} tbody tr`, 'padding-inline')),
+    ).toBeGreaterThanOrEqual(0.25);
+    expect(
+      rem(
+        declaration(
+          phoneRules,
+          ".cs-table[data-layout='compact'] :is(th, td):first-child",
+          'padding-inline-start',
+        ),
+      ),
+    ).toBeGreaterThanOrEqual(0.25);
+    expect(
+      rem(
+        declaration(
+          phoneRules,
+          ".cs-table[data-layout='compact'] :is(th, td):last-child",
+          'padding-inline-end',
+        ),
+      ),
+    ).toBeGreaterThanOrEqual(0.25);
+  });
+
   it('sets every record value at the end edge, so values never zig-zag', () => {
     expect(declaration(phoneRules, `${RECORD} tbody td > [data-slot='value']`, 'text-align')).toBe(
       'end',
@@ -75,6 +115,27 @@ describe('styles/tables.css', () => {
     expect(
       declaration(phoneRules, `${RECORD} tbody td[data-stack] > [data-slot='value']`, 'text-align'),
     ).toBe('start');
+  });
+
+  it('gives a link that is a whole record value a 24px target both ways', () => {
+    // Regression: a token id link ("42") in a record was 17.6px wide.
+    const link = `${RECORD} tbody td > [data-slot='value'] > a`;
+    expect(declaration(phoneRules, link, 'min-width')).toBe('1.5rem');
+    expect(declaration(phoneRules, link, 'min-height')).toBe('1.5rem');
+  });
+
+  it('keeps a trailing button’s touch pad from widening a record', () => {
+    // Regression: a help button's 44px pad at the end of an event name made
+    // the /coordination-changes list scroll sideways at 320px.
+    expect(declaration(phoneRules, `${RECORD} tbody tr`, 'overflow')).toBe('clip');
+  });
+
+  it('lets nothing inside a record value push the record past the screen', () => {
+    // Regression: a named address in a nowrap link ("Cosmic Signature NFT
+    // Anchoring Wallet") made a /statistics/tokens record 76px too wide at 320px.
+    expect(
+      declaration(phoneRules, `${RECORD} tbody td > [data-slot='value'] *`, 'text-wrap-mode'),
+    ).toBe('wrap');
   });
 
   it('labels each value from its own cell, in sentence case at 13px', () => {

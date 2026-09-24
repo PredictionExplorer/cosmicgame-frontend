@@ -192,10 +192,14 @@ const BanGestureTable = ({ gestureHistory, ...state }: BanGestureTableProps) => 
               {hidden ? <TableTag>{t('banGesture.hiddenTag')}</TableTag> : null}
               <Tooltip>
                 <TooltipTrigger asChild>
-                  {/* Two lines on a desktop row, the whole message on a phone. */}
+                  {/*
+                   * Two lines on a desktop row, the whole message on a phone.
+                   * `max-w-full`: as a start-aligned flex item the span would
+                   * otherwise size to an unbroken word and never wrap it.
+                   */}
                   <span
                     className={cn(
-                      'block break-words sm:line-clamp-2',
+                      'block max-w-full break-words sm:line-clamp-2',
                       hidden ? 'text-subtle' : 'text-foreground',
                     )}
                   >

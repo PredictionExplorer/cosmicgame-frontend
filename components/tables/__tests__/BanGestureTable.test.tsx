@@ -116,6 +116,16 @@ describe('BanGestureTable', () => {
     expect(screen.getAllByText('Test message').length).toBeGreaterThanOrEqual(1);
   });
 
+  it('keeps a long unbroken message within its record', async () => {
+    // Regression: as a start-aligned flex item the message sized itself to
+    // one unbroken word and ran 680px past a 320px phone record.
+    const message = 'ThisIsAnIntentionallyUnbrokenGestureMessage'.repeat(4);
+    await act(async () => {
+      render(<BanGestureTable gestureHistory={[createGestureHistory({ Message: message })]} />);
+    });
+    expect(screen.getAllByText(message)[0]).toHaveClass('max-w-full', 'break-words');
+  });
+
   it('calls get_banned_bids on mount', async () => {
     await act(async () => {
       render(<BanGestureTable gestureHistory={[createGestureHistory()]} />);
