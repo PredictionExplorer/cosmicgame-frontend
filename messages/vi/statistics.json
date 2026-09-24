@@ -572,7 +572,7 @@
       "typeRandomWalk": "Nét bút ETH + RandomWalk (rút ngắn)",
       "typeCst": "Nét bút CST (kéo dài)",
       "summaryFinal": "Khi hoàn tất, cửa sổ là {current}. Trong chu kỳ, cửa sổ dao động từ {low} đến {high}.",
-      "description": "Cửa sổ hiệu chỉnh CST quyết định chi phí một nét bút CST mất bao lâu để giảm từ giá khởi điểm về không. Mỗi nét bút ETH rút ngắn cửa sổ một chút; mỗi nét bút CST kéo dài nó. Mỗi chấm là một nét bút, tô màu theo loại; đường kẻ là cửa sổ có hiệu lực sau nét bút đó.",
+      "description": "Cửa sổ hiệu chỉnh CST quyết định chi phí một nét bút CST mất bao lâu để giảm từ giá khởi điểm về không. Mỗi nét bút ETH rút ngắn cửa sổ một chút; mỗi nét bút CST kéo dài nó. Đường kẻ đổi ở mỗi nét bút sang cửa sổ có hiệu lực sau nét bút đó; bảng liệt kê từng nét bút và loại của nó.",
       "empty": "Không có dữ liệu cửa sổ hiệu chỉnh theo từng nét bút cho chu kỳ này. Các chu kỳ được lập chỉ mục trước các sự kiện V2 không có dữ liệu này.",
       "selectCycle": "Chọn một chu kỳ để xem.",
       "loadErrorTitle": "Không tải được dòng thời gian cửa sổ hiệu chỉnh",

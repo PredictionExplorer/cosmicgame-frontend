@@ -5,6 +5,7 @@ import type { GestureInfo } from '@/services/api/types';
 import { checkA11y, render, screen, within } from '@/test-utils';
 
 import CstCalibrationWindowChart, { CstCalibrationWindowView } from '../CstCalibrationWindowChart';
+import { DOTS_MAX_POINTS } from '../charts/theme';
 
 const mockUseGestureListByCycle = jest.fn();
 const mockUseRoundInfo = jest.fn();
@@ -59,6 +60,23 @@ describe('CstCalibrationWindowView', () => {
     expect(circles[0]).toHaveAttribute('fill', 'hsl(var(--method-eth))');
     expect(circles[1]).toHaveAttribute('fill', 'hsl(var(--method-eth-rwlk))');
     expect(circles[2]).toHaveAttribute('fill', 'hsl(var(--method-cst))');
+  });
+
+  it("leaves a dense cycle's step line unburied: no dots at rest, no dot key", () => {
+    // Regression: ~1,100 gesture dots covered the line the legend promised.
+    const dense = Array.from({ length: DOTS_MAX_POINTS + 1 }, (_, index) => ({
+      TimeStamp: T0 + index * 60,
+      GestureType: index % 2 === 0 ? 0 : 2,
+      BidderAddr: ADDR_A,
+      CstDutchAuctionDurationInt: 10_000 + (index % 2 === 0 ? -5 : 5),
+    })) as unknown as GestureInfo[];
+    const { container } = render(
+      <CstCalibrationWindowView gestures={dense} isLive label="Window" />,
+    );
+    expect(container.querySelectorAll('circle')).toHaveLength(0);
+    const figure = screen.getByRole('figure', { name: 'Window' });
+    expect(within(figure).getByText('CST Calibration Window')).toBeInTheDocument();
+    expect(within(figure).queryByText('CST gesture (lengthens)')).not.toBeInTheDocument();
   });
 
   it('reads the window now and its range in one sentence', () => {

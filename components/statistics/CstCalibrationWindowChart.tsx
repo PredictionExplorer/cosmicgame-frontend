@@ -33,6 +33,7 @@ import { ChartTooltipCard } from './charts/ChartTooltipCard';
 import { useDurationAxis, useElapsedHoursAxis } from './charts/axes';
 import {
   CHART_MARGIN,
+  DOTS_MAX_POINTS,
   GRID_PROPS,
   SERIES_COLOR,
   TOOLTIP_PROPS,
@@ -111,6 +112,33 @@ function gestureDot({ cx, cy, index, payload }: DotProps) {
   );
 }
 
+/** The hovered gesture, ringed in its method's colour. */
+function activeGestureDot({ cx, cy, payload }: DotProps) {
+  if (cx === undefined || cy === undefined || !payload) return <g />;
+  return (
+    <circle
+      cx={cx}
+      cy={cy}
+      r={4}
+      fill={
+        payload.gestureType < 0 ? SERIES_COLOR.measure : gestureMethodColor(payload.gestureType)
+      }
+      stroke="hsl(var(--background))"
+      strokeWidth={1.5}
+    />
+  );
+}
+
+/**
+ * Whether every gesture draws its dot at rest. A cycle of a thousand
+ * gestures would bury the step line under its dots, so above
+ * `DOTS_MAX_POINTS` the line reads alone and a gesture's method shows on
+ * hover, in the tooltip and in the table.
+ */
+export function drawsGestureDots(points: readonly CstCalibrationPoint[]): boolean {
+  return points.length <= DOTS_MAX_POINTS;
+}
+
 const CalibrationChartView = memo(function CalibrationChartView({
   points,
   minSeconds,
@@ -120,6 +148,7 @@ const CalibrationChartView = memo(function CalibrationChartView({
   minSeconds: number;
   maxSeconds: number;
 }) {
+  const dots = drawsGestureDots(points);
   const xAxis = useElapsedHoursAxis(points[points.length - 1]?.hoursIntoRound ?? 0);
   const yAxis = useDurationAxis(minSeconds, maxSeconds);
   return (
@@ -146,10 +175,10 @@ const CalibrationChartView = memo(function CalibrationChartView({
           type="stepAfter"
           dataKey="windowSeconds"
           stroke={SERIES_COLOR.measure}
-          strokeOpacity={0.7}
-          strokeWidth={1.25}
-          dot={gestureDot}
-          activeDot={{ r: 4 }}
+          strokeOpacity={dots ? 0.7 : 1}
+          strokeWidth={dots ? 1.25 : 1.5}
+          dot={dots ? gestureDot : false}
+          activeDot={activeGestureDot}
           isAnimationActive={false}
         />
       </ComposedChart>
@@ -178,7 +207,8 @@ type CstCalibrationWindowViewProps = {
 /**
  * The CST Calibration Window over one cycle: the window after every gesture
  * as a step line, each gesture a dot in its method's colour (ETH and Random
- * Walk gestures shorten it, CST gestures lengthen it), on whole-hour ticks.
+ * Walk gestures shorten it, CST gestures lengthen it) while the cycle is
+ * small enough for the dots to leave the line readable, on whole-hour ticks.
  */
 export const CstCalibrationWindowView: FC<CstCalibrationWindowViewProps> = ({
   gestures,
@@ -265,24 +295,30 @@ export const CstCalibrationWindowView: FC<CstCalibrationWindowViewProps> = ({
               color: SERIES_COLOR.measure,
               shape: 'line',
             },
-            {
-              key: 'eth',
-              label: t('charts.cstWindow.typeEth'),
-              color: GESTURE_METHOD_COLOR.eth,
-              shape: 'dot',
-            },
-            {
-              key: 'rwlk',
-              label: t('charts.cstWindow.typeRandomWalk'),
-              color: GESTURE_METHOD_COLOR.ethRandomWalk,
-              shape: 'dot',
-            },
-            {
-              key: 'cst',
-              label: t('charts.cstWindow.typeCst'),
-              color: GESTURE_METHOD_COLOR.cst,
-              shape: 'dot',
-            },
+            // The legend keys only what the plot draws: a dense cycle has no
+            // dots at rest, and its tooltip names the hovered gesture's method.
+            ...(drawsGestureDots(timeline.points)
+              ? ([
+                  {
+                    key: 'eth',
+                    label: t('charts.cstWindow.typeEth'),
+                    color: GESTURE_METHOD_COLOR.eth,
+                    shape: 'dot',
+                  },
+                  {
+                    key: 'rwlk',
+                    label: t('charts.cstWindow.typeRandomWalk'),
+                    color: GESTURE_METHOD_COLOR.ethRandomWalk,
+                    shape: 'dot',
+                  },
+                  {
+                    key: 'cst',
+                    label: t('charts.cstWindow.typeCst'),
+                    color: GESTURE_METHOD_COLOR.cst,
+                    shape: 'dot',
+                  },
+                ] as const)
+              : []),
           ]}
         />
       }

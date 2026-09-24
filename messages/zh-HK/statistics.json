@@ -572,7 +572,7 @@
       "typeRandomWalk": "ETH + Random Walk 落筆（縮短）",
       "typeCst": "CST 落筆（延長）",
       "summaryFinal": "收官時窗口為 {current}，週期內介於 {low} 與 {high} 之間。",
-      "description": "CST 校準窗口決定 CST 落筆價格從起始值衰減到免費所需的時間。每次 ETH 落筆都會略微縮短窗口；每次 CST 落筆則會延長它。每個圓點代表一次落筆，顏色區分類型；折線表示該次落筆之後生效的窗口長度。",
+      "description": "CST 校準窗口決定 CST 落筆價格從起始值衰減到免費所需的時間。每次 ETH 落筆都會略微縮短窗口；每次 CST 落筆則會延長它。折線在每次落筆時躍變為之後生效的窗口長度；表格列出每次落筆及其類型。",
       "empty": "此週期沒有逐筆校準窗口數據。V2 事件之前索引的週期不包含該數據。",
       "selectCycle": "請選擇要查看的週期。",
       "loadErrorTitle": "未能載入校準窗口時間線",
