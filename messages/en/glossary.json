@@ -1,0 +1,97 @@
+{
+  "ui": {
+    "moreInformation": "More information"
+  },
+  "terms": {
+    "gesture": {
+      "term": "Gesture",
+      "short": "A participant’s on-chain act in a Cycle, made with ETH or CST, that extends the clock and shapes the Signature.",
+      "long": "Each Gesture adds the current time increment to the Cycle Finalization Time, records one Stellar Selection entry and may imprint Participation CST. The first Gesture of every Cycle is made with ETH; after that, ETH and CST Gestures mix freely."
+    },
+    "cycle": {
+      "term": "Performance Cycle",
+      "short": "One run of the protocol, from its opening Calibration Window to finalization, when its allocations are distributed.",
+      "long": "A Cycle has no fixed length: it ends when its Cycle Finalization Time runs out and someone finalizes it. About half of the Cycle Reserve then rolls into the next Cycle as the Compounding Cycle Reserve."
+    },
+    "cycleFinalizationTime": {
+      "term": "Cycle Finalization Time",
+      "short": "The moment a Cycle can close. The first Gesture starts the clock, and every later Gesture extends it.",
+      "long": "When the clock reaches zero, the participant who made the Final Gesture may finalize the Cycle and retrieve the Signature Allocation. Gestures stay possible until the Cycle is actually finalized, and each one moves the time forward again."
+    },
+    "calibrationWindow": {
+      "term": "Calibration Window",
+      "short": "A window in which the Gesture Cost descends from its Calibration Ceiling toward its Calibration Floor, so the cost falls the longer you wait.",
+      "long": "ETH and CST Gestures follow separate windows. The CST window is stored on-chain and changes after every Gesture: a CST Gesture lengthens it slightly and an ETH Gesture shortens it."
+    },
+    "cycleReserve": {
+      "term": "Cycle Reserve",
+      "short": "The ETH held for the current Cycle. ETH Gestures and contributions add to it, and the allocations draw from it at finalization.",
+      "long": "Each allocation track receives a fixed share when the Cycle finalizes: the Signature Allocation, Stellar Selection, Anchor Distributions, the Chrono-Warrior, Public Goods and the Compounding Cycle Reserve that opens the next Cycle."
+    },
+    "signatureAllocation": {
+      "term": "Signature Allocation",
+      "short": "The allocation for the Final Gesture of a Cycle: a share of the Cycle Reserve in ETH, Recognition CST and a Cosmic Signature NFT.",
+      "long": "The participant who made the Final Gesture may finalize the Cycle and retrieve it, with priority over the tokens and NFTs attached to Gestures. If they do not finalize within their exclusive window, whoever finalizes the Cycle receives it."
+    },
+    "finalCstGesture": {
+      "term": "Final CST Gesture",
+      "short": "The last Gesture made with CST in a Cycle.",
+      "long": "When the Cycle finalizes, the participant who made it receives Recognition CST and a Cosmic Signature NFT."
+    },
+    "enduranceChampion": {
+      "term": "Endurance Champion",
+      "short": "The participant who remained the most recent Gesture maker for the longest consecutive interval in a Cycle.",
+      "long": "The interval is the longest gap before another Gesture arrived. When the Cycle finalizes, the Endurance Champion receives Recognition CST and a Cosmic Signature NFT."
+    },
+    "chronoWarrior": {
+      "term": "Chrono-Warrior",
+      "short": "The participant who held the Endurance Champion position for the longest consecutive interval in a Cycle.",
+      "long": "The Endurance Champion is the longest-held most recent Gesture; the Chrono-Warrior is the longest-held Endurance Champion. At finalization the Chrono-Warrior receives a share of the Cycle Reserve in ETH, Recognition CST and a Cosmic Signature NFT."
+    },
+    "stellarSelection": {
+      "term": "Stellar Selection",
+      "short": "The protocol’s random selection at finalization, which distributes allocations among the recorded entries.",
+      "long": "Every Gesture records one entry. At finalization the contract selects entries with on-chain randomness for ETH and Cosmic Signature NFT allocations, and anchored Random Walk NFTs take part in a separate selection. The same address can be selected more than once."
+    },
+    "anchoring": {
+      "term": "Anchoring",
+      "short": "Locking a Cosmic Signature or Random Walk NFT to the protocol so it takes part in Anchor Distributions or Anchored-NFT Stellar Selection.",
+      "long": "Anchored Cosmic Signature NFTs share the Anchor Distribution of every finalized Cycle; anchored Random Walk NFTs join a separate Stellar Selection. Each NFT can be anchored only once, so releasing an anchor is final."
+    },
+    "anchorDistribution": {
+      "term": "Anchor Distribution",
+      "short": "The share of each finalized Cycle’s ETH that is split equally among anchored Cosmic Signature NFTs.",
+      "long": "It accumulates while the NFT stays anchored and is paid out when you release the anchor. If no Cosmic Signature NFT is anchored at finalization, that share stays in the Cycle Reserve."
+    },
+    "retrieve": {
+      "term": "Retrieve",
+      "short": "Move an allocation the protocol holds for you into your wallet.",
+      "long": "Allocations wait in the Allocations Wallet until their recipient retrieves them. After the retrieval timeout, the contracts let anyone retrieve an unretrieved allocation, so retrieve promptly."
+    },
+    "imprint": {
+      "term": "Imprint",
+      "short": "Create a new Cosmic Signature NFT or new CST on-chain.",
+      "long": "Finalization imprints the Cycle’s Cosmic Signature NFTs and Recognition CST, and a Gesture may imprint Participation CST. Every Cosmic Signature NFT is generated from its on-chain seed."
+    },
+    "publicGoods": {
+      "term": "Public Goods",
+      "short": "The share of every Cycle Reserve forwarded to the Public Goods Beneficiary, currently Protocol Guild.",
+      "long": "Protocol Guild funds Ethereum core contributors. The Cosmic Council is designed to choose the beneficiary once contract ownership moves under its control."
+    },
+    "outreachReserve": {
+      "term": "Outreach Reserve",
+      "short": "CST imprinted every Cycle for people who help others discover the protocol.",
+      "long": "It is distributed to ecosystem contributors, and every distribution is recorded on-chain."
+    },
+    "cosmicCouncil": {
+      "term": "Cosmic Council",
+      "short": "The on-chain body where CST holders submit Coordination Proposals and express Support or Opposition.",
+      "long": "Delegated CST carries Coordination Weight. The Council is designed to direct protocol parameters, such as the Public Goods Beneficiary, once contract ownership moves under its control; today the protocol owner manages them."
+    },
+    "cst": {
+      "term": "CST",
+      "short": "Cosmic Signature Token, the protocol’s ERC-20 token.",
+      "long": "Gestures can imprint CST, and CST pays for CST Gestures, which burn it. Delegated CST carries Coordination Weight on the Cosmic Council."
+    }
+  }
+}

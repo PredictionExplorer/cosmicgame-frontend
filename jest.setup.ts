@@ -135,6 +135,7 @@ jest.mock('next-intl', () => {
     coordination: require('./messages/en/coordination.json') as Record<string, unknown>,
     ethContribution: require('./messages/en/ethContribution.json') as Record<string, unknown>,
     faq: require('./messages/en/faq.json') as Record<string, unknown>,
+    glossary: require('./messages/en/glossary.json') as Record<string, unknown>,
     imprint: require('./messages/en/imprint.json') as Record<string, unknown>,
     legal: require('./messages/en/legal.json') as Record<string, unknown>,
     marketing: require('./messages/en/marketing.json') as Record<string, unknown>,

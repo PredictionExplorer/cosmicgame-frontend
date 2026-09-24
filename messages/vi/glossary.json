@@ -1,0 +1,97 @@
+{
+  "ui": {
+    "moreInformation": "Thông tin thêm"
+  },
+  "terms": {
+    "gesture": {
+      "term": "Nét bút",
+      "short": "Hành động trên chuỗi của người tham gia trong một chu kỳ, bằng ETH hoặc CST, giúp kéo dài đồng hồ và thêm một nét cho Signature.",
+      "long": "Mỗi nét bút cộng mức tăng thời gian hiện tại vào thời điểm hoàn tất chu kỳ, ghi nhận một lượt Tinh tuyển và có thể khắc CST tham gia. Nét bút đầu tiên của mỗi chu kỳ phải dùng ETH; sau đó bạn có thể xen kẽ nét bút ETH và CST tùy ý."
+    },
+    "cycle": {
+      "term": "Chu kỳ trình diễn",
+      "short": "Một lần vận hành trọn vẹn của giao thức, từ cửa sổ hiệu chỉnh mở đầu đến lúc hoàn tất, khi các phân bổ được chia.",
+      "long": "Chu kỳ không có độ dài cố định: chu kỳ kết thúc khi đã qua thời điểm hoàn tất chu kỳ và có người thực hiện hoàn tất. Khi đó, khoảng một nửa Dự trữ chu kỳ chuyển sang chu kỳ tiếp theo dưới dạng Dự trữ tích lũy."
+    },
+    "cycleFinalizationTime": {
+      "term": "Thời điểm hoàn tất chu kỳ",
+      "short": "Thời điểm chu kỳ có thể hoàn tất. Nét bút đầu tiên khởi động đồng hồ, và mỗi nét bút sau đó kéo dài nó.",
+      "long": "Khi đồng hồ về không, người tham gia đặt nét bút cuối cùng có thể hoàn tất chu kỳ và nhận về Phân bổ Signature. Bạn vẫn có thể đặt nét bút cho đến khi chu kỳ thật sự hoàn tất, và mỗi nét bút lại đẩy thời điểm lùi về sau."
+    },
+    "calibrationWindow": {
+      "term": "Cửa sổ hiệu chỉnh",
+      "short": "Khoảng thời gian chi phí nét bút giảm dần từ trần hiệu chỉnh xuống sàn hiệu chỉnh: bạn càng chờ lâu, chi phí càng thấp.",
+      "long": "Nét bút ETH và nét bút CST theo các cửa sổ riêng. Cửa sổ CST được lưu trên chuỗi và thay đổi sau mỗi nét bút: nét bút CST kéo dài cửa sổ một chút, còn nét bút ETH rút ngắn nó."
+    },
+    "cycleReserve": {
+      "term": "Dự trữ chu kỳ",
+      "short": "Lượng ETH được giữ cho chu kỳ hiện tại. Nét bút ETH và các khoản đóng góp làm nó tăng lên, và các phân bổ được chi từ đây khi hoàn tất.",
+      "long": "Khi chu kỳ hoàn tất, mỗi luồng phân bổ nhận một phần cố định: Phân bổ Signature, Tinh tuyển, phân phối neo giữ, Chiến binh Thời gian, Hàng hóa công và Dự trữ tích lũy mở đầu chu kỳ tiếp theo."
+    },
+    "signatureAllocation": {
+      "term": "Phân bổ Signature",
+      "short": "Phân bổ dành cho nét bút cuối cùng của một chu kỳ: một phần Dự trữ chu kỳ bằng ETH, CST ghi nhận và một Cosmic Signature NFT.",
+      "long": "Người tham gia đặt nét bút cuối cùng có thể hoàn tất chu kỳ và nhận về phân bổ này, kèm quyền ưu tiên với các token và NFT đính kèm nét bút. Nếu người đó không hoàn tất trong khoảng thời gian dành riêng, người thực hiện hoàn tất sẽ nhận phân bổ."
+    },
+    "finalCstGesture": {
+      "term": "Nét bút CST cuối cùng",
+      "short": "Nét bút cuối cùng được đặt bằng CST trong một chu kỳ.",
+      "long": "Khi chu kỳ hoàn tất, người tham gia đặt nét bút đó nhận CST ghi nhận và một Cosmic Signature NFT."
+    },
+    "enduranceChampion": {
+      "term": "Quán quân Bền bỉ",
+      "short": "Người tham gia giữ vị trí nét bút gần nhất trong khoảng thời gian liên tục dài nhất của một chu kỳ.",
+      "long": "Khoảng thời gian này là quãng chờ dài nhất trước khi có nét bút tiếp theo. Khi chu kỳ hoàn tất, Quán quân Bền bỉ nhận CST ghi nhận và một Cosmic Signature NFT."
+    },
+    "chronoWarrior": {
+      "term": "Chiến binh Thời gian",
+      "short": "Người tham gia giữ vị trí Quán quân Bền bỉ trong khoảng thời gian liên tục dài nhất của một chu kỳ.",
+      "long": "Quán quân Bền bỉ là người giữ nét bút gần nhất lâu nhất; Chiến binh Thời gian là người giữ vị trí Quán quân Bền bỉ lâu nhất. Khi hoàn tất, Chiến binh Thời gian nhận một phần Dự trữ chu kỳ bằng ETH, CST ghi nhận và một Cosmic Signature NFT."
+    },
+    "stellarSelection": {
+      "term": "Tinh tuyển",
+      "short": "Việc chọn ngẫu nhiên của giao thức khi hoàn tất, để xác định người nhận phân bổ trong số các lượt đã ghi nhận.",
+      "long": "Mỗi nét bút ghi nhận một lượt. Khi hoàn tất, hợp đồng dùng nguồn ngẫu nhiên trên chuỗi để chọn các lượt nhận phân bổ ETH và Cosmic Signature NFT; các Random Walk NFT đang neo giữ tham gia một đợt Tinh tuyển riêng. Cùng một địa chỉ có thể được chọn nhiều lần."
+    },
+    "anchoring": {
+      "term": "Neo giữ",
+      "short": "Gắn một Cosmic Signature NFT hoặc Random Walk NFT vào giao thức để tham gia phân phối neo giữ hoặc Tinh tuyển NFT neo giữ.",
+      "long": "Các Cosmic Signature NFT đang neo giữ cùng chia phân phối neo giữ của mỗi chu kỳ đã hoàn tất; các Random Walk NFT đang neo giữ tham gia một đợt Tinh tuyển riêng. Mỗi NFT chỉ được neo giữ một lần, nên khi đã gỡ neo thì không thể neo giữ lại."
+    },
+    "anchorDistribution": {
+      "term": "Phân phối neo giữ",
+      "short": "Phần ETH của mỗi chu kỳ đã hoàn tất được chia đều cho các Cosmic Signature NFT đang neo giữ.",
+      "long": "Phần này tích lũy trong thời gian NFT được neo giữ và được chi trả khi bạn gỡ neo. Nếu khi hoàn tất không có Cosmic Signature NFT nào đang neo giữ, phần đó ở lại trong Dự trữ chu kỳ."
+    },
+    "retrieve": {
+      "term": "Nhận về",
+      "short": "Chuyển phân bổ mà giao thức đang giữ cho bạn về ví của bạn.",
+      "long": "Các phân bổ được giữ trong ví phân bổ cho đến khi người nhận nhận về. Sau thời hạn nhận về, hợp đồng cho phép bất kỳ ai nhận về phân bổ chưa được nhận, vì vậy hãy nhận về sớm."
+    },
+    "imprint": {
+      "term": "Khắc",
+      "short": "Tạo trên chuỗi một Cosmic Signature NFT mới hoặc CST mới.",
+      "long": "Khi hoàn tất, giao thức khắc các Cosmic Signature NFT và CST ghi nhận của chu kỳ; mỗi nét bút cũng có thể khắc CST tham gia. Mỗi Cosmic Signature NFT được tạo từ seed trên chuỗi của nó."
+    },
+    "publicGoods": {
+      "term": "Hàng hóa công",
+      "short": "Phần của mỗi Dự trữ chu kỳ được chuyển đến đơn vị thụ hưởng Hàng hóa công, hiện là Protocol Guild.",
+      "long": "Protocol Guild tài trợ cho những người đóng góp cốt lõi cho Ethereum. Theo thiết kế, khi quyền sở hữu hợp đồng chuyển sang Hội đồng Vũ trụ, hội đồng sẽ chọn đơn vị thụ hưởng."
+    },
+    "outreachReserve": {
+      "term": "Dự trữ truyền thông",
+      "short": "CST được khắc mỗi chu kỳ cho những người giúp người khác biết đến giao thức.",
+      "long": "Phần CST này được trao cho những người đóng góp trong hệ sinh thái, và mọi lần trao đều được ghi lại trên chuỗi."
+    },
+    "cosmicCouncil": {
+      "term": "Hội đồng Vũ trụ",
+      "short": "Cơ quan điều phối trên chuỗi, nơi người nắm giữ CST gửi đề xuất điều phối và bày tỏ tán thành hoặc phản đối.",
+      "long": "CST đã ủy quyền tạo nên trọng số điều phối. Theo thiết kế, khi quyền sở hữu hợp đồng chuyển sang Hội đồng, Hội đồng sẽ quyết định các tham số của giao thức, như đơn vị thụ hưởng Hàng hóa công; hiện chủ sở hữu giao thức vẫn quản lý các thiết lập này."
+    },
+    "cst": {
+      "term": "CST",
+      "short": "Cosmic Signature Token, token ERC-20 của giao thức.",
+      "long": "Nét bút có thể khắc CST, và CST dùng để trả chi phí cho nét bút CST, khi đó số CST này bị đốt. CST đã ủy quyền tạo nên trọng số điều phối trong Hội đồng Vũ trụ."
+    }
+  }
+}
