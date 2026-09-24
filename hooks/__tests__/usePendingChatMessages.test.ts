@@ -55,4 +55,38 @@ describe('usePendingChatMessages', () => {
     });
     expect(result.current.pending).toHaveLength(0);
   });
+
+  it('matches the indexed row by transaction, so a repeated message never hides a new one', () => {
+    const earlier = {
+      BidderAddr: ADDRESS,
+      Message: 'gm',
+      TxHash: '0xold',
+    } as GestureInfo;
+    const { result, rerender } = renderHook(
+      ({ gestures }: { gestures: GestureInfo[] }) => usePendingChatMessages(gestures),
+      { initialProps: { gestures: [earlier] } },
+    );
+    act(() => result.current.record(ADDRESS, 'gm', '0xNEW'));
+    expect(result.current.pending).toHaveLength(1);
+
+    rerender({ gestures: [{ ...earlier, TxHash: '0xnew' }, earlier] });
+    expect(result.current.pending).toHaveLength(0);
+  });
+
+  it('forgets an echoed row, so it never returns when the feed window moves on', () => {
+    const echo = { BidderAddr: ADDRESS, Message: 'hello', TxHash: '0xabc' } as GestureInfo;
+    const { result, rerender } = renderHook(
+      ({ gestures }: { gestures: GestureInfo[] }) => usePendingChatMessages(gestures),
+      { initialProps: { gestures: [] as GestureInfo[] } },
+    );
+    act(() => result.current.record(ADDRESS, 'hello', '0xabc'));
+    rerender({ gestures: [echo] });
+    expect(result.current.pending).toHaveLength(0);
+
+    act(() => {
+      jest.advanceTimersByTime(PENDING_MESSAGE_STALE_MS);
+    });
+    rerender({ gestures: [] });
+    expect(result.current.pending).toHaveLength(0);
+  });
 });
