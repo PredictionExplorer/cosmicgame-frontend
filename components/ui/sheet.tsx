@@ -7,7 +7,7 @@ import { X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
-import { TOUCH_TARGET_ICON_CLASS } from '@/lib/touch-target';
+import { OVERLAY_CLOSE_CLASS } from '@/components/ui/dialog';
 
 const Sheet = SheetPrimitive.Root;
 
@@ -38,7 +38,10 @@ const SheetOverlay = React.forwardRef<
 SheetOverlay.displayName = SheetPrimitive.Overlay.displayName;
 
 const sheetVariants = cva(
-  'fixed z-50 gap-4 bg-background p-6 shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500',
+  // A floating layer: the raised surface, one hairline edge and the float
+  // shadow. It slides in from its edge over the base duration and leaves
+  // faster; reduced motion skips both (styles/global.css, overlay motion).
+  'fixed z-50 gap-4 border-rule bg-surface-raised p-6 shadow-float ease-[var(--ease-out-expo)] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-[var(--duration-fast)] data-[state=open]:duration-[var(--duration-base)]',
   {
     variants: {
       side: {
@@ -68,16 +71,12 @@ const SheetContent = React.forwardRef<
   <SheetPortal>
     <SheetOverlay />
     <SheetPrimitive.Content ref={ref} className={cn(sheetVariants({ side }), className)} {...props}>
-      {children}
-      <SheetPrimitive.Close
-        className={cn(
-          'absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary',
-          TOUCH_TARGET_ICON_CLASS,
-        )}
-      >
-        <X className="h-4 w-4" />
+      {/* First in the DOM so focus order matches the corner it paints in. */}
+      <SheetPrimitive.Close className={OVERLAY_CLOSE_CLASS}>
+        <X aria-hidden className="size-4" />
         <SheetCloseLabel />
       </SheetPrimitive.Close>
+      {children}
     </SheetPrimitive.Content>
   </SheetPortal>
 ));
@@ -102,7 +101,7 @@ const SheetTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SheetPrimitive.Title
     ref={ref}
-    className={cn('text-lg font-semibold text-foreground', className)}
+    className={cn('type-title text-foreground', className)}
     {...props}
   />
 ));

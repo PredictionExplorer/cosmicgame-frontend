@@ -12,7 +12,8 @@
  *            --display-tracking-scale, --display-word-spacing).
  *   Text     Inter 400/500/600: body, labels, buttons and every heading of
  *            24px or less (type-heading-3, type-title).
- *   Figures  Inter with tabular, lining numerals and a slashed zero.
+ *   Figures  Inter with tabular, lining numerals (no slashed zero; see the
+ *            figure tiers below).
  *   Ids      JetBrains Mono, only for addresses, hashes, seeds and token
  *            numbers (type-hash, type-mono).
  *
@@ -46,6 +47,12 @@
   @media (width >= 64rem) {
     font-size: clamp(3rem, 0.75rem + 4.2vw, 4.5rem); /* 48 → 72px */
   }
+
+  /* Vietnamese stacks diacritics above and below (Nghệ over từng): at 1.0
+     the marks of two lines touch. */
+  &:where(:lang(vi)) {
+    line-height: 1.12;
+  }
 }
 
 /* Landing section H2s. */
@@ -57,6 +64,10 @@
   letter-spacing: calc(-0.025em * var(--display-tracking-scale));
   text-wrap: balance;
   overflow-wrap: break-word;
+
+  &:where(:lang(vi)) {
+    line-height: 1.15;
+  }
 }
 
 /* Long-form H1, detail title. */
@@ -249,19 +260,31 @@
   }
 }
 
-/* Captions, footnotes, helper text and units: the 12px floor. */
+/*
+ * Captions, footnotes, helper text and units: the 12px floor. Han, kana and
+ * Hangul need more pixels than Latin at the same size to stay legible in the
+ * subtle tier, so under :lang() the caption is 13px, as the eyebrow is.
+ */
 @utility type-caption {
   font-size: 0.75rem; /* 12px */
   line-height: 1.45;
   font-weight: 400;
   overflow-wrap: break-word;
+
+  &:where(:lang(zh), :lang(ja), :lang(ko)) {
+    font-size: 0.8125rem;
+    line-height: 1.5;
+  }
 }
 
 /* ── Figures ──────────────────────────────────────────────────────────── */
 
 /*
- * Every number that ticks or aligns is Inter with tabular, lining numerals
- * and a slashed zero, so a column of amounts lines up and 0 never reads as O.
+ * Every number that ticks or aligns is Inter with tabular, lining numerals,
+ * so a column of amounts lines up; Inter's narrow oval zero never reads as
+ * O. No slashed zero: the Inter subsets next/font serves from Google carry
+ * only calt, ccmp, dnom, frac, locl, numr, pnum and tnum, so `slashed-zero`
+ * (the `zero` feature) would promise a glyph that never renders.
  * Set units in type-caption text-subtle, joined to the number by U+00A0.
  */
 @utility type-figure-xl {
@@ -270,7 +293,7 @@
   line-height: 1;
   font-weight: 400;
   letter-spacing: calc(-0.03em * var(--display-tracking-scale));
-  font-variant-numeric: tabular-nums lining-nums slashed-zero;
+  font-variant-numeric: tabular-nums lining-nums;
 }
 
 @utility type-figure-lg {
@@ -279,7 +302,7 @@
   line-height: 1.1;
   font-weight: 500;
   letter-spacing: -0.01em;
-  font-variant-numeric: tabular-nums lining-nums slashed-zero;
+  font-variant-numeric: tabular-nums lining-nums;
 }
 
 @utility type-figure-md {
@@ -287,7 +310,7 @@
   font-size: 1.25rem; /* 20px */
   line-height: 1.3;
   font-weight: 500;
-  font-variant-numeric: tabular-nums lining-nums slashed-zero;
+  font-variant-numeric: tabular-nums lining-nums;
 }
 
 /* Ledger cells and inline readouts. */
@@ -296,7 +319,7 @@
   font-size: 0.875rem; /* 14px */
   line-height: 1.4;
   font-weight: 500;
-  font-variant-numeric: tabular-nums lining-nums slashed-zero;
+  font-variant-numeric: tabular-nums lining-nums;
 }
 
 /*

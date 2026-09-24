@@ -56,7 +56,7 @@ describe('styles/tables.css', () => {
 
   it('sets numeric cells in tabular, lining figures', () => {
     expect(declaration(topRules, '.cs-table td[data-numeric]', 'font-variant-numeric')).toBe(
-      'tabular-nums lining-nums slashed-zero',
+      'tabular-nums lining-nums',
     );
   });
 
@@ -140,10 +140,29 @@ describe('styles/tables.css', () => {
 
   it('labels each value from its own cell, in sentence case at 13px', () => {
     const label = `${RECORD} tbody td::before`;
-    expect(declaration(phoneRules, label, 'content')).toBe('attr(data-label)');
+    // Drawn for the eye only (empty alternative text): the cell's column
+    // header already names it to a screen reader, which would otherwise read
+    // the column twice. The plain form stays first as the fallback.
+    const contents: string[] = [];
+    for (const rule of phoneRules.filter((r) => r.selectors.includes(label))) {
+      rule.walkDecls('content', (decl) => {
+        contents.push(decl.value);
+      });
+    }
+    expect(contents).toEqual(['attr(data-label)', "attr(data-label) / ''"]);
     expect(declaration(phoneRules, label, 'text-transform')).toBe('none');
     expect(declaration(phoneRules, label, 'font-size')).toBe('0.8125rem');
     expect(declaration(phoneRules, label, 'color')).toBe('hsl(var(--subtle-foreground))');
+  });
+
+  it('lets a named address wrap in a compact table instead of forcing records', () => {
+    // Regression: "Cosmic Signature NFT Anchoring Wallet" was wider than the
+    // owner column at 390px, so the holders table fell back to records.
+    const address = ".cs-table[data-layout='compact'] td[data-kind='address']";
+    expect(declaration(phoneRules, address, 'text-wrap-mode')).toBe('wrap');
+    expect(declaration(phoneRules, `${address} > [data-slot='value'] *`, 'text-wrap-mode')).toBe(
+      'wrap',
+    );
   });
 
   it('drops labelled blank lines and secondary columns on phones', () => {

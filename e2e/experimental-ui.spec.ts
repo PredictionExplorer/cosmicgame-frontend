@@ -139,7 +139,7 @@ test.describe('experimental UI', () => {
       page.locator('[data-testid="gesture-console"][data-variant="sheet"]'),
     ).toBeVisible();
     // The dialog is named by the heading it shows.
-    await expect(page.getByRole('dialog', { name: 'Make a Gesture' })).toBeVisible();
+    await expect(page.getByRole('dialog', { name: 'Make a gesture' })).toBeVisible();
   });
 
   test('keeps keyboard focus clear of the phone dock', async ({ page, isMobile }) => {

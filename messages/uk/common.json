@@ -1,8 +1,4 @@
 {
-  "faqPage": {
-    "heading": "Поширені запитання",
-    "description": "Відповіді на запитання про Cosmic Signature: що це за протокол, як працюють жести та чим він не є."
-  },
   "languageSwitcher": {
     "label": "Мова"
   },
@@ -69,8 +65,6 @@
     "loading": "Завантаження",
     "loadingEllipsis": "Завантаження…",
     "loadingDots": "Завантаження…",
-    "noData": "Немає даних.",
-    "nothingHere": "Тут поки нічого немає",
     "unavailable": "Недоступно"
   },
   "liveStatus": {

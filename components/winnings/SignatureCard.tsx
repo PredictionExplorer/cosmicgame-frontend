@@ -42,6 +42,15 @@ export interface SignatureCardProps {
   unavailableDetail?: ReactNode;
   /** Above the fold: load eagerly. */
   priority?: boolean;
+  /**
+   * Join the parent's rows: the parent spans four rows as a subgrid (the
+   * plate, the title, the meta line and one line of `children`), so each
+   * line of the label starts at the same height across a row of cards even
+   * where a neighbour's meta wraps. The grid sets a 4px row gap. Every level
+   * keeps a `minmax(0, 1fr)` column, so a long name wraps inside the card
+   * instead of widening it past its grid column.
+   */
+  subgrid?: boolean;
   className?: string;
 }
 
@@ -67,11 +76,19 @@ export function SignatureCard({
   unavailableLabel,
   unavailableDetail,
   priority = false,
+  subgrid = false,
   className,
 }: SignatureCardProps) {
   return (
-    <figure className={cn('flex min-w-0 flex-col gap-3', className)} data-token-id={tokenId}>
-      <Link href={href} tabIndex={-1} aria-hidden className="block">
+    <figure
+      className={cn(
+        'min-w-0',
+        subgrid ? 'row-span-4 grid grid-cols-1 grid-rows-subgrid' : 'flex flex-col gap-3',
+        className,
+      )}
+      data-token-id={tokenId}
+    >
+      <Link href={href} tabIndex={-1} aria-hidden className={cn('block', subgrid && 'mb-2')}>
         {artState === 'ready' ? (
           <ArtFrame
             sources={signatureSources(signatureMedia(seed))}
@@ -99,6 +116,7 @@ export function SignatureCard({
         }
         meta={meta}
         tags={tags}
+        className={subgrid ? 'row-span-3 grid grid-cols-1 grid-rows-subgrid' : undefined}
       >
         {children}
       </WallLabel>

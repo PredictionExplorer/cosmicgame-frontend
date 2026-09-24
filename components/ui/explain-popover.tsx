@@ -142,11 +142,11 @@ export function ExplainPopover({
           {children}
         </Slot>
       </PopoverPrimitive.Anchor>
-      <span id={descriptionId} hidden>
+      <span id={descriptionId} hidden data-explain-companion="">
         {definition}
       </span>
       {details ? (
-        <span role="status" className="sr-only">
+        <span role="status" className="sr-only" data-explain-companion="">
           {pinned ? details : ''}
         </span>
       ) : null}
@@ -190,6 +190,42 @@ export function ExplainPopover({
 }
 
 /**
+ * Whether a trigger sits inside a sentence: a run of visible text beside it,
+ * directly or around the inline elements that wrap it (`<p>The <Term/>
+ * expires</p>`, `<p>Before the <strong><Term/></strong> ends</p>`). The
+ * walk stops at the first ancestor that is not inline, the box the line of
+ * text lives in. The explanation's own companions (the hidden description,
+ * the live region) never count, and neither does whitespace.
+ *
+ * A trigger in a sentence keeps its line box (WCAG 2.5.8's inline
+ * exception); anything else — a figure label, a ledger role, a heading made
+ * of the term alone — is standalone and grows a 44px touch target.
+ */
+export function sitsInSentence(trigger: HTMLElement): boolean {
+  let node: Element = trigger;
+  for (let parent = trigger.parentElement; parent; parent = parent.parentElement) {
+    for (const sibling of Array.from(parent.childNodes)) {
+      if (sibling === node) continue;
+      if (sibling.nodeType === Node.TEXT_NODE) {
+        if (/\S/.test(sibling.textContent ?? '')) return true;
+        continue;
+      }
+      if (!(sibling instanceof HTMLElement)) continue;
+      if (sibling.hidden || sibling.hasAttribute('data-explain-companion')) continue;
+      if (
+        window.getComputedStyle(sibling).display === 'inline' &&
+        /\S/.test(sibling.textContent ?? '')
+      ) {
+        return true;
+      }
+    }
+    if (window.getComputedStyle(parent).display !== 'inline') return false;
+    node = parent;
+  }
+  return false;
+}
+
+/**
  * Enter and Space activate an inline `role="button"` the way they activate a
  * native button. Both are cancelled first: Space would scroll the page and
  * Enter could reach an enclosing form. A held key does not toggle repeatedly.
@@ -219,6 +255,15 @@ export interface ExplainedTermProps extends Omit<
    * it opens an explanation.
    */
   announce?: 'text' | 'moreInformation';
+  /**
+   * `auto` (default) measures the trigger once it mounts: a word inside a
+   * sentence keeps its line (WCAG 2.5.8's inline exception), and a word that
+   * stands alone — a figure label, a ledger role, a heading — grows a 44px
+   * touch target on coarse pointers without moving the layout
+   * (`touch-hit-area`). Pass `sentence` or `standalone` only where the
+   * measurement cannot see the context.
+   */
+  placement?: 'auto' | 'sentence' | 'standalone';
   side?: Side;
   align?: Align;
   maxWidth?: number;
@@ -237,6 +282,10 @@ export interface ExplainedTermProps extends Omit<
  * and box its underline, where a span breaks across lines with the sentence
  * (CJK included).
  *
+ * On touch, a standalone trigger (see `placement`) reaches 44px: its own box
+ * grows by padding that a negative margin hands back, so hit-testing and
+ * the tap-target audit see the real target and nothing around it moves.
+ *
  *   <ExplainedTerm definition={t('erc20.definition')}>ERC-20</ExplainedTerm>
  *   <ExplainedTerm definition={tooltip} announce="moreInformation">{label}</ExplainedTerm>
  */
@@ -246,6 +295,7 @@ export function ExplainedTerm({
   title,
   children,
   announce = 'text',
+  placement = 'auto',
   side,
   align,
   maxWidth,
@@ -257,6 +307,16 @@ export function ExplainedTerm({
   const visibleText = typeof children === 'string' ? children : undefined;
   const cardTitle = title ?? visibleText;
   const label = visibleText ?? title;
+  const triggerRef = React.useRef<HTMLSpanElement>(null);
+  // The server cannot see the layout, so it renders the sentence form (no
+  // pad); the measurement below only ever adds a pad that moves nothing.
+  const [measuredStandalone, setMeasuredStandalone] = React.useState(false);
+  const standalone = placement === 'auto' ? measuredStandalone : placement === 'standalone';
+
+  React.useLayoutEffect(() => {
+    if (placement !== 'auto' || !triggerRef.current) return;
+    setMeasuredStandalone(!sitsInSentence(triggerRef.current));
+  }, [placement]);
 
   return (
     <ExplainPopover
@@ -269,8 +329,10 @@ export function ExplainedTerm({
     >
       <span
         {...rest}
+        ref={triggerRef}
         role="button"
         tabIndex={0}
+        data-placement={standalone ? 'standalone' : 'sentence'}
         aria-label={
           announce === 'moreInformation' && label
             ? tTooltips('moreInformationAbout', { label })
@@ -289,6 +351,7 @@ export function ExplainedTerm({
           'underline decoration-dotted decoration-1 underline-offset-[0.22em] [text-decoration-color:color-mix(in_oklab,currentColor_55%,transparent)]',
           'transition-[text-decoration-color] duration-[var(--duration-fast)] ease-[var(--ease-out-soft)]',
           'hover:[text-decoration-color:currentColor] focus-visible:[text-decoration-color:currentColor] data-[state=open]:[text-decoration-color:currentColor]',
+          standalone && 'touch-hit-area',
           className,
         )}
       >

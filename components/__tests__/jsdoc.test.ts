@@ -6,7 +6,6 @@ const COMPONENTS_DIR = resolve(__dirname, '..');
 const COMPONENT_FILES = [
   'home/AuctionInfo.tsx',
   'home/observatory/GesturePanel.tsx',
-  'common/VideoPlayerDialog.tsx',
   'UserStatisticsView.tsx',
   'nft/NFTTrait.tsx',
 ] as const;
@@ -67,7 +66,6 @@ const files: FileEntry[] = COMPONENT_FILES.map((name) => {
 const EXPECTED_COUNTS: Record<string, number> = {
   'home/AuctionInfo.tsx': 1,
   'home/observatory/GesturePanel.tsx': 3,
-  'common/VideoPlayerDialog.tsx': 1,
   'UserStatisticsView.tsx': 1,
   'nft/NFTTrait.tsx': 1,
 };
@@ -93,9 +91,9 @@ describe('Component JSDoc coverage', () => {
   });
 
   describe('no export is missing from the inventory', () => {
-    it('total exported symbols across all component files is 7', () => {
+    it('total exported symbols across all component files is 6', () => {
       const total = files.reduce((sum, f) => sum + f.exports.length, 0);
-      expect(total).toBe(7);
+      expect(total).toBe(6);
     });
   });
 

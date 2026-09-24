@@ -95,7 +95,7 @@ export function SectionShell({
                   aria-expanded={open}
                   aria-controls={panelId}
                   onClick={toggle}
-                  className="group inline-flex max-w-full items-start gap-2.5 rounded-edge text-left"
+                  className="group inline-flex max-w-full touch-hit-area items-start gap-2.5 rounded-edge text-left"
                 >
                   <span className="min-w-0">{title}</span>
                   <ChevronDown

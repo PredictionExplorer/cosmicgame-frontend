@@ -11,18 +11,16 @@ import {
   formatAddress,
   formatAmount,
   formatAmountParts,
-  formatCSTValue,
   formatCount,
   formatDateTime,
   formatDateTimeTitle,
   formatDuration,
-  formatEthValue,
   formatNumber,
   formatPercent,
   formatRelativeTime,
   formatSeconds,
-  formatTableAmount,
   formatTimeZoneLabel,
+  formatZonedDateTimeParts,
   isZeroAddress,
   sameAddress,
   shortenHex,
@@ -499,26 +497,43 @@ describe('addresses', () => {
   });
 });
 
-describe('legacy helpers delegate to the formatting layer', () => {
-  it('formatEthValue: grouped card ETH in every locale, "0 ETH" when missing', () => {
-    expect(formatEthValue(32.29391, 'en')).toBe(nb('32.2939~ETH'));
-    expect(formatEthValue(263113.6, 'en')).toBe(nb('263,113.6000~ETH'));
-    expect(formatEthValue(8.07351, 'vi')).toBe(nb('8,0735~ETH'));
-    expect(formatEthValue(undefined, 'en')).toBe(nb('0~ETH'));
-    expect(formatEthValue(Number.NaN, 'en')).toBe(nb('0~ETH'));
+describe('typographic details', () => {
+  it('signs a delta with the true minus sign, level with the plus', () => {
+    // Regression: signed CST amounts printed Intl's hyphen-minus ("-269.74"),
+    // short and low beside "+176.00" in the same tabular column.
+    expect(
+      formatAmount(-269.74, { unit: 'CST', context: 'table', signDisplay: 'exceptZero' }),
+    ).toBe('\u2212269.74\u00a0CST');
+    expect(formatAmount(176, { unit: 'CST', context: 'table', signDisplay: 'exceptZero' })).toBe(
+      '+176.00\u00a0CST',
+    );
+    // An unsigned amount keeps whatever Intl prints.
+    expect(formatAmount(-1, { unit: 'ETH', context: 'hero' })).toBe('-1\u00a0ETH');
   });
 
-  it('formatCSTValue: grouped card CST with 2 decimals, none when whole', () => {
-    expect(formatCSTValue(60872.26, 'en')).toBe(nb('60,872.26~CST'));
-    expect(formatCSTValue(1000, 'en')).toBe(nb('1,000~CST'));
-    expect(formatCSTValue(1000, 'uk')).toBe(nb('1~000~CST'));
-    expect(formatCSTValue(null, 'en')).toBe(nb('0~CST'));
+  it('labels a standalone date with its zone in the locale style', () => {
+    const at = Date.UTC(2026, 8, 22, 23, 4, 45) / 1000;
+    const now = Date.UTC(2026, 8, 24);
+    expect(formatDateTime(at, { timeZone: 'utc', now, showZone: true })).toBe('Sep 22, 23:04 UTC');
+    expect(formatDateTime(at, { locale: 'ja', timeZone: 'utc', now, showZone: true })).toBe(
+      '9月22日 23:04（UTC）',
+    );
+    expect(formatZonedDateTimeParts(at, { locale: 'ja', timeZone: 'utc', now })).toEqual({
+      lead: '9月22日 23:04（',
+      zone: 'UTC',
+      trail: '）',
+    });
+    expect(formatZonedDateTimeParts(null)).toBeNull();
   });
 
-  it('formatTableAmount: unit-free fixed digits for ledger columns', () => {
-    expect(formatTableAmount(2.65478, 'en')).toBe('2.6548');
-    expect(formatTableAmount(0, 'en')).toBe('0');
-    expect(formatTableAmount(12.5, 'en', 'CST')).toBe('12.50');
-    expect(formatTableAmount(null, 'en')).toBe(UNAVAILABLE_VALUE);
+  it('pads the day only where dates stack in a column', () => {
+    const march9 = Date.UTC(2024, 2, 9, 10, 0, 0) / 1000;
+    const now = Date.UTC(2026, 8, 24);
+    // Compact (tables, cards): padded so a column lines up.
+    expect(formatDateTime(march9, { timeZone: 'utc', now })).toBe('Mar 09, 2024, 10:00');
+    // Full (record pages, hover titles): as written.
+    expect(formatDateTime(march9, { style: 'full', timeZone: 'utc', now })).toBe(
+      'Mar 9, 2024, 10:00:00',
+    );
   });
 });

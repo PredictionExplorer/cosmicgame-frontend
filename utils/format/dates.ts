@@ -135,6 +135,8 @@ const koreanNumericDate = (year: number, monthIndex: number, day: number): strin
 interface DateTimeTemplateInput extends CalendarParts {
   readonly withYear: boolean;
   readonly withSeconds: boolean;
+  /** Pad a one-digit day ("Jan 05") so a column of compact dates lines up. */
+  readonly padDay: boolean;
 }
 
 const clock = ({ hours, minutes, seconds, withSeconds }: DateTimeTemplateInput): string =>
@@ -149,10 +151,11 @@ const hanDateTime = (input: DateTimeTemplateInput): string =>
   `${input.withYear ? `${input.year}年` : ''}${input.monthIndex + 1}月${input.day}日 ${clock(input)}`;
 
 const DATE_TIME_TEMPLATES: LocaleRecord<(input: DateTimeTemplateInput) => string> = {
-  // "Jan 05, 12:34" / "Jan 05, 2025, 12:34": the historical padded day keeps
-  // table columns aligned.
+  // Compact "Jan 05, 12:34" / "Jan 05, 2025, 12:34": the padded day keeps a
+  // column of dates aligned. Full "Jan 5, 2025, 12:34:56": a record page, a
+  // hover title or a sentence, where a padded day just reads wrong.
   en: (input) =>
-    `${MONTH_LABELS[input.monthIndex]} ${pad2(input.day)}${
+    `${MONTH_LABELS[input.monthIndex]} ${input.padDay ? pad2(input.day) : input.day}${
       input.withYear ? `, ${input.year}` : ''
     }, ${clock(input)}`,
   zh: hanDateTime,
@@ -205,6 +208,13 @@ export interface DateTimeOptions {
   readonly timeZone?: DateTimeZone;
   /** Reference instant (epoch ms) for `year: 'auto'`. Default `Date.now()`. */
   readonly now?: number;
+  /**
+   * Print the zone after the date-time in the locale's style ("Sep 22,
+   * 23:04 UTC-5", "9月22日 23:04（UTC-5）"), for a date that stands alone: a
+   * record page, a header figure. A table states its zone once instead
+   * (`<TimeZoneNote>`).
+   */
+  readonly showZone?: boolean;
 }
 
 /** The instant of a Unix timestamp in seconds, or `null` when it is not a real date. */
@@ -230,10 +240,22 @@ export function formatDateTime(
     year = style === 'full' ? 'always' : 'auto',
     timeZone = 'local',
     now,
+    showZone = false,
   }: DateTimeOptions = {},
 ): string {
   const date = toDate(timestamp);
   if (!date) return UNAVAILABLE_VALUE;
+  if (showZone) {
+    const zoned = formatZonedDateTimeParts(timestamp, {
+      locale,
+      style,
+      seconds,
+      year,
+      timeZone,
+      now,
+    });
+    return zoned ? `${zoned.lead}${zoned.zone}${zoned.trail}` : UNAVAILABLE_VALUE;
+  }
   const parts = calendarParts(date, timeZone);
   const withYear =
     year === 'always' ||
@@ -245,6 +267,7 @@ export function formatDateTime(
     ...parts,
     withYear,
     withSeconds: style === 'full' || seconds,
+    padDay: style === 'compact',
   });
 }
 
@@ -273,6 +296,34 @@ export function formatTimeZoneLabel(
   const hours = Math.floor(Math.abs(offsetMinutes) / 60);
   const minutes = Math.abs(offsetMinutes) % 60;
   return `UTC${sign}${hours}${minutes ? `:${pad2(minutes)}` : ''}`;
+}
+
+/** A date-time with its zone, split so the zone can be set apart from the value. */
+export interface ZonedDateTimeParts {
+  /** Everything before the zone: "Sep 22, 23:04 ", "9月22日 23:04（". */
+  readonly lead: string;
+  /** The zone label: "UTC-5". */
+  readonly zone: string;
+  /** Anything after it: "", "）". */
+  readonly trail: string;
+}
+
+/**
+ * `formatDateTime(…, { showZone: true })` in three parts, so `<DateTime
+ * showZone>` can set the zone in the subtle tier like a unit. `null` when the
+ * timestamp is not a real date.
+ */
+export function formatZonedDateTimeParts(
+  timestamp: number | null | undefined,
+  options: Omit<DateTimeOptions, 'showZone'> = {},
+): ZonedDateTimeParts | null {
+  const date = toDate(timestamp);
+  if (!date) return null;
+  const { locale = 'en', timeZone = 'local' } = options;
+  const plain = formatDateTime(timestamp, { ...options, showZone: false });
+  const marker = '\u0000';
+  const [lead = '', trail = ''] = pickByLocale(ZONE_TEMPLATES, locale)(plain, marker).split(marker);
+  return { lead, zone: formatTimeZoneLabel(timeZone, date), trail };
 }
 
 export interface DateTimeTitleOptions {
@@ -324,7 +375,7 @@ export function formatRelativeTime(
  * "Jan 01, 12:34", `zh` "1月1日 12:34", `uk` "1 січ., 12:34", `vi`
  * "1/1, 12:34", each with the year added when it is not the current year.
  * Browser-local time by default; pass `utc` only for deterministic server
- * snapshots — hydration-safe UI uses `<DateTime>` / `HydrationSafeDateTime`.
+ * snapshots — hydration-safe UI uses `<DateTime>` / `useHydrationSafeDateTime`.
  *
  * @deprecated No production code calls this any more; it survives only
  * because table tests build their expected text with it. Use
@@ -337,18 +388,6 @@ export const convertTimestampToDateTime = (
   locale: string = 'en',
   timeZone: TimestampTimeZone = 'local',
 ): string => formatDateTime(timestamp, { locale, seconds: showSecond, timeZone });
-
-/**
- * Deterministic value used for SSR and the first hydration render.
- *
- * @deprecated No production caller; use
- * `formatDateTime(timestamp, { locale, seconds, timeZone: 'utc' })`.
- */
-export const convertTimestampToServerDateTime = (
-  timestamp: number,
-  showSecond: boolean = false,
-  locale: string = 'en',
-): string => convertTimestampToDateTime(timestamp, showSecond, locale, 'utc');
 
 const hanCalendarDate = (year: number, monthIndex: number, day: number): string =>
   `${year}/${monthIndex + 1}/${day}`;

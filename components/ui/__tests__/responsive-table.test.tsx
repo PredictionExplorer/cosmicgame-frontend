@@ -29,6 +29,52 @@ function cellLabels(container: HTMLElement): string[] {
   );
 }
 
+describe('ResponsiveTable roles', () => {
+  it('states every table role, which a phone record would lose in WebKit', () => {
+    // Below 40em the records set table, rows and cells to display: block;
+    // WebKit drops implicit table semantics then, so each part says its role.
+    const { container } = render(
+      <ResponsiveTable aria-label="Test table">
+        <ResponsiveTableHead>
+          <ResponsiveTableRow>
+            <ResponsiveTableHeadCell>Cycle</ResponsiveTableHeadCell>
+          </ResponsiveTableRow>
+        </ResponsiveTableHead>
+        <ResponsiveTableBody>
+          <ResponsiveTableRow>
+            <ResponsiveTableCell label="Cycle">7</ResponsiveTableCell>
+          </ResponsiveTableRow>
+        </ResponsiveTableBody>
+      </ResponsiveTable>,
+    );
+    expect(container.querySelector('table')).toHaveAttribute('role', 'table');
+    for (const group of container.querySelectorAll('thead, tbody')) {
+      expect(group).toHaveAttribute('role', 'rowgroup');
+    }
+    for (const row of container.querySelectorAll('tr')) expect(row).toHaveAttribute('role', 'row');
+    expect(container.querySelector('th')).toHaveAttribute('role', 'columnheader');
+    expect(container.querySelector('td')).toHaveAttribute('role', 'cell');
+  });
+
+  it('gives a plain header <tr> its row role too', () => {
+    const { container } = render(
+      <ResponsiveTable aria-label="Test table">
+        <ResponsiveTableHead>
+          <tr>
+            <ResponsiveTableHeadCell>Cycle</ResponsiveTableHeadCell>
+          </tr>
+        </ResponsiveTableHead>
+        <ResponsiveTableBody>
+          <ResponsiveTableRow>
+            <ResponsiveTableCell label="Cycle">7</ResponsiveTableCell>
+          </ResponsiveTableRow>
+        </ResponsiveTableBody>
+      </ResponsiveTable>,
+    );
+    expect(container.querySelector('thead tr')).toHaveAttribute('role', 'row');
+  });
+});
+
 describe('ResponsiveTableCell labels', () => {
   it('publishes its own label for the mobile card layout to render', () => {
     render(
@@ -407,7 +453,8 @@ describe('ResponsiveTableRow activation', () => {
 
     await user.click(screen.getByRole('cell', { name: '7' }));
 
-    expect(container.querySelector('tr')).not.toHaveAttribute('role');
+    // Only its table role: a click gives a plain row no control semantics.
+    expect(container.querySelector('tr')).toHaveAttribute('role', 'row');
   });
 });
 
@@ -426,7 +473,9 @@ describe('ResponsiveTableRow accessibility', () => {
 
     const row = screen.getByRole('row');
 
-    expect(row).not.toHaveAttribute('role');
+    // The row keeps its table role (stated for WebKit's phone records) and
+    // never becomes a button.
+    expect(row).toHaveAttribute('role', 'row');
     expect(row).not.toHaveAttribute('tabindex');
   });
 

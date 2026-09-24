@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { Breadcrumbs, type BreadcrumbItem } from '@/components/ui/breadcrumbs';
-import { GradientText } from '@/components/ui/gradient-text';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { ScrollRail } from '@/components/ui/scroll-rail';
 import { UnknownValue } from '@/components/ui/unknown-value';
@@ -102,13 +101,6 @@ export interface PageHeaderProps {
   titleId?: string;
   className?: string;
   align?: 'left' | 'center';
-  /**
-   * @deprecated Every page has exactly one H1, and it is this header's. `2`
-   * dates from pages that stacked a server summary above a second header.
-   */
-  titleLevel?: 1 | 2;
-  /** @deprecated The H1 is plain foreground; gradient text is reserved for the landing. */
-  gradientTitle?: boolean | 'signature' | 'nebula' | 'aurora';
 }
 
 const TITLE_CLASS: Record<PageHeaderVariant, string> = {
@@ -183,8 +175,6 @@ export function PageHeader({
   titleId,
   className,
   align = 'left',
-  titleLevel = 1,
-  gradientTitle = false,
 }: PageHeaderProps) {
   const t = useTranslations('common');
   const sectionLabel = section ? t(`pageHeader.sections.${section}`) : null;
@@ -193,9 +183,6 @@ export function PageHeader({
       ? buildTrail(breadcrumbs, section, t('breadcrumbs.home'), sectionLabel)
       : null;
   const centered = align === 'center' && !actions;
-  const TitleTag = titleLevel === 2 ? 'h2' : 'h1';
-  const titleGradient =
-    gradientTitle === true ? 'signature' : gradientTitle === false ? null : gradientTitle;
 
   // A hub titled with its section's own name ("Admin") would say it twice.
   const eyebrowEchoesTitle =
@@ -250,16 +237,12 @@ export function PageHeader({
         )}
       >
         <div className="min-w-0">
-          <TitleTag
+          <h1
             id={titleId}
-            className={cn(
-              'text-foreground print:!text-foreground',
-              titleLevel === 2 ? TITLE_CLASS.data : TITLE_CLASS[variant],
-              titleGradient && '[&]:text-transparent',
-            )}
+            className={cn('text-foreground print:!text-foreground', TITLE_CLASS[variant])}
           >
-            {titleGradient ? <GradientText variant={titleGradient}>{title}</GradientText> : title}
-          </TitleTag>
+            {title}
+          </h1>
           {subtitle ? (
             <HeaderLede
               moreLabel={t('pageHeader.readMore')}

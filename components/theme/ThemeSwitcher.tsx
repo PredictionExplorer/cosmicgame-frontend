@@ -1,5 +1,6 @@
 'use client';
 
+import { useId } from 'react';
 import { Palette } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -17,10 +18,20 @@ import { setSiteTheme, useSiteTheme } from '@/lib/theme/client';
 import { SITE_THEMES } from '@/lib/theme/config';
 import { cn } from '@/lib/utils';
 
-/** One accessible, keyboard-navigable palette menu for every site header. */
+/**
+ * One accessible, keyboard-navigable palette menu for every site header.
+ *
+ * A menu reads only its items in menu mode, so the explanations are wired
+ * in rather than left as stray paragraphs: the intro and the "applies
+ * site-wide" note describe the menu itself, and each palette is named by
+ * its name alone and described by its one-line character.
+ */
 export function ThemeSwitcher({ className }: { className?: string }) {
   const t = useTranslations('common');
   const theme = useSiteTheme();
+  const baseId = useId();
+  const introId = `${baseId}-intro`;
+  const noteId = `${baseId}-note`;
 
   return (
     <DropdownMenu>
@@ -42,45 +53,55 @@ export function ThemeSwitcher({ className }: { className?: string }) {
         align="end"
         sideOffset={10}
         collisionPadding={12}
-        className="max-h-[var(--radix-dropdown-menu-content-available-height)] w-80 max-w-[calc(100vw-1.5rem)] overflow-y-auto rounded-2xl border-border p-2 shadow-2xl"
+        aria-describedby={`${introId} ${noteId}`}
+        className="max-h-[var(--radix-dropdown-menu-content-available-height)] w-80 max-w-[calc(100vw-1.5rem)] overflow-y-auto rounded-surface border-rule p-2 shadow-float"
       >
-        <DropdownMenuLabel className="px-3 pt-2 text-sm">
+        <DropdownMenuLabel className="px-3 pt-2 type-label text-foreground">
           {t('themeSwitcher.label')}
         </DropdownMenuLabel>
-        <p className="px-3 pb-2 text-xs leading-relaxed text-muted-foreground">
+        <p id={introId} className="px-3 pb-2 type-caption text-muted-foreground">
           {t('themeSwitcher.description')}
         </p>
         <DropdownMenuSeparator className="mx-1" />
         <DropdownMenuRadioGroup value={theme} onValueChange={setSiteTheme}>
-          {SITE_THEMES.map((option) => (
-            <DropdownMenuRadioItem
-              key={option}
-              value={option}
-              textValue={t(`themeSwitcher.themes.${option}.name`)}
-              className="my-1 min-h-16 cursor-pointer gap-3 rounded-xl py-2 pl-7 pr-3 focus:bg-primary/10 data-[state=checked]:bg-primary/8 [&>span:first-child]:text-primary"
-            >
-              <span
-                data-palette={option}
-                aria-hidden
-                className="relative flex h-11 w-14 shrink-0 items-end overflow-hidden rounded-lg border border-foreground/15 bg-background p-1.5 shadow-sm"
+          {SITE_THEMES.map((option) => {
+            const nameId = `${baseId}-${option}-name`;
+            const descriptionId = `${baseId}-${option}-description`;
+            return (
+              <DropdownMenuRadioItem
+                key={option}
+                value={option}
+                textValue={t(`themeSwitcher.themes.${option}.name`)}
+                aria-labelledby={nameId}
+                aria-describedby={descriptionId}
+                className="my-1 min-h-16 cursor-pointer gap-3 rounded-control py-2 pl-7 pr-3 focus:bg-primary/10 data-[state=checked]:bg-primary/8 [&>span:first-child]:text-primary"
               >
-                <span className="absolute inset-0 bg-[image:var(--gradient-atmosphere)] opacity-[var(--atmosphere-strength)]" />
-                <span className="relative h-3 w-8 rounded-sm bg-signature-gradient" />
-                <span className="relative ml-1 h-3 w-1 rounded-sm bg-secondary" />
-              </span>
-              <span className="min-w-0">
-                <span className="block text-sm font-medium text-foreground">
-                  {t(`themeSwitcher.themes.${option}.name`)}
+                <span
+                  data-palette={option}
+                  aria-hidden
+                  className="relative flex h-11 w-14 shrink-0 items-end overflow-hidden rounded-control border border-rule bg-background p-1.5"
+                >
+                  <span className="absolute inset-0 bg-[image:var(--gradient-atmosphere)] opacity-[var(--atmosphere-strength)]" />
+                  <span className="relative h-3 w-8 rounded-edge bg-signature-gradient" />
+                  <span className="relative ml-1 h-3 w-1 rounded-edge bg-secondary" />
                 </span>
-                <span className="mt-0.5 block text-[11px] leading-relaxed text-muted-foreground">
-                  {t(`themeSwitcher.themes.${option}.description`)}
+                <span className="min-w-0">
+                  <span id={nameId} className="block type-label text-foreground">
+                    {t(`themeSwitcher.themes.${option}.name`)}
+                  </span>
+                  <span
+                    id={descriptionId}
+                    className="mt-0.5 block type-caption text-muted-foreground"
+                  >
+                    {t(`themeSwitcher.themes.${option}.description`)}
+                  </span>
                 </span>
-              </span>
-            </DropdownMenuRadioItem>
-          ))}
+              </DropdownMenuRadioItem>
+            );
+          })}
         </DropdownMenuRadioGroup>
         <DropdownMenuSeparator className="mx-1" />
-        <p className="px-3 py-2 text-[11px] leading-relaxed text-muted-foreground">
+        <p id={noteId} className="px-3 py-2 type-caption text-muted-foreground">
           {t('themeSwitcher.sitewide')}
         </p>
       </DropdownMenuContent>

@@ -8,6 +8,7 @@ import { localizeCrossHostHref } from '@/lib/hostRouting';
 import { cn } from '@/lib/utils';
 import { SiteLink } from '@/components/layout/SiteLink';
 import { buttonVariants } from '@/components/ui/button';
+import { PhrasedText } from '@/components/ui/phrased-text';
 
 import { EventHorizonCountdown } from './EventHorizonCountdown';
 import { HeroArtShowcase } from './HeroArtShowcase';
@@ -39,7 +40,10 @@ export function Hero({ hero }: { hero: LandingContent['hero'] }) {
         <div className={styles.heroGrid}>
           <p className={cn('type-eyebrow text-subtle', styles.heroEyebrow)}>{hero.eyebrow}</p>
           <h1 id="landing-headline" className={cn('type-display-xl', styles.headline)}>
-            {hero.headlineLead} <span className={styles.headlineAccent}>{hero.headlineAccent}</span>
+            <PhrasedText>{hero.headlineLead}</PhrasedText>{' '}
+            <span className={styles.headlineAccent}>
+              <PhrasedText>{hero.headlineAccent}</PhrasedText>
+            </span>
           </h1>
           <p className={cn('type-body-md text-muted-foreground sm:type-lede', styles.subhead)}>
             {hero.subhead}

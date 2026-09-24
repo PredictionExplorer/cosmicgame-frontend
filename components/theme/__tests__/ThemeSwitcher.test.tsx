@@ -28,6 +28,25 @@ describe('color scheme menu', () => {
     ).toHaveAttribute('aria-checked', 'false');
   });
 
+  it('reads its explanations to screen readers: the menu and each palette are described', async () => {
+    const user = userEvent.setup();
+    render(<ThemeSwitcher />);
+
+    await user.click(screen.getByRole('button', { name: 'common.themeSwitcher.label' }));
+
+    // Plain paragraphs inside role=menu are skipped in menu mode; the intro
+    // and the site-wide note are the menu's description instead.
+    const menu = await screen.findByRole('menu');
+    expect(menu).toHaveAccessibleDescription(
+      'common.themeSwitcher.description common.themeSwitcher.sitewide',
+    );
+    // A palette is named by its name alone and described by its character.
+    const aurora = screen.getByRole('menuitemradio', {
+      name: 'common.themeSwitcher.themes.aurora.name',
+    });
+    expect(aurora).toHaveAccessibleDescription('common.themeSwitcher.themes.aurora.description');
+  });
+
   it('lets keyboard users choose the original blue and returns focus to the trigger', async () => {
     const user = userEvent.setup();
     render(<ThemeSwitcher />);

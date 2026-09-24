@@ -4,7 +4,7 @@
     "breadcrumb": "자주 묻는 질문",
     "subtitle": "처음 시작하는 방법부터 심화 메커니즘까지, Cosmic Signature에 관해 알아야 할 내용을 한곳에 모았습니다.",
     "answerCount": "답변 {count, number}개",
-    "categoryCount": "{count, number}개 카테고리"
+    "categoryCount": "카테고리 {count, number}개"
   },
   "search": {
     "placeholder": "질문 검색…",

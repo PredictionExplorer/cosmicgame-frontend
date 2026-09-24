@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
+import { expectNoStrandedHeadingPunctuation } from './heading-lines';
 import { mockZhQualityApi } from './zh-quality-mocks';
 import { toZhPath, ZH_ROUTE_INVENTORY, type ZhRouteInventoryEntry } from './zh-route-inventory';
 
@@ -150,7 +151,11 @@ async function expectLocalizedMetadata(page: Page, route: ZhRouteInventoryEntry)
   }
 }
 
-async function expectChineseTypography(page: Page, route: ZhRouteInventoryEntry): Promise<void> {
+async function expectChineseTypography(
+  page: Page,
+  route: ZhRouteInventoryEntry,
+  viewportName: string,
+): Promise<void> {
   const typography = await page.evaluate(async () => {
     await document.fonts.ready;
     const bodyStyle = getComputedStyle(document.body);
@@ -163,6 +168,7 @@ async function expectChineseTypography(page: Page, route: ZhRouteInventoryEntry)
       headingFound: Boolean(heading),
       letterSpacing: headingStyle?.letterSpacing ?? '',
       wordBreak: headingStyle?.wordBreak ?? '',
+      overflowWrap: headingStyle?.overflowWrap ?? '',
       lineBreak: headingStyle?.lineBreak ?? '',
     };
   });
@@ -173,9 +179,17 @@ async function expectChineseTypography(page: Page, route: ZhRouteInventoryEntry)
   }
   if (typography.headingFound) {
     expect(['normal', '0px']).toContain(typography.letterSpacing);
-    expect(typography.wordBreak).not.toBe('keep-all');
+    // Headings break Han text at punctuation (keep-all), so a line turns at a
+    // comma rather than inside 周期; a clause too long for its line must
+    // still wrap, so keep-all always comes with an overflow-wrap safety net.
+    // That net ignores the line-start rules, so the lines themselves are
+    // checked too: none may start with 。 or ，.
+    if (typography.wordBreak === 'keep-all') {
+      expect(['anywhere', 'break-word']).toContain(typography.overflowWrap);
+    }
     expect(typography.lineBreak).not.toBe('anywhere');
   }
+  await expectNoStrandedHeadingPunctuation(page, `${route.id} at ${viewportName}`);
 }
 
 function readVisibleHeadings(page: Page): Promise<string> {
@@ -273,7 +287,7 @@ test.describe('Sprint 8 Chinese full-site route QA', () => {
         await expectLocalizedMetadata(page, route);
         await expectNoUnexpectedEnglishHeadings(page, route);
         await expectNoUnexpectedEnglishUiCopy(page, route);
-        await expectChineseTypography(page, route);
+        await expectChineseTypography(page, route, viewport.name);
         await expectLocalePreservingLinks(page);
         await expectNoHorizontalOverflow(page, route);
         if (NOINDEX_ROUTE_IDS.has(route.id)) {

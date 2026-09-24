@@ -153,8 +153,8 @@
       "tooltip": "Số giao dịch phân phối từ Dự trữ truyền thông được lập chỉ mục."
     },
     "randomWalkNftsUsed": {
-      "label": "RandomWalk NFT đã sử dụng",
-      "tooltip": "Các RandomWalk NFT đã được đính kèm vào nét bút ETH để giảm chi phí nét bút một lần."
+      "label": "Random Walk NFT đã sử dụng",
+      "tooltip": "Các Random Walk NFT đã được đính kèm vào nét bút ETH để giảm chi phí nét bút một lần."
     },
     "namedTokens": {
       "label": "Token đã đặt tên",
@@ -229,7 +229,7 @@
   },
   "sectionTooltips": {
     "attachedAssets": "Các tài sản ERC-721 và ERC-20 đính kèm vào nét bút, có thể xem cho mọi chu kỳ hoặc chỉ chu kỳ trình diễn hiện tại.",
-    "gestureTypeDistribution": "Tỷ lệ nét bút đặt bằng ETH, RandomWalk (trả bằng ETH) và CST theo thời gian, lấy mẫu theo khoảng đã chọn. Chỉ chu kỳ hiện tại.",
+    "gestureTypeDistribution": "Tỷ lệ nét bút đặt bằng ETH, Random Walk (trả bằng ETH) và CST theo thời gian, lấy mẫu theo khoảng đã chọn. Chỉ chu kỳ hiện tại.",
     "enduranceTimeline": "Biểu đồ Gantt về ai đã giữ vị trí dẫn đầu trong một chu kỳ. Mỗi thanh là một đoạn dẫn đầu (độ rộng = thời gian địa chỉ đó giữ vị trí dẫn đầu). Thanh rộng nhất là Quán quân Bền bỉ; Chiến binh Thời gian là người tham gia có một lần làm Quán quân Bền bỉ liên tục lâu nhất. Chọn bất kỳ chu kỳ nào để so sánh.",
     "cstWindow": "Cửa sổ hiệu chỉnh CST đã biến đổi thế nào trong một chu kỳ. Mỗi nét bút ETH rút ngắn cửa sổ một chút; mỗi nét bút CST kéo dài nó. Cửa sổ quyết định chi phí nét bút CST giảm về không nhanh đến đâu. Chọn bất kỳ chu kỳ nào để so sánh.",
     "cstCost": "Mỗi nét bút CST thực sự tốn bao nhiêu trong một chu kỳ, trên thang log, cùng với thời gian còn lại của đồng hồ phân bổ ngay trước đó. Nét bút giữa chu kỳ thường gần như không tốn chi phí; ở giai đoạn cuối, đặt nét bút liên tục khiến chi phí không có thời gian giảm và có thể lên tới hàng nghìn CST.",
@@ -258,7 +258,7 @@
     "rwlkTotalTokensImprinted": "Tổng Cosmic Signature NFT và CST đi kèm đã khắc cho những người neo giữ RandomWalk NFT thông qua Tinh tuyển NFT neo giữ.",
     "rwlkTotalTokensAnchored": "Số RandomWalk NFT hiện đang neo giữ trong giao thức.",
     "cstGroup": "Neo giữ Cosmic Signature NFT chia sẻ phân phối neo giữ ETH giữa các Cosmic Signature NFT hiện đang neo giữ.",
-    "rwlkGroup": "Neo giữ RandomWalk NFT mang lại diện nhận phân bổ Tinh tuyển NFT neo giữ."
+    "rwlkGroup": "Neo giữ Random Walk NFT mang lại diện nhận phân bổ Tinh tuyển NFT neo giữ."
   },
   "activity": {
     "heading": "Hoạt động nét bút",
@@ -292,7 +292,7 @@
     "historyLink": "Xem lịch sử neo giữ",
     "tabs": {
       "cosmicSignature": "Cosmic Signature NFT",
-      "randomWalk": "RandomWalk NFT",
+      "randomWalk": "Random Walk NFT",
       "label": "Bộ sưu tập NFT"
     },
     "groups": {
@@ -301,7 +301,7 @@
     },
     "stats": {
       "activeHoldersCosmicSignature": "Số người neo giữ Cosmic Signature NFT đang hoạt động",
-      "activeHoldersRandomWalk": "Số người neo giữ RandomWalk NFT đang hoạt động",
+      "activeHoldersRandomWalk": "Số người neo giữ Random Walk NFT đang hoạt động",
       "distributionDeposits": "Số đợt nạp phân phối neo giữ",
       "totalDistributions": "Tổng phân phối neo giữ",
       "tokensImprinted": "Tổng token đã khắc",
@@ -567,7 +567,7 @@
       "window": "Cửa sổ hiệu chỉnh CST",
       "windowAfter": "Cửa sổ sau nét bút này",
       "typeEth": "Nét bút ETH (rút ngắn)",
-      "typeRandomWalk": "Nét bút ETH + RandomWalk (rút ngắn)",
+      "typeRandomWalk": "Nét bút ETH + Random Walk (rút ngắn)",
       "typeCst": "Nét bút CST (kéo dài)",
       "summaryFinal": "Khi hoàn tất, cửa sổ là {current}. Trong chu kỳ, cửa sổ dao động từ {low} đến {high}.",
       "description": "Cửa sổ hiệu chỉnh CST quyết định chi phí một nét bút CST mất bao lâu để giảm từ giá khởi điểm về không. Mỗi nét bút ETH rút ngắn cửa sổ một chút; mỗi nét bút CST kéo dài nó. Đường kẻ đổi ở mỗi nét bút sang cửa sổ có hiệu lực sau nét bút đó; bảng liệt kê từng nét bút và loại của nó.",
@@ -619,11 +619,11 @@
     "viewTable": "Xem dạng bảng",
     "mix": {
       "eth": "ETH",
-      "ethRandomWalk": "ETH + RandomWalk NFT",
+      "ethRandomWalk": "ETH + Random Walk NFT",
       "cst": "CST",
       "total": "Tổng cộng {count, number} nét bút",
       "window": "Khung bắt đầu",
-      "summary": "Nét bút trong chu kỳ này: {total}. ETH {eth} ({ethShare}), ETH + RandomWalk NFT {rwlk} ({rwlkShare}), CST {cst} ({cstShare}).",
+      "summary": "Nét bút trong chu kỳ này: {total}. ETH {eth} ({ethShare}), ETH + Random Walk NFT {rwlk} ({rwlkShare}), CST {cst} ({cstShare}).",
       "intervalAria": "{hours, plural, other {Mỗi # giờ}}"
     }
   },
@@ -822,18 +822,18 @@
       }
     },
     "usedRwlkNfts": {
-      "eyebrow": "Sử dụng RandomWalk NFT · Arbitrum",
-      "heading": "RandomWalk NFT đã sử dụng",
-      "description": "Xem các RandomWalk NFT đã được đính kèm vào nét bút ETH để hưởng mức giảm chi phí nét bút một lần.",
-      "source": "Các API sử dụng RandomWalk công khai của Cosmic Signature",
+      "eyebrow": "Sử dụng Random Walk NFT · Arbitrum",
+      "heading": "Random Walk NFT đã sử dụng",
+      "description": "Xem các Random Walk NFT đã được đính kèm vào nét bút ETH để hưởng mức giảm chi phí nét bút một lần.",
+      "source": "Các API sử dụng Random Walk công khai của Cosmic Signature",
       "cards": {
-        "used": "RandomWalk NFT đã sử dụng",
+        "used": "Random Walk NFT đã sử dụng",
         "discount": "Giảm giá một lần",
         "scope": "Phạm vi sử dụng",
         "scopeValue": "Một nét bút mỗi NFT"
       },
       "links": {
-        "imprint": "Khắc RandomWalk NFT",
+        "imprint": "Khắc Random Walk NFT",
         "learn": "Tìm hiểu cách nét bút vận hành",
         "cycle": "Xem dữ liệu chu kỳ hiện tại"
       }

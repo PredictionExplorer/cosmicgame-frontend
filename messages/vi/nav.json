@@ -48,8 +48,8 @@
       "description": "Các NFT đính kèm vào nét bút qua các chu kỳ"
     },
     "usedRwlkNfts": {
-      "label": "RandomWalk NFT đã sử dụng",
-      "description": "RandomWalk NFT đã dùng để giảm chi phí nét bút"
+      "label": "Random Walk NFT đã sử dụng",
+      "description": "Random Walk NFT đã dùng để giảm chi phí nét bút"
     },
     "statistics": {
       "label": "Thống kê",
@@ -303,12 +303,6 @@
       "defaultLabel": "NFT trên Axiom Zero",
       "menuLabel": "Sàn Axiom Zero",
       "shortLabel": "Axiom Zero"
-    },
-    "chaosZero": {
-      "ariaLabel": "Thị trường dự đoán Chaos Zero",
-      "defaultLabel": "Chaos Zero",
-      "menuLabel": "Chaos Zero",
-      "shortLabel": "Chaos Zero"
     }
   },
   "maintenance": {

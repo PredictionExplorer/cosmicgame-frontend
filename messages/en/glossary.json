@@ -3,7 +3,7 @@
     "gesture": {
       "term": "Gesture",
       "short": "A participant’s on-chain act in a Cycle, made with ETH or CST, that extends the clock and shapes the Signature.",
-      "long": "Each Gesture adds the current time increment to the Cycle Finalization Time, records one Stellar Selection entry and may imprint Participation CST. The first Gesture of every Cycle is made with ETH; after that, ETH and CST Gestures mix freely."
+      "long": "Each gesture adds the current time increment to the Cycle Finalization Time, records one Stellar Selection entry and may imprint Participation CST. The first gesture of every Cycle is made with ETH; after that, ETH and CST gestures mix freely."
     },
     "cycle": {
       "term": "Performance Cycle",
@@ -12,43 +12,43 @@
     },
     "cycleFinalizationTime": {
       "term": "Cycle Finalization Time",
-      "short": "The moment a Cycle can close. The first Gesture starts the clock, and every later Gesture extends it.",
-      "long": "When the clock reaches zero, the participant who made the Final Gesture may finalize the Cycle and retrieve the Signature Allocation. Gestures stay possible until the Cycle is actually finalized, and each one moves the time forward again."
+      "short": "The moment a Cycle can close. The first gesture starts the clock, and every later gesture extends it.",
+      "long": "When the clock reaches zero, the participant holding the Last Gesture may finalize the Cycle and retrieve the Signature Allocation. Gestures stay possible until the Cycle is actually finalized, and each one moves the time forward again."
     },
     "calibrationWindow": {
       "term": "Calibration Window",
       "short": "A window in which the Gesture Cost descends from its Calibration Ceiling toward its Calibration Floor, so the cost falls the longer you wait.",
-      "long": "ETH and CST Gestures follow separate windows. The CST window is stored on-chain and changes after every Gesture: a CST Gesture lengthens it slightly and an ETH Gesture shortens it."
+      "long": "ETH and CST gestures follow separate windows. The CST window is stored on-chain and changes after every gesture: a CST gesture lengthens it slightly and an ETH gesture shortens it."
     },
     "cycleReserve": {
       "term": "Cycle Reserve",
-      "short": "The ETH held for the current Cycle. ETH Gestures and contributions add to it, and the allocations draw from it at finalization.",
+      "short": "The ETH held for the current Cycle. ETH gestures and contributions add to it, and the allocations draw from it at finalization.",
       "long": "Each allocation track receives a fixed share when the Cycle finalizes: the Signature Allocation, Stellar Selection, Anchor Distributions, the Chrono-Warrior, Public Goods and the Compounding Cycle Reserve that opens the next Cycle."
     },
     "signatureAllocation": {
       "term": "Signature Allocation",
-      "short": "The allocation for the Final Gesture of a Cycle: a share of the Cycle Reserve in ETH, Recognition CST and a Cosmic Signature NFT.",
-      "long": "The participant who made the Final Gesture may finalize the Cycle and retrieve it, with priority over the tokens and NFTs attached to Gestures. If they do not finalize within their exclusive window, whoever finalizes the Cycle receives it."
+      "short": "The allocation for whoever holds the Last Gesture when a Cycle closes: a share of the Cycle Reserve in ETH, Recognition CST and a Cosmic Signature NFT.",
+      "long": "The participant holding the Last Gesture may finalize the Cycle and retrieve it, with priority over the tokens and NFTs attached to gestures. If they do not finalize within their exclusive window, whoever finalizes the Cycle receives it."
     },
     "finalCstGesture": {
       "term": "Final CST Gesture",
-      "short": "The last Gesture made with CST in a Cycle.",
+      "short": "The last gesture made with CST in a Cycle.",
       "long": "When the Cycle finalizes, the participant who made it receives Recognition CST and a Cosmic Signature NFT."
     },
     "enduranceChampion": {
       "term": "Endurance Champion",
-      "short": "The participant who remained the most recent Gesture maker for the longest consecutive interval in a Cycle.",
-      "long": "The interval is the longest gap before another Gesture arrived. When the Cycle finalizes, the Endurance Champion receives Recognition CST and a Cosmic Signature NFT."
+      "short": "The participant who remained the most recent gesture maker for the longest consecutive interval in a Cycle.",
+      "long": "The interval is the longest gap before another gesture arrived. When the Cycle finalizes, the Endurance Champion receives Recognition CST and a Cosmic Signature NFT."
     },
     "chronoWarrior": {
       "term": "Chrono-Warrior",
       "short": "The participant who held the Endurance Champion position for the longest consecutive interval in a Cycle.",
-      "long": "The Endurance Champion is the longest-held most recent Gesture; the Chrono-Warrior is the longest-held Endurance Champion. At finalization the Chrono-Warrior receives a share of the Cycle Reserve in ETH, Recognition CST and a Cosmic Signature NFT."
+      "long": "The Endurance Champion is the longest-held most recent gesture; the Chrono-Warrior is the longest-held Endurance Champion. At finalization the Chrono-Warrior receives a share of the Cycle Reserve in ETH, Recognition CST and a Cosmic Signature NFT."
     },
     "stellarSelection": {
       "term": "Stellar Selection",
       "short": "The protocol’s random selection at finalization, which distributes allocations among the recorded entries.",
-      "long": "Every Gesture records one entry. At finalization the contract selects entries with on-chain randomness for ETH and Cosmic Signature NFT allocations, and anchored Random Walk NFTs take part in a separate selection. The same address can be selected more than once."
+      "long": "Every gesture records one entry. At finalization the contract selects entries with on-chain randomness for ETH and Cosmic Signature NFT allocations, and anchored Random Walk NFTs take part in a separate selection. The same address can be selected more than once."
     },
     "anchoring": {
       "term": "Anchoring",
@@ -68,7 +68,7 @@
     "imprint": {
       "term": "Imprint",
       "short": "Create a new Cosmic Signature NFT or new CST on-chain.",
-      "long": "Finalization imprints the Cycle’s Cosmic Signature NFTs and Recognition CST, and a Gesture may imprint Participation CST. Every Cosmic Signature NFT is generated from its on-chain seed."
+      "long": "Finalization imprints the Cycle’s Cosmic Signature NFTs and Recognition CST, and a gesture may imprint Participation CST. Every Cosmic Signature NFT is generated from its on-chain seed."
     },
     "publicGoods": {
       "term": "Public Goods",
@@ -88,7 +88,7 @@
     "cst": {
       "term": "CST",
       "short": "Cosmic Signature Token, the protocol’s ERC-20 token.",
-      "long": "Gestures can imprint CST, and CST pays for CST Gestures, which burn it. Delegated CST carries Coordination Weight on the Cosmic Council."
+      "long": "Gestures can imprint CST, and CST pays for CST gestures, which burn it. Delegated CST carries Coordination Weight on the Cosmic Council."
     }
   }
 }

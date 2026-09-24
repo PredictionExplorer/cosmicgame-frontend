@@ -54,7 +54,7 @@
     },
     "contractErrors": {
       "insufficientReceivedBidAmount": "Поточна вартість жесту перевищує переказану вами суму.",
-      "usedRandomWalkNft": "Цей RandomWalk NFT уже використано для жесту.",
+      "usedRandomWalkNft": "Цей Random Walk NFT уже використано для жесту.",
       "callerIsNotNftOwner": "Ви не власник цього NFT.",
       "roundIsInactive": "Поточний цикл неактивний.",
       "tooLongBidMessage": "Повідомлення до вашого жесту надто довге.",

@@ -153,8 +153,8 @@
       "tooltip": "인덱싱된 홍보 준비금 배분 트랜잭션 수를 나타냅니다."
     },
     "randomWalkNftsUsed": {
-      "label": "사용된 RandomWalk NFT",
-      "tooltip": "일회성 제스처 비용 할인을 위해 ETH 제스처에 이미 첨부된 RandomWalk NFT입니다."
+      "label": "사용된 Random Walk NFT",
+      "tooltip": "일회성 제스처 비용 할인을 위해 ETH 제스처에 이미 첨부된 Random Walk NFT입니다."
     },
     "namedTokens": {
       "label": "이름 붙인 토큰",
@@ -229,7 +229,7 @@
   },
   "sectionTooltips": {
     "attachedAssets": "제스처에 첨부된 ERC-721 및 ERC-20 자산입니다. 전체 사이클 기준 또는 현재 퍼포먼스 사이클 기준으로 볼 수 있습니다.",
-    "gestureTypeDistribution": "ETH, RandomWalk(ETH 지불), CST로 남긴 제스처의 비중을 선택한 간격으로 샘플링해 시간 흐름에 따라 보여 줍니다. 현재 사이클만 해당합니다.",
+    "gestureTypeDistribution": "ETH, Random Walk(ETH 지불), CST로 남긴 제스처의 비중을 선택한 간격으로 샘플링해 시간 흐름에 따라 보여 줍니다. 현재 사이클만 해당합니다.",
     "enduranceTimeline": "사이클 동안 누가 선두를 지켰는지 보여 주는 간트 차트입니다. 각 막대는 하나의 선두 유지 구간이며, 막대 너비는 해당 주소가 선두를 지킨 시간입니다. 가장 넓은 막대가 수호 챔피언이고, 시간의 전사는 수호 챔피언 지위를 끊기지 않고 가장 오래 유지한 참여자입니다. 비교할 사이클을 자유롭게 선택할 수 있습니다.",
     "cstWindow": "사이클 동안 CST 보정 구간이 어떻게 변해 왔는지 보여 줍니다. ETH 제스처는 구간을 조금씩 줄이고, CST 제스처는 구간을 늘립니다. 이 구간은 CST 제스처 비용이 0까지 내려가는 속도를 정합니다. 비교할 사이클을 자유롭게 선택할 수 있습니다.",
     "cstCost": "사이클 동안 각 CST 제스처에 실제로 든 비용을 로그 스케일로, 제스처 직전에 남아 있던 마감 시간과 함께 보여 줍니다. 사이클 중반의 제스처는 비용이 거의 0에 가까운 경우가 많지만, 종반에 제스처가 빠르게 이어지면 비용이 내려갈 시간이 없어 수천 CST에 이를 수 있습니다.",
@@ -258,7 +258,7 @@
     "rwlkTotalTokensImprinted": "앵커링 NFT 별빛 선정을 통해 RandomWalk NFT 앵커링 보유자에게 각인된 Cosmic Signature NFT와 짝지어진 CST를 모두 합한 값입니다.",
     "rwlkTotalTokensAnchored": "현재 프로토콜에 앵커링된 RandomWalk NFT 수를 나타냅니다.",
     "cstGroup": "Cosmic Signature NFT 앵커링에서는 현재 앵커링된 Cosmic Signature NFT가 ETH 앵커링 지급을 나누어 받습니다.",
-    "rwlkGroup": "RandomWalk NFT 앵커링은 앵커링 NFT 별빛 선정 배분 자격을 부여합니다."
+    "rwlkGroup": "Random Walk NFT 앵커링은 앵커링 NFT 별빛 선정 배분 자격을 부여합니다."
   },
   "activity": {
     "heading": "제스처 활동",
@@ -292,7 +292,7 @@
     "historyLink": "앵커링 내역 보기",
     "tabs": {
       "cosmicSignature": "Cosmic Signature NFT",
-      "randomWalk": "RandomWalk NFT",
+      "randomWalk": "Random Walk NFT",
       "label": "NFT 컬렉션"
     },
     "groups": {
@@ -301,7 +301,7 @@
     },
     "stats": {
       "activeHoldersCosmicSignature": "활성 Cosmic Signature NFT 앵커링 보유자 수",
-      "activeHoldersRandomWalk": "활성 RandomWalk NFT 앵커링 보유자 수",
+      "activeHoldersRandomWalk": "활성 Random Walk NFT 앵커링 보유자 수",
       "distributionDeposits": "앵커링 지급 적립 횟수",
       "totalDistributions": "앵커링 지급 총액",
       "tokensImprinted": "각인된 토큰 총수",
@@ -567,7 +567,7 @@
       "window": "CST 보정 구간",
       "windowAfter": "이 제스처 이후 구간",
       "typeEth": "ETH 제스처 (단축)",
-      "typeRandomWalk": "ETH + RandomWalk 제스처 (단축)",
+      "typeRandomWalk": "ETH + Random Walk 제스처 (단축)",
       "typeCst": "CST 제스처 (연장)",
       "summaryFinal": "마감 시점 구간: {current}. 사이클 중 범위: {low} ~ {high}.",
       "description": "CST 보정 구간은 CST 제스처 비용이 시작값에서 0까지 내려가는 데 걸리는 시간을 정합니다. ETH 제스처는 구간을 조금씩 줄이고, CST 제스처는 구간을 늘립니다. 선은 제스처마다 그 이후 적용되는 구간으로 바뀝니다. 표에는 각 제스처와 유형이 나옵니다.",
@@ -619,11 +619,11 @@
     "viewTable": "표로 보기",
     "mix": {
       "eth": "ETH",
-      "ethRandomWalk": "ETH + RandomWalk NFT",
+      "ethRandomWalk": "ETH + Random Walk NFT",
       "cst": "CST",
       "total": "합계 제스처 {count, number}회",
       "window": "구간 시작",
-      "summary": "이번 사이클 제스처 {total}회: ETH {eth}회 ({ethShare}), ETH + RandomWalk NFT {rwlk}회 ({rwlkShare}), CST {cst}회 ({cstShare}).",
+      "summary": "이번 사이클 제스처 {total}회: ETH {eth}회 ({ethShare}), ETH + Random Walk NFT {rwlk}회 ({rwlkShare}), CST {cst}회 ({cstShare}).",
       "intervalAria": "{hours, plural, other {#시간마다}}"
     }
   },
@@ -735,12 +735,12 @@
       "stellarEthRecipients": "사이클당 별빛 선정 수령자 수가 변경되었습니다.",
       "stellarNftRecipients": "사이클당 별빛 선정 NFT 수령자 수가 변경되었습니다.",
       "cycleActivationDelay": "사이클 활성화 전 지연 시간이 변경되었습니다.",
-      "anchoredRandomWalkRecipients": "앵커링된 RandomWalk NFT 대상 별빛 선정 NFT 수령자 수가 변경되었습니다.",
+      "anchoredRandomWalkRecipients": "앵커링된 Random Walk NFT 대상 별빛 선정 NFT 수령자 수가 변경되었습니다.",
       "publicGoodsVaultAddress": "공공재 금고 주소가 변경되었습니다.",
-      "randomWalkContractAddress": "RandomWalk NFT 컨트랙트 주소가 변경되었습니다.",
+      "randomWalkContractAddress": "Random Walk NFT 컨트랙트 주소가 변경되었습니다.",
       "allocationsWalletAddress": "배분 지갑(배분 에스크로) 주소가 변경되었습니다.",
       "anchoringWalletAddress": "앵커링 지갑 주소가 변경되었습니다.",
-      "randomWalkAnchoringWalletAddress": "RandomWalk NFT 앵커링 지갑 주소가 변경되었습니다.",
+      "randomWalkAnchoringWalletAddress": "Random Walk NFT 앵커링 지갑 주소가 변경되었습니다.",
       "outreachWalletAddress": "홍보 지갑 주소가 변경되었습니다.",
       "cstContractAddress": "Cosmic Signature CST 토큰(ERC-20) 컨트랙트 주소가 변경되었습니다.",
       "cosmicSignatureNftAddress": "Cosmic Signature NFT(ERC-721) 컨트랙트 주소가 변경되었습니다.",
@@ -822,18 +822,18 @@
       }
     },
     "usedRwlkNfts": {
-      "eyebrow": "RandomWalk NFT 사용 · Arbitrum",
-      "heading": "사용된 RandomWalk NFT",
-      "description": "일회성 제스처 비용 할인을 위해 이미 ETH 제스처에 첨부된 RandomWalk NFT를 살펴볼 수 있습니다.",
-      "source": "Cosmic Signature 공개 RandomWalk 사용 API",
+      "eyebrow": "Random Walk NFT 사용 · Arbitrum",
+      "heading": "사용된 Random Walk NFT",
+      "description": "일회성 제스처 비용 할인을 위해 이미 ETH 제스처에 첨부된 Random Walk NFT를 살펴볼 수 있습니다.",
+      "source": "Cosmic Signature 공개 Random Walk 사용 API",
       "cards": {
-        "used": "사용된 RandomWalk NFT",
+        "used": "사용된 Random Walk NFT",
         "discount": "일회성 할인",
         "scope": "사용 범위",
         "scopeValue": "NFT당 제스처 1회"
       },
       "links": {
-        "imprint": "RandomWalk NFT 각인",
+        "imprint": "Random Walk NFT 각인",
         "learn": "제스처 작동 원리 알아보기",
         "cycle": "현재 사이클 데이터 보기"
       }

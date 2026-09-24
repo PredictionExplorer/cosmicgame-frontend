@@ -48,8 +48,8 @@
       "description": "여러 사이클에 걸쳐 제스처에 첨부된 NFT"
     },
     "usedRwlkNfts": {
-      "label": "사용된 RandomWalk NFT",
-      "description": "제스처 비용 할인에 이미 사용된 RandomWalk NFT"
+      "label": "사용된 Random Walk NFT",
+      "description": "제스처 비용 할인에 이미 사용된 Random Walk NFT"
     },
     "statistics": {
       "label": "통계",
@@ -303,12 +303,6 @@
       "defaultLabel": "Axiom Zero의 NFT",
       "menuLabel": "Axiom Zero 마켓플레이스",
       "shortLabel": "Axiom Zero"
-    },
-    "chaosZero": {
-      "ariaLabel": "Chaos Zero 예측 시장",
-      "defaultLabel": "Chaos Zero",
-      "menuLabel": "Chaos Zero",
-      "shortLabel": "Chaos Zero"
     }
   },
   "maintenance": {

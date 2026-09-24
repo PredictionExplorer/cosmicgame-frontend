@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
+import { expectNoStrandedHeadingPunctuation } from './heading-lines';
 import {
   LOCALE_ROUTE_INVENTORY,
   toLocalePath,
@@ -329,6 +330,7 @@ export function defineLocaleSiteQa(profile: LocaleQaProfile): void {
           await expectNoUnexpectedEnglishHeadings(page, route, profile);
           await expectNoUnexpectedEnglishUiCopy(page, route, profile);
           await expectLocaleTypography(page, route, profile);
+          await expectNoStrandedHeadingPunctuation(page, `${route.id} at ${viewport.name}`);
           await expectLocalePreservingLinks(page, profile.locale);
           await expectNoHorizontalOverflow(page, route);
           if (NOINDEX_ROUTE_IDS.has(route.id)) {

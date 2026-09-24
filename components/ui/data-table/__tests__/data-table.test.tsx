@@ -201,6 +201,25 @@ describe('DataTable sorting', () => {
   });
 });
 
+describe('DataTable header help', () => {
+  it('keeps the help box of a touch pointer off a sortable label', () => {
+    // Regression: the 44px help box reached 7px into "Number of Tokens
+    // Owned", so a tap on the end of the label opened help instead of sorting.
+    const withHelp: DataTableColumn<Row>[] = [
+      { ...columns[0]!, help: 'Who holds the tokens.' },
+      { ...columns[1]!, help: 'Gestures made.' },
+    ];
+    render(
+      <DataTable ariaLabel="Holders" data={rows} columns={withHelp} getRowKey={(r) => r.id} />,
+    );
+    const [plain, sortable] = screen.getAllByRole('columnheader');
+    expect(within(sortable!).getByRole('button', { name: 'Gestures' }).parentElement).toHaveClass(
+      'pointer-coarse:gap-5',
+    );
+    expect(plain!.firstElementChild).not.toHaveClass('pointer-coarse:gap-5');
+  });
+});
+
 describe('nextSort', () => {
   it('cycles a column through its first direction, the other, and back', () => {
     const first = nextSort(null, 'amount', 'desc');

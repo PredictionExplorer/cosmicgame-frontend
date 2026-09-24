@@ -18,7 +18,7 @@ function sourceFiles(directory: string): string[] {
  * until hydration and the local zone afterwards.
  */
 const ZONE_DEPENDENT_FORMATTER =
-  /\b(?:convertTimestampToDateTime|convertTimestampToServerDateTime|formatDateTime|formatDateTimeTitle)\b/;
+  /\b(?:convertTimestampToDateTime|formatDateTime|formatDateTimeTitle)\b/;
 
 describe('timestamp rendering call sites', () => {
   it('routes production UI through the hydration-safe <DateTime>', () => {

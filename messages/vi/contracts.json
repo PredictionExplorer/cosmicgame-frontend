@@ -53,7 +53,7 @@
     },
     "rwalkAnchor": {
       "name": "Ví neo giữ RWLK",
-      "description": "Hợp đồng neo giữ dành cho RandomWalk NFT"
+      "description": "Hợp đồng neo giữ dành cho Random Walk NFT"
     }
   },
   "categories": {
@@ -158,7 +158,7 @@
       "nftLabel": "NFT Tinh tuyển (người tham gia)",
       "nftTooltip": "Số người tham gia được chọn ngẫu nhiên để nhận Cosmic Signature NFT mỗi chu kỳ",
       "anchorLabel": "NFT Tinh tuyển (RWLK neo giữ)",
-      "anchorTooltip": "Số người neo giữ RandomWalk NFT được chọn ngẫu nhiên để nhận Cosmic Signature NFT mỗi chu kỳ"
+      "anchorTooltip": "Số người neo giữ Random Walk NFT được chọn ngẫu nhiên để nhận Cosmic Signature NFT mỗi chu kỳ"
     },
     "cstComplete": "Cửa sổ đã chạy hết thời lượng, nên chi phí nét bút CST giữ ở mức sàn cho đến khi nét bút CST tiếp theo bắt đầu lại cửa sổ.",
     "ethClosed": "Nét bút đầu tiên của chu kỳ đã đóng cửa sổ này; giờ chi phí nét bút ETH tăng theo từng nét bút.",

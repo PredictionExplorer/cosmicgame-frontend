@@ -40,7 +40,7 @@ export type SortValue = string | number | bigint | boolean | null | undefined;
 
 export interface ColumnKindSpec {
   readonly align: LogicalAlign;
-  /** Tabular, lining figures with a slashed zero. */
+  /** Tabular, lining figures. */
   readonly numeric: boolean;
   /** Never wraps: a date, an amount or a short address is one unit. */
   readonly nowrap: boolean;

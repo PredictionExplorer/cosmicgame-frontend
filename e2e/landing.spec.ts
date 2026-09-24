@@ -165,7 +165,7 @@ test.describe('Landing page @ cosmicsignature.com', () => {
     await expect(
       timer.getByRole('heading', { name: /Cycle #42 is waiting for its first Gesture/i }),
     ).toBeVisible();
-    await expect(timer.getByText(/The first Gesture ignites/)).toBeVisible();
+    await expect(timer.getByText(/The first gesture ignites/i)).toBeVisible();
     await expect(timer.getByRole('link', { name: /open the app/i })).toHaveAttribute(
       'href',
       APP_ORIGIN_PATTERN,

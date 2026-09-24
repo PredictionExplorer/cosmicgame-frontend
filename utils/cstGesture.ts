@@ -123,12 +123,6 @@ export function mapCTPriceInfo(
   return { ...data, isFree: isCstGestureFree(data) };
 }
 
-export function formatCstAmount(value: number | null | undefined, digits = 4): string {
-  if (value == null || !Number.isFinite(value)) return '--';
-  if (value === 0) return '0';
-  return value >= 1 ? value.toFixed(digits).replace(/\.?0+$/, '') : value.toFixed(6);
-}
-
 export function getCstAuctionProgress({
   AuctionDuration,
   SecondsElapsed,

@@ -54,7 +54,7 @@
     },
     "contractErrors": {
       "insufficientReceivedBidAmount": "현재 제스처 비용이 전송한 금액보다 큽니다.",
-      "usedRandomWalkNft": "이 RandomWalk NFT는 이미 제스처에 사용되었습니다.",
+      "usedRandomWalkNft": "이 Random Walk NFT는 이미 제스처에 사용되었습니다.",
       "callerIsNotNftOwner": "이 NFT의 소유자가 아닙니다.",
       "roundIsInactive": "현재 사이클이 활성 상태가 아닙니다.",
       "tooLongBidMessage": "제스처 메시지가 너무 깁니다.",

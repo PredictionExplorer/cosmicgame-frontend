@@ -184,6 +184,44 @@ describe('GestureHistoryTable', () => {
     expect(screen.getByAltText('tables.gestureHistory.randomWalkImageAlt')).toBeInTheDocument();
   });
 
+  test('reads as lines on a phone: the method on the date line, the cycle only when it varies', () => {
+    const gesture = (id: number, round: number) => ({
+      EvtLogId: id,
+      TimeStamp: 1_700_000_000 + id,
+      BidderAddr: '0x555eced709352759Ed0f1317dfC0a5FEf1310e60',
+      GestureType: 2,
+      CstPriceEth: 25.5,
+      RoundNum: round,
+    });
+    const cellOf = (container: HTMLElement, kind: string) =>
+      container.querySelector(`tbody tr td[data-kind="${kind}"]`);
+
+    const { container, unmount } = render(
+      <GestureHistoryTable
+        gestureHistory={[gesture(2, 2), gesture(1, 2)]}
+        showParticipant={false}
+        showHold={false}
+      />,
+    );
+    // The type column is dropped on phones; its tag rides on the date line.
+    const typeHeader = screen.getByRole('columnheader', { name: /tables.columns.gestureType/ });
+    expect(typeHeader).toHaveAttribute('data-priority', 'secondary');
+    const dateTag = cellOf(container, 'datetime')?.querySelector('.sm\\:hidden');
+    expect(dateTag).toHaveTextContent('CST');
+    // One cycle in the list: each record would repeat it, so phones drop it.
+    expect(cellOf(container, 'link')).toHaveAttribute('data-priority', 'secondary');
+    unmount();
+
+    const spanning = render(
+      <GestureHistoryTable
+        gestureHistory={[gesture(2, 3), gesture(1, 2)]}
+        showParticipant={false}
+        showHold={false}
+      />,
+    );
+    expect(cellOf(spanning.container, 'link')).toHaveAttribute('data-priority', 'primary');
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(<GestureHistoryTable gestureHistory={[]} />);
     await checkA11y(container);

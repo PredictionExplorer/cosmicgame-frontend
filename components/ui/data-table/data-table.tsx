@@ -600,7 +600,7 @@ export function DataTable<T>({
           <ResponsiveTableBody>
             {showSkeleton
               ? Array.from({ length: skeletonRows }, (_, rowIndex) => (
-                  <tr key={rowIndex} aria-hidden="true">
+                  <tr key={rowIndex} role="row" aria-hidden="true">
                     {visible.map((col) => (
                       <ResponsiveTableCell
                         key={col.column.id}
@@ -721,8 +721,9 @@ export function DataTable<T>({
                         ) : null}
                       </ResponsiveTableRow>
                       {isExpanded ? (
-                        <tr id={detailsId} data-detail="true">
+                        <tr id={detailsId} role="row" data-detail="true">
                           <td
+                            role="cell"
                             colSpan={columnCount}
                             className="border-b border-rule-faint bg-surface-sunken px-4 py-3"
                           >
@@ -854,7 +855,15 @@ function HeaderCell<T>({
       {col.help ? (
         // The help button trails its label, so it always reads as part of
         // this column's header rather than floating towards the next one.
-        <span className="inline-flex max-w-full items-end gap-1.5 align-bottom">
+        // On coarse pointers its 44px box reaches 15px left of the icon; a
+        // 20px gap keeps that box off a sortable label, so a tap on the end
+        // of the label sorts instead of opening the help.
+        <span
+          className={cn(
+            'inline-flex max-w-full items-end gap-1.5 align-bottom',
+            column.sortable && 'pointer-coarse:gap-5',
+          )}
+        >
           {label}
           <InfoTooltip
             content={col.help}

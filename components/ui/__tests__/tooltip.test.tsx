@@ -205,14 +205,16 @@ describe('InfoTooltip', () => {
     expect(screen.getByRole('button', { name: 'Explain cycle timing' })).toBeInTheDocument();
   });
 
-  it('is a 24px button at every width, with a 44px hit area on coarse pointers', () => {
+  it('is a 24px button on fine pointers and a real 44px box on coarse pointers', () => {
     render(<InfoTooltip content="Extra context" label="Total Cycles" className="ml-1.5" />);
 
     const trigger = screen.getByRole('button', { name: 'More information about Total Cycles' });
-    // The button's own box is 24px, which is what automated audits measure;
-    // the 16px icon beside it keeps the row's layout and the caller's margin.
-    expect(trigger).toHaveClass('size-6', 'pointer-coarse:after:size-11');
-    expect(trigger.className).not.toMatch(/sm:after:hidden/);
+    // The button's own box is the target (no pseudo-element pad): 24px, and
+    // 44px on touch, absolutely positioned so the 16px icon beside it keeps
+    // the row's layout and the caller's margin.
+    expect(trigger).toHaveClass('absolute', 'size-6', 'pointer-coarse:size-11');
+    expect(trigger).not.toHaveAttribute('data-touch-target');
+    expect(trigger.className).not.toMatch(/after:/);
     const wrapper = trigger.closest('[data-slot="info-tooltip"]');
     expect(wrapper).toHaveClass('text-subtle', 'ml-1.5');
     expect(wrapper?.querySelector('svg')).toHaveClass('size-4');

@@ -535,10 +535,15 @@ function isPresent(item: ReactNode): boolean {
   return item !== null && item !== undefined && item !== false && item !== '';
 }
 
-/** The caption line of a wall label: short facts separated by middle dots. */
+/**
+ * The caption line of a wall label: short facts separated by middle dots.
+ * Each dot trails the fact before it, so when the line wraps on a phone the
+ * dot stays at the end of the line it belongs to and no line starts with one.
+ */
 export function WallLabelMeta({ items, className }: WallLabelMetaProps) {
   const present = items.filter(isPresent);
   if (present.length === 0) return null;
+  const last = present.length - 1;
   return (
     <p
       className={cn(
@@ -548,8 +553,8 @@ export function WallLabelMeta({ items, className }: WallLabelMetaProps) {
     >
       {present.map((item, index) => (
         <span key={index} className="inline-flex items-baseline gap-2">
-          {index > 0 ? <span aria-hidden>·</span> : null}
           {item}
+          {index < last ? <span aria-hidden>·</span> : null}
         </span>
       ))}
     </p>

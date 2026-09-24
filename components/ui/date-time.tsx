@@ -9,6 +9,7 @@ import {
   formatDateTimeTitle,
   formatRelativeTime,
   formatTimeZoneLabel,
+  formatZonedDateTimeParts,
   toIsoDateTime,
   type DateTimeZone,
 } from '@/utils/format';
@@ -78,6 +79,12 @@ export interface DateTimeProps extends Omit<HTMLAttributes<HTMLElement>, 'childr
    * `utc` where a page states UTC. SSR always renders UTC.
    */
   timeZone?: DateTimeZone;
+  /**
+   * Print the zone after the value ("Sep 22, 2026, 23:04:45 UTC-5"). Every
+   * date is in the reader's zone, so one that stands alone (a record page, a
+   * header figure) says which; a table says it once with `<TimeZoneNote>`.
+   */
+  showZone?: boolean;
   /** Render prop for composing the formatted value into other markup. */
   children?: (value: string) => ReactNode;
 }
@@ -95,6 +102,7 @@ export function DateTime({
   year,
   locale,
   timeZone = 'local',
+  showZone = false,
   className,
   children,
   ...rest
@@ -115,23 +123,40 @@ export function DateTime({
   }
 
   const now = nowMs > 0 ? nowMs : undefined;
-  const absolute = formatDateTime(timestamp, {
+  const options = {
     locale: resolvedLocale,
-    style: variant === 'full' ? 'full' : 'compact',
+    style: variant === 'full' ? ('full' as const) : ('compact' as const),
     seconds,
     year,
     timeZone: zone,
     now,
-  });
-  const value =
-    variant === 'relative' && now
-      ? formatRelativeTime(timestamp, { locale: resolvedLocale, now })
-      : absolute;
+  };
+  const absolute = formatDateTime(timestamp, { ...options, showZone });
+  const relative = variant === 'relative' && now;
+  const value = relative
+    ? formatRelativeTime(timestamp, { locale: resolvedLocale, now })
+    : absolute;
   const title = formatDateTimeTitle(timestamp, { locale: resolvedLocale, timeZone: zone, now });
+  // The zone reads like a unit: subtle, and in proportional figures, so
+  // "UTC-5" does not take a tabular figure's spacing inside a readout.
+  const zoned =
+    showZone && !relative && !children ? formatZonedDateTimeParts(timestamp, options) : null;
 
   return (
     <time dateTime={iso} title={title} className={cn('whitespace-nowrap', className)} {...rest}>
-      {children ? children(value) : value}
+      {children ? (
+        children(value)
+      ) : zoned ? (
+        <>
+          {zoned.lead}
+          <span data-slot="zone" className="text-subtle [font-variant-numeric:normal]">
+            {zoned.zone}
+          </span>
+          {zoned.trail}
+        </>
+      ) : (
+        value
+      )}
     </time>
   );
 }

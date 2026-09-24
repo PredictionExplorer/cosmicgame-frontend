@@ -186,9 +186,9 @@
         }
       },
       "used-rwlk-nfts": {
-        "heading": "使用済みのRandomWalk NFT",
-        "description": "ETH一筆の割引に使用済みのRandomWalk NFTを確認できます。割引に使えるのは、各NFTにつき一度だけです。",
-        "source": "Cosmic Signature公開RandomWalk使用API",
+        "heading": "使用済みのRandom Walk NFT",
+        "description": "ETH一筆の割引に使用済みのRandom Walk NFTを確認できます。割引に使えるのは、各NFTにつき一度だけです。",
+        "source": "Cosmic Signature公開Random Walk使用API",
         "links": {
           "imprint": "Random Walk NFTを刻印する",
           "learn": "一筆の仕組みを学ぶ",
@@ -196,7 +196,7 @@
         },
         "cards": {
           "used": {
-            "label": "使用済みのRandomWalk NFT"
+            "label": "使用済みのRandom Walk NFT"
           },
           "wallets": {
             "label": "参加者のウォレット"
@@ -405,7 +405,7 @@
       "subhead": "一筆ごとにサイクルが延び、シグネチャーが形づくられ、参加CSTが刻印されることがあります。",
       "methods": {
         "eth": "ETH一筆",
-        "ethRandomWalk": "ETH + RandomWalk一筆",
+        "ethRandomWalk": "ETH + Random Walk一筆",
         "cst": "CST一筆"
       }
     },

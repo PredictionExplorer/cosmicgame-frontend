@@ -15,12 +15,11 @@ import { cn } from '@/lib/utils';
  *   site     80rem: every page and section (the default)
  *   wide     90rem: the app home's control desk only
  *   reading  one prose measure (66ch), centred: long-form articles
+ *   full     no measure: a band that spans its parent
  *
- * The legacy sizes (`sm` … `prose`) and `gutter` remain for existing call
- * sites; new code uses the three above, which carry the gutter themselves.
+ * Every size carries its own edge; `gutter` adds padding inside it for the
+ * rare band that needs one.
  */
-
-const FLUID_SIZES = new Set(['site', 'wide', 'reading']);
 
 const containerVariants = cva('mx-auto', {
   variants: {
@@ -28,17 +27,7 @@ const containerVariants = cva('mx-auto', {
       site: 'site-container',
       wide: 'w-[min(100%-2*var(--gutter),90rem)]',
       reading: 'w-[min(100%-2*var(--gutter),var(--measure-prose))]',
-      /** @deprecated Use `site`, `wide` or `reading`. */
-      sm: 'w-full max-w-2xl',
-      /** @deprecated Use `site`, `wide` or `reading`. */
-      md: 'w-full max-w-4xl',
-      /** @deprecated Use `site`, `wide` or `reading`. */
-      lg: 'w-full max-w-6xl',
-      /** @deprecated Use `site`, `wide` or `reading`. */
-      xl: 'w-full max-w-7xl',
       full: 'w-full max-w-none',
-      /** @deprecated Use `reading`. */
-      prose: 'w-full max-w-prose',
     },
     gutter: {
       none: '',
@@ -49,6 +38,7 @@ const containerVariants = cva('mx-auto', {
   },
   defaultVariants: {
     size: 'site',
+    gutter: 'none',
   },
 });
 
@@ -57,16 +47,8 @@ export type ContainerProps = React.HTMLAttributes<HTMLDivElement> &
 
 export const Container = React.forwardRef<HTMLDivElement, ContainerProps>(
   ({ className, size, gutter, ...props }, ref) => {
-    const resolvedSize = size ?? 'site';
-    // The fluid sizes include the gutter in their width; the legacy fixed
-    // widths keep their padding unless the caller turns it off.
-    const resolvedGutter = gutter ?? (FLUID_SIZES.has(resolvedSize) ? 'none' : 'md');
     return (
-      <div
-        ref={ref}
-        className={cn(containerVariants({ size: resolvedSize, gutter: resolvedGutter }), className)}
-        {...props}
-      />
+      <div ref={ref} className={cn(containerVariants({ size, gutter }), className)} {...props} />
     );
   },
 );

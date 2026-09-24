@@ -143,9 +143,13 @@
  * maintenance banner at 88px/96px, for one bar that actually rendered at ~73px.
  * The header is now exactly `--header-height` tall and everything that needs to
  * sit below it derives from this one value.
+ *
+ * On phones it is 56px: every control in it is a 44px target, so 72px only
+ * took space from the page, and with a sticky sub-navigation under it about
+ * a seventh of an 844px screen never scrolled away.
  */
 :root {
-  --header-height: 4.5rem; /* 72px */
+  --header-height: 3.5rem; /* 56px on phones */
   /* Breathing room between the header and anything pinned beneath it. */
   --sticky-offset: calc(var(--header-height) + 0.75rem);
   /*
@@ -212,6 +216,12 @@
   --display-word-spacing: 0.06em;
 }
 
+@media (width >= 40rem) {
+  :root {
+    --header-height: 4.5rem; /* 72px */
+  }
+}
+
 /*
  * Chinese punctuation in a Chinese face. Inter, first in the text stack,
  * carries the ellipsis and the em dash, so 搜尋問題…… rendered as six tight
@@ -243,6 +253,31 @@
     local('PingFang HK Regular'), local('PingFangHK-Regular'), local('Noto Sans CJK HK Regular'),
     local('NotoSansCJKhk-Regular'), local('Source Han Sans HC Regular'), local('Microsoft JhengHei');
   unicode-range: U+2014, U+2026;
+}
+
+/*
+ * Korean display punctuation. Hangul in a heading falls through Clash to the
+ * Korean cut, but ASCII ! , . : ? stay in Clash, whose period is a heavy
+ * square block beside the thin Hangul strokes (만듭니다.). This alias, first
+ * in the Korean display stack, sets only those marks in the platform's
+ * Korean face; Latin words (Cosmic Signature, ETH) keep Clash. Where no
+ * Korean face is installed under those names (Android, most Linux), the
+ * last source is a 2 KB self-hosted cut of the five marks from Noto Sans KR.
+ * One face covers every weight, so the marks are never synthesised bold.
+ */
+@font-face {
+  font-family: 'CS Korean Display Punctuation';
+  src:
+    local('Apple SD Gothic Neo'),
+    local('AppleSDGothicNeo-Regular'),
+    local('Noto Sans CJK KR'),
+    local('NotoSansCJKkr-Regular'),
+    local('Noto Sans KR'),
+    local('Source Han Sans K'),
+    local('Malgun Gothic'),
+    url('/fonts/noto-sans-kr/NotoSansKR-punctuation.ttf') format('truetype');
+  font-weight: 100 900;
+  unicode-range: U+0021, U+002C, U+002E, U+003A, U+003F;
 }
 
 /*
@@ -284,6 +319,9 @@ html:lang(zh-HK) {
  */
 html:lang(ko) {
   --cjk-font-stack: var(--font-noto-kr), 'Apple SD Gothic Neo', 'Malgun Gothic';
+  --display-font-stack:
+    'CS Korean Display Punctuation', var(--font-clash-display), 'ClashDisplay-Variable',
+    var(--cjk-font-stack), sans-serif;
   word-break: keep-all;
 }
 
@@ -495,6 +533,37 @@ body:has([data-maintenance-banner]) .home-control-shell {
   }
 
   /*
+   * Chinese has no phrase-aware breaking, and balanced lines break wherever
+   * the midpoint falls, often inside a word (让周 / 期储备, 由链 / 上种子).
+   * `keep-all` breaks Han text only at punctuation and spaces, so a heading
+   * turns its line at a comma (十余条轨道， / 让周期储备循轨而行。); a clause too
+   * long for the line still wraps through `overflow-wrap: anywhere`, which
+   * also keeps the heading's min-content from widening its column. Korean
+   * keeps its document-wide keep-all and Japanese its auto-phrase below.
+   *
+   * That overflow break ignores the line-start rules: a clause that just
+   * misses the line splits a word or pushes its 。 onto a line of its own.
+   * Long display copy therefore carries authored break points (zero-width
+   * spaces, as BudouX inserts), and <PhrasedText> (lib/phrases.ts) glues
+   * each mark to its character, so no line ever starts with 。 or ，.
+   */
+  :is(h1, h2, h3, [class*='type-display-'], [class*='type-heading-'], .type-section):lang(zh) {
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+
+  /*
+   * A Chinese placeholder (搜索问题……) is Chinese text in a field whose face
+   * is Inter first: set it in the locale's CJK stack so its ellipsis takes
+   * the Chinese face's wide marks rather than six tight Inter dots, even
+   * where the punctuation alias finds no platform face. Noto Sans SC and
+   * PingFang both still seat the ellipsis on the baseline, not centred.
+   */
+  :where(input, textarea):lang(zh)::placeholder {
+    font-family: var(--cjk-font-stack), sans-serif;
+  }
+
+  /*
    * Japanese has no spaces to break at, so short text wraps wherever the line
    * ends — often mid-word (シグネチャー配 | 分, 確 | 定できる). `auto-phrase`
    * asks the browser to break between phrases instead (Chrome 119+, BudouX);
@@ -512,7 +581,10 @@ body:has([data-maintenance-banner]) .home-control-shell {
     .type-title,
     .type-lede,
     .type-body-lg,
+    [class*='type-body-md'],
+    [class*='type-body-sm'],
     .type-label,
+    [class*='type-eyebrow'],
     .type-caption,
     summary,
     button,
@@ -689,6 +761,40 @@ body:has([data-maintenance-banner]) .home-control-shell {
   &:hover {
     text-decoration-color: currentColor;
   }
+
+  /* touch-link-target, below */
+  @media (pointer: coarse) {
+    min-block-size: 1.5rem;
+    min-inline-size: 1.5rem;
+    align-content: center;
+  }
+}
+
+/*
+ * A link to a record (an address's profile, a cycle, a token) where it sits
+ * as a value on a record page or in a ledger: the text keeps its colour and
+ * carries a hairline underline in the rule colour at rest, solid on hover
+ * and focus, so it reads as a way in without turning a column of values
+ * into a column of accent colour.
+ */
+@utility link-entity {
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: hsl(var(--rule));
+  text-underline-offset: 4px;
+  transition: text-decoration-color var(--duration-fast) var(--ease-out-soft);
+
+  &:hover,
+  &:focus-visible {
+    text-decoration-color: currentColor;
+  }
+
+  /* touch-link-target, below */
+  @media (pointer: coarse) {
+    min-block-size: 1.5rem;
+    min-inline-size: 1.5rem;
+    align-content: center;
+  }
 }
 
 @utility link-quiet {
@@ -701,6 +807,54 @@ body:has([data-maintenance-banner]) .home-control-shell {
   &:hover,
   &:focus-visible {
     text-decoration-color: currentColor;
+  }
+
+  /* touch-link-target, below */
+  @media (pointer: coarse) {
+    min-block-size: 1.5rem;
+    min-inline-size: 1.5rem;
+    align-content: center;
+  }
+}
+
+/*
+ * Touch targets on coarse pointers (WCAG 2.5.8; measured by
+ * e2e/mobile-tap-targets.mobile.spec.ts). Both grow the element's own box,
+ * which is what hit-testing and the audit see; neither draws a pad with a
+ * pseudo-element.
+ *
+ * touch-link-target: a text link laid out as a box (a flex item, an
+ * inline-flex row, a block) is at least 24×24px, its text centred in it. A
+ * link that flows inside a sentence stays `display: inline`, where min sizes
+ * do not apply, which is WCAG's inline exception. `link` and `link-quiet`
+ * already include it.
+ *
+ * touch-hit-area: a control that must not move the layout (a figure label, a
+ * standalone explained term) reaches 44px. Padding grows its border box and
+ * an equal negative margin hands the space back, on inline and block boxes
+ * alike, so nothing around it shifts. The focus ring moves in by the inline
+ * pad so it still hugs the text. The block pad assumes content about 1.1em
+ * tall, which Inter, Clash and the CJK faces all exceed, so the box is never
+ * under 44px. Never put it on a word inside a sentence: the pad would cover
+ * the lines above and below.
+ */
+@utility touch-link-target {
+  @media (pointer: coarse) {
+    min-block-size: 1.5rem;
+    min-inline-size: 1.5rem;
+    align-content: center;
+  }
+}
+
+@utility touch-hit-area {
+  @media (pointer: coarse) {
+    --touch-pad-block: max(0px, calc((2.75rem - 1.1em) / 2));
+    --touch-pad-inline: 0.625rem;
+    padding-block: var(--touch-pad-block);
+    padding-inline: var(--touch-pad-inline);
+    margin-block: calc(var(--touch-pad-block) * -1);
+    margin-inline: calc(var(--touch-pad-inline) * -1);
+    outline-offset: calc(var(--focus-ring-offset) - var(--touch-pad-inline));
   }
 }
 
@@ -878,6 +1032,129 @@ body:has([data-maintenance-banner]) .home-control-shell {
   to {
     height: 0;
   }
+}
+
+/*
+ * Overlay motion: dialogs, sheets, menus, popovers, tooltips and the
+ * explanation card enter and leave through these (the class names of
+ * tailwindcss-animate, which the primitives were written against, defined
+ * here so no dependency is needed). `animate-in` plays `enter` from the
+ * values the modifiers set (`fade-in-0`, `zoom-in-95`, `slide-in-from-top-2`,
+ * `slide-in-from-right`); `animate-out` plays `exit` to theirs. Radix waits
+ * for the exit before unmounting. Both run only when motion is welcome, so a
+ * reduced-motion visitor sees overlays appear and go at once, and the
+ * `motion-reduce:animate-none` guards at call sites hold.
+ */
+@keyframes enter {
+  from {
+    opacity: var(--tw-enter-opacity, 1);
+    transform: translate3d(var(--tw-enter-translate-x, 0), var(--tw-enter-translate-y, 0), 0)
+      scale(var(--tw-enter-scale, 1));
+  }
+}
+
+@keyframes exit {
+  to {
+    opacity: var(--tw-exit-opacity, 1);
+    transform: translate3d(var(--tw-exit-translate-x, 0), var(--tw-exit-translate-y, 0), 0)
+      scale(var(--tw-exit-scale, 1));
+  }
+}
+
+@utility animate-in {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: enter var(--tw-duration, var(--duration-fast)) var(--tw-ease, var(--ease-out-expo));
+  }
+}
+
+@utility animate-out {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: exit var(--tw-duration, var(--duration-fast)) var(--tw-ease, var(--ease-out-soft))
+      forwards;
+  }
+}
+
+@utility fade-in-* {
+  --tw-enter-opacity: calc(--value(integer) / 100);
+}
+
+@utility fade-out-* {
+  --tw-exit-opacity: calc(--value(integer) / 100);
+}
+
+@utility zoom-in-* {
+  --tw-enter-scale: calc(--value(integer) / 100);
+  --tw-enter-scale: --value([number]);
+}
+
+@utility zoom-out-* {
+  --tw-exit-scale: calc(--value(integer) / 100);
+  --tw-exit-scale: --value([number]);
+}
+
+@utility slide-in-from-top-* {
+  --tw-enter-translate-y: calc(var(--spacing) * --value(integer) * -1);
+}
+
+@utility slide-in-from-bottom-* {
+  --tw-enter-translate-y: calc(var(--spacing) * --value(integer));
+}
+
+@utility slide-in-from-left-* {
+  --tw-enter-translate-x: calc(var(--spacing) * --value(integer) * -1);
+}
+
+@utility slide-in-from-right-* {
+  --tw-enter-translate-x: calc(var(--spacing) * --value(integer));
+}
+
+@utility slide-out-to-top-* {
+  --tw-exit-translate-y: calc(var(--spacing) * --value(integer) * -1);
+}
+
+@utility slide-out-to-bottom-* {
+  --tw-exit-translate-y: calc(var(--spacing) * --value(integer));
+}
+
+@utility slide-out-to-left-* {
+  --tw-exit-translate-x: calc(var(--spacing) * --value(integer) * -1);
+}
+
+@utility slide-out-to-right-* {
+  --tw-exit-translate-x: calc(var(--spacing) * --value(integer));
+}
+
+/* Whole-panel slides for sheets: in from, and out to, their own edge. */
+@utility slide-in-from-top {
+  --tw-enter-translate-y: -100%;
+}
+
+@utility slide-in-from-bottom {
+  --tw-enter-translate-y: 100%;
+}
+
+@utility slide-in-from-left {
+  --tw-enter-translate-x: -100%;
+}
+
+@utility slide-in-from-right {
+  --tw-enter-translate-x: 100%;
+}
+
+@utility slide-out-to-top {
+  --tw-exit-translate-y: -100%;
+}
+
+@utility slide-out-to-bottom {
+  --tw-exit-translate-y: 100%;
+}
+
+@utility slide-out-to-left {
+  --tw-exit-translate-x: -100%;
+}
+
+@utility slide-out-to-right {
+  --tw-exit-translate-x: 100%;
 }
 
 @utility animate-accordion-down {

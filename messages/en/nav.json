@@ -48,8 +48,8 @@
       "description": "NFTs attached to gestures across cycles"
     },
     "usedRwlkNfts": {
-      "label": "Used RandomWalk NFTs",
-      "description": "RandomWalk NFTs already used for a lower Gesture Cost"
+      "label": "Used Random Walk NFTs",
+      "description": "Random Walk NFTs already used for a lower Gesture Cost"
     },
     "statistics": {
       "label": "Statistics",
@@ -303,12 +303,6 @@
       "defaultLabel": "NFTs on Axiom Zero",
       "menuLabel": "Axiom Zero Marketplace",
       "shortLabel": "Axiom Zero"
-    },
-    "chaosZero": {
-      "ariaLabel": "Chaos Zero prediction market",
-      "defaultLabel": "Chaos Zero",
-      "menuLabel": "Chaos Zero",
-      "shortLabel": "Chaos Zero"
     }
   },
   "maintenance": {

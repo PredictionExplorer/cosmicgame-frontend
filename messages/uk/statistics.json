@@ -153,8 +153,8 @@
       "tooltip": "Кількість проіндексованих транзакцій передачі з резерву просування."
     },
     "randomWalkNftsUsed": {
-      "label": "Використані RandomWalk NFT",
-      "tooltip": "RandomWalk NFT, які вже долучено до ETH-жестів для одноразового зменшення вартості жесту."
+      "label": "Використані Random Walk NFT",
+      "tooltip": "Random Walk NFT, які вже долучено до ETH-жестів для одноразового зменшення вартості жесту."
     },
     "namedTokens": {
       "label": "Іменовані токени",
@@ -229,7 +229,7 @@
   },
   "sectionTooltips": {
     "attachedAssets": "Активи ERC-721 та ERC-20, долучені до жестів; можна переглянути за всі цикли або лише за поточний перформанс-цикл.",
-    "gestureTypeDistribution": "Частка жестів за ETH, з RandomWalk (оплачених ETH) і за CST у часі, з вибіркою через обраний інтервал. Лише поточний цикл.",
+    "gestureTypeDistribution": "Частка жестів за ETH, з Random Walk (оплачених ETH) і за CST у часі, з вибіркою через обраний інтервал. Лише поточний цикл.",
     "enduranceTimeline": "Діаграма Ганта: хто утримував лідерство протягом циклу. Кожна смуга — період лідерства (її ширина показує, як довго адреса утримувала лідерство). Найширша смуга належить Чемпіону витривалості; Воїн часу — учасник, який найдовше безперервно залишався Чемпіоном витривалості. Оберіть будь-який цикл для порівняння.",
     "cstWindow": "Як змінювалося вікно калібрування CST протягом циклу. Кожен ETH-жест трохи скорочує вікно; кожен CST-жест подовжує його. Вікно визначає, як швидко вартість CST-жесту спадає до нуля. Оберіть будь-який цикл для порівняння.",
     "cstCost": "Скільки фактично коштував кожен CST-жест протягом циклу, у логарифмічному масштабі, разом із залишком годинника розподілу безпосередньо перед ним. У середині циклу жести часто майже нічого не коштують; наприкінці циклу швидкі жести не дають вартості часу спасти, і вона може сягати тисяч CST.",
@@ -258,7 +258,7 @@
     "rwlkTotalTokensImprinted": "Загальна кількість Cosmic Signature NFT і супровідних CST, закарбованих для власників закріплень RandomWalk NFT через зоряний відбір закріплених NFT.",
     "rwlkTotalTokensAnchored": "Кількість RandomWalk NFT, зараз закріплених у протоколі.",
     "cstGroup": "Закріплення Cosmic Signature NFT розділяє надходження за закріплення в ETH між зараз закріпленими Cosmic Signature NFT.",
-    "rwlkGroup": "Закріплення RandomWalk NFT дає право на розподіли зоряного відбору закріплених NFT."
+    "rwlkGroup": "Закріплення Random Walk NFT дає право на розподіли зоряного відбору закріплених NFT."
   },
   "activity": {
     "heading": "Активність жестів",
@@ -292,7 +292,7 @@
     "historyLink": "Переглянути історію закріплень",
     "tabs": {
       "cosmicSignature": "Cosmic Signature NFT",
-      "randomWalk": "RandomWalk NFT",
+      "randomWalk": "Random Walk NFT",
       "label": "Колекція NFT"
     },
     "groups": {
@@ -301,7 +301,7 @@
     },
     "stats": {
       "activeHoldersCosmicSignature": "Активні власники закріплених Cosmic Signature NFT",
-      "activeHoldersRandomWalk": "Активні власники закріплених RandomWalk NFT",
+      "activeHoldersRandomWalk": "Активні власники закріплених Random Walk NFT",
       "distributionDeposits": "Кількість депозитів надходжень за закріплення",
       "totalDistributions": "Усього надходжень за закріплення",
       "tokensImprinted": "Усього закарбовано токенів",
@@ -567,7 +567,7 @@
       "window": "Вікно калібрування CST",
       "windowAfter": "Вікно після цього жесту",
       "typeEth": "ETH-жест (скорочує)",
-      "typeRandomWalk": "ETH-жест із RandomWalk (скорочує)",
+      "typeRandomWalk": "ETH-жест із Random Walk (скорочує)",
       "typeCst": "CST-жест (подовжує)",
       "summaryFinal": "На момент завершення вікно становило {current}. Протягом циклу воно змінювалося від {low} до {high}.",
       "description": "Вікно калібрування CST визначає, за скільки часу вартість CST-жесту спадає від початкового значення до нуля. Кожен ETH-жест трохи скорочує вікно; кожен CST-жест подовжує його. Лінія змінюється на кожному жесті — до вікна, що діє після нього; таблиця перелічує кожен жест і його тип.",
@@ -619,11 +619,11 @@
     "viewTable": "Показати таблицею",
     "mix": {
       "eth": "ETH",
-      "ethRandomWalk": "ETH із RandomWalk NFT",
+      "ethRandomWalk": "ETH із Random Walk NFT",
       "cst": "CST",
       "total": "Усього {count, plural, one {# жест} few {# жести} many {# жестів} other {# жесту}}",
       "window": "Початок інтервалу",
-      "summary": "Жестів у цьому циклі: {total}. ETH — {eth} ({ethShare}), ETH із RandomWalk NFT — {rwlk} ({rwlkShare}), CST — {cst} ({cstShare}).",
+      "summary": "Жестів у цьому циклі: {total}. ETH — {eth} ({ethShare}), ETH із Random Walk NFT — {rwlk} ({rwlkShare}), CST — {cst} ({cstShare}).",
       "intervalAria": "{hours, plural, one {Щогодини} few {Кожні # години} many {Кожні # годин} other {Кожні # години}}"
     }
   },
@@ -822,18 +822,18 @@
       }
     },
     "usedRwlkNfts": {
-      "eyebrow": "Використання RandomWalk NFT · Arbitrum",
-      "heading": "Використані RandomWalk NFT",
-      "description": "Перегляньте RandomWalk NFT, які вже долучено до ETH-жестів для одноразового зменшення вартості жесту.",
-      "source": "Публічні API використання RandomWalk Cosmic Signature",
+      "eyebrow": "Використання Random Walk NFT · Arbitrum",
+      "heading": "Використані Random Walk NFT",
+      "description": "Перегляньте Random Walk NFT, які вже долучено до ETH-жестів для одноразового зменшення вартості жесту.",
+      "source": "Публічні API використання Random Walk Cosmic Signature",
       "cards": {
-        "used": "Використані RandomWalk NFT",
+        "used": "Використані Random Walk NFT",
         "discount": "Одноразова знижка",
         "scope": "Межі використання",
         "scopeValue": "Один жест на NFT"
       },
       "links": {
-        "imprint": "Закарбувати RandomWalk NFT",
+        "imprint": "Закарбувати Random Walk NFT",
         "learn": "Дізнатися, як працюють жести",
         "cycle": "Переглянути дані поточного циклу"
       }

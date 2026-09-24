@@ -38,7 +38,18 @@ export async function openTooltip(trigger: Locator): Promise<void> {
       .catch(() => false);
 
   if (!coarsePointer) {
-    await trigger.hover({ force: true });
+    // An explained word wraps with its sentence, and the centre of a
+    // two-line inline box can fall between its fragments, on the paragraph
+    // behind it. Point at the middle of the first line the trigger draws.
+    const position = await trigger.evaluate((element) => {
+      const box = element.getBoundingClientRect();
+      const line = element.getClientRects()[0] ?? box;
+      return {
+        x: line.left - box.left + line.width / 2,
+        y: line.top - box.top + line.height / 2,
+      };
+    });
+    await trigger.hover({ force: true, position });
     await page.waitForTimeout(250);
     if (await tooltipIsVisible()) {
       return;

@@ -22,16 +22,6 @@ describe('Badge', () => {
     },
   );
 
-  it.each([
-    ['default', 'accent'],
-    ['secondary', 'accent'],
-    ['destructive', 'critical'],
-    ['outline', 'neutral'],
-  ] as const)('maps the deprecated %s variant to the %s tone', (variant, tone) => {
-    render(<Badge variant={variant}>{variant}</Badge>);
-    expect(screen.getByText(variant)).toHaveAttribute('data-tone', tone);
-  });
-
   it('never renders below the 12px caption floor', () => {
     render(
       <>

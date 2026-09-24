@@ -5,7 +5,6 @@
  */
 
 import { toFiniteNumber } from '@/utils/finiteNumber';
-import { formatGroupedNumber } from '@/utils/format';
 
 const MICROSECONDS_PER_SECOND = 1_000_000;
 
@@ -40,16 +39,4 @@ export function initialDurationSeconds(
   const divisor = toFiniteNumber(initialDurationDivisor);
   if (increment === null || divisor === null || increment < 0 || divisor <= 0) return null;
   return Math.floor(increment / divisor);
-}
-
-/**
- * A percentage parameter given in points, as the API and contract report them (25 → "25%",
- * 0.5 → "0.5%"), through `Intl` percent formatting in the page locale: locale digits, the sign
- * attached as every style guide requires, at most two decimals.
- */
-export function formatPercentPoints(points: number, locale: string): string {
-  return formatGroupedNumber(points / 100, locale, {
-    style: 'percent',
-    maximumFractionDigits: 2,
-  });
 }

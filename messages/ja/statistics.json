@@ -153,8 +153,8 @@
       "tooltip": "インデックス済みの広報準備金配分トランザクションの数。"
     },
     "randomWalkNftsUsed": {
-      "label": "使用されたRandomWalk NFT",
-      "tooltip": "一度だけの一筆の費用の割引のためにETH一筆にすでに添付されたRandomWalk NFT。"
+      "label": "使用されたRandom Walk NFT",
+      "tooltip": "一度だけの一筆の費用の割引のためにETH一筆にすでに添付されたRandom Walk NFT。"
     },
     "namedTokens": {
       "label": "名前付きトークン",
@@ -229,7 +229,7 @@
   },
   "sectionTooltips": {
     "attachedAssets": "一筆に添付されたERC-721とERC-20のアセット。すべてのサイクル、または現在のパフォーマンス・サイクルだけを表示できます。",
-    "gestureTypeDistribution": "ETH、RandomWalk（ETH支払い）、CSTで入れられた一筆の割合の時間推移を、選んだ間隔でサンプリングしたもの。現在のサイクルのみ。",
+    "gestureTypeDistribution": "ETH、Random Walk（ETH支払い）、CSTで入れられた一筆の割合の時間推移を、選んだ間隔でサンプリングしたもの。現在のサイクルのみ。",
     "enduranceTimeline": "サイクル中に誰が先頭を保っていたかのガントチャート。各バーは先頭の保持区間で、幅はそのアドレスが先頭を保った時間です。最も幅の広いバーが持久チャンピオン。時の戦士は、持久チャンピオンとしての単一の連続した保持が最も長かった参加者です。任意のサイクルを選んで比較できます。",
     "cstWindow": "サイクル中にCST調律期間がどう推移したか。ETH一筆はそれぞれ期間をわずかに短くし、CST一筆はそれぞれ長くします。この期間が、CST一筆の費用が費用なしまで下がる速さを決めます。任意のサイクルを選んで比較できます。",
     "cstCost": "サイクル中に各CST一筆に実際にかかった費用を対数目盛で、その直前に残っていた確定までの残り時間とともに示します。サイクル中盤の一筆はほとんど費用なしのことが多く、終盤では一筆が続いて費用が下がる時間がなくなり、価格が数千CSTに達することもあります。",
@@ -258,7 +258,7 @@
     "rwlkTotalTokensImprinted": "係留NFT星選を通じてRandomWalk NFTの係留者のために刻印されたCosmic Signature NFTと、それに伴うCSTの総数。",
     "rwlkTotalTokensAnchored": "プロトコルに現在係留されているRandomWalk NFTの数。",
     "cstGroup": "Cosmic Signature NFTの係留は、現在係留中のCosmic Signature NFTの間でETHの係留配分を分け合います。",
-    "rwlkGroup": "RandomWalk NFTの係留は、係留NFT星選の配分の対象資格を与えます。"
+    "rwlkGroup": "Random Walk NFTの係留は、係留NFT星選の配分の対象資格を与えます。"
   },
   "activity": {
     "heading": "一筆の活動",
@@ -292,7 +292,7 @@
     "historyLink": "係留の履歴を見る",
     "tabs": {
       "cosmicSignature": "Cosmic Signature NFT",
-      "randomWalk": "RandomWalk NFT",
+      "randomWalk": "Random Walk NFT",
       "label": "NFTコレクション"
     },
     "groups": {
@@ -301,7 +301,7 @@
     },
     "stats": {
       "activeHoldersCosmicSignature": "Cosmic Signature NFTの活動中の係留者数",
-      "activeHoldersRandomWalk": "RandomWalk NFTの活動中の係留者数",
+      "activeHoldersRandomWalk": "Random Walk NFTの活動中の係留者数",
       "distributionDeposits": "係留配分の積立回数",
       "totalDistributions": "係留配分の総額",
       "tokensImprinted": "刻印されたトークンの総数",
@@ -567,7 +567,7 @@
       "window": "CST調律期間",
       "windowAfter": "この一筆の後の期間",
       "typeEth": "ETH一筆（短くする）",
-      "typeRandomWalk": "ETH + RandomWalk一筆（短くする）",
+      "typeRandomWalk": "ETH + Random Walk一筆（短くする）",
       "typeCst": "CST一筆（長くする）",
       "summaryFinal": "確定時の期間は{current}です。サイクル中は{low}から{high}の間で推移しました。",
       "description": "CST調律期間は、CST一筆の費用が開始値から費用なしまで下がるのにかかる時間を決めます。ETH一筆はそれぞれ期間をわずかに短くし、CST一筆はそれぞれ長くします。線は一筆ごとに、その後に有効な期間へ切り替わります。表には各一筆とその種類を載せています。",
@@ -619,11 +619,11 @@
     "viewTable": "表で表示",
     "mix": {
       "eth": "ETH",
-      "ethRandomWalk": "ETH + RandomWalk NFT",
+      "ethRandomWalk": "ETH + Random Walk NFT",
       "cst": "CST",
       "total": "合計{count, number}筆",
       "window": "区間の開始",
-      "summary": "このサイクルの一筆は{total}筆です。内訳はETHが{eth}筆（{ethShare}）、ETH + RandomWalk NFTが{rwlk}筆（{rwlkShare}）、CSTが{cst}筆（{cstShare}）です。",
+      "summary": "このサイクルの一筆は{total}筆です。内訳はETHが{eth}筆（{ethShare}）、ETH + Random Walk NFTが{rwlk}筆（{rwlkShare}）、CSTが{cst}筆（{cstShare}）です。",
       "intervalAria": "{hours, plural, other {#時間ごと}}"
     }
   },
@@ -735,12 +735,12 @@
       "stellarEthRecipients": "サイクルあたりの星選受領者数が変更されました。",
       "stellarNftRecipients": "サイクルあたりの星選NFT受領者数が変更されました。",
       "cycleActivationDelay": "サイクル有効化前の遅延時間が変更されました。",
-      "anchoredRandomWalkRecipients": "係留RandomWalk NFTの星選NFT受領者数が変更されました。",
+      "anchoredRandomWalkRecipients": "係留Random Walk NFTの星選NFT受領者数が変更されました。",
       "publicGoodsVaultAddress": "公共財金庫のアドレスが変更されました。",
-      "randomWalkContractAddress": "RandomWalk NFTコントラクトのアドレスが変更されました。",
+      "randomWalkContractAddress": "Random Walk NFTコントラクトのアドレスが変更されました。",
       "allocationsWalletAddress": "配分ウォレット（配分エスクロー）のアドレスが変更されました。",
       "anchoringWalletAddress": "係留ウォレットのアドレスが変更されました。",
-      "randomWalkAnchoringWalletAddress": "RandomWalk NFT係留ウォレットのアドレスが変更されました。",
+      "randomWalkAnchoringWalletAddress": "Random Walk NFT係留ウォレットのアドレスが変更されました。",
       "outreachWalletAddress": "広報ウォレットのアドレスが変更されました。",
       "cstContractAddress": "Cosmic Signature CSTトークン（ERC-20）コントラクトのアドレスが変更されました。",
       "cosmicSignatureNftAddress": "Cosmic Signature NFT（ERC-721）コントラクトのアドレスが変更されました。",
@@ -822,18 +822,18 @@
       }
     },
     "usedRwlkNfts": {
-      "eyebrow": "RandomWalk NFTの使用 · Arbitrum",
-      "heading": "使用済みのRandomWalk NFT",
-      "description": "ETH一筆の割引に使用済みのRandomWalk NFTを確認できます。各NFTを割引に使えるのは一度だけです。",
-      "source": "Cosmic Signature公開RandomWalk使用API",
+      "eyebrow": "Random Walk NFTの使用 · Arbitrum",
+      "heading": "使用済みのRandom Walk NFT",
+      "description": "ETH一筆の割引に使用済みのRandom Walk NFTを確認できます。各NFTを割引に使えるのは一度だけです。",
+      "source": "Cosmic Signature公開Random Walk使用API",
       "cards": {
-        "used": "使用済みのRandomWalk NFT",
+        "used": "使用済みのRandom Walk NFT",
         "discount": "一度だけの割引",
         "scope": "使用範囲",
         "scopeValue": "NFTごとに一筆1回"
       },
       "links": {
-        "imprint": "RandomWalk NFTを刻印する",
+        "imprint": "Random Walk NFTを刻印する",
         "learn": "一筆の仕組みを学ぶ",
         "cycle": "現在のサイクルデータを見る"
       }

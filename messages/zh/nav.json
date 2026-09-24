@@ -303,12 +303,6 @@
       "defaultLabel": "Axiom Zero 上的 NFT",
       "menuLabel": "Axiom Zero 市场",
       "shortLabel": "Axiom Zero"
-    },
-    "chaosZero": {
-      "ariaLabel": "Chaos Zero 预测市场",
-      "defaultLabel": "Chaos Zero",
-      "menuLabel": "Chaos Zero",
-      "shortLabel": "Chaos Zero"
     }
   },
   "maintenance": {

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { cn } from '@/lib/utils';
+import { PhrasedText } from '@/components/ui/phrased-text';
 
 import styles from './Landing.module.css';
 
@@ -34,7 +35,7 @@ export function SectionHeading({
         id={headingId}
         className={cn('mt-4', size === 'display' ? 'type-display-md' : 'type-display-sm')}
       >
-        {heading}
+        {typeof heading === 'string' ? <PhrasedText>{heading}</PhrasedText> : heading}
       </h2>
       {description ? (
         <p

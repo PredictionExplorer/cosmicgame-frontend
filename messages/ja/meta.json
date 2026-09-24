@@ -195,8 +195,8 @@
     "description": "Cosmic Signature CSTトークンの送付履歴"
   },
   "usedRwlkNfts": {
-    "title": "使用済みのRandomWalk NFT",
-    "description": "Cosmic Signatureで一筆の費用の50%割引のためにETH一筆にすでに添付されたRandomWalk NFT。各RandomWalk NFTはこの割引に一度だけ使えます。"
+    "title": "使用済みのRandom Walk NFT",
+    "description": "Cosmic Signatureで一筆の費用の50%割引のためにETH一筆にすでに添付されたRandom Walk NFT。各Random Walk NFTはこの割引に一度だけ使えます。"
   },
   "siteMap": {
     "title": "サイトマップ",

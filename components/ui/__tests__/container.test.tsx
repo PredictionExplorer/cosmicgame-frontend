@@ -24,20 +24,14 @@ describe('Container', () => {
     expect(screen.getByTestId('c')).toHaveClass(expected);
   });
 
-  it.each([
-    ['sm', 'max-w-2xl'],
-    ['md', 'max-w-4xl'],
-    ['lg', 'max-w-6xl'],
-    ['xl', 'max-w-7xl'],
-    ['full', 'max-w-none'],
-    ['prose', 'max-w-prose'],
-  ] as const)('keeps the legacy size=%s with its gutter', (size, expected) => {
+  it('spans its parent at size=full', () => {
     render(
-      <Container size={size} data-testid="c">
+      <Container size="full" data-testid="c">
         body
       </Container>,
     );
-    expect(screen.getByTestId('c')).toHaveClass(expected, 'px-4');
+    expect(screen.getByTestId('c')).toHaveClass('max-w-none');
+    expect(screen.getByTestId('c').className).not.toMatch(/\bpx-/);
   });
 
   it('applies gutter variants', () => {

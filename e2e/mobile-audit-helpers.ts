@@ -273,6 +273,38 @@ export async function collectTapTargetViolations(page: Page): Promise<TapTargetV
       }
 
       /**
+       * Whether an inline control flows inside a sentence: visible text
+       * beside it, directly or around the inline elements that wrap it, up
+       * to the first box that is not inline. That is WCAG 2.5.8's inline
+       * exception, measured here rather than taken from the component, so
+       * a figure label or a heading made of the term alone is still held to
+       * the full size.
+       */
+      function sitsInSentence(el: Element): boolean {
+        let node: Element = el;
+        for (let parent = el.parentElement; parent; parent = parent.parentElement) {
+          for (const sibling of Array.from(parent.childNodes)) {
+            if (sibling === node) continue;
+            if (sibling.nodeType === Node.TEXT_NODE) {
+              if (/\S/.test(sibling.textContent ?? '')) return true;
+              continue;
+            }
+            if (!(sibling instanceof HTMLElement) || sibling.hidden) continue;
+            if (sibling.hasAttribute('data-explain-companion')) continue;
+            if (
+              window.getComputedStyle(sibling).display === 'inline' &&
+              /\S/.test(sibling.textContent ?? '')
+            ) {
+              return true;
+            }
+          }
+          if (window.getComputedStyle(parent).display !== 'inline') return false;
+          node = parent;
+        }
+        return false;
+      }
+
+      /**
        * Controls too small to grow without disturbing the layout around them
        * extend their hit area with a pseudo-element and declare
        * `data-touch-target="extended"`. Measure that pseudo-element rather
@@ -353,8 +385,17 @@ export async function collectTapTargetViolations(page: Page): Promise<TapTargetV
         if (style.display === 'none' || style.visibility === 'hidden') continue;
         if (style.pointerEvents === 'none') continue;
 
-        // Inline links flowing inside body copy are exempt from target sizing.
+        // Inline links flowing inside body copy are exempt from target sizing,
+        // and so is an explained word (an inline role="button") inside a
+        // sentence. A standalone one is measured like any other control.
         if (el.tagName === 'A' && style.display === 'inline') continue;
+        if (
+          el.getAttribute('role') === 'button' &&
+          style.display === 'inline' &&
+          sitsInSentence(el)
+        ) {
+          continue;
+        }
 
         const rect = el.getBoundingClientRect();
         if (rect.width === 0 || rect.height === 0) continue;

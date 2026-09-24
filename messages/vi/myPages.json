@@ -1,12 +1,7 @@
 {
   "shared": {
-    "loading": "Đang tải…",
     "unavailable": "Không khả dụng",
-    "yes": "Có",
-    "no": "Không",
-    "cycle": "Chu kỳ",
-    "cycleNumber": "Chu kỳ {cycle}",
-    "recipient": "Người nhận"
+    "cycleNumber": "Chu kỳ {cycle}"
   },
   "allocations": {
     "title": "Phân bổ của tôi",
@@ -188,8 +183,8 @@
       "empty": {
         "cosmicSignatureTitle": "Chưa có hoạt động neo giữ",
         "cosmicSignatureDescription": "Cosmic Signature NFT đang neo giữ cùng chia phân phối neo giữ ETH của mỗi chu kỳ.",
-        "randomWalkTitle": "Chưa neo giữ RandomWalk",
-        "randomWalkDescription": "RandomWalk NFT đang neo giữ tham gia Tinh tuyển NFT neo giữ."
+        "randomWalkTitle": "Chưa neo giữ Random Walk",
+        "randomWalkDescription": "Random Walk NFT đang neo giữ tham gia Tinh tuyển NFT neo giữ."
       },
       "stats": {
         "anchorActions": "Thao tác neo giữ",
@@ -244,25 +239,6 @@
       },
       "emptyTitle": "Ví này chưa có Signature nào",
       "emptyDescription": "Các Signature bạn nhận được qua phân bổ hoặc mua trên sàn sẽ hiện ở đây."
-    },
-    "table": {
-      "empty": "Chưa có token nào.",
-      "details": "Chi tiết",
-      "datetime": "Thời điểm",
-      "tokenId": "Mã token",
-      "tokenName": "Tên token",
-      "cycle": "Chu kỳ",
-      "recipientAddress": "Địa chỉ người nhận",
-      "currentlyAnchored": "Đang neo giữ?",
-      "anchoredOnce": "Đã từng neo giữ?",
-      "allocationType": "Loại phân bổ",
-      "types": {
-        "stellarSelection": "Tinh tuyển Cosmic Signature NFT",
-        "anchoredNftSelection": "Tinh tuyển NFT neo giữ (người neo giữ RandomWalk)",
-        "signatureAllocation": "Người nhận phân bổ Signature (#{cycle})",
-        "enduranceChampion": "Quán quân Bền bỉ",
-        "lastCstParticipant": "Người tham gia CST cuối cùng"
-      }
     }
   },
   "transferCst": {

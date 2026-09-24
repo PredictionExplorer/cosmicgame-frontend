@@ -54,7 +54,7 @@
     },
     "contractErrors": {
       "insufficientReceivedBidAmount": "The current Gesture Cost is greater than the amount you transferred.",
-      "usedRandomWalkNft": "This RandomWalk NFT has already been used for a gesture.",
+      "usedRandomWalkNft": "This Random Walk NFT has already been used for a gesture.",
       "callerIsNotNftOwner": "You are not the owner of this NFT.",
       "roundIsInactive": "The current cycle is not active.",
       "tooLongBidMessage": "Your gesture message is too long.",

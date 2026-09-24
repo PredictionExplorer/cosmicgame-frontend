@@ -46,7 +46,9 @@ export function SourceCode({ source }: { source: string }) {
               href={`#L${number}`}
               aria-hidden="true"
               tabIndex={-1}
-              className="sticky start-0 w-11 shrink-0 select-none bg-surface-sunken pe-3 text-end text-subtle no-underline hover:text-foreground sm:w-14 sm:pe-4"
+              // A mouse permalink only: on touch the 22px line pitch is too
+              // tight to aim at (WCAG 2.5.8) and a scroll would catch them.
+              className="sticky start-0 w-11 shrink-0 select-none bg-surface-sunken pe-3 text-end text-subtle no-underline hover:text-foreground pointer-coarse:pointer-events-none sm:w-14 sm:pe-4"
             >
               {number}
             </a>

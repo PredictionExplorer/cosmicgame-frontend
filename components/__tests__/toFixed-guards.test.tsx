@@ -1,8 +1,3 @@
-import { UNAVAILABLE_VALUE } from '@/utils/format';
-
-import { render, screen } from '@/test-utils';
-
-import { StatCard } from '../ui/stat-card';
 import { summarizeGestures } from '../user-statistics/profileSummary';
 
 /**
@@ -22,18 +17,5 @@ describe('unguarded .toFixed regressions', () => {
     ]);
     expect(summary.ethSpent).toBe(0.25);
     expect(summary.cstSpent).toBe(0);
-  });
-
-  it('keeps the stat-card trend output unchanged for a real delta', () => {
-    render(<StatCard label="Cycles" value="12" trend={{ delta: 4.25, label: 'vs last cycle' }} />);
-    expect(screen.getByText('+4.3%')).toBeInTheDocument();
-  });
-
-  it('renders the sentinel rather than NaN% for a missing stat-card delta', () => {
-    render(
-      <StatCard label="Cycles" value="12" trend={{ delta: missing, label: 'vs last cycle' }} />,
-    );
-    expect(screen.getByText(`${UNAVAILABLE_VALUE}%`)).toBeInTheDocument();
-    expect(screen.queryByText('NaN%')).not.toBeInTheDocument();
   });
 });

@@ -120,6 +120,13 @@ and `fill`, inline styles), import the colour from `lib/theme/dataColors.ts`:
 the image inside with `object-fit: contain`. Nothing overlays, crops, dims or tints the
 artwork.
 
+**Sizes.** The media server publishes a 640px thumbnail and the 3456px original only.
+`signatureMedia` adds image-optimizer renditions at 1200 and 1920px between them
+(`withOptimizedRenditions` in `lib/artRenditions`, built with next/image's
+`getImageProps`), so a 720px plate at 2x or a phone at 3x fetches about 1.5× its slot
+instead of the original. It is for media on a host in `images.remotePatterns` only; a
+failed optimized file falls back along the plate's source chain.
+
 ### Browser chrome
 
 `THEME_CHROME` (`lib/theme/config.ts`) holds each palette's `--background` as hex. The
@@ -134,7 +141,11 @@ Four roles, three families plus one mono:
   it for uk and vi. CJK glyphs come from the locale's Noto Sans cut.
 - **Text**: Inter 400, 500 and 600, for body, labels, buttons and every heading of 24px or
   less.
-- **Figures**: Inter with tabular, lining numerals and a slashed zero.
+- **Figures**: Inter with tabular, lining numerals. There is no slashed zero: the Inter
+  subsets next/font serves from Google carry only the calt, ccmp, dnom, frac, locl, numr,
+  pnum and tnum features, so `slashed-zero` would promise a glyph that never renders.
+  Inter's narrow oval zero does not read as O; Clash's round one does, so a figure
+  that could be misread ("01") is set in `type-figure-*`, never in Clash.
 - **Identifiers**: JetBrains Mono, only for addresses, hashes, seeds and token numbers.
 
 The type utilities never set a colour. Pair a label, caption or eyebrow with `text-subtle`
@@ -158,7 +169,7 @@ The type utilities never set a colour. Pair a label, caption or eyebrow with `te
 | `type-body-sm`                 | 14px           | 1.5  | 400    | Inter | Dense body                                                                                                                                                                              |
 | `type-label`                   | 13px           | 18px | 500    | Inter | Field, figure and ledger-header labels. Sentence case, no tracking                                                                                                                      |
 | `type-eyebrow`                 | 12px           | 16px | 500    | Inter | Section and page kicker, once per section. Uppercase with 0.12em tracking (0.06em on phones), hyphenated rather than chopped in a narrow column; CJK: 13px with no case and no tracking |
-| `type-caption`                 | 12px           | 1.45 | 400    | Inter | Captions, helper text, units. **The floor**                                                                                                                                             |
+| `type-caption`                 | 12px           | 1.45 | 400    | Inter | Captions, helper text, units. **The floor**. CJK: 13px/1.5, as Han, kana and Hangul need more pixels than Latin                                                                         |
 | `type-figure-xl`               | 48–72px        | 1    | 400    | Inter | The single hero figure                                                                                                                                                                  |
 | `type-figure-lg`               | 32px           | 1.1  | 500    | Inter | Figure strips                                                                                                                                                                           |
 | `type-figure-md`               | 20px           | 1.3  | 500    | Inter | Inline readouts                                                                                                                                                                         |
@@ -212,10 +223,29 @@ the CJK faces.
 
 - **CJK**: display at 600 with no tracking. Headings use line-height 1.25 and balanced
   wrapping. Eyebrows and tracking utilities drop their Latin tracking.
-- **Japanese**: headings, ledes, labels, captions, buttons, tabs, summaries and definition
-  lists use `word-break: auto-phrase`, and the document uses `line-break: strict`.
+- **Chinese**: headings use `word-break: keep-all`, so a balanced heading turns its line
+  at punctuation (十余条轨道， / 让周期储备循轨而行。) instead of inside a word; a clause too long
+  for the line still wraps through `overflow-wrap: anywhere`. That overflow break ignores
+  the line-start rules, so display copy follows the BudouX model: a clause longer than
+  about nine characters carries authored break points (`\u200B`, `PHRASE_BREAK` in
+  `lib/phrases.ts`) between its phrases (都有一部分\u200B流向\u200B以太坊\u200B核心贡献者。),
+  and the heading renders through `<PhrasedText>` (`components/ui/phrased-text.tsx`),
+  which glues each closing mark to the character before it and each opening mark to the
+  one after, so no line starts with 。 or ， even at an overflow. The zero-width space
+  stays in the text: unlike `<wbr>` it adds no pause to Chrome's accessible name. The
+  e2e site QA fails on any heading line that starts with a closing mark. Placeholders are
+  set in the CJK stack.
+- **Japanese**: headings, ledes, body copy (`type-body-md`, `type-body-sm`), labels,
+  eyebrows, captions, buttons, tabs, summaries and definition lists use
+  `word-break: auto-phrase`, and the document uses `line-break: strict`.
 - **Korean**: `keep-all` everywhere, monospace included, so a counter always stays with
-  its digit.
+  its digit. Display headings take `! , . : ?` from the platform Korean face through a
+  punctuation-only alias ahead of Clash, whose square period sat heavy after Hangul;
+  where no Korean face is installed under the listed names (Android, Linux), the alias
+  falls back to a 2 KB cut of those five marks from Noto Sans KR
+  (`public/fonts/noto-sans-kr/`).
+- **Vietnamese**: `type-display-xl` and `-lg` open their leading (1.12 and 1.15) so
+  stacked diacritics on consecutive lines never touch.
 - **Paragraphs**: `p`, `li`, `dd`, `figcaption` and `blockquote` use `text-wrap: pretty`.
 - **Language islands**: an element whose own `lang` differs from the page's, such as a
   language-menu endonym, takes its own language's CJK cut.
@@ -232,6 +262,34 @@ A link inside running text must not rely on hue alone.
   already read as links by position.
 - Unstyled `<a>` elements inside `p`, `li`, `dd`, `figcaption`, `blockquote` and `td` get
   the `link` style automatically.
+- `link-entity`: a link to a record (a cycle, a token, a profile) set as a value on a
+  record page or in a ledger. The text keeps its colour, with a hairline underline in the
+  rule colour at rest that turns solid on hover and focus. `<AddressChip variant="plain">`
+  uses it for addresses.
+
+### Touch targets
+
+On coarse pointers every control a finger aims at is at least 44×44px and every text
+link laid out as a box at least 24×24px (WCAG 2.5.5 and 2.5.8), measured on the
+element's real box by `e2e/mobile-tap-targets.mobile.spec.ts`. Grow the real box; draw
+a pseudo-element pad only where nothing else can reach the size.
+
+| Tool                                                     | Where                                        | What it does                                                                                                                                                                                                         |
+| -------------------------------------------------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `touch-hit-area`                                         | `styles/global.css`                          | Padding grows the border box to 44px and an equal negative margin hands the space back, on inline and block boxes alike, so nothing moves. The focus ring moves in by the inline pad. Never on a word in a sentence. |
+| `touch-link-target`                                      | `styles/global.css`                          | A 24px floor (min-block-size, min-inline-size) that inline links ignore, which is WCAG's inline exception. `link` and `link-quiet` include it.                                                                       |
+| `ExplainedTerm` / `Term` `placement`                     | `components/ui/explain-popover`              | `auto` measures the trigger (`sitsInSentence`): a word in a sentence keeps its line; a standalone label, role or heading takes `touch-hit-area`. `sentence` and `standalone` override the measurement.               |
+| `InfoTooltip`                                            | `components/ui/info-tooltip`                 | The absolutely positioned button is 24px on fine pointers and itself 44px on coarse ones, its ring drawn 10px inside so it hugs the icon.                                                                            |
+| `Button`, `TabsTrigger`                                  | `components/ui/button`, `components/ui/tabs` | 44×44 below `sm`, width included, so an icon-only toolbar button or a one-word segment ("All") qualifies.                                                                                                            |
+| `TOUCH_TARGET_EXTENDED_CLASS`                            | `lib/touch-target`                           | The ::after pad for icon controls smaller than `touch-hit-area` can lift (a 16px copy glyph), on coarse pointers. Pair with `data-touch-target="extended"`.                                                          |
+| `TOUCH_TARGET_ICON_CLASS`, `…_HEIGHT_…`, `…_TEXT_LINK_…` | `lib/touch-target`                           | Width-scoped (below `sm`) size helpers for controls that can grow in the layout.                                                                                                                                     |
+
+The audit exempts an inline `<a>` and an inline explained word only when it measures
+the element inside a sentence. Two targets must not overlap: a sortable table header
+with help puts 20px between its label and the ⓘ on coarse pointers, so the help's
+44px box clears the sort button. An `IntersectionObserver` that must ignore the sticky
+header takes `headerRootMargin()` (`lib/headerOffset`), which reads `--header-height`
+(56px on phones, 72px from `sm`) instead of a hard-coded 72px.
 
 ## Shape, depth and layout
 
@@ -258,7 +316,13 @@ sticky header, the mobile dock, sheets and menus. Visitors who prefer reduced tr
 get the opaque page colour.
 
 **Layout rhythm.** `--gutter` (16–80px) is the one content edge. `site-container` is
-`min(100% - 2 × gutter, 80rem)` on both hosts. The other tokens are `--section-gap`
+`min(100% - 2 × gutter, 80rem)` on both hosts, and `PageShell` draws the same edge
+(a max-width plus gutter padding, so `max-w-none px-0` still opens a full-bleed page):
+a page's H1 starts on the header's edge at every width, which
+`e2e/content-edge.desktop.spec.ts` checks at 820, 1280, 1366 and 1600px. The header is
+`--header-height` tall (56px below `sm`, where each of its controls is a 44px target, and 72px
+from `sm`), and everything pinned under it (`--sticky-offset`, sticky sub-navigation, the
+maintenance banner, page tops) derives from that one value. The other tokens are `--section-gap`
 (landing and long-form sections), `--block-gap` (data-page blocks), `--stack-gap`,
 `--row-h` (48px ledger rows), `--row-h-dense` (44px), `--measure-prose` (66ch) and
 `--measure-lede` (60ch).
@@ -268,6 +332,15 @@ get the opaque page colour.
 live value washing back to foreground). The easings are `ease-out-expo` and
 `ease-gallery`. There are no springs: `--ease-spring` is an alias of `ease-out-expo`. A
 live dot fades in and out over 2.4s and never grows.
+
+**Overlay motion.** Dialogs, sheets, menus, popovers, tooltips and the explanation card
+enter and leave through `animate-in` / `animate-out` with the modifiers `fade-in-*`,
+`fade-out-*`, `zoom-in-*` (`zoom-in-[0.98]` too), `zoom-out-*`, `slide-in-from-{side}-*`,
+`slide-out-to-{side}-*` and the whole-panel `slide-in-from-{side}` / `slide-out-to-{side}`
+(the tailwindcss-animate names, defined in `styles/global.css` with no dependency). They
+read `duration-*` and `ease-*`, default to `duration-fast` with `ease-out-expo` in and
+`ease-out-soft` out, and run only under `prefers-reduced-motion: no-preference`: a
+reduced-motion visitor sees overlays appear and go at once.
 
 ## Focus
 
@@ -346,6 +419,13 @@ screen. `stack` puts long text under its label. Blank cells and `priority: 'seco
 columns drop out, so no empty labelled line is left behind. The connected wallet's
 record carries its 2px accent rule down the start edge.
 
+The records keep table semantics: every part of `ResponsiveTable` and the static `Table`
+states its role (`table`, `rowgroup`, `row`, `columnheader`, `cell`), because WebKit drops
+the implicit roles of a table restyled with `display: block`, and the drawn label has
+empty alternative text (`content: attr(data-label) / ''`), so a screen reader hears the
+column header once rather than twice. A table built from raw `<tr>`/`<td>` inside these
+primitives states the same roles.
+
 A table stays a real table on phones (`layout="compact"`) only when every column a phone
 shows is a compact kind (`address`, `link`, `amount`, `count`, `percent`, `status`) and
 there are at most three: `phoneLayoutFor` decides it from the columns. A date, a
@@ -390,6 +470,25 @@ position ("#3 of 37") and a "Show my row" button that jumps to its page.
 `currentRowSummary` adds figures to that line. Never append "(You)" to the address
 text.
 
+## Copy
+
+Catalogs carry the text exactly as it renders; nothing transforms case. In English:
+
+- **Sentence case** for headings, labels, buttons, tabs and table headers: "Make a
+  gesture", "Number of gestures", "Gesture type".
+- **Common nouns stay lower case** after the start of a sentence: gesture, cycle,
+  allocation, recipient. "a new gesture", "ETH and CST gestures", "Cycle 12" (a
+  numbered cycle is a name, like "Chapter 12").
+- **Named quantities, reserves, windows and roles keep their capitals**: Gesture Cost,
+  Gesture Chat, Cycle Finalization Time, Cycle Reserve, Calibration Window, Signature
+  Allocation, Stellar Selection, Endurance Champion, Chrono-Warrior, the Last Gesture
+  (the role: "You hold the Last Gesture"), the Final CST Gesture.
+- **Random Walk NFT** is two words in every locale; `RandomWalk` is only the contract's
+  name (`contracts.entries.*.name`, `formats.address.known.randomWalk`).
+
+`i18n/__tests__/english-copy.test.ts` enforces the last two rules; its allowlist holds
+the strings a parallel change still owned, and may only shrink.
+
 ## Retired patterns
 
 `styles/__tests__/token-usage.test.ts` counts these in `app/` and `components/`, and the
@@ -412,14 +511,14 @@ counts may only fall. When a change removes some, lower the baseline in the same
 | An ⓘ after every label                                    | `Term` or `ExplainedTerm` on the word; one `InfoTooltip` per section  |
 | A one-line "Loading…" panel                               | The skeleton of the layout it replaces                                |
 | `max-w-7xl px-5 lg:px-12` on a section                    | `Container` (`site-container`)                                        |
+| An `::after` touch pad on a word or label                 | `touch-hit-area` (the real box), or `ExplainedTerm`'s own placement   |
 
 ## Component inventory
 
 The primitives every page composes from, one per job. Import from `components/ui`
 (or `lib/conceptIcons` for icons). When a page needs something this list does not
 cover, extend the primitive with a variant or an optional prop; do not build a
-parallel one. Everything in `components/styled` is deprecated and maps onto a row
-below (the module header lists the mapping); wave 4 deletes it.
+parallel one. (The old `components/styled` wrappers are gone; each had a row below.)
 
 ### Actions
 
@@ -439,8 +538,8 @@ is allowed). Touch targets reach 44px below `sm`.
 | ------------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `Badge`             | `components/ui/badge`           | A short tag or state beside a value. `tone`: `neutral` (hairline rule, the default), `accent`, `positive`, `attention`, `critical`, `live`. `size`: `sm` (12px) or `md` (13px). `mono` for token numbers, `dot` for a 6px state mark (it breathes only for `live`), `icon`, `shape="pill"` only for the live Cycle state, `overline` for a rare uppercase status (the `type-eyebrow` face, uncased in CJK by its own rule). At most two per wall label. `variant` is deprecated. |
 | `Term`              | `components/ui/term`            | A coined word that explains itself from the glossary: `<Term id="calibrationWindow" />`, `<Term id="stellarSelection">Stellar Selections</Term>`. Dotted underline, short definition on hover, the long one pinned by click, tap, Enter or Space (and announced), one tab stop. The trigger is an inline `<span role="button">`, so a long term wraps with its sentence. The page must declare `'glossary'` in `<PageMessages>`.                                                 |
-| `ExplainedTerm`     | `components/ui/explain-popover` | The same trigger for a word outside the glossary: `<ExplainedTerm definition="…">ERC-20</ExplainedTerm>` (`details`, `title` optional). `announce="moreInformation"` names a figure label "More information about {label}" (StatCard uses it).                                                                                                                                                                                                                                   |
-| `InfoTooltip`       | `components/ui/info-tooltip`    | One ⓘ per section or group, and where a decision depends on the explanation. Pass `label` at every new call site (the button is named "More information about {label}"; without it, just "More information"). A 16px icon under a 24px button (44px hit area on coarse pointers); `className` still positions and colours the icon.                                                                                                                                              |
+| `ExplainedTerm`     | `components/ui/explain-popover` | The same trigger for a word outside the glossary: `<ExplainedTerm definition="…">ERC-20</ExplainedTerm>` (`details`, `title` optional). `announce="moreInformation"` names a figure label "More information about {label}" (the /contracts figure rows use it).                                                                                                                                                                                                                  |
+| `InfoTooltip`       | `components/ui/info-tooltip`    | One ⓘ per section or group, and where a decision depends on the explanation. Pass `label` at every new call site (the button is named "More information about {label}"; without it, just "More information"). A 16px icon under a 24px button that is itself 44px on coarse pointers (no pseudo-element pad); `className` still positions and colours the icon.                                                                                                                  |
 | `ExplainPopover`    | `components/ui/explain-popover` | The hover-and-pin card behind all three, for a custom trigger. The definition is the trigger's description through `aria-describedby` (a `hidden` copy beside it), and pinning announces `details` through a polite live region.                                                                                                                                                                                                                                                 |
 | `GLOSSARY_TERM_IDS` | `lib/glossary`                  | The 18 glossary ids and `GlossaryTermId`, server-safe: map over them in a server component with `getTranslations('glossary')`. `gesture`, `cycle`, `cycleFinalizationTime`, `calibrationWindow`, `cycleReserve`, `signatureAllocation`, `finalCstGesture`, `enduranceChampion`, `chronoWarrior`, `stellarSelection`, `anchoring`, `anchorDistribution`, `retrieve`, `imprint`, `publicGoods`, `outreachReserve`, `cosmicCouncil`, `cst`.                                         |
 
@@ -471,33 +570,28 @@ banks, hand-coins, heart-handshakes, clovers, card suits) under every lucide ali
 (`Trophy`, `TrophyIcon`, `LucideTrophy`) and from their per-icon module paths
 (`OFF_LEXICON_ICON_NAMES` and `OFF_LEXICON_ICON_MODULES` in `eslint.config.mjs`).
 
-### Figures and sections
+### Sections
 
-| Primitive        | Import                          | Use                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| ---------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `StatCard`       | `components/ui/stat-card`       | One labelled figure. `size`: `hero` (32px, `type-figure-lg`), `md` (20px, `type-figure-md`, the default), `compact` (16px). `emphasis` draws the signature ring on the one figure a row exists for (at most one per row; `featured` and `gradient` are deprecated aliases). `tooltip` turns the label into an `ExplainedTerm`. `semantics="definition"` renders `dt`/`dd` inside a `<dl>`, with `srDescription` as an sr-only `dd`. `caption`, `trend`, `loading`. Server-safe. |
-| `StatGrid`       | `components/ui/stat-card`       | The responsive row for one card size (`compact` is two across from the smallest phone; `md` one across below `sm`).                                                                                                                                                                                                                                                                                                                                                             |
-| `SectionHeader`  | `components/ui/section-header`  | The section-heading tier. `as` (`h2` default, `h3`, `h4`) fits the outline; `size` `page` (`type-section`) or `panel` (`type-heading-3`); `eyebrow`, `description`, one `info`, right-aligned `actions`, `headingId` for `aria-labelledby`. Server-safe.                                                                                                                                                                                                                        |
-| `Section`        | `components/ui/section`         | A revealed `<section>` that renders `SectionHeader` and labels itself by it.                                                                                                                                                                                                                                                                                                                                                                                                    |
-| `SectionDivider` | `components/ui/section-divider` | A hairline between groups of one page, optionally with a centred kicker (`as` sets its element). It separates; it is not a heading tier.                                                                                                                                                                                                                                                                                                                                        |
-| `SectionEyebrow` | `components/ui/section-eyebrow` | The page kicker chip above an H1. Its dot never pulses (`pulse` is ignored); live data shows through `LiveStatus`.                                                                                                                                                                                                                                                                                                                                                              |
+| Primitive       | Import                         | Use                                                                                                                                                                                                                                                                                                                           |
+| --------------- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SectionHeader` | `components/ui/section-header` | The section-heading tier. `as` (`h2` default, `h3`, `h4`) fits the outline; `size` `page` (`type-section`) or `panel` (`type-heading-3`); `eyebrow`, `description`, one `info`, right-aligned `actions`, `headingId` for `aria-labelledby`. Server-safe.                                                                      |
+| `PhrasedText`   | `components/ui/phrased-text`   | Display copy that may be Chinese: `<h2><PhrasedText>{copy.heading}</PhrasedText></h2>`. Glues each closing mark to its character (and an opening mark to the next) with an inline nowrap span, so no line starts with 。 or ，; the copy's authored `\u200B` break points stay in the text. Other scripts render as they are. |
 
 ### Layout and surfaces
 
-| Primitive    | Import                      | Use                                                                                                                                                                                                                                                           |
-| ------------ | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Container`  | `components/ui/container`   | The content edge. `size="site"` (the default: `site-container`, the header's and footer's edge), `wide` (90rem, the app-home desk only), `reading` (one prose measure). Legacy fixed sizes remain, deprecated. Never hand-roll `max-w-7xl px-*` on a section. |
-| `PageShell`  | `components/ui/page-shell`  | The page's `<main>` and backdrop.                                                                                                                                                                                                                             |
-| `Surface`    | `components/ui/surface`     | `plain`, `quiet` (a fill, no border: the one control group), `outlined` (the default: one hairline on a faint surface), `raised` (floating layers). Old variants are aliases on the token ladder. At most one bordered level per region.                      |
-| `Card`       | `components/ui/card`        | Surface's `outlined` role with header, title (`type-heading-3`), description and content slots.                                                                                                                                                               |
-| `ScrollRail` | `components/ui/scroll-rail` | One row that scrolls sideways with edge fades only while there is more that way, keeping the current item (`data-state="active"`, `aria-current="page"`, `aria-selected`) in view. For tabs, sub-navigation and chip rows.                                    |
+| Primitive    | Import                      | Use                                                                                                                                                                                                                                                                                                                                                                                  |
+| ------------ | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `Container`  | `components/ui/container`   | The content edge. `size="site"` (the default: `site-container`, the header's and footer's edge), `wide` (90rem, the app-home desk only), `reading` (one prose measure). Legacy fixed sizes remain, deprecated. Never hand-roll `max-w-7xl px-*` on a section.                                                                                                                        |
+| `PageShell`  | `components/ui/page-shell`  | The page's `<main>` and backdrop.                                                                                                                                                                                                                                                                                                                                                    |
+| `Surface`    | `components/ui/surface`     | `plain`, `quiet` (a fill, no border: the one control group), `outlined` (the default: one hairline on a faint surface), `raised` (floating layers). Old variants are aliases on the token ladder. At most one bordered level per region.                                                                                                                                             |
+| `ScrollRail` | `components/ui/scroll-rail` | One row that scrolls sideways with edge fades only while there is more that way, keeping the current item (`data-state="active"`, `aria-current="page"`, `aria-selected`) in view. For tabs, sub-navigation and chip rows. A row with nothing focusable in it (steps, figures) makes its track focusable while it overflows, a region named by `label`, so the arrow keys scroll it. |
 
 ### Navigation within a page
 
-| Primitive                                 | Import               | Use                                                                                                                                                                                                                                                                                                                             |
-| ----------------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Tabs`                                    | `components/ui/tabs` | `TabsList variant`: `segmented` (the default: views of one thing, a sunken track with no border), `underline` (page sub-navigation), `pills` (short sets and filters); `scroll` puts the row on a `ScrollRail`. Pick the variant rather than reshaping a list with classes. Radix keeps arrow keys, Home, End and one tab stop. |
-| `tabsListVariants`, `tabsTriggerVariants` | `components/ui/tabs` | The same look for link-based sub-navigation: mark the current link `aria-current="page"`.                                                                                                                                                                                                                                       |
+| Primitive                                 | Import               | Use                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ----------------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `Tabs`                                    | `components/ui/tabs` | `TabsList variant`: `segmented` (the default: views of one thing, a sunken track with no border; the selected segment is raised with a hairline edge and draws no primary rule, so it never competes with an underline row above it), `underline` (page sub-navigation), `pills` (short sets and filters); `scroll` puts the row on a `ScrollRail`, at least the rail's width so an underline row's rule spans the column. Pick the variant rather than reshaping a list with classes. Radix keeps arrow keys, Home, End and one tab stop. |
+| `tabsListVariants`, `tabsTriggerVariants` | `components/ui/tabs` | The same look for link-based sub-navigation: mark the current link `aria-current="page"`.                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 
 ### Forms
 
@@ -517,14 +611,34 @@ banks, hand-coins, heart-handshakes, clovers, card suits) under every lucide ali
 | Page skeletons | `components/ui/page-skeletons` | Route-level `loading.tsx` bodies for record pages: `RecordDetailSkeleton`, `LedgerPageSkeleton`, `NftDetailSkeleton`, `ProfileSkeleton`, `CycleAllocationSkeleton`, `SkeletonSectionCard`.                                                                                                                                                                                |
 | `EmptyState`   | `components/ui/empty-state`    | Nothing here yet, and what would fill it. `variant` `page`, `panel` (the default) or `inline`; `headingLevel` 2–4.                                                                                                                                                                                                                                                        |
 | `ErrorState`   | `components/ui/error-state`    | Something could not be read or done, with a retry. Same variants; status colour on the icon tile only.                                                                                                                                                                                                                                                                    |
-| `LoadingState` | `components/ui/loading-state`  | A blocking wait with nothing to preview (a transaction confirming). For content on its way, use a skeleton.                                                                                                                                                                                                                                                               |
 | `UnknownValue` | `components/ui/unknown-value`  | A figure that could not be read: a dash with a screen-reader label, never `0`.                                                                                                                                                                                                                                                                                            |
+
+### Overlays
+
+| Primitive                 | Import                                        | Use                                                                                                                                                                                                                                                                          |
+| ------------------------- | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Dialog`, `Sheet`         | `components/ui/dialog`, `components/ui/sheet` | On the raised surface with the float shadow (dialogs at the surface radius). The close control renders first in the DOM, so focus order matches the corner it paints in; `OVERLAY_CLOSE_CLASS` is its shared look (44px on phones, 24px from `sm`). Titles are `type-title`. |
+| `DropdownMenu`, `Popover` | `components/ui/…`                             | Floating surface and highlight from `item-highlight`. A menu reads only its items: wire explanatory text in with `aria-describedby` (the palette menu does), never as stray paragraphs.                                                                                      |
 
 ### Data and identifiers (wave 1)
 
 `Amount`, `DateTime`, `Duration`, `AddressChip`, `LiveStatus`, `TxStatus`,
 `ResponsiveTable` and `Pagination` are documented with the formatting layer and the
-transaction kit; see `docs/` and each module's header.
+transaction kit; see `docs/` and each module's header. Three rules to know:
+
+- **Dates.** Every date is in the reader's zone. A table states it once
+  (`<TimeZoneNote>`); a date that stands alone, a record page or a header figure, prints
+  it with `<DateTime showZone>` ("Sep 22, 2026, 23:04:45 UTC-5"), which sets the zone like
+  a unit (subtle, proportional figures) inside the locale's own template ("9月22日
+  23:04（UTC-5）"); `formatZonedDateTimeParts` gives the same three parts to other markup.
+  Only the compact style pads a one-digit day ("Jan 05") so a column lines up; the full
+  style writes it as is.
+- **Signed amounts.** `formatAmount` with any `signDisplay` prints the true minus sign
+  (U+2212), level with the "+" beside it.
+- **Class merging.** `cn()` knows the `type-*` tiers: a later tier replaces an earlier
+  one and a primitive's default size, weight, leading and tracking, so a caller's
+  `type-heading-3` wins over `text-lg font-semibold`. A later `text-sm` still overrides a
+  tier's size, and a face (`font-mono`) is left to the cascade.
 
 ## Tests
 
@@ -536,8 +650,11 @@ transaction kit; see `docs/` and each module's header.
   `transition-all` rule and the forced-colors fallback.
 - `styles/__tests__/global-css.test.ts` checks the site-wide guarantees: the dimmed-text
   shim (compiled through Tailwind, to prove its layer, order and specificity), the display
-  guard, the 12px floor, the CJK eyebrow reset, figure faces and numerals, display tokens
-  and the content edge.
+  guard, the 12px floor, the CJK eyebrow reset, figure faces and numerals, display tokens,
+  the content edge, the touch utilities and the overlay motion (compiled, so the
+  reduced-motion condition is proven).
+- `e2e/mobile-tap-targets.mobile.spec.ts` measures every control's real box on a phone;
+  `e2e/content-edge.desktop.spec.ts` checks the H1 against the header's edge.
 - `styles/__tests__/tables-css.test.ts` pins the ledger layout: shared alignment, tabular
   figures, phone records, dropped blank and secondary lines, the scroll cue and print.
 - `components/ui/data-table/__tests__/` covers column kinds, sorting, paging, states and

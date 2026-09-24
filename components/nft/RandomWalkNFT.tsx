@@ -4,7 +4,7 @@ import { formatId } from '@/utils';
 
 import { cn } from '@/lib/utils';
 import { useRWLKNFT } from '@/hooks/useRWLKNFT';
-import { NFTSkeleton } from '@/components/styled';
+import { SkeletonArtPlate } from '@/components/ui/skeleton';
 
 import NFTImage from './NFTImage';
 
@@ -33,7 +33,7 @@ const RandomWalkNFT = ({
   const content = (
     <div className="relative">
       {!nft ? (
-        <NFTSkeleton />
+        <SkeletonArtPlate />
       ) : (
         <NFTImage src={nft.black_image_thumb} alt={decorative ? '' : undefined} density="compact" />
       )}

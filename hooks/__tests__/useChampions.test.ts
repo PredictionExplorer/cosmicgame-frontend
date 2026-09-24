@@ -104,7 +104,7 @@ describe('deriveChampionsState', () => {
     expect(state.latestGesture.progressToEnduranceChampion).toBeCloseTo(59.4, 1);
   });
 
-  it('keeps known identity with a zero hold while transaction timing is indexing', () => {
+  it('keeps known identity but an unknown hold while transaction timing is indexing', () => {
     const freshAddress = '0x3333333333333333333333333333333333333333';
     const state = deriveChampionsState({
       data: baseSnapshot,
@@ -117,8 +117,33 @@ describe('deriveChampionsState', () => {
 
     expect(state.latestGesture.address).toBe(freshAddress);
     expect(state.latestGesture.latestGestureTime).toBeNull();
+    // Regression: the ledger printed a confident "0s" and a live "record
+    // forming" caption above "details are syncing". Unknown time is pending.
+    expect(state.latestGesture.isTimeKnown).toBe(false);
     expect(state.latestGesture.holdDuration).toBe(0);
     expect(state.latestGesture.progressToEnduranceChampion).toBe(0);
+  });
+
+  it("uses the snapshot's time while indexing when it names the same participant", () => {
+    const state = deriveChampionsState({
+      data: baseSnapshot,
+      latestParticipantEvidence: {
+        address: baseSnapshot.LastBidderAddress ?? '',
+        timestamp: null,
+      },
+      nowMs: 1_100_000,
+    });
+
+    expect(state.latestGesture.isTimeKnown).toBe(true);
+    expect(state.latestGesture.latestGestureTime).toBe(900);
+    expect(state.latestGesture.holdDuration).toBe(200);
+  });
+
+  it('knows the time before any gesture: nothing to measure yet', () => {
+    const state = deriveChampionsState({ data: null, nowMs: 1_100_000 });
+
+    expect(state.latestGesture.address).toBeNull();
+    expect(state.latestGesture.isTimeKnown).toBe(true);
   });
 
   it('uses fresh evidence when determining a new live Endurance Champion', () => {

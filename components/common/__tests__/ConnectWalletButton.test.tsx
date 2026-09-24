@@ -269,19 +269,6 @@ describe('ConnectWalletButton', () => {
         navigation.usePathname = realPathname;
       }
     });
-
-    it('keeps the deprecated isMobileView prop working', () => {
-      render(
-        <ConnectWalletButton
-          isMobileView
-          loading={false}
-          balance={{ ETH: 0, CosmicToken: 0, CosmicSignature: 0, RWLK: 0 }}
-          stakedTokenCount={{ cst: 0, rwalk: 0 }}
-        />,
-      );
-      expect(screen.getByTestId('wallet-account-trigger')).toBeInTheDocument();
-      expect(screen.queryByTestId('wallet-menu-trigger')).toBeNull();
-    });
   });
 
   it('shows a figure it could not read as unavailable, never as zero', async () => {

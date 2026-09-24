@@ -54,7 +54,7 @@
     },
     "contractErrors": {
       "insufficientReceivedBidAmount": "Chi phí nét bút hiện tại lớn hơn số tiền bạn đã chuyển.",
-      "usedRandomWalkNft": "RandomWalk NFT này đã được dùng cho một nét bút.",
+      "usedRandomWalkNft": "Random Walk NFT này đã được dùng cho một nét bút.",
       "callerIsNotNftOwner": "Bạn không phải chủ sở hữu của NFT này.",
       "roundIsInactive": "Chu kỳ hiện tại không hoạt động.",
       "tooLongBidMessage": "Lời nhắn nét bút của bạn quá dài.",

@@ -24,10 +24,7 @@ export function TxExplorerLink({ hash, label, className }: TxExplorerLinkProps) 
       href={getExplorerUrl('tx', hash)}
       target="_blank"
       rel="noopener noreferrer"
-      className={cn(
-        'inline-flex items-center gap-1 font-medium text-primary underline decoration-primary/40 underline-offset-4 transition-colors hover:decoration-primary',
-        className,
-      )}
+      className={cn('link inline-flex items-center gap-1 font-medium', className)}
     >
       {label}
       <ExternalLink className="h-3.5 w-3.5 shrink-0" aria-hidden />

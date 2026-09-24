@@ -17,13 +17,8 @@ describe('Surface', () => {
     ['quiet', 'bg-surface'],
     ['outlined', 'border-rule-faint'],
     ['raised', 'shadow-float'],
-    ['glass', 'border-rule-faint'],
-    ['glass-bordered', 'border-rule'],
-    ['solid', 'bg-surface'],
     ['gradient-border', 'gradient-border-card'],
     ['gradient-border-accent', 'gradient-border-card-accent'],
-    ['elevated', 'shadow-float'],
-    ['solar', 'border-rule-faint'],
   ] as const)('applies variant=%s', (variant, expected) => {
     render(
       <Surface variant={variant} data-testid="s">

@@ -13,8 +13,8 @@
         "title": "{cycle} opens soon"
       },
       "waitingFirstGesture": {
-        "title": "{cycle} is waiting for its first Gesture",
-        "body": "The first Gesture ignites the Cycle Finalization Time and starts shaping the next Signature."
+        "title": "{cycle} is waiting for its first gesture",
+        "body": "The first gesture ignites the Cycle Finalization Time and starts shaping the next Signature."
       },
       "approach": {
         "title": "{cycle} finalizes in"

@@ -87,7 +87,7 @@ function ClockFigures(props: CountdownRenderProps) {
       // text-[size], and the digits must set solid (line-height 1).
       className={cn(
         FIGURE_SIZE,
-        'flex items-start justify-center gap-[0.12em] font-normal leading-none tracking-[-0.03em] text-foreground tabular-nums lining-nums slashed-zero',
+        'flex items-start justify-center gap-[0.12em] font-normal leading-none tracking-[-0.03em] text-foreground tabular-nums lining-nums',
       )}
     >
       {groups.map((group, index) => (

@@ -14,9 +14,9 @@
     "eth": "ETH",
     "cst": "CST",
     "cosmicNfts": "Cosmic Signature NFT",
-    "rwlkNfts": "RandomWalk NFT",
+    "rwlkNfts": "Random Walk NFT",
     "anchoredCst": "係留中のCosmic Signature NFT",
-    "anchoredRwlk": "係留中のRandomWalk NFT"
+    "anchoredRwlk": "係留中のRandom Walk NFT"
   },
   "labels": {
     "balancesHeading": "残高"

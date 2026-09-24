@@ -1,6 +1,5 @@
 import '@testing-library/jest-dom';
 
-import { SectionDivider } from '@/components/ui/section-divider';
 import { SectionHeader } from '@/components/ui/section-header';
 
 import { checkA11y, render, screen } from '@/test-utils';
@@ -49,19 +48,5 @@ describe('SectionHeader', () => {
       <SectionHeader title="Protocol economy" description="Totals across every cycle." />,
     );
     await checkA11y(container);
-  });
-});
-
-describe('SectionDivider', () => {
-  it('draws a hairline separator without a title', () => {
-    render(<SectionDivider />);
-    expect(screen.getByRole('separator')).toHaveClass('bg-rule-faint');
-  });
-
-  it('renders a titled divider as a heading unless told otherwise', () => {
-    const { rerender } = render(<SectionDivider title="Name history" />);
-    expect(screen.getByRole('heading', { level: 3, name: 'Name history' })).toBeInTheDocument();
-    rerender(<SectionDivider title="Name history" as="p" />);
-    expect(screen.queryByRole('heading')).toBeNull();
   });
 });

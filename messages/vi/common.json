@@ -1,8 +1,4 @@
 {
-  "faqPage": {
-    "heading": "Giải đáp",
-    "description": "Giải đáp về Cosmic Signature: bản chất của giao thức, cách nét bút hoạt động và những giới hạn cần biết."
-  },
   "languageSwitcher": {
     "label": "Ngôn ngữ"
   },
@@ -69,8 +65,6 @@
     "loading": "Đang tải",
     "loadingEllipsis": "Đang tải…",
     "loadingDots": "Đang tải…",
-    "noData": "Không có dữ liệu.",
-    "nothingHere": "Chưa có gì ở đây",
     "unavailable": "Không khả dụng"
   },
   "liveStatus": {

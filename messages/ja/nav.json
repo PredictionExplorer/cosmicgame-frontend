@@ -48,8 +48,8 @@
       "description": "各サイクルで一筆に添付されたNFT"
     },
     "usedRwlkNfts": {
-      "label": "使用済みのRandomWalk NFT",
-      "description": "一筆の費用の割引にすでに使われたRandomWalk NFT"
+      "label": "使用済みのRandom Walk NFT",
+      "description": "一筆の費用の割引にすでに使われたRandom Walk NFT"
     },
     "statistics": {
       "label": "統計",
@@ -303,12 +303,6 @@
       "defaultLabel": "Axiom ZeroのNFT",
       "menuLabel": "Axiom Zeroマーケットプレイス",
       "shortLabel": "Axiom Zero"
-    },
-    "chaosZero": {
-      "ariaLabel": "Chaos Zeroの予測市場",
-      "defaultLabel": "Chaos Zero",
-      "menuLabel": "Chaos Zero",
-      "shortLabel": "Chaos Zero"
     }
   },
   "maintenance": {

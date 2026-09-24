@@ -44,6 +44,42 @@ describe('SignatureCard', () => {
     expect(screen.getByTestId('pending-plate')).toBeInTheDocument();
   });
 
+  it('joins the rows of its grid so neighbouring labels line up', () => {
+    // Regression: on /allocation/1 a role whose amounts wrapped on a phone
+    // pushed its Recipient line below its neighbour's.
+    const { container, rerender } = render(
+      <SignatureCard
+        tokenId={27}
+        seed="5084a8"
+        title="Chrono-Warrior"
+        meta={['#000027', '3.5397 ETH', '1,000 CST']}
+        sizes="20rem"
+        unavailableLabel="Artwork unavailable"
+        subgrid
+      >
+        <p>Recipient</p>
+      </SignatureCard>,
+    );
+    const figure = container.querySelector('figure');
+    expect(figure).toHaveClass('row-span-4', 'grid-rows-subgrid');
+    expect(container.querySelector('figcaption')).toHaveClass('row-span-3', 'grid-rows-subgrid');
+    // A shrinkable column at each level: a long recipient name wraps in the
+    // card instead of pushing it past a 320px phone's edge.
+    expect(figure).toHaveClass('grid-cols-1');
+    expect(container.querySelector('figcaption')).toHaveClass('grid-cols-1');
+
+    rerender(
+      <SignatureCard
+        tokenId={27}
+        seed="5084a8"
+        title="Chrono-Warrior"
+        sizes="20rem"
+        unavailableLabel="Artwork unavailable"
+      />,
+    );
+    expect(container.querySelector('figure')).not.toHaveClass('grid-rows-subgrid');
+  });
+
   it('holds a busy plate with no "unavailable" caption while the seed is on its way', () => {
     render(
       <SignatureCard

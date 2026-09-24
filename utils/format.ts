@@ -22,7 +22,7 @@ import { formatUnits } from 'viem';
 
 import { getLocaleConfig } from '@/i18n/localeConfig';
 
-import { UNAVAILABLE_VALUE, formatAmount, formatNumber, type AmountUnit } from './format/numbers';
+import { UNAVAILABLE_VALUE, formatNumber } from './format/numbers';
 
 export {
   NBSP,
@@ -42,7 +42,6 @@ export {
 } from './format/numbers';
 export {
   convertTimestampToDateTime,
-  convertTimestampToServerDateTime,
   formatDateTime,
   formatDateTimeTitle,
   formatRelativeTime,
@@ -50,11 +49,13 @@ export {
   formatUnixTsLabel,
   formatUtcDateTimeStamp,
   formatYyyymmddLabel,
+  formatZonedDateTimeParts,
   toIsoDateTime,
   type DateTimeOptions,
   type DateTimeTitleOptions,
   type DateTimeZone,
   type TimestampTimeZone,
+  type ZonedDateTimeParts,
 } from './format/dates';
 export {
   calculateTimeDiff,
@@ -83,39 +84,6 @@ type BigNumberish = bigint | string | number;
 export const toIntlLocale = (locale: string = 'en'): string => getLocaleConfig(locale).intlLocale;
 
 /**
- * Formats ETH for a card or summary: grouped, exactly 4 decimals, the unit
- * after a no-break space ("32.2939 ETH", "1,234.5000 ETH", uk "1 234.5000
- * ETH", vi "8,0735 ETH"), dust as "<0.0001 ETH". A missing or non-finite
- * value renders "0 ETH", as it always has; negatives keep their sign.
- * Delegates to `formatAmount` (`context: 'card'`).
- *
- * `locale` is required on this and the other legacy amount helpers, so a
- * call site cannot silently print English grouping on a translated page.
- */
-export const formatEthValue = (value: number | null | undefined, locale: string): string =>
-  formatAmount(Number.isFinite(value) ? value : 0, { unit: 'ETH', locale });
-
-/**
- * Formats CST for a card or summary: grouped, 0–2 decimals, so a protocol
- * constant reads "1,000 CST" and a balance "60,872.26 CST"; dust renders
- * "<0.01 CST". A missing value renders "0 CST". Delegates to `formatAmount`.
- */
-export const formatCSTValue = (value: number | null | undefined, locale: string): string =>
-  formatAmount(Number.isFinite(value) ? value : 0, { unit: 'CST', locale });
-
-/**
- * Formats a table amount without a unit (the column header names it): fixed
- * digits so decimals line up (ETH 4, CST 2), zero as "0", dust as "<0.0001",
- * a missing value as an em dash. Delegates to `formatAmount`
- * (`context: 'table'`).
- */
-export const formatTableAmount = (
-  value: number | null | undefined,
-  locale: string,
-  unit: AmountUnit = 'ETH',
-): string => formatAmount(value, { unit, locale, context: 'table', withUnit: false });
-
-/**
  * Locale-aware grouped number (Chinese data displays keep Western grouping).
  * Delegates to `formatNumber`; prefer `formatCount` for counts.
  */
@@ -124,26 +92,6 @@ export const formatGroupedNumber = (
   locale: string = 'en',
   options?: Intl.NumberFormatOptions,
 ): string => formatNumber(value, locale, options);
-
-/**
- * Parses a wei/smallest-unit balance to a plain fixed-decimal string
- * ("1.2346"): a machine value for arithmetic and contract input, never for
- * display (use `formatAmount`).
- *
- * Total by construction: `BigInt()` throws on fractional numbers and
- * non-numeric strings, and `toFixed` throws on out-of-range precision, so
- * anything unparseable renders `UNAVAILABLE_VALUE` rather than escaping as an
- * uncaught RangeError/SyntaxError mid-render.
- */
-export const parseBalance = (value: BigNumberish, decimals = 18, decimalsToDisplay = 4): string => {
-  try {
-    const parsed = parseFloat(formatUnits(BigInt(value), decimals));
-    if (!Number.isFinite(parsed)) return UNAVAILABLE_VALUE;
-    return parsed.toFixed(decimalsToDisplay);
-  } catch {
-    return UNAVAILABLE_VALUE;
-  }
-};
 
 /**
  * `toFixed` that cannot throw. Finite input is byte-identical to
@@ -173,17 +121,6 @@ export const weiToEthNumber = (value: BigNumberish, fallback = 0): number => {
   }
 };
 
-/** Converts HTML date input value (YYYY-MM-DD) to API date param (YYYYMMDD). */
-export function toYyyymmdd(isoDate: string): string {
-  return isoDate.replace(/-/g, '');
-}
-
-/** Converts API date param (YYYYMMDD) to HTML date input value (YYYY-MM-DD). */
-export function fromYyyymmdd(yyyymmdd: string): string {
-  if (yyyymmdd.length !== 8) return yyyymmdd;
-  return `${yyyymmdd.slice(0, 4)}-${yyyymmdd.slice(4, 6)}-${yyyymmdd.slice(6, 8)}`;
-}
-
 /** Returns UTC YYYYMMDD for today minus `days` calendar days. */
 export function yyyymmddDaysAgoUtc(days: number): string {
   const d = new Date();
@@ -202,23 +139,4 @@ export function yyyymmddTodayUtc(): string {
 /** Wide date range used to bootstrap CST supply history (all available days). */
 export function supplyHistoryBootstrapRange(): { from: string; to: string } {
   return { from: '19700101', to: yyyymmddTodayUtc() };
-}
-
-/** Min/max YYYYMMDD dates from supply history API rows. */
-export function supplyHistoryDateBounds(
-  records: readonly { Date: string }[],
-): { from: string; to: string } | null {
-  if (records.length === 0) return null;
-  const first = records[0];
-  if (!first) return null;
-  let from = first.Date;
-  let to = first.Date;
-  for (let i = 1; i < records.length; i++) {
-    const row = records[i];
-    if (!row) continue;
-    const date = row.Date;
-    if (date < from) from = date;
-    if (date > to) to = date;
-  }
-  return { from, to };
 }

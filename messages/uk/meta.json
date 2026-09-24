@@ -195,8 +195,8 @@
     "description": "Історія переказів токена CST Cosmic Signature"
   },
   "usedRwlkNfts": {
-    "title": "Використані RandomWalk NFT",
-    "description": "RandomWalk NFT, уже долучені до ETH-жестів зі знижкою 50% на вартість жесту в Cosmic Signature. Кожен RandomWalk NFT можна використати для цієї знижки лише раз."
+    "title": "Використані Random Walk NFT",
+    "description": "Random Walk NFT, уже долучені до ETH-жестів зі знижкою 50% на вартість жесту в Cosmic Signature. Кожен Random Walk NFT можна використати для цієї знижки лише раз."
   },
   "siteMap": {
     "title": "Мапа сайту",

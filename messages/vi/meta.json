@@ -195,8 +195,8 @@
     "description": "Lịch sử chuyển token CST của Cosmic Signature"
   },
   "usedRwlkNfts": {
-    "title": "RandomWalk NFT đã sử dụng",
-    "description": "Các RandomWalk NFT đã được đính kèm vào nét bút ETH để giảm 50% chi phí nét bút trong Cosmic Signature. Mỗi RandomWalk NFT chỉ dùng được một lần cho mức giảm giá này."
+    "title": "Random Walk NFT đã sử dụng",
+    "description": "Các Random Walk NFT đã được đính kèm vào nét bút ETH để giảm 50% chi phí nét bút trong Cosmic Signature. Mỗi Random Walk NFT chỉ dùng được một lần cho mức giảm giá này."
   },
   "siteMap": {
     "title": "Sơ đồ trang",

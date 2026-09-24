@@ -1,8 +1,4 @@
 {
-  "faqPage": {
-    "heading": "Clarifications",
-    "description": "Answers to common questions about Cosmic Signature, its protocol, and how gestures work."
-  },
   "languageSwitcher": {
     "label": "Language"
   },
@@ -69,8 +65,6 @@
     "loading": "Loading",
     "loadingEllipsis": "Loading…",
     "loadingDots": "Loading...",
-    "noData": "No data available.",
-    "nothingHere": "Nothing here yet",
     "unavailable": "Unavailable"
   },
   "liveStatus": {
@@ -97,8 +91,8 @@
     "title": "Alerts and sound",
     "intro": "Everything here stays off until you turn it on. Choices are saved in this browser.",
     "sound": {
-      "label": "Chime when a Gesture follows yours",
-      "description": "A short sound when another participant’s Gesture follows your latest one. Needs a connected wallet and this tab open."
+      "label": "Chime when a gesture follows yours",
+      "description": "A short sound when another participant’s gesture follows your latest one. Needs a connected wallet and this tab open."
     },
     "alert": {
       "label": "Alert before finalization",

@@ -34,7 +34,6 @@ const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
   'components/nft/traits/ChaosMeter.tsx': 1,
   'components/nft/traits/NftTraitPanel.tsx': 1,
   'components/nft/traits/palette.ts': 2,
-  'components/ui/stat-card.tsx': 1,
 };
 
 /**

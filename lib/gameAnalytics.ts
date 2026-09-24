@@ -41,7 +41,3 @@ export function trackChatJoinCtaClicked(): void {
 export function trackGestureSheetOpened(): void {
   event({ action: 'gesture_sheet_opened', category: 'gameplay', label: 'action-dock' });
 }
-
-export function trackComposerSheetOpened(): void {
-  event({ action: 'gesture_sheet_opened', category: 'gameplay', label: 'experimental-composer' });
-}

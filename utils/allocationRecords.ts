@@ -19,6 +19,8 @@
  * "(All CS NFT Stakers)", so wallet counts must skip anything that is not an address.
  */
 
+import { isAddress } from 'viem';
+
 import { toFiniteNumber } from '@/utils/finiteNumber';
 
 /** Rows whose `AmountEth` is an ETH amount (allocations and the type-18 timeout retrieval). */
@@ -92,10 +94,17 @@ export function recipientKey(row: AllocationRecipientRow): string {
 }
 
 /**
- * How many recipients the rows name, which is how many rows a ledger grouped
- * by recipient shows. A count beside such a table uses this, so it matches
- * the rows rather than the records behind them.
+ * How many wallets the rows allocate to: each address once, whatever its
+ * case. The type-15 placeholder ("(All CS NFT Stakers)", the anchor-holders
+ * as a group) and blank rows name no wallet, so a grouped ledger may show one
+ * row more than this count; the figure answers "wallets that received at
+ * least one allocation", which a row for every anchor-holder is not.
  */
 export function countRecipients(rows: readonly AllocationRecipientRow[]): number {
-  return new Set(rows.map(recipientKey)).size;
+  const wallets = new Set<string>();
+  for (const row of rows) {
+    const address = row.WinnerAddr?.trim();
+    if (address && isAddress(address, { strict: false })) wallets.add(address.toLowerCase());
+  }
+  return wallets.size;
 }

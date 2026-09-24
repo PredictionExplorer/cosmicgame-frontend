@@ -72,17 +72,33 @@ describe('allocation totals', () => {
 });
 
 describe('countRecipients', () => {
-  it('counts each recipient once, whatever the address case', () => {
+  const ANCHOR_HOLDERS_PLACEHOLDER = '(All CS NFT Stakers)'; // lexicon-allow-backend-type
+  const walletA = '0x1Ec1CCEF3e1735bdA3F4BA698e8a524AA7c93274';
+  const walletB = '0x70997970C51812dc3A010C7d01b50e0d17dc79C8';
+
+  it('counts each wallet once, whatever the address case', () => {
     // The allocation page's badge counted records (54) beside a table that
     // lists one row per recipient (12).
     expect(
       countRecipients([
-        { WinnerAddr: '0xAbC' },
-        { WinnerAddr: '0xabc' },
-        { WinnerAddr: '0xdef' },
+        { WinnerAddr: walletA },
+        { WinnerAddr: walletA.toLowerCase() },
+        { WinnerAddr: walletB },
         { WinnerAddr: null },
         {},
       ]),
-    ).toBe(3);
+    ).toBe(2);
+  });
+
+  it('skips the anchor-holder placeholder a type-15 row carries', () => {
+    // Regression: Cycle #1 read "Recipients 10" beside nine wallets and one
+    // "All Cosmic Signature NFT anchor-holders" row.
+    expect(
+      countRecipients([
+        { WinnerAddr: walletA },
+        { WinnerAddr: ANCHOR_HOLDERS_PLACEHOLDER },
+        { WinnerAddr: walletB },
+      ]),
+    ).toBe(2);
   });
 });

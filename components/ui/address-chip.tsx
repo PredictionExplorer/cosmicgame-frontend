@@ -127,17 +127,23 @@ export function AddressChip({
     );
   }
 
-  // A chip is a muted pill; plain text takes the colour of the cell or sentence it sits in.
+  // A chip is a muted pill with no underline (the pill is its own cue);
+  // plain text takes the colour of the cell or sentence it sits in.
   const textClass = cn(
-    'inline-flex min-w-0 items-center no-underline transition-colors print:!text-foreground',
-    variant === 'chip' ? 'text-muted-foreground' : '[color:inherit]',
+    'inline-flex min-w-0 items-center transition-colors print:!text-foreground',
+    variant === 'chip' ? 'text-muted-foreground no-underline' : '[color:inherit]',
   );
+  // A plain address that opens a profile says so at rest: a faint hairline
+  // underline (the rule colour) that turns solid on hover and focus, the
+  // one entity-link look for records and ledgers. It must not also carry
+  // `no-underline`, which wins over the utility in the cascade.
+  const plainLinkClass = variant === 'plain' && 'link-entity';
 
   return (
     <span
       className={cn(
         'inline-flex max-w-full items-center gap-1 whitespace-nowrap align-middle',
-        variant === 'chip' && 'rounded-md bg-foreground/[0.04] py-0.5 pl-2 pr-0.5 text-xs',
+        variant === 'chip' && 'rounded-control bg-surface-sunken py-0.5 pl-2 pr-0.5 text-xs',
         variant === 'chip' && !showCopy && 'pr-2',
         className,
       )}
@@ -146,7 +152,11 @@ export function AddressChip({
         <Link
           href={linkTarget}
           title={title}
-          className={cn(textClass, 'hover:text-primary focus-visible:text-primary max-sm:min-h-6')}
+          className={cn(
+            textClass,
+            plainLinkClass,
+            'hover:text-primary focus-visible:text-primary max-sm:min-h-6',
+          )}
         >
           {content}
         </Link>
@@ -161,7 +171,7 @@ export function AddressChip({
           onClick={handleCopy}
           data-touch-target="extended"
           className={cn(
-            'inline-flex size-6 shrink-0 items-center justify-center rounded text-muted-foreground transition-colors hover:text-foreground focus-visible:text-foreground',
+            'inline-flex size-6 shrink-0 items-center justify-center rounded-control text-muted-foreground transition-colors hover:text-foreground focus-visible:text-foreground',
             TOUCH_TARGET_EXTENDED_CLASS,
           )}
           aria-label={copied ? tCommon('actions.copied') : tCommon('actions.copyAddress')}

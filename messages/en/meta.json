@@ -195,8 +195,8 @@
     "description": "Cosmic Signature CST Token Transfer History"
   },
   "usedRwlkNfts": {
-    "title": "Used RandomWalk NFTs",
-    "description": "RandomWalk NFTs already attached to ETH gestures for a 50% Gesture-Cost discount in Cosmic Signature. Each RandomWalk NFT can be used once for this discount."
+    "title": "Used Random Walk NFTs",
+    "description": "Random Walk NFTs already attached to ETH gestures for a 50% Gesture-Cost discount in Cosmic Signature. Each Random Walk NFT can be used once for this discount."
   },
   "siteMap": {
     "title": "Site Map",
@@ -267,7 +267,7 @@
   },
   "howItWorks": {
     "title": "How It Works: Performance Cycles, Gestures, and NFTs",
-    "description": "Learn how a Cosmic Signature Performance Cycle unfolds — from the Calibration Window through Gestures to final allocation distribution."
+    "description": "Learn how a Cosmic Signature Performance Cycle unfolds — from the Calibration Window through gestures to final allocation distribution."
   },
   "riskDisclosures": {
     "title": "Risk Disclosures: Not an \u0049nvestment Product",

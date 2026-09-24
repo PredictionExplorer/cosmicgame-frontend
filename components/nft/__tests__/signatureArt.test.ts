@@ -47,6 +47,16 @@ describe('signatureMedia', () => {
         src: expect.stringContaining('/cosmicsignature/0xABC123/thumb_card.webp'),
         width: SIGNATURE_THUMB_WIDTH,
       },
+      // The media server publishes no size between the two, so the image
+      // optimizer resizes the original for 720px plates at 2x and phones at 3x.
+      {
+        src: expect.stringMatching(/^\/_next\/image\?url=.*full\.webp&w=1200&/),
+        width: 1200,
+      },
+      {
+        src: expect.stringMatching(/^\/_next\/image\?url=.*full\.webp&w=1920&/),
+        width: 1920,
+      },
       {
         src: expect.stringContaining('/cosmicsignature/0xabc123/images/web/full.webp'),
         width: 3456,

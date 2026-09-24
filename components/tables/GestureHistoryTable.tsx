@@ -18,6 +18,7 @@ import { GestureMethodTag, resolveGestureType } from '@/components/tables/Gestur
 import type { LedgerStateProps } from '@/components/tables/ledger-props';
 import { useBannedGestures } from '@/hooks/useApiQuery';
 import { useNow } from '@/hooks/useNow';
+import { DateTime } from '@/components/ui/date-time';
 
 interface GestureHistory {
   EvtLogId: number;
@@ -312,10 +313,15 @@ const GestureHistoryTable = ({
     return all.filter((column): column is DataTableColumn<GestureHistory> => Boolean(column));
   }, [t, showRound, showParticipant, showHold, holds, banned]);
 
+  const phoneColumns = useMemo(
+    () => withPhoneLines(columns, gestureHistory, t('status.unknown')),
+    [columns, gestureHistory, t],
+  );
+
   return (
     <DataTable
       data={gestureHistory}
-      columns={columns}
+      columns={phoneColumns}
       ariaLabel={t('gestureHistory.tableLabel')}
       getRowKey={(gesture) => gesture.EvtLogId}
       getRowHref={(gesture) => `/gesture/${gesture.EvtLogId}`}
@@ -325,5 +331,41 @@ const GestureHistoryTable = ({
     />
   );
 };
+
+/**
+ * On a phone a gesture reads as lines rather than a spec sheet: its method
+ * rides on the date line (the method column is hidden there, the tag beside
+ * a unit that already says CST was a line of its own), and the cycle shows
+ * only when the list spans more than one, so a participant's gestures in
+ * one cycle do not each repeat "Cycle 2". Wider screens keep every column.
+ */
+function withPhoneLines(
+  columns: DataTableColumn<GestureHistory>[],
+  gestures: readonly GestureHistory[],
+  unknownLabel: string,
+): DataTableColumn<GestureHistory>[] {
+  const spansCycles = new Set(gestures.map((gesture) => gesture.RoundNum)).size > 1;
+  return columns.map((column): DataTableColumn<GestureHistory> => {
+    if (column.id === 'type' || (column.id === 'cycle' && !spansCycles)) {
+      return { ...column, priority: 'secondary' };
+    }
+    if (column.id !== 'datetime') return column;
+    return {
+      ...column,
+      // The date stays inline, so the row link's underline still reaches it.
+      cell: (gesture, { value }) => (
+        <>
+          <DateTime timestamp={typeof value === 'number' ? value : null} seconds />
+          <span className="ms-2 inline-block align-middle sm:hidden">
+            <GestureMethodTag
+              gestureType={resolveGestureType(gesture)}
+              unknownLabel={unknownLabel}
+            />
+          </span>
+        </>
+      ),
+    };
+  });
+}
 
 export default GestureHistoryTable;

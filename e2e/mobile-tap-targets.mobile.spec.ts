@@ -13,8 +13,11 @@ import {
  * Touch target sizing across the dApp.
  *
  * Inline links inside body copy are exempt (WCAG 2.5.8), which the helper
- * handles by skipping `display: inline` anchors. Everything else that a finger
- * is expected to hit must be at least 44x44.
+ * handles by skipping `display: inline` anchors, and so are explained words
+ * (inline `role="button"` spans) that it measures to be inside a sentence.
+ * Text links laid out as boxes must be 24x24; everything else that a finger
+ * is expected to hit must be at least 44x44, measured on its real box (or a
+ * declared `data-touch-target="extended"` pseudo-element pad).
  */
 
 const NARROW = MOBILE_AUDIT_VIEWPORTS[0];

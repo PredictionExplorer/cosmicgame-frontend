@@ -1,9 +1,6 @@
 /** Interval between data polling cycles (12 seconds). */
 export const DATA_POLL_INTERVAL_MS = 12_000;
 
-/** Interval between statistics page polling cycles (5 seconds). */
-export const STATS_POLL_INTERVAL_MS = 5_000;
-
 /** Interval between header data polling cycles (30 seconds). */
 export const HEADER_POLL_INTERVAL_MS = 30_000;
 
