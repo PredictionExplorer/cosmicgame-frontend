@@ -175,6 +175,7 @@
   },
   "pagination": {
     "label": "페이지 이동",
+    "labelFor": "{table} 페이지 이동",
     "range": "{total}개 중 {from}~{to}",
     "goToPage": "페이지로 이동:",
     "goToPageAria": "페이지로 이동",

@@ -175,6 +175,7 @@
   },
   "pagination": {
     "label": "навігація сторінками",
+    "labelFor": "Навігація сторінками: {table}",
     "range": "{from}–{to} з {total}",
     "goToPage": "Перейти на сторінку:",
     "goToPageAria": "перейти на сторінку",
