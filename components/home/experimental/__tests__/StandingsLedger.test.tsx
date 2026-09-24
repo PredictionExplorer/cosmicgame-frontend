@@ -152,7 +152,7 @@ describe('StandingsLedger', () => {
     );
   });
 
-  it('names the method of a RandomWalk Gesture, which its ETH unit does not', () => {
+  it('names the ETH + RandomWalk method, which its ETH unit does not', () => {
     renderLedger({
       latestGesture: {
         ...latestGesture,

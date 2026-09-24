@@ -137,7 +137,7 @@ export function StandingsLedger({
         ? getCstGestureCost(gesture)
         : getEthGestureCost(gesture)
       : undefined;
-    // The unit already names ETH and CST; only a RandomWalk Gesture adds its method.
+    // The unit already names ETH and CST; only ETH + RandomWalk adds its method.
     const details = gesture
       ? [
           gestureType === GESTURE_TYPE.randomWalk
