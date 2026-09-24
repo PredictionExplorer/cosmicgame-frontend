@@ -244,8 +244,10 @@ A link inside running text must not rely on hue alone.
   already read as links by position.
 - Unstyled `<a>` elements inside `p`, `li`, `dd`, `figcaption`, `blockquote` and `td` get
   the `link` style automatically.
-- An entity link (an address that opens a profile) is `<AddressChip variant="plain">`:
-  a hairline underline in the rule colour at rest, solid on hover and focus.
+- `link-entity`: a link to a record (a cycle, a token, a profile) set as a value on a
+  record page or in a ledger. The text keeps its colour, with a hairline underline in the
+  rule colour at rest that turns solid on hover and focus. `<AddressChip variant="plain">`
+  uses it for addresses.
 
 ### Touch targets
 

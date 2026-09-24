@@ -135,9 +135,7 @@ export function AddressChip({
   // A plain address that opens a profile says so at rest: a faint hairline
   // underline (the rule colour) that turns solid on hover and focus, the
   // one entity-link look for records and ledgers. The pill is its own cue.
-  const plainLinkClass =
-    variant === 'plain' &&
-    'underline decoration-[hsl(var(--rule))] decoration-1 underline-offset-4 hover:decoration-current focus-visible:decoration-current';
+  const plainLinkClass = variant === 'plain' && 'link-entity';
 
   return (
     <span

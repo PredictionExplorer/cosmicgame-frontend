@@ -241,11 +241,21 @@ describe('touch targets on coarse pointers', () => {
   });
 
   it('gives box-laid text links a 24px floor that inline links never take', async () => {
-    for (const className of ['link', 'link-quiet', 'touch-link-target']) {
+    for (const className of ['link', 'link-quiet', 'link-entity', 'touch-link-target']) {
       const css = await declarationsFor(className);
       expect(css).toContain('@media (pointer: coarse) min-block-size: 1.5rem');
       expect(css).toContain('@media (pointer: coarse) min-inline-size: 1.5rem');
     }
+  });
+});
+
+describe('links', () => {
+  it('marks a record link at rest with a hairline in the rule colour', async () => {
+    const css = await declarationsFor('link-entity');
+    expect(css).toContain('text-decoration-line: underline');
+    expect(css).toContain('text-decoration-color: hsl(var(--rule))');
+    // Solid on hover and focus.
+    expect(css).toContain('text-decoration-color: currentColor');
   });
 });
 

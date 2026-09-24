@@ -755,6 +755,33 @@ body:has([data-maintenance-banner]) .home-control-shell {
   }
 }
 
+/*
+ * A link to a record (an address's profile, a cycle, a token) where it sits
+ * as a value on a record page or in a ledger: the text keeps its colour and
+ * carries a hairline underline in the rule colour at rest, solid on hover
+ * and focus, so it reads as a way in without turning a column of values
+ * into a column of accent colour.
+ */
+@utility link-entity {
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: hsl(var(--rule));
+  text-underline-offset: 4px;
+  transition: text-decoration-color var(--duration-fast) var(--ease-out-soft);
+
+  &:hover,
+  &:focus-visible {
+    text-decoration-color: currentColor;
+  }
+
+  /* touch-link-target, below */
+  @media (pointer: coarse) {
+    min-block-size: 1.5rem;
+    min-inline-size: 1.5rem;
+    align-content: center;
+  }
+}
+
 @utility link-quiet {
   text-decoration-line: underline;
   text-decoration-thickness: 1px;
