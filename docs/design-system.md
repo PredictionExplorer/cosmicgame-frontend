@@ -240,7 +240,10 @@ the CJK faces.
   `word-break: auto-phrase`, and the document uses `line-break: strict`.
 - **Korean**: `keep-all` everywhere, monospace included, so a counter always stays with
   its digit. Display headings take `! , . : ?` from the platform Korean face through a
-  punctuation-only alias ahead of Clash, whose square period sat heavy after Hangul.
+  punctuation-only alias ahead of Clash, whose square period sat heavy after Hangul;
+  where no Korean face is installed under the listed names (Android, Linux), the alias
+  falls back to a 2 KB cut of those five marks from Noto Sans KR
+  (`public/fonts/noto-sans-kr/`).
 - **Vietnamese**: `type-display-xl` and `-lg` open their leading (1.12 and 1.15) so
   stacked diacritics on consecutive lines never touch.
 - **Paragraphs**: `p`, `li`, `dd`, `figcaption` and `blockquote` use `text-wrap: pretty`.
@@ -282,7 +285,11 @@ a pseudo-element pad only where nothing else can reach the size.
 | `TOUCH_TARGET_ICON_CLASS`, `…_HEIGHT_…`, `…_TEXT_LINK_…` | `lib/touch-target`                           | Width-scoped (below `sm`) size helpers for controls that can grow in the layout.                                                                                                                                     |
 
 The audit exempts an inline `<a>` and an inline explained word only when it measures
-the element inside a sentence.
+the element inside a sentence. Two targets must not overlap: a sortable table header
+with help puts 20px between its label and the ⓘ on coarse pointers, so the help's
+44px box clears the sort button. An `IntersectionObserver` that must ignore the sticky
+header takes `headerRootMargin()` (`lib/headerOffset`), which reads `--header-height`
+(56px on phones, 72px from `sm`) instead of a hard-coded 72px.
 
 ## Shape, depth and layout
 
@@ -565,9 +572,10 @@ banks, hand-coins, heart-handshakes, clovers, card suits) under every lucide ali
 
 ### Sections
 
-| Primitive       | Import                         | Use                                                                                                                                                                                                                                                      |
-| --------------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `SectionHeader` | `components/ui/section-header` | The section-heading tier. `as` (`h2` default, `h3`, `h4`) fits the outline; `size` `page` (`type-section`) or `panel` (`type-heading-3`); `eyebrow`, `description`, one `info`, right-aligned `actions`, `headingId` for `aria-labelledby`. Server-safe. |
+| Primitive       | Import                         | Use                                                                                                                                                                                                                                                                                                                           |
+| --------------- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SectionHeader` | `components/ui/section-header` | The section-heading tier. `as` (`h2` default, `h3`, `h4`) fits the outline; `size` `page` (`type-section`) or `panel` (`type-heading-3`); `eyebrow`, `description`, one `info`, right-aligned `actions`, `headingId` for `aria-labelledby`. Server-safe.                                                                      |
+| `PhrasedText`   | `components/ui/phrased-text`   | Display copy that may be Chinese: `<h2><PhrasedText>{copy.heading}</PhrasedText></h2>`. Glues each closing mark to its character (and an opening mark to the next) with an inline nowrap span, so no line starts with 。 or ，; the copy's authored `\u200B` break points stay in the text. Other scripts render as they are. |
 
 ### Layout and surfaces
 
