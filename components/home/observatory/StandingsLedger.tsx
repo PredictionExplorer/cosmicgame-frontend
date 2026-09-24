@@ -46,12 +46,14 @@ const SETTLE_MS = 900;
  * The ledger's columns: role, holder, time held, allocation. Every row uses
  * the same proportional template (and the header row repeats it), so holders,
  * durations and allocations line up down the ledger at every width where the
- * ledger is a table. Below 30rem of ledger width each row reads as a record.
+ * ledger is a table, and the cells of a row share one baseline: the small
+ * mono holder sits on the line of the larger figures beside it. Below 30rem
+ * of ledger width each row reads as a record.
  */
 const ROW_GRID =
-  '@[30rem]/ledger:grid @[30rem]/ledger:grid-cols-[minmax(0,1.25fr)_minmax(0,1.1fr)_minmax(0,1fr)_minmax(0,0.95fr)] @[30rem]/ledger:items-start @[30rem]/ledger:gap-x-4';
+  '@[30rem]/ledger:grid @[30rem]/ledger:grid-cols-[minmax(0,1.25fr)_minmax(0,1.1fr)_minmax(0,1fr)_minmax(0,0.95fr)] @[30rem]/ledger:items-baseline @[30rem]/ledger:gap-x-4';
 const FIELDS_GRID =
-  '@[30rem]/ledger:col-span-3 @[30rem]/ledger:grid @[30rem]/ledger:grid-cols-subgrid';
+  '@[30rem]/ledger:col-span-3 @[30rem]/ledger:grid @[30rem]/ledger:grid-cols-subgrid @[30rem]/ledger:items-baseline';
 
 export interface StandingsLedgerProps {
   champions: ChampionsState;
@@ -132,7 +134,8 @@ function LedgerRow({
       <div className={ROW_GRID}>
         <h3 className="flex min-w-0 items-start gap-2 type-label font-medium text-foreground">
           <Icon className="mt-px size-4 shrink-0 text-subtle" aria-hidden />
-          <span className="min-w-0">{role}</span>
+          {/* The role's text, not the icon, gives the row its baseline. */}
+          <span className="min-w-0 self-baseline">{role}</span>
         </h3>
         <dl className={cn('mt-2 grid gap-y-1.5 @[30rem]/ledger:mt-0', FIELDS_GRID)}>
           <div className="flex min-w-0 items-baseline justify-between gap-3 @[30rem]/ledger:block">
