@@ -2,14 +2,13 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
+import { readDashboard } from '@/app/[locale]/(app)/publicDataReads';
+import { seedsDisabled } from '@/app/[locale]/(app)/QuerySeed';
+
 import { get_bid_list_by_round } from '@/services/api/rounds';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import { parseCanonicalNonNegativeSafeInteger } from '@/utils/routeParams';
 import { createMetadata } from '@/utils/seo';
-import { PageMessages } from '@/components/i18n/PageMessages';
-
-import { readDashboard } from '../../../publicDataReads';
-import { seedsDisabled } from '../../../QuerySeed';
 
 import EmbedEnduranceChart from './EmbedEnduranceChart';
 
@@ -94,9 +93,6 @@ export default async function Page({
     ? await Promise.all([readDashboard(), readLeadLaneCount(cycle)])
     : [null, undefined];
   const liveCycle = toFiniteNumber(dashboard?.data?.CurRoundNum) ?? undefined;
-  return (
-    <PageMessages namespaces={['statistics', 'tables']}>
-      <EmbedEnduranceChart roundNum={cycle} seedLiveCycle={liveCycle} expectedLanes={lanes} />
-    </PageMessages>
-  );
+  // The embed layout serializes the chart's namespaces (EMBED_NAMESPACES).
+  return <EmbedEnduranceChart roundNum={cycle} seedLiveCycle={liveCycle} expectedLanes={lanes} />;
 }

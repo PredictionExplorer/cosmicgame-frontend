@@ -652,7 +652,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
   },
   {
     id: 'endurance-embed',
-    pageFile: '(app)/embed/endurance/[round]/page.tsx',
+    pageFile: '(embed)/embed/endurance/[round]/page.tsx',
     publicPath: '/embed/endurance/[round]',
     fixturePath: `/embed/endurance/${contributionId}`,
     host: 'app',

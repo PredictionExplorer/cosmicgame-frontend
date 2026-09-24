@@ -39,10 +39,11 @@ const MEDIA_PRECONNECT_ORIGINS: string[] = Array.from(
 );
 
 /**
- * Shared `<html>`/`<body>` document rendered by BOTH root layouts —
- * `app/[locale]/(app)/layout.tsx` and `app/[locale]/(landing)/layout.tsx`.
+ * Shared `<html>`/`<body>` document rendered by every root layout —
+ * `app/[locale]/(app)/layout.tsx`, `app/[locale]/(landing)/layout.tsx` and
+ * the chrome-free `app/[locale]/(embed)/layout.tsx`.
  *
- * Neither layout reads request state (no `headers()` / `cookies()`), which is
+ * No layout reads request state (no `headers()` / `cookies()`), which is
  * what allows content routes to be statically generated and CDN-cached. Host
  * separation is enforced entirely at the edge by proxy.ts, and the locale
  * arrives as a route param, so the layouts can be resolved from the URL path

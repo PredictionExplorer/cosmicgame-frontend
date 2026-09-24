@@ -10,7 +10,7 @@ import AllocationDetailPage, {
   generateMetadata as generateAllocationDetailMetadata,
 } from '../allocation/[id]/page';
 import { generateMetadata as generateCoordinationMetadata } from '../coordination-changes/page';
-import { generateMetadata as generateEmbedEnduranceMetadata } from '../embed/endurance/[round]/page';
+import { generateMetadata as generateEmbedEnduranceMetadata } from '../../(embed)/embed/endurance/[round]/page';
 import { generateMetadata as generateEthContributionDetailMetadata } from '../eth-contribution/detail/[id]/page';
 import { generateMetadata as generateEthContributionMetadata } from '../eth-contribution/page';
 import { generateMetadata as generateEthContributionCycleMetadata } from '../eth-contribution/round/[round]/page';
@@ -62,7 +62,7 @@ jest.mock('../internal/cst-outreach-transfer/CstOutreachTransferPage', () => ({
   __esModule: true,
   default: () => null,
 }));
-jest.mock('../embed/endurance/[round]/EmbedEnduranceChart', () => ({
+jest.mock('../../(embed)/embed/endurance/[round]/EmbedEnduranceChart', () => ({
   __esModule: true,
   default: () => null,
 }));

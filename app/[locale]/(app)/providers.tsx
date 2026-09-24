@@ -4,12 +4,11 @@ import { useState, useEffect, type ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 import { offchainLookupSignature } from 'viem/utils';
 import { WagmiProvider } from 'wagmi';
-import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { CookiesProvider } from 'react-cookie';
 import { MotionConfig } from 'framer-motion';
 
-import { usePathname } from '@/i18n/navigation';
 import { wagmiConfig } from '@/config/wagmi';
 import { networkConfig, getEnvValidation } from '@/config/networks';
 import ErrorBoundary from '@/components/layout/ErrorBoundary';
@@ -25,9 +24,9 @@ import { ContractAddressesProvider } from '@/contexts/ContractAddressesContext';
 import { NotificationProvider } from '@/contexts/NotificationContext';
 import { WalletUiProvider } from '@/contexts/WalletUiContext';
 import { useLiveGameDataRefresh } from '@/hooks/useLiveGameDataRefresh';
-import { reportError } from '@/utils/errors';
 import { installGlobalErrorHandlers } from '@/utils/globalErrorHandlers';
 import { getClientBuildInfo } from '@/lib/buildInfo';
+import { makeQueryClient } from '@/lib/queryClient';
 import { baseTransition } from '@/lib/motion';
 import { getApiBase, getApiOrigin, getRpcUrl } from '@/lib/serverRotation';
 
@@ -48,29 +47,6 @@ const harnessUiEnabled =
 const HarnessPanel = harnessUiEnabled
   ? dynamic(() => import('@/components/dev/HarnessPanel'), { ssr: false })
   : null;
-
-function makeQueryClient() {
-  return new QueryClient({
-    // Surface failed reads in Sentry. `apiCall` already reports transport
-    // errors; this additionally catches queryFn-level failures (schema
-    // asserts, envelope errors) with the owning query key for context.
-    queryCache: new QueryCache({
-      onError: (error, query) => {
-        reportError(error, `query:${String(query.queryKey[0] ?? 'unknown')}`);
-      },
-    }),
-    defaultOptions: {
-      queries: {
-        staleTime: 30_000,
-        gcTime: 300_000,
-        refetchOnWindowFocus: false,
-        // Two retries (~3 attempts) balances resilience against slow error
-        // surfacing now that per-section error states are user-visible.
-        retry: 2,
-      },
-    },
-  });
-}
 
 function LiveGameDataRefresh() {
   useLiveGameDataRefresh();
@@ -126,12 +102,6 @@ export function Providers({
   showAppChrome?: boolean;
 }) {
   const [queryClient] = useState(() => makeQueryClient());
-
-  // Routes under /embed render a single artifact (e.g. a chart) with no app chrome
-  // or background, so they can be opened standalone in their own browser window.
-  const pathname = usePathname();
-  const bareEmbed = pathname === '/embed' || pathname.startsWith('/embed/');
-  const chrome = showAppChrome && !bareEmbed;
 
   useEffect(() => {
     installGlobalErrorHandlers();
@@ -209,15 +179,15 @@ export function Providers({
                           <TooltipProvider delayDuration={200} skipDelayDuration={300}>
                             <div
                               className={
-                                chrome ? 'site-shell flex min-h-screen flex-col' : undefined
+                                showAppChrome ? 'site-shell flex min-h-screen flex-col' : undefined
                               }
                             >
-                              {!bareEmbed && <SkipLink />}
-                              {chrome && <Header />}
-                              <div className={chrome ? 'min-w-0 flex-1' : undefined}>
+                              <SkipLink />
+                              {showAppChrome && <Header />}
+                              <div className={showAppChrome ? 'min-w-0 flex-1' : undefined}>
                                 <ErrorBoundary>{children}</ErrorBoundary>
                               </div>
-                              {chrome && <Footer />}
+                              {showAppChrome && <Footer />}
                             </div>
                           </TooltipProvider>
                         </NotificationProvider>

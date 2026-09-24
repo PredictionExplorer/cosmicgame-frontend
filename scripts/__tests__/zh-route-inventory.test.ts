@@ -14,7 +14,7 @@ function collectPageFiles(directory: string): string[] {
 }
 
 function publicPathForPageFile(pageFile: string): string {
-  const withoutGroup = pageFile.replace(/^\((?:app|landing)\)\//, '');
+  const withoutGroup = pageFile.replace(/^\((?:app|embed|landing)\)\//, '');
   const withoutPage = withoutGroup.replace(/\/?page\.tsx$/, '');
   if (withoutPage === '' || withoutPage === 'landing-site') return '/';
   return `/${withoutPage}`;
