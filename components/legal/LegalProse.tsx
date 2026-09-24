@@ -105,26 +105,29 @@ const CALLOUT_TONES = {
 /**
  * A callout: a 2px rule on the inline start, the title as a label with its
  * icon, and the text below at the full width of the column. `attention`
- * carries the one warning a document must not let a reader miss.
+ * carries the one warning a document must not let a reader miss. It is a
+ * note (`role="note"`), not an `<aside>`: callouts sit inside the document's
+ * sections, where a complementary landmark would not be top level.
  */
 export function LegalCallout({
   tone = 'note',
   title,
   text,
   locale,
-  as: Element = 'aside',
   className,
 }: {
   tone?: keyof typeof CALLOUT_TONES;
   title: string;
   text: string;
   locale: string;
-  as?: 'aside' | 'div';
   className?: string;
 }) {
   const { icon: Icon, rule, iconClass } = CALLOUT_TONES[tone];
   return (
-    <Element className={cn('max-w-[var(--measure-prose)] border-s-2 py-1 ps-5', rule, className)}>
+    <div
+      role="note"
+      className={cn('max-w-[var(--measure-prose)] border-s-2 py-1 ps-5', rule, className)}
+    >
       <p className="flex items-center gap-2 type-title text-foreground">
         <Icon aria-hidden className={cn('size-4 shrink-0', iconClass)} />
         {title}
@@ -132,7 +135,7 @@ export function LegalCallout({
       <p className="mt-2 type-prose text-muted-foreground">
         <RichText text={text} locale={locale} />
       </p>
-    </Element>
+    </div>
   );
 }
 

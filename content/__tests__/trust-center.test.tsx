@@ -134,6 +134,22 @@ describe('Trust Center template', () => {
     },
   );
 
+  // axe flagged the Terms acknowledgment, an <aside> inside a section, as a
+  // complementary landmark that is not top level.
+  it.each(Object.entries(PAGES))(
+    '%s: callouts are notes, never landmarks nested in the document',
+    (_page, renderPage) => {
+      render(renderPage('en'));
+      expect(document.querySelector('main aside, section aside')).toBeNull();
+      expect(screen.queryAllByRole('complementary')).toHaveLength(0);
+    },
+  );
+
+  it('marks the Terms warning and acknowledgment as notes', () => {
+    render(PAGES.terms('en'));
+    expect(screen.getAllByRole('note').length).toBeGreaterThanOrEqual(2);
+  });
+
   it.each(routing.locales)('prints no markup and no untranslated link tag (%s)', (locale) => {
     for (const renderPage of Object.values(PAGES)) {
       const { unmount } = render(renderPage(locale));
