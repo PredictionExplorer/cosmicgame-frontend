@@ -40,6 +40,9 @@ import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
 import { useCycleParticipation, useRetrieveStatus } from '@/hooks/useCycleParticipation';
 import { useEndgameChainSync } from '@/hooks/useEndgameChainSync';
 import { useAllocationNotification } from '@/hooks/useAllocationNotification';
+import { useAttentionPreferences } from '@/hooks/useAttentionPreferences';
+import { useBackgroundDeadlineRefresh, useReturnResync } from '@/hooks/useDeadlineWatch';
+import { useLiveFreshness } from '@/hooks/useLiveFreshness';
 import { useGestureChime } from '@/hooks/useGestureChime';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { invalidateLiveGameQueries } from '@/hooks/useLiveGameDataRefresh';
@@ -87,6 +90,9 @@ const MemoHomeObservatoryHero = memo(HomeObservatoryHero);
 const MemoGestureMessageChat = memo(GestureMessageChat);
 const MemoAttachedNFTAllocationShowcase = memo(AttachedNFTAllocationShowcase);
 const MemoDeckArtCard = memo(DeckArtCard);
+
+/** The deadline's own read: the tab title trusts it while it keeps arriving. */
+const DEADLINE_FRESHNESS_KEYS = [['allocationTime']] as const;
 
 /** Pending optimistic chat rows expire if the indexer never echoes them. */
 const PENDING_MESSAGE_EXPIRY_MS = 90_000;
@@ -326,13 +332,25 @@ const HomePage = ({
 
   // Attention settings (chime, alert before finalization, tab-title
   // countdown) are opt-in per browser: nothing sounds or notifies until the
-  // viewer turns it on in the bell menu (useAttentionPreferences).
+  // viewer turns it on in the bell menu (useAttentionPreferences). The alert
+  // re-reads the time left from the chain before it fires (F220).
+  const alertCycle = dashboardData?.CurRoundNum ?? null;
+  const verifyRemainingMs = useCallback(async (): Promise<number | null> => {
+    if (!cosmicGame) return null;
+    const sample = await fetchEndgameChainSample(cosmicGame);
+    // Another cycle already: this one finalized, nothing is left to warn about.
+    if (alertCycle == null || sample.roundNum !== alertCycle) return 0;
+    queryClient.setQueryData(['allocationTime'], sample.mainPrizeTimeSec);
+    queryClient.setQueryData(['currentTime'], sample.blockTimestampSec);
+    return (sample.mainPrizeTimeSec - sample.blockTimestampSec) * 1000;
+  }, [alertCycle, cosmicGame, queryClient]);
   useAllocationNotification({
     allocationTime: allocationFinalize.allocationTime,
-    cycleNumber: dashboardData?.CurRoundNum ?? null,
+    cycleNumber: alertCycle,
     notificationTitle: t('notifications.finalizationSoonTitle'),
     notificationBody: (minutesLeft) =>
       t('notifications.finalizationSoonBody', { minutes: minutesLeft }),
+    verifyRemainingMs,
   });
 
   // Chime only for a connected viewer who opted in, when their Gesture was
@@ -394,7 +412,10 @@ const HomePage = ({
   // ETL/backend bypassed) that keep the countdown target, last bidder, and
   // claim state within ~1-2s of on-chain reality around the zero-cross.
   const endgame = useEndgameChainSync({ targetMs: allocationTime });
-  const finalizationConfirmed = !endgame.isConfirmationPending;
+  // A tab that returns with a stale deadline holds "ready" until a fresh
+  // reading lands: a Gesture may have moved it while the tab was hidden.
+  const returnResync = useReturnResync();
+  const finalizationConfirmed = !endgame.isConfirmationPending && !returnResync;
 
   const withPostTxRefresh = useCallback(
     (retryMs = 1500, activationMs = 3000, includeCurrentSpecialRecipients = true) => {
@@ -617,9 +638,22 @@ const HomePage = ({
     cycleState.phase === 'final-minute';
   const showPanel = loading || isRoundActive;
 
-  // Endgame theater: the tab title ticks during the final window so players
-  // who tabbed away can see the clock closing from anywhere.
-  useTabTitleCountdown({ enabled: isFinalWindow, targetMs: allocationTime });
+  // The opt-in tab-title countdown during the final window. An armed alert
+  // or countdown keeps the deadline fresh while the tab is hidden, and the
+  // title never counts toward a deadline that stopped updating.
+  const { preferences: attention } = useAttentionPreferences();
+  useBackgroundDeadlineRefresh(
+    attention.finalizationAlert || (attention.tabTitle && isFinalWindow),
+  );
+  const deadlineFreshness = useLiveFreshness({
+    queryKeys: DEADLINE_FRESHNESS_KEYS,
+    pollIntervalMs: 60_000,
+  });
+  useTabTitleCountdown({
+    enabled: isFinalWindow,
+    targetMs: allocationTime,
+    stale: deadlineFreshness.state === 'delayed' || deadlineFreshness.state === 'offline',
+  });
 
   // One shared label for the gesture panel and the action dock, so the
   // displayed cost can never drift between them.

@@ -15,14 +15,23 @@ function formatRemaining(ms: number): string {
  * from anywhere — only when they turned "Countdown in the tab title" on in
  * their attention preferences (off by default). Captures the original title
  * on activation and restores it on deactivation (phase change, preference
- * change, navigation, unmount).
+ * change, navigation, unmount). While the deadline is stale the title reads
+ * "… · {title}" rather than count toward a time that may have moved.
  */
 export function useTabTitleCountdown({
   enabled,
   targetMs,
+  stale = false,
 }: {
   enabled: boolean;
   targetMs: number;
+  /**
+   * The deadline has not been confirmed recently (polls failed or paused in
+   * a hidden tab). Gestures only move the deadline later, so counting toward
+   * a stale one would show false urgency: the title shows an ellipsis
+   * instead until fresh data arrives.
+   */
+  stale?: boolean;
 }): void {
   const baseTitleRef = useRef<string | null>(null);
   const { preferences } = useAttentionPreferences();
@@ -37,7 +46,8 @@ export function useTabTitleCountdown({
 
     const update = () => {
       const base = baseTitleRef.current ?? '';
-      document.title = `${formatRemaining(targetMs - Date.now())} \u00b7 ${base}`;
+      const lead = stale ? '\u2026' : formatRemaining(targetMs - Date.now());
+      document.title = `${lead} \u00b7 ${base}`;
     };
     update();
     const interval = setInterval(update, 1000);
@@ -49,5 +59,5 @@ export function useTabTitleCountdown({
         baseTitleRef.current = null;
       }
     };
-  }, [active, targetMs]);
+  }, [active, stale, targetMs]);
 }
