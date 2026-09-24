@@ -355,6 +355,19 @@ describe('GesturePanel', () => {
     ).toBeInTheDocument();
   });
 
+  it.each(['NFT', 'Token'])(
+    'has no accessibility violations with the %s attachment open',
+    async (contributionType) => {
+      const { container } = render(
+        <GesturePanel
+          {...baseProps}
+          form={makeForm({ advancedExpanded: true, contributionType })}
+        />,
+      );
+      await checkA11y(container);
+    },
+  );
+
   it('hides collision prevention for CST gestures (no ETH cost to bump)', () => {
     render(
       <GesturePanel
