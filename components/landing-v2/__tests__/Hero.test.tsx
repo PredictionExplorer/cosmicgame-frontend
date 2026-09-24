@@ -56,11 +56,17 @@ describe('<Hero />', () => {
     expect(heading).toHaveTextContent(landingContentEn.hero.headlineAccent);
   });
 
-  it('renders the primary CTA linking to the app subdomain', () => {
+  it('renders the primary CTA linking to the app subdomain in the same tab', () => {
     render(<Hero hero={landingContentEn.hero} />);
     const primaryCta = screen.getByRole('link', { name: /open the app/i });
     expect(primaryCta).toHaveAttribute('href', 'https://app.cosmicsignature.com');
-    expect(primaryCta).toHaveAttribute('rel', 'noopener');
+    expect(primaryCta).not.toHaveAttribute('target');
+  });
+
+  it('leaves the site header to the landing shell, outside <main>', () => {
+    render(<Hero hero={landingContentEn.hero} />);
+    expect(screen.queryByRole('banner')).not.toBeInTheDocument();
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
   });
 
   it('renders the secondary CTA anchoring to the cycle section', () => {

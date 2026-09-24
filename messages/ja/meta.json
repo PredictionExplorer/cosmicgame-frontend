@@ -22,7 +22,7 @@
     "description": "確定したすべてのパフォーマンス・サイクルにわたるCosmic Signatureの配分の受領者、サイクル統計、ETH配分の完全な履歴。"
   },
   "anchoring": {
-    "title": "係留",
+    "title": "係留配分",
     "description": "Cosmic Signature NFTをプロトコルに係留して、サイクルごとのETH係留配分を受け取る。係留の全体統計と、Arbitrum上での仕組みを見る。"
   },
   "statistics": {

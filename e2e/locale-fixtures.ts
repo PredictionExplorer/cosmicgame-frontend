@@ -28,20 +28,22 @@ export interface LocaleChromeFixture {
   readonly switcherLabel: string;
   /** Own-language label shown for this locale inside the switcher menu. */
   readonly switcherOption: string;
-  /** Footer legal link labels. */
+  /** Footer legal link labels (the canonical page names, `nav.routes.*.label`). */
   readonly footer: { readonly terms: string; readonly privacy: string };
-  /** Primary navigation labels (desktop rail / mobile drawer). */
+  /** Primary navigation labels (desktop header / mobile drawer). */
   readonly nav: {
     readonly primaryLabel: string;
     readonly openMenu: string;
     readonly gallery: string;
+    /** The Explore panel trigger and drawer section. */
     readonly explore: string;
-    readonly help: string;
+    /** The Learn panel trigger and drawer section (About lives there). */
+    readonly learn: string;
     readonly aboutPattern: RegExp;
   };
-  /** Site-map page heading and one section label. */
+  /** Site-map page heading and one section title (the Trust section). */
   readonly siteMap: { readonly heading: string; readonly title: string; readonly section: string };
-  /** 404 heading pattern and the home-link label. */
+  /** 404 heading pattern and the label of its primary action, which leads to the Observatory. */
   readonly notFound: { readonly headingPattern: RegExp; readonly homeLink: string };
   /** Skip link accessible name. */
   readonly skipLink: string;
@@ -66,7 +68,7 @@ const { cycle, tokenId, contributionId } = ROUTE_FIXTURES;
 export const LOCALE_ROUTE_TEXT: Record<TranslatedLocale, Readonly<Record<string, string>>> = {
   zh: Object.fromEntries(ZH_ROUTE_INVENTORY.map((route) => [route.id, route.expectedText])),
   'zh-TW': {
-    'app-not-found': '404：找不到頁面',
+    'app-not-found': '找不到頁面',
     'site-map': '網站導覽',
     'landing-home': '程序化鏈上藝術',
     about: '關於 Cosmic Signature',
@@ -134,7 +136,7 @@ export const LOCALE_ROUTE_TEXT: Record<TranslatedLocale, Readonly<Record<string,
     'endurance-embed': '此週期暫無領先紀錄',
   },
   'zh-HK': {
-    'app-not-found': '404：找不到頁面',
+    'app-not-found': '找不到頁面',
     'site-map': '網站地圖',
     'landing-home': '程序化鏈上藝術',
     about: '關於 Cosmic Signature',
@@ -202,7 +204,7 @@ export const LOCALE_ROUTE_TEXT: Record<TranslatedLocale, Readonly<Record<string,
     'endurance-embed': '此週期暫無領先記錄',
   },
   uk: {
-    'app-not-found': '404 — Сторінку не знайдено',
+    'app-not-found': 'Сторінку не знайдено',
     'site-map': 'Мапа сайту',
     'landing-home': 'процедурне ончейн-мистецтво',
     about: 'Про Cosmic Signature',
@@ -270,7 +272,7 @@ export const LOCALE_ROUTE_TEXT: Record<TranslatedLocale, Readonly<Record<string,
     'endurance-embed': 'У цьому циклі лідерства ще не було',
   },
   ko: {
-    'app-not-found': '404 — 페이지를 찾을 수 없습니다',
+    'app-not-found': '페이지를 찾을 수 없습니다',
     'site-map': '사이트맵',
     'landing-home': '절차적 온체인 아트',
     about: 'Cosmic Signature 소개',
@@ -338,7 +340,7 @@ export const LOCALE_ROUTE_TEXT: Record<TranslatedLocale, Readonly<Record<string,
     'endurance-embed': '이 사이클에는 아직 선두 기록이 없습니다',
   },
   ja: {
-    'app-not-found': '404：ページが見つかりません',
+    'app-not-found': 'ページが見つかりません',
     'site-map': 'サイトマップ',
     'landing-home': 'プロシージャル・オンチェーンアート',
     about: 'Cosmic Signatureについて',
@@ -406,7 +408,7 @@ export const LOCALE_ROUTE_TEXT: Record<TranslatedLocale, Readonly<Record<string,
     'endurance-embed': 'このサイクルにはまだ先頭記録がありません',
   },
   vi: {
-    'app-not-found': '404 — Không tìm thấy trang',
+    'app-not-found': 'Không tìm thấy trang',
     'site-map': 'Sơ đồ trang',
     'landing-home': 'Nghệ thuật tạo sinh trên chuỗi',
     about: 'Về Cosmic Signature',
@@ -620,11 +622,11 @@ export const LOCALE_CHROME: Record<TranslatedLocale, LocaleChromeFixture> = {
       openMenu: '打开菜单',
       gallery: '画廊',
       explore: '探索',
-      help: '帮助',
+      learn: '学习',
       aboutPattern: /关于 Cosmic Signature/,
     },
-    siteMap: { heading: '网站地图', title: '网站地图 · Cosmic Signature', section: '个人工具' },
-    notFound: { headingPattern: /404：找不到页面/, homeLink: '返回首页' },
+    siteMap: { heading: '网站地图', title: '网站地图 · Cosmic Signature', section: '信任' },
+    notFound: { headingPattern: /^找不到页面$/, homeLink: '前往观测台' },
     skipLink: '跳至主要内容',
     landingH1: getLandingContent('zh').hero.headlineLead,
     landingText: getLandingContent('zh').hero.headlineLead,
@@ -639,11 +641,11 @@ export const LOCALE_CHROME: Record<TranslatedLocale, LocaleChromeFixture> = {
       openMenu: '開啟選單',
       gallery: '畫廊',
       explore: '探索',
-      help: '說明',
+      learn: '學習',
       aboutPattern: /關於 Cosmic Signature/,
     },
-    siteMap: { heading: '網站導覽', title: '網站導覽 · Cosmic Signature', section: '個人工具' },
-    notFound: { headingPattern: /404：找不到頁面/, homeLink: '返回首頁' },
+    siteMap: { heading: '網站導覽', title: '網站導覽 · Cosmic Signature', section: '信任' },
+    notFound: { headingPattern: /^找不到頁面$/, homeLink: '前往觀測台' },
     skipLink: '跳至主要內容',
     landingH1: getLandingContent('zh-TW').hero.headlineLead,
     landingText: getLandingContent('zh-TW').hero.headlineLead,
@@ -658,11 +660,11 @@ export const LOCALE_CHROME: Record<TranslatedLocale, LocaleChromeFixture> = {
       openMenu: '打開選單',
       gallery: '畫廊',
       explore: '探索',
-      help: '幫助',
+      learn: '學習',
       aboutPattern: /關於 Cosmic Signature/,
     },
-    siteMap: { heading: '網站地圖', title: '網站地圖 · Cosmic Signature', section: '個人工具' },
-    notFound: { headingPattern: /404：找不到頁面/, homeLink: '返回主頁' },
+    siteMap: { heading: '網站地圖', title: '網站地圖 · Cosmic Signature', section: '信任' },
+    notFound: { headingPattern: /^找不到頁面$/, homeLink: '前往觀測台' },
     skipLink: '跳至主要內容',
     landingH1: getLandingContent('zh-HK').hero.headlineLead,
     landingText: getLandingContent('zh-HK').hero.headlineLead,
@@ -671,21 +673,21 @@ export const LOCALE_CHROME: Record<TranslatedLocale, LocaleChromeFixture> = {
     script: SCRIPT_PATTERNS.uk,
     switcherLabel: 'Мова',
     switcherOption: 'Українська',
-    footer: { terms: 'Умови', privacy: 'Конфіденційність' },
+    footer: { terms: 'Умови використання', privacy: 'Політика конфіденційності' },
     nav: {
       primaryLabel: 'Основна навігація',
       openMenu: 'Меню',
       gallery: 'Галерея',
       explore: 'Огляд',
-      help: 'Довідка',
+      learn: 'Навчання',
       aboutPattern: /Про Cosmic Signature/,
     },
     siteMap: {
       heading: 'Мапа сайту',
       title: 'Мапа сайту · Cosmic Signature',
-      section: 'Персональні інструменти застосунку',
+      section: 'Довіра',
     },
-    notFound: { headingPattern: /404 — Сторінку не знайдено/, homeLink: 'На головну' },
+    notFound: { headingPattern: /^Сторінку не знайдено$/, homeLink: 'До Обсерваторії' },
     skipLink: 'Перейти до основного вмісту',
     landingH1: getLandingContent('uk').hero.headlineLead,
     landingText: getLandingContent('uk').hero.headlineLead,
@@ -700,11 +702,11 @@ export const LOCALE_CHROME: Record<TranslatedLocale, LocaleChromeFixture> = {
       openMenu: '메뉴',
       gallery: '갤러리',
       explore: '탐색',
-      help: '도움말',
+      learn: '학습',
       aboutPattern: /Cosmic Signature 소개/,
     },
-    siteMap: { heading: '사이트맵', title: '사이트맵 · Cosmic Signature', section: '개인 도구' },
-    notFound: { headingPattern: /404 — 페이지를 찾을 수 없습니다/, homeLink: '홈으로' },
+    siteMap: { heading: '사이트맵', title: '사이트맵 · Cosmic Signature', section: '신뢰' },
+    notFound: { headingPattern: /^페이지를 찾을 수 없습니다$/, homeLink: '관측소로 이동' },
     skipLink: '본문으로 건너뛰기',
     landingH1: getLandingContent('ko').hero.headlineLead,
     landingText: getLandingContent('ko').hero.headlineLead,
@@ -719,15 +721,15 @@ export const LOCALE_CHROME: Record<TranslatedLocale, LocaleChromeFixture> = {
       openMenu: 'メニュー',
       gallery: 'ギャラリー',
       explore: '探索',
-      help: 'ヘルプ',
+      learn: '学ぶ',
       aboutPattern: /Cosmic Signatureについて/,
     },
     siteMap: {
       heading: 'サイトマップ',
       title: 'サイトマップ · Cosmic Signature',
-      section: '個人ツール',
+      section: '信頼',
     },
-    notFound: { headingPattern: /404：ページが見つかりません/, homeLink: 'ホームへ戻る' },
+    notFound: { headingPattern: /^ページが見つかりません$/, homeLink: '観測所へ' },
     skipLink: 'メインコンテンツへスキップ',
     landingH1: getLandingContent('ja').hero.headlineLead,
     landingText: getLandingContent('ja').hero.headlineLead,
@@ -736,21 +738,21 @@ export const LOCALE_CHROME: Record<TranslatedLocale, LocaleChromeFixture> = {
     script: SCRIPT_PATTERNS.vi,
     switcherLabel: 'Ngôn ngữ',
     switcherOption: 'Tiếng Việt',
-    footer: { terms: 'Điều khoản', privacy: 'Quyền riêng tư' },
+    footer: { terms: 'Điều khoản dịch vụ', privacy: 'Chính sách quyền riêng tư' },
     nav: {
       primaryLabel: 'Điều hướng chính',
       openMenu: 'Menu',
       gallery: 'Phòng trưng bày',
       explore: 'Khám phá',
-      help: 'Trợ giúp',
+      learn: 'Tìm hiểu',
       aboutPattern: /Về Cosmic Signature/,
     },
     siteMap: {
       heading: 'Sơ đồ trang',
       title: 'Sơ đồ trang · Cosmic Signature',
-      section: 'Công cụ ứng dụng cá nhân',
+      section: 'Tin cậy',
     },
-    notFound: { headingPattern: /404 — Không tìm thấy trang/, homeLink: 'Về trang chủ' },
+    notFound: { headingPattern: /^Không tìm thấy trang$/, homeLink: 'Đến Đài quan sát' },
     skipLink: 'Chuyển đến nội dung chính',
     landingH1: getLandingContent('vi').hero.headlineLead,
     landingText: getLandingContent('vi').hero.headlineLead,

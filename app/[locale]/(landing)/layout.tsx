@@ -6,6 +6,7 @@ import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server
 
 import { getLandingContent } from '@/content/landing';
 
+import { LandingFooter } from '@/components/landing-v2/LandingFooter';
 import { routing } from '@/i18n/routing';
 import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { LANDING_CHROME_NAMESPACES, pickMessages } from '@/lib/i18n/clientMessages';
@@ -70,7 +71,9 @@ export default async function LandingRootLayout({ children, params }: LayoutProp
     notFound();
   }
   setRequestLocale(locale);
-  const { meta, footer } = getLandingContent(locale);
+  const { meta, footer, cycle, art, tracks } = getLandingContent(locale);
+  // The home page's section names, linked from the header on every landing page.
+  const sections = { cycle: cycle.eyebrow, art: art.eyebrow, tracks: tracks.eyebrow };
   const seo = await getTranslations({ locale, namespace: 'seo' });
   const inLanguage = jsonLdInLanguage(locale);
   const landingUrl = localeHref(LANDING_ORIGIN, '/', locale);
@@ -107,7 +110,9 @@ export default async function LandingRootLayout({ children, params }: LayoutProp
       }
     >
       <NextIntlClientProvider messages={chromeMessages}>
-        <LandingShell footer={footer}>{children}</LandingShell>
+        <LandingShell footer={<LandingFooter footer={footer} />} sections={sections}>
+          {children}
+        </LandingShell>
       </NextIntlClientProvider>
     </RootDocument>
   );

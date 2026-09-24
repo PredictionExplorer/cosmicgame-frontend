@@ -118,6 +118,12 @@
   --font-family-display: var(--display-font-stack);
   --font-display: var(--display-font-stack);
   --font-mono: var(--mono-font-stack);
+  /*
+   * The brand face (`font-brand`): Clash Display in every locale. The
+   * wordmark is a Latin logotype, so no html:lang() rule may swap it; the
+   * uk and vi display stacks would otherwise redraw the logo in Onest.
+   */
+  --font-brand: var(--font-clash-display), 'ClashDisplay-Variable', system-ui, sans-serif;
 
   /*
    * Tailwind v4 only generates `xs:` / `max-xs:` variants for a breakpoint it
@@ -142,6 +148,12 @@
   --header-height: 4.5rem; /* 72px */
   /* Breathing room between the header and anything pinned beneath it. */
   --sticky-offset: calc(var(--header-height) + 0.75rem);
+  /*
+   * Room a fixed bottom bar takes from the end of the page: the footer pads
+   * its last row by it, so the legal links and the colophon stay reachable.
+   * Zero unless a bar is on the page (below).
+   */
+  --dock-clearance: 0px;
 
   /*
    * Companion faces (docs/i18n/README.md §5, lib/fonts.ts). Each names the
@@ -397,6 +409,16 @@ body:has([data-maintenance-banner]) .home-control-shell {
 :root {
   /* shadcn/ui's base radius: the control step of the scale. */
   --radius: var(--radius-control);
+}
+
+/*
+ * The home's phone action dock (`[data-action-dock]`, below 1024px) floats
+ * 12px above the bottom edge and is about 64px tall.
+ */
+@media (max-width: 1023.98px) {
+  :root:has([data-action-dock]) {
+    --dock-clearance: 5.5rem;
+  }
 }
 
 @layer base {

@@ -31,7 +31,7 @@ test.describe('Sprint 1 Chinese layout QA', () => {
       if (viewport.width < 1024) {
         await page.getByRole('button', { name: '打开菜单' }).click();
         const drawer = page.getByRole('dialog');
-        await expect(drawer.getByText('协议', { exact: true })).toBeVisible();
+        await expect(drawer.getByText('参与', { exact: true })).toBeVisible();
         await expect(drawer.getByText('生态', { exact: true })).toBeVisible();
         await expect(drawer.getByText('画廊', { exact: true })).toBeVisible();
         await page.keyboard.press('Escape');
@@ -39,12 +39,14 @@ test.describe('Sprint 1 Chinese layout QA', () => {
         const primary = page.getByRole('navigation', { name: '主导航' });
         await expect(primary.getByText('画廊', { exact: true })).toBeVisible();
         await expect(primary.getByText('探索', { exact: true })).toBeVisible();
-        await expect(primary.getByText('帮助', { exact: true })).toBeVisible();
+        await expect(primary.getByText('学习', { exact: true })).toBeVisible();
       }
 
-      const footerProtocol = page.locator('footer').getByText('协议', { exact: true });
-      await expect(footerProtocol).toHaveCSS('letter-spacing', /^(normal|0px)$/);
-      await expect(footerProtocol).toHaveCSS('font-family', /Noto Sans SC/);
+      const footerSection = page
+        .locator('footer')
+        .getByRole('heading', { name: '参与', exact: true });
+      await expect(footerSection).toHaveCSS('letter-spacing', /^(normal|0px)$/);
+      await expect(footerSection).toHaveCSS('font-family', /Noto Sans SC/);
       await expectNoHorizontalOverflow(page);
 
       await page.goto('/zh/gallery');
@@ -54,10 +56,12 @@ test.describe('Sprint 1 Chinese layout QA', () => {
 
       await page.goto('/zh/site-map');
       await expect(page.getByRole('heading', { level: 1, name: '网站地图' })).toBeVisible();
-      await expect(page.getByText('个人工具', { exact: true })).toBeVisible();
-      await expect(page.getByText('公开协议页面', { exact: true })).toBeVisible();
-      await expect(page.getByText('协议数据页面', { exact: true })).toBeVisible();
-      await expect(page.getByText('生态', { exact: true }).last()).toBeVisible();
+      const siteMap = page.getByRole('main');
+      for (const section of ['参与', '记录', '信任', '账户', '生态']) {
+        await expect(
+          siteMap.getByRole('heading', { level: 2, name: section, exact: true }),
+        ).toBeVisible();
+      }
       await expectNoHorizontalOverflow(page);
 
       await testInfo.attach(`zh-site-map-${viewport.name}`, {
@@ -74,8 +78,8 @@ test.describe('Sprint 1 Chinese layout QA', () => {
       await expectNoHorizontalOverflow(page);
 
       await page.goto('/zh/this-page-does-not-exist');
-      await expect(page.getByRole('heading', { level: 1, name: '404：找不到页面' })).toBeVisible();
-      await expect(page.getByRole('link', { name: '返回首页' })).toBeVisible();
+      await expect(page.getByRole('heading', { level: 1, name: '找不到页面' })).toBeVisible();
+      await expect(page.getByRole('link', { name: '前往观测台' })).toBeVisible();
       await expectNoHorizontalOverflow(page);
     });
   }

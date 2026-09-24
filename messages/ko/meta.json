@@ -22,7 +22,7 @@
     "description": "마감된 모든 퍼포먼스 사이클에 걸친 Cosmic Signature 배분 수령자 전체 내역과 사이클 통계, ETH 배분 현황을 확인할 수 있습니다."
   },
   "anchoring": {
-    "title": "앵커링",
+    "title": "앵커링 지급",
     "description": "Cosmic Signature NFT를 프로토콜에 앵커링하면 사이클마다 ETH 앵커링 지급을 받습니다. 전체 앵커링 통계와 함께 이 메커니즘이 Arbitrum에서 어떻게 작동하는지 확인할 수 있습니다."
   },
   "statistics": {

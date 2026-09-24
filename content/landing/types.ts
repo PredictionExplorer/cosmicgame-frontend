@@ -171,26 +171,12 @@ export interface LandingFaqContent {
   readonly items: readonly LandingFaqItem[];
 }
 
-export interface LandingFooterColumn {
-  readonly heading: string;
-  readonly links: readonly LandingLink[];
-}
-
+/** The landing footer's own copy; its links come from config/siteNav.ts. */
 export interface LandingFooterContent {
-  readonly brandName: string;
-  readonly logoAlt: string;
   readonly tagline: string;
-  readonly columns: readonly LandingFooterColumn[];
   /** Serializable template. Replace `{year}` with the current four-digit year. */
   readonly copyright: string;
   readonly colophon: string;
-}
-
-export interface LandingNotFoundContent {
-  readonly code: string;
-  readonly heading: string;
-  readonly description: string;
-  readonly cta: LandingLink;
 }
 
 export interface LandingContent {
@@ -205,5 +191,4 @@ export interface LandingContent {
   readonly verifiability: LandingVerifiabilityContent;
   readonly faq: LandingFaqContent;
   readonly footer: LandingFooterContent;
-  readonly notFound: LandingNotFoundContent;
 }

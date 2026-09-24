@@ -1,6 +1,7 @@
 {
   "connect": {
     "button": "지갑 연결",
+    "buttonShort": "연결",
     "opening": "지갑 목록을 여는 중…",
     "restoring": "지갑 연결을 복원하는 중…",
     "disclaimer": "지갑을 연결하면 <terms>이용약관</terms>에 동의하고 <risk>위험 고지</risk> 내용을 확인한 것으로 간주됩니다. 제스처는 {network} 네트워크에서 이루어지며, 제스처 비용과 네트워크 수수료를 위해 해당 네트워크의 ETH가 필요합니다."
@@ -12,27 +13,22 @@
   "balances": {
     "eth": "ETH",
     "cst": "CST",
-    "cosmicNfts": "Cosmic NFT",
-    "rwlkNfts": "RWLK NFT",
+    "cosmicNfts": "Cosmic Signature NFT",
+    "rwlkNfts": "RandomWalk NFT",
     "anchoredCst": "앵커링된 Cosmic Signature NFT",
-    "anchoredRwlk": "앵커링된 RWLK NFT"
+    "anchoredRwlk": "앵커링된 RandomWalk NFT"
   },
   "labels": {
-    "loading": "불러오는 중…",
-    "balancesHeading": "잔액",
-    "anchoredHeading": "앵커링",
-    "nftCount": "{count}"
+    "balancesHeading": "잔액"
   },
   "account": {
     "heading": "계정",
-    "myDashboard": "내 대시보드",
-    "myRewards": "내 배분",
-    "myNfts": "내 NFT",
-    "transferCst": "CST 전송",
+    "menuLabel": "{address} 계정 메뉴",
+    "menuLabelWithAlert": "{address} 계정 메뉴. 회수할 배분이 있습니다",
+    "retrieveReady": "회수 가능",
+    "retrieveAmount": "회수 가능: {amount}",
     "addCstToMetaMask": "MetaMask에 CST 추가",
     "addingCstToMetaMask": "MetaMask에 CST 추가 중…",
-    "myAnchors": "내 앵커링",
-    "winningHistory": "내 배분 내역",
     "viewOnExplorer": "{explorer} 사이트에서 보기",
     "switchWallet": "지갑 변경",
     "disconnect": "연결 해제"

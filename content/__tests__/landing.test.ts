@@ -1,6 +1,7 @@
 import { getLandingContent, landingContentEn, landingContentZh } from '@/content/landing';
 
 import { CST_GECKOTERMINAL_POOL_URL } from '@/config/geckoterminal';
+import { outboundLinks } from '@/config/siteNav';
 
 const landingContent = landingContentEn;
 
@@ -18,7 +19,6 @@ describe('landing content shape', () => {
     expect(landingContentZh.art.stages).toHaveLength(landingContentEn.art.stages.length);
     expect(landingContentZh.tracks.items).toHaveLength(landingContentEn.tracks.items.length);
     expect(landingContentZh.faq.items).toHaveLength(landingContentEn.faq.items.length);
-    expect(landingContentZh.footer.columns).toHaveLength(landingContentEn.footer.columns.length);
     expect(JSON.stringify(landingContentZh)).toMatch(/[\u3400-\u9fff]/);
   });
 
@@ -66,16 +66,15 @@ describe('landing content shape', () => {
     expect(landingContent.faq.items.length).toBeGreaterThanOrEqual(5);
   });
 
-  it('footer has exactly four link columns', () => {
-    expect(landingContent.footer.columns).toHaveLength(4);
+  it('footer copy carries the tagline, a {year} copyright template and the colophon', () => {
+    expect(landingContent.footer.tagline).toEqual(expect.any(String));
+    expect(landingContent.footer.copyright).toContain('{year}');
+    expect(landingContent.footer.colophon).toEqual(expect.any(String));
   });
 
-  it('footer ecosystem column links Axiom Zero, Chaos Zero, Uniswap, and GeckoTerminal', () => {
-    const ecosystem = landingContent.footer.columns.find(
-      (column) => column.heading === 'Ecosystem',
-    );
-    expect(ecosystem).toBeDefined();
-    const hrefs = ecosystem!.links.map((link) => link.href);
+  it('the shared footer ecosystem row links Axiom Zero, Chaos Zero, Uniswap, and GeckoTerminal', () => {
+    // Both footers render the taxonomy (config/siteNav.ts), not landing copy.
+    const hrefs = outboundLinks('ecosystem').map((link) => link.href);
     expect(hrefs).toContain('https://www.axiomzero.market/cosmic-signature');
     expect(hrefs).toContain('https://chaoszero.com');
     expect(hrefs.some((href) => href.startsWith('https://app.uniswap.org/'))).toBe(true);

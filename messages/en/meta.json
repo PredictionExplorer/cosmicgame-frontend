@@ -22,7 +22,7 @@
     "description": "View the complete history of Cosmic Signature allocation recipients, cycle statistics, and ETH distributions across all finalized Performance Cycles."
   },
   "anchoring": {
-    "title": "Anchoring",
+    "title": "Anchor Distributions",
     "description": "Anchor your Cosmic Signature NFTs to the protocol to receive per-cycle ETH Anchor Distributions. View global anchoring statistics and how the mechanism works on Arbitrum."
   },
   "statistics": {

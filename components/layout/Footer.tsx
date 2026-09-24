@@ -1,274 +1,43 @@
 'use client';
 
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
-import { Link } from '@/i18n/navigation';
-import type { AppLocale } from '@/i18n/routing';
-import { LanguageDirectory } from '@/components/layout/LanguageDirectory';
-import { BrandMark } from '@/components/layout/BrandMark';
-import { FooterWrapper } from '@/components/styled';
-import { CST_GECKOTERMINAL_POOL_URL } from '@/config/geckoterminal';
-import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
-import { CHAOS_ZERO_PREDICTIONS_URL } from '@/config/predictions';
-import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 import { getClientBuildInfo, isVercelProductionDeploy } from '@/lib/buildInfo';
-import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
 
-const XIcon = (props: { className?: string }) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="currentColor"
-    aria-hidden="true"
-    {...props}
-    style={{ width: 16, height: 16 }}
-  >
-    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231L18.244 2.25Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z" />
-  </svg>
-);
-
-const DiscordIcon = (props: { className?: string }) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="currentColor"
-    aria-hidden="true"
-    {...props}
-    style={{ width: 16, height: 16 }}
-  >
-    <path d="M20.317 4.369A19.791 19.791 0 0 0 16.558 3.2a.074.074 0 0 0-.079.037c-.34.6-.716 1.38-.979 1.994a18.27 18.27 0 0 0-5 0 12.64 12.64 0 0 0-.987-1.994.077.077 0 0 0-.079-.037 19.736 19.736 0 0 0-3.76 1.17.07.07 0 0 0-.032.027C2.533 8.045 1.862 11.607 2.202 15.125a.082.082 0 0 0 .031.056 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.2 14.2 0 0 0 1.226-1.994.076.076 0 0 0-.041-.105 13.104 13.104 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .077-.01c3.927 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .079.009c.12.099.245.198.372.292a.077.077 0 0 1-.006.128 12.3 12.3 0 0 1-1.873.891.077.077 0 0 0-.04.106c.36.698.773 1.363 1.225 1.993a.076.076 0 0 0 .084.029 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-4.108-.838-7.638-3.548-10.79a.061.061 0 0 0-.031-.028ZM8.02 13.041c-1.183 0-2.157-1.086-2.157-2.419 0-1.333.955-2.42 2.157-2.42 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.955 2.419-2.157 2.419Zm7.975 0c-1.183 0-2.157-1.086-2.157-2.419 0-1.333.955-2.42 2.157-2.42 1.21 0 2.175 1.096 2.156 2.42 0 1.333-.946 2.419-2.156 2.419Z" />
-  </svg>
-);
+import { SiteFooter } from './SiteFooter';
 
 /**
- * Footer navigation. Because the header's Explore/Help destinations live in
- * client-only dropdown panels, this footer is the primary server-rendered
- * crawl path for them — every internal route from the header nav must stay
- * reachable here or on /site-map (enforced by app/__tests__/crawl-paths).
+ * The app footer: the shared site footer (the full directory of both hosts,
+ * grouped by the navigation taxonomy) plus the build commit on previews.
+ * The header's Explore and Learn panels are client-only, so this footer is
+ * the server-rendered crawl path for their routes (guarded by
+ * app/[locale]/(app)/__tests__/crawl-paths.test.tsx).
  */
-type FooterTranslator = (key: string) => string;
-
-interface FooterLink {
-  label: string;
-  href: string;
-  external?: boolean;
-}
-
-interface FooterGroup {
-  title: string;
-  links: FooterLink[];
-}
-
-function getFooterLinks(t: FooterTranslator, locale: AppLocale): FooterGroup[] {
-  return [
-    {
-      title: t('sections.protocol'),
-      links: [
-        { label: t('links.gallery'), href: '/gallery' },
-        { label: t('links.currentCycle'), href: '/current-cycle' },
-        { label: t('links.statistics'), href: '/statistics' },
-        { label: t('links.contracts'), href: '/contracts' },
-        { label: t('links.sourceCode'), href: '/code' },
-      ],
-    },
-    {
-      title: t('sections.explore'),
-      links: [
-        { label: t('links.allocationRecipients'), href: '/allocation' },
-        { label: t('links.anchorDistributions'), href: '/anchoring' },
-        { label: t('links.outreachReserve'), href: '/marketing' },
-        { label: t('links.howItWorks'), href: '/how-it-works' },
-        { label: t('links.faq'), href: '/faq' },
-      ],
-    },
-    {
-      title: t('sections.ecosystem'),
-      links: [
-        {
-          label: t('links.axiomZero'),
-          href: COSMIC_SIGNATURE_MARKETPLACE_URL,
-          external: true,
-        },
-        { label: t('links.chaosZero'), href: CHAOS_ZERO_PREDICTIONS_URL, external: true },
-        { label: t('links.uniswap'), href: CST_UNISWAP_SWAP_URL, external: true },
-        {
-          label: t('links.geckoTerminal'),
-          href: CST_GECKOTERMINAL_POOL_URL,
-          external: true,
-        },
-      ],
-    },
-    {
-      title: t('sections.resources'),
-      links: [
-        {
-          label: t('links.about'),
-          href: localeHref(LANDING_ORIGIN, '/about', locale),
-          external: true,
-        },
-        {
-          label: t('links.learn'),
-          href: localeHref(LANDING_ORIGIN, '/learn', locale),
-          external: true,
-        },
-        {
-          label: t('links.whitePaper'),
-          href: localeHref(LANDING_ORIGIN, '/white-paper', locale),
-          external: true,
-        },
-        { label: t('links.audits'), href: '/audits' },
-        { label: t('links.siteMap'), href: '/site-map' },
-        {
-          label: t('links.protocolGuild'),
-          href: 'https://protocol-guild.readthedocs.io',
-          external: true,
-        },
-      ],
-    },
-    {
-      title: t('sections.community'),
-      links: [
-        { label: t('links.twitter'), href: 'https://x.com/CosmicSignature', external: true },
-        { label: t('links.discord'), href: 'https://discord.gg/bGnPn96Qwt', external: true },
-        {
-          label: t('links.discover'),
-          href: localeHref(LANDING_ORIGIN, '/', locale),
-          external: true,
-        },
-      ],
-    },
-  ];
-}
-
 const Footer = () => {
   const t = useTranslations('footer');
-  const commonT = useTranslations('common');
-  const navT = useTranslations('nav');
-  const locale = useLocale() as AppLocale;
-  const footerLinks = getFooterLinks(t, locale);
   const build = getClientBuildInfo();
   const showBuild =
     build && (!isVercelProductionDeploy() || process.env.NEXT_PUBLIC_SHOW_BUILD_COMMIT === '1');
 
   return (
-    <FooterWrapper className="relative mt-auto border-t border-white/10">
-      <div className="relative overflow-hidden">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-linear-to-br from-primary/[0.04] via-transparent to-transparent"
-        />
-        <div className="site-container relative">
-          <div className="grid gap-10 py-12 sm:py-14 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,3.4fr)] xl:gap-12">
-            <div className="min-w-0">
-              <Link
-                href="/"
-                aria-label={navT('brand.homeLabel')}
-                className="inline-flex min-h-11 max-w-full items-center gap-3 no-underline"
-              >
-                <BrandMark className="h-9 w-9 shrink-0" />
-                <span className="font-display text-xl font-semibold tracking-tight text-foreground [overflow-wrap:anywhere]">
-                  Cosmic <span className="text-primary">Signature</span>
-                </span>
-              </Link>
-              <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted-foreground">
-                {t('tagline')}
-              </p>
-              <div className="mt-5 flex items-center gap-2">
-                <a
-                  href="https://x.com/CosmicSignature"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={t('social.twitterLabel')}
-                  className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/[0.02] text-muted-foreground transition hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
-                >
-                  <XIcon />
-                </a>
-                <a
-                  href="https://discord.gg/bGnPn96Qwt"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={t('social.discordLabel')}
-                  className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/[0.02] text-muted-foreground transition hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
-                >
-                  <DiscordIcon />
-                </a>
-              </div>
-            </div>
-
-            <nav
-              aria-label={commonT('accessibility.footer')}
-              className="grid min-w-0 grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 lg:grid-cols-5"
-            >
-              {footerLinks.map(({ title, links }) => (
-                <div key={title} className="min-w-0">
-                  <h2 className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-white/65 [overflow-wrap:anywhere]">
-                    {title}
-                  </h2>
-                  <ul className="space-y-0.5">
-                    {links.map((link) => (
-                      <li key={link.label}>
-                        {link.external ? (
-                          <a
-                            href={link.href}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex min-h-11 max-w-full items-center py-1.5 text-sm leading-relaxed text-white/70 no-underline transition hover:text-white [overflow-wrap:anywhere]"
-                          >
-                            {link.label}
-                          </a>
-                        ) : (
-                          <Link
-                            href={link.href}
-                            className="inline-flex min-h-11 max-w-full items-center py-1.5 text-sm leading-relaxed text-white/70 no-underline transition hover:text-white [overflow-wrap:anywhere]"
-                          >
-                            {link.label}
-                          </Link>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </nav>
-          </div>
-
-          <div className="border-t border-white/10 py-5">
-            <LanguageDirectory />
-          </div>
-
-          <div className="flex flex-col items-center justify-between gap-4 border-t border-white/10 py-6 text-xs lg:flex-row">
-            <div className="flex flex-col items-center gap-1 sm:items-start">
-              <p className="text-white/50">{t('copyright', { year: new Date().getFullYear() })}</p>
-              {showBuild ? (
-                <p
-                  data-testid="build-commit"
-                  className="font-mono text-[10px] text-white/40 [overflow-wrap:anywhere]"
-                  title={`${build.fullSha}${build.ref ? ` (${build.ref})` : ''}`}
-                >
-                  {build.shortSha}
-                  {build.ref ? ` · ${build.ref}` : ''}
-                </p>
-              ) : null}
-            </div>
-            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-              <span className="font-mono uppercase tracking-[0.24em] text-white/40">
-                {t('colophon')}
-              </span>
-              <Link
-                href="/terms"
-                className="inline-flex min-h-11 items-center text-white/60 no-underline transition hover:text-white"
-              >
-                {t('links.terms')}
-              </Link>
-              <Link
-                href="/privacy"
-                className="inline-flex min-h-11 items-center text-white/60 no-underline transition hover:text-white"
-              >
-                {t('links.privacy')}
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    </FooterWrapper>
+    <SiteFooter
+      host="app"
+      tagline={t('tagline')}
+      copyright={t('copyright', { year: String(new Date().getFullYear()) })}
+      colophon={t('colophon')}
+      meta={
+        showBuild ? (
+          <p
+            data-testid="build-commit"
+            className="type-mono text-subtle [overflow-wrap:anywhere]"
+            title={`${build.fullSha}${build.ref ? ` (${build.ref})` : ''}`}
+          >
+            {build.shortSha}
+            {build.ref ? ` · ${build.ref}` : ''}
+          </p>
+        ) : null
+      }
+    />
   );
 };
 

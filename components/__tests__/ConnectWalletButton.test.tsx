@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 
-import { render, screen, checkA11y } from '@/test-utils';
+import { render, screen, checkA11y, within } from '@/test-utils';
 
 jest.mock('@rainbow-me/rainbowkit');
 jest.mock('wagmi');
@@ -21,200 +21,72 @@ jest.mock('../../hooks/useMetaMaskWatchAsset', () => ({
   }),
 }));
 
-// eslint-disable-next-line import/order
+// eslint-disable-next-line import/order -- the mocks above must load before the component
 import ConnectWalletButton from '@/components/common/ConnectWalletButton';
 
+const ACCOUNT = '0x1234567890abcdef1234567890abcdef12345678';
 const defaultBalance = { ETH: 1.5, CosmicToken: 100, CosmicSignature: 3, RWLK: 2 };
-const defaultAnchored = { cst: 1, rwalk: 0 };
+
+function renderConnected(props: Partial<React.ComponentProps<typeof ConnectWalletButton>> = {}) {
+  mockUseActiveWeb3React.mockReturnValue({ account: ACCOUNT, chainId: 421614, active: true });
+  return render(
+    <ConnectWalletButton
+      presentation="menu"
+      loading={false}
+      balance={defaultBalance}
+      stakedTokenCount={{ cst: 1, rwalk: 0 }}
+      {...props}
+    />,
+  );
+}
+
+async function openMenu() {
+  await userEvent.setup().click(screen.getByTestId('wallet-menu-trigger'));
+  return screen.findByRole('menu');
+}
 
 beforeEach(() => {
   jest.clearAllMocks();
   mockUseActiveWeb3React.mockReturnValue({ account: null, chainId: 421614, active: false });
 });
 
-describe('ConnectWalletButton', () => {
-  it('renders the RainbowKit ConnectButton when wallet is not connected', () => {
-    const { container } = render(
-      <ConnectWalletButton
-        isMobileView={false}
-        loading={false}
-        balance={defaultBalance}
-        stakedTokenCount={defaultAnchored}
-      />,
-    );
-    expect(container).toBeInTheDocument();
+describe('ConnectWalletButton balances', () => {
+  it('shows the short address on the pill', () => {
+    renderConnected();
+    expect(
+      within(screen.getByTestId('wallet-menu-trigger')).getByText(/0x1234…⁠5678/),
+    ).toBeInTheDocument();
   });
 
-  it('renders the shortened wallet address when connected (desktop)', () => {
-    mockUseActiveWeb3React.mockReturnValue({
-      account: '0x1234567890abcdef1234567890abcdef12345678',
-      chainId: 421614,
-      active: true,
+  it('lists balances and anchored NFTs as figures, units in the labels', async () => {
+    renderConnected({
+      balance: { ETH: 2.5, CosmicToken: 50, CosmicSignature: 5, RWLK: 3 },
+      stakedTokenCount: { cst: 7, rwalk: 2 },
     });
-
-    render(
-      <ConnectWalletButton
-        isMobileView={false}
-        loading={false}
-        balance={defaultBalance}
-        stakedTokenCount={defaultAnchored}
-      />,
-    );
-
-    expect(screen.getByText(/0x1234…\u20605678/)).toBeInTheDocument();
+    const menu = await openMenu();
+    expect(within(menu).getByText('wallet.labels.balancesHeading')).toBeInTheDocument();
+    const figure = (label: string) =>
+      within(menu).getByText(label).closest('div')?.querySelector('dd')?.textContent;
+    expect(figure('wallet.balances.eth')).toMatch(/^2\.5/);
+    expect(figure('wallet.balances.cosmicNfts')).toBe('5');
+    expect(figure('wallet.balances.anchoredCst')).toBe('7');
+    expect(figure('wallet.balances.anchoredRwlk')).toBe('2');
   });
 
-  it('renders the shortened wallet address in mobile view when connected', () => {
-    mockUseActiveWeb3React.mockReturnValue({
-      account: '0x1234567890abcdef1234567890abcdef12345678',
-      chainId: 421614,
-      active: true,
-    });
-
-    render(
-      <ConnectWalletButton
-        isMobileView={true}
-        loading={false}
-        balance={defaultBalance}
-        stakedTokenCount={defaultAnchored}
-      />,
-    );
-
-    const pill = screen.getByText(/0x1234…\u20605678/);
-    expect(pill).toBeInTheDocument();
-    // Below the sm breakpoint the address is announced but not drawn, so the
-    // icon-only trigger fits the 320px header.
-    expect(pill).toHaveClass('sr-only', 'sm:not-sr-only');
-  });
-
-  it('renders dropdown trigger with address when connected (desktop)', () => {
-    mockUseActiveWeb3React.mockReturnValue({
-      account: '0x1234567890abcdef1234567890abcdef12345678',
-      chainId: 421614,
-      active: true,
-    });
-
-    render(
-      <ConnectWalletButton
-        isMobileView={false}
-        loading={false}
-        balance={defaultBalance}
-        stakedTokenCount={defaultAnchored}
-      />,
-    );
-
-    const trigger = screen.getByText(/0x1234…\u20605678/);
-    expect(trigger).toBeInTheDocument();
-  });
-
-  it('shows balance after opening dropdown', async () => {
-    const user = userEvent.setup();
-    mockUseActiveWeb3React.mockReturnValue({
-      account: '0x1234567890abcdef1234567890abcdef12345678',
-      chainId: 421614,
-      active: true,
-    });
-
-    render(
-      <ConnectWalletButton
-        isMobileView={false}
-        loading={false}
-        balance={{ ETH: 2.5, CosmicToken: 50, CosmicSignature: 5, RWLK: 3 }}
-        stakedTokenCount={defaultAnchored}
-      />,
-    );
-
-    await user.click(screen.getByText(/0x1234…\u20605678/));
-
-    expect(screen.getByText('wallet.labels.balancesHeading')).toBeInTheDocument();
-    expect(screen.getByText('2.5000')).toBeInTheDocument();
-  });
-
-  it('shows "Loading..." in dropdown when loading is true', async () => {
-    const user = userEvent.setup();
-    mockUseActiveWeb3React.mockReturnValue({
-      account: '0x1234567890abcdef1234567890abcdef12345678',
-      chainId: 421614,
-      active: true,
-    });
-
-    render(
-      <ConnectWalletButton
-        isMobileView={false}
-        loading={true}
-        balance={defaultBalance}
-        stakedTokenCount={defaultAnchored}
-      />,
-    );
-
-    await user.click(screen.getByText(/0x1234…\u20605678/));
-
-    expect(screen.getByText('wallet.labels.loading')).toBeInTheDocument();
-  });
-
-  it('shows anchored token counts in dropdown', async () => {
-    const user = userEvent.setup();
-    mockUseActiveWeb3React.mockReturnValue({
-      account: '0x1234567890abcdef1234567890abcdef12345678',
-      chainId: 421614,
-      active: true,
-    });
-
-    render(
-      <ConnectWalletButton
-        isMobileView={false}
-        loading={false}
-        balance={defaultBalance}
-        stakedTokenCount={{ cst: 7, rwalk: 2 }}
-      />,
-    );
-
-    await user.click(screen.getByText(/0x1234…\u20605678/));
-
-    expect(screen.getByText('wallet.balances.anchoredCst')).toBeInTheDocument();
-    expect(screen.queryByText('CST NFTs')).not.toBeInTheDocument();
-    expect(screen.getByText('7')).toBeInTheDocument();
-  });
-
-  it('renders nav links with correct hrefs in dropdown', async () => {
-    const user = userEvent.setup();
-    mockUseActiveWeb3React.mockReturnValue({
-      account: '0x1234567890abcdef1234567890abcdef12345678',
-      chainId: 421614,
-      active: true,
-    });
-
-    render(
-      <ConnectWalletButton
-        isMobileView={false}
-        loading={false}
-        balance={defaultBalance}
-        stakedTokenCount={defaultAnchored}
-      />,
-    );
-
-    await user.click(screen.getByText(/0x1234…\u20605678/));
-
-    expect(screen.getByText('wallet.account.myDashboard')).toBeInTheDocument();
-    expect(screen.getByText('wallet.account.myNfts')).toBeInTheDocument();
-    expect(screen.queryByText('Transfer NFTs')).not.toBeInTheDocument();
-
-    const statLink = screen.getByText('wallet.account.myDashboard').closest('a');
-    expect(statLink).toHaveAttribute('href', '/my-statistics');
-    expect(screen.getByText('wallet.account.myNfts').closest('a')).toHaveAttribute(
-      'href',
-      '/my-tokens',
-    );
-    expect(document.querySelector('a[href="/transfer-cosmic-signature-nfts"]')).toBeNull();
+  it('shows a loading mark instead of figures while balances load', async () => {
+    renderConnected({ loading: true });
+    const menu = await openMenu();
+    expect(
+      within(menu).getByText('wallet.balances.eth').closest('div')?.querySelector('dd'),
+    ).toHaveTextContent('…');
   });
 
   it('has no accessibility violations', async () => {
     const { container } = render(
       <ConnectWalletButton
-        isMobileView={false}
         loading={false}
         balance={defaultBalance}
-        stakedTokenCount={defaultAnchored}
+        stakedTokenCount={{ cst: 1, rwalk: 0 }}
       />,
     );
     await checkA11y(container);

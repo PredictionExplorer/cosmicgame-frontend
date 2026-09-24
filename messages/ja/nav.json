@@ -5,23 +5,80 @@
   },
   "primaryLabel": "メインナビゲーション",
   "menuLabel": "メニュー",
+  "menuLabelWithAlert": "メニュー。受け取れる配分があります",
   "drawerTitle": "ナビゲーション",
-  "sections": {
-    "protocol": "プロトコル",
-    "ecosystem": "エコシステム",
-    "myAccount": "アカウント"
+  "menus": {
+    "explore": "探索",
+    "learn": "学ぶ"
   },
-  "links": {
+  "sections": {
+    "participate": "参加",
+    "collection": "コレクション",
+    "explore": "探索",
+    "records": "記録",
+    "learn": "学ぶ",
+    "trust": "信頼",
+    "account": "アカウント",
+    "ecosystem": "エコシステム",
+    "community": "コミュニティ"
+  },
+  "routes": {
+    "observatory": {
+      "label": "観測所",
+      "description": "進行中のサイクルで一筆を入れる"
+    },
+    "currentCycle": {
+      "label": "現在のサイクル",
+      "description": "進行中のサイクルのすべての一筆と順位"
+    },
+    "imprint": {
+      "label": "RandomWalk NFTの刻印",
+      "description": "RandomWalk NFTを刻印して一筆の費用を下げる"
+    },
     "gallery": {
       "label": "ギャラリー",
       "description": "これまでに刻印されたすべてのシグネチャー"
     },
-    "explore": {
-      "label": "探索"
+    "namedNfts": {
+      "label": "名前付きNFT",
+      "description": "所有者が名前を付けたシグネチャー"
     },
-    "currentCycle": {
-      "label": "現在のサイクル",
-      "description": "進行中のサイクルを形づくる直近の一筆"
+    "attachedNfts": {
+      "label": "添付されたNFT拠出",
+      "description": "各サイクルで一筆に添付されたNFT"
+    },
+    "usedRwlkNfts": {
+      "label": "使用済みのRandomWalk NFT",
+      "description": "一筆の費用の割引にすでに使われたRandomWalk NFT"
+    },
+    "statistics": {
+      "label": "統計",
+      "description": "プロトコル全体の指標と記録"
+    },
+    "statisticsParticipation": {
+      "label": "参加統計",
+      "short": "参加",
+      "description": "参加者と一筆の推移"
+    },
+    "statisticsTokens": {
+      "label": "トークン分布統計",
+      "short": "トークン",
+      "description": "CSTとNFTの供給量と保有者"
+    },
+    "statisticsAnchoring": {
+      "label": "係留統計",
+      "short": "係留",
+      "description": "係留の合計と履歴"
+    },
+    "statisticsActivity": {
+      "label": "一筆の活動統計",
+      "short": "活動",
+      "description": "サイクルごとの一筆のタイミング"
+    },
+    "statisticsPerformance": {
+      "label": "参加者の実績統計",
+      "short": "実績",
+      "description": "サイクルの記録と参加者の順位"
     },
     "allocationRecipients": {
       "label": "配分の受領者",
@@ -31,20 +88,36 @@
       "label": "係留配分",
       "description": "係留中のNFTとその配分"
     },
-    "outreachReserve": {
-      "label": "広報準備金",
-      "description": "コミュニティへの広報活動"
+    "outreachAllocations": {
+      "label": "広報配分",
+      "description": "広報準備金から配分されたCST"
     },
-    "statistics": {
-      "label": "統計",
-      "description": "プロトコル全体の指標と記録"
+    "publicGoodsProtocol": {
+      "label": "プロトコルの公共財拠出",
+      "short": "プロトコル拠出",
+      "description": "各サイクルの公共財配分"
     },
-    "contracts": {
-      "label": "コントラクト",
-      "description": "検証済みのアドレスとソースコード"
+    "publicGoodsVoluntary": {
+      "label": "自発的な公共財拠出",
+      "short": "自発的な拠出",
+      "description": "公共財金庫への直接の拠出"
     },
-    "help": {
-      "label": "ヘルプ"
+    "publicGoodsRetrievals": {
+      "label": "公共財の受け取り",
+      "short": "受け取り",
+      "description": "公共財金庫から送られた資金"
+    },
+    "ethContributions": {
+      "label": "直接ETH拠出",
+      "description": "直接拠出されたETHとそのメモ"
+    },
+    "coordinationChanges": {
+      "label": "調整の変更履歴",
+      "description": "プロトコルのパラメーターのすべての変更"
+    },
+    "retrievedAllocations": {
+      "label": "受け取り済みの配分",
+      "description": "確定したサイクルの配分記録"
     },
     "howItWorks": {
       "label": "仕組み",
@@ -54,34 +127,169 @@
       "label": "よくある質問",
       "description": "よく寄せられる質問への回答"
     },
-    "about": {
-      "label": "Cosmic Signatureについて",
-      "description": "プロトコルの背景にある物語"
-    },
-    "learn": {
+    "learnHub": {
       "label": "学習ハブ",
-      "description": "ガイドと詳しい解説"
+      "description": "プロトコル、アート、参加方法のガイド"
     },
     "whitePaper": {
       "label": "ホワイトペーパー",
       "description": "プロトコルの完全なリファレンス"
     },
-    "discover": {
-      "label": "Cosmic Signatureを知る",
-      "description": "アート、物語、そしてプロトコル"
+    "quiz": {
+      "label": "クイズ",
+      "description": "3段階で理解度を確認"
     },
-    "myDashboard": "ダッシュボード",
-    "myAllocations": "自分の配分",
-    "myNfts": "自分のNFT",
-    "myAnchors": "自分の係留",
-    "recipientHistory": "受領履歴"
+    "about": {
+      "label": "Cosmic Signatureについて",
+      "short": "概要",
+      "description": "プロトコルの背景にある物語"
+    },
+    "projectSite": {
+      "label": "プロジェクトサイト",
+      "description": "アート、物語、プロトコルをひと目で"
+    },
+    "security": {
+      "label": "セキュリティ",
+      "description": "プロトコルを検証し、安全に利用する方法"
+    },
+    "audits": {
+      "label": "監査",
+      "description": "監査と形式検証の状況"
+    },
+    "contracts": {
+      "label": "コントラクト",
+      "description": "Arbitrum上の検証済みコントラクトアドレス"
+    },
+    "sourceCode": {
+      "label": "ソースコード",
+      "description": "レンダリングパイプラインとコントラクトのソース"
+    },
+    "riskDisclosures": {
+      "label": "リスク開示",
+      "description": "参加する前に理解しておくこと"
+    },
+    "terms": {
+      "label": "利用規約",
+      "description": "アプリの利用と参加に関する条件"
+    },
+    "privacy": {
+      "label": "プライバシーポリシー",
+      "description": "ウォレットデータ、アナリティクス、オンチェーンの透明性"
+    },
+    "siteMap": {
+      "label": "サイトマップ",
+      "description": "セクション別のすべてのページ"
+    },
+    "myStatistics": {
+      "label": "自分の統計",
+      "description": "自分の一筆、配分、係留"
+    },
+    "myAllocations": {
+      "label": "自分の配分",
+      "description": "受け取りを待っている配分"
+    },
+    "myNfts": {
+      "label": "自分のNFT",
+      "description": "ウォレット内のシグネチャー"
+    },
+    "myAnchors": {
+      "label": "自分の係留",
+      "description": "NFTを係留し、配分を受け取る"
+    },
+    "allocationHistory": {
+      "label": "自分の配分履歴",
+      "description": "ウォレットへのすべての配分"
+    },
+    "transferCst": {
+      "label": "CSTの送付",
+      "description": "別のアドレスへCSTを送る"
+    }
+  },
+  "groups": {
+    "publicGoods": {
+      "label": "公共財",
+      "description": "イーサリアムのコア開発者へのすべての拠出"
+    }
+  },
+  "outbound": {
+    "uniswap": {
+      "label": "UniswapでCSTを取引",
+      "description": "Arbitrum上でETHをCSTにスワップ"
+    },
+    "axiomZero": {
+      "label": "Axiom Zero",
+      "description": "手数料ゼロのNFTマーケットプレイス"
+    },
+    "chaosZero": {
+      "label": "Chaos Zero",
+      "description": "独立した予測市場"
+    },
+    "geckoTerminal": {
+      "label": "GeckoTerminal",
+      "description": "CSTプールの価格と流動性"
+    },
+    "x": {
+      "label": "X（Twitter）",
+      "description": "ニュースとお知らせ"
+    },
+    "discord": {
+      "label": "Discord",
+      "description": "コミュニティとの交流"
+    },
+    "github": {
+      "label": "GitHub",
+      "description": "オープンソースのリポジトリ"
+    },
+    "protocolGuild": {
+      "label": "Protocol Guild",
+      "description": "公共財配分の受領者"
+    }
+  },
+  "link": {
+    "newTab": "（新しいタブで開きます）"
+  },
+  "cta": {
+    "openApp": "アプリを開く"
+  },
+  "search": {
+    "trigger": "検索",
+    "triggerLabel": "ページと記録を検索",
+    "title": "Cosmic Signatureを検索",
+    "placeholder": "ページを検索、またはアドレス、トークン、サイクル、一筆IDを貼り付け",
+    "placeholderShort": "ページ、アドレス、IDを検索",
+    "listLabel": "結果",
+    "groups": {
+      "jump": "移動先"
+    },
+    "results": {
+      "address": "参加者{address}",
+      "token": "シグネチャー{id}",
+      "cycle": "サイクル{cycle}",
+      "gesture": "ID{id}の一筆",
+      "transaction": "{explorer}でトランザクションを見る"
+    },
+    "descriptions": {
+      "address": "このアドレスの一筆、配分、NFT",
+      "token": "作品、特性、履歴",
+      "cycle": "このサイクルの配分の受領者",
+      "gesture": "この一筆の費用、方法、メッセージ",
+      "transaction": "新しいタブでブロックエクスプローラーを開きます"
+    },
+    "empty": "「{query}」に一致する結果はありません。ページ名、アドレス、数字で検索してください。",
+    "keys": {
+      "move": "移動",
+      "open": "開く",
+      "close": "閉じる"
+    }
+  },
+  "drawer": {
+    "preferences": "設定"
+  },
+  "footer": {
+    "linksAndLanguages": "リンクと言語"
   },
   "ecosystem": {
-    "groupLabel": "Cosmic Signatureエコシステム",
     "uniswap": {
-      "name": "CSTを取引",
-      "product": "Uniswap",
-      "tagline": "UniswapでETHをCSTにスワップ",
       "ariaLabel": "UniswapでCSTを取引",
       "defaultLabel": "UniswapでCSTを取引",
       "shortLabel": "CSTを取引"
@@ -91,21 +299,15 @@
       "shortLabel": "CSTプールを見る"
     },
     "axiomZero": {
-      "name": "Axiom Zero",
-      "product": "NFTマーケットプレイス",
-      "tagline": "手数料ゼロのマーケットプレイスでCosmic Signature NFTを集める",
       "ariaLabel": "Axiom Zero NFTマーケットプレイス",
       "defaultLabel": "Axiom ZeroのNFT",
       "menuLabel": "Axiom Zeroマーケットプレイス",
       "shortLabel": "Axiom Zero"
     },
     "chaosZero": {
-      "name": "Chaos Zero",
-      "product": "予測市場",
-      "tagline": "プロトコルの各サイクルについて予測する",
-      "ariaLabel": "Chaos Zeroで予測する",
-      "defaultLabel": "Chaos Zeroで予測する",
-      "menuLabel": "Chaos Zeroの予測",
+      "ariaLabel": "Chaos Zeroの予測市場",
+      "defaultLabel": "Chaos Zero",
+      "menuLabel": "Chaos Zero",
       "shortLabel": "Chaos Zero"
     }
   },

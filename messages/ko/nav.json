@@ -5,23 +5,80 @@
   },
   "primaryLabel": "주 내비게이션",
   "menuLabel": "메뉴",
+  "menuLabelWithAlert": "메뉴. 회수할 배분이 있습니다",
   "drawerTitle": "내비게이션",
-  "sections": {
-    "protocol": "프로토콜",
-    "ecosystem": "생태계",
-    "myAccount": "내 계정"
+  "menus": {
+    "explore": "탐색",
+    "learn": "학습"
   },
-  "links": {
+  "sections": {
+    "participate": "참여",
+    "collection": "컬렉션",
+    "explore": "탐색",
+    "records": "기록",
+    "learn": "학습",
+    "trust": "신뢰",
+    "account": "계정",
+    "ecosystem": "생태계",
+    "community": "커뮤니티"
+  },
+  "routes": {
+    "observatory": {
+      "label": "관측소",
+      "description": "진행 중인 사이클에 제스처 남기기"
+    },
+    "currentCycle": {
+      "label": "현재 사이클",
+      "description": "진행 중인 사이클의 모든 제스처와 순위"
+    },
+    "imprint": {
+      "label": "RandomWalk NFT 각인",
+      "description": "RandomWalk NFT 각인으로 제스처 비용 낮추기"
+    },
     "gallery": {
       "label": "갤러리",
       "description": "지금까지 각인된 모든 시그니처"
     },
-    "explore": {
-      "label": "탐색"
+    "namedNfts": {
+      "label": "이름 붙인 NFT",
+      "description": "소유자가 이름을 붙인 시그니처"
     },
-    "currentCycle": {
-      "label": "현재 사이클",
-      "description": "현재 사이클을 빚어내는 실시간 제스처"
+    "attachedNfts": {
+      "label": "첨부된 NFT 기여",
+      "description": "여러 사이클에 걸쳐 제스처에 첨부된 NFT"
+    },
+    "usedRwlkNfts": {
+      "label": "사용된 RandomWalk NFT",
+      "description": "제스처 비용 할인에 이미 사용된 RandomWalk NFT"
+    },
+    "statistics": {
+      "label": "통계",
+      "description": "프로토콜 전체 지표와 기록"
+    },
+    "statisticsParticipation": {
+      "label": "참여 통계",
+      "short": "참여",
+      "description": "시간에 따른 참여자와 제스처"
+    },
+    "statisticsTokens": {
+      "label": "토큰 분포 통계",
+      "short": "토큰",
+      "description": "CST와 NFT의 공급량과 보유자"
+    },
+    "statisticsAnchoring": {
+      "label": "앵커링 통계",
+      "short": "앵커링",
+      "description": "앵커링 총계와 이력"
+    },
+    "statisticsActivity": {
+      "label": "제스처 활동 통계",
+      "short": "활동",
+      "description": "사이클별로 제스처가 일어나는 시간대"
+    },
+    "statisticsPerformance": {
+      "label": "참여자 성과 통계",
+      "short": "성과",
+      "description": "사이클 기록과 참여자 순위"
     },
     "allocationRecipients": {
       "label": "배분 수령자",
@@ -31,20 +88,36 @@
       "label": "앵커링 지급",
       "description": "앵커링된 NFT와 그 지급 내역"
     },
-    "outreachReserve": {
-      "label": "홍보 준비금",
-      "description": "커뮤니티 홍보 활동"
+    "outreachAllocations": {
+      "label": "홍보 배분",
+      "description": "홍보 준비금에서 배분된 CST"
     },
-    "statistics": {
-      "label": "통계",
-      "description": "프로토콜 전체 지표와 기록"
+    "publicGoodsProtocol": {
+      "label": "프로토콜 공공재 기여",
+      "short": "프로토콜 기여",
+      "description": "사이클마다 이루어진 공공재 배분"
     },
-    "contracts": {
-      "label": "컨트랙트",
-      "description": "검증된 주소와 소스 코드"
+    "publicGoodsVoluntary": {
+      "label": "자발적 공공재 기여",
+      "short": "자발적 기여",
+      "description": "공공재 금고에 직접 보낸 기여"
     },
-    "help": {
-      "label": "도움말"
+    "publicGoodsRetrievals": {
+      "label": "공공재 회수 내역",
+      "short": "회수 내역",
+      "description": "공공재 금고에서 전달된 자금"
+    },
+    "ethContributions": {
+      "label": "직접 ETH 기여",
+      "description": "직접 기여한 ETH와 메모"
+    },
+    "coordinationChanges": {
+      "label": "조율 변경 내역",
+      "description": "프로토콜 매개변수의 모든 변경"
+    },
+    "retrievedAllocations": {
+      "label": "회수된 배분",
+      "description": "마감된 사이클의 배분 기록"
     },
     "howItWorks": {
       "label": "작동 원리",
@@ -54,34 +127,169 @@
       "label": "자주 묻는 질문",
       "description": "자주 묻는 질문과 답"
     },
-    "about": {
-      "label": "Cosmic Signature 소개",
-      "description": "프로토콜에 담긴 이야기"
-    },
-    "learn": {
+    "learnHub": {
       "label": "학습 센터",
-      "description": "안내서와 심층 해설"
+      "description": "프로토콜, 작품, 참여 방법 안내서"
     },
     "whitePaper": {
       "label": "백서",
       "description": "프로토콜 전체 참조 문서"
     },
-    "discover": {
-      "label": "Cosmic Signature 둘러보기",
-      "description": "작품, 이야기, 그리고 프로토콜"
+    "quiz": {
+      "label": "지식 퀴즈",
+      "description": "세 단계로 나눈 이해도 점검"
     },
-    "myDashboard": "내 대시보드",
-    "myAllocations": "내 배분",
-    "myNfts": "내 NFT",
-    "myAnchors": "내 앵커링",
-    "recipientHistory": "내 배분 내역"
+    "about": {
+      "label": "Cosmic Signature 소개",
+      "short": "소개",
+      "description": "프로토콜에 담긴 이야기"
+    },
+    "projectSite": {
+      "label": "프로젝트 사이트",
+      "description": "작품, 이야기, 프로토콜을 한눈에"
+    },
+    "security": {
+      "label": "보안",
+      "description": "프로토콜을 검증하고 안전하게 이용하는 방법"
+    },
+    "audits": {
+      "label": "보안 감사",
+      "description": "보안 감사와 정형 검증 현황"
+    },
+    "contracts": {
+      "label": "컨트랙트",
+      "description": "Arbitrum에서 검증된 컨트랙트 주소"
+    },
+    "sourceCode": {
+      "label": "소스 코드",
+      "description": "렌더링 파이프라인과 컨트랙트 소스"
+    },
+    "riskDisclosures": {
+      "label": "위험 고지",
+      "description": "참여 전에 알아 두어야 할 사항"
+    },
+    "terms": {
+      "label": "이용약관",
+      "description": "앱 이용과 참여에 적용되는 조건"
+    },
+    "privacy": {
+      "label": "개인정보 처리방침",
+      "description": "지갑 데이터, 분석 도구, 온체인 투명성"
+    },
+    "siteMap": {
+      "label": "사이트맵",
+      "description": "섹션별로 정리한 모든 페이지"
+    },
+    "myStatistics": {
+      "label": "내 통계",
+      "description": "내 제스처, 배분, 앵커링"
+    },
+    "myAllocations": {
+      "label": "내 배분",
+      "description": "회수를 기다리는 배분"
+    },
+    "myNfts": {
+      "label": "내 NFT",
+      "description": "지갑에 있는 시그니처"
+    },
+    "myAnchors": {
+      "label": "내 앵커링",
+      "description": "NFT 앵커링과 지급 회수"
+    },
+    "allocationHistory": {
+      "label": "내 배분 내역",
+      "description": "지갑에 이루어진 모든 배분"
+    },
+    "transferCst": {
+      "label": "CST 전송",
+      "description": "다른 주소로 CST 보내기"
+    }
+  },
+  "groups": {
+    "publicGoods": {
+      "label": "공공재",
+      "description": "이더리움 핵심 기여자를 위한 모든 기여"
+    }
+  },
+  "outbound": {
+    "uniswap": {
+      "label": "Uniswap에서 CST 거래",
+      "description": "Arbitrum에서 ETH를 CST로 교환"
+    },
+    "axiomZero": {
+      "label": "Axiom Zero",
+      "description": "수수료 없는 NFT 마켓플레이스"
+    },
+    "chaosZero": {
+      "label": "Chaos Zero",
+      "description": "독립적인 예측 시장"
+    },
+    "geckoTerminal": {
+      "label": "GeckoTerminal",
+      "description": "CST 풀의 가격과 유동성"
+    },
+    "x": {
+      "label": "X (Twitter)",
+      "description": "소식과 공지"
+    },
+    "discord": {
+      "label": "Discord",
+      "description": "커뮤니티와의 대화"
+    },
+    "github": {
+      "label": "GitHub",
+      "description": "오픈 소스 저장소"
+    },
+    "protocolGuild": {
+      "label": "Protocol Guild",
+      "description": "공공재 배분을 받는 곳"
+    }
+  },
+  "link": {
+    "newTab": "(새 탭에서 열림)"
+  },
+  "cta": {
+    "openApp": "앱 열기"
+  },
+  "search": {
+    "trigger": "검색",
+    "triggerLabel": "페이지와 기록 검색",
+    "title": "Cosmic Signature 검색",
+    "placeholder": "페이지 검색 또는 주소, 토큰, 사이클, 제스처 ID 붙여 넣기",
+    "placeholderShort": "페이지, 주소, ID 검색",
+    "listLabel": "결과",
+    "groups": {
+      "jump": "바로 가기"
+    },
+    "results": {
+      "address": "참여자 {address}",
+      "token": "시그니처 {id}",
+      "cycle": "사이클 {cycle}",
+      "gesture": "제스처 ID {id}",
+      "transaction": "{explorer} 사이트에서 트랜잭션 보기"
+    },
+    "descriptions": {
+      "address": "이 주소의 제스처, 배분, NFT",
+      "token": "작품과 특성, 이력",
+      "cycle": "이 사이클의 배분 수령자",
+      "gesture": "이 제스처의 비용, 방식, 메시지",
+      "transaction": "새 탭에서 블록 탐색기를 엽니다"
+    },
+    "empty": "검색 결과가 없습니다: {query}. 페이지 이름, 주소, 숫자로 검색해 주세요.",
+    "keys": {
+      "move": "이동",
+      "open": "열기",
+      "close": "닫기"
+    }
+  },
+  "drawer": {
+    "preferences": "환경 설정"
+  },
+  "footer": {
+    "linksAndLanguages": "링크 및 언어"
   },
   "ecosystem": {
-    "groupLabel": "Cosmic Signature 생태계",
     "uniswap": {
-      "name": "CST 거래",
-      "product": "Uniswap",
-      "tagline": "Uniswap에서 ETH를 CST로 교환",
       "ariaLabel": "Uniswap에서 CST 거래",
       "defaultLabel": "Uniswap에서 CST 거래",
       "shortLabel": "CST 거래"
@@ -91,21 +299,15 @@
       "shortLabel": "CST 풀 보기"
     },
     "axiomZero": {
-      "name": "Axiom Zero",
-      "product": "NFT 마켓플레이스",
-      "tagline": "수수료 없는 마켓플레이스에서 Cosmic Signature NFT 수집",
       "ariaLabel": "Axiom Zero NFT 마켓플레이스",
       "defaultLabel": "Axiom Zero의 NFT",
       "menuLabel": "Axiom Zero 마켓플레이스",
       "shortLabel": "Axiom Zero"
     },
     "chaosZero": {
-      "name": "Chaos Zero",
-      "product": "예측 시장",
-      "tagline": "사이클마다 예측에 참여",
-      "ariaLabel": "Chaos Zero에서 예측 참여",
-      "defaultLabel": "Chaos Zero에서 예측 참여",
-      "menuLabel": "Chaos Zero 예측",
+      "ariaLabel": "Chaos Zero 예측 시장",
+      "defaultLabel": "Chaos Zero",
+      "menuLabel": "Chaos Zero",
       "shortLabel": "Chaos Zero"
     }
   },

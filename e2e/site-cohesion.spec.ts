@@ -149,7 +149,14 @@ for (const route of routes) {
         .soft(page.getByRole('banner').getByRole('button', { name: /connect wallet/i }))
         .toHaveCount(0);
       if (route.id.endsWith('not-found')) {
-        await expect.soft(page.getByRole('banner').locator('a[href="/learn"]')).toBeVisible();
+        // Below 1024px the landing header's links move into its menu sheet.
+        await expect
+          .soft(
+            isMobile
+              ? page.getByRole('banner').getByRole('button', { name: /^Open menu/ })
+              : page.getByRole('banner').locator('a[href="/learn"]'),
+          )
+          .toBeVisible();
       }
     }
 
@@ -161,7 +168,11 @@ for (const route of routes) {
       const footer = page.getByRole('contentinfo');
       if ((await footer.count()) === 1) {
         await expect.soft(footer.getByRole('link').first()).toBeVisible();
-        await expect.soft(footer.getByTestId('language-directory')).toBeVisible();
+        // Phones fold the footer's groups behind their headings; the language
+        // directory's links stay in the HTML either way.
+        const directory = footer.getByTestId('language-directory');
+        if (isMobile) await expect.soft(directory).toBeAttached();
+        else await expect.soft(directory).toBeVisible();
       }
 
       const header = page.getByRole('banner');

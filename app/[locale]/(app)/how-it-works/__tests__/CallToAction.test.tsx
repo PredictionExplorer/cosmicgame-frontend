@@ -64,9 +64,9 @@ describe('CallToAction', () => {
     expect(screen.queryByText(/\\u2019/)).not.toBeInTheDocument();
   });
 
-  it('renders Open the Protocol link pointing to homepage', () => {
+  it('renders the Make a Gesture link pointing to the Observatory', () => {
     render(<CallToAction callToAction={callToAction} />);
-    const link = screen.getByRole('link', { name: 'Open the Protocol' });
+    const link = screen.getByRole('link', { name: 'Make a Gesture' });
     expect(link).toHaveAttribute('href', '/');
   });
 

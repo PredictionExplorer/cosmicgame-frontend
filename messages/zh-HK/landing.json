@@ -58,7 +58,6 @@
       "waitingFirstGesture": "週期已開啟，等待第一筆",
       "synchronized": "倒數已與協議時間同步"
     },
-    "openLiveCycle": "查看即時週期",
     "viewCstPool": "GeckoTerminal 上的 CST 池",
     "eventHorizon": "事件地平線",
     "countdownAria": "{label}：{duration}",

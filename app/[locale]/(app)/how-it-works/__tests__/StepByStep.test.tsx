@@ -73,7 +73,8 @@ describe('StepByStep', () => {
       }
     }
     expect(screen.getByText(/Connect Wallet/)).toBeInTheDocument();
-    expect(screen.getByText(/Click "Gesture Now"/)).toBeInTheDocument();
+    expect(screen.getByText(/Press the gesture button/)).toBeInTheDocument();
+    expect(screen.queryByText(/Gesture Now/)).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

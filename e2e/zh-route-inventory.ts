@@ -54,7 +54,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/quality-assurance-route-not-found',
     host: 'app',
     cluster: 'global',
-    expectedText: '404：找不到页面',
+    expectedText: '找不到页面',
   },
   {
     id: 'site-map',

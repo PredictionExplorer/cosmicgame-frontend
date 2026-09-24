@@ -30,7 +30,7 @@ export const howItWorksTextVi = {
     headingAccent: 'hoạt động như thế nào',
     paragraph:
       'Những nét bút nối tiếp nhau định hình Signature trong mỗi chu kỳ trình diễn. Khi đếm ngược về 0, chu kỳ có thể được hoàn tất. Giao thức khi đó phân phối dự trữ qua hơn mười luồng, gồm phân bổ Signature, phân phối neo giữ và phần dành cho Protocol Guild.',
-    primaryCtaLabel: 'Mở giao thức',
+    primaryCtaLabel: 'Đặt nét bút',
     secondaryCtaLabel: 'Tìm hiểu thêm',
   },
   overview: {
@@ -221,7 +221,7 @@ export const howItWorksTextVi = {
   callToAction: {
     heading: 'Sẵn sàng đặt nét bút đầu tiên?',
     body: 'Kết nối ví để đặt nét bút trong chu kỳ hiện tại, định hình Signature và có thể khắc CST tham gia.',
-    primaryCtaLabel: 'Mở giao thức',
+    primaryCtaLabel: 'Đặt nét bút',
     discordCtaLabel: 'Discord',
     twitterCtaLabel: 'Twitter / X',
   },

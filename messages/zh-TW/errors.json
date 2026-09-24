@@ -40,18 +40,11 @@
   "apiFailure": "服務未回應，請稍後再試。",
   "unexpected": "發生未預期的錯誤，請重試。",
   "notFound": {
-    "title": "404：找不到頁面",
-    "description": "要找的頁面不存在，或已移至其他位置。Cosmic Signature 是 Arbitrum 上的程序化鏈上藝術協議，請透過下方連結繼續探索。",
-    "returnHome": "返回首頁",
-    "suggestedPages": "推薦頁面",
-    "popularPages": "常用頁面",
-    "links": {
-      "home": "首頁（目前週期）",
-      "gallery": "NFT 畫廊",
-      "howItWorks": "運作原理",
-      "faq": "常見問題",
-      "statistics": "統計",
-      "anchoring": "錨定配發"
-    }
+    "code": "錯誤 404",
+    "title": "找不到頁面",
+    "description": "連結可能有誤，或頁面已經移動。可以從下面這些頁面繼續。",
+    "primaryCta": "前往觀測台",
+    "secondaryCta": "瀏覽畫廊",
+    "suggestedPages": "推薦頁面"
   }
 }

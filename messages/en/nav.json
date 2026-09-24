@@ -4,24 +4,81 @@
     "tagline": "On-chain art protocol"
   },
   "primaryLabel": "Primary",
-  "menuLabel": "menu",
+  "menuLabel": "Open menu",
+  "menuLabelWithAlert": "Open menu, allocations ready to retrieve",
   "drawerTitle": "Navigation",
-  "sections": {
-    "protocol": "Protocol",
-    "ecosystem": "Ecosystem",
-    "myAccount": "My Account"
+  "menus": {
+    "explore": "Explore",
+    "learn": "Learn"
   },
-  "links": {
+  "sections": {
+    "participate": "Participate",
+    "collection": "Collection",
+    "explore": "Explore",
+    "records": "Records",
+    "learn": "Learn",
+    "trust": "Trust",
+    "account": "Account",
+    "ecosystem": "Ecosystem",
+    "community": "Community"
+  },
+  "routes": {
+    "observatory": {
+      "label": "Observatory",
+      "description": "Make a gesture in the live cycle"
+    },
+    "currentCycle": {
+      "label": "Current Cycle",
+      "description": "The live cycle in full: every gesture and standing"
+    },
+    "imprint": {
+      "label": "Imprint RandomWalk NFT",
+      "description": "Imprint a RandomWalk NFT for a lower Gesture Cost"
+    },
     "gallery": {
       "label": "Gallery",
       "description": "Every Signature imprinted so far"
     },
-    "explore": {
-      "label": "Explore"
+    "namedNfts": {
+      "label": "Named NFTs",
+      "description": "Signatures their owners have named"
     },
-    "currentCycle": {
-      "label": "Current Cycle",
-      "description": "Live gestures shaping the active cycle"
+    "attachedNfts": {
+      "label": "Attached NFT Contributions",
+      "description": "NFTs attached to gestures across cycles"
+    },
+    "usedRwlkNfts": {
+      "label": "Used RandomWalk NFTs",
+      "description": "RandomWalk NFTs already used for a lower Gesture Cost"
+    },
+    "statistics": {
+      "label": "Statistics",
+      "description": "Protocol-wide figures and records"
+    },
+    "statisticsParticipation": {
+      "label": "Participation Statistics",
+      "short": "Participation",
+      "description": "Participants and gestures over time"
+    },
+    "statisticsTokens": {
+      "label": "Token Distribution Statistics",
+      "short": "Tokens",
+      "description": "CST and NFT supply and holders"
+    },
+    "statisticsAnchoring": {
+      "label": "Anchoring Statistics",
+      "short": "Anchoring",
+      "description": "Anchoring totals and history"
+    },
+    "statisticsActivity": {
+      "label": "Gesture Activity Statistics",
+      "short": "Activity",
+      "description": "When gestures happen, cycle by cycle"
+    },
+    "statisticsPerformance": {
+      "label": "Participant Performance Statistics",
+      "short": "Performance",
+      "description": "Cycle records and participant standings"
     },
     "allocationRecipients": {
       "label": "Allocation Recipients",
@@ -31,20 +88,36 @@
       "label": "Anchor Distributions",
       "description": "Anchored NFTs and their distributions"
     },
-    "outreachReserve": {
-      "label": "Outreach Reserve",
-      "description": "Community outreach activity"
+    "outreachAllocations": {
+      "label": "Outreach Allocations",
+      "description": "CST allocated from the Outreach Reserve"
     },
-    "statistics": {
-      "label": "Statistics",
-      "description": "Protocol-wide metrics and records"
+    "publicGoodsProtocol": {
+      "label": "Protocol Public-Goods Contributions",
+      "short": "Protocol",
+      "description": "The Public Goods Allocation of every cycle"
     },
-    "contracts": {
-      "label": "Contracts",
-      "description": "Verified addresses and source code"
+    "publicGoodsVoluntary": {
+      "label": "Voluntary Public-Goods Contributions",
+      "short": "Voluntary",
+      "description": "Contributions sent straight to the Public Goods Vault"
     },
-    "help": {
-      "label": "Help"
+    "publicGoodsRetrievals": {
+      "label": "Public Goods Retrievals",
+      "short": "Retrievals",
+      "description": "Funds forwarded from the Public Goods Vault"
+    },
+    "ethContributions": {
+      "label": "Direct ETH Contributions",
+      "description": "ETH contributed directly, with its notes"
+    },
+    "coordinationChanges": {
+      "label": "Coordination Changes",
+      "description": "Every change to the protocol’s parameters"
+    },
+    "retrievedAllocations": {
+      "label": "Retrieved Allocations",
+      "description": "Allocation records across finalized cycles"
     },
     "howItWorks": {
       "label": "How It Works",
@@ -54,34 +127,169 @@
       "label": "FAQ",
       "description": "Answers to common questions"
     },
-    "about": {
-      "label": "About Cosmic Signature",
-      "description": "The story behind the protocol"
-    },
-    "learn": {
+    "learnHub": {
       "label": "Learn Hub",
-      "description": "Guides and deep dives"
+      "description": "Guides to the protocol, the art and taking part"
     },
     "whitePaper": {
       "label": "White Paper",
       "description": "The complete protocol reference"
     },
-    "discover": {
-      "label": "Discover Cosmic Signature",
-      "description": "The art, the story, and the protocol"
+    "quiz": {
+      "label": "Quiz",
+      "description": "Test what you know, in three tiers"
     },
-    "myDashboard": "My Dashboard",
-    "myAllocations": "My Allocations",
-    "myNfts": "My NFTs",
-    "myAnchors": "My Anchors",
-    "recipientHistory": "Recipient History"
+    "about": {
+      "label": "About Cosmic Signature",
+      "short": "About",
+      "description": "The story behind the protocol"
+    },
+    "projectSite": {
+      "label": "Project Site",
+      "description": "The art, the story and the protocol at a glance"
+    },
+    "security": {
+      "label": "Security",
+      "description": "How to verify the protocol and stay safe"
+    },
+    "audits": {
+      "label": "Audits",
+      "description": "Audit and formal verification status"
+    },
+    "contracts": {
+      "label": "Contracts",
+      "description": "Verified contract addresses on Arbitrum"
+    },
+    "sourceCode": {
+      "label": "Source Code",
+      "description": "The rendering pipeline and contract source"
+    },
+    "riskDisclosures": {
+      "label": "Risk Disclosures",
+      "description": "What to understand before you take part"
+    },
+    "terms": {
+      "label": "Terms of Service",
+      "description": "The terms for using the app and taking part"
+    },
+    "privacy": {
+      "label": "Privacy Policy",
+      "description": "Wallet data, analytics and on-chain transparency"
+    },
+    "siteMap": {
+      "label": "Site Map",
+      "description": "Every page, grouped by section"
+    },
+    "myStatistics": {
+      "label": "My Statistics",
+      "description": "Your gestures, allocations and anchors"
+    },
+    "myAllocations": {
+      "label": "My Allocations",
+      "description": "Allocations waiting for you to retrieve"
+    },
+    "myNfts": {
+      "label": "My NFTs",
+      "description": "The Signatures in your wallet"
+    },
+    "myAnchors": {
+      "label": "My Anchors",
+      "description": "Anchor NFTs and retrieve their distributions"
+    },
+    "allocationHistory": {
+      "label": "My Allocation History",
+      "description": "Every allocation made to your wallet"
+    },
+    "transferCst": {
+      "label": "Transfer CST",
+      "description": "Send CST to another address"
+    }
+  },
+  "groups": {
+    "publicGoods": {
+      "label": "Public Goods",
+      "description": "Every contribution to Ethereum’s core contributors"
+    }
+  },
+  "outbound": {
+    "uniswap": {
+      "label": "Trade CST on Uniswap",
+      "description": "Swap ETH for CST on Arbitrum"
+    },
+    "axiomZero": {
+      "label": "Axiom Zero",
+      "description": "Zero-fee NFT marketplace"
+    },
+    "chaosZero": {
+      "label": "Chaos Zero",
+      "description": "Independent prediction market"
+    },
+    "geckoTerminal": {
+      "label": "GeckoTerminal",
+      "description": "Price and liquidity of the CST pool"
+    },
+    "x": {
+      "label": "X (Twitter)",
+      "description": "News and announcements"
+    },
+    "discord": {
+      "label": "Discord",
+      "description": "Talk with the community"
+    },
+    "github": {
+      "label": "GitHub",
+      "description": "Open-source repositories"
+    },
+    "protocolGuild": {
+      "label": "Protocol Guild",
+      "description": "Recipient of the Public Goods Allocation"
+    }
+  },
+  "link": {
+    "newTab": "(opens in a new tab)"
+  },
+  "cta": {
+    "openApp": "Open the app"
+  },
+  "search": {
+    "trigger": "Search",
+    "triggerLabel": "Search pages and records",
+    "title": "Search Cosmic Signature",
+    "placeholder": "Search pages, or paste an address, token, cycle or gesture ID",
+    "placeholderShort": "Search pages, addresses, IDs",
+    "listLabel": "Results",
+    "groups": {
+      "jump": "Go to"
+    },
+    "results": {
+      "address": "Participant {address}",
+      "token": "Signature {id}",
+      "cycle": "Cycle #{cycle}",
+      "gesture": "Gesture ID {id}",
+      "transaction": "Transaction on {explorer}"
+    },
+    "descriptions": {
+      "address": "Gestures, allocations and NFTs of this address",
+      "token": "The artwork, its traits and its history",
+      "cycle": "Allocation recipients of this cycle",
+      "gesture": "Cost, method and message of this gesture",
+      "transaction": "Opens the block explorer in a new tab"
+    },
+    "empty": "Nothing matches “{query}”. Try a page name, an address or a number.",
+    "keys": {
+      "move": "Move",
+      "open": "Open",
+      "close": "Close"
+    }
+  },
+  "drawer": {
+    "preferences": "Preferences"
+  },
+  "footer": {
+    "linksAndLanguages": "Links and languages"
   },
   "ecosystem": {
-    "groupLabel": "Cosmic Signature ecosystem",
     "uniswap": {
-      "name": "Trade CST",
-      "product": "Uniswap",
-      "tagline": "Swap ETH for CST on Uniswap",
       "ariaLabel": "Trade CST on Uniswap",
       "defaultLabel": "Trade CST on Uniswap",
       "shortLabel": "Trade CST"
@@ -91,21 +299,15 @@
       "shortLabel": "View CST pool"
     },
     "axiomZero": {
-      "name": "Axiom Zero",
-      "product": "NFT marketplace",
-      "tagline": "Collect Cosmic Signature NFTs on the zero-fee marketplace",
       "ariaLabel": "Axiom Zero NFT marketplace",
       "defaultLabel": "NFTs on Axiom Zero",
       "menuLabel": "Axiom Zero Marketplace",
       "shortLabel": "Axiom Zero"
     },
     "chaosZero": {
-      "name": "Chaos Zero",
-      "product": "Prediction market",
-      "tagline": "Make predictions on each cycle of the protocol",
-      "ariaLabel": "Make predictions on Chaos Zero",
-      "defaultLabel": "Make Predictions on Chaos Zero",
-      "menuLabel": "Chaos Zero Predictions",
+      "ariaLabel": "Chaos Zero prediction market",
+      "defaultLabel": "Chaos Zero",
+      "menuLabel": "Chaos Zero",
       "shortLabel": "Chaos Zero"
     }
   },

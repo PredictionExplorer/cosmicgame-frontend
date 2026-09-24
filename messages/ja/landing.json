@@ -58,7 +58,6 @@
       "waitingFirstGesture": "開始済み、最初の一筆を待っています",
       "synchronized": "プロトコル時刻に同期したカウントダウン"
     },
-    "openLiveCycle": "進行中のサイクルを開く",
     "viewCstPool": "GeckoTerminalのCSTプール",
     "eventHorizon": "事象の地平線",
     "countdownAria": "{label}：{duration}",

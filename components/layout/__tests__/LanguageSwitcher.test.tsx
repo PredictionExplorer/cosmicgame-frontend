@@ -121,35 +121,27 @@ describe('LanguageSwitcher', () => {
     });
   });
 
-  describe('list variant', () => {
-    it('lays every language out as a radio group with the current one checked', () => {
+  describe('select variant', () => {
+    it('lists every language in itself, the current one selected', () => {
       mockLocale = 'zh-TW';
-      render(<LanguageSwitcher variant="list" />);
+      render(<LanguageSwitcher variant="select" />);
 
-      const group = screen.getByRole('radiogroup', TRIGGER);
-      const radios = within(group).getAllByRole('radio');
-      expect(radios.map((radio) => radio.textContent)).toEqual(
+      const select = screen.getByRole('combobox', TRIGGER);
+      expect(select).toHaveValue('zh-TW');
+      const options = within(select).getAllByRole('option');
+      expect(options.map((option) => option.textContent)).toEqual(
         routing.locales.map((locale) => LOCALE_LABELS[locale]),
       );
-      expect(radios.map((radio) => radio.getAttribute('lang'))).toEqual([...routing.locales]);
-      expect(within(group).getByRole('radio', { name: LOCALE_LABELS['zh-TW'] })).toHaveAttribute(
-        'aria-checked',
-        'true',
-      );
-      expect(within(group).getByRole('radio', { name: LOCALE_LABELS.en })).toHaveAttribute(
-        'aria-checked',
-        'false',
-      );
+      expect(options.map((option) => option.getAttribute('lang'))).toEqual([...routing.locales]);
     });
 
-    it('switches locale on a single tap, without opening a menu', async () => {
+    it('switches locale on change, keeping the query and hash', async () => {
       const user = userEvent.setup();
-      render(<LanguageSwitcher variant="list" />);
+      render(<LanguageSwitcher variant="select" />);
 
-      await user.click(screen.getByRole('radio', { name: LOCALE_LABELS.ja }));
+      await user.selectOptions(screen.getByRole('combobox', TRIGGER), 'ja');
 
       expect(mockReplace).toHaveBeenCalledWith('/gallery?tab=traits#top', { locale: 'ja' });
-      expect(screen.queryByRole('menu')).not.toBeInTheDocument();
     });
   });
 });

@@ -187,6 +187,29 @@ test.describe('Landing responsive regressions', () => {
       await page.keyboard.press('Enter');
       await expect(page.locator('main#main')).toBeFocused();
 
+      const cycleEyebrow = getLandingContent('en').cycle.eyebrow;
+      if (width < 1024) {
+        // Phones: the header's links and preferences live in the menu sheet.
+        const menuButton = page.getByRole('banner').getByRole('button', { name: 'Open menu' });
+        await menuButton.focus();
+        await page.keyboard.press('Enter');
+        const sheet = page.getByRole('dialog', { name: 'Navigation' });
+        await expect(sheet).toBeVisible();
+        await expect(sheet.getByRole('combobox', { name: 'Language' })).toHaveValue('en');
+        await page.keyboard.press('Escape');
+        await expect(sheet).toBeHidden();
+        await expect(menuButton).toBeFocused();
+
+        await page.keyboard.press('Enter');
+        await expect(sheet).toBeVisible();
+        await sheet.getByRole('link', { name: cycleEyebrow, exact: true }).focus();
+        await page.keyboard.press('Enter');
+        await expect(sheet).toBeHidden();
+        await expect(page).toHaveURL(/#cycle$/);
+        await expect(page.locator('#cycle')).toBeInViewport({ ratio: 0.01 });
+        return;
+      }
+
       const languages = page.getByRole('button', { name: 'Language', exact: true });
       await languages.focus();
       await page.keyboard.press('Enter');
@@ -203,7 +226,7 @@ test.describe('Landing responsive regressions', () => {
 
       const cycleLink = page
         .locator('header nav')
-        .getByRole('link', { name: getLandingContent('en').cycle.eyebrow, exact: true });
+        .getByRole('link', { name: cycleEyebrow, exact: true });
       await cycleLink.focus();
       await page.keyboard.press('Enter');
       await expect(page).toHaveURL(/#cycle$/);

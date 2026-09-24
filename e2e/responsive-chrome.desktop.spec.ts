@@ -36,8 +36,9 @@ for (const locale of routing.locales) {
     for (const width of [320, 375, 640, 820, 1024, 1280, 1440, 1920]) {
       await page.setViewportSize({ width, height: 900 });
       await expectChromeFits(page);
+      // The drawer carries the navigation below 1024px; from there the header does.
       const menu = page.locator('header button[aria-haspopup="dialog"]');
-      if (width < 1280) await expect(menu).toBeVisible();
+      if (width < 1024) await expect(menu).toBeVisible();
       else await expect(menu).toBeHidden();
     }
   });
@@ -49,9 +50,9 @@ test('drawer fits a small phone, returns focus and resets after a desktop resize
   await page.setViewportSize({ width: 320, height: 568 });
   await page.goto('/faq', { waitUntil: 'domcontentloaded' });
   await waitForStableLayout(page);
-  const menu = page.getByRole('button', { name: 'menu', exact: true });
+  const menu = page.getByRole('button', { name: 'Open menu', exact: true });
   await menu.click();
-  const drawer = page.getByRole('dialog');
+  const drawer = page.getByRole('dialog', { name: 'Navigation' });
   await expect(drawer).toBeVisible();
   await expect(drawer.locator('a[href="/gallery"]')).toBeInViewport();
   expect(
@@ -82,7 +83,7 @@ test('phone navigation fits in the server-rendered page before hydration', async
   const page = await context.newPage();
   try {
     await page.goto('/faq', { waitUntil: 'load' });
-    await expect(page.getByRole('button', { name: 'menu', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Open menu', exact: true })).toBeVisible();
     await expect(page.locator('header a[href="/gallery"]')).toBeHidden();
     await expectChromeFits(page);
   } finally {

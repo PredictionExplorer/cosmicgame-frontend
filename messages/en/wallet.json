@@ -1,6 +1,7 @@
 {
   "connect": {
     "button": "Connect Wallet",
+    "buttonShort": "Connect",
     "opening": "Opening the wallet list…",
     "restoring": "Restoring your wallet connection…",
     "disclaimer": "By connecting a wallet, you agree to the <terms>Terms of Service</terms> and acknowledge the <risk>Risk Disclosures</risk>. Gestures happen on {network} and need ETH there for the Gesture Cost and network fees."
@@ -12,27 +13,22 @@
   "balances": {
     "eth": "ETH",
     "cst": "CST",
-    "cosmicNfts": "COSMIC NFTs",
-    "rwlkNfts": "RWLK NFTs",
+    "cosmicNfts": "Cosmic Signature NFTs",
+    "rwlkNfts": "RandomWalk NFTs",
     "anchoredCst": "Anchored Cosmic Signature NFTs",
-    "anchoredRwlk": "Anchored RWLK NFTs"
+    "anchoredRwlk": "Anchored RandomWalk NFTs"
   },
   "labels": {
-    "loading": "Loading...",
-    "balancesHeading": "Balances",
-    "anchoredHeading": "Anchored",
-    "nftCount": "{count}"
+    "balancesHeading": "Balances"
   },
   "account": {
     "heading": "Account",
-    "myDashboard": "My Dashboard",
-    "myRewards": "My Allocations",
-    "myNfts": "My NFTs",
-    "transferCst": "Transfer CST",
+    "menuLabel": "Account menu for {address}",
+    "menuLabelWithAlert": "Account menu for {address}, allocations ready to retrieve",
+    "retrieveReady": "Ready to retrieve",
+    "retrieveAmount": "{amount} ready to retrieve",
     "addCstToMetaMask": "Add CST to MetaMask",
     "addingCstToMetaMask": "Adding CST to MetaMask...",
-    "myAnchors": "My Anchors",
-    "winningHistory": "Allocation History",
     "viewOnExplorer": "View on {explorer}",
     "switchWallet": "Switch wallet",
     "disconnect": "Disconnect"

@@ -30,7 +30,7 @@ export const landingTextEn = {
       'Take part in a living art protocol on Arbitrum. Every gesture helps shape the next Signature; every cycle distributes its reserves among participants and Ethereum’s public infrastructure.',
     biologyDisclaimer:
       'Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC mutational signatures in biology. It is an on-chain art protocol and app.',
-    primaryCtaLabel: 'Open the App',
+    primaryCtaLabel: 'Open the app',
     secondaryCtaLabel: 'Explore the Cycle',
     statisticsCtaLabel: 'Protocol statistics',
     galleryCtaLabel: 'NFT gallery',
@@ -322,57 +322,8 @@ export const landingTextEn = {
   },
 
   footer: {
-    brandName: 'Cosmic Signature',
-    logoAlt: 'Cosmic Signature',
     tagline: 'A procedural on-chain art protocol on Arbitrum.',
-    columns: {
-      protocol: {
-        heading: 'Protocol',
-        links: {
-          app: 'Open the App',
-          about: 'About',
-          learn: 'Learn',
-          quiz: 'Quiz',
-          'how-it-works': 'Documentation',
-          contracts: 'Contracts',
-          code: 'Source Code',
-          audits: 'Security Audit',
-        },
-      },
-      ecosystem: {
-        heading: 'Ecosystem',
-        links: {
-          marketplace: 'Axiom Zero Marketplace',
-          predictions: 'Chaos Zero Predictions',
-          uniswap: 'Trade CST on Uniswap',
-          geckoterminal: 'View CST pool on GeckoTerminal',
-        },
-      },
-      community: {
-        heading: 'Community',
-        links: {
-          twitter: 'X / Twitter',
-          discord: 'Discord',
-          github: 'GitHub',
-          'protocol-guild': 'Protocol Guild',
-        },
-      },
-      legal: {
-        heading: 'Legal',
-        links: {
-          terms: 'Terms',
-          privacy: 'Privacy',
-          faq: 'FAQ',
-        },
-      },
-    },
     copyright: '© {year} Cosmic Signature. Project-owned materials: CC0 1.0.',
     colophon: 'CC0 1.0 · Publicly verifiable · Reproducible art',
-  },
-
-  notFound: {
-    heading: 'Page not found',
-    description: 'This page may have moved, or the address may be incorrect.',
-    ctaLabel: 'Back to the home page',
   },
 } satisfies LandingText;

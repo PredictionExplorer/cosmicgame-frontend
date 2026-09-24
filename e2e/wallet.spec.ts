@@ -9,6 +9,19 @@ import { mockZhQualityApi } from './zh-quality-mocks';
 
 const MOCK_CST_ADDRESS = '0x6666666666666666666666666666666666666666';
 
+/**
+ * The connected wallet's pill in the header. The header renders a phone and
+ * a desktop pill and shows one with CSS, and narrow phones show no address
+ * text, so find the displayed pill by the address in its accessible name.
+ */
+function connectedPill(page: Page) {
+  return page
+    .getByRole('banner')
+    .getByRole('button', { name: /0x1234…\u20605678/ })
+    .filter({ visible: true })
+    .first();
+}
+
 async function openMobileMenuIfNeeded(page: Page) {
   const menuButton = page.locator('role=button[name="menu"]');
   if (await menuButton.isVisible()) {
@@ -144,7 +157,7 @@ test.describe('Wallet connection state (disconnected)', () => {
     await expect(dialog).toBeVisible();
     await dialog.getByRole('button', { name: /^MetaMask$/i }).click();
 
-    await expect(page.getByText(/0x1234…\u20605678/).first()).toBeVisible({ timeout: 10_000 });
+    await expect(connectedPill(page)).toBeVisible({ timeout: 10_000 });
     await expect(inlineMessage).toHaveValue(draft);
     await expect
       .poll(() => page.evaluate(() => window.__mockEthereumRequests ?? []))
@@ -153,12 +166,25 @@ test.describe('Wallet connection state (disconnected)', () => {
     expect(pageErrors.join('\n')).not.toContain('Cannot find module');
 
     for (const theme of SITE_THEMES) {
-      await page.getByRole('button', { name: common.themeSwitcher.label, exact: true }).click();
-      await page
-        .getByRole('menuitemradio', {
-          name: new RegExp(`^${common.themeSwitcher.themes[theme].name}`),
-        })
-        .click();
+      const themeName = common.themeSwitcher.themes[theme].name;
+      const themeButton = page.getByRole('button', {
+        name: common.themeSwitcher.label,
+        exact: true,
+      });
+      if (await themeButton.isVisible()) {
+        await themeButton.click();
+        await page.getByRole('menuitemradio', { name: new RegExp(`^${themeName}`) }).click();
+      } else {
+        // Phones: the palette lives in the navigation drawer, not the header.
+        await page
+          .getByRole('banner')
+          .getByRole('button', { name: /^Open menu/ })
+          .click();
+        const drawer = page.getByRole('dialog', { name: 'Navigation' });
+        await drawer.getByRole('radio', { name: themeName, exact: true }).click();
+        await page.keyboard.press('Escape');
+        await expect(drawer).toBeHidden();
+      }
       await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
 
       if (isMobile) await page.getByTestId('dock-open-sheet').click();
@@ -339,7 +365,7 @@ test.describe('Wallet connection state (disconnected)', () => {
     await dialog.getByRole('button', { name: /^MetaMask$/i }).click();
 
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
-    await expect(page.getByText(/0x1234…\u20605678/).first()).toBeVisible({ timeout: 10_000 });
+    await expect(connectedPill(page)).toBeVisible({ timeout: 10_000 });
     await expect
       .poll(() => page.evaluate(() => window.__mockEthereumRequests ?? []))
       .toContain('eth_requestAccounts');

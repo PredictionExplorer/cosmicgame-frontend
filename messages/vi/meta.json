@@ -22,7 +22,7 @@
     "description": "Xem toàn bộ lịch sử người nhận phân bổ của Cosmic Signature, thống kê chu kỳ và các đợt phân phối ETH qua mọi chu kỳ trình diễn đã hoàn tất."
   },
   "anchoring": {
-    "title": "Neo giữ",
+    "title": "Phân phối neo giữ",
     "description": "Neo giữ Cosmic Signature NFT với giao thức để nhận phân phối neo giữ ETH theo từng chu kỳ. Xem thống kê neo giữ toàn cầu và cách cơ chế này vận hành trên Arbitrum."
   },
   "statistics": {

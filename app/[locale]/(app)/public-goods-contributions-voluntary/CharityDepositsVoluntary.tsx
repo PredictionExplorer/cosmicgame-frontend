@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 
 import { PageHeader } from '@/components/layout/PageHeader';
 import { AddressChip } from '@/components/ui/address-chip';
+import { RouteGroupNav } from '@/components/layout/RouteGroupNav';
 import { PageShell } from '@/components/ui/page-shell';
 import {
   CharityDepositTable,
@@ -30,6 +31,7 @@ const CharityDepositsVoluntary = ({ seoSummary }: { seoSummary?: ReactNode }) =>
           subtitle={t('voluntary.subtitle')}
         />
       )}
+      <RouteGroupNav group="publicGoods" current="publicGoodsVoluntary" />
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
         {t('voluntary.description')}
       </p>

@@ -1,6 +1,7 @@
 {
   "connect": {
     "button": "連接錢包",
+    "buttonShort": "連接",
     "opening": "正在開啟錢包清單…",
     "restoring": "正在恢復錢包連線…",
     "disclaimer": "連接錢包即表示你同意<terms>服務條款</terms>，並已知悉<risk>風險揭露</risk>。落筆在 {network} 上進行，需要該網路上的 ETH 支付落筆價格與網路手續費。"
@@ -12,27 +13,22 @@
   "balances": {
     "eth": "ETH",
     "cst": "CST",
-    "cosmicNfts": "COSMIC NFT",
-    "rwlkNfts": "RWLK NFT",
+    "cosmicNfts": "Cosmic Signature NFT",
+    "rwlkNfts": "RandomWalk NFT",
     "anchoredCst": "已錨定 Cosmic Signature NFT",
-    "anchoredRwlk": "已錨定 RWLK NFT"
+    "anchoredRwlk": "已錨定 RandomWalk NFT"
   },
   "labels": {
-    "loading": "載入中…",
-    "balancesHeading": "餘額",
-    "anchoredHeading": "已錨定",
-    "nftCount": "{count} 枚"
+    "balancesHeading": "餘額"
   },
   "account": {
     "heading": "帳戶",
-    "myDashboard": "我的儀表板",
-    "myRewards": "我的分配",
-    "myNfts": "我的 NFT",
-    "transferCst": "轉帳 CST",
+    "menuLabel": "{address} 的帳戶選單",
+    "menuLabelWithAlert": "{address} 的帳戶選單，有可取回的分配",
+    "retrieveReady": "可取回",
+    "retrieveAmount": "{amount} 可取回",
     "addCstToMetaMask": "將 CST 新增至 MetaMask",
     "addingCstToMetaMask": "正在新增 CST…",
-    "myAnchors": "我的錨定",
-    "winningHistory": "獲配紀錄",
     "viewOnExplorer": "在 {explorer} 上查看",
     "switchWallet": "更換錢包",
     "disconnect": "中斷連接"

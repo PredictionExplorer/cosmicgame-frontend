@@ -186,6 +186,7 @@ export function EventHorizonCountdown() {
   const locale = useLocale();
   const formatT = useTranslations('formats');
   const timerT = useTranslations('landing.timer');
+  const navT = useTranslations('nav');
   const [sample, setSample] = useState<LandingCycleTimerSample | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
   const [nowMs, setNowMs] = useState<number | null>(null);
@@ -414,8 +415,8 @@ export function EventHorizonCountdown() {
               </span>
             )}
             <div className={styles.links}>
-              <a href={localeHref(APP_ORIGIN, '/', locale)} rel="noopener">
-                {timerT('openLiveCycle')}
+              <a href={localeHref(APP_ORIGIN, '/', locale)}>
+                {navT('cta.openApp')}
                 <ArrowRight aria-hidden="true" />
               </a>
               <a

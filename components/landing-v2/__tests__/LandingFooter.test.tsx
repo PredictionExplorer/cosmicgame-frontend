@@ -1,89 +1,78 @@
-import { render, screen, within } from '@testing-library/react';
+import '@testing-library/jest-dom';
 
 import { landingContentEn } from '@/content/landing';
 
+import { FOOTER_SECTIONS } from '@/config/siteNav';
 import { LOCALE_LABELS, routing } from '@/i18n/routing';
+import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { LandingFooter } from '@/components/landing-v2/LandingFooter';
 
-describe('<LandingFooter />', () => {
-  it('renders the wordmark link back to the landing root', () => {
-    render(<LandingFooter footer={landingContentEn.footer} />);
-    const home = screen.getByRole('link', { name: /cosmic signature/i });
-    expect(home).toHaveAttribute('href', '/');
-  });
+import { checkA11y, render, screen, within } from '@/test-utils';
 
-  it('renders the protocol tagline', () => {
+describe('<LandingFooter />', () => {
+  it('renders the wordmark link back to the landing root and the landing tagline', () => {
     render(<LandingFooter footer={landingContentEn.footer} />);
+    expect(screen.getByRole('link', { name: 'nav.brand.homeLabel' })).toHaveAttribute('href', '/');
     expect(screen.getByText(landingContentEn.footer.tagline)).toBeInTheDocument();
   });
 
-  it('renders every link column heading', () => {
+  it('renders the same section columns as the app footer', () => {
     render(<LandingFooter footer={landingContentEn.footer} />);
-    for (const col of landingContentEn.footer.columns) {
-      expect(screen.getByText(col.heading)).toBeInTheDocument();
+    const nav = screen.getByRole('navigation', { name: 'common.accessibility.footer' });
+    for (const section of FOOTER_SECTIONS) {
+      expect(
+        within(nav).getByRole('heading', { level: 2, name: `nav.sections.${section}` }),
+      ).toBeInTheDocument();
     }
   });
 
-  it('renders every link with correct href', () => {
+  it('keeps landing pages on the router and sends app pages to the app in the same tab', () => {
     render(<LandingFooter footer={landingContentEn.footer} />);
-    for (const col of landingContentEn.footer.columns) {
-      for (const link of col.links) {
-        const el = screen.getByRole('link', { name: link.label });
-        expect(el).toHaveAttribute('href', link.href);
-      }
-    }
+    expect(screen.getByRole('link', { name: 'nav.routes.whitePaper.label' })).toHaveAttribute(
+      'href',
+      '/white-paper',
+    );
+    const faq = screen.getByRole('link', { name: 'nav.routes.faq.label' });
+    expect(faq).toHaveAttribute('href', localeHref(APP_ORIGIN, '/faq', 'en'));
+    expect(faq).not.toHaveAttribute('target');
   });
 
-  it('marks external links with target=_blank and rel=noopener', () => {
-    render(<LandingFooter footer={landingContentEn.footer} />);
-    const nav = screen.getByRole('navigation', { name: /footer/i });
-    const externalLinks = within(nav)
-      .getAllByRole('link')
-      .filter((a) => (a.getAttribute('href') ?? '').startsWith('http'));
-
-    expect(externalLinks.length).toBeGreaterThan(0);
-    for (const link of externalLinks) {
-      expect(link).toHaveAttribute('target', '_blank');
-      expect(link.getAttribute('rel')).toContain('noopener');
-    }
+  it('never links an in-page anchor that only exists on the home page', () => {
+    const { container } = render(<LandingFooter footer={landingContentEn.footer} />);
+    const anchors = Array.from(container.querySelectorAll('a[href^="#"]'));
+    expect(anchors).toHaveLength(0);
   });
 
-  it('renders the crawlable language directory with a link per locale', () => {
+  it('offers a way into the app', () => {
+    render(<LandingFooter footer={landingContentEn.footer} />);
+    expect(screen.getByRole('link', { name: 'nav.cta.openApp' })).toHaveAttribute(
+      'href',
+      localeHref(APP_ORIGIN, '/', 'en'),
+    );
+  });
+
+  it('renders the crawlable language directory', () => {
     render(<LandingFooter footer={landingContentEn.footer} />);
     const directory = screen.getByRole('navigation', { name: 'common.languageSwitcher.label' });
-    const links = within(directory).getAllByRole('link');
-    expect(links.map((link) => link.textContent)).toEqual(
-      routing.locales.map((locale) => LOCALE_LABELS[locale]),
-    );
-    // Landing pages link the same page in every language at its canonical URL.
-    expect(links.map((link) => link.getAttribute('href'))).toEqual(
-      routing.locales.map((locale) => (locale === routing.defaultLocale ? '/' : `/${locale}`)),
-    );
+    for (const locale of routing.locales) {
+      expect(within(directory).getByText(LOCALE_LABELS[locale])).toBeInTheDocument();
+    }
   });
 
-  it('renders the CC0 colophon', () => {
+  it('renders the copyright with the current year and the colophon', () => {
     render(<LandingFooter footer={landingContentEn.footer} />);
-    expect(screen.getByText(landingContentEn.footer.colophon)).toBeInTheDocument();
-  });
-
-  it('renders the current year in the copyright', () => {
-    const { container } = render(<LandingFooter footer={landingContentEn.footer} />);
-    const year = new Date().getFullYear().toString();
-    // The copyright line is rendered as a <p> with the year inline.
-    const copyright = Array.from(container.querySelectorAll('p')).find((p) =>
-      (p.textContent ?? '').includes(`\u00a9 ${year}`),
+    const year = String(new Date().getFullYear());
+    expect(
+      screen.getByText(landingContentEn.footer.copyright.replace('{year}', year)),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: landingContentEn.footer.colophon })).toHaveAttribute(
+      'href',
+      localeHref(APP_ORIGIN, '/security', 'en'),
     );
-    expect(copyright).toBeDefined();
-    expect(copyright?.textContent).toContain('Cosmic Signature');
   });
 
-  it('contains no banned lexicon terms in the rendered DOM', () => {
+  it('has no accessibility violations', async () => {
     const { container } = render(<LandingFooter footer={landingContentEn.footer} />);
-    const text = container.textContent ?? '';
-    expect(text).not.toMatch(/\bbid(?:ding|der|s)?\b/i);
-    expect(text).not.toMatch(/\bprize(?:s|d)?\b/i);
-    expect(text).not.toMatch(/\braffle(?:s)?\b/i);
-    expect(text).not.toMatch(/\bstak(?:e|er|ing)\b/i);
-    expect(text).not.toMatch(/\bcharit(?:y|able)\b/i);
+    await checkA11y(container);
   });
 });

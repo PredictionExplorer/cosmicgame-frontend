@@ -58,7 +58,6 @@
       "waitingFirstGesture": "Відкрито, очікується перший жест",
       "synchronized": "Відлік синхронізовано з часом протоколу"
     },
-    "openLiveCycle": "Відкрити поточний цикл",
     "viewCstPool": "Пул CST на GeckoTerminal",
     "eventHorizon": "Горизонт подій",
     "countdownAria": "{label}: {duration}",

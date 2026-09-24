@@ -40,18 +40,11 @@
   "apiFailure": "サービスから応答がありませんでした。しばらくしてからもう一度お試しください。",
   "unexpected": "予期しないエラーです。もう一度お試しください。",
   "notFound": {
-    "title": "404：ページが見つかりません",
-    "description": "お探しのページは存在しないか、移動した可能性があります。Cosmic SignatureはArbitrum上のプロシージャル・オンチェーンアート・プロトコルです。下のリンクから目的のページをお探しください。",
-    "returnHome": "ホームへ戻る",
-    "suggestedPages": "おすすめのページ",
-    "popularPages": "よく見られているページ",
-    "links": {
-      "home": "ホーム——進行中のサイクル",
-      "gallery": "NFTギャラリー",
-      "howItWorks": "仕組み",
-      "faq": "よくある質問",
-      "statistics": "統計",
-      "anchoring": "係留配分"
-    }
+    "code": "エラー404",
+    "title": "ページが見つかりません",
+    "description": "URLが間違っているか、ページが移動した可能性があります。以下のページから続けてください。",
+    "primaryCta": "観測所へ",
+    "secondaryCta": "ギャラリーを見る",
+    "suggestedPages": "おすすめのページ"
   }
 }
