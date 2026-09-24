@@ -18,7 +18,7 @@ export const REEL_FADE_MS = 600;
 /**
  * How long a clip may sit without reaching `playing` before the reel gives
  * up on it (refused autoplay, a stalled download, a decoder that never
- * starts). Without this the hero would freeze on the poster forever: the
+ * starts). Without this the plate would freeze on the poster forever: the
  * parent disables its timer rotation while the reel is active.
  */
 export const REEL_START_TIMEOUT_MS = 10_000;
@@ -32,6 +32,8 @@ interface ArtReelProps {
   /** Pre-loaded silently while `current` plays so the hand-off has no gap. */
   next: ReelToken | null;
   poster: string;
+  /** Held on its current frame: the viewer paused the artwork. */
+  paused?: boolean;
   /** Called after the end-of-clip fade completes; the parent then swaps tokens. */
   onEnded: () => void;
   /** Called when the current clip cannot be played; the parent shows the still. */
@@ -39,26 +41,29 @@ interface ArtReelProps {
 }
 
 /**
- * The hero's generation reel: each imprinted Signature is drawn by a seeded
+ * The generation reel: each imprinted Signature is drawn by a seeded
  * three-body simulation, and the server keeps a 30-second clip of that
- * drawing beside every still. The reel plays the current token's clip,
+ * drawing beside every still. The reel plays the current token's clip on the
+ * black plate at the art's own ratio (object-fit: contain, nothing cropped),
  * pre-loads the next token's clip in a hidden sibling, fades to black when
  * the clip ends and hands control back to the parent to advance. Because the
  * hidden sibling is keyed by seed it simply becomes the visible one — no
  * reload — and fades in.
  *
- * Playback is paused while the reel is scrolled out of view or the tab is
- * hidden, so a page left open does not decode 60fps video for nobody.
+ * Playback stops while the viewer has paused the artwork, while the reel is
+ * scrolled out of view and while the tab is hidden, so a page left open does
+ * not decode 60fps video for nobody.
  *
  * Failure paths all end in `onError` so the parent can fall back to the
  * still image and resume timer rotation: a clip that errors (current, or the
  * pre-loaded next once it is promoted), a `play()` that rejects, or a clip
  * that never reaches `playing` within REEL_START_TIMEOUT_MS.
  */
-export function ArtReel({ current, next, poster, onEnded, onError }: ArtReelProps) {
+export function ArtReel({ current, next, poster, paused = false, onEnded, onError }: ArtReelProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef(new Map<string, HTMLVideoElement>());
   const inViewRef = useRef(true);
+  const pausedRef = useRef(paused);
   const failedSeeds = useRef(new Set<string>());
   const fadeTimer = useRef<number | null>(null);
   const startTimer = useRef<number | null>(null);
@@ -89,7 +94,8 @@ export function ArtReel({ current, next, poster, onEnded, onError }: ArtReelProp
     (seed: string) => {
       const video = videoRefs.current.get(seed);
       if (!video) return;
-      const shouldPlay = inViewRef.current && document.visibilityState !== 'hidden';
+      const shouldPlay =
+        !pausedRef.current && inViewRef.current && document.visibilityState !== 'hidden';
       if (!shouldPlay) {
         clearStartTimer();
         video.pause();
@@ -116,6 +122,12 @@ export function ArtReel({ current, next, poster, onEnded, onError }: ArtReelProp
     },
     [clearStartTimer, failCurrent],
   );
+
+  // The viewer's pause holds the clip on its current frame; play resumes it.
+  useEffect(() => {
+    pausedRef.current = paused;
+    syncPlayback(current.seed);
+  }, [paused, current.seed, syncPlayback]);
 
   // A new current clip (first mount, or the pre-loaded sibling promoted):
   // drop any pending hand-off from the previous clip, refuse a clip that
@@ -188,7 +200,7 @@ export function ArtReel({ current, next, poster, onEnded, onError }: ArtReelProp
   const tokens = hasNext ? [current, next] : [current];
 
   return (
-    <div ref={containerRef} className="absolute inset-0 bg-black" data-testid="deck-art-reel">
+    <div ref={containerRef} className="absolute inset-0 bg-art-ground" data-testid="deck-art-reel">
       {tokens.map((token) => {
         const isCurrent = token.seed === current.seed;
         return (
@@ -203,7 +215,7 @@ export function ArtReel({ current, next, poster, onEnded, onError }: ArtReelProp
             muted
             playsInline
             preload="auto"
-            autoPlay={isCurrent}
+            autoPlay={isCurrent && !paused}
             aria-hidden
             tabIndex={-1}
             data-testid={isCurrent ? 'deck-art-reel-current' : 'deck-art-reel-next'}
@@ -211,7 +223,7 @@ export function ArtReel({ current, next, poster, onEnded, onError }: ArtReelProp
             onPlaying={isCurrent ? clearStartTimer : undefined}
             onError={() => handleClipError(token.seed)}
             className={cn(
-              'absolute inset-0 h-full w-full object-cover transition-opacity duration-[600ms] ease-out',
+              'absolute inset-0 h-full w-full object-contain transition-opacity duration-[600ms] ease-out',
               isCurrent && !fading ? 'opacity-100' : 'opacity-0',
             )}
           />

@@ -527,13 +527,6 @@
     "monument": {
       "reserveLabel": "シグネチャー配分",
       "reserveExtras": "+ 1,000 CST · Cosmic Signature NFT 1点 · 添付されたアセット",
-      "youChip": "自分",
-      "fullConsole": "一筆のフルコンソールを開く",
-      "chooseRwlkToken": "下のフルコンソールでRandomWalkトークンを選んでください",
-      "microcopy": "一筆ごとに確定時刻が延び、星選の対象として記録されます。経過時間に応じて参加CSTが刻印されることもあります。",
-      "notifyAria": "サイクルが確定できるようになる前に通知する",
-      "notifyLabel": "確定前に通知：",
-      "notifyMinutes": "{minutes}分",
       "calendarTitle": "Cosmic Signatureサイクル{number}が始まります",
       "calendarBody": "次のパフォーマンス・サイクルで一筆を入れられるようになります。最初の一筆が確定までの時計を動かします。",
       "calendarCta": "開始をカレンダーに追加"
@@ -541,12 +534,10 @@
     "board": {
       "title": "配分トラック",
       "subtitle": "このサイクルの確定時に配分されるもの",
-      "tooltip": "現在のパフォーマンス・サイクルのすべての配分トラックのライブ表示：金額、現在の保持者、現在の記録。",
       "cstPlusNft": "1,000 CST + NFT",
-      "awaitingGesture": "最初の一筆を待っています",
-      "awaitingRecord": "記録はまだありません",
       "stellarStatus": "一筆はすべて対象になります",
-      "fullBreakdown": "内訳をすべて見る"
+      "ethGroup": "サイクル準備金のETH",
+      "fixedGroup": "CSTとNFTの配分"
     },
     "art": {
       "sectionAria": "注目のオンチェーンアートワーク",
@@ -554,17 +545,9 @@
       "galleryCta": "ギャラリー",
       "viewAria": "Cosmic Signature {id}を見る",
       "alt": "Cosmic Signatureのアートワーク{id}——決定論的な三体ジェネラティブアート",
-      "pairingNote": "オンチェーンに刻印された決定論的な三体アート。すべてのシグネチャーには1,000 CSTが添えられています。"
-    },
-    "composer": {
-      "title": "一筆で語る",
-      "subtitle": "メッセージは一筆とともにオンチェーンに残ります",
-      "placeholder": "任意のオンチェーンメッセージを書く…",
-      "note": "送信するとArbitrumに一筆が記録されます。添えたメッセージは一筆チャットに表示されます。",
-      "connectBody": "ウォレットを接続すると、一筆を入れて一筆チャットにメッセージを投稿できます。",
-      "rwlkChip": "RWLK #{id}",
-      "rwlkChoose": "RWLK：トークンを選ぶ",
-      "cstFree": "CST一筆はいま費用なしです"
+      "pairingNote": "オンチェーンに刻印された決定論的な三体アート。すべてのシグネチャーには1,000 CSTが添えられています。",
+      "title": "Cosmic Signature {id}",
+      "titleNamed": "「{name}」"
     },
     "personal": {
       "title": "現在の位置",
@@ -576,22 +559,25 @@
       "gestures": "{count, plural, =0 {このサイクルではまだ一筆を入れていません} other {このサイクルで#筆}}",
       "retrieve": "待機中の配分を受け取る",
       "nothingWaiting": "未受け取りの配分はありません",
-      "cstPreview": "いま一筆を入れると約{amount} CSTが刻印されます"
+      "cstPreview": "いま一筆を入れると約{amount} CSTが刻印されます",
+      "entryShare": "このサイクルの星選対象の{share}"
     },
-    "miniBar": {
-      "aria": "サイクルのクイックコンソール",
-      "reserve": "シグネチャー配分",
-      "jump": "観測所に戻る"
+    "console": {
+      "title": "一筆を入れる",
+      "methodLabel": "一筆の方法",
+      "free": "費用なし",
+      "reward": "参加CSTのプレビュー",
+      "minAccepted": "最小数量",
+      "messageHint": "メッセージは一筆とともにオンチェーンに残ります",
+      "finalizeOpensIn": "{duration}後には、どのウォレットからでもサイクルを確定できます。それまでは、最後の一筆を入れた参加者だけが確定できます。"
     },
-    "story": {
-      "collapsedTitle": "Cosmic Signatureについて",
-      "collapsedSubtitle": "物語、アートワーク、そして各パフォーマンス・サイクルがシグネチャーになるまで",
-      "expand": "展開"
+    "standings": {
+      "title": "ライブ順位",
+      "paidVia": "{method}を使用"
+    },
+    "links": {
+      "previousCycleDescription": "前回確定したサイクルの受領者と配分"
     }
-  },
-  "mobileCta": {
-    "makeGesture": "一筆を入れる",
-    "preview": "一筆の選択肢をプレビュー"
   },
   "observatory": {
     "pulse": {

@@ -527,13 +527,6 @@
     "monument": {
       "reserveLabel": "签名分配",
       "reserveExtras": "+ 1,000 CST · 1 枚 Cosmic Signature NFT · 附加资产",
-      "youChip": "你",
-      "fullConsole": "打开完整落笔控制台",
-      "chooseRwlkToken": "请在下方完整控制台中选择你的 Random Walk 代币",
-      "microcopy": "每次落笔都会延长收官倒计时、增加一次星选资格，并可能铭刻参与 CST。",
-      "notifyAria": "在周期可收官前提醒我",
-      "notifyLabel": "收官前提醒：",
-      "notifyMinutes": "{minutes} 分钟",
       "calendarTitle": "Cosmic Signature 第 {number} 个周期开启",
       "calendarBody": "下一演绎周期即将开放落笔。第一笔会启动收官倒计时。",
       "calendarCta": "把开启时间加入日历"
@@ -541,12 +534,10 @@
     "board": {
       "title": "分配轨道",
       "subtitle": "本周期收官时发放的全部内容",
-      "tooltip": "当前演绎周期各条分配轨道的实时一览：金额、当前持有者与现存纪录。",
       "cstPlusNft": "1,000 CST + NFT",
-      "awaitingGesture": "等待第一笔",
-      "awaitingRecord": "暂无纪录",
       "stellarStatus": "每一次落笔都是一份星选资格",
-      "fullBreakdown": "查看完整分配明细"
+      "ethGroup": "来自周期储备的 ETH",
+      "fixedGroup": "CST 与 NFT 分配"
     },
     "art": {
       "sectionAria": "精选链上艺术作品",
@@ -554,17 +545,9 @@
       "galleryCta": "画廊",
       "viewAria": "查看 Cosmic Signature {id}",
       "alt": "Cosmic Signature 艺术作品 {id} —— 确定性三体生成艺术",
-      "pairingNote": "确定性三体艺术，铭刻于链上。每枚签名作品都配有 1,000 CST。"
-    },
-    "composer": {
-      "title": "以落笔发声",
-      "subtitle": "留言与你的落笔一同上链",
-      "placeholder": "写一条可选的链上留言……",
-      "note": "发送即在 Arbitrum 上真实落笔——留言随之上链，并显示在落笔留言板中。",
-      "connectBody": "连接钱包即可落笔，并在落笔留言板中留言。",
-      "rwlkChip": "RWLK #{id}",
-      "rwlkChoose": "RWLK：选择代币",
-      "cstFree": "当前 CST 落笔免费"
+      "pairingNote": "确定性三体艺术，铭刻于链上。每枚签名作品都配有 1,000 CST。",
+      "title": "Cosmic Signature {id}",
+      "titleNamed": "《{name}》"
     },
     "personal": {
       "title": "你的位置",
@@ -576,22 +559,25 @@
       "gestures": "{count, plural, =0 {本周期尚未落笔} other {本周期已落笔 # 次}}",
       "retrieve": "取回等待中的分配",
       "nothingWaiting": "暂无等待取回的分配",
-      "cstPreview": "此刻落笔约可铭刻 {amount} CST"
+      "cstPreview": "此刻落笔约可铭刻 {amount} CST",
+      "entryShare": "占本周期星选资格的 {share}"
     },
-    "miniBar": {
-      "aria": "周期快捷台",
-      "reserve": "签名分配",
-      "jump": "返回观测台"
+    "console": {
+      "title": "落笔",
+      "methodLabel": "落笔方式",
+      "free": "免费",
+      "reward": "CST 铭刻预览",
+      "minAccepted": "最低接受",
+      "messageHint": "留言与你的落笔一同上链",
+      "finalizeOpensIn": "{duration}后你即可收官。在此之前，只有写下收官之笔的参与者可以收官。"
     },
-    "story": {
-      "collapsedTitle": "关于 Cosmic Signature",
-      "collapsedSubtitle": "故事、作品，以及每个演绎周期如何凝成签名",
-      "expand": "展开"
+    "standings": {
+      "title": "实时席位",
+      "paidVia": "使用 {method}"
+    },
+    "links": {
+      "previousCycleDescription": "上一个收官周期的获配者与分配"
     }
-  },
-  "mobileCta": {
-    "makeGesture": "落笔",
-    "preview": "预览落笔选项"
   },
   "observatory": {
     "pulse": {

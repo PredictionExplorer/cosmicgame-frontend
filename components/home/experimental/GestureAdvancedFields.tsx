@@ -1,36 +1,26 @@
 'use client';
 
 import { useId } from 'react';
-import { Settings2, Info } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { protocolFacts } from '@/content/protocol-facts';
-
-import { formatCstAmount } from '@/utils/cstGesture';
 import {
   clampCollisionBufferPercent,
   ethGestureSendAmount,
   formatEthQuote,
 } from '@/utils/gestureQuote';
-import { cn } from '@/lib/utils';
+import { formatAmount } from '@/utils/format';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { MessageTextarea } from '@/components/ui/message-textarea';
-import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { CustomTextField } from '@/components/styled';
+import { Skeleton } from '@/components/ui/skeleton';
 import type { EthGestureInfo } from '@/hooks/useGestureForm';
-
-const MESSAGE_MAX_LENGTH = protocolFacts.gestureMessageMaxLength;
-const MESSAGE_COUNTER_WARN_AT = MESSAGE_MAX_LENGTH - 20;
+import { cn } from '@/lib/utils';
 
 export interface GestureAdvancedFieldsProps {
   gestureType: string;
   contributionType: string;
   setContributionType: (value: string) => void;
-  message: string;
-  setMessage: (value: string) => void;
   nftDonateAddress: string;
   setNftDonateAddress: (value: string) => void;
   nftId: string;
@@ -48,29 +38,41 @@ export interface GestureAdvancedFieldsProps {
   setCstRewardTolerancePercent?: (value: number) => void;
   acceptAnyCstReward?: boolean;
   setAcceptAnyCstReward?: (value: boolean) => void;
-  previewMode?: boolean;
   /** False before the cycle's first gesture: only the ETH method exists then. */
   showAll: boolean;
-  /**
-   * `stack`: under the form (the accordion, width-capped). `panel`: the
-   * monument's side panel, which owns its own width — one column there
-   * reads best; the panel scrolls within the card's height if it must.
-   */
-  layout?: 'stack' | 'panel';
+  className?: string;
+}
+
+/** A number field with its unit inside the end of the field. */
+function SuffixedNumberInput({
+  id,
+  suffix,
+  className,
+  ...props
+}: React.ComponentProps<typeof Input> & { suffix: string }) {
+  return (
+    <div className={cn('relative shrink-0', className)}>
+      <Input id={id} type="number" inputMode="decimal" className="pe-8 tabular-nums" {...props} />
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 end-3 flex items-center type-caption text-subtle"
+      >
+        {suffix}
+      </span>
+    </div>
+  );
 }
 
 /**
- * The Advanced options of a gesture — on-chain message, attached NFT/token,
- * minimum-CST protection and collision buffer. Shared by the inline accordion
- * in GestureForm and by the monument's side panel (GestureAdvancedPanel), so
- * the fields exist exactly once whichever way they are opened.
+ * The Advanced options of a gesture: an attached NFT or token, the minimum
+ * CST reward protection and the collision buffer. Groups are separated by
+ * hairlines inside the disclosure, never by nested boxes. The message is not
+ * here: it is part of the console itself.
  */
 export function GestureAdvancedFields({
   gestureType,
   contributionType,
   setContributionType,
-  message,
-  setMessage,
   nftDonateAddress,
   setNftDonateAddress,
   nftId,
@@ -88,303 +90,185 @@ export function GestureAdvancedFields({
   setCstRewardTolerancePercent,
   acceptAnyCstReward = false,
   setAcceptAnyCstReward,
-  previewMode = false,
   showAll,
-  layout = 'stack',
+  className,
 }: GestureAdvancedFieldsProps) {
   const t = useTranslations('home');
-  const tCommon = useTranslations('common');
   const locale = useLocale();
-  const messageInputId = useId();
+  const baseId = useId();
   const ethPrice = ethGestureInfo?.ETHPrice;
+  const hasEthQuote = ethPrice != null && Number.isFinite(ethPrice) && ethPrice >= 0;
 
-  const messageField = (
-    <>
-      <div>
-        <div className="mb-2 flex items-center gap-2">
-          <Label htmlFor={messageInputId} className="text-sm font-semibold text-foreground">
-            {t('form.advanced.messageLabel')}{' '}
-            <span className="text-xs font-normal text-muted-foreground">
-              {t('form.advanced.messageOptionalHint', {
-                maxLength: String(MESSAGE_MAX_LENGTH),
-              })}
-            </span>
-          </Label>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                type="button"
-                aria-label={t('form.advanced.messageTooltipAria')}
-                className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.04] text-muted-foreground transition-colors hover:border-primary/25 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-              >
-                <Info className="h-3.5 w-3.5" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className="max-w-[260px]">{t('form.advanced.messageTooltip')}</p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
-        <MessageTextarea
-          id={messageInputId}
-          aria-describedby={`${messageInputId}-count`}
-          placeholder={t('form.advanced.messagePlaceholder')}
-          value={message}
-          maxLength={MESSAGE_MAX_LENGTH}
-          rows={3}
-          disabled={previewMode}
-          onChange={(e) => setMessage(e.target.value)}
-        />
-        <div className="mt-1.5 flex justify-end">
-          <span
-            id={`${messageInputId}-count`}
-            data-testid="gesture-message-char-count"
-            className={cn(
-              'text-xs tabular-nums',
-              message.length >= MESSAGE_COUNTER_WARN_AT
-                ? 'text-amber-300'
-                : 'text-muted-foreground',
-            )}
-          >
-            {message.length}/{MESSAGE_MAX_LENGTH}
-          </span>
-        </div>
-      </div>
-    </>
-  );
-  const attachIntro = (
-    <>
-      <p className="text-xs text-muted-foreground">{t('form.advanced.attachIntro')}</p>
-    </>
-  );
-  const minCstBox = (
-    <>
-      {showAll && (
-        <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-4 space-y-3">
-          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            {t('form.advanced.minCstProtection.title')}
-          </p>
-          <p className="text-xs leading-relaxed text-muted-foreground">
-            {t('form.advanced.minCstProtection.body')}
-          </p>
-          <label className="flex items-start gap-2 rounded-md border border-white/[0.06] bg-white/[0.02] p-3 text-sm">
-            <Checkbox
-              checked={acceptAnyCstReward}
-              disabled={previewMode || !setAcceptAnyCstReward}
-              onChange={(e) => setAcceptAnyCstReward?.(e.currentTarget.checked)}
-              aria-label={t('form.advanced.minCstProtection.acceptAnyAria')}
-            />
-            <span>
-              <span className="block font-medium text-foreground">
-                {t('form.advanced.minCstProtection.acceptAnyTitle')}
-              </span>
-              <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">
-                {t('form.advanced.minCstProtection.acceptAnyBody')}
-              </span>
-            </span>
-          </label>
-          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2">
-            <div className="flex items-center gap-2 shrink-0">
-              <span className="text-sm text-muted-foreground whitespace-nowrap">
-                {t('form.advanced.minCstProtection.toleranceLabel')}
-              </span>
-              <div className="relative w-[4.75rem] shrink-0">
-                <CustomTextField
-                  type="number"
-                  placeholder="1"
-                  value={cstRewardTolerancePercent}
-                  min={0}
-                  max={100}
-                  step={0.1}
-                  className="h-9 px-2.5 py-2 pr-7 text-sm tabular-nums"
-                  disabled={acceptAnyCstReward || previewMode || !setCstRewardTolerancePercent}
-                  onChange={(e) => setCstRewardTolerancePercent?.(Number(e.target.value))}
-                />
-                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none text-xs">
-                  %
-                </span>
-              </div>
-            </div>
-            <span className="text-sm font-mono text-muted-foreground tabular-nums min-w-0">
-              {t('form.advanced.minCstProtection.minAmount', {
-                amount: formatCstAmount(gestureCstRewardAmountMin),
-              })}
-            </span>
-          </div>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            {t('form.advanced.minCstProtection.revertNote')}
-          </p>
-        </div>
-      )}
-    </>
-  );
-  const attachFields = (
-    <>
-      <RadioGroup
-        value={contributionType}
-        onValueChange={(value) => {
-          setRwlkId(-1);
-          setContributionType(value);
-        }}
-        className="flex flex-row flex-wrap gap-x-4 gap-y-2"
-      >
-        <label className="flex items-center gap-1.5 cursor-pointer">
-          <RadioGroupItem value="NFT" />
-          <span className="text-sm">{t('form.advanced.attachNft')}</span>
-        </label>
-        <label className="flex items-center gap-1.5 cursor-pointer">
-          <RadioGroupItem value="Token" />
-          <span className="text-sm">{t('form.advanced.attachToken')}</span>
-        </label>
-      </RadioGroup>
-      {contributionType === 'Token' && (
-        <div className="space-y-3">
-          <div className="min-w-0">
-            <Label className="text-xs text-muted-foreground mb-1 block">
-              {t('form.advanced.tokenContractLabel')}
-            </Label>
-            <Input
-              placeholder="0x..."
-              value={tokenDonateAddress}
-              onChange={(e) => setTokenDonateAddress(e.target.value)}
-              disabled={previewMode}
-              className="w-full max-w-md font-mono text-sm"
-              spellCheck={false}
-              autoComplete="off"
-            />
-          </div>
-          <div className="w-full max-w-[11rem]">
-            <Label className="text-xs text-muted-foreground mb-1 block">
-              {t('form.advanced.tokenAmountLabel')}
-            </Label>
-            <Input
-              placeholder="0.0"
-              type="number"
-              value={tokenAmount}
-              onChange={(e) => setTokenAmount(e.target.value)}
-              disabled={previewMode}
-              className="font-mono text-sm tabular-nums"
-            />
-          </div>
-        </div>
-      )}
-      {contributionType === 'NFT' && (
-        <div className="space-y-3">
-          <div className="min-w-0">
-            <Label className="text-xs text-muted-foreground mb-1 block">
-              {t('form.advanced.nftContractLabel')}
-            </Label>
-            <Input
-              placeholder="0x..."
-              value={nftDonateAddress}
-              onChange={(e) => setNftDonateAddress(e.target.value)}
-              disabled={previewMode}
-              className="w-full max-w-md font-mono text-sm"
-              spellCheck={false}
-              autoComplete="off"
-            />
-          </div>
-          <div className="w-full max-w-[7.5rem]">
-            <Label className="text-xs text-muted-foreground mb-1 block">
-              {t('form.advanced.nftIdLabel')}
-            </Label>
-            <Input
-              placeholder={t('form.advanced.nftIdPlaceholder')}
-              type="number"
-              min={0}
-              value={nftId}
-              onChange={(e) => setNftId(e.target.value)}
-              disabled={previewMode}
-              className="font-mono text-sm tabular-nums"
-            />
-          </div>
-        </div>
-      )}
-    </>
-  );
-  const collisionBox = (
-    <>
-      {gestureType !== 'CST' && (
-        <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-4 space-y-3">
-          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            {t('form.advanced.collision.title')}
-          </p>
-          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2">
-            <div className="flex items-center gap-2 shrink-0">
-              <span className="text-sm text-muted-foreground whitespace-nowrap">
-                {t('form.advanced.collision.raiseBy')}
-              </span>
-              <div className="relative w-[4.25rem] shrink-0">
-                <CustomTextField
-                  type="number"
-                  placeholder="0"
-                  value={gestureCostPlus}
-                  min={0}
-                  max={50}
-                  className="h-9 px-2.5 py-2 pr-7 text-sm tabular-nums"
-                  disabled={previewMode}
-                  onChange={(e) => {
-                    setBidPricePlus(clampCollisionBufferPercent(e.target.value));
-                  }}
-                />
-                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none text-xs">
-                  %
-                </span>
-              </div>
-            </div>
-            <span className="text-sm font-mono text-muted-foreground tabular-nums min-w-0">
-              {ethPrice != null && Number.isFinite(ethPrice) && ethPrice >= 0
-                ? t('form.advanced.collision.approxCost', {
-                    amount: formatEthQuote(
-                      ethGestureSendAmount(ethPrice, gestureType, gestureCostPlus),
-                      locale,
-                    ),
-                  })
-                : tCommon('status.loadingDots')}
-            </span>
-          </div>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            {t('form.advanced.collision.note', { percent: String(gestureCostPlus) })}
-          </p>
-        </div>
-      )}{' '}
-    </>
-  );
+  const ids = {
+    attach: `${baseId}-attach`,
+    contract: `${baseId}-contract`,
+    amount: `${baseId}-amount`,
+    acceptAny: `${baseId}-accept-any`,
+    tolerance: `${baseId}-tolerance`,
+    collision: `${baseId}-collision`,
+  };
+
+  const groupTitle = 'type-label text-foreground';
+  const groupNote = 'type-caption text-muted-foreground';
 
   return (
     <div
-      className={cn('space-y-4', layout === 'panel' ? 'pt-1' : 'pt-2 max-w-xl')}
+      className={cn('divide-y divide-rule-faint', className)}
       data-testid="gesture-advanced-fields"
-      data-layout={layout}
     >
-      {messageField}
-      {attachIntro}
-      {minCstBox}
-      {attachFields}
-      {collisionBox}
-    </div>
-  );
-}
+      <fieldset className="space-y-3 pb-5">
+        <legend id={ids.attach} className={cn(groupTitle, 'mb-1')}>
+          {t('form.advanced.attachIntro')}
+        </legend>
+        <RadioGroup
+          value={contributionType}
+          onValueChange={(value) => {
+            setRwlkId(-1);
+            setContributionType(value);
+          }}
+          aria-labelledby={ids.attach}
+          className="flex flex-row flex-wrap gap-x-5 gap-y-2"
+        >
+          <label className="flex min-h-11 cursor-pointer items-center gap-2 type-body-sm sm:min-h-9">
+            <RadioGroupItem value="NFT" />
+            {t('form.advanced.attachNft')}
+          </label>
+          <label className="flex min-h-11 cursor-pointer items-center gap-2 type-body-sm sm:min-h-9">
+            <RadioGroupItem value="Token" />
+            {t('form.advanced.attachToken')}
+          </label>
+        </RadioGroup>
+        <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_9rem]">
+          <div className="min-w-0">
+            <Label htmlFor={ids.contract} className="mb-1.5 block type-caption text-subtle">
+              {contributionType === 'Token'
+                ? t('form.advanced.tokenContractLabel')
+                : t('form.advanced.nftContractLabel')}
+            </Label>
+            <Input
+              id={ids.contract}
+              placeholder="0x…"
+              value={contributionType === 'Token' ? tokenDonateAddress : nftDonateAddress}
+              onChange={(e) =>
+                contributionType === 'Token'
+                  ? setTokenDonateAddress(e.target.value)
+                  : setNftDonateAddress(e.target.value)
+              }
+              className="font-mono"
+              spellCheck={false}
+              autoComplete="off"
+            />
+          </div>
+          <div className="min-w-0">
+            <Label htmlFor={ids.amount} className="mb-1.5 block type-caption text-subtle">
+              {contributionType === 'Token'
+                ? t('form.advanced.tokenAmountLabel')
+                : t('form.advanced.nftIdLabel')}
+            </Label>
+            <Input
+              id={ids.amount}
+              type="number"
+              inputMode={contributionType === 'Token' ? 'decimal' : 'numeric'}
+              min={0}
+              placeholder={
+                contributionType === 'Token' ? '0.0' : t('form.advanced.nftIdPlaceholder')
+              }
+              value={contributionType === 'Token' ? tokenAmount : nftId}
+              onChange={(e) =>
+                contributionType === 'Token'
+                  ? setTokenAmount(e.target.value)
+                  : setNftId(e.target.value)
+              }
+              className="tabular-nums"
+            />
+          </div>
+        </div>
+      </fieldset>
 
-/**
- * The monument's Advanced side panel: at `xl` the centre card takes the chat
- * column's width and this panel fills the new right half at full card height,
- * so opening Advanced never makes the card taller (see CycleMonument
- * `sidePanel`). The accordion trigger in GestureForm stays the toggle.
- */
-export function GestureAdvancedPanel(props: Omit<GestureAdvancedFieldsProps, 'layout'>) {
-  const t = useTranslations('home');
-  return (
-    <aside
-      data-testid="gesture-advanced-panel"
-      aria-label={t('form.advanced.title')}
-      className="text-left"
-    >
-      <p className="mb-4 flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-        <Settings2 className="h-4 w-4" aria-hidden />
-        {t('form.advanced.title')}
-      </p>
-      <GestureAdvancedFields {...props} layout="panel" />
-    </aside>
+      {showAll ? (
+        <fieldset className="space-y-3 py-5" data-testid="min-cst-protection">
+          <legend className={groupTitle}>{t('form.advanced.minCstProtection.title')}</legend>
+          <p className={groupNote}>{t('form.advanced.minCstProtection.body')}</p>
+          <div className="flex items-start gap-3">
+            <Checkbox
+              id={ids.acceptAny}
+              checked={acceptAnyCstReward}
+              disabled={!setAcceptAnyCstReward}
+              onChange={(e) => setAcceptAnyCstReward?.(e.currentTarget.checked)}
+              className="mt-0.5"
+            />
+            <Label htmlFor={ids.acceptAny} className="min-w-0 cursor-pointer">
+              <span className="block type-body-sm font-medium text-foreground">
+                {t('form.advanced.minCstProtection.acceptAnyTitle')}
+              </span>
+              <span className={cn('mt-0.5 block', groupNote)}>
+                {t('form.advanced.minCstProtection.acceptAnyBody')}
+              </span>
+            </Label>
+          </div>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <Label htmlFor={ids.tolerance} className="type-body-sm text-muted-foreground">
+              {t('form.advanced.minCstProtection.toleranceLabel')}
+            </Label>
+            <SuffixedNumberInput
+              id={ids.tolerance}
+              suffix="%"
+              value={cstRewardTolerancePercent}
+              min={0}
+              max={100}
+              step={0.1}
+              disabled={acceptAnyCstReward || !setCstRewardTolerancePercent}
+              onChange={(e) => setCstRewardTolerancePercent?.(Number(e.target.value))}
+              className="w-24"
+            />
+            <span className="type-figure-sm text-muted-foreground">
+              {t('form.advanced.minCstProtection.minAmount', {
+                amount: formatAmount(gestureCstRewardAmountMin, {
+                  unit: 'CST',
+                  locale,
+                  withUnit: false,
+                }),
+              })}
+            </span>
+          </div>
+          <p className={groupNote}>{t('form.advanced.minCstProtection.revertNote')}</p>
+        </fieldset>
+      ) : null}
+
+      {gestureType !== 'CST' ? (
+        <fieldset className="space-y-3 pt-5" data-testid="collision-buffer">
+          <legend className={groupTitle}>{t('form.advanced.collision.title')}</legend>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <Label htmlFor={ids.collision} className="type-body-sm text-muted-foreground">
+              {t('form.advanced.collision.raiseBy')}
+            </Label>
+            <SuffixedNumberInput
+              id={ids.collision}
+              suffix="%"
+              value={gestureCostPlus}
+              min={0}
+              max={50}
+              onChange={(e) => setBidPricePlus(clampCollisionBufferPercent(e.target.value))}
+              className="w-24"
+            />
+            <div className="type-figure-sm text-muted-foreground">
+              {hasEthQuote ? (
+                t('form.advanced.collision.approxCost', {
+                  amount: formatEthQuote(
+                    ethGestureSendAmount(ethPrice, gestureType, gestureCostPlus),
+                    locale,
+                  ),
+                })
+              ) : (
+                <Skeleton className="h-3.5 w-20" />
+              )}
+            </div>
+          </div>
+          <p className={groupNote}>
+            {t('form.advanced.collision.note', { percent: String(gestureCostPlus) })}
+          </p>
+        </fieldset>
+      ) : null}
+    </div>
   );
 }

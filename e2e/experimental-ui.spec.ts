@@ -11,36 +11,43 @@ async function openExperiment(page: Page, path = EXPERIMENT_PATH): Promise<void>
 }
 
 test.describe('experimental UI', () => {
-  test('preserves the PR deck structure without replacing the current home', async ({ page }) => {
+  test('hangs the art beside the monument without replacing the current home', async ({ page }) => {
     await openExperiment(page);
 
     const header = page.getByTestId('home-deck-header');
-    const art = page.getByTestId('home-art-hero');
     const deck = page.getByTestId('home-deck-layout');
 
     await expect(header).toBeVisible();
-    await expect(art).toBeVisible();
-    await expect(deck).toBeVisible();
-    await expect(deck.getByTestId('home-deck-board')).toBeVisible();
+    await expect(deck.getByTestId('home-art-hero')).toBeVisible();
     await expect(deck.getByTestId('home-deck-monument')).toBeVisible();
-    await expect(deck.getByTestId('home-deck-chat')).toBeVisible();
+    await expect(deck.getByTestId('home-deck-board')).toBeVisible();
+    await expect(page.getByTestId('home-deck-chat')).toBeVisible();
     await expect(page.getByTestId('experimental-ui-return')).toHaveAttribute('href', '/');
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
       'content',
       /noindex,\s*follow/,
     );
 
+    // One gesture form: one submit, one message field, no second composer.
+    await expect(page.locator('#gesture-submit')).toHaveCount(1);
+    await expect(page.getByTestId('gesture-message-input')).toHaveCount(1);
+    await expect(page.getByTestId('gesture-composer')).toHaveCount(0);
+    // One allocation view, and no legacy strip or second hero at the end.
+    await expect(page.getByTestId('allocation-tracks-board')).toHaveCount(1);
+    await expect(page.getByTestId('home-story-section')).toHaveCount(0);
+
     const order = await page.evaluate(() => {
-      const headerNode = document.querySelector('[data-testid="home-deck-header"]');
-      const artNode = document.querySelector('[data-testid="home-art-hero"]');
-      const deckNode = document.querySelector('[data-testid="home-deck-layout"]');
-      if (!headerNode || !artNode || !deckNode) return [];
-      return [
-        Boolean(headerNode.compareDocumentPosition(artNode) & Node.DOCUMENT_POSITION_FOLLOWING),
-        Boolean(artNode.compareDocumentPosition(deckNode) & Node.DOCUMENT_POSITION_FOLLOWING),
-      ];
+      const at = (testId: string) => document.querySelector(`[data-testid="${testId}"]`);
+      const header = at('home-deck-header');
+      const art = at('home-art-hero');
+      const monument = at('home-deck-monument');
+      const board = at('home-deck-board');
+      if (!header || !art || !monument || !board) return [];
+      const follows = (a: Element, b: Element) =>
+        Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+      return [follows(header, art), follows(art, monument), follows(monument, board)];
     });
-    expect(order).toEqual([true, true]);
+    expect(order).toEqual([true, true, true]);
 
     const currentHome = await page.context().newPage();
     try {
@@ -55,43 +62,43 @@ test.describe('experimental UI', () => {
     }
   });
 
-  test('opens Advanced sideways without making the monument taller', async ({ page, isMobile }) => {
-    test.skip(Boolean(isMobile), 'desktop-only geometry contract');
-    await page.setViewportSize({ width: 1440, height: 1000 });
+  test('keeps the clock and the art in the first desktop viewport', async ({ page, isMobile }) => {
+    test.skip(Boolean(isMobile), 'desktop geometry contract');
+    await page.setViewportSize({ width: 1440, height: 900 });
     await openExperiment(page);
 
-    const monument = page.getByTestId('home-deck-monument');
-    await monument.scrollIntoViewIfNeeded();
-    const before = await monument.boundingBox();
-    expect(before).not.toBeNull();
-
-    await page.getByRole('button', { name: 'Advanced' }).click();
-    await expect(page.getByTestId('gesture-advanced-panel')).toBeVisible();
-    await expect(page.getByTestId('home-deck-chat')).toBeHidden();
-    await expect(monument).toHaveClass(/xl:col-span-2/);
-
-    const after = await monument.boundingBox();
-    expect(after).not.toBeNull();
-    expect(Math.abs(after!.height - before!.height)).toBeLessThanOrEqual(8);
+    const clock = await page.getByRole('timer').boundingBox();
+    const art = await page.getByTestId('home-art-hero').boundingBox();
+    expect(clock).not.toBeNull();
+    expect(art).not.toBeNull();
+    expect(clock!.y + clock!.height).toBeLessThanOrEqual(900);
+    expect(art!.y).toBeLessThan(900);
+    // The monument sits beside the art, not under it.
+    expect(clock!.x).toBeGreaterThan(art!.x + art!.width);
   });
 
-  test('does not show the sticky mini-bar before the deck has passed', async ({
+  test('prices every method in its segment and opens Advanced inside the console', async ({
     page,
     isMobile,
   }) => {
-    test.skip(Boolean(isMobile), 'desktop sticky bar contract');
+    test.skip(Boolean(isMobile), 'desktop console contract');
     await page.setViewportSize({ width: 1440, height: 1000 });
     await openExperiment(page);
 
-    await expect(page.getByTestId('deck-mini-bar')).toHaveCount(0);
-    await page.evaluate(() => {
-      const deck = document.querySelector('[data-testid="home-deck-layout"]');
-      window.scrollTo({ top: (deck?.getBoundingClientRect().bottom ?? 0) + window.scrollY + 200 });
-    });
-    await expect(page.getByTestId('deck-mini-bar')).toBeVisible();
+    const methods = page.getByRole('radiogroup', { name: 'Gesture method' }).getByRole('radio');
+    await expect(methods).toHaveCount(3);
+    await expect(methods.first()).toContainText('ETH');
+    await expect(page.getByTestId('calibration-window')).toBeVisible();
+
+    const console_ = page.getByTestId('gesture-console').first();
+    await console_.getByText('Advanced', { exact: true }).click();
+    await expect(console_.getByTestId('gesture-advanced-fields')).toBeVisible();
   });
 
-  test('uses the intended phone order and still-art fallback', async ({ page, isMobile }) => {
+  test('uses the intended phone order, the shared dock and the still art', async ({
+    page,
+    isMobile,
+  }) => {
     test.skip(!isMobile, 'mobile-only responsive contract');
     await page.setViewportSize({ width: 390, height: 844 });
     await openExperiment(page);
@@ -102,6 +109,7 @@ test.describe('experimental UI', () => {
         document.querySelector(`[data-testid="${testId}"]`)?.getBoundingClientRect().top ??
         Number.POSITIVE_INFINITY;
       return {
+        art: top('home-art-hero'),
         monument: top('home-deck-monument'),
         board: top('home-deck-board'),
         chat: top('home-deck-chat'),
@@ -110,10 +118,64 @@ test.describe('experimental UI', () => {
       };
     });
 
+    expect(positions.art).toBeLessThan(positions.monument);
     expect(positions.monument).toBeLessThan(positions.board);
     expect(positions.board).toBeLessThan(positions.chat);
     expect(positions.scrollWidth).toBeLessThanOrEqual(positions.clientWidth + 1);
-    await expect(page.getByTestId('mobile-composer-fab')).toBeVisible();
+
+    // The header's actions and its related link share one row on phones.
+    const header = page.getByTestId('home-deck-header');
+    await expect(header.getByTestId('experimental-ui-new-here')).toBeVisible();
+    await expect(header.getByRole('navigation')).toBeHidden();
+    const rows = await page.evaluate(() => {
+      const top = (testId: string) =>
+        document.querySelector(`[data-testid="${testId}"]`)?.getBoundingClientRect().top ?? 0;
+      return { back: top('experimental-ui-return'), newHere: top('experimental-ui-new-here') };
+    });
+    expect(Math.abs(rows.back - rows.newHere)).toBeLessThan(12);
+
+    // The dock carries the clock and the priced action, and opens the same console.
+    await expect(page.getByTestId('action-dock-mobile')).toBeVisible();
+    await page.getByTestId('dock-open-sheet').click();
+    await expect(
+      page.locator('[data-testid="gesture-console"][data-variant="sheet"]'),
+    ).toBeVisible();
+    // The dialog is named by the heading it shows.
+    await expect(page.getByRole('dialog', { name: 'Make a Gesture' })).toBeVisible();
+  });
+
+  test('keeps keyboard focus clear of the phone dock', async ({ page, isMobile }) => {
+    test.skip(!isMobile, 'the dock floats over phones only');
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openExperiment(page);
+    await expect(page.getByTestId('action-dock-mobile')).toBeVisible();
+
+    // Tab to the art's Pause control, which first paints under the dock.
+    const toggle = page.getByTestId('art-motion-toggle');
+    for (let press = 0; press < 40; press += 1) {
+      await page.keyboard.press('Tab');
+      if (await toggle.evaluate((node) => node === document.activeElement)) break;
+    }
+    await expect(toggle).toBeFocused();
+    const overlap = await page.evaluate(() => {
+      const focused = document.activeElement!.getBoundingClientRect();
+      const dock = document.querySelector('[data-action-dock]')!.getBoundingClientRect();
+      return focused.bottom - dock.top;
+    });
+    expect(overlap).toBeLessThanOrEqual(0);
+  });
+
+  test('pauses the artwork and remembers it', async ({ page, isMobile }) => {
+    test.skip(Boolean(isMobile), 'the reel runs on wide screens');
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await openExperiment(page);
+
+    const toggle = page.getByTestId('art-motion-toggle');
+    await expect(toggle).toHaveAccessibleName('Pause animation');
+    await toggle.click();
+    await expect(toggle).toHaveAccessibleName('Play animation');
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await expect(page.getByTestId('art-motion-toggle')).toHaveAccessibleName('Play animation');
   });
 
   test('honors reduced motion by keeping generation video unmounted', async ({ page }) => {
@@ -134,28 +196,5 @@ test.describe('experimental UI', () => {
       page.getByRole('heading', { level: 1, name: 'Cosmic Signature 观测台' }),
     ).toBeVisible({ timeout: 20_000 });
     await expect(page.getByRole('link', { name: '返回当前界面' })).toHaveAttribute('href', '/zh');
-  });
-
-  test('matches the pinned deck appearance at the primary desktop breakpoint', async ({
-    page,
-    isMobile,
-  }) => {
-    test.skip(Boolean(isMobile), 'desktop visual contract');
-    await page.setViewportSize({ width: 1440, height: 1000 });
-    await page.emulateMedia({ reducedMotion: 'reduce' });
-    await openExperiment(page);
-    await page.addStyleTag({
-      content: 'nextjs-portal { display: none !important; }',
-    });
-
-    const deck = page.getByTestId('home-deck-layout');
-    await deck.scrollIntoViewIfNeeded();
-    await expect(deck).toHaveScreenshot('deck-1440.png', {
-      animations: 'disabled',
-      caret: 'hide',
-      maxDiffPixelRatio: 0.02,
-      maskColor: '#151a42',
-      mask: [deck.getByRole('timer')],
-    });
   });
 });
