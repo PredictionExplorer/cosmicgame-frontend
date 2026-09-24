@@ -1,6 +1,12 @@
 import { getAssetsUrl, getThumbUrl, getWebImageUrl } from '@/utils';
 
-import { ART_WIDTH, type ArtRendition, type ArtSource } from '@/components/ui/art-frame';
+import { withOptimizedRenditions } from '@/lib/artRenditions';
+import {
+  ART_HEIGHT,
+  ART_WIDTH,
+  type ArtRendition,
+  type ArtSource,
+} from '@/components/ui/art-frame';
 
 /*
  * A Signature's published media, derived from its seed alone. A leaf module
@@ -32,7 +38,10 @@ export function isRenderPending(imprintedAt: number | null | undefined, nowMs: n
 
 /** Every published file of one Signature, derived from its seed. */
 export interface SignatureMedia {
-  /** The responsive set: the 640px thumbnail and the full-size web image. */
+  /**
+   * The responsive set: the 640px thumbnail, optimizer renditions at 1200
+   * and 1920px (lib/artRenditions), and the full-size web image.
+   */
   renditions: readonly ArtRendition[];
   /** The full-size web image (WebP, the same pixels as the source at a fraction of the bytes). */
   webImage: string;
@@ -55,10 +64,13 @@ export function signatureMedia(seed: string | number | null | undefined): Signat
   const hex = bareSeed(seed);
   const webImage = getWebImageUrl(hex);
   return {
-    renditions: [
-      { src: getThumbUrl(hex, 'card'), width: SIGNATURE_THUMB_WIDTH },
-      { src: webImage, width: ART_WIDTH },
-    ],
+    renditions: withOptimizedRenditions(
+      [
+        { src: getThumbUrl(hex, 'card'), width: SIGNATURE_THUMB_WIDTH },
+        { src: webImage, width: ART_WIDTH },
+      ],
+      ART_WIDTH / ART_HEIGHT,
+    ),
     webImage,
     sourceImage: getAssetsUrl(`cosmicsignature/0x${hex}.png`),
     video: getAssetsUrl(`cosmicsignature/0x${hex}.mp4`),
