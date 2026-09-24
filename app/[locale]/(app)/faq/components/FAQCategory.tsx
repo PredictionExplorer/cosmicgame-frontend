@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { type FAQCategory as FAQCategoryType, type FAQItem } from '@/content/faq';
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { cn } from '@/lib/utils';
 import {
   Accordion,
   AccordionContent,
@@ -23,6 +24,7 @@ import {
   normalizeForMatch,
   type AnswerTerm,
 } from './answerText';
+import { FAQ_SCROLL_MARGIN_CLASS } from './scrollMargin';
 
 /** Contract identifiers the answers quote, set as code. */
 const ANSWER_CODE = [protocolFacts.dynamicCstRewardFormula];
@@ -110,7 +112,7 @@ export const FAQCategorySection = forwardRef<HTMLElement, FAQCategoryProps>(
         ref={ref}
         id={`faq-category-${category.id}`}
         aria-labelledby={headingId}
-        className="scroll-mt-[calc(var(--header-height)+4.5rem)] lg:scroll-mt-[var(--sticky-offset)]"
+        className={FAQ_SCROLL_MARGIN_CLASS}
       >
         <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3 border-b border-rule pb-4">
           <div className="min-w-0">
@@ -157,7 +159,7 @@ export const FAQCategorySection = forwardRef<HTMLElement, FAQCategoryProps>(
                 key={item.id}
                 value={item.id}
                 id={item.hashAnchor || item.id}
-                className="scroll-mt-[calc(var(--header-height)+4.5rem)] border-b border-rule-faint lg:scroll-mt-[var(--sticky-offset)]"
+                className={cn(FAQ_SCROLL_MARGIN_CLASS, 'border-b border-rule-faint')}
               >
                 <AccordionTrigger className="gap-6 py-5 text-start type-title text-foreground hover:no-underline hover:text-primary [&>svg]:size-5 [&>svg]:text-subtle">
                   {/* One flex item: a highlighted match stays inline in the question

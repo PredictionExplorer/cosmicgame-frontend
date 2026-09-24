@@ -7,6 +7,7 @@ import { GLOSSARY_TERM_IDS } from '@/lib/glossary';
 import { render, screen, checkA11y, waitFor, within } from '@/test-utils';
 
 import FAQPage from '../FAQPage';
+import { FAQ_SCROLL_MARGIN_CLASS } from '../components/scrollMargin';
 
 Object.assign(navigator, {
   clipboard: { writeText: jest.fn().mockResolvedValue(undefined) },
@@ -82,6 +83,22 @@ describe('FAQPage', () => {
     expect(screen.getByRole('heading', { level: 2, name: 'Glossary' })).toBeInTheDocument();
     for (const id of GLOSSARY_TERM_IDS) {
       expect(document.getElementById(`glossary-${id}`)).toBeInTheDocument();
+    }
+  });
+
+  it('lands every jump target just under the contents bar, not a header’s height below it', () => {
+    render(<FAQPage content={faqContentEn} />);
+    // The page's scroll padding already clears the site header.
+    expect(FAQ_SCROLL_MARGIN_CLASS).not.toContain('header-height');
+    const [category] = faqContentEn.categories;
+    const [question] = category!.items;
+    for (const target of [
+      document.getElementById(`faq-category-${category!.id}`),
+      document.getElementById(question!.hashAnchor || question!.id),
+      document.getElementById('faq-category-glossary'),
+      document.getElementById(`glossary-${GLOSSARY_TERM_IDS[0]}`),
+    ]) {
+      expect(target).toHaveClass(...FAQ_SCROLL_MARGIN_CLASS.split(' '));
     }
   });
 

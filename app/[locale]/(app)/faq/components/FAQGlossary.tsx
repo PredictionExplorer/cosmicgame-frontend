@@ -2,8 +2,10 @@ import { forwardRef } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { GLOSSARY_TERM_IDS } from '@/lib/glossary';
+import { cn } from '@/lib/utils';
 
 import { categoryAnchor } from './CategoryNav';
+import { FAQ_SCROLL_MARGIN_CLASS } from './scrollMargin';
 
 /** The glossary's id in the FAQ contents. */
 export const GLOSSARY_ENTRY_ID = 'glossary';
@@ -24,7 +26,7 @@ export const FAQGlossary = forwardRef<HTMLElement>(function FAQGlossary(_props, 
       ref={ref}
       id={categoryAnchor(GLOSSARY_ENTRY_ID)}
       aria-labelledby={headingId}
-      className="scroll-mt-[calc(var(--header-height)+4.5rem)] lg:scroll-mt-[var(--sticky-offset)]"
+      className={FAQ_SCROLL_MARGIN_CLASS}
     >
       <header className="border-b border-rule pb-4">
         <h2 id={headingId} className="type-section">
@@ -37,7 +39,7 @@ export const FAQGlossary = forwardRef<HTMLElement>(function FAQGlossary(_props, 
           <div
             key={id}
             id={`glossary-${id}`}
-            className="scroll-mt-[calc(var(--header-height)+4.5rem)] border-b border-rule-faint py-4 lg:scroll-mt-[var(--sticky-offset)]"
+            className={cn(FAQ_SCROLL_MARGIN_CLASS, 'border-b border-rule-faint py-4')}
           >
             <dt className="type-title text-foreground">{tGlossary(`terms.${id}.term`)}</dt>
             <dd className="mt-1 type-body-sm text-muted-foreground">
