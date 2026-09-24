@@ -10,8 +10,10 @@ jest.mock('../../../../../hooks/useApiQuery', () => ({
 
 jest.mock('../../../../../components/tables/CharityWithdrawalTable', () => ({
   __esModule: true,
-  default: ({ list }: { list: unknown[] }) => (
-    <div data-testid="withdrawal-table">rows: {list.length}</div>
+  default: ({ list, loading }: { list: unknown[]; loading?: boolean }) => (
+    <div data-testid="withdrawal-table" data-loading={loading ? 'true' : undefined}>
+      rows: {list.length}
+    </div>
   ),
 }));
 
@@ -27,7 +29,7 @@ describe('CharityWithdrawals', () => {
   it('shows loading state', () => {
     mockUseCharityWithdrawals.mockReturnValue({ data: [], isLoading: true });
     render(<CharityWithdrawals />);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByTestId('withdrawal-table')).toHaveAttribute('data-loading', 'true');
   });
 
   it('renders the table when loaded', () => {
@@ -42,7 +44,7 @@ describe('CharityWithdrawals', () => {
   it('does not show loading when data is ready', () => {
     mockUseCharityWithdrawals.mockReturnValue({ data: [], isLoading: false });
     render(<CharityWithdrawals />);
-    expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+    expect(screen.getByTestId('withdrawal-table')).not.toHaveAttribute('data-loading');
   });
 
   it('has no accessibility violations', async () => {

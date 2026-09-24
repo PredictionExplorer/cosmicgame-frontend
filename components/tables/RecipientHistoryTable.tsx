@@ -67,7 +67,7 @@ export const ALLOCATION_SOURCE_BY_RECORD_TYPE: Readonly<Record<number, Allocatio
 
 /** Anchor Distribution ETH: retrieved with the anchors, not the other ETH. */
 const ANCHOR_DISTRIBUTION_TYPE = 15;
-/** An attached NFT from any collection, not a Cosmic Signature token. */
+/** An attached NFT from any collection, not a Cosmic Signature NFT. */
 const ATTACHED_NFT_TYPE = 16;
 
 /** The My Allocations section where a record is retrieved. */

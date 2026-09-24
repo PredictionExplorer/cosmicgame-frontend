@@ -11,8 +11,10 @@ jest.mock('../../../../../hooks/useApiQuery', () => ({
 }));
 
 jest.mock('../../../../../components/tables/CharityDepositTable', () => ({
-  CharityDepositTable: ({ list }: { list: unknown[] }) => (
-    <div data-testid="deposit-table">rows: {list.length}</div>
+  CharityDepositTable: ({ list, loading }: { list: unknown[]; loading?: boolean }) => (
+    <div data-testid="deposit-table" data-loading={loading ? 'true' : undefined}>
+      rows: {list.length}
+    </div>
   ),
 }));
 
@@ -31,7 +33,7 @@ describe('CharityCGDeposits', () => {
   it('shows loading state', () => {
     mockUseCharityCGDeposits.mockReturnValue({ data: [], isLoading: true });
     render(<CharityCGDeposits />);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByTestId('deposit-table')).toHaveAttribute('data-loading', 'true');
   });
 
   it('renders the table when loaded', () => {
