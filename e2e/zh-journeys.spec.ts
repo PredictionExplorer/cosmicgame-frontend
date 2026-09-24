@@ -63,7 +63,12 @@ test.describe('Sprint 8 deterministic Chinese journeys', () => {
         ':is(button, [role="button"])[aria-label^="更多信息"]:visible, :is(button, [role="button"])[aria-label^="查看“"]:visible, button[aria-label^="说明“"]:visible',
       )
       .first();
-    await openTooltip(trigger);
+    // The first explained label is a header figure's, which opens on a tap or a
+    // click; one that lands before hydration is dropped, so open until it shows.
+    await expect(async () => {
+      await openTooltip(trigger);
+      await expect(page.getByRole('tooltip').first()).toBeVisible({ timeout: 2_000 });
+    }).toPass({ timeout: 30_000 });
     await expect(page.getByRole('tooltip').first()).toContainText(/锚定|派发|NFT/);
     await dismissOpenTooltips(page);
 
