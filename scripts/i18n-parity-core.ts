@@ -186,15 +186,6 @@ export function unitSpacingProblems(message: string): readonly string[] {
   return [...found];
 }
 
-/** The message with every flagged number–unit space replaced by U+00A0. */
-export function joinUnitsWithNoBreakSpace(message: string): string {
-  return message.replace(UNIT_AFTER_SPACE, (join: string, _token: string, placeholder?: string) =>
-    placeholder === undefined || QUANTITY_PLACEHOLDER.test(placeholder)
-      ? join.replace(' ', '\u00a0')
-      : join,
-  );
-}
-
 const pluralCategoryCache = new Map<string, readonly string[]>();
 
 /** CLDR plural categories a locale's catalogs must cover. */

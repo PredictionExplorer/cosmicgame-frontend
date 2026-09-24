@@ -325,6 +325,11 @@ export function formatRelativeTime(
  * "1/1, 12:34", each with the year added when it is not the current year.
  * Browser-local time by default; pass `utc` only for deterministic server
  * snapshots — hydration-safe UI uses `<DateTime>` / `HydrationSafeDateTime`.
+ *
+ * @deprecated No production code calls this any more; it survives only
+ * because table tests build their expected text with it. Use
+ * `formatDateTime(timestamp, { locale, seconds, timeZone })`, or `<DateTime>`
+ * in markup.
  */
 export const convertTimestampToDateTime = (
   timestamp: number,
@@ -333,7 +338,12 @@ export const convertTimestampToDateTime = (
   timeZone: TimestampTimeZone = 'local',
 ): string => formatDateTime(timestamp, { locale, seconds: showSecond, timeZone });
 
-/** Deterministic value used for SSR and the first hydration render. */
+/**
+ * Deterministic value used for SSR and the first hydration render.
+ *
+ * @deprecated No production caller; use
+ * `formatDateTime(timestamp, { locale, seconds, timeZone: 'utc' })`.
+ */
 export const convertTimestampToServerDateTime = (
   timestamp: number,
   showSecond: boolean = false,

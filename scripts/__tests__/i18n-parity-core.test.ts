@@ -3,7 +3,6 @@ import {
   compareNamespace,
   flattenMessages,
   icuSignature,
-  joinUnitsWithNoBreakSpace,
   pluralCategoriesFor,
   strictProblems,
   unitSpacingProblems,
@@ -296,7 +295,7 @@ describe('number formatting parity', () => {
   });
 });
 
-describe('unitSpacingProblems / joinUnitsWithNoBreakSpace', () => {
+describe('unitSpacingProblems', () => {
   it('flags quantity placeholders and plural counts before a unit', () => {
     expect(
       unitSpacingProblems(
@@ -309,11 +308,5 @@ describe('unitSpacingProblems / joinUnitsWithNoBreakSpace', () => {
     expect(unitSpacingProblems('Anchor Action for {token} NFT · Cycle {cycle} ETH')).toEqual([]);
     expect(unitSpacingProblems('{amount}\u00a0ETH')).toEqual([]);
     expect(unitSpacingProblems('{amount} ETHER')).toEqual([]);
-  });
-
-  it('rewrites only the flagged joins', () => {
-    expect(joinUnitsWithNoBreakSpace('≈ {amount} USD for {token} NFT')).toBe(
-      '≈ {amount}\u00a0USD for {token} NFT',
-    );
   });
 });
