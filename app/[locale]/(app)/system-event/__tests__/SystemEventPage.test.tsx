@@ -18,12 +18,14 @@ jest.mock('../../../../../components/tables/AdminEventsTable', () => ({
     error,
     onRetry,
     emptyDescription,
+    emptyAction,
   }: {
     list: unknown[];
     loading?: boolean;
     error?: string;
     onRetry?: () => void;
     emptyDescription?: string;
+    emptyAction?: React.ReactNode;
   }) => (
     <div data-testid="events-table" data-loading={loading ? 'true' : undefined}>
       events: {list.length}
@@ -35,7 +37,12 @@ jest.mock('../../../../../components/tables/AdminEventsTable', () => ({
           </button>
         </p>
       ) : null}
-      {list.length === 0 && !loading && !error ? <p>{emptyDescription}</p> : null}
+      {list.length === 0 && !loading && !error ? (
+        <>
+          <p>{emptyDescription}</p>
+          {emptyAction}
+        </>
+      ) : null}
     </div>
   ),
 }));
@@ -118,14 +125,36 @@ describe('SystemEventPage', () => {
     expect(changed?.querySelector('dd')).not.toHaveClass('lg:type-figure-lg');
   });
 
-  it('leaves the dates out of a window with no changes, and says why it is empty', () => {
+  it('says once that a window has no changes: no figures, one link back (regression)', () => {
+    // It showed a lone "Changes 0" figure and the same link in the header and
+    // the empty state, around a description that called it a "window".
     mockEvents({ data: [] });
     render(<SystemEventPage round={1} start={100} end={200} />);
     expect(screen.queryByText('First change')).not.toBeInTheDocument();
+    expect(document.querySelector('[data-figure]')).toBeNull();
     expect(
-      screen.getByText('The protocol kept its existing settings through this window.'),
+      screen.getByText('The contract owner changed no settings before cycle 1 opened.'),
     ).toBeInTheDocument();
+    expect(screen.getAllByRole('link', { name: /All coordination changes/ })).toHaveLength(1);
   });
+
+  it.each([
+    ['changes', { data: rows }, true],
+    ['a loading list', { isLoading: true }, true],
+    ['no changes', { data: [] }, false],
+    ['a failed read', { error: new Error('fail') }, false],
+  ])(
+    'puts %s in the reading column only when there are rows to read (regression)',
+    (_, state, narrow) => {
+      // An empty window's state sat in the left 48rem column, off-centre, with
+      // about 900px of nothing beside it at 1440px.
+      mockEvents(state);
+      render(<SystemEventPage round={1} start={100} end={200} />);
+      expect(
+        screen.getByTestId('events-table').parentElement?.classList.contains('max-w-3xl'),
+      ).toBe(narrow);
+    },
+  );
 
   it('keeps the header while the list loads and hands the table its loading state', () => {
     mockEvents({ isLoading: true });

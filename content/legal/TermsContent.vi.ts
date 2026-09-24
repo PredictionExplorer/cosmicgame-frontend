@@ -248,7 +248,7 @@ export const termsCopyVi = {
     {
       id: 'contact',
       subtitle: 'Thông tin liên hệ',
-      text: 'Nếu bạn có câu hỏi về Điều khoản dịch vụ này, hãy liên hệ với chúng tôi trên <discord>Discord</discord>, <x>X</x> hoặc qua <frontendRepository>kho mã GitHub</frontendRepository>.',
+      text: 'Nếu bạn có câu hỏi về Điều khoản dịch vụ này, hãy liên hệ với chúng tôi qua <support>support@cosmicsignature.com</support>, trên <discord>Discord</discord>, <x>X</x> hoặc qua <frontendRepository>kho mã GitHub</frontendRepository>.',
     },
   ],
   // lexicon-allow-start: Howey-test denial copy must explicitly negate an investment framing.
@@ -259,8 +259,6 @@ export const termsCopyVi = {
   // lexicon-allow-end
   allocationsTable: {
     title: 'Tổng quan các luồng phân bổ',
-    track: 'Luồng',
-    none: 'Không có',
     sharedBy: '{percent}, chia cho {count} người',
     each: '{count} × {amount}',
   },

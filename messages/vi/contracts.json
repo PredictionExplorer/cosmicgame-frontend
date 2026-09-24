@@ -28,7 +28,7 @@
       "description": "Bộ sưu tập NFT ERC-721 được khắc làm phân bổ cho người nhận của mỗi chu kỳ"
     },
     "randomWalk": {
-      "name": "RandomWalk",
+      "name": "Random Walk NFT",
       "description": "Bộ sưu tập RandomWalk NFT có thể đính kèm vào nét bút ETH để được giảm giá một lần, hoặc neo giữ để thuộc diện Tinh tuyển NFT neo giữ"
     },
     "council": {
@@ -108,7 +108,7 @@
         "tooltip": "Chi phí nét bút ETH dùng tham số bước tăng này. Chi phí nét bút CST đi theo cửa sổ hiệu chỉnh CST trực tiếp."
       },
       "timeIncrement": {
-        "label": "Mức tăng thời gian",
+        "label": "Thời gian cộng thêm cho mỗi nét bút",
         "tooltip": "Mỗi nét bút cộng thêm khoảng thời gian này vào thời điểm hoàn tất chu kỳ. Mức tăng lớn thêm {percent}% sau mỗi chu kỳ."
       },
       "cstPreview": {
@@ -120,13 +120,18 @@
         "tooltip": "Khoảng thời gian người đặt nét bút cuối cùng có để hoàn tất chu kỳ trước khi cửa sổ hoàn tất mở ra cho bất kỳ ai"
       },
       "initial": {
-        "label": "Mức tăng thời gian ban đầu",
+        "label": "Thời lượng chu kỳ ban đầu",
         "tooltip": "Thời điểm hoàn tất chu kỳ ban đầu được cộng thêm khi nét bút đầu tiên được đặt"
       },
       "message": {
         "label": "Độ dài lời nhắn tối đa",
         "tooltip": "Số ký tự tối đa được phép trong lời nhắn của nét bút"
       }
+    },
+    "groups": {
+      "gestures": "Nét bút",
+      "timing": "Thời gian",
+      "selection": "Tinh tuyển"
     }
   },
   "parameters": {
@@ -178,13 +183,6 @@
   "seo": {
     "heading": "Hợp đồng Cosmic Signature",
     "description": "Tra cứu địa chỉ hợp đồng Cosmic Signature trên Arbitrum để kiểm tra mã nguồn, cấu hình và các giao dịch trên chuỗi.",
-    "partialFallback": "Chưa tải được danh sách địa chỉ hiện tại. Bên dưới là địa chỉ proxy và hợp đồng triển khai đã xác minh, được lưu trong cấu hình giao thức.",
-    "relatedAria": "Mã nguồn, bảo mật và xác minh hợp đồng",
-    "links": {
-      "code": "Xem mã nguồn Cosmic Signature",
-      "security": "Đọc tổng quan bảo mật",
-      "audits": "Xem kiểm toán và xác minh",
-      "risk": "Đọc công bố rủi ro"
-    }
+    "partialFallback": "Chưa tải được danh sách địa chỉ hiện tại. Bên dưới là địa chỉ proxy và hợp đồng triển khai đã xác minh, được lưu trong cấu hình giao thức."
   }
 }

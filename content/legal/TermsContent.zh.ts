@@ -241,7 +241,7 @@ export const termsCopyZh = {
     {
       id: 'contact',
       subtitle: '联系方式',
-      text: '如对本服务条款有任何疑问，请通过 <discord>Discord</discord>、<x>X</x> 或 <frontendRepository>GitHub 仓库</frontendRepository>联系我们。',
+      text: '如对本服务条款有任何疑问，请发送邮件至 <support>support@cosmicsignature.com</support>，或通过 <discord>Discord</discord>、<x>X</x> 或 <frontendRepository>GitHub 仓库</frontendRepository>联系我们。',
     },
   ],
   // lexicon-allow-start: Howey 测试否认文案须明确排除投资属性。
@@ -252,8 +252,6 @@ export const termsCopyZh = {
   // lexicon-allow-end
   allocationsTable: {
     title: '分配轨道一览',
-    track: '轨道',
-    none: '无',
     sharedBy: '{percent}，由 {count} 人共享',
     each: '{count} × {amount}',
   },

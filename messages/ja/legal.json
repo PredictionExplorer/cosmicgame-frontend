@@ -5,13 +5,15 @@
     "privacy": "プライバシーポリシー",
     "risk": "リスク開示",
     "security": "セキュリティ",
-    "audits": "監査"
+    "audits": "監査",
+    "contracts": "コントラクト",
+    "code": "ソースコード"
   },
   "document": {
     "contents": "このページの内容",
     "backToTop": "ページの先頭へ",
     "backToContents": "目次へ戻る",
     "sectionLink": "「{section}」へのリンク",
-    "revisionHistory": "改訂履歴"
+    "revisionHistory": "GitHubの改訂履歴"
   }
 }

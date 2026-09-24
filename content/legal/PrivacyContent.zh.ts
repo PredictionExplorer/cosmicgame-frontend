@@ -12,6 +12,10 @@ export const privacyCopyZh = {
       '网站通过下方列出的服务统计访问并报告错误，并且只设置下方列出的 Cookie。',
     ],
   },
+  withoutErrorReports: {
+    inShortMeasure: '网站通过下方列出的服务统计访问，并且只设置下方列出的 Cookie。',
+    improvement: '我们使用汇总后的使用数据修复问题、改进网站。',
+  },
   introductionTitle: '引言',
   introduction: [
     'Cosmic Signature 是构建在 Arbitrum（以太坊二层网络）上的程序化链上艺术协议。作为去中心化应用（dApp），我们在数据与隐私方面的运作方式不同于传统 Web 应用。',

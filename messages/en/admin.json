@@ -25,6 +25,7 @@
     "heading": "Gesture messages",
     "description": "Every gesture that carries a message. Filter by visibility, cycle or text.",
     "readOnly": "Read-only. Connect the moderator wallet to hide or restore messages.",
+    "noRole": "This wallet holds no on-chain operator role, so Hide and Restore are off. Connect an operator wallet to moderate messages.",
     "loadError": "The gesture messages could not be loaded.",
     "clearSearch": "Clear the search"
   },
@@ -49,18 +50,7 @@
       "scheduled": "Scheduled"
     },
     "fields": {
-      "ethStellarRecipients": "Number of ETH Stellar Selection recipients per cycle",
-      "nftStellarRecipients": "Number of NFT Stellar Selection recipients per cycle",
-      "nftHolderRecipients": "Number of NFT holder recipients per cycle",
-      "signatureAllocationPercentage": "Signature Allocation percentage",
-      "publicGoodsPercentage": "Public Goods percentage",
-      "stellarSelectionPercentage": "Stellar Selection percentage",
-      "anchorDistributionPercentage": "Anchor Distribution percentage",
       "timeIncrease": "Time increment growth per cycle",
-      "allocationTimeout": "Finalization timeout",
-      "priceIncrease": "ETH Gesture Cost step-up",
-      "gestureTimeIncrement": "Time added per gesture",
-      "initialAllocationSeconds": "Initial time increment",
       "initialGestureCostFraction": "Initial Gesture Cost fraction",
       "activationTime": "Activation time",
       "gestureRatio": "ETH to CST Gesture ratio",

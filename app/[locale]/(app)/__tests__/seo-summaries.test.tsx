@@ -5,7 +5,7 @@ import seoMessages from '@/messages/en/seo.json';
 import statisticsMessages from '@/messages/en/statistics.json';
 import zhSeoMessages from '@/messages/zh/seo.json';
 
-import { useDashboardInfo } from '@/hooks/useApiQuery';
+import { useDashboardInfo, useDonationsBoth } from '@/hooks/useApiQuery';
 
 import { render, screen, within } from '@/test-utils';
 
@@ -96,6 +96,7 @@ jest.mock('@/hooks/useApiQuery', () => ({
   useRWLKAnchorActions: () => mockAnchorLists.rwlkActions,
   useCSTAnchorDistributions: () => mockAnchorLists.deposits,
   useGlobalRWLKAnchorImprints: () => mockAnchorLists.imprints,
+  useDonationsBoth: jest.fn(),
 }));
 jest.mock('../publicDataReads', () => ({
   ...jest.requireActual('../publicDataReads'),
@@ -112,6 +113,12 @@ const mockRandomWalkImprinted = jest.fn(() =>
 
 const mockGetDashboardInfo = get_dashboard_info as jest.MockedFunction<typeof get_dashboard_info>;
 const mockUseDashboardInfo = useDashboardInfo as jest.MockedFunction<typeof useDashboardInfo>;
+const mockUseDonationsBoth = useDonationsBoth as jest.MockedFunction<typeof useDonationsBoth>;
+/** The ledger's client query as the server seed leaves it: the server read's rows. */
+const seededContributions = (data: unknown[] | undefined) =>
+  mockUseDonationsBoth.mockReturnValue({ data, isLoading: false } as unknown as ReturnType<
+    typeof useDonationsBoth
+  >);
 const mockGetLocale = getLocale as jest.MockedFunction<typeof getLocale>;
 const mockGetRoundList = get_round_list as jest.MockedFunction<typeof get_round_list>;
 const mockGetClaimHistory = get_claim_history as jest.MockedFunction<typeof get_claim_history>;
@@ -226,6 +233,7 @@ describe('server-rendered page headers', () => {
     mockDirectContributions.mockResolvedValue([{ AmountEth: 1, DonorAddr: WALLET_A }] as Rows<
       typeof get_donations_both
     >);
+    seededContributions([{ AmountEth: 1, DonorAddr: WALLET_A }]);
     mockCstRewards.mockResolvedValue([]);
     mockRwalkImprints.mockResolvedValue([]);
     mockPublicGoodsDeposits.mockResolvedValue([]);
@@ -340,6 +348,26 @@ describe('server-rendered page headers', () => {
         'href',
         '/security',
       );
+      // One Trust Center: the contracts carry its tabs, beside the documents
+      // and the source code.
+      const trust = screen.getByRole('navigation', { name: COMMON.section('trust') });
+      expect(
+        within(trust)
+          .getAllByRole('link')
+          .map((link) => link.getAttribute('href')),
+      ).toEqual([
+        '/security',
+        '/audits',
+        '/contracts',
+        '/code',
+        '/risk-disclosures',
+        '/terms',
+        '/privacy',
+      ]);
+      expect(within(trust).getByRole('link', { current: 'page' })).toHaveAttribute(
+        'href',
+        '/contracts',
+      );
     });
 
     it('says when the addresses come from the verified fallback', async () => {
@@ -362,6 +390,19 @@ describe('server-rendered page headers', () => {
     expect(
       screen.getByRole('heading', { level: 2, name: 'Project repositories' }),
     ).toBeInTheDocument();
+    // Each repository heading is its name alone (regression: "Frontend (opens in
+    // a new tab)"); the link says it opens a new tab through its description.
+    for (const heading of screen.getAllByRole('heading', { level: 3 })) {
+      expect(heading.textContent).not.toMatch(/new tab/i);
+      const link = within(heading).getByRole('link');
+      expect(link).toHaveAttribute('target', '_blank');
+      expect(link).toHaveAccessibleDescription('nav.link.newTab');
+    }
+    // The IPFS artifact and GitHub are linked where they are evidence, not as
+    // header chips: the header carries the Trust Center tabs, code current.
+    expect(screen.queryByRole('link', { name: /IPFS/ })).toBeNull();
+    const trust = screen.getByRole('navigation', { name: COMMON.section('trust') });
+    expect(within(trust).getByRole('link', { current: 'page' })).toHaveAttribute('href', '/code');
   });
 
   it('renders the gallery header with the collection figures', async () => {
@@ -608,6 +649,7 @@ describe('server-rendered page headers', () => {
         { AmountEth: 0.5, DonorAddr: '0x4d3949cd8980e942eb9dd24d4ecc27584a8d71fa' },
       ] as Rows<typeof get_donations_both>;
       mockDirectContributions.mockResolvedValue(rows);
+      seededContributions(rows);
 
       render(await PublicDataRouteSeoSummary({ route: 'eth-contribution' }));
 
@@ -615,6 +657,22 @@ describe('server-rendered page headers', () => {
       expect(figureValue('records')).toHaveTextContent(String(rows.length));
       expect(figureValue('totalEth')).toHaveTextContent('30.5000 ETH');
       expect(figureValue('contributors')).toHaveTextContent('2');
+    });
+
+    it('moves the direct-contribution figures with the ledger after a new contribution (regression)', async () => {
+      // The figures were computed once on the server: after a contribution the
+      // ledger showed the new row while the header kept the ISR snapshot.
+      const rows = [{ AmountEth: 1, DonorAddr: WALLET_A }] as Rows<typeof get_donations_both>;
+      mockDirectContributions.mockResolvedValue(rows);
+      seededContributions(rows);
+      const { rerender } = render(await PublicDataRouteSeoSummary({ route: 'eth-contribution' }));
+      expect(figureValue('records')).toHaveTextContent(/^1$/);
+
+      seededContributions([...rows, { AmountEth: 2, DonorAddr: WALLET_B }]);
+      rerender(await PublicDataRouteSeoSummary({ route: 'eth-contribution' }));
+      expect(figureValue('records')).toHaveTextContent(/^2$/);
+      expect(figureValue('totalEth')).toHaveTextContent('3.0000 ETH');
+      expect(figureValue('contributors')).toHaveTextContent(/^2$/);
     });
 
     it('counts the coordination events the table lists, with the latest change', async () => {
@@ -847,6 +905,7 @@ describe('server-rendered page headers', () => {
 
     it('renders a failed read as unavailable, never as a confident zero', async () => {
       mockDirectContributions.mockRejectedValue(new Error('Network response was not OK'));
+      seededContributions(undefined);
 
       render(await PublicDataRouteSeoSummary({ route: 'eth-contribution' }));
 

@@ -43,8 +43,18 @@ export interface PrivacySection {
 export interface PrivacyCopy {
   readonly title: string;
   readonly subtitle: string;
-  /** Three plain sentences above the policy. */
+  /**
+   * Three plain sentences above the policy. The last says what the site
+   * measures and reports, naming error reports.
+   */
   readonly inShort: { readonly title: string; readonly points: readonly string[] };
+  /**
+   * The two sentences that name error reports, as a deployment without an
+   * error-reporting service (no Sentry DSN) must say them: the last "In
+   * short" point, and the `use` section's `improvement` clause. The policy
+   * never names a processing activity its services table does not list.
+   */
+  readonly withoutErrorReports: { readonly inShortMeasure: string; readonly improvement: string };
   readonly introductionTitle: string;
   readonly introduction: readonly string[];
   readonly sections: readonly PrivacySection[];
@@ -103,6 +113,34 @@ function Clauses({
   ));
 }
 
+/**
+ * The copy this deployment may state: without an error-reporting service,
+ * the sentences that name error reports give way to their variants.
+ */
+export function privacyCopyForDeployment(copy: PrivacyCopy, reportsErrors: boolean): PrivacyCopy {
+  if (reportsErrors) return copy;
+  const { inShortMeasure, improvement } = copy.withoutErrorReports;
+  return {
+    ...copy,
+    inShort: { ...copy.inShort, points: [...copy.inShort.points.slice(0, -1), inShortMeasure] },
+    sections: copy.sections.map((section) =>
+      section.id === 'use'
+        ? {
+            ...section,
+            content: section.content.map((item) =>
+              item.id === 'improvement' ? { ...item, text: improvement } : item,
+            ),
+          }
+        : section,
+    ),
+  };
+}
+
+/**
+ * The services this deployment loads. On a phone each record opens on a
+ * title line: the service's name, with its policy link at the same line's
+ * end, then what it is for and what it receives.
+ */
 function ServicesTable({ copy, locale }: { copy: PrivacyCopy['services']; locale: string }) {
   const { columns } = copy;
   return (
@@ -146,8 +184,16 @@ function ServicesTable({ copy, locale }: { copy: PrivacyCopy['services']; locale
           }
           return (
             <TableRow key={service.id}>
-              <TableCell label={columns.service} className="font-medium text-foreground">
-                {service.name}
+              <TableCell
+                label={columns.service}
+                phone="title"
+                className="font-medium text-foreground"
+              >
+                <span className="flex items-baseline justify-between gap-4">
+                  <span>{service.name}</span>
+                  {/* On a phone the policy closes the title line. */}
+                  <span className="font-normal sm:hidden">{policy}</span>
+                </span>
               </TableCell>
               <TableCell label={columns.purpose} stack>
                 <RichText text={copy.items[service.id].purpose} locale={locale} />
@@ -155,7 +201,9 @@ function ServicesTable({ copy, locale }: { copy: PrivacyCopy['services']; locale
               <TableCell label={columns.data} stack>
                 <RichText text={copy.items[service.id].data} locale={locale} />
               </TableCell>
-              <TableCell label={columns.policy}>{policy}</TableCell>
+              <TableCell label={columns.policy} phone="omit">
+                {policy}
+              </TableCell>
             </TableRow>
           );
         })}
@@ -164,6 +212,11 @@ function ServicesTable({ copy, locale }: { copy: PrivacyCopy['services']; locale
   );
 }
 
+/**
+ * The cookies and browser storage this deployment sets. On a phone each
+ * record opens on the key itself, in mono, with its type and lifetime on one
+ * line under it ("Cookie · 1 year"), then what it is for.
+ */
 function StorageTable({ copy }: { copy: PrivacyCopy['storage'] }) {
   const { columns } = copy;
   return (
@@ -179,22 +232,30 @@ function StorageTable({ copy }: { copy: PrivacyCopy['storage'] }) {
       <TableBody>
         {activePrivacyStorage().map((entry) => (
           <TableRow key={entry.id}>
-            <TableCell label={columns.name}>
+            <TableCell label={columns.name} phone="title">
               <span className="flex flex-col gap-0.5">
                 {entry.names.map((name) => (
                   <code key={name} className="type-mono leading-6 text-foreground">
                     {name}
                   </code>
                 ))}
+                <span className="type-caption font-normal text-subtle sm:hidden">
+                  {copy.kinds[entry.kind]}
+                  <span aria-hidden> · </span>
+                  <span className="sr-only">, </span>
+                  {copy.lifetimes[entry.lifetime]}
+                </span>
               </span>
             </TableCell>
-            <TableCell label={columns.kind} className="whitespace-nowrap">
+            <TableCell label={columns.kind} phone="omit" className="whitespace-nowrap">
               {copy.kinds[entry.kind]}
             </TableCell>
             <TableCell label={columns.purpose} stack>
               {copy.items[entry.id]}
             </TableCell>
-            <TableCell label={columns.lifetime}>{copy.lifetimes[entry.lifetime]}</TableCell>
+            <TableCell label={columns.lifetime} phone="omit">
+              {copy.lifetimes[entry.lifetime]}
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>
@@ -207,7 +268,7 @@ function InShort({ copy, locale }: { copy: PrivacyCopy['inShort']; locale: strin
   return (
     <section
       aria-labelledby="privacy-in-short-title"
-      className="max-w-[var(--measure-prose)] border-s-2 border-primary py-1 ps-5"
+      className="border-s-2 border-primary py-1 ps-5"
     >
       <h2 id="privacy-in-short-title" className="type-title text-foreground">
         {copy.title}
@@ -230,10 +291,11 @@ function InShort({ copy, locale }: { copy: PrivacyCopy['inShort']; locale: strin
  * The privacy policy in the Trust Center template: what matters in three
  * sentences, then the policy, including the services this deployment loads
  * and the cookies and browser storage it sets, both listed from the same
- * configuration that turns them on (content/legal/privacyInventory).
+ * configuration that turns them on (content/legal/privacyInventory). The
+ * sentences about error reports follow that configuration too.
  */
 export function PrivacyContent({
-  copy,
+  copy: sourceCopy,
   locale,
   labels,
 }: {
@@ -241,6 +303,10 @@ export function PrivacyContent({
   locale: string;
   labels: LegalDocumentLabels;
 }) {
+  const copy = privacyCopyForDeployment(
+    sourceCopy,
+    activePrivacyServices().some((service) => service.id === 'sentry'),
+  );
   const section = (id: PrivacySectionId) => {
     const found = copy.sections.find((candidate) => candidate.id === id);
     return found

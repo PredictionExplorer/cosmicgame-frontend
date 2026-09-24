@@ -25,6 +25,7 @@
     "heading": "落笔留言",
     "description": "所有附带留言的落笔。可按可见性、周期或文字筛选。",
     "readOnly": "只读。连接审核员钱包后即可隐藏或恢复留言。",
+    "noRole": "此钱包没有链上运营角色，因此无法隐藏或恢复留言。请连接运营钱包后再审核留言。",
     "loadError": "未能加载落笔留言。",
     "clearSearch": "清除搜索"
   },
@@ -49,18 +50,7 @@
       "scheduled": "待启用"
     },
     "fields": {
-      "ethStellarRecipients": "每个周期的 ETH 星选获配者人数",
-      "nftStellarRecipients": "每个周期的 NFT 星选获配者人数",
-      "nftHolderRecipients": "每个周期的 NFT 持有者获配人数",
-      "signatureAllocationPercentage": "签名分配比例",
-      "publicGoodsPercentage": "公共物品比例",
-      "stellarSelectionPercentage": "星选比例",
-      "anchorDistributionPercentage": "锚定派发比例",
       "timeIncrease": "时间增量的每周期增幅",
-      "allocationTimeout": "专属收官期限",
-      "priceIncrease": "ETH 落笔价格增幅",
-      "gestureTimeIncrement": "每笔落笔增加的时间",
-      "initialAllocationSeconds": "初始时间增量",
       "initialGestureCostFraction": "初始落笔价格比例",
       "activationTime": "启用时间",
       "gestureRatio": "ETH 与 CST 落笔比率",

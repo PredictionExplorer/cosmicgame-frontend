@@ -17,6 +17,9 @@ import { formatCount, toIntlLocale } from '@/utils/format';
 import { AUDIT_FINDINGS_TOTAL, AUDIT_SEVERITIES, HACKEN_AUDIT, type AuditSeverity } from './audit';
 import { LEGAL_LINKS } from './links';
 
+/** A link button whose label may take two lines on a phone: the height follows the text. */
+const WRAPPING_BUTTON_CLASS = 'h-auto max-w-full whitespace-normal py-2.5 text-start';
+
 export interface AuditsCopy {
   readonly title: string;
   readonly intro: string;
@@ -157,12 +160,13 @@ function AuditSummary({ copy, locale }: { copy: AuditsCopy['summary']; locale: s
         </ul>
       </div>
 
+      {/* A long label (uk, vi) wraps inside its button rather than push the card past a 320px screen. */}
       <div className="mt-7 flex flex-wrap gap-3">
         <SiteLink
           href={HACKEN_AUDIT.reportUrl}
           kind="external"
           externalIcon={false}
-          className={buttonVariants({ variant: 'default' })}
+          className={cn(buttonVariants({ variant: 'default' }), WRAPPING_BUTTON_CLASS)}
         >
           {copy.reportCta}
           <ArrowUpRight aria-hidden className="size-4" />
@@ -171,7 +175,7 @@ function AuditSummary({ copy, locale }: { copy: AuditsCopy['summary']; locale: s
           href={LEGAL_LINKS.contractsRepository.href}
           kind="external"
           externalIcon={false}
-          className={buttonVariants({ variant: 'outline' })}
+          className={cn(buttonVariants({ variant: 'outline' }), WRAPPING_BUTTON_CLASS)}
         >
           {copy.repositoryCta}
           <ArrowUpRight aria-hidden className="size-4" />

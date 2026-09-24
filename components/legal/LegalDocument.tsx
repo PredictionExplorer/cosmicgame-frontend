@@ -1,10 +1,11 @@
 import type { ReactNode } from 'react';
-import { ArrowUp, ChevronDown, Link2 } from 'lucide-react';
+import { ChevronDown, Link2 } from 'lucide-react';
+import { useLocale } from 'next-intl';
 
 import { TrustCenterTabs } from '@/content/legal/TrustCenterTabs';
 import {
   TRUST_DOCUMENT_DATES,
-  TRUST_DOCUMENT_SOURCES,
+  trustDocumentSource,
   type TrustCenterPage,
 } from '@/content/legal/trustCenter';
 import type { LegalDocumentLabels } from '@/content/legal/labels';
@@ -16,7 +17,14 @@ import { SiteLink } from '@/components/layout/SiteLink';
 import { PageShell } from '@/components/ui/page-shell';
 import { cn } from '@/lib/utils';
 
+import { BackToContentsLink } from './BackToContentsLink';
 import { LegalContentsRail } from './LegalContentsRail';
+
+/** The H1's id: "Back to top" returns to the title, and the skip link keeps `#main`. */
+const DOCUMENT_TITLE_ID = 'document-title';
+
+/** The phone contents disclosure, which "Back to contents" opens. */
+export const CONTENTS_ID = 'contents';
 
 export interface LegalDocumentSection {
   /** The anchor: stable across locales, so `/terms#allocations` works in every language. */
@@ -32,6 +40,15 @@ export interface LegalDocumentProps {
   /** Evidence at a glance under the header, before the first section (audit figures, key points). */
   summary?: ReactNode;
   sections: readonly LegalDocumentSection[];
+  /**
+   * `compact`: a tighter rhythm for a document of short sections (the risk
+   * disclosures), with no per-section way back to the contents on phones.
+   */
+  density?: 'default' | 'compact';
+  /** `grid`: from `xl` the sections sit two to a row, each under its own hairline. */
+  sectionLayout?: 'stack' | 'grid';
+  /** A closing note after the sections, outside the contents. */
+  closing?: ReactNode;
   /** The Trust Center chrome, read on the server (`getLegalDocumentLabels`). */
   labels: LegalDocumentLabels;
 }
@@ -40,12 +57,15 @@ export interface LegalDocumentProps {
  * The Trust Center reading template shared by Security, Audits, Risk
  * disclosures, Terms and Privacy: the reading header (the Trust Center
  * eyebrow, the title, the lede, the document date and its revision history,
- * the five pages as tabs), then the document. Every section is an anchor
- * with its own link; the contents follow the reader in a sticky rail from
- * `lg` and fold into an "On this page" disclosure on phones, where each
- * section ends with a way back to it.
+ * the five pages as tabs), then the document on one measure
+ * (`--measure-document`), so every section rule, ledger, table, list and
+ * callout ends on the same edge while paragraphs keep the prose measure
+ * inside it. Every section is an anchor with its own link; the contents
+ * follow the reader in a sticky rail from `lg` and fold into an "On this
+ * page" disclosure on phones, which each section's way back reopens.
  *
- * Renders on the server; only the rail's scroll tracking runs on the client.
+ * Renders on the server; only the rail's scroll tracking and the way back
+ * to the contents run on the client.
  */
 export function LegalDocument({
   page,
@@ -53,11 +73,15 @@ export function LegalDocument({
   intro,
   summary,
   sections,
+  density = 'default',
+  sectionLayout = 'stack',
+  closing,
   labels,
 }: LegalDocumentProps) {
+  const locale = useLocale();
   const documentDate = TRUST_DOCUMENT_DATES[page];
-  const source = TRUST_DOCUMENT_SOURCES[page];
   const items = sections.map(({ id, heading }) => ({ id, label: heading }));
+  const grid = sectionLayout === 'grid';
 
   return (
     <PageShell variant="data">
@@ -67,12 +91,14 @@ export function LegalDocument({
         section="trust"
         sectionHub={page === 'security'}
         title={title}
+        titleId={DOCUMENT_TITLE_ID}
         subtitle={intro}
         meta={
           <>
             <ReviewedStamp date={documentDate.date} kind={documentDate.kind} />
+            {/* This locale's copy file: its commits are this document's history. */}
             <SiteLink
-              href={frontendFileHistory(source)}
+              href={frontendFileHistory(trustDocumentSource(page, locale))}
               kind="external"
               className="link-quiet inline-flex min-h-6 items-center gap-1 transition-colors duration-[var(--duration-fast)] hover:text-foreground"
             >
@@ -84,14 +110,19 @@ export function LegalDocument({
       />
 
       <div className="lg:grid lg:grid-cols-[minmax(0,12rem)_minmax(0,1fr)] lg:gap-x-16">
-        <LegalContentsRail items={items} title={labels.contents} backToTop={labels.backToTop} />
+        <LegalContentsRail
+          items={items}
+          title={labels.contents}
+          backToTop={labels.backToTop}
+          topId={DOCUMENT_TITLE_ID}
+        />
 
-        <div className="min-w-0">
+        <div className="min-w-0 max-w-[var(--measure-document)]">
           {summary ? <div className="mb-10 sm:mb-14">{summary}</div> : null}
 
           <details
-            id="contents"
-            className="group mb-10 rounded-surface border border-rule lg:hidden"
+            id={CONTENTS_ID}
+            className="group mb-10 scroll-mt-6 rounded-surface border border-rule lg:hidden"
           >
             <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 type-title text-foreground [&::-webkit-details-marker]:hidden">
               <span>
@@ -116,18 +147,23 @@ export function LegalDocument({
             </ol>
           </details>
 
-          {sections.map((section, index) => (
-            <LegalSection
-              key={section.id}
-              id={section.id}
-              heading={section.heading}
-              first={index === 0 && !summary}
-              anchorLabel={labels.sectionLink.replace('{section}', section.heading)}
-              backLabel={labels.backToContents}
-            >
-              {section.content}
-            </LegalSection>
-          ))}
+          <div className={cn(grid && 'xl:grid xl:grid-cols-2 xl:gap-x-12')}>
+            {sections.map((section, index) => (
+              <LegalSection
+                key={section.id}
+                id={section.id}
+                heading={section.heading}
+                first={index === 0 && !summary}
+                density={density}
+                anchorLabel={labels.sectionLink.replace('{section}', section.heading)}
+                backLabel={density === 'compact' ? null : labels.backToContents}
+              >
+                {section.content}
+              </LegalSection>
+            ))}
+          </div>
+
+          {closing ? <div className="mt-12 sm:mt-14">{closing}</div> : null}
         </div>
       </div>
     </PageShell>
@@ -138,6 +174,7 @@ function LegalSection({
   id,
   heading,
   first,
+  density,
   anchorLabel,
   backLabel,
   children,
@@ -145,8 +182,10 @@ function LegalSection({
   id: string;
   heading: string;
   first: boolean;
+  density: 'default' | 'compact';
   anchorLabel: string;
-  backLabel: string;
+  /** The phone way back to the contents; `null` in a document of short sections. */
+  backLabel: string | null;
   children: ReactNode;
 }) {
   const headingId = `${id}-heading`;
@@ -154,7 +193,13 @@ function LegalSection({
     <section
       id={id}
       aria-labelledby={headingId}
-      className={cn(!first && 'mt-12 border-t border-rule pt-10 sm:mt-14 sm:pt-12')}
+      className={cn(
+        'scroll-mt-6',
+        !first &&
+          (density === 'compact'
+            ? 'mt-10 border-t border-rule pt-8'
+            : 'mt-12 border-t border-rule pt-10 sm:mt-14 sm:pt-12'),
+      )}
     >
       {/* The anchor sits beside the heading, not inside it, so the heading's name is its text. */}
       <div className="group/anchor flex items-start gap-2">
@@ -169,16 +214,14 @@ function LegalSection({
           <Link2 aria-hidden className="size-4" />
         </a>
       </div>
-      <div className="mt-5 space-y-5 sm:mt-6">{children}</div>
-      <p className="mt-8 lg:hidden">
-        <a
-          href="#contents"
-          className="inline-flex min-h-6 items-center gap-1.5 type-label text-subtle transition-colors duration-[var(--duration-fast)] hover:text-foreground"
-        >
-          <ArrowUp aria-hidden className="size-3.5" />
-          {backLabel}
-        </a>
-      </p>
+      <div className={cn('space-y-5', density === 'compact' ? 'mt-4' : 'mt-5 sm:mt-6')}>
+        {children}
+      </div>
+      {backLabel ? (
+        <p className="mt-8 lg:hidden">
+          <BackToContentsLink targetId={CONTENTS_ID} label={backLabel} />
+        </p>
+      ) : null}
     </section>
   );
 }

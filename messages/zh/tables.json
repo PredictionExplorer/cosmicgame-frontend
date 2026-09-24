@@ -210,7 +210,7 @@
     "explainColumn": "说明“{column}”列"
   },
   "adminEvents": {
-    "empty": "此期间没有记录到配置变更"
+    "empty": "没有配置变更"
   },
   "allocation": {
     "cycle": "第 {cycle} 个周期",

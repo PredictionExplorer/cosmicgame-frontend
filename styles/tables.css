@@ -272,6 +272,30 @@
   }
 
   /*
+   * A record's title line (a service's name, a storage key): the value alone,
+   * at the start and in the foreground tier, so the eye has one thing to
+   * anchor each record on. A cell the title already carries is left out.
+   */
+  .cs-table:not([data-layout='compact']) tbody td[data-phone='title'] {
+    grid-template-columns: minmax(0, 1fr);
+    color: hsl(var(--foreground));
+    font-weight: 600;
+    text-align: start;
+  }
+
+  .cs-table:not([data-layout='compact']) tbody td[data-phone='title']::before {
+    content: none;
+  }
+
+  .cs-table:not([data-layout='compact']) tbody td[data-phone='title'] > [data-slot='value'] {
+    text-align: start;
+  }
+
+  .cs-table:not([data-layout='compact']) tbody td[data-phone='omit'] {
+    display: none;
+  }
+
+  /*
    * Columns marked redundant on a phone, in either layout. The selectors
    * match the record rules' specificity and come after them, so a secondary
    * cell cannot come back as a grid line.

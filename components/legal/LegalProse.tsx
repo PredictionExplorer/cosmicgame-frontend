@@ -12,13 +12,26 @@ import { LegalLink, RichText } from './RichText';
  * The reading blocks of the Trust Center documents. All server-safe; body
  * copy is `type-prose` (17px, 66ch, 1.65; CJK and Cyrillic tuned by the
  * utility) in the muted tier, headings and emphasis in foreground, and every
- * piece of copy goes through `RichText`, so its tags become links.
+ * piece of copy goes through `RichText`, so its tags become links. Blocks
+ * take the document's width (`--measure-document`, set by LegalDocument), so
+ * rules, ledgers and lists share one edge; only paragraphs stop at the prose
+ * measure inside it.
  */
+
+/**
+ * A clause a link can cite (`/terms#allocations-retrieval`): it lands a
+ * little below the sticky header, and while it is the target a 2px primary
+ * rule stands just outside its start edge, so the reader sees which of
+ * thirty clauses was meant. The rule is a pseudo-element in the margin, so
+ * nothing moves and no row's hairline shifts; it does not animate.
+ */
+export const CITABLE_CLASS =
+  "relative scroll-mt-6 before:pointer-events-none before:absolute before:inset-y-0 before:-start-3 before:w-0.5 before:rounded-pill before:bg-primary before:opacity-0 before:content-[''] target:before:opacity-100";
 
 const PARAGRAPH_SIZES = {
   /** Body copy: 17px at the prose measure. */
   prose: 'type-prose text-muted-foreground',
-  /** A source line or footnote under a block: 14px, subtle. */
+  /** A source line or footnote under a block: 14px, subtle, on the prose measure. */
   note: 'max-w-[var(--measure-prose)] type-body-sm text-subtle',
 } as const;
 
@@ -43,7 +56,8 @@ export function LegalParagraph({
 
 /**
  * A clause: an H3 (with its own anchor, `<section>-<clause>`) over its text.
- * Clauses of one section are separated by space, not boxes.
+ * Clauses of one section are separated by space, not boxes; a cited clause
+ * is marked while it is the target (`CITABLE_CLASS`).
  */
 export function LegalClause({
   id,
@@ -59,7 +73,7 @@ export function LegalClause({
   children?: ReactNode;
 }) {
   return (
-    <div id={id} className="space-y-2 pt-1">
+    <div id={id} className={cn('space-y-2 pt-1', id && CITABLE_CLASS)}>
       {heading ? <h3 className="type-heading-3 text-foreground">{heading}</h3> : null}
       {text ? <LegalParagraph text={text} locale={locale} /> : null}
       {children}
@@ -124,10 +138,7 @@ export function LegalCallout({
 }) {
   const { icon: Icon, rule, iconClass } = CALLOUT_TONES[tone];
   return (
-    <div
-      role="note"
-      className={cn('max-w-[var(--measure-prose)] border-s-2 py-1 ps-5', rule, className)}
-    >
+    <div role="note" className={cn('border-s-2 py-1 ps-5', rule, className)}>
       <p className="flex items-center gap-2 type-title text-foreground">
         <Icon aria-hidden className={cn('size-4 shrink-0', iconClass)} />
         {title}
@@ -148,24 +159,28 @@ export interface LegalLedgerRow {
 /**
  * A spec-sheet ledger under a small heading: the term on the left, its
  * detail on the right (stacked on phones), rows between hairlines. For
- * values a reader checks, such as addresses and handles.
+ * values a reader checks, such as addresses and handles. `note` says once,
+ * under the heading and before the rows, what the whole list proves.
  */
 export function LegalLedger({
   heading,
+  note,
   rows,
   className,
 }: {
   heading?: string;
+  note?: ReactNode;
   rows: readonly LegalLedgerRow[];
   className?: string;
 }) {
   return (
     <div className={className}>
       {heading ? <h3 className="type-title text-foreground">{heading}</h3> : null}
+      {note ? <div className={heading ? 'mt-2' : undefined}>{note}</div> : null}
       <dl
         className={cn(
           'divide-y divide-rule-faint border-y border-rule-faint',
-          heading ? 'mt-3' : undefined,
+          heading || note ? 'mt-3' : undefined,
         )}
       >
         {rows.map(({ key, term, detail }) => (
@@ -202,7 +217,7 @@ export function LegalResourceList({
   locale: string;
 }) {
   return (
-    <ul className="max-w-[var(--measure-prose)] divide-y divide-rule-faint border-y border-rule-faint">
+    <ul className="divide-y divide-rule-faint border-y border-rule-faint">
       {resources.map(({ link, label, description }) => {
         const external = LEGAL_LINKS[link].kind === 'external';
         const Arrow = external ? ArrowUpRight : ArrowRight;

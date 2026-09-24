@@ -70,7 +70,7 @@ export const AdminEventsTable = ({ list, ...state }: AdminEventsTableProps) => {
 
     const valueOf = (row: AdminEventRow): ReactNode => {
       const event = eventOf(row);
-      if (row.RecordType === 0) return t('status.undefined');
+      if (row.RecordType === 0) return <UnknownValue label={t('status.unavailable')} />;
       switch (event?.type) {
         case 'timestamp':
           return <DateTime timestamp={row.IntegerValue} year="always" />;

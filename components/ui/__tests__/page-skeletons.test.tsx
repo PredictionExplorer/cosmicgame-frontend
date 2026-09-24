@@ -28,6 +28,15 @@ describe('record page skeletons', () => {
     expect(document.querySelector('main#main')).not.toBeNull();
   });
 
+  it('keeps a short ledger in the reading column under a full-width header', () => {
+    const { container } = render(
+      <LedgerPageSkeleton figures={3} rows={4} width="max-w-none" body="narrow" />,
+    );
+    const table = container.querySelector('[role="status"] > .max-w-3xl');
+    expect(table).not.toBeNull();
+    expect(screen.getByRole('status')).toHaveClass('max-w-none');
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(<RecordDetailSkeleton />);
     await checkA11y(container);
@@ -42,6 +51,9 @@ describe('dynamic record routes', () => {
     'gesture/[id]',
     'allocation/[id]',
     'eth-contribution/detail/[id]',
+    'eth-contribution/round/[round]',
+    'cosmic-token-transfer/[address]',
+    'cosmic-signature-transfer/[address]',
     'anchor-action/[IsRwalk]/[actionId]',
     'system-event/[round]/[start]/[end]',
     'distributions-by-token/[address]/[tokenId]',

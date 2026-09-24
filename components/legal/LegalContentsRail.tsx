@@ -35,16 +35,20 @@ export function currentSectionId(
 /**
  * The document's contents as a sticky rail beside the text (from `lg`), with
  * the section in view marked `aria-current="location"` and a link back to
- * the top. Phones get the server-rendered "On this page" disclosure instead.
+ * the top (the document's title, `topId`: `#main` belongs to the skip link).
+ * Phones get the server-rendered "On this page" disclosure instead.
  */
 export function LegalContentsRail({
   items,
   title,
   backToTop,
+  topId,
 }: {
   items: readonly LegalContentsItem[];
   title: string;
   backToTop: string;
+  /** The id "Back to top" returns to: the H1. */
+  topId: string;
 }) {
   const [active, setActive] = useState<string | null>(null);
 
@@ -98,7 +102,7 @@ export function LegalContentsRail({
           ))}
         </ol>
         <a
-          href="#main"
+          href={`#${topId}`}
           className="mt-6 inline-flex min-h-6 items-center gap-1.5 type-label text-subtle transition-colors duration-[var(--duration-fast)] hover:text-foreground"
         >
           <ArrowUp aria-hidden className="size-3.5" />

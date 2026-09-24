@@ -18,9 +18,10 @@
     },
     "allChanges": "Tất cả thay đổi điều phối",
     "loadError": "Không tải được các thay đổi cấu hình.",
-    "emptyDescription": "Trong khoảng này, giao thức giữ nguyên các thiết lập sẵn có.",
+    "emptyDescription": "Chủ sở hữu hợp đồng không thay đổi thiết lập nào trước khi chu kỳ {cycle} mở.",
     "invalidTitle": "Không có khoảng cấu hình này",
-    "invalidDescription": "Chu kỳ hoặc phạm vi sự kiện trong liên kết không hợp lệ."
+    "invalidDescription": "Chu kỳ hoặc phạm vi sự kiện trong liên kết không hợp lệ.",
+    "emptyDescriptionInitial": "Chủ sở hữu hợp đồng không thay đổi thiết lập nào trước khi chu kỳ đầu tiên mở."
   },
   "events": {
     "undefined": "Không xác định",

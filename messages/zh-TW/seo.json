@@ -59,7 +59,7 @@
       "marketing": {
         "heading": "推廣分配",
         "description": "檢視 Cosmic Signature 推廣分配歷史，以及向幫助更多人了解協議的生態貢獻者發放的 CST。",
-        "source": "Cosmic Signature 公開推廣分配 API",
+        "source": "Cosmic Signature 推廣 API",
         "links": {
           "faq": "閱讀常見問題",
           "statistics": "檢視協議統計",
@@ -101,7 +101,7 @@
       "eth-contribution": {
         "heading": "直接 ETH 貢獻",
         "description": "直接轉入週期儲備的 ETH，附每位貢獻者的留言與所屬週期。",
-        "source": "Cosmic Signature 公開貢獻 API",
+        "source": "Cosmic Signature 貢獻 API",
         "links": {
           "reserve": "週期儲備如何分配",
           "protocol": "公共財份額的去向",
@@ -207,8 +207,8 @@
       },
       "coordination-changes": {
         "heading": "協調變更",
-        "description": "檢視 Cosmic Signature 的公開協調變更，包括影響後續週期的協議模式、參數更新與管理紀錄。",
-        "source": "Cosmic Signature 公開系統事件 API",
+        "description": "自目前模式開始以來，合約所有者對協議參數所做的每一項變更。",
+        "source": "Cosmic Signature 系統事件 API",
         "links": {
           "security": "閱讀安全概覽",
           "audits": "查閱審計與驗證",
@@ -231,7 +231,7 @@
       "public-goods-contributions-cg": {
         "heading": "協議公共財資助",
         "description": "追蹤 Cosmic Signature 各週期自動轉入公共財金庫、併發往其目前受益方 Protocol Guild 的資金。",
-        "source": "Cosmic Signature 公開公共財 API",
+        "source": "Cosmic Signature 公共財 API",
         "links": {
           "learn": "了解公共財機制",
           "statistics": "檢視公共財統計",
@@ -253,7 +253,7 @@
       "public-goods-contributions-voluntary": {
         "heading": "自願公共財資助",
         "description": "任何人直接轉入公共財金庫的 ETH，交由其受益方，目前為 Protocol Guild。",
-        "source": "Cosmic Signature 公開公共財 API",
+        "source": "Cosmic Signature 公共財 API",
         "links": {
           "direct": "檢視直接 ETH 貢獻",
           "learn": "了解公共財機制",
@@ -274,7 +274,7 @@
       "public-goods-retrievals": {
         "heading": "公共財取回",
         "description": "檢視 Cosmic Signature 公共財金庫的取回紀錄；週期儲備會由此轉向目前配置的公共財受益方 Protocol Guild。",
-        "source": "Cosmic Signature 公開公共財 API",
+        "source": "Cosmic Signature 公共財 API",
         "links": {
           "learn": "了解公共財機制",
           "protocolGuild": "造訪 Protocol Guild",

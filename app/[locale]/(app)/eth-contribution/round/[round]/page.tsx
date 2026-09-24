@@ -4,7 +4,10 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
+import { QuerySeed } from '../../../QuerySeed';
+
 import EthDonationByRoundPage from './EthDonationByRoundPage';
+import { readCycleContributionsSeed } from './cycleContributionsSeed';
 
 export async function generateMetadata(
   { params }: { params: Promise<{ locale: string; round: string }> },
@@ -12,10 +15,11 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { locale, round } = await params;
   const t = await getTranslations({ locale, namespace: 'meta' });
+  // The tab names the cycle, as the H1 does ("Cycle 1 contributions").
   return createPageMetadata(
     parent,
-    t('ethContributionByCycle.title'),
-    t('ethContributionByCycle.description'),
+    t('ethContributionByCycle.title', { cycle: round }),
+    t('ethContributionByCycle.description', { cycle: round }),
     undefined,
     `/eth-contribution/round/${round}`,
     { index: false, locale },
@@ -33,9 +37,14 @@ export default async function Page({
 }) {
   const { locale, round } = await params;
   setRequestLocale(locale);
+  const cycle = Number(round);
+  // The cycle's first read, so its contributions are in the HTML (no layout shift).
+  const seeds = await readCycleContributionsSeed(cycle);
   return (
     <PageMessages namespaces={['ethContribution', 'tables']}>
-      <EthDonationByRoundPage round={Number(round)} />
+      <QuerySeed seeds={seeds}>
+        <EthDonationByRoundPage round={cycle} />
+      </QuerySeed>
     </PageMessages>
   );
 }

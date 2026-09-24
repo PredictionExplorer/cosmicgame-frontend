@@ -16,7 +16,7 @@
       "description": "The main protocol proxy contract that manages cycles, gestures, and allocation distribution"
     },
     "implementation": {
-      "name": "Implementation Contract",
+      "name": "Implementation contract",
       "description": "The current implementation behind the Cosmic Signature Protocol proxy contract"
     },
     "cst": {
@@ -28,7 +28,7 @@
       "description": "ERC-721 NFT collection imprinted as allocations to cycle recipients"
     },
     "randomWalk": {
-      "name": "RandomWalk",
+      "name": "Random Walk NFT",
       "description": "RandomWalk NFT collection that can be attached to ETH gestures for a one-time discount or anchored for Anchored-NFT Stellar Selection eligibility"
     },
     "council": {
@@ -108,7 +108,7 @@
         "tooltip": "ETH gesture cost uses this step-up parameter. CST gesture cost follows the live CST Calibration Window."
       },
       "timeIncrement": {
-        "label": "Time increment",
+        "label": "Time added per gesture",
         "tooltip": "Each gesture adds this much time to the Cycle Finalization Time. The increment grows by {percent}% with each cycle."
       },
       "cstPreview": {
@@ -120,13 +120,18 @@
         "tooltip": "Time the Final Gesture participant has to finalize the cycle before the Open-Finalization Window opens to anyone"
       },
       "initial": {
-        "label": "Initial time increment",
+        "label": "Initial cycle duration",
         "tooltip": "The initial Cycle Finalization Time added when the first gesture is made"
       },
       "message": {
         "label": "Message length limit",
         "tooltip": "Maximum character length allowed in gesture messages"
       }
+    },
+    "groups": {
+      "gestures": "Gestures",
+      "timing": "Timing",
+      "selection": "Stellar Selection"
     }
   },
   "parameters": {
@@ -178,13 +183,6 @@
   "seo": {
     "heading": "Cosmic Signature contracts",
     "description": "Cosmic Signature publishes its public Arbitrum contract addresses so participants, researchers, search engines, and AI systems can connect the app experience to verifiable on-chain protocol records.",
-    "partialFallback": "Live contract address data is temporarily unavailable in this server snapshot. The verified protocol proxy and implementation addresses below are the static fallback from the frontend protocol facts.",
-    "relatedAria": "Contract trust resources",
-    "links": {
-      "code": "Review Cosmic Signature source code",
-      "security": "Read the security overview",
-      "audits": "Review audits and verification",
-      "risk": "Read risk disclosures"
-    }
+    "partialFallback": "Live contract address data is temporarily unavailable in this server snapshot. The verified protocol proxy and implementation addresses below are the static fallback from the frontend protocol facts."
   }
 }

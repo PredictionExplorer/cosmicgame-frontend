@@ -5,13 +5,15 @@
     "privacy": "Політика конфіденційності",
     "risk": "Розкриття ризиків",
     "security": "Безпека",
-    "audits": "Аудити"
+    "audits": "Аудити",
+    "contracts": "Контракти",
+    "code": "Вихідний код"
   },
   "document": {
     "contents": "На цій сторінці",
     "backToTop": "Угору",
     "backToContents": "До змісту",
     "sectionLink": "Посилання на розділ «{section}»",
-    "revisionHistory": "Історія змін"
+    "revisionHistory": "Історія змін на GitHub"
   }
 }

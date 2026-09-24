@@ -26,28 +26,24 @@ function ShareCell({ percent }: { percent: number }) {
   );
 }
 
+/** Contributors per page: the first page is the top ten. */
+const RANKING_PAGE_SIZE = 10;
+
 export interface TopMarketersLeaderboardProps extends LedgerStateProps {
   rewards: readonly MarketingReward[];
-  /** How many contributors to rank. Default 5. */
-  limit?: number;
 }
 
 /**
- * The top outreach contributors as a ledger: rank, contributor (to their
- * outreach history), share of all outreach CST as a bar in the outreach
- * track colour, CST received and allocation count. One neutral row style for
- * every rank: this is a record, not a podium.
+ * The outreach contributors ranked as a ledger, ten to a page (the first page
+ * is the top ten, and the pager says how many there are): rank, contributor
+ * (to their outreach history), share of all outreach CST as a bar in the
+ * outreach track colour, CST received and allocation count, the figures
+ * grouped at the row's end. One neutral row style for every rank: this is a
+ * record, not a podium.
  */
-export function TopMarketersLeaderboard({
-  rewards,
-  limit = 5,
-  ...state
-}: TopMarketersLeaderboardProps) {
+export function TopMarketersLeaderboard({ rewards, ...state }: TopMarketersLeaderboardProps) {
   const t = useTranslations('marketing.leaderboard');
-  const contributors = useMemo(
-    () => rankOutreachContributors(rewards).slice(0, limit),
-    [rewards, limit],
-  );
+  const contributors = useMemo(() => rankOutreachContributors(rewards), [rewards]);
 
   const columns = useMemo<DataTableColumn<OutreachContributor>[]>(
     () => [
@@ -75,6 +71,7 @@ export function TopMarketersLeaderboard({
         help: t('columns.shareHelp'),
         value: (row) => row.sharePercent,
         cell: (row) => <ShareCell percent={row.sharePercent} />,
+        width: '12rem',
       },
       {
         id: 'received',
@@ -82,6 +79,7 @@ export function TopMarketersLeaderboard({
         header: t('columns.received'),
         unit: 'CST',
         value: (row) => row.totalCst,
+        width: '10rem',
       },
       {
         id: 'allocations',
@@ -89,6 +87,7 @@ export function TopMarketersLeaderboard({
         header: t('columns.allocations'),
         value: (row) => row.allocations,
         priority: 'secondary',
+        width: '7rem',
       },
     ],
     [t],
@@ -103,7 +102,7 @@ export function TopMarketersLeaderboard({
       description={t('description')}
       getRowKey={(row) => row.address}
       emptyTitle={t('empty')}
-      pageSize={Infinity}
+      pageSize={RANKING_PAGE_SIZE}
       {...state}
     />
   );

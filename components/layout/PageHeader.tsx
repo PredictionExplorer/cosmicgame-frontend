@@ -66,6 +66,13 @@ export type PageHeaderVariant = 'data' | 'reading';
 export interface PageHeaderProps {
   title: ReactNode;
   /**
+   * What a record page is about, set directly under the H1 and before the
+   * lede: the address of a transfer history or an outreach record (an
+   * `AddressChip` and its explorer link), so the reader knows whose figures
+   * follow before reading them.
+   */
+  identity?: ReactNode;
+  /**
    * The lede under the H1. On data pages a long lede is clamped to three
    * lines on phones, with a "Read more" toggle; reading pages always show it
    * whole (see `clampLede`).
@@ -182,6 +189,7 @@ function buildTrail(
  */
 export function PageHeader({
   title,
+  identity,
   subtitle,
   variant = 'data',
   clampLede = variant === 'data',
@@ -269,6 +277,17 @@ export function PageHeader({
           >
             {title}
           </h1>
+          {identity ? (
+            <div
+              data-slot="page-header-identity"
+              className={cn(
+                'mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 type-body-sm text-muted-foreground sm:mt-3',
+                centered && 'justify-center',
+              )}
+            >
+              {identity}
+            </div>
+          ) : null}
           {subtitle ? (
             <HeaderLede
               moreLabel={t('pageHeader.readMore')}

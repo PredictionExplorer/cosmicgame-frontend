@@ -59,7 +59,7 @@
       "marketing": {
         "heading": "Phân bổ truyền thông",
         "description": "Xem lịch sử phân bổ truyền thông của Cosmic Signature và các đợt phân phối CST cho những người đóng góp giúp mọi người khám phá giao thức.",
-        "source": "Các API phân bổ truyền thông công khai của Cosmic Signature",
+        "source": "API truyền thông của Cosmic Signature",
         "links": {
           "faq": "Đọc câu hỏi thường gặp",
           "statistics": "Xem thống kê giao thức",
@@ -101,7 +101,7 @@
       "eth-contribution": {
         "heading": "Đóng góp ETH trực tiếp",
         "description": "ETH gửi thẳng vào Dự trữ chu kỳ, kèm lời nhắn và chu kỳ của từng người đóng góp.",
-        "source": "Các API đóng góp công khai của Cosmic Signature",
+        "source": "API đóng góp của Cosmic Signature",
         "links": {
           "reserve": "Cách phân bổ dự trữ chu kỳ",
           "protocol": "Phần Hàng hóa công được chuyển đến đâu",
@@ -207,8 +207,8 @@
       },
       "coordination-changes": {
         "heading": "Thay đổi điều phối",
-        "description": "Xem các thay đổi điều phối công khai của Cosmic Signature, gồm thay đổi chế độ giao thức, cập nhật tham số và bản ghi quản trị ảnh hưởng đến các chu kỳ sau.",
-        "source": "Các API sự kiện hệ thống công khai của Cosmic Signature",
+        "description": "Mọi thay đổi mà chủ sở hữu hợp đồng đã thực hiện với các tham số giao thức kể từ khi chế độ hiện tại bắt đầu.",
+        "source": "API sự kiện hệ thống của Cosmic Signature",
         "links": {
           "security": "Đọc tổng quan bảo mật",
           "audits": "Xem kiểm toán và xác minh",
@@ -231,7 +231,7 @@
       "public-goods-contributions-cg": {
         "heading": "Đóng góp Hàng hóa công của giao thức",
         "description": "Theo dõi các khoản chuyển hàng hóa công tự động của Cosmic Signature từ các chu kỳ giao thức đến Kho Hàng hóa công và đơn vị thụ hưởng đã cấu hình — hiện là Protocol Guild.",
-        "source": "Các API hàng hóa công công khai của Cosmic Signature",
+        "source": "API Hàng hóa công của Cosmic Signature",
         "links": {
           "learn": "Tìm hiểu về hàng hóa công",
           "statistics": "Xem thống kê hàng hóa công",
@@ -253,7 +253,7 @@
       "public-goods-contributions-voluntary": {
         "heading": "Đóng góp Hàng hóa công tự nguyện",
         "description": "ETH mà bất kỳ ai gửi thẳng vào Kho Hàng hóa công, dành cho đơn vị thụ hưởng — hiện là Protocol Guild.",
-        "source": "Các API hàng hóa công công khai của Cosmic Signature",
+        "source": "API Hàng hóa công của Cosmic Signature",
         "links": {
           "direct": "Xem đóng góp ETH trực tiếp",
           "learn": "Tìm hiểu về hàng hóa công",
@@ -274,7 +274,7 @@
       "public-goods-retrievals": {
         "heading": "Nhận về Hàng hóa công",
         "description": "Xem các lần nhận về từ Kho Hàng hóa công của Cosmic Signature, nơi dự trữ chu kỳ chuyển hỗ trợ đến đơn vị thụ hưởng hàng hóa công đã cấu hình — hiện là Protocol Guild.",
-        "source": "Các API hàng hóa công công khai của Cosmic Signature",
+        "source": "API Hàng hóa công của Cosmic Signature",
         "links": {
           "learn": "Tìm hiểu về hàng hóa công",
           "protocolGuild": "Truy cập Protocol Guild",

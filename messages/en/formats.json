@@ -26,10 +26,10 @@
     "self": "This address",
     "known": {
       "protocol": "Cosmic Signature Protocol",
-      "implementation": "Implementation Contract",
+      "implementation": "Implementation contract",
       "cst": "Cosmic Signature CST Token",
       "nft": "Cosmic Signature NFT",
-      "randomWalk": "RandomWalk",
+      "randomWalk": "Random Walk NFT",
       "council": "Cosmic Council",
       "publicGoods": "Public Goods Vault",
       "outreach": "Outreach Reserve",

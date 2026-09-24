@@ -59,7 +59,7 @@
       "marketing": {
         "heading": "Outreach allocations",
         "description": "Review Cosmic Signature outreach allocation history and CST distributions for ecosystem contributors who help people discover the protocol.",
-        "source": "Cosmic Signature public outreach allocation APIs",
+        "source": "Cosmic Signature outreach API",
         "links": {
           "faq": "Read the FAQ",
           "statistics": "View protocol statistics",
@@ -101,7 +101,7 @@
       "eth-contribution": {
         "heading": "Direct ETH contributions",
         "description": "ETH sent straight to the Cycle Reserve, with each contributor’s note and cycle.",
-        "source": "Cosmic Signature public contribution APIs",
+        "source": "Cosmic Signature contribution API",
         "links": {
           "reserve": "How the Cycle Reserve is split",
           "protocol": "Where the Public Goods share goes",
@@ -207,8 +207,8 @@
       },
       "coordination-changes": {
         "heading": "Coordination changes",
-        "description": "Review public Cosmic Signature coordination changes, including protocol mode changes, parameter updates, and administration records that affect future cycles.",
-        "source": "Cosmic Signature public system event APIs",
+        "description": "Every change the contract owner has made to protocol parameters since the current mode began.",
+        "source": "Cosmic Signature system-event API",
         "links": {
           "security": "Read the security overview",
           "audits": "Review audits and verification",
@@ -230,11 +230,11 @@
       },
       "public-goods-contributions-cg": {
         "heading": "Protocol Public Goods contributions",
-        "description": "Track automatic Cosmic Signature public-goods forwards from protocol cycles to the Public Goods Vault and its configured beneficiary — currently Protocol Guild.",
-        "source": "Cosmic Signature public-goods API",
+        "description": "Track automatic Cosmic Signature Public Goods forwards from protocol cycles to the Public Goods Vault and its configured beneficiary — currently Protocol Guild.",
+        "source": "Cosmic Signature Public Goods API",
         "links": {
           "learn": "Learn about public goods",
-          "statistics": "View public-goods statistics",
+          "statistics": "View Public Goods statistics",
           "contracts": "Review the vault contract"
         },
         "cards": {
@@ -253,7 +253,7 @@
       "public-goods-contributions-voluntary": {
         "heading": "Voluntary Public Goods contributions",
         "description": "ETH that anyone sends straight to the Public Goods Vault, for its beneficiary, currently Protocol Guild.",
-        "source": "Cosmic Signature public-goods API",
+        "source": "Cosmic Signature Public Goods API",
         "links": {
           "direct": "View direct ETH contributions",
           "learn": "Learn about public goods",
@@ -273,8 +273,8 @@
       },
       "public-goods-retrievals": {
         "heading": "Public Goods retrievals",
-        "description": "Review retrievals from the Cosmic Signature Public Goods Vault, where cycle reserves forward support to the configured public-goods beneficiary — currently Protocol Guild.",
-        "source": "Cosmic Signature public-goods API",
+        "description": "Review retrievals from the Cosmic Signature Public Goods Vault, where cycle reserves forward support to the configured Public Goods beneficiary — currently Protocol Guild.",
+        "source": "Cosmic Signature Public Goods API",
         "links": {
           "learn": "Learn about public goods",
           "protocolGuild": "Visit Protocol Guild",

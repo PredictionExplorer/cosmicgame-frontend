@@ -112,8 +112,10 @@
     "description": "Закарбуйте Random Walk NFT на Cosmic Signature. Кожен невикористаний Random Walk NFT можна долучити до одного ETH-жесту зі знижкою 50% на вартість ETH-жесту."
   },
   "systemEvent": {
-    "title": "Системні події",
-    "description": "Події адміністрування протоколу та зміни параметрів координації для конкретного циклу Cosmic Signature."
+    "title": "Конфігурація перед циклом {cycle}",
+    "description": "Параметри протоколу, які власник контракту змінив перед початком циклу {cycle}, із новим значенням і транзакцією для кожного.",
+    "titleInitial": "Початкова конфігурація",
+    "descriptionInitial": "Параметри протоколу, які власник контракту встановив перед першим циклом, зі значенням і транзакцією для кожного."
   },
   "currentCycleFull": {
     "title": "Поточний перформанс-цикл",
@@ -159,7 +161,7 @@
     "description": "Долучайтеся до просування Cosmic Signature й отримуйте розподіли CST. Перегляньте найактивніших учасників екосистеми, історію розподілів і дізнайтеся, як узяти участь."
   },
   "outreachAddress": {
-    "title": "Розподіли за просування",
+    "title": "Розподіли за просування · {address}",
     "description": "Історія розподілів за просування та розподіли CST для учасника екосистеми Cosmic Signature. Перегляньте реферальну активність і внески."
   },
   "ethContribution": {
@@ -167,12 +169,12 @@
     "description": "Внесіть ETH безпосередньо до резерву циклу Cosmic Signature без жесту. Перегляньте історію внесків і супровідні повідомлення."
   },
   "ethContributionDetail": {
-    "title": "Деталі прямого внеску ETH",
+    "title": "Внесок №{id}",
     "description": "Відомості про внесок ETH до резерву циклу Cosmic Signature: адреса автора, сума, цикл і супровідне повідомлення."
   },
   "ethContributionByCycle": {
-    "title": "Прямі внески ETH за циклами",
-    "description": "Прямі внески ETH до протоколу Cosmic Signature з розбивкою за перформанс-циклами."
+    "title": "Внески циклу {cycle}",
+    "description": "Прямі внески ETH до резерву циклу під час циклу {cycle}."
   },
   "myStatistics": {
     "title": "Моя статистика",
@@ -187,12 +189,12 @@
     "description": "Перекажіть свої токени CST Cosmic Signature на адресу іншого гаманця."
   },
   "cosmicSignatureTransfers": {
-    "title": "Історія передач NFT",
-    "description": "Історія передач Cosmic Signature NFT"
+    "title": "Передачі NFT · {address}",
+    "description": "Cosmic Signature NFT, закарбовані на цю адресу, і кожен, який вона отримала чи надіслала."
   },
   "cosmicTokenTransfers": {
-    "title": "Історія переказів CST",
-    "description": "Історія переказів токена CST Cosmic Signature"
+    "title": "Перекази CST · {address}",
+    "description": "CST, закарбовані на цю адресу, отримані й надіслані нею, а також витрачені на її жести за CST."
   },
   "usedRwlkNfts": {
     "title": "Використані Random Walk NFT",

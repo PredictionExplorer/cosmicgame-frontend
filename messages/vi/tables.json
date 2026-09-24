@@ -210,7 +210,7 @@
     "explainColumn": "Giải thích cột: {column}"
   },
   "adminEvents": {
-    "empty": "Không có thay đổi cấu hình nào được ghi nhận trong khoảng này"
+    "empty": "Không có thay đổi cấu hình"
   },
   "allocation": {
     "cycle": "Chu kỳ {cycle}",

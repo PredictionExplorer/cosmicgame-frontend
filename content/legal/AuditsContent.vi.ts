@@ -1,10 +1,4 @@
-import { formatCount } from '@/utils/format';
-
-import { AUDIT_FINDINGS_TOTAL, HACKEN_AUDIT } from './audit';
 import type { AuditsCopy } from './AuditsContent';
-
-const { findings, invariants } = HACKEN_AUDIT;
-const count = (value: number) => formatCount(value, 'vi');
 
 /** Vietnamese copy for /audits, rendered by AuditsContent. */
 export const auditsCopyVi: AuditsCopy = {
@@ -35,8 +29,8 @@ export const auditsCopyVi: AuditsCopy = {
     heading: 'Kiểm toán độc lập bởi Hacken',
     paragraphs: [
       `Cuối năm 2025, Hacken đã thực hiện một cuộc rà soát bảo mật độc lập các hợp đồng thông minh của Cosmic Signature. Phạm vi bao gồm các hợp đồng đang vận hành trong kho mã công khai, từ giao thức cốt lõi điều hành mỗi chu kỳ đến token CST, cả hai bộ sưu tập NFT, các ví neo giữ, cùng các hợp đồng quản lý ví và hệ thống hỗ trợ chúng. Hacken công bố báo cáo cuối cùng vào tháng 1 năm 2026.`,
-      `Báo cáo liệt kê ${count(AUDIT_FINDINGS_TOTAL)} phát hiện, không có phát hiện nào ở mức nghiêm trọng hay cao: ${count(findings.medium)} mức trung bình, ${count(findings.low)} mức thấp và ${count(findings.informational)} quan sát mang tính thông tin. Phần lớn mô tả những cân nhắc thiết kế mà đội ngũ đã xem xét và chấp nhận, và báo cáo giải thích từng phát hiện cùng trạng thái của nó.`,
-      `Bên cạnh rà soát thủ công, Hacken đã chạy kiểm thử fuzz với ${count(invariants.tested)} bất biến của hệ thống, chẳng hạn yêu cầu rằng lượng ETH giao thức nắm giữ luôn bằng số đã nạp trừ số đã nhận về. Cả ${count(invariants.held)} bất biến đều giữ vững qua ${count(invariants.runs)} lượt chạy.`,
+      'Báo cáo nêu từng phát hiện cùng mức độ nghiêm trọng và trạng thái của nó; phần tóm tắt phía trên thống kê số lượng. Không có phát hiện nào ở mức nghiêm trọng hay cao, và phần lớn mô tả những cân nhắc thiết kế mà đội ngũ đã xem xét và chấp nhận.',
+      'Bên cạnh rà soát thủ công, Hacken đã chạy kiểm thử fuzz với các bất biến của hệ thống, chẳng hạn yêu cầu rằng lượng ETH giao thức nắm giữ luôn bằng số đã nạp trừ số đã nhận về. Mọi bất biến đều giữ vững.',
     ],
   },
   analysis: {

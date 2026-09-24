@@ -10,6 +10,11 @@ import {
 } from '@/app/[locale]/(app)/contracts/contractAddressData';
 
 import {
+  ALLOCATION_TRACK_COPY_KEYS,
+  withNextCycleShare,
+  type AllocationTrackShare,
+} from '@/config/allocationTracks';
+import {
   ContractEvidence,
   formatSourcifyChecked,
   SourcifyCheckedNote,
@@ -39,11 +44,34 @@ import {
 const PARAMETER_GROUPS = ['shares', 'selection', 'timing', 'cost'] as const;
 type ParameterGroup = (typeof PARAMETER_GROUPS)[number];
 
-/** One read-only parameter: its label key and the value to show. */
+/** One read-only parameter: a stable key, its label and the value to show. */
 interface ParameterRow {
   key: string;
+  label: string;
   /** `null`: the dashboard reported the field but it could not be read. */
   value: ReactNode | null;
+}
+
+/**
+ * The Cycle Reserve's split as the dashboard reports it, every track in the
+ * order and with the names /contracts uses, completed with the remainder
+ * carried to the next cycle, so the shares add up to 100% (`null`: a share
+ * that could not be read).
+ */
+export function allocationShares(data: {
+  PrizePercentage?: unknown;
+  ChronoWarriorPercentage?: unknown;
+  RafflePercentage?: unknown;
+  StakingPercentage?: unknown;
+  CharityPercentage?: unknown;
+}): AllocationTrackShare[] {
+  return withNextCycleShare([
+    { id: 'signature', percent: toFiniteNumber(data.PrizePercentage) },
+    { id: 'chrono', percent: toFiniteNumber(data.ChronoWarriorPercentage) },
+    { id: 'stellar', percent: toFiniteNumber(data.RafflePercentage) },
+    { id: 'anchor', percent: toFiniteNumber(data.StakingPercentage) },
+    { id: 'publicGoods', percent: toFiniteNumber(data.CharityPercentage) },
+  ]);
 }
 
 /**
@@ -51,6 +79,8 @@ interface ParameterRow {
  * room the value leaves, and the value wraps inside at most 60% of the row,
  * so a long value ("Not reported by the dashboard API", a date and its
  * badge) never squeezes the label to a syllable per line or runs off the edge.
+ * A wide row (an address) sets its value and its evidence on one line from
+ * `xl`, stacked below.
  */
 function SheetRow({
   label,
@@ -86,7 +116,7 @@ function SheetRow({
         className={cn(
           'min-w-0 text-foreground',
           wide
-            ? 'flex flex-col items-start gap-1.5'
+            ? 'flex flex-col items-start gap-1.5 xl:flex-row xl:flex-wrap xl:items-baseline xl:gap-x-6'
             : 'max-w-[60%] text-end type-figure-sm [overflow-wrap:break-word]',
         )}
       >
@@ -164,38 +194,72 @@ export default function AdminSettingsPage() {
       </span>
     ) : null;
 
+  // A parameter /contracts also shows reads its label from the contracts
+  // catalog, so the two pages cannot name it differently.
+  const field = (key: string) => t(`settings.fields.${key}`);
   const groups: Record<ParameterGroup, ParameterRow[]> = {
-    shares: [
-      { key: 'signatureAllocationPercentage', value: percent(data.PrizePercentage) },
-      { key: 'stellarSelectionPercentage', value: percent(data.RafflePercentage) },
-      { key: 'anchorDistributionPercentage', value: percent(data.StakingPercentage) },
-      { key: 'publicGoodsPercentage', value: percent(data.CharityPercentage) },
-    ],
+    // Every track /contracts draws, Chrono-Warrior and the remainder carried
+    // to the next cycle included, so the shares read as the whole split.
+    shares: allocationShares(data).map((share) => ({
+      key: `share-${share.id}`,
+      label: tContracts(`funds.segments.${ALLOCATION_TRACK_COPY_KEYS[share.id]}.label`),
+      value: percent(share.percent),
+    })),
     selection: [
-      { key: 'ethStellarRecipients', value: count(data.NumRaffleEthWinnersBidding) },
-      { key: 'nftStellarRecipients', value: count(data.NumRaffleNFTWinnersBidding) },
-      { key: 'nftHolderRecipients', value: count(data.NumRaffleNFTWinnersStakingRWalk) },
+      {
+        key: 'ethStellarRecipients',
+        label: tContracts('parameters.selection.ethLabel'),
+        value: count(data.NumRaffleEthWinnersBidding),
+      },
+      {
+        key: 'nftStellarRecipients',
+        label: tContracts('parameters.selection.nftLabel'),
+        value: count(data.NumRaffleNFTWinnersBidding),
+      },
+      {
+        key: 'anchoredStellarRecipients',
+        label: tContracts('parameters.selection.anchorLabel'),
+        value: count(data.NumRaffleNFTWinnersStakingRWalk),
+      },
     ],
     timing: [
-      { key: 'activationTime', value: activationValue },
-      { key: 'gestureTimeIncrement', value: duration(secondsFromMicroseconds(timeIncrement)) },
-      { key: 'timeIncrease', value: divisor(data.TimeIncrease) },
+      { key: 'activationTime', label: field('activationTime'), value: activationValue },
       {
-        key: 'initialAllocationSeconds',
+        key: 'gestureTimeIncrement',
+        label: tContracts('configuration.cards.timeIncrement.label'),
+        value: duration(secondsFromMicroseconds(timeIncrement)),
+      },
+      { key: 'timeIncrease', label: field('timeIncrease'), value: divisor(data.TimeIncrease) },
+      {
+        key: 'initialCycleDuration',
+        label: tContracts('configuration.cards.initial.label'),
         // `InitialSecondsUntilPrize` carries the divisor, not seconds (see DashboardInfo).
         value: duration(initialDurationSeconds(timeIncrement, data.InitialSecondsUntilPrize)),
       },
-      { key: 'allocationTimeout', value: duration(secondsOrNull(data.TimeoutClaimPrize)) },
+      {
+        key: 'finalizationTimeout',
+        label: tContracts('configuration.cards.finalization.label'),
+        value: duration(secondsOrNull(data.TimeoutClaimPrize)),
+      },
       {
         key: 'calibrationWindowLength',
+        label: field('calibrationWindowLength'),
         value: duration(secondsOrNull(data.RoundStartCSTAuctionLength)),
       },
     ],
     cost: [
-      { key: 'priceIncrease', value: divisor(data.PriceIncrease) },
+      {
+        key: 'priceIncrease',
+        label: tContracts('configuration.cards.ethStep.label'),
+        value: divisor(data.PriceIncrease),
+      },
       // The dashboard API does not report these two; say so instead of an empty field.
-      { key: 'initialGestureCostFraction', value: notReported },
-      { key: 'gestureRatio', value: notReported },
+      {
+        key: 'initialGestureCostFraction',
+        label: field('initialGestureCostFraction'),
+        value: notReported,
+      },
+      { key: 'gestureRatio', label: field('gestureRatio'), value: notReported },
     ],
   };
 
@@ -253,7 +317,7 @@ export default function AdminSettingsPage() {
             />
             <dl className="border-t border-rule-faint">
               {groups[group].map((row) => (
-                <SheetRow key={row.key} id={row.key} label={t(`settings.fields.${row.key}`)}>
+                <SheetRow key={row.key} id={row.key} label={row.label}>
                   {row.value ?? unknown}
                 </SheetRow>
               ))}

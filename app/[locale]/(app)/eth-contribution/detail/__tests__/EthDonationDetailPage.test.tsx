@@ -60,9 +60,10 @@ describe('EthDonationDetailPage', () => {
     expect(from).toHaveTextContent('0x4D39');
     // The contributor sits in the figure's type, not in a 12px chip.
     expect(from?.querySelector('.text-xs')).toBeNull();
-    const cycle = screen.getByRole('link', { name: '3' });
+    // The link names where it leads, and its visible number is part of that name.
+    const cycle = screen.getByRole('link', { name: 'ethContribution.detail.cycleLink(cycle=3)' });
     expect(cycle).toHaveAttribute('href', '/eth-contribution/round/3');
-    expect(cycle).toHaveAttribute('title', 'ethContribution.detail.cycleLink(cycle=3)');
+    expect(cycle).toHaveTextContent('3');
     expect(document.querySelector('[data-figure="date"] time')).toBeInTheDocument();
     for (const id of ['from', 'date']) {
       expect(document.querySelector(`[data-figure="${id}"] dd`)).not.toHaveClass(
@@ -121,11 +122,40 @@ describe('EthDonationDetailPage', () => {
     withRecord(null);
     render(<EthDonationDetailPage id={9} />);
 
+    // The H1 no longer claims the record exists (regression: "Contribution #9"
+    // above "There is no contribution #9").
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'ethContribution.detail.notFoundHeading',
+    );
     expect(screen.getByText('ethContribution.detail.notFoundTitle(id=9)')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'ethContribution.detail.backToAll' })).toHaveAttribute(
       'href',
       '/eth-contribution',
     );
+  });
+
+  it('opens on the not-found state the server found, with no figures to drop (regression)', () => {
+    // Every missing record drew four figure skeletons, then removed them when
+    // the client read answered, shifting the page (desktop CLS 0.095).
+    withRecord(undefined, { isLoading: true });
+    render(<EthDonationDetailPage id={9} knownMissing />);
+
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'ethContribution.detail.notFoundHeading',
+    );
+    expect(document.querySelector('[data-figure]')).toBeNull();
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(screen.getByText('ethContribution.detail.notFoundTitle(id=9)')).toBeInTheDocument();
+  });
+
+  it('shows the record when the client read finds it after all', () => {
+    withRecord(DONATION);
+    render(<EthDonationDetailPage id={7} knownMissing />);
+
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'ethContribution.detail.title(id=7)',
+    );
+    expect(document.querySelector('[data-figure="amount"]')).toHaveTextContent('20.0000 ETH');
   });
 
   it('refuses an invalid id without querying', () => {

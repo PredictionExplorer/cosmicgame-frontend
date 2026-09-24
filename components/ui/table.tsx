@@ -124,10 +124,17 @@ interface TableCellProps extends Omit<React.TdHTMLAttributes<HTMLTableCellElemen
   numeric?: boolean;
   /** In a phone record, set the value under its label at full width (long text). */
   stack?: boolean;
+  /**
+   * The cell's part in a phone record: `title` opens the record with the
+   * value alone (no label), at the start, in the foreground tier — the name a
+   * reader anchors on; `omit` leaves the cell out of the record, for a value
+   * the title line already carries.
+   */
+  phone?: 'title' | 'omit';
 }
 
 const TableCell = React.forwardRef<HTMLTableCellElement, TableCellProps>(
-  ({ className, label, align = 'start', numeric, stack, children, ...props }, ref) => (
+  ({ className, label, align = 'start', numeric, stack, phone, children, ...props }, ref) => (
     <td
       ref={ref}
       role="cell"
@@ -135,6 +142,7 @@ const TableCell = React.forwardRef<HTMLTableCellElement, TableCellProps>(
       data-align={align}
       data-numeric={numeric ? 'true' : undefined}
       data-stack={stack ? 'true' : undefined}
+      data-phone={phone}
       className={cn(
         'border-b border-rule-faint px-4 py-3 align-top leading-6 text-muted-foreground',
         className,

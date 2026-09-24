@@ -3,16 +3,9 @@ import { Fragment } from 'react';
 import type { LegalDocumentLabels } from '@/content/legal/labels';
 
 import { LegalDocument } from '@/components/legal/LegalDocument';
-import { LegalCallout, LegalClause, LegalList } from '@/components/legal/LegalProse';
+import { CITABLE_CLASS, LegalCallout, LegalClause, LegalList } from '@/components/legal/LegalProse';
 import { RichText } from '@/components/legal/RichText';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { cn } from '@/lib/utils';
 import { formatCount, formatPercent } from '@/utils/format';
 
 import { TERMS_ALLOCATION_ROWS, type TermsAllocationRow } from './termsAllocations';
@@ -56,12 +49,9 @@ export interface TermsCopy {
     readonly title: string;
     readonly text: string;
   };
-  /** The allocation tracks at a glance, above the allocation clauses. */
+  /** The allocation tracks, each with its figures and its clause. */
   readonly allocationsTable: {
     readonly title: string;
-    readonly track: string;
-    /** Read by screen readers in an empty cell. */
-    readonly none: string;
     /** `{percent}` shared by `{count}` Recipients. */
     readonly sharedBy: string;
     /** `{count}` Recipients each receive `{amount}`. */
@@ -77,38 +67,22 @@ export function clauseAnchor(sectionId: string, clauseId: string): string {
   return `${sectionId}-${clauseId}`;
 }
 
-/** A unit and its figure in a phone summary line ("ETH 25%"); nothing when the track has none. */
-function SummaryPart({ unit, value }: { unit: string; value: string | null }) {
-  if (value === null) return null;
-  return (
-    <span className="whitespace-nowrap">
-      <span className="text-subtle">{unit}</span> {value}
-    </span>
-  );
-}
-
 /**
- * The allocation tracks at a glance: a table from `sm`, and on phones one
- * line per track ("ETH 25% · CST 1,000 · NFT 1") instead of eleven
- * four-row records, since each track's clause follows with its rule.
+ * The allocation tracks as one list, each track once: its name (the clause's
+ * anchor, so the risk disclosures can cite it), its figures on one line
+ * ("ETH 25% · CST 1,000 · NFT 1", from `protocolFacts`), and the sentence
+ * that binds it. It replaces a table followed by the same eleven tracks
+ * again as clauses, which stated every figure twice.
  */
-function AllocationsTable({
+function AllocationTracks({
   copy,
-  names,
+  tracks,
   locale,
 }: {
   copy: TermsCopy['allocationsTable'];
-  names: ReadonlyMap<string, string>;
+  tracks: readonly TermsClause[];
   locale: string;
 }) {
-  const none = (
-    <>
-      <span aria-hidden className="text-subtle">
-        —
-      </span>
-      <span className="sr-only">{copy.none}</span>
-    </>
-  );
   const amountText = (value: number | undefined, row: TermsAllocationRow): string | null => {
     if (value === undefined) return null;
     const formatted = formatCount(value, locale);
@@ -118,88 +92,74 @@ function AllocationsTable({
   };
   const ethText = (row: TermsAllocationRow): string | null => {
     if (!row.eth) return null;
-    const percent = `${row.eth.approximate ? '≈ ' : ''}${formatPercent(row.eth.percent, locale)}`;
+    const percent = `${row.eth.approximate ? '≈ ' : ''}${formatPercent(row.eth.percent, locale)}`;
     return row.eth.sharedBy
       ? copy.sharedBy
           .replace('{percent}', percent)
           .replace('{count}', formatCount(row.eth.sharedBy, locale))
       : percent;
   };
-  const amount = (value: number | undefined, row: TermsAllocationRow) =>
-    amountText(value, row) ?? none;
-  const eth = (row: TermsAllocationRow) => ethText(row) ?? none;
-  const trackLink = (row: TermsAllocationRow) => (
-    <a href={`#${clauseAnchor('allocations', row.id)}`} className="link-quiet">
-      {names.get(row.id) ?? row.id}
-    </a>
-  );
+  const clauses = new Map(tracks.map((track) => [track.id, track]));
 
   return (
-    <figure className="max-w-3xl">
-      <figcaption id="allocations-table-title" className="type-title text-foreground">
+    <div>
+      <h3 id="allocations-tracks-title" className="type-title text-foreground">
         {copy.title}
-      </figcaption>
-      <Table labelledBy="allocations-table-title" containerClassName="mt-3 max-sm:hidden">
-        <TableHeader>
-          <TableRow>
-            <TableHead>{copy.track}</TableHead>
-            <TableHead align="end">ETH</TableHead>
-            <TableHead align="end">CST</TableHead>
-            <TableHead align="end">NFT</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {TERMS_ALLOCATION_ROWS.map((row) => (
-            <TableRow key={row.id}>
-              <TableCell label={copy.track} className="text-foreground">
-                {trackLink(row)}
-              </TableCell>
-              <TableCell label="ETH" align="end" numeric>
-                {eth(row)}
-              </TableCell>
-              <TableCell label="CST" align="end" numeric>
-                {amount(row.cst, row)}
-              </TableCell>
-              <TableCell label="NFT" align="end" numeric>
-                {amount(row.nft, row)}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      </h3>
       <dl
-        data-allocations-summary
-        className="mt-3 divide-y divide-rule-faint border-y border-rule-faint sm:hidden"
+        aria-labelledby="allocations-tracks-title"
+        data-allocation-tracks
+        className="mt-3 divide-y divide-rule-faint border-y border-rule-faint"
       >
         {TERMS_ALLOCATION_ROWS.map((row) => {
+          const clause = clauses.get(row.id);
+          if (!clause) return null;
+          // A track without a figure in a unit says nothing for it, rather than a dash.
           const parts = [
             { unit: 'ETH', value: ethText(row) },
             { unit: 'CST', value: amountText(row.cst, row) },
             { unit: 'NFT', value: amountText(row.nft, row) },
-          ].filter((part) => part.value !== null);
+          ].filter((part): part is { unit: string; value: string } => part.value !== null);
           return (
-            <div key={row.id} className="py-2.5">
-              <dt className="type-body-sm text-foreground">{trackLink(row)}</dt>
-              <dd className="mt-0.5 type-figure-sm text-muted-foreground">
-                {parts.map((part, index) => (
-                  <Fragment key={part.unit}>
-                    {index > 0 ? (
-                      <>
-                        {' '}
-                        <span aria-hidden className="text-subtle">
-                          ·
-                        </span>{' '}
-                      </>
-                    ) : null}
-                    <SummaryPart unit={part.unit} value={part.value} />
-                  </Fragment>
-                ))}
+            <div
+              key={row.id}
+              id={clauseAnchor('allocations', row.id)}
+              className={cn(
+                'grid gap-x-8 gap-y-1.5 py-4 md:grid-cols-[minmax(0,13rem)_minmax(0,1fr)]',
+                CITABLE_CLASS,
+              )}
+            >
+              <dt>
+                <span className="block type-title text-foreground">{clause.subtitle}</span>
+                <span
+                  data-track-figures
+                  className="mt-1 block type-figure-sm text-muted-foreground"
+                >
+                  {parts.map((part, index) => (
+                    <Fragment key={part.unit}>
+                      {index > 0 ? (
+                        <>
+                          {' '}
+                          <span aria-hidden className="text-subtle">
+                            ·
+                          </span>{' '}
+                        </>
+                      ) : null}
+                      <span className="whitespace-nowrap">
+                        <span className="text-subtle">{part.unit}</span> {part.value}
+                      </span>
+                    </Fragment>
+                  ))}
+                </span>
+              </dt>
+              <dd className="type-prose text-muted-foreground">
+                <RichText text={clause.text} locale={locale} />
               </dd>
             </div>
           );
         })}
       </dl>
-    </figure>
+    </div>
   );
 }
 
@@ -229,11 +189,8 @@ function TermsSectionBody({
     );
   }
 
-  // Allocations: the opening clause, the tracks at a glance, each track's
-  // clause as a name-and-rule row, then the retrieval and no-guarantee clauses.
-  const names = new Map(
-    section.content.flatMap((item) => (item.subtitle ? [[item.id, item.subtitle] as const] : [])),
-  );
+  // Allocations: the opening clause, the tracks (each once, with its figures
+  // and its rule), then the retrieval and no-guarantee clauses.
   const tracks = section.content.filter((item) => TRACK_IDS.has(item.id));
   const [opening, ...rest] = section.content.filter((item) => !TRACK_IDS.has(item.id));
   return (
@@ -246,21 +203,7 @@ function TermsSectionBody({
           locale={locale}
         />
       ) : null}
-      <AllocationsTable copy={copy.allocationsTable} names={names} locale={locale} />
-      <dl className="max-w-3xl divide-y divide-rule-faint border-y border-rule-faint">
-        {tracks.map((item) => (
-          <div
-            key={item.id}
-            id={clauseAnchor(section.id, item.id)}
-            className="grid gap-x-8 gap-y-1 py-4 md:grid-cols-[minmax(0,12rem)_minmax(0,1fr)]"
-          >
-            <dt className="type-title text-foreground">{item.subtitle}</dt>
-            <dd className="type-body-md text-muted-foreground">
-              <RichText text={item.text} locale={locale} />
-            </dd>
-          </div>
-        ))}
-      </dl>
+      <AllocationTracks copy={copy.allocationsTable} tracks={tracks} locale={locale} />
       {rest.map((item) => (
         <LegalClause
           key={item.id}
@@ -277,9 +220,9 @@ function TermsSectionBody({
 /**
  * The Terms of Service in the Trust Center template: the warning first, then
  * each section with its clauses (every clause is an anchor, so support and
- * the risk disclosures can cite `/terms#allocations-retrieval`), the
- * allocation tracks at a glance, the prohibited activities as a real list,
- * and the acknowledgment last.
+ * the risk disclosures can cite `/terms#allocations-retrieval`, and a cited
+ * clause is marked), the allocation tracks as one list with their figures,
+ * the prohibited activities as a real list, and the acknowledgment last.
  */
 export function TermsContent({
   copy,

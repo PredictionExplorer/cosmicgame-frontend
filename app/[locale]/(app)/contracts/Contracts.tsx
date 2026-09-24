@@ -28,6 +28,7 @@ import { FundDistribution } from './components/FundDistribution';
 import { ProtocolConfiguration } from './components/ProtocolConfiguration';
 import { PublicGoodsVaultAction } from './components/PublicGoodsVaultAction';
 import type { CalibrationWindowReading } from './components/calibrationWindow';
+import { ContractReadStatus, type ContractReadHealth } from './components/ContractReadStatus';
 
 /**
  * The preview grows with the seconds since the last gesture, so it stays live, but at a pace
@@ -116,6 +117,11 @@ const Contracts = ({ seoSummary, addresses, initialContractAddrs = null }: Contr
   const [cstWindow, setCstWindow] = useState<Read<CalibrationWindowReading>>(undefined);
   const [ethWindow, setEthWindow] = useState<Read<CalibrationWindowReading>>(undefined);
   const [cstStartingCost, setCstStartingCost] = useState<Read<number>>(undefined);
+  // The polled read's health, for the configuration's freshness stamp.
+  const [liveReadHealth, setLiveReadHealth] = useState<ContractReadHealth>({
+    lastSuccessAtMs: null,
+    lastAttemptFailed: false,
+  });
 
   const charityWalletContract = useContractNoSigner(vaultAddress, CHARITY_WALLET_ABI);
   const cosmicGameContract = useContractNoSigner(cosmicGame, COSMICGAME_ABI);
@@ -216,10 +222,12 @@ const Contracts = ({ seoSummary, addresses, initialContractAddrs = null }: Contr
         const amount = Number(formatEther(v ?? 0n));
         if (!cancelled) {
           setCstRewardAmountForBidding(Number.isFinite(amount) ? amount : null);
+          setLiveReadHealth({ lastSuccessAtMs: Date.now(), lastAttemptFailed: false });
         }
       } catch (e) {
         if (!cancelled) {
           setCstRewardAmountForBidding(null);
+          setLiveReadHealth((previous) => ({ ...previous, lastAttemptFailed: true }));
           reportError(e, 'contracts live cstRewardAmountForBidding');
         }
       } finally {
@@ -299,6 +307,7 @@ const Contracts = ({ seoSummary, addresses, initialContractAddrs = null }: Contr
       {/* The server-rendered header (ContractsSeoSummary) is the page's only header. */}
       {seoSummary ?? (
         <PageHeader
+          variant="reading"
           section="trust"
           title={t('page.title')}
           subtitle={t('page.subtitle')}
@@ -336,6 +345,12 @@ const Contracts = ({ seoSummary, addresses, initialContractAddrs = null }: Contr
           ethStellarRecipients={dashboardNumber(data?.NumRaffleEthWinnersBidding)}
           nftStellarRecipients={dashboardNumber(data?.NumRaffleNFTWinnersBidding)}
           anchoredStellarRecipients={dashboardNumber(data?.NumRaffleNFTWinnersStakingRWalk)}
+          status={
+            <ContractReadStatus
+              health={liveReadHealth}
+              pollIntervalMs={CST_REWARD_PREVIEW_REFRESH_MS}
+            />
+          }
         />
 
         <CalibrationWindows

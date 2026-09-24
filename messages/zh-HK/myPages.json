@@ -313,6 +313,7 @@
       }
     },
     "switcherLabel": "該地址的轉移記錄",
+    "artUnavailable": "作品暫不可用",
     "viewOnExplorer": "在 {explorer} 查看",
     "error": "無法載入該地址的轉移記錄。",
     "count": "{count, plural, other {# 項記錄}}",
@@ -320,7 +321,9 @@
       "imprinted": "銘刻",
       "received": "收到",
       "sent": "發出",
-      "consumed": "消耗"
+      "consumed": "消耗",
+      "anchored": "錨定",
+      "released": "解錨"
     },
     "filter": {
       "label": "顯示",

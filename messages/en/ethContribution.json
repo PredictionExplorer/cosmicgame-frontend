@@ -50,7 +50,8 @@
     "notFoundTitle": "There is no contribution #{id}",
     "notFoundDescription": "Only contributions made with a note have a record page. Find the one you're after in the full list.",
     "backToAll": "All contributions",
-    "loadError": "This contribution couldn't be loaded."
+    "loadError": "This contribution couldn't be loaded.",
+    "notFoundHeading": "Contribution not found"
   },
   "cycle": {
     "invalidNumber": "Invalid cycle number",
@@ -71,6 +72,7 @@
     "emptyDescription": "Contributions sent while cycle {cycle} is active appear here.",
     "loadError": "The contributions of this cycle couldn't be loaded.",
     "invalidTitle": "This link doesn't point to a cycle",
-    "invalidDescription": "Cycle numbers are whole numbers from 0, like 3."
+    "invalidDescription": "Cycle numbers are whole numbers from 0, like 3.",
+    "emptyDescriptionPast": "No direct ETH contributions were made during cycle {cycle}."
   }
 }

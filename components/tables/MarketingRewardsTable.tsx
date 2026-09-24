@@ -12,6 +12,8 @@ export type { MarketingReward };
 
 interface MarketingRewardsTableProps extends LedgerStateProps {
   list: MarketingReward[];
+  /** Phone layout (`DataTable` `layout`); `compact` keeps the two columns side by side. */
+  layout?: 'auto' | 'cards' | 'compact';
 }
 
 /**
@@ -23,7 +25,7 @@ interface MarketingRewardsTableProps extends LedgerStateProps {
  * base units) is muted like dust in every ledger, and a note beside the row
  * range says why whenever the list holds one.
  */
-const MarketingRewardsTable = ({ list, ...state }: MarketingRewardsTableProps) => {
+const MarketingRewardsTable = ({ list, layout, ...state }: MarketingRewardsTableProps) => {
   const t = useTranslations('tables');
   const locale = useLocale();
   const dustNote = useOutreachDustNote(list, locale);
@@ -61,6 +63,7 @@ const MarketingRewardsTable = ({ list, ...state }: MarketingRewardsTableProps) =
       emptyTitle={t('empty.outreachAllocations')}
       initialSort={{ id: 'datetime', direction: 'desc' }}
       caption={dustNote}
+      layout={layout}
       {...state}
     />
   );

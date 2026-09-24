@@ -94,12 +94,12 @@
       "description": "CST allocated from the Outreach Reserve"
     },
     "publicGoodsProtocol": {
-      "label": "Protocol Public-Goods Contributions",
+      "label": "Protocol Public Goods Contributions",
       "short": "Protocol",
       "description": "The Public Goods Allocation of every cycle"
     },
     "publicGoodsVoluntary": {
-      "label": "Voluntary Public-Goods Contributions",
+      "label": "Voluntary Public Goods Contributions",
       "short": "Voluntary",
       "description": "Contributions sent straight to the Public Goods Vault"
     },

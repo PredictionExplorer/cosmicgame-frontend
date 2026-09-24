@@ -210,7 +210,7 @@
     "explainColumn": "列の説明：{column}"
   },
   "adminEvents": {
-    "empty": "この期間に記録された設定の変更はありません"
+    "empty": "設定の変更はありません"
   },
   "allocation": {
     "cycle": "サイクル{cycle}",

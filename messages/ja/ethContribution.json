@@ -50,7 +50,8 @@
     "notFoundTitle": "拠出 #{id}は見つかりません",
     "notFoundDescription": "メモ付きの拠出にだけ記録ページがあります。一覧から探してください。",
     "backToAll": "すべての拠出",
-    "loadError": "この拠出を読み込めませんでした。"
+    "loadError": "この拠出を読み込めませんでした。",
+    "notFoundHeading": "拠出が見つかりません"
   },
   "cycle": {
     "invalidNumber": "サイクル番号が無効です",
@@ -71,6 +72,7 @@
     "emptyDescription": "サイクル{cycle}の間に送られた拠出がここに表示されます。",
     "loadError": "このサイクルの拠出を読み込めませんでした。",
     "invalidTitle": "このリンクはサイクルを指していません",
-    "invalidDescription": "サイクル番号は3のような0から始まる整数です。"
+    "invalidDescription": "サイクル番号は3のような0から始まる整数です。",
+    "emptyDescriptionPast": "サイクル{cycle}の間に直接のETH拠出はありませんでした。"
   }
 }

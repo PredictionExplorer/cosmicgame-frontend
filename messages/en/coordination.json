@@ -18,9 +18,10 @@
     },
     "allChanges": "All coordination changes",
     "loadError": "The configuration changes could not be loaded.",
-    "emptyDescription": "The protocol kept its existing settings through this window.",
+    "emptyDescription": "The contract owner changed no settings before cycle {cycle} opened.",
     "invalidTitle": "This configuration window does not exist",
-    "invalidDescription": "The cycle or event range in the link is not valid."
+    "invalidDescription": "The cycle or event range in the link is not valid.",
+    "emptyDescriptionInitial": "The contract owner changed no settings before the first cycle opened."
   },
   "events": {
     "undefined": "Unknown event",

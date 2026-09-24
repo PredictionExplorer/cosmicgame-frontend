@@ -18,9 +18,10 @@
     },
     "allChanges": "전체 조율 변경 내역",
     "loadError": "구성 변경 내역을 불러오지 못했습니다.",
-    "emptyDescription": "이 기간에는 프로토콜이 기존 설정을 유지했습니다.",
+    "emptyDescription": "사이클 {cycle} 시작 전에 컨트랙트 소유자가 변경한 설정이 없습니다.",
     "invalidTitle": "존재하지 않는 구성 기간입니다",
-    "invalidDescription": "링크의 사이클 또는 이벤트 범위가 올바르지 않습니다."
+    "invalidDescription": "링크의 사이클 또는 이벤트 범위가 올바르지 않습니다.",
+    "emptyDescriptionInitial": "첫 사이클 시작 전에 컨트랙트 소유자가 변경한 설정이 없습니다."
   },
   "events": {
     "undefined": "정의되지 않음",

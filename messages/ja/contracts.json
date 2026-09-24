@@ -28,7 +28,7 @@
       "description": "サイクルの受領者への配分として刻印されるERC-721 NFTコレクション"
     },
     "randomWalk": {
-      "name": "RandomWalk",
+      "name": "Random Walk NFT",
       "description": "一度だけの割引のためにETH一筆に添付するか、係留NFT星選の対象となるために係留できるRandomWalk NFTコレクション"
     },
     "council": {
@@ -108,7 +108,7 @@
         "tooltip": "ETH一筆の費用はこの上げ幅のパラメーターに従います。CST一筆の費用はライブのCST調律期間に従います。"
       },
       "timeIncrement": {
-        "label": "時間増分",
+        "label": "一筆あたりに加わる時間",
         "tooltip": "一筆ごとにこの時間がサイクル確定時刻に加わります。増分はサイクルごとに{percent}%ずつ大きくなります。"
       },
       "cstPreview": {
@@ -120,13 +120,18 @@
         "tooltip": "公開確定期間が誰にでも開かれる前に、最後の一筆の参加者がサイクルを確定できる時間"
       },
       "initial": {
-        "label": "初期時間増分",
+        "label": "初期サイクル期間",
         "tooltip": "最初の一筆が入れられたときに加わる初期のサイクル確定時刻"
       },
       "message": {
         "label": "メッセージの最大長",
         "tooltip": "一筆のメッセージに許される最大文字数"
       }
+    },
+    "groups": {
+      "gestures": "一筆",
+      "timing": "時間",
+      "selection": "星選"
     }
   },
   "parameters": {
@@ -178,13 +183,6 @@
   "seo": {
     "heading": "Cosmic Signatureコントラクト",
     "description": "Cosmic Signatureの公開Arbitrumコントラクトを確認できます。アプリに表示された内容を、オンチェーンの記録と照らし合わせて検証するための資料です。",
-    "partialFallback": "現在のコントラクトアドレスを取得できないため、以下にプロジェクトで公開しているプロキシと実装のアドレスを表示しています。",
-    "relatedAria": "コントラクトの信頼性に関するリソース",
-    "links": {
-      "code": "Cosmic Signatureのソースコードを確認する",
-      "security": "セキュリティの概要を読む",
-      "audits": "監査と検証を確認する",
-      "risk": "リスク開示を読む"
-    }
+    "partialFallback": "現在のコントラクトアドレスを取得できないため、以下にプロジェクトで公開しているプロキシと実装のアドレスを表示しています。"
   }
 }

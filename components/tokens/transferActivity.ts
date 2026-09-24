@@ -6,18 +6,33 @@ import { isZeroAddress, sameAddress } from '@/utils/format';
  * - `imprinted`: created for it (from the zero address): CST a gesture
  *   imprinted to it, or a Cosmic Signature NFT it received as an allocation
  * - `consumed`: destroyed from it (to the zero address): CST a CST gesture spent
+ * - `anchored` / `released`: moved into an anchoring wallet and back. The
+ *   address still owns what it anchored, so these rows are neither sent nor
+ *   received and stay out of both totals.
  * - `received` / `sent`: moved between it and another address
  */
-export type TransferActivity = 'imprinted' | 'received' | 'sent' | 'consumed';
+export type TransferActivity =
+  | 'imprinted'
+  | 'received'
+  | 'sent'
+  | 'consumed'
+  | 'anchored'
+  | 'released';
 
 /** The direction an activity moves value: into the address, or out of it. */
 export type TransferDirection = 'in' | 'out';
 
-export const ACTIVITY_DIRECTION: Readonly<Record<TransferActivity, TransferDirection>> = {
+/**
+ * Where each activity moves value; `null` for anchoring, which moves custody
+ * but not ownership, so the incoming and outgoing filters leave it out.
+ */
+export const ACTIVITY_DIRECTION: Readonly<Record<TransferActivity, TransferDirection | null>> = {
   imprinted: 'in',
   received: 'in',
   sent: 'out',
   consumed: 'out',
+  anchored: null,
+  released: null,
 };
 
 export interface ClassifiedTransfer {
@@ -34,17 +49,25 @@ export interface ClassifiedTransfer {
 /**
  * Classifies one transfer from the point of view of `address`. A transfer
  * from the address to itself reads as sent, with itself as the counterparty,
- * and is marked `self`.
+ * and is marked `self`. A transfer into one of `anchorWallets` (the protocol's
+ * anchoring contracts) reads as anchored, and one out of it as released.
  */
 export function classifyTransfer(
   from: string | null | undefined,
   to: string | null | undefined,
   address: string,
+  anchorWallets: readonly (string | null | undefined)[] = [],
 ): ClassifiedTransfer {
   if (isZeroAddress(from)) return { activity: 'imprinted', counterparty: null, self: false };
   if (isZeroAddress(to)) return { activity: 'consumed', counterparty: null, self: false };
+  const isAnchorWallet = (candidate: string | null | undefined) =>
+    anchorWallets.some((wallet) => sameAddress(wallet, candidate));
   if (sameAddress(from, address)) {
+    if (isAnchorWallet(to)) return { activity: 'anchored', counterparty: to ?? null, self: false };
     return { activity: 'sent', counterparty: to ?? null, self: sameAddress(to, address) };
+  }
+  if (isAnchorWallet(from)) {
+    return { activity: 'released', counterparty: from ?? null, self: false };
   }
   return { activity: 'received', counterparty: from ?? null, self: false };
 }
@@ -56,7 +79,10 @@ export interface ActivityRow {
   self?: boolean;
 }
 
-/** Whether a row moved value in the given direction; a self-transfer moves both ways. */
+/**
+ * Whether a row moved value in the given direction; a self-transfer moves both
+ * ways, and an anchoring move neither.
+ */
 export function movesInDirection(row: ActivityRow, direction: TransferDirection): boolean {
   return row.self === true || ACTIVITY_DIRECTION[row.activity] === direction;
 }
@@ -85,13 +111,15 @@ export interface CstTransferTotals {
 
 /**
  * Sums a CST history by activity. Rows without a readable amount count as
- * zero; a self-transfer counts as both received and sent.
+ * zero; a self-transfer counts as both received and sent; anchoring moves
+ * change neither side.
  */
 export function sumCstTransfers(
   rows: readonly (ActivityRow & { wei: bigint | null })[],
 ): CstTransferTotals {
   const totals = { received: 0n, imprinted: 0n, sent: 0n, consumed: 0n };
   for (const row of rows) {
+    if (row.activity === 'anchored' || row.activity === 'released') continue;
     const wei = row.wei ?? 0n;
     totals[row.activity] += wei;
     if (row.self) totals.received += wei;
@@ -116,6 +144,8 @@ export function countByActivity(rows: readonly ActivityRow[]): Record<TransferAc
     received: 0,
     sent: 0,
     consumed: 0,
+    anchored: 0,
+    released: 0,
   };
   for (const row of rows) {
     counts[row.activity] += 1;

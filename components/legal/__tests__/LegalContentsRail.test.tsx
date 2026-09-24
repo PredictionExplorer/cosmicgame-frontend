@@ -33,12 +33,17 @@ describe('LegalContentsRail', () => {
         ]}
         title="On this page"
         backToTop="Back to top"
+        topId="document-title"
       />,
     );
     const nav = screen.getByRole('navigation', { name: 'On this page' });
     expect(nav).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'One' })).toHaveAttribute('href', '#one');
     expect(screen.getByRole('link', { name: 'Two' })).toHaveAttribute('href', '#two');
-    expect(screen.getByRole('link', { name: 'Back to top' })).toHaveAttribute('href', '#main');
+    // The title, not #main: that target belongs to the site's one skip link (regression).
+    expect(screen.getByRole('link', { name: 'Back to top' })).toHaveAttribute(
+      'href',
+      '#document-title',
+    );
   });
 });

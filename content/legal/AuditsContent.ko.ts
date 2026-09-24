@@ -1,10 +1,4 @@
-import { formatCount } from '@/utils/format';
-
-import { AUDIT_FINDINGS_TOTAL, HACKEN_AUDIT } from './audit';
 import type { AuditsCopy } from './AuditsContent';
-
-const { findings, invariants } = HACKEN_AUDIT;
-const count = (value: number) => formatCount(value, 'ko');
 
 /** Korean copy for /audits, rendered by AuditsContent. */
 export const auditsCopyKo: AuditsCopy = {
@@ -35,8 +29,8 @@ export const auditsCopyKo: AuditsCopy = {
     heading: 'Hacken의 독립 보안 감사',
     paragraphs: [
       `Hacken은 2025년 말 Cosmic Signature 스마트 컨트랙트의 독립 보안 검토를 수행했습니다. 검토는 공개 저장소의 운영 컨트랙트를 대상으로 하여, 각 사이클을 운영하는 핵심 프로토콜부터 CST 토큰, 두 NFT 컬렉션, 앵커링 지갑, 그리고 이를 지원하는 지갑 및 시스템 관리 컨트랙트까지 아울렀습니다. Hacken은 2026년 1월에 최종 보고서를 공개했습니다.`,
-      `보고서에는 발견 사항 ${count(AUDIT_FINDINGS_TOTAL)}건이 실려 있으며, 심각도가 치명 또는 높음인 항목은 없습니다. 중간 ${count(findings.medium)}건, 낮음 ${count(findings.low)}건, 정보성 관찰 ${count(findings.informational)}건입니다. 대부분은 팀이 검토하고 수용한 설계상의 절충을 설명한 것이며, 보고서는 각 발견 사항을 그 상태와 함께 설명합니다.`,
-      `수동 검토와 함께 Hacken은 시스템 불변 조건 ${count(invariants.tested)}개를 대상으로 퍼즈 테스트를 실행했습니다. 불변 조건이란 예컨대 프로토콜이 보유한 ETH가 항상 적립된 금액에서 회수된 금액을 뺀 값과 같아야 한다는 성질입니다. ${count(invariants.held)}개 모두 ${count(invariants.runs)}회 실행에서 유지되었습니다.`,
+      '보고서는 각 발견 사항을 심각도 및 상태와 함께 제시하며, 위의 요약이 그 수를 집계합니다. 치명 또는 높음 심각도 항목은 없으며, 대부분은 팀이 검토하고 수용한 설계상의 절충을 설명한 것입니다.',
+      '수동 검토와 함께 Hacken은 시스템 불변 조건을 대상으로 퍼즈 테스트를 실행했습니다. 불변 조건이란 예컨대 프로토콜이 보유한 ETH가 항상 적립된 금액에서 회수된 금액을 뺀 값과 같아야 한다는 성질입니다. 모든 불변 조건이 유지되었습니다.',
     ],
   },
   analysis: {

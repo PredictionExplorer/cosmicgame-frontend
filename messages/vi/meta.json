@@ -112,8 +112,10 @@
     "description": "Khắc một Random Walk NFT trên Cosmic Signature. Mỗi Random Walk NFT chưa sử dụng có thể đính kèm vào một nét bút ETH để giảm 50% chi phí nét bút ETH."
   },
   "systemEvent": {
-    "title": "Sự kiện hệ thống",
-    "description": "Các sự kiện quản trị giao thức và thay đổi tham số điều phối của một chu kỳ Cosmic Signature cụ thể."
+    "title": "Cấu hình trước chu kỳ {cycle}",
+    "description": "Các tham số giao thức mà chủ sở hữu hợp đồng đã thay đổi trước khi chu kỳ {cycle} mở, kèm giá trị mới và giao dịch của từng thay đổi.",
+    "titleInitial": "Cấu hình ban đầu",
+    "descriptionInitial": "Các tham số giao thức mà chủ sở hữu hợp đồng đã đặt trước khi chu kỳ đầu tiên mở, kèm giá trị và giao dịch của từng tham số."
   },
   "currentCycleFull": {
     "title": "Chu kỳ trình diễn hiện tại",
@@ -159,7 +161,7 @@
     "description": "Đóng góp cho hoạt động truyền thông của Cosmic Signature và nhận phân bổ CST. Xem những người đóng góp hàng đầu cho hệ sinh thái, lịch sử phân bổ và cách tham gia."
   },
   "outreachAddress": {
-    "title": "Phân bổ truyền thông",
+    "title": "Phân bổ truyền thông · {address}",
     "description": "Lịch sử phân bổ truyền thông và phân bổ CST của một người đóng góp cho hệ sinh thái Cosmic Signature. Xem hoạt động giới thiệu và đóng góp."
   },
   "ethContribution": {
@@ -167,12 +169,12 @@
     "description": "Đóng góp ETH trực tiếp vào dự trữ chu kỳ của Cosmic Signature mà không đặt nét bút. Xem lịch sử đóng góp và lời nhắn đi kèm."
   },
   "ethContributionDetail": {
-    "title": "Chi tiết đóng góp ETH trực tiếp",
+    "title": "Đóng góp #{id}",
     "description": "Chi tiết đóng góp ETH vào dự trữ chu kỳ Cosmic Signature: địa chỉ người đóng góp, số tiền, chu kỳ và lời nhắn."
   },
   "ethContributionByCycle": {
-    "title": "Đóng góp ETH trực tiếp theo chu kỳ",
-    "description": "Các khoản đóng góp ETH trực tiếp cho giao thức Cosmic Signature, phân theo chu kỳ trình diễn."
+    "title": "Đóng góp của chu kỳ {cycle}",
+    "description": "Các khoản ETH đóng góp trực tiếp vào dự trữ chu kỳ trong chu kỳ {cycle}."
   },
   "myStatistics": {
     "title": "Thống kê của tôi",
@@ -187,12 +189,12 @@
     "description": "Gửi token CST của Cosmic Signature đến một địa chỉ ví khác."
   },
   "cosmicSignatureTransfers": {
-    "title": "Lịch sử chuyển giao NFT",
-    "description": "Lịch sử chuyển giao Cosmic Signature NFT"
+    "title": "Lịch sử chuyển giao NFT · {address}",
+    "description": "Các Cosmic Signature NFT được khắc cho địa chỉ này, cùng mọi NFT nó đã nhận hoặc gửi."
   },
   "cosmicTokenTransfers": {
-    "title": "Lịch sử chuyển token CST",
-    "description": "Lịch sử chuyển token CST của Cosmic Signature"
+    "title": "Lịch sử chuyển CST · {address}",
+    "description": "CST được khắc cho địa chỉ này, CST địa chỉ này nhận và gửi, cùng CST bị tiêu thụ bởi các nét bút CST của nó."
   },
   "usedRwlkNfts": {
     "title": "Random Walk NFT đã sử dụng",

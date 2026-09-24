@@ -210,7 +210,7 @@
     "explainColumn": "열 설명: {column}"
   },
   "adminEvents": {
-    "empty": "이 기간에 기록된 구성 변경이 없습니다"
+    "empty": "구성 변경이 없습니다"
   },
   "allocation": {
     "cycle": "사이클 {cycle}",

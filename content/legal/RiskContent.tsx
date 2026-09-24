@@ -37,7 +37,10 @@ export interface RiskCopy {
  * /risk-disclosures: the one thing to know before taking part, then the risks
  * grouped by where they come from — the Cycle's mechanics, its timing, the
  * actions that cannot be undone, wallets, the network and the app, and value —
- * each group ending with the Terms clause that states the rule.
+ * each group ending with the Terms clause that states the rule. The groups
+ * are short, so they sit two to a row from `xl` on a compact rhythm, and
+ * what participants do closes the page as a note rather than a seventh
+ * section.
  */
 export function RiskContent({
   copy,
@@ -62,25 +65,26 @@ export function RiskContent({
           locale={locale}
         />
       }
-      sections={[
-        ...copy.groups.map((group) => ({
-          id: group.id,
-          heading: group.heading,
-          content: (
-            <>
-              <LegalList items={group.risks} locale={locale} />
-              <LegalParagraph text={group.source} locale={locale} size="note" />
-            </>
-          ),
-        })),
-        {
-          id: 'participation',
-          heading: copy.participation.heading,
-          content: copy.participation.paragraphs.map((paragraph) => (
+      density="compact"
+      sectionLayout="grid"
+      sections={copy.groups.map((group) => ({
+        id: group.id,
+        heading: group.heading,
+        content: (
+          <>
+            <LegalList items={group.risks} locale={locale} />
+            <LegalParagraph text={group.source} locale={locale} size="note" />
+          </>
+        ),
+      }))}
+      closing={
+        <div role="note" className="space-y-2 border-t border-rule pt-8">
+          <p className="type-title text-foreground">{copy.participation.heading}</p>
+          {copy.participation.paragraphs.map((paragraph) => (
             <LegalParagraph key={paragraph} text={paragraph} locale={locale} />
-          )),
-        },
-      ]}
+          ))}
+        </div>
+      }
     />
   );
 }

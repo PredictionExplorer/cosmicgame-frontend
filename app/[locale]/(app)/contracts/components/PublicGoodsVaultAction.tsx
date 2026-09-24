@@ -2,11 +2,12 @@
 
 import { useLocale, useTranslations } from 'next-intl';
 import { useQueryClient } from '@tanstack/react-query';
-import { SendHorizontal } from 'lucide-react';
+import { Inbox, SendHorizontal } from 'lucide-react';
 
 import { charityWalletAbi as CHARITY_WALLET_ABI } from '@/contracts/abis';
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { cn } from '@/lib/utils';
 import { formatPercent, sameAddress } from '@/utils/format';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import { AddressChip } from '@/components/ui/address-chip';
@@ -167,7 +168,13 @@ export function PublicGoodsVaultAction({
           ))}
         </dl>
 
-        <div className="space-y-3">
+        <div
+          data-slot="vault-status"
+          className={cn(
+            'space-y-3',
+            balance !== undefined && 'rounded-surface bg-surface-sunken p-4 sm:p-5',
+          )}
+        >
           {balance === undefined ? null : balance === null ? (
             <p
               data-testid="vault-balance-unavailable"
@@ -197,7 +204,11 @@ export function PublicGoodsVaultAction({
               <TxStatus stage={tx.stage} />
             </>
           ) : (
-            <p data-testid="vault-empty" className="type-body-sm text-muted-foreground">
+            <p
+              data-testid="vault-empty"
+              className="flex items-start gap-2.5 type-body-sm text-muted-foreground"
+            >
+              <Inbox aria-hidden className="mt-0.5 size-4 shrink-0 text-subtle" />
               {t('vault.empty')}
             </p>
           )}

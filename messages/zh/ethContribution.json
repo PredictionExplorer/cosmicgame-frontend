@@ -50,7 +50,8 @@
     "notFoundTitle": "没有编号为 #{id} 的贡献",
     "notFoundDescription": "只有附带留言的贡献才有记录页。请在完整列表中查找。",
     "backToAll": "全部贡献",
-    "loadError": "无法加载这笔贡献。"
+    "loadError": "无法加载这笔贡献。",
+    "notFoundHeading": "未找到该贡献"
   },
   "cycle": {
     "invalidNumber": "周期编号无效",
@@ -71,6 +72,7 @@
     "emptyDescription": "第 {cycle} 个周期进行期间发送的贡献会显示在这里。",
     "loadError": "无法加载该周期的贡献。",
     "invalidTitle": "此链接没有指向任何周期",
-    "invalidDescription": "周期编号是从 0 开始的整数，例如 3。"
+    "invalidDescription": "周期编号是从 0 开始的整数，例如 3。",
+    "emptyDescriptionPast": "第 {cycle} 个周期内没有直接 ETH 贡献。"
   }
 }

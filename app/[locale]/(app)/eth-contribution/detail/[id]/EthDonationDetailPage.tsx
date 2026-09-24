@@ -1,11 +1,10 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { ArrowRight, ArrowUpRight } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Link2Off, SearchX } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
-import { ContributionIcon } from '@/lib/conceptIcons';
 import { formatAddress, formatCount } from '@/utils/format';
 import { useDonationsWithInfoById } from '@/hooks/useApiQuery';
 import { parseContributionNote } from '@/components/contributions/contributionNote';
@@ -22,6 +21,11 @@ import { Skeleton, SkeletonDetailRows } from '@/components/ui/skeleton';
 
 interface EthDonationDetailPageProps {
   id: number;
+  /**
+   * The server read found no such record: the page opens on its not-found
+   * state instead of figure skeletons that would then vanish.
+   */
+  knownMissing?: boolean;
 }
 
 /** A label and its value on one hairline row; the value wraps under the label on phones. */
@@ -34,10 +38,14 @@ function SpecRow({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
+/** The way back to the ledger: a 44px row on phones, a text link from `sm`. */
 function BackToAll() {
   const t = useTranslations('ethContribution.detail');
   return (
-    <Link href="/eth-contribution" className="link inline-flex items-center gap-1.5 type-body-sm">
+    <Link
+      href="/eth-contribution"
+      className="link inline-flex min-h-11 items-center gap-1.5 type-body-sm sm:min-h-6"
+    >
       {t('backToAll')}
       <ArrowRight aria-hidden className="size-3.5" />
     </Link>
@@ -52,23 +60,24 @@ function BackToAll() {
  * fetched: opening a record page does not make the visitor's browser call a
  * stranger's server.
  */
-const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
+const EthDonationDetailPage = ({ id, knownMissing = false }: EthDonationDetailPageProps) => {
   const t = useTranslations('ethContribution.detail');
   const locale = useLocale();
   const valid = Number.isInteger(id) && id >= 0;
   const { data, isLoading, isError, refetch } = useDonationsWithInfoById(valid ? id : null);
   const trail = [{ label: t('breadcrumbContributions'), href: '/eth-contribution' }];
 
+  // The states (an invalid link, a missing record, a failed read) stand on the
+  // full content width, centred under the header, not in the record's column.
   if (!valid) {
     return (
       <LedgerPage
-        width="narrow"
         header={<PageHeader section="records" breadcrumbs={trail} title={t('invalidId')} />}
       >
         <EmptyState
           variant="page"
           headingLevel={2}
-          icon={<ContributionIcon aria-hidden />}
+          icon={<Link2Off aria-hidden />}
           title={t('invalidIdTitle')}
           description={t('invalidIdDescription')}
           action={<BackToAll />}
@@ -95,8 +104,11 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
       id: 'cycle',
       label: t('figures.cycle'),
       value: data ? (
+        // The figure shows the number; the link says where it leads ("All
+        // contributions in cycle 7"), which a title attribute did not announce.
         <Link
           href={`/eth-contribution/round/${data.RoundNum}`}
+          aria-label={t('cycleLink', { cycle: data.RoundNum })}
           title={t('cycleLink', { cycle: data.RoundNum })}
           className="link-quiet"
         >
@@ -114,28 +126,39 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
     },
   ];
 
+  // A record that does not exist is not titled as if it did. The server may
+  // already know (then the client read only confirms it); otherwise the
+  // figures hold their place until the client read answers.
+  const notFound = !data && (knownMissing || (!isLoading && !isError));
   const header = (
     <PageHeader
       section="records"
       breadcrumbs={trail}
-      title={t('title', { id })}
+      title={notFound ? t('notFoundHeading') : t('title', { id })}
       subtitle={data ? t('lede', { cycle: data.RoundNum }) : undefined}
-      figures={isError || (!isLoading && !data) ? undefined : figures}
+      figures={isError || notFound ? undefined : figures}
     />
   );
 
-  if (isError) {
+  if (notFound) {
     return (
-      <LedgerPage width="narrow" header={header}>
-        <ErrorState headingLevel={2} message={t('loadError')} onRetry={() => void refetch()} />
+      <LedgerPage header={header}>
+        <EmptyState
+          variant="page"
+          headingLevel={2}
+          icon={<SearchX aria-hidden />}
+          title={t('notFoundTitle', { id })}
+          description={t('notFoundDescription')}
+          action={<BackToAll />}
+        />
       </LedgerPage>
     );
   }
 
-  if (isLoading) {
+  if (isError) {
     return (
-      <LedgerPage width="narrow" header={header}>
-        <SkeletonDetailRows rows={2} />
+      <LedgerPage header={header}>
+        <ErrorState headingLevel={2} message={t('loadError')} onRetry={() => void refetch()} />
       </LedgerPage>
     );
   }
@@ -143,14 +166,7 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
   if (!data) {
     return (
       <LedgerPage width="narrow" header={header}>
-        <EmptyState
-          variant="page"
-          headingLevel={2}
-          icon={<ContributionIcon aria-hidden />}
-          title={t('notFoundTitle', { id })}
-          description={t('notFoundDescription')}
-          action={<BackToAll />}
-        />
+        <SkeletonDetailRows rows={2} />
       </LedgerPage>
     );
   }

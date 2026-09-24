@@ -2,7 +2,7 @@ import { formatDuration } from '@/utils/format';
 
 import { checkA11y, render, screen, within } from '@/test-utils';
 
-import AdminSettingsPage from '../AdminSettingsPage';
+import AdminSettingsPage, { allocationShares } from '../AdminSettingsPage';
 
 const mockUseDashboardInfo = jest.fn();
 const mockRefetch = jest.fn();
@@ -35,6 +35,7 @@ const dashboard = {
   NumRaffleNFTWinnersBidding: 10,
   NumRaffleNFTWinnersStakingRWalk: 10,
   PrizePercentage: 25,
+  ChronoWarriorPercentage: 8,
   CharityPercentage: 7,
   RafflePercentage: 4,
   StakingPercentage: 6,
@@ -98,12 +99,37 @@ describe('AdminSettingsPage', () => {
     expect(valueOf('Cosmic Council')).toHaveTextContent(dashboard.ContractAddrs.CosmicDaoAddr);
   });
 
-  it('reads the Stellar Selection recipient counts and the shares the API sends', () => {
+  it('reads the Stellar Selection recipient counts under the names /contracts uses', () => {
     render(<AdminSettingsPage />);
-    expect(valueOf('Number of ETH Stellar Selection recipients per cycle')).toHaveTextContent('3');
-    expect(valueOf('Number of NFT holder recipients per cycle')).toHaveTextContent('10');
-    expect(valueOf('Signature Allocation percentage')).toHaveTextContent('25%');
-    expect(valueOf('Public Goods percentage')).toHaveTextContent('7%');
+    expect(valueOf('ETH Stellar Selection recipients')).toHaveTextContent('3');
+    expect(valueOf('NFT Stellar Selection recipients')).toHaveTextContent('10');
+    // RandomWalk anchor-holders, not "NFT holders" (regression).
+    expect(valueOf('Anchored-NFT Stellar Selection recipients')).toHaveTextContent('10');
+  });
+
+  // The shares group listed four tracks adding to 42%: Chrono-Warrior and the
+  // remainder carried to the next cycle, which /contracts draws, were missing.
+  it('lists the whole Cycle Reserve split, every track /contracts draws', () => {
+    render(<AdminSettingsPage />);
+    const shares = screen.getByRole('region', { name: 'Allocation shares' });
+    const rows = Array.from(shares.querySelectorAll('[data-parameter]'));
+    expect(rows.map((row) => row.querySelector('dt')?.textContent)).toEqual([
+      'Signature Allocation',
+      'Chrono-Warrior',
+      'Stellar Selection',
+      'Anchor Distribution',
+      'Public Goods',
+      'Next cycle',
+    ]);
+    expect(valueOf('Chrono-Warrior')).toHaveTextContent('8%');
+    expect(valueOf('Next cycle')).toHaveTextContent('50%');
+  });
+
+  it('builds shares that add up to 100%', () => {
+    const shares = allocationShares(dashboard);
+    expect(shares.reduce((total, share) => total + (share.percent ?? 0), 0)).toBe(100);
+    // An unreadable share leaves the remainder unknown rather than a wrong figure.
+    expect(allocationShares({ ...dashboard, RafflePercentage: 'n/a' }).at(-1)?.percent).toBeNull();
   });
 
   it('shows divisors as the percentage they apply and durations as durations', () => {
@@ -118,7 +144,8 @@ describe('AdminSettingsPage', () => {
     expect(valueOf('Finalization timeout').textContent).toBe(
       formatDuration(172800, { locale: 'en' }),
     );
-    expect(valueOf('Initial time increment').textContent).toBe(
+    // A duration, named as one on both pages (it was "Initial time increment").
+    expect(valueOf('Initial cycle duration').textContent).toBe(
       formatDuration(88135, { locale: 'en' }),
     );
   });

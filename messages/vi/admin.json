@@ -25,6 +25,7 @@
     "heading": "Lời nhắn nét bút",
     "description": "Mọi nét bút có kèm lời nhắn. Lọc theo trạng thái hiển thị, chu kỳ hoặc nội dung.",
     "readOnly": "Chỉ xem. Kết nối ví kiểm duyệt để ẩn hoặc khôi phục lời nhắn.",
+    "noRole": "Ví này không có vai trò vận hành trên chuỗi nên không thể ẩn hoặc khôi phục lời nhắn. Hãy kết nối ví vận hành để kiểm duyệt lời nhắn.",
     "loadError": "Không tải được lời nhắn nét bút.",
     "clearSearch": "Xóa tìm kiếm"
   },
@@ -49,18 +50,7 @@
       "scheduled": "Đã lên lịch"
     },
     "fields": {
-      "ethStellarRecipients": "Số người nhận ETH Tinh tuyển mỗi chu kỳ",
-      "nftStellarRecipients": "Số người nhận NFT Tinh tuyển mỗi chu kỳ",
-      "nftHolderRecipients": "Số người nắm giữ NFT được nhận mỗi chu kỳ",
-      "signatureAllocationPercentage": "Tỷ lệ phân bổ Signature",
-      "publicGoodsPercentage": "Tỷ lệ Hàng hóa công",
-      "stellarSelectionPercentage": "Tỷ lệ Tinh tuyển",
-      "anchorDistributionPercentage": "Tỷ lệ phân phối neo giữ",
       "timeIncrease": "Mức tăng thời gian tăng thêm mỗi chu kỳ",
-      "allocationTimeout": "Thời hạn hoàn tất",
-      "priceIncrease": "Bước tăng chi phí nét bút ETH",
-      "gestureTimeIncrement": "Thời gian cộng thêm cho mỗi nét bút",
-      "initialAllocationSeconds": "Mức tăng thời gian ban đầu",
       "initialGestureCostFraction": "Tỷ lệ chi phí nét bút ban đầu",
       "activationTime": "Thời điểm kích hoạt",
       "gestureRatio": "Tỷ lệ nét bút ETH so với CST",

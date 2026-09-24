@@ -9,6 +9,7 @@ import {
 const ME = '0xA169574D0d353E3010997A3E64846b7D1B2a63B6';
 const OTHER = '0x1Ec14aDaf61e27AB339bc590BA4Bf2356Dd7E990';
 const ZERO = '0x0000000000000000000000000000000000000000';
+const ANCHOR_WALLET = '0xB7F13a14f9EB5F1f1AFB1A1A0FaD6Dc1a5B2e0C4';
 const WEI = 1_000_000_000_000_000_000n;
 
 describe('classifyTransfer', () => {
@@ -47,6 +48,29 @@ describe('classifyTransfer', () => {
     expect(movesInDirection(self, 'in')).toBe(true);
     expect(movesInDirection(self, 'out')).toBe(true);
     expect(movesInDirection(classifyTransfer(OTHER, ME, ME), 'out')).toBe(false);
+  });
+
+  it('reads a move into an anchoring wallet as anchored, not sent (regression)', () => {
+    // An anchored NFT read as "Sent" and counted in the Sent total, though
+    // the address still owns it and can release it.
+    const anchored = classifyTransfer(ME, ANCHOR_WALLET.toLowerCase(), ME, [ANCHOR_WALLET]);
+    expect(anchored).toEqual({
+      activity: 'anchored',
+      counterparty: ANCHOR_WALLET.toLowerCase(),
+      self: false,
+    });
+    expect(classifyTransfer(ANCHOR_WALLET, ME, ME, [null, ANCHOR_WALLET])).toEqual({
+      activity: 'released',
+      counterparty: ANCHOR_WALLET,
+      self: false,
+    });
+    // Neither direction filter lists custody moves.
+    expect(movesInDirection(anchored, 'out')).toBe(false);
+    expect(movesInDirection(anchored, 'in')).toBe(false);
+  });
+
+  it('keeps an ordinary transfer when no anchoring wallet is known', () => {
+    expect(classifyTransfer(ME, ANCHOR_WALLET, ME).activity).toBe('sent');
   });
 });
 
@@ -97,6 +121,23 @@ describe('sumCstTransfers with a self-transfer', () => {
   });
 });
 
+describe('sumCstTransfers with anchoring moves', () => {
+  it('leaves anchored and released amounts out of both sides', () => {
+    const totals = sumCstTransfers([
+      { activity: 'received', wei: 5n * WEI },
+      { activity: 'anchored', wei: 5n * WEI },
+      { activity: 'released', wei: 5n * WEI },
+    ]);
+    expect(totals).toEqual({
+      received: 5n * WEI,
+      imprinted: 0n,
+      sent: 0n,
+      consumed: 0n,
+      net: 5n * WEI,
+    });
+  });
+});
+
 describe('countByActivity', () => {
   it('counts a self-transfer as received and sent', () => {
     expect(countByActivity([{ activity: 'sent', self: true }])).toEqual({
@@ -104,12 +145,19 @@ describe('countByActivity', () => {
       received: 1,
       sent: 1,
       consumed: 0,
+      anchored: 0,
+      released: 0,
     });
   });
 
   it('counts rows per activity', () => {
     expect(
-      countByActivity([{ activity: 'imprinted' }, { activity: 'sent' }, { activity: 'imprinted' }]),
-    ).toEqual({ imprinted: 2, received: 0, sent: 1, consumed: 0 });
+      countByActivity([
+        { activity: 'imprinted' },
+        { activity: 'sent' },
+        { activity: 'imprinted' },
+        { activity: 'anchored' },
+      ]),
+    ).toEqual({ imprinted: 2, received: 0, sent: 1, consumed: 0, anchored: 1, released: 0 });
   });
 });

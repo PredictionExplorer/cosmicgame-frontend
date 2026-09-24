@@ -313,6 +313,7 @@
       }
     },
     "switcherLabel": "このアドレスの移転履歴",
+    "artUnavailable": "アートワークを利用できません",
     "viewOnExplorer": "{explorer}で見る",
     "error": "このアドレスの移転履歴を読み込めませんでした。",
     "count": "{count, plural, other {#件}}",
@@ -320,7 +321,9 @@
       "imprinted": "刻印",
       "received": "受け取り",
       "sent": "送付",
-      "consumed": "消費"
+      "consumed": "消費",
+      "anchored": "係留",
+      "released": "係留解除"
     },
     "filter": {
       "label": "表示",

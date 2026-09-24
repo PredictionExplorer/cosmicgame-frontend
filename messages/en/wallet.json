@@ -1,6 +1,6 @@
 {
   "connect": {
-    "button": "Connect Wallet",
+    "button": "Connect wallet",
     "buttonShort": "Connect",
     "opening": "Opening the wallet list…",
     "restoring": "Restoring your wallet connection…",

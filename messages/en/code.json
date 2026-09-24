@@ -35,7 +35,7 @@
       },
       "renderer": {
         "label": "Spectral renderer",
-        "description": "Traces each body's path in a colour that drifts across the spectrum."
+        "description": "Traces each body's path in a color that drifts across the spectrum."
       },
       "image": {
         "label": "Cosmic Signature NFT image",
@@ -45,15 +45,7 @@
   },
   "seo": {
     "heading": "Cosmic Signature source code",
-    "description": "Explore the frontend, Go backend, smart contracts, and image generation source code for Cosmic Signature. Use the viewer below to inspect how on-chain seeds become reproducible NFT artwork.",
-    "relatedAria": "Source code related pages",
-    "links": {
-      "ipfs": "Open the published IPFS source artifact",
-      "github": "Open the GitHub organization",
-      "contracts": "Review verified contracts",
-      "security": "Read security notes",
-      "gallery": "Explore generated NFT art"
-    }
+    "description": "Explore the frontend, Go backend, smart contracts, and image generation source code for Cosmic Signature. Use the viewer below to inspect how on-chain seeds become reproducible NFT artwork."
   },
   "repositories": {
     "heading": "Project repositories",

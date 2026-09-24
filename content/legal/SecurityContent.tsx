@@ -1,7 +1,11 @@
 import type { LegalDocumentLabels } from '@/content/legal/labels';
 
 import { LegalDocument } from '@/components/legal/LegalDocument';
-import { ContractEvidence, formatSourcifyChecked } from '@/components/legal/ContractEvidence';
+import {
+  ContractEvidence,
+  SourcifyCheckedNote,
+  formatSourcifyChecked,
+} from '@/components/legal/ContractEvidence';
 import { CopyValue } from '@/components/legal/CopyValue';
 import {
   LegalLedger,
@@ -10,8 +14,11 @@ import {
   LegalResourceList,
   type LegalResource,
 } from '@/components/legal/LegalProse';
+import { RichText } from '@/components/legal/RichText';
 import { SiteLink } from '@/components/layout/SiteLink';
 import { AddressChip } from '@/components/ui/address-chip';
+import { TOUCH_TARGET_EXTENDED_CLASS } from '@/lib/touch-target';
+import { cn } from '@/lib/utils';
 
 import {
   OFFICIAL_COMMUNITY,
@@ -65,8 +72,10 @@ const COMMUNITY_NAMES: Record<OfficialCommunityId, string> = { x: 'X', discord: 
 
 /**
  * /security, the Trust Center hub: the official websites, community accounts
- * and core contracts (each with its explorer and Sourcify evidence), the
- * security model, how to report a vulnerability, and where to verify.
+ * and core contracts (each with its explorer and Sourcify evidence, and the
+ * Sourcify statement said once under the heading, before the rows it
+ * covers), the security model, how to report a vulnerability, and where to
+ * verify.
  */
 export function SecurityContent({
   copy,
@@ -104,15 +113,23 @@ export function SecurityContent({
         rows={OFFICIAL_COMMUNITY.map(({ id, handle, href }) => ({
           key: id,
           term: COMMUNITY_NAMES[id],
+          // The handle, then what the account is for: two lines on a phone for
+          // every row alike, one from sm.
           detail: (
-            <span className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
-              <SiteLink
-                href={href}
-                kind="external"
-                className="link inline-flex items-center gap-1 type-hash"
-              >
-                {handle}
-              </SiteLink>
+            <span className="flex flex-col gap-0.5 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-x-3">
+              <span>
+                <SiteLink
+                  href={href}
+                  kind="external"
+                  data-touch-target="extended"
+                  className={cn(
+                    'link inline-flex min-h-6 items-center gap-1 type-hash',
+                    TOUCH_TARGET_EXTENDED_CLASS,
+                  )}
+                >
+                  {handle}
+                </SiteLink>
+              </span>
               <span>{official.community[id]}</span>
             </span>
           ),
@@ -121,6 +138,16 @@ export function SecurityContent({
       <div>
         <LegalLedger
           heading={official.contractsHeading}
+          note={
+            <SourcifyCheckedNote
+              text={
+                <RichText
+                  text={official.contractsIntro.replace('{date}', formatSourcifyChecked(locale))}
+                  locale={locale}
+                />
+              }
+            />
+          }
           rows={OFFICIAL_CONTRACTS.map(({ id, address }) => {
             const name = contractNames[id];
             return {
@@ -146,12 +173,6 @@ export function SecurityContent({
               ),
             };
           })}
-        />
-        <LegalParagraph
-          text={official.contractsIntro.replace('{date}', formatSourcifyChecked(locale))}
-          locale={locale}
-          size="note"
-          className="mt-4"
         />
       </div>
     </div>

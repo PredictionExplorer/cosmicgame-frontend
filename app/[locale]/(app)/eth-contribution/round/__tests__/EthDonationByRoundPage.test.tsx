@@ -13,9 +13,18 @@ jest.mock('@/hooks/useApiQuery', () => ({
 
 jest.mock('@/components/tables/EthDonationTable', () => ({
   __esModule: true,
-  default: ({ list, loading }: { list: unknown[]; loading?: boolean }) => (
+  default: ({
+    list,
+    loading,
+    emptyDescription,
+  }: {
+    list: unknown[];
+    loading?: boolean;
+    emptyDescription?: string;
+  }) => (
     <div data-testid="contribution-table" data-loading={loading ? 'true' : undefined}>
       rows: {list.length}
+      {list.length === 0 && !loading ? <p>{emptyDescription}</p> : null}
     </div>
   ),
 }));
@@ -26,7 +35,10 @@ const ROWS = [
   { EvtLogId: 3, DonorAddr: '0xBB', AmountEth: 0.5 },
 ];
 
-function withRows(data: unknown[] | undefined, state: { isLoading?: boolean } = {}) {
+function withRows(
+  data: unknown[] | undefined,
+  state: { isLoading?: boolean; isError?: boolean } = {},
+) {
   mockUseDonationsBothByRound.mockReturnValue({
     data,
     isLoading: false,
@@ -87,6 +99,42 @@ describe('EthDonationByRoundPage', () => {
       'href',
       '/current-cycle',
     );
+  });
+
+  it('says once, in the past tense, that a closed cycle had no contributions (regression)', () => {
+    // A finished cycle read "Contributions sent while cycle 7 is active appear
+    // here." under three zero figures.
+    withRows([]);
+    render(<EthDonationByRoundPage round={7} />);
+
+    expect(document.querySelector('[data-figure]')).toBeNull();
+    expect(
+      screen.getByText('ethContribution.cycle.emptyDescriptionPast(cycle=7)'),
+    ).toBeInTheDocument();
+  });
+
+  it.each([
+    ['contributions', ROWS, {}, true],
+    ['a loading ledger', undefined, { isLoading: true }, true],
+    ['no contributions', [], {}, false],
+    ['a failed read', undefined, { isError: true }, false],
+  ])(
+    'puts %s in the reading column only when there are rows to read (regression)',
+    (_, data, state, narrow) => {
+      // An empty cycle's state sat in the left 48rem column, off-centre.
+      withRows(data, state);
+      render(<EthDonationByRoundPage round={3} />);
+      expect(
+        screen.getByTestId('contribution-table').parentElement?.classList.contains('max-w-3xl'),
+      ).toBe(narrow);
+    },
+  );
+
+  it('keeps the present tense for the live cycle', () => {
+    withRows([]);
+    render(<EthDonationByRoundPage round={9} />);
+
+    expect(screen.getByText('ethContribution.cycle.emptyDescription(cycle=9)')).toBeInTheDocument();
   });
 
   it('hands the loading state to the ledger', () => {

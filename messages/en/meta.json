@@ -112,8 +112,10 @@
     "description": "Imprint a Random Walk NFT on Cosmic Signature. Each unused Random Walk NFT can be attached to one ETH gesture for a 50% ETH Gesture Cost discount."
   },
   "systemEvent": {
-    "title": "System Events",
-    "description": "Protocol administration events and coordination parameter changes for a specific Cosmic Signature cycle."
+    "title": "Configuration before cycle {cycle}",
+    "description": "The protocol parameters the contract owner changed before cycle {cycle} opened, each with its new value and transaction.",
+    "titleInitial": "Initial configuration",
+    "descriptionInitial": "The protocol parameters the contract owner set before the first cycle opened, each with its value and transaction."
   },
   "currentCycleFull": {
     "title": "Current Performance Cycle",
@@ -139,7 +141,7 @@
     "description": "All ETH allocations this participant received through Stellar Selection. Track random-selection allocations across completed cycles."
   },
   "publicGoodsCgContributions": {
-    "title": "Protocol Public-Goods Contributions",
+    "title": "Protocol Public Goods Contributions",
     "description": "Public Goods Allocations from each finalized Cosmic Signature cycle. Follow funds from the Cycle Reserve to the Public Goods Vault."
   },
   "publicGoodsRetrievals": {
@@ -147,7 +149,7 @@
     "description": "Funds forwarded from the Cosmic Signature Public Goods Vault to its configured Public Goods recipient."
   },
   "publicGoodsVoluntary": {
-    "title": "Voluntary Public-Goods Contributions",
+    "title": "Voluntary Public Goods Contributions",
     "description": "Voluntary contributions from the Cosmic Signature community to the Public Goods Vault for its configured recipient."
   },
   "allocationRetrieved": {
@@ -159,7 +161,7 @@
     "description": "Contribute to Cosmic Signature outreach and receive CST allocations. See top ecosystem contributors, allocation history, and how to take part."
   },
   "outreachAddress": {
-    "title": "Outreach Allocations",
+    "title": "Outreach allocations · {address}",
     "description": "Outreach allocation history and CST allocations for a Cosmic Signature ecosystem contributor. Review referral activity and contributions."
   },
   "ethContribution": {
@@ -167,12 +169,12 @@
     "description": "Contribute ETH directly to the Cosmic Signature Cycle Reserve and view the complete contribution history, with each contributor’s cycle and note."
   },
   "ethContributionDetail": {
-    "title": "Direct ETH Contribution Detail",
+    "title": "Contribution #{id}",
     "description": "Details of a specific ETH contribution to the Cosmic Signature Cycle Reserve — contributor address, amount, cycle, and optional note."
   },
   "ethContributionByCycle": {
-    "title": "Direct ETH Contributions by Cycle",
-    "description": "Direct ETH contributions to the Cosmic Signature protocol broken down by Performance Cycle."
+    "title": "Cycle {cycle} contributions",
+    "description": "Direct ETH contributions to the Cycle Reserve during cycle {cycle}."
   },
   "myStatistics": {
     "title": "My Statistics",
@@ -187,12 +189,12 @@
     "description": "Send your Cosmic Signature CST tokens to another wallet address."
   },
   "cosmicSignatureTransfers": {
-    "title": "NFT Transfer History",
-    "description": "Cosmic Signature NFT Transfer History"
+    "title": "NFT transfers · {address}",
+    "description": "Cosmic Signature NFTs imprinted to this address, and every one it received or sent."
   },
   "cosmicTokenTransfers": {
-    "title": "CST Transfer History",
-    "description": "Cosmic Signature CST Token Transfer History"
+    "title": "CST transfers · {address}",
+    "description": "CST imprinted to this address, received and sent by it, and consumed by its CST gestures."
   },
   "usedRwlkNfts": {
     "title": "Used Random Walk NFTs",

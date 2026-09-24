@@ -313,6 +313,7 @@
       }
     },
     "switcherLabel": "Transfers of this address",
+    "artUnavailable": "Artwork unavailable",
     "viewOnExplorer": "View on {explorer}",
     "error": "The transfers of this address couldn't be loaded.",
     "count": "{count, plural, one {# transfer} other {# transfers}}",
@@ -320,7 +321,9 @@
       "imprinted": "Imprinted",
       "received": "Received",
       "sent": "Sent",
-      "consumed": "Consumed"
+      "consumed": "Consumed",
+      "anchored": "Anchored",
+      "released": "Released"
     },
     "filter": {
       "label": "Show",

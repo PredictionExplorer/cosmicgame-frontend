@@ -5,13 +5,15 @@
     "privacy": "Chính sách quyền riêng tư",
     "risk": "Công bố rủi ro",
     "security": "Bảo mật",
-    "audits": "Kiểm toán"
+    "audits": "Kiểm toán",
+    "contracts": "Hợp đồng",
+    "code": "Mã nguồn"
   },
   "document": {
     "contents": "Trên trang này",
     "backToTop": "Về đầu trang",
     "backToContents": "Về mục lục",
     "sectionLink": "Liên kết đến mục “{section}”",
-    "revisionHistory": "Lịch sử sửa đổi"
+    "revisionHistory": "Lịch sử sửa đổi trên GitHub"
   }
 }

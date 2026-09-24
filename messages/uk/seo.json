@@ -59,7 +59,7 @@
       "marketing": {
         "heading": "Розподіли за просування",
         "description": "Перегляньте історію розподілів за просування Cosmic Signature та розподіли CST для учасників екосистеми, які допомагають людям відкрити протокол.",
-        "source": "Публічні API розподілів за просування Cosmic Signature",
+        "source": "API просування Cosmic Signature",
         "links": {
           "faq": "Читати поширені запитання",
           "statistics": "Переглянути статистику протоколу",
@@ -101,7 +101,7 @@
       "eth-contribution": {
         "heading": "Прямі внески ETH",
         "description": "ETH, надіслані безпосередньо до резерву циклу, з повідомленням і циклом кожного внеску.",
-        "source": "Публічні API внесків Cosmic Signature",
+        "source": "API внесків Cosmic Signature",
         "links": {
           "reserve": "Як розподіляється резерв циклу",
           "protocol": "Куди йде частка суспільних благ",
@@ -207,8 +207,8 @@
       },
       "coordination-changes": {
         "heading": "Зміни координації",
-        "description": "Перегляньте публічні зміни координації Cosmic Signature, зокрема зміни режиму протоколу, оновлення параметрів і записи адміністрування, що впливають на майбутні цикли.",
-        "source": "Публічні API системних подій Cosmic Signature",
+        "description": "Кожна зміна параметрів протоколу, яку власник контракту зробив від початку поточного режиму.",
+        "source": "API системних подій Cosmic Signature",
         "links": {
           "security": "Читати огляд безпеки",
           "audits": "Переглянути аудити та верифікацію",
@@ -231,7 +231,7 @@
       "public-goods-contributions-cg": {
         "heading": "Внески протоколу у суспільні блага",
         "description": "Відстежуйте автоматичні перерахування Cosmic Signature на суспільні блага з циклів протоколу до сховища суспільних благ і його налаштованого бенефіціара — зараз це Protocol Guild.",
-        "source": "Публічні API суспільних благ Cosmic Signature",
+        "source": "API суспільних благ Cosmic Signature",
         "links": {
           "learn": "Дізнатися про суспільні блага",
           "statistics": "Переглянути статистику суспільних благ",
@@ -253,7 +253,7 @@
       "public-goods-contributions-voluntary": {
         "heading": "Добровільні внески у суспільні блага",
         "description": "ETH, які будь-хто надсилає безпосередньо до сховища суспільних благ для його бенефіціара — зараз це Protocol Guild.",
-        "source": "Публічні API суспільних благ Cosmic Signature",
+        "source": "API суспільних благ Cosmic Signature",
         "links": {
           "direct": "Переглянути прямі внески ETH",
           "learn": "Дізнатися про суспільні блага",
@@ -274,7 +274,7 @@
       "public-goods-retrievals": {
         "heading": "Забрані кошти суспільних благ",
         "description": "Перегляньте кошти, забрані зі сховища суспільних благ Cosmic Signature, через яке резерви циклів перераховують підтримку налаштованому бенефіціару суспільних благ — зараз це Protocol Guild.",
-        "source": "Публічні API суспільних благ Cosmic Signature",
+        "source": "API суспільних благ Cosmic Signature",
         "links": {
           "learn": "Дізнатися про суспільні блага",
           "protocolGuild": "Відвідати Protocol Guild",

@@ -112,8 +112,10 @@
     "description": "Cosmic SignatureでRandom Walk NFTを刻印する。未使用のRandom Walk NFTはそれぞれ1回のETH一筆に添付でき、ETH一筆の費用が50%割引されます。"
   },
   "systemEvent": {
-    "title": "システムイベント",
-    "description": "特定のCosmic Signatureサイクルにおけるプロトコル管理イベントと調整パラメーターの変更。"
+    "title": "サイクル{cycle}より前の設定",
+    "description": "サイクル{cycle}の開始前にコントラクト所有者が変更したプロトコルのパラメーターです。それぞれの新しい値とトランザクションを示します。",
+    "titleInitial": "初期設定",
+    "descriptionInitial": "最初のサイクルの開始前にコントラクト所有者が設定したプロトコルのパラメーターです。それぞれの値とトランザクションを示します。"
   },
   "currentCycleFull": {
     "title": "現在のパフォーマンス・サイクル",
@@ -159,7 +161,7 @@
     "description": "Cosmic Signatureの広報に貢献してCST配分を受け取る。主なエコシステム貢献者、配分の履歴、参加の方法を見る。"
   },
   "outreachAddress": {
-    "title": "広報配分",
+    "title": "広報配分 · {address}",
     "description": "Cosmic Signatureエコシステム貢献者の広報配分の履歴とCST配分。紹介活動と貢献を確認する。"
   },
   "ethContribution": {
@@ -167,12 +169,12 @@
     "description": "一筆を入れずに、Cosmic Signatureのサイクル準備金へETHを直接拠出できます。公開された拠出履歴も確認できます。"
   },
   "ethContributionDetail": {
-    "title": "直接ETH拠出の詳細",
+    "title": "拠出 #{id}",
     "description": "サイクル準備金へのETH拠出の詳細です。拠出者アドレス、金額、サイクル、添えられたメモを確認できます。"
   },
   "ethContributionByCycle": {
-    "title": "サイクル別の直接ETH拠出",
-    "description": "Cosmic Signatureプロトコルへの直接ETH拠出を、パフォーマンス・サイクルごとに分けて見る。"
+    "title": "サイクル{cycle}の拠出",
+    "description": "サイクル{cycle}の間にサイクル準備金へ直接拠出されたETHです。"
   },
   "myStatistics": {
     "title": "自分の統計",
@@ -187,12 +189,12 @@
     "description": "Cosmic Signature CSTトークンを別のウォレットアドレスへ送る。"
   },
   "cosmicSignatureTransfers": {
-    "title": "NFTの移転履歴",
-    "description": "Cosmic Signature NFTの移転履歴"
+    "title": "NFTの移転履歴 · {address}",
+    "description": "このアドレスに刻印されたCosmic Signature NFTと、受け取ったり送ったりしたすべてのNFTです。"
   },
   "cosmicTokenTransfers": {
-    "title": "CSTの送付履歴",
-    "description": "Cosmic Signature CSTトークンの送付履歴"
+    "title": "CSTの送付履歴 · {address}",
+    "description": "このアドレスに刻印されたCST、受け取ったCSTと送ったCST、そしてCSTでの一筆に消費したCSTです。"
   },
   "usedRwlkNfts": {
     "title": "使用済みのRandom Walk NFT",

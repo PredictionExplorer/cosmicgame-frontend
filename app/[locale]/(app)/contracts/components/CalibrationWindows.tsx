@@ -232,7 +232,7 @@ function WindowPanel({
             aria-valuetext={t('parameters.progress', {
               percent: formatPercent(status.progress * 100, locale, { maximumFractionDigits: 0 }),
             })}
-            className="h-1.5 w-full rounded-pill bg-surface-sunken"
+            className="h-1.5 w-full rounded-pill bg-surface-sunken shadow-[inset_0_0_0_1px_hsl(var(--input))]"
           >
             <div
               className="h-full rounded-pill bg-primary"

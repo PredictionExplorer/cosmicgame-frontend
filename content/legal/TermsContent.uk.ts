@@ -242,7 +242,7 @@ export const termsCopyUk = {
     {
       id: 'contact',
       subtitle: 'Контактна інформація',
-      text: 'Якщо у вас є запитання щодо цих Умов використання, зв’яжіться з нами в <discord>Discord</discord>, <x>X</x> або через <frontendRepository>репозиторій на GitHub</frontendRepository>.',
+      text: 'Якщо у вас є запитання щодо цих Умов використання, напишіть на <support>support@cosmicsignature.com</support> або зв’яжіться з нами в <discord>Discord</discord>, <x>X</x> чи через <frontendRepository>репозиторій на GitHub</frontendRepository>.',
     },
   ],
   // lexicon-allow-start: Howey-test denial copy must explicitly negate an investment framing.
@@ -253,8 +253,6 @@ export const termsCopyUk = {
   // lexicon-allow-end
   allocationsTable: {
     title: 'Напрями розподілу коротко',
-    track: 'Напрям',
-    none: 'Немає',
     sharedBy: '{percent}, ділять {count}',
     each: '{count} × {amount}',
   },

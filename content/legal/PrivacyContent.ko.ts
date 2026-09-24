@@ -12,6 +12,10 @@ export const privacyCopyKo = {
       '사이트는 아래에 적은 서비스로 방문을 측정하고 오류를 보고하며, 아래에 적은 쿠키만 설정합니다.',
     ],
   },
+  withoutErrorReports: {
+    inShortMeasure: '사이트는 아래에 적은 서비스로 방문을 측정하며, 아래에 적은 쿠키만 설정합니다.',
+    improvement: '집계한 이용 데이터로 문제를 고치고 사이트를 개선합니다.',
+  },
   introductionTitle: '개요',
   introduction: [
     'Cosmic Signature는 이더리움 레이어 2 네트워크인 Arbitrum 위에 구축된 탈중앙화 온체인 아트 프로토콜입니다. 탈중앙화 애플리케이션(dApp)인 만큼, 데이터와 개인정보를 다루는 방식이 기존 웹 애플리케이션과 다릅니다.',

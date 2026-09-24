@@ -50,7 +50,8 @@
     "notFoundTitle": "沒有編號為 #{id} 的貢獻",
     "notFoundDescription": "只有附帶留言的貢獻才有記錄頁。請在完整列表中查找。",
     "backToAll": "全部貢獻",
-    "loadError": "無法載入這筆貢獻。"
+    "loadError": "無法載入這筆貢獻。",
+    "notFoundHeading": "找不到這筆貢獻"
   },
   "cycle": {
     "invalidNumber": "週期編號無效",
@@ -71,6 +72,7 @@
     "emptyDescription": "第 {cycle} 個週期進行期間發送的貢獻會顯示在這裏。",
     "loadError": "無法載入該週期的貢獻。",
     "invalidTitle": "此連結沒有指向任何週期",
-    "invalidDescription": "週期編號是從 0 開始的整數，例如 3。"
+    "invalidDescription": "週期編號是從 0 開始的整數，例如 3。",
+    "emptyDescriptionPast": "第 {cycle} 個週期內沒有直接 ETH 貢獻。"
   }
 }

@@ -132,9 +132,9 @@
     "formSubmittedWithInfo": "{amount} ETH contribution and accompanying information confirmed.",
     "formFailed": "ETH contribution failed, please check your input and try again.",
     "publicGoodsVault": {
-      "none": "No public-goods funds are waiting in the vault.",
+      "none": "No Public Goods funds are waiting in the vault.",
       "connectWallet": "Connect your wallet to forward Public Goods Vault funds.",
-      "forwarded": "Public-goods funds were forwarded to Protocol Guild.",
+      "forwarded": "Public Goods funds were forwarded to Protocol Guild.",
       "failed": "Unable to forward Public Goods Vault funds.",
       "forwarding": "Forwarding...",
       "forward": "Forward to Protocol Guild",

@@ -28,7 +28,7 @@
       "description": "사이클 수령자에게 배분으로 각인되는 ERC-721 NFT 컬렉션"
     },
     "randomWalk": {
-      "name": "RandomWalk",
+      "name": "Random Walk NFT",
       "description": "ETH 제스처에 첨부해 1회 할인을 받거나, 앵커링하여 앵커링 NFT 별빛 선정 자격을 얻을 수 있는 RandomWalk NFT 컬렉션"
     },
     "council": {
@@ -108,7 +108,7 @@
         "tooltip": "ETH 제스처 비용은 이 인상률 매개변수를 따릅니다. CST 제스처 비용은 실시간 CST 보정 구간을 따릅니다."
       },
       "timeIncrement": {
-        "label": "시간 증가량",
+        "label": "제스처당 추가되는 시간",
         "tooltip": "제스처마다 사이클 마감 시각에 이만큼의 시간이 더해집니다. 증가량은 사이클마다 {percent}%씩 늘어납니다."
       },
       "cstPreview": {
@@ -120,13 +120,18 @@
         "tooltip": "공개 마감 구간이 열려 누구나 마감할 수 있게 되기 전까지, 최종 제스처를 남긴 참여자가 사이클을 마감할 수 있는 시간입니다."
       },
       "initial": {
-        "label": "초기 시간 증가량",
+        "label": "초기 사이클 기간",
         "tooltip": "첫 제스처를 남길 때 더해지는 초기 사이클 마감 시간입니다."
       },
       "message": {
         "label": "메시지 최대 길이",
         "tooltip": "제스처 메시지에 허용되는 최대 글자 수입니다."
       }
+    },
+    "groups": {
+      "gestures": "제스처",
+      "timing": "시간",
+      "selection": "별빛 선정"
     }
   },
   "parameters": {
@@ -178,13 +183,6 @@
   "seo": {
     "heading": "Cosmic Signature 컨트랙트",
     "description": "Cosmic Signature의 공개 Arbitrum 컨트랙트 주소를 확인할 수 있습니다. 앱에 표시된 내용을 온체인 기록과 대조해 검증하는 데 활용할 수 있습니다.",
-    "partialFallback": "현재 컨트랙트 주소 데이터를 불러올 수 없어, 프로젝트에 등록된 프로토콜 프록시와 구현 컨트랙트 주소를 표시합니다.",
-    "relatedAria": "컨트랙트 신뢰 자료",
-    "links": {
-      "code": "Cosmic Signature 소스 코드 살펴보기",
-      "security": "보안 개요 읽기",
-      "audits": "보안 감사 및 검증 살펴보기",
-      "risk": "위험 고지 읽기"
-    }
+    "partialFallback": "현재 컨트랙트 주소 데이터를 불러올 수 없어, 프로젝트에 등록된 프로토콜 프록시와 구현 컨트랙트 주소를 표시합니다."
   }
 }

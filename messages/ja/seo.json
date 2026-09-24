@@ -59,7 +59,7 @@
       "marketing": {
         "heading": "広報配分",
         "description": "Cosmic Signatureを広める活動に携わる貢献者への、広報配分とCSTの配分履歴を確認できます。",
-        "source": "Cosmic Signature公開広報配分API",
+        "source": "Cosmic Signature広報API",
         "links": {
           "faq": "よくある質問を読む",
           "statistics": "プロトコル統計を見る",
@@ -101,7 +101,7 @@
       "eth-contribution": {
         "heading": "直接ETH拠出",
         "description": "サイクル準備金へ直接送られたETHを、拠出者のメモと対象サイクルとともに確認できます。",
-        "source": "Cosmic Signature公開拠出API",
+        "source": "Cosmic Signature拠出API",
         "links": {
           "reserve": "サイクル準備金の配分のしくみ",
           "protocol": "公共財の取り分の行き先",
@@ -207,8 +207,8 @@
       },
       "coordination-changes": {
         "heading": "調整の変更履歴",
-        "description": "プロトコルモードの変更、パラメーターの更新、今後のサイクルに影響する管理記録を含む、Cosmic Signatureの公開調整変更を確認する。",
-        "source": "Cosmic Signature公開システムイベントAPI",
+        "description": "現在のモードが始まってからコントラクト所有者がプロトコルのパラメーターに加えたすべての変更です。",
+        "source": "Cosmic SignatureシステムイベントAPI",
         "links": {
           "security": "セキュリティの概要を読む",
           "audits": "監査と検証を確認する",
@@ -231,7 +231,7 @@
       "public-goods-contributions-cg": {
         "heading": "プロトコルの公共財拠出",
         "description": "プロトコルのサイクルから公共財金庫と、設定された受け手——現在はProtocol Guild——へのCosmic Signatureの自動公共財送付を追う。",
-        "source": "Cosmic Signature公開公共財API",
+        "source": "Cosmic Signature公共財API",
         "links": {
           "learn": "公共財について学ぶ",
           "statistics": "公共財の統計を見る",
@@ -253,7 +253,7 @@
       "public-goods-contributions-voluntary": {
         "heading": "自発的な公共財拠出",
         "description": "誰でも公共財金庫へ直接送れるETHで、設定された受け手——現在はProtocol Guild——に届けられます。",
-        "source": "Cosmic Signature公開公共財API",
+        "source": "Cosmic Signature公共財API",
         "links": {
           "direct": "直接ETH拠出を見る",
           "learn": "公共財について学ぶ",
@@ -274,7 +274,7 @@
       "public-goods-retrievals": {
         "heading": "公共財の受け取り",
         "description": "公共財金庫から、設定されている受け手への送付履歴を確認できます。現在の受け手はProtocol Guildです。",
-        "source": "Cosmic Signature公開公共財API",
+        "source": "Cosmic Signature公共財API",
         "links": {
           "learn": "公共財について学ぶ",
           "protocolGuild": "Protocol Guildを見る",

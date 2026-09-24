@@ -18,6 +18,7 @@ import { sumAllocatedEth } from '@/utils/allocationRecords';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import { formatCount, formatPercent, sameAddress } from '@/utils/format';
 
+import { ContributionFigure } from './eth-contribution/ContributionFigure';
 import {
   readAnchorCstActions,
   readAnchorEthDeposits,
@@ -382,19 +383,15 @@ async function getRouteFigures(
       };
     }
     case 'eth-contribution': {
-      // The same source as the Contribution History table below the header, so the
-      // figures always reconcile with the rows a reader can count.
+      // The figures read the ledger's own client query (seeded from this read), so
+      // they always reconcile with the rows below, also after a new contribution.
       const contributions = await readDirectContributions();
-      const rows = contributions.data;
       return {
         reads: [contributions],
         figures: [
-          { key: 'records', value: rows && count(rows.length) },
-          { key: 'totalEth', value: rows && eth(sumAmountEth(rows)) },
-          {
-            key: 'contributors',
-            value: rows && count(countDistinctAddresses(rows.map((row) => row.DonorAddr))),
-          },
+          { key: 'records', value: <ContributionFigure metric="records" /> },
+          { key: 'totalEth', value: <ContributionFigure metric="totalEth" /> },
+          { key: 'contributors', value: <ContributionFigure metric="contributors" /> },
         ],
       };
     }

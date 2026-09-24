@@ -313,6 +313,7 @@
       }
     },
     "switcherLabel": "이 주소의 전송 내역",
+    "artUnavailable": "작품을 불러올 수 없습니다",
     "viewOnExplorer": "{explorer}에서 보기",
     "error": "이 주소의 전송 내역을 불러오지 못했습니다.",
     "count": "{count, plural, other {#건}}",
@@ -320,7 +321,9 @@
       "imprinted": "각인",
       "received": "받음",
       "sent": "보냄",
-      "consumed": "소모"
+      "consumed": "소모",
+      "anchored": "앵커링",
+      "released": "앵커링 해제"
     },
     "filter": {
       "label": "표시",
