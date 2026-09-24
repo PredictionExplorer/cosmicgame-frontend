@@ -448,9 +448,15 @@ export const whitePaperTextZh = {
               formula: protocolFacts.dynamicCstRewardFormula,
               notation: protocolFacts.participationCstNotation,
               legend: [
-                { symbol: 'Δt', meaning: '距上一笔的秒数' },
-                { symbol: 'm', meaning: '参与 CST 乘数（合约参数）' },
-                { symbol: 'i', meaning: '当前周期时间增量（微秒）' },
+                { symbol: protocolFacts.participationCstSymbols[0], meaning: '距上一笔的秒数' },
+                {
+                  symbol: protocolFacts.participationCstSymbols[1],
+                  meaning: '参与 CST 乘数（合约参数）',
+                },
+                {
+                  symbol: protocolFacts.participationCstSymbols[2],
+                  meaning: '当前周期时间增量（微秒）',
+                },
               ],
               caption: '一笔落笔铭刻的参与 CST。经过时间自上一笔起算，并按当前周期时间增量归一化。',
             },

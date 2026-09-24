@@ -463,9 +463,18 @@ export const whitePaperTextUk = {
               formula: protocolFacts.dynamicCstRewardFormula,
               notation: protocolFacts.participationCstNotation,
               legend: [
-                { symbol: 'Δt', meaning: 'секунди від попереднього жесту' },
-                { symbol: 'm', meaning: 'множник CST участі, параметр контракту' },
-                { symbol: 'i', meaning: 'поточний часовий приріст циклу в мікросекундах' },
+                {
+                  symbol: protocolFacts.participationCstSymbols[0],
+                  meaning: 'секунди від попереднього жесту',
+                },
+                {
+                  symbol: protocolFacts.participationCstSymbols[1],
+                  meaning: 'множник CST участі, параметр контракту',
+                },
+                {
+                  symbol: protocolFacts.participationCstSymbols[2],
+                  meaning: 'поточний часовий приріст циклу в мікросекундах',
+                },
               ],
               caption:
                 'CST участі, закарбовані жестом. Час, що минув, відлічується від попереднього жесту й масштабується відносно поточного часового приросту циклу.',

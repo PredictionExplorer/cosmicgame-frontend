@@ -448,9 +448,15 @@ export const whitePaperTextZhHk = {
               formula: protocolFacts.dynamicCstRewardFormula,
               notation: protocolFacts.participationCstNotation,
               legend: [
-                { symbol: 'Δt', meaning: '距上一筆的秒數' },
-                { symbol: 'm', meaning: '參與 CST 乘數（合約參數）' },
-                { symbol: 'i', meaning: '目前週期時間增量（微秒）' },
+                { symbol: protocolFacts.participationCstSymbols[0], meaning: '距上一筆的秒數' },
+                {
+                  symbol: protocolFacts.participationCstSymbols[1],
+                  meaning: '參與 CST 乘數（合約參數）',
+                },
+                {
+                  symbol: protocolFacts.participationCstSymbols[2],
+                  meaning: '目前週期時間增量（微秒）',
+                },
               ],
               caption: '一筆落筆銘刻的參與 CST。經過時間自上一筆起算，並按目前週期時間增量歸一化。',
             },

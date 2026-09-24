@@ -203,7 +203,7 @@ export const learnTextVi = {
         {
           heading: 'Một nét bút làm gì',
           body: [
-            `Mỗi nét bút ghi nhận sự tham gia vào chu kỳ đang diễn ra, có thể khắc CST tham gia động, kéo dài thời điểm hoàn tất chu kỳ và góp vào bối cảnh lịch sử xoay quanh Signature cuối cùng. CST tham gia dùng công thức căn bậc hai: ${protocolFacts.participationCstNotation}, trong đó Δt là số giây kể từ nét bút trước, m là hệ số nhân CST tham gia và i là mức tăng thời gian của chu kỳ.`,
+            `Mỗi nét bút ghi nhận sự tham gia vào chu kỳ đang diễn ra, có thể khắc CST tham gia động, kéo dài thời điểm hoàn tất chu kỳ và góp vào bối cảnh lịch sử xoay quanh Signature cuối cùng. CST tham gia dùng công thức căn bậc hai: ${protocolFacts.participationCstNotation}, trong đó ${protocolFacts.participationCstSymbols[0]} là số giây kể từ nét bút trước, m là hệ số nhân CST tham gia và i là mức tăng thời gian của chu kỳ.`,
             `Chi phí nét bút thay đổi trong suốt chu kỳ. Nét bút ETH và nét bút CST dùng các cơ chế liên quan nhưng riêng biệt, bao gồm các cửa sổ hiệu chỉnh giúp người tham gia thấy rõ đường đi của chi phí. Mỗi nét bút CST kéo dài cửa sổ hiệu chỉnh CST khoảng ${cstWindowIncrease}%; mỗi nét bút ETH rút ngắn nó khoảng ${cstWindowDecrease}%.`,
           ],
         },

@@ -167,7 +167,7 @@ export const learnTextZh = {
         {
           heading: '落笔会带来什么',
           body: [
-            `每一笔都会写入当前周期，可能铭刻参与 CST，延长收官倒计时，并成为最终签名历史的一部分。参与 CST 的数量按平方根公式计算：${protocolFacts.participationCstNotation}，其中 Δt 为距上一笔的秒数，m 为参与 CST 乘数，i 为周期时间增量。`,
+            `每一笔都会写入当前周期，可能铭刻参与 CST，延长收官倒计时，并成为最终签名历史的一部分。参与 CST 的数量按平方根公式计算：${protocolFacts.participationCstNotation}，其中 ${protocolFacts.participationCstSymbols[0]} 为距上一笔的秒数，m 为参与 CST 乘数，i 为周期时间增量。`,
             `落笔价格会在周期中持续变化。ETH 落笔与 CST 落笔彼此关联，但各有机制；校准窗口会清楚显示价格如何变化。每笔 CST 落笔会使 CST 校准窗口延长约 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%；每笔 ETH 落笔则会使其缩短约 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%。`,
           ],
         },

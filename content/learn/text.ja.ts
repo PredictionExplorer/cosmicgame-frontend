@@ -194,7 +194,7 @@ export const learnTextJa = {
         {
           heading: '一筆がすること',
           body: [
-            `すべての一筆は進行中のサイクルへの参加を記録し、動的な参加CSTを刻印することがあり、サイクル確定時刻を延ばし、最終シグネチャーを取り巻く歴史的な文脈に寄与します。参加CSTは平方根の式を使います：${protocolFacts.participationCstNotation}。Δtは前の一筆からの秒数、mは参加CSTの乗数、iはサイクルの時間増分です。`,
+            `すべての一筆は進行中のサイクルへの参加を記録し、動的な参加CSTを刻印することがあり、サイクル確定時刻を延ばし、最終シグネチャーを取り巻く歴史的な文脈に寄与します。参加CSTは平方根の式を使います：${protocolFacts.participationCstNotation}。${protocolFacts.participationCstSymbols[0]}は前の一筆からの秒数、mは参加CSTの乗数、iはサイクルの時間増分です。`,
             `一筆の費用はサイクルの中で変わります。ETH一筆とCST一筆は関連しつつも異なる仕組みを使い、参加者に費用の道筋を見せる調律期間を含みます。CST一筆はそれぞれCST調律期間を約${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%長くし、ETH一筆はそれぞれ約${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%短くします。`,
           ],
         },

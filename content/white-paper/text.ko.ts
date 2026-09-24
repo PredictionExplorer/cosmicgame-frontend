@@ -460,9 +460,18 @@ export const whitePaperTextKo = {
               formula: protocolFacts.dynamicCstRewardFormula,
               notation: protocolFacts.participationCstNotation,
               legend: [
-                { symbol: 'Δt', meaning: '직전 제스처 이후 경과한 초' },
-                { symbol: 'm', meaning: '참여 CST 배수(컨트랙트 매개변수)' },
-                { symbol: 'i', meaning: '현재 사이클 시간 증가량(마이크로초)' },
+                {
+                  symbol: protocolFacts.participationCstSymbols[0],
+                  meaning: '직전 제스처 이후 경과한 초',
+                },
+                {
+                  symbol: protocolFacts.participationCstSymbols[1],
+                  meaning: '참여 CST 배수(컨트랙트 매개변수)',
+                },
+                {
+                  symbol: protocolFacts.participationCstSymbols[2],
+                  meaning: '현재 사이클 시간 증가량(마이크로초)',
+                },
               ],
               caption:
                 '제스처 하나가 각인하는 참여 CST. 경과 시간은 직전 제스처부터 측정하며, 현재 사이클 시간 증가량에 맞춰 스케일을 조정합니다.',

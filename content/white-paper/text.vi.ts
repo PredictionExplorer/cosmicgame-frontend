@@ -466,10 +466,16 @@ export const whitePaperTextVi = {
               formula: protocolFacts.dynamicCstRewardFormula,
               notation: protocolFacts.participationCstNotation,
               legend: [
-                { symbol: 'Δt', meaning: 'số giây kể từ nét bút trước' },
-                { symbol: 'm', meaning: 'hệ số nhân CST tham gia, một tham số của hợp đồng' },
                 {
-                  symbol: 'i',
+                  symbol: protocolFacts.participationCstSymbols[0],
+                  meaning: 'số giây kể từ nét bút trước',
+                },
+                {
+                  symbol: protocolFacts.participationCstSymbols[1],
+                  meaning: 'hệ số nhân CST tham gia, một tham số của hợp đồng',
+                },
+                {
+                  symbol: protocolFacts.participationCstSymbols[2],
                   meaning: 'mức tăng thời gian hiện tại của chu kỳ, tính bằng micro giây',
                 },
               ],

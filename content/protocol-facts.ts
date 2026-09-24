@@ -63,6 +63,12 @@ export const protocolFacts = {
    */
   participationCstNotation: 'CST = ⌊√(Δt × m ÷ i)⌋',
   /**
+   * The notation's symbols, in legend order. Copy interpolates them rather
+   * than typing Δ: the display face has no Greek, and copy modules must stay
+   * in the letters it covers (lib/__tests__/display-font-coverage.test.ts).
+   */
+  participationCstSymbols: ['Δt', 'm', 'i'],
+  /**
    * Computed at the launch parameters (time increment = exactly 1 hour).
    * The increment grows 1% per cycle, so live amounts drift slightly lower
    * over time; the app preview and the contract are the source of truth.

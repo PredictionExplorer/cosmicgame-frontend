@@ -452,9 +452,18 @@ export const whitePaperTextEn = {
               formula: protocolFacts.dynamicCstRewardFormula,
               notation: protocolFacts.participationCstNotation,
               legend: [
-                { symbol: 'Δt', meaning: 'seconds since the previous gesture' },
-                { symbol: 'm', meaning: 'the Participation CST multiplier, a contract parameter' },
-                { symbol: 'i', meaning: 'the current cycle time increment, in microseconds' },
+                {
+                  symbol: protocolFacts.participationCstSymbols[0],
+                  meaning: 'seconds since the previous gesture',
+                },
+                {
+                  symbol: protocolFacts.participationCstSymbols[1],
+                  meaning: 'the Participation CST multiplier, a contract parameter',
+                },
+                {
+                  symbol: protocolFacts.participationCstSymbols[2],
+                  meaning: 'the current cycle time increment, in microseconds',
+                },
               ],
               caption:
                 'Participation CST imprinted by a gesture. Elapsed time is measured since the previous gesture and scaled against the current cycle time increment.',

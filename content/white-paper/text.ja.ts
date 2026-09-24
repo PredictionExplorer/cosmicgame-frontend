@@ -459,9 +459,15 @@ export const whitePaperTextJa = {
               formula: protocolFacts.dynamicCstRewardFormula,
               notation: protocolFacts.participationCstNotation,
               legend: [
-                { symbol: 'Δt', meaning: '前の一筆からの秒数' },
-                { symbol: 'm', meaning: '参加CSTの乗数（コントラクトのパラメーター）' },
-                { symbol: 'i', meaning: '現在のサイクルの時間増分（マイクロ秒）' },
+                { symbol: protocolFacts.participationCstSymbols[0], meaning: '前の一筆からの秒数' },
+                {
+                  symbol: protocolFacts.participationCstSymbols[1],
+                  meaning: '参加CSTの乗数（コントラクトのパラメーター）',
+                },
+                {
+                  symbol: protocolFacts.participationCstSymbols[2],
+                  meaning: '現在のサイクルの時間増分（マイクロ秒）',
+                },
               ],
               caption:
                 '一筆が刻印する参加CST。経過時間は前の一筆から測り、現在のサイクルの時間増分に対して尺度化されます。',

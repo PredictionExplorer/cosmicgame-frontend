@@ -193,7 +193,7 @@ export const learnTextKo = {
         {
           heading: '제스처가 하는 일',
           body: [
-            `모든 제스처는 진행 중인 사이클에 참여를 기록하고, 동적 참여 CST를 각인할 수 있으며, 사이클 마감 시각을 연장하고, 최종 시그니처를 둘러싼 역사적 맥락에 기여합니다. 참여 CST는 제곱근 공식을 사용합니다: ${protocolFacts.participationCstNotation}. 여기서 Δt는 직전 제스처 이후 경과한 초, m은 참여 CST 배수, i는 사이클 시간 증가량입니다.`,
+            `모든 제스처는 진행 중인 사이클에 참여를 기록하고, 동적 참여 CST를 각인할 수 있으며, 사이클 마감 시각을 연장하고, 최종 시그니처를 둘러싼 역사적 맥락에 기여합니다. 참여 CST는 제곱근 공식을 사용합니다: ${protocolFacts.participationCstNotation}. 여기서 ${protocolFacts.participationCstSymbols[0]} 기호는 직전 제스처 이후 경과한 초, m은 참여 CST 배수, i는 사이클 시간 증가량입니다.`,
             `제스처 비용은 사이클 동안 변합니다. ETH 제스처와 CST 제스처는 서로 관련되지만 별개인 메커니즘을 따르며, 그 안에는 비용 경로를 참여자에게 보여 주는 보정 구간이 있습니다. CST 제스처마다 CST 보정 구간이 약 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}% 늘어나고, ETH 제스처마다 약 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}% 줄어듭니다.`,
           ],
         },

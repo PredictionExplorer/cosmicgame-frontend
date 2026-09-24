@@ -194,7 +194,7 @@ export const learnTextEn = {
         {
           heading: 'What a gesture does',
           body: [
-            `Every gesture records participation in the active cycle, may imprint dynamic Participation CST, extends Cycle Finalization Time, and contributes to the historical context around the final Signature. Participation CST uses a square-root formula: ${protocolFacts.participationCstNotation}, where Δt is the seconds since the previous gesture, m the Participation CST multiplier and i the cycle time increment.`,
+            `Every gesture records participation in the active cycle, may imprint dynamic Participation CST, extends Cycle Finalization Time, and contributes to the historical context around the final Signature. Participation CST uses a square-root formula: ${protocolFacts.participationCstNotation}, where ${protocolFacts.participationCstSymbols[0]} is the seconds since the previous gesture, m the Participation CST multiplier and i the cycle time increment.`,
             `Gesture Cost changes across the cycle. ETH gestures and CST gestures use related but distinct mechanics, including Calibration Windows that make the cost path visible to participants. Each CST gesture lengthens the CST Calibration Window by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%; each ETH gesture shortens it by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%.`,
           ],
         },
