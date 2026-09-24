@@ -42,6 +42,8 @@ As in [glossary-zh.md §1](./glossary-zh.md#1-term-formation-rules造词规则),
 | Gesture (原 bid)           | 落筆 · 一筆 / 這一筆  |                | Make a Gesture → 落筆; ETH gesture → ETH 落筆; gesture count → 落筆次數; live → 即時落筆    |
 | Gesture Cost               | 落筆價格              |                | never 成本                                                                                  |
 | Final Gesture              | 收官之筆              |                |                                                                                             |
+| Last Gesture (the role)    | 最新落筆              |                | the standings role; never 最後落筆                                                          |
+| Your cycle standing        | 你在本週期的位置      |                | the wallet's own strip beside the Gesture form                                              |
 | Performance Cycle (round)  | 演繹週期 · 週期       |                | 週 with the 辵 radical, never 周期 (mainland form); a cycle number is 第 N 個週期 / 週期 #N |
 | Finalize / Finalization    | 收官                  |                | from Go (圍棋); familiar in Taiwan media (收官戰)                                           |
 | Finalization countdown     | 收官倒數              |                | 倒數 is the Taiwan word; 倒計時 reads mainland                                              |

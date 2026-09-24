@@ -53,6 +53,8 @@ compose perfectly: 每一笔，都在塑造签名 ("Every Gesture Shapes the Sig
 | ETH gesture / CST gesture          | ETH 落笔 / CST 落笔 |
 | Gesture Cost                       | 落笔价格            |
 | Final Gesture                      | 收官之笔            |
+| Last Gesture (the role)            | 最新落笔            |
+| Your cycle standing (personal)     | 你在本周期的位置    |
 | gesture count / Number of Gestures | 落笔次数            |
 | Live gestures                      | 实时落笔            |
 | Gestures with CST                  | CST 落笔            |

@@ -71,6 +71,7 @@ needs. It is the National Institute of Korean Language spelling (제스처, neve
 | Gesture Cost                       | 제스처 비용             |
 | Final Gesture                      | 최종 제스처             |
 | Last Gesture (most recent)         | 최근 제스처             |
+| Your cycle standing (personal)     | 내 사이클 현황          |
 | gesture count / Number of Gestures | 제스처 수               |
 | Live gestures                      | 실시간 제스처           |
 | Gestures with CST                  | CST 제스처              |

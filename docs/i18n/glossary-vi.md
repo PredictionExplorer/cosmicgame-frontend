@@ -77,6 +77,7 @@ is **đặt nét bút** ("to place a stroke"); the classifier is the noun itself
 | Gesture Cost                       | chi phí nét bút             |
 | Final Gesture                      | nét bút cuối cùng           |
 | Last Gesture (most recent)         | nét bút gần nhất            |
+| Your cycle standing (personal)     | Vị thế của bạn trong chu kỳ |
 | gesture count / Number of Gestures | số nét bút                  |
 | Total Gestures                     | tổng số nét bút             |
 | Live gestures                      | nét bút đang diễn ra        |

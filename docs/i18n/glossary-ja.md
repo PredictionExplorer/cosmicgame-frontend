@@ -72,6 +72,7 @@ needs. The idiom 一筆を入れる ("to put in a stroke") is the verb.
 | Gesture Cost                       | 一筆の費用               |
 | Final Gesture                      | 最後の一筆               |
 | Last Gesture (most recent)         | 最新の一筆               |
+| Your cycle standing (personal)     | このサイクルでの位置     |
 | gesture count / Number of Gestures | 筆数                     |
 | Total Gestures                     | 一筆の総数               |
 | Live gestures                      | 直近の一筆               |
