@@ -174,14 +174,15 @@ describe('AttachedAssetsSection NFT paging', () => {
     expect(screen.getByText('NFT 1')).toBeInTheDocument();
   });
 
-  it('shows a single page when everything fits', async () => {
+  it('drops the pager when everything fits on one page', async () => {
     const user = userEvent.setup();
     render(<AttachedAssetsSection currentRoundNum={CURRENT_CYCLE} />);
 
     await user.click(screen.getByRole('button', { name: 'Current cycle' }));
 
-    expect(within(pager()).getByText('1')).toBeInTheDocument();
-    expect(within(pager()).queryByText('2')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('navigation', { name: 'tables.pagination.label' }),
+    ).not.toBeInTheDocument();
   });
 });
 

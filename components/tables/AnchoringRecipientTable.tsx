@@ -1,97 +1,64 @@
-import { useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+'use client';
 
-import { getExplorerUrl, shortenHex } from '@/utils';
+import { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 
-import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
-import { Link } from '@/i18n/navigation';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import {
-  TablePrimaryContainer,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryHead,
-  TablePrimaryRow,
-  TablePrimaryHeadCell,
-  TablePrimary,
-} from '@/components/styled';
-import { CustomPagination } from '@/components/common/CustomPagination';
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+import type { LedgerStateProps } from '@/components/tables/ledger-props';
 import type { CSTAnchorDistribution } from '@/services/api';
 
-const RecipientRow = ({ recipient }: { recipient: CSTAnchorDistribution }) => {
+interface AnchoringRecipientTableProps extends LedgerStateProps {
+  list: CSTAnchorDistribution[];
+}
+
+/** A cycle's Anchor Distribution: each anchor-holder, their anchored NFTs and ETH. */
+const AnchoringRecipientTable = ({ list, ...state }: AnchoringRecipientTableProps) => {
   const t = useTranslations('tables');
-  const locale = useLocale();
 
-  if (!recipient) {
-    return <TablePrimaryRow />;
-  }
-
-  return (
-    <TablePrimaryRow>
-      <TablePrimaryCell label={t('columns.datetime')}>
-        <a
-          className="text-inherit"
-          href={getExplorerUrl('tx', recipient.TxHash ?? '')}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <HydrationSafeDateTime timestamp={recipient.TimeStamp ?? 0} locale={locale} />
-        </a>
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.anchorHolder')} align="left">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Link href={`/user/${recipient.StakerAddr}`} className="text-inherit font-mono">
-              {shortenHex(recipient.StakerAddr ?? '', 6)}
-            </Link>
-          </TooltipTrigger>
-          <TooltipContent>{recipient.StakerAddr}</TooltipContent>
-        </Tooltip>
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.numberOfNfts')} align="center">
-        {recipient.StakerNumStakedNFTs}
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.distributionAmountEth')} align="right">
-        {(recipient.StakerAmountEth ?? 0).toFixed(4)}
-      </TablePrimaryCell>
-    </TablePrimaryRow>
+  const columns = useMemo<DataTableColumn<CSTAnchorDistribution>[]>(
+    () => [
+      {
+        id: 'datetime',
+        kind: 'datetime',
+        header: t('columns.datetime'),
+        value: (row) => row.TimeStamp,
+        txHash: (row) => row.TxHash,
+      },
+      {
+        id: 'holder',
+        kind: 'address',
+        header: t('columns.anchorHolder'),
+        value: (row) => row.StakerAddr,
+      },
+      {
+        id: 'nfts',
+        kind: 'count',
+        header: t('columns.numberOfNfts'),
+        value: (row) => row.StakerNumStakedNFTs,
+        sortable: true,
+      },
+      {
+        id: 'amount',
+        kind: 'amount',
+        header: t('columns.distributionAmountEth'),
+        value: (row) => row.StakerAmountEth,
+        showUnit: false,
+        sortable: true,
+      },
+    ],
+    [t],
   );
-};
-
-const AnchoringRecipientTable = ({ list }: { list: CSTAnchorDistribution[] }) => {
-  const t = useTranslations('tables');
-  const perPage = 5;
-  const [page, setPage] = useState(1);
-
-  if (list.length === 0) {
-    return <p>{t('anchoringRecipient.empty')}</p>;
-  }
-
-  const displayedRecipients = list.slice((page - 1) * perPage, page * perPage);
 
   return (
-    <>
-      <TablePrimaryContainer>
-        <TablePrimary>
-          <TablePrimaryHead>
-            <tr>
-              <TablePrimaryHeadCell align="left">{t('columns.datetime')}</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">{t('columns.anchorHolder')}</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>{t('columns.numberOfNfts')}</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">
-                {t('columns.distributionAmountEth')}
-              </TablePrimaryHeadCell>
-            </tr>
-          </TablePrimaryHead>
-          <TablePrimaryBody>
-            {displayedRecipients.map((recipient) => (
-              <RecipientRow key={recipient.StakerAddr} recipient={recipient} />
-            ))}
-          </TablePrimaryBody>
-        </TablePrimary>
-      </TablePrimaryContainer>
-      <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
-    </>
+    <DataTable
+      data={list}
+      columns={columns}
+      ariaLabel={t('names.anchorDistribution')}
+      getRowKey={(row) => row.StakerAddr ?? row.EvtLogId}
+      emptyTitle={t('anchoringRecipient.emptyTitle')}
+      emptyDescription={t('anchoringRecipient.empty')}
+      {...state}
+    />
   );
 };
 

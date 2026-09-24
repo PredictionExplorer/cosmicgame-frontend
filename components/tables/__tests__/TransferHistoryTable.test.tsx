@@ -69,16 +69,14 @@ describe('TransferHistoryTable', () => {
     expect(datetimes).toHaveLength(1);
   });
 
-  it('shows Cosmic Signature NFT anchoring wallet label for CST anchoring address', () => {
+  it('names the Cosmic Signature NFT anchoring wallet instead of showing hex', () => {
     render(<TransferHistoryTable list={[createRecord({ FromAddr: TEST_STAKING_CST_LABEL })]} />);
-    expect(screen.getByText('tables.transferHistory.signatureAnchoringWallet')).toBeInTheDocument();
+    expect(screen.getByText('formats.address.known.cosmicAnchor')).toBeInTheDocument();
   });
 
-  it('shows RandomWalk NFT anchoring wallet label for RWLK anchoring address', () => {
+  it('names the Random Walk NFT anchoring wallet instead of showing hex', () => {
     render(<TransferHistoryTable list={[createRecord({ FromAddr: TEST_STAKING_RWALK_LABEL })]} />);
-    expect(
-      screen.getByText('tables.transferHistory.randomWalkAnchoringWallet'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('formats.address.known.rwalkAnchor')).toBeInTheDocument();
   });
 
   it('shows shortened hex for regular addresses', () => {
@@ -96,15 +94,13 @@ describe('TransferHistoryTable', () => {
     expect(userLinks.length).toBeGreaterThanOrEqual(2);
   });
 
-  it('renders only first page of results (perPage=5)', () => {
-    const list = Array.from({ length: 8 }, (_, i) =>
+  it('shows 20 rows a page with the row range', () => {
+    const list = Array.from({ length: 25 }, (_, i) =>
       createRecord({ EvtLogId: i, TimeStamp: 1701346718 + i * 86400 }),
     );
-    render(<TransferHistoryTable list={list} />);
-    expect(screen.getByText(convertTimestampToDateTime(list[4]!.TimeStamp))).toBeInTheDocument();
-    expect(
-      screen.queryByText(convertTimestampToDateTime(list[5]!.TimeStamp)),
-    ).not.toBeInTheDocument();
+    const { container } = render(<TransferHistoryTable list={list} />);
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(20);
+    expect(screen.getByText('tables.pagination.range(from=1,to=20,total=25)')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

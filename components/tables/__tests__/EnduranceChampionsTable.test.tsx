@@ -1,23 +1,9 @@
 import '@testing-library/jest-dom';
 import { fireEvent } from '@testing-library/react';
 
-import { formatSeconds } from '@/utils';
-
 import EnduranceChampionsTable from '@/components/tables/EnduranceChampionsTable';
 
 import { checkA11y, render, screen } from '@/test-utils';
-
-const mockFormatSeconds = jest.fn();
-jest.mock('@/utils', () => {
-  const actual = jest.requireActual<typeof import('@/utils')>('@/utils');
-  return {
-    ...actual,
-    formatSeconds: (seconds: number, locale?: string) => {
-      mockFormatSeconds(seconds, locale);
-      return actual.formatSeconds(seconds, locale);
-    },
-  };
-});
 
 const createChampion = (overrides = {}) => ({
   participant: '0x1234567890abcdef1234567890abcdef12345678',
@@ -29,9 +15,10 @@ const createChampion = (overrides = {}) => ({
 beforeEach(() => jest.clearAllMocks());
 
 describe('EnduranceChampionsTable', () => {
-  it('renders loading state when championList is null', () => {
+  it('holds placeholder rows while the list is computed', () => {
     render(<EnduranceChampionsTable championList={null} />);
-    expect(screen.getByText('tables.status.loading')).toBeInTheDocument();
+    expect(screen.getByRole('table')).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByRole('status')).toHaveTextContent('tables.skeleton.loadingRows');
   });
 
   it('renders empty state when championList is empty', () => {
@@ -52,8 +39,10 @@ describe('EnduranceChampionsTable', () => {
     );
     expect(screen.getAllByText(/1h/).length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText(/30m/).length).toBeGreaterThanOrEqual(1);
-    expect(mockFormatSeconds).toHaveBeenCalledWith(3600, 'en');
-    expect(mockFormatSeconds).toHaveBeenCalledWith(1800, 'en');
+    // Durations render as machine-readable <time> elements, end-aligned.
+    const [duration] = screen.getAllByText(/1h/);
+    expect(duration?.closest('time')).toHaveAttribute('datetime', 'PT1H');
+    expect(duration?.closest('td')).toHaveAttribute('data-align', 'end');
   });
 
   it('renders 0 chrono warrior time as formatted seconds', () => {
@@ -106,8 +95,8 @@ describe('EnduranceChampionsTable', () => {
     expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
   });
 
-  it('shows pagination when list.length > perPage', () => {
-    const list = Array.from({ length: 8 }, (_, i) =>
+  it('shows pagination when the list is longer than a page', () => {
+    const list = Array.from({ length: 25 }, (_, i) =>
       createChampion({ participant: `0x${String(i).padStart(40, '0')}` }),
     );
     render(<EnduranceChampionsTable championList={list} />);
@@ -115,7 +104,7 @@ describe('EnduranceChampionsTable', () => {
   });
 
   it('pagination click changes visible rows', () => {
-    const list = Array.from({ length: 8 }, (_, i) =>
+    const list = Array.from({ length: 25 }, (_, i) =>
       createChampion({
         participant: `0x${String(i).padStart(40, '0')}`,
         championTime: (i + 1) * 1000,
@@ -124,16 +113,15 @@ describe('EnduranceChampionsTable', () => {
     render(<EnduranceChampionsTable championList={list} />);
 
     const rowsBefore = screen.getAllByRole('row').filter((r) => r.querySelector('td'));
-    expect(rowsBefore.length).toBe(5);
+    expect(rowsBefore.length).toBe(20);
 
-    const page2Link = screen.getByText('2');
-    fireEvent.click(page2Link);
+    fireEvent.click(screen.getByRole('button', { name: '2' }));
 
     const rowsAfter = screen.getAllByRole('row').filter((r) => r.querySelector('td'));
-    expect(rowsAfter.length).toBe(3);
+    expect(rowsAfter.length).toBe(5);
   });
 
-  it('renders AddressLink with correct href', () => {
+  it('links the participant to their page', () => {
     const addr = '0x1234567890abcdef1234567890abcdef12345678';
     render(<EnduranceChampionsTable championList={[createChampion({ participant: addr })]} />);
     const links = screen.getAllByRole('link');
@@ -210,7 +198,7 @@ describe('EnduranceChampionsTable', () => {
     const rows = screen.getAllByRole('row');
     const dataRows = rows.filter((r) => r.querySelector('td'));
     const firstRowText = dataRows[0]?.textContent ?? '';
-    expect(firstRowText).toContain(formatSeconds(300));
+    expect(firstRowText).toContain('5m');
   });
 
   it('has no accessibility violations', async () => {

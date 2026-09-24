@@ -15,8 +15,10 @@ jest.mock('../../../../../hooks/useApiQuery', () => ({
 
 jest.mock('../../../../../components/tables/RecipientHistoryTable', () => ({
   __esModule: true,
-  default: ({ winningHistory }: { winningHistory: unknown[] }) => (
-    <div data-testid="history-table">rows: {winningHistory.length}</div>
+  default: ({ winningHistory, loading }: { winningHistory: unknown[]; loading?: boolean }) => (
+    <div data-testid="history-table" data-loading={loading ? 'true' : undefined}>
+      rows: {winningHistory.length}
+    </div>
   ),
 }));
 
@@ -46,7 +48,7 @@ describe('WinningHistory', () => {
     mockUseActiveWeb3React.mockReturnValue({ account: '0xABC' });
     mockUseClaimHistoryByUser.mockReturnValue({ data: null, isLoading: true, error: null });
     render(<WinningHistory />);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByTestId('history-table')).toHaveAttribute('data-loading', 'true');
   });
 
   it('shows error state', () => {

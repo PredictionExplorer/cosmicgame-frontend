@@ -1,30 +1,32 @@
 {
   "empty": {
-    "gestures": "No gestures yet.",
-    "gestureHistory": "No gesture history yet.",
-    "participants": "No participants yet.",
-    "recipients": "No recipients yet.",
+    "gestures": "No gestures yet",
+    "gestureHistory": "No gesture history yet",
+    "participants": "No participants yet",
+    "recipients": "No recipients yet",
     "recipientCyclesTitle": "No recipients yet",
     "recipientCyclesDescription": "No Performance Cycles have been finalized yet.",
     "allocations": "No allocations yet.",
+    "outreachAllocations": "No Outreach Reserve allocations yet",
     "anchorActions": "No anchor actions yet.",
-    "anchorHolders": "No anchor-holders yet.",
+    "anchorHolders": "No anchor-holders yet",
     "anchoredTokens": "No anchored tokens yet.",
-    "contributions": "No contributions yet.",
-    "contributors": "No contributors yet.",
+    "contributions": "No contributions yet",
+    "contributors": "No contributors yet",
     "publicGoods": "No public goods activity yet.",
     "stellarSelection": "No Stellar Selection allocations yet.",
     "tokens": "No tokens yet.",
     "holders": "No holders yet.",
-    "spenders": "No spenders yet.",
-    "enduranceChampions": "No endurance champions yet.",
+    "stellarEntries": "No Stellar Selection entries yet",
+    "spenders": "No spenders yet",
+    "enduranceChampions": "No endurance champions yet",
     "attachedNfts": "No attached NFTs yet.",
     "attachedTokens": "No attached tokens yet.",
     "systemEvents": "No system events yet.",
-    "modeChanges": "No mode changes yet.",
-    "events": "No events yet.",
-    "history": "No history yet.",
-    "retrievals": "No retrievals yet.",
+    "modeChanges": "No mode changes yet",
+    "events": "No events yet",
+    "history": "No history yet",
+    "retrievals": "No retrievals yet",
     "generic": "No data available.",
     "nothingHere": "Nothing here yet"
   },
@@ -71,7 +73,6 @@
   "status": {
     "loading": "Loading...",
     "live": "Live",
-    "you": "(You)",
     "youBadge": "You",
     "yes": "Yes",
     "no": "No",
@@ -128,6 +129,8 @@
     "event": "Event",
     "newValue": "New Value",
     "recordType": "Record Type",
+    "source": "Source",
+    "received": "Received",
     "position": "Position",
     "note": "Note",
     "userAddress": "User Address",
@@ -148,8 +151,31 @@
     "actions": "Actions",
     "selected": "Selected"
   },
+  "names": {
+    "participants": "Unique participants",
+    "recipients": "Unique recipients",
+    "ethContributors": "Unique ETH contributors",
+    "cstAnchorHolders": "Cosmic Signature NFT anchor-holders",
+    "rwlkAnchorHolders": "Random Walk NFT anchor-holders",
+    "publicGoodsContributions": "Public Goods contributions",
+    "publicGoodsRetrievals": "Public Goods retrievals",
+    "outreachAllocations": "Outreach Reserve allocations",
+    "parameterChanges": "Parameter changes",
+    "cycleActivations": "Cycle activations",
+    "nameHistory": "Name history",
+    "transfers": "Transfer history",
+    "anchorDistribution": "Anchor Distribution recipients",
+    "ethContributions": "ETH contributions",
+    "allocationRecords": "Allocation records",
+    "allocationsByRecipient": "Allocations by recipient",
+    "ethSpent": "ETH spent per participant",
+    "stellarSelectionEntries": "Stellar Selection entries",
+    "enduranceChampions": "Endurance Champions",
+    "gestureMessages": "Gesture messages"
+  },
   "pagination": {
     "label": "pagination",
+    "range": "{from}–{to} of {total}",
     "goToPage": "Go to page:",
     "goToPageAria": "go to page",
     "previous": "Previous",
@@ -158,14 +184,18 @@
     "nextAria": "Go to next page",
     "morePages": "More pages"
   },
-  "density": {
-    "groupLabel": "Row density",
-    "comfortable": "comfortable",
-    "compact": "compact",
-    "comfortableAria": "Comfortable row density",
-    "compactAria": "Compact row density",
-    "comfortableHelp": "Use taller rows with more spacing for easier scanning.",
-    "compactHelp": "Use shorter rows to fit more allocation records on screen."
+  "currentRow": {
+    "position": "#{rank} of {total}",
+    "show": "Show my row"
+  },
+  "proof": {
+    "transactionNewTab": "Transaction on the block explorer, opens in a new tab"
+  },
+  "links": {
+    "newTab": "Opens in a new tab"
+  },
+  "details": {
+    "header": "Details"
   },
   "skeleton": {
     "loadingText": "Loading text",
@@ -178,38 +208,52 @@
     "explainColumn": "Explain column: {column}"
   },
   "adminEvents": {
-    "empty": "No events yet."
+    "empty": "No configuration changes were recorded in this window"
   },
   "allocation": {
     "cycle": "Cycle {cycle}",
-    "cycleAria": "Cycle {cycle} allocation summary",
     "openDetails": "Open the detailed allocation breakdown for cycle #{cycle}.",
     "allocationHelp": "Signature Allocation amount and recipient wallet for this cycle.",
-    "explore": "Explore",
-    "exploreAria": "Explore cycle {cycle}",
-    "exploreHelp": "View recipients, deposits, and allocation details for cycle #{cycle}.",
     "gestures": "Gestures",
     "gesturesHelp": "Total gestures made during this cycle.",
-    "nfts": "NFTs",
     "nftsHelp": "NFTs attached to gestures during this cycle.",
-    "stellar": "Stellar",
     "stellarHelp": "ETH allocated to the Stellar Selection pool.",
-    "anchor": "Anchor",
     "anchorHelp": "ETH allocated to Anchor Distributions.",
-    "distributed": "Distributed",
     "distributedHelp": "Cosmic Signature NFTs distributed via Stellar Selection.",
-    "loadingAria": "Loading allocation cycles",
-    "listAria": "Allocation recipients by cycle"
+    "listAria": "Allocation recipients by cycle",
+    "columns": {
+      "finalized": "Finalized",
+      "signatureEth": "Signature Allocation (ETH)",
+      "chronoEth": "Chrono-Warrior (ETH)",
+      "stellarEth": "Stellar Selection (ETH)",
+      "anchorEth": "Anchor Distribution (ETH)",
+      "nftsAttached": "NFTs attached",
+      "nftsViaStellar": "NFTs via Stellar Selection"
+    }
   },
   "anchoringRecipient": {
+    "emptyTitle": "No anchored NFTs this cycle",
     "empty": "No Cosmic Signature NFTs were anchored when this cycle finalized. Its Anchor Distribution remained in the Cycle Reserve."
+  },
+  "publicGoods": {
+    "voluntaryEmpty": "Contributions sent straight to the Public Goods Vault appear here. The vault holds them for its configured Public Goods recipient."
   },
   "banGesture": {
     "banned": "Gesture hidden.",
     "unbanned": "Gesture restored.",
     "error": "The moderation status could not be updated. Please try again.",
     "ban": "Hide",
-    "unban": "Restore"
+    "unban": "Restore",
+    "visibilityLabel": "Show messages",
+    "hiddenTag": "Hidden",
+    "allCycles": "All cycles",
+    "search": "Search messages",
+    "noMatches": "No messages match these filters",
+    "filters": {
+      "all": "All",
+      "visible": "Visible",
+      "hidden": "Hidden"
+    }
   },
   "ethContribution": {
     "withInfo": "Contribution with info",
@@ -236,29 +280,30 @@
     "removed": "Token name was removed."
   },
   "recipientHistory": {
-    "notApplicable": "N/A",
-    "unretrievedHelp": "Not yet retrieved. Open My Allocations to retrieve it.",
-    "unretrievedAria": "Unretrieved allocation information",
-    "types": {
-      "mainEth": "Main ETH Allocation",
-      "mainCst": "Main Signature Allocation CST",
-      "mainNft": "Main Signature Allocation CS NFT",
-      "finalCstNft": "Final CST Gesture CS NFT",
-      "finalCstRecognition": "Final CST Gesture Recognition CST",
-      "enduranceNft": "Endurance Champion CS NFT",
-      "enduranceRecognition": "Endurance Champion Recognition CST",
-      "chronoEth": "Chrono-Warrior ETH",
-      "chronoCst": "Chrono-Warrior CST",
-      "chronoNft": "Chrono-Warrior CS NFT",
-      "participantStellarEth": "ETH Stellar Selection (for participants)",
-      "participantStellarCst": "Recognition CST from Stellar Selection (for participants)",
-      "participantStellarNft": "CS NFT Stellar Selection (for participants)",
-      "anchorStellarCst": "Recognition CST from Anchored-NFT Stellar Selection (for Random Walk anchor-holders)",
-      "anchorStellarNft": "CS NFT Stellar Selection (for Random Walk anchor-holders)",
-      "anchorDistributionEth": "Anchor Distribution ETH (for Cosmic Signature NFT anchor-holders)",
-      "attachedNftRetrieval": "Attached NFT (timeout retrieval)",
-      "attachedErc20Retrieval": "Attached ERC-20 (timeout retrieval)",
-      "stellarEthRetrieval": "ETH Stellar Selection (timeout retrieval)"
+    "sources": {
+      "signature": "Signature Allocation",
+      "finalCstGesture": "Final CST Gesture",
+      "enduranceChampion": "Endurance Champion",
+      "chronoWarrior": "Chrono-Warrior",
+      "stellarSelection": "Stellar Selection",
+      "anchoredStellarSelection": "Anchored-NFT Stellar Selection",
+      "anchorDistribution": "Anchor Distribution",
+      "attachedNftTimeout": "Attached NFT (timeout retrieval)",
+      "attachedErc20Timeout": "Attached ERC-20 (timeout retrieval)",
+      "stellarEthTimeout": "ETH Stellar Selection (timeout retrieval)"
+    },
+    "nft": "NFT #{id}",
+    "readyToRetrieve": "Ready to retrieve",
+    "retrieve": "Retrieve",
+    "retrieved": "Retrieved",
+    "allAnchorHolders": "All Cosmic Signature NFT anchor-holders",
+    "showRecords": "{count, plural, one {Show # record} other {Show # records}}",
+    "hideRecords": "Hide records",
+    "totals": {
+      "eth": "ETH received",
+      "cst": "CST received",
+      "nfts": "NFTs received",
+      "cycles": "Cycles"
     }
   },
   "specialAllocation": {
@@ -323,18 +368,8 @@
     "printWindow": "Window: {duration}",
     "printReign": "Reign: {duration}"
   },
-  "stellarSelection": {
-    "ethDeposit": "ETH Deposit",
-    "anchoredNft": "Anchored-NFT Stellar Selection Cosmic Signature NFT",
-    "signatureNftSelection": "Cosmic Signature NFT Stellar Selection",
-    "signatureNft": "Cosmic Signature NFT"
-  },
   "systemModes": {
     "viewEvent": "View system event for {scope}"
-  },
-  "transferHistory": {
-    "signatureAnchoringWallet": "Cosmic Signature NFT Anchoring Wallet",
-    "randomWalkAnchoringWallet": "Random Walk NFT Anchoring Wallet"
   },
   "uniqueAnchorHolders": {
     "numAnchorActions": "Num Anchor Actions",

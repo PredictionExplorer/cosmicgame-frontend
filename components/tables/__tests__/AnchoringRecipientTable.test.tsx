@@ -85,16 +85,16 @@ describe('AnchoringRecipientTable', () => {
     expect(screen.getByText('0.1000')).toBeInTheDocument();
   });
 
-  it('renders only first page of results (perPage=5)', () => {
-    const list = Array.from({ length: 8 }, (_, i) =>
+  it('shows 20 rows a page with the row range', () => {
+    const list = Array.from({ length: 25 }, (_, i) =>
       createRecipient({
         StakerAddr: `0x${String(i).padStart(40, '0')}`,
         StakerNumStakedNFTs: 100 + i,
       }),
     );
-    render(<AnchoringRecipientTable list={list} />);
-    expect(screen.getByText('104')).toBeInTheDocument();
-    expect(screen.queryByText('105')).not.toBeInTheDocument();
+    const { container } = render(<AnchoringRecipientTable list={list} />);
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(20);
+    expect(screen.getByText('tables.pagination.range(from=1,to=20,total=25)')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

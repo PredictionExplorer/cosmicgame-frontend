@@ -8,25 +8,6 @@ import GestureHistoryTable from '@/components/tables/GestureHistoryTable';
 
 import { render, screen, checkA11y } from '@/test-utils';
 
-const mockConvertTimestampToDateTime = jest.fn();
-const mockFormatSeconds = jest.fn();
-jest.mock('@/utils', () => {
-  const actual = jest.requireActual<typeof import('@/utils')>('@/utils');
-  return {
-    ...actual,
-    convertTimestampToDateTime: (timestamp: number, showSecond?: boolean, locale?: string) => {
-      mockConvertTimestampToDateTime(timestamp, showSecond, locale);
-      return actual.convertTimestampToDateTime(timestamp, showSecond, locale);
-    },
-    formatSeconds: (seconds: number, locale?: string) => {
-      mockFormatSeconds(seconds, locale);
-      return actual.formatSeconds(seconds, locale);
-    },
-  };
-});
-
-beforeEach(() => jest.clearAllMocks());
-
 describe('GestureHistoryTable', () => {
   test('with no records', () => {
     render(<GestureHistoryTable gestureHistory={[]} />);
@@ -64,12 +45,15 @@ describe('GestureHistoryTable', () => {
       screen.getByText(convertTimestampToDateTime(mockData[0]!.TimeStamp, true)),
     ).toBeInTheDocument();
     expect(document.querySelector('time[datetime="2023-11-30T12:18:38.000Z"]')).toBeInTheDocument();
-    expect(mockFormatSeconds).toHaveBeenCalledWith(expect.any(Number), 'en');
     expect(screen.getByText(shortenHex(mockData[0]!.BidderAddr, 6))).toBeInTheDocument();
-    // Component displays "X ETH" suffix, not "Ξ"
-    expect(screen.getByText(`${mockData[0]!.EthPriceEth.toFixed(7)} ETH`)).toBeInTheDocument();
-    expect(screen.getByText(mockData[0]!.RoundNum)).toBeInTheDocument();
+    // The cost reads at the ledger precision with its unit, never "Ξ".
+    expect(screen.getByText('0.1004').textContent).toBe('0.1004\u00a0ETH');
+    // The cycle links to its allocation page.
+    expect(screen.getByRole('link', { name: '4' })).toHaveAttribute('href', '/allocation/4');
     expect(screen.getByText(mockData[0]!.Message)).toBeInTheDocument();
+    // The method is a tag, not a row tint.
+    expect(screen.getAllByText('ETH').length).toBeGreaterThanOrEqual(2);
+    expect(document.querySelector('tbody tr')).not.toHaveAttribute('style');
   });
 
   test('shows CST cost and gesture type for CST bids', () => {
@@ -91,8 +75,93 @@ describe('GestureHistoryTable', () => {
       />,
     );
 
-    expect(screen.getByText('25.5000 CST')).toBeInTheDocument();
-    expect(screen.getByText('CST')).toBeInTheDocument();
+    expect(screen.getByText('25.50').textContent).toBe('25.50\u00a0CST');
+    expect(screen.getAllByText('CST').length).toBeGreaterThanOrEqual(1);
+  });
+
+  test('drops the info and message columns when no gesture has either', () => {
+    const { container } = render(
+      <GestureHistoryTable
+        gestureHistory={[
+          {
+            EvtLogId: 9,
+            TimeStamp: 1701346718,
+            BidderAddr: '0x555eced709352759Ed0f1317dfC0a5FEf1310e60',
+            GestureType: 0,
+            EthPriceEth: 0.1,
+            RoundNum: 1,
+          },
+        ]}
+      />,
+    );
+    const headers = Array.from(container.querySelectorAll('th')).map((th) => th.textContent);
+    expect(headers).not.toContain('tables.columns.gestureInfo');
+    expect(headers).not.toContain('tables.columns.message');
+    // No labelled blank line survives on a phone record.
+    expect(container.querySelector('td[data-label="tables.columns.gestureInfo"]')).toBeNull();
+  });
+
+  test('pages 20 gestures at a time, each leading to its gesture page', () => {
+    const list = Array.from({ length: 25 }, (_, i) => ({
+      EvtLogId: 1000 + i,
+      TimeStamp: 1701346718 - i * 60,
+      BidderAddr: '0x555eced709352759Ed0f1317dfC0a5FEf1310e60',
+      GestureType: 0,
+      EthPriceEth: 0.1,
+      RoundNum: 1,
+    }));
+    const { container } = render(<GestureHistoryTable gestureHistory={list} showRound={false} />);
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(20);
+    expect(
+      screen.getByRole('link', { name: 'tables.gestureHistory.viewGesture(id=1000)' }),
+    ).toHaveAttribute('href', '/gesture/1000');
+  });
+
+  test("drops who and how long on a participant's own page", () => {
+    const { container } = render(
+      <GestureHistoryTable
+        gestureHistory={[
+          {
+            EvtLogId: 11,
+            TimeStamp: 1701346718,
+            BidderAddr: '0x555eced709352759Ed0f1317dfC0a5FEf1310e60',
+            GestureType: 0,
+            EthPriceEth: 0.1,
+            RoundNum: 1,
+          },
+        ]}
+        showParticipant={false}
+        showHold={false}
+      />,
+    );
+    const headers = Array.from(container.querySelectorAll('th')).map((th) => th.textContent);
+    expect(headers).not.toContain('tables.columns.participant');
+    expect(headers).not.toContain('tables.columns.gestureDuration');
+    expect(headers).toContain('tables.columns.gestureCost');
+  });
+
+  test('holds a finished cycle’s last gesture until the cycle ended', () => {
+    // Regression: on /allocation/N the newest gesture's hold kept ticking
+    // forever ("43d 4h 6m 3s" on cycle 1).
+    const gesture = (id: number, timeStamp: number) => ({
+      EvtLogId: id,
+      TimeStamp: timeStamp,
+      BidderAddr: '0x555eced709352759Ed0f1317dfC0a5FEf1310e60',
+      GestureType: 0,
+      EthPriceEth: 0.1,
+      RoundNum: 1,
+    });
+    const { container } = render(
+      <GestureHistoryTable
+        gestureHistory={[gesture(2, 1_700_000_600), gesture(1, 1_700_000_000)]}
+        showRound={false}
+        heldUntil={1_700_004_239}
+      />,
+    );
+    const holds = Array.from(container.querySelectorAll('td[data-kind="duration"]')).map((cell) =>
+      cell.textContent?.replace(/\s+/g, ' '),
+    );
+    expect(holds).toEqual(['1h 0m 39s', '10m']);
   });
 
   test('uses localized alt text for the Random Walk NFT image', () => {

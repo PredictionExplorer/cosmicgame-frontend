@@ -80,3 +80,22 @@ export function sumAllocatedEth(rows: readonly AllocationAmountRow[]): number {
     return total + (toFiniteNumber(row.AmountEth) ?? 0);
   }, 0);
 }
+
+/** The recipient a history row names; Anchor Distribution rows may name none. */
+export interface AllocationRecipientRow {
+  WinnerAddr?: string | null;
+}
+
+/** The key rows are grouped under per recipient: the address, case-insensitively. */
+export function recipientKey(row: AllocationRecipientRow): string {
+  return (row.WinnerAddr ?? '').toLowerCase();
+}
+
+/**
+ * How many recipients the rows name, which is how many rows a ledger grouped
+ * by recipient shows. A count beside such a table uses this, so it matches
+ * the rows rather than the records behind them.
+ */
+export function countRecipients(rows: readonly AllocationRecipientRow[]): number {
+  return new Set(rows.map(recipientKey)).size;
+}

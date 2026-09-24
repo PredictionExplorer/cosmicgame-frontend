@@ -11,8 +11,10 @@ jest.mock('../../../../../hooks/useApiQuery', () => ({
 }));
 
 jest.mock('../../../../../components/tables/AdminEventsTable', () => ({
-  AdminEventsTable: ({ list }: { list: unknown[] }) => (
-    <div data-testid="events-table">rows: {list.length}</div>
+  AdminEventsTable: ({ list, loading }: { list: unknown[]; loading?: boolean }) => (
+    <div data-testid="events-table" data-loading={loading ? 'true' : undefined}>
+      rows: {list.length}
+    </div>
   ),
 }));
 
@@ -46,7 +48,7 @@ describe('ChangedParameters', () => {
     mockUseSystemModelist.mockReturnValue({ data: null, isLoading: true });
     mockUseSystemEvents.mockReturnValue({ data: [], isLoading: false });
     render(<ChangedParameters />);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByTestId('events-table')).toHaveAttribute('data-loading', 'true');
   });
 
   it('renders events table when loaded', () => {

@@ -25,7 +25,7 @@ describe('CharityDepositTable', () => {
   it('renders table headers', () => {
     render(<CharityDepositTable list={[createDonation()]} />);
     expect(screen.getAllByText('tables.columns.datetime').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('tables.columns.cycleNumber').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.cycle').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('tables.columns.contributorAddress').length).toBeGreaterThanOrEqual(
       1,
     );
@@ -48,23 +48,39 @@ describe('CharityDepositTable', () => {
     expect(roundLink.closest('a')).toHaveAttribute('href', '/allocation/5');
   });
 
-  it('renders blank cell for negative RoundNum', () => {
+  it('drops the cycle column when no contribution has a cycle', () => {
     render(<CharityDepositTable list={[createDonation({ RoundNum: -1 })]} />);
     expect(screen.queryByText('-1')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('columnheader', { name: 'tables.columns.cycle' }),
+    ).not.toBeInTheDocument();
   });
 
-  it('formats AmountEth to 6 decimal places', () => {
+  it('shows ETH at the ledger precision, end-aligned', () => {
     render(<CharityDepositTable list={[createDonation({ AmountEth: 1.5 })]} />);
-    expect(screen.getByText('1.500000')).toBeInTheDocument();
+    const amount = screen.getByText('1.5000');
+    expect(amount.closest('td')).toHaveAttribute('data-align', 'end');
   });
 
-  it('uses perPage=10 for pagination', () => {
-    const list = Array.from({ length: 12 }, (_, i) =>
+  it('shows 20 contributions a page', () => {
+    const list = Array.from({ length: 25 }, (_, i) =>
       createDonation({ EvtLogId: i, RoundNum: i + 1 }),
     );
-    render(<CharityDepositTable list={list} />);
-    expect(screen.getByText('10')).toBeInTheDocument();
-    expect(screen.queryByText('11')).not.toBeInTheDocument();
+    const { container } = render(<CharityDepositTable list={list} />);
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(20);
+  });
+
+  it('names itself with a visible heading when given a title', () => {
+    render(<CharityDepositTable list={[createDonation()]} title="Contribution records" />);
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Contribution records' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('table', { name: 'Contribution records' })).toBeInTheDocument();
+  });
+
+  it('holds placeholder rows while the page loads', () => {
+    render(<CharityDepositTable list={[]} loading />);
+    expect(screen.getByRole('table')).toHaveAttribute('aria-busy', 'true');
   });
 
   it('sets rel="noopener noreferrer" on all target="_blank" links', () => {

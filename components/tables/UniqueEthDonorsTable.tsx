@@ -1,91 +1,60 @@
-import { useState } from 'react';
+'use client';
+
+import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 
-import {
-  TablePrimary,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryContainer,
-  TablePrimaryHead,
-  TablePrimaryHeadCell,
-  TablePrimaryRow,
-} from '@/components/styled';
-import { CustomPagination } from '@/components/common/CustomPagination';
-import { AddressLink } from '@/components/common/AddressLink';
-import { TableHeaderHelp } from '@/components/tables/TableHeaderHelp';
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+import type { LedgerStateProps } from '@/components/tables/ledger-props';
 import type { UniqueEthDonor } from '@/services/api/types';
 
 export type { UniqueEthDonor };
 
-const UniqueEthDonorsRow = ({ row }: { row: UniqueEthDonor }) => {
+interface UniqueEthDonorsTableProps extends LedgerStateProps {
+  list: UniqueEthDonor[];
+}
+
+/** Every wallet that has contributed ETH, with its contribution count and total. */
+export const UniqueEthDonorsTable = ({ list, ...state }: UniqueEthDonorsTableProps) => {
   const t = useTranslations('tables');
 
-  if (!row) {
-    return <TablePrimaryRow />;
-  }
-
-  const totalDonated = row.TotalDonatedEth;
-
-  return (
-    <TablePrimaryRow>
-      <TablePrimaryCell label={t('columns.contributorAddress')}>
-        <AddressLink address={row.DonorAddr} url={`/user/${row.DonorAddr}`} />
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.numberOfContributions')} align="center">
-        {row.CountDonations}
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.totalContributedEth')} align="right">
-        {typeof totalDonated === 'number' && Number.isFinite(totalDonated)
-          ? totalDonated.toFixed(2)
-          : '—'}
-      </TablePrimaryCell>
-    </TablePrimaryRow>
+  const columns = useMemo<DataTableColumn<UniqueEthDonor>[]>(
+    () => [
+      {
+        id: 'contributor',
+        kind: 'address',
+        header: t('columns.contributorAddress'),
+        help: t('statisticsTooltips.contributorAddress'),
+        value: (row) => row.DonorAddr,
+      },
+      {
+        id: 'contributions',
+        kind: 'count',
+        header: t('columns.numberOfContributions'),
+        help: t('statisticsTooltips.numberOfContributions'),
+        value: (row) => row.CountDonations,
+        sortable: true,
+      },
+      {
+        id: 'total',
+        kind: 'amount',
+        header: t('columns.totalContributedEth'),
+        help: t('statisticsTooltips.totalContributedEth'),
+        value: (row) => row.TotalDonatedEth,
+        showUnit: false,
+        sortable: true,
+      },
+    ],
+    [t],
   );
-};
-
-export const UniqueEthDonorsTable = ({ list }: { list: UniqueEthDonor[] }) => {
-  const t = useTranslations('tables');
-  const perPage = 5;
-  const [page, setPage] = useState(1);
-
-  if (!list || list.length === 0) {
-    return <p>{t('empty.contributors')}</p>;
-  }
 
   return (
-    <div className="w-full">
-      <TablePrimaryContainer>
-        <TablePrimary>
-          <TablePrimaryHead>
-            <tr>
-              <TablePrimaryHeadCell align="left">
-                <TableHeaderHelp
-                  desktop={t('columns.contributorAddress')}
-                  tooltip={t('statisticsTooltips.contributorAddress')}
-                />
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>
-                <TableHeaderHelp
-                  desktop={t('columns.numberOfContributions')}
-                  tooltip={t('statisticsTooltips.numberOfContributions')}
-                />
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">
-                <TableHeaderHelp
-                  desktop={t('columns.totalContributedEth')}
-                  tooltip={t('statisticsTooltips.totalContributedEth')}
-                />
-              </TablePrimaryHeadCell>
-            </tr>
-          </TablePrimaryHead>
-          <TablePrimaryBody>
-            {list.slice((page - 1) * perPage, page * perPage).map((donor) => (
-              <UniqueEthDonorsRow row={donor} key={donor.DonorAid} />
-            ))}
-          </TablePrimaryBody>
-        </TablePrimary>
-      </TablePrimaryContainer>
-      <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
-    </div>
+    <DataTable
+      data={list ?? []}
+      columns={columns}
+      ariaLabel={t('names.ethContributors')}
+      getRowKey={(row) => row.DonorAid}
+      emptyTitle={t('empty.contributors')}
+      {...state}
+    />
   );
 };

@@ -73,17 +73,17 @@ describe('UniqueParticipantsTable', () => {
     expect(screen.getByText('<0.0001')).toBeInTheDocument();
   });
 
-  it('renders only first page of results (perPage=5)', () => {
-    const list = Array.from({ length: 8 }, (_, i) =>
+  it('shows 20 rows a page with the row range', () => {
+    const list = Array.from({ length: 25 }, (_, i) =>
       createParticipant({
         BidderAid: String(i),
         BidderAddr: `0x${String(i).padStart(40, '0')}`,
         NumBids: i + 1,
       }),
     );
-    render(<UniqueParticipantsTable list={list} />);
-    expect(screen.getByText('5')).toBeInTheDocument();
-    expect(screen.queryByText('6')).not.toBeInTheDocument();
+    const { container } = render(<UniqueParticipantsTable list={list} />);
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(20);
+    expect(screen.getByText('tables.pagination.range(from=1,to=20,total=25)')).toBeInTheDocument();
   });
 
   it('renders address as link to user page', () => {

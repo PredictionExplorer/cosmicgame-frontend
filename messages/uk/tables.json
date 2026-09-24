@@ -1,30 +1,32 @@
 {
   "empty": {
-    "gestures": "Жестів ще немає.",
-    "gestureHistory": "Історії жестів ще немає.",
-    "participants": "Учасників ще немає.",
-    "recipients": "Отримувачів ще немає.",
+    "gestures": "Жестів ще немає",
+    "gestureHistory": "Історії жестів ще немає",
+    "participants": "Учасників ще немає",
+    "recipients": "Отримувачів ще немає",
     "recipientCyclesTitle": "Отримувачів ще немає",
     "recipientCyclesDescription": "Жоден перформанс-цикл ще не завершено.",
     "allocations": "Розподілів ще немає.",
+    "outreachAllocations": "Розподілів із резерву просування ще немає",
     "anchorActions": "Дій закріплення ще немає.",
-    "anchorHolders": "Власників закріплень ще немає.",
+    "anchorHolders": "Власників закріплень ще немає",
     "anchoredTokens": "Закріплених токенів ще немає.",
-    "contributions": "Внесків ще немає.",
-    "contributors": "Авторів внесків ще немає.",
+    "contributions": "Внесків ще немає",
+    "contributors": "Авторів внесків ще немає",
     "publicGoods": "Активності суспільних благ ще немає.",
     "stellarSelection": "Розподілів зоряного відбору ще немає.",
     "tokens": "Токенів ще немає.",
     "holders": "Власників ще немає.",
-    "spenders": "Витрат ще немає.",
-    "enduranceChampions": "Чемпіонів витривалості ще немає.",
+    "stellarEntries": "Записів зоряного відбору ще немає",
+    "spenders": "Витрат ще немає",
+    "enduranceChampions": "Чемпіонів витривалості ще немає",
     "attachedNfts": "Долучених NFT ще немає.",
     "attachedTokens": "Долучених токенів ще немає.",
     "systemEvents": "Системних подій ще немає.",
-    "modeChanges": "Змін режиму ще немає.",
-    "events": "Подій ще немає.",
-    "history": "Історії ще немає.",
-    "retrievals": "Забирань ще немає.",
+    "modeChanges": "Змін режиму ще немає",
+    "events": "Подій ще немає",
+    "history": "Історії ще немає",
+    "retrievals": "Забирань ще немає",
     "generic": "Немає даних.",
     "nothingHere": "Поки що порожньо"
   },
@@ -71,7 +73,6 @@
   "status": {
     "loading": "Завантаження…",
     "live": "Наживо",
-    "you": "(ви)",
     "youBadge": "Ви",
     "yes": "Так",
     "no": "Ні",
@@ -128,6 +129,8 @@
     "event": "Подія",
     "newValue": "Нове значення",
     "recordType": "Тип запису",
+    "source": "Джерело",
+    "received": "Отримано",
     "position": "Позиція",
     "note": "Примітка",
     "userAddress": "Адреса користувача",
@@ -148,8 +151,31 @@
     "actions": "Дії",
     "selected": "Обрано"
   },
+  "names": {
+    "participants": "Унікальні учасники",
+    "recipients": "Унікальні отримувачі",
+    "ethContributors": "Унікальні автори внесків ETH",
+    "cstAnchorHolders": "Власники закріплених Cosmic Signature NFT",
+    "rwlkAnchorHolders": "Власники закріплених RandomWalk NFT",
+    "publicGoodsContributions": "Внески в суспільні блага",
+    "publicGoodsRetrievals": "Забрані кошти суспільних благ",
+    "outreachAllocations": "Розподіли з резерву просування",
+    "parameterChanges": "Зміни параметрів",
+    "cycleActivations": "Активації циклів",
+    "nameHistory": "Історія назв",
+    "transfers": "Історія переказів",
+    "anchorDistribution": "Отримувачі надходжень за закріплення",
+    "ethContributions": "Внески ETH",
+    "allocationRecords": "Записи розподілів",
+    "allocationsByRecipient": "Розподіли за отримувачами",
+    "ethSpent": "Витрачено ETH за учасниками",
+    "stellarSelectionEntries": "Записи зоряного відбору",
+    "enduranceChampions": "Чемпіони витривалості",
+    "gestureMessages": "Повідомлення жестів"
+  },
   "pagination": {
     "label": "навігація сторінками",
+    "range": "{from}–{to} з {total}",
     "goToPage": "Перейти на сторінку:",
     "goToPageAria": "перейти на сторінку",
     "previous": "Попередня",
@@ -158,14 +184,18 @@
     "nextAria": "Перейти на наступну сторінку",
     "morePages": "Більше сторінок"
   },
-  "density": {
-    "groupLabel": "Щільність рядків",
-    "comfortable": "просторі",
-    "compact": "компактні",
-    "comfortableAria": "Просторі рядки",
-    "compactAria": "Компактні рядки",
-    "comfortableHelp": "Вищі рядки з більшими відступами для зручнішого перегляду.",
-    "compactHelp": "Нижчі рядки, щоб умістити більше записів розподілів на екрані."
+  "currentRow": {
+    "position": "Позиція {rank} з {total}",
+    "show": "Показати мій рядок"
+  },
+  "proof": {
+    "transactionNewTab": "Транзакція в оглядачі блоків, відкривається в новій вкладці"
+  },
+  "links": {
+    "newTab": "Відкривається в новій вкладці"
+  },
+  "details": {
+    "header": "Докладніше"
   },
   "skeleton": {
     "loadingText": "Завантаження тексту",
@@ -178,38 +208,52 @@
     "explainColumn": "Пояснити стовпець: {column}"
   },
   "adminEvents": {
-    "empty": "Подій ще немає."
+    "empty": "За цей період змін конфігурації не зафіксовано"
   },
   "allocation": {
     "cycle": "Цикл {cycle}",
-    "cycleAria": "Підсумок розподілів циклу {cycle}",
     "openDetails": "Відкрити докладну структуру розподілу для циклу {cycle}.",
     "allocationHelp": "Сума розподілу Сигнатури та гаманець отримувача в цьому циклі.",
-    "explore": "Переглянути",
-    "exploreAria": "Переглянути цикл {cycle}",
-    "exploreHelp": "Переглянути отримувачів, депозити та подробиці розподілу для циклу {cycle}.",
     "gestures": "Жести",
     "gesturesHelp": "Загальна кількість жестів у цьому циклі.",
-    "nfts": "NFT",
     "nftsHelp": "NFT, долучені до жестів у цьому циклі.",
-    "stellar": "Зоряний відбір",
     "stellarHelp": "ETH, спрямований до пулу зоряного відбору.",
-    "anchor": "Закріплення",
     "anchorHelp": "ETH, спрямований на надходження за закріплення.",
-    "distributed": "Передано",
     "distributedHelp": "Cosmic Signature NFT, передані через зоряний відбір.",
-    "loadingAria": "Завантаження циклів розподілу",
-    "listAria": "Отримувачі розподілів за циклами"
+    "listAria": "Отримувачі розподілів за циклами",
+    "columns": {
+      "finalized": "Завершено",
+      "signatureEth": "Розподіл Сигнатури (ETH)",
+      "chronoEth": "Воїн часу (ETH)",
+      "stellarEth": "Зоряний відбір (ETH)",
+      "anchorEth": "Надходження за закріплення (ETH)",
+      "nftsAttached": "Долучені NFT",
+      "nftsViaStellar": "NFT через зоряний відбір"
+    }
   },
   "anchoringRecipient": {
+    "emptyTitle": "У цьому циклі закріплених NFT не було",
     "empty": "На момент завершення циклу закріплених NFT не було. Частка надходжень за закріплення залишилася в резерві циклу."
+  },
+  "publicGoods": {
+    "voluntaryEmpty": "Внески, надіслані безпосередньо до сховища суспільних благ, з’являться тут. Сховище зберігає їх для бенефіціара, визначеного в налаштуваннях контракту."
   },
   "banGesture": {
     "banned": "Жест заблоковано.",
     "unbanned": "Блокування жесту знято.",
     "error": "Сталася помилка",
     "ban": "Заблокувати",
-    "unban": "Розблокувати"
+    "unban": "Розблокувати",
+    "visibilityLabel": "Показати повідомлення",
+    "hiddenTag": "Приховано",
+    "allCycles": "Усі цикли",
+    "search": "Пошук повідомлень",
+    "noMatches": "Немає повідомлень за цими фільтрами",
+    "filters": {
+      "all": "Усі",
+      "visible": "Видимі",
+      "hidden": "Приховані"
+    }
   },
   "ethContribution": {
     "withInfo": "Внесок із повідомленням",
@@ -236,29 +280,30 @@
     "removed": "Ім’я токена видалено."
   },
   "recipientHistory": {
-    "notApplicable": "н/д",
-    "unretrievedHelp": "Не забрано. Забрати можна на сторінці «Мої розподіли».",
-    "unretrievedAria": "Інформація про незабраний розподіл",
-    "types": {
-      "mainEth": "Основний розподіл ETH",
-      "mainCst": "CST основного розподілу Сигнатури",
-      "mainNft": "CS NFT основного розподілу Сигнатури",
-      "finalCstNft": "CS NFT завершального CST-жесту",
-      "finalCstRecognition": "CST визнання за завершальний CST-жест",
-      "enduranceNft": "CS NFT Чемпіона витривалості",
-      "enduranceRecognition": "CST визнання Чемпіона витривалості",
-      "chronoEth": "ETH Воїна часу",
-      "chronoCst": "CST Воїна часу",
-      "chronoNft": "CS NFT Воїна часу",
-      "participantStellarEth": "Зоряний відбір ETH (для учасників)",
-      "participantStellarCst": "CST визнання із зоряного відбору (для учасників)",
-      "participantStellarNft": "Зоряний відбір CS NFT (для учасників)",
-      "anchorStellarCst": "CST визнання із зоряного відбору закріплених NFT (для власників закріплень RandomWalk)",
-      "anchorStellarNft": "Зоряний відбір CS NFT (для власників закріплень RandomWalk)",
-      "anchorDistributionEth": "ETH надходжень за закріплення (для власників закріплень Cosmic Signature NFT)",
-      "attachedNftRetrieval": "Долучений NFT (забирання після тайм-ауту)",
-      "attachedErc20Retrieval": "Долучений ERC-20 (забирання після тайм-ауту)",
-      "stellarEthRetrieval": "Зоряний відбір ETH (забирання після тайм-ауту)"
+    "sources": {
+      "signature": "Розподіл Сигнатури",
+      "finalCstGesture": "Завершальний CST-жест",
+      "enduranceChampion": "Чемпіон витривалості",
+      "chronoWarrior": "Воїн часу",
+      "stellarSelection": "Зоряний відбір",
+      "anchoredStellarSelection": "Зоряний відбір закріплених NFT",
+      "anchorDistribution": "Надходження за закріплення",
+      "attachedNftTimeout": "Долучений NFT (забирання після тайм-ауту)",
+      "attachedErc20Timeout": "Долучений ERC-20 (забирання після тайм-ауту)",
+      "stellarEthTimeout": "Зоряний відбір ETH (забирання після тайм-ауту)"
+    },
+    "nft": "NFT #{id}",
+    "readyToRetrieve": "Можна забрати",
+    "retrieve": "Забрати",
+    "retrieved": "Забрано",
+    "allAnchorHolders": "Усі власники закріплених Cosmic Signature NFT",
+    "showRecords": "{count, plural, one {Показати # запис} few {Показати # записи} many {Показати # записів} other {Показати # запису}}",
+    "hideRecords": "Сховати записи",
+    "totals": {
+      "eth": "Отримано ETH",
+      "cst": "Отримано CST",
+      "nfts": "Отримано NFT",
+      "cycles": "Цикли"
     }
   },
   "specialAllocation": {
@@ -323,18 +368,8 @@
     "printWindow": "Вікно: {duration}",
     "printReign": "Лідерство: {duration}"
   },
-  "stellarSelection": {
-    "ethDeposit": "Депозит ETH",
-    "anchoredNft": "Cosmic Signature NFT із зоряного відбору закріплених NFT",
-    "signatureNftSelection": "Зоряний відбір Cosmic Signature NFT",
-    "signatureNft": "Cosmic Signature NFT"
-  },
   "systemModes": {
     "viewEvent": "Переглянути системну подію: {scope}"
-  },
-  "transferHistory": {
-    "signatureAnchoringWallet": "Гаманець закріплення Cosmic Signature NFT",
-    "randomWalkAnchoringWallet": "Гаманець закріплення RandomWalk NFT"
   },
   "uniqueAnchorHolders": {
     "numAnchorActions": "Кількість закріплень",

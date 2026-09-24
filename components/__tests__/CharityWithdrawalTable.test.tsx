@@ -30,7 +30,9 @@ describe('CharityWithdrawalTable', () => {
       screen.getByText(convertTimestampToDateTime(mockData[0]!.TimeStamp)),
     ).toBeInTheDocument();
     expect(screen.getByText('0x555e…\u20600e60')).toBeInTheDocument();
-    expect(screen.getByText(mockData[0]!.AmountEth.toFixed(6))).toBeInTheDocument();
+    // ETH reads at the ledger precision, with the exact value on hover.
+    const amount = screen.getByText('0.1004');
+    expect(amount).toHaveAttribute('title', expect.stringContaining('0.10041564272868614'));
   });
 
   test('external links have rel="noopener noreferrer"', () => {

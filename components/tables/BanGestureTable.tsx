@@ -1,29 +1,29 @@
-import { useCallback, useEffect, useState } from 'react';
+'use client';
+
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Search } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { getExplorerUrl } from '@/utils';
-
-import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
+import { formatCount } from '@/utils/format';
 import { Button } from '@/components/ui/button';
+import { DataTable, TableTag, type DataTableColumn } from '@/components/ui/data-table';
+import { Input } from '@/components/ui/input';
 import {
-  TablePrimaryContainer,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryHead,
-  TablePrimaryRow,
-  TablePrimaryHeadCell,
-  TablePrimary,
-} from '@/components/styled';
-import { CustomPagination } from '@/components/common/CustomPagination';
-import { AddressLink } from '@/components/common/AddressLink';
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { GestureMethodTag } from '@/components/tables/GestureMethodTag';
+import type { LedgerStateProps } from '@/components/tables/ledger-props';
 import api from '@/services/api';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { useNotification } from '@/contexts/NotificationContext';
-import { Link } from '@/i18n/navigation';
 import getErrorMessage from '@/utils/alert';
 import { reportError, getEthErrorMessage } from '@/utils/errors';
-import { cn } from '@/lib/utils';
 
 interface GestureHistory {
   EvtLogId: number;
@@ -35,200 +35,275 @@ interface GestureHistory {
   Message?: string;
 }
 
-interface HistoryRowProps {
-  history: GestureHistory;
-  isBanned: boolean;
-  updateBannedList: () => Promise<void> | void;
-}
-
-interface HistoryTableProps {
-  gestureHistory: GestureHistory[];
-  perPage: number;
-  curPage: number;
-}
-
-interface BanGestureTableProps {
+interface BanGestureTableProps extends LedgerStateProps {
   gestureHistory: GestureHistory[];
 }
 
-const gestureTypeBg: Record<number, string> = {
-  2: 'bg-teal-500/10',
-  1: 'bg-gray-500/10',
-  0: 'bg-black/10',
-};
+type Visibility = 'all' | 'visible' | 'hidden';
 
-const HistoryRow = ({ history, isBanned, updateBannedList }: HistoryRowProps) => {
+const VISIBILITY: readonly Visibility[] = ['all', 'visible', 'hidden'];
+const ALL_CYCLES = 'all';
+/** Enough messages to review at once without a page of tens of thousands of pixels. */
+const MODERATION_PAGE_SIZE = 25;
+
+/** Hides a gesture's message from public view, or restores it. */
+function ModerationAction({
+  gesture,
+  hidden,
+  onChanged,
+}: {
+  gesture: GestureHistory;
+  hidden: boolean;
+  onChanged: () => Promise<void> | void;
+}) {
   const t = useTranslations('tables');
   const tToast = useTranslations('toasts');
   const locale = useLocale();
   const { account } = useActiveWeb3React();
   const { setNotification } = useNotification();
+  const [busy, setBusy] = useState(false);
 
-  const handleBan = async () => {
+  const run = async () => {
+    setBusy(true);
     try {
-      await api.ban_bid(history.EvtLogId, account as string);
-      updateBannedList();
+      if (hidden) await api.unban_gesture(gesture.EvtLogId);
+      else await api.ban_bid(gesture.EvtLogId, account as string);
+      await onChanged();
       setNotification({
         visible: true,
         type: 'success',
-        text: tToast('admin.gestureBan.banned'),
+        text: tToast(hidden ? 'admin.gestureBan.unbanned' : 'admin.gestureBan.banned'),
       });
-    } catch (e) {
-      reportError(e, 'ban gesture');
-      const rawMsg = getEthErrorMessage(e, tToast('admin.gestureBan.failed'), { locale });
-      if (rawMsg) {
-        const msg = getErrorMessage(rawMsg) || rawMsg;
-        setNotification({ visible: true, text: msg, type: 'error' });
+    } catch (error) {
+      reportError(error, hidden ? 'unban gesture' : 'ban gesture');
+      const rawMessage = getEthErrorMessage(error, tToast('admin.gestureBan.failed'), { locale });
+      if (rawMessage) {
+        setNotification({
+          visible: true,
+          type: 'error',
+          text: getErrorMessage(rawMessage) || rawMessage,
+        });
       }
+    } finally {
+      setBusy(false);
     }
   };
-
-  const handleUnban = async () => {
-    try {
-      await api.unban_gesture(history.EvtLogId);
-      updateBannedList();
-      setNotification({
-        visible: true,
-        type: 'success',
-        text: tToast('admin.gestureBan.unbanned'),
-      });
-    } catch (e) {
-      reportError(e, 'unban gesture');
-      const rawMsg = getEthErrorMessage(e, tToast('admin.gestureBan.failed'), { locale });
-      if (rawMsg) {
-        const msg = getErrorMessage(rawMsg) || rawMsg;
-        setNotification({ visible: true, text: msg, type: 'error' });
-      }
-    }
-  };
-
-  if (!history) {
-    return <TablePrimaryRow />;
-  }
 
   return (
-    <TablePrimaryRow className={cn(gestureTypeBg[history.GestureType] || 'bg-black/10')}>
-      <TablePrimaryCell label={t('columns.date')}>
-        <a
-          className="text-inherit"
-          href={getExplorerUrl('tx', history.TxHash)}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <HydrationSafeDateTime timestamp={history.TimeStamp} locale={locale} />
-        </a>
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.participant')} align="center">
-        <AddressLink address={history.BidderAddr} url={`/user/${history.BidderAddr}`} />
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.cycle')} align="center">
-        <Link
-          className="text-inherit"
-          href={`/allocation/${history.RoundNum}`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {history.RoundNum}
-        </Link>
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.gestureType')} align="center">
-        {history.GestureType === 2 ? 'CST' : history.GestureType === 1 ? 'RWLK' : 'ETH'}
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.message')}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            {/*
-             * The desktop ellipsis hid the message behind a hover tooltip that
-             * touch users cannot open, so on a phone it wraps in full instead.
-             */}
-            <span className="block break-words sm:max-w-[18rem] sm:truncate">
-              {history.Message}
-            </span>
-          </TooltipTrigger>
-          <TooltipContent>{history.Message || ''}</TooltipContent>
-        </Tooltip>
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.actions')} align="center">
-        {isBanned ? (
-          <Button variant="ghost" size="sm" onClick={handleUnban}>
-            {t('banGesture.unban')}
-          </Button>
-        ) : (
-          <Button variant="ghost" size="sm" onClick={handleBan}>
-            {t('banGesture.ban')}
-          </Button>
-        )}
-      </TablePrimaryCell>
-    </TablePrimaryRow>
+    <Button
+      variant={hidden ? 'outline' : 'ghost'}
+      size="sm"
+      onClick={run}
+      disabled={busy}
+      className="px-3"
+    >
+      {hidden ? t('banGesture.unban') : t('banGesture.ban')}
+    </Button>
   );
-};
+}
 
-const HistoryTable = ({ gestureHistory, perPage, curPage }: HistoryTableProps) => {
+/**
+ * Gesture messages for moderation, 25 at a time: filter by visibility, cycle
+ * or text, then hide a message from public view or restore it. A hidden
+ * message is marked with a tag and set in the subtle tier.
+ */
+const BanGestureTable = ({ gestureHistory, ...state }: BanGestureTableProps) => {
   const t = useTranslations('tables');
-  const [bannedList, setBannedList] = useState<number[]>([]);
+  const locale = useLocale();
+  const [hiddenIds, setHiddenIds] = useState<ReadonlySet<number>>(() => new Set());
+  const [visibility, setVisibility] = useState<Visibility>('all');
+  const [cycle, setCycle] = useState<string>(ALL_CYCLES);
+  const [query, setQuery] = useState('');
 
-  const getBannedList = useCallback(async () => {
-    const gestures = await api.get_banned_bids();
-    setBannedList(gestures.map((x: { bid_id: number }) => x.bid_id));
+  const refreshHidden = useCallback(async () => {
+    const hidden = await api.get_banned_bids();
+    setHiddenIds(new Set(hidden.map((entry: { bid_id: number }) => entry.bid_id)));
   }, []);
 
   useEffect(() => {
-    getBannedList(); // eslint-disable-line react-hooks/set-state-in-effect
-  }, [getBannedList]);
+    // The moderation list is admin-only and cheap; it loads once and after
+    // every change.
+    void refreshHidden(); // eslint-disable-line react-hooks/set-state-in-effect -- async fetch on mount
+  }, [refreshHidden]);
 
-  const displayedGestures = gestureHistory.slice((curPage - 1) * perPage, curPage * perPage);
-
-  return (
-    <TablePrimaryContainer>
-      <TablePrimary>
-        <TablePrimaryHead>
-          <tr>
-            <TablePrimaryHeadCell align="left">{t('columns.date')}</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>{t('columns.participant')}</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>{t('columns.cycle')}</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>{t('columns.gestureType')}</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="left">{t('columns.message')}</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>
-              <span className="sr-only">{t('columns.actions')}</span>
-            </TablePrimaryHeadCell>
-          </tr>
-        </TablePrimaryHead>
-        <TablePrimaryBody>
-          {displayedGestures.map((history) => (
-            <HistoryRow
-              key={history.EvtLogId}
-              history={history}
-              isBanned={bannedList.includes(history.EvtLogId)}
-              updateBannedList={getBannedList}
-            />
-          ))}
-        </TablePrimaryBody>
-      </TablePrimary>
-    </TablePrimaryContainer>
+  const cycles = useMemo(
+    () => [...new Set(gestureHistory.map((gesture) => gesture.RoundNum))].sort((a, b) => b - a),
+    [gestureHistory],
   );
-};
 
-const BanGestureTable = ({ gestureHistory }: BanGestureTableProps) => {
-  const t = useTranslations('tables');
-  const perPage = 200;
-  const [curPage, setCurrentPage] = useState(1);
+  const counts = useMemo(() => {
+    const hidden = gestureHistory.filter((gesture) => hiddenIds.has(gesture.EvtLogId)).length;
+    return { all: gestureHistory.length, hidden, visible: gestureHistory.length - hidden };
+  }, [gestureHistory, hiddenIds]);
+
+  const rows = useMemo(() => {
+    const needle = query.trim().toLocaleLowerCase(locale);
+    return gestureHistory.filter((gesture) => {
+      const hidden = hiddenIds.has(gesture.EvtLogId);
+      if (visibility === 'hidden' && !hidden) return false;
+      if (visibility === 'visible' && hidden) return false;
+      if (cycle !== ALL_CYCLES && String(gesture.RoundNum) !== cycle) return false;
+      return !needle || (gesture.Message ?? '').toLocaleLowerCase(locale).includes(needle);
+    });
+  }, [gestureHistory, hiddenIds, visibility, cycle, query, locale]);
+
+  const columns = useMemo<DataTableColumn<GestureHistory>[]>(
+    () => [
+      {
+        id: 'date',
+        kind: 'datetime',
+        header: t('columns.date'),
+        value: (gesture) => gesture.TimeStamp,
+        txHash: (gesture) => gesture.TxHash,
+      },
+      {
+        id: 'participant',
+        kind: 'address',
+        header: t('columns.participant'),
+        value: (gesture) => gesture.BidderAddr,
+      },
+      {
+        id: 'cycle',
+        kind: 'link',
+        header: t('columns.cycle'),
+        value: (gesture) => gesture.RoundNum,
+        href: (gesture) => `/allocation/${gesture.RoundNum}`,
+        priority: 'secondary',
+      },
+      {
+        id: 'type',
+        kind: 'text',
+        header: t('columns.gestureType'),
+        value: (gesture) => gesture.GestureType,
+        cell: (gesture) => (
+          <GestureMethodTag gestureType={gesture.GestureType} unknownLabel={t('status.unknown')} />
+        ),
+        priority: 'secondary',
+      },
+      {
+        id: 'message',
+        kind: 'text',
+        header: t('columns.message'),
+        value: (gesture) => gesture.Message,
+        cell: (gesture) => {
+          const hidden = hiddenIds.has(gesture.EvtLogId);
+          return (
+            <span className="flex flex-col items-start gap-1">
+              {hidden ? <TableTag>{t('banGesture.hiddenTag')}</TableTag> : null}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  {/*
+                   * Two lines on a desktop row, the whole message on a phone.
+                   * `max-w-full`: as a start-aligned flex item the span would
+                   * otherwise size to an unbroken word and never wrap it.
+                   */}
+                  <span
+                    className={cn(
+                      'block max-w-full break-words sm:line-clamp-2',
+                      hidden ? 'text-subtle' : 'text-foreground',
+                    )}
+                  >
+                    {gesture.Message}
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-[min(24rem,90vw)] break-words">
+                  {gesture.Message}
+                </TooltipContent>
+              </Tooltip>
+            </span>
+          );
+        },
+        stack: true,
+        width: '100%',
+      },
+      {
+        id: 'action',
+        kind: 'text',
+        header: <span className="sr-only">{t('columns.actions')}</span>,
+        // The button names itself; a phone record shows it unlabelled.
+        label: '',
+        align: 'end',
+        cell: (gesture) => (
+          <ModerationAction
+            gesture={gesture}
+            hidden={hiddenIds.has(gesture.EvtLogId)}
+            onChanged={refreshHidden}
+          />
+        ),
+      },
+    ],
+    [t, hiddenIds, refreshHidden],
+  );
+
+  const toolbar = (
+    <div className="mb-4 flex flex-wrap items-center gap-3">
+      <div
+        role="group"
+        aria-label={t('banGesture.visibilityLabel')}
+        className="inline-flex rounded-control border border-input bg-surface-sunken p-0.5"
+      >
+        {VISIBILITY.map((option) => (
+          <button
+            key={option}
+            type="button"
+            aria-pressed={visibility === option}
+            onClick={() => setVisibility(option)}
+            className={cn(
+              'inline-flex h-11 items-center gap-1.5 rounded-[calc(var(--radius-control)-2px)] px-3 type-body-sm',
+              'text-muted-foreground transition-colors duration-[var(--duration-fast)] hover:text-foreground sm:h-8',
+              visibility === option && 'bg-surface-raised text-foreground',
+            )}
+          >
+            {t(`banGesture.filters.${option}`)}
+            <span className="tabular-nums text-subtle">{formatCount(counts[option], locale)}</span>
+          </button>
+        ))}
+      </div>
+      <Select value={cycle} onValueChange={setCycle}>
+        <SelectTrigger className="h-11 w-auto min-w-36 sm:h-9" aria-label={t('columns.cycle')}>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value={ALL_CYCLES}>{t('banGesture.allCycles')}</SelectItem>
+          {cycles.map((round) => (
+            <SelectItem key={round} value={String(round)}>
+              {t('allocation.cycle', { cycle: round })}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <label className="relative min-w-0 flex-1 basis-56">
+        <span className="sr-only">{t('banGesture.search')}</span>
+        <Search
+          aria-hidden
+          className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-subtle"
+        />
+        <Input
+          type="search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder={t('banGesture.search')}
+          className="pl-9 sm:h-9"
+        />
+      </label>
+    </div>
+  );
+
+  const filtered = rows.length !== gestureHistory.length;
 
   return (
-    <div className="mt-4">
-      {gestureHistory.length > 0 ? (
-        <>
-          <HistoryTable gestureHistory={gestureHistory} perPage={perPage} curPage={curPage} />
-          <CustomPagination
-            page={curPage}
-            setPage={setCurrentPage}
-            totalLength={gestureHistory.length}
-            perPage={perPage}
-          />
-        </>
-      ) : (
-        <p>{t('empty.gestureHistory')}</p>
-      )}
-    </div>
+    <DataTable
+      data={rows}
+      columns={columns}
+      ariaLabel={t('names.gestureMessages')}
+      toolbar={gestureHistory.length > 0 ? toolbar : undefined}
+      getRowKey={(gesture) => gesture.EvtLogId}
+      emptyTitle={filtered ? t('banGesture.noMatches') : t('empty.gestureHistory')}
+      pageSize={MODERATION_PAGE_SIZE}
+      resetPageKey={`${visibility}|${cycle}|${query}`}
+      layout="cards"
+      {...state}
+    />
   );
 };
 

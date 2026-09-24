@@ -51,7 +51,7 @@ describe('EthDonationTable', () => {
 
   it('renders amount', () => {
     render(<EthDonationTable list={[createDonation({ AmountEth: 0.5 })]} />);
-    expect(screen.getByText('0.50')).toBeInTheDocument();
+    expect(screen.getByText('0.5000')).toBeInTheDocument();
   });
 
   it('shows contribution type when showType is true', () => {
@@ -82,12 +82,18 @@ describe('EthDonationTable', () => {
     expect(datetimeLink.closest('a')).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
-  it('renders round number as a link', () => {
+  it('links the cycle to its contribution list in the same tab', () => {
     render(<EthDonationTable list={[createDonation({ RoundNum: '5' })]} />);
     const roundLink = screen.getByText('5');
-    expect(roundLink.closest('a')).toHaveAttribute('href', '/allocation/5');
-    expect(roundLink.closest('a')).toHaveAttribute('target', '_blank');
-    expect(roundLink.closest('a')).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(roundLink.closest('a')).toHaveAttribute('href', '/eth-contribution/round/5');
+    expect(roundLink.closest('a')).not.toHaveAttribute('target');
+  });
+
+  it('hides the cycle column on a page about one cycle', () => {
+    render(<EthDonationTable list={[createDonation({ RoundNum: '5' })]} showCycle={false} />);
+    expect(
+      screen.queryByRole('columnheader', { name: 'tables.columns.round' }),
+    ).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

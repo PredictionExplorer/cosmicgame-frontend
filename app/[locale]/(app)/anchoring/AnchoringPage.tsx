@@ -180,7 +180,9 @@ const AnchoringPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
         <ArrowRight className="h-5 w-5 text-primary opacity-60 transition-transform group-hover:translate-x-1 group-hover:opacity-100" />
       </Link>
 
-      <div>
+      {/* The gap below the section is its own, like its siblings' mb-10:
+          a table that fits one page no longer carries a pager to space it. */}
+      <div className="mb-10">
         <SectionDivider title={t('overview.sections.cosmicSignature')} />
         {loading ? (
           <div className="space-y-3 py-4">

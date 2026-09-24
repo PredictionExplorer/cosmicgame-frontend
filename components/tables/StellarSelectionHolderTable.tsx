@@ -1,167 +1,123 @@
-import { useEffect, useState } from 'react';
+'use client';
+
+import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 
-import type { GestureInfo } from '@/services/api';
-import {
-  TablePrimaryContainer,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryHead,
-  TablePrimaryRow,
-  TablePrimary,
-  TablePrimaryHeadCell,
-} from '@/components/styled';
-import { CustomPagination } from '@/components/common/CustomPagination';
-import { AddressLink } from '@/components/common/AddressLink';
+import { sameAddress } from '@/utils/format';
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+import type { LedgerStateProps } from '@/components/tables/ledger-props';
 import { useActiveWeb3React } from '@/hooks/web3';
+import type { GestureInfo } from '@/services/api';
 
-interface HolderRowProps {
-  holder: {
-    userAddr: string;
-    count: number;
-    ethProbability: number;
-    NFTProbability: number;
-  } | null;
+interface Holder {
+  userAddr: string;
+  count: number;
+  ethProbability: number;
+  NFTProbability: number;
 }
 
-const HolderRow = ({ holder }: HolderRowProps) => {
-  const t = useTranslations('tables');
-  const { account } = useActiveWeb3React();
-
-  if (!holder) {
-    return <TablePrimaryRow />;
-  }
-
-  const isCurrentUser = holder && account === holder.userAddr;
-
-  return (
-    <TablePrimaryRow className={isCurrentUser ? 'bg-white/[0.06]' : undefined}>
-      <TablePrimaryCell label={t('columns.holder')} align="left">
-        <AddressLink address={holder?.userAddr ?? ''} url={`/user/${holder?.userAddr ?? ''}`} />
-        &nbsp;
-        {isCurrentUser && t('status.you')}
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.numberOfStellarEntries')} align="center">
-        {holder?.count ?? 0}
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.ethSelectionProbability')} align="center">
-        {((holder?.ethProbability ?? 0) * 100).toFixed(2)}%
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.nftSelectionProbability')} align="center">
-        {((holder?.NFTProbability ?? 0) * 100).toFixed(2)}%
-      </TablePrimaryCell>
-    </TablePrimaryRow>
-  );
-};
-
-interface StellarSelectionHolderTableProps {
+interface StellarSelectionHolderTableProps extends LedgerStateProps {
   list: GestureInfo[];
   numRaffleEthWinner?: number;
   numRaffleNFTWinner?: number;
 }
 
+/**
+ * Stellar Selection entries per participant this cycle (one per gesture),
+ * most first, with the chance of at least one ETH or NFT selection given the
+ * cycle's number of selections.
+ */
+function holdersFrom(
+  list: readonly GestureInfo[],
+  ethSelections: number,
+  nftSelections: number,
+): Holder[] {
+  const counts = new Map<string, { userAddr: string; count: number }>();
+  for (const gesture of list) {
+    const key = gesture.BidderAddr.toLowerCase();
+    const entry = counts.get(key) ?? { userAddr: gesture.BidderAddr, count: 0 };
+    entry.count += 1;
+    counts.set(key, entry);
+  }
+  const total = list.length;
+  return [...counts.values()]
+    .map(({ userAddr, count }) => ({
+      userAddr,
+      count,
+      ethProbability: 1 - Math.pow((total - count) / total, ethSelections),
+      NFTProbability: 1 - Math.pow((total - count) / total, nftSelections),
+    }))
+    .sort((a, b) => b.count - a.count);
+}
+
+/**
+ * The cycle's Stellar Selection entries by participant. The connected
+ * wallet's row stays at its true position, marked "You", with its position
+ * above the table; it is never lifted to the top.
+ */
 const StellarSelectionHolderTable = ({
   list,
   numRaffleEthWinner,
   numRaffleNFTWinner,
+  ...state
 }: StellarSelectionHolderTableProps) => {
   const t = useTranslations('tables');
-  const perPage = 5;
-  const [page, setPage] = useState(1);
-  const [holderList, setHolderList] = useState<
-    | {
-        userAddr: string;
-        count: number;
-        ethProbability: number;
-        NFTProbability: number;
-      }[]
-    | null
-  >(null);
-
   const { account } = useActiveWeb3React();
+  const ready = Boolean(numRaffleEthWinner && numRaffleNFTWinner);
 
-  useEffect(() => {
-    const groupAndCountByParticipantAddr = () => {
-      const result: { [key: string]: number } = {};
+  const holders = useMemo(
+    () =>
+      ready && list.length > 0
+        ? holdersFrom(list, numRaffleEthWinner ?? 1, numRaffleNFTWinner ?? 1)
+        : [],
+    [ready, list, numRaffleEthWinner, numRaffleNFTWinner],
+  );
 
-      list.forEach((event: GestureInfo) => {
-        const addr = event.BidderAddr;
-        if (result[addr]) {
-          result[addr]++;
-        } else {
-          result[addr] = 1;
-        }
-      });
-
-      const sortedResults = Object.entries(result)
-        .map(([bidderAddr, count]) => ({
-          userAddr: bidderAddr,
-          count,
-          ethProbability:
-            1 - Math.pow((list.length - count) / list.length, numRaffleEthWinner ?? 1),
-          NFTProbability:
-            1 - Math.pow((list.length - count) / list.length, numRaffleNFTWinner ?? 1),
-        }))
-        .sort((a, b) => b.count - a.count);
-
-      const userIndex = sortedResults.findIndex((item) => item.userAddr === account);
-      if (userIndex !== -1) {
-        const userItem = sortedResults.splice(userIndex, 1)[0];
-        if (userItem) sortedResults.unshift(userItem);
-      }
-
-      return sortedResults;
-    };
-
-    if (numRaffleEthWinner && numRaffleNFTWinner) {
-      const holders = groupAndCountByParticipantAddr();
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setHolderList(holders);
-    }
-  }, [list, numRaffleEthWinner, numRaffleNFTWinner, account]);
-
-  if (list.length === 0) {
-    return <p>{t('empty.holders')}</p>;
-  }
+  const columns = useMemo<DataTableColumn<Holder>[]>(
+    () => [
+      {
+        id: 'holder',
+        kind: 'address',
+        header: t('columns.holder'),
+        value: (row) => row.userAddr,
+      },
+      {
+        id: 'entries',
+        kind: 'count',
+        header: t('columns.numberOfStellarEntries'),
+        value: (row) => row.count,
+      },
+      {
+        id: 'ethProbability',
+        kind: 'percent',
+        header: t('columns.ethSelectionProbability'),
+        value: (row) => row.ethProbability,
+        percentScale: 'ratio',
+      },
+      {
+        id: 'nftProbability',
+        kind: 'percent',
+        header: t('columns.nftSelectionProbability'),
+        value: (row) => row.NFTProbability,
+        percentScale: 'ratio',
+      },
+    ],
+    [t],
+  );
 
   return (
-    <>
-      {holderList === null ? (
-        <p className="text-lg font-semibold">{t('status.loading')}</p>
-      ) : (
-        <>
-          <TablePrimaryContainer>
-            <TablePrimary>
-              <TablePrimaryHead>
-                <tr>
-                  <TablePrimaryHeadCell align="left">{t('columns.holder')}</TablePrimaryHeadCell>
-                  <TablePrimaryHeadCell align="center">
-                    {t('columns.numberOfStellarEntries')}
-                  </TablePrimaryHeadCell>
-                  <TablePrimaryHeadCell align="center">
-                    {t('columns.ethSelectionProbability')}
-                  </TablePrimaryHeadCell>
-                  <TablePrimaryHeadCell align="center">
-                    {t('columns.nftSelectionProbability')}
-                  </TablePrimaryHeadCell>
-                </tr>
-              </TablePrimaryHead>
-              <TablePrimaryBody>
-                {holderList.slice((page - 1) * perPage, page * perPage).map((holder) => (
-                  <HolderRow key={holder.userAddr} holder={holder} />
-                ))}
-              </TablePrimaryBody>
-            </TablePrimary>
-          </TablePrimaryContainer>
-          <CustomPagination
-            page={page}
-            setPage={setPage}
-            totalLength={holderList.length}
-            perPage={perPage}
-          />
-        </>
-      )}
-    </>
+    <DataTable
+      data={holders}
+      columns={columns}
+      ariaLabel={t('names.stellarSelectionEntries')}
+      getRowKey={(row) => row.userAddr}
+      isCurrentRow={(row) => sameAddress(row.userAddr, account)}
+      emptyTitle={t('empty.stellarEntries')}
+      {...state}
+      // The chances need the cycle's selection counts; until they arrive the
+      // rows are placeholders rather than an empty table.
+      loading={state.loading || (list.length > 0 && !ready)}
+    />
   );
 };
 

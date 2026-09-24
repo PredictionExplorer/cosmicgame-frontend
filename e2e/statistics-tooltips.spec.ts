@@ -109,36 +109,38 @@ test.describe('/statistics tooltips', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
 
     if (testInfo.project.name !== 'Desktop Chrome') {
-      // The card layout hides the header row, so there is no header tooltip to
-      // open on a phone. What has to hold instead is that each value still
-      // carries its column name: the header text stays in `thead` for assistive
-      // tech, and every cell repeats it from `data-label` via CSS `::before`.
+      // A three-column table stays a compact table on a phone, header row
+      // included, so its column names are visible text.
       const participantsTable = page
         .getByRole('table')
         .filter({ hasText: 'Participant Address' })
         .first();
-      await expect(participantsTable.locator('thead th').first()).toContainText(
-        'Participant Address',
+      await participantsTable.scrollIntoViewIfNeeded();
+      await expect(participantsTable).toHaveAttribute('data-layout', 'compact');
+      await expect(participantsTable.locator('thead th').first()).toBeVisible();
+
+      // A wider table becomes one record per row. Each value still carries its
+      // column name: the header stays in `thead` for assistive tech, and every
+      // cell repeats it from `data-label` via CSS `::before`.
+      const recipientsTable = page
+        .getByRole('table')
+        .filter({ hasText: 'Recipient Address' })
+        .first();
+      await expect(recipientsTable).toHaveAttribute('data-layout', 'cards');
+      const firstRecipientRow = recipientsTable.locator('tbody tr').first();
+      await firstRecipientRow.scrollIntoViewIfNeeded();
+      await expect(firstRecipientRow.locator('td').first()).toHaveAttribute(
+        'data-label',
+        'Recipient Address',
       );
 
-      const firstParticipantRow = participantsTable.locator('tbody tr').first();
-      await firstParticipantRow.scrollIntoViewIfNeeded();
-      await expect(firstParticipantRow.locator('td').first()).toHaveAttribute(
-        'data-label',
-        'Participant Address',
-      );
-      await expect(firstParticipantRow.locator('td').nth(1)).toHaveAttribute(
-        'data-label',
-        'Number of Gestures',
-      );
-
-      const renderedLabels = await firstParticipantRow
+      const renderedLabels = await firstRecipientRow
         .locator('td')
         .evaluateAll((cells) =>
           cells.map((cell) => getComputedStyle(cell, '::before').content.replace(/^"|"$/g, '')),
         );
       expect(renderedLabels).toEqual(
-        expect.arrayContaining(['Participant Address', 'Number of Gestures']),
+        expect.arrayContaining(['Recipient Address', 'Allocations Received']),
       );
       return;
     }

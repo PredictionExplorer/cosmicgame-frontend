@@ -60,10 +60,13 @@ describe('EthDonationDetailPage', () => {
     expect(screen.getByText('0xDonor')).toBeInTheDocument();
   });
 
-  it('renders round number', () => {
+  it("links the cycle to that cycle's contribution list", () => {
     mockUseDonationsWithInfoById.mockReturnValue({ data: baseDonation, isLoading: false });
     render(<EthDonationDetailPage id={1} />);
-    expect(screen.getByRole('link', { name: /cycle 3/i })).toHaveAttribute('href', '/allocation/3');
+    expect(screen.getByRole('link', { name: /cycle 3/i })).toHaveAttribute(
+      'href',
+      '/eth-contribution/round/3',
+    );
   });
 
   it('renders amount in ETH', () => {

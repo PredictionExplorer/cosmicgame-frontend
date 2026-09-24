@@ -30,7 +30,7 @@ import {
   SignatureAllocationIcon,
   StellarSelectionIcon,
 } from '@/lib/conceptIcons';
-import { formatFixed, toIntlLocale } from '@/utils/format';
+import { formatCount, formatFixed, toIntlLocale } from '@/utils/format';
 import { ALLOCATION_TRACK_COLORS, type AllocationTrackId } from '@/config/allocationTracks';
 import { Link } from '@/i18n/navigation';
 import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
@@ -62,7 +62,7 @@ import AttachedERC20Table from '@/components/attachments/AttachedERC20Table';
 import RecipientHistoryTable, {
   type WinningHistoryEntry,
 } from '@/components/tables/RecipientHistoryTable';
-import { STELLAR_SELECTION_RECORD_TYPES } from '@/utils/allocationRecords';
+import { countRecipients, STELLAR_SELECTION_RECORD_TYPES } from '@/utils/allocationRecords';
 
 const sectionFade = {
   hidden: { opacity: 0, y: 24 },
@@ -881,8 +881,10 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
           </h2>
           <InfoTooltip content={t('details.ledger.tooltip')} />
           {cycleAllocationLedger.length > 0 ? (
+            // One row per recipient, so the count matches the table's rows
+            // rather than the records they gather.
             <span className="ml-1 rounded-full border border-white/[0.08] bg-white/[0.04] px-2 py-0.5 text-xs tabular-nums text-muted-foreground">
-              {cycleAllocationLedger.length}
+              {formatCount(countRecipients(cycleAllocationLedger), locale)}
             </span>
           ) : null}
         </div>
@@ -890,7 +892,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
           <RecipientHistoryTable
             winningHistory={cycleAllocationLedger}
             showRoundColumn={false}
-            perPage={10}
+            groupBy="recipient"
           />
         ) : (
           <p className="text-sm text-muted-foreground">{t('details.ledger.empty')}</p>
@@ -933,7 +935,11 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
 
           <TabsContent value="gestures" className="mt-6">
             {gestureHistory.length > 0 ? (
-              <GestureHistoryTable gestureHistory={gestureHistory} />
+              <GestureHistoryTable
+                gestureHistory={gestureHistory}
+                showRound={false}
+                heldUntil={allocationInfo.TimeStamp}
+              />
             ) : (
               <EmptyState title={t('details.data.empty.gestures')} />
             )}

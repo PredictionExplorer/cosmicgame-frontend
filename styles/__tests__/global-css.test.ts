@@ -8,8 +8,9 @@ import postcss, { type ChildNode, type Root, type Rule } from 'postcss';
 import { compile } from 'tailwindcss';
 
 /**
- * Site-wide guarantees in styles/global.css and styles/typography.css that
- * no component opts into, so nothing else would catch their removal.
+ * Site-wide guarantees in styles/global.css, styles/typography.css and
+ * styles/tables.css that no component opts into, so nothing else would catch
+ * their removal.
  */
 
 const STYLES = resolve(__dirname, '..');
@@ -17,6 +18,7 @@ const strip = (css: string) => css.replace(/\/\*[\s\S]*?\*\//g, '');
 const globalSource = readFileSync(resolve(STYLES, 'global.css'), 'utf8');
 const globalCss = strip(globalSource);
 const typographyCss = strip(readFileSync(resolve(STYLES, 'typography.css'), 'utf8'));
+const tablesCss = strip(readFileSync(resolve(STYLES, 'tables.css'), 'utf8'));
 
 /** styles/global.css as Tailwind compiles it for `candidates`, parsed. */
 async function compileGlobalCss(candidates: string[]): Promise<Root> {
@@ -143,7 +145,7 @@ describe('global typography guarantees', () => {
   });
 
   it('keeps the mobile table-card label at 12px or more, in the subtle tier', () => {
-    const label = ruleBody(globalCss, '.cs-table tbody td::before');
+    const label = ruleBody(tablesCss, ".cs-table:not([data-layout='compact']) tbody td::before");
     expect(label).toContain('color: hsl(var(--subtle-foreground))');
     for (const size of fontSizes(label)) expect(size).toBeGreaterThanOrEqual(12);
   });

@@ -52,7 +52,7 @@ const EthDonationByRoundPage = ({ round }: EthDonationByRoundPageProps) => {
           </div>
         ) : (
           <div className={cn(detailPanelClass, 'overflow-x-auto p-2 sm:p-4')}>
-            <EthDonationTable list={(donationInfo ?? []) as EthDonation[]} />
+            <EthDonationTable list={(donationInfo ?? []) as EthDonation[]} showCycle={false} />
           </div>
         )}
       </div>

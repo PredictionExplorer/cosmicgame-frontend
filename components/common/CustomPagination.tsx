@@ -1,14 +1,4 @@
-import { useMemo, type ChangeEvent } from 'react';
-import { useTranslations } from 'next-intl';
-
-import { Input } from '@/components/ui/input';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-} from '@/components/ui/pagination';
+import { TablePagination } from '@/components/ui/pagination';
 
 interface CustomPaginationProps {
   page: number;
@@ -17,91 +7,17 @@ interface CustomPaginationProps {
   perPage: number;
 }
 
-function getVisiblePages(current: number, total: number): (number | 'ellipsis')[] {
-  if (total <= 7) {
-    return Array.from({ length: total }, (_, i) => i + 1);
-  }
-
-  const pages: (number | 'ellipsis')[] = [1];
-
-  if (current > 3) {
-    pages.push('ellipsis');
-  }
-
-  const start = Math.max(2, current - 1);
-  const end = Math.min(total - 1, current + 1);
-
-  for (let i = start; i <= end; i++) {
-    pages.push(i);
-  }
-
-  if (current < total - 2) {
-    pages.push('ellipsis');
-  }
-
-  pages.push(total);
-
-  return pages;
-}
-
+/**
+ * @deprecated Render `<DataTable>` (`@/components/ui/data-table`), which
+ * paginates itself, or `<TablePagination>` from `@/components/ui/pagination`.
+ * This wrapper keeps existing tables on the shared pagination: the row range,
+ * Previous and Next, and nothing at all for a single page.
+ */
 export const CustomPagination = ({
   page,
   setPage,
   totalLength,
   perPage,
-}: CustomPaginationProps) => {
-  const t = useTranslations('tables');
-  const pageCount = useMemo(
-    () => Math.max(1, Math.ceil(totalLength / perPage)),
-    [totalLength, perPage],
-  );
-
-  const showGoToInput = pageCount >= 30;
-
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = Number(e.target.value);
-    if (Number.isNaN(value)) return;
-
-    const nextPage = Math.min(Math.max(value, 1), pageCount);
-    setPage(nextPage);
-  };
-
-  const visiblePages = getVisiblePages(page, pageCount);
-
-  return (
-    <div
-      className={`mt-4 flex flex-wrap items-center gap-2 ${showGoToInput ? 'justify-center sm:justify-end' : 'justify-center'}`}
-    >
-      <Pagination>
-        <PaginationContent>
-          {visiblePages.map((item, i) => (
-            <PaginationItem key={i}>
-              {item === 'ellipsis' ? (
-                <PaginationEllipsis />
-              ) : (
-                <PaginationLink isActive={item === page} onClick={() => setPage(item)}>
-                  {item}
-                </PaginationLink>
-              )}
-            </PaginationItem>
-          ))}
-        </PaginationContent>
-      </Pagination>
-
-      {showGoToInput && (
-        <div className="my-1 flex items-center sm:ml-8">
-          <span className="mr-2 text-sm">{t('pagination.goToPage')}</span>
-          <Input
-            type="number"
-            className="max-w-[100px]"
-            value={page}
-            onChange={handleInputChange}
-            min={1}
-            max={pageCount}
-            aria-label={t('pagination.goToPageAria')}
-          />
-        </div>
-      )}
-    </div>
-  );
-};
+}: CustomPaginationProps) => (
+  <TablePagination page={page} pageSize={perPage} total={totalLength} onPageChange={setPage} />
+);

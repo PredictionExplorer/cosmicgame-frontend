@@ -32,13 +32,10 @@ const AdminPage = () => {
       />
       <div>
         <h2 className="text-xl font-semibold mb-4">{t('page.gestureList')}</h2>
-        {isLoading || gestureList === null ? (
-          <p className="text-lg font-semibold" role="status">
-            {t('page.loading')}
-          </p>
-        ) : (
-          <BanGestureTable gestureHistory={gestureList} />
-        )}
+        <BanGestureTable
+          gestureHistory={gestureList ?? []}
+          loading={isLoading || gestureList === null}
+        />
       </div>
     </PageShell>
   );

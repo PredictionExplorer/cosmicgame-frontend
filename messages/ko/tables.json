@@ -1,30 +1,32 @@
 {
   "empty": {
-    "gestures": "아직 제스처가 없습니다.",
-    "gestureHistory": "아직 제스처 내역이 없습니다.",
-    "participants": "아직 참여자가 없습니다.",
-    "recipients": "아직 수령자가 없습니다.",
+    "gestures": "아직 제스처가 없습니다",
+    "gestureHistory": "아직 제스처 내역이 없습니다",
+    "participants": "아직 참여자가 없습니다",
+    "recipients": "아직 수령자가 없습니다",
     "recipientCyclesTitle": "아직 수령자가 없습니다",
     "recipientCyclesDescription": "아직 마감된 퍼포먼스 사이클이 없습니다.",
     "allocations": "아직 배분이 없습니다.",
+    "outreachAllocations": "아직 홍보 준비금 배분이 없습니다",
     "anchorActions": "아직 앵커링 작업이 없습니다.",
-    "anchorHolders": "아직 앵커링 보유자가 없습니다.",
+    "anchorHolders": "아직 앵커링 보유자가 없습니다",
     "anchoredTokens": "아직 앵커링된 토큰이 없습니다.",
-    "contributions": "아직 기여가 없습니다.",
-    "contributors": "아직 기여자가 없습니다.",
+    "contributions": "아직 기여가 없습니다",
+    "contributors": "아직 기여자가 없습니다",
     "publicGoods": "아직 공공재 활동이 없습니다.",
     "stellarSelection": "아직 별빛 선정 배분이 없습니다.",
     "tokens": "아직 토큰이 없습니다.",
     "holders": "아직 보유자가 없습니다.",
-    "spenders": "아직 ETH를 사용한 참여자가 없습니다.",
-    "enduranceChampions": "아직 수호 챔피언이 없습니다.",
+    "stellarEntries": "아직 별빛 선정 자격이 없습니다",
+    "spenders": "아직 ETH를 사용한 참여자가 없습니다",
+    "enduranceChampions": "아직 수호 챔피언이 없습니다",
     "attachedNfts": "아직 첨부된 NFT가 없습니다.",
     "attachedTokens": "아직 첨부된 토큰이 없습니다.",
     "systemEvents": "아직 시스템 이벤트가 없습니다.",
-    "modeChanges": "아직 모드 변경이 없습니다.",
-    "events": "아직 이벤트가 없습니다.",
-    "history": "아직 내역이 없습니다.",
-    "retrievals": "아직 회수 내역이 없습니다.",
+    "modeChanges": "아직 모드 변경이 없습니다",
+    "events": "아직 이벤트가 없습니다",
+    "history": "아직 내역이 없습니다",
+    "retrievals": "아직 회수 내역이 없습니다",
     "generic": "데이터가 없습니다.",
     "nothingHere": "아직 표시할 내용이 없습니다"
   },
@@ -71,7 +73,6 @@
   "status": {
     "loading": "불러오는 중…",
     "live": "실시간",
-    "you": "(나)",
     "youBadge": "나",
     "yes": "예",
     "no": "아니요",
@@ -128,6 +129,8 @@
     "event": "이벤트",
     "newValue": "새 값",
     "recordType": "기록 유형",
+    "source": "배분 구분",
+    "received": "수령",
     "position": "순번",
     "note": "비고",
     "userAddress": "사용자 주소",
@@ -148,8 +151,31 @@
     "actions": "작업",
     "selected": "선택됨"
   },
+  "names": {
+    "participants": "고유 참여자",
+    "recipients": "고유 수령자",
+    "ethContributors": "고유 ETH 기여자",
+    "cstAnchorHolders": "Cosmic Signature NFT 앵커링 보유자",
+    "rwlkAnchorHolders": "RandomWalk NFT 앵커링 보유자",
+    "publicGoodsContributions": "공공재 기여 내역",
+    "publicGoodsRetrievals": "공공재 회수 내역",
+    "outreachAllocations": "홍보 준비금 배분 내역",
+    "parameterChanges": "매개변수 변경 내역",
+    "cycleActivations": "사이클 활성화",
+    "nameHistory": "이름 변경 내역",
+    "transfers": "전송 내역",
+    "anchorDistribution": "앵커링 지급 수령자",
+    "ethContributions": "ETH 기여",
+    "allocationRecords": "배분 기록",
+    "allocationsByRecipient": "수령자별 배분",
+    "ethSpent": "참여자별 ETH 지출",
+    "stellarSelectionEntries": "별빛 선정 자격",
+    "enduranceChampions": "수호 챔피언",
+    "gestureMessages": "제스처 메시지"
+  },
   "pagination": {
     "label": "페이지 이동",
+    "range": "{total}개 중 {from}~{to}",
     "goToPage": "페이지로 이동:",
     "goToPageAria": "페이지로 이동",
     "previous": "이전",
@@ -158,14 +184,18 @@
     "nextAria": "다음 페이지로 이동",
     "morePages": "페이지 더 보기"
   },
-  "density": {
-    "groupLabel": "행 간격",
-    "comfortable": "넓게",
-    "compact": "좁게",
-    "comfortableAria": "넓은 행 간격",
-    "compactAria": "좁은 행 간격",
-    "comfortableHelp": "행을 높이고 여백을 넓혀 읽기 쉽게 표시합니다.",
-    "compactHelp": "행을 낮춰 한 화면에 더 많은 배분 기록을 표시합니다."
+  "currentRow": {
+    "position": "{total}개 중 {rank}번째",
+    "show": "내 위치 보기"
+  },
+  "proof": {
+    "transactionNewTab": "블록 탐색기의 트랜잭션, 새 탭에서 열림"
+  },
+  "links": {
+    "newTab": "새 탭에서 열림"
+  },
+  "details": {
+    "header": "상세"
   },
   "skeleton": {
     "loadingText": "텍스트 불러오는 중",
@@ -178,38 +208,52 @@
     "explainColumn": "열 설명: {column}"
   },
   "adminEvents": {
-    "empty": "아직 이벤트가 없습니다."
+    "empty": "이 기간에 기록된 구성 변경이 없습니다"
   },
   "allocation": {
     "cycle": "사이클 {cycle}",
-    "cycleAria": "사이클 {cycle} 배분 요약",
     "openDetails": "사이클 {cycle}의 상세 배분 내역을 엽니다.",
     "allocationHelp": "이 사이클의 시그니처 배분 금액과 수령자 지갑입니다.",
-    "explore": "탐색",
-    "exploreAria": "사이클 {cycle} 탐색",
-    "exploreHelp": "사이클 {cycle}의 수령자, 적립, 배분 상세를 확인합니다.",
     "gestures": "제스처",
     "gesturesHelp": "이 사이클에서 남긴 제스처 합계입니다.",
-    "nfts": "NFT",
     "nftsHelp": "이 사이클에서 제스처에 첨부된 NFT입니다.",
-    "stellar": "별빛 선정",
     "stellarHelp": "별빛 선정 풀에 배분된 ETH입니다.",
-    "anchor": "앵커링",
     "anchorHelp": "앵커링 지급에 배분된 ETH입니다.",
-    "distributed": "전달된 NFT",
     "distributedHelp": "별빛 선정으로 전달된 Cosmic Signature NFT입니다.",
-    "loadingAria": "배분 사이클 불러오는 중",
-    "listAria": "사이클별 배분 수령자"
+    "listAria": "사이클별 배분 수령자",
+    "columns": {
+      "finalized": "마감 시각",
+      "signatureEth": "시그니처 배분(ETH)",
+      "chronoEth": "시간의 전사(ETH)",
+      "stellarEth": "별빛 선정(ETH)",
+      "anchorEth": "앵커링 지급(ETH)",
+      "nftsAttached": "첨부 NFT",
+      "nftsViaStellar": "별빛 선정 NFT"
+    }
   },
   "anchoringRecipient": {
+    "emptyTitle": "이번 사이클에 앵커링된 NFT가 없습니다",
     "empty": "사이클 마감 시 앵커링된 Cosmic Signature NFT가 없어, 해당 사이클의 앵커링 지급 몫은 사이클 준비금에 남았습니다."
+  },
+  "publicGoods": {
+    "voluntaryEmpty": "공공재 금고로 직접 보낸 기여가 여기에 표시됩니다. 금고는 이 자금을 지정된 공공재 수령처를 위해 보관합니다."
   },
   "banGesture": {
     "banned": "제스처가 차단되었습니다.",
     "unbanned": "제스처 차단이 해제되었습니다.",
     "error": "오류가 발생했습니다",
     "ban": "차단",
-    "unban": "차단 해제"
+    "unban": "차단 해제",
+    "visibilityLabel": "메시지 표시",
+    "hiddenTag": "숨김",
+    "allCycles": "모든 사이클",
+    "search": "메시지 검색",
+    "noMatches": "조건에 맞는 메시지가 없습니다",
+    "filters": {
+      "all": "전체",
+      "visible": "표시됨",
+      "hidden": "숨김"
+    }
   },
   "ethContribution": {
     "withInfo": "정보 포함 기여",
@@ -236,29 +280,30 @@
     "removed": "토큰 이름이 삭제되었습니다."
   },
   "recipientHistory": {
-    "notApplicable": "해당 없음",
-    "unretrievedHelp": "아직 회수하지 않았습니다. 내 배분에서 회수할 수 있습니다.",
-    "unretrievedAria": "미회수 배분 정보",
-    "types": {
-      "mainEth": "시그니처 배분 ETH",
-      "mainCst": "시그니처 배분 CST",
-      "mainNft": "시그니처 배분 CS NFT",
-      "finalCstNft": "최종 CST 제스처 CS NFT",
-      "finalCstRecognition": "최종 CST 제스처 공로 CST",
-      "enduranceNft": "수호 챔피언 CS NFT",
-      "enduranceRecognition": "수호 챔피언 공로 CST",
-      "chronoEth": "시간의 전사 ETH",
-      "chronoCst": "시간의 전사 CST",
-      "chronoNft": "시간의 전사 CS NFT",
-      "participantStellarEth": "ETH 별빛 선정(참여자 대상)",
-      "participantStellarCst": "별빛 선정 공로 CST(참여자 대상)",
-      "participantStellarNft": "CS NFT 별빛 선정(참여자 대상)",
-      "anchorStellarCst": "앵커링 NFT 별빛 선정 공로 CST(RandomWalk 앵커링 보유자 대상)",
-      "anchorStellarNft": "CS NFT 별빛 선정(RandomWalk 앵커링 보유자 대상)",
-      "anchorDistributionEth": "앵커링 지급 ETH(Cosmic Signature NFT 앵커링 보유자 대상)",
-      "attachedNftRetrieval": "첨부 NFT(기한 만료 회수)",
-      "attachedErc20Retrieval": "첨부 ERC-20(기한 만료 회수)",
-      "stellarEthRetrieval": "ETH 별빛 선정(기한 만료 회수)"
+    "sources": {
+      "signature": "시그니처 배분",
+      "finalCstGesture": "최종 CST 제스처",
+      "enduranceChampion": "수호 챔피언",
+      "chronoWarrior": "시간의 전사",
+      "stellarSelection": "별빛 선정",
+      "anchoredStellarSelection": "앵커링 NFT 별빛 선정",
+      "anchorDistribution": "앵커링 지급",
+      "attachedNftTimeout": "첨부 NFT(기한 만료 회수)",
+      "attachedErc20Timeout": "첨부 ERC-20(기한 만료 회수)",
+      "stellarEthTimeout": "ETH 별빛 선정(기한 만료 회수)"
+    },
+    "nft": "NFT #{id}",
+    "readyToRetrieve": "회수 가능",
+    "retrieve": "회수",
+    "retrieved": "회수 완료",
+    "allAnchorHolders": "모든 Cosmic Signature NFT 앵커링 보유자",
+    "showRecords": "{count, plural, other {기록 #건 보기}}",
+    "hideRecords": "기록 숨기기",
+    "totals": {
+      "eth": "수령한 ETH",
+      "cst": "수령한 CST",
+      "nfts": "수령한 NFT",
+      "cycles": "사이클"
     }
   },
   "specialAllocation": {
@@ -323,18 +368,8 @@
     "printWindow": "유지 구간: {duration}",
     "printReign": "유지 기간: {duration}"
   },
-  "stellarSelection": {
-    "ethDeposit": "ETH 적립",
-    "anchoredNft": "앵커링 NFT 별빛 선정 Cosmic Signature NFT",
-    "signatureNftSelection": "Cosmic Signature NFT 별빛 선정",
-    "signatureNft": "Cosmic Signature NFT"
-  },
   "systemModes": {
     "viewEvent": "{scope} 시스템 이벤트 보기"
-  },
-  "transferHistory": {
-    "signatureAnchoringWallet": "Cosmic Signature NFT 앵커링 지갑",
-    "randomWalkAnchoringWallet": "RandomWalk NFT 앵커링 지갑"
   },
   "uniqueAnchorHolders": {
     "numAnchorActions": "앵커링 작업 수",

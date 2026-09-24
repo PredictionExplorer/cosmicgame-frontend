@@ -14,8 +14,10 @@ jest.mock('../../../../../hooks/useApiQuery', () => ({
 
 jest.mock('../../../../../components/tables/BanGestureTable', () => ({
   __esModule: true,
-  default: ({ gestureHistory }: { gestureHistory: unknown[] }) => (
-    <div data-testid="ban-gesture-table">rows: {gestureHistory.length}</div>
+  default: ({ gestureHistory, loading }: { gestureHistory: unknown[]; loading?: boolean }) => (
+    <div data-testid="ban-gesture-table" data-loading={loading ? 'true' : undefined}>
+      rows: {gestureHistory.length}
+    </div>
   ),
 }));
 
@@ -25,13 +27,13 @@ describe('AdminPage', () => {
   it('shows loading state when query is loading', () => {
     mockUseGestureList.mockReturnValue({ data: undefined, isLoading: true, error: null });
     render(<AdminPage />);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByTestId('ban-gesture-table')).toHaveAttribute('data-loading', 'true');
   });
 
   it('shows loading when data is null', () => {
     mockUseGestureList.mockReturnValue({ data: undefined, isLoading: false, error: null });
     render(<AdminPage />);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByTestId('ban-gesture-table')).toHaveAttribute('data-loading', 'true');
   });
 
   it('renders BanGestureTable with filtered gesture list', () => {

@@ -1,0 +1,388 @@
+/*
+ * Tables: one ledger for the whole app.
+ *
+ * The markup comes from components/ui/responsive-table.tsx (client tables,
+ * and components/ui/data-table on top of it) and components/ui/table.tsx
+ * (static, server-rendered tables such as the white paper). Both render a
+ * `.cs-table`; this file owns how it lays out:
+ *
+ *   40em and up   A ledger. Sentence-case type-label headers over a --rule,
+ *                 rows divided by --rule-faint, text, dates and addresses at
+ *                 the start, numbers at the end in tabular figures.
+ *   Below 40em    `data-layout="cards"` (the default): each row becomes a
+ *                 spec-sheet record in a stacked list, one --rule between
+ *                 records, label at the start and value at the end, so
+ *                 values never zig-zag between columns.
+ *                 `data-layout="compact"` keeps a real table, for up to
+ *                 three short columns (an owner, a count, an amount).
+ *
+ * A column's alignment travels as `data-align` on both its header and its
+ * cells, and numeric columns carry `data-numeric`, so a header can never
+ * disagree with the values under it. Each body cell wraps its content in one
+ * `[data-slot='value']` node, which is what lets the record layout treat a
+ * cell holding a badge, a sub-line or a link as a single value.
+ *
+ * These rules are unlayered on purpose: they win over Tailwind's layered
+ * utilities, so a stray `text-center` or `whitespace-nowrap` in a cell cannot
+ * bring back a zig-zag or push a record wider than the screen. Padding, type
+ * and colour stay as utilities in the components, where call sites tune them.
+ */
+
+/* ── Alignment and figures (every width) ──────────────────────────────── */
+
+.cs-table :is(th, td)[data-align='start'] {
+  text-align: start;
+}
+
+.cs-table :is(th, td)[data-align='end'] {
+  text-align: end;
+}
+
+/* Only status icons are centred; everything else reads from an edge. */
+.cs-table :is(th, td)[data-align='center'] {
+  text-align: center;
+}
+
+.cs-table td[data-numeric] {
+  font-variant-numeric: tabular-nums lining-nums slashed-zero;
+}
+
+.cs-table :is(th, td)[data-nowrap] {
+  white-space: nowrap;
+}
+
+/*
+ * A header cell clips what overflows it. On a phone, a header's sort and help
+ * buttons carry transparent 44px touch pads (data-touch-target="extended");
+ * unclipped, the last column's pad reached past the table, which then
+ * scrolled sideways by a few pixels for nothing.
+ */
+.cs-table th {
+  overflow: clip;
+}
+
+/* The connected wallet's row: a 2px accent rule at the row's start edge,
+ * with the row kept in its ranked place. */
+.cs-table tbody tr[data-current] > td:first-child {
+  box-shadow: inset 2px 0 0 hsl(var(--primary));
+}
+
+/* An address links to its participant page: foreground ink with the quiet
+ * ledger underline, like every other link in a cell (TABLE_LINK_CLASS). The
+ * rule is unlayered, so it restates the hover colour as well. */
+.cs-table td[data-kind='address'] a {
+  color: hsl(var(--foreground));
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in oklab, currentColor 30%, transparent);
+  text-underline-offset: 0.2em;
+}
+
+.cs-table td[data-kind='address'] a:hover {
+  color: hsl(var(--primary));
+  text-decoration-color: currentColor;
+}
+
+/*
+ * Scroll cue. A wide table scrolls inside its own container, and while more
+ * of it lies beyond an edge, that edge fades out. It is driven by the
+ * container's own scroll position (a scroll-driven animation), so it needs no
+ * script and works in static server-rendered tables too. When the table fits,
+ * the timeline is inactive and nothing fades; browsers without scroll-driven
+ * animations show no cue.
+ */
+@property --cs-table-fade-start {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --cs-table-fade-end {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@keyframes cs-table-scroll-cue {
+  0% {
+    --cs-table-fade-start: 0px;
+    --cs-table-fade-end: 2.5rem;
+  }
+  8%,
+  92% {
+    --cs-table-fade-start: 2.5rem;
+    --cs-table-fade-end: 2.5rem;
+  }
+  100% {
+    --cs-table-fade-start: 2.5rem;
+    --cs-table-fade-end: 0px;
+  }
+}
+
+@supports (animation-timeline: scroll()) {
+  .cs-table-scroll {
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 var(--cs-table-fade-start),
+      #000 calc(100% - var(--cs-table-fade-end)),
+      transparent 100%
+    );
+    animation: cs-table-scroll-cue linear both;
+    animation-timeline: scroll(self inline);
+  }
+
+  /* Someone scrolling with the keyboard sees the whole table, and the mask
+   * would otherwise clip the container's focus outline. */
+  .cs-table-scroll:focus-visible {
+    mask-image: none;
+  }
+}
+
+/* ── Phones: spec-sheet records ───────────────────────────────────────── */
+
+@media screen and (max-width: 39.99em) {
+  .cs-table:not([data-layout='compact']),
+  .cs-table:not([data-layout='compact']) :is(thead, tbody, tr, td) {
+    display: block;
+  }
+
+  /* Headers stay in the accessibility tree; each value repeats its label. */
+  .cs-table:not([data-layout='compact']) thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /*
+   * One record per row, in a stacked list: records are divided by one
+   * --rule and nothing else, no box and no fill, so the section around the
+   * table stays the one frame. The small inline inset keeps a focused
+   * value's outline (2px, 2px out) inside the scroll container, which would
+   * otherwise clip it at the end edge.
+   */
+  .cs-table:not([data-layout='compact']) tbody tr {
+    padding-block: 0.5rem;
+    padding-inline: 0.25rem;
+    /* A help or copy button at a value's end carries a transparent 44px
+     * touch pad (data-touch-target="extended") that reached past the screen
+     * and made the whole list scroll sideways. The record clips at its own
+     * edge, which still leaves the inset above for a focus outline. */
+    overflow: clip;
+  }
+
+  .cs-table:not([data-layout='compact']) tbody tr + tr {
+    border-top: 1px solid hsl(var(--rule));
+  }
+
+  /*
+   * A spec-sheet line: the label (the cell's own `data-label`, so it cannot
+   * drift from its column) at the start, the value at the end. Neither side
+   * ever shrinks below its longest word: the label keeps its whole line
+   * when it fits, and a longer value (a list of assets, a sentence) wraps
+   * in the space that remains, still flush with the end edge.
+   */
+  .cs-table:not([data-layout='compact']) tbody td {
+    display: grid;
+    grid-template-columns: minmax(min-content, max-content) minmax(min-content, 1fr);
+    align-items: baseline;
+    column-gap: 1rem;
+    padding: 0.3125rem 0;
+    border-bottom: 0;
+    /* Long words break rather than widen the record. `break-word`, not
+     * `anywhere`: the latter lets a label's minimum shrink to one letter. */
+    overflow-wrap: break-word;
+    /* A stray `whitespace-nowrap` must not push a record past the screen. */
+    white-space: normal;
+    text-align: end;
+  }
+
+  /* The label: type-label in the subtle tier, in sentence case. */
+  .cs-table:not([data-layout='compact']) tbody td::before {
+    content: attr(data-label);
+    color: hsl(var(--subtle-foreground));
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.125rem;
+    letter-spacing: normal;
+    text-transform: none;
+    text-align: start;
+    overflow-wrap: normal;
+  }
+
+  /* Every value sits at the end edge, whatever its desktop alignment. */
+  .cs-table:not([data-layout='compact']) tbody td > [data-slot='value'] {
+    min-width: 0;
+    text-align: end;
+  }
+
+  /*
+   * Nothing inside a value may push its record past the screen either: a
+   * protocol address shown by name ("Cosmic Signature NFT Anchoring Wallet")
+   * or a date wraps between its words. Only wrapping changes, not how spaces
+   * collapse, and a short address or an amount has no break opportunity of
+   * its own (word joiners, no-break spaces), so it stays whole.
+   */
+  .cs-table:not([data-layout='compact']) tbody td > [data-slot='value'] * {
+    text-wrap-mode: wrap;
+  }
+
+  /* Long text (a message, a description) spans the record under its label. */
+  .cs-table:not([data-layout='compact']) tbody td[data-stack] {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0.25rem;
+  }
+
+  .cs-table:not([data-layout='compact']) tbody td[data-stack] > [data-slot='value'] {
+    text-align: start;
+  }
+
+  /*
+   * A link that is the whole value gets the 24px WCAG 2.5.8 target: raising
+   * its line box turns the line into the target without moving the text, and
+   * a short one ("42", a token id) is widened to match.
+   */
+  .cs-table:not([data-layout='compact']) tbody td > [data-slot='value'] > a {
+    display: inline-block;
+    min-width: 1.5rem;
+    min-height: 1.5rem;
+    line-height: 1.5rem;
+  }
+
+  /* A labelled blank line is noise: a cell with nothing to show is dropped. */
+  .cs-table:not([data-layout='compact']) td[data-empty='true'] {
+    display: none;
+  }
+
+  /*
+   * Columns marked redundant on a phone, in either layout. The selectors
+   * match the record rules' specificity and come after them, so a secondary
+   * cell cannot come back as a grid line.
+   */
+  .cs-table tbody td[data-priority='secondary'],
+  .cs-table thead th[data-priority='secondary'] {
+    display: none;
+  }
+
+  /* A record's expanded details follow it in a sunken well, inside the
+   * same record: no rule between the two. */
+  .cs-table:not([data-layout='compact']) tbody tr[data-detail] {
+    margin-block-end: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    border-top: 0;
+    border-radius: var(--radius-surface);
+    background: hsl(var(--surface-sunken));
+  }
+
+  .cs-table:not([data-layout='compact']) tbody tr[data-detail] > td {
+    display: block;
+    padding: 0.5rem 0;
+    border-bottom: 0;
+    background: none;
+    text-align: start;
+  }
+
+  .cs-table:not([data-layout='compact']) tbody tr[data-detail] > td::before {
+    content: none;
+  }
+
+  /* On a record, the connected wallet's rule runs down the record's edge,
+   * with room between it and the labels. */
+  .cs-table:not([data-layout='compact']) tbody tr[data-current] {
+    padding-inline-start: 0.75rem;
+    box-shadow: inset 2px 0 0 hsl(var(--primary));
+  }
+
+  .cs-table:not([data-layout='compact']) tbody tr[data-current] > td:first-child {
+    box-shadow: none;
+  }
+
+  /* Compact tables stay tables; they tighten their gutters so an address and
+   * two figures fit a 320px screen. */
+  .cs-table[data-layout='compact'] :is(th, td) {
+    padding-inline: 0.5rem;
+  }
+
+  /* The first column keeps a 0.25rem inset: a focused link or header button
+   * draws its outline 4px outside itself (2px ring, 2px offset), and the
+   * scroll container clips anything past its edge. It also keeps the
+   * figures off a bordered parent's edge. */
+  .cs-table[data-layout='compact'] :is(th, td):first-child {
+    padding-inline-start: 0.25rem;
+  }
+
+  /* The last column keeps just enough room for a header button's target. */
+  .cs-table[data-layout='compact'] :is(th, td):last-child {
+    padding-inline-end: 0.375rem;
+  }
+}
+
+/* ── Paper ────────────────────────────────────────────────────────────── */
+
+@media print {
+  /*
+   * Chrome's print/PDF pass can match the narrow media query and collapse the
+   * record layout into an unreadable single column. Force real table geometry
+   * and drop the repeated per-cell labels on paper.
+   */
+  .cs-table {
+    display: table !important;
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  .cs-table-scroll {
+    overflow: visible !important;
+    mask-image: none !important;
+  }
+
+  .cs-table thead {
+    position: static !important;
+    display: table-header-group !important;
+    width: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+    clip-path: none !important;
+  }
+
+  .cs-table tbody {
+    display: table-row-group !important;
+  }
+
+  .cs-table thead tr,
+  .cs-table tbody tr {
+    display: table-row !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    background: none !important;
+  }
+
+  .cs-table th,
+  .cs-table td {
+    display: table-cell !important;
+    padding: 0.5rem 0.75rem !important;
+    color: hsl(var(--foreground)) !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .cs-table td::before {
+    content: none !important;
+  }
+
+  /* Nothing is hidden on paper: width is no longer a constraint. */
+  .cs-table td[data-empty='true'],
+  .cs-table td[data-priority='secondary'],
+  .cs-table th[data-priority='secondary'] {
+    display: table-cell !important;
+  }
+
+  .cs-table a {
+    color: hsl(var(--foreground)) !important;
+    text-decoration: underline !important;
+  }
+}

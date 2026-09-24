@@ -8,10 +8,11 @@ import {
   ResponsiveTableHead,
   ResponsiveTableHeadCell,
   ResponsiveTableRow,
+  TABLE_LINK_CLASS,
   TABLE_ROW_LINK_CLASS,
 } from '@/components/ui/responsive-table';
 
-import { checkA11y, render, screen, within } from '@/test-utils';
+import { act, checkA11y, render, screen } from '@/test-utils';
 
 /** Wraps cells in the minimum valid table so jsdom nesting stays legal. */
 function TableWith({ children }: { children: React.ReactNode }) {
@@ -496,59 +497,102 @@ describe('ResponsiveTableRow accessibility', () => {
     await checkA11y(container);
   });
 
-  it('keeps a visible focus ring on the row link, which is the keyboard target', () => {
-    expect(TABLE_ROW_LINK_CLASS).toContain('focus-visible:ring-2');
+  it('styles the row link as a link, leaving the focus ring to the shared outline', () => {
+    expect(TABLE_ROW_LINK_CLASS).toBe(TABLE_LINK_CLASS);
+    expect(TABLE_LINK_CLASS).toContain('underline');
+    expect(TABLE_LINK_CLASS).not.toContain('outline-none');
   });
 });
 
 describe('ResponsiveTableContainer', () => {
-  it('is keyboard focusable so its scroll area can be reached without a pointer', () => {
+  /** jsdom lays nothing out: fake a ResizeObserver and the scroll geometry. */
+  function mockOverflow(scrollWidth: number, clientWidth: number) {
+    const observe = jest.fn(function observe(this: { callback: () => void }) {
+      this.callback();
+    });
+    class FakeResizeObserver {
+      callback: () => void;
+      constructor(callback: () => void) {
+        this.callback = callback;
+      }
+      observe = observe;
+      disconnect() {}
+      unobserve() {}
+    }
+    const original = window.ResizeObserver;
+    window.ResizeObserver = FakeResizeObserver as unknown as typeof ResizeObserver;
+    const widths = [
+      jest.spyOn(HTMLElement.prototype, 'scrollWidth', 'get').mockReturnValue(scrollWidth),
+      jest.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(clientWidth),
+    ];
+    return () => {
+      window.ResizeObserver = original;
+      widths.forEach((spy) => spy.mockRestore());
+    };
+  }
+
+  it('adds no tab stop while the table fits', () => {
+    const restore = mockOverflow(600, 600);
     render(
-      <ResponsiveTableContainer data-testid="scroller">
-        <ResponsiveTable aria-label="Test table" />
-      </ResponsiveTableContainer>,
-    );
-
-    const scroller = screen.getByTestId('scroller');
-    expect(scroller).toHaveAttribute('tabindex', '0');
-
-    scroller.focus();
-    expect(scroller).toHaveFocus();
-  });
-
-  it('stays an unnamed plain element when given no label', () => {
-    // A nameless region is worse for screen-reader users than no landmark.
-    render(
-      <ResponsiveTableContainer data-testid="scroller">
-        <ResponsiveTable aria-label="Test table" />
-      </ResponsiveTableContainer>,
-    );
-
-    expect(screen.queryByRole('region')).not.toBeInTheDocument();
-    expect(screen.getByTestId('scroller')).not.toHaveAttribute('role');
-    expect(screen.getByTestId('scroller')).not.toHaveAttribute('aria-label');
-  });
-
-  it('becomes a named region when given a label', () => {
-    render(
-      <ResponsiveTableContainer label="Cycle history">
+      <ResponsiveTableContainer data-testid="scroller" label="Cycle history">
         <ResponsiveTable aria-label="Cycle history" />
       </ResponsiveTableContainer>,
     );
-
-    expect(screen.getByRole('region', { name: 'Cycle history' })).toBeInTheDocument();
+    const scroller = screen.getByTestId('scroller');
+    expect(scroller).not.toHaveAttribute('tabindex');
+    expect(screen.queryByRole('region')).not.toBeInTheDocument();
+    restore();
   });
 
-  it('keeps the caller className alongside its own styling', () => {
+  it('becomes a focusable, named region when the table is wider than its box', async () => {
+    const restore = mockOverflow(900, 320);
     render(
+      <ResponsiveTableContainer data-testid="scroller" label="Cycle history">
+        <ResponsiveTable aria-label="Cycle history" />
+      </ResponsiveTableContainer>,
+    );
+    await act(async () => {});
+
+    const region = screen.getByRole('region', { name: 'Cycle history' });
+    expect(region).toHaveAttribute('tabindex', '0');
+    expect(region).toHaveAttribute('data-overflowing', 'true');
+    region.focus();
+    expect(region).toHaveFocus();
+    restore();
+  });
+
+  it('stays an unnamed element without a label, even when it scrolls', async () => {
+    // A nameless region is worse for screen-reader users than no landmark.
+    const restore = mockOverflow(900, 320);
+    render(
+      <ResponsiveTableContainer data-testid="scroller">
+        <ResponsiveTable aria-label="Test table" />
+      </ResponsiveTableContainer>,
+    );
+    await act(async () => {});
+
+    expect(screen.queryByRole('region')).not.toBeInTheDocument();
+    expect(screen.getByTestId('scroller')).toHaveAttribute('tabindex', '0');
+    restore();
+  });
+
+  it('draws no box of its own unless asked to', () => {
+    const { rerender } = render(
       <ResponsiveTableContainer className="mt-8" data-testid="scroller">
         <ResponsiveTable aria-label="Test table" />
       </ResponsiveTableContainer>,
     );
 
     const scroller = screen.getByTestId('scroller');
-    expect(scroller).toHaveClass('mt-8');
-    expect(scroller).toHaveClass('overflow-x-auto');
+    expect(scroller).toHaveClass('mt-8', 'overflow-x-auto', 'cs-table-scroll');
+    expect(scroller.className).not.toMatch(/\bborder\b|bg-/);
+
+    rerender(
+      <ResponsiveTableContainer variant="framed" data-testid="scroller">
+        <ResponsiveTable aria-label="Test table" />
+      </ResponsiveTableContainer>,
+    );
+    expect(screen.getByTestId('scroller')).toHaveClass('border', 'border-rule');
   });
 
   it('renders its table children', () => {
@@ -564,8 +608,81 @@ describe('ResponsiveTableContainer', () => {
       </ResponsiveTableContainer>,
     );
 
-    const region = screen.getByRole('region', { name: 'Cycle history' });
-    expect(within(region).getByRole('table', { name: 'Cycle history' })).toBeInTheDocument();
+    expect(screen.getByRole('table', { name: 'Cycle history' })).toBeInTheDocument();
+    expect(screen.getByRole('cell', { name: '7' })).toBeInTheDocument();
+  });
+});
+
+describe('column alignment', () => {
+  it('states one alignment on the header and its cells', () => {
+    const { container } = render(
+      <ResponsiveTable aria-label="Test table">
+        <ResponsiveTableHead>
+          <tr>
+            <ResponsiveTableHeadCell align="right" numeric>
+              Amount
+            </ResponsiveTableHeadCell>
+            <ResponsiveTableHeadCell>Recipient</ResponsiveTableHeadCell>
+          </tr>
+        </ResponsiveTableHead>
+        <ResponsiveTableBody>
+          <ResponsiveTableRow>
+            <ResponsiveTableCell label="Amount" align="right" numeric>
+              1.5
+            </ResponsiveTableCell>
+            <ResponsiveTableCell label="Recipient">0xabc</ResponsiveTableCell>
+          </ResponsiveTableRow>
+        </ResponsiveTableBody>
+      </ResponsiveTable>,
+    );
+
+    const [amountHead, recipientHead] = Array.from(container.querySelectorAll('th'));
+    const [amountCell, recipientCell] = Array.from(container.querySelectorAll('td'));
+    expect(amountHead).toHaveAttribute('data-align', 'end');
+    expect(amountCell).toHaveAttribute('data-align', 'end');
+    expect(amountCell).toHaveAttribute('data-numeric', 'true');
+    expect(recipientHead).toHaveAttribute('data-align', 'start');
+    expect(recipientCell).toHaveAttribute('data-align', 'start');
+  });
+
+  it('wraps each cell in exactly one value node, however many children it has', () => {
+    const { container } = render(
+      <TableWith>
+        <ResponsiveTableRow>
+          <ResponsiveTableCell label="Result">
+            0% <span>(0/2)</span> <em>CST only</em>
+          </ResponsiveTableCell>
+        </ResponsiveTableRow>
+      </TableWith>,
+    );
+
+    const cell = container.querySelector('td');
+    expect(cell?.children).toHaveLength(1);
+    expect(cell?.firstElementChild).toHaveAttribute('data-slot', 'value');
+  });
+
+  it('marks long text to sit under its label on a phone', () => {
+    const { container } = render(
+      <TableWith>
+        <ResponsiveTableRow>
+          <ResponsiveTableCell label="Message" stack>
+            A long message
+          </ResponsiveTableCell>
+        </ResponsiveTableRow>
+      </TableWith>,
+    );
+    expect(container.querySelector('td')).toHaveAttribute('data-stack', 'true');
+  });
+
+  it('marks the connected wallet row without moving it', () => {
+    render(
+      <TableWith>
+        <ResponsiveTableRow current>
+          <ResponsiveTableCell label="Holder">0xabc</ResponsiveTableCell>
+        </ResponsiveTableRow>
+      </TableWith>,
+    );
+    expect(screen.getByRole('row')).toHaveAttribute('data-current', 'true');
   });
 });
 
@@ -574,6 +691,13 @@ describe('ResponsiveTable', () => {
     render(<ResponsiveTable aria-label="Cycle history" />);
 
     expect(screen.getByRole('table', { name: 'Cycle history' })).toBeInTheDocument();
+  });
+
+  it('lays rows out as phone records by default, or keeps a compact table', () => {
+    const { rerender } = render(<ResponsiveTable aria-label="Cycle history" />);
+    expect(screen.getByRole('table')).toHaveAttribute('data-layout', 'cards');
+    rerender(<ResponsiveTable aria-label="Cycle history" layout="compact" />);
+    expect(screen.getByRole('table')).toHaveAttribute('data-layout', 'compact');
   });
 
   it('merges a caller className without dropping the mobile card class', () => {

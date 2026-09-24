@@ -1,106 +1,63 @@
-import { useState, useMemo } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+'use client';
 
-import { formatTableAmount } from '@/utils';
+import { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 
-import {
-  TablePrimary,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryContainer,
-  TablePrimaryHead,
-  TablePrimaryHeadCell,
-  TablePrimaryRow,
-} from '@/components/styled';
-import { CustomPagination } from '@/components/common/CustomPagination';
-import { AddressLink } from '@/components/common/AddressLink';
-import { TableHeaderHelp } from '@/components/tables/TableHeaderHelp';
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+import type { LedgerStateProps } from '@/components/tables/ledger-props';
 import type { Participant } from '@/services/api/types';
 
 export type { Participant };
 
-interface UniqueParticipantsRowProps {
-  bidder?: Participant;
-  locale: string;
-}
-
-const UniqueParticipantsRow = ({ bidder, locale }: UniqueParticipantsRowProps) => {
-  const t = useTranslations('tables');
-
-  if (!bidder) {
-    return <TablePrimaryRow />;
-  }
-
-  const { BidderAddr, NumBids, MaxBidAmountEth } = bidder;
-
-  return (
-    <TablePrimaryRow>
-      <TablePrimaryCell label={t('columns.participantAddress')}>
-        <AddressLink address={BidderAddr} url={`/user/${BidderAddr}`} />
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.numberOfGestures')} align="center">
-        {NumBids}
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.maxGestureEth')} align="right">
-        {formatTableAmount(MaxBidAmountEth, locale)}
-      </TablePrimaryCell>
-    </TablePrimaryRow>
-  );
-};
-
-interface UniqueParticipantsTableProps {
+interface UniqueParticipantsTableProps extends LedgerStateProps {
   list: Participant[];
 }
 
-export const UniqueParticipantsTable = ({ list }: UniqueParticipantsTableProps) => {
+/** Every wallet that has made a gesture, with its gesture count and largest ETH gesture. */
+export const UniqueParticipantsTable = ({ list, ...state }: UniqueParticipantsTableProps) => {
   const t = useTranslations('tables');
-  const locale = useLocale();
-  const perPage = 5;
-  const [page, setPage] = useState(1);
 
-  const paginatedList = useMemo(
-    () => list.slice((page - 1) * perPage, page * perPage),
-    [list, page],
+  const columns = useMemo<DataTableColumn<Participant>[]>(
+    () => [
+      {
+        id: 'participant',
+        kind: 'address',
+        header: t('columns.participantAddress'),
+        help: t('statisticsTooltips.participantAddress'),
+        value: (row) => row.BidderAddr,
+      },
+      {
+        id: 'gestures',
+        kind: 'count',
+        header: t('columns.numberOfGestures'),
+        help: t('statisticsTooltips.numberOfGestures'),
+        value: (row) => row.NumBids,
+        sortable: true,
+      },
+      {
+        id: 'maxGesture',
+        kind: 'amount',
+        header: t('columns.maxGestureEth'),
+        help: t('statisticsTooltips.maxGestureEth'),
+        // A wallet that only ever gestured with CST has no ETH gesture: the
+        // API reports a negative sentinel, which reads as none, not as dust.
+        value: (row) => (row.MaxBidAmountEth >= 0 ? row.MaxBidAmountEth : null),
+        blankLabel: t('status.none'),
+        showUnit: false,
+        sortable: true,
+      },
+    ],
+    [t],
   );
 
-  if (list.length === 0) {
-    return <p>{t('empty.participants')}</p>;
-  }
-
   return (
-    <div className="w-full">
-      <TablePrimaryContainer>
-        <TablePrimary>
-          <TablePrimaryHead>
-            <tr>
-              <TablePrimaryHeadCell align="left">
-                <TableHeaderHelp
-                  desktop={t('columns.participantAddress')}
-                  tooltip={t('statisticsTooltips.participantAddress')}
-                />
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="center">
-                <TableHeaderHelp
-                  desktop={t('columns.numberOfGestures')}
-                  tooltip={t('statisticsTooltips.numberOfGestures')}
-                />
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">
-                <TableHeaderHelp
-                  desktop={t('columns.maxGestureEth')}
-                  tooltip={t('statisticsTooltips.maxGestureEth')}
-                />
-              </TablePrimaryHeadCell>
-            </tr>
-          </TablePrimaryHead>
-          <TablePrimaryBody>
-            {paginatedList.map((bidder) => (
-              <UniqueParticipantsRow bidder={bidder} locale={locale} key={bidder.BidderAid} />
-            ))}
-          </TablePrimaryBody>
-        </TablePrimary>
-      </TablePrimaryContainer>
-      <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
-    </div>
+    <DataTable
+      data={list}
+      columns={columns}
+      ariaLabel={t('names.participants')}
+      getRowKey={(row) => row.BidderAid}
+      emptyTitle={t('empty.participants')}
+      {...state}
+    />
   );
 };

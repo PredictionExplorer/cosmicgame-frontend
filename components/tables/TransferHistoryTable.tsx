@@ -1,109 +1,61 @@
-import { useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+'use client';
 
-import { getExplorerUrl, shortenHex } from '@/utils';
+import { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 
-import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
-import { Link } from '@/i18n/navigation';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import {
-  TablePrimary,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryContainer,
-  TablePrimaryHead,
-  TablePrimaryHeadCell,
-  TablePrimaryRow,
-} from '@/components/styled';
-import { ZERO_ADDRESS } from '@/config/misc';
-import { useContractAddresses } from '@/contexts/ContractAddressesContext';
-import { CustomPagination } from '@/components/common/CustomPagination';
+import { isZeroAddress } from '@/utils/format';
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+import type { LedgerStateProps } from '@/components/tables/ledger-props';
 import type { CSTTransferRecord } from '@/services/api';
 
-function addrEq(a: string | undefined, b: string): boolean {
-  return !!a && !!b && a.toLowerCase() === b.toLowerCase();
+interface TransferHistoryTableProps extends LedgerStateProps {
+  list: CSTTransferRecord[];
 }
 
-const TransferHistoryRow = ({ record }: { record: CSTTransferRecord }) => {
+/**
+ * A token's transfers, each date linked to its transaction. The imprint
+ * itself (a transfer from the zero address) is left out; protocol wallets,
+ * such as the anchoring wallets, read by name.
+ */
+export const TransferHistoryTable = ({ list, ...state }: TransferHistoryTableProps) => {
   const t = useTranslations('tables');
-  const locale = useLocale();
-  const { stakingCst, stakingRwalk } = useContractAddresses();
-  if (!record || record.FromAddr === ZERO_ADDRESS) {
-    return null;
-  }
+  const transfers = useMemo(() => list.filter((row) => !isZeroAddress(row.FromAddr)), [list]);
 
-  const { TxHash, TimeStamp, FromAddr, ToAddr } = record;
-
-  return (
-    <TablePrimaryRow>
-      <TablePrimaryCell label={t('columns.dateTimeCompact')}>
-        <a
-          className="text-inherit"
-          href={getExplorerUrl('tx', TxHash)}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <HydrationSafeDateTime timestamp={TimeStamp} locale={locale} />
-        </a>
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.from')}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Link href={`/user/${FromAddr}`} className="text-inherit font-mono break-all">
-              {addrEq(FromAddr, stakingCst)
-                ? t('transferHistory.signatureAnchoringWallet')
-                : addrEq(FromAddr, stakingRwalk)
-                  ? t('transferHistory.randomWalkAnchoringWallet')
-                  : shortenHex(FromAddr ?? '', 6)}
-            </Link>
-          </TooltipTrigger>
-          <TooltipContent>{FromAddr}</TooltipContent>
-        </Tooltip>
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.to')}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Link href={`/user/${ToAddr}`} className="text-inherit font-mono break-all">
-              {addrEq(ToAddr, stakingCst)
-                ? t('transferHistory.signatureAnchoringWallet')
-                : addrEq(ToAddr, stakingRwalk)
-                  ? t('transferHistory.randomWalkAnchoringWallet')
-                  : shortenHex(ToAddr ?? '', 6)}
-            </Link>
-          </TooltipTrigger>
-          <TooltipContent>{ToAddr ?? ''}</TooltipContent>
-        </Tooltip>
-      </TablePrimaryCell>
-    </TablePrimaryRow>
+  const columns = useMemo<DataTableColumn<CSTTransferRecord>[]>(
+    () => [
+      {
+        id: 'datetime',
+        kind: 'datetime',
+        header: t('columns.dateTimeCompact'),
+        value: (row) => row.TimeStamp,
+        txHash: (row) => row.TxHash,
+      },
+      {
+        id: 'from',
+        kind: 'address',
+        header: t('columns.from'),
+        value: (row) => row.FromAddr,
+        zeroRole: 'from',
+      },
+      {
+        id: 'to',
+        kind: 'address',
+        header: t('columns.to'),
+        value: (row) => row.ToAddr,
+        zeroRole: 'to',
+      },
+    ],
+    [t],
   );
-};
-
-export const TransferHistoryTable = ({ list }: { list: CSTTransferRecord[] }) => {
-  const t = useTranslations('tables');
-  const perPage = 5;
-  const [page, setPage] = useState(1);
 
   return (
-    <>
-      <TablePrimaryContainer>
-        <TablePrimary>
-          <TablePrimaryHead>
-            <tr>
-              <TablePrimaryHeadCell align="left">
-                {t('columns.dateTimeCompact')}
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">{t('columns.from')}</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">{t('columns.to')}</TablePrimaryHeadCell>
-            </tr>
-          </TablePrimaryHead>
-          <TablePrimaryBody>
-            {list.slice((page - 1) * perPage, page * perPage).map((record) => (
-              <TransferHistoryRow record={record} key={record.EvtLogId} />
-            ))}
-          </TablePrimaryBody>
-        </TablePrimary>
-      </TablePrimaryContainer>
-      <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
-    </>
+    <DataTable
+      data={transfers}
+      columns={columns}
+      ariaLabel={t('names.transfers')}
+      getRowKey={(row) => row.EvtLogId}
+      emptyTitle={t('empty.history')}
+      {...state}
+    />
   );
 };

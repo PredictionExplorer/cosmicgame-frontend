@@ -15,6 +15,7 @@ import { COORDINATION_EVENTS_END_ID } from '@/services/api/system';
  */
 function ChangedParameters({ seoSummary }: { seoSummary?: ReactNode }) {
   const t = useTranslations('coordination');
+  const tTables = useTranslations('tables');
   const { data: modeList, isLoading: isLoadingModeList } = useSystemModelist();
   const startId = modeList != null ? ((modeList as { EvtLogId: number }[])[0]?.EvtLogId ?? 0) : -1;
   const { data: events = [], isLoading: isLoadingEvents } = useSystemEvents(
@@ -32,13 +33,11 @@ function ChangedParameters({ seoSummary }: { seoSummary?: ReactNode }) {
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
         {t('page.description')}
       </p>
-      {loading ? (
-        <p className="text-lg font-semibold" role="status">
-          {t('page.loading')}
-        </p>
-      ) : (
-        <AdminEventsTable list={events as AdminEventRow[]} />
-      )}
+      <AdminEventsTable
+        list={events as AdminEventRow[]}
+        loading={loading}
+        title={tTables('names.parameterChanges')}
+      />
     </PageShell>
   );
 }

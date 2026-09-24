@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { PageShell } from '@/components/ui/page-shell';
-import { Spinner } from '@/components/ui/spinner';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useMarketingRewards } from '@/hooks/useApiQuery';
 import { useDashboardInfo } from '@/hooks/useApiQuery';
 import type { MarketingReward } from '@/services/api/types';
@@ -17,6 +17,35 @@ import { TopMarketersLeaderboard } from '@/components/marketing/TopMarketersLead
 import { RewardsHistorySection } from '@/components/marketing/RewardsHistorySection';
 import { MarketingCTA } from '@/components/marketing/MarketingCTA';
 
+/** The three figures' places while they load, at their finished height. */
+function StatsPlaceholder() {
+  return (
+    <div aria-hidden className="grid gap-6 pb-8 sm:grid-cols-3 sm:pb-10">
+      {[0, 1, 2].map((index) => (
+        <Skeleton key={index} className="h-[7.5rem] rounded-xl" />
+      ))}
+    </div>
+  );
+}
+
+/** The leaderboard's and history's place while the allocations load. */
+function LedgerPlaceholder({ label }: { label: string }) {
+  return (
+    <div role="status" aria-label={label} className="space-y-3 py-8 sm:py-10">
+      <Skeleton className="mx-auto mb-8 h-8 w-64 max-w-full" />
+      {[0, 1, 2, 3, 4].map((index) => (
+        <Skeleton key={index} className="h-12 w-full" />
+      ))}
+    </div>
+  );
+}
+
+/**
+ * The outreach page. What does not depend on the chain (the introduction,
+ * how it works, the call to action) renders at once; the figures and the
+ * two ledgers hold their places with placeholders until their reads land,
+ * rather than the whole page waiting behind one spinner.
+ */
 const MarketingRewards = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('marketing');
   const { data: marketingRewards, isLoading: rewardsLoading } = useMarketingRewards();
@@ -37,29 +66,28 @@ const MarketingRewards = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const totalAllocatedCst = toFiniteNumber(dashboard?.MainStats?.TotalMktRewardsEth);
   const rewardTransactions = toFiniteNumber(dashboard?.MainStats?.NumMktRewards);
 
-  if (loading) {
-    return (
-      <PageShell variant="data" backdrop="signature">
-        {seoSummary}
-        <div className="flex justify-center py-16" role="status" aria-label={t('loadingAria')}>
-          <Spinner />
-        </div>
-      </PageShell>
-    );
-  }
-
   return (
     <PageShell variant="data" backdrop="signature">
       {seoSummary}
       <MarketingHero compact={Boolean(seoSummary)} />
-      <MarketingStats
-        totalAllocatedCst={totalAllocatedCst}
-        activeMarketers={activeMarketers}
-        rewardTransactions={rewardTransactions}
-      />
+      {loading ? (
+        <StatsPlaceholder />
+      ) : (
+        <MarketingStats
+          totalAllocatedCst={totalAllocatedCst}
+          activeMarketers={activeMarketers}
+          rewardTransactions={rewardTransactions}
+        />
+      )}
       <HowItWorks />
-      <TopMarketersLeaderboard rewards={rewards} />
-      <RewardsHistorySection rewards={rewards} />
+      {rewardsLoading ? (
+        <LedgerPlaceholder label={t('loadingAria')} />
+      ) : (
+        <>
+          <TopMarketersLeaderboard rewards={rewards} />
+          <RewardsHistorySection rewards={rewards} />
+        </>
+      )}
       <MarketingCTA />
     </PageShell>
   );

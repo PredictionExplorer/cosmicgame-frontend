@@ -1,81 +1,66 @@
-import { useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+'use client';
 
-import { getExplorerUrl } from '@/utils';
+import { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 
-import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
-import {
-  TablePrimary,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryContainer,
-  TablePrimaryHead,
-  TablePrimaryHeadCell,
-  TablePrimaryRow,
-} from '@/components/styled';
-import { CustomPagination } from '@/components/common/CustomPagination';
-import { AddressLink } from '@/components/common/AddressLink';
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+import type { LedgerStateProps } from '@/components/tables/ledger-props';
 import type { MarketingReward } from '@/services/api/types';
 
 export type { MarketingReward };
 
-const GlobalMarketingRewardsRow = ({ row }: { row: MarketingReward }) => {
-  const t = useTranslations('tables');
-  const locale = useLocale();
-  if (!row) {
-    return <TablePrimaryRow />;
-  }
+interface GlobalMarketingRewardsTableProps extends LedgerStateProps {
+  list: MarketingReward[];
+}
 
-  return (
-    <TablePrimaryRow>
-      <TablePrimaryCell label={t('columns.datetime')}>
-        <a
-          className="text-inherit"
-          href={getExplorerUrl('tx', row.TxHash)}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <HydrationSafeDateTime timestamp={row.TimeStamp} locale={locale} />
-        </a>
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.outreachContributor')} align="center">
-        <AddressLink address={row.MarketerAddr} url={`/marketing/${row.MarketerAddr}`} />
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.amount')} align="right">
-        {row.AmountEth.toFixed(2)} CST
-      </TablePrimaryCell>
-    </TablePrimaryRow>
+/**
+ * Every Outreach Reserve allocation: when (linked to its transaction), to
+ * whom (linked to that contributor's outreach history) and how much CST.
+ */
+export const GlobalMarketingRewardsTable = ({
+  list,
+  ...state
+}: GlobalMarketingRewardsTableProps) => {
+  const t = useTranslations('tables');
+
+  const columns = useMemo<DataTableColumn<MarketingReward>[]>(
+    () => [
+      {
+        id: 'datetime',
+        kind: 'datetime',
+        header: t('columns.datetime'),
+        value: (row) => row.TimeStamp,
+        txHash: (row) => row.TxHash,
+        year: 'always',
+        sortable: true,
+      },
+      {
+        id: 'contributor',
+        kind: 'address',
+        header: t('columns.outreachContributor'),
+        value: (row) => row.MarketerAddr,
+        href: (row) => `/marketing/${row.MarketerAddr}`,
+      },
+      {
+        id: 'amount',
+        kind: 'amount',
+        header: t('columns.amount'),
+        unit: 'CST',
+        value: (row) => row.AmountEth,
+        sortable: true,
+      },
+    ],
+    [t],
   );
-};
-
-export const GlobalMarketingRewardsTable = ({ list }: { list: MarketingReward[] }) => {
-  const t = useTranslations('tables');
-  const perPage = 5;
-  const [page, setPage] = useState(1);
-
-  if (list.length === 0) {
-    return <p>{t('empty.allocations')}</p>;
-  }
 
   return (
-    <>
-      <TablePrimaryContainer>
-        <TablePrimary>
-          <TablePrimaryHead>
-            <tr>
-              <TablePrimaryHeadCell align="left">{t('columns.datetime')}</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>{t('columns.outreachContributor')}</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">{t('columns.amount')}</TablePrimaryHeadCell>
-            </tr>
-          </TablePrimaryHead>
-          <TablePrimaryBody>
-            {list.slice((page - 1) * perPage, page * perPage).map((row) => (
-              <GlobalMarketingRewardsRow row={row} key={row.EvtLogId} />
-            ))}
-          </TablePrimaryBody>
-        </TablePrimary>
-      </TablePrimaryContainer>
-      <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
-    </>
+    <DataTable
+      data={list}
+      columns={columns}
+      ariaLabel={t('names.outreachAllocations')}
+      getRowKey={(row) => row.EvtLogId}
+      emptyTitle={t('empty.outreachAllocations')}
+      {...state}
+    />
   );
 };

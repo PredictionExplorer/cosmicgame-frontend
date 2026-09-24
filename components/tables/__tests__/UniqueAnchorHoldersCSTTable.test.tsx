@@ -90,13 +90,13 @@ describe('UniqueAnchorHoldersCSTTable', () => {
     expect(userLink).toHaveAttribute('href', `/user/${addr}`);
   });
 
-  it('renders only first page of results (perPage=5)', () => {
-    const list = Array.from({ length: 8 }, (_, i) =>
+  it('shows 20 rows a page with the row range', () => {
+    const list = Array.from({ length: 25 }, (_, i) =>
       createAnchorHolder({ StakerAid: i, NumStakeActions: 100 + i }),
     );
-    render(<UniqueAnchorHoldersCSTTable list={list} />);
-    expect(screen.getByText('104')).toBeInTheDocument();
-    expect(screen.queryByText('105')).not.toBeInTheDocument();
+    const { container } = render(<UniqueAnchorHoldersCSTTable list={list} />);
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(20);
+    expect(screen.getByText('tables.pagination.range(from=1,to=20,total=25)')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
