@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowRight, Pause, Play } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -10,13 +10,8 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { signatureMedia, signatureSources, useSignatureAlt } from '@/components/nft/signatureArt';
 import { Button } from '@/components/ui/button';
-import {
-  ART_PLATE_CLASS,
-  ArtFrame,
-  PendingPlate,
-  WallLabel,
-  type ArtStatus,
-} from '@/components/ui/art-frame';
+import { ArtFrame, PendingPlate, WallLabel, type ArtStatus } from '@/components/ui/art-frame';
+import { DateTime } from '@/components/ui/date-time';
 import { cn } from '@/lib/utils';
 
 import { ArtReel, type ReelToken } from './ArtReel';
@@ -30,6 +25,8 @@ export interface StageToken extends ReelToken {
   name?: string | null;
   /** The cycle that imprinted it. */
   cycle?: number | null;
+  /** When it was imprinted, in Unix seconds. */
+  imprintedAt?: number | null;
 }
 
 interface StageArtworkProps {
@@ -62,14 +59,17 @@ function prefersStillArt(reducedMotion: boolean): boolean {
 /**
  * The page's featured Signature, hung on its black plate at the native
  * 3456:2234 ratio with nothing on top of it, and its wall label beneath:
- * name, token number and cycle, and the one control the artwork needs.
+ * name, cycle and imprint date, and the one control the artwork needs.
  *
- * On wide screens the plate plays each token's generation clip (the seeded
- * simulation drawing the Signature) and advances when it ends; elsewhere,
- * and whenever the viewer prefers reduced motion, it shows the still. Pause
- * holds whatever is showing — the clip on its frame, the still in place —
- * and is remembered in this browser. A token whose files all fail ends in
- * the designed unavailable plate, and the parent may skip to the next one.
+ * The still is always the plate's base layer: the server renders it, so it is
+ * the page's first large paint, and nothing ever unmounts it. On wide screens
+ * the generation clip (the seeded simulation drawing the Signature) is laid
+ * over it and fades in only once it plays; the plate advances when a clip
+ * ends. Elsewhere, and whenever the viewer prefers reduced motion, the still
+ * is all there is. Pause holds whatever is showing — the clip on its frame,
+ * the still in place — and is remembered in this browser. A token whose files
+ * all fail ends in the designed unavailable plate, and the parent may skip to
+ * the next one.
  */
 export function StageArtwork({
   token,
@@ -95,6 +95,12 @@ export function StageArtwork({
     !prefersStillArt(reducedMotion) &&
     failedClipSeed !== token.seed;
 
+  // The server-picked first token paints at once; only a token the rotation
+  // brings in later arrives with a fade ("adjust state when a prop changes").
+  const [firstTokenId] = useState(() => token?.id ?? null);
+  const [rotated, setRotated] = useState(false);
+  if (!rotated && token != null && token.id !== firstTokenId) setRotated(true);
+
   useEffect(() => {
     onReelActiveChange(reelActive);
   }, [reelActive, onReelActiveChange]);
@@ -103,13 +109,27 @@ export function StageArtwork({
     if (token) setFailedClipSeed(token.seed);
   }, [token]);
 
+  // While the clip covers the still, a still that failed is no reason to skip
+  // the token; if the clip gives up too, the failure is reported then.
   const tokenId = token?.id ?? null;
+  const stillStatusRef = useRef<ArtStatus | null>(null);
   const handleStatus = useCallback(
     (status: ArtStatus) => {
-      if (tokenId != null) onArtStatus?.(tokenId, status);
+      stillStatusRef.current = status;
+      if (tokenId == null) return;
+      if (status === 'unavailable' && reelActive) return;
+      onArtStatus?.(tokenId, status);
     },
-    [onArtStatus, tokenId],
+    [onArtStatus, tokenId, reelActive],
   );
+  const wasReelActiveRef = useRef(reelActive);
+  useEffect(() => {
+    const clipGaveUp = wasReelActiveRef.current && !reelActive;
+    wasReelActiveRef.current = reelActive;
+    if (clipGaveUp && tokenId != null && stillStatusRef.current === 'unavailable') {
+      onArtStatus?.(tokenId, 'unavailable');
+    }
+  }, [reelActive, tokenId, onArtStatus]);
 
   const media = signatureMedia(token?.seed);
   const tokenLabel = token ? formatId(token.id) : null;
@@ -134,36 +154,41 @@ export function StageArtwork({
           href={`/detail/${token.id}`}
           aria-label={t('deck.art.viewAria', { id: tokenLabel ?? '' })}
           data-testid="deck-art-link"
-          className="block rounded-edge"
+          className="group/plate relative block rounded-edge"
         >
+          {/* Keyed per token, so a new still replaces the last one whole. */}
+          <div
+            key={token.id}
+            className={cn(
+              rotated && 'motion-safe:animate-in motion-safe:fade-in motion-safe:duration-700',
+            )}
+          >
+            <ArtFrame
+              sources={signatureSources(media)}
+              alt={alt}
+              sizes="(min-width: 1280px) 750px, (min-width: 1024px) 58vw, 100vw"
+              priority
+              unavailableLabel={tDetail('image.artworkUnavailable')}
+              unavailableDetail={tokenLabel}
+              onStatusChange={handleStatus}
+            />
+          </div>
           {reelActive ? (
-            <div className={cn(ART_PLATE_CLASS, 'aspect-art w-full')}>
+            // The clip layer covers the plate and keeps its print edge on top.
+            <div className="pointer-events-none absolute inset-0 z-[3] overflow-hidden rounded-edge">
               <ArtReel
                 current={token}
                 next={nextToken}
-                poster={media.renditions[0]?.src ?? media.webImage}
                 paused={paused}
                 onEnded={onReelEnded}
                 onError={handleClipError}
               />
-            </div>
-          ) : (
-            // Keyed per token so each still arrives with a short fade.
-            <div
-              key={token.id}
-              className="motion-safe:animate-in motion-safe:fade-in motion-safe:duration-700"
-            >
-              <ArtFrame
-                sources={signatureSources(media)}
-                alt={alt}
-                sizes="(min-width: 1280px) 750px, (min-width: 1024px) 58vw, 100vw"
-                priority
-                unavailableLabel={tDetail('image.artworkUnavailable')}
-                unavailableDetail={tokenLabel}
-                onStatusChange={handleStatus}
+              <span
+                aria-hidden
+                className="absolute inset-0 rounded-[inherit] shadow-[var(--art-edge)] transition-shadow duration-[var(--duration-fast)] group-hover/plate:shadow-[var(--art-edge-active)] group-focus-visible/plate:shadow-[var(--art-edge-active)]"
               />
             </div>
-          )}
+          ) : null}
         </Link>
       ) : (
         <PendingPlate label={t('hero.artUnavailable.body')} className="px-6" />
@@ -175,12 +200,18 @@ export function StageArtwork({
           meta={
             token
               ? [
-                  <span key="id" className="type-mono text-muted-foreground">
-                    {tokenLabel}
-                  </span>,
+                  // The number leads only when a name took the title line.
+                  name ? (
+                    <span key="id" className="type-mono text-muted-foreground">
+                      {tokenLabel}
+                    </span>
+                  ) : null,
                   token.cycle != null
-                    ? t('hero.cycleNumber', { number: String(token.cycle) })
+                    ? t('latestSignature.imprintedIn', { number: String(token.cycle) })
                     : null,
+                  token.imprintedAt ? (
+                    <DateTime key="at" timestamp={token.imprintedAt} variant="relative" />
+                  ) : null,
                 ]
               : undefined
           }
@@ -188,7 +219,8 @@ export function StageArtwork({
         >
           <p className="type-caption text-subtle">{t('deck.art.pairingNote')}</p>
         </WallLabel>
-        <div className="-me-3 flex shrink-0 items-center gap-1 max-sm:-ms-3">
+        {/* The row wraps rather than widen a 320px page in long-label locales. */}
+        <div className="-me-3 flex shrink-0 flex-wrap items-center gap-1 max-sm:-ms-3 max-sm:max-w-[calc(100%+1.5rem)]">
           {canPause && token ? (
             <Button
               type="button"
