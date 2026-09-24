@@ -5,7 +5,6 @@ import { ArrowRight, Check } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
-import { Badge } from '@/components/ui/badge';
 import { SectionHeader } from '@/components/ui/section-header';
 import type { CyclePhase } from '@/lib/cycleState';
 import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
@@ -64,7 +63,10 @@ export const PHASE_GUIDE_LINK_CLASS = cn(
 
 /**
  * How this cycle works, told as where it is now: the six steps of a
- * Performance Cycle as a vertical stepper with the current one marked. From
+ * Performance Cycle as a vertical stepper with the current one marked. It
+ * draws with the page's progress-rule colours only: the path travelled and
+ * its checked steps in the accent, the current step filled, the steps ahead
+ * on the rule; nothing sits on a fill of its own. From
  * 1024px every step explains itself; on narrower screens only the current
  * one does (the others keep their explanation for screen readers), so the
  * guide stays short without clipping a step or scrolling sideways. Links
@@ -108,14 +110,15 @@ export function CyclePhaseGuide({
               aria-current={state === 'now' ? 'step' : undefined}
               className={cn('relative flex min-w-0 gap-3', last ? 'pb-0' : 'pb-3 lg:pb-5')}
             >
-              {/* The rail: a hairline from this marker to the next. */}
+              {/* The rail: a hairline from this marker to the next, clear of
+                  both markers. The stretch travelled reads in the accent, as
+                  the fill of every progress rule on the page does. */}
               {!last && (
                 <span
                   aria-hidden
                   className={cn(
                     'absolute bottom-0 start-2.5 top-6 w-px',
-                    // The stretch already travelled reads a step stronger.
-                    state === 'passed' ? 'bg-subtle' : 'bg-rule',
+                    state === 'passed' ? 'bg-primary' : 'bg-rule',
                   )}
                 />
               )}
@@ -126,8 +129,8 @@ export function CyclePhaseGuide({
                   state === 'now'
                     ? 'border-primary bg-primary text-primary-foreground'
                     : state === 'passed'
-                      ? 'border-subtle bg-background text-subtle'
-                      : 'border-rule bg-background text-subtle',
+                      ? 'border-primary text-primary'
+                      : 'border-rule text-subtle',
                 )}
               >
                 {state === 'passed' ? <Check className="size-3" /> : index + 1}
@@ -142,15 +145,16 @@ export function CyclePhaseGuide({
                   >
                     {t(`phaseGuide.steps.${step.messageKey}.label`)}
                   </span>
-                  {state === 'now' ? (
-                    <Badge tone="accent" size="sm">
-                      {t('phaseGuide.stepState.now')}
-                    </Badge>
-                  ) : (
-                    <span className={cn('type-caption text-subtle', state === 'next' && 'sr-only')}>
-                      {t(`phaseGuide.stepState.${state}`)}
-                    </span>
-                  )}
+                  {/* The state is a caption, never a chip: the marker carries the emphasis. */}
+                  <span
+                    className={cn(
+                      'type-caption',
+                      state === 'now' ? 'text-primary' : 'text-subtle',
+                      state === 'next' && 'sr-only',
+                    )}
+                  >
+                    {t(`phaseGuide.stepState.${state}`)}
+                  </span>
                 </p>
                 {/* Every step explains itself from 1024px; below, the current
                     one does and the rest keep it for screen readers. */}

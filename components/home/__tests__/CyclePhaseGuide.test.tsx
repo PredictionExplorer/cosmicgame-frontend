@@ -23,6 +23,21 @@ describe('CyclePhaseGuide', () => {
     expect(within(steps[2]!).getByText('home.phaseGuide.stepState.now')).toBeVisible();
   });
 
+  it('draws with the progress-rule colours only, never a chip or a fill of its own', () => {
+    const { container } = render(<CyclePhaseGuide phase="live" />);
+    // The state reads as a caption beside the step's label, not a badge.
+    const now = screen.getByText('home.phaseGuide.stepState.now');
+    expect(now).toHaveClass('type-caption', 'text-primary');
+    expect(now.parentElement).toHaveTextContent('home.phaseGuide.steps.open.label');
+    expect(now.parentElement?.tagName).toBe('P');
+    // Travelled rails and checked markers in the accent, the rest on the rule:
+    // no background, subtle or tinted fill adds to the page's palette.
+    const fills = Array.from(container.querySelectorAll<HTMLElement>('[class*="bg-"]')).flatMap(
+      (element) => element.className.split(/\s+/).filter((name) => name.startsWith('bg-')),
+    );
+    expect(new Set(fills)).toEqual(new Set(['bg-primary', 'bg-rule']));
+  });
+
   it('explains every step from 1024px and the current one at every width', () => {
     render(<CyclePhaseGuide phase="ready-to-finalize" />);
     for (const step of CYCLE_STEPS) {
