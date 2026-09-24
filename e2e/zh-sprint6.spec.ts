@@ -83,7 +83,13 @@ test.describe('zh Sprint 6 — FAQ, legal, trust, contracts, code, and imprint',
 
     await openZh(page, '/zh/imprint');
     await expect(page.getByRole('heading', { name: '铭刻 Random Walk NFT' }).first()).toBeVisible();
-    await expect(page.getByRole('button', { name: '铭刻' })).toBeVisible();
+    // A disconnected visitor is asked to connect instead of being offered an imprint (F091).
+    const panel = page.getByRole('region', { name: '铭刻 Random Walk NFT' });
+    await expect(panel.getByRole('button', { name: '连接钱包' })).toBeVisible();
+    await expect(
+      panel.getByText('连接钱包即可铭刻 Random Walk NFT。', { exact: false }),
+    ).toBeVisible();
+    await expect(panel.getByRole('button', { name: '铭刻', exact: true })).toHaveCount(0);
   });
 
   test('preserves locale through the source-code alias redirect', async ({ page }) => {
