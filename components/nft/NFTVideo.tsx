@@ -2,7 +2,6 @@ import { Play } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { InfoTooltip } from '@/components/ui/info-tooltip';
-import { GradientBorder } from '@/components/styled';
 
 import NFTImage from './NFTImage';
 
@@ -11,35 +10,38 @@ interface NFTVideoProps {
   onClick: () => void;
 }
 
+/**
+ * A still of the artwork with a play button that opens its animation.
+ *
+ * @deprecated The detail page plays the animation inside its own plate with
+ * `SignatureViewer` (Still / In motion). This block remains for existing call
+ * sites and is removed in wave 4. It no longer dims or scales the art, and the
+ * whole poster is a labelled button, so it works from the keyboard.
+ */
 const NFTVideo = ({ image_thumb, onClick }: NFTVideoProps) => {
   const t = useTranslations('detail');
 
   return (
     <div data-testid="nft-video-section">
-      <div className="flex items-center gap-2 mb-4">
-        <h3 className="text-lg font-semibold text-foreground">{t('video.watchAnimation')}</h3>
+      <div className="mb-4 flex items-center gap-2">
+        <h3 className="type-heading-3 text-foreground">{t('video.watchAnimation')}</h3>
         <InfoTooltip content={t('video.watchAnimationTooltip')} />
       </div>
-      <GradientBorder className="max-w-2xl overflow-hidden">
-        <div
-          className="relative cursor-pointer group"
-          onClick={onClick}
-          data-testid="nft-video-play"
+      <button
+        type="button"
+        onClick={onClick}
+        className="group relative block w-full max-w-2xl cursor-pointer overflow-hidden rounded-edge focus-ring-inset"
+        aria-label={t('video.watchAnimation')}
+        data-testid="nft-video-play"
+      >
+        <NFTImage src={image_thumb} alt="" frame="signature" />
+        <span
+          aria-hidden
+          className="absolute bottom-3 left-3 flex size-12 items-center justify-center rounded-full bg-art-ground/70 text-foreground ring-1 ring-rule transition-colors duration-[var(--duration-fast)] group-hover:bg-primary group-hover:text-primary-foreground"
         >
-          <div className="overflow-hidden">
-            <NFTImage
-              src={image_thumb}
-              alt={t('image.defaultAlt')}
-              className="opacity-60 transition-all duration-500 group-hover:opacity-80 group-hover:scale-[1.02]"
-            />
-          </div>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-black/40 backdrop-blur-sm border border-white/20 transition-all duration-300 group-hover:scale-110 group-hover:bg-primary/30 group-hover:border-primary/40">
-              <Play className="h-7 w-7 text-white ml-1" fill="currentColor" />
-            </div>
-          </div>
-        </div>
-      </GradientBorder>
+          <Play className="ml-0.5 size-5" fill="currentColor" />
+        </span>
+      </button>
     </div>
   );
 };

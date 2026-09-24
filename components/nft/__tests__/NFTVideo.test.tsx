@@ -5,7 +5,14 @@ import NFTVideo from '../NFTVideo';
 jest.mock('next/image', () => ({
   __esModule: true,
   default: (props: Record<string, unknown>) => {
-    const { fill: _f, priority: _p, unoptimized: _u, ...rest } = props;
+    const {
+      fill: _f,
+      priority: _p,
+      unoptimized: _u,
+      loader: _l,
+      fetchPriority: _fp,
+      ...rest
+    } = props;
 
     return <img {...rest} />;
   },
@@ -26,18 +33,25 @@ describe('NFTVideo', () => {
 
   it('renders "Watch Animation" heading', () => {
     render(<NFTVideo {...defaultProps} />);
-    expect(screen.getByText('detail.video.watchAnimation')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'detail.video.watchAnimation' }),
+    ).toBeInTheDocument();
   });
 
-  it('renders the thumbnail image', () => {
-    render(<NFTVideo {...defaultProps} />);
-    const img = screen.getByRole('img');
+  it('shows the still on its plate, undimmed and decorative inside the button', () => {
+    const { container } = render(<NFTVideo {...defaultProps} />);
+    const img = container.querySelector('img');
     expect(img).toHaveAttribute('src', '/images/thumb.png');
+    expect(img).toHaveAttribute('alt', '');
+    expect(img).toHaveClass('aspect-art');
+    expect(img?.className).not.toMatch(/opacity|scale/);
   });
 
-  it('calls onClick when play button is clicked', () => {
+  it('is a labelled button that works from the keyboard', () => {
     render(<NFTVideo {...defaultProps} />);
-    fireEvent.click(screen.getByTestId('nft-video-play'));
+    const play = screen.getByRole('button', { name: 'detail.video.watchAnimation' });
+    expect(play).toHaveAttribute('type', 'button');
+    fireEvent.click(play);
     expect(defaultProps.onClick).toHaveBeenCalledTimes(1);
   });
 

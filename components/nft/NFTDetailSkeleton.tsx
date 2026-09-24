@@ -1,53 +1,49 @@
+import { PendingPlate } from '@/components/ui/art-frame';
 import { Skeleton } from '@/components/ui/skeleton';
 
+/** Rows of the provenance ledger the skeleton reserves. */
+const SPEC_ROWS = 6;
+
+/**
+ * The detail page while the token record loads, matched to its layout: the
+ * pending plate at the art's ratio with the label row under it, and the wall
+ * label beside it (breadcrumb, name, caption line, ledger rows).
+ */
 export function NFTDetailSkeleton() {
   return (
-    <div className="container mx-auto px-4" data-testid="nft-detail-skeleton">
-      {/* Breadcrumb */}
-      <div className="pt-4 pb-6">
-        <Skeleton className="h-4 w-48" />
-      </div>
-
-      {/* Hero: Image + Identity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-        <div>
-          <Skeleton className="aspect-video w-full rounded-xl" />
-          <div className="mt-4 flex gap-3">
-            <Skeleton className="h-9 w-24 rounded-md" />
-            <Skeleton className="h-9 flex-1 rounded-md" />
+    <div className="site-container" data-testid="nft-detail-skeleton" aria-busy="true">
+      <div className="grid items-start gap-x-12 gap-y-8 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,22rem)] xl:gap-x-16">
+        <div className="flex flex-col gap-3 max-sm:-mx-[var(--gutter)]">
+          <PendingPlate busy className="max-sm:rounded-none" />
+          <div className="flex items-center gap-2 max-sm:px-[var(--gutter)]">
+            <Skeleton className="h-11 w-44 rounded-control sm:h-9" />
+            <Skeleton className="ml-auto h-11 w-40 rounded-control sm:h-9" />
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 pt-2">
-          <Skeleton className="h-10 w-3/4" />
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-4">
+            <Skeleton className="h-4 w-48" />
+            <Skeleton className="h-10 w-3/4" />
+            <Skeleton className="h-3 w-1/2" />
+          </div>
+          <div className="divide-y divide-rule-faint border-y border-rule-faint">
+            {Array.from({ length: SPEC_ROWS }, (_, row) => (
+              <div
+                key={row}
+                className="grid grid-cols-[minmax(0,7.5rem)_minmax(0,1fr)] gap-x-4 py-3.5"
+                data-testid="spec-row-skeleton"
+              >
+                <Skeleton className="h-3 w-16" />
+                <Skeleton className="h-3 w-2/3" />
+              </div>
+            ))}
+          </div>
           <div className="flex gap-2">
-            <Skeleton className="h-6 w-20 rounded-full" />
-            <Skeleton className="h-6 w-32 rounded-full" />
-            <Skeleton className="h-6 w-28 rounded-full" />
+            <Skeleton className="h-11 w-24 rounded-control sm:h-9" />
+            <Skeleton className="h-11 w-36 rounded-control sm:h-9" />
           </div>
-          <Skeleton className="mt-2 h-4 w-48" />
         </div>
-      </div>
-
-      {/* Stat Cards Grid */}
-      <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-4">
-            <Skeleton className="h-3 w-20" />
-            <Skeleton className="mt-3 h-6 w-2/3" />
-          </div>
-        ))}
-      </div>
-
-      {/* Seed block */}
-      <div className="mt-6">
-        <Skeleton className="h-12 w-full max-w-md rounded-lg" />
-      </div>
-
-      {/* Video preview */}
-      <div className="mt-12">
-        <Skeleton className="h-5 w-36 mb-4" />
-        <Skeleton className="aspect-video w-full max-w-2xl rounded-xl" />
       </div>
     </div>
   );

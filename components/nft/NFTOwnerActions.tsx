@@ -6,7 +6,6 @@ import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
-import { SectionDivider } from '@/components/ui/section-divider';
 
 export interface NFTOwnerActionsProps {
   address: string;
@@ -45,24 +44,27 @@ export function NFTOwnerActions({
 }: NFTOwnerActionsProps) {
   const t = useTranslations('detail');
 
+  const nameHeading = nftTokenName
+    ? t('ownerActions.renameHeading')
+    : t('ownerActions.nameHeading');
+
+  // The one quiet surface of the page: the owner's tools, grouped by
+  // hairlines inside it rather than by nested boxes.
   return (
-    <div
-      className="gradient-border-card rounded-xl bg-white/[0.02] p-6"
-      data-testid="owner-actions"
-    >
-      <div className="flex items-center gap-2 mb-6">
-        <h3 className="text-lg font-semibold text-foreground">{t('ownerActions.title')}</h3>
+    <div className="rounded-surface bg-surface p-5 sm:p-6" data-testid="owner-actions">
+      <div className="mb-6 flex items-center gap-2">
+        <h2 className="type-heading-3 text-foreground">{t('ownerActions.title')}</h2>
         <InfoTooltip content={t('ownerActions.titleTooltip')} />
       </div>
 
       {showMetaMaskAction && (
         <>
           <div>
-            <div className="flex items-center gap-2 mb-3">
-              <WalletCards className="h-4 w-4 text-primary/70" aria-hidden />
-              <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+            <div className="mb-3 flex items-center gap-2">
+              <WalletCards className="size-4 text-subtle" aria-hidden />
+              <h3 className="type-label text-muted-foreground">
                 {t('ownerActions.metaMaskHeading')}
-              </h4>
+              </h3>
               <InfoTooltip content={t('ownerActions.metaMaskTooltip')} />
             </div>
             <Button variant="secondary" onClick={onAddToMetaMask} disabled={addingToMetaMask}>
@@ -73,21 +75,20 @@ export function NFTOwnerActions({
             </Button>
           </div>
 
-          <SectionDivider className="my-6" />
+          <hr className="my-6 border-rule-faint" />
         </>
       )}
 
       {/* Transfer section */}
       <div>
-        <div className="flex items-center gap-2 mb-3">
-          <Send className="h-4 w-4 text-primary/70" />
-          <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-            {t('ownerActions.transferHeading')}
-          </h4>
+        <div className="mb-3 flex items-center gap-2">
+          <Send className="size-4 text-subtle" aria-hidden />
+          <h3 className="type-label text-muted-foreground">{t('ownerActions.transferHeading')}</h3>
           <InfoTooltip content={t('ownerActions.transferTooltip')} />
         </div>
         <div className="flex gap-2">
           <Input
+            aria-label={t('ownerActions.transferHeading')}
             placeholder={t('ownerActions.recipientPlaceholder')}
             className="flex-1 font-mono text-sm"
             value={address}
@@ -95,24 +96,23 @@ export function NFTOwnerActions({
           />
           <Button variant="secondary" onClick={onTransfer} disabled={disabled}>
             {t('ownerActions.transferButton')}
-            <ArrowRight className="ml-1.5 h-4 w-4" />
+            <ArrowRight className="ml-1.5 h-4 w-4" aria-hidden />
           </Button>
         </div>
       </div>
 
-      <SectionDivider className="my-6" />
+      <hr className="my-6 border-rule-faint" />
 
       {/* Rename section */}
       <div>
-        <div className="flex items-center gap-2 mb-3">
-          <Pen className="h-4 w-4 text-primary/70" />
-          <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-            {nftTokenName ? t('ownerActions.renameHeading') : t('ownerActions.nameHeading')}
-          </h4>
+        <div className="mb-3 flex items-center gap-2">
+          <Pen className="size-4 text-subtle" aria-hidden />
+          <h3 className="type-label text-muted-foreground">{nameHeading}</h3>
           <InfoTooltip content={t('ownerActions.nameTooltip')} />
         </div>
         <div className="flex gap-2">
           <Input
+            aria-label={nameHeading}
             placeholder={t('ownerActions.namePlaceholder')}
             value={tokenName}
             className="flex-1"
@@ -133,9 +133,9 @@ export function NFTOwnerActions({
             </Button>
           )}
         </div>
-        <p className="text-xs text-muted-foreground mt-3">
+        <p className="mt-3 type-caption text-subtle">
           {t('ownerActions.namedTokensCount', { count: totalNamedTokens })}{' '}
-          <Link href="/named-nfts" className="text-primary hover:underline">
+          <Link href="/named-nfts" className="link">
             {t('ownerActions.viewAllNamedTokens')}
           </Link>
         </p>

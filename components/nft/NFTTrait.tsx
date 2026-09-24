@@ -1,19 +1,27 @@
 'use client';
 
-import 'yet-another-react-lightbox/styles.css';
-
-import { useState, useMemo, useEffect, useCallback, useRef, type ChangeEvent } from 'react';
+import {
+  useState,
+  useMemo,
+  useEffect,
+  useCallback,
+  useId,
+  useRef,
+  type ChangeEvent,
+  type ReactNode,
+} from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import Lightbox from 'yet-another-react-lightbox';
 import { usePublicClient } from 'wagmi';
 import { isAddress } from 'viem';
-import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, ChevronUp, ChevronDown, Expand, Trophy } from 'lucide-react';
 
-import { formatId, getAssetsUrl, getOriginUrl, getWebImageUrl } from '@/utils';
+import { formatId } from '@/utils';
 
 import { useCollectionTraits, useNftMetadata } from '@/hooks/useNftTraits';
-import { normalizeTraitEntry, type CosmicSignatureMetadata } from '@/lib/nftMetadata';
+import {
+  normalizeTraitEntry,
+  type CosmicSignatureMetadata,
+  type TraitTranslator,
+} from '@/lib/nftMetadata';
 import { useRouter } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import {
@@ -24,15 +32,6 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
-import { InfoTooltip } from '@/components/ui/info-tooltip';
-import { SectionDivider } from '@/components/ui/section-divider';
 import NameHistoryTable from '@/components/tables/NameHistoryTable';
 import { TransferHistoryTable } from '@/components/tables/TransferHistoryTable';
 import { useActiveWeb3React } from '@/hooks/web3';
@@ -48,19 +47,17 @@ import {
   useNameHistory,
   useCTOwnershipTransfers,
 } from '@/hooks/useApiQuery';
-import { useClipboard } from '@/hooks/useClipboard';
 import { useMetaMaskWatchAsset } from '@/hooks/useMetaMaskWatchAsset';
-import { GradientText } from '@/components/styled';
-import VideoPlayerDialog from '@/components/common/VideoPlayerDialog';
 import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
 
-import NFTImage from './NFTImage';
-import NFTVideo from './NFTVideo';
-import { NFTMetadata } from './NFTMetadata';
+import { NFTSeed } from './NFTMetadata';
 import { NFTOwnerActions } from './NFTOwnerActions';
 import { NFTDetailSkeleton } from './NFTDetailSkeleton';
-import { NFTBreadcrumb } from './NFTBreadcrumb';
-import { HueStrip, RarityRankChip, SpectralClassBadge } from './traits';
+import { NFTIdentity } from './NFTIdentity';
+import { NFTNeighbourNav, neighbourIds } from './NFTNeighbourNav';
+import { NFTShareMenu } from './NFTShareMenu';
+import { SignatureViewer } from './SignatureViewer';
+import { composeSignatureAlt, signatureMedia } from './signatureArt';
 import { NftTraitPanel } from './traits/NftTraitPanel';
 
 interface NFTDetailInfo extends CSTTokenInfo {
@@ -76,69 +73,96 @@ interface NFTTraitProps {
    * so the trait panel is in the first HTML paint. Omit to load on the client.
    */
   initialMetadata?: CosmicSignatureMetadata | null;
+  /**
+   * The token record the server already read, so the art and its wall label
+   * are in the first HTML paint. Omit to load it on the client.
+   */
+  initialToken?: CSTTokenInfo | null;
 }
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
-};
 
 /** Naming writes land before the indexer catches up, so the refetch is deferred. */
 const NAME_REFETCH_DELAY_MS = 3000;
 
-function getAllocationTypeConfig(recordType?: number) {
-  switch (recordType) {
-    case 1:
-      return {
-        labelKey: 'badges.stellarSelectionRecipient',
-        className: 'bg-accent/20 text-accent border-accent/30',
-      } as const;
-    case 2:
-      return {
-        labelKey: 'badges.anchorRecipient',
-        className: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-      } as const;
-    case 3:
-      return {
-        labelKey: 'badges.cycleRecipient',
-        className: 'bg-primary/20 text-primary border-primary/30',
-      } as const;
-    case 4:
-      return {
-        labelKey: 'badges.enduranceChampion',
-        className: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-      } as const;
-    default:
-      return null;
+/**
+ * The plate's rendered width: the art column beside the 18–22rem wall label
+ * from `lg` (at most the 80rem container less the label), the full screen
+ * width below.
+ */
+const PLATE_SIZES = '(min-width: 1280px) 880px, (min-width: 1024px) 62vw, 100vw';
+
+/**
+ * Where the arrow keys belong to a control instead of the page: fields,
+ * composite widgets that move their own selection, and open overlays.
+ */
+const KEY_OWNING_SELECTOR = [
+  'input',
+  'textarea',
+  'select',
+  '[contenteditable="true"]',
+  '[role="tablist"]',
+  '[role="radiogroup"]',
+  '[role="menu"]',
+  '[role="listbox"]',
+  '[role="slider"]',
+  '[role="dialog"]',
+  '[role="region"]',
+].join(',');
+
+function isPageLevelArrow(event: KeyboardEvent): boolean {
+  if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
+    return false;
   }
+  const target = event.target;
+  return !(target instanceof Element && target.closest(KEY_OWNING_SELECTOR));
 }
 
-/** Full detail page for a Cosmic Signature NFT, showing metadata, traits, image/video, naming, transfer, and ownership history. */
-const NFTTrait = ({ tokenId, initialMetadata }: NFTTraitProps) => {
+/** A titled block below the hero. */
+function DetailSection({
+  title,
+  children,
+  testId,
+}: {
+  title: string;
+  children: ReactNode;
+  testId?: string;
+}) {
+  const headingId = useId();
+  return (
+    <section aria-labelledby={headingId} className="mt-16" data-testid={testId}>
+      <h2 id={headingId} className="mb-6 type-section text-foreground">
+        {title}
+      </h2>
+      {children}
+    </section>
+  );
+}
+
+/**
+ * The NFT detail page: the Signature on its plate with the Still / In motion
+ * viewer beside its wall label (name, number, traits, provenance ledger and
+ * actions), then the seed, the trait panel, the owner's tools, and the name
+ * and ownership histories.
+ */
+const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => {
   const t = useTranslations('detail');
   const tCommon = useTranslations('common');
   const tToasts = useTranslations('toasts');
+  const tTraits = useTranslations('traits');
   const locale = useLocale();
   const [openDialog, setOpenDialog] = useState(false);
-  const [openVideo, setOpenVideo] = useState(false);
-  const [imageOpen, setImageOpen] = useState(false);
-  const [videoPath, setVideoPath] = useState<string | null>(null);
   const [address, setAddress] = useState('');
   const [tokenName, setTokenName] = useState('');
-  const [menuOpen, setMenuOpen] = useState(false);
 
-  const { data: dashboard, isLoading: loadingDashboard } = useDashboardInfo();
-  const { data: nftRaw, isLoading: loadingNFT, refetch: refetchCSTInfo } = useCSTInfo(tokenId);
+  // The count only bounds the "next" link, so it need not poll on an art page.
+  const { data: dashboard } = useDashboardInfo(undefined, { poll: false });
   const {
-    data: nameHistory = [],
-    isLoading: loadingNames,
-    refetch: refetchNameHistory,
-  } = useNameHistory(tokenId);
-  const {
-    data: transferHistoryRaw = [],
-    isLoading: loadingTransfers,
-    refetch: refetchTransferHistory,
-  } = useCTOwnershipTransfers(tokenId);
+    data: nftRaw,
+    isLoading: loadingNFT,
+    refetch: refetchCSTInfo,
+  } = useCSTInfo(tokenId, initialToken);
+  const { data: nameHistory = [], refetch: refetchNameHistory } = useNameHistory(tokenId);
+  const { data: transferHistoryRaw = [], refetch: refetchTransferHistory } =
+    useCTOwnershipTransfers(tokenId);
 
   const nft = (nftRaw as NFTDetailInfo | null) ?? null;
   const transferHistory = transferHistoryRaw as (CSTTransferRecord & { TransferType?: number })[];
@@ -155,21 +179,7 @@ const NFTTrait = ({ tokenId, initialMetadata }: NFTTraitProps) => {
   const { traits: collectionTraits } = useCollectionTraits();
   const rarity = collectionTraits?.rarity.byId.get(tokenId) ?? null;
 
-  const image = useMemo(() => {
-    if (!nft?.Seed) return '';
-    return getAssetsUrl(`cosmicsignature/0x${nft.Seed}.png`);
-  }, [nft]);
-
-  // Same pixels as the PNG at a fraction of the bytes; the PNG stays the
-  // fallback for tokens rendered before the WebP derivative existed.
-  const heroImage = useMemo(() => (nft?.Seed ? getWebImageUrl(nft.Seed) : ''), [nft]);
-
-  const video = useMemo(() => {
-    if (!nft?.Seed) return '';
-    return getAssetsUrl(`cosmicsignature/0x${nft.Seed}.mp4`);
-  }, [nft]);
-
-  const loading = loadingDashboard || loadingNFT || loadingNames || loadingTransfers;
+  const media = useMemo(() => signatureMedia(nft?.Seed), [nft?.Seed]);
 
   const router = useRouter();
   const nftContract = useCosmicSignatureContract();
@@ -177,7 +187,6 @@ const NFTTrait = ({ tokenId, initialMetadata }: NFTTraitProps) => {
   const publicClient = usePublicClient();
   const { setNotification } = useNotification();
   const { ensureCorrectChain } = useRequireChain();
-  const { copy } = useClipboard();
   const { isMetaMaskConnected, isAddingNft, addCosmicSignatureNft } = useMetaMaskWatchAsset();
 
   const nameRefetchTimers = useRef(new Set<ReturnType<typeof setTimeout>>());
@@ -201,30 +210,20 @@ const NFTTrait = ({ tokenId, initialMetadata }: NFTTraitProps) => {
   }, []);
 
   const isOwner = account != null && account === nft?.CurOwnerAddr;
-  const totalImprints = dashboard?.MainStats?.NumCSTokenMints ?? 0;
-  const canGoPrev = tokenId > 0;
-  const canGoNext = totalImprints > 0 && tokenId < totalImprints - 1;
+  const totalImprints = dashboard?.MainStats?.NumCSTokenMints ?? null;
+  const { previous: previousId, next: nextId } = neighbourIds(tokenId, totalImprints);
 
-  const handlePrev = useCallback(() => {
-    if (canGoPrev) router.push(`/detail/${tokenId - 1}`);
-  }, [canGoPrev, tokenId, router]);
-
-  const handleNext = useCallback(async () => {
-    if (!nftContract) return;
-    const totalSupply = await nftContract.read.totalSupply?.();
-    router.push(`/detail/${Math.min(tokenId + 1, Number(totalSupply ?? 0) - 1)}`);
-  }, [nftContract, tokenId, router]);
-
-  // Keyboard navigation
+  // The arrow keys walk the collection, as the labelled links do: no read
+  // before navigating, and never while a control owns the arrow keys.
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-      if (e.key === 'ArrowLeft' && canGoPrev) handlePrev();
-      if (e.key === 'ArrowRight' && canGoNext) handleNext();
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (!isPageLevelArrow(event)) return;
+      if (event.key === 'ArrowLeft' && previousId !== null) router.push(`/detail/${previousId}`);
+      if (event.key === 'ArrowRight' && nextId !== null) router.push(`/detail/${nextId}`);
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [canGoPrev, canGoNext, handlePrev, handleNext]);
+  }, [previousId, nextId, router]);
 
   const handleClickTransfer = async () => {
     if (!isAddress(address)) {
@@ -267,12 +266,6 @@ const NFTTrait = ({ tokenId, initialMetadata }: NFTTraitProps) => {
   };
 
   const handleCloseDialog = () => setOpenDialog(false);
-
-  const handlePlay = (videoUrl: string) => {
-    if (!videoUrl) return;
-    setVideoPath(videoUrl);
-    setOpenVideo(true);
-  };
 
   const handleTransfer = async () => {
     handleCloseDialog();
@@ -398,242 +391,65 @@ const NFTTrait = ({ tokenId, initialMetadata }: NFTTraitProps) => {
     setTokenName(inputName.slice(0, i));
   };
 
-  if (loading) {
+  if (!nft && loadingNFT) {
     return <NFTDetailSkeleton />;
   }
 
-  const currentTokenName = nameHistory.length > 0 ? nameHistory[0]?.TokenName : undefined;
-  const allocationConfig = getAllocationTypeConfig(nft?.RecordType);
-  const anchoringEligible = !nft?.Staked && !nft?.WasUnstaked;
+  // The name history is newest first; before it loads, the token record's name.
+  const currentName =
+    (nameHistory.length > 0 ? nameHistory[0]?.TokenName : nft?.TokenName)?.trim() || null;
+  const id = formatId(tokenId);
+  const subject = currentName ?? tTraits('quickView.title', { id });
+  const alt = composeSignatureAlt(tTraits as unknown as TraitTranslator, {
+    id,
+    name: currentName,
+    entry: traitEntry,
+  });
 
   return (
-    <div className="container mx-auto px-4">
-      {/* Breadcrumb */}
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={fadeUp}
-        transition={{ duration: 0.4 }}
-        className="print-motion-visible pb-6"
-      >
-        <NFTBreadcrumb tokenId={tokenId} tokenName={currentTokenName} />
-      </motion.div>
-
-      {/* Hero: Image + Token Identity */}
-      <motion.section
-        initial="hidden"
-        animate="visible"
-        variants={fadeUp}
-        transition={{ duration: 0.5, delay: 0.1 }}
-        className="print-motion-visible"
+    <div className="site-container">
+      <section
+        aria-label={subject}
+        className="grid items-start gap-x-12 gap-y-8 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,22rem)] xl:gap-x-16"
         data-testid="hero-section"
       >
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-          {/* Image column */}
-          <div>
-            <div
-              className="gradient-border-card rounded-xl overflow-hidden cursor-pointer transition-shadow duration-300 hover:shadow-[0_0_40px_hsl(var(--primary)/0.15)]"
-              onClick={() => setImageOpen(true)}
-              data-testid="nft-image-container"
-            >
-              <NFTImage
-                src={heroImage || image}
-                fallbackSrc={heroImage ? image : undefined}
-                terminalFallbackSrc={null}
-                alt={t('image.defaultAlt')}
-                priority
+        <SignatureViewer
+          media={media}
+          alt={alt}
+          subject={subject}
+          tokenLabel={id}
+          unavailableLabel={t('image.artworkUnavailable')}
+          sizes={PLATE_SIZES}
+          navigation={<NFTNeighbourNav tokenId={tokenId} total={totalImprints} />}
+          // Never taller than the screen leaves room for; full-bleed on phones.
+          className="mx-auto w-full max-w-[max(20rem,calc((100svh_-_var(--header-height)_-_11rem)_*_3456_/_2234))] max-sm:-mx-[var(--gutter)] max-sm:w-auto max-sm:max-w-none"
+          plateClassName="max-sm:rounded-none"
+          controlsClassName="max-sm:px-[var(--gutter)]"
+        />
+
+        <NFTIdentity
+          tokenId={tokenId}
+          name={currentName}
+          nft={nft}
+          entry={traitEntry}
+          rarity={rarity}
+          rarityTotal={collectionTraits?.rarity.total ?? 0}
+          className="lg:sticky lg:top-[var(--sticky-offset)]"
+          actions={
+            <>
+              <NFTShareMenu imageUrl={media?.sourceImage} videoUrl={media?.video} />
+              <NftMarketplaceButton
+                variant="card"
+                label={t('actions.buyOrSellNfts')}
+                className="h-11 border-input bg-transparent px-3 text-sm font-medium normal-case text-foreground hover:bg-surface sm:h-9"
               />
-              <HueStrip
-                hues={traitEntry?.hues}
-                size="sm"
-                className="absolute inset-x-0 bottom-0 rounded-none"
-              />
-              <div className="absolute top-3 left-3">
-                <Badge className="bg-black/50 backdrop-blur-sm text-white border-white/20 text-xs font-mono">
-                  {formatId(tokenId)}
-                </Badge>
-              </div>
-              <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Expand className="h-5 w-5 text-white/70" />
-              </div>
-            </div>
+            </>
+          }
+        />
+      </section>
 
-            {/* Actions bar below image */}
-            {/* Wraps on phones: share, marketplace and the prev/next pair do
-                not fit one 320px row once each control reaches its 44px touch
-                target, and without wrapping the marketplace label spills out
-                of its own button. */}
-            <div className="mt-4 flex items-center gap-3 max-sm:flex-wrap">
-              <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="text-xs">
-                    {t('share.trigger')}
-                    {menuOpen ? (
-                      <ChevronUp className="ml-1 h-3.5 w-3.5" />
-                    ) : (
-                      <ChevronDown className="ml-1 h-3.5 w-3.5" />
-                    )}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
-                  <DropdownMenuItem
-                    onClick={() => {
-                      copy(getOriginUrl(video));
-                      setMenuOpen(false);
-                    }}
-                  >
-                    {t('share.copyVideoLink')}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      copy(getOriginUrl(image));
-                      setMenuOpen(false);
-                    }}
-                  >
-                    {t('share.copyImageLink')}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      copy(window.location.href);
-                      setMenuOpen(false);
-                    }}
-                  >
-                    {t('share.copyPageLink')}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <NftMarketplaceButton variant="card" label={t('actions.buyOrSellNfts')} />
-
-              <div className="flex gap-2 ml-auto">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handlePrev}
-                  disabled={!canGoPrev}
-                  aria-label={t('navigation.previousToken')}
-                  // Icon-only, so `px-3` alone leaves it ~42px wide.
-                  className="max-sm:min-w-11"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleNext}
-                  disabled={!canGoNext}
-                  aria-label={t('navigation.nextToken')}
-                  className="max-sm:min-w-11"
-                >
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          {/* Token Identity column */}
-          <div className="flex flex-col gap-4 pt-2" data-testid="token-identity">
-            {/* Token name */}
-            {currentTokenName ? (
-              <h1 className="text-3xl md:text-4xl font-bold font-display tracking-tight">
-                <GradientText>{currentTokenName}</GradientText>
-              </h1>
-            ) : (
-              <h1 className="text-3xl md:text-4xl font-bold font-display tracking-tight text-muted-foreground/50">
-                {t('hero.unnamedToken')}
-              </h1>
-            )}
-
-            {/* Badges row */}
-            <div className="flex flex-wrap items-center gap-2" data-testid="token-badges">
-              <Badge variant="outline" className="font-mono text-xs">
-                {formatId(tokenId)}
-              </Badge>
-
-              {allocationConfig && (
-                <Badge className={`border text-xs ${allocationConfig.className}`}>
-                  {t(allocationConfig.labelKey)}
-                  <InfoTooltip
-                    content={
-                      nft?.RecordType === 3
-                        ? t('badges.receivedAsCycleRecipient', { round: String(nft?.RoundNum) })
-                        : t('badges.receivedAs', { label: t(allocationConfig.labelKey) })
-                    }
-                    iconClassName="h-3 w-3 ml-1"
-                  />
-                </Badge>
-              )}
-
-              {anchoringEligible ? (
-                <Badge className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-xs">
-                  {t('badges.eligibleForAnchoring')}
-                  <InfoTooltip
-                    content={t('badges.eligibleForAnchoringTooltip')}
-                    iconClassName="h-3 w-3 ml-1"
-                  />
-                </Badge>
-              ) : (
-                <Badge className="bg-red-500/15 text-red-400 border border-red-500/30 text-xs">
-                  {t('badges.alreadyAnchored')}
-                  <InfoTooltip
-                    content={t('badges.alreadyAnchoredTooltip')}
-                    iconClassName="h-3 w-3 ml-1"
-                  />
-                </Badge>
-              )}
-            </div>
-
-            {traitEntry?.hasArtTraits ? (
-              <div className="flex flex-wrap items-center gap-2" data-testid="token-trait-badges">
-                <SpectralClassBadge value={traitEntry.spectralClass} size="md" withLabel />
-                <RarityRankChip
-                  rarity={rarity}
-                  total={collectionTraits?.rarity.total ?? 0}
-                  size="md"
-                  verbose
-                />
-              </div>
-            ) : null}
-
-            {/* Round link */}
-            {nft?.RoundNum != null && (
-              <div className="mt-1">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => router.push(`/allocation/${nft.RoundNum ?? 0}`)}
-                  className="text-xs"
-                >
-                  <Trophy className="h-3.5 w-3.5 mr-1.5" />
-                  {t('actions.viewCycleDetails', { round: nft.RoundNum })}
-                </Button>
-              </div>
-            )}
-          </div>
-        </div>
-      </motion.section>
-
-      {/* Metadata Stat Cards */}
-      <motion.section
-        initial="hidden"
-        animate="visible"
-        variants={fadeUp}
-        transition={{ duration: 0.5, delay: 0.25 }}
-        className="print-motion-visible mt-12"
-        data-testid="metadata-section"
-      >
-        <NFTMetadata nft={nft} />
-      </motion.section>
-
-      {/* Traits: composition, orbital physics, provenance, media */}
-      <motion.section
-        initial="hidden"
-        animate="visible"
-        variants={fadeUp}
-        transition={{ duration: 0.5, delay: 0.3 }}
-        className="print-motion-visible mt-12"
-        data-testid="traits-section"
-      >
+      {/* The traits and the seed they all derive from, verification data first. */}
+      <section className="mt-16" data-testid="traits-section">
         <NftTraitPanel
           tokenId={tokenId}
           metadata={metadata}
@@ -641,31 +457,12 @@ const NFTTrait = ({ tokenId, initialMetadata }: NFTTraitProps) => {
           isError={metadataError}
           onRetry={() => void refetchMetadata()}
           collectionTraits={collectionTraits}
+          lead={<NFTSeed seed={nft?.Seed} headingLevel={3} />}
         />
-      </motion.section>
+      </section>
 
-      {/* Video Preview */}
-      {video ? (
-        <motion.section
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          transition={{ duration: 0.5, delay: 0.35 }}
-          className="print-motion-visible mt-12"
-        >
-          <NFTVideo image_thumb={image} onClick={() => handlePlay(video)} />
-        </motion.section>
-      ) : null}
-
-      {/* Owner Actions */}
       {isOwner && (
-        <motion.section
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          transition={{ duration: 0.5, delay: 0.45 }}
-          className="print-motion-visible mt-12"
-        >
+        <section className="mt-16">
           <NFTOwnerActions
             address={address}
             tokenName={tokenName}
@@ -683,49 +480,20 @@ const NFTTrait = ({ tokenId, initialMetadata }: NFTTraitProps) => {
             onSetName={handleSetTokenName}
             onClearName={handleClearName}
           />
-        </motion.section>
+        </section>
       )}
 
-      {/* Name History */}
       {nameHistory.length > 0 && (
-        <motion.section
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          className="print-motion-visible mt-12"
-        >
-          <SectionDivider title={t('sections.nameHistory')} className="mb-6" />
+        <DetailSection title={t('sections.nameHistory')}>
           <NameHistoryTable list={nameHistory} />
-        </motion.section>
+        </DetailSection>
       )}
 
-      {/* Transfer History */}
       {transferHistory.length > 0 && !transferHistory[0]?.TransferType && (
-        <motion.section
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          transition={{ duration: 0.5, delay: 0.55 }}
-          className="print-motion-visible mt-12"
-        >
-          <SectionDivider title={t('sections.ownershipHistory')} className="mb-6" />
+        <DetailSection title={t('sections.ownershipHistory')}>
           <TransferHistoryTable list={transferHistory} />
-        </motion.section>
+        </DetailSection>
       )}
-
-      {/* Lightbox & Video Dialog */}
-      {image ? (
-        <Lightbox open={imageOpen} close={() => setImageOpen(false)} slides={[{ src: image }]} />
-      ) : null}
-      <VideoPlayerDialog
-        open={openVideo}
-        videoPath={videoPath}
-        onClose={() => {
-          setOpenVideo(false);
-          setVideoPath(null);
-        }}
-      />
 
       {/* Transfer confirmation dialog */}
       <Dialog open={openDialog} onOpenChange={(open) => !open && handleCloseDialog()}>

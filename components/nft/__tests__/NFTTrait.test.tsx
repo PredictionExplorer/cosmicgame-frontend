@@ -1,6 +1,6 @@
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 
-import { render, screen, fireEvent, checkA11y, waitFor, act } from '@/test-utils';
+import { render, screen, fireEvent, checkA11y, waitFor, act, within } from '@/test-utils';
 
 import NFTTrait from '../NFTTrait';
 
@@ -87,10 +87,11 @@ jest.mock('next/navigation', () => ({
 
 const mockTransferFrom = jest.fn();
 const mockSetNftName = jest.fn();
+const mockTotalSupply = jest.fn().mockResolvedValue(BigInt(100));
 jest.mock('../../../hooks/useCosmicSignatureContract', () => ({
   __esModule: true,
   default: () => ({
-    read: { totalSupply: jest.fn().mockResolvedValue(BigInt(100)) },
+    read: { totalSupply: mockTotalSupply },
     write: { transferFrom: mockTransferFrom, setNftName: mockSetNftName },
   }),
 }));
@@ -130,16 +131,11 @@ jest.mock('next/link', () => ({
   ),
 }));
 
-jest.mock('../NFTImage', () => ({
-  __esModule: true,
-  default: () => <div data-testid="nft-image" />,
-}));
-jest.mock('../NFTVideo', () => ({
-  __esModule: true,
-  default: () => <div data-testid="nft-video" />,
-}));
 jest.mock('../NFTMetadata', () => ({
-  NFTMetadata: () => <div data-testid="nft-metadata" />,
+  NFTSpecList: ({ nft }: { nft: { RoundNum?: number } | null }) => (
+    <dl data-testid="nft-spec-list" data-cycle={nft?.RoundNum} />
+  ),
+  NFTSeed: ({ seed }: { seed?: string }) => <div data-testid="nft-seed">{seed}</div>,
 }));
 jest.mock('../NFTOwnerActions', () => ({
   NFTOwnerActions: (props: {
@@ -173,14 +169,6 @@ jest.mock('../../../components/tables/NameHistoryTable', () => ({
 }));
 jest.mock('../../../components/tables/TransferHistoryTable', () => ({
   TransferHistoryTable: () => <div data-testid="transfer-history-table" />,
-}));
-jest.mock('../../../components/common/VideoPlayerDialog', () => ({
-  __esModule: true,
-  default: () => null,
-}));
-jest.mock('yet-another-react-lightbox', () => ({
-  __esModule: true,
-  default: () => null,
 }));
 
 beforeEach(() => {
@@ -231,10 +219,33 @@ const withNameHistory = (names: Array<{ TokenName: string }> = [{ TokenName: 'My
   });
 
 describe('NFTTrait', () => {
-  it('shows skeleton loading state', () => {
-    mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true });
+  it('shows the layout-matched skeleton only while the token record loads', () => {
+    mockUseCSTInfo.mockReturnValue({ data: undefined, isLoading: true, refetch: jest.fn() });
     render(<NFTTrait tokenId={5} />);
     expect(screen.getByTestId('nft-detail-skeleton')).toBeInTheDocument();
+  });
+
+  it('renders the hero at once from the server record, without waiting for other reads', () => {
+    mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true });
+    mockUseNameHistory.mockReturnValue({ data: [], isLoading: true, refetch: jest.fn() });
+    mockUseCSTInfo.mockImplementation((_id: number, initial?: unknown) => ({
+      data: initial,
+      isLoading: false,
+      refetch: jest.fn(),
+    }));
+    const initialToken = { ...baseNft, EvtLogId: 1, BlockNum: 1, TxId: 1, DateTime: '' };
+    render(<NFTTrait tokenId={5} initialToken={initialToken} />);
+    expect(screen.queryByTestId('nft-detail-skeleton')).not.toBeInTheDocument();
+    expect(screen.getByTestId('hero-section')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'MyToken' })).toBeInTheDocument();
+    expect(mockUseCSTInfo).toHaveBeenCalledWith(5, expect.objectContaining({ TokenId: 5 }));
+  });
+
+  it('does not poll the dashboard on an art page', () => {
+    withDashboard();
+    withNft();
+    render(<NFTTrait tokenId={5} />);
+    expect(mockUseDashboardInfo).toHaveBeenCalledWith(undefined, { poll: false });
   });
 
   it('renders hero section after data loads', () => {
@@ -257,12 +268,19 @@ describe('NFTTrait', () => {
     );
   });
 
-  it('renders breadcrumb', () => {
+  it('renders breadcrumbs through the PageHeader API', () => {
     withDashboard();
     withNft();
     withNameHistory();
     render(<NFTTrait tokenId={5} />);
-    expect(screen.getByTestId('nft-breadcrumb')).toBeInTheDocument();
+    const breadcrumb = screen.getByRole('navigation', { name: 'common.accessibility.breadcrumb' });
+    expect(
+      within(breadcrumb).getByRole('link', { name: 'common.breadcrumbs.home' }),
+    ).toHaveAttribute('href', '/');
+    expect(
+      within(breadcrumb).getByRole('link', { name: 'common.breadcrumbs.gallery' }),
+    ).toHaveAttribute('href', '/gallery');
+    expect(within(breadcrumb).getByText('MyToken')).toHaveAttribute('aria-current', 'page');
   });
 
   it('renders token identity with name', () => {
@@ -271,57 +289,97 @@ describe('NFTTrait', () => {
     withNameHistory([{ TokenName: 'MyToken' }]);
     render(<NFTTrait tokenId={5} />);
     expect(screen.getByTestId('token-identity')).toBeInTheDocument();
-    expect(screen.getAllByText('MyToken').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByRole('heading', { level: 1, name: 'MyToken' })).toBeInTheDocument();
   });
 
-  it('renders "Unnamed Token" when no name history', () => {
+  it('titles an unnamed token "Cosmic Signature #000005" at full contrast', () => {
     withDashboard();
-    withNft();
+    withNft({ TokenName: '' });
     mockUseNameHistory.mockReturnValue({ data: [], isLoading: false, refetch: jest.fn() });
     render(<NFTTrait tokenId={5} />);
-    expect(screen.getByText('detail.hero.unnamedToken')).toBeInTheDocument();
+    const title = screen.getByRole('heading', { level: 1, name: 'Cosmic Signature #000005' });
+    expect(title.className).not.toMatch(/muted-foreground\/|text-subtle/);
+    expect(screen.queryByText('detail.hero.unnamedToken')).not.toBeInTheDocument();
   });
 
-  it('renders token badges', () => {
+  it('uses the newest name from the history over the token record', () => {
+    withDashboard();
+    withNft({ TokenName: 'Old Name' });
+    withNameHistory([{ TokenName: 'New Name' }, { TokenName: 'Old Name' }]);
+    render(<NFTTrait tokenId={5} />);
+    expect(screen.getByRole('heading', { level: 1, name: 'New Name' })).toBeInTheDocument();
+  });
+
+  it('puts the provenance ledger in the wall label and the seed with the traits', () => {
     withDashboard();
     withNft();
     render(<NFTTrait tokenId={5} />);
-    expect(screen.getByTestId('token-badges')).toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('token-identity')).getByTestId('nft-spec-list'),
+    ).toHaveAttribute('data-cycle', '3');
+    expect(within(screen.getByTestId('traits-section')).getByTestId('nft-seed')).toHaveTextContent(
+      'abc123',
+    );
+    // The cycle link lives in the ledger; the old button duplicating it is gone.
+    expect(screen.queryByText('detail.actions.viewCycleDetails(round=3)')).not.toBeInTheDocument();
   });
 
-  it('renders anchoring eligible badge when not anchored', () => {
+  it('shows the artwork on its plate with alt text composed from the token', () => {
     withDashboard();
-    withNft({ Staked: false, WasUnstaked: false });
+    withNft();
+    withNameHistory();
     render(<NFTTrait tokenId={5} />);
-    expect(screen.getByText('detail.badges.eligibleForAnchoring')).toBeInTheDocument();
+    const art = screen.getByAltText('“MyToken”, Cosmic Signature #000005');
+    expect(art.getAttribute('srcset')).toContain('/0xabc123/thumb_card.webp 640w');
+    expect(screen.getByTestId('art-frame')).toHaveClass('art-plate');
   });
 
-  it('renders already anchored badge when anchored', () => {
+  it('offers Still / In motion, full screen and labelled neighbour links under the art', () => {
     withDashboard();
-    withNft({ Staked: true });
+    withNft();
+    withNameHistory();
     render(<NFTTrait tokenId={5} />);
-    expect(screen.getByText('detail.badges.alreadyAnchored')).toBeInTheDocument();
+    const modes = screen.getByRole('group', { name: 'detail.viewer.modeLabel' });
+    expect(within(modes).getByRole('button', { name: /detail.viewer.still/ })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(screen.getByRole('button', { name: /detail.viewer.fullscreen/ })).toBeInTheDocument();
+    const neighbours = screen.getByRole('navigation', { name: 'detail.navigation.label' });
+    expect(within(neighbours).getByRole('link', { name: /Previous Signature/ })).toHaveAttribute(
+      'href',
+      '/detail/4',
+    );
+    expect(within(neighbours).getByRole('link', { name: /Next Signature/ })).toHaveAttribute(
+      'href',
+      '/detail/6',
+    );
   });
 
-  it('renders allocation type badge for Round Recipient', () => {
+  it('never reads the contract to find the next token', () => {
     withDashboard();
-    withNft({ RecordType: 3 });
-    render(<NFTTrait tokenId={5} />);
-    expect(screen.getByText('detail.badges.cycleRecipient')).toBeInTheDocument();
+    withNft();
+    render(<NFTTrait tokenId={9} />);
+    // Token 9 is the last of 10 imprinted: no next link, and no totalSupply read.
+    const neighbours = screen.getByRole('navigation', { name: 'detail.navigation.label' });
+    expect(within(neighbours).queryByRole('link', { name: /Next Signature/ })).toBeNull();
+    fireEvent.keyDown(window, { key: 'ArrowRight' });
+    expect(mockRouterPush).not.toHaveBeenCalled();
+    expect(mockTotalSupply).not.toHaveBeenCalled();
   });
 
-  it('renders NFT image', () => {
+  it('keeps the quiet action row: share and the marketplace', () => {
     withDashboard();
     withNft();
     render(<NFTTrait tokenId={5} />);
-    expect(screen.getByTestId('nft-image')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /detail.share.trigger/ })).toBeInTheDocument();
   });
 
-  it('renders metadata section', () => {
+  it('lights the page down: no animated or dimmed entrance on the server HTML', () => {
     withDashboard();
     withNft();
-    render(<NFTTrait tokenId={5} />);
-    expect(screen.getByTestId('nft-metadata')).toBeInTheDocument();
+    const { container } = render(<NFTTrait tokenId={5} />);
+    expect(container.querySelector('[style*="opacity"]')).toBeNull();
   });
 
   it('renders name history table when history exists', () => {
@@ -483,8 +541,16 @@ describe('NFTTrait', () => {
     expect(mockReportError).toHaveBeenCalledWith(error, 'clear Cosmic Signature NFT name');
   });
 
-  it('has no accessibility violations', async () => {
-    mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true });
+  it('has no accessibility violations while loading', async () => {
+    mockUseCSTInfo.mockReturnValue({ data: undefined, isLoading: true, refetch: jest.fn() });
+    const { container } = render(<NFTTrait tokenId={5} />);
+    await checkA11y(container);
+  });
+
+  it('has no accessibility violations once loaded', async () => {
+    withDashboard();
+    withNft();
+    withNameHistory();
     const { container } = render(<NFTTrait tokenId={5} />);
     await checkA11y(container);
   });
