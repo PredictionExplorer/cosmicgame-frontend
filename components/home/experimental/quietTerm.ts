@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { TOUCH_TARGET_INLINE_TEXT_CLASS } from '@/lib/touch-target';
 
 /**
  * For an explained term that names a row the page has already introduced (a
@@ -7,11 +7,7 @@ import { cn } from '@/lib/utils';
  * read as a glossary. The first mention of each concept (the monument, the
  * console) keeps the visible underline.
  *
- * On coarse pointers the trigger's hit area grows by 6px above and below, so
- * a 16–20px label becomes a target of at least 24px (WCAG 2.5.8) without
- * making its row any taller.
+ * On coarse pointers the trigger keeps a hit area at least 24px tall
+ * (WCAG 2.5.8) without making its row any taller.
  */
-export const QUIET_TERM_CLASS = cn(
-  '[text-decoration-color:transparent]',
-  "pointer-coarse:relative pointer-coarse:after:absolute pointer-coarse:after:inset-x-0 pointer-coarse:after:-inset-y-1.5 pointer-coarse:after:content-['']",
-);
+export const QUIET_TERM_CLASS = `[text-decoration-color:transparent] ${TOUCH_TARGET_INLINE_TEXT_CLASS}`;
