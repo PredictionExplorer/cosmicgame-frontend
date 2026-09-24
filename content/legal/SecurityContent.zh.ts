@@ -21,8 +21,7 @@ export const securityCopyZh: SecurityCopy = {
     },
     contractsHeading: 'Arbitrum One 上的核心合约',
     contractsIntro:
-      '每个合约公开的源代码在 Sourcify 上均为完全匹配，因此链上的字节码就是你能读到的代码。<contracts>合约页面</contracts>列出了所有地址。',
-    sourcifyMatch: '完全匹配',
+      '每个合约公开的源代码在 Sourcify 上均为完全匹配（核对日期：{date}），因此链上的字节码就是你能读到的代码。<contracts>合约页面</contracts>列出了所有地址。',
     explorerLink: 'Arbiscan',
     sourcifyLink: 'Sourcify',
     copyLabel: '复制 {value}',

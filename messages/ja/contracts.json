@@ -66,7 +66,7 @@
     "description": "Arbitrum One上のCosmic Signatureのすべてのコントラクトです。アドレスをコピーするか、Arbiscanでアドレスを、Sourcifyでソースコードを確認できます。",
     "explorer": "Arbiscan",
     "sourcify": "Sourcify",
-    "exactMatch": "完全一致"
+    "verified": "Sourcifyへのリンクがあるアドレスは、すべてSourcifyで完全一致しています（{date}に確認）。"
   },
   "funds": {
     "title": "配分トラック",

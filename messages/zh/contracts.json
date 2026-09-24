@@ -66,7 +66,7 @@
     "description": "Cosmic Signature 在 Arbitrum One 上的全部合约。可复制地址，或在 Arbiscan 上核对地址、在 Sourcify 上核对源代码。",
     "explorer": "Arbiscan",
     "sourcify": "Sourcify",
-    "exactMatch": "完全匹配"
+    "verified": "附有 Sourcify 链接的地址均在 Sourcify 上完全匹配，核对日期：{date}。"
   },
   "funds": {
     "title": "分配轨道",

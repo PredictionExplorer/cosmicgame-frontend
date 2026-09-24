@@ -21,8 +21,7 @@ export const securityCopyUk: SecurityCopy = {
     },
     contractsHeading: 'Основні контракти в Arbitrum One',
     contractsIntro:
-      'Опублікований вихідний код кожного контракту точно збігається на Sourcify, тож байткод у блокчейні — це той самий код, який ви можете прочитати. Усі адреси наведено на <contracts>сторінці контрактів</contracts>.',
-    sourcifyMatch: 'Точний збіг',
+      'Опублікований вихідний код кожного контракту точно збігається на Sourcify (перевірено {date}), тож байткод у блокчейні — це той самий код, який ви можете прочитати. Усі адреси наведено на <contracts>сторінці контрактів</contracts>.',
     explorerLink: 'Arbiscan',
     sourcifyLink: 'Sourcify',
     copyLabel: 'Копіювати {value}',

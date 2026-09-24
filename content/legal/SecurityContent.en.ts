@@ -21,8 +21,7 @@ export const securityCopyEn: SecurityCopy = {
     },
     contractsHeading: 'Core contracts on Arbitrum One',
     contractsIntro:
-      'The published source code of each contract is an exact match on Sourcify, so the bytecode on-chain is the code you can read. The <contracts>contracts page</contracts> lists every address.',
-    sourcifyMatch: 'Exact match',
+      'The published source code of each contract is an exact match on Sourcify (checked {date}), so the bytecode on-chain is the code you can read. The <contracts>contracts page</contracts> lists every address.',
     explorerLink: 'Arbiscan',
     sourcifyLink: 'Sourcify',
     copyLabel: 'Copy {value}',

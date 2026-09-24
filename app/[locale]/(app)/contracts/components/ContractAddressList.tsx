@@ -1,6 +1,11 @@
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
-import { ContractEvidence } from '@/components/legal/ContractEvidence';
+import {
+  ContractEvidence,
+  formatSourcifyChecked,
+  SourcifyCheckedNote,
+  type ContractEvidenceLabels,
+} from '@/components/legal/ContractEvidence';
 import { GeckoTerminalPoolButton } from '@/components/common/GeckoTerminalPoolButton';
 import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
 import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
@@ -20,17 +25,19 @@ import {
  * The one list of Cosmic Signature contract addresses, grouped by role and
  * rendered with the page (no client fetch, no second copy elsewhere). Each
  * row carries the full address with a copy button, the Arbiscan and Sourcify
- * evidence, and the token's market links where they apply.
+ * evidence, and the token's market links where they apply; what a Sourcify
+ * link vouches for is said once, under the heading. From `xl` a row reads
+ * across three columns (name, address, evidence) instead of leaving the
+ * right half empty.
  */
 export function ContractAddressList({
   apiAddresses,
-  explorerUrl,
 }: {
   /** The dashboard's `ContractAddrs`, or null when the read failed. */
   apiAddresses: ContractAddresses | null | undefined;
-  explorerUrl: string;
 }) {
   const t = useTranslations('contracts');
+  const locale = useLocale();
   const copy = Object.fromEntries(
     CONTRACT_ENTRY_IDS.map((id) => [
       id,
@@ -38,10 +45,9 @@ export function ContractAddressList({
     ]),
   ) as ContractEntryCopy;
   const contracts = buildContracts(apiAddresses, copy);
-  const evidence = {
+  const evidence: ContractEvidenceLabels = {
     explorer: t('addresses.explorer'),
     sourcify: t('addresses.sourcify'),
-    exactMatch: t('addresses.exactMatch'),
   };
 
   return (
@@ -50,6 +56,10 @@ export function ContractAddressList({
         headingId="contract-addresses-heading"
         title={t('addresses.title')}
         description={t('addresses.description')}
+      />
+      <SourcifyCheckedNote
+        text={t('addresses.verified', { date: formatSourcifyChecked(locale) })}
+        className="-mt-3 max-w-2xl sm:-mt-5"
       />
       <div className="mt-6 space-y-10">
         {CONTRACT_CATEGORIES.map((category) => {
@@ -63,12 +73,7 @@ export function ContractAddressList({
               </h3>
               <ul className="mt-3 divide-y divide-rule-faint border-y border-rule-faint">
                 {items.map((contract) => (
-                  <ContractAddressRow
-                    key={contract.id}
-                    contract={contract}
-                    explorerUrl={explorerUrl}
-                    evidence={evidence}
-                  />
+                  <ContractAddressRow key={contract.id} contract={contract} evidence={evidence} />
                 ))}
               </ul>
             </section>
@@ -81,12 +86,10 @@ export function ContractAddressList({
 
 function ContractAddressRow({
   contract,
-  explorerUrl,
   evidence,
 }: {
   contract: ContractEntry;
-  explorerUrl: string;
-  evidence: { explorer: string; sourcify: string; exactMatch: string };
+  evidence: ContractEvidenceLabels;
 }) {
   const market =
     contract.id === 'cst' ? (
@@ -101,23 +104,24 @@ function ContractAddressRow({
   return (
     <li
       data-contract={contract.id}
-      className="grid gap-x-10 gap-y-3 py-5 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]"
+      className="grid gap-x-10 gap-y-2 py-5 lg:grid-cols-[minmax(0,18rem)_minmax(0,1fr)] xl:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] xl:items-center"
     >
-      <div className="min-w-0">
+      <div className="min-w-0 lg:row-span-2 xl:row-span-1">
         <p className="type-title text-foreground">{contract.name}</p>
         <p className="mt-1 type-body-sm text-muted-foreground">{contract.description}</p>
       </div>
+      {/* The whole address at every width (it wraps on phones), for a character-by-character check. */}
+      <AddressChip
+        address={contract.address}
+        variant="plain"
+        display="full"
+        label={false}
+        href={false}
+        className="type-hash self-start whitespace-normal text-foreground xl:self-center"
+      />
       <div className="flex min-w-0 flex-col items-start gap-2">
-        <AddressChip
-          address={contract.address}
-          variant="plain"
-          display="responsive"
-          label={false}
-          href={false}
-          className="type-hash text-foreground"
-        />
-        <ContractEvidence address={contract.address} explorerUrl={explorerUrl} labels={evidence} />
-        {market ? <div className="mt-1 flex flex-wrap gap-2">{market}</div> : null}
+        <ContractEvidence address={contract.address} labels={evidence} />
+        {market ? <div className="flex flex-wrap gap-2">{market}</div> : null}
       </div>
     </li>
   );

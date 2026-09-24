@@ -313,10 +313,7 @@ const Contracts = ({ seoSummary, addresses, initialContractAddrs = null }: Contr
 
       <div className="space-y-16 sm:space-y-20">
         {addresses ?? (
-          <ContractAddressList
-            apiAddresses={data?.ContractAddrs ?? initialContractAddrs}
-            explorerUrl={networkConfig.explorerUrl}
-          />
+          <ContractAddressList apiAddresses={data?.ContractAddrs ?? initialContractAddrs} />
         )}
 
         <FundDistribution

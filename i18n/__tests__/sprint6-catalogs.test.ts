@@ -31,7 +31,7 @@ describe('Sprint 6 focused catalogs', () => {
     expect(zhFaq.search.ariaLabel).toBe('搜索常见问题');
     expect(zhFaq.category.copyLinkAria).toContain('复制');
     expect(zhContracts.addresses.title).toBe('合约地址');
-    expect(zhContracts.addresses.exactMatch).toBe('完全匹配');
+    expect(zhContracts.addresses.verified).toContain('完全匹配');
     expect(zhCode.viewer.title).toBe('代码查看器');
     expect(zhImprint.page.submit).toBe('铭刻');
   });

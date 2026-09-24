@@ -66,7 +66,7 @@
     "description": "Усі контракти Cosmic Signature в Arbitrum One. Скопіюйте адресу або перевірте її в Arbiscan, а вихідний код — на Sourcify.",
     "explorer": "Arbiscan",
     "sourcify": "Sourcify",
-    "exactMatch": "Точний збіг"
+    "verified": "Кожна адреса з посиланням на Sourcify точно збігається там; перевірено {date}."
   },
   "funds": {
     "title": "Напрями розподілу",

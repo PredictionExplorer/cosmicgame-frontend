@@ -66,7 +66,7 @@
     "description": "Mọi hợp đồng Cosmic Signature trên Arbitrum One. Sao chép địa chỉ, hoặc kiểm tra địa chỉ trên Arbiscan và mã nguồn trên Sourcify.",
     "explorer": "Arbiscan",
     "sourcify": "Sourcify",
-    "exactMatch": "Khớp chính xác"
+    "verified": "Mọi địa chỉ có liên kết Sourcify đều khớp chính xác trên đó, kiểm tra ngày {date}."
   },
   "funds": {
     "title": "Các luồng phân bổ",

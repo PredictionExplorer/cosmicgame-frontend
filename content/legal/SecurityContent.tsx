@@ -1,7 +1,7 @@
 import type { LegalDocumentLabels } from '@/content/legal/labels';
 
 import { LegalDocument } from '@/components/legal/LegalDocument';
-import { ContractEvidence } from '@/components/legal/ContractEvidence';
+import { ContractEvidence, formatSourcifyChecked } from '@/components/legal/ContractEvidence';
 import { CopyValue } from '@/components/legal/CopyValue';
 import {
   LegalLedger,
@@ -12,7 +12,6 @@ import {
 } from '@/components/legal/LegalProse';
 import { SiteLink } from '@/components/layout/SiteLink';
 import { AddressChip } from '@/components/ui/address-chip';
-import { networkConfig } from '@/config/networks';
 
 import {
   OFFICIAL_COMMUNITY,
@@ -34,9 +33,12 @@ export interface SecurityCopy {
     readonly communityHeading: string;
     readonly community: Readonly<Record<OfficialCommunityId, string>>;
     readonly contractsHeading: string;
-    /** Rich text: may link the contracts page. */
+    /**
+     * Rich text: may link the contracts page. Says once, for the whole list,
+     * that each address is an exact match on Sourcify; `{date}` is the day
+     * that was checked (`SOURCIFY_CHECKED`), spelled in the locale.
+     */
     readonly contractsIntro: string;
-    readonly sourcifyMatch: string;
     readonly explorerLink: string;
     readonly sourcifyLink: string;
     /** The copy button's name; `{value}` is the domain. */
@@ -126,22 +128,19 @@ export function SecurityContent({
               term: name,
               detail: (
                 <span className="flex flex-col gap-1.5">
+                  {/* The whole address at every width (it wraps on phones): the page asks
+                      readers to check it character by character. */}
                   <AddressChip
                     address={address}
                     variant="plain"
-                    display="responsive"
+                    display="full"
                     label={false}
                     href={false}
-                    className="text-foreground"
+                    className="type-hash self-start whitespace-normal text-foreground"
                   />
                   <ContractEvidence
                     address={address}
-                    explorerUrl={networkConfig.explorerUrl}
-                    labels={{
-                      explorer: official.explorerLink,
-                      sourcify: official.sourcifyLink,
-                      exactMatch: official.sourcifyMatch,
-                    }}
+                    labels={{ explorer: official.explorerLink, sourcify: official.sourcifyLink }}
                   />
                 </span>
               ),
@@ -149,7 +148,7 @@ export function SecurityContent({
           })}
         />
         <LegalParagraph
-          text={official.contractsIntro}
+          text={official.contractsIntro.replace('{date}', formatSourcifyChecked(locale))}
           locale={locale}
           size="note"
           className="mt-4"

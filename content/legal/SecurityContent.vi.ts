@@ -21,8 +21,7 @@ export const securityCopyVi: SecurityCopy = {
     },
     contractsHeading: 'Hợp đồng cốt lõi trên Arbitrum One',
     contractsIntro:
-      'Mã nguồn công bố của mỗi hợp đồng khớp chính xác trên Sourcify, nên bytecode trên chuỗi chính là mã bạn đọc được. <contracts>Trang hợp đồng</contracts> liệt kê mọi địa chỉ.',
-    sourcifyMatch: 'Khớp chính xác',
+      'Mã nguồn công bố của mỗi hợp đồng khớp chính xác trên Sourcify (kiểm tra ngày {date}), nên bytecode trên chuỗi chính là mã bạn đọc được. <contracts>Trang hợp đồng</contracts> liệt kê mọi địa chỉ.',
     explorerLink: 'Arbiscan',
     sourcifyLink: 'Sourcify',
     copyLabel: 'Sao chép {value}',

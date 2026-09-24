@@ -147,11 +147,26 @@ describe('Contracts', () => {
     expect(
       token?.querySelector(`a[href="https://sepolia.arbiscan.io/address/${addr('2')}"]`),
     ).not.toBeNull();
-    // An address the API reports that was never checked on Sourcify gets no badge.
-    expect(token?.textContent).not.toContain('Exact match');
-    // The verified implementation, from protocolFacts, is an exact match.
+    // An address the API reports that was never checked on Sourcify gets no Sourcify link.
+    expect(token?.querySelector('a[href*="sourcify"]')).toBeNull();
+    // The verified implementation, from protocolFacts, links its Sourcify source.
     const implementation = document.querySelector('[data-contract="implementation"]');
-    expect(implementation?.textContent).toContain('Exact match');
+    expect(implementation?.querySelector('a[href*="repo.sourcify.dev"]')).not.toBeNull();
+    // What that link vouches for is said once for the list, not as a badge on every row.
+    expect(screen.queryByText('Exact match')).toBeNull();
+    const notes = document.querySelectorAll('[data-sourcify-note]');
+    expect(notes).toHaveLength(1);
+    expect(notes[0]).toHaveTextContent(
+      'Every address with a Sourcify link is an exact match there, checked September 24, 2026.',
+    );
+  });
+
+  it('shows every whole address, so it can be checked character by character on a phone', () => {
+    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+    render(<Contracts />);
+    const row = document.querySelector('[data-contract="implementation"]');
+    expect(row).toHaveTextContent(checksumAddress(protocolFacts.contractAddresses.implementation));
+    expect(row?.querySelector('.sm\\:hidden')).toBeNull();
   });
 
   it('drops API address fields it has no name for', () => {

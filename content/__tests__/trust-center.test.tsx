@@ -25,6 +25,7 @@ import { TRUST_CENTER_PAGES, TRUST_DOCUMENT_DATES } from '@/content/legal/trustC
 import { protocolFacts } from '@/content/protocol-facts';
 
 import { routing } from '@/i18n/routing';
+import { checksumAddress } from '@/utils/format';
 
 import { render, screen, within } from '@/test-utils';
 
@@ -159,7 +160,17 @@ describe('Security', () => {
     for (const { address } of OFFICIAL_CONTRACTS) {
       expect(sourcifyLinks).toContain(sourcifyContractUrl(address));
     }
-    expect(screen.getAllByText('Exact match')).toHaveLength(OFFICIAL_CONTRACTS.length);
+    // The Sourcify match is stated once, with the day it was checked, not badged per row.
+    expect(screen.queryByText('Exact match')).toBeNull();
+    expect(
+      screen.getByText(/exact match on Sourcify \(checked September 24, 2026\)/),
+    ).toBeInTheDocument();
+    // The whole address, never shortened on phones: the page asks for a character-by-character check.
+    for (const { address } of OFFICIAL_CONTRACTS) {
+      expect(screen.getByTitle(checksumAddress(address))).toHaveTextContent(
+        checksumAddress(address),
+      );
+    }
   });
 
   it('says where to report a vulnerability', () => {

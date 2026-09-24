@@ -21,8 +21,7 @@ export const securityCopyKo: SecurityCopy = {
     },
     contractsHeading: 'Arbitrum One의 핵심 컨트랙트',
     contractsIntro:
-      '각 컨트랙트의 공개 소스 코드는 Sourcify에서 완전히 일치하므로, 온체인 바이트코드가 곧 읽을 수 있는 코드입니다. 모든 주소는 <contracts>컨트랙트 페이지</contracts>에 있습니다.',
-    sourcifyMatch: '완전 일치',
+      '각 컨트랙트의 공개 소스 코드는 Sourcify에서 완전히 일치하므로(확인일: {date}), 온체인 바이트코드가 곧 읽을 수 있는 코드입니다. 모든 주소는 <contracts>컨트랙트 페이지</contracts>에 있습니다.',
     explorerLink: 'Arbiscan',
     sourcifyLink: 'Sourcify',
     copyLabel: '{value} 복사',

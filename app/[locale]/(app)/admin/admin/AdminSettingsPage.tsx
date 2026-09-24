@@ -9,8 +9,12 @@ import {
   type ContractEntryCopy,
 } from '@/app/[locale]/(app)/contracts/contractAddressData';
 
-import { networkConfig } from '@/config/networks';
-import { ContractEvidence } from '@/components/legal/ContractEvidence';
+import {
+  ContractEvidence,
+  formatSourcifyChecked,
+  SourcifyCheckedNote,
+  type ContractEvidenceLabels,
+} from '@/components/legal/ContractEvidence';
 import { AddressChip } from '@/components/ui/address-chip';
 import { Badge } from '@/components/ui/badge';
 import { DateTime } from '@/components/ui/date-time';
@@ -204,10 +208,9 @@ export default function AdminSettingsPage() {
       },
     ]),
   ) as ContractEntryCopy;
-  const evidence = {
+  const evidence: ContractEvidenceLabels = {
     explorer: tContracts('addresses.explorer'),
     sourcify: tContracts('addresses.sourcify'),
-    exactMatch: tContracts('addresses.exactMatch'),
   };
 
   return (
@@ -219,22 +222,22 @@ export default function AdminSettingsPage() {
           title={t('settings.groups.contracts')}
           description={t('settings.contractsDescription')}
         />
+        <SourcifyCheckedNote
+          text={tContracts('addresses.verified', { date: formatSourcifyChecked(locale) })}
+          className="-mt-2 mb-5 max-w-2xl"
+        />
         <dl className="border-t border-rule-faint">
           {buildContracts(data.ContractAddrs, contractCopy).map((contract) => (
             <SheetRow key={contract.id} id={contract.id} label={contract.name} wide>
               <AddressChip
                 address={contract.address}
                 variant="plain"
-                display="responsive"
+                display="full"
                 label={false}
                 href={false}
-                className="type-hash text-foreground"
+                className="type-hash whitespace-normal text-foreground"
               />
-              <ContractEvidence
-                address={contract.address}
-                explorerUrl={networkConfig.explorerUrl}
-                labels={evidence}
-              />
+              <ContractEvidence address={contract.address} labels={evidence} />
             </SheetRow>
           ))}
         </dl>

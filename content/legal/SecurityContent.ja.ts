@@ -21,8 +21,7 @@ export const securityCopyJa: SecurityCopy = {
     },
     contractsHeading: 'Arbitrum Oneのコアコントラクト',
     contractsIntro:
-      '各コントラクトの公開ソースコードはSourcifyで完全に一致しているため、オンチェーンのバイトコードは読むことのできるコードそのものです。すべてのアドレスは<contracts>コントラクトページ</contracts>にあります。',
-    sourcifyMatch: '完全一致',
+      '各コントラクトの公開ソースコードはSourcifyで完全に一致しているため（{date}に確認）、オンチェーンのバイトコードは読むことのできるコードそのものです。すべてのアドレスは<contracts>コントラクトページ</contracts>にあります。',
     explorerLink: 'Arbiscan',
     sourcifyLink: 'Sourcify',
     copyLabel: '{value}をコピー',

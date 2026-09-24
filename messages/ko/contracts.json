@@ -66,7 +66,7 @@
     "description": "Arbitrum One의 모든 Cosmic Signature 컨트랙트입니다. 주소를 복사하거나 Arbiscan에서 주소를, Sourcify에서 소스 코드를 확인할 수 있습니다.",
     "explorer": "Arbiscan",
     "sourcify": "Sourcify",
-    "exactMatch": "완전 일치"
+    "verified": "Sourcify 링크가 있는 주소는 모두 Sourcify에서 완전 일치합니다. 확인일: {date}."
   },
   "funds": {
     "title": "배분 경로",
