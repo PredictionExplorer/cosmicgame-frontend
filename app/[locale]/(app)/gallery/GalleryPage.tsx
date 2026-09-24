@@ -1,6 +1,5 @@
 'use client';
 
-import type { ReactNode } from 'react';
 import { useMemo, useState, useCallback, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Sparkles } from 'lucide-react';
@@ -12,10 +11,7 @@ import { useCollectionTraits } from '@/hooks/useNftTraits';
 import type { CategoricalTraitKey } from '@/lib/nftMetadata';
 import { useRouter, usePathname } from '@/i18n/navigation';
 import { Link } from '@/i18n/navigation';
-import { PageHeader } from '@/components/layout/PageHeader';
-import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
 import { ErrorState } from '@/components/ui/error-state';
-import { PageShell } from '@/components/ui/page-shell';
 import {
   Sheet,
   SheetContent,
@@ -38,7 +34,6 @@ import api from '@/services/api';
 
 import { GalleryActiveFilters } from './components/GalleryActiveFilters';
 import { GalleryCollectionDna } from './components/GalleryCollectionDna';
-import { GalleryHero, type GalleryStats } from './components/GalleryHero';
 import { GalleryToolbar } from './components/GalleryToolbar';
 import { GalleryGrid } from './components/GalleryGrid';
 import { GalleryTraitFacets } from './components/GalleryTraitFacets';
@@ -66,18 +61,14 @@ function isNumeric(value: string) {
 /** Viewport at which the trait facets live in a sidebar instead of a sheet. */
 const RAIL_MEDIA_QUERY = '(min-width: 1024px)';
 
-interface GalleryPageProps {
-  /** The server-rendered page header, the page's only header. */
-  seoSummary?: ReactNode;
-  /**
-   * The route renders the page shell and the header itself, outside this
-   * component's Suspense boundary, so the H1 and figures stay in the static
-   * HTML while the grid (which reads the URL) renders on the client.
-   */
-  bare?: boolean;
-}
-
-const GalleryPage = ({ seoSummary, bare = false }: GalleryPageProps) => {
+/**
+ * The gallery body: the featured imprint, the collection DNA, the archive
+ * toolbar, facets and grid. The route renders the page shell and the server
+ * header (GallerySeoSummary: H1, lede, the collection's figures, the
+ * marketplace action) outside this component's Suspense boundary, so they stay
+ * in the static HTML while the grid, which reads the URL, renders on the client.
+ */
+const GalleryPage = () => {
   const t = useTranslations('gallery');
   const tTraits = useTranslations('traits');
   const { data: nfts, isLoading, isError, refetch } = useCSTList();
@@ -139,17 +130,6 @@ const GalleryPage = ({ seoSummary, bare = false }: GalleryPageProps) => {
   // Trait-index state for the UI: undefined while loading, null when it failed.
   const traitsForUi = traitsError ? null : traitsLoading ? undefined : (collectionTraits ?? null);
   const traitSortsAvailable = traitsForUi !== null;
-
-  const stats: GalleryStats = useMemo(() => {
-    const list = nfts ?? [];
-    return {
-      total: list.length,
-      staked: list.filter((n) => n.Staked).length,
-      named: list.filter((n) => n.TokenName && n.TokenName !== '').length,
-      // Cycle 0 is a real cycle: filter on presence, not truthiness.
-      rounds: new Set(list.map((n) => n.RoundNum).filter((round) => round != null)).size,
-    };
-  }, [nfts]);
 
   const sorted = useMemo(() => {
     const list = [...(nfts ?? [])];
@@ -349,38 +329,17 @@ const GalleryPage = ({ seoSummary, bare = false }: GalleryPageProps) => {
     }
   }, []);
 
-  // The server-rendered header (GallerySeoSummary) is the page's only header.
-  const pageHeader = seoSummary ?? (
-    <PageHeader
-      section="collection"
-      sectionHub
-      title={t('page.title')}
-      subtitle={t('page.subtitle')}
-      actions={<NftMarketplaceButton variant="secondary" />}
-    />
-  );
-  const headerOutside = bare || Boolean(seoSummary);
-  const shell = (children: ReactNode) =>
-    bare ? (
-      <>{children}</>
-    ) : (
-      <PageShell variant="data" backdrop="signature">
-        {pageHeader}
-        {children}
-      </PageShell>
-    );
-
   // An empty grid would read as "no Signatures exist yet", which is a very
   // different statement from "the archive could not be read".
   if (isError) {
-    return shell(
+    return (
       <ErrorState
         title={t('error.title')}
         message={t('error.message')}
         headingLevel={2}
         onRetry={() => void refetch()}
         surface
-      />,
+      />
     );
   }
 
@@ -398,7 +357,7 @@ const GalleryPage = ({ seoSummary, bare = false }: GalleryPageProps) => {
     />
   );
 
-  return shell(
+  return (
     <>
       <Surface
         variant="nebula"
@@ -490,9 +449,6 @@ const GalleryPage = ({ seoSummary, bare = false }: GalleryPageProps) => {
           </div>
         </div>
       </Surface>
-
-      {/* The server header carries the collection's figures; show them once. */}
-      {headerOutside ? null : <GalleryHero stats={stats} loading={isLoading} />}
 
       <GalleryCollectionDna
         collectionTraits={traitsForUi}
@@ -593,7 +549,7 @@ const GalleryPage = ({ seoSummary, bare = false }: GalleryPageProps) => {
         collectionTraits={traitsForUi}
         onSelectTrait={handleSelectTrait}
       />
-    </>,
+    </>
   );
 };
 

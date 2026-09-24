@@ -6,12 +6,6 @@
   "jsonLd": {
     "name": "Cosmic Signature Gallery"
   },
-  "page": {
-    "eyebrowImprinted": "Collection · {count} NFTs Imprinted",
-    "eyebrowLive": "Collection · Live",
-    "title": "NFT Gallery",
-    "subtitle": "Explore the complete Cosmic Signature NFT collection imprinted across every cycle"
-  },
   "intro": {
     "badge": "Generative archive",
     "description": "Each Cosmic Signature NFT is a unique piece of generative art derived from an on-chain seed via three-body-problem physics simulations. In a typical cycle, 24 new NFTs are imprinted: four role NFTs, ten participant Stellar Selection NFTs, and ten Anchored-NFT Stellar Selection NFTs for RandomWalk NFT anchor-holders."
@@ -23,24 +17,6 @@
     "badgeImprint": "Featured imprint",
     "badgeArchive": "Archive",
     "awaitingMetadata": "Awaiting metadata"
-  },
-  "hero": {
-    "totalImprinted": {
-      "label": "Total Imprinted",
-      "tooltip": "The total number of COSMIC NFTs imprinted across all cycles"
-    },
-    "currentlyAnchored": {
-      "label": "Currently Anchored",
-      "tooltip": "NFTs anchored to the protocol, receiving distributions for their owners"
-    },
-    "namedNfts": {
-      "label": "Named NFTs",
-      "tooltip": "NFTs that have been given a unique custom name by their owner"
-    },
-    "cycles": {
-      "label": "Cycles",
-      "tooltip": "The number of unique cycles that have produced NFTs"
-    }
   },
   "card": {
     "alt": "Cosmic Signature {id}",

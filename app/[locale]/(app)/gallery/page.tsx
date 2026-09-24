@@ -103,7 +103,7 @@ export default async function Page({ params }: PageProps) {
         <PageShell variant="data" backdrop="signature">
           <GallerySeoSummary actions={<NftMarketplaceButton variant="secondary" />} />
           <Suspense>
-            <GalleryPage bare />
+            <GalleryPage />
           </Suspense>
         </PageShell>
       </>
