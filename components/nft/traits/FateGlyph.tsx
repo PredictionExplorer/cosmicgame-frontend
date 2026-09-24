@@ -18,9 +18,10 @@ export interface FateGlyphProps {
   className?: string;
 }
 
+/** Each fate's glyph, in its Collection DNA series colour (the data tokens). */
 const fateStyles: Record<string, { Icon: typeof Orbit; className: string }> = {
-  eternalDance: { Icon: InfinityIcon, className: 'text-[rgb(var(--impact-green-rgb))]' },
-  ejection: { Icon: ArrowUpRight, className: 'text-[rgb(var(--chrono-rose-rgb))]' },
+  eternalDance: { Icon: InfinityIcon, className: 'text-data-5' },
+  ejection: { Icon: ArrowUpRight, className: 'text-data-4' },
 };
 
 /**
@@ -36,7 +37,7 @@ export function FateGlyph({ value, size = 'sm', withLabel = false, className }: 
     className: 'text-muted-foreground',
   };
   const label = valueLabel('fate', value);
-  const iconClass = size === 'sm' ? 'h-3 w-3' : 'h-4 w-4';
+  const iconClass = size === 'sm' ? 'size-3' : 'size-4';
 
   return (
     <Tooltip>
@@ -44,8 +45,9 @@ export function FateGlyph({ value, size = 'sm', withLabel = false, className }: 
         <span
           role="img"
           className={cn(
-            'inline-flex items-center gap-1 cursor-help',
-            size === 'sm' ? 'type-caption' : 'text-xs',
+            'inline-flex cursor-help items-center gap-1.5',
+            // md takes the surrounding text size, like the other trait values.
+            size === 'sm' && 'type-caption',
             className,
           )}
           aria-label={t('card.fateAria', { value: label })}

@@ -4,7 +4,6 @@ export * from './HueStrip';
 export * from './SpectralClassBadge';
 export * from './ChaosMeter';
 export * from './FateGlyph';
-export * from './AllocationPill';
+export * from './AllocationLabel';
 export * from './RarityRankChip';
-export * from './TraitPill';
 export * from './TraitSheet';
