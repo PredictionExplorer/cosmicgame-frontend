@@ -51,13 +51,6 @@
     "anchoringGlanceTitle": "Tổng quan neo giữ",
     "anchoringGlanceDescription": "{cosmicCount} Cosmic Signature NFT và {randomWalkCount} RandomWalk NFT hiện đang neo giữ. Xem thao tác neo giữ, token đang neo giữ và người neo giữ riêng biệt trên trang thống kê neo giữ.",
     "anchoringGlanceLink": "Thống kê neo giữ",
-    "headlines": {
-      "uniqueParticipants": "người tham gia riêng biệt",
-      "nftsImprinted": "NFT đã khắc",
-      "nftsAnchored": "NFT đang neo giữ",
-      "gesturesThisCycle": "nét bút trong chu kỳ này",
-      "allocationsDistributed": "phân bổ đã phân phối"
-    },
     "pendingStellarRetrievals": "{count} người nhận chưa nhận về tổng cộng {amount}",
     "voluntaryContributionSummary": "{count} với tổng cộng {amount}",
     "jsonLd": {
@@ -84,30 +77,17 @@
       "label": "Chu kỳ trình diễn đang diễn ra",
       "tooltip": "Số chu kỳ trình diễn hiện tại được API công khai của Cosmic Signature lập chỉ mục."
     },
-    "activeCycleGestures": {
-      "label": "Nét bút của chu kỳ đang diễn ra",
-      "tooltip": "Số nét bút được lập chỉ mục đã đặt trong chu kỳ trình diễn đang diễn ra đến nay."
-    },
-    "totalCycles": {
-      "label": "Tổng số chu kỳ",
-      "tooltip": "Tổng số chu kỳ trình diễn đã hoàn thành hoặc đang được lập chỉ mục kể từ khi giao thức ra mắt."
-    },
     "allocationsDistributed": {
       "label": "Phân bổ đã phân phối",
       "tooltip": "Các bản ghi phân bổ được lập chỉ mục qua mọi chu kỳ. Gồm phân bổ cho người nhận và các dấu mốc phân bổ của giao thức như các đợt nạp phân phối neo giữ."
     },
     "cosmicSignatureNftsImprinted": {
-      "label": "Cosmic Signature NFT đã khắc",
       "shortLabel": "NFT đã khắc",
       "tooltip": "Số token ERC-721 Cosmic Signature NFT tích lũy mà giao thức đã khắc qua mọi chu kỳ được lập chỉ mục. Giá trị 0 nghĩa là API thống kê hiện không báo cáo lần khắc nào được lập chỉ mục cho bộ đếm này."
     },
     "contractBalance": {
       "label": "Số dư hợp đồng",
       "tooltip": "ETH hiện được hợp đồng giao thức Cosmic Signature nắm giữ trước các phân bổ, lần nhận về hoặc chuyển tiếp chu kỳ trong tương lai."
-    },
-    "numAllocationsDistributed": {
-      "label": "Số phân bổ đã phân phối",
-      "tooltip": "Số bản ghi phân bổ đã được ghi nhận. Nếu chưa có bản ghi chi tiết, số liệu sử dụng tổng phân bổ theo người nhận."
     },
     "totalSignatureAllocationsDistributed": {
       "label": "Tổng phân bổ Signature đã phân phối",
@@ -608,24 +588,18 @@
     "emptyDescription": "Bạn hiện chưa có phân bổ nào được ghi nhận."
   },
   "namedNfts": {
-    "eyebrow": "NFT đã đặt tên · {count}",
     "title": "Cosmic Signature NFT đã đặt tên",
     "subtitle": "Duyệt các Cosmic Signature NFT đã được đặt tên tùy chỉnh",
-    "description": "Chủ sở hữu Cosmic Signature NFT có thể đặt tên tùy chỉnh cho NFT của mình, tạo nên một danh tính độc nhất trong bộ sưu tập. NFT đã đặt tên nổi bật trong phòng trưng bày và mang dấu ấn cá nhân của chủ sở hữu.",
     "emptyTitle": "Không có NFT đã đặt tên",
     "emptyDescription": "Chưa có Cosmic Signature NFT nào được đặt tên."
   },
   "attachedNfts": {
-    "eyebrow": "NFT đính kèm · {count}",
     "title": "Đóng góp NFT đính kèm",
-    "subtitle": "Các NFT thành viên cộng đồng đã đính kèm vào nét bút qua các chu kỳ",
-    "description": "Thành viên cộng đồng có thể đính kèm NFT (ERC-721) của mình vào nét bút bằng các tùy chọn nâng cao. NFT đính kèm được chuyển đến người tham gia nhận phân bổ Signature khi chu kỳ hoàn tất, làm giàu phần phân phối ngoài ETH."
+    "subtitle": "Các NFT thành viên cộng đồng đã đính kèm vào nét bút qua các chu kỳ"
   },
   "usedRwlkNfts": {
-    "eyebrow": "RWLK đã sử dụng · {count}",
     "title": "Random Walk NFT đã sử dụng",
     "subtitle": "Các Random Walk NFT đã đính kèm vào nét bút ETH để giảm 50% chi phí nét bút một lần",
-    "description": "Người nắm giữ RandomWalk NFT có thể đính kèm một NFT chưa sử dụng vào nét bút ETH để giảm 50% chi phí nét bút trong Cosmic Signature. Sau khi sử dụng, RandomWalk NFT được ghi lại ở đây. Mỗi NFT chỉ dùng được một lần cho mức giảm giá này, nên thời điểm sử dụng là một quyết định chiến thuật.",
     "loading": "Đang tải…",
     "empty": "Chưa có NFT nào."
   },
@@ -651,10 +625,7 @@
     "titleBeforeDeployment": "Cấu hình hệ thống được thiết lập trước khi triển khai",
     "range": "Phạm vi nhật ký sự kiện {start}–{end}",
     "breadcrumbs": {
-      "home": "Trang chủ",
-      "coordination": "Thay đổi điều phối",
-      "beforeCycle": "Trước chu kỳ {cycle}",
-      "deployment": "Triển khai"
+      "coordination": "Thay đổi điều phối"
     },
     "loading": "Đang tải…",
     "loadError": "Không tải được sự kiện hệ thống",

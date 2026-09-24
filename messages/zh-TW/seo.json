@@ -1,7 +1,7 @@
 {
   "publicData": {
     "common": {
-      "unavailable": "暫不可用",
+      "none": "尚無",
       "source": "資料來源：{source}",
       "relatedPagesAria": "{heading}相關頁面"
     },
@@ -324,6 +324,10 @@
       "gestures": "落筆總次數",
       "signatureAllocation": "簽名分配",
       "opened": "開啟時間"
+    },
+    "info": {
+      "gestures": "本週期的落筆總次數。每一筆也同時計入一次星選資格。",
+      "signatureAllocation": "簽名分配中的 ETH 部分，由寫下收官之筆的參與者取回。獲配者還將獲得 1,000 CST 與一枚 Cosmic Signature NFT。"
     },
     "relatedAria": "目前週期相關頁面",
     "links": {

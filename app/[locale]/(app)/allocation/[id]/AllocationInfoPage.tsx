@@ -639,7 +639,8 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
                   <Amount value={allocationInfo.AmountEth} unit="ETH" />
                 </span>
               ),
-              info: t('details.hero.amountTooltip'),
+              // The definition that matches the label: the ETH part of the Signature Allocation.
+              info: t('details.statistics.cards.signatureEth.tooltip'),
             },
             {
               id: 'recipient',

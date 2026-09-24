@@ -51,13 +51,6 @@
     "anchoringGlanceTitle": "Anchoring at a Glance",
     "anchoringGlanceDescription": "{cosmicCount} Cosmic Signature NFTs and {randomWalkCount} Random Walk NFTs are currently anchored. See anchor actions, anchored tokens, and unique anchor-holders on the anchoring statistics page.",
     "anchoringGlanceLink": "Anchoring statistics",
-    "headlines": {
-      "uniqueParticipants": "unique participants",
-      "nftsImprinted": "NFTs imprinted",
-      "nftsAnchored": "NFTs anchored",
-      "gesturesThisCycle": "gestures this cycle",
-      "allocationsDistributed": "allocations distributed"
-    },
     "pendingStellarRetrievals": "{count} recipients have yet to retrieve funds totaling {amount}",
     "voluntaryContributionSummary": "{count} totaling {amount}",
     "jsonLd": {
@@ -84,30 +77,17 @@
       "label": "Active Performance Cycle",
       "tooltip": "The current Performance Cycle number indexed by the public Cosmic Signature API."
     },
-    "activeCycleGestures": {
-      "label": "Active Cycle Gestures",
-      "tooltip": "Number of indexed gestures made in the active Performance Cycle so far."
-    },
-    "totalCycles": {
-      "label": "Total Cycles",
-      "tooltip": "Total Performance Cycles completed or currently indexed since protocol launch."
-    },
     "allocationsDistributed": {
       "label": "Allocations Distributed",
       "tooltip": "Indexed allocation records across all cycles. Includes recipient allocations and protocol allocation markers such as Anchor Distribution deposits."
     },
     "cosmicSignatureNftsImprinted": {
-      "label": "Cosmic Signature NFTs Imprinted",
       "shortLabel": "NFTs Imprinted",
       "tooltip": "Cumulative count of Cosmic Signature NFT ERC-721 tokens imprinted by the protocol across all indexed cycles. A value of 0 means the statistics API is currently reporting no indexed imprints for this counter."
     },
     "contractBalance": {
       "label": "Contract Balance",
       "tooltip": "ETH currently held by the Cosmic Signature protocol contract before future allocations, retrievals, or cycle transitions."
-    },
-    "numAllocationsDistributed": {
-      "label": "Allocations Distributed",
-      "tooltip": "Number of indexed allocation records. Aggregated recipient totals are used when detailed records are unavailable."
     },
     "totalSignatureAllocationsDistributed": {
       "label": "Total Signature Allocations Distributed",
@@ -608,24 +588,18 @@
     "emptyDescription": "You currently have no recorded allocations."
   },
   "namedNfts": {
-    "eyebrow": "Named NFTs · {count}",
     "title": "Named Cosmic Signature NFTs",
     "subtitle": "Browse Cosmic Signature NFTs that have been given custom names",
-    "description": "Cosmic Signature NFT owners can give their NFTs custom names, creating a unique identity within the collection. Named NFTs stand out in the gallery and carry the personal touch of their owners.",
     "emptyTitle": "No named NFTs",
     "emptyDescription": "No Cosmic Signature NFTs have been named yet."
   },
   "attachedNfts": {
-    "eyebrow": "Attached NFTs · {count}",
     "title": "Attached NFT Contributions",
-    "subtitle": "NFTs attached to gestures by community members across cycles",
-    "description": "Community members can attach their NFTs (ERC-721) to gestures using the advanced options. Attached NFTs forward to the participant who receives the Signature Allocation when the cycle finalizes, enriching the distribution beyond ETH."
+    "subtitle": "NFTs attached to gestures by community members across cycles"
   },
   "usedRwlkNfts": {
-    "eyebrow": "Used RWLK · {count}",
     "title": "Used Random Walk NFTs",
     "subtitle": "Random Walk NFTs attached to ETH gestures for the one-time 50% Gesture Cost reduction",
-    "description": "Random Walk NFT holders can attach an unused NFT to an ETH gesture for a 50% Gesture Cost reduction in Cosmic Signature. Once used, a Random Walk NFT is recorded here. Each NFT can only be used once for this discount, making the timing of its use a strategic decision.",
     "loading": "Loading...",
     "empty": "No NFTs yet."
   },
@@ -651,10 +625,7 @@
     "titleBeforeDeployment": "System Configuration Made Before Deployment",
     "range": "Event log range {start}–{end}",
     "breadcrumbs": {
-      "home": "Home",
-      "coordination": "Coordination changes",
-      "beforeCycle": "Before cycle {cycle}",
-      "deployment": "Deployment"
+      "coordination": "Coordination changes"
     },
     "loading": "Loading...",
     "loadError": "Failed to load system events",

@@ -7,10 +7,9 @@
   },
   "recipients": {
     "header": {
-      "eyebrow": "Allocation · Performance Cycles",
       "title": "Allocation Recipients",
       "subtitle": "Browse the complete history of allocation recipients, cycle statistics, and allocation distributions across all finalized Performance Cycles.",
-      "scope": "Finalized round records only",
+      "scope": "Finalized cycle records only",
       "scopeTooltip": "Totals cover finalized Performance Cycles. Active cycles and separate allocation retrieval records are excluded."
     },
     "intro": "When a Performance Cycle finalizes, the participant who made the Final Gesture retrieves the Signature Allocation — {percentage}% of the Cycle Reserve, 1,000 CST, and a unique Cosmic Signature NFT. Additional allocations flow through Chrono-Warrior, Stellar Selection, Anchor Distributions, Public Goods, and the Compounding Cycle Reserve.",
@@ -42,24 +41,6 @@
           "label": "Next cycle",
           "tooltip": "The remaining Cycle Reserve compounds into the next Performance Cycle after the finalized allocations are made."
         }
-      }
-    },
-    "stats": {
-      "totalCycles": {
-        "label": "Total Cycles",
-        "tooltip": "The total number of finalized Performance Cycles so far."
-      },
-      "totalEth": {
-        "label": "Total ETH Distributed",
-        "tooltip": "The combined ETH distributed as Signature Allocations across all cycles."
-      },
-      "totalGestures": {
-        "label": "Total Gestures",
-        "tooltip": "The cumulative number of gestures made across all finalized cycles."
-      },
-      "uniqueRecipients": {
-        "label": "Unique Recipients",
-        "tooltip": "The number of distinct wallet addresses that have retrieved a Signature Allocation."
       }
     }
   },
@@ -100,7 +81,6 @@
     },
     "hero": {
       "aria": "Cycle Hero",
-      "amountTooltip": "Total ETH retrieved by the participant who made the Final Gesture when the countdown reached zero.",
       "recipient": "Recipient",
       "nft": "NFT",
       "nftTooltip": "View this Cosmic Signature NFT in the gallery.",
@@ -241,7 +221,6 @@
     }
   },
   "finalized": {
-    "home": "Home",
     "title": "Allocation finalized",
     "invalid": {
       "subtitle": "This page needs a valid cycle number in the URL.",
@@ -257,7 +236,6 @@
       "defaultTitle": "Allocation finalized",
       "successSubtitle": "Cycle {cycle} was finalized on-chain.",
       "cycleBreadcrumb": "Cycle {cycle}",
-      "finalizedBreadcrumb": "Finalized",
       "breakdown": "Allocation breakdown (Signature Allocation distribution, other allocations, and attached tokens) is on the allocation details page for this cycle.",
       "viewDetails": "View cycle {cycle} allocation details",
       "review": "You can also review everything under <allocations>My Allocations</allocations>.",
@@ -265,8 +243,6 @@
     },
     "result": {
       "title": "Congratulations! Cycle {cycle} Signature Allocation received.",
-      "allocationBreadcrumb": "Allocation",
-      "retrievedBreadcrumb": "Retrieved",
       "sectionTitle": "Cycle {cycle} allocations",
       "sectionDescription": "Summary of the Signature Allocation components for this cycle.",
       "ethAllocation": "ETH allocation",

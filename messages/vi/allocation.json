@@ -7,7 +7,6 @@
   },
   "recipients": {
     "header": {
-      "eyebrow": "Phân bổ · Chu kỳ trình diễn",
       "title": "Người nhận phân bổ",
       "subtitle": "Lịch sử người nhận phân bổ, thống kê và chi tiết phân bổ của mọi chu kỳ trình diễn đã hoàn tất.",
       "scope": "Chỉ gồm các bản ghi chu kỳ đã hoàn tất",
@@ -42,24 +41,6 @@
           "label": "Chu kỳ tiếp theo",
           "tooltip": "Phần Dự trữ chu kỳ còn lại được tích lũy sang chu kỳ trình diễn tiếp theo sau khi các phân bổ đã hoàn tất được thực hiện."
         }
-      }
-    },
-    "stats": {
-      "totalCycles": {
-        "label": "Tổng số chu kỳ",
-        "tooltip": "Tổng số chu kỳ trình diễn đã hoàn tất đến nay."
-      },
-      "totalEth": {
-        "label": "Tổng ETH đã phân phối",
-        "tooltip": "Tổng ETH đã phân phối dưới dạng phân bổ Signature qua mọi chu kỳ."
-      },
-      "totalGestures": {
-        "label": "Tổng số nét bút",
-        "tooltip": "Tổng số nét bút tích lũy qua mọi chu kỳ đã hoàn tất."
-      },
-      "uniqueRecipients": {
-        "label": "Người nhận riêng biệt",
-        "tooltip": "Số địa chỉ ví riêng biệt đã nhận về một phân bổ Signature."
       }
     }
   },
@@ -100,7 +81,6 @@
     },
     "hero": {
       "aria": "Tiêu điểm chu kỳ",
-      "amountTooltip": "Tổng ETH được người tham gia đặt nét bút cuối cùng nhận về khi đếm ngược về không.",
       "recipient": "Người nhận",
       "nft": "NFT",
       "nftTooltip": "Xem Cosmic Signature NFT này trong phòng trưng bày.",
@@ -241,7 +221,6 @@
     }
   },
   "finalized": {
-    "home": "Trang chủ",
     "title": "Phân bổ đã hoàn tất",
     "invalid": {
       "subtitle": "Trang này cần một số chu kỳ hợp lệ trong URL.",
@@ -257,7 +236,6 @@
       "defaultTitle": "Phân bổ đã hoàn tất",
       "successSubtitle": "Chu kỳ {cycle} đã được hoàn tất trên chuỗi.",
       "cycleBreadcrumb": "Chu kỳ {cycle}",
-      "finalizedBreadcrumb": "Đã hoàn tất",
       "breakdown": "Chi tiết phân bổ (phân phối phân bổ Signature, các phân bổ khác và token đính kèm) nằm trên trang chi tiết phân bổ của chu kỳ này.",
       "viewDetails": "Xem chi tiết phân bổ chu kỳ {cycle}",
       "review": "Bạn cũng có thể xem lại mọi thứ trong <allocations>Phân bổ của tôi</allocations>.",
@@ -265,8 +243,6 @@
     },
     "result": {
       "title": "Đã nhận phân bổ Signature của chu kỳ {cycle}.",
-      "allocationBreadcrumb": "Phân bổ",
-      "retrievedBreadcrumb": "Đã nhận về",
       "sectionTitle": "Phân bổ chu kỳ {cycle}",
       "sectionDescription": "Tóm tắt các thành phần của phân bổ Signature trong chu kỳ này.",
       "ethAllocation": "Phân bổ ETH",

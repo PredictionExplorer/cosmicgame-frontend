@@ -7,7 +7,6 @@
   },
   "recipients": {
     "header": {
-      "eyebrow": "分配 · 演繹週期",
       "title": "分配名錄",
       "subtitle": "瀏覽所有已收官演繹週期的獲配紀錄、週期統計與分配流向。",
       "scope": "僅顯示已收官週期紀錄",
@@ -42,24 +41,6 @@
           "label": "下一週期",
           "tooltip": "各項分配完成後，剩餘的週期儲備會滾入下一週期。"
         }
-      }
-    },
-    "stats": {
-      "totalCycles": {
-        "label": "週期總數",
-        "tooltip": "目前已收官的演繹週期總數。"
-      },
-      "totalEth": {
-        "label": "ETH 發放總額",
-        "tooltip": "所有週期簽名分配中發放的 ETH 總額。"
-      },
-      "totalGestures": {
-        "label": "落筆總次數",
-        "tooltip": "所有已收官週期的累計落筆次數。"
-      },
-      "uniqueRecipients": {
-        "label": "獨立獲配者",
-        "tooltip": "曾取回簽名分配的獨立錢包地址數量。"
       }
     }
   },
@@ -100,7 +81,6 @@
     },
     "hero": {
       "aria": "週期概覽",
-      "amountTooltip": "收官倒數歸零後，寫下收官之筆的參與者取回的 ETH 總額。",
       "recipient": "獲配者",
       "nft": "NFT",
       "nftTooltip": "在畫廊中檢視這枚 Cosmic Signature NFT。",
@@ -241,7 +221,6 @@
     }
   },
   "finalized": {
-    "home": "首頁",
     "title": "週期已收官",
     "invalid": {
       "subtitle": "網址中需要提供有效的週期編號。",
@@ -257,7 +236,6 @@
       "defaultTitle": "週期已收官",
       "successSubtitle": "第 {cycle} 個週期已在鏈上收官。",
       "cycleBreadcrumb": "第 {cycle} 個週期",
-      "finalizedBreadcrumb": "已收官",
       "breakdown": "分配詳情頁列有本週期的簽名分配流向、其他分配及已附加資產。",
       "viewDetails": "檢視第 {cycle} 個週期的分配詳情",
       "review": "也可前往<allocations>我的分配</allocations>檢視全部分配紀錄。",
@@ -265,8 +243,6 @@
     },
     "result": {
       "title": "第 {cycle} 個週期的簽名分配已取回。",
-      "allocationBreadcrumb": "分配",
-      "retrievedBreadcrumb": "已取回",
       "sectionTitle": "第 {cycle} 個週期的分配",
       "sectionDescription": "本週期簽名分配各組成部分的摘要。",
       "ethAllocation": "ETH 分配",

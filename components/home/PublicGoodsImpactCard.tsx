@@ -45,12 +45,10 @@ export function PublicGoodsImpactCard({
   const retrievedEth = toNumber(data.MainStats.SumWithdrawals);
 
   if (variant === 'compact') {
+    // The compact card sits under the protocol Public Goods ledger, whose header
+    // already totals the contributions, so it leaves the lifetime sum out.
     const stats = [
       { label: t('publicGoods.thisCycle'), value: formatEthValue(currentCycleEth, locale) },
-      {
-        label: t('publicGoods.stats.lifetime'),
-        value: formatEthValue(lifetimeContributedEth, locale),
-      },
       { label: t('publicGoods.stats.vault'), value: formatEthValue(vaultBalanceEth, locale) },
       { label: t('publicGoods.stats.retrieved'), value: formatEthValue(retrievedEth, locale) },
     ];
@@ -78,7 +76,7 @@ export function PublicGoodsImpactCard({
             </h2>
           </div>
         </div>
-        <dl className="mt-3 grid grid-cols-2 divide-x divide-y divide-white/[0.07] overflow-hidden rounded-lg border border-white/[0.07] sm:grid-cols-4 sm:divide-y-0">
+        <dl className="mt-3 grid grid-cols-3 divide-x divide-white/[0.07] overflow-hidden rounded-lg border border-white/[0.07]">
           {stats.map((stat) => (
             <div key={stat.label} className="min-w-0 bg-black/10 p-2.5">
               <dt className="text-[10px] uppercase tracking-wider text-muted-foreground">

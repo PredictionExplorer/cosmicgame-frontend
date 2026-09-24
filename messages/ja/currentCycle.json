@@ -3,15 +3,11 @@
     "title": "サイクルデータを読み込めませんでした",
     "message": "ページを再読み込みしてもう一度お試しください。"
   },
-  "nav": {
-    "backToHome": "ホームに戻る"
-  },
   "status": {
     "notStarted": "未開始"
   },
   "hero": {
     "title": "サイクル{n}",
-    "subtitle": "{date}に開始・{count, plural, other {{count}筆}}",
     "status": {
       "openingSoon": "まもなく開始",
       "awaitingFirstGesture": "最初の一筆を待っています",
@@ -36,14 +32,6 @@
     }
   },
   "stats": {
-    "totalGestures": {
-      "label": "一筆の総数",
-      "tooltip": "このサイクルで入れられた一筆の総数。それぞれの一筆は星選の対象にもなります。"
-    },
-    "cycleReserve": {
-      "label": "サイクル準備金",
-      "tooltip": "最後の一筆を入れた参加者が受け取るシグネチャー配分のETH部分。受領者は1,000 CSTとCosmic Signature NFTも受け取ります。"
-    },
     "stellarSelectionPool": {
       "label": "星選プール",
       "tooltip": "サイクルが確定すると、無作為に選ばれた{count}人の参加者に分けられるETH。"

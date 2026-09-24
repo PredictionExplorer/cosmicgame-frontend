@@ -35,6 +35,16 @@ export const protocolFacts = {
     cosmicSignatureNftAnchoringWallet: '0x6308A405B4FF1eA890870Efe2a6D036750B81F7C',
     rwlkAnchoringWallet: '0x5EB3396092841E6c5b0b51141699F6711E830529',
   },
+  /**
+   * Where the Public Goods Vault sends its retrievals: `charityAddress()` on the
+   * vault (read 2026-09-23), which the site names Protocol Guild. The owner can
+   * change it, so pages name an address only when it matches this one and show
+   * any other address as hex.
+   */
+  publicGoodsBeneficiary: {
+    name: 'Protocol Guild',
+    address: '0xdddd576bAF106bAAe54bDE40BCac602bB4a7cf79',
+  },
   mainEthPercentage: 25,
   chronoWarriorEthPercentage: 8,
   stellarSelectionEthPercentage: 4,

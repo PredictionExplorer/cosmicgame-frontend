@@ -1,7 +1,7 @@
 {
   "publicData": {
     "common": {
-      "unavailable": "取得不可",
+      "none": "まだなし",
       "source": "データソース：{source}",
       "relatedPagesAria": "{heading}の関連ページ"
     },
@@ -324,6 +324,10 @@
       "gestures": "一筆の総数",
       "signatureAllocation": "シグネチャー配分",
       "opened": "開始日時"
+    },
+    "info": {
+      "gestures": "このサイクルで入れられた一筆の総数。それぞれの一筆は星選の対象にもなります。",
+      "signatureAllocation": "最後の一筆を入れた参加者が受け取るシグネチャー配分のETH部分。受領者は1,000 CSTとCosmic Signature NFTも受け取ります。"
     },
     "relatedAria": "現在のサイクルの関連ページ",
     "links": {

@@ -105,12 +105,10 @@ const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const [donatedTokensTab, setDonatedTokensTab] = useState(0);
   const perPage = 12;
 
-  const header = seoSummary;
-
   if (isLoading) {
     return (
       <PageShell variant="data" backdrop="signature">
-        {header}
+        {seoSummary}
         <div className="flex items-center justify-center py-16">
           <Spinner size="lg" />
         </div>
@@ -121,7 +119,7 @@ const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   if (isError || !data) {
     return (
       <PageShell variant="data" backdrop="signature">
-        {header}
+        {seoSummary}
         <ErrorState
           headingLevel={2}
           title={t('error.title')}
@@ -164,7 +162,7 @@ const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
 
   return (
     <PageShell variant="data" backdrop="signature">
-      {header}
+      {seoSummary}
 
       {/* ===== HERO SECTION ===== */}
       {/* No gradient-border-card (mask pseudo): Chrome/Skia PDF often drops nested content in that compositing path. */}

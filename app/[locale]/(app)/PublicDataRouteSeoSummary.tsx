@@ -13,7 +13,7 @@ import { DateTime } from '@/components/ui/date-time';
 import { localizeCrossHostHref } from '@/lib/hostRouting';
 import { sumAllocatedEth } from '@/utils/allocationRecords';
 import { toFiniteNumber } from '@/utils/finiteNumber';
-import { formatCount, formatPercent } from '@/utils/format';
+import { NBSP, formatCount, formatPercent, sameAddress } from '@/utils/format';
 import { formatEthQuote } from '@/utils/gestureQuote';
 
 import {
@@ -90,7 +90,7 @@ const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
     ],
   },
   'eth-contribution': {
-    section: 'participate',
+    section: 'records',
     links: [
       { href: '/how-it-works', key: 'reserve' },
       { href: '/public-goods-contributions-cg', key: 'protocol' },
@@ -169,10 +169,17 @@ const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
   },
 };
 
+/**
+ * The value of a figure read from a list that may be empty: `NONE_YET` when the
+ * read succeeded but has no row to show ("None yet"), `null` when it failed
+ * (the header's "Unavailable" dash).
+ */
+const NONE_YET = Symbol('none-yet');
+
 /** A figure before its label is resolved: the catalog key under `cards` plus the value. */
 interface FigureSpec {
   key: string;
-  value: ReactNode | null;
+  value: ReactNode | typeof NONE_YET | null;
   /** Show the card's `tooltip` copy behind an info button. */
   hasTooltip?: boolean;
 }
@@ -222,11 +229,30 @@ function latestRow<T extends { TimeStamp?: unknown }>(rows: readonly T[]): T | n
   return latest;
 }
 
+/**
+ * An ETH quote (five significant digits, like the gesture form's cost) set
+ * the way `<Amount>` sets every ETH figure: tabular digits, the unit muted
+ * and joined by a no-break space.
+ */
+function EthQuote({ value, locale }: { value: number; locale: string }) {
+  return (
+    <data value={value} className="whitespace-nowrap tabular-nums">
+      {formatEthQuote(value, locale)}
+      {NBSP}
+      <span className="text-muted-foreground">ETH</span>
+    </data>
+  );
+}
+
 async function getRouteFigures(route: SeoSummaryRoute, locale: string): Promise<RouteFigures> {
   const count = (value: number) => formatCount(value, locale);
   const eth = (value: number) => <Amount value={value} unit="ETH" locale={locale} />;
-  const date = (seconds: number | null) =>
-    seconds === null ? null : <DateTime timestamp={seconds} locale={locale} />;
+  /** The newest row's date, "None yet" for an empty list, unknown when the read failed. */
+  const latestDate = (rows: readonly { TimeStamp?: unknown }[] | null) => {
+    if (rows === null) return null;
+    const seconds = latestTimestamp(rows);
+    return seconds === null ? NONE_YET : <DateTime timestamp={seconds} locale={locale} />;
+  };
 
   switch (route) {
     case 'allocation': {
@@ -321,7 +347,7 @@ async function getRouteFigures(route: SeoSummaryRoute, locale: string): Promise<
         figures: [
           { key: 'cycle', value: cycle === null ? null : count(cycle) },
           // The same quote format as the home tabs and submit button (five significant digits).
-          { key: 'cost', value: cost === null ? null : `${formatEthQuote(cost, locale)} ETH` },
+          { key: 'cost', value: cost === null ? null : <EthQuote value={cost} locale={locale} /> },
           {
             key: 'discount',
             value: formatPercent(protocolFacts.randomWalkDiscountPercentage, locale),
@@ -425,7 +451,7 @@ async function getRouteFigures(route: SeoSummaryRoute, locale: string): Promise<
         reads: [events],
         figures: [
           { key: 'records', value: rows && count(rows.length) },
-          { key: 'latest', value: rows && date(latestTimestamp(rows)) },
+          { key: 'latest', value: latestDate(rows) },
           {
             key: 'parameters',
             value: rows && count(new Set(rows.map((row) => row.RecordType)).size),
@@ -446,7 +472,7 @@ async function getRouteFigures(route: SeoSummaryRoute, locale: string): Promise<
           { key: 'records', value: rows && count(rows.length) },
           { key: 'totalEth', value: rows && eth(sumAmountEth(rows)) },
           { key: 'share', value: formatPercent(share, locale), hasTooltip: true },
-          { key: 'latest', value: rows && date(latestTimestamp(rows)) },
+          { key: 'latest', value: latestDate(rows) },
         ],
       };
     }
@@ -473,15 +499,27 @@ async function getRouteFigures(route: SeoSummaryRoute, locale: string): Promise<
         latest && typeof latest.DestinationAddr === 'string' && isAddress(latest.DestinationAddr)
           ? latest.DestinationAddr
           : null;
+      // Named when it is the vault's documented beneficiary; any other address reads as hex.
+      const { name: beneficiaryName, address: beneficiaryAddress } =
+        protocolFacts.publicGoodsBeneficiary;
       return {
         reads: [withdrawals],
         figures: [
           { key: 'records', value: rows && count(rows.length) },
           { key: 'totalEth', value: rows && eth(sumAmountEth(rows)) },
-          { key: 'latest', value: rows && date(latestTimestamp(rows)) },
+          { key: 'latest', value: latestDate(rows) },
           {
             key: 'beneficiary',
-            value: beneficiary && <AddressChip address={beneficiary} className="type-figure-sm" />,
+            value:
+              rows === null ? null : beneficiary === null ? (
+                NONE_YET
+              ) : (
+                <AddressChip
+                  address={beneficiary}
+                  label={sameAddress(beneficiary, beneficiaryAddress) ? beneficiaryName : undefined}
+                  className="type-figure-sm"
+                />
+              ),
             hasTooltip: true,
           },
         ],
@@ -528,7 +566,12 @@ export async function PublicDataRouteSeoSummary({
     return {
       id: figure.key,
       label,
-      value: figure.value,
+      value:
+        figure.value === NONE_YET ? (
+          <span className="text-muted-foreground">{t('publicData.common.none')}</span>
+        ) : (
+          figure.value
+        ),
       info: figure.hasTooltip ? t(`${prefix}.cards.${figure.key}.tooltip`) : undefined,
     };
   });
@@ -544,9 +587,13 @@ export async function PublicDataRouteSeoSummary({
       meta={
         readAt !== null || note ? (
           <>
-            {readAt !== null ? <SnapshotStamp at={readAt} /> : null}
             {readAt !== null ? (
-              <span>{t('publicData.common.source', { source: t(`${prefix}.source`) })}</span>
+              // One item, so the stamp and its source flow as one line of text.
+              <span>
+                <SnapshotStamp at={readAt} />
+                {' · '}
+                {t('publicData.common.source', { source: t(`${prefix}.source`) })}
+              </span>
             ) : null}
             {note}
           </>

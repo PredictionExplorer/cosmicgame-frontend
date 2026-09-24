@@ -34,11 +34,13 @@ export async function CurrentCycleSeoSummary() {
           id: 'gestures',
           label: t('currentCycleSummary.cards.gestures'),
           value: figure('gestures'),
+          info: t('currentCycleSummary.info.gestures'),
         },
         {
           id: 'signatureAllocation',
           label: t('currentCycleSummary.cards.signatureAllocation'),
           value: figure('reserve'),
+          info: t('currentCycleSummary.info.signatureAllocation'),
         },
         { id: 'opened', label: t('currentCycleSummary.cards.opened'), value: figure('opened') },
       ]}

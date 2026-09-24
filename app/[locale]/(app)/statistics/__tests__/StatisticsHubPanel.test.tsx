@@ -43,12 +43,18 @@ beforeEach(() => {
 });
 
 describe('StatisticsHubPanel', () => {
-  it('leaves the headline figures to the page header', () => {
+  it('leaves the headline figures to the page header: each appears once per page', () => {
     render(<StatisticsHubPanel />);
-    // StatisticsSeoSummary shows the cycle, allocations, imprints and balance once, from
-    // the same dashboard query; the panel no longer repeats them in a stat-card row.
-    expect(screen.queryByText('Total Cycles')).not.toBeInTheDocument();
-    expect(screen.queryByText('Contract Balance')).not.toBeInTheDocument();
+    // StatisticsSeoSummary shows the cycle and its gestures, allocations, imprints and
+    // balance once, from the same dashboard query; the body repeats none of them.
+    for (const label of [
+      'Total Cycles',
+      'Contract Balance',
+      statisticsMessages.metrics.allocationsDistributed.label,
+      statisticsMessages.metrics.cosmicSignatureNftsImprinted.shortLabel,
+    ]) {
+      expect(screen.queryByText(label)).not.toBeInTheDocument();
+    }
   });
 
   it('renders an explore card linking to every section page', () => {
@@ -64,11 +70,11 @@ describe('StatisticsHubPanel', () => {
     }
   });
 
-  it('shows live headline stats inside explore cards', () => {
+  it('keeps the explore cards to navigation: no figure repeats the header', () => {
     render(<StatisticsHubPanel />);
-    expect(screen.getByText('unique participants')).toBeInTheDocument();
-    expect(screen.getByText('gestures this cycle')).toBeInTheDocument();
-    expect(screen.getByText('allocations distributed')).toBeInTheDocument();
+    const nav = screen.getByRole('navigation', { name: 'Statistics section pages' });
+    // A figure is a text node of digits (and grouping marks) alone.
+    expect(within(nav).queryAllByText(/^[\d,.\s]+$/)).toHaveLength(0);
   });
 
   it('renders the protocol economy groups', () => {

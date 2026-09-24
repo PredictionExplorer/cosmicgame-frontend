@@ -3,15 +3,11 @@
     "title": "未能加载周期数据",
     "message": "请刷新页面重试。"
   },
-  "nav": {
-    "backToHome": "返回首页"
-  },
   "status": {
     "notStarted": "尚未开始"
   },
   "hero": {
     "title": "第 {n} 个周期",
-    "subtitle": "开启于 {date} · 已落笔 {count} 次",
     "status": {
       "openingSoon": "即将开启",
       "awaitingFirstGesture": "等待第一笔",
@@ -36,14 +32,6 @@
     }
   },
   "stats": {
-    "totalGestures": {
-      "label": "落笔总次数",
-      "tooltip": "本周期的落笔总次数。每一笔也同时计入一次星选资格。"
-    },
-    "cycleReserve": {
-      "label": "周期储备",
-      "tooltip": "签名分配中的 ETH 部分，由写下收官之笔的参与者取回。获配者还将获得 1,000 CST 与一枚 Cosmic Signature NFT。"
-    },
     "stellarSelectionPool": {
       "label": "星选池",
       "tooltip": "周期收官时，这部分 ETH 将由程序化随机选出的 {count} 位参与者均分。"

@@ -51,13 +51,6 @@
     "anchoringGlanceTitle": "錨定概覽",
     "anchoringGlanceDescription": "目前共有 {cosmicCount} 枚 Cosmic Signature NFT 與 {randomWalkCount} 枚 Random Walk NFT 處於錨定狀態。前往錨定統計頁面，可查看錨定操作、已錨定代幣與獨立錨定者。",
     "anchoringGlanceLink": "查看錨定統計",
-    "headlines": {
-      "uniqueParticipants": "位獨立參與者",
-      "nftsImprinted": "枚已銘刻 NFT",
-      "nftsAnchored": "枚已錨定 NFT",
-      "gesturesThisCycle": "次本週期落筆",
-      "allocationsDistributed": "條分配記錄"
-    },
     "pendingStellarRetrievals": "{count} 位獲配者尚未取回共計 {amount}",
     "voluntaryContributionSummary": "{count} 筆，共計 {amount}",
     "jsonLd": {
@@ -84,30 +77,17 @@
       "label": "目前演繹週期",
       "tooltip": "Cosmic Signature 公共 API 目前索引的演繹週期編號。"
     },
-    "activeCycleGestures": {
-      "label": "目前週期落筆",
-      "tooltip": "目前週期內已索引的落筆次數。"
-    },
-    "totalCycles": {
-      "label": "週期總數",
-      "tooltip": "協議上線以來，已完成或目前已索引的演繹週期總數。"
-    },
     "allocationsDistributed": {
       "label": "已發放分配",
       "tooltip": "所有週期中的已索引分配記錄，包括獲配者分配，以及錨定派發存入等協議分配標記。"
     },
     "cosmicSignatureNftsImprinted": {
-      "label": "已銘刻 Cosmic Signature NFT",
       "shortLabel": "已銘刻 NFT",
       "tooltip": "協議在所有已索引週期中累計銘刻的 Cosmic Signature NFT（ERC-721）數量。若數值為 0，表示統計 API 目前未報告此計數器的銘刻記錄。"
     },
     "contractBalance": {
       "label": "合約餘額",
       "tooltip": "Cosmic Signature 協議合約目前持有的 ETH，尚未進入後續分配、取回或週期轉換。"
-    },
-    "numAllocationsDistributed": {
-      "label": "已發放分配數量",
-      "tooltip": "已索引的分配記錄數；詳細記錄暫不可用時，採用獲配者分配總數的彙總值。"
     },
     "totalSignatureAllocationsDistributed": {
       "label": "簽名分配總額",
@@ -608,24 +588,18 @@
     "emptyDescription": "此錢包目前沒有分配記錄。"
   },
   "namedNfts": {
-    "eyebrow": "已命名 NFT · {count}",
     "title": "已命名 Cosmic Signature NFT",
     "subtitle": "瀏覽由持有者自定義名稱的 Cosmic Signature NFT",
-    "description": "Cosmic Signature NFT 持有者可以為 NFT 自定義名稱，讓每枚作品在系列中擁有獨特身份。已命名 NFT 會在畫廊中更易辨認，也保留了持有者留下的個人印記。",
     "emptyTitle": "暫無已命名 NFT",
     "emptyDescription": "尚未有持有者為 Cosmic Signature NFT 命名。"
   },
   "attachedNfts": {
-    "eyebrow": "已附加 NFT · {count}",
     "title": "已附加 NFT 貢獻",
-    "subtitle": "瀏覽各週期中社區成員隨落筆附加的 NFT",
-    "description": "社區成員可透過高級選項隨落筆附加自己的 NFT（ERC-721）。週期收官後，已附加 NFT 會轉給簽名分配獲配者，讓最終分配不止包含 ETH。"
+    "subtitle": "瀏覽各週期中社區成員隨落筆附加的 NFT"
   },
   "usedRwlkNfts": {
-    "eyebrow": "已使用 RWLK · {count}",
     "title": "已使用的 Random Walk NFT",
     "subtitle": "隨 ETH 落筆附加、用於一次性降低 50% 落筆價格的 Random Walk NFT",
-    "description": "Random Walk NFT 持有者可將一枚尚未使用的 NFT 附加至 ETH 落筆，使該筆落筆價格降低 50%。使用後，這枚 Random Walk NFT 會記錄在此。每枚 NFT 僅可享受一次此項優惠，因此使用時機由持有者自行決定。",
     "loading": "載入中…",
     "empty": "暫無 NFT。"
   },
@@ -651,10 +625,7 @@
     "titleBeforeDeployment": "部署前的系統配置",
     "range": "事件日誌範圍 {start}～{end}",
     "breadcrumbs": {
-      "home": "主頁",
-      "coordination": "協調變更",
-      "beforeCycle": "第 {cycle} 個週期前",
-      "deployment": "部署"
+      "coordination": "協調變更"
     },
     "loading": "載入中…",
     "loadError": "未能載入系統事件",

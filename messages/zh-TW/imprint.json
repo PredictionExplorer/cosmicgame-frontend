@@ -6,7 +6,7 @@
   "page": {
     "title": "銘刻 Random Walk NFT",
     "subtitle": "擁有 Random Walk NFT，可將一筆 ETH 落筆的價格降低 50%",
-    "description": "Random Walk NFT 是獨特的數位藏品。將一枚附加至 ETH 落筆，就能讓這一筆的 ETH 落筆價格降低 50%；週期後段價格較高時，減免的金額也更大。每枚 NFT 只能用於一次價格減免，時機由你選擇。錨定 Random Walk NFT 則能取得錨定 NFT 星選資格，與落筆附加是兩項獨立機制。",
+    "description": "每枚 NFT 只能用於一次價格減免，時機由你選擇。錨定 Random Walk NFT 則能取得錨定 NFT 星選資格，與落筆附加是兩項獨立機制。",
     "currentCost": "目前銘刻價格",
     "costBreakdown": "合約價格 {base} ETH，另加 {percent}% 餘量，以免確認前價格上漲導致銘刻失敗。",
     "submit": "銘刻",

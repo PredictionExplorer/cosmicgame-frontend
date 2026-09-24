@@ -3,15 +3,11 @@
     "title": "Không tải được dữ liệu chu kỳ",
     "message": "Vui lòng tải lại trang để thử lại."
   },
-  "nav": {
-    "backToHome": "Về trang chủ"
-  },
   "status": {
     "notStarted": "Chưa bắt đầu"
   },
   "hero": {
     "title": "Chu kỳ #{n}",
-    "subtitle": "Mở ngày {date} • đã có {count, plural, other {{count} nét bút}}",
     "status": {
       "openingSoon": "Sắp mở",
       "awaitingFirstGesture": "Đang chờ nét bút đầu tiên",
@@ -36,14 +32,6 @@
     }
   },
   "stats": {
-    "totalGestures": {
-      "label": "Tổng số nét bút",
-      "tooltip": "Tổng số nét bút trong chu kỳ này. Mỗi nét bút ghi nhận thêm một lượt Tinh tuyển."
-    },
-    "cycleReserve": {
-      "label": "Dự trữ chu kỳ",
-      "tooltip": "Phần ETH của phân bổ Signature được người tham gia đặt nét bút cuối cùng nhận về. Người nhận cũng nhận 1.000 CST và một Cosmic Signature NFT."
-    },
     "stellarSelectionPool": {
       "label": "Quỹ Tinh tuyển",
       "tooltip": "ETH được chia cho {count} người tham gia được chọn ngẫu nhiên khi chu kỳ hoàn tất."

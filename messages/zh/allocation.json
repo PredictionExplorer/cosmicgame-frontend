@@ -7,7 +7,6 @@
   },
   "recipients": {
     "header": {
-      "eyebrow": "分配 · 演绎周期",
       "title": "分配名录",
       "subtitle": "浏览所有已收官演绎周期的获配记录、周期统计与分配流向。",
       "scope": "仅显示已收官周期记录",
@@ -42,24 +41,6 @@
           "label": "下一周期",
           "tooltip": "各项分配完成后，剩余的周期储备会滚入下一周期。"
         }
-      }
-    },
-    "stats": {
-      "totalCycles": {
-        "label": "周期总数",
-        "tooltip": "目前已收官的演绎周期总数。"
-      },
-      "totalEth": {
-        "label": "ETH 发放总额",
-        "tooltip": "所有周期签名分配中发放的 ETH 总额。"
-      },
-      "totalGestures": {
-        "label": "落笔总次数",
-        "tooltip": "所有已收官周期的累计落笔次数。"
-      },
-      "uniqueRecipients": {
-        "label": "独立获配者",
-        "tooltip": "曾取回签名分配的独立钱包地址数量。"
       }
     }
   },
@@ -100,7 +81,6 @@
     },
     "hero": {
       "aria": "周期概览",
-      "amountTooltip": "收官倒计时归零后，写下收官之笔的参与者取回的 ETH 总额。",
       "recipient": "获配者",
       "nft": "NFT",
       "nftTooltip": "在画廊中查看这枚 Cosmic Signature NFT。",
@@ -241,7 +221,6 @@
     }
   },
   "finalized": {
-    "home": "首页",
     "title": "周期已收官",
     "invalid": {
       "subtitle": "网址中需要提供有效的周期编号。",
@@ -257,7 +236,6 @@
       "defaultTitle": "周期已收官",
       "successSubtitle": "第 {cycle} 个周期已在链上收官。",
       "cycleBreadcrumb": "第 {cycle} 个周期",
-      "finalizedBreadcrumb": "已收官",
       "breakdown": "分配详情页列有本周期的签名分配流向、其他分配及已附加资产。",
       "viewDetails": "查看第 {cycle} 个周期的分配详情",
       "review": "也可前往<allocations>我的分配</allocations>查看全部分配记录。",
@@ -265,8 +243,6 @@
     },
     "result": {
       "title": "第 {cycle} 个周期的签名分配已取回。",
-      "allocationBreadcrumb": "分配",
-      "retrievedBreadcrumb": "已取回",
       "sectionTitle": "第 {cycle} 个周期的分配",
       "sectionDescription": "本周期签名分配各组成部分的摘要。",
       "ethAllocation": "ETH 分配",

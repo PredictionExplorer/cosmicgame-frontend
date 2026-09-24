@@ -64,6 +64,7 @@ jest.mock('../../../../services/api/marketing', () => ({
 }));
 jest.mock('../../../../services/api/system', () => ({
   COORDINATION_EVENTS_END_ID: 9_999_999_999,
+  coordinationStartId: jest.requireActual('../../../../services/api/system').coordinationStartId,
   get_system_modelist: jest.fn(() => Promise.resolve([])),
   get_system_events: jest.fn(() => Promise.resolve([])),
 }));
@@ -231,7 +232,7 @@ describe('server-rendered page headers', () => {
   });
 
   describe('statistics hub', () => {
-    it('renders one H1, the Insights eyebrow and one live figure row', async () => {
+    it('renders one H1, the Explore eyebrow and one live figure row', async () => {
       render(await StatisticsSeoSummary());
 
       expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
@@ -239,7 +240,7 @@ describe('server-rendered page headers', () => {
         screen.getByRole('heading', { level: 1, name: statisticsMessages.hub.seo.heading }),
       ).toBeInTheDocument();
       // The hub names its section without linking to itself.
-      expect(screen.getByText(COMMON.section('insights'))).not.toHaveAttribute('href');
+      expect(screen.getByText(COMMON.section('explore'))).not.toHaveAttribute('href');
       expect(figureValue('activePerformanceCycle')).toHaveTextContent('42');
       // The gestures caption sits under the cycle figure.
       expect(document.querySelectorAll('[data-figure="activePerformanceCycle"] dd')).toHaveLength(
@@ -371,6 +372,13 @@ describe('server-rendered page headers', () => {
       'href',
       '/',
     );
+    // The gestures and Signature Allocation figures define themselves behind an info button.
+    const cards = seoMessages.currentCycleSummary.cards;
+    for (const label of [cards.gestures, cards.signatureAllocation]) {
+      expect(
+        screen.getByRole('button', { name: `More information about ${label}` }),
+      ).toBeInTheDocument();
+    }
   });
 
   it('holds the server-read cycle figures before the first client read', async () => {
@@ -394,9 +402,9 @@ describe('server-rendered page headers', () => {
   });
 
   it.each([
-    ['anchoring' as const, 'Anchor Distributions', 'records', '/site-map'],
-    ['marketing' as const, 'Outreach Allocations', 'records', '/site-map'],
-    ['eth-contribution' as const, 'Direct ETH Contributions', 'participate', '/'],
+    ['anchoring' as const, 'Anchor Distributions', 'records', null],
+    ['marketing' as const, 'Outreach Allocations', 'records', null],
+    ['eth-contribution' as const, 'Direct ETH Contributions', 'records', null],
     ['attached-nfts' as const, 'Attached NFT Contributions', 'collection', '/gallery'],
     ['named-nfts' as const, 'Named Cosmic Signature NFTs', 'collection', '/gallery'],
     ['used-rwlk-nfts' as const, 'Used RandomWalk NFTs', 'collection', '/gallery'],
@@ -407,13 +415,20 @@ describe('server-rendered page headers', () => {
 
       expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
       expect(screen.getByRole('heading', { level: 1, name: heading })).toBeInTheDocument();
-      expect(
-        screen.getByRole('link', {
-          name: COMMON.section(section),
-        }),
-      ).toHaveAttribute('href', hub);
+      if (hub) {
+        expect(screen.getByRole('link', { name: COMMON.section(section) })).toHaveAttribute(
+          'href',
+          hub,
+        );
+      } else {
+        // Records has no hub page: the eyebrow names it without a link.
+        expect(screen.getByText(COMMON.section(section))).not.toHaveAttribute('href');
+        expect(screen.queryByRole('link', { name: COMMON.section(section) })).toBeNull();
+      }
       expect(screen.getByText(COMMON.snapshot)).toBeInTheDocument();
-      expect(screen.getByText(/^Source: /)).toBeInTheDocument();
+      // The stamp and its source are one item of the meta line, so they flow as one line.
+      const source = screen.getByText(/^· Source: /);
+      expect(source).toContainElement(screen.getByText(COMMON.snapshot));
       // The eyebrow names the section, never the H1 with "· Arbitrum".
       expect(screen.queryByText(/· Arbitrum/)).not.toBeInTheDocument();
     },
@@ -423,7 +438,7 @@ describe('server-rendered page headers', () => {
     mockDirectContributions.mockRejectedValue(new Error('Network response was not OK'));
     render(await PublicDataRouteSeoSummary({ route: 'eth-contribution' }));
     expect(screen.queryByText(COMMON.snapshot)).not.toBeInTheDocument();
-    expect(screen.queryByText(/^Source: /)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Source: /)).not.toBeInTheDocument();
   });
 
   it('renders allocation totals from finalized rounds, gestures included', async () => {
@@ -512,10 +527,12 @@ describe('server-rendered page headers', () => {
 
       render(await PublicDataRouteSeoSummary({ route: 'imprint' }));
 
-      // The same quote format as the home tabs and submit button (five significant digits).
-      // jest-dom normalizes the no-break space before the unit to a plain space.
-      expect(figureValue('cost')).toHaveTextContent(/^0\.10211\sETH$/);
-      expect(figureValue('cost').textContent).toBe('0.10211 ETH');
+      // The same quote format as the home tabs and submit button (five significant digits),
+      // set like every other ETH figure: a no-break space and a muted unit.
+      expect(figureValue('cost').textContent).toBe('0.10211\u00a0ETH');
+      expect(within(figureValue('cost') as HTMLElement).getByText('ETH')).toHaveClass(
+        'text-muted-foreground',
+      );
       expect(screen.queryByText(/185/)).not.toBeInTheDocument();
       expect(figureValue('discount')).toHaveTextContent(
         `${protocolFacts.randomWalkDiscountPercentage}%`,
@@ -591,6 +608,46 @@ describe('server-rendered page headers', () => {
       render(await PublicDataRouteSeoSummary({ route: 'public-goods-contributions-cg' }));
       expect(figureValue('share')).toHaveTextContent(`${protocolFacts.publicGoodsPercentage}%`);
       expect(document.querySelector('[data-figure="track"]')).toBeNull();
+    });
+
+    it('shows "None yet" for the latest record of an empty but successful read', async () => {
+      const cg = render(
+        await PublicDataRouteSeoSummary({ route: 'public-goods-contributions-cg' }),
+      );
+      expect(figureValue('latest')).toHaveTextContent('None yet');
+      expect(figureValue('latest')).not.toHaveTextContent(COMMON.unavailable);
+      cg.unmount();
+
+      const retrievals = render(
+        await PublicDataRouteSeoSummary({ route: 'public-goods-retrievals' }),
+      );
+      expect(figureValue('latest')).toHaveTextContent('None yet');
+      expect(figureValue('beneficiary')).toHaveTextContent('None yet');
+      retrievals.unmount();
+
+      render(await PublicDataRouteSeoSummary({ route: 'coordination-changes' }));
+      expect(figureValue('latest')).toHaveTextContent('None yet');
+    });
+
+    it('keeps the unavailable dash when the list could not be read', async () => {
+      mockPublicGoodsRetrievals.mockRejectedValue(new Error('offline'));
+      render(await PublicDataRouteSeoSummary({ route: 'public-goods-retrievals' }));
+      expect(figureValue('latest')).toHaveTextContent(COMMON.unavailable);
+      expect(figureValue('beneficiary')).toHaveTextContent(COMMON.unavailable);
+      expect(figureValue('beneficiary')).not.toHaveTextContent('None yet');
+    });
+
+    it('names the documented Public Goods beneficiary on its chip', async () => {
+      const { address, name } = protocolFacts.publicGoodsBeneficiary;
+      mockPublicGoodsRetrievals.mockResolvedValue([
+        { AmountEth: 1, TimeStamp: 100, DestinationAddr: address },
+      ] as Rows<typeof get_charity_withdrawals>);
+
+      render(await PublicDataRouteSeoSummary({ route: 'public-goods-retrievals' }));
+
+      const chip = within(figureValue('beneficiary') as HTMLElement).getByRole('link');
+      expect(chip).toHaveTextContent(name);
+      expect(chip).toHaveAttribute('href', `/user/${address}`);
     });
 
     it('names the latest Public Goods beneficiary from the retrievals', async () => {
@@ -695,7 +752,7 @@ describe('server-rendered page headers', () => {
       'href',
       '/statistics',
     );
-    expect(screen.getByText(/^数据来源：/)).toBeInTheDocument();
+    expect(screen.getByText(/^· 数据来源：/)).toBeInTheDocument();
     expect(screen.queryByText(/initial HTML for search engines/i)).not.toBeInTheDocument();
   });
 
