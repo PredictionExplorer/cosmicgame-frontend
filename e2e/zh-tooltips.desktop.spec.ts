@@ -71,10 +71,13 @@ const ROUTES: readonly TooltipRoute[] = [
     explainedTerms: ['签名分配', '最新落笔', '坚守冠军'],
   },
   {
+    // One explanation pattern (D079): no info buttons; the coined Cycle
+    // Reserve and the standings roles explain themselves in place, and the
+    // allocation names are plain, explained together in one disclosure.
     path: '/zh/current-cycle',
     readyText: '落笔总次数',
-    minimum: 4,
-    explainedTerms: ['周期储备', '签名分配', '公共物品', '坚守冠军'],
+    minimum: 0,
+    explainedTerms: ['周期储备', '坚守冠军'],
   },
   { path: `/zh/allocation/${cycle}`, readyText: `第 ${cycle} 个周期`, minimum: 5 },
   { path: '/zh/anchoring', readyText: '锚定运作原理', minimum: 3 },
@@ -96,7 +99,7 @@ test.describe('Sprint 8 translated tooltip interaction coverage', () => {
 
       await expect(page.getByText(route.readyText, { exact: false }).first()).toBeVisible();
       const triggers = page.getByRole('button', { name: TRANSLATED_TOOLTIP_NAME });
-      await expect(triggers.first()).toBeVisible();
+      if (route.minimum > 0) await expect(triggers.first()).toBeVisible();
       // Folded sections (the home's "how the reserve is allocated") hold
       // triggers too: open every disclosure in the page body.
       await page.evaluate(() => {
