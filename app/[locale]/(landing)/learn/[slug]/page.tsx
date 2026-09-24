@@ -1,4 +1,4 @@
-import type { Metadata, ResolvingMetadata } from 'next';
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
@@ -25,7 +25,7 @@ import { cn } from '@/lib/utils';
 import { formatYyyymmddLabel } from '@/utils/format/dates';
 import { formatId } from '@/utils/format/ids';
 import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage } from '@/utils/jsonLd';
-import { createPageMetadata } from '@/utils/seo';
+import { createMetadata } from '@/utils/seo';
 
 interface PageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -46,10 +46,7 @@ export function generateStaticParams() {
   return getLearnSlugs().map((slug) => ({ slug }));
 }
 
-export async function generateMetadata(
-  { params }: PageProps,
-  parent: ResolvingMetadata,
-): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale, slug } = await params;
   setRequestLocale(locale);
   const article = getLearnArticle(slug, locale);
@@ -57,9 +54,8 @@ export async function generateMetadata(
   const t = await getTranslations({ locale, namespace: 'meta' });
   const metaKey = `learnArticles.${article.slug}`;
 
-  // Articles share the Learn hub's card (learn/opengraph-image.tsx).
-  return createPageMetadata(
-    parent,
+  // Each guide has its own share card (./opengraph-image.tsx).
+  return createMetadata(
     t(`${metaKey}.title`),
     t(`${metaKey}.description`),
     undefined,

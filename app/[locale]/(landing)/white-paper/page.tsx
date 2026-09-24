@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { Metadata, ResolvingMetadata } from 'next';
+import type { Metadata } from 'next';
 import { ArrowUpRight, Download } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
@@ -46,7 +46,7 @@ import { formatOgCycle } from '@/lib/og/copy';
 import { cn } from '@/lib/utils';
 import { formatId } from '@/utils/format/ids';
 import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage } from '@/utils/jsonLd';
-import { createPageMetadata } from '@/utils/seo';
+import { createMetadata } from '@/utils/seo';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -59,17 +59,14 @@ const CONTENTS_ID = 'contents';
 /** Lists whose items are the stages of a sequence, numbered in the web edition. */
 const ORDERED_LISTS = new Set(['art-pipeline']);
 
-export async function generateMetadata(
-  { params }: PageProps,
-  parent: ResolvingMetadata,
-): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   setRequestLocale(locale);
   const { metadata } = getWhitePaperContent(locale);
   const t = await getTranslations({ locale, namespace: 'meta' });
 
-  return createPageMetadata(
-    parent,
+  // The paper has its own share card (./opengraph-image.tsx).
+  return createMetadata(
     t('whitePaper.title'),
     t('whitePaper.description'),
     undefined,
@@ -254,7 +251,7 @@ function SubsectionView({
         headingId={headingId}
         number={subsection.number}
         anchorLabel={fillTemplate(reading.headingLinkTemplate, {
-          title: `${subsection.number} ${subsection.heading}`,
+          title: [subsection.number, subsection.heading].join(' '),
         })}
       >
         {subsection.heading}

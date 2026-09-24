@@ -1,4 +1,4 @@
-import type { Metadata, ResolvingMetadata } from 'next';
+import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { QUIZ_PATH, getQuizContent } from '@/content/quiz';
@@ -12,21 +12,19 @@ import { Link } from '@/i18n/navigation';
 import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { formatCount } from '@/utils/format/numbers';
 import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage, webPageJsonLd } from '@/utils/jsonLd';
-import { createPageMetadata } from '@/utils/seo';
+import { createMetadata } from '@/utils/seo';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
 }
 
-export async function generateMetadata(
-  { params }: PageProps,
-  parent: ResolvingMetadata,
-): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: 'meta' });
 
-  return createPageMetadata(parent, t('quiz.title'), t('quiz.description'), undefined, QUIZ_PATH, {
+  // The quiz has its own share card (./opengraph-image.tsx), which its tiers inherit.
+  return createMetadata(t('quiz.title'), t('quiz.description'), undefined, QUIZ_PATH, {
     canonicalHost: 'landing',
     locale,
   });
