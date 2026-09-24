@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type RefObject } from 'react';
 
+import { cssLengthToPx } from '@/hooks/useStickyClearance';
 import { cn } from '@/lib/utils';
 
 import { GalleryFiltersButton } from './GalleryFiltersButton';
@@ -34,6 +35,14 @@ export function GalleryFloatingFilters({
     const toolbar = toolbarRef.current;
     const results = resultsRef.current;
     if (!toolbar || !results || typeof IntersectionObserver === 'undefined') return;
+    // The fixed header covers the top of the viewport.
+    const rootStyle = window.getComputedStyle(document.documentElement);
+    const headerHeight = Math.ceil(
+      cssLengthToPx(
+        rootStyle.getPropertyValue('--header-height'),
+        Number.parseFloat(rootStyle.fontSize) || 16,
+      ),
+    );
     let toolbarInView = true;
     let resultsInView = false;
     const observer = new IntersectionObserver(
@@ -44,8 +53,7 @@ export function GalleryFloatingFilters({
         }
         setVisible(!toolbarInView && resultsInView);
       },
-      // The fixed header covers the top of the viewport.
-      { rootMargin: '-72px 0px 0px 0px' },
+      { rootMargin: `-${headerHeight}px 0px 0px 0px` },
     );
     observer.observe(toolbar);
     observer.observe(results);
@@ -54,7 +62,9 @@ export function GalleryFloatingFilters({
 
   if (!visible) return null;
   return (
+    // A fixed bottom bar: focus scrolled into view clears it (--dock-clearance).
     <div
+      data-action-dock
       className={cn(
         'fixed inset-x-0 bottom-[max(1rem,env(safe-area-inset-bottom))] z-40 flex justify-center lg:hidden',
         'pointer-events-none motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-4 motion-safe:duration-[var(--duration-base)]',

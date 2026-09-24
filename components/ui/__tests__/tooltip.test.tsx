@@ -91,7 +91,7 @@ describe('Tooltip', () => {
     expect(await screen.findByRole('tooltip')).toHaveTextContent('Helpful tooltip');
   });
 
-  it('suppresses the first touch click so links can show the tooltip before navigating', async () => {
+  it('lets a link act on the first touch tap: its hint never swallows the tap', () => {
     const handleClick = jest.fn((event: MouseEvent<HTMLAnchorElement>) => {
       event.preventDefault();
     });
@@ -107,13 +107,46 @@ describe('Tooltip', () => {
     touchPointerDown(trigger);
     fireEvent.click(trigger);
 
-    expect(handleClick).not.toHaveBeenCalled();
-    expect(await screen.findByRole('tooltip')).toHaveTextContent('0x1234567890');
-
-    touchPointerDown(trigger);
-    fireEvent.click(trigger);
-
     expect(handleClick).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+  });
+
+  it('lets a filter button act on the first tap when a badge inside it has a hint', () => {
+    const handleSelect = jest.fn();
+    render(
+      <TooltipProvider>
+        <button type="button" onClick={handleSelect}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span>Class B</span>
+            </TooltipTrigger>
+            <TooltipContent>A hot blue-white spectrum</TooltipContent>
+          </Tooltip>
+        </button>
+      </TooltipProvider>,
+    );
+
+    const badge = screen.getByText('Class B');
+    touchPointerDown(badge);
+    fireEvent.click(badge);
+
+    expect(handleSelect).toHaveBeenCalledTimes(1);
+  });
+
+  it('lets a segmented option select on the first tap', () => {
+    const handleSelect = jest.fn();
+    renderTooltip(
+      <button type="button" role="radio" aria-checked={false} onClick={handleSelect}>
+        Anchored
+      </button>,
+      'Signatures anchored right now',
+    );
+
+    const option = screen.getByRole('radio', { name: 'Anchored' });
+    touchPointerDown(option);
+    fireEvent.click(option);
+
+    expect(handleSelect).toHaveBeenCalledTimes(1);
   });
 
   it('does not suppress normal mouse clicks on link triggers', () => {

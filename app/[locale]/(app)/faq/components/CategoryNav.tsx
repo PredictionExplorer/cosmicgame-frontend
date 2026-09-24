@@ -1,8 +1,10 @@
 'use client';
 
+import { useRef } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
+import { useStickyClearance } from '@/hooks/useStickyClearance';
 import { cn } from '@/lib/utils';
 import { ScrollRail } from '@/components/ui/scroll-rail';
 
@@ -38,9 +40,14 @@ export const categoryAnchor = (id: string) => `faq-category-${id}`;
  */
 export function CategoryNav({ entries, activeId, onSelect, className }: CategoryNavProps) {
   const t = useTranslations('faq');
+  const navRef = useRef<HTMLElement>(null);
+  // Below `lg` the chips bar covers the top of the page: focus stops below it.
+  // From `lg` it is a side column, which covers nothing above the content.
+  useStickyClearance(navRef, { media: '(max-width: 1023.98px)' });
 
   return (
     <nav
+      ref={navRef}
       aria-label={t('navigation.ariaLabel')}
       className={cn(
         // Phones and tablets: a glass bar under the header, bleeding to the page gutters.

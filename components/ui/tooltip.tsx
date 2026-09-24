@@ -43,6 +43,42 @@ function Tooltip({ open: openProp, defaultOpen, onOpenChange, ...props }: Toolti
 
 Tooltip.displayName = TooltipPrimitive.Root.displayName;
 
+/**
+ * Triggers that do something of their own when tapped: a link, a field, a
+ * radio, tab or menu option. A plain button trigger is left out, because a
+ * `<TooltipTrigger>` button (no `asChild`) exists to show its hint.
+ */
+const ACTING_TRIGGER_SELECTOR = [
+  'a[href]',
+  'input',
+  'select',
+  'textarea',
+  'summary',
+  '[role="link"]',
+  '[role="radio"]',
+  '[role="checkbox"]',
+  '[role="switch"]',
+  '[role="tab"]',
+  '[role="menuitem"]',
+  '[role="option"]',
+].join(',');
+
+/** A trigger inside any of these (a badge in a filter button) belongs to that control. */
+const ENCLOSING_CONTROL_SELECTOR = `${ACTING_TRIGGER_SELECTOR},button,[role="button"]`;
+
+/**
+ * Whether a tap on the trigger must act rather than show the hint: touch
+ * never turns the first tap on a control into "show the hint", which would
+ * make every such control need two taps.
+ */
+function actsOnTap(element: EventTarget | null): boolean {
+  if (!(element instanceof Element)) return false;
+  return (
+    element.matches(ACTING_TRIGGER_SELECTOR) ||
+    element.parentElement?.closest(ENCLOSING_CONTROL_SELECTOR) != null
+  );
+}
+
 const TooltipTrigger = React.forwardRef<
   React.ComponentRef<typeof TooltipPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Trigger>
@@ -66,7 +102,14 @@ const TooltipTrigger = React.forwardRef<
       ref={ref}
       {...props}
       onPointerDown={(event) => {
-        if (event.pointerType === 'touch' && tooltip && !tooltip.open) {
+        // Touch has no hover: a first tap on a plain trigger reveals its hint
+        // (and is not also a click); a control's tap always does its job.
+        if (
+          event.pointerType === 'touch' &&
+          tooltip &&
+          !tooltip.open &&
+          !actsOnTap(event.currentTarget)
+        ) {
           tooltip.setOpen(true);
           shouldSuppressClickRef.current = true;
         }

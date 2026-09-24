@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
+import { useStickyClearance } from '@/hooks/useStickyClearance';
 import { Link, usePathname } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { ScrollRail } from '@/components/ui/scroll-rail';
@@ -55,6 +56,8 @@ export function StatisticsSubNav() {
   const pathname = usePathname();
   const t = useTranslations('statistics');
   const { sentinelRef, stickyRef, stuck } = useStuck();
+  // Focus scrolled into view stops below the bar, not under it.
+  useStickyClearance(stickyRef);
 
   return (
     <>

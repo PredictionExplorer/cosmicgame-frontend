@@ -211,6 +211,53 @@ describe('GalleryView', () => {
     expect(screen.queryByRole('button', { name: 'Clear all' })).not.toBeInTheDocument();
   });
 
+  it('reads an empty refresh under a header that counted Signatures as a failed read', () => {
+    const refetch = jest.fn();
+    mockUseCSTList.mockReturnValue({ data: [], isLoading: false, isError: false, refetch });
+    render(<GalleryView search="" snapshotCount={48} />);
+    expect(screen.getByText('gallery.error.title')).toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { name: 'gallery.empty.collectionTitle' }),
+    ).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Try again/ }));
+    expect(refetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('hands focus to the next chip, then to the result count, as filters go', () => {
+    const { rerender } = render(<GalleryView search="show=anchored&q=7" />);
+    const chips = within(screen.getByTestId('active-trait-filters')).getAllByRole('button');
+    expect(chips).toHaveLength(2);
+    chips[0]!.focus();
+    fireEvent.click(chips[0]!);
+    rerender(<GalleryView search="q=7" />);
+    const remaining = within(screen.getByTestId('active-trait-filters')).getByRole('button');
+    expect(remaining).toHaveFocus();
+    fireEvent.click(remaining);
+    rerender(<GalleryView search="" />);
+    expect(screen.getByTestId('gallery-result-count')).toHaveFocus();
+  });
+
+  it('returns focus to the result count after Clear all', () => {
+    const { rerender } = render(<GalleryView search="show=anchored" />);
+    const clearAll = within(screen.getByTestId('gallery-results-bar')).getByRole('button', {
+      name: 'Clear all',
+    });
+    clearAll.focus();
+    fireEvent.click(clearAll);
+    rerender(<GalleryView search="" />);
+    expect(screen.getByTestId('gallery-result-count')).toHaveFocus();
+  });
+
+  it('keeps the Collection DNA panel mounted, so its disclosure always names it', () => {
+    render(<GalleryView search="" />);
+    const toggle = screen.getByTestId('dna-toggle');
+    const panel = document.getElementById(toggle.getAttribute('aria-controls') ?? '');
+    expect(panel).not.toBeNull();
+    expect(panel).toHaveAttribute('hidden');
+    fireEvent.click(toggle);
+    expect(panel).not.toHaveAttribute('hidden');
+  });
+
   it('shows plate skeletons while the archive loads', () => {
     mockUseCSTList.mockReturnValue({
       data: undefined,

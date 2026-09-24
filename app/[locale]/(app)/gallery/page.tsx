@@ -19,7 +19,7 @@ import { PageMessages } from '@/components/i18n/PageMessages';
 import { PageShell } from '@/components/ui/page-shell';
 
 import { readCollection } from '../publicDataReads';
-import { QuerySeed } from '../QuerySeed';
+import { QuerySeed, seedsDisabled } from '../QuerySeed';
 
 import { GalleryAbout } from './GalleryAbout';
 import GalleryPage from './GalleryPage';
@@ -67,6 +67,10 @@ export default async function Page({ params }: PageProps) {
     readCollection(),
   ]);
   const inLanguage = jsonLdInLanguage(locale);
+  // The collection size the server read, so the wall can tell a failed
+  // refresh from an empty collection. Off under the e2e harness, whose
+  // browser mocks own the list.
+  const snapshotCount = seedsDisabled() ? null : (collection.data?.length ?? null);
 
   return (
     <PageMessages namespaces={['detail', 'gallery', 'tables', 'traits']}>
@@ -114,8 +118,8 @@ export default async function Page({ params }: PageProps) {
            * shifts and a filtered link swaps plates in place.
            */}
           <QuerySeed seeds={[{ queryKey: ['cstList'], data: collection.data, at: collection.at }]}>
-            <Suspense fallback={<GalleryView search="" />}>
-              <GalleryPage />
+            <Suspense fallback={<GalleryView search="" snapshotCount={snapshotCount} />}>
+              <GalleryPage snapshotCount={snapshotCount} />
             </Suspense>
           </QuerySeed>
           <GalleryAbout locale={locale} />

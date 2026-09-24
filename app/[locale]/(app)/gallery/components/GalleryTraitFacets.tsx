@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import type { CollectionTraits } from '@/hooks/useNftTraits';
@@ -207,10 +207,15 @@ function ChaosRangeControl({
   );
 }
 
+/** The first control of a panel, where focus goes when the control that had it goes. */
+const FIRST_CONTROL_SELECTOR = 'input:not([disabled]), button:not([disabled])';
+
 /**
  * GalleryTraitFacets — the trait filters: the chaos range, then one
  * collapsible list per categorical trait with its collection counts. Shown in
- * the desktop rail and in the filter sheet below `lg`.
+ * the desktop rail and in the filter sheet below `lg`. "Clear all" and
+ * "Clear <trait>" remove themselves, so they hand focus to the panel's first
+ * control and to their trait's heading.
  */
 export function GalleryTraitFacets({
   collectionTraits,
@@ -227,9 +232,19 @@ export function GalleryTraitFacets({
   const locale = useLocale();
   const { typeLabel } = useTraitLabels();
   const activeCount = countActiveTraitFilters(selected, chaosRange);
+  const rootRef = useRef<HTMLDivElement>(null);
+  // Where focus goes once a clear has reached the URL and the panel re-rendered.
+  const focusAfterClear = useRef<(() => HTMLElement | null | undefined) | null>(null);
+
+  useEffect(() => {
+    const find = focusAfterClear.current;
+    if (!find) return;
+    focusAfterClear.current = null;
+    find()?.focus();
+  }, [activeCount]);
 
   return (
-    <div className={cn('space-y-4', className)} data-testid="trait-facets">
+    <div ref={rootRef} className={cn('space-y-4', className)} data-testid="trait-facets">
       <div className="flex min-h-9 items-center justify-between gap-2 px-2">
         <h2 className="flex items-center gap-2 type-title text-foreground">
           {t('facets.title')}
@@ -240,7 +255,15 @@ export function GalleryTraitFacets({
           ) : null}
         </h2>
         {activeCount > 0 ? (
-          <Button variant="ghost" size="sm" onClick={onClearAll}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              focusAfterClear.current = () =>
+                rootRef.current?.querySelector<HTMLElement>(FIRST_CONTROL_SELECTOR);
+              onClearAll();
+            }}
+          >
             {t('facets.clearAll')}
           </Button>
         ) : null}
@@ -294,7 +317,7 @@ export function GalleryTraitFacets({
               if (!options || options.length === 0) return null;
               const chosen = selected[key] ?? [];
               return (
-                <AccordionItem key={key} value={key} className="border-rule-faint">
+                <AccordionItem key={key} value={key} className="border-rule-faint" data-facet={key}>
                   <AccordionTrigger className="min-h-11 px-2 py-2 type-label text-foreground hover:no-underline">
                     <span className="flex items-center gap-2">
                       {typeLabel(key)}
@@ -316,7 +339,14 @@ export function GalleryTraitFacets({
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => onClearKey(key)}
+                        onClick={() => {
+                          // The trait's heading (its accordion trigger) takes focus.
+                          focusAfterClear.current = () =>
+                            rootRef.current?.querySelector<HTMLElement>(
+                              `[data-facet="${key}"] button`,
+                            );
+                          onClearKey(key);
+                        }}
                         className="mt-1 px-2"
                       >
                         {t('facets.clearFacet', { trait: typeLabel(key) })}

@@ -31,7 +31,11 @@ function LiveState() {
         <span aria-hidden className="size-1.5 rounded-full bg-live" />
         {t('status.live')}
       </span>
-      <InfoTooltip content={t('endurance.liveHelp')} iconClassName="size-3.5" />
+      <InfoTooltip
+        content={t('endurance.liveHelp')}
+        label={t('status.live')}
+        iconClassName="size-3.5"
+      />
     </span>
   );
 }

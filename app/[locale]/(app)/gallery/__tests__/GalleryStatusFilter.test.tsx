@@ -37,6 +37,13 @@ describe('GalleryStatusFilter', () => {
     expect(onChange).toHaveBeenCalledTimes(4);
   });
 
+  it('explains the selected option in words in the sheet, where there is no hover', () => {
+    render(<GalleryStatusFilter value="anchored" onChange={jest.fn()} block />);
+    const group = screen.getByRole('radiogroup');
+    expect(group).toHaveAccessibleDescription('gallery.filters.anchored.tooltip');
+    expect(screen.getByText('gallery.filters.anchored.tooltip')).toBeVisible();
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(<GalleryStatusFilter value="all" onChange={jest.fn()} />);
     await checkA11y(container);

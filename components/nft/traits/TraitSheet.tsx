@@ -204,7 +204,11 @@ export function TraitSheet({
                   >
                     <dt className="mb-1 flex items-center gap-1 type-label text-subtle">
                       {typeLabel(key)}
-                      <InfoTooltip content={typeHint(key)} iconClassName="h-3 w-3" />
+                      <InfoTooltip
+                        content={typeHint(key)}
+                        label={typeLabel(key)}
+                        iconClassName="h-3 w-3"
+                      />
                     </dt>
                     <dd className="flex flex-wrap items-baseline gap-2 type-body-sm text-foreground">
                       {value}
