@@ -450,6 +450,12 @@ export const whitePaperTextEn = {
             {
               kind: 'formula',
               formula: protocolFacts.dynamicCstRewardFormula,
+              notation: protocolFacts.participationCstNotation,
+              legend: [
+                { symbol: 'Δt', meaning: 'seconds since the previous gesture' },
+                { symbol: 'm', meaning: 'the Participation CST multiplier, a contract parameter' },
+                { symbol: 'i', meaning: 'the current cycle time increment, in microseconds' },
+              ],
               caption:
                 'Participation CST imprinted by a gesture. Elapsed time is measured since the previous gesture and scaled against the current cycle time increment.',
             },
@@ -890,4 +896,56 @@ export const whitePaperTextEn = {
   },
   licenseNote:
     'This paper, like all project-owned Cosmic Signature materials, is dedicated to the public domain under CC0 1.0.',
+  reading: {
+    railLabel: 'On this page',
+    openContentsLabel: 'Contents',
+    backToTopLabel: 'Back to top',
+    headingLinkTemplate: 'Link to this section: {title}',
+    formulaLabel: 'Formula',
+    noteLabel: 'Note',
+    contractExpressionLabel: 'The expression in the contract',
+    figureTemplate: 'Figure {number}',
+    readingTimeTemplate: '{minutes} min read',
+    newTabNote: '(opens in a new tab)',
+  },
+  figures: {
+    cycle: {
+      title: 'A Performance Cycle, from opening to the next cycle',
+      caption: 'Durations are launch values; Section 3 gives the exact rules.',
+      steps: [
+        {
+          label: 'Opening',
+          detail:
+            'The ETH Calibration Window lowers the opening cost until someone makes the first gesture.',
+        },
+        {
+          label: 'Gestures',
+          detail: `Each gesture adds the time increment to the countdown: ${protocolFacts.initialCycleTimeIncrementHours} hour at launch.`,
+        },
+        {
+          label: 'Final Gesture window',
+          detail: `Once the countdown expires, only the Final Gesture participant may finalize, for ${protocolFacts.finalGestureExclusivityHours} hours.`,
+        },
+        {
+          label: 'Open finalization',
+          detail: 'After that, anyone may finalize and take over the beneficiary\u2019s role.',
+        },
+        {
+          label: 'Next cycle',
+          detail: `The next cycle opens after a short delay, ${protocolFacts.defaultNextCycleDelayMinutes} minutes by default.`,
+        },
+      ],
+    },
+    allocation: {
+      title: 'Where the Cycle Reserve goes at finalization',
+      caption:
+        'Shares of the protocol\u2019s ETH balance at finalization. The remainder, about half, compounds into the next cycle.',
+    },
+    art: {
+      title: 'Two Signatures from the collection',
+      caption:
+        'Each image is the pipeline\u2019s output for the seed printed under it; anyone can regenerate it, pixel for pixel.',
+      seedLabel: 'Seed',
+    },
+  },
 } satisfies WhitePaperText;

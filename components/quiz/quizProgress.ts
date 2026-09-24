@@ -328,9 +328,4 @@ export function estimatedMinutes(questionCount: number): number {
   return Math.max(2, Math.round((questionCount * SECONDS_PER_QUESTION) / 60));
 }
 
-/** Fills `{name}` placeholders in a content-module template. */
-export function fillTemplate(template: string, values: Record<string, string | number>): string {
-  return template.replace(/\{(\w+)\}/g, (match, key: string) =>
-    key in values ? String(values[key]) : match,
-  );
-}
+export { fillTemplate } from '@/components/reading/template';

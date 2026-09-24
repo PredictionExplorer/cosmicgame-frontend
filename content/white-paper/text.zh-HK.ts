@@ -446,6 +446,12 @@ export const whitePaperTextZhHk = {
             {
               kind: 'formula',
               formula: protocolFacts.dynamicCstRewardFormula,
+              notation: protocolFacts.participationCstNotation,
+              legend: [
+                { symbol: 'Δt', meaning: '距上一筆的秒數' },
+                { symbol: 'm', meaning: '參與 CST 乘數（合約參數）' },
+                { symbol: 'i', meaning: '目前週期時間增量（微秒）' },
+              ],
               caption: '一筆落筆銘刻的參與 CST。經過時間自上一筆起算，並按目前週期時間增量歸一化。',
             },
             {
@@ -867,4 +873,53 @@ export const whitePaperTextZhHk = {
     ],
   },
   licenseNote: '本文與 Cosmic Signature 全部項目自有材料一樣，依 CC0 1.0 獻入公有領域。',
+  reading: {
+    railLabel: '本頁目錄',
+    openContentsLabel: '目錄',
+    backToTopLabel: '返回頁頂',
+    headingLinkTemplate: '本節連結：{title}',
+    formulaLabel: '公式',
+    noteLabel: '說明',
+    contractExpressionLabel: '合約中的原始表達式',
+    figureTemplate: '圖 {number}',
+    readingTimeTemplate: '約 {minutes} 分鐘讀完',
+    newTabNote: '（於新分頁開啟）',
+  },
+  figures: {
+    cycle: {
+      title: '一個演繹週期：由開場到下一週期',
+      caption: '時長為上線參數；具體規則見第 3 節。',
+      steps: [
+        {
+          label: '開場',
+          detail: 'ETH 校準窗口逐步壓低開場價格，直至有人落下第一筆。',
+        },
+        {
+          label: '落筆',
+          detail: `每一筆都為倒數加上一個時間增量，上線時為 ${protocolFacts.initialCycleTimeIncrementHours} 小時。`,
+        },
+        {
+          label: '專屬收官窗口',
+          detail: `倒數結束後的 ${protocolFacts.finalGestureExclusivityHours} 小時內，只有收官之筆參與者可以收官。`,
+        },
+        {
+          label: '公開收官',
+          detail: '此後任何人都可以收官，並接手週期受益方的角色。',
+        },
+        {
+          label: '下一週期',
+          detail: `短暫延遲後下一週期開啟，預設 ${protocolFacts.defaultNextCycleDelayMinutes} 分鐘。`,
+        },
+      ],
+    },
+    allocation: {
+      title: '收官時週期儲備的去向',
+      caption: '份額按收官時協議的 ETH 餘額計算；其餘約一半滾入下一週期。',
+    },
+    art: {
+      title: '藏品中的兩件簽名作品',
+      caption: '每幅圖像都是渲染管線按下方種子輸出的結果，任何人都能逐像素重新生成。',
+      seedLabel: '種子',
+    },
+  },
 } satisfies WhitePaperText;

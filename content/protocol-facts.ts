@@ -56,6 +56,13 @@ export const protocolFacts = {
   dynamicCstRewardFormula:
     'floor(sqrt(elapsedSinceLastGesture * bidCstRewardAmountMultiplier / mainPrizeTimeIncrementInMicroSeconds))',
   /**
+   * The same rule for readers, with neutral symbols: Δt is the seconds since
+   * the previous gesture, m the Participation CST multiplier and i the cycle
+   * time increment in microseconds. Reader-facing copy shows this and keeps
+   * the contract identifiers above for verification.
+   */
+  participationCstNotation: 'CST = ⌊√(Δt × m ÷ i)⌋',
+  /**
    * Computed at the launch parameters (time increment = exactly 1 hour).
    * The increment grows 1% per cycle, so live amounts drift slightly lower
    * over time; the app preview and the contract are the source of truth.

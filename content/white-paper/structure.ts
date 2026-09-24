@@ -1,4 +1,10 @@
-import { WHITE_PAPER_VERSION, type WhitePaperBlock, type WhitePaperReference } from './types';
+import {
+  WHITE_PAPER_VERSION,
+  type WhitePaperBlock,
+  type WhitePaperFiguresCopy,
+  type WhitePaperReadingCopy,
+  type WhitePaperReference,
+} from './types';
 
 /**
  * The locale-independent skeleton of the white paper.
@@ -260,4 +266,6 @@ export type WhitePaperText = {
     readonly items: readonly WhitePaperReference[];
   };
   readonly licenseNote: string;
+  readonly reading: WhitePaperReadingCopy;
+  readonly figures: WhitePaperFiguresCopy;
 };

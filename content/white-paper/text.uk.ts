@@ -461,6 +461,12 @@ export const whitePaperTextUk = {
             {
               kind: 'formula',
               formula: protocolFacts.dynamicCstRewardFormula,
+              notation: protocolFacts.participationCstNotation,
+              legend: [
+                { symbol: 'Δt', meaning: 'секунди від попереднього жесту' },
+                { symbol: 'm', meaning: 'множник CST участі, параметр контракту' },
+                { symbol: 'i', meaning: 'поточний часовий приріст циклу в мікросекундах' },
+              ],
               caption:
                 'CST участі, закарбовані жестом. Час, що минув, відлічується від попереднього жесту й масштабується відносно поточного часового приросту циклу.',
             },
@@ -905,4 +911,56 @@ export const whitePaperTextUk = {
   },
   licenseNote:
     'Цей документ, як і всі матеріали Cosmic Signature, що належать проєкту, передано в суспільне надбання за CC0 1.0.',
+  reading: {
+    railLabel: 'На цій сторінці',
+    openContentsLabel: 'Зміст',
+    backToTopLabel: 'Угору',
+    headingLinkTemplate: 'Посилання на цей розділ: {title}',
+    formulaLabel: 'Формула',
+    noteLabel: 'Примітка',
+    contractExpressionLabel: 'Вираз у контракті',
+    figureTemplate: 'Рисунок {number}',
+    readingTimeTemplate: '{minutes} хв читання',
+    newTabNote: '(відкривається в новій вкладці)',
+  },
+  figures: {
+    cycle: {
+      title: 'Перформанс-цикл від відкриття до наступного циклу',
+      caption: 'Тривалості наведено для параметрів запуску; точні правила — у розділі 3.',
+      steps: [
+        {
+          label: 'Відкриття',
+          detail:
+            'Вікно калібрування ETH знижує вартість відкриття, доки хтось не зробить перший жест.',
+        },
+        {
+          label: 'Жести',
+          detail: `Кожен жест додає до відліку часовий приріст: ${protocolFacts.initialCycleTimeIncrementHours} година на момент запуску.`,
+        },
+        {
+          label: 'Вікно завершального жесту',
+          detail: `Коли відлік спливає, протягом ${protocolFacts.finalGestureExclusivityHours} годин завершити цикл може лише учасник завершального жесту.`,
+        },
+        {
+          label: 'Відкрите завершення',
+          detail: 'Після цього завершити цикл може будь-хто й перебрати роль бенефіціара.',
+        },
+        {
+          label: 'Наступний цикл',
+          detail: `Наступний цикл відкривається після короткої затримки — за замовчуванням ${protocolFacts.defaultNextCycleDelayMinutes} хвилин.`,
+        },
+      ],
+    },
+    allocation: {
+      title: 'Куди йде резерв циклу під час завершення',
+      caption:
+        'Частки балансу ETH протоколу на момент завершення. Решта, близько половини, переходить у наступний цикл.',
+    },
+    art: {
+      title: 'Дві Сигнатури з колекції',
+      caption:
+        'Кожне зображення — результат конвеєра для сіду під ним; будь-хто може відтворити його піксель у піксель.',
+      seedLabel: 'Сід',
+    },
+  },
 } satisfies WhitePaperText;
