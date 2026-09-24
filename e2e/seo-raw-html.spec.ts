@@ -239,6 +239,19 @@ function extractTitle(html: string): string {
   return html.match(/<title>([^<]+)<\/title>/)?.[1] ?? '';
 }
 
+/**
+ * A 404's own head, in the HTML crawlers read: the error's title (not the
+ * site default) and no "index, follow" beside the `noindex` Next.js adds.
+ */
+function expectNotFoundHead(html: string, path: string): void {
+  const title = extractTitle(html);
+  expect(title, `${path} names the error in its title`).toMatch(/ · Cosmic Signature$/);
+  expect(title, `${path} does not keep the site default title`).not.toBe('Cosmic Signature');
+  expect(html, `${path} has no indexable robots line`).not.toMatch(
+    /name="robots"[^>]+content="index/i,
+  );
+}
+
 function extractDescription(html: string): string {
   return html.match(/<meta[^>]+name="description"[^>]+content="([^"]+)"/)?.[1] ?? '';
 }
@@ -518,6 +531,7 @@ test.describe('raw HTML SEO', () => {
       expect(response.status(), `${path} must be a real 404`).toBe(404);
       const html = await response.text();
       expect(html).toMatch(/name="robots"[^>]+content="[^"]*noindex/i);
+      expectNotFoundHead(html, path);
       expect(html).not.toContain(`rel="canonical" href="https://${APP_HOST}${path}"`);
     }
   });
@@ -674,6 +688,7 @@ test.describe('raw HTML SEO', () => {
   test('invalid token detail routes return a real 404', async ({ request }) => {
     const response = await request.get('/detail/not-a-token', { headers: hostHeaders(APP_HOST) });
     expect(response.status()).toBe(404);
+    expectNotFoundHead(await response.text(), '/detail/not-a-token');
   });
 
   test('unknown top-level routes return a real 404 with branded content', async ({ request }) => {
@@ -684,6 +699,8 @@ test.describe('raw HTML SEO', () => {
     const html = await response.text();
     // The heading is written in sentence case ("Page not found").
     expect(html).toMatch(/Page not found/i);
+    expect(html).toContain('<title>Page not found · Cosmic Signature</title>');
+    expectNotFoundHead(html, '/this-route-does-not-exist');
   });
 
   test('static content pages are CDN-cacheable (no forced dynamic rendering)', async ({

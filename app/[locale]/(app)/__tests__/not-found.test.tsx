@@ -69,9 +69,23 @@ describe('app 404 page', () => {
     expect(metadata.robots).toEqual({ index: false, follow: true });
   });
 
-  it('exports no metadata from the not-found file, which would read the locale from headers', async () => {
+  it('heads every 404 from the not-found files, with the locale from params, never headers', async () => {
+    const intl = await import('next-intl/server');
+    const getLocale = jest.spyOn(intl, 'getLocale');
     const appModule = await import('../not-found');
-    expect('generateMetadata' in appModule).toBe(false);
+    const landingModule = await import('../../(landing)/not-found');
+    // Whatever calls notFound() (a segment layout rejecting an id included),
+    // this is the head crawlers get: the error's title and noindex, follow.
+    for (const generate of [appModule.generateMetadata, landingModule.generateMetadata]) {
+      const metadata = await generate({ params: Promise.resolve({ locale: 'ja' }) });
+      expect(metadata.title).toEqual({ absolute: 'errors.notFound.title · Cosmic Signature' });
+      expect(metadata.robots).toEqual({ index: false, follow: true });
+    }
+    // An unknown or missing locale falls back to the default instead of throwing.
+    const fallback = await appModule.generateMetadata({ params: Promise.resolve({}) });
+    expect(fallback.robots).toEqual({ index: false, follow: true });
+    expect(getLocale).not.toHaveBeenCalled();
+    getLocale.mockRestore();
   });
 });
 
@@ -87,7 +101,7 @@ describe('landing 404 page', () => {
     expect(screen.queryByRole('button', { name: 'nav.search.triggerLabel' })).toBeNull();
   });
 
-  it('exports no metadata either: the Learn and Quiz pages name the tab for a missing slug', () => {
-    expect('generateMetadata' in landingNotFoundModule).toBe(false);
+  it('shares the head of the landing 404 with the route-group not-found file', () => {
+    expect(landingNotFoundModule.generateMetadata).toBeInstanceOf(Function);
   });
 });

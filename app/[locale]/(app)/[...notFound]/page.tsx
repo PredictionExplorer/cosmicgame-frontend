@@ -8,9 +8,9 @@ interface PageProps {
 }
 
 /**
- * "Page not found · Cosmic Signature" in the tab. Page metadata resolves
- * independently of the `notFound()` below, and it is the head the browser
- * keeps once the not-found boundary renders; `not-found.tsx` takes none.
+ * "Page not found · Cosmic Signature" in the tab. The (app) not-found file
+ * heads the 404 the same way; this page's own metadata keeps the streamed
+ * head identical to it.
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
