@@ -5,6 +5,8 @@ import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 
+import { ValuePending } from './ValuePending';
+
 export const GESTURE_METHODS = [
   { value: 'ETH', messageKey: 'eth' },
   { value: 'RandomWalk', messageKey: 'randomWalk' },
@@ -17,6 +19,11 @@ export type GestureMethodValue = (typeof GESTURE_METHODS)[number]['value'];
 export interface MethodCost {
   value: string;
   unit: string;
+  /**
+   * Read from the dashboard snapshot while the live quote is on its way:
+   * shown with "≈" until the quote replaces it.
+   */
+  approximate?: boolean;
 }
 
 export interface GestureMethodControlProps {
@@ -60,7 +67,6 @@ export function GestureMethodControl({
   className,
 }: GestureMethodControlProps) {
   const t = useTranslations('home');
-  const tCommon = useTranslations('common');
   const labelId = useId();
   const explanationId = useId();
   const rwlkNoteId = useId();
@@ -131,11 +137,14 @@ export function GestureMethodControl({
               >
                 {cost ? (
                   <>
-                    <span className="whitespace-nowrap">{cost.value}</span>{' '}
+                    <span className="whitespace-nowrap">
+                      {cost.approximate ? '≈\u00a0' : null}
+                      {cost.value}
+                    </span>{' '}
                     <span className="whitespace-nowrap">{cost.unit}</span>
                   </>
                 ) : (
-                  <span className="type-caption text-subtle">{tCommon('status.loadingDots')}</span>
+                  <ValuePending ch={9} />
                 )}
               </span>
             </button>

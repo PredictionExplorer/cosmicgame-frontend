@@ -179,25 +179,26 @@ export function CalibrationStatus({
       data-window={firstGesture ? 'eth' : 'cst'}
       className={cn('min-w-0', className)}
     >
-      <div className="flex min-w-0 items-center gap-1.5">
-        <CalibrationWindowIcon className="size-4 shrink-0 text-subtle" aria-hidden />
-        <h2 id="calibration-status-title" className="type-label min-w-0 text-foreground">
-          {title}
-        </h2>
-        <InfoTooltip content={explanation} label={title} />
-        {/* The quote's freshness: a still dot that turns amber when reads fail. */}
+      <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <div className="flex min-w-0 items-center gap-1.5">
+          <CalibrationWindowIcon className="size-4 shrink-0 text-subtle" aria-hidden />
+          <h2 id="calibration-status-title" className="type-title min-w-0 text-foreground">
+            {title}
+          </h2>
+          <InfoTooltip content={explanation} label={title} />
+        </div>
+        {/* The quote's freshness, in the same words as the standings and the chat. */}
         <LiveStatus
-          variant="dot"
+          variant="inline"
           still
           queryKeys={firstGesture ? [['bidEthPrice']] : [['ctPrice']]}
           pollIntervalMs={15_000}
-          className="ms-auto"
         />
       </div>
 
       {/* The cost now stands where the line starts (top left) and the floor
           where it ends (bottom right), so the row reads as the fall itself. */}
-      <div className="mt-2 flex min-w-0 items-stretch gap-3">
+      <div className="mt-3 flex min-w-0 items-stretch gap-3">
         <span
           data-testid="calibration-cost-now"
           className="type-figure-sm shrink-0 self-start text-foreground"

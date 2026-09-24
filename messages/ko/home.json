@@ -123,14 +123,14 @@
       "waitingFirstGesture": {
         "eyebrow": "사이클 열림",
         "label": "첫 제스처 대기 중",
-        "status": "사이클이 열려 있습니다. 첫 제스처가 마감 카운트다운을 시작합니다.",
+        "status": "첫 제스처가 마감 카운트다운을 시작합니다.",
         "tooltip": "마감 카운트다운은 아직 시작되지 않았습니다. 첫 제스처가 사이클 타이머를 시작하고 이 시그니처를 빚어내기 시작합니다.",
         "display": "첫 제스처를 기다립니다"
       },
       "approach": {
         "eyebrow": "사이클 마감까지",
         "label": "12시간 미만",
-        "status": "사이클이 진행 중입니다. 모든 제스처가 마감 카운트다운을 연장할 수 있습니다.",
+        "status": "모든 제스처가 마감 카운트다운을 연장할 수 있습니다.",
         "tooltip": "사이클 마감까지 남은 시간입니다. 0이 되면 최종 제스처를 남긴 참여자가 사이클을 마감할 수 있습니다."
       },
       "finalHour": {
@@ -168,7 +168,7 @@
       "live": {
         "eyebrow": "사이클 마감까지",
         "label": "사이클 진행 중",
-        "status": "사이클이 진행 중입니다. 모든 제스처가 마감 카운트다운을 연장할 수 있습니다.",
+        "status": "모든 제스처가 마감 카운트다운을 연장할 수 있습니다.",
         "tooltip": "사이클 마감까지 남은 시간입니다. 0이 되면 최종 제스처를 남긴 참여자가 사이클을 마감할 수 있습니다."
       }
     },
@@ -235,8 +235,8 @@
       },
       "ethGesture": "ETH 제스처",
       "ethGestureTooltip": "지금 ETH로 제스처를 남기는 데 드는 비용",
-      "randomWalkGesture": "ETH + RandomWalk 제스처",
-      "randomWalkGestureTooltip": "ETH 제스처에 RandomWalk NFT를 첨부하면 ETH 제스처 비용이 50% 할인됩니다",
+      "randomWalkGesture": "ETH + Random Walk 제스처",
+      "randomWalkGestureTooltip": "ETH 제스처에 Random Walk NFT를 첨부하면 ETH 제스처 비용이 50% 할인됩니다",
       "cstGesture": "CST 제스처",
       "cstGestureTooltip": "CST로 남기는 제스처입니다. 비용은 실시간 보정 구간을 따라 내려가며, CST 제스처는 구간을 늘리고 ETH 제스처는 줄입니다.",
       "free": "0 CST",
@@ -265,9 +265,9 @@
   },
   "ticker": {
     "openLatestAria": "최근 제스처 {id} 열기",
-    "gestureLine": "{address}의 {kind, select, cst {CST 제스처} randomWalk {ETH + RandomWalk 제스처} other {ETH 제스처}}",
+    "gestureLine": "{address}의 {kind, select, cst {CST 제스처} randomWalk {ETH + Random Walk 제스처} other {ETH 제스처}}",
     "paymentUnavailable": "비용 동기화 중…",
-    "rwlkToken": "RandomWalk #{id}",
+    "rwlkToken": "Random Walk #{id}",
     "age": {
       "justNow": "방금",
       "seconds": "{count}초 전",
@@ -359,8 +359,8 @@
     },
     "submit": {
       "eth": "ETH로 제스처 남기기 ({cost} ETH)",
-      "randomWalkWithToken": "ETH + RandomWalk 토큰 {tokenId} 제스처 남기기 ({cost} ETH)",
-      "randomWalk": "ETH + RandomWalk로 제스처 남기기",
+      "randomWalkWithToken": "ETH + Random Walk 토큰 {tokenId} 제스처 남기기 ({cost} ETH)",
+      "randomWalk": "ETH + Random Walk로 제스처 남기기",
       "cst": "CST로 제스처 남기기 ({cost} CST)",
       "cstFree": "CST로 제스처 남기기 (0 CST + 가스 비용)",
       "generic": "{method} 제스처 남기기",
@@ -379,7 +379,8 @@
     "connect": {
       "title": "지갑 연결 후 제스처 남기기",
       "body": "위의 실시간 제스처 방식과 비용을 확인한 뒤, MetaMask 또는 다른 지갑을 연결해 Arbitrum에 제출할 수 있습니다.",
-      "cta": "지갑 연결 후 제스처 남기기"
+      "cta": "지갑 연결 후 제스처 남기기",
+      "ctaShort": "지갑 연결"
     },
     "message": {
       "add": "메시지 추가"
@@ -439,8 +440,8 @@
         "tooltip": "사이클 참여 기록 가운데 무작위로 선정된 참여자가 공로 CST와 Cosmic Signature NFT를 받습니다."
       },
       "randomWalkAnchor": {
-        "name": "RandomWalk 앵커링 보유자",
-        "tooltip": "RandomWalk NFT 앵커링 보유자는 공로 CST와 Cosmic Signature NFT를 받을 수 있습니다."
+        "name": "Random Walk 앵커링 보유자",
+        "tooltip": "Random Walk NFT 앵커링 보유자는 공로 CST와 Cosmic Signature NFT를 받을 수 있습니다."
       },
       "cosmicAnchor": {
         "name": "Cosmic Signature 앵커링",
@@ -522,13 +523,11 @@
     "view": {
       "messages": "메시지",
       "all": "모든 활동"
-    },
-    "eventGroup": "{count, plural, other {사이클 이벤트 #개}}"
+    }
   },
   "deck": {
     "title": "Cosmic Signature 관측소",
     "intro": "ETH 또는 CST로 제스처를 남기면 가장 최근 참여자가 됩니다. 시간이 끝나면 최근 참여자가 사이클을 마감하고 시그니처 배분을 받을 수 있습니다.",
-    "introShort": "시간이 끝나면 최근 참여자가 사이클을 마감하고 시그니처 배분을 받을 수 있습니다.",
     "newHere": "처음이신가요? 작동 원리",
     "experimentalUi": "실험적 UI",
     "returnToCurrent": "기존 UI로 돌아가기",
@@ -599,16 +598,18 @@
     },
     "clock": {
       "reserveLabel": "시그니처 배분",
-      "reserveExtras": "+ 1,000 CST · Cosmic Signature NFT 1개 · 첨부 자산",
+      "reserveExtraCst": "+ 1,000 CST",
+      "reserveExtraNft": "Cosmic Signature NFT 1개",
+      "reserveAttached": "{count, plural, other {첨부 자산 #개}}",
       "reserveUsd": "≈ {amount} USD",
       "calendarTitle": "Cosmic Signature 사이클 {number} 시작",
       "calendarBody": "다음 퍼포먼스 사이클이 제스처를 받기 시작합니다. 첫 제스처가 마감 카운트다운을 시작합니다.",
       "calendarCta": "시작 시각을 캘린더에 추가",
-      "units": {
-        "days": "{count, plural, other {일}}",
-        "hours": "{count, plural, other {시간}}",
-        "minutes": "{count, plural, other {분}}",
-        "seconds": "{count, plural, other {초}}"
+      "unitLabels": {
+        "days": "일",
+        "hours": "시간",
+        "minutes": "분",
+        "seconds": "초"
       },
       "state": {
         "ready": "마감 준비 완료",
@@ -651,16 +652,21 @@
         "time": "유지 시간",
         "allocation": "배분"
       },
-      "passesIn": "{duration} 후 수호 챔피언 기록을 넘어섭니다",
-      "extendsIn": "{duration} 후 수호 챔피언 기록을 연장합니다",
-      "chronoMayClose": "현재 유지가 이어지면 {duration} 후 증가가 멈춥니다",
+      "empty": {
+        "latest": "이번 사이클에는 아직 제스처가 없습니다",
+        "endurance": "아직 수호 챔피언 기록이 없습니다",
+        "chrono": "아직 시간의 전사 기록이 없습니다",
+        "finalCst": "아직 CST 제스처가 없습니다"
+      },
+      "passesRecordIn": "수호 챔피언 기록을 넘어서기까지",
+      "extendsRecordIn": "수호 챔피언 기록을 연장하기까지",
+      "chronoStopsIn": "현재 유지가 이어지면 증가가 멈추기까지",
       "finalCstNote": "CST 제스처로만 바뀝니다",
       "position": "제스처 순번",
       "challenge": {
-        "title": "현재 수호 유지",
-        "held": "지금까지",
-        "record": "시간의 전사 기록",
-        "passesIn": "넘어서기까지"
+        "reign": "수호 챔피언의 현재 유지 구간",
+        "passesIn": "이 기록을 넘어서기까지",
+        "progressAria": "시간의 전사 기록 대비 수호 챔피언의 현재 유지 구간"
       },
       "paid": "지불",
       "received": "받음"

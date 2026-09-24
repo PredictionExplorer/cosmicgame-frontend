@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from 'react';
 import { ArrowRight, MessageSquare, type LucideIcon } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 import { AddressChip } from '@/components/ui/address-chip';
 import { Amount } from '@/components/ui/amount';
@@ -11,11 +11,11 @@ import { DateTime } from '@/components/ui/date-time';
 import { Duration } from '@/components/ui/duration';
 import { ExplainedTerm } from '@/components/ui/explain-popover';
 import { LiveStatus } from '@/components/ui/live-status';
+import { SectionHeader } from '@/components/ui/section-header';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Term } from '@/components/ui/term';
 import { UnknownValue } from '@/components/ui/unknown-value';
 import type { ChampionsState } from '@/hooks/useChampions';
-import { useFormat } from '@/hooks/useFormat';
 import type { PositionMoment } from '@/hooks/usePositionMoment';
 import { Link } from '@/i18n/navigation';
 import {
@@ -26,7 +26,7 @@ import {
 } from '@/lib/conceptIcons';
 import { cn } from '@/lib/utils';
 import type { GestureInfo } from '@/services/api';
-import { formatPercent, sameAddress } from '@/utils/format';
+import { sameAddress } from '@/utils/format';
 import {
   formatGestureMethod,
   formatAttachedAssets,
@@ -104,11 +104,25 @@ interface LedgerRowProps {
   icon: LucideIcon;
   role: ReactNode;
   holder: string | null;
+  /** Said once, under the role, while nobody holds it; its holder and time read as a dash. */
   emptyText: string;
   account: string | null;
   time: ReactNode;
   allocation: ReactNode;
   children?: ReactNode;
+}
+
+/** A value nobody holds yet: a dash for sighted readers, "None" for everyone. */
+function NoValue() {
+  const tTables = useTranslations('tables');
+  return (
+    <>
+      <span aria-hidden className="type-figure-sm text-subtle">
+        —
+      </span>
+      <span className="sr-only">{tTables('status.none')}</span>
+    </>
+  );
 }
 
 function LedgerRow({
@@ -135,7 +149,7 @@ function LedgerRow({
       data-current={isYou || undefined}
       data-settling={settling || undefined}
       className={cn(
-        'relative py-2.5',
+        'relative py-2',
         // The connected wallet's row carries a 2px accent rule and a row whose
         // holder just changed a --live one. The rule hangs in the frame's
         // gutter, so the row's columns stay aligned with the rest.
@@ -145,11 +159,18 @@ function LedgerRow({
       )}
     >
       <div className={ROW_GRID}>
-        <RoleHeading className="flex min-w-0 items-start gap-2 type-label font-medium text-foreground">
-          <Icon className="mt-px size-4 shrink-0 text-subtle" aria-hidden />
-          {/* The role's text, not the icon, gives the row its baseline. */}
-          <span className="min-w-0 self-baseline">{role}</span>
-        </RoleHeading>
+        <div className="min-w-0">
+          <RoleHeading className="flex min-w-0 items-start gap-2 type-label font-medium text-foreground">
+            <Icon className="mt-px size-4 shrink-0 text-subtle" aria-hidden />
+            {/* The role's text, not the icon, gives the row its baseline. */}
+            <span className="min-w-0 self-baseline">{role}</span>
+          </RoleHeading>
+          {!holder && (
+            <p data-testid={`${testId}-empty`} className="type-caption mt-1 ps-6 text-subtle">
+              {emptyText}
+            </p>
+          )}
+        </div>
         <dl className={cn('mt-2 grid gap-y-1.5 @[30rem]/ledger:mt-0', FIELDS_GRID)}>
           <div className="flex min-w-0 items-baseline justify-between gap-3 @[30rem]/ledger:block">
             <dt className="type-label text-subtle @[30rem]/ledger:sr-only">
@@ -172,13 +193,15 @@ function LedgerRow({
                   )}
                 </>
               ) : (
-                <span className="type-caption text-subtle">{emptyText}</span>
+                <NoValue />
               )}
             </dd>
           </div>
           <div className="flex min-w-0 items-baseline justify-between gap-3 @[30rem]/ledger:block">
             <dt className="type-label text-subtle @[30rem]/ledger:sr-only">{t('columns.time')}</dt>
-            <dd className="min-w-0 text-end @[30rem]/ledger:text-start">{time}</dd>
+            <dd className="min-w-0 text-end @[30rem]/ledger:text-start">
+              {holder ? time : <NoValue />}
+            </dd>
           </div>
           <div className="flex min-w-0 items-baseline justify-between gap-3 @[30rem]/ledger:block">
             <dt className="type-label text-subtle @[30rem]/ledger:sr-only">
@@ -234,47 +257,61 @@ function TimeHeld({
   );
 }
 
-/** A 2px progress rule against a record, with its caption and percentage. */
-function RecordProgress({
-  percent,
-  caption,
-  live,
-  label,
-}: {
-  percent: number;
-  caption: string;
-  live: boolean;
-  label: string;
-}) {
-  const locale = useLocale();
+/** A 2px progress rule against a record. */
+function RecordRule({ percent, live, label }: { percent: number; live: boolean; label: string }) {
   const value = Math.max(0, Math.min(100, percent));
   return (
-    <div data-testid="latest-endurance-progress">
-      <div className="flex items-baseline justify-between gap-3">
-        <span className={cn('type-caption', live ? 'text-live' : 'text-muted-foreground')}>
-          {caption}
-        </span>
-        <span className="type-caption tabular-nums text-subtle">
-          {formatPercent(Math.floor(value), locale, { maximumFractionDigits: 0 })}
-        </span>
-      </div>
+    <div
+      role="progressbar"
+      aria-label={label}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={Math.floor(value)}
+      className="h-0.5 w-full rounded-pill bg-rule"
+    >
       <div
-        role="progressbar"
-        aria-label={label}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={Math.floor(value)}
-        className="mt-1.5 h-0.5 w-full rounded-pill bg-rule"
-      >
-        <div
-          className={cn(
-            'h-full rounded-pill transition-[width] duration-[var(--duration-slow)]',
-            live ? 'bg-live' : 'bg-primary',
-          )}
-          style={{ width: `${value}%` }}
-        />
-      </div>
+        className={cn(
+          'h-full rounded-pill transition-[width] duration-[var(--duration-slow)]',
+          live ? 'bg-live' : 'bg-primary',
+        )}
+        style={{ width: `${value}%` }}
+      />
     </div>
+  );
+}
+
+interface LedgerFact {
+  key: string;
+  testId?: string;
+  label: string;
+  /** A duration in seconds: a countdown reads as a clock, an elapsed hold in units. */
+  seconds: number;
+  countdown?: boolean;
+}
+
+/**
+ * What changes a row next, as label and figure lines: the label wraps and
+ * the figure sits in its own column and never does, so a ticking figure can
+ * never re-wrap the line and move the desk (the ledger is measured against
+ * the rows of the page, not its own content). Countdowns read as a clock
+ * ("8d 06:56:51"), whose width holds while it ticks.
+ */
+function LedgerFacts({ facts }: { facts: LedgerFact[] }) {
+  return (
+    <dl className="grid gap-y-1">
+      {facts.map((fact) => (
+        <div
+          key={fact.key}
+          data-testid={fact.testId}
+          className="grid grid-cols-[minmax(0,3fr)_minmax(0,2fr)] items-baseline gap-x-3"
+        >
+          <dt className="type-caption min-w-0 text-muted-foreground">{fact.label}</dt>
+          <dd className="type-caption min-w-0 text-end text-foreground">
+            <Duration seconds={fact.seconds} variant={fact.countdown ? 'clock' : 'compact'} />
+          </dd>
+        </div>
+      ))}
+    </dl>
   );
 }
 
@@ -414,7 +451,7 @@ function LedgerSkeleton() {
   return (
     <>
       {[0, 1, 2, 3].map((row) => (
-        <li key={row} data-testid="standings-ledger-skeleton-row" aria-hidden className="py-2.5">
+        <li key={row} data-testid="standings-ledger-skeleton-row" aria-hidden className="py-2">
           <div className={ROW_GRID}>
             <span className="flex items-center gap-2">
               <Skeleton className="size-4 shrink-0 rounded-edge" />
@@ -435,11 +472,14 @@ function LedgerSkeleton() {
 /**
  * The Standings Ledger: the four roles a Gesture can change — Last Gesture,
  * Endurance Champion, Chrono-Warrior and Final CST Gesture — as four aligned
- * rows in one frame. Holders line up in mono, durations in tabular figures,
- * and each row carries what changes it next as a caption. The Endurance hold
- * that is measured against the Chrono record reads as one line under the
- * ledger. A row whose holder just changed settles with a 900ms --live rule;
- * the connected wallet's row carries the accent rule and a "You" tag.
+ * rows. Holders line up in mono, durations in tabular figures, and each row
+ * carries what changes it next under it: the Last Gesture its hold against
+ * the Endurance record, the Chrono-Warrior the Endurance Champion's current
+ * reign against its record. Those lines have a fixed shape, so the ledger
+ * keeps its height while the figures tick. A row whose holder just changed
+ * settles with a 900ms --live rule; the connected wallet's row carries the
+ * accent rule and a "You" tag. A role nobody holds yet says so once, under
+ * its name.
  *
  * Holds are shown only when they are measured against a real clock; before
  * hydration they read as pending, never as a confident 0s or 0%. Until the
@@ -465,7 +505,6 @@ export function StandingsLedger({
   const tTables = useTranslations('tables');
   const tHome = useTranslations('home');
   const tCommon = useTranslations('common');
-  const format = useFormat();
   const { latestGesture: latest, endurance, chrono, chronoChallenge, lastCst } = champions;
   const clockKnown = latest.isTimeKnown !== false;
   const hasEnduranceRecord = !!endurance.address;
@@ -476,7 +515,13 @@ export function StandingsLedger({
 
   // What changes the Last Gesture row next: its hold measured against the
   // Endurance record. Unknown until the clock is.
-  const latestProgress = (() => {
+  const latestProgress: {
+    percent: number;
+    live: boolean;
+    caption?: string;
+    showBar: boolean;
+    fact?: LedgerFact;
+  } | null = (() => {
     if (!latest.address || !clockKnown) return null;
     if (!hasEnduranceRecord || latest.durationToBeat <= 0) {
       return {
@@ -496,16 +541,47 @@ export function StandingsLedger({
     }
     return {
       percent: latest.progressToEnduranceChampion,
-      caption: t(latest.isCurrentEnduranceChampion ? 'ledger.extendsIn' : 'ledger.passesIn', {
-        duration: format.duration(latest.secondsUntilEnduranceChampion),
-      }),
       live: false,
       showBar: true,
+      fact: {
+        key: 'endurance',
+        testId: 'latest-endurance-countdown',
+        label: t(
+          latest.isCurrentEnduranceChampion ? 'ledger.extendsRecordIn' : 'ledger.passesRecordIn',
+        ),
+        seconds: latest.secondsUntilEnduranceChampion,
+        countdown: true,
+      },
     };
   })();
 
+  // The Endurance Champion's current reign against the Chrono-Warrior record,
+  // under the row it can change. Its holder is named once, on the Endurance
+  // Champion row.
   const showChallenge =
     !loading && !!chrono.address && chronoChallenge.hasDetails && !chronoChallenge.isLive;
+  const challengeFacts: LedgerFact[] = [];
+  if (showChallenge && chronoChallenge.duration !== undefined) {
+    challengeFacts.push({
+      key: 'reign',
+      testId: 'chrono-challenge-segment',
+      label: t('ledger.challenge.reign'),
+      seconds: chronoChallenge.duration,
+    });
+  }
+  if (showChallenge && chronoChallenge.startsGrowingIn !== undefined) {
+    challengeFacts.push({
+      key: 'passes',
+      testId: 'chrono-challenge-next-change',
+      label: t('ledger.challenge.passesIn'),
+      seconds: chronoChallenge.startsGrowingIn,
+      countdown: true,
+    });
+  }
+  const challengePercent =
+    chronoChallenge.duration !== undefined && chronoChallenge.recordToBeat > 0
+      ? (chronoChallenge.duration / (chronoChallenge.recordToBeat + 1)) * 100
+      : null;
 
   return (
     <section
@@ -514,22 +590,20 @@ export function StandingsLedger({
       data-testid="standings-ledger"
       className={cn('@container/ledger min-w-0', className)}
     >
-      <header className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <Heading id={headingId} className="type-title text-foreground">
-          {t('standings.title')}
-        </Heading>
-        <LiveStatus variant="inline" still queryKeys={[['currentSpecialWinners']]} />
-      </header>
-      {description && (
-        <p className="mt-1.5 max-w-[var(--measure-lede)] type-body-sm text-muted-foreground">
-          {description}
-        </p>
-      )}
+      <SectionHeader
+        as={Heading}
+        size="panel"
+        headingId={headingId}
+        title={t('standings.title')}
+        description={description}
+        actions={<LiveStatus variant="inline" still queryKeys={[['currentSpecialWinners']]} />}
+        className="mb-0 flex-row flex-wrap items-baseline justify-between gap-y-1 sm:items-baseline"
+      />
 
       {/* The column heads, once, for sighted readers; every value carries its own label. */}
       <div
         aria-hidden
-        className="mt-3 hidden border-b border-rule pb-2 type-label text-subtle @[30rem]/ledger:grid @[30rem]/ledger:grid-cols-[minmax(0,1.25fr)_minmax(0,1.1fr)_minmax(0,1fr)_minmax(0,0.95fr)] @[30rem]/ledger:gap-x-4"
+        className="mt-2.5 hidden border-b border-rule pb-2 type-label text-subtle @[30rem]/ledger:grid @[30rem]/ledger:grid-cols-[minmax(0,1.25fr)_minmax(0,1.1fr)_minmax(0,1fr)_minmax(0,0.95fr)] @[30rem]/ledger:gap-x-4"
       >
         <span />
         <span>{t('ledger.columns.holder')}</span>
@@ -552,14 +626,12 @@ export function StandingsLedger({
                 </ExplainedTerm>
               }
               holder={latest.address}
-              emptyText={tTables('specialAllocation.noLatestGesture')}
+              emptyText={t('ledger.empty.latest')}
               account={account}
               time={
                 latest.address ? (
                   <TimeHeld seconds={latest.holdDuration} live={false} pending={!clockKnown} />
-                ) : (
-                  <UnknownValue label={tTables('specialAllocation.noLatestGesture')} />
-                )
+                ) : null
               }
               allocation={
                 <span className="type-label text-muted-foreground">
@@ -571,12 +643,18 @@ export function StandingsLedger({
                 <div className="space-y-2.5">
                   {latestProgress ? (
                     latestProgress.showBar ? (
-                      <RecordProgress
-                        percent={latestProgress.percent}
-                        live={latestProgress.live}
-                        label={tTables('specialAllocation.progressAria')}
-                        caption={latestProgress.caption}
-                      />
+                      <div data-testid="latest-endurance-progress" className="space-y-1.5">
+                        {latestProgress.fact ? (
+                          <LedgerFacts facts={[latestProgress.fact]} />
+                        ) : (
+                          <p className="type-caption text-live">{latestProgress.caption}</p>
+                        )}
+                        <RecordRule
+                          percent={latestProgress.percent}
+                          live={latestProgress.live}
+                          label={tTables('specialAllocation.progressAria')}
+                        />
+                      </div>
                     ) : (
                       <p data-testid="latest-participant-status" className="type-caption text-live">
                         {latestProgress.caption}
@@ -605,19 +683,15 @@ export function StandingsLedger({
                 <Term id="enduranceChampion">{tTables('specialAllocation.enduranceChampion')}</Term>
               }
               holder={endurance.address}
-              emptyText={tTables('specialAllocation.noEnduranceRecord')}
+              emptyText={t('ledger.empty.endurance')}
               account={account}
               time={
-                endurance.address ? (
-                  <TimeHeld
-                    seconds={endurance.duration}
-                    live={endurance.isLive}
-                    pending={endurance.isLive && !clockKnown}
-                    caption={endurance.isLive ? tTables('specialAllocation.growingNow') : undefined}
-                  />
-                ) : (
-                  <UnknownValue label={tTables('specialAllocation.noEnduranceRecord')} />
-                )
+                <TimeHeld
+                  seconds={endurance.duration}
+                  live={endurance.isLive}
+                  pending={endurance.isLive && !clockKnown}
+                  caption={endurance.isLive ? tTables('specialAllocation.growingNow') : undefined}
+                />
               }
               allocation={
                 <span className="type-figure-sm text-foreground">{t('standings.cstPlusNft')}</span>
@@ -630,18 +704,14 @@ export function StandingsLedger({
               icon={ChronoWarriorIcon}
               role={<Term id="chronoWarrior">{tTables('specialAllocation.chronoWarrior')}</Term>}
               holder={chrono.address}
-              emptyText={tTables('specialAllocation.noChronoRecord')}
+              emptyText={t('ledger.empty.chrono')}
               account={account}
               time={
-                chrono.address ? (
-                  <TimeHeld
-                    seconds={chrono.duration}
-                    live={chrono.isLive}
-                    caption={chrono.isLive ? tTables('specialAllocation.growingNow') : undefined}
-                  />
-                ) : (
-                  <UnknownValue label={tTables('specialAllocation.noChronoRecord')} />
-                )
+                <TimeHeld
+                  seconds={chrono.duration}
+                  live={chrono.isLive}
+                  caption={chrono.isLive ? tTables('specialAllocation.growingNow') : undefined}
+                />
               }
               allocation={
                 chronoEth != null ? (
@@ -659,15 +729,31 @@ export function StandingsLedger({
               {chrono.isLive &&
                 chrono.willStopGrowingIn !== undefined &&
                 chrono.willStopGrowingIn > 0 && (
-                  <p
-                    data-testid="chrono-next-change"
-                    className="type-caption text-muted-foreground"
-                  >
-                    {t('ledger.chronoMayClose', {
-                      duration: format.duration(chrono.willStopGrowingIn),
-                    })}
-                  </p>
+                  <div data-testid="chrono-next-change">
+                    <LedgerFacts
+                      facts={[
+                        {
+                          key: 'stops',
+                          label: t('ledger.chronoStopsIn'),
+                          seconds: chrono.willStopGrowingIn,
+                          countdown: true,
+                        },
+                      ]}
+                    />
+                  </div>
                 )}
+              {challengeFacts.length > 0 && (
+                <div data-testid="chrono-active-challenge" className="space-y-1.5">
+                  <LedgerFacts facts={challengeFacts} />
+                  {challengePercent != null && (
+                    <RecordRule
+                      percent={challengePercent}
+                      live={false}
+                      label={t('ledger.challenge.progressAria')}
+                    />
+                  )}
+                </div>
+              )}
             </LedgerRow>
 
             <LedgerRow
@@ -678,7 +764,7 @@ export function StandingsLedger({
                 <Term id="finalCstGesture">{tTables('specialAllocation.finalCstGesture')}</Term>
               }
               holder={lastCst.address}
-              emptyText={tTables('specialAllocation.awaitingCstGesture')}
+              emptyText={t('ledger.empty.finalCst')}
               account={account}
               time={
                 // This role holds no timer: a dash for sighted readers, the reason for everyone.
@@ -697,51 +783,6 @@ export function StandingsLedger({
         )}
       </ul>
       {loading && <span className="sr-only">{tCommon('status.loading')}</span>}
-
-      {showChallenge && (
-        <div
-          data-testid="chrono-active-challenge"
-          className="mt-3 @[30rem]/ledger:flex @[30rem]/ledger:flex-wrap @[30rem]/ledger:items-baseline @[30rem]/ledger:gap-x-4 @[30rem]/ledger:gap-y-1"
-        >
-          <p className="type-label text-muted-foreground">{t('ledger.challenge.title')}</p>
-          {/* The hold belongs to the Endurance Champion in the row above
-              (useChampions: the challenge address is the effective holder),
-              so the line gives only its figures. */}
-          <dl className="mt-1.5 grid gap-y-1 @[30rem]/ledger:mt-0 @[30rem]/ledger:flex @[30rem]/ledger:flex-wrap @[30rem]/ledger:items-baseline @[30rem]/ledger:gap-x-4">
-            {[
-              chronoChallenge.duration !== undefined && {
-                testId: 'chrono-challenge-segment',
-                label: t('ledger.challenge.held'),
-                seconds: chronoChallenge.duration,
-              },
-              {
-                testId: 'chrono-challenge-record-to-beat',
-                label: t('ledger.challenge.record'),
-                seconds: chronoChallenge.recordToBeat,
-              },
-              chronoChallenge.startsGrowingIn !== undefined && {
-                testId: 'chrono-challenge-next-change',
-                // When the current hold passes the Chrono record, whoever holds it.
-                label: t('ledger.challenge.passesIn'),
-                seconds: chronoChallenge.startsGrowingIn,
-              },
-            ]
-              .filter((fact): fact is { testId: string; label: string; seconds: number } => !!fact)
-              .map((fact) => (
-                <div
-                  key={fact.testId}
-                  data-testid={fact.testId}
-                  className="flex items-baseline justify-between gap-3 @[30rem]/ledger:justify-start @[30rem]/ledger:gap-1.5"
-                >
-                  <dt className="type-caption text-subtle">{fact.label}</dt>
-                  <dd>
-                    <Duration seconds={fact.seconds} className="type-figure-sm" />
-                  </dd>
-                </div>
-              ))}
-          </dl>
-        </div>
-      )}
     </section>
   );
 }

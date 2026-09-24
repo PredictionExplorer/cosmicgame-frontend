@@ -2,7 +2,7 @@ import userEvent from '@testing-library/user-event';
 
 import { render, screen, within, checkA11y } from '@/test-utils';
 
-import { AllocationsDisclosure, ControlDesk } from '../ControlDesk';
+import { AllocationsDisclosure, ControlDesk, DESK_REGION, DeskDisclosure } from '../ControlDesk';
 
 const regions = {
   header: <h1>Observatory</h1>,
@@ -14,6 +14,9 @@ const regions = {
   art: <section aria-label="Latest Signature">Art</section>,
 };
 
+/** Classes that draw a box: a border on every side, a fill or a rounded frame. */
+const BOX = /(?:^|\s)(?:border(?:\s|$)|bg-surface|rounded-surface)/;
+
 describe('ControlDesk', () => {
   it('keeps the DOM in the order a phone reads it: clock, form, standing, standings, Calibration, art', () => {
     render(<ControlDesk {...regions} />);
@@ -23,7 +26,6 @@ describe('ControlDesk', () => {
       node.getAttribute('data-testid'),
     );
     expect(order).toEqual([
-      'control-desk-cycle',
       'control-desk-clock',
       'control-desk-gesture',
       'control-desk-standing',
@@ -35,22 +37,13 @@ describe('ControlDesk', () => {
     for (const cell of grid.children) {
       expect(cell.className).not.toMatch(/(?:^|\s)(?:[a-z-]+:)*order-/);
     }
-    // The Cycle column's frame is decoration only.
-    const frame = screen.getByTestId('control-desk-cycle');
-    expect(frame).toHaveAttribute('aria-hidden');
-    expect(frame).toBeEmptyDOMElement();
   });
 
   it('places each cell explicitly from 1024px', () => {
     render(<ControlDesk {...regions} />);
     // Row 1: the Cycle column (5 of 12: clock over Calibration) beside the standings (7 of 12).
-    expect(screen.getByTestId('control-desk-cycle')).toHaveClass(
-      'lg:col-span-5',
-      'lg:col-start-1',
-      'lg:row-start-1',
-      'lg:row-span-2',
-    );
     expect(screen.getByTestId('control-desk-clock')).toHaveClass(
+      'lg:col-span-5',
       'lg:col-start-1',
       'lg:row-start-1',
     );
@@ -76,19 +69,12 @@ describe('ControlDesk', () => {
     );
   });
 
-  it('hangs the art on the wall and frames the standing only while the desk is one column', () => {
-    render(<ControlDesk {...regions} />);
-    const art = screen.getByTestId('control-desk-art');
-    expect(art.className).not.toMatch(/(?:^|\s)(?:border|bg-surface)/);
-    const standing = screen.getByTestId('control-desk-standing');
-    expect(standing).toHaveClass('border', 'lg:border-0', 'lg:bg-transparent');
-  });
-
-  it('keeps a placeholder standing off phones', () => {
+  it('keeps a placeholder standing to the two-column desk', () => {
     const { rerender } = render(<ControlDesk {...regions} />);
-    expect(screen.getByTestId('control-desk-standing')).not.toHaveClass('max-md:hidden');
+    expect(screen.getByTestId('control-desk-standing')).not.toHaveClass('max-lg:hidden');
     rerender(<ControlDesk {...regions} standingOnPhones={false} />);
-    expect(screen.getByTestId('control-desk-standing')).toHaveClass('max-md:hidden');
+    // Below 1024px the placeholder would only repeat the form's connect action.
+    expect(screen.getByTestId('control-desk-standing')).toHaveClass('max-lg:hidden');
   });
 
   it("gives the art the form's place between cycles", () => {
@@ -108,21 +94,29 @@ describe('ControlDesk', () => {
     );
   });
 
-  it('frames each region once: no bordered box inside a bordered box', () => {
+  it('boxes only the form: every other region opens on a hairline on the page ground', () => {
     render(<ControlDesk {...regions} />);
-    // The Cycle column's frame is drawn from 1024px; the clock and the
-    // Calibration Window drop their own frames there.
-    expect(screen.getByTestId('control-desk-cycle')).toHaveClass('lg:block', 'border');
-    expect(screen.getByTestId('control-desk-clock')).toHaveClass('lg:border-0');
-    expect(screen.getByTestId('control-desk-calibration')).toHaveClass('lg:border-0');
     // The form is the page's one quiet surface: a fill, no border.
-    expect(screen.getByTestId('control-desk-gesture')).toHaveClass('bg-surface');
-    expect(screen.getByTestId('control-desk-gesture').className).not.toMatch(
-      /(?:^|\s)border(?:\s|$)/,
-    );
+    const form = screen.getByTestId('control-desk-gesture');
+    expect(form).toHaveClass('bg-surface', 'rounded-surface');
+    expect(form.className).not.toMatch(/(?:^|\s)border(?:\s|$)/);
+    for (const testId of [
+      'control-desk-clock',
+      'control-desk-standings',
+      'control-desk-calibration',
+      'control-desk-art',
+      'control-desk-standing',
+    ]) {
+      const cell = screen.getByTestId(testId);
+      expect(cell.className).not.toMatch(BOX);
+      expect(cell).toHaveClass(...DESK_REGION.split(' '));
+    }
+    // A region that continues its column opens on the fainter rule from 1024px.
+    expect(screen.getByTestId('control-desk-calibration')).toHaveClass('lg:border-rule-faint');
+    expect(screen.getByTestId('control-desk-standing')).toHaveClass('lg:border-rule-faint');
   });
 
-  it('keeps the allocation breakdown in a native disclosure', async () => {
+  it('keeps the allocation breakdown in a native disclosure row', async () => {
     const user = userEvent.setup();
     render(
       <AllocationsDisclosure>
@@ -130,10 +124,24 @@ describe('ControlDesk', () => {
       </AllocationsDisclosure>,
     );
     const disclosure = screen.getByTestId('allocations-disclosure');
+    expect(disclosure.tagName).toBe('DETAILS');
+    expect(disclosure.className).not.toMatch(BOX);
+    expect(disclosure).toHaveClass('border-t', 'border-b');
     expect(disclosure).not.toHaveAttribute('open');
     await user.click(within(disclosure).getByText('home.orientation.allocationsTitle'));
     expect(disclosure).toHaveAttribute('open');
     expect(within(disclosure).getByText('Ledger')).toBeVisible();
+  });
+
+  it('stacks disclosure rows as one list, each closed by its own rule', () => {
+    render(
+      <DeskDisclosure testId="row" summary={<span>Story</span>}>
+        <p>Notes</p>
+      </DeskDisclosure>,
+    );
+    const row = screen.getByTestId('row');
+    expect(row).toHaveClass('border-b');
+    expect(row).not.toHaveClass('border-t');
   });
 
   it('omits the form between cycles without leaving a gap', () => {

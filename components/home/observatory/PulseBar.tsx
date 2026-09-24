@@ -27,8 +27,6 @@ export interface PulseBarProps {
   lastGestureAge?: string | null;
   /** The connected wallet holds the Last Gesture: said once, in the first viewport. */
   youHoldLatest?: boolean;
-  /** Controls placed before the "New here?" link (the attention menu). */
-  aside?: ReactNode;
   className?: string;
 }
 
@@ -57,10 +55,14 @@ export function introForPhase(phase: CyclePhase): PulseIntro {
 }
 
 /**
- * The Observatory's header strip on the shared content edge: the page H1, one
- * live pill for the Cycle, the phase in words, the gesture count, and a quiet
- * route to the walkthrough. The intro sentence stays short on phones so the
- * clock starts in the first third of the screen.
+ * The Observatory's header strip on the shared content edge: the page H1 at
+ * the display size every app H1 uses, one live pill for the Cycle, the phase
+ * in words, the Gesture count, and a quiet route to the walkthrough. The
+ * facts follow the H1 on its line where there is room. While Gestures run
+ * the strip says nothing more: the clock's status, the form and the cycle
+ * guide already say how to take part, so the desk starts high on every
+ * screen. A phase that needs explaining (before the cycle opens, before its
+ * first Gesture, at zero) says so in one sentence under the facts.
  */
 export function PulseBar({
   cycleNumber = null,
@@ -68,7 +70,6 @@ export function PulseBar({
   gestureCount,
   lastGestureAge = null,
   youHoldLatest = false,
-  aside = null,
   className,
 }: PulseBarProps) {
   const t = useTranslations('home');
@@ -119,73 +120,66 @@ export function PulseBar({
     <div
       data-testid="home-deck-header"
       className={cn(
-        'grid min-w-0 gap-x-8 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center xl:grid-cols-[auto_minmax(0,1fr)_auto]',
+        'grid min-w-0 gap-x-8 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center',
         className,
       )}
     >
-      <h1 id="home-deck-title" className="type-section min-w-0 text-foreground">
-        {t('deck.title')}
-      </h1>
-      {/* The facts wrap as a list whose dot separators hang in a clipped
-          gutter: a dot that would start a wrapped line is cut away, so no
-          line ever ends or starts on an orphaned separator. */}
-      <div className="mt-3 min-w-0 overflow-hidden sm:col-span-2 xl:col-span-1 xl:col-start-2 xl:row-start-1 xl:mt-0">
-        <ul role="list" className="-ms-4 flex flex-wrap items-center gap-y-2">
-          <li className="ps-4">
-            <Badge shape="pill" tone="neutral" className="gap-2 text-foreground">
-              {/* Breathes only while the dashboard poll succeeds (liveFreshness). */}
-              <LiveStatus variant="dot" />
-              {cycleNumber == null
-                ? t('hero.cycleFallback')
-                : t('hero.cycleNumber', { number: String(cycleNumber) })}
-            </Badge>
-          </li>
-          {facts.map((fact, index) => (
-            <li
-              key={fact.key}
-              className={cn(
-                'relative ps-4',
-                // The first fact follows the pill with space alone.
-                index > 0 && FACT_SEPARATOR,
-                // The age also reads in the ledger; it gives way where the
-                // strip shares its row with the H1.
-                fact.wide && 'max-sm:hidden xl:max-2xl:hidden',
-              )}
-            >
-              {fact.node}
-            </li>
-          ))}
-          {youHoldLatest && (
+      {/* The H1 and the facts share a line where there is room; the facts
+          wrap under the H1 where there is not. */}
+      <div className="flex min-w-0 flex-wrap items-center gap-x-6 gap-y-3">
+        <h1 id="home-deck-title" className="type-display-sm min-w-0 text-foreground">
+          {t('deck.title')}
+        </h1>
+        {/* The facts wrap as a list whose dot separators hang in a clipped
+            gutter: a dot that would start a wrapped line is cut away, so no
+            line ever ends or starts on an orphaned separator. */}
+        <div className="min-w-0 overflow-hidden">
+          <ul role="list" className="-ms-4 flex flex-wrap items-center gap-y-2">
             <li className="ps-4">
-              <Badge tone="positive" dot size="sm" data-testid="pulse-you-latest">
-                {t('observatory.standing.positionLatest')}
+              <Badge shape="pill" tone="neutral" className="gap-2 text-foreground">
+                {/* Breathes only while the dashboard poll succeeds (liveFreshness). */}
+                <LiveStatus variant="dot" />
+                {cycleNumber == null
+                  ? t('hero.cycleFallback')
+                  : t('hero.cycleNumber', { number: String(cycleNumber) })}
               </Badge>
             </li>
-          )}
-        </ul>
+            {facts.map((fact, index) => (
+              <li
+                key={fact.key}
+                className={cn(
+                  'relative ps-4',
+                  // The first fact follows the pill with space alone.
+                  index > 0 && FACT_SEPARATOR,
+                  // The age also reads in the ledger; it gives way where the
+                  // strip is narrow.
+                  fact.wide && 'max-2xl:hidden',
+                )}
+              >
+                {fact.node}
+              </li>
+            ))}
+            {youHoldLatest && (
+              <li className="ps-4">
+                <Badge tone="positive" dot size="sm" data-testid="pulse-you-latest">
+                  {t('observatory.standing.positionLatest')}
+                </Badge>
+              </li>
+            )}
+          </ul>
+        </div>
       </div>
-      <p
-        data-testid="pulse-intro"
-        data-intro={intro}
-        className="type-body-sm mt-2.5 max-w-[72ch] text-muted-foreground sm:col-span-2 xl:col-span-3 xl:mt-2 xl:max-w-none"
-      >
-        {intro === 'default' ? (
-          <>
-            {/* Phones get a sentence written to their length (the form just
-                below says how to take part), never one cut off mid-clause. A
-                phase sentence explains a moment and always reads in full. */}
-            <span data-testid="pulse-intro-short" className="sm:hidden">
-              {t('deck.introShort')}
-            </span>
-            <span className="max-sm:hidden">{t('deck.intro')}</span>
-          </>
-        ) : (
-          t(`deck.introByPhase.${intro}`)
-        )}
-      </p>
-      {/* One set of routes: under the intro on phones, beside the H1 from sm. */}
-      <div className="mt-2 flex items-center gap-3 sm:col-start-2 sm:row-start-1 sm:mt-0 xl:col-start-3">
-        {aside}
+      {intro !== 'default' && (
+        <p
+          data-testid="pulse-intro"
+          data-intro={intro}
+          className="type-body-sm mt-3 max-w-[var(--measure-lede)] text-muted-foreground sm:col-span-2"
+        >
+          {t(`deck.introByPhase.${intro}`)}
+        </p>
+      )}
+      {/* The route to the walkthrough: under the facts on phones, beside the H1 from sm. */}
+      <div className="mt-2 flex items-center sm:col-start-2 sm:row-start-1 sm:mt-0">
         <Link
           href="/how-it-works"
           className={cn(

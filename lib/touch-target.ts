@@ -1,8 +1,11 @@
 /**
- * Touch target sizing for phones (WCAG 2.5.5, verified by
- * `e2e/mobile-tap-targets.mobile.spec.ts`).
+ * Target sizing (WCAG 2.5.8 and 2.5.5, verified by
+ * `e2e/mobile-tap-targets.mobile.spec.ts` and the axe smoke suite).
  *
- * Everything here is scoped below `sm` so pointer layouts keep their density.
+ * The 24px minimum of 2.5.8 applies at every width, because it covers a
+ * mouse as much as a finger: {@link TOUCH_TARGET_TEXT_LINK_CLASS} is never
+ * scoped. The 44px enhancements below are scoped below `sm`, so pointer
+ * layouts keep their density.
  *
  * These use `min-*` rather than `h-*`/`w-*` on purpose. A control is very often
  * a flex item, and along a flex container's main axis `flex-basis` supersedes
@@ -27,14 +30,15 @@ export const TOUCH_TARGET_ICON_CLASS =
 export const TOUCH_TARGET_HEIGHT_CLASS = 'min-h-11 sm:min-h-0';
 
 /**
- * Lifts a block-level text link to the 24px WCAG 2.5.8 target on phones.
+ * Lifts a block-level text link to the 24px WCAG 2.5.8 target at every width.
  *
  * Text links get 24px rather than 44px because padding out every breadcrumb and
  * footer list to 44px is precisely what 2.5.8 exists to avoid. Growing the line
  * box rather than setting `min-height` keeps the text optically centred instead
- * of stranding it against the top of a taller box.
+ * of stranding it against the top of a taller box. Tailwind emits `leading-*`
+ * after the `type-*` utilities, so it wins over their line height.
  */
-export const TOUCH_TARGET_TEXT_LINK_CLASS = 'max-sm:leading-6';
+export const TOUCH_TARGET_TEXT_LINK_CLASS = 'leading-6';
 
 /**
  * Extends a control's hit area to 44x44 with a transparent pseudo-element,

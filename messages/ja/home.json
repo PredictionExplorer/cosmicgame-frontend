@@ -123,14 +123,14 @@
       "waitingFirstGesture": {
         "eyebrow": "サイクルは開始済み",
         "label": "最初の一筆を待っています",
-        "status": "サイクルは始まっています。最初の一筆が確定までの時計を動かします。",
+        "status": "最初の一筆が確定までの時計を動かします。",
         "tooltip": "確定までのカウントダウンはまだ動いていません。最初の一筆がサイクルタイマーを始動させ、このシグネチャーを形づくり始めます。",
         "display": "最初の一筆を待っています"
       },
       "approach": {
         "eyebrow": "サイクル確定まで",
         "label": "12時間未満",
-        "status": "サイクルは進行中です。一筆を入れると確定までの時間が延びることがあります。",
+        "status": "一筆を入れると確定までの時間が延びることがあります。",
         "tooltip": "これがサイクル確定時刻です。ゼロになると、最後の一筆の参加者がサイクルを確定できます。"
       },
       "finalHour": {
@@ -168,7 +168,7 @@
       "live": {
         "eyebrow": "サイクル確定まで",
         "label": "サイクルは進行中",
-        "status": "サイクルは進行中です。一筆を入れると確定までの時間が延びることがあります。",
+        "status": "一筆を入れると確定までの時間が延びることがあります。",
         "tooltip": "これがサイクル確定時刻です。ゼロになると、最後の一筆の参加者がサイクルを確定できます。"
       }
     },
@@ -235,8 +235,8 @@
       },
       "ethGesture": "ETH一筆",
       "ethGestureTooltip": "ETHで一筆を入れる現在の費用",
-      "randomWalkGesture": "ETH + RandomWalk一筆",
-      "randomWalkGestureTooltip": "RandomWalk NFTをETH一筆に添付すると、ETH一筆の費用が50%引き下げられます",
+      "randomWalkGesture": "ETH + Random Walk一筆",
+      "randomWalkGestureTooltip": "Random Walk NFTをETH一筆に添付すると、ETH一筆の費用が50%引き下げられます",
       "cstGesture": "CST一筆",
       "cstGestureTooltip": "CSTで一筆を入れます。費用はライブの調律期間を通じて下がり、CST一筆はその期間を長く、ETH一筆は短くします。",
       "free": "0 CST",
@@ -265,9 +265,9 @@
   },
   "ticker": {
     "openLatestAria": "最新の一筆{id}を開く",
-    "gestureLine": "{address}が{kind, select, cst {CST一筆} randomWalk {ETH + RandomWalk一筆} other {ETH一筆}}を入れました",
+    "gestureLine": "{address}が{kind, select, cst {CST一筆} randomWalk {ETH + Random Walk一筆} other {ETH一筆}}を入れました",
     "paymentUnavailable": "費用を同期中…",
-    "rwlkToken": "RandomWalk #{id}",
+    "rwlkToken": "Random Walk #{id}",
     "age": {
       "justNow": "たった今",
       "seconds": "{count}秒前",
@@ -359,8 +359,8 @@
     },
     "submit": {
       "eth": "ETHで一筆（{cost} ETH）",
-      "randomWalkWithToken": "ETH + RandomWalkトークン{tokenId}で一筆（{cost} ETH）",
-      "randomWalk": "ETH + RandomWalkで一筆",
+      "randomWalkWithToken": "ETH + Random Walkトークン{tokenId}で一筆（{cost} ETH）",
+      "randomWalk": "ETH + Random Walkで一筆",
       "cst": "CSTで一筆（{cost} CST）",
       "cstFree": "CSTで一筆（0 CSTとガス代）",
       "generic": "{method}で一筆",
@@ -379,7 +379,8 @@
     "connect": {
       "title": "接続して一筆を送信",
       "body": "上の表示で現在の方法と費用を確認し、MetaMaskなどのウォレットを接続すると、Arbitrumで一筆を入れられます。",
-      "cta": "ウォレットを接続して一筆を入れる"
+      "cta": "ウォレットを接続して一筆を入れる",
+      "ctaShort": "ウォレットを接続"
     },
     "message": {
       "add": "メッセージを追加"
@@ -439,8 +440,8 @@
         "tooltip": "サイクルの対象の中から無作為に選ばれた参加者が功労CSTとCosmic Signature NFTを受け取ります。"
       },
       "randomWalkAnchor": {
-        "name": "RandomWalk係留者",
-        "tooltip": "RandomWalk NFTの係留者は功労CSTとCosmic Signature NFTを受け取ることがあります。"
+        "name": "Random Walk係留者",
+        "tooltip": "Random Walk NFTの係留者は功労CSTとCosmic Signature NFTを受け取ることがあります。"
       },
       "cosmicAnchor": {
         "name": "Cosmic Signatureの係留",
@@ -522,13 +523,11 @@
     "view": {
       "messages": "メッセージ",
       "all": "すべての動き"
-    },
-    "eventGroup": "{count, plural, other {サイクルのイベント#件}}"
+    }
   },
   "deck": {
     "title": "Cosmic Signature観測所",
     "intro": "ETHまたはCSTで一筆を入れると最新の参加者になります。時計がゼロになると、最新の参加者がサイクルを確定してシグネチャー配分を受け取れます。",
-    "introShort": "時計がゼロになると、最新の参加者がサイクルを確定してシグネチャー配分を受け取れます。",
     "newHere": "初めてですか？仕組みを見る",
     "experimentalUi": "実験的なUI",
     "returnToCurrent": "現在のUIに戻る",
@@ -599,16 +598,18 @@
     },
     "clock": {
       "reserveLabel": "シグネチャー配分",
-      "reserveExtras": "+ 1,000 CST · Cosmic Signature NFT 1点 · 添付されたアセット",
+      "reserveExtraCst": "+ 1,000 CST",
+      "reserveExtraNft": "Cosmic Signature NFT 1点",
+      "reserveAttached": "{count, plural, other {添付されたアセット#点}}",
       "reserveUsd": "≈ {amount} USD",
       "calendarTitle": "Cosmic Signatureサイクル{number}が始まります",
       "calendarBody": "次のパフォーマンス・サイクルで一筆を入れられるようになります。最初の一筆が確定までの時計を動かします。",
       "calendarCta": "開始をカレンダーに追加",
-      "units": {
-        "days": "{count, plural, other {日}}",
-        "hours": "{count, plural, other {時間}}",
-        "minutes": "{count, plural, other {分}}",
-        "seconds": "{count, plural, other {秒}}"
+      "unitLabels": {
+        "days": "日",
+        "hours": "時間",
+        "minutes": "分",
+        "seconds": "秒"
       },
       "state": {
         "ready": "確定できます",
@@ -651,16 +652,21 @@
         "time": "保持時間",
         "allocation": "配分"
       },
-      "passesIn": "あと{duration}で持久記録を超えます",
-      "extendsIn": "あと{duration}で持久記録を延ばします",
-      "chronoMayClose": "現在の保持が続けば{duration}後に伸びが止まります",
+      "empty": {
+        "latest": "このサイクルの一筆はまだありません",
+        "endurance": "持久記録はまだありません",
+        "chrono": "時の戦士の記録はまだありません",
+        "finalCst": "CST一筆はまだありません"
+      },
+      "passesRecordIn": "持久記録を超えるまで",
+      "extendsRecordIn": "持久記録を延ばすまで",
+      "chronoStopsIn": "現在の保持が続けば伸びが止まるまで",
       "finalCstNote": "CST一筆でのみ変わります",
       "position": "一筆の番号",
       "challenge": {
-        "title": "現在の持久保持",
-        "held": "これまで",
-        "record": "時の戦士の記録",
-        "passesIn": "超えるまで"
+        "reign": "持久チャンピオンの現在の保持期間",
+        "passesIn": "この記録を超えるまで",
+        "progressAria": "時の戦士の記録に対する持久チャンピオンの現在の保持期間"
       },
       "paid": "支払い",
       "received": "受け取り"

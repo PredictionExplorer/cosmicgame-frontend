@@ -123,14 +123,14 @@
       "waitingFirstGesture": {
         "eyebrow": "Цикл відкрито",
         "label": "Очікування першого жесту",
-        "status": "Цикл відкрито. Перший жест запускає відлік до завершення.",
+        "status": "Перший жест запускає відлік до завершення.",
         "tooltip": "Відлік до завершення ще не запущено. Перший жест запускає таймер циклу й починає формувати цю Сигнатуру.",
         "display": "Очікування першого жесту"
       },
       "approach": {
         "eyebrow": "До завершення циклу",
         "label": "Менше 12 годин",
-        "status": "Цикл триває. Кожен жест може подовжити відлік до завершення.",
+        "status": "Кожен жест може подовжити відлік до завершення.",
         "tooltip": "Відлік до моменту, коли цикл можна буде завершити. Коли він дійде до нуля, автор завершального жесту зможе завершити цикл."
       },
       "finalHour": {
@@ -168,7 +168,7 @@
       "live": {
         "eyebrow": "До завершення циклу",
         "label": "Цикл триває",
-        "status": "Цикл триває. Кожен жест може подовжити відлік до завершення.",
+        "status": "Кожен жест може подовжити відлік до завершення.",
         "tooltip": "Відлік до моменту, коли цикл можна буде завершити. Коли він дійде до нуля, автор завершального жесту зможе завершити цикл."
       }
     },
@@ -235,8 +235,8 @@
       },
       "ethGesture": "ETH-жест",
       "ethGestureTooltip": "Поточна вартість жесту за ETH",
-      "randomWalkGesture": "ETH-жест + RandomWalk",
-      "randomWalkGestureTooltip": "Вартість ETH-жесту зменшується на 50%, якщо до нього долучити RandomWalk NFT",
+      "randomWalkGesture": "ETH-жест + Random Walk",
+      "randomWalkGestureTooltip": "Вартість ETH-жесту зменшується на 50%, якщо до нього долучити Random Walk NFT",
       "cstGesture": "CST-жест",
       "cstGestureTooltip": "Жест за CST. Вартість знижується протягом поточного вікна калібрування, яке CST-жести подовжують, а ETH-жести скорочують.",
       "free": "0 CST",
@@ -265,9 +265,9 @@
   },
   "ticker": {
     "openLatestAria": "Відкрити останній жест {id}",
-    "gestureLine": "{address} робить {kind, select, cst {CST-жест} randomWalk {ETH-жест з RandomWalk} other {ETH-жест}}",
+    "gestureLine": "{address} робить {kind, select, cst {CST-жест} randomWalk {ETH-жест з Random Walk} other {ETH-жест}}",
     "paymentUnavailable": "вартість синхронізується…",
-    "rwlkToken": "RandomWalk {id}",
+    "rwlkToken": "Random Walk {id}",
     "age": {
       "justNow": "щойно",
       "seconds": "{count}с тому",
@@ -359,8 +359,8 @@
     },
     "submit": {
       "eth": "Зробити ETH-жест ({cost} ETH)",
-      "randomWalkWithToken": "Зробити ETH-жест + RandomWalk {tokenId} ({cost} ETH)",
-      "randomWalk": "Зробити ETH-жест + RandomWalk",
+      "randomWalkWithToken": "Зробити ETH-жест + Random Walk {tokenId} ({cost} ETH)",
+      "randomWalk": "Зробити ETH-жест + Random Walk",
       "cst": "Зробити CST-жест ({cost} CST)",
       "cstFree": "Зробити CST-жест (0 CST + газ)",
       "generic": "Зробити жест: {method}",
@@ -379,7 +379,8 @@
     "connect": {
       "title": "Під’єднайте гаманець, щоб надіслати жест",
       "body": "Перегляньте способи жесту та їхню вартість вище, а потім під’єднайте MetaMask або інший гаманець, щоб надіслати жест на Arbitrum.",
-      "cta": "Під’єднати гаманець для жесту"
+      "cta": "Під’єднати гаманець для жесту",
+      "ctaShort": "Під’єднати гаманець"
     },
     "message": {
       "add": "Додати повідомлення"
@@ -439,8 +440,8 @@
         "tooltip": "Учасників випадково відбирають серед записів циклу для отримання CST визнання та Cosmic Signature NFT."
       },
       "randomWalkAnchor": {
-        "name": "Власники закріплень RandomWalk",
-        "tooltip": "Власники закріплень RandomWalk NFT можуть отримати CST визнання та Cosmic Signature NFT."
+        "name": "Власники закріплень Random Walk",
+        "tooltip": "Власники закріплень Random Walk NFT можуть отримати CST визнання та Cosmic Signature NFT."
       },
       "cosmicAnchor": {
         "name": "Закріплення Cosmic Signature",
@@ -522,13 +523,11 @@
     "view": {
       "messages": "Повідомлення",
       "all": "Уся активність"
-    },
-    "eventGroup": "{count, plural, one {# подія циклу} few {# події циклу} many {# подій циклу} other {# події циклу}}"
+    }
   },
   "deck": {
     "title": "Обсерваторія Cosmic Signature",
     "intro": "Зробіть жест за ETH або CST, щоб стати останнім учасником. Коли відлік дійде до нуля, останній учасник може завершити цикл та отримати розподіл Сигнатури.",
-    "introShort": "Коли відлік дійде до нуля, останній учасник може завершити цикл та отримати розподіл Сигнатури.",
     "newHere": "Ви тут уперше? Як це працює",
     "experimentalUi": "Експериментальний інтерфейс",
     "returnToCurrent": "Повернутися до поточного інтерфейсу",
@@ -599,16 +598,18 @@
     },
     "clock": {
       "reserveLabel": "Розподіл Сигнатури",
-      "reserveExtras": "+ 1 000 CST · 1 Cosmic Signature NFT · долучені активи",
+      "reserveExtraCst": "+ 1 000 CST",
+      "reserveExtraNft": "1 Cosmic Signature NFT",
+      "reserveAttached": "{count, plural, one {# долучений актив} few {# долучені активи} many {# долучених активів} other {# долученого активу}}",
       "reserveUsd": "≈ {amount} USD",
       "calendarTitle": "Cosmic Signature: відкривається Цикл {number}",
       "calendarBody": "Наступний перформанс-цикл відкривається для жестів. Перший жест запускає відлік до завершення.",
       "calendarCta": "Додати відкриття в календар",
-      "units": {
-        "days": "{count, plural, one {день} few {дні} many {днів} other {дня}}",
-        "hours": "{count, plural, one {година} few {години} many {годин} other {години}}",
-        "minutes": "{count, plural, one {хвилина} few {хвилини} many {хвилин} other {хвилини}}",
-        "seconds": "{count, plural, one {секунда} few {секунди} many {секунд} other {секунди}}"
+      "unitLabels": {
+        "days": "дні",
+        "hours": "години",
+        "minutes": "хвилини",
+        "seconds": "секунди"
       },
       "state": {
         "ready": "Готовий до завершення",
@@ -651,16 +652,21 @@
         "time": "Час утримання",
         "allocation": "Розподіл"
       },
-      "passesIn": "Перевищить рекорд витривалості через {duration}",
-      "extendsIn": "Подовжить рекорд витривалості через {duration}",
-      "chronoMayClose": "Перестане зростати через {duration}, якщо поточне утримання триватиме",
+      "empty": {
+        "latest": "У цьому циклі ще немає жестів",
+        "endurance": "Рекорду витривалості ще немає",
+        "chrono": "Рекорду Воїна часу ще немає",
+        "finalCst": "CST-жестів ще немає"
+      },
+      "passesRecordIn": "Перевищить рекорд витривалості через",
+      "extendsRecordIn": "Подовжить рекорд витривалості через",
+      "chronoStopsIn": "Якщо поточне утримання триватиме, перестане зростати через",
       "finalCstNote": "Змінюється лише CST-жестом",
       "position": "Позиція жесту",
       "challenge": {
-        "title": "Поточне утримання витривалості",
-        "held": "Наразі",
-        "record": "Рекорд Воїна часу",
-        "passesIn": "Перевищить через"
+        "reign": "Поточне лідерство Чемпіона витривалості",
+        "passesIn": "Перевищить цей рекорд через",
+        "progressAria": "Поточне лідерство Чемпіона витривалості відносно рекорду Воїна часу"
       },
       "paid": "Сплачено",
       "received": "Отримано"

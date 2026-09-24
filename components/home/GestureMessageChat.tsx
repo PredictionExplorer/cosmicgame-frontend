@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import {
-  ChevronDown,
   CircleCheck,
   Clock3,
   MessageCircle,
@@ -32,6 +31,7 @@ import { TxExplorerLink } from '@/components/ui/tx-status';
 import type { GestureFeedSystemEvent } from '@/components/home/deck/feedSystemEvents';
 import { useBannedGestures } from '@/hooks/useApiQuery';
 import { useLivePulse } from '@/hooks/useLivePulse';
+import { TOUCH_TARGET_EXTENDED_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
 import type { GestureInfo } from '@/services/api';
 import { formatAddress, formatAmount, formatCount, sameAddress } from '@/utils/format';
@@ -151,8 +151,7 @@ type FeedItem =
 
 type FeedRow =
   | { type: 'message'; key: string; entry: GestureChatMessage }
-  | { type: 'event'; key: string; event: GestureFeedSystemEvent }
-  | { type: 'events'; key: string; events: GestureFeedSystemEvent[] };
+  | { type: 'event'; key: string; event: GestureFeedSystemEvent };
 
 function getGestureChatMessages(
   gestures: GestureInfo[],
@@ -198,35 +197,25 @@ function messageKey(gesture: GestureInfo, index: number): string {
 }
 
 /**
- * Messages lead. Between two messages, the cycle events that happened in
- * between fold into one line ("3 cycle events") that opens in place; a lone
- * event stays a compact row. The "All activity" view lists every event.
+ * The "Messages" view lists participants' messages only, as its name says;
+ * "All activity" lists every cycle event between them, each as one compact
+ * row.
  */
 export function buildFeedRows(items: FeedItem[], view: ChatView): FeedRow[] {
   const rows: FeedRow[] = [];
-  let run: GestureFeedSystemEvent[] = [];
-  const flush = () => {
-    if (run.length === 0) return;
-    if (view === 'messages' && run.length > 1) {
-      rows.push({ type: 'events', key: `events:${run[0]!.id}`, events: run });
-    } else {
-      for (const event of run) rows.push({ type: 'event', key: `event:${event.id}`, event });
-    }
-    run = [];
-  };
   items.forEach((item, index) => {
     if (item.type === 'system') {
-      run.push(item.event);
+      if (view === 'all') {
+        rows.push({ type: 'event', key: `event:${item.event.id}`, event: item.event });
+      }
       return;
     }
-    flush();
     rows.push({
       type: 'message',
       key: `message:${messageKey(item.entry.gesture, index)}`,
       entry: item.entry,
     });
   });
-  flush();
   return rows;
 }
 
@@ -299,39 +288,6 @@ function SystemEventRow({ event }: { event: GestureFeedSystemEvent }) {
   );
 }
 
-/** Several events between two messages: one line that opens in place. */
-function EventGroupRow({ events }: { events: GestureFeedSystemEvent[] }) {
-  const t = useTranslations('home');
-  const newest = events[0]!;
-  const Icon = EVENT_ICON[newest.kind];
-  return (
-    <details data-testid="chat-event-group" data-count={events.length} className="group/events">
-      <summary className="flex min-h-11 cursor-pointer list-none items-center gap-3 py-1.5 [&::-webkit-details-marker]:hidden">
-        <Icon className="size-4 shrink-0 text-subtle" aria-hidden />
-        <span className="type-label min-w-0 flex-1 text-muted-foreground">
-          {t('chat.eventGroup', { count: events.length })}
-        </span>
-        <DateTime
-          timestamp={newest.timestamp}
-          variant="relative"
-          className="type-caption shrink-0 text-subtle"
-        />
-        <ChevronDown
-          className="size-4 shrink-0 text-subtle transition-transform duration-[var(--duration-base)] group-open/events:rotate-180 motion-reduce:transition-none"
-          aria-hidden
-        />
-      </summary>
-      <ul role="list" className="ms-7 divide-y divide-rule-faint border-s border-rule-faint ps-3">
-        {events.map((event) => (
-          <li key={event.id}>
-            <SystemEventRow event={event} />
-          </li>
-        ))}
-      </ul>
-    </details>
-  );
-}
-
 function MessageRow({
   entry,
   isOwn,
@@ -364,7 +320,13 @@ function MessageRow({
         className="flex min-w-0 items-center justify-between gap-3"
       >
         <span className="flex min-w-0 items-center gap-2">
-          <AddressChip address={gesture.BidderAddr} variant="plain" label={false} />
+          {/* Authorship recedes so the message leads, as the ledger sets addresses. */}
+          <AddressChip
+            address={gesture.BidderAddr}
+            variant="plain"
+            label={false}
+            className="type-hash text-muted-foreground"
+          />
           {isOwn && (
             <Badge tone="accent" size="sm">
               {t('chat.you')}
@@ -388,7 +350,12 @@ function MessageRow({
             <span aria-hidden>·</span>
             <Link
               href={`/gesture/${gestureId}`}
-              className="link-quiet tabular-nums text-subtle hover:text-foreground"
+              data-touch-target="extended"
+              className={cn(
+                'link-quiet tabular-nums text-subtle hover:text-foreground',
+                // A 44px hit area on phones without growing the line.
+                TOUCH_TARGET_EXTENDED_CLASS,
+              )}
               aria-label={t('chat.openPositionAria', { position: String(position ?? gestureId) })}
             >
               #{position ?? gestureId}
@@ -410,7 +377,12 @@ function PendingMessageRow({ pending }: { pending: PendingChatMessage }) {
       className="py-3.5"
     >
       <div className="flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1">
-        <AddressChip address={pending.address} variant="plain" label={false} />
+        <AddressChip
+          address={pending.address}
+          variant="plain"
+          label={false}
+          className="type-hash text-muted-foreground"
+        />
         <Badge
           tone="accent"
           size="sm"
@@ -434,13 +406,14 @@ function PendingMessageRow({ pending }: { pending: PendingChatMessage }) {
 }
 
 /**
- * The cycle's Gesture Chat: participants' messages lead, newest first, as
- * ruled rows on one frame. Cycle events between two messages fold into one
- * line that opens in place; "All activity" lists every event. On phones the
- * feed is part of the page (the newest rows, then "Show more"); from 1024px
- * it scrolls inside its frame. Its freshness stamp says when the feed last
- * updated and turns to "Reconnecting" or "Updates delayed" when refreshes
- * fail, while the history already on screen stays.
+ * The cycle's Gesture Chat: participants' messages, newest first, as ruled
+ * rows on the page ground under one hairline (no box, like the ledger beside
+ * it). "Messages" lists only messages; "All activity" adds every cycle
+ * event, each as one compact row. On phones the feed is part of the page
+ * (the newest rows, then "Show more"); from 1024px it scrolls inside its
+ * region, fading at an edge with more to read. Its freshness stamp says when the feed last updated and
+ * turns to "Reconnecting" or "Updates delayed" when refreshes fail, while
+ * the history already on screen stays.
  */
 export function GestureMessageChat({
   gestures,
@@ -486,6 +459,10 @@ export function GestureMessageChat({
   );
   const pending = pendingMessages ?? [];
   const hasFeedContent = rows.length > 0 || pending.length > 0;
+  // The view switch stays while anything is on record, so an events-only
+  // cycle can still open "All activity" from an empty "Messages" view.
+  const hasAnyContent = hasFeedContent || visibleEvents.length > 0;
+  const noMessagesYet = view === 'messages' && messages.length === 0 && pending.length === 0;
   const hasMoreEvents = (systemEvents?.length ?? 0) > eventLimit;
   const hasOlderContent = hasMoreEvents || Boolean(pagination?.hasMore);
   const phoneRows = phoneVisibleRows(rows, pending.length, phoneMessages);
@@ -613,14 +590,14 @@ export function GestureMessageChat({
     <div
       data-testid="gesture-message-chat"
       className={cn(
-        'flex min-w-0 flex-col rounded-surface border border-rule-faint bg-surface/60 print:h-auto print:break-inside-avoid',
+        'flex min-w-0 flex-col border-t border-rule print:h-auto print:break-inside-avoid',
         className,
       )}
     >
-      <header className="flex shrink-0 flex-wrap items-start justify-between gap-x-4 gap-y-1 border-b border-rule-faint px-5 py-4 sm:px-6">
+      <header className="flex shrink-0 flex-wrap items-start justify-between gap-x-4 gap-y-1 border-b border-rule-faint pb-3 pt-4">
         <div className="min-w-0">
           <div className="flex items-center gap-1.5">
-            <h2 id={titleId} className="type-title text-foreground">
+            <h2 id={titleId} className="type-heading-3 text-foreground">
               {t('chat.title')}
             </h2>
             <InfoTooltip content={t('chat.joinTooltip')} label={t('chat.title')} />
@@ -638,8 +615,8 @@ export function GestureMessageChat({
         />
       </header>
 
-      {hasFeedContent && !isLoading && !error && (
-        <div className="shrink-0 border-b border-rule-faint px-5 py-2.5 sm:px-6 print:hidden">
+      {hasAnyContent && !isLoading && !error && (
+        <div className="shrink-0 border-b border-rule-faint py-2.5 print:hidden">
           <div
             role="group"
             aria-label={t('chat.viewLabel')}
@@ -661,7 +638,7 @@ export function GestureMessageChat({
         </div>
       )}
 
-      {/* From 1024px the feed scrolls inside the frame; below it is part of the page. */}
+      {/* From 1024px the feed scrolls inside its region; below it is part of the page. */}
       <div className="relative min-h-0 lg:min-h-[24rem] lg:flex-1 print:min-h-0">
         <div
           ref={scrollRef}
@@ -672,7 +649,9 @@ export function GestureMessageChat({
           onScroll={isPrinting ? undefined : handleScroll}
           data-overflow-top={(!isPrinting && scrollEdges.top) || undefined}
           data-overflow-bottom={(!isPrinting && scrollEdges.bottom) || undefined}
-          className="focus-ring-inset px-5 sm:px-6 lg:absolute lg:inset-0 lg:overflow-y-auto lg:overscroll-y-contain lg:[scrollbar-gutter:stable] print:static print:overflow-visible"
+          // From 1024px the region starts 0.75rem before the text column, so
+          // the newest message's settle rule is not clipped by the scroller.
+          className="focus-ring-inset lg:absolute lg:inset-y-0 lg:-start-3 lg:end-0 lg:overflow-y-auto lg:overscroll-y-contain lg:ps-3 lg:[scrollbar-gutter:stable] print:static print:overflow-visible"
           style={scrollMask ? { maskImage: scrollMask, WebkitMaskImage: scrollMask } : undefined}
         >
           {isLoading ? (
@@ -694,17 +673,20 @@ export function GestureMessageChat({
             </div>
           ) : null}
 
-          {!isLoading &&
-          !error &&
-          hasFeedContent &&
-          messages.length === 0 &&
-          pending.length === 0 &&
-          onJoinCta ? (
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-rule-faint py-3">
+          {!isLoading && !error && hasAnyContent && noMessagesYet ? (
+            <div
+              data-testid="chat-no-messages"
+              className={cn(
+                'flex flex-wrap items-center justify-between gap-3 py-3',
+                hasFeedContent && 'border-b border-rule-faint',
+              )}
+            >
               <p className="type-body-sm text-muted-foreground">{t('chat.empty.messagesFirst')}</p>
-              <Button variant="secondary" size="sm" onClick={onJoinCta}>
-                {t('chat.empty.cta')}
-              </Button>
+              {onJoinCta ? (
+                <Button variant="secondary" size="sm" onClick={onJoinCta}>
+                  {t('chat.empty.cta')}
+                </Button>
+              ) : null}
             </div>
           ) : null}
 
@@ -734,15 +716,13 @@ export function GestureMessageChat({
                       settling={isSettling && row.entry === newestMessage}
                       methodTag={methodTag(row.entry.gesture)}
                     />
-                  ) : row.type === 'event' ? (
-                    <SystemEventRow event={row.event} />
                   ) : (
-                    <EventGroupRow events={row.events} />
+                    <SystemEventRow event={row.event} />
                   )}
                 </li>
               ))}
             </ol>
-          ) : !isLoading && !error ? (
+          ) : !isLoading && !error && !hasAnyContent ? (
             <EmptyState
               variant="inline"
               headingLevel={3}

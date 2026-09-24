@@ -176,7 +176,7 @@ describe('GestureMessageChat', () => {
     expect(screen.getByText('Hidden')).toBeInTheDocument();
   });
 
-  it('lets messages lead and folds the events between two messages into one line', async () => {
+  it('lists messages only under Messages, and every event under All activity', async () => {
     const user = userEvent.setup();
     render(
       <GestureMessageChat
@@ -188,22 +188,24 @@ describe('GestureMessageChat', () => {
       />,
     );
 
-    const rows = screen
-      .getAllByRole('listitem')
-      .filter((item) => item.hasAttribute('data-chat-row'));
-    expect(rows.map((row) => row.getAttribute('data-chat-row'))).toEqual([
+    const rowKeys = () =>
+      screen
+        .getAllByRole('listitem')
+        .filter((item) => item.hasAttribute('data-chat-row'))
+        .map((row) => row.getAttribute('data-chat-row'));
+    // "Messages" means messages: no event rows and no folded groups between them.
+    expect(rowKeys()).toEqual(['message:2', 'message:1']);
+    expect(screen.queryByTestId('chat-system-event')).not.toBeInTheDocument();
+
+    // "All activity" interleaves every event, newest first.
+    await user.click(screen.getByRole('button', { name: 'home.chat.view.all' }));
+    expect(rowKeys()).toEqual([
       'message:2',
-      'events:event-30',
+      'event:event-30',
+      'event:event-20',
+      'event:event-10',
       'message:1',
     ]);
-    const group = screen.getByTestId('chat-event-group');
-    expect(group).toHaveAttribute('data-count', '3');
-    expect(group).not.toHaveAttribute('open');
-    expect(within(group).getByText('home.chat.eventGroup(count=3)')).toBeVisible();
-
-    await user.click(within(group).getByText('home.chat.eventGroup(count=3)'));
-    expect(group).toHaveAttribute('open');
-    expect(within(group).getAllByTestId('chat-system-event')).toHaveLength(3);
   });
 
   it('lists every event in the All activity view, as compact rows that are not headings', async () => {
@@ -233,14 +235,15 @@ describe('GestureMessageChat', () => {
     ]);
   });
 
-  it('keeps a lone event as a compact row', () => {
+  it('reads an event as one compact row in All activity', async () => {
+    const user = userEvent.setup();
     render(
       <GestureMessageChat
         gestures={[makeGesture({ EvtLogId: 1, TimeStamp: 1_700_000_100, Message: 'hi' })]}
         systemEvents={[makeEvent(1, { kind: 'gestureMilestone', count: 1000, address: undefined })]}
       />,
     );
-    expect(screen.queryByTestId('chat-event-group')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'home.chat.view.all' }));
     expect(screen.getByTestId('chat-system-event')).toHaveTextContent(
       'home.chat.system.gestureMilestone(count=1,000)',
     );
@@ -291,13 +294,20 @@ describe('GestureMessageChat', () => {
     expect(onJoinCta).toHaveBeenCalledTimes(1);
   });
 
-  it('invites a message above cycle events when no participant has written yet', () => {
+  it('invites a message when no participant has written yet, with the events one tap away', async () => {
+    const user = userEvent.setup();
     render(
       <GestureMessageChat gestures={[]} systemEvents={[makeEvent(1)]} onJoinCta={jest.fn()} />,
     );
-    expect(screen.getByText('home.chat.empty.messagesFirst')).toBeVisible();
+    expect(screen.getByTestId('chat-no-messages')).toHaveTextContent(
+      'home.chat.empty.messagesFirst',
+    );
     expect(screen.getByRole('button', { name: 'home.chat.empty.cta' })).toBeVisible();
+    // Not the "nothing has happened" state: the cycle's events are on record.
+    expect(screen.queryByText('home.chat.empty.title')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'home.chat.view.all' }));
     expect(screen.getByTestId('chat-system-event')).toBeInTheDocument();
+    expect(screen.queryByTestId('chat-no-messages')).not.toBeInTheDocument();
   });
 
   it('shows loading and a first-read failure without presenting either as an empty chat', async () => {
@@ -400,6 +410,7 @@ describe('GestureMessageChat', () => {
     const { rerender } = render(
       <GestureMessageChat gestures={[]} systemEvents={systemEvents} resetKey="7:original" />,
     );
+    await user.click(screen.getByRole('button', { name: 'home.chat.view.all' }));
     expect(screen.getAllByTestId('chat-system-event')).toHaveLength(50);
     await user.click(screen.getByRole('button', { name: 'home.chat.history.loadOlder' }));
     expect(screen.getAllByTestId('chat-system-event')).toHaveLength(100);
@@ -413,7 +424,8 @@ describe('GestureMessageChat', () => {
     expect(screen.getAllByTestId('chat-system-event')).toHaveLength(50);
   });
 
-  it('prints all known events and loaded messages without fetching older messages', () => {
+  it('prints all known events and loaded messages without fetching older messages', async () => {
+    const user = userEvent.setup();
     const onLoadMore = jest.fn().mockResolvedValue(undefined);
     const systemEvents = Array.from({ length: 75 }, (_, index) =>
       makeEvent(index, { kind: 'cycleStart', cycleNumber: index, address: undefined }),
@@ -425,6 +437,7 @@ describe('GestureMessageChat', () => {
         pagination={{ hasMore: true, isLoading: false, error: false, onLoadMore }}
       />,
     );
+    await user.click(screen.getByRole('button', { name: 'home.chat.view.all' }));
     expect(screen.getAllByTestId('chat-system-event')).toHaveLength(50);
     act(() => window.dispatchEvent(new Event('beforeprint')));
     expect(screen.getAllByTestId('chat-system-event')).toHaveLength(75);
@@ -434,7 +447,7 @@ describe('GestureMessageChat', () => {
     expect(screen.getAllByTestId('chat-system-event')).toHaveLength(50);
   });
 
-  it('has no accessibility violations with messages, folded events and a pending row', async () => {
+  it('has no accessibility violations with messages, events and a pending row', async () => {
     const { container } = render(
       <GestureMessageChat
         cycleNumber={7}
@@ -485,9 +498,9 @@ describe('buildFeedRows', () => {
     }) as const;
   const event = (id: number) => ({ type: 'system', timestamp: id, event: makeEvent(id) }) as const;
 
-  it('folds runs of two or more events and keeps a lone one as a row', () => {
+  it('lists messages only in the Messages view', () => {
     const rows = buildFeedRows([message(9), event(8), event(7), message(6), event(5)], 'messages');
-    expect(rows.map((row) => row.type)).toEqual(['message', 'events', 'message', 'event']);
+    expect(rows.map((row) => row.type)).toEqual(['message', 'message']);
   });
 
   it('lists every event in the All activity view', () => {

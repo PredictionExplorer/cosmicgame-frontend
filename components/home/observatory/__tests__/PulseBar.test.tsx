@@ -14,10 +14,9 @@ describe('PulseBar', () => {
     render(<PulseBar {...baseProps} />);
 
     const bar = screen.getByTestId('home-deck-header');
-    expect(
-      within(bar).getByRole('heading', { level: 1, name: 'home.deck.title' }),
-    ).toBeInTheDocument();
-    expect(within(bar).getByText('home.deck.intro')).toBeInTheDocument();
+    const h1 = within(bar).getByRole('heading', { level: 1, name: 'home.deck.title' });
+    // The display size every app H1 uses, not the section-heading tier.
+    expect(h1).toHaveClass('type-display-sm');
     expect(within(bar).getByText('home.hero.cycleNumber(number=7)')).toBeInTheDocument();
     expect(screen.getByTestId('pulse-phase-chip')).toHaveTextContent(
       'home.chrono.phase.live.label',
@@ -98,16 +97,21 @@ describe('PulseBar', () => {
     expect(screen.getByTestId('pulse-intro')).toHaveTextContent('home.deck.introByPhase.zero');
 
     rerender(<PulseBar {...baseProps} phase="final-minute" />);
-    expect(screen.getByTestId('pulse-intro')).toHaveTextContent('home.deck.intro');
+    expect(screen.queryByTestId('pulse-intro')).not.toBeInTheDocument();
   });
 
-  it('writes the standing intro to a phone’s length instead of clamping it mid-clause', () => {
+  it('says nothing more while Gestures run, so the desk starts high on every screen', () => {
     render(<PulseBar {...baseProps} phase="live" />);
-    const intro = screen.getByTestId('pulse-intro');
-    expect(intro.className).not.toMatch(/line-clamp/);
-    expect(screen.getByTestId('pulse-intro-short')).toHaveTextContent('home.deck.introShort');
-    expect(screen.getByTestId('pulse-intro-short')).toHaveClass('sm:hidden');
-    expect(within(intro).getByText('home.deck.intro')).toHaveClass('max-sm:hidden');
+    // The clock's status, the form and the cycle guide say how to take part.
+    expect(screen.queryByTestId('pulse-intro')).not.toBeInTheDocument();
+    expect(screen.getByTestId('home-deck-header')).not.toHaveTextContent('home.deck.intro');
+  });
+
+  it('writes the Gesture count as a figure with its coined noun', () => {
+    render(<PulseBar {...baseProps} />);
+    expect(screen.getByTestId('pulse-gesture-count')).toHaveClass('tabular-nums');
+    // The age also reads in the ledger; it shows only where the strip has room.
+    expect(screen.getByTestId('pulse-last-gesture').closest('li')).toHaveClass('max-2xl:hidden');
   });
 
   it.each([

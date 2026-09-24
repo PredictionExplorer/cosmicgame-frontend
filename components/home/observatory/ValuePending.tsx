@@ -1,5 +1,6 @@
 import { useTranslations } from 'next-intl';
 
+import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
 export interface ValuePendingProps {
@@ -11,21 +12,17 @@ export interface ValuePendingProps {
 }
 
 /**
- * An inline placeholder for one figure that has not arrived yet: a skeleton
- * bar as wide as the value will be (so nothing reflows when it lands) and a
- * spoken "Loading…". It is a `<span>`, so it sits inside a sentence, a `<p>`
- * or a `<dd>` where the block Skeleton cannot. Never render a pending figure
- * as `0`, `0s` or `0%`.
+ * An inline placeholder for one figure that has not arrived yet: the shared
+ * Skeleton, as a bar as wide as the value will be (so nothing reflows when it
+ * lands) and a spoken "Loading…". It is a `<span>`, so it sits inside a
+ * sentence, a `<p>` or a `<dd>` where the block Skeleton cannot. Never render
+ * a pending figure as `0`, `0s` or `0%`.
  */
 export function ValuePending({ ch = 8, label, className }: ValuePendingProps) {
   const tCommon = useTranslations('common');
   return (
     <span data-slot="value-pending" className={cn('inline-flex align-middle', className)}>
-      <span
-        aria-hidden
-        className="inline-block h-[1em] rounded-edge bg-muted/70 motion-safe:animate-pulse"
-        style={{ width: `${ch}ch` }}
-      />
+      <Skeleton as="span" className="inline-block h-[1em]" style={{ width: `${ch}ch` }} />
       <span className="sr-only">{label ?? tCommon('status.loadingDots')}</span>
     </span>
   );

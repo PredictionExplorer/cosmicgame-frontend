@@ -149,7 +149,10 @@ describe('GesturePanel', () => {
         />,
       );
 
-      expect(screen.getByTestId('panel-method-eth-cost')).toHaveTextContent('Loading...');
+      // A skeleton with a spoken "Loading", never the text "Loading..." on screen.
+      const cost = screen.getByTestId('panel-method-eth-cost');
+      expect(within(cost).getByText('Loading...')).toHaveClass('sr-only');
+      expect(cost.querySelector('[data-slot="value-pending"]')).not.toBeNull();
       expect(submitButton()).toBeDisabled();
     },
   );
@@ -285,6 +288,59 @@ describe('GesturePanel', () => {
     expect(
       within(screen.getByTestId('panel-cst-metric-reward')).getByText('Loading...'),
     ).toHaveClass('sr-only');
+  });
+
+  it('says the preview is unavailable when its read failed, instead of pulsing forever', () => {
+    render(
+      <GesturePanel
+        {...baseProps}
+        form={makeForm({
+          gestureCstRewardAmount: null,
+          gestureCstRewardAmountMin: null,
+          cstRewardReadFailed: true,
+        })}
+      />,
+    );
+    for (const testId of ['panel-cst-metric-reward', 'panel-cst-min-accepted']) {
+      const row = screen.getByTestId(testId);
+      expect(row).toHaveTextContent('—');
+      expect(row).toHaveTextContent('common.status.unavailable');
+      expect(within(row).queryByText('Loading...')).not.toBeInTheDocument();
+    }
+  });
+
+  it('prices the ETH methods from the dashboard, marked approximate, until the live quote lands', () => {
+    const { rerender } = render(
+      <GesturePanel
+        {...baseProps}
+        data={makeData({ CurBidPriceEth: 0.01 })}
+        form={makeForm({ ethGestureInfo: null })}
+        submit={{ action: 'home.form.submit.action.eth', cost: null }}
+      />,
+    );
+    // The mark joins its figure with a no-break space, so it never ends a line.
+    expect(screen.getByTestId('panel-method-eth-cost').textContent).toContain(`≈${NBSP}0.01`);
+    expect(screen.getByTestId('panel-method-randomWalk-cost').textContent).toContain(
+      `≈${NBSP}0.005`,
+    );
+    // An approximate price never arms the submit: the live quote prices the Gesture.
+    expect(submitButton()).toBeDisabled();
+
+    rerender(
+      <GesturePanel {...baseProps} data={makeData({ CurBidPriceEth: 0.01 })} form={makeForm()} />,
+    );
+    expect(screen.getByTestId('panel-method-eth-cost')).toHaveTextContent('0.01 ETH');
+    expect(screen.getByTestId('panel-method-eth-cost')).not.toHaveTextContent('≈');
+  });
+
+  it('keeps the connect action on one line, with a short label on phones', () => {
+    render(<GesturePanel {...baseProps} account={null} form={makeForm()} />);
+    const connect = within(screen.getByTestId('connect-to-gesture')).getByRole('button');
+    expect(connect).toHaveClass('whitespace-nowrap', 'w-full');
+    expect(within(connect).getByText('home.form.connect.ctaShort')).toHaveClass('sm:hidden');
+    expect(within(connect).getByText('home.form.connect.cta')).toHaveClass('max-sm:hidden');
+    // The line under the button carries the purpose, balanced so no word strands.
+    expect(screen.getByText('home.orientation.connectHelp')).toHaveClass('text-balance');
   });
 
   it('surfaces the on-chain duration mismatch note when contract and API disagree', () => {

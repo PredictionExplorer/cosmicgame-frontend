@@ -249,15 +249,25 @@ test.describe('home gesture chat', () => {
     ).toBeVisible();
     await expect(page.getByTestId('clock-reserve')).toContainText('2.5000 ETH');
 
-    // The Endurance hold against the Chrono record, in neutral words; the
-    // holder is named once, on the Endurance row.
-    const challenge = page.getByTestId('chrono-active-challenge');
+    // The Endurance Champion's current reign against the Chrono record, in
+    // neutral words, under the Chrono-Warrior row it can change: the holder
+    // is named once, on the Endurance row, and the record once, as the
+    // Chrono-Warrior's time held.
+    const chrono = page.getByTestId('chrono-role-summary');
+    await expect(chrono).toContainText(/30m/);
+    const challenge = chrono.getByTestId('chrono-active-challenge');
     await expect(challenge).toBeVisible();
-    await expect(challenge).toContainText(home.observatory.ledger.challenge.title);
-    await expect(challenge).toContainText(/Held\s*20m/);
-    await expect(challenge).toContainText(/Chrono record\s*30m/);
-    // The hold keeps growing while the page is open, so the time left ticks down.
-    await expect(challenge).toContainText(/Passes it in\s*(10m( 1s)?|9m \d+s)/);
+    await expect(challenge.getByTestId('chrono-challenge-segment')).toContainText(
+      new RegExp(`${home.observatory.ledger.challenge.reign}\\s*20m`),
+    );
+    // The reign keeps growing while the page is open, so the time left ticks
+    // down, read as a clock whose width holds while it ticks.
+    await expect(challenge.getByTestId('chrono-challenge-next-change')).toContainText(
+      new RegExp(`${home.observatory.ledger.challenge.passesIn}\\s*00:(10:0[01]|09:\\d\\d)`),
+    );
+    await expect(
+      challenge.getByRole('progressbar', { name: home.observatory.ledger.challenge.progressAria }),
+    ).toBeVisible();
     await expect(challenge.getByRole('link')).toHaveCount(0);
     await expect(
       page

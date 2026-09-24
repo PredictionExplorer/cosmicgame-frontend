@@ -73,7 +73,7 @@ export function LatestSignature({
       className={cn('min-w-0', className)}
     >
       <div className="flex items-baseline justify-between gap-3">
-        <h2 id={headingId} className="type-label text-foreground">
+        <h2 id={headingId} className="type-heading-3 text-foreground">
           {t('title')}
         </h2>
         <Link
