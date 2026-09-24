@@ -66,6 +66,25 @@ describe('mergeLandingCyclePoll', () => {
     expect(next.lastAttemptFailed).toBe(true);
   });
 
+  it('drops the previous cycle’s target when a new cycle arrives without one', () => {
+    const newCycle = mergeLandingCyclePoll(reading, {
+      targetServerTimeSec: null,
+      currentServerTimeSec: 9_000,
+      dashboard: dashboard({ CurRoundNum: 13, CurNumBids: 1 }),
+      sampledAtMs: sampledAtMs + 8_000_000,
+    });
+    expect(newCycle.dashboard?.CurRoundNum).toBe(13);
+    expect(newCycle.targetServerTimeSec).toBeNull();
+
+    // Within one cycle, a missing target still keeps the last good one.
+    const sameCycle = mergeLandingCyclePoll(reading, {
+      ...goodPoll,
+      targetServerTimeSec: null,
+      dashboard: dashboard({ CurNumBids: 35 }),
+    });
+    expect(sameCycle.targetServerTimeSec).toBe(8_200);
+  });
+
   it('dates a later complete poll as the new last success', () => {
     const later = { ...goodPoll, sampledAtMs: sampledAtMs + 24_000, currentServerTimeSec: 1_024 };
     const next = mergeLandingCyclePoll(
@@ -183,6 +202,23 @@ describe('getLandingCycleTimerSnapshot', () => {
     expect(snapshot.phase).toBe('loading');
     expect(snapshot.showCountdown).toBe(false);
     expect(snapshot.cycleNumber).toBe(12);
+  });
+
+  it('never pairs a new cycle with the previous cycle’s past target', () => {
+    // Regression (F219): the poll that first saw cycle 13 after its first
+    // gesture lost the time read, and the carried cycle-12 target, already
+    // past, announced "ready to finalize".
+    const nowMs = sampledAtMs + 8_000_000;
+    const newCycle = mergeLandingCyclePoll(reading, {
+      targetServerTimeSec: null,
+      currentServerTimeSec: 9_000,
+      dashboard: dashboard({ CurRoundNum: 13, CurNumBids: 1, TsRoundStart: 8_900 }),
+      sampledAtMs: nowMs,
+    });
+    const snapshot = getLandingCycleTimerSnapshot({ reading: newCycle, nowMs });
+
+    expect(snapshot.phase).toBe('loading');
+    expect(snapshot.cycleNumber).toBe(13);
   });
 
   it('keeps counting from the last good reading after a failed poll', () => {

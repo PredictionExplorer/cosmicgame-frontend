@@ -35,15 +35,25 @@ export interface LandingCycleReading {
   lastAttemptFailed: boolean;
 }
 
-/** Merges a poll into the previous reading, field by field. */
+/**
+ * Merges a poll into the previous reading, field by field. A carried value
+ * must still describe the same cycle: when the poll's dashboard reports a
+ * new cycle, the previous cycle's finalization target is dropped rather
+ * than paired with it (a past target would read as "ready to finalize").
+ */
 export function mergeLandingCyclePoll(
   previous: LandingCycleReading | null,
   poll: LandingCyclePoll,
 ): LandingCycleReading {
   const clockRead = poll.currentServerTimeSec !== null;
   const failed = poll.targetServerTimeSec === null || !clockRead || poll.dashboard === null;
+  const cycleChanged =
+    poll.dashboard !== null &&
+    previous?.dashboard != null &&
+    poll.dashboard.CurRoundNum !== previous.dashboard.CurRoundNum;
+  const carriedTarget = cycleChanged ? null : (previous?.targetServerTimeSec ?? null);
   return {
-    targetServerTimeSec: poll.targetServerTimeSec ?? previous?.targetServerTimeSec ?? null,
+    targetServerTimeSec: poll.targetServerTimeSec ?? carriedTarget,
     currentServerTimeSec: clockRead
       ? poll.currentServerTimeSec
       : (previous?.currentServerTimeSec ?? null),

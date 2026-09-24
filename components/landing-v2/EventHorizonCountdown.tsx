@@ -44,18 +44,15 @@ export const POLL_INTERVAL_MS = 12_000;
 
 const CLOCK_UNITS: readonly ClockUnit[] = ['days', 'hours', 'minutes', 'seconds'];
 
+/** One poll of the three reads; each helper answers null on failure and never throws. */
 async function pollLandingCycle(): Promise<LandingCyclePoll> {
   const sampledAtMs = Date.now();
-  try {
-    const [targetServerTimeSec, currentServerTimeSec, dashboard] = await Promise.all([
-      fetchLandingFinalizationTimeSec(),
-      fetchLandingCurrentTimeSec(),
-      fetchLandingDashboardSnapshot(),
-    ]);
-    return { targetServerTimeSec, currentServerTimeSec, dashboard, sampledAtMs };
-  } catch {
-    return { targetServerTimeSec: null, currentServerTimeSec: null, dashboard: null, sampledAtMs };
-  }
+  const [targetServerTimeSec, currentServerTimeSec, dashboard] = await Promise.all([
+    fetchLandingFinalizationTimeSec(),
+    fetchLandingCurrentTimeSec(),
+    fetchLandingDashboardSnapshot(),
+  ]);
+  return { targetServerTimeSec, currentServerTimeSec, dashboard, sampledAtMs };
 }
 
 function subscribeOnline(onChange: () => void): () => void {
