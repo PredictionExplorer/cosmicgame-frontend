@@ -400,7 +400,9 @@ const EnduranceGanttView = memo(function EnduranceGanttView({
       {laneLimit !== null && total > laneLimit ? (
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
           <p className="type-body-sm text-muted-foreground">
-            {t('charts.endurance.lanesShown', { shown: lanes.length, total })}
+            {showAll
+              ? t('charts.endurance.lanesAll', { total })
+              : t('charts.endurance.lanesShown', { shown: lanes.length, total })}
           </p>
           <Button
             type="button"

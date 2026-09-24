@@ -73,7 +73,8 @@ describe('StatisticsHubPanel', () => {
     expect(within(cycle).getByText(metrics.ethInGesturesCurrentCycle.label)).toBeInTheDocument();
     const eth = within(cycle).getByText(metrics.ethInGesturesCurrentCycle.label).parentElement!;
     expect(eth).toHaveTextContent('2.3294 ETH');
-    expect(within(cycle).getByRole('img', { name: /^Gestures per day/ })).toBeInTheDocument();
+    // The bars are UTC days and say so, beside an opening time printed in the reader's zone.
+    expect(within(cycle).getByRole('img', { name: /^Gestures per UTC day/ })).toBeInTheDocument();
     expect(within(cycle).getByRole('link', { name: hub.cycle.open })).toHaveAttribute(
       'href',
       '/current-cycle',

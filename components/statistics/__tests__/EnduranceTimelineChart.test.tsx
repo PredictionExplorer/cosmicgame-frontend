@@ -144,6 +144,9 @@ describe('EnduranceTimelineChart', () => {
 
     await user.click(screen.getByRole('button', { name: 'Show all 16' }));
     expect(within(gantt).getAllByRole('group')).toHaveLength(16);
+    // Every lane is in view: the caption says so rather than "Showing 16 of 16".
+    expect(screen.getByText('Showing all 16 addresses that held the lead')).toBeInTheDocument();
+    expect(screen.queryByText(/Showing 16 of 16/)).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Show the top 14' })).toHaveAttribute(
       'aria-expanded',
       'true',
