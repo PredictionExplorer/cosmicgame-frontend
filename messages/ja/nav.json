@@ -303,12 +303,6 @@
       "defaultLabel": "Axiom ZeroのNFT",
       "menuLabel": "Axiom Zeroマーケットプレイス",
       "shortLabel": "Axiom Zero"
-    },
-    "chaosZero": {
-      "ariaLabel": "Chaos Zeroの予測市場",
-      "defaultLabel": "Chaos Zero",
-      "menuLabel": "Chaos Zero",
-      "shortLabel": "Chaos Zero"
     }
   },
   "maintenance": {

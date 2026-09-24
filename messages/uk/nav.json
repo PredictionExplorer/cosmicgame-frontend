@@ -303,12 +303,6 @@
       "defaultLabel": "NFT на Axiom Zero",
       "menuLabel": "Маркетплейс Axiom Zero",
       "shortLabel": "Axiom Zero"
-    },
-    "chaosZero": {
-      "ariaLabel": "Ринок прогнозів Chaos Zero",
-      "defaultLabel": "Chaos Zero",
-      "menuLabel": "Chaos Zero",
-      "shortLabel": "Chaos Zero"
     }
   },
   "maintenance": {

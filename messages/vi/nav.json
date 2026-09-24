@@ -303,12 +303,6 @@
       "defaultLabel": "NFT trên Axiom Zero",
       "menuLabel": "Sàn Axiom Zero",
       "shortLabel": "Axiom Zero"
-    },
-    "chaosZero": {
-      "ariaLabel": "Thị trường dự đoán Chaos Zero",
-      "defaultLabel": "Chaos Zero",
-      "menuLabel": "Chaos Zero",
-      "shortLabel": "Chaos Zero"
     }
   },
   "maintenance": {

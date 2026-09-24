@@ -303,12 +303,6 @@
       "defaultLabel": "NFTs on Axiom Zero",
       "menuLabel": "Axiom Zero Marketplace",
       "shortLabel": "Axiom Zero"
-    },
-    "chaosZero": {
-      "ariaLabel": "Chaos Zero prediction market",
-      "defaultLabel": "Chaos Zero",
-      "menuLabel": "Chaos Zero",
-      "shortLabel": "Chaos Zero"
     }
   },
   "maintenance": {
