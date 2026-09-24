@@ -15,9 +15,10 @@ describe('landing content shape', () => {
   it('selects complete locale models without changing structural invariants', () => {
     expect(getLandingContent('en')).toBe(landingContentEn);
     expect(getLandingContent('zh-CN')).toBe(landingContentZh);
-    expect(landingContentZh.cycle.stages).toHaveLength(landingContentEn.cycle.stages.length);
+    expect(landingContentZh.cycle.steps).toHaveLength(landingContentEn.cycle.steps.length);
     expect(landingContentZh.art.stages).toHaveLength(landingContentEn.art.stages.length);
-    expect(landingContentZh.tracks.items).toHaveLength(landingContentEn.tracks.items.length);
+    expect(landingContentZh.tracks.eth).toHaveLength(landingContentEn.tracks.eth.length);
+    expect(landingContentZh.tracks.fixed).toHaveLength(landingContentEn.tracks.fixed.length);
     expect(landingContentZh.faq.items).toHaveLength(landingContentEn.faq.items.length);
     expect(JSON.stringify(landingContentZh)).toMatch(/[\u3400-\u9fff]/);
   });
@@ -34,6 +35,7 @@ describe('landing content shape', () => {
       council: expect.any(Object),
       verifiability: expect.any(Object),
       faq: expect.any(Object),
+      closing: expect.any(Object),
       footer: expect.any(Object),
     });
   });
@@ -42,17 +44,18 @@ describe('landing content shape', () => {
     expect(landingContent.hero.primaryCta.href).toBe('https://app.cosmicsignature.com');
   });
 
-  it('cycle section has exactly four ordered stages', () => {
-    expect(landingContent.cycle.stages).toHaveLength(4);
-    expect(landingContent.cycle.stages.map((s) => s.number)).toEqual(['01', '02', '03', '04']);
+  it('cycle section explains a cycle in exactly three ordered steps', () => {
+    expect(landingContent.cycle.steps.map((s) => s.number)).toEqual(['01', '02', '03']);
   });
 
   it('art section has exactly seven pipeline stages', () => {
     expect(landingContent.art.stages).toHaveLength(7);
   });
 
-  it('tracks list has ten allocation entries', () => {
-    expect(landingContent.tracks.items).toHaveLength(10);
+  it('tracks list six ETH shares that add up to 100% and four fixed allocations', () => {
+    expect(landingContent.tracks.eth).toHaveLength(6);
+    expect(landingContent.tracks.eth.reduce((total, track) => total + track.share, 0)).toBe(100);
+    expect(landingContent.tracks.fixed).toHaveLength(4);
   });
 
   it('public-goods section contains the required disclaimer verbiage', () => {
@@ -92,7 +95,7 @@ describe('landing content contract accuracy', () => {
   });
 
   it('anchoring copy does not promise ETH to RandomWalk anchors', () => {
-    expect(landingContent.anchoring.body).toMatch(/no ETH/i);
+    expect(landingContent.anchoring.bullets.join(' ')).toMatch(/Random Walk.*no ETH/i);
   });
 
   it('council quorum copy matches GovernorCountingSimple (Support + Abstain only)', () => {
@@ -109,16 +112,29 @@ describe('landing content contract accuracy', () => {
     expect(landingContent.council.body).toMatch(/delegate/i);
   });
 
-  it('art facts match the open-source render pipeline (64 spectral bins)', () => {
-    const bins = landingContent.art.facts.find((fact) => fact.label === 'Wavelength bins');
-    expect(bins?.value).toBe('64');
+  it('art copy matches the open-source render pipeline (64 spectral bins, native size)', () => {
+    expect(JSON.stringify(landingContent.art.stages)).toMatch(/Sixty-four wavelength bins/);
     expect(JSON.stringify(landingContent.art)).not.toMatch(/\b16 wavelength|Sixteen wavelength/i);
+    expect(landingContent.art.facts.find((fact) => fact.id === 'resolution')?.value).toBe(
+      '3456 × 2234',
+    );
+    // The imprinted count is read live, never written into copy.
+    expect(landingContent.art.facts.find((fact) => fact.id === 'imprinted')?.value).toBeNull();
   });
 
-  it('marquee chips avoid unsupported audit claims', () => {
-    expect(landingContent.hero.marqueeChips).not.toContain('Audited Contracts');
-    expect(landingContent.hero.marqueeChips).not.toContain('Formally Verified');
-    expect(landingContent.hero.marqueeChips).toContain('Verified Contracts');
+  it('keeps trust claims off the hero (they live, linked, under Verifiability)', () => {
+    expect(JSON.stringify(landingContent.hero)).not.toMatch(
+      /Audited|Formally Verified|Verified Contracts/i,
+    );
+  });
+
+  it('describes the reserve split without claiming it reaches everyone who took part', () => {
+    expect(landingContent.meta.description).not.toMatch(/everyone who shaped/i);
+    expect(landingContent.meta.description).toMatch(/more than ten tracks/);
+  });
+
+  it('moves the COSMIC database disambiguation to the footer of every landing page', () => {
+    expect(landingContent.footer.disambiguation).toMatch(/not related to the COSMIC/);
   });
 
   it('scopes CC0 claims to project-owned materials with third-party exceptions', () => {

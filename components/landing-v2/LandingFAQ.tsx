@@ -1,55 +1,60 @@
-'use client';
-
+import { ArrowRight, ChevronDown } from 'lucide-react';
 import { useLocale } from 'next-intl';
 
 import type { LandingContent } from '@/content/landing';
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
+import { getSiteRoute, resolveRouteHref } from '@/config/siteNav';
+import { SiteLink } from '@/components/layout/SiteLink';
 import { JsonLd, faqPageJsonLd, jsonLdInLanguage } from '@/utils/jsonLd';
 
-import { SectionHeading } from './SectionHeading';
+import { LandingSection, SectionHeading } from './SectionHeading';
+import styles from './Landing.module.css';
 
+/**
+ * The landing FAQ: native disclosures, so every answer is in the server HTML
+ * (for readers without JavaScript and for search), opens without hydration,
+ * and one open answer closes the others where the browser supports `name`.
+ * It opens with what a participant does and what the art is; the plain
+ * denials follow.
+ */
 export function LandingFAQ({ faq }: { faq: LandingContent['faq'] }) {
   const locale = useLocale();
-  const faqItems = faq.items.map((item) => ({
-    question: item.question,
-    answer: item.answer,
-  }));
+  const appFaq = resolveRouteHref(getSiteRoute('faq'), 'landing', locale);
+  const items = faq.items.map((item) => ({ question: item.question, answer: item.answer }));
 
   return (
-    <section id="faq" className="relative border-t border-border bg-card py-16 sm:py-24 lg:py-28">
-      <JsonLd data={faqPageJsonLd(faqItems, jsonLdInLanguage(locale))} />
-      <div className="mx-auto max-w-4xl px-5 sm:px-6 lg:px-12">
-        <SectionHeading
-          eyebrow={faq.eyebrow}
-          heading={faq.heading}
-          align="center"
-          className="mx-auto"
-        />
-        <div className="mt-16 rounded-2xl border border-border bg-foreground/[0.02] p-2 backdrop-blur">
-          <Accordion type="single" collapsible>
-            {faq.items.map((item, idx) => (
-              <AccordionItem
-                key={idx}
-                value={`faq-${idx}`}
-                className="border-border last:border-b-0"
-              >
-                <AccordionTrigger className="px-6 py-5 text-left text-base font-medium text-foreground hover:no-underline sm:text-lg">
-                  {item.question}
-                </AccordionTrigger>
-                <AccordionContent className="px-6 pb-6 text-sm leading-relaxed text-muted-foreground sm:text-base">
-                  {item.answer}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
+    <LandingSection id="faq" labelledBy="landing-faq-heading">
+      <JsonLd data={faqPageJsonLd(items, jsonLdInLanguage(locale))} />
+      <div className={styles.faqLayout}>
+        <div className={styles.faqIntro}>
+          <SectionHeading
+            size="compact"
+            eyebrow={faq.eyebrow}
+            heading={faq.heading}
+            headingId="landing-faq-heading"
+          />
+          <SiteLink
+            href={appFaq.href}
+            kind={appFaq.kind}
+            prefetch="intent"
+            className="link-quiet type-body-sm mt-6 inline-flex min-h-11 items-center gap-1.5 text-foreground sm:min-h-8"
+          >
+            {faq.moreLabel}
+            <ArrowRight aria-hidden className="size-4 text-subtle" />
+          </SiteLink>
+        </div>
+        <div className={styles.faqList}>
+          {faq.items.map((item) => (
+            <details key={item.question} name="landing-faq" className={styles.faqItem}>
+              <summary className={styles.faqQuestion}>
+                <span className="type-heading-3">{item.question}</span>
+                <ChevronDown aria-hidden className={styles.faqChevron} />
+              </summary>
+              <p className="type-prose pb-6 text-muted-foreground">{item.answer}</p>
+            </details>
+          ))}
         </div>
       </div>
-    </section>
+    </LandingSection>
   );
 }

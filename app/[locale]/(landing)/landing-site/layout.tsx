@@ -52,7 +52,7 @@ export default async function LandingLayout({ children, params }: LayoutProps) {
   setRequestLocale(locale);
 
   return (
-    <div className="relative min-h-screen overflow-x-clip bg-deep-space text-stellar-white antialiased">
+    <div className="relative min-h-screen overflow-x-clip bg-background text-foreground antialiased">
       {children}
     </div>
   );

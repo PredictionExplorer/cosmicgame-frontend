@@ -4,42 +4,50 @@ import { landingContentEn } from '@/content/landing';
 
 import { TheCycle } from '@/components/landing-v2/TheCycle';
 
+const cycle = landingContentEn.cycle;
+
 describe('<TheCycle />', () => {
   it('renders the section heading with lexicon-safe copy', () => {
-    render(<TheCycle cycle={landingContentEn.cycle} />);
+    render(<TheCycle cycle={cycle} />);
     expect(
       screen.getByRole('heading', { level: 2, name: /performance cycle/i }),
     ).toBeInTheDocument();
+    expect(screen.getByText(cycle.eyebrow)).toBeInTheDocument();
   });
 
-  it('renders the eyebrow label', () => {
-    render(<TheCycle cycle={landingContentEn.cycle} />);
-    expect(screen.getByText(landingContentEn.cycle.eyebrow)).toBeInTheDocument();
-  });
-
-  it('renders all four cycle stages', () => {
-    render(<TheCycle cycle={landingContentEn.cycle} />);
-    for (const stage of landingContentEn.cycle.stages) {
-      expect(screen.getByRole('heading', { level: 3, name: stage.title })).toBeInTheDocument();
+  it('explains a cycle in three numbered steps, as an ordered list', () => {
+    const { container } = render(<TheCycle cycle={cycle} />);
+    expect(container.querySelectorAll('ol > li')).toHaveLength(3);
+    expect(cycle.steps.map((step) => step.number)).toEqual(['01', '02', '03']);
+    for (const step of cycle.steps) {
+      expect(screen.getByRole('heading', { level: 3, name: step.title })).toBeInTheDocument();
+      expect(screen.getByText(step.number)).toBeInTheDocument();
     }
   });
 
-  it('renders the stage numbers as visible labels', () => {
-    render(<TheCycle cycle={landingContentEn.cycle} />);
-    expect(screen.getByText('01')).toBeInTheDocument();
-    expect(screen.getByText('02')).toBeInTheDocument();
-    expect(screen.getByText('03')).toBeInTheDocument();
-    expect(screen.getByText('04')).toBeInTheDocument();
+  it('leaves the Calibration Window percentages to the FAQ', () => {
+    const { container } = render(<TheCycle cycle={cycle} />);
+    expect(container.textContent).not.toMatch(/Calibration Window/);
+    expect(container.textContent).not.toMatch(/0\.398|0\.4%/);
   });
 
-  it('has an id="cycle" anchor for in-page navigation', () => {
-    const { container } = render(<TheCycle cycle={landingContentEn.cycle} />);
-    expect(container.querySelector('#cycle')).not.toBeNull();
+  it('ends with a way to take the first step, and a walkthrough, in the app', () => {
+    render(<TheCycle cycle={cycle} />);
+    const gesture = screen.getByRole('link', { name: 'Make a gesture' });
+    expect(gesture).toHaveAttribute('href', 'https://app.cosmicsignature.com#make-gesture');
+    expect(gesture).not.toHaveAttribute('target');
+    expect(gesture.className).toMatch(/bg-signature-gradient/);
+    expect(screen.getByRole('link', { name: cycle.guideCta.label })).toHaveAttribute(
+      'href',
+      'https://app.cosmicsignature.com/how-it-works',
+    );
   });
 
-  it('uses ordered list semantics for stages', () => {
-    const { container } = render(<TheCycle cycle={landingContentEn.cycle} />);
-    expect(container.querySelector('ol')).not.toBeNull();
-    expect(container.querySelectorAll('ol li').length).toBe(4);
+  it('has an id="cycle" anchor named by its heading', () => {
+    const { container } = render(<TheCycle cycle={cycle} />);
+    expect(container.querySelector('#cycle')).toHaveAttribute(
+      'aria-labelledby',
+      'landing-cycle-heading',
+    );
   });
 });

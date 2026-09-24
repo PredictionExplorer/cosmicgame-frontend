@@ -1,6 +1,13 @@
 'use client';
 
-import { Fragment, useEffect, useRef, useState, type CSSProperties } from 'react';
+import {
+  Fragment,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type CSSProperties,
+} from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -51,8 +58,17 @@ async function pollLandingCycle(): Promise<LandingCyclePoll> {
   }
 }
 
-function isOnline(): boolean {
-  return typeof navigator === 'undefined' || navigator.onLine !== false;
+function subscribeOnline(onChange: () => void): () => void {
+  window.addEventListener('online', onChange);
+  window.addEventListener('offline', onChange);
+  return () => {
+    window.removeEventListener('online', onChange);
+    window.removeEventListener('offline', onChange);
+  };
+}
+
+function readOnline(): boolean {
+  return navigator.onLine !== false;
 }
 
 /**
@@ -63,7 +79,7 @@ function isOnline(): boolean {
 function useLandingCycleReading() {
   const [reading, setReading] = useState<LandingCycleReading | null>(null);
   const [nowMs, setNowMs] = useState<number | null>(null);
-  const [online, setOnline] = useState(true);
+  const online = useSyncExternalStore(subscribeOnline, readOnline, () => true);
   const readingRef = useRef<LandingCycleReading | null>(null);
 
   useEffect(() => {
@@ -99,10 +115,6 @@ function useLandingCycleReading() {
       if (!cancelled) pollId = window.setTimeout(loop, nextDelayMs());
     };
 
-    const syncOnline = () => setOnline(isOnline());
-    syncOnline();
-    window.addEventListener('online', syncOnline);
-    window.addEventListener('offline', syncOnline);
     void loop();
     const tickId = window.setInterval(() => setNowMs(Date.now()), 1000);
 
@@ -110,8 +122,6 @@ function useLandingCycleReading() {
       cancelled = true;
       if (pollId !== undefined) window.clearTimeout(pollId);
       window.clearInterval(tickId);
-      window.removeEventListener('online', syncOnline);
-      window.removeEventListener('offline', syncOnline);
     };
   }, []);
 

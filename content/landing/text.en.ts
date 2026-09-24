@@ -6,8 +6,7 @@ import type { LandingText } from './structure';
 export const landingTextEn = {
   meta: {
     title: 'Cosmic Signature: Procedural On-Chain Art Protocol on Arbitrum',
-    description:
-      'Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Every gesture shapes the cycle’s final Signature, and the protocol redistributes its reserves across everyone who shaped the outcome — including the infrastructure Ethereum itself depends on.',
+    description: `Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants make gestures in each Performance Cycle; when it finalizes, new Signatures are imprinted and the Cycle Reserve is allocated across more than ten tracks, ${protocolFacts.publicGoodsPercentage}% of it to Ethereum’s core contributors.`,
     keywords: [
       'Cosmic Signature',
       'procedural art protocol',
@@ -26,30 +25,11 @@ export const landingTextEn = {
     headline: 'Art, shaped by every gesture.',
     headlineLead: 'Art, shaped by',
     headlineAccent: 'every gesture.',
-    subhead:
-      'Take part in a living art protocol on Arbitrum. Every gesture helps shape the next Signature; every cycle distributes its reserves among participants and Ethereum’s public infrastructure.',
-    biologyDisclaimer:
-      'Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC mutational signatures in biology. It is an on-chain art protocol and app.',
+    subhead: `Make a gesture with ETH or CST to extend the cycle’s clock. When it runs out, finalizing the cycle imprints new Signatures and allocates the Cycle Reserve, ${protocolFacts.publicGoodsPercentage}% of it to Ethereum’s core contributors.`,
     primaryCtaLabel: 'Open the app',
-    secondaryCtaLabel: 'Explore the Cycle',
-    statisticsCtaLabel: 'Protocol statistics',
-    galleryCtaLabel: 'NFT gallery',
-    scrollAriaLabel: 'Scroll to The Cycle section',
-    marqueeChips: [
-      'Verified Contracts',
-      'CC0',
-      'Open Source',
-      'Deterministic Art',
-      '7% to Protocol Guild',
-      'Cosmic Council',
-      'Arbitrum One',
-    ],
+    secondaryCtaLabel: 'How a cycle works',
     art: {
-      eyebrow: 'From the collection',
-      caption: 'Imprinted on-chain · CC0',
-      cstNote: `Every imprinted Signature is paired with ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST.`,
       formingLabel: 'Signal forming',
-      formingBody: 'A Signature from the collection appears here as soon as the network responds.',
       viewAriaLabel: 'View Cosmic Signature {tokenLabel} in the app',
       artworkAlt: 'Cosmic Signature {tokenLabel} — deterministic three-body generative artwork',
       galleryCta: 'Browse the full gallery',
@@ -59,26 +39,22 @@ export const landingTextEn = {
   cycle: {
     eyebrow: 'The Cycle',
     heading: 'A Performance Cycle, from opening to finalization.',
-    description:
-      'A cycle opens with a Calibration Window and evolves as participants make gestures. Once the Cycle Finalization Time expires, the cycle can be finalized and its allocations distributed.',
-    stages: {
-      opening: {
-        title: 'Cycle Opening',
-        body: `A new Performance Cycle begins. The first ETH Calibration Window opens, and the CST Calibration Window uses a stored on-chain duration that currently starts from a ${protocolFacts.initialCstCalibrationWindowHours}-hour reference.`,
+    steps: {
+      gesture: {
+        title: 'Make a gesture',
+        body: 'Take part with ETH or CST. Each gesture is recorded on-chain and enters the cycle’s Stellar Selection.',
       },
-      gestures: {
-        title: 'Gestures',
-        body: `Participants make gestures with ETH or CST. Every gesture extends the Cycle Finalization Time, records a Stellar Selection entry, and may imprint dynamic Participation CST based on the square root of the time since the previous gesture. ETH gestures shorten the CST Calibration Window by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%; CST gestures lengthen it by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%.`,
+      extend: {
+        title: 'Extend the clock',
+        body: 'Every gesture adds time to the Cycle Finalization Time, so the cycle runs for as long as people keep taking part.',
       },
-      finalization: {
-        title: 'Finalization',
-        body: 'When the Cycle Finalization Time expires, the participant who made the Final Gesture may finalize the cycle. After the exclusivity window, the Open-Finalization Window opens to anyone.',
-      },
-      allocations: {
-        title: 'Allocations',
-        body: 'The protocol distributes the Cycle Reserve across more than ten allocation tracks. About half of the ETH reserve rolls into the next cycle’s Compounding Reserve.',
+      finalize: {
+        title: 'Finalize and allocate',
+        body: 'When the clock reaches zero, the cycle can be finalized: new Signatures are imprinted and the Cycle Reserve is allocated across the tracks below.',
       },
     },
+    gestureCtaLabel: 'Make a gesture',
+    guideCtaLabel: 'How it works, step by step',
   },
 
   art: {
@@ -86,14 +62,7 @@ export const landingTextEn = {
     heading: 'Three-body physics. Art from an on-chain seed.',
     description:
       'Every Cosmic Signature NFT visualizes three celestial bodies orbiting under Newtonian gravity. Three bodies produce fundamentally chaotic trajectories. No AI. No training data. Just deterministic physics. Same seed → identical output, pixel for pixel.',
-    loading: {
-      label: 'Loading the collection',
-      description: 'Artwork appears here as soon as the collection data is available.',
-    },
     showcase: {
-      collectionLabel: 'From the collection',
-      signalLabel: 'Signal',
-      awaitingMetadataLabel: 'Awaiting metadata',
       viewAriaLabel: 'View Cosmic Signature {tokenLabel}',
       artworkAlt: 'Cosmic Signature artwork {tokenLabel}',
     },
@@ -120,7 +89,7 @@ export const landingTextEn = {
         body: 'Colors are mixed in the OKLab perceptual space with 120° hue separation per body, modulated by drift and a sine wave.',
       },
       'spectral-render': {
-        title: 'Spectral Render',
+        title: 'Spectral render',
         body: 'Sixty-four wavelength bins from 380 to 700 nanometers render the orbit trails with velocity-dependent thickness and depth of field.',
       },
       signature: {
@@ -129,9 +98,9 @@ export const landingTextEn = {
       },
     },
     facts: {
-      'wavelength-bins': { label: 'Wavelength bins' },
-      'physics-steps': { label: 'Physics steps per candidate', value: '1,000,000' },
-      'candidate-orbits': { label: 'Candidate orbits', value: '100,000' },
+      imprinted: { label: 'Imprinted so far' },
+      resolution: { label: 'Native resolution' },
+      animation: { label: 'Animation', value: '30 s at 60 fps' },
       license: { label: 'License' },
     },
   },
@@ -141,7 +110,8 @@ export const landingTextEn = {
     heading: 'More than ten ways the protocol distributes the Cycle Reserve.',
     description:
       'When a cycle finalizes, the protocol distributes its ETH and CST reserves across allocation tracks that recognize endurance, timing, dedication, and participation. About half of the ETH reserve compounds into the next cycle.',
-    cardLabel: 'Allocation',
+    ethLabel: 'ETH from each Cycle Reserve',
+    fixedLabel: 'CST and NFTs, every cycle',
     items: {
       'signature-allocation': {
         title: 'Signature Allocation',
@@ -194,14 +164,14 @@ export const landingTextEn = {
   anchoring: {
     eyebrow: 'Anchoring',
     heading: 'Anchor Cosmic Signature NFTs to the protocol.',
-    body: `Anchored Cosmic Signature NFTs receive a proportional share of the ${protocolFacts.anchorDistributionPercentage}% Anchor Distribution each cycle, paid out when the anchor is released. Release the anchor whenever you like — but each NFT can be anchored only once, so releasing permanently ends that NFT’s anchoring eligibility. Anchored Random Walk NFTs receive entries into the Anchored-NFT Stellar Selection, where selected anchor-holders receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and a Cosmic Signature NFT (no ETH).`,
+    body: `Anchor a Cosmic Signature NFT and it receives a proportional share of the ${protocolFacts.anchorDistributionPercentage}% Anchor Distribution every cycle, paid out when the anchor is released. You can release it at any time, but each NFT can be anchored only once.`,
     bullets: [
-      'Per-cycle ETH accrual, retrieved at anchor release',
-      'Release anchors at any time — each NFT anchors only once',
-      'Random Walk anchors enter the Stellar Selection',
-      'No fixed term and no penalties; releasing is permanent per NFT',
+      'ETH accrues every cycle and is retrieved at release',
+      'No fixed term and no penalty; releasing is permanent for that NFT',
+      'Random Walk NFTs, from the companion collection, can be anchored too',
+      `Anchored Random Walk NFTs enter the Anchored-NFT Stellar Selection: ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and a Cosmic Signature NFT, no ETH`,
     ],
-    ctaLabel: 'Anchor in the App',
+    ctaLabel: 'Anchor in the app',
   },
 
   publicGoods: {
@@ -214,7 +184,7 @@ export const landingTextEn = {
       'This is a forwarding of ETH to a public-goods address (currently Protocol Guild). It is not a charitable contribution in the U.S. tax sense, and Cosmic Signature makes no representation about its tax treatment.',
     // lexicon-allow-end
     card: {
-      label: 'Cycle Allocation',
+      label: 'Cycle allocation',
       description: 'of every Performance Cycle is forwarded to Protocol Guild.',
       tableRows: {
         contributors: { label: 'Protocol Guild contributors' },
@@ -228,7 +198,7 @@ export const landingTextEn = {
   council: {
     eyebrow: 'Cosmic Council',
     heading: 'Protocol Coordination, on-chain.',
-    body: 'The Cosmic Council coordinates the protocol on-chain. CST holders delegate their weight (to themselves or another address), submit Coordination Proposals, and express Support or Opposition. The Coordination Quorum is met when Support plus Abstain weight reaches 3% of CST supply. Proposal threshold: 100 CST.',
+    body: 'CST holders coordinate the protocol on-chain: they delegate weight, submit Coordination Proposals and express Support or Opposition.',
     columns: [
       {
         title: 'Coordination Proposal',
@@ -248,27 +218,51 @@ export const landingTextEn = {
   verifiability: {
     eyebrow: 'Verifiability',
     heading: 'Open, verified, reproducible.',
-    body: 'Anyone can verify a Signature by regenerating it from its seed. Contract verification, static analysis notes, and audit status are published through the app as reports become available. Project-owned materials in this repository are dedicated under CC0 1.0; third-party dependencies, fonts, and assets retain their own licenses.',
+    body: 'Anyone can verify a Signature by regenerating it from its seed. Contract verification, static analysis notes, and audit status are published through the app as reports become available. Project-owned materials in the Cosmic Signature repositories are dedicated under CC0 1.0; third-party dependencies, fonts, and assets retain their own licenses.',
     pillars: [
       {
         title: 'CC0 1.0',
         body: 'Project-owned contracts, shaders, and rendering pipelines. No rights reserved. Third-party materials are excluded.',
       },
       {
-        title: 'Verification Status',
+        title: 'Verification status',
         body: 'The app links public contract addresses, source-code resources, verification context, and audit/report status so anyone can inspect what has been published.',
       },
       {
-        title: 'Reproducible Art',
+        title: 'Reproducible art',
         body: 'SHA-256 hashes of generated frames asserted in continuous integration. Same seed → identical output.',
       },
     ],
+    evidenceLabel: 'Check it yourself',
   },
 
   faq: {
     eyebrow: 'Clarifications',
     heading: 'Questions worth answering plainly.',
+    moreLabel: 'More answers in the FAQ',
     items: [
+      {
+        question: 'What do I actually do as a participant?',
+        answer:
+          'You make gestures. Each gesture is an ETH or CST transaction that extends the Cycle Finalization Time, records a Stellar Selection entry, may imprint dynamic Participation CST, and shapes the cycle’s Signature. You may anchor Cosmic Signature NFTs to receive a share of Anchor Distributions. You may submit Coordination Proposals through the Cosmic Council if you hold at least 100 CST.',
+      },
+      {
+        question: 'What is the art, technically?',
+        answer:
+          'Each Cosmic Signature NFT is a deterministic render of a three-body Newtonian simulation. The on-chain seed selects a candidate orbit (from 100,000 simulated via a 4th-order Yoshida symplectic integrator), which is then spectrally rendered across 64 wavelength bins with OKLab color mixing. The pipeline is fully open-source under CC0; anyone can reproduce a Signature from its seed.',
+      },
+      {
+        question: 'Where do the ETH allocations come from?',
+        answer:
+          'From the Cycle Reserve, which grows as participants make gestures. When a cycle finalizes, about half rolls forward into the next cycle’s Compounding Reserve; the remainder is distributed across allocation tracks (Signature Allocation, Chrono-Warrior, Anchor Distribution, Stellar Selection, Public Goods) per on-chain parameters.',
+      },
+      // lexicon-allow-start: explicit denial of charitable-tax-treatment framing.
+      {
+        question: 'What exactly is Public Goods?',
+        answer:
+          'Seven percent of each cycle’s ETH reserve is forwarded to a public-goods address, currently Protocol Guild. Protocol Guild is the collective funding mechanism for 170+ Ethereum core contributors. This is a forwarding of ETH to a public-goods address; it is not a charitable contribution in the U.S. tax sense, and Cosmic Signature makes no representation about its tax treatment.',
+      },
+      // lexicon-allow-end
       // lexicon-allow-start: explicit denial of lottery, casino, gambling, house, dealer, and bet categories.
       {
         question: 'Is this a lottery, casino, or gambling product?',
@@ -276,11 +270,13 @@ export const landingTextEn = {
           'No. Cosmic Signature is a procedural on-chain art protocol. Participants make gestures during a Performance Cycle; the protocol distributes allocations across more than ten tracks when the cycle finalizes. There is no house, no dealer, no bet. Allocations recognize endurance, timing, and participation. The one random allocation track, Stellar Selection, is a protocol-level procedural distribution.',
       },
       // lexicon-allow-end
+      // lexicon-allow-start: explicit investment and securities denial.
       {
-        question: 'What do I actually do as a participant?',
+        question: 'Is any of this an investment?',
         answer:
-          'You make gestures. Each gesture is an ETH or CST transaction that extends the Cycle Finalization Time, records a Stellar Selection entry, may imprint dynamic Participation CST, and shapes the cycle’s Signature. You may anchor Cosmic Signature NFTs to receive a share of Anchor Distributions. You may submit Coordination Proposals through the Cosmic Council if you hold at least 100 CST.',
+          'No. CST tokens express participation and coordination weight within the protocol, not equity, profit share, dividend, or investment contract. No team wallet receives ETH from participant gestures. Cosmic Signature makes no representation about token price or future behavior and does not solicit participation as an investment.',
       },
+      // lexicon-allow-end
       {
         question: 'Why does the Participation CST amount change?',
         answer: `The Participation CST imprint uses a square-root formula based on how long it has been since the previous gesture. Longer quiet periods create larger CST imprints, but the square root makes the increase sublinear. Very rapid gestures can imprint 0 CST. The app previews the current amount before you submit.`,
@@ -290,40 +286,23 @@ export const landingTextEn = {
         answer: `The CST Calibration Window is stored on-chain and changes after every gesture. A CST gesture lengthens it by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%, making CST Gesture Cost descend more slowly. An ETH gesture shortens it by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%, making CST Gesture Cost descend faster.`,
       },
       {
-        question: 'Where do the ETH allocations come from?',
-        answer:
-          'From the Cycle Reserve, which grows as participants make gestures. When a cycle finalizes, about half rolls forward into the next cycle’s Compounding Reserve; the remainder is distributed across allocation tracks (Signature Allocation, Chrono-Warrior, Anchor Distribution, Stellar Selection, Public Goods) per on-chain parameters.',
-      },
-      // lexicon-allow-start: explicit investment and securities denial.
-      {
-        question: 'Is any of this an investment?',
-        answer:
-          'No. CST tokens express participation and coordination weight within the protocol, not equity, profit share, dividend, or investment contract. No team wallet receives ETH from participant gestures. Cosmic Signature makes no representation about token price or future behavior and does not solicit participation as an investment.',
-      },
-      // lexicon-allow-end
-      // lexicon-allow-start: explicit denial of charitable-tax-treatment framing.
-      {
-        question: 'What exactly is Public Goods?',
-        answer:
-          'Seven percent of each cycle’s ETH reserve is forwarded to a public-goods address, currently Protocol Guild. Protocol Guild is the collective funding mechanism for 170+ Ethereum core contributors. This is a forwarding of ETH to a public-goods address; it is not a charitable contribution in the U.S. tax sense, and Cosmic Signature makes no representation about its tax treatment.',
-      },
-      // lexicon-allow-end
-      {
-        question: 'What is the art, technically?',
-        answer:
-          'Each Cosmic Signature NFT is a deterministic render of a three-body Newtonian simulation. The on-chain seed selects a candidate orbit (from 100,000 simulated via a 4th-order Yoshida symplectic integrator), which is then spectrally rendered across 64 wavelength bins with OKLab color mixing. The pipeline is fully open-source under CC0; anyone can reproduce a Signature from its seed.',
-      },
-      {
         question: 'Can I fork this?',
         answer:
           'Yes. Project-owned contracts, shaders, renderers, marketing pages, and documentation are dedicated under CC0 1.0 — no rights reserved. Third-party dependencies, fonts, and assets remain under their own licenses; see THIRD_PARTY_NOTICES.md.',
       },
     ],
   },
+  closing: {
+    eyebrow: 'The collection',
+    heading: 'Every cycle adds to the collection.',
+    body: 'Follow the live cycle, make a gesture, or browse every Signature imprinted so far.',
+  },
 
   footer: {
     tagline: 'A procedural on-chain art protocol on Arbitrum.',
     copyright: '© {year} Cosmic Signature. Project-owned materials: CC0 1.0.',
     colophon: 'CC0 1.0 · Publicly verifiable · Reproducible art',
+    disambiguation:
+      'Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC mutational signatures in biology. It is an on-chain art protocol and app.',
   },
 } satisfies LandingText;

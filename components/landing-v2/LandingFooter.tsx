@@ -9,6 +9,8 @@ import { OpenAppLink } from './OpenAppLink';
  * `SiteFooter` from the navigation taxonomy), with the landing's own
  * tagline and colophon and a way into the app. Links to the app go out in
  * the same tab; the FAQ resolves to the app's FAQ on every landing page.
+ * The legal row carries the disambiguation from the COSMIC cancer database,
+ * a note every landing page needs and no page should lead with.
  *
  * A server component: the landing layout renders it and hands it to the
  * client shell as its `footer` slot, so only the footer's small islands
@@ -22,6 +24,7 @@ export function LandingFooter({ footer }: { footer: LandingContent['footer'] }) 
       copyright={footer.copyright}
       colophon={footer.colophon}
       action={<OpenAppLink size="lg" />}
+      meta={<p className="max-w-[65ch]">{footer.disambiguation}</p>}
     />
   );
 }

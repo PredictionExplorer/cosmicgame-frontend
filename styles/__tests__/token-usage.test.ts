@@ -51,7 +51,7 @@ const RETIRED: Record<string, RetiredPattern> = {
   'text below the 12px floor': {
     use: 'type-caption (12px) or type-label (13px)',
     pattern: /(?<![\w-])text-\[(?:[5-9]|1[01])(?:\.\d+)?px\]/g,
-    baseline: 152,
+    baseline: 147,
   },
   'white-alpha surface or border': {
     use: 'bg-surface-sunken / bg-surface / bg-surface-raised, border-rule / border-rule-faint',
