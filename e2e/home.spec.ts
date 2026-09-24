@@ -277,16 +277,14 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     const chronoRow = page.getByTestId('chrono-role-summary').first();
     const enduranceRow = page.getByTestId('control-desk-endurance').first();
     await ensureVisible(chronoRow);
-    await expect(chronoRow.getByRole('link', { name: data.ChronoWarriorAddress })).toHaveAttribute(
-      'href',
-      `/user/${data.ChronoWarriorAddress}`,
-    );
-    await expect(chronoRow.getByRole('link', { name: data.EnduranceChampionAddress })).toHaveCount(
+    // Holder links read the short address; the full one is their target.
+    await expect(chronoRow.locator(`a[href="/user/${data.ChronoWarriorAddress}"]`)).toBeVisible();
+    await expect(chronoRow.locator(`a[href="/user/${data.EnduranceChampionAddress}"]`)).toHaveCount(
       0,
     );
     await expect(
-      enduranceRow.getByRole('link', { name: data.EnduranceChampionAddress }),
-    ).toHaveAttribute('href', `/user/${data.EnduranceChampionAddress}`);
+      enduranceRow.locator(`a[href="/user/${data.EnduranceChampionAddress}"]`),
+    ).toBeVisible();
   });
 
   test('Recipient History section renders', async ({ page }) => {
