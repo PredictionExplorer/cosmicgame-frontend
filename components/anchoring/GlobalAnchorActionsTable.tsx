@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 
+import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import { DataTable, TableLink, TableTag, type DataTableColumn } from '@/components/ui/data-table';
 
 import { TokenCell } from './TokenCell';
@@ -51,7 +52,11 @@ export const GlobalAnchorActionsTable = ({
         value: (row) => row.ActionId,
         cell: (row) => (
           <span className="inline-flex flex-wrap items-center justify-end gap-x-2 gap-y-1 sm:justify-start">
-            <TableLink href={anchorActionHref(collection, row.ActionId)}>
+            {/* Beside its tag the link is not the whole value: it takes the 24px line itself. */}
+            <TableLink
+              href={anchorActionHref(collection, row.ActionId)}
+              className={TOUCH_TARGET_TEXT_LINK_CLASS}
+            >
               {t('anchorActionDetail.breadcrumbs.action', { id: row.ActionId })}
             </TableLink>
             <TableTag>{row.ActionType === 1 ? t('common.release') : t('common.anchor')}</TableTag>

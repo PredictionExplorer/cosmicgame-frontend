@@ -215,7 +215,8 @@ test.describe('zh Sprint 4 — transactions and holdings routes', () => {
     await openZhRoute(
       page,
       `/zh/distributions-by-token/${SPRINT4_MOCK_ADDRESS}/${SPRINT4_MOCK_TOKEN_ID}`,
-      `Cosmic Signature #${String(SPRINT4_MOCK_TOKEN_ID).padStart(6, '0')} 的锚定派发 · Cosmic Signature`,
+      // Titled like its H1; a title that already names the brand gets no brand suffix.
+      `Cosmic Signature #${String(SPRINT4_MOCK_TOKEN_ID).padStart(6, '0')} 的锚定派发`,
     );
     await expect(
       page.getByRole('heading', {
@@ -228,6 +229,8 @@ test.describe('zh Sprint 4 — transactions and holdings routes', () => {
 
   test('opens representative Chinese allocation tooltips', async ({ page }) => {
     await openZhRoute(page, '/zh/allocation', '分配名录 · Cosmic Signature');
+    // The triggers answer only once the page has hydrated, as in the English tooltip specs.
+    await page.waitForLoadState('networkidle');
     await expectZhLabelTooltip(page, '周期储备分配', /ETH 储备如何沿协议各条轨道分配/);
     // A split legend entry explains itself: the track's name is the trigger.
     await expectZhTermTooltip(page, '签名分配', /完成收官之笔的参与者取回/);
@@ -235,6 +238,7 @@ test.describe('zh Sprint 4 — transactions and holdings routes', () => {
 
   test('opens representative Chinese anchoring tooltips', async ({ page }) => {
     await openZhRoute(page, '/zh/anchoring', '锚定派发 · Cosmic Signature');
+    await page.waitForLoadState('networkidle');
     // The hub's flow: the pool, divided by the anchored NFTs, is the share per anchored NFT.
     await expectZhLabelTooltip(
       page,
