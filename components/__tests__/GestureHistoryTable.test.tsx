@@ -161,7 +161,8 @@ describe('GestureHistoryTable', () => {
     const holds = Array.from(container.querySelectorAll('td[data-kind="duration"]')).map((cell) =>
       cell.textContent?.replace(/\s+/g, ' '),
     );
-    expect(holds).toEqual(['1h 0m 39s', '10m']);
+    // Fixed clock fields, so the right-aligned column lines up.
+    expect(holds).toEqual(['01:00:39', '00:10:00']);
   });
 
   test('uses localized alt text for the Random Walk NFT image', () => {

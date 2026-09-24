@@ -160,7 +160,7 @@ function GestureInfo({ gesture }: { gesture: GestureHistory }) {
 function GrowingDuration({ since }: { since: number }) {
   const nowMs = useNow(1000);
   if (nowMs <= 0) return null;
-  return <Duration seconds={Math.floor(nowMs / 1000) - since} />;
+  return <Duration seconds={Math.floor(nowMs / 1000) - since} variant="clock" />;
 }
 
 /**
@@ -268,7 +268,9 @@ const GestureHistoryTable = ({
           return hold == null ? (
             <GrowingDuration since={gesture.TimeStamp} />
           ) : (
-            <Duration seconds={hold} />
+            // Fixed fields ("04:10:00", "1d 04:16:52"), so the right-aligned
+            // column lines up instead of dropping trailing zero units.
+            <Duration seconds={hold} variant="clock" />
           );
         },
         sortable: true,
