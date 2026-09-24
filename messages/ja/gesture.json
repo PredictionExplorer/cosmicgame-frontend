@@ -4,70 +4,57 @@
     "help": "URLの一筆IDには0以上の数値を指定してください。"
   },
   "header": {
-    "title": "一筆の詳細",
-    "loadingSubtitle": "一筆のデータを読み込み中…",
-    "positionLabel": "一筆の順位 #{position}"
+    "title": "一筆#{position}",
+    "fallback": "一筆",
+    "explorer": "トランザクションを見る"
   },
   "empty": {
     "title": "一筆の情報が見つかりません。",
     "help": "IDが正しくないか、一筆のデータがまだ反映されていない可能性があります。"
   },
+  "figures": {
+    "cost": "一筆の費用",
+    "participationCst": "参加CST",
+    "cycle": "サイクル"
+  },
+  "method": {
+    "eth": "ETH",
+    "ethRandomWalk": "ETH + Random Walk NFT",
+    "cst": "CST"
+  },
   "sections": {
-    "transaction": {
-      "title": "トランザクションとサイクル",
-      "description": "この一筆が入れられた時刻と、属するサイクル。"
-    },
-    "cost": {
-      "title": "費用と参加CST",
-      "description": "支払われた金額と、この一筆で刻印された参加CST。"
-    },
-    "type": {
-      "title": "一筆の種類",
-      "description": "この一筆にRandom Walk NFTまたはCSTが使われたかどうか。"
-    },
-    "erc20": {
-      "title": "添付されたERC-20",
-      "description": "この一筆に添付された任意のERC-20トークン。"
-    },
-    "nft": {
-      "title": "添付されたNFT",
-      "description": "NFTが添付されている場合、そのメタデータを表示します。"
+    "details": {
+      "title": "記録"
     },
     "message": {
-      "title": "メッセージ",
-      "description": "参加者がこの一筆に添えたメッセージ。"
+      "title": "メッセージ"
+    },
+    "nft": {
+      "title": "添付されたNFT"
     }
   },
   "rows": {
-    "datetime": "一筆の日時",
-    "datetimeHelp": "ブロックエクスプローラーでトランザクションを開きます",
-    "participantAddress": "参加者アドレス",
-    "cycleNumber": "サイクル番号",
-    "cycleValue": "サイクル{round}",
-    "gestureCost": "一筆の費用",
-    "participationCst": "参加CST",
-    "attachedRandomWalk": "ETH一筆に添付されたRandomWalk NFT：",
-    "paidWithCst": "CST（ERC-20）で支払い：",
-    "randomWalkId": "RandomWalk NFT ID：",
-    "erc20Address": "添付されたERC-20トークンのアドレス：",
-    "erc20Amount": "添付されたERC-20トークンの数量：",
-    "nftAddress": "添付されたNFTトークンのアドレス：",
-    "nftId": "添付されたNFTトークンID：",
-    "nftTokenUri": "NFTトークンURI："
+    "participant": "参加者",
+    "finalizationTime": "この一筆の後の確定時刻",
+    "transaction": "トランザクション",
+    "erc20": "添付されたERC-20",
+    "erc20Amount": "添付されたERC-20トークンの数量",
+    "nftContract": "添付されたNFTトークンのアドレス",
+    "nftId": "添付されたNFTトークンID"
   },
-  "values": {
-    "yes": "はい",
-    "no": "いいえ"
+  "nav": {
+    "aria": "前後の一筆",
+    "previous": "前の一筆",
+    "next": "次の一筆",
+    "all": "サイクル{cycle}のすべての一筆"
   },
   "nftPreview": {
-    "heading": "プレビューとメタデータ",
     "collectionName": "コレクション名",
     "artist": "アーティスト",
     "platform": "プラットフォーム",
     "description": "説明"
   },
   "randomWalk": {
-    "previewAria": "Random Walk NFTのプレビュー",
     "heading": "Random Walk NFT"
   }
 }

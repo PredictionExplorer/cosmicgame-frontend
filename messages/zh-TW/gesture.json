@@ -4,70 +4,57 @@
     "help": "網址中的落筆 ID 需為非負整數。"
   },
   "header": {
-    "title": "落筆詳情",
-    "loadingSubtitle": "正在載入落筆資料…",
-    "positionLabel": "落筆位置 #{position}"
+    "title": "落筆 #{position}",
+    "fallback": "落筆",
+    "explorer": "查看交易"
   },
   "empty": {
     "title": "未找到落筆資訊。",
     "help": "此 ID 可能無效，或這一筆尚未被索引收錄。"
   },
+  "figures": {
+    "cost": "落筆價格",
+    "participationCst": "參與 CST",
+    "cycle": "週期"
+  },
+  "method": {
+    "eth": "ETH",
+    "ethRandomWalk": "ETH + Random Walk NFT",
+    "cst": "CST"
+  },
   "sections": {
-    "transaction": {
-      "title": "交易與週期",
-      "description": "落筆時間與所屬週期。"
-    },
-    "cost": {
-      "title": "落筆價格與參與 CST",
-      "description": "這一筆支付的金額，以及由此銘刻的參與 CST。"
-    },
-    "type": {
-      "title": "落筆類型",
-      "description": "這一筆是否使用了 Random Walk NFT 或 CST。"
-    },
-    "erc20": {
-      "title": "已附加 ERC-20",
-      "description": "隨這一筆附加的 ERC-20 代幣（如有）。"
-    },
-    "nft": {
-      "title": "已附加 NFT",
-      "description": "隨這一筆附加的 NFT 及其後設資料（如有）。"
+    "details": {
+      "title": "記錄"
     },
     "message": {
-      "title": "留言",
-      "description": "參與者落筆時附上的留言。"
+      "title": "留言"
+    },
+    "nft": {
+      "title": "已附加 NFT"
     }
   },
   "rows": {
-    "datetime": "落筆時間",
-    "datetimeHelp": "點選可在區塊瀏覽器中檢視交易",
-    "participantAddress": "參與者地址",
-    "cycleNumber": "週期編號",
-    "cycleValue": "第 {round} 個週期",
-    "gestureCost": "落筆價格",
-    "participationCst": "參與 CST",
-    "attachedRandomWalk": "ETH 落筆是否附加 Random Walk NFT",
-    "paidWithCst": "是否使用 CST（ERC-20）支付",
-    "randomWalkId": "Random Walk NFT ID",
-    "erc20Address": "已附加 ERC-20 代幣地址",
+    "participant": "參與者",
+    "finalizationTime": "此次落筆後的收官時間",
+    "transaction": "交易",
+    "erc20": "已附加 ERC-20",
     "erc20Amount": "已附加 ERC-20 代幣數量",
-    "nftAddress": "已附加 NFT 代幣地址",
-    "nftId": "已附加 NFT 代幣 ID",
-    "nftTokenUri": "NFT Token URI"
+    "nftContract": "已附加 NFT 代幣地址",
+    "nftId": "已附加 NFT 代幣 ID"
   },
-  "values": {
-    "yes": "是",
-    "no": "否"
+  "nav": {
+    "aria": "相鄰落筆",
+    "previous": "上一次落筆",
+    "next": "下一次落筆",
+    "all": "第 {cycle} 個週期的全部落筆"
   },
   "nftPreview": {
-    "heading": "預覽與後設資料",
     "collectionName": "系列名稱",
     "artist": "藝術家",
     "platform": "平台",
     "description": "描述"
   },
   "randomWalk": {
-    "previewAria": "Random Walk NFT 預覽",
     "heading": "Random Walk NFT"
   }
 }

@@ -36,7 +36,6 @@ const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
   'app/[locale]/(app)/cosmic-token-transfer/[address]/CosmicTokenTransfersPage.tsx': 1,
   'app/[locale]/(app)/distributions-by-token/[address]/[tokenId]/RewardsByTokenPage.tsx': 2,
   'app/[locale]/(app)/eth-contribution/detail/[id]/EthDonationDetailPage.tsx': 1,
-  'app/[locale]/(app)/gesture/[id]/GesturePage.tsx': 2,
   'app/[locale]/(app)/my-allocations/MyWinnings.tsx': 1,
   'app/[locale]/(app)/my-anchors/MyAnchors.tsx': 1,
   'app/[locale]/(app)/page.tsx': 1,
@@ -91,7 +90,6 @@ const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
  */
 const LOCAL_AMOUNT_FORMATTER = /\b(?:function|const)\s+format(?:Eth|Cst|CST|EthValue|Amount)\b/;
 const LOCAL_AMOUNT_FORMATTER_BASELINE: readonly string[] = [
-  'app/[locale]/(app)/gesture/[id]/GesturePage.tsx',
   'components/home/HomeObservatoryHero.tsx',
 ];
 

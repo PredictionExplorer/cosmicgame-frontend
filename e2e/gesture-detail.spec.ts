@@ -9,13 +9,11 @@ test.describe('Gesture detail page', () => {
 
   test('shows gesture information fields', async ({ page }) => {
     await page.goto('/gesture/1', { waitUntil: 'networkidle' });
-    // One H1: "Gesture Position #N" once the gesture is indexed with its position,
-    // "Gesture details" otherwise.
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText(
-      /^(Gesture Position #\d+|Gesture details)$/,
-    );
+    // One H1: "Gesture #N" (its place in the cycle) once the gesture is indexed
+    // with its position, "Gesture" otherwise.
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(/^(Gesture #\d+|Gesture)$/);
     await expect(
-      page.getByText(/Transaction and cycle|No gesture information found/i).first(),
+      page.getByRole('heading', { name: /^(Record|No gesture information found\.)$/ }).first(),
     ).toBeVisible();
   });
 
@@ -84,11 +82,14 @@ test.describe('Gesture detail page', () => {
 
     await page.goto('/gesture/18482', { waitUntil: 'networkidle' });
 
-    const section = page.getByRole('region', { name: 'Cost and Participation CST' });
-    await expect(section).toContainText('411.5278 CST');
-    await expect(section).toContainText('Participation CST');
-    await expect(section).toContainText('100.00 CST');
-    const sectionText = await section.innerText();
-    expect(sectionText).not.toMatch(/Gesture cost\s*0\.00 CST/);
+    // The header figures: what was paid (exactly, as the wallet showed it) and what it imprinted.
+    await expect(page.locator('[data-figure="cost"]')).toContainText('411.527831 CST');
+    await expect(page.locator('[data-figure="participationCst"]')).toContainText(
+      'Participation CST',
+    );
+    await expect(page.locator('[data-figure="participationCst"]')).toContainText('100 CST');
+    await expect(page.locator('[data-figure="cost"]')).not.toContainText(/^Gesture Cost\s*0 CST$/);
+    // A message is quoted only when there is one.
+    await expect(page.getByTestId('gesture-message')).toContainText('rewards system');
   });
 });

@@ -4,70 +4,57 @@
     "help": "Мã nét bút trong URL phải là số nguyên không âm."
   },
   "header": {
-    "title": "Chi tiết nét bút",
-    "loadingSubtitle": "Đang tải dữ liệu nét bút…",
-    "positionLabel": "Vị trí nét bút #{position}"
+    "title": "Nét bút #{position}",
+    "fallback": "Nét bút",
+    "explorer": "Xem giao dịch"
   },
   "empty": {
     "title": "Không tìm thấy thông tin nét bút.",
     "help": "Mã nét bút có thể không hợp lệ hoặc dữ liệu chưa được cập nhật."
   },
+  "figures": {
+    "cost": "Chi phí nét bút",
+    "participationCst": "CST tham gia",
+    "cycle": "Chu kỳ"
+  },
+  "method": {
+    "eth": "ETH",
+    "ethRandomWalk": "ETH + Random Walk NFT",
+    "cst": "CST"
+  },
   "sections": {
-    "transaction": {
-      "title": "Giao dịch và chu kỳ",
-      "description": "Nét bút được đặt khi nào và thuộc chu kỳ nào."
-    },
-    "cost": {
-      "title": "Chi phí và CST tham gia",
-      "description": "Số tiền đã trả và lượng CST tham gia được khắc khi đặt nét bút."
-    },
-    "type": {
-      "title": "Loại nét bút",
-      "description": "Nét bút này có dùng Random Walk NFT hay CST hay không."
-    },
-    "erc20": {
-      "title": "ERC-20 đính kèm",
-      "description": "Token ERC-20 tùy chọn được đính kèm vào nét bút này."
-    },
-    "nft": {
-      "title": "NFT đính kèm",
-      "description": "Siêu dữ liệu của NFT được đính kèm vào nét bút này, nếu có."
+    "details": {
+      "title": "Bản ghi"
     },
     "message": {
-      "title": "Lời nhắn",
-      "description": "Lời nhắn mà người tham gia để lại cùng nét bút này."
+      "title": "Lời nhắn"
+    },
+    "nft": {
+      "title": "NFT đính kèm"
     }
   },
   "rows": {
-    "datetime": "Thời điểm nét bút",
-    "datetimeHelp": "Mở giao dịch trên trình khám phá khối",
-    "participantAddress": "Địa chỉ người tham gia",
-    "cycleNumber": "Số chu kỳ",
-    "cycleValue": "Chu kỳ {round}",
-    "gestureCost": "Chi phí nét bút",
-    "participationCst": "CST tham gia",
-    "attachedRandomWalk": "RandomWalk NFT đính kèm vào nét bút ETH:",
-    "paidWithCst": "Thanh toán bằng CST (ERC-20):",
-    "randomWalkId": "Mã RandomWalkNFT:",
-    "erc20Address": "Địa chỉ token ERC-20 đính kèm:",
-    "erc20Amount": "Số lượng token ERC-20 đính kèm:",
-    "nftAddress": "Địa chỉ token NFT đính kèm:",
-    "nftId": "Mã token NFT đính kèm:",
-    "nftTokenUri": "URI token NFT:"
+    "participant": "Người tham gia",
+    "finalizationTime": "Thời điểm hoàn tất sau nét bút này",
+    "transaction": "Giao dịch",
+    "erc20": "ERC-20 đính kèm",
+    "erc20Amount": "Số lượng token ERC-20 đính kèm",
+    "nftContract": "Địa chỉ token NFT đính kèm",
+    "nftId": "Mã token NFT đính kèm"
   },
-  "values": {
-    "yes": "Có",
-    "no": "Không"
+  "nav": {
+    "aria": "Các nét bút liền kề",
+    "previous": "Nét bút trước",
+    "next": "Nét bút sau",
+    "all": "Mọi nét bút trong chu kỳ {cycle}"
   },
   "nftPreview": {
-    "heading": "Xem trước và siêu dữ liệu",
     "collectionName": "Tên bộ sưu tập",
     "artist": "Nghệ sĩ",
     "platform": "Nền tảng",
     "description": "Mô tả"
   },
   "randomWalk": {
-    "previewAria": "Xem trước Random Walk NFT",
     "heading": "Random Walk NFT"
   }
 }
