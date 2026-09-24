@@ -95,9 +95,14 @@ test.describe('Sprint 8 translated tooltip interaction coverage', () => {
         await expect(trigger).toBeVisible();
         if (!isTerm) await expect(trigger).toHaveAttribute('aria-label', /[\u3400-\u9fff]/);
 
-        await openTooltip(trigger);
         const tooltip = page.getByRole('tooltip').first();
-        await expect(tooltip).toBeVisible();
+        // Server-rendered triggers are listed before the page hydrates; until
+        // then a hover has no handler, so try again until the card opens.
+        await expect(async () => {
+          await dismissOpenTooltips(page);
+          await openTooltip(trigger);
+          await expect(tooltip).toBeVisible({ timeout: 1_000 });
+        }).toPass({ timeout: 15_000 });
         const text = (await tooltip.innerText()).trim();
         expect(text.length).toBeGreaterThan(0);
         if (!/[\u3400-\u9fff]/.test(text)) {
