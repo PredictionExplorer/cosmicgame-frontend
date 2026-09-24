@@ -73,6 +73,11 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
     }
   }, [donationInfo]);
 
+  // A contribution sits under the contributions ledger; the subtitle names its id.
+  const contributionsTrail = [
+    { label: t('detail.breadcrumbContributions'), href: '/eth-contribution' },
+  ];
+
   if (!Number.isInteger(id) || id < 0) {
     return (
       <PageShell variant="data" backdrop="signature">
@@ -92,13 +97,8 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
           <PageHeader
             title={t('detail.title')}
             subtitle={t('detail.loadingSubtitle')}
-            breadcrumbs={[
-              { label: t('detail.breadcrumbHome'), href: '/' },
-              { label: t('detail.breadcrumbContributions'), href: '/eth-contribution' },
-              { label: `#${id}` },
-            ]}
-            className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
-            align="left"
+            section="participate"
+            breadcrumbs={contributionsTrail}
           />
           <div className={cn(detailPanelClass, 'p-10 text-center')}>
             <p className="text-sm font-medium text-muted-foreground">{t('detail.loading')}</p>
@@ -115,13 +115,8 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
         <div className="mx-auto max-w-3xl">
           <PageHeader
             title={t('detail.title')}
-            breadcrumbs={[
-              { label: t('detail.breadcrumbHome'), href: '/' },
-              { label: t('detail.breadcrumbContributions'), href: '/eth-contribution' },
-              { label: `#${id}` },
-            ]}
-            className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
-            align="left"
+            section="participate"
+            breadcrumbs={contributionsTrail}
           />
           {isError ? (
             <div className={detailPanelClass}>
@@ -143,13 +138,8 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
         <PageHeader
           title={t('detail.title')}
           subtitle={t('detail.subtitle', { id })}
-          breadcrumbs={[
-            { label: t('detail.breadcrumbHome'), href: '/' },
-            { label: t('detail.breadcrumbContributions'), href: '/eth-contribution' },
-            { label: `#${id}` },
-          ]}
-          className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
-          align="left"
+          section="participate"
+          breadcrumbs={contributionsTrail}
         />
 
         <SectionCard

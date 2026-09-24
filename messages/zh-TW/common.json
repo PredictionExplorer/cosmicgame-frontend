@@ -56,7 +56,10 @@
     "snapshot": "資料快照：{date}",
     "lastReviewed": "最後審閱：{date}",
     "lastUpdated": "最後更新：{date}",
-    "relatedPages": "相關頁面"
+    "relatedPages": "相關頁面",
+    "crumbs": {
+      "participants": "參與者"
+    }
   },
   "status": {
     "loading": "載入中",

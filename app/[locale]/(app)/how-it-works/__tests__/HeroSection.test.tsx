@@ -63,9 +63,17 @@ describe('HeroSection', () => {
     ).toBeInTheDocument();
   });
 
-  it('renders the protocol badge', () => {
+  it('names the Help section in the eyebrow without linking the hub to itself', () => {
     render(<HeroSection hero={hero} />);
-    expect(screen.getByText('Procedural On-Chain Art Protocol')).toBeInTheDocument();
+    expect(screen.getByText('common.pageHeader.sections.help')).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'common.pageHeader.sections.help' })).toBeNull();
+  });
+
+  it('accents the words the copy marks, without a separator added in code', () => {
+    render(<HeroSection hero={hero} />);
+    const heading = screen.getByRole('heading', { level: 1 });
+    expect(heading.querySelector('.text-primary')).toHaveTextContent('Works');
+    expect(heading.textContent).toBe('How Cosmic Signature Works');
   });
 
   it('renders Open the Protocol link pointing to homepage', () => {
@@ -80,10 +88,9 @@ describe('HeroSection', () => {
     expect(link).toHaveAttribute('href', '#protocol-overview');
   });
 
-  it('has the correct aria-labelledby on the section', () => {
-    const { container } = render(<HeroSection hero={hero} />);
-    const section = container.querySelector('section');
-    expect(section).toHaveAttribute('aria-labelledby', 'hero-heading');
+  it('keeps the H1 id the page links to', () => {
+    render(<HeroSection hero={hero} />);
+    expect(screen.getByRole('heading', { level: 1 })).toHaveAttribute('id', 'hero-heading');
   });
 
   it('has no accessibility violations', async () => {

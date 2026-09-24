@@ -22,14 +22,17 @@ const MarketingRewardsPage = ({ address: rawAddress }: MarketingRewardsPageProps
   const { data: marketingRewards = [], isLoading: loading } = useMarketingRewardsByUser(
     invalidAddress ? undefined : address,
   );
+  // One contributor's outreach allocations sit under the Outreach ledger.
+  const tNav = useTranslations('nav');
+  const outreachTrail = [{ label: tNav('links.outreachReserve.label'), href: '/marketing' }];
 
   return (
     <PageShell variant="marketing" backdrop="signature">
       {invalidAddress ? (
-        <PageHeader title={t('address.invalid')} />
+        <PageHeader section="records" breadcrumbs={outreachTrail} title={t('address.invalid')} />
       ) : (
         <>
-          <PageHeader title={t('address.heading')}>
+          <PageHeader section="records" breadcrumbs={outreachTrail} title={t('address.heading')}>
             <Link
               href={`/user/${address}`}
               className="mt-5 inline-block break-all font-mono text-sm text-muted-foreground transition-colors hover:text-primary"

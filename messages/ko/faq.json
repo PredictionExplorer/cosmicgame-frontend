@@ -1,8 +1,7 @@
 {
   "hero": {
-    "badge": "지식 베이스",
-    "titlePrefix": "Cosmic Signature",
-    "titleHighlight": "자주 묻는 질문",
+    "title": "Cosmic Signature <accent>자주 묻는 질문</accent>",
+    "breadcrumb": "자주 묻는 질문",
     "subtitle": "처음 시작하는 방법부터 심화 메커니즘까지, Cosmic Signature에 관해 알아야 할 내용을 한곳에 모았습니다.",
     "answerCount": "답변 {count}개 이상",
     "answerCountTooltip": "Cosmic Signature의 모든 측면을 아우르는 상세한 답변입니다.",

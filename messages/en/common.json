@@ -56,7 +56,10 @@
     "snapshot": "Snapshot · {date}",
     "lastReviewed": "Last reviewed {date}",
     "lastUpdated": "Last updated {date}",
-    "relatedPages": "Related pages"
+    "relatedPages": "Related pages",
+    "crumbs": {
+      "participants": "Participants"
+    }
   },
   "status": {
     "loading": "Loading",

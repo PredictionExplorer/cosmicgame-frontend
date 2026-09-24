@@ -19,9 +19,7 @@ export const howItWorksTextEn = {
     pageLabel: 'How It Works',
   },
   hero: {
-    badge: 'Procedural On-Chain Art Protocol',
-    headingLead: 'How Cosmic Signature',
-    headingAccent: 'Works',
+    heading: 'How Cosmic Signature <accent>Works</accent>',
     paragraph:
       'Gesture. Endure. Shape the Signature. Participants make gestures during a Performance Cycle. When the Cycle Finalization Time expires, the cycle can be finalized and allocations distribute across more than ten tracks — including the Signature Allocation, Anchor Distributions, and Protocol Guild.',
     primaryCtaLabel: 'Open the Protocol',

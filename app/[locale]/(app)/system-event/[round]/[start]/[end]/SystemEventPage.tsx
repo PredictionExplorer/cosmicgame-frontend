@@ -39,23 +39,15 @@ const SystemEventPage = ({ start, end, round }: SystemEventPageProps) => {
     <PageShell variant="data" backdrop="signature" className="max-sm:pb-16">
       <div className="mx-auto max-w-6xl">
         <PageHeader
-          title={title}
-          subtitle={t('systemEvent.range', { start, end })}
+          section="records"
           breadcrumbs={[
-            { label: t('systemEvent.breadcrumbs.home'), href: '/' },
             {
               label: t('systemEvent.breadcrumbs.coordination'),
               href: '/coordination-changes',
             },
-            {
-              label:
-                round > 0
-                  ? t('systemEvent.breadcrumbs.beforeCycle', { cycle: round })
-                  : t('systemEvent.breadcrumbs.deployment'),
-            },
           ]}
-          className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
-          align="left"
+          title={title}
+          subtitle={t('systemEvent.range', { start, end })}
         />
 
         {loading ? (

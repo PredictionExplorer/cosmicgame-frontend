@@ -39,16 +39,13 @@ function AnchorActionDetailPage({ IsRwalk, actionId }: { IsRwalk: number; action
   return (
     <PageShell variant="data" backdrop="signature" className="max-sm:pb-16">
       <div className="mx-auto max-w-5xl">
+        {/* A public record: it sits under the Anchor Distributions ledger, not under
+            the reader's own anchors. */}
         <PageHeader
-          title={t('anchorActionDetail.title')}
+          section="records"
+          breadcrumbs={[{ label: t('overview.title'), href: '/anchoring' }]}
+          title={t('anchorActionDetail.breadcrumbs.action', { id: actionId })}
           subtitle={subtitleText}
-          breadcrumbs={[
-            { label: t('anchorActionDetail.breadcrumbs.home'), href: '/' },
-            { label: t('anchorActionDetail.breadcrumbs.myAnchors'), href: '/my-anchors' },
-            { label: t('anchorActionDetail.breadcrumbs.action', { id: actionId }) },
-          ]}
-          className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
-          align="left"
         />
 
         {loading ? (

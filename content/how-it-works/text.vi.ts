@@ -25,9 +25,7 @@ export const howItWorksTextVi = {
     pageLabel: 'Cách hoạt động',
   },
   hero: {
-    badge: 'Giao thức nghệ thuật tạo sinh trên chuỗi',
-    headingLead: 'Cosmic Signature',
-    headingAccent: 'hoạt động như thế nào',
+    heading: 'Cosmic Signature <accent>hoạt động như thế nào</accent>',
     paragraph:
       'Những nét bút nối tiếp nhau định hình Signature trong mỗi chu kỳ trình diễn. Khi đếm ngược về 0, chu kỳ có thể được hoàn tất. Giao thức khi đó phân phối dự trữ qua hơn mười luồng, gồm phân bổ Signature, phân phối neo giữ và phần dành cho Protocol Guild.',
     primaryCtaLabel: 'Mở giao thức',

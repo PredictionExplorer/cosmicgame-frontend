@@ -95,13 +95,14 @@ const publicPages: PublicPage[] = [
   {
     path: '/faq',
     host: APP_HOST,
-    h1: 'Cosmic Signature FAQ',
+    // One rich message: the accent span sits inside the H1 text.
+    h1: /Cosmic Signature[\s\S]{0,200}FAQ/,
     jsonLd: ['FAQPage', 'BreadcrumbList'],
   },
   {
     path: '/how-it-works',
     host: APP_HOST,
-    h1: 'How Cosmic Signature Works',
+    h1: /How Cosmic Signature[\s\S]{0,200}Works/,
     jsonLd: ['WebPage', 'BreadcrumbList'],
   },
   { path: '/anchoring', host: APP_HOST, h1: 'Anchor Distributions' },
@@ -133,7 +134,7 @@ const publicPages: PublicPage[] = [
   {
     path: '/zh/faq',
     host: APP_HOST,
-    h1: 'Cosmic Signature 常见问题',
+    h1: /Cosmic Signature[\s\S]{0,200}常见问题/,
     jsonLd: ['Organization', 'WebSite', 'WebApplication', 'FAQPage', 'BreadcrumbList'],
   },
   {
@@ -157,7 +158,7 @@ const publicPages: PublicPage[] = [
   {
     path: '/uk/faq',
     host: APP_HOST,
-    // The hero h1 renders the prefix and the gradient highlight as siblings.
+    // One rich message: the accent span sits inside the H1 text.
     h1: /Cosmic Signature[\s\S]{0,200}Поширені запитання/,
     jsonLd: ['Organization', 'WebSite', 'WebApplication', 'FAQPage', 'BreadcrumbList'],
   },

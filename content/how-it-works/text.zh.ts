@@ -19,9 +19,7 @@ export const howItWorksTextZh = {
     pageLabel: '运作原理',
   },
   hero: {
-    badge: '程序化链上艺术协议',
-    headingLead: 'Cosmic Signature',
-    headingAccent: '运作原理',
+    heading: 'Cosmic Signature <accent>运作原理</accent>',
     paragraph:
       '落笔，坚守，塑造签名。参与者在演绎周期中落笔；收官倒计时归零后，周期即可收官，储备将沿十余条分配轨道发放——签名分配、锚定派发与 Protocol Guild 都在其中。',
     primaryCtaLabel: '进入协议',

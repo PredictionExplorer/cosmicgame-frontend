@@ -1,8 +1,7 @@
 {
   "hero": {
-    "badge": "知識庫",
-    "titlePrefix": "Cosmic Signature",
-    "titleHighlight": "常見問題",
+    "title": "Cosmic Signature <accent>常見問題</accent>",
+    "breadcrumb": "常見問題",
     "subtitle": "從初次參與到深入理解週期機制，這裏彙集了關於 Cosmic Signature 的常見疑問。",
     "answerCount": "{count}+ 條解答",
     "answerCountTooltip": "全面解答 Cosmic Signature 各方面的常見問題。",

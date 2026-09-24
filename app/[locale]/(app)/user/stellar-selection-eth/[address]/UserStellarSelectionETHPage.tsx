@@ -28,6 +28,7 @@ import {
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { useParticipantTrail } from '@/components/layout/participantTrail';
 import { PageShell } from '@/components/ui/page-shell';
 import { Spinner } from '@/components/ui/spinner';
 import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
@@ -135,6 +136,7 @@ const UserStellarSelectionETHPage = ({ address: rawAddress }: { address: string 
       : 'Invalid Address';
 
   const invalidAddress = !validatedAddress || validatedAddress === 'Invalid Address';
+  const participantTrail = useParticipantTrail(invalidAddress ? null : validatedAddress);
   const [isClaiming, setIsClaiming] = useState(false);
 
   const {
@@ -198,14 +200,22 @@ const UserStellarSelectionETHPage = ({ address: rawAddress }: { address: string 
   if (invalidAddress) {
     return (
       <PageShell variant="data" backdrop="signature">
-        <PageHeader title={tStatistics('stellarSelectionEth.invalidAddress')} />
+        <PageHeader
+          section="insights"
+          breadcrumbs={participantTrail}
+          title={tStatistics('stellarSelectionEth.invalidAddress')}
+        />
       </PageShell>
     );
   }
 
   return (
     <PageShell variant="data" backdrop="signature">
-      <PageHeader title={tStatistics('stellarSelectionEth.heading')}>
+      <PageHeader
+        section="insights"
+        breadcrumbs={participantTrail}
+        title={tStatistics('stellarSelectionEth.heading')}
+      >
         <p className="mt-5 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-sm text-muted-foreground">
           <span>{tStatistics('stellarSelectionEth.user')}</span>
           <span className="min-w-0 break-all font-mono">{validatedAddress}</span>

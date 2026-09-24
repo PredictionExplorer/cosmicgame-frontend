@@ -39,7 +39,7 @@ export default async function Page({ params }: PageProps) {
           data={breadcrumbJsonLd(
             [
               { name: common('breadcrumbs.home'), path: '/' },
-              { name: faq('hero.titleHighlight'), path: '/faq' },
+              { name: faq('hero.breadcrumb'), path: '/faq' },
             ],
             localeHref(APP_ORIGIN, '/', locale),
           )}

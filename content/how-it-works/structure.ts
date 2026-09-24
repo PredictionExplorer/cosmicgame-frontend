@@ -64,9 +64,8 @@ export type HowItWorksText = {
   readonly jsonLd: HowItWorksJsonLdContent;
   readonly breadcrumbs: HowItWorksBreadcrumbsContent;
   readonly hero: {
-    readonly badge: string;
-    readonly headingLead: string;
-    readonly headingAccent: string;
+    /** The H1, the accented words marked `<accent>…</accent>`. */
+    readonly heading: string;
     readonly paragraph: string;
     readonly primaryCtaLabel: string;
     readonly secondaryCtaLabel: string;

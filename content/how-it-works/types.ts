@@ -22,10 +22,12 @@ export interface HowItWorksBreadcrumbsContent {
 }
 
 export interface HowItWorksHeroContent {
-  readonly badge: string;
-  /** The H1 renders as `{headingLead} {headingAccent}` with the accent in a gradient span. */
-  readonly headingLead: string;
-  readonly headingAccent: string;
+  /**
+   * The H1 as one string per locale, the accented words marked
+   * `<accent>…</accent>`: each locale owns its word order and spacing
+   * (Japanese sets no space between a Latin name and Japanese text).
+   */
+  readonly heading: string;
   readonly paragraph: string;
   readonly primaryCta: HowItWorksLink;
   /** In-page anchor CTA (plain `<a>`), e.g. `#protocol-overview`. */

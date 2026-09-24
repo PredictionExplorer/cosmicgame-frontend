@@ -1,8 +1,7 @@
 {
   "hero": {
-    "badge": "Cơ sở kiến thức",
-    "titlePrefix": "Câu hỏi thường gặp về",
-    "titleHighlight": "Cosmic Signature",
+    "title": "Câu hỏi thường gặp về <accent>Cosmic Signature</accent>",
+    "breadcrumb": "Câu hỏi thường gặp",
     "subtitle": "Mọi điều bạn cần biết về Cosmic Signature — từ những bước đầu tiên đến các cơ chế nâng cao của giao thức.",
     "answerCount": "{count}+ câu trả lời",
     "answerCountTooltip": "Những câu trả lời đầy đủ bao quát mọi khía cạnh của Cosmic Signature.",

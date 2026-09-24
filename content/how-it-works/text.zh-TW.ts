@@ -19,9 +19,7 @@ export const howItWorksTextZhTw = {
     pageLabel: '運作原理',
   },
   hero: {
-    badge: '程序化鏈上藝術協議',
-    headingLead: 'Cosmic Signature',
-    headingAccent: '運作原理',
+    heading: 'Cosmic Signature <accent>運作原理</accent>',
     paragraph:
       '落筆，堅守，塑造簽名。參與者在演繹週期中落筆；收官倒數歸零後，週期即可收官，儲備將沿十餘條分配軌道發放——簽名分配、錨定配發與 Protocol Guild 都在其中。',
     primaryCtaLabel: '進入協議',

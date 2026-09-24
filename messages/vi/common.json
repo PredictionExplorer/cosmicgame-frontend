@@ -56,7 +56,10 @@
     "snapshot": "Ảnh chụp dữ liệu · {date}",
     "lastReviewed": "Xem xét lần cuối: {date}",
     "lastUpdated": "Cập nhật lần cuối: {date}",
-    "relatedPages": "Trang liên quan"
+    "relatedPages": "Trang liên quan",
+    "crumbs": {
+      "participants": "Người tham gia"
+    }
   },
   "status": {
     "loading": "Đang tải",

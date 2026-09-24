@@ -56,7 +56,10 @@
     "snapshot": "데이터 스냅숏: {date}",
     "lastReviewed": "최종 검토: {date}",
     "lastUpdated": "최종 업데이트: {date}",
-    "relatedPages": "관련 페이지"
+    "relatedPages": "관련 페이지",
+    "crumbs": {
+      "participants": "참여자"
+    }
   },
   "status": {
     "loading": "불러오는 중",

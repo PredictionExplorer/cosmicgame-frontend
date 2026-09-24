@@ -4,8 +4,10 @@ import GesturePage from '../[id]/GesturePage';
 
 const mockUseGestureInfo = jest.fn();
 
+const mockUseDashboardInfo = jest.fn(() => ({ data: { CurRoundNum: 9 } }));
 jest.mock('../../../../../hooks/useApiQuery', () => ({
   useGestureInfo: (...args: unknown[]) => mockUseGestureInfo(...args),
+  useDashboardInfo: () => mockUseDashboardInfo(),
 }));
 
 jest.mock('axios', () => ({
@@ -69,8 +71,18 @@ describe('GesturePage', () => {
     expect(screen.getByText('gesture.empty.title')).toBeInTheDocument();
   });
 
-  it('renders gesture details heading', () => {
+  it('names the gesture by its position in the H1, falling back to the generic title', () => {
     mockUseGestureInfo.mockReturnValue({ data: baseGestureInfo, isLoading: false });
+    const { unmount } = render(<GesturePage gestureId={1} />);
+    expect(
+      screen.getByRole('heading', { name: 'gesture.header.positionLabel(position=7)', level: 1 }),
+    ).toBeInTheDocument();
+    unmount();
+
+    mockUseGestureInfo.mockReturnValue({
+      data: { ...baseGestureInfo, BidPosition: undefined },
+      isLoading: false,
+    });
     render(<GesturePage gestureId={1} />);
     expect(
       screen.getByRole('heading', { name: 'gesture.header.title', level: 1 }),
@@ -83,12 +95,34 @@ describe('GesturePage', () => {
       isLoading: false,
     });
     render(<GesturePage gestureId={23514} />);
-    expect(
-      screen.getAllByText('gesture.header.positionLabel(position=7)').length,
-    ).toBeGreaterThanOrEqual(1);
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'gesture.header.positionLabel(position=7)',
+    );
     expect(
       screen.queryByText('gesture.header.positionLabel(position=23514)'),
     ).not.toBeInTheDocument();
+  });
+
+  it('places a finalized cycle’s gesture under that cycle’s record', () => {
+    mockUseGestureInfo.mockReturnValue({ data: baseGestureInfo, isLoading: false });
+    render(<GesturePage gestureId={1} />);
+    const trail = screen.getByRole('navigation', { name: 'common.accessibility.breadcrumb' });
+    expect(
+      within(trail).getByRole('link', { name: 'gesture.rows.cycleValue(round=5)' }),
+    ).toHaveAttribute('href', '/allocation/5');
+    expect(
+      within(trail).getByRole('link', { name: 'common.pageHeader.sections.records' }),
+    ).toBeInTheDocument();
+  });
+
+  it('places a live cycle’s gesture under the current cycle', () => {
+    mockUseDashboardInfo.mockReturnValueOnce({ data: { CurRoundNum: 5 } });
+    mockUseGestureInfo.mockReturnValue({ data: baseGestureInfo, isLoading: false });
+    render(<GesturePage gestureId={1} />);
+    const trail = screen.getByRole('navigation', { name: 'common.accessibility.breadcrumb' });
+    expect(
+      within(trail).getByRole('link', { name: 'gesture.rows.cycleValue(round=5)' }),
+    ).toHaveAttribute('href', '/current-cycle');
   });
 
   it('renders participant address', () => {
@@ -100,10 +134,10 @@ describe('GesturePage', () => {
   it('renders round number', () => {
     mockUseGestureInfo.mockReturnValue({ data: baseGestureInfo, isLoading: false });
     render(<GesturePage gestureId={1} />);
-    expect(screen.getByRole('link', { name: 'gesture.rows.cycleValue(round=5)' })).toHaveAttribute(
-      'href',
-      '/allocation/5',
-    );
+    // The breadcrumb and the details row both link the cycle's record.
+    const links = screen.getAllByRole('link', { name: 'gesture.rows.cycleValue(round=5)' });
+    expect(links).toHaveLength(2);
+    for (const link of links) expect(link).toHaveAttribute('href', '/allocation/5');
   });
 
   it('renders ETH gesture cost for GestureType !== 2', () => {

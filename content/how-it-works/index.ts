@@ -26,9 +26,7 @@ function buildHowItWorksContent(text: HowItWorksText): HowItWorksContent {
     jsonLd: text.jsonLd,
     breadcrumbs: text.breadcrumbs,
     hero: {
-      badge: text.hero.badge,
-      headingLead: text.hero.headingLead,
-      headingAccent: text.hero.headingAccent,
+      heading: text.hero.heading,
       paragraph: text.hero.paragraph,
       primaryCta: { label: text.hero.primaryCtaLabel, href: structure.hero.primaryCtaHref },
       secondaryCta: { label: text.hero.secondaryCtaLabel, href: structure.hero.secondaryCtaHref },

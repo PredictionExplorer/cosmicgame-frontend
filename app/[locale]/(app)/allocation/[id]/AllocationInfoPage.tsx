@@ -33,6 +33,8 @@ import { Link } from '@/i18n/navigation';
 import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import { cn } from '@/lib/utils';
 import { TOUCH_TARGET_ICON_CLASS, TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { Amount } from '@/components/ui/amount';
 import { PageShell } from '@/components/ui/page-shell';
 import {
   useRoundInfo,
@@ -479,17 +481,16 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
   if (roundNum < 0) {
     return (
       <PageShell variant="data" backdrop="signature">
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <h1 className="type-display-md mb-4">{t('details.invalid.title')}</h1>
-          <p className="text-muted-foreground mb-6">{t('details.invalid.help')}</p>
-          <Link
-            href="/allocation"
-            className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
-          >
-            <ChevronLeft className="h-4 w-4" />
-            {t('details.invalid.back')}
-          </Link>
-        </div>
+        <PageHeader
+          section="records"
+          breadcrumbs={[{ label: t('details.breadcrumbs.recipients'), href: '/allocation' }]}
+          title={t('details.invalid.title')}
+          subtitle={t('details.invalid.help')}
+        />
+        <Link href="/allocation" className="link inline-flex items-center gap-2 type-body-sm">
+          <ChevronLeft aria-hidden className="h-4 w-4" />
+          {t('details.invalid.back')}
+        </Link>
       </PageShell>
     );
   }
@@ -516,19 +517,16 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
   if (!allocationInfo) {
     return (
       <PageShell variant="data" backdrop="signature">
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <h1 className="type-display-md mb-4">{t('details.notFound.title')}</h1>
-          <p className="text-muted-foreground mb-6">
-            {t('details.notFound.help', { cycle: roundNum })}
-          </p>
-          <Link
-            href="/allocation"
-            className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
-          >
-            <ChevronLeft className="h-4 w-4" />
-            {t('details.notFound.back')}
-          </Link>
-        </div>
+        <PageHeader
+          section="records"
+          breadcrumbs={[{ label: t('details.breadcrumbs.recipients'), href: '/allocation' }]}
+          title={t('details.notFound.title')}
+          subtitle={t('details.notFound.help', { cycle: roundNum })}
+        />
+        <Link href="/allocation" className="link inline-flex items-center gap-2 type-body-sm">
+          <ChevronLeft aria-hidden className="h-4 w-4" />
+          {t('details.notFound.back')}
+        </Link>
       </PageShell>
     );
   }
@@ -551,13 +549,8 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
     }),
   }));
 
+  // The Signature Allocation ETH is the header's figure; the statistics grid does not repeat it.
   const stats = [
-    {
-      icon: <Trophy className="h-3.5 w-3.5" />,
-      label: t('details.statistics.cards.signatureEth.label'),
-      value: `${formatFixed(allocationInfo.AmountEth, 4)} ETH`,
-      tooltip: t('details.statistics.cards.signatureEth.tooltip'),
-    },
     {
       icon: <Heart className="h-3.5 w-3.5" />,
       label: t('details.statistics.cards.publicGoods.label'),
@@ -612,111 +605,87 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
 
   return (
     <PageShell variant="data" backdrop="signature">
-      {/* Breadcrumbs */}
-      <nav className="mb-6 flex items-center gap-1.5 text-sm text-muted-foreground">
-        <Link
-          href="/allocation"
-          className={cn('hover:text-primary transition-colors', TOUCH_TARGET_TEXT_LINK_CLASS)}
-        >
-          {t('details.breadcrumbs.recipients')}
-        </Link>
-        <ChevronRight className="h-3.5 w-3.5" />
-        <span className="text-foreground">{t('formats.cycle', { cycle: roundNum })}</span>
-      </nav>
-
-      {/* Hero Banner */}
-      <motion.section
-        initial="hidden"
-        animate="visible"
-        variants={sectionFade}
-        className="mb-12"
-        aria-label={t('details.hero.aria')}
-      >
-        <div className="relative border-b border-border pb-10">
-          <div className="relative flex flex-col gap-6">
-            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
-              <div className="space-y-4 min-w-0 flex-1">
-                <h1 className="type-display-lg text-foreground">
-                  {t('formats.cycleHash', { cycle: roundNum })}
-                </h1>
-
-                <div className="flex items-baseline gap-2 flex-wrap">
-                  <p
-                    className="font-display text-3xl font-medium tracking-tight tabular-nums text-primary md:text-5xl"
-                    data-testid="hero-allocation-amount"
-                  >
-                    {formatFixed(allocationInfo.AmountEth, 4)} ETH
-                  </p>
-                  <InfoTooltip content={t('details.hero.amountTooltip')} iconClassName="h-4 w-4" />
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground/60">
-                      {t('details.hero.recipient')}
-                    </span>
-                    <CopyableAddress
-                      address={allocationInfo.WinnerAddr}
-                      href={`/user/${allocationInfo.WinnerAddr}`}
-                    />
-                  </div>
-
-                  {allocationInfo.TokenId > 0 && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground/60">
-                        {t('details.hero.nft')}
-                      </span>
+      {/* The cycle's header: one H1, the trail to the recipients ledger, the Signature
+          Allocation, its recipient and NFT as figures, and the finalization record. */}
+      <section aria-label={t('details.hero.aria')}>
+        <PageHeader
+          section="records"
+          breadcrumbs={[{ label: t('details.breadcrumbs.recipients'), href: '/allocation' }]}
+          title={t('formats.cycleHash', { cycle: roundNum })}
+          titleId="cycle-heading"
+          actions={
+            <>
+              <button
+                onClick={handleShareRound}
+                className={cn(
+                  'inline-flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-sm text-muted-foreground hover:text-white hover:border-white/[0.15] transition-all',
+                  TOUCH_TARGET_ICON_CLASS,
+                )}
+                aria-label={t('details.hero.shareAria')}
+                data-testid="share-round-button"
+              >
+                <Share2 className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">{t('details.hero.share')}</span>
+              </button>
+              <RoundNavigation roundNum={roundNum} maxRound={maxRound} />
+            </>
+          }
+          figures={[
+            {
+              id: 'signatureEth',
+              label: t('details.statistics.cards.signatureEth.label'),
+              value: (
+                <span data-testid="hero-allocation-amount">
+                  <Amount value={allocationInfo.AmountEth} unit="ETH" />
+                </span>
+              ),
+              info: t('details.hero.amountTooltip'),
+            },
+            {
+              id: 'recipient',
+              label: t('details.hero.recipient'),
+              value: (
+                <CopyableAddress
+                  address={allocationInfo.WinnerAddr}
+                  href={`/user/${allocationInfo.WinnerAddr}`}
+                />
+              ),
+            },
+            ...(allocationInfo.TokenId > 0
+              ? [
+                  {
+                    id: 'nft',
+                    label: t('details.hero.nft'),
+                    value: (
                       <Link
                         href={`/detail/${allocationInfo.TokenId}`}
-                        className={cn(
-                          'text-sm text-primary hover:underline',
-                          TOUCH_TARGET_TEXT_LINK_CLASS,
-                        )}
+                        className={cn('link type-body-md', TOUCH_TARGET_TEXT_LINK_CLASS)}
                       >
                         {t('formats.cosmicSignatureToken', { token: allocationInfo.TokenId })}
                       </Link>
-                      <InfoTooltip content={t('details.hero.nftTooltip')} />
-                    </div>
-                  )}
-
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                    <span>
-                      <HydrationSafeDateTime timestamp={allocationInfo.TimeStamp} locale={locale}>
-                        {(dateTime) => t('details.hero.finalized', { dateTime })}
-                      </HydrationSafeDateTime>
-                    </span>
-                    <span className="text-white/10">|</span>
-                    <a
-                      href={getExplorerUrl('tx', allocationInfo.TxHash)}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1 hover:text-primary transition-colors"
-                    >
-                      {t('details.hero.viewTransaction')} <ExternalLink className="h-3 w-3" />
-                    </a>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2 shrink-0">
-                <button
-                  onClick={handleShareRound}
-                  className={cn(
-                    'inline-flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-sm text-muted-foreground hover:text-white hover:border-white/[0.15] transition-all',
-                    TOUCH_TARGET_ICON_CLASS,
-                  )}
-                  aria-label={t('details.hero.shareAria')}
-                  data-testid="share-round-button"
-                >
-                  <Share2 className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">{t('details.hero.share')}</span>
-                </button>
-                <RoundNavigation roundNum={roundNum} maxRound={maxRound} />
-              </div>
-            </div>
-          </div>
-        </div>
-      </motion.section>
+                    ),
+                    info: t('details.hero.nftTooltip'),
+                  },
+                ]
+              : []),
+          ]}
+          meta={
+            <>
+              <HydrationSafeDateTime timestamp={allocationInfo.TimeStamp} locale={locale}>
+                {(dateTime) => t('details.hero.finalized', { dateTime })}
+              </HydrationSafeDateTime>
+              <a
+                href={getExplorerUrl('tx', allocationInfo.TxHash)}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-6 items-center gap-1 transition-colors hover:text-foreground"
+              >
+                {t('details.hero.viewTransaction')} <ExternalLink aria-hidden className="h-3 w-3" />
+              </a>
+            </>
+          }
+        />
+      </section>
 
       {/* Cycle Recipients */}
       <motion.section

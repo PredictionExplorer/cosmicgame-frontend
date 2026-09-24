@@ -241,9 +241,17 @@ describe('AllocationInfoPage', () => {
       expect(breadcrumbLink.closest('a')).toHaveAttribute('href', '/allocation');
     });
 
-    it('renders current round in breadcrumbs', () => {
+    it('builds the trail Home › Records › Allocation Recipients, the H1 naming the cycle', () => {
       renderWithData(3);
-      expect(screen.getByText('allocation.formats.cycle(cycle=3)')).toBeInTheDocument();
+      const trail = screen.getByRole('navigation', { name: 'common.accessibility.breadcrumb' });
+      expect(
+        within(trail)
+          .getAllByRole('link')
+          .map((link) => link.getAttribute('href')),
+      ).toEqual(['/', '/site-map', '/allocation']);
+      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+        'allocation.formats.cycleHash(cycle=3)',
+      );
     });
 
     it('displays large hero allocation amount', () => {
@@ -514,13 +522,14 @@ describe('AllocationInfoPage', () => {
       expect(screen.getByText('allocation.details.statistics.title')).toBeInTheDocument();
     });
 
-    it('renders all 9 stat cards', () => {
+    it('renders the stat cards the header does not already show', () => {
       renderWithData(1);
       const statsSection = screen.getByLabelText('allocation.details.statistics.aria');
-      // Labeled "Signature Allocation ETH" because the stat shows the Final
-      // Gesture recipient's ETH, not the whole Cycle Reserve.
+      // The Signature Allocation ETH is the header's first figure, shown once per page.
+      expect(
+        within(statsSection).queryByText('allocation.details.statistics.cards.signatureEth.label'),
+      ).not.toBeInTheDocument();
       for (const card of [
-        'signatureEth',
         'publicGoods',
         'anchor',
         'stellar',

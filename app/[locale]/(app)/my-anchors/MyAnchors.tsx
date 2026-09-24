@@ -5,7 +5,6 @@ import { Layers, TrendingUp, Gift } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { PageShell } from '@/components/ui/page-shell';
-import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useActiveWeb3React } from '@/hooks/web3';
 import {
@@ -145,16 +144,7 @@ const MyAnchors = () => {
 
   return (
     <PageShell variant="data" backdrop="signature">
-      <PageHeader
-        align="left"
-        eyebrow={
-          <SectionEyebrow tone="aurora" pulse>
-            {t('anchors.eyebrow')}
-          </SectionEyebrow>
-        }
-        title={t('anchors.title')}
-        subtitle={t('anchors.subtitle')}
-      />
+      <PageHeader section="account" title={t('anchors.title')} subtitle={t('anchors.subtitle')} />
 
       {!account ? (
         <WalletRequiredState

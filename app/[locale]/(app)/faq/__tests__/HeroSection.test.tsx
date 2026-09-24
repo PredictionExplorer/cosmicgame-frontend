@@ -57,9 +57,18 @@ describe('HeroSection', () => {
     expect(screen.getByRole('heading', { name: /Cosmic Signature FAQ/i })).toBeInTheDocument();
   });
 
-  it('renders "Knowledge Base" badge', () => {
+  it('names the Help section in the eyebrow, linked to its hub', () => {
     render(<HeroSection {...defaultProps} />);
-    expect(screen.getByText('Knowledge Base')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'common.pageHeader.sections.help' })).toHaveAttribute(
+      'href',
+      '/how-it-works',
+    );
+  });
+
+  it('renders one H1 in the reading size', () => {
+    render(<HeroSection {...defaultProps} />);
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    expect(screen.getByRole('heading', { level: 1 })).toHaveClass('type-display-md');
   });
 
   it('renders the subtitle text', () => {

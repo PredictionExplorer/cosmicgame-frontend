@@ -89,10 +89,10 @@ export default function CstOutreachTransferPage() {
     <PageShell variant="data" backdrop="signature">
       <div className="mx-auto max-w-3xl">
         <PageHeader
+          section="admin"
+          breadcrumbs={[]}
           title={t('outreachTransfer.title')}
           subtitle={t('outreachTransfer.subtitle')}
-          className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
-          align="left"
         />
 
         {!active || !account ? (

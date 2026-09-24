@@ -20,7 +20,7 @@ import { LinkifiedText } from '@/components/ui/linkified-text';
 import { PageShell } from '@/components/ui/page-shell';
 import RandomWalkNFT from '@/components/nft/RandomWalkNFT';
 import NFTImage from '@/components/nft/NFTImage';
-import { useGestureInfo } from '@/hooks/useApiQuery';
+import { useDashboardInfo, useGestureInfo } from '@/hooks/useApiQuery';
 import { cn } from '@/lib/utils';
 import type { GestureInfo } from '@/services/api';
 import { formatFixed } from '@/utils/format';
@@ -87,6 +87,8 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
   const tCommon = useTranslations('common');
   const locale = useLocale();
   const { data: gestureInfo = null, isLoading: loading } = useGestureInfo(gestureId);
+  // Only to tell the live cycle (its page is /current-cycle) from a finalized one.
+  const { data: dashboard } = useDashboardInfo(undefined, { poll: false });
 
   const [tokenURI, setTokenURI] = useState<NFTTokenURI | null>(null);
 
@@ -108,23 +110,32 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
   }
 
   const gesturePosition = gestureInfo?.BidPosition;
-  const gesturePositionLabel =
-    gesturePosition !== undefined && gesturePosition !== null
-      ? t('header.positionLabel', { position: gesturePosition })
-      : t('header.positionFallback');
+  const hasPosition = gesturePosition !== undefined && gesturePosition !== null;
+  // A gesture sits under its cycle: the live one on /current-cycle, a finalized one on
+  // its allocation record.
+  const cycle = gestureInfo?.RoundNum;
+  const cycleCrumb =
+    typeof cycle === 'number' && cycle >= 0
+      ? [
+          {
+            label: t('rows.cycleValue', { round: cycle }),
+            href: dashboard?.CurRoundNum === cycle ? '/current-cycle' : `/allocation/${cycle}`,
+          },
+        ]
+      : [];
 
   return (
     <PageShell variant="detail" backdrop="signature" className="max-sm:pb-16">
       <div className="mx-auto max-w-3xl">
         <PageHeader
-          title={t('header.title')}
-          subtitle={loading ? t('header.loadingSubtitle') : gesturePositionLabel}
-          breadcrumbs={[
-            { label: tCommon('breadcrumbs.home'), href: '/' },
-            { label: gesturePositionLabel },
-          ]}
-          className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
-          align="left"
+          section="records"
+          breadcrumbs={cycleCrumb}
+          title={
+            hasPosition
+              ? t('header.positionLabel', { position: gesturePosition })
+              : t('header.title')
+          }
+          subtitle={loading ? t('header.loadingSubtitle') : undefined}
         />
 
         {loading ? (

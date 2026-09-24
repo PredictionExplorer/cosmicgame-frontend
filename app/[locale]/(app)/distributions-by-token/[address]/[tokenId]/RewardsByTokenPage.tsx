@@ -15,6 +15,7 @@ import {
   detailPanelClass,
 } from '@/components/detail-page/DetailPageChrome';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { useParticipantTrail } from '@/components/layout/participantTrail';
 import { PageShell } from '@/components/ui/page-shell';
 import { Button } from '@/components/ui/button';
 import { useAnchorDistributionsByUserByTokenDetails } from '@/hooks/useApiQuery';
@@ -242,20 +243,16 @@ function RewardsByTokenPage({ address, tokenId }: { address: string; tokenId: nu
   }, [rawResponse]);
 
   const pageTitle = t('distributionsByToken.title', { tokenId });
+  const participantTrail = useParticipantTrail(address);
 
   return (
     <PageShell variant="data" backdrop="signature" className="max-sm:pb-16">
       <div className="mx-auto max-w-5xl">
         <PageHeader
+          section="insights"
+          breadcrumbs={participantTrail}
           title={pageTitle}
           subtitle={t('distributionsByToken.subtitle', { address })}
-          breadcrumbs={[
-            { label: t('distributionsByToken.breadcrumbs.home'), href: '/' },
-            { label: t('distributionsByToken.breadcrumbs.user'), href: `/user/${address}` },
-            { label: t('distributionsByToken.breadcrumbs.token', { tokenId }) },
-          ]}
-          className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
-          align="left"
         />
 
         {loading ? (

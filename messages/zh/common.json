@@ -56,7 +56,10 @@
     "snapshot": "数据快照：{date}",
     "lastReviewed": "最后审阅：{date}",
     "lastUpdated": "最后更新：{date}",
-    "relatedPages": "相关页面"
+    "relatedPages": "相关页面",
+    "crumbs": {
+      "participants": "参与者"
+    }
   },
   "status": {
     "loading": "加载中",
