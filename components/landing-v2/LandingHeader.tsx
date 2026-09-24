@@ -221,7 +221,7 @@ export function LandingHeader({ sections }: LandingHeaderProps) {
               </nav>
               <div className="border-t border-rule-faint px-4 pb-[max(env(safe-area-inset-bottom),0.75rem)] pt-3">
                 <p className="type-eyebrow text-subtle">{t('drawer.preferences')}</p>
-                <PalettePicker className="mt-2 -ml-1.5" />
+                <PalettePicker className="mt-1 -ml-2.5" />
                 <LanguageSwitcher variant="select" className="mt-2 w-full" />
               </div>
             </SheetContent>

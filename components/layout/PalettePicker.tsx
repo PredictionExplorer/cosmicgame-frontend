@@ -35,7 +35,7 @@ export function PalettePicker({ className }: { className?: string }) {
     <div
       role="radiogroup"
       aria-label={t('themeSwitcher.label')}
-      className={cn('flex items-center gap-1.5', className)}
+      className={cn('flex items-center gap-1', className)}
     >
       {SITE_THEMES.map((option, index) => {
         const selected = option === theme;
@@ -55,7 +55,7 @@ export function PalettePicker({ className }: { className?: string }) {
             onClick={() => setSiteTheme(option)}
             onKeyDown={(event) => onKeyDown(event, index)}
             className={cn(
-              'flex size-9 items-center justify-center rounded-control border transition-colors duration-150',
+              'flex size-11 items-center justify-center rounded-control border transition-colors duration-150',
               selected ? 'border-primary bg-primary/10' : 'border-transparent hover:border-input',
             )}
           >
