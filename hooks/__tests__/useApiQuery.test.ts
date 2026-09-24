@@ -1,6 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { useQuery } from '@tanstack/react-query';
 
+import { ApiReadError } from '@/services/api/readError';
 import {
   useDashboardInfo,
   useRoundList,
@@ -268,6 +269,20 @@ describe('useApiQuery hooks', () => {
       jest.clearAllMocks();
       renderHook(() => useRoundInfo(5));
       expect(mockUseQuery.mock.calls[0][0].enabled).toBe(true);
+    });
+
+    it('never retries the answer for a cycle with no record (HTTP 400), and retries failures twice', () => {
+      renderHook(() => useRoundInfo(2));
+      const retry = mockUseQuery.mock.calls[0][0].retry as (
+        count: number,
+        error: unknown,
+      ) => boolean;
+
+      expect(retry(0, new ApiReadError('Network response was not OK', 400))).toBe(false);
+      expect(retry(0, new ApiReadError('Network response was not OK', 502))).toBe(true);
+      expect(retry(0, new Error('Network Error'))).toBe(true);
+      expect(retry(1, new ApiReadError('Network response was not OK', 502))).toBe(true);
+      expect(retry(2, new ApiReadError('Network response was not OK', 502))).toBe(false);
     });
   });
 

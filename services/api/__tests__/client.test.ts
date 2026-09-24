@@ -25,6 +25,7 @@ import {
   pagedPath,
   DEFAULT_API_PAGE_LIMIT,
 } from '@/services/api/client';
+import { ApiReadError, apiErrorStatus, isRecordNotFound } from '@/services/api/readError';
 
 import { reportError } from '../../../utils/errors';
 
@@ -245,6 +246,23 @@ describe('apiCallRequired', () => {
       }),
     ).rejects.toThrow('Network response was not OK');
   });
+
+  it.each([
+    ['400', makeAxios400, 400, true],
+    ['404', makeAxios404, 404, true],
+    ['500', makeAxios500, 500, false],
+    ['a network failure', makeAxiosNoResponse, undefined, false],
+  ])(
+    'keeps the HTTP status of %s on the rejection, so a page can tell a missing record from a failure',
+    async (_label, makeError, status, notFound) => {
+      const rejection = await apiCallRequired(async () => {
+        throw makeError();
+      }).catch((error: unknown) => error);
+      expect(rejection).toBeInstanceOf(ApiReadError);
+      expect(apiErrorStatus(rejection)).toBe(status);
+      expect(isRecordNotFound(rejection)).toBe(notFound);
+    },
+  );
 
   it('keeps a schema mismatch message intact so the field path survives', async () => {
     const mismatch = new Error('schemaMismatch:DashboardInfo — CurRoundNum: expected number');

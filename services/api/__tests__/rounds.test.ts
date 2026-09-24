@@ -21,6 +21,7 @@ import {
   get_bid_eth_price,
   get_time_until_prize,
 } from '@/services/api/rounds';
+import { isRecordNotFound } from '@/services/api/readError';
 
 jest.mock('axios', () => {
   const actual = jest.requireActual<typeof import('axios')>('axios');
@@ -343,9 +344,12 @@ describe('rounds API', () => {
       );
     });
 
-    it('propagates a 400 instead of resolving to null', async () => {
+    it('propagates a 400 instead of resolving to null, as a missing record', async () => {
       mockedAxios.get.mockRejectedValue(make400());
-      await expect(get_round_info(1)).rejects.toThrow('Network response was not OK');
+      const rejection = await get_round_info(1).catch((error: unknown) => error);
+      expect((rejection as Error).message).toBe('Network response was not OK');
+      // The live cycle answers 400 "record not found": pages show "no record", not an error.
+      expect(isRecordNotFound(rejection)).toBe(true);
     });
 
     it('throws on network error', async () => {

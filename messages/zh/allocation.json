@@ -35,10 +35,6 @@
       "title": "周期编号无效",
       "help": "周期编号必须为正整数。"
     },
-    "notFound": {
-      "title": "未找到分配数据",
-      "help": "暂无第 {cycle} 个周期的数据。该周期可能尚未收官。"
-    },
     "error": {
       "title": "无法加载该周期",
       "message": "第 {cycle} 个周期的数据加载失败。请重试，或返回名录。"
@@ -137,6 +133,21 @@
       }
     }
   },
+  "missingCycle": {
+    "open": {
+      "title": "第 {cycle} 个周期仍在进行",
+      "body": "该周期收官后，其分配记录会显示在这里。"
+    },
+    "notStarted": {
+      "title": "第 {cycle} 个周期尚未开始",
+      "body": "周期逐一进行，当前进行中的是第 {live} 个周期。"
+    },
+    "unknown": {
+      "title": "暂无第 {cycle} 个周期的记录",
+      "body": "该周期可能仍在进行，或其记录仍在索引中。"
+    },
+    "currentCycle": "查看当前周期"
+  },
   "finalized": {
     "title": "周期已收官",
     "index": {
@@ -148,9 +159,7 @@
     },
     "pending": {
       "successTitle": "第 {cycle} 个周期已收官",
-      "successBody": "你的收官已上链。记录索引完成后会显示在这里，本页会自动更新。",
-      "defaultTitle": "暂无第 {cycle} 个周期的记录",
-      "defaultBody": "该周期可能仍在进行，或其记录仍在索引中。"
+      "successBody": "你的收官已上链。记录索引完成后会显示在这里，本页会自动更新。"
     },
     "links": {
       "viewCycle": "查看第 {cycle} 个周期",

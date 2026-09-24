@@ -1,3 +1,7 @@
+import userEvent from '@testing-library/user-event';
+
+import { ApiReadError } from '@/services/api/readError';
+
 import { act, checkA11y, render, screen, waitFor, within } from '@/test-utils';
 
 import AllocationFinalizedPage from '../AllocationFinalizedPage';
@@ -65,6 +69,17 @@ const ALLOCATION = {
 
 function roundInfo(data: unknown, isLoading = false) {
   mockUseRoundInfo.mockReturnValue({ data, isLoading, refetch: mockRefetch });
+}
+
+/** A failed read: `status` 400 is the API's "record not found" for a cycle it does not hold. */
+function roundInfoFails(status?: number) {
+  mockUseRoundInfo.mockReturnValue({
+    data: undefined,
+    isLoading: false,
+    isError: true,
+    error: new ApiReadError('Network response was not OK', status),
+    refetch: mockRefetch,
+  });
 }
 
 beforeEach(() => {
@@ -143,25 +158,44 @@ describe('AllocationFinalizedPage', () => {
     expect(screen.queryByRole('heading', { name: 'allocation.finalized.next.title' })).toBeNull();
   });
 
-  it('says there is no record yet, and links the cycle, when the indexer has none', () => {
-    roundInfo(null);
+  it('says a cycle the API holds no record of is still open, and links the current cycle', () => {
+    // Cycles 0–4 are finalized: Cycle 5 is the one open now.
+    mockUseRoundList.mockReturnValue({
+      data: [0, 1, 2, 3, 4].map((RoundNum) => ({ RoundNum })),
+      isLoading: false,
+    });
+    roundInfoFails(400);
     render(<AllocationFinalizedPage />);
     expect(
       screen.getByRole('heading', {
         level: 1,
-        name: 'allocation.finalized.pending.defaultTitle(cycle=5)',
+        name: 'allocation.missingCycle.open.title(cycle=5)',
       }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole('link', { name: 'allocation.finalized.links.viewCycle(cycle=5)' }),
-    ).toHaveAttribute('href', '/allocation/5');
+    expect(screen.getByTestId('current-cycle-link')).toHaveAttribute('href', '/current-cycle');
+    expect(screen.queryByText('allocation.details.error.title')).not.toBeInTheDocument();
+  });
+
+  it('shows a failed read as an error with a retry, never as a missing record', async () => {
+    roundInfoFails(503);
+    render(<AllocationFinalizedPage />);
+    expect(screen.getByText('allocation.details.error.title')).toBeInTheDocument();
+    expect(screen.queryByText(/missingCycle/)).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: /try again/i }));
+    expect(mockRefetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows a network failure as an error too', () => {
+    roundInfoFails(undefined);
+    render(<AllocationFinalizedPage />);
+    expect(screen.getByText('allocation.details.error.title')).toBeInTheDocument();
   });
 
   it('keeps asking for the record after a finalization until the indexer has it', () => {
     jest.useFakeTimers();
     try {
       mockSearchParams = new URLSearchParams('cycle=0&message=success');
-      roundInfo(null);
+      roundInfoFails(400);
       render(<AllocationFinalizedPage />);
       expect(
         screen.getByRole('heading', {

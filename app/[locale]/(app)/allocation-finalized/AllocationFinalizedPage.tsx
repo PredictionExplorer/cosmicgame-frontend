@@ -14,11 +14,13 @@ import { Amount } from '@/components/ui/amount';
 import { PendingPlate, WallLabel } from '@/components/ui/art-frame';
 import { buttonVariants } from '@/components/ui/button';
 import { DateTime } from '@/components/ui/date-time';
+import { ErrorState } from '@/components/ui/error-state';
 import { PageShell } from '@/components/ui/page-shell';
 import { SectionHeader } from '@/components/ui/section-header';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TxExplorerLink } from '@/components/ui/tx-status';
 import { isRenderPending, signatureMedia, signatureSources } from '@/components/nft/signatureArt';
+import { useMissingCycle } from '@/components/winnings/missingCycle';
 import { SignatureCard } from '@/components/winnings/SignatureCard';
 import { SignatureReveal } from '@/components/winnings/SignatureReveal';
 import { SpecList, SpecRow } from '@/components/winnings/SpecList';
@@ -27,6 +29,7 @@ import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import { useCSTInfo, useRoundInfo, useRoundList } from '@/hooks/useApiQuery';
 import { useNow } from '@/hooks/useNow';
 import { useActiveWeb3React } from '@/hooks/web3';
+import { isRecordNotFound } from '@/services/api/readError';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import { sameAddress } from '@/utils/format';
 import { formatId } from '@/utils/format/ids';
@@ -69,7 +72,12 @@ const AllocationFinalizedPage = ({ seoSummary }: { seoSummary?: ReactNode }) => 
   const cycle = cycleParam(searchParams.get('cycle'));
   const isClaimSuccess = searchParams.get('message') === 'success';
 
-  const { data: allocationInfo, isLoading, refetch } = useRoundInfo(cycle ?? -1);
+  const { data: allocationInfo, isLoading, isError, error, refetch } = useRoundInfo(cycle ?? -1);
+  const missingCycle = useMissingCycle(cycle ?? 0);
+  // The API answers 400 for a cycle it holds no record of: not indexed yet, still open, or not
+  // started. Anything else that fails is a failed read, with a retry.
+  const missing =
+    (isError && isRecordNotFound(error)) || (!isLoading && !isError && !allocationInfo);
 
   /**
    * After `claimMainPrize`, the chain is on the next cycle; `roundActivationTime()` is when
@@ -109,7 +117,7 @@ const AllocationFinalizedPage = ({ seoSummary }: { seoSummary?: ReactNode }) => 
 
   // A participant who just finalized arrives before the indexer: keep asking until it has
   // the cycle, so the record (and its Signature) appears without a reload.
-  const waitingForRecord = isClaimSuccess && cycle !== null && !isLoading && !allocationInfo;
+  const waitingForRecord = isClaimSuccess && cycle !== null && missing;
   useEffect(() => {
     if (!waitingForRecord) return;
     const id = window.setInterval(() => void refetch(), RECORD_POLL_MS);
@@ -149,30 +157,53 @@ const AllocationFinalizedPage = ({ seoSummary }: { seoSummary?: ReactNode }) => 
     );
   }
 
-  if (!allocationInfo) {
+  if (isError && !missing) {
     return (
       <PageShell variant="data" backdrop="signature">
         <PageHeader
           section="records"
           breadcrumbs={trail}
-          title={
-            isClaimSuccess
-              ? t('finalized.pending.successTitle', { cycle })
-              : t('finalized.pending.defaultTitle', { cycle })
-          }
-          subtitle={
-            isClaimSuccess ? t('finalized.pending.successBody') : t('finalized.pending.defaultBody')
-          }
-          related={[
-            { href: `/allocation/${cycle}`, label: t('finalized.links.viewCycle', { cycle }) },
-            ...(isClaimSuccess
-              ? [{ href: '/my-allocations', label: t('finalized.links.myAllocations') }]
-              : [{ href: '/allocation', label: t('finalized.links.allRecipients') }]),
-          ]}
+          title={t('finalized.result.title', { cycle })}
         />
-        {isClaimSuccess ? (
+        <ErrorState
+          headingLevel={2}
+          title={t('details.error.title')}
+          message={t('details.error.message', { cycle })}
+          onRetry={() => void refetch()}
+        />
+      </PageShell>
+    );
+  }
+
+  if (!allocationInfo) {
+    // Arriving from their own finalization, the participant waits for the indexer here.
+    if (isClaimSuccess) {
+      return (
+        <PageShell variant="data" backdrop="signature">
+          <PageHeader
+            section="records"
+            breadcrumbs={trail}
+            title={t('finalized.pending.successTitle', { cycle })}
+            subtitle={t('finalized.pending.successBody')}
+            related={[
+              { href: `/allocation/${cycle}`, label: t('finalized.links.viewCycle', { cycle }) },
+              { href: '/my-allocations', label: t('finalized.links.myAllocations') },
+            ]}
+          />
           <FinalizedSignatureSkeleton label={t('finalized.loading.status')} />
-        ) : null}
+        </PageShell>
+      );
+    }
+    return (
+      <PageShell variant="data" backdrop="signature">
+        <PageHeader
+          section="records"
+          breadcrumbs={trail}
+          title={missingCycle.title}
+          subtitle={missingCycle.body}
+          actions={missingCycle.currentCycleLink}
+          related={[{ href: '/allocation', label: t('finalized.links.allRecipients') }]}
+        />
       </PageShell>
     );
   }

@@ -44,6 +44,7 @@ import {
   AllocationSplitBar,
   type AllocationSplitSegment,
 } from '@/components/winnings/AllocationSplitBar';
+import { useMissingCycle } from '@/components/winnings/missingCycle';
 import { SignatureCard } from '@/components/winnings/SignatureCard';
 import { useSignatureIndex } from '@/components/winnings/useSignatureIndex';
 import {
@@ -56,6 +57,7 @@ import {
 } from '@/hooks/useApiQuery';
 import { useClipboard } from '@/hooks/useClipboard';
 import { useFormat } from '@/hooks/useFormat';
+import { isRecordNotFound } from '@/services/api/readError';
 import type { RoundInfo } from '@/services/api/types';
 import { countRecipients, STELLAR_SELECTION_RECORD_TYPES } from '@/utils/allocationRecords';
 import { toFiniteNumber } from '@/utils/finiteNumber';
@@ -223,8 +225,10 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
     data: allocationInfo,
     isLoading: loadingRound,
     isError: roundFailed,
+    error: roundError,
     refetch: refetchRound,
   } = useRoundInfo(roundNum);
+  const missingCycle = useMissingCycle(roundNum);
   const { data: gestureHistory = [], isLoading: loadingGestures } = useGestureListByCycle(
     roundNum,
     'desc',
@@ -280,18 +284,45 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
   const breadcrumbs = [{ label: t('details.breadcrumbs.recipients'), href: '/allocation' }];
   const title = t('formats.cycleHash', { cycle: roundNum });
 
-  if (roundNum < 0 || (!loadingRound && !roundFailed && !allocationInfo)) {
-    const invalid = roundNum < 0;
+  const recipientsLink = [{ href: '/allocation', label: t('details.breadcrumbs.recipients') }];
+
+  if (roundNum < 0) {
     return (
       <PageShell variant="data" backdrop="signature">
         <PageHeader
           section="records"
           breadcrumbs={breadcrumbs}
-          title={invalid ? t('details.invalid.title') : t('details.notFound.title')}
-          subtitle={
-            invalid ? t('details.invalid.help') : t('details.notFound.help', { cycle: roundNum })
+          title={t('details.invalid.title')}
+          subtitle={t('details.invalid.help')}
+          related={recipientsLink}
+        />
+      </PageShell>
+    );
+  }
+
+  // The API answers 400 for a cycle it holds no record of (the live cycle, one not started):
+  // a final answer, not a failure to retry.
+  const missing =
+    (roundFailed && isRecordNotFound(roundError)) ||
+    (!loadingRound && !roundFailed && !allocationInfo);
+  if (missing) {
+    return (
+      <PageShell variant="data" backdrop="signature">
+        <PageHeader
+          section="records"
+          breadcrumbs={breadcrumbs}
+          title={missingCycle.title}
+          subtitle={missingCycle.body}
+          actions={
+            <>
+              {missingCycle.currentCycleLink}
+              {missingCycle.state === 'unknown' || roundList.length === 0 ? null : (
+                // From a cycle not finalized yet, "previous" is the newest finalized one.
+                <CycleNavigation cycle={lastCycle + 1} lastCycle={lastCycle} />
+              )}
+            </>
           }
-          related={[{ href: '/allocation', label: t('details.breadcrumbs.recipients') }]}
+          related={recipientsLink}
         />
       </PageShell>
     );

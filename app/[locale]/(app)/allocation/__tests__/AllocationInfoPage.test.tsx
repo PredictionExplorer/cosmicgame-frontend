@@ -1,5 +1,7 @@
 import userEvent from '@testing-library/user-event';
 
+import { ApiReadError } from '@/services/api/readError';
+
 import { checkA11y, render, screen, within } from '@/test-utils';
 
 import AllocationInfoPage from '../[id]/AllocationInfoPage';
@@ -171,13 +173,67 @@ describe('AllocationInfoPage', () => {
       ).toHaveAttribute('href', '/allocation');
     });
 
-    it('says when a cycle has no record yet', () => {
-      mockUseRoundInfo.mockReturnValue({ data: null, isLoading: false });
+    /** What the API answers for a cycle it holds no record of: HTTP 400 "record not found". */
+    function answerNoRecord() {
+      const refetch = jest.fn();
+      mockUseRoundInfo.mockReturnValue({
+        data: undefined,
+        isLoading: false,
+        isError: true,
+        error: new ApiReadError('Network response was not OK', 400),
+        refetch,
+      });
+      return refetch;
+    }
+
+    it('shows the live cycle as still open, with the way to follow it, not as an error', () => {
+      answerNoRecord();
+      // Cycles 0–3 are finalized, so Cycle 4 is the one open now.
+      render(<AllocationInfoPage roundNum={4} />);
+      expect(
+        screen.getByRole('heading', {
+          level: 1,
+          name: 'allocation.missingCycle.open.title(cycle=4)',
+        }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('link', { name: 'allocation.missingCycle.currentCycle' }),
+      ).toHaveAttribute('href', '/current-cycle');
+      expect(
+        screen.getByRole('link', {
+          name: 'allocation.details.navigation.previousAria, allocation.formats.cycle(cycle=3)',
+        }),
+      ).toHaveAttribute('href', '/allocation/3');
+      expect(screen.queryByText('allocation.details.error.title')).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /try again/i })).not.toBeInTheDocument();
+    });
+
+    it('says a cycle beyond the live one has not started, naming the live one', () => {
+      answerNoRecord();
       render(<AllocationInfoPage roundNum={99} />);
       expect(
-        screen.getByRole('heading', { level: 1, name: 'allocation.details.notFound.title' }),
+        screen.getByRole('heading', {
+          level: 1,
+          name: 'allocation.missingCycle.notStarted.title(cycle=99)',
+        }),
       ).toBeInTheDocument();
-      expect(screen.getByText('allocation.details.notFound.help(cycle=99)')).toBeInTheDocument();
+      expect(
+        screen.getByText('allocation.missingCycle.notStarted.body(cycle=99,live=4)'),
+      ).toBeInTheDocument();
+      expect(screen.getByTestId('current-cycle-link')).toHaveAttribute('href', '/current-cycle');
+    });
+
+    it('says only that there is no record yet while the cycle list is unknown', () => {
+      answerNoRecord();
+      mockUseRoundList.mockReturnValue({ data: undefined, isLoading: true });
+      render(<AllocationInfoPage roundNum={7} />);
+      expect(
+        screen.getByRole('heading', {
+          level: 1,
+          name: 'allocation.missingCycle.unknown.title(cycle=7)',
+        }),
+      ).toBeInTheDocument();
+      expect(screen.getByTestId('current-cycle-link')).toBeInTheDocument();
     });
 
     it('tells a failed read from a missing cycle and retries it', async () => {
@@ -186,13 +242,26 @@ describe('AllocationInfoPage', () => {
         data: undefined,
         isLoading: false,
         isError: true,
+        error: new ApiReadError('Network response was not OK', 502),
         refetch,
       });
       render(<AllocationInfoPage roundNum={1} />);
       expect(screen.getByText('allocation.details.error.title')).toBeInTheDocument();
-      expect(screen.queryByText('allocation.details.notFound.title')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('current-cycle-link')).not.toBeInTheDocument();
       await userEvent.click(screen.getByRole('button', { name: /try again/i }));
       expect(refetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('treats a network failure (no status) as a failed read', () => {
+      mockUseRoundInfo.mockReturnValue({
+        data: undefined,
+        isLoading: false,
+        isError: true,
+        error: new ApiReadError('Network response was not OK'),
+        refetch: jest.fn(),
+      });
+      render(<AllocationInfoPage roundNum={1} />);
+      expect(screen.getByText('allocation.details.error.title')).toBeInTheDocument();
     });
   });
 

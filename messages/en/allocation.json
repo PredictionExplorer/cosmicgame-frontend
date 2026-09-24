@@ -35,10 +35,6 @@
       "title": "Invalid cycle number",
       "help": "The cycle number must be a positive integer."
     },
-    "notFound": {
-      "title": "Allocation data not found",
-      "help": "No data available for Cycle #{cycle}. The cycle may not have finalized yet."
-    },
     "error": {
       "title": "Couldn't load this cycle",
       "message": "Cycle #{cycle} data failed to load. Try again, or go back to the recipients list."
@@ -137,6 +133,21 @@
       }
     }
   },
+  "missingCycle": {
+    "open": {
+      "title": "Cycle {cycle} is still open",
+      "body": "Its allocation record appears here once the cycle is finalized."
+    },
+    "notStarted": {
+      "title": "Cycle {cycle} hasn't started",
+      "body": "Cycles run one at a time, and Cycle {live} is the one open now."
+    },
+    "unknown": {
+      "title": "No record of Cycle {cycle} yet",
+      "body": "The cycle may still be open, or its record is still being indexed."
+    },
+    "currentCycle": "Follow the current cycle"
+  },
   "finalized": {
     "title": "Allocation finalized",
     "index": {
@@ -148,9 +159,7 @@
     },
     "pending": {
       "successTitle": "Cycle {cycle} is finalized",
-      "successBody": "Your finalization is on-chain. Its record appears here as soon as it is indexed; this page updates by itself.",
-      "defaultTitle": "No record of Cycle {cycle} yet",
-      "defaultBody": "The cycle may still be open, or its record is still being indexed."
+      "successBody": "Your finalization is on-chain. Its record appears here as soon as it is indexed; this page updates by itself."
     },
     "links": {
       "viewCycle": "View Cycle {cycle}",

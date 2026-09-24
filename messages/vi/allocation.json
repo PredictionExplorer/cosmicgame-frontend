@@ -35,10 +35,6 @@
       "title": "Số chu kỳ không hợp lệ",
       "help": "Số chu kỳ phải là một số nguyên dương."
     },
-    "notFound": {
-      "title": "Không tìm thấy dữ liệu phân bổ",
-      "help": "Không có dữ liệu cho chu kỳ #{cycle}. Chu kỳ này có thể chưa hoàn tất."
-    },
     "error": {
       "title": "Không tải được chu kỳ này",
       "message": "Không tải được dữ liệu chu kỳ #{cycle}. Hãy thử lại, hoặc quay về danh sách người nhận."
@@ -137,6 +133,21 @@
       }
     }
   },
+  "missingCycle": {
+    "open": {
+      "title": "Chu kỳ {cycle} vẫn đang diễn ra",
+      "body": "Bản ghi phân bổ của chu kỳ sẽ xuất hiện ở đây sau khi chu kỳ hoàn tất."
+    },
+    "notStarted": {
+      "title": "Chu kỳ {cycle} chưa bắt đầu",
+      "body": "Các chu kỳ diễn ra lần lượt, và chu kỳ đang mở hiện nay là chu kỳ {live}."
+    },
+    "unknown": {
+      "title": "Chưa có bản ghi của chu kỳ {cycle}",
+      "body": "Chu kỳ có thể vẫn đang diễn ra, hoặc bản ghi vẫn đang được lập chỉ mục."
+    },
+    "currentCycle": "Theo dõi chu kỳ hiện tại"
+  },
   "finalized": {
     "title": "Phân bổ đã hoàn tất",
     "index": {
@@ -148,9 +159,7 @@
     },
     "pending": {
       "successTitle": "Chu kỳ {cycle} đã hoàn tất",
-      "successBody": "Việc hoàn tất đã được ghi trên chuỗi. Bản ghi sẽ hiện ở đây ngay khi được lập chỉ mục; trang này tự cập nhật.",
-      "defaultTitle": "Chưa có bản ghi của chu kỳ {cycle}",
-      "defaultBody": "Chu kỳ có thể vẫn đang diễn ra, hoặc bản ghi vẫn đang được lập chỉ mục."
+      "successBody": "Việc hoàn tất đã được ghi trên chuỗi. Bản ghi sẽ hiện ở đây ngay khi được lập chỉ mục; trang này tự cập nhật."
     },
     "links": {
       "viewCycle": "Xem chu kỳ {cycle}",
