@@ -32,8 +32,10 @@ function cycleOrNotFound(round: string): number {
  * The API has no per-cycle count of makers, so this reads the cycle's
  * gesture list, which the chart then reads again in the browser. Seeding the
  * chart's query instead would inline the whole list in the HTML (about 1 MB
- * of JSON for cycle 1); the count is one number, and the render that reads
- * it is cached for `revalidate`.
+ * of JSON for cycle 1) to save one read; the count is one number. The route
+ * renders per request: caching it (ISR, an empty `generateStaticParams`)
+ * turns the embed's 404 into a 500, since the 404's metadata reads the
+ * locale from the request headers.
  */
 async function readLeadLaneCount(cycle: number): Promise<number | undefined> {
   try {
