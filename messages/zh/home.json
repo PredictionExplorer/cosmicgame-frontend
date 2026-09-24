@@ -690,7 +690,7 @@
   "rwlkGrid": {
     "searchPlaceholder": "输入 NFT ID",
     "searchAria": "按 ID 查找 RandomWalk NFT",
-    "tokenAria": "RandomWalk NFT {id}",
+    "tokenAria": "RandomWalk NFT 编号 {id}",
     "empty": "未找到匹配的 NFT"
   },
   "orientation": {
