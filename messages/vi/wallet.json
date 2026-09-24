@@ -1,6 +1,7 @@
 {
   "connect": {
     "button": "Kết nối ví",
+    "buttonShort": "Kết nối",
     "opening": "Đang mở danh sách ví…",
     "restoring": "Đang khôi phục kết nối ví…",
     "disclaimer": "Khi kết nối ví, bạn đồng ý với <terms>Điều khoản sử dụng</terms> và xác nhận đã đọc <risk>Công bố rủi ro</risk>. Nét bút diễn ra trên {network} và cần ETH trên mạng đó cho chi phí nét bút và phí mạng."
@@ -12,27 +13,22 @@
   "balances": {
     "eth": "ETH",
     "cst": "CST",
-    "cosmicNfts": "COSMIC NFT",
-    "rwlkNfts": "RWLK NFT",
+    "cosmicNfts": "Cosmic Signature NFT",
+    "rwlkNfts": "RandomWalk NFT",
     "anchoredCst": "Cosmic Signature NFT đang neo giữ",
-    "anchoredRwlk": "RWLK NFT đang neo giữ"
+    "anchoredRwlk": "RandomWalk NFT đang neo giữ"
   },
   "labels": {
-    "loading": "Đang tải…",
-    "balancesHeading": "Số dư",
-    "anchoredHeading": "Đang neo giữ",
-    "nftCount": "{count}"
+    "balancesHeading": "Số dư"
   },
   "account": {
     "heading": "Tài khoản",
-    "myDashboard": "Bảng điều khiển của tôi",
-    "myRewards": "Phân bổ của tôi",
-    "myNfts": "NFT của tôi",
-    "transferCst": "Chuyển CST",
+    "menuLabel": "Menu tài khoản {address}",
+    "menuLabelWithAlert": "Menu tài khoản {address}, có phân bổ đang chờ nhận về",
+    "retrieveReady": "Sẵn sàng nhận về",
+    "retrieveAmount": "{amount} sẵn sàng nhận về",
     "addCstToMetaMask": "Thêm CST vào MetaMask",
     "addingCstToMetaMask": "Đang thêm CST vào MetaMask…",
-    "myAnchors": "Neo giữ của tôi",
-    "winningHistory": "Lịch sử nhận phân bổ",
     "viewOnExplorer": "Xem trên {explorer}",
     "switchWallet": "Đổi ví",
     "disconnect": "Ngắt kết nối"

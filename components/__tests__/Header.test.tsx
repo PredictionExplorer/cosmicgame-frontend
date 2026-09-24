@@ -3,17 +3,17 @@ import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 
 import Header from '@/components/layout/Header';
-import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
-import { CHAOS_ZERO_PREDICTIONS_URL } from '@/config/predictions';
-import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
+import { OUTBOUND_LINKS } from '@/config/siteNav';
+import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
 
-import { render, screen, checkA11y, within, act, waitFor } from '@/test-utils';
+import { render, screen, checkA11y, within, waitFor } from '@/test-utils';
 
 jest.mock('@rainbow-me/rainbowkit');
 jest.mock('wagmi');
 jest.mock('viem');
 
 let mockAccount: string | null = null;
+let mockClaims = { ETHRaffleToClaim: 0, NumDonatedNFTToClaim: 0 };
 const mockAddCst = jest.fn();
 const mockPathname = jest.spyOn(jest.requireMock('next/navigation'), 'usePathname');
 
@@ -38,11 +38,9 @@ jest.mock('../../hooks/useMetaMaskWatchAsset', () => ({
 jest.mock('../../contexts/ApiDataContext', () => ({
   useApiData: () => ({
     apiData: {
-      ETHRaffleToClaim: 0,
-      ETHRaffleToClaimWei: 0,
-      NumDonatedNFTToClaim: 0,
+      ...mockClaims,
       UnretrievedAnchorDistribution: 0,
-      releasableActionIds: [],
+      claimableActionIds: [],
     },
     setApiData: jest.fn(),
     fetchData: jest.fn(),
@@ -58,144 +56,164 @@ jest.mock('../../contexts/SystemModeContext', () => ({
   useSystemMode: () => ({ data: 0, fetchData: jest.fn() }),
 }));
 
-jest.mock('../../hooks/useRWLKNFTContract', () => ({
+jest.mock('../../hooks/useRWLKNFTContract', () => ({ __esModule: true, default: () => null }));
+jest.mock('../../hooks/useCosmicSignatureContract', () => ({
   __esModule: true,
   default: () => null,
 }));
 
 jest.mock('../../services/api', () => ({
   __esModule: true,
-  default: {
-    get_user_balance: jest.fn(),
-    get_user_info: jest.fn(),
-  },
+  default: { get_user_balance: jest.fn(), get_user_info: jest.fn() },
 }));
-
-const setViewportWidth = (value: number) => {
-  Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value });
-};
 
 beforeEach(() => {
   jest.clearAllMocks();
   mockAccount = null;
+  mockClaims = { ETHRaffleToClaim: 0, NumDonatedNFTToClaim: 0 };
   mockPathname.mockReturnValue('/');
-  setViewportWidth(1440);
 });
 
-describe('Header (desktop)', () => {
-  it('renders the logo linked to home', () => {
-    render(<Header />);
-    const logo = screen
-      .getByRole('link', { name: 'nav.brand.homeLabel' })
-      .querySelector('[data-brand-mark]');
-    expect(logo).toBeInTheDocument();
-    expect(logo).toHaveAttribute('aria-hidden', 'true');
-    expect(screen.getByRole('link', { name: 'nav.brand.homeLabel' })).toHaveAttribute('href', '/');
-  });
+const primaryNav = () => screen.getByRole('navigation', { name: 'nav.primaryLabel' });
 
-  it('renders the brand wordmark next to the logo', () => {
+describe('Header', () => {
+  it('links the wordmark lockup home', () => {
     render(<Header />);
     const home = screen.getByRole('link', { name: 'nav.brand.homeLabel' });
-    expect(within(home).getByText('Cosmic Signature')).toBeInTheDocument();
-    expect(within(home).getByText('nav.brand.tagline')).toBeInTheDocument();
+    expect(home).toHaveAttribute('href', '/');
+    expect(home.querySelector('[data-brand-mark]')).toHaveAttribute('aria-hidden', 'true');
+    const wordmark = home.querySelector('[data-wordmark]');
+    expect(wordmark).toHaveTextContent('Cosmic Signature');
+    expect(wordmark).toHaveAttribute('lang', 'en');
+    expect(wordmark).toHaveAttribute('translate', 'no');
   });
 
-  it('renders the primary navigation rail with lexicon-safe labels', () => {
+  it('leads the primary navigation with the Observatory', () => {
     render(<Header />);
-    const primaryNav = screen.getByRole('navigation', { name: 'nav.primaryLabel' });
-    expect(within(primaryNav).getByText('nav.links.gallery.label')).toBeInTheDocument();
-    expect(within(primaryNav).getByText('nav.links.explore.label')).toBeInTheDocument();
-    expect(within(primaryNav).getByText('nav.links.help.label')).toBeInTheDocument();
+    const links = within(primaryNav()).getAllByRole('link');
+    expect(links[0]).toHaveTextContent('nav.routes.observatory.label');
+    expect(links[0]).toHaveAttribute('href', '/');
+    expect(
+      within(primaryNav()).getByRole('link', { name: 'nav.routes.gallery.label' }),
+    ).toHaveAttribute('href', '/gallery');
+    expect(
+      within(primaryNav()).getByRole('button', { name: 'nav.menus.explore' }),
+    ).toBeInTheDocument();
+    expect(
+      within(primaryNav()).getByRole('button', { name: 'nav.menus.learn' }),
+    ).toBeInTheDocument();
   });
 
-  it('links Gallery directly to the gallery page', () => {
+  it('keeps preferences, search and the wallet outside the navigation landmark', () => {
     render(<Header />);
-    expect(screen.getByRole('link', { name: 'nav.links.gallery.label' })).toHaveAttribute(
-      'href',
-      '/gallery',
+    expect(
+      within(primaryNav()).queryByRole('button', { name: 'common.themeSwitcher.label' }),
+    ).toBeNull();
+    expect(
+      within(screen.getByRole('banner')).getByRole('button', { name: 'nav.search.triggerLabel' }),
+    ).toBeInTheDocument();
+  });
+
+  it.each([
+    ['/', 'nav.routes.observatory.label', 'page'],
+    ['/current-cycle', 'nav.routes.observatory.label', 'true'],
+    ['/gallery', 'nav.routes.gallery.label', 'page'],
+    ['/detail/25', 'nav.routes.gallery.label', 'true'],
+  ])('marks the current section on %s', (path, name, current) => {
+    mockPathname.mockReturnValue(path);
+    render(<Header />);
+    expect(within(primaryNav()).getByRole('link', { name })).toHaveAttribute(
+      'aria-current',
+      current,
     );
   });
 
-  it('opens the Explore panel with icons and supporting copy', async () => {
-    const user = userEvent.setup();
+  it.each([
+    ['/allocation-finalized', 'nav.menus.explore'],
+    ['/user/0x1', 'nav.menus.explore'],
+    ['/security', 'nav.menus.learn'],
+  ])('marks the panel that holds %s', (path, name) => {
+    mockPathname.mockReturnValue(path);
     render(<Header />);
-
-    await user.click(screen.getByRole('button', { name: 'nav.links.explore.label' }));
-
-    const menu = await screen.findByRole('menu');
-    expect(within(menu).getByText('nav.links.currentCycle.label')).toBeInTheDocument();
-    expect(within(menu).getByText('nav.links.currentCycle.description')).toBeInTheDocument();
-    expect(within(menu).getByText('nav.links.statistics.label')).toBeInTheDocument();
-    expect(within(menu).getByText('nav.links.contracts.label')).toBeInTheDocument();
-
-    const links = within(menu).getAllByRole('menuitem');
-    expect(links.length).toBe(6);
+    expect(within(primaryNav()).getByRole('button', { name })).toHaveAttribute(
+      'aria-current',
+      'true',
+    );
+    expect(
+      within(primaryNav()).getByRole('link', { name: 'nav.routes.gallery.label' }),
+    ).not.toHaveAttribute('aria-current');
   });
 
-  it('hosts the Discover destination as the featured card in the Help panel', async () => {
+  it('opens the Explore panel: records, statistics, Public Goods and the ecosystem', async () => {
+    mockPathname.mockReturnValue('/public-goods-retrievals');
     const user = userEvent.setup();
     render(<Header />);
-
-    await user.click(screen.getByRole('button', { name: 'nav.links.help.label' }));
-
+    await user.click(within(primaryNav()).getByRole('button', { name: 'nav.menus.explore' }));
     const menu = await screen.findByRole('menu');
-    const discover = within(menu).getByRole('menuitem', {
-      name: /nav\.links\.discover\.label/i,
+
+    expect(
+      within(menu).getByRole('menuitem', { name: /nav\.routes\.currentCycle\.label/ }),
+    ).toHaveAttribute('href', '/current-cycle');
+    expect(within(menu).getByText('nav.sections.records')).toBeInTheDocument();
+    const publicGoods = within(menu).getByRole('menuitem', {
+      name: /nav\.groups\.publicGoods\.label/,
     });
-    expect(discover).toHaveAttribute('href', 'https://cosmicsignature.com');
-    expect(discover).toHaveAttribute('rel', 'noopener');
-    expect(within(menu).getByText('nav.links.discover.description')).toBeInTheDocument();
+    expect(publicGoods).toHaveAttribute('href', '/public-goods-contributions-cg');
+    expect(publicGoods).toHaveAttribute('aria-current', 'true');
+    expect(
+      within(menu).getByRole('menuitem', { name: 'nav.routes.statisticsTokens.short' }),
+    ).toHaveAttribute('href', '/statistics/tokens');
+
+    for (const link of OUTBOUND_LINKS.filter((candidate) => candidate.group === 'ecosystem')) {
+      const item = within(menu).getByRole('menuitem', {
+        name: new RegExp(`nav\\.outbound\\.${link.id}\\.label`),
+      });
+      expect(item).toHaveAttribute('href', link.href);
+      expect(item).toHaveAttribute('target', '_blank');
+      expect(item).toHaveAttribute('rel', 'noopener noreferrer');
+      expect(item).toHaveTextContent('nav.link.newTab');
+    }
   });
 
-  it('keeps internal and cross-host help links in the Help panel', async () => {
+  it('opens the Learn panel with trust pages and same-tab links to the project site', async () => {
     const user = userEvent.setup();
     render(<Header />);
-
-    await user.click(screen.getByRole('button', { name: 'nav.links.help.label' }));
-
+    await user.click(within(primaryNav()).getByRole('button', { name: 'nav.menus.learn' }));
     const menu = await screen.findByRole('menu');
-    expect(
-      within(menu).getByRole('menuitem', { name: /nav\.links\.howItWorks\.label/i }),
-    ).toHaveAttribute('href', '/how-it-works');
-    expect(within(menu).getByRole('menuitem', { name: /nav\.links\.faq\.label/i })).toHaveAttribute(
-      'href',
-      '/faq',
-    );
-    expect(
-      within(menu).getByRole('menuitem', { name: /nav\.links\.about\.label/i }),
-    ).toHaveAttribute('href', 'https://cosmicsignature.com/about');
-    expect(
-      within(menu).getByRole('menuitem', { name: /nav\.links\.learn\.label/i }),
-    ).toHaveAttribute('href', 'https://cosmicsignature.com/learn');
+
+    for (const [name, href] of [
+      ['security', '/security'],
+      ['riskDisclosures', '/risk-disclosures'],
+      ['faq', '/faq'],
+    ]) {
+      expect(
+        within(menu).getByRole('menuitem', { name: new RegExp(`nav\\.routes\\.${name}\\.label`) }),
+      ).toHaveAttribute('href', href);
+    }
+    const whitePaper = within(menu).getByRole('menuitem', {
+      name: /nav\.routes\.whitePaper\.label/,
+    });
+    expect(whitePaper).toHaveAttribute('href', localeHref(LANDING_ORIGIN, '/white-paper', 'en'));
+    expect(whitePaper).not.toHaveAttribute('target');
   });
 
-  it('renders the ecosystem dock with all three destinations', () => {
+  it('never shows the ecosystem as a header dock', () => {
     render(<Header />);
-
-    const dock = screen.getByRole('group', { name: 'nav.ecosystem.groupLabel' });
-    expect(
-      within(dock).getByRole('link', { name: 'nav.ecosystem.uniswap.ariaLabel' }),
-    ).toHaveAttribute('href', CST_UNISWAP_SWAP_URL);
-    expect(
-      within(dock).getByRole('link', { name: 'nav.ecosystem.axiomZero.ariaLabel' }),
-    ).toHaveAttribute('href', COSMIC_SIGNATURE_MARKETPLACE_URL);
-    expect(
-      within(dock).getByRole('link', { name: 'nav.ecosystem.chaosZero.ariaLabel' }),
-    ).toHaveAttribute('href', CHAOS_ZERO_PREDICTIONS_URL);
+    for (const link of OUTBOUND_LINKS) {
+      expect(screen.queryByRole('link', { name: new RegExp(link.id, 'i') })).toBeNull();
+    }
   });
 
-  it('names Axiom Zero and Chaos Zero visibly in the dock', () => {
+  it('opens the command palette from the search button and with Ctrl+K', async () => {
+    const user = userEvent.setup();
     render(<Header />);
+    await user.click(screen.getByRole('button', { name: 'nav.search.triggerLabel' }));
+    expect(await screen.findByRole('combobox')).toHaveFocus();
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('combobox')).not.toBeInTheDocument());
 
-    const dock = screen.getByRole('group', { name: 'nav.ecosystem.groupLabel' });
-    expect(within(dock).getByText('nav.ecosystem.axiomZero.name')).toBeInTheDocument();
-    expect(within(dock).getByText('nav.ecosystem.chaosZero.name')).toBeInTheDocument();
-    expect(within(dock).getByText('nav.ecosystem.uniswap.name')).toBeInTheDocument();
-  });
-
-  it('does not render a maintenance banner when systemMode is 0', () => {
-    render(<Header />);
-    expect(screen.queryByText(/MAINTENANCE/)).not.toBeInTheDocument();
+    await user.keyboard('{Control>}k{/Control}');
+    expect(await screen.findByRole('combobox')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
@@ -203,174 +221,106 @@ describe('Header (desktop)', () => {
     await checkA11y(container);
   });
 
-  it('has no accessibility violations with the Help panel open', async () => {
+  it('has no accessibility violations with the Explore panel open', async () => {
     const user = userEvent.setup();
     render(<Header />);
-
-    await user.click(screen.getByRole('button', { name: 'nav.links.help.label' }));
-    const menu = await screen.findByRole('menu');
-
+    await user.click(within(primaryNav()).getByRole('button', { name: 'nav.menus.explore' }));
     // Scoped to the panel: Radix aria-hides background content while open.
-    await checkA11y(menu);
+    await checkA11y(await screen.findByRole('menu'));
   });
 });
 
-describe('Header (mobile)', () => {
-  it('identifies the current section on a nested page', async () => {
-    mockPathname.mockReturnValue('/statistics/participation');
+describe('Header drawer', () => {
+  const openDrawer = async () => {
     const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: /^nav\.menuLabel/ }));
+    return { user, drawer: await screen.findByRole('dialog') };
+  };
+
+  it('lists every section, with the everyday ones open', async () => {
     render(<Header />);
-    await user.click(screen.getByRole('button', { name: 'nav.menuLabel' }));
-    const drawer = await screen.findByRole('dialog');
+    const { drawer } = await openDrawer();
+    for (const section of ['participate', 'collection', 'explore', 'records', 'learn', 'trust']) {
+      expect(within(drawer).getByText(`nav.sections.${section}`)).toBeInTheDocument();
+    }
+    const participate = within(drawer).getByText('nav.sections.participate').closest('details');
+    const trust = within(drawer).getByText('nav.sections.trust').closest('details');
+    expect(participate).toHaveAttribute('open');
+    expect(trust).not.toHaveAttribute('open');
     expect(
-      within(drawer).getByRole('link', { name: 'nav.links.statistics.label' }),
-    ).toHaveAttribute('aria-current', 'page');
-    expect(
-      within(drawer).getByRole('link', { name: 'nav.links.gallery.label' }),
-    ).not.toHaveAttribute('aria-current');
+      within(drawer).getByRole('link', { name: /nav\.routes\.observatory\.label/ }),
+    ).toHaveAttribute('href', '/');
   });
 
-  it('exposes drawer state and returns keyboard focus to its trigger', async () => {
-    const user = userEvent.setup();
+  it('opens the section of the current page and marks the page', async () => {
+    mockPathname.mockReturnValue('/statistics/participation');
+    render(<Header />);
+    const { drawer } = await openDrawer();
+    expect(within(drawer).getByText('nav.sections.explore').closest('details')).toHaveAttribute(
+      'open',
+    );
+    expect(
+      within(drawer).getByRole('link', { name: /nav\.routes\.statisticsParticipation\.label/ }),
+    ).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('moves the palette and language preferences into the drawer', async () => {
+    render(<Header />);
+    const { drawer } = await openDrawer();
+    expect(
+      within(drawer).getByRole('radiogroup', { name: 'common.themeSwitcher.label' }),
+    ).toBeInTheDocument();
+    expect(
+      within(drawer).getByRole('combobox', { name: 'common.languageSwitcher.label' }),
+    ).toBeInTheDocument();
+  });
+
+  it('shows the account pages first once a wallet is connected', async () => {
+    mockAccount = '0x1234567890abcdef1234567890abcdef12345678';
+    render(<Header />);
+    const { drawer } = await openDrawer();
+    const summaries = within(drawer)
+      .getAllByText(/^nav\.sections\./)
+      .map((node) => node.textContent);
+    expect(summaries[0]).toBe('nav.sections.account');
+    expect(
+      within(drawer).getByRole('link', { name: /nav\.routes\.transferCst\.label/ }),
+    ).toHaveAttribute('href', '/transfer-cst');
+  });
+
+  it('labels the retrieve signal for screen readers', async () => {
+    mockAccount = '0x1234567890abcdef1234567890abcdef12345678';
+    mockClaims = { ETHRaffleToClaim: 0.5, NumDonatedNFTToClaim: 0 };
+    render(<Header />);
+    const trigger = screen.getByRole('button', { name: 'nav.menuLabelWithAlert' });
+    expect(trigger).toBeInTheDocument();
+    const { drawer } = await openDrawer();
+    expect(
+      within(drawer).getByRole('link', { name: /nav\.routes\.myAllocations\.label/ }),
+    ).toHaveTextContent('wallet.account.retrieveReady');
+  });
+
+  it('opens third-party links in a new tab from the ecosystem section', async () => {
+    render(<Header />);
+    const { drawer } = await openDrawer();
+    const link = within(drawer).getByRole('link', { name: /nav\.outbound\.uniswap\.label/ });
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  it('returns focus to the menu button on Escape', async () => {
     render(<Header />);
     const trigger = screen.getByRole('button', { name: 'nav.menuLabel' });
-
-    expect(trigger).toHaveAttribute('aria-haspopup', 'dialog');
-    expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    await user.click(trigger);
-    const dialog = await screen.findByRole('dialog');
+    const { user } = await openDrawer();
     expect(trigger).toHaveAttribute('aria-expanded', 'true');
-    expect(trigger).toHaveAttribute('aria-controls', dialog.id);
-
     await user.keyboard('{Escape}');
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(trigger).toHaveFocus();
-    expect(trigger).toHaveAttribute('aria-expanded', 'false');
-  });
-
-  it('closes the drawer when resizing to desktop and keeps it closed on return', async () => {
-    const user = userEvent.setup();
-    render(<Header />);
-    await user.click(screen.getByRole('button', { name: 'nav.menuLabel' }));
-    expect(await screen.findByRole('dialog')).toBeInTheDocument();
-
-    act(() => {
-      setViewportWidth(1440);
-      window.dispatchEvent(new Event('resize'));
-    });
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-
-    act(() => {
-      setViewportWidth(820);
-      window.dispatchEvent(new Event('resize'));
-    });
-    expect(screen.getByRole('button', { name: 'nav.menuLabel' })).toHaveAttribute(
-      'aria-expanded',
-      'false',
-    );
-  });
-
-  beforeEach(() => {
-    setViewportWidth(375);
-  });
-
-  it('shows a mobile wallet connect button without opening the drawer', async () => {
-    render(<Header />);
-
-    expect(await screen.findByTestId('connect-wallet-button')).toBeVisible();
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-  });
-
-  it('opens the drawer with primary navigation links', async () => {
-    const user = userEvent.setup();
-    render(<Header />);
-
-    await user.click(screen.getByRole('button', { name: 'nav.menuLabel' }));
-
-    const dialog = await screen.findByRole('dialog');
-    expect(
-      within(dialog).getByRole('link', { name: /nav\.links\.gallery\.label/i }),
-    ).toHaveAttribute('href', '/gallery');
-    expect(
-      within(dialog).getByRole('link', { name: /nav\.links\.currentCycle\.label/i }),
-    ).toHaveAttribute('href', '/current-cycle');
-    expect(within(dialog).getByRole('link', { name: /nav\.links\.faq\.label/i })).toHaveAttribute(
-      'href',
-      '/faq',
-    );
-  });
-
-  it('lets connected MetaMask users add CST from the drawer', async () => {
-    const user = userEvent.setup();
-    mockAccount = '0x1234567890abcdef1234567890abcdef12345678';
-    render(<Header />);
-
-    await user.click(screen.getByRole('button', { name: 'nav.menuLabel' }));
-
-    const dialog = await screen.findByRole('dialog');
-    await user.click(
-      within(dialog).getByRole('button', { name: 'wallet.account.addCstToMetaMask' }),
-    );
-    expect(mockAddCst).toHaveBeenCalledTimes(1);
-  });
-
-  it('renders the ecosystem section inside the drawer', async () => {
-    const user = userEvent.setup();
-    render(<Header />);
-
-    await user.click(screen.getByRole('button', { name: 'nav.menuLabel' }));
-
-    const dialog = await screen.findByRole('dialog');
-    expect(within(dialog).getByText('nav.sections.ecosystem')).toBeInTheDocument();
-    expect(
-      within(dialog).getByRole('link', { name: 'nav.ecosystem.uniswap.ariaLabel' }),
-    ).toHaveAttribute('href', CST_UNISWAP_SWAP_URL);
-    expect(
-      within(dialog).getByRole('link', { name: 'nav.ecosystem.axiomZero.ariaLabel' }),
-    ).toHaveAttribute('href', COSMIC_SIGNATURE_MARKETPLACE_URL);
-    expect(
-      within(dialog).getByRole('link', { name: 'nav.ecosystem.chaosZero.ariaLabel' }),
-    ).toHaveAttribute('href', CHAOS_ZERO_PREDICTIONS_URL);
-  });
-
-  it('renders the featured Discover card inside the drawer', async () => {
-    const user = userEvent.setup();
-    render(<Header />);
-
-    await user.click(screen.getByRole('button', { name: 'nav.menuLabel' }));
-
-    const dialog = await screen.findByRole('dialog');
-    const discover = within(dialog).getByRole('link', { name: /nav\.links\.discover\.label/i });
-    expect(discover).toHaveAttribute('href', 'https://cosmicsignature.com');
-    expect(discover).toHaveAttribute('rel', 'noopener');
-  });
-
-  it('opens ecosystem links in a new tab with safe rel attributes', async () => {
-    const user = userEvent.setup();
-    render(<Header />);
-
-    await user.click(screen.getByRole('button', { name: 'nav.menuLabel' }));
-
-    const dialog = await screen.findByRole('dialog');
-    for (const name of [
-      'nav.ecosystem.uniswap.ariaLabel',
-      'nav.ecosystem.axiomZero.ariaLabel',
-      'nav.ecosystem.chaosZero.ariaLabel',
-    ]) {
-      const link = within(dialog).getByRole('link', { name });
-      expect(link).toHaveAttribute('target', '_blank');
-      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
-    }
   });
 
   it('has no accessibility violations with the drawer open', async () => {
-    const user = userEvent.setup();
     render(<Header />);
-
-    await user.click(screen.getByRole('button', { name: 'nav.menuLabel' }));
-    const dialog = await screen.findByRole('dialog');
-
-    // Scoped to the drawer: Radix aria-hides background content while open.
-    await checkA11y(dialog);
+    const { drawer } = await openDrawer();
+    await checkA11y(drawer);
   });
 });

@@ -1,6 +1,7 @@
 {
   "connect": {
     "button": "ウォレットを接続",
+    "buttonShort": "接続",
     "opening": "ウォレット一覧を開いています…",
     "restoring": "ウォレットの接続を復元しています…",
     "disclaimer": "ウォレットを接続すると、<terms>利用規約</terms>に同意し、<risk>リスク開示</risk>を確認したものとみなされます。一筆は{network}で行われ、一筆の費用とネットワーク手数料のために{network}上のETHが必要です。"
@@ -12,27 +13,22 @@
   "balances": {
     "eth": "ETH",
     "cst": "CST",
-    "cosmicNfts": "COSMIC NFT",
-    "rwlkNfts": "RWLK NFT",
+    "cosmicNfts": "Cosmic Signature NFT",
+    "rwlkNfts": "RandomWalk NFT",
     "anchoredCst": "係留中のCosmic Signature NFT",
-    "anchoredRwlk": "係留中のRWLK NFT"
+    "anchoredRwlk": "係留中のRandomWalk NFT"
   },
   "labels": {
-    "loading": "読み込み中…",
-    "balancesHeading": "残高",
-    "anchoredHeading": "係留中",
-    "nftCount": "{count}"
+    "balancesHeading": "残高"
   },
   "account": {
     "heading": "アカウント",
-    "myDashboard": "ダッシュボード",
-    "myRewards": "自分の配分",
-    "myNfts": "自分のNFT",
-    "transferCst": "CSTを送付",
+    "menuLabel": "{address}のアカウントメニュー",
+    "menuLabelWithAlert": "{address}のアカウントメニュー。受け取れる配分があります",
+    "retrieveReady": "受け取り可能",
+    "retrieveAmount": "受け取り可能：{amount}",
     "addCstToMetaMask": "CSTをMetaMaskに追加",
     "addingCstToMetaMask": "CSTをMetaMaskに追加しています…",
-    "myAnchors": "自分の係留",
-    "winningHistory": "受領履歴",
     "viewOnExplorer": "{explorer}で見る",
     "switchWallet": "ウォレットを変更",
     "disconnect": "接続を解除"

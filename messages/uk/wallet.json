@@ -1,6 +1,7 @@
 {
   "connect": {
     "button": "Під’єднати гаманець",
+    "buttonShort": "Під’єднати",
     "opening": "Відкриваємо список гаманців…",
     "restoring": "Відновлюємо під’єднання гаманця…",
     "disclaimer": "Під’єднуючи гаманець, ви погоджуєтеся з <terms>Умовами використання</terms> та ознайомлені з <risk>Розкриттям ризиків</risk>. Жести відбуваються в мережі {network}, і для вартості жесту та мережевих комісій потрібен ETH у цій мережі."
@@ -12,27 +13,22 @@
   "balances": {
     "eth": "ETH",
     "cst": "CST",
-    "cosmicNfts": "COSMIC NFT",
-    "rwlkNfts": "RWLK NFT",
+    "cosmicNfts": "Cosmic Signature NFT",
+    "rwlkNfts": "RandomWalk NFT",
     "anchoredCst": "Закріплені Cosmic Signature NFT",
-    "anchoredRwlk": "Закріплені RWLK NFT"
+    "anchoredRwlk": "Закріплені RandomWalk NFT"
   },
   "labels": {
-    "loading": "Завантаження…",
-    "balancesHeading": "Баланси",
-    "anchoredHeading": "Закріплено",
-    "nftCount": "{count}"
+    "balancesHeading": "Баланси"
   },
   "account": {
     "heading": "Обліковий запис",
-    "myDashboard": "Мій кабінет",
-    "myRewards": "Мої розподіли",
-    "myNfts": "Мої NFT",
-    "transferCst": "Переказати CST",
+    "menuLabel": "Меню облікового запису {address}",
+    "menuLabelWithAlert": "Меню облікового запису {address}. Є розподіли, які можна забрати",
+    "retrieveReady": "Можна забрати",
+    "retrieveAmount": "{amount} можна забрати",
     "addCstToMetaMask": "Додати CST у MetaMask",
     "addingCstToMetaMask": "Додаємо CST у MetaMask…",
-    "myAnchors": "Мої закріплення",
-    "winningHistory": "Історія отримувачів",
     "viewOnExplorer": "Переглянути в {explorer}",
     "switchWallet": "Змінити гаманець",
     "disconnect": "Від’єднати"

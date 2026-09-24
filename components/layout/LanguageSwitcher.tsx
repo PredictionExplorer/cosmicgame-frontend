@@ -17,16 +17,16 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-export type LanguageSwitcherVariant = 'pill' | 'compact' | 'list';
+export type LanguageSwitcherVariant = 'pill' | 'compact' | 'list' | 'select';
 
 interface LanguageSwitcherProps {
   className?: string;
   /**
    * `pill` (default) — globe, the current language in its own name, and a
    * chevron, opening a radio menu of every language. `compact` — the same
-   * menu behind an icon-only trigger for narrow headers. `list` — every
-   * language laid out as a radio group, for the mobile drawer, where a nested
-   * menu would hide the choice behind a second tap.
+   * menu behind an icon-only trigger for narrow headers. `select` — a native
+   * select, the smallest control for a drawer's preferences row (the phone
+   * opens its own picker). `list` — every language laid out as a radio group.
    */
   variant?: LanguageSwitcherVariant;
 }
@@ -54,10 +54,34 @@ export function LanguageSwitcher({ className, variant = 'pill' }: LanguageSwitch
     router.replace(`${pathname}${suffix}`, { locale: next as AppLocale });
   };
 
+  if (variant === 'select') {
+    return (
+      <label className={cn('relative inline-flex min-w-0 items-center', className)}>
+        <span className="sr-only">{label}</span>
+        <Globe aria-hidden className="pointer-events-none absolute left-3 size-4 text-subtle" />
+        <select
+          value={locale}
+          onChange={(event) => switchTo(event.target.value)}
+          className="h-11 w-full min-w-0 cursor-pointer appearance-none truncate rounded-control border border-input bg-surface-sunken pl-9 pr-8 text-sm text-foreground transition-colors duration-150 hover:border-foreground/40"
+        >
+          {routing.locales.map((option) => (
+            <option key={option} value={option} lang={option}>
+              {LOCALE_LABELS[option]}
+            </option>
+          ))}
+        </select>
+        <ChevronDown
+          aria-hidden
+          className="pointer-events-none absolute right-2.5 size-4 text-subtle"
+        />
+      </label>
+    );
+  }
+
   if (variant === 'list') {
     return (
       <div className={cn('space-y-2', className)}>
-        <p className="flex items-center gap-2 px-1 font-mono text-[10px] uppercase tracking-[0.3em] text-white/45">
+        <p className="type-eyebrow flex items-center gap-2 px-1 text-subtle">
           <Globe className="h-3.5 w-3.5" aria-hidden />
           {label}
         </p>
@@ -73,10 +97,10 @@ export function LanguageSwitcher({ className, variant = 'pill' }: LanguageSwitch
                 aria-checked={selected}
                 onClick={() => switchTo(option)}
                 className={cn(
-                  'flex min-h-11 items-center justify-between gap-2 rounded-xl border px-3.5 py-2 text-left text-sm transition-colors',
+                  'flex min-h-11 items-center justify-between gap-2 rounded-control border px-3.5 py-2 text-left text-sm transition-colors',
                   selected
-                    ? 'border-secondary/40 bg-secondary/10 text-white'
-                    : 'border-white/[0.08] bg-white/[0.03] text-white/75 hover:border-white/[0.16] hover:bg-white/[0.06] hover:text-white',
+                    ? 'border-secondary/40 bg-secondary/10 text-foreground'
+                    : 'border-rule-faint bg-surface-sunken text-muted-foreground hover:border-input hover:text-foreground',
                 )}
               >
                 <span>{LOCALE_LABELS[option]}</span>
@@ -99,26 +123,26 @@ export function LanguageSwitcher({ className, variant = 'pill' }: LanguageSwitch
           size={compact ? 'icon' : 'sm'}
           aria-label={label}
           className={cn(
-            'rounded-full border border-white/[0.12] bg-white/[0.05] text-white/85 shadow-[inset_0_1px_0_rgb(255_255_255/0.05)] hover:border-white/[0.22] hover:bg-white/[0.09] hover:text-white data-[state=open]:border-secondary/40 data-[state=open]:bg-secondary/10 data-[state=open]:text-white',
+            'rounded-pill border border-input bg-surface-sunken text-foreground hover:border-foreground/40 hover:bg-muted hover:text-foreground data-[state=open]:border-secondary/40 data-[state=open]:bg-secondary/10 data-[state=open]:text-foreground',
             compact
-              ? 'h-11 w-11 shrink-0 sm:h-10 sm:w-10'
+              ? 'size-11 shrink-0 sm:size-10'
               : 'h-11 gap-2 pl-3 pr-2.5 text-xs font-medium sm:h-9',
             className,
           )}
         >
-          <Globe className="shrink-0 text-secondary/90" aria-hidden />
+          <Globe className="shrink-0 text-secondary" aria-hidden />
           {!compact && (
             <>
               <span lang={locale} className="max-w-[9rem] truncate">
                 {current}
               </span>
-              <ChevronDown className="h-3.5 w-3.5 shrink-0 text-white/55" aria-hidden />
+              <ChevronDown className="h-3.5 w-3.5 shrink-0 text-subtle" aria-hidden />
             </>
           )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-[13rem] p-1.5">
-        <DropdownMenuLabel className="flex items-center gap-2 px-2 py-1.5 font-mono text-[10px] font-normal uppercase tracking-[0.3em] text-white/45">
+        <DropdownMenuLabel className="type-eyebrow flex items-center gap-2 px-2 py-1.5 font-normal text-subtle">
           <Globe className="h-3.5 w-3.5" aria-hidden />
           {label}
         </DropdownMenuLabel>
@@ -129,7 +153,7 @@ export function LanguageSwitcher({ className, variant = 'pill' }: LanguageSwitch
               key={option}
               value={option}
               lang={option}
-              className="min-h-10 cursor-pointer rounded-lg py-2 pr-3 text-sm text-white/80 data-[state=checked]:bg-secondary/10 data-[state=checked]:text-white sm:min-h-9"
+              className="min-h-10 cursor-pointer rounded-control py-2 pr-3 text-sm text-muted-foreground data-[state=checked]:bg-secondary/10 data-[state=checked]:text-foreground sm:min-h-9"
             >
               {LOCALE_LABELS[option]}
             </DropdownMenuRadioItem>

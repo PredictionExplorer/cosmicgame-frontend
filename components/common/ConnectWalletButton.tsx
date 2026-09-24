@@ -1,35 +1,34 @@
+'use client';
+
+import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
+import { Check, ChevronDown, Copy, Wallet } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
+
 import {
-  ChevronDown,
-  LayoutDashboard,
-  Gift,
-  Coins,
-  Layers,
-  History,
-  SendHorizontal,
-  Wallet,
-  Copy,
-  Check,
-} from 'lucide-react';
-import { useState } from 'react';
-import { useTranslations } from 'next-intl';
-
-import { shortenHex } from '@/utils';
-
-import { formatFixed } from '@/utils/format';
+  ACCOUNT_ROUTE_IDS,
+  getSiteRoute,
+  locateSitePath,
+  outboundLinks,
+  type SiteRouteId,
+} from '@/config/siteNav';
+import { OUTBOUND_ICONS, SITE_ROUTE_ICONS } from '@/config/siteNavIcons';
+import { usePathname } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
+import { formatAmount, formatAddress, formatCount } from '@/utils/format';
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { AddCstToMetaMaskButton } from '@/components/common/AddCstToMetaMaskButton';
-import { ChaosZeroButton } from '@/components/common/ChaosZeroButton';
-import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
-import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
-import { NavLink } from '@/components/styled';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { NavRowContent } from '@/components/layout/NavRow';
+import { SiteLink } from '@/components/layout/SiteLink';
+import { useSiteNavCopy } from '@/components/layout/useSiteNav';
 import { ConnectWalletAction } from '@/components/wallet/ConnectWalletAction';
 import { WrongNetworkBadge } from '@/components/wallet/NetworkGuard';
 import {
@@ -37,288 +36,507 @@ import {
   WalletAccountPanel,
   WalletNetworkMenuItems,
 } from '@/components/wallet/WalletAccountPanel';
+import { useWalletAccount } from '@/hooks/useWalletAccount';
 import { useActiveWeb3React } from '@/hooks/web3';
 
 interface Balance {
   ETH: number;
   CosmicToken: number;
+  /** Cosmic Signature NFTs the wallet holds now. */
   CosmicSignature: number;
   RWLK: number;
 }
 
 interface AnchoredTokenCount {
-  cst: number;
-  rwalk: number;
+  cst?: number;
+  rwalk?: number;
 }
 
+export type ConnectWalletPresentation = 'menu' | 'sheet' | 'responsive';
+
 interface ConnectWalletButtonProps {
-  isMobileView: boolean;
+  /** @deprecated Pass `presentation` instead: true is 'sheet', false is 'menu'. */
+  isMobileView?: boolean;
+  /**
+   * How a connected wallet opens its account: a dropdown `menu`, a bottom
+   * `sheet` for phones, or `responsive` (sheet under 768px, menu above,
+   * chosen by CSS so the first paint is right at every width).
+   */
+  presentation?: ConnectWalletPresentation;
   className?: string;
   loading: boolean;
   balance: Balance;
   stakedTokenCount: AnchoredTokenCount;
+  /** Something waits in My Allocations. */
   hasUnclaimedRewards?: boolean;
+  /** The ETH part of it, shown on the My Allocations row. */
+  retrievableEth?: number | null;
   /** Applies the experimental liquid-glass material without changing other routes. */
   liquid?: boolean;
+  /**
+   * Shorten the connect label to "Connect" where the header is tightest:
+   * under 640px, and from 1024px until the wide layout at 1280px.
+   */
+  compactInHeader?: boolean;
 }
 
+interface AccountDetailsProps {
+  loading: boolean;
+  balance: Balance;
+  stakedTokenCount: AnchoredTokenCount;
+  hasUnclaimedRewards: boolean;
+  retrievableEth: number | null;
+}
+
+/** The retrieve signal, in words: visible under My Allocations, and read aloud. */
+function RetrieveNote({ retrievableEth }: { retrievableEth: number | null }) {
+  const t = useTranslations('wallet');
+  const locale = useLocale();
+  return (
+    <span className="type-caption mt-0.5 inline-flex items-center gap-1.5 text-positive">
+      <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-positive" />
+      {retrievableEth !== null
+        ? t('account.retrieveAmount', {
+            amount: formatAmount(retrievableEth, { unit: 'ETH', locale, context: 'card' }),
+          })
+        : t('account.retrieveReady')}
+    </span>
+  );
+}
+
+function useCurrentRoute(): SiteRouteId | null {
+  const pathname = usePathname();
+  const location = locateSitePath(pathname);
+  return location.exact ? (location.route?.id ?? null) : null;
+}
+
+/** The account pages as menu items (menu) or plain links (sheet). */
+function AccountPages({
+  variant,
+  hasUnclaimedRewards,
+  retrievableEth,
+}: {
+  variant: 'menu' | 'list';
+  hasUnclaimedRewards: boolean;
+  retrievableEth: number | null;
+}) {
+  const copy = useSiteNavCopy();
+  const currentRoute = useCurrentRoute();
+
+  return (
+    <>
+      {ACCOUNT_ROUTE_IDS.map((id) => {
+        const current = currentRoute === id;
+        const alert = hasUnclaimedRewards && id === 'myAllocations';
+        const link = (
+          <SiteLink
+            href={getSiteRoute(id).path}
+            kind="internal"
+            aria-current={current ? 'page' : undefined}
+            className={cn(
+              'group/row flex w-full cursor-pointer items-center gap-3 rounded-control px-2 no-underline',
+              variant === 'menu' ? 'py-1.5' : 'min-h-11 py-2 hover:bg-muted',
+            )}
+          >
+            <NavRowContent
+              iconStyle="inline"
+              icon={SITE_ROUTE_ICONS[id]}
+              current={current}
+              label={
+                <span className="flex flex-col">
+                  <span>{copy.routeLabel(id)}</span>
+                  {alert ? <RetrieveNote retrievableEth={retrievableEth} /> : null}
+                </span>
+              }
+            />
+          </SiteLink>
+        );
+        return variant === 'menu' ? (
+          <DropdownMenuItem
+            key={id}
+            asChild
+            className="p-0 data-[highlighted]:bg-muted focus:bg-muted focus:text-foreground"
+          >
+            {link}
+          </DropdownMenuItem>
+        ) : (
+          <li key={id}>{link}</li>
+        );
+      })}
+    </>
+  );
+}
+
+function BalanceFigure({
+  label,
+  value,
+  loading,
+}: {
+  label: string;
+  value: string;
+  loading: boolean;
+}) {
+  return (
+    <div className="flex min-w-0 flex-col">
+      <dt className="type-caption text-subtle">{label}</dt>
+      <dd className="type-figure-sm text-foreground">{loading ? '…' : value}</dd>
+    </div>
+  );
+}
+
+/** Balances and anchored NFTs as a small spec sheet. */
+function AccountBalances({ loading, balance, stakedTokenCount }: AccountDetailsProps) {
+  const t = useTranslations('wallet');
+  const locale = useLocale();
+  const count = (value: number | undefined) =>
+    value === undefined ? '…' : formatCount(value, locale);
+  return (
+    <section className="px-2 py-2">
+      <h3 className="type-eyebrow pb-2 text-subtle">{t('labels.balancesHeading')}</h3>
+      <dl className="grid grid-cols-2 gap-x-4 gap-y-2.5">
+        <BalanceFigure
+          loading={loading}
+          label={t('balances.eth')}
+          value={formatAmount(balance.ETH, {
+            unit: 'ETH',
+            locale,
+            context: 'card',
+            withUnit: false,
+          })}
+        />
+        <BalanceFigure
+          loading={loading}
+          label={t('balances.cst')}
+          value={formatAmount(balance.CosmicToken, {
+            unit: 'CST',
+            locale,
+            context: 'card',
+            withUnit: false,
+          })}
+        />
+        <BalanceFigure
+          loading={loading}
+          label={t('balances.cosmicNfts')}
+          value={count(balance.CosmicSignature)}
+        />
+        <BalanceFigure
+          loading={loading}
+          label={t('balances.rwlkNfts')}
+          value={count(balance.RWLK)}
+        />
+        <BalanceFigure
+          loading={false}
+          label={t('balances.anchoredCst')}
+          value={count(stakedTokenCount.cst)}
+        />
+        <BalanceFigure
+          loading={false}
+          label={t('balances.anchoredRwlk')}
+          value={count(stakedTokenCount.rwalk)}
+        />
+      </dl>
+    </section>
+  );
+}
+
+/** Trading destinations that belong with a wallet: CST on Uniswap, NFTs on Axiom Zero. */
+const WALLET_OUTBOUND = outboundLinks('ecosystem').filter(
+  (link) => link.id === 'uniswap' || link.id === 'axiomZero',
+);
+
+function AccountMenu(props: AccountDetailsProps & { trigger: ReactNode }) {
+  const t = useTranslations('wallet');
+  const copy = useSiteNavCopy();
+  const account = useWalletAccount();
+
+  return (
+    <DropdownMenu modal={false}>
+      {props.trigger}
+      {/* Sits in the chrome layer with the header it drops out of. */}
+      <DropdownMenuContent
+        align="end"
+        sideOffset={10}
+        collisionPadding={16}
+        className="z-50 max-h-[var(--radix-dropdown-menu-content-available-height)] w-80 overflow-y-auto rounded-surface border-rule bg-popover p-1.5 shadow-float"
+      >
+        {account.address ? (
+          <div className="flex items-center justify-between gap-3 px-2 pb-1 pt-1.5">
+            <div className="min-w-0">
+              {account.walletName ? (
+                <p className="type-caption text-subtle">{account.walletName}</p>
+              ) : null}
+              <p className="type-mono truncate text-foreground" title={account.address}>
+                {formatAddress(account.address)}
+              </p>
+            </div>
+            <DropdownMenuItem
+              onSelect={(event) => {
+                event.preventDefault();
+                void account.copyAddress();
+              }}
+              aria-label={
+                account.copied ? t('accessibility.addressCopied') : t('accessibility.copyAddress')
+              }
+              className="size-9 shrink-0 cursor-pointer justify-center rounded-control p-0 text-subtle data-[highlighted]:bg-muted data-[highlighted]:text-foreground"
+            >
+              {account.copied ? (
+                <Check aria-hidden className="size-4 text-positive" />
+              ) : (
+                <Copy aria-hidden className="size-4" />
+              )}
+            </DropdownMenuItem>
+          </div>
+        ) : null}
+        <WalletNetworkMenuItems />
+
+        <DropdownMenuSeparator className="bg-rule-faint" />
+        <DropdownMenuGroup>
+          <DropdownMenuLabel className="type-eyebrow px-2 pb-1 pt-1.5 font-medium text-subtle">
+            {copy.sectionTitle('account')}
+          </DropdownMenuLabel>
+          <AccountPages
+            variant="menu"
+            hasUnclaimedRewards={props.hasUnclaimedRewards}
+            retrievableEth={props.retrievableEth}
+          />
+        </DropdownMenuGroup>
+
+        <DropdownMenuSeparator className="bg-rule-faint" />
+        <AccountBalances {...props} />
+
+        <DropdownMenuSeparator className="bg-rule-faint" />
+        <DropdownMenuGroup>
+          <AddCstToMetaMaskButton />
+          {WALLET_OUTBOUND.map((link) => {
+            const Icon = OUTBOUND_ICONS[link.id];
+            return (
+              <DropdownMenuItem
+                key={link.id}
+                asChild
+                className="cursor-pointer gap-2.5 px-2 data-[highlighted]:bg-muted focus:bg-muted focus:text-foreground"
+              >
+                <SiteLink href={link.href} kind="external" externalIconClassName="ml-auto">
+                  <Icon aria-hidden className="size-3.5 text-muted-foreground" />
+                  {copy.outboundLabel(link.id)}
+                </SiteLink>
+              </DropdownMenuItem>
+            );
+          })}
+        </DropdownMenuGroup>
+
+        <DropdownMenuSeparator className="bg-rule-faint" />
+        <WalletAccountMenuItems />
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+function AccountSheet(props: AccountDetailsProps & { trigger: ReactNode }) {
+  const t = useTranslations('wallet');
+  const copy = useSiteNavCopy();
+  return (
+    <Sheet>
+      {props.trigger}
+      <SheetContent
+        side="bottom"
+        aria-describedby={undefined}
+        className="max-h-[88dvh] overflow-y-auto rounded-t-surface border-t border-rule bg-background p-0 pb-[env(safe-area-inset-bottom)]"
+      >
+        <div className="flex h-14 items-center border-b border-rule-faint pl-5 pr-16">
+          <SheetTitle className="type-eyebrow text-subtle">{t('account.heading')}</SheetTitle>
+        </div>
+        <div className="px-5 pb-4 pt-4">
+          <WalletAccountPanel />
+        </div>
+        <nav
+          aria-label={copy.sectionTitle('account')}
+          className="border-t border-rule-faint px-3 py-2"
+        >
+          <p className="type-eyebrow px-2 pb-1 pt-2 text-subtle">{copy.sectionTitle('account')}</p>
+          <ul>
+            <AccountPages
+              variant="list"
+              hasUnclaimedRewards={props.hasUnclaimedRewards}
+              retrievableEth={props.retrievableEth}
+            />
+          </ul>
+        </nav>
+        <div className="border-t border-rule-faint px-3 pt-1">
+          <AccountBalances {...props} />
+        </div>
+        <ul className="border-t border-rule-faint px-3 pb-4 pt-2">
+          <li>
+            <AddCstToMetaMaskButton
+              variant="drawer"
+              className="min-h-11 rounded-control px-2 text-foreground hover:bg-muted hover:text-foreground"
+            />
+          </li>
+          {WALLET_OUTBOUND.map((link) => {
+            const Icon = OUTBOUND_ICONS[link.id];
+            return (
+              <li key={link.id}>
+                <SiteLink
+                  href={link.href}
+                  kind="external"
+                  externalIconClassName="ml-auto"
+                  className="flex min-h-11 items-center gap-3 rounded-control px-2 text-sm text-foreground no-underline transition-colors duration-150 hover:bg-muted"
+                >
+                  <Icon aria-hidden className="size-4 text-subtle" />
+                  {copy.outboundLabel(link.id)}
+                </SiteLink>
+              </li>
+            );
+          })}
+        </ul>
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+interface WalletPillProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  address: string;
+  hasUnclaimedRewards: boolean;
+  withChevron: boolean;
+  liquid: boolean;
+  testId: string;
+}
+
+/** The connected wallet's trigger. Forwards ref and props for Radix `asChild`. */
+const WalletPill = forwardRef<HTMLButtonElement, WalletPillProps>(function WalletPill(
+  { address, hasUnclaimedRewards, withChevron, liquid, className, testId, ...rest },
+  ref,
+) {
+  const t = useTranslations('wallet');
+  const short = formatAddress(address);
+  return (
+    <button
+      ref={ref}
+      type="button"
+      data-testid={testId}
+      aria-label={
+        hasUnclaimedRewards
+          ? t('account.menuLabelWithAlert', { address: short })
+          : t('account.menuLabel', { address: short })
+      }
+      {...rest}
+      className={cn(
+        'relative inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-pill border border-input bg-surface-sunken px-3 text-sm text-foreground transition-colors duration-150 hover:border-foreground/40 hover:bg-muted data-[state=open]:border-primary/50 data-[state=open]:bg-muted md:min-h-10',
+        liquid && 'liquid-glass-control',
+        className,
+      )}
+    >
+      <Wallet aria-hidden className="size-4 shrink-0 text-subtle" />
+      {/* The address shows wherever the header has room for it. */}
+      <span className="type-mono hidden text-foreground min-[400px]:inline lg:hidden xl:inline">
+        {short}
+      </span>
+      {hasUnclaimedRewards ? (
+        <span
+          aria-hidden
+          className="absolute right-1 top-1 size-2 rounded-full bg-positive ring-2 ring-background"
+        />
+      ) : null}
+      {withChevron ? <ChevronDown aria-hidden className="size-3.5 shrink-0 text-subtle" /> : null}
+      <WrongNetworkBadge className={withChevron ? undefined : 'min-[360px]:hidden'} />
+    </button>
+  );
+});
+
+/**
+ * The header wallet control. Disconnected, it is the shared connect button.
+ * Connected, the pill opens the account: the address, the network, the
+ * account pages (grouped, with the retrieve signal in words), balances,
+ * wallet actions and Switch wallet / Disconnect. A dropdown menu from
+ * 768px, a bottom sheet on phones.
+ */
 const ConnectWalletButton = ({
   isMobileView,
+  presentation,
   className,
   loading,
   balance,
   stakedTokenCount,
   hasUnclaimedRewards = false,
+  retrievableEth = null,
   liquid = false,
+  compactInHeader = false,
 }: ConnectWalletButtonProps) => {
   const t = useTranslations('wallet');
   const { account } = useActiveWeb3React();
-  const [copied, setCopied] = useState(false);
+  const mode: ConnectWalletPresentation =
+    presentation ?? (isMobileView === undefined ? 'responsive' : isMobileView ? 'sheet' : 'menu');
 
-  const handleCopy = async () => {
-    if (!account) return;
-    await navigator.clipboard.writeText(account);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  if (account) {
-    if (isMobileView) {
-      // Below the desktop header the pill opens the account panel (address,
-      // network, explorer, switch wallet, disconnect) instead of being inert.
-      return (
-        <Popover>
-          <PopoverTrigger
-            className={cn(
-              'relative inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full border border-border bg-card/40 px-3 text-sm outline-none transition-colors hover:bg-card/70',
-              liquid && 'liquid-glass-control',
-              className,
-            )}
-            data-testid="wallet-account-trigger"
-          >
-            <Wallet className="h-4 w-4 text-muted-foreground" aria-hidden />
-            <span className="sr-only sm:not-sr-only sm:font-mono">{shortenHex(account)}</span>
-            {hasUnclaimedRewards && (
-              <span aria-hidden className="h-2 w-2 rounded-full bg-emerald-400" />
-            )}
-            {/* Under 360px the header has no room for the wrong-network chip. */}
-            <WrongNetworkBadge className="min-[360px]:hidden" />
-          </PopoverTrigger>
-          <PopoverContent
-            align="end"
-            collisionPadding={16}
-            aria-label={t('account.heading')}
-            className="w-[min(20rem,calc(100vw-2rem))] border-border"
-          >
-            <WalletAccountPanel />
-          </PopoverContent>
-        </Popover>
-      );
-    }
-
+  if (!account) {
     return (
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          data-testid="wallet-menu-trigger"
-          className={cn(
-            'relative ml-auto inline-flex h-auto cursor-pointer items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.03] px-4 py-2 text-sm outline-none transition-colors hover:bg-white/[0.06]',
-            liquid && 'liquid-glass-control',
-            className,
-          )}
-        >
-          {/* With the navigation in the bar there is no room for the
-              wrong-network chip: the pill carries the state, and the menu
-              opens on the switch. */}
-          <WrongNetworkBadge />
-          <Wallet className="h-3.5 w-3.5 text-muted-foreground" />
-          {shortenHex(account)}
-          {hasUnclaimedRewards && (
-            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-          )}
-          <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-        </DropdownMenuTrigger>
-        {/* Sits in the chrome layer with the header it drops out of; the
-            previous z-[10003] was outside any scale and beat the skip link. */}
-        <DropdownMenuContent className="z-50 w-[280px]" align="end">
-          {/* Address header */}
-          <div className="flex items-center justify-between px-3 py-2">
-            <span className="text-xs font-mono text-muted-foreground">
-              {shortenHex(account, 8)}
-            </span>
-            <button
-              onClick={handleCopy}
-              aria-label={
-                copied ? t('accessibility.addressCopied') : t('accessibility.copyAddress')
-              }
-              className="text-muted-foreground/50 hover:text-muted-foreground transition-colors"
-            >
-              {copied ? (
-                <Check className="h-3.5 w-3.5 text-emerald-400" />
-              ) : (
-                <Copy className="h-3.5 w-3.5" />
-              )}
-            </button>
-          </div>
-
-          {/* Network state (and the switch, when the wallet is elsewhere) */}
-          <div className="px-1 pb-1">
-            <WalletNetworkMenuItems />
-          </div>
-
-          <DropdownMenuSeparator />
-
-          {/* Account links */}
-          <div className="px-1 py-1">
-            <p className="px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
-              {t('account.heading')}
-            </p>
-            <DropdownMenuItem className="cursor-pointer p-0">
-              <NavLink
-                href="/my-statistics"
-                className="flex w-full items-center gap-2.5 px-2 py-1.5 text-sm"
-              >
-                <LayoutDashboard className="h-3.5 w-3.5 text-muted-foreground" />
-                {t('account.myDashboard')}
-              </NavLink>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer p-0">
-              <NavLink
-                href="/my-allocations"
-                className="flex w-full items-center gap-2.5 px-2 py-1.5 text-sm"
-              >
-                <Gift className="h-3.5 w-3.5 text-muted-foreground" />
-                {t('account.myRewards')}
-                {hasUnclaimedRewards && (
-                  <span className="ml-auto h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                )}
-              </NavLink>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer p-0">
-              <NavLink
-                href="/my-tokens"
-                className="flex w-full items-center gap-2.5 px-2 py-1.5 text-sm"
-              >
-                <Coins className="h-3.5 w-3.5 text-muted-foreground" />
-                {t('account.myNfts')}
-              </NavLink>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer p-0">
-              <NftMarketplaceButton variant="menu" />
-            </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer p-0">
-              <NavLink
-                href="/transfer-cst"
-                className="flex w-full items-center gap-2.5 px-2 py-1.5 text-sm"
-              >
-                <SendHorizontal className="h-3.5 w-3.5 text-muted-foreground" />
-                {t('account.transferCst')}
-              </NavLink>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer p-0">
-              <UniswapTradeButton variant="menu" />
-            </DropdownMenuItem>
-            <AddCstToMetaMaskButton />
-            <DropdownMenuItem className="cursor-pointer p-0">
-              <ChaosZeroButton variant="menu" />
-            </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer p-0">
-              <NavLink
-                href="/my-anchors"
-                className="flex w-full items-center gap-2.5 px-2 py-1.5 text-sm"
-              >
-                <Layers className="h-3.5 w-3.5 text-muted-foreground" />
-                {t('account.myAnchors')}
-              </NavLink>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer p-0">
-              <NavLink
-                href="/recipient-history"
-                className="flex w-full items-center gap-2.5 px-2 py-1.5 text-sm"
-              >
-                <History className="h-3.5 w-3.5 text-muted-foreground" />
-                {t('account.winningHistory')}
-              </NavLink>
-            </DropdownMenuItem>
-          </div>
-
-          <DropdownMenuSeparator />
-
-          {/* Balances */}
-          <div className="px-3 py-2 space-y-1.5">
-            <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
-              {t('labels.balancesHeading')}
-            </p>
-            {loading ? (
-              <p className="text-xs text-primary">{t('labels.loading')}</p>
-            ) : (
+      // The wallet modal UI is a lazy chunk that mounts on demand; hover and
+      // focus warm it, so the click still feels instant.
+      <div className="ml-auto">
+        <ConnectWalletAction
+          showIcon={false}
+          label={
+            compactInHeader ? (
               <>
-                <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">{t('balances.eth')}</span>
-                  <span className="font-medium">{formatFixed(balance.ETH, 4)}</span>
-                </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">{t('balances.cst')}</span>
-                  <span className="font-medium">{formatFixed(balance.CosmicToken, 2)}</span>
-                </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">{t('balances.cosmicNfts')}</span>
-                  <span className="font-medium">
-                    {t('labels.nftCount', { count: balance.CosmicSignature })}
-                  </span>
-                </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">{t('balances.rwlkNfts')}</span>
-                  <span className="font-medium">
-                    {t('labels.nftCount', { count: balance.RWLK })}
-                  </span>
-                </div>
+                <span className="sm:hidden lg:inline xl:hidden">{t('connect.buttonShort')}</span>
+                <span className="hidden sm:inline lg:hidden xl:inline">{t('connect.button')}</span>
               </>
-            )}
-          </div>
-
-          <DropdownMenuSeparator />
-
-          {/* Staking */}
-          <div className="px-3 py-2 space-y-1.5">
-            <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
-              {t('labels.anchoredHeading')}
-            </p>
-            <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">{t('balances.anchoredCst')}</span>
-              <span className="font-medium text-primary">
-                {t('labels.nftCount', { count: stakedTokenCount.cst })}
-              </span>
-            </div>
-            <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">{t('balances.anchoredRwlk')}</span>
-              <span className="font-medium text-primary">
-                {t('labels.nftCount', { count: stakedTokenCount.rwalk })}
-              </span>
-            </div>
-          </div>
-
-          <DropdownMenuSeparator />
-
-          {/* Explorer, switch wallet and disconnect */}
-          <div className="px-1 py-1">
-            <WalletAccountMenuItems />
-          </div>
-        </DropdownMenuContent>
-      </DropdownMenu>
+            ) : undefined
+          }
+          className={cn('min-h-11 sm:min-h-10', liquid && 'liquid-glass-cta', className)}
+        />
+      </div>
     );
   }
 
+  const details: AccountDetailsProps = {
+    loading,
+    balance,
+    stakedTokenCount,
+    hasUnclaimedRewards,
+    retrievableEth,
+  };
+
+  const sheet = (
+    <AccountSheet
+      {...details}
+      trigger={
+        <SheetTrigger asChild>
+          <WalletPill
+            address={account}
+            hasUnclaimedRewards={hasUnclaimedRewards}
+            withChevron={false}
+            liquid={liquid}
+            testId="wallet-account-trigger"
+            className={cn(mode === 'responsive' && 'md:hidden', className)}
+          />
+        </SheetTrigger>
+      }
+    />
+  );
+  const menu = (
+    <AccountMenu
+      {...details}
+      trigger={
+        <DropdownMenuTrigger asChild>
+          <WalletPill
+            address={account}
+            hasUnclaimedRewards={hasUnclaimedRewards}
+            withChevron
+            liquid={liquid}
+            testId="wallet-menu-trigger"
+            className={cn(mode === 'responsive' && 'hidden md:inline-flex', className)}
+          />
+        </DropdownMenuTrigger>
+      }
+    />
+  );
+
+  if (mode === 'sheet') return sheet;
+  if (mode === 'menu') return menu;
   return (
-    // Our own trigger (not RainbowKit's ConnectButton): the wallet modal UI
-    // is deferred to a lazy chunk that mounts on demand, so nothing from
-    // RainbowKit can render before intent. Hover/focus warms the chunk so
-    // the click still feels instant.
-    <div className="ml-auto">
-      <ConnectWalletAction
-        showIcon={false}
-        className={cn('min-h-11 sm:min-h-0', liquid && 'liquid-glass-cta', className)}
-      />
-    </div>
+    <>
+      {sheet}
+      {menu}
+    </>
   );
 };
 
