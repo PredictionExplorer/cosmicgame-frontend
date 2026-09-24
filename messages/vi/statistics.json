@@ -383,7 +383,7 @@
     "leaderboardTitle": "Đã chi và đã nhận",
     "claimsTitle": "Nhận về theo chu kỳ",
     "leaderboard": {
-      "description": "Mỗi người tham gia đạt số nét bút tối thiểu đã chọn đã chi bao nhiêu cho nét bút và nhận lại bao nhiêu qua phân bổ ETH, trên mọi chu kỳ. Số liệu tính bằng ETH; CST đã chi cùng phân bổ NFT và CST hiển thị bên dưới.",
+      "description": "Mỗi người tham gia đạt số nét bút tối thiểu đã chọn đã chi bao nhiêu cho nét bút và được phân bổ bao nhiêu ETH, trên mọi chu kỳ. Số liệu tính bằng ETH; CST đã chi cùng phân bổ NFT và CST hiển thị bên dưới.",
       "minimumGestures": "Số nét bút tối thiểu",
       "loadErrorTitle": "Không tải được bảng xếp hạng thành tích",
       "loadErrorMessage": "Dịch vụ thống kê không phản hồi. Hãy thử lại sau ít phút.",

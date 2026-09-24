@@ -16,6 +16,9 @@ import { SkeletonTable } from '@/components/ui/skeleton';
 
 import { SegmentedControl } from './SegmentedControl';
 
+/** The backend's order key for "most gestures first"; the table re-sorts client-side. */
+const GESTURE_ORDER = 'bids'; // lexicon-allow-backend-type
+
 /** The gesture floors a reader can filter by. */
 export const MIN_GESTURE_OPTIONS = [5, 10, 25] as const;
 
@@ -42,7 +45,7 @@ export const ParticipantOutcomesSection = () => {
   const t = useTranslations('statistics');
   const format = useFormat();
   const [minGestures, setMinGestures] = useState<number>(MIN_GESTURE_OPTIONS[0]);
-  const { data, isLoading, isError, refetch } = useOutcomesQuery('bids', minGestures);
+  const { data, isLoading, isError, refetch } = useOutcomesQuery(GESTURE_ORDER, minGestures);
   const list = useMemo(() => data ?? [], [data]);
   const totals = useMemo(() => outcomeTotals(list), [list]);
   const eth = (value: number) => format.amount(value, { unit: 'ETH' });

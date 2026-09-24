@@ -10,12 +10,14 @@ import { createDashboardInfo } from '../test-support/statisticsTestFixtures';
 
 const mockUseDashboardInfo = jest.fn();
 const mockUseCTStatistics = jest.fn();
-const mockUseBidFrequency = jest.fn();
+const mockUseGestureFrequency = jest.fn();
 
 jest.mock('../../../../../hooks/useApiQuery', () => ({
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
   useCTStatistics: (...args: unknown[]) => mockUseCTStatistics(...args),
-  useBidFrequency: (...args: unknown[]) => mockUseBidFrequency(...args),
+  // lexicon-allow-start: the hook name mirrors the backend route
+  useBidFrequency: (...args: unknown[]) => mockUseGestureFrequency(...args),
+  // lexicon-allow-end
 }));
 
 jest.mock('next/link', () => ({
@@ -44,7 +46,7 @@ beforeEach(() => {
   jest.clearAllMocks();
   mockDashboard();
   mockUseCTStatistics.mockReturnValue({ data: { TotalSupplyEth: 55707.11 }, isLoading: false });
-  mockUseBidFrequency.mockReturnValue({ data: [], isLoading: false, isError: false });
+  mockUseGestureFrequency.mockReturnValue({ data: [], isLoading: false, isError: false });
 });
 
 describe('StatisticsHubPanel', () => {

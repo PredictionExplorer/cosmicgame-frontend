@@ -46,7 +46,7 @@ beforeEach(() => {
 describe('ParticipantOutcomesSection', () => {
   it('asks the backend in gesture order and sorts by gestures', () => {
     render(<ParticipantOutcomesSection />);
-    expect(mockUseOutcomes).toHaveBeenCalledWith('bids', 5);
+    expect(mockUseOutcomes).toHaveBeenCalledWith('bids', 5); // lexicon-allow-backend-type
     const rows = within(screen.getByRole('table')).getAllByRole('row');
     expect(rows[1]).toHaveTextContent('810');
     expect(rows[3]).toHaveTextContent('7');
@@ -72,7 +72,7 @@ describe('ParticipantOutcomesSection', () => {
     const user = userEvent.setup();
     render(<ParticipantOutcomesSection />);
     await user.click(screen.getByRole('radio', { name: '25+' }));
-    expect(mockUseOutcomes).toHaveBeenLastCalledWith('bids', 25);
+    expect(mockUseOutcomes).toHaveBeenLastCalledWith('bids', 25); // lexicon-allow-backend-type
   });
 
   it('says when no participant meets the floor', () => {
