@@ -140,6 +140,37 @@ describe('SignatureViewer', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
+  it('shows the browser’s controls while the animation fills the screen, and only then', () => {
+    let current: Element | null = null;
+    Object.defineProperty(document, 'fullscreenElement', {
+      configurable: true,
+      get: () => current,
+    });
+    renderViewer();
+    fireEvent.click(modeButton(/detail.viewer.motion/));
+    const video = screen.getByTestId('signature-motion') as HTMLVideoElement;
+    expect(video.controls).toBe(false);
+
+    current = video;
+    act(() => {
+      document.dispatchEvent(new Event('fullscreenchange'));
+    });
+    expect(video.controls).toBe(true);
+    // The native controls own the click: the page does not toggle it a second time.
+    const plays = play.mock.calls.length;
+    const pauses = pause.mock.calls.length;
+    fireEvent.click(video);
+    expect(play).toHaveBeenCalledTimes(plays);
+    expect(pause).toHaveBeenCalledTimes(pauses);
+
+    current = null;
+    act(() => {
+      document.dispatchEvent(new Event('fullscreenchange'));
+    });
+    expect(video.controls).toBe(false);
+    Reflect.deleteProperty(document, 'fullscreenElement');
+  });
+
   it('draws the pending plate with the token number when there is no seed yet', () => {
     renderViewer({ media: null });
     const plate = screen.getByRole('img', { name: '“Twisted Mind”, Cosmic Signature #000025' });

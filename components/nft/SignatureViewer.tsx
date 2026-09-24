@@ -20,6 +20,14 @@ interface WebkitVideoElement extends HTMLVideoElement {
   webkitEnterFullscreen?: () => void;
 }
 
+/** The element in full screen, with Safari's prefixed property as a fallback. */
+function fullscreenElement(): Element | null {
+  const doc = document as Document & { webkitFullscreenElement?: Element | null };
+  return doc.fullscreenElement ?? doc.webkitFullscreenElement ?? null;
+}
+
+const FULLSCREEN_CHANGE_EVENTS = ['fullscreenchange', 'webkitfullscreenchange'] as const;
+
 export interface SignatureViewerProps {
   /** The token's published media; `null` until the indexer has its seed. */
   media: SignatureMedia | null;
@@ -136,6 +144,24 @@ export function SignatureViewer({
     };
   }, [showMotion]);
 
+  // Full screen leaves the label row behind, so the animation gets the
+  // browser's own controls (pause, scrub, exit) while it fills the screen,
+  // and hands them back when it returns to the plate.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!showMotion || !video) return;
+    const syncControls = () => {
+      video.controls = fullscreenElement() === video;
+    };
+    for (const type of FULLSCREEN_CHANGE_EVENTS) document.addEventListener(type, syncControls);
+    return () => {
+      for (const type of FULLSCREEN_CHANGE_EVENTS) {
+        document.removeEventListener(type, syncControls);
+      }
+      video.controls = false;
+    };
+  }, [showMotion]);
+
   const togglePlayback = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -143,6 +169,11 @@ export function SignatureViewer({
     if (video.paused) void video.play()?.catch(() => {});
     else video.pause();
   }, []);
+
+  // With native controls showing, a click on the video already toggles it.
+  const handleVideoClick = () => {
+    if (!videoRef.current?.controls) togglePlayback();
+  };
 
   const openFullscreen = () => {
     const video = videoRef.current;
@@ -180,7 +211,7 @@ export function SignatureViewer({
               onPlay={() => setPlaying(true)}
               onPause={() => setPlaying(false)}
               onError={handleMotionError}
-              onClick={togglePlayback}
+              onClick={handleVideoClick}
               className="relative z-[1] cursor-pointer"
               data-testid="signature-motion"
             />
