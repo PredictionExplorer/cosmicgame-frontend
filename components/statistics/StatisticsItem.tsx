@@ -19,7 +19,8 @@ export interface StatisticsItemProps {
  * StatisticsItem — one spec-sheet row: the label on the left in the muted
  * tier, the figure on the right in tabular `type-figure-sm`, a caption under
  * the figure when it needs one. Labels wrap at word boundaries; a figure
- * never wraps inside itself. With `href` the figure links to the records it
+ * never wraps inside itself: it keeps its width and the label wraps
+ * beside it, so a narrow row never pushes the figure past the edge. With `href` the figure links to the records it
  * counts, ending in the ledger's arrow.
  */
 export function StatisticsItem({ title, value, caption, href, className }: StatisticsItemProps) {
@@ -31,7 +32,7 @@ export function StatisticsItem({ title, value, caption, href, className }: Stati
       )}
     >
       <dt className="min-w-0 type-body-sm text-muted-foreground">{title}</dt>
-      <dd className="min-w-0 text-right">
+      <dd className="shrink-0 text-right">
         {href ? (
           <Link
             href={href}

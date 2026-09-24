@@ -118,7 +118,8 @@ export function SectionShell({
           ) : null}
         </div>
         {actions && open ? (
-          <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>
+          // Never wider than the row: on a phone the actions take their own line and wrap inside it.
+          <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2">{actions}</div>
         ) : null}
       </div>
       <div id={panelId} hidden={!open} className="mt-6 min-w-0 sm:mt-8">

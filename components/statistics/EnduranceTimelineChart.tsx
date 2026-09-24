@@ -29,8 +29,8 @@ import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
 import { SkeletonChart } from '@/components/ui/skeleton';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
+import { SegmentedControl } from './SegmentedControl';
 import { ChartFigure } from './charts/ChartFigure';
 import { ChartLegend } from './charts/ChartLegend';
 import { ChartTooltipCard } from './charts/ChartTooltipCard';
@@ -407,6 +407,7 @@ const EnduranceTimelineChart: FC<EnduranceTimelineChartProps> = ({ round, isLive
   const locale = useLocale();
   const hasRound = round >= 0;
   const { data: gestures, isLoading, isError, refetch } = useGestureListByCycle(round, 'asc');
+  const [view, setView] = useState<'gantt' | 'lines'>('gantt');
 
   // Finalized rounds end at their claim timestamp; the live round stays open at "now".
   const { data: roundInfo } = useRoundInfo(hasRound && !isLive ? round : -1);
@@ -516,21 +517,26 @@ const EnduranceTimelineChart: FC<EnduranceTimelineChartProps> = ({ round, isLive
       }
       state={state}
       note={t('charts.endurance.description')}
+      controls={
+        <SegmentedControl
+          label={t('charts.endurance.viewLabel')}
+          hideLabel
+          value={view}
+          onValueChange={setView}
+          options={[
+            { value: 'gantt', label: t('charts.endurance.gantt') },
+            { value: 'lines', label: t('charts.endurance.lineChart') },
+          ]}
+        />
+      }
       table={<DataTable data={rows} columns={columns} ariaLabel={label} />}
     >
       <div data-testid="endurance-timeline-chart">
-        <Tabs defaultValue="gantt" className="w-full">
-          <TabsList aria-label={t('charts.endurance.viewLabel')}>
-            <TabsTrigger value="gantt">{t('charts.endurance.gantt')}</TabsTrigger>
-            <TabsTrigger value="lines">{t('charts.endurance.lineChart')}</TabsTrigger>
-          </TabsList>
-          <TabsContent value="gantt" className="mt-5">
-            <EnduranceGanttView gantt={gantt} />
-          </TabsContent>
-          <TabsContent value="lines" className="mt-5">
-            <EnduranceLineView points={timeline.points} />
-          </TabsContent>
-        </Tabs>
+        {view === 'gantt' ? (
+          <EnduranceGanttView gantt={gantt} />
+        ) : (
+          <EnduranceLineView points={timeline.points} />
+        )}
       </div>
     </ChartFigure>
   );
