@@ -284,6 +284,22 @@ describe('StandingsLedger', () => {
     expect(within(ledger).getByText('common.status.loading')).toHaveClass('sr-only');
   });
 
+  it('names the Signature Allocation in the Last Gesture row until a page gives its figure', () => {
+    const { rerender } = render(<StandingsLedger {...baseProps} />);
+    const latestRow = () => screen.getByTestId('latest-participant-intel');
+    // The home: its clock already shows the figure, so the row names it.
+    expect(visibleText(latestRow())).toContain('home.observatory.clock.reserveLabel');
+    expect(visibleText(latestRow())).not.toContain('8.0735');
+
+    // The cycle page: a figure like the other rows', captioned with its name.
+    rerender(<StandingsLedger {...baseProps} signatureEth={8.0735} />);
+    expect(visibleText(latestRow())).toContain('8.0735');
+    expect(visibleText(latestRow())).toContain('home.observatory.clock.reserveLabel');
+
+    rerender(<StandingsLedger {...baseProps} signatureEth={null} />);
+    expect(within(latestRow()).getByText('common.status.unavailable')).toBeInTheDocument();
+  });
+
   it('sits one level deeper, introduced by a line, inside the cycle page', () => {
     render(
       <StandingsLedger

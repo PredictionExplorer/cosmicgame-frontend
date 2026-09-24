@@ -96,6 +96,8 @@
   },
   "gestureDetail": {
     "title": "Thông tin nét bút",
+    "titleFor": "Nét bút #{position} · Chu kỳ #{cycle}",
+    "titleForId": "Bản ghi nét bút {id}",
     "description": "Xem thông tin chi tiết về nét bút gồm dấu thời gian, địa chỉ người tham gia, chi phí nét bút và bối cảnh chu kỳ của giao thức Cosmic Signature."
   },
   "coordinationChanges": {

@@ -40,8 +40,8 @@
   },
   "contact": {
     "heading": "ほかに知りたいことはありますか？",
-    "description": "お探しの答えが見つからない場合は、以下のチャンネルでコミュニティにご相談ください。",
-    "x": "Twitter / X",
+    "description": "DiscordまたはXで質問してください。コミュニティとチームの両方が目を通しています。",
+    "x": "X（Twitter）",
     "discord": "Discord"
   },
   "tooltips": {

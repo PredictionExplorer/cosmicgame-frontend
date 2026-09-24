@@ -364,7 +364,7 @@ export const faqTextJa = {
       'get-help': {
         question: '質問があるとき、どこで助けを得られますか？',
         answer:
-          'Discord、X / Twitter、サポートメールで問い合わせできます。公式リンクとメールアドレスは「Cosmic Signatureについて」ページで確認してください。',
+          'Discord、X（Twitter）、サポートメールで問い合わせできます。公式リンクとメールアドレスは「Cosmic Signatureについて」ページで確認してください。',
       },
       'stay-updated': {
         question: 'Cosmic Signatureの最新情報はどう追えますか？',

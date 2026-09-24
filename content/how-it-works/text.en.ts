@@ -2,6 +2,8 @@ import { protocolFacts } from '@/content/protocol-facts';
 
 import type { HowItWorksText } from './structure';
 
+const cst = protocolFacts.specialAllocationCst.toLocaleString('en-US');
+
 /** English how-it-works copy, keyed by the skeleton in structure.ts. */
 export const howItWorksTextEn = {
   metadata: {
@@ -27,73 +29,79 @@ export const howItWorksTextEn = {
   },
   rewardBreakdown: {
     heading: 'What a gesture can lead to',
-    subhead: 'Participation CST and the allocation tracks available each cycle.',
+    subhead: 'Each gesture takes part in several allocation tracks of its cycle.',
     items: [
       {
         title: 'Dynamic Participation CST',
         description:
-          'Each gesture may imprint CST based on how long it has been since the previous gesture.',
-        tooltip: `Participation CST uses a square-root formula: ${protocolFacts.dynamicCstRewardFormula}. Rapid gestures can receive 0 CST; longer quiet periods create larger imprints.`,
+          'A gesture may imprint CST. The amount follows the square root of the time since the previous gesture: a gesture right after another can imprint 0 CST, and a longer quiet period imprints more.',
       },
       {
         title: 'Stellar Selection entry',
-        description:
-          'Each gesture records an entry in Stellar Selection for end-of-cycle allocations.',
-        tooltip: `When the cycle finalizes, entries are randomly selected: three participants share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve in ETH.`,
+        description: `Each gesture records one entry. When the cycle finalizes, three entries are drawn at random to share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve in ETH.`,
       },
       {
         title: 'Cosmic Signature NFT selection',
-        description: `Ten participants receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and a unique Cosmic Signature NFT via Stellar Selection each cycle.`,
-        tooltip: `Ten Stellar Selection recipients plus ten Random Walk NFT anchor-holders each receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and a Cosmic Signature NFT each cycle.`,
+        description: `Ten more entries are drawn to receive ${cst} CST and a Cosmic Signature NFT each. The same address can be drawn more than once, and no number of entries guarantees a selection.`,
       },
       {
         title: 'Signature Allocation',
-        description: `The participant who made the Final Gesture may retrieve ${protocolFacts.mainEthPercentage}% of the Cycle Reserve in ETH, ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST, and a Cosmic Signature NFT.`,
-        tooltip:
-          'ETH gestures add to the Cycle Reserve. The participant who made the Final Gesture may finalize the cycle and retrieve the Signature Allocation through the protocol contract.',
+        description: `The participant who made the Final Gesture may finalize the cycle and retrieve ${protocolFacts.mainEthPercentage}% of the Cycle Reserve in ETH, ${cst} CST and a Cosmic Signature NFT.`,
       },
     ],
+  },
+  costs: {
+    heading: 'What a gesture costs',
+    subhead: 'Know these before you pay for a gesture with ETH or CST.',
+    items: [
+      {
+        title: 'The spend is not returned',
+        body: 'ETH paid for a gesture joins the Cycle Reserve, and CST paid is burned. Neither comes back when someone gestures after you.',
+      },
+      {
+        title: 'The ETH cost steps up',
+        body: `Each ETH gesture raises the next ETH Gesture Cost by ${protocolFacts.ethGestureCostStepUpPercent}%. It falls only in the ETH Calibration Window that opens each cycle.`,
+      },
+      {
+        title: 'Gas is paid separately',
+        body: 'Every gesture is an Arbitrum transaction, so you also pay a network fee in ETH. Your wallet shows it before you confirm.',
+      },
+    ],
+    note: 'Gesture only with funds you can afford to part with.',
+    riskLinkLabel: 'Read the risk disclosures',
   },
   gameCycle: {
     heading: 'Lifecycle of a Performance Cycle',
     subhead: 'Every cycle follows this sequence from open to finalization.',
+    legend: {
+      gestures: 'Gestures',
+      exclusiveWindow: `${protocolFacts.finalGestureExclusivityHours}-hour window: only the Final Gesture participant can finalize`,
+      allocations: 'Allocation tracks',
+    },
     phases: [
       {
         label: 'The cycle opens',
-        description: `A new Performance Cycle begins. The first ETH Calibration Window opens, and the CST Calibration Window starts from a ${protocolFacts.initialCstCalibrationWindowHours}-hour reference that then changes with participation.`,
-        tooltip:
-          'Calibration Windows let participants gesture at falling cost. The Cycle Reserve starts at zero plus the Compounding Reserve from the previous cycle.',
+        description: `A new Performance Cycle opens. The ETH and CST Gesture Costs each fall through a Calibration Window; the CST window starts from a ${protocolFacts.initialCstCalibrationWindowHours}-hour reference that changes with participation. The Cycle Reserve starts with what the previous cycle carried forward.`,
       },
       {
         label: 'Participants gesture',
-        description: `Each gesture adds the current time increment to Cycle Finalization Time. Participation CST is dynamic, and ETH/CST gestures move the CST Calibration Window by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}% down or ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}% up.`,
-        tooltip:
-          'Participation CST follows a square-root formula based on elapsed time since the previous gesture. The current app preview is the source of truth for the exact CST amount.',
+        description: `Each gesture adds the current time increment to the Cycle Finalization Time. An ETH gesture shortens the CST Calibration Window by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%; a CST gesture lengthens it by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%.`,
       },
       {
         label: 'The Cycle Finalization Time expires',
-        description:
-          'When the countdown reaches zero, the participant who made the Final Gesture becomes eligible to finalize the cycle.',
-        tooltip: `Gestures remain possible until finalization actually executes — a late gesture extends the stored time and takes over the Final Gesture position. The Final Gesture participant has a ${protocolFacts.finalGestureExclusivityHours}-hour exclusive finalization window; afterwards anyone may finalize and receives the Signature Allocation.`,
+        description: `When the countdown reaches zero, the participant who made the Final Gesture has ${protocolFacts.finalGestureExclusivityHours} hours to finalize the cycle. After that, anyone may finalize, and whoever does receives the Signature Allocation. Until finalization runs, a new gesture extends the clock and becomes the Final Gesture.`,
       },
       {
         label: 'The cycle finalizes',
-        description: `The participant who made the Final Gesture retrieves the Signature Allocation: ${protocolFacts.mainEthPercentage}% of the Cycle Reserve, ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST, and a Cosmic Signature NFT.`,
-        tooltip:
-          'The Signature Allocation retrieval happens via the protocol contract. The CST and Cosmic Signature NFT are imprinted automatically.',
+        description: `Finalization distributes every allocation. The participant who finalizes receives the Signature Allocation: ${protocolFacts.mainEthPercentage}% of the Cycle Reserve, ${cst} CST and a Cosmic Signature NFT.`,
       },
       {
         label: 'Stellar Selections',
-        description: `Three ETH Stellar Selection recipients share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve. Ten NFT Stellar Selection recipients plus ten Anchored-NFT Stellar Selection recipients each receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and a Cosmic Signature NFT.`,
-        tooltip:
-          'Each gesture adds one entry, and every selection is drawn from all of the cycle’s entries, with replacement. Anchored Random Walk NFTs take part in a separate Stellar Selection.',
+        description: `Three ETH Stellar Selection recipients share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve. Ten NFT Stellar Selection recipients, and ten Anchored-NFT Stellar Selection recipients drawn from anchored Random Walk NFTs, each receive ${cst} CST and a Cosmic Signature NFT. Each gesture adds one entry, and every selection is drawn from all of the cycle’s entries, with replacement.`,
       },
       {
         label: 'The next cycle begins',
-        description:
-          'About half of the Cycle Reserve rolls forward as the Compounding Reserve, and the next cycle begins with fresh Calibration Windows.',
-        tooltip:
-          'The Compounding Cycle Reserve means the protocol accumulates value rather than extracts it. The live contracts report the current window durations and costs.',
+        description: `The remaining ${protocolFacts.compoundingReservePercentage}% of the Cycle Reserve rolls forward as the Compounding Reserve, and the next cycle opens with fresh Calibration Windows.`,
       },
     ],
   },
@@ -105,79 +113,61 @@ export const howItWorksTextEn = {
   },
   stepByStep: {
     heading: 'Getting started',
-    subhead: 'From wallet connection to your first gesture in three steps.',
+    subhead: 'From connecting a wallet to your first gesture, in three steps.',
     stepLabel: 'Step {n}',
     steps: [
       {
         title: 'Connect your wallet',
-        tooltip:
-          'Arbitrum is a Layer 2 blockchain on Ethereum with lower gas fees and faster transactions.',
         highlights: [
-          'Click the "Connect Wallet" button at the top of the page.',
-          'Use a wallet that supports the Arbitrum blockchain, such as MetaMask.',
-          'Switch your network to Arbitrum when prompted, then approve permissions.',
-          'Your wallet address will appear in the header once connected.',
+          'Press the connect button at the top right of the page.',
+          'Use a wallet that supports Arbitrum, such as MetaMask. Arbitrum is an Ethereum Layer 2 with lower fees and faster transactions.',
+          'Switch to the Arbitrum network when your wallet asks, then approve the connection.',
+          'Once you are connected, your address appears in the header.',
         ],
       },
       {
         title: 'Check the Gesture Cost',
-        tooltip:
-          'Check the gas estimate in your wallet before confirming. Network fees vary and are separate from the Gesture Cost.',
         highlights: [
-          'Check the current Gesture Cost in ETH or CST before committing.',
-          'Review the live Participation CST preview; the amount changes with time since the previous gesture.',
-          'Note the Signature Allocation amount to see the potential ETH distribution.',
-          'Ensure your wallet holds the Gesture Cost plus a small amount for gas fees.',
+          'Check the current Gesture Cost in ETH or CST before you commit.',
+          'Review the Participation CST preview; it changes with the time since the previous gesture.',
+          'Make sure your wallet holds the Gesture Cost plus a little ETH for the network fee, which your wallet shows before you confirm.',
         ],
       },
       {
         title: 'Make your gesture',
-        tooltip: `Each Random Walk NFT can be used once for the ${protocolFacts.randomWalkDiscountPercentage}% ETH Gesture Cost reduction - choose your moment wisely.`,
         highlights: [
-          `Choose ETH, optionally attach a Random Walk NFT for a ${protocolFacts.randomWalkDiscountPercentage}% ETH Gesture Cost reduction, or make a CST (ERC-20) gesture.`,
-          'Press the gesture button, which names the method and the cost (for example "Gesture with ETH"), and confirm the transaction in your wallet.',
+          `Choose ETH or CST. An ETH gesture can carry a Random Walk NFT for a ${protocolFacts.randomWalkDiscountPercentage}% ETH Gesture Cost reduction, once per NFT.`,
+          'Press the gesture button, which names the method and the cost (for example “Gesture with ETH”), and confirm the transaction in your wallet.',
         ],
       },
     ],
+    fundingText: 'Need ETH on Arbitrum first?',
+    fundingLinkLabel: 'How to add ETH on Arbitrum',
   },
   proTips: {
-    heading: 'Tips and strategy',
-    subhead: 'Practical guidance for maximizing participation across allocation tracks.',
+    heading: 'Good to know',
+    subhead: 'Details that are easy to miss.',
     tips: [
       {
-        title: 'Watch both Calibration Windows',
-        body: 'ETH gestures slightly shorten the CST Calibration Window; CST gestures slightly lengthen it. The live app panels show the current cost path.',
+        title: 'Two Calibration Windows',
+        body: `The ETH Gesture Cost falls through its Calibration Window once, as each cycle opens. The CST Gesture Cost starts a new window after every CST gesture: from twice the cost just paid (at least ${protocolFacts.cstCalibrationCeilingMinCst} CST) down to zero.`,
       },
       {
-        title: 'Attach a Random Walk NFT',
-        body: 'Each Random Walk NFT can be used once for the cost reduction. Save it for a higher-cost gesture to maximize the effect.',
+        title: 'Each Random Walk NFT works once',
+        body: `A Random Walk NFT reduces one ETH gesture by ${protocolFacts.randomWalkDiscountPercentage}%, and cannot reduce another after that. Using it is separate from anchoring it.`,
       },
       {
-        title: 'One gesture, one Stellar Selection entry',
-        body: `Three ETH Stellar Selection recipients share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve. Ten participant NFT recipients and ten Random Walk NFT anchor-holders each receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and a Cosmic Signature NFT.`,
-      },
-      {
-        title: 'Use a burner wallet',
-        body: 'A burner wallet isolates your protocol activity from your main holdings for additional security. Audit and verification status is published on the Audits page.',
-      },
-      {
-        title: 'Watch the finalization time',
-        body: 'Gesturing near the deadline positions you closest to the Final Gesture, but another participant can still gesture after you until the cycle is finalized.',
-      },
-      {
-        title: 'Gesture with CST',
-        body: `A CST gesture records a Stellar Selection entry, extends the timer, may imprint dynamic Participation CST, and lengthens the CST Calibration Window by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%.`,
+        title: 'Use a separate wallet',
+        body: 'A burner wallet keeps your protocol activity apart from your main holdings. The Audits page lists what has been reviewed and verified.',
       },
     ],
   },
   callToAction: {
     heading: 'Ready to make your first gesture?',
-    // The JSX original rendered a literal "\u2019" because unicode escapes are
-    // not processed inside JSX text; this is the intentional fix to a real ’.
     body: 'Join the active Performance Cycle. Connect your wallet and make your first gesture to start imprinting CST and shaping the cycle’s Signature.',
     primaryCtaLabel: 'Make a gesture',
     faqCtaLabel: 'Browse the FAQ',
     discordCtaLabel: 'Discord',
-    twitterCtaLabel: 'Twitter / X',
+    twitterCtaLabel: 'X (Twitter)',
   },
 } satisfies HowItWorksText;

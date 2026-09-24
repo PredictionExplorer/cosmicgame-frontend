@@ -11,6 +11,7 @@ import {
   type FAQContent,
 } from '@/content/faq';
 
+import { jumpToSection, sectionScrollBehavior } from '@/lib/jumpToSection';
 import { PageShell } from '@/components/ui/page-shell';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Button } from '@/components/ui/button';
@@ -32,14 +33,16 @@ function useDebounce(value: string, delay: number): string {
   return debounced;
 }
 
-/** Smooth unless the reader asked for reduced motion. */
-function scrollBehavior(): ScrollBehavior {
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
-}
-
 /** Scrolls an element to the top of the reading area; its scroll-margin clears the sticky bars. */
 function scrollToElement(id: string) {
-  document.getElementById(id)?.scrollIntoView({ behavior: scrollBehavior(), block: 'start' });
+  document
+    .getElementById(id)
+    ?.scrollIntoView({ behavior: sectionScrollBehavior(), block: 'start' });
+}
+
+/** The button that opens and closes a question (the accordion trigger in its header). */
+function questionTrigger(anchor: string): HTMLElement | null {
+  return document.getElementById(anchor)?.querySelector<HTMLElement>('h3 button') ?? null;
 }
 
 interface FAQPageProps {
@@ -51,7 +54,10 @@ interface FAQPageProps {
  * questions, then a contents rail (a sticky column from `lg`, a sticky chip
  * row below it) beside the categories and the glossary. Answers are closed
  * by default and open in place from a popular question, a shared `#link`,
- * find-in-page or "Expand all"; a search opens every matching answer.
+ * find-in-page or "Expand all"; a search opens every matching answer. A
+ * jump from the contents or a popular question moves keyboard focus with
+ * it (to the category heading, or the opened question) and puts the anchor
+ * in the address bar, as following the link itself would.
  */
 const FAQPage = ({ content }: FAQPageProps) => {
   const t = useTranslations('faq');
@@ -99,12 +105,22 @@ const FAQPage = ({ content }: FAQPageProps) => {
     [categories, t],
   );
 
-  const openItem = useCallback((itemId: string, categoryId: string, anchor: string) => {
-    setExpandedItems((current) => (current.includes(itemId) ? current : [...current, itemId]));
-    setActiveCategory(categoryId);
-    // After the answer has opened, so the scroll lands on its final position.
-    requestAnimationFrame(() => requestAnimationFrame(() => scrollToElement(anchor)));
-  }, []);
+  const openItem = useCallback(
+    (itemId: string, categoryId: string, anchor: string, moveFocus = false) => {
+      setExpandedItems((current) => (current.includes(itemId) ? current : [...current, itemId]));
+      setActiveCategory(categoryId);
+      // After the answer has opened, so the scroll lands on its final position.
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+          // A reader who chose the question continues from it; a link that
+          // opened the page only scrolls, and focus stays where it starts.
+          if (moveFocus) jumpToSection(anchor, { focus: questionTrigger(anchor) });
+          else scrollToElement(anchor);
+        }),
+      );
+    },
+    [],
+  );
 
   useEffect(() => {
     const openHashTarget = () => {
@@ -157,14 +173,15 @@ const FAQPage = ({ content }: FAQPageProps) => {
   const handlePopularClick = useCallback(
     (itemId: string, categoryId: string) => {
       const resolved = findFaqItemById(content, itemId);
-      openItem(itemId, categoryId, resolved?.item.hashAnchor ?? itemId);
+      openItem(itemId, categoryId, resolved?.item.hashAnchor ?? itemId, true);
     },
     [content, openItem],
   );
 
   const handleNavSelect = useCallback((id: string) => {
     setActiveCategory(id);
-    scrollToElement(categoryAnchor(id));
+    // Focus lands on the category heading, so the next Tab is its first question.
+    jumpToSection(categoryAnchor(id));
   }, []);
 
   const setSectionRef = useCallback(

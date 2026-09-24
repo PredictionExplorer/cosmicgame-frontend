@@ -1,12 +1,12 @@
 'use client';
 
 import { Fragment, type ReactNode } from 'react';
+import { ChevronRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { ALLOCATION_TRACK_COLORS, type AllocationTrackId } from '@/config/allocationTracks';
 import { cn } from '@/lib/utils';
 import { Amount } from '@/components/ui/amount';
-import { ExplainedTerm } from '@/components/ui/explain-popover';
 import { SectionHeader } from '@/components/ui/section-header';
 import {
   Table,
@@ -21,6 +21,8 @@ import { FundDistribution, reserveTracks } from '@/components/tokens/FundDistrib
 import type { DashboardInfo } from '@/services/api/types';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import { formatAmount, formatPercent } from '@/utils/format';
+
+import { CYCLE_SECTION_SCROLL_MARGIN } from './CycleSectionNav';
 
 /** The copy key of each allocation under `currentCycle.allocations.cards`. */
 type AllocationKey =
@@ -63,10 +65,45 @@ function joinParts(parts: ReactNode[]): ReactNode {
 }
 
 /**
+ * What each allocation is, for the section's one disclosure: a definition
+ * list of every row that has a definition, in the ledger's order.
+ */
+function AllocationDefinitions({ rows, summary }: { rows: AllocationRow[]; summary: string }) {
+  return (
+    <details className="group mb-6 border-y border-rule-faint" data-testid="allocation-definitions">
+      <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 type-label text-muted-foreground transition-colors duration-fast hover:text-foreground [&::-webkit-details-marker]:hidden">
+        <ChevronRight
+          aria-hidden
+          className="size-4 shrink-0 text-subtle transition-transform duration-fast group-open:rotate-90"
+        />
+        {summary}
+      </summary>
+      <dl className="grid gap-x-10 pb-4 md:grid-cols-2">
+        {rows.flatMap((row) =>
+          row.definition
+            ? [
+                <div key={row.key} className="border-t border-rule-faint py-3">
+                  <dt className="type-label text-foreground">{row.name}</dt>
+                  <dd className="mt-1 max-w-[var(--measure-lede)] type-body-sm text-muted-foreground">
+                    {row.definition}
+                  </dd>
+                </div>,
+              ]
+            : [],
+        )}
+      </dl>
+    </details>
+  );
+}
+
+/**
  * Everything this cycle allocates when it finalizes, once: the Cycle
  * Reserve split as a proportional bar, then one ledger of every allocation
  * with its share of the reserve (the tracks paid in ETH carry the bar's
  * colours), what each recipient receives and how many recipients there are.
+ * The allocation names are plain labels; what each one is sits in one "How
+ * the reserve splits" disclosure under the section title, not behind ten
+ * separate explanations.
  */
 export function CycleAllocations({ data, headingId }: { data: DashboardInfo; headingId: string }) {
   const t = useTranslations('currentCycle');
@@ -211,11 +248,7 @@ export function CycleAllocations({ data, headingId }: { data: DashboardInfo; hea
           row.track ? ALLOCATION_TRACK_COLORS[row.track] : 'border border-rule',
         )}
       />
-      {row.definition ? (
-        <ExplainedTerm definition={row.definition}>{row.name}</ExplainedTerm>
-      ) : (
-        row.name
-      )}
+      {row.name}
     </span>
   );
 
@@ -227,12 +260,13 @@ export function CycleAllocations({ data, headingId }: { data: DashboardInfo; hea
   };
 
   return (
-    <section aria-labelledby={headingId} className="scroll-mt-24" id="allocations">
+    <section aria-labelledby={headingId} className={CYCLE_SECTION_SCROLL_MARGIN} id="allocations">
       <SectionHeader
         headingId={headingId}
         title={t('sections.allocations.title')}
         description={t('sections.allocations.description')}
       />
+      <AllocationDefinitions rows={rows} summary={t('allocations.explain')} />
       <FundDistribution data={data} describe={false} className="mb-6" />
       {/* Phones: one short record per allocation (name and share, what each
           recipient receives, how many), instead of four labelled lines each. */}

@@ -1,4 +1,4 @@
-import { render, screen, checkA11y, fireEvent } from '@/test-utils';
+import { act, render, screen, checkA11y, fireEvent } from '@/test-utils';
 
 import CurrentRoundPage from '../CurrentRoundPage';
 
@@ -151,13 +151,35 @@ describe('CurrentRoundPage', () => {
     expect(mockRefetch).toHaveBeenCalledTimes(1);
   });
 
+  it('draws the header’s bottom rule while the body loads, before the section bar can', () => {
+    mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true, isError: false });
+    render(<CurrentRoundPage seoSummary={<header data-testid="summary" />} />);
+    const standIn = screen.getByTestId('summary').nextElementSibling;
+    expect(standIn).toHaveClass('border-b', 'border-rule');
+    expect(standIn).toHaveAttribute('aria-hidden');
+  });
+
+  it('carries one freshness stamp, on the status column only while there are no standings', () => {
+    setupLoaded({ TsRoundStart: 0, LastBidderAddr: ZERO });
+    clock(0, NOW_SEC - 60);
+    const { container, unmount } = render(<CurrentRoundPage />);
+    expect(container.querySelectorAll('[data-live-state]')).toHaveLength(1);
+    expect(container.querySelector('[data-phase] [data-live-state]')).not.toBeNull();
+    unmount();
+
+    // With standings, the ledger carries it (mocked here), so the column does not.
+    setupLoaded();
+    const loaded = render(<CurrentRoundPage />);
+    expect(loaded.container.querySelector('[data-phase] [data-live-state]')).toBeNull();
+  });
+
   it('keeps the page when a background poll fails after a successful load', () => {
     setupLoaded({}, { isError: true, isRefetchError: true });
     mockFreshness.mockReturnValue({ state: 'delayed', ageMs: 60_000, lastSuccessAtMs: 1 });
     render(<CurrentRoundPage />);
 
     expect(screen.queryByText('currentCycle.error.title')).not.toBeInTheDocument();
-    expect(screen.getByText('currentCycle.hero.title(n=42)')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.status.heading')).toBeInTheDocument();
     // The phase keeps its name but stops breathing, and the clock says it may be stale.
     expect(screen.getByTestId('live-badge')).toHaveAttribute('data-tone', 'neutral');
     expect(screen.getByText(/common\.liveStatus\.delayedCaveat/)).toBeInTheDocument();
@@ -167,9 +189,71 @@ describe('CurrentRoundPage', () => {
     setupLoaded();
     render(<CurrentRoundPage seoSummary={<h1>Current cycle</h1>} />);
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    // The H1 names the cycle, so the status column is titled by what it shows (D077).
     expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent(
-      'currentCycle.hero.title(n=42)',
+      'currentCycle.status.heading',
     );
+    expect(screen.queryByText('currentCycle.hero.title(n=42)')).not.toBeInTheDocument();
+  });
+
+  it('puts a section bar under the header that jumps to each section (D077)', () => {
+    setupLoaded();
+    render(<CurrentRoundPage seoSummary={<h1>Current cycle</h1>} />);
+    const nav = screen.getByRole('navigation', { name: 'currentCycle.sectionNav.aria' });
+    expect(Array.from(nav.querySelectorAll('a')).map((link) => link.getAttribute('href'))).toEqual([
+      '#standings',
+      '#allocations',
+      '#participants',
+      '#gesture-history',
+      '#rules',
+    ]);
+    // The standings are a jump target of their own.
+    expect(document.getElementById('standings')).toContainElement(
+      screen.getByTestId('special-allocation-recipients'),
+    );
+  });
+
+  it('leaves Standings out of the section bar before the first gesture', () => {
+    setupLoaded({ TsRoundStart: 0, LastBidderAddr: ZERO });
+    clock(0, NOW_SEC - 60);
+    render(<CurrentRoundPage />);
+    const nav = screen.getByRole('navigation', { name: 'currentCycle.sectionNav.aria' });
+    expect(nav).not.toHaveTextContent('currentCycle.sectionNav.standings');
+  });
+
+  it('keeps the status column in the page flow, beside the taller ledger (D082)', () => {
+    setupLoaded();
+    const { container } = render(<CurrentRoundPage />);
+    const status = container.querySelector('[data-phase]');
+    expect(status?.className).not.toMatch(/sticky/);
+  });
+
+  it('has one polite status that speaks changes, silent on load (D086)', () => {
+    setupLoaded();
+    render(<CurrentRoundPage />);
+    const announcer = screen.getByTestId('cycle-announcer');
+    expect(announcer).toHaveAttribute('role', 'status');
+    expect(announcer).toHaveAttribute('aria-live', 'polite');
+    expect(announcer).toBeEmptyDOMElement();
+  });
+
+  it('announces a new Last Gesture by someone else', () => {
+    jest.useFakeTimers();
+    try {
+      setupLoaded();
+      const { rerender } = render(<CurrentRoundPage />);
+      setupLoaded({
+        CurNumBids: 138,
+        LastBidderAddr: '0x2222222222222222222222222222222222222222',
+      });
+      rerender(<CurrentRoundPage />);
+      act(() => {
+        jest.advanceTimersByTime(2_000);
+      });
+      expect(screen.getByTestId('cycle-announcer')).toHaveTextContent(/home\.announce\.newGesture/);
+    } finally {
+      jest.useRealTimers();
+    }
   });
 
   it('names a running clock with the home clock’s live phase and a breathing badge', () => {

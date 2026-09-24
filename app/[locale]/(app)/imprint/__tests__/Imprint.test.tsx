@@ -94,6 +94,13 @@ describe('Imprint', () => {
     expect(screen.getByTestId('imprint-cost-breakdown')).toHaveTextContent('0.090498');
   });
 
+  it('quotes the Random Walk Gesture Cost as the header and the gesture form do (D088)', async () => {
+    renderWithQuery(<Imprint />);
+    const comparison = await screen.findByTestId('imprint-gesture-cost');
+    // Half of 0.10211 ETH, at the gesture quote's five significant digits.
+    expect(comparison).toHaveTextContent('0.051055 ETH');
+  });
+
   it('asks a disconnected visitor to connect instead of offering an imprint', async () => {
     mockAccount.mockReturnValue(null);
     renderWithQuery(<Imprint />);

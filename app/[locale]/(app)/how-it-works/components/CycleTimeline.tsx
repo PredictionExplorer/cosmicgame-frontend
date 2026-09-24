@@ -4,14 +4,18 @@ import { ArrowRight } from 'lucide-react';
 import type { HowItWorksContent } from '@/content/how-it-works';
 import { protocolFacts } from '@/content/protocol-facts';
 
-import { ALLOCATION_TRACK_IDS, type AllocationTrackId } from '@/config/allocationTracks';
+import {
+  ALLOCATION_TRACK_COLORS,
+  ALLOCATION_TRACK_IDS,
+  type AllocationTrackId,
+} from '@/config/allocationTracks';
 import { Link } from '@/i18n/navigation';
 import { GESTURE_METHOD_BG_CLASS, type GestureMethod } from '@/lib/theme/dataColors';
 import { cn } from '@/lib/utils';
 import { ArtFrame, WallLabel } from '@/components/ui/art-frame';
-import { ExplainedTerm } from '@/components/ui/explain-popover';
 import { SectionHeader } from '@/components/ui/section-header';
 import { signatureMedia, signatureSources } from '@/components/nft/signatureMedia';
+import { formatPercent } from '@/utils/format';
 import { formatId } from '@/utils/format/ids';
 
 /**
@@ -132,6 +136,22 @@ const METHOD_LEGEND: ReadonlyArray<{ method: GestureMethod; label: string }> = [
   { method: 'cst', label: 'CST' },
 ];
 
+/** The Final Gesture participant's exclusive window, drawn hatched (one pattern per drawing). */
+function WindowPattern({ id }: { id: string }) {
+  return (
+    <pattern
+      id={id}
+      width="8"
+      height="8"
+      patternUnits="userSpaceOnUse"
+      patternTransform="rotate(45)"
+    >
+      <rect width="8" height="8" className="fill-primary/15" />
+      <line x1="0" y1="0" x2="0" y2="8" strokeWidth="3" className="stroke-primary/60" />
+    </pattern>
+  );
+}
+
 /** The reserve split as segments of the allocation bar (x and width in drawing units). */
 function splitSegments(layout: DrawingLayout) {
   const total = ALLOCATION_TRACK_IDS.reduce((sum, id) => sum + SHARES[id], 0);
@@ -208,16 +228,7 @@ function CycleDrawing({ layout, className }: { layout: DrawingLayout; className?
           >
             <path d="M 0 0 L 10 5 L 0 10 z" className="fill-subtle" />
           </marker>
-          <pattern
-            id={windowId}
-            width="8"
-            height="8"
-            patternUnits="userSpaceOnUse"
-            patternTransform="rotate(45)"
-          >
-            <rect width="8" height="8" className="fill-primary/15" />
-            <line x1="0" y1="0" x2="0" y2="8" strokeWidth="3" className="stroke-primary/60" />
-          </pattern>
+          <WindowPattern id={windowId} />
         </defs>
 
         {/* The clock: from the opening gesture to the zero point. */}
@@ -348,19 +359,83 @@ function CycleDrawing({ layout, className }: { layout: DrawingLayout; className?
 }
 
 /**
+ * The drawing's key, as its caption: the gesture dots by method, the hatched
+ * exclusive window, and every allocation segment with its name and share, in
+ * the colours and order every chart of the split uses.
+ */
+function CycleLegend({
+  legend,
+  trackLabels,
+  locale,
+}: {
+  legend: HowItWorksContent['gameCycle']['legend'];
+  trackLabels: Readonly<Record<AllocationTrackId, string>>;
+  locale: string;
+}) {
+  const itemsClass = 'flex flex-wrap items-center gap-x-5 gap-y-1.5';
+  return (
+    // Three rows, each named in the start column: the gesture methods, the
+    // hatched window (its swatch stands in for a name) and the allocation tracks.
+    <figcaption className="mt-5 grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-5 gap-y-2.5 type-caption text-subtle sm:mt-3">
+      <span className="type-label text-muted-foreground">{legend.gestures}</span>
+      <ul className={itemsClass}>
+        {METHOD_LEGEND.map((entry) => (
+          <li key={entry.method} className="inline-flex items-center gap-1.5">
+            <span
+              aria-hidden
+              className={cn('size-2 rounded-pill', GESTURE_METHOD_BG_CLASS[entry.method])}
+            />
+            {entry.label}
+          </li>
+        ))}
+      </ul>
+      <svg
+        aria-hidden
+        focusable="false"
+        viewBox="0 0 24 8"
+        className="h-2 w-6 shrink-0 self-center justify-self-end"
+      >
+        <defs>
+          <WindowPattern id="cycle-window-legend" />
+        </defs>
+        <rect width="24" height="8" rx="1" fill="url(#cycle-window-legend)" />
+      </svg>
+      <p data-legend="exclusive-window">{legend.exclusiveWindow}</p>
+      <span className="type-label text-muted-foreground">{legend.allocations}</span>
+      <ul className={itemsClass}>
+        {ALLOCATION_TRACK_IDS.map((id) => (
+          <li key={id} data-legend-track={id} className="inline-flex items-center gap-1.5">
+            <span aria-hidden className={cn('size-2 rounded-edge', ALLOCATION_TRACK_COLORS[id])} />
+            {trackLabels[id]}
+            <span className="tabular-nums text-muted-foreground">
+              {formatPercent(SHARES[id], locale)}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </figcaption>
+  );
+}
+
+/**
  * How it works, drawn once: the cycle's mechanism as one diagram (a compact
- * arrangement on phones), its six numbered stages captioned below with the
- * page's own copy, and the cycle's payoff, a real Signature. Server-rendered;
- * the drawing is a picture of the captions, so it is hidden from assistive
- * technology.
+ * arrangement on phones) with its key, its six numbered stages captioned
+ * below with the page's own copy, and the cycle's payoff, a real Signature.
+ * Server-rendered and static: every rule is in the visible captions, so the
+ * drawing itself is hidden from assistive technology.
  */
 export function CycleTimeline({
   gameCycle,
   payoff,
+  trackLabels,
+  locale,
   unavailableLabel,
 }: {
   gameCycle: HowItWorksContent['gameCycle'];
   payoff: HowItWorksContent['payoff'];
+  /** Each allocation track's name, as /current-cycle and /contracts name it. */
+  trackLabels: Readonly<Record<AllocationTrackId, string>>;
+  locale: string;
   /** "Artwork unavailable", for the plate when the image cannot load. */
   unavailableLabel: string;
 }) {
@@ -377,17 +452,7 @@ export function CycleTimeline({
       <figure className="mt-8 sm:mt-12" data-testid="cycle-diagram">
         <CycleDrawing layout={COMPACT} className="sm:hidden" />
         <CycleDrawing layout={WIDE} className="max-sm:hidden" />
-        <ul
-          aria-hidden
-          className="mt-4 flex flex-wrap gap-x-5 gap-y-1 type-caption text-subtle sm:mt-2"
-        >
-          {METHOD_LEGEND.map((entry) => (
-            <li key={entry.method} className="inline-flex items-center gap-1.5">
-              <span className={cn('size-2 rounded-pill', GESTURE_METHOD_BG_CLASS[entry.method])} />
-              {entry.label}
-            </li>
-          ))}
-        </ul>
+        <CycleLegend legend={gameCycle.legend} trackLabels={trackLabels} locale={locale} />
       </figure>
 
       <ol className="mt-10 grid gap-x-10 gap-y-8 border-t border-rule pt-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -395,9 +460,7 @@ export function CycleTimeline({
           <li key={phase.label} className="flex gap-4">
             <StageNumber n={index + 1} className="mt-0.5 shrink-0" />
             <div className="min-w-0">
-              <h3 className="type-title text-foreground">
-                <ExplainedTerm definition={phase.tooltip}>{phase.label}</ExplainedTerm>
-              </h3>
+              <h3 className="type-title text-foreground">{phase.label}</h3>
               <p className="mt-1.5 type-body-sm text-muted-foreground">{phase.description}</p>
             </div>
           </li>
@@ -422,7 +485,10 @@ export function CycleTimeline({
         <div className="lg:col-span-5">
           <h3 className="type-heading-2 text-foreground">{payoff.heading}</h3>
           <p className="mt-4 type-body-md text-muted-foreground">{payoff.body}</p>
-          <Link href={payoff.link.href} className="link mt-6 inline-flex items-center gap-1.5">
+          <Link
+            href={payoff.link.href}
+            className="link mt-6 inline-flex min-h-6 items-center gap-1.5"
+          >
             {payoff.link.label}
             <ArrowRight aria-hidden className="size-4" />
           </Link>

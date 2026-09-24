@@ -5,12 +5,17 @@
   },
   "header": {
     "title": "Gesture #{position}",
-    "fallback": "Gesture",
+    "fallback": "Gesture record {id}",
     "explorer": "View transaction"
   },
   "empty": {
     "title": "No gesture information found.",
-    "help": "Check the gesture ID. A recent gesture may take a moment to appear."
+    "help": "Check the gesture ID. A recent gesture may take a moment to appear.",
+    "action": "See the current cycle"
+  },
+  "error": {
+    "title": "Gesture record didn’t load",
+    "message": "Check your connection and try again."
   },
   "figures": {
     "cost": "Gesture Cost",
@@ -37,6 +42,8 @@
     "participant": "Participant",
     "finalizationTime": "Finalization time after this gesture",
     "transaction": "Transaction",
+    "copyHash": "Copy transaction hash",
+    "hashCopied": "Transaction hash copied",
     "erc20": "Attached ERC-20",
     "erc20Amount": "Attached ERC-20 token amount",
     "nftContract": "Attached NFT contract address",
@@ -46,7 +53,7 @@
     "aria": "Neighbouring gestures",
     "previous": "Previous gesture",
     "next": "Next gesture",
-    "all": "All gestures in Cycle {cycle}"
+    "all": "All gestures in Cycle #{cycle}"
   },
   "nftPreview": {
     "collectionName": "Collection name",

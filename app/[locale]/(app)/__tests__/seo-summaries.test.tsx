@@ -386,28 +386,29 @@ describe('server-rendered page headers', () => {
 
   it('renders the current-cycle header with live cycle figures', async () => {
     render(await CurrentCycleSeoSummary());
+    // D077: the H1 is the cycle itself; the page's name is the eyebrow above it.
     expect(
-      screen.getByRole('heading', {
-        level: 1,
-        name: 'Current Cosmic Signature Performance Cycle',
-      }),
+      screen.getByRole('heading', { level: 1, name: 'currentCycle.hero.title(n=42)' }),
     ).toBeInTheDocument();
-    // The status block names the cycle; the header does not repeat its number.
+    expect(screen.getByText('Current Performance Cycle')).toBeInTheDocument();
+    expect(seoMessages.currentCycleSummary.description).not.toMatch(/\.\s+\S/);
+    // The H1 names the cycle; no figure repeats its number.
     expect(document.querySelector('[data-figure="cycle"]')).toBeNull();
     expect(figureValue('gestures')).toHaveTextContent('17');
     expect(figureValue('signatureAllocation')).toHaveTextContent('5.5000 ETH');
-    // /current-cycle belongs to Explore, as in the navigation (config/siteNav).
-    expect(screen.getByRole('link', { name: COMMON.section('explore') })).toHaveAttribute(
-      'href',
-      '/statistics',
+    // The opening date is set a size down, with its zone (D082, D275).
+    expect(document.querySelector('[data-figure="opened"]')).toHaveTextContent(
+      /formats\.dateTime\.timeZone\(zone=UTC/,
     );
-    // The gestures and Signature Allocation figures define themselves behind an info button.
+    // One explanation pattern per screen (D079): the figures are plain labels,
+    // the coined words below explain themselves in place.
     const cards = seoMessages.currentCycleSummary.cards;
     for (const label of [cards.gestures, cards.signatureAllocation]) {
-      expect(
-        screen.getByRole('button', { name: `More information about ${label}` }),
-      ).toBeInTheDocument();
+      expect(screen.getByText(label, { exact: true })).toBeInTheDocument();
     }
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    // The page's one freshness stamp is in the body, which follows the live cycle.
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 
   it('holds the server-read cycle figures before the first client read', async () => {
@@ -901,11 +902,9 @@ describe('server-rendered page headers', () => {
     galleryAbout.unmount();
 
     const currentCycle = render(await CurrentCycleSeoSummary());
+    expect(screen.getByText(zhSeoMessages.currentCycleSummary.heading)).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', {
-        level: 1,
-        name: zhSeoMessages.currentCycleSummary.heading,
-      }),
+      screen.getByRole('heading', { level: 1, name: 'currentCycle.hero.title(n=42)' }),
     ).toBeInTheDocument();
     currentCycle.unmount();
 

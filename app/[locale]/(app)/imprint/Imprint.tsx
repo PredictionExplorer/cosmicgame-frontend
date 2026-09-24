@@ -33,9 +33,10 @@ import { toFiniteNumber } from '@/utils/finiteNumber';
 import {
   IMPRINT_COST_BUFFER_PERCENT,
   ethGestureBaseCost,
+  formatEthQuote,
   imprintSendValueWei,
 } from '@/utils/gestureQuote';
-import { formatAmount } from '@/utils/format';
+import { NBSP, formatAmount } from '@/utils/format';
 
 import { imprintedTokenId, useImprintCost, useOwnedRandomWalks } from './randomWalkImprint';
 
@@ -214,11 +215,16 @@ const Imprint = ({ seoSummary }: { seoSummary?: ReactNode }) => {
               {ethGestureCost === null ? (
                 <UnknownValue label={tCommon('status.unavailable')} />
               ) : (
-                <Amount
+                // A Gesture Cost reads as the header's and the gesture form's quote
+                // (five significant digits); the imprint amounts above match the wallet.
+                <data
                   value={ethGestureBaseCost(ethGestureCost, 'RandomWalk')}
-                  unit="ETH"
-                  context="exact"
-                />
+                  className="whitespace-nowrap tabular-nums"
+                >
+                  {formatEthQuote(ethGestureBaseCost(ethGestureCost, 'RandomWalk'), locale)}
+                  {NBSP}
+                  <span className="text-muted-foreground">ETH</span>
+                </data>
               )}
             </p>
             <p className="mt-1 type-caption text-subtle">

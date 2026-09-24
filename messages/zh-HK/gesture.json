@@ -5,12 +5,17 @@
   },
   "header": {
     "title": "落筆 #{position}",
-    "fallback": "落筆",
+    "fallback": "落筆記錄 {id}",
     "explorer": "查看交易"
   },
   "empty": {
     "title": "未找到落筆資訊。",
-    "help": "此 ID 可能無效，或這一筆尚未被索引收錄。"
+    "help": "此 ID 可能無效，或這一筆尚未被索引收錄。",
+    "action": "查看目前週期"
+  },
+  "error": {
+    "title": "未能載入落筆記錄",
+    "message": "請檢查網絡連線後重試。"
   },
   "figures": {
     "cost": "落筆價格",
@@ -37,6 +42,8 @@
     "participant": "參與者",
     "finalizationTime": "此次落筆後的收官時間",
     "transaction": "交易",
+    "copyHash": "複製交易哈希",
+    "hashCopied": "交易哈希已複製",
     "erc20": "已附加 ERC-20",
     "erc20Amount": "已附加 ERC-20 代幣數量",
     "nftContract": "已附加 NFT 代幣地址",

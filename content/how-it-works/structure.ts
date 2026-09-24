@@ -2,6 +2,7 @@ import {
   HOW_IT_WORKS_PATH,
   type HowItWorksArtSample,
   type HowItWorksBreadcrumbsContent,
+  type HowItWorksCostsContent,
   type HowItWorksGameCycleContent,
   type HowItWorksJsonLdContent,
   type HowItWorksProTipsContent,
@@ -29,6 +30,17 @@ export const HOW_IT_WORKS_STRUCTURE = {
     cycle: 1,
     seed: '5084a87375896c7103ba17b57264f20de35d9e6eb545314680ad5e074dfc33ad',
   },
+  /** The risk disclosures, where the cost section sends a reader before they gesture. */
+  costs: {
+    riskHref: '/risk-disclosures',
+  },
+  /**
+   * The FAQ answer on bridging ETH to Arbitrum (the same stable anchor as the
+   * gesture form's FundingNotice, `FUNDING_HELP_HREF`).
+   */
+  stepByStep: {
+    fundingHref: '/faq#how-to-get-eth-on-arbitrum',
+  },
   callToAction: {
     primaryCtaHref: '/#make-gesture',
     faqCtaHref: '/faq',
@@ -43,6 +55,8 @@ export const HOW_IT_WORKS_STRUCTURE = {
     readonly secondaryCtaHref: string;
   };
   readonly payoffSample: HowItWorksArtSample;
+  readonly costs: { readonly riskHref: string };
+  readonly stepByStep: { readonly fundingHref: string };
   readonly callToAction: {
     readonly primaryCtaHref: string;
     readonly faqCtaHref: string;
@@ -71,6 +85,9 @@ export type HowItWorksText = {
     readonly secondaryCtaLabel: string;
   };
   readonly rewardBreakdown: HowItWorksRewardBreakdownContent;
+  readonly costs: Omit<HowItWorksCostsContent, 'riskLink'> & {
+    readonly riskLinkLabel: string;
+  };
   readonly gameCycle: HowItWorksGameCycleContent;
   readonly payoff: {
     readonly heading: string;
@@ -79,7 +96,11 @@ export type HowItWorksText = {
     readonly caption: string;
     readonly linkLabel: string;
   };
-  readonly stepByStep: HowItWorksStepByStepContent;
+  readonly stepByStep: Omit<HowItWorksStepByStepContent, 'funding'> & {
+    /** A short question before the link ("Need ETH on Arbitrum?"). */
+    readonly fundingText: string;
+    readonly fundingLinkLabel: string;
+  };
   readonly proTips: HowItWorksProTipsContent;
   readonly callToAction: {
     readonly heading: string;

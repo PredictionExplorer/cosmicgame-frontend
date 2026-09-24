@@ -28,7 +28,7 @@ export const faqTextEn = {
           'Gestures can be made with ETH or CST tokens (ERC-20). The first gesture of every cycle must be an ETH gesture; after that, ETH and CST gestures can be mixed freely. You may also attach a Random Walk NFT to an ETH gesture to receive a 50% reduction in ETH Gesture Cost. Cosmic Signature NFTs (ERC-721) are allocation and anchoring assets; they are not accepted as gesture payment. CST gestures use their own Calibration Window: the CST Gesture Cost descends while the window runs, and the window length itself changes after every ETH or CST gesture.',
       },
       'can-i-participate-without-nfts': {
-        question: "Can I participate if I don't own any NFTs?",
+        question: 'Can I participate if I don’t own any NFTs?',
         answer:
           'Yes. Anyone can participate in a Cosmic Signature Performance Cycle by making a gesture. An unused Random Walk NFT can be attached to an ETH gesture for a 50% Gesture Cost reduction.',
       },
@@ -76,7 +76,7 @@ export const faqTextEn = {
       },
       'how-does-anchoring-work': {
         question: 'How does Anchoring work?',
-        answer: `Cosmic Signature NFTs can be anchored to the protocol to receive ETH Anchor Distributions: each finalized cycle allocates ${protocolFacts.anchorDistributionPercentage}% of the Cycle Reserve, split equally per anchored Cosmic Signature NFT, and the accumulated ETH is paid out when you release the anchor. Random Walk NFTs can also be anchored, but only for Anchored-NFT Stellar Selection eligibility — selected anchor-holders receive CST and Cosmic Signature NFTs, not ETH. Two rules to know: every NFT can be anchored only once, ever (after you release an anchor, that NFT can never be anchored again), and if no Cosmic Signature NFTs are anchored when a cycle finalizes, that cycle's ${protocolFacts.anchorDistributionPercentage}% simply stays in the Cycle Reserve. CST (ERC-20) cannot be anchored. Visit the My Anchors page (from your account menu) to manage anchors.`,
+        answer: `Cosmic Signature NFTs can be anchored to the protocol to receive ETH Anchor Distributions: each finalized cycle allocates ${protocolFacts.anchorDistributionPercentage}% of the Cycle Reserve, split equally per anchored Cosmic Signature NFT, and the accumulated ETH is paid out when you release the anchor. Random Walk NFTs can also be anchored, but only for Anchored-NFT Stellar Selection eligibility — selected anchor-holders receive CST and Cosmic Signature NFTs, not ETH. Two rules to know: every NFT can be anchored only once, ever (after you release an anchor, that NFT can never be anchored again), and if no Cosmic Signature NFTs are anchored when a cycle finalizes, that cycle’s ${protocolFacts.anchorDistributionPercentage}% simply stays in the Cycle Reserve. CST (ERC-20) cannot be anchored. Visit the My Anchors page (from your account menu) to manage anchors.`,
       },
       'what-are-marketing-rewards': {
         question: 'What is the Outreach Reserve?',
@@ -238,7 +238,7 @@ export const faqTextEn = {
       'donate-nfts-to-game': {
         question: 'How can other NFT projects contribute their tokens to a cycle?',
         answer:
-          'Projects can attach their tokens (ERC-721 or ERC-20) to a gesture using the "Advanced" pane. Provide the contract address and token ID or amount and submit the gesture. Attached tokens are held in the Allocations Wallet escrow and flow to the Signature Allocation recipient after finalization.',
+          'Projects can attach their tokens (ERC-721 or ERC-20) to a gesture using the “Advanced” pane. Provide the contract address and token ID or amount and submit the gesture. Attached tokens are held in the Allocations Wallet escrow and flow to the Signature Allocation recipient after finalization.',
       },
     },
   },
@@ -305,15 +305,15 @@ export const faqTextEn = {
       'team-controls': {
         question: 'What controls does the team have over the protocol?',
         answer:
-          'Initially, the team has the ability to adjust certain parameters of the protocol, such as gesture-time increments or allocation-track percentages. This control is implemented through the smart contract\'s "Ownable" pattern and is scoped to the inter-cycle window: once the next cycle activates — which happens before its first gesture — the core protocol parameters are locked until that cycle finalizes. A few narrower controls remain available outside that lock: the owner can postpone a cycle’s activation until its first gesture arrives, adjust the delay before the next cycle at any time, and manage peripheral contracts (the Public Goods Vault beneficiary, NFT metadata URIs, and the Allocations Wallet retrieval timeout) at any time. The protocol contract is also upgradeable (UUPS) by the owner, but only between cycles; the currently deployed implementation is the publicly verified V2.',
+          'Initially, the team has the ability to adjust certain parameters of the protocol, such as gesture-time increments or allocation-track percentages. This control is implemented through the smart contract’s “Ownable” pattern and is scoped to the inter-cycle window: once the next cycle activates — which happens before its first gesture — the core protocol parameters are locked until that cycle finalizes. A few narrower controls remain available outside that lock: the owner can postpone a cycle’s activation until its first gesture arrives, adjust the delay before the next cycle at any time, and manage peripheral contracts (the Public Goods Vault beneficiary, NFT metadata URIs, and the Allocations Wallet retrieval timeout) at any time. The protocol contract is also upgradeable (UUPS) by the owner, but only between cycles; the currently deployed implementation is the publicly verified V2.',
       },
       'will-team-always-have-control': {
-        question: "Will the team always have control over the protocol's parameters?",
+        question: 'Will the team always have control over the protocol’s parameters?',
         answer:
           'No. Once the protocol is stable, ownership transfers to the Cosmic Council. Parameter changes thereafter occur only through Protocol Coordination proposals that clear the Coordination Quorum.',
       },
       'what-is-renounce-ownership': {
-        question: 'What does "renouncing ownership" mean?',
+        question: 'What does “renouncing ownership” mean?',
         answer:
           'Renouncing ownership is an Ownable-contract function that permanently transfers control away from the deployer address. Once called, no privileged role can modify the contract’s parameters.',
       },
@@ -350,7 +350,7 @@ export const faqTextEn = {
       'get-help': {
         question: 'How can I get help if I have questions?',
         answer:
-          'Use the official Discord and X / Twitter links, or the support email listed on the About page.',
+          'Use the official Discord and X (Twitter) links, or the support email listed on the About page.',
       },
       'stay-updated': {
         question: 'How can I stay updated on Cosmic Signature news?',

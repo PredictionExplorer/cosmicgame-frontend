@@ -2,7 +2,10 @@ import type { HowItWorksContent } from '@/content/how-it-works';
 
 import { SectionHeader } from '@/components/ui/section-header';
 
-/** Tips and strategy: each tip's title and the reasoning behind it, as a quiet index. */
+/**
+ * Good to know: the details that are easy to miss, as a two-column
+ * definition list on the page's hairlines (the name, then the plain fact).
+ */
 export function ProTips({ proTips }: { proTips: HowItWorksContent['proTips'] }) {
   return (
     <section aria-labelledby="tips-heading">
@@ -11,14 +14,19 @@ export function ProTips({ proTips }: { proTips: HowItWorksContent['proTips'] }) 
         title={proTips.heading}
         description={proTips.subhead}
       />
-      <ul className="mt-8 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+      <dl className="divide-y divide-rule-faint border-y border-rule">
         {proTips.tips.map((tip) => (
-          <li key={tip.title} className="border-t border-rule pt-5">
-            <h3 className="type-title text-foreground">{tip.title}</h3>
-            <p className="mt-2 type-body-sm text-muted-foreground">{tip.body}</p>
-          </li>
+          <div
+            key={tip.title}
+            className="grid gap-1.5 py-4 sm:grid-cols-[minmax(0,15rem)_minmax(0,1fr)] sm:gap-x-10 sm:py-5"
+          >
+            <dt className="type-title text-foreground">{tip.title}</dt>
+            <dd className="max-w-[var(--measure-lede)] type-body-sm text-muted-foreground">
+              {tip.body}
+            </dd>
+          </div>
         ))}
-      </ul>
+      </dl>
     </section>
   );
 }

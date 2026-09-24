@@ -10,10 +10,17 @@ test.describe('Gesture detail page', () => {
   test('shows gesture information fields', async ({ page }) => {
     await page.goto('/gesture/1', { waitUntil: 'networkidle' });
     // One H1: "Gesture #N" (its place in the cycle) once the gesture is indexed
-    // with its position, "Gesture" otherwise.
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText(/^(Gesture #\d+|Gesture)$/);
+    // with its position, "Gesture record <id>" otherwise.
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+      /^(Gesture #\d+|Gesture record 1)$/,
+    );
+    // The record, a record that does not exist, or a read that failed (with a retry).
     await expect(
-      page.getByRole('heading', { name: /^(Record|No gesture information found\.)$/ }).first(),
+      page
+        .getByRole('heading', {
+          name: /^(Record|No gesture information found\.|Gesture record didn’t load)$/,
+        })
+        .first(),
     ).toBeVisible();
   });
 
@@ -92,5 +99,38 @@ test.describe('Gesture detail page', () => {
     await expect(page.locator('[data-figure="cost"]')).not.toContainText(/^Gesture Cost\s*0 CST$/);
     // A message is quoted only when there is one.
     await expect(page.getByTestId('gesture-message')).toContainText('rewards system');
+  });
+
+  test('a record the API does not hold reads as missing, not as a failed read (D321)', async ({
+    page,
+  }) => {
+    // The production API answers an id it does not hold with 400, not 404.
+    let reads = 0;
+    // lexicon-allow-start: mocked backend route is a sealed API contract.
+    await page.route('**/api/cosmicgame/bid/info/40000', (route) => {
+      reads += 1;
+      return route.fulfill({ status: 400, json: { error: 'record not found' } });
+    });
+    // lexicon-allow-end
+
+    await page.goto('/gesture/40000', { waitUntil: 'networkidle' });
+
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Gesture record 40000');
+    await expect(
+      page.getByRole('heading', { name: 'No gesture information found.' }),
+    ).toBeVisible();
+    await expect(page.getByRole('link', { name: 'See the current cycle' })).toHaveAttribute(
+      'href',
+      '/current-cycle',
+    );
+    await expect(page.getByRole('heading', { name: 'Gesture record didn’t load' })).toHaveCount(0);
+    // The answer is final: it is read once, never retried.
+    expect(reads).toBe(1);
+  });
+
+  test('an id that is not a whole number is invalid, never a nearby gesture', async ({ page }) => {
+    await page.goto('/gesture/12abc', { waitUntil: 'networkidle' });
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Invalid gesture ID');
+    await expect(page).toHaveTitle(/^Invalid gesture ID · /);
   });
 });

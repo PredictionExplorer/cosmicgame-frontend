@@ -96,6 +96,8 @@
   },
   "gestureDetail": {
     "title": "제스처 정보",
+    "titleFor": "제스처 #{position} · 사이클 {cycle}",
+    "titleForId": "제스처 기록 {id}",
     "description": "Cosmic Signature 프로토콜의 제스처 상세 정보입니다. 시각, 참여자 주소, 제스처 비용, 사이클 맥락을 확인할 수 있습니다."
   },
   "coordinationChanges": {

@@ -315,16 +315,12 @@
     }
   },
   "currentCycleSummary": {
-    "heading": "Chu kỳ trình diễn Cosmic Signature hiện tại",
-    "description": "Theo dõi chu kỳ Cosmic Signature hiện tại: số nét bút, dự trữ, tài sản đính kèm, các luồng phân bổ và trạng thái hoàn tất.",
+    "heading": "Chu kỳ trình diễn hiện tại",
+    "description": "Đồng hồ, thứ hạng, phân bổ và mọi nét bút của chu kỳ đang diễn ra, cập nhật trực tiếp.",
     "cards": {
       "gestures": "Tổng số nét bút",
       "signatureAllocation": "Phân bổ Signature",
       "opened": "Ngày mở"
-    },
-    "info": {
-      "gestures": "Tổng số nét bút trong chu kỳ này. Mỗi nét bút ghi nhận thêm một lượt Tinh tuyển.",
-      "signatureAllocation": "Phần ETH của phân bổ Signature được người tham gia đặt nét bút cuối cùng nhận về. Người nhận cũng nhận 1.000 CST và một Cosmic Signature NFT."
     },
     "relatedAria": "Các trang liên quan đến chu kỳ hiện tại",
     "links": {

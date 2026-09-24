@@ -9,24 +9,23 @@ const proTips = howItWorksContentEn.proTips;
 describe('ProTips', () => {
   it('renders the section heading', () => {
     render(<ProTips proTips={proTips} />);
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Tips and strategy' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Good to know' })).toBeInTheDocument();
   });
 
-  it('shows each tip with its reasoning in the open, not behind a tooltip', () => {
+  it('shows each detail as a term and its plain fact, not behind a tooltip', () => {
     render(<ProTips proTips={proTips} />);
-    expect(screen.getAllByRole('listitem')).toHaveLength(6);
+    expect(screen.getAllByRole('term')).toHaveLength(3);
     for (const tip of proTips.tips) {
-      expect(screen.getByRole('heading', { level: 3, name: tip.title })).toBeInTheDocument();
+      expect(screen.getByText(tip.title).tagName).toBe('DT');
       expect(screen.getByText(tip.body)).toBeInTheDocument();
     }
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
-  it('never advises stacking entries', () => {
+  it('never advises stacking entries or timing gestures', () => {
     render(<ProTips proTips={proTips} />);
     expect(screen.queryByText(/Stack/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/maximi[sz]e|wisely|strategy/i)).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

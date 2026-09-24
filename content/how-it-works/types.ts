@@ -49,10 +49,13 @@ export interface HowItWorksPayoffContent {
   readonly sample: HowItWorksArtSample;
 }
 
+/**
+ * One outcome of a gesture. An explainer shows its explanation: the whole
+ * rule is in the visible description, with no hover card behind the title.
+ */
 export interface HowItWorksRewardItem {
   readonly title: string;
   readonly description: string;
-  readonly tooltip: string;
 }
 
 export interface HowItWorksRewardBreakdownContent {
@@ -66,15 +69,45 @@ export interface HowItWorksRewardBreakdownContent {
   ];
 }
 
+/** One line of what a gesture costs: a short title and the plain fact behind it. */
+export interface HowItWorksCostItem {
+  readonly title: string;
+  readonly body: string;
+}
+
+/**
+ * What a gesture costs, beside what it can lead to: the spend is not
+ * returned, the ETH cost steps up, and gas is paid on Arbitrum. It closes
+ * with a caution and the link to the risk disclosures.
+ */
+export interface HowItWorksCostsContent {
+  readonly heading: string;
+  readonly subhead: string;
+  readonly items: readonly [HowItWorksCostItem, HowItWorksCostItem, HowItWorksCostItem];
+  readonly note: string;
+  readonly riskLink: HowItWorksLink;
+}
+
+/** One numbered stage of the cycle; the rule is in the visible description. */
 export interface HowItWorksCyclePhase {
   readonly label: string;
   readonly description: string;
-  readonly tooltip: string;
+}
+
+/** The key under the drawing: what its dots, hatched band and allocation bar stand for. */
+export interface HowItWorksCycleLegend {
+  /** Names the gesture dots, which are labelled by their tickers. */
+  readonly gestures: string;
+  /** The hatched band after zero: the Final Gesture participant's exclusive window. */
+  readonly exclusiveWindow: string;
+  /** Names the allocation bar, whose segments are labelled by track. */
+  readonly allocations: string;
 }
 
 export interface HowItWorksGameCycleContent {
   readonly heading: string;
   readonly subhead: string;
+  readonly legend: HowItWorksCycleLegend;
   readonly phases: readonly [
     HowItWorksCyclePhase,
     HowItWorksCyclePhase,
@@ -87,7 +120,6 @@ export interface HowItWorksGameCycleContent {
 
 export interface HowItWorksStep {
   readonly title: string;
-  readonly tooltip: string;
   readonly highlights: readonly string[];
 }
 
@@ -100,9 +132,14 @@ export interface HowItWorksStepByStepContent {
    */
   readonly stepLabel: string;
   readonly steps: readonly [HowItWorksStep, HowItWorksStep, HowItWorksStep];
+  /** Where to get ETH on Arbitrum: a short question and the FAQ answer on bridging. */
+  readonly funding: {
+    readonly text: string;
+    readonly link: HowItWorksLink;
+  };
 }
 
-/** A tip: its title and the strategy behind it. */
+/** A detail that is easy to miss: its name and the plain fact. */
 export interface HowItWorksTip {
   readonly title: string;
   readonly body: string;
@@ -111,14 +148,7 @@ export interface HowItWorksTip {
 export interface HowItWorksProTipsContent {
   readonly heading: string;
   readonly subhead: string;
-  readonly tips: readonly [
-    HowItWorksTip,
-    HowItWorksTip,
-    HowItWorksTip,
-    HowItWorksTip,
-    HowItWorksTip,
-    HowItWorksTip,
-  ];
+  readonly tips: readonly [HowItWorksTip, HowItWorksTip, HowItWorksTip];
 }
 
 export interface HowItWorksCallToActionContent {
@@ -136,6 +166,7 @@ export interface HowItWorksContent {
   readonly breadcrumbs: HowItWorksBreadcrumbsContent;
   readonly hero: HowItWorksHeroContent;
   readonly rewardBreakdown: HowItWorksRewardBreakdownContent;
+  readonly costs: HowItWorksCostsContent;
   readonly gameCycle: HowItWorksGameCycleContent;
   readonly payoff: HowItWorksPayoffContent;
   readonly stepByStep: HowItWorksStepByStepContent;

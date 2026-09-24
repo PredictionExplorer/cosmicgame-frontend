@@ -67,6 +67,12 @@ export interface StandingsLedgerProps {
   account?: string | null;
   /** The Chrono-Warrior's ETH allocation; null while the reserve is unknown. */
   chronoEth: number | null;
+  /**
+   * The Signature Allocation's ETH, set where the ledger shows it as the Last
+   * Gesture's figure (the cycle page); null while unknown. Omitted, the row
+   * names the allocation instead (the home's clock already shows the figure).
+   */
+  signatureEth?: number | null;
   /** The connected wallet's latest change of position, for the landed line. */
   moment?: PositionMoment | null;
   /**
@@ -394,7 +400,7 @@ function GestureFacts({ gesture, pending }: { gesture: GestureInfo | null; pendi
           aria-label={`${t('intel.viewGesture')} ${
             typeof gesture.BidPosition === 'number' ? `#${gesture.BidPosition}` : ''
           }`.trim()}
-          className="link-quiet inline-flex items-center gap-1 text-primary"
+          className="link-quiet inline-flex min-h-6 items-center gap-1 text-primary"
         >
           {typeof gesture.BidPosition === 'number'
             ? `#${gesture.BidPosition}`
@@ -495,6 +501,7 @@ export function StandingsLedger({
   showLastGesture = true,
   account = null,
   chronoEth,
+  signatureEth,
   moment = null,
   headingLevel = 2,
   headingId = 'standings-ledger-title',
@@ -632,9 +639,27 @@ export function StandingsLedger({
                 ) : null
               }
               allocation={
-                <span className="type-label text-muted-foreground">
-                  {tHome('observatory.clock.reserveLabel')}
-                </span>
+                signatureEth === undefined ? (
+                  <span className="type-label text-muted-foreground">
+                    {tHome('observatory.clock.reserveLabel')}
+                  </span>
+                ) : (
+                  <span className="inline-flex flex-col items-end">
+                    {signatureEth === null ? (
+                      <UnknownValue label={tCommon('status.unavailable')} />
+                    ) : (
+                      <Amount
+                        value={signatureEth}
+                        unit="ETH"
+                        context="card"
+                        className="type-figure-sm text-foreground"
+                      />
+                    )}
+                    <span className="type-caption text-subtle">
+                      {tHome('observatory.clock.reserveLabel')}
+                    </span>
+                  </span>
+                )
               }
             >
               {latest.address && (

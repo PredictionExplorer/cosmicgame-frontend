@@ -5,6 +5,7 @@ import { render, screen, checkA11y, fireEvent, within } from '@/test-utils';
 import { AttachedTokensSection, ATTACHED_NFTS_PER_PAGE } from '../components/AttachedTokensSection';
 import { CycleAllocations } from '../components/CycleAllocations';
 import { CycleRules } from '../components/CycleRules';
+import { CYCLE_SECTION_SCROLL_MARGIN } from '../components/CycleSectionNav';
 
 jest.mock('../components/AttachedNftPlate', () => ({
   AttachedNftPlate: ({ nft }: { nft: { RecordId: number } }) => (
@@ -88,15 +89,37 @@ describe('CycleAllocations', () => {
     for (const part of parts) expect(part.textContent).not.toMatch(/^·/);
   });
 
-  it('leaves the Public Goods definition out rather than print an unknown share', () => {
-    const { unmount } = render(<CycleAllocations data={data} headingId="allocations" />);
-    expect(
-      within(row('publicGoods'))
-        .getByText('currentCycle.allocations.cards.publicGoods.name')
-        .closest('[role="button"]'),
-    ).not.toBeNull();
-    unmount();
+  it('names the allocations plainly and explains them in one disclosure (D079)', () => {
+    render(<CycleAllocations data={data} headingId="allocations" />);
+    // No row label is a popover trigger.
+    expect(document.querySelector('table [role="button"]')).toBeNull();
+    expect(document.querySelector('li[data-allocation] [role="button"]')).toBeNull();
 
+    const disclosure = screen.getByTestId('allocation-definitions');
+    expect(disclosure.tagName).toBe('DETAILS');
+    expect(disclosure).not.toHaveAttribute('open');
+    expect(within(disclosure).getByText('currentCycle.allocations.explain').tagName).toBe(
+      'SUMMARY',
+    );
+    const terms = within(disclosure)
+      .getAllByRole('term', { hidden: true })
+      .map((term) => term.textContent);
+    expect(terms).toEqual([
+      'currentCycle.allocations.cards.signature.name',
+      'currentCycle.allocations.cards.chronoWarrior.name',
+      'currentCycle.allocations.cards.ethStellar.name',
+      'currentCycle.allocations.cards.cosmicAnchor.name',
+      'currentCycle.allocations.cards.publicGoods.name',
+      'Next cycle',
+      'currentCycle.allocations.cards.nftStellar.name',
+      'currentCycle.allocations.cards.randomWalkAnchor.name',
+      'currentCycle.allocations.cards.endurance.name',
+      'currentCycle.allocations.cards.finalCst.name',
+    ]);
+    expect(disclosure).toHaveTextContent('currentCycle.allocations.cards.publicGoods.tooltip');
+  });
+
+  it('leaves the Public Goods definition out rather than print an unknown share', () => {
     render(
       <CycleAllocations
         data={{ ...data, CharityPercentage: undefined } as DashboardInfo}
@@ -104,11 +127,9 @@ describe('CycleAllocations', () => {
       />,
     );
     expect(document.body).not.toHaveTextContent('percent=—');
-    expect(
-      within(row('publicGoods'))
-        .getByText('currentCycle.allocations.cards.publicGoods.name')
-        .closest('[role="button"]'),
-    ).toBeNull();
+    const disclosure = screen.getByTestId('allocation-definitions');
+    expect(disclosure).not.toHaveTextContent('currentCycle.allocations.cards.publicGoods.name');
+    expect(row('publicGoods')).toHaveTextContent('currentCycle.allocations.cards.publicGoods.name');
   });
 
   it('gives phones one short record per allocation instead of four labelled lines', () => {
@@ -168,6 +189,18 @@ describe('AttachedTokensSection', () => {
 });
 
 describe('CycleRules', () => {
+  it('formats its counts for the reader’s locale (D088)', () => {
+    render(
+      <CycleRules
+        data={{ ...data, NumRaffleNFTWinnersStakingRWalk: 1200 } as DashboardInfo}
+        headingId="rules"
+      />,
+    );
+    expect(screen.getByText(/anchorHolders=1,200/)).toBeInTheDocument();
+    // The section is a target of the page's section bar.
+    expect(document.getElementById('rules')).toHaveClass(CYCLE_SECTION_SCROLL_MARGIN);
+  });
+
   it('reads the rules from the live parameters and links to the full explanation', () => {
     render(<CycleRules data={data} headingId="rules" />);
     expect(

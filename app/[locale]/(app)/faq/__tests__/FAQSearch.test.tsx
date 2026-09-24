@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { renderToString } from 'react-dom/server';
 import userEvent from '@testing-library/user-event';
 
 import { render, screen, checkA11y } from '@/test-utils';
@@ -21,6 +22,19 @@ function FAQSearchWrapper({ onChange }: { onChange: (v: string) => void }) {
 const input = () => screen.getByRole('searchbox', { name: 'Search frequently asked questions' });
 
 describe('FAQSearch', () => {
+  it('keeps a query typed before the page hydrated', () => {
+    const container = document.createElement('div');
+    container.innerHTML = renderToString(<FAQSearch value="" onChange={jest.fn()} />);
+    document.body.appendChild(container);
+    // The reader types while the server HTML is still inert.
+    container.querySelector('input')!.value = 'anchor';
+
+    const onChange = jest.fn();
+    render(<FAQSearch value="" onChange={onChange} />, { container, hydrate: true });
+    expect(onChange).toHaveBeenCalledWith('anchor');
+    container.remove();
+  });
+
   it('renders the shared search field with its placeholder', () => {
     render(<FAQSearch value="" onChange={jest.fn()} />);
     expect(input()).toHaveAttribute('placeholder', 'Search questions…');

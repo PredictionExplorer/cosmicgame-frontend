@@ -4,7 +4,16 @@
     "message": "Check your connection and try again."
   },
   "status": {
-    "notStarted": "Not started"
+    "notStarted": "Not started",
+    "heading": "Cycle status"
+  },
+  "sectionNav": {
+    "aria": "On this page",
+    "standings": "Standings",
+    "allocations": "Allocations",
+    "participants": "Participants",
+    "gestures": "Gestures",
+    "rules": "Rules"
   },
   "hero": {
     "title": "Cycle #{n}",
@@ -40,6 +49,7 @@
       "receives": "Each recipient receives",
       "recipients": "Recipients"
     },
+    "explain": "How the reserve splits",
     "amounts": {
       "ethEach": "{amount} ETH each",
       "fixedCst": "1,000 CST",
@@ -55,15 +65,15 @@
       },
       "chronoWarrior": {
         "name": "Chrono-Warrior Allocation",
-        "tooltip": "The participant who held the Endurance Champion position for the longest consecutive interval receives a percentage of the Cycle Reserve and a Cosmic Signature NFT."
+        "tooltip": "The participant who held the Endurance Champion position for the longest consecutive interval receives a percentage of the Cycle Reserve in ETH, 1,000 CST and a Cosmic Signature NFT."
       },
       "ethStellar": {
         "name": "ETH Stellar Selection",
         "tooltip": "Participants are selected at random from the cycle entries to share an allocation of ETH."
       },
       "cosmicAnchor": {
-        "name": "Cosmic Signature anchor-holders",
-        "tooltip": "Anchor-holders of Cosmic Signature NFTs share the per-cycle Anchor Distribution.",
+        "name": "Anchor Distribution",
+        "tooltip": "A share of the Cycle Reserve in ETH, split equally among all anchored Cosmic Signature NFTs at finalization.",
         "recipientLabel": "Proportional · all anchor-holders"
       },
       "publicGoods": {
@@ -76,7 +86,7 @@
         "tooltip": "Participants are selected at random from the cycle entries to receive Recognition CST and Cosmic Signature NFTs."
       },
       "randomWalkAnchor": {
-        "name": "Random Walk anchor-holders",
+        "name": "Anchored-NFT Stellar Selection",
         "tooltip": "Anchor-holders of Random Walk NFTs may receive Recognition CST and Cosmic Signature NFTs."
       },
       "endurance": {

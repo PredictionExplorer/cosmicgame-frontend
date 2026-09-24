@@ -4,9 +4,10 @@ import { faqContentEn } from '@/content/faq';
 
 import { GLOSSARY_TERM_IDS } from '@/lib/glossary';
 
-import { render, screen, checkA11y, waitFor } from '@/test-utils';
+import { render, screen, checkA11y, waitFor, within } from '@/test-utils';
 
 import FAQPage from '../FAQPage';
+import { FAQ_SCROLL_MARGIN_CLASS } from '../components/scrollMargin';
 
 Object.assign(navigator, {
   clipboard: { writeText: jest.fn().mockResolvedValue(undefined) },
@@ -30,6 +31,16 @@ beforeEach(() => {
 
 const searchbox = () =>
   screen.getByRole('searchbox', { name: /search frequently asked questions/i });
+
+/**
+ * Enters a query as one input event. Typing it key by key re-renders all 67
+ * answers per keystroke, which is slow enough to time out on a busy machine;
+ * FAQSearch's own tests cover typing.
+ */
+async function searchFor(user: ReturnType<typeof userEvent.setup>, query: string) {
+  await user.click(searchbox());
+  await user.paste(query);
+}
 
 describe('FAQPage', () => {
   it('renders the hero heading', () => {
@@ -75,16 +86,51 @@ describe('FAQPage', () => {
     }
   });
 
-  it('opens a popular question’s answer in place and scrolls to it', async () => {
+  it('lands every jump target just under the contents bar, not a header’s height below it', () => {
+    render(<FAQPage content={faqContentEn} />);
+    // The page's scroll padding already clears the site header.
+    expect(FAQ_SCROLL_MARGIN_CLASS).not.toContain('header-height');
+    const [category] = faqContentEn.categories;
+    const [question] = category!.items;
+    for (const target of [
+      document.getElementById(`faq-category-${category!.id}`),
+      document.getElementById(question!.hashAnchor || question!.id),
+      document.getElementById('faq-category-glossary'),
+      document.getElementById(`glossary-${GLOSSARY_TERM_IDS[0]}`),
+    ]) {
+      expect(target).toHaveClass(...FAQ_SCROLL_MARGIN_CLASS.split(' '));
+    }
+  });
+
+  it('opens a popular question’s answer in place, scrolls to it and moves focus there (D289)', async () => {
     const user = userEvent.setup();
     render(<FAQPage content={faqContentEn} />);
-    await user.click(screen.getByRole('link', { name: /What is the Signature Allocation\?/ }));
+    await user.click(screen.getByRole('link', { name: /How do I get ETH on Arbitrum\?/ }));
 
-    expect(
-      screen.getByRole('button', { name: 'What is the Signature Allocation?', expanded: true }),
-    ).toBeInTheDocument();
+    const question = screen.getByRole('button', {
+      name: 'How do I get ETH on Arbitrum?',
+      expanded: true,
+    });
     expect(scrollIntoView).toHaveBeenCalled();
-    expect(scrollIntoView.mock.contexts.at(-1)).toBe(document.getElementById('main-allocation'));
+    expect(scrollIntoView.mock.contexts.at(-1)).toBe(
+      document.getElementById('how-to-get-eth-on-arbitrum'),
+    );
+    // The next Tab continues from the opened question, and its link is in the address bar.
+    expect(question).toHaveFocus();
+    expect(window.location.hash).toBe('#how-to-get-eth-on-arbitrum');
+  });
+
+  it('moves focus to the category a contents entry jumps to (D289)', async () => {
+    const user = userEvent.setup();
+    render(<FAQPage content={faqContentEn} />);
+    const nav = screen.getByRole('navigation', { name: 'FAQ categories' });
+    const category = faqContentEn.categories[2]!;
+    await user.click(within(nav).getByRole('link', { name: new RegExp(category.title) }));
+
+    const heading = screen.getByRole('heading', { level: 2, name: category.title });
+    expect(heading).toHaveFocus();
+    expect(heading).toHaveAttribute('tabindex', '-1');
+    expect(window.location.hash).toBe(`#faq-category-${category.id}`);
   });
 
   it('opens the answer a shared link points at', () => {
@@ -98,7 +144,7 @@ describe('FAQPage', () => {
   it('shows a deep-linked question even when a search would hide it', async () => {
     const user = userEvent.setup();
     render(<FAQPage content={faqContentEn} />);
-    await user.type(searchbox(), 'Endurance Champion');
+    await searchFor(user, 'Endurance Champion');
     await screen.findByText(/Showing \d+ of \d+ questions/i, {}, { timeout: 10_000 });
     expect(
       screen.queryByRole('button', { name: 'What is the Signature Allocation?' }),
@@ -109,10 +155,11 @@ describe('FAQPage', () => {
     window.dispatchEvent(new HashChangeEvent('hashchange'));
 
     expect(
-      await screen.findByRole('button', {
-        name: 'What is the Signature Allocation?',
-        expanded: true,
-      }),
+      await screen.findByRole(
+        'button',
+        { name: 'What is the Signature Allocation?', expanded: true },
+        { timeout: 10_000 },
+      ),
     ).toBeInTheDocument();
     expect(searchbox()).toHaveValue('');
   }, 30_000);
@@ -122,7 +169,7 @@ describe('FAQPage', () => {
     render(<FAQPage content={faqContentEn} />);
     expect(screen.getByText('Popular questions')).toBeInTheDocument();
 
-    await user.type(searchbox(), 'Endurance Champion');
+    await searchFor(user, 'Endurance Champion');
     await screen.findByText(/Showing \d+ of \d+ questions/i, {}, { timeout: 10_000 });
     await waitFor(() => expect(screen.queryByText('Popular questions')).not.toBeInTheDocument());
     expect(screen.queryByRole('navigation', { name: 'FAQ categories' })).not.toBeInTheDocument();
@@ -131,7 +178,7 @@ describe('FAQPage', () => {
   it('offers to clear a search that matches nothing', async () => {
     const user = userEvent.setup();
     render(<FAQPage content={faqContentEn} />);
-    await user.type(searchbox(), 'xyznonexistentquestion123');
+    await searchFor(user, 'xyznonexistentquestion123');
 
     const clear = await screen.findByRole(
       'button',
@@ -150,5 +197,6 @@ describe('FAQPage', () => {
         region: { enabled: false },
       },
     });
-  });
+    // axe walks all 67 answers and the glossary.
+  }, 30_000);
 });

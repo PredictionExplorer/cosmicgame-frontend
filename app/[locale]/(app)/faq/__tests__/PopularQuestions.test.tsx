@@ -25,21 +25,36 @@ describe('PopularQuestions', () => {
     const list = screen.getByRole('list');
     const links = within(list).getAllByRole('link');
     expect(links).toHaveLength(4);
-    expect(links[0]).toHaveTextContent('What is Cosmic Signature?');
-    expect(links[1]).toHaveAttribute('href', '#main-allocation');
+    expect(links[0]).toHaveTextContent('How does a Performance Cycle work?');
+    expect(links[3]).toHaveAttribute('href', '#how-to-get-eth-on-arbitrum');
+  });
+
+  it('never repeats a question that opens its own category (D085)', () => {
+    for (const id of faqContentEn.popularQuestionIds) {
+      const category = faqContentEn.categories.find((entry) =>
+        entry.items.some((item) => item.id === id),
+      );
+      expect(category?.items[0]?.id).not.toBe(id);
+    }
   });
 
   it('names each question’s category', () => {
     render(<PopularQuestions content={faqContentEn} onQuestionClick={onQuestionClick} />);
     expect(screen.getByText('Getting started')).toBeInTheDocument();
-    expect(screen.getAllByText('Allocations & distributions')).toHaveLength(3);
+    expect(screen.getAllByText('Allocations & distributions')).toHaveLength(2);
+    expect(screen.getByText('Arbitrum & technical')).toBeInTheDocument();
   });
 
   it('opens the answer in place instead of jumping', async () => {
     const user = userEvent.setup();
     render(<PopularQuestions content={faqContentEn} onQuestionClick={onQuestionClick} />);
-    await user.click(screen.getByRole('link', { name: /What is Cosmic Signature\?/ }));
-    expect(onQuestionClick).toHaveBeenCalledWith('what-is-cosmic-signature', 'getting-started');
+    await user.click(screen.getByRole('link', { name: /How does a Performance Cycle work\?/ }));
+    // lexicon-allow-start — a legacy public URL fragment id.
+    expect(onQuestionClick).toHaveBeenCalledWith(
+      'how-does-the-bidding-game-work',
+      'getting-started',
+    );
+    // lexicon-allow-end
   });
 
   it('applies a custom className', () => {

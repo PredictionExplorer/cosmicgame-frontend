@@ -27,12 +27,14 @@ import { ZERO_ADDRESS } from '@/lib/cycleState';
 import { resolveLatestGesture } from '@/lib/latestGesture';
 import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
 import { useEndgameChainSync } from '@/hooks/useEndgameChainSync';
+import { useHomeAnnouncer } from '@/hooks/useHomeAnnouncer';
 import { useLiveFreshness } from '@/hooks/useLiveFreshness';
 import { useNow } from '@/hooks/useNow';
 import { useActiveWeb3React } from '@/hooks/web3';
 
 import { cyclePhaseView } from './cyclePhase';
 import { CycleDetails } from './components/CycleDetails';
+import { CYCLE_SECTION_SCROLL_MARGIN, CycleSectionNav } from './components/CycleSectionNav';
 import { CycleStatus } from './components/CycleStatus';
 
 const EMPTY: never[] = [];
@@ -62,13 +64,16 @@ function CurrentCycleSkeleton() {
 
 /**
  * `seoSummary` is the server-rendered page header, the page's only header: it
- * carries the cycle, gesture count, Signature Allocation and opening time, so
- * the body starts with the clock and never repeats those figures.
+ * names the cycle and carries its gesture count, Signature Allocation and
+ * opening time, so the body starts with the section bar and the clock and
+ * never repeats those figures.
  *
  * The dashboard polls every few seconds. A failed poll keeps the last reading
- * on screen (the header's live status says it is delayed, and the clock stops
- * calling itself live); the page is replaced by an error only when nothing has
- * ever loaded, and "Try again" refetches instead of reloading the page.
+ * on screen (the live status says it is delayed, and the clock stops calling
+ * itself live); the page is replaced by an error only when nothing has ever
+ * loaded, and "Try again" refetches instead of reloading the page. A polite
+ * status speaks the changes a reader acts on (a new Last Gesture by someone
+ * else, the clock's phase changes), never every poll.
  */
 const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('currentCycle');
@@ -131,10 +136,38 @@ const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
     [gestureQuery.data],
   );
 
-  if (!data) {
+  const phase = data
+    ? cyclePhaseView({
+        data,
+        allocationTime,
+        activationTime,
+        now: nowMs,
+        finalizationConfirmed: !endgame.isConfirmationPending,
+        fresh: freshness.state === 'live' || freshness.state === 'connecting',
+        account,
+        // Unknown until the contract's timeout is read: until then only the
+        // latest participant is offered the finalize action.
+        openFinalizationMs:
+          allocationTime > 0 && timeoutFinalize > 0
+            ? allocationTime + timeoutFinalize * 1000
+            : null,
+      })
+    : null;
+  // The same voice as the home clock: a new Last Gesture by someone else and
+  // the phase changes (final hour, final minute, zero), nothing on load.
+  const announcement = useHomeAnnouncer({
+    phase: phase?.state.phase ?? 'loading',
+    latestAddress: data?.LastBidderAddr,
+    gestureCount: data?.CurNumBids ?? null,
+    account,
+  });
+
+  if (!data || !phase) {
     return (
       <PageShell variant="data" backdrop="signature">
         {seoSummary}
+        {/* The section bar draws the header's bottom rule; until it renders, this does. */}
+        <div aria-hidden className="mb-8 border-b border-rule sm:mb-10" />
         {dashboard.isError ? (
           <ErrorState
             headingLevel={2}
@@ -149,22 +182,14 @@ const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
     );
   }
 
-  const phase = cyclePhaseView({
-    data,
-    allocationTime,
-    activationTime,
-    now: nowMs,
-    finalizationConfirmed: !endgame.isConfirmationPending,
-    fresh: freshness.state === 'live' || freshness.state === 'connecting',
-    account,
-    // Unknown until the contract's timeout is read: until then only the
-    // latest participant is offered the finalize action.
-    openFinalizationMs:
-      allocationTime > 0 && timeoutFinalize > 0 ? allocationTime + timeoutFinalize * 1000 : null,
-  });
   return (
     <PageShell variant="data" backdrop="signature">
       {seoSummary}
+      <CycleSectionNav hasStandings={hasStandings} />
+
+      <p role="status" aria-live="polite" className="sr-only" data-testid="cycle-announcer">
+        {announcement.text ? <span key={announcement.id}>{announcement.text}</span> : null}
+      </p>
 
       <div className="space-y-[calc(var(--block-gap)*1.5)]">
         <section
@@ -179,24 +204,25 @@ const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
             nowMs={nowMs}
             participants={participants}
             headingId="cycle-status-heading"
-            className={
-              hasStandings
-                ? 'lg:sticky lg:top-[calc(var(--sticky-offset)+1rem)] lg:col-span-5 lg:self-start'
-                : 'max-w-xl'
-            }
+            // One freshness stamp per page: the ledger's while there is one.
+            liveStatus={!hasStandings}
+            className={hasStandings ? 'lg:col-span-5' : 'max-w-xl'}
           />
           {hasStandings ? (
-            <StandingsLedger
-              headingLevel={3}
-              headingId="cycle-standings-heading"
-              description={tTables('specialAllocation.headingHelp')}
-              champions={champions}
-              latestGesture={latestResolution.gesture}
-              gestureDetailsPending={latestResolution.isSyncing}
-              account={account}
-              chronoEth={trackAmounts.chronoEth}
-              className="min-w-0 lg:col-span-7"
-            />
+            <div id="standings" className={`min-w-0 lg:col-span-7 ${CYCLE_SECTION_SCROLL_MARGIN}`}>
+              <StandingsLedger
+                headingLevel={3}
+                headingId="cycle-standings-heading"
+                description={tTables('specialAllocation.headingHelp')}
+                champions={champions}
+                latestGesture={latestResolution.gesture}
+                gestureDetailsPending={latestResolution.isSyncing}
+                account={account}
+                chronoEth={trackAmounts.chronoEth}
+                signatureEth={trackAmounts.signatureEth}
+                className="min-w-0"
+              />
+            </div>
           ) : null}
         </section>
 

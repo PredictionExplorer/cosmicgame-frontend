@@ -96,6 +96,8 @@
   },
   "gestureDetail": {
     "title": "Інформація про жест",
+    "titleFor": "Жест #{position} · Цикл {cycle}",
+    "titleForId": "Запис жесту {id}",
     "description": "Докладна інформація про жест у протоколі Cosmic Signature: часова мітка, адреса учасника, вартість жесту та контекст циклу."
   },
   "coordinationChanges": {

@@ -29,72 +29,79 @@ export const howItWorksTextJa = {
   },
   rewardBreakdown: {
     heading: '一筆からつながるもの',
-    subhead: '一筆を入れることで、サイクルごとの複数の配分トラックに関わります。',
+    subhead: '一筆はそれぞれ、そのサイクルの複数の配分トラックに関わります。',
     items: [
       {
         title: '動的な参加CST',
         description:
-          '一筆はそれぞれ、前の一筆からの経過時間に基づいてCSTを刻印することがあります。',
-        tooltip: `参加CSTは平方根の式を使います：${protocolFacts.dynamicCstRewardFormula}。連続する一筆は0 CSTになることがあり、静かな時間が長いほど刻印は大きくなります。`,
+          '一筆はCSTを刻印することがあります。量は前の一筆からの経過時間の平方根に従うため、直前の一筆のすぐ後では0 CSTになることもあり、静かな時間が長いほど多く刻印されます。',
       },
       {
         title: '星選の対象',
-        description: '一筆ごとに、サイクル終了時の配分のための星選の対象が1件記録されます。',
-        tooltip: `サイクルが確定すると、対象の中から無作為に選ばれます。3人の参加者がサイクル準備金の${protocolFacts.stellarSelectionEthPercentage}%をETHで分け合います。`,
+        description: `一筆ごとに対象が1件記録されます。サイクルが確定すると無作為に3件が選ばれ、サイクル準備金の${protocolFacts.stellarSelectionEthPercentage}%をETHで分け合います。`,
       },
       {
         title: 'Cosmic Signature NFTの選定',
-        description: `サイクルごとに10人の参加者が、星選を通じて${cst} CSTと唯一のCosmic Signature NFTを受け取ります。`,
-        tooltip: `サイクルごとに、10人の星選受領者と10人のRandom Walk NFT係留者が、それぞれ${cst} CSTとCosmic Signature NFTを受け取ります。`,
+        description: `さらに10件が選ばれ、それぞれ${cst} CSTとCosmic Signature NFTを受け取ります。同じアドレスが複数回選ばれることもあり、対象が何件あっても選ばれる保証はありません。`,
       },
       {
         title: 'シグネチャー配分',
-        description: `最後の一筆を入れた参加者は、サイクル準備金の${protocolFacts.mainEthPercentage}%をETHで、${cst} CST、そしてCosmic Signature NFTを受け取れます。`,
-        tooltip:
-          'サイクル準備金はETH一筆から積み立てられます。最後の一筆を入れた参加者は、プロトコルのコントラクトを通じてシグネチャー配分を受け取ります。',
+        description: `最後の一筆を入れた参加者はサイクルを確定でき、サイクル準備金の${protocolFacts.mainEthPercentage}%をETHで、${cst} CST、そしてCosmic Signature NFTを受け取れます。`,
       },
     ],
+  },
+  costs: {
+    heading: '一筆にかかる費用',
+    subhead: 'ETHまたはCSTで一筆を入れる前に、次の点を確認してください。',
+    items: [
+      {
+        title: '支払った費用は戻りません',
+        body: '一筆に支払ったETHはサイクル準備金に加わり、支払ったCSTは焼却されます。後から誰かが一筆を入れても、どちらも戻りません。',
+      },
+      {
+        title: 'ETHの費用は一筆ごとに上がります',
+        body: `ETH一筆のたびに、次のETH一筆の費用が${protocolFacts.ethGestureCostStepUpPercent}%上がります。費用が下がるのは、各サイクルの開始時に開くETH調律期間だけです。`,
+      },
+      {
+        title: 'ガス代は別にかかります',
+        body: '一筆はArbitrumのトランザクションなので、ネットワーク手数料もETHで支払います。金額は確認前にウォレットに表示されます。',
+      },
+    ],
+    note: '失っても差し支えない資金の範囲で一筆を入れてください。',
+    riskLinkLabel: 'リスク開示を読む',
   },
   gameCycle: {
     heading: 'パフォーマンス・サイクルのライフサイクル',
     subhead: 'すべてのサイクルは、開始から確定までこの順序で進みます。',
+    legend: {
+      gestures: '一筆',
+      exclusiveWindow: `最後の一筆の参加者だけが確定できる${protocolFacts.finalGestureExclusivityHours}時間`,
+      allocations: '配分トラック',
+    },
     phases: [
       {
         label: 'サイクル開始',
-        description: `新しいパフォーマンス・サイクルが始まります。最初のETH調律期間が開き、CST調律期間は${protocolFacts.initialCstCalibrationWindowHours}時間の基準から始まって、参加に応じて変化します。`,
-        tooltip:
-          '調律期間があるので、参加者は下がっていく費用で一筆を入れられます。サイクル準備金はゼロに前のサイクルからの累積準備金を加えたところから始まります。',
+        description: `新しいパフォーマンス・サイクルが始まります。ETHとCSTの一筆の費用はそれぞれ調律期間の中で下がり、CST調律期間は${protocolFacts.initialCstCalibrationWindowHours}時間の基準から始まって参加に応じて変化します。サイクル準備金は、前のサイクルから持ち越された分から始まります。`,
       },
       {
         label: '参加者が一筆を入れる',
-        description: `一筆ごとに、現在の時間増分がサイクル確定時刻に加わります。参加CSTは動的で、ETH一筆とCST一筆はCST調律期間を約${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%短く、または約${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%長く動かします。`,
-        tooltip:
-          '参加CSTは、前の一筆からの経過時間に基づく平方根の式に従います。正確なCSTの量は、アプリの現在のプレビューが基準です。',
+        description: `一筆ごとに、現在の時間増分がサイクル確定時刻に加わります。ETH一筆はCST調律期間を約${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%短くし、CST一筆は約${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%長くします。`,
       },
       {
         label: 'サイクル確定時刻を迎える',
-        description:
-          'カウントダウンがゼロになると、最後の一筆を入れた参加者がサイクルを確定できるようになります。',
-        tooltip: `確定が実際に実行されるまで、一筆は引き続き入れられます。遅れて入った一筆は保存された時刻を延ばし、最後の一筆の位置を引き継ぎます。最後の一筆の参加者には${protocolFacts.finalGestureExclusivityHours}時間の優先確定期間があり、その後は誰でも確定でき、シグネチャー配分を受け取ります。`,
+        description: `カウントダウンがゼロになると、最後の一筆を入れた参加者は${protocolFacts.finalGestureExclusivityHours}時間のうちにサイクルを確定できます。その後は誰でも確定でき、確定した人がシグネチャー配分を受け取ります。確定が実行されるまでは新しい一筆を入れられ、その一筆が時刻を延ばして最後の一筆になります。`,
       },
       {
         label: 'サイクル確定',
-        description: `最後の一筆を入れた参加者がシグネチャー配分を受け取ります：サイクル準備金の${protocolFacts.mainEthPercentage}%、${cst} CST、そしてCosmic Signature NFT。`,
-        tooltip:
-          'シグネチャー配分の受け取りはプロトコルのコントラクトを通じて行われます。CSTとCosmic Signature NFTは自動的に刻印されます。',
+        description: `確定によってすべての配分が行われます。確定した参加者は、サイクル準備金の${protocolFacts.mainEthPercentage}%、${cst} CST、Cosmic Signature NFTからなるシグネチャー配分を受け取ります。`,
       },
       {
         label: '星選',
-        description: `3人のETH星選受領者がサイクル準備金の${protocolFacts.stellarSelectionEthPercentage}%を分け合います。10人のNFT星選受領者と10人の係留NFT星選受領者が、それぞれ${cst} CSTとCosmic Signature NFTを受け取ります。`,
-        tooltip:
-          '対象は一筆ごとに1件記録され、すべての星選はサイクルの対象全体から復元抽出で選ばれます。Random Walk NFTの係留者には別の星選があります。',
+        description: `3人のETH星選受領者がサイクル準備金の${protocolFacts.stellarSelectionEthPercentage}%を分け合います。10人のNFT星選受領者と、係留されたRandom Walk NFTから選ばれる10人の係留NFT星選受領者が、それぞれ${cst} CSTとCosmic Signature NFTを受け取ります。対象は一筆ごとに1件記録され、すべての星選はサイクルの対象全体から復元抽出で選ばれます。`,
       },
       {
         label: '次のサイクル',
-        description:
-          'サイクル準備金のおよそ半分が累積準備金として次へ持ち越され、次のサイクルは新しい調律期間とともに始まります。',
-        tooltip:
-          '累積準備金があるということは、プロトコルが価値を引き出すのではなく蓄えていくということです。現在の期間の長さと費用はライブのコントラクトが報告します。',
+        description: `サイクル準備金の残り${protocolFacts.compoundingReservePercentage}%が累積準備金として持ち越され、次のサイクルは新しい調律期間とともに始まります。`,
       },
     ],
   },
@@ -111,63 +118,47 @@ export const howItWorksTextJa = {
     steps: [
       {
         title: 'ウォレットを接続する',
-        tooltip:
-          'ArbitrumはEthereum上のレイヤー2ブロックチェーンで、ガス代が安く、トランザクションが速いのが特徴です。',
         highlights: [
-          'ページ上部の「ウォレットを接続」ボタンをクリックします。',
-          'MetaMaskなど、Arbitrumブロックチェーンに対応したウォレットを使います。',
-          '求められたらネットワークをArbitrumに切り替え、権限を承認します。',
+          'ページ右上の接続ボタンを押します。',
+          'MetaMaskなど、Arbitrumに対応したウォレットを使います。ArbitrumはEthereumのレイヤー2で、手数料が安く、トランザクションが速いのが特徴です。',
+          '求められたらネットワークをArbitrumに切り替え、接続を承認します。',
           '接続が完了すると、ヘッダーにウォレットアドレスが表示されます。',
         ],
       },
       {
         title: '一筆の費用を確認する',
-        tooltip:
-          'ガス代はネットワークの状況や操作内容によって変わります。一筆の費用とは別に必要なため、送信前にウォレットの見積もりを確認してください。',
         highlights: [
           '決める前に、ETHまたはCSTでの現在の一筆の費用を確認します。',
-          'ライブの参加CSTのプレビューを確認します。量は前の一筆からの経過時間で変わります。',
-          'シグネチャー配分の金額を見て、ETH配分の見込みを把握します。',
-          'ウォレットに一筆の費用と、ガス代のための少額があることを確かめます。',
+          '参加CSTのプレビューを確認します。量は前の一筆からの経過時間で変わります。',
+          'ウォレットに一筆の費用と、ネットワーク手数料のための少額のETHがあることを確かめます。手数料は確認前にウォレットに表示されます。',
         ],
       },
       {
         title: '一筆を入れる',
-        tooltip: `各Random Walk NFTは${protocolFacts.randomWalkDiscountPercentage}%のETH一筆の費用の引き下げに一度だけ使えます。使う瞬間は慎重に選んでください。`,
         highlights: [
-          `ETHを選び、任意でRandom Walk NFTを添付して${protocolFacts.randomWalkDiscountPercentage}%のETH一筆の費用の引き下げを受けるか、CST（ERC-20）で一筆を入れます。`,
+          `ETHかCSTを選びます。ETH一筆にはRandom Walk NFTを添付でき、${protocolFacts.randomWalkDiscountPercentage}%のETH一筆の費用の引き下げを受けられます。引き下げは1つのNFTにつき一度だけです。`,
           '方法と費用が書かれた一筆のボタン（例：「ETHで一筆」）を押し、ウォレットでトランザクションを確認します。',
         ],
       },
     ],
+    fundingText: 'ArbitrumのETHがまだありませんか？',
+    fundingLinkLabel: 'ArbitrumでETHを用意する方法',
   },
   proTips: {
-    heading: 'コツと戦略',
-    subhead: '配分トラック全体で参加を最大限に活かすための実践的な手引き。',
+    heading: '知っておきたいこと',
+    subhead: '見落としやすい点をまとめました。',
     tips: [
       {
-        title: '二つの調律期間を見守る',
-        body: 'ETH一筆はCST調律期間をわずかに短くし、CST一筆はわずかに長くします。アプリのライブパネルが現在の費用の推移を示します。',
+        title: '二つの調律期間',
+        body: `ETHの一筆の費用が調律期間で下がるのは、各サイクルの開始時の一度だけです。CSTの一筆の費用は、CST一筆のたびに新しい期間が始まり、直前に支払われた費用の2倍（最低${protocolFacts.cstCalibrationCeilingMinCst} CST）からゼロまで下がります。`,
       },
       {
-        title: 'Random Walk NFTを添付する',
-        body: '各Random Walk NFTは費用の引き下げに一度しか使えません。効果を最大にするため、費用の高い一筆のために取っておきましょう。',
-      },
-      {
-        title: '一筆ごとに星選の対象を1件記録',
-        body: `3人のETH星選受領者がサイクル準備金の${protocolFacts.stellarSelectionEthPercentage}%を分け合います。10人の参加者NFT受領者と10人のRandom Walk NFT係留者が、それぞれ${cst} CSTとCosmic Signature NFTを受け取ります。`,
+        title: 'Random Walk NFTは一度だけ',
+        body: `Random Walk NFTは1回のETH一筆の費用を${protocolFacts.randomWalkDiscountPercentage}%引き下げ、その後はほかの一筆には使えません。使うことと係留することは別です。`,
       },
       {
         title: '参加専用のウォレットを使う',
-        body: '参加専用のウォレットは、プロトコルでの活動を主な保有資産から切り離し、さらなる安全性を加えます。監査と検証の状況は監査ページで公開しています。',
-      },
-      {
-        title: '確定時刻を見守る',
-        body: '期限の近くで一筆を入れると最後の一筆に最も近い位置に立てますが、サイクルが確定するまでは他の参加者が後から一筆を入れることもできます。',
-      },
-      {
-        title: 'CSTで一筆を入れる',
-        body: `CST一筆は星選の対象を記録し、タイマーを延ばし、動的な参加CSTを刻印することがあり、CST調律期間を約${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%長くします。`,
+        body: '参加専用のウォレットは、プロトコルでの活動を主な保有資産から切り離します。レビューと検証の状況は監査ページで確認できます。',
       },
     ],
   },
@@ -177,6 +168,6 @@ export const howItWorksTextJa = {
     primaryCtaLabel: '一筆を入れる',
     faqCtaLabel: 'よくある質問を見る',
     discordCtaLabel: 'Discord',
-    twitterCtaLabel: 'Twitter / X',
+    twitterCtaLabel: 'X（Twitter）',
   },
 } satisfies HowItWorksText;

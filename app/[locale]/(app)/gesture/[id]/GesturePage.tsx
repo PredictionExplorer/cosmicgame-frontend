@@ -1,11 +1,12 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ExternalLink } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
 import { GESTURE_METHOD_BG_CLASS, type GestureMethod } from '@/lib/theme/dataColors';
+import { TOUCH_TARGET_EXTENDED_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { AddressChip } from '@/components/ui/address-chip';
@@ -13,8 +14,10 @@ import { Amount } from '@/components/ui/amount';
 import { Badge } from '@/components/ui/badge';
 import type { BreadcrumbItem } from '@/components/ui/breadcrumbs';
 import { buttonVariants } from '@/components/ui/button';
-import { DateTime } from '@/components/ui/date-time';
+import { CopyButton } from '@/components/ui/copy-button';
+import { DateTime, useTimeZoneLabel } from '@/components/ui/date-time';
 import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
 import { LinkifiedText } from '@/components/ui/linkified-text';
 import { PageShell } from '@/components/ui/page-shell';
 import { MEDIA_PLATE_CLASS, PendingPlate } from '@/components/ui/art-frame';
@@ -27,14 +30,10 @@ import { useAttachedNftMetadata } from '@/components/attachments/useAttachedNftM
 import { resolveGestureType } from '@/components/tables/GestureMethodTag';
 import { useDashboardInfo, useGestureInfo } from '@/hooks/useApiQuery';
 import type { GestureInfo } from '@/services/api';
-import {
-  NBSP,
-  UNAVAILABLE_VALUE,
-  formatCount,
-  formatNumber,
-  formatTimeZoneLabel,
-} from '@/utils/format';
+import { isRecordNotFound } from '@/services/api/readError';
+import { NBSP, UNAVAILABLE_VALUE, formatCount, formatNumber } from '@/utils/format';
 import { formatId } from '@/utils/format/ids';
+import { getExplorerUrl } from '@/utils/urls';
 
 import { useGestureNeighbours } from './gestureNeighbours';
 
@@ -116,13 +115,14 @@ function metadataText(value: unknown): string | null {
 }
 
 /**
- * A citable instant: the full date in UTC with the zone printed, so two
- * readers quoting the record quote the same time (the explorer's zone too).
- * The age and the full date stay on hover.
+ * A citable instant: the full date in the reader's zone, as every other
+ * page prints it, with that zone named beside it (UTC through hydration, so
+ * the server HTML never guesses). The age and the full date stay on hover.
  */
 function RecordTime({ timestamp }: { timestamp: number | null | undefined }) {
+  const zone = useTimeZoneLabel();
   return (
-    <DateTime timestamp={timestamp} variant="full" timeZone="utc">
+    <DateTime timestamp={timestamp} variant="full">
       {(value) =>
         value === UNAVAILABLE_VALUE ? (
           value
@@ -130,13 +130,52 @@ function RecordTime({ timestamp }: { timestamp: number | null | undefined }) {
           <>
             {value}
             {NBSP}
-            <span className="text-subtle">{formatTimeZoneLabel('utc')}</span>
+            <span className="text-subtle">{zone}</span>
           </>
         )
       }
     </DateTime>
   );
 }
+
+/**
+ * The transaction behind the record: the full hash (it may break anywhere),
+ * a copy button and the explorer proof as an icon link.
+ */
+function TransactionHash({ hash }: { hash: string }) {
+  const t = useTranslations('gesture');
+  return (
+    <span className="flex items-start gap-2">
+      <span className="min-w-0 type-hash text-muted-foreground">{hash}</span>
+      <CopyButton
+        value={hash}
+        label={t('rows.copyHash')}
+        copiedLabel={t('rows.hashCopied')}
+        className="-my-0.5"
+      />
+      <a
+        href={getExplorerUrl('tx', hash)}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={t('header.explorer')}
+        data-touch-target="extended"
+        className={cn(
+          '-my-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-control text-subtle transition-colors duration-fast hover:text-foreground focus-visible:text-foreground',
+          TOUCH_TARGET_EXTENDED_CLASS,
+        )}
+      >
+        <ExternalLink aria-hidden className="size-3.5" />
+      </a>
+    </span>
+  );
+}
+
+/**
+ * The record's width: wide enough on desktop for a transaction hash (66
+ * mono characters) with its copy and explorer buttons on one line beside the
+ * label column. The participant's message keeps the narrower reading measure.
+ */
+const RECORD_WIDTH_CLASS = 'max-w-4xl';
 
 /** One label / value line of the record. */
 function RecordRow({ label, children }: { label: string; children: ReactNode }) {
@@ -153,13 +192,29 @@ function RecordRow({ label, children }: { label: string; children: ReactNode }) 
  * the cycle, the header carries what it cost, what it imprinted and its
  * cycle, and the meta line how it was paid, when (with the explorer proof).
  * The participant's message is quoted when there is one. Previous and next
- * step through the cycle by position.
+ * step through the cycle by position: beside the title from `sm`, after
+ * the record on phones, where the figures come first.
+ *
+ * The page sits on the site's content edge like every other page, with the
+ * record itself held to a reading width. The server reads the record
+ * (page.tsx seeds the query), so the heading and figures are in the first
+ * HTML. A read that fails offers a retry; a record that does not exist
+ * says so and points to the current cycle.
  */
 const GesturePage = ({ gestureId }: { gestureId: number }) => {
   const t = useTranslations('gesture');
   const tCommon = useTranslations('common');
   const locale = useLocale();
-  const { data: gestureInfo = null, isLoading: loading } = useGestureInfo(gestureId);
+  const {
+    data: gestureInfo = null,
+    isLoading: loading,
+    isError,
+    error,
+    refetch,
+  } = useGestureInfo(gestureId);
+  // The API answers 400 "record not found" for an id it does not hold: that
+  // is a missing record (mistyped, or not indexed yet), not a failed read.
+  const readFailed = isError && !isRecordNotFound(error);
   // Only to tell the live cycle (its page is /current-cycle) from a finalized one.
   const { data: dashboard, isError: dashboardFailed } = useDashboardInfo(undefined, {
     poll: false,
@@ -174,15 +229,19 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
   });
   const tokenURI = nftMetadata.data ?? null;
 
+  const toCurrentCycle = (
+    <Link href="/current-cycle" className={buttonVariants({ variant: 'outline' })}>
+      {t('empty.action')}
+      <ArrowRight aria-hidden />
+    </Link>
+  );
+
+  // The route hands -1 for an id that is not a whole number (page.tsx).
   if (gestureId < 0) {
     return (
-      <PageShell variant="detail">
-        <EmptyState
-          variant="page"
-          headingLevel={2}
-          title={t('invalid.title')}
-          description={t('invalid.help')}
-        />
+      <PageShell variant="data">
+        <PageHeader title={t('invalid.title')} subtitle={t('invalid.help')} />
+        {toCurrentCycle}
       </PageShell>
     );
   }
@@ -201,20 +260,32 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
     typeof cycle === 'number' && !dashboardFailed && dashboard?.CurRoundNum === cycle
       ? '/current-cycle#gesture-history'
       : `/allocation/${cycle}`;
-  // A position is an ordinal, not a quantity: no digit grouping ("#1141").
+  // A position is an ordinal, not a quantity: no digit grouping ("#1141", "record 29434").
   const title = hasPosition
     ? t('header.title', { position: String(position) })
-    : t('header.fallback');
+    : t('header.fallback', { id: String(gestureId) });
 
   if (loading || !gestureInfo) {
     return (
-      <PageShell variant="detail" backdrop="signature">
-        <div className="mx-auto max-w-3xl">
-          <PageHeader section={section} breadcrumbs={trail} title={title} />
+      <PageShell variant="data" backdrop="signature">
+        <PageHeader section={section} breadcrumbs={trail} title={title} />
+        <div className={RECORD_WIDTH_CLASS}>
           {loading ? (
             <SkeletonDetailRows rows={6} />
+          ) : readFailed ? (
+            <ErrorState
+              headingLevel={2}
+              title={t('error.title')}
+              message={t('error.message')}
+              onRetry={() => void refetch()}
+            />
           ) : (
-            <EmptyState headingLevel={2} title={t('empty.title')} description={t('empty.help')} />
+            <EmptyState
+              headingLevel={2}
+              title={t('empty.title')}
+              description={t('empty.help')}
+              action={toCurrentCycle}
+            />
           )}
         </div>
       </PageShell>
@@ -274,6 +345,13 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
     );
   };
   const hasSteps = !!(neighbours.previous || neighbours.next);
+  const stepNav = (className: string) =>
+    hasSteps ? (
+      <nav aria-label={t('nav.aria')} className={cn('flex flex-wrap gap-2', className)}>
+        {stepLink('previous')}
+        {stepLink('next')}
+      </nav>
+    ) : null;
   const nftMetadataRows = (
     [
       ['collectionName', t('nftPreview.collectionName'), tokenURI?.collection_name],
@@ -287,8 +365,8 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
   });
 
   return (
-    <PageShell variant="detail" backdrop="signature" className="max-sm:pb-16">
-      <div className="mx-auto max-w-3xl">
+    <PageShell variant="data" backdrop="signature" className="max-sm:pb-16">
+      <div>
         <PageHeader
           section={section}
           breadcrumbs={trail}
@@ -328,22 +406,20 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
             <>
               {methodBadge}
               <RecordTime timestamp={gestureInfo.TimeStamp} />
-              <TxExplorerLink hash={gestureInfo.TxHash} label={t('header.explorer')} />
+              <TxExplorerLink
+                hash={gestureInfo.TxHash}
+                label={t('header.explorer')}
+                className="min-h-6"
+              />
             </>
           }
-          actions={
-            hasSteps ? (
-              <nav aria-label={t('nav.aria')} className="flex flex-wrap gap-2 max-sm:w-full">
-                {stepLink('previous')}
-                {stepLink('next')}
-              </nav>
-            ) : undefined
-          }
+          // Phones put the figures first and step through the cycle after the record.
+          actions={hasSteps ? stepNav('max-sm:hidden') : undefined}
         />
 
-        <div className="space-y-12">
+        <div className={cn(RECORD_WIDTH_CLASS, 'space-y-12')}>
           {message ? (
-            <figure data-testid="gesture-message">
+            <figure data-testid="gesture-message" className="max-w-3xl">
               <figcaption className="type-label text-subtle">
                 {t('sections.message.title')}
               </figcaption>
@@ -369,7 +445,7 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
                 {finalizationTime === null ? unknown : <RecordTime timestamp={finalizationTime} />}
               </RecordRow>
               <RecordRow label={t('rows.transaction')}>
-                <span className="type-hash text-muted-foreground">{gestureInfo.TxHash}</span>
+                {gestureInfo.TxHash ? <TransactionHash hash={gestureInfo.TxHash} /> : unknown}
               </RecordRow>
               {gestureInfo.DonatedERC20TokenAddr ? (
                 <>
@@ -456,12 +532,17 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
 
           {typeof cycle === 'number' ? (
             <p>
-              <Link href={cycleHref} className="link inline-flex items-center gap-1.5 type-body-sm">
+              <Link
+                href={cycleHref}
+                className="link inline-flex min-h-6 items-center gap-1.5 type-body-sm"
+              >
                 {t('nav.all', { cycle: formatCount(cycle, locale) })}
                 <ArrowRight aria-hidden className="size-3.5" />
               </Link>
             </p>
           ) : null}
+
+          {stepNav('sm:hidden')}
         </div>
       </div>
     </PageShell>

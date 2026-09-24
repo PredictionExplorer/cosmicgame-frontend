@@ -5,12 +5,17 @@
   },
   "header": {
     "title": "Nét bút #{position}",
-    "fallback": "Nét bút",
+    "fallback": "Bản ghi nét bút {id}",
     "explorer": "Xem giao dịch"
   },
   "empty": {
     "title": "Không tìm thấy thông tin nét bút.",
-    "help": "Mã nét bút có thể không hợp lệ hoặc dữ liệu chưa được cập nhật."
+    "help": "Mã nét bút có thể không hợp lệ hoặc dữ liệu chưa được cập nhật.",
+    "action": "Xem chu kỳ hiện tại"
+  },
+  "error": {
+    "title": "Không tải được bản ghi nét bút",
+    "message": "Hãy kiểm tra kết nối rồi thử lại."
   },
   "figures": {
     "cost": "Chi phí nét bút",
@@ -37,6 +42,8 @@
     "participant": "Người tham gia",
     "finalizationTime": "Thời điểm hoàn tất sau nét bút này",
     "transaction": "Giao dịch",
+    "copyHash": "Sao chép mã băm giao dịch",
+    "hashCopied": "Đã sao chép mã băm giao dịch",
     "erc20": "ERC-20 đính kèm",
     "erc20Amount": "Số lượng token ERC-20 đính kèm",
     "nftContract": "Địa chỉ token NFT đính kèm",
@@ -46,7 +53,7 @@
     "aria": "Các nét bút liền kề",
     "previous": "Nét bút trước",
     "next": "Nét bút sau",
-    "all": "Mọi nét bút trong chu kỳ {cycle}"
+    "all": "Mọi nét bút trong chu kỳ #{cycle}"
   },
   "nftPreview": {
     "collectionName": "Tên bộ sưu tập",

@@ -40,8 +40,8 @@
   },
   "contact": {
     "heading": "还有其他问题？",
-    "description": "没有找到想了解的内容？社区成员很乐意提供帮助。通过以下任一渠道联系我们，我们会尽快回复。",
-    "x": "Twitter / X",
+    "description": "可以在 Discord 或 X 上提问，社区成员和团队都会看到。",
+    "x": "X（Twitter）",
     "discord": "Discord"
   },
   "tooltips": {

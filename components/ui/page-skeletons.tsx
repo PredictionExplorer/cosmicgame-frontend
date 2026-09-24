@@ -60,16 +60,19 @@ export function RecordDetailSkeleton({
   sections = [3, 2, 2],
   width = 'max-w-3xl',
   shell = 'data',
+  align = 'center',
 }: {
   /** Rows per section card, top to bottom. */
   sections?: readonly number[];
   /** The page's own column width. */
-  width?: 'max-w-3xl' | 'max-w-5xl';
+  width?: 'max-w-3xl' | 'max-w-4xl' | 'max-w-5xl';
   shell?: 'data' | 'detail';
+  /** `start` for a record set on the site's content edge rather than centred in it. */
+  align?: 'center' | 'start';
 }) {
   return (
     <PageShell variant={shell} backdrop="signature" className="max-sm:pb-16">
-      <LoadingRegion className={cn('mx-auto', width)}>
+      <LoadingRegion className={cn(align === 'center' && 'mx-auto', width)}>
         <SkeletonPageHeader />
         {sections.map((rows, i) => (
           <SkeletonSectionCard key={i} rows={rows} />

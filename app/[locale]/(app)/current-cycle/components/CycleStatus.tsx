@@ -5,14 +5,14 @@ import { ArrowRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
+import { TOUCH_TARGET_EXTENDED_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
 import { Amount } from '@/components/ui/amount';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DateTime } from '@/components/ui/date-time';
 import { Duration } from '@/components/ui/duration';
-import { ExplainedTerm } from '@/components/ui/explain-popover';
-import { LiveStatusView } from '@/components/ui/live-status';
+import { LiveStatus, LiveStatusView } from '@/components/ui/live-status';
 import { Term } from '@/components/ui/term';
 import { UnknownValue } from '@/components/ui/unknown-value';
 import { useLiveFreshness } from '@/hooks/useLiveFreshness';
@@ -30,6 +30,11 @@ export interface CycleStatusProps {
   /** Unique participants this cycle, or null while the gesture list loads or failed. */
   participants: number | null;
   headingId: string;
+  /**
+   * Whether the column carries the page's one freshness stamp: while the
+   * cycle has no standings ledger beside it (the ledger carries it then).
+   */
+  liveStatus?: boolean;
   className?: string;
 }
 
@@ -40,10 +45,12 @@ interface Figure {
 }
 
 /**
- * The cycle at a glance: its number and phase, the finalization clock set as
- * type, what the phase means, the page's one commit action and the cycle's
- * running figures as spec-sheet rows. The phase comes from `cyclePhaseView`,
- * so it names the zero-cross exactly as the home clock does.
+ * The cycle at a glance (the H1 above names it): its phase, the
+ * finalization clock set as type, what the phase means in one visible
+ * sentence, the page's one commit action and the cycle's running figures as
+ * spec-sheet rows. Only the coined Cycle Reserve explains itself; the other
+ * labels say what they are. The phase comes from `cyclePhaseView`, so it
+ * names the zero-cross exactly as the home clock does.
  */
 export function CycleStatus({
   data,
@@ -51,6 +58,7 @@ export function CycleStatus({
   nowMs,
   participants,
   headingId,
+  liveStatus = false,
   className,
 }: CycleStatusProps) {
   const t = useTranslations('currentCycle');
@@ -60,7 +68,7 @@ export function CycleStatus({
   const freshness = useLiveFreshness();
   const unknown = <UnknownValue label={tCommon('status.unavailable')} />;
 
-  const phaseCopy = (key: 'eyebrow' | 'label' | 'status' | 'tooltip') =>
+  const phaseCopy = (key: 'eyebrow' | 'label' | 'status') =>
     tHome(`chrono.phase.${phase.messageKey}.${key}`);
   const { state } = phase;
   const remainingSeconds =
@@ -68,6 +76,8 @@ export function CycleStatus({
       ? Math.max(0, Math.ceil((phase.countdownTargetMs - nowMs) / 1000))
       : null;
   const clockStale = freshness.state === 'delayed' || freshness.state === 'offline';
+  // A stale clock names the delay under itself; the stamp would say it twice.
+  const clockCaveat = clockStale && remainingSeconds !== null;
 
   const reserve = toFiniteNumber(data.CosmicGameBalanceEth);
   const startedAt = toFiniteNumber(data.TsRoundStart);
@@ -79,7 +89,15 @@ export function CycleStatus({
   const figures: Figure[] = [
     {
       id: 'reserve',
-      label: <Term id="cycleReserve" />,
+      // A label on its own line, not a word in a sentence: on phones its
+      // hit area grows to 44px without moving the row.
+      label: (
+        <Term
+          id="cycleReserve"
+          data-touch-target="extended"
+          className={TOUCH_TARGET_EXTENDED_CLASS}
+        />
+      ),
       value: reserve === null ? unknown : <Amount value={reserve} unit="ETH" />,
     },
     {
@@ -99,20 +117,12 @@ export function CycleStatus({
     },
     {
       id: 'contributed',
-      label: (
-        <ExplainedTerm definition={t('stats.contributedEth.tooltip')} announce="moreInformation">
-          {t('stats.contributedEth.label')}
-        </ExplainedTerm>
-      ),
+      label: t('stats.contributedEth.label'),
       value: contributed === null ? unknown : <Amount value={contributed} unit="ETH" />,
     },
     {
       id: 'attachedNfts',
-      label: (
-        <ExplainedTerm definition={t('stats.attachedNfts.tooltip')} announce="moreInformation">
-          {t('stats.attachedNfts.label')}
-        </ExplainedTerm>
-      ),
+      label: t('stats.attachedNfts.label'),
       value: attachedNfts === null ? unknown : formatCount(attachedNfts, locale),
     },
   ];
@@ -121,17 +131,18 @@ export function CycleStatus({
     <div className={cn('min-w-0', className)} data-phase={state.phase}>
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
         <h2 id={headingId} className="type-section">
-          {t('hero.title', { n: data.CurRoundNum })}
+          {t('status.heading')}
         </h2>
-        <Badge data-testid="live-badge" tone={phase.tone} shape="pill" dot>
-          {phaseCopy('label')}
-        </Badge>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          {liveStatus && !clockCaveat ? <LiveStatus variant="inline" /> : null}
+          <Badge data-testid="live-badge" tone={phase.tone} shape="pill" dot>
+            {phaseCopy('label')}
+          </Badge>
+        </div>
       </div>
 
       <div className="mt-8 sm:mt-10">
-        <p className="type-label text-subtle">
-          <ExplainedTerm definition={phaseCopy('tooltip')}>{phaseCopy('eyebrow')}</ExplainedTerm>
-        </p>
+        <p className="type-label text-subtle">{phaseCopy('eyebrow')}</p>
         {remainingSeconds !== null ? (
           <div
             role="timer"
@@ -167,7 +178,7 @@ export function CycleStatus({
             </DateTime>
           </p>
         ) : null}
-        {clockStale && remainingSeconds !== null ? (
+        {clockCaveat ? (
           <LiveStatusView
             state={freshness.state}
             ageMs={freshness.ageMs}

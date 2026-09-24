@@ -4,7 +4,16 @@
     "message": "请检查网络连接后重试。"
   },
   "status": {
-    "notStarted": "尚未开始"
+    "notStarted": "尚未开始",
+    "heading": "周期状态"
+  },
+  "sectionNav": {
+    "aria": "本页内容",
+    "standings": "席位",
+    "allocations": "分配",
+    "participants": "参与者",
+    "gestures": "落笔",
+    "rules": "规则"
   },
   "hero": {
     "title": "第 {n} 个周期",
@@ -40,6 +49,7 @@
       "receives": "每位获配者获得",
       "recipients": "获配者"
     },
+    "explain": "储备如何分配",
     "amounts": {
       "ethEach": "每位 {amount} ETH",
       "fixedCst": "1,000 CST",
@@ -55,15 +65,15 @@
       },
       "chronoWarrior": {
         "name": "时之勇士分配",
-        "tooltip": "单次连续保持坚守冠军位置最久的参与者，将获配周期储备的一定比例与一枚 Cosmic Signature NFT。"
+        "tooltip": "单次连续保持坚守冠军位置最久的参与者，将获配周期储备中一定比例的 ETH、1,000 CST 与一枚 Cosmic Signature NFT。"
       },
       "ethStellar": {
         "name": "ETH 星选",
         "tooltip": "协议从本周期的星选资格中程序化随机选出参与者，均分一份 ETH 分配。"
       },
       "cosmicAnchor": {
-        "name": "Cosmic Signature 锚定",
-        "tooltip": "每个周期的锚定派发，由 Cosmic Signature NFT 的锚定者按比例分得。",
+        "name": "锚定派发",
+        "tooltip": "周期储备中以 ETH 计的一份，收官时由所有已锚定的 Cosmic Signature NFT 平均分享。",
         "recipientLabel": "按比例 · 全体锚定者"
       },
       "publicGoods": {
@@ -76,7 +86,7 @@
         "tooltip": "协议从本周期的星选资格中程序化随机选出参与者，每位获配表彰 CST 与 Cosmic Signature NFT。"
       },
       "randomWalkAnchor": {
-        "name": "Random Walk 锚定者",
+        "name": "锚定 NFT 星选",
         "tooltip": "Random Walk NFT 的锚定者可能获配表彰 CST 与 Cosmic Signature NFT。"
       },
       "endurance": {

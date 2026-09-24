@@ -361,7 +361,7 @@ export const faqTextZh = {
       },
       'get-help': {
         question: '遇到问题时，如何获得帮助？',
-        answer: '可使用“关于”页面列出的官方 Discord、X / Twitter 链接或支持邮箱联系我们。',
+        answer: '可使用“关于”页面列出的官方 Discord、X（Twitter）链接或支持邮箱联系我们。',
       },
       'stay-updated': {
         question: '如何关注 Cosmic Signature 的最新动态？',

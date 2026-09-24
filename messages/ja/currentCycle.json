@@ -4,7 +4,16 @@
     "message": "接続を確認して、もう一度お試しください。"
   },
   "status": {
-    "notStarted": "未開始"
+    "notStarted": "未開始",
+    "heading": "サイクルの状況"
+  },
+  "sectionNav": {
+    "aria": "このページの内容",
+    "standings": "順位",
+    "allocations": "配分",
+    "participants": "参加者",
+    "gestures": "一筆",
+    "rules": "ルール"
   },
   "hero": {
     "title": "サイクル{n}",
@@ -40,6 +49,7 @@
       "receives": "受領者ごとの配分",
       "recipients": "受領者"
     },
+    "explain": "準備金の配分のしかた",
     "amounts": {
       "ethEach": "各{amount} ETH",
       "fixedCst": "1,000 CST",
@@ -55,15 +65,15 @@
       },
       "chronoWarrior": {
         "name": "時の戦士配分",
-        "tooltip": "持久チャンピオンの称号を最も長く連続して保持した参加者が、サイクル準備金の一定割合とCosmic Signature NFTを受け取ります。"
+        "tooltip": "持久チャンピオンの称号を最も長く連続して保持した参加者が、サイクル準備金の一定割合のETH、1,000 CST、Cosmic Signature NFTを受け取ります。"
       },
       "ethStellar": {
         "name": "ETH星選",
         "tooltip": "サイクルの対象の中から無作為に選ばれた参加者がETHの配分を分け合います。"
       },
       "cosmicAnchor": {
-        "name": "Cosmic Signatureの係留",
-        "tooltip": "Cosmic Signature NFTの係留者はサイクルごとの係留配分を分け合います。",
+        "name": "係留配分",
+        "tooltip": "サイクル準備金のうちETH建ての一部で、確定時に係留されたすべてのCosmic Signature NFTで均等に分けられます。",
         "recipientLabel": "比例配分 · すべての係留者"
       },
       "publicGoods": {
@@ -76,7 +86,7 @@
         "tooltip": "サイクルの対象の中から無作為に選ばれた参加者が功労CSTとCosmic Signature NFTを受け取ります。"
       },
       "randomWalkAnchor": {
-        "name": "Random Walk係留者",
+        "name": "係留NFT星選",
         "tooltip": "Random Walk NFTの係留者は功労CSTとCosmic Signature NFTを受け取ることがあります。"
       },
       "endurance": {
