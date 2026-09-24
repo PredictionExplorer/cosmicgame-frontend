@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 
-import { TRUST_CENTER_PAGES, type TrustCenterPage } from './trustCenter';
+import { TRUST_CENTER_TABS, type TrustCenterTab } from './trustCenter';
 
 /**
  * The Trust Center's own chrome strings (`legal` catalog), read on the server
@@ -16,8 +16,18 @@ export interface LegalDocumentLabels {
   /** The heading anchor's name; `{section}` is the heading. */
   readonly sectionLink: string;
   readonly revisionHistory: string;
-  /** The Trust Center tab labels, which are also the documents' titles. */
-  readonly tabs: Readonly<Record<TrustCenterPage, string>>;
+  /** The Trust Center tab labels; a document's is also its title. */
+  readonly tabs: Readonly<Record<TrustCenterTab, string>>;
+}
+
+/** The Trust Center tab labels, for a Trust page that is not a document (contracts, code). */
+export async function getTrustCenterTabLabels(
+  locale: string,
+): Promise<Readonly<Record<TrustCenterTab, string>>> {
+  const t = await getTranslations({ locale, namespace: 'legal' });
+  return Object.fromEntries(
+    TRUST_CENTER_TABS.map(({ id }) => [id, t(`breadcrumbs.${id}`)]),
+  ) as Record<TrustCenterTab, string>;
 }
 
 export async function getLegalDocumentLabels(locale: string): Promise<LegalDocumentLabels> {
@@ -28,8 +38,6 @@ export async function getLegalDocumentLabels(locale: string): Promise<LegalDocum
     backToContents: t('document.backToContents'),
     sectionLink: t('document.sectionLink', { section: '{section}' }),
     revisionHistory: t('document.revisionHistory'),
-    tabs: Object.fromEntries(
-      TRUST_CENTER_PAGES.map(({ id }) => [id, t(`breadcrumbs.${id}`)]),
-    ) as Record<TrustCenterPage, string>,
+    tabs: await getTrustCenterTabLabels(locale),
   };
 }

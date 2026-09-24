@@ -183,13 +183,6 @@
   "seo": {
     "heading": "Cosmic Signature 合約",
     "description": "查閱 Cosmic Signature 在 Arbitrum 上的合約地址，並透過原始碼與鏈上紀錄驗證協議。",
-    "partialFallback": "暫時無法取得最新合約地址。下方顯示協議資料中已驗證的代理合約與實作合約地址。",
-    "relatedAria": "合約信任資源",
-    "links": {
-      "code": "檢視 Cosmic Signature 原始碼",
-      "security": "閱讀安全概覽",
-      "audits": "檢視審計與驗證",
-      "risk": "閱讀風險揭露"
-    }
+    "partialFallback": "暫時無法取得最新合約地址。下方顯示協議資料中已驗證的代理合約與實作合約地址。"
   }
 }

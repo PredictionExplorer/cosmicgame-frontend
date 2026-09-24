@@ -307,6 +307,7 @@ const Contracts = ({ seoSummary, addresses, initialContractAddrs = null }: Contr
       {/* The server-rendered header (ContractsSeoSummary) is the page's only header. */}
       {seoSummary ?? (
         <PageHeader
+          variant="reading"
           section="trust"
           title={t('page.title')}
           subtitle={t('page.subtitle')}

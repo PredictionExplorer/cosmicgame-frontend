@@ -45,13 +45,7 @@
   },
   "seo": {
     "heading": "Cosmic Signatureソースコード",
-    "description": "Cosmic Signatureのフロントエンド、Goバックエンド、スマートコントラクト、画像生成のソースコードを公開しています。以下のビューアーで、オンチェーンのシードから再現可能なNFTアートを生成する仕組みを確認できます。",
-    "relatedAria": "ソースコードの関連ページ",
-    "links": {
-      "contracts": "検証済みコントラクトを確認する",
-      "security": "セキュリティに関する注記を読む",
-      "gallery": "生成されたNFTアートを探索する"
-    }
+    "description": "Cosmic Signatureのフロントエンド、Goバックエンド、スマートコントラクト、画像生成のソースコードを公開しています。以下のビューアーで、オンチェーンのシードから再現可能なNFTアートを生成する仕組みを確認できます。"
   },
   "repositories": {
     "heading": "プロジェクトのリポジトリ",

@@ -5,7 +5,9 @@
     "privacy": "プライバシーポリシー",
     "risk": "リスク開示",
     "security": "セキュリティ",
-    "audits": "監査"
+    "audits": "監査",
+    "contracts": "コントラクト",
+    "code": "ソースコード"
   },
   "document": {
     "contents": "このページの内容",

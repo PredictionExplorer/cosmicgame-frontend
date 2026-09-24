@@ -183,13 +183,6 @@
   "seo": {
     "heading": "Hợp đồng Cosmic Signature",
     "description": "Tra cứu địa chỉ hợp đồng Cosmic Signature trên Arbitrum để kiểm tra mã nguồn, cấu hình và các giao dịch trên chuỗi.",
-    "partialFallback": "Chưa tải được danh sách địa chỉ hiện tại. Bên dưới là địa chỉ proxy và hợp đồng triển khai đã xác minh, được lưu trong cấu hình giao thức.",
-    "relatedAria": "Mã nguồn, bảo mật và xác minh hợp đồng",
-    "links": {
-      "code": "Xem mã nguồn Cosmic Signature",
-      "security": "Đọc tổng quan bảo mật",
-      "audits": "Xem kiểm toán và xác minh",
-      "risk": "Đọc công bố rủi ro"
-    }
+    "partialFallback": "Chưa tải được danh sách địa chỉ hiện tại. Bên dưới là địa chỉ proxy và hợp đồng triển khai đã xác minh, được lưu trong cấu hình giao thức."
   }
 }

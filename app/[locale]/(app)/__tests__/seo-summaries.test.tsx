@@ -337,6 +337,26 @@ describe('server-rendered page headers', () => {
         'href',
         '/security',
       );
+      // One Trust Center: the contracts carry its tabs, beside the documents
+      // and the source code.
+      const trust = screen.getByRole('navigation', { name: COMMON.section('trust') });
+      expect(
+        within(trust)
+          .getAllByRole('link')
+          .map((link) => link.getAttribute('href')),
+      ).toEqual([
+        '/security',
+        '/audits',
+        '/contracts',
+        '/code',
+        '/risk-disclosures',
+        '/terms',
+        '/privacy',
+      ]);
+      expect(within(trust).getByRole('link', { current: 'page' })).toHaveAttribute(
+        'href',
+        '/contracts',
+      );
     });
 
     it('says when the addresses come from the verified fallback', async () => {
@@ -367,9 +387,11 @@ describe('server-rendered page headers', () => {
       expect(link).toHaveAttribute('target', '_blank');
       expect(link).toHaveAccessibleDescription('nav.link.newTab');
     }
-    // The IPFS artifact and GitHub are linked where they are evidence, not as chips.
-    const related = screen.getByRole('navigation', { name: /related/i });
-    expect(within(related).queryByRole('link', { name: /IPFS|GitHub/ })).toBeNull();
+    // The IPFS artifact and GitHub are linked where they are evidence, not as
+    // header chips: the header carries the Trust Center tabs, code current.
+    expect(screen.queryByRole('link', { name: /IPFS/ })).toBeNull();
+    const trust = screen.getByRole('navigation', { name: COMMON.section('trust') });
+    expect(within(trust).getByRole('link', { current: 'page' })).toHaveAttribute('href', '/code');
   });
 
   it('renders the gallery header with the collection figures', async () => {

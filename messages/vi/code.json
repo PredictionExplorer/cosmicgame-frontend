@@ -45,13 +45,7 @@
   },
   "seo": {
     "heading": "Mã nguồn Cosmic Signature",
-    "description": "Khám phá mã nguồn giao diện, backend Go, hợp đồng thông minh và công cụ tạo hình ảnh của Cosmic Signature. Trình xem bên dưới cho thấy cách seed trên chuỗi trở thành tác phẩm NFT có thể tái tạo.",
-    "relatedAria": "Các trang liên quan đến mã nguồn",
-    "links": {
-      "contracts": "Xem các hợp đồng đã xác minh",
-      "security": "Đọc ghi chú bảo mật",
-      "gallery": "Khám phá nghệ thuật NFT đã tạo"
-    }
+    "description": "Khám phá mã nguồn giao diện, backend Go, hợp đồng thông minh và công cụ tạo hình ảnh của Cosmic Signature. Trình xem bên dưới cho thấy cách seed trên chuỗi trở thành tác phẩm NFT có thể tái tạo."
   },
   "repositories": {
     "heading": "Kho mã nguồn dự án",

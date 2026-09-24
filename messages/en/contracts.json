@@ -183,13 +183,6 @@
   "seo": {
     "heading": "Cosmic Signature contracts",
     "description": "Cosmic Signature publishes its public Arbitrum contract addresses so participants, researchers, search engines, and AI systems can connect the app experience to verifiable on-chain protocol records.",
-    "partialFallback": "Live contract address data is temporarily unavailable in this server snapshot. The verified protocol proxy and implementation addresses below are the static fallback from the frontend protocol facts.",
-    "relatedAria": "Contract trust resources",
-    "links": {
-      "code": "Review Cosmic Signature source code",
-      "security": "Read the security overview",
-      "audits": "Review audits and verification",
-      "risk": "Read risk disclosures"
-    }
+    "partialFallback": "Live contract address data is temporarily unavailable in this server snapshot. The verified protocol proxy and implementation addresses below are the static fallback from the frontend protocol facts."
   }
 }

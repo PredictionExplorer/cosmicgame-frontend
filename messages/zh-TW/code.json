@@ -45,13 +45,7 @@
   },
   "seo": {
     "heading": "Cosmic Signature 原始碼",
-    "description": "探索 Cosmic Signature 的前端、Go 後端、智慧合約與影像生成原始碼。下方檢視器可查看鏈上種子如何生成可重現的 NFT 藝術作品。",
-    "relatedAria": "原始碼相關頁面",
-    "links": {
-      "contracts": "檢視已驗證合約",
-      "security": "閱讀安全說明",
-      "gallery": "瀏覽生成的 NFT 藝術"
-    }
+    "description": "探索 Cosmic Signature 的前端、Go 後端、智慧合約與影像生成原始碼。下方檢視器可查看鏈上種子如何生成可重現的 NFT 藝術作品。"
   },
   "repositories": {
     "heading": "專案儲存庫",

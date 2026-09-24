@@ -14,6 +14,24 @@ export const TRUST_CENTER_PAGES = [
 
 export type TrustCenterPage = (typeof TRUST_CENTER_PAGES)[number]['id'];
 
+/**
+ * The Trust Center's tabs: the five documents and the two evidence pages,
+ * the deployed contracts and the source code, in the order of the Trust
+ * column of the navigation. Every page with the Trust eyebrow carries them,
+ * so the Trust Center reads as one place.
+ */
+export const TRUST_CENTER_TABS = [
+  { id: 'security', href: '/security' },
+  { id: 'audits', href: '/audits' },
+  { id: 'contracts', href: '/contracts' },
+  { id: 'code', href: '/code' },
+  { id: 'risk', href: '/risk-disclosures' },
+  { id: 'terms', href: '/terms' },
+  { id: 'privacy', href: '/privacy' },
+] as const satisfies readonly { id: string; href: string }[];
+
+export type TrustCenterTab = (typeof TRUST_CENTER_TABS)[number]['id'];
+
 export interface TrustDocumentDate {
   /** ISO calendar date, `YYYY-MM-DD`. */
   date: string;

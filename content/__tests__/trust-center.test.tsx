@@ -21,7 +21,7 @@ import { activePrivacyServices, activePrivacyStorage } from '@/content/legal/pri
 import { RiskContent } from '@/content/legal/RiskContent';
 import { SecurityContent } from '@/content/legal/SecurityContent';
 import { TermsContent } from '@/content/legal/TermsContent';
-import { TRUST_CENTER_PAGES, TRUST_DOCUMENT_DATES } from '@/content/legal/trustCenter';
+import { TRUST_CENTER_TABS, TRUST_DOCUMENT_DATES } from '@/content/legal/trustCenter';
 import { protocolFacts } from '@/content/protocol-facts';
 
 import { routing } from '@/i18n/routing';
@@ -41,7 +41,7 @@ function labelsFor(locale: string): LegalDocumentLabels {
     sectionLink: legal.document.sectionLink ?? '',
     revisionHistory: legal.document.revisionHistory ?? '',
     tabs: Object.fromEntries(
-      TRUST_CENTER_PAGES.map(({ id }) => [id, legal.breadcrumbs[id] ?? id]),
+      TRUST_CENTER_TABS.map(({ id }) => [id, legal.breadcrumbs[id] ?? id]),
     ) as LegalDocumentLabels['tabs'],
   };
 }
@@ -94,7 +94,11 @@ describe('Trust Center template', () => {
       render(renderPage('en'));
       expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
       const tabs = screen.getByRole('navigation', { name: 'common.pageHeader.sections.trust' });
-      expect(within(tabs).getAllByRole('link')).toHaveLength(5);
+      // The five documents and the two evidence pages (contracts, source code),
+      // each named.
+      const links = within(tabs).getAllByRole('link');
+      expect(links).toHaveLength(7);
+      for (const link of links) expect(link.textContent?.trim()).not.toBe('');
       expect(within(tabs).getByRole('link', { current: 'page' })).toBeInTheDocument();
       const date = TRUST_DOCUMENT_DATES[page as keyof typeof TRUST_DOCUMENT_DATES];
       expect(document.querySelector('time')).toHaveAttribute('datetime', date.date);
