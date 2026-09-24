@@ -375,7 +375,7 @@ export function formatRelativeTime(
  * "Jan 01, 12:34", `zh` "1月1日 12:34", `uk` "1 січ., 12:34", `vi`
  * "1/1, 12:34", each with the year added when it is not the current year.
  * Browser-local time by default; pass `utc` only for deterministic server
- * snapshots — hydration-safe UI uses `<DateTime>` / `HydrationSafeDateTime`.
+ * snapshots — hydration-safe UI uses `<DateTime>` / `useHydrationSafeDateTime`.
  *
  * @deprecated No production code calls this any more; it survives only
  * because table tests build their expected text with it. Use
@@ -388,18 +388,6 @@ export const convertTimestampToDateTime = (
   locale: string = 'en',
   timeZone: TimestampTimeZone = 'local',
 ): string => formatDateTime(timestamp, { locale, seconds: showSecond, timeZone });
-
-/**
- * Deterministic value used for SSR and the first hydration render.
- *
- * @deprecated No production caller; use
- * `formatDateTime(timestamp, { locale, seconds, timeZone: 'utc' })`.
- */
-export const convertTimestampToServerDateTime = (
-  timestamp: number,
-  showSecond: boolean = false,
-  locale: string = 'en',
-): string => convertTimestampToDateTime(timestamp, showSecond, locale, 'utc');
 
 const hanCalendarDate = (year: number, monthIndex: number, day: number): string =>
   `${year}/${monthIndex + 1}/${day}`;

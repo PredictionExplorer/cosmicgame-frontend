@@ -8,7 +8,6 @@ import {
   formatHoursTick,
   formatDurationTick,
   convertTimestampToDateTime,
-  convertTimestampToServerDateTime,
   formatGroupedNumber,
 } from '../format';
 
@@ -168,8 +167,8 @@ describe('YYYYMMDD date helpers', () => {
   it('uses an explicit deterministic UTC value for server snapshots', () => {
     const timestamp = Date.UTC(2026, 0, 1, 12, 34, 56) / 1000;
     expect(convertTimestampToDateTime(timestamp, true, 'en', 'utc')).toBe('Jan 01, 12:34:56');
-    expect(convertTimestampToServerDateTime(timestamp, true, 'zh')).toBe('1月1日 12:34:56');
-    expect(convertTimestampToServerDateTime(timestamp, true, 'uk')).toBe('1 січ., 12:34:56');
+    expect(convertTimestampToDateTime(timestamp, true, 'zh', 'utc')).toBe('1月1日 12:34:56');
+    expect(convertTimestampToDateTime(timestamp, true, 'uk', 'utc')).toBe('1 січ., 12:34:56');
   });
 
   it('abbreviates every Ukrainian month through Intl rather than a hand-kept array', () => {

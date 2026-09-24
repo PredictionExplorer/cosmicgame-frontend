@@ -42,7 +42,6 @@ export {
 } from './format/numbers';
 export {
   convertTimestampToDateTime,
-  convertTimestampToServerDateTime,
   formatDateTime,
   formatDateTimeTitle,
   formatRelativeTime,

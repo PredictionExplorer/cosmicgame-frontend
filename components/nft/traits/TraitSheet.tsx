@@ -14,7 +14,7 @@ import {
   type TraitKey,
 } from '@/lib/nftMetadata';
 import { Link } from '@/i18n/navigation';
-import { useHydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
+import { useHydrationSafeDateTime } from '@/components/ui/date-time';
 import { cn } from '@/lib/utils';
 import { toIntlLocale } from '@/utils/format';
 import { InfoTooltip } from '@/components/ui/info-tooltip';

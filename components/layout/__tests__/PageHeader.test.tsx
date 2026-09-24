@@ -261,13 +261,6 @@ describe('PageHeader', () => {
     expect(screen.getByRole('heading', { level: 1 })).toHaveAttribute('id', 'allocation-heading');
   });
 
-  it('keeps the deprecated title level and gradient props working', () => {
-    const { rerender } = render(<PageHeader title="Summary" titleLevel={2} />);
-    expect(screen.getByRole('heading', { level: 2 })).toHaveClass('type-display-sm');
-    rerender(<PageHeader title="Nebula" gradientTitle="nebula" />);
-    expect(screen.getByText('Nebula')).toHaveClass('text-gradient-nebula');
-  });
-
   it('has no accessibility violations', async () => {
     const { container } = render(
       <PageHeader

@@ -3,7 +3,15 @@ import { hydrateRoot, type Root } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
 import { render, screen } from '@testing-library/react';
 
-import { DateTime, TimeZoneNote, useTimeZoneLabel } from '../date-time';
+import { getRelativeTime } from '@/utils';
+
+import {
+  DateTime,
+  TimeZoneNote,
+  useHydrationSafeDateTime,
+  useHydrationSafeNowSeconds,
+  useTimeZoneLabel,
+} from '../date-time';
 
 // 2026-01-01 00:30:45 UTC is still 31 December in Los Angeles: a date and
 // year boundary, so the hydration switch is visible in every field.
@@ -127,5 +135,53 @@ describe('time zone captions', () => {
   it('states the zone once through the formats catalog', () => {
     render(<TimeZoneNote />);
     expect(screen.getByText(/^formats\.dateTime\.timeZone\(zone=UTC/)).toBeInTheDocument();
+  });
+});
+
+describe('hydration-safe date strings', () => {
+  function StringProbe({ timestamp, locale }: { timestamp: number; locale?: string }) {
+    return <>{useHydrationSafeDateTime(timestamp, true, locale)}</>;
+  }
+
+  function RelativeTimeProbe({ timestamp }: { timestamp: number }) {
+    const nowSeconds = useHydrationSafeNowSeconds(timestamp);
+    return <>{getRelativeTime(timestamp, nowSeconds)}</>;
+  }
+
+  beforeEach(() => {
+    jest.spyOn(Date, 'now').mockReturnValue(MID_2026);
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('serves deterministic UTC strings through hydration without a mismatch', async () => {
+    const { serverHtml, onRecoverableError, cleanup } = await hydrate(
+      <StringProbe timestamp={NEW_YEAR} />,
+    );
+    expect(serverHtml).toContain('Jan 01, 00:30:45');
+    expect(onRecoverableError).not.toHaveBeenCalled();
+    await cleanup();
+  });
+
+  it('follows the active locale when no locale is passed', () => {
+    const nextIntl = jest.requireMock('next-intl') as { useLocale: () => string };
+    jest.spyOn(nextIntl, 'useLocale').mockReturnValue('zh');
+    render(<StringProbe timestamp={NEW_YEAR} />);
+    // The zh compact form ("1月1日 00:30:45"), in the runner's local zone after
+    // hydration, which may fall on 2025-12-31 and so carry the year.
+    expect(document.body.textContent).toMatch(/^(?:\d{4}年)?\d{1,2}月\d{1,2}日 \d{2}:\d{2}:45$/);
+  });
+
+  it('defers relative time until hydration instead of reading the clock during render', async () => {
+    const timestamp = 1_700_000_000;
+    jest.spyOn(Date, 'now').mockReturnValue((timestamp + 120) * 1000);
+    const { container, serverHtml, cleanup } = await hydrate(
+      <RelativeTimeProbe timestamp={timestamp} />,
+    );
+    expect(serverHtml).toContain('just now');
+    expect(container).toHaveTextContent('2 minutes ago');
+    await cleanup();
   });
 });
