@@ -146,15 +146,18 @@ describe('GesturePage', () => {
     expect(refetch).toHaveBeenCalledTimes(1);
   });
 
-  it('sets the record on the site’s content edge, holding only the record to a reading width (D256)', () => {
+  it('sets the record on the site’s content edge, holding only the record to its own width (D256)', () => {
     renderGesture();
-    expect(screen.getByRole('heading', { level: 1 }).closest('.max-w-3xl')).toBeNull();
+    expect(screen.getByRole('heading', { level: 1 }).closest('.max-w-4xl')).toBeNull();
+    // Wide enough for the transaction hash and its two buttons on one desktop line.
     expect(
       screen
         .getByRole('heading', { level: 2, name: 'gesture.sections.details.title' })
-        .closest('.max-w-3xl'),
+        .closest('.max-w-4xl'),
     ).not.toBeNull();
-    expect(document.querySelector('.mx-auto.max-w-3xl')).toBeNull();
+    // The message keeps the reading measure.
+    expect(screen.getByTestId('gesture-message')).toHaveClass('max-w-3xl');
+    expect(document.querySelector('.mx-auto.max-w-4xl, .mx-auto.max-w-3xl')).toBeNull();
   });
 
   it('names the gesture by its place in the cycle, never by its record id (F173)', () => {

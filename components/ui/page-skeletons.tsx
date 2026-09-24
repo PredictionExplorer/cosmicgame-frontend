@@ -65,7 +65,7 @@ export function RecordDetailSkeleton({
   /** Rows per section card, top to bottom. */
   sections?: readonly number[];
   /** The page's own column width. */
-  width?: 'max-w-3xl' | 'max-w-5xl';
+  width?: 'max-w-3xl' | 'max-w-4xl' | 'max-w-5xl';
   shell?: 'data' | 'detail';
   /** `start` for a record set on the site's content edge rather than centred in it. */
   align?: 'center' | 'start';

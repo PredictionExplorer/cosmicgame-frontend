@@ -170,6 +170,13 @@ function TransactionHash({ hash }: { hash: string }) {
   );
 }
 
+/**
+ * The record's width: wide enough on desktop for a transaction hash (66
+ * mono characters) with its copy and explorer buttons on one line beside the
+ * label column. The participant's message keeps the narrower reading measure.
+ */
+const RECORD_WIDTH_CLASS = 'max-w-4xl';
+
 /** One label / value line of the record. */
 function RecordRow({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -262,7 +269,7 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
     return (
       <PageShell variant="data" backdrop="signature">
         <PageHeader section={section} breadcrumbs={trail} title={title} />
-        <div className="max-w-3xl">
+        <div className={RECORD_WIDTH_CLASS}>
           {loading ? (
             <SkeletonDetailRows rows={6} />
           ) : readFailed ? (
@@ -410,9 +417,9 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
           actions={hasSteps ? stepNav('max-sm:hidden') : undefined}
         />
 
-        <div className="max-w-3xl space-y-12">
+        <div className={cn(RECORD_WIDTH_CLASS, 'space-y-12')}>
           {message ? (
-            <figure data-testid="gesture-message">
+            <figure data-testid="gesture-message" className="max-w-3xl">
               <figcaption className="type-label text-subtle">
                 {t('sections.message.title')}
               </figcaption>
