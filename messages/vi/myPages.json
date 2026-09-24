@@ -343,7 +343,9 @@
       "imprinted": "Đã khắc",
       "received": "Đã nhận",
       "sent": "Đã gửi",
-      "consumed": "Đã tiêu thụ"
+      "consumed": "Đã tiêu thụ",
+      "anchored": "Đã neo giữ",
+      "released": "Đã gỡ neo"
     },
     "filter": {
       "label": "Hiển thị",

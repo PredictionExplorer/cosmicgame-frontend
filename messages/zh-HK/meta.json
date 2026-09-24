@@ -74,14 +74,6 @@
     "title": "轉帳 CST",
     "description": "將 Cosmic Signature CST 代幣轉帳至其他錢包地址。"
   },
-  "cosmicSignatureTransfers": {
-    "title": "NFT 轉移記錄",
-    "description": "查看指定錢包的 Cosmic Signature NFT 轉移記錄，包括轉出方、接收方、代幣 ID 與時間。"
-  },
-  "cosmicTokenTransfers": {
-    "title": "CST 轉帳記錄",
-    "description": "查看指定錢包的 CST 轉帳記錄，包括轉出方、接收方、數量與時間。"
-  },
   "siteMap": {
     "title": "網站地圖",
     "description": "瀏覽 Cosmic Signature 協議的各個部分，包括落筆、NFT 畫廊、錨定、統計、分配與公共物品資助。"

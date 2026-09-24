@@ -186,14 +186,6 @@
     "title": "Transfer CST",
     "description": "Send your Cosmic Signature CST tokens to another wallet address."
   },
-  "cosmicSignatureTransfers": {
-    "title": "NFT Transfer History",
-    "description": "Cosmic Signature NFT Transfer History"
-  },
-  "cosmicTokenTransfers": {
-    "title": "CST Transfer History",
-    "description": "Cosmic Signature CST Token Transfer History"
-  },
   "usedRwlkNfts": {
     "title": "Used RandomWalk NFTs",
     "description": "RandomWalk NFTs already attached to ETH gestures for a 50% Gesture-Cost discount in Cosmic Signature. Each RandomWalk NFT can be used once for this discount."

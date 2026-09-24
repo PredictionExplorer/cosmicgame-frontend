@@ -1,8 +1,13 @@
 import type { Metadata, ResolvingMetadata } from 'next';
-import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { setRequestLocale } from 'next-intl/server';
 
-import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
+import {
+  readTransferHistorySeed,
+  transferHistoryMetadata,
+} from '@/components/tokens/transferHistoryRoute';
+
+import { QuerySeed, seedsDisabled } from '../../QuerySeed';
 
 import CosmicTokenTransfersPage from './CosmicTokenTransfersPage';
 
@@ -14,16 +19,7 @@ export async function generateMetadata(
   { params }: PageProps,
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
-  const { locale, address } = await params;
-  const t = await getTranslations({ locale, namespace: 'meta' });
-  return createPageMetadata(
-    parent,
-    t('cosmicTokenTransfers.title'),
-    t('cosmicTokenTransfers.description'),
-    undefined,
-    `/cosmic-token-transfer/${address}`,
-    { index: false, locale },
-  );
+  return transferHistoryMetadata('cst', await params, parent);
 }
 
 // Dynamic-param pages render on demand; revalidate keeps live protocol data
@@ -33,9 +29,13 @@ export const revalidate = 300;
 export default async function Page({ params }: PageProps) {
   const { locale, address } = await params;
   setRequestLocale(locale);
+  // The history's first read, so the ledger is in the HTML (no layout shift).
+  const seeds = seedsDisabled() ? [] : await readTransferHistorySeed('cst', address);
   return (
     <PageMessages namespaces={['myPages', 'tables']}>
-      <CosmicTokenTransfersPage address={address} />
+      <QuerySeed seeds={seeds}>
+        <CosmicTokenTransfersPage address={address} />
+      </QuerySeed>
     </PageMessages>
   );
 }

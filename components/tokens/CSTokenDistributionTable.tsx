@@ -14,7 +14,7 @@ interface TokenDistribution {
 
 interface CSTokenDistributionTableProps extends LedgerStateProps {
   list: TokenDistribution[];
-  /** Rows per page; the statistics section shows a short ledger. */
+  /** Rows per page. Default: the shared ledger size, 20 (10 on a phone). */
   perPage?: number;
   /** Names the table; defaults to the statistics section it sits in. */
   ariaLabel?: string;
@@ -27,7 +27,7 @@ interface CSTokenDistributionTableProps extends LedgerStateProps {
  */
 export function CSTokenDistributionTable({
   list,
-  perPage = 5,
+  perPage,
   ariaLabel,
   ...state
 }: CSTokenDistributionTableProps) {

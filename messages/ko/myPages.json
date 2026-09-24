@@ -343,7 +343,9 @@
       "imprinted": "각인",
       "received": "받음",
       "sent": "보냄",
-      "consumed": "소모"
+      "consumed": "소모",
+      "anchored": "앵커링",
+      "released": "앵커링 해제"
     },
     "filter": {
       "label": "표시",

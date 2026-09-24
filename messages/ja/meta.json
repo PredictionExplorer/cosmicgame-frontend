@@ -186,14 +186,6 @@
     "title": "CSTの送付",
     "description": "Cosmic Signature CSTトークンを別のウォレットアドレスへ送る。"
   },
-  "cosmicSignatureTransfers": {
-    "title": "NFTの移転履歴",
-    "description": "Cosmic Signature NFTの移転履歴"
-  },
-  "cosmicTokenTransfers": {
-    "title": "CSTの送付履歴",
-    "description": "Cosmic Signature CSTトークンの送付履歴"
-  },
   "usedRwlkNfts": {
     "title": "使用済みのRandomWalk NFT",
     "description": "Cosmic Signatureで一筆の費用の50%割引のためにETH一筆にすでに添付されたRandomWalk NFT。各RandomWalk NFTはこの割引に一度だけ使えます。"

@@ -186,14 +186,6 @@
     "title": "CST 전송",
     "description": "보유한 Cosmic Signature CST 토큰을 다른 지갑 주소로 전송합니다."
   },
-  "cosmicSignatureTransfers": {
-    "title": "NFT 전송 내역",
-    "description": "Cosmic Signature NFT 전송 내역을 확인할 수 있습니다."
-  },
-  "cosmicTokenTransfers": {
-    "title": "CST 토큰 전송 내역",
-    "description": "Cosmic Signature CST 토큰 전송 내역을 확인할 수 있습니다."
-  },
   "usedRwlkNfts": {
     "title": "사용된 RandomWalk NFT",
     "description": "Cosmic Signature에서 제스처 비용 50% 할인을 위해 이미 ETH 제스처에 첨부된 RandomWalk NFT입니다. 각 RandomWalk NFT는 이 할인에 한 번만 쓸 수 있습니다."

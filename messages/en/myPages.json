@@ -343,7 +343,9 @@
       "imprinted": "Imprinted",
       "received": "Received",
       "sent": "Sent",
-      "consumed": "Consumed"
+      "consumed": "Consumed",
+      "anchored": "Anchored",
+      "released": "Released"
     },
     "filter": {
       "label": "Show",

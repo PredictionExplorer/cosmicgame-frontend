@@ -28,14 +28,15 @@ describe('CSTokenDistributionTable', () => {
     );
   });
 
-  it('pages a long list five at a time', () => {
-    const many = Array.from({ length: 8 }, (_, index) => ({
+  it('pages at the shared ledger size, so seven holders fit on one page (regression)', () => {
+    // It paged five at a time: "1–5 of 7" where every other ledger shows 20.
+    const seven = Array.from({ length: 7 }, (_, index) => ({
       OwnerAddr: `0x${String(index + 1).padStart(40, '0')}`,
       OwnerAid: index,
       NumTokens: index + 1,
     }));
-    render(<CSTokenDistributionTable list={many} />);
-    expect(within(screen.getByRole('table')).getAllByRole('row')).toHaveLength(6);
+    render(<CSTokenDistributionTable list={seven} />);
+    expect(within(screen.getByRole('table')).getAllByRole('row')).toHaveLength(8);
   });
 
   it('says so when nobody holds one yet', () => {

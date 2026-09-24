@@ -343,7 +343,9 @@
       "imprinted": "銘刻",
       "received": "收到",
       "sent": "傳出",
-      "consumed": "消耗"
+      "consumed": "消耗",
+      "anchored": "錨定",
+      "released": "解錨"
     },
     "filter": {
       "label": "顯示",

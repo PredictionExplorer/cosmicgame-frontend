@@ -343,7 +343,9 @@
       "imprinted": "Закарбовано",
       "received": "Отримано",
       "sent": "Надіслано",
-      "consumed": "Витрачено"
+      "consumed": "Витрачено",
+      "anchored": "Закріплено",
+      "released": "Відкріплено"
     },
     "filter": {
       "label": "Показати",

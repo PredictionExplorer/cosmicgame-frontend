@@ -7,19 +7,25 @@ import { getAddress, isAddress } from 'viem';
 
 import { Link } from '@/i18n/navigation';
 import { EXPLORER_NAME } from '@/lib/chainGuard';
-import { ImprintIcon } from '@/lib/conceptIcons';
+import { AnchoringIcon, ImprintIcon } from '@/lib/conceptIcons';
 import { formatAmount, formatCount, formatId } from '@/utils/format';
 import { getExplorerUrl } from '@/utils/urls';
+import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { useCSTTransfers, useCTTransfers } from '@/hooks/useApiQuery';
 import { LedgerPage } from '@/components/ledger/LedgerPage';
 import { PageHeader, PageHeaderTabs, type PageHeaderFigure } from '@/components/layout/PageHeader';
 import { useParticipantTrail } from '@/components/layout/participantTrail';
 import { AddressChip } from '@/components/ui/address-chip';
 import { Amount } from '@/components/ui/amount';
-import { DataTable, TableLink, type DataTableColumn } from '@/components/ui/data-table';
+import {
+  DataTable,
+  TableLink,
+  useTablePageSize,
+  type DataTableColumn,
+} from '@/components/ui/data-table';
 import { EmptyState } from '@/components/ui/empty-state';
+import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Skeleton } from '@/components/ui/skeleton';
-import { tabsListVariants, tabsTriggerVariants } from '@/components/ui/tabs';
 
 import {
   ACTIVITY_DIRECTION,
@@ -37,6 +43,8 @@ export type TransferAsset = 'cst' | 'nft';
 
 type Filter = 'all' | TransferDirection;
 
+const FILTERS: readonly Filter[] = ['all', 'in', 'out'];
+
 /** One row of either history, classified from the page address's side. */
 interface TransferEntry {
   key: number;
@@ -52,21 +60,37 @@ interface TransferEntry {
   tokenId: number | null;
 }
 
-/** +1 for what came into the address, -1 for what left it. */
-const signOf = (activity: TransferActivity): 1 | -1 =>
-  ACTIVITY_DIRECTION[activity] === 'in' ? 1 : -1;
+/**
+ * +1 for what came into the address, -1 for what left it, 0 for what moved
+ * without changing hands (a transfer to itself, anchoring and release).
+ */
+function signOf(entry: Pick<TransferEntry, 'activity' | 'self'>): 1 | -1 | 0 {
+  if (entry.self) return 0;
+  const direction = ACTIVITY_DIRECTION[entry.activity];
+  if (direction === null) return 0;
+  return direction === 'in' ? 1 : -1;
+}
 
 const ACTIVITY_ICONS: Record<TransferActivity, ComponentType<LucideProps>> = {
   imprinted: ImprintIcon,
   received: ArrowDownLeft,
   sent: ArrowUpRight,
   consumed: Flame,
+  anchored: AnchoringIcon,
+  released: AnchoringIcon,
 };
 
 const HISTORY_PATH: Record<TransferAsset, string> = {
   cst: '/cosmic-token-transfer',
   nft: '/cosmic-signature-transfer',
 };
+
+/**
+ * The phone counterparty line under the activity word: a real ledger link
+ * (foreground ink, the quiet underline, a 24px row), not muted caption text.
+ */
+const PHONE_COUNTERPARTY_CLASS =
+  'type-body-sm text-muted-foreground sm:hidden [&_a]:min-h-6 [&_a]:text-foreground [&_a]:underline [&_a]:decoration-1 [&_a]:underline-offset-[0.2em] [&_a]:decoration-[color-mix(in_oklab,currentColor_30%,transparent)] [&_a:hover]:text-primary [&_a:hover]:decoration-current';
 
 function numberOrZero(value: unknown): number {
   return typeof value === 'number' && Number.isFinite(value) ? value : 0;
@@ -78,9 +102,10 @@ function stringOrEmpty(value: unknown): string {
 
 /**
  * The activity word with its glyph: the direction reads before the amount
- * does. On a phone, where the counterparty column is dropped to keep each
- * record short, a transfer's other side follows under the word (the
- * protocol's own imprints and consumptions need no second line).
+ * does. The word sits on the row's baseline and the glyph is centred on it.
+ * On a phone, where the counterparty column is dropped to keep each record
+ * short, a transfer's other side follows under the word (the protocol's own
+ * imprints and consumptions need no second line).
  */
 function ActivityCell({
   activity,
@@ -93,42 +118,27 @@ function ActivityCell({
   const Icon = ACTIVITY_ICONS[activity];
   return (
     <span className="inline-flex flex-col items-end gap-0.5 sm:items-start">
-      <span className="inline-flex items-center gap-2 whitespace-nowrap">
-        <Icon aria-hidden className="size-4 shrink-0 text-subtle" />
+      <span className="inline-flex items-baseline gap-2 whitespace-nowrap">
+        <Icon aria-hidden className="size-4 shrink-0 self-center text-subtle" />
         {t(`activity.${activity}`)}
       </span>
-      {counterparty ? <span className="type-caption sm:hidden">{counterparty}</span> : null}
+      {counterparty ? <span className={PHONE_COUNTERPARTY_CLASS}>{counterparty}</span> : null}
     </span>
-  );
-}
-
-function FilterGroup({ value, onChange }: { value: Filter; onChange: (next: Filter) => void }) {
-  const t = useTranslations('myPages.transferHistory.filter');
-  const options: Filter[] = ['all', 'in', 'out'];
-  return (
-    <div role="group" aria-label={t('label')} className={tabsListVariants()}>
-      {options.map((option) => (
-        <button
-          key={option}
-          type="button"
-          aria-pressed={value === option}
-          data-state={value === option ? 'active' : 'inactive'}
-          onClick={() => onChange(option)}
-          className={tabsTriggerVariants()}
-        >
-          {t(option)}
-        </button>
-      ))}
-    </div>
   );
 }
 
 /**
  * One address's CST or NFT transfer history: an identity header (the full
- * address to copy, its explorer page, the totals), a switch to the other
- * asset's history, and a ledger that says what each row meant for this
- * address — imprinted, received, sent or consumed — with signed CST amounts
- * and the counterparty, never a raw zero address.
+ * address to copy and its explorer page directly under the title, then the
+ * totals), a switch to the other asset's history, and a ledger that says what
+ * each row meant for this address — imprinted, received, sent, consumed,
+ * anchored or released — with signed CST amounts and the counterparty, never
+ * a raw zero address.
+ *
+ * While the history loads, every block that the data fills keeps its final
+ * shape (the figure captions, the filter bar with its count, a page of rows),
+ * so nothing below the header moves when it arrives. The route seeds the
+ * first read on the server, so a fresh page arrives with its ledger.
  */
 export function AddressTransferHistory({
   asset,
@@ -144,6 +154,8 @@ export function AddressTransferHistory({
   const address = isAddress(rawAddress, { strict: false }) ? getAddress(rawAddress) : null;
   const participantTrail = useParticipantTrail(address);
   const [filter, setFilter] = useState<Filter>('all');
+  const pageSize = useTablePageSize();
+  const { stakingCst, stakingRwalk } = useContractAddresses();
 
   const cst = useCTTransfers(asset === 'cst' ? address : null);
   const nft = useCSTTransfers(asset === 'nft' ? address : null);
@@ -151,12 +163,14 @@ export function AddressTransferHistory({
 
   const entries = useMemo<TransferEntry[]>(() => {
     if (!address) return [];
+    const anchorWallets = [stakingCst, stakingRwalk];
     return (query.data ?? []).map((row) => {
       const record = row as Record<string, unknown>;
       const { activity, counterparty, self } = classifyTransfer(
         stringOrEmpty(record.FromAddr),
         stringOrEmpty(record.ToAddr),
         address,
+        anchorWallets,
       );
       return {
         key: numberOrZero(record.EvtLogId),
@@ -169,7 +183,7 @@ export function AddressTransferHistory({
         tokenId: asset === 'nft' ? numberOrZero(record.TokenId) : null,
       };
     });
-  }, [address, asset, query.data]);
+  }, [address, asset, query.data, stakingCst, stakingRwalk]);
 
   const shown = useMemo(
     () => (filter === 'all' ? entries : entries.filter((entry) => movesInDirection(entry, filter))),
@@ -185,6 +199,7 @@ export function AddressTransferHistory({
       txHash: (entry) => entry.txHash,
       year: 'auto',
       sortable: true,
+      width: '12rem',
     };
     const counterpartyChip = (other: string) => (
       <AddressChip address={other} variant="plain" showCopy={false} currentAddress={address} />
@@ -200,6 +215,7 @@ export function AddressTransferHistory({
           counterparty={entry.counterparty ? counterpartyChip(entry.counterparty) : null}
         />
       ),
+      width: '11rem',
     };
     // The protocol imprints and consumes: those rows name it rather than
     // print the zero address, and a transfer's other side is its address.
@@ -228,22 +244,23 @@ export function AddressTransferHistory({
           kind: 'amount',
           header: tTables('columns.amountCst'),
           unit: 'CST',
+          width: '10rem',
           // Signed from this address's side, so a column of changes adds up;
-          // a transfer to itself changes nothing, so it carries no sign.
-          value: (entry) =>
-            entry.wei === null
-              ? null
-              : Number(entry.wei) * (entry.self ? 0 : signOf(entry.activity)),
-          cell: (entry) =>
-            entry.wei === null ? null : (
+          // a transfer that changes no hands carries no sign.
+          value: (entry) => (entry.wei === null ? null : Number(entry.wei) * signOf(entry)),
+          cell: (entry) => {
+            if (entry.wei === null) return null;
+            const sign = signOf(entry);
+            return (
               <Amount
-                value={entry.self ? entry.wei : BigInt(signOf(entry.activity)) * entry.wei}
+                value={sign === 0 ? entry.wei : BigInt(sign) * entry.wei}
                 unit="CST"
                 context="table"
                 showUnit={false}
-                signDisplay={entry.self ? 'never' : 'exceptZero'}
+                signDisplay={sign === 0 ? 'never' : 'exceptZero'}
               />
-            ),
+            );
+          },
           sortable: true,
         },
       ];
@@ -263,37 +280,39 @@ export function AddressTransferHistory({
             </TableLink>
           ),
         sortable: true,
+        width: '9rem',
       },
       counterparty,
     ];
   }, [address, asset, t, tFormats, tTables]);
 
-  // While the history loads a figure is a skeleton; when it fails, the
-  // header's unavailable dash (`null`). Totals are exact: sums of base units.
-  const ready = !query.isLoading && !query.isError;
-  const pending = query.isLoading ? <Skeleton className="h-7 w-24" /> : null;
+  // While the history loads a figure is a skeleton, with its caption line
+  // held open; when it fails, the header's unavailable dash (`null`). Totals
+  // are exact: sums of base units.
+  const loading = query.isLoading;
+  const ready = !loading && !query.isError;
+  const pending = loading ? <Skeleton className="h-7 w-24" /> : null;
+  const pendingCaption = loading ? <Skeleton className="mt-1 h-3.5 w-28" /> : undefined;
   let figures: PageHeaderFigure[];
   if (asset === 'cst') {
     const totals = sumCstTransfers(entries);
     const cst = (wei: bigint) => formatAmount(wei, { unit: 'CST', locale });
+    const caption = (amount: bigint, key: 'imprintedCaption' | 'consumedCaption') => {
+      if (!ready) return pendingCaption;
+      return amount > 0n ? t(`cst.figures.${key}`, { amount: cst(amount) }) : undefined;
+    };
     figures = [
       {
         id: 'received',
         label: t('cst.figures.received'),
         value: ready ? <Amount value={totals.received} unit="CST" /> : pending,
-        caption:
-          ready && totals.imprinted > 0n
-            ? t('cst.figures.imprintedCaption', { amount: cst(totals.imprinted) })
-            : undefined,
+        caption: caption(totals.imprinted, 'imprintedCaption'),
       },
       {
         id: 'sent',
         label: t('cst.figures.sent'),
         value: ready ? <Amount value={totals.sent} unit="CST" /> : pending,
-        caption:
-          ready && totals.consumed > 0n
-            ? t('cst.figures.consumedCaption', { amount: cst(totals.consumed) })
-            : undefined,
+        caption: caption(totals.consumed, 'consumedCaption'),
       },
       {
         id: 'net',
@@ -316,12 +335,18 @@ export function AddressTransferHistory({
       section="explore"
       breadcrumbs={participantTrail}
       title={t(`${asset}.title`)}
-      subtitle={t(`${asset}.lede`)}
-      figures={address ? figures : undefined}
-      meta={
+      identity={
         address ? (
+          // Whose history this is, before any of its figures.
           <>
-            <AddressChip address={address} display="responsive" label={false} href={false} />
+            <AddressChip
+              address={address}
+              variant="plain"
+              display="responsive"
+              label={false}
+              href={false}
+              className="text-foreground"
+            />
             <a
               href={getExplorerUrl('address', address)}
               target="_blank"
@@ -335,6 +360,8 @@ export function AddressTransferHistory({
           </>
         ) : undefined
       }
+      subtitle={t(`${asset}.lede`)}
+      figures={address ? figures : undefined}
       tabs={
         address ? (
           // The address's other ledger, one tab away on the header's rule.
@@ -362,7 +389,7 @@ export function AddressTransferHistory({
           action={
             <Link
               href="/statistics/participation"
-              className="link inline-flex items-center gap-1.5 type-body-sm"
+              className="link inline-flex min-h-11 items-center gap-1.5 type-body-sm sm:min-h-6"
             >
               {t('invalidAddress.action')}
               <ArrowRight aria-hidden className="size-3.5" />
@@ -373,6 +400,10 @@ export function AddressTransferHistory({
     );
   }
 
+  // The filter bar stands from the first paint (its count a skeleton while
+  // loading); only a history that turns out empty drops it.
+  const showToolbar = loading || entries.length > 0;
+
   return (
     <LedgerPage header={header}>
       <DataTable
@@ -380,19 +411,33 @@ export function AddressTransferHistory({
         columns={columns}
         ariaLabel={t(`${asset}.title`)}
         getRowKey={(entry) => entry.key}
-        loading={query.isLoading}
+        loading={loading}
+        skeletonRows={pageSize}
         error={query.isError ? t('error') : undefined}
         onRetry={() => void query.refetch()}
         emptyTitle={t(filter === 'all' ? `${asset}.empty` : 'filter.empty')}
         emptyDescription={filter === 'all' ? t(`${asset}.emptyDescription`) : undefined}
         resetPageKey={filter}
+        // Short values: the ledger keeps to a readable width instead of
+        // spreading four columns across the whole screen.
+        className="max-w-5xl"
         toolbar={
-          entries.length > 0 ? (
+          showToolbar ? (
             <div className="mb-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-              <FilterGroup value={filter} onChange={setFilter} />
-              <p className="type-caption text-subtle tabular-nums">
-                {t('count', { count: shown.length })}
-              </p>
+              <SegmentedControl
+                label={t('filter.label')}
+                hideLabel
+                options={FILTERS.map((option) => ({ value: option, label: t(`filter.${option}`) }))}
+                value={filter}
+                onValueChange={setFilter}
+              />
+              {loading ? (
+                <Skeleton className="h-4 w-20" />
+              ) : (
+                <p className="type-caption text-subtle tabular-nums">
+                  {t('count', { count: shown.length })}
+                </p>
+              )}
             </div>
           ) : null
         }

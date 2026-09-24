@@ -186,14 +186,6 @@
     "title": "Chuyển CST",
     "description": "Gửi token CST của Cosmic Signature đến một địa chỉ ví khác."
   },
-  "cosmicSignatureTransfers": {
-    "title": "Lịch sử chuyển giao NFT",
-    "description": "Lịch sử chuyển giao Cosmic Signature NFT"
-  },
-  "cosmicTokenTransfers": {
-    "title": "Lịch sử chuyển token CST",
-    "description": "Lịch sử chuyển token CST của Cosmic Signature"
-  },
   "usedRwlkNfts": {
     "title": "RandomWalk NFT đã sử dụng",
     "description": "Các RandomWalk NFT đã được đính kèm vào nét bút ETH để giảm 50% chi phí nét bút trong Cosmic Signature. Mỗi RandomWalk NFT chỉ dùng được một lần cho mức giảm giá này."

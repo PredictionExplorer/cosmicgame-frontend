@@ -343,7 +343,9 @@
       "imprinted": "刻印",
       "received": "受け取り",
       "sent": "送付",
-      "consumed": "消費"
+      "consumed": "消費",
+      "anchored": "係留",
+      "released": "係留解除"
     },
     "filter": {
       "label": "表示",

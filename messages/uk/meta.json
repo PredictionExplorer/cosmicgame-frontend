@@ -186,14 +186,6 @@
     "title": "Переказати CST",
     "description": "Перекажіть свої токени CST Cosmic Signature на адресу іншого гаманця."
   },
-  "cosmicSignatureTransfers": {
-    "title": "Історія передач NFT",
-    "description": "Історія передач Cosmic Signature NFT"
-  },
-  "cosmicTokenTransfers": {
-    "title": "Історія переказів CST",
-    "description": "Історія переказів токена CST Cosmic Signature"
-  },
   "usedRwlkNfts": {
     "title": "Використані RandomWalk NFT",
     "description": "RandomWalk NFT, уже долучені до ETH-жестів зі знижкою 50% на вартість жесту в Cosmic Signature. Кожен RandomWalk NFT можна використати для цієї знижки лише раз."

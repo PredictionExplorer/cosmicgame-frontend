@@ -5,6 +5,7 @@ import { AddressTransferHistory } from '../AddressTransferHistory';
 const ME = '0xa169574d0d353e3010997a3e64846b7d1b2a63b6';
 const OTHER = '0x1ec14adaf61e27ab339bc590ba4bf2356dd7e990';
 const ZERO = '0x0000000000000000000000000000000000000000';
+const MOCK_ANCHOR_WALLET = '0xb7f13a14f9eb5f1f1afb1a1a0fad6dc1a5b2e0c4';
 const WEI = 1_000_000_000_000_000_000n;
 
 const mockUseCTTransfers = jest.fn();
@@ -14,6 +15,10 @@ const mockRefetch = jest.fn();
 jest.mock('@/hooks/useApiQuery', () => ({
   useCTTransfers: (...args: unknown[]) => mockUseCTTransfers(...args),
   useCSTTransfers: (...args: unknown[]) => mockUseCSTTransfers(...args),
+}));
+
+jest.mock('@/contexts/ContractAddressesContext', () => ({
+  useContractAddresses: () => ({ stakingCst: MOCK_ANCHOR_WALLET, stakingRwalk: '' }),
 }));
 
 function query(
@@ -109,20 +114,46 @@ describe('AddressTransferHistory — CST', () => {
     expect(within(table()).queryByRole('link', { name: /0x0000/ })).not.toBeInTheDocument();
   });
 
-  it('filters to incoming or outgoing transfers', () => {
+  it('filters to incoming or outgoing transfers with one single-choice group', () => {
     render(<AddressTransferHistory asset="cst" address={ME} />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'myPages.transferHistory.filter.out' }));
+    const group = screen.getByRole('radiogroup', { name: 'myPages.transferHistory.filter.label' });
+    fireEvent.click(
+      within(group).getByRole('radio', { name: 'myPages.transferHistory.filter.out' }),
+    );
     expect(
-      screen.getByRole('button', { name: 'myPages.transferHistory.filter.out' }),
-    ).toHaveAttribute('aria-pressed', 'true');
+      within(group).getByRole('radio', { name: 'myPages.transferHistory.filter.out' }),
+    ).toBeChecked();
     const rows = within(table()).getAllByRole('row').slice(1);
     expect(rows).toHaveLength(2);
     expect(screen.getByText('myPages.transferHistory.count(count=2)')).toBeInTheDocument();
   });
 
+  it('keeps the loaded layout while loading: caption lines, the filter bar and a page of rows (regression)', () => {
+    // The captions and the filter bar used to mount only with the data, and
+    // five skeleton rows stood in for twenty: the ledger jumped on load.
+    mockUseCTTransfers.mockReturnValue(query(undefined, { isLoading: true }));
+    render(<AddressTransferHistory asset="cst" address={ME} />);
+
+    for (const id of ['received', 'sent']) {
+      const figure = document.querySelector(`[data-figure="${id}"]`);
+      expect(figure?.querySelectorAll('dd')).toHaveLength(2);
+    }
+    expect(
+      screen.getByRole('radiogroup', { name: 'myPages.transferHistory.filter.label' }),
+    ).toBeInTheDocument();
+    expect(document.querySelectorAll('tbody tr')).toHaveLength(20);
+  });
+
   it('identifies the address with a copy button and its explorer page, and links the NFT history', () => {
     render(<AddressTransferHistory asset="cst" address={ME} />);
+
+    // Whose history it is reads directly under the title, before the figures.
+    const identity = document.querySelector('[data-slot="page-header-identity"]');
+    expect(identity).toHaveTextContent('0xA169574D0d353E3010997A3E64846b7D1B2a63B6');
+    expect(identity?.compareDocumentPosition(document.querySelector('dl')!)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
 
     expect(screen.getByRole('button', { name: 'common.actions.copyAddress' })).toBeInTheDocument();
     expect(
@@ -187,6 +218,28 @@ describe('AddressTransferHistory — NFT', () => {
     );
     expect(mockUseCSTTransfers).toHaveBeenCalledWith(ME);
     expect(mockUseCTTransfers).toHaveBeenCalledWith(null);
+  });
+
+  it('reads an NFT moved into the anchoring wallet as anchored, not sent (regression)', () => {
+    mockUseCSTTransfers.mockReturnValue(
+      query([
+        {
+          EvtLogId: 5,
+          TxHash: '0xe',
+          TimeStamp: 1_786_900_000,
+          TokenId: 25,
+          FromAddr: ME,
+          ToAddr: MOCK_ANCHOR_WALLET,
+        },
+        ...NFT_ROWS,
+      ]),
+    );
+    render(<AddressTransferHistory asset="nft" address={ME} />);
+
+    const rows = within(table()).getAllByRole('row').slice(1);
+    expect(rows[0]).toHaveTextContent('myPages.transferHistory.activity.anchored');
+    // Still one sent: the anchored NFT stays the address's own.
+    expect(document.querySelector('[data-figure="sent"]')).toHaveTextContent('1');
   });
 
   it('has no accessibility violations', async () => {
