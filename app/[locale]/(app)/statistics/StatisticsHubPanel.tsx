@@ -13,6 +13,7 @@ import { useHydrated } from '@/hooks/useHydrated';
 import { useCTStatistics, useDashboardInfo } from '@/hooks/useApiQuery';
 import type { DashboardInfo } from '@/services/api/types';
 import { Amount } from '@/components/ui/amount';
+import { DateTime, useTimeZoneLabel } from '@/components/ui/date-time';
 import { ErrorState } from '@/components/ui/error-state';
 import { LiveStatus } from '@/components/ui/live-status';
 import { SkeletonDetailRows, SkeletonTable } from '@/components/ui/skeleton';
@@ -23,7 +24,6 @@ import { StatisticsGroup } from '@/components/statistics/StatisticsGroup';
 import { StatisticsItem } from '@/components/statistics/StatisticsItem';
 import { DefinitionsDisclosure } from '@/components/statistics/DefinitionsDisclosure';
 import { ReserveSplit } from '@/components/statistics/ReserveSplit';
-import { UtcTime } from '@/components/statistics/charts/UtcTime';
 
 import { allocationsWalletEth } from './allocationsWallet';
 import { CycleRhythm } from './CycleRhythm';
@@ -68,6 +68,24 @@ function SectionEntry({ section, figure }: { section: StatisticsSectionDef; figu
         />
       </SiteLink>
     </li>
+  );
+}
+
+/**
+ * A moment in the reader's zone, as every other page prints it (the same
+ * opening reads the same here and on the current cycle), with the zone named
+ * inline so the figure never needs a caption: "Aug 11, 19:38 UTC-5".
+ */
+function LocalMoment({ timestamp }: { timestamp: number }) {
+  const zone = useTimeZoneLabel();
+  return (
+    <DateTime timestamp={timestamp}>
+      {(value) => (
+        <>
+          {value} <span className="text-subtle">{zone}</span>
+        </>
+      )}
+    </DateTime>
   );
 }
 
@@ -214,16 +232,9 @@ const StatisticsHubPanel = () => {
       >
         <div className="grid gap-x-12 gap-y-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
           <dl className="min-w-0 self-start border-t border-rule">
-            {/* UTC, the zone of the daily bars beside it and of every statistics chart, named inline. */}
             <StatisticsItem
               title={t('hub.cycle.opened')}
-              value={
-                opened && opened > 0 ? (
-                  <UtcTime timestamp={opened} locale={format.locale} />
-                ) : (
-                  count(null)
-                )
-              }
+              value={opened && opened > 0 ? <LocalMoment timestamp={opened} /> : count(null)}
             />
             <StatisticsItem
               title={metric('ethInGesturesCurrentCycle')}
