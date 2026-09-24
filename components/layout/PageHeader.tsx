@@ -55,6 +55,11 @@ export interface PageHeaderProps {
   title: ReactNode;
   /** The lede under the H1: clamped to three lines on phones, with a "Read more" toggle. */
   subtitle?: ReactNode;
+  /**
+   * `false` shows the lede in full on phones too, for a lede of a sentence or
+   * two where a "Read more" line would hide a single line of text.
+   */
+  clampLede?: boolean;
   variant?: PageHeaderVariant;
   /**
    * The section the page belongs to (components/layout/pageSections). On a
@@ -168,6 +173,7 @@ function buildTrail(
 export function PageHeader({
   title,
   subtitle,
+  clampLede = true,
   variant = 'data',
   section,
   sectionHub = false,
@@ -262,6 +268,7 @@ export function PageHeader({
           </TitleTag>
           {subtitle ? (
             <HeaderLede
+              clamp={clampLede}
               moreLabel={t('pageHeader.readMore')}
               lessLabel={t('pageHeader.readLess')}
               className={cn(

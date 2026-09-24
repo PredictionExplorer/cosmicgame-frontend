@@ -7,6 +7,8 @@ import { cn } from '@/lib/utils';
 
 export interface HeaderLedeProps {
   children: ReactNode;
+  /** `false`: never clamped, so no "Read more" either (a short lede). Default `true`. */
+  clamp?: boolean;
   /** Button label while the lede is clamped. */
   moreLabel: string;
   /** Button label once it is expanded. */
@@ -22,29 +24,35 @@ export interface HeaderLedeProps {
  * server renders the button and the client removes it once it measures a
  * lede that fits: the common case never shifts the page.
  */
-export function HeaderLede({ children, moreLabel, lessLabel, className }: HeaderLedeProps) {
+export function HeaderLede({
+  children,
+  clamp = true,
+  moreLabel,
+  lessLabel,
+  className,
+}: HeaderLedeProps) {
   const id = useId();
   const ref = useRef<HTMLParagraphElement>(null);
   const [expanded, setExpanded] = useState(false);
-  const [clamped, setClamped] = useState(true);
+  const [clamped, setClamped] = useState(clamp);
 
   useEffect(() => {
     const element = ref.current;
-    if (!element) return;
+    if (!element || !clamp) return;
     const measure = () => setClamped(element.scrollHeight > element.clientHeight + 1);
     measure();
     if (typeof ResizeObserver === 'undefined') return;
     const observer = new ResizeObserver(measure);
     observer.observe(element);
     return () => observer.disconnect();
-  }, []);
+  }, [clamp]);
 
   return (
     <>
-      <p ref={ref} id={id} className={cn(className, !expanded && 'max-sm:line-clamp-3')}>
+      <p ref={ref} id={id} className={cn(className, clamp && !expanded && 'max-sm:line-clamp-3')}>
         {children}
       </p>
-      {clamped || expanded ? (
+      {clamp && (clamped || expanded) ? (
         <button
           type="button"
           aria-controls={id}

@@ -42,7 +42,7 @@ import { useChampions } from '@/hooks/useChampions';
 import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
 import { useCycleParticipation, useRetrieveStatus } from '@/hooks/useCycleParticipation';
 import { useEndgameChainSync } from '@/hooks/useEndgameChainSync';
-import { useAllocationNotification } from '@/hooks/useAllocationNotification';
+import { useVerifiedFinalizationAlert } from '@/hooks/useVerifiedFinalizationAlert';
 import { useAttentionPreferences } from '@/hooks/useAttentionPreferences';
 import { useBackgroundDeadlineRefresh, useReturnResync } from '@/hooks/useDeadlineWatch';
 import { useLiveFreshness } from '@/hooks/useLiveFreshness';
@@ -287,23 +287,9 @@ const HomePage = ({
   // countdown) are opt-in per browser: nothing sounds or notifies until the
   // viewer turns it on in the bell menu (useAttentionPreferences). The alert
   // re-reads the time left from the chain before it fires (F220).
-  const alertCycle = dashboardData?.CurRoundNum ?? null;
-  const verifyRemainingMs = useCallback(async (): Promise<number | null> => {
-    if (!cosmicGame) return null;
-    const sample = await fetchEndgameChainSample(cosmicGame);
-    // Another cycle already: this one finalized, nothing is left to warn about.
-    if (alertCycle == null || sample.roundNum !== alertCycle) return 0;
-    queryClient.setQueryData(['allocationTime'], sample.mainPrizeTimeSec);
-    queryClient.setQueryData(['currentTime'], sample.blockTimestampSec);
-    return (sample.mainPrizeTimeSec - sample.blockTimestampSec) * 1000;
-  }, [alertCycle, cosmicGame, queryClient]);
-  useAllocationNotification({
+  useVerifiedFinalizationAlert({
     allocationTime: allocationFinalize.allocationTime,
-    cycleNumber: alertCycle,
-    notificationTitle: t('notifications.finalizationSoonTitle'),
-    notificationBody: (minutesLeft) =>
-      t('notifications.finalizationSoonBody', { minutes: minutesLeft }),
-    verifyRemainingMs,
+    cycleNumber: dashboardData?.CurRoundNum ?? null,
   });
 
   // Chime only for a connected viewer who opted in, when their Gesture was

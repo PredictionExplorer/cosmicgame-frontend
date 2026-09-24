@@ -27,6 +27,7 @@ import {
   getGestureSubmitLabel,
   getGestureSubmitParts,
 } from '@/components/home/observatory/gestureSubmitLabel';
+import { StandingsLedger } from '@/components/home/observatory/StandingsLedger';
 import { AllocationTracksBoard } from '@/components/home/experimental/AllocationTracksBoard';
 import { CycleMonument } from '@/components/home/experimental/CycleMonument';
 import { CyclePhaseGuide } from '@/components/home/experimental/CyclePhaseGuide';
@@ -36,18 +37,20 @@ import {
 } from '@/components/home/experimental/DeckPersonalStrip';
 import { GestureConsole } from '@/components/home/experimental/GestureConsole';
 import { StageArtwork, type StageToken } from '@/components/home/experimental/StageArtwork';
-import { StandingsLedger } from '@/components/home/experimental/StandingsLedger';
 import { useArtMotionPreference } from '@/components/home/experimental/useArtMotionPreference';
-import { useChampionsAtClock } from '@/components/home/experimental/useChampionsAtClock';
 import { useFocusClearOfDock } from '@/components/home/experimental/useFocusClearOfDock';
 import { AttachedNFTAllocationShowcase } from '@/components/attachments/DonatedNFTPrizeShowcase';
 import type { ArtStatus } from '@/components/ui/art-frame';
+import { useContractAddresses } from '@/contexts/ContractAddressesContext';
+import { useChampions } from '@/hooks/useChampions';
 import { useGestureForm } from '@/hooks/useGestureForm';
 import { useHomeGestureFeed } from '@/hooks/useHomeGestureFeed';
 import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
 import { useEndgameChainSync } from '@/hooks/useEndgameChainSync';
-import { useAllocationNotification } from '@/hooks/useAllocationNotification';
 import { useGestureChime } from '@/hooks/useGestureChime';
+import { useOwnGestureOverlay } from '@/hooks/useOwnGestureOverlay';
+import { usePositionMoment } from '@/hooks/usePositionMoment';
+import { useVerifiedFinalizationAlert } from '@/hooks/useVerifiedFinalizationAlert';
 import { invalidateLiveGameQueries } from '@/hooks/useLiveGameDataRefresh';
 import { useNow } from '@/hooks/useNow';
 import { useRotatingIndex } from '@/hooks/useRotatingIndex';
@@ -71,7 +74,8 @@ import { deriveAllocationTrackAmounts } from '@/lib/allocationTracks';
 import { AllocationIcon } from '@/lib/conceptIcons';
 import { SITE_ROUTE_ICONS } from '@/config/siteNavIcons';
 import { getCycleState, getDashboardActivationTime } from '@/lib/cycleState';
-import { resolveLatestGesture } from '@/lib/latestGesture';
+import { resolveLatestGesture, type LatestParticipantEvidence } from '@/lib/latestGesture';
+import { fetchEndgameChainSample, type EndgameChainSample } from '@/lib/rpcRace';
 import {
   UX_SCENARIO_DEMO_ACCOUNT,
   simulateUxScenarioGesture,
@@ -79,6 +83,7 @@ import {
 } from '@/lib/uxCycleScenarios';
 import type { CSTTokenInfo, DashboardInfo, GestureInfo, SpecialRecipients } from '@/services/api';
 import { deriveLiveCstGestureData } from '@/utils/cstGesture';
+import { toFiniteNumber } from '@/utils/finiteNumber';
 import { sameAddress } from '@/utils/format';
 import { getStableClientTargetTime, type ServerTimingSample } from '@/utils/time';
 
@@ -122,11 +127,13 @@ interface ExperimentalHomePageProps {
 
 function toStageToken(id: number, info: CSTTokenInfo | null | undefined): StageToken | null {
   if (!info?.Seed) return null;
+  const imprintedAt = toFiniteNumber(info.TimeStamp ?? info.MintTimeStamp);
   return {
     id,
     seed: `0x${info.Seed}`,
     name: typeof info.TokenName === 'string' ? info.TokenName : null,
     cycle: typeof info.RoundNum === 'number' ? info.RoundNum : null,
+    imprintedAt: imprintedAt != null && imprintedAt > 0 ? imprintedAt : null,
   };
 }
 
@@ -166,12 +173,39 @@ const ExperimentalHomePage = ({
     isError: dashboardFailed,
     refetch: refetchDashboard,
   } = useDashboardInfo(initialDashboardData);
+  // The wallet's own confirmed Gesture counts on every surface from its
+  // receipt until the index includes it (F221), as on the Observatory.
+  const { cosmicGame } = useContractAddresses();
+  const readChain = useMemo(
+    () => (cosmicGame ? () => fetchEndgameChainSample(cosmicGame) : null),
+    [cosmicGame],
+  );
+  const storeChainSample = useCallback(
+    (sample: EndgameChainSample) => {
+      queryClient.setQueryData(['allocationTime'], sample.mainPrizeTimeSec);
+      queryClient.setQueryData(['currentTime'], sample.blockTimestampSec);
+    },
+    [queryClient],
+  );
+  const {
+    data: overlaidDashboard,
+    own: ownGesture,
+    record: recordOwnGesture,
+  } = useOwnGestureOverlay({
+    dashboard: dashboardData ?? null,
+    readChain,
+    onChainSample: storeChainSample,
+    // The wallet's own history now includes the Gesture.
+    onIndexed: (address) => void queryClient.invalidateQueries({ queryKey: ['userInfo', address] }),
+    onError: reportError,
+  });
   const { data: currentTimeData, dataUpdatedAt: currentTimeUpdatedAt } = useCurrentTime(
     coherentInitialTimingSample?.currentServerTimeSec,
     coherentInitialTimingSample ? 0 : undefined,
   );
 
-  const round = dashboardData?.CurRoundNum ?? -1;
+  const data = overlaidDashboard;
+  const round = data?.CurRoundNum ?? -1;
   const initialGestureList = useMemo(
     () =>
       initialLatestGesture && initialLatestGesture.RoundNum === round
@@ -183,7 +217,6 @@ const ExperimentalHomePage = ({
   const { data: nftDonationsData } = useDonationsNFTByRound(round);
   const { data: erc20DonationsData } = useDonationsERC20ByRound(round);
 
-  const data = dashboardData ?? null;
   const loading = dashboardLoading;
   const curGestureList = feed.gestures;
   const chatGestures = feed.chatGestures;
@@ -236,6 +269,18 @@ const ExperimentalHomePage = ({
     [feed.latestGesture, data?.LastBidderAddr],
   );
   const latestGesture = latestResolution.gesture;
+  // Until the wallet's own Gesture is indexed, its block time is the evidence
+  // for the hold, so the Last Gesture never reads "held 0s" after it lands.
+  const latestEvidence = useMemo<LatestParticipantEvidence | undefined>(() => {
+    if (
+      ownGesture &&
+      !latestResolution.gesture &&
+      sameAddress(latestResolution.address, ownGesture.address)
+    ) {
+      return { address: ownGesture.address, timestamp: ownGesture.timestampSec };
+    }
+    return latestResolution.evidence;
+  }, [latestResolution, ownGesture]);
 
   const [gesturePulseKey, setGesturePulseKey] = useState(0);
 
@@ -307,14 +352,10 @@ const ExperimentalHomePage = ({
   // ── Cycle state ──────────────────────────────────────────────────────
   const gestureForm = useGestureForm();
   const hasCurrentGesture = !!data && data.LastBidderAddr !== zeroAddress;
-  // Measured against the page clock, so the server HTML and the hydration
-  // render show the hold as of the sampled instant, never a false "0s".
-  const champions = useChampionsAtClock({
-    initialData: initialSpecialRecipients,
-    latestParticipantEvidence: latestResolution.evidence,
-    enabled: hasCurrentGesture,
-    nowMs: now,
-  });
+  // The one champions derivation of the app, seeded with the page clock, so
+  // the server HTML and the hydration render show the hold as of the sampled
+  // instant, never a false "0s".
+  const champions = useChampions(initialSpecialRecipients, latestEvidence, hasCurrentGesture, now);
   const allocationFinalize = useAllocationFinalize({
     data,
     offset,
@@ -322,13 +363,11 @@ const ExperimentalHomePage = ({
   });
 
   // Attention settings (chime, alert before finalization, tab-title
-  // countdown) are opt-in per browser, from the bell in the header.
-  useAllocationNotification({
+  // countdown) are opt-in per browser, from the bell in the header. The
+  // alert re-reads the time left from the chain before it fires (F220).
+  useVerifiedFinalizationAlert({
     allocationTime: allocationFinalize.allocationTime,
     cycleNumber: dashboardData?.CurRoundNum ?? null,
-    notificationTitle: t('notifications.finalizationSoonTitle'),
-    notificationBody: (minutesLeft) =>
-      t('notifications.finalizationSoonBody', { minutes: minutesLeft }),
   });
   useGestureChime({
     account,
@@ -396,17 +435,11 @@ const ExperimentalHomePage = ({
     [fetchActivationTime, queryClient, setMessage],
   );
 
-  const optimisticallyRecordGesture = useCallback(() => {
-    queryClient.setQueryData<DashboardInfo | null>(['dashboardInfo'], (current) => {
-      if (!current) return current;
-      return {
-        ...current,
-        CurNumBids: (current.CurNumBids ?? 0) + 1,
-        LastBidderAddr: account ?? current.LastBidderAddr,
-      };
-    });
+  // The receipt is in: the Gesture counts now, on every surface.
+  const recordConfirmedGesture = useCallback(() => {
     setGesturePulseKey((value) => value + 1);
-  }, [account, queryClient]);
+    if (account) recordOwnGesture(account, offset);
+  }, [account, offset, recordOwnGesture]);
 
   // Optimistic chat rows: a just-sent message shows instantly and is removed
   // once the indexer echoes the real gesture (or after a safety timeout).
@@ -471,7 +504,7 @@ const ExperimentalHomePage = ({
       if (trimmedMessage && account) {
         recordPendingMessage(account, trimmedMessage);
       }
-      optimisticallyRecordGesture();
+      recordConfirmedGesture();
       withPostTxRefresh();
       return true;
     },
@@ -482,7 +515,7 @@ const ExperimentalHomePage = ({
       notify,
       onGesture,
       onGestureWithCST,
-      optimisticallyRecordGesture,
+      recordConfirmedGesture,
       recordPendingMessage,
       setMessage,
       tToast,
@@ -565,6 +598,15 @@ const ExperimentalHomePage = ({
   const submitParts = getGestureSubmitParts(submitQuote);
 
   const trackAmounts = useMemo(() => deriveAllocationTrackAmounts(data), [data]);
+
+  // The wallet's own moments: its Gesture landing, or its place taken.
+  const position = usePositionMoment({
+    account,
+    latestAddress: loading ? undefined : data?.LastBidderAddr,
+    cycle: data?.CurRoundNum,
+    gestureCount: data?.CurNumBids,
+    nowMs: now,
+  });
 
   // Method switches reset any picked RandomWalk token so a stale token can't
   // ride along silently.
@@ -741,28 +783,29 @@ const ExperimentalHomePage = ({
               title={t('deck.title')}
               titleId="home-deck-title"
               subtitle={t('deck.intro')}
+              // Two sentences: a "Read more" line would hide just one line.
+              clampLede={false}
               actions={
-                // Phones: the actions and the related link share one row
-                // (scrolling, with the edge fade the related row uses), so
-                // the header gives the art more of the first screen.
-                <div className="flex max-w-full items-center gap-2 scrollbar-none max-sm:-my-1 max-sm:-ms-1 max-sm:overflow-x-auto max-sm:py-1 max-sm:ps-1 max-sm:pe-8 max-sm:[mask-image:linear-gradient(to_right,black_calc(100%-2rem),transparent)]">
-                  <AttentionMenu />
-                  <Button asChild variant="outline" size="sm" className="shrink-0">
-                    <Link href="/" data-testid="experimental-ui-return">
-                      {t('deck.returnToCurrent')}
-                    </Link>
-                  </Button>
+                // Phones: the newcomer's link reads straight after the lede,
+                // then the two controls share a row. Both controls take one
+                // height (44px on phones, 36px from sm) and one radius.
+                <div className="flex flex-col items-start gap-4 max-sm:-mt-2 sm:flex-row sm:items-center sm:gap-2">
                   <Link
                     href="/how-it-works"
                     data-testid="experimental-ui-new-here"
-                    className="group inline-flex min-h-8 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-pill border border-rule px-3 type-label text-muted-foreground transition-colors duration-fast hover:border-input hover:text-foreground sm:hidden"
+                    className="link inline-flex items-center gap-1.5 type-body-sm max-sm:leading-6 sm:hidden"
                   >
                     {t('deck.newHere')}
-                    <ArrowRight
-                      aria-hidden
-                      className="size-3.5 shrink-0 text-subtle transition-colors duration-fast group-hover:text-foreground"
-                    />
+                    <ArrowRight aria-hidden className="size-3.5 shrink-0" />
                   </Link>
+                  <div className="flex items-center gap-2">
+                    <AttentionMenu className="rounded-control sm:h-9 sm:w-9" />
+                    <Button asChild variant="outline" size="sm" className="shrink-0">
+                      <Link href="/" data-testid="experimental-ui-return">
+                        {t('deck.returnToCurrent')}
+                      </Link>
+                    </Button>
+                  </div>
                 </div>
               }
               // From sm the related link sits in the header's own row.
@@ -823,24 +866,25 @@ const ExperimentalHomePage = ({
             </div>
 
             <div data-testid="home-deck-board" className="min-w-0 lg:col-span-7 lg:row-start-2">
+              {/* The one standings ledger of the app, as on the Observatory. */}
               <StandingsLedger
                 champions={champions}
                 latestGesture={latestGesture}
+                gestureDetailsPending={latestResolution.isSyncing}
+                showLastGesture={hasCurrentGesture}
                 account={account}
-                signatureEth={data ? trackAmounts.signatureEth : null}
                 chronoEth={data ? trackAmounts.chronoEth : null}
-                nowMs={now}
-                footer={
-                  account ? (
-                    <DeckPersonalStrip
-                      account={account}
-                      gestures={curGestureList}
-                      totalGestures={data?.CurNumBids}
-                      feedStatus={personalFeedStatus}
-                    />
-                  ) : null
-                }
+                moment={position.moment}
               />
+              {account ? (
+                <DeckPersonalStrip
+                  account={account}
+                  gestures={curGestureList}
+                  totalGestures={data?.CurNumBids}
+                  feedStatus={personalFeedStatus}
+                  className="mt-3 border-t"
+                />
+              ) : null}
             </div>
           </div>
 
@@ -860,8 +904,10 @@ const ExperimentalHomePage = ({
             className="mt-16 grid grid-cols-1 gap-x-10 gap-y-12 lg:grid-cols-12 xl:gap-x-14"
           >
             <div data-testid="home-deck-chat" className="relative min-w-0 lg:col-span-7">
-              {/* On desktop the chat fills the height the tracks ledger sets
-                  and scrolls inside it; on phones it keeps its own height. */}
+              {/* From 1024px the chat fills the height the tracks ledger sets
+                  and scrolls inside it. Below that it grows with its rows (the
+                  chat windows them behind "Show more"), so nothing it holds
+                  can spill over the tracks that follow. */}
               <MemoGestureMessageChat
                 gestures={chatGestures}
                 pagination={chatPagination}
@@ -875,7 +921,7 @@ const ExperimentalHomePage = ({
                 onJoinCta={!loading && isRoundActive ? handleJoinChatCta : undefined}
                 systemEvents={feedSystemEvents}
                 pendingMessages={pendingMessages}
-                className="h-[clamp(24rem,70svh,34rem)] lg:absolute lg:inset-0 lg:h-auto print:static print:h-auto"
+                className="lg:absolute lg:inset-0 print:static print:h-auto"
               />
             </div>
             <MemoAllocationTracksBoard data={data} className="lg:col-span-5" />
@@ -961,6 +1007,7 @@ const ExperimentalHomePage = ({
         canClaim={canClaim}
         isClaiming={isClaiming}
         claimWait={claimWait}
+        moment={position.moment}
         onFinalize={() => void handleFinalize('dock')}
         onOpenSheet={openSheet}
         onJumpToPanel={scrollToConsole}

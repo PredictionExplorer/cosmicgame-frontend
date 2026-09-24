@@ -30,6 +30,24 @@ describe('HeaderLede', () => {
     restore();
   });
 
+  it('never clamps a lede the page asks to show in full, so it offers no toggle', () => {
+    const restore = mockOverflow(120, 72);
+    const html = renderToString(
+      <HeaderLede clamp={false} moreLabel="Read more" lessLabel="Show less">
+        Two sentences.
+      </HeaderLede>,
+    );
+    expect(html).not.toContain('Read more');
+    render(
+      <HeaderLede clamp={false} moreLabel="Read more" lessLabel="Show less">
+        Two sentences.
+      </HeaderLede>,
+    );
+    expect(screen.getByText('Two sentences.')).not.toHaveClass('max-sm:line-clamp-3');
+    expect(screen.queryByRole('button')).toBeNull();
+    restore();
+  });
+
   it('renders the toggle on the server, where nothing is measured yet', () => {
     const html = renderToString(
       <HeaderLede moreLabel="Read more" lessLabel="Show less">
