@@ -4,6 +4,7 @@
 import { IPFS_GATEWAYS } from '../attachedNftMetadata';
 import {
   fetchAttachedNftImage,
+  fetchPublicHttps,
   findAttachedNftRecord,
   imageUrlCandidates,
   isPublicHttpsUrl,
@@ -46,6 +47,8 @@ describe('isPublicHttpsUrl', () => {
   it.each([
     'http://randomwalknft-api.com/metadata/4079',
     'https://localhost/x',
+    'https://localhost./x',
+    'https://metadata.google.internal./x',
     'https://127.0.0.1/x',
     'https://2130706433/x',
     'https://[::1]/x',
@@ -58,6 +61,64 @@ describe('isPublicHttpsUrl', () => {
     'not a url',
   ])('refuses %s', (url) => {
     expect(isPublicHttpsUrl(url)).toBe(false);
+  });
+});
+
+function redirectResponse(location: string, status = 302) {
+  return new Response(null, { status, headers: { Location: location } });
+}
+
+describe('fetchPublicHttps', () => {
+  const originalFetch = global.fetch;
+
+  afterEach(() => {
+    global.fetch = originalFetch;
+  });
+
+  it('follows a redirect to another public https host, checking each hop', async () => {
+    global.fetch = jest
+      .fn()
+      .mockResolvedValueOnce(redirectResponse('https://bafy.ipfs.dweb.link/1.json'))
+      .mockResolvedValueOnce(jsonResponse({ name: 'GBC' }));
+
+    const response = await fetchPublicHttps('https://dweb.link/ipfs/bafy/1.json');
+    await expect(response.json()).resolves.toEqual({ name: 'GBC' });
+    expect(global.fetch).toHaveBeenNthCalledWith(
+      1,
+      'https://dweb.link/ipfs/bafy/1.json',
+      expect.objectContaining({ redirect: 'manual' }),
+    );
+    expect(global.fetch).toHaveBeenNthCalledWith(
+      2,
+      'https://bafy.ipfs.dweb.link/1.json',
+      expect.objectContaining({ redirect: 'manual' }),
+    );
+  });
+
+  it('never follows a public host to a private one', async () => {
+    global.fetch = jest
+      .fn()
+      .mockResolvedValue(redirectResponse('http://169.254.169.254/latest/meta-data'));
+    await expect(fetchPublicHttps('https://art.example.com/1.json')).rejects.toThrow(
+      'Refused a non-public URL',
+    );
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('gives up after a few redirects', async () => {
+    global.fetch = jest
+      .fn()
+      .mockImplementation(() => Promise.resolve(redirectResponse('https://art.example.com/loop')));
+    await expect(fetchPublicHttps('https://art.example.com/loop')).rejects.toThrow(
+      'Too many redirects',
+    );
+    expect(global.fetch).toHaveBeenCalledTimes(4);
+  });
+
+  it('refuses a private url before any request', async () => {
+    global.fetch = jest.fn();
+    await expect(fetchPublicHttps('https://127.0.0.1/x')).rejects.toThrow();
+    expect(global.fetch).not.toHaveBeenCalled();
   });
 });
 

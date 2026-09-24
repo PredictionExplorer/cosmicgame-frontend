@@ -139,15 +139,19 @@ export type MetadataFetchInit = Omit<RequestInit, 'signal' | 'headers'> & {
   next?: { revalidate?: number | false };
 };
 
+/** A `fetch` stand-in: the server passes one that checks every redirect hop. */
+export type MetadataFetcher = (url: string, init: RequestInit) => Promise<Response>;
+
 async function fetchMetadataFromUrl(
   url: string,
   init: MetadataFetchInit | undefined,
   timeoutMs: number,
+  fetcher: MetadataFetcher,
 ): Promise<AttachedNftMetadata> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const response = await fetch(url, {
+    const response = await fetcher(url, {
       ...init,
       headers: { Accept: 'application/json' },
       signal: controller.signal,
@@ -171,6 +175,8 @@ export interface FetchAttachedNftMetadataOptions {
   init?: MetadataFetchInit;
   /** Skips candidates that fail this check (the server's public-host guard). */
   allowUrl?: (url: string) => boolean;
+  /** Reads each candidate (default: the global `fetch`). */
+  fetcher?: MetadataFetcher;
   timeoutMs?: number;
 }
 
@@ -181,14 +187,20 @@ export interface FetchAttachedNftMetadataOptions {
  */
 export async function fetchAttachedNftMetadata(
   uri: string,
-  { init, allowUrl, timeoutMs = METADATA_FETCH_TIMEOUT_MS }: FetchAttachedNftMetadataOptions = {},
+  {
+    init,
+    allowUrl,
+    fetcher = (url, requestInit) => fetch(url, requestInit),
+    timeoutMs = METADATA_FETCH_TIMEOUT_MS,
+  }: FetchAttachedNftMetadataOptions = {},
 ): Promise<AttachedNftMetadata | null> {
   const candidates = metadataUrlCandidates(uri).filter((url) => !allowUrl || allowUrl(url));
   if (candidates.length === 0) return null;
-  if (candidates.length === 1) return fetchMetadataFromUrl(candidates[0]!, init, timeoutMs);
+  const read = (url: string) => fetchMetadataFromUrl(url, init, timeoutMs, fetcher);
+  if (candidates.length === 1) return read(candidates[0]!);
 
   try {
-    return await Promise.any(candidates.map((url) => fetchMetadataFromUrl(url, init, timeoutMs)));
+    return await Promise.any(candidates.map(read));
   } catch (error) {
     if (error instanceof AggregateError && error.errors.length > 0) {
       throw error.errors[0];

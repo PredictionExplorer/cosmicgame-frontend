@@ -66,10 +66,32 @@ export function isPublicHttpsUrl(value: string): boolean {
   }
   if (url.protocol !== 'https:' || url.username || url.password) return false;
   if (url.port && url.port !== '443') return false;
-  const host = url.hostname.toLowerCase();
+  // A fully qualified name ("localhost.") is the same host as without its dot.
+  const host = url.hostname.toLowerCase().replace(/\.$/, '');
   if (host === 'localhost' || !host.includes('.')) return false;
   if (IPV4_HOST.test(host) || host.startsWith('[')) return false;
   return !PRIVATE_HOST_SUFFIXES.some((suffix) => host.endsWith(suffix));
+}
+
+/** Redirects one server read may follow (IPFS gateways use one or two). */
+const MAX_REDIRECTS = 3;
+
+/**
+ * `fetch` for untrusted URLs: redirects are followed by hand, and each hop
+ * must pass `isPublicHttpsUrl` too, so a public host cannot bounce the
+ * server to a private one. Rejects on a refused hop or too many redirects.
+ */
+export async function fetchPublicHttps(url: string, init: RequestInit = {}): Promise<Response> {
+  let current = url;
+  for (let hop = 0; hop <= MAX_REDIRECTS; hop += 1) {
+    if (!isPublicHttpsUrl(current)) throw new Error('Refused a non-public URL');
+    const response = await fetch(current, { ...init, redirect: 'manual' });
+    const location = response.headers.get('location');
+    if (response.status < 300 || response.status > 399 || !location) return response;
+    void response.body?.cancel().catch(() => {});
+    current = new URL(location, current).toString();
+  }
+  throw new Error('Too many redirects');
 }
 
 const readAttachedRecords = unstable_cache(
@@ -106,6 +128,7 @@ export const readAttachedNftMetadataDocument = cache(
       return await fetchAttachedNftMetadata(uri, {
         init: { next: { revalidate: METADATA_REVALIDATE_SECONDS } },
         allowUrl: isPublicHttpsUrl,
+        fetcher: fetchPublicHttps,
         timeoutMs: SERVER_METADATA_TIMEOUT_MS,
       });
     } catch {
@@ -178,7 +201,7 @@ export async function fetchAttachedNftImage(url: string): Promise<AttachedNftIma
   try {
     const served = await Promise.any(
       candidates.map(async (candidate, index) => {
-        const response = await fetch(candidate, {
+        const response = await fetchPublicHttps(candidate, {
           cache: 'no-store',
           signal: controllers[index]!.signal,
         });
