@@ -15,17 +15,18 @@ export const ALLOCATION_TRACK_IDS = [
 export type AllocationTrackId = (typeof ALLOCATION_TRACK_IDS)[number];
 
 /**
- * Background utility for each track's bar segment and legend swatch. Data categories keep
- * fixed hues in every palette (styles/themes.css): the palette primary and secondary are close
- * lilacs in Midnight and Nebula, so they cannot tell two tracks apart.
+ * Background utility for each track's bar segment and legend swatch: the --track-* data
+ * series (docs/design-system.md → Data series), fixed hues in every palette, 4.5:1 or more on
+ * every surface. The palette primary and secondary are close lilacs in Midnight and Nebula,
+ * so they cannot tell two tracks apart.
  */
 export const ALLOCATION_TRACK_COLORS: Readonly<Record<AllocationTrackId, string>> = {
-  signature: 'bg-chart-3',
-  chrono: 'bg-chart-2',
-  stellar: 'bg-[rgb(var(--solar-gold-rgb))]',
-  anchor: 'bg-[rgb(var(--impact-green-rgb))]',
-  publicGoods: 'bg-[rgb(var(--chrono-rose-rgb))]',
-  nextCycle: 'bg-muted-foreground/40',
+  signature: 'bg-track-signature',
+  chrono: 'bg-track-chrono',
+  stellar: 'bg-track-stellar-eth',
+  anchor: 'bg-track-anchoring',
+  publicGoods: 'bg-track-public-goods',
+  nextCycle: 'bg-track-compounding',
 };
 
 /** Each track's key under `contracts.funds.segments` (label and tooltip) in the catalogs. */
