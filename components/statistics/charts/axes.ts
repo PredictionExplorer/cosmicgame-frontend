@@ -82,10 +82,14 @@ export function useTimeAxis(fromTs: number, toTs: number, count?: number): Numer
   }, [fromTs, toTs, wanted, locale]);
 }
 
-/** Time into a cycle, in hours on the data and whole days or hours on the ticks. */
+/**
+ * Time into a cycle, in hours on the data and whole days or hours on the
+ * ticks. Its labels are short ("14d"), so a phone takes four of them, not
+ * the date axes' three: "0 · 30d" gave a six-week cycle no scale.
+ */
 export function useElapsedHoursAxis(maxHours: number, count?: number): NumericAxis {
   const locale = useLocale();
-  const tickCount = useTickCount();
+  const tickCount = useTickCount(6, 4);
   const wanted = count ?? tickCount;
   return useMemo(() => {
     const seconds = elapsedTicks(Math.max(0, maxHours) * HOUR, wanted);

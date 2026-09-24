@@ -602,7 +602,7 @@
       "clockBefore": "Clock remaining before",
       "gestureBy": "Gesture by",
       "clickHint": "Click the dot to open the transaction.",
-      "description": "Each dot is the CST actually paid for a gesture (log scale — hollow dots were free). After every CST gesture the cost resets near twice the paid amount and descends to free across the Calibration Window. The dashed line shows the allocation clock remaining right before each gesture: when the clock runs low, rapid gesturing leaves the cost no time to descend, so paid prices escalate. Click a dot to open its transaction.",
+      "description": "Each dot is the CST actually paid for a gesture (log scale — hollow dots were free). After every CST gesture the cost resets near twice the paid amount and descends to free across the Calibration Window. The dashed line shows the allocation clock remaining right before each gesture: when the clock runs low, rapid gesturing leaves the cost no time to descend, so paid prices escalate.",
       "empty": "No CST gestures in this cycle.",
       "selectCycle": "Select a cycle to inspect.",
       "loadErrorTitle": "Failed to load CST gesture costs",

@@ -30,6 +30,7 @@ import type { GestureInfo } from '@/services/api/types';
 import { useGestureListByCycle } from '@/hooks/useApiQuery';
 import { GESTURE_METHOD_COLOR } from '@/lib/theme/dataColors';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { getLocaleConfig } from '@/i18n/localeConfig';
 import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
@@ -245,7 +246,14 @@ type CstGestureCostViewProps = {
 export const CstGestureCostView: FC<CstGestureCostViewProps> = ({ gestures, label }) => {
   const t = useTranslations('statistics');
   const locale = useLocale();
+  const coarse = useCoarsePointer();
   const series = useMemo(() => getCstGestureCostSeries(gestures), [gestures]);
+  // A dot opens its transaction on click; a finger gets the tooltip, and the table's links.
+  const note = coarse
+    ? t('charts.cstCost.description')
+    : [t('charts.cstCost.description'), t('charts.cstCost.clickHint')].join(
+        getLocaleConfig(locale).wordSpacing ? ' ' : '',
+      );
 
   const columns = useMemo<DataTableColumn<CostRow>[]>(
     () => [
@@ -310,7 +318,7 @@ export const CstGestureCostView: FC<CstGestureCostViewProps> = ({ gestures, labe
           ]}
         />
       }
-      note={t('charts.cstCost.description')}
+      note={note}
       preferTable={series.points.length < MIN_PLOT_POINTS}
       table={
         <DataTable

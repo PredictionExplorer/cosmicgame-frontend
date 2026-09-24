@@ -387,9 +387,13 @@ const StatisticsHubPanel = () => {
         />
       </SectionShell>
 
-      <SectionShell title={t('hub.relatedTitle')}>
-        <nav aria-label={t('hub.seo.relatedPagesAria')}>
-          <ul className="flex flex-wrap gap-x-8 gap-y-2">
+      {/* A quiet list, not a section of its own: a small label, then the links. */}
+      <section aria-labelledby="statistics-related" className="border-t border-rule pt-8">
+        <h2 id="statistics-related" className="type-label text-subtle">
+          {t('hub.relatedTitle')}
+        </h2>
+        <nav aria-label={t('hub.seo.relatedPagesAria')} className="mt-3">
+          <ul className="flex flex-wrap gap-x-8 gap-y-1">
             {RELATED_LINKS.map((link) => (
               <li key={link.href}>
                 <Link
@@ -406,7 +410,7 @@ const StatisticsHubPanel = () => {
             ))}
           </ul>
         </nav>
-      </SectionShell>
+      </section>
     </div>
   );
 };
