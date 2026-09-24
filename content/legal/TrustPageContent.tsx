@@ -47,6 +47,28 @@ export interface TrustPageCopy {
 
 const LINK_CLASS = 'text-primary underline-offset-4 hover:underline';
 
+/**
+ * Copy text with `backticked` spans (a URL or an address to check character
+ * by character) set as code, so the backticks never reach the reader.
+ */
+function CopyText({ text }: { text: string }) {
+  const parts = text.split(/`([^`]+)`/);
+  if (parts.length === 1) return <>{text}</>;
+  return (
+    <>
+      {parts.map((part, index) =>
+        index % 2 === 1 ? (
+          <code key={index} className="font-mono text-foreground">
+            {part}
+          </code>
+        ) : (
+          part
+        ),
+      )}
+    </>
+  );
+}
+
 function TrustLink({ link, locale }: { link: TrustPageLink; locale: string }) {
   if (link.kind === 'app') {
     return (
@@ -110,7 +132,7 @@ export function TrustPageContent({
             <LegalSectionHeading>{section.heading}</LegalSectionHeading>
             {section.paragraphs?.map((paragraph) => (
               <p key={paragraph} className="leading-8 text-muted-foreground">
-                {paragraph}
+                <CopyText text={paragraph} />
               </p>
             ))}
             {section.linkParagraph && (
@@ -126,7 +148,9 @@ export function TrustPageContent({
             {section.bullets && (
               <ul className="list-disc space-y-3 pl-5 leading-8 text-muted-foreground [overflow-wrap:anywhere]">
                 {section.bullets.map((bullet) => (
-                  <li key={bullet}>{bullet}</li>
+                  <li key={bullet}>
+                    <CopyText text={bullet} />
+                  </li>
                 ))}
               </ul>
             )}
