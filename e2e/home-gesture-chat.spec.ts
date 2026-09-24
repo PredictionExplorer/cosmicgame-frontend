@@ -46,11 +46,19 @@ async function expectDecisionDashboardInViewport(page: Page) {
   ).toBeLessThanOrEqual(viewport.width);
 }
 
+/** Opens the optional message editor, which recedes behind one control until wanted. */
+async function openMessageEditor(panel: Locator) {
+  const toggle = panel.getByTestId('gesture-message-toggle');
+  if ((await toggle.getAttribute('aria-expanded')) !== 'true') await toggle.click();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+}
+
 /** The expanded editor can extend the form, but every control must remain reachable. */
 async function expectCommentFormReachable(page: Page) {
   const panel = page.locator('[data-testid="gesture-panel"][data-variant="card"]');
   const message = panel.getByTestId('gesture-message-input');
   const connect = panel.getByTestId('connect-to-gesture');
+  await openMessageEditor(panel);
   await expect(message).toBeVisible();
   await expect(message).toBeEditable();
   await expect(message).toHaveAccessibleName(/\S/);
@@ -77,40 +85,58 @@ async function expectCommentFormReachable(page: Page) {
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
 }
 
-/** A taller editor must use the full row instead of reserving an empty sidebar band. */
+/**
+ * The form spans the whole desk row under the clock and the standings, with
+ * the wallet standing beside its main column rather than a narrow stacked
+ * form and an empty sidebar band. The three methods sit side by side.
+ */
 async function expectEfficientDesktopLayout(page: Page) {
-  const overview = page.getByTestId('control-desk-overview');
+  const grid = page.getByTestId('control-desk-grid');
+  const cycle = page.getByTestId('control-desk-cycle');
+  const standings = page.getByTestId('control-desk-standings');
   const form = page.getByTestId('control-desk-gesture');
   const methods = page.getByTestId('panel-method-tabs');
-  const editor = form.getByTestId('gesture-panel-message');
-  const [overviewBox, formBox, methodsBox, editorBox] = await Promise.all([
-    overview.boundingBox(),
+  const standing = form.getByTestId('gesture-panel-standing');
+  const [gridBox, cycleBox, standingsBox, formBox, methodsBox, standingBox] = await Promise.all([
+    grid.boundingBox(),
+    cycle.boundingBox(),
+    standings.boundingBox(),
     form.boundingBox(),
     methods.boundingBox(),
-    editor.boundingBox(),
+    standing.boundingBox(),
   ]);
-  expect(overviewBox).not.toBeNull();
-  expect(formBox).not.toBeNull();
-  expect(methodsBox).not.toBeNull();
-  expect(editorBox).not.toBeNull();
+  for (const box of [gridBox, cycleBox, standingsBox, formBox, methodsBox, standingBox]) {
+    expect(box).not.toBeNull();
+  }
 
-  expect(Math.abs(formBox!.x - overviewBox!.x)).toBeLessThanOrEqual(1);
-  expect(Math.abs(formBox!.width - overviewBox!.width)).toBeLessThanOrEqual(1);
-  const gap = await page
-    .getByTestId('control-desk-grid')
-    .evaluate((element) => Number.parseFloat(getComputedStyle(element).rowGap));
-  const formGap = formBox!.y - (overviewBox!.y + overviewBox!.height);
+  // The clock column and the standings share the first row.
+  expect(Math.abs(cycleBox!.y - standingsBox!.y)).toBeLessThanOrEqual(1);
+  expect(cycleBox!.x + cycleBox!.width).toBeLessThanOrEqual(standingsBox!.x);
+
+  // The form spans the row beneath them.
+  expect(Math.abs(formBox!.x - gridBox!.x)).toBeLessThanOrEqual(1);
+  expect(Math.abs(formBox!.width - gridBox!.width)).toBeLessThanOrEqual(1);
+  const gap = await grid.evaluate((element) => Number.parseFloat(getComputedStyle(element).rowGap));
+  const rowBottom = Math.max(
+    cycleBox!.y + cycleBox!.height,
+    standingsBox!.y + standingsBox!.height,
+  );
+  const formGap = formBox!.y - rowBottom;
   expect(formGap).toBeGreaterThanOrEqual(0);
   expect(formGap).toBeLessThanOrEqual(gap + 2);
 
-  // The writing area and method controls occupy the same horizontal band.
-  // Bounds catch the old narrow, vertically stacked form even if its outer
-  // wrapper has been stretched to look full-width.
-  expect(methodsBox!.x + methodsBox!.width).toBeLessThanOrEqual(editorBox!.x);
-  expect(editorBox!.y).toBeLessThan(methodsBox!.y + methodsBox!.height);
-  expect(editorBox!.y + editorBox!.height).toBeGreaterThan(methodsBox!.y);
-  expect(editorBox!.width).toBeGreaterThanOrEqual(formBox!.width * 0.4);
-  expect(editorBox!.x + editorBox!.width).toBeLessThanOrEqual(formBox!.x + formBox!.width);
+  // The standing column sits beside the methods, in the same band.
+  expect(methodsBox!.x + methodsBox!.width).toBeLessThanOrEqual(standingBox!.x);
+  expect(standingBox!.y).toBeLessThan(methodsBox!.y + methodsBox!.height);
+  expect(methodsBox!.width).toBeGreaterThanOrEqual(formBox!.width * 0.45);
+
+  // Every method on one line, each with its price.
+  const tops = await methods
+    .locator('button[aria-pressed]')
+    .evaluateAll((buttons) => buttons.map((button) => button.getBoundingClientRect().top));
+  expect(tops.length).toBeGreaterThanOrEqual(1);
+  for (const top of tops) expect(Math.abs(top - tops[0]!)).toBeLessThanOrEqual(1);
+
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth),
     'the page must not overflow horizontally',
@@ -207,8 +233,8 @@ test.describe('home gesture chat', () => {
     await expect(
       latest.getByRole('link', { name: '0x3333333333333333333333333333333333333333' }),
     ).toBeVisible();
-    await expect(page.getByTestId('latest-participant-paid-amount')).toContainText('20.0000 CST');
-    await expect(page.getByTestId('latest-participant-cst-received')).toContainText('100.00 CST');
+    await expect(page.getByTestId('latest-participant-paid-amount')).toContainText('20 CST');
+    await expect(page.getByTestId('latest-participant-cst-received')).toContainText('100 CST');
     await expect(page.getByTestId('latest-participant-gesture-id')).toContainText('#4');
     await expect(page.getByTestId('latest-participant-message')).toContainText(
       'Newest message from a gesture',
@@ -218,18 +244,20 @@ test.describe('home gesture chat', () => {
     ).toBeVisible();
     await expect(page.getByTestId('clock-reserve')).toContainText('2.5000 ETH');
 
+    // The Endurance hold against the Chrono record, in neutral words; the
+    // holder is named once, on the Endurance row.
     const challenge = page.getByTestId('chrono-active-challenge');
     await expect(challenge).toBeVisible();
-    await expect(challenge).toContainText('Active Endurance Challenge');
-    await expect(challenge).toContainText('0x1111…\u20601111');
+    await expect(challenge).toContainText(home.observatory.ledger.challenge.title);
+    await expect(challenge).toContainText(/Held\s*20m/);
+    await expect(challenge).toContainText(/Chrono record\s*30m/);
+    await expect(challenge).toContainText(/Passes it in\s*10m 1s/);
+    await expect(challenge.getByRole('link')).toHaveCount(0);
     await expect(
-      challenge.getByRole('link', {
-        name: '0x1111111111111111111111111111111111111111',
-      }),
+      page
+        .getByTestId('control-desk-endurance')
+        .getByRole('link', { name: '0x1111111111111111111111111111111111111111' }),
     ).toBeVisible();
-    await expect(page.getByTestId('chrono-challenge-segment')).toContainText('20m');
-    await expect(page.getByTestId('chrono-challenge-record-to-beat')).toContainText('30m');
-    await expect(page.getByTestId('chrono-challenge-next-change')).toContainText('10m 1s');
   });
 
   test('keeps Last Gesture visible while the special-recipient endpoint is stale', async ({
@@ -251,8 +279,8 @@ test.describe('home gesture chat', () => {
       latest.getByRole('link', { name: '0x9999999999999999999999999999999999999999' }),
     ).toHaveCount(0);
     await expect(page.getByTestId('latest-participant-gesture-details')).toBeVisible();
-    await expect(page.getByTestId('latest-participant-paid-amount')).toContainText('20.0000 CST');
-    await expect(page.getByTestId('latest-participant-cst-received')).toContainText('100.00 CST');
+    await expect(page.getByTestId('latest-participant-paid-amount')).toContainText('20 CST');
+    await expect(page.getByTestId('latest-participant-cst-received')).toContainText('100 CST');
   });
 
   test('keeps a syncing Last Gesture panel when the gesture list trails the dashboard', async ({
@@ -310,7 +338,7 @@ test.describe('home gesture chat', () => {
       await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
       await expectDecisionDashboardInViewport(page);
       await expectEfficientDesktopLayout(page);
-      await expect(page.getByTestId('panel-cst-economics')).toBeVisible();
+      await expect(page.getByTestId('panel-cst-reward')).toBeVisible();
       await expectTextWithoutOverlap(page.getByTestId('panel-method-tabs'));
       await expectTextWithoutOverlap(page.getByTestId('panel-cst-reward'));
       await expectTextWithoutOverlap(page.getByTestId('control-desk-calibration'));
@@ -402,12 +430,18 @@ test.describe('home gesture chat', () => {
     const inlineMessage = inlinePanel.getByRole('textbox', {
       name: new RegExp(`^${home.form.advanced.messageLabel}`),
     });
+    await expect(inlineMessage).toBeHidden();
+    await openMessageEditor(inlinePanel);
     await expect(inlineMessage).toBeVisible();
     await expect(inlineMessage).toBeEditable();
     const draft = 'A comment started before connecting.';
     await inlineMessage.fill(draft);
-    await expect(page.getByTestId('gesture-price-strip')).toHaveCount(0);
+
+    // The dock never covers the form: it steps aside while the form is on
+    // screen and returns once it has scrolled away.
     const dockAction = page.getByTestId('dock-open-sheet');
+    await expect(dockAction).toBeHidden();
+    await page.getByTestId('home-feed-layout').scrollIntoViewIfNeeded();
     await expect(dockAction).toBeVisible();
     await dockAction.click();
 
@@ -443,7 +477,7 @@ test.describe('home gesture chat', () => {
 
     const allocations = page.getByTestId('allocations-disclosure');
     await expect(page.getByTestId('latest-participant-intel')).toBeVisible();
-    await expect(page.getByTestId('chrono-endurance-intel')).toBeVisible();
+    await expect(page.getByTestId('standings-ledger')).toBeVisible();
     await expect(page.getByTestId('control-desk-calibration')).toBeVisible();
     await expect(page.getByTestId('allocation-ledger')).toBeHidden();
 
@@ -456,7 +490,7 @@ test.describe('home gesture chat', () => {
     await page.keyboard.press('Enter');
     await expect(page.getByTestId('allocation-ledger')).toBeHidden();
     await expect(page.getByTestId('latest-participant-intel')).toBeVisible();
-    await expect(page.getByTestId('chrono-endurance-intel')).toBeVisible();
+    await expect(page.getByTestId('standings-ledger')).toBeVisible();
     await expect(page.getByTestId('control-desk-calibration')).toBeVisible();
   });
 
@@ -513,7 +547,7 @@ test.describe('home gesture chat', () => {
     const panel = page.locator('[data-testid="gesture-panel"][data-variant="card"]');
     const clock = page.locator('[data-testid="cycle-clock"]:visible').first();
     const latest = page.getByTestId('latest-participant-intel');
-    const chrono = page.getByTestId('chrono-endurance-intel');
+    const chrono = page.getByTestId('standings-ledger');
     const ledger = page.getByTestId('allocation-ledger');
     const cycleDetails = page.locator('[data-testid="cycle-details-link-card"]:visible').first();
     const artwork = page.locator('[data-testid="deck-art-card"]:visible').first();
@@ -560,7 +594,7 @@ test.describe('home gesture chat', () => {
       return;
     }
 
-    // The full-width composer follows the standings; the feed follows the desk.
+    // The full-width form follows the clock and the standings; the feed follows the desk.
     expect(clockBox!.y + clockBox!.height).toBeLessThanOrEqual(panelBox!.y + 2);
     await expectEfficientDesktopLayout(page);
     expect(panelBox!.y + panelBox!.height).toBeLessThanOrEqual(artworkBox!.y + 2);

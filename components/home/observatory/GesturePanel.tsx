@@ -478,6 +478,7 @@ export function GesturePanel({
         <div data-testid="gesture-panel-advanced" className="min-w-0">
           <button
             type="button"
+            id={`${advancedRegionId}-trigger`}
             aria-expanded={advancedExpanded}
             aria-controls={advancedRegionId}
             onClick={() => setAdvancedExpanded(!advancedExpanded)}
@@ -490,7 +491,13 @@ export function GesturePanel({
               aria-hidden
             />
           </button>
-          <div id={advancedRegionId} hidden={!advancedExpanded} className="mt-3">
+          <div
+            id={advancedRegionId}
+            role="region"
+            aria-labelledby={`${advancedRegionId}-trigger`}
+            hidden={!advancedExpanded}
+            className="mt-3"
+          >
             {advancedExpanded && (
               <GestureAdvanced
                 form={form}

@@ -116,6 +116,7 @@ function LedgerRow({
   return (
     <li
       data-testid={testId}
+      data-empty={!holder || undefined}
       data-current={isYou || undefined}
       data-settling={settling || undefined}
       className={cn(

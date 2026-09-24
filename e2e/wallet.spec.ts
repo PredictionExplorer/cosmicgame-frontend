@@ -22,6 +22,17 @@ function connectedPill(page: Page) {
     .first();
 }
 
+/**
+ * Phones: the action dock steps aside while the inline gesture form is on
+ * screen, so the quick-action sheet is reached once the form scrolls away.
+ */
+async function openSheetFromDock(page: Page) {
+  await page.getByTestId('home-feed-layout').scrollIntoViewIfNeeded();
+  const dockAction = page.getByTestId('dock-open-sheet');
+  await expect(dockAction).toBeVisible();
+  await dockAction.click();
+}
+
 async function openMobileMenuIfNeeded(page: Page) {
   const menuButton = page.locator('role=button[name="menu"]');
   if (await menuButton.isVisible()) {
@@ -139,7 +150,10 @@ test.describe('Wallet connection state (disconnected)', () => {
     });
     const draft = 'A note for the cosmos.';
 
-    // The editor must be discoverable and usable before any wallet interaction.
+    // The editor must be discoverable and usable before any wallet interaction:
+    // the optional message recedes behind one control, never a disclosure
+    // element or the advanced options.
+    await inlinePanel.getByTestId('gesture-message-toggle').click();
     await expect(inlineMessage).toBeVisible();
     await expect(inlineMessage).toBeEditable();
     expect(await inlineMessage.evaluate((element) => element.closest('details') !== null)).toBe(
@@ -187,7 +201,7 @@ test.describe('Wallet connection state (disconnected)', () => {
       }
       await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
 
-      if (isMobile) await page.getByTestId('dock-open-sheet').click();
+      if (isMobile) await openSheetFromDock(page);
       const panel = page.locator(
         `[data-testid="gesture-panel"][data-variant="${isMobile ? 'sheet' : 'card'}"]`,
       );
@@ -232,7 +246,7 @@ test.describe('Wallet connection state (disconnected)', () => {
       }
     }
 
-    if (isMobile) await page.getByTestId('dock-open-sheet').click();
+    if (isMobile) await openSheetFromDock(page);
     const panel = page.locator(
       `[data-testid="gesture-panel"][data-variant="${isMobile ? 'sheet' : 'card'}"]`,
     );
@@ -261,31 +275,32 @@ test.describe('Wallet connection state (disconnected)', () => {
       panel.locator(isMobile ? '#gesture-submit-sheet' : '#gesture-submit'),
     ).toBeDisabled();
 
-    const layoutBox = (await panel.getByTestId('gesture-panel-layout').boundingBox())!;
-    const contextBox = (await panel.getByTestId('gesture-panel-context').boundingBox())!;
+    // Message, advanced options and the action share the form's main column;
+    // from tablets up the wallet's standing sits beside it.
     const messageBox = (await panel.getByTestId('gesture-panel-message').boundingBox())!;
     const actionBox = (await panel.getByTestId('gesture-panel-action').boundingBox())!;
     const collapsedBox = (await advanced.boundingBox())!;
-    expect(collapsedBox.x).toBeCloseTo(contextBox.x, 0);
-    expect(collapsedBox.width).toBeCloseTo(contextBox.width, 0);
+    expect(collapsedBox.x).toBeCloseTo(messageBox.x, 0);
+    expect(collapsedBox.width).toBeCloseTo(messageBox.width, 0);
     expect(actionBox.x).toBeCloseTo(messageBox.x, 0);
     expect(actionBox.width).toBeCloseTo(messageBox.width, 0);
     if (!isMobile) {
-      expect(contextBox.x + contextBox.width).toBeLessThan(messageBox.x);
-      expect(contextBox.y).toBeCloseTo(messageBox.y, 0);
+      const standingBox = (await panel.getByTestId('gesture-panel-standing').boundingBox())!;
+      expect(messageBox.x + messageBox.width).toBeLessThanOrEqual(standingBox.x);
     }
 
     await advancedTrigger.click();
     await expect(advancedTrigger).toHaveAttribute('aria-expanded', 'true');
     await expect(advanced.getByRole('region')).toBeVisible();
     const expandedBox = (await advanced.boundingBox())!;
-    expect(expandedBox.x).toBeCloseTo(layoutBox.x, 0);
-    expect(expandedBox.width).toBeCloseTo(layoutBox.width, 0);
+    expect(expandedBox.x).toBeCloseTo(messageBox.x, 0);
+    expect(expandedBox.width).toBeCloseTo(messageBox.width, 0);
     await expect(message).toHaveValue(draft);
     await expect(tokenSearch).toHaveValue('42');
 
+    // The visible label is the checkbox's name.
     const acceptAnyReward = advanced.getByRole('checkbox', {
-      name: home.form.advanced.minCstProtection.acceptAnyAria,
+      name: home.form.advanced.minCstProtection.acceptAnyTitle,
     });
     await acceptAnyReward.check();
     await expect(acceptAnyReward).toBeChecked();
