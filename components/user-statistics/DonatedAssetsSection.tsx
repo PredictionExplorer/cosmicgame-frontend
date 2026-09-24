@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 
 import { AttachedAssetsIcon } from '@/lib/conceptIcons';
 import { Button } from '@/components/ui/button';
+import { ChainGuard } from '@/components/wallet/NetworkGuard';
 import { Badge } from '@/components/ui/badge';
 import { SkeletonTable } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -101,9 +102,12 @@ export function DonatedAssetsSection({
         }
         action={
           unclaimedNFTs.length > 0 && canClaim ? (
-            <Button onClick={onClaimAllNFTs} loading={isClaiming} size="sm">
-              {t('statistics.donatedAssets.nfts.claimAll')}
-            </Button>
+            // On another network the action becomes "Switch to …" before anything is sent.
+            <ChainGuard explain={false}>
+              <Button onClick={onClaimAllNFTs} loading={isClaiming} size="sm">
+                {t('statistics.donatedAssets.nfts.claimAll')}
+              </Button>
+            </ChainGuard>
           ) : null
         }
       >
@@ -136,9 +140,11 @@ export function DonatedAssetsSection({
         }
         action={
           unclaimedERC20Count > 0 && canClaim ? (
-            <Button onClick={onClaimAllERC20} size="sm">
-              {t('statistics.donatedAssets.erc20.claimAll')}
-            </Button>
+            <ChainGuard explain={false}>
+              <Button onClick={onClaimAllERC20} size="sm">
+                {t('statistics.donatedAssets.erc20.claimAll')}
+              </Button>
+            </ChainGuard>
           ) : null
         }
       >

@@ -55,7 +55,7 @@
     },
     "seo": {
       "heading": "Protocol statistics",
-      "description": "Explore Cosmic Signature activity on Arbitrum: Performance Cycles, gestures, NFTs, CST, anchoring, reserves, and allocations. The tables below show the latest available protocol data.",
+      "description": "Explore Cosmic Signature activity on Arbitrum: Performance Cycles, gestures, NFTs, CST, anchoring, reserves, and allocations.",
       "relatedPagesAria": "Statistics related pages",
       "links": {
         "currentCycle": "View the current Performance Cycle",
