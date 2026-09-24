@@ -273,9 +273,10 @@ heading on one page uses one style (`type-heading-3`).
 
 **Ticking figures.** A line that carries a live figure has a fixed shape: the label wraps,
 the figure sits in its own column and never does, and a countdown reads as a clock
-(`<Duration variant="clock">`, "8d 06:56:51") whose width holds while it ticks. A
-`flex-wrap` row of ticking values re-wraps as the digits change and moves everything
-below it.
+(`<Duration variant="clock">`, "8d 06:56:51") whose width holds while it ticks. Lines
+stacked together share that one format, so a growing hold under a countdown reads as a
+clock too ("1d 01:12:05" over "8d 00:24:38") and the digits align. A `flex-wrap` row of
+ticking values re-wraps as the digits change and moves everything below it.
 
 **Targets.** Every text link is at least 24px tall at every width
 (`TOUCH_TARGET_TEXT_LINK_CLASS`, `lib/touch-target.ts`): WCAG 2.5.8 covers a mouse as much
