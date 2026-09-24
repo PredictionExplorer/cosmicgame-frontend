@@ -39,9 +39,9 @@ jest.mock('@/hooks/useHomeGestureFeed', () => ({
       gestures,
       chatGestures: gestures,
       latestGesture: gestures[gestures.length - 1] ?? null,
-      mode: 'legacy',
-      isLoading: false,
-      error: null,
+      mode: 'mode' in result ? result.mode : 'legacy',
+      isLoading: result.isLoading ?? false,
+      error: result.error ?? null,
       hasMore: false,
       isLoadingOlder: false,
       olderError: null,
@@ -611,6 +611,34 @@ describe('ExperimentalHomePage', () => {
     // (7h 3m 11s + 1s) − 2h 21m 9s.
     expect(screen.getByTestId('standing-latest-progress')).toHaveTextContent(
       'tables.specialAllocation.needsToBecomeChampion(duration=4h 42m 3s)',
+    );
+  });
+
+  it('counts the wallet’s entries only once the feed holds the whole cycle', () => {
+    mockAccount = LATEST;
+    // The server seed: the latest Gesture alone, the wallet's own.
+    mockUseHomeGestureFeed.mockReturnValue({
+      data: [
+        { EvtLogId: 9, BidderAddr: LATEST, TimeStamp: 1, RoundNum: 5 } as unknown as GestureInfo,
+      ],
+      mode: undefined,
+      isLoading: true,
+    });
+    const { unmount } = renderPage();
+
+    expect(screen.getByTestId('personal-gesture-count-pending')).toBeInTheDocument();
+    expect(screen.queryByTestId('personal-entry-share')).not.toBeInTheDocument();
+    unmount();
+
+    // The whole feed: the dashboard's 10 Gestures are N.
+    mockUseHomeGestureFeed.mockReturnValue({
+      data: [
+        { EvtLogId: 9, BidderAddr: LATEST, TimeStamp: 1, RoundNum: 5 } as unknown as GestureInfo,
+      ],
+    });
+    renderPage();
+    expect(screen.getByTestId('personal-entry-share')).toHaveTextContent(
+      'home.deck.personal.entryShare(share=10%)',
     );
   });
 

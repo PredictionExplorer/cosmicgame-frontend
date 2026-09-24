@@ -26,7 +26,10 @@ import { getGestureSubmitLabel } from '@/components/home/observatory/gestureSubm
 import { AllocationTracksBoard } from '@/components/home/experimental/AllocationTracksBoard';
 import { CycleMonument } from '@/components/home/experimental/CycleMonument';
 import { CyclePhaseGuide } from '@/components/home/experimental/CyclePhaseGuide';
-import { DeckPersonalStrip } from '@/components/home/experimental/DeckPersonalStrip';
+import {
+  DeckPersonalStrip,
+  type PersonalFeedStatus,
+} from '@/components/home/experimental/DeckPersonalStrip';
 import { GestureConsole } from '@/components/home/experimental/GestureConsole';
 import { StageArtwork, type StageToken } from '@/components/home/experimental/StageArtwork';
 import { StandingsLedger } from '@/components/home/experimental/StandingsLedger';
@@ -183,6 +186,12 @@ const ExperimentalHomePage = ({
     }),
     [feed.hasMore, feed.isLoadingOlder, feed.olderError, feed.loadOlder],
   );
+  // The feed serves its one-row server seed until the first snapshot lands.
+  const personalFeedStatus: PersonalFeedStatus = feed.error
+    ? 'error'
+    : feed.isLoading || !feed.mode
+      ? 'loading'
+      : 'ready';
   const donatedNFTs = useMemo(() => nftDonationsData ?? [], [nftDonationsData]);
   const donatedERC20Tokens = useMemo(() => erc20DonationsData ?? [], [erc20DonationsData]);
 
@@ -795,7 +804,14 @@ const ExperimentalHomePage = ({
                 chronoEth={data ? trackAmounts.chronoEth : null}
                 nowMs={now}
                 footer={
-                  account ? <DeckPersonalStrip account={account} gestures={curGestureList} /> : null
+                  account ? (
+                    <DeckPersonalStrip
+                      account={account}
+                      gestures={curGestureList}
+                      totalGestures={data?.CurNumBids}
+                      feedStatus={personalFeedStatus}
+                    />
+                  ) : null
                 }
               />
             </div>

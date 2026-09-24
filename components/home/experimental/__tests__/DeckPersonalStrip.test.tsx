@@ -31,13 +31,28 @@ function gestures(mine: number, others: number): GestureInfo[] {
   ] as GestureInfo[];
 }
 
+type StripProps = Parameters<typeof DeckPersonalStrip>[0];
+
+/** A strip over a complete feed of `mine + others` Gestures, unless overridden. */
+function renderStrip(mine: number, others: number, props: Partial<StripProps> = {}) {
+  return render(
+    <DeckPersonalStrip
+      account={ACCOUNT}
+      gestures={gestures(mine, others)}
+      totalGestures={mine + others}
+      feedStatus="ready"
+      {...props}
+    />,
+  );
+}
+
 beforeEach(() => {
   mockUseApiData.mockReturnValue(makeApiData());
 });
 
 describe('DeckPersonalStrip', () => {
   it('counts the wallet’s Gestures this cycle and their plain share of the entries', () => {
-    render(<DeckPersonalStrip account={ACCOUNT} gestures={gestures(3, 97)} />);
+    renderStrip(3, 97);
 
     expect(screen.getByTestId('personal-gesture-count')).toHaveTextContent(
       'home.deck.personal.gestures(count=3)',
@@ -48,8 +63,37 @@ describe('DeckPersonalStrip', () => {
     );
   });
 
+  it('takes N from the cycle’s Gesture count, not from the rows the feed holds', () => {
+    renderStrip(1, 3, { totalGestures: 8 });
+
+    expect(screen.getByTestId('personal-entry-share')).toHaveTextContent(
+      'home.deck.personal.entryShare(share=12.5%)',
+    );
+  });
+
+  it('waits for the whole feed before it counts, never reading the seed as the cycle', () => {
+    // The server seed: one row, the wallet's own latest Gesture.
+    renderStrip(1, 0, { totalGestures: 40, feedStatus: 'loading' });
+
+    expect(screen.queryByTestId('personal-gesture-count')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('personal-entry-share')).not.toBeInTheDocument();
+    expect(screen.getByTestId('personal-gesture-count-pending')).toHaveTextContent(
+      'tables.status.loading',
+    );
+  });
+
+  it('leaves the count and share out when the feed cannot be read', () => {
+    renderStrip(1, 0, { totalGestures: 40, feedStatus: 'error' });
+
+    expect(screen.queryByTestId('personal-gesture-count')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('personal-gesture-count-pending')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('personal-entry-share')).not.toBeInTheDocument();
+    // The way to the wallet's allocations stays.
+    expect(screen.getByTestId('personal-allocations-link')).toBeInTheDocument();
+  });
+
   it('leaves the share out before the wallet has a Gesture this cycle', () => {
-    render(<DeckPersonalStrip account={ACCOUNT} gestures={gestures(0, 12)} />);
+    renderStrip(0, 12);
 
     expect(screen.getByTestId('personal-gesture-count')).toHaveTextContent(
       'home.deck.personal.gestures(count=0)',
@@ -59,7 +103,7 @@ describe('DeckPersonalStrip', () => {
 
   it('turns into a retrieve action when an allocation is waiting', () => {
     mockUseApiData.mockReturnValue(makeApiData({ ETHRaffleToClaim: 0.0123 }));
-    render(<DeckPersonalStrip account={ACCOUNT} gestures={gestures(1, 1)} />);
+    renderStrip(1, 1);
 
     const retrieve = screen.getByTestId('personal-retrieve');
     expect(retrieve).toHaveAttribute('href', '/my-allocations');
@@ -68,7 +112,7 @@ describe('DeckPersonalStrip', () => {
   });
 
   it('links quietly to the allocations page when nothing is waiting', () => {
-    render(<DeckPersonalStrip account={ACCOUNT} gestures={gestures(1, 1)} />);
+    renderStrip(1, 1);
 
     expect(screen.getByTestId('personal-allocations-link')).toHaveAttribute(
       'href',
@@ -78,7 +122,12 @@ describe('DeckPersonalStrip', () => {
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<DeckPersonalStrip account={ACCOUNT} gestures={gestures(2, 8)} />);
+    const { container } = renderStrip(2, 8);
+    await checkA11y(container);
+  });
+
+  it('has no accessibility violations while the feed loads', async () => {
+    const { container } = renderStrip(1, 0, { feedStatus: 'loading' });
     await checkA11y(container);
   });
 });
