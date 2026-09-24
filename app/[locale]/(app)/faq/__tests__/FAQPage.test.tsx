@@ -95,6 +95,28 @@ describe('FAQPage', () => {
     ).toBeInTheDocument();
   });
 
+  it('shows a deep-linked question even when a search would hide it', async () => {
+    const user = userEvent.setup();
+    render(<FAQPage content={faqContentEn} />);
+    await user.type(searchbox(), 'Endurance Champion');
+    await screen.findByText(/Showing \d+ of \d+ questions/i, {}, { timeout: 10_000 });
+    expect(
+      screen.queryByRole('button', { name: 'What is the Signature Allocation?' }),
+    ).not.toBeInTheDocument();
+
+    // A same-page link to another question (hashchange, no reload).
+    window.history.pushState(null, '', '/faq#main-allocation');
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+
+    expect(
+      await screen.findByRole('button', {
+        name: 'What is the Signature Allocation?',
+        expanded: true,
+      }),
+    ).toBeInTheDocument();
+    expect(searchbox()).toHaveValue('');
+  }, 30_000);
+
   it('filters questions when searching and hides the index', async () => {
     const user = userEvent.setup();
     render(<FAQPage content={faqContentEn} />);

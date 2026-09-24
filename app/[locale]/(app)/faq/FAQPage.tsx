@@ -60,7 +60,9 @@ const FAQPage = ({ content }: FAQPageProps) => {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const sectionRefs = useRef<Map<string, HTMLElement>>(new Map());
 
-  const debouncedSearch = useDebounce(searchInput, 200);
+  const typedSearch = useDebounce(searchInput, 200);
+  // Typing is debounced; clearing (the clear button, a deep link) applies at once.
+  const debouncedSearch = searchInput.trim() ? typedSearch : '';
   const totalCount = getTotalFaqQuestionCount(content);
   const { categories } = content;
   const isSearching = debouncedSearch.trim().length > 0;
@@ -109,6 +111,8 @@ const FAQPage = ({ content }: FAQPageProps) => {
       if (!window.location.hash) return;
       const result = findFaqItemByHash(content, window.location.hash);
       if (!result) return;
+      // A deep link always shows its question, even if a search would hide it.
+      setSearchInput('');
       openItem(result.item.id, result.category.id, result.item.hashAnchor ?? result.item.id);
     };
     openHashTarget();

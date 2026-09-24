@@ -81,7 +81,7 @@ const zhRoutes: ReadonlyArray<{
     path: '/zh/faq',
     label: 'FAQ and trust',
     assertAccessibleName: async (page) =>
-      expect(page.getByRole('textbox', { name: '搜索常见问题' })).toBeVisible(),
+      expect(page.getByRole('searchbox', { name: '搜索常见问题' })).toBeVisible(),
   },
   {
     path: '/zh/eth-contribution',
@@ -235,7 +235,9 @@ test.describe('A11y smoke (WCAG 2.1 AA)', () => {
       path: '/uk/faq',
       label: 'FAQ and trust',
       assertAccessibleName: async (page) =>
-        expect(page.getByRole('textbox', { name: 'Пошук серед поширених запитань' })).toBeVisible(),
+        expect(
+          page.getByRole('searchbox', { name: 'Пошук серед поширених запитань' }),
+        ).toBeVisible(),
     },
     {
       path: '/uk/eth-contribution',

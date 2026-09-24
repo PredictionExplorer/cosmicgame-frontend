@@ -184,6 +184,17 @@ describe('FAQCategorySection', () => {
     );
   });
 
+  it('keeps a highlighted question one inline run inside its flex trigger', () => {
+    renderFAQCategory({ searchQuery: 'Anchoring' });
+    const trigger = screen.getByRole('button', { name: 'How does Anchoring work?' });
+    // The trigger is a flex row: a bare <mark> would become its own flex item,
+    // pushed apart from the rest of the question and read as a separate word.
+    const items = Array.from(trigger.children).filter((child) => child.tagName !== 'svg');
+    expect(items).toHaveLength(1);
+    expect(items[0]?.querySelector('mark')).toHaveTextContent('Anchoring');
+    expect(items[0]).toHaveTextContent('How does Anchoring work?');
+  });
+
   it('renders nothing when the search matches nothing in this category', () => {
     const { container } = renderFAQCategory({ searchQuery: 'xyznonexistent' });
     expect(container.firstChild).toBeNull();

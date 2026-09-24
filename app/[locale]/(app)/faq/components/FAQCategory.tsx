@@ -160,7 +160,11 @@ export const FAQCategorySection = forwardRef<HTMLElement, FAQCategoryProps>(
                 className="scroll-mt-[calc(var(--header-height)+4.5rem)] border-b border-rule-faint lg:scroll-mt-[var(--sticky-offset)]"
               >
                 <AccordionTrigger className="gap-6 py-5 text-start type-title text-foreground hover:no-underline hover:text-primary [&>svg]:size-5 [&>svg]:text-subtle">
-                  {searching ? highlightMatches(item.question, searchQuery) : item.question}
+                  {/* One flex item: a highlighted match stays inline in the question
+                      (the trigger is a flex row) and in its accessible name. */}
+                  <span className="min-w-0">
+                    {searching ? highlightMatches(item.question, searchQuery) : item.question}
+                  </span>
                 </AccordionTrigger>
                 <AccordionContent hiddenUntilFound={!open} className="pb-6">
                   <p className="type-prose text-muted-foreground">

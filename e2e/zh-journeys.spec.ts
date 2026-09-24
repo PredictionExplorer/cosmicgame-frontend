@@ -74,7 +74,7 @@ test.describe('Sprint 8 deterministic Chinese journeys', () => {
 
   test('supports Chinese FAQ search and hash deep links', async ({ page }) => {
     await page.goto('/zh/faq', { waitUntil: 'domcontentloaded' });
-    const search = page.getByRole('textbox', { name: '搜索常见问题' });
+    const search = page.getByRole('searchbox', { name: '搜索常见问题' });
     await search.fill('锚定');
     await expect(page.getByText(/共 67 个问题，当前显示 \d+ 个/)).toBeVisible();
     await expect(page.getByRole('button', { name: '锚定如何运作？', exact: true })).toBeVisible();
