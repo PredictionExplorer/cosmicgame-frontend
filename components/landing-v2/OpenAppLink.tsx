@@ -27,8 +27,8 @@ export function OpenAppLink({
       href={app.href}
       kind={app.kind}
       className={cn(
-        'inline-flex shrink-0 items-center gap-2 rounded-control bg-signature-gradient text-sm font-semibold text-primary-foreground no-underline shadow-[inset_0_1px_0_hsl(var(--foreground)/0.16)] transition-[filter] duration-150 hover:brightness-110',
-        size === 'md' ? 'h-10 px-4' : 'h-11 px-5',
+        'inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-control bg-signature-gradient text-sm font-semibold text-primary-foreground no-underline shadow-[inset_0_1px_0_hsl(var(--foreground)/0.16)] transition-[filter] duration-150 hover:brightness-110',
+        size === 'md' ? 'h-10 px-3 sm:px-4' : 'h-11 px-5',
         className,
       )}
     >
