@@ -55,7 +55,8 @@
       "total": "CST received",
       "allocations": "Allocations",
       "first": "First allocation",
-      "latest": "Latest allocation"
+      "latest": "Latest allocation",
+      "allocated": "Allocated"
     },
     "emptyDescription": "Allocations appear here once the outreach team sends CST to this address.",
     "invalidAddress": {

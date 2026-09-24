@@ -13,7 +13,8 @@
     "figures": {
       "changes": "変更数",
       "first": "最初の変更",
-      "latest": "最新の変更"
+      "latest": "最新の変更",
+      "changed": "変更日時"
     },
     "allChanges": "調整の変更履歴をすべて見る",
     "loadError": "設定の変更を読み込めませんでした。",

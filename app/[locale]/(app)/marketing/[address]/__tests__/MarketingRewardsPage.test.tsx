@@ -72,6 +72,15 @@ describe('MarketingRewardsPage', () => {
     expect(figure('Latest allocation')).toHaveTextContent('2024');
   });
 
+  it('dates a single allocation once, at the smaller figure size', () => {
+    mockUseMarketingRewardsByUser.mockReturnValue(query({ data: [reward(1, 25, 1_700_000_000)] }));
+    render(<MarketingRewardsPage address={VALID_ADDRESS} />);
+    expect(screen.queryByText('First allocation')).not.toBeInTheDocument();
+    expect(screen.queryByText('Latest allocation')).not.toBeInTheDocument();
+    expect(figure('Allocated')).toHaveTextContent('2023');
+    expect(figure('Allocated').querySelector('dd')).not.toHaveClass('lg:type-figure-lg');
+  });
+
   it('mutes and explains allocations too small to show, only when there are some', () => {
     mockUseMarketingRewardsByUser.mockReturnValue(
       query({ data: [reward(1, 10, 1_700_000_000), reward(2, 3e-15, 1_700_000_100)] }),

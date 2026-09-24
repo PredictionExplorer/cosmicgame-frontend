@@ -2,11 +2,11 @@
 
 import type { ReactNode } from 'react';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
 import { ContributionIcon } from '@/lib/conceptIcons';
-import { formatAddress } from '@/utils/format';
+import { formatAddress, formatCount } from '@/utils/format';
 import { useDonationsWithInfoById } from '@/hooks/useApiQuery';
 import { parseContributionNote } from '@/components/contributions/contributionNote';
 import { LedgerPage } from '@/components/ledger/LedgerPage';
@@ -46,13 +46,15 @@ function BackToAll() {
 
 /**
  * One direct ETH contribution. The header leads with what a reader came for
- * — how much, from whom, in which cycle and when — and the body gives the
- * contributor's note as a pull quote, then the on-chain record with its
- * transaction. The note's link is shown, never fetched: opening a record
- * page does not make the visitor's browser call a stranger's server.
+ * — how much, from whom, in which cycle and when, each said once on the
+ * page — and the body gives the contributor's note as a pull quote, then the
+ * on-chain record: its transaction and id. The note's link is shown, never
+ * fetched: opening a record page does not make the visitor's browser call a
+ * stranger's server.
  */
 const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
   const t = useTranslations('ethContribution.detail');
+  const locale = useLocale();
   const valid = Number.isInteger(id) && id >= 0;
   const { data, isLoading, isError, refetch } = useDonationsWithInfoById(valid ? id : null);
   const trail = [{ label: t('breadcrumbContributions'), href: '/eth-contribution' }];
@@ -83,16 +85,22 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
       value: data ? <Amount value={data.AmountEth} unit="ETH" /> : pending,
     },
     {
+      // The contributor as hex at the figure's own size, not a 12px chip.
       id: 'from',
       label: t('figures.from'),
-      value: data?.DonorAddr ? <AddressChip address={data.DonorAddr} /> : pending,
+      value: data?.DonorAddr ? <AddressChip address={data.DonorAddr} variant="plain" /> : pending,
+      size: 'md',
     },
     {
       id: 'cycle',
       label: t('figures.cycle'),
       value: data ? (
-        <Link href={`/eth-contribution/round/${data.RoundNum}`} className="link-quiet">
-          {t('cycleValue', { cycle: data.RoundNum })}
+        <Link
+          href={`/eth-contribution/round/${data.RoundNum}`}
+          title={t('cycleLink', { cycle: data.RoundNum })}
+          className="link-quiet"
+        >
+          {formatCount(data.RoundNum, locale)}
         </Link>
       ) : (
         pending
@@ -102,6 +110,7 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
       id: 'date',
       label: t('figures.date'),
       value: data ? <DateTime timestamp={data.TimeStamp} year="always" /> : pending,
+      size: 'md',
     },
   ];
 
@@ -126,7 +135,7 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
   if (isLoading) {
     return (
       <LedgerPage width="narrow" header={header}>
-        <SkeletonDetailRows rows={5} />
+        <SkeletonDetailRows rows={2} />
       </LedgerPage>
     );
   }
@@ -199,21 +208,6 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
             <TxProofLink hash={data.TxHash} className="type-hash">
               {formatAddress(data.TxHash)}
             </TxProofLink>
-          </SpecRow>
-          <SpecRow label={t('datetimeLabel')}>
-            <DateTime timestamp={data.TimeStamp} variant="full" seconds />
-          </SpecRow>
-          <SpecRow label={t('contributorAddressLabel')}>
-            <AddressChip address={data.DonorAddr} variant="plain" display="responsive" />
-          </SpecRow>
-          <SpecRow label={t('cycleNumberLabel')}>
-            <Link
-              href={`/eth-contribution/round/${data.RoundNum}`}
-              className="link-quiet inline-flex items-center gap-1.5"
-            >
-              {t('cycleLink', { cycle: data.RoundNum })}
-              <ArrowRight aria-hidden className="size-3.5 text-subtle" />
-            </Link>
           </SpecRow>
           <SpecRow label={t('recordLabel')}>
             <span className="type-mono">{t('recordValue', { id })}</span>

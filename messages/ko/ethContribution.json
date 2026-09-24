@@ -29,10 +29,6 @@
     "invalidId": "유효하지 않은 기여 ID",
     "title": "기여 #{id}",
     "breadcrumbContributions": "ETH 기여",
-    "datetimeLabel": "날짜와 시간",
-    "contributorAddressLabel": "기여자 주소",
-    "cycleNumberLabel": "사이클",
-    "cycleValue": "사이클 {cycle}",
     "lede": "사이클 {cycle}의 사이클 준비금에 직접 기여한 ETH입니다.",
     "figures": {
       "amount": "수량",

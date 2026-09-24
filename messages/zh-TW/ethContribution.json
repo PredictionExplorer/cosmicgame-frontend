@@ -29,10 +29,6 @@
     "invalidId": "貢獻 ID 無效",
     "title": "貢獻 #{id}",
     "breadcrumbContributions": "ETH 貢獻",
-    "datetimeLabel": "日期和時間",
-    "contributorAddressLabel": "貢獻者地址",
-    "cycleNumberLabel": "週期",
-    "cycleValue": "第 {cycle} 個週期",
     "lede": "向第 {cycle} 個週期的週期儲備直接貢獻的 ETH。",
     "figures": {
       "amount": "數量",

@@ -60,17 +60,28 @@ export default function MarketingRewardsPage({ address: rawAddress }: MarketingR
       value: ready ? formatCount(summary.allocations, locale) : pending,
     },
   ];
-  if (!ready || summary.allocations > 0) {
+  // Each date once, at figure-md: one allocation (or several at one moment)
+  // gets a single date.
+  if (ready && summary.allocations > 0 && summary.first === summary.latest) {
+    figures.push({
+      id: 'allocated',
+      label: t('address.figures.allocated'),
+      value: <DateTime timestamp={summary.first} year="always" />,
+      size: 'md',
+    });
+  } else if (!ready || summary.allocations > 0) {
     figures.push(
       {
         id: 'first',
         label: t('address.figures.first'),
         value: ready ? <DateTime timestamp={summary.first} year="always" /> : pending,
+        size: 'md',
       },
       {
         id: 'latest',
         label: t('address.figures.latest'),
         value: ready ? <DateTime timestamp={summary.latest} year="always" /> : pending,
+        size: 'md',
       },
     );
   }

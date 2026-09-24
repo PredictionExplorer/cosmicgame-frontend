@@ -55,7 +55,8 @@
       "total": "受け取ったCST",
       "allocations": "配分件数",
       "first": "最初の配分",
-      "latest": "最新の配分"
+      "latest": "最新の配分",
+      "allocated": "配分日時"
     },
     "emptyDescription": "広報チームがこのアドレスへCSTを送ると、配分がここに表示されます。",
     "invalidAddress": {

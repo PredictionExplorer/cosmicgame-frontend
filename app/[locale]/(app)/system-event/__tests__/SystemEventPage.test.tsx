@@ -105,6 +105,19 @@ describe('SystemEventPage', () => {
     expect(screen.getByText('Latest change', { selector: 'span' })).toBeInTheDocument();
   });
 
+  it('gives changes made at one moment a single date, at the smaller figure size', () => {
+    // Regression: one change showed the same date as "First change" and
+    // "Latest change", both at 32px.
+    mockEvents({ data: [rows[1]] });
+    render(<SystemEventPage round={1} start={100} end={200} />);
+    expect(screen.queryByText('First change', { selector: 'span' })).not.toBeInTheDocument();
+    expect(screen.queryByText('Latest change', { selector: 'span' })).not.toBeInTheDocument();
+    const changed = document.querySelector('[data-figure="changed"]');
+    expect(changed).toHaveTextContent('Changed');
+    expect(within(changed as HTMLElement).getByText(/2024/)).toBeInTheDocument();
+    expect(changed?.querySelector('dd')).not.toHaveClass('lg:type-figure-lg');
+  });
+
   it('leaves the dates out of a window with no changes, and says why it is empty', () => {
     mockEvents({ data: [] });
     render(<SystemEventPage round={1} start={100} end={200} />);

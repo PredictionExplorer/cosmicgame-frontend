@@ -55,7 +55,8 @@
       "total": "CST đã nhận",
       "allocations": "Số lần phân bổ",
       "first": "Lần phân bổ đầu",
-      "latest": "Lần phân bổ gần nhất"
+      "latest": "Lần phân bổ gần nhất",
+      "allocated": "Thời điểm phân bổ"
     },
     "emptyDescription": "Các khoản phân bổ sẽ hiện ở đây khi đội ngũ truyền thông gửi CST đến địa chỉ này.",
     "invalidAddress": {

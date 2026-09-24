@@ -29,10 +29,6 @@
     "invalidId": "拠出IDが無効です",
     "title": "拠出 #{id}",
     "breadcrumbContributions": "ETH拠出",
-    "datetimeLabel": "日時",
-    "contributorAddressLabel": "拠出者アドレス",
-    "cycleNumberLabel": "サイクル",
-    "cycleValue": "サイクル{cycle}",
     "lede": "サイクル{cycle}のサイクル準備金への直接ETH拠出です。",
     "figures": {
       "amount": "数量",

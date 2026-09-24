@@ -186,6 +186,8 @@ interface FigureSpec {
   value: ReactNode | typeof NONE_YET | null;
   /** Show the card's `tooltip` copy behind an info button. */
   hasTooltip?: boolean;
+  /** A date: kept at figure-md beside the counts (see `PageHeaderFigure.size`). */
+  size?: 'md';
 }
 
 interface RouteFigures {
@@ -455,7 +457,7 @@ async function getRouteFigures(route: SeoSummaryRoute, locale: string): Promise<
         reads: [events],
         figures: [
           { key: 'records', value: rows && count(rows.length) },
-          { key: 'latest', value: latestDate(rows) },
+          { key: 'latest', value: latestDate(rows), size: 'md' },
           {
             key: 'parameters',
             value: rows && count(new Set(rows.map((row) => row.RecordType)).size),
@@ -476,7 +478,7 @@ async function getRouteFigures(route: SeoSummaryRoute, locale: string): Promise<
           { key: 'records', value: rows && count(rows.length) },
           { key: 'totalEth', value: rows && eth(sumAmountEth(rows)) },
           { key: 'share', value: formatPercent(share, locale), hasTooltip: true },
-          { key: 'latest', value: latestDate(rows) },
+          { key: 'latest', value: latestDate(rows), size: 'md' },
         ],
       };
     }
@@ -511,7 +513,7 @@ async function getRouteFigures(route: SeoSummaryRoute, locale: string): Promise<
         figures: [
           { key: 'records', value: rows && count(rows.length) },
           { key: 'totalEth', value: rows && eth(sumAmountEth(rows)) },
-          { key: 'latest', value: latestDate(rows) },
+          { key: 'latest', value: latestDate(rows), size: 'md' },
           {
             key: 'beneficiary',
             value:
@@ -580,6 +582,7 @@ export async function PublicDataRouteSeoSummary({
           figure.value
         ),
       info: figure.hasTooltip ? t(`${prefix}.cards.${figure.key}.tooltip`) : undefined,
+      size: figure.size,
     };
   });
 

@@ -55,7 +55,8 @@
       "total": "获配 CST",
       "allocations": "分配笔数",
       "first": "首笔分配",
-      "latest": "最近一笔分配"
+      "latest": "最近一笔分配",
+      "allocated": "分配时间"
     },
     "emptyDescription": "推广团队向此地址发出 CST 后，分配会显示在这里。",
     "invalidAddress": {

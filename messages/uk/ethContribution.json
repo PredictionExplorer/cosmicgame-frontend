@@ -29,10 +29,6 @@
     "invalidId": "Недійсний ідентифікатор внеску",
     "title": "Внесок №{id}",
     "breadcrumbContributions": "Внески ETH",
-    "datetimeLabel": "Дата й час",
-    "contributorAddressLabel": "Адреса автора внеску",
-    "cycleNumberLabel": "Цикл",
-    "cycleValue": "Цикл {cycle}",
     "lede": "Прямий внесок ETH до резерву циклу {cycle}.",
     "figures": {
       "amount": "Сума",

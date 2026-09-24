@@ -13,7 +13,8 @@
     "figures": {
       "changes": "변경 횟수",
       "first": "첫 변경",
-      "latest": "최근 변경"
+      "latest": "최근 변경",
+      "changed": "변경 일시"
     },
     "allChanges": "전체 조율 변경 내역",
     "loadError": "구성 변경 내역을 불러오지 못했습니다.",

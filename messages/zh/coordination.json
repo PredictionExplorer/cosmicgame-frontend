@@ -13,7 +13,8 @@
     "figures": {
       "changes": "变更数",
       "first": "首次变更",
-      "latest": "最近变更"
+      "latest": "最近变更",
+      "changed": "变更时间"
     },
     "allChanges": "全部协调变更",
     "loadError": "未能加载配置变更。",

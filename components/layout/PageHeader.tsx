@@ -28,6 +28,12 @@ export interface PageHeaderFigure {
   info?: string;
   /** A visible qualifier under the value. */
   caption?: ReactNode;
+  /**
+   * `md` keeps a long value — a date, an address — at the figure-md size on
+   * wide screens too, where counts and amounts step up to figure-lg: a
+   * timestamp set at 32px outweighs the figures it dates.
+   */
+  size?: 'md';
 }
 
 /** A related page, rendered as a quiet chip under the header. */
@@ -428,7 +434,8 @@ export function PageHeaderFigures({
           {/* A date may wrap in a narrow column rather than overflow it. */}
           <dd
             className={cn(
-              'mt-1 type-figure-md text-foreground [&_time]:whitespace-normal lg:type-figure-lg',
+              'mt-1 type-figure-md text-foreground [&_time]:whitespace-normal',
+              figure.size !== 'md' && 'lg:type-figure-lg',
               rows && 'max-sm:mt-0 max-sm:text-right',
             )}
           >

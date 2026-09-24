@@ -55,7 +55,8 @@
       "total": "받은 CST",
       "allocations": "배분 건수",
       "first": "첫 배분",
-      "latest": "최근 배분"
+      "latest": "최근 배분",
+      "allocated": "배분 일시"
     },
     "emptyDescription": "홍보 팀이 이 주소로 CST를 보내면 배분이 여기에 표시됩니다.",
     "invalidAddress": {

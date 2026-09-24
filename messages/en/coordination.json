@@ -13,7 +13,8 @@
     "figures": {
       "changes": "Changes",
       "first": "First change",
-      "latest": "Latest change"
+      "latest": "Latest change",
+      "changed": "Changed"
     },
     "allChanges": "All coordination changes",
     "loadError": "The configuration changes could not be loaded.",

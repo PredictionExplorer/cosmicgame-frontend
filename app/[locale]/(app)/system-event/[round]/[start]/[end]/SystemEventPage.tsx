@@ -101,18 +101,28 @@ const SystemEventPage = (props: SystemEventPageProps) => {
       value: ready ? formatCount(rows.length, locale) : pending,
     },
   ];
-  // Dates only when there is something to date.
-  if (!ready || span) {
+  // Dates only when there is something to date, once each: a window whose
+  // changes share one moment gets a single date. They stay at figure-md.
+  if (span && span.first === span.latest) {
+    figures.push({
+      id: 'changed',
+      label: t('systemEvent.figures.changed'),
+      value: <DateTime timestamp={span.first} year="always" />,
+      size: 'md',
+    });
+  } else if (!ready || span) {
     figures.push(
       {
         id: 'first',
         label: t('systemEvent.figures.first'),
         value: span ? <DateTime timestamp={span.first} year="always" /> : pending,
+        size: 'md',
       },
       {
         id: 'latest',
         label: t('systemEvent.figures.latest'),
         value: span ? <DateTime timestamp={span.latest} year="always" /> : pending,
+        size: 'md',
       },
     );
   }

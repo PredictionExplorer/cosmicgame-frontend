@@ -29,10 +29,6 @@
     "invalidId": "Mã đóng góp không hợp lệ",
     "title": "Đóng góp #{id}",
     "breadcrumbContributions": "Đóng góp ETH",
-    "datetimeLabel": "Ngày giờ",
-    "contributorAddressLabel": "Địa chỉ người đóng góp",
-    "cycleNumberLabel": "Chu kỳ",
-    "cycleValue": "Chu kỳ {cycle}",
     "lede": "Khoản đóng góp ETH trực tiếp vào dự trữ chu kỳ của chu kỳ {cycle}.",
     "figures": {
       "amount": "Số lượng",

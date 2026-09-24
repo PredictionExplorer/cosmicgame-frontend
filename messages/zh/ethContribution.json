@@ -29,10 +29,6 @@
     "invalidId": "贡献 ID 无效",
     "title": "贡献 #{id}",
     "breadcrumbContributions": "ETH 贡献",
-    "datetimeLabel": "日期和时间",
-    "contributorAddressLabel": "贡献者地址",
-    "cycleNumberLabel": "周期",
-    "cycleValue": "第 {cycle} 个周期",
     "lede": "向第 {cycle} 个周期的周期储备直接贡献的 ETH。",
     "figures": {
       "amount": "数量",

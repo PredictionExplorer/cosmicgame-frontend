@@ -13,7 +13,8 @@
     "figures": {
       "changes": "Số thay đổi",
       "first": "Thay đổi đầu tiên",
-      "latest": "Thay đổi gần nhất"
+      "latest": "Thay đổi gần nhất",
+      "changed": "Thời điểm thay đổi"
     },
     "allChanges": "Tất cả thay đổi điều phối",
     "loadError": "Không tải được các thay đổi cấu hình.",

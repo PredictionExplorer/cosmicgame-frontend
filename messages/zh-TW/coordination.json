@@ -13,7 +13,8 @@
     "figures": {
       "changes": "變更數",
       "first": "首次變更",
-      "latest": "最近變更"
+      "latest": "最近變更",
+      "changed": "變更時間"
     },
     "allChanges": "全部協調變更",
     "loadError": "未能載入設定變更。",

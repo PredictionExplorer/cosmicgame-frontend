@@ -56,11 +56,32 @@ describe('EthDonationDetailPage', () => {
       'ethContribution.detail.title(id=7)',
     );
     expect(document.querySelector('[data-figure="amount"]')).toHaveTextContent('20.0000 ETH');
-    expect(document.querySelector('[data-figure="from"]')).toHaveTextContent('0x4D39');
-    expect(
-      screen.getByRole('link', { name: 'ethContribution.detail.cycleValue(cycle=3)' }),
-    ).toHaveAttribute('href', '/eth-contribution/round/3');
+    const from = document.querySelector('[data-figure="from"]');
+    expect(from).toHaveTextContent('0x4D39');
+    // The contributor sits in the figure's type, not in a 12px chip.
+    expect(from?.querySelector('.text-xs')).toBeNull();
+    const cycle = screen.getByRole('link', { name: '3' });
+    expect(cycle).toHaveAttribute('href', '/eth-contribution/round/3');
+    expect(cycle).toHaveAttribute('title', 'ethContribution.detail.cycleLink(cycle=3)');
     expect(document.querySelector('[data-figure="date"] time')).toBeInTheDocument();
+    for (const id of ['from', 'date']) {
+      expect(document.querySelector(`[data-figure="${id}"] dd`)).not.toHaveClass(
+        'lg:type-figure-lg',
+      );
+    }
+  });
+
+  it('says each fact once: the record holds only the transaction and its id', () => {
+    withRecord(DONATION);
+    render(<EthDonationDetailPage id={7} />);
+
+    const record = screen
+      .getByRole('heading', { name: 'ethContribution.detail.recordTitle' })
+      .closest('section') as HTMLElement;
+    expect(record.querySelectorAll('dt')).toHaveLength(2);
+    expect(record.querySelector('time')).toBeNull();
+    expect(record).not.toHaveTextContent('0x4D39');
+    expect(document.querySelectorAll('a[href="/eth-contribution/round/3"]')).toHaveLength(1);
   });
 
   it("shows the contributor's note as a quote with its link, never fetching it", () => {

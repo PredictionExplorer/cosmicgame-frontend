@@ -29,10 +29,6 @@
     "invalidId": "Invalid contribution id",
     "title": "Contribution #{id}",
     "breadcrumbContributions": "Direct ETH contributions",
-    "datetimeLabel": "Date and time",
-    "contributorAddressLabel": "Contributor address",
-    "cycleNumberLabel": "Cycle",
-    "cycleValue": "Cycle {cycle}",
     "lede": "A direct ETH contribution to the Cycle Reserve of cycle {cycle}.",
     "figures": {
       "amount": "Amount",
