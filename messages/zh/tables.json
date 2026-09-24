@@ -7,6 +7,7 @@
     "recipientCyclesTitle": "暂无获配者",
     "recipientCyclesDescription": "尚无已收官的演绎周期。",
     "allocations": "暂无分配。",
+    "outreachAllocations": "暂无推广储备分配",
     "anchorActions": "暂无锚定操作。",
     "anchorHolders": "暂无锚定者。",
     "anchoredTokens": "暂无已锚定代币。",
@@ -16,6 +17,7 @@
     "stellarSelection": "暂无星选分配。",
     "tokens": "暂无代币。",
     "holders": "暂无持有者。",
+    "stellarEntries": "暂无星选资格",
     "spenders": "暂无 ETH 支出记录。",
     "enduranceChampions": "暂无坚守冠军。",
     "attachedNfts": "暂无已附加 NFT。",
@@ -71,7 +73,6 @@
   "status": {
     "loading": "加载中…",
     "live": "实时",
-    "you": "（你）",
     "youBadge": "你",
     "yes": "是",
     "no": "否",
@@ -80,7 +81,8 @@
     "unavailable": "暂不可用",
     "undefined": "未定义",
     "deployment": "部署",
-    "currentlyActive": "当前启用"
+    "currentlyActive": "当前启用",
+    "you": "（你）"
   },
   "columns": {
     "cycle": "周期",
@@ -128,6 +130,8 @@
     "event": "事件",
     "newValue": "新值",
     "recordType": "记录类型",
+    "source": "来源",
+    "received": "获配",
     "position": "位置",
     "note": "备注",
     "userAddress": "用户地址",
@@ -148,8 +152,31 @@
     "actions": "操作",
     "selected": "已选择"
   },
+  "names": {
+    "participants": "独立参与者",
+    "recipients": "独立获配者",
+    "ethContributors": "独立 ETH 贡献者",
+    "cstAnchorHolders": "Cosmic Signature NFT 锚定者",
+    "rwlkAnchorHolders": "Random Walk NFT 锚定者",
+    "publicGoodsContributions": "公共物品资助记录",
+    "publicGoodsRetrievals": "公共物品取回记录",
+    "outreachAllocations": "推广储备分配记录",
+    "parameterChanges": "参数变更记录",
+    "cycleActivations": "周期启用记录",
+    "nameHistory": "命名历史",
+    "transfers": "转移记录",
+    "anchorDistribution": "锚定派发获配者",
+    "ethContributions": "ETH 贡献",
+    "allocationRecords": "分配记录",
+    "allocationsByRecipient": "按获配者汇总的分配",
+    "ethSpent": "各参与者的 ETH 支出",
+    "stellarSelectionEntries": "星选资格",
+    "enduranceChampions": "坚守冠军",
+    "gestureMessages": "落笔留言"
+  },
   "pagination": {
     "label": "分页导航",
+    "range": "第 {from} 至 {to} 条，共 {total} 条",
     "goToPage": "转到页码：",
     "goToPageAria": "转到页码",
     "previous": "上一页",
@@ -158,14 +185,18 @@
     "nextAria": "转到下一页",
     "morePages": "更多页面"
   },
-  "density": {
-    "groupLabel": "表格密度",
-    "comfortable": "舒适",
-    "compact": "紧凑",
-    "comfortableAria": "将表格密度设为舒适",
-    "compactAria": "将表格密度设为紧凑",
-    "comfortableHelp": "加高表格行并增大间距，便于浏览。",
-    "compactHelp": "减小表格行高，以便在屏幕上显示更多分配记录。"
+  "currentRow": {
+    "position": "第 {rank} 位，共 {total} 位",
+    "show": "查看我的位置"
+  },
+  "proof": {
+    "transactionNewTab": "区块浏览器中的交易，在新标签页中打开"
+  },
+  "links": {
+    "newTab": "在新标签页中打开"
+  },
+  "details": {
+    "header": "详情"
   },
   "skeleton": {
     "loadingText": "正在加载文本",
@@ -178,38 +209,61 @@
     "explainColumn": "说明“{column}”列"
   },
   "adminEvents": {
-    "empty": "暂无事件。"
+    "empty": "此期间没有记录到配置变更"
   },
   "allocation": {
     "cycle": "第 {cycle} 个周期",
-    "cycleAria": "第 {cycle} 个周期分配摘要",
     "openDetails": "打开第 {cycle} 个周期的分配明细。",
     "allocationHelp": "这一周期的签名分配金额与获配钱包。",
+    "gestures": "落笔",
+    "gesturesHelp": "这一周期的落笔总次数。",
+    "nftsHelp": "这一周期内随落笔附加的 NFT 数量。",
+    "stellarHelp": "分配至星选池的 ETH。",
+    "anchorHelp": "分配至锚定派发的 ETH。",
+    "distributedHelp": "通过星选发放的 Cosmic Signature NFT 数量。",
+    "listAria": "按周期排列的获配者列表",
+    "columns": {
+      "finalized": "收官时间",
+      "signatureEth": "签名分配（ETH）",
+      "chronoEth": "时之勇士（ETH）",
+      "stellarEth": "星选（ETH）",
+      "anchorEth": "锚定派发（ETH）",
+      "nftsAttached": "附加 NFT",
+      "nftsViaStellar": "星选 NFT"
+    },
+    "cycleAria": "第 {cycle} 个周期分配摘要",
     "explore": "查看",
     "exploreAria": "查看第 {cycle} 个周期",
     "exploreHelp": "查看第 {cycle} 个周期的获配者、存入和分配明细。",
-    "gestures": "落笔",
-    "gesturesHelp": "这一周期的落笔总次数。",
     "nfts": "NFT",
-    "nftsHelp": "这一周期内随落笔附加的 NFT 数量。",
     "stellar": "星选",
-    "stellarHelp": "分配至星选池的 ETH。",
     "anchor": "锚定",
-    "anchorHelp": "分配至锚定派发的 ETH。",
     "distributed": "已发放",
-    "distributedHelp": "通过星选发放的 Cosmic Signature NFT 数量。",
-    "loadingAria": "正在加载周期分配",
-    "listAria": "按周期排列的获配者列表"
+    "loadingAria": "正在加载周期分配"
   },
   "anchoringRecipient": {
+    "emptyTitle": "本周期没有锚定的 NFT",
     "empty": "周期收官时没有已锚定的 Cosmic Signature NFT，该周期的锚定派发份额留在周期储备中。"
+  },
+  "publicGoods": {
+    "voluntaryEmpty": "直接转入公共物品金库的资助会显示在这里，由金库为当前配置的公共物品受益方保管。"
   },
   "banGesture": {
     "banned": "落笔已禁用。",
     "unbanned": "已解除落笔禁用。",
     "error": "操作失败，请重试。",
     "ban": "禁用",
-    "unban": "解除禁用"
+    "unban": "解除禁用",
+    "visibilityLabel": "显示留言",
+    "hiddenTag": "已隐藏",
+    "allCycles": "全部周期",
+    "search": "搜索留言",
+    "noMatches": "没有符合筛选条件的留言",
+    "filters": {
+      "all": "全部",
+      "visible": "可见",
+      "hidden": "已隐藏"
+    }
   },
   "ethContribution": {
     "withInfo": "附带信息的贡献",
@@ -236,6 +290,31 @@
     "removed": "代币名称已移除。"
   },
   "recipientHistory": {
+    "sources": {
+      "signature": "签名分配",
+      "finalCstGesture": "CST 收官之笔",
+      "enduranceChampion": "坚守冠军",
+      "chronoWarrior": "时之勇士",
+      "stellarSelection": "星选",
+      "anchoredStellarSelection": "锚定 NFT 星选",
+      "anchorDistribution": "锚定派发",
+      "attachedNftTimeout": "附加 NFT（超时取回）",
+      "attachedErc20Timeout": "附加 ERC-20（超时取回）",
+      "stellarEthTimeout": "ETH 星选（超时取回）"
+    },
+    "nft": "NFT #{id}",
+    "readyToRetrieve": "可取回",
+    "retrieve": "取回",
+    "retrieved": "已取回",
+    "allAnchorHolders": "全部 Cosmic Signature NFT 锚定者",
+    "showRecords": "{count, plural, other {查看 # 条记录}}",
+    "hideRecords": "收起记录",
+    "totals": {
+      "eth": "获配 ETH",
+      "cst": "获配 CST",
+      "nfts": "获配 NFT",
+      "cycles": "周期数"
+    },
     "notApplicable": "不适用",
     "unretrievedHelp": "尚未取回，请前往“待取回分配”页面操作。",
     "unretrievedAria": "未取回分配说明",
@@ -323,18 +402,8 @@
     "printWindow": "时段：{duration}",
     "printReign": "在位：{duration}"
   },
-  "stellarSelection": {
-    "ethDeposit": "ETH 存入",
-    "anchoredNft": "通过锚定 NFT 星选获配的 Cosmic Signature NFT",
-    "signatureNftSelection": "Cosmic Signature NFT 星选",
-    "signatureNft": "Cosmic Signature NFT"
-  },
   "systemModes": {
     "viewEvent": "查看{scope}的系统事件"
-  },
-  "transferHistory": {
-    "signatureAnchoringWallet": "Cosmic Signature NFT 锚定钱包",
-    "randomWalkAnchoringWallet": "Random Walk NFT 锚定钱包"
   },
   "uniqueAnchorHolders": {
     "numAnchorActions": "锚定次数",
@@ -386,5 +455,24 @@
     "systemEnded": "下一系统事件取代此事件的时间。",
     "attachedNftContractAddress": "随落笔附加的代币所属 ERC-721 合约地址。",
     "attachedNftCount": "此合约中已随落笔附加的 NFT 数量。"
+  },
+  "density": {
+    "groupLabel": "表格密度",
+    "comfortable": "舒适",
+    "compact": "紧凑",
+    "comfortableAria": "将表格密度设为舒适",
+    "compactAria": "将表格密度设为紧凑",
+    "comfortableHelp": "加高表格行并增大间距，便于浏览。",
+    "compactHelp": "减小表格行高，以便在屏幕上显示更多分配记录。"
+  },
+  "stellarSelection": {
+    "ethDeposit": "ETH 存入",
+    "anchoredNft": "通过锚定 NFT 星选获配的 Cosmic Signature NFT",
+    "signatureNftSelection": "Cosmic Signature NFT 星选",
+    "signatureNft": "Cosmic Signature NFT"
+  },
+  "transferHistory": {
+    "signatureAnchoringWallet": "Cosmic Signature NFT 锚定钱包",
+    "randomWalkAnchoringWallet": "Random Walk NFT 锚定钱包"
   }
 }

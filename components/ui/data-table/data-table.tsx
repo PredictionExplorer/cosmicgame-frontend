@@ -1,0 +1,827 @@
+'use client';
+
+import * as React from 'react';
+import { ArrowDown, ArrowUp, ChevronDown } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
+
+import { cn } from '@/lib/utils';
+import { TOUCH_TARGET_EXTENDED_CLASS } from '@/lib/touch-target';
+import { formatCount, type AmountUnit } from '@/utils/format';
+import { Link, useRouter } from '@/i18n/navigation';
+import { TimeZoneNote } from '@/components/ui/date-time';
+import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
+import { TablePagination, pageCountFor } from '@/components/ui/pagination';
+import {
+  ResponsiveTable,
+  ResponsiveTableBody,
+  ResponsiveTableCell,
+  ResponsiveTableContainer,
+  ResponsiveTableHead,
+  ResponsiveTableHeadCell,
+  ResponsiveTableRow,
+  TABLE_LINK_CLASS,
+  logicalAlign,
+  type ColumnAlign,
+  type ColumnPriority,
+  type LogicalAlign,
+  type TableLayout,
+} from '@/components/ui/responsive-table';
+import { Skeleton } from '@/components/ui/skeleton';
+
+import { YouBadge } from './cells';
+import {
+  COLUMN_KINDS,
+  compareRows,
+  isBlankValue,
+  type ColumnKind,
+  type SortDirection,
+  type SortValue,
+} from './column-kinds';
+import { KindValue, blankShowsUnknown } from './kind-value';
+import { useTablePageSize } from './use-page-size';
+
+export type { SortDirection, SortValue };
+
+/** What a custom `cell` renderer receives besides the row. */
+export interface DataTableCellContext {
+  /** The row's position in the sorted rows, across all pages (0-based). */
+  index: number;
+  /** What the column's `value` returned for the row. */
+  value: SortValue;
+  /** Whether the row belongs to the connected wallet (`isCurrentRow`). */
+  isCurrent: boolean;
+}
+
+/**
+ * One column. Most columns need only `id`, `header`, `kind` and `value`: the
+ * kind supplies the alignment, wrapping, figure style, renderer and sort
+ * order (see `COLUMN_KINDS`). `cell` replaces the renderer when a value needs
+ * more than its kind gives it; `value` still drives sorting and emptiness.
+ */
+export interface DataTableColumn<T> {
+  /** Stable id, for sorting and React keys. */
+  id: string;
+  /** Header content. */
+  header: React.ReactNode;
+  /**
+   * The column name as plain text: the label beside each value in a phone
+   * record. Required when `header` is not a string.
+   */
+  label?: string;
+  /** What the column holds. Default `text`. */
+  kind?: ColumnKind;
+  /** The raw value: what the kind renders, what sorts, and what counts as empty. */
+  value?: (row: T) => SortValue;
+  /** Custom renderer, replacing the kind's. */
+  cell?: (row: T, context: DataTableCellContext) => React.ReactNode;
+  /** A one-sentence explanation, shown from an info button beside the header. */
+  help?: string;
+  /** Let readers sort by this column from its header. */
+  sortable?: boolean;
+  /** Custom ascending comparator; defaults to comparing `value`. */
+  compare?: (a: T, b: T) => number;
+
+  /** `amount`: the unit. Default `ETH`. */
+  unit?: AmountUnit;
+  /** `amount`: print the unit. Default `true`; pass `false` under a header that names it. */
+  showUnit?: boolean;
+  /** `percent`: `percent` (default) reads 12.5 as 12.5%, `ratio` reads 0.125 as 12.5%. */
+  percentScale?: 'percent' | 'ratio';
+  /** `datetime`: show seconds. */
+  seconds?: boolean;
+  /** `datetime`: the year rule. Default `auto` (only when it is not this year). */
+  year?: 'auto' | 'always' | 'never';
+  /** `datetime`: the transaction the date proves; links the date to the explorer. */
+  txHash?: (row: T) => string | null | undefined;
+  /**
+   * `link`, `address`, `datetime`: the internal destination. For `address` it
+   * defaults to `/user/<address>`; return `null` for an address that should
+   * not link.
+   */
+  href?: (row: T) => string | null | undefined;
+  /** `address`: show the copy button. Default `false` in tables. */
+  copy?: boolean;
+  /** `address`: the zero address's role in a transfer (imprinted / consumed). */
+  zeroRole?: 'from' | 'to';
+  /** `address`: the address the page is about, which reads "This address". */
+  currentAddress?: string | null;
+  /**
+   * What a blank value shows: `empty` (not applicable) or `unknown` (a dash
+   * that is announced as unavailable). Numeric kinds default to `unknown`.
+   */
+  whenBlank?: 'empty' | 'unknown';
+  /** What a blank value's dash says to a screen reader ("None"). Default "Unavailable". */
+  blankLabel?: string;
+
+  /** `secondary`: dropped from phone records. */
+  priority?: ColumnPriority;
+  /** In a phone record, put the value under its label (long text). */
+  stack?: boolean;
+  /** Drop the column when no row has a value, instead of showing an empty column. */
+  hideWhenEmpty?: boolean;
+  /** Overrides the kind's alignment. Rarely right: headers follow it too. */
+  align?: ColumnAlign;
+  /** Overrides the kind's wrapping: `true` keeps a short label ("Cycle 12") on one line. */
+  nowrap?: boolean;
+  /** CSS width of the column (`'8rem'`, `'20%'`). */
+  width?: string;
+  headerClassName?: string;
+  cellClassName?: string;
+
+  /** @deprecated Use `value`. */
+  accessor?: (row: T) => SortValue;
+  /** @deprecated Use `cell`. */
+  render?: (row: T, index: number) => React.ReactNode;
+  /** @deprecated Use `help`. */
+  tooltip?: string;
+  /** @deprecated Use `priority: 'secondary'`. */
+  hideOnMobile?: boolean;
+}
+
+export interface DataTableProps<T> {
+  data: readonly T[];
+  columns: readonly DataTableColumn<T>[];
+  /**
+   * The table's accessible name. With `title` the visible heading names the
+   * table and this names its scroll region.
+   */
+  ariaLabel: string;
+  /** A visible heading above the table, which also names it. */
+  title?: React.ReactNode;
+  /** The heading's level in the page outline. Default 2. */
+  headingLevel?: 2 | 3 | 4;
+  /** A line under the title. */
+  description?: React.ReactNode;
+  /** Controls at the end of the title row (a filter, a link). */
+  actions?: React.ReactNode;
+  /** A bar between the title and the table (filters). */
+  toolbar?: React.ReactNode;
+
+  /** Stable key per row. Defaults to the index, which re-mounts rows on sort. */
+  getRowKey?: (row: T, index: number) => React.Key;
+  /**
+   * Where the row leads. The first column's content becomes a real link (the
+   * keyboard and screen-reader entry point) and a click anywhere else on the
+   * row follows it too. Return `null` for a row without a destination.
+   */
+  getRowHref?: (row: T, index: number) => string | null | undefined;
+  /** Accessible name of the row link, when the first cell alone is ambiguous. */
+  getRowLabel?: (row: T, index: number) => string;
+  /** The column that carries the row link and the "You" tag. Default: the first. */
+  rowLinkColumn?: string;
+  /** @deprecated Pass `getRowHref`, which keyboard users can reach too. */
+  onRowClick?: (row: T, index: number) => void;
+  /** Extra classes per row (a hidden, muted row). */
+  rowClassName?: (row: T) => string | undefined;
+
+  /**
+   * The connected wallet's row. It stays in its place in the order, marked
+   * with an accent rule and a "You" tag, and a line above the table gives
+   * its position with a way to jump to its page.
+   */
+  isCurrentRow?: (row: T) => boolean;
+  /** Extra figures for that line ("12 gestures"). */
+  currentRowSummary?: (row: T) => React.ReactNode;
+
+  /**
+   * Content a row can expand to show under itself (the records a summary row
+   * stands for). Adds a disclosure button at the row's end; return `null`
+   * for a row with nothing to expand.
+   */
+  renderDetails?: (row: T) => React.ReactNode;
+  /** The disclosure button's text for a row, expanded or not. */
+  detailsLabel?: (row: T, expanded: boolean) => string;
+
+  loading?: boolean;
+  /** Placeholder rows while loading. Default 5. */
+  skeletonRows?: number;
+  /** A load failure: the message under the error title. */
+  error?: React.ReactNode;
+  errorTitle?: string;
+  onRetry?: () => void;
+  emptyTitle?: string;
+  emptyDescription?: string;
+  emptyAction?: React.ReactNode;
+  emptyIcon?: React.ReactNode;
+
+  /** The order before anyone sorts. Without it, rows keep the order given. */
+  initialSort?: { id: string; direction: SortDirection };
+  /**
+   * Rows per page. Default 20, or 10 on a phone.
+   * `Infinity` shows every row.
+   */
+  pageSize?: number;
+  /** Controlled page (1-based), with `onPageChange`. */
+  page?: number;
+  onPageChange?: (page: number) => void;
+  /** Changing this value returns the table to page 1 (a new filter, a new search). */
+  resetPageKey?: unknown;
+
+  /**
+   * Phone layout. `auto` (default) keeps a real table for three columns or
+   * fewer and turns longer rows into records.
+   */
+  layout?: 'auto' | TableLayout;
+  /** Row height: `comfortable` 48px (default) or `compact` 40px. */
+  density?: 'comfortable' | 'compact';
+  /** Classes on the outer wrapper. */
+  className?: string;
+  /** Classes on the `<table>` (a `min-width` for a wide ledger). */
+  tableClassName?: string;
+  /** @deprecated Density is set by `density`; there is no reader toggle any more. */
+  densityStorageKey?: string | null;
+}
+
+interface ResolvedColumn<T> {
+  column: DataTableColumn<T>;
+  label: string;
+  kind: ColumnKind;
+  align: LogicalAlign;
+  numeric: boolean;
+  nowrap: boolean;
+  priority: ColumnPriority;
+  help?: string;
+  valueOf: (row: T) => SortValue;
+  hasValue: boolean;
+}
+
+function resolveColumn<T>(column: DataTableColumn<T>): ResolvedColumn<T> {
+  const kind = column.kind ?? 'text';
+  const spec = COLUMN_KINDS[kind];
+  const accessor = column.value ?? column.accessor;
+  return {
+    column,
+    label: column.label ?? (typeof column.header === 'string' ? column.header : column.id),
+    kind,
+    align: column.align ? logicalAlign(column.align) : spec.align,
+    numeric: spec.numeric,
+    nowrap: column.nowrap ?? spec.nowrap,
+    priority: column.priority ?? (column.hideOnMobile ? 'secondary' : 'primary'),
+    help: column.help ?? column.tooltip,
+    valueOf: accessor ?? (() => undefined),
+    hasValue: Boolean(accessor),
+  };
+}
+
+const HEADING_CLASS: Record<2 | 3 | 4, string> = {
+  2: 'type-section',
+  3: 'type-heading-3',
+  4: 'type-title',
+};
+
+/** Placeholder widths per kind, so the skeleton has the finished table's rhythm. */
+const SKELETON_WIDTH: Record<ColumnKind, string> = {
+  text: 'w-3/4',
+  link: 'w-16',
+  address: 'w-24',
+  datetime: 'w-28',
+  amount: 'w-16',
+  count: 'w-8',
+  percent: 'w-10',
+  duration: 'w-20',
+  status: 'w-6',
+};
+
+function prefersReducedMotion(): boolean {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return true;
+  return (
+    document.documentElement.dataset.motion === 'reduced' ||
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+}
+
+/**
+ * DataTable: the one table. Pass `columns` with a `kind` each and `data`; the
+ * table handles alignment, formatting, sorting (with `aria-sort`),
+ * pagination, loading rows, the empty and error states, the connected
+ * wallet's row and the phone layout.
+ */
+export function DataTable<T>({
+  data,
+  columns,
+  ariaLabel,
+  title,
+  headingLevel = 2,
+  description,
+  actions,
+  toolbar,
+  getRowKey,
+  getRowHref,
+  getRowLabel,
+  rowLinkColumn,
+  onRowClick,
+  rowClassName,
+  isCurrentRow,
+  currentRowSummary,
+  renderDetails,
+  detailsLabel,
+  loading = false,
+  skeletonRows = 5,
+  error,
+  errorTitle,
+  onRetry,
+  emptyTitle,
+  emptyDescription,
+  emptyAction,
+  emptyIcon,
+  initialSort,
+  pageSize: pageSizeProp,
+  page: controlledPage,
+  onPageChange,
+  resetPageKey,
+  layout: layoutProp = 'auto',
+  density = 'comfortable',
+  className,
+  tableClassName,
+}: DataTableProps<T>) {
+  const t = useTranslations('tables');
+  const locale = useLocale();
+  const router = useRouter();
+  const headingId = React.useId();
+  const wrapperRef = React.useRef<HTMLDivElement>(null);
+
+  const resolved = React.useMemo(() => columns.map(resolveColumn), [columns]);
+  const visible = React.useMemo(
+    () =>
+      resolved.filter(
+        (col) =>
+          !col.column.hideWhenEmpty ||
+          !col.hasValue ||
+          data.some((row) => !isBlankValue(col.valueOf(row))),
+      ),
+    [resolved, data],
+  );
+
+  const layout: TableLayout =
+    layoutProp === 'auto'
+      ? visible.length <= 3 && !visible.some((col) => col.column.stack)
+        ? 'compact'
+        : 'cards'
+      : layoutProp;
+  const autoPageSize = useTablePageSize();
+  const pageSize = pageSizeProp ?? autoPageSize;
+
+  // ── Sorting ───────────────────────────────────────────────────────────
+  const [sort, setSort] = React.useState<{ id: string; direction: SortDirection } | null>(
+    initialSort ?? null,
+  );
+
+  const sorted = React.useMemo(() => {
+    const active = sort ? resolved.find((col) => col.column.id === sort.id) : undefined;
+    if (!sort || !active) return data;
+    const { compare } = active.column;
+    const indexed = data.map((row, index) => ({ row, index }));
+    indexed.sort((a, b) => {
+      const order = compare
+        ? (sort.direction === 'asc' ? 1 : -1) * compare(a.row, b.row)
+        : compareRows(active.valueOf(a.row), active.valueOf(b.row), sort.direction);
+      // Ties keep their given order, so a sort never shuffles equal rows.
+      return order || a.index - b.index;
+    });
+    return indexed.map(({ row }) => row);
+  }, [data, resolved, sort]);
+
+  // ── Paging ────────────────────────────────────────────────────────────
+  // The page is remembered together with the key it was chosen under, so a
+  // new `resetPageKey` (a filter) or sort order starts again from page 1
+  // without an effect.
+  const sortKey = sort ? `${sort.id}:${sort.direction}` : '';
+  const [pageState, setPageState] = React.useState({ page: 1, key: resetPageKey, sortKey });
+  const uncontrolledPage =
+    pageState.key === resetPageKey && pageState.sortKey === sortKey ? pageState.page : 1;
+  const paginate = Number.isFinite(pageSize) && pageSize > 0;
+  const pageCount = paginate ? pageCountFor(sorted.length, pageSize) : 1;
+  const page = Math.min(Math.max(controlledPage ?? uncontrolledPage, 1), pageCount);
+  const pageRows = paginate ? sorted.slice((page - 1) * pageSize, page * pageSize) : sorted;
+  const pageOffset = paginate ? (page - 1) * pageSize : 0;
+
+  const goToPage = (next: number) => {
+    setPageState({ page: next, key: resetPageKey, sortKey });
+    onPageChange?.(next);
+    // Keep the reader at the top of the new page when they paged from the
+    // bottom of a long table.
+    const wrapper = wrapperRef.current;
+    if (!wrapper || typeof window === 'undefined') return;
+    window.requestAnimationFrame(() => {
+      if (wrapper.getBoundingClientRect().top < 0) {
+        wrapper.scrollIntoView({
+          block: 'start',
+          behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+        });
+      }
+    });
+  };
+
+  const toggleSort = (col: ResolvedColumn<T>) => {
+    const first = COLUMN_KINDS[col.kind].firstDirection;
+    setSort((current) => {
+      if (!current || current.id !== col.column.id) return { id: col.column.id, direction: first };
+      if (current.direction === first) {
+        return { id: col.column.id, direction: first === 'asc' ? 'desc' : 'asc' };
+      }
+      // A third click returns to the table's own order.
+      return initialSort ?? null;
+    });
+  };
+
+  // ── Expanded details ──────────────────────────────────────────────────
+  const [expanded, setExpanded] = React.useState<ReadonlySet<React.Key>>(() => new Set());
+
+  // ── The connected wallet's row ────────────────────────────────────────
+  const currentIndex = isCurrentRow ? sorted.findIndex((row) => isCurrentRow(row)) : -1;
+  const currentRow = currentIndex >= 0 ? sorted[currentIndex] : undefined;
+  const currentPage = currentIndex >= 0 && paginate ? Math.floor(currentIndex / pageSize) + 1 : 1;
+
+  const linkColumnId = rowLinkColumn ?? visible[0]?.column.id;
+  const hasDatetime = visible.some((col) => col.kind === 'datetime');
+  const cellPadding = density === 'compact' ? 'py-2.5' : 'py-3';
+  const Heading = `h${headingLevel}` as const;
+  const columnCount = visible.length + (renderDetails ? 1 : 0);
+
+  const toggleDetails = (key: React.Key) =>
+    setExpanded((current) => {
+      const next = new Set(current);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+
+  const header =
+    title || actions || description ? (
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+        <div className="min-w-0 space-y-1">
+          {title ? (
+            <Heading id={headingId} className={cn(HEADING_CLASS[headingLevel], 'text-foreground')}>
+              {title}
+            </Heading>
+          ) : null}
+          {description ? (
+            <p className="max-w-[var(--measure-lede)] type-body-sm text-muted-foreground">
+              {description}
+            </p>
+          ) : null}
+        </div>
+        {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}
+      </div>
+    ) : null;
+
+  if (error) {
+    return (
+      <div ref={wrapperRef} className={className}>
+        {header}
+        <ErrorState
+          title={errorTitle}
+          message={error}
+          onRetry={onRetry}
+          headingLevel={title ? (Math.min(headingLevel + 1, 4) as 3 | 4) : headingLevel}
+        />
+      </div>
+    );
+  }
+
+  if (!loading && data.length === 0) {
+    return (
+      <div ref={wrapperRef} className={className}>
+        {header}
+        {toolbar}
+        <EmptyState
+          icon={emptyIcon}
+          title={emptyTitle ?? t('empty.nothingHere')}
+          description={emptyDescription}
+          action={emptyAction}
+        />
+      </div>
+    );
+  }
+
+  const showSkeleton = loading && data.length === 0;
+
+  return (
+    <div
+      ref={wrapperRef}
+      data-slot="data-table"
+      className={cn('scroll-mt-[calc(var(--header-height,4.5rem)+1rem)]', className)}
+    >
+      {header}
+      {toolbar}
+
+      {currentRow !== undefined && !showSkeleton ? (
+        <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 type-body-sm">
+          <YouBadge />
+          <span className="tabular-nums text-muted-foreground">
+            {t('currentRow.position', {
+              rank: formatCount(currentIndex + 1, locale),
+              total: formatCount(sorted.length, locale),
+            })}
+          </span>
+          {currentRowSummary ? (
+            <span className="text-muted-foreground">{currentRowSummary(currentRow)}</span>
+          ) : null}
+          {currentPage !== page ? (
+            <button
+              type="button"
+              onClick={() => goToPage(currentPage)}
+              data-touch-target="extended"
+              className={cn(TABLE_LINK_CLASS, TOUCH_TARGET_EXTENDED_CLASS, 'type-body-sm')}
+            >
+              {t('currentRow.show')}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+
+      {showSkeleton ? (
+        <p role="status" className="sr-only">
+          {t('skeleton.loadingRows')}
+        </p>
+      ) : null}
+
+      <ResponsiveTableContainer label={ariaLabel}>
+        <ResponsiveTable
+          layout={layout}
+          aria-label={title ? undefined : ariaLabel}
+          aria-labelledby={title ? headingId : undefined}
+          aria-busy={loading || undefined}
+          className={tableClassName}
+        >
+          <ResponsiveTableHead>
+            <tr>
+              {visible.map((col) => (
+                <HeaderCell
+                  key={col.column.id}
+                  col={col}
+                  sort={sort}
+                  onSort={toggleSort}
+                  explainLabel={t('tableHeaderHelp.explainColumn', {
+                    column: typeof col.column.header === 'string' ? col.column.header : col.label,
+                  })}
+                />
+              ))}
+              {renderDetails ? (
+                <ResponsiveTableHeadCell align="end">
+                  <span className="sr-only">{t('details.header')}</span>
+                </ResponsiveTableHeadCell>
+              ) : null}
+            </tr>
+          </ResponsiveTableHead>
+          <ResponsiveTableBody>
+            {showSkeleton
+              ? Array.from({ length: skeletonRows }, (_, rowIndex) => (
+                  <tr key={rowIndex} aria-hidden="true">
+                    {visible.map((col) => (
+                      <ResponsiveTableCell
+                        key={col.column.id}
+                        label={col.label}
+                        align={col.align}
+                        priority={col.priority}
+                        className={cellPadding}
+                      >
+                        <Skeleton
+                          className={cn(
+                            'inline-block h-3.5 align-middle',
+                            SKELETON_WIDTH[col.kind],
+                          )}
+                        />
+                      </ResponsiveTableCell>
+                    ))}
+                    {renderDetails ? (
+                      <ResponsiveTableCell label={t('details.header')} className={cellPadding} />
+                    ) : null}
+                  </tr>
+                ))
+              : pageRows.map((row, pageIndex) => {
+                  const index = pageOffset + pageIndex;
+                  const key = getRowKey ? getRowKey(row, index) : index;
+                  const href = getRowHref?.(row, index) ?? null;
+                  const isCurrent = isCurrentRow?.(row) ?? false;
+                  const activate = href
+                    ? () => router.push(href)
+                    : onRowClick
+                      ? () => onRowClick(row, index)
+                      : undefined;
+                  const details = renderDetails?.(row) ?? null;
+                  const isExpanded = details !== null && expanded.has(key);
+                  const detailsId = `${headingId}-details-${String(key)}`;
+
+                  return (
+                    <React.Fragment key={key}>
+                      <ResponsiveTableRow
+                        onActivate={activate}
+                        current={isCurrent}
+                        data-expanded={isExpanded ? 'true' : undefined}
+                        className={rowClassName?.(row)}
+                      >
+                        {visible.map((col) => {
+                          const value = col.valueOf(row);
+                          let content = renderCell(col, row, { index, value, isCurrent });
+                          const carriesRow = col.column.id === linkColumnId;
+                          if (carriesRow && href) {
+                            content = (
+                              <Link
+                                href={href}
+                                className={TABLE_LINK_CLASS}
+                                aria-label={getRowLabel?.(row, index)}
+                              >
+                                {content}
+                              </Link>
+                            );
+                          }
+                          if (carriesRow && isCurrent) {
+                            content = (
+                              <span className="inline-flex max-w-full flex-wrap items-center gap-x-2 gap-y-1">
+                                {content}
+                                <YouBadge />
+                              </span>
+                            );
+                          }
+                          return (
+                            <ResponsiveTableCell
+                              key={col.column.id}
+                              label={col.label}
+                              align={col.align}
+                              numeric={col.numeric}
+                              nowrap={col.nowrap}
+                              stack={col.column.stack}
+                              priority={col.priority}
+                              data-kind={col.kind}
+                              className={cn(
+                                cellPadding,
+                                (col.numeric || col.kind === 'address') && 'text-foreground',
+                                col.column.cellClassName,
+                              )}
+                            >
+                              {content}
+                            </ResponsiveTableCell>
+                          );
+                        })}
+                        {renderDetails ? (
+                          <ResponsiveTableCell
+                            label={t('details.header')}
+                            align="end"
+                            nowrap
+                            className={cellPadding}
+                          >
+                            {details !== null ? (
+                              <button
+                                type="button"
+                                aria-expanded={isExpanded}
+                                aria-controls={isExpanded ? detailsId : undefined}
+                                onClick={() => toggleDetails(key)}
+                                className={cn(
+                                  TABLE_LINK_CLASS,
+                                  'inline-flex min-h-6 items-center gap-1 no-underline hover:underline',
+                                  'max-sm:min-h-11',
+                                )}
+                              >
+                                {detailsLabel?.(row, isExpanded) ?? t('details.header')}
+                                <ChevronDown
+                                  aria-hidden
+                                  className={cn(
+                                    'size-3.5 shrink-0 text-subtle transition-transform duration-[var(--duration-fast)]',
+                                    isExpanded && 'rotate-180',
+                                  )}
+                                />
+                              </button>
+                            ) : null}
+                          </ResponsiveTableCell>
+                        ) : null}
+                      </ResponsiveTableRow>
+                      {isExpanded ? (
+                        <tr id={detailsId} data-detail="true">
+                          <td
+                            colSpan={columnCount}
+                            className="border-b border-rule-faint bg-surface-sunken px-4 py-3"
+                          >
+                            {details}
+                          </td>
+                        </tr>
+                      ) : null}
+                    </React.Fragment>
+                  );
+                })}
+          </ResponsiveTableBody>
+        </ResponsiveTable>
+      </ResponsiveTableContainer>
+
+      {!showSkeleton ? (
+        <TablePagination
+          page={page}
+          pageSize={paginate ? pageSize : Math.max(sorted.length, 1)}
+          total={sorted.length}
+          onPageChange={goToPage}
+          caption={hasDatetime ? <TimeZoneNote /> : undefined}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+function renderCell<T>(
+  col: ResolvedColumn<T>,
+  row: T,
+  context: DataTableCellContext,
+): React.ReactNode {
+  const { column } = col;
+  if (column.cell) return column.cell(row, context);
+  if (column.render) return column.render(row, context.index);
+  if (!col.hasValue) return null;
+  // Nothing to show stays truly empty, so a phone record drops the line.
+  if (isBlankValue(context.value) && !blankShowsUnknown(col.kind, column.whenBlank)) return null;
+  return (
+    <KindValue
+      kind={col.kind}
+      value={context.value}
+      href={column.href ? column.href(row) : undefined}
+      txHash={column.txHash?.(row)}
+      unit={column.unit}
+      showUnit={column.showUnit}
+      percentScale={column.percentScale}
+      seconds={column.seconds}
+      year={column.year}
+      copy={column.copy}
+      zeroRole={column.zeroRole}
+      currentAddress={column.currentAddress}
+      whenBlank={column.whenBlank}
+      blankLabel={column.blankLabel}
+    />
+  );
+}
+
+function HeaderCell<T>({
+  col,
+  sort,
+  onSort,
+  explainLabel,
+}: {
+  col: ResolvedColumn<T>;
+  sort: { id: string; direction: SortDirection } | null;
+  onSort: (col: ResolvedColumn<T>) => void;
+  explainLabel: string;
+}) {
+  const { column } = col;
+  const active = sort?.id === column.id ? sort.direction : null;
+  const Arrow = active === 'asc' ? ArrowUp : ArrowDown;
+
+  // A sortable header reads like every other header until it is sorted: only
+  // the active column shows its arrow, so no header holds a gap for an
+  // invisible icon.
+  const label = column.sortable ? (
+    <button
+      type="button"
+      onClick={() => onSort(col)}
+      // A text button in a header row cannot grow to 44px without pushing the
+      // row taller; on a phone a transparent pad carries the target instead.
+      data-touch-target="extended"
+      className={cn(
+        TOUCH_TARGET_EXTENDED_CLASS,
+        'inline-flex min-w-0 items-center gap-1 rounded-sm [text-align:inherit]',
+        'transition-colors duration-[var(--duration-fast)] hover:text-foreground',
+        active && 'text-foreground',
+        // On an end-aligned column the arrow leads, keeping the label at the edge.
+        col.align === 'end' && 'flex-row-reverse',
+      )}
+    >
+      <span>{column.header}</span>
+      {active ? <Arrow aria-hidden className="size-3.5 shrink-0" /> : null}
+    </button>
+  ) : (
+    <span className="min-w-0">{column.header}</span>
+  );
+
+  return (
+    <ResponsiveTableHeadCell
+      align={col.align}
+      numeric={col.numeric}
+      priority={col.priority}
+      style={column.width ? { width: column.width } : undefined}
+      aria-sort={
+        column.sortable
+          ? active === 'asc'
+            ? 'ascending'
+            : active === 'desc'
+              ? 'descending'
+              : 'none'
+          : undefined
+      }
+      className={column.headerClassName}
+    >
+      {col.help ? (
+        // The help button trails its label, so it always reads as part of
+        // this column's header rather than floating towards the next one.
+        <span className="inline-flex max-w-full items-end gap-1.5 align-bottom">
+          {label}
+          <InfoTooltip
+            content={col.help}
+            ariaLabel={explainLabel}
+            className="mb-0.5"
+            iconClassName="size-3.5"
+          />
+        </span>
+      ) : (
+        label
+      )}
+    </ResponsiveTableHeadCell>
+  );
+}

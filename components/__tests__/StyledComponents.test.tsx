@@ -100,9 +100,9 @@ describe('TablePrimaryContainer', () => {
     expect(screen.getByText('Table content')).toBeInTheDocument();
   });
 
-  it('has bg-white opacity class', () => {
+  it('is the unboxed ledger scroll container', () => {
     const { container } = render(<TablePrimaryContainer>content</TablePrimaryContainer>);
-    expect(container.firstChild).toHaveClass('bg-white/[0.02]');
+    expect(container.firstChild).toHaveClass('cs-table-scroll', 'overflow-x-auto');
   });
 
   it('merges additional className', () => {

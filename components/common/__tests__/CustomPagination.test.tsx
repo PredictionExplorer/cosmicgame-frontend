@@ -47,10 +47,18 @@ describe('CustomPagination', () => {
     expect(screen.queryByLabelText('tables.pagination.goToPageAria')).not.toBeInTheDocument();
   });
 
-  it('renders single page when totalLength <= perPage', () => {
-    render(<CustomPagination {...defaultProps} totalLength={5} perPage={10} />);
-    expect(screen.getByText('1')).toBeInTheDocument();
-    expect(screen.queryByText('2')).not.toBeInTheDocument();
+  it('renders nothing when every row fits on one page', () => {
+    const { container } = render(
+      <CustomPagination {...defaultProps} totalLength={5} perPage={10} />,
+    );
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it('shows the row range and Previous and Next', () => {
+    render(<CustomPagination {...defaultProps} page={2} totalLength={50} perPage={10} />);
+    expect(screen.getByText('tables.pagination.range(from=11,to=20,total=50)')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'tables.pagination.previousAria' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'tables.pagination.nextAria' })).toBeEnabled();
   });
 
   it('clamps page input to valid range', () => {

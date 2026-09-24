@@ -145,7 +145,7 @@ describe('global typography guarantees', () => {
   });
 
   it('keeps the mobile table-card label at 12px or more, in the subtle tier', () => {
-    const label = ruleBody(tablesCss, '.cs-table tbody td::before');
+    const label = ruleBody(tablesCss, ".cs-table:not([data-layout='compact']) tbody td::before");
     expect(label).toContain('color: hsl(var(--subtle-foreground))');
     for (const size of fontSizes(label)) expect(size).toBeGreaterThanOrEqual(12);
   });
