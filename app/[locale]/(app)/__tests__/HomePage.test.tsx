@@ -400,7 +400,7 @@ const makeDashboardData = (overrides = {}) => ({
   CurRoundNum: 5,
   CurNumBids: 10,
   LastBidderAddr: '0xBidder',
-  GestureCostEth: 0.01,
+  CurBidPriceEth: 0.01,
   PrizeAmountEth: 1.5,
   RaffleAmountEth: 0.4,
   StakingAmountEth: 0.6,
@@ -656,8 +656,8 @@ describe('HomePage', () => {
 
     render(<HomePage />);
 
-    expect(screen.getByTestId('panel-method-eth-cost')).toHaveTextContent('0.01000 ETH');
-    expect(screen.getByTestId('panel-method-randomWalk-cost')).toHaveTextContent('0.00500 ETH');
+    expect(screen.getByTestId('panel-method-eth-cost')).toHaveTextContent('0.01 ETH');
+    expect(screen.getByTestId('panel-method-randomWalk-cost')).toHaveTextContent('0.005 ETH');
     expect(screen.getByTestId('panel-method-cst-cost')).toHaveTextContent('1 CST');
   });
 
@@ -959,9 +959,9 @@ describe('HomePage', () => {
 
     const panel = screen.getByTestId('gesture-panel');
     expect(panel).toBeVisible();
-    expect(within(panel).getByTestId('panel-method-eth-cost')).toHaveTextContent('0.01000 ETH');
+    expect(within(panel).getByTestId('panel-method-eth-cost')).toHaveTextContent('0.01 ETH');
     expect(within(panel).getByTestId('panel-method-randomWalk-cost')).toHaveTextContent(
-      '0.00500 ETH',
+      '0.005 ETH',
     );
     expect(within(panel).getByTestId('panel-method-cst-cost')).toHaveTextContent('1 CST');
     expect(screen.queryByTestId('gesture-price-strip')).not.toBeInTheDocument();
@@ -1205,7 +1205,7 @@ describe('HomePage', () => {
     });
 
     render(<HomePage />);
-    expect(getPanelSubmitButton()).toHaveTextContent('home.form.submit.eth(cost=0.01020)');
+    expect(getPanelSubmitButton()).toHaveTextContent('home.form.submit.eth(cost=0.01)');
     await user.click(getPanelSubmitButton());
 
     expect(mockRequestNotificationPermission).toHaveBeenCalledTimes(1);
@@ -1442,7 +1442,7 @@ describe('HomePage', () => {
       within(screen.getByTestId('connect-to-gesture')).getByText('home.orientation.connectHelp'),
     ).toBeVisible();
     // Live prices stay visible for observers deciding whether to join.
-    expect(screen.getByTestId('panel-method-eth-cost')).toHaveTextContent('0.01000 ETH');
+    expect(screen.getByTestId('panel-method-eth-cost')).toHaveTextContent('0.01 ETH');
     expect((await screen.findAllByTestId('connect-wallet-button')).length).toBeGreaterThanOrEqual(
       1,
     );
@@ -1853,7 +1853,7 @@ describe('HomePage', () => {
 
     expect(
       within(screen.getByTestId('action-dock-mobile')).getByTestId('dock-open-sheet'),
-    ).toHaveTextContent('home.form.submit.eth(cost=0.01020)');
+    ).toHaveTextContent('home.form.submit.eth(cost=0.01)');
     // jest.setup's IntersectionObserver mock always reports out-of-view, so
     // the page must have flipped the desktop dock through the observer path.
     expect(screen.getByTestId('action-dock-desktop')).toBeInTheDocument();

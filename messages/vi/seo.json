@@ -45,11 +45,13 @@
           "actions": {
             "label": "Thao tác neo giữ / gỡ neo"
           },
-          "tokens": {
-            "label": "Token đang neo giữ"
+          "ethDeposits": {
+            "label": "Số đợt nạp ETH phân phối neo giữ",
+            "tooltip": "Số lần nạp ETH vào phân phối neo giữ cho các Cosmic Signature NFT đang neo giữ. Mỗi đợt nạp được chia cho các NFT đang neo giữ tại thời điểm nạp."
           },
-          "distributions": {
-            "label": "Bản ghi phân phối neo giữ"
+          "stellarImprints": {
+            "label": "Lượt khắc Tinh tuyển NFT neo giữ",
+            "tooltip": "Số Cosmic Signature NFT đã khắc cho các RandomWalk NFT đang neo giữ thông qua Tinh tuyển NFT neo giữ."
           }
         }
       },
@@ -67,8 +69,8 @@
           "records": {
             "label": "Bản ghi phân bổ truyền thông"
           },
-          "reserve": {
-            "label": "Dự trữ truyền thông"
+          "allocatedCst": {
+            "label": "Tổng CST phân bổ truyền thông"
           },
           "contributors": {
             "label": "Người đóng góp truyền thông riêng biệt"
@@ -153,10 +155,12 @@
         },
         "cards": {
           "records": {
-            "label": "Bản ghi phân bổ đã nhận về"
+            "label": "Bản ghi phân bổ",
+            "tooltip": "Mọi bản ghi phân bổ qua các chu kỳ đã hoàn tất, gồm phân bổ ETH, CST và NFT."
           },
           "eth": {
-            "label": "ETH đã nhận về"
+            "label": "ETH đã phân bổ",
+            "tooltip": "Tổng ETH phân bổ Signature, Chiến binh Thời gian, Tinh tuyển và phân phối neo giữ qua các chu kỳ đã hoàn tất. Không gồm phân bổ CST và NFT."
           },
           "recipients": {
             "label": "Ví người nhận"

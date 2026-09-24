@@ -8,7 +8,7 @@ import { normalizeDashboardWire } from '@/services/api/rounds';
  */
 describe('normalizeDashboardWire — TokenReward precision', () => {
   const gestureCostOf = (tokenReward: unknown) =>
-    normalizeDashboardWire({ TokenReward: tokenReward }).GestureCostEth;
+    normalizeDashboardWire({ TokenReward: tokenReward }).ParticipationCstReward;
 
   it('converts a whole-ETH reward exactly', () => {
     expect(gestureCostOf('100000000000000000000')).toBe(100);
@@ -29,24 +29,42 @@ describe('normalizeDashboardWire — TokenReward precision', () => {
     expect(Math.abs(exact - truth)).toBeLessThanOrEqual(Math.abs(lossy - truth));
   });
 
-  it('still reports 0 for the sentinel wire values', () => {
-    expect(gestureCostOf('')).toBe(0);
-    expect(gestureCostOf('error')).toBe(0);
-    expect(gestureCostOf(undefined)).toBe(0);
-    expect(gestureCostOf(null)).toBe(0);
-    expect(gestureCostOf(42)).toBe(0);
+  it('leaves the reward unknown for the sentinel wire values instead of reporting 0', () => {
+    for (const sentinel of ['', 'error', undefined, null, 42]) {
+      const normalized = normalizeDashboardWire({ TokenReward: sentinel });
+      expect(normalized).not.toHaveProperty('ParticipationCstReward');
+    }
   });
 
   it('falls back to the numeric parse for non-integer strings', () => {
     expect(gestureCostOf('1.5')).toBeCloseTo(1.5e-18);
-    expect(gestureCostOf('nonsense')).toBe(0);
+    expect(gestureCostOf('nonsense')).toBeUndefined();
   });
 
-  it('leaves an explicit GestureCostEth untouched', () => {
+  it('leaves an explicit ParticipationCstReward untouched', () => {
     const normalized = normalizeDashboardWire({
-      GestureCostEth: 0.5,
+      ParticipationCstReward: 0.5,
       TokenReward: '100000000000000000000',
     });
-    expect(normalized.GestureCostEth).toBe(0.5);
+    expect(normalized.ParticipationCstReward).toBe(0.5);
+  });
+});
+
+describe('normalizeDashboardWire — units', () => {
+  // Regression: the imprint summary once printed "185.6693 ETH" as the Gesture Cost because
+  // TokenReward (a CST amount) was normalized into an ETH-named field.
+  const wire = {
+    BidPriceEth: 0.10210695701197195,
+    TokenReward: '185669300000000000000',
+  };
+
+  it('maps the ETH Gesture Cost from BidPriceEth only', () => {
+    expect(normalizeDashboardWire(wire).CurBidPriceEth).toBe(0.10210695701197195);
+  });
+
+  it('exposes TokenReward only as a CST amount, never under an ETH name', () => {
+    const normalized = normalizeDashboardWire(wire);
+    expect(normalized.ParticipationCstReward).toBeCloseTo(185.6693);
+    expect(normalized).not.toHaveProperty('GestureCostEth');
   });
 });

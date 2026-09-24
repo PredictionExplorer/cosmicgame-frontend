@@ -153,9 +153,9 @@
       "label": "Gestures with CST",
       "tooltip": "Number of gestures made with CST instead of ETH across indexed cycles."
     },
-    "outreachReserve": {
-      "label": "Outreach Reserve",
-      "tooltip": "CST imprinted for outreach and ecosystem contributors, separate from per-gesture Participation CST and NFT-paired Recognition CST."
+    "outreachCstAllocated": {
+      "label": "Outreach CST Allocated",
+      "tooltip": "CST sent from the Outreach Reserve to outreach and ecosystem contributors so far, separate from per-gesture Participation CST and NFT-paired Recognition CST."
     },
     "outreachTransactions": {
       "label": "Outreach Transactions",
@@ -180,10 +180,6 @@
     "uniqueEthContributors": {
       "label": "Unique ETH Contributors",
       "tooltip": "Unique wallet addresses that contributed ETH to the protocol."
-    },
-    "uniqueAnchorHolders": {
-      "label": "Unique Anchor-holders",
-      "tooltip": "Combined unique wallets that have anchored Cosmic Signature NFTs or Random Walk NFTs."
     },
     "cosmicSignatureNftHolders": {
       "label": "Cosmic Signature NFT Holders",
@@ -296,11 +292,12 @@
       "randomWalkTooltip": "Total number of Random Walk NFTs currently anchored and eligible for Anchored-NFT Stellar Selection.",
       "poolLabel": "Anchor Distribution Pool",
       "poolTooltip": "ETH currently allocated to the Anchor Distribution pool for Cosmic Signature NFT anchor-holders.",
+      "poolCaption": "Deposited when this cycle finalizes; earlier deposits not yet retrieved show as Unretrieved.",
       "perNftLabel": "Distribution per Cosmic Signature NFT",
       "perNftTooltip": "Current ETH Anchor Distribution per anchored Cosmic Signature NFT: on-chain pool divided by the indexed total of anchored NFTs.",
-      "perNftTooltipUnavailable": "The Anchor Distribution per NFT is unavailable while the anchored NFT count is being updated. The on-chain pool already contains ETH.",
+      "perNftNoneAnchored": "No anchored Cosmic Signature NFTs indexed yet",
       "activeHoldersLabel": "Active Anchor-holders",
-      "activeHoldersTooltip": "Combined active wallets currently anchoring at least one Cosmic Signature NFT or Random Walk NFT."
+      "activeHoldersTooltip": "Distinct wallets that currently anchor at least one Cosmic Signature or RandomWalk NFT. A wallet anchoring both kinds counts once."
     },
     "description": "Anchored NFTs are a core part of Cosmic Signature: Cosmic Signature NFTs share ETH Anchor Distributions, while Random Walk NFTs participate in Anchored-NFT Stellar Selection.",
     "historyLink": "View anchor history",
@@ -314,7 +311,8 @@
       "randomWalk": "RWLK Anchoring Overview"
     },
     "stats": {
-      "activeHolders": "Number of Active Anchor-holders",
+      "activeHoldersCosmicSignature": "Active Cosmic Signature NFT Anchor-holders",
+      "activeHoldersRandomWalk": "Active Random Walk NFT Anchor-holders",
       "distributionDeposits": "Number of Anchor-Distribution Deposits",
       "totalDistributions": "Total Anchor Distributions",
       "tokensImprinted": "Total Tokens Imprinted",

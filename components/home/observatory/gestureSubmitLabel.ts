@@ -2,27 +2,32 @@ import type { useTranslations } from 'next-intl';
 
 import type { CstGestureData } from '@/utils/cstGesture';
 import { formatFixed } from '@/utils/format';
+import { ethGestureBaseCost, formatEthQuote } from '@/utils/gestureQuote';
 
 type HomeTranslator = ReturnType<typeof useTranslations>;
 
 export interface GestureSubmitLabelInput {
   t: HomeTranslator;
+  /** The page locale, for the quote's decimal separator. */
+  locale: string;
   gestureType: string;
   ethPrice: number | null | undefined;
-  gestureCostPlus: number;
   rwlkId: number;
   cstGestureData: Pick<CstGestureData, 'isFree' | 'CSTPrice' | 'source'>;
 }
 
 /**
- * The one label used by every gesture submit button (full console, monument,
- * chat composer), so the shown cost can never drift between surfaces.
+ * The one label used by every gesture submit button (the home gesture panel and
+ * action dock, and the experimental console, monument and chat composer), so the
+ * shown cost can never drift between surfaces. It quotes the Gesture Cost itself,
+ * formatted like the method tabs; the collision buffer the form adds on top is
+ * disclosed next to the button, not folded in here.
  */
 export function getGestureSubmitLabel({
   t,
+  locale,
   gestureType,
   ethPrice,
-  gestureCostPlus,
   rwlkId,
   cstGestureData,
 }: GestureSubmitLabelInput): string {
@@ -33,13 +38,16 @@ export function getGestureSubmitLabel({
   ) {
     return t('form.submit.generic', { method: gestureType });
   }
-  const adj = (ethPrice ?? 0) * (1 + gestureCostPlus / 100);
-  const fmt = (v: number, threshold: number) => (v > threshold ? v.toFixed(2) : v.toFixed(5));
-  if (gestureType === 'ETH') return t('form.submit.eth', { cost: fmt(adj, 0.1) });
+  const price = ethPrice ?? 0;
+  if (gestureType === 'ETH') {
+    return t('form.submit.eth', {
+      cost: formatEthQuote(ethGestureBaseCost(price, 'ETH'), locale),
+    });
+  }
   if (gestureType === 'RandomWalk' && rwlkId !== -1)
     return t('form.submit.randomWalkWithToken', {
       tokenId: String(rwlkId),
-      cost: fmt(adj * 0.5, 0.2),
+      cost: formatEthQuote(ethGestureBaseCost(price, 'RandomWalk'), locale),
     });
   if (gestureType === 'CST') {
     if (cstGestureData.isFree) return t('form.submit.cstFree');

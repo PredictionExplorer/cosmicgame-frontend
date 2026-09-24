@@ -1,7 +1,7 @@
 import userEvent from '@testing-library/user-event';
 import { createRef } from 'react';
 
-import { render, screen, within, checkA11y } from '@/test-utils';
+import { fireEvent, render, screen, within, checkA11y } from '@/test-utils';
 
 import { GesturePanel, type GesturePanelFormState } from '../GesturePanel';
 
@@ -80,7 +80,7 @@ const baseProps = {
   isRoundActive: true,
   account: '0xUser' as string | null,
   cstGestureData: cstData,
-  submitLabel: 'home.form.submit.eth(cost=0.01020)',
+  submitLabel: 'home.form.submit.eth(cost=0.01)',
   canGesture: true,
   isGesturing: false,
   cycleTimerEnded: false,
@@ -99,11 +99,9 @@ describe('GesturePanel', () => {
     render(<GesturePanel {...baseProps} form={makeForm()} />);
 
     const tabs = screen.getByTestId('panel-method-tabs');
-    expect(within(tabs).getByTestId('panel-method-eth-cost')).toHaveTextContent('0.01000 ETH');
+    expect(within(tabs).getByTestId('panel-method-eth-cost')).toHaveTextContent('0.01 ETH');
     // RandomWalk rides an ETH gesture at half cost.
-    expect(within(tabs).getByTestId('panel-method-randomWalk-cost')).toHaveTextContent(
-      '0.00500 ETH',
-    );
+    expect(within(tabs).getByTestId('panel-method-randomWalk-cost')).toHaveTextContent('0.005 ETH');
     expect(within(tabs).getByTestId('panel-method-cst-cost')).toHaveTextContent('12.5 CST');
     expect(
       within(tabs).getByRole('button', { name: /home\.form\.method\.eth\.label/ }),
@@ -143,10 +141,9 @@ describe('GesturePanel', () => {
 
       expect(screen.getByTestId('panel-method-eth-cost')).toHaveTextContent('Loading...');
       expect(screen.getByTestId('panel-method-randomWalk-cost')).toHaveTextContent('Loading...');
-      expect(screen.queryByText('0.00000 ETH')).not.toBeInTheDocument();
-      expect(
-        screen.getByText('home.form.advanced.collision.approxCost(amount=--)'),
-      ).toBeInTheDocument();
+      expect(screen.queryByText(/^0 ETH$/)).not.toBeInTheDocument();
+      expect(screen.getByTestId('collision-send-amount')).toHaveTextContent('Loading...');
+      expect(screen.queryByTestId('gesture-send-amount')).not.toBeInTheDocument();
 
       const submit = screen.getByRole('button', {
         name: `home.form.submit.generic(method=${gestureType})`,
@@ -474,12 +471,60 @@ describe('GesturePanel', () => {
     expect(screen.getByText('home.form.advanced.collision.title')).toBeInTheDocument();
     // 0.01 ETH × 1.02 collision buffer.
     expect(
-      screen.getByText('home.form.advanced.collision.approxCost(amount=0.010200)'),
+      screen.getByText('home.form.advanced.collision.approxCost(amount=0.0102)'),
     ).toBeInTheDocument();
 
     const nftInput = screen.getByPlaceholderText('0x...');
     await user.type(nftInput, '0xa');
     expect(form.setNftDonateAddress).toHaveBeenCalled();
+  });
+
+  describe('one gesture, one quoted cost', () => {
+    it('quotes the same Gesture Cost in the tab and discloses the amount sent under submit', () => {
+      // Regression: the tab said 0.10211, the button "(0.10 ETH)" and Advanced 0.104152.
+      render(
+        <GesturePanel
+          {...baseProps}
+          submitLabel="home.form.submit.eth(cost=0.10211)"
+          form={makeForm({
+            ethGestureInfo: {
+              AuctionDuration: 3600,
+              ETHPrice: 0.10210695701197195,
+              SecondsElapsed: 1800,
+            },
+          })}
+        />,
+      );
+
+      expect(screen.getByTestId('panel-method-eth-cost')).toHaveTextContent('0.10211 ETH');
+      expect(
+        screen.getByRole('button', { name: 'home.form.submit.eth(cost=0.10211)' }),
+      ).toBeInTheDocument();
+      expect(screen.getByTestId('gesture-send-amount')).toHaveTextContent(
+        'home.form.submit.sendsNote(amount=0.10415,percent=2)',
+      );
+    });
+
+    it('omits the send note when no collision buffer is added', () => {
+      render(<GesturePanel {...baseProps} form={makeForm({ gestureCostPlus: 0 })} />);
+      expect(screen.queryByTestId('gesture-send-amount')).not.toBeInTheDocument();
+    });
+
+    it.each([
+      ['-5', 0],
+      ['80', 50],
+      ['7', 7],
+    ])('clamps a Raise-by entry of %s to %s', (typed, expected) => {
+      const form = makeForm({ advancedExpanded: true, gestureCostPlus: 3 });
+      render(<GesturePanel {...baseProps} form={form} />);
+
+      fireEvent.change(screen.getByTestId('collision-buffer-input'), {
+        target: { value: typed },
+      });
+
+      expect(form.setBidPricePlus).toHaveBeenCalledTimes(1);
+      expect(form.setBidPricePlus).toHaveBeenCalledWith(expected);
+    });
   });
 
   it('hides collision prevention for CST gestures (no ETH cost to bump)', () => {
@@ -500,7 +545,7 @@ describe('GesturePanel', () => {
     render(<GesturePanel {...baseProps} form={makeForm()} />);
 
     const submit = document.getElementById('gesture-submit') as HTMLButtonElement;
-    expect(submit).toHaveTextContent('home.form.submit.eth(cost=0.01020)');
+    expect(submit).toHaveTextContent('home.form.submit.eth(cost=0.01)');
     await user.click(submit);
 
     expect(baseProps.onSubmit).toHaveBeenCalledTimes(1);
@@ -546,7 +591,7 @@ describe('GesturePanel', () => {
       expect(screen.getByText('home.orientation.connectHelp')).toBeInTheDocument();
       expect(screen.getByTestId('connect-wallet-button')).toBeInTheDocument();
       // Prices stay visible — that is the point of the preview.
-      expect(screen.getByTestId('panel-method-eth-cost')).toHaveTextContent('0.01000 ETH');
+      expect(screen.getByTestId('panel-method-eth-cost')).toHaveTextContent('0.01 ETH');
       const input = screen.getByRole('textbox', { name: /home\.form\.advanced\.messageLabel/ });
       expect(input).toBeVisible();
       expect(input).toBeEnabled();

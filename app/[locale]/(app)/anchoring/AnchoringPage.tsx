@@ -17,6 +17,7 @@ import {
   useGlobalRWLKAnchorImprints,
   useDashboardInfo,
   useUniqueCSTAnchorHolders,
+  useUniqueRWLKAnchorHolders,
 } from '@/hooks/useApiQuery';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ErrorState } from '@/components/ui/error-state';
@@ -25,11 +26,17 @@ import { PageShell } from '@/components/ui/page-shell';
 import { SectionDivider } from '@/components/ui/section-divider';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 import { Surface } from '@/components/ui/surface';
+import { UnknownValue } from '@/components/ui/unknown-value';
 import { formatEthValue } from '@/utils/format';
-import { formatDistributionPerAnchoredNftEth } from '@/utils/anchoringStats';
+import {
+  countActiveAnchorHolders,
+  distributionPerAnchoredNft,
+  formatPerNftEth,
+} from '@/utils/anchoringStats';
 
 const AnchoringPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('anchoring');
+  const tCommon = useTranslations('common');
   const locale = useLocale();
   const {
     data: cosmicSignatureRewards,
@@ -42,64 +49,65 @@ const AnchoringPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
     error: rwlkError,
   } = useGlobalRWLKAnchorImprints();
   const { data: dashboardData, isLoading: isLoadingDashboard } = useDashboardInfo();
-  const { data: uniqueStakers, isLoading: isLoadingStakers } = useUniqueCSTAnchorHolders();
+  const { data: cstHolders, isLoading: isLoadingCstHolders } = useUniqueCSTAnchorHolders();
+  const { data: rwlkHolders, isLoading: isLoadingRwlkHolders } = useUniqueRWLKAnchorHolders();
 
   const loading = isLoadingCST || isLoadingRWLK;
-  const statsLoading = isLoadingDashboard || isLoadingStakers;
+  const statsLoading = isLoadingDashboard || isLoadingCstHolders || isLoadingRwlkHolders;
   const hasError = Boolean(cstError || rwlkError);
 
-  const distributionPerNft = useMemo(
-    () =>
-      formatDistributionPerAnchoredNftEth(
-        dashboardData?.StakingAmountEth,
-        dashboardData?.MainStats?.StakeStatisticsCST?.TotalTokensStaked,
-      ),
-    [dashboardData],
-  );
+  const heroStats = useMemo(() => {
+    const unknown = <UnknownValue label={tCommon('status.unavailable')} />;
+    const count = (value: number | undefined) =>
+      typeof value === 'number' ? value.toLocaleString(locale) : unknown;
+    const pool = dashboardData?.StakingAmountEth;
+    const perNft = distributionPerAnchoredNft(
+      pool,
+      dashboardData?.MainStats?.StakeStatisticsCST?.TotalTokensStaked,
+    );
+    const activeHolders = countActiveAnchorHolders(cstHolders, rwlkHolders);
 
-  const heroStats = useMemo(
-    () => [
+    return [
       {
         label: t('overview.stats.pool.label'),
-        value: formatEthValue(dashboardData?.StakingAmountEth ?? 0, locale),
+        value: typeof pool === 'number' ? formatEthValue(pool, locale) : unknown,
         tooltip: t('overview.stats.pool.tooltip'),
+        caption: t('overview.stats.pool.caption'),
         icon: <Coins className="h-4 w-4" />,
         featured: true,
         gradient: true,
       },
       {
         label: t('overview.stats.cosmicSignatureAnchored.label'),
-        value: (
-          dashboardData?.MainStats?.StakeStatisticsCST?.TotalTokensStaked ?? 0
-        ).toLocaleString(locale),
+        value: count(dashboardData?.MainStats?.StakeStatisticsCST?.TotalTokensStaked),
         tooltip: t('overview.stats.cosmicSignatureAnchored.tooltip'),
         icon: <Layers className="h-4 w-4" />,
       },
       {
         label: t('overview.stats.randomWalkAnchored.label'),
-        value: (
-          dashboardData?.MainStats?.StakeStatisticsRWalk?.TotalTokensStaked ?? 0
-        ).toLocaleString(locale),
+        value: count(dashboardData?.MainStats?.StakeStatisticsRWalk?.TotalTokensStaked),
         tooltip: t('overview.stats.randomWalkAnchored.tooltip'),
         icon: <Layers className="h-4 w-4" />,
       },
       {
         label: t('overview.stats.distributionPerNft.label'),
-        value: distributionPerNft.value,
-        tooltip: distributionPerNft.indexedCountUnavailable
-          ? t('overview.stats.distributionPerNft.tooltipUnavailable')
-          : t('overview.stats.distributionPerNft.tooltip'),
+        value: perNft.status === 'available' ? formatPerNftEth(perNft.perNftEth) : unknown,
+        tooltip: t('overview.stats.distributionPerNft.tooltip'),
+        caption:
+          perNft.status === 'noneAnchored'
+            ? t('overview.stats.distributionPerNft.noneAnchored')
+            : undefined,
         icon: <TrendingUp className="h-4 w-4" />,
       },
       {
-        label: t('overview.stats.uniqueHolders.label'),
-        value: (uniqueStakers?.length ?? 0).toLocaleString(locale),
-        tooltip: t('overview.stats.uniqueHolders.tooltip'),
+        // One definition with /statistics/anchoring: distinct wallets anchoring either kind.
+        label: t('overview.stats.activeHolders.label'),
+        value: activeHolders === null ? unknown : activeHolders.toLocaleString(locale),
+        tooltip: t('overview.stats.activeHolders.tooltip'),
         icon: <Users className="h-4 w-4" />,
       },
-    ],
-    [dashboardData, distributionPerNft, locale, t, uniqueStakers],
-  );
+    ];
+  }, [cstHolders, dashboardData, locale, rwlkHolders, t, tCommon]);
 
   if (hasError) {
     return (

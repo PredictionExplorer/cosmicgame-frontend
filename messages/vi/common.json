@@ -47,7 +47,8 @@
     "loadingEllipsis": "Đang tải…",
     "loadingDots": "Đang tải…",
     "noData": "Không có dữ liệu.",
-    "nothingHere": "Chưa có gì ở đây"
+    "nothingHere": "Chưa có gì ở đây",
+    "unavailable": "Không khả dụng"
   },
   "actions": {
     "copyAddress": "Sao chép địa chỉ",

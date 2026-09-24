@@ -7,6 +7,8 @@ export interface AnchoringStatItem {
   label: string;
   value: ReactNode;
   tooltip: string;
+  /** Visible qualifier under the value (see StatCard `caption`). */
+  caption?: ReactNode;
   icon?: ReactNode;
   featured?: boolean;
   gradient?: boolean;
@@ -40,6 +42,7 @@ export function AnchoringHeroStats({ stats, loading = false, className }: Anchor
           label={stat.label}
           value={stat.value}
           tooltip={stat.tooltip}
+          caption={stat.caption}
           icon={stat.icon}
           featured={stat.featured}
           gradient={stat.gradient}

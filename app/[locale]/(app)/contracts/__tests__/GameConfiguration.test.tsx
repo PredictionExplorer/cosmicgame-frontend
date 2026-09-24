@@ -65,20 +65,28 @@ describe('GameConfiguration', () => {
     expect(screen.getByText('43200s')).toBeInTheDocument();
   });
 
-  it('handles zero/missing values with "--" fallback', () => {
+  it('renders unread values as unavailable, never as a zero', () => {
+    // Regression: a failed step-up read once showed "0%" while the other cards showed "--".
     render(
       <GameConfiguration
-        priceIncrease={0}
-        timeIncrease={0}
-        timeIncrement={0}
-        cstRewardPerBid={0}
-        maxMessageLength={0}
-        claimTimeout={0}
-        initialIncrement={0}
+        priceIncrease={null}
+        timeIncrease={null}
+        timeIncrement={null}
+        cstRewardPerBid={null}
+        maxMessageLength={null}
+        claimTimeout={null}
+        initialIncrement={null}
       />,
     );
-    const dashes = screen.getAllByText('--');
-    expect(dashes.length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByText('common.status.unavailable')).toHaveLength(6);
+    expect(screen.queryByText('0%')).not.toBeInTheDocument();
+    expect(screen.queryByText(/-- CST/)).not.toBeInTheDocument();
+    expect(screen.queryByText('--')).not.toBeInTheDocument();
+  });
+
+  it('highlights no card over the others', () => {
+    const { container } = render(<GameConfiguration {...defaultProps} />);
+    expect(container.querySelector('.gradient-border-card-accent')).toBeNull();
   });
 
   it('displays time increment as duration, not the increase percentage', () => {
@@ -87,10 +95,9 @@ describe('GameConfiguration', () => {
     expect(screen.queryByText('5%')).not.toBeInTheDocument();
   });
 
-  it('shows "--" for Time Increment when timeIncrement is 0 regardless of timeIncrease', () => {
-    render(<GameConfiguration {...defaultProps} timeIncrease={1} timeIncrement={0} />);
-    const dashes = screen.getAllByText('--');
-    expect(dashes.length).toBeGreaterThanOrEqual(1);
+  it('shows Time Increment as unavailable until it is read, regardless of timeIncrease', () => {
+    render(<GameConfiguration {...defaultProps} timeIncrease={1} timeIncrement={null} />);
+    expect(screen.getAllByText('common.status.unavailable')).toHaveLength(1);
   });
 
   it('shows loading skeletons when loading is true', () => {

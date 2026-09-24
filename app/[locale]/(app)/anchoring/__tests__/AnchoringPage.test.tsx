@@ -6,12 +6,18 @@ const mockUseCSTAnchorDistributions = jest.fn();
 const mockUseGlobalRWLKAnchorImprints = jest.fn();
 const mockUseDashboardInfo = jest.fn();
 const mockUseUniqueCSTAnchorHolders = jest.fn();
+const mockUseUniqueRWLKAnchorHolders = jest.fn<unknown, unknown[]>(() => ({
+  data: [],
+  isLoading: false,
+  error: null,
+}));
 
 jest.mock('../../../../../hooks/useApiQuery', () => ({
   useCSTAnchorDistributions: (...args: unknown[]) => mockUseCSTAnchorDistributions(...args),
   useGlobalRWLKAnchorImprints: (...args: unknown[]) => mockUseGlobalRWLKAnchorImprints(...args),
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
   useUniqueCSTAnchorHolders: (...args: unknown[]) => mockUseUniqueCSTAnchorHolders(...args),
+  useUniqueRWLKAnchorHolders: (...args: unknown[]) => mockUseUniqueRWLKAnchorHolders(...args),
 }));
 
 jest.mock('../../../../../components/anchoring/GlobalAnchorDistributionsTable', () => ({
@@ -31,7 +37,7 @@ jest.mock('../../../../../components/anchoring/AnchoringHeroStats', () => ({
     stats,
     loading,
   }: {
-    stats: { label: string; value: string }[];
+    stats: { label: string; value: React.ReactNode; caption?: React.ReactNode }[];
     loading?: boolean;
   }) => (
     <div data-testid="anchoring-hero-stats">
@@ -40,6 +46,7 @@ jest.mock('../../../../../components/anchoring/AnchoringHeroStats', () => ({
         : stats.map((s) => (
             <span key={s.label} data-testid={`stat-${s.label}`}>
               {s.label}: {s.value}
+              {s.caption ? <em> {s.caption}</em> : null}
             </span>
           ))}
     </div>
@@ -67,7 +74,21 @@ const mockDashboard = {
 };
 
 const mockAnchorHolders = {
-  data: [{ StakerAddr: '0x1' }, { StakerAddr: '0x2' }, { StakerAddr: '0x3' }],
+  data: [
+    { StakerAddr: '0x1', TotalTokensStaked: 2 },
+    { StakerAddr: '0x2', TotalTokensStaked: 1 },
+    { StakerAddr: '0x3', TotalTokensStaked: 4 },
+  ],
+  isLoading: false,
+  error: null,
+};
+
+const mockRwlkAnchorHolders = {
+  data: [
+    { StakerAddr: '0x2', TotalTokensStaked: 3 },
+    { StakerAddr: '0x4', TotalTokensStaked: 1 },
+    { StakerAddr: '0x5', TotalTokensStaked: 0 },
+  ],
   isLoading: false,
   error: null,
 };
@@ -77,6 +98,7 @@ function setupDefaults() {
   mockUseGlobalRWLKAnchorImprints.mockReturnValue(noError);
   mockUseDashboardInfo.mockReturnValue(mockDashboard);
   mockUseUniqueCSTAnchorHolders.mockReturnValue(mockAnchorHolders);
+  mockUseUniqueRWLKAnchorHolders.mockReturnValue(mockRwlkAnchorHolders);
 }
 
 describe('AnchoringPage', () => {
@@ -108,8 +130,51 @@ describe('AnchoringPage', () => {
       screen.getByTestId('stat-anchoring.overview.stats.distributionPerNft.label'),
     ).toHaveTextContent('anchoring.overview.stats.distributionPerNft.label');
     expect(
-      screen.getByTestId('stat-anchoring.overview.stats.uniqueHolders.label'),
-    ).toHaveTextContent('anchoring.overview.stats.uniqueHolders.label');
+      screen.getByTestId('stat-anchoring.overview.stats.activeHolders.label'),
+    ).toHaveTextContent('anchoring.overview.stats.activeHolders.label');
+  });
+
+  it('counts active anchor-holders across both NFT kinds once each', () => {
+    setupDefaults();
+    render(<AnchoringPage />);
+    // 0x1, 0x2, 0x3 anchor Cosmic Signature NFTs; 0x2 and 0x4 RandomWalk; 0x5 released all.
+    expect(
+      screen.getByTestId('stat-anchoring.overview.stats.activeHolders.label'),
+    ).toHaveTextContent('anchoring.overview.stats.activeHolders.label: 4');
+  });
+
+  it('shows no per-NFT distribution, with a visible reason, when nothing is anchored', () => {
+    setupDefaults();
+    mockUseDashboardInfo.mockReturnValue({
+      ...mockDashboard,
+      data: {
+        ...mockDashboard.data,
+        StakingAmountEth: 0.172488,
+        MainStats: {
+          ...mockDashboard.data.MainStats,
+          StakeStatisticsCST: { TotalTokensStaked: 0 },
+        },
+      },
+    });
+    render(<AnchoringPage />);
+
+    const card = screen.getByTestId('stat-anchoring.overview.stats.distributionPerNft.label');
+    expect(card).not.toHaveTextContent('0.172488');
+    expect(card).toHaveTextContent('common.status.unavailable');
+    expect(card).toHaveTextContent('anchoring.overview.stats.distributionPerNft.noneAnchored');
+  });
+
+  it('shows unread dashboard figures as unavailable, not 0', () => {
+    setupDefaults();
+    mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: false, error: null });
+    render(<AnchoringPage />);
+
+    expect(
+      screen.getByTestId('stat-anchoring.overview.stats.cosmicSignatureAnchored.label'),
+    ).toHaveTextContent('common.status.unavailable');
+    expect(screen.getByTestId('stat-anchoring.overview.stats.pool.label')).not.toHaveTextContent(
+      '0 ETH',
+    );
   });
 
   it('shows stats loading state when dashboard is loading', () => {

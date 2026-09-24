@@ -15,6 +15,7 @@ import {
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
 import { TableHeaderHelp } from '@/components/tables/TableHeaderHelp';
+import { UnknownValue } from '@/components/ui/unknown-value';
 import type { Recipient } from '@/services/api/types';
 
 export type { Recipient };
@@ -37,7 +38,11 @@ const UniqueRecipientsRow = ({ recipient, locale }: UniqueRecipientsRowProps) =>
         <AddressLink address={recipient.WinnerAddr} url={`/user/${recipient.WinnerAddr}`} />
       </TablePrimaryCell>
       <TablePrimaryCell label={t('columns.allocationsReceived')} align="right">
-        {recipient.AllocationsCount}
+        {typeof recipient.AllocationsCount === 'number' ? (
+          recipient.AllocationsCount
+        ) : (
+          <UnknownValue label={t('status.unavailable')} />
+        )}
       </TablePrimaryCell>
       <TablePrimaryCell label={t('columns.maxAllocationEth')} align="right">
         {formatTableAmount(recipient.MaxWinAmountEth, locale)}

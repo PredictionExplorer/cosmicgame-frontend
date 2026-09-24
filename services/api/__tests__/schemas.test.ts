@@ -40,7 +40,7 @@ describe('DashboardInfoSchema', () => {
     PrizeClaimTs: 1_700_000_000,
     TsRoundStart: 1_699_000_000,
     LastBidderAddr: '0xabc',
-    GestureCostEth: 0.001,
+    ParticipationCstReward: 165.02,
     StakingAmountEth: 0.5,
     NumRaffleNFTWinnersBidding: 3,
     NumRaffleNFTWinnersStakingRWalk: 2,
@@ -138,7 +138,8 @@ describe('DashboardInfoSchema', () => {
     if (parsed.success) {
       expect(parsed.data.CurPrizeAmountEth).toBe(12.34);
       expect(parsed.data.CurBidPriceEth).toBe(0.056);
-      expect(parsed.data.GestureCostEth).toBeCloseTo(0.1);
+      expect(parsed.data.ParticipationCstReward).toBeCloseTo(0.1);
+      expect(parsed.data).not.toHaveProperty('GestureCostEth');
     }
   });
 });

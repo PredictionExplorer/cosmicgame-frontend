@@ -461,11 +461,18 @@ describe('GestureForm', () => {
     expect(defaultProps.setBidPricePlus).toHaveBeenCalledWith(10);
   });
 
-  it('gesture cost plus input rejects values > 50', () => {
+  it.each([
+    ['51', 50],
+    ['-5', 0],
+    ['', 0],
+    ['12.7', 12],
+  ])('clamps a gesture cost buffer of %p to %p percent', (typed, expected) => {
+    // Regression: only values above 50 were rejected, so a negative buffer underpaid and
+    // reverted. The shared clamp keeps the buffer a whole percent in [0, 50].
     render(<GestureForm {...defaultProps} advancedExpanded={true} gestureType="ETH" />);
     const input = screen.getByPlaceholderText('0');
-    fireEvent.change(input, { target: { value: '51' } });
-    expect(defaultProps.setBidPricePlus).not.toHaveBeenCalled();
+    fireEvent.change(input, { target: { value: typed } });
+    expect(defaultProps.setBidPricePlus).toHaveBeenLastCalledWith(expected);
   });
 
   it('computed gesture cost shows ETH amount with gestureCostPlus applied', () => {
@@ -477,9 +484,9 @@ describe('GestureForm', () => {
         gestureCostPlus={10}
       />,
     );
-    const expectedPrice = (0.01 * (1 + 10 / 100) * 1).toFixed(6);
+    // The value sent, in the quote format the home page uses (five significant digits).
     expect(
-      screen.getByText(`home.form.advanced.collision.approxCost(amount=${expectedPrice})`),
+      screen.getByText('home.form.advanced.collision.approxCost(amount=0.011)'),
     ).toBeInTheDocument();
   });
 
@@ -492,9 +499,8 @@ describe('GestureForm', () => {
         gestureCostPlus={0}
       />,
     );
-    const expectedPrice = (0.01 * 1 * 0.5).toFixed(6);
     expect(
-      screen.getByText(`home.form.advanced.collision.approxCost(amount=${expectedPrice})`),
+      screen.getByText('home.form.advanced.collision.approxCost(amount=0.005)'),
     ).toBeInTheDocument();
   });
 

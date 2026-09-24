@@ -1,20 +1,22 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
+import {
+  ALLOCATION_TRACK_COLORS,
+  ALLOCATION_TRACK_COPY_KEYS,
+  withNextCycleShare,
+  type AllocationTrackShare,
+} from '@/config/allocationTracks';
 import { cn } from '@/lib/utils';
+import { toFiniteNumber } from '@/utils/finiteNumber';
+import { formatPercentPoints } from '@/utils/protocolParams';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-
-interface FundSegment {
-  label: string;
-  value: number;
-  color: string;
-  tooltip: string;
-}
+import { UnknownValue } from '@/components/ui/unknown-value';
 
 interface FundDistributionProps {
   prizePercentage?: number;
@@ -25,22 +27,11 @@ interface FundDistributionProps {
   loading?: boolean;
 }
 
-const SEGMENT_COLORS = {
-  allocation: 'bg-chart-1',
-  chrono: 'bg-chart-2',
-  stellarSelection: 'bg-[#F59E0B]',
-  anchoring: 'bg-[#10B981]',
-  charity: 'bg-[#F472B6]',
-} as const;
-
-const DOT_COLORS = {
-  allocation: 'bg-chart-1',
-  chrono: 'bg-chart-2',
-  stellarSelection: 'bg-[#F59E0B]',
-  anchoring: 'bg-[#10B981]',
-  charity: 'bg-[#F472B6]',
-} as const;
-
+/**
+ * The Cycle Reserve split. Each segment is drawn against the whole reserve (100%), and the
+ * remainder that carries into the next cycle is its own segment, so a 25% track fills a
+ * quarter of the bar rather than half of it.
+ */
 export function FundDistribution({
   prizePercentage,
   chronoWarriorPercentage,
@@ -50,6 +41,8 @@ export function FundDistribution({
   loading = false,
 }: FundDistributionProps) {
   const t = useTranslations('contracts');
+  const tCommon = useTranslations('common');
+  const locale = useLocale();
 
   if (loading) {
     return (
@@ -60,7 +53,7 @@ export function FundDistribution({
         <CardContent>
           <Skeleton className="h-10 w-full rounded-full" />
           <div className="mt-4 flex flex-wrap gap-4">
-            {Array.from({ length: 5 }).map((_, i) => (
+            {Array.from({ length: 6 }).map((_, i) => (
               <Skeleton key={i} className="h-4 w-24" />
             ))}
           </div>
@@ -69,40 +62,20 @@ export function FundDistribution({
     );
   }
 
-  const segments: FundSegment[] = [
-    {
-      label: t('funds.segments.signature.label'),
-      value: prizePercentage ?? 0,
-      color: SEGMENT_COLORS.allocation,
-      tooltip: t('funds.segments.signature.tooltip'),
-    },
-    {
-      label: t('funds.segments.chrono.label'),
-      value: chronoWarriorPercentage ?? 0,
-      color: SEGMENT_COLORS.chrono,
-      tooltip: t('funds.segments.chrono.tooltip'),
-    },
-    {
-      label: t('funds.segments.stellar.label'),
-      value: stellarSelectionPercentage ?? 0,
-      color: SEGMENT_COLORS.stellarSelection,
-      tooltip: t('funds.segments.stellar.tooltip'),
-    },
-    {
-      label: t('funds.segments.anchor.label'),
-      value: stakingPercentage ?? 0,
-      color: SEGMENT_COLORS.anchoring,
-      tooltip: t('funds.segments.anchor.tooltip'),
-    },
-    {
-      label: t('funds.segments.publicGoods.label'),
-      value: charityPercentage ?? 0,
-      color: SEGMENT_COLORS.charity,
-      tooltip: t('funds.segments.publicGoods.tooltip'),
-    },
-  ];
-
-  const total = segments.reduce((sum, s) => sum + s.value, 0);
+  const shares: AllocationTrackShare[] = withNextCycleShare([
+    { id: 'signature', percent: toFiniteNumber(prizePercentage) },
+    { id: 'chrono', percent: toFiniteNumber(chronoWarriorPercentage) },
+    { id: 'stellar', percent: toFiniteNumber(stellarSelectionPercentage) },
+    { id: 'anchor', percent: toFiniteNumber(stakingPercentage) },
+    { id: 'publicGoods', percent: toFiniteNumber(charityPercentage) },
+  ]);
+  const segments = shares.map((share) => ({
+    ...share,
+    label: t(`funds.segments.${ALLOCATION_TRACK_COPY_KEYS[share.id]}.label`),
+    tooltip: t(`funds.segments.${ALLOCATION_TRACK_COPY_KEYS[share.id]}.tooltip`),
+    color: ALLOCATION_TRACK_COLORS[share.id],
+    formatted: share.percent === null ? null : formatPercentPoints(share.percent, locale),
+  }));
 
   return (
     <Card>
@@ -119,10 +92,9 @@ export function FundDistribution({
           aria-label={t('funds.chartAria')}
         >
           {segments.map((segment, i) => {
-            if (segment.value <= 0) return null;
-            const widthPercent = total > 0 ? (segment.value / total) * 100 : 0;
+            if (segment.percent === null || segment.percent <= 0) return null;
             return (
-              <Tooltip key={segment.label}>
+              <Tooltip key={segment.id}>
                 <TooltipTrigger asChild>
                   <motion.div
                     className={cn(
@@ -130,14 +102,15 @@ export function FundDistribution({
                       'relative h-full',
                       i > 0 && 'border-l border-black/20',
                     )}
+                    data-testid={`fund-segment-${segment.id}`}
                     initial={{ width: 0 }}
-                    animate={{ width: `${widthPercent}%` }}
+                    animate={{ width: `${Math.min(100, segment.percent)}%` }}
                     transition={{ duration: 0.8, delay: i * 0.1, ease: 'easeOut' as const }}
                   />
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="max-w-[220px] text-xs leading-relaxed">
-                    {segment.label}: {segment.value}%
+                    {segment.label}: {segment.formatted}
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -146,24 +119,16 @@ export function FundDistribution({
         </div>
 
         <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
-          {segments.map((segment) => {
-            const dotColor =
-              Object.values(DOT_COLORS)[
-                Object.values(SEGMENT_COLORS).indexOf(
-                  segment.color as (typeof SEGMENT_COLORS)[keyof typeof SEGMENT_COLORS],
-                )
-              ];
-            return (
-              <div key={segment.label} className="flex items-center gap-2 text-sm">
-                <span
-                  className={cn('inline-block h-2.5 w-2.5 rounded-full', dotColor ?? segment.color)}
-                />
-                <span className="text-muted-foreground">{segment.label}</span>
-                <span className="font-semibold">{segment.value}%</span>
-                <InfoTooltip content={segment.tooltip} />
-              </div>
-            );
-          })}
+          {segments.map((segment) => (
+            <div key={segment.id} className="flex items-center gap-2 text-sm">
+              <span className={cn('inline-block h-2.5 w-2.5 rounded-full', segment.color)} />
+              <span className="text-muted-foreground">{segment.label}</span>
+              <span className="font-semibold">
+                {segment.formatted ?? <UnknownValue label={tCommon('status.unavailable')} />}
+              </span>
+              <InfoTooltip content={segment.tooltip} />
+            </div>
+          ))}
         </div>
       </CardContent>
     </Card>

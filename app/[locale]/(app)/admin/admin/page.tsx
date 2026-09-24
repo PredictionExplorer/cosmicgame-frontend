@@ -26,7 +26,7 @@ export default async function Page({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
   return (
-    <PageMessages namespaces={['admin']}>
+    <PageMessages namespaces={['admin', 'contracts']}>
       <AdminSettingsPage />
     </PageMessages>
   );

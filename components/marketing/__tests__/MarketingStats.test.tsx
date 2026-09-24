@@ -43,7 +43,7 @@ jest.mock('framer-motion', () => {
 });
 
 const defaultProps = {
-  totalRewardsEth: 1234.56,
+  totalAllocatedCst: 1234.56,
   activeMarketers: 42,
   rewardTransactions: 150,
 };
@@ -75,9 +75,18 @@ describe('MarketingStats', () => {
 
   it('renders zero values without crashing', () => {
     renderWithTooltip(
-      <MarketingStats totalRewardsEth={0} activeMarketers={0} rewardTransactions={0} />,
+      <MarketingStats totalAllocatedCst={0} activeMarketers={0} rewardTransactions={0} />,
     );
     expect(screen.getByText('Total Allocations')).toBeInTheDocument();
+  });
+
+  it('shows unread figures as unavailable, never as 0 CST', () => {
+    renderWithTooltip(
+      <MarketingStats totalAllocatedCst={null} activeMarketers={3} rewardTransactions={null} />,
+    );
+    expect(screen.getAllByText('common.status.unavailable')).toHaveLength(2);
+    expect(screen.queryByText('CST')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/Total Allocations.*0/)).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

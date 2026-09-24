@@ -20,10 +20,9 @@ import {
 } from '@/components/styled';
 import { cn } from '@/lib/utils';
 import type { WinningHistoryEntry } from '@/services/api/types';
+import { allocationAmountUnit } from '@/utils/allocationRecords';
+import { UNAVAILABLE_VALUE } from '@/utils/format';
 export type { WinningHistoryEntry };
-
-/** Stellar Selection rows in `AllPrizes` / `cg_prize.ptype`. */
-export const STELLAR_SELECTION_RECORD_TYPES = new Set([10, 11, 12, 13, 14, 18]);
 
 /** Backend `cg_prize.ptype` / API `RecordType` — must match black-site prize history labels. */
 const RECORD_TYPE_MAP: Record<number, { icon: ReactNode; textKey: string }> = {
@@ -81,28 +80,24 @@ const RECORD_TYPE_MAP: Record<number, { icon: ReactNode; textKey: string }> = {
   },
 };
 
-const ETH_RECORD_TYPES = new Set([0, 7, 10, 15, 18]);
-const CST_RECORD_TYPES = new Set([1, 4, 6, 8, 11, 13]);
-const NFT_RECORD_TYPES = new Set([2, 3, 5, 9, 12, 14, 16]);
-
+/** A row's `AmountEth` in the unit its record type carries (see `utils/allocationRecords`). */
 function formatAllocationAmount(
   recordType: number,
   amountEth: number | undefined,
   notApplicable: string,
 ): string {
-  if (NFT_RECORD_TYPES.has(recordType)) {
-    return notApplicable;
+  switch (allocationAmountUnit(recordType)) {
+    case 'nft':
+      return notApplicable;
+    case 'eth':
+      return `${(amountEth ?? 0).toFixed(4)} ETH`;
+    case 'erc20':
+      return `${(amountEth ?? 0).toFixed(4)} (ERC-20)`;
+    case 'cst':
+      return `${Math.round(amountEth ?? 0)} CST`;
+    case 'unknown':
+      return UNAVAILABLE_VALUE;
   }
-  if (ETH_RECORD_TYPES.has(recordType)) {
-    return `${(amountEth ?? 0).toFixed(4)} ETH`;
-  }
-  if (recordType === 17) {
-    return `${(amountEth ?? 0).toFixed(4)} (ERC-20)`;
-  }
-  if (CST_RECORD_TYPES.has(recordType)) {
-    return `${Math.round(amountEth ?? 0)} CST`;
-  }
-  return ' ';
 }
 
 const WinningHistoryRow = ({

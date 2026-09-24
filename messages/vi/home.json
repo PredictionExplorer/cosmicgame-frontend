@@ -353,7 +353,7 @@
         "title": "Dự phòng thay đổi chi phí",
         "raiseBy": "Tăng thêm",
         "approxCost": "≈ {amount} ETH",
-        "note": "Cho phép chi phí nét bút tăng tối đa {percent}% nếu nét bút khác trong cùng khối được ghi nhận trước. Thiết lập này không làm tăng chi phí cố định của giao thức."
+        "note": "Cộng thêm {percent}% vào số tiền gửi để nét bút vẫn thành công nếu một nét bút khác trong cùng khối được ghi nhận trước. Hợp đồng chỉ thu chi phí nét bút hiện tại và hoàn lại phần còn lại trong cùng giao dịch, trừ khi khoản chênh lệch quá nhỏ so với phí gas."
       }
     },
     "submit": {
@@ -362,7 +362,8 @@
       "randomWalk": "Đặt nét bút bằng ETH + RandomWalk",
       "cst": "Đặt nét bút bằng CST ({cost} CST)",
       "cstFree": "Đặt nét bút bằng CST (KHÔNG TỐN CHI PHÍ)",
-      "generic": "Đặt nét bút bằng {method}"
+      "generic": "Đặt nét bút bằng {method}",
+      "sendsNote": "Gửi khoảng {amount} ETH, gồm {percent}% dự phòng thay đổi chi phí."
     },
     "processing": "Đang xử lý…",
     "finalGestureMade": "Bạn đã đặt nét bút cuối cùng của chu kỳ này. Khi bộ đếm kết thúc, hãy dùng Hoàn tất chu kỳ bên dưới.",

@@ -85,6 +85,50 @@ describe('AdminEventsTable', () => {
     expect(newValueHeaders.length).toBeGreaterThanOrEqual(1);
   });
 
+  describe('time added per gesture', () => {
+    // Regression: the V2 event reports microseconds, and the table once formatted
+    // 3,672,360,000 µs as seconds ("42504d 4h") instead of 1h 1m 12s.
+    const timeIncrementRow: AdminEventRow = {
+      EvtLogId: '26006',
+      RecordType: 21,
+      TransferType: 0,
+      TimeStamp: 1786491506,
+      TxHash: '0x40e9',
+      IntegerValue: 3_672_360_000,
+      AddressValue: '',
+      StringValue: '',
+    };
+
+    afterEach(() => jest.restoreAllMocks());
+
+    test('converts the microsecond value before formatting it', () => {
+      render(<AdminEventsTable list={[timeIncrementRow]} />);
+
+      expect(screen.getByText('1h 1m 12s')).toBeInTheDocument();
+      expect(screen.queryByText(/42504d/)).not.toBeInTheDocument();
+    });
+
+    test('formats the converted duration with the locale units', () => {
+      jest
+        .spyOn(jest.requireMock<typeof import('next-intl')>('next-intl'), 'useLocale')
+        .mockReturnValue('zh');
+
+      render(<AdminEventsTable list={[timeIncrementRow]} />);
+
+      expect(screen.getByText('1小时1分12秒')).toBeInTheDocument();
+    });
+
+    test('keeps second-based durations in seconds', () => {
+      render(
+        <AdminEventsTable
+          list={[{ ...timeIncrementRow, EvtLogId: '25530', RecordType: 7, IntegerValue: 3600 }]}
+        />,
+      );
+
+      expect(screen.getByText('1h')).toBeInTheDocument();
+    });
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(<AdminEventsTable list={[]} />);
     await checkA11y(container);

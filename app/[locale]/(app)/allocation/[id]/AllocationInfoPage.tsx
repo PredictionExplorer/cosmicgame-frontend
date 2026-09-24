@@ -27,7 +27,8 @@ import { useLocale, useTranslations } from 'next-intl';
 
 import { getExplorerUrl, formatEthValue, shortenHex, getEnduranceChampions } from '@/utils';
 
-import { formatFixed } from '@/utils/format';
+import { formatFixed, toIntlLocale } from '@/utils/format';
+import { ALLOCATION_TRACK_COLORS, type AllocationTrackId } from '@/config/allocationTracks';
 import { Link } from '@/i18n/navigation';
 import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import { cn } from '@/lib/utils';
@@ -56,9 +57,9 @@ import AttachedNFTTable from '@/components/attachments/AttachedNFTTable';
 import EnduranceChampionsTable from '@/components/tables/EnduranceChampionsTable';
 import AttachedERC20Table from '@/components/attachments/AttachedERC20Table';
 import RecipientHistoryTable, {
-  STELLAR_SELECTION_RECORD_TYPES,
   type WinningHistoryEntry,
 } from '@/components/tables/RecipientHistoryTable';
+import { STELLAR_SELECTION_RECORD_TYPES } from '@/utils/allocationRecords';
 
 const sectionFade = {
   hidden: { opacity: 0, y: 24 },
@@ -321,19 +322,33 @@ function RecipientCard({
 }
 
 interface DistributionSegment {
-  id: string;
+  id: AllocationTrackId;
   label: string;
   value: number;
-  color: string;
   tooltip: string;
 }
 
+/**
+ * The ETH a finalized cycle distributed, split by track. Shares are of the ETH distributed
+ * this cycle (every ETH track, Chrono-Warrior included); the Cycle Reserve's remainder that
+ * carries into the next cycle is not part of this payload, so it is not drawn.
+ */
 function AllocationDistributionBar({ segments }: { segments: DistributionSegment[] }) {
+  const t = useTranslations('allocation');
+  const locale = useLocale();
   const total = segments.reduce((sum, s) => sum + s.value, 0);
   if (total === 0) return null;
+  const shareFormat = new Intl.NumberFormat(toIntlLocale(locale), {
+    style: 'percent',
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
 
   return (
     <div data-testid="allocation-distribution-bar">
+      <p className="mb-3 text-sm text-muted-foreground" data-testid="allocation-distribution-total">
+        {t('details.distribution.total', { amount: formatFixed(total, 4) })}
+      </p>
       <motion.div
         className="flex h-3 rounded-full overflow-hidden bg-white/[0.04]"
         initial={{ scaleX: 0 }}
@@ -345,10 +360,13 @@ function AllocationDistributionBar({ segments }: { segments: DistributionSegment
           const pct = (seg.value / total) * 100;
           if (pct < 0.5) return null;
           return (
-            <Tooltip key={seg.label}>
+            <Tooltip key={seg.id}>
               <TooltipTrigger asChild>
                 <div
-                  className={cn('relative transition-all duration-300', seg.color)}
+                  className={cn(
+                    'relative transition-all duration-300',
+                    ALLOCATION_TRACK_COLORS[seg.id],
+                  )}
                   style={{ width: `${pct}%` }}
                   data-testid={`distribution-segment-${seg.id}`}
                 />
@@ -361,17 +379,20 @@ function AllocationDistributionBar({ segments }: { segments: DistributionSegment
         })}
       </motion.div>
       <div className="flex flex-wrap gap-x-5 gap-y-2 mt-3">
-        {segments.map((seg) => {
-          const pct = total > 0 ? ((seg.value / total) * 100).toFixed(1) : '0.0';
-          return (
-            <div key={seg.label} className="flex items-center gap-2 text-xs">
-              <span className={cn('h-2.5 w-2.5 rounded-full', seg.color)} />
-              <span className="text-muted-foreground">{seg.label}</span>
-              <span className="text-white/80 font-medium tabular-nums">{pct}%</span>
-              <InfoTooltip content={seg.tooltip} />
-            </div>
-          );
-        })}
+        {segments.map((seg) => (
+          <div
+            key={seg.id}
+            className="flex items-center gap-2 text-xs"
+            data-testid={`distribution-legend-${seg.id}`}
+          >
+            <span className={cn('h-2.5 w-2.5 rounded-full', ALLOCATION_TRACK_COLORS[seg.id])} />
+            <span className="text-muted-foreground">{seg.label}</span>
+            <span className="text-white/80 font-medium tabular-nums">
+              {formatFixed(seg.value, 4)} ETH · {shareFormat.format(seg.value / total)}
+            </span>
+            <InfoTooltip content={seg.tooltip} />
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -512,44 +533,23 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
     );
   }
 
-  const distributionSegments: DistributionSegment[] = [
-    {
-      id: 'signature-allocation',
-      label: t('details.distribution.segments.signature.label'),
-      value: allocationInfo.AmountEth,
-      color: 'bg-[#15BFFD]',
-      tooltip: t('details.distribution.segments.signature.tooltip', {
-        amount: formatFixed(allocationInfo.AmountEth, 4),
-      }),
-    },
-    {
-      id: 'public-goods',
-      label: t('details.distribution.segments.publicGoods.label'),
-      value: allocationInfo.CharityAmountETH,
-      color: 'bg-emerald-500',
-      tooltip: t('details.distribution.segments.publicGoods.tooltip', {
-        amount: formatFixed(allocationInfo.CharityAmountETH, 4),
-      }),
-    },
-    {
-      id: 'anchor-distribution',
-      label: t('details.distribution.segments.anchor.label'),
-      value: allocationInfo.StakingDepositAmountEth,
-      color: 'bg-[#9C37FD]',
-      tooltip: t('details.distribution.segments.anchor.tooltip', {
-        amount: formatFixed(allocationInfo.StakingDepositAmountEth, 4),
-      }),
-    },
-    {
-      id: 'stellar-selection',
-      label: t('details.distribution.segments.stellar.label'),
-      value: allocationInfo.RoundStats.TotalRaffleEthDepositsEth ?? 0,
-      color: 'bg-[#5B8DEF]',
-      tooltip: t('details.distribution.segments.stellar.tooltip', {
-        amount: (allocationInfo.RoundStats.TotalRaffleEthDepositsEth ?? 0).toFixed(4),
-      }),
-    },
-  ];
+  const distributionAmounts: Record<Exclude<AllocationTrackId, 'nextCycle'>, number> = {
+    signature: allocationInfo.AmountEth ?? 0,
+    chrono: allocationInfo.ChronoWarriorAmountEth ?? 0,
+    stellar: allocationInfo.RoundStats.TotalRaffleEthDepositsEth ?? 0,
+    anchor: allocationInfo.StakingDepositAmountEth ?? 0,
+    publicGoods: allocationInfo.CharityAmountETH ?? 0,
+  };
+  const distributionSegments: DistributionSegment[] = (
+    Object.keys(distributionAmounts) as (keyof typeof distributionAmounts)[]
+  ).map((id) => ({
+    id,
+    label: t(`details.distribution.segments.${id}.label`),
+    value: distributionAmounts[id],
+    tooltip: t(`details.distribution.segments.${id}.tooltip`, {
+      amount: formatFixed(distributionAmounts[id], 4),
+    }),
+  }));
 
   const stats = [
     {

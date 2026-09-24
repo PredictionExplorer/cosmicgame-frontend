@@ -8,6 +8,7 @@
     "subtitle": "拥有 Random Walk NFT，可将一笔 ETH 落笔的价格降低 50%",
     "description": "Random Walk NFT 是独特的数字藏品。将一枚附加至 ETH 落笔，可让这一笔的 ETH 落笔价格降低 50%；周期后段价格较高时，减免的金额也更大。每枚 NFT 仅可用于一次价格减免，时机由你选择。锚定 Random Walk NFT 则可取得锚定 NFT 星选资格，与落笔附加是两项独立机制。",
     "currentCost": "当前铭刻价格",
+    "costBreakdown": "合约价格 {base} ETH，另加 {percent}% 余量，以免确认前价格上涨导致铭刻失败。",
     "submit": "铭刻",
     "myNfts": "我的 Random Walk NFT"
   },

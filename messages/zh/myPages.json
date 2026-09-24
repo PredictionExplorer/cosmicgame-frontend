@@ -65,7 +65,7 @@
       "distributionPerNft": {
         "label": "每枚 Cosmic Signature NFT 派发额",
         "tooltip": "当前每枚已锚定 Cosmic Signature NFT 的 ETH 锚定派发额，按链上锚定池总额除以已索引的锚定 NFT 数量计算。",
-        "indexUnavailableSuffix": "锚定数量数据尚未同步，因此暂无法计算每枚 NFT 的派发额。请稍后再试。"
+        "noneAnchored": "尚未索引到已锚定的 Cosmic Signature NFT"
       }
     }
   },

@@ -153,9 +153,9 @@
       "label": "CST 落筆",
       "tooltip": "所有已索引週期中，使用 CST 而非 ETH 完成的落筆次數。"
     },
-    "outreachReserve": {
-      "label": "推廣儲備",
-      "tooltip": "推廣與生態貢獻者所獲 CST 單獨計算；每筆落筆產生的參與 CST 與 NFT 配套的表彰 CST 均不計入。"
+    "outreachCstAllocated": {
+      "label": "推廣分配 CST 總量",
+      "tooltip": "迄今由推廣儲備發放給推廣與生態貢獻者的 CST，與每筆落筆產生的參與 CST 及 NFT 配套的表彰 CST 分開計算。"
     },
     "outreachTransactions": {
       "label": "推廣交易",
@@ -180,10 +180,6 @@
     "uniqueEthContributors": {
       "label": "獨立 ETH 貢獻者",
       "tooltip": "曾向協議貢獻 ETH 的獨立錢包地址。"
-    },
-    "uniqueAnchorHolders": {
-      "label": "獨立錨定者",
-      "tooltip": "曾錨定 Cosmic Signature NFT 或 Random Walk NFT 的獨立錢包合計數。"
     },
     "cosmicSignatureNftHolders": {
       "label": "Cosmic Signature NFT 持有者",
@@ -296,11 +292,12 @@
       "randomWalkTooltip": "目前已錨定且具備錨定 NFT 星選資格的 Random Walk NFT 總數。",
       "poolLabel": "錨定派發池",
       "poolTooltip": "目前分配至 Cosmic Signature NFT 錨定者派發池的 ETH。",
+      "poolCaption": "本週期收官時存入；此前已存入但尚未取回的部分計入「未取回」。",
       "perNftLabel": "每枚 Cosmic Signature NFT 派發額",
       "perNftTooltip": "目前每枚已錨定 Cosmic Signature NFT 對應的 ETH 錨定派發：鏈上派發池除以已索引的已錨定 NFT 總數。",
-      "perNftTooltipUnavailable": "鏈上錨定派發池已有餘額，但已索引的 Cosmic Signature NFT 錨定數量尚未同步，暫時無法計算每枚 NFT 的派發額。",
+      "perNftNoneAnchored": "尚未索引到已錨定的 Cosmic Signature NFT",
       "activeHoldersLabel": "活躍錨定者",
-      "activeHoldersTooltip": "目前至少錨定一枚 Cosmic Signature NFT 或 Random Walk NFT 的活躍錢包合計數。"
+      "activeHoldersTooltip": "目前至少錨定一枚 Cosmic Signature NFT 或 Random Walk NFT 的不同錢包數；同時錨定兩類 NFT 的錢包只計一次。"
     },
     "description": "已錨定 NFT 是 Cosmic Signature 的核心組成部分：Cosmic Signature NFT 共享 ETH 錨定派發；Random Walk NFT 則參與錨定 NFT 星選。",
     "historyLink": "查看錨定歷史",
@@ -314,7 +311,8 @@
       "randomWalk": "Random Walk NFT 錨定概覽"
     },
     "stats": {
-      "activeHolders": "活躍錨定者數量",
+      "activeHoldersCosmicSignature": "活躍 Cosmic Signature NFT 錨定者數量",
+      "activeHoldersRandomWalk": "活躍 Random Walk NFT 錨定者數量",
       "distributionDeposits": "錨定派發存入次數",
       "totalDistributions": "錨定派發總額",
       "tokensImprinted": "已銘刻代幣總數",

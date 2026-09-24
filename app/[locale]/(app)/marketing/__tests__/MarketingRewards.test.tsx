@@ -56,7 +56,7 @@ function MockStats(props: Record<string, unknown>) {
   return (
     <div
       data-testid="stats"
-      data-total={props.totalRewardsEth}
+      data-total={props.totalAllocatedCst}
       data-marketers={props.activeMarketers}
       data-transactions={props.rewardTransactions}
     >
@@ -166,16 +166,20 @@ describe('MarketingRewards', () => {
 
     expect(screen.getByTestId('leaderboard')).toHaveTextContent('Leaderboard: 0');
     expect(screen.getByTestId('history')).toHaveTextContent('History: 0');
+    // An unread list is an unknown contributor count, not 0 contributors.
+    expect(screen.getByTestId('stats')).not.toHaveAttribute('data-marketers');
   });
 
-  it('handles missing dashboard stats gracefully', () => {
+  it('passes unread dashboard stats as unknown, never as 0', () => {
+    // Regression: a failed dashboard read rendered "0 CST" and "0" transactions.
     mockUseMarketingRewards.mockReturnValue({ data: [], isLoading: false });
     mockUseDashboardInfo.mockReturnValue({ data: null, isLoading: false });
     render(<MarketingRewards />);
 
     const stats = screen.getByTestId('stats');
-    expect(stats).toHaveAttribute('data-total', '0');
-    expect(stats).toHaveAttribute('data-transactions', '0');
+    expect(stats).not.toHaveAttribute('data-total');
+    expect(stats).not.toHaveAttribute('data-transactions');
+    expect(stats).toHaveAttribute('data-marketers', '0');
   });
 
   it('does not render sections while loading', () => {

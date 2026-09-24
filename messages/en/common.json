@@ -47,7 +47,8 @@
     "loadingEllipsis": "Loading…",
     "loadingDots": "Loading...",
     "noData": "No data available.",
-    "nothingHere": "Nothing here yet"
+    "nothingHere": "Nothing here yet",
+    "unavailable": "Unavailable"
   },
   "actions": {
     "copyAddress": "Copy address",

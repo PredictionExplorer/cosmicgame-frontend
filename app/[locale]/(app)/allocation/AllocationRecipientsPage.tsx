@@ -7,6 +7,7 @@ import { useLocale, useTranslations } from 'next-intl';
 
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { ALLOCATION_TRACK_COLORS } from '@/config/allocationTracks';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
@@ -27,7 +28,7 @@ const AllocationRecipientsPage = ({ seoSummary }: { seoSummary?: ReactNode }) =>
       label: t('recipients.reserveSplit.tracks.signature.label'),
       value: `${protocolFacts.mainEthPercentage}%`,
       width: `${protocolFacts.mainEthPercentage}%`,
-      color: 'bg-[rgb(var(--aurora-cyan-rgb))]',
+      color: ALLOCATION_TRACK_COLORS.signature,
       tooltip: t('recipients.reserveSplit.tracks.signature.tooltip'),
     },
     {
@@ -35,7 +36,7 @@ const AllocationRecipientsPage = ({ seoSummary }: { seoSummary?: ReactNode }) =>
       label: t('recipients.reserveSplit.tracks.chrono.label'),
       value: `${protocolFacts.chronoWarriorEthPercentage}%`,
       width: `${protocolFacts.chronoWarriorEthPercentage}%`,
-      color: 'bg-[rgb(var(--nebula-violet-rgb))]',
+      color: ALLOCATION_TRACK_COLORS.chrono,
       tooltip: t('recipients.reserveSplit.tracks.chrono.tooltip'),
     },
     {
@@ -43,7 +44,7 @@ const AllocationRecipientsPage = ({ seoSummary }: { seoSummary?: ReactNode }) =>
       label: t('recipients.reserveSplit.tracks.stellar.label'),
       value: `${protocolFacts.stellarSelectionEthPercentage}%`,
       width: `${protocolFacts.stellarSelectionEthPercentage}%`,
-      color: 'bg-[rgb(var(--solar-gold-rgb))]',
+      color: ALLOCATION_TRACK_COLORS.stellar,
       tooltip: t('recipients.reserveSplit.tracks.stellar.tooltip'),
     },
     {
@@ -51,7 +52,7 @@ const AllocationRecipientsPage = ({ seoSummary }: { seoSummary?: ReactNode }) =>
       label: t('recipients.reserveSplit.tracks.anchor.label'),
       value: `${protocolFacts.anchorDistributionPercentage}%`,
       width: `${protocolFacts.anchorDistributionPercentage}%`,
-      color: 'bg-[rgb(var(--impact-green-rgb))]',
+      color: ALLOCATION_TRACK_COLORS.anchor,
       tooltip: t('recipients.reserveSplit.tracks.anchor.tooltip'),
     },
     {
@@ -59,7 +60,7 @@ const AllocationRecipientsPage = ({ seoSummary }: { seoSummary?: ReactNode }) =>
       label: t('recipients.reserveSplit.tracks.publicGoods.label'),
       value: `${protocolFacts.publicGoodsPercentage}%`,
       width: `${protocolFacts.publicGoodsPercentage}%`,
-      color: 'bg-[rgb(var(--chrono-rose-rgb))]',
+      color: ALLOCATION_TRACK_COLORS.publicGoods,
       tooltip: t('recipients.reserveSplit.tracks.publicGoods.tooltip'),
     },
     {
@@ -67,7 +68,7 @@ const AllocationRecipientsPage = ({ seoSummary }: { seoSummary?: ReactNode }) =>
       label: t('recipients.reserveSplit.tracks.nextCycle.label'),
       value: `~${protocolFacts.compoundingReservePercentage}%`,
       width: `${protocolFacts.compoundingReservePercentage}%`,
-      color: 'bg-white/40',
+      color: ALLOCATION_TRACK_COLORS.nextCycle,
       tooltip: t('recipients.reserveSplit.tracks.nextCycle.tooltip'),
     },
   ] as const;

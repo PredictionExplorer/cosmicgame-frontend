@@ -84,11 +84,16 @@ jest.mock('next/image', () => ({
 }));
 
 jest.mock('../../../../../components/anchoring/AnchoringHeroStats', () => ({
-  AnchoringHeroStats: ({ stats }: { stats: { label: string; value: string }[] }) => (
+  AnchoringHeroStats: ({
+    stats,
+  }: {
+    stats: { label: string; value: React.ReactNode; caption?: React.ReactNode }[];
+  }) => (
     <div data-testid="anchoring-hero-stats">
       {stats.map((s) => (
         <span key={s.label} data-testid={`stat-${s.label}`}>
           {s.label}: {s.value}
+          {s.caption ? <em> {s.caption}</em> : null}
         </span>
       ))}
     </div>
@@ -173,7 +178,8 @@ describe('MyAnchors', () => {
     expect(screen.queryByTestId('stat-Distribution per CST')).not.toBeInTheDocument();
   });
 
-  it('shows pool ETH in Distribution per Cosmic Signature NFT when indexed TotalTokensStaked is zero', async () => {
+  it('shows no per-NFT figure, with a visible reason, when no anchored NFT is indexed', async () => {
+    // Regression: the whole pool (0.225795 ETH) was shown as the per-NFT figure.
     mockUseDashboardInfo.mockReturnValue({
       data: {
         MainStats: {
@@ -186,9 +192,10 @@ describe('MyAnchors', () => {
     });
     render(<MyAnchors />);
     await waitFor(() => {});
-    expect(
-      screen.getByTestId('stat-myPages.anchors.stats.distributionPerNft.label'),
-    ).toHaveTextContent('0.225795 ETH');
+    const card = screen.getByTestId('stat-myPages.anchors.stats.distributionPerNft.label');
+    expect(card).not.toHaveTextContent('0.225795');
+    expect(card).toHaveTextContent('common.status.unavailable');
+    expect(card).toHaveTextContent('myPages.anchors.stats.distributionPerNft.noneAnchored');
   });
 
   it('renders page title', async () => {

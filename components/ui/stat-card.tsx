@@ -47,6 +47,11 @@ interface StatCardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children' 
   featured?: boolean;
   /** Optional trend pill rendered below the value. */
   trend?: StatCardTrend;
+  /**
+   * A visible line under the value that qualifies it (for example why a figure is unknown).
+   * Anything a reader needs to interpret the number belongs here, not only in the tooltip.
+   */
+  caption?: ReactNode;
   loading?: boolean;
 }
 
@@ -59,6 +64,7 @@ export function StatCard({
   gradient = false,
   featured = false,
   trend,
+  caption,
   loading = false,
   className,
   ...rest
@@ -113,6 +119,9 @@ export function StatCard({
         </div>
       )}
       {!loading && trend ? <StatTrend {...trend} /> : null}
+      {!loading && caption ? (
+        <p className="relative z-[1] mt-2 type-body-sm text-muted-foreground">{caption}</p>
+      ) : null}
     </div>
   );
 }

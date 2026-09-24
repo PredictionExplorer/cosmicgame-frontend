@@ -442,12 +442,37 @@ describe('AllocationInfoPage', () => {
       expect(screen.getByTestId('allocation-distribution-bar')).toBeInTheDocument();
     });
 
-    it('renders all four distribution segments', () => {
+    it('renders a segment for every ETH track, Chrono-Warrior included', () => {
       renderWithData(1);
-      expect(screen.getByTestId('distribution-segment-signature-allocation')).toBeInTheDocument();
-      expect(screen.getByTestId('distribution-segment-public-goods')).toBeInTheDocument();
-      expect(screen.getByTestId('distribution-segment-anchor-distribution')).toBeInTheDocument();
-      expect(screen.getByTestId('distribution-segment-stellar-selection')).toBeInTheDocument();
+      for (const id of ['signature', 'chrono', 'stellar', 'anchor', 'publicGoods']) {
+        expect(screen.getByTestId(`distribution-segment-${id}`)).toBeInTheDocument();
+      }
+    });
+
+    it('states each share of the ETH the cycle distributed', () => {
+      // Cycle 1 on production: the bar once divided by four tracks and dropped the
+      // Chrono-Warrior's 3.5397 ETH, printing Signature as 59.5% instead of 50%.
+      renderWithData(1, {
+        AmountEth: 11.0616,
+        ChronoWarriorAmountEth: 3.5397,
+        StakingDepositAmountEth: 2.6548,
+        CharityAmountETH: 3.0972,
+        RoundStats: { ...baseAllocationInfo.RoundStats, TotalRaffleEthDepositsEth: 1.7699 },
+      });
+
+      const expected = {
+        signature: '11.0616 ETH · 50.0%',
+        chrono: '3.5397 ETH · 16.0%',
+        stellar: '1.7699 ETH · 8.0%',
+        anchor: '2.6548 ETH · 12.0%',
+        publicGoods: '3.0972 ETH · 14.0%',
+      };
+      for (const [id, text] of Object.entries(expected)) {
+        expect(screen.getByTestId(`distribution-legend-${id}`)).toHaveTextContent(text);
+      }
+      expect(screen.getByTestId('allocation-distribution-total')).toHaveTextContent(
+        'amount=22.1232',
+      );
     });
 
     it('displays distribution labels', () => {
@@ -465,13 +490,16 @@ describe('AllocationInfoPage', () => {
       expect(
         within(bar).getByText('allocation.details.distribution.segments.stellar.label'),
       ).toBeInTheDocument();
+      expect(
+        within(bar).getByText('allocation.details.distribution.segments.chrono.label'),
+      ).toBeInTheDocument();
     });
 
     it('displays percentage values', () => {
       renderWithData(1);
       const bar = screen.getByTestId('allocation-distribution-bar');
       const pctElements = within(bar).getAllByText(/%$/);
-      expect(pctElements.length).toBe(4);
+      expect(pctElements.length).toBe(5);
     });
 
     it('renders section heading with tooltip', () => {

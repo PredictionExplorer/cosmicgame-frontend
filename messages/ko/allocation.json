@@ -140,11 +140,15 @@
     "distribution": {
       "aria": "배분 구성",
       "title": "배분 구성",
-      "tooltip": "이 사이클의 준비금이 각 배분 경로로 어떻게 나뉘었는지 보여 주는 도표입니다.",
+      "tooltip": "이 사이클에 배분된 ETH가 각 배분 경로로 어떻게 나뉘었는지 보여 줍니다. 사이클 준비금의 나머지는 다음 사이클로 이월되며 여기에는 표시하지 않습니다.",
       "segments": {
         "signature": {
           "label": "시그니처 배분",
           "tooltip": "최종 제스처를 남긴 참여자가 회수한 {amount} ETH"
+        },
+        "chrono": {
+          "label": "시간의 전사",
+          "tooltip": "수호 챔피언 자리를 가장 오랫동안 연속으로 지킨 참여자인 시간의 전사에게 배분된 {amount} ETH"
         },
         "publicGoods": {
           "label": "공공재",
@@ -158,7 +162,8 @@
           "label": "별빛 선정",
           "tooltip": "별빛 선정 풀에 배분된 {amount} ETH"
         }
-      }
+      },
+      "total": "이 사이클 배분 총액 {amount} ETH"
     },
     "statistics": {
       "aria": "사이클 통계",

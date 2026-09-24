@@ -36,8 +36,8 @@ const HUB_TOOLTIPS = [
     expected: /ETH currently held by the Cosmic Signature protocol contract/,
   },
   {
-    label: 'Outreach Reserve',
-    expected: /CST imprinted for outreach and ecosystem contributors/,
+    label: 'Outreach CST Allocated',
+    expected: /CST sent from the Outreach Reserve to outreach and ecosystem contributors/,
   },
   {
     label: 'Allocation Economy',
@@ -63,8 +63,9 @@ const PARTICIPATION_TOOLTIPS = [
     expected: /contributed ETH to the protocol/,
   },
   {
-    label: 'Unique Anchor-holders',
-    expected: /Combined unique wallets that have anchored Cosmic Signature NFTs or RandomWalk NFTs/,
+    label: 'Active Anchor-holders',
+    expected:
+      /Distinct wallets that currently anchor at least one Cosmic Signature or RandomWalk NFT/,
   },
 ];
 

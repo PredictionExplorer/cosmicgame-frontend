@@ -122,7 +122,7 @@ export const DashboardInfoSchema = z
     PrizeClaimTs: z.number(),
     TsRoundStart: z.number(),
     LastBidderAddr: AddressSchema,
-    GestureCostEth: z.number(),
+    ParticipationCstReward: z.number().optional(),
     StakingAmountEth: z.number(),
     MainStats: MainStatsSchema,
     ContractAddrs: ContractAddressesSchema.optional(),
@@ -399,11 +399,12 @@ export const ParticipantSchema = z
   })
   .loose();
 
+/** Raw `statistics/unique/winners` row; `get_unique_winners` maps `PrizesCount` to `AllocationsCount`. */
 export const RecipientSchema = z
   .object({
     WinnerAid: IdSchema,
     WinnerAddr: AddressSchema,
-    AllocationsCount: z.number().optional(),
+    PrizesCount: z.number(),
     MaxWinAmountEth: z.number(),
     PrizesSum: z.number(),
   })

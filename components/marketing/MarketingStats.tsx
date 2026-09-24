@@ -6,12 +6,14 @@ import { Info } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { UnknownValue } from '@/components/ui/unknown-value';
 import { cn } from '@/lib/utils';
 import { TOUCH_TARGET_EXTENDED_CLASS } from '@/lib/touch-target';
 
 interface StatCardProps {
   label: string;
-  value: number;
+  /** `null` when the figure could not be read: rendered as unavailable, never as 0. */
+  value: number | null;
   suffix?: string;
   tooltip: string;
   decimals?: number;
@@ -51,9 +53,10 @@ function useCountUp(target: number, inView: boolean, decimals = 0) {
 function StatCard({ label, value, suffix = '', tooltip, decimals = 0 }: StatCardProps) {
   const locale = useLocale();
   const t = useTranslations('marketing');
+  const tCommon = useTranslations('common');
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-40px' });
-  const displayed = useCountUp(value, inView, decimals);
+  const displayed = useCountUp(value ?? 0, inView && value !== null, decimals);
 
   return (
     <motion.div
@@ -85,25 +88,33 @@ function StatCard({ label, value, suffix = '', tooltip, decimals = 0 }: StatCard
           <TooltipContent className="max-w-xs">{tooltip}</TooltipContent>
         </Tooltip>
       </div>
-      <p
-        className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl"
-        aria-label={t('stats.valueAria', { label, value, suffix })}
-      >
-        {displayed.toLocaleString(locale)}
-        {suffix && <span className="ml-1 text-xl text-muted-foreground">{suffix}</span>}
-      </p>
+      {value === null ? (
+        <p className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">
+          <UnknownValue label={tCommon('status.unavailable')} />
+        </p>
+      ) : (
+        <p
+          className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl"
+          aria-label={t('stats.valueAria', { label, value, suffix })}
+        >
+          {displayed.toLocaleString(locale)}
+          {suffix && <span className="ml-1 text-xl text-muted-foreground">{suffix}</span>}
+        </p>
+      )}
     </motion.div>
   );
 }
 
+/** Each figure is `null` when its read failed, and then shows as unavailable instead of 0. */
 export interface MarketingStatsProps {
-  totalRewardsEth: number;
-  activeMarketers: number;
-  rewardTransactions: number;
+  /** CST sent from the Outreach Reserve so far (`MainStats.TotalMktRewardsEth`, a CST amount). */
+  totalAllocatedCst: number | null;
+  activeMarketers: number | null;
+  rewardTransactions: number | null;
 }
 
 export function MarketingStats({
-  totalRewardsEth,
+  totalAllocatedCst,
   activeMarketers,
   rewardTransactions,
 }: MarketingStatsProps) {
@@ -117,7 +128,7 @@ export function MarketingStats({
       <div className="grid gap-6 sm:grid-cols-3">
         <StatCard
           label={t('stats.totalAllocations.label')}
-          value={totalRewardsEth}
+          value={totalAllocatedCst}
           suffix="CST"
           decimals={2}
           tooltip={t('stats.totalAllocations.tooltip')}

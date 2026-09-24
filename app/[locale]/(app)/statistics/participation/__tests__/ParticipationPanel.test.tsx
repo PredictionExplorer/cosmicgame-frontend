@@ -9,13 +9,21 @@ const mockUseDashboardInfo = jest.fn();
 const mockUseUniqueParticipants = jest.fn();
 const mockUseUniqueRecipients = jest.fn();
 const mockUseUniqueDonors = jest.fn();
+const mockUseUniqueCSTAnchorHolders = jest.fn();
+const mockUseUniqueRWLKAnchorHolders = jest.fn();
 
 jest.mock('../../../../../../hooks/useApiQuery', () => ({
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
   useUniqueParticipants: (...args: unknown[]) => mockUseUniqueParticipants(...args),
   useUniqueRecipients: (...args: unknown[]) => mockUseUniqueRecipients(...args),
   useUniqueDonors: (...args: unknown[]) => mockUseUniqueDonors(...args),
+  useUniqueCSTAnchorHolders: (...args: unknown[]) => mockUseUniqueCSTAnchorHolders(...args),
+  useUniqueRWLKAnchorHolders: (...args: unknown[]) => mockUseUniqueRWLKAnchorHolders(...args),
 }));
+
+const WALLET_A = `0x${'a1'.repeat(20)}`;
+const WALLET_B = `0x${'b2'.repeat(20)}`;
+const WALLET_C = `0x${'c3'.repeat(20)}`;
 
 jest.mock('next/link', () => ({
   __esModule: true,
@@ -51,7 +59,36 @@ beforeEach(() => {
   );
   mockUseUniqueRecipients.mockReturnValue(okQuery([{ WinnerAid: '1', WinnerAddr: '0xccc' }]));
   mockUseUniqueDonors.mockReturnValue(okQuery([{ DonorAid: '1', DonorAddr: '0xddd' }]));
+  // A anchors both kinds; C has released its only RandomWalk NFT.
+  mockUseUniqueCSTAnchorHolders.mockReturnValue(
+    okQuery([
+      { StakerAddr: WALLET_A, TotalTokensStaked: 2 },
+      { StakerAddr: WALLET_B, TotalTokensStaked: 1 },
+    ]),
+  );
+  mockUseUniqueRWLKAnchorHolders.mockReturnValue(
+    okQuery([
+      // The same wallet as A, in upper case.
+      { StakerAddr: `0x${'A1'.repeat(20)}`, TotalTokensStaked: 3 },
+      { StakerAddr: WALLET_C, TotalTokensStaked: 0 },
+    ]),
+  );
 });
+
+/** The stat cards in the order the panel renders them. */
+const STAT_LABELS = [
+  'Unique Participants',
+  'Unique Recipients',
+  'Unique ETH Contributors',
+  'Active Anchor-holders',
+] as const;
+
+/** The value element of the stat card with the given label. */
+function statValue(label: (typeof STAT_LABELS)[number]) {
+  const value = document.querySelectorAll('.stat-card-value')[STAT_LABELS.indexOf(label)];
+  if (!value) throw new Error(`no stat card ${label}`);
+  return value;
+}
 
 describe('ParticipationPanel', () => {
   it('renders the participation stat cards from dashboard data', () => {
@@ -60,8 +97,27 @@ describe('ParticipationPanel', () => {
     expect(screen.getAllByText('Unique Participants').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('29')).toBeInTheDocument();
     expect(screen.getAllByText('Unique Recipients').length).toBeGreaterThanOrEqual(1);
-    // Anchor-holders card sums CST + RWLK unique anchor-holders (7 + 3).
-    expect(screen.getByText('10')).toBeInTheDocument();
+  });
+
+  it('counts each active anchor-holder once, as the anchoring pages do', () => {
+    render(<ParticipationPanel />);
+    // Regression: the card summed the per-kind unique counts (7 + 3 = 10 in the fixture),
+    // counting a wallet that anchors both kinds twice. A and B anchor now; C released.
+    expect(statValue('Active Anchor-holders')).toHaveTextContent(/^2$/);
+    expect(screen.queryByText('10')).not.toBeInTheDocument();
+    expect(screen.queryByText('Unique Anchor-holders')).not.toBeInTheDocument();
+  });
+
+  it('shows unread figures as unavailable, never as a bare dash or zero', () => {
+    mockUseDashboardInfo.mockReturnValue({ ...okQuery(undefined), isError: true });
+    mockUseUniqueRWLKAnchorHolders.mockReturnValue({ ...okQuery(undefined), isError: true });
+    render(<ParticipationPanel />);
+
+    for (const label of ['Unique Participants', 'Active Anchor-holders'] as const) {
+      const value = statValue(label);
+      expect(value).toHaveTextContent('common.status.unavailable');
+      expect(value).not.toHaveTextContent(/\d/);
+    }
   });
 
   it('sorts participants by gesture count before rendering the table', () => {

@@ -153,9 +153,9 @@
       "label": "CSTでの一筆",
       "tooltip": "インデックス済みのサイクルにわたって、ETHではなくCSTで入れられた一筆の数。"
     },
-    "outreachReserve": {
-      "label": "広報準備金",
-      "tooltip": "広報とエコシステムの貢献者のために刻印されたCST。一筆ごとの参加CSTやNFTに伴う功労CSTとは別のものです。"
+    "outreachCstAllocated": {
+      "label": "広報配分CSTの総量",
+      "tooltip": "これまでに広報準備金から広報とエコシステムの貢献者へ送られたCSTです。一筆ごとの参加CSTやNFTに伴う功労CSTとは別のものです。"
     },
     "outreachTransactions": {
       "label": "広報トランザクション",
@@ -180,10 +180,6 @@
     "uniqueEthContributors": {
       "label": "ユニークETH拠出者",
       "tooltip": "プロトコルへETHを拠出したユニークなウォレットアドレス。"
-    },
-    "uniqueAnchorHolders": {
-      "label": "ユニーク係留者",
-      "tooltip": "Cosmic Signature NFTまたはRandomWalk NFTを係留したことのあるユニークなウォレットの合計。"
     },
     "cosmicSignatureNftHolders": {
       "label": "Cosmic Signature NFT保有者",
@@ -296,11 +292,12 @@
       "randomWalkTooltip": "現在係留され、係留NFT星選の対象となっているRandomWalk NFTの総数。",
       "poolLabel": "係留配分プール",
       "poolTooltip": "Cosmic Signature NFTの係留者のために係留配分プールに現在配分されているETH。",
+      "poolCaption": "このサイクルの確定時に積み立てられます。以前の積立分でまだ受け取られていないものは「未受け取り」に表示されます。",
       "perNftLabel": "Cosmic Signature NFTあたりの配分",
       "perNftTooltip": "係留中のCosmic Signature NFT 1点あたりの現在のETH係留配分：オンチェーンのプールを、インデックス済みの係留NFT総数で割った値。",
-      "perNftTooltipUnavailable": "NFT 1点あたりのETH係留配分は、プール残高を係留中のNFT総数で割って求めます。現在、残高とNFT数が同期していないため計算できません。",
+      "perNftNoneAnchored": "係留中のCosmic Signature NFTはまだインデックスされていません",
       "activeHoldersLabel": "活動中の係留者",
-      "activeHoldersTooltip": "Cosmic Signature NFTまたはRandomWalk NFTを少なくとも1点現在係留している活動中のウォレットの合計。"
+      "activeHoldersTooltip": "Cosmic Signature NFTまたはRandomWalk NFTを少なくとも1点現在係留している異なるウォレットの数です。両方を係留しているウォレットは1つとして数えます。"
     },
     "description": "係留されたNFTはCosmic Signatureの中核です。Cosmic Signature NFTはETHの係留配分を分け合い、RandomWalk NFTは係留NFT星選に参加します。",
     "historyLink": "係留の履歴を見る",
@@ -314,7 +311,8 @@
       "randomWalk": "RWLK係留の概要"
     },
     "stats": {
-      "activeHolders": "活動中の係留者数",
+      "activeHoldersCosmicSignature": "Cosmic Signature NFTの活動中の係留者数",
+      "activeHoldersRandomWalk": "RandomWalk NFTの活動中の係留者数",
       "distributionDeposits": "係留配分の積立回数",
       "totalDistributions": "係留配分の総額",
       "tokensImprinted": "刻印されたトークンの総数",

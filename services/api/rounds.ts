@@ -40,9 +40,9 @@ import type {
 } from './types';
 
 /**
- * Maps the live Go `/statistics/dashboard` JSON into the field names the app schema expects.
- * Wire format uses `PrizeAmountEth`, `BidPriceEth`, `TokenReward` (wei string); lexicon/UI use
- * `CurPrizeAmountEth`, `CurBidPriceEth`, `GestureCostEth`.
+ * Maps the live Go `/statistics/dashboard` JSON onto the app schema: `PrizeAmountEth` →
+ * `CurPrizeAmountEth`, `BidPriceEth` → `CurBidPriceEth` (the ETH Gesture Cost), and
+ * `TokenReward` (a wei string of CST, never an ETH cost) → `ParticipationCstReward` in CST.
  */
 export function normalizeDashboardWire(raw: Record<string, unknown>): Record<string, unknown> {
   const data = { ...raw };
@@ -53,16 +53,18 @@ export function normalizeDashboardWire(raw: Record<string, unknown>): Record<str
   if (data.CurBidPriceEth === undefined && typeof data.BidPriceEth === 'number') {
     data.CurBidPriceEth = data.BidPriceEth;
   }
-  if (data.GestureCostEth === undefined) {
-    data.GestureCostEth = tokenRewardWeiStringToGestureCostEth(data.TokenReward);
+  if (data.ParticipationCstReward === undefined) {
+    const reward = tokenRewardWeiStringToCst(data.TokenReward);
+    if (reward !== undefined) data.ParticipationCstReward = reward;
   }
 
   return data;
 }
 
-function tokenRewardWeiStringToGestureCostEth(tokenReward: unknown): number {
+/** Converts the wire `TokenReward` (a wei-denominated CST string); `undefined` when it is absent or a sentinel. */
+function tokenRewardWeiStringToCst(tokenReward: unknown): number | undefined {
   if (typeof tokenReward !== 'string' || tokenReward === '' || tokenReward === 'error') {
-    return 0;
+    return undefined;
   }
   // Keep the value in wei through `formatUnits`: `Number(wei) / 1e18` rounds
   // the integer to a double first and loses precision past 2^53.
@@ -70,7 +72,7 @@ function tokenRewardWeiStringToGestureCostEth(tokenReward: unknown): number {
     return weiToEthNumber(BigInt(tokenReward));
   } catch {
     const n = Number(tokenReward);
-    return Number.isFinite(n) ? n / 1e18 : 0;
+    return Number.isFinite(n) ? n / 1e18 : undefined;
   }
 }
 
@@ -123,11 +125,17 @@ export function get_prize_time(opts?: ApiRequestOptions): Promise<number> {
   }, 0);
 }
 
-/** Fetches the global allocation-claim history with flattened transaction fields (optionally paged). */
-export function get_claim_history(opts?: ApiListRequestOptions): Promise<TxInfo[]> {
+/**
+ * Fetches the global allocation history (every record type: ETH, CST, NFT and retrieval rows,
+ * with flattened transaction fields; optionally paged). `AmountEth` is in the unit of the row's
+ * `RecordType`, so totals must go through `utils/allocationRecords`, never a plain sum.
+ */
+export function get_claim_history(opts?: ApiListRequestOptions): Promise<WinningHistoryEntry[]> {
   return apiCallRequired(async () => {
     const { data } = await apiGet(getAPIUrl(`prizes/history/global/${pagedPath(opts)}`), opts);
-    return flattenTxArray<TxInfo>(data.GlobalPrizeHistory);
+    const history = flattenTxArray<WinningHistoryEntry>(data.GlobalPrizeHistory);
+    validateList(WinningHistoryEntrySchema, history, 'WinningHistory[global]');
+    return history;
   });
 }
 

@@ -59,6 +59,23 @@ describe('StatCard', () => {
     expect(await screen.findByRole('tooltip')).toHaveTextContent('ETH held by the contract.');
   });
 
+  it('renders a visible caption under the value, but not while loading', () => {
+    const { rerender } = render(
+      <StatCard label="Distribution per NFT" value="—" caption="No anchored NFTs indexed yet" />,
+    );
+    expect(screen.getByText('No anchored NFTs indexed yet')).toBeVisible();
+
+    rerender(
+      <StatCard
+        label="Distribution per NFT"
+        value="—"
+        caption="No anchored NFTs indexed yet"
+        loading
+      />,
+    );
+    expect(screen.queryByText('No anchored NFTs indexed yet')).not.toBeInTheDocument();
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(<StatCard label="Cycles" value={42} />);
     await checkA11y(container);

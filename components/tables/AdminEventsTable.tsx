@@ -24,6 +24,8 @@ import type { AdminEventRow } from '@/services/api/types';
 
 export type { AdminEventRow };
 
+const MICROSECONDS_PER_SECOND = 1_000_000;
+
 const AdminEventsRow = ({ row }: { row?: AdminEventRow }) => {
   const t = useTranslations('tables');
   const tCoordination = useTranslations('coordination');
@@ -87,6 +89,8 @@ const AdminEventsRow = ({ row }: { row?: AdminEventRow }) => {
           row.IntegerValue
         ) : event?.type === 'time' ? (
           formatSeconds(row.IntegerValue, locale)
+        ) : event?.type === 'microseconds' ? (
+          formatSeconds(row.IntegerValue / MICROSECONDS_PER_SECOND, locale)
         ) : event?.type === 'address' ? (
           <span className="font-mono break-all">{row.AddressValue}</span>
         ) : (

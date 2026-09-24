@@ -45,7 +45,7 @@ import { DeckMiniBar } from '@/components/home/experimental/DeckMiniBar';
 import { DeckPersonalStrip } from '@/components/home/experimental/DeckPersonalStrip';
 import { GestureComposer } from '@/components/home/experimental/GestureComposer';
 import { deriveFeedSystemEvents } from '@/components/home/deck/feedSystemEvents';
-import { getGestureSubmitLabel } from '@/components/home/experimental/gestureSubmitLabel';
+import { getGestureSubmitLabel } from '@/components/home/observatory/gestureSubmitLabel';
 import { AttachedNFTAllocationShowcase } from '@/components/attachments/DonatedNFTPrizeShowcase';
 import Allocation from '@/components/home/experimental/Allocation';
 import { useGestureForm } from '@/hooks/useGestureForm';
@@ -79,6 +79,7 @@ import {
 } from '@/lib/uxCycleScenarios';
 import type { CSTTokenInfo, DashboardInfo } from '@/services/api';
 import { deriveLiveCstGestureData } from '@/utils/cstGesture';
+import { ethGestureSendAmount, formatEthQuote } from '@/utils/gestureQuote';
 
 const LatestNFTs = dynamic(() => import('@/components/nft/LatestNFTs'), {
   ssr: false,
@@ -514,16 +515,32 @@ const ExperimentalHomePage = ({
   // who tabbed away can see the clock closing from anywhere.
   useTabTitleCountdown({ enabled: isFinalWindow, targetMs: allocationTime });
 
-  // One shared label for every gesture submit surface (console, monument,
-  // composer) so the displayed cost can never drift between them.
+  // The home page's label for every gesture submit surface (console, monument,
+  // composer), so both UIs quote the same Gesture Cost. The collision buffer the
+  // form adds on top is disclosed under the console button, not folded in here.
   const submitLabel = getGestureSubmitLabel({
     t,
+    locale,
     gestureType,
-    ethPrice: ethGestureInfo?.ETHPrice ?? 0,
-    gestureCostPlus,
+    ethPrice: ethGestureInfo?.ETHPrice,
     rwlkId,
     cstGestureData: liveCstGestureData,
   });
+  const ethPrice = ethGestureInfo?.ETHPrice;
+  const sendsNote =
+    (gestureType === 'ETH' || gestureType === 'RandomWalk') &&
+    gestureCostPlus > 0 &&
+    ethPrice != null &&
+    Number.isFinite(ethPrice) &&
+    ethPrice >= 0
+      ? t('form.submit.sendsNote', {
+          amount: formatEthQuote(
+            ethGestureSendAmount(ethPrice, gestureType, gestureCostPlus),
+            locale,
+          ),
+          percent: gestureCostPlus,
+        })
+      : null;
 
   const scrollToGestureForm = useCallback(() => {
     const el = document.getElementById('make-gesture');
@@ -727,6 +744,14 @@ const ExperimentalHomePage = ({
                   )}
                 </Button>
               )}
+              {canGesture && sendsNote ? (
+                <p
+                  className="text-xs leading-relaxed text-muted-foreground"
+                  data-testid="gesture-send-amount"
+                >
+                  {sendsNote}
+                </p>
+              ) : null}
               {account && !canGesture && cycleTimerEnded === false && (
                 <p className="text-sm text-muted-foreground">{t('form.finalGestureMade')}</p>
               )}

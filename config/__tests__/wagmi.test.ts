@@ -70,7 +70,6 @@ describe('wagmi wallet configuration (light boot config)', () => {
     process.env.NEXT_PUBLIC_NETWORK = 'local';
     jest.resetModules();
     try {
-       
       const harnessConfig = (require('../wagmi') as typeof import('../wagmi')).wagmiConfig;
       expect(harnessConfig).toMatchObject({
         storage: { kind: 'wagmi-storage', key: 'cosmic-harness-wagmi' },

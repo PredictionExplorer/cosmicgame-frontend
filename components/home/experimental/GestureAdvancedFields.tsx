@@ -2,11 +2,16 @@
 
 import { useId } from 'react';
 import { Settings2, Info } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { protocolFacts } from '@/content/protocol-facts';
 
 import { formatCstAmount } from '@/utils/cstGesture';
+import {
+  clampCollisionBufferPercent,
+  ethGestureSendAmount,
+  formatEthQuote,
+} from '@/utils/gestureQuote';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -88,7 +93,10 @@ export function GestureAdvancedFields({
   layout = 'stack',
 }: GestureAdvancedFieldsProps) {
   const t = useTranslations('home');
+  const tCommon = useTranslations('common');
+  const locale = useLocale();
   const messageInputId = useId();
+  const ethPrice = ethGestureInfo?.ETHPrice;
 
   const messageField = (
     <>
@@ -316,8 +324,7 @@ export function GestureAdvancedFields({
                   className="h-9 px-2.5 py-2 pr-7 text-sm tabular-nums"
                   disabled={previewMode}
                   onChange={(e) => {
-                    const value = Number(e.target.value);
-                    if (value <= 50) setBidPricePlus(value);
+                    setBidPricePlus(clampCollisionBufferPercent(e.target.value));
                   }}
                 />
                 <span className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none text-xs">
@@ -326,13 +333,14 @@ export function GestureAdvancedFields({
               </div>
             </div>
             <span className="text-sm font-mono text-muted-foreground tabular-nums min-w-0">
-              {t('form.advanced.collision.approxCost', {
-                amount: (
-                  (ethGestureInfo?.ETHPrice ?? 0) *
-                  (1 + gestureCostPlus / 100) *
-                  (gestureType === 'RandomWalk' ? 0.5 : 1)
-                ).toFixed(6),
-              })}
+              {ethPrice != null && Number.isFinite(ethPrice) && ethPrice >= 0
+                ? t('form.advanced.collision.approxCost', {
+                    amount: formatEthQuote(
+                      ethGestureSendAmount(ethPrice, gestureType, gestureCostPlus),
+                      locale,
+                    ),
+                  })
+                : tCommon('status.loadingDots')}
             </span>
           </div>
           <p className="text-xs text-muted-foreground leading-relaxed">

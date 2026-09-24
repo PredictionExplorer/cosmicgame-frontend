@@ -353,7 +353,7 @@
         "title": "防碰撞",
         "raiseBy": "上調",
         "approxCost": "≈ {amount} ETH",
-        "note": "將落筆價格上調 {percent}%，以免兩筆落在同一區塊時相互碰撞。此調整不會永久抬高價格。"
+        "note": "在發送金額上加 {percent}%，這樣即使同一區塊中有其他落筆搶先，本次落筆仍能成功。合約只收取目前落筆價格，其餘部分在同一筆交易中退還；若差額小到不足以抵付 Gas，則不退還。"
       }
     },
     "submit": {
@@ -362,7 +362,8 @@
       "randomWalk": "以 ETH + Random Walk 落筆",
       "cst": "以 CST 落筆（{cost} CST）",
       "cstFree": "以 CST 落筆（免費）",
-      "generic": "以 {method} 落筆"
+      "generic": "以 {method} 落筆",
+      "sendsNote": "約發送 {amount} ETH，含 {percent}% 防碰撞餘量。"
     },
     "processing": "處理中…",
     "finalGestureMade": "本週期的最新一筆由你寫下。倒數走完後，點擊下方的「收官」即可。",

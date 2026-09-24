@@ -18,22 +18,16 @@
     "contractTitle": "Hợp đồng Cosmic Signature",
     "contractDescription": "Địa chỉ hợp đồng và tham số trên chuỗi từ API bảng điều khiển.",
     "placeholders": {
-      "address": "Nhập địa chỉ tại đây",
       "number": "Nhập số tại đây"
     },
     "actions": {
       "setAddress": "Đặt địa chỉ",
       "set": "Đặt"
     },
+    "values": {
+      "divisorPercent": "{percent} (số chia {divisor})"
+    },
     "fields": {
-      "cosmicSignatureNft": "Địa chỉ hợp đồng Cosmic Signature NFT (ERC-721)",
-      "cstToken": "Địa chỉ hợp đồng token CST của Cosmic Signature (ERC-20)",
-      "publicGoodsVault": "Địa chỉ hợp đồng Kho Hàng hóa công",
-      "randomWalkNft": "Địa chỉ hợp đồng RandomWalk NFT",
-      "stellarSelectionWallet": "Địa chỉ hợp đồng ví Tinh tuyển",
-      "anchoringWallet": "Địa chỉ hợp đồng ví neo giữ",
-      "outreachWallet": "Địa chỉ hợp đồng ví truyền thông",
-      "businessLogic": "Địa chỉ hợp đồng logic nghiệp vụ",
       "ethStellarRecipients": "Số người nhận ETH Tinh tuyển mỗi chu kỳ",
       "nftStellarRecipients": "Số người nhận NFT Tinh tuyển mỗi chu kỳ",
       "nftHolderRecipients": "Số người nắm giữ NFT được nhận mỗi chu kỳ",
@@ -44,7 +38,7 @@
       "timeIncrease": "Mức tăng thời gian",
       "allocationTimeout": "Thời hạn nhận về phân bổ Signature",
       "priceIncrease": "Mức tăng giá",
-      "nanosecondsExtra": "Nano giây cộng thêm",
+      "gestureTimeIncrement": "Thời gian cộng thêm cho mỗi nét bút",
       "initialAllocationSeconds": "Số giây ban đầu đến phân bổ Signature",
       "initialGestureCostFraction": "Tỷ lệ chi phí nét bút ban đầu",
       "activationTime": "Thời điểm kích hoạt",

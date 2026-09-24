@@ -353,7 +353,7 @@
         "title": "Collision Prevention",
         "raiseBy": "Raise by",
         "approxCost": "≈ {amount} ETH",
-        "note": "Bumps Gesture Cost by {percent}% to avoid collision when two gestures land in the same block. Does not permanently raise the cost."
+        "note": "Adds {percent}% to the amount sent so the gesture still succeeds if another lands first in the same block. The contract charges only the current Gesture Cost and refunds the rest in the same transaction, unless the difference is too small to cover the gas."
       }
     },
     "submit": {
@@ -362,7 +362,8 @@
       "randomWalk": "Gesture with ETH + RandomWalk",
       "cst": "Gesture with CST ({cost} CST)",
       "cstFree": "Gesture with CST (FREE GESTURE)",
-      "generic": "Gesture with {method}"
+      "generic": "Gesture with {method}",
+      "sendsNote": "Sends about {amount} ETH, including the {percent}% collision buffer."
     },
     "processing": "Processing...",
     "finalGestureMade": "You made the final gesture for this cycle. When the timer ends, use Finalize Cycle below.",

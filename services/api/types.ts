@@ -53,6 +53,10 @@ export interface MainStats {
   NumCSTokenMints: number;
   TotalRaffleEthDeposits: number;
   TotalCSTConsumedEth: number;
+  /**
+   * CST sent from the Outreach Reserve to contributors so far. Despite the `Eth` suffix this
+   * is a CST amount (18-decimal token units converted), not ETH and not a reserve balance.
+   */
   TotalMktRewardsEth: number;
   NumMktRewards: number;
   TotalRaffleEthWithdrawn: number;
@@ -101,12 +105,17 @@ export interface ContractAddresses {
 export interface DashboardInfo {
   CurNumBids: number;
   CurPrizeAmountEth: number;
+  /** The current ETH Gesture Cost (wire `BidPriceEth`, normalized in `normalizeDashboardWire`). */
   CurBidPriceEth?: number;
   CurRoundNum: number;
   PrizeClaimTs: number;
   TsRoundStart: number;
   LastBidderAddr: string;
-  GestureCostEth: number;
+  /**
+   * Participation CST a gesture made now would imprint, in CST (wire `TokenReward`). A CST
+   * amount, not a cost: never format it as ETH. Absent when the backend could not read it.
+   */
+  ParticipationCstReward?: number;
   StakingAmountEth: number;
   CurRoundPrizeTime?: number;
   MainStats: MainStats;
@@ -640,8 +649,11 @@ export interface Participant {
 export interface Recipient {
   WinnerAid: string;
   WinnerAddr: string;
-  AllocationsCount: number;
+  /** Mapped from the wire's `PrizesCount` in `get_unique_winners`; undefined when absent. */
+  AllocationsCount?: number;
+  /** Largest Signature Allocation (main ETH) received; 0 for wallets that never received one. */
   MaxWinAmountEth: number;
+  /** Sum of every ETH allocation received. */
   PrizesSum: number;
   [key: string]: unknown;
 }
@@ -778,7 +790,8 @@ export interface NotifyRedBoxResult {
   ETHRaffleToClaim: number;
   ETHRaffleToClaimWei: number;
   NumDonatedNFTToClaim: number;
-  UnretrievedAnchorDistribution: number;
+  /** Mapped from the wire's `UnclaimedStakingReward` in `notify_red_box`. */
+  UnretrievedAnchorDistribution?: number;
   [key: string]: unknown;
 }
 

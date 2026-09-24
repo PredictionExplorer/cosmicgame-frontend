@@ -47,7 +47,8 @@
     "loadingEllipsis": "読み込み中…",
     "loadingDots": "読み込み中…",
     "noData": "データがありません。",
-    "nothingHere": "まだ何もありません"
+    "nothingHere": "まだ何もありません",
+    "unavailable": "取得不可"
   },
   "actions": {
     "copyAddress": "アドレスをコピー",

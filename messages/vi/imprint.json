@@ -8,6 +8,7 @@
     "subtitle": "Sở hữu một Random Walk NFT để được giảm 50% chi phí nét bút ETH",
     "description": "Mỗi RandomWalk NFT là một tác phẩm số độc nhất. Khi đính kèm một NFT chưa sử dụng vào nét bút ETH, bạn được giảm 50% chi phí nét bút, kể cả ở giai đoạn cuối chu kỳ. Mỗi NFT chỉ áp dụng mức giảm này một lần, vì vậy thời điểm sử dụng tùy thuộc vào lựa chọn của bạn. Bạn cũng có thể neo giữ RandomWalk NFT để thuộc diện Tinh tuyển NFT neo giữ; đây là cơ chế riêng, không liên quan đến việc đính kèm NFT vào nét bút.",
     "currentCost": "Chi phí khắc hiện tại",
+    "costBreakdown": "Chi phí trong hợp đồng {base} ETH, cộng thêm {percent}% dự phòng để lượt khắc vẫn thành công nếu chi phí tăng trước khi được xác nhận.",
     "submit": "Khắc ngay",
     "myNfts": "Random Walk NFT của tôi"
   },

@@ -89,14 +89,25 @@ export function get_user_balance(
   }, null);
 }
 
-/** Fetches red-box notification data (unclaimed winnings) for a wallet address. */
+/**
+ * Fetches red-box notification data (unretrieved allocations) for a wallet address. The wire
+ * names the unretrieved Anchor Distribution `UnclaimedStakingReward`; it is mapped onto the
+ * UI's `UnretrievedAnchorDistribution` here, since reading the UI name off the wire left the
+ * retrieval prompt permanently hidden.
+ */
 export function notify_red_box(
   address: string,
   opts?: ApiRequestOptions,
 ): Promise<NotifyRedBoxResult | null> {
   return apiCall(async () => {
     const { data } = await apiGet(getAPIUrl(`user/notif_red_box/${address}`), opts);
-    return data.Winnings as NotifyRedBoxResult;
+    const winnings = data?.Winnings as Record<string, unknown> | null | undefined;
+    if (!winnings || typeof winnings !== 'object') return null;
+    const unretrieved = winnings.UnretrievedAnchorDistribution ?? winnings.UnclaimedStakingReward;
+    return {
+      ...winnings,
+      UnretrievedAnchorDistribution: typeof unretrieved === 'number' ? unretrieved : undefined,
+    } as NotifyRedBoxResult;
   }, null);
 }
 
@@ -112,15 +123,27 @@ export function get_unique_bidders(opts?: ApiRequestOptions): Promise<Participan
   }, []);
 }
 
-/** Fetches the list of unique allocation-recipient addresses with win counts. */
+/**
+ * Maps a `statistics/unique/winners` row onto {@link Recipient}. The wire still names the
+ * allocation count `PrizesCount`; the UI reads `AllocationsCount`. A missing count stays
+ * undefined so the table shows it as unknown instead of a blank cell.
+ */
+function toRecipient(row: Record<string, unknown>): Recipient {
+  const count = row.AllocationsCount ?? row.PrizesCount;
+  return {
+    ...row,
+    AllocationsCount: typeof count === 'number' && Number.isFinite(count) ? count : undefined,
+  } as Recipient;
+}
+
+/** Fetches the list of unique allocation-recipient addresses with allocation counts. */
 export function get_unique_winners(opts?: ApiRequestOptions): Promise<Recipient[]> {
   return apiCall(async () => {
     const { data } = await apiGet(getAPIUrl('statistics/unique/winners'), opts);
-    return safeValidateListSample(
-      RecipientSchema,
-      data.UniqueWinners,
-      'uniqueWinners',
-    ) as Recipient[];
+    const rows = safeValidateListSample(RecipientSchema, data.UniqueWinners, 'uniqueWinners');
+    return Array.isArray(rows)
+      ? rows.map((row) => toRecipient(row as Record<string, unknown>))
+      : [];
   }, []);
 }
 

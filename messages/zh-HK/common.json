@@ -47,7 +47,8 @@
     "loadingEllipsis": "載入中…",
     "loadingDots": "載入中…",
     "noData": "暫無數據",
-    "nothingHere": "暫無內容"
+    "nothingHere": "暫無內容",
+    "unavailable": "暫不可用"
   },
   "actions": {
     "copyAddress": "複製地址",

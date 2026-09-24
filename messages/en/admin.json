@@ -18,22 +18,16 @@
     "contractTitle": "Cosmic Signature Contract",
     "contractDescription": "Contract addresses and on-chain parameters from the dashboard API.",
     "placeholders": {
-      "address": "Enter address here",
       "number": "Enter number here"
     },
     "actions": {
       "setAddress": "Set Address",
       "set": "Set"
     },
+    "values": {
+      "divisorPercent": "{percent} (divisor {divisor})"
+    },
     "fields": {
-      "cosmicSignatureNft": "Cosmic Signature NFT (ERC-721) contract address",
-      "cstToken": "Cosmic Signature CST Token (ERC-20) contract address",
-      "publicGoodsVault": "Public Goods Vault contract address",
-      "randomWalkNft": "RandomWalk NFT contract address",
-      "stellarSelectionWallet": "Stellar Selection wallet contract address",
-      "anchoringWallet": "Anchoring wallet contract address",
-      "outreachWallet": "Outreach wallet contract address",
-      "businessLogic": "Business logic contract address",
       "ethStellarRecipients": "Number of ETH Stellar Selection recipients per cycle",
       "nftStellarRecipients": "Number of NFT Stellar Selection recipients per cycle",
       "nftHolderRecipients": "Number of NFT holder recipients per cycle",
@@ -44,7 +38,7 @@
       "timeIncrease": "Time increase",
       "allocationTimeout": "Timeout to retrieve Signature Allocation",
       "priceIncrease": "Price increase",
-      "nanosecondsExtra": "Additional nanoseconds",
+      "gestureTimeIncrement": "Time added per gesture",
       "initialAllocationSeconds": "Initial seconds until Signature Allocation",
       "initialGestureCostFraction": "Initial Gesture Cost fraction",
       "activationTime": "Activation time",

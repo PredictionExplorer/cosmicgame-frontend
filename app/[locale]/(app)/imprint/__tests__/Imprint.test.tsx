@@ -6,7 +6,8 @@ import { checkA11y, render, screen, waitFor } from '@/test-utils';
 import Imprint from '../Imprint';
 
 const mockImprint = jest.fn();
-const mockGetImprintCost = jest.fn(() => Promise.resolve(BigInt(1000000000000000)));
+const DEFAULT_IMPRINT_COST_WEI = BigInt(1000000000000000);
+const mockGetImprintCost = jest.fn(() => Promise.resolve(DEFAULT_IMPRINT_COST_WEI));
 const mockWalletOfOwner = jest.fn(() => Promise.resolve([] as readonly bigint[]));
 const mockWaitForTxReceipt = jest.fn().mockResolvedValue({ status: 'success' });
 
@@ -69,7 +70,11 @@ jest.mock('sonner', () => ({
   },
 }));
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => {
+  jest.clearAllMocks();
+  // Reset here rather than at the end of a test body, which a failing assertion would skip.
+  mockGetImprintCost.mockResolvedValue(DEFAULT_IMPRINT_COST_WEI);
+});
 
 async function renderImprint(overrides?: { account?: string | null; tokens?: readonly bigint[] }) {
   if (overrides?.account !== undefined) {
@@ -105,8 +110,38 @@ describe('Mint', () => {
 
   it('displays mint price with ETH label', async () => {
     await renderImprint();
-    expect(screen.getByText('ETH')).toBeInTheDocument();
+    expect(await screen.findByText('ETH')).toBeInTheDocument();
     expect(screen.getByText('Current imprint cost')).toBeInTheDocument();
+  });
+
+  it('displays the value it sends at the current cost, with the contract cost broken out', async () => {
+    // Regression: the page once showed cost × 1.01 + 0.008 ETH while sending cost × 1.01.
+    mockGetImprintCost.mockResolvedValue(BigInt('91300000000000000'));
+    const user = userEvent.setup();
+    mockImprint.mockResolvedValueOnce('0xTxHash');
+    render(<Imprint />);
+
+    expect(await screen.findByTestId('imprint-send-value')).toHaveTextContent('0.092213 ETH');
+    expect(screen.getByTestId('imprint-cost-breakdown')).toHaveTextContent(
+      'Contract cost 0.0913 ETH, plus a 1% buffer',
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Imprint Now' }));
+    await waitFor(() =>
+      expect(mockImprint).toHaveBeenCalledWith({ value: BigInt('92213000000000000') }),
+    );
+  });
+
+  it('shows the cost as unavailable, not 0 ETH, when the read fails', async () => {
+    mockGetImprintCost.mockRejectedValueOnce(new Error('RPC down'));
+    render(<Imprint />);
+
+    await waitFor(() =>
+      expect(screen.getByTestId('imprint-send-value')).toHaveTextContent(
+        'common.status.unavailable',
+      ),
+    );
+    expect(screen.getByTestId('imprint-send-value')).not.toHaveTextContent(/\d/);
   });
 
   it('calls getMintPrice on mount', async () => {

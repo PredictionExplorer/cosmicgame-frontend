@@ -75,6 +75,37 @@ describe('AnchoringPanel', () => {
     expect(screen.getAllByText('26').length).toBeGreaterThanOrEqual(1);
   });
 
+  it('counts a wallet anchoring both kinds once in Active Anchor-holders', () => {
+    // Regression: the card summed the per-kind active counts (7 + 9 = 16) although five
+    // wallets anchor both kinds, contradicting the hub.
+    mockUseUniqueCSTAnchorHolders.mockReturnValue(
+      okQuery([
+        { StakerAddr: '0xAAA', TotalTokensStaked: 9 },
+        { StakerAddr: '0xBBB', TotalTokensStaked: 3 },
+      ]),
+    );
+    mockUseUniqueRWLKAnchorHolders.mockReturnValue(
+      okQuery([
+        { StakerAddr: '0xbbb', TotalTokensStaked: 14 },
+        { StakerAddr: '0xCCC', TotalTokensStaked: 1 },
+        { StakerAddr: '0xDDD', TotalTokensStaked: 0 },
+      ]),
+    );
+    render(<AnchoringPanel />);
+
+    const card = screen.getByText('Active Anchor-holders').closest('div.border');
+    expect(card?.querySelector('.stat-card-value')).toHaveTextContent(/^3$/);
+    // The per-kind counts below keep their own, per-kind label.
+    expect(screen.getByText('Active Cosmic Signature NFT Anchor-holders')).toBeInTheDocument();
+  });
+
+  it('explains how the pool relates to unretrieved distributions', () => {
+    render(<AnchoringPanel />);
+    expect(
+      screen.getByText(/earlier deposits not yet retrieved show as Unretrieved/),
+    ).toBeInTheDocument();
+  });
+
   it('renders CST/RWLK anchoring tabs', () => {
     render(<AnchoringPanel />);
     expect(screen.getByRole('tab', { name: 'Cosmic Signature NFT' })).toBeInTheDocument();

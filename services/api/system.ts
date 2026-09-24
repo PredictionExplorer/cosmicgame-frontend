@@ -36,3 +36,18 @@ export function get_system_events(
     return flattenTxArray<AdminEventRow>(data.AdminEvents);
   }, []);
 }
+
+/** Upper event-log bound for {@link get_coordination_events}: every event up to the latest. */
+export const COORDINATION_EVENTS_END_ID = 9_999_999_999;
+
+/**
+ * Fetches the coordination (parameter) changes the /coordination-changes table lists: the admin
+ * events from the latest system-mode change onward, or every event when no mode change is
+ * indexed. The server summary counts this same list, so its headline always matches the table.
+ */
+export async function get_coordination_events(opts?: ApiRequestOptions): Promise<AdminEventRow[]> {
+  const modes = await get_system_modelist(opts);
+  const latestModeChangeId = Number(modes[0]?.EvtLogId);
+  const startId = Number.isFinite(latestModeChangeId) ? latestModeChangeId : 0;
+  return get_system_events(startId, COORDINATION_EVENTS_END_ID, opts);
+}

@@ -3,19 +3,22 @@
 import type { ReactNode } from 'react';
 import { useState, useEffect } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { formatEther, parseEther } from 'viem';
+import { formatEther } from 'viem';
 import { usePublicClient } from 'wagmi';
 import { Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { parseBalance } from '@/utils';
-
-import { formatFixed } from '@/utils/format';
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { PageShell } from '@/components/ui/page-shell';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { SectionDivider } from '@/components/ui/section-divider';
+import { UnknownValue } from '@/components/ui/unknown-value';
+import {
+  IMPRINT_COST_BUFFER_PERCENT,
+  formatEthQuote,
+  imprintSendValueWei,
+} from '@/utils/gestureQuote';
 import useRWLKNFTContract from '@/hooks/useRWLKNFTContract';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { asWriteFn } from '@/utils/contractWrite';
@@ -25,8 +28,11 @@ import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
 const Imprint = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('imprint');
   const toastT = useTranslations('toasts');
+  const tCommon = useTranslations('common');
   const locale = useLocale();
-  const [imprintCost, setImprintCost] = useState('0');
+  // The contract's current imprint cost in wei; `null` until the read succeeds.
+  const [contractCostWei, setContractCostWei] = useState<bigint | null>(null);
+  const [costReadFailed, setCostReadFailed] = useState(false);
   const [nftIds, setNftIds] = useState<number[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { account } = useActiveWeb3React();
@@ -41,11 +47,10 @@ const Imprint = ({ seoSummary }: { seoSummary?: ReactNode }) => {
     setIsSubmitting(true);
     try {
       const abiImprintCost = (await nftContract.read.getMintPrice?.()) as bigint; // lexicon-allow-abi
-      const newPrice = parseFloat(formatEther(abiImprintCost)) * 1.01;
 
       const hash = await asWriteFn(nftContract.write.mint)({
         // lexicon-allow-abi
-        value: parseEther(newPrice.toFixed(6)),
+        value: imprintSendValueWei(abiImprintCost),
       });
       const receipt = await publicClient?.waitForTransactionReceipt({ hash });
       assertSuccessfulTransactionReceipt(receipt);
@@ -67,14 +72,14 @@ const Imprint = ({ seoSummary }: { seoSummary?: ReactNode }) => {
     let cancelled = false;
     const getData = async () => {
       try {
-        const abiImprintCost = (await nftContract.read.getMintPrice?.()) as bigint; // lexicon-allow-abi
+        const abiImprintCost = await nftContract.read.getMintPrice?.(); // lexicon-allow-abi
         if (cancelled) return;
-        // `parseBalance` yields a sentinel for unreadable values, so parse the
-        // base cost before deriving the displayed total.
-        const baseCost = parseFloat(parseBalance(abiImprintCost));
-        setImprintCost(formatFixed(baseCost * 1.01 + 0.008, 4, '0'));
+        if (typeof abiImprintCost !== 'bigint')
+          throw new Error('Imprint cost read returned no value');
+        setContractCostWei(abiImprintCost);
       } catch (err) {
         if (cancelled) return;
+        setCostReadFailed(true);
         reportError(err, 'read RWLK imprint cost');
       }
     };
@@ -119,10 +124,34 @@ const Imprint = ({ seoSummary }: { seoSummary?: ReactNode }) => {
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 mx-auto mb-4">
             <Sparkles className="h-8 w-8 text-primary" />
           </div>
-          <p className="text-3xl font-bold font-display">
-            {imprintCost} <span className="text-primary">ETH</span>
+          {/* The value an imprint sends at the cost read on load (the cost plus the buffer),
+              quoted to five significant digits like every ETH cost; the contract's own cost and
+              the buffer are broken out underneath. The imprint re-reads the cost when it is
+              sent, so the wallet shows the exact wei, which differs only if the cost moved. */}
+          <p className="text-3xl font-bold font-display" data-testid="imprint-send-value">
+            {contractCostWei === null ? (
+              <UnknownValue
+                label={tCommon(costReadFailed ? 'status.unavailable' : 'status.loading')}
+              />
+            ) : (
+              <>
+                {formatEthQuote(Number(formatEther(imprintSendValueWei(contractCostWei))), locale)}{' '}
+                <span className="text-primary">ETH</span>
+              </>
+            )}
           </p>
           <p className="text-sm text-muted-foreground mt-2">{t('page.currentCost')}</p>
+          {contractCostWei !== null ? (
+            <p
+              className="mt-2 text-xs leading-relaxed text-muted-foreground tabular-nums"
+              data-testid="imprint-cost-breakdown"
+            >
+              {t('page.costBreakdown', {
+                base: formatEthQuote(Number(formatEther(contractCostWei)), locale),
+                percent: IMPRINT_COST_BUFFER_PERCENT,
+              })}
+            </p>
+          ) : null}
           <Button size="lg" onClick={handleImprint} className="w-full mt-6" disabled={isSubmitting}>
             {isSubmitting ? toastT('imprint.imprinting') : t('page.submit')}
           </Button>

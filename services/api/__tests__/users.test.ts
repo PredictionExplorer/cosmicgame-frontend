@@ -164,6 +164,23 @@ describe('users API', () => {
       );
     });
 
+    it('maps the wire UnclaimedStakingReward onto UnretrievedAnchorDistribution', async () => {
+      // Regression: the lexicon rename read the UI name off the wire, so the retrieval
+      // prompt never showed for wallets with unretrieved Anchor Distributions.
+      mockedAxios.get.mockResolvedValue({
+        data: { Winnings: { ETHRaffleToClaim: 0, UnclaimedStakingReward: 1.4054718307649714 } },
+      });
+
+      const result = await notify_red_box('0xuser');
+
+      expect(result?.UnretrievedAnchorDistribution).toBe(1.4054718307649714);
+    });
+
+    it('returns null when the payload has no Winnings', async () => {
+      mockedAxios.get.mockResolvedValue({ data: {} });
+      expect(await notify_red_box('0xuser')).toBeNull();
+    });
+
     it('returns null on 400 response', async () => {
       mockedAxios.get.mockRejectedValue(make400());
       expect(await notify_red_box('0xuser')).toBeNull();
@@ -186,6 +203,38 @@ describe('users API', () => {
       expect(mockedAxios.get).toHaveBeenCalledWith(
         expect.stringMatching(/statistics\/unique\/winners/),
       );
+    });
+
+    it('maps the wire PrizesCount onto AllocationsCount', async () => {
+      // Regression: the column read AllocationsCount off the wire and rendered blank.
+      mockedAxios.get.mockResolvedValue({
+        data: {
+          UniqueWinners: [
+            {
+              WinnerAid: 980,
+              WinnerAddr: '0x7406',
+              PrizesCount: 39,
+              MaxWinAmountEth: 0,
+              PrizesSum: 3.5397,
+            },
+          ],
+        },
+      });
+
+      const [recipient] = await get_unique_winners();
+
+      expect(recipient?.AllocationsCount).toBe(39);
+      expect(recipient?.PrizesSum).toBe(3.5397);
+    });
+
+    it('leaves a missing count undefined rather than inventing one', async () => {
+      mockedAxios.get.mockResolvedValue({
+        data: { UniqueWinners: [{ WinnerAid: 1, WinnerAddr: '0x1' }] },
+      });
+
+      const [recipient] = await get_unique_winners();
+
+      expect(recipient?.AllocationsCount).toBeUndefined();
     });
 
     it('returns empty array on 400 response', async () => {

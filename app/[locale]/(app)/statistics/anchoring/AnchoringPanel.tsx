@@ -7,7 +7,11 @@ import { useLocale, useTranslations } from 'next-intl';
 import { formatEthValue, formatGroupedNumber } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
-import { formatDistributionPerAnchoredNftEth } from '@/utils/anchoringStats';
+import {
+  countActiveAnchorHolders,
+  distributionPerAnchoredNft,
+  formatPerNftEth,
+} from '@/utils/anchoringStats';
 import {
   useCSTAnchorActions,
   useDashboardInfo,
@@ -19,6 +23,7 @@ import {
 } from '@/hooks/useApiQuery';
 import { Surface } from '@/components/ui/surface';
 import { SkeletonStatCard } from '@/components/ui/skeleton';
+import { UnknownValue } from '@/components/ui/unknown-value';
 import {
   AnchoringHeroStats,
   type AnchoringStatItem,
@@ -42,6 +47,7 @@ function toDataState<T>(query: UseQueryResult<T[], Error>): AnchoringDataState<T
 /** Anchoring snapshot cards plus the CST/RWLK anchoring detail tabs. */
 const AnchoringPanel = () => {
   const t = useTranslations('statistics');
+  const tCommon = useTranslations('common');
   const locale = useLocale();
   const { data: dashboardData, isLoading: dashboardLoading } = useDashboardInfo(undefined, {
     poll: false,
@@ -56,46 +62,55 @@ const AnchoringPanel = () => {
   const cstAnchorStats = dashboardData?.MainStats.StakeStatisticsCST;
   const rwlkAnchorStats = dashboardData?.MainStats.StakeStatisticsRWalk;
 
-  const distributionPerCst = formatDistributionPerAnchoredNftEth(
-    dashboardData?.StakingAmountEth,
-    cstAnchorStats?.TotalTokensStaked,
+  const unknown = <UnknownValue label={tCommon('status.unavailable')} />;
+  const count = (value: number | undefined) =>
+    typeof value === 'number' ? formatGroupedNumber(value, locale) : unknown;
+  const pool = dashboardData?.StakingAmountEth;
+  const perNft = distributionPerAnchoredNft(pool, cstAnchorStats?.TotalTokensStaked);
+  // Distinct wallets anchoring either kind: the per-kind NumActiveStakers overlap, so their
+  // sum counted a wallet that anchors both kinds twice.
+  const activeAnchorHolders = countActiveAnchorHolders(
+    uniqueCSTAnchorHoldersQuery.data,
+    uniqueRWLKAnchorHoldersQuery.data,
   );
-  const totalActiveAnchorHolders =
-    (cstAnchorStats?.NumActiveStakers ?? 0) + (rwlkAnchorStats?.NumActiveStakers ?? 0);
 
   const anchoringSnapshotStats: AnchoringStatItem[] = [
     {
       label: t('anchoringPage.snapshot.cosmicSignatureLabel'),
-      value: formatGroupedNumber(cstAnchorStats?.TotalTokensStaked ?? 0, locale),
+      value: count(cstAnchorStats?.TotalTokensStaked),
       tooltip: t('anchoringPage.snapshot.cosmicSignatureTooltip'),
       icon: <Lock className="h-4 w-4" />,
       featured: true,
     },
     {
       label: t('anchoringPage.snapshot.randomWalkLabel'),
-      value: formatGroupedNumber(rwlkAnchorStats?.TotalTokensStaked ?? 0, locale),
+      value: count(rwlkAnchorStats?.TotalTokensStaked),
       tooltip: t('anchoringPage.snapshot.randomWalkTooltip'),
       icon: <Activity className="h-4 w-4" />,
       featured: true,
     },
     {
       label: t('anchoringPage.snapshot.poolLabel'),
-      value: formatEthValue(dashboardData?.StakingAmountEth ?? 0, locale),
+      value: typeof pool === 'number' ? formatEthValue(pool, locale) : unknown,
       tooltip: t('anchoringPage.snapshot.poolTooltip'),
+      caption: t('anchoringPage.snapshot.poolCaption'),
       icon: <Coins className="h-4 w-4" />,
       gradient: true,
     },
     {
       label: t('anchoringPage.snapshot.perNftLabel'),
-      value: distributionPerCst.value,
-      tooltip: distributionPerCst.indexedCountUnavailable
-        ? t('anchoringPage.snapshot.perNftTooltipUnavailable')
-        : t('anchoringPage.snapshot.perNftTooltip'),
+      value: perNft.status === 'available' ? formatPerNftEth(perNft.perNftEth) : unknown,
+      tooltip: t('anchoringPage.snapshot.perNftTooltip'),
+      caption:
+        perNft.status === 'noneAnchored'
+          ? t('anchoringPage.snapshot.perNftNoneAnchored')
+          : undefined,
       icon: <TrendingUp className="h-4 w-4" />,
     },
     {
       label: t('anchoringPage.snapshot.activeHoldersLabel'),
-      value: formatGroupedNumber(totalActiveAnchorHolders, locale),
+      value:
+        activeAnchorHolders === null ? unknown : formatGroupedNumber(activeAnchorHolders, locale),
       tooltip: t('anchoringPage.snapshot.activeHoldersTooltip'),
       icon: <Users className="h-4 w-4" />,
     },
@@ -116,7 +131,9 @@ const AnchoringPanel = () => {
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </Link>
         </div>
-        {dashboardLoading ? (
+        {dashboardLoading ||
+        uniqueCSTAnchorHoldersQuery.isLoading ||
+        uniqueRWLKAnchorHoldersQuery.isLoading ? (
           <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {Array.from({ length: 5 }).map((_, i) => (
               <SkeletonStatCard key={i} />
