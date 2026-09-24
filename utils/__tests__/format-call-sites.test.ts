@@ -33,7 +33,6 @@ const FIXED_DECIMAL_CALL = /\.toFixed\(|\bformatFixed\(/g;
 const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
   'app/[locale]/(app)/allocation-finalized/AllocationFinalizedPage.tsx': 1,
   'app/[locale]/(app)/allocation/[id]/AllocationInfoPage.tsx': 13,
-
   'app/[locale]/(app)/cosmic-token-transfer/[address]/CosmicTokenTransfersPage.tsx': 1,
   'app/[locale]/(app)/distributions-by-token/[address]/[tokenId]/RewardsByTokenPage.tsx': 2,
   'app/[locale]/(app)/eth-contribution/detail/[id]/EthDonationDetailPage.tsx': 1,
