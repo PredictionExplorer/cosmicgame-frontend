@@ -235,12 +235,19 @@ export function useGestureList() {
   });
 }
 
+/**
+ * One gesture record. The API answers 400 `record not found` for an id it
+ * does not hold (mistyped, or not indexed yet): that answer is final, so it
+ * is not retried, and the page reads it with `isRecordNotFound(error)` to say
+ * "no record" instead of blaming the connection.
+ */
 export function useGestureInfo(evtLogId: number) {
   return useQuery<GestureInfo | null>({
     queryKey: ['gestureInfo', evtLogId],
     queryFn: ({ signal }) => api.get_bid_info(evtLogId, { signal }),
     enabled: evtLogId > 0,
     staleTime: 60_000,
+    retry: (failureCount, error) => !isRecordNotFound(error) && failureCount < READ_RETRIES,
   });
 }
 

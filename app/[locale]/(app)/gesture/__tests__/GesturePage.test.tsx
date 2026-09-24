@@ -1,3 +1,4 @@
+import { ApiReadError } from '@/services/api/readError';
 import { formatTimeZoneLabel } from '@/utils/format';
 
 import { fireEvent, render, screen, within, checkA11y } from '@/test-utils';
@@ -83,10 +84,15 @@ const figure = (container: HTMLElement, id: string) =>
   container.querySelector(`[data-figure="${id}"]`);
 
 describe('GesturePage', () => {
-  it('explains an invalid gesture id', () => {
+  it('explains an invalid gesture id under the page’s one H1, with a way onward', () => {
     mockUseGestureInfo.mockReturnValue({ data: null, isLoading: false });
     render(<GesturePage gestureId={-1} />);
-    expect(screen.getByRole('heading', { name: 'gesture.invalid.title' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('gesture.invalid.title');
+    expect(screen.getByText('gesture.invalid.help')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /gesture\.empty\.action/ })).toHaveAttribute(
+      'href',
+      '/current-cycle',
+    );
   });
 
   it('shows the record’s rows as a skeleton while it loads', () => {
@@ -108,6 +114,26 @@ describe('GesturePage', () => {
       '/current-cycle',
     );
     expect(screen.queryByRole('heading', { name: 'gesture.error.title' })).not.toBeInTheDocument();
+  });
+
+  it('reads the API’s 400 "record not found" as a missing record, not a failed read (D321)', () => {
+    // The production API answers an id it does not hold with 400 {"error":"record not found"}.
+    const refetch = jest.fn();
+    mockUseGestureInfo.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      error: new ApiReadError('Network response was not OK', 400),
+      refetch,
+    });
+    render(<GesturePage gestureId={40000} />);
+    expect(screen.getByRole('heading', { name: 'gesture.empty.title' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /gesture\.empty\.action/ })).toHaveAttribute(
+      'href',
+      '/current-cycle',
+    );
+    expect(screen.queryByRole('heading', { name: 'gesture.error.title' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /retry|try/i })).not.toBeInTheDocument();
   });
 
   it('tells a failed read apart from a missing record, and retries it (D321)', () => {

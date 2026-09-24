@@ -30,6 +30,7 @@ import { useAttachedNftMetadata } from '@/components/attachments/useAttachedNftM
 import { resolveGestureType } from '@/components/tables/GestureMethodTag';
 import { useDashboardInfo, useGestureInfo } from '@/hooks/useApiQuery';
 import type { GestureInfo } from '@/services/api';
+import { isRecordNotFound } from '@/services/api/readError';
 import { NBSP, UNAVAILABLE_VALUE, formatCount, formatNumber } from '@/utils/format';
 import { formatId } from '@/utils/format/ids';
 import { getExplorerUrl } from '@/utils/urls';
@@ -200,9 +201,13 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
   const {
     data: gestureInfo = null,
     isLoading: loading,
-    isError: readFailed,
+    isError,
+    error,
     refetch,
   } = useGestureInfo(gestureId);
+  // The API answers 400 "record not found" for an id it does not hold: that
+  // is a missing record (mistyped, or not indexed yet), not a failed read.
+  const readFailed = isError && !isRecordNotFound(error);
   // Only to tell the live cycle (its page is /current-cycle) from a finalized one.
   const { data: dashboard, isError: dashboardFailed } = useDashboardInfo(undefined, {
     poll: false,
@@ -217,15 +222,19 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
   });
   const tokenURI = nftMetadata.data ?? null;
 
+  const toCurrentCycle = (
+    <Link href="/current-cycle" className={buttonVariants({ variant: 'outline' })}>
+      {t('empty.action')}
+      <ArrowRight aria-hidden />
+    </Link>
+  );
+
+  // The route hands -1 for an id that is not a whole number (page.tsx).
   if (gestureId < 0) {
     return (
       <PageShell variant="data">
-        <EmptyState
-          variant="page"
-          headingLevel={2}
-          title={t('invalid.title')}
-          description={t('invalid.help')}
-        />
+        <PageHeader title={t('invalid.title')} subtitle={t('invalid.help')} />
+        {toCurrentCycle}
       </PageShell>
     );
   }
@@ -268,12 +277,7 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
               headingLevel={2}
               title={t('empty.title')}
               description={t('empty.help')}
-              action={
-                <Link href="/current-cycle" className={buttonVariants({ variant: 'outline' })}>
-                  {t('empty.action')}
-                  <ArrowRight aria-hidden />
-                </Link>
-              }
+              action={toCurrentCycle}
             />
           )}
         </div>

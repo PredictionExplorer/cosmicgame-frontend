@@ -382,6 +382,18 @@ describe('useApiQuery hooks', () => {
 
       expect(getOptions().enabled).toBe(true);
     });
+
+    it('never retries the answer for a record the API does not hold (HTTP 400), and retries failures twice (D321)', () => {
+      renderHook(() => useGestureInfo(40000));
+      const retry = getOptions().retry as (count: number, error: unknown) => boolean;
+
+      expect(retry(0, new ApiReadError('Network response was not OK', 400))).toBe(false);
+      expect(retry(0, new ApiReadError('Network response was not OK', 404))).toBe(false);
+      expect(retry(0, new ApiReadError('Network response was not OK', 502))).toBe(true);
+      expect(retry(0, new Error('Network Error'))).toBe(true);
+      expect(retry(1, new ApiReadError('Network response was not OK', 502))).toBe(true);
+      expect(retry(2, new ApiReadError('Network response was not OK', 502))).toBe(false);
+    });
   });
 
   describe('useGestureListByCycle', () => {

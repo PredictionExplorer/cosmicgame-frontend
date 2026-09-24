@@ -100,4 +100,35 @@ test.describe('Gesture detail page', () => {
     // A message is quoted only when there is one.
     await expect(page.getByTestId('gesture-message')).toContainText('rewards system');
   });
+
+  test('a record the API does not hold reads as missing, not as a failed read (D321)', async ({
+    page,
+  }) => {
+    // The production API answers an id it does not hold with 400, not 404.
+    let reads = 0;
+    await page.route('**/api/cosmicgame/bid/info/40000', (route) => {
+      reads += 1;
+      return route.fulfill({ status: 400, json: { error: 'record not found' } });
+    });
+
+    await page.goto('/gesture/40000', { waitUntil: 'networkidle' });
+
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Gesture record 40000');
+    await expect(
+      page.getByRole('heading', { name: 'No gesture information found.' }),
+    ).toBeVisible();
+    await expect(page.getByRole('link', { name: 'See the current cycle' })).toHaveAttribute(
+      'href',
+      '/current-cycle',
+    );
+    await expect(page.getByRole('heading', { name: 'Gesture record didn’t load' })).toHaveCount(0);
+    // The answer is final: it is read once, never retried.
+    expect(reads).toBe(1);
+  });
+
+  test('an id that is not a whole number is invalid, never a nearby gesture', async ({ page }) => {
+    await page.goto('/gesture/12abc', { waitUntil: 'networkidle' });
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Invalid gesture ID');
+    await expect(page).toHaveTitle(/^Invalid gesture ID · /);
+  });
 });
