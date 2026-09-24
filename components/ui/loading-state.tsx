@@ -15,6 +15,12 @@ interface LoadingStateProps {
   className?: string;
 }
 
+/**
+ * LoadingState — a blocking wait with nothing to preview: a transaction being
+ * confirmed, a file being prepared. For content that is on its way, render a
+ * skeleton of its layout instead (components/ui/skeleton), so the page keeps
+ * its shape.
+ */
 export function LoadingState({
   title,
   description,
@@ -30,11 +36,11 @@ export function LoadingState({
       className={cn('flex flex-col items-center justify-center text-center', pad, className)}
     >
       <Spinner size={size} />
-      <p className="mt-4 type-heading-3 text-foreground">{title ?? t('status.loading')}</p>
+      <p className="mt-4 type-title text-foreground">{title ?? t('status.loading')}</p>
       {description ? (
         <p className="mt-1 max-w-sm type-body-sm text-muted-foreground">{description}</p>
       ) : null}
-      {hint ? <p className="mt-3 max-w-sm type-body-sm text-muted-foreground/70">{hint}</p> : null}
+      {hint ? <p className="mt-3 max-w-sm type-caption text-subtle">{hint}</p> : null}
     </div>
   );
 }

@@ -49,7 +49,8 @@ export const ScrollRail = React.forwardRef<HTMLDivElement, ScrollRailProps>(
       (behavior: ScrollBehavior) => {
         const track = trackRef.current;
         const active = track?.querySelector<HTMLElement>(activeSelector);
-        if (!track || !active) return;
+        // jsdom and very old engines have no element scrolling API.
+        if (!track || !active || typeof track.scrollBy !== 'function') return;
         const trackBox = track.getBoundingClientRect();
         const box = active.getBoundingClientRect();
         // Keep a fade's width of room beside the item (1.75rem).

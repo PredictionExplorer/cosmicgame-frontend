@@ -7,7 +7,8 @@ const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
     <div
       ref={ref}
       className={cn(
-        'relative min-w-0 overflow-hidden rounded-xl border border-white/[0.10] bg-card text-card-foreground',
+        // Card is Surface's `outlined` role: one hairline on a faint surface.
+        'relative min-w-0 overflow-hidden rounded-surface border border-rule-faint bg-surface/60 text-card-foreground',
         className,
       )}
       {...props}
@@ -25,18 +26,14 @@ CardHeader.displayName = 'CardHeader';
 
 const CardTitle = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn('type-heading-2 font-medium leading-snug', className)}
-      {...props}
-    />
+    <div ref={ref} className={cn('type-heading-3 text-foreground', className)} {...props} />
   ),
 );
 CardTitle.displayName = 'CardTitle';
 
 const CardDescription = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('text-sm text-muted-foreground', className)} {...props} />
+    <div ref={ref} className={cn('type-body-sm text-muted-foreground', className)} {...props} />
   ),
 );
 CardDescription.displayName = 'CardDescription';
