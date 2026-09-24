@@ -1,6 +1,6 @@
 import { checkA11y, fireEvent, render, screen, within } from '@/test-utils';
 
-import UsedRwlkNftsPage, { toUsedRwlkNftRecords } from '../UsedRwlkNftsPage';
+import UsedRwlkNftsPage, { newestFirst, toUsedRwlkNftRecords } from '../UsedRwlkNftsPage';
 
 const mockUseUsedRWLKNFTs = jest.fn();
 jest.mock('@/hooks/useApiQuery', () => ({
@@ -50,6 +50,17 @@ describe('toUsedRwlkNftRecords', () => {
   });
 });
 
+describe('newestFirst', () => {
+  it('puts the latest use first and records without a time last', () => {
+    const [a, b, c] = [
+      { ...record({ RWalkTokenId: 1, TimeStamp: 10 }), TxHash: null },
+      { ...record({ RWalkTokenId: 2, TimeStamp: null }), TxHash: null },
+      { ...record({ RWalkTokenId: 3, TimeStamp: 30 }), TxHash: null },
+    ];
+    expect(newestFirst([a, b, c]).map((r) => r.RWalkTokenId)).toEqual([3, 1, 2]);
+  });
+});
+
 describe('UsedRwlkNftsPage', () => {
   it('renders the fallback header without a server summary', () => {
     mockUseUsedRWLKNFTs.mockReturnValue(state());
@@ -57,46 +68,68 @@ describe('UsedRwlkNftsPage', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Used Random Walk NFTs' })).toBeVisible();
   });
 
-  it('shows each used RandomWalk NFT with its art, its page, the participant and the cycle', () => {
+  it('hangs each used RandomWalk NFT on a plate, with its page, cycle and participant', () => {
     mockUseUsedRWLKNFTs.mockReturnValue(state({ data: [record()] }));
     render(<UsedRwlkNftsPage />);
-    const table = screen.getAllByRole('table')[0]!;
-    expect(within(table).getByAltText('RandomWalk NFT #000215')).toHaveAttribute(
+    const wall = screen.getByRole('list', { name: 'Used Random Walk NFTs' });
+    const card = within(wall).getByTestId('used-rwlk-nft');
+    expect(within(card).getByAltText('RandomWalk NFT #000215')).toHaveAttribute(
       'src',
       expect.stringContaining('000215_black_thumb.jpg'),
     );
-    expect(within(table).getByRole('link', { name: /#000215/ })).toHaveAttribute(
+    // The plate and its number are one link, named by the plate's alt text.
+    const tokenLink = within(card).getByRole('link', { name: /RandomWalk NFT #000215/ });
+    expect(tokenLink).toHaveAttribute('href', 'https://www.randomwalknft.com/detail/215');
+    expect(tokenLink).toHaveAttribute('target', '_blank');
+    expect(within(card).getByRole('link', { name: 'Cycle 1' })).toHaveAttribute(
       'href',
-      'https://www.randomwalknft.com/detail/215',
+      '/allocation/1',
     );
-    expect(within(table).getByRole('link', { name: '1' })).toHaveAttribute('href', '/allocation/1');
-    expect(within(table).getByRole('link', { name: /0x4A9A/ })).toHaveAttribute(
+    expect(within(card).getByRole('link', { name: /0x4A9A/ })).toHaveAttribute(
       'href',
       `/user/${PARTICIPANT}`,
     );
+    expect(within(card).getByText('Used by')).toBeInTheDocument();
+    expect(within(card).getByRole('time')).toHaveAttribute('dateTime', expect.any(String));
   });
 
-  it('pages a long ledger instead of five rows at a time', () => {
+  it('shows the newest use first and pages twelve at a time', () => {
     mockUseUsedRWLKNFTs.mockReturnValue(
       state({
-        data: Array.from({ length: 25 }, (_, i) => record({ RWalkTokenId: i, TxHash: `0x${i}` })),
+        data: Array.from({ length: 14 }, (_, i) =>
+          record({ RWalkTokenId: i, TxHash: `0x${i}`, TimeStamp: 1000 + i }),
+        ),
       }),
     );
     render(<UsedRwlkNftsPage />);
+    const cards = screen.getAllByTestId('used-rwlk-nft');
+    expect(cards).toHaveLength(12);
+    expect(within(cards[0]!).getByAltText('RandomWalk NFT #000013')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'tables.pagination.nextAria' }));
-    expect(screen.getAllByText(/tables\.pagination\.range\(from=21/)[0]).toBeInTheDocument();
+    expect(screen.getAllByTestId('used-rwlk-nft')).toHaveLength(2);
   });
 
-  it('says what fills an empty ledger', () => {
+  it('shows plate skeletons while loading', () => {
+    mockUseUsedRWLKNFTs.mockReturnValue(state({ isLoading: true, data: undefined }));
+    render(<UsedRwlkNftsPage />);
+    expect(screen.getByRole('status', { name: 'tables.skeleton.loadingNft' })).toBeInTheDocument();
+  });
+
+  it('says what fills an empty page', () => {
     mockUseUsedRWLKNFTs.mockReturnValue(state());
     render(<UsedRwlkNftsPage />);
-    expect(screen.getByText('No RandomWalk NFTs used yet')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'No RandomWalk NFTs used yet' }),
+    ).toBeInTheDocument();
   });
 
-  it('offers a retry when the ledger cannot be read', () => {
+  it('offers a retry when the records cannot be read', () => {
     const refetch = jest.fn();
     mockUseUsedRWLKNFTs.mockReturnValue(state({ isError: true, refetch }));
     render(<UsedRwlkNftsPage />);
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Used RandomWalk NFTs could not be loaded' }),
+    ).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /Try again/ }));
     expect(refetch).toHaveBeenCalled();
   });

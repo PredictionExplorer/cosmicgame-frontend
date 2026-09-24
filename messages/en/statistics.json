@@ -609,17 +609,15 @@
   "usedRwlkNfts": {
     "title": "Used Random Walk NFTs",
     "subtitle": "Random Walk NFTs attached to ETH gestures for the one-time 50% Gesture Cost reduction",
-    "columns": {
-      "artwork": "Artwork",
-      "token": "RandomWalk NFT",
-      "participant": "Participant",
-      "cycle": "Cycle",
-      "date": "Date"
-    },
     "artAlt": "RandomWalk NFT {id}",
+    "loadErrorTitle": "Used RandomWalk NFTs could not be loaded",
     "loadError": "The used RandomWalk NFTs could not be read. Try again.",
     "emptyTitle": "No RandomWalk NFTs used yet",
-    "emptyDescription": "A RandomWalk NFT appears here once an ETH gesture uses it for its one-time Gesture Cost reduction."
+    "emptyDescription": "A RandomWalk NFT appears here once an ETH gesture uses it for its one-time Gesture Cost reduction.",
+    "card": {
+      "cycle": "Cycle {cycle}",
+      "usedBy": "Used by"
+    }
   },
   "stellarSelectionEth": {
     "invalidAddress": "Invalid Address",

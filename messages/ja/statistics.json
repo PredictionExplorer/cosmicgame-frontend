@@ -609,17 +609,15 @@
   "usedRwlkNfts": {
     "title": "使用済みのRandom Walk NFT",
     "subtitle": "一度だけの50%の一筆の費用の割引のためにETH一筆に添付されたRandom Walk NFT",
-    "columns": {
-      "artwork": "アートワーク",
-      "token": "RandomWalk NFT",
-      "participant": "参加者",
-      "cycle": "サイクル",
-      "date": "日時"
-    },
     "artAlt": "RandomWalk NFT {id}",
+    "loadErrorTitle": "使用済みのRandomWalk NFTを読み込めませんでした",
     "loadError": "使用済みのRandomWalk NFTを読み込めませんでした。もう一度お試しください。",
     "emptyTitle": "使用済みのRandomWalk NFTはまだありません",
-    "emptyDescription": "ETH一筆が一度だけの一筆の費用の割引にRandomWalk NFTを使うと、ここに表示されます。"
+    "emptyDescription": "ETH一筆が一度だけの一筆の費用の割引にRandomWalk NFTを使うと、ここに表示されます。",
+    "card": {
+      "cycle": "サイクル{cycle}",
+      "usedBy": "参加者"
+    }
   },
   "stellarSelectionEth": {
     "invalidAddress": "無効なアドレス",

@@ -609,17 +609,15 @@
   "usedRwlkNfts": {
     "title": "已使用的 Random Walk NFT",
     "subtitle": "隨 ETH 落筆附加、用於一次性降低 50% 落筆價格的 Random Walk NFT",
-    "columns": {
-      "artwork": "作品",
-      "token": "RandomWalk NFT",
-      "participant": "參與者",
-      "cycle": "週期",
-      "date": "時間"
-    },
     "artAlt": "RandomWalk NFT {id}",
+    "loadErrorTitle": "無法載入已使用的 RandomWalk NFT",
     "loadError": "無法讀取已使用的 RandomWalk NFT，請重試。",
     "emptyTitle": "尚無已使用的 RandomWalk NFT",
-    "emptyDescription": "ETH 落筆使用 RandomWalk NFT 獲得一次性落筆價格減免後，該 NFT 會顯示在這裡。"
+    "emptyDescription": "ETH 落筆使用 RandomWalk NFT 獲得一次性落筆價格減免後，該 NFT 會顯示在這裡。",
+    "card": {
+      "cycle": "第 {cycle} 個週期",
+      "usedBy": "參與者"
+    }
   },
   "stellarSelectionEth": {
     "invalidAddress": "地址無效",

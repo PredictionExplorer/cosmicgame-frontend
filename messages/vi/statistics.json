@@ -609,17 +609,15 @@
   "usedRwlkNfts": {
     "title": "Random Walk NFT đã sử dụng",
     "subtitle": "Các Random Walk NFT đã đính kèm vào nét bút ETH để giảm 50% chi phí nét bút một lần",
-    "columns": {
-      "artwork": "Tác phẩm",
-      "token": "RandomWalk NFT",
-      "participant": "Người tham gia",
-      "cycle": "Chu kỳ",
-      "date": "Thời gian"
-    },
     "artAlt": "RandomWalk NFT {id}",
+    "loadErrorTitle": "Không tải được các RandomWalk NFT đã sử dụng",
     "loadError": "Không đọc được các RandomWalk NFT đã sử dụng. Hãy thử lại.",
     "emptyTitle": "Chưa có RandomWalk NFT nào được sử dụng",
-    "emptyDescription": "RandomWalk NFT sẽ hiện ở đây khi một nét bút ETH dùng nó để giảm chi phí nét bút một lần."
+    "emptyDescription": "RandomWalk NFT sẽ hiện ở đây khi một nét bút ETH dùng nó để giảm chi phí nét bút một lần.",
+    "card": {
+      "cycle": "Chu kỳ {cycle}",
+      "usedBy": "Người tham gia"
+    }
   },
   "stellarSelectionEth": {
     "invalidAddress": "Địa chỉ không hợp lệ",

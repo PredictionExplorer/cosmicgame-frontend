@@ -609,17 +609,15 @@
   "usedRwlkNfts": {
     "title": "Використані Random Walk NFT",
     "subtitle": "Random Walk NFT, долучені до ETH-жестів для одноразового зменшення вартості жесту на 50%",
-    "columns": {
-      "artwork": "Твір",
-      "token": "RandomWalk NFT",
-      "participant": "Учасник",
-      "cycle": "Цикл",
-      "date": "Дата"
-    },
     "artAlt": "RandomWalk NFT {id}",
+    "loadErrorTitle": "Не вдалося завантажити використані RandomWalk NFT",
     "loadError": "Не вдалося прочитати використані RandomWalk NFT. Спробуйте ще раз.",
     "emptyTitle": "Використаних RandomWalk NFT ще немає",
-    "emptyDescription": "RandomWalk NFT з’являється тут, щойно ETH-жест використає його для одноразового зменшення вартості жесту."
+    "emptyDescription": "RandomWalk NFT з’являється тут, щойно ETH-жест використає його для одноразового зменшення вартості жесту.",
+    "card": {
+      "cycle": "Цикл {cycle}",
+      "usedBy": "Учасник"
+    }
   },
   "stellarSelectionEth": {
     "invalidAddress": "Недійсна адреса",

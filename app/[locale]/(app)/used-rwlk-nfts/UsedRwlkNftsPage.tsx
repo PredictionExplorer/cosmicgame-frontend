@@ -1,8 +1,10 @@
 'use client';
 
-import { useMemo, type ReactNode } from 'react';
+import { useMemo, useRef, useState, type ReactNode } from 'react';
+import { ArrowUpRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
+import { SITE_ROUTE_ICONS } from '@/config/siteNavIcons';
 import { getRWLKImageUrl } from '@/utils/urls';
 import { formatCount } from '@/utils/format';
 import { formatId } from '@/utils/format/ids';
@@ -10,14 +12,16 @@ import { toFiniteNumber } from '@/utils/finiteNumber';
 import { useUsedRWLKNFTs } from '@/hooks/useApiQuery';
 import type { UsedRWLKNFT } from '@/services/api/types';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { AddressChip } from '@/components/ui/address-chip';
 import { ArtFrame } from '@/components/ui/art-frame';
-import {
-  DataTable,
-  ExternalTableLink,
-  TableLink,
-  type DataTableColumn,
-} from '@/components/ui/data-table';
+import { TableLink } from '@/components/ui/data-table';
+import { DateTime } from '@/components/ui/date-time';
+import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
 import { PageShell } from '@/components/ui/page-shell';
+import { TablePagination } from '@/components/ui/pagination';
+import { SIGNATURE_GRID_CLASS, SignatureGridSkeleton } from '@/components/nft/SignatureCard';
+import { cn } from '@/lib/utils';
 
 /** One RandomWalk NFT a gesture used. */
 export interface UsedRwlkNftRecord {
@@ -30,7 +34,7 @@ export interface UsedRwlkNftRecord {
   TimeStamp: number | null;
 }
 
-/** Reads the indexer's loosely typed rows into ledger rows. */
+/** Reads the indexer's loosely typed rows into records. */
 export function toUsedRwlkNftRecords(rows: readonly UsedRWLKNFT[]): UsedRwlkNftRecord[] {
   return rows.map((row) => ({
     RWalkTokenId: row.RWalkTokenId,
@@ -39,6 +43,11 @@ export function toUsedRwlkNftRecords(rows: readonly UsedRWLKNFT[]): UsedRwlkNftR
     TxHash: typeof row.TxHash === 'string' && row.TxHash ? row.TxHash : null,
     TimeStamp: toFiniteNumber(row.TimeStamp),
   }));
+}
+
+/** Newest use first; records without a time keep their order at the end. */
+export function newestFirst(records: readonly UsedRwlkNftRecord[]): UsedRwlkNftRecord[] {
+  return [...records].sort((a, b) => (b.TimeStamp ?? -1) - (a.TimeStamp ?? -1));
 }
 
 /** The RandomWalk project's page for one token. */
@@ -51,77 +60,35 @@ function randomWalkThumb(tokenId: number): string {
   return getRWLKImageUrl(String(tokenId).padStart(6, '0'), 'black_thumb.jpg');
 }
 
+const PAGE_SIZE = 12;
+
+/** The page's own glyph, as in the navigation. */
+const UsedRwlkIcon = SITE_ROUTE_ICONS.usedRwlkNfts;
+
+/** Three across from `md`, four from `xl`: a RandomWalk render reads well at about 300px. */
+const COLUMNS_CLASS = 'md:grid-cols-3 xl:grid-cols-4';
+const SIZES = '(min-width: 1280px) 19rem, (min-width: 768px) 33vw, 50vw';
+
+/** Plates in the first viewport, which load eagerly. */
+const EAGER_CARDS = 4;
+
 /**
- * The used RandomWalk NFTs as a ledger with their art: each row shows the
- * piece on a black plate (RandomWalk renders share the Signatures' ratio and
- * black ground), links to it on the RandomWalk site, and names the
- * participant, the cycle and the gesture that used it.
+ * The RandomWalk NFTs gestures have used, hung as works: each on its black
+ * plate (RandomWalk renders share the Signatures' ratio and black ground),
+ * linked to its page on the RandomWalk site, with the cycle, when, and the
+ * participant whose gesture used it. Newest first, twelve a page.
  *
  * `seoSummary` is the server-rendered page header, the page's only header.
  */
 const UsedRwlkNftsPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('statistics');
-  const tDetail = useTranslations('detail');
-  const locale = useLocale();
   const { data, isLoading, isError, refetch } = useUsedRWLKNFTs();
-  const rows = useMemo(() => toUsedRwlkNftRecords(data ?? []), [data]);
-
-  const columns: DataTableColumn<UsedRwlkNftRecord>[] = [
-    {
-      // On a phone the picture leads its record, full width and unlabelled.
-      id: 'artwork',
-      header: <span className="sr-only">{t('usedRwlkNfts.columns.artwork')}</span>,
-      label: '',
-      stack: true,
-      value: (row) => row.RWalkTokenId,
-      width: '7.5rem',
-      cell: (row) => (
-        <ArtFrame
-          sources={[randomWalkThumb(row.RWalkTokenId)]}
-          alt={t('usedRwlkNfts.artAlt', { id: formatId(row.RWalkTokenId) })}
-          sizes="(max-width: 639px) 15rem, 96px"
-          density="compact"
-          unavailableLabel={tDetail('image.artworkUnavailable')}
-          className="w-24 max-sm:w-full max-sm:max-w-60"
-        />
-      ),
-    },
-    {
-      id: 'token',
-      header: t('usedRwlkNfts.columns.token'),
-      value: (row) => row.RWalkTokenId,
-      nowrap: true,
-      cell: (row) => (
-        <ExternalTableLink href={randomWalkHref(row.RWalkTokenId)} className="type-mono">
-          {formatId(row.RWalkTokenId)}
-        </ExternalTableLink>
-      ),
-    },
-    {
-      id: 'participant',
-      header: t('usedRwlkNfts.columns.participant'),
-      kind: 'address',
-      value: (row) => row.BidderAddr,
-    },
-    {
-      id: 'cycle',
-      header: t('usedRwlkNfts.columns.cycle'),
-      kind: 'count',
-      value: (row) => row.RoundNum,
-      cell: (row) => (
-        <TableLink href={`/allocation/${row.RoundNum}`}>
-          {formatCount(row.RoundNum, locale)}
-        </TableLink>
-      ),
-    },
-    {
-      id: 'date',
-      header: t('usedRwlkNfts.columns.date'),
-      kind: 'datetime',
-      value: (row) => row.TimeStamp,
-      txHash: (row) => row.TxHash,
-    },
-  ];
+  const records = useMemo(() => newestFirst(toUsedRwlkNftRecords(data ?? [])), [data]);
+  const [page, setPage] = useState(1);
+  const wallRef = useRef<HTMLDivElement>(null);
+  const pageCount = Math.max(1, Math.ceil(records.length / PAGE_SIZE));
+  const current = Math.min(page, pageCount);
+  const visible = records.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
 
   return (
     <PageShell variant="data" backdrop="signature">
@@ -133,21 +100,123 @@ const UsedRwlkNftsPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
         />
       )}
 
-      <DataTable
-        data={rows}
-        columns={columns}
-        ariaLabel={t('usedRwlkNfts.title')}
-        getRowKey={(row) => `${row.TxHash}-${row.RWalkTokenId}`}
-        initialSort={{ id: 'date', direction: 'desc' }}
-        loading={isLoading}
-        error={isError ? t('usedRwlkNfts.loadError') : undefined}
-        onRetry={() => void refetch()}
-        emptyTitle={t('usedRwlkNfts.emptyTitle')}
-        emptyDescription={t('usedRwlkNfts.emptyDescription')}
-        headingLevel={2}
-      />
+      {isError ? (
+        <ErrorState
+          title={t('usedRwlkNfts.loadErrorTitle')}
+          message={t('usedRwlkNfts.loadError')}
+          headingLevel={2}
+          onRetry={() => void refetch()}
+        />
+      ) : isLoading ? (
+        <SignatureGridSkeleton count={8} className={COLUMNS_CLASS} />
+      ) : records.length === 0 ? (
+        <EmptyState
+          icon={<UsedRwlkIcon aria-hidden />}
+          title={t('usedRwlkNfts.emptyTitle')}
+          description={t('usedRwlkNfts.emptyDescription')}
+          headingLevel={2}
+          variant="page"
+        />
+      ) : (
+        <div ref={wallRef} className="scroll-mt-[var(--sticky-offset)]">
+          <ul
+            className={cn(SIGNATURE_GRID_CLASS, COLUMNS_CLASS)}
+            aria-label={t('usedRwlkNfts.title')}
+          >
+            {visible.map((record, index) => (
+              <li key={`${record.TxHash ?? 'record'}-${record.RWalkTokenId}`} className="min-w-0">
+                <UsedRandomWalkCard
+                  record={record}
+                  priority={current === 1 && index < EAGER_CARDS}
+                />
+              </li>
+            ))}
+          </ul>
+          <TablePagination
+            page={current}
+            pageSize={PAGE_SIZE}
+            total={records.length}
+            onPageChange={(next) => {
+              setPage(next);
+              wallRef.current?.scrollIntoView?.({ block: 'start' });
+            }}
+            className="mt-10 border-t border-rule-faint pt-5 sm:pl-0"
+          />
+        </div>
+      )}
     </PageShell>
   );
 };
+
+/**
+ * One used RandomWalk NFT: the plate and its number link to the token on the
+ * RandomWalk site (a new tab); the caption names the cycle (linked to its
+ * allocation), when the gesture landed and the participant, as the attached
+ * NFTs' labels do.
+ */
+function UsedRandomWalkCard({
+  record,
+  priority,
+}: {
+  record: UsedRwlkNftRecord;
+  priority: boolean;
+}) {
+  const t = useTranslations('statistics');
+  const tTables = useTranslations('tables');
+  const tDetail = useTranslations('detail');
+  const locale = useLocale();
+  const id = formatId(record.RWalkTokenId);
+
+  return (
+    <article className="min-w-0" data-testid="used-rwlk-nft">
+      <a
+        href={randomWalkHref(record.RWalkTokenId)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group block rounded-edge"
+      >
+        <ArtFrame
+          sources={[randomWalkThumb(record.RWalkTokenId)]}
+          alt={t('usedRwlkNfts.artAlt', { id })}
+          sizes={SIZES}
+          priority={priority}
+          unavailableLabel={tDetail('image.artworkUnavailable')}
+          unavailableDetail={id}
+          className="group-hover:after:shadow-[var(--art-edge-active)]"
+        />
+        {/* The plate's alt text already names the token. */}
+        <p
+          aria-hidden
+          className="mt-3 flex items-center gap-1 type-body-md font-medium tabular-nums text-foreground"
+        >
+          <span className="decoration-rule underline-offset-4 group-hover:underline">{id}</span>
+          <ArrowUpRight className="size-3.5 shrink-0 text-subtle" />
+        </p>
+        <span className="sr-only">{tTables('links.newTab')}</span>
+      </a>
+      {/* The space before each dot does not break, so a wrapped line ends with the dot. */}
+      <p className="mt-1.5 type-caption text-subtle">
+        <TableLink href={`/allocation/${record.RoundNum}`}>
+          {t('usedRwlkNfts.card.cycle', { cycle: formatCount(record.RoundNum, locale) })}
+        </TableLink>
+        {record.TimeStamp === null ? null : (
+          <>
+            {'\u00a0· '}
+            <DateTime timestamp={record.TimeStamp} />
+          </>
+        )}
+      </p>
+      <p className="mt-1 flex min-w-0 items-center gap-1.5 type-caption text-subtle">
+        <span className="shrink-0">{t('usedRwlkNfts.card.usedBy')}</span>
+        <AddressChip
+          address={record.BidderAddr}
+          variant="plain"
+          showCopy={false}
+          className="min-w-0"
+        />
+      </p>
+    </article>
+  );
+}
 
 export default UsedRwlkNftsPage;
