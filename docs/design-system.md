@@ -319,6 +319,9 @@ Every ledger is a `<DataTable>` (`@/components/ui/data-table`). It sits on the
 `ResponsiveTable*` primitives in `components/ui/responsive-table.tsx`, and
 `styles/tables.css` owns the layout. Static, server-rendered tables such as the white
 paper's use `<Table>` from `components/ui/table.tsx`, which draws the same `.cs-table`.
+Name a static table after the heading it sits under (`labelledBy="<heading id>"`); its
+scroll container, like DataTable's, becomes a focusable, named region only while the
+table is wider than its column.
 
 **Column kinds.** A column declares what it holds, and the kind sets its alignment,
 wrapping, figures, renderer and first sort direction. Alignment reaches the header and
@@ -335,19 +338,43 @@ its cells as one `data-align`, so the two cannot disagree.
 `cell` replaces the renderer while the kind keeps the alignment. `value` is what sorts,
 and blank values sort last in both directions. Give `align` only to an unusual column.
 
-**Phones.** Below 40em a table with more than three columns turns each row into a record.
-The label (the column header in sentence case, 13px, `text-subtle`) sits at the start and
-the 14px value at the end. `stack` puts long text under its label. Blank cells and
-`priority: 'secondary'` columns drop out, so no empty labelled line is left behind. A
-table of three columns or fewer stays a table (`layout="compact"`).
+**Phones.** Below 40em each row becomes a record in a stacked list: records are divided
+by one `--rule`, with no box, fill or rule inside them. The label (the column header in
+sentence case, 13px, `text-subtle`) sits at the start and the 14px value at the end, and
+anything inside a value wraps between words rather than push the record past the
+screen. `stack` puts long text under its label. Blank cells and `priority: 'secondary'`
+columns drop out, so no empty labelled line is left behind. The connected wallet's
+record carries its 2px accent rule down the start edge.
+
+A table stays a real table on phones (`layout="compact"`) only when every column a phone
+shows is a compact kind (`address`, `link`, `amount`, `count`, `percent`, `status`) and
+there are at most three: `phoneLayoutFor` decides it from the columns. A date, a
+duration or free text needs a record line's width, so any table holding one reads as
+records. Because a panel's padding or a locale's longer words can still push three
+short columns past a 320px screen, an automatic compact table that turns out wider than
+its column on a phone becomes records before it paints (`useCompactFit`). Pass `layout`
+only to pin a choice; a pinned layout is never overridden. Compact cells keep a 0.25rem
+inset at both ends so a focused link's outline (2px, 2px out) stays inside the scroll
+container.
 
 **States.** `loading` draws skeleton rows at the real row height. `error` with `onRetry`
 shows an `ErrorState` with a retry button, and an empty list shows an `EmptyState`
-(`emptyTitle`, `emptyDescription`, `emptyAction`). A table never shows a bare "No data"
+(`emptyTitle`, `emptyDescription`, `emptyAction`). Their titles sit one level under the
+table's `title` (an `h2` title gives an `h3` state), or at `headingLevel` when the table
+has no title, so the outline never skips a level. A table never shows a bare "No data"
 line.
 
 **Pages.** 20 rows a page, or 10 on a phone. `TablePagination` shows Previous and Next
-with the range ("1–20 of 1,140") and hides itself when everything fits on one page.
+with the range ("1–20 of 1,140") and hides itself when everything fits on one page. The
+visible range is not a live region, because a live table's total changes on its own; a
+screen reader hears the new range once, after the reader pages. "Go to page" commits on
+Enter or when the field is left, never per keystroke.
+
+**Sorting.** A header click cycles its column through the kind's first direction, the
+other direction, and back to the table's own order (`initialSort`). When the table's
+own order already sorts that column, a click turns it around, so every click changes
+something. A sorted header's arrow sits in the label's line of text, so a wrapping label
+keeps it beside the words.
 
 **Links.** `getRowHref` makes the first column's value (or `rowLinkColumn`'s) a real
 same-tab link, and a click anywhere else on the row follows it too. `TableLink` covers
