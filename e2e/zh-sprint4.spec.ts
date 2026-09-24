@@ -87,13 +87,12 @@ test.describe('zh Sprint 4 — transactions and holdings routes', () => {
       '已取回分配 · Cosmic Signature',
     );
     await expect(
-      page.getByText(`第 ${SPRINT4_MOCK_CYCLE} 个周期的签名分配已取回。`, {
-        exact: true,
+      page.getByRole('heading', {
+        level: 1,
+        name: `第 ${SPRINT4_MOCK_CYCLE} 个周期的签名分配`,
       }),
     ).toBeVisible();
-    await expect(
-      page.getByRole('heading', { name: `第 ${SPRINT4_MOCK_CYCLE} 个周期的分配` }),
-    ).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: '签名分配' })).toBeVisible();
   });
 
   test('/zh/anchoring renders localized anchoring overview and metadata', async ({ page }) => {

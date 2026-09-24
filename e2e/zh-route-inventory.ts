@@ -224,7 +224,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: `/allocation-finalized?cycle=${cycle}`,
     host: 'app',
     cluster: 'transactions',
-    expectedText: `第 ${cycle} 个周期的分配`,
+    expectedText: `第 ${cycle} 个周期的签名分配`,
   },
   {
     id: 'anchoring',

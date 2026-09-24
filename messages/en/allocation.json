@@ -14,63 +14,30 @@
     },
     "intro": "When a Performance Cycle finalizes, the participant who made the Final Gesture retrieves the Signature Allocation — {percentage}% of the Cycle Reserve, 1,000 CST, and a unique Cosmic Signature NFT. Additional allocations flow through Chrono-Warrior, Stellar Selection, Anchor Distributions, Public Goods, and the Compounding Cycle Reserve.",
     "reserveSplit": {
-      "label": "Cycle Reserve Split",
-      "tooltip": "Percentages show how a finalized cycle's ETH reserve is allocated across protocol tracks.",
-      "tracks": {
-        "signature": {
-          "label": "Signature",
-          "tooltip": "The Signature Allocation is the main ETH allocation, retrieved by the participant who made the Final Gesture."
-        },
-        "chrono": {
-          "label": "Chrono",
-          "tooltip": "The Chrono-Warrior allocation goes to the participant who held the Endurance Champion position for the longest consecutive interval."
-        },
-        "stellar": {
-          "label": "Stellar ETH",
-          "tooltip": "ETH set aside for Stellar Selection recipients. Each gesture creates selection frequency for these participant allocations."
-        },
-        "anchor": {
-          "label": "Anchor",
-          "tooltip": "ETH distributed to wallets with Cosmic Signature NFTs anchored to the protocol. RandomWalk NFT anchors receive Anchored-NFT Stellar Selection eligibility instead, not ETH."
-        },
-        "publicGoods": {
-          "label": "Public Goods",
-          "tooltip": "ETH forwarded from the cycle to the selected Public Goods Beneficiary, currently Protocol Guild."
-        },
-        "nextCycle": {
-          "label": "Next cycle",
-          "tooltip": "The remaining Cycle Reserve compounds into the next Performance Cycle after the finalized allocations are made."
-        }
-      }
-    }
+      "label": "Cycle reserve split",
+      "tooltip": "Percentages show how a finalized cycle's ETH reserve is allocated across protocol tracks."
+    },
+    "ledgerTitle": "Finalized cycles"
   },
   "details": {
-    "copy": {
-      "addressAria": "Copy address {address}",
-      "addressSuccess": "Address copied to clipboard"
-    },
     "navigation": {
       "previousAria": "Previous cycle",
       "nextAria": "Next cycle"
     },
     "recipientCard": {
-      "recipient": "Recipient",
-      "none": "None",
-      "nftToken": "NFT Token"
+      "recipient": "Recipient"
     },
     "share": {
       "summary": "Cycle #{cycle} — Cosmic Signature\nSignature Allocation: {amount} ETH\nRecipient: {recipient}\nGestures: {gestures}\n{url}",
       "success": "Cycle summary copied to clipboard"
     },
     "invalid": {
-      "title": "Invalid Cycle Number",
-      "help": "The cycle number must be a positive integer.",
-      "back": "Back to Allocation Recipients"
+      "title": "Invalid cycle number",
+      "help": "The cycle number must be a positive integer."
     },
     "notFound": {
-      "title": "Allocation Data Not Found",
-      "help": "No data available for Cycle #{cycle}. The cycle may not have finalized yet.",
-      "back": "Back to Allocation Recipients"
+      "title": "Allocation data not found",
+      "help": "No data available for Cycle #{cycle}. The cycle may not have finalized yet."
     },
     "error": {
       "title": "Couldn't load this cycle",
@@ -79,126 +46,76 @@
     "breadcrumbs": {
       "recipients": "Allocation Recipients"
     },
+    "loading": "Loading the cycle",
     "hero": {
-      "aria": "Cycle Hero",
-      "recipient": "Recipient",
-      "nft": "NFT",
-      "nftTooltip": "View this Cosmic Signature NFT in the gallery.",
-      "finalized": "Finalized {dateTime}",
+      "finalized": "Finalized <dateTime></dateTime>",
       "viewTransaction": "View transaction",
       "share": "Share",
       "shareAria": "Share cycle summary"
     },
     "recipientSection": {
-      "aria": "Cycle Recipients",
-      "title": "Cycle Recipients",
-      "tooltip": "All allocation recipients for this cycle. The Signature Allocation goes to the participant who made the Final Gesture; special roles receive additional allocations.",
-      "labels": {
-        "ethAllocation": "ETH Allocation",
-        "recognitionCst": "Recognition CST",
-        "cosmicSignatureNft": "Cosmic Signature NFT"
-      },
+      "title": "Cycle recipients",
+      "description": "Each role received a Cosmic Signature NFT when the cycle was finalized.",
       "cards": {
         "signature": {
-          "title": "Signature Allocation",
-          "tooltip": "After the countdown reaches zero, the participant who made the Final Gesture may finalize the cycle and retrieve the Signature Allocation: ETH, 1,000 CST, and a Cosmic Signature NFT."
+          "title": "Signature Allocation"
         },
         "chrono": {
-          "title": "Chrono-Warrior",
-          "tooltip": "The participant who held the Endurance Champion position for the longest consecutive interval. Retrieves ETH, Recognition CST, and a Cosmic Signature NFT."
+          "title": "Chrono-Warrior"
         },
         "endurance": {
-          "title": "Endurance Champion",
-          "tooltip": "The participant who held the most-recent-gesture position for the longest uninterrupted interval. Receives a Recognition CST imprint of 1,000 CST and a Cosmic Signature NFT."
+          "title": "Endurance Champion"
         },
         "finalCst": {
-          "title": "Final CST Gesture",
-          "tooltip": "The participant who made the last CST gesture of the cycle. Receives a Recognition CST imprint of 1,000 CST and a Cosmic Signature NFT."
+          "title": "Final CST Gesture"
         }
       }
     },
     "distribution": {
-      "aria": "Allocation Distribution",
-      "title": "Allocation Distribution",
+      "title": "Allocation distribution",
       "tooltip": "How the ETH distributed this cycle splits across allocation tracks. The rest of the Cycle Reserve carries into the next cycle and is not shown here.",
-      "segments": {
-        "signature": {
-          "label": "Signature Allocation",
-          "tooltip": "{amount} ETH retrieved by the participant who made the Final Gesture."
-        },
-        "chrono": {
-          "label": "Chrono-Warrior",
-          "tooltip": "{amount} ETH allocated to the Chrono-Warrior, the participant who held the Endurance Champion position for the longest consecutive interval."
-        },
-        "publicGoods": {
-          "label": "Public Goods",
-          "tooltip": "{amount} ETH forwarded to the Public Goods Beneficiary (Protocol Guild)."
-        },
-        "anchor": {
-          "label": "Anchor Distribution",
-          "tooltip": "{amount} ETH distributed in proportion to each wallet's number of anchored Cosmic Signature NFTs."
-        },
-        "stellar": {
-          "label": "Stellar Selection",
-          "tooltip": "{amount} ETH allocated to the Stellar Selection pool."
-        }
-      },
       "total": "{amount} ETH distributed this cycle"
     },
     "statistics": {
-      "aria": "Cycle Statistics",
-      "title": "Cycle Statistics",
+      "title": "Cycle statistics",
       "tooltip": "Key metrics summarizing this cycle's activity and allocation distribution.",
       "cards": {
         "signatureEth": {
-          "label": "Signature Allocation ETH",
+          "label": "Signature Allocation",
           "tooltip": "The ETH portion of the Signature Allocation retrieved by the participant who made the Final Gesture of this cycle."
         },
-        "publicGoods": {
-          "label": "Public Goods",
-          "tooltip": "The amount forwarded to the Public Goods Beneficiary (Protocol Guild) from this cycle."
-        },
-        "anchor": {
-          "label": "Anchor Distribution",
-          "tooltip": "Total ETH distributed to participants who anchored Cosmic Signature NFTs for this cycle."
-        },
-        "stellar": {
-          "label": "Stellar Selection Pool",
-          "tooltip": "Total ETH allocated to the Stellar Selection pool across the cycle."
+        "recipients": {
+          "label": "Recipients",
+          "tooltip": "Wallets that received at least one allocation this cycle, each counted once."
         },
         "gestures": {
-          "label": "Total Gestures",
-          "tooltip": "The total number of gestures made during this cycle."
+          "label": "Gestures"
         },
         "attachedNfts": {
-          "label": "Attached NFTs",
-          "tooltip": "Number of NFTs attached to gestures by participants during this cycle."
+          "label": "Attached NFTs"
         },
         "anchoredTokens": {
-          "label": "Anchored Tokens",
-          "tooltip": "Number of NFT tokens anchored to the protocol for this cycle."
+          "label": "Anchored tokens"
         },
         "uniqueAnchorHolders": {
-          "label": "Unique Anchor-holders",
+          "label": "Unique anchor-holders",
           "tooltip": "How many unique addresses had tokens anchored during this cycle."
         },
         "totalContributed": {
-          "label": "Total Contributed",
-          "tooltip": "Combined value of all ERC-20 token contributions attached to gestures during this cycle."
+          "label": "Contributed ETH",
+          "tooltip": "Direct ETH contributions from the community during this cycle."
         }
       }
     },
     "ledger": {
-      "aria": "All Allocations for This Cycle",
-      "title": "All Allocations for This Cycle",
-      "tooltip": "Complete ledger of every allocation record for this cycle — Signature Allocation, Chrono-Warrior, Endurance Champion, Stellar Selection, Anchor Distributions, and related NFT/CST distributions.",
+      "title": "All allocations for this cycle",
+      "description": "Every allocation record of the cycle, grouped by recipient.",
       "empty": "No allocation records yet."
     },
     "data": {
-      "divider": "Detailed Data",
-      "aria": "Cycle Data",
+      "divider": "Detailed data",
       "tabs": {
-        "gestures": "Gesture History",
+        "gestures": "Gesture history",
         "endurance": "Endurance Champions",
         "stellar": "Stellar Selection",
         "anchoring": "Anchor Distributions",
@@ -215,44 +132,48 @@
       "contributions": {
         "nfts": "Attached NFTs",
         "nftsTooltip": "NFTs attached to gestures during this cycle, forwarded to the participant who made the Final Gesture.",
-        "erc20": "Attached ERC-20 Tokens",
+        "erc20": "Attached ERC-20 tokens",
         "erc20Tooltip": "ERC-20 tokens attached to gestures by participants, forwarded to the Signature Allocation recipient."
       }
     }
   },
   "finalized": {
     "title": "Allocation finalized",
-    "invalid": {
-      "subtitle": "This page needs a valid cycle number in the URL.",
-      "missingParameter": "Missing or invalid <code>cycle</code> query parameter.",
-      "guidance": "Open <allocations>My Allocations</allocations> to review completed cycles."
+    "index": {
+      "title": "Latest finalized cycles",
+      "description": "Each cycle's Signature Allocation, shown by the Signature it imprinted."
     },
     "loading": {
-      "subtitle": "Loading cycle {cycle}…",
-      "status": "Loading..."
+      "status": "Loading the finalized cycle"
     },
     "pending": {
-      "successTitle": "You successfully completed this cycle",
-      "defaultTitle": "Allocation finalized",
-      "successSubtitle": "Cycle {cycle} was finalized on-chain.",
-      "cycleBreadcrumb": "Cycle {cycle}",
-      "breakdown": "Allocation breakdown (Signature Allocation distribution, other allocations, and attached tokens) is on the allocation details page for this cycle.",
-      "viewDetails": "View cycle {cycle} allocation details",
-      "review": "You can also review everything under <allocations>My Allocations</allocations>.",
-      "empty": "No allocation information."
+      "successTitle": "Cycle {cycle} is finalized",
+      "successBody": "Your finalization is on-chain. Its record appears here as soon as it is indexed; this page updates by itself.",
+      "defaultTitle": "No record of Cycle {cycle} yet",
+      "defaultBody": "The cycle may still be open, or its record is still being indexed."
+    },
+    "links": {
+      "viewCycle": "View Cycle {cycle}",
+      "myAllocations": "My Allocations",
+      "allRecipients": "Allocation Recipients"
     },
     "result": {
-      "title": "Congratulations! Cycle {cycle} Signature Allocation received.",
-      "sectionTitle": "Cycle {cycle} allocations",
-      "sectionDescription": "Summary of the Signature Allocation components for this cycle.",
-      "ethAllocation": "ETH allocation",
-      "nftId": "Cosmic Signature NFT ID",
-      "attachedTokensLabel": "Attached NFTs (ERC-721)",
-      "attachedTokens": "{count, plural, one {# attached NFT} other {# attached NFTs}} (ERC-721)"
+      "title": "Cycle {cycle} Signature Allocation",
+      "successTitle": "Congratulations! The Cycle {cycle} Signature Allocation is yours",
+      "lede": "What the participant who made the Final Gesture received when the cycle was finalized.",
+      "successLede": "You made the Final Gesture of Cycle {cycle}. The ETH, the CST and this Signature are now in your wallet.",
+      "componentsTitle": "Signature Allocation",
+      "eth": "ETH",
+      "cst": "CST",
+      "nft": "Cosmic Signature NFT",
+      "attached": "Attached NFTs",
+      "attachedTokens": "{count, plural, one {# attached NFT} other {# attached NFTs}} (ERC-721)",
+      "recipient": "Recipient",
+      "finalized": "Finalized",
+      "viewTransaction": "View transaction"
     },
     "next": {
       "title": "Next steps",
-      "description": "Stellar Selection may produce separate allocations, while anchoring may produce separate Anchor Distributions.",
       "body": "There could also be additional allocations from Stellar Selection. To view your allocations, go to the <allocations>My Allocations</allocations> page. For Anchor Distributions, visit the <anchors>My Anchors</anchors> page."
     }
   }

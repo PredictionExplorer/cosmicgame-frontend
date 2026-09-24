@@ -13,6 +13,13 @@ export interface SignatureCardProps {
   seed: string | number | null | undefined;
   /** Line 1 of the wall label: the token's name, or what the token stands for (a role). */
   title: ReactNode;
+  /** Where the plate and the title lead. Default: the token's page. */
+  href?: string;
+  /**
+   * Set `false` when the title names something other than the token (a
+   * role): it is then plain text, and a link in `meta` leads to the token.
+   */
+  linkTitle?: boolean;
   titleAs?: 'h2' | 'h3' | 'p';
   /** Line 2: short facts (token number, cycle, date). */
   meta?: readonly ReactNode[];
@@ -32,15 +39,17 @@ export interface SignatureCardProps {
 
 /**
  * A Signature on its black plate with a wall label under it: the one way an
- * allocation page shows a token. The plate and the title both lead to the
- * token's page; the plate is a pointer shortcut only (out of the tab order
- * and hidden from screen readers), so each card is one stop. Nothing is
- * drawn over the art.
+ * allocation page shows a token. The plate and the title lead to the same
+ * place (the token's page unless `href` says otherwise); the plate is a
+ * pointer shortcut only (out of the tab order and hidden from screen
+ * readers), so each card is one stop. Nothing is drawn over the art.
  */
 export function SignatureCard({
   tokenId,
   seed,
   title,
+  href = `/detail/${tokenId}`,
+  linkTitle = true,
   titleAs = 'p',
   meta,
   tags,
@@ -51,7 +60,6 @@ export function SignatureCard({
   priority = false,
   className,
 }: SignatureCardProps) {
-  const href = `/detail/${tokenId}`;
   return (
     <figure className={cn('flex min-w-0 flex-col gap-3', className)} data-token-id={tokenId}>
       <Link href={href} tabIndex={-1} aria-hidden className="block">
@@ -68,9 +76,13 @@ export function SignatureCard({
         as="figcaption"
         titleAs={titleAs}
         title={
-          <Link href={href} className="link-quiet">
-            {title}
-          </Link>
+          linkTitle ? (
+            <Link href={href} className="link-quiet">
+              {title}
+            </Link>
+          ) : (
+            title
+          )
         }
         meta={meta}
         tags={tags}
