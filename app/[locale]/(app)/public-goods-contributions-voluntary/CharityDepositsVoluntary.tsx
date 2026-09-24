@@ -16,6 +16,7 @@ import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 const CharityDepositsVoluntary = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('publicGoods');
   const tTables = useTranslations('tables');
+  const tFormats = useTranslations('formats');
   const { charity } = useContractAddresses();
   const { data: voluntaryDeposits = [], isLoading: loading } = useCharityVoluntary();
 
@@ -37,7 +38,18 @@ const CharityDepositsVoluntary = ({ seoSummary }: { seoSummary?: ReactNode }) =>
         loading={loading}
         title={tTables('names.publicGoodsContributions')}
         emptyDescription={tTables('publicGoods.voluntaryEmpty')}
-        emptyAction={charity ? <AddressChip address={charity} label={false} href={false} /> : null}
+        emptyAction={
+          charity ? (
+            // The vault by name, with its address to copy: a bare hex chip
+            // gave no hint which address it was.
+            <p className="flex flex-col items-center gap-1.5">
+              <span className="type-label text-subtle">
+                {tFormats('address.known.publicGoods')}
+              </span>
+              <AddressChip address={charity} label={false} href={false} display="responsive" />
+            </p>
+          ) : null
+        }
       />
     </PageShell>
   );
