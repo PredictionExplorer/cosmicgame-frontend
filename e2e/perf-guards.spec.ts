@@ -1,6 +1,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
 import { LOCALE_PREFIXES } from './locale-fixtures';
+import { MOBILE_AUDIT_SAMPLE_TEXT, mockMobileAuditApi } from './mobile-audit-fixtures';
 
 /**
  * Performance guardrails distilled from the RES-82 investigation. Each test
@@ -15,6 +16,8 @@ import { LOCALE_PREFIXES } from './locale-fixtures';
  *    preloaded on every page).
  * 4. Phones must never mount the WebGL hero (its three.js chunk is ~320KB
  *    of gzip that small viewports render nothing with).
+ * 5. A participant profile must hold its layout while its reads arrive
+ *    (measured CLS was 0.49 at 1440x900: the footer again).
  */
 
 const LANDING_HEADERS = { 'X-Forwarded-Host': 'cosmicsignature.com' };
@@ -99,6 +102,63 @@ test.describe('app home layout stability', () => {
     await page.goto('/', { waitUntil: 'load' });
     // Let the delayed data land, sections hydrate, and fonts settle.
     await page.waitForTimeout(2_500);
+
+    const cls = await page.evaluate(() => window.__perfGuards?.cls ?? 0);
+    expect(cls).toBeLessThan(0.1);
+  });
+});
+
+// lexicon-allow-start: the fixture mirrors sealed backend wire keys.
+/** A participant with a profile record, so every profile section renders once it arrives. */
+const POPULATED_PROFILE = {
+  UserInfo: {
+    Address: MOBILE_AUDIT_SAMPLE_TEXT.longAddress,
+    NumBids: 12_345,
+    NumPrizes: 87,
+    MaxBidAmount: 1.2345678,
+    MaxWinAmount: 123.4567891,
+    CosmicSignatureNumTransfers: 42,
+    TotalCSTokensWon: 1_234_567.891,
+    SumRaffleEthWinnings: 12.3456789,
+    SumRaffleEthWithdrawal: 98.7654321,
+    UnclaimedNFTs: 3,
+    NumRaffleEthWinnings: 64,
+    RaffleNFTsCount: 21,
+    RewardNFTsCount: 9,
+    StakingStatisticsRWalk: {
+      TotalNumStakeActions: 30,
+      TotalNumUnstakeActions: 12,
+      TotalTokensStaked: 18,
+      TotalTokensMinted: 5,
+    },
+  },
+  Gestures: [],
+};
+// lexicon-allow-end
+
+test.describe('participant profile layout stability', () => {
+  test('the profile keeps its layout while its reads arrive', async ({ page, isMobile }) => {
+    // Regression: at 1440x900 the loading profile was short enough to show the footer, and
+    // the sections pushed it a screen down when the profile arrived (CLS 0.49). The header
+    // holds its final height (figures, captions, the address row) and the loading body a
+    // screen's. Phones run at the project's own viewport.
+    if (!isMobile) await page.setViewportSize({ width: 1440, height: 900 });
+    await mockMobileAuditApi(page);
+    // Registered last, so it runs first: every read arrives late, the profile populated.
+    await page.route('**/api/cosmicgame/**', async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      if (new URL(route.request().url()).pathname.includes('/user/info/')) {
+        await route.fulfill({ json: POPULATED_PROFILE });
+        return;
+      }
+      await route.fallback();
+    });
+
+    await installClsObserver(page);
+    await page.goto(`/user/${MOBILE_AUDIT_SAMPLE_TEXT.longAddress}`, { waitUntil: 'load' });
+    // The profile has landed once its sections replace the loading skeleton.
+    await expect(page.getByTestId('statistics-loading-skeleton')).toHaveCount(0);
+    await page.waitForTimeout(1_500);
 
     const cls = await page.evaluate(() => window.__perfGuards?.cls ?? 0);
     expect(cls).toBeLessThan(0.1);

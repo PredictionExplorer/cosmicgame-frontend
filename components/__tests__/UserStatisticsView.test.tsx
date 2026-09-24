@@ -187,6 +187,33 @@ describe('UserStatisticsView', () => {
     ).not.toBeInTheDocument();
   });
 
+  it('never calls the page empty while a source it could not read might hold activity', () => {
+    // Regression: a failed read defaulted to [] and counted as empty, so an address whose
+    // NFTs (or anchors, outreach or attached assets) did not load read "No activity yet".
+    mockUseUserInfo.mockReturnValue({ ...defaultHookReturn, data: null });
+    mockUseClaimHistoryByUser.mockReturnValue({ ...defaultHookReturn, data: [] });
+    mockUseCSTTokensByUser.mockReturnValue({ data: undefined, isLoading: false, isError: true });
+    render(<UserStatisticsView address={ADDRESS} isOwnProfile={false} />);
+    expect(screen.queryByText('myPages.statistics.page.emptyTitle')).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'myPages.statistics.page.sections.artworks' }),
+    ).toBeInTheDocument();
+  });
+
+  it('holds the header at its loaded height while the reads arrive', () => {
+    // Regression (CLS 0.49 at 1440x900): the address row and the figure captions appeared
+    // only with the data, so everything under the header moved when it arrived.
+    mockUseUserInfo.mockReturnValue({ ...defaultHookReturn, isLoading: true });
+    mockUseClaimHistoryByUser.mockReturnValue({ ...defaultHookReturn, isLoading: true });
+    render(<UserStatisticsView address={ADDRESS} isOwnProfile={false} />);
+    expect(screen.getByText(ADDRESS)).toBeInTheDocument();
+    for (const id of ['gestures', 'spent', 'received', 'balance']) {
+      const figure = document.querySelector(`[data-figure="${id}"]`) as HTMLElement;
+      // The value and its caption line each hold a placeholder.
+      expect(figure.querySelectorAll('dd')).toHaveLength(2);
+    }
+  });
+
   it('waits for every source before calling the page empty', () => {
     mockUseUserInfo.mockReturnValue({ ...defaultHookReturn, data: null });
     mockUseClaimHistoryByUser.mockReturnValue({ ...defaultHookReturn, isLoading: true });
@@ -199,6 +226,8 @@ describe('UserStatisticsView', () => {
     const h1 = screen.getByRole('heading', { level: 1 });
     expect(h1).toHaveTextContent('myPages.statistics.page.participant');
     expect(h1).toHaveTextContent('0xA169…⁠63B6');
+    // The whole address reads under the figures, not only in the copy button's tooltip.
+    expect(screen.getByText(ADDRESS)).not.toBe(h1);
     expect(screen.getByText('myPages.statistics.page.userSubtitle')).toBeInTheDocument();
     expect(screen.queryByTestId('quick-actions')).not.toBeInTheDocument();
   });

@@ -111,25 +111,29 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
   const claimsQuery = useClaimHistoryByUser(address);
   const userInfoQuery = useUserInfo(address);
   const { data: balanceData, isLoading: loadingBalance } = useUserBalance(address);
-  const { data: cstAnchorActions = [], isLoading: loadingCSTActions } =
-    useCSTAnchorActionsByUser(address);
-  const { data: rwlkAnchorActions = [], isLoading: loadingRWLKActions } =
-    useRWLKAnchorActionsByUser(address);
-  const { data: marketingRewardsRaw = [], isLoading: loadingMarketing } =
-    useMarketingRewardsByUser(address);
-  const { data: cstListRaw = [], isLoading: loadingCST } = useCSTTokensByUser(address);
-  const { data: cstStakingRewardsRaw = [], isLoading: loadingStakingRewards } =
-    useAnchorDistributionsByUser(address);
+  const cstAnchorActionsQuery = useCSTAnchorActionsByUser(address);
+  const rwlkAnchorActionsQuery = useRWLKAnchorActionsByUser(address);
+  const marketingQuery = useMarketingRewardsByUser(address);
+  const cstTokensQuery = useCSTTokensByUser(address);
+  const anchorDistributionsQuery = useAnchorDistributionsByUser(address);
   const { data: collectedCstStakingRewardsRaw = [] } =
     useCSTAnchorDistributionsRetrievedByUser(address);
   const { data: cstStakingRewardsByDepositRaw = [] } =
     useCSTAnchorDistributionsByUserByDeposit(address);
   const { data: rwlkImprints = [] } = useRWLKAnchorImprintsByUser(address);
-  const { data: claimedNFTsRaw = [], isLoading: loadingClaimedNFTs } =
-    useClaimedDonatedNFTByUser(address);
-  const { data: unclaimedNFTsRaw = [], isLoading: loadingUnclaimedNFTs } =
-    useUnclaimedDonatedNFTByUser(address);
-  const { data: erc20Raw = [], isLoading: loadingERC20 } = useDonationsERC20ByUser(address);
+  const claimedNFTsQuery = useClaimedDonatedNFTByUser(address);
+  const unclaimedNFTsQuery = useUnclaimedDonatedNFTByUser(address);
+  const erc20Query = useDonationsERC20ByUser(address);
+
+  const { data: cstAnchorActions = [], isLoading: loadingCSTActions } = cstAnchorActionsQuery;
+  const { data: rwlkAnchorActions = [], isLoading: loadingRWLKActions } = rwlkAnchorActionsQuery;
+  const { data: marketingRewardsRaw = [], isLoading: loadingMarketing } = marketingQuery;
+  const { data: cstListRaw = [], isLoading: loadingCST } = cstTokensQuery;
+  const { data: cstStakingRewardsRaw = [], isLoading: loadingStakingRewards } =
+    anchorDistributionsQuery;
+  const { data: claimedNFTsRaw = [], isLoading: loadingClaimedNFTs } = claimedNFTsQuery;
+  const { data: unclaimedNFTsRaw = [], isLoading: loadingUnclaimedNFTs } = unclaimedNFTsQuery;
+  const { data: erc20Raw = [], isLoading: loadingERC20 } = erc20Query;
 
   const userInfoRaw = userInfoQuery.data;
   const gestureHistory = useMemo(() => userInfoRaw?.Gestures ?? [], [userInfoRaw]);
@@ -257,8 +261,21 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
     claimedDonatedNFTsList.length > 0 ||
     unclaimedDonatedNFTsList.length > 0 ||
     donatedERC20List.length > 0;
-  // A read that failed is not "nothing": only answered, empty sources make the page empty.
-  const allEmpty = !anyLoading && !hasActivity && !userInfoQuery.isError && !claimsQuery.isError;
+  // A read that failed is not "nothing": its `[]` default would read as empty, so the page
+  // is empty only once every source has answered, and answered with nothing.
+  const anyFailed = [
+    userInfoQuery,
+    claimsQuery,
+    cstTokensQuery,
+    cstAnchorActionsQuery,
+    rwlkAnchorActionsQuery,
+    anchorDistributionsQuery,
+    marketingQuery,
+    claimedNFTsQuery,
+    unclaimedNFTsQuery,
+    erc20Query,
+  ].some((query) => query.isError);
+  const allEmpty = !anyLoading && !hasActivity && !anyFailed;
 
   return (
     <PageShell variant="data" className={SHELL_CLASS}>
@@ -272,7 +289,9 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
       />
 
       {userInfoQuery.isLoading ? (
-        <div data-testid="statistics-loading-skeleton">
+        // A screen tall, as the sections that replace it are: the footer stays below the
+        // fold while they load, instead of showing and then being pushed away (CLS).
+        <div data-testid="statistics-loading-skeleton" className="min-h-svh">
           <SkeletonTable rows={6} columns={4} />
         </div>
       ) : allEmpty ? (
