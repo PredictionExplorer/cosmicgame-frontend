@@ -4,7 +4,7 @@ import { appSitemapRoutes } from '@/lib/seoRoutes';
 
 import { checkA11y, render, screen, within } from '@/test-utils';
 
-import SiteMapPage from '../SiteMapPage';
+import SiteMapPage, { SITE_MAP_COLUMNS } from '../SiteMapPage';
 
 const ARTICLES = [
   { slug: 'what-is-cosmic-signature', title: 'What Is Cosmic Signature?' },
@@ -33,6 +33,29 @@ describe('SiteMapPage', () => {
         ).toBeInTheDocument();
       }
     }
+  });
+
+  it('lays the sections out in one column per header menu, each section once', () => {
+    expect([...SITE_MAP_COLUMNS.flat()].sort()).toEqual([...SITE_SECTION_IDS].sort());
+    render(<SiteMapPage />);
+    // DOM order follows the columns, so the two-column flow below 1280px
+    // and the stacked phone list read in the same order.
+    const order = [...document.querySelectorAll('section[id]')].map((section) => section.id);
+    expect(order.slice(0, SITE_SECTION_IDS.length)).toEqual(SITE_MAP_COLUMNS.flat());
+    for (const column of SITE_MAP_COLUMNS) {
+      const wrapper = document.getElementById(column[0]!)!.parentElement!;
+      expect(wrapper).toHaveClass('contents', 'xl:block');
+      expect([...wrapper.children].map((child) => child.id)).toEqual(column);
+    }
+  });
+
+  it('starts each column on one rule: the header drops its own from 640px', () => {
+    render(<SiteMapPage />);
+    expect(screen.getByRole('banner')).toHaveClass('sm:border-b-0');
+    const lead = document.getElementById(SITE_MAP_COLUMNS[0]![0]!)!;
+    // On phones the first section sits under the header's rule instead.
+    expect(lead).toHaveClass('max-sm:border-t-0', 'sm:border-rule');
+    expect(document.getElementById('records')).not.toHaveClass('max-sm:border-t-0');
   });
 
   it('always lists the account pages', () => {

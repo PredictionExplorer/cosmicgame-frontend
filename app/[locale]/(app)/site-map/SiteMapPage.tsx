@@ -4,7 +4,6 @@ import { useLocale, useTranslations } from 'next-intl';
 
 import {
   SITE_ORIGINS,
-  SITE_SECTION_IDS,
   getSiteRoute,
   outboundLinks,
   resolveRouteHref,
@@ -12,6 +11,7 @@ import {
   siteHostLabel,
   type OutboundGroupId,
   type SiteRoute,
+  type SiteSectionId,
 } from '@/config/siteNav';
 import {
   OUTBOUND_GROUP_ICONS,
@@ -46,24 +46,50 @@ const ROW_DESCRIPTION_CLASS = 'max-sm:hidden';
 /** A section's rows: one column from 640px, two on phones. */
 const ROWS_CLASS = 'mt-2 grid grid-cols-2 gap-x-2 sm:mt-4 sm:flex sm:flex-col sm:gap-0.5';
 
+/** Ecosystem and Community sit side by side from 768px: their rows pair up from 1280px. */
+const OUTBOUND_ROWS_CLASS =
+  'mt-2 grid grid-cols-2 gap-x-2 sm:mt-4 sm:flex sm:flex-col sm:gap-0.5 xl:grid xl:gap-x-6';
+
+/**
+ * The map's columns from 1280px, one per header menu (config/siteNav
+ * APP_HEADER_NAV): the Observatory and the Gallery with the account pages
+ * of the wallet menu, the Explore panel, the Learn panel. Each column runs
+ * about as long as the others. Below 1280px the same sections, in the same
+ * order, flow through two balanced columns, and phones stack them.
+ */
+export const SITE_MAP_COLUMNS: readonly (readonly SiteSectionId[])[] = [
+  ['participate', 'collection', 'account'],
+  ['explore', 'records'],
+  ['learn', 'trust'],
+];
+
 /**
  * One section of the map: its heading, its one-line description and every
  * row, open at every width and without script (the site map is the
  * server-rendered crawl path for the header's client-only menus). Its `id`
  * is the section's anchor (`/site-map#records`), where page headers lead the
  * Records eyebrow.
+ *
+ * From 640px every section opens with a rule, so each column starts on one
+ * (the page header drops its own there). On phones the sections are divided
+ * by faint rules, and the first one sits under the header's rule.
  */
 function SiteMapSection({
   id,
   title,
   description,
   icon: Icon,
+  lead = false,
+  rowsClassName = ROWS_CLASS,
   children,
 }: {
   id: string;
   title: string;
   description: string;
   icon: LucideIcon;
+  /** The first section of the page, directly under the header on phones. */
+  lead?: boolean;
+  rowsClassName?: string;
   children: ReactNode;
 }) {
   const headingId = `sitemap-${id}-heading`;
@@ -71,14 +97,17 @@ function SiteMapSection({
     <section
       id={id}
       aria-labelledby={headingId}
-      className="scroll-mt-[calc(var(--header-height)+1.5rem)] break-inside-avoid border-t border-rule-faint py-5 first:border-t-0 first:pt-0 sm:mb-10 sm:border-rule sm:py-0 sm:pt-6 sm:first:border-t sm:first:pt-6"
+      className={cn(
+        'scroll-mt-[calc(var(--header-height)+1.5rem)] break-inside-avoid border-t border-rule-faint py-5 sm:mb-10 sm:border-rule sm:py-0 sm:pt-6',
+        lead && 'max-sm:border-t-0 max-sm:pt-0',
+      )}
     >
       <h2 id={headingId} className="type-heading-3 flex items-center gap-2.5 text-foreground">
         <Icon aria-hidden className="size-5 shrink-0 text-primary" />
         {title}
       </h2>
       <p className="type-body-sm mt-1.5 text-muted-foreground">{description}</p>
-      <ul className={ROWS_CLASS}>{children}</ul>
+      <ul className={rowsClassName}>{children}</ul>
     </section>
   );
 }
@@ -123,6 +152,7 @@ function OutboundSection({ group }: { group: OutboundGroupId }) {
       title={copy.sectionTitle(group)}
       description={t(`sections.${group}`)}
       icon={OUTBOUND_GROUP_ICONS[group]}
+      rowsClassName={OUTBOUND_ROWS_CLASS}
     >
       {outboundLinks(group).map((link) => (
         <li key={link.id} className="min-w-0">
@@ -198,40 +228,56 @@ interface SiteMapPageProps {
 const SiteMapPage = ({ articles = [] }: SiteMapPageProps) => {
   const t = useTranslations('siteMap');
   const copy = useSiteNavCopy();
+  const leadSection = SITE_MAP_COLUMNS[0]?.[0];
 
   return (
     <PageShell variant="data" backdrop="signature">
+      {/* From 640px each column opens on its own section rule; a header
+          rule 40px above it would draw two hairlines. */}
       <PageHeader
         title={t('page.title')}
         subtitle={t('page.subtitle')}
         section="trust"
-        className="mb-6 sm:mb-10"
+        className="mb-6 sm:mb-10 sm:border-b-0 sm:pb-0"
       />
 
-      <div className="gap-x-12 md:columns-2 xl:columns-3">
-        {SITE_SECTION_IDS.map((section) => (
-          <SiteMapSection
-            key={section}
-            id={section}
-            title={copy.sectionTitle(section)}
-            description={t(`sections.${section}`)}
-            icon={SITE_SECTION_ICONS[section]}
-          >
-            {routesInSection(section).map((route, index, routes) => (
-              <Fragment key={route.id}>
-                {route.host !== (routes[index - 1]?.host ?? 'app') ? (
-                  <li className="col-span-2">
-                    <HostDivider
-                      label={siteHostLabel(route.host)}
-                      className="px-2 pb-1 pt-3 sm:px-3"
-                    />
-                  </li>
-                ) : null}
-                <RouteRow route={route} />
-              </Fragment>
+      {/* Columns are wrappers from 1280px and dissolve below it, where the
+          sections balance themselves across two columns. */}
+      {/* Multi-column layout drops the last section's margin at a column's
+          foot, so the flow keeps the gap itself. */}
+      <div className="gap-x-12 md:columns-2 md:pb-10 xl:grid xl:grid-cols-3 xl:pb-0">
+        {SITE_MAP_COLUMNS.map((column) => (
+          <div key={column.join('-')} className="contents xl:block xl:min-w-0">
+            {column.map((section) => (
+              <SiteMapSection
+                key={section}
+                id={section}
+                title={copy.sectionTitle(section)}
+                description={t(`sections.${section}`)}
+                icon={SITE_SECTION_ICONS[section]}
+                lead={section === leadSection}
+              >
+                {routesInSection(section).map((route, index, routes) => (
+                  <Fragment key={route.id}>
+                    {route.host !== (routes[index - 1]?.host ?? 'app') ? (
+                      <li className="col-span-2">
+                        <HostDivider
+                          label={siteHostLabel(route.host)}
+                          className="px-2 pb-1 pt-3 sm:px-3"
+                        />
+                      </li>
+                    ) : null}
+                    <RouteRow route={route} />
+                  </Fragment>
+                ))}
+              </SiteMapSection>
             ))}
-          </SiteMapSection>
+          </div>
         ))}
+      </div>
+
+      {/* The destinations outside the app, as one row under the columns. */}
+      <div className="gap-x-12 md:grid md:grid-cols-2">
         <OutboundSection group="ecosystem" />
         <OutboundSection group="community" />
       </div>
