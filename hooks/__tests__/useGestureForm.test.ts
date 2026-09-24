@@ -371,6 +371,8 @@ describe('useGestureForm', () => {
     expect(result.current.ethGestureInfo).toEqual({
       AuctionDuration: 3600,
       ETHPrice: 0.01,
+      // The exact wei the funding check compares against the wallet balance.
+      ETHPriceWei: BigInt('10000000000000000'),
       SecondsElapsed: 1800,
     });
   });
@@ -392,6 +394,8 @@ describe('useGestureForm', () => {
     expect(result.current.ethGestureInfo).toEqual({
       AuctionDuration: 3600,
       ETHPrice: 0.01,
+      // The exact wei the funding check compares against the wallet balance.
+      ETHPriceWei: BigInt('10000000000000000'),
       SecondsElapsed: 1800,
     });
   });

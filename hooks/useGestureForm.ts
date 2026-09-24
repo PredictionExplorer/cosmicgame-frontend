@@ -48,6 +48,11 @@ type PreparedAttachment =
 export interface EthGestureInfo {
   AuctionDuration: number;
   ETHPrice: number;
+  /**
+   * The same price in wei, exact, for amounts that must match the wallet
+   * (the funding check before submit). Absent on hand-built quotes.
+   */
+  ETHPriceWei?: bigint;
   SecondsElapsed: number;
 }
 
@@ -120,9 +125,11 @@ export function useGestureForm() {
 
   const ethGestureInfo = useMemo<EthGestureInfo | null>(() => {
     if (!bidEthPriceData) return null;
+    const priceWei = BigInt(bidEthPriceData.ETHPrice);
     return {
       AuctionDuration: parseInt(bidEthPriceData.AuctionDuration),
-      ETHPrice: parseFloat(formatEther(BigInt(bidEthPriceData.ETHPrice))),
+      ETHPrice: parseFloat(formatEther(priceWei)),
+      ETHPriceWei: priceWei,
       SecondsElapsed: parseInt(bidEthPriceData.SecondsElapsed),
     };
   }, [bidEthPriceData]);
