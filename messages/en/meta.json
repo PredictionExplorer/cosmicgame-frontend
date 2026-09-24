@@ -46,7 +46,7 @@
     "description": "Gesture frequency over time, activity spikes, participant active periods, gesture-type mix, cycle timelines, and cycle activations."
   },
   "statisticsPerformance": {
-    "title": "Participant outcomes",
+    "title": "Participant Outcomes",
     "description": "What each participant spent on gestures and received in allocations, and how every cycle’s retrievable assets were retrieved."
   },
   "faq": {
