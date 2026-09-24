@@ -148,7 +148,8 @@ const AttachedNFT = ({ nft, showRecord = false, className }: AttachedNFTProps) =
             ]}
           />
           {nft.DonorAddr ? (
-            <p className="flex min-w-0 items-center gap-1.5 type-caption text-subtle">
+            // The address never breaks: in a narrow column it takes its own line.
+            <p className="flex min-w-0 flex-wrap items-center gap-x-1.5 type-caption text-subtle">
               <span className="shrink-0">{t('attachedNfts.card.attachedBy')}</span>
               <AddressChip
                 address={nft.DonorAddr}

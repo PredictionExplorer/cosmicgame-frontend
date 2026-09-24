@@ -165,8 +165,9 @@ describe('AttachedNFTAllocationShowcase', () => {
       screen.getByText('currentCycle.showcase.description.nftOnly(nftCount=1,cycle=42)'),
     ).toBeInTheDocument();
     expect(screen.getByText('currentCycle.showcase.badge')).toBeInTheDocument();
-    expect(screen.getByText('currentCycle.showcase.bonusReceipt.label')).toBeInTheDocument();
-    expect(screen.getByText('currentCycle.showcase.summary.previewAll')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.showcase.summary.assetsIncluded')).toBeInTheDocument();
+    // What the preview leaves out is counted under the assets, not in the facts.
+    expect(screen.queryByText(/summary\.preview/)).not.toBeInTheDocument();
     expectSingleRecipientRuleSummary();
   });
 
@@ -441,8 +442,11 @@ describe('AttachedNFTAllocationShowcase', () => {
     expect(
       screen.getByText('currentCycle.showcase.remainder.nftOnly(nftCount=2)'),
     ).toBeInTheDocument();
+    // The facts count every attached asset; the remainder line says what is not shown.
     expect(
-      screen.getByText('currentCycle.showcase.summary.previewCount(visible=4,total=6)'),
+      screen.getByText(
+        /currentCycle\.showcase\.bonusReceipt\.(nftOnly|erc20Only)\((nft|erc20)Count=6\)/,
+      ),
     ).toBeInTheDocument();
     expectSingleRecipientRuleSummary();
   });
@@ -460,8 +464,11 @@ describe('AttachedNFTAllocationShowcase', () => {
     expect(
       screen.getByText('currentCycle.showcase.remainder.erc20Only(erc20Count=2)'),
     ).toBeInTheDocument();
+    // The facts count every attached asset; the remainder line says what is not shown.
     expect(
-      screen.getByText('currentCycle.showcase.summary.previewCount(visible=4,total=6)'),
+      screen.getByText(
+        /currentCycle\.showcase\.bonusReceipt\.(nftOnly|erc20Only)\((nft|erc20)Count=6\)/,
+      ),
     ).toBeInTheDocument();
     expectSingleRecipientRuleSummary();
   });

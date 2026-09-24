@@ -103,12 +103,11 @@
     "heading": "このサイクルに添付されたアセット",
     "cycleFallback": "現在",
     "description": {
-      "nftOnly": "シグネチャー配分とともに移るコミュニティ添付アセットの簡潔な受領証です。サイクル{cycle}が確定すると、最後の一筆の参加者が{nftCount, plural, other {添付された{nftCount}点のNFTすべて}}を受け取ります。",
-      "erc20Only": "シグネチャー配分とともに移るコミュニティ添付アセットの簡潔な受領証です。サイクル{cycle}が確定すると、最後の一筆の参加者が{erc20Count, plural, other {添付された{erc20Count}件のERC-20トークン添付分すべて}}を受け取ります。",
-      "mixed": "シグネチャー配分とともに移るコミュニティ添付アセットの簡潔な受領証です。サイクル{cycle}が確定すると、最後の一筆の参加者が{nftCount, plural, other {添付された{nftCount}点のNFT}}と{erc20Count, plural, other {添付された{erc20Count}件のERC-20トークン添付分}}のすべてを受け取ります。"
+      "nftOnly": "コミュニティが添付したアセットは、シグネチャー配分とともに移ります。サイクル{cycle}が確定すると、最後の一筆の参加者が{nftCount, plural, other {添付された{nftCount}点のNFTすべて}}を受け取ります。",
+      "erc20Only": "コミュニティが添付したアセットは、シグネチャー配分とともに移ります。サイクル{cycle}が確定すると、最後の一筆の参加者が{erc20Count, plural, other {添付された{erc20Count}件のERC-20トークン添付分すべて}}を受け取ります。",
+      "mixed": "コミュニティが添付したアセットは、シグネチャー配分とともに移ります。サイクル{cycle}が確定すると、最後の一筆の参加者が{nftCount, plural, other {添付された{nftCount}点のNFT}}と{erc20Count, plural, other {添付された{erc20Count}件のERC-20トークン添付分}}のすべてを受け取ります。"
     },
     "bonusReceipt": {
-      "label": "追加アセットの内訳",
       "nftOnly": "{nftCount, plural, other {ERC-721トークン{nftCount}点}}",
       "erc20Only": "{erc20Count, plural, other {ERC-20添付分{erc20Count}件}}",
       "mixed": "{nftCount, plural, other {ERC-721トークン{nftCount}点}} + {erc20Count, plural, other {ERC-20添付分{erc20Count}件}}"
@@ -117,9 +116,6 @@
       "assetsIncluded": "含まれるアセット",
       "cycle": "サイクル",
       "cycleValue": "#{cycle}",
-      "preview": "プレビュー",
-      "previewAll": "すべて表示中",
-      "previewCount": "{total}件中{visible}件",
       "recipientRule": "受領者のルール",
       "recipientRuleValue": "最後の一筆"
     },

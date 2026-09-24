@@ -15,7 +15,7 @@ import NFTImage from '@/components/nft/NFTImage';
 import { AddressChip } from '@/components/ui/address-chip';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
-import { InfoTooltip } from '@/components/ui/info-tooltip';
+import { ExplainedTerm } from '@/components/ui/explain-popover';
 import { Surface } from '@/components/ui/surface';
 
 import {
@@ -74,7 +74,6 @@ export function AttachedNFTAllocationShowcase({
   const previewNfts = nfts.slice(0, MAX_NFT_PREVIEW);
   const previewErc20Tokens = erc20Tokens.slice(0, MAX_ERC20_PREVIEW);
   const totalPreviewCount = previewNfts.length + previewErc20Tokens.length;
-  const totalAssetCount = nfts.length + erc20Tokens.length;
   const allocationSummary =
     nfts.length > 0 && erc20Tokens.length > 0
       ? t('showcase.bonusReceipt.mixed', { nftCount: nfts.length, erc20Count: erc20Tokens.length })
@@ -94,10 +93,6 @@ export function AttachedNFTAllocationShowcase({
             erc20Count: erc20Tokens.length,
             cycle: cycleLabel,
           });
-  const previewCopy =
-    totalPreviewCount >= totalAssetCount
-      ? t('showcase.summary.previewAll')
-      : t('showcase.summary.previewCount', { visible: totalPreviewCount, total: totalAssetCount });
   const hiddenNftCount = nfts.length - previewNfts.length;
   const hiddenErc20Count = erc20Tokens.length - previewErc20Tokens.length;
   const remainderCopy =
@@ -157,18 +152,23 @@ export function AttachedNFTAllocationShowcase({
           </p>
         </header>
 
+        {/* What travels, in which cycle, to whom. (What is not shown here is
+            counted under the assets.) */}
         <dl
           className={cn(
             'mt-6 grid grid-cols-2 gap-x-6 gap-y-4 border-y border-rule-faint py-4',
-            !rail && 'lg:grid-cols-4',
+            !rail && 'sm:grid-cols-3',
           )}
         >
-          <SummaryFact label={t('showcase.bonusReceipt.label')} value={allocationSummary} />
+          <SummaryFact
+            label={t('showcase.summary.assetsIncluded')}
+            value={allocationSummary}
+            className={cn('col-span-2', !rail && 'sm:col-span-1')}
+          />
           <SummaryFact
             label={t('showcase.summary.cycle')}
             value={t('showcase.summary.cycleValue', { cycle: cycleLabel })}
           />
-          <SummaryFact label={t('showcase.summary.preview')} value={previewCopy} />
           <SummaryFact
             label={t('showcase.summary.recipientRule')}
             value={t('showcase.summary.recipientRuleValue')}
@@ -245,9 +245,17 @@ function getAttachedErc20Amount(
   return null;
 }
 
-function SummaryFact({ label, value }: { label: string; value: string }) {
+function SummaryFact({
+  label,
+  value,
+  className,
+}: {
+  label: string;
+  value: string;
+  className?: string;
+}) {
   return (
-    <div className="min-w-0">
+    <div className={cn('min-w-0', className)}>
       <dt className="type-caption text-subtle">{label}</dt>
       <dd className="mt-1 type-body-sm font-medium text-foreground [overflow-wrap:anywhere]">
         {value}
@@ -411,11 +419,13 @@ function AttachedNFTAllocationCard({
           </Badge>
           {estimate ? (
             <Badge tone="neutral" size="sm">
-              {t('showcase.nftCard.floorEstimate', {
-                price: formatNumber(estimate.floorPriceEth, locale, { maximumFractionDigits: 3 }),
-                currency: estimate.currency,
-              })}
-              <InfoTooltip content={t('showcase.nftCard.floorTooltip')} />
+              {/* The estimate explains itself: its source and what it leaves out. */}
+              <ExplainedTerm definition={t('showcase.nftCard.floorTooltip')}>
+                {t('showcase.nftCard.floorEstimate', {
+                  price: formatNumber(estimate.floorPriceEth, locale, { maximumFractionDigits: 3 }),
+                  currency: estimate.currency,
+                })}
+              </ExplainedTerm>
             </Badge>
           ) : null}
         </div>
@@ -501,14 +511,15 @@ function AttachedERC20AllocationCard({
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
           <Badge tone="neutral" size="sm">
-            {t('showcase.erc20Card.badge')}
-            <InfoTooltip
-              content={
+            <ExplainedTerm
+              definition={
                 metadata?.logoURI
                   ? t('showcase.erc20Card.badgeTooltipLogo', { source: logoSource })
                   : t('showcase.erc20Card.badgeTooltipDefault')
               }
-            />
+            >
+              {t('showcase.erc20Card.badge')}
+            </ExplainedTerm>
           </Badge>
         </div>
 

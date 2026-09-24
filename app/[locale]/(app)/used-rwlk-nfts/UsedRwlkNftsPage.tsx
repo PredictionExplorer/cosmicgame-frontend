@@ -206,7 +206,8 @@ function UsedRandomWalkCard({
           </>
         )}
       </p>
-      <p className="mt-1 flex min-w-0 items-center gap-1.5 type-caption text-subtle">
+      {/* The address never breaks: in a narrow column it takes its own line. */}
+      <p className="mt-1 flex min-w-0 flex-wrap items-center gap-x-1.5 type-caption text-subtle">
         <span className="shrink-0">{t('usedRwlkNfts.card.usedBy')}</span>
         <AddressChip
           address={record.BidderAddr}
