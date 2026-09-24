@@ -1,7 +1,7 @@
 import type { DashboardInfo } from '@/services/api';
 import type { CyclePhase } from '@/lib/cycleState';
 
-import { checkA11y, render, screen } from '@/test-utils';
+import { checkA11y, render, screen, waitFor } from '@/test-utils';
 
 import { CyclePhaseGuide, phaseToTimelineId } from '../CyclePhaseGuide';
 
@@ -85,6 +85,35 @@ describe('CyclePhaseGuide', () => {
     const current = screen.getByTestId('cycle-phase-guide-current');
     expect(current).toHaveTextContent('home.phaseGuide.steps.open.detail');
     expect(current).toHaveClass('xl:hidden');
+  });
+
+  it('lets the keyboard scroll the rail while it overflows', async () => {
+    // The cells hold no links, so the scrolling rail itself takes a tab stop.
+    const scroll = jest.spyOn(HTMLElement.prototype, 'scrollWidth', 'get').mockReturnValue(900);
+    const client = jest.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(358);
+    try {
+      render(
+        <CyclePhaseGuide
+          data={data}
+          loading={false}
+          allocationTime={NOW + 13 * 3600_000}
+          activationTime={0}
+          now={NOW}
+          finalizationConfirmed
+        />,
+      );
+
+      const rail = await waitFor(() =>
+        screen.getByRole('group', { name: 'home.phaseGuide.timelineAria' }),
+      );
+      expect(rail).toHaveAttribute('tabindex', '0');
+      expect(rail).toContainElement(
+        screen.getByRole('list', { name: 'home.phaseGuide.timelineAria' }),
+      );
+    } finally {
+      scroll.mockRestore();
+      client.mockRestore();
+    }
   });
 
   it('has no accessibility violations', async () => {

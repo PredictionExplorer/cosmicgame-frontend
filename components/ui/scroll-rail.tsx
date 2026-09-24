@@ -15,6 +15,14 @@ export interface ScrollRailProps extends React.HTMLAttributes<HTMLDivElement> {
   activeSelector?: string;
   /** Classes for the scrolling track (gap, padding); `className` styles the outer frame. */
   trackClassName?: string;
+  /**
+   * For a rail whose items hold nothing focusable (a stepper, a row of
+   * figures): while the row really overflows, the track takes a tab stop and
+   * this name as a `group`, so the arrow keys can scroll it (axe
+   * `scrollable-region-focusable`, WCAG 2.1.1). A row that fits gives both
+   * back, so it is never an empty stop. Rails of links or tabs need none.
+   */
+  keyboardScrollableLabel?: string;
 }
 
 /**
@@ -30,10 +38,20 @@ export interface ScrollRailProps extends React.HTMLAttributes<HTMLDivElement> {
  * shift-wheel and by moving focus through it.
  */
 export const ScrollRail = React.forwardRef<HTMLDivElement, ScrollRailProps>(
-  ({ activeSelector = ACTIVE_SELECTOR, className, trackClassName, children, ...props }, ref) => {
+  (
+    {
+      activeSelector = ACTIVE_SELECTOR,
+      className,
+      trackClassName,
+      keyboardScrollableLabel,
+      children,
+      ...props
+    },
+    ref,
+  ) => {
     const trackRef = React.useRef<HTMLDivElement | null>(null);
     React.useImperativeHandle(ref, () => trackRef.current as HTMLDivElement, []);
-    const [edges, setEdges] = React.useState({ start: false, end: false });
+    const [edges, setEdges] = React.useState({ start: false, end: false, overflows: false });
 
     const measure = React.useCallback(() => {
       const track = trackRef.current;
@@ -41,8 +59,12 @@ export const ScrollRail = React.forwardRef<HTMLDivElement, ScrollRailProps>(
       const max = track.scrollWidth - track.clientWidth;
       // Logical start: scrollLeft is negative in right-to-left layouts.
       const offset = Math.abs(track.scrollLeft);
-      const next = { start: offset > 1, end: max - offset > 1 };
-      setEdges((prev) => (prev.start === next.start && prev.end === next.end ? prev : next));
+      const next = { start: offset > 1, end: max - offset > 1, overflows: max > 1 };
+      setEdges((prev) =>
+        prev.start === next.start && prev.end === next.end && prev.overflows === next.overflows
+          ? prev
+          : next,
+      );
     }, []);
 
     const revealActive = React.useCallback(
@@ -77,6 +99,9 @@ export const ScrollRail = React.forwardRef<HTMLDivElement, ScrollRailProps>(
       track.addEventListener('scroll', onScroll, { passive: true });
       const resize = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure);
       resize?.observe(track);
+      // The content can outgrow a track that keeps its size (a web font
+      // arriving, a label changing), which moves the overflow too.
+      for (const child of Array.from(track.children)) resize?.observe(child);
 
       // Follow the current item when it changes (a tab selected, a route
       // pushed): Radix and the router only flip attributes.
@@ -100,6 +125,7 @@ export const ScrollRail = React.forwardRef<HTMLDivElement, ScrollRailProps>(
     }, [measure, revealActive]);
 
     const mask = `linear-gradient(to right, transparent 0, #000 ${edges.start ? FADE : '0px'}, #000 calc(100% - ${edges.end ? FADE : '0px'}), transparent 100%)`;
+    const keyboardScrollable = Boolean(keyboardScrollableLabel) && edges.overflows;
 
     return (
       <div className={cn('relative min-w-0', className)} {...props}>
@@ -107,6 +133,9 @@ export const ScrollRail = React.forwardRef<HTMLDivElement, ScrollRailProps>(
           ref={trackRef}
           data-overflow-start={edges.start || undefined}
           data-overflow-end={edges.end || undefined}
+          tabIndex={keyboardScrollable ? 0 : undefined}
+          role={keyboardScrollable ? 'group' : undefined}
+          aria-label={keyboardScrollable ? keyboardScrollableLabel : undefined}
           className={cn(
             'flex min-w-0 overflow-x-auto overscroll-x-contain scroll-smooth scrollbar-none motion-reduce:scroll-auto',
             // The track clips anything outside it, so focus rings draw inside

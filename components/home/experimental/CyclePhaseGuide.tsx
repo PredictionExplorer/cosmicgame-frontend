@@ -1,6 +1,5 @@
 'use client';
 
-import { useRef } from 'react';
 import { ArrowRight, Check } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -11,8 +10,6 @@ import { SectionHeader } from '@/components/ui/section-header';
 import { getCycleState, type CyclePhase } from '@/lib/cycleState';
 import { cn } from '@/lib/utils';
 import type { DashboardInfo } from '@/services/api';
-
-import { useKeyboardScrollable } from './useKeyboardScrollable';
 
 interface CyclePhaseGuideProps {
   data: DashboardInfo | null;
@@ -86,10 +83,6 @@ export function CyclePhaseGuide({
   const activeStepId = phaseToTimelineId(phase);
   const activeIndex = TIMELINE_STEPS.findIndex((step) => step.id === activeStepId);
   const active = TIMELINE_STEPS[activeIndex] ?? TIMELINE_STEPS[0];
-  // The rail's cells hold no links, so while it scrolls the rail itself
-  // takes the keyboard.
-  const railRef = useRef<HTMLDivElement>(null);
-  useKeyboardScrollable(railRef, t('phaseGuide.timelineAria'));
   const stateLabel: Record<StepState, string> = {
     passed: t('phaseGuide.stepState.passed'),
     now: t('phaseGuide.stepState.now'),
@@ -120,9 +113,11 @@ export function CyclePhaseGuide({
         }
       />
 
+      {/* The rail's cells hold no links, so while it scrolls the rail itself
+          takes the keyboard. */}
       <ScrollRail
-        ref={railRef}
         activeSelector='[aria-current="step"]'
+        keyboardScrollableLabel={t('phaseGuide.timelineAria')}
         trackClassName="focus-ring-inset rounded-surface max-xl:snap-x max-xl:snap-mandatory"
       >
         <ol
