@@ -20,7 +20,6 @@ const UTIL_FILES = [
   'metadata.ts',
   'seo.ts',
   'urls.ts',
-  'wallet.ts',
 ] as const;
 
 type FileEntry = {
@@ -91,7 +90,6 @@ const EXPECTED_COUNTS: Record<string, number> = {
   'metadata.ts': 1,
   'seo.ts': 7,
   'urls.ts': 12,
-  'wallet.ts': 2,
 };
 
 describe('Utils JSDoc coverage', () => {
@@ -115,9 +113,9 @@ describe('Utils JSDoc coverage', () => {
   });
 
   describe('no function is missing from the inventory', () => {
-    it('total exported functions/constants across all util files is 85', () => {
+    it('total exported functions/constants across all util files is 83', () => {
       const total = files.reduce((sum, f) => sum + f.exports.length, 0);
-      expect(total).toBe(85);
+      expect(total).toBe(83);
     });
   });
 

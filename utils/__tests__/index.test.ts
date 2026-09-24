@@ -6,7 +6,6 @@ import {
   formatSeconds,
   formatEthValue,
   formatCSTValue,
-  isWalletAddress,
   getExplorerUrl,
   getAssetsUrl,
   getRWLKImageUrl,
@@ -133,28 +132,6 @@ describe('formatCSTValue', () => {
 
   it('formats zero', () => {
     expect(formatCSTValue(0, 'en')).toBe('0\u00a0CST');
-  });
-});
-
-describe('isWalletAddress', () => {
-  it('returns wallet name for known addresses', () => {
-    const result = isWalletAddress('0x0000000000000000000000000000000000000000');
-    expect(typeof result).toBe('string');
-  });
-
-  it('returns empty string for unknown addresses', () => {
-    const result = isWalletAddress('0x1111111111111111111111111111111111111111');
-    expect(result).toBe('');
-  });
-
-  it('returns empty string for a random non-wallet address', () => {
-    const result = isWalletAddress('0xabcdef1234567890abcdef1234567890abcdef12');
-    expect(result).toBe('');
-  });
-
-  it('returns empty string for address 0x1234567890abcdef1234567890abcdef12345678', () => {
-    const result = isWalletAddress('0x1234567890abcdef1234567890abcdef12345678');
-    expect(result).toBe('');
   });
 });
 
