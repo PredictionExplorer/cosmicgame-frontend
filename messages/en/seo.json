@@ -17,11 +17,11 @@
         },
         "cards": {
           "finalizedCycles": {
-            "label": "Finalized Cycles",
+            "label": "Finalized cycles",
             "tooltip": "The number of Performance Cycles with finalized allocation data."
           },
           "recipients": {
-            "label": "Signature Allocation Recipients",
+            "label": "Signature Allocation recipients",
             "tooltip": "Distinct wallets that received the Signature Allocation by making the Final Gesture."
           },
           "totalEth": {
@@ -29,7 +29,7 @@
             "tooltip": "The sum of Signature Allocation ETH across finalized cycles, based on cycle records."
           },
           "totalGestures": {
-            "label": "Total Gestures",
+            "label": "Total gestures",
             "tooltip": "The cumulative number of gestures made across all finalized cycles."
           }
         }
