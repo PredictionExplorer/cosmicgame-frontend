@@ -22,7 +22,7 @@
     "description": "查看 Cosmic Signature 所有已收官演绎周期的获配记录、周期统计与 ETH 发放情况。"
   },
   "anchoring": {
-    "title": "锚定",
+    "title": "锚定派发",
     "description": "将 Cosmic Signature NFT 锚定至协议，即可在每个周期获得 ETH 锚定派发。查看全局锚定统计，以及该机制在 Arbitrum 上的运作原理。"
   },
   "myAllocations": {

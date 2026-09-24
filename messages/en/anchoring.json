@@ -209,7 +209,7 @@
       "columns": {
         "depositDatetime": "Deposit Datetime",
         "depositId": "Deposit ID",
-        "cycle": "Round",
+        "cycle": "Cycle",
         "depositAmountEth": "Deposit Amount (ETH)",
         "retrievedAmountEth": "Collected Amount (ETH)"
       }

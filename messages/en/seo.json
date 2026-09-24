@@ -27,7 +27,7 @@
           },
           "totalEth": {
             "label": "Total Signature Allocation ETH",
-            "tooltip": "The sum of Signature Allocation ETH across finalized cycles, based on round records."
+            "tooltip": "The sum of Signature Allocation ETH across finalized cycles, based on cycle records."
           }
         }
       },
