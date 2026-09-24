@@ -96,6 +96,16 @@ describe('CST supply series', () => {
     expect(points[1]).toMatchObject({ imprinted: 10, burned: 2, net: 8, gestures: 4 });
   });
 
+  it('places a day without a timestamp by its date', () => {
+    const [point] = supplyByDate([
+      { ...byDate[0]!, Date: '20260101', TimeStamp: undefined as unknown as number },
+    ]);
+    expect(point?.ts).toBe(Date.UTC(2026, 0, 1) / 1000);
+    expect(
+      supplyByDate([{ ...byDate[0]!, Date: 'n/a', TimeStamp: undefined as unknown as number }]),
+    ).toEqual([]);
+  });
+
   it('numbers gestures from the first and reads the nested transaction', () => {
     const points = supplyByGesture([
       {

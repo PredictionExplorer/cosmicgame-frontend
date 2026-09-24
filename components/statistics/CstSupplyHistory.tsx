@@ -62,11 +62,17 @@ export interface SupplyPoint {
   txHash?: string;
 }
 
-/** The daily series, oldest first. */
+/** UTC midnight of a `YYYYMMDD` day, in Unix seconds; NaN when it is not one. */
+function dayStart(date: string | undefined): number {
+  const match = /^(\d{4})(\d{2})(\d{2})$/.exec(date ?? '');
+  return match ? Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])) / 1000 : NaN;
+}
+
+/** The daily series, oldest first. A day without a timestamp is placed by its `Date`. */
 export function supplyByDate(records: readonly SupplyByDateRecord[]): SupplyPoint[] {
   return records
     .map((r) => ({
-      ts: r.TimeStamp,
+      ts: Number.isFinite(r.TimeStamp) ? r.TimeStamp : dayStart(r.Date),
       supply: r.TotalSupplyEth ?? 0,
       imprinted: r.MintAmountEth ?? 0,
       burned: r.BurnAmountEth ?? 0,
@@ -289,7 +295,8 @@ export const CstSupplyHistory: FC<{ label: string }> = ({ label }) => {
     first && last
       ? t('charts.supply.summary', {
           supply: cst(last.supply),
-          date: formatUnixTsLabel(last.ts, false, locale),
+          // The same calendar style as the range beside it.
+          date: formatDateRange(last.ts, last.ts, locale),
           range: formatDateRange(first.ts, last.ts, locale),
           imprinted: cst(points.reduce((sum, p) => sum + p.imprinted, 0)),
           burned: cst(points.reduce((sum, p) => sum + p.burned, 0)),

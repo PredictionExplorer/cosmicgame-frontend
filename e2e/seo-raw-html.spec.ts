@@ -95,7 +95,7 @@ const publicPages: PublicPage[] = [
   {
     path: '/statistics',
     host: APP_HOST,
-    h1: 'Cosmic Signature Protocol Statistics',
+    h1: 'Protocol statistics',
     jsonLd: ['WebPage', 'Dataset'],
   },
   {
@@ -135,7 +135,7 @@ const publicPages: PublicPage[] = [
   {
     path: '/zh/statistics',
     host: APP_HOST,
-    h1: 'Cosmic Signature 协议统计',
+    h1: '协议统计',
     jsonLd: ['Organization', 'WebSite', 'WebApplication', 'WebPage', 'Dataset'],
   },
   {
@@ -160,7 +160,7 @@ const publicPages: PublicPage[] = [
   {
     path: '/uk/statistics',
     host: APP_HOST,
-    h1: 'Статистика протоколу Cosmic Signature',
+    h1: 'Статистика протоколу',
     jsonLd: ['Organization', 'WebSite', 'WebApplication', 'WebPage', 'Dataset'],
   },
   {

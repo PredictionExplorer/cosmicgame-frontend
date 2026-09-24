@@ -9,24 +9,30 @@ async function expectNoHorizontalPageOverflow(page: import('@playwright/test').P
 }
 
 async function openStatisticsAnchorActions(page: import('@playwright/test').Page) {
-  const anchoringHeading = page.getByRole('heading', { name: 'Anchoring Statistics' });
+  const anchoringHeading = page.getByRole('heading', { level: 1, name: 'Anchoring statistics' });
   await anchoringHeading.scrollIntoViewIfNeeded();
   await expect(anchoringHeading).toBeVisible();
 
   const cstTab = page.getByRole('tab', { name: /Cosmic Signature NFT/i });
-  const rwlkTab = page.getByRole('tab', { name: /RandomWalk NFT/i });
+  const rwlkTab = page.getByRole('tab', { name: /Random ?Walk NFT/i });
   await expect(cstTab).toBeVisible();
   await rwlkTab.click();
   await expect(rwlkTab).toHaveAttribute('aria-selected', 'true');
   await cstTab.click();
   await expect(cstTab).toHaveAttribute('aria-selected', 'true');
 
-  const actionsToggle = page.getByRole('button', { name: /Anchor \/ Release Actions/i }).first();
-  await actionsToggle.scrollIntoViewIfNeeded();
-  await expect(actionsToggle).toBeVisible();
-  if ((await actionsToggle.getAttribute('aria-expanded')) === 'false') {
-    await actionsToggle.click();
-  }
+  const actions = page.getByRole('heading', { name: /Anchor \/ release actions/i }).first();
+  await actions.scrollIntoViewIfNeeded();
+  await expect(actions).toBeVisible();
+}
+
+/** No child widens the layout viewport past the device (the fixed header sizes against it). */
+async function expectLayoutViewportFits(page: import('@playwright/test').Page) {
+  const { clientWidth, viewportWidth } = await page.evaluate(() => ({
+    clientWidth: document.documentElement.clientWidth,
+    viewportWidth: window.innerWidth,
+  }));
+  expect(clientWidth).toBe(viewportWidth);
 }
 
 test.describe('Responsive - Mobile viewport', () => {
@@ -77,6 +83,18 @@ test.describe('Responsive - Mobile viewport', () => {
     const response = await page.goto('/statistics', { waitUntil: 'networkidle' });
     expect(response?.status()).toBe(200);
     await expect(page.locator('body')).not.toHaveText('Internal Server Error');
+    await expectNoHorizontalPageOverflow(page);
+    await expectLayoutViewportFits(page);
+  });
+
+  test('statistics activity keeps its charts and controls inside 375px', async ({ page }) => {
+    const response = await page.goto('/statistics/activity', { waitUntil: 'networkidle' });
+    expect(response?.status()).toBe(200);
+    const cycle = page.getByRole('heading', { level: 2, name: 'One cycle in detail' });
+    await cycle.scrollIntoViewIfNeeded();
+    await expect(cycle).toBeVisible();
+    await expectNoHorizontalPageOverflow(page);
+    await expectLayoutViewportFits(page);
   });
 
   test('statistics anchoring remains readable without page overflow at 375px', async ({ page }) => {

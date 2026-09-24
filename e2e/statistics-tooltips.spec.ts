@@ -1,6 +1,11 @@
 import { test, expect } from '@playwright/test';
 
-import { expectAllLabelTooltips, expectLabelTooltip } from './tooltip-helpers';
+import {
+  expectAllLabelTooltips,
+  expectLabelTooltip,
+  expectTooltipFullyVisible,
+  openTooltip,
+} from './tooltip-helpers';
 
 const HUB_TOOLTIPS = [
   {
@@ -8,48 +13,36 @@ const HUB_TOOLTIPS = [
     expected: /current Performance Cycle number indexed/,
   },
   {
-    label: 'Allocations Distributed',
+    label: 'Allocations distributed',
     expected: /Indexed allocation records across all cycles/,
   },
   {
-    label: 'NFTs Imprinted',
+    label: 'NFTs imprinted',
     expected: /Cumulative count of Cosmic Signature NFT ERC-721 tokens imprinted/,
   },
   {
-    label: 'Contract Balance',
+    label: 'Contract balance',
     expected: /ETH currently held by the Cosmic Signature protocol contract/,
-  },
-  {
-    label: 'Outreach CST Allocated',
-    expected: /CST sent from the Outreach Reserve to outreach and ecosystem contributors/,
-  },
-  {
-    label: 'Allocation Economy',
-    expected: /Cumulative allocation records and ETH flows/,
-  },
-  {
-    label: 'Random Walk NFTs Used',
-    expected: /attached to ETH gestures for a one-time Gesture Cost reduction/,
   },
 ];
 
 const PARTICIPATION_TOOLTIPS = [
   {
-    label: 'Unique Participants',
+    label: 'Unique participants',
     expected: /Unique wallet addresses that have made at least one indexed gesture/,
   },
   {
-    label: 'Unique Recipients',
+    label: 'Unique recipients',
     expected: /received at least one indexed allocation/,
   },
   {
-    label: 'Unique ETH Contributors',
+    label: 'Unique ETH contributors',
     expected: /contributed ETH to the protocol/,
   },
   {
-    label: 'Active Anchor-holders',
+    label: 'Active anchor-holders',
     expected:
-      /Distinct wallets that currently anchor at least one Cosmic Signature or RandomWalk NFT/,
+      /Distinct wallets that currently anchor at least one Cosmic Signature or Random Walk NFT/,
   },
 ];
 
@@ -66,26 +59,26 @@ test.describe('/statistics tooltips', () => {
     await expectAllLabelTooltips(page, PARTICIPATION_TOOLTIPS);
   });
 
-  test('opens anchoring tooltips', async ({ page }) => {
+  test('explains the anchoring figures in one Definitions disclosure', async ({ page }) => {
     await page.goto('/statistics/anchoring', { waitUntil: 'networkidle' });
-    await page.emulateMedia({ reducedMotion: 'reduce' });
-    await expectAllLabelTooltips(page, [
-      {
-        label: 'Total Tokens Imprinted',
-        expected: /Indexed Cosmic Signature NFT imprint count associated/,
-      },
-    ]);
+    await page.getByRole('tab', { name: 'Random Walk NFT' }).click();
+    const panel = page.getByRole('tabpanel', { name: 'Random Walk NFT' });
+    const definitions = panel.locator('details').filter({ hasText: 'Definitions' }).first();
+    await definitions.scrollIntoViewIfNeeded();
+    await definitions.locator('summary').click();
+    await expect(
+      definitions.getByText(/imprinted for Random Walk NFT anchor-holders through Anchored-NFT/),
+    ).toBeVisible();
   });
 
-  test('opens activity tooltips', async ({ page }) => {
+  test('explains a section once, beside its title', async ({ page }) => {
     await page.goto('/statistics/activity', { waitUntil: 'networkidle' });
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await expectAllLabelTooltips(page, [
-      {
-        label: 'Cycle Activations',
-        expected: /System event windows that show when protocol cycles/,
-      },
-    ]);
+    // The explanation sits beside the H2 (which folds the section), not inside it.
+    const trigger = page.getByRole('button', { name: 'More information about Cycle activations' });
+    await trigger.scrollIntoViewIfNeeded();
+    await openTooltip(trigger);
+    await expectTooltipFullyVisible(page, /System event windows that show when protocol cycles/);
   });
 
   test('opens a representative table header tooltip', async ({ page }, testInfo) => {

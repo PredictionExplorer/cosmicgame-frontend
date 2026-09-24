@@ -325,7 +325,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/statistics',
     host: 'app',
     cluster: 'statistics',
-    expectedText: 'Cosmic Signature 协议统计',
+    expectedText: '协议统计',
   },
   {
     id: 'statistics-activity',
@@ -361,7 +361,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/statistics/performance',
     host: 'app',
     cluster: 'statistics',
-    expectedText: '参与者表现统计',
+    expectedText: '参与者结果',
   },
   {
     id: 'statistics-tokens',
@@ -415,7 +415,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: `/user/${address}`,
     host: 'app',
     cluster: 'statistics',
-    expectedText: '参与者统计',
+    expectedText: '落笔花费',
   },
   {
     id: 'user-stellar-eth',

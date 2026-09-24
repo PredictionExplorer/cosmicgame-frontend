@@ -228,15 +228,11 @@ test.describe('zh Sprint 5 — statistics, tables, and formatting', () => {
 
   test('renders every Sprint 5 route in Chinese', async ({ page }) => {
     const routes: Array<[string, string, string | undefined]> = [
-      [
-        '/zh/statistics',
-        'Cosmic Signature 协议统计',
-        '统计：演绎周期、落笔、NFT 与 CST · Cosmic Signature',
-      ],
+      ['/zh/statistics', '协议统计', '统计：演绎周期、落笔、NFT 与 CST · Cosmic Signature'],
       ['/zh/statistics/activity', '落笔活动统计', '落笔活动统计 · Cosmic Signature'],
       ['/zh/statistics/anchoring', '锚定统计', '锚定统计 · Cosmic Signature'],
       ['/zh/statistics/participation', '参与统计', '参与统计 · Cosmic Signature'],
-      ['/zh/statistics/performance', '参与者表现统计', '参与者表现统计 · Cosmic Signature'],
+      ['/zh/statistics/performance', '参与者结果', '参与者结果 · Cosmic Signature'],
       ['/zh/statistics/tokens', '代币分布统计', '代币分布统计 · Cosmic Signature'],
       ['/zh/recipient-history', '我的分配历史', '我的分配历史 · Cosmic Signature'],
       ['/zh/named-nfts', '已命名 Cosmic Signature NFT', '已命名 NFT · Cosmic Signature'],
@@ -246,7 +242,7 @@ test.describe('zh Sprint 5 — statistics, tables, and formatting', () => {
         '已使用的 Random Walk NFT',
         '已使用的 Random Walk NFT · Cosmic Signature',
       ],
-      [`/zh/user/${ADDRESS}`, '参与者统计', undefined],
+      [`/zh/user/${ADDRESS}`, '落笔花费', undefined],
       [
         `/zh/user/stellar-selection-eth/${ADDRESS}`,
         '此参与者获配的星选 ETH',
@@ -278,11 +274,8 @@ test.describe('zh Sprint 5 — statistics, tables, and formatting', () => {
       '/zh/statistics',
       '统计：演绎周期、落笔、NFT 与 CST · Cosmic Signature',
     );
-    const label = page.getByText('当前演绎周期', { exact: true }).first();
-    const tooltipTrigger = label
-      .locator('xpath=ancestor::*[.//button or .//*[@role="button"]][1]')
-      .locator('button, [role="button"]')
-      .first();
+    // The header figure's explanation is named after its label.
+    const tooltipTrigger = page.getByRole('button', { name: '查看“当前演绎周期”的更多信息' });
     await tooltipTrigger.scrollIntoViewIfNeeded();
     await openTooltip(tooltipTrigger);
     await expectTooltipFullyVisible(page, /当前索引的演绎周期编号/);
@@ -292,8 +285,8 @@ test.describe('zh Sprint 5 — statistics, tables, and formatting', () => {
     await expect(page.getByText(/1月1日 \d{2}:34/, { exact: true })).toBeVisible();
 
     await openZhRoute(page, '/zh/statistics/tokens', '代币分布统计 · Cosmic Signature');
-    await expect(page.getByRole('button', { name: '开始日期' })).toContainText('2026/1/1');
-    await expect(page.getByText('2026/1/1', { exact: true }).first()).toBeVisible();
+    // The supply summary dates the reading in the zh calendar style.
+    await expect(page.getByText(/^2026年1月1日 总供应量：1,000\sCST。/)).toBeVisible();
 
     await openZhRoute(page, `/zh/system-event/${CYCLE}/100/200`, '系统事件 · Cosmic Signature');
     const eventTooltipTrigger = page.getByRole('button', {
