@@ -28,6 +28,12 @@ function cycleOrNotFound(round: string): number {
  * How many addresses held the lead in `cycle`: every gesture hands its maker
  * the lead, so it is the number of distinct gesture makers. It sizes the
  * chart's loading lanes, so the window keeps its height when they arrive.
+ *
+ * The API has no per-cycle count of makers, so this reads the cycle's
+ * gesture list, which the chart then reads again in the browser. Seeding the
+ * chart's query instead would inline the whole list in the HTML (about 1 MB
+ * of JSON for cycle 1); the count is one number, and the render that reads
+ * it is cached for `revalidate`.
  */
 async function readLeadLaneCount(cycle: number): Promise<number | undefined> {
   try {

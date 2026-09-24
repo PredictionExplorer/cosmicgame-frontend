@@ -50,12 +50,12 @@ export async function generateMetadata({ params }: Pick<LayoutProps, 'params'>):
 
 /**
  * Root layout for embeds (`/embed/...` on app.cosmicsignature.com): one
- * artifact, such as a cycle's Endurance timeline, in a window of its own or
- * a third-party iframe. It shares the document (theme, fonts, analytics)
- * with the app but not the app's shell: no header or footer, no wallet
- * stack, and only the message namespaces an embed reads. Moving between an
- * embed and the app is a full page load, which suits a link that opens in a
- * new window.
+ * artifact, such as a cycle's Endurance timeline, in a window of its own
+ * (`X-Frame-Options: SAMEORIGIN` keeps other sites from framing it). It
+ * shares the document (theme, fonts, analytics) with the app but not the
+ * app's shell: no header or footer, no wallet stack, and only the message
+ * namespaces an embed reads. Moving between an embed and the app is a full
+ * page load, which suits links that open in a new window.
  */
 export default async function EmbedRootLayout({ children, params }: LayoutProps) {
   const { locale } = await params;

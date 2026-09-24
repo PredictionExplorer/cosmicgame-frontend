@@ -20,7 +20,7 @@ jest.mock('next/navigation', () => ({
 }));
 jest.mock('../../../../../../../components/statistics/EnduranceTimelineChart', () => ({
   __esModule: true,
-  default: ({
+  default: function MockEnduranceTimelineChart({
     round,
     isLive,
     laneLimit,
@@ -28,12 +28,21 @@ jest.mock('../../../../../../../components/statistics/EnduranceTimelineChart', (
     round: number;
     isLive: boolean;
     laneLimit?: number | null;
-  }) => (
-    <div data-testid="endurance-chart" data-lane-limit={String(laneLimit)}>
-      {round}
-      {isLive ? ' live' : ' final'}
-    </div>
-  ),
+  }) {
+    const { useChartLinksOpenNewWindow } = jest.requireActual<
+      typeof import('@/components/statistics/charts/timeline')
+    >('@/components/statistics/charts/timeline');
+    return (
+      <div
+        data-testid="endurance-chart"
+        data-lane-limit={String(laneLimit)}
+        data-new-window-links={String(useChartLinksOpenNewWindow())}
+      >
+        {round}
+        {isLive ? ' live' : ' final'}
+      </div>
+    );
+  },
   EnduranceTimelineSkeleton: ({ lanes }: { lanes?: number }) => (
     <div role="status" data-testid="endurance-skeleton" data-lanes={String(lanes)} />
   ),
@@ -91,6 +100,16 @@ describe('EmbedEnduranceChart', () => {
     mockUseDashboardInfo.mockReturnValue(dashboard({ data: { CurRoundNum: 3 } }));
     render(<EmbedEnduranceChart roundNum={1} />);
     expect(screen.getByTestId('endurance-chart')).toHaveAttribute('data-lane-limit', 'null');
+  });
+
+  it('opens the chart’s links in a new window, like its source link', () => {
+    mockUseDashboardInfo.mockReturnValue(dashboard({ data: { CurRoundNum: 3 } }));
+    render(<EmbedEnduranceChart roundNum={1} />);
+    expect(screen.getByTestId('endurance-chart')).toHaveAttribute('data-new-window-links', 'true');
+    expect(screen.getByRole('link', { name: /opens in a new window/ })).toHaveAttribute(
+      'target',
+      '_blank',
+    );
   });
 
   it('puts the badge and the chart in the server render from the server read', () => {

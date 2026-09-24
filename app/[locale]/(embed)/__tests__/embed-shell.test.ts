@@ -5,7 +5,7 @@ import { dirname, join, relative, resolve } from 'node:path';
  * Embed shell contract: an embed renders without the dApp's providers (no
  * WagmiProvider, no wallet UI), so nothing it imports may reach the wallet
  * stack. A wagmi hook under an embed would throw at render for want of its
- * provider, and the stack would ship to every third-party iframe.
+ * provider, and the stack would ship to every embed window.
  *
  * Walks static and dynamic imports from the embed layout, its boundaries
  * and every embed page through repo source, collecting the npm packages

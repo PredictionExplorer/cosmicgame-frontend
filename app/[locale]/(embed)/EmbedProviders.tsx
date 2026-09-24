@@ -10,10 +10,11 @@ import { installGlobalErrorHandlers } from '@/utils/globalErrorHandlers';
 
 /**
  * The client shell of an embed: an API client, tooltips and error
- * reporting, and nothing else. An embed opens in a window of its own or in a
- * third-party iframe, reads public data and never connects a wallet, so the
- * dApp's providers (wagmi, the wallet UI, chain-event polling, protocol
- * contexts, header and footer) stay out of its bundle.
+ * reporting, and nothing else. An embed opens in a window of its own (the
+ * site sends `X-Frame-Options: SAMEORIGIN`, so only its own pages may frame
+ * it), reads public data and never connects a wallet, so the dApp's
+ * providers (wagmi, the wallet UI, chain-event polling, protocol contexts,
+ * header and footer) stay out of its bundle.
  */
 export function EmbedProviders({ children }: { children: ReactNode }) {
   const [queryClient] = useState(makeQueryClient);

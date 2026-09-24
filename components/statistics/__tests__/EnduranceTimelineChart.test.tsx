@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { act, checkA11y, render, screen, within } from '@/test-utils';
 
 import EnduranceTimelineChart from '../EnduranceTimelineChart';
+import { ChartLinksOpenNewWindow } from '../charts/timeline';
 
 const mockUseGestureListByCycle = jest.fn();
 const mockUseRoundInfo = jest.fn();
@@ -124,6 +125,29 @@ describe('EnduranceTimelineChart', () => {
     expect(links).toHaveLength(2);
     for (const link of links) {
       expect(link).toHaveClass('type-mono');
+      expect(link.getAttribute('href')).toMatch(/^\/user\/0x/);
+      expect(link).not.toHaveAttribute('target');
+    }
+  });
+
+  it('opens its participants in a new window inside an embed, and says so', async () => {
+    // Regression: the embed's summary addresses turned the embed window into the app,
+    // while its own source link opened a new window.
+    const user = userEvent.setup();
+    render(
+      <ChartLinksOpenNewWindow>
+        <EnduranceTimelineChart round={2} isLive label="Endurance" />
+      </ChartLinksOpenNewWindow>,
+    );
+    const caption = screen.getByRole('figure', { name: 'Endurance' }).querySelector('figcaption')!;
+    await user.click(screen.getByRole('button', { name: 'View as table' }));
+    const table = screen.getByRole('table', { name: 'Endurance' });
+    const links = [...within(caption).getAllByRole('link'), ...within(table).getAllByRole('link')];
+    expect(links).toHaveLength(4);
+    for (const link of links) {
+      expect(link).toHaveAttribute('target', '_blank');
+      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+      expect(link).toHaveAccessibleName(/\(opens in a new window\)$/);
       expect(link.getAttribute('href')).toMatch(/^\/user\/0x/);
     }
   });

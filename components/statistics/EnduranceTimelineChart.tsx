@@ -48,7 +48,13 @@ import {
   Y_AXIS_PROPS,
   timelineMarkStyle,
 } from './charts/theme';
-import { SummaryAddress, useCoarsePointer, useTimelineReadout } from './charts/timeline';
+import {
+  ChartAddressLink,
+  SummaryAddress,
+  useChartLinksOpenNewWindow,
+  useCoarsePointer,
+  useTimelineReadout,
+} from './charts/timeline';
 import { useRovingStints } from './charts/useRovingStints';
 
 const LINE_CHART_HEIGHT = 320;
@@ -59,6 +65,10 @@ const LINE_CHART_HEIGHT = 320;
 export const DEFAULT_LANE_LIMIT = 14;
 
 const pct = (v: number): string => `${Math.max(0, Math.min(100, v * 100))}%`;
+
+/** The table's address link inside an embed, drawn as the table's own address cells are. */
+const EMBED_TABLE_ADDRESS =
+  'font-mono no-underline [color:inherit] transition-colors hover:text-primary focus-visible:text-primary';
 
 /**
  * The lane grid. From `sm` the address sits in a column beside its lane; on a
@@ -542,6 +552,7 @@ const EnduranceTimelineChart: FC<EnduranceTimelineChartProps> = ({
   const t = useTranslations('statistics');
   const locale = useLocale();
   const hydrated = useHydrated();
+  const newWindowLinks = useChartLinksOpenNewWindow();
   const hasRound = round >= 0;
   const { data: gestures, isLoading, isError, refetch } = useGestureListByCycle(round, 'asc');
   const [view, setView] = useState<'gantt' | 'lines'>('gantt');
@@ -590,6 +601,10 @@ const EnduranceTimelineChart: FC<EnduranceTimelineChartProps> = ({
         kind: 'address',
         header: t('charts.activePeriods.participant'),
         value: (row) => row.address,
+        // In an embed the participant opens in a new window, like the summary's links.
+        cell: newWindowLinks
+          ? (row) => <ChartAddressLink address={row.address} className={EMBED_TABLE_ADDRESS} />
+          : undefined,
       },
       { id: 'role', kind: 'text', header: t('charts.endurance.role'), value: (row) => row.role },
       {
@@ -614,7 +629,7 @@ const EnduranceTimelineChart: FC<EnduranceTimelineChartProps> = ({
         sortable: true,
       },
     ],
-    [t],
+    [newWindowLinks, t],
   );
 
   const loading = hasRound && isLoading;

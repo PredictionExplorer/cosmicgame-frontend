@@ -11,6 +11,7 @@ import { useHydrated } from '@/hooks/useHydrated';
 import EnduranceTimelineChart, {
   EnduranceTimelineSkeleton,
 } from '@/components/statistics/EnduranceTimelineChart';
+import { ChartLinksOpenNewWindow } from '@/components/statistics/charts/timeline';
 import { Badge } from '@/components/ui/badge';
 import { ErrorState } from '@/components/ui/error-state';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -29,7 +30,7 @@ interface EmbedEnduranceChartProps {
  * whether the cycle is live or final, and a link back to the full activity
  * page in Cosmic Signature. It fills the window's width, so maximizing the
  * window widens the chart, and it draws every lane: the window scrolls, never
- * a box inside it.
+ * a box inside it. Every link opens a new window, so the embed stays itself.
  *
  * Whether the cycle is live or final comes from the dashboard: the server's
  * read (`seedLiveCycle`) puts the badge and the chart's frame in the HTML,
@@ -90,13 +91,16 @@ const EmbedEnduranceChart: FC<EmbedEnduranceChartProps> = ({
         </Link>
       </header>
       {known ? (
-        <EnduranceTimelineChart
-          round={roundNum}
-          isLive={isLive}
-          label={title}
-          laneLimit={null}
-          expectedLanes={expectedLanes}
-        />
+        // Its participants open in a new window, like the source link above.
+        <ChartLinksOpenNewWindow>
+          <EnduranceTimelineChart
+            round={roundNum}
+            isLive={isLive}
+            label={title}
+            laneLimit={null}
+            expectedLanes={expectedLanes}
+          />
+        </ChartLinksOpenNewWindow>
       ) : isError && hydrated ? (
         <ErrorState headingLevel={2} message={t('shared.serviceError')} onRetry={() => refetch()} />
       ) : (
