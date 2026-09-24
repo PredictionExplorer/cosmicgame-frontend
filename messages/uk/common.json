@@ -46,19 +46,23 @@
     "sections": {
       "participate": "Участь",
       "collection": "Колекція",
+      "explore": "Огляд",
       "records": "Записи",
-      "insights": "Аналітика",
-      "trust": "Центр довіри",
-      "help": "Довідка",
-      "account": "Мій обліковий запис",
+      "learn": "Навчання",
+      "trust": "Довіра",
+      "account": "Обліковий запис",
       "admin": "Адміністрування"
     },
     "snapshot": "Знімок даних · {date}",
     "lastReviewed": "Останній перегляд: {date}",
     "lastUpdated": "Оновлено: {date}",
     "relatedPages": "Пов’язані сторінки",
+    "readMore": "Читати далі",
+    "readLess": "Згорнути",
     "crumbs": {
-      "participants": "Учасники"
+      "participants": "Учасники",
+      "allocationRecipients": "Отримувачі розподілів",
+      "cycle": "Цикл {cycle}"
     }
   },
   "status": {

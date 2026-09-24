@@ -28,7 +28,7 @@ export function HeroSection({
   return (
     <PageHeader
       variant="reading"
-      section="help"
+      section="learn"
       titleId="faq-hero-heading"
       // One rich message per locale: each language sets its own spacing and word order.
       title={t.rich('hero.title', {

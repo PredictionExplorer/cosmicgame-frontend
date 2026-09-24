@@ -153,7 +153,7 @@ function UserStellarSelectionNFTPage({ address: rawAddress }: { address: string 
     return (
       <PageShell variant="data" backdrop="signature">
         <PageHeader
-          section="insights"
+          section="explore"
           breadcrumbs={participantTrail}
           title={t('stellarSelectionNft.invalidAddress')}
         />
@@ -164,7 +164,7 @@ function UserStellarSelectionNFTPage({ address: rawAddress }: { address: string 
   return (
     <PageShell variant="data" backdrop="signature">
       <PageHeader
-        section="insights"
+        section="explore"
         breadcrumbs={participantTrail}
         title={t('stellarSelectionNft.heading')}
       >

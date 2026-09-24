@@ -46,19 +46,23 @@
     "sections": {
       "participate": "參與",
       "collection": "作品集",
+      "explore": "探索",
       "records": "紀錄",
-      "insights": "資料分析",
-      "trust": "信任中心",
-      "help": "說明",
-      "account": "我的帳戶",
+      "learn": "學習",
+      "trust": "信任",
+      "account": "帳戶",
       "admin": "管理"
     },
     "snapshot": "資料快照：{date}",
     "lastReviewed": "最後審閱：{date}",
     "lastUpdated": "最後更新：{date}",
     "relatedPages": "相關頁面",
+    "readMore": "展開全文",
+    "readLess": "收合",
     "crumbs": {
-      "participants": "參與者"
+      "participants": "參與者",
+      "allocationRecipients": "分配名錄",
+      "cycle": "第 {cycle} 個週期"
     }
   },
   "status": {

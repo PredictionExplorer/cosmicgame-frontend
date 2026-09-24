@@ -46,19 +46,23 @@
     "sections": {
       "participate": "Tham gia",
       "collection": "Bộ sưu tập",
+      "explore": "Khám phá",
       "records": "Bản ghi",
-      "insights": "Phân tích",
-      "trust": "Trung tâm tin cậy",
-      "help": "Trợ giúp",
-      "account": "Tài khoản của tôi",
+      "learn": "Tìm hiểu",
+      "trust": "Tin cậy",
+      "account": "Tài khoản",
       "admin": "Quản trị"
     },
     "snapshot": "Ảnh chụp dữ liệu · {date}",
     "lastReviewed": "Xem xét lần cuối: {date}",
     "lastUpdated": "Cập nhật lần cuối: {date}",
     "relatedPages": "Trang liên quan",
+    "readMore": "Xem thêm",
+    "readLess": "Thu gọn",
     "crumbs": {
-      "participants": "Người tham gia"
+      "participants": "Người tham gia",
+      "allocationRecipients": "Người nhận phân bổ",
+      "cycle": "Chu kỳ #{cycle}"
     }
   },
   "status": {

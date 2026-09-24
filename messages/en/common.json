@@ -46,19 +46,23 @@
     "sections": {
       "participate": "Participate",
       "collection": "Collection",
+      "explore": "Explore",
       "records": "Records",
-      "insights": "Insights",
-      "trust": "Trust Center",
-      "help": "Help",
-      "account": "My account",
+      "learn": "Learn",
+      "trust": "Trust",
+      "account": "Account",
       "admin": "Admin"
     },
     "snapshot": "Snapshot · {date}",
     "lastReviewed": "Last reviewed {date}",
     "lastUpdated": "Last updated {date}",
     "relatedPages": "Related pages",
+    "readMore": "Read more",
+    "readLess": "Show less",
     "crumbs": {
-      "participants": "Participants"
+      "participants": "Participants",
+      "allocationRecipients": "Allocation Recipients",
+      "cycle": "Cycle #{cycle}"
     }
   },
   "status": {

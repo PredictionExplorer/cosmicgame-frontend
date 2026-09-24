@@ -163,7 +163,7 @@ const CosmicSignatureTransfersPage = ({ address: rawAddress }: { address: string
     <PageShell variant="data" backdrop="signature" className="max-sm:pb-16">
       <div className="mx-auto max-w-5xl">
         <PageHeader
-          section="insights"
+          section="explore"
           breadcrumbs={participantTrail}
           title={t('transferHistory.nft.title')}
           subtitle={address ?? undefined}

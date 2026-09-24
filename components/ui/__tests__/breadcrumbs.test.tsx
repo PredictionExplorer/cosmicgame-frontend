@@ -1,4 +1,4 @@
-import { Breadcrumbs, toBreadcrumbSegments } from '@/components/ui/breadcrumbs';
+import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 
 import { render, screen, within } from '@/test-utils';
 
@@ -23,35 +23,5 @@ describe('Breadcrumbs', () => {
   it('renders nothing for an empty trail', () => {
     const { container } = render(<Breadcrumbs items={[]} />);
     expect(container).toBeEmptyDOMElement();
-  });
-});
-
-describe('toBreadcrumbSegments', () => {
-  it('turns the visible trail plus the current page into JSON-LD segments', () => {
-    expect(
-      toBreadcrumbSegments(
-        [
-          { label: 'Home', href: '/' },
-          { label: 'Statistics', href: '/statistics' },
-        ],
-        { name: 'Participation', path: '/statistics/participation' },
-      ),
-    ).toEqual([
-      { name: 'Home', path: '/' },
-      { name: 'Statistics', path: '/statistics' },
-      { name: 'Participation', path: '/statistics/participation' },
-    ]);
-  });
-
-  it('drops unlinked crumbs and a crumb that repeats the current page', () => {
-    expect(
-      toBreadcrumbSegments(
-        [{ label: 'Home', href: '/' }, { label: 'Terms', href: '/terms' }, { label: 'Section' }],
-        { name: 'Terms of Service', path: '/terms' },
-      ),
-    ).toEqual([
-      { name: 'Home', path: '/' },
-      { name: 'Terms of Service', path: '/terms' },
-    ]);
   });
 });

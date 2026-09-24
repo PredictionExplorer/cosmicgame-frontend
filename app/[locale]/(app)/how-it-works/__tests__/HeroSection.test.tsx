@@ -63,10 +63,10 @@ describe('HeroSection', () => {
     ).toBeInTheDocument();
   });
 
-  it('names the Help section in the eyebrow without linking the hub to itself', () => {
+  it('names the Learn section in the eyebrow without linking the hub to itself', () => {
     render(<HeroSection hero={hero} />);
-    expect(screen.getByText('common.pageHeader.sections.help')).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'common.pageHeader.sections.help' })).toBeNull();
+    expect(screen.getByText('common.pageHeader.sections.learn')).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'common.pageHeader.sections.learn' })).toBeNull();
   });
 
   it('accents the words the copy marks, without a separator added in code', () => {

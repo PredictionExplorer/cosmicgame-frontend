@@ -16,6 +16,7 @@ import {
   detailPanelClass,
 } from '@/components/detail-page/DetailPageChrome';
 import { PageHeader } from '@/components/layout/PageHeader';
+import type { BreadcrumbItem } from '@/components/ui/breadcrumbs';
 import { LinkifiedText } from '@/components/ui/linkified-text';
 import { PageShell } from '@/components/ui/page-shell';
 import RandomWalkNFT from '@/components/nft/RandomWalkNFT';
@@ -82,13 +83,45 @@ function formatParticipationCST(gestureInfo: GestureInfo): string {
   return formatAmount(getParticipationCST(gestureInfo), 'CST', { fractional: 7, standard: 2 });
 }
 
+type CommonTranslate = (key: string, values?: Record<string, string | number>) => string;
+
+/**
+ * A gesture sits under its cycle, and its trail repeats that cycle page's own:
+ * the live cycle is /current-cycle (Participate, whose hub is Home), a
+ * finalized one is its record under Allocation Recipients. Until the
+ * dashboard says which cycle is live, the trail stops at Home rather than
+ * guess; if the dashboard cannot be read, the cycle is taken as finalized.
+ */
+export function gestureTrail(
+  cycle: number | undefined,
+  liveCycle: number | undefined | null,
+  dashboardFailed: boolean,
+  t: CommonTranslate,
+): { section: 'participate' | 'records'; trail: BreadcrumbItem[] } {
+  if (typeof cycle !== 'number' || cycle < 0) return { section: 'records', trail: [] };
+  const cycleLabel = t('pageHeader.crumbs.cycle', { cycle });
+  if (!dashboardFailed && typeof liveCycle !== 'number') return { section: 'records', trail: [] };
+  if (liveCycle === cycle) {
+    return { section: 'participate', trail: [{ label: cycleLabel, href: '/current-cycle' }] };
+  }
+  return {
+    section: 'records',
+    trail: [
+      { label: t('pageHeader.crumbs.allocationRecipients'), href: '/allocation' },
+      { label: cycleLabel, href: `/allocation/${cycle}` },
+    ],
+  };
+}
+
 const GesturePage = ({ gestureId }: { gestureId: number }) => {
   const t = useTranslations('gesture');
   const tCommon = useTranslations('common');
   const locale = useLocale();
   const { data: gestureInfo = null, isLoading: loading } = useGestureInfo(gestureId);
   // Only to tell the live cycle (its page is /current-cycle) from a finalized one.
-  const { data: dashboard } = useDashboardInfo(undefined, { poll: false });
+  const { data: dashboard, isError: dashboardFailed } = useDashboardInfo(undefined, {
+    poll: false,
+  });
 
   const [tokenURI, setTokenURI] = useState<NFTTokenURI | null>(null);
 
@@ -111,25 +144,19 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
 
   const gesturePosition = gestureInfo?.BidPosition;
   const hasPosition = gesturePosition !== undefined && gesturePosition !== null;
-  // A gesture sits under its cycle: the live one on /current-cycle, a finalized one on
-  // its allocation record.
-  const cycle = gestureInfo?.RoundNum;
-  const cycleCrumb =
-    typeof cycle === 'number' && cycle >= 0
-      ? [
-          {
-            label: t('rows.cycleValue', { round: cycle }),
-            href: dashboard?.CurRoundNum === cycle ? '/current-cycle' : `/allocation/${cycle}`,
-          },
-        ]
-      : [];
+  const { section, trail } = gestureTrail(
+    gestureInfo?.RoundNum,
+    dashboardFailed ? null : dashboard?.CurRoundNum,
+    dashboardFailed,
+    (key, values) => tCommon(key, values),
+  );
 
   return (
     <PageShell variant="detail" backdrop="signature" className="max-sm:pb-16">
       <div className="mx-auto max-w-3xl">
         <PageHeader
-          section="records"
-          breadcrumbs={cycleCrumb}
+          section={section}
+          breadcrumbs={trail}
           title={
             hasPosition
               ? t('header.positionLabel', { position: gesturePosition })

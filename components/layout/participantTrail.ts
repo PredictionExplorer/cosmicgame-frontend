@@ -6,11 +6,11 @@ import { formatAddress } from '@/utils/format';
 
 /**
  * The breadcrumb parents of a participant's record pages, for `PageHeader`
- * with `section="insights"`: Participants (the participation statistics),
+ * with `section="explore"`: Participants (the participation statistics),
  * then the participant's profile when `address` is given.
  *
- *   /user/0xA169…            Home › Insights › Participants
- *   /user/stellar-…/0xA169…  Home › Insights › Participants › 0xA169…63B6
+ *   /user/0xA169…            Home › Explore › Participants
+ *   /user/stellar-…/0xA169…  Home › Explore › Participants › 0xA169…63B6
  */
 export function useParticipantTrail(address?: string | null): BreadcrumbItem[] {
   const t = useTranslations('common');

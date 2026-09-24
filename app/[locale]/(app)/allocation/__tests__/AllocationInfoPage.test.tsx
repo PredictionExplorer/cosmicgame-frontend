@@ -241,14 +241,15 @@ describe('AllocationInfoPage', () => {
       expect(breadcrumbLink.closest('a')).toHaveAttribute('href', '/allocation');
     });
 
-    it('builds the trail Home › Records › Allocation Recipients, the H1 naming the cycle', () => {
+    it('builds the trail Home › Allocation Recipients, the H1 naming the cycle', () => {
       renderWithData(3);
+      // Records has no hub page, so the trail goes straight to the ledger.
       const trail = screen.getByRole('navigation', { name: 'common.accessibility.breadcrumb' });
       expect(
         within(trail)
           .getAllByRole('link')
           .map((link) => link.getAttribute('href')),
-      ).toEqual(['/', '/site-map', '/allocation']);
+      ).toEqual(['/', '/allocation']);
       expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
         'allocation.formats.cycleHash(cycle=3)',
       );

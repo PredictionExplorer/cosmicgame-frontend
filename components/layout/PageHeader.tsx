@@ -8,6 +8,7 @@ import { Breadcrumbs, type BreadcrumbItem } from '@/components/ui/breadcrumbs';
 import { GradientText } from '@/components/ui/gradient-text';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { UnknownValue } from '@/components/ui/unknown-value';
+import { HeaderLede } from '@/components/layout/HeaderLede';
 import { PAGE_SECTIONS, type PageSectionId } from '@/components/layout/pageSections';
 
 export type { PageSectionId } from '@/components/layout/pageSections';
@@ -45,13 +46,14 @@ export type PageHeaderVariant = 'data' | 'reading';
 
 export interface PageHeaderProps {
   title: ReactNode;
-  /** The one-sentence lede under the H1. */
+  /** The lede under the H1: clamped to three lines on phones, with a "Read more" toggle. */
   subtitle?: ReactNode;
   variant?: PageHeaderVariant;
   /**
    * The section the page belongs to (components/layout/pageSections). On a
    * top-level page it is the eyebrow, linked to the section hub; on a record
-   * page with `breadcrumbs` it is the first crumb after Home.
+   * page with `breadcrumbs` it is the first crumb after Home. A section
+   * without a hub (Records) is a plain eyebrow and no crumb.
    */
   section?: PageSectionId;
   /** The page is its section's hub: the eyebrow names the section without linking to itself. */
@@ -121,8 +123,9 @@ function isExternalHref(href: string): boolean {
 
 /**
  * The trail for a record page: Home, the section crumb (unless the section
- * hub is Home itself or the caller already links it), then the caller's
- * parents. A caller's own Home crumb is replaced so the label is shared.
+ * has no hub, its hub is Home itself or the caller already links it), then
+ * the caller's parents. A caller's own Home crumb is replaced so the label is
+ * shared.
  */
 function buildTrail(
   breadcrumbs: readonly BreadcrumbItem[],
@@ -192,14 +195,15 @@ export function PageHeader({
     sectionHub &&
     typeof title === 'string' &&
     sectionLabel?.trim().toLocaleLowerCase() === title.trim().toLocaleLowerCase();
+  const hub = section ? PAGE_SECTIONS[section].hub : null;
   const eyebrowContent =
     eyebrow ??
-    (!trail && section && sectionLabel && !eyebrowEchoesTitle ? (
-      sectionHub ? (
+    (!trail && sectionLabel && !eyebrowEchoesTitle ? (
+      sectionHub || !hub ? (
         sectionLabel
       ) : (
         <Link
-          href={PAGE_SECTIONS[section].hub}
+          href={hub}
           className="inline-flex min-h-6 items-center transition-colors duration-fast hover:text-foreground hover:underline hover:underline-offset-4"
         >
           {sectionLabel}
@@ -211,7 +215,7 @@ export function PageHeader({
     <header
       className={cn(
         'relative mb-8 border-b border-rule print:relative print:z-[2] print:text-foreground sm:mb-10',
-        tabs ? 'pb-0' : 'pb-7 sm:pb-10',
+        tabs ? 'pb-0' : 'pb-6 sm:pb-10',
         centered && 'text-center',
         className,
       )}
@@ -250,7 +254,9 @@ export function PageHeader({
             {titleGradient ? <GradientText variant={titleGradient}>{title}</GradientText> : title}
           </TitleTag>
           {subtitle ? (
-            <p
+            <HeaderLede
+              moreLabel={t('pageHeader.readMore')}
+              lessLabel={t('pageHeader.readLess')}
               className={cn(
                 // 16px on phones keeps the header inside the first screen.
                 'mt-3 type-lede text-muted-foreground max-sm:text-base print:!text-foreground/85 sm:mt-4',
@@ -258,7 +264,7 @@ export function PageHeader({
               )}
             >
               {subtitle}
-            </p>
+            </HeaderLede>
           ) : null}
         </div>
         {actions ? (
@@ -271,7 +277,7 @@ export function PageHeader({
       {meta ? (
         <div
           className={cn(
-            'mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 type-caption text-subtle sm:mt-6',
+            'mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 type-caption text-subtle sm:mt-6',
             centered && 'justify-center',
           )}
         >
@@ -282,7 +288,7 @@ export function PageHeader({
       {related && related.length > 0 ? (
         <nav
           aria-label={relatedLabel ?? t('pageHeader.relatedPages')}
-          className={cn(meta ? 'mt-4' : 'mt-5 sm:mt-6')}
+          className={cn(meta ? 'mt-3 sm:mt-4' : 'mt-4 sm:mt-6')}
         >
           {/* One scrollable row on phones (the edge fade says it scrolls), wrapping from sm. */}
           <ul
@@ -365,9 +371,10 @@ export function PageHeaderTabs({
 }
 
 /**
- * The header's figure row: label over value, a two-column grid on phones and
- * one row divided by hairlines from `lg`. Each figure appears once per page —
- * the page body never repeats it in a second stat row.
+ * The header's figure row: label over value, a two-column grid on phones (an
+ * odd last figure spans both columns, so no cell is left empty) and one row
+ * divided by hairlines from `lg`. Each figure appears once per page — the
+ * page body never repeats it in a second stat row.
  */
 export function PageHeaderFigures({
   figures,
@@ -381,7 +388,9 @@ export function PageHeaderFigures({
   return (
     <dl
       className={cn(
-        'mt-5 grid grid-cols-2 gap-x-6 gap-y-4 sm:mt-8 sm:gap-y-5',
+        // Phones: tighter rhythm, so the header stays near the top of the first screen.
+        'mt-4 grid grid-cols-2 gap-x-4 gap-y-3 sm:mt-8 sm:gap-x-6 sm:gap-y-5',
+        'max-sm:[&>div:last-child:nth-child(odd)]:col-span-2',
         FIGURE_COLUMNS[Math.min(figures.length, 4)],
         'lg:flex lg:flex-wrap lg:gap-x-0 lg:divide-x lg:divide-rule',
         className,
@@ -394,7 +403,8 @@ export function PageHeaderFigures({
           className="min-w-0 lg:px-8 lg:first:pl-0 lg:last:pr-0"
         >
           <dt className="type-label text-subtle">
-            {figure.label}
+            {/* The label is its own text node, so the dt reads exactly as the label. */}
+            <span>{figure.label}</span>
             {figure.info ? (
               // The word joiner keeps the icon on the line of the label's last word.
               <span className="whitespace-nowrap">
@@ -408,7 +418,8 @@ export function PageHeaderFigures({
               </span>
             ) : null}
           </dt>
-          <dd className="mt-1 type-figure-md text-foreground lg:type-figure-lg">
+          {/* A date may wrap in a narrow column rather than overflow it. */}
+          <dd className="mt-1 type-figure-md text-foreground [&_time]:whitespace-normal lg:type-figure-lg">
             {figure.value === null ? <UnknownValue label={unavailable} /> : figure.value}
           </dd>
           {figure.caption ? (

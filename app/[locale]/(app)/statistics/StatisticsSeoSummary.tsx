@@ -27,7 +27,7 @@ export async function StatisticsSeoSummary() {
 
   return (
     <PageHeader
-      section="insights"
+      section="explore"
       sectionHub
       title={t('hub.seo.heading')}
       titleId="statistics-heading"

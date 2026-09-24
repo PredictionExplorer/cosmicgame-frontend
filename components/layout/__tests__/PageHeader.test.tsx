@@ -52,21 +52,42 @@ describe('PageHeader', () => {
     it('builds a record page trail as Home › section › parents, the H1 naming the page', () => {
       render(
         <PageHeader
-          section="records"
-          breadcrumbs={[{ label: 'Cycle #2', href: '/allocation/2' }]}
-          title="Gesture #1135"
+          section="explore"
+          breadcrumbs={[{ label: 'Participants', href: '/statistics/participation' }]}
+          title="0xA169…63B6"
         />,
       );
       const nav = screen.getByRole('navigation', { name: 'common.accessibility.breadcrumb' });
       const links = within(nav).getAllByRole('link');
       expect(links.map((link) => [link.textContent, link.getAttribute('href')])).toEqual([
         [HOME, '/'],
-        [section('records'), PAGE_SECTIONS.records.hub],
-        ['Cycle #2', '/allocation/2'],
+        [section('explore'), PAGE_SECTIONS.explore.hub],
+        ['Participants', '/statistics/participation'],
       ]);
       // The trail replaces the eyebrow: the section appears once.
-      expect(screen.getAllByText(section('records'))).toHaveLength(1);
-      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Gesture #1135');
+      expect(screen.getAllByText(section('explore'))).toHaveLength(1);
+      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('0xA169…63B6');
+    });
+
+    it('names a section without a hub as plain text and leaves it out of trails', () => {
+      const { rerender } = render(<PageHeader section="records" title="Allocation Recipients" />);
+      expect(screen.getByText(section('records'))).toBeInTheDocument();
+      expect(screen.queryByRole('link', { name: section('records') })).toBeNull();
+
+      rerender(
+        <PageHeader
+          section="records"
+          breadcrumbs={[{ label: 'Allocation Recipients', href: '/allocation' }]}
+          title="Cycle #2"
+        />,
+      );
+      const nav = screen.getByRole('navigation', { name: 'common.accessibility.breadcrumb' });
+      expect(
+        within(nav)
+          .getAllByRole('link')
+          .map((link) => link.getAttribute('href')),
+      ).toEqual(['/', '/allocation']);
+      expect(screen.queryByText(section('records'))).toBeNull();
     });
 
     it('skips the section crumb when the section hub is Home or already in the trail', () => {
@@ -78,7 +99,7 @@ describe('PageHeader', () => {
 
       rerender(
         <PageHeader
-          section="insights"
+          section="explore"
           breadcrumbs={[
             { label: 'Statistics', href: '/statistics' },
             { label: 'Participation', href: '/statistics/participation' },
@@ -136,7 +157,11 @@ describe('PageHeader', () => {
       );
       const figure = document.querySelector('[data-figure="imprinted"]');
       expect(figure).not.toBeNull();
-      expect(within(figure as HTMLElement).getByText('Imprinted').tagName).toBe('DT');
+      expect(
+        within(figure as HTMLElement)
+          .getByText('Imprinted')
+          .closest('dt'),
+      ).not.toBeNull();
       expect(within(figure as HTMLElement).getByText('48').tagName).toBe('DD');
       expect(within(figure as HTMLElement).getByText('this cycle')).toBeInTheDocument();
     });
@@ -149,6 +174,34 @@ describe('PageHeader', () => {
       expect(value).toHaveTextContent('—');
       expect(value).toHaveTextContent('common.status.unavailable');
       expect(value).not.toHaveTextContent(/\d/);
+    });
+
+    it('keeps the label its own text node, so an exact-text lookup finds it beside an info button', () => {
+      render(
+        <PageHeader
+          title="Statistics"
+          figures={[{ id: 'balance', label: 'Contract Balance', value: '1', info: 'ETH held.' }]}
+        />,
+      );
+      const label = screen.getByText('Contract Balance', { exact: true });
+      expect(label.textContent).toBe('Contract Balance');
+      expect(label.closest('dt')).not.toBeNull();
+    });
+
+    it('lets an odd last figure span both phone columns', () => {
+      render(
+        <PageHeader
+          title="Ledger"
+          figures={[
+            { id: 'a', label: 'A', value: '1' },
+            { id: 'b', label: 'B', value: '2' },
+            { id: 'c', label: 'C', value: '3' },
+          ]}
+        />,
+      );
+      expect(document.querySelector('dl')).toHaveClass(
+        'max-sm:[&>div:last-child:nth-child(odd)]:col-span-2',
+      );
     });
 
     it('names each figure info button after its label', () => {

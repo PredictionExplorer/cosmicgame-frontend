@@ -10,30 +10,6 @@ export interface BreadcrumbItem {
   href?: string;
 }
 
-/** One trail item for `breadcrumbJsonLd` (utils/jsonLd). */
-export interface BreadcrumbSegment {
-  name: string;
-  path: string;
-}
-
-/**
- * The same trail as structured data: every linked ancestor plus the current
- * page, so the visible breadcrumb and `breadcrumbJsonLd` cannot drift.
- *
- *   const trail = [{ label: t('home'), href: '/' }, { label: t('statistics'), href: '/statistics' }];
- *   <PageHeader breadcrumbs={trail} … />
- *   breadcrumbJsonLd(toBreadcrumbSegments(trail, { name: title, path: '/statistics/tokens' }), base)
- */
-export function toBreadcrumbSegments(
-  trail: readonly BreadcrumbItem[],
-  current: BreadcrumbSegment,
-): BreadcrumbSegment[] {
-  const ancestors = trail.flatMap((item) =>
-    item.href && item.href !== current.path ? [{ name: item.label, path: item.href }] : [],
-  );
-  return [...ancestors, current];
-}
-
 export interface BreadcrumbsProps {
   items: readonly BreadcrumbItem[];
   className?: string;

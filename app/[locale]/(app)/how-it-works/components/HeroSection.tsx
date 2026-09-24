@@ -13,7 +13,7 @@ export function HeroSection({ hero }: { hero: HowItWorksContent['hero'] }) {
   return (
     <PageHeader
       variant="reading"
-      section="help"
+      section="learn"
       sectionHub
       titleId="hero-heading"
       title={<AccentTitle text={hero.heading} />}

@@ -244,7 +244,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
     return (
       <MainWrapper>
         <PageHeader
-          section="insights"
+          section="explore"
           breadcrumbs={participantTrail}
           title={t('statistics.page.invalidAddress')}
         />
@@ -259,7 +259,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
       <PageHeader
         {...(isOwnProfile
           ? { section: 'account' as const, sectionHub: true }
-          : { section: 'insights' as const, breadcrumbs: participantTrail })}
+          : { section: 'explore' as const, breadcrumbs: participantTrail })}
         title={isOwnProfile ? t('statistics.page.ownTitle') : t('statistics.page.userTitle')}
         subtitle={
           isOwnProfile ? t('statistics.page.ownSubtitle') : t('statistics.page.userSubtitle')

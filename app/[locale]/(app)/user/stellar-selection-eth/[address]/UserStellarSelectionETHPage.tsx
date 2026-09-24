@@ -201,7 +201,7 @@ const UserStellarSelectionETHPage = ({ address: rawAddress }: { address: string 
     return (
       <PageShell variant="data" backdrop="signature">
         <PageHeader
-          section="insights"
+          section="explore"
           breadcrumbs={participantTrail}
           title={tStatistics('stellarSelectionEth.invalidAddress')}
         />
@@ -212,7 +212,7 @@ const UserStellarSelectionETHPage = ({ address: rawAddress }: { address: string 
   return (
     <PageShell variant="data" backdrop="signature">
       <PageHeader
-        section="insights"
+        section="explore"
         breadcrumbs={participantTrail}
         title={tStatistics('stellarSelectionEth.heading')}
       >

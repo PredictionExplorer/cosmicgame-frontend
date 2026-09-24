@@ -57,9 +57,9 @@ describe('HeroSection', () => {
     expect(screen.getByRole('heading', { name: /Cosmic Signature FAQ/i })).toBeInTheDocument();
   });
 
-  it('names the Help section in the eyebrow, linked to its hub', () => {
+  it('names the Learn section in the eyebrow, linked to its hub', () => {
     render(<HeroSection {...defaultProps} />);
-    expect(screen.getByRole('link', { name: 'common.pageHeader.sections.help' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'common.pageHeader.sections.learn' })).toHaveAttribute(
       'href',
       '/how-it-works',
     );
