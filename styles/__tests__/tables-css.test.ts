@@ -140,7 +140,16 @@ describe('styles/tables.css', () => {
 
   it('labels each value from its own cell, in sentence case at 13px', () => {
     const label = `${RECORD} tbody td::before`;
-    expect(declaration(phoneRules, label, 'content')).toBe('attr(data-label)');
+    // Drawn for the eye only (empty alternative text): the cell's column
+    // header already names it to a screen reader, which would otherwise read
+    // the column twice. The plain form stays first as the fallback.
+    const contents: string[] = [];
+    for (const rule of phoneRules.filter((r) => r.selectors.includes(label))) {
+      rule.walkDecls('content', (decl) => {
+        contents.push(decl.value);
+      });
+    }
+    expect(contents).toEqual(['attr(data-label)', "attr(data-label) / ''"]);
     expect(declaration(phoneRules, label, 'text-transform')).toBe('none');
     expect(declaration(phoneRules, label, 'font-size')).toBe('0.8125rem');
     expect(declaration(phoneRules, label, 'color')).toBe('hsl(var(--subtle-foreground))');

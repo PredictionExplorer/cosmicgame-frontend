@@ -200,9 +200,16 @@
     text-align: end;
   }
 
-  /* The label: type-label in the subtle tier, in sentence case. */
+  /*
+   * The label: type-label in the subtle tier, in sentence case. It is drawn
+   * for the eye only: the cell already has its column header (explicit
+   * roles, responsive-table.tsx), so the empty alternative text keeps a
+   * screen reader from announcing the column twice ("Holder, Holder 0x1Ec1…").
+   * A browser without the alt-text syntax keeps the first declaration.
+   */
   .cs-table:not([data-layout='compact']) tbody td::before {
     content: attr(data-label);
+    content: attr(data-label) / '';
     color: hsl(var(--subtle-foreground));
     font-size: 0.8125rem;
     font-weight: 500;

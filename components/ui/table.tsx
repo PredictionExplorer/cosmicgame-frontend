@@ -12,6 +12,8 @@ import { ResponsiveTableContainer } from '@/components/ui/responsive-table';
  * - Every cell names its column (`label`), which a phone shows beside the
  *   value when the row becomes a record; `stack` puts long text under its
  *   label instead.
+ * - Every part states its table role, which a phone record (display: block)
+ *   would otherwise lose in WebKit; see ResponsiveTable.
  * - The table is named by the heading it sits under (`labelledBy`, an id)
  *   or by `label`. A table wider than its column scrolls inside `Table`'s
  *   own container, which fades the edge with more content beyond it and,
@@ -47,6 +49,7 @@ const Table = React.forwardRef<HTMLTableElement, TableProps>(
     >
       <table
         ref={ref}
+        role="table"
         data-layout={layout}
         aria-labelledby={labelledBy}
         aria-label={labelledBy ? undefined : label}
@@ -61,25 +64,34 @@ Table.displayName = 'Table';
 const TableHeader = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
->(({ className, ...props }, ref) => <thead ref={ref} className={className} {...props} />);
+>(({ className, ...props }, ref) => (
+  <thead ref={ref} role="rowgroup" className={className} {...props} />
+));
 TableHeader.displayName = 'TableHeader';
 
 const TableBody = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
->(({ className, ...props }, ref) => <tbody ref={ref} className={className} {...props} />);
+>(({ className, ...props }, ref) => (
+  <tbody ref={ref} role="rowgroup" className={className} {...props} />
+));
 TableBody.displayName = 'TableBody';
 
 const TableFooter = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
-  <tfoot ref={ref} className={cn('border-t border-rule font-medium', className)} {...props} />
+  <tfoot
+    ref={ref}
+    role="rowgroup"
+    className={cn('border-t border-rule font-medium', className)}
+    {...props}
+  />
 ));
 TableFooter.displayName = 'TableFooter';
 
 const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTMLTableRowElement>>(
-  ({ className, ...props }, ref) => <tr ref={ref} className={className} {...props} />,
+  ({ className, ...props }, ref) => <tr ref={ref} role="row" className={className} {...props} />,
 );
 TableRow.displayName = 'TableRow';
 
@@ -91,6 +103,7 @@ const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
   ({ className, align = 'start', scope = 'col', ...props }, ref) => (
     <th
       ref={ref}
+      role={scope === 'row' || scope === 'rowgroup' ? 'rowheader' : 'columnheader'}
       scope={scope}
       data-align={align}
       className={cn(
@@ -117,6 +130,7 @@ const TableCell = React.forwardRef<HTMLTableCellElement, TableCellProps>(
   ({ className, label, align = 'start', numeric, stack, children, ...props }, ref) => (
     <td
       ref={ref}
+      role="cell"
       data-label={label}
       data-align={align}
       data-numeric={numeric ? 'true' : undefined}

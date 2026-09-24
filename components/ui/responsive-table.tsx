@@ -27,6 +27,12 @@ import { cn } from '@/lib/utils';
  *   records, so a record never shows a labelled blank line.
  * - The table has no outer box. The section around it is the one frame; the
  *   ledger itself is a header rule and row hairlines.
+ * - Every part states its table role (`table`, `rowgroup`, `row`,
+ *   `columnheader`, `cell`). A phone record sets these elements to
+ *   `display: block`, and WebKit drops the implicit roles of a table restyled
+ *   that way, so VoiceOver would otherwise lose table navigation and read
+ *   the hidden header row as stray text. The explicit roles equal the
+ *   implicit ones, so nothing changes where the table stays a table.
  *
  * `components/ui/data-table` builds on these: prefer `<DataTable>` with
  * column kinds for new tables.
@@ -160,6 +166,7 @@ interface ResponsiveTableProps extends React.TableHTMLAttributes<HTMLTableElemen
 export function ResponsiveTable({ className, layout = 'cards', ...props }: ResponsiveTableProps) {
   return (
     <table
+      role="table"
       data-testid="table"
       data-layout={layout}
       className={cn(TABLE_CLASS, 'w-full border-collapse', className)}
@@ -175,14 +182,14 @@ export function ResponsiveTableHead({
   // Not sticky: the container scrolls horizontally, which per spec forces the
   // other axis to `auto`, so a sticky header would stick to a box that never
   // scrolls vertically.
-  return <thead data-testid="thead" className={className} {...props} />;
+  return <thead role="rowgroup" data-testid="thead" className={className} {...props} />;
 }
 
 export function ResponsiveTableBody({
   className,
   ...props
 }: React.HTMLAttributes<HTMLTableSectionElement>) {
-  return <tbody data-testid="tbody" className={className} {...props} />;
+  return <tbody role="rowgroup" data-testid="tbody" className={className} {...props} />;
 }
 
 interface ColumnProps {
@@ -207,6 +214,7 @@ export function ResponsiveTableHeadCell({
 }: HeadCellProps) {
   return (
     <th
+      role="columnheader"
       data-testid="th"
       data-priority={priority}
       data-align={logicalAlign(align)}
@@ -260,6 +268,7 @@ export function ResponsiveTableCell({
 }: CellProps) {
   return (
     <td
+      role="cell"
       data-testid="td"
       data-label={label}
       data-priority={priority}
@@ -320,6 +329,7 @@ export function ResponsiveTableRow({
 
   return (
     <tr
+      role="row"
       data-testid="tr"
       data-current={current ? 'true' : undefined}
       className={cn(

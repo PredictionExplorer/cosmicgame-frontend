@@ -52,6 +52,21 @@ describe('static Table', () => {
     expect(name?.firstElementChild).toHaveAttribute('data-slot', 'value');
   });
 
+  it('states every table role, which a phone record would lose in WebKit', () => {
+    // Below 40em the records set table, rows and cells to display: block;
+    // WebKit drops implicit table semantics then, so each part says its role.
+    const { container } = render(<Contracts />);
+    expect(container.querySelector('table')).toHaveAttribute('role', 'table');
+    for (const group of container.querySelectorAll('thead, tbody')) {
+      expect(group).toHaveAttribute('role', 'rowgroup');
+    }
+    for (const row of container.querySelectorAll('tr')) expect(row).toHaveAttribute('role', 'row');
+    for (const th of container.querySelectorAll('th')) {
+      expect(th).toHaveAttribute('role', 'columnheader');
+    }
+    for (const td of container.querySelectorAll('td')) expect(td).toHaveAttribute('role', 'cell');
+  });
+
   it('is named by the heading it sits under', () => {
     render(
       <section>

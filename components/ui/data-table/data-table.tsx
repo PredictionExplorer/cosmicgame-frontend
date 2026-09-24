@@ -578,7 +578,7 @@ export function DataTable<T>({
           className={tableClassName}
         >
           <ResponsiveTableHead>
-            <tr>
+            <tr role="row">
               {visible.map((col) => (
                 <HeaderCell
                   key={col.column.id}
@@ -600,7 +600,7 @@ export function DataTable<T>({
           <ResponsiveTableBody>
             {showSkeleton
               ? Array.from({ length: skeletonRows }, (_, rowIndex) => (
-                  <tr key={rowIndex} aria-hidden="true">
+                  <tr key={rowIndex} role="row" aria-hidden="true">
                     {visible.map((col) => (
                       <ResponsiveTableCell
                         key={col.column.id}
@@ -721,8 +721,9 @@ export function DataTable<T>({
                         ) : null}
                       </ResponsiveTableRow>
                       {isExpanded ? (
-                        <tr id={detailsId} data-detail="true">
+                        <tr id={detailsId} role="row" data-detail="true">
                           <td
+                            role="cell"
                             colSpan={columnCount}
                             className="border-b border-rule-faint bg-surface-sunken px-4 py-3"
                           >
