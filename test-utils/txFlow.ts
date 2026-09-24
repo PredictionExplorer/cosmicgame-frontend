@@ -3,7 +3,7 @@
  * (useClaimAllocations, useAnchorActions, useGestureForm…). It runs the same
  * option callbacks in the same order as the real flow — prepare, approvals
  * that are still needed, write, onConfirmed, successMessage — without the
- * chain guard, receipts or toasts, which `useTxFlow.test.ts` covers.
+ * chain guard, receipts or toasts, which `useTxFlow.test.tsx` covers.
  *
  *   const mockTx = createFakeTxFlow();
  *   jest.mock('../useTxFlow', () => ({ useTxFlow: () => mockTx.flow }));
@@ -78,11 +78,16 @@ export function createFakeTxFlow(account: `0x${string}` = '0xUser' as `0x${strin
       }
       const hash = await options.write(ctx);
       const receipt = { ...fake.receipt, transactionHash: hash } as TransactionReceipt;
-      await options.onConfirmed?.(receipt, ctx);
-      state.success =
-        typeof options.successMessage === 'function'
-          ? await options.successMessage(receipt)
-          : options.successMessage;
+      // Like the real flow, nothing after confirmation turns it into a failure.
+      try {
+        await options.onConfirmed?.(receipt, ctx);
+        state.success =
+          typeof options.successMessage === 'function'
+            ? await options.successMessage(receipt)
+            : options.successMessage;
+      } catch {
+        state.success = 'toasts.tx.confirmedRefresh';
+      }
       return { status: 'confirmed', hash, receipt };
     } catch (err) {
       const info = classifyTxError(err);

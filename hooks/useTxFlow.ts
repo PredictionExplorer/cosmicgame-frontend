@@ -3,7 +3,7 @@
 import { createElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
-import { useAccount, useConfig, usePublicClient, useSwitchChain } from 'wagmi';
+import { useConfig, useConnection, usePublicClient, useSwitchChain } from 'wagmi';
 import { writeContract, type Config, type WriteContractParameters } from '@wagmi/core';
 import type {
   Abi,
@@ -24,9 +24,15 @@ import {
   REQUIRED_CHAIN_NAME,
   ensureWalletOnRequiredChain,
 } from '@/lib/chainGuard';
-import { TxRevertedError, classifyTxError, type TxErrorInfo } from '@/lib/txErrors';
+import {
+  TxCancelledInWalletError,
+  TxClientUnavailableError,
+  TxRevertedError,
+  classifyTxError,
+  type TxErrorInfo,
+} from '@/lib/txErrors';
 import { IDLE_TX_STAGE, isTxBusy, type TxStage } from '@/lib/txStage';
-import { getContractErrorDescriptor } from '@/utils/contractErrors';
+import { getContractErrorDescriptor, withDecodedContractError } from '@/utils/contractErrors';
 import { reportError } from '@/utils/errors';
 
 export { isTxBusy, txStageHash, type TxStage, type TxStatusName } from '@/lib/txStage';
@@ -116,7 +122,12 @@ export interface TxRunOptions {
    * shortfall with amounts). Return null to fall back to the defaults.
    */
   describeError?: (err: unknown, info: TxErrorInfo) => string | null;
-  /** Runs after the receipt confirms and before the success toast. */
+  /**
+   * Runs after the receipt confirms and before the success toast. A throw
+   * here (a follow-up read that hits a rate limit…) is reported and the flow
+   * still ends `confirmed`, with a generic success toast: a mined transaction
+   * is never shown as failed.
+   */
   onConfirmed?: (receipt: TransactionReceipt, ctx: TxContext) => void | Promise<void>;
   /** Sentry context for unexpected failures. */
   errorContext?: string;
@@ -125,7 +136,11 @@ export interface TxRunOptions {
 export type TxResult =
   | { status: 'confirmed'; hash: Hash; receipt: TransactionReceipt }
   | { status: 'failed'; error: TxErrorInfo; hash?: Hash }
-  | { status: 'cancelled' }
+  /**
+   * Declined in the wallet (nothing sent), or cancelled from the wallet after
+   * sending — then `hash` is the mined replacement, which paid a network fee.
+   */
+  | { status: 'cancelled'; hash?: Hash }
   /** `prepare` returned false, or no wallet was connected. */
   | { status: 'aborted' }
   /** Another run of this flow is still in progress. */
@@ -176,8 +191,8 @@ export function useTxFlow(): UseTxFlowResult {
   const t = useTranslations('toasts');
   const config = useConfig();
   const publicClient = usePublicClient({ chainId: activeChain.id });
-  const { address, chainId: walletChainId } = useAccount();
-  const { switchChainAsync } = useSwitchChain();
+  const { address, chainId: walletChainId } = useConnection();
+  const { mutateAsync: switchChainAsync } = useSwitchChain();
   const walletUi = useOptionalWalletUi();
 
   const [stage, setStage] = useState<TxStage>(IDLE_TX_STAGE);
@@ -190,6 +205,8 @@ export function useTxFlow(): UseTxFlowResult {
     };
   }, []);
 
+  // After an unmount the flow keeps going (the transaction is already in the
+  // wallet or on-chain) and its toast keeps reporting; only the stage stops.
   const update = useCallback((next: TxStage) => {
     if (mountedRef.current) setStage(next);
   }, []);
@@ -230,6 +247,7 @@ export function useTxFlow(): UseTxFlowResult {
         return { status: 'busy' };
       }
       const toastId = `tx-${++toastSequence}`;
+      const errorContext = options.errorContext ?? 'tx-flow';
 
       if (!address) {
         update({ status: 'idle' });
@@ -258,28 +276,52 @@ export function useTxFlow(): UseTxFlowResult {
           } as unknown as WriteContractParameters),
       };
 
-      const waitForReceipt = async (hash: Hash): Promise<TransactionReceipt> => {
-        if (!publicClient) throw new Error('Public client is unavailable.');
-        let replacedBy: 'cancelled' | null = null;
-        const receipt = await publicClient.waitForTransactionReceipt({
+      const waitForReceipt = async (
+        client: NonNullable<typeof publicClient>,
+        hash: Hash,
+      ): Promise<TransactionReceipt> => {
+        let cancelledInWallet = false;
+        const receipt = await client.waitForTransactionReceipt({
           hash,
           timeout: RECEIPT_TIMEOUT_MS,
           onReplaced: (replacement) => {
             // A speed-up in the wallet replaces the hash; follow it so the
-            // explorer link stays right. A wallet "cancel" is a cancellation.
-            if (replacement.reason === 'cancelled') replacedBy = 'cancelled';
+            // explorer link stays right. A wallet "cancel" mines a zero-value
+            // replacement instead: a cancellation, but one that paid a fee.
+            if (replacement.reason === 'cancelled') cancelledInWallet = true;
             currentHash = replacement.transaction.hash;
           },
         });
-        if (replacedBy === 'cancelled') {
-          throw new ChainGuardError('rejected');
+        if (cancelledInWallet) {
+          throw new TxCancelledInWalletError(receipt.transactionHash ?? currentHash ?? hash);
         }
         if (receipt.status !== 'success') throw new TxRevertedError(receipt.transactionHash);
         return receipt;
       };
 
+      /**
+       * Success copy for a mined transaction. Everything from here on runs
+       * after confirmation, so nothing may turn the outcome into a failure: a
+       * throwing `onConfirmed` or copy builder is reported and the toast falls
+       * back to a generic confirmation that suggests a refresh.
+       */
+      const confirmedMessage = async (receipt: TransactionReceipt): Promise<string | null> => {
+        try {
+          await options.onConfirmed?.(receipt, ctx);
+          return typeof options.successMessage === 'function'
+            ? await options.successMessage(receipt)
+            : options.successMessage;
+        } catch (postConfirmErr) {
+          reportError(postConfirmErr, `${errorContext}-post-confirm`);
+          return t('tx.confirmedRefresh');
+        }
+      };
+
       try {
         update({ status: 'preparing' });
+        // Checked before any wallet prompt: without a client for the
+        // protocol's chain the flow could send but never follow the result.
+        if (!publicClient) throw new TxClientUnavailableError();
 
         const chainStatus = await ensureWalletOnRequiredChain(config, {
           fallbackChainId: walletChainId ?? null,
@@ -321,7 +363,7 @@ export function useTxFlow(): UseTxFlowResult {
             id: toastId,
             description: explorerLink(approvalHash),
           });
-          await waitForReceipt(approvalHash);
+          await waitForReceipt(publicClient, approvalHash);
         }
 
         update({ status: 'awaiting-signature', step: total, total });
@@ -337,15 +379,11 @@ export function useTxFlow(): UseTxFlowResult {
           description: explorerLink(hash),
         });
 
-        const receipt = await waitForReceipt(hash);
+        const receipt = await waitForReceipt(publicClient, hash);
         const finalHash = receipt.transactionHash ?? currentHash ?? hash;
         update({ status: 'confirmed', hash: finalHash });
-        await options.onConfirmed?.(receipt, ctx);
 
-        const success =
-          typeof options.successMessage === 'function'
-            ? await options.successMessage(receipt)
-            : options.successMessage;
+        const success = await confirmedMessage(receipt);
         if (success) {
           toast.success(success, {
             id: toastId,
@@ -357,14 +395,29 @@ export function useTxFlow(): UseTxFlowResult {
         }
         return { status: 'confirmed', hash: finalHash, receipt };
       } catch (err) {
-        const info = classifyTxError(err);
-        if (info.kind === 'rejected') {
+        const classified = classifyTxError(err);
+        if (classified.kind === 'rejected') {
           update({ status: 'cancelled' });
           toast.info(t('walletTransactionCancelled'), { id: toastId });
           return { status: 'cancelled' };
         }
+        if (err instanceof TxCancelledInWalletError) {
+          const replacementHash = err.hash as Hash;
+          update({ status: 'cancelled', hash: replacementHash });
+          toast.info(t('tx.status.cancelledInWallet'), {
+            id: toastId,
+            description: explorerLink(replacementHash),
+            duration: SUCCESS_TOAST_MS,
+          });
+          return { status: 'cancelled', hash: replacementHash };
+        }
 
-        reportError(err, options.errorContext ?? 'tx-flow');
+        reportError(err, errorContext);
+        // "Copy details" carries the decoded custom error and its arguments.
+        const info: TxErrorInfo = {
+          ...classified,
+          details: withDecodedContractError(classified.details, err),
+        };
         const descriptor = getContractErrorDescriptor(err);
         const message =
           options.describeError?.(err, info) ??

@@ -32,6 +32,8 @@ describe('TxStatus', () => {
     [{ status: 'pending', hash: '0x1' }, 'toasts.tx.button.pending'],
     [{ status: 'confirmed', hash: '0x1' }, 'toasts.tx.status.confirmed'],
     [{ status: 'cancelled' }, 'toasts.tx.status.cancelled'],
+    // A wallet "cancel" after sending: the replacement paid a fee.
+    [{ status: 'cancelled', hash: '0xc4' }, 'toasts.tx.status.cancelledInWallet'],
   ])('describes %o', (stage, text) => {
     render(<TxStatus stage={stage} />);
     expect(screen.getByRole('status')).toHaveTextContent(text);

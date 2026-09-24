@@ -33,7 +33,6 @@
   },
   "network": {
     "unavailable": "网络暂不可用，请重新连接钱包。",
-    "switchForGesture": "落笔前，请将钱包切换至 {network}。",
     "wrongChain": "钱包尚未连接完成，或当前处于其他网络。请切换至 {network} 后重试。"
   },
   "gesture": {
@@ -220,8 +219,10 @@
     },
     "status": {
       "confirmed": "已在链上确认。",
-      "cancelled": "已在钱包中取消，未发送任何内容。"
+      "cancelled": "已在钱包中取消，未发送任何内容。",
+      "cancelledInWallet": "已在钱包中取消。取消操作消耗了网络手续费，除此之外未发送任何内容。"
     },
+    "confirmedRefresh": "已在链上确认。如果页面尚未更新，请刷新页面。",
     "error": {
       "insufficientFunds": "钱包在 {network} 上的 ETH 不足以支付本次交易及网络手续费。",
       "wrongNetwork": "钱包当前处于其他网络。请切换至 {network} 后重试。",

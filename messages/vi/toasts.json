@@ -33,7 +33,6 @@
   },
   "network": {
     "unavailable": "Mạng không khả dụng — vui lòng kết nối lại ví.",
-    "switchForGesture": "Hãy chuyển ví sang {network} trước khi đặt nét bút.",
     "wrongChain": "Ví vẫn đang kết nối hoặc đang ở mạng khác. Hãy chuyển sang {network} và thử lại."
   },
   "gesture": {
@@ -220,8 +219,10 @@
     },
     "status": {
       "confirmed": "Đã xác nhận trên chuỗi.",
-      "cancelled": "Đã hủy trong ví. Không có gì được gửi."
+      "cancelled": "Đã hủy trong ví. Không có gì được gửi.",
+      "cancelledInWallet": "Đã hủy trong ví. Việc hủy đã tốn phí mạng, ngoài ra không có gì được gửi."
     },
+    "confirmedRefresh": "Đã xác nhận trên chuỗi. Nếu trang chưa cập nhật, hãy tải lại trang.",
     "error": {
       "insufficientFunds": "Ví không đủ ETH trên {network} để trả cho giao dịch này và phí mạng.",
       "wrongNetwork": "Ví đang ở mạng khác. Hãy chuyển sang {network} và thử lại.",

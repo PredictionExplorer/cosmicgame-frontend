@@ -1,20 +1,14 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { AlertCircle, Check, CircleSlash, ExternalLink, Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
+import { useTxStageLabel } from '@/hooks/useTxStageLabel';
+import { stateTone } from '@/lib/stateTone';
+import type { TxStage } from '@/lib/txStage';
 import { cn } from '@/lib/utils';
 import { getExplorerUrl } from '@/utils/urls';
-import { useTxStageLabel } from '@/hooks/useTxStageLabel';
-import type { TxStage } from '@/lib/txStage';
-
-/**
- * Semantic state colours. `--positive` / `--critical` are the palette-tuned
- * state tokens; until a palette defines them the fallbacks match the shared
- * defaults, so every palette renders the same readable hue.
- */
-const POSITIVE_TEXT = 'text-[hsl(var(--positive,var(--success)))]';
-const CRITICAL_TEXT = 'text-[hsl(var(--critical,0_80%_72%))]';
 
 interface TxExplorerLinkProps {
   hash: string;
@@ -71,10 +65,10 @@ function StepDot({ state }: { state: StepState }) {
       aria-hidden
       className={cn(
         'relative inline-flex h-2 w-2 shrink-0 rounded-full',
-        state === 'done' && 'bg-[hsl(var(--positive,var(--success)))]',
+        state === 'done' && stateTone.positiveDot,
         state === 'current' && 'bg-primary',
         state === 'upcoming' && 'bg-muted-foreground/40',
-        state === 'failed' && 'bg-[hsl(var(--critical,0_80%_72%))]',
+        state === 'failed' && stateTone.criticalDot,
       )}
     />
   );
@@ -104,7 +98,7 @@ export function TxStatus({ stage, variant = 'line', className }: TxStatusProps) 
   const hash = 'hash' in stage ? stage.hash : undefined;
   const steps = variant === 'steps' ? stepStates(stage) : null;
 
-  let icon: React.ReactNode = null;
+  let icon: ReactNode = null;
   let message: string | null = null;
   let tone = 'text-muted-foreground';
 
@@ -112,18 +106,20 @@ export function TxStatus({ stage, variant = 'line', className }: TxStatusProps) 
     case 'idle':
       break;
     case 'confirmed':
-      icon = <Check className={cn('h-4 w-4 shrink-0', POSITIVE_TEXT)} aria-hidden />;
+      icon = <Check className={cn('h-4 w-4 shrink-0', stateTone.positiveText)} aria-hidden />;
       message = t('tx.status.confirmed');
       tone = 'text-foreground';
       break;
     case 'failed':
-      icon = <AlertCircle className={cn('h-4 w-4 shrink-0', CRITICAL_TEXT)} aria-hidden />;
+      icon = <AlertCircle className={cn('h-4 w-4 shrink-0', stateTone.criticalText)} aria-hidden />;
       message = stage.message;
       tone = 'text-foreground';
       break;
     case 'cancelled':
       icon = <CircleSlash className="h-4 w-4 shrink-0" aria-hidden />;
-      message = t('tx.status.cancelled');
+      // With a hash, the wallet's "cancel" replaced a sent transaction: the
+      // replacement paid a fee, so "nothing was sent" would be wrong.
+      message = stage.hash ? t('tx.status.cancelledInWallet') : t('tx.status.cancelled');
       break;
     default:
       icon = <Loader2 className="h-4 w-4 shrink-0 animate-spin text-primary" aria-hidden />;
@@ -148,7 +144,7 @@ export function TxStatus({ stage, variant = 'line', className }: TxStatusProps) 
               <span
                 className={cn(
                   steps[key] === 'current' && 'font-semibold text-foreground',
-                  steps[key] === 'failed' && CRITICAL_TEXT,
+                  steps[key] === 'failed' && stateTone.criticalText,
                 )}
               >
                 {t(`tx.steps.${key}`)}

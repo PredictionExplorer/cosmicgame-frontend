@@ -167,11 +167,20 @@ export function useAllocationFinalize({
         write: (ctx) =>
           ctx.writeContract({ ...contract, functionName: 'claimMainPrize', gas: gasLimit }),
         onConfirmed: async () => {
-          const roundAfter = (await publicClient.readContract({
-            ...contract,
-            functionName: 'roundNum',
-          })) as bigint;
-          if (roundAfter <= roundBefore) {
+          // A successful claimMainPrize receipt already means the cycle
+          // advanced; this read only double-checks it. When the read itself
+          // fails (a rate limit, a flaky RPC) the receipt stands, so the
+          // participant still reaches the confirmation page.
+          let roundAfter: bigint | null = null;
+          try {
+            roundAfter = (await publicClient.readContract({
+              ...contract,
+              functionName: 'roundNum',
+            })) as bigint;
+          } catch (readErr) {
+            reportError(readErr, 'finalize-cycle-round-check');
+          }
+          if (roundAfter !== null && roundAfter <= roundBefore) {
             notify('warning', t('finalize.roundDidNotAdvance'));
             return;
           }

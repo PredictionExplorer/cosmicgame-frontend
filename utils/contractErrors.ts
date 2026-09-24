@@ -12,11 +12,6 @@ import { cosmicGameAbi } from '@/contracts/abis';
  * viem into their bundle.
  */
 
-/** Detects viem's `ContractFunctionExecutionError` (on-chain revert) by error name. */
-export function isContractRevertError(err: unknown): boolean {
-  return err instanceof Error && err.name === 'ContractFunctionExecutionError';
-}
-
 /** Detects reads against addresses with no bytecode in local/e2e environments. */
 export function isEmptyContractReadError(err: unknown): boolean {
   if (!(err instanceof Error)) return false;
@@ -41,21 +36,6 @@ export function isEmptyContractReadError(err: unknown): boolean {
 
   return isEmptyContractReadError(walkable.cause);
 }
-
-const CUSTOM_ERROR_MESSAGES: Record<string, string> = {
-  InsufficientReceivedBidAmount:
-    'The current Gesture Cost is greater than the amount you transferred.',
-  UsedRandomWalkNft: 'This RandomWalk NFT has already been used for a gesture.',
-  CallerIsNotNftOwner: 'You are not the owner of this NFT.',
-  RoundIsInactive: 'The current cycle is not active.',
-  TooLongBidMessage: 'Your gesture message is too long.',
-  WrongBidType: 'Wrong gesture type selected.',
-  FundTransferFailed: 'Fund transfer failed.',
-  MainPrizeEarlyClaim: 'Not enough time has elapsed to retrieve the Signature Allocation.',
-  MainPrizeClaimDenied:
-    'Only the Last Participant is permitted to retrieve the Signature Allocation.',
-  NoBidsPlacedInCurrentRound: 'No gestures have been made in the current cycle yet.',
-};
 
 const CUSTOM_ERROR_TRANSLATION_KEYS: Record<string, string> = {
   InsufficientReceivedBidAmount: 'gesture.contractErrors.insufficientReceivedBidAmount',
@@ -197,36 +177,6 @@ export function getContractErrorDescriptor(
 }
 
 /**
- * Returns a user-friendly error message for contract revert failures.
- * Decodes known contract custom errors and detects gesture-cost-rose scenarios.
- *
- * @param err - The caught error
- * @param displayedEthPrice - The ETH price (in ETH, not wei) shown to the user
- *   before submitting; used to compute the price-rose delta for
- *   `InsufficientReceivedBidAmount`.
- * @returns A friendly message string, or `null` to fall back to generic handling.
- */
-export function getContractErrorMessage(
-  err: unknown,
-  optionsOrDisplayedEthPrice?: number | ContractErrorOptions,
-): string | null {
-  const descriptor = getContractErrorDescriptor(err, optionsOrDisplayedEthPrice);
-  if (!descriptor) return null;
-
-  if (descriptor.key === 'gesture.contractErrors.cstCostChanged') {
-    return (
-      `CST Gesture Cost changed while your transaction was in transit, likely because another gesture landed first. ` +
-      `The contract required ${descriptor.values?.required} CST, above your ${descriptor.values?.maximum} CST maximum. Refresh and try again.`
-    );
-  }
-  if (descriptor.key === 'gesture.contractErrors.ethCostChanged') {
-    return `Gesture Cost rose by ${descriptor.values?.increase} ETH while your transaction was in transit. The new required cost is ${descriptor.values?.required} ETH. Please try again.`;
-  }
-
-  return CUSTOM_ERROR_MESSAGES[descriptor.errorName] ?? null;
-}
-
-/**
  * Custom errors that the V2 bid paths can revert with but that are missing from
  * the generated `cosmicGameAbi` (the ABI has the V2 bid *functions* but not these
  * V2 error definitions). Regenerating the ABI from the V2 contracts would make
@@ -297,7 +247,7 @@ function formatArgValue(v: unknown): string {
  * narrow per-function ABI slice with no error defs). Returns `null` when the
  * error is not a decodable contract revert.
  */
-export function formatCustomContractError(err: unknown): string | null {
+function formatCustomContractError(err: unknown): string | null {
   const data = extractRevertData(err);
   if (!data || data === '0x') return null;
   try {
@@ -319,4 +269,15 @@ export function formatCustomContractError(err: unknown): string | null {
   } catch {
     return null;
   }
+}
+
+/**
+ * A classified error's technical summary plus the decoded custom error with
+ * its named arguments, when the revert carried one. For "Copy details" and
+ * support only; the UI always shows a localized sentence instead.
+ */
+export function withDecodedContractError(details: string, err: unknown): string {
+  const decoded = formatCustomContractError(err);
+  if (!decoded || details.includes(decoded)) return details;
+  return details ? `${details}\n${decoded}` : decoded;
 }

@@ -3,8 +3,11 @@ import { act, renderHook } from '@testing-library/react';
 import { toast } from 'sonner';
 import { getConnectorClient, writeContract } from '@wagmi/core';
 import { getChainId } from 'viem/actions';
+// The real encoder (the `viem` entry is a jest mock).
+import { encodeErrorResult } from 'viem/utils';
 
 import { WalletUiProvider } from '@/contexts/WalletUiContext';
+import { reportError } from '@/utils/errors';
 
 import { useTxFlow, useTxStageLabel, type TxRunOptions, type TxStage } from '../useTxFlow';
 
@@ -28,12 +31,14 @@ const mockConfig = { id: 'config' };
 let mockAddress: `0x${string}` | undefined = '0xUser';
 const mockSwitchChainAsync = jest.fn();
 const mockWaitForReceipt = jest.fn();
+let mockHasPublicClient = true;
 
 jest.mock('wagmi', () => ({
   useConfig: () => mockConfig,
-  useAccount: () => ({ address: mockAddress, chainId: APP_CHAIN }),
-  usePublicClient: () => ({ waitForTransactionReceipt: mockWaitForReceipt }),
-  useSwitchChain: () => ({ switchChainAsync: mockSwitchChainAsync }),
+  useConnection: () => ({ address: mockAddress, chainId: APP_CHAIN }),
+  usePublicClient: () =>
+    mockHasPublicClient ? { waitForTransactionReceipt: mockWaitForReceipt } : undefined,
+  useSwitchChain: () => ({ mutateAsync: mockSwitchChainAsync }),
 }));
 
 const mockToast = toast as unknown as Record<
@@ -43,6 +48,7 @@ const mockToast = toast as unknown as Record<
 const mockWriteContract = writeContract as jest.Mock;
 const mockGetConnectorClient = getConnectorClient as jest.Mock;
 const mockGetChainId = getChainId as jest.Mock;
+const mockReportError = reportError as jest.Mock;
 
 const SIGN_REQUEST = { address: '0xContract', abi: [], functionName: 'doIt' } as const;
 
@@ -59,6 +65,7 @@ function baseOptions(overrides: Partial<TxRunOptions> = {}): TxRunOptions {
 beforeEach(() => {
   jest.clearAllMocks();
   mockAddress = '0xUser';
+  mockHasPublicClient = true;
   mockGetConnectorClient.mockResolvedValue({ id: 'connector-client' });
   mockGetChainId.mockResolvedValue(APP_CHAIN);
   mockSwitchChainAsync.mockResolvedValue(undefined);
@@ -245,6 +252,36 @@ describe('useTxFlow — failures', () => {
     expect(stage).toMatchObject({ status: 'failed', message: 'Action fallback.' });
   });
 
+  it('puts the decoded custom error and its arguments behind Copy details', async () => {
+    const writeText = jest.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+    const data = encodeErrorResult({
+      abi: [
+        {
+          type: 'error',
+          name: 'BidCstRewardAmountMinLimitNotReached',
+          inputs: [
+            { name: 'bidCstRewardAmount', type: 'uint256' },
+            { name: 'bidCstRewardAmountMinLimit', type: 'uint256' },
+          ],
+        },
+      ],
+      errorName: 'BidCstRewardAmountMinLimitNotReached',
+      args: [777n, 666n],
+    });
+    mockWriteContract.mockRejectedValue(
+      Object.assign(new Error('execution reverted'), { cause: { data } }),
+    );
+    const { result } = await run(baseOptions());
+
+    const [, options] = mockToast.error.mock.calls[0]!;
+    options.action.onClick({ preventDefault: jest.fn() });
+    const copied = String(writeText.mock.calls[0]![0]);
+    expect(copied).toContain('CosmicSignatureErrors.BidCstRewardAmountMinLimitNotReached(');
+    expect(copied).toContain('bidCstRewardAmount = 777');
+    expect(result).toMatchObject({ error: { details: copied } });
+  });
+
   it('explains a known cause instead of the fallback', async () => {
     mockWriteContract.mockRejectedValue({
       name: 'InsufficientFundsError',
@@ -318,6 +355,128 @@ describe('useTxFlow — failures', () => {
         action: expect.objectContaining({ label: 'toasts.tx.connectWallet' }),
       }),
     );
+  });
+});
+
+describe('useTxFlow — after confirmation', () => {
+  it('never reports a confirmed transaction as failed when onConfirmed throws', async () => {
+    const { result, hook } = await run(
+      baseOptions({
+        errorContext: 'finalize-cycle',
+        onConfirmed: async () => {
+          throw new Error('429 Too Many Requests');
+        },
+        successMessage: () => 'Flow copy that depends on onConfirmed',
+      }),
+    );
+
+    expect(result).toMatchObject({ status: 'confirmed', hash: '0xhash' });
+    expect(hook.result.current.stage).toEqual({ status: 'confirmed', hash: '0xhash' });
+    expect(mockToast.error).not.toHaveBeenCalled();
+    // A generic confirmation that suggests a refresh, with the explorer link.
+    expect(mockToast.success).toHaveBeenCalledWith(
+      'toasts.tx.confirmedRefresh',
+      expect.objectContaining({ description: expect.anything() }),
+    );
+    expect(mockReportError).toHaveBeenCalledWith(
+      expect.objectContaining({ message: '429 Too Many Requests' }),
+      'finalize-cycle-post-confirm',
+    );
+  });
+
+  it('falls back to the generic confirmation when the copy builder throws', async () => {
+    const { result } = await run(
+      baseOptions({
+        successMessage: () => {
+          throw new Error('no event in receipt');
+        },
+      }),
+    );
+
+    expect(result.status).toBe('confirmed');
+    expect(mockToast.success).toHaveBeenCalledWith('toasts.tx.confirmedRefresh', expect.anything());
+    expect(mockReportError).toHaveBeenCalledWith(expect.any(Error), 'tx-flow-post-confirm');
+  });
+
+  it('keeps reporting after the component unmounts mid-flow', async () => {
+    let release!: (hash: string) => void;
+    mockWriteContract.mockImplementationOnce(
+      () => new Promise<string>((resolve) => (release = resolve)),
+    );
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    const hook = renderHook(() => useTxFlow());
+
+    let pending!: Promise<unknown>;
+    await act(async () => {
+      pending = hook.result.current.run(baseOptions());
+      await Promise.resolve();
+    });
+    hook.unmount();
+
+    let result: unknown;
+    await act(async () => {
+      release('0xhash');
+      result = await pending;
+    });
+
+    expect(result).toMatchObject({ status: 'confirmed', hash: '0xhash' });
+    // The lifecycle toast still reaches its end state for the person who left.
+    expect(mockToast.success).toHaveBeenCalledWith('Done.', expect.anything());
+    expect(errorSpy).not.toHaveBeenCalled();
+    errorSpy.mockRestore();
+  });
+});
+
+describe('useTxFlow — receipts', () => {
+  it('says the transaction may still land when the receipt times out, with its link', async () => {
+    mockWaitForReceipt.mockRejectedValue(
+      Object.assign(new Error('Timed out while waiting for transaction.'), {
+        name: 'WaitForTransactionReceiptTimeoutError',
+      }),
+    );
+    const { result, hook } = await run(baseOptions());
+
+    expect(result).toMatchObject({ status: 'failed', hash: '0xhash', error: { kind: 'timeout' } });
+    expect(mockToast.error).toHaveBeenCalledWith(
+      'toasts.tx.error.timeout(explorer=Arbiscan)',
+      expect.objectContaining({
+        description: expect.anything(),
+        duration: Number.POSITIVE_INFINITY,
+      }),
+    );
+    expect(hook.result.current.stage).toMatchObject({ status: 'failed', hash: '0xhash' });
+  });
+
+  it('reads a wallet cancel as a cancellation that paid a fee, not as rejected', async () => {
+    mockWaitForReceipt.mockImplementation(async ({ onReplaced }) => {
+      onReplaced?.({ reason: 'cancelled', transaction: { hash: '0xcancel' } });
+      return { status: 'success', transactionHash: '0xcancel', logs: [] };
+    });
+    const { result, hook } = await run(baseOptions());
+
+    expect(result).toEqual({ status: 'cancelled', hash: '0xcancel' });
+    expect(hook.result.current.stage).toEqual({ status: 'cancelled', hash: '0xcancel' });
+    expect(mockToast.info).toHaveBeenCalledWith(
+      'toasts.tx.status.cancelledInWallet',
+      expect.objectContaining({ description: expect.anything() }),
+    );
+    expect(mockToast.info).not.toHaveBeenCalledWith(
+      'toasts.walletTransactionCancelled',
+      expect.anything(),
+    );
+    expect(mockToast.success).not.toHaveBeenCalled();
+    expect(mockToast.error).not.toHaveBeenCalled();
+  });
+
+  it('fails before any wallet prompt when it could not follow the transaction', async () => {
+    mockHasPublicClient = false;
+    mockGetChainId.mockResolvedValue(1);
+    const { result } = await run(baseOptions());
+
+    expect(result).toMatchObject({ status: 'failed', error: { kind: 'network' } });
+    expect(mockSwitchChainAsync).not.toHaveBeenCalled();
+    expect(mockWriteContract).not.toHaveBeenCalled();
+    expect(mockToast.error).toHaveBeenCalledWith('toasts.tx.error.network', expect.anything());
   });
 });
 

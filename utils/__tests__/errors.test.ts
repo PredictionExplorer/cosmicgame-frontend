@@ -8,7 +8,7 @@ import {
   reportError,
   reportErrorThrottled,
 } from '@/utils/errors';
-import { isContractRevertError, isEmptyContractReadError } from '@/utils/contractErrors';
+import { isEmptyContractReadError } from '@/utils/contractErrors';
 
 jest.mock('@sentry/nextjs', () => ({
   captureException: jest.fn(),
@@ -157,34 +157,6 @@ describe('getEthErrorMessage', () => {
 
   it('returns fallback for string error', () => {
     expect(getEthErrorMessage('something broke')).toBe('An error occurred');
-  });
-});
-
-describe('isContractRevertError', () => {
-  it('returns true for Error with name ContractFunctionExecutionError', () => {
-    const err = new Error('The contract function "systemMode" reverted.');
-    err.name = 'ContractFunctionExecutionError';
-    expect(isContractRevertError(err)).toBe(true);
-  });
-
-  it('returns false for a plain Error', () => {
-    expect(isContractRevertError(new Error('generic'))).toBe(false);
-  });
-
-  it('returns false for null', () => {
-    expect(isContractRevertError(null)).toBe(false);
-  });
-
-  it('returns false for undefined', () => {
-    expect(isContractRevertError(undefined)).toBe(false);
-  });
-
-  it('returns false for a string', () => {
-    expect(isContractRevertError('ContractFunctionExecutionError')).toBe(false);
-  });
-
-  it('returns false for a non-Error object with matching name', () => {
-    expect(isContractRevertError({ name: 'ContractFunctionExecutionError' })).toBe(false);
   });
 });
 

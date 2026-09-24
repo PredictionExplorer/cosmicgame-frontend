@@ -17,6 +17,12 @@ import { isTransientNetworkError, isUserRejection } from '@/utils/errors';
 export type TxErrorKind =
   /** The person dismissed or rejected the wallet prompt. Not a failure. */
   | 'rejected'
+  /**
+   * The person cancelled a sent transaction from their wallet, which replaced
+   * it with a zero-value transaction. Not a failure, but unlike `rejected`
+   * the replacement was mined and paid a network fee.
+   */
+  | 'cancelled-in-wallet'
   /** The wallet cannot cover the value plus gas. */
   | 'insufficient-funds'
   /** The wallet is connected to a different chain than the protocol's. */
@@ -52,6 +58,31 @@ export class TxRevertedError extends Error {
     super(`Transaction ${hash} reverted on-chain.`);
     this.name = 'TxRevertedError';
     this.hash = hash;
+  }
+}
+
+/**
+ * Thrown by the transaction flow when the wallet's "cancel" replaced the
+ * transaction: `hash` is the mined replacement, which spent a network fee.
+ */
+export class TxCancelledInWalletError extends Error {
+  readonly hash: string;
+  constructor(hash: string) {
+    super(`Transaction was cancelled in the wallet and replaced by ${hash}.`);
+    this.name = 'TxCancelledInWalletError';
+    this.hash = hash;
+  }
+}
+
+/**
+ * Thrown before any wallet prompt when the app has no client for the
+ * protocol's chain (RPC transport missing), so it could not follow the
+ * transaction after sending it. Reads as a network failure.
+ */
+export class TxClientUnavailableError extends Error {
+  constructor() {
+    super('No public client for the protocol chain.');
+    this.name = 'TxClientUnavailableError';
   }
 }
 
@@ -159,7 +190,11 @@ export function classifyTxError(err: unknown): TxErrorInfo {
   });
   const find = (set: Set<string>) => names.find((name) => set.has(name)) ?? null;
 
+  if (names.includes('TxCancelledInWalletError')) {
+    return result('cancelled-in-wallet', 'TxCancelledInWalletError');
+  }
   if (isUserRejection(err)) return result('rejected', 'UserRejectedRequestError');
+  if (names.includes('TxClientUnavailableError')) return result('network');
 
   const wrongNetwork = find(WRONG_NETWORK_NAMES);
   if (wrongNetwork) return result('wrong-network', wrongNetwork);

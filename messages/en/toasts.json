@@ -33,7 +33,6 @@
   },
   "network": {
     "unavailable": "Network unavailable — please reconnect your wallet.",
-    "switchForGesture": "Switch your wallet to {network} before making a gesture.",
     "wrongChain": "Your wallet is still connecting or is on another network. Switch to {network} and try again."
   },
   "gesture": {
@@ -220,8 +219,10 @@
     },
     "status": {
       "confirmed": "Confirmed on-chain.",
-      "cancelled": "Cancelled in your wallet. Nothing was sent."
+      "cancelled": "Cancelled in your wallet. Nothing was sent.",
+      "cancelledInWallet": "Cancelled in your wallet. The cancellation used a network fee; nothing else was sent."
     },
+    "confirmedRefresh": "Confirmed on-chain. Refresh the page if it hasn’t updated yet.",
     "error": {
       "insufficientFunds": "Your wallet doesn't have enough ETH on {network} for this transaction and its network fee.",
       "wrongNetwork": "Your wallet is on another network. Switch to {network} and try again.",

@@ -25,7 +25,15 @@ export type TxStage =
   | { status: 'pending'; hash: Hash }
   | { status: 'confirmed'; hash: Hash }
   | { status: 'failed'; error: TxErrorInfo; message: string; hash?: Hash }
-  | { status: 'cancelled' };
+  | {
+      status: 'cancelled';
+      /**
+       * Set when the wallet's "cancel" replaced a sent transaction: the mined
+       * replacement, which paid a network fee. Absent for a declined prompt,
+       * where nothing was sent.
+       */
+      hash?: Hash;
+    };
 
 export type TxStatusName = TxStage['status'];
 

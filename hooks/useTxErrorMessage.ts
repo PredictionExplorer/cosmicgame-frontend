@@ -22,6 +22,8 @@ export function useTxErrorMessage(): (info: TxErrorInfo, fallback?: string) => s
       switch (info.kind) {
         case 'rejected':
           return t('walletTransactionCancelled');
+        case 'cancelled-in-wallet':
+          return t('tx.status.cancelledInWallet');
         case 'insufficient-funds':
           return t('tx.error.insufficientFunds', { network: REQUIRED_CHAIN_NAME });
         case 'wrong-network':

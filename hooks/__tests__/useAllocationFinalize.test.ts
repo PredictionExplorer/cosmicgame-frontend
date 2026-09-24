@@ -393,6 +393,29 @@ describe('useAllocationFinalize', () => {
     expect(mockTx.lastSuccessMessage()).toBeNull();
   });
 
+  it('trusts the receipt when the round check read fails, and still redirects', async () => {
+    mockReadRoundNum.mockReset();
+    mockReadRoundNum
+      .mockResolvedValueOnce(BigInt(5))
+      .mockRejectedValueOnce(new Error('429 Too Many Requests'));
+
+    const { result } = renderHook(() => useAllocationFinalize({ data: baseData, offset: 0 }));
+
+    let success: boolean | undefined;
+    await act(async () => {
+      success = await result.current.onFinalize();
+    });
+
+    expect(success).toBe(true);
+    expect(mockNotify).not.toHaveBeenCalledWith('warning', 'toasts.finalize.roundDidNotAdvance');
+    expect(mockReportError).toHaveBeenCalledWith(
+      expect.objectContaining({ message: '429 Too Many Requests' }),
+      'finalize-cycle-round-check',
+    );
+    expect(mockPush).toHaveBeenCalledWith('/allocation-finalized?cycle=5&message=success');
+    expect(mockTx.lastSuccessMessage()).toBe('toasts.cycleFinalized');
+  });
+
   it('warns if on-chain round went backwards (chain reorg edge case)', async () => {
     mockReadRoundNum.mockReset();
     mockReadRoundNum.mockResolvedValueOnce(BigInt(5)).mockResolvedValueOnce(BigInt(4));
