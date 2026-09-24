@@ -1,8 +1,9 @@
 import { useTranslations } from 'next-intl';
 import {
-  ArrowDown,
   ArrowRight,
   Atom,
+  ChevronDown,
+  ChevronRight,
   Fingerprint,
   Hash,
   Image as ImageIcon,
@@ -23,9 +24,10 @@ export const RENDER_PIPELINE_STEPS = [
 ] as const satisfies ReadonlyArray<{ id: string; icon: LucideIcon }>;
 
 /**
- * How the viewer's program turns a seed into an image, as a chain of five
- * steps: a row joined by arrows from `lg`, a column joined by downward
- * arrows below it. The last step leads to the gallery, where the images are.
+ * How the viewer's program turns a seed into an image, as a chain: five
+ * numbered nodes joined by a hairline, left to right from `lg` and top to
+ * bottom below it, with no boxes around the steps. The last step leads to
+ * the gallery, where the images are.
  */
 export function RenderPipeline() {
   const t = useTranslations('code');
@@ -38,47 +40,46 @@ export function RenderPipeline() {
         title={t('pipeline.heading')}
         description={t('pipeline.description')}
       />
-      <ol className="grid gap-8 lg:grid-cols-5 lg:gap-7">
+      <ol className="grid lg:grid-cols-5 lg:gap-x-8">
         {RENDER_PIPELINE_STEPS.map(({ id, icon: Icon }, index) => (
-          <li key={id} data-step={id} className="relative flex">
-            <div className="flex w-full flex-col rounded-surface border border-rule bg-surface p-4">
-              <div className="flex items-center gap-2.5">
-                <span
-                  aria-hidden
-                  className="flex size-8 shrink-0 items-center justify-center rounded-control border border-rule-faint bg-surface-sunken text-secondary"
-                >
-                  <Icon className="size-4" />
-                </span>
-                <span aria-hidden className="type-mono text-subtle">
-                  {String(index + 1).padStart(2, '0')}
-                </span>
-              </div>
-              <h3 className="mt-3 type-label text-foreground">{t(`pipeline.steps.${id}.label`)}</h3>
+          <li
+            key={id}
+            data-step={id}
+            className="relative grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 pb-8 last:pb-0 lg:block lg:pb-0"
+          >
+            {index < last ? (
+              // The chain: down the node column on phones, across to the next node from lg.
+              <span
+                aria-hidden
+                className="absolute start-5 top-12 bottom-2 w-px bg-rule lg:start-14 lg:end-[-1.5rem] lg:top-5 lg:bottom-auto lg:h-px lg:w-auto"
+              >
+                <ChevronDown className="absolute -bottom-1.5 -start-1.5 size-3 text-subtle lg:hidden" />
+                <ChevronRight className="absolute -end-1 -top-1.5 hidden size-3 text-subtle lg:block" />
+              </span>
+            ) : null}
+            <span
+              aria-hidden
+              className="relative flex size-10 items-center justify-center rounded-control border border-rule bg-surface text-secondary"
+            >
+              <Icon className="size-[1.125rem]" />
+            </span>
+            <div className="min-w-0 pt-0.5 lg:mt-5 lg:pt-0">
+              <p aria-hidden className="type-mono text-subtle">
+                {String(index + 1).padStart(2, '0')}
+              </p>
+              <h3 className="mt-1 type-title text-foreground">{t(`pipeline.steps.${id}.label`)}</h3>
               <p className="mt-1.5 type-body-sm text-muted-foreground">
                 {t(`pipeline.steps.${id}.description`)}
               </p>
               {index === last ? (
-                <p className="mt-auto pt-3">
-                  <SiteLink
-                    href="/gallery"
-                    kind="internal"
-                    className="link inline-flex min-h-6 items-center gap-1 type-body-sm"
-                  >
+                <p className="mt-3 type-body-sm">
+                  <SiteLink href="/gallery" kind="internal" className="link">
                     {t('pipeline.galleryLink')}
-                    <ArrowRight aria-hidden className="size-3.5" />
+                    <ArrowRight aria-hidden className="ms-1 inline size-3.5 align-[-0.125em]" />
                   </SiteLink>
                 </p>
               ) : null}
             </div>
-            {index < last ? (
-              <span
-                aria-hidden
-                className="absolute start-1/2 top-full flex h-8 -translate-x-1/2 items-center text-subtle rtl:translate-x-1/2 lg:start-full lg:top-1/2 lg:h-auto lg:w-7 lg:-translate-y-1/2 lg:translate-x-0 lg:justify-center rtl:lg:translate-x-0"
-              >
-                <ArrowDown className="size-4 lg:hidden" />
-                <ArrowRight className="hidden size-4 lg:block rtl:-scale-x-100" />
-              </span>
-            ) : null}
           </li>
         ))}
       </ol>

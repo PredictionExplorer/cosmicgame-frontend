@@ -61,74 +61,73 @@ export function LegalDocument({
 
   return (
     <PageShell variant="data">
-      <div className="mx-auto w-full max-w-[68rem]">
-        <PageHeader
-          variant="reading"
-          section="trust"
-          sectionHub={page === 'security'}
-          title={title}
-          subtitle={intro}
-          meta={
-            <>
-              <ReviewedStamp date={documentDate.date} kind={documentDate.kind} />
-              <SiteLink
-                href={frontendFileHistory(source)}
-                kind="external"
-                className="link-quiet inline-flex min-h-6 items-center gap-1 transition-colors duration-[var(--duration-fast)] hover:text-foreground"
-              >
-                {labels.revisionHistory}
-              </SiteLink>
-            </>
-          }
-          tabs={<TrustCenterTabs current={page} labels={labels.tabs} />}
-        />
-
-        <div className="lg:grid lg:grid-cols-[minmax(0,12rem)_minmax(0,1fr)] lg:gap-x-16">
-          <LegalContentsRail items={items} title={labels.contents} backToTop={labels.backToTop} />
-
-          <div className="min-w-0">
-            {summary ? <div className="mb-10 sm:mb-14">{summary}</div> : null}
-
-            <details
-              id="contents"
-              className="group mb-10 rounded-surface border border-rule lg:hidden"
+      {/* The site's one content edge: the header, rail and prose align with the site header. */}
+      <PageHeader
+        variant="reading"
+        section="trust"
+        sectionHub={page === 'security'}
+        title={title}
+        subtitle={intro}
+        meta={
+          <>
+            <ReviewedStamp date={documentDate.date} kind={documentDate.kind} />
+            <SiteLink
+              href={frontendFileHistory(source)}
+              kind="external"
+              className="link-quiet inline-flex min-h-6 items-center gap-1 transition-colors duration-[var(--duration-fast)] hover:text-foreground"
             >
-              <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 type-title text-foreground [&::-webkit-details-marker]:hidden">
-                <span>
-                  {labels.contents} <span className="type-label text-subtle">({items.length})</span>
-                </span>
-                <ChevronDown
-                  aria-hidden
-                  className="size-4 shrink-0 text-subtle transition-transform duration-[var(--duration-fast)] group-open:rotate-180"
-                />
-              </summary>
-              <ol className="border-t border-rule-faint px-4 py-2">
-                {items.map(({ id, label }) => (
-                  <li key={id}>
-                    <a
-                      href={`#${id}`}
-                      className="flex min-h-11 items-center type-body-sm text-muted-foreground transition-colors duration-[var(--duration-fast)] hover:text-foreground"
-                    >
-                      {label}
-                    </a>
-                  </li>
-                ))}
-              </ol>
-            </details>
+              {labels.revisionHistory}
+            </SiteLink>
+          </>
+        }
+        tabs={<TrustCenterTabs current={page} labels={labels.tabs} />}
+      />
 
-            {sections.map((section, index) => (
-              <LegalSection
-                key={section.id}
-                id={section.id}
-                heading={section.heading}
-                first={index === 0 && !summary}
-                anchorLabel={labels.sectionLink.replace('{section}', section.heading)}
-                backLabel={labels.backToContents}
-              >
-                {section.content}
-              </LegalSection>
-            ))}
-          </div>
+      <div className="lg:grid lg:grid-cols-[minmax(0,12rem)_minmax(0,1fr)] lg:gap-x-16">
+        <LegalContentsRail items={items} title={labels.contents} backToTop={labels.backToTop} />
+
+        <div className="min-w-0">
+          {summary ? <div className="mb-10 sm:mb-14">{summary}</div> : null}
+
+          <details
+            id="contents"
+            className="group mb-10 rounded-surface border border-rule lg:hidden"
+          >
+            <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 type-title text-foreground [&::-webkit-details-marker]:hidden">
+              <span>
+                {labels.contents} <span className="type-label text-subtle">({items.length})</span>
+              </span>
+              <ChevronDown
+                aria-hidden
+                className="size-4 shrink-0 text-subtle transition-transform duration-[var(--duration-fast)] group-open:rotate-180"
+              />
+            </summary>
+            <ol className="border-t border-rule-faint px-4 py-2">
+              {items.map(({ id, label }) => (
+                <li key={id}>
+                  <a
+                    href={`#${id}`}
+                    className="flex min-h-11 items-center type-body-sm text-muted-foreground transition-colors duration-[var(--duration-fast)] hover:text-foreground"
+                  >
+                    {label}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </details>
+
+          {sections.map((section, index) => (
+            <LegalSection
+              key={section.id}
+              id={section.id}
+              heading={section.heading}
+              first={index === 0 && !summary}
+              anchorLabel={labels.sectionLink.replace('{section}', section.heading)}
+              backLabel={labels.backToContents}
+            >
+              {section.content}
+            </LegalSection>
+          ))}
         </div>
       </div>
     </PageShell>
