@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Link2Off } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
@@ -42,8 +42,9 @@ function changeSpan(rows: readonly AdminEventRow[]): { first: number; latest: nu
 /**
  * The configuration changes the contract owner recorded in one maintenance
  * window, the one before a cycle opened: how many, when they began and
- * ended, and each change with its new value and transaction. The window is
- * named by its cycle, never by its event log ids.
+ * ended, and each change with its new value and transaction, in one reading
+ * column. The window is named by its cycle, never by its event log ids. A
+ * window without changes says so once, with one way back to the full log.
  */
 const SystemEventPage = (props: SystemEventPageProps) => {
   const { round, start, end } = props;
@@ -62,7 +63,7 @@ const SystemEventPage = (props: SystemEventPageProps) => {
   const allChanges = (
     <Link
       href="/coordination-changes"
-      className="link-quiet inline-flex min-h-6 items-center gap-1.5 text-muted-foreground"
+      className="link-quiet inline-flex min-h-11 items-center gap-1.5 text-muted-foreground sm:min-h-6"
     >
       {t('systemEvent.allChanges')}
       <ArrowRight aria-hidden className="size-3.5 text-subtle" />
@@ -72,7 +73,6 @@ const SystemEventPage = (props: SystemEventPageProps) => {
   if (!valid) {
     return (
       <LedgerPage
-        width="narrow"
         header={
           <PageHeader section="records" breadcrumbs={trail} title={t('systemEvent.invalidTitle')} />
         }
@@ -80,6 +80,7 @@ const SystemEventPage = (props: SystemEventPageProps) => {
         <EmptyState
           variant="page"
           headingLevel={2}
+          icon={<Link2Off aria-hidden />}
           title={t('systemEvent.invalidTitle')}
           description={t('systemEvent.invalidDescription')}
           action={allChanges}
@@ -128,9 +129,13 @@ const SystemEventPage = (props: SystemEventPageProps) => {
   }
 
   const initial = round === 0;
+  // No changes: the empty ledger says so, once, with the one link back; a lone
+  // "0" and the same link in the header would only repeat it.
+  const empty = ready && rows.length === 0;
 
   return (
     <LedgerPage
+      width="narrow"
       header={
         <PageHeader
           section="records"
@@ -139,8 +144,8 @@ const SystemEventPage = (props: SystemEventPageProps) => {
           subtitle={
             initial ? t('systemEvent.ledeInitial') : t('systemEvent.lede', { cycle: round })
           }
-          figures={figures}
-          meta={allChanges}
+          figures={empty ? undefined : figures}
+          meta={empty ? undefined : allChanges}
         />
       }
     >
@@ -150,7 +155,11 @@ const SystemEventPage = (props: SystemEventPageProps) => {
         error={error ? t('systemEvent.loadError') : undefined}
         onRetry={() => void refetch()}
         title={tTables('names.parameterChanges')}
-        emptyDescription={t('systemEvent.emptyDescription')}
+        emptyDescription={
+          initial
+            ? t('systemEvent.emptyDescriptionInitial')
+            : t('systemEvent.emptyDescription', { cycle: round })
+        }
         emptyAction={allChanges}
       />
     </LedgerPage>

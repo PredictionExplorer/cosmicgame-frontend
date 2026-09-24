@@ -12,9 +12,16 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { locale, id } = await params;
   const t = await getTranslations({ locale, namespace: 'meta' });
+  const tRecord = await getTranslations({ locale, namespace: 'ethContribution' });
+  // The tab names the record, as its H1 does ("Contribution #7").
+  const recordId = Number(id);
+  const title =
+    Number.isInteger(recordId) && recordId >= 0
+      ? tRecord('detail.title', { id: recordId })
+      : tRecord('detail.invalidId');
   return createPageMetadata(
     parent,
-    t('ethContributionDetail.title'),
+    title,
     t('ethContributionDetail.description'),
     undefined,
     `/eth-contribution/detail/${id}`,

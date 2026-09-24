@@ -110,10 +110,6 @@
     "title": "Khắc Random Walk NFT",
     "description": "Khắc một Random Walk NFT trên Cosmic Signature. Mỗi Random Walk NFT chưa sử dụng có thể đính kèm vào một nét bút ETH để giảm 50% chi phí nét bút ETH."
   },
-  "systemEvent": {
-    "title": "Sự kiện hệ thống",
-    "description": "Các sự kiện quản trị giao thức và thay đổi tham số điều phối của một chu kỳ Cosmic Signature cụ thể."
-  },
   "currentCycleFull": {
     "title": "Chu kỳ trình diễn hiện tại",
     "description": "Chi tiết đầy đủ về chu kỳ trình diễn đang diễn ra: lịch sử nét bút, bảng xếp hạng, đóng góp đính kèm và phân phối phân bổ."
@@ -159,7 +155,6 @@
     "description": "Đóng góp cho hoạt động truyền thông của Cosmic Signature và nhận phân bổ CST. Xem những người đóng góp hàng đầu cho hệ sinh thái, lịch sử phân bổ và cách tham gia."
   },
   "outreachAddress": {
-    "title": "Phân bổ truyền thông",
     "description": "Lịch sử phân bổ truyền thông và phân bổ CST của một người đóng góp cho hệ sinh thái Cosmic Signature. Xem hoạt động giới thiệu và đóng góp."
   },
   "ethContribution": {
@@ -167,12 +162,7 @@
     "description": "Đóng góp ETH trực tiếp vào dự trữ chu kỳ của Cosmic Signature mà không đặt nét bút. Xem lịch sử đóng góp và lời nhắn đi kèm."
   },
   "ethContributionDetail": {
-    "title": "Chi tiết đóng góp ETH trực tiếp",
     "description": "Chi tiết đóng góp ETH vào dự trữ chu kỳ Cosmic Signature: địa chỉ người đóng góp, số tiền, chu kỳ và lời nhắn."
-  },
-  "ethContributionByCycle": {
-    "title": "Đóng góp ETH trực tiếp theo chu kỳ",
-    "description": "Các khoản đóng góp ETH trực tiếp cho giao thức Cosmic Signature, phân theo chu kỳ trình diễn."
   },
   "myStatistics": {
     "title": "Thống kê của tôi",

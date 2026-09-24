@@ -201,7 +201,7 @@ const BanGestureTable = ({
         header: t('columns.cycle'),
         value: (gesture) => gesture.RoundNum,
         href: (gesture) => `/allocation/${gesture.RoundNum}`,
-        priority: 'secondary',
+        // Kept on phones: a moderator filters and judges a message by its cycle.
       },
       {
         id: 'type',

@@ -1,6 +1,8 @@
 import type { Metadata, ResolvingMetadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { isAddress } from 'viem';
 
+import { formatAddress } from '@/utils/format';
 import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
@@ -12,9 +14,14 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { locale, address } = await params;
   const t = await getTranslations({ locale, namespace: 'meta' });
+  const tOutreach = await getTranslations({ locale, namespace: 'marketing' });
+  // The tab names whose record it is, so two contributors' tabs differ.
+  const title = isAddress(address, { strict: false })
+    ? `${tOutreach('address.parent')} · ${formatAddress(address)}`
+    : tOutreach('address.invalidAddress.title');
   return createPageMetadata(
     parent,
-    t('outreachAddress.title'),
+    title,
     t('outreachAddress.description'),
     undefined,
     `/marketing/${address}`,

@@ -18,9 +18,10 @@
     },
     "allChanges": "調整の変更履歴をすべて見る",
     "loadError": "設定の変更を読み込めませんでした。",
-    "emptyDescription": "この期間、プロトコルは既存の設定のまま稼働しました。",
+    "emptyDescription": "サイクル{cycle}の開始前にコントラクト所有者が変更した設定はありません。",
     "invalidTitle": "この設定期間は存在しません",
-    "invalidDescription": "リンクのサイクルまたはイベントの範囲が正しくありません。"
+    "invalidDescription": "リンクのサイクルまたはイベントの範囲が正しくありません。",
+    "emptyDescriptionInitial": "最初のサイクルの開始前にコントラクト所有者が変更した設定はありません。"
   },
   "events": {
     "undefined": "未定義",

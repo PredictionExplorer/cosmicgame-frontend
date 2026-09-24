@@ -211,7 +211,7 @@
     "explainColumn": "Пояснити стовпець: {column}"
   },
   "adminEvents": {
-    "empty": "За цей період змін конфігурації не зафіксовано"
+    "empty": "Змін конфігурації немає"
   },
   "allocation": {
     "cycle": "Цикл {cycle}",

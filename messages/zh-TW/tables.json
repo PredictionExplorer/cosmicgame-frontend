@@ -211,7 +211,7 @@
     "explainColumn": "說明「{column}」欄"
   },
   "adminEvents": {
-    "empty": "此期間沒有記錄到設定變更"
+    "empty": "沒有設定變更"
   },
   "allocation": {
     "cycle": "第 {cycle} 個週期",

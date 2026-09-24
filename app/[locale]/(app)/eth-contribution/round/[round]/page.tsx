@@ -11,11 +11,14 @@ export async function generateMetadata(
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
   const { locale, round } = await params;
-  const t = await getTranslations({ locale, namespace: 'meta' });
+  const t = await getTranslations({ locale, namespace: 'ethContribution' });
+  // The tab names the cycle, as the H1 does ("Cycle 1 contributions").
+  const cycle = Number(round);
+  const valid = Number.isInteger(cycle) && cycle >= 0;
   return createPageMetadata(
     parent,
-    t('ethContributionByCycle.title'),
-    t('ethContributionByCycle.description'),
+    valid ? t('cycle.title', { cycle }) : t('cycle.invalidNumber'),
+    valid ? t('cycle.lede', { cycle }) : t('cycle.invalidDescription'),
     undefined,
     `/eth-contribution/round/${round}`,
     { index: false, locale },

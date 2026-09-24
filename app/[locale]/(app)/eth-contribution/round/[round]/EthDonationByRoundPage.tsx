@@ -1,10 +1,9 @@
 'use client';
 
-import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight, Link2Off } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
-import { ContributionIcon } from '@/lib/conceptIcons';
 import { formatCount } from '@/utils/format';
 import { useDashboardInfo, useDonationsBothByRound } from '@/hooks/useApiQuery';
 import { LedgerPage } from '@/components/ledger/LedgerPage';
@@ -27,7 +26,9 @@ function countContributors(rows: readonly EthDonation[]): number {
 /**
  * One cycle's direct ETH contributions: the count, total and contributors in
  * the header, the neighbouring cycles one step away, the cycle's own page
- * (its allocation, or the live cycle), and the ledger.
+ * (its allocation, or the live cycle), and the ledger in one reading column
+ * (a cycle's ledger is always short). A cycle without contributions says so
+ * once, in the ledger, in the past tense once the cycle has closed.
  */
 const EthDonationByRoundPage = ({ round }: EthDonationByRoundPageProps) => {
   const t = useTranslations('ethContribution.cycle');
@@ -41,17 +42,19 @@ const EthDonationByRoundPage = ({ round }: EthDonationByRoundPageProps) => {
   if (!valid) {
     return (
       <LedgerPage
-        width="narrow"
         header={<PageHeader section="records" breadcrumbs={trail} title={t('invalidNumber')} />}
       >
         <EmptyState
           variant="page"
           headingLevel={2}
-          icon={<ContributionIcon aria-hidden />}
+          icon={<Link2Off aria-hidden />}
           title={t('invalidTitle')}
           description={t('invalidDescription')}
           action={
-            <Link href="/eth-contribution" className="link inline-flex items-center gap-1.5">
+            <Link
+              href="/eth-contribution"
+              className="link inline-flex min-h-11 items-center gap-1.5 sm:min-h-6"
+            >
               {t('breadcrumbContributions')}
               <ArrowRight aria-hidden className="size-3.5" />
             </Link>
@@ -117,19 +120,23 @@ const EthDonationByRoundPage = ({ round }: EthDonationByRoundPageProps) => {
     </nav>
   );
 
+  // An empty ledger says so itself; three zeros above it would say it again.
+  const empty = ready && rows.length === 0;
+  const closed = liveCycle !== null && round < liveCycle;
+
   const header = (
     <PageHeader
       section="records"
       breadcrumbs={trail}
       title={t('title', { cycle: round })}
       subtitle={t('lede', { cycle: round })}
-      figures={figures}
+      figures={empty ? undefined : figures}
       actions={neighbours}
       meta={
         liveCycle !== null && round <= liveCycle ? (
           <Link
             href={cycleHref}
-            className="link-quiet inline-flex items-center gap-1.5 text-muted-foreground"
+            className="link-quiet inline-flex min-h-11 items-center gap-1.5 text-muted-foreground sm:min-h-6"
           >
             {isLive ? t('viewLive') : t('viewAllocation', { cycle: round })}
             <ArrowRight aria-hidden className="size-3.5 text-subtle" />
@@ -140,14 +147,16 @@ const EthDonationByRoundPage = ({ round }: EthDonationByRoundPageProps) => {
   );
 
   return (
-    <LedgerPage header={header}>
+    <LedgerPage width="narrow" header={header}>
       <EthDonationTable
         list={rows}
         showCycle={false}
         loading={isLoading}
         error={isError ? t('loadError') : undefined}
         onRetry={() => void refetch()}
-        emptyDescription={t('emptyDescription', { cycle: round })}
+        emptyDescription={t(closed ? 'emptyDescriptionPast' : 'emptyDescription', {
+          cycle: round,
+        })}
       />
     </LedgerPage>
   );

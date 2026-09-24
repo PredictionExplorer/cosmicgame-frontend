@@ -211,7 +211,7 @@
     "explainColumn": "Explain column: {column}"
   },
   "adminEvents": {
-    "empty": "No configuration changes were recorded in this window"
+    "empty": "No configuration changes"
   },
   "allocation": {
     "cycle": "Cycle {cycle}",

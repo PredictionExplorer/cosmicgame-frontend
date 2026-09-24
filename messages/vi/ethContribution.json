@@ -50,7 +50,8 @@
     "notFoundTitle": "Không có khoản đóng góp #{id}",
     "notFoundDescription": "Chỉ khoản đóng góp có lời nhắn mới có trang hồ sơ. Hãy tìm trong danh sách đầy đủ.",
     "backToAll": "Tất cả đóng góp",
-    "loadError": "Không tải được khoản đóng góp này."
+    "loadError": "Không tải được khoản đóng góp này.",
+    "notFoundHeading": "Không tìm thấy khoản đóng góp"
   },
   "cycle": {
     "invalidNumber": "Số chu kỳ không hợp lệ",
@@ -71,6 +72,7 @@
     "emptyDescription": "Các khoản đóng góp gửi trong chu kỳ {cycle} sẽ hiện ở đây.",
     "loadError": "Không tải được các khoản đóng góp của chu kỳ này.",
     "invalidTitle": "Liên kết này không dẫn đến chu kỳ nào",
-    "invalidDescription": "Số chu kỳ là số nguyên từ 0, ví dụ 3."
+    "invalidDescription": "Số chu kỳ là số nguyên từ 0, ví dụ 3.",
+    "emptyDescriptionPast": "Không có khoản đóng góp ETH trực tiếp nào trong chu kỳ {cycle}."
   }
 }

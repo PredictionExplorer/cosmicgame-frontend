@@ -18,9 +18,10 @@
     },
     "allChanges": "全部协调变更",
     "loadError": "未能加载配置变更。",
-    "emptyDescription": "在此期间，协议沿用了原有设置。",
+    "emptyDescription": "第 {cycle} 个周期开启前，合约所有者没有变更任何设置。",
     "invalidTitle": "该配置期间不存在",
-    "invalidDescription": "链接中的周期或事件范围无效。"
+    "invalidDescription": "链接中的周期或事件范围无效。",
+    "emptyDescriptionInitial": "首个周期开启前，合约所有者没有变更任何设置。"
   },
   "events": {
     "undefined": "未定义",

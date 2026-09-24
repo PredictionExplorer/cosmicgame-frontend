@@ -110,10 +110,6 @@
     "title": "Imprint Random Walk NFT",
     "description": "Imprint a Random Walk NFT on Cosmic Signature. Each unused Random Walk NFT can be attached to one ETH gesture for a 50% ETH Gesture Cost discount."
   },
-  "systemEvent": {
-    "title": "System Events",
-    "description": "Protocol administration events and coordination parameter changes for a specific Cosmic Signature cycle."
-  },
   "currentCycleFull": {
     "title": "Current Performance Cycle",
     "description": "Full details for the active Performance Cycle: gesture history, leaderboards, attached contributions, and allocation distribution."
@@ -159,7 +155,6 @@
     "description": "Contribute to Cosmic Signature outreach and receive CST allocations. See top ecosystem contributors, allocation history, and how to take part."
   },
   "outreachAddress": {
-    "title": "Outreach Allocations",
     "description": "Outreach allocation history and CST allocations for a Cosmic Signature ecosystem contributor. Review referral activity and contributions."
   },
   "ethContribution": {
@@ -167,12 +162,7 @@
     "description": "Contribute ETH directly to the Cosmic Signature Cycle Reserve and view the complete contribution history, with each contributor’s cycle and note."
   },
   "ethContributionDetail": {
-    "title": "Direct ETH Contribution Detail",
     "description": "Details of a specific ETH contribution to the Cosmic Signature Cycle Reserve — contributor address, amount, cycle, and optional note."
-  },
-  "ethContributionByCycle": {
-    "title": "Direct ETH Contributions by Cycle",
-    "description": "Direct ETH contributions to the Cosmic Signature protocol broken down by Performance Cycle."
   },
   "myStatistics": {
     "title": "My Statistics",

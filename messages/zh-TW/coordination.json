@@ -18,9 +18,10 @@
     },
     "allChanges": "全部協調變更",
     "loadError": "未能載入設定變更。",
-    "emptyDescription": "在此期間，協議沿用原有設定。",
+    "emptyDescription": "第 {cycle} 個週期開啟前，合約所有者沒有變更任何設定。",
     "invalidTitle": "此設定期間不存在",
-    "invalidDescription": "連結中的週期或事件範圍無效。"
+    "invalidDescription": "連結中的週期或事件範圍無效。",
+    "emptyDescriptionInitial": "首個週期開啟前，合約所有者沒有變更任何設定。"
   },
   "events": {
     "undefined": "未定義",

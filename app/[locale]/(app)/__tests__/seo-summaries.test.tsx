@@ -6,7 +6,7 @@ import statisticsMessages from '@/messages/en/statistics.json';
 import zhSeoMessages from '@/messages/zh/seo.json';
 
 import { HomeObservatoryHero } from '@/components/home/HomeObservatoryHero';
-import { useDashboardInfo } from '@/hooks/useApiQuery';
+import { useDashboardInfo, useDonationsBoth } from '@/hooks/useApiQuery';
 
 import { render, screen, within } from '@/test-utils';
 
@@ -77,10 +77,17 @@ jest.mock('../../../../services/api/tokens', () => ({
 // lexicon-allow-end
 jest.mock('@/hooks/useApiQuery', () => ({
   useDashboardInfo: jest.fn(),
+  useDonationsBoth: jest.fn(),
 }));
 
 const mockGetDashboardInfo = get_dashboard_info as jest.MockedFunction<typeof get_dashboard_info>;
 const mockUseDashboardInfo = useDashboardInfo as jest.MockedFunction<typeof useDashboardInfo>;
+const mockUseDonationsBoth = useDonationsBoth as jest.MockedFunction<typeof useDonationsBoth>;
+/** The ledger's client query as the server seed leaves it: the server read's rows. */
+const seededContributions = (data: unknown[] | undefined) =>
+  mockUseDonationsBoth.mockReturnValue({ data, isLoading: false } as unknown as ReturnType<
+    typeof useDonationsBoth
+  >);
 const mockGetLocale = getLocale as jest.MockedFunction<typeof getLocale>;
 const mockGetRoundList = get_round_list as jest.MockedFunction<typeof get_round_list>;
 const mockGetClaimHistory = get_claim_history as jest.MockedFunction<typeof get_claim_history>;
@@ -192,6 +199,7 @@ describe('server-rendered page headers', () => {
     mockDirectContributions.mockResolvedValue([{ AmountEth: 1, DonorAddr: WALLET_A }] as Rows<
       typeof get_donations_both
     >);
+    seededContributions([{ AmountEth: 1, DonorAddr: WALLET_A }]);
     mockCstRewards.mockResolvedValue([]);
     mockRwalkImprints.mockResolvedValue([]);
     mockPublicGoodsDeposits.mockResolvedValue([]);
@@ -591,6 +599,7 @@ describe('server-rendered page headers', () => {
         { AmountEth: 0.5, DonorAddr: '0x4d3949cd8980e942eb9dd24d4ecc27584a8d71fa' },
       ] as Rows<typeof get_donations_both>;
       mockDirectContributions.mockResolvedValue(rows);
+      seededContributions(rows);
 
       render(await PublicDataRouteSeoSummary({ route: 'eth-contribution' }));
 
@@ -598,6 +607,22 @@ describe('server-rendered page headers', () => {
       expect(figureValue('records')).toHaveTextContent(String(rows.length));
       expect(figureValue('totalEth')).toHaveTextContent('30.5000 ETH');
       expect(figureValue('contributors')).toHaveTextContent('2');
+    });
+
+    it('moves the direct-contribution figures with the ledger after a new contribution (regression)', async () => {
+      // The figures were computed once on the server: after a contribution the
+      // ledger showed the new row while the header kept the ISR snapshot.
+      const rows = [{ AmountEth: 1, DonorAddr: WALLET_A }] as Rows<typeof get_donations_both>;
+      mockDirectContributions.mockResolvedValue(rows);
+      seededContributions(rows);
+      const { rerender } = render(await PublicDataRouteSeoSummary({ route: 'eth-contribution' }));
+      expect(figureValue('records')).toHaveTextContent(/^1$/);
+
+      seededContributions([...rows, { AmountEth: 2, DonorAddr: WALLET_B }]);
+      rerender(await PublicDataRouteSeoSummary({ route: 'eth-contribution' }));
+      expect(figureValue('records')).toHaveTextContent(/^2$/);
+      expect(figureValue('totalEth')).toHaveTextContent('3.0000 ETH');
+      expect(figureValue('contributors')).toHaveTextContent(/^2$/);
     });
 
     it('counts the coordination events the table lists, with the latest change', async () => {
@@ -746,6 +771,7 @@ describe('server-rendered page headers', () => {
 
     it('renders a failed read as unavailable, never as a confident zero', async () => {
       mockDirectContributions.mockRejectedValue(new Error('Network response was not OK'));
+      seededContributions(undefined);
 
       render(await PublicDataRouteSeoSummary({ route: 'eth-contribution' }));
 

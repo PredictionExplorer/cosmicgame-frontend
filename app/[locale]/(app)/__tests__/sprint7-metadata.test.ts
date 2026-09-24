@@ -132,18 +132,34 @@ describe('Sprint 7 route metadata', () => {
 
   it('contains complete Chinese titles for every Sprint 7 metadata key', () => {
     expect(zhMeta.ethContribution.title).toContain('ETH 贡献');
-    expect(zhMeta.ethContributionDetail.title).toContain('贡献详情');
-    expect(zhMeta.ethContributionByCycle.title).toContain('按周期');
     expect(zhMeta.publicGoodsCgContributions.title).toContain('公共物品');
     expect(zhMeta.publicGoodsVoluntary.title).toContain('自愿');
     expect(zhMeta.publicGoodsRetrievals.title).toContain('取回');
     expect(zhMeta.outreach.title).toContain('推广分配');
-    expect(zhMeta.outreachAddress.title).toContain('推广分配');
     expect(zhMeta.coordinationChanges.title).toContain('协调变更');
     expect(zhMeta.admin.title).toContain('留言审核');
     expect(zhMeta.adminSettings.title).toContain('合约设置');
     expect(zhMeta.internalCstOutreachTransfer.title).toContain('推广转账');
     expect(zhMeta.embedEndurance.title).toContain('坚守');
+  });
+
+  it('names the record in the tab title of every record page, as its H1 does', async () => {
+    // Every contribution, cycle and outreach record shared one static title, so
+    // two tabs could not be told apart.
+    const params = (extra: Record<string, string>) =>
+      Promise.resolve({ locale: 'zh', id: '7', round: '7', address: '0x1234', ...extra });
+    const titleOf = async (
+      build: (typeof localizedRoutes)[number]['build'],
+      extra: Record<string, string> = {},
+    ) => documentTitleOf(await build({ params: params(extra) }, resolvingMetadata()));
+
+    expect(await titleOf(generateEthContributionDetailMetadata)).toMatch(/^贡献 #7/);
+    expect(await titleOf(generateEthContributionCycleMetadata)).toMatch(/^第 7 个周期的贡献/);
+    expect(
+      await titleOf(generateOutreachAddressMetadata, {
+        address: '0xa169574d0d353e3010997a3e64846b7d1b2a63b6',
+      }),
+    ).toMatch(/^推广分配 · 0xA169…\u206063B6/);
   });
 
   it('emits unique, indexable allocation-detail metadata in both locales', async () => {

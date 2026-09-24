@@ -121,6 +121,11 @@ describe('EthDonationDetailPage', () => {
     withRecord(null);
     render(<EthDonationDetailPage id={9} />);
 
+    // The H1 no longer claims the record exists (regression: "Contribution #9"
+    // above "There is no contribution #9").
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'ethContribution.detail.notFoundHeading',
+    );
     expect(screen.getByText('ethContribution.detail.notFoundTitle(id=9)')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'ethContribution.detail.backToAll' })).toHaveAttribute(
       'href',

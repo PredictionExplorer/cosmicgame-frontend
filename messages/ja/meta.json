@@ -110,10 +110,6 @@
     "title": "Random Walk NFTの刻印",
     "description": "Cosmic SignatureでRandom Walk NFTを刻印する。未使用のRandom Walk NFTはそれぞれ1回のETH一筆に添付でき、ETH一筆の費用が50%割引されます。"
   },
-  "systemEvent": {
-    "title": "システムイベント",
-    "description": "特定のCosmic Signatureサイクルにおけるプロトコル管理イベントと調整パラメーターの変更。"
-  },
   "currentCycleFull": {
     "title": "現在のパフォーマンス・サイクル",
     "description": "進行中のパフォーマンス・サイクルの全詳細：一筆の履歴、順位表、添付された拠出、配分の分布。"
@@ -159,7 +155,6 @@
     "description": "Cosmic Signatureの広報に貢献してCST配分を受け取る。主なエコシステム貢献者、配分の履歴、参加の方法を見る。"
   },
   "outreachAddress": {
-    "title": "広報配分",
     "description": "Cosmic Signatureエコシステム貢献者の広報配分の履歴とCST配分。紹介活動と貢献を確認する。"
   },
   "ethContribution": {
@@ -167,12 +162,7 @@
     "description": "一筆を入れずに、Cosmic Signatureのサイクル準備金へETHを直接拠出できます。公開された拠出履歴も確認できます。"
   },
   "ethContributionDetail": {
-    "title": "直接ETH拠出の詳細",
     "description": "サイクル準備金へのETH拠出の詳細です。拠出者アドレス、金額、サイクル、添えられたメモを確認できます。"
-  },
-  "ethContributionByCycle": {
-    "title": "サイクル別の直接ETH拠出",
-    "description": "Cosmic Signatureプロトコルへの直接ETH拠出を、パフォーマンス・サイクルごとに分けて見る。"
   },
   "myStatistics": {
     "title": "自分の統計",

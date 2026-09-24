@@ -13,9 +13,18 @@ jest.mock('@/hooks/useApiQuery', () => ({
 
 jest.mock('@/components/tables/EthDonationTable', () => ({
   __esModule: true,
-  default: ({ list, loading }: { list: unknown[]; loading?: boolean }) => (
+  default: ({
+    list,
+    loading,
+    emptyDescription,
+  }: {
+    list: unknown[];
+    loading?: boolean;
+    emptyDescription?: string;
+  }) => (
     <div data-testid="contribution-table" data-loading={loading ? 'true' : undefined}>
       rows: {list.length}
+      {list.length === 0 && !loading ? <p>{emptyDescription}</p> : null}
     </div>
   ),
 }));
@@ -87,6 +96,25 @@ describe('EthDonationByRoundPage', () => {
       'href',
       '/current-cycle',
     );
+  });
+
+  it('says once, in the past tense, that a closed cycle had no contributions (regression)', () => {
+    // A finished cycle read "Contributions sent while cycle 7 is active appear
+    // here." under three zero figures.
+    withRows([]);
+    render(<EthDonationByRoundPage round={7} />);
+
+    expect(document.querySelector('[data-figure]')).toBeNull();
+    expect(
+      screen.getByText('ethContribution.cycle.emptyDescriptionPast(cycle=7)'),
+    ).toBeInTheDocument();
+  });
+
+  it('keeps the present tense for the live cycle', () => {
+    withRows([]);
+    render(<EthDonationByRoundPage round={9} />);
+
+    expect(screen.getByText('ethContribution.cycle.emptyDescription(cycle=9)')).toBeInTheDocument();
   });
 
   it('hands the loading state to the ledger', () => {

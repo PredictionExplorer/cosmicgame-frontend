@@ -110,10 +110,6 @@
     "title": "Random Walk NFT 각인",
     "description": "Cosmic Signature에서 Random Walk NFT를 각인합니다. 사용하지 않은 Random Walk NFT는 ETH 제스처 하나에 첨부해 ETH 제스처 비용을 50% 할인받을 수 있습니다."
   },
-  "systemEvent": {
-    "title": "시스템 이벤트",
-    "description": "특정 Cosmic Signature 사이클의 프로토콜 관리 이벤트와 조율 매개변수 변경 내역을 확인할 수 있습니다."
-  },
   "currentCycleFull": {
     "title": "현재 퍼포먼스 사이클",
     "description": "진행 중인 퍼포먼스 사이클의 전체 정보입니다. 제스처 내역, 순위표, 첨부된 기여, 배분 현황을 확인할 수 있습니다."
@@ -159,7 +155,6 @@
     "description": "Cosmic Signature를 널리 알리는 데 기여하면 CST 배분을 받을 수 있습니다. 상위 생태계 기여자, 배분 내역, 참여 방법을 확인할 수 있습니다."
   },
   "outreachAddress": {
-    "title": "홍보 배분",
     "description": "Cosmic Signature 생태계 기여자 한 명의 홍보 배분 내역과 CST 배분입니다. 추천 활동과 기여 내역을 확인할 수 있습니다."
   },
   "ethContribution": {
@@ -167,12 +162,7 @@
     "description": "제스처를 남기지 않고 Cosmic Signature 사이클 준비금에 ETH를 직접 기여하고, 공개된 기여 내역을 확인할 수 있습니다."
   },
   "ethContributionDetail": {
-    "title": "직접 ETH 기여 상세",
     "description": "사이클 준비금에 기여한 ETH의 상세 정보입니다. 기여자 주소, 금액, 사이클, 함께 남긴 메모를 확인할 수 있습니다."
-  },
-  "ethContributionByCycle": {
-    "title": "사이클별 직접 ETH 기여",
-    "description": "Cosmic Signature 프로토콜에 이루어진 직접 ETH 기여를 퍼포먼스 사이클별로 나누어 보여 줍니다."
   },
   "myStatistics": {
     "title": "내 통계",

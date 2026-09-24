@@ -131,10 +131,6 @@
     "title": "星選 NFT",
     "description": "查看此參與者透過星選獲配的全部 Cosmic Signature NFT。"
   },
-  "systemEvent": {
-    "title": "系統事件",
-    "description": "查看指定 Cosmic Signature 週期的協議管理事件與協調參數變更。"
-  },
   "faq": {
     "title": "常見問題：Arbitrum 鏈上藝術協議",
     "description": "解答 Cosmic Signature、演繹週期、落筆、CST、三體 NFT 藝術、Arbitrum、錨定、合約與協議安全等常見問題。"
@@ -196,7 +192,6 @@
     "description": "參與 Cosmic Signature 推廣並獲得 CST 分配。查看推廣貢獻榜、分配記錄與參與方式。"
   },
   "outreachAddress": {
-    "title": "推廣分配",
     "description": "查看指定 Cosmic Signature 推廣貢獻者的推廣記錄與 CST 分配。"
   },
   "ethContribution": {
@@ -204,12 +199,7 @@
     "description": "直接向 Cosmic Signature 週期儲備貢獻 ETH，並查看完整貢獻記錄。"
   },
   "ethContributionDetail": {
-    "title": "直接 ETH 貢獻詳情",
     "description": "查看指定 ETH 貢獻的貢獻者地址、金額、所屬週期與可選留言。"
-  },
-  "ethContributionByCycle": {
-    "title": "按週期查看直接 ETH 貢獻",
-    "description": "按演繹週期查看向 Cosmic Signature 協議直接貢獻的 ETH。"
   },
   "admin": {
     "title": "落筆留言審核",

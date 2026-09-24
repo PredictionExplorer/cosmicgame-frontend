@@ -131,10 +131,6 @@
     "title": "星选 NFT",
     "description": "查看此参与者通过星选获配的全部 Cosmic Signature NFT。"
   },
-  "systemEvent": {
-    "title": "系统事件",
-    "description": "查看指定 Cosmic Signature 周期的协议管理事件与协调参数变更。"
-  },
   "faq": {
     "title": "常见问题：Arbitrum 链上艺术协议",
     "description": "解答 Cosmic Signature、演绎周期、落笔、CST、三体 NFT 艺术、Arbitrum、锚定、合约与协议安全等常见问题。"
@@ -196,7 +192,6 @@
     "description": "参与 Cosmic Signature 推广并获得 CST 分配。查看推广贡献榜、分配记录与参与方式。"
   },
   "outreachAddress": {
-    "title": "推广分配",
     "description": "查看指定 Cosmic Signature 推广贡献者的推广记录与 CST 分配。"
   },
   "ethContribution": {
@@ -204,12 +199,7 @@
     "description": "直接向 Cosmic Signature 周期储备贡献 ETH，并查看完整贡献记录。"
   },
   "ethContributionDetail": {
-    "title": "直接 ETH 贡献详情",
     "description": "查看指定 ETH 贡献的贡献者地址、金额、所属周期与可选留言。"
-  },
-  "ethContributionByCycle": {
-    "title": "按周期查看直接 ETH 贡献",
-    "description": "按演绎周期查看向 Cosmic Signature 协议直接贡献的 ETH。"
   },
   "admin": {
     "title": "落笔留言审核",
