@@ -187,9 +187,14 @@ export function PageHeader({
   const titleGradient =
     gradientTitle === true ? 'signature' : gradientTitle === false ? null : gradientTitle;
 
+  // A hub titled with its section's own name ("Admin") would say it twice.
+  const eyebrowEchoesTitle =
+    sectionHub &&
+    typeof title === 'string' &&
+    sectionLabel?.trim().toLocaleLowerCase() === title.trim().toLocaleLowerCase();
   const eyebrowContent =
     eyebrow ??
-    (!trail && section && sectionLabel ? (
+    (!trail && section && sectionLabel && !eyebrowEchoesTitle ? (
       sectionHub ? (
         sectionLabel
       ) : (

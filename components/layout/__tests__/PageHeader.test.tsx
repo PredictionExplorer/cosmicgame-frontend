@@ -42,6 +42,13 @@ describe('PageHeader', () => {
       expect(screen.queryByRole('link', { name: section('collection') })).toBeNull();
     });
 
+    it('drops the eyebrow of a hub titled with its section name', () => {
+      // The catalog mock answers with keys, so a title equal to the key is the echo.
+      render(<PageHeader section="admin" sectionHub title={section('admin')} />);
+      expect(screen.getAllByText(section('admin'))).toHaveLength(1);
+      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(section('admin'));
+    });
+
     it('builds a record page trail as Home › section › parents, the H1 naming the page', () => {
       render(
         <PageHeader
