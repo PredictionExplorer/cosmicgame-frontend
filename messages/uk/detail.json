@@ -7,19 +7,11 @@
     "productDescription": "Унікальний генеративний NFT протоколу ончейн-мистецтва Cosmic Signature, створений за допомогою фізичної симуляції задачі трьох тіл.",
     "breadcrumbToken": "Токен {id}"
   },
-  "breadcrumb": {
-    "tokenFallback": "Токен {id}"
-  },
-  "hero": {
-    "unnamedToken": "Токен без імені"
-  },
   "badges": {
     "stellarSelectionRecipient": "Отримувач зоряного відбору",
     "anchorRecipient": "Отримувач за закріплення",
     "cycleRecipient": "Отримувач циклу",
     "enduranceChampion": "Чемпіон витривалості",
-    "receivedAsCycleRecipient": "Отримано за завершальний жест у циклі {round}",
-    "receivedAs": "Отримано в ролі: {label}",
     "eligibleForAnchoring": "Можна закріпити",
     "eligibleForAnchoringTooltip": "Цей Cosmic Signature NFT ще ніколи не закріплювали; після закріплення він може отримувати надходження за закріплення в ETH.",
     "alreadyAnchored": "Уже закріплено",
@@ -32,12 +24,10 @@
     "copyPageLink": "Копіювати посилання на сторінку"
   },
   "actions": {
-    "buyOrSellNfts": "Купити або продати NFT",
-    "viewCycleDetails": "Деталі циклу {round}"
+    "buyOrSellNfts": "Купити або продати NFT"
   },
   "navigation": {
-    "previousToken": "Попередній токен",
-    "nextToken": "Наступний токен"
+    "label": "Попередня й наступна Сигнатури"
   },
   "sections": {
     "nameHistory": "Історія імен",
@@ -71,24 +61,31 @@
   },
   "metadata": {
     "imprinted": "Закарбовано",
-    "imprintedTooltip": "Коли цей токен закарбовано ончейн. Натисніть, щоб переглянути транзакцію.",
     "cycle": "Цикл",
-    "cycleTooltip": "Перформанс-цикл, у якому цей токен розподілено. Натисніть, щоб переглянути деталі циклу.",
     "recipient": "Отримувач",
-    "recipientTooltip": "Адреса, яка первісно отримала цей токен під час перформанс-циклу.",
     "owner": "Власник",
-    "ownerTooltip": "Поточний власник цього токена. Може відрізнятися від отримувача, якщо токен передавали.",
     "roundNumber": "Цикл {round}",
+    "anchoring": "Закріплення",
     "seed": "Сід",
     "seedTooltip": "Унікальний випадковий сід, з якого згенеровано твір і ознаки цього токена.",
     "copySeed": "Копіювати сід"
   },
-  "video": {
-    "watchAnimation": "Дивитися анімацію",
-    "watchAnimationTooltip": "Кожен Cosmic Signature NFT має унікальну генеративну анімацію, створену з його сіду. Натисніть, щоб переглянути."
-  },
   "image": {
-    "defaultAlt": "NFT",
+    "rendering": "Твір малюється",
     "artworkUnavailable": "Твір недоступний"
+  },
+  "viewer": {
+    "modeLabel": "Вигляд твору",
+    "still": "Нерухомо",
+    "motion": "У русі",
+    "play": "Відтворити анімацію",
+    "pause": "Призупинити анімацію",
+    "fullscreen": "На весь екран",
+    "zoomIn": "Збільшити",
+    "zoomOut": "Умістити в екран",
+    "zoomHint": "Натисніть на твір або клавішу +, щоб збільшити.",
+    "panHint": "Перетягуйте твір або користуйтеся клавішами зі стрілками. Натисніть 0, щоб умістити його в екран.",
+    "motionError": "Не вдалося завантажити анімацію.",
+    "motionLabel": "Анімація: {subject}"
   }
 }

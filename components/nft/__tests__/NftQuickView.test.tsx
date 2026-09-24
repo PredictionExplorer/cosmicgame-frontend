@@ -13,7 +13,14 @@ import { NftQuickView } from '../NftQuickView';
 jest.mock('next/image', () => ({
   __esModule: true,
   default: (props: Record<string, unknown>) => {
-    const { fill: _f, priority: _p, unoptimized: _u, ...rest } = props;
+    const {
+      fill: _f,
+      priority: _p,
+      unoptimized: _u,
+      loader: _l,
+      fetchPriority: _fp,
+      ...rest
+    } = props;
     return <img {...rest} />;
   },
 }));
@@ -61,9 +68,14 @@ describe('NftQuickView', () => {
       />,
     );
     expect(screen.getByRole('heading', { name: 'NUMBA 1' })).toBeInTheDocument();
-    expect(screen.getByAltText('Cosmic Signature #000001 artwork')).toHaveAttribute(
-      'src',
-      expect.stringContaining('/0xa1/images/web/full.webp'),
+    // The alt text is composed from the traits, not a bare number.
+    const art = screen.getByAltText(
+      '“NUMBA 1”, Cosmic Signature #000001: Orbit Ribbons structure, Glacial Split palette, spectral class B',
+    );
+    expect(art).toHaveAttribute('src', expect.stringContaining('/0xa1/images/web/full.webp'));
+    // Nothing is layered over the art: the hue strip sits under the plate.
+    expect(screen.getByTestId('art-frame')).not.toContainElement(
+      screen.getAllByTestId('hue-strip')[0]!,
     );
     expect(screen.getAllByTestId('spectral-class-badge')[0]).toHaveTextContent('Class B');
     expect(screen.getByTestId('rarity-rank-chip')).toBeInTheDocument();
@@ -72,6 +84,27 @@ describe('NftQuickView', () => {
       'href',
       '/detail/1',
     );
+  });
+
+  it('sets the title in the 24px display tier, free of the dialog title defaults', () => {
+    render(
+      <NftQuickView
+        tokenId={1}
+        items={items}
+        onOpenChange={jest.fn()}
+        onNavigate={jest.fn()}
+        collectionTraits={collectionTraits}
+      />,
+    );
+    const title = screen.getByRole('heading', { name: 'NUMBA 1' });
+    // type-heading-2 is Clash at 24px and the display weight. tailwind-merge
+    // does not know the type-* utilities, so any size, weight, leading or
+    // tracking utility beside it would win in the cascade (18px bold).
+    expect(title).toHaveClass('type-heading-2');
+    expect(title.className).not.toMatch(
+      /\b(text-(xs|sm|base|lg|xl)|font-(semibold|bold)|leading-|tracking-)/,
+    );
+    expect(screen.getByRole('dialog')).toHaveAccessibleName('NUMBA 1');
   });
 
   it('navigates with the arrow keys and buttons within the visible items', () => {

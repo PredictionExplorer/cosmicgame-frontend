@@ -253,5 +253,10 @@
     "segmentAria": "{value}: {count} NFTs. Filter by this trait.",
     "legendCount": "{count}",
     "loading": "Reading the collection's traits…"
+  },
+  "alt": {
+    "subjectNamed": "“{name}”, Cosmic Signature {id}",
+    "withTraits": "{subject}: {structure} structure, {palette} palette",
+    "withTraitsAndClass": "{subject}: {structure} structure, {palette} palette, spectral class {spectralClass}"
   }
 }

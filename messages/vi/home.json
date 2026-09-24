@@ -678,7 +678,6 @@
   },
   "latestNfts": {
     "title": "NFT mới nhất",
-    "dividerAlt": "đường phân cách",
     "previousAria": "NFT mới nhất trước đó",
     "nextAria": "NFT mới nhất tiếp theo",
     "empty": {
@@ -689,7 +688,8 @@
   },
   "rwlkGrid": {
     "searchPlaceholder": "Nhập mã NFT",
-    "searchIconAlt": "biểu tượng tìm kiếm",
+    "searchAria": "Tìm RandomWalk NFT theo mã",
+    "tokenAria": "RandomWalk NFT {id}",
     "empty": "Không tìm thấy NFT phù hợp"
   },
   "orientation": {

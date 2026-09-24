@@ -54,6 +54,12 @@ export interface AddressChipProps {
    * `href`, `currentAddress` and the zero-address rule).
    */
   label?: string | false;
+  /**
+   * Let a word label ("Cosmic Signature NFT Anchoring Wallet") wrap onto more
+   * lines instead of truncating, where the full name must read (a spec-sheet
+   * ledger row). Hex never wraps.
+   */
+  wrapLabel?: boolean;
   className?: string;
 }
 
@@ -72,6 +78,7 @@ export function AddressChip({
   zeroRole,
   currentAddress,
   label,
+  wrapLabel = false,
   className,
 }: AddressChipProps) {
   const t = useTranslations('formats');
@@ -117,7 +124,11 @@ export function AddressChip({
 
   let content: ReactNode;
   if (wordLabel) {
-    content = <span className="truncate">{wordLabel}</span>;
+    content = (
+      <span className={wrapLabel ? 'whitespace-normal [overflow-wrap:anywhere]' : 'truncate'}>
+        {wordLabel}
+      </span>
+    );
   } else if (display === 'responsive') {
     content = (
       <span className="font-mono">

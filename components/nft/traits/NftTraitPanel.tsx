@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useId, useState, type ReactNode } from 'react';
 import { Check, Copy, ExternalLink } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -10,11 +10,10 @@ import { cn } from '@/lib/utils';
 import { TOUCH_TARGET_ICON_CLASS } from '@/lib/touch-target';
 import { toIntlLocale } from '@/utils/format';
 import { Button } from '@/components/ui/button';
-import { SectionDivider } from '@/components/ui/section-divider';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-import { HueStrip } from './HueStrip';
+import { TRAIT_GRID_CLASS, TRAIT_TILE_CLASS } from './layout';
 import { RarityRankChip } from './RarityRankChip';
 import { TraitSheet } from './TraitSheet';
 import { hueColor } from './palette';
@@ -31,6 +30,8 @@ export interface NftTraitPanelProps {
   onRetry?: () => void;
   /** Collection index for rarity rank and value shares (optional). */
   collectionTraits?: CollectionTraits | null;
+  /** Shown under the introduction, above the tabs (the detail page puts the seed here). */
+  lead?: ReactNode;
   className?: string;
 }
 
@@ -44,16 +45,9 @@ function Fact({
   wide?: boolean;
 }) {
   return (
-    <div
-      className={cn(
-        'min-w-0 rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2.5',
-        wide && 'sm:col-span-2 lg:col-span-3',
-      )}
-    >
-      <dt className="mb-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-        {label}
-      </dt>
-      <dd className="text-sm text-foreground">{children}</dd>
+    <div className={cn(TRAIT_TILE_CLASS, wide && 'col-span-2')}>
+      <dt className="mb-1 type-label text-subtle">{label}</dt>
+      <dd className="type-body-sm text-foreground">{children}</dd>
     </div>
   );
 }
@@ -75,20 +69,18 @@ function HashValue({
   }
   return (
     <span className="flex items-start gap-2">
-      <code className="min-w-0 flex-1 break-all font-mono text-[11px] leading-relaxed text-muted-foreground">
-        {value}
-      </code>
+      <code className="min-w-0 flex-1 type-hash text-muted-foreground">{value}</code>
       <button
         type="button"
         onClick={handleCopy}
         aria-label={copied ? copiedLabel : copyLabel}
         className={cn(
-          'shrink-0 rounded-md p-1.5 text-muted-foreground/60 transition-colors hover:bg-white/[0.04] hover:text-primary',
+          'shrink-0 rounded-control p-1.5 text-subtle transition-colors hover:bg-surface hover:text-foreground',
           TOUCH_TARGET_ICON_CLASS,
         )}
       >
         {copied ? (
-          <Check className="h-3.5 w-3.5 text-emerald-400" aria-hidden />
+          <Check className="h-3.5 w-3.5 text-positive" aria-hidden />
         ) : (
           <Copy className="h-3.5 w-3.5" aria-hidden />
         )}
@@ -104,10 +96,10 @@ function MediaLink({ href, label, hint }: { href: string; label: string; hint: s
       target="_blank"
       rel="noopener noreferrer"
       title={hint}
-      className="flex min-h-11 items-center justify-between gap-3 rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-sm text-foreground transition-colors hover:border-primary/30 hover:bg-white/[0.04]"
+      className="flex min-h-11 items-center justify-between gap-3 rounded-control bg-surface-sunken px-4 py-2 type-body-sm text-foreground no-underline transition-colors duration-[var(--duration-fast)] hover:bg-surface"
     >
       <span>{label}</span>
-      <ExternalLink className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden />
+      <ExternalLink className="h-3.5 w-3.5 shrink-0 text-subtle" aria-hidden />
     </a>
   );
 }
@@ -123,10 +115,12 @@ export function NftTraitPanel({
   isError = false,
   onRetry,
   collectionTraits,
+  lead,
   className,
 }: NftTraitPanelProps) {
   const t = useTranslations('traits');
   const locale = useLocale();
+  const headingId = useId();
   const { typeLabel } = useTraitLabels();
   const intl = toIntlLocale(locale);
   const number = (value: number, digits = 2) =>
@@ -138,21 +132,21 @@ export function NftTraitPanel({
   let body: ReactNode;
   if (metadata === undefined && !isError) {
     body = (
-      <div className="space-y-3" aria-busy="true" aria-label={t('panel.loading')}>
+      <div role="status" className="space-y-4" aria-busy="true" aria-label={t('panel.loading')}>
         <Skeleton className="h-9 w-72" />
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }, (_, i) => (
-            <Skeleton key={i} className="h-16 w-full" />
+        <div className={TRAIT_GRID_CLASS}>
+          {Array.from({ length: 8 }, (_, i) => (
+            <Skeleton key={i} className="h-[4.5rem] w-full rounded-control" />
           ))}
         </div>
       </div>
     );
   } else if (isError && !metadata) {
     body = (
-      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-sm text-muted-foreground">
+      <div className="flex flex-wrap items-center gap-3 rounded-control bg-surface-sunken px-4 py-3 type-body-sm text-muted-foreground">
         <span>{t('panel.error')}</span>
         {onRetry ? (
-          <Button variant="outline" size="sm" className="text-xs" onClick={onRetry}>
+          <Button variant="outline" size="sm" className="normal-case" onClick={onRetry}>
             {t('panel.retry')}
           </Button>
         ) : null}
@@ -160,7 +154,7 @@ export function NftTraitPanel({
     );
   } else if (!metadata || !entry?.hasArtTraits) {
     body = (
-      <p className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-sm text-muted-foreground">
+      <p className="max-w-[var(--measure-prose)] rounded-control bg-surface-sunken px-4 py-3 type-body-sm text-muted-foreground">
         {t('panel.unavailable')}
       </p>
     );
@@ -175,15 +169,32 @@ export function NftTraitPanel({
 
     body = (
       <Tabs defaultValue="composition" className="w-full">
-        <TabsList className="flex w-full flex-wrap justify-start gap-1 bg-white/[0.03] sm:inline-flex sm:w-auto">
-          <TabsTrigger value="composition">{t('groups.composition')}</TabsTrigger>
-          <TabsTrigger value="physics">{t('groups.physics')}</TabsTrigger>
-          <TabsTrigger value="provenance">{t('groups.provenance')}</TabsTrigger>
-          {media ? <TabsTrigger value="media">{t('groups.media')}</TabsTrigger> : null}
+        {/* Underline tabs on one line: they scroll sideways on a phone rather
+            than wrapping a lone tab onto a second row. */}
+        <TabsList className="flex h-auto w-full justify-start gap-6 overflow-x-auto rounded-none border-b border-rule bg-transparent p-0 scrollbar-none max-sm:[mask-image:linear-gradient(to_right,black_calc(100%-2.5rem),transparent)] sm:h-auto">
+          {[
+            ['composition', t('groups.composition')],
+            ['physics', t('groups.physics')],
+            ['provenance', t('groups.provenance')],
+            ...(media ? [['media', t('groups.media')]] : []),
+          ].map(([value, label]) => (
+            <TabsTrigger
+              key={value}
+              value={value!}
+              className={cn(
+                'relative min-w-11 shrink-0 whitespace-nowrap rounded-none bg-transparent px-0 pb-3 pt-2 type-body-sm font-medium text-muted-foreground focus-ring-inset hover:text-foreground',
+                'data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none',
+                "after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-primary after:opacity-0 after:content-[''] data-[state=active]:after:opacity-100",
+              )}
+            >
+              {label}
+            </TabsTrigger>
+          ))}
+          {/* Room past the last tab, so it can scroll clear of the edge fade. */}
+          <span aria-hidden className="w-4 shrink-0 sm:hidden" />
         </TabsList>
 
-        <TabsContent value="composition" className="mt-4 space-y-4">
-          {entry.hues ? <HueStrip hues={entry.hues} size="md" /> : null}
+        <TabsContent value="composition" className="mt-6 space-y-2 sm:space-y-3">
           <TraitSheet
             entry={entry}
             facets={facets}
@@ -191,7 +202,7 @@ export function NftTraitPanel({
             groups={['composition']}
             hideHeadings
           />
-          <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <dl className={TRAIT_GRID_CLASS}>
             {typeof palette?.dominant_wavelength_nm === 'number' ? (
               <Fact label={t('panel.dominantWavelength')}>
                 {t('panel.nanometres', { value: number(palette.dominant_wavelength_nm, 0) })}
@@ -210,7 +221,7 @@ export function NftTraitPanel({
           </dl>
         </TabsContent>
 
-        <TabsContent value="physics" className="mt-4 space-y-4">
+        <TabsContent value="physics" className="mt-6 space-y-2 sm:space-y-3">
           <TraitSheet
             entry={entry}
             facets={facets}
@@ -218,7 +229,7 @@ export function NftTraitPanel({
             groups={['physics']}
             hideHeadings
           />
-          <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <dl className={TRAIT_GRID_CLASS}>
             {masses.length > 0 ? (
               <Fact label={t('panel.masses')} wide>
                 <ul className="space-y-1.5">
@@ -230,7 +241,7 @@ export function NftTraitPanel({
                           index: index + 1,
                           value: number(mass, 1),
                         })}
-                        className="relative h-2 flex-1 overflow-hidden rounded-full bg-white/[0.06]"
+                        className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-rule-faint"
                       >
                         <span
                           aria-hidden
@@ -246,7 +257,7 @@ export function NftTraitPanel({
                       </span>
                       <span
                         aria-hidden
-                        className="w-16 shrink-0 text-right font-mono text-xs tabular-nums text-muted-foreground"
+                        className="w-16 shrink-0 text-right type-caption tabular-nums text-muted-foreground"
                       >
                         {number(mass, 1)}
                       </span>
@@ -267,28 +278,24 @@ export function NftTraitPanel({
             ) : null}
             {typeof simulation?.total_energy === 'number' ? (
               <Fact label={t('panel.totalEnergy')}>
-                <span className="font-mono tabular-nums">{number(simulation.total_energy, 1)}</span>
+                <span className="tabular-nums">{number(simulation.total_energy, 1)}</span>
               </Fact>
             ) : null}
             {typeof simulation?.angular_momentum === 'number' ? (
               <Fact label={t('panel.angularMomentum')}>
-                <span className="font-mono tabular-nums">
-                  {number(simulation.angular_momentum, 1)}
-                </span>
+                <span className="tabular-nums">{number(simulation.angular_momentum, 1)}</span>
               </Fact>
             ) : null}
             {typeof simulation?.equilateralness === 'number' ? (
               <Fact label={t('panel.equilateralness')}>
-                <span className="font-mono tabular-nums">
-                  {number(simulation.equilateralness, 3)}
-                </span>
+                <span className="tabular-nums">{number(simulation.equilateralness, 3)}</span>
               </Fact>
             ) : null}
             {simulation?.integrator ? (
               <Fact label={t('panel.integrator')}>
                 <span className="font-mono">{simulation.integrator}</span>
                 {typeof simulation.steps === 'number' ? (
-                  <span className="ml-2 text-xs text-muted-foreground">
+                  <span className="ml-2 type-caption text-subtle">
                     {t('panel.steps', { steps: number(simulation.steps, 0) })}
                   </span>
                 ) : null}
@@ -298,7 +305,7 @@ export function NftTraitPanel({
               <Fact label={typeLabel('fate')}>
                 {t('panel.ejectionStep', { step: number(simulation.fate.ejection_step, 0) })}
                 {typeof simulation.fate.horizon_steps === 'number' ? (
-                  <span className="ml-2 text-xs text-muted-foreground">
+                  <span className="ml-2 type-caption text-subtle">
                     {t('panel.horizonSteps', { steps: number(simulation.fate.horizon_steps, 0) })}
                   </span>
                 ) : null}
@@ -306,11 +313,11 @@ export function NftTraitPanel({
             ) : null}
             {simulation?.braid?.word ? (
               <Fact label={t('panel.braid')} wide>
-                <code className="block break-words font-mono text-xs leading-relaxed text-muted-foreground">
+                <code className="block type-hash text-muted-foreground">
                   {simulation.braid.word}
                 </code>
                 {typeof simulation.braid.crossings === 'number' ? (
-                  <span className="mt-1 block text-xs text-muted-foreground">
+                  <span className="mt-1 block type-caption text-subtle">
                     {t('panel.braidCrossings', { count: simulation.braid.crossings })}
                   </span>
                 ) : null}
@@ -319,7 +326,7 @@ export function NftTraitPanel({
           </dl>
         </TabsContent>
 
-        <TabsContent value="provenance" className="mt-4 space-y-4">
+        <TabsContent value="provenance" className="mt-6 space-y-2 sm:space-y-3">
           {rarity ? (
             <div className="flex flex-wrap items-center gap-2">
               <RarityRankChip rarity={rarity} total={rarityTotal} size="md" verbose />
@@ -332,7 +339,7 @@ export function NftTraitPanel({
             groups={['provenance']}
             hideHeadings
           />
-          <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <dl className={TRAIT_GRID_CLASS}>
             {metadata.metadata_version ? (
               <Fact label={t('panel.metadataVersion')}>
                 <span className="font-mono">{metadata.metadata_version}</span>
@@ -340,7 +347,7 @@ export function NftTraitPanel({
             ) : null}
             {metadata.image_details ? (
               <Fact label={t('panel.image')} wide>
-                <span className="mb-1 block text-xs text-muted-foreground">
+                <span className="mb-1 block type-caption text-subtle">
                   {metadata.image_details.width && metadata.image_details.height
                     ? t('panel.dimensions', {
                         width: metadata.image_details.width,
@@ -362,7 +369,7 @@ export function NftTraitPanel({
             ) : null}
             {metadata.animation_details ? (
               <Fact label={t('panel.animation')} wide>
-                <span className="mb-1 block text-xs text-muted-foreground">
+                <span className="mb-1 block type-caption text-subtle">
                   {metadata.animation_details.width && metadata.animation_details.height
                     ? t('panel.dimensions', {
                         width: metadata.animation_details.width,
@@ -387,8 +394,8 @@ export function NftTraitPanel({
         </TabsContent>
 
         {media ? (
-          <TabsContent value="media" className="mt-4">
-            <div className="grid gap-2 sm:grid-cols-2">
+          <TabsContent value="media" className="mt-6">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {media.web_image ? (
                 <MediaLink
                   href={media.web_image}
@@ -439,9 +446,14 @@ export function NftTraitPanel({
   }
 
   return (
-    <section className={className} data-testid="nft-trait-panel" aria-label={t('panel.title')}>
-      <SectionDivider title={t('panel.title')} className="mb-2" />
-      <p className="mb-6 text-sm text-muted-foreground">{t('panel.subtitle')}</p>
+    <section className={className} data-testid="nft-trait-panel" aria-labelledby={headingId}>
+      <h2 id={headingId} className="type-section text-foreground">
+        {t('panel.title')}
+      </h2>
+      <p className="mt-2 mb-6 max-w-[var(--measure-lede)] type-body-sm text-muted-foreground">
+        {t('panel.subtitle')}
+      </p>
+      {lead ? <div className="mb-8">{lead}</div> : null}
       {body}
     </section>
   );

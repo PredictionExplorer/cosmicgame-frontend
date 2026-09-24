@@ -7,19 +7,11 @@
     "productDescription": "Unique generative NFT from the Cosmic Signature procedural on-chain art protocol, rendered from three-body problem physics.",
     "breadcrumbToken": "Token #{id}"
   },
-  "breadcrumb": {
-    "tokenFallback": "Token {id}"
-  },
-  "hero": {
-    "unnamedToken": "Unnamed Token"
-  },
   "badges": {
     "stellarSelectionRecipient": "Stellar Selection Recipient",
     "anchorRecipient": "Anchor Recipient",
     "cycleRecipient": "Cycle Recipient",
     "enduranceChampion": "Endurance Champion",
-    "receivedAsCycleRecipient": "Received as the Cycle Recipient in Cycle #{round}",
-    "receivedAs": "Received as a {label}",
     "eligibleForAnchoring": "Eligible for Anchoring",
     "eligibleForAnchoringTooltip": "This Cosmic Signature NFT has never been anchored and can receive ETH Anchor Distributions when anchored.",
     "alreadyAnchored": "Already Anchored",
@@ -32,12 +24,10 @@
     "copyPageLink": "Copy Page Link"
   },
   "actions": {
-    "buyOrSellNfts": "Buy or sell NFTs",
-    "viewCycleDetails": "View Cycle #{round} Details"
+    "buyOrSellNfts": "Buy or sell NFTs"
   },
   "navigation": {
-    "previousToken": "Previous token",
-    "nextToken": "Next token"
+    "label": "Previous and next Signatures"
   },
   "sections": {
     "nameHistory": "Name History",
@@ -71,24 +61,31 @@
   },
   "metadata": {
     "imprinted": "Imprinted",
-    "imprintedTooltip": "When this token was imprinted on-chain. Click to view the transaction.",
     "cycle": "Cycle",
-    "cycleTooltip": "The Performance Cycle in which this token was allocated. Click to view cycle details.",
     "recipient": "Recipient",
-    "recipientTooltip": "The address that originally received this token during the Performance Cycle.",
     "owner": "Owner",
-    "ownerTooltip": "The current holder of this token. May differ from the recipient if the token was transferred.",
     "roundNumber": "Cycle #{round}",
+    "anchoring": "Anchoring",
     "seed": "Seed",
     "seedTooltip": "The unique random seed used to generate this token's artwork and traits.",
     "copySeed": "Copy seed"
   },
-  "video": {
-    "watchAnimation": "Watch Animation",
-    "watchAnimationTooltip": "Each Cosmic Signature NFT has a unique generative animation derived from its seed. Click to watch."
-  },
   "image": {
-    "defaultAlt": "NFT",
+    "rendering": "Rendering",
     "artworkUnavailable": "Artwork unavailable"
+  },
+  "viewer": {
+    "modeLabel": "Artwork view",
+    "still": "Still",
+    "motion": "In motion",
+    "play": "Play animation",
+    "pause": "Pause animation",
+    "fullscreen": "Full screen",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Fit to screen",
+    "zoomHint": "Select the artwork or press + to zoom in.",
+    "panHint": "Drag or use the arrow keys to move around the artwork. Press 0 to fit it to the screen.",
+    "motionError": "The animation could not be loaded.",
+    "motionLabel": "Animation of {subject}"
   }
 }

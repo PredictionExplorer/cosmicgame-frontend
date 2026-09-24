@@ -45,7 +45,7 @@ export function FateGlyph({ value, size = 'sm', withLabel = false, className }: 
           role="img"
           className={cn(
             'inline-flex items-center gap-1 cursor-help',
-            size === 'sm' ? 'text-[10px]' : 'text-xs',
+            size === 'sm' ? 'type-caption' : 'text-xs',
             className,
           )}
           aria-label={t('card.fateAria', { value: label })}

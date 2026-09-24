@@ -12,8 +12,8 @@ jest.mock('../../../hooks/useRWLKNFT', () => ({
 jest.mock(
   '../NFTImage',
   () =>
-    function MockNFTImage({ src }: { src: string }) {
-      return <img data-testid="nft-image" src={src} alt="nft" />;
+    function MockNFTImage({ src, alt = 'nft' }: { src: string; alt?: string }) {
+      return <img data-testid="nft-image" src={src} alt={alt} />;
     },
 );
 
@@ -43,9 +43,21 @@ describe('RandomWalkNFT', () => {
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
-  it('applies selected border style when selected', () => {
+  it('marks the selected card with the primary border and a check, not colour alone', () => {
     const { container } = render(<RandomWalkNFT tokenId={1} selected={true} />);
-    expect(container.firstChild).toHaveClass('border-white');
+    expect(container.firstChild).toHaveClass('border-primary');
+    expect(container.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('hides its image and number from assistive tech when decorative', () => {
+    render(<RandomWalkNFT tokenId={7} decorative />);
+    expect(screen.getByTestId('nft-image')).toHaveAttribute('alt', '');
+    expect(screen.getByText('#000007')).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('names its link by the image and the token number', () => {
+    render(<RandomWalkNFT tokenId={99} selectable={false} />);
+    expect(screen.getByRole('link')).toHaveAccessibleName('nft #000099');
   });
 
   it('uses the palette border when not selected', () => {

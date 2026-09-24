@@ -253,5 +253,10 @@
     "segmentAria": "{value}: {count} NFT. Lọc theo đặc tính này.",
     "legendCount": "{count}",
     "loading": "Đang đọc đặc tính của bộ sưu tập…"
+  },
+  "alt": {
+    "subjectNamed": "“{name}”, Cosmic Signature {id}",
+    "withTraits": "{subject}: cấu trúc {structure}, bảng màu {palette}",
+    "withTraitsAndClass": "{subject}: cấu trúc {structure}, bảng màu {palette}, lớp quang phổ {spectralClass}"
   }
 }

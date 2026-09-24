@@ -17,7 +17,7 @@ const pillVariants = cva(
   {
     variants: {
       tone: {
-        neutral: 'border-white/[0.08] bg-white/[0.04] text-muted-foreground',
+        neutral: 'border-rule bg-surface-sunken text-muted-foreground',
         aurora:
           'border-[rgb(var(--aurora-cyan-rgb)/0.25)] bg-[rgb(var(--aurora-cyan-rgb)/0.08)] text-[rgb(var(--aurora-cyan-rgb))]',
         nebula:
@@ -64,8 +64,8 @@ export const AttributePill = React.forwardRef<HTMLSpanElement, AttributePillProp
       {icon ? <span aria-hidden>{icon}</span> : null}
       {label ? (
         <>
-          <span className="text-muted-foreground/70">{label}</span>
-          <span aria-hidden className="text-muted-foreground/30">
+          <span className="text-subtle">{label}</span>
+          <span aria-hidden className="text-subtle">
             ·
           </span>
         </>

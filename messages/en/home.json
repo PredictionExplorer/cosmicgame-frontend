@@ -678,7 +678,6 @@
   },
   "latestNfts": {
     "title": "Latest NFTs",
-    "dividerAlt": "divider",
     "previousAria": "Previous latest NFTs",
     "nextAria": "Next latest NFTs",
     "empty": {
@@ -689,7 +688,8 @@
   },
   "rwlkGrid": {
     "searchPlaceholder": "Enter NFT ID",
-    "searchIconAlt": "search icon",
+    "searchAria": "Find a RandomWalk NFT by ID",
+    "tokenAria": "RandomWalk NFT {id}",
     "empty": "Nothing Found!"
   },
   "orientation": {

@@ -253,5 +253,10 @@
     "segmentAria": "{value}: NFT {count}개. 이 특성으로 필터링합니다.",
     "legendCount": "{count}",
     "loading": "컬렉션 특성을 읽는 중…"
+  },
+  "alt": {
+    "subjectNamed": "Cosmic Signature {id} “{name}”",
+    "withTraits": "{subject} — 구조: {structure}, 팔레트: {palette}",
+    "withTraitsAndClass": "{subject} — 구조: {structure}, 팔레트: {palette}, 분광형: {spectralClass}"
   }
 }

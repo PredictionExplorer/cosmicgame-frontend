@@ -678,7 +678,6 @@
   },
   "latestNfts": {
     "title": "最新 NFT",
-    "dividerAlt": "分隔线",
     "previousAria": "上一组最新 NFT",
     "nextAria": "下一组最新 NFT",
     "empty": {
@@ -689,7 +688,8 @@
   },
   "rwlkGrid": {
     "searchPlaceholder": "输入 NFT ID",
-    "searchIconAlt": "搜索图标",
+    "searchAria": "按 ID 查找 RandomWalk NFT",
+    "tokenAria": "RandomWalk NFT 编号 {id}",
     "empty": "未找到匹配的 NFT"
   },
   "orientation": {

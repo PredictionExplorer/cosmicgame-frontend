@@ -678,7 +678,6 @@
   },
   "latestNfts": {
     "title": "최신 NFT",
-    "dividerAlt": "구분선",
     "previousAria": "이전 최신 NFT",
     "nextAria": "다음 최신 NFT",
     "empty": {
@@ -689,7 +688,8 @@
   },
   "rwlkGrid": {
     "searchPlaceholder": "NFT ID 입력",
-    "searchIconAlt": "검색 아이콘",
+    "searchAria": "ID로 RandomWalk NFT 검색",
+    "tokenAria": "RandomWalk NFT {id}",
     "empty": "검색 결과가 없습니다"
   },
   "orientation": {

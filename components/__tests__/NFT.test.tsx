@@ -27,11 +27,18 @@ describe('NFT', () => {
       RecordType: 1,
       TokenName: 'Six',
     };
-    render(<NFT nft={mockData} />);
+    const { container } = render(<NFT nft={mockData} />);
 
     // Grid cards render the lightweight card thumbnail (full image is the fallback).
+    // The link is named by its label, so the image is decorative.
     const thumb = getThumbUrl(mockData.Seed, 'card');
-    const src = screen.getByAltText('NFT').getAttribute('src') ?? '';
+    const image = container.querySelector('img');
+    expect(image).toHaveAttribute('alt', '');
+    expect(image).toHaveClass('aspect-art', 'bg-art-ground', 'object-contain');
+    expect(screen.getByRole('link')).toHaveAccessibleName(
+      `${formatId(mockData.TokenId)} ${mockData.TokenName}`,
+    );
+    const src = image?.getAttribute('src') ?? '';
     const decoded = new URL(src, 'http://localhost').searchParams.get('url') ?? src;
     expect(decoded).toContain(thumb);
     expect(screen.getByText(formatId(mockData.TokenId))).toBeInTheDocument();

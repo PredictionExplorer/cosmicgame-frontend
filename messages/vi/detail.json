@@ -7,19 +7,11 @@
     "productDescription": "Cosmic Signature NFT là tác phẩm tạo sinh độc nhất trên chuỗi, được tạo từ mô phỏng bài toán ba vật thể.",
     "breadcrumbToken": "Token #{id}"
   },
-  "breadcrumb": {
-    "tokenFallback": "Token {id}"
-  },
-  "hero": {
-    "unnamedToken": "Token chưa đặt tên"
-  },
   "badges": {
     "stellarSelectionRecipient": "Người nhận Tinh tuyển",
     "anchorRecipient": "Người nhận neo giữ",
     "cycleRecipient": "Người nhận của chu kỳ",
     "enduranceChampion": "Quán quân Bền bỉ",
-    "receivedAsCycleRecipient": "Nhận phân bổ với vai trò người nhận của chu kỳ #{round}",
-    "receivedAs": "Nhận với vai trò {label}",
     "eligibleForAnchoring": "Đủ điều kiện neo giữ",
     "eligibleForAnchoringTooltip": "Cosmic Signature NFT này chưa từng được neo giữ và có thể nhận phân phối neo giữ bằng ETH khi được neo giữ.",
     "alreadyAnchored": "Đã neo giữ",
@@ -32,12 +24,10 @@
     "copyPageLink": "Sao chép liên kết trang"
   },
   "actions": {
-    "buyOrSellNfts": "Mua hoặc bán NFT",
-    "viewCycleDetails": "Xem chi tiết chu kỳ #{round}"
+    "buyOrSellNfts": "Mua hoặc bán NFT"
   },
   "navigation": {
-    "previousToken": "Token trước",
-    "nextToken": "Token sau"
+    "label": "Signature trước và sau"
   },
   "sections": {
     "nameHistory": "Lịch sử tên",
@@ -71,24 +61,31 @@
   },
   "metadata": {
     "imprinted": "Đã khắc",
-    "imprintedTooltip": "Thời điểm token này được khắc lên chuỗi. Nhấn để xem giao dịch.",
     "cycle": "Chu kỳ",
-    "cycleTooltip": "Chu kỳ trình diễn trong đó token này được phân bổ. Nhấn để xem chi tiết chu kỳ.",
     "recipient": "Người nhận",
-    "recipientTooltip": "Địa chỉ đã nhận token này ban đầu trong chu kỳ trình diễn.",
     "owner": "Chủ sở hữu",
-    "ownerTooltip": "Người nắm giữ token này hiện tại. Có thể khác với người nhận nếu token đã được chuyển giao.",
     "roundNumber": "Chu kỳ #{round}",
+    "anchoring": "Neo giữ",
     "seed": "Seed",
     "seedTooltip": "Seed ngẫu nhiên độc nhất được dùng để tạo tác phẩm và đặc tính của token này.",
     "copySeed": "Sao chép seed"
   },
-  "video": {
-    "watchAnimation": "Xem hoạt ảnh",
-    "watchAnimationTooltip": "Mỗi Cosmic Signature NFT có hoạt ảnh tạo sinh riêng, được tạo từ seed của tác phẩm. Nhấn để xem."
-  },
   "image": {
-    "defaultAlt": "NFT",
+    "rendering": "Đang kết xuất",
     "artworkUnavailable": "Tác phẩm không khả dụng"
+  },
+  "viewer": {
+    "modeLabel": "Chế độ xem tác phẩm",
+    "still": "Ảnh tĩnh",
+    "motion": "Chuyển động",
+    "play": "Phát hoạt ảnh",
+    "pause": "Tạm dừng hoạt ảnh",
+    "fullscreen": "Toàn màn hình",
+    "zoomIn": "Phóng to",
+    "zoomOut": "Vừa màn hình",
+    "zoomHint": "Chọn tác phẩm hoặc nhấn + để phóng to.",
+    "panHint": "Kéo hoặc dùng phím mũi tên để di chuyển quanh tác phẩm. Nhấn 0 để vừa màn hình.",
+    "motionError": "Không thể tải hoạt ảnh.",
+    "motionLabel": "Hoạt ảnh của {subject}"
   }
 }

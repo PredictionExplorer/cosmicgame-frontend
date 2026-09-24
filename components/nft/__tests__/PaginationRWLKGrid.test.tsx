@@ -72,7 +72,7 @@ describe('PaginationRWLKGrid', () => {
         setSelectedToken={setSelected}
       />,
     );
-    fireEvent.click(screen.getAllByTestId('rwlk-card')[0]!.closest('[class*="cursor"]')!);
+    fireEvent.click(screen.getByRole('button', { name: 'home.rwlkGrid.tokenAria(id=#000010)' }));
     expect(setSelected).toHaveBeenCalledWith(10);
   });
 
@@ -86,15 +86,71 @@ describe('PaginationRWLKGrid', () => {
         setSelectedToken={setSelected}
       />,
     );
-    fireEvent.click(screen.getAllByTestId('rwlk-card')[0]!.closest('[class*="cursor"]')!);
+    fireEvent.click(screen.getAllByTestId('rwlk-option')[0]!);
     expect(setSelected).toHaveBeenCalledWith(-1);
   });
 
-  it('card click is no-op when setSelectedToken is not provided', () => {
+  it('renders plain cards, not buttons, when nothing can be selected', () => {
     render(<PaginationRWLKGrid loading={false} data={[10]} />);
-    expect(() =>
-      fireEvent.click(screen.getByTestId('rwlk-card').closest('[class*="cursor"]')!),
-    ).not.toThrow();
+    expect(screen.getByTestId('rwlk-card')).toBeInTheDocument();
+    expect(screen.queryByTestId('rwlk-option')).not.toBeInTheDocument();
+  });
+
+  it('makes each token a labelled toggle button that reports its selection', () => {
+    render(
+      <PaginationRWLKGrid
+        loading={false}
+        data={[10, 20]}
+        selectedToken={20}
+        setSelectedToken={jest.fn()}
+      />,
+    );
+    const group = screen.getByRole('group', { name: 'home.form.rwlk.title' });
+    const options = within(group).getAllByRole('button');
+    expect(options).toHaveLength(2);
+    expect(options[0]).toHaveAttribute('type', 'button');
+    expect(options[0]).toHaveAttribute('aria-pressed', 'false');
+    expect(options[1]).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('is labelled by the picker heading when one is given', () => {
+    render(
+      <>
+        <h3 id="rwlk-heading">Your NFTs</h3>
+        <PaginationRWLKGrid
+          loading={false}
+          data={[10]}
+          setSelectedToken={jest.fn()}
+          labelledBy="rwlk-heading"
+        />
+      </>,
+    );
+    expect(screen.getByRole('group', { name: 'Your NFTs' })).toBeInTheDocument();
+  });
+
+  it('selects a token from the keyboard', () => {
+    const setSelected = jest.fn();
+    render(
+      <PaginationRWLKGrid
+        loading={false}
+        data={[10]}
+        selectedToken={-1}
+        setSelectedToken={setSelected}
+      />,
+    );
+    const option = screen.getByTestId('rwlk-option');
+    option.focus();
+    expect(option).toHaveFocus();
+    // Native buttons turn Enter and Space into clicks.
+    fireEvent.click(option);
+    expect(setSelected).toHaveBeenCalledWith(10);
+  });
+
+  it('labels the search field and keeps its icon out of the accessibility tree', () => {
+    const { container } = render(<PaginationRWLKGrid loading={false} data={[]} />);
+    expect(screen.getByRole('searchbox', { name: 'home.rwlkGrid.searchAria' })).toBeInTheDocument();
+    expect(container.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
+    expect(container.querySelector('img')).toBeNull();
   });
 
   it('search input filters displayed items', () => {
@@ -158,6 +214,18 @@ describe('PaginationRWLKGrid', () => {
 
   it('has no accessibility violations', async () => {
     const { container } = render(<PaginationRWLKGrid loading={false} data={[]} />);
+    await checkA11y(container);
+  });
+
+  it('has no accessibility violations with selectable tokens', async () => {
+    const { container } = render(
+      <PaginationRWLKGrid
+        loading={false}
+        data={[10, 20]}
+        selectedToken={10}
+        setSelectedToken={jest.fn()}
+      />,
+    );
     await checkA11y(container);
   });
 });

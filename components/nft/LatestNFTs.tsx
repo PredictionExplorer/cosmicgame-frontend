@@ -25,7 +25,8 @@ const LatestNFTs = () => {
           <NftMarketplaceButton variant="compact" />
         </div>
         <div className="text-center mb-14">
-          <Image src="/images/divider.svg" width={93} height={3} alt={t('latestNfts.dividerAlt')} />
+          {/* A decorative rule: announcing "divider" would only add noise. */}
+          <Image src="/images/divider.svg" width={93} height={3} alt="" />
         </div>
 
         {nftData.length > 0 ? (
@@ -71,7 +72,7 @@ const LatestNFTs = () => {
             </div>
           </>
         ) : (
-          <div className="mx-auto mt-8 max-w-lg rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 text-center">
+          <div className="mx-auto mt-8 max-w-lg rounded-surface border border-rule bg-surface p-6 text-center">
             <h3 className="font-display text-lg font-semibold text-foreground">
               {t('latestNfts.empty.title')}
             </h3>

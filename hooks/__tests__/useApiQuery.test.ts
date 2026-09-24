@@ -580,6 +580,32 @@ describe('useApiQuery hooks', () => {
 
       expect(mockUseQuery.mock.calls[0][0].enabled).toBe(true);
     });
+
+    it('treats a server seed as fresh by default', () => {
+      const seed = { TokenId: 7 } as never;
+      renderHook(() => useCSTInfo(7, seed));
+
+      const options = mockUseQuery.mock.calls[0][0];
+      expect(options.initialData).toBe(seed);
+      expect(options.initialDataUpdatedAt).toBeUndefined();
+    });
+
+    it('dates a stale ISR seed to epoch 0 so it refreshes after hydration', () => {
+      const seed = { TokenId: 7 } as never;
+      renderHook(() => useCSTInfo(7, seed, { seedIsStale: true }));
+
+      const options = mockUseQuery.mock.calls[0][0];
+      expect(options.initialData).toBe(seed);
+      expect(options.initialDataUpdatedAt).toBe(0);
+    });
+
+    it('leaves a missing seed to the normal first fetch', () => {
+      renderHook(() => useCSTInfo(7, null, { seedIsStale: true }));
+
+      const options = mockUseQuery.mock.calls[0][0];
+      expect(options.initialData).toBeUndefined();
+      expect(options.initialDataUpdatedAt).toBeUndefined();
+    });
   });
 
   describe('useNameHistory', () => {

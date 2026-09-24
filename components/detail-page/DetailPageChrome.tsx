@@ -4,15 +4,21 @@ import type { ReactNode } from 'react';
 
 import { cn } from '@/lib/utils';
 
-export const detailPanelClass =
-  'rounded-xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm overflow-hidden';
+/**
+ * The one quiet surface of a record page: the surface token, a hairline rule
+ * and the surface radius. Content inside groups with hairlines and space, not
+ * nested boxes; no blur, because nothing here floats.
+ */
+export const detailPanelClass = 'overflow-hidden rounded-surface border border-rule bg-surface';
 
 export const detailLinkClass = 'text-primary underline-offset-2 hover:underline';
 
+/** A spec-sheet ledger: label / value rows divided by faint hairlines. */
 export function DefinitionList({ children }: { children: ReactNode }) {
-  return <dl className="divide-y divide-white/[0.06]">{children}</dl>;
+  return <dl className="divide-y divide-rule-faint">{children}</dl>;
 }
 
+/** A titled panel of a record page, named by its own heading. */
 export function SectionCard({
   sectionId,
   title,
@@ -28,25 +34,25 @@ export function SectionCard({
 }) {
   return (
     <section className={cn(detailPanelClass, 'mb-8', className)} aria-labelledby={sectionId}>
-      <div className="border-b border-white/[0.06] px-5 py-4">
-        <h2
-          id={sectionId}
-          className="font-display text-lg font-semibold tracking-tight text-foreground"
-        >
+      <div className="border-b border-rule-faint px-5 py-4">
+        <h2 id={sectionId} className="type-heading-3 text-foreground">
           {title}
         </h2>
-        {description ? <p className="mt-1 text-sm text-muted-foreground">{description}</p> : null}
+        {description ? (
+          <p className="mt-1 type-body-sm text-muted-foreground">{description}</p>
+        ) : null}
       </div>
       {children}
     </section>
   );
 }
 
+/** One row of a DefinitionList: a sentence-case label beside its value (stacked on phones). */
 export function DetailRow({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="grid grid-cols-1 gap-1.5 px-4 py-3.5 sm:grid-cols-[minmax(0,260px)_minmax(0,1fr)] sm:gap-8 sm:items-baseline sm:px-5">
-      <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</dt>
-      <dd className="min-w-0 text-sm leading-relaxed text-foreground">{children}</dd>
+      <dt className="type-label text-subtle">{label}</dt>
+      <dd className="min-w-0 type-body-sm leading-relaxed text-foreground">{children}</dd>
     </div>
   );
 }

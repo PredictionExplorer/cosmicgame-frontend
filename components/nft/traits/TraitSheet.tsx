@@ -23,6 +23,12 @@ import { AllocationPill } from './AllocationPill';
 import { ChaosMeter } from './ChaosMeter';
 import { FateGlyph } from './FateGlyph';
 import { HueStrip } from './HueStrip';
+import {
+  TRAIT_GRID_CLASS,
+  TRAIT_GRID_DENSE_CLASS,
+  TRAIT_TILE_CLASS,
+  TRAIT_TILE_DENSE_CLASS,
+} from './layout';
 import { SpectralClassBadge } from './SpectralClassBadge';
 import { useTraitLabels } from './useTraitLabels';
 
@@ -136,7 +142,7 @@ export function TraitSheet({
         return (
           <Link
             href={`/allocation/${entry.cycle}`}
-            className="font-medium text-inherit no-underline transition-colors hover:text-primary"
+            className="link-quiet inline-flex min-h-6 items-center font-medium"
             aria-label={t('card.viewCycle', { n: entry.cycle })}
           >
             {t('card.cycleLong', { n: entry.cycle })}
@@ -161,7 +167,7 @@ export function TraitSheet({
       <button
         type="button"
         onClick={() => onSelectTrait(key, value)}
-        className="inline-flex items-center rounded-md text-left transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="inline-flex items-center rounded-edge text-left transition-colors hover:text-primary"
       >
         {content}
       </button>
@@ -180,14 +186,7 @@ export function TraitSheet({
             {hideHeadings ? null : (
               <h3 className="type-eyebrow mb-3 text-muted-foreground">{t(`groups.${group}`)}</h3>
             )}
-            <dl
-              className={cn(
-                'grid gap-x-6',
-                dense
-                  ? 'grid-cols-2 gap-y-3 sm:grid-cols-3'
-                  : 'grid-cols-1 gap-y-4 sm:grid-cols-2 lg:grid-cols-3',
-              )}
-            >
+            <dl className={dense ? TRAIT_GRID_DENSE_CLASS : TRAIT_GRID_CLASS}>
               {rows.map(({ key, value }) => {
                 const share =
                   CATEGORICAL.has(key) && total
@@ -201,21 +200,21 @@ export function TraitSheet({
                   <div
                     key={key}
                     className={cn(
-                      'min-w-0 rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2.5',
+                      dense ? TRAIT_TILE_DENSE_CLASS : TRAIT_TILE_CLASS,
                       // The allocation pill is the widest value; give it room.
                       key === 'allocation' && 'col-span-2',
                     )}
                     data-testid={`trait-row-${key}`}
                   >
-                    <dt className="mb-1 flex items-center gap-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                    <dt className="mb-1 flex items-center gap-1 type-label text-subtle">
                       {typeLabel(key)}
                       <InfoTooltip content={typeHint(key)} iconClassName="h-3 w-3" />
                     </dt>
-                    <dd className="flex flex-wrap items-center gap-2 text-sm text-foreground">
+                    <dd className="flex flex-wrap items-center gap-2 type-body-sm text-foreground">
                       {value}
                       {share !== undefined && total ? (
                         <span
-                          className="ml-auto shrink-0 font-mono text-[10px] tabular-nums text-muted-foreground/70"
+                          className="ml-auto shrink-0 type-caption tabular-nums text-subtle"
                           title={t('rarity.share', { count: share, total })}
                         >
                           {t('rarity.shareShort', { count: share, total })}

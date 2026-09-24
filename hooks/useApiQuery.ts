@@ -346,15 +346,31 @@ export function useCSTTokensByUser(address: string | null | undefined) {
   });
 }
 
-export function useCSTInfo(tokenId: number | null | undefined, initialData?: CSTTokenInfo | null) {
+export interface CSTInfoOptions {
+  /**
+   * The seed may be older than the token's live state: an ISR page reads it
+   * once per regeneration window, so the owner, name and anchoring can have
+   * changed since. Dating it to epoch 0 keeps it for the first paint and
+   * refreshes it right after hydration. Leave it off where the seed only
+   * feeds immutable fields (the home hero's artwork, drawn from the seed).
+   */
+  seedIsStale?: boolean;
+}
+
+export function useCSTInfo(
+  tokenId: number | null | undefined,
+  initialData?: CSTTokenInfo | null,
+  { seedIsStale = false }: CSTInfoOptions = {},
+) {
   return useQuery<CSTTokenInfo | null>({
     queryKey: ['cstInfo', tokenId],
     queryFn: ({ signal }) => api.get_cst_info(tokenId!, { signal }),
     enabled: tokenId != null && tokenId >= 0,
     staleTime: 60_000,
-    // Server-rendered seed (e.g. the home hero artwork): keeps the first
-    // client render identical to the SSR HTML without an immediate refetch.
+    // A server-rendered seed keeps the first client render identical to the
+    // SSR HTML; unless it is marked stale it also counts as fresh.
     initialData: initialData ?? undefined,
+    initialDataUpdatedAt: initialData && seedIsStale ? 0 : undefined,
   });
 }
 

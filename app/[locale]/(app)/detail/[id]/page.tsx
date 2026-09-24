@@ -13,7 +13,7 @@ import {
   type CosmicSignatureMetadata,
   type TraitTranslator,
 } from '@/lib/nftMetadata';
-import { getAPIUrl } from '@/services/api/client';
+import { flattenTx, getAPIUrl } from '@/services/api/client';
 import type { CSTTokenInfo } from '@/services/api/types';
 import { createMetadata } from '@/utils/seo';
 import { JsonLd, nftProductJsonLd, breadcrumbJsonLd } from '@/utils/jsonLd';
@@ -166,7 +166,13 @@ export default async function Page({ params }: PageProps) {
             localeHref(APP_ORIGIN, '/', locale),
           )}
         />
-        <DetailPage tokenId={tokenId} initialMetadata={metadata} />
+        <DetailPage
+          tokenId={tokenId}
+          initialMetadata={metadata}
+          // The same record the client reads, so the art and its wall label
+          // are in the first HTML paint instead of behind a skeleton.
+          initialToken={tokenInfo ? (flattenTx(tokenInfo) as CSTTokenInfo) : undefined}
+        />
       </>
     </PageMessages>
   );
