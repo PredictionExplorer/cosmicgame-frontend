@@ -4,7 +4,7 @@ import { SpecialAllocationRecipients } from '@/components/tables/SpecialAllocati
 import type { ChampionsState } from '@/hooks/useChampions';
 import type { GestureInfo } from '@/services/api/types';
 
-import { checkA11y, render, screen } from '@/test-utils';
+import { checkA11y, render, screen, within } from '@/test-utils';
 
 const enduranceAddress = '0x1111111111111111111111111111111111111111';
 const chronoAddress = '0x3333333333333333333333333333333333333333';
@@ -460,7 +460,10 @@ describe('SpecialAllocationRecipients', () => {
     expect(screen.getByTestId('chrono-active-challenge')).toHaveTextContent(
       'tables.specialAllocation.activeEnduranceChallenge',
     );
-    expect(screen.getByTestId('chrono-active-challenge')).toHaveTextContent(enduranceAddress);
+    // The challenger is an AddressChip: short hex, the full address on hover.
+    expect(
+      within(screen.getByTestId('chrono-active-challenge')).getByRole('link', { name: /^0x1111/ }),
+    ).toHaveAttribute('title', enduranceAddress);
     expect(screen.getByTestId('chrono-challenge-segment')).toHaveTextContent('20m');
     expect(screen.getByTestId('chrono-challenge-next-change')).toHaveTextContent(
       'tables.specialAllocation.canOvertakeIn',
