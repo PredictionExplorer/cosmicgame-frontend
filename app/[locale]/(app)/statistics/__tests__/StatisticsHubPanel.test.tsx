@@ -46,7 +46,12 @@ describe('StatisticsHubPanel', () => {
   it('renders headline stat cards from the dashboard', () => {
     render(<StatisticsHubPanel />);
     expect(screen.getByText('Total Cycles')).toBeInTheDocument();
-    expect(screen.getByText('Allocations Distributed', { selector: 'p' })).toBeInTheDocument();
+    // The StatCard label is a Term (the card has a tooltip); the economy row
+    // of the same name further down the panel has its own explanation.
+    const [headline] = screen.getAllByRole('button', {
+      name: 'More information about Allocations Distributed',
+    });
+    expect(headline).toHaveTextContent('Allocations Distributed');
     expect(screen.getByText('Contract Balance')).toBeInTheDocument();
     expect(screen.getByText('36.1595 ETH')).toBeInTheDocument();
   });
