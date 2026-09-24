@@ -1,9 +1,10 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Layers, Gavel, ArrowLeftRight, Ticket, ArrowRight } from 'lucide-react';
+import { ArrowLeftRight, ArrowRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
+import { AnchoringIcon, GestureIcon, StellarSelectionIcon } from '@/lib/conceptIcons';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 
@@ -35,13 +36,13 @@ export function QuickActions({ address, className }: QuickActionsProps) {
       label: t('statistics.quickActions.anchor.label'),
       description: t('statistics.quickActions.anchor.description'),
       href: '/my-anchors',
-      icon: <Layers className="h-4 w-4" />,
+      icon: <AnchoringIcon className="h-4 w-4" />,
     },
     {
       label: t('statistics.quickActions.gesture.label'),
       description: t('statistics.quickActions.gesture.description'),
       href: '/',
-      icon: <Gavel className="h-4 w-4" />,
+      icon: <GestureIcon className="h-4 w-4" />,
     },
     {
       label: t('statistics.quickActions.transfers.label'),
@@ -53,7 +54,7 @@ export function QuickActions({ address, className }: QuickActionsProps) {
       label: t('statistics.quickActions.stellarSelection.label'),
       description: t('statistics.quickActions.stellarSelection.description'),
       href: `/user/stellar-selection-eth/${address}`,
-      icon: <Ticket className="h-4 w-4" />,
+      icon: <StellarSelectionIcon className="h-4 w-4" />,
     },
   ];
 

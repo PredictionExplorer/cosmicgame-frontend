@@ -1,7 +1,15 @@
 'use client';
 
-import { Anchor, Feather, Flag, Hourglass, Sparkles, Timer } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
+import {
+  AnchoringIcon,
+  ChronoWarriorIcon,
+  EnduranceChampionIcon,
+  FinalCstGestureIcon,
+  SignatureAllocationIcon,
+  StellarSelectionIcon,
+} from '@/lib/conceptIcons';
 import { cn } from '@/lib/utils';
 import { AttributePill, type PillTone } from '@/components/nft/AttributePills';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -19,12 +27,12 @@ export interface AllocationPillProps {
 }
 
 const allocationStyles: Record<string, { tone: PillTone; Icon: typeof Sparkles }> = {
-  stellarSelection: { tone: 'aurora', Icon: Sparkles },
-  anchoredSelection: { tone: 'nebula', Icon: Anchor },
-  finalGesture: { tone: 'solar', Icon: Flag },
-  lastCstGesture: { tone: 'neutral', Icon: Feather },
-  enduranceChampion: { tone: 'impact', Icon: Hourglass },
-  chronoWarrior: { tone: 'rose', Icon: Timer },
+  stellarSelection: { tone: 'aurora', Icon: StellarSelectionIcon },
+  anchoredSelection: { tone: 'nebula', Icon: AnchoringIcon },
+  finalGesture: { tone: 'solar', Icon: SignatureAllocationIcon },
+  lastCstGesture: { tone: 'neutral', Icon: FinalCstGestureIcon },
+  enduranceChampion: { tone: 'impact', Icon: EnduranceChampionIcon },
+  chronoWarrior: { tone: 'rose', Icon: ChronoWarriorIcon },
 };
 
 /**

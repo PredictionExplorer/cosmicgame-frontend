@@ -2,11 +2,12 @@
 
 import type { ReactNode } from 'react';
 import { formatUnits } from 'viem';
-import { ExternalLink, Gift, ImageOff, Sparkles } from 'lucide-react';
+import { ExternalLink, ImageOff, Sparkles } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { getExplorerUrl, shortenHex } from '@/utils';
 
+import { AttachedAssetsIcon } from '@/lib/conceptIcons';
 import { Link } from '@/i18n/navigation';
 import NFTImage from '@/components/nft/NFTImage';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
@@ -137,7 +138,7 @@ export function AttachedNFTAllocationShowcase({
             </div>
 
             <div className="flex items-center gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.04] px-4 py-3 shadow-[0_18px_70px_-48px_rgb(var(--aurora-cyan-rgb)/0.9)]">
-              <Gift className="h-5 w-5 text-primary" />
+              <AttachedAssetsIcon className="h-5 w-5 text-primary" />
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                   {t('showcase.bonusReceipt.label')}

@@ -1,9 +1,10 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Gift, ImageOff } from 'lucide-react';
+import { ImageOff } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
+import { AttachedAssetsIcon } from '@/lib/conceptIcons';
 import { cn } from '@/lib/utils';
 import { TOUCH_TARGET_HEIGHT_CLASS } from '@/lib/touch-target';
 import { useDonationsERC20ByRound, useDonationsNFTList } from '@/hooks/useApiQuery';
@@ -101,7 +102,7 @@ export function AttachedAssetsSection({ currentRoundNum }: AttachedAssetsSection
     <StatsSection
       title={t('tokens.sections.attachedAssets')}
       tooltip={t('sectionTooltips.attachedAssets')}
-      icon={<Gift className="h-3.5 w-3.5" />}
+      icon={<AttachedAssetsIcon className="h-3.5 w-3.5" />}
       defaultOpen
     >
       <Tabs defaultValue="nfts">

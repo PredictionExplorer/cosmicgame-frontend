@@ -1,11 +1,17 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Wallet, Coins, Trophy, Gem, Gavel, TrendingUp } from 'lucide-react';
+import { Wallet, TrendingUp } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { formatEthValue } from '@/utils';
 
+import {
+  CstTokenIcon,
+  GestureIcon,
+  SignatureAllocationIcon,
+  StellarSelectionIcon,
+} from '@/lib/conceptIcons';
 import { formatFixed } from '@/utils/format';
 import { cn } from '@/lib/utils';
 import { StatCard, StatCardSkeleton } from '@/components/ui/stat-card';
@@ -58,26 +64,26 @@ export function HeroStats({
         label: t('statistics.hero.cstBalance.label'),
         value: `${formatFixed(balanceCST, 2)} CST`,
         tooltip: t('statistics.hero.cstBalance.tooltip'),
-        icon: <Coins className="h-4 w-4" />,
+        icon: <CstTokenIcon className="h-4 w-4" />,
         featured: true,
       },
       {
         label: t('statistics.hero.signatureAllocations.label'),
         value: userInfo.NumPrizes.toLocaleString(locale),
         tooltip: t('statistics.hero.signatureAllocations.tooltip'),
-        icon: <Trophy className="h-4 w-4" />,
+        icon: <SignatureAllocationIcon className="h-4 w-4" />,
       },
       {
         label: t('statistics.hero.totalEth.label'),
         value: formatEthValue(totalEthWon, locale),
         tooltip: t('statistics.hero.totalEth.tooltip'),
-        icon: <Gem className="h-4 w-4" />,
+        icon: <StellarSelectionIcon className="h-4 w-4" />,
       },
       {
         label: t('statistics.hero.gestures.label'),
         value: userInfo.NumBids.toLocaleString(locale),
         tooltip: t('statistics.hero.gestures.tooltip'),
-        icon: <Gavel className="h-4 w-4" />,
+        icon: <GestureIcon className="h-4 w-4" />,
       },
       {
         label: t('statistics.hero.selectionFrequency.label'),

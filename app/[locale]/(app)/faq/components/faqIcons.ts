@@ -1,12 +1,14 @@
-import { Gamepad2, Gem, Layers, Rocket, ShieldCheck, Trophy, type LucideIcon } from 'lucide-react';
+import { Blocks, Gem, Rocket, ShieldCheck, type LucideIcon } from 'lucide-react';
 
 import type { FAQCategoryIcon } from '@/content/faq';
 
+import { AllocationIcon, CycleIcon } from '@/lib/conceptIcons';
+
 export const FAQ_ICONS: Record<FAQCategoryIcon, LucideIcon> = {
   rocket: Rocket,
-  trophy: Trophy,
-  cycle: Gamepad2,
+  trophy: AllocationIcon,
+  cycle: CycleIcon,
   gem: Gem,
-  layers: Layers,
+  layers: Blocks,
   shield: ShieldCheck,
 };

@@ -1,12 +1,13 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ArrowRight, Fingerprint, HeartHandshake, Orbit, Radio, Sparkles } from 'lucide-react';
+import { ArrowRight, Fingerprint, Orbit, Radio, Sparkles } from 'lucide-react';
 import { LazyMotion, domAnimation, m } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { formatId, getAssetsUrl, toIntlLocale } from '@/utils';
 
+import { PublicGoodsIcon } from '@/lib/conceptIcons';
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
@@ -43,7 +44,7 @@ interface HomeObservatoryHeroProps {
 const storyCards = [
   { icon: Orbit, messageKey: 'gestures', tone: 'aurora' },
   { icon: Fingerprint, messageKey: 'cst', tone: 'nebula' },
-  { icon: HeartHandshake, messageKey: 'publicGoods', tone: 'impact' },
+  { icon: PublicGoodsIcon, messageKey: 'publicGoods', tone: 'impact' },
 ] as const;
 
 const toneClasses: Record<(typeof storyCards)[number]['tone'], string> = {

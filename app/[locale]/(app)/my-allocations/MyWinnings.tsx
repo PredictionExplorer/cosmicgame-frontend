@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import { Trophy, Gift, Coins } from 'lucide-react';
+import { Coins } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
+import { AttachedAssetsIcon, StellarSelectionIcon } from '@/lib/conceptIcons';
 import { useRouter } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -189,7 +190,7 @@ export default function MyWinnings() {
             </div>
           ) : !stellarSelectionETHAllocations || stellarSelectionETHAllocations.length === 0 ? (
             <EmptyState
-              icon={<Trophy className="h-8 w-8 text-muted-foreground/50" />}
+              icon={<StellarSelectionIcon className="h-8 w-8 text-muted-foreground/50" />}
               title={t('allocations.empty.ethTitle')}
               description={t('allocations.empty.ethDescription')}
             />
@@ -263,7 +264,7 @@ export default function MyWinnings() {
             </div>
           ) : !donatedNFTs || donatedNFTs.length === 0 ? (
             <EmptyState
-              icon={<Gift className="h-8 w-8 text-muted-foreground/50" />}
+              icon={<AttachedAssetsIcon className="h-8 w-8 text-muted-foreground/50" />}
               title={t('allocations.empty.nftTitle')}
               description={t('allocations.empty.nftDescription')}
             />

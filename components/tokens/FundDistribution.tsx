@@ -1,10 +1,17 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { Heart, Layers, RotateCcw, Shuffle, Swords, Trophy } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
 
+import {
+  AnchoringIcon,
+  ChronoWarriorIcon,
+  CompoundingReserveIcon,
+  PublicGoodsIcon,
+  SignatureAllocationIcon,
+  StellarSelectionIcon,
+} from '@/lib/conceptIcons';
 import {
   ALLOCATION_TRACK_COLORS,
   ALLOCATION_TRACK_COPY_KEYS,
@@ -28,12 +35,12 @@ type DistData = {
 };
 
 const TRACK_ICONS: Record<AllocationTrackId, ReactNode> = {
-  signature: <Trophy className="h-4 w-4" aria-hidden />,
-  chrono: <Swords className="h-4 w-4" aria-hidden />,
-  stellar: <Shuffle className="h-4 w-4" aria-hidden />,
-  anchor: <Layers className="h-4 w-4" aria-hidden />,
-  publicGoods: <Heart className="h-4 w-4" aria-hidden />,
-  nextCycle: <RotateCcw className="h-4 w-4" aria-hidden />,
+  signature: <SignatureAllocationIcon className="h-4 w-4" aria-hidden />,
+  chrono: <ChronoWarriorIcon className="h-4 w-4" aria-hidden />,
+  stellar: <StellarSelectionIcon className="h-4 w-4" aria-hidden />,
+  anchor: <AnchoringIcon className="h-4 w-4" aria-hidden />,
+  publicGoods: <PublicGoodsIcon className="h-4 w-4" aria-hidden />,
+  nextCycle: <CompoundingReserveIcon className="h-4 w-4" aria-hidden />,
 };
 
 /** A track's share of the reserve, clamped into [0, 100]; `null` when it could not be read. */

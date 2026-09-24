@@ -1,10 +1,11 @@
 'use client';
 
-import { Coins, Crown, Lock, Swords, Zap } from 'lucide-react';
+import { Lock, Zap } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { formatSeconds, shortenHex } from '@/utils';
 
+import { ChronoWarriorIcon, EnduranceChampionIcon, FinalCstGestureIcon } from '@/lib/conceptIcons';
 import { ChronoWarriorDetails } from '@/components/special-allocation/ChronoWarriorDetails';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import type { ChampionsState } from '@/hooks/useChampions';
@@ -199,7 +200,7 @@ export function ChronoEnduranceIntel({
       >
         <RoleSummary
           testId="control-desk-endurance"
-          icon={<Crown className="h-3.5 w-3.5" aria-hidden />}
+          icon={<EnduranceChampionIcon className="h-3.5 w-3.5" aria-hidden />}
           label={tTables('specialAllocation.enduranceChampion')}
           tooltip={tTables('specialAllocation.enduranceTooltip')}
           address={champions.endurance.address}
@@ -212,7 +213,7 @@ export function ChronoEnduranceIntel({
         />
         <RoleSummary
           testId="chrono-role-summary"
-          icon={<Swords className="h-3.5 w-3.5" aria-hidden />}
+          icon={<ChronoWarriorIcon className="h-3.5 w-3.5" aria-hidden />}
           label={tTables('specialAllocation.chronoWarrior')}
           tooltip={tTables('specialAllocation.chronoTooltip')}
           address={champions.chrono.address}
@@ -225,7 +226,7 @@ export function ChronoEnduranceIntel({
         />
         <RoleSummary
           testId="final-cst-role-summary"
-          icon={<Coins className="h-3.5 w-3.5" aria-hidden />}
+          icon={<FinalCstGestureIcon className="h-3.5 w-3.5" aria-hidden />}
           label={tTables('specialAllocation.finalCstGesture')}
           tooltip={tTables('specialAllocation.finalCstTooltip')}
           address={champions.lastCst.address}

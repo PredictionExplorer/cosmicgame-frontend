@@ -1,11 +1,12 @@
 'use client';
 
 import { useMemo } from 'react';
-import { ArrowRight, Crown, PackageOpen, Radio, Shuffle, Sparkles, User } from 'lucide-react';
+import { ArrowRight, PackageOpen, Radio, Sparkles, User } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { formatSeconds } from '@/utils';
 
+import { EnduranceChampionIcon, StellarSelectionIcon } from '@/lib/conceptIcons';
 import { Link } from '@/i18n/navigation';
 import { Surface } from '@/components/ui/surface';
 import { useApiData } from '@/contexts/ApiDataContext';
@@ -122,7 +123,7 @@ export function DeckPersonalStrip({
                   : 'text-[rgb(var(--solar-gold-rgb))]',
               )}
             >
-              <Crown className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              <EnduranceChampionIcon className="h-3.5 w-3.5 shrink-0" aria-hidden />
               {enduranceLabel}
             </span>
           )}
@@ -140,7 +141,7 @@ export function DeckPersonalStrip({
               data-testid="personal-stellar-standing"
               className="inline-flex items-center gap-1.5 text-xs tabular-nums text-muted-foreground"
             >
-              <Shuffle className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              <StellarSelectionIcon className="h-3.5 w-3.5 shrink-0" aria-hidden />
               {t('status.standing.ethStellar')} {formatFixed(standing.stellarEth, 1)}%{' \u00b7 '}
               {t('status.standing.nftStellar')} {formatFixed(standing.nft, 1)}%
             </span>

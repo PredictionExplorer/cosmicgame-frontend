@@ -2,22 +2,13 @@
 
 import { useMemo } from 'react';
 import {
-  Trophy,
-  Crown,
-  Swords,
   Coins,
   ChevronLeft,
   ChevronRight,
   ExternalLink,
   Copy,
-  Gavel,
-  Heart,
-  Landmark,
-  BarChart3,
   ImageIcon,
-  Gift,
   Share2,
-  Layers,
   Users,
   Sparkles,
 } from 'lucide-react';
@@ -27,6 +18,18 @@ import { useLocale, useTranslations } from 'next-intl';
 
 import { getExplorerUrl, formatEthValue, shortenHex, getEnduranceChampions } from '@/utils';
 
+import {
+  AnchorDistributionIcon,
+  AnchoringIcon,
+  AttachedAssetsIcon,
+  ChronoWarriorIcon,
+  EnduranceChampionIcon,
+  FinalCstGestureIcon,
+  GestureIcon,
+  PublicGoodsIcon,
+  SignatureAllocationIcon,
+  StellarSelectionIcon,
+} from '@/lib/conceptIcons';
 import { formatFixed, toIntlLocale } from '@/utils/format';
 import { ALLOCATION_TRACK_COLORS, type AllocationTrackId } from '@/config/allocationTracks';
 import { Link } from '@/i18n/navigation';
@@ -553,43 +556,43 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
 
   const stats = [
     {
-      icon: <Trophy className="h-3.5 w-3.5" />,
+      icon: <SignatureAllocationIcon className="h-3.5 w-3.5" />,
       label: t('details.statistics.cards.signatureEth.label'),
       value: `${formatFixed(allocationInfo.AmountEth, 4)} ETH`,
       tooltip: t('details.statistics.cards.signatureEth.tooltip'),
     },
     {
-      icon: <Heart className="h-3.5 w-3.5" />,
+      icon: <PublicGoodsIcon className="h-3.5 w-3.5" />,
       label: t('details.statistics.cards.publicGoods.label'),
       value: `${formatFixed(allocationInfo.CharityAmountETH, 4)} ETH`,
       tooltip: t('details.statistics.cards.publicGoods.tooltip'),
     },
     {
-      icon: <Landmark className="h-3.5 w-3.5" />,
+      icon: <AnchorDistributionIcon className="h-3.5 w-3.5" />,
       label: t('details.statistics.cards.anchor.label'),
       value: `${formatFixed(allocationInfo.StakingDepositAmountEth, 4)} ETH`,
       tooltip: t('details.statistics.cards.anchor.tooltip'),
     },
     {
-      icon: <BarChart3 className="h-3.5 w-3.5" />,
+      icon: <StellarSelectionIcon className="h-3.5 w-3.5" />,
       label: t('details.statistics.cards.stellar.label'),
       value: `${(allocationInfo.RoundStats.TotalRaffleEthDepositsEth ?? 0).toFixed(4)} ETH`,
       tooltip: t('details.statistics.cards.stellar.tooltip'),
     },
     {
-      icon: <Gavel className="h-3.5 w-3.5" />,
+      icon: <GestureIcon className="h-3.5 w-3.5" />,
       label: t('details.statistics.cards.gestures.label'),
       value: allocationInfo.RoundStats.TotalBids,
       tooltip: t('details.statistics.cards.gestures.tooltip'),
     },
     {
-      icon: <Gift className="h-3.5 w-3.5" />,
+      icon: <AttachedAssetsIcon className="h-3.5 w-3.5" />,
       label: t('details.statistics.cards.attachedNfts.label'),
       value: allocationInfo.RoundStats.TotalDonatedNFTs ?? 0,
       tooltip: t('details.statistics.cards.attachedNfts.tooltip'),
     },
     {
-      icon: <Layers className="h-3.5 w-3.5" />,
+      icon: <AnchoringIcon className="h-3.5 w-3.5" />,
       label: t('details.statistics.cards.anchoredTokens.label'),
       value: allocationInfo.StakingNumStakedTokens,
       tooltip: t('details.statistics.cards.anchoredTokens.tooltip'),
@@ -739,7 +742,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
           animate="visible"
         >
           <RecipientCard
-            icon={<Trophy className="h-5 w-5" />}
+            icon={<SignatureAllocationIcon className="h-5 w-5" />}
             title={t('details.recipientSection.cards.signature.title')}
             tooltip={t('details.recipientSection.cards.signature.tooltip')}
             address={allocationInfo.WinnerAddr}
@@ -759,7 +762,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
             featured
           />
           <RecipientCard
-            icon={<Swords className="h-5 w-5" />}
+            icon={<ChronoWarriorIcon className="h-5 w-5" />}
             title={t('details.recipientSection.cards.chrono.title')}
             tooltip={t('details.recipientSection.cards.chrono.tooltip')}
             address={allocationInfo.ChronoWarriorAddr}
@@ -778,7 +781,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
             testId="chrono-warrior"
           />
           <RecipientCard
-            icon={<Crown className="h-5 w-5" />}
+            icon={<EnduranceChampionIcon className="h-5 w-5" />}
             title={t('details.recipientSection.cards.endurance.title')}
             tooltip={t('details.recipientSection.cards.endurance.tooltip')}
             address={allocationInfo.EnduranceWinnerAddr}
@@ -793,7 +796,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
             testId="endurance-champion"
           />
           <RecipientCard
-            icon={<Coins className="h-5 w-5" />}
+            icon={<FinalCstGestureIcon className="h-5 w-5" />}
             title={t('details.recipientSection.cards.finalCst.title')}
             tooltip={t('details.recipientSection.cards.finalCst.tooltip')}
             address={allocationInfo.LastCstBidderAddr}

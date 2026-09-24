@@ -1,10 +1,11 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Shield, TrendingDown, ImageIcon, Ticket, Clock, Zap } from 'lucide-react';
+import { Shield, TrendingDown, ImageIcon, Clock, Zap } from 'lucide-react';
 
 import type { HowItWorksContent } from '@/content/how-it-works';
 
+import { StellarSelectionIcon } from '@/lib/conceptIcons';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 
 const containerVariants = {
@@ -21,7 +22,7 @@ export function ProTips({ proTips }: { proTips: HowItWorksContent['proTips'] }) 
   const tips = [
     { Icon: TrendingDown, ...proTips.tips[0] },
     { Icon: ImageIcon, ...proTips.tips[1] },
-    { Icon: Ticket, ...proTips.tips[2] },
+    { Icon: StellarSelectionIcon, ...proTips.tips[2] },
     { Icon: Shield, ...proTips.tips[3] },
     { Icon: Clock, ...proTips.tips[4] },
     { Icon: Zap, ...proTips.tips[5] },

@@ -1,10 +1,15 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Play, Users, TimerOff, Trophy, Ticket, RotateCcw } from 'lucide-react';
+import { Play, Users, TimerOff } from 'lucide-react';
 
 import type { HowItWorksContent } from '@/content/how-it-works';
 
+import {
+  CompoundingReserveIcon,
+  SignatureAllocationIcon,
+  StellarSelectionIcon,
+} from '@/lib/conceptIcons';
 import { GradientText } from '@/components/styled';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 
@@ -23,9 +28,9 @@ export function GameCycle({ gameCycle }: { gameCycle: HowItWorksContent['gameCyc
     { Icon: Play, ...gameCycle.phases[0] },
     { Icon: Users, ...gameCycle.phases[1] },
     { Icon: TimerOff, ...gameCycle.phases[2] },
-    { Icon: Trophy, ...gameCycle.phases[3] },
-    { Icon: Ticket, ...gameCycle.phases[4] },
-    { Icon: RotateCcw, ...gameCycle.phases[5] },
+    { Icon: SignatureAllocationIcon, ...gameCycle.phases[3] },
+    { Icon: StellarSelectionIcon, ...gameCycle.phases[4] },
+    { Icon: CompoundingReserveIcon, ...gameCycle.phases[5] },
   ];
 
   return (

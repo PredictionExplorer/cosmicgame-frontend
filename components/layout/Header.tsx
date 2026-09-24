@@ -1,21 +1,13 @@
 'use client';
 
 import { useState, useEffect, useMemo, type FC, type ReactNode } from 'react';
-import {
-  ArrowUpRight,
-  Coins,
-  Gift,
-  History,
-  Layers,
-  LayoutDashboard,
-  Menu,
-  type LucideIcon,
-} from 'lucide-react';
+import { ArrowUpRight, Coins, History, LayoutDashboard, Menu, type LucideIcon } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { formatEther } from 'viem';
 
 import { Link, usePathname } from '@/i18n/navigation';
 import type { AppLocale } from '@/i18n/routing';
+import { AllocationIcon, AnchoringIcon } from '@/lib/conceptIcons';
 import { cn } from '@/lib/utils';
 import getNAVs, { type NavDescriptor } from '@/config/nav';
 import { getEcosystemDestinations } from '@/config/ecosystem';
@@ -418,7 +410,7 @@ const Header: FC = () => {
                     t('links.myAllocations')
                   ),
                   route: '/my-allocations',
-                  icon: Gift,
+                  icon: AllocationIcon,
                 }}
                 onNavigate={closeDrawer}
               />
@@ -427,7 +419,7 @@ const Header: FC = () => {
                 onNavigate={closeDrawer}
               />
               <DrawerNavRow
-                item={{ title: t('links.myAnchors'), route: '/my-anchors', icon: Layers }}
+                item={{ title: t('links.myAnchors'), route: '/my-anchors', icon: AnchoringIcon }}
                 onNavigate={closeDrawer}
               />
               <DrawerNavRow

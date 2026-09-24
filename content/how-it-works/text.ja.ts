@@ -183,9 +183,8 @@ export const howItWorksTextJa = {
           '各Random Walk NFTは費用の引き下げに一度しか使えません。効果を最大にするため、費用の高い一筆のために取っておきましょう。',
       },
       {
-        title: '星選の対象を積み重ねる',
-        description:
-          '一筆ごとに星選の対象が1件記録されます。一筆が多いほど選ばれる頻度は高くなります。',
+        title: '一筆ごとに星選の対象を1件記録',
+        description: 'ETHでもCSTでも、一筆ごとにサイクル確定時の星選の対象が1件記録されます。',
         tooltip: `3人のETH星選受領者がサイクル準備金の${protocolFacts.stellarSelectionEthPercentage}%を分け合います。10人の参加者NFT受領者と10人のRandom Walk NFT係留者が、それぞれ${cst} CSTとCosmic Signature NFTを受け取ります。`,
       },
       {

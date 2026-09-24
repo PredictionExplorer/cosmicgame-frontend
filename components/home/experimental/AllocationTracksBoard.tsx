@@ -1,24 +1,20 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import {
-  ArrowRight,
-  Coins,
-  Crown,
-  ImageIcon,
-  Layers,
-  Shuffle,
-  Sprout,
-  Swords,
-  Trophy,
-  Users,
-  Zap,
-} from 'lucide-react';
+import { ArrowRight, ImageIcon, Layers, Users, Zap } from 'lucide-react';
 import { zeroAddress } from 'viem';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { formatSeconds, shortenHex } from '@/utils';
 
+import {
+  ChronoWarriorIcon,
+  EnduranceChampionIcon,
+  FinalCstGestureIcon,
+  PublicGoodsIcon,
+  SignatureAllocationIcon,
+  StellarSelectionIcon,
+} from '@/lib/conceptIcons';
 import { Link } from '@/i18n/navigation';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Surface } from '@/components/ui/surface';
@@ -115,7 +111,7 @@ export function AllocationTracksBoard({
   const rows: TrackRow[] = [
     {
       key: 'signature',
-      icon: <Trophy className="h-4 w-4" />,
+      icon: <SignatureAllocationIcon className="h-4 w-4" />,
       title: t('allocation.cards.signature.name'),
       value: ethAmount(data?.PrizeAmountEth ?? 0),
       detail: (
@@ -134,7 +130,7 @@ export function AllocationTracksBoard({
     },
     {
       key: 'chrono',
-      icon: <Swords className="h-4 w-4" />,
+      icon: <ChronoWarriorIcon className="h-4 w-4" />,
       title: t('allocation.cards.chronoWarrior.name'),
       value: ethAmount(chronoEth),
       detail: (
@@ -152,7 +148,7 @@ export function AllocationTracksBoard({
     },
     {
       key: 'endurance',
-      icon: <Crown className="h-4 w-4" />,
+      icon: <EnduranceChampionIcon className="h-4 w-4" />,
       title: t('allocation.cards.endurance.name'),
       value: cstPlusNft,
       detail: (
@@ -170,7 +166,7 @@ export function AllocationTracksBoard({
     },
     {
       key: 'stellar-eth',
-      icon: <Shuffle className="h-4 w-4" />,
+      icon: <StellarSelectionIcon className="h-4 w-4" />,
       title: t('allocation.cards.ethStellar.name'),
       value: ethAmount(data?.RaffleAmountEth ?? 0),
       detail: `${recipients(stellarEthRecipients)} · ${t('deck.board.stellarStatus')}`,
@@ -200,7 +196,7 @@ export function AllocationTracksBoard({
     },
     {
       key: 'public-goods',
-      icon: <Sprout className="h-4 w-4" />,
+      icon: <PublicGoodsIcon className="h-4 w-4" />,
       title: t('allocation.cards.publicGoods.name'),
       value: ethAmount(publicGoodsEth),
       detail: t('allocation.cards.publicGoods.recipientLabel'),
@@ -208,7 +204,7 @@ export function AllocationTracksBoard({
     },
     {
       key: 'final-cst',
-      icon: <Coins className="h-4 w-4" />,
+      icon: <FinalCstGestureIcon className="h-4 w-4" />,
       title: t('allocation.cards.finalCst.name'),
       value: cstPlusNft,
       detail: (

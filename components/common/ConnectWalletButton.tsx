@@ -1,9 +1,7 @@
 import {
   ChevronDown,
   LayoutDashboard,
-  Gift,
   Coins,
-  Layers,
   History,
   SendHorizontal,
   Wallet,
@@ -16,6 +14,7 @@ import { useTranslations } from 'next-intl';
 import { shortenHex } from '@/utils';
 
 import { formatFixed } from '@/utils/format';
+import { AllocationIcon, AnchoringIcon } from '@/lib/conceptIcons';
 import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
@@ -186,7 +185,7 @@ const ConnectWalletButton = ({
                 href="/my-allocations"
                 className="flex w-full items-center gap-2.5 px-2 py-1.5 text-sm"
               >
-                <Gift className="h-3.5 w-3.5 text-muted-foreground" />
+                <AllocationIcon className="h-3.5 w-3.5 text-muted-foreground" />
                 {t('account.myRewards')}
                 {hasUnclaimedRewards && (
                   <span className="ml-auto h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -226,7 +225,7 @@ const ConnectWalletButton = ({
                 href="/my-anchors"
                 className="flex w-full items-center gap-2.5 px-2 py-1.5 text-sm"
               >
-                <Layers className="h-3.5 w-3.5 text-muted-foreground" />
+                <AnchoringIcon className="h-3.5 w-3.5 text-muted-foreground" />
                 {t('account.myAnchors')}
               </NavLink>
             </DropdownMenuItem>

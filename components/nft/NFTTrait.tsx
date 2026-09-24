@@ -8,10 +8,11 @@ import Lightbox from 'yet-another-react-lightbox';
 import { usePublicClient } from 'wagmi';
 import { isAddress } from 'viem';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, ChevronUp, ChevronDown, Expand, Trophy } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ChevronUp, ChevronDown, Expand } from 'lucide-react';
 
 import { formatId, getAssetsUrl, getOriginUrl, getWebImageUrl } from '@/utils';
 
+import { CycleIcon } from '@/lib/conceptIcons';
 import { useCollectionTraits, useNftMetadata } from '@/hooks/useNftTraits';
 import { normalizeTraitEntry, type CosmicSignatureMetadata } from '@/lib/nftMetadata';
 import { useRouter } from '@/i18n/navigation';
@@ -604,7 +605,7 @@ const NFTTrait = ({ tokenId, initialMetadata }: NFTTraitProps) => {
                   onClick={() => router.push(`/allocation/${nft.RoundNum ?? 0}`)}
                   className="text-xs"
                 >
-                  <Trophy className="h-3.5 w-3.5 mr-1.5" />
+                  <CycleIcon className="h-3.5 w-3.5 mr-1.5" />
                   {t('actions.viewCycleDetails', { round: nft.RoundNum })}
                 </Button>
               </div>

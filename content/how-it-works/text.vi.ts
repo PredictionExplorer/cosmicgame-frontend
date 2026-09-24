@@ -186,9 +186,9 @@ export const howItWorksTextVi = {
           'Mỗi Random Walk NFT chỉ dùng được một lần cho mức giảm chi phí. Hãy để dành cho một nét bút có chi phí cao hơn để tối đa hóa hiệu quả.',
       },
       {
-        title: 'Tích lũy lượt Tinh tuyển',
+        title: 'Mỗi nét bút, một lượt Tinh tuyển',
         description:
-          'Mỗi nét bút ghi nhận một lượt Tinh tuyển. Càng nhiều nét bút, tần suất được chọn càng cao.',
+          'Mỗi nét bút bằng ETH hoặc CST ghi nhận một lượt cho đợt Tinh tuyển khi chu kỳ hoàn tất.',
         tooltip: `Ba người nhận ETH Tinh tuyển chia ${protocolFacts.stellarSelectionEthPercentage}% Dự trữ chu kỳ. Mười người tham gia nhận NFT và mười người neo giữ Random Walk NFT, mỗi người nhận ${cstAmount} CST và một Cosmic Signature NFT.`,
       },
       {

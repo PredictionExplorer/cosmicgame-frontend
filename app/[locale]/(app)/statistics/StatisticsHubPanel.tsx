@@ -1,11 +1,12 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { ArrowRight, Coins, Hash, Heart, Layers, Lock, Trophy, Wallet } from 'lucide-react';
+import { ArrowRight, Hash, Layers, Lock, Wallet } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { formatCSTValue, formatCount, formatEthValue } from '@/utils';
 
+import { AllocationIcon, CstTokenIcon, PublicGoodsIcon } from '@/lib/conceptIcons';
 import { Link } from '@/i18n/navigation';
 import { useCTStatistics, useDashboardInfo } from '@/hooks/useApiQuery';
 import type { DashboardInfo } from '@/services/api/types';
@@ -151,7 +152,7 @@ const StatisticsHubPanel = () => {
         <StatCard
           label={t('metrics.allocationsDistributed.label')}
           value={formatCount(totalAllocationsDistributed, locale)}
-          icon={<Trophy className="h-4 w-4" />}
+          icon={<AllocationIcon className="h-4 w-4" />}
           tooltip={t('metrics.allocationsDistributed.tooltip')}
         />
         <StatCard
@@ -218,7 +219,7 @@ const StatisticsHubPanel = () => {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <StatisticsGroup
           title={t('groups.allocationEconomy.label')}
-          icon={<Trophy className="h-4 w-4" />}
+          icon={<AllocationIcon className="h-4 w-4" />}
           accentColor="blue"
           tooltip={t('groups.allocationEconomy.tooltip')}
         >
@@ -269,7 +270,7 @@ const StatisticsHubPanel = () => {
 
         <StatisticsGroup
           title={t('groups.tokenEconomy.label')}
-          icon={<Coins className="h-4 w-4" />}
+          icon={<CstTokenIcon className="h-4 w-4" />}
           accentColor="purple"
           tooltip={t('groups.tokenEconomy.tooltip')}
         >
@@ -338,7 +339,7 @@ const StatisticsHubPanel = () => {
 
         <StatisticsGroup
           title={t('groups.publicGoods.label')}
-          icon={<Heart className="h-4 w-4" />}
+          icon={<PublicGoodsIcon className="h-4 w-4" />}
           accentColor="emerald"
           tooltip={t('groups.publicGoods.tooltip')}
         >
