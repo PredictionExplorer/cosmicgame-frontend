@@ -291,8 +291,7 @@
       "label": "係留中のNFT",
       "headers": {
         "tokenId": {
-          "desktop": "NFT",
-          "mobile": "NFT"
+          "desktop": "NFT"
         },
         "anchorDatetime": {
           "desktop": "係留日時",

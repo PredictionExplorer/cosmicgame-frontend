@@ -52,6 +52,13 @@ describe('GlobalAnchoredTokensTable', () => {
     }
   });
 
+  it('heads a phone record with the art, with no column label stacked above it', () => {
+    const { container } = render(<GlobalAnchoredTokensTable list={[cstRow]} IsRWLK={false} />);
+    const tokenCell = container.querySelector('td[data-label=""]');
+    expect(tokenCell).toHaveAttribute('data-stack', 'true');
+    expect(tokenCell?.querySelector('[data-testid="art-frame"]')).not.toBeNull();
+  });
+
   it('orders NFTs anchored at the same moment by their action, newest first', () => {
     // One transaction anchors several NFTs: the API lists them oldest action first.
     const rows = [26, 27, 28].map((action) => ({

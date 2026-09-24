@@ -291,8 +291,7 @@
       "label": "NFT đang neo giữ",
       "headers": {
         "tokenId": {
-          "desktop": "NFT",
-          "mobile": "NFT"
+          "desktop": "NFT"
         },
         "anchorDatetime": {
           "desktop": "Thời điểm neo giữ",

@@ -60,10 +60,10 @@ describe('RwalkAnchorDistributionImprintsTable', () => {
 
   it('reads as one media object on a phone: the caption carries the cycle and the proof', () => {
     const { container } = render(<RwalkAnchorDistributionImprintsTable list={[imprint()]} />);
-    const tokenCell = container.querySelector(
-      'td[data-label="anchoring.tables.randomWalkImprints.columns.tokenId"]',
-    );
+    // The art heads the record with no column label stacked above it.
+    const tokenCell = container.querySelector('td[data-label=""]');
     expect(tokenCell).toHaveAttribute('data-stack', 'true');
+    expect(tokenCell?.querySelector('[data-testid="art-frame"]')).not.toBeNull();
     const caption = tokenCell?.querySelector('.sm\\:hidden');
     expect(caption?.querySelector('a[href="/allocation/1"]')).not.toBeNull();
     expect(caption?.querySelector('a[href*="0ximprint"]')).not.toBeNull();

@@ -291,8 +291,7 @@
       "label": "앵커링된 NFT",
       "headers": {
         "tokenId": {
-          "desktop": "NFT",
-          "mobile": "NFT"
+          "desktop": "NFT"
         },
         "anchorDatetime": {
           "desktop": "앵커링 일시",

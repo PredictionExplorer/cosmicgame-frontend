@@ -54,6 +54,8 @@ export const RwalkAnchorDistributionImprintsTable = ({
         id: 'token',
         kind: 'link',
         header: t('tables.randomWalkImprints.columns.tokenId'),
+        // The record's media object (the art and its number) heads a phone record unlabelled.
+        label: '',
         value: (row) => row.TokenId,
         stack: true,
         cell: (row) => (

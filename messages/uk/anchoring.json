@@ -291,8 +291,7 @@
       "label": "Закріплені NFT",
       "headers": {
         "tokenId": {
-          "desktop": "NFT",
-          "mobile": "NFT"
+          "desktop": "NFT"
         },
         "anchorDatetime": {
           "desktop": "Закріплено",

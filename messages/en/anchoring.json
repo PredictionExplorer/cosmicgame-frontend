@@ -291,8 +291,7 @@
       "label": "Anchored NFTs",
       "headers": {
         "tokenId": {
-          "desktop": "NFT",
-          "mobile": "Token"
+          "desktop": "NFT"
         },
         "anchorDatetime": {
           "desktop": "Anchored",

@@ -291,8 +291,7 @@
       "label": "已锚定 NFT",
       "headers": {
         "tokenId": {
-          "desktop": "NFT",
-          "mobile": "NFT"
+          "desktop": "NFT"
         },
         "anchorDatetime": {
           "desktop": "锚定时间",

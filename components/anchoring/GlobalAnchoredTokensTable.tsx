@@ -61,7 +61,8 @@ export const GlobalAnchoredTokensTable = ({
         id: 'token',
         kind: 'link',
         header: t('tables.globalAnchoredTokens.headers.tokenId.desktop'),
-        label: t('tables.globalAnchoredTokens.headers.tokenId.mobile'),
+        // The record's media object (the art and its number) heads a phone record unlabelled.
+        label: '',
         value: (row) => anchoredTokenId(row, IsRWLK),
         sortable: true,
         stack: true,
