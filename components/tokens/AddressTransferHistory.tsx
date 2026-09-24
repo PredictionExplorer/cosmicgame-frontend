@@ -12,7 +12,6 @@ import { formatAmount, formatCount } from '@/utils/format';
 import { getExplorerUrl } from '@/utils/urls';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { useCSTTransfers, useCTTransfers } from '@/hooks/useApiQuery';
-import { TokenCell } from '@/components/anchoring/TokenCell';
 import { useSignatureSeeds } from '@/components/anchoring/useSignatureSeeds';
 import { LedgerPage } from '@/components/ledger/LedgerPage';
 import { PageHeader, PageHeaderTabs, type PageHeaderFigure } from '@/components/layout/PageHeader';
@@ -34,6 +33,7 @@ import {
   type TransferActivity,
   type TransferDirection,
 } from './transferActivity';
+import { TransferTokenCell } from './TransferTokenCell';
 
 /** Which history: the CST token's transfers, or the Cosmic Signature NFTs'. */
 export type TransferAsset = 'cst' | 'nft';
@@ -278,12 +278,10 @@ export function AddressTransferHistory({
         // The artwork's plate beside its number: the rows are Signatures.
         cell: (entry) =>
           entry.tokenId === null ? null : (
-            <TokenCell
-              collection="cosmicSignature"
+            <TransferTokenCell
               tokenId={entry.tokenId}
               seed={seedFor(entry.tokenId)}
               seedPending={seedsPending}
-              thumbnail
             />
           ),
         sortable: true,

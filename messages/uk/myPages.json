@@ -336,6 +336,7 @@
       }
     },
     "switcherLabel": "Історія цієї адреси",
+    "artUnavailable": "Твір недоступний",
     "viewOnExplorer": "Переглянути в {explorer}",
     "error": "Не вдалося завантажити історію цієї адреси.",
     "count": "{count, plural, one {# запис} few {# записи} many {# записів} other {# запису}}",

@@ -336,6 +336,7 @@
       }
     },
     "switcherLabel": "Lịch sử chuyển của địa chỉ này",
+    "artUnavailable": "Tác phẩm không khả dụng",
     "viewOnExplorer": "Xem trên {explorer}",
     "error": "Không tải được lịch sử chuyển của địa chỉ này.",
     "count": "{count, plural, other {# giao dịch}}",

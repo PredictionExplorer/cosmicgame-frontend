@@ -336,6 +336,7 @@
       }
     },
     "switcherLabel": "このアドレスの移転履歴",
+    "artUnavailable": "アートワークを利用できません",
     "viewOnExplorer": "{explorer}で見る",
     "error": "このアドレスの移転履歴を読み込めませんでした。",
     "count": "{count, plural, other {#件}}",

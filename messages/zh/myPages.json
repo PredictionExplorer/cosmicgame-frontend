@@ -336,6 +336,7 @@
       }
     },
     "switcherLabel": "该地址的转移记录",
+    "artUnavailable": "作品暂不可用",
     "viewOnExplorer": "在 {explorer} 查看",
     "error": "无法加载该地址的转移记录。",
     "count": "{count, plural, other {# 条记录}}",

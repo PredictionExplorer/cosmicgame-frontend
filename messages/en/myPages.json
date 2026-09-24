@@ -336,6 +336,7 @@
       }
     },
     "switcherLabel": "Transfers of this address",
+    "artUnavailable": "Artwork unavailable",
     "viewOnExplorer": "View on {explorer}",
     "error": "The transfers of this address couldn't be loaded.",
     "count": "{count, plural, one {# transfer} other {# transfers}}",
