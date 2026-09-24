@@ -13,6 +13,7 @@ import {
 } from '@/components/tables/CharityDepositTable';
 import { useCharityCGDeposits, useDashboardInfo } from '@/hooks/useApiQuery';
 
+/** `seoSummary` is the server-rendered page header, the page's only header. */
 const CharityCGDeposits = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('publicGoods');
   const tTables = useTranslations('tables');
@@ -21,14 +22,14 @@ const CharityCGDeposits = ({ seoSummary }: { seoSummary?: ReactNode }) => {
 
   return (
     <PageShell variant="data" backdrop="signature">
-      {seoSummary}
-      {!seoSummary && (
-        <PageHeader title={t('protocol.title')} titleLevel={2} subtitle={t('protocol.subtitle')} />
+      {seoSummary ?? (
+        <PageHeader
+          section="records"
+          title={t('protocol.title')}
+          subtitle={t('protocol.subtitle')}
+        />
       )}
       <RouteGroupNav group="publicGoods" current="publicGoodsProtocol" />
-      <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        {t('protocol.description')}
-      </p>
       <PublicGoodsImpactCard data={dashboardData ?? null} variant="compact" className="mb-8" />
       <CharityDepositTable
         list={charityCGDeposits as PublicGoodsContributionEntry[]}

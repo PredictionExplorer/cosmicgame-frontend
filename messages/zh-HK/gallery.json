@@ -6,12 +6,6 @@
   "jsonLd": {
     "name": "Cosmic Signature 畫廊"
   },
-  "page": {
-    "eyebrowImprinted": "作品集 · 已銘刻 {count} 枚 NFT",
-    "eyebrowLive": "作品集 · 即時",
-    "title": "NFT 畫廊",
-    "subtitle": "瀏覽各週期銘刻的全部 Cosmic Signature NFT"
-  },
   "intro": {
     "badge": "生成藝術檔案",
     "description": "每枚 Cosmic Signature NFT 都是獨一無二的生成藝術，由鏈上種子經三體問題物理模擬推演而成。通常每個週期會銘刻 24 枚新 NFT：4 枚角色 NFT，10 枚經參與者 NFT 星選發放，另有 10 枚經錨定 NFT 星選發放給 Random Walk NFT 錨定者。"
@@ -23,24 +17,6 @@
     "badgeImprint": "精選銘刻",
     "badgeArchive": "檔案",
     "awaitingMetadata": "等待元數據"
-  },
-  "hero": {
-    "totalImprinted": {
-      "label": "銘刻總數",
-      "tooltip": "所有週期累計銘刻的 COSMIC NFT 總數。"
-    },
-    "currentlyAnchored": {
-      "label": "目前已錨定",
-      "tooltip": "已錨定至協議的 NFT，正在為持有者累積錨定派發。"
-    },
-    "namedNfts": {
-      "label": "已命名 NFT",
-      "tooltip": "由持有者賦予專屬名稱的 NFT。"
-    },
-    "cycles": {
-      "label": "週期數",
-      "tooltip": "銘刻過 NFT 的週期數量。"
-    }
   },
   "card": {
     "alt": "Cosmic Signature {id}",

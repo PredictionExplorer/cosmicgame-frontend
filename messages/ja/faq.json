@@ -1,8 +1,7 @@
 {
   "hero": {
-    "badge": "ナレッジベース",
-    "titlePrefix": "Cosmic Signature",
-    "titleHighlight": "よくある質問",
+    "title": "Cosmic Signature<accent>よくある質問</accent>",
+    "breadcrumb": "よくある質問",
     "subtitle": "初めての参加から詳しい仕組みまで、Cosmic Signatureの疑問に答えます。",
     "answerCount": "{count}件以上の回答",
     "answerCountTooltip": "Cosmic Signatureのあらゆる側面を網羅した詳しい回答です。",

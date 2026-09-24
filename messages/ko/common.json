@@ -42,6 +42,29 @@
     "home": "홈",
     "gallery": "갤러리"
   },
+  "pageHeader": {
+    "sections": {
+      "participate": "참여",
+      "collection": "컬렉션",
+      "explore": "탐색",
+      "records": "기록",
+      "learn": "학습",
+      "trust": "신뢰",
+      "account": "계정",
+      "admin": "관리자"
+    },
+    "snapshot": "데이터 스냅숏: {date}",
+    "lastReviewed": "최종 검토: {date}",
+    "lastUpdated": "최종 업데이트: {date}",
+    "relatedPages": "관련 페이지",
+    "readMore": "더 보기",
+    "readLess": "접기",
+    "crumbs": {
+      "participants": "참여자",
+      "allocationRecipients": "배분 수령자",
+      "cycle": "사이클 {cycle}"
+    }
+  },
   "status": {
     "loading": "불러오는 중",
     "loadingEllipsis": "불러오는 중…",

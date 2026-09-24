@@ -149,15 +149,10 @@ const AdminSettingsPage = () => {
     <PageShell variant="data" className="max-sm:pb-16">
       <div className="mx-auto max-w-4xl">
         <PageHeader
+          section="admin"
+          breadcrumbs={[]}
           title={t('settings.title')}
           subtitle={t('settings.subtitle')}
-          breadcrumbs={[
-            { label: t('settings.breadcrumbs.home'), href: '/' },
-            { label: t('settings.breadcrumbs.admin'), href: '/admin' },
-            { label: t('settings.breadcrumbs.settings') },
-          ]}
-          className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
-          align="left"
         />
 
         {isLoading || !data ? (

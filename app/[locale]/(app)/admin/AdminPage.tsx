@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl';
 
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
-import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 import { useGestureList } from '@/hooks/useApiQuery';
 import BanGestureTable from '@/components/tables/BanGestureTable';
 
@@ -21,12 +20,8 @@ const AdminPage = () => {
   return (
     <PageShell variant="data">
       <PageHeader
-        align="left"
-        eyebrow={
-          <SectionEyebrow tone="rose" pulse>
-            {t('page.eyebrow')}
-          </SectionEyebrow>
-        }
+        section="admin"
+        sectionHub
         title={t('page.title')}
         subtitle={t('page.subtitle')}
       />

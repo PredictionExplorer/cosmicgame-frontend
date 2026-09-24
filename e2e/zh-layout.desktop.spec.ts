@@ -115,9 +115,11 @@ test.describe('Sprint 3 Chinese layout QA', () => {
       });
 
       await page.goto('/zh/gallery');
-      // Visible gallery heading is an h2 (the h1 is the English SeoSummary until Sprint 7).
-      await expect(page.getByRole('heading', { name: 'NFT 画廊' })).toBeVisible();
-      await expect(page.getByText('铭刻总数', { exact: true }).first()).toBeVisible();
+      // One header: the server-rendered H1 with the collection's figures.
+      await expect(
+        page.getByRole('heading', { level: 1, name: 'Cosmic Signature 画廊' }),
+      ).toBeVisible();
+      await expect(page.getByText('已铭刻 NFT', { exact: true })).toBeVisible();
       await expectNoHorizontalOverflow(page);
       await testInfo.attach(`zh-gallery-${viewport.name}`, {
         body: await page.screenshot({ fullPage: true }),

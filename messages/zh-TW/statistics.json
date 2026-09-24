@@ -32,9 +32,6 @@
       "description": "檢視參與者表現榜，以及 Cosmic Signature 各演繹週期中可取回資產的處理情況。"
     }
   },
-  "intro": {
-    "eyebrow": "協議統計 · Arbitrum"
-  },
   "breadcrumbs": {
     "statistics": "統計"
   },
@@ -54,13 +51,6 @@
     "anchoringGlanceTitle": "錨定概覽",
     "anchoringGlanceDescription": "目前共有 {cosmicCount} 枚 Cosmic Signature NFT 與 {randomWalkCount} 枚 Random Walk NFT 處於錨定狀態。前往錨定統計頁面，可檢視錨定操作、已錨定代幣與獨立錨定者。",
     "anchoringGlanceLink": "檢視錨定統計",
-    "headlines": {
-      "uniqueParticipants": "位獨立參與者",
-      "nftsImprinted": "枚已銘刻 NFT",
-      "nftsAnchored": "枚已錨定 NFT",
-      "gesturesThisCycle": "次本週期落筆",
-      "allocationsDistributed": "條分配紀錄"
-    },
     "pendingStellarRetrievals": "{count} 位獲配者尚未取回共計 {amount}",
     "voluntaryContributionSummary": "{count} 筆，共計 {amount}",
     "jsonLd": {
@@ -70,12 +60,8 @@
       "datasetDescription": "可供檢索的 Cosmic Signature 公開活動摘要，資料由 Arbitrum 智慧合約與 Cosmic Signature API 索引。"
     },
     "seo": {
-      "eyebrow": "協議統計 · Arbitrum",
       "heading": "Cosmic Signature 協議統計",
       "description": "本頁彙總 Cosmic Signature 在 Arbitrum 上的公開協議活動，包括演繹週期狀態、落筆、Cosmic Signature NFT、CST、錨定、儲備與分配資料。",
-      "lastUpdated": "更新時間：{date}",
-      "unavailableSuffix": "。即時資料暫不可用，目前顯示協議機制說明。",
-      "dataSource": "資料來自 Cosmic Signature 公共 API，該 API 索引協議在 Arbitrum 上的智慧合約活動。可透過下方連結了解協議機制與驗證資訊。",
       "relatedPagesAria": "統計相關頁面",
       "links": {
         "currentCycle": "檢視目前演繹週期",
@@ -83,43 +69,25 @@
         "contracts": "檢視已驗證的 Arbitrum 合約",
         "faq": "閱讀 Cosmic Signature 常見問題"
       },
-      "unavailable": "暫不可用"
+      "gesturesCaption": "本週期落筆 {count, number} 次"
     }
   },
   "metrics": {
     "activePerformanceCycle": {
       "label": "目前演繹週期",
-      "tooltip": "Cosmic Signature 公共 API 目前索引的演繹週期編號。",
-      "seoDescription": "根據 Cosmic Signature 在 Arbitrum 上的活動索引得出的目前演繹週期編號。"
-    },
-    "activeCycleGestures": {
-      "label": "目前週期落筆",
-      "tooltip": "目前週期內已索引的落筆次數。",
-      "seoDescription": "目前演繹週期內已索引的落筆次數。"
-    },
-    "totalCycles": {
-      "label": "週期總數",
-      "tooltip": "協議上線以來，已完成或目前已索引的演繹週期總數。"
+      "tooltip": "Cosmic Signature 公共 API 目前索引的演繹週期編號。"
     },
     "allocationsDistributed": {
       "label": "已發放分配",
       "tooltip": "所有週期中的已索引分配紀錄，包括獲配者分配，以及錨定配發存入等協議分配標記。"
     },
     "cosmicSignatureNftsImprinted": {
-      "label": "已銘刻 Cosmic Signature NFT",
       "shortLabel": "已銘刻 NFT",
-      "tooltip": "協議在所有已索引週期中累計銘刻的 Cosmic Signature NFT（ERC-721）數量。若數值為 0，表示統計 API 目前未報告此計數器的銘刻紀錄。",
-      "seoDescription": "協議在所有已索引週期中累計銘刻的 Cosmic Signature NFT（ERC-721）數量。"
+      "tooltip": "協議在所有已索引週期中累計銘刻的 Cosmic Signature NFT（ERC-721）數量。若數值為 0，表示統計 API 目前未報告此計數器的銘刻紀錄。"
     },
     "contractBalance": {
       "label": "合約餘額",
-      "seoLabel": "協議合約餘額",
-      "tooltip": "Cosmic Signature 協議合約目前持有的 ETH，尚未進入後續分配、取回或週期轉換。",
-      "seoDescription": "Cosmic Signature 協議合約在後續分配流轉前持有的 ETH。"
-    },
-    "numAllocationsDistributed": {
-      "label": "已發放分配數量",
-      "tooltip": "已索引的分配紀錄數；詳細紀錄暫不可用時，採用獲配者分配總數的彙總值。"
+      "tooltip": "Cosmic Signature 協議合約目前持有的 ETH，尚未進入後續分配、取回或週期轉換。"
     },
     "totalSignatureAllocationsDistributed": {
       "label": "簽名分配總額",
@@ -620,24 +588,18 @@
     "emptyDescription": "此錢包目前沒有分配紀錄。"
   },
   "namedNfts": {
-    "eyebrow": "已命名 NFT · {count}",
     "title": "已命名 Cosmic Signature NFT",
     "subtitle": "瀏覽由持有者自定義名稱的 Cosmic Signature NFT",
-    "description": "Cosmic Signature NFT 持有者可以為 NFT 自定義名稱，讓每枚作品在系列中擁有獨特身份。已命名 NFT 會在畫廊中更易辨認，也保留了持有者留下的個人印記。",
     "emptyTitle": "暫無已命名 NFT",
     "emptyDescription": "尚未有持有者為 Cosmic Signature NFT 命名。"
   },
   "attachedNfts": {
-    "eyebrow": "已附加 NFT · {count}",
     "title": "已附加 NFT 貢獻",
-    "subtitle": "瀏覽各週期中社群成員隨落筆附加的 NFT",
-    "description": "社群成員可透過進階選項隨落筆附加自己的 NFT（ERC-721）。週期收官後，已附加 NFT 會轉給簽名分配獲配者，讓最終分配不止包含 ETH。"
+    "subtitle": "瀏覽各週期中社群成員隨落筆附加的 NFT"
   },
   "usedRwlkNfts": {
-    "eyebrow": "已使用 RWLK · {count}",
     "title": "已使用的 Random Walk NFT",
     "subtitle": "隨 ETH 落筆附加、用於一次性降低 50% 落筆價格的 Random Walk NFT",
-    "description": "Random Walk NFT 持有者可將一枚尚未使用的 NFT 附加至 ETH 落筆，使該筆落筆價格降低 50%。使用後，這枚 Random Walk NFT 會記錄在此。每枚 NFT 僅可享受一次此項優惠，因此使用時機由持有者自行決定。",
     "loading": "載入中…",
     "empty": "暫無 NFT。"
   },
@@ -663,10 +625,7 @@
     "titleBeforeDeployment": "部署前的系統配置",
     "range": "事件日誌範圍 {start}～{end}",
     "breadcrumbs": {
-      "home": "首頁",
-      "coordination": "協調變更",
-      "beforeCycle": "第 {cycle} 個週期前",
-      "deployment": "部署"
+      "coordination": "協調變更"
     },
     "loading": "載入中…",
     "loadError": "未能載入系統事件",

@@ -2,8 +2,7 @@ import type { TrustPageCopy } from './TrustPageContent';
 
 /** English copy for /security, rendered by TrustPageContent. */
 export const securityCopyEn: TrustPageCopy = {
-  eyebrow: 'Trust and security',
-  title: 'Cosmic Signature Security',
+  title: 'Security',
   intro:
     'Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Its security posture depends on public smart contracts, transparent protocol data, careful wallet interactions, and clear participant education.',
   sections: [

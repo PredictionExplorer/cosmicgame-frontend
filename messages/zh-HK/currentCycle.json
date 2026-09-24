@@ -3,15 +3,11 @@
     "title": "未能載入週期數據",
     "message": "請重新整理頁面重試。"
   },
-  "nav": {
-    "backToHome": "返回主頁"
-  },
   "status": {
     "notStarted": "尚未開始"
   },
   "hero": {
     "title": "第 {n} 個週期",
-    "subtitle": "開啟於 {date} · 已落筆 {count} 次",
     "status": {
       "openingSoon": "即將開啟",
       "awaitingFirstGesture": "等待第一筆",
@@ -36,14 +32,6 @@
     }
   },
   "stats": {
-    "totalGestures": {
-      "label": "落筆總次數",
-      "tooltip": "本週期的落筆總次數。每一筆也同時計入一次星選資格。"
-    },
-    "cycleReserve": {
-      "label": "週期儲備",
-      "tooltip": "簽名分配中的 ETH 部分，由寫下收官之筆的參與者取回。獲配者還將獲得 1,000 CST 與一枚 Cosmic Signature NFT。"
-    },
     "stellarSelectionPool": {
       "label": "星選池",
       "tooltip": "週期收官時，這部分 ETH 將由程序化隨機選出的 {count} 位參與者均分。"

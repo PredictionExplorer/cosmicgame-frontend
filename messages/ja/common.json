@@ -42,6 +42,29 @@
     "home": "ホーム",
     "gallery": "ギャラリー"
   },
+  "pageHeader": {
+    "sections": {
+      "participate": "参加",
+      "collection": "コレクション",
+      "explore": "探索",
+      "records": "記録",
+      "learn": "学ぶ",
+      "trust": "信頼",
+      "account": "アカウント",
+      "admin": "管理者"
+    },
+    "snapshot": "データのスナップショット：{date}",
+    "lastReviewed": "最終確認：{date}",
+    "lastUpdated": "最終更新：{date}",
+    "relatedPages": "関連ページ",
+    "readMore": "続きを読む",
+    "readLess": "閉じる",
+    "crumbs": {
+      "participants": "参加者",
+      "allocationRecipients": "配分の受領者",
+      "cycle": "サイクル{cycle}"
+    }
+  },
   "status": {
     "loading": "読み込み中",
     "loadingEllipsis": "読み込み中…",

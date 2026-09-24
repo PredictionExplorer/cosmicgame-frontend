@@ -33,6 +33,7 @@ function MyWallet() {
   return (
     <PageShell variant="data" backdrop="signature">
       <PageHeader
+        section="account"
         title={t('tokens.page.title')}
         subtitle={t('tokens.page.subtitle')}
         actions={<NftMarketplaceButton variant="secondary" label={t('tokens.page.marketplace')} />}

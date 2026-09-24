@@ -43,30 +43,34 @@ beforeEach(() => {
 });
 
 describe('StatisticsHubPanel', () => {
-  it('renders headline stat cards from the dashboard', () => {
+  it('leaves the headline figures to the page header: each appears once per page', () => {
     render(<StatisticsHubPanel />);
-    expect(screen.getByText('Total Cycles')).toBeInTheDocument();
-    // The StatCard label is a Term (the card has a tooltip); the economy row
-    // of the same name further down the panel has its own explanation.
-    const [headline] = screen.getAllByRole('button', {
-      name: 'More information about Allocations Distributed',
-    });
-    expect(headline).toHaveTextContent('Allocations Distributed');
-    expect(screen.getByText('Contract Balance')).toBeInTheDocument();
-    expect(screen.getByText('36.1595 ETH')).toBeInTheDocument();
+    // StatisticsSeoSummary shows the cycle and its gestures, allocations, imprints and
+    // balance once, from the same dashboard query; the body repeats none of them.
+    for (const label of [
+      'Total Cycles',
+      'Contract Balance',
+      statisticsMessages.metrics.allocationsDistributed.label,
+      statisticsMessages.metrics.cosmicSignatureNftsImprinted.shortLabel,
+    ]) {
+      expect(screen.queryByText(label)).not.toBeInTheDocument();
+    }
   });
 
-  it('gives each headline figure its own pictogram', () => {
+  it('gives each economy group its own concept pictogram', () => {
     render(<StatisticsHubPanel />);
-    // Allocations Distributed and NFTs Imprinted sit side by side: one
-    // concept, one glyph, and never the same glyph for two concepts.
-    const headline = screen.getByTestId('statistics-hub').firstElementChild;
-    const glyphs = [...(headline?.querySelectorAll('svg') ?? [])].map(
-      (svg) => [...svg.classList].find((name) => name.startsWith('lucide-')) ?? '',
-    );
-    expect(glyphs).toHaveLength(4);
-    expect(new Set(glyphs).size).toBe(glyphs.length);
-    expect(glyphs).toEqual(expect.arrayContaining(['lucide-layers', 'lucide-stamp']));
+    // The three groups sit side by side: one concept, one glyph, and never
+    // the same glyph for two concepts.
+    const glyphs = [
+      statisticsMessages.groups.allocationEconomy.label,
+      statisticsMessages.groups.tokenEconomy.label,
+      statisticsMessages.groups.publicGoods.label,
+    ].map((title) => {
+      const headerRow = screen.getByRole('heading', { name: title }).parentElement?.parentElement;
+      const glyph = headerRow?.firstElementChild?.querySelector('svg');
+      return [...(glyph?.classList ?? [])].find((name) => name.startsWith('lucide-')) ?? '';
+    });
+    expect(glyphs).toEqual(['lucide-layers', 'lucide-coins', 'lucide-sprout']);
   });
 
   it('renders an explore card linking to every section page', () => {
@@ -82,11 +86,11 @@ describe('StatisticsHubPanel', () => {
     }
   });
 
-  it('shows live headline stats inside explore cards', () => {
+  it('keeps the explore cards to navigation: no figure repeats the header', () => {
     render(<StatisticsHubPanel />);
-    expect(screen.getByText('unique participants')).toBeInTheDocument();
-    expect(screen.getByText('gestures this cycle')).toBeInTheDocument();
-    expect(screen.getByText('allocations distributed')).toBeInTheDocument();
+    const nav = screen.getByRole('navigation', { name: 'Statistics section pages' });
+    // A figure is a text node of digits (and grouping marks) alone.
+    expect(within(nav).queryAllByText(/^[\d,.\s]+$/)).toHaveLength(0);
   });
 
   it('renders the protocol economy groups', () => {

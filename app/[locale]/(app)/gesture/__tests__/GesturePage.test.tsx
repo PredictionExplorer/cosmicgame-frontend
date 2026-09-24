@@ -4,8 +4,12 @@ import GesturePage from '../[id]/GesturePage';
 
 const mockUseGestureInfo = jest.fn();
 
+const mockUseDashboardInfo = jest.fn((): { data?: { CurRoundNum: number }; isError?: boolean } => ({
+  data: { CurRoundNum: 9 },
+}));
 jest.mock('../../../../../hooks/useApiQuery', () => ({
   useGestureInfo: (...args: unknown[]) => mockUseGestureInfo(...args),
+  useDashboardInfo: () => mockUseDashboardInfo(),
 }));
 
 jest.mock('axios', () => ({
@@ -69,8 +73,18 @@ describe('GesturePage', () => {
     expect(screen.getByText('gesture.empty.title')).toBeInTheDocument();
   });
 
-  it('renders gesture details heading', () => {
+  it('names the gesture by its position in the H1, falling back to the generic title', () => {
     mockUseGestureInfo.mockReturnValue({ data: baseGestureInfo, isLoading: false });
+    const { unmount } = render(<GesturePage gestureId={1} />);
+    expect(
+      screen.getByRole('heading', { name: 'gesture.header.positionLabel(position=7)', level: 1 }),
+    ).toBeInTheDocument();
+    unmount();
+
+    mockUseGestureInfo.mockReturnValue({
+      data: { ...baseGestureInfo, BidPosition: undefined },
+      isLoading: false,
+    });
     render(<GesturePage gestureId={1} />);
     expect(
       screen.getByRole('heading', { name: 'gesture.header.title', level: 1 }),
@@ -83,12 +97,61 @@ describe('GesturePage', () => {
       isLoading: false,
     });
     render(<GesturePage gestureId={23514} />);
-    expect(
-      screen.getAllByText('gesture.header.positionLabel(position=7)').length,
-    ).toBeGreaterThanOrEqual(1);
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'gesture.header.positionLabel(position=7)',
+    );
     expect(
       screen.queryByText('gesture.header.positionLabel(position=23514)'),
     ).not.toBeInTheDocument();
+  });
+
+  it('places a finalized cycle’s gesture under that cycle’s record', () => {
+    mockUseGestureInfo.mockReturnValue({ data: baseGestureInfo, isLoading: false });
+    render(<GesturePage gestureId={1} />);
+    const trail = screen.getByRole('navigation', { name: 'common.accessibility.breadcrumb' });
+    expect(
+      within(trail)
+        .getAllByRole('link')
+        .map((link) => [link.textContent, link.getAttribute('href')]),
+    ).toEqual([
+      ['common.breadcrumbs.home', '/'],
+      ['common.pageHeader.crumbs.allocationRecipients', '/allocation'],
+      ['common.pageHeader.crumbs.cycle(cycle=5)', '/allocation/5'],
+    ]);
+  });
+
+  it('places a live cycle’s gesture under the current cycle', () => {
+    mockUseDashboardInfo.mockReturnValueOnce({ data: { CurRoundNum: 5 } });
+    mockUseGestureInfo.mockReturnValue({ data: baseGestureInfo, isLoading: false });
+    render(<GesturePage gestureId={1} />);
+    const trail = screen.getByRole('navigation', { name: 'common.accessibility.breadcrumb' });
+    expect(
+      within(trail)
+        .getAllByRole('link')
+        .map((link) => [link.textContent, link.getAttribute('href')]),
+    ).toEqual([
+      ['common.breadcrumbs.home', '/'],
+      ['common.pageHeader.crumbs.cycle(cycle=5)', '/current-cycle'],
+    ]);
+  });
+
+  it('does not guess the cycle’s page before the dashboard says which cycle is live', () => {
+    mockUseDashboardInfo.mockReturnValueOnce({ data: undefined });
+    mockUseGestureInfo.mockReturnValue({ data: baseGestureInfo, isLoading: false });
+    render(<GesturePage gestureId={1} />);
+    const trail = screen.getByRole('navigation', { name: 'common.accessibility.breadcrumb' });
+    expect(within(trail).getAllByRole('link')).toHaveLength(1);
+    expect(within(trail).queryByText('common.pageHeader.crumbs.cycle(cycle=5)')).toBeNull();
+  });
+
+  it('takes the cycle as finalized when the dashboard cannot be read', () => {
+    mockUseDashboardInfo.mockReturnValueOnce({ data: undefined, isError: true });
+    mockUseGestureInfo.mockReturnValue({ data: baseGestureInfo, isLoading: false });
+    render(<GesturePage gestureId={1} />);
+    const trail = screen.getByRole('navigation', { name: 'common.accessibility.breadcrumb' });
+    expect(
+      within(trail).getByRole('link', { name: 'common.pageHeader.crumbs.cycle(cycle=5)' }),
+    ).toHaveAttribute('href', '/allocation/5');
   });
 
   it('renders participant address', () => {

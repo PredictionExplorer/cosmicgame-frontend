@@ -30,7 +30,6 @@
     "invalidId": "貢獻 ID 無效",
     "title": "ETH 貢獻詳情",
     "loadingSubtitle": "正在載入貢獻記錄…",
-    "breadcrumbHome": "主頁",
     "breadcrumbContributions": "ETH 貢獻",
     "loading": "載入中…",
     "notFound": "未找到這筆貢獻。",
@@ -60,9 +59,7 @@
     "invalidNumber": "週期編號無效",
     "title": "第 {cycle} 個週期的直接 ETH 貢獻",
     "subtitle": "此週期記錄的全部直接 ETH 貢獻。",
-    "breadcrumbHome": "主頁",
     "breadcrumbContributions": "ETH 貢獻",
-    "breadcrumbCycle": "第 {cycle} 個週期",
     "loading": "載入中…"
   }
 }

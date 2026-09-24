@@ -1,22 +1,13 @@
 'use client';
 
-import type { ReactNode } from 'react';
-import { ArrowRight, Lock, Wallet } from 'lucide-react';
+import { ArrowRight, Lock } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { formatCSTValue, formatCount, formatEthValue } from '@/utils';
 
-import {
-  AllocationIcon,
-  CstTokenIcon,
-  CycleIcon,
-  ImprintIcon,
-  PublicGoodsIcon,
-} from '@/lib/conceptIcons';
+import { AllocationIcon, CstTokenIcon, PublicGoodsIcon } from '@/lib/conceptIcons';
 import { Link } from '@/i18n/navigation';
 import { useCTStatistics, useDashboardInfo } from '@/hooks/useApiQuery';
-import type { DashboardInfo } from '@/services/api/types';
-import { StatCard } from '@/components/ui/stat-card';
 import { Surface } from '@/components/ui/surface';
 import { SectionDivider } from '@/components/ui/section-divider';
 import { SkeletonStatCard } from '@/components/ui/skeleton';
@@ -26,25 +17,11 @@ import { StatisticsGroup } from '@/components/statistics/StatisticsGroup';
 
 import { STATISTICS_SECTIONS, type StatisticsSectionDef } from './statistics-sections';
 
-/** Prefer DB row count from cg_prize; fall back to aggregated recipient counts. */
-function getTotalAllocationsDistributed(data: DashboardInfo): number {
-  return Number(
-    data.CgPrizeRowCount ??
-      data.MainStats?.CgPrizeRowCount ??
-      data.TotalPrizeAwards ??
-      data.MainStats?.TotalPrizeAwards ??
-      data.TotalPrizes ??
-      0,
-  );
-}
-
-interface ExploreCardProps {
-  section: StatisticsSectionDef;
-  headline: ReactNode;
-  headlineLabel: string;
-}
-
-function ExploreCard({ section, headline, headlineLabel }: ExploreCardProps) {
+/**
+ * A section page's card: what the page covers, as a link. It carries no
+ * figure — the hub's headline figures are the header's, each shown once.
+ */
+function ExploreCard({ section }: { section: StatisticsSectionDef }) {
   const t = useTranslations('statistics');
   const Icon = section.icon;
   return (
@@ -71,17 +48,19 @@ function ExploreCard({ section, headline, headlineLabel }: ExploreCardProps) {
           <p className="mt-3 flex-1 text-sm leading-6 text-muted-foreground">
             {t(`navigation.${section.messageKey}.description`)}
           </p>
-          <p className="mt-4 text-sm">
-            <span className="text-xl font-semibold text-foreground">{headline}</span>{' '}
-            <span className="text-muted-foreground">{headlineLabel}</span>
-          </p>
         </div>
       </Link>
     </Surface>
   );
 }
 
-/** Statistics hub: headline metrics, protocol economy groups, and links into the section pages. */
+/**
+ * Statistics hub body: links into the section pages and the protocol economy
+ * groups. The headline figures (the active cycle and its gestures,
+ * allocations distributed, NFTs imprinted, the contract balance) live in the
+ * page header (StatisticsSeoSummary), read from the same dashboard query, and
+ * the body does not repeat them.
+ */
 const StatisticsHubPanel = () => {
   const t = useTranslations('statistics');
   const locale = useLocale();
@@ -91,12 +70,7 @@ const StatisticsHubPanel = () => {
   if (dashboardLoading) {
     return (
       <div data-testid="statistics-hub-loading">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <SkeletonStatCard key={i} />
-          ))}
-        </div>
-        <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 3 }).map((_, i) => (
             <SkeletonStatCard key={i} className="h-48" />
           ))}
@@ -117,76 +91,17 @@ const StatisticsHubPanel = () => {
   }
 
   const data = dashboardData;
-  const totalAllocationsDistributed = getTotalAllocationsDistributed(data);
   const cstAnchorStats = data.MainStats.StakeStatisticsCST;
   const rwlkAnchorStats = data.MainStats.StakeStatisticsRWalk;
-  const totalAnchored = cstAnchorStats.TotalTokensStaked + rwlkAnchorStats.TotalTokensStaked;
-
-  const exploreHeadlines: Record<string, { headline: ReactNode; headlineLabel: string }> = {
-    participation: {
-      headline: formatCount(data.MainStats.NumUniqueBidders, locale),
-      headlineLabel: t('hub.headlines.uniqueParticipants'),
-    },
-    tokens: {
-      headline: formatCount(data.MainStats.NumCSTokenMints, locale),
-      headlineLabel: t('hub.headlines.nftsImprinted'),
-    },
-    anchoring: {
-      headline: formatCount(totalAnchored, locale),
-      headlineLabel: t('hub.headlines.nftsAnchored'),
-    },
-    activity: {
-      headline: formatCount(Number(data.CurNumBids ?? 0), locale),
-      headlineLabel: t('hub.headlines.gesturesThisCycle'),
-    },
-    performance: {
-      headline: formatCount(totalAllocationsDistributed, locale),
-      headlineLabel: t('hub.headlines.allocationsDistributed'),
-    },
-  };
 
   return (
     <div data-testid="statistics-hub">
-      {/* Headline metrics */}
-      <div className="mb-10 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
-        <StatCard
-          label={t('metrics.totalCycles.label')}
-          value={formatCount(data.CurRoundNum, locale)}
-          icon={<CycleIcon className="h-4 w-4" />}
-          tooltip={t('metrics.totalCycles.tooltip')}
-        />
-        <StatCard
-          label={t('metrics.allocationsDistributed.label')}
-          value={formatCount(totalAllocationsDistributed, locale)}
-          icon={<AllocationIcon className="h-4 w-4" />}
-          tooltip={t('metrics.allocationsDistributed.tooltip')}
-        />
-        <StatCard
-          label={t('metrics.cosmicSignatureNftsImprinted.shortLabel')}
-          value={formatCount(data.MainStats.NumCSTokenMints, locale)}
-          icon={<ImprintIcon className="h-4 w-4" />}
-          tooltip={t('metrics.cosmicSignatureNftsImprinted.tooltip')}
-        />
-        <StatCard
-          label={t('metrics.contractBalance.label')}
-          value={formatEthValue(data.CosmicGameBalanceEth ?? 0, locale)}
-          icon={<Wallet className="h-4 w-4" />}
-          tooltip={t('metrics.contractBalance.tooltip')}
-          gradient
-        />
-      </div>
-
       {/* Section explore cards */}
       <SectionDivider title={t('hub.exploreTitle')} className="mb-6" />
       <nav aria-label={t('hub.exploreAria')} className="mb-12">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {STATISTICS_SECTIONS.map((section) => (
-            <ExploreCard
-              key={section.slug}
-              section={section}
-              headline={exploreHeadlines[section.slug]?.headline ?? '—'}
-              headlineLabel={exploreHeadlines[section.slug]?.headlineLabel ?? ''}
-            />
+            <ExploreCard key={section.slug} section={section} />
           ))}
         </div>
       </nav>
@@ -229,15 +144,6 @@ const StatisticsHubPanel = () => {
           accentColor="blue"
           tooltip={t('groups.allocationEconomy.tooltip')}
         >
-          <StatisticsItem
-            title={t('metrics.numAllocationsDistributed.label')}
-            value={
-              <Link href="/allocation" className="text-inherit">
-                {totalAllocationsDistributed}
-              </Link>
-            }
-            tooltip={t('metrics.numAllocationsDistributed.tooltip')}
-          />
           <StatisticsItem
             title={t('metrics.totalSignatureAllocationsDistributed.label')}
             value={formatEthValue(Number(data.TotalPrizesPaidAmountEth) || 0, locale)}
@@ -284,15 +190,6 @@ const StatisticsHubPanel = () => {
             title={t('metrics.totalSupplyErc20.label')}
             value={formatCSTValue(ctStatisticsData?.TotalSupplyEth ?? 0, locale)}
             tooltip={t('metrics.totalSupplyErc20.tooltip')}
-          />
-          <StatisticsItem
-            title={t('metrics.cosmicSignatureNftsImprinted.shortLabel')}
-            value={
-              <Link href="/gallery" className="text-inherit">
-                {formatCount(data.MainStats.NumCSTokenMints, locale)}
-              </Link>
-            }
-            tooltip={t('metrics.cosmicSignatureNftsImprinted.tooltip')}
           />
           <StatisticsItem
             title={t('metrics.totalCstConsumed.label')}

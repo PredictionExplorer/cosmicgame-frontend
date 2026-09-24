@@ -128,9 +128,7 @@ test.describe('Sprint 8 deterministic Chinese journeys', () => {
 
   test('validates contribution and outreach forms without live-chain writes', async ({ page }) => {
     await page.goto('/zh/eth-contribution', { waitUntil: 'domcontentloaded' });
-    await expect(
-      page.getByRole('heading', { name: 'ETH 贡献', exact: true }).first(),
-    ).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: '直接 ETH 贡献' })).toBeVisible();
     await expect(page.getByText('贡献记录', { exact: true })).toBeVisible();
     await expect(page.getByLabel('金额（ETH）')).toHaveCount(0);
 

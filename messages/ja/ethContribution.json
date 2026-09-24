@@ -30,7 +30,6 @@
     "invalidId": "拠出IDが無効です",
     "title": "直接ETH拠出の詳細",
     "loadingSubtitle": "拠出を読み込み中…",
-    "breadcrumbHome": "ホーム",
     "breadcrumbContributions": "ETH拠出",
     "loading": "読み込み中…",
     "notFound": "拠出が見つかりません。",
@@ -60,9 +59,7 @@
     "invalidNumber": "サイクル番号が無効です",
     "title": "サイクル{cycle}の直接ETH拠出",
     "subtitle": "このサイクルに記録されたすべての直接ETH拠出。",
-    "breadcrumbHome": "ホーム",
     "breadcrumbContributions": "ETH拠出",
-    "breadcrumbCycle": "サイクル{cycle}",
     "loading": "読み込み中…"
   }
 }

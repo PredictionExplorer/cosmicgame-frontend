@@ -6,12 +6,6 @@
   "jsonLd": {
     "name": "Cosmic Signature 갤러리"
   },
-  "page": {
-    "eyebrowImprinted": "컬렉션 · 각인된 NFT {count}개",
-    "eyebrowLive": "컬렉션 · 실시간",
-    "title": "NFT 갤러리",
-    "subtitle": "모든 사이클에 걸쳐 각인된 Cosmic Signature NFT 컬렉션 전체를 한눈에"
-  },
   "intro": {
     "badge": "제너러티브 아카이브",
     "description": "Cosmic Signature NFT 하나하나는 온체인 시드에서 삼체 문제 물리 시뮬레이션을 거쳐 태어난 고유한 제너러티브 아트입니다. 일반적인 사이클에서는 새 NFT 24개가 각인됩니다. 역할 NFT가 4개, 참여자 대상 별빛 선정이 10개, RandomWalk NFT 앵커링 보유자를 위한 앵커링 NFT 별빛 선정이 10개입니다."
@@ -23,24 +17,6 @@
     "badgeImprint": "대표 각인",
     "badgeArchive": "아카이브",
     "awaitingMetadata": "메타데이터 대기 중"
-  },
-  "hero": {
-    "totalImprinted": {
-      "label": "총 각인 수",
-      "tooltip": "모든 사이클에 걸쳐 각인된 COSMIC NFT의 총수"
-    },
-    "currentlyAnchored": {
-      "label": "현재 앵커링됨",
-      "tooltip": "프로토콜에 앵커링되어 소유자에게 앵커링 지급이 돌아가는 NFT"
-    },
-    "namedNfts": {
-      "label": "이름 붙인 NFT",
-      "tooltip": "소유자가 고유한 이름을 붙인 NFT"
-    },
-    "cycles": {
-      "label": "사이클 수",
-      "tooltip": "NFT를 만들어 낸 사이클의 수"
-    }
   },
   "card": {
     "alt": "Cosmic Signature {id}",

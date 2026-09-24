@@ -2,24 +2,25 @@
 
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 import { protocolFacts } from '@/content/protocol-facts';
 
-import { AllocationIcon, CycleIcon, GestureIcon, RecipientIcon } from '@/lib/conceptIcons';
 import { ALLOCATION_TRACK_COLORS } from '@/config/allocationTracks';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
-import { SectionEyebrow } from '@/components/ui/section-eyebrow';
-import { StatCard, StatCardSkeleton } from '@/components/ui/stat-card';
 import { Surface } from '@/components/ui/surface';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { AllocationTable } from '@/components/tables/AllocationTable';
 import { useRoundList } from '@/hooks/useApiQuery';
 
+/**
+ * `seoSummary` is the server-rendered page header, the page's only header: it
+ * carries the cycle, recipient, ETH and gesture totals, so the body does not
+ * repeat them.
+ */
 const AllocationRecipientsPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('allocation');
-  const locale = useLocale();
   const { data: rawPrizeClaims = [], isLoading: loading } = useRoundList();
 
   const allocationTracks = [
@@ -78,53 +79,14 @@ const AllocationRecipientsPage = ({ seoSummary }: { seoSummary?: ReactNode }) =>
     [rawPrizeClaims],
   );
 
-  const summaryStats = useMemo(() => {
-    if (allocationFinalizations.length === 0) return null;
-    const totalRounds = allocationFinalizations.length;
-    const totalEth = allocationFinalizations.reduce((sum, r) => sum + (r.AmountEth || 0), 0);
-    const totalGestures = allocationFinalizations.reduce(
-      (sum, r) => sum + (r.RoundStats?.TotalBids || 0),
-      0,
-    );
-    const uniqueRecipients = new Set(
-      allocationFinalizations.map((r) => r.WinnerAddr).filter(Boolean),
-    ).size;
-    return { totalRounds, totalEth, totalGestures, uniqueRecipients };
-  }, [allocationFinalizations]);
-
   return (
     <PageShell variant="data" backdrop="signature">
-      {seoSummary}
-      {seoSummary ? (
-        <div className="mb-8">
-          <span className="inline-flex items-center gap-1.5 type-body-sm text-muted-foreground">
-            <span>{t('recipients.header.scope')}</span>
-            <InfoTooltip
-              content={t('recipients.header.scopeTooltip')}
-              label={t('recipients.header.scope')}
-            />
-          </span>
-        </div>
-      ) : (
+      {seoSummary ?? (
         <PageHeader
-          align="left"
-          eyebrow={
-            <SectionEyebrow tone="aurora" pulse>
-              {t('recipients.header.eyebrow')}
-            </SectionEyebrow>
-          }
+          section="records"
           title={t('recipients.header.title')}
-          titleLevel={2}
           subtitle={t('recipients.header.subtitle')}
-          meta={
-            <span className="inline-flex items-center gap-1.5 type-body-sm text-muted-foreground">
-              <span>{t('recipients.header.scope')}</span>
-              <InfoTooltip
-                content={t('recipients.header.scopeTooltip')}
-                label={t('recipients.header.scope')}
-              />
-            </span>
-          }
+          meta={<AllocationScopeNote />}
         />
       )}
 
@@ -171,52 +133,27 @@ const AllocationRecipientsPage = ({ seoSummary }: { seoSummary?: ReactNode }) =>
         </div>
       </Surface>
 
-      {loading ? (
-        <div className="mb-12 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <StatCardSkeleton key={i} />
-          ))}
-        </div>
-      ) : summaryStats ? (
-        <div data-testid="summary-stats" className="mb-12 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <StatCard
-            data-testid="summary-stat-total-cycles"
-            label={t('recipients.stats.totalCycles.label')}
-            value={summaryStats.totalRounds}
-            icon={<CycleIcon className="h-4 w-4" />}
-            accent="aurora"
-            tooltip={t('recipients.stats.totalCycles.tooltip')}
-          />
-          <StatCard
-            data-testid="summary-stat-total-eth-distributed"
-            label={t('recipients.stats.totalEth.label')}
-            value={`${summaryStats.totalEth.toFixed(2)} ETH`}
-            icon={<AllocationIcon className="h-4 w-4" />}
-            accent="solar"
-            tooltip={t('recipients.stats.totalEth.tooltip')}
-          />
-          <StatCard
-            data-testid="summary-stat-total-gestures"
-            label={t('recipients.stats.totalGestures.label')}
-            value={summaryStats.totalGestures.toLocaleString(locale)}
-            icon={<GestureIcon className="h-4 w-4" />}
-            accent="nebula"
-            tooltip={t('recipients.stats.totalGestures.tooltip')}
-          />
-          <StatCard
-            data-testid="summary-stat-unique-recipients"
-            label={t('recipients.stats.uniqueRecipients.label')}
-            value={summaryStats.uniqueRecipients}
-            icon={<RecipientIcon className="h-4 w-4" />}
-            accent="impact"
-            tooltip={t('recipients.stats.uniqueRecipients.tooltip')}
-          />
-        </div>
-      ) : null}
-
       <AllocationTable list={allocationFinalizations} loading={loading} />
     </PageShell>
   );
 };
+
+/**
+ * "Finalized cycle records only", with its definition: the scope of every
+ * figure and row on the page, for the header's meta line.
+ */
+export function AllocationScopeNote() {
+  const t = useTranslations('allocation');
+  return (
+    <span className="inline-flex items-center gap-1">
+      <span>{t('recipients.header.scope')}</span>
+      <InfoTooltip
+        content={t('recipients.header.scopeTooltip')}
+        label={t('recipients.header.scope')}
+        iconClassName="size-3.5"
+      />
+    </span>
+  );
+}
 
 export default AllocationRecipientsPage;

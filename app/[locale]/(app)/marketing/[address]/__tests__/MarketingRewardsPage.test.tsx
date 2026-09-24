@@ -63,8 +63,19 @@ describe('MarketingRewardsPage', () => {
   it('renders a link to the user page', () => {
     mockUseMarketingRewardsByUser.mockReturnValue({ data: [], isLoading: false });
     render(<MarketingRewardsPage address={VALID_ADDRESS} />);
-    const link = screen.getByRole('link');
-    expect(link).toHaveAttribute('href', expect.stringContaining('/user/'));
+    const link = screen
+      .getAllByRole('link')
+      .find((candidate) => candidate.getAttribute('href')?.includes('/user/'));
+    expect(link).toBeDefined();
+  });
+
+  it('places the contributor under the Outreach ledger', () => {
+    mockUseMarketingRewardsByUser.mockReturnValue({ data: [], isLoading: false });
+    render(<MarketingRewardsPage address={VALID_ADDRESS} />);
+    expect(screen.getByRole('link', { name: 'nav.links.outreachReserve.label' })).toHaveAttribute(
+      'href',
+      '/marketing',
+    );
   });
 
   it('has no accessibility violations', async () => {

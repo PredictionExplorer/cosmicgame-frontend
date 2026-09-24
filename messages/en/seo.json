@@ -1,13 +1,12 @@
 {
   "publicData": {
     "common": {
-      "unavailable": "Unavailable",
-      "lastUpdated": "Last updated: {date}. Source: {source}.",
+      "none": "None yet",
+      "source": "Source: {source}",
       "relatedPagesAria": "{heading} related pages"
     },
     "routes": {
       "allocation": {
-        "eyebrow": "Allocation history · Arbitrum",
         "heading": "Allocation Recipients",
         "description": "Browse public Cosmic Signature allocation history across finalized Performance Cycles, including Signature Allocations, Stellar Selection, Anchor Distributions, and public-goods flows.",
         "source": "Cosmic Signature public cycle data",
@@ -28,11 +27,14 @@
           "totalEth": {
             "label": "Total Signature Allocation ETH",
             "tooltip": "The sum of Signature Allocation ETH across finalized cycles, based on cycle records."
+          },
+          "totalGestures": {
+            "label": "Total Gestures",
+            "tooltip": "The cumulative number of gestures made across all finalized cycles."
           }
         }
       },
       "anchoring": {
-        "eyebrow": "Anchor distributions · Arbitrum",
         "heading": "Anchor Distributions",
         "description": "Track public Cosmic Signature NFT anchoring, ETH Anchor Distribution records, RandomWalk NFT anchoring, and Anchored-NFT Stellar Selection imprints.",
         "source": "Cosmic Signature public anchoring APIs",
@@ -56,7 +58,6 @@
         }
       },
       "marketing": {
-        "eyebrow": "Outreach allocations · Arbitrum",
         "heading": "Outreach Allocations",
         "description": "Review Cosmic Signature outreach allocation history and CST distributions for ecosystem contributors who help people discover the protocol.",
         "source": "Cosmic Signature public outreach allocation APIs",
@@ -78,7 +79,6 @@
         }
       },
       "imprint": {
-        "eyebrow": "RandomWalk NFT imprinting · Arbitrum",
         "heading": "Imprint RandomWalk NFT",
         "description": "Imprint RandomWalk NFTs for Cosmic Signature participation. Each unused RandomWalk NFT can be attached to one ETH gesture for a 50% Gesture Cost reduction.",
         "source": "Cosmic Signature public protocol configuration APIs",
@@ -100,13 +100,12 @@
         }
       },
       "eth-contribution": {
-        "eyebrow": "Direct ETH contributions · Arbitrum",
         "heading": "Direct ETH Contributions",
-        "description": "Browse direct ETH contributions to the Cosmic Signature Public Goods Vault and the public notes, cycles, and contributor records attached to them.",
+        "description": "Browse direct ETH contributions to the Cosmic Signature Cycle Reserve and the public notes, cycles, and contributor records attached to them.",
         "source": "Cosmic Signature public contribution APIs",
         "links": {
-          "protocol": "Protocol public-goods contributions",
-          "voluntary": "Voluntary public-goods records",
+          "reserve": "How the Cycle Reserve is split",
+          "protocol": "Where the Public Goods share goes",
           "risk": "Read risk disclosures"
         },
         "cards": {
@@ -122,7 +121,6 @@
         }
       },
       "attached-nfts": {
-        "eyebrow": "Attached NFT contributions · Arbitrum",
         "heading": "Attached NFT Contributions",
         "description": "Browse NFTs attached to Cosmic Signature gestures. Attached ERC-721 tokens forward to the participant who receives the Signature Allocation when a cycle finalizes.",
         "source": "Cosmic Signature public attached NFT APIs",
@@ -144,7 +142,6 @@
         }
       },
       "allocation-finalized": {
-        "eyebrow": "Retrieved allocations · Arbitrum",
         "heading": "Retrieved Allocations",
         "description": "Inspect public allocation retrieval records from Cosmic Signature, including ETH receipts, Cosmic Signature NFT allocations, and Stellar Selection distributions.",
         "source": "Cosmic Signature public allocation retrieval APIs",
@@ -168,7 +165,6 @@
         }
       },
       "named-nfts": {
-        "eyebrow": "Named NFTs · Arbitrum",
         "heading": "Named Cosmic Signature NFTs",
         "description": "Browse Cosmic Signature NFTs that owners have given custom names, connecting token identity, gallery discovery, and on-chain collection history.",
         "source": "Cosmic Signature public token APIs",
@@ -184,14 +180,12 @@
           "owners": {
             "label": "Current Owners"
           },
-          "collection": {
-            "label": "Collection",
-            "value": "Cosmic Signature ERC-721"
+          "imprinted": {
+            "label": "Imprinted NFTs"
           }
         }
       },
       "used-rwlk-nfts": {
-        "eyebrow": "RandomWalk NFT usage · Arbitrum",
         "heading": "Used RandomWalk NFTs",
         "description": "Review RandomWalk NFTs that have already been attached to ETH gestures for their one-time Gesture Cost reduction.",
         "source": "Cosmic Signature public RandomWalk usage APIs",
@@ -204,17 +198,15 @@
           "used": {
             "label": "Used RandomWalk NFTs"
           },
+          "wallets": {
+            "label": "Participant Wallets"
+          },
           "discount": {
             "label": "One-Time Discount"
-          },
-          "scope": {
-            "label": "Usage Scope",
-            "value": "One gesture per NFT"
           }
         }
       },
       "coordination-changes": {
-        "eyebrow": "Coordination changes · Arbitrum",
         "heading": "Coordination Changes",
         "description": "Review public Cosmic Signature coordination changes, including protocol mode changes, parameter updates, and administration records that affect future cycles.",
         "source": "Cosmic Signature public system event APIs",
@@ -227,18 +219,16 @@
           "records": {
             "label": "Coordination Change Records"
           },
-          "governance": {
-            "label": "Governance Surface",
-            "value": "Cosmic Council"
+          "latest": {
+            "label": "Latest Change"
           },
-          "network": {
-            "label": "Network",
-            "value": "Arbitrum"
+          "parameters": {
+            "label": "Parameters Changed",
+            "tooltip": "How many distinct protocol parameters these records change. Only the contract owner can change them."
           }
         }
       },
       "public-goods-contributions-cg": {
-        "eyebrow": "Protocol public-goods contributions · Arbitrum",
         "heading": "Protocol Public-Goods Contributions",
         "description": "Track automatic Cosmic Signature public-goods forwards from protocol cycles to the Public Goods Vault and its configured beneficiary — currently Protocol Guild.",
         "source": "Cosmic Signature public public-goods APIs",
@@ -254,14 +244,16 @@
           "totalEth": {
             "label": "Protocol Public-Goods ETH"
           },
-          "track": {
-            "label": "Allocation Track",
-            "value": "Public Goods"
+          "share": {
+            "label": "Share of Each Cycle Reserve",
+            "tooltip": "The share of each finalized Cycle Reserve that the protocol forwards to the Public Goods Vault."
+          },
+          "latest": {
+            "label": "Latest Contribution"
           }
         }
       },
       "public-goods-contributions-voluntary": {
-        "eyebrow": "Voluntary public-goods contributions · Arbitrum",
         "heading": "Voluntary Public-Goods Contributions",
         "description": "Browse voluntary public-goods contributions from the Cosmic Signature community, including cycle context and contributor records.",
         "source": "Cosmic Signature public public-goods APIs",
@@ -283,7 +275,6 @@
         }
       },
       "public-goods-retrievals": {
-        "eyebrow": "Public-goods retrievals · Arbitrum",
         "heading": "Public Goods Retrievals",
         "description": "Review retrievals from the Cosmic Signature Public Goods Vault, where cycle reserves forward support to the configured public-goods beneficiary — currently Protocol Guild.",
         "source": "Cosmic Signature public public-goods APIs",
@@ -299,25 +290,24 @@
           "totalEth": {
             "label": "Retrieved Public-Goods ETH"
           },
-          "track": {
-            "label": "Beneficiary Track",
-            "value": "Public Goods Vault"
+          "latest": {
+            "label": "Latest Retrieval"
+          },
+          "beneficiary": {
+            "label": "Latest Beneficiary",
+            "tooltip": "The address that received the most recent retrieval from the Public Goods Vault. The configured beneficiary is currently Protocol Guild."
           }
         }
       }
     }
   },
   "gallerySummary": {
-    "eyebrow": "Deterministic NFT art · Arbitrum",
     "heading": "Cosmic Signature Gallery",
     "description": "Explore Cosmic Signature NFT artwork generated from deterministic three-body physics, on-chain seeds, spectral rendering, and Performance Cycle data. Each Signature is reproducible from protocol records and represents a specific cycle context.",
-    "unavailable": "Unavailable",
     "cards": {
       "imprinted": "Imprinted NFTs",
-      "process": "Art Process",
-      "processValue": "Three-body simulation",
-      "license": "License",
-      "licenseValue": "CC0-aligned"
+      "anchored": "Anchored NFTs",
+      "named": "Named NFTs"
     },
     "relatedAria": "Gallery related pages",
     "links": {
@@ -327,14 +317,17 @@
     }
   },
   "currentCycleSummary": {
-    "eyebrow": "Live Performance Cycle · Arbitrum",
     "heading": "Current Cosmic Signature Performance Cycle",
     "description": "Follow the active Cosmic Signature Performance Cycle: gestures, the Cycle Reserve, attached assets, allocation tracks, and finalization status. The display below updates with live protocol data.",
-    "unavailable": "Unavailable",
     "cards": {
       "cycle": "Cycle",
-      "gestures": "Gestures",
-      "reserve": "Reserve Snapshot"
+      "gestures": "Total Gestures",
+      "signatureAllocation": "Signature Allocation",
+      "opened": "Opened"
+    },
+    "info": {
+      "gestures": "Total gestures made in this cycle. Each gesture is also a Stellar Selection entry.",
+      "signatureAllocation": "ETH portion of the Signature Allocation retrieved by the participant who made the Final Gesture. The recipient also receives 1,000 CST and a Cosmic Signature NFT."
     },
     "relatedAria": "Current cycle related pages",
     "links": {

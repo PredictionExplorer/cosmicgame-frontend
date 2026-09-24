@@ -19,9 +19,7 @@ export const howItWorksTextUk = {
     pageLabel: 'Як це працює',
   },
   hero: {
-    badge: 'Процедурний протокол ончейн-мистецтва',
-    headingLead: 'Як працює',
-    headingAccent: 'Cosmic Signature',
+    heading: 'Як працює <accent>Cosmic Signature</accent>',
     paragraph:
       'Жест за жестом учасники формують Сигнатуру протягом перформанс-циклу. Коли відлік дійде до нуля, цикл можна завершити. Тоді протокол виконає розподіли за понад десятьма напрямами, серед яких розподіл Сигнатури, надходження за закріплення та підтримка Protocol Guild.',
     primaryCtaLabel: 'Зробити жест',

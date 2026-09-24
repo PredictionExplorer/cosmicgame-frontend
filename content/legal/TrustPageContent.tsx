@@ -1,12 +1,20 @@
+import type { ReactNode } from 'react';
+
+import { PageHeader } from '@/components/layout/PageHeader';
+import { ReviewedStamp } from '@/components/layout/ReviewedStamp';
 import { Link } from '@/i18n/navigation';
 import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
+
+import { LegalSectionHeading } from './LegalSectionHeading';
+import { TRUST_DOCUMENT_DATES, type TrustCenterPage } from './trustCenter';
 
 /**
  * Shared renderer for the trust pages (/audits, /security, /risk-disclosures).
  *
- * The three pages share one anatomy — eyebrow, title, intro, then sections of
- * paragraphs, bullets, links, and notes — so the markup lives once here and
- * each page provides a `TrustPageCopy` object per locale.
+ * The three pages share the Trust Center template with /terms and /privacy —
+ * the reading header (Trust Center eyebrow, title, intro, document date,
+ * tabs), then sections of paragraphs, bullets, links, and notes — so the
+ * markup lives once here and each page provides a `TrustPageCopy` per locale.
  */
 
 export interface TrustPageLink {
@@ -32,13 +40,34 @@ export interface TrustPageSection {
 }
 
 export interface TrustPageCopy {
-  readonly eyebrow: string;
   readonly title: string;
   readonly intro: string;
   readonly sections: readonly TrustPageSection[];
 }
 
 const LINK_CLASS = 'text-primary underline-offset-4 hover:underline';
+
+/**
+ * Copy text with `backticked` spans (a URL or an address to check character
+ * by character) set as code, so the backticks never reach the reader.
+ */
+function CopyText({ text }: { text: string }) {
+  const parts = text.split(/`([^`]+)`/);
+  if (parts.length === 1) return <>{text}</>;
+  return (
+    <>
+      {parts.map((part, index) =>
+        index % 2 === 1 ? (
+          <code key={index} className="font-mono text-foreground">
+            {part}
+          </code>
+        ) : (
+          part
+        ),
+      )}
+    </>
+  );
+}
 
 function TrustLink({ link, locale }: { link: TrustPageLink; locale: string }) {
   if (link.kind === 'app') {
@@ -62,14 +91,35 @@ function TrustLink({ link, locale }: { link: TrustPageLink; locale: string }) {
   );
 }
 
-export function TrustPageContent({ copy, locale }: { copy: TrustPageCopy; locale: string }) {
+export function TrustPageContent({
+  copy,
+  locale,
+  page,
+  tabs,
+}: {
+  copy: TrustPageCopy;
+  locale: string;
+  /** Which Trust Center page this is: sets the document date, and Security is the hub. */
+  page?: TrustCenterPage;
+  /** The Trust Center tabs (`TrustCenterTabs`). */
+  tabs?: ReactNode;
+}) {
+  const documentDate = page ? TRUST_DOCUMENT_DATES[page] : undefined;
   return (
     <>
-      <header className="border-b border-border pb-10">
-        <p className="type-eyebrow text-primary/80">{copy.eyebrow}</p>
-        <h1 className="mt-4 type-display-lg text-foreground">{copy.title}</h1>
-        <p className="mt-6 type-body-lg text-muted-foreground">{copy.intro}</p>
-      </header>
+      <PageHeader
+        variant="reading"
+        section="trust"
+        sectionHub={page === 'security'}
+        title={copy.title}
+        subtitle={copy.intro}
+        meta={
+          documentDate ? (
+            <ReviewedStamp date={documentDate.date} kind={documentDate.kind} />
+          ) : undefined
+        }
+        tabs={tabs}
+      />
 
       {copy.sections.map((section) => {
         const linksOnly =
@@ -79,10 +129,10 @@ export function TrustPageContent({ copy, locale }: { copy: TrustPageCopy; locale
             key={section.heading}
             className={linksOnly ? 'mt-12 space-y-4' : 'mt-12 space-y-5'}
           >
-            <h2 className="font-display text-2xl font-medium tracking-tight">{section.heading}</h2>
+            <LegalSectionHeading>{section.heading}</LegalSectionHeading>
             {section.paragraphs?.map((paragraph) => (
               <p key={paragraph} className="leading-8 text-muted-foreground">
-                {paragraph}
+                <CopyText text={paragraph} />
               </p>
             ))}
             {section.linkParagraph && (
@@ -98,7 +148,9 @@ export function TrustPageContent({ copy, locale }: { copy: TrustPageCopy; locale
             {section.bullets && (
               <ul className="list-disc space-y-3 pl-5 leading-8 text-muted-foreground [overflow-wrap:anywhere]">
                 {section.bullets.map((bullet) => (
-                  <li key={bullet}>{bullet}</li>
+                  <li key={bullet}>
+                    <CopyText text={bullet} />
+                  </li>
                 ))}
               </ul>
             )}

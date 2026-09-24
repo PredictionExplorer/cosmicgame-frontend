@@ -2,8 +2,7 @@ import type { TrustPageCopy } from './TrustPageContent';
 
 /** Korean copy for /audits, rendered by TrustPageContent. */
 export const auditsCopyKo: TrustPageCopy = {
-  eyebrow: '보안 감사와 검증',
-  title: 'Cosmic Signature 보안 감사',
+  title: '보안 감사',
   intro:
     'Cosmic Signature의 보안 감사 보고서와 검증 자료를 소개합니다. 검토 범위, 발견 사항과 대응 현황, 공개 소스 코드를 확인할 수 있습니다.',
   sections: [

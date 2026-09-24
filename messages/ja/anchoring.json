@@ -25,7 +25,6 @@
   "overview": {
     "errorTitle": "係留データの読み込みエラー",
     "errorMessage": "係留データを読み込めませんでした。しばらくしてからもう一度お試しください。",
-    "eyebrow": "係留配分 · ライブ",
     "title": "係留配分",
     "subtitle": "係留活動の全体像と配分履歴の概要",
     "intro": {
@@ -92,12 +91,9 @@
     }
   },
   "anchorActionDetail": {
-    "title": "係留の操作",
     "subtitle": "{token} NFTの係留操作",
     "error": "係留操作の詳細を読み込めませんでした。しばらくしてからもう一度お試しください。",
     "breadcrumbs": {
-      "home": "ホーム",
-      "myAnchors": "自分の係留",
       "action": "操作 #{id}"
     },
     "empty": "この係留操作のデータが見つかりません。",
@@ -129,11 +125,6 @@
   "distributionsByToken": {
     "title": "トークン{tokenId}の係留配分の内訳",
     "subtitle": "{address}の配分",
-    "breadcrumbs": {
-      "home": "ホーム",
-      "user": "ユーザー",
-      "token": "トークン #{tokenId}"
-    },
     "details": {
       "anchorTitle": "係留",
       "releaseTitle": "係留の解除",

@@ -6,12 +6,6 @@
   "jsonLd": {
     "name": "Cosmic Signatureギャラリー"
   },
-  "page": {
-    "eyebrowImprinted": "コレクション · 刻印済みNFT {count}点",
-    "eyebrowLive": "コレクション · ライブ",
-    "title": "NFTギャラリー",
-    "subtitle": "これまでのサイクルで生まれたCosmic Signature NFTを一覧で楽しめます"
-  },
   "intro": {
     "badge": "ジェネラティブ・アーカイブ",
     "description": "各Cosmic Signature NFTは、オンチェーンのシードから三体問題の物理シミュレーションを経て導かれた、唯一のジェネラティブアート作品です。標準的なサイクルでは24点の新しいNFTが刻印されます。役割NFTが4点、参加者の星選NFTが10点、そしてRandomWalk NFTの係留者に向けた係留NFT星選が10点です。"
@@ -23,24 +17,6 @@
     "badgeImprint": "注目の刻印",
     "badgeArchive": "アーカイブ",
     "awaitingMetadata": "メタデータ待ち"
-  },
-  "hero": {
-    "totalImprinted": {
-      "label": "刻印総数",
-      "tooltip": "すべてのサイクルで刻印されたCOSMIC NFTの総数"
-    },
-    "currentlyAnchored": {
-      "label": "現在係留中",
-      "tooltip": "プロトコルに係留され、所有者のために配分を受け取っているNFT"
-    },
-    "namedNfts": {
-      "label": "名前付きNFT",
-      "tooltip": "所有者によって固有の名前を付けられたNFT"
-    },
-    "cycles": {
-      "label": "サイクル",
-      "tooltip": "NFTを生み出したサイクルの数"
-    }
   },
   "card": {
     "alt": "Cosmic Signature {id}",

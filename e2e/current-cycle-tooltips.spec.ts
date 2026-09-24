@@ -13,7 +13,7 @@ const CURRENT_CYCLE_TOOLTIPS = [
     expected: /Total gestures made in this cycle/,
   },
   {
-    label: 'Cycle Reserve',
+    label: 'Signature Allocation',
     expected: /ETH portion of the Signature Allocation/,
   },
   {

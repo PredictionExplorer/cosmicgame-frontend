@@ -8,13 +8,7 @@ test.describe('/gallery tooltips', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
   });
 
-  test('opens gallery hero card and control tooltips', async ({ page }) => {
-    const totalNfts = page.getByText('Total Imprinted', { exact: true }).first();
-    await totalNfts.scrollIntoViewIfNeeded();
-    await totalNfts.hover();
-    await expectTooltipFullyVisible(page, /total number of COSMIC NFTs imprinted/i);
-    await dismissOpenTooltips(page);
-
+  test('opens the archive control tooltips', async ({ page }) => {
     await page.getByRole('radio', { name: 'All' }).hover();
     await expectTooltipFullyVisible(page, /Show all NFTs in the collection/);
     await dismissOpenTooltips(page);

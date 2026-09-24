@@ -1,13 +1,12 @@
 {
   "publicData": {
     "common": {
-      "unavailable": "暂不可用",
-      "lastUpdated": "更新时间：{date}。数据来源：{source}。",
+      "none": "暂无",
+      "source": "数据来源：{source}",
       "relatedPagesAria": "{heading}相关页面"
     },
     "routes": {
       "allocation": {
-        "eyebrow": "分配历史 · Arbitrum",
         "heading": "分配名录",
         "description": "浏览 Cosmic Signature 已收官演绎周期的公开分配历史，包括签名分配、星选、锚定派发与公共物品资金流。",
         "source": "Cosmic Signature 公开周期 API",
@@ -28,11 +27,14 @@
           "totalEth": {
             "label": "签名分配 ETH 总额",
             "tooltip": "根据周期记录汇总的历次签名分配 ETH。"
+          },
+          "totalGestures": {
+            "label": "落笔总次数",
+            "tooltip": "所有已收官周期的累计落笔次数。"
           }
         }
       },
       "anchoring": {
-        "eyebrow": "锚定派发 · Arbitrum",
         "heading": "锚定派发",
         "description": "追踪 Cosmic Signature NFT 锚定、ETH 锚定派发记录、Random Walk NFT 锚定，以及锚定 NFT 星选铭刻。",
         "source": "Cosmic Signature 公开锚定 API",
@@ -56,7 +58,6 @@
         }
       },
       "marketing": {
-        "eyebrow": "推广分配 · Arbitrum",
         "heading": "推广分配",
         "description": "查看 Cosmic Signature 推广分配历史，以及向帮助更多人了解协议的生态贡献者发放的 CST。",
         "source": "Cosmic Signature 公开推广分配 API",
@@ -78,7 +79,6 @@
         }
       },
       "imprint": {
-        "eyebrow": "Random Walk NFT 铭刻 · Arbitrum",
         "heading": "铭刻 Random Walk NFT",
         "description": "铭刻 Random Walk NFT，以参与 Cosmic Signature。每枚尚未使用的 Random Walk NFT 都可附加至一笔 ETH 落笔，使落笔价格降低 50%。",
         "source": "Cosmic Signature 公开协议配置 API",
@@ -100,13 +100,12 @@
         }
       },
       "eth-contribution": {
-        "eyebrow": "直接 ETH 贡献 · Arbitrum",
         "heading": "直接 ETH 贡献",
         "description": "浏览直接转入 Cosmic Signature 周期储备的 ETH，以及随这些记录公开的留言、周期与贡献者信息。",
         "source": "Cosmic Signature 公开贡献 API",
         "links": {
-          "protocol": "查看协议公共物品资助",
-          "voluntary": "查看自愿公共物品资助",
+          "reserve": "周期储备如何分配",
+          "protocol": "公共物品份额的去向",
           "risk": "阅读风险披露"
         },
         "cards": {
@@ -122,7 +121,6 @@
         }
       },
       "attached-nfts": {
-        "eyebrow": "已附加 NFT 贡献 · Arbitrum",
         "heading": "已附加 NFT 贡献",
         "description": "浏览随 Cosmic Signature 落笔附加的 NFT。周期收官时，已附加的 ERC-721 代币会转给签名分配获配者。",
         "source": "Cosmic Signature 公开已附加 NFT API",
@@ -144,7 +142,6 @@
         }
       },
       "allocation-finalized": {
-        "eyebrow": "已取回分配 · Arbitrum",
         "heading": "已取回分配",
         "description": "查看 Cosmic Signature 的公开分配取回记录，包括收到的 ETH、Cosmic Signature NFT 分配与星选分配。",
         "source": "Cosmic Signature 公开分配取回 API",
@@ -168,7 +165,6 @@
         }
       },
       "named-nfts": {
-        "eyebrow": "已命名 NFT · Arbitrum",
         "heading": "已命名 Cosmic Signature NFT",
         "description": "浏览由持有者自定义名称的 Cosmic Signature NFT，串联代币身份、画廊发现与链上系列历史。",
         "source": "Cosmic Signature 公开代币 API",
@@ -184,14 +180,12 @@
           "owners": {
             "label": "当前持有者"
           },
-          "collection": {
-            "label": "系列",
-            "value": "Cosmic Signature ERC-721"
+          "imprinted": {
+            "label": "已铭刻 NFT"
           }
         }
       },
       "used-rwlk-nfts": {
-        "eyebrow": "Random Walk NFT 使用记录 · Arbitrum",
         "heading": "已使用的 Random Walk NFT",
         "description": "查看已经附加至 ETH 落笔、并用掉一次性落笔价格减免资格的 Random Walk NFT。",
         "source": "Cosmic Signature 公开 Random Walk 使用 API",
@@ -204,17 +198,15 @@
           "used": {
             "label": "已使用的 Random Walk NFT"
           },
+          "wallets": {
+            "label": "参与者钱包"
+          },
           "discount": {
             "label": "一次性减免"
-          },
-          "scope": {
-            "label": "使用范围",
-            "value": "每枚 NFT 可用于一笔落笔"
           }
         }
       },
       "coordination-changes": {
-        "eyebrow": "协调变更 · Arbitrum",
         "heading": "协调变更",
         "description": "查看 Cosmic Signature 的公开协调变更，包括影响后续周期的协议模式、参数更新与管理记录。",
         "source": "Cosmic Signature 公开系统事件 API",
@@ -227,18 +219,16 @@
           "records": {
             "label": "协调变更记录"
           },
-          "governance": {
-            "label": "协调主体",
-            "value": "宇宙议会"
+          "latest": {
+            "label": "最近变更"
           },
-          "network": {
-            "label": "网络",
-            "value": "Arbitrum"
+          "parameters": {
+            "label": "变更的参数",
+            "tooltip": "这些记录涉及的不同协议参数数量。只有合约所有者可以变更这些参数。"
           }
         }
       },
       "public-goods-contributions-cg": {
-        "eyebrow": "协议公共物品资助 · Arbitrum",
         "heading": "协议公共物品资助",
         "description": "追踪 Cosmic Signature 各周期自动转入公共物品金库、并发往其当前受益方 Protocol Guild 的资金。",
         "source": "Cosmic Signature 公开公共物品 API",
@@ -254,14 +244,16 @@
           "totalEth": {
             "label": "协议公共物品 ETH"
           },
-          "track": {
-            "label": "分配轨道",
-            "value": "公共物品"
+          "share": {
+            "label": "每个周期储备的份额",
+            "tooltip": "每个已收官周期储备中由协议转入公共物品金库的份额。"
+          },
+          "latest": {
+            "label": "最近一次资助"
           }
         }
       },
       "public-goods-contributions-voluntary": {
-        "eyebrow": "自愿公共物品资助 · Arbitrum",
         "heading": "自愿公共物品资助",
         "description": "浏览 Cosmic Signature 社区自愿提供的公共物品资金，包括所属周期与贡献者记录。",
         "source": "Cosmic Signature 公开公共物品 API",
@@ -283,7 +275,6 @@
         }
       },
       "public-goods-retrievals": {
-        "eyebrow": "公共物品取回 · Arbitrum",
         "heading": "公共物品取回",
         "description": "查看 Cosmic Signature 公共物品金库的取回记录；周期储备会由此转向当前配置的公共物品受益方 Protocol Guild。",
         "source": "Cosmic Signature 公开公共物品 API",
@@ -299,25 +290,24 @@
           "totalEth": {
             "label": "已取回公共物品 ETH"
           },
-          "track": {
-            "label": "受益轨道",
-            "value": "公共物品金库"
+          "latest": {
+            "label": "最近一次取回"
+          },
+          "beneficiary": {
+            "label": "最近受益方",
+            "tooltip": "最近一次从公共物品金库取回的资金接收地址。当前配置的受益方为 Protocol Guild。"
           }
         }
       }
     }
   },
   "gallerySummary": {
-    "eyebrow": "确定性 NFT 艺术 · Arbitrum",
     "heading": "Cosmic Signature 画廊",
     "description": "浏览由确定性三体物理、链上种子、光谱渲染与演绎周期数据共同生成的 Cosmic Signature NFT。每件签名作品都可从协议记录复现，并对应一个特定周期。",
-    "unavailable": "暂不可用",
     "cards": {
       "imprinted": "已铭刻 NFT",
-      "process": "作品生成方式",
-      "processValue": "三体模拟",
-      "license": "许可",
-      "licenseValue": "遵循 CC0"
+      "anchored": "已锚定 NFT",
+      "named": "已命名 NFT"
     },
     "relatedAria": "画廊相关页面",
     "links": {
@@ -327,14 +317,17 @@
     }
   },
   "currentCycleSummary": {
-    "eyebrow": "实时演绎周期 · Arbitrum",
     "heading": "当前 Cosmic Signature 演绎周期",
     "description": "本页追踪当前 Cosmic Signature 演绎周期，包括公开落笔次数、周期储备、已附加资产、分配轨道与收官状态。",
-    "unavailable": "暂不可用",
     "cards": {
       "cycle": "周期",
-      "gestures": "落笔",
-      "reserve": "储备快照"
+      "gestures": "落笔总次数",
+      "signatureAllocation": "签名分配",
+      "opened": "开启时间"
+    },
+    "info": {
+      "gestures": "本周期的落笔总次数。每一笔也同时计入一次星选资格。",
+      "signatureAllocation": "签名分配中的 ETH 部分，由写下收官之笔的参与者取回。获配者还将获得 1,000 CST 与一枚 Cosmic Signature NFT。"
     },
     "relatedAria": "当前周期相关页面",
     "links": {

@@ -4,9 +4,10 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
+import { PublicDataQuerySeed } from '../PublicDataQuerySeed';
 import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
 
-import AllocationRecipientsPage from './AllocationRecipientsPage';
+import AllocationRecipientsPage, { AllocationScopeNote } from './AllocationRecipientsPage';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -36,7 +37,13 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <PageMessages namespaces={['allocation', 'tables']}>
-      <AllocationRecipientsPage seoSummary={<PublicDataRouteSeoSummary route="allocation" />} />
+      <PublicDataQuerySeed route="allocation">
+        <AllocationRecipientsPage
+          seoSummary={
+            <PublicDataRouteSeoSummary route="allocation" note={<AllocationScopeNote />} />
+          }
+        />
+      </PublicDataQuerySeed>
     </PageMessages>
   );
 }

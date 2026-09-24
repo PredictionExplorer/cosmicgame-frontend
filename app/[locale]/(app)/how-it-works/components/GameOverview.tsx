@@ -26,10 +26,11 @@ export function GameOverview({ overview }: { overview: HowItWorksContent['overvi
   ];
 
   return (
+    // The first section after the page header: the header's margin sets the gap above it.
     <section
       id="protocol-overview"
       aria-labelledby="protocol-overview-heading"
-      className="py-8 sm:py-10"
+      className="pb-8 sm:pb-10"
     >
       <div className="mb-10 max-w-3xl">
         <h2 id="protocol-overview-heading" className="type-display-sm">

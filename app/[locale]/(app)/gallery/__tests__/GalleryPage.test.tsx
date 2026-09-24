@@ -1,5 +1,3 @@
-import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
-
 import { render, screen, checkA11y, fireEvent, waitFor } from '@/test-utils';
 
 import GalleryPage from '../GalleryPage';
@@ -103,37 +101,20 @@ const mockNFTs = [
 beforeEach(() => jest.clearAllMocks());
 
 describe('GalleryPage', () => {
-  it('renders the page title and subtitle', () => {
-    mockUseCSTList.mockReturnValue({ data: [], isLoading: false, error: null });
-    render(<GalleryPage />);
-    expect(screen.getByText('gallery.page.title')).toBeInTheDocument();
-    expect(screen.getByText('gallery.page.subtitle')).toBeInTheDocument();
-  });
-
-  it('links to the Cosmic Signature marketplace', () => {
-    mockUseCSTList.mockReturnValue({ data: [], isLoading: false, error: null });
-    render(<GalleryPage />);
-
-    expect(screen.getByRole('link', { name: 'nav.ecosystem.axiomZero.ariaLabel' })).toHaveAttribute(
-      'href',
-      COSMIC_SIGNATURE_MARKETPLACE_URL,
-    );
-  });
-
   it.each([
     { state: 'loaded', isLoading: false, isError: false },
     { state: 'loading', isLoading: true, isError: false },
     { state: 'failed', isLoading: false, isError: true },
-  ])('keeps the primary heading and marketplace action inside main when $state', (query) => {
+  ])('renders only the body when $state: the route renders the shell and header', (query) => {
     mockUseCSTList.mockReturnValue({ ...query, data: [], refetch: jest.fn() });
-    render(<GalleryPage seoSummary={<h1>Collection overview</h1>} />);
+    render(<GalleryPage />);
 
-    const main = screen.getByRole('main');
-    expect(main).toContainElement(screen.getByRole('heading', { level: 1 }));
-    expect(screen.queryByText('gallery.page.title')).not.toBeInTheDocument();
-    expect(main).toContainElement(
-      screen.getByRole('link', { name: 'nav.ecosystem.axiomZero.ariaLabel' }),
-    );
+    expect(screen.queryByRole('main')).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument();
+    // The collection figures and the marketplace action live in the server header.
+    expect(
+      screen.queryByRole('link', { name: 'nav.ecosystem.axiomZero.ariaLabel' }),
+    ).not.toBeInTheDocument();
   });
 
   it('shows skeleton loading state', () => {
@@ -141,15 +122,6 @@ describe('GalleryPage', () => {
     const { container } = render(<GalleryPage />);
     const skeletons = container.querySelectorAll('.animate-pulse');
     expect(skeletons.length).toBeGreaterThan(0);
-  });
-
-  it('renders hero stats with correct counts', () => {
-    mockUseCSTList.mockReturnValue({ data: mockNFTs, isLoading: false, error: null });
-    render(<GalleryPage />);
-    expect(screen.getByText('gallery.hero.totalImprinted.label')).toBeInTheDocument();
-    expect(screen.getByText('gallery.hero.currentlyAnchored.label')).toBeInTheDocument();
-    expect(screen.getByText('gallery.hero.namedNfts.label')).toBeInTheDocument();
-    expect(screen.getByText('gallery.hero.cycles.label')).toBeInTheDocument();
   });
 
   it('renders NFT cards when data is loaded', () => {

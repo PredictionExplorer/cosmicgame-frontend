@@ -14,7 +14,9 @@ import {
   visualArtworkJsonLd,
 } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
+import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
 import { PageMessages } from '@/components/i18n/PageMessages';
+import { PageShell } from '@/components/ui/page-shell';
 
 import GalleryPage from './GalleryPage';
 import { GallerySeoSummary } from './GallerySeoSummary';
@@ -96,9 +98,14 @@ export default async function Page({ params }: PageProps) {
               : []),
           ]}
         />
-        <Suspense>
-          <GalleryPage seoSummary={<GallerySeoSummary />} />
-        </Suspense>
+        {/* The header renders outside the Suspense boundary: the grid reads the
+            URL and renders on the client, the H1 and figures stay in the HTML. */}
+        <PageShell variant="data" backdrop="signature">
+          <GallerySeoSummary actions={<NftMarketplaceButton variant="secondary" />} />
+          <Suspense>
+            <GalleryPage />
+          </Suspense>
+        </PageShell>
       </>
     </PageMessages>
   );

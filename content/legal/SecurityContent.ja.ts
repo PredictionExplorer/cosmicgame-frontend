@@ -2,8 +2,7 @@ import type { TrustPageCopy } from './TrustPageContent';
 
 /** Japanese copy for /security, rendered by TrustPageContent. */
 export const securityCopyJa: TrustPageCopy = {
-  eyebrow: '信頼とセキュリティ',
-  title: 'Cosmic Signatureセキュリティ',
+  title: 'セキュリティ',
   intro:
     'Cosmic SignatureはArbitrum上のプロシージャル・オンチェーンアート・プロトコルです。そのセキュリティは、公開されたスマートコントラクト、透明なプロトコルデータ、慎重なウォレットの操作、そして参加者への明確な説明に支えられています。',
   sections: [

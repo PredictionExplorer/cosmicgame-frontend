@@ -22,14 +22,14 @@ const myTheme = createTheme({
   styles: [],
 });
 
+/** `seoSummary` is the server-rendered page header, the page's only header. */
 const CodeViewer = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('code');
 
   return (
     <PageShell variant="data" backdrop="signature">
-      {seoSummary}
-      {!seoSummary && (
-        <PageHeader title={t('viewer.title')} titleLevel={2} subtitle={t('viewer.subtitle')} />
+      {seoSummary ?? (
+        <PageHeader section="trust" title={t('viewer.title')} subtitle={t('viewer.subtitle')} />
       )}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>

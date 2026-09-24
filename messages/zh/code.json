@@ -10,7 +10,6 @@
     "github": "公开的 GitHub 组织位于 <link>github.com/PredictionExplorer</link>。"
   },
   "seo": {
-    "eyebrow": "源代码 · 确定性艺术",
     "heading": "Cosmic Signature 源代码",
     "description": "查看 Cosmic Signature 的前端、Go 后端、智能合约与图像生成源代码。通过下方查看器，了解链上种子如何生成可复现的 NFT 艺术作品。",
     "excerpt": "种子 -> SHA3-256 随机流 -> 三体模拟 -> 光谱渲染器 -> Cosmic Signature NFT 图像",

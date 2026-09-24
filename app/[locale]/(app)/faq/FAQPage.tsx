@@ -181,21 +181,21 @@ const FAQPage = ({ content }: FAQPageProps) => {
         categoryCount={categories.length}
       />
 
+      {/* The page header closes with its own rule, so search results follow it directly. */}
       {!isSearching && (
         <>
+          <PopularQuestions
+            className="pt-0"
+            content={content}
+            onQuestionClick={handlePopularClick}
+          />
           <SectionDivider />
-          <PopularQuestions content={content} onQuestionClick={handlePopularClick} />
+          <CategoryNav
+            categories={categories}
+            activeCategory={activeCategory}
+            onCategoryClick={setActiveCategory}
+          />
         </>
-      )}
-
-      <SectionDivider />
-
-      {!isSearching && (
-        <CategoryNav
-          categories={categories}
-          activeCategory={activeCategory}
-          onCategoryClick={setActiveCategory}
-        />
       )}
 
       <div className="mt-6 space-y-12">

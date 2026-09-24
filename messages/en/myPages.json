@@ -1,7 +1,5 @@
 {
   "shared": {
-    "home": "Home",
-    "user": "User",
     "loading": "Loading...",
     "unavailable": "Unavailable",
     "yes": "Yes",
@@ -14,7 +12,6 @@
     "recipient": "Recipient"
   },
   "allocations": {
-    "eyebrow": "Personal · Allocations",
     "title": "My Allocations",
     "subtitle": "View and retrieve all your pending allocations",
     "loadErrorTitle": "Unable to load allocations",
@@ -39,7 +36,6 @@
     "viewHistory": "View Allocation History"
   },
   "anchors": {
-    "eyebrow": "Personal · Anchors",
     "title": "My Anchors",
     "subtitle": "Manage your anchored NFTs and view Cosmic Signature NFT distributions",
     "tabs": {
@@ -383,10 +379,6 @@
       "outreach": "Outreach Wallet",
       "stellarSelection": "Stellar Selection Wallet",
       "publicGoods": "Public Goods Vault"
-    },
-    "breadcrumbs": {
-      "nft": "NFT transfers",
-      "cst": "CST transfers"
     },
     "nft": {
       "title": "Cosmic Signature Transfers",

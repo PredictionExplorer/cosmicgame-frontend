@@ -8,7 +8,18 @@ import type { PrivacyCopy } from '@/content/legal/PrivacyContent';
 import { termsCopyEn } from '@/content/legal/TermsContent.en';
 import { termsCopyZh } from '@/content/legal/TermsContent.zh';
 import type { TrustPageCopy } from '@/content/legal/TrustPageContent';
+import { TRUST_DOCUMENT_DATES } from '@/content/legal/trustCenter';
 import { protocolFacts } from '@/content/protocol-facts';
+
+import { routing } from '@/i18n/routing';
+
+/** A locale's Trust Center tab labels (`legal.breadcrumbs`). */
+function trustTabLabels(locale: string): Record<'security' | 'audits' | 'risk', string> {
+  const legal = JSON.parse(
+    readFileSync(join(process.cwd(), 'messages', locale, 'legal.json'), 'utf8'),
+  ) as { breadcrumbs: Record<'security' | 'audits' | 'risk', string> };
+  return legal.breadcrumbs;
+}
 
 function termsStructure(copy: typeof termsCopyEn | typeof termsCopyZh) {
   return {
@@ -58,9 +69,19 @@ describe('localized legal content', () => {
     for (const getCopy of [getAuditsCopy, getSecurityCopy, getRiskCopy]) {
       expect(trustPageStructure(getCopy('zh'))).toEqual(trustPageStructure(getCopy('en')));
     }
-    expect(getAuditsCopy('zh').title).toBe('Cosmic Signature 审计');
-    expect(getSecurityCopy('zh').title).toBe('Cosmic Signature 安全');
-    expect(getRiskCopy('zh').title).toBe('Cosmic Signature 风险披露');
+    // The H1 is the page name; the brand stays in <title> and JSON-LD.
+    expect(getAuditsCopy('zh').title).toBe('审计');
+    expect(getSecurityCopy('zh').title).toBe('安全');
+    expect(getRiskCopy('zh').title).toBe('风险披露');
+  });
+
+  it('titles every trust page with its Trust Center tab label, in every locale', () => {
+    for (const locale of routing.locales) {
+      const legal = trustTabLabels(locale);
+      expect(getSecurityCopy(locale).title).toBe(legal.security);
+      expect(getAuditsCopy(locale).title).toBe(legal.audits);
+      expect(getRiskCopy(locale).title).toBe(legal.risk);
+    }
   });
 
   it('preserves Terms protocol facts and legal dates', () => {
@@ -73,7 +94,16 @@ describe('localized legal content', () => {
     );
     expect(chineseTerms).toContain(String(protocolFacts.finalGestureExclusivityHours));
     expect(chineseTerms).toContain(String(protocolFacts.secondaryRetrievalTimeoutWeeks));
-    expect(termsCopyZh.lastUpdated).toContain('2026年7月20日');
+  });
+
+  it('dates the terms and privacy policy from one locale-independent source', () => {
+    // The header renders these through ReviewedStamp, in each locale's long date form.
+    expect(TRUST_DOCUMENT_DATES.terms).toEqual({ date: '2026-07-20', kind: 'updated' });
+    expect(TRUST_DOCUMENT_DATES.privacy).toEqual({ date: '2026-07-20', kind: 'updated' });
+    expect(TRUST_DOCUMENT_DATES.audits).toEqual({ date: '2026-08-24', kind: 'reviewed' });
+    // Security and the risk disclosures state no date, so none is invented for them.
+    expect(TRUST_DOCUMENT_DATES.security).toBeUndefined();
+    expect(TRUST_DOCUMENT_DATES.risk).toBeUndefined();
   });
 
   it('describes Arbitrum settlement and smart-contract custody accurately in both locales', () => {

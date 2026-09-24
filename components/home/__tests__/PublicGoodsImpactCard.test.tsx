@@ -62,9 +62,11 @@ describe('PublicGoodsImpactCard', () => {
     expect(card).toHaveAttribute('data-variant', 'compact');
     expect(card).toHaveClass('p-4');
     expect(card).toHaveTextContent('8.6415 ETH');
-    expect(card).toHaveTextContent('11.2345 ETH');
     expect(card).toHaveTextContent('0.5000 ETH');
     expect(card).toHaveTextContent('2.5000 ETH');
+    // The ledger's own header totals the contributions: the card does not repeat them.
+    expect(card).not.toHaveTextContent('11.2345 ETH');
+    expect(card).not.toHaveTextContent('home.publicGoods.stats.lifetime');
     expect(screen.queryByRole('link', { name: /home\.publicGoods\.cta/ })).not.toBeInTheDocument();
     expect(screen.queryByText(/not a charitable contribution/)).not.toBeInTheDocument();
   });

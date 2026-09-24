@@ -21,9 +21,7 @@ export const howItWorksTextJa = {
     pageLabel: '仕組み',
   },
   hero: {
-    badge: 'プロシージャル・オンチェーンアート・プロトコル',
-    headingLead: 'Cosmic Signatureの',
-    headingAccent: '仕組み',
+    heading: 'Cosmic Signatureの<accent>仕組み</accent>',
     paragraph:
       '一筆を重ね、時間を見守り、シグネチャーを形づくります。確定時刻を過ぎるとサイクルを確定でき、準備金はシグネチャー配分、係留配分、Protocol Guildなど、10を超えるトラックへ配分されます。',
     primaryCtaLabel: '一筆を入れる',

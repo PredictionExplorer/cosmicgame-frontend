@@ -11,6 +11,7 @@ import CharityWithdrawalTable, {
 } from '@/components/tables/CharityWithdrawalTable';
 import { useCharityWithdrawals } from '@/hooks/useApiQuery';
 
+/** `seoSummary` is the server-rendered page header, the page's only header. */
 const CharityWithdrawals = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('publicGoods');
   const tTables = useTranslations('tables');
@@ -18,18 +19,14 @@ const CharityWithdrawals = ({ seoSummary }: { seoSummary?: ReactNode }) => {
 
   return (
     <PageShell variant="data" backdrop="signature">
-      {seoSummary}
-      {!seoSummary && (
+      {seoSummary ?? (
         <PageHeader
+          section="records"
           title={t('retrievals.title')}
-          titleLevel={2}
           subtitle={t('retrievals.subtitle')}
         />
       )}
       <RouteGroupNav group="publicGoods" current="publicGoodsRetrievals" />
-      <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        {t('retrievals.description')}
-      </p>
       <CharityWithdrawalTable
         list={charityWithdrawals as CharityWithdrawal[]}
         loading={loading}

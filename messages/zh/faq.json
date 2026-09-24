@@ -1,8 +1,7 @@
 {
   "hero": {
-    "badge": "知识库",
-    "titlePrefix": "Cosmic Signature",
-    "titleHighlight": "常见问题",
+    "title": "Cosmic Signature <accent>常见问题</accent>",
+    "breadcrumb": "常见问题",
     "subtitle": "从初次参与到深入理解周期机制，这里汇集了关于 Cosmic Signature 的常见疑问。",
     "answerCount": "{count}+ 条解答",
     "answerCountTooltip": "全面解答 Cosmic Signature 各方面的常见问题。",

@@ -10,7 +10,6 @@
     "github": "The public GitHub organization is available at <link>github.com/PredictionExplorer</link>."
   },
   "seo": {
-    "eyebrow": "Source code · deterministic art",
     "heading": "Cosmic Signature Source Code",
     "description": "Explore the frontend, Go backend, smart contracts, and image generation source code for Cosmic Signature. Use the viewer below to inspect how on-chain seeds become reproducible NFT artwork.",
     "excerpt": "seed -> SHA3-256 random stream -> three-body simulation -> spectral renderer -> Cosmic Signature NFT image",

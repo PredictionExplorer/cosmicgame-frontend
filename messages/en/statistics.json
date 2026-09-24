@@ -32,9 +32,6 @@
       "description": "Participant performance leaderboard and retrievable allocation outcomes for every Cosmic Signature Performance Cycle."
     }
   },
-  "intro": {
-    "eyebrow": "Protocol Statistics · Arbitrum"
-  },
   "breadcrumbs": {
     "statistics": "Statistics"
   },
@@ -54,13 +51,6 @@
     "anchoringGlanceTitle": "Anchoring at a Glance",
     "anchoringGlanceDescription": "{cosmicCount} Cosmic Signature NFTs and {randomWalkCount} Random Walk NFTs are currently anchored. See anchor actions, anchored tokens, and unique anchor-holders on the anchoring statistics page.",
     "anchoringGlanceLink": "Anchoring statistics",
-    "headlines": {
-      "uniqueParticipants": "unique participants",
-      "nftsImprinted": "NFTs imprinted",
-      "nftsAnchored": "NFTs anchored",
-      "gesturesThisCycle": "gestures this cycle",
-      "allocationsDistributed": "allocations distributed"
-    },
     "pendingStellarRetrievals": "{count} recipients have yet to retrieve funds totaling {amount}",
     "voluntaryContributionSummary": "{count} totaling {amount}",
     "jsonLd": {
@@ -70,12 +60,8 @@
       "datasetDescription": "A summary of public Cosmic Signature activity indexed from Arbitrum smart contracts by the Cosmic Signature API."
     },
     "seo": {
-      "eyebrow": "Protocol statistics · Arbitrum",
       "heading": "Cosmic Signature Protocol Statistics",
       "description": "Explore Cosmic Signature activity on Arbitrum: Performance Cycles, gestures, NFTs, CST, anchoring, reserves, and allocations. The tables below show the latest available protocol data.",
-      "lastUpdated": "Last updated: {date}",
-      "unavailableSuffix": ". Live data is temporarily unavailable; this page is showing explanatory protocol context.",
-      "dataSource": "Data comes from the public Cosmic Signature API, which indexes the protocol’s Arbitrum smart contract activity. The links below explain the protocol and its verification resources.",
       "relatedPagesAria": "Statistics related pages",
       "links": {
         "currentCycle": "View the current Performance Cycle",
@@ -83,43 +69,25 @@
         "contracts": "Review verified Arbitrum contracts",
         "faq": "Read the Cosmic Signature FAQ"
       },
-      "unavailable": "Unavailable"
+      "gesturesCaption": "{count, plural, one {# gesture} other {# gestures}} this cycle"
     }
   },
   "metrics": {
     "activePerformanceCycle": {
       "label": "Active Performance Cycle",
-      "tooltip": "The current Performance Cycle number indexed by the public Cosmic Signature API.",
-      "seoDescription": "Current Performance Cycle number indexed from Cosmic Signature activity on Arbitrum."
-    },
-    "activeCycleGestures": {
-      "label": "Active Cycle Gestures",
-      "tooltip": "Number of indexed gestures made in the active Performance Cycle so far.",
-      "seoDescription": "Indexed gesture count for the active Performance Cycle."
-    },
-    "totalCycles": {
-      "label": "Total Cycles",
-      "tooltip": "Total Performance Cycles completed or currently indexed since protocol launch."
+      "tooltip": "The current Performance Cycle number indexed by the public Cosmic Signature API."
     },
     "allocationsDistributed": {
       "label": "Allocations Distributed",
       "tooltip": "Indexed allocation records across all cycles. Includes recipient allocations and protocol allocation markers such as Anchor Distribution deposits."
     },
     "cosmicSignatureNftsImprinted": {
-      "label": "Cosmic Signature NFTs Imprinted",
       "shortLabel": "NFTs Imprinted",
-      "tooltip": "Cumulative count of Cosmic Signature NFT ERC-721 tokens imprinted by the protocol across all indexed cycles. A value of 0 means the statistics API is currently reporting no indexed imprints for this counter.",
-      "seoDescription": "Cumulative Cosmic Signature NFT ERC-721 tokens imprinted by the protocol across all indexed cycles."
+      "tooltip": "Cumulative count of Cosmic Signature NFT ERC-721 tokens imprinted by the protocol across all indexed cycles. A value of 0 means the statistics API is currently reporting no indexed imprints for this counter."
     },
     "contractBalance": {
       "label": "Contract Balance",
-      "seoLabel": "Protocol Contract Balance",
-      "tooltip": "ETH currently held by the Cosmic Signature protocol contract before future allocations, retrievals, or cycle transitions.",
-      "seoDescription": "ETH currently held by the Cosmic Signature protocol contract before future allocation flows."
-    },
-    "numAllocationsDistributed": {
-      "label": "Allocations Distributed",
-      "tooltip": "Number of indexed allocation records. Aggregated recipient totals are used when detailed records are unavailable."
+      "tooltip": "ETH currently held by the Cosmic Signature protocol contract before future allocations, retrievals, or cycle transitions."
     },
     "totalSignatureAllocationsDistributed": {
       "label": "Total Signature Allocations Distributed",
@@ -620,24 +588,18 @@
     "emptyDescription": "You currently have no recorded allocations."
   },
   "namedNfts": {
-    "eyebrow": "Named NFTs · {count}",
     "title": "Named Cosmic Signature NFTs",
     "subtitle": "Browse Cosmic Signature NFTs that have been given custom names",
-    "description": "Cosmic Signature NFT owners can give their NFTs custom names, creating a unique identity within the collection. Named NFTs stand out in the gallery and carry the personal touch of their owners.",
     "emptyTitle": "No named NFTs",
     "emptyDescription": "No Cosmic Signature NFTs have been named yet."
   },
   "attachedNfts": {
-    "eyebrow": "Attached NFTs · {count}",
     "title": "Attached NFT Contributions",
-    "subtitle": "NFTs attached to gestures by community members across cycles",
-    "description": "Community members can attach their NFTs (ERC-721) to gestures using the advanced options. Attached NFTs forward to the participant who receives the Signature Allocation when the cycle finalizes, enriching the distribution beyond ETH."
+    "subtitle": "NFTs attached to gestures by community members across cycles"
   },
   "usedRwlkNfts": {
-    "eyebrow": "Used RWLK · {count}",
     "title": "Used Random Walk NFTs",
     "subtitle": "Random Walk NFTs attached to ETH gestures for the one-time 50% Gesture Cost reduction",
-    "description": "Random Walk NFT holders can attach an unused NFT to an ETH gesture for a 50% Gesture Cost reduction in Cosmic Signature. Once used, a Random Walk NFT is recorded here. Each NFT can only be used once for this discount, making the timing of its use a strategic decision.",
     "loading": "Loading...",
     "empty": "No NFTs yet."
   },
@@ -663,10 +625,7 @@
     "titleBeforeDeployment": "System Configuration Made Before Deployment",
     "range": "Event log range {start}–{end}",
     "breadcrumbs": {
-      "home": "Home",
-      "coordination": "Coordination changes",
-      "beforeCycle": "Before cycle {cycle}",
-      "deployment": "Deployment"
+      "coordination": "Coordination changes"
     },
     "loading": "Loading...",
     "loadError": "Failed to load system events",

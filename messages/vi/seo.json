@@ -1,13 +1,12 @@
 {
   "publicData": {
     "common": {
-      "unavailable": "Không khả dụng",
-      "lastUpdated": "Cập nhật: {date}. Nguồn: {source}.",
+      "none": "Chưa có",
+      "source": "Nguồn: {source}",
       "relatedPagesAria": "Các trang liên quan đến {heading}"
     },
     "routes": {
       "allocation": {
-        "eyebrow": "Lịch sử phân bổ · Arbitrum",
         "heading": "Người nhận phân bổ",
         "description": "Lịch sử phân bổ của các chu kỳ Cosmic Signature đã hoàn tất: phân bổ Signature, Tinh tuyển, phân phối neo giữ và phần dành cho Hàng hóa công.",
         "source": "Các API chu kỳ công khai của Cosmic Signature",
@@ -28,11 +27,14 @@
           "totalEth": {
             "label": "Tổng ETH phân bổ Signature",
             "tooltip": "Tổng ETH phân bổ Signature qua các chu kỳ đã hoàn tất, dựa trên bản ghi chu kỳ."
+          },
+          "totalGestures": {
+            "label": "Tổng số nét bút",
+            "tooltip": "Tổng số nét bút tích lũy qua mọi chu kỳ đã hoàn tất."
           }
         }
       },
       "anchoring": {
-        "eyebrow": "Phân phối neo giữ · Arbitrum",
         "heading": "Phân phối neo giữ",
         "description": "Theo dõi hoạt động neo giữ Cosmic Signature NFT công khai, các bản ghi phân phối neo giữ ETH, neo giữ RandomWalk NFT và các lần khắc Tinh tuyển NFT neo giữ.",
         "source": "Các API neo giữ công khai của Cosmic Signature",
@@ -56,7 +58,6 @@
         }
       },
       "marketing": {
-        "eyebrow": "Phân bổ truyền thông · Arbitrum",
         "heading": "Phân bổ truyền thông",
         "description": "Xem lịch sử phân bổ truyền thông của Cosmic Signature và các đợt phân phối CST cho những người đóng góp giúp mọi người khám phá giao thức.",
         "source": "Các API phân bổ truyền thông công khai của Cosmic Signature",
@@ -78,7 +79,6 @@
         }
       },
       "imprint": {
-        "eyebrow": "Khắc RandomWalk NFT · Arbitrum",
         "heading": "Khắc RandomWalk NFT",
         "description": "Khắc RandomWalk NFT để tham gia Cosmic Signature. Mỗi RandomWalk NFT chưa sử dụng có thể được đính kèm vào một nét bút ETH để giảm 50% chi phí nét bút.",
         "source": "Các API cấu hình giao thức công khai của Cosmic Signature",
@@ -100,13 +100,12 @@
         }
       },
       "eth-contribution": {
-        "eyebrow": "Đóng góp ETH trực tiếp · Arbitrum",
         "heading": "Đóng góp ETH trực tiếp",
         "description": "Xem các khoản đóng góp ETH trực tiếp vào dự trữ chu kỳ Cosmic Signature cùng thông tin người đóng góp, chu kỳ và lời nhắn công khai.",
         "source": "Các API đóng góp công khai của Cosmic Signature",
         "links": {
-          "protocol": "Đóng góp hàng hóa công của giao thức",
-          "voluntary": "Bản ghi hàng hóa công tự nguyện",
+          "reserve": "Cách phân bổ dự trữ chu kỳ",
+          "protocol": "Phần Hàng hóa công được chuyển đến đâu",
           "risk": "Đọc công bố rủi ro"
         },
         "cards": {
@@ -122,7 +121,6 @@
         }
       },
       "attached-nfts": {
-        "eyebrow": "Đóng góp NFT đính kèm · Arbitrum",
         "heading": "Đóng góp NFT đính kèm",
         "description": "Duyệt các NFT đính kèm vào nét bút Cosmic Signature. Token ERC-721 đính kèm được chuyển đến người tham gia nhận phân bổ Signature khi chu kỳ hoàn tất.",
         "source": "Các API NFT đính kèm công khai của Cosmic Signature",
@@ -144,7 +142,6 @@
         }
       },
       "allocation-finalized": {
-        "eyebrow": "Phân bổ đã nhận về · Arbitrum",
         "heading": "Phân bổ đã nhận về",
         "description": "Xem các bản ghi nhận về phân bổ công khai của Cosmic Signature, gồm biên nhận ETH, phân bổ Cosmic Signature NFT và phân phối Tinh tuyển.",
         "source": "Các API nhận về phân bổ công khai của Cosmic Signature",
@@ -168,7 +165,6 @@
         }
       },
       "named-nfts": {
-        "eyebrow": "NFT đã đặt tên · Arbitrum",
         "heading": "Cosmic Signature NFT đã đặt tên",
         "description": "Khám phá Cosmic Signature NFT đã được chủ sở hữu đặt tên. Xem tác phẩm, thông tin token và lịch sử sở hữu trên chuỗi.",
         "source": "Các API token công khai của Cosmic Signature",
@@ -184,14 +180,12 @@
           "owners": {
             "label": "Chủ sở hữu hiện tại"
           },
-          "collection": {
-            "label": "Bộ sưu tập",
-            "value": "Cosmic Signature ERC-721"
+          "imprinted": {
+            "label": "NFT đã khắc"
           }
         }
       },
       "used-rwlk-nfts": {
-        "eyebrow": "Sử dụng RandomWalk NFT · Arbitrum",
         "heading": "RandomWalk NFT đã sử dụng",
         "description": "Xem các RandomWalk NFT đã được đính kèm vào nét bút ETH để hưởng mức giảm chi phí nét bút một lần.",
         "source": "Các API sử dụng RandomWalk công khai của Cosmic Signature",
@@ -204,17 +198,15 @@
           "used": {
             "label": "RandomWalk NFT đã sử dụng"
           },
+          "wallets": {
+            "label": "Ví người tham gia"
+          },
           "discount": {
             "label": "Giảm giá một lần"
-          },
-          "scope": {
-            "label": "Phạm vi sử dụng",
-            "value": "Một nét bút mỗi NFT"
           }
         }
       },
       "coordination-changes": {
-        "eyebrow": "Thay đổi điều phối · Arbitrum",
         "heading": "Thay đổi điều phối",
         "description": "Xem các thay đổi điều phối công khai của Cosmic Signature, gồm thay đổi chế độ giao thức, cập nhật tham số và bản ghi quản trị ảnh hưởng đến các chu kỳ sau.",
         "source": "Các API sự kiện hệ thống công khai của Cosmic Signature",
@@ -227,18 +219,16 @@
           "records": {
             "label": "Bản ghi thay đổi điều phối"
           },
-          "governance": {
-            "label": "Cơ chế điều phối",
-            "value": "Hội đồng Vũ trụ"
+          "latest": {
+            "label": "Thay đổi gần nhất"
           },
-          "network": {
-            "label": "Mạng",
-            "value": "Arbitrum"
+          "parameters": {
+            "label": "Tham số đã thay đổi",
+            "tooltip": "Số tham số giao thức khác nhau mà các bản ghi này thay đổi. Chỉ chủ sở hữu hợp đồng mới có thể thay đổi chúng."
           }
         }
       },
       "public-goods-contributions-cg": {
-        "eyebrow": "Đóng góp hàng hóa công của giao thức · Arbitrum",
         "heading": "Đóng góp Hàng hóa công của giao thức",
         "description": "Theo dõi các khoản chuyển hàng hóa công tự động của Cosmic Signature từ các chu kỳ giao thức đến Kho Hàng hóa công và đơn vị thụ hưởng đã cấu hình — hiện là Protocol Guild.",
         "source": "Các API hàng hóa công công khai của Cosmic Signature",
@@ -254,14 +244,16 @@
           "totalEth": {
             "label": "ETH hàng hóa công của giao thức"
           },
-          "track": {
-            "label": "Luồng phân bổ",
-            "value": "Hàng hóa công"
+          "share": {
+            "label": "Tỷ lệ của mỗi Dự trữ chu kỳ",
+            "tooltip": "Tỷ lệ của mỗi Dự trữ chu kỳ đã hoàn tất mà giao thức chuyển vào Kho Hàng hóa công."
+          },
+          "latest": {
+            "label": "Đóng góp gần nhất"
           }
         }
       },
       "public-goods-contributions-voluntary": {
-        "eyebrow": "Đóng góp hàng hóa công tự nguyện · Arbitrum",
         "heading": "Đóng góp Hàng hóa công tự nguyện",
         "description": "Duyệt các khoản đóng góp hàng hóa công tự nguyện từ cộng đồng Cosmic Signature, gồm bối cảnh chu kỳ và bản ghi người đóng góp.",
         "source": "Các API hàng hóa công công khai của Cosmic Signature",
@@ -283,7 +275,6 @@
         }
       },
       "public-goods-retrievals": {
-        "eyebrow": "Nhận về hàng hóa công · Arbitrum",
         "heading": "Nhận về Hàng hóa công",
         "description": "Xem các lần nhận về từ Kho Hàng hóa công của Cosmic Signature, nơi dự trữ chu kỳ chuyển hỗ trợ đến đơn vị thụ hưởng hàng hóa công đã cấu hình — hiện là Protocol Guild.",
         "source": "Các API hàng hóa công công khai của Cosmic Signature",
@@ -299,25 +290,24 @@
           "totalEth": {
             "label": "ETH hàng hóa công đã nhận về"
           },
-          "track": {
-            "label": "Luồng thụ hưởng",
-            "value": "Kho Hàng hóa công"
+          "latest": {
+            "label": "Lần nhận về gần nhất"
+          },
+          "beneficiary": {
+            "label": "Đơn vị thụ hưởng gần nhất",
+            "tooltip": "Địa chỉ đã nhận khoản gần nhất từ Kho Hàng hóa công. Đơn vị thụ hưởng được cấu hình hiện là Protocol Guild."
           }
         }
       }
     }
   },
   "gallerySummary": {
-    "eyebrow": "Nghệ thuật NFT tất định · Arbitrum",
     "heading": "Phòng trưng bày Cosmic Signature",
     "description": "Khám phá tác phẩm Cosmic Signature NFT được tạo từ vật lý ba vật thể tất định, seed trên chuỗi, kết xuất quang phổ và dữ liệu chu kỳ trình diễn. Mỗi Signature có thể tái tạo từ bản ghi giao thức và đại diện cho một bối cảnh chu kỳ cụ thể.",
-    "unavailable": "Không khả dụng",
     "cards": {
       "imprinted": "NFT đã khắc",
-      "process": "Quy trình nghệ thuật",
-      "processValue": "Mô phỏng ba vật thể",
-      "license": "Giấy phép",
-      "licenseValue": "Theo tinh thần CC0"
+      "anchored": "NFT đang neo giữ",
+      "named": "NFT đã đặt tên"
     },
     "relatedAria": "Các trang liên quan đến phòng trưng bày",
     "links": {
@@ -327,14 +317,17 @@
     }
   },
   "currentCycleSummary": {
-    "eyebrow": "Chu kỳ trình diễn trực tiếp · Arbitrum",
     "heading": "Chu kỳ trình diễn Cosmic Signature hiện tại",
     "description": "Theo dõi chu kỳ Cosmic Signature hiện tại: số nét bút, dự trữ, tài sản đính kèm, các luồng phân bổ và trạng thái hoàn tất.",
-    "unavailable": "Không khả dụng",
     "cards": {
       "cycle": "Chu kỳ",
-      "gestures": "Nét bút",
-      "reserve": "Dự trữ hiện tại"
+      "gestures": "Tổng số nét bút",
+      "signatureAllocation": "Phân bổ Signature",
+      "opened": "Ngày mở"
+    },
+    "info": {
+      "gestures": "Tổng số nét bút trong chu kỳ này. Mỗi nét bút ghi nhận thêm một lượt Tinh tuyển.",
+      "signatureAllocation": "Phần ETH của phân bổ Signature được người tham gia đặt nét bút cuối cùng nhận về. Người nhận cũng nhận 1.000 CST và một Cosmic Signature NFT."
     },
     "relatedAria": "Các trang liên quan đến chu kỳ hiện tại",
     "links": {

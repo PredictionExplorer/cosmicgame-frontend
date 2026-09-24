@@ -7,7 +7,6 @@
   },
   "recipients": {
     "header": {
-      "eyebrow": "配分 · パフォーマンス・サイクル",
       "title": "配分の受領者",
       "subtitle": "確定したすべてのサイクルについて、配分の受領者、統計、配分の内訳を確認できます。",
       "scope": "確定したサイクルの記録のみ",
@@ -42,24 +41,6 @@
           "label": "次のサイクル",
           "tooltip": "確定した配分が行われた後、残りのサイクル準備金は次のパフォーマンス・サイクルへ累積します。"
         }
-      }
-    },
-    "stats": {
-      "totalCycles": {
-        "label": "総サイクル数",
-        "tooltip": "これまでに確定したパフォーマンス・サイクルの総数。"
-      },
-      "totalEth": {
-        "label": "配られたETHの総額",
-        "tooltip": "すべてのサイクルでシグネチャー配分として配られたETHの合計。"
-      },
-      "totalGestures": {
-        "label": "一筆の総数",
-        "tooltip": "確定したすべてのサイクルで入れられた一筆の累計。"
-      },
-      "uniqueRecipients": {
-        "label": "ユニーク受領者",
-        "tooltip": "シグネチャー配分を受け取ったことのある異なるウォレットアドレスの数。"
       }
     }
   },
@@ -100,7 +81,6 @@
     },
     "hero": {
       "aria": "サイクルの概要",
-      "amountTooltip": "このサイクルのシグネチャー配分として受け取られたETHの総額です。",
       "recipient": "受領者",
       "nft": "NFT",
       "nftTooltip": "このCosmic Signature NFTをギャラリーで見る。",
@@ -241,7 +221,6 @@
     }
   },
   "finalized": {
-    "home": "ホーム",
     "title": "配分が確定しました",
     "invalid": {
       "subtitle": "このページにはURLに有効なサイクル番号が必要です。",
@@ -257,7 +236,6 @@
       "defaultTitle": "配分が確定しました",
       "successSubtitle": "サイクル{cycle}はオンチェーンで確定しました。",
       "cycleBreadcrumb": "サイクル{cycle}",
-      "finalizedBreadcrumb": "確定済み",
       "breakdown": "配分の内訳（シグネチャー配分の分布、その他の配分、添付されたトークン）は、このサイクルの配分詳細ページにあります。",
       "viewDetails": "サイクル{cycle}の配分詳細を見る",
       "review": "<allocations>自分の配分</allocations>でもすべてを確認できます。",
@@ -265,8 +243,6 @@
     },
     "result": {
       "title": "おめでとうございます。サイクル{cycle}のシグネチャー配分を受け取りました。",
-      "allocationBreadcrumb": "配分",
-      "retrievedBreadcrumb": "受け取り済み",
       "sectionTitle": "サイクル{cycle}の配分",
       "sectionDescription": "このサイクルで受け取ったシグネチャー配分の内訳です。",
       "ethAllocation": "ETH配分",

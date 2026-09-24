@@ -18,14 +18,9 @@ export default function TransferCstPage() {
     <PageShell variant="data" backdrop="signature">
       <div className="mx-auto max-w-3xl">
         <PageHeader
+          section="account"
           title={t('transferCst.page.title')}
           subtitle={t('transferCst.page.subtitle')}
-          breadcrumbs={[
-            { label: t('shared.home'), href: '/' },
-            { label: t('transferCst.page.title') },
-          ]}
-          className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
-          align="left"
           actions={<UniswapTradeButton variant="secondary" />}
         />
 

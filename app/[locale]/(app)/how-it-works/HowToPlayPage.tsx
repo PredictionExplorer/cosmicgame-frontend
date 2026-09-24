@@ -17,8 +17,8 @@ import { CallToAction } from './components/CallToAction';
 const HowToPlayPage = ({ content }: { content: HowItWorksContent }) => {
   return (
     <PageShell variant="marketing" backdrop="signature">
+      {/* The page header closes with its own rule. */}
       <HeroSection hero={content.hero} />
-      <SectionDivider />
       <GameOverview overview={content.overview} />
       <SectionDivider />
       <RewardBreakdown rewardBreakdown={content.rewardBreakdown} />

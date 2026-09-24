@@ -32,8 +32,7 @@ const FIXED_DECIMAL_CALL = /\.toFixed\(|\bformatFixed\(/g;
 /** Remaining fixed-decimal calls per file; lower as call sites migrate. */
 const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
   'app/[locale]/(app)/allocation-finalized/AllocationFinalizedPage.tsx': 1,
-  'app/[locale]/(app)/allocation/[id]/AllocationInfoPage.tsx': 15,
-  'app/[locale]/(app)/allocation/AllocationRecipientsPage.tsx': 1,
+  'app/[locale]/(app)/allocation/[id]/AllocationInfoPage.tsx': 13,
   'app/[locale]/(app)/cosmic-token-transfer/[address]/CosmicTokenTransfersPage.tsx': 1,
   'app/[locale]/(app)/distributions-by-token/[address]/[tokenId]/RewardsByTokenPage.tsx': 2,
   'app/[locale]/(app)/eth-contribution/detail/[id]/EthDonationDetailPage.tsx': 1,
@@ -92,9 +91,7 @@ const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
  */
 const LOCAL_AMOUNT_FORMATTER = /\b(?:function|const)\s+format(?:Eth|Cst|CST|EthValue|Amount)\b/;
 const LOCAL_AMOUNT_FORMATTER_BASELINE: readonly string[] = [
-  'app/[locale]/(app)/current-cycle/CurrentCycleSeoSummary.tsx',
   'app/[locale]/(app)/gesture/[id]/GesturePage.tsx',
-  'app/[locale]/(app)/statistics/StatisticsSeoSummary.tsx',
   'components/home/HomeObservatoryHero.tsx',
 ];
 

@@ -3,15 +3,11 @@
     "title": "Failed to load cycle data",
     "message": "Please refresh the page to try again."
   },
-  "nav": {
-    "backToHome": "Back to Home"
-  },
   "status": {
     "notStarted": "Not started"
   },
   "hero": {
     "title": "Cycle #{n}",
-    "subtitle": "Opened {date} • {count, plural, one {{count} gesture} other {{count} gestures}} made",
     "status": {
       "openingSoon": "Opening soon",
       "awaitingFirstGesture": "Awaiting first Gesture",
@@ -36,14 +32,6 @@
     }
   },
   "stats": {
-    "totalGestures": {
-      "label": "Total Gestures",
-      "tooltip": "Total gestures made in this cycle. Each gesture is also a Stellar Selection entry."
-    },
-    "cycleReserve": {
-      "label": "Cycle Reserve",
-      "tooltip": "ETH portion of the Signature Allocation retrieved by the participant who made the Final Gesture. The recipient also receives 1,000 CST and a Cosmic Signature NFT."
-    },
     "stellarSelectionPool": {
       "label": "Stellar Selection Pool",
       "tooltip": "ETH split across {count} randomly selected participants when the cycle finalizes."

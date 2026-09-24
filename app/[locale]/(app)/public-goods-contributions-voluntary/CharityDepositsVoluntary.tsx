@@ -14,6 +14,7 @@ import {
 import { useCharityVoluntary } from '@/hooks/useApiQuery';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 
+/** `seoSummary` is the server-rendered page header, the page's only header. */
 const CharityDepositsVoluntary = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('publicGoods');
   const tTables = useTranslations('tables');
@@ -23,18 +24,14 @@ const CharityDepositsVoluntary = ({ seoSummary }: { seoSummary?: ReactNode }) =>
 
   return (
     <PageShell variant="data" backdrop="signature">
-      {seoSummary}
-      {!seoSummary && (
+      {seoSummary ?? (
         <PageHeader
+          section="records"
           title={t('voluntary.title')}
-          titleLevel={2}
           subtitle={t('voluntary.subtitle')}
         />
       )}
       <RouteGroupNav group="publicGoods" current="publicGoodsVoluntary" />
-      <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        {t('voluntary.description')}
-      </p>
       <CharityDepositTable
         list={voluntaryDeposits as PublicGoodsContributionEntry[]}
         loading={loading}

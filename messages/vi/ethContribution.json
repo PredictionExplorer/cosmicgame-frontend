@@ -30,7 +30,6 @@
     "invalidId": "Mã đóng góp không hợp lệ",
     "title": "Chi tiết đóng góp ETH trực tiếp",
     "loadingSubtitle": "Đang tải đóng góp…",
-    "breadcrumbHome": "Trang chủ",
     "breadcrumbContributions": "Đóng góp ETH",
     "loading": "Đang tải…",
     "notFound": "Không tìm thấy khoản đóng góp.",
@@ -60,9 +59,7 @@
     "invalidNumber": "Số chu kỳ không hợp lệ",
     "title": "Đóng góp ETH trực tiếp cho chu kỳ {cycle}",
     "subtitle": "Mọi khoản đóng góp ETH trực tiếp được ghi nhận cho chu kỳ này.",
-    "breadcrumbHome": "Trang chủ",
     "breadcrumbContributions": "Đóng góp ETH",
-    "breadcrumbCycle": "Chu kỳ {cycle}",
     "loading": "Đang tải…"
   }
 }

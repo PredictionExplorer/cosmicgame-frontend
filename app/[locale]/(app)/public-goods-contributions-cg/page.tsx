@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
+import { PublicDataQuerySeed } from '../PublicDataQuerySeed';
 import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
 
 import CharityCGDeposits from './CharityCGDeposits';
@@ -36,9 +37,11 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <PageMessages namespaces={['home', 'marketing', 'publicGoods', 'tables']}>
-      <CharityCGDeposits
-        seoSummary={<PublicDataRouteSeoSummary route="public-goods-contributions-cg" />}
-      />
+      <PublicDataQuerySeed route="public-goods-contributions-cg">
+        <CharityCGDeposits
+          seoSummary={<PublicDataRouteSeoSummary route="public-goods-contributions-cg" />}
+        />
+      </PublicDataQuerySeed>
     </PageMessages>
   );
 }

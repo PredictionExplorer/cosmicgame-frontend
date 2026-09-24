@@ -4,8 +4,6 @@ export const privacyCopyVi = {
   title: 'Chính sách quyền riêng tư',
   subtitle:
     'Quyền riêng tư của bạn rất quan trọng với chúng tôi. Chính sách này giải thích cách Cosmic Signature thu thập, sử dụng và bảo vệ thông tin của bạn khi bạn tương tác với ứng dụng phi tập trung của chúng tôi.',
-  homeLabel: 'Trang chủ',
-  lastUpdated: 'Cập nhật lần cuối: 20 tháng 7 năm 2026',
   introductionTitle: 'Giới thiệu',
   introduction: [
     'Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum, một mạng Layer 2 của Ethereum. Ứng dụng phi tập trung (dApp) này xử lý dữ liệu và quyền riêng tư theo cách khác với ứng dụng web truyền thống.',

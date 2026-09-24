@@ -167,7 +167,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/gallery',
     host: 'app',
     cluster: 'core',
-    expectedText: 'NFT 画廊',
+    expectedText: 'Cosmic Signature 画廊',
   },
   {
     id: 'detail',
@@ -224,7 +224,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: `/allocation-finalized?cycle=${cycle}`,
     host: 'app',
     cluster: 'transactions',
-    expectedText: '已取回分配',
+    expectedText: `第 ${cycle} 个周期的分配`,
   },
   {
     id: 'anchoring',
@@ -482,7 +482,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/risk-disclosures',
     host: 'app',
     cluster: 'trust',
-    expectedText: 'Cosmic Signature 风险披露',
+    expectedText: '风险披露',
   },
   {
     id: 'security',
@@ -491,7 +491,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/security',
     host: 'app',
     cluster: 'trust',
-    expectedText: 'Cosmic Signature 安全',
+    expectedText: '安全',
   },
   {
     id: 'audits',
@@ -500,7 +500,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/audits',
     host: 'app',
     cluster: 'trust',
-    expectedText: 'Cosmic Signature 审计',
+    expectedText: '审计',
   },
   {
     id: 'imprint',
@@ -602,7 +602,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/marketing',
     host: 'app',
     cluster: 'long-tail',
-    expectedText: '推广 Cosmic Signature',
+    expectedText: '推广分配',
   },
   {
     id: 'outreach-address',

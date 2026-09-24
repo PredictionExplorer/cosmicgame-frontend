@@ -4,7 +4,6 @@
     "contracts": "Hợp đồng"
   },
   "page": {
-    "eyebrow": "Hợp đồng đã xác minh · Arbitrum",
     "title": "Địa chỉ hợp đồng",
     "subtitle": "Địa chỉ, cấu hình, mã nguồn và thông tin xác minh các hợp đồng của Cosmic Signature.",
     "allocationAria": "Các luồng phân bổ",
@@ -171,11 +170,9 @@
     "aria": "Chuyển số dư Kho Hàng hóa công đến Protocol Guild"
   },
   "seo": {
-    "eyebrow": "Hợp đồng đã xác minh · Arbitrum",
     "heading": "Hợp đồng Cosmic Signature",
     "description": "Tra cứu địa chỉ hợp đồng Cosmic Signature trên Arbitrum để kiểm tra mã nguồn, cấu hình và các giao dịch trên chuỗi.",
     "partialFallback": "Chưa tải được danh sách địa chỉ hiện tại. Bên dưới là địa chỉ proxy và hợp đồng triển khai đã xác minh, được lưu trong cấu hình giao thức.",
-    "empty": "Tạm thời chưa tải được địa chỉ hợp đồng. Danh sách sẽ xuất hiện khi dịch vụ dữ liệu hoạt động trở lại.",
     "relatedAria": "Mã nguồn, bảo mật và xác minh hợp đồng",
     "links": {
       "code": "Xem mã nguồn Cosmic Signature",

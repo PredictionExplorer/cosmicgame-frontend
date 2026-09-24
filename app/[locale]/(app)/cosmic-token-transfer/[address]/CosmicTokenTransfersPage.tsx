@@ -9,6 +9,7 @@ import { getExplorerUrl, getWalletKind } from '@/utils';
 import { detailPanelClass } from '@/components/detail-page/DetailPageChrome';
 import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { useParticipantTrail } from '@/components/layout/participantTrail';
 import { PageShell } from '@/components/ui/page-shell';
 import {
   TablePrimary,
@@ -156,20 +157,16 @@ const CosmicTokenTransfersPage = ({ address: rawAddress }: { address: string }) 
   const address = isAddress(rawAddress.toLowerCase()) ? getAddress(rawAddress.toLowerCase()) : null;
 
   const { data: cosmicTokenTransfers = [], isLoading: loading } = useCTTransfers(address);
+  const participantTrail = useParticipantTrail(address);
 
   return (
     <PageShell variant="data" backdrop="signature" className="max-sm:pb-16">
       <div className="mx-auto max-w-5xl">
         <PageHeader
+          section="explore"
+          breadcrumbs={participantTrail}
           title={t('transferHistory.cst.title')}
           subtitle={address ?? undefined}
-          breadcrumbs={[
-            { label: t('shared.home'), href: '/' },
-            ...(address ? ([{ label: t('shared.user'), href: `/user/${address}` }] as const) : []),
-            { label: t('transferHistory.breadcrumbs.cst') },
-          ]}
-          className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
-          align="left"
         />
 
         {!address ? (

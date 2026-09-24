@@ -10,7 +10,13 @@ const LANDING_HOST = 'cosmicsignature.com';
 interface PublicPage {
   path: string;
   host: string;
-  h1: string | RegExp;
+  /** Text the raw HTML must contain (the H1's text). */
+  h1: string;
+  /**
+   * The H1 is one rich message (the accent in a span inside it): `h1` is then
+   * its exact text once the tags are stripped.
+   */
+  richH1?: true;
   /** JSON-LD @type values that must be present in the raw HTML. */
   jsonLd?: string[];
 }
@@ -96,12 +102,14 @@ const publicPages: PublicPage[] = [
     path: '/faq',
     host: APP_HOST,
     h1: 'Cosmic Signature FAQ',
+    richH1: true,
     jsonLd: ['FAQPage', 'BreadcrumbList'],
   },
   {
     path: '/how-it-works',
     host: APP_HOST,
     h1: 'How Cosmic Signature Works',
+    richH1: true,
     jsonLd: ['WebPage', 'BreadcrumbList'],
   },
   { path: '/anchoring', host: APP_HOST, h1: 'Anchor Distributions' },
@@ -134,6 +142,7 @@ const publicPages: PublicPage[] = [
     path: '/zh/faq',
     host: APP_HOST,
     h1: 'Cosmic Signature 常见问题',
+    richH1: true,
     jsonLd: ['Organization', 'WebSite', 'WebApplication', 'FAQPage', 'BreadcrumbList'],
   },
   {
@@ -157,8 +166,8 @@ const publicPages: PublicPage[] = [
   {
     path: '/uk/faq',
     host: APP_HOST,
-    // The hero h1 renders the prefix and the gradient highlight as siblings.
-    h1: /Cosmic Signature[\s\S]{0,200}Поширені запитання/,
+    h1: 'Cosmic Signature Поширені запитання',
+    richH1: true,
     jsonLd: ['Organization', 'WebSite', 'WebApplication', 'FAQPage', 'BreadcrumbList'],
   },
   {
@@ -177,6 +186,16 @@ const publicPages: PublicPage[] = [
 
 function hostHeaders(host: string) {
   return { Host: host, 'X-Forwarded-Host': host };
+}
+
+/** The first H1's text with its tags stripped and whitespace collapsed. */
+function extractH1Text(html: string): string {
+  const inner = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/)?.[1] ?? '';
+  return inner
+    .replace(/<[^>]+>/g, '')
+    .replaceAll('&amp;', '&')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function countMatches(text: string, pattern: RegExp): number {
@@ -253,10 +272,10 @@ test.describe('raw HTML SEO', () => {
       expect(html).toMatch(/<title>[^<]{10,}<\/title>/);
       expect(html).toMatch(/<meta[^>]+name="description"[^>]+content="[^"]{30,}"/);
       expect(html).toMatch(/<link[^>]+rel="canonical"[^>]+href="https?:\/\//);
-      if (typeof page.h1 === 'string') {
-        expect(html).toContain(page.h1);
+      if (page.richH1) {
+        expect(extractH1Text(html)).toBe(page.h1);
       } else {
-        expect(html).toMatch(page.h1);
+        expect(html).toContain(page.h1);
       }
       expect(countMatches(html, /<h1[\s>]/g)).toBe(1);
       expect(html).not.toMatch(/name="robots"[^>]+content="[^"]*noindex/i);

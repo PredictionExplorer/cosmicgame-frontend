@@ -2,8 +2,7 @@ import type { TrustPageCopy } from './TrustPageContent';
 
 /** Japanese copy for /audits, rendered by TrustPageContent. */
 export const auditsCopyJa: TrustPageCopy = {
-  eyebrow: '監査と検証',
-  title: 'Cosmic Signature監査',
+  title: '監査',
   intro:
     'Cosmic Signatureの監査報告書と検証資料を紹介します。レビューの対象範囲、指摘事項と対応状況、公開ソースコードを確認できます。',
   sections: [

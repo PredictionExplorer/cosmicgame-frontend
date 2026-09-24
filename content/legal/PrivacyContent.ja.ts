@@ -4,8 +4,6 @@ export const privacyCopyJa = {
   title: 'プライバシーポリシー',
   subtitle:
     '利用者のプライバシーを大切にしています。本ポリシーは、当分散型アプリケーションを利用する際にCosmic Signatureが情報をどのように収集し、利用し、保護するかを説明します。',
-  homeLabel: 'ホーム',
-  lastUpdated: '最終更新：2026年7月20日',
   introductionTitle: 'はじめに',
   introduction: [
     'Cosmic Signatureは、Ethereumのレイヤー2ネットワークであるArbitrum上に築かれた分散型のブロックチェーンプロトコルです。分散型アプリケーション（dApp）として、データとプライバシーに関しては従来のウェブアプリケーションとは異なる方法で扱います。',

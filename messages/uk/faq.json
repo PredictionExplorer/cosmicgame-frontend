@@ -1,8 +1,7 @@
 {
   "hero": {
-    "badge": "База знань",
-    "titlePrefix": "Cosmic Signature",
-    "titleHighlight": "Поширені запитання",
+    "title": "Cosmic Signature <accent>Поширені запитання</accent>",
+    "breadcrumb": "Поширені запитання",
     "subtitle": "Усе, що варто знати про Cosmic Signature — від перших кроків до тонкощів механіки протоколу.",
     "answerCount": "{count}+ відповідей",
     "answerCountTooltip": "Вичерпні відповіді про кожен аспект Cosmic Signature.",

@@ -2,8 +2,7 @@ import type { TrustPageCopy } from './TrustPageContent';
 
 /** Chinese copy for /audits, rendered by TrustPageContent. */
 export const auditsCopyZhHk: TrustPageCopy = {
-  eyebrow: '審計與驗證',
-  title: 'Cosmic Signature 審計',
+  title: '審計',
   intro:
     '查閱 Cosmic Signature 的合約審計與驗證資料，了解審查範圍、發現及處理狀態，並核對公開的合約實現。',
   sections: [

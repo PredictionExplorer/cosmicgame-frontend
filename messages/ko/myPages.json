@@ -1,7 +1,5 @@
 {
   "shared": {
-    "home": "홈",
-    "user": "사용자",
     "loading": "불러오는 중…",
     "unavailable": "확인 불가",
     "yes": "예",
@@ -14,7 +12,6 @@
     "recipient": "수령자"
   },
   "allocations": {
-    "eyebrow": "개인 · 배분",
     "title": "내 배분",
     "subtitle": "아직 회수하지 않은 배분을 한곳에서 확인하고 회수합니다",
     "loadErrorTitle": "불러오지 못했습니다",
@@ -39,7 +36,6 @@
     "viewHistory": "배분 내역 보기"
   },
   "anchors": {
-    "eyebrow": "개인 · 앵커링",
     "title": "내 앵커링",
     "subtitle": "앵커링된 NFT를 관리하고 Cosmic Signature NFT 앵커링 지급을 확인합니다",
     "tabs": {
@@ -383,10 +379,6 @@
       "outreach": "홍보 지갑",
       "stellarSelection": "별빛 선정 지갑",
       "publicGoods": "공공재 금고"
-    },
-    "breadcrumbs": {
-      "nft": "NFT 전송",
-      "cst": "CST 전송"
     },
     "nft": {
       "title": "Cosmic Signature NFT 전송 내역",

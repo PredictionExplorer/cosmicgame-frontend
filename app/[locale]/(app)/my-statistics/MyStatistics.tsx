@@ -22,6 +22,8 @@ const MyStatistics = () => {
     return (
       <MainWrapper aria-label={t('statistics.page.ariaOwn')}>
         <PageHeader
+          section="account"
+          sectionHub
           title={t('statistics.page.ownTitle')}
           subtitle={t('statistics.page.ownSubtitle')}
         />

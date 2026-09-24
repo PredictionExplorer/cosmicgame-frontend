@@ -6,6 +6,8 @@ import { JsonLd, datasetJsonLd, jsonLdInLanguage, webPageJsonLd } from '@/utils/
 import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
+import { DashboardQuerySeed } from '../QuerySeed';
+
 import { StatisticsSeoSummary } from './StatisticsSeoSummary';
 import StatisticsHubPanel from './StatisticsHubPanel';
 
@@ -58,8 +60,10 @@ export default async function Page({ params }: PageProps) {
             }),
           ]}
         />
-        <StatisticsSeoSummary />
-        <StatisticsHubPanel />
+        <DashboardQuerySeed>
+          <StatisticsSeoSummary />
+          <StatisticsHubPanel />
+        </DashboardQuerySeed>
       </>
     </PageMessages>
   );

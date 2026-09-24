@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
+import { PublicDataQuerySeed } from '../PublicDataQuerySeed';
 import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
 
 import ChangedParameters from './ChangedParameters';
@@ -36,7 +37,11 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <PageMessages namespaces={['coordination', 'statistics', 'tables']}>
-      <ChangedParameters seoSummary={<PublicDataRouteSeoSummary route="coordination-changes" />} />
+      <PublicDataQuerySeed route="coordination-changes">
+        <ChangedParameters
+          seoSummary={<PublicDataRouteSeoSummary route="coordination-changes" />}
+        />
+      </PublicDataQuerySeed>
     </PageMessages>
   );
 }

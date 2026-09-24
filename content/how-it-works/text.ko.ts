@@ -19,9 +19,7 @@ export const howItWorksTextKo = {
     pageLabel: '작동 원리',
   },
   hero: {
-    badge: '절차적 온체인 아트 프로토콜',
-    headingLead: 'Cosmic Signature',
-    headingAccent: '작동 원리',
+    heading: 'Cosmic Signature <accent>작동 원리</accent>',
     paragraph:
       '제스처를 남기고, 시간을 지켜보며, 시그니처를 함께 빚어냅니다. 참여자는 퍼포먼스 사이클 동안 제스처를 남기고, 사이클 마감 시각이 지나면 사이클을 마감할 수 있습니다. 배분은 시그니처 배분, 앵커링 지급, Protocol Guild를 비롯한 10개가 넘는 경로로 이루어집니다.',
     primaryCtaLabel: '제스처 남기기',

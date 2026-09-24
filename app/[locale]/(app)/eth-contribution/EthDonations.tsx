@@ -148,19 +148,18 @@ const EthDonations = ({ seoSummary }: { seoSummary?: ReactNode }) => {
 
   return (
     <PageShell variant="data" backdrop="signature">
-      {seoSummary}
-      {!seoSummary && (
-        <PageHeader title={t('page.title')} titleLevel={2} subtitle={t('page.subtitle')} />
+      {seoSummary ?? (
+        <PageHeader section="records" title={t('page.title')} subtitle={t('page.subtitle')} />
       )}
-      <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        {t('page.description')}
-      </p>
 
       {!!account && (
         <div className="mb-12 rounded-xl border border-white/[0.06] bg-white/[0.03] p-6 space-y-4">
-          <h3 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
-            {t('page.formTitle')}
-          </h3>
+          <div className="space-y-1">
+            <h2 className="type-title text-foreground">{t('page.formTitle')}</h2>
+            <p className="type-body-sm text-muted-foreground max-w-prose">
+              {t('page.description')}
+            </p>
+          </div>
           <div>
             <Label
               htmlFor="eth-contribution-page-amount"

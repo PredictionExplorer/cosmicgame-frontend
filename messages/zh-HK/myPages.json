@@ -1,7 +1,5 @@
 {
   "shared": {
-    "home": "主頁",
-    "user": "用戶",
     "loading": "載入中…",
     "unavailable": "暫不可用",
     "yes": "是",
@@ -14,7 +12,6 @@
     "recipient": "獲配者"
   },
   "allocations": {
-    "eyebrow": "個人 · 分配",
     "title": "我的分配",
     "subtitle": "查看並取回所有未取回分配",
     "loadErrorTitle": "未能載入分配",
@@ -39,7 +36,6 @@
     "viewHistory": "查看分配記錄"
   },
   "anchors": {
-    "eyebrow": "個人 · 錨定",
     "title": "我的錨定",
     "subtitle": "管理已錨定 NFT，查看 ETH 錨定派發",
     "tabs": {
@@ -383,10 +379,6 @@
       "outreach": "推廣錢包",
       "stellarSelection": "星選錢包",
       "publicGoods": "公共物品金庫"
-    },
-    "breadcrumbs": {
-      "nft": "NFT 轉移",
-      "cst": "CST 轉帳"
     },
     "nft": {
       "title": "Cosmic Signature NFT 轉移記錄",

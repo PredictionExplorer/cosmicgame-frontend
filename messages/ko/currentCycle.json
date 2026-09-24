@@ -3,15 +3,11 @@
     "title": "사이클 데이터를 불러오지 못했습니다",
     "message": "페이지를 새로 고쳐 다시 시도해 주세요."
   },
-  "nav": {
-    "backToHome": "홈으로"
-  },
   "status": {
     "notStarted": "시작 전"
   },
   "hero": {
     "title": "사이클 {n}",
-    "subtitle": "{date} 시작 · {count, plural, other {제스처 #회}}",
     "status": {
       "openingSoon": "곧 시작",
       "awaitingFirstGesture": "첫 제스처 대기 중",
@@ -36,14 +32,6 @@
     }
   },
   "stats": {
-    "totalGestures": {
-      "label": "총 제스처 수",
-      "tooltip": "이 사이클에서 남겨진 모든 제스처의 합계입니다. 제스처 하나하나가 별빛 선정 자격으로도 기록됩니다."
-    },
-    "cycleReserve": {
-      "label": "사이클 준비금",
-      "tooltip": "최종 제스처를 남긴 참여자가 회수하는 시그니처 배분의 ETH 부분입니다. 수령자는 1,000 CST와 Cosmic Signature NFT도 함께 받습니다."
-    },
     "stellarSelectionPool": {
       "label": "별빛 선정 풀",
       "tooltip": "사이클이 마감될 때 무작위로 선정된 참여자 {count}명에게 나뉘는 ETH입니다."

@@ -41,10 +41,6 @@ const STATIC_MAINNET_CONTRACTS = {
   ImplementationAddr: protocolFacts.contractAddresses.implementation,
 } satisfies Partial<ContractAddresses>;
 
-export function isAddress(value: unknown): value is string {
-  return typeof value === 'string' && /^0x[a-fA-F0-9]{40}$/.test(value);
-}
-
 export function getDisplayContractAddresses(
   apiAddrs: ContractAddresses | undefined | null,
 ): Partial<ContractAddresses> {
@@ -132,17 +128,4 @@ export function buildContracts(
   ];
 
   return contracts.filter((c) => c.address);
-}
-
-export function getSeoContractAddressEntries(
-  apiAddrs: ContractAddresses | undefined | null,
-  labels: Record<string, string>,
-) {
-  return Object.entries(getDisplayContractAddresses(apiAddrs))
-    .filter((entry): entry is [string, string] => isAddress(entry[1]))
-    .map(([key, address]) => ({
-      key,
-      label: labels[key] ?? key,
-      address,
-    }));
 }

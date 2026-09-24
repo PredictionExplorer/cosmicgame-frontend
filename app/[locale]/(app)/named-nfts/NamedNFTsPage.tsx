@@ -22,7 +22,6 @@ import { Spinner } from '@/components/ui/spinner';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
-import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 
 const NamedNFTRow = ({ nft }: { nft: CSTTokenInfo }) => {
   const t = useTranslations('tables');
@@ -68,40 +67,24 @@ const NamedNFTsTable = ({ list }: { list: CSTTokenInfo[] }) => {
   );
 };
 
+/** `seoSummary` is the server-rendered page header, the page's only header. */
 const NamedNFTsPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('statistics');
-  const locale = useLocale();
   const [curPage, setCurPage] = useState(1);
   const perPage = 5;
   const { data: list = [], isLoading: loading } = useNamedNFTs();
 
   return (
     <PageShell variant="data" backdrop="signature">
-      {seoSummary}
-      {seoSummary ? (
-        <div className="mb-8">
-          <SectionEyebrow tone="aurora">
-            {t('namedNfts.eyebrow', { count: list.length.toLocaleString(locale) })}
-          </SectionEyebrow>
-        </div>
-      ) : (
+      {seoSummary ?? (
         <PageHeader
-          align="left"
-          eyebrow={
-            <SectionEyebrow tone="aurora">
-              {t('namedNfts.eyebrow', { count: list.length.toLocaleString(locale) })}
-            </SectionEyebrow>
-          }
+          section="collection"
           title={t('namedNfts.title')}
-          titleLevel={2}
           subtitle={t('namedNfts.subtitle')}
         />
       )}
-      <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        {t('namedNfts.description')}
-      </p>
 
-      <div className="mt-12">
+      <div>
         {loading ? (
           <div className="flex justify-center py-8">
             <Spinner />

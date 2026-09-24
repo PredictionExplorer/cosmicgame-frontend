@@ -32,6 +32,7 @@ import {
 import { getDonatedErc20RawClaimAmount } from '@/utils/donatedErc20';
 import { MainWrapper } from '@/components/styled';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { useParticipantTrail } from '@/components/layout/participantTrail';
 import { SectionDivider } from '@/components/ui/section-divider';
 import { StatCardSkeleton } from '@/components/ui/stat-card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -88,6 +89,7 @@ function LoadingSkeleton() {
 /** Comprehensive user profile view with bidding stats, winning history, anchoring actions, token holdings, and stellarSelection claims. */
 const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) => {
   const t = useTranslations('myPages');
+  const participantTrail = useParticipantTrail();
   const { account } = useActiveWeb3React();
   const { fetchData: fetchStakedTokens } = useAnchoredToken();
   const queryClient = useQueryClient();
@@ -236,10 +238,16 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
     claimAllDonatedERC20(donatedTokensToClaim);
   };
 
+  // Another participant's profile sits under the participation statistics; your own
+  // statistics are the hub of your account pages.
   if (address === 'Invalid Address') {
     return (
       <MainWrapper>
-        <PageHeader title={t('statistics.page.invalidAddress')} />
+        <PageHeader
+          section="explore"
+          breadcrumbs={participantTrail}
+          title={t('statistics.page.invalidAddress')}
+        />
       </MainWrapper>
     );
   }
@@ -249,6 +257,9 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
       aria-label={isOwnProfile ? t('statistics.page.ariaOwn') : t('statistics.page.ariaUser')}
     >
       <PageHeader
+        {...(isOwnProfile
+          ? { section: 'account' as const, sectionHub: true }
+          : { section: 'explore' as const, breadcrumbs: participantTrail })}
         title={isOwnProfile ? t('statistics.page.ownTitle') : t('statistics.page.userTitle')}
         subtitle={
           isOwnProfile ? t('statistics.page.ownSubtitle') : t('statistics.page.userSubtitle')

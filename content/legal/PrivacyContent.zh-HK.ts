@@ -4,8 +4,6 @@ export const privacyCopyZhHk = {
   title: '私隱政策',
   subtitle:
     '我們重視你的私隱。本政策說明你與 Cosmic Signature 去中心化應用程式互動時，我們如何收集、使用及保護相關資訊。',
-  homeLabel: '主頁',
-  lastUpdated: '最後更新：2026年7月20日',
   introductionTitle: '引言',
   introduction: [
     'Cosmic Signature 是構建在 Arbitrum（以太坊二層網絡）上的程序化鏈上藝術協議。作為去中心化應用程式（dApp），我們在數據與私隱方面的運作方式不同於傳統 Web 應用程式。',

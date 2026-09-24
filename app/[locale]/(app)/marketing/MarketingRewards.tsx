@@ -41,17 +41,19 @@ function LedgerPlaceholder({ label }: { label: string }) {
 }
 
 /**
- * The outreach page. What does not depend on the chain (the introduction,
- * how it works, the call to action) renders at once; the figures and the
- * two ledgers hold their places with placeholders until their reads land,
- * rather than the whole page waiting behind one spinner.
+ * The outreach page. `seoSummary` is the server-rendered page header, the
+ * page's only header: it carries the program's figures, so the body does not
+ * repeat them. What does not depend on the chain (how it works, the call to
+ * action) renders at once; the two ledgers hold their places with placeholders
+ * until their reads land, rather than the whole page waiting behind one spinner.
  */
 const MarketingRewards = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('marketing');
   const { data: marketingRewards, isLoading: rewardsLoading } = useMarketingRewards();
   const { data: dashboard, isLoading: dashboardLoading } = useDashboardInfo();
 
-  const loading = rewardsLoading || dashboardLoading;
+  // The stat row, drawn only when there is no server header, needs both reads.
+  const statsLoading = rewardsLoading || dashboardLoading;
 
   const rewards = useMemo(() => (marketingRewards ?? []) as MarketingReward[], [marketingRewards]);
 
@@ -68,16 +70,19 @@ const MarketingRewards = ({ seoSummary }: { seoSummary?: ReactNode }) => {
 
   return (
     <PageShell variant="data" backdrop="signature">
-      {seoSummary}
-      <MarketingHero compact={Boolean(seoSummary)} />
-      {loading ? (
-        <StatsPlaceholder />
-      ) : (
-        <MarketingStats
-          totalAllocatedCst={totalAllocatedCst}
-          activeMarketers={activeMarketers}
-          rewardTransactions={rewardTransactions}
-        />
+      {seoSummary ?? (
+        <>
+          <MarketingHero />
+          {statsLoading ? (
+            <StatsPlaceholder />
+          ) : (
+            <MarketingStats
+              totalAllocatedCst={totalAllocatedCst}
+              activeMarketers={activeMarketers}
+              rewardTransactions={rewardTransactions}
+            />
+          )}
+        </>
       )}
       <HowItWorks />
       {rewardsLoading ? (

@@ -111,7 +111,9 @@ test.describe('zh Sprint 4 — transactions and holdings routes', () => {
       `/zh/anchor-action/0/${SPRINT4_MOCK_ACTION_ID}`,
       '锚定操作详情 · Cosmic Signature',
     );
-    await expect(page.getByRole('heading', { level: 1, name: '锚定操作' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { level: 1, name: `操作 #${SPRINT4_MOCK_ACTION_ID}` }),
+    ).toBeVisible();
     await expect(page.getByText('Cosmic Signature NFT 锚定操作', { exact: true })).toBeVisible();
     await expect(page.getByText('锚定时间', { exact: true })).toBeVisible();
   });

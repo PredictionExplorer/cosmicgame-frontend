@@ -2,8 +2,7 @@ import type { TrustPageCopy } from './TrustPageContent';
 
 /** English copy for /risk-disclosures, rendered by TrustPageContent. */
 export const riskCopyEn: TrustPageCopy = {
-  eyebrow: 'Risk and participant clarity',
-  title: 'Cosmic Signature Risk Disclosures',
+  title: 'Risk Disclosures',
   // lexicon-allow-start: explicit legal denial copy must name the denied categories.
   intro:
     'Cosmic Signature is a procedural on-chain art protocol on Arbitrum. It is not a lottery, casino, gambling product, investment product, or promise of financial results.',

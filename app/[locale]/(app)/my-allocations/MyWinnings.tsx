@@ -9,7 +9,6 @@ import { useRouter } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
-import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 import { SectionDivider } from '@/components/ui/section-divider';
 import { EmptyState } from '@/components/ui/empty-state';
 import { WalletRequiredState } from '@/components/wallet/WalletRequiredState';
@@ -140,11 +139,7 @@ export default function MyWinnings() {
   if (!account) {
     return (
       <PageShell variant="data" backdrop="signature">
-        <PageHeader
-          align="left"
-          eyebrow={<SectionEyebrow tone="solar">{t('allocations.eyebrow')}</SectionEyebrow>}
-          title={t('allocations.title')}
-        />
+        <PageHeader section="account" title={t('allocations.title')} />
         <WalletRequiredState
           title={tWallet('required.allocations.title')}
           description={tWallet('required.allocations.description')}
@@ -157,8 +152,9 @@ export default function MyWinnings() {
   if (hasError) {
     return (
       <PageShell variant="data">
-        <PageHeader title={t('allocations.title')} />
+        <PageHeader section="account" title={t('allocations.title')} />
         <ErrorState
+          headingLevel={2}
           title={t('allocations.loadErrorTitle')}
           message={t('allocations.loadErrorMessage')}
           onRetry={refetch}
@@ -170,12 +166,7 @@ export default function MyWinnings() {
   return (
     <PageShell variant="data" backdrop="signature">
       <PageHeader
-        align="left"
-        eyebrow={
-          <SectionEyebrow tone="solar" pulse>
-            {t('allocations.eyebrow')}
-          </SectionEyebrow>
-        }
+        section="account"
         title={t('allocations.title')}
         subtitle={t('allocations.subtitle')}
       />

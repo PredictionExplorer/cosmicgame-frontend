@@ -71,7 +71,6 @@ test.describe('zh Sprint 3 — core dApp routes', () => {
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
     await expect(page).toHaveTitle('当前演绎周期 · Cosmic Signature');
     await expect(page.getByRole('heading', { name: /第 \d+ 个周期/ }).first()).toBeVisible();
-    await expect(page.getByRole('link', { name: '返回首页' })).toBeVisible();
 
     await expect(page.getByText('落笔总次数', { exact: true }).first()).toBeVisible();
     await expectZhLabelTooltip(page, '落笔总次数', /本周期的落笔总次数/);
@@ -83,19 +82,13 @@ test.describe('zh Sprint 3 — core dApp routes', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
     await expect(page).toHaveTitle('画廊：确定性三体 NFT 艺术 · Cosmic Signature');
-    // The visible gallery heading is an h2; the page's h1 belongs to the
-    // crawler-facing SeoSummary (still English until Sprint 7).
-    await expect(page.getByRole('heading', { name: 'NFT 画廊' })).toBeVisible();
+    // One header: the server-rendered H1 with the collection's figures.
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Cosmic Signature 画廊' }),
+    ).toBeVisible();
+    await expect(page.getByText('已铭刻 NFT', { exact: true })).toBeVisible();
     await expect(page.getByRole('textbox', { name: '搜索 NFT' })).toBeVisible();
     await expect(page.getByText('全部', { exact: true }).first()).toBeVisible();
-
-    // GalleryHero wraps the whole stat card in a TooltipTrigger (no info
-    // button), so hover the label itself — same as gallery-tooltips.spec.ts.
-    const totalImprinted = page.getByText('铭刻总数', { exact: true }).first();
-    await totalImprinted.scrollIntoViewIfNeeded();
-    await totalImprinted.hover();
-    await expectTooltipFullyVisible(page, /所有周期累计铭刻/);
-    await dismissOpenTooltips(page);
   });
 
   test('gallery card navigates to a Chinese detail page', async ({ page }) => {
@@ -168,7 +161,9 @@ test.describe('zh Sprint 3 — core dApp routes', () => {
   test('English core routes are unchanged (regression net)', async ({ page }) => {
     await page.goto('/gallery');
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-    await expect(page.getByRole('heading', { name: 'NFT Gallery' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Cosmic Signature Gallery' }),
+    ).toBeVisible();
 
     await page.goto('/how-it-works');
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');

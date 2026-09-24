@@ -6,8 +6,7 @@
   "header": {
     "title": "落笔详情",
     "loadingSubtitle": "正在加载落笔数据…",
-    "positionLabel": "落笔位置 #{position}",
-    "positionFallback": "落笔位置"
+    "positionLabel": "落笔位置 #{position}"
   },
   "empty": {
     "title": "未找到落笔信息。",

@@ -1,8 +1,7 @@
 {
   "hero": {
-    "badge": "Knowledge Base",
-    "titlePrefix": "Cosmic Signature",
-    "titleHighlight": "FAQ",
+    "title": "Cosmic Signature <accent>FAQ</accent>",
+    "breadcrumb": "FAQ",
     "subtitle": "Everything you need to know about Cosmic Signature — from getting started to the finer protocol mechanics.",
     "answerCount": "{count}+ Answers",
     "answerCountTooltip": "Comprehensive answers covering every aspect of Cosmic Signature.",

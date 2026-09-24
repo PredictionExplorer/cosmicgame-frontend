@@ -30,7 +30,7 @@ describe('Sprint 7 focused catalogs', () => {
   it('contains complete Chinese route, form, status, tooltip, and ARIA copy', () => {
     expect(zhEthContribution.page.title).toBe('ETH 贡献');
     expect(zhEthContribution.form.contributeEth).toBe('贡献 ETH');
-    expect(zhEthContribution.detail.breadcrumbHome).toBe('首页');
+    expect(zhEthContribution.detail.breadcrumbContributions).toBe('ETH 贡献');
     expect(zhPublicGoods.retrievals.title).toBe('公共物品取回');
     expect(zhMarketing.stats.infoAria).toContain('说明');
     expect(zhMarketing.transferForm.recipientLabel).toBe('接收地址');

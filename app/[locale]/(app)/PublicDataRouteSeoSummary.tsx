@@ -1,33 +1,40 @@
+import type { ReactNode } from 'react';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { isAddress } from 'viem';
 
 import { protocolFacts } from '@/content/protocol-facts';
 
-import { InfoTooltip } from '@/components/ui/info-tooltip';
-import { UnknownValue } from '@/components/ui/unknown-value';
-import { Link } from '@/i18n/navigation';
-import { localizeCrossHostHref } from '@/lib/hostRouting';
-import {
-  get_staking_cst_actions,
-  get_staking_cst_rewards,
-  get_staking_rwalk_actions,
-  get_staking_rwalk_mints_global,
-} from '@/services/api/anchoring';
-import {
-  get_charity_cg_deposits,
-  get_charity_voluntary,
-  get_charity_withdrawals,
-  get_donations_both,
-  get_donations_nft_list,
-} from '@/services/api/donations';
-import { get_marketing_rewards } from '@/services/api/marketing';
-import { get_claim_history, get_dashboard_info, get_round_list } from '@/services/api/rounds';
-import { get_coordination_events } from '@/services/api/system';
-import { get_named_nfts, get_used_rwlk_nfts } from '@/services/api/tokens';
+import { PageHeader, type PageHeaderFigure } from '@/components/layout/PageHeader';
+import type { PageSectionId } from '@/components/layout/pageSections';
+import { SnapshotStamp } from '@/components/layout/SnapshotStamp';
+import { AddressChip } from '@/components/ui/address-chip';
+import { Amount } from '@/components/ui/amount';
+import { DateTime } from '@/components/ui/date-time';
+import { LANDING_ORIGIN, localizeCrossHostHref } from '@/lib/hostRouting';
 import { sumAllocatedEth } from '@/utils/allocationRecords';
 import { toFiniteNumber } from '@/utils/finiteNumber';
-import { formatUtcDateTimeStamp, toIntlLocale } from '@/utils/format';
+import { NBSP, formatCount, formatPercent, sameAddress } from '@/utils/format';
 import { formatEthQuote } from '@/utils/gestureQuote';
+
+import {
+  readAnchorCstActions,
+  readAnchorEthDeposits,
+  readAnchorRwalkActions,
+  readAnchorStellarImprints,
+  readAttachedNfts,
+  readClaimHistory,
+  readCoordinationEvents,
+  readDashboard,
+  readDirectContributions,
+  readMarketingRewards,
+  readNamedNfts,
+  readPublicGoodsDeposits,
+  readPublicGoodsRetrievals,
+  readRoundList,
+  readUsedRwlkNfts,
+  readVoluntaryPublicGoods,
+  type TimedRead,
+} from './publicDataReads';
 
 export type SeoSummaryRoute =
   | 'allocation'
@@ -44,23 +51,18 @@ export type SeoSummaryRoute =
   | 'public-goods-contributions-voluntary'
   | 'public-goods-retrievals';
 
-interface SummaryCard {
-  key: string;
-  /**
-   * The formatted figure. `null` means the figure is unknown — its read failed or the value
-   * is missing — and renders as an em dash announced as "Unavailable", never as a zero.
-   * Omitted for cards whose value is fixed copy in the catalog (`cards.<key>.value`).
-   */
-  figure?: string | null;
-  hasTooltip?: boolean;
-}
-
 interface RouteDefinition {
+  section: PageSectionId;
+  /**
+   * Related pages. Landing pages are built on `LANDING_ORIGIN`, so
+   * `localizeCrossHostHref` adds the reader's locale on every host.
+   */
   links: readonly { href: string; key: string }[];
 }
 
 const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
   allocation: {
+    section: 'records',
     links: [
       { href: '/statistics', key: 'statistics' },
       { href: '/how-it-works', key: 'learn' },
@@ -68,13 +70,15 @@ const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
     ],
   },
   anchoring: {
+    section: 'records',
     links: [
-      { href: '/statistics', key: 'statistics' },
-      { href: 'https://cosmicsignature.com/learn/anchoring-nfts', key: 'learn' },
+      { href: '/statistics/anchoring', key: 'statistics' },
+      { href: `${LANDING_ORIGIN}/learn/anchoring-nfts`, key: 'learn' },
       { href: '/gallery', key: 'gallery' },
     ],
   },
   marketing: {
+    section: 'records',
     links: [
       { href: '/faq', key: 'faq' },
       { href: '/statistics', key: 'statistics' },
@@ -82,6 +86,7 @@ const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
     ],
   },
   imprint: {
+    section: 'participate',
     links: [
       { href: '/', key: 'cycle' },
       { href: '/how-it-works', key: 'learn' },
@@ -89,13 +94,15 @@ const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
     ],
   },
   'eth-contribution': {
+    section: 'records',
     links: [
+      { href: '/how-it-works', key: 'reserve' },
       { href: '/public-goods-contributions-cg', key: 'protocol' },
-      { href: '/public-goods-contributions-voluntary', key: 'voluntary' },
       { href: '/risk-disclosures', key: 'risk' },
     ],
   },
   'attached-nfts': {
+    section: 'collection',
     links: [
       { href: '/gallery', key: 'gallery' },
       { href: '/current-cycle', key: 'cycle' },
@@ -103,6 +110,7 @@ const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
     ],
   },
   'allocation-finalized': {
+    section: 'records',
     links: [
       { href: '/allocation', key: 'allocation' },
       { href: '/statistics', key: 'statistics' },
@@ -110,13 +118,15 @@ const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
     ],
   },
   'named-nfts': {
+    section: 'collection',
     links: [
       { href: '/gallery', key: 'gallery' },
-      { href: 'https://cosmicsignature.com/learn/three-body-nft-art', key: 'learn' },
+      { href: `${LANDING_ORIGIN}/learn/three-body-nft-art`, key: 'learn' },
       { href: '/code', key: 'code' },
     ],
   },
   'used-rwlk-nfts': {
+    section: 'collection',
     links: [
       { href: '/imprint', key: 'imprint' },
       { href: '/how-it-works', key: 'learn' },
@@ -124,19 +134,21 @@ const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
     ],
   },
   'coordination-changes': {
+    section: 'records',
     links: [
       { href: '/security', key: 'security' },
       { href: '/audits', key: 'audits' },
       {
-        href: 'https://cosmicsignature.com/learn/cst-token-and-cosmic-council',
+        href: `${LANDING_ORIGIN}/learn/cst-token-and-cosmic-council`,
         key: 'learn',
       },
     ],
   },
   'public-goods-contributions-cg': {
+    section: 'records',
     links: [
       {
-        href: 'https://cosmicsignature.com/learn/protocol-guild-public-goods',
+        href: `${LANDING_ORIGIN}/learn/protocol-guild-public-goods`,
         key: 'learn',
       },
       { href: '/public-goods-retrievals', key: 'retrievals' },
@@ -144,6 +156,7 @@ const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
     ],
   },
   'public-goods-contributions-voluntary': {
+    section: 'records',
     links: [
       { href: '/eth-contribution', key: 'direct' },
       { href: '/public-goods-contributions-cg', key: 'protocol' },
@@ -151,6 +164,7 @@ const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
     ],
   },
   'public-goods-retrievals': {
+    section: 'records',
     links: [
       { href: '/public-goods-contributions-cg', key: 'protocol' },
       { href: '/public-goods-contributions-voluntary', key: 'voluntary' },
@@ -159,33 +173,25 @@ const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
   },
 };
 
-/** Locale-aware figure formatters; each returns `null` when the value is not a finite number. */
-function createFormatters(locale: string) {
-  const intlLocale = toIntlLocale(locale);
-  const count = new Intl.NumberFormat(intlLocale);
-  const amount = new Intl.NumberFormat(intlLocale, { maximumFractionDigits: 4 });
-  const percent = new Intl.NumberFormat(intlLocale, { style: 'percent' });
-  const format = (value: unknown, render: (numeric: number) => string): string | null => {
-    const numeric = toFiniteNumber(value);
-    return numeric === null ? null : render(numeric);
-  };
-  return {
-    number: (value: unknown) => format(value, (n) => count.format(n)),
-    eth: (value: unknown) => format(value, (n) => `${amount.format(n)} ETH`),
-    /** An ETH Gesture Cost, in the same quote format as the home tabs and submit button. */
-    ethQuote: (value: unknown) => format(value, (n) => `${formatEthQuote(n, locale)} ETH`),
-    cst: (value: unknown) => format(value, (n) => `${amount.format(n)} CST`),
-    percent: (value: unknown) => format(value, (n) => percent.format(n / 100)),
-  };
+/**
+ * The value of a figure read from a list that may be empty: `NONE_YET` when the
+ * read succeeded but has no row to show ("None yet"), `null` when it failed
+ * (the header's "Unavailable" dash).
+ */
+const NONE_YET = Symbol('none-yet');
+
+/** A figure before its label is resolved: the catalog key under `cards` plus the value. */
+interface FigureSpec {
+  key: string;
+  value: ReactNode | typeof NONE_YET | null;
+  /** Show the card's `tooltip` copy behind an info button. */
+  hasTooltip?: boolean;
 }
 
-/** Resolves a read to `null` instead of rejecting, so one failed read marks only its own cards unknown. */
-async function settle<T>(read: Promise<T>): Promise<T | null> {
-  try {
-    return await read;
-  } catch {
-    return null;
-  }
+interface RouteFigures {
+  figures: FigureSpec[];
+  /** The reads the figures were built from; the snapshot is dated by those that resolved. */
+  reads: readonly TimedRead<unknown>[];
 }
 
 function sumAmountEth(rows: readonly { AmountEth?: unknown }[]): number {
@@ -207,266 +213,401 @@ function countDistinctAddresses(values: readonly unknown[]): number {
   return addresses.size;
 }
 
-async function getSummaryCards(route: SeoSummaryRoute, locale: string): Promise<SummaryCard[]> {
-  const format = createFormatters(locale);
+/** The newest `TimeStamp` (Unix seconds) among rows, or null when there is none. */
+function latestTimestamp(rows: readonly { TimeStamp?: unknown }[]): number | null {
+  let latest: number | null = null;
+  for (const row of rows) {
+    const ts = toFiniteNumber(row.TimeStamp);
+    if (ts !== null && ts > 0 && (latest === null || ts > latest)) latest = ts;
+  }
+  return latest;
+}
+
+/** The row with the newest `TimeStamp`, or null. */
+function latestRow<T extends { TimeStamp?: unknown }>(rows: readonly T[]): T | null {
+  let latest: T | null = null;
+  for (const row of rows) {
+    const ts = toFiniteNumber(row.TimeStamp) ?? 0;
+    if (latest === null || ts > (toFiniteNumber(latest.TimeStamp) ?? 0)) latest = row;
+  }
+  return latest;
+}
+
+/**
+ * An ETH quote (five significant digits, like the gesture form's cost) set
+ * the way `<Amount>` sets every ETH figure: tabular digits, the unit muted
+ * and joined by a no-break space.
+ */
+function EthQuote({ value, locale }: { value: number; locale: string }) {
+  return (
+    <data value={value} className="whitespace-nowrap tabular-nums">
+      {formatEthQuote(value, locale)}
+      {NBSP}
+      <span className="text-muted-foreground">ETH</span>
+    </data>
+  );
+}
+
+async function getRouteFigures(route: SeoSummaryRoute, locale: string): Promise<RouteFigures> {
+  const count = (value: number) => formatCount(value, locale);
+  const eth = (value: number) => <Amount value={value} unit="ETH" locale={locale} />;
+  /** The newest row's date, "None yet" for an empty list, unknown when the read failed. */
+  const latestDate = (rows: readonly { TimeStamp?: unknown }[] | null) => {
+    if (rows === null) return null;
+    const seconds = latestTimestamp(rows);
+    return seconds === null ? NONE_YET : <DateTime timestamp={seconds} locale={locale} />;
+  };
 
   switch (route) {
     case 'allocation': {
-      const rounds = await settle(get_round_list());
-      return [
-        {
-          key: 'finalizedCycles',
-          figure: rounds && format.number(rounds.length),
-          hasTooltip: true,
-        },
-        {
-          key: 'recipients',
-          figure:
-            rounds && format.number(countDistinctAddresses(rounds.map((row) => row.WinnerAddr))),
-          hasTooltip: true,
-        },
-        {
-          key: 'totalEth',
-          figure: rounds && format.eth(sumAmountEth(rounds)),
-          hasTooltip: true,
-        },
-      ];
+      const rounds = await readRoundList();
+      const rows = rounds.data;
+      return {
+        reads: [rounds],
+        figures: [
+          { key: 'finalizedCycles', value: rows && count(rows.length), hasTooltip: true },
+          {
+            key: 'recipients',
+            value: rows && count(countDistinctAddresses(rows.map((row) => row.WinnerAddr))),
+            hasTooltip: true,
+          },
+          { key: 'totalEth', value: rows && eth(sumAmountEth(rows)), hasTooltip: true },
+          {
+            key: 'totalGestures',
+            value:
+              rows &&
+              count(
+                rows.reduce(
+                  (total, row) => total + (toFiniteNumber(row.RoundStats?.TotalBids) ?? 0),
+                  0,
+                ),
+              ),
+            hasTooltip: true,
+          },
+        ],
+      };
     }
     case 'anchoring': {
       const [cstActions, rwalkActions, ethDeposits, stellarImprints] = await Promise.all([
-        settle(get_staking_cst_actions()),
-        settle(get_staking_rwalk_actions()),
-        settle(get_staking_cst_rewards()),
-        settle(get_staking_rwalk_mints_global()),
+        readAnchorCstActions(),
+        readAnchorRwalkActions(),
+        readAnchorEthDeposits(),
+        readAnchorStellarImprints(),
       ]);
-      return [
-        {
-          key: 'actions',
-          figure:
-            cstActions && rwalkActions && format.number(cstActions.length + rwalkActions.length),
-        },
-        {
-          key: 'ethDeposits',
-          figure: ethDeposits && format.number(ethDeposits.length),
-          hasTooltip: true,
-        },
-        {
-          key: 'stellarImprints',
-          figure: stellarImprints && format.number(stellarImprints.length),
-          hasTooltip: true,
-        },
-      ];
+      return {
+        reads: [cstActions, rwalkActions, ethDeposits, stellarImprints],
+        figures: [
+          {
+            key: 'actions',
+            value:
+              cstActions.data &&
+              rwalkActions.data &&
+              count(cstActions.data.length + rwalkActions.data.length),
+          },
+          {
+            key: 'ethDeposits',
+            value: ethDeposits.data && count(ethDeposits.data.length),
+            hasTooltip: true,
+          },
+          {
+            key: 'stellarImprints',
+            value: stellarImprints.data && count(stellarImprints.data.length),
+            hasTooltip: true,
+          },
+        ],
+      };
     }
     case 'marketing': {
-      const [dashboard, rewards] = await Promise.all([
-        settle(get_dashboard_info()),
-        settle(get_marketing_rewards()),
-      ]);
-      return [
-        { key: 'records', figure: rewards && format.number(rewards.length) },
-        // `TotalMktRewardsEth` is CST already sent to contributors (an 18-decimal token
-        // amount despite the `Eth` suffix), not an ETH balance.
-        { key: 'allocatedCst', figure: format.cst(dashboard?.MainStats?.TotalMktRewardsEth) },
-        {
-          key: 'contributors',
-          figure:
-            rewards &&
-            format.number(countDistinctAddresses(rewards.map((row) => row.MarketerAddr))),
-        },
-      ];
+      const [dashboard, rewards] = await Promise.all([readDashboard(), readMarketingRewards()]);
+      // `TotalMktRewardsEth` is CST already sent to contributors (an 18-decimal token
+      // amount despite the `Eth` suffix), not an ETH balance.
+      const allocatedCst = toFiniteNumber(dashboard.data?.MainStats?.TotalMktRewardsEth);
+      return {
+        reads: [dashboard, rewards],
+        figures: [
+          { key: 'records', value: rewards.data && count(rewards.data.length) },
+          {
+            key: 'allocatedCst',
+            value:
+              allocatedCst === null ? null : (
+                <Amount value={allocatedCst} unit="CST" locale={locale} />
+              ),
+          },
+          {
+            key: 'contributors',
+            value:
+              rewards.data &&
+              count(countDistinctAddresses(rewards.data.map((row) => row.MarketerAddr))),
+          },
+        ],
+      };
     }
     case 'imprint': {
-      const dashboard = await settle(get_dashboard_info());
-      return [
-        { key: 'cycle', figure: format.number(dashboard?.CurRoundNum) },
-        { key: 'cost', figure: format.ethQuote(dashboard?.CurBidPriceEth) },
-        { key: 'discount', figure: format.percent(protocolFacts.randomWalkDiscountPercentage) },
-      ];
+      const dashboard = await readDashboard();
+      const cycle = toFiniteNumber(dashboard.data?.CurRoundNum);
+      const cost = toFiniteNumber(dashboard.data?.CurBidPriceEth);
+      return {
+        reads: [dashboard],
+        figures: [
+          { key: 'cycle', value: cycle === null ? null : count(cycle) },
+          // The same quote format as the home tabs and submit button (five significant digits).
+          { key: 'cost', value: cost === null ? null : <EthQuote value={cost} locale={locale} /> },
+          {
+            key: 'discount',
+            value: formatPercent(protocolFacts.randomWalkDiscountPercentage, locale),
+          },
+        ],
+      };
     }
     case 'eth-contribution': {
-      // The same source as the Contribution History table below the summary, so the
-      // headline figures always reconcile with the rows a reader can count.
-      const contributions = await settle(get_donations_both());
-      return [
-        { key: 'records', figure: contributions && format.number(contributions.length) },
-        { key: 'totalEth', figure: contributions && format.eth(sumAmountEth(contributions)) },
-        {
-          key: 'contributors',
-          figure:
-            contributions &&
-            format.number(countDistinctAddresses(contributions.map((row) => row.DonorAddr))),
-        },
-      ];
+      // The same source as the Contribution History table below the header, so the
+      // figures always reconcile with the rows a reader can count.
+      const contributions = await readDirectContributions();
+      const rows = contributions.data;
+      return {
+        reads: [contributions],
+        figures: [
+          { key: 'records', value: rows && count(rows.length) },
+          { key: 'totalEth', value: rows && eth(sumAmountEth(rows)) },
+          {
+            key: 'contributors',
+            value: rows && count(countDistinctAddresses(rows.map((row) => row.DonorAddr))),
+          },
+        ],
+      };
     }
     case 'attached-nfts': {
-      const attachedNfts = await settle(get_donations_nft_list());
-      return [
-        { key: 'records', figure: attachedNfts && format.number(attachedNfts.length) },
-        {
-          key: 'contracts',
-          figure:
-            attachedNfts &&
-            format.number(countDistinctAddresses(attachedNfts.map((row) => row.TokenAddr))),
-        },
-        {
-          key: 'contributors',
-          figure:
-            attachedNfts &&
-            format.number(countDistinctAddresses(attachedNfts.map((row) => row.DonorAddr))),
-        },
-      ];
+      const attached = await readAttachedNfts();
+      const rows = attached.data;
+      return {
+        reads: [attached],
+        figures: [
+          { key: 'records', value: rows && count(rows.length) },
+          {
+            key: 'contracts',
+            value: rows && count(countDistinctAddresses(rows.map((row) => row.TokenAddr))),
+          },
+          {
+            key: 'contributors',
+            value: rows && count(countDistinctAddresses(rows.map((row) => row.DonorAddr))),
+          },
+        ],
+      };
     }
     case 'allocation-finalized': {
-      const history = await settle(get_claim_history());
-      return [
-        { key: 'records', figure: history && format.number(history.length), hasTooltip: true },
-        // History rows mix ETH, CST and NFT record types, and `AmountEth` carries each
-        // row's own unit: only ETH allocation types may be summed as ETH.
-        { key: 'eth', figure: history && format.eth(sumAllocatedEth(history)), hasTooltip: true },
-        {
-          key: 'recipients',
-          figure:
-            history && format.number(countDistinctAddresses(history.map((row) => row.WinnerAddr))),
-        },
-      ];
+      const history = await readClaimHistory();
+      const rows = history.data;
+      return {
+        reads: [history],
+        figures: [
+          { key: 'records', value: rows && count(rows.length), hasTooltip: true },
+          // History rows mix ETH, CST and NFT record types, and `AmountEth` carries each
+          // row's own unit: only ETH allocation types may be summed as ETH.
+          { key: 'eth', value: rows && eth(sumAllocatedEth(rows)), hasTooltip: true },
+          {
+            key: 'recipients',
+            value: rows && count(countDistinctAddresses(rows.map((row) => row.WinnerAddr))),
+          },
+        ],
+      };
     }
     case 'named-nfts': {
-      const named = await settle(get_named_nfts());
-      return [
-        { key: 'named', figure: named && format.number(named.length) },
-        {
-          key: 'owners',
-          figure:
-            named &&
-            format.number(
-              countDistinctAddresses(named.map((row) => row.CurOwnerAddr ?? row.OwnerAddr)),
-            ),
-        },
-        { key: 'collection' },
-      ];
+      const [named, dashboard] = await Promise.all([readNamedNfts(), readDashboard()]);
+      const rows = named.data;
+      const imprinted = toFiniteNumber(dashboard.data?.MainStats?.NumCSTokenMints);
+      const owners = rows?.map((row) => row.CurOwnerAddr || row.OwnerAddr) ?? [];
+      // The names endpoint may omit owners. Rows without any owner field say nothing
+      // about ownership: counting them would print "0 owners" beside 3 named NFTs.
+      const ownersKnown = rows !== null && (rows.length === 0 || owners.some(Boolean));
+      return {
+        reads: [named, dashboard],
+        figures: [
+          { key: 'named', value: rows && count(rows.length) },
+          ...(rows === null || ownersKnown
+            ? [{ key: 'owners', value: rows && count(countDistinctAddresses(owners)) }]
+            : []),
+          { key: 'imprinted', value: imprinted === null ? null : count(imprinted) },
+        ],
+      };
     }
     case 'used-rwlk-nfts': {
-      const used = await settle(get_used_rwlk_nfts());
-      return [
-        { key: 'used', figure: used && format.number(used.length) },
-        { key: 'discount', figure: format.percent(protocolFacts.randomWalkDiscountPercentage) },
-        { key: 'scope' },
-      ];
+      const used = await readUsedRwlkNfts();
+      const rows = used.data;
+      return {
+        reads: [used],
+        figures: [
+          { key: 'used', value: rows && count(rows.length) },
+          {
+            key: 'wallets',
+            value: rows && count(countDistinctAddresses(rows.map((row) => row.BidderAddr))),
+          },
+          {
+            key: 'discount',
+            value: formatPercent(protocolFacts.randomWalkDiscountPercentage, locale),
+          },
+        ],
+      };
     }
     case 'coordination-changes': {
-      // The parameter-change events the table on this page lists, not the mode list.
-      const events = await settle(get_coordination_events());
-      return [
-        { key: 'records', figure: events && format.number(events.length) },
-        { key: 'governance' },
-        { key: 'network' },
-      ];
+      const events = await readCoordinationEvents();
+      const rows = events.data;
+      return {
+        reads: [events],
+        figures: [
+          { key: 'records', value: rows && count(rows.length) },
+          { key: 'latest', value: latestDate(rows) },
+          {
+            key: 'parameters',
+            value: rows && count(new Set(rows.map((row) => row.RecordType)).size),
+            hasTooltip: true,
+          },
+        ],
+      };
     }
     case 'public-goods-contributions-cg': {
-      const deposits = await settle(get_charity_cg_deposits());
-      return [
-        { key: 'records', figure: deposits && format.number(deposits.length) },
-        { key: 'totalEth', figure: deposits && format.eth(sumAmountEth(deposits)) },
-        { key: 'track' },
-      ];
+      const [deposits, dashboard] = await Promise.all([readPublicGoodsDeposits(), readDashboard()]);
+      const rows = deposits.data;
+      // The live contract share, or the documented one when the dashboard read failed.
+      const share =
+        toFiniteNumber(dashboard.data?.CharityPercentage) ?? protocolFacts.publicGoodsPercentage;
+      return {
+        reads: [deposits],
+        figures: [
+          { key: 'records', value: rows && count(rows.length) },
+          { key: 'totalEth', value: rows && eth(sumAmountEth(rows)) },
+          { key: 'share', value: formatPercent(share, locale), hasTooltip: true },
+          { key: 'latest', value: latestDate(rows) },
+        ],
+      };
     }
     case 'public-goods-contributions-voluntary': {
-      const deposits = await settle(get_charity_voluntary());
-      return [
-        { key: 'records', figure: deposits && format.number(deposits.length) },
-        { key: 'totalEth', figure: deposits && format.eth(sumAmountEth(deposits)) },
-        {
-          key: 'contributors',
-          figure:
-            deposits && format.number(countDistinctAddresses(deposits.map((row) => row.DonorAddr))),
-        },
-      ];
+      const deposits = await readVoluntaryPublicGoods();
+      const rows = deposits.data;
+      return {
+        reads: [deposits],
+        figures: [
+          { key: 'records', value: rows && count(rows.length) },
+          { key: 'totalEth', value: rows && eth(sumAmountEth(rows)) },
+          {
+            key: 'contributors',
+            value: rows && count(countDistinctAddresses(rows.map((row) => row.DonorAddr))),
+          },
+        ],
+      };
     }
     case 'public-goods-retrievals': {
-      const withdrawals = await settle(get_charity_withdrawals());
-      return [
-        { key: 'records', figure: withdrawals && format.number(withdrawals.length) },
-        { key: 'totalEth', figure: withdrawals && format.eth(sumAmountEth(withdrawals)) },
-        { key: 'track' },
-      ];
+      const withdrawals = await readPublicGoodsRetrievals();
+      const rows = withdrawals.data;
+      const latest = rows && latestRow(rows);
+      const beneficiary =
+        latest && typeof latest.DestinationAddr === 'string' && isAddress(latest.DestinationAddr)
+          ? latest.DestinationAddr
+          : null;
+      // Named when it is the vault's documented beneficiary; any other address reads as hex.
+      const { name: beneficiaryName, address: beneficiaryAddress } =
+        protocolFacts.publicGoodsBeneficiary;
+      return {
+        reads: [withdrawals],
+        figures: [
+          { key: 'records', value: rows && count(rows.length) },
+          { key: 'totalEth', value: rows && eth(sumAmountEth(rows)) },
+          { key: 'latest', value: latestDate(rows) },
+          {
+            key: 'beneficiary',
+            value:
+              rows === null ? null : beneficiary === null ? (
+                NONE_YET
+              ) : (
+                <AddressChip
+                  address={beneficiary}
+                  label={sameAddress(beneficiary, beneficiaryAddress) ? beneficiaryName : undefined}
+                  className="type-figure-sm"
+                />
+              ),
+            hasTooltip: true,
+          },
+        ],
+      };
     }
   }
 }
 
-export async function PublicDataRouteSeoSummary({ route }: { route: SeoSummaryRoute }) {
+/** When the figures were read: the newest of the reads that resolved, or null if none did. */
+function snapshotTime(reads: readonly TimedRead<unknown>[]): number | null {
+  const resolved = reads.filter((read) => read.data !== null);
+  return resolved.length > 0 ? Math.max(...resolved.map((read) => read.at)) : null;
+}
+
+export interface PublicDataRouteSeoSummaryProps {
+  route: SeoSummaryRoute;
+  /** A footnote for the meta line, such as the records' scope. */
+  note?: ReactNode;
+  /** Right-aligned actions, from the page. */
+  actions?: ReactNode;
+}
+
+/**
+ * The page header of a public data route, rendered on the server: section
+ * eyebrow, H1, lede, the route's figures read from the public API, a snapshot
+ * stamp dated by those reads, and related pages. It is the page's only
+ * header — client pages render it first and add no header of their own.
+ */
+export async function PublicDataRouteSeoSummary({
+  route,
+  note,
+  actions,
+}: PublicDataRouteSeoSummaryProps) {
   const locale = await getLocale();
   const t = await getTranslations({ locale, namespace: 'seo' });
   const prefix = `publicData.routes.${route}`;
   const definition = routeDefinitions[route];
   const heading = t(`${prefix}.heading`);
-  const unavailable = t('publicData.common.unavailable');
-  const updatedAt = new Date();
-  const cards = await getSummaryCards(route, locale);
+  const { figures, reads } = await getRouteFigures(route, locale);
+  const readAt = snapshotTime(reads);
+
+  const headerFigures: PageHeaderFigure[] = figures.map((figure) => {
+    const label = t(`${prefix}.cards.${figure.key}.label`);
+    return {
+      id: figure.key,
+      label,
+      value:
+        figure.value === NONE_YET ? (
+          <span className="text-muted-foreground">{t('publicData.common.none')}</span>
+        ) : (
+          figure.value
+        ),
+      info: figure.hasTooltip ? t(`${prefix}.cards.${figure.key}.tooltip`) : undefined,
+    };
+  });
 
   return (
-    <section
-      aria-labelledby={`${route}-seo-heading`}
-      className="mb-12 border-b border-border pb-10"
-    >
-      <p className="type-eyebrow text-primary/80">{t(`${prefix}.eyebrow`)}</p>
-      <h1 id={`${route}-seo-heading`} className="mt-4 type-display-lg text-foreground">
-        {heading}
-      </h1>
-      <p className="mt-4 max-w-3xl type-body-lg text-muted-foreground">
-        {t(`${prefix}.description`)}
-      </p>
-      <p className="mt-3 type-body-sm text-muted-foreground">
-        {t('publicData.common.lastUpdated', {
-          date: formatUtcDateTimeStamp(updatedAt, locale),
-          source: t(`${prefix}.source`),
-        })}
-      </p>
-
-      <dl className="mt-8 grid gap-3 sm:grid-cols-3">
-        {cards.map((card) => {
-          const cardPrefix = `${prefix}.cards.${card.key}`;
-          const label = t(`${cardPrefix}.label`);
-          const tooltip = card.hasTooltip ? t(`${cardPrefix}.tooltip`) : undefined;
-          return (
-            <div
-              key={card.key}
-              data-summary-card={card.key}
-              className="rounded-xl border border-border bg-card p-4 sm:p-5"
-            >
-              <dt className="flex items-center gap-1.5 text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                <span>{label}</span>
-                {tooltip ? (
-                  <InfoTooltip content={tooltip} label={label} iconClassName="h-3 w-3" />
-                ) : null}
-              </dt>
-              <dd className="mt-2 font-display text-2xl font-medium text-foreground">
-                {card.figure === undefined ? (
-                  t(`${cardPrefix}.value`)
-                ) : card.figure === null ? (
-                  <UnknownValue label={unavailable} />
-                ) : (
-                  card.figure
-                )}
-              </dd>
-            </div>
-          );
-        })}
-      </dl>
-
-      <nav aria-label={t('publicData.common.relatedPagesAria', { heading })} className="mt-6">
-        <ul className="flex flex-wrap gap-3 text-sm">
-          {definition.links.map((link) => (
-            <li key={link.href}>
-              <Link
-                href={localizeCrossHostHref(link.href, locale)}
-                className="text-primary underline-offset-4 hover:underline"
-              >
-                {t(`${prefix}.links.${link.key}`)}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </section>
+    <PageHeader
+      section={definition.section}
+      title={heading}
+      titleId={`${route}-heading`}
+      subtitle={t(`${prefix}.description`)}
+      figures={headerFigures}
+      actions={actions}
+      meta={
+        readAt !== null || note ? (
+          <>
+            {readAt !== null ? (
+              // One item, so the stamp and its source flow as one line of text.
+              <span>
+                <SnapshotStamp at={readAt} />
+                {' · '}
+                {t('publicData.common.source', { source: t(`${prefix}.source`) })}
+              </span>
+            ) : null}
+            {note}
+          </>
+        ) : undefined
+      }
+      related={definition.links.map((link) => ({
+        href: localizeCrossHostHref(link.href, locale),
+        label: t(`${prefix}.links.${link.key}`),
+      }))}
+      relatedLabel={t('publicData.common.relatedPagesAria', { heading })}
+    />
   );
 }

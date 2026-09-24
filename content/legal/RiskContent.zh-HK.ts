@@ -2,8 +2,7 @@ import type { TrustPageCopy } from './TrustPageContent';
 
 /** Chinese copy for /risk-disclosures, rendered by TrustPageContent. */
 export const riskCopyZhHk: TrustPageCopy = {
-  eyebrow: '風險與參與說明',
-  title: 'Cosmic Signature 風險披露',
+  title: '風險披露',
   // lexicon-allow-start: 法律否認文案須明確列出所排除的類別。
   intro:
     'Cosmic Signature 是 Arbitrum 上的程序化鏈上藝術協議。它不是彩票、賭場、賭博產品或投資產品，也不承諾任何財務結果。',

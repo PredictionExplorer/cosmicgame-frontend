@@ -2,8 +2,7 @@ import type { TrustPageCopy } from './TrustPageContent';
 
 /** Vietnamese copy for /risk-disclosures, rendered by TrustPageContent. */
 export const riskCopyVi: TrustPageCopy = {
-  eyebrow: 'Rủi ro và sự minh bạch với người tham gia',
-  title: 'Công bố rủi ro Cosmic Signature',
+  title: 'Công bố rủi ro',
   // lexicon-allow-start: explicit legal denial copy must name the denied categories.
   intro:
     'Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Đây không phải xổ số, sòng bạc, sản phẩm cờ bạc, sản phẩm đầu tư hay lời hứa về kết quả tài chính.',

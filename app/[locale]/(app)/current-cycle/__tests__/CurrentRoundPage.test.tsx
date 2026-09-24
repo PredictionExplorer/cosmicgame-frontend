@@ -180,30 +180,34 @@ describe('CurrentRoundPage', () => {
     expect(screen.getByTestId('live-badge')).toHaveTextContent('currentCycle.hero.status.live');
   });
 
-  it('renders gesture count in subtitle', () => {
+  it('leaves the gesture count and opening time to the page header', () => {
     setupLoaded();
     render(<CurrentRoundPage />);
-    expect(
-      screen.getByText(/currentCycle\.hero\.subtitle\(date=.+,count=137\)/),
-    ).toBeInTheDocument();
+    // The server header (CurrentCycleSeoSummary) carries them; the card does not repeat them.
+    expect(screen.queryByText(/currentCycle\.hero\.subtitle/)).not.toBeInTheDocument();
   });
 
-  it('renders all 6 stat cards with correct values', () => {
+  it('renders the four stat cards the header does not already show', () => {
     setupLoaded();
     render(<CurrentRoundPage />);
 
-    expect(screen.getByText('currentCycle.stats.totalGestures.label')).toBeInTheDocument();
-    expect(screen.getByText('currentCycle.stats.cycleReserve.label')).toBeInTheDocument();
     expect(screen.getByText('currentCycle.stats.stellarSelectionPool.label')).toBeInTheDocument();
     expect(screen.getByText('currentCycle.stats.publicGoods.label')).toBeInTheDocument();
     expect(screen.getByText('currentCycle.stats.contributedEth.label')).toBeInTheDocument();
     expect(screen.getByText('currentCycle.stats.attachedNfts.label')).toBeInTheDocument();
+    // Gestures and the Signature Allocation are header figures, shown once per page.
+    expect(screen.queryByText('currentCycle.stats.totalGestures.label')).not.toBeInTheDocument();
+    expect(screen.queryByText('currentCycle.stats.cycleReserve.label')).not.toBeInTheDocument();
+    expect(screen.queryByText('5.1234 ETH')).not.toBeInTheDocument();
   });
 
-  it('displays formatted allocation pool value', () => {
+  it('renders the server header first, as the page’s only header', () => {
     setupLoaded();
-    render(<CurrentRoundPage />);
-    expect(screen.getByText('5.1234 ETH')).toBeInTheDocument();
+    render(<CurrentRoundPage seoSummary={<h1>Current cycle</h1>} />);
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent(
+      'currentCycle.hero.title(n=42)',
+    );
   });
 
   it('displays formatted stellar selection pool value', () => {
@@ -357,19 +361,28 @@ describe('CurrentRoundPage', () => {
     expect(screen.queryByTestId('special-allocation-recipients')).not.toBeInTheDocument();
   });
 
-  it('renders "Make a Gesture" CTA link', () => {
+  it('points "Make a Gesture" at the home gesture form', () => {
     setupLoaded();
     render(<CurrentRoundPage />);
     const cta = screen.getByRole('link', { name: /currentCycle\.hero\.cta\.makeGesture/ });
-    expect(cta).toBeInTheDocument();
+    expect(cta).toHaveAttribute('href', '/#make-gesture');
+  });
+
+  it('points the finalize CTA at the home clock, not the gesture form', () => {
+    setupLoaded();
+    mockUseAllocationFinalize.mockReturnValue({
+      allocationTime: (NOW_SEC - 60) * 1000,
+      activationTime: NOW_SEC - 3600,
+    });
+    render(<CurrentRoundPage />);
+    const cta = screen.getByRole('link', { name: /currentCycle\.hero\.cta\.finalizeCycle/ });
     expect(cta).toHaveAttribute('href', '/');
   });
 
-  it('renders "Back to Home" navigation link', () => {
+  it('has no "Back to Home" link: the site header already links home', () => {
     setupLoaded();
     render(<CurrentRoundPage />);
-    const link = screen.getByRole('link', { name: /currentCycle\.nav\.backToHome/ });
-    expect(link).toHaveAttribute('href', '/');
+    expect(screen.queryByRole('link', { name: /currentCycle\.nav\.backToHome/ })).toBeNull();
   });
 
   it('passes data to RoundInfoSection', () => {
@@ -439,12 +452,6 @@ describe('CurrentRoundPage', () => {
     render(<CurrentRoundPage />);
 
     expect(screen.getByTestId('round-info-section')).toHaveAttribute('data-erc20', '2');
-  });
-
-  it('renders singular gesture text for 1 gesture', () => {
-    setupLoaded({ CurNumBids: 1 });
-    render(<CurrentRoundPage />);
-    expect(screen.getByText(/currentCycle\.hero\.subtitle\(date=.+,count=1\)/)).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

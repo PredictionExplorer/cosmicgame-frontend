@@ -87,14 +87,18 @@ const AllocationFinalizedPage = ({ seoSummary }: { seoSummary?: ReactNode }) => 
     setFinishFireworks(true);
   };
 
-  const breadcrumbsBase = [
-    { label: t('finalized.home'), href: '/' },
-    { label: t('finalized.title') },
-  ];
+  // A cycle's finalization sits under that cycle's record.
+  const cycleTrail = cycleIsValid
+    ? [
+        {
+          label: t('finalized.pending.cycleBreadcrumb', { cycle: roundNum }),
+          href: `/allocation/${roundNum}`,
+        },
+      ]
+    : [];
 
   return (
     <MainWrapper className="max-sm:pb-16">
-      {seoSummary}
       <div className="mx-auto max-w-3xl">
         {isClaimSuccess && !finishFireworks && (
           <Fireworks
@@ -115,14 +119,14 @@ const AllocationFinalizedPage = ({ seoSummary }: { seoSummary?: ReactNode }) => 
 
         {!cycleIsValid ? (
           <>
-            <PageHeader
-              title={t('finalized.title')}
-              subtitle={t('finalized.invalid.subtitle')}
-              breadcrumbs={breadcrumbsBase}
-              className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
-              align="left"
-              titleLevel={2}
-            />
+            {/* Without a cycle the page is the public record: the server header. */}
+            {seoSummary ?? (
+              <PageHeader
+                section="records"
+                title={t('finalized.title')}
+                subtitle={t('finalized.invalid.subtitle')}
+              />
+            )}
             <div className={cn(detailPanelClass, 'p-10 text-center')}>
               <p className="font-medium text-foreground">
                 {t.rich('finalized.invalid.missingParameter', {
@@ -143,12 +147,10 @@ const AllocationFinalizedPage = ({ seoSummary }: { seoSummary?: ReactNode }) => 
         ) : loading ? (
           <>
             <PageHeader
+              section="records"
+              breadcrumbs={cycleTrail}
               title={t('finalized.title')}
               subtitle={t('finalized.loading.subtitle', { cycle: roundNum })}
-              breadcrumbs={breadcrumbsBase}
-              className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
-              align="left"
-              titleLevel={2}
             />
             <div className={cn(detailPanelClass, 'p-10 text-center')}>
               <p className="text-sm font-medium text-muted-foreground">
@@ -169,21 +171,8 @@ const AllocationFinalizedPage = ({ seoSummary }: { seoSummary?: ReactNode }) => 
                   ? t('finalized.pending.successSubtitle', { cycle: roundNum })
                   : undefined
               }
-              breadcrumbs={
-                isClaimSuccess
-                  ? [
-                      { label: t('finalized.home'), href: '/' },
-                      {
-                        label: t('finalized.pending.cycleBreadcrumb', { cycle: roundNum }),
-                        href: `/allocation/${roundNum}`,
-                      },
-                      { label: t('finalized.pending.finalizedBreadcrumb') },
-                    ]
-                  : breadcrumbsBase
-              }
-              className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
-              align="left"
-              titleLevel={2}
+              section="records"
+              breadcrumbs={cycleTrail}
             />
             <div className={cn(detailPanelClass, 'space-y-6 p-10 text-center')}>
               {isClaimSuccess ? (
@@ -215,18 +204,9 @@ const AllocationFinalizedPage = ({ seoSummary }: { seoSummary?: ReactNode }) => 
         ) : (
           <>
             <PageHeader
+              section="records"
+              breadcrumbs={cycleTrail}
               title={t('finalized.result.title', { cycle: allocationInfo.RoundNum })}
-              breadcrumbs={[
-                { label: t('finalized.home'), href: '/' },
-                {
-                  label: t('finalized.result.allocationBreadcrumb'),
-                  href: `/allocation/${allocationInfo.RoundNum}`,
-                },
-                { label: t('finalized.result.retrievedBreadcrumb') },
-              ]}
-              className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
-              align="left"
-              titleLevel={2}
             />
 
             <SectionCard

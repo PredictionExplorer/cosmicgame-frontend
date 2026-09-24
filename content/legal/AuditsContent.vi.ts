@@ -2,8 +2,7 @@ import type { TrustPageCopy } from './TrustPageContent';
 
 /** Vietnamese copy for /audits, rendered by TrustPageContent. */
 export const auditsCopyVi: TrustPageCopy = {
-  eyebrow: 'Kiểm toán và xác minh',
-  title: 'Kiểm toán Cosmic Signature',
+  title: 'Kiểm toán',
   intro:
     'Trang này tổng hợp kết quả rà soát hợp đồng Cosmic Signature và liên kết đến các báo cáo. Bạn có thể xem phạm vi kiểm toán, các vấn đề được ghi nhận và bản triển khai công khai của giao thức.',
   sections: [
