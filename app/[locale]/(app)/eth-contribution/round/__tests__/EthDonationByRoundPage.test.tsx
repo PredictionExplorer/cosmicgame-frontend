@@ -35,7 +35,10 @@ const ROWS = [
   { EvtLogId: 3, DonorAddr: '0xBB', AmountEth: 0.5 },
 ];
 
-function withRows(data: unknown[] | undefined, state: { isLoading?: boolean } = {}) {
+function withRows(
+  data: unknown[] | undefined,
+  state: { isLoading?: boolean; isError?: boolean } = {},
+) {
   mockUseDonationsBothByRound.mockReturnValue({
     data,
     isLoading: false,
@@ -109,6 +112,23 @@ describe('EthDonationByRoundPage', () => {
       screen.getByText('ethContribution.cycle.emptyDescriptionPast(cycle=7)'),
     ).toBeInTheDocument();
   });
+
+  it.each([
+    ['contributions', ROWS, {}, true],
+    ['a loading ledger', undefined, { isLoading: true }, true],
+    ['no contributions', [], {}, false],
+    ['a failed read', undefined, { isError: true }, false],
+  ])(
+    'puts %s in the reading column only when there are rows to read (regression)',
+    (_, data, state, narrow) => {
+      // An empty cycle's state sat in the left 48rem column, off-centre.
+      withRows(data, state);
+      render(<EthDonationByRoundPage round={3} />);
+      expect(
+        screen.getByTestId('contribution-table').parentElement?.classList.contains('max-w-3xl'),
+      ).toBe(narrow);
+    },
+  );
 
   it('keeps the present tense for the live cycle', () => {
     withRows([]);

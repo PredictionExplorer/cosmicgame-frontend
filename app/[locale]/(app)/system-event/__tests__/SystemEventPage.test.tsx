@@ -138,6 +138,24 @@ describe('SystemEventPage', () => {
     expect(screen.getAllByRole('link', { name: /All coordination changes/ })).toHaveLength(1);
   });
 
+  it.each([
+    ['changes', { data: rows }, true],
+    ['a loading list', { isLoading: true }, true],
+    ['no changes', { data: [] }, false],
+    ['a failed read', { error: new Error('fail') }, false],
+  ])(
+    'puts %s in the reading column only when there are rows to read (regression)',
+    (_, state, narrow) => {
+      // An empty window's state sat in the left 48rem column, off-centre, with
+      // about 900px of nothing beside it at 1440px.
+      mockEvents(state);
+      render(<SystemEventPage round={1} start={100} end={200} />);
+      expect(
+        screen.getByTestId('events-table').parentElement?.classList.contains('max-w-3xl'),
+      ).toBe(narrow);
+    },
+  );
+
   it('keeps the header while the list loads and hands the table its loading state', () => {
     mockEvents({ isLoading: true });
     render(<SystemEventPage round={1} start={100} end={200} />);

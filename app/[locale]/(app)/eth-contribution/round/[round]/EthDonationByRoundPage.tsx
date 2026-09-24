@@ -28,7 +28,8 @@ function countContributors(rows: readonly EthDonation[]): number {
  * the header, the neighbouring cycles one step away, the cycle's own page
  * (its allocation, or the live cycle), and the ledger in one reading column
  * (a cycle's ledger is always short). A cycle without contributions says so
- * once, in the ledger, in the past tense once the cycle has closed.
+ * once, in the past tense once the cycle has closed, centred on the full
+ * width like every ledger state (so is a failed read).
  */
 const EthDonationByRoundPage = ({ round }: EthDonationByRoundPageProps) => {
   const t = useTranslations('ethContribution.cycle');
@@ -147,7 +148,7 @@ const EthDonationByRoundPage = ({ round }: EthDonationByRoundPageProps) => {
   );
 
   return (
-    <LedgerPage width="narrow" header={header}>
+    <LedgerPage width={empty || isError ? 'full' : 'narrow'} header={header}>
       <EthDonationTable
         list={rows}
         showCycle={false}

@@ -44,7 +44,8 @@ function changeSpan(rows: readonly AdminEventRow[]): { first: number; latest: nu
  * window, the one before a cycle opened: how many, when they began and
  * ended, and each change with its new value and transaction, in one reading
  * column. The window is named by its cycle, never by its event log ids. A
- * window without changes says so once, with one way back to the full log.
+ * window without changes says so once, with one way back to the full log,
+ * centred on the full width like every ledger state (so is a failed read).
  */
 const SystemEventPage = (props: SystemEventPageProps) => {
   const { round, start, end } = props;
@@ -135,7 +136,7 @@ const SystemEventPage = (props: SystemEventPageProps) => {
 
   return (
     <LedgerPage
-      width="narrow"
+      width={empty || error ? 'full' : 'narrow'}
       header={
         <PageHeader
           section="records"

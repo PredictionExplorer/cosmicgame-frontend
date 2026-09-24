@@ -34,7 +34,8 @@ interface MarketingRewardsPageProps {
  * identity header (whose record it is, directly under the title: the address
  * with copy and a way to their profile), what the allocations add up to and
  * when they began and last arrived, then the allocations themselves in one
- * reading column (a two-column table on phones too).
+ * reading column (a two-column table on phones too). No allocations, or a
+ * failed read, stand centred on the full width like every ledger state.
  */
 export default function MarketingRewardsPage({ address: rawAddress }: MarketingRewardsPageProps) {
   const t = useTranslations('marketing');
@@ -49,6 +50,7 @@ export default function MarketingRewardsPage({ address: rawAddress }: MarketingR
   // While the list loads a figure is a skeleton; when it fails, the header's
   // unavailable dash (`null`). With no allocations there are no dates to show.
   const ready = !query.isLoading && !query.isError;
+  const empty = ready && rewards.length === 0;
   const pending = query.isLoading ? <Skeleton className="h-7 w-24" /> : null;
   const figures: PageHeaderFigure[] = [
     {
@@ -144,7 +146,7 @@ export default function MarketingRewardsPage({ address: rawAddress }: MarketingR
   }
 
   return (
-    <LedgerPage header={header} width="narrow">
+    <LedgerPage header={header} width={empty || query.isError ? 'full' : 'narrow'}>
       <MarketingRewardsTable
         list={rewards}
         // A date and an amount fit side by side on any phone: a table, not records.

@@ -107,6 +107,18 @@ describe('MarketingRewardsPage', () => {
     ).toBeVisible();
   });
 
+  it.each([
+    ['allocations', query({ data: [reward(1, 25, 1_700_000_000)] }), true],
+    ['a loading list', query({ data: undefined, isLoading: true }), true],
+    ['no allocations', query(), false],
+    ['a failed read', query({ data: undefined, isError: true }), false],
+  ])('puts %s in the reading column only when there are rows to read', (_, state, narrow) => {
+    // The empty state sat in the left 48rem column, off-centre.
+    mockUseMarketingRewardsByUser.mockReturnValue(state);
+    const { container } = render(<MarketingRewardsPage address={VALID_ADDRESS} />);
+    expect(container.querySelector('main > .max-w-3xl') !== null).toBe(narrow);
+  });
+
   it('holds the figures and rows while loading', () => {
     mockUseMarketingRewardsByUser.mockReturnValue(query({ data: undefined, isLoading: true }));
     const { container } = render(<MarketingRewardsPage address={VALID_ADDRESS} />);
