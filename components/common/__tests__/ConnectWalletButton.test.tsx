@@ -48,7 +48,7 @@ jest.mock('../../../contexts/WalletUiContext', () => {
 const mockDisconnectAsync = jest.fn().mockResolvedValue(undefined);
 jest.mock('wagmi', () => ({
   ...jest.requireActual('../../../__mocks__/wagmi'),
-  useDisconnect: () => ({ disconnectAsync: mockDisconnectAsync, isPending: false }),
+  useDisconnect: () => ({ mutateAsync: mockDisconnectAsync, isPending: false }),
 }));
 
 jest.mock('../../ui/dropdown-menu', () => ({

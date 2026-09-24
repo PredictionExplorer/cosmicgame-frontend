@@ -10,15 +10,15 @@ jest.mock('../useNotify', () => ({
 
 const mockAccount = jest.fn<{ isConnected: boolean; chainId?: number }, []>();
 const mockSwitchChainAsync = jest.fn<Promise<unknown>, [{ chainId: number }]>();
-const mockConnectorClient = jest.fn<{ data: unknown }, []>();
-const mockWalletClient = jest.fn<{ data: unknown }, []>();
+const mockUseConnectorClient = jest.fn();
+const mockUseWalletClient = jest.fn();
 
 jest.mock('wagmi', () => ({
-  useAccount: () => mockAccount(),
+  useConnection: () => mockAccount(),
   useConfig: () => ({}),
-  useSwitchChain: () => ({ switchChainAsync: mockSwitchChainAsync }),
-  useConnectorClient: () => mockConnectorClient(),
-  useWalletClient: () => mockWalletClient(),
+  useSwitchChain: () => ({ mutateAsync: mockSwitchChainAsync, isPending: false }),
+  useConnectorClient: (...args: unknown[]) => mockUseConnectorClient(...args),
+  useWalletClient: (...args: unknown[]) => mockUseWalletClient(...args),
 }));
 
 const mockGetConnectorClient = jest.fn<Promise<unknown>, [unknown]>();
@@ -38,8 +38,6 @@ const SIGNER = { id: 'signer' };
 beforeEach(() => {
   jest.clearAllMocks();
   mockAccount.mockReturnValue({ isConnected: true, chainId: APP_CHAIN_ID });
-  mockConnectorClient.mockReturnValue({ data: SIGNER });
-  mockWalletClient.mockReturnValue({ data: undefined });
   mockGetConnectorClient.mockResolvedValue(SIGNER);
   mockGetChainId.mockResolvedValue(APP_CHAIN_ID);
   mockSwitchChainAsync.mockResolvedValue(undefined);
@@ -198,13 +196,24 @@ describe('useRequireChain — wallet on the wrong chain', () => {
     expect(mockSwitchChainAsync).not.toHaveBeenCalled();
     expect(mockGetChainId).not.toHaveBeenCalled();
   });
+
+  it('keeps no chain-pinned client query, which would fail while the wallet is elsewhere', async () => {
+    const { result } = renderHook(() => useRequireChain());
+    expect(mockUseConnectorClient).not.toHaveBeenCalled();
+    expect(mockUseWalletClient).not.toHaveBeenCalled();
+
+    await act(async () => {
+      await result.current.ensureChain();
+    });
+    // The guard resolves the wallet's client when it runs, unpinned.
+    expect(mockGetConnectorClient).toHaveBeenCalledTimes(1);
+    expect(mockGetChainId).toHaveBeenCalledWith(SIGNER);
+  });
 });
 
 describe('useRequireChain — no wallet connected', () => {
   beforeEach(() => {
     mockAccount.mockReturnValue({ isConnected: false, chainId: undefined });
-    mockConnectorClient.mockReturnValue({ data: undefined });
-    mockWalletClient.mockReturnValue({ data: undefined });
     mockGetConnectorClient.mockRejectedValue(new Error('no connector'));
   });
 
@@ -242,7 +251,7 @@ describe('useRequireChain — no wallet connected', () => {
     expect(mockSwitchChainAsync).not.toHaveBeenCalled();
   });
 
-  it('falls back to the imperative connector client when the hooks have none yet', async () => {
+  it('reads the wallet chain through the imperative connector client', async () => {
     mockAccount.mockReturnValue({ isConnected: true, chainId: APP_CHAIN_ID });
     mockGetConnectorClient.mockResolvedValue(SIGNER);
     mockGetChainId.mockResolvedValue(APP_CHAIN_ID);
@@ -259,7 +268,7 @@ describe('useRequireChain — no wallet connected', () => {
 
   it('falls back to the wagmi chain id when the wallet refuses to report one', async () => {
     mockAccount.mockReturnValue({ isConnected: true, chainId: OTHER_CHAIN_ID });
-    mockConnectorClient.mockReturnValue({ data: SIGNER });
+    mockGetConnectorClient.mockResolvedValue(SIGNER);
     mockGetChainId.mockRejectedValue(new Error('unsupported method'));
     const { result } = renderHook(() => useRequireChain());
 

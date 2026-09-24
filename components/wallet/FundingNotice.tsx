@@ -2,7 +2,7 @@
 
 import { ArrowRight, Info } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { useAccount, useBalance } from 'wagmi';
+import { useBalance, useConnection } from 'wagmi';
 import { formatEther } from 'viem';
 
 import { activeChain } from '@/config/chains';
@@ -39,7 +39,7 @@ export interface FundingNoticeProps {
 export function FundingNotice({ requiredWei, className }: FundingNoticeProps) {
   const t = useTranslations('wallet');
   const { intlLocale } = getLocaleConfig(useLocale());
-  const { address } = useAccount();
+  const { address } = useConnection();
   const { data: balance } = useBalance({
     address,
     chainId: activeChain.id,

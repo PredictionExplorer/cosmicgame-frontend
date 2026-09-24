@@ -61,8 +61,8 @@ const mockGetSignerChainId = jest.fn().mockResolvedValue(421614);
 jest.mock('wagmi', () => ({
   useConfig: jest.fn(() => ({})),
   useChainId: jest.fn(() => 421614),
-  useAccount: jest.fn(() => ({ address: '0xUser', isConnected: true, chainId: 421614 })),
-  useSwitchChain: jest.fn(() => ({ switchChainAsync: mockSwitchChainAsync })),
+  useConnection: jest.fn(() => ({ address: '0xUser', isConnected: true, chainId: 421614 })),
+  useSwitchChain: jest.fn(() => ({ mutateAsync: mockSwitchChainAsync })),
   useConnectorClient: jest.fn(() => ({ data: undefined })),
   usePublicClient: jest.fn(() => ({
     waitForTransactionReceipt: mockWaitForTransactionReceipt,
@@ -237,8 +237,6 @@ jest.mock('../../contracts/abis', () => ({
 
 const mockReportError = jest.fn();
 const mockGetContractErrorDescriptor = jest.fn().mockReturnValue(null);
-const mockIsContractRevertError = jest.fn().mockReturnValue(false);
-const mockFormatCustomContractError = jest.fn().mockReturnValue(null);
 
 jest.mock('../../utils/errors', () => ({
   ...jest.requireActual('../../utils/errors'),
@@ -247,8 +245,6 @@ jest.mock('../../utils/errors', () => ({
 
 jest.mock('../../utils/contractErrors', () => ({
   getContractErrorDescriptor: (...args: unknown[]) => mockGetContractErrorDescriptor(...args),
-  isContractRevertError: (...args: unknown[]) => mockIsContractRevertError(...args),
-  formatCustomContractError: (...args: unknown[]) => mockFormatCustomContractError(...args),
 }));
 
 /* ────────────────────────────────────────────────────────────────── */
@@ -297,9 +293,7 @@ beforeEach(() => {
   mockWalletGetChainId.mockResolvedValue(421614);
   mockGetSignerChainId.mockResolvedValue(421614);
   mockWaitForTransactionReceipt.mockResolvedValue({ status: 'success' });
-  mockIsContractRevertError.mockReturnValue(false);
   mockGetContractErrorDescriptor.mockReturnValue(null);
-  mockFormatCustomContractError.mockReturnValue(null);
   mockEstimateContractGas.mockResolvedValue(BigInt(500_000));
   mockUseCosmicGameContract.mockReturnValue(mockContractObj);
   mockApiGetUserBalance.mockResolvedValue({

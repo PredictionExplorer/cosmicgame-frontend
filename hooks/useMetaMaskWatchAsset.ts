@@ -3,7 +3,7 @@
 import { useCallback, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { isAddress } from 'viem';
-import { useAccount } from 'wagmi';
+import { useConnection } from 'wagmi';
 
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { isUserRejection, reportError } from '@/utils/errors';
@@ -59,7 +59,7 @@ export function isMetaMaskConnector(connector: MetaMaskConnectorLike | null | un
 export function useMetaMaskWatchAsset() {
   const t = useTranslations('toasts');
   const { notify } = useNotify();
-  const { connector, isConnected } = useAccount();
+  const { connector, isConnected } = useConnection();
   const { ensureCorrectChain } = useRequireChain();
   const contractAddresses = useContractAddresses();
   const [pendingAsset, setPendingAsset] = useState<WatchAssetKind | null>(null);

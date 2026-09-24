@@ -89,7 +89,7 @@ export function useOptionalWalletUi(): WalletUiContextValue | null {
  * Rationale: the wallet modal UI was statically imported by the providers
  * tree, so every visitor on every page downloaded it — the single largest
  * chunk of the app-home bundle — even though most sessions never connect.
- * wagmi itself stays eager (hooks like useAccount render everywhere, and
+ * wagmi itself stays eager (hooks like useConnection render everywhere, and
  * returning users must silently reconnect); only the modal UI is deferred.
  *
  * Must be mounted INSIDE WagmiProvider: the lazily mounted RainbowKit

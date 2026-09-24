@@ -55,16 +55,16 @@ describe('ensureWalletOnRequiredChain', () => {
     expect(mockSwitchChain).toHaveBeenCalledWith(config, { chainId: activeChain.id });
   });
 
-  it('uses an injected switch implementation and signer when given', async () => {
+  it('uses an injected switch implementation when given', async () => {
     const switchTo = jest.fn().mockResolvedValue(undefined);
-    const signer = { id: 'hook-signer' };
     mockGetChainId.mockResolvedValue(1);
 
-    await ensureWalletOnRequiredChain(config, { signer, switchTo });
+    await ensureWalletOnRequiredChain(config, { switchTo });
 
-    expect(mockGetConnectorClient).not.toHaveBeenCalled();
-    expect(mockGetChainId).toHaveBeenCalledWith(signer);
+    expect(mockGetConnectorClient).toHaveBeenCalledWith(config);
+    expect(mockGetChainId).toHaveBeenCalledWith(SIGNER);
     expect(switchTo).toHaveBeenCalledWith(activeChain.id);
+    expect(mockSwitchChain).not.toHaveBeenCalled();
   });
 
   it('distinguishes a declined switch from a failed one', async () => {

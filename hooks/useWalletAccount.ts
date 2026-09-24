@@ -1,11 +1,11 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useAccount, useDisconnect } from 'wagmi';
+import { useConnection, useDisconnect } from 'wagmi';
 
 import { useOptionalWalletUi } from '@/contexts/WalletUiContext';
 import { useClipboard } from '@/hooks/useClipboard';
-import { useRequireChain } from '@/hooks/useRequireChain';
+import { useWalletNetwork } from '@/hooks/useWalletNetwork';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { EXPLORER_NAME } from '@/lib/chainGuard';
 import { reportError } from '@/utils/errors';
@@ -23,7 +23,7 @@ export interface WalletAccountState {
   /** Explorer page for the address, and the explorer's display name. */
   explorerUrl: string | null;
   explorerName: string;
-  /** Network facts and the switch action from `useRequireChain`. */
+  /** Network facts and the switch action from `useWalletNetwork`. */
   requiredChainName: string;
   connectedChainName: string | null;
   isWrongChain: boolean;
@@ -53,12 +53,12 @@ export function useWalletAccount(): WalletAccountState {
   // The same account the wallet pill shows (including the UX-scenario demo
   // account), so the panel never disagrees with its trigger.
   const { account } = useActiveWeb3React();
-  const { connector } = useAccount();
+  const { connector } = useConnection();
   const address = (account ?? null) as `0x${string}` | null;
-  const { disconnectAsync, isPending: isDisconnecting = false } = useDisconnect();
+  const { mutateAsync: disconnectAsync, isPending: isDisconnecting = false } = useDisconnect();
   const walletUi = useOptionalWalletUi();
   const { copy } = useClipboard();
-  const chain = useRequireChain();
+  const chain = useWalletNetwork();
   const [copied, setCopied] = useState(false);
   const copiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 

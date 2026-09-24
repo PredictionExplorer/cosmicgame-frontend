@@ -8,7 +8,7 @@ import {
   type Locale as RainbowKitLocale,
 } from '@rainbow-me/rainbowkit';
 import { useLocale, useTranslations } from 'next-intl';
-import { useAccount } from 'wagmi';
+import { useConnection } from 'wagmi';
 
 import { getPathname } from '@/i18n/navigation';
 import { pickByLocale, type LocaleRecord } from '@/i18n/locale';
@@ -40,7 +40,7 @@ function ConnectModalOpener({
   onModalOpened?: () => void;
 }) {
   const { openConnectModal } = useConnectModal();
-  const { status } = useAccount();
+  const { status } = useConnection();
   const lastHandledRequestRef = useRef(0);
 
   useEffect(() => {

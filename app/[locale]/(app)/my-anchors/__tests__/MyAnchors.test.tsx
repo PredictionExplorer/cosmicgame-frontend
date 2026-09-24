@@ -28,8 +28,8 @@ jest.mock('wagmi', () => ({
   useWalletClient: () => ({ data: undefined }),
   useConnectorClient: () => ({ data: undefined }),
   useConfig: () => ({}),
-  useAccount: () => ({ address: '0xUser', isConnected: true, chainId: 421614 }),
-  useSwitchChain: () => ({ switchChainAsync: jest.fn() }),
+  useConnection: () => ({ address: '0xUser', isConnected: true, chainId: 421614 }),
+  useSwitchChain: () => ({ mutateAsync: jest.fn() }),
 }));
 
 jest.mock('@wagmi/core', () => ({
@@ -120,7 +120,7 @@ describe('MyAnchors', () => {
     await act(async () => {
       render(<MyAnchors />);
     });
-    expect(screen.getByText('myPages.anchors.walletDescription')).toBeInTheDocument();
+    expect(screen.getByText('wallet.required.anchors.description')).toBeInTheDocument();
   });
 
   it('shows skeleton loading state', async () => {

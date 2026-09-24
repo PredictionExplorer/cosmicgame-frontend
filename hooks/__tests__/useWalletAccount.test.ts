@@ -11,15 +11,15 @@ const mockRequestConnectModal = jest.fn();
 let mockAccount: string | null = ACCOUNT;
 
 jest.mock('wagmi', () => ({
-  useAccount: () => ({ connector: { name: 'MetaMask' } }),
-  useDisconnect: () => ({ disconnectAsync: mockDisconnectAsync, isPending: false }),
+  useConnection: () => ({ connector: { name: 'MetaMask' } }),
+  useDisconnect: () => ({ mutateAsync: mockDisconnectAsync, isPending: false }),
 }));
 jest.mock('../web3', () => ({
   useActiveWeb3React: () => ({ account: mockAccount, chainId: 421614, active: !!mockAccount }),
 }));
 jest.mock('../useClipboard', () => ({ useClipboard: () => ({ copy: mockCopy }) }));
-jest.mock('../useRequireChain', () => ({
-  useRequireChain: () => ({
+jest.mock('../useWalletNetwork', () => ({
+  useWalletNetwork: () => ({
     requiredChainName: 'Arbitrum Sepolia',
     connectedChainName: 'Ethereum',
     isWrongChain: true,

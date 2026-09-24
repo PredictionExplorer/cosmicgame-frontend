@@ -74,8 +74,6 @@ export function getChainDisplayName(chainId: number | null | undefined): string 
 }
 
 export interface EnsureWalletChainOptions {
-  /** A connected client whose `eth_chainId` is the wallet's real chain, if one is at hand. */
-  signer?: unknown;
   /** Chain id wagmi reports, used only when the wallet refuses `eth_chainId`. */
   fallbackChainId?: number | null;
   /** Switch implementation; defaults to wagmi's imperative `switchChain`. */
@@ -91,24 +89,22 @@ export interface EnsureWalletChainOptions {
  */
 export async function ensureWalletOnRequiredChain(
   config: Config,
-  { signer, fallbackChainId = null, switchTo }: EnsureWalletChainOptions = {},
+  { fallbackChainId = null, switchTo }: EnsureWalletChainOptions = {},
 ): Promise<ChainGuardStatus> {
-  let client = signer;
-  if (!client) {
+  let client: Client | undefined;
+  try {
     // Deliberately unpinned: wagmi rejects a pinned chainId while the
     // connector sits on another chain (ConnectorChainMismatchError), and a
     // client on the wallet's current chain is what detects the mismatch.
-    try {
-      client = await getConnectorClient(config);
-    } catch {
-      client = undefined;
-    }
+    client = await getConnectorClient(config);
+  } catch {
+    client = undefined;
   }
   if (!client) return 'no-wallet';
 
   let walletChainId: number;
   try {
-    walletChainId = await getChainId(client as Client);
+    walletChainId = await getChainId(client);
   } catch {
     walletChainId = fallbackChainId ?? activeChain.id;
   }

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useConfig, usePublicClient, useWalletClient, useConnectorClient } from 'wagmi';
+import { useConfig, usePublicClient } from 'wagmi';
 import { writeContract, type Config } from '@wagmi/core';
 import { getContract, type Abi, type Client, type Hash } from 'viem';
 
@@ -59,30 +59,27 @@ function createGuardedWrite(config: Config, address: `0x${string}`, abi: Abi) {
 /**
  * Generic contract hook that preserves viem's ABI-level type inference.
  * Each contract hook passes a `const`-asserted ABI, so the returned
- * contract has fully typed `.read`, `.write`, and `.estimateGas` methods.
+ * contract has fully typed `.read` and `.write` methods.
  *
  * `.write.*` calls are chain-guarded (see `createGuardedWrite`): prefer
  * `useTxFlow` for new flows, which adds the lifecycle toast on top.
+ *
+ * The contract is built on the public client only. Writes resolve the signer
+ * themselves when they run, so the hook keeps no wallet-client query: a
+ * chain-pinned one fails (ConnectorChainMismatchError, reported to Sentry)
+ * on every page, for as long as a connected wallet sits on another network.
  */
 export default function useContract<const TAbi extends Abi>(address: string, abi: TAbi) {
   const config = useConfig();
   const publicClient = usePublicClient();
-  const { data: walletClient } = useWalletClient({ chainId: activeChain.id });
-  const { data: connectorClient } = useConnectorClient({ chainId: activeChain.id });
-  const signerClient = connectorClient ?? walletClient;
 
   return useMemo(() => {
     if (!address || !abi || !publicClient) return null;
     try {
-      // Wagmi's `useWalletClient({ chainId })` wallet client carries different `chain` generics than
-      // `usePublicClient()`, which makes `getContract`'s `write` a broken union unless normalized.
-      const client: Client | { public: Client; wallet: Client } = signerClient
-        ? { public: publicClient as Client, wallet: signerClient as Client }
-        : (publicClient as Client);
       const contract = getContract({
         address: address as `0x${string}`,
         abi,
-        client,
+        client: publicClient as Client,
       });
       const write = createGuardedWrite(config, address as `0x${string}`, abi);
       return Object.assign(contract, { write }) as typeof contract;
@@ -90,5 +87,5 @@ export default function useContract<const TAbi extends Abi>(address: string, abi
       reportError(error, 'useContract init');
       return null;
     }
-  }, [address, abi, config, publicClient, signerClient]);
+  }, [address, abi, config, publicClient]);
 }

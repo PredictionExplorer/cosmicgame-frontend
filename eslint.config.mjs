@@ -72,6 +72,14 @@ const config = [
               message:
                 "Import locale-aware navigation from '@/i18n/navigation' (useSearchParams and notFound stay on next/navigation).",
             },
+            // wagmi 3 renamed the account hooks; the old names are deprecated
+            // aliases (AGENTS.md: heed deprecation notices).
+            {
+              name: 'wagmi',
+              importNames: ['useAccount', 'useAccountEffect', 'useSwitchAccount'],
+              message:
+                'Deprecated in wagmi 3: use useConnection, useConnectionEffect or useSwitchConnection.',
+            },
           ],
         },
       ],

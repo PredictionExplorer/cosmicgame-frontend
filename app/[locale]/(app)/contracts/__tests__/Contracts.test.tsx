@@ -81,7 +81,7 @@ jest.mock('@/hooks/useRequireChain', () => ({
 }));
 
 jest.mock('wagmi', () => ({
-  useAccount: () => ({ address: undefined, isConnected: false }),
+  useConnection: () => ({ address: undefined, isConnected: false }),
   useChainId: () => 421614,
   useConfig: () => ({}),
   usePublicClient: () => undefined,

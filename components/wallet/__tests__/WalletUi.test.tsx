@@ -32,7 +32,7 @@ jest.mock('@rainbow-me/rainbowkit', () => ({
   },
   useConnectModal: () => ({ openConnectModal: mockOpenConnectModal }),
 }));
-jest.mock('wagmi', () => ({ useAccount: () => ({ status: mockStatus }) }));
+jest.mock('wagmi', () => ({ useConnection: () => ({ status: mockStatus }) }));
 jest.mock('../wallet-connectors', () => ({ installWalletConnectors: jest.fn() }));
 jest.mock('../../../config/wagmi', () => ({
   wagmiConfig: {},
