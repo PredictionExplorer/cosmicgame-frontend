@@ -294,6 +294,14 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
               owner={owner}
               currentName={currentName ?? ''}
               totalNamedTokens={dashboard?.MainStats?.TotalNamedTokens ?? null}
+              // The ledger's own rule: never anchored, not anchored now.
+              anchoringEligible={!nft?.Staked && !nft?.WasUnstaked}
+              onAnchored={() =>
+                // The indexer records the anchor a moment after the receipt.
+                scheduleNameRefetch(() => {
+                  void refetchCSTInfo();
+                })
+              }
               showMetaMaskAction={isMetaMaskConnected}
               addingToMetaMask={isAddingNft}
               onAddToMetaMask={() => void addCosmicSignatureNft(tokenId)}

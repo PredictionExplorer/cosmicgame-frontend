@@ -37,6 +37,10 @@
       "name": "Đặt tên",
       "transfer": "Chuyển giao"
     },
+    "anchor": {
+      "button": "Neo giữ {id}",
+      "note": "NFT đang neo giữ cùng chia phân phối neo giữ của mỗi chu kỳ đã hoàn tất. Mỗi NFT chỉ được neo giữ một lần, nên khi đã gỡ neo thì không thể neo giữ lại."
+    },
     "metaMaskTooltip": "Yêu cầu tiện ích MetaMask trên trình duyệt hiển thị NFT này. Tính năng nhập NFT đang thử nghiệm và chưa có trên MetaMask Mobile.",
     "addToMetaMask": "Thêm NFT vào MetaMask",
     "addingToMetaMask": "Đang thêm NFT vào MetaMask…",

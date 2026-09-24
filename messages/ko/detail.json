@@ -37,6 +37,10 @@
       "name": "이름",
       "transfer": "전송"
     },
+    "anchor": {
+      "button": "{id} 앵커링",
+      "note": "앵커링한 NFT는 마감된 사이클마다 앵커링 지급을 나누어 받습니다. NFT마다 앵커링은 한 번만 할 수 있으므로 앵커링 해제는 되돌릴 수 없습니다."
+    },
     "metaMaskTooltip": "MetaMask 브라우저 확장 프로그램에 이 NFT를 표시하도록 요청합니다. NFT 추가는 실험적인 기능으로, MetaMask 모바일에서는 지원되지 않습니다.",
     "addToMetaMask": "MetaMask에 NFT 추가",
     "addingToMetaMask": "MetaMask에 NFT 추가 중…",

@@ -37,6 +37,10 @@
       "name": "命名",
       "transfer": "轉移"
     },
+    "anchor": {
+      "button": "錨定 {id}",
+      "note": "錨定後，這枚 NFT 將共享每個已收官週期的錨定配發。每枚 NFT 只能錨定一次，解錨後無法再次錨定。"
+    },
     "metaMaskTooltip": "請求 MetaMask 瀏覽器擴充功能顯示這枚 NFT。NFT 匯入仍為實驗性功能，MetaMask 行動裝置暫不支援。",
     "addToMetaMask": "將 NFT 新增至 MetaMask",
     "addingToMetaMask": "正在新增 NFT…",

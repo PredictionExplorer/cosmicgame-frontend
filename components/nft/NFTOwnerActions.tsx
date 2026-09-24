@@ -7,8 +7,10 @@ import type { Address } from 'viem';
 
 import { cosmicSignatureAbi } from '@/contracts/abis';
 
+import { AnchoringIcon } from '@/lib/conceptIcons';
 import { Link } from '@/i18n/navigation';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
+import { useAnchorActions } from '@/hooks/useAnchorActions';
 import { useNotify } from '@/hooks/useNotify';
 import { useTxFlow, useTxStageLabel } from '@/hooks/useTxFlow';
 import { formatId } from '@/utils/format';
@@ -34,6 +36,13 @@ export interface NFTOwnerActionsProps {
   currentName: string;
   /** How many tokens carry a name, for the pointer to the Named NFTs page. */
   totalNamedTokens: number | null;
+  /**
+   * The token has never been anchored (the ledger's "Eligible for
+   * Anchoring"): the card offers to anchor it here, not only on /anchoring.
+   */
+  anchoringEligible?: boolean;
+  /** After a confirmed anchor: the token is now anchored, so refresh it. */
+  onAnchored?: () => void | Promise<unknown>;
   showMetaMaskAction: boolean;
   addingToMetaMask: boolean;
   onAddToMetaMask: () => void;
@@ -46,8 +55,8 @@ export interface NFTOwnerActionsProps {
 type Pending = 'transfer' | 'name' | 'clear' | null;
 
 /**
- * The owner's tools beside the Signature: name it (or clear its name), and
- * send it to another wallet. The transfer is irreversible, so it checks the
+ * The owner's tools beside the Signature: anchor it while it never has been,
+ * name it (or clear its name), and send it to another wallet. The transfer is irreversible, so it checks the
  * recipient on-chain as it is typed and reviews what leaves and where before
  * the wallet opens, with an acknowledgement for a new, contract or protocol
  * address. Every write runs through `useTxFlow` (chain guard, wallet prompt,
@@ -58,6 +67,8 @@ export function NFTOwnerActions({
   owner,
   currentName,
   totalNamedTokens,
+  anchoringEligible = false,
+  onAnchored,
   showMetaMaskAction,
   addingToMetaMask,
   onAddToMetaMask,
@@ -73,6 +84,8 @@ export function NFTOwnerActions({
   const { run, stage, isBusy } = useTxFlow();
   const stageLabel = useTxStageLabel();
   const [pending, setPending] = useState<Pending>(null);
+  const { anchor, txStage: anchorStage } = useAnchorActions();
+  const [anchoring, setAnchoring] = useState(false);
 
   const [name, setName] = useState('');
   const [recipientText, setRecipientText] = useState('');
@@ -184,6 +197,18 @@ export function NFTOwnerActions({
   const busyLabel = (kind: Exclude<Pending, null>) =>
     pending === kind ? (stageLabel(stage) ?? undefined) : undefined;
 
+  /** Anchors this token (the approval first, when the collection has none). */
+  const anchorToken = async () => {
+    setAnchoring(true);
+    try {
+      const result = await anchor(tokenId, false);
+      if (result.status === 'confirmed') await onAnchored?.();
+    } finally {
+      setAnchoring(false);
+    }
+  };
+  const busy = isBusy || anchoring;
+
   return (
     <section
       aria-labelledby={headingId}
@@ -193,6 +218,26 @@ export function NFTOwnerActions({
       <h2 id={headingId} className="type-title text-foreground">
         {t('title')}
       </h2>
+
+      {anchoringEligible ? (
+        <div className="mt-4 flex flex-col gap-3 rounded-control bg-surface-sunken p-4">
+          <p className="type-body-sm text-muted-foreground">{t('anchor.note')}</p>
+          <ChainGuard requireConnection buttonClassName="w-full">
+            <Button
+              type="button"
+              variant="secondary"
+              loading={anchoring}
+              disabled={busy && !anchoring}
+              onClick={() => void anchorToken()}
+              className="w-full"
+            >
+              <AnchoringIcon aria-hidden />
+              {(anchoring ? stageLabel(anchorStage) : null) ?? t('anchor.button', { id })}
+            </Button>
+          </ChainGuard>
+          {anchoring ? <TxStatus stage={anchorStage} /> : null}
+        </div>
+      ) : null}
 
       <Tabs defaultValue="name" className="mt-4">
         <TabsList className="w-full">
@@ -213,7 +258,7 @@ export function NFTOwnerActions({
                   value={name}
                   placeholder={currentName || t('namePlaceholder')}
                   autoComplete="off"
-                  disabled={isBusy}
+                  disabled={busy}
                   onChange={(event) => setName(truncateToBytes(event.target.value))}
                 />
               )}
@@ -224,7 +269,7 @@ export function NFTOwnerActions({
                   type="submit"
                   variant="secondary"
                   loading={pending === 'name'}
-                  disabled={!name.trim() || (isBusy && pending !== 'name')}
+                  disabled={!name.trim() || (busy && pending !== 'name')}
                   className="flex-1"
                 >
                   {busyLabel('name') ?? (named ? t('changeName') : t('setName'))}
@@ -234,7 +279,7 @@ export function NFTOwnerActions({
                     type="button"
                     variant="outline"
                     loading={pending === 'clear'}
-                    disabled={isBusy && pending !== 'clear'}
+                    disabled={busy && pending !== 'clear'}
                     onClick={() => void clearName()}
                   >
                     {busyLabel('clear') ?? t('clearName')}
@@ -272,7 +317,7 @@ export function NFTOwnerActions({
               error={recipientTouched ? recipient.error : null}
               check={check}
               reviewShown={recipient.address !== null}
-              disabled={isBusy}
+              disabled={busy}
             />
             {recipient.address ? (
               <TransferReview
@@ -292,7 +337,7 @@ export function NFTOwnerActions({
               <Button
                 type="submit"
                 loading={pending === 'transfer' || checkingRecipient}
-                disabled={isBusy && pending !== 'transfer'}
+                disabled={busy && pending !== 'transfer'}
                 className="w-full"
               >
                 {busyLabel('transfer') ??

@@ -37,6 +37,10 @@
       "name": "命名",
       "transfer": "转移"
     },
+    "anchor": {
+      "button": "锚定 {id}",
+      "note": "锚定后，这枚 NFT 将共享每个已收官周期的锚定派发。每枚 NFT 只能锚定一次，解锚后无法再次锚定。"
+    },
     "metaMaskTooltip": "请求 MetaMask 浏览器扩展显示这枚 NFT。NFT 导入仍为实验性功能，MetaMask 移动端暂不支持。",
     "addToMetaMask": "将 NFT 添加至 MetaMask",
     "addingToMetaMask": "正在添加 NFT…",
