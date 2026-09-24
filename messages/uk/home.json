@@ -686,7 +686,7 @@
       "positionWindowEnded": "Ваш ексклюзивний проміжок завершився",
       "goToFinalize": "Перейти до завершення",
       "thisCycle": "Цей цикл",
-      "gestures": "{count, plural, =0 {Жестів ще немає} one {# з {total} жестів} few {# з {total} жестів} many {# з {total} жестів} other {# з {total} жестів}}",
+      "gestures": "{count, plural, =0 {Ваших жестів ще немає} one {# з {total} жестів} few {# з {total} жестів} many {# з {total} жестів} other {# з {total} жестів}}",
       "share": "{percent} записів зоряного відбору",
       "updating": "Оновлюється після вашого жесту",
       "checkFailed": "Не вдалося перевірити",

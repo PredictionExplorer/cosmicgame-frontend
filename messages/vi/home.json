@@ -686,7 +686,7 @@
       "positionWindowEnded": "Khoảng thời gian dành riêng cho bạn đã kết thúc",
       "goToFinalize": "Đến phần hoàn tất",
       "thisCycle": "Chu kỳ này",
-      "gestures": "{count, plural, =0 {Chưa có nét bút} other {# trên {total} nét bút}}",
+      "gestures": "{count, plural, =0 {Bạn chưa có nét bút nào} other {# trên {total} nét bút}}",
       "share": "{percent} số mục Tinh tuyển",
       "updating": "Đang cập nhật sau nét bút của bạn",
       "checkFailed": "Không thể kiểm tra",

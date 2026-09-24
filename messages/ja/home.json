@@ -686,7 +686,7 @@
       "positionWindowEnded": "単独で確定できる時間は終わりました",
       "goToFinalize": "確定へ移動",
       "thisCycle": "このサイクル",
-      "gestures": "{count, plural, =0 {まだ一筆はありません} other {{total}筆中#筆}}",
+      "gestures": "{count, plural, =0 {まだ一筆を入れていません} other {{total}筆中#筆}}",
       "share": "星選エントリーの{percent}",
       "updating": "一筆を反映しています",
       "checkFailed": "確認できませんでした",

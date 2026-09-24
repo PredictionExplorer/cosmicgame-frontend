@@ -686,7 +686,7 @@
       "positionWindowEnded": "你的独享时段已结束",
       "goToFinalize": "前往收官",
       "thisCycle": "本周期",
-      "gestures": "{count, plural, =0 {尚未落笔} other {共 {total} 笔中的 # 笔}}",
+      "gestures": "{count, plural, =0 {你尚未落笔} other {共 {total} 笔中的 # 笔}}",
       "share": "占星选条目的 {percent}",
       "updating": "正在同步你的落笔",
       "checkFailed": "无法查询",

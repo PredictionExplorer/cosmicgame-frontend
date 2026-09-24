@@ -686,7 +686,7 @@
       "positionWindowEnded": "단독 마감 시간이 끝났습니다",
       "goToFinalize": "마감하러 가기",
       "thisCycle": "이번 사이클",
-      "gestures": "{count, plural, =0 {아직 제스처 없음} other {{total}개 중 #개}}",
+      "gestures": "{count, plural, =0 {남긴 제스처 없음} other {{total}개 중 #개}}",
       "share": "별빛 선정 참여 항목의 {percent}",
       "updating": "제스처 반영 중",
       "checkFailed": "확인하지 못했습니다",

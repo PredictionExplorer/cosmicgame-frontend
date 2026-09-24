@@ -553,7 +553,9 @@ export function StandingsLedger({
                 pending={endurance.isLive && !clockKnown}
                 caption={endurance.isLive ? tTables('specialAllocation.growingNow') : undefined}
               />
-            ) : null
+            ) : (
+              <UnknownValue label={tTables('specialAllocation.noEnduranceRecord')} />
+            )
           }
           allocation={
             <span className="type-figure-sm text-foreground">{t('standings.cstPlusNft')}</span>
@@ -574,7 +576,9 @@ export function StandingsLedger({
                 live={chrono.isLive}
                 caption={chrono.isLive ? tTables('specialAllocation.growingNow') : undefined}
               />
-            ) : null
+            ) : (
+              <UnknownValue label={tTables('specialAllocation.noChronoRecord')} />
+            )
           }
           allocation={
             chronoEth != null ? (

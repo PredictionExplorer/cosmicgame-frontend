@@ -224,6 +224,13 @@ describe('StandingsLedger', () => {
     expect(screen.getByTestId('final-cst-role-summary')).toHaveTextContent(
       'tables.specialAllocation.awaitingCstGesture',
     );
+    // An empty role never leaves its time held blank: a dash, with the reason for readers.
+    for (const testId of ['control-desk-endurance', 'chrono-role-summary']) {
+      const timeHeld = within(screen.getByTestId(testId)).getByText(
+        'home.observatory.ledger.columns.time',
+      ).nextElementSibling;
+      expect(timeHeld).toHaveTextContent('—');
+    }
   });
 
   it('has no accessibility violations', async () => {
