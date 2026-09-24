@@ -138,15 +138,15 @@
   },
   "missingCycle": {
     "open": {
-      "title": "Chu kỳ {cycle} vẫn đang diễn ra",
+      "title": "Chu kỳ #{cycle} vẫn đang diễn ra",
       "body": "Bản ghi phân bổ của chu kỳ sẽ xuất hiện ở đây sau khi chu kỳ hoàn tất."
     },
     "notStarted": {
-      "title": "Chu kỳ {cycle} chưa bắt đầu",
-      "body": "Các chu kỳ diễn ra lần lượt, và chu kỳ đang mở hiện nay là chu kỳ {live}."
+      "title": "Chu kỳ #{cycle} chưa bắt đầu",
+      "body": "Các chu kỳ diễn ra lần lượt, và chu kỳ đang mở hiện nay là chu kỳ #{live}."
     },
     "unknown": {
-      "title": "Chưa có bản ghi của chu kỳ {cycle}",
+      "title": "Chưa có bản ghi của chu kỳ #{cycle}",
       "body": "Chu kỳ có thể vẫn đang diễn ra, hoặc bản ghi vẫn đang được lập chỉ mục."
     },
     "currentCycle": "Theo dõi chu kỳ hiện tại"

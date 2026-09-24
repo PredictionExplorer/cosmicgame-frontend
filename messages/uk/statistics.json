@@ -253,10 +253,10 @@
     "cstAnchorDistributionDeposits": "Загальна кількість подій депозиту до пулу надходжень за закріплення Cosmic Signature NFT.",
     "cstTotalAnchorDistributions": "Загальна сума ETH, передана як надходження за закріплення власникам закріплень Cosmic Signature NFT.",
     "cstUnretrievedAnchorDistributions": "Надходження за закріплення, нараховані, але ще не забрані власниками закріплень Cosmic Signature NFT.",
-    "rwlkActiveAnchorHolders": "Гаманці, що зараз мають щонайменше один закріплений RandomWalk NFT.",
-    "rwlkTotalTokensImprinted": "Загальна кількість Cosmic Signature NFT і супровідних CST, закарбованих для власників закріплень RandomWalk NFT через зоряний відбір закріплених NFT.",
+    "rwlkActiveAnchorHolders": "Гаманці, що зараз мають щонайменше один закріплений Random Walk NFT.",
+    "rwlkTotalTokensImprinted": "Загальна кількість Cosmic Signature NFT і супровідних CST, закарбованих для власників закріплень Random Walk NFT через зоряний відбір закріплених NFT.",
     "cstGroup": "Закріплення Cosmic Signature NFT розділяє надходження за закріплення в ETH між зараз закріпленими Cosmic Signature NFT.",
-    "rwlkGroup": "Закріплення RandomWalk NFT дає право на розподіли зоряного відбору закріплених NFT."
+    "rwlkGroup": "Закріплення Random Walk NFT дає право на розподіли зоряного відбору закріплених NFT."
   },
   "activity": {
     "heading": "Активність жестів",
@@ -283,7 +283,7 @@
     "historyLink": "Переглянути історію закріплень",
     "tabs": {
       "cosmicSignature": "Cosmic Signature NFT",
-      "randomWalk": "RandomWalk NFT",
+      "randomWalk": "Random Walk NFT",
       "label": "Колекція NFT"
     },
     "groups": {
@@ -292,7 +292,7 @@
     },
     "stats": {
       "activeHoldersCosmicSignature": "Активні власники закріплених Cosmic Signature NFT",
-      "activeHoldersRandomWalk": "Активні власники закріплених RandomWalk NFT",
+      "activeHoldersRandomWalk": "Активні власники закріплених Random Walk NFT",
       "distributionDeposits": "Кількість депозитів надходжень за закріплення",
       "totalDistributions": "Усього надходжень за закріплення",
       "tokensImprinted": "Закарбовані Cosmic Signature NFT",
