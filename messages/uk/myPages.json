@@ -121,6 +121,7 @@
         "title": "Жести",
         "largest": "Найбільший жест в ETH",
         "firstCycle": "Перший цикл",
+        "firstCycleValue": "Цикл {cycle}",
         "latest": "Останній жест"
       },
       "stellarSelection": {
@@ -128,7 +129,7 @@
         "ethSelections": "Відбори ETH",
         "ethAllocated": "Розподілено ETH",
         "ethRetrieved": "Забрано ETH",
-        "nfts": "Закарбовано NFT"
+        "nfts": "Відібрано NFT"
       },
       "nfts": {
         "title": "Cosmic Signature NFT",

@@ -1,5 +1,6 @@
 'use client';
 
+import { useId } from 'react';
 import { useTranslations } from 'next-intl';
 
 import type { SelectionShare as SelectionShareFigures } from '@/lib/selectionStanding';
@@ -29,17 +30,15 @@ export function SelectionShare({
 }: SelectionShareProps) {
   const t = useTranslations('myPages');
   const format = useFormat();
+  const titleId = useId();
   const percent = format.percent(share.share, { scale: 'ratio' });
 
   return (
     <section
-      aria-labelledby="selection-share-title"
+      aria-labelledby={titleId}
       className="rounded-surface bg-surface-sunken px-5 py-5 sm:px-6"
     >
-      <h2
-        id="selection-share-title"
-        className="flex items-center gap-2 type-label text-subtle [&_svg]:size-4"
-      >
+      <h2 id={titleId} className="flex items-center gap-2 type-label text-subtle [&_svg]:size-4">
         <StellarSelectionIcon aria-hidden />
         {t('statistics.selection.title', { cycle })}
       </h2>

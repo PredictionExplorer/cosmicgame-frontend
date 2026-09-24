@@ -121,6 +121,7 @@
         "title": "落筆",
         "largest": "最大一筆 ETH 落筆",
         "firstCycle": "首個週期",
+        "firstCycleValue": "第 {cycle} 個週期",
         "latest": "最近落筆"
       },
       "stellarSelection": {
@@ -128,7 +129,7 @@
         "ethSelections": "ETH 星選次數",
         "ethAllocated": "已分配 ETH",
         "ethRetrieved": "已取回 ETH",
-        "nfts": "已銘刻 NFT"
+        "nfts": "星選 NFT"
       },
       "nfts": {
         "title": "Cosmic Signature NFT",

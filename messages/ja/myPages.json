@@ -121,6 +121,7 @@
         "title": "一筆",
         "largest": "最大のETHの一筆",
         "firstCycle": "最初のサイクル",
+        "firstCycleValue": "サイクル{cycle}",
         "latest": "直近の一筆"
       },
       "stellarSelection": {
@@ -128,7 +129,7 @@
         "ethSelections": "ETHの星選回数",
         "ethAllocated": "配分されたETH",
         "ethRetrieved": "受け取ったETH",
-        "nfts": "刻印されたNFT"
+        "nfts": "星選のNFT"
       },
       "nfts": {
         "title": "Cosmic Signature NFT",

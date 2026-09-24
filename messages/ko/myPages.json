@@ -121,6 +121,7 @@
         "title": "제스처",
         "largest": "최대 ETH 제스처",
         "firstCycle": "첫 사이클",
+        "firstCycleValue": "사이클 {cycle}",
         "latest": "최근 제스처"
       },
       "stellarSelection": {
@@ -128,7 +129,7 @@
         "ethSelections": "ETH 선정 횟수",
         "ethAllocated": "배분된 ETH",
         "ethRetrieved": "회수한 ETH",
-        "nfts": "각인된 NFT"
+        "nfts": "선정된 NFT"
       },
       "nfts": {
         "title": "Cosmic Signature NFT",

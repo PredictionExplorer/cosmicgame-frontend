@@ -121,6 +121,7 @@
         "title": "Gestures",
         "largest": "Largest ETH gesture",
         "firstCycle": "First cycle",
+        "firstCycleValue": "Cycle {cycle}",
         "latest": "Latest gesture"
       },
       "stellarSelection": {
@@ -128,7 +129,7 @@
         "ethSelections": "ETH selections",
         "ethAllocated": "ETH allocated",
         "ethRetrieved": "ETH retrieved",
-        "nfts": "NFTs imprinted"
+        "nfts": "NFTs selected"
       },
       "nfts": {
         "title": "Cosmic Signature NFTs",

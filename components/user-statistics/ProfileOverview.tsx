@@ -64,7 +64,8 @@ export function ProfileOverview({
               gestures.firstCycle === null ? (
                 <UnknownValue label={tCommon('status.unavailable')} />
               ) : (
-                tCommon('pageHeader.crumbs.cycle', { cycle: gestures.firstCycle })
+                // "Cycle 0", as the profile's badges and pool name a cycle.
+                t('statistics.overview.gestures.firstCycleValue', { cycle: gestures.firstCycle })
               )
             }
           />

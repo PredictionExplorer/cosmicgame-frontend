@@ -121,6 +121,7 @@
         "title": "Nét bút",
         "largest": "Nét bút ETH lớn nhất",
         "firstCycle": "Chu kỳ đầu tiên",
+        "firstCycleValue": "Chu kỳ {cycle}",
         "latest": "Nét bút gần nhất"
       },
       "stellarSelection": {
@@ -128,7 +129,7 @@
         "ethSelections": "Lượt chọn ETH",
         "ethAllocated": "ETH được phân bổ",
         "ethRetrieved": "ETH đã nhận về",
-        "nfts": "NFT đã khắc"
+        "nfts": "NFT qua Tinh tuyển"
       },
       "nfts": {
         "title": "Cosmic Signature NFT",
