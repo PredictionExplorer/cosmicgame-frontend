@@ -49,6 +49,8 @@ export interface EthAllocationsTableProps {
   emptyTitle?: string;
   emptyDescription?: string;
   emptyAction?: ReactNode;
+  /** The concept the empty state is about (the Stellar Selection mark on its own page). */
+  emptyIcon?: ReactNode;
   headingLevel?: 2 | 3 | 4;
   className?: string;
 }

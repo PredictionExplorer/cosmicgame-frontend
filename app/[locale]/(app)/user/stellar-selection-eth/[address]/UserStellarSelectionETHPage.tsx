@@ -27,7 +27,7 @@ import { useClaimAllocations } from '@/hooks/useClaimAllocations';
 import { useFormat } from '@/hooks/useFormat';
 import { useTxStageLabel } from '@/hooks/useTxStageLabel';
 import { useActiveWeb3React } from '@/hooks/web3';
-import { RetrieveIcon } from '@/lib/conceptIcons';
+import { RetrieveIcon, StellarSelectionIcon } from '@/lib/conceptIcons';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import { sameAddress } from '@/utils/format';
 
@@ -134,6 +134,7 @@ const UserStellarSelectionETHPage = ({ address: rawAddress }: { address: string 
         headingLevel={2}
         emptyTitle={t('stellarSelectionEth.emptyTitle')}
         emptyDescription={t('stellarSelectionEth.emptyDescription')}
+        emptyIcon={<StellarSelectionIcon aria-hidden className="size-6" />}
         emptyAction={
           <Link
             href={STELLAR_SELECTION_FAQ_HREF}
