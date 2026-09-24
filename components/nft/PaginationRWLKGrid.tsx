@@ -6,7 +6,7 @@ import { formatId } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
 import { Input } from '@/components/ui/input';
-import { Spinner } from '@/components/ui/spinner';
+import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import {
   Pagination,
@@ -30,6 +30,16 @@ interface PaginationRWLKGridProps {
    * labelled "Your Random Walk NFTs".
    */
   labelledBy?: string;
+}
+
+/** The grid's columns: the loading skeleton draws the same grid the tokens fill. */
+function gridClass(compact: boolean): string {
+  return cn(
+    'grid grid-cols-2',
+    compact
+      ? 'gap-3 @min-[30rem]/rwlk:grid-cols-3 @min-[48rem]/rwlk:grid-cols-4 @min-[64rem]/rwlk:grid-cols-6'
+      : 'gap-8 md:grid-cols-3',
+  );
 }
 
 function getPaginationRange(current: number, total: number): (number | 'ellipsis')[] {
@@ -81,17 +91,24 @@ const PaginationRWLKGrid: FC<PaginationRWLKGridProps> = ({
     currentPage * itemsPerPage,
   );
 
-  // Nothing to search until the wallet's NFTs are read, and nothing to
+  // Nothing to search until the wallet's NFTs are read: the grid's own shape
+  // waits in skeleton cards, so nothing jumps when the tokens land. Nothing to
   // search when it holds none: then one sentence says so, and where to get one.
   if (loading) {
     return (
       <div
         role="status"
-        className={cn('flex items-center gap-2', compact ? 'mt-3' : 'mt-8')}
+        className={cn('@container/rwlk', compact ? 'mt-3' : 'mt-8')}
         data-testid="rwlk-loading"
       >
-        <Spinner className="size-4" aria-hidden />
-        <span className="type-caption text-subtle">{t('rwlkGrid.loading')}</span>
+        <span className="sr-only">{t('rwlkGrid.loading')}</span>
+        <div aria-hidden className={gridClass(compact)}>
+          {Array.from({ length: itemsPerPage }, (_, index) => (
+            <div key={index} className="overflow-hidden rounded-lg border border-border">
+              <Skeleton className="w-full rounded-none pt-[64%]" />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -138,12 +155,7 @@ const PaginationRWLKGrid: FC<PaginationRWLKGridProps> = ({
             role="group"
             aria-labelledby={labelledBy}
             aria-label={labelledBy ? undefined : t('form.rwlk.title')}
-            className={cn(
-              'grid grid-cols-2',
-              compact
-                ? 'gap-3 @min-[30rem]/rwlk:grid-cols-3 @min-[48rem]/rwlk:grid-cols-4 @min-[64rem]/rwlk:grid-cols-6'
-                : 'gap-8 md:grid-cols-3',
-            )}
+            className={gridClass(compact)}
           >
             {paginatedItems.map((tokenId) => {
               const selected = tokenId === selectedToken;

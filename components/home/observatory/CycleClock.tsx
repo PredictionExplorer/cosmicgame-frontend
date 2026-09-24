@@ -10,6 +10,7 @@ import { Amount } from '@/components/ui/amount';
 import { Button } from '@/components/ui/button';
 import { Duration } from '@/components/ui/duration';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
+import { useHydrated } from '@/hooks/useHydrated';
 import { Term } from '@/components/ui/term';
 import { UnknownValue } from '@/components/ui/unknown-value';
 import { ChainGuard } from '@/components/wallet/NetworkGuard';
@@ -91,16 +92,31 @@ function clockGroups({ days, hours, minutes, seconds }: CountdownRenderProps): C
 }
 
 /**
+ * Ticks the server-rendered figures until React takes over. The page is
+ * statically regenerated, so its HTML carries a countdown read up to a few
+ * seconds before it was served, and on a slow phone hydration can take
+ * several more: without this the clock sat frozen, then jumped. The script
+ * runs where it stands (right after the figures), recomputes each group from
+ * the deadline every second, and stops once the figures say they are
+ * hydrated. It exists only in the server HTML: a client-side render never
+ * creates it, since React ticks from the first frame.
+ */
+export const PREHYDRATION_TICK = `(function(){var s=document.currentScript,e=s&&s.previousElementSibling;if(!e)return;var t=Number(e.getAttribute('data-deadline'));if(!(t>0))return;var i=0;function k(){if(e.hasAttribute('data-hydrated')){clearInterval(i);return}var r=Math.max(0,t-Date.now()),v={days:Math.floor(r/864e5),hours:Math.floor(r%864e5/36e5),minutes:Math.floor(r%36e5/6e4),seconds:Math.floor(r%6e4/1e3)},n=e.querySelectorAll('[data-unit]');for(var j=0;j<n.length;j++){var u=n[j].getAttribute('data-unit');if(u in v)n[j].textContent=String(v[u]).padStart(2,'0')}if(r<=0)clearInterval(i)}i=setInterval(k,1000);k()})();`;
+
+/**
  * The clock as type: tabular Inter figures with hairline colons and a
  * localized caption unit under each group. No tiles, rings or glows.
  */
-function ClockFigures(props: CountdownRenderProps) {
+function ClockFigures({ deadlineMs, ...props }: CountdownRenderProps & { deadlineMs: number }) {
   const t = useTranslations('home.observatory.clock.unitLabels');
   const groups = clockGroups(props);
+  const hydrated = useHydrated();
 
   return (
     <div
       data-testid="clock-figures"
+      data-deadline={deadlineMs}
+      data-hydrated={hydrated || undefined}
       // The size goes first: tailwind-merge drops a leading-* that precedes a
       // text-[size], and the digits must set solid (line-height 1).
       className={cn(
@@ -116,17 +132,17 @@ function ClockFigures(props: CountdownRenderProps) {
             </span>
           )}
           <span className="flex flex-col items-center">
-            <span>{String(group.value).padStart(2, '0')}</span>
+            {/* The pre-hydration tick may already have moved these digits on;
+                React's first render keeps the server value it reconciles. */}
+            <span data-unit={group.id} suppressHydrationWarning>
+              {String(group.value).padStart(2, '0')}
+            </span>
             <span className="type-caption mt-1 tracking-normal text-subtle">{t(group.id)}</span>
           </span>
         </Fragment>
       ))}
     </div>
   );
-}
-
-function renderClockFigures(props: CountdownRenderProps) {
-  return <ClockFigures {...props} />;
 }
 
 function renderWindowCountdown({ total }: CountdownRenderProps) {
@@ -169,6 +185,7 @@ export function CycleClock({
   const t = useTranslations('home');
   const tCommon = useTranslations('common');
   const locale = useLocale();
+  const hydrated = useHydrated();
 
   const cycleState = getCycleState({
     data,
@@ -242,12 +259,17 @@ export function CycleClock({
       >
         <div className="w-full">
           {showCountdown ? (
-            <SmoothCountdown
-              date={targetMs}
-              initialNowMs={now}
-              renderer={renderClockFigures}
-              intervalMs={1000}
-            />
+            <>
+              <SmoothCountdown
+                date={targetMs}
+                initialNowMs={now}
+                renderer={(props) => <ClockFigures {...props} deadlineMs={targetMs} />}
+                intervalMs={1000}
+              />
+              {/* Server HTML and hydration only: a client-side render ticks
+                  from its first frame, and never creates a script. */}
+              {!hydrated && <script dangerouslySetInnerHTML={{ __html: PREHYDRATION_TICK }} />}
+            </>
           ) : (
             <p
               data-testid="clock-display"

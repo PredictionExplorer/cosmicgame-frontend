@@ -1,8 +1,11 @@
 import userEvent from '@testing-library/user-event';
+import { renderToString } from 'react-dom/server';
+
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 import { render, screen, within, checkA11y } from '@/test-utils';
 
-import { CycleClock } from '../CycleClock';
+import { CycleClock, PREHYDRATION_TICK } from '../CycleClock';
 
 const HOLDER = '0x1111111111111111111111111111111111111111';
 const OTHER = '0x2222222222222222222222222222222222222222';
@@ -80,6 +83,65 @@ describe('CycleClock', () => {
     expect(
       within(figures).getByText('home.observatory.clock.unitLabels.hours'),
     ).toBeInTheDocument();
+  });
+
+  it('ships a tick script after the figures in the server HTML, so the clock never sits frozen', () => {
+    const allocationTime = Date.now() + 5 * 60_000;
+    const html = renderToString(
+      <TooltipProvider>
+        <CycleClock {...baseProps} allocationTime={allocationTime} />
+      </TooltipProvider>,
+    );
+    const container = document.createElement('div');
+    container.innerHTML = html;
+    const figures = container.querySelector('[data-testid="clock-figures"]')!;
+    expect(figures).toHaveAttribute('data-deadline', String(allocationTime));
+    expect(figures).not.toHaveAttribute('data-hydrated');
+    expect(figures.querySelectorAll('[data-unit]')).toHaveLength(3);
+    const script = figures.nextElementSibling;
+    expect(script?.tagName).toBe('SCRIPT');
+    expect(script?.innerHTML).toBe(PREHYDRATION_TICK);
+  });
+
+  it('never creates the script in a client render, where React ticks from the first frame', () => {
+    render(<CycleClock {...baseProps} allocationTime={Date.now() + 5 * 60_000} />);
+    const figures = screen.getByTestId('clock-figures');
+    expect(figures).toHaveAttribute('data-hydrated', 'true');
+    expect(screen.getByTestId('cycle-clock').querySelector('script')).toBeNull();
+  });
+
+  it('ticks the server-rendered figures from the deadline until hydration, then stops', () => {
+    jest.useFakeTimers();
+    const container = document.createElement('div');
+    try {
+      jest.setSystemTime(1_000_000);
+      // 1d 1h 1m 1s before the deadline.
+      container.innerHTML =
+        `<div id="figures" data-deadline="${1_000_000 + 90_061_000}">` +
+        '<span data-unit="days">09</span><span data-unit="hours">09</span>' +
+        '<span data-unit="minutes">09</span><span data-unit="seconds">09</span></div>' +
+        '<script id="tick"></script>';
+      document.body.append(container);
+      const script = container.querySelector('#tick');
+      Object.defineProperty(document, 'currentScript', { configurable: true, get: () => script });
+      new Function(PREHYDRATION_TICK)();
+
+      const figures = container.querySelector('#figures')!;
+      const digits = () => [...figures.querySelectorAll('[data-unit]')].map((n) => n.textContent);
+      // The first paint already reads the time left now, not when the page was built.
+      expect(digits()).toEqual(['01', '01', '01', '01']);
+      jest.advanceTimersByTime(2_000);
+      expect(digits()).toEqual(['01', '01', '00', '59']);
+
+      // Once React has the figures, the script leaves them alone.
+      figures.setAttribute('data-hydrated', 'true');
+      jest.advanceTimersByTime(3_000);
+      expect(digits()).toEqual(['01', '01', '00', '59']);
+    } finally {
+      Reflect.deleteProperty(document, 'currentScript');
+      container.remove();
+      jest.useRealTimers();
+    }
   });
 
   it('puts the alerts control beside the heading it is about', () => {

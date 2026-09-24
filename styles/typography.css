@@ -133,6 +133,8 @@
   font-weight: 600;
   letter-spacing: -0.005em;
   overflow-wrap: break-word;
+  /* A heading that wraps never strands its last word (translations run longer). */
+  text-wrap: pretty;
 }
 
 /* Panel, card and dialog titles. */
@@ -143,6 +145,7 @@
   font-weight: 600;
   letter-spacing: -0.005em;
   overflow-wrap: break-word;
+  text-wrap: pretty;
 }
 
 /* ── Reading text ─────────────────────────────────────────────────────── */
