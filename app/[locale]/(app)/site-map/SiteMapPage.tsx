@@ -32,9 +32,12 @@ export interface SiteMapArticle {
   readonly title: string;
 }
 
-/** Phones: a compact two-column row, name only. From 640px: icon, name and description. */
+/**
+ * Phones: a compact two-column row, name only, a long single word (GeckoTerminal)
+ * breaking rather than overflowing its half. From 640px: icon, name and description.
+ */
 const ROW_CLASS =
-  'group/row flex min-h-11 items-center gap-3 rounded-control px-2 py-1.5 no-underline transition-colors duration-150 hover:bg-muted sm:min-h-0 sm:px-3 sm:py-2';
+  'group/row flex min-h-11 items-center gap-3 rounded-control px-2 py-1.5 no-underline transition-colors duration-150 [overflow-wrap:anywhere] hover:bg-muted sm:min-h-0 sm:px-3 sm:py-2 sm:[overflow-wrap:normal]';
 
 /** Phones drop the row's icon and description, so two names fit side by side. */
 const ROW_ICON_CLASS = 'max-sm:hidden';

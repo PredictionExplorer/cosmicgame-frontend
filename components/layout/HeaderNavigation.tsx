@@ -348,54 +348,60 @@ function HeaderPanel({
         style={shift ? { transform: `translateX(${shift}px)` } : undefined}
         className="absolute left-0 top-full z-50 w-[min(42rem,calc(100vw-2rem))] rounded-surface border border-rule bg-popover p-2 text-popover-foreground shadow-float"
       >
-        <div className="grid gap-x-2 gap-y-1 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
-          <ul onKeyDown={onColumnKeyDown}>
-            {entriesByHost(panel.primary).map((run, runIndex) => (
-              <Fragment key={`${run.host}-${runIndex}`}>
-                {run.host === 'landing' ? (
-                  <li className="px-2.5 pb-1 pt-2.5">
-                    <HostDivider label={siteHostLabel('landing')} />
-                  </li>
-                ) : null}
-                {run.entries.map((entry) => (
-                  <Fragment key={`${entry.kind}-${entry.id}`}>
-                    <PanelEntry entry={entry} location={location} />
-                    {panel.id === 'explore' &&
-                    entry.kind === 'route' &&
-                    entry.id === 'statistics' ? (
-                      <>
-                        <StatisticsChips location={location} />
-                        <PanelSearch
-                          onOpenSearch={() => {
-                            close(false);
-                            onOpenSearch();
-                          }}
-                        />
-                      </>
+        {/* The links render only while open: the footer and the site map are
+            the server-rendered paths to the same pages. */}
+        {open ? (
+          <>
+            <div className="grid gap-x-2 gap-y-1 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+              <ul onKeyDown={onColumnKeyDown}>
+                {entriesByHost(panel.primary).map((run, runIndex) => (
+                  <Fragment key={`${run.host}-${runIndex}`}>
+                    {run.host === 'landing' ? (
+                      <li className="px-2.5 pb-1 pt-2.5">
+                        <HostDivider label={siteHostLabel('landing')} />
+                      </li>
                     ) : null}
+                    {run.entries.map((entry) => (
+                      <Fragment key={`${entry.kind}-${entry.id}`}>
+                        <PanelEntry entry={entry} location={location} />
+                        {panel.id === 'explore' &&
+                        entry.kind === 'route' &&
+                        entry.id === 'statistics' ? (
+                          <>
+                            <StatisticsChips location={location} />
+                            <PanelSearch
+                              onOpenSearch={() => {
+                                close(false);
+                                onOpenSearch();
+                              }}
+                            />
+                          </>
+                        ) : null}
+                      </Fragment>
+                    ))}
                   </Fragment>
                 ))}
-              </Fragment>
-            ))}
-          </ul>
-          <div className="md:border-l md:border-rule-faint md:pl-2">
-            <p id={secondaryHeadingId} className="type-eyebrow px-2.5 pb-1.5 pt-2 text-subtle">
-              {copy.sectionTitle(panel.secondary.section)}
-            </p>
-            <ul aria-labelledby={secondaryHeadingId} onKeyDown={onColumnKeyDown}>
-              {panel.secondary.entries.map((entry) => (
-                <PanelEntry
-                  key={`${entry.kind}-${entry.id}`}
-                  entry={entry}
-                  location={location}
-                  withDescription={panel.id === 'learn'}
-                />
-              ))}
-            </ul>
-          </div>
-        </div>
-        <hr className="-mx-2 my-2 border-rule-faint" />
-        <PanelOutbound panel={panel} />
+              </ul>
+              <div className="md:border-l md:border-rule-faint md:pl-2">
+                <p id={secondaryHeadingId} className="type-eyebrow px-2.5 pb-1.5 pt-2 text-subtle">
+                  {copy.sectionTitle(panel.secondary.section)}
+                </p>
+                <ul aria-labelledby={secondaryHeadingId} onKeyDown={onColumnKeyDown}>
+                  {panel.secondary.entries.map((entry) => (
+                    <PanelEntry
+                      key={`${entry.kind}-${entry.id}`}
+                      entry={entry}
+                      location={location}
+                      withDescription={panel.id === 'learn'}
+                    />
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <hr className="-mx-2 my-2 border-rule-faint" />
+            <PanelOutbound panel={panel} />
+          </>
+        ) : null}
       </div>
     </li>
   );

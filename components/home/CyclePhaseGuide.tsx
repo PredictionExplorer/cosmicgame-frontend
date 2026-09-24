@@ -86,6 +86,7 @@ export function CyclePhaseGuide({ phase, cycleLinks, className }: CyclePhaseGuid
           fades out before the edge instead of ending at the border. */}
       <ScrollRail
         activeSelector='[aria-current="step"]'
+        label={t('phaseGuide.timelineAria')}
         className="mt-4"
         trackClassName="max-lg:snap-x max-lg:snap-mandatory lg:flex-col lg:overflow-visible"
       >

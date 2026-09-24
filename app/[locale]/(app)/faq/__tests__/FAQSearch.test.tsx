@@ -56,12 +56,12 @@ describe('FAQSearch', () => {
     expect(screen.getByRole('status')).toBeEmptyDOMElement();
   });
 
-  it('focuses the field on "/"', () => {
+  it('claims no "/" shortcut, which could not be turned off (WCAG 2.1.4)', () => {
     render(<FAQSearch value="" onChange={jest.fn()} />);
     const event = new KeyboardEvent('keydown', { key: '/', cancelable: true });
     document.dispatchEvent(event);
-    expect(document.activeElement).toBe(input());
-    expect(event.defaultPrevented).toBe(true);
+    expect(document.activeElement).not.toBe(input());
+    expect(event.defaultPrevented).toBe(false);
   });
 
   it('leaves Cmd+K and Ctrl+K to the site-wide command palette', () => {

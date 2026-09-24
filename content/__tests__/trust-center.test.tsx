@@ -93,7 +93,7 @@ describe('Trust Center template', () => {
     (page, renderPage) => {
       render(renderPage('en'));
       expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
-      const tabs = screen.getByRole('navigation', { name: 'common.pageHeader.sections.trust' });
+      const tabs = screen.getByRole('navigation', { name: 'nav.sections.trust' });
       expect(within(tabs).getAllByRole('link')).toHaveLength(5);
       expect(within(tabs).getByRole('link', { current: 'page' })).toBeInTheDocument();
       const date = TRUST_DOCUMENT_DATES[page as keyof typeof TRUST_DOCUMENT_DATES];

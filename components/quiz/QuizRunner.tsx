@@ -246,6 +246,10 @@ export function QuizRunner({
         advance();
         return;
       }
+      // A digit answers only while the question has focus (it takes focus with every new
+      // question), so a stray digit elsewhere, typed or heard by speech input, never records
+      // an answer that cannot be changed (WCAG 2.1.4).
+      if (!questionRef.current?.contains(document.activeElement)) return;
       const digit = Number.parseInt(event.key, 10);
       const option = digit >= 1 && digit <= 4 ? current.options[digit - 1] : undefined;
       if (option) {
