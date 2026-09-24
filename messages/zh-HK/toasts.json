@@ -147,13 +147,6 @@
     "failed": "銘刻未完成。請檢查錢包與網絡後重試。",
     "imprinting": "銘刻中…"
   },
-  "admin": {
-    "gestureBan": {
-      "banned": "落筆已成功屏蔽。",
-      "unbanned": "落筆已取消屏蔽。",
-      "failed": "未能更新落筆審核狀態，請重試。"
-    }
-  },
   "regionLabel": "通知",
   "close": "關閉通知",
   "tx": {

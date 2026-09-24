@@ -147,13 +147,6 @@
     "failed": "Imprint didn't go through. Check your wallet and network, then try again.",
     "imprinting": "Imprinting..."
   },
-  "admin": {
-    "gestureBan": {
-      "banned": "Gesture was banned successfully!",
-      "unbanned": "Gesture was unbanned successfully!",
-      "failed": "An error occurred"
-    }
-  },
   "regionLabel": "Notifications",
   "close": "Close notification",
   "tx": {

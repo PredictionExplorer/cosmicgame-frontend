@@ -147,13 +147,6 @@
     "failed": "Chưa khắc được. Hãy kiểm tra ví và mạng, rồi thử lại.",
     "imprinting": "Đang khắc…"
   },
-  "admin": {
-    "gestureBan": {
-      "banned": "Đã chặn nét bút.",
-      "unbanned": "Đã bỏ chặn nét bút.",
-      "failed": "Đã xảy ra lỗi"
-    }
-  },
   "regionLabel": "Thông báo",
   "close": "Đóng thông báo",
   "tx": {

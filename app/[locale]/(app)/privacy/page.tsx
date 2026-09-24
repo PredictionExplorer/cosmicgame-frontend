@@ -1,6 +1,8 @@
 import type { Metadata, ResolvingMetadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
+import { getLegalDocumentLabels } from '@/content/legal/labels';
+
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd } from '@/utils/jsonLd';
 import { createPageMetadata } from '@/utils/seo';
@@ -30,7 +32,10 @@ export async function generateMetadata(
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const legal = await getTranslations({ locale, namespace: 'legal' });
+  const [legal, labels] = await Promise.all([
+    getTranslations({ locale, namespace: 'legal' }),
+    getLegalDocumentLabels(locale),
+  ]);
 
   return (
     <>
@@ -49,7 +54,7 @@ export default async function Page({ params }: PageProps) {
           localeHref(APP_ORIGIN, '/', locale),
         )}
       />
-      <PrivacyPage locale={locale} />
+      <PrivacyPage locale={locale} labels={labels} />
     </>
   );
 }

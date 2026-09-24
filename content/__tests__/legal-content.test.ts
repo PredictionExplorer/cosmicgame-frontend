@@ -1,16 +1,32 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { getAuditsCopy, getRiskCopy, getSecurityCopy } from '@/content/legal';
+import {
+  getAuditsCopy,
+  getPrivacyCopy,
+  getRiskCopy,
+  getSecurityCopy,
+  getTermsCopy,
+} from '@/content/legal';
+import { LEGAL_LINKS, isLegalLinkId } from '@/content/legal/links';
 import { privacyCopyEn } from '@/content/legal/PrivacyContent.en';
 import { privacyCopyZh } from '@/content/legal/PrivacyContent.zh';
 import type { PrivacyCopy } from '@/content/legal/PrivacyContent';
+import {
+  activePrivacyStorage,
+  ATTENTION_STORAGE_KEY,
+  EXPLAINER_STORAGE_KEY,
+  OBSERVATORY_VISITED_STORAGE_KEY,
+} from '@/content/legal/privacyInventory';
+import { RISK_GROUP_IDS } from '@/content/legal/RiskContent';
 import { termsCopyEn } from '@/content/legal/TermsContent.en';
 import { termsCopyZh } from '@/content/legal/TermsContent.zh';
-import type { TrustPageCopy } from '@/content/legal/TrustPageContent';
-import { TRUST_DOCUMENT_DATES } from '@/content/legal/trustCenter';
+import { TERMS_ALLOCATION_ROWS } from '@/content/legal/termsAllocations';
+import { TRUST_CENTER_PAGES, TRUST_DOCUMENT_DATES } from '@/content/legal/trustCenter';
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { richTextLinks } from '@/components/legal/RichText';
+import { ATTENTION_STORAGE_KEY as HOOK_ATTENTION_KEY } from '@/hooks/useAttentionPreferences';
 import { routing } from '@/i18n/routing';
 
 /** A locale's Trust Center tab labels (`legal.breadcrumbs`). */
@@ -21,58 +37,76 @@ function trustTabLabels(locale: string): Record<'security' | 'audits' | 'risk', 
   return legal.breadcrumbs;
 }
 
-function termsStructure(copy: typeof termsCopyEn | typeof termsCopyZh) {
-  return {
-    sections: copy.sections.map((section) => ({
-      id: section.id,
-      items: section.content.map((item) => item.id),
-    })),
-    additional: copy.additional.map((item) => item.id),
-  };
+/** Every string in a copy object, with its path, in a stable order. */
+function strings(value: unknown, path = ''): [string, string][] {
+  if (typeof value === 'string') return [[path, value]];
+  if (Array.isArray(value))
+    return value.flatMap((item, index) => strings(item, `${path}[${index}]`));
+  if (value && typeof value === 'object') {
+    return Object.entries(value).flatMap(([key, item]) => strings(item, `${path}.${key}`));
+  }
+  return [];
 }
 
-function privacyStructure(copy: typeof privacyCopyEn | typeof privacyCopyZh) {
-  return {
-    introduction: copy.introduction.length,
-    sections: copy.sections.map((section) => ({
-      id: section.id,
-      items: section.content.map((item) => item.id),
-    })),
-    additional: copy.additional.map((item) => item.id),
-  };
+/** The shape of a copy object: every path, without its text. */
+function shape(value: unknown): string[] {
+  return strings(value)
+    .map(([path]) => path)
+    .sort();
 }
 
-function trustPageStructure(copy: TrustPageCopy) {
-  return copy.sections.map((section) => ({
-    paragraphs: section.paragraphs?.length ?? 0,
-    bullets: section.bullets?.length ?? 0,
-    linkParagraph: section.linkParagraph
-      ? { kind: section.linkParagraph.kind, href: section.linkParagraph.href }
-      : null,
-    hasNote: Boolean(section.note),
-    links: section.links?.map((link) => ({ kind: link.kind, href: link.href })) ?? [],
-  }));
-}
+const GETTERS = {
+  security: getSecurityCopy,
+  audits: getAuditsCopy,
+  risk: getRiskCopy,
+  terms: getTermsCopy,
+  privacy: getPrivacyCopy,
+} as const;
+
+const TRANSLATED = routing.locales.filter((locale) => locale !== routing.defaultLocale);
+
+/** Strips link tags, for assertions about the words. */
+const plain = (text: string | undefined) => (text ?? '').replace(/<\/?\w+>/g, '');
 
 describe('localized legal content', () => {
-  it('keeps Terms clause structure in exact parity', () => {
-    expect(termsStructure(termsCopyZh)).toEqual(termsStructure(termsCopyEn));
-    expect(termsCopyZh.title).toBe('服务条款');
-  });
+  it.each(Object.entries(GETTERS))(
+    '%s: every locale has the same structure as English',
+    (_page, getCopy) => {
+      const english = shape(getCopy('en'));
+      for (const locale of TRANSLATED) {
+        expect({ locale, shape: shape(getCopy(locale)) }).toEqual({ locale, shape: english });
+      }
+    },
+  );
 
-  it('keeps Privacy clause structure in exact parity', () => {
-    expect(privacyStructure(privacyCopyZh)).toEqual(privacyStructure(privacyCopyEn));
-    expect(privacyCopyZh.title).toBe('隐私政策');
-  });
+  it.each(Object.entries(GETTERS))(
+    '%s: every link tag is known and each string links what English links',
+    (_page, getCopy) => {
+      const english = new Map(strings(getCopy('en')));
+      for (const locale of routing.locales) {
+        for (const [path, text] of strings(getCopy(locale))) {
+          const tags = richTextLinks(text);
+          for (const tag of tags)
+            expect({ locale, path, tag, known: isLegalLinkId(tag) }).toEqual({
+              locale,
+              path,
+              tag,
+              known: true,
+            });
+          expect({ locale, path, tags: [...tags].sort() }).toEqual({
+            locale,
+            path,
+            tags: [...richTextLinks(english.get(path) ?? '')].sort(),
+          });
+        }
+      }
+    },
+  );
 
-  it('keeps trust-page structure (sections, hrefs, link kinds) in exact parity', () => {
-    for (const getCopy of [getAuditsCopy, getSecurityCopy, getRiskCopy]) {
-      expect(trustPageStructure(getCopy('zh'))).toEqual(trustPageStructure(getCopy('en')));
+  it('keeps the link ids the copy may name in one registry', () => {
+    for (const target of Object.values(LEGAL_LINKS)) {
+      expect(target.href).toMatch(/^(\/|https:\/\/|mailto:)/);
     }
-    // The H1 is the page name; the brand stays in <title> and JSON-LD.
-    expect(getAuditsCopy('zh').title).toBe('审计');
-    expect(getSecurityCopy('zh').title).toBe('安全');
-    expect(getRiskCopy('zh').title).toBe('风险披露');
   });
 
   it('titles every trust page with its Trust Center tab label, in every locale', () => {
@@ -82,31 +116,119 @@ describe('localized legal content', () => {
       expect(getAuditsCopy(locale).title).toBe(legal.audits);
       expect(getRiskCopy(locale).title).toBe(legal.risk);
     }
+    expect(termsCopyZh.title).toBe('服务条款');
+    expect(privacyCopyZh.title).toBe('隐私政策');
   });
 
-  it('preserves Terms protocol facts and legal dates', () => {
-    const chineseTerms = JSON.stringify(termsCopyZh);
-    expect(chineseTerms).toContain(
-      String(protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture),
-    );
-    expect(chineseTerms).toContain(
-      String(protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture),
-    );
-    expect(chineseTerms).toContain(String(protocolFacts.finalGestureExclusivityHours));
-    expect(chineseTerms).toContain(String(protocolFacts.secondaryRetrievalTimeoutWeeks));
+  it('groups the risks in the same order in every locale', () => {
+    for (const locale of routing.locales) {
+      expect(getRiskCopy(locale).groups.map((group) => group.id)).toEqual([...RISK_GROUP_IDS]);
+    }
   });
 
-  it('dates the terms and privacy policy from one locale-independent source', () => {
-    // The header renders these through ReviewedStamp, in each locale's long date form.
-    expect(TRUST_DOCUMENT_DATES.terms).toEqual({ date: '2026-07-20', kind: 'updated' });
-    expect(TRUST_DOCUMENT_DATES.privacy).toEqual({ date: '2026-07-20', kind: 'updated' });
+  it('states the participant-specific risks from the protocol facts in every locale', () => {
+    for (const locale of routing.locales) {
+      const risk = JSON.stringify(getRiskCopy(locale));
+      expect(risk).toContain(String(protocolFacts.finalGestureExclusivityHours));
+      expect(risk).toContain(String(protocolFacts.secondaryRetrievalTimeoutWeeks));
+      expect(risk).toContain(`${protocolFacts.ethGestureCostStepUpPercent}`);
+    }
+  });
+
+  it('preserves Terms protocol facts in every locale', () => {
+    for (const locale of routing.locales) {
+      const terms = JSON.stringify(getTermsCopy(locale));
+      // The decimal separator follows the locale (vi: 0,4).
+      const increase = String(protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture);
+      expect(terms).toMatch(new RegExp(increase.replace('.', '[.,]')));
+      expect(terms).toContain(String(protocolFacts.finalGestureExclusivityHours));
+      expect(terms).toContain(String(protocolFacts.secondaryRetrievalTimeoutWeeks));
+      expect(terms).toContain(`${protocolFacts.randomWalkDiscountPercentage}%`);
+    }
+  });
+
+  it('names every allocation track of the table in the Terms clauses', () => {
+    for (const locale of routing.locales) {
+      const allocations = getTermsCopy(locale).sections.find(
+        (section) => section.id === 'allocations',
+      );
+      const named = new Set(
+        allocations?.content.filter((item) => item.subtitle).map((item) => item.id),
+      );
+      for (const row of TERMS_ALLOCATION_ROWS)
+        expect({ locale, row: row.id, named: named.has(row.id) }).toEqual({
+          locale,
+          row: row.id,
+          named: true,
+        });
+    }
+  });
+
+  it('lists the prohibited activities without typed bullet glyphs', () => {
+    for (const locale of routing.locales) {
+      const prohibited = getTermsCopy(locale).sections.find(
+        (section) => section.id === 'prohibited',
+      );
+      expect(prohibited?.bullets).toHaveLength(7);
+      for (const bullet of prohibited?.bullets ?? []) expect(bullet).not.toMatch(/^[•·-]/);
+    }
+  });
+
+  it('dates every Trust Center document from one locale-independent source', () => {
+    for (const { id } of TRUST_CENTER_PAGES) {
+      expect(TRUST_DOCUMENT_DATES[id].date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    }
+    // The review date of the audit status; the text dates of the documents.
     expect(TRUST_DOCUMENT_DATES.audits).toEqual({ date: '2026-08-24', kind: 'reviewed' });
-    // Security and the risk disclosures state no date, so none is invented for them.
-    expect(TRUST_DOCUMENT_DATES.security).toBeUndefined();
-    expect(TRUST_DOCUMENT_DATES.risk).toBeUndefined();
+    expect(TRUST_DOCUMENT_DATES.terms).toEqual({ date: '2026-07-20', kind: 'updated' });
+    // No copy states a date of its own any more.
+    for (const locale of routing.locales) {
+      for (const getCopy of Object.values(GETTERS)) {
+        expect(JSON.stringify(getCopy(locale))).not.toMatch(/20\d\d-\d\d-\d\d/);
+      }
+    }
   });
 
-  it('describes Arbitrum settlement and smart-contract custody accurately in both locales', () => {
+  it('pins the storage keys the privacy policy names to their sources', () => {
+    expect(ATTENTION_STORAGE_KEY).toBe(HOOK_ATTENTION_KEY);
+    const explainer = readFileSync(
+      join(process.cwd(), 'components/home/CyclePhaseGuide.tsx'),
+      'utf8',
+    );
+    expect(explainer).toContain(`'${EXPLAINER_STORAGE_KEY}'`);
+    // The experimental home's returning-visitor marker was once missing from the policy.
+    const observatory = readFileSync(
+      join(process.cwd(), 'app/[locale]/(app)/experimental-ui/ExperimentalHomePage.tsx'),
+      'utf8',
+    );
+    expect(observatory).toContain(`'${OBSERVATORY_VISITED_STORAGE_KEY}'`);
+    expect(activePrivacyStorage().flatMap((entry) => entry.names)).toEqual(
+      expect.arrayContaining([
+        ATTENTION_STORAGE_KEY,
+        EXPLAINER_STORAGE_KEY,
+        OBSERVATORY_VISITED_STORAGE_KEY,
+      ]),
+    );
+  });
+
+  it('lists every storage key the app declares', () => {
+    const listed = new Set(activePrivacyStorage().flatMap((entry) => entry.names));
+    const declared = /(?:STORAGE_KEY|StorageKey) = '([a-z0-9-]+)'/g;
+    const keys = ['app', 'components', 'hooks', 'lib', 'contexts'].flatMap((dir) =>
+      (readdirSync(join(process.cwd(), dir), { recursive: true }) as string[])
+        .filter((file) => /\.tsx?$/.test(file) && !file.includes('__tests__'))
+        .flatMap((file) =>
+          Array.from(
+            readFileSync(join(process.cwd(), dir, file), 'utf8').matchAll(declared),
+            (match) => match[1] ?? '',
+          ),
+        ),
+    );
+    expect(keys).toEqual(expect.arrayContaining(['cosmic-observatory-visited']));
+    for (const key of keys) expect(listed).toContain(key);
+  });
+
+  it('describes Arbitrum settlement and smart-contract custody accurately', () => {
     const copy: PrivacyCopy = privacyCopyEn;
     const chineseCopy: PrivacyCopy = privacyCopyZh;
     const englishSecurity = copy.sections
@@ -126,13 +248,18 @@ describe('localized legal content', () => {
     expect(chineseSecurity).toMatch(/转入协议合约.*锁定.*释放或取回/);
   });
 
+  it('states what the site does instead of what it may do', () => {
+    const english = JSON.stringify(privacyCopyEn);
+    expect(english).not.toMatch(/We may collect|may use cookies|may use third-party/);
+  });
+
   it('aligns the Terms IP carve-out with the scoped root CC0 dedication', () => {
-    const englishIp = termsCopyEn.additional.find(
-      (item) => item.id === 'intellectual-property',
-    )?.text;
-    const chineseIp = termsCopyZh.additional.find(
-      (item) => item.id === 'intellectual-property',
-    )?.text;
+    const englishIp = plain(
+      termsCopyEn.additional.find((item) => item.id === 'intellectual-property')?.text,
+    );
+    const chineseIp = plain(
+      termsCopyZh.additional.find((item) => item.id === 'intellectual-property')?.text,
+    );
 
     expect(englishIp).toMatch(/root LICENSE.*CC0 1\.0/);
     expect(englishIp).toMatch(/Third-party dependencies.*retain their own licenses/);

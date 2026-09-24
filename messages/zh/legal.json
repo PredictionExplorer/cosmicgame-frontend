@@ -6,5 +6,12 @@
     "risk": "风险披露",
     "security": "安全",
     "audits": "审计"
+  },
+  "document": {
+    "contents": "本页内容",
+    "backToTop": "返回顶部",
+    "backToContents": "返回目录",
+    "sectionLink": "链接到本节：{section}",
+    "revisionHistory": "修订历史"
   }
 }

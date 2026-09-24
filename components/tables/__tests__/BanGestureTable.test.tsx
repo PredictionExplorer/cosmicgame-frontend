@@ -8,9 +8,6 @@ const mockBanGesture = jest.fn().mockResolvedValue(undefined);
 const mockUnbanGesture = jest.fn().mockResolvedValue(undefined);
 const mockGetBannedGestures = jest.fn().mockResolvedValue([]);
 
-jest.mock('../../../hooks/web3', () => ({
-  useActiveWeb3React: jest.fn(() => ({ account: '0xadmin' })),
-}));
 jest.mock('../../../contexts/NotificationContext', () => ({
   useNotification: jest.fn(() => ({ setNotification: mockSetNotification })),
 }));
@@ -24,15 +21,12 @@ jest.mock('../../../services/api', () => ({
 }));
 jest.mock('../../../utils/errors', () => ({
   reportError: jest.fn(),
-  getEthErrorMessage: jest.fn(() => 'An error occurred'),
-}));
-jest.mock('../../../utils/alert', () => ({
-  __esModule: true,
-  default: jest.fn((msg: string) => msg),
 }));
 
 // eslint-disable-next-line import/order
 import BanGestureTable from '@/components/tables/BanGestureTable';
+
+const MODERATOR = '0x9999999999999999999999999999999999999999';
 
 const createGestureHistory = (overrides = {}) => ({
   EvtLogId: 1,
@@ -81,7 +75,9 @@ describe('BanGestureTable', () => {
 
   it('renders Ban button for non-banned gestures', async () => {
     await act(async () => {
-      render(<BanGestureTable gestureHistory={[createGestureHistory()]} />);
+      render(
+        <BanGestureTable gestureHistory={[createGestureHistory()]} moderatorAddress={MODERATOR} />,
+      );
     });
     expect(screen.getAllByText('tables.banGesture.ban').length).toBeGreaterThanOrEqual(1);
   });
@@ -133,22 +129,70 @@ describe('BanGestureTable', () => {
     expect(mockGetBannedGestures).toHaveBeenCalled();
   });
 
+  // A network failure on the hidden list once escaped as an unhandled rejection.
+  it('keeps the list and reports it when the hidden list cannot be read', async () => {
+    const { reportError } = jest.requireMock('../../../utils/errors') as {
+      reportError: jest.Mock;
+    };
+    const failure = new Error('network down');
+    mockGetBannedGestures.mockRejectedValueOnce(failure);
+    await act(async () => {
+      render(<BanGestureTable gestureHistory={[createGestureHistory()]} />);
+    });
+    expect(reportError).toHaveBeenCalledWith(failure, 'load hidden gestures');
+    expect(screen.getAllByText('Hello world').length).toBeGreaterThanOrEqual(1);
+  });
+
+  // After a successful Hide, a failed refresh once showed the "could not hide" toast.
+  it('reports a successful hide even when the refresh after it fails', async () => {
+    const user = userEvent.setup();
+    render(
+      <BanGestureTable
+        gestureHistory={[createGestureHistory({ EvtLogId: 7 })]}
+        moderatorAddress={MODERATOR}
+      />,
+    );
+    const banButton = await screen.findByRole('button', { name: 'tables.banGesture.ban' });
+    mockGetBannedGestures.mockRejectedValueOnce(new Error('network down'));
+    await user.click(banButton);
+
+    await waitFor(() =>
+      expect(mockSetNotification).toHaveBeenCalledWith(
+        expect.objectContaining({ type: 'success', text: 'tables.banGesture.banned' }),
+      ),
+    );
+    expect(mockSetNotification).not.toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'error' }),
+    );
+    // The change shows at once, without waiting for the list to be read again.
+    expect(
+      await screen.findByRole('button', { name: 'tables.banGesture.unban' }),
+    ).toBeInTheDocument();
+  });
+
   it('Ban click calls api.ban_bid with EvtLogId and account', async () => {
     const user = userEvent.setup();
-    render(<BanGestureTable gestureHistory={[createGestureHistory({ EvtLogId: 42 })]} />);
+    render(
+      <BanGestureTable
+        gestureHistory={[createGestureHistory({ EvtLogId: 42 })]}
+        moderatorAddress={MODERATOR}
+      />,
+    );
 
     const banButton = await screen.findByRole('button', { name: 'tables.banGesture.ban' });
     await user.click(banButton);
 
     await waitFor(() => {
-      expect(mockBanGesture).toHaveBeenCalledWith(42, '0xadmin');
+      expect(mockBanGesture).toHaveBeenCalledWith(42, MODERATOR);
     });
   });
 
   it('shows success notification after banning', async () => {
     const user = userEvent.setup();
     mockBanGesture.mockResolvedValueOnce(undefined);
-    render(<BanGestureTable gestureHistory={[createGestureHistory()]} />);
+    render(
+      <BanGestureTable gestureHistory={[createGestureHistory()]} moderatorAddress={MODERATOR} />,
+    );
 
     const banButton = await screen.findByRole('button', { name: 'tables.banGesture.ban' });
     await user.click(banButton);
@@ -157,7 +201,7 @@ describe('BanGestureTable', () => {
       expect(mockSetNotification).toHaveBeenCalledWith(
         expect.objectContaining({
           type: 'success',
-          text: 'toasts.admin.gestureBan.banned',
+          text: 'tables.banGesture.banned',
         }),
       );
     });
@@ -165,7 +209,12 @@ describe('BanGestureTable', () => {
 
   it('shows Unban button for banned gestures', async () => {
     mockGetBannedGestures.mockResolvedValue([{ bid_id: 1 }]);
-    render(<BanGestureTable gestureHistory={[createGestureHistory({ EvtLogId: 1 })]} />);
+    render(
+      <BanGestureTable
+        gestureHistory={[createGestureHistory({ EvtLogId: 1 })]}
+        moderatorAddress={MODERATOR}
+      />,
+    );
 
     expect(
       await screen.findByRole('button', { name: 'tables.banGesture.unban' }),
@@ -175,7 +224,12 @@ describe('BanGestureTable', () => {
   it('Unban click calls api.unban_gesture with EvtLogId', async () => {
     const user = userEvent.setup();
     mockGetBannedGestures.mockResolvedValue([{ bid_id: 1 }]);
-    render(<BanGestureTable gestureHistory={[createGestureHistory({ EvtLogId: 1 })]} />);
+    render(
+      <BanGestureTable
+        gestureHistory={[createGestureHistory({ EvtLogId: 1 })]}
+        moderatorAddress={MODERATOR}
+      />,
+    );
 
     const unbanButton = await screen.findByRole('button', { name: 'tables.banGesture.unban' });
     await user.click(unbanButton);
@@ -189,7 +243,12 @@ describe('BanGestureTable', () => {
     const user = userEvent.setup();
     mockGetBannedGestures.mockResolvedValue([{ bid_id: 1 }]);
     mockUnbanGesture.mockResolvedValueOnce(undefined);
-    render(<BanGestureTable gestureHistory={[createGestureHistory({ EvtLogId: 1 })]} />);
+    render(
+      <BanGestureTable
+        gestureHistory={[createGestureHistory({ EvtLogId: 1 })]}
+        moderatorAddress={MODERATOR}
+      />,
+    );
 
     const unbanButton = await screen.findByRole('button', { name: 'tables.banGesture.unban' });
     await user.click(unbanButton);
@@ -198,49 +257,59 @@ describe('BanGestureTable', () => {
       expect(mockSetNotification).toHaveBeenCalledWith(
         expect.objectContaining({
           type: 'success',
-          text: 'toasts.admin.gestureBan.unbanned',
+          text: 'tables.banGesture.unbanned',
         }),
       );
     });
   });
 
-  it('shows error notification when ban fails', async () => {
-    const user = userEvent.setup();
-    mockBanGesture.mockRejectedValueOnce(new Error('Server error'));
-    const { getEthErrorMessage } = jest.requireMock('../../../utils/errors');
-    getEthErrorMessage.mockReturnValueOnce('Server error details');
-    render(<BanGestureTable gestureHistory={[createGestureHistory()]} />);
-
-    const banButton = await screen.findByRole('button', { name: 'tables.banGesture.ban' });
-    await user.click(banButton);
-
-    await waitFor(() => {
-      expect(mockSetNotification).toHaveBeenCalledWith({
-        visible: true,
-        text: 'Server error details',
-        type: 'error',
-      });
-    });
-  });
-
-  it('selects the localized admin fallback when no technical detail is shown', async () => {
+  it('reports a failed request and says the message could not be updated', async () => {
     const user = userEvent.setup();
     const error = new Error('Server error');
     mockBanGesture.mockRejectedValueOnce(error);
-    const { getEthErrorMessage, reportError } = jest.requireMock('../../../utils/errors');
-    getEthErrorMessage.mockImplementationOnce((_err: unknown, fallback: string) => fallback);
-    render(<BanGestureTable gestureHistory={[createGestureHistory()]} />);
+    const { reportError } = jest.requireMock('../../../utils/errors');
+    render(
+      <BanGestureTable gestureHistory={[createGestureHistory()]} moderatorAddress={MODERATOR} />,
+    );
 
     await user.click(await screen.findByRole('button', { name: 'tables.banGesture.ban' }));
 
     await waitFor(() =>
       expect(mockSetNotification).toHaveBeenCalledWith({
         visible: true,
-        text: 'toasts.admin.gestureBan.failed',
+        text: 'tables.banGesture.error',
         type: 'error',
       }),
     );
     expect(reportError).toHaveBeenCalledWith(error, 'ban gesture');
+  });
+
+  it('keeps the button busy, with its label, while the request runs', async () => {
+    const user = userEvent.setup();
+    let settle: () => void = () => undefined;
+    mockBanGesture.mockReturnValueOnce(new Promise<void>((resolve) => (settle = resolve)));
+    render(
+      <BanGestureTable gestureHistory={[createGestureHistory()]} moderatorAddress={MODERATOR} />,
+    );
+
+    const button = await screen.findByRole('button', { name: 'tables.banGesture.ban' });
+    await user.click(button);
+    expect(button).toHaveAttribute('aria-busy', 'true');
+    await user.click(button);
+    expect(mockBanGesture).toHaveBeenCalledTimes(1);
+
+    await act(async () => settle());
+    await waitFor(() => expect(button).not.toHaveAttribute('aria-busy', 'true'));
+  });
+
+  it('offers no moderation controls without a moderator wallet', async () => {
+    await act(async () => {
+      render(<BanGestureTable gestureHistory={[createGestureHistory()]} />);
+    });
+    expect(screen.queryByRole('button', { name: 'tables.banGesture.ban' })).not.toBeInTheDocument();
+    expect(screen.queryByText('tables.columns.actions')).not.toBeInTheDocument();
+    // The list itself stays readable.
+    expect(screen.getAllByText('Hello world').length).toBeGreaterThanOrEqual(1);
   });
 
   it('reviews 25 messages a page instead of all of them at once', async () => {
@@ -262,7 +331,7 @@ describe('BanGestureTable', () => {
       createGestureHistory({ EvtLogId: 1, Message: 'Kept' }),
       createGestureHistory({ EvtLogId: 2, Message: 'Hidden one' }),
     ];
-    render(<BanGestureTable gestureHistory={list} />);
+    render(<BanGestureTable gestureHistory={list} moderatorAddress={MODERATOR} />);
     await screen.findByRole('button', { name: 'tables.banGesture.unban' });
 
     await user.click(screen.getByRole('button', { name: /tables\.banGesture\.filters\.hidden/ }));

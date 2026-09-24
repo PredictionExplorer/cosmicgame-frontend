@@ -1,42 +1,60 @@
-import { render, screen, checkA11y } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import AdminPage from '../AdminPage';
 
-const mockUseGestureList = jest.fn().mockReturnValue({
-  data: undefined,
-  isLoading: false,
-  error: null,
-});
+const mockUseGestureList = jest.fn();
+const mockRefetch = jest.fn();
+let mockWallet: { account: string | null; active: boolean } = { account: null, active: false };
 
 jest.mock('../../../../../hooks/useApiQuery', () => ({
   useGestureList: (...args: unknown[]) => mockUseGestureList(...args),
 }));
 
+jest.mock('../../../../../hooks/web3', () => ({
+  useActiveWeb3React: () => mockWallet,
+}));
+
+interface TableProps {
+  gestureHistory: unknown[];
+  loading?: boolean;
+  error?: string;
+  moderatorAddress?: string | null;
+  notice?: React.ReactNode;
+  title?: string;
+}
+
 jest.mock('../../../../../components/tables/BanGestureTable', () => ({
   __esModule: true,
-  default: ({ gestureHistory, loading }: { gestureHistory: unknown[]; loading?: boolean }) => (
-    <div data-testid="ban-gesture-table" data-loading={loading ? 'true' : undefined}>
-      rows: {gestureHistory.length}
-    </div>
+  default: ({ gestureHistory, loading, error, moderatorAddress, notice, title }: TableProps) => (
+    <section aria-label={title}>
+      {notice}
+      <div
+        data-testid="ban-gesture-table"
+        data-loading={loading ? 'true' : undefined}
+        data-moderator={moderatorAddress ?? ''}
+        data-error={error ?? ''}
+      >
+        rows: {gestureHistory.length}
+      </div>
+    </section>
   ),
 }));
 
-beforeEach(() => jest.clearAllMocks());
+const MODERATOR = '0x1111111111111111111111111111111111111111';
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockWallet = { account: null, active: false };
+  mockUseGestureList.mockReturnValue({
+    data: [],
+    isLoading: false,
+    isError: false,
+    refetch: mockRefetch,
+  });
+});
 
 describe('AdminPage', () => {
-  it('shows loading state when query is loading', () => {
-    mockUseGestureList.mockReturnValue({ data: undefined, isLoading: true, error: null });
-    render(<AdminPage />);
-    expect(screen.getByTestId('ban-gesture-table')).toHaveAttribute('data-loading', 'true');
-  });
-
-  it('shows loading when data is null', () => {
-    mockUseGestureList.mockReturnValue({ data: undefined, isLoading: false, error: null });
-    render(<AdminPage />);
-    expect(screen.getByTestId('ban-gesture-table')).toHaveAttribute('data-loading', 'true');
-  });
-
-  it('renders BanGestureTable with filtered gesture list', () => {
+  it('lists only gestures that carry a message', () => {
     mockUseGestureList.mockReturnValue({
       data: [
         { Message: 'Hello', EvtLogId: 1 },
@@ -44,33 +62,54 @@ describe('AdminPage', () => {
         { Message: 'World', EvtLogId: 3 },
       ],
       isLoading: false,
-      error: null,
+      isError: false,
+      refetch: mockRefetch,
     });
     render(<AdminPage />);
     expect(screen.getByTestId('ban-gesture-table')).toHaveTextContent('rows: 2');
   });
 
-  it('filters out gestures with empty messages', () => {
-    mockUseGestureList.mockReturnValue({
-      data: [
-        { Message: '', EvtLogId: 1 },
-        { Message: '', EvtLogId: 2 },
-      ],
-      isLoading: false,
-      error: null,
-    });
+  it('shows placeholder rows while the list loads', () => {
+    mockUseGestureList.mockReturnValue({ data: undefined, isLoading: true, isError: false });
     render(<AdminPage />);
-    expect(screen.getByTestId('ban-gesture-table')).toHaveTextContent('rows: 0');
+    expect(screen.getByTestId('ban-gesture-table')).toHaveAttribute('data-loading', 'true');
   });
 
-  it('renders the page title', () => {
-    mockUseGestureList.mockReturnValue({ data: [], isLoading: false, error: null });
+  it('says the list could not be loaded instead of loading forever', () => {
+    mockUseGestureList.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      refetch: mockRefetch,
+    });
     render(<AdminPage />);
-    expect(screen.getByText('Admin')).toBeInTheDocument();
+    const table = screen.getByTestId('ban-gesture-table');
+    expect(table).not.toHaveAttribute('data-loading');
+    expect(table).toHaveAttribute('data-error', 'The gesture messages could not be loaded.');
+  });
+
+  it('keeps the list read-only, with no moderation controls, until a wallet connects', () => {
+    render(<AdminPage />);
+    expect(screen.getByTestId('ban-gesture-table')).toHaveAttribute('data-moderator', '');
+    expect(screen.getByTestId('moderation-read-only')).toHaveTextContent(
+      'Read-only. Connect the moderator wallet to hide or restore messages.',
+    );
+    expect(screen.getByRole('button', { name: /wallet\.connect/ })).toBeInTheDocument();
+  });
+
+  it('hands the connected wallet to the table as the moderator', () => {
+    mockWallet = { account: MODERATOR, active: true };
+    render(<AdminPage />);
+    expect(screen.getByTestId('ban-gesture-table')).toHaveAttribute('data-moderator', MODERATOR);
+    expect(screen.queryByTestId('moderation-read-only')).not.toBeInTheDocument();
+  });
+
+  it('titles the list', () => {
+    render(<AdminPage />);
+    expect(screen.getByRole('region', { name: 'Gesture messages' })).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
-    mockUseGestureList.mockReturnValue({ data: [], isLoading: false, error: null });
     const { container } = render(<AdminPage />);
     await checkA11y(container);
   });

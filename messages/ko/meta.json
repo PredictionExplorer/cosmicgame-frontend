@@ -63,7 +63,7 @@
   },
   "contracts": {
     "title": "컨트랙트: 검증된 Arbitrum 스마트 컨트랙트",
-    "description": "Cosmic Signature 스마트 컨트랙트 주소, 검증 상태, 보안 감사, 정형 검증 관련 안내, Arbitrum 배포 세부 정보를 확인할 수 있습니다."
+    "description": "Arbitrum One의 모든 Cosmic Signature 스마트 컨트랙트 주소와 블록 탐색기, Sourcify 링크, 배분 비율, 프로토콜 설정, 보정 구간을 확인할 수 있습니다."
   },
   "terms": {
     "title": "이용약관",
@@ -83,7 +83,7 @@
   },
   "audits": {
     "title": "보안 감사: 검증과 컨트랙트 검토",
-    "description": "Cosmic Signature 스마트 컨트랙트는 Hacken의 독립적인 보안 감사를 받았습니다. 보안 감사 보고서, 정형 검증 배경, 소스 코드 검증 자료를 확인할 수 있습니다."
+    "description": "Hacken의 Cosmic Signature 컨트랙트 독립 보안 감사 요약입니다. 심각도별 발견 사항, 퍼징한 불변 조건, 보고서 전문, 저장소의 정형 검증 명세를 확인할 수 있습니다."
   },
   "code": {
     "title": "소스 코드: CC0 온체인 아트 프로토콜",
@@ -220,16 +220,16 @@
     "invalidAddress": "잘못된 주소"
   },
   "admin": {
-    "title": "관리자",
-    "description": "Cosmic Signature 프로토콜의 관리 도구입니다. 프로토콜 매개변수, 컨트랙트 설정, 시스템 구성을 관리합니다."
+    "title": "제스처 메시지 관리",
+    "description": "운영 도구: Cosmic Signature 사이트에서 제스처 메시지를 숨기거나 복원합니다."
   },
   "adminSettings": {
-    "title": "관리자 설정",
-    "description": "관리자 설정과 컨트랙트 관리 화면입니다."
+    "title": "컨트랙트 설정",
+    "description": "Cosmic Signature 컨트랙트 주소와 매개변수를 읽기 전용으로 보여 주는 운영 화면입니다."
   },
   "internalCstOutreachTransfer": {
     "title": "CST 홍보 전송",
-    "description": "설정된 홍보 준비금 지갑 서명자만 사용할 수 있는 제한된 CST 전송 도구입니다."
+    "description": "홍보 준비금 재무 담당자가 준비금에서 CST를 보내는 운영 도구입니다."
   },
   "embedEndurance": {
     "title": "수호 챔피언 및 시간의 전사 타임라인",

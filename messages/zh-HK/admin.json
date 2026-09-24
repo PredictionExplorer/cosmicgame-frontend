@@ -1,30 +1,52 @@
 {
-  "page": {
-    "title": "管理",
-    "subtitle": "管理落筆記錄與系統設定",
-    "gestureList": "落筆列表",
-    "loading": "載入中…"
+  "tools": {
+    "label": "營運工具",
+    "moderation": "留言審核",
+    "settings": "合約設定",
+    "outreachTransfer": "推廣轉帳"
+  },
+  "wallet": {
+    "connected": "已連接錢包",
+    "notConnected": "未連接錢包",
+    "restoring": "正在恢復錢包連接…",
+    "rolesLabel": "此錢包的鏈上角色",
+    "rolesError": "未能讀取其鏈上角色。",
+    "rolesPartial": "部分鏈上角色未能讀取。",
+    "roles": {
+      "protocolOwner": "協議所有者",
+      "outreachOwner": "推廣儲備所有者",
+      "outreachTreasurer": "推廣儲備財務執行人",
+      "none": "沒有鏈上角色"
+    }
+  },
+  "moderation": {
+    "title": "落筆留言審核",
+    "subtitle": "在本站隱藏或恢復落筆留言。隱藏的留言仍保留在鏈上，只是本站不再顯示。",
+    "heading": "落筆留言",
+    "description": "所有附帶留言的落筆。可按可見性、週期或文字篩選。",
+    "readOnly": "只讀。連接審核員錢包後即可隱藏或恢復留言。",
+    "loadError": "未能載入落筆留言。",
+    "clearSearch": "清除搜尋"
   },
   "settings": {
-    "title": "管理方法",
-    "subtitle": "以只讀方式查看控制面板中的合約地址與參數。",
-    "breadcrumbs": {
-      "home": "主頁",
-      "admin": "管理",
-      "settings": "設定"
-    },
-    "loading": "載入中…",
-    "contractTitle": "Cosmic Signature 合約",
-    "contractDescription": "控制面板 API 提供的合約地址與鏈上參數。",
-    "placeholders": {
-      "number": "在此輸入數值"
-    },
-    "actions": {
-      "setAddress": "設定地址",
-      "set": "設定"
+    "title": "合約設定",
+    "subtitle": "控制面板提供的協議合約地址與參數。只讀：只有協議所有者能在鏈上更改這些數值。",
+    "loadError": "未能載入合約設定。",
+    "notReported": "控制面板 API 未有提供",
+    "contractsDescription": "每個協議合約，附 Arbiscan 上的地址；已驗證的合約另附 Sourcify 上的源代碼。",
+    "groups": {
+      "contracts": "合約",
+      "shares": "分配比例",
+      "selection": "星選",
+      "timing": "時間參數",
+      "cost": "落筆價格"
     },
     "values": {
       "divisorPercent": "{percent}（除數 {divisor}）"
+    },
+    "status": {
+      "active": "已啟用",
+      "scheduled": "待啟用"
     },
     "fields": {
       "ethStellarRecipients": "每個週期的 ETH 星選獲配者人數",
@@ -34,34 +56,50 @@
       "publicGoodsPercentage": "公共物品比例",
       "stellarSelectionPercentage": "星選比例",
       "anchorDistributionPercentage": "錨定派發比例",
-      "timeIncrease": "時間增量",
-      "allocationTimeout": "取回簽名分配的超時時間",
-      "priceIncrease": "價格增幅",
+      "timeIncrease": "時間增量的每週期增幅",
+      "allocationTimeout": "專屬收官期限",
+      "priceIncrease": "ETH 落筆價格增幅",
       "gestureTimeIncrement": "每筆落筆增加的時間",
-      "initialAllocationSeconds": "距簽名分配的初始秒數",
+      "initialAllocationSeconds": "初始時間增量",
       "initialGestureCostFraction": "初始落筆價格比例",
       "activationTime": "啟用時間",
       "gestureRatio": "ETH 與 CST 落筆比率",
-      "calibrationWindowLength": "週期開啟時 CST 校準窗口時長",
-      "switchMode": "切換模式"
-    },
-    "modes": {
-      "runtime": "運行模式",
-      "maintenance": "維護模式"
+      "calibrationWindowLength": "週期開啟時 CST 校準窗口時長"
     }
   },
   "outreachTransfer": {
     "title": "CST 推廣轉帳",
-    "subtitle": "僅限透過此網址訪問的轉帳工具，供已配置的推廣儲備錢包簽名者使用。",
-    "roleReadError": "未能讀取推廣儲備的所有者與財務執行人。",
-    "walletRequiredTitle": "未連接錢包",
-    "walletRequiredDescription": "請連接推廣儲備現任財務執行人的錢包，再撥付 CST 分配。",
-    "walletUnavailableTitle": "推廣錢包暫不可用",
-    "walletUnavailableDescription": "控制面板尚未提供推廣錢包地址。",
-    "rolesLoadingTitle": "正在載入推廣儲備角色",
-    "rolesLoadingDescription": "正在從合約讀取 MarketingWallet 的所有者與財務執行人。",
-    "rolesErrorTitle": "未能讀取推廣儲備角色",
-    "restrictedTitle": "訪問受限",
-    "restrictedDescription": "請連接推廣儲備現任財務執行人（{treasurer}）的錢包，才能使用此轉帳工具。所有者：{owner}。"
+    "subtitle": "從推廣儲備向參與者轉出 CST。只有推廣儲備的財務執行人錢包可以轉出。",
+    "treasurer": "財務執行人",
+    "owner": "所有者",
+    "walletRequiredTitle": "連接財務執行人錢包以轉出 CST",
+    "walletRequiredDescription": "連接後，此頁會顯示推廣儲備的餘額；如屬財務執行人，更會顯示轉出 CST 的表格。",
+    "walletUnavailableTitle": "推廣儲備地址暫不可用",
+    "walletUnavailableDescription": "控制面板尚未提供推廣儲備的地址，請稍後重新載入頁面。",
+    "rolesErrorTitle": "未能讀取推廣儲備的角色",
+    "rolesErrorDescription": "沒有財務執行人的地址，本頁無法判斷此錢包能否轉出。",
+    "restrictedTitle": "此錢包不是財務執行人",
+    "restrictedDescription": "只有推廣儲備的財務執行人才能從中轉出 CST。請連接財務執行人錢包後繼續。",
+    "form": {
+      "title": "轉出 CST",
+      "description": "一筆交易即把該數額從推廣儲備轉給接收方，而且無法撤銷。",
+      "amount": "數額",
+      "amountHint": "小數可用小數點或逗號。",
+      "sends": "將轉出 {amount}",
+      "submit": "轉出 CST",
+      "reserveHeading": "推廣儲備",
+      "reserve": "儲備地址",
+      "balance": "CST 餘額",
+      "history": "推廣儲備轉帳記錄",
+      "balanceError": "未能讀取推廣儲備的 CST 餘額。",
+      "confirmed": "已從推廣儲備轉出 CST。",
+      "failed": "CST 未能轉出。請檢查錢包後再試。",
+      "errors": {
+        "amount": "請輸入大於零的數額。",
+        "precision": "{decimals, plural, other {最多使用 # 位小數。}}",
+        "grouping": "請勿使用千位分隔符：輸入 1000，而非 1,000。",
+        "insufficient": "推廣儲備的 CST 少於此數額。"
+      }
+    }
   }
 }

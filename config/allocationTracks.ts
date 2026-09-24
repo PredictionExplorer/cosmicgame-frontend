@@ -19,9 +19,10 @@ export type AllocationTrackId = (typeof ALLOCATION_TRACK_IDS)[number];
  * `--track-*` series (docs/design-system.md, "Data series"). They are fixed hues in every
  * palette (styles/themes.css), 4.5:1 or more on every surface, and no two tracks share one:
  * the palette primary and secondary are close lilacs in Midnight and Nebula, so they cannot
- * tell two tracks apart; red is never a track. The one map for every chart of the split, on
- * both hosts (the landing's AllocationBar draws the compounding remainder hatched in the same
- * hue), so a track reads the same on every page and chart.
+ * tell two tracks apart; red is never a track, and the remainder that carries into the next
+ * cycle takes the neutral series. The one map for every chart of the split, on both hosts
+ * (the landing's AllocationBar draws that remainder hatched in the same hue), so a track
+ * reads the same on every page and chart.
  */
 export const ALLOCATION_TRACK_COLORS: Readonly<Record<AllocationTrackId, string>> = {
   signature: 'bg-track-signature',

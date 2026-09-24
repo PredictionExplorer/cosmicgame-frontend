@@ -147,13 +147,6 @@
     "failed": "铭刻未完成。请检查钱包与网络后重试。",
     "imprinting": "铭刻中…"
   },
-  "admin": {
-    "gestureBan": {
-      "banned": "落笔已成功屏蔽。",
-      "unbanned": "落笔已取消屏蔽。",
-      "failed": "未能更新落笔审核状态，请重试。"
-    }
-  },
   "regionLabel": "通知",
   "close": "关闭通知",
   "tx": {

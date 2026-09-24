@@ -5,14 +5,47 @@
   },
   "viewer": {
     "title": "代码查看器",
-    "subtitle": "查看将种子转换为图像的生成代码",
-    "description": "以下代码会把智能合约生成的种子转换为图像。你也可以在 IPFS 上查看：",
-    "github": "公开的 GitHub 组织位于 <link>github.com/PredictionExplorer</link>。"
+    "description": "把每个种子转换为图像和视频的 Rust 程序。同一文件也发布在 IPFS 上。",
+    "language": "Rust",
+    "lines": "{count, plural, other {# 行}}",
+    "codeAria": "图像生成源代码（Rust）",
+    "copy": "复制代码",
+    "copied": "已复制",
+    "wrap": "自动换行",
+    "ipfs": "IPFS",
+    "github": "GitHub",
+    "cid": "IPFS 内容标识符"
+  },
+  "pipeline": {
+    "heading": "从种子到图像",
+    "description": "下方代码如何一步步把 NFT 的种子变成艺术作品。",
+    "galleryLink": "在画廊中查看这些图像",
+    "steps": {
+      "seed": {
+        "label": "种子",
+        "description": "NFT 的种子，在铭刻时记录在链上。"
+      },
+      "stream": {
+        "label": "SHA3-256 随机流",
+        "description": "将种子哈希为可复现的随机字节流。"
+      },
+      "simulation": {
+        "label": "三体模拟",
+        "description": "从随机流中取得三个天体的质量、位置和速度，并计算它们的轨道。"
+      },
+      "renderer": {
+        "label": "光谱渲染器",
+        "description": "以沿光谱渐变的颜色描绘每个天体的轨迹。"
+      },
+      "image": {
+        "label": "Cosmic Signature NFT 图像",
+        "description": "最后一帧即为图像，全部帧组成视频。同一个种子总是得到同样的结果。"
+      }
+    }
   },
   "seo": {
     "heading": "Cosmic Signature 源代码",
     "description": "查看 Cosmic Signature 的前端、Go 后端、智能合约与图像生成源代码。通过下方查看器，了解链上种子如何生成可复现的 NFT 艺术作品。",
-    "excerpt": "种子 -> SHA3-256 随机流 -> 三体模拟 -> 光谱渲染器 -> Cosmic Signature NFT 图像",
     "relatedAria": "源代码相关页面",
     "links": {
       "ipfs": "查看 IPFS 上已发布的源代码",

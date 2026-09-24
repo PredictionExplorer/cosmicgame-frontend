@@ -1,71 +1,83 @@
-'use client';
-
-import type { ReactNode } from 'react';
-import dynamic from 'next/dynamic';
-import { createTheme } from '@uiw/codemirror-themes';
 import { useTranslations } from 'next-intl';
+import { ArrowUpRight } from 'lucide-react';
 
-const CodeMirror = dynamic(() => import('@uiw/react-codemirror'), { ssr: false });
+import {
+  CODE_REPOSITORIES,
+  IMAGE_GENERATION_IPFS_CID,
+  IMAGE_GENERATION_IPFS_URL,
+} from '@/content/code/structure';
 
-import { PageHeader } from '@/components/layout/PageHeader';
-import { PageShell } from '@/components/ui/page-shell';
-import { CodeWrapper, StyledLink } from '@/components/styled';
+import { SiteLink } from '@/components/layout/SiteLink';
+import { SectionHeader } from '@/components/ui/section-header';
 
 import { COSMIC_SIGNATURE_CODE } from './cosmicSignatureCode';
+import { SourceCode, countSourceLines } from './SourceCode';
+import { SourceViewer } from './SourceViewer';
 
-const myTheme = createTheme({
-  theme: 'light',
-  settings: {
-    background: 'transparent',
-    fontFamily: 'monospace',
-  },
-  styles: [],
-});
+const SOURCE_LINK_CLASS =
+  'link-quiet inline-flex min-h-6 items-center gap-1 type-label text-muted-foreground transition-colors duration-[var(--duration-fast)] hover:text-foreground';
 
-/** `seoSummary` is the server-rendered page header, the page's only header. */
-const CodeViewer = ({ seoSummary }: { seoSummary?: ReactNode }) => {
+const IMAGE_GENERATION_REPOSITORY = CODE_REPOSITORIES.find(({ id }) => id === 'images')!.href;
+
+/**
+ * The image generation program, rendered on the server: highlighted, with
+ * line numbers and anchors, in a frame that scrolls by keyboard, wraps on
+ * request and copies the file; under it, its IPFS identifier and where else
+ * it is published.
+ */
+export default function CodeViewer() {
   const t = useTranslations('code');
+  const lineCount = countSourceLines(COSMIC_SIGNATURE_CODE);
 
   return (
-    <PageShell variant="data" backdrop="signature">
-      {seoSummary ?? (
-        <PageHeader section="trust" title={t('viewer.title')} subtitle={t('viewer.subtitle')} />
-      )}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div>
-          <div>
-            <p className="text-base leading-[1.8]">{t('viewer.description')}</p>
-            <p className="text-base">
-              <StyledLink href="https://ipfs.io/ipfs/QmWEao2HjCvyHJSbYnWLyZj8HfFardxzuNh7AUk1jgyXTm">
-                ipfs:/QmWEao2HjCvyHJSbYnWLyZj8HfFardxzuNh7AUk1jgyXTm
-              </StyledLink>
-            </p>
-            <p className="mt-3 text-base">
-              {t.rich('viewer.github', {
-                link: (chunks) => (
-                  <StyledLink href="https://github.com/PredictionExplorer">{chunks}</StyledLink>
-                ),
-              })}
-            </p>
-          </div>
-        </div>
-        <div>
-          <CodeWrapper className="code-wrapper">
-            {
-              <CodeMirror
-                value={COSMIC_SIGNATURE_CODE}
-                theme={myTheme}
-                editable={false}
-                basicSetup={{ lineNumbers: false, foldGutter: false }}
-                height="500px"
-                style={{ fontSize: '16px' }}
-              />
-            }
-          </CodeWrapper>
-        </div>
+    <section aria-labelledby="code-viewer-heading">
+      <SectionHeader
+        headingId="code-viewer-heading"
+        title={t('viewer.title')}
+        description={t('viewer.description')}
+      />
+      <SourceViewer
+        regionLabel={t('viewer.codeAria')}
+        meta={
+          <>
+            {t('viewer.language')}
+            <span aria-hidden className="px-1.5 text-subtle">
+              ·
+            </span>
+            {t('viewer.lines', { count: lineCount })}
+          </>
+        }
+      >
+        <SourceCode source={COSMIC_SIGNATURE_CODE} />
+      </SourceViewer>
+      <div className="mt-3 flex flex-wrap items-baseline justify-between gap-x-8 gap-y-2">
+        <p className="flex min-w-0 flex-wrap items-baseline gap-x-2 type-caption text-subtle">
+          <span>{t('viewer.cid')}</span>
+          <span className="type-hash break-all text-muted-foreground">
+            ipfs://{IMAGE_GENERATION_IPFS_CID}
+          </span>
+        </p>
+        <p className="flex items-center gap-x-5">
+          <SiteLink
+            href={IMAGE_GENERATION_IPFS_URL}
+            kind="external"
+            externalIcon={false}
+            className={SOURCE_LINK_CLASS}
+          >
+            {t('viewer.ipfs')}
+            <ArrowUpRight aria-hidden className="size-3.5 text-subtle" />
+          </SiteLink>
+          <SiteLink
+            href={IMAGE_GENERATION_REPOSITORY}
+            kind="external"
+            externalIcon={false}
+            className={SOURCE_LINK_CLASS}
+          >
+            {t('viewer.github')}
+            <ArrowUpRight aria-hidden className="size-3.5 text-subtle" />
+          </SiteLink>
+        </p>
       </div>
-    </PageShell>
+    </section>
   );
-};
-
-export default CodeViewer;
+}

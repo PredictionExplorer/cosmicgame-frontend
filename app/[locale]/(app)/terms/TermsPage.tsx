@@ -1,12 +1,13 @@
 import { getTermsCopy } from '@/content/legal';
+import type { LegalDocumentLabels } from '@/content/legal/labels';
 import { TermsContent } from '@/content/legal/TermsContent';
-import { TrustCenterTabs } from '@/content/legal/TrustCenterTabs';
 
-export default function TermsPage({ locale = 'en' }: { locale?: string }) {
-  return (
-    <TermsContent
-      copy={getTermsCopy(locale)}
-      tabs={<TrustCenterTabs current="terms" locale={locale} />}
-    />
-  );
+export default function TermsPage({
+  locale,
+  labels,
+}: {
+  locale: string;
+  labels: LegalDocumentLabels;
+}) {
+  return <TermsContent copy={getTermsCopy(locale)} locale={locale} labels={labels} />;
 }

@@ -140,8 +140,8 @@ describe('Sprint 7 route metadata', () => {
     expect(zhMeta.outreach.title).toContain('推广分配');
     expect(zhMeta.outreachAddress.title).toContain('推广分配');
     expect(zhMeta.coordinationChanges.title).toContain('协调变更');
-    expect(zhMeta.admin.title).toContain('管理');
-    expect(zhMeta.adminSettings.title).toContain('管理设置');
+    expect(zhMeta.admin.title).toContain('留言审核');
+    expect(zhMeta.adminSettings.title).toContain('合约设置');
     expect(zhMeta.internalCstOutreachTransfer.title).toContain('推广转账');
     expect(zhMeta.embedEndurance.title).toContain('坚守');
   });

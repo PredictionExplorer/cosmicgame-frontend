@@ -1,30 +1,52 @@
 {
-  "page": {
-    "title": "Admin",
-    "subtitle": "Manage gestures and system administration",
-    "gestureList": "Gesture List",
-    "loading": "Loading..."
+  "tools": {
+    "label": "Operator tools",
+    "moderation": "Moderation",
+    "settings": "Contract settings",
+    "outreachTransfer": "Outreach transfer"
+  },
+  "wallet": {
+    "connected": "Connected wallet",
+    "notConnected": "No wallet connected",
+    "restoring": "Restoring the wallet connection…",
+    "rolesLabel": "On-chain roles of this wallet",
+    "rolesError": "Its on-chain roles could not be read.",
+    "rolesPartial": "Some of its on-chain roles could not be read.",
+    "roles": {
+      "protocolOwner": "Protocol owner",
+      "outreachOwner": "Outreach Reserve owner",
+      "outreachTreasurer": "Outreach Reserve treasurer",
+      "none": "No on-chain role"
+    }
+  },
+  "moderation": {
+    "title": "Message moderation",
+    "subtitle": "Hide a gesture message from this site, or restore it. A hidden message stays on-chain; the site stops showing it.",
+    "heading": "Gesture messages",
+    "description": "Every gesture that carries a message. Filter by visibility, cycle or text.",
+    "readOnly": "Read-only. Connect the moderator wallet to hide or restore messages.",
+    "loadError": "The gesture messages could not be loaded.",
+    "clearSearch": "Clear the search"
   },
   "settings": {
-    "title": "Administrative methods",
-    "subtitle": "Read-only view of dashboard contract addresses and parameters.",
-    "breadcrumbs": {
-      "home": "Home",
-      "admin": "Admin",
-      "settings": "Settings"
-    },
-    "loading": "Loading...",
-    "contractTitle": "Cosmic Signature Contract",
-    "contractDescription": "Contract addresses and on-chain parameters from the dashboard API.",
-    "placeholders": {
-      "number": "Enter number here"
-    },
-    "actions": {
-      "setAddress": "Set Address",
-      "set": "Set"
+    "title": "Contract settings",
+    "subtitle": "The protocol's contract addresses and parameters as the dashboard reports them. Read-only: only the protocol owner changes these values, on-chain.",
+    "loadError": "The contract settings could not be loaded.",
+    "notReported": "Not reported by the dashboard API",
+    "contractsDescription": "Every protocol contract, with its address on Arbiscan and, where verified, its source on Sourcify.",
+    "groups": {
+      "contracts": "Contracts",
+      "shares": "Allocation shares",
+      "selection": "Stellar Selection",
+      "timing": "Timing",
+      "cost": "Gesture Cost"
     },
     "values": {
       "divisorPercent": "{percent} (divisor {divisor})"
+    },
+    "status": {
+      "active": "Active",
+      "scheduled": "Scheduled"
     },
     "fields": {
       "ethStellarRecipients": "Number of ETH Stellar Selection recipients per cycle",
@@ -34,34 +56,50 @@
       "publicGoodsPercentage": "Public Goods percentage",
       "stellarSelectionPercentage": "Stellar Selection percentage",
       "anchorDistributionPercentage": "Anchor Distribution percentage",
-      "timeIncrease": "Time increase",
-      "allocationTimeout": "Timeout to retrieve Signature Allocation",
-      "priceIncrease": "Price increase",
+      "timeIncrease": "Time increment growth per cycle",
+      "allocationTimeout": "Finalization timeout",
+      "priceIncrease": "ETH Gesture Cost step-up",
       "gestureTimeIncrement": "Time added per gesture",
-      "initialAllocationSeconds": "Initial seconds until Signature Allocation",
+      "initialAllocationSeconds": "Initial time increment",
       "initialGestureCostFraction": "Initial Gesture Cost fraction",
       "activationTime": "Activation time",
       "gestureRatio": "ETH to CST Gesture ratio",
-      "calibrationWindowLength": "Cycle start CST Calibration Window length",
-      "switchMode": "Switch mode"
-    },
-    "modes": {
-      "runtime": "Runtime Mode",
-      "maintenance": "Maintenance Mode"
+      "calibrationWindowLength": "Cycle start CST Calibration Window length"
     }
   },
   "outreachTransfer": {
-    "title": "CST Outreach Transfer",
-    "subtitle": "Send CST allocations from the Outreach Reserve treasurer wallet.",
-    "roleReadError": "Unable to read the outreach reserve owner and treasurer.",
-    "walletRequiredTitle": "Wallet not connected",
-    "walletRequiredDescription": "Connect the current Outreach Reserve treasurer wallet to send CST allocations.",
-    "walletUnavailableTitle": "Outreach Reserve wallet unavailable",
-    "walletUnavailableDescription": "The Outreach Reserve wallet address is not available yet.",
-    "rolesLoadingTitle": "Loading outreach reserve roles",
-    "rolesLoadingDescription": "Reading the Outreach Reserve owner and treasurer from the contract.",
-    "rolesErrorTitle": "Unable to read outreach reserve roles",
-    "restrictedTitle": "Access restricted",
-    "restrictedDescription": "Connect the current Outreach Reserve treasurer wallet ({treasurer}) to use this form. Owner: {owner}."
+    "title": "CST outreach transfer",
+    "subtitle": "Send CST from the Outreach Reserve to a participant. Only the reserve's treasurer wallet can send.",
+    "treasurer": "Treasurer",
+    "owner": "Owner",
+    "walletRequiredTitle": "Connect the treasurer wallet to send CST",
+    "walletRequiredDescription": "Once connected, this page shows the Outreach Reserve's balance and, for its treasurer, the form that sends CST from it.",
+    "walletUnavailableTitle": "Outreach Reserve address unavailable",
+    "walletUnavailableDescription": "The dashboard has not reported the Outreach Reserve's address yet. Reload the page in a moment.",
+    "rolesErrorTitle": "The Outreach Reserve's roles could not be read",
+    "rolesErrorDescription": "Without the treasurer's address this page cannot tell whether this wallet may send.",
+    "restrictedTitle": "This wallet is not the treasurer",
+    "restrictedDescription": "Only the Outreach Reserve's treasurer can send CST from it. Connect the treasurer wallet to continue.",
+    "form": {
+      "title": "Send CST",
+      "description": "One transaction moves the amount from the Outreach Reserve to the recipient. It cannot be undone.",
+      "amount": "Amount",
+      "amountHint": "Use a dot or a comma for decimals.",
+      "sends": "Sends {amount}",
+      "submit": "Send CST",
+      "reserveHeading": "Outreach Reserve",
+      "reserve": "Reserve address",
+      "balance": "CST balance",
+      "history": "Outreach Reserve transfers",
+      "balanceError": "The reserve's CST balance could not be read.",
+      "confirmed": "CST sent from the Outreach Reserve.",
+      "failed": "The CST could not be sent. Check the wallet and try again.",
+      "errors": {
+        "amount": "Enter an amount greater than zero.",
+        "precision": "{decimals, plural, one {Use at most # decimal place.} other {Use at most # decimal places.}}",
+        "grouping": "Leave out thousands separators: type 1000, not 1,000.",
+        "insufficient": "The reserve holds less CST than this."
+      }
+    }
   }
 }

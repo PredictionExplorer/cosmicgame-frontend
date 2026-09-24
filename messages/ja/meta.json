@@ -63,7 +63,7 @@
   },
   "contracts": {
     "title": "コントラクト：検証済みのArbitrumスマートコントラクト",
-    "description": "Cosmic Signatureのスマートコントラクトアドレス、検証状況、監査、形式検証の注記、Arbitrumへのデプロイの詳細。"
+    "description": "Arbitrum One上のCosmic Signatureのすべてのスマートコントラクトアドレスと、エクスプローラーとSourcifyへのリンク。配分の内訳、プロトコルの設定、調律期間も確認できます。"
   },
   "terms": {
     "title": "利用規約",
@@ -83,7 +83,7 @@
   },
   "audits": {
     "title": "監査：検証とコントラクトのレビュー",
-    "description": "Cosmic Signatureのスマートコントラクトは、Hackenによる独立した監査を受けました。報告書、形式検証の背景、ソースコード検証のリソースを確認する。"
+    "description": "HackenによるCosmic Signatureコントラクトの独立監査の概要。深刻度別の所見、ファジングした不変条件、報告書の全文、リポジトリにある形式検証の仕様を確認できます。"
   },
   "code": {
     "title": "ソースコード：CC0のオンチェーンアート・プロトコル",
@@ -220,16 +220,16 @@
     "invalidAddress": "無効なアドレス"
   },
   "admin": {
-    "title": "管理者",
-    "description": "Cosmic Signatureプロトコルの管理機能。プロトコルのパラメーター、コントラクトの設定、システム構成を管理する。"
+    "title": "一筆のメッセージ管理",
+    "description": "運営ツール：Cosmic Signatureのサイトで一筆のメッセージを非表示にしたり、元に戻したりします。"
   },
   "adminSettings": {
-    "title": "管理者設定",
-    "description": "管理者設定とコントラクトの管理"
+    "title": "コントラクト設定",
+    "description": "Cosmic Signatureのコントラクトアドレスとパラメーターを閲覧のみで表示する運営画面です。"
   },
   "internalCstOutreachTransfer": {
     "title": "CST広報送付",
-    "description": "設定された広報準備金ウォレットの署名者向けの、制限付きCST送付ツール。"
+    "description": "広報準備金の財務担当者が準備金からCSTを送付するための運営ツールです。"
   },
   "embedEndurance": {
     "title": "持久と時の戦士のタイムライン",

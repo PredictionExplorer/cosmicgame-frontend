@@ -2,10 +2,9 @@ import type { Metadata, ResolvingMetadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { getRiskCopy } from '@/content/legal';
-import { TrustCenterTabs } from '@/content/legal/TrustCenterTabs';
-import { TrustPageContent } from '@/content/legal/TrustPageContent';
+import { getLegalDocumentLabels } from '@/content/legal/labels';
+import { RiskContent } from '@/content/legal/RiskContent';
 
-import { PageShell } from '@/components/ui/page-shell';
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd } from '@/utils/jsonLd';
 import { createPageMetadata } from '@/utils/seo';
@@ -33,10 +32,13 @@ export async function generateMetadata(
 export default async function RiskDisclosuresPage({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const legal = await getTranslations({ locale, namespace: 'legal' });
+  const [legal, labels] = await Promise.all([
+    getTranslations({ locale, namespace: 'legal' }),
+    getLegalDocumentLabels(locale),
+  ]);
 
   return (
-    <PageShell variant="form">
+    <>
       <JsonLd
         data={breadcrumbJsonLd(
           [
@@ -52,12 +54,7 @@ export default async function RiskDisclosuresPage({ params }: PageProps) {
           localeHref(APP_ORIGIN, '/', locale),
         )}
       />
-      <TrustPageContent
-        copy={getRiskCopy(locale)}
-        locale={locale}
-        page="risk"
-        tabs={<TrustCenterTabs current="risk" locale={locale} />}
-      />
-    </PageShell>
+      <RiskContent copy={getRiskCopy(locale)} locale={locale} labels={labels} />
+    </>
   );
 }

@@ -242,11 +242,11 @@
     "voluntaryEmpty": "直接轉入公共物品金庫的資助會顯示在這裏，由金庫為目前設定的公共物品受益方保管。"
   },
   "banGesture": {
-    "banned": "落筆已禁用。",
-    "unbanned": "已解除落筆禁用。",
-    "error": "操作失敗，請重試。",
-    "ban": "禁用",
-    "unban": "解除禁用",
+    "banned": "留言已隱藏。",
+    "unbanned": "留言已恢復。",
+    "error": "未能更新留言狀態，請重試。",
+    "ban": "隱藏",
+    "unban": "恢復",
     "visibilityLabel": "顯示留言",
     "hiddenTag": "已隱藏",
     "allCycles": "全部週期",

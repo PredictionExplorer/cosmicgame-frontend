@@ -6,5 +6,12 @@
     "risk": "Công bố rủi ro",
     "security": "Bảo mật",
     "audits": "Kiểm toán"
+  },
+  "document": {
+    "contents": "Trên trang này",
+    "backToTop": "Về đầu trang",
+    "backToContents": "Về mục lục",
+    "sectionLink": "Liên kết đến mục “{section}”",
+    "revisionHistory": "Lịch sử sửa đổi"
   }
 }

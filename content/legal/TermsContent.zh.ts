@@ -73,7 +73,7 @@ export const termsCopyZh = {
         {
           id: 'random-walk',
           subtitle: 'Random Walk NFT 价格减免',
-          text: '一枚 Random Walk NFT 可附加至一笔 ETH 落笔，使 ETH 落笔价格降低 50%。该操作永久有效且无法撤销；使用后，同一枚 Random Walk NFT 不得再次用于价格减免。',
+          text: `一枚 Random Walk NFT 可附加至一笔 ETH 落笔，使 ETH 落笔价格降低 ${protocolFacts.randomWalkDiscountPercentage}%。该操作永久有效且无法撤销；使用后，同一枚 Random Walk NFT 不得再次用于价格减免。`,
         },
       ],
     },
@@ -175,7 +175,7 @@ export const termsCopyZh = {
         {
           id: 'audits',
           subtitle: '智能合约审计',
-          text: '我们会尽力保障智能合约安全，但任何审计都无法保证绝对安全。你须自行承担使用本平台的风险。',
+          text: '我们会尽力保障智能合约安全，但任何审计都无法保证绝对安全；审计检查了哪些内容，请见<audits>审计</audits>。你须自行承担使用本平台的风险。',
         },
       ],
     },
@@ -187,34 +187,15 @@ export const termsCopyZh = {
           id: 'intro',
           text: '你同意不得从事以下任何禁止行为：',
         },
-        {
-          id: 'exploit',
-          text: '• 利用程序缺陷、故障或漏洞操纵或破坏协议机制',
-        },
-        {
-          id: 'automation',
-          text: '• 使用机器人、脚本或自动化工具与平台交互',
-        },
-        {
-          id: 'collusion',
-          text: '• 实施任何形式的市场操纵，或与其他用户串通',
-        },
-        {
-          id: 'security',
-          text: '• 试图入侵、逆向工程或破坏平台安全',
-        },
-        {
-          id: 'law',
-          text: '• 违反任何适用法律法规',
-        },
-        {
-          id: 'accounts',
-          text: '• 创建多个账户以取得不公平优势',
-        },
-        {
-          id: 'malicious',
-          text: '• 上传恶意内容或试图发动拒绝服务攻击',
-        },
+      ],
+      bullets: [
+        '利用程序缺陷、故障或漏洞操纵或破坏协议机制',
+        '使用机器人、脚本或自动化工具与平台交互',
+        '实施任何形式的市场操纵，或与其他用户串通',
+        '试图入侵、逆向工程或破坏平台安全',
+        '违反任何适用法律法规',
+        '创建多个账户以取得不公平优势',
+        '上传恶意内容或试图发动拒绝服务攻击',
       ],
     },
   ],
@@ -223,7 +204,7 @@ export const termsCopyZh = {
     {
       id: 'intellectual-property',
       subtitle: '知识产权',
-      text: '仓库根目录 LICENSE 所涵盖的项目自有材料采用 CC0 1.0。第三方依赖、字体、素材及其他第三方材料仍适用各自的许可证，不在该权利放弃范围内；详见 THIRD_PARTY_NOTICES.md。CC0 不放弃商标权或专利权。未采用 CC0 或指定开源许可证的材料仍归各自权利人所有，并受适用的知识产权法律保护。通过协议获得 NFT，代表你拥有相应的特定代币；除非另有明确说明，该所有权不包含底层知识产权。',
+      text: '仓库根目录 <license>LICENSE</license> 所涵盖的项目自有材料采用 CC0 1.0。第三方依赖、字体、素材及其他第三方材料仍适用各自的许可证，不在该权利放弃范围内；详见 <notices>THIRD_PARTY_NOTICES.md</notices>。CC0 不放弃商标权或专利权。未采用 CC0 或指定开源许可证的材料仍归各自权利人所有，并受适用的知识产权法律保护。通过协议获得 NFT，代表你拥有相应的特定代币；除非另有明确说明，该所有权不包含底层知识产权。',
     },
     // lexicon-allow-start: 责任限制条款须忠实保留利润损失这一法律概念。
     {
@@ -260,7 +241,7 @@ export const termsCopyZh = {
     {
       id: 'contact',
       subtitle: '联系方式',
-      text: '如对本服务条款有任何疑问，请通过官方社区渠道或 GitHub 仓库联系我们。',
+      text: '如对本服务条款有任何疑问，请通过 <discord>Discord</discord>、<x>X</x> 或 <frontendRepository>GitHub 仓库</frontendRepository>联系我们。',
     },
   ],
   // lexicon-allow-start: Howey 测试否认文案须明确排除投资属性。
@@ -269,6 +250,13 @@ export const termsCopyZh = {
     text: '参与 Cosmic Signature 涉及财务风险。加密货币与 NFT 市场波动剧烈，你可能无法收回落笔所对应的价值。切勿使用无法承受失去的资金落笔。Cosmic Signature 不是投资产品，不对代币价格或未来表现作任何陈述，也不会以投资名义招揽参与。参与前，请自行研究并审慎考虑自身财务状况。',
   },
   // lexicon-allow-end
+  allocationsTable: {
+    title: '分配轨道一览',
+    track: '轨道',
+    none: '无',
+    sharedBy: '{percent}，由 {count} 人共享',
+    each: '{count} × {amount}',
+  },
   acknowledgment: {
     title: '确认',
     text: '使用 Cosmic Signature，即表示你确认已阅读、理解并同意受本服务条款约束。你同时确认已理解区块链技术、加密货币与 NFT 所涉及的风险。',

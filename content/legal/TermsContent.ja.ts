@@ -2,7 +2,7 @@ import { protocolFacts } from '@/content/protocol-facts';
 
 import type { TermsCopy } from './TermsContent';
 
-const cst = protocolFacts.specialAllocationCst.toLocaleString();
+const cst = protocolFacts.specialAllocationCst.toLocaleString('ja-JP');
 
 export const termsCopyJa = {
   title: '利用規約',
@@ -76,7 +76,7 @@ export const termsCopyJa = {
         {
           id: 'random-walk',
           subtitle: 'Random Walk NFTによる費用の引き下げ',
-          text: 'Random Walk NFTはETH一筆に一度だけ添付でき、ETH一筆の費用が50%引き下げられます。この操作は取り消せません。一度使ったRandom Walk NFTを、再び費用の引き下げに使うことはできません。',
+          text: `Random Walk NFTはETH一筆に一度だけ添付でき、ETH一筆の費用が${protocolFacts.randomWalkDiscountPercentage}%引き下げられます。この操作は取り消せません。一度使ったRandom Walk NFTを、再び費用の引き下げに使うことはできません。`,
         },
       ],
     },
@@ -87,7 +87,7 @@ export const termsCopyJa = {
         {
           id: 'distribution',
           subtitle: '配分の実行',
-          text: `配分はスマートコントラクトのルールに従って自動的に配られます。標準的なサイクルでは、以下の配分トラック全体で${protocolFacts.typicalNftsPerCycle}点のCosmic Signature NFTと${protocolFacts.typicalCstImprintsPerCycle.toLocaleString()} CSTが刻印されます。`,
+          text: `配分はスマートコントラクトのルールに従って自動的に配られます。標準的なサイクルでは、以下の配分トラック全体で${protocolFacts.typicalNftsPerCycle}点のCosmic Signature NFTと${protocolFacts.typicalCstImprintsPerCycle.toLocaleString('ja-JP')} CSTが刻印されます。`,
         },
         {
           id: 'signature',
@@ -142,7 +142,7 @@ export const termsCopyJa = {
         {
           id: 'outreach',
           subtitle: '広報準備金',
-          text: `サイクルごとに${protocolFacts.outreachReserveCst.toLocaleString()} CSTが、広報配分とエコシステムの貢献者のために刻印されます。`,
+          text: `サイクルごとに${protocolFacts.outreachReserveCst.toLocaleString('ja-JP')} CSTが、広報配分とエコシステムの貢献者のために刻印されます。`,
         },
         {
           id: 'retrieval',
@@ -178,7 +178,7 @@ export const termsCopyJa = {
         {
           id: 'audits',
           subtitle: 'スマートコントラクトの監査',
-          text: '当方はスマートコントラクトの安全性の確保に努めていますが、いかなる監査も完全な安全性を保証することはできません。プラットフォームの利用は利用者自身のリスクで行われます。',
+          text: '当方はスマートコントラクトの安全性の確保に努めていますが、いかなる監査も完全な安全性を保証することはできません。監査で確認した範囲は<audits>監査</audits>をご覧ください。プラットフォームの利用は利用者自身のリスクで行われます。',
         },
       ],
     },
@@ -190,34 +190,15 @@ export const termsCopyJa = {
           id: 'intro',
           text: '利用者は、以下の禁止行為のいずれにも関与しないことに同意します：',
         },
-        {
-          id: 'exploit',
-          text: '• バグ、不具合、脆弱性を通じてプロトコルの仕組みを操作または悪用しようとすること',
-        },
-        {
-          id: 'automation',
-          text: '• ボット、スクリプト、自動化ツールを使ってプラットフォームとやり取りすること',
-        },
-        {
-          id: 'collusion',
-          text: '• いかなる形の市場操作や、他の利用者との共謀に関与すること',
-        },
-        {
-          id: 'security',
-          text: '• プラットフォームのセキュリティをハッキング、リバースエンジニアリング、または侵害しようとすること',
-        },
-        {
-          id: 'law',
-          text: '• 適用される法令に違反すること',
-        },
-        {
-          id: 'accounts',
-          text: '• 不公正な優位を得るために複数のアカウントを作成すること',
-        },
-        {
-          id: 'malicious',
-          text: '• 悪意のあるコンテンツをアップロードしたり、サービス拒否攻撃を試みたりすること',
-        },
+      ],
+      bullets: [
+        'バグ、不具合、脆弱性を通じてプロトコルの仕組みを操作または悪用しようとすること',
+        'ボット、スクリプト、自動化ツールを使ってプラットフォームとやり取りすること',
+        'いかなる形の市場操作や、他の利用者との共謀に関与すること',
+        'プラットフォームのセキュリティをハッキング、リバースエンジニアリング、または侵害しようとすること',
+        '適用される法令に違反すること',
+        '不公正な優位を得るために複数のアカウントを作成すること',
+        '悪意のあるコンテンツをアップロードしたり、サービス拒否攻撃を試みたりすること',
       ],
     },
   ],
@@ -226,7 +207,7 @@ export const termsCopyJa = {
     {
       id: 'intellectual-property',
       subtitle: '知的財産',
-      text: 'リポジトリのルートLICENSEの対象となるプロジェクト所有の素材は、CC0 1.0で提供されます。第三者の依存関係、フォント、アセット、その他の第三者の素材はそれぞれのライセンスを保持し、この提供には含まれません。THIRD_PARTY_NOTICES.mdをご覧ください。CC0は商標権や特許権を放棄するものではありません。CC0または明示されたオープンソースライセンスの対象でない素材は、それぞれの権利者の財産のままであり、適用される知的財産法によって保護されます。プロトコルを通じて受け取ったNFTは、その特定のトークンの所有権を与えますが、明示されている場合を除き、基礎となる知的財産の所有権を与えるものではありません。',
+      text: 'リポジトリのルートにある<license>LICENSE</license>の対象となるプロジェクト所有の素材は、CC0 1.0で提供されます。第三者の依存関係、フォント、アセット、その他の第三者の素材はそれぞれのライセンスを保持し、この提供には含まれません。<notices>THIRD_PARTY_NOTICES.md</notices>をご覧ください。CC0は商標権や特許権を放棄するものではありません。CC0または明示されたオープンソースライセンスの対象でない素材は、それぞれの権利者の財産のままであり、適用される知的財産法によって保護されます。プロトコルを通じて受け取ったNFTは、その特定のトークンの所有権を与えますが、明示されている場合を除き、基礎となる知的財産の所有権を与えるものではありません。',
     },
     // lexicon-allow-start: boilerplate limitation-of-liability language must preserve "profits".
     {
@@ -263,7 +244,7 @@ export const termsCopyJa = {
     {
       id: 'contact',
       subtitle: '連絡先',
-      text: '本利用規約についてご質問がある場合は、公式のコミュニティチャンネルまたはGitHubリポジトリを通じてお問い合わせください。',
+      text: '本利用規約についてご質問がある場合は、<discord>Discord</discord>、<x>X</x>、<frontendRepository>GitHubリポジトリ</frontendRepository>のいずれかでお問い合わせください。',
     },
   ],
   // lexicon-allow-start: Howey-test denial copy must explicitly negate an investment framing.
@@ -272,6 +253,13 @@ export const termsCopyJa = {
     text: 'Cosmic Signatureへの参加には金銭的なリスクが伴います。暗号資産とNFTの市場は非常に変動が大きく、一筆の価値が戻らないことがあります。失っても生活に支障のない範囲で参加してください。Cosmic Signatureは投資商品ではなく、トークンの価格や将来の動きについて何も表明せず、投資として参加を勧誘することもありません。参加する前に、必ず自身で調べ、自身の経済状況を慎重に検討してください。',
   },
   // lexicon-allow-end
+  allocationsTable: {
+    title: '配分トラックの一覧',
+    track: 'トラック',
+    none: 'なし',
+    sharedBy: '{percent}（{count}人で分配）',
+    each: '{count} × {amount}',
+  },
   acknowledgment: {
     title: '確認',
     text: 'Cosmic Signatureを利用することにより、利用者は本利用規約を読み、理解し、これに拘束されることに同意したことを確認します。また、ブロックチェーン技術、暗号資産、NFTに関わるリスクを理解していることを確認します。',

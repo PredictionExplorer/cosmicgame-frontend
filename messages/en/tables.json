@@ -242,9 +242,9 @@
     "voluntaryEmpty": "Contributions sent straight to the Public Goods Vault appear here. The vault holds them for its configured Public Goods recipient."
   },
   "banGesture": {
-    "banned": "Gesture hidden.",
-    "unbanned": "Gesture restored.",
-    "error": "The moderation status could not be updated. Please try again.",
+    "banned": "Message hidden.",
+    "unbanned": "Message restored.",
+    "error": "The message could not be updated. Try again.",
     "ban": "Hide",
     "unban": "Restore",
     "visibilityLabel": "Show messages",

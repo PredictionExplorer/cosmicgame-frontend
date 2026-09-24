@@ -3,7 +3,15 @@ import type { PrivacyCopy } from './PrivacyContent';
 export const privacyCopyVi = {
   title: 'Chính sách quyền riêng tư',
   subtitle:
-    'Quyền riêng tư của bạn rất quan trọng với chúng tôi. Chính sách này giải thích cách Cosmic Signature thu thập, sử dụng và bảo vệ thông tin của bạn khi bạn tương tác với ứng dụng phi tập trung của chúng tôi.',
+    'Cách Cosmic Signature xử lý thông tin khi bạn dùng ứng dụng và trang dự án: điều gì công khai trên chuỗi, trang web đo lường và lưu trữ gì, và dịch vụ nào nhận dữ liệu gì.',
+  inShort: {
+    title: 'Tóm tắt',
+    points: [
+      'Địa chỉ ví của bạn và mọi việc bạn làm trên chuỗi đều công khai và vĩnh viễn: ai cũng đọc được trên Arbitrum và không ai xóa được.',
+      'Kết nối ví chỉ chia sẻ địa chỉ công khai của ví. Chúng tôi không bao giờ hỏi cụm từ khôi phục, khóa riêng hay mật khẩu của bạn, và không thu thập tên hay địa chỉ email của bạn.',
+      'Trang web đo lượt truy cập và báo lỗi qua các dịch vụ được nêu tên bên dưới, và chỉ đặt các cookie được liệt kê bên dưới.',
+    ],
+  },
   introductionTitle: 'Giới thiệu',
   introduction: [
     'Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum, một mạng Layer 2 của Ethereum. Ứng dụng phi tập trung (dApp) này xử lý dữ liệu và quyền riêng tư theo cách khác với ứng dụng web truyền thống.',
@@ -27,7 +35,7 @@ export const privacyCopyVi = {
         {
           id: 'usage',
           subtitle: 'Dữ liệu sử dụng',
-          text: 'Chúng tôi có thể thu thập dữ liệu sử dụng ẩn danh như các trang đã xem, thời gian trên nền tảng và các mẫu tương tác chung để cải thiện dịch vụ.',
+          text: 'Chúng tôi đo cách trang web được sử dụng: các trang được xem, tốc độ tải trang, trang dẫn đến, cùng quốc gia, trình duyệt và loại thiết bị của lượt truy cập. Các dịch vụ phân tích làm việc này được liệt kê tại <privacyServices>Dịch vụ chúng tôi sử dụng</privacyServices>.',
         },
       ],
     },
@@ -43,12 +51,12 @@ export const privacyCopyVi = {
         {
           id: 'improvement',
           subtitle: 'Cải thiện nền tảng',
-          text: 'Chúng tôi dùng dữ liệu tổng hợp, ẩn danh để cải thiện nền tảng, sửa lỗi và phát triển tính năng mới.',
+          text: 'Chúng tôi dùng dữ liệu sử dụng đã tổng hợp và báo cáo lỗi để sửa lỗi và cải thiện trang web.',
         },
         {
           id: 'communication',
           subtitle: 'Liên lạc',
-          text: 'Chúng tôi có thể dùng thông tin của bạn để gửi các cập nhật quan trọng về nền tảng, chẳng hạn thông báo bảo mật hoặc những thay đổi lớn trong cơ chế giao thức.',
+          text: 'Chúng tôi không thu thập địa chỉ email hay thông tin liên hệ khác, nên không liên hệ trực tiếp với bạn. Thông báo, bao gồm thông báo bảo mật và thay đổi của giao thức, được đăng trên <x>X</x> và <discord>Discord</discord>.',
         },
       ],
     },
@@ -64,7 +72,7 @@ export const privacyCopyVi = {
         {
           id: 'infrastructure',
           subtitle: 'Bảo mật hạ tầng',
-          text: 'Hạ tầng web của chúng tôi dùng các biện pháp bảo mật tiêu chuẩn ngành, gồm mã hóa HTTPS, lưu trữ an toàn và kiểm toán bảo mật định kỳ.',
+          text: 'Trang web chỉ được phục vụ qua HTTPS, trên nền tảng lưu trữ của Vercel. Các hợp đồng thông minh đã được kiểm toán độc lập; xem <audits>Kiểm toán</audits>.',
         },
         {
           id: 'passwords',
@@ -85,7 +93,7 @@ export const privacyCopyVi = {
         {
           id: 'third-party',
           subtitle: 'Dịch vụ bên thứ ba',
-          text: 'Chúng tôi có thể dùng dịch vụ bên thứ ba cho phân tích, lưu trữ và hạ tầng. Các dịch vụ này chịu ràng buộc bởi chính sách quyền riêng tư của riêng họ và chúng tôi bảo đảm họ đáp ứng các tiêu chuẩn bảo vệ dữ liệu phù hợp.',
+          text: 'Các dịch vụ được liệt kê tại <privacyServices>Dịch vụ chúng tôi sử dụng</privacyServices> nhận dữ liệu được mô tả ở đó và xử lý theo chính sách quyền riêng tư của riêng họ, có liên kết trong bảng.',
         },
         {
           id: 'legal',
@@ -111,7 +119,7 @@ export const privacyCopyVi = {
         {
           id: 'cookies',
           subtitle: 'Tùy chọn cookie',
-          text: 'Trang web của chúng tôi có thể dùng cookie cho các chức năng cơ bản. Bạn có thể kiểm soát thiết lập cookie qua trình duyệt.',
+          text: 'Trang web chỉ đặt các cookie được liệt kê tại <privacyStorage>Cookie và bộ nhớ trình duyệt</privacyStorage>. Bạn có thể xóa hoặc chặn chúng trong cài đặt trình duyệt; trang web vẫn hoạt động nhưng sẽ không nhớ bảng màu và ngôn ngữ của bạn.',
         },
       ],
     },
@@ -126,12 +134,12 @@ export const privacyCopyVi = {
     {
       id: 'changes',
       subtitle: 'Thay đổi chính sách này',
-      text: 'Chúng tôi có thể cập nhật Chính sách quyền riêng tư theo thời gian. Chúng tôi sẽ thông báo mọi thay đổi bằng cách đăng Chính sách quyền riêng tư mới trên trang này và cập nhật ngày “Cập nhật lần cuối”. Bạn nên xem lại Chính sách quyền riêng tư này định kỳ để nắm các thay đổi.',
+      text: 'Chúng tôi có thể cập nhật Chính sách quyền riêng tư này theo thời gian. Mọi thay đổi đều được đăng trên trang này kèm ngày “Cập nhật lần cuối” ở đầu trang, và từng thay đổi đều có trong <privacyHistory>lịch sử sửa đổi</privacyHistory> của chính sách.',
     },
     {
       id: 'contact',
       subtitle: 'Thông tin liên hệ',
-      text: 'Nếu bạn có câu hỏi về Chính sách quyền riêng tư này, vui lòng liên hệ với chúng tôi qua các kênh cộng đồng chính thức hoặc kho mã GitHub.',
+      text: 'Nếu bạn có câu hỏi về Chính sách quyền riêng tư này, hãy liên hệ với chúng tôi qua <support>support@cosmicsignature.com</support>, trên <discord>Discord</discord> hoặc trên <x>X</x>.',
     },
     {
       id: 'international',
@@ -139,8 +147,83 @@ export const privacyCopyVi = {
       text: 'Cosmic Signature thanh toán trên Arbitrum, một mạng Layer 2 của Ethereum có thể truy cập toàn cầu. Khi sử dụng nền tảng, bạn xác nhận rằng thông tin của mình có thể được xử lý và lưu trữ tại nhiều địa điểm khác nhau trên thế giới.',
     },
   ],
-  notice: {
-    title: 'Quan trọng: tính minh bạch của blockchain',
-    text: 'Xin lưu ý rằng giao dịch blockchain là công khai và vĩnh viễn. Địa chỉ ví và mọi tương tác của bạn với hợp đồng thông minh của chúng tôi đều hiển thị công khai và không thể xóa. Đây là đặc tính căn bản của công nghệ blockchain, không phải hạn chế trong thực hành quyền riêng tư của chúng tôi.',
+  services: {
+    heading: 'Dịch vụ chúng tôi sử dụng',
+    intro:
+      'Trang web này dùng các dịch vụ dưới đây. Mỗi dịch vụ xử lý dữ liệu được nêu theo chính sách quyền riêng tư của riêng mình.',
+    columns: {
+      service: 'Dịch vụ',
+      purpose: 'Mục đích',
+      data: 'Dữ liệu nhận được',
+      policy: 'Chính sách quyền riêng tư',
+    },
+    policyLink: 'Chính sách',
+    ownPolicy: 'Chính sách này',
+    none: 'Không có',
+    items: {
+      vercel: {
+        purpose: 'Lưu trữ và phân phối trang web',
+        data: 'Địa chỉ IP và thông tin trình duyệt của bạn, trong nhật ký yêu cầu',
+      },
+      vercelAnalytics: {
+        purpose: 'Đếm lượt xem trang và đo tốc độ trang, không dùng cookie',
+        data: 'Trang được xem, trang dẫn đến, quốc gia, trình duyệt và loại thiết bị',
+      },
+      googleAnalytics: {
+        purpose: 'Đo cách khách truy cập sử dụng trang web',
+        data: 'Trang được xem, vị trí gần đúng, trình duyệt và thiết bị, qua cookie',
+      },
+      sentry: {
+        purpose: 'Báo lỗi để có thể sửa',
+        data: 'Lỗi, trang, trình duyệt của bạn và bản ghi lại khoảnh khắc trước lỗi, với mọi văn bản và dữ liệu nhập đều được che',
+      },
+      api: {
+        purpose: 'Cung cấp dữ liệu giao thức mà các trang hiển thị',
+        data: 'Các bản ghi bạn mở, kể cả địa chỉ ví bạn tra cứu',
+      },
+      rpc: {
+        purpose: 'Đọc hợp đồng trên Arbitrum và chuyển tiếp giao dịch bạn ký',
+        data: 'Địa chỉ IP của bạn, các địa chỉ được đọc và giao dịch bạn gửi',
+      },
+      walletConnect: {
+        purpose: 'Kết nối ví di động và ví qua mã QR',
+        data: 'Địa chỉ ví của bạn và các tin nhắn đã mã hóa giữa trang web và ví',
+      },
+      coingecko: {
+        purpose: 'Cung cấp giá ETH và CST theo đô la Mỹ',
+        data: 'Địa chỉ IP của bạn, khi một trang hiển thị giá đô la',
+      },
+    },
+  },
+  storage: {
+    heading: 'Cookie và bộ nhớ trình duyệt',
+    intro:
+      'Trang web lưu những mục sau trên thiết bị của bạn. Không mục nào chứa tên hay thông tin liên hệ của bạn. Cookie được gửi kèm yêu cầu; bộ nhớ trình duyệt chỉ ở trên thiết bị của bạn.',
+    columns: {
+      name: 'Tên',
+      kind: 'Loại',
+      purpose: 'Mục đích',
+      lifetime: 'Lưu trong',
+    },
+    kinds: {
+      cookie: 'Cookie',
+      browser: 'Bộ nhớ trình duyệt',
+    },
+    lifetimes: {
+      oneYear: '1 năm',
+      twoYears: '2 năm',
+      untilCleared: 'Đến khi bạn xóa',
+    },
+    items: {
+      themeCookie: 'Ghi nhớ bảng màu của bạn trên cả hai trang Cosmic Signature',
+      localeCookie: 'Ghi nhớ ngôn ngữ bạn chọn',
+      gaCookies: 'Phân biệt các lượt truy cập lặp lại cho Google Analytics',
+      themeStorage: 'Ghi nhớ bảng màu của bạn trên trang này',
+      attention: 'Ghi nhớ cài đặt nhắc nhở và âm thanh của bạn',
+      explainer: 'Ghi nhớ rằng bạn đã đóng phần giải thích chu kỳ',
+      observatory:
+        'Ghi nhớ rằng bạn đã ghé trang chủ thử nghiệm, để phần giới thiệu được thu gọn ở lần sau',
+      wallet: 'Ghi nhớ ví bạn đã kết nối để ứng dụng có thể kết nối lại',
+    },
   },
 } as const satisfies PrivacyCopy;

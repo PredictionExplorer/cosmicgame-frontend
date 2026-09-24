@@ -149,7 +149,7 @@
   },
   "contracts": {
     "title": "合约：已验证的 Arbitrum 智能合约",
-    "description": "查看 Cosmic Signature 智能合约地址、验证状态、审计、形式化验证说明与 Arbitrum 部署详情。"
+    "description": "Cosmic Signature 在 Arbitrum One 上的全部智能合约地址，附区块浏览器与 Sourcify 链接，以及分配比例、协议配置与校准窗口。"
   },
   "terms": {
     "title": "服务条款",
@@ -173,7 +173,7 @@
   },
   "audits": {
     "title": "审计：验证与合约审查",
-    "description": "Cosmic Signature 智能合约已由 Hacken 完成独立审计。查看审计报告、形式化验证背景与源代码验证资源。"
+    "description": "Hacken 对 Cosmic Signature 合约的独立审计概览：按严重程度划分的发现、模糊测试的不变量与完整报告，以及合约仓库中的形式化验证规范。"
   },
   "code": {
     "title": "源代码：CC0 链上艺术协议",
@@ -220,16 +220,16 @@
     "description": "按演绎周期查看向 Cosmic Signature 协议直接贡献的 ETH。"
   },
   "admin": {
-    "title": "管理",
-    "description": "Cosmic Signature 协议管理工具，用于查看协议参数、合约设置与系统配置。"
+    "title": "落笔留言审核",
+    "description": "运营工具：在 Cosmic Signature 网站上隐藏或恢复落笔留言。"
   },
   "adminSettings": {
-    "title": "管理设置",
-    "description": "查看 Cosmic Signature 的管理设置与合约配置。"
+    "title": "合约设置",
+    "description": "以只读方式查看 Cosmic Signature 合约地址与参数的运营视图。"
   },
   "internalCstOutreachTransfer": {
     "title": "CST 推广转账",
-    "description": "仅供已配置推广储备钱包签名者使用的受限 CST 转账工具。"
+    "description": "供推广储备财务执行人从储备转出 CST 的运营工具。"
   },
   "embedEndurance": {
     "title": "坚守与时之勇士时间线",

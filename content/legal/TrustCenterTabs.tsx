@@ -1,30 +1,27 @@
-import { getTranslations } from 'next-intl/server';
+import { useTranslations } from 'next-intl';
 
 import { PageHeaderTabs } from '@/components/layout/PageHeader';
 
 import { TRUST_CENTER_PAGES, type TrustCenterPage } from './trustCenter';
 
 /**
- * The Trust Center pages as `PageHeader` tabs, labelled from the `legal`
- * catalog on the server (the client legal pages do not load that catalog).
+ * The Trust Center pages as `PageHeader` tabs. The labels come from the
+ * page's server read of the `legal` catalog (`getLegalDocumentLabels`).
  */
-export async function TrustCenterTabs({
+export function TrustCenterTabs({
   current,
-  locale,
+  labels,
 }: {
   current: TrustCenterPage;
-  locale: string;
+  labels: Readonly<Record<TrustCenterPage, string>>;
 }) {
-  const [legal, common] = await Promise.all([
-    getTranslations({ locale, namespace: 'legal' }),
-    getTranslations({ locale, namespace: 'common' }),
-  ]);
+  const common = useTranslations('common');
   return (
     <PageHeaderTabs
       label={common('pageHeader.sections.trust')}
       items={TRUST_CENTER_PAGES.map(({ id, href }) => ({
         href,
-        label: legal(`breadcrumbs.${id}`),
+        label: labels[id],
         current: id === current,
       }))}
     />

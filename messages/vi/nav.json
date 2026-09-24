@@ -154,7 +154,7 @@
     },
     "audits": {
       "label": "Kiểm toán",
-      "description": "Tình trạng kiểm toán và kiểm chứng hình thức"
+      "description": "Kiểm toán của Hacken và đặc tả kiểm chứng hình thức"
     },
     "contracts": {
       "label": "Hợp đồng",

@@ -2,7 +2,9 @@ import { protocolFacts } from '@/content/protocol-facts';
 
 import type { ContractAddresses } from '@/services/api/types';
 
-export type ContractCategory = 'core' | 'wallet' | 'anchoring';
+/** The address list's groups, in reading order. */
+export const CONTRACT_CATEGORIES = ['core', 'wallet', 'anchoring'] as const;
+export type ContractCategory = (typeof CONTRACT_CATEGORIES)[number];
 export const CONTRACT_ENTRY_IDS = [
   'protocol',
   'implementation',

@@ -5,12 +5,7 @@
   },
   "page": {
     "title": "合约地址",
-    "subtitle": "查看 Cosmic Signature 协议的链上地址、配置、源代码链接与验证背景。",
-    "allocationAria": "分配轨道",
-    "configurationAria": "协议配置",
-    "addressesAria": "合约地址",
-    "addressesTitle": "合约地址",
-    "parametersAria": "校准窗口与星选参数"
+    "subtitle": "查看 Cosmic Signature 协议的链上地址、配置、源代码链接与验证背景。"
   },
   "network": {
     "chain": "链 ID {chainId}"
@@ -63,18 +58,15 @@
   },
   "categories": {
     "core": "核心合约",
-    "wallet": "钱包合约",
-    "anchoring": "锚定合约"
+    "wallet": "钱包",
+    "anchoring": "锚定"
   },
-  "search": {
-    "placeholder": "按名称或地址搜索合约……",
-    "ariaLabel": "搜索合约",
-    "clearAria": "清除搜索",
-    "empty": "没有与“{searchTerm}”匹配的合约"
-  },
-  "addressCard": {
-    "copyAria": "复制{name}地址",
-    "explorerAria": "在区块浏览器中查看{name}"
+  "addresses": {
+    "title": "合约地址",
+    "description": "Cosmic Signature 在 Arbitrum One 上的全部合约。可复制地址，或在 Arbiscan 上核对地址、在 Sourcify 上核对源代码。",
+    "explorer": "Arbiscan",
+    "sourcify": "Sourcify",
+    "verified": "附有 Sourcify 链接的地址均在 Sourcify 上完全匹配，核对日期：{date}。"
   },
   "funds": {
     "title": "分配轨道",
@@ -109,6 +101,7 @@
   },
   "configuration": {
     "title": "协议配置",
+    "description": "协议合约当前读取的实时参数。",
     "cards": {
       "ethStep": {
         "label": "ETH 落笔价格增幅",
@@ -137,21 +130,28 @@
     }
   },
   "parameters": {
-    "title": "校准窗口与星选参数",
+    "windowsTitle": "校准窗口",
+    "windowsDescription": "每个窗口都会随时间降低落笔价格。CST 窗口在每次 CST 落笔后重新开始；ETH 窗口在每个周期开始时打开，并在首次落笔时关闭。",
     "cstTitle": "CST 校准窗口",
     "ethTitle": "ETH 校准窗口",
     "duration": "总时长",
     "elapsed": "已过时长",
-    "ceiling": "校准上限",
+    "remaining": "剩余",
+    "progress": "已完成 {percent}",
+    "state": {
+      "running": "进行中",
+      "complete": "已完成",
+      "closed": "已关闭",
+      "notStarted": "未开始"
+    },
+    "ceiling": "起始价格",
     "cstDurationTooltip": "CST 校准窗口当前存储在链上的时长。每笔 CST 落笔会使其延长约 {increase}%，每笔 ETH 落笔会使其缩短约 {decrease}%。",
     "cstElapsedTooltip": "当前 CST 校准窗口已经过的时间。",
     "cstCeilingTooltip": "当前所示 CST 校准窗口的起始落笔价格。价格会在实时存储的窗口时长内线性下降。",
     "ethDurationTooltip": "ETH 校准窗口的总时长；落笔价格会在此期间逐步下降。",
     "ethElapsedTooltip": "当前 ETH 校准窗口已经过的时间。",
-    "publicGoodsAddress": "公共物品地址",
+    "publicGoodsAddress": "公共物品受益方",
     "publicGoodsAddressTooltip": "当前从公共物品金库合约接收公共物品分配的链上地址。",
-    "copyPublicGoodsAria": "复制公共物品地址",
-    "viewPublicGoodsAria": "在区块浏览器中查看公共物品地址",
     "selection": {
       "ethLabel": "ETH 星选获配者",
       "ethTooltip": "每个周期通过程序化随机方式获得 ETH 分配的参与者数量。",
@@ -159,15 +159,21 @@
       "nftTooltip": "每个周期通过程序化随机方式获得 Cosmic Signature NFT 的参与者数量。",
       "anchorLabel": "NFT 星选（已锚定 RWLK）",
       "anchorTooltip": "每个周期通过程序化随机方式获得 Cosmic Signature NFT 的 Random Walk NFT 锚定者数量。"
-    }
+    },
+    "cstComplete": "窗口已走完全程，CST 落笔价格将停留在最低点，直到下一次 CST 落笔重新开始窗口。",
+    "ethClosed": "本周期的首次落笔已关闭该窗口；此后 ETH 落笔价格随每次落笔递增。",
+    "ethComplete": "窗口已走完全程，ETH 落笔价格将停留在最低点，直到本周期的首次落笔。"
   },
   "vault": {
-    "title": "公共物品金库操作",
+    "title": "公共物品",
+    "description": "每个周期都会把公共物品份额存入金库，再由金库转拨给公共物品受益方。",
     "tooltip": "调用公共物品金库的 send() 函数，将金库中的 ETH 余额转拨给已配置的受益方 Protocol Guild。",
+    "vaultAddress": "金库",
+    "share": "每个周期的份额",
     "balance": "金库当前余额",
-    "description": "将金库中可用的公共物品资金转拨给 Protocol Guild。",
-    "descriptionWithBeneficiary": "将金库中可用的公共物品资金转拨给 Protocol Guild（{address}）。",
-    "aria": "将公共物品金库余额转拨给 Protocol Guild"
+    "empty": "金库目前为空，暂无可转拨的资金。",
+    "balanceUnavailable": "暂时无法读取金库余额，因此目前不提供转拨操作。",
+    "note": "任何人都可以把金库余额转拨给受益方，只需支付 Gas 费。"
   },
   "seo": {
     "heading": "Cosmic Signature 合约",

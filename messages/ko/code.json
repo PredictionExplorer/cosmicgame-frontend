@@ -5,14 +5,47 @@
   },
   "viewer": {
     "title": "코드 뷰어",
-    "subtitle": "시드를 이미지로 바꾸는 생성 코드",
-    "description": "다음 코드는 스마트 컨트랙트가 생성한 시드를 이미지로 변환합니다. IPFS에서도 볼 수 있습니다:",
-    "github": "공개 GitHub 조직은 <link>github.com/PredictionExplorer</link>에서 볼 수 있습니다."
+    "description": "각 시드를 이미지와 영상으로 바꾸는 Rust 프로그램입니다. 같은 파일이 IPFS에도 게시되어 있습니다.",
+    "language": "Rust",
+    "lines": "{count, plural, other {#줄}}",
+    "codeAria": "이미지 생성 소스 코드(Rust)",
+    "copy": "코드 복사",
+    "copied": "복사됨",
+    "wrap": "줄 바꿈",
+    "ipfs": "IPFS",
+    "github": "GitHub",
+    "cid": "IPFS 콘텐츠 식별자"
+  },
+  "pipeline": {
+    "heading": "시드에서 이미지까지",
+    "description": "아래 코드가 NFT의 시드를 단계별로 작품으로 바꾸는 과정입니다.",
+    "galleryLink": "갤러리에서 이미지 보기",
+    "steps": {
+      "seed": {
+        "label": "시드",
+        "description": "NFT의 시드로, 각인될 때 온체인에 기록됩니다."
+      },
+      "stream": {
+        "label": "SHA3-256 무작위 스트림",
+        "description": "시드를 해시하여 재현 가능한 무작위 바이트 스트림을 만듭니다."
+      },
+      "simulation": {
+        "label": "삼체 시뮬레이션",
+        "description": "스트림에서 세 천체의 질량, 위치, 속도를 정하고 궤도를 계산합니다."
+      },
+      "renderer": {
+        "label": "스펙트럼 렌더러",
+        "description": "각 천체의 경로를 스펙트럼을 따라 조금씩 변하는 색으로 그립니다."
+      },
+      "image": {
+        "label": "Cosmic Signature NFT 이미지",
+        "description": "마지막 프레임이 이미지가 되고, 모든 프레임이 모여 영상이 됩니다. 같은 시드는 항상 같은 결과를 냅니다."
+      }
+    }
   },
   "seo": {
     "heading": "Cosmic Signature 소스 코드",
     "description": "Cosmic Signature의 프론트엔드, Go 백엔드, 스마트 컨트랙트, 이미지 생성 소스 코드를 살펴볼 수 있습니다. 아래 뷰어에서 온체인 시드가 재현 가능한 NFT 아트로 변환되는 과정을 확인할 수 있습니다.",
-    "excerpt": "시드 -> SHA3-256 무작위 스트림 -> 삼체 시뮬레이션 -> 스펙트럼 렌더러 -> Cosmic Signature NFT 이미지",
     "relatedAria": "소스 코드 관련 페이지",
     "links": {
       "ipfs": "게시된 IPFS 소스 아티팩트 열기",

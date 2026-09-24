@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { Breadcrumbs, type BreadcrumbItem } from '@/components/ui/breadcrumbs';
 import { GradientText } from '@/components/ui/gradient-text';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
+import { ScrollRail } from '@/components/ui/scroll-rail';
 import { UnknownValue } from '@/components/ui/unknown-value';
 import { HeaderLede } from '@/components/layout/HeaderLede';
 import { PAGE_SECTIONS, type PageSectionId } from '@/components/layout/pageSections';
@@ -341,8 +342,9 @@ export interface PageHeaderTab {
 /**
  * Underline tabs between sibling pages, for `PageHeader`'s `tabs` slot: they
  * sit on the header's bottom rule, the current page marked with a 2px primary
- * rule and `aria-current="page"`. On phones the row scrolls, fading at the
- * edge. Links, not ARIA tabs: each one is its own page.
+ * rule and `aria-current="page"`. A row wider than the screen scrolls on a
+ * ScrollRail, fading only at an edge with more to see and keeping the current
+ * page in view. Links, not ARIA tabs: each one is its own page.
  */
 export function PageHeaderTabs({
   label,
@@ -354,24 +356,26 @@ export function PageHeaderTabs({
 }) {
   return (
     <nav aria-label={label} className="-mb-px">
-      <ul className="flex gap-6 overflow-x-auto scrollbar-none max-sm:pe-8 max-sm:[mask-image:linear-gradient(to_right,black_calc(100%-2rem),transparent)]">
-        {items.map((item) => (
-          <li key={item.href} className="shrink-0">
-            <Link
-              href={item.href}
-              aria-current={item.current ? 'page' : undefined}
-              className={cn(
-                'focus-ring-inset inline-flex min-h-11 items-center whitespace-nowrap border-b-2 type-label transition-colors duration-fast',
-                item.current
-                  ? 'border-primary text-foreground'
-                  : 'border-transparent text-muted-foreground hover:border-rule hover:text-foreground',
-              )}
-            >
-              {item.label}
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <ScrollRail>
+        <ul className="flex gap-6">
+          {items.map((item) => (
+            <li key={item.href} className="shrink-0">
+              <Link
+                href={item.href}
+                aria-current={item.current ? 'page' : undefined}
+                className={cn(
+                  'focus-ring-inset inline-flex min-h-11 items-center whitespace-nowrap border-b-2 type-label transition-colors duration-[var(--duration-fast)]',
+                  item.current
+                    ? 'border-primary text-foreground'
+                    : 'border-transparent text-muted-foreground hover:border-rule hover:text-foreground',
+                )}
+              >
+                {item.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </ScrollRail>
     </nav>
   );
 }

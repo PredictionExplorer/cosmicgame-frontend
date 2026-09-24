@@ -154,7 +154,7 @@
     },
     "audits": {
       "label": "审计",
-      "description": "审计与形式化验证状态"
+      "description": "Hacken 审计与形式化验证规范"
     },
     "contracts": {
       "label": "合约",

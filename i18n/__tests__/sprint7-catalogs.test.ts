@@ -34,9 +34,10 @@ describe('Sprint 7 focused catalogs', () => {
     expect(zhPublicGoods.loadError).toBe('无法加载公共物品记录。');
     expect(zhMarketing.cta.copyEmail).toBe('复制邮箱地址');
     expect(zhMarketing.transferForm.historyLink).toContain('推广储备');
+    expect(zhAdmin.outreachTransfer.form.sends).toBe('将转出 {amount}');
     expect(zhCoordination.page.title).toBe('协调变更');
     expect(zhCoordination.events.publicGoodsPercentage).toBe('公共物品比例已变更');
-    expect(zhAdmin.outreachTransfer.restrictedTitle).toBe('访问受限');
+    expect(zhAdmin.outreachTransfer.restrictedTitle).toBe('此钱包不是财务执行人');
   });
 
   it('pins the reviewed English rendering', () => {
@@ -45,7 +46,7 @@ describe('Sprint 7 focused catalogs', () => {
     expect(enPublicGoods.loadError).toBe("The Public Goods records couldn't be loaded.");
     expect(enMarketing.cta.contact).toBe('Email the outreach team');
     expect(enCoordination.page.title).toBe('Coordination changes');
-    expect(enAdmin.settings.title).toBe('Administrative methods');
+    expect(enAdmin.settings.title).toBe('Contract settings');
   });
 
   it('uses glossary-safe Chinese for outreach and public-goods copy', () => {

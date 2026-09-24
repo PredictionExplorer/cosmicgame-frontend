@@ -299,7 +299,7 @@ test.describe('zh Sprint 7 — long-tail routes', () => {
     });
 
     await openZh(page, '/zh/admin');
-    await expect(page.getByRole('heading', { name: '管理', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '落笔留言审核', exact: true })).toBeVisible();
     const gestureRow = page.getByRole('row', { name: /Review locale link/ });
     await expect(gestureRow).toBeVisible();
     await expect(gestureRow.getByRole('link', { name: '7', exact: true })).toHaveAttribute(
@@ -308,8 +308,8 @@ test.describe('zh Sprint 7 — long-tail routes', () => {
     );
 
     await openZh(page, '/zh/admin/admin');
-    await expect(page.getByRole('heading', { name: '管理方法', exact: true })).toBeVisible();
-    await expect(page.getByText('Cosmic Signature 合约', { exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '合约设置', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '合约', exact: true })).toBeVisible();
 
     await openZh(page, '/zh/internal/cst-outreach-transfer');
     await expect(page.getByRole('heading', { name: 'CST 推广转账', exact: true })).toBeVisible();

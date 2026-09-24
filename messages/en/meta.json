@@ -63,7 +63,7 @@
   },
   "contracts": {
     "title": "Contracts: Verified Arbitrum Smart Contracts",
-    "description": "Find Cosmic Signature smart contract addresses, verification status, audits, formal verification notes, and Arbitrum deployment details."
+    "description": "Every Cosmic Signature smart contract address on Arbitrum One, with explorer and Sourcify links, plus the allocation split, the protocol configuration and the Calibration Windows."
   },
   "terms": {
     "title": "Terms",
@@ -83,7 +83,7 @@
   },
   "audits": {
     "title": "Audits: Verification and Contract Review",
-    "description": "The Cosmic Signature smart contracts were independently audited by Hacken. Review the report, formal verification context, and source-code verification resources."
+    "description": "Hacken's independent audit of the Cosmic Signature contracts at a glance: findings by severity, fuzzed invariants and the full report, with the formal verification specs in the repository."
   },
   "code": {
     "title": "Source Code: CC0 On-Chain Art Protocol",
@@ -220,16 +220,16 @@
     "invalidAddress": "Invalid Address"
   },
   "admin": {
-    "title": "Admin",
-    "description": "Administrative controls for the Cosmic Signature protocol. Manage protocol parameters, contract settings, and system configuration."
+    "title": "Message moderation",
+    "description": "Operator tool: hide gesture messages from the Cosmic Signature site, or restore them."
   },
   "adminSettings": {
-    "title": "Admin Settings",
-    "description": "Administrative settings and contract management"
+    "title": "Contract settings",
+    "description": "Read-only operator view of the Cosmic Signature contract addresses and parameters."
   },
   "internalCstOutreachTransfer": {
-    "title": "CST Outreach Transfer",
-    "description": "Restricted CST transfer tool for the configured outreach reserve wallet signer."
+    "title": "CST outreach transfer",
+    "description": "Operator tool for the Outreach Reserve treasurer to send CST from the reserve."
   },
   "embedEndurance": {
     "title": "Endurance & Chrono Timeline",

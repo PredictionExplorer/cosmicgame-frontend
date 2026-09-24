@@ -3,7 +3,15 @@ import type { PrivacyCopy } from './PrivacyContent';
 export const privacyCopyKo = {
   title: '개인정보 처리방침',
   subtitle:
-    'Cosmic Signature(이하 “회사”)는 사용자의 개인정보를 중요하게 생각합니다. 본 방침은 사용자가 회사의 탈중앙화 애플리케이션을 이용할 때 회사가 사용자의 정보를 어떻게 수집하고 이용하며 보호하는지 설명합니다.',
+    '앱과 프로젝트 사이트를 이용할 때 Cosmic Signature가 정보를 어떻게 다루는지 설명합니다. 온체인에 공개되는 정보, 사이트가 측정하고 저장하는 정보, 각 서비스가 받는 정보를 정리했습니다.',
+  inShort: {
+    title: '요약',
+    points: [
+      '지갑 주소와 온체인에서 한 모든 일은 공개되며 영구히 남습니다. 누구나 Arbitrum에서 읽을 수 있고 누구도 삭제할 수 없습니다.',
+      '지갑을 연결하면 공개 주소만 공유됩니다. 시드 구문, 개인 키, 비밀번호를 요구하지 않으며 이름이나 이메일 주소도 수집하지 않습니다.',
+      '사이트는 아래에 적은 서비스로 방문을 측정하고 오류를 보고하며, 아래에 적은 쿠키만 설정합니다.',
+    ],
+  },
   introductionTitle: '개요',
   introduction: [
     'Cosmic Signature는 이더리움 레이어 2 네트워크인 Arbitrum 위에 구축된 탈중앙화 온체인 아트 프로토콜입니다. 탈중앙화 애플리케이션(dApp)인 만큼, 데이터와 개인정보를 다루는 방식이 기존 웹 애플리케이션과 다릅니다.',
@@ -27,7 +35,7 @@ export const privacyCopyKo = {
         {
           id: 'usage',
           subtitle: '이용 데이터',
-          text: '회사는 서비스 개선을 위해 방문한 페이지, 플랫폼 이용 시간, 일반적인 상호작용 패턴과 같은 익명 이용 데이터를 수집할 수 있습니다.',
+          text: '사이트 이용 현황을 측정합니다. 조회한 페이지, 페이지 로딩 속도, 유입 사이트, 방문한 국가와 브라우저, 기기 종류입니다. 이 측정을 하는 분석 서비스는 <privacyServices>사용하는 서비스</privacyServices>에 적었습니다.',
         },
       ],
     },
@@ -43,12 +51,12 @@ export const privacyCopyKo = {
         {
           id: 'improvement',
           subtitle: '플랫폼 개선',
-          text: '회사는 플랫폼을 개선하고 버그를 수정하며 새로운 기능을 개발하기 위해 집계된 익명 데이터를 이용합니다.',
+          text: '집계한 이용 데이터와 오류 보고서로 버그를 고치고 사이트를 개선합니다.',
         },
         {
           id: 'communication',
           subtitle: '안내',
-          text: '회사는 보안 알림이나 프로토콜 메커니즘의 중대한 변경과 같은 플랫폼 관련 중요 소식을 전달하기 위해 사용자의 정보를 이용할 수 있습니다.',
+          text: '이메일 주소나 다른 연락처는 수집하지 않으므로 개별적으로 연락하지 않습니다. 보안 공지와 프로토콜 변경을 포함한 공지는 <x>X</x> 및 <discord>Discord</discord>에 게시합니다.',
         },
       ],
     },
@@ -64,7 +72,7 @@ export const privacyCopyKo = {
         {
           id: 'infrastructure',
           subtitle: '인프라 보안',
-          text: '회사의 웹 인프라는 HTTPS 암호화, 안전한 호스팅, 정기적인 보안 감사 등 업계 표준 보안 조치를 적용합니다.',
+          text: '사이트는 HTTPS로만 제공되며 Vercel 호스팅 플랫폼에서 운영됩니다. 스마트 컨트랙트는 독립 감사를 받았습니다. 자세한 내용은 <audits>보안 감사</audits> 페이지를 참고해 주세요.',
         },
         {
           id: 'passwords',
@@ -85,7 +93,7 @@ export const privacyCopyKo = {
         {
           id: 'third-party',
           subtitle: '제3자 서비스',
-          text: '회사는 분석, 호스팅, 인프라를 위해 제3자 서비스를 이용할 수 있습니다. 이러한 서비스는 각자의 개인정보 처리방침을 따르며, 회사는 이들이 적절한 데이터 보호 기준을 충족하는지 확인합니다.',
+          text: '<privacyServices>사용하는 서비스</privacyServices>에 적은 서비스는 그곳에 설명한 데이터를 받아 각자의 개인정보 처리방침에 따라 처리합니다. 각 방침의 링크는 표에 있습니다.',
         },
         {
           id: 'legal',
@@ -111,7 +119,7 @@ export const privacyCopyKo = {
         {
           id: 'cookies',
           subtitle: '쿠키 설정',
-          text: '회사 웹사이트는 기본 기능을 위해 쿠키를 사용할 수 있습니다. 쿠키 설정은 브라우저에서 관리할 수 있습니다.',
+          text: '사이트는 <privacyStorage>쿠키와 브라우저 저장소</privacyStorage>에 적은 쿠키만 설정합니다. 브라우저 설정에서 삭제하거나 차단할 수 있습니다. 그래도 사이트는 작동하지만 색상 테마와 언어 선택은 기억하지 못합니다.',
         },
       ],
     },
@@ -126,12 +134,12 @@ export const privacyCopyKo = {
     {
       id: 'changes',
       subtitle: '방침의 변경',
-      text: '회사는 본 개인정보 처리방침을 수시로 변경할 수 있습니다. 변경 사항은 이 페이지에 새 개인정보 처리방침을 게시하고 “최종 업데이트” 날짜를 갱신하는 방식으로 알립니다. 변경 여부를 확인할 수 있도록 본 개인정보 처리방침을 정기적으로 검토하는 것을 권장합니다.',
+      text: '이 개인정보 처리방침은 수시로 업데이트될 수 있습니다. 모든 변경 사항은 이 페이지에 게시하고 상단의 "최종 업데이트" 날짜를 갱신하며, 각 변경은 이 방침의 <privacyHistory>개정 이력</privacyHistory>에서도 확인할 수 있습니다.',
     },
     {
       id: 'contact',
       subtitle: '문의처',
-      text: '본 개인정보 처리방침에 관한 질문은 공식 커뮤니티 채널이나 GitHub 저장소를 통해 문의해 주세요.',
+      text: '이 개인정보 처리방침에 관한 문의는 <support>support@cosmicsignature.com</support>, <discord>Discord</discord>, <x>X</x> 중 한 곳으로 연락해 주세요.',
     },
     {
       id: 'international',
@@ -139,8 +147,82 @@ export const privacyCopyKo = {
       text: 'Cosmic Signature는 전 세계에서 접근할 수 있는 이더리움 레이어 2 네트워크인 Arbitrum에서 트랜잭션을 처리합니다. 플랫폼을 이용함으로써 사용자는 자신의 정보가 세계 여러 지역에서 처리되고 저장될 수 있음을 인정합니다.',
     },
   ],
-  notice: {
-    title: '중요: 블록체인의 투명성',
-    text: '블록체인 트랜잭션은 공개되며 영구적입니다. 사용자의 지갑 주소, 그리고 스마트 컨트랙트와 이루어진 모든 상호작용은 누구나 볼 수 있으며 삭제할 수 없습니다. 이는 블록체인 기술의 근본적인 특성이며, 회사의 개인정보 보호 조치가 미흡해서 발생하는 문제가 아닙니다.',
+  services: {
+    heading: '사용하는 서비스',
+    intro:
+      '이 사이트는 아래 서비스를 사용합니다. 각 서비스는 표에 적은 데이터를 자체 개인정보 처리방침에 따라 처리합니다.',
+    columns: {
+      service: '서비스',
+      purpose: '용도',
+      data: '받는 데이터',
+      policy: '개인정보 처리방침',
+    },
+    policyLink: '처리방침',
+    ownPolicy: '이 방침',
+    none: '없음',
+    items: {
+      vercel: {
+        purpose: '사이트 호스팅과 전송',
+        data: '요청 로그에 남는 IP 주소와 브라우저 정보',
+      },
+      vercelAnalytics: {
+        purpose: '쿠키 없이 페이지 조회 수를 세고 페이지 속도를 측정',
+        data: '조회한 페이지, 유입 사이트, 국가, 브라우저, 기기 종류',
+      },
+      googleAnalytics: {
+        purpose: '방문자의 사이트 이용 방식 측정',
+        data: '조회한 페이지, 대략적인 위치, 브라우저와 기기(쿠키 사용)',
+      },
+      sentry: {
+        purpose: '수정을 위한 오류 보고',
+        data: '오류 내용, 페이지, 브라우저, 오류 직전 화면의 재생(모든 텍스트와 입력은 가림 처리)',
+      },
+      api: {
+        purpose: '페이지에 표시되는 프로토콜 데이터 제공',
+        data: '열어 본 기록(조회한 지갑 주소 포함)',
+      },
+      rpc: {
+        purpose: 'Arbitrum 컨트랙트 조회와 서명한 트랜잭션 전달',
+        data: 'IP 주소, 조회한 주소, 보낸 트랜잭션',
+      },
+      walletConnect: {
+        purpose: '모바일 지갑과 QR 코드 지갑 연결',
+        data: '지갑 주소, 사이트와 지갑 사이의 암호화된 메시지',
+      },
+      coingecko: {
+        purpose: 'ETH와 CST의 미국 달러 가격 제공',
+        data: '달러 가격을 표시하는 페이지의 IP 주소',
+      },
+    },
+  },
+  storage: {
+    heading: '쿠키와 브라우저 저장소',
+    intro:
+      '사이트는 아래 항목을 기기에 저장합니다. 이름이나 연락처는 포함되지 않습니다. 쿠키는 요청과 함께 전송되고, 브라우저 저장소는 기기에만 남습니다.',
+    columns: {
+      name: '이름',
+      kind: '유형',
+      purpose: '용도',
+      lifetime: '보관 기간',
+    },
+    kinds: {
+      cookie: '쿠키',
+      browser: '브라우저 저장소',
+    },
+    lifetimes: {
+      oneYear: '1년',
+      twoYears: '2년',
+      untilCleared: '직접 지울 때까지',
+    },
+    items: {
+      themeCookie: '두 Cosmic Signature 사이트에서 색상 테마를 기억',
+      localeCookie: '선택한 언어를 기억',
+      gaCookies: 'Google Analytics에서 재방문을 구분',
+      themeStorage: '이 사이트에서 색상 테마를 기억',
+      attention: '마감 전 알림과 소리 설정을 기억',
+      explainer: '사이클 안내를 닫은 것을 기억',
+      observatory: '실험용 홈 재방문을 기억해 소개를 접힌 상태로 표시',
+      wallet: '연결한 지갑을 기억해 앱이 다시 연결할 수 있게 함',
+    },
   },
 } as const satisfies PrivacyCopy;

@@ -29,7 +29,7 @@ Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC
 - **Contracts** (https://app.cosmicsignature.com/contracts): Smart contract addresses, ABIs, and fund distribution breakdown
 - **Source Code** (https://app.cosmicsignature.com/code): Source code and verification resources
 - **Security** (https://app.cosmicsignature.com/security): Security model, verification resources, and participant safety notes
-- **Audits** (https://app.cosmicsignature.com/audits): Hacken audit report and formal verification context
+- **Audits** (https://app.cosmicsignature.com/audits): Hacken audit report, invariant fuzzing results, formal verification specifications in the contracts repository, and a verification checklist
 - **Risk Disclosures** (https://app.cosmicsignature.com/risk-disclosures): Non-investment language, blockchain risks, and participant clarity
 - **Outreach** (https://app.cosmicsignature.com/marketing): Outreach Allocation program for community contributors
 - **Imprint** (https://app.cosmicsignature.com/imprint): Imprint Random Walk NFTs
@@ -186,7 +186,7 @@ Together with the 3,000 CST Outreach Reserve, typical fixed end-of-cycle/outreac
 - The protocol contract is upgradeable (UUPS) by the owner, but only between cycles; the deployed implementation is publicly verified
 - After the remaining upgrades, the deployer intends to give up privileged control by transferring ownership to the Cosmic Council or renouncing ownership. The approach will be announced in advance
 - After renunciation, no owner remains and parameters can no longer be changed or upgraded
-- All smart contracts are open-source and exact-match verified on-chain; the contracts were independently audited by Hacken, and the report and formal-verification status are published at https://app.cosmicsignature.com/audits
+- All smart contracts are open-source and exact-match verified on-chain; the contracts were independently audited by Hacken, and the report and the formal verification specifications kept in the contracts repository are linked from https://app.cosmicsignature.com/audits
 - No team wallet receives ETH from participant gestures — all reserves flow through the public smart contracts under the published allocation rules
 - If the team disappears, the protocol is self-sustaining (seeds on-chain, code open-source)
 
@@ -360,7 +360,7 @@ Cosmic Signature 与 COSMIC 癌症突变数据库及生物学中的 COSMIC 突�
 - 核心协议参数只能在下一周期尚未启用时调整；周期启用时点、周期间隔及部分外围配置有各自限制
 - 协议合约采用 UUPS 升级方式，但只能在周期间调整；当前实现可在链上逐字节验证
 - 所有参与者 ETH 都依照公开合约规则在协议内流转，没有团队钱包直接接收落笔 ETH
-- 合约已由 Hacken 完成独立审计，报告与形式化验证状态发布于 https://app.cosmicsignature.com/zh/audits
+- 合约已由 Hacken 完成独立审计，报告与合约仓库中的形式化验证规范见于 https://app.cosmicsignature.com/zh/audits
 - 长期目标是在剩余升级完成后，让部署者交出特权控制。所有者角色将移交宇宙议会或直接放弃，具体方式提前公布
 - 即使团队停止维护，链上种子与开放源代码仍允许任何人复现 NFT 作品
 
@@ -464,7 +464,7 @@ Cosmic Signature 與 COSMIC 癌症突變資料庫及生物學中的 COSMIC 突�
 - 核心協議參數只能在下一週期尚未啟用時調整；週期啟用時點、週期間隔及部分外圍配置有各自限制
 - 協議合約採用 UUPS 升級方式，但只能在週期間調整；目前實現可在鏈上逐位元組驗證
 - 所有參與者 ETH 都依照公開合約規則在協議內流轉，沒有團隊錢包直接接收落筆 ETH
-- 合約已由 Hacken 完成獨立審計，報告與形式化驗證狀態發布於 https://app.cosmicsignature.com/zh-TW/audits
+- 合約已由 Hacken 完成獨立審計，報告與合約儲存庫中的形式化驗證規格見於 https://app.cosmicsignature.com/zh-TW/audits
 - 長期目標是在剩餘升級完成後，讓部署者交出特權控制。所有者角色將移交宇宙議會或直接放棄，具體方式提前公布
 - 即使團隊停止維護，鏈上種子與開放原始碼仍允許任何人復現 NFT 作品
 
@@ -568,7 +568,7 @@ Cosmic Signature 與 COSMIC 癌症突變數據庫及生物學中的 COSMIC 突�
 - 核心協議參數只能在下一週期尚未啟用時調整；週期啟用時點、週期間隔及部分外圍配置有各自限制
 - 協議合約採用 UUPS 升級方式，但只能在週期間調整；目前實現可在鏈上逐字節驗證
 - 所有參與者 ETH 都依照公開合約規則在協議內流轉，沒有團隊錢包直接接收落筆 ETH
-- 合約已由 Hacken 完成獨立審計，報告與形式化驗證狀態發佈於 https://app.cosmicsignature.com/zh-HK/audits
+- 合約已由 Hacken 完成獨立審計，報告與合約儲存庫中的形式化驗證規格見於 https://app.cosmicsignature.com/zh-HK/audits
 - 長期目標是在剩餘升級完成後，讓部署者交出特權控制。所有者角色將移交宇宙議會或直接放棄，具體方式提前公布
 - 即使團隊停止維護，鏈上種子與開放源代碼仍允許任何人復現 NFT 作品
 
@@ -672,7 +672,7 @@ Cosmic Signature не пов’язаний із базою даних мута�
 - Основні параметри протоколу можна змінювати лише доти, доки наступний цикл ще не активовано; момент активації циклу, інтервал між циклами та частина периферійних налаштувань мають власні обмеження
 - Контракти протоколу використовують схему оновлення UUPS, але оновлення можливе лише між циклами; поточну реалізацію можна побайтово верифікувати ончейн
 - Усі ETH учасників рухаються всередині протоколу за відкритими правилами контрактів; жоден гаманець команди не отримує ETH за жести напряму
-- Контракти пройшли незалежний аудит Hacken; звіт і стан формальної верифікації опубліковано на https://app.cosmicsignature.com/uk/audits
+- Контракти пройшли незалежний аудит Hacken; звіт і специфікації формальної верифікації з репозиторію контрактів наведено на https://app.cosmicsignature.com/uk/audits
 - Після решти оновлень привілейований контроль планують передати Космічній Раді або прибрати через відмову від володіння контрактом. Обраний спосіб буде оголошено заздалегідь
 - Навіть якщо команда припинить підтримку, ончейн-сіди та відкритий код дають змогу будь-кому відтворити NFT-твори
 
@@ -776,7 +776,7 @@ Cosmic Signature는 COSMIC 암 돌연변이 데이터베이스나 생물학의 C
 - 핵심 프로토콜 매개변수는 다음 사이클이 활성화되기 전에만 변경할 수 있으며, 사이클 활성화 시점과 사이클 간 간격, 일부 주변 설정에는 별도의 제한이 있습니다.
 - 프로토콜 컨트랙트는 UUPS 업그레이드 방식을 쓰지만 업그레이드는 사이클 사이에만 가능하며, 현재 구현은 온체인에서 바이트 단위로 검증할 수 있습니다.
 - 참여자의 모든 ETH는 공개된 컨트랙트 규칙에 따라 프로토콜 안에서만 움직이며, 어떤 팀 지갑도 제스처의 ETH를 직접 받지 않습니다.
-- 컨트랙트는 Hacken의 독립 감사를 받았으며, 보고서와 정형 검증 현황은 https://app.cosmicsignature.com/ko/audits 에 공개되어 있습니다.
+- 컨트랙트는 Hacken의 독립 감사를 받았으며, 보고서와 저장소의 정형 검증 명세는 https://app.cosmicsignature.com/ko/audits 에 공개되어 있습니다.
 - 남은 업그레이드가 끝나면 배포자는 우주 평의회로 소유권을 이전하거나 소유권을 포기해 특권 통제를 내려놓을 계획입니다. 구체적인 방식은 미리 공개합니다.
 - 팀이 지원을 중단해도 온체인 시드와 오픈 소스 코드가 있으므로 누구나 NFT 작품을 재현할 수 있습니다.
 
@@ -880,7 +880,7 @@ Cosmic Signatureは、COSMICがん変異データベースや生物学のCOSMIC�
 - 中核のプロトコルパラメーターは次のサイクルが有効になる前にだけ変更でき、サイクルの有効化時刻、サイクル間の遅延、一部の周辺設定には別の制限があります。
 - プロトコルコントラクトはUUPSアップグレード方式を使いますが、アップグレードはサイクルの間にだけ可能で、現在の実装はオンチェーンでバイト単位に検証できます。
 - 参加者のすべてのETHは公開されたコントラクトのルールに従ってプロトコルの中だけで動き、どのチームのウォレットも一筆のETHを直接受け取りません。
-- コントラクトはHackenの独立監査を受けており、報告書と形式検証の状況は https://app.cosmicsignature.com/ja/audits で公開されています。
+- コントラクトはHackenの独立監査を受けており、報告書とリポジトリにある形式検証の仕様は https://app.cosmicsignature.com/ja/audits で公開されています。
 - 残りのアップグレード後、デプロイ者は宇宙評議会への所有権移譲、または所有権の放棄によって特権的な管理を手放す予定です。具体的な方法は事前に公表します。
 - チームが支援をやめても、オンチェーンのシードとオープンソースのコードがあるので、誰でもNFTの作品を再現できます。
 
@@ -984,7 +984,7 @@ Trong phần lớn các chu kỳ, 24 Cosmic Signature NFT được khắc, mỗi
 - Các tham số cốt lõi của giao thức chỉ có thể thay đổi trước khi chu kỳ tiếp theo kích hoạt; thời điểm kích hoạt chu kỳ, độ trễ giữa các chu kỳ và một số thiết lập ngoại vi có giới hạn riêng
 - Hợp đồng giao thức dùng mô hình nâng cấp UUPS, nhưng chỉ có thể nâng cấp giữa các chu kỳ, và bản triển khai hiện tại có thể xác minh trên chuỗi đến từng byte
 - Toàn bộ ETH của người tham gia chỉ di chuyển trong giao thức theo quy tắc hợp đồng đã công bố, và không ví nào của đội ngũ trực tiếp nhận ETH từ nét bút
-- Các hợp đồng đã được Hacken kiểm toán độc lập; báo cáo và tình trạng kiểm chứng hình thức được công bố tại https://app.cosmicsignature.com/vi/audits
+- Các hợp đồng đã được Hacken kiểm toán độc lập; báo cáo và đặc tả kiểm chứng hình thức trong kho mã hợp đồng được liệt kê tại https://app.cosmicsignature.com/vi/audits
 - Sau các nâng cấp còn lại, bên triển khai dự định từ bỏ quyền kiểm soát đặc biệt bằng cách chuyển quyền sở hữu cho Hội đồng Vũ trụ hoặc từ bỏ quyền sở hữu. Phương án cụ thể sẽ được công bố trước
 - Nếu đội ngũ ngừng hỗ trợ, seed trên chuỗi và mã nguồn mở vẫn cho phép bất kỳ ai tái tạo tác phẩm NFT
 

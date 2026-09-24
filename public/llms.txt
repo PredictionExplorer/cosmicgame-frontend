@@ -25,7 +25,7 @@ Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC
 - [Contracts](https://app.cosmicsignature.com/contracts): Smart contract details and addresses
 - [Source Code](https://app.cosmicsignature.com/code): Source code and verification resources
 - [Security](https://app.cosmicsignature.com/security): Security model, verification resources, and participant safety notes
-- [Audits](https://app.cosmicsignature.com/audits): Hacken audit report and formal verification context
+- [Audits](https://app.cosmicsignature.com/audits): Hacken audit report, invariant fuzzing results, formal verification specifications in the contracts repository, and a verification checklist
 - [Risk Disclosures](https://app.cosmicsignature.com/risk-disclosures): Non-investment language, blockchain risks, and participant clarity
 - [Outreach](https://app.cosmicsignature.com/marketing): Outreach allocation program
 - [Imprint](https://app.cosmicsignature.com/imprint): Imprint Random Walk NFTs
@@ -81,7 +81,7 @@ Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC
 ## Technical
 
 - Blockchain: Arbitrum (Ethereum Layer 2)
-- Smart contracts: Open-source Solidity contracts, exact-match verified on-chain; owner-controlled parameters until ownership moves under Cosmic Council control (independently audited by Hacken; report and formal-verification status: https://app.cosmicsignature.com/audits)
+- Smart contracts: Open-source Solidity contracts, exact-match verified on-chain; owner-controlled parameters until ownership moves under Cosmic Council control (independently audited by Hacken; report and formal verification specifications: https://app.cosmicsignature.com/audits)
 - NFT art: Generated from on-chain seeds using an open-source Rust program
 - Frontend: Next.js, React, TypeScript
 

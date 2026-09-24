@@ -238,6 +238,28 @@ describe('useClipboard', () => {
     expect(document.querySelectorAll('textarea')).toHaveLength(0);
   });
 
+  it('resolves as the fallback reports: true on success, false when refused or thrown', async () => {
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText: jest.fn().mockRejectedValue(new Error('denied')) },
+      writable: true,
+      configurable: true,
+    });
+    const { result } = renderHook(() => useClipboard());
+
+    document.execCommand = jest.fn().mockReturnValue(true);
+    await expect(result.current.copy('a')).resolves.toBe(true);
+
+    document.execCommand = jest.fn().mockReturnValue(false);
+    await expect(result.current.copy('b')).resolves.toBe(false);
+
+    document.execCommand = jest.fn(() => {
+      throw new Error('unsupported');
+    });
+    await expect(result.current.copy('c')).resolves.toBe(false);
+    // The textarea is removed even when the copy throws.
+    expect(document.querySelectorAll('textarea')).toHaveLength(0);
+  });
+
   it('returns a stable copy reference across renders', () => {
     const { result, rerender } = renderHook(() => useClipboard());
     const first = result.current.copy;

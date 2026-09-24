@@ -6,5 +6,12 @@
     "risk": "Risk Disclosures",
     "security": "Security",
     "audits": "Audits"
+  },
+  "document": {
+    "contents": "On this page",
+    "backToTop": "Back to top",
+    "backToContents": "Back to contents",
+    "sectionLink": "Link to {section}",
+    "revisionHistory": "Revision history"
   }
 }
