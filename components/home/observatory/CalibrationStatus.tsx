@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { protocolFacts } from '@/content/protocol-facts';
 
 import { InfoTooltip } from '@/components/ui/info-tooltip';
+import { LiveStatus } from '@/components/ui/live-status';
 import type { EthGestureInfo } from '@/hooks/useGestureForm';
 import { useFormat } from '@/hooks/useFormat';
 import { CalibrationWindowIcon } from '@/lib/conceptIcons';
@@ -185,6 +186,14 @@ export function CalibrationStatus({
           {title}
         </h2>
         <InfoTooltip content={explanation} label={title} />
+        {/* The quote's freshness: a still dot that turns amber when reads fail. */}
+        <LiveStatus
+          variant="dot"
+          still
+          queryKeys={firstGesture ? [['bidEthPrice']] : [['ctPrice']]}
+          pollIntervalMs={15_000}
+          className="ms-auto"
+        />
       </div>
 
       <div className="mt-2 flex min-w-0 items-center gap-3">
