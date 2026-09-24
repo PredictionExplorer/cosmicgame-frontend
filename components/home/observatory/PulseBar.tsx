@@ -58,11 +58,12 @@ export function introForPhase(phase: CyclePhase): PulseIntro {
  * The Observatory's header strip on the shared content edge: the page H1 at
  * the display size every app H1 uses, one live pill for the Cycle, the phase
  * in words, the Gesture count, and a quiet route to the walkthrough. The
- * facts follow the H1 on its line where there is room. While Gestures run
- * the strip says nothing more: the clock's status, the form and the cycle
- * guide already say how to take part, so the desk starts high on every
- * screen. A phase that needs explaining (before the cycle opens, before its
- * first Gesture, at zero) says so in one sentence under the facts.
+ * facts follow the H1 on its line where there is room, and the route stays
+ * on the H1's line whatever wraps. While Gestures run the strip says nothing
+ * more: the clock's status, the form and the cycle guide already say how to
+ * take part, so the desk starts high on every screen. A phase that needs
+ * explaining (before the cycle opens, before its first Gesture, at zero) says
+ * so in one sentence under the facts.
  */
 export function PulseBar({
   cycleNumber = null,
@@ -120,7 +121,7 @@ export function PulseBar({
     <div
       data-testid="home-deck-header"
       className={cn(
-        'grid min-w-0 gap-x-8 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center',
+        'grid min-w-0 gap-x-8 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start',
         className,
       )}
     >
@@ -178,16 +179,24 @@ export function PulseBar({
           {t(`deck.introByPhase.${intro}`)}
         </p>
       )}
-      {/* The route to the walkthrough: under the facts on phones, beside the H1 from sm. */}
+      {/* The route to the walkthrough: under the facts on phones, and from sm
+          centred on the H1's first line, so it stays with the title when the
+          facts wrap under it. On desktop it reads short, which keeps the strip
+          on one line at 1280px and the method selector in the 1280x720 first
+          viewport. */}
       <div className="mt-2 flex items-center sm:col-start-2 sm:row-start-1 sm:mt-0">
+        {/* An empty strut one display line tall sets the row's height. */}
+        <span aria-hidden className="type-display-sm h-[1lh] w-0 max-sm:hidden" />
         <Link
           href="/how-it-works"
+          data-testid="home-deck-how-it-works"
           className={cn(
             'link-quiet inline-flex items-center gap-1.5 type-label text-primary',
             TOUCH_TARGET_TEXT_LINK_CLASS,
           )}
         >
-          {t('deck.newHere')}
+          <span className="lg:hidden">{t('deck.newHere')}</span>
+          <span className="max-lg:hidden">{t('deck.howItWorks')}</span>
           <ArrowRight className="size-3.5" aria-hidden />
         </Link>
       </div>

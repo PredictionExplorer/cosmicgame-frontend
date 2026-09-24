@@ -40,12 +40,19 @@ describe('PulseBar', () => {
     expect(within(facts!).getAllByRole('listitem').length).toBeGreaterThanOrEqual(3);
   });
 
-  it('routes newcomers to the walkthrough', () => {
+  it('routes newcomers to the walkthrough, on the H1 line and short on desktop', () => {
     render(<PulseBar {...baseProps} />);
-    expect(screen.getByRole('link', { name: /home\.deck\.newHere/ })).toHaveAttribute(
-      'href',
-      '/how-it-works',
-    );
+    const link = screen.getByRole('link', { name: /home\.deck\.newHere/ });
+    expect(link).toHaveAttribute('href', '/how-it-works');
+    // Phones and tablets ask "New here?"; the desktop strip reads short so it
+    // keeps one line at 1280px and the method selector stays in the fold.
+    expect(within(link).getByText('home.deck.newHere')).toHaveClass('lg:hidden');
+    expect(within(link).getByText('home.deck.howItWorks')).toHaveClass('max-lg:hidden');
+    // From sm the link centres on the H1's first line, not on the whole strip.
+    const strut = link.previousElementSibling;
+    expect(strut).toHaveAttribute('aria-hidden');
+    expect(strut).toHaveClass('type-display-sm', 'h-[1lh]');
+    expect(screen.getByTestId('home-deck-header')).toHaveClass('sm:items-start');
   });
 
   it('keeps the masthead focused on one newcomer route', () => {
@@ -74,7 +81,7 @@ describe('PulseBar', () => {
     render(<PulseBar {...baseProps} gestureCount={null} />);
     const count = screen.getByTestId('pulse-gesture-count');
     expect(count).not.toHaveTextContent(/\d/);
-    expect(count).toHaveTextContent('Loading...');
+    expect(count).toHaveTextContent('common.status.loadingEllipsis');
   });
 
   it('says so in the masthead while the wallet holds the Last Gesture', () => {
