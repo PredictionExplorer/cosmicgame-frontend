@@ -45,7 +45,9 @@ export function dailySeries(
 /**
  * The hub's pulse: gestures per day over the last 30 days as a spark strip,
  * read in one sentence beside it (the total and the busiest day), with the
- * range under the strip. Plain SVG, no chart library on the hub.
+ * range under the strip. Plain SVG, no chart library on the hub. The API
+ * buckets by UTC day, and the label says so, since the opening time beside
+ * it is printed in the reader's zone.
  */
 export function CycleRhythm() {
   const t = useTranslations('statistics');

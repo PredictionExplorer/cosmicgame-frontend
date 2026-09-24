@@ -65,7 +65,7 @@
       "ownSubtitle": "모든 퍼포먼스 사이클에 걸친 내 제스처와 그 비용, 받은 배분, NFT와 앵커링입니다.",
       "userSubtitle": "모든 퍼포먼스 사이클에 걸친 이 주소의 제스처와 그 비용, 받은 배분, NFT와 앵커링입니다.",
       "emptyTitle": "아직 활동이 없습니다",
-      "emptyDescription": "이 계정은 아직 어떤 퍼포먼스 사이클에도 참여하지 않았습니다. 제스처를 남기는 순간 기록이 시작됩니다.",
+      "emptyDescription": "이 주소에는 아직 제스처, 배분, 앵커링 기록이 없습니다.",
       "sections": {
         "gestureHistory": "제스처",
         "recipientHistory": "받은 배분",

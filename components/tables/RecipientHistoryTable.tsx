@@ -15,6 +15,7 @@ import {
   STELLAR_SELECTION_RECORD_TYPES,
 } from '@/utils/allocationRecords';
 import { toFiniteNumber } from '@/utils/finiteNumber';
+import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import { AddressChip } from '@/components/ui/address-chip';
 import { Amount } from '@/components/ui/amount';
 import {
@@ -135,7 +136,10 @@ function RetrievalStatus({ record }: { record: WinningHistoryEntry }) {
   return (
     <span className="inline-flex flex-wrap items-center justify-end gap-x-3 gap-y-1">
       <TableTag tone="accent">{t('recipientHistory.readyToRetrieve')}</TableTag>
-      <TableLink href={`/my-allocations#${retrievalSection(record.RecordType)}`}>
+      <TableLink
+        href={`/my-allocations#${retrievalSection(record.RecordType)}`}
+        className={TOUCH_TARGET_TEXT_LINK_CLASS}
+      >
         {t('recipientHistory.retrieve')}
       </TableLink>
     </span>

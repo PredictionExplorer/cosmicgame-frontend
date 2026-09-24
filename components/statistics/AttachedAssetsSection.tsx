@@ -102,6 +102,7 @@ export function AttachedAssetsSection({ currentRoundNum }: AttachedAssetsSection
             />
           ) : visibleNfts.length === 0 ? (
             <EmptyState
+              variant="inline"
               headingLevel={3}
               icon={<AttachedAssetsIcon className="size-6" />}
               title={

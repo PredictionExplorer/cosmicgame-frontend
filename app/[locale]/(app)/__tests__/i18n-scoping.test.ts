@@ -1,6 +1,8 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 
+import { EMBED_NAMESPACES } from '@/app/[locale]/(embed)/embedMessages';
+
 import { NAMESPACES } from '@/i18n/request';
 import { APP_CHROME_NAMESPACES } from '@/lib/i18n/clientMessages';
 
@@ -22,6 +24,7 @@ import { APP_CHROME_NAMESPACES } from '@/lib/i18n/clientMessages';
 
 const REPO_ROOT = resolve(__dirname, '..', '..', '..', '..');
 const APP_GROUP_ROOT = resolve(REPO_ROOT, 'app/[locale]/(app)');
+const EMBED_GROUP_ROOT = resolve(REPO_ROOT, 'app/[locale]/(embed)');
 
 const RESOLVE_EXTENSIONS = [
   '.ts',
@@ -154,4 +157,33 @@ describe('app route group i18n scoping', () => {
       expect(unknown).toEqual([]);
     },
   );
+});
+
+describe('embed route group i18n scoping', () => {
+  // The embed layout serializes one set for the whole group, with no page
+  // declarations: every embed page and boundary, and the layout's own
+  // client shell, must stay inside it.
+  const serialized = new Set<string>(EMBED_NAMESPACES);
+  const entries = [
+    ...findScopedEntryFiles(EMBED_GROUP_ROOT),
+    ...['layout.tsx', 'error.tsx', 'not-found.tsx'].map((name) => join(EMBED_GROUP_ROOT, name)),
+  ];
+
+  it('found the embed pages (walker sanity)', () => {
+    expect(entries.some((file) => file.endsWith('embed/endurance/[round]/page.tsx'))).toBe(true);
+  });
+
+  it.each(entries.map((file) => [relative(EMBED_GROUP_ROOT, file), file] as const))(
+    '%s reads only namespaces the embed layout serializes',
+    (_rel, file) => {
+      const missing = [...collectUsedNamespaces(file)].filter(
+        (namespace) => !serialized.has(namespace),
+      );
+      expect(missing).toEqual([]);
+    },
+  );
+
+  it('serializes only known namespaces', () => {
+    expect([...serialized].filter((namespace) => !known.has(namespace))).toEqual([]);
+  });
 });

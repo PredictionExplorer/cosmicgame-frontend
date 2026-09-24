@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 export interface SparkBarsProps {
   /** The values, oldest first. */
   values: readonly number[];
-  /** What the bars show, for assistive technology ("Gestures per day, last 30 days: …"). */
+  /** What the bars show, for assistive technology ("Gestures per UTC day, last 30 days: …"). */
   label: string;
   /** The bar colour, a CSS colour (`SERIES_COLOR.gestures`). */
   color: string;

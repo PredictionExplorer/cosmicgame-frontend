@@ -479,7 +479,7 @@ plus the site-wide SEO finish.
 | `/admin`                                | `(app)/admin/page.tsx`                                     | ✅  | ✅  | ✅  | ✅  |
 | `/admin/admin`                          | `(app)/admin/admin/page.tsx`                               | ✅  | ✅  | ✅  | ✅  |
 | `/internal/cst-outreach-transfer`       | `(app)/internal/`                                          | ✅  | ✅  | ✅  | ✅  |
-| `/embed/endurance/[round]`              | `(app)/embed/endurance/`                                   | ✅  | ✅  | ✅  | ✅  |
+| `/embed/endurance/[round]`              | `(embed)/embed/endurance/`                                 | ✅  | ✅  | ✅  | ✅  |
 | `/experimental-ui` (noindex)            | `(app)/experimental-ui/`, `components/home/deck/`          | ✅  | ✅  | ☐   | ✅  |
 
 **SEO sweep (cross-cutting):**

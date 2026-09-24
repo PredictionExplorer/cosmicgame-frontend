@@ -1,11 +1,13 @@
 'use client';
 
 // lexicon-allow-start: internal analytics identifiers mirror backend wire names
+import dynamic from 'next/dynamic';
 import { ArrowUpRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
 import { useDashboardInfo, useSystemModelist } from '@/hooks/useApiQuery';
+import { useHydrated } from '@/hooks/useHydrated';
 import { StatsSection } from '@/components/statistics/StatsSection';
 import { SectionShell } from '@/components/statistics/SectionShell';
 import { SkeletonChart } from '@/components/ui/skeleton';
@@ -14,11 +16,33 @@ import { useCycleScope } from '@/components/statistics/useCycleScope';
 import { BidFrequencyChart } from '@/components/statistics/BidFrequencyChart';
 import { LastBidSpikeChart } from '@/components/statistics/LastBidSpikeChart';
 import { BidderActivePeriodsTimeline } from '@/components/statistics/BidderActivePeriodsTimeline';
-import { GestureTypeMixChart } from '@/components/statistics/GestureTypeMixChart';
-import CstCalibrationWindowChart from '@/components/statistics/CstCalibrationWindowChart';
-import CstGestureCostChart from '@/components/statistics/CstGestureCostChart';
-import EnduranceTimelineChart from '@/components/statistics/EnduranceTimelineChart';
 import { SystemModesTable, type EventRow } from '@/components/tables/SystemModesTable';
+
+/**
+ * The one-cycle charts sit below three all-time sections: each loads in its
+ * own chunk after the page, behind a skeleton of its height, so the page's
+ * first load carries only the charts at the top.
+ */
+const chartSkeleton = (height: number) =>
+  function ChartLoading() {
+    return <SkeletonChart height={height} bars={18} />;
+  };
+const GestureTypeMixChart = dynamic(
+  () => import('@/components/statistics/GestureTypeMixChart').then((m) => m.GestureTypeMixChart),
+  { ssr: false, loading: chartSkeleton(300) },
+);
+const EnduranceTimelineChart = dynamic(
+  () => import('@/components/statistics/EnduranceTimelineChart'),
+  { ssr: false, loading: chartSkeleton(320) },
+);
+const CstCalibrationWindowChart = dynamic(
+  () => import('@/components/statistics/CstCalibrationWindowChart'),
+  { ssr: false, loading: chartSkeleton(320) },
+);
+const CstGestureCostChart = dynamic(() => import('@/components/statistics/CstGestureCostChart'), {
+  ssr: false,
+  loading: chartSkeleton(320),
+});
 
 /**
  * Gesture activity: frequency, spikes and the most active participants over
@@ -27,15 +51,19 @@ import { SystemModesTable, type EventRow } from '@/components/tables/SystemModes
  * and the cycle activations log. The cycle charts mount only once the
  * dashboard names the live cycle: until then the section shows a chart
  * skeleton, and a failed read shows an error with a retry, never a chart's
- * "not started" or "select a cycle" state for a cycle that is live.
+ * "not started" or "select a cycle" state for a cycle that is live. The live
+ * cycle is read only after hydration, so the first client render matches the
+ * server's skeleton even when the dashboard query has already answered.
  */
 const ActivityPanel = () => {
   const t = useTranslations('statistics');
+  const hydrated = useHydrated();
   const dashboardQuery = useDashboardInfo(undefined, { poll: false });
   const systemModesQuery = useSystemModelist();
-  const liveCycle = dashboardQuery.data?.CurRoundNum ?? -1;
+  const liveCycle = hydrated ? (dashboardQuery.data?.CurRoundNum ?? -1) : -1;
   const scope = useCycleScope(liveCycle);
   const cycleKnown = liveCycle >= 0;
+  const dashboardFailed = hydrated && dashboardQuery.isError;
   const systemModeChanges = (systemModesQuery.data ?? []) as EventRow[];
   const title = (key: string) => t(`activity.sections.${key}`);
 
@@ -61,8 +89,8 @@ const ActivityPanel = () => {
         title={title('cycleTimelines')}
         description={t('activity.cycleTimelinesDescription')}
         actions={<CycleScopeControl scope={scope} />}
-        isLoading={!cycleKnown && !dashboardQuery.isError}
-        isError={!cycleKnown && dashboardQuery.isError}
+        isLoading={!cycleKnown && !dashboardFailed}
+        isError={!cycleKnown && dashboardFailed}
         onRetry={() => dashboardQuery.refetch()}
         skeleton={<SkeletonChart />}
       >
@@ -131,6 +159,11 @@ const ActivityPanel = () => {
         tooltip={t('sectionTooltips.cycleActivations')}
         defaultOpen={false}
         lazy
+        collapsedSummary={
+          systemModesQuery.data
+            ? t('activity.cycleActivationsCount', { count: systemModeChanges.length })
+            : null
+        }
         isLoading={systemModesQuery.isLoading}
         isError={systemModesQuery.isError}
         onRetry={() => systemModesQuery.refetch()}

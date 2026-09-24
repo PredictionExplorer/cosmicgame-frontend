@@ -3,7 +3,7 @@ import { resolvingMetadata } from '@/test-utils/metadata';
 import { appSitemapRoutes, dynamicNoindexRoutePrefixes, noindexAppRoutes } from '@/lib/seoRoutes';
 import { createMetadata } from '@/utils/seo';
 
-import { generateMetadata as generateEmbedEnduranceMetadata } from '../embed/endurance/[round]/page';
+import { generateMetadata as generateEmbedEnduranceMetadata } from '../../(embed)/embed/endurance/[round]/page';
 import { generateMetadata as generateCstOutreachTransferMetadata } from '../internal/cst-outreach-transfer/page';
 import { generateMetadata as generateRecipientHistoryMetadata } from '../recipient-history/page';
 import { generateMetadata as generateTransferCstMetadata } from '../transfer-cst/page';
@@ -13,7 +13,7 @@ jest.mock('../internal/cst-outreach-transfer/CstOutreachTransferPage', () => ({
   default: () => null,
 }));
 
-jest.mock('../embed/endurance/[round]/EmbedEnduranceChart', () => ({
+jest.mock('../../(embed)/embed/endurance/[round]/EmbedEnduranceChart', () => ({
   __esModule: true,
   default: () => null,
 }));

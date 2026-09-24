@@ -261,9 +261,10 @@ describe('server-rendered page headers', () => {
       expect(figureValue('allocationsDistributed')).toHaveTextContent('107');
       expect(figureValue('cosmicSignatureNftsImprinted')).toHaveTextContent('240');
       expect(figureValue('contractBalance')).toHaveTextContent('12.3400 ETH');
+      // The related pages close the hub body, so the section tabs follow the figures.
       expect(
-        screen.getByRole('link', { name: statisticsMessages.hub.seo.links.contracts }),
-      ).toHaveAttribute('href', '/contracts');
+        screen.queryByRole('link', { name: statisticsMessages.hub.seo.links.contracts }),
+      ).not.toBeInTheDocument();
       expect(
         screen.getByRole('button', {
           name: `More information about ${statisticsMessages.metrics.activePerformanceCycle.label}`,

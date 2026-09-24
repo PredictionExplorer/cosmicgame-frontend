@@ -7,6 +7,7 @@ import { DateTime } from '@/components/ui/date-time';
 import { Skeleton } from '@/components/ui/skeleton';
 import { UnknownValue } from '@/components/ui/unknown-value';
 import { useFormat } from '@/hooks/useFormat';
+import { useHydrated } from '@/hooks/useHydrated';
 import { useDashboardInfo } from '@/hooks/useApiQuery';
 
 import { dashboardMetricValue, type DashboardMetric } from './dashboardMetrics';
@@ -18,7 +19,10 @@ export type { DashboardMetric } from './dashboardMetrics';
  * polled query as the page body, so the header and the body never show two
  * values for one metric. Until the client's first read arrives it shows
  * `seed`, the value the server read for this render, so the server HTML
- * holds the number and hydration does not flicker.
+ * holds the number and hydration does not flicker. The client's reading
+ * replaces it only after hydration: the app shell's dashboard query can
+ * answer before this island hydrates, and a different number in the first
+ * client render would make React discard the server HTML (#418).
  */
 export function DashboardFigure({
   metric,
@@ -30,11 +34,12 @@ export function DashboardFigure({
 }) {
   const t = useTranslations('common');
   const format = useFormat();
+  const hydrated = useHydrated();
   const { data, isLoading } = useDashboardInfo();
-  const value = data ? dashboardMetricValue(data, metric) : seed;
+  const value = hydrated && data ? dashboardMetricValue(data, metric) : seed;
 
   if (value === undefined) {
-    return isLoading ? (
+    return !hydrated || isLoading ? (
       <Skeleton className="mt-1 h-6 w-20" aria-hidden />
     ) : (
       <UnknownValue label={t('status.unavailable')} />

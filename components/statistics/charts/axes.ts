@@ -7,7 +7,7 @@ import { formatCount, formatDuration, formatDurationTick } from '@/utils/format'
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 import { formatTimeTick } from './labels';
-import { durationScale, elapsedTicks, linearScale, timeStep, timeTicks } from './ticks';
+import { durationScale, elapsedTicks, linearScale, timeAxisTicks } from './ticks';
 
 const HOUR = 3_600;
 
@@ -32,6 +32,38 @@ export interface NumericAxis {
   ticks: number[];
   domain: [number, number];
   format: (value: number) => string;
+  /** The YAxis `width` its widest tick label needs (`yAxisWidth`). */
+  width: number;
+}
+
+/**
+ * Room a Y axis needs for its widest tick label: the label at the 12px tick
+ * size (tabular digits, narrow separators, anything else a letter's width,
+ * CJK a full em) plus the space Recharts keeps between the label and the plot
+ * (its tick size and our tick margin, 6px each) and 2px of air. A fixed width
+ * clipped "10,000" and "100,000" at a phone's width.
+ */
+export function yAxisWidth(labels: readonly string[], min = 28): number {
+  const glyph = (char: string): number => {
+    if (/[0-9]/.test(char)) return 7.8;
+    if (/[.,:'’\s\u00a0\u202f]/.test(char)) return 4;
+    if (/[\u3000-\u9fff\uac00-\ud7af]/.test(char)) return 12;
+    return 7.6;
+  };
+  const widest = labels.reduce(
+    (max, label) =>
+      Math.max(
+        max,
+        [...label].reduce((sum, char) => sum + glyph(char), 0),
+      ),
+    0,
+  );
+  return Math.max(min, Math.ceil(widest + 14));
+}
+
+/** An axis with its labels measured into `width`. */
+function measured(axis: Omit<NumericAxis, 'width'>): NumericAxis {
+  return { ...axis, width: yAxisWidth(axis.ticks.map(axis.format)) };
 }
 
 /** A date axis over Unix seconds: calendar ticks and their labels ("Aug 12", "14:00", "Sep"). */
@@ -40,31 +72,34 @@ export function useTimeAxis(fromTs: number, toTs: number, count?: number): Numer
   const tickCount = useTickCount();
   const wanted = count ?? tickCount;
   return useMemo(() => {
-    const step = timeStep(fromTs, toTs, wanted);
-    const ticks = timeTicks(fromTs, toTs, step);
+    const { step, ticks } = timeAxisTicks(fromTs, toTs, wanted);
     const first = ticks[0];
-    return {
+    return measured({
       ticks,
       domain: [fromTs, toTs],
       format: (ts: number) => formatTimeTick(ts, step, locale, { first: ts === first }),
-    };
+    });
   }, [fromTs, toTs, wanted, locale]);
 }
 
-/** Time into a cycle, in hours on the data and whole days or hours on the ticks. */
+/**
+ * Time into a cycle, in hours on the data and whole days or hours on the
+ * ticks. Its labels are short ("14d"), so a phone takes four of them, not
+ * the date axes' three: "0 · 30d" gave a six-week cycle no scale.
+ */
 export function useElapsedHoursAxis(maxHours: number, count?: number): NumericAxis {
   const locale = useLocale();
-  const tickCount = useTickCount();
+  const tickCount = useTickCount(6, 4);
   const wanted = count ?? tickCount;
   return useMemo(() => {
     const seconds = elapsedTicks(Math.max(0, maxHours) * HOUR, wanted);
     const label = durationTick((seconds[1] ?? HOUR) - (seconds[0] ?? 0), locale);
     const ticks = seconds.map((s) => s / HOUR);
-    return {
+    return measured({
       ticks,
       domain: [0, Math.max(maxHours, ticks[ticks.length - 1] ?? 0)],
       format: (hours: number) => label(hours * HOUR),
-    };
+    });
   }, [maxHours, wanted, locale]);
 }
 
@@ -74,7 +109,7 @@ export function useDurationAxis(minSeconds: number, maxSeconds: number, count = 
   return useMemo(() => {
     const scale = durationScale(minSeconds, maxSeconds, count);
     const step = (scale.ticks[1] ?? HOUR) - (scale.ticks[0] ?? 0);
-    return { ...scale, format: durationTick(step, locale) };
+    return measured({ ...scale, format: durationTick(step, locale) });
   }, [minSeconds, maxSeconds, count, locale]);
 }
 
@@ -86,7 +121,7 @@ export function useLinearAxis(minValue: number, maxValue: number, count = 4): Nu
   const locale = useLocale();
   return useMemo(() => {
     const scale = linearScale(minValue, maxValue, count);
-    return { ...scale, format: (value: number) => formatCount(value, locale) };
+    return measured({ ...scale, format: (value: number) => formatCount(value, locale) });
   }, [minValue, maxValue, count, locale]);
 }
 
@@ -96,6 +131,6 @@ export function useCountAxis(maxValue: number, count = 4): NumericAxis {
   return useMemo(() => {
     // Never finer than one: a count axis has no "2.5 gestures".
     const scale = linearScale(0, Math.max(count, maxValue), count);
-    return { ...scale, format: (value: number) => formatCount(value, locale) };
+    return measured({ ...scale, format: (value: number) => formatCount(value, locale) });
   }, [maxValue, count, locale]);
 }

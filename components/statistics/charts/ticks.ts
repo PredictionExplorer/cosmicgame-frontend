@@ -137,6 +137,29 @@ export function timeStep(fromTs: number, toTs: number, count = 6): TimeStep {
 }
 
 /**
+ * The date ticks for `[fromTs, toTs]` at about `count` ticks, and never
+ * fewer than two: at a phone's three ticks, six weeks from Aug 12 hold a
+ * single month boundary, and a lone "Sep 2026" gives the axis neither its
+ * start nor its scale. The step then gets finer (up to three counts more)
+ * until two calendar ticks fall inside the range.
+ */
+export function timeAxisTicks(
+  fromTs: number,
+  toTs: number,
+  count: number,
+): { step: TimeStep; ticks: number[] } {
+  let step = timeStep(fromTs, toTs, count);
+  let ticks = timeTicks(fromTs, toTs, step);
+  for (let extra = 1; ticks.length < 2 && extra <= 3; extra += 1) {
+    const finer = timeStep(fromTs, toTs, count + extra);
+    if (finer === step) continue;
+    step = finer;
+    ticks = timeTicks(fromTs, toTs, step);
+  }
+  return { step, ticks };
+}
+
+/**
  * Tick instants (Unix seconds) on UTC calendar boundaries inside
  * `[fromTs, toTs]`: whole hours, midnights, or the first day of a month on
  * the step's grid (January, April, July and October for three months).

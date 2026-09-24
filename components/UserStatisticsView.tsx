@@ -79,11 +79,11 @@ function tokenBalance(wei: string | undefined): number | null {
 }
 
 /**
- * A participant's profile (and your own statistics): an identity header
- * that sets what the address spent on gestures beside what it received,
- * this cycle's Stellar Selection share as a plain count, the figures behind
- * its history once each, its Cosmic Signature NFTs on their plates, and the
- * ledgers: gestures, allocations, anchoring, outreach and attached assets.
+ * A participant's profile (and your own statistics): the identity header,
+ * this cycle's Stellar Selection share, the figures behind its history, its
+ * NFTs, and the ledgers. Each section stands on its own data: an address
+ * with no gestures can still hold allocations, anchors and assets to
+ * retrieve, so "no activity" shows only once every source answered empty.
  */
 const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) => {
   const t = useTranslations('myPages');
@@ -111,24 +111,29 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
   const claimsQuery = useClaimHistoryByUser(address);
   const userInfoQuery = useUserInfo(address);
   const { data: balanceData, isLoading: loadingBalance } = useUserBalance(address);
-  const { data: cstAnchorActions = [], isLoading: loadingCSTActions } =
-    useCSTAnchorActionsByUser(address);
-  const { data: rwlkAnchorActions = [], isLoading: loadingRWLKActions } =
-    useRWLKAnchorActionsByUser(address);
-  const { data: marketingRewardsRaw = [] } = useMarketingRewardsByUser(address);
-  const { data: cstListRaw = [], isLoading: loadingCST } = useCSTTokensByUser(address);
-  const { data: cstStakingRewardsRaw = [], isLoading: loadingStakingRewards } =
-    useAnchorDistributionsByUser(address);
+  const cstAnchorActionsQuery = useCSTAnchorActionsByUser(address);
+  const rwlkAnchorActionsQuery = useRWLKAnchorActionsByUser(address);
+  const marketingQuery = useMarketingRewardsByUser(address);
+  const cstTokensQuery = useCSTTokensByUser(address);
+  const anchorDistributionsQuery = useAnchorDistributionsByUser(address);
   const { data: collectedCstStakingRewardsRaw = [] } =
     useCSTAnchorDistributionsRetrievedByUser(address);
   const { data: cstStakingRewardsByDepositRaw = [] } =
     useCSTAnchorDistributionsByUserByDeposit(address);
   const { data: rwlkImprints = [] } = useRWLKAnchorImprintsByUser(address);
-  const { data: claimedNFTsRaw = [], isLoading: loadingClaimedNFTs } =
-    useClaimedDonatedNFTByUser(address);
-  const { data: unclaimedNFTsRaw = [], isLoading: loadingUnclaimedNFTs } =
-    useUnclaimedDonatedNFTByUser(address);
-  const { data: erc20Raw = [], isLoading: loadingERC20 } = useDonationsERC20ByUser(address);
+  const claimedNFTsQuery = useClaimedDonatedNFTByUser(address);
+  const unclaimedNFTsQuery = useUnclaimedDonatedNFTByUser(address);
+  const erc20Query = useDonationsERC20ByUser(address);
+
+  const { data: cstAnchorActions = [], isLoading: loadingCSTActions } = cstAnchorActionsQuery;
+  const { data: rwlkAnchorActions = [], isLoading: loadingRWLKActions } = rwlkAnchorActionsQuery;
+  const { data: marketingRewardsRaw = [], isLoading: loadingMarketing } = marketingQuery;
+  const { data: cstListRaw = [], isLoading: loadingCST } = cstTokensQuery;
+  const { data: cstStakingRewardsRaw = [], isLoading: loadingStakingRewards } =
+    anchorDistributionsQuery;
+  const { data: claimedNFTsRaw = [], isLoading: loadingClaimedNFTs } = claimedNFTsQuery;
+  const { data: unclaimedNFTsRaw = [], isLoading: loadingUnclaimedNFTs } = unclaimedNFTsQuery;
+  const { data: erc20Raw = [], isLoading: loadingERC20 } = erc20Query;
 
   const userInfoRaw = userInfoQuery.data;
   const gestureHistory = useMemo(() => userInfoRaw?.Gestures ?? [], [userInfoRaw]);
@@ -231,6 +236,46 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
   }
 
   const headerLoading = userInfoQuery.isLoading || claimsQuery.isLoading || loadingBalance;
+  const anyLoading =
+    userInfoQuery.isLoading ||
+    claimsQuery.isLoading ||
+    loadingCST ||
+    loadingCSTActions ||
+    loadingRWLKActions ||
+    loadingStakingRewards ||
+    loadingMarketing ||
+    loadingClaimedNFTs ||
+    loadingUnclaimedNFTs ||
+    loadingERC20;
+  const anchoredTokens = userInfoRaw?.CurrentlyStakedTokens ?? [];
+  const hasActivity =
+    gestureHistory.length > 0 ||
+    claimHistory.length > 0 ||
+    (cstListRaw?.length ?? 0) > 0 ||
+    anchoredTokens.length > 0 ||
+    cstAnchorActions.length > 0 ||
+    rwlkAnchorActions.length > 0 ||
+    anchorActions > 0 ||
+    cstAnchorDistributions.length > 0 ||
+    marketingRewards.length > 0 ||
+    claimedDonatedNFTsList.length > 0 ||
+    unclaimedDonatedNFTsList.length > 0 ||
+    donatedERC20List.length > 0;
+  // A read that failed is not "nothing": its `[]` default would read as empty, so the page
+  // is empty only once every source has answered, and answered with nothing.
+  const anyFailed = [
+    userInfoQuery,
+    claimsQuery,
+    cstTokensQuery,
+    cstAnchorActionsQuery,
+    rwlkAnchorActionsQuery,
+    anchorDistributionsQuery,
+    marketingQuery,
+    claimedNFTsQuery,
+    unclaimedNFTsQuery,
+    erc20Query,
+  ].some((query) => query.isError);
+  const allEmpty = !anyLoading && !hasActivity && !anyFailed;
 
   return (
     <PageShell variant="data" className={SHELL_CLASS}>
@@ -244,17 +289,12 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
       />
 
       {userInfoQuery.isLoading ? (
-        <div data-testid="statistics-loading-skeleton">
+        // A screen tall, as the sections that replace it are: the footer stays below the
+        // fold while they load, instead of showing and then being pushed away (CLS).
+        <div data-testid="statistics-loading-skeleton" className="min-h-svh">
           <SkeletonTable rows={6} columns={4} />
         </div>
-      ) : userInfoQuery.isError ? (
-        <ErrorState
-          headingLevel={2}
-          title={t('statistics.page.loadErrorTitle')}
-          message={t('statistics.page.loadErrorMessage')}
-          onRetry={() => userInfoQuery.refetch()}
-        />
-      ) : !userInfo || !gestureSummary ? (
+      ) : allEmpty ? (
         <EmptyState
           variant="page"
           headingLevel={2}
@@ -274,30 +314,43 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
             />
           ) : null}
 
-          <ProfileOverview
-            address={address}
-            userInfo={userInfo}
-            gestures={gestureSummary}
-            latestGestureTs={latestGestureTs}
-            anchoredNow={anchoredNow}
-            anchorActions={anchorActions}
-            anchorDistributionsEth={totalAnchorDistributionEth}
-          />
+          {/* The figures come from the profile record; an address without one skips them. */}
+          {userInfo && gestureSummary ? (
+            <ProfileOverview
+              address={address}
+              userInfo={userInfo}
+              gestures={gestureSummary}
+              latestGestureTs={latestGestureTs}
+              anchoredNow={anchoredNow}
+              anchorActions={anchorActions}
+              anchorDistributionsEth={totalAnchorDistributionEth}
+            />
+          ) : null}
 
           <SectionShell title={t('statistics.page.sections.artworks')}>
             <ProfileArtworks
               tokens={cstListRaw ?? []}
-              anchored={anchoredArtworks(userInfoRaw?.CurrentlyStakedTokens ?? [])}
+              anchored={anchoredArtworks(anchoredTokens)}
               loading={loadingCST}
             />
           </SectionShell>
 
           <SectionShell title={t('statistics.page.sections.gestureHistory')}>
-            <GestureHistoryTable
-              gestureHistory={gestureHistory}
-              showParticipant={false}
-              showHold={false}
-            />
+            {userInfoQuery.isError ? (
+              <ErrorState
+                headingLevel={3}
+                title={t('statistics.page.loadErrorTitle')}
+                message={t('statistics.page.loadErrorMessage')}
+                onRetry={() => userInfoQuery.refetch()}
+              />
+            ) : (
+              // An empty list says "No gestures yet" inside the section.
+              <GestureHistoryTable
+                gestureHistory={gestureHistory}
+                showParticipant={false}
+                showHold={false}
+              />
+            )}
           </SectionShell>
 
           <SectionShell title={t('statistics.page.sections.recipientHistory')}>

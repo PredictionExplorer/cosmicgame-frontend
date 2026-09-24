@@ -19,7 +19,7 @@ const INHERITED_OR_NON_DOCUMENT_ROUTES = new Set([
  * Routes that are never shared as a link, so they carry no share card: the
  * standalone endurance chart is an iframe embed (noindex, nofollow).
  */
-const NON_SHAREABLE_ROUTES = new Set(['app/[locale]/(app)/embed/endurance/[round]/page.tsx']);
+const NON_SHAREABLE_ROUTES = new Set(['app/[locale]/(embed)/embed/endurance/[round]/page.tsx']);
 
 function collectPageFiles(directory: string): string[] {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {

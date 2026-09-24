@@ -1,7 +1,7 @@
 'use client';
 
 // lexicon-allow-start: internal analytics identifiers mirror backend wire names
-import { useMemo, useState, type FC } from 'react';
+import { useMemo, type FC } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
@@ -26,6 +26,7 @@ import {
   TIMELINE_MARK_CLASS,
   timelineMarkStyle,
 } from './charts/theme';
+import { SummaryAddress, useCoarsePointer, useTimelineReadout } from './charts/timeline';
 import { useRovingStints } from './charts/useRovingStints';
 
 const TOP_N = 20;
@@ -48,6 +49,13 @@ type TableRow = {
 
 const percent = (value: number): string => `${Math.max(0, Math.min(100, value * 100))}%`;
 
+/**
+ * The lane grid. From `sm` the rank, address and count sit in a column beside
+ * the lane; on a phone they take their own line above it, so the plot spans
+ * the width instead of a third of it.
+ */
+const LANE_GRID = 'grid grid-cols-1 gap-x-3 sm:grid-cols-[minmax(7.5rem,11rem)_minmax(0,1fr)]';
+
 type BidderActivePeriodsTimelineProps = {
   enabled?: boolean;
   /** Names the figure (the section's title). */
@@ -60,7 +68,7 @@ type BidderActivePeriodsTimelineProps = {
  * every width: a lane per participant, ranked by gestures, every bar in the
  * gestures series colour so rank, not hue, identifies a lane. One tab stop:
  * the arrow keys step through a lane's periods and between lanes, and the
- * focused or hovered period reads out below the plot.
+ * hovered, tapped or focused period reads out below the plot.
  */
 export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> = ({
   enabled = true,
@@ -97,7 +105,8 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
 
   const counts = useMemo(() => lanes.map((lane) => lane.periods.length), [lanes]);
   const roving = useRovingStints(counts);
-  const [readout, setReadout] = useState<BidderActivePeriod | null>(null);
+  const readout = useTimelineReadout<BidderActivePeriod>();
+  const coarse = useCoarsePointer();
   const axis = useTimeAxis(initTs, finTs);
   const range = Math.max(1, finTs - initTs);
 
@@ -184,11 +193,12 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
       label={label}
       summary={
         leader
-          ? t('charts.activePeriods.summary', {
+          ? t.rich('charts.activePeriods.summary', {
               count: lanes.length,
               range: formatDateRange(initTs, finTs, locale),
               leader: formatAddress(leader.BidderAddr),
               gestures: format.count(leader.NumBids),
+              who: () => <SummaryAddress address={leader.BidderAddr} />,
             })
           : undefined
       }
@@ -198,8 +208,8 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
     >
       <div data-testid="bidder-active-periods-timeline" className="min-w-0">
         {/* One grid for the axis and every lane, so they cannot drift apart. */}
-        <div className="grid grid-cols-[minmax(7.5rem,11rem)_minmax(0,1fr)] gap-x-3">
-          <div className="border-b border-rule pb-2 type-caption text-subtle">
+        <div className={LANE_GRID}>
+          <div className="hidden border-b border-rule pb-2 type-caption text-subtle sm:block">
             {t('charts.activePeriods.participant')}
           </div>
           <div aria-hidden className="relative border-b border-rule pb-2 type-caption text-subtle">
@@ -226,7 +236,7 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
           role="group"
           aria-label={label}
           onKeyDown={roving.onKeyDown}
-          onMouseLeave={() => setReadout(null)}
+          onMouseLeave={readout.onMouseLeave}
         >
           {lanes.map((lane, row) => (
             <div
@@ -239,11 +249,13 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
                 periods: lane.periods.length,
               })}
               className={cn(
-                'grid grid-cols-[minmax(7.5rem,11rem)_minmax(0,1fr)] gap-x-3 border-b border-rule-faint transition-colors duration-fast',
+                LANE_GRID,
+                'border-b border-rule-faint pt-1.5 transition-colors duration-fast sm:pt-0',
                 TIMELINE_LANE_FOCUS_CLASS,
               )}
             >
-              <div className="flex min-h-10 min-w-0 flex-col justify-center py-1 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+              {/* A phone reads rank, address and count on one line above the lane. */}
+              <div className="flex min-w-0 items-baseline justify-between gap-3 sm:min-h-10 sm:items-center sm:py-1">
                 <span className="flex min-w-0 items-baseline gap-2">
                   <span
                     aria-hidden
@@ -258,11 +270,17 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
                     {formatAddress(lane.participant.BidderAddr)}
                   </Link>
                 </span>
-                <span className="ps-6 type-caption text-subtle tabular-nums sm:ps-0">
+                <span className="shrink-0 type-caption text-subtle tabular-nums">
                   {format.count(lane.participant.NumBids)}
                 </span>
               </div>
               <div className="relative min-h-10">
+                {lane.periods.length === 0 ? (
+                  // Gestures more than six hours apart form no period: say so, not an empty lane.
+                  <span className="absolute inset-y-0 start-0 flex items-center type-caption text-subtle">
+                    {t('charts.activePeriods.noPeriods')}
+                  </span>
+                ) : null}
                 {axis.ticks.map((tick) => (
                   <span
                     key={tick}
@@ -285,15 +303,11 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
                       role="img"
                       aria-label={periodLabel(period)}
                       tabIndex={current ? 0 : -1}
-                      onFocus={() => {
-                        roving.setCurrent({ row, item });
-                        setReadout(period);
-                      }}
-                      onMouseEnter={() => setReadout(period)}
+                      {...readout.markHandlers(period, () => roving.setCurrent({ row, item }))}
                       className={cn(
                         TIMELINE_MARK_CLASS,
-                        'inset-y-2.5 cursor-default rounded-edge opacity-80 transition-opacity duration-fast [--mark-min:3px] hover:opacity-100',
-                        readout === period && 'opacity-100',
+                        'inset-y-2.5 rounded-edge opacity-80 transition-opacity duration-fast [--mark-min:3px] hover:opacity-100',
+                        readout.active === period && 'opacity-100',
                       )}
                       style={{
                         ...timelineMarkStyle(start, width),
@@ -308,7 +322,9 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
         </div>
 
         <p aria-live="polite" className="mt-3 min-h-5 type-body-sm text-muted-foreground">
-          {readout ? periodLabel(readout) : t('charts.activePeriods.hint')}
+          {readout.active
+            ? periodLabel(readout.active)
+            : t(coarse ? 'charts.activePeriods.hintTouch' : 'charts.activePeriods.hint')}
         </p>
       </div>
     </ChartFigure>

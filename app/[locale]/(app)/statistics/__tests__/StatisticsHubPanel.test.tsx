@@ -2,6 +2,8 @@ import userEvent from '@testing-library/user-event';
 
 import statisticsMessages from '@/messages/en/statistics.json';
 
+import { formatDateTime, formatTimeZoneLabel } from '@/utils/format';
+
 import { render, screen, within, checkA11y } from '@/test-utils';
 
 import StatisticsHubPanel from '../StatisticsHubPanel';
@@ -71,7 +73,8 @@ describe('StatisticsHubPanel', () => {
     expect(within(cycle).getByText(metrics.ethInGesturesCurrentCycle.label)).toBeInTheDocument();
     const eth = within(cycle).getByText(metrics.ethInGesturesCurrentCycle.label).parentElement!;
     expect(eth).toHaveTextContent('2.3294 ETH');
-    expect(within(cycle).getByRole('img', { name: /^Gestures per day/ })).toBeInTheDocument();
+    // The bars are UTC days and say so, beside an opening time printed in the reader's zone.
+    expect(within(cycle).getByRole('img', { name: /^Gestures per UTC day/ })).toBeInTheDocument();
     expect(within(cycle).getByRole('link', { name: hub.cycle.open })).toHaveAttribute(
       'href',
       '/current-cycle',
@@ -201,10 +204,42 @@ describe('StatisticsHubPanel', () => {
     expect(container.querySelector('[data-live-state]')).not.toBeInTheDocument();
   });
 
-  it('dates the opening of the cycle in UTC, the zone of its daily bars, and says so once', () => {
+  it("dates the opening of the cycle in the reader's zone, as every page does, named inline", () => {
     render(<StatisticsHubPanel />);
-    // The jest intl mock prints the formats key with its values.
-    expect(screen.getAllByText('formats.dateTime.timeZone(zone=UTC)')).toHaveLength(1);
+    const cycle = screen.getByRole('region', { name: 'Cycle 3 so far' });
+    const opened = within(cycle).getByText(hub.cycle.opened).parentElement!;
+    // The same compact local date-time the current cycle prints for this moment...
+    const local = formatDateTime(1_700_000_000, {
+      locale: 'en',
+      timeZone: 'local',
+      now: Date.now(),
+    });
+    // ...followed by its zone ("UTC", "UTC+3", "UTC-5:30").
+    expect(opened.querySelector('time')).toHaveTextContent(
+      `${local} ${formatTimeZoneLabel('local')}`,
+    );
+    // No separate "Time zone" line: the zone travels with the time.
+    expect(screen.queryByText(/formats\.dateTime\.timeZone/)).not.toBeInTheDocument();
+  });
+
+  it('sets retrievals from the Allocations Wallet beside deposits of the same scope', () => {
+    render(<StatisticsHubPanel />);
+    // The first match is the figure's label; the Definitions disclosure repeats it.
+    const row = (label: string) => screen.getAllByText(label)[0]!.parentElement!;
+    expect(row(metrics.stellarSelectionEthDeposited.label)).toHaveTextContent('0.9879 ETH');
+    expect(row(metrics.chronoWarriorEthDeposited.label)).toHaveTextContent('1.9757 ETH');
+    // Every retrieval from the wallet, both tracks: never set against one track alone.
+    expect(row(metrics.allocationsWalletEthRetrieved.label)).toHaveTextContent('2.9636 ETH');
+  });
+
+  it('closes with the related pages, the current cycle linked once from its own section', () => {
+    render(<StatisticsHubPanel />);
+    const related = screen.getByRole('navigation', { name: hub.seo.relatedPagesAria });
+    expect(within(related).getByRole('link', { name: hub.seo.links.contracts })).toHaveAttribute(
+      'href',
+      '/contracts',
+    );
+    expect(within(related).queryByRole('link', { name: hub.seo.links.currentCycle })).toBeNull();
   });
 
   it('keeps polling enabled on the hub dashboard query', () => {

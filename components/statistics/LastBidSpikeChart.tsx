@@ -252,7 +252,7 @@ export const LastBidSpikeChart: FC<LastBidSpikeChartProps> = ({ enabled = true, 
               domain={yAxis.domain}
               ticks={yAxis.ticks}
               tickFormatter={yAxis.format}
-              width={40}
+              width={yAxis.width}
               allowDecimals={false}
             />
             <Tooltip {...TOOLTIP_PROPS} content={<SpikeTooltip />} />

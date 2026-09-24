@@ -38,9 +38,11 @@ export function outcomeTotals(list: readonly OutcomeEntry[]) {
 /**
  * What each participant spent on gestures and what came back to them as ETH
  * allocations, side by side and in neutral ink: no gain/loss colours, no
- * "biggest spender" ranking. The strip above totals the same columns, and
- * says how many received more ETH than they spent. Sorted by gestures;
- * every figure column sorts from its header.
+ * rank. The strip above totals the same columns, and says how many received
+ * more ETH than they spent. Listed by gestures; gestures, spent, received and
+ * allocations sort from their headers. The difference and the cycles with an
+ * allocation do not: a table sorted by either would be a board of who came
+ * out ahead, and a position number beside it a ranking.
  */
 export const ParticipantOutcomesSection = () => {
   const t = useTranslations('statistics');
@@ -71,16 +73,6 @@ export const ParticipantOutcomesSection = () => {
 
   const columns = useMemo<DataTableColumn<OutcomeEntry>[]>(
     () => [
-      {
-        id: 'rank',
-        kind: 'count',
-        header: '#',
-        label: t('performance.outcomes.rank'),
-        cell: (_row, { index }) => format.count(index + 1),
-        width: '3rem',
-        // A phone record is already one participant; its place in the list says the rest.
-        priority: 'secondary',
-      },
       {
         id: 'participant',
         kind: 'address',
@@ -137,7 +129,6 @@ export const ParticipantOutcomesSection = () => {
         header: t('performance.leaderboard.columns.net'),
         help: t('performance.outcomes.netHelp'),
         value: (row) => row.NetPlEth,
-        sortable: true,
         // Spent and received sit side by side above it on a phone; the difference stays on wider screens.
         priority: 'secondary',
         // Signed by the formatter, in the same ink as every other figure.
@@ -150,32 +141,18 @@ export const ParticipantOutcomesSection = () => {
           }),
       },
       {
-        id: 'rate',
-        kind: 'percent',
-        percentScale: 'ratio',
-        header: t('performance.leaderboard.columns.allocationRate'),
-        help: t('performance.outcomes.rateHelp'),
-        value: (row) => row.WinRate,
-        sortable: true,
-        cell: (row) => (
-          <span className="inline-flex flex-col items-end">
-            {/* One decimal, as every percentage on the statistics pages. */}
-            <span>
-              {format.percent(row.WinRate, {
-                scale: 'ratio',
-                minimumFractionDigits: 1,
-                maximumFractionDigits: 1,
-              })}
-            </span>
-            <span className="type-caption text-muted-foreground">
-              {t('performance.outcomes.cycles', {
-                part: format.count(row.RoundsWon),
-                // A number, for the plural; the message formats it (#) in the locale's style.
-                whole: row.RoundsParticipated,
-              })}
-            </span>
-          </span>
-        ),
+        // A count of cycles ("1 of 2 cycles"), never a percentage: no rate to compare by.
+        id: 'cycles',
+        kind: 'count',
+        header: t('performance.leaderboard.columns.cyclesWithAllocation'),
+        help: t('performance.outcomes.cyclesHelp'),
+        value: (row) => row.RoundsWon,
+        cell: (row) =>
+          t('performance.outcomes.cycles', {
+            part: format.count(row.RoundsWon),
+            // A number, for the plural; the message formats it (#) in the locale's style.
+            whole: row.RoundsParticipated,
+          }),
       },
       {
         id: 'allocations',

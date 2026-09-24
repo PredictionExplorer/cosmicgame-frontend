@@ -23,6 +23,7 @@ import { useCountAxis, useTimeAxis } from './charts/axes';
 import {
   CHART_MARGIN,
   GRID_PROPS,
+  MAX_BAR_SIZE,
   SERIES_COLOR,
   TOOLTIP_PROPS,
   X_AXIS_PROPS,
@@ -123,8 +124,11 @@ export const BidFrequencyChart: FC<BidFrequencyChartProps> = ({ enabled = true, 
   );
 
   const points = useMemo(() => toChartPoints(data ?? []), [data]);
-  const firstTs = points[0]?.bucketTs ?? initTs;
-  const lastTs = points[points.length - 1]?.bucketTs ?? finTs;
+  // The range a reader is told is the one with gestures in it, not the query's padded end.
+  const active = points.filter((point) => point.numBids > 0);
+  const firstTs = active[0]?.bucketTs ?? points[0]?.bucketTs ?? initTs;
+  const lastTs =
+    active[active.length - 1]?.bucketTs ?? points[points.length - 1]?.bucketTs ?? finTs;
   const withTime = interval === 'hour';
   const total = points.reduce((sum, point) => sum + point.numBids, 0);
   const peak = points.reduce<ChartPoint | null>(
@@ -230,7 +234,7 @@ export const BidFrequencyChart: FC<BidFrequencyChartProps> = ({ enabled = true, 
               domain={yAxis.domain}
               ticks={yAxis.ticks}
               tickFormatter={yAxis.format}
-              width={44}
+              width={yAxis.width}
               allowDecimals={false}
             />
             <Tooltip {...TOOLTIP_PROPS} content={<FrequencyTooltip withTime={withTime} />} />
@@ -238,6 +242,7 @@ export const BidFrequencyChart: FC<BidFrequencyChartProps> = ({ enabled = true, 
               dataKey="numBids"
               fill={SERIES_COLOR.gestures}
               radius={[2, 2, 0, 0]}
+              maxBarSize={MAX_BAR_SIZE}
               isAnimationActive={false}
             />
           </BarChart>

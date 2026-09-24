@@ -1,4 +1,12 @@
-import { durationScale, elapsedTicks, linearScale, niceStep, timeStep, timeTicks } from '../ticks';
+import {
+  durationScale,
+  elapsedTicks,
+  linearScale,
+  niceStep,
+  timeAxisTicks,
+  timeStep,
+  timeTicks,
+} from '../ticks';
 import { formatDateRange, formatMonthDay, formatTimeTick } from '../labels';
 
 const DAY = 86_400;
@@ -73,5 +81,27 @@ describe('chart labels', () => {
     expect(range).toMatch(/Sep 24/);
     expect(range.match(/2026/g)).toHaveLength(1);
     expect(formatDateRange(AUG_12, AUG_12 + 43 * DAY, 'vi')).toBe('12/8 – 24/9/2026');
+  });
+});
+
+describe('timeAxisTicks', () => {
+  it('never leaves a date axis with a single tick', () => {
+    // Regression: Aug 12 – Sep 24 at a phone's three ticks drew only "Sep 2026".
+    const from = Date.UTC(2026, 7, 12) / 1000;
+    const to = Date.UTC(2026, 8, 24) / 1000;
+    expect(timeTicks(from, to, timeStep(from, to, 3))).toHaveLength(1);
+    const { step, ticks } = timeAxisTicks(from, to, 3);
+    expect(step.unit).toBe('day');
+    expect(ticks.length).toBeGreaterThanOrEqual(2);
+    expect(ticks.length).toBeLessThanOrEqual(4);
+  });
+
+  it('keeps the chosen step when it already shows two ticks', () => {
+    const from = Date.UTC(2026, 0, 1) / 1000;
+    const to = Date.UTC(2026, 11, 31) / 1000;
+    expect(timeAxisTicks(from, to, 6)).toEqual({
+      step: timeStep(from, to, 6),
+      ticks: timeTicks(from, to, timeStep(from, to, 6)),
+    });
   });
 });

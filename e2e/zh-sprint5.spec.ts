@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
+import { waitForStableLayout } from './mobile-audit-helpers';
 import { dismissOpenTooltips, expectTooltipFullyVisible, openTooltip } from './tooltip-helpers';
 
 const ADDRESS = '0x1111111111111111111111111111111111111111';
@@ -221,6 +222,9 @@ async function openZhRoute(page: Page, path: string, title?: string): Promise<vo
 }
 
 test.describe('zh Sprint 5 — statistics, tables, and formatting', () => {
+  // A reader in China: date-times print in the reader's zone, so the zone is pinned.
+  test.use({ timezoneId: 'Asia/Shanghai' });
+
   test.beforeEach(async ({ page }) => {
     await mockSprint5Api(page);
     await page.emulateMedia({ reducedMotion: 'reduce' });
@@ -243,16 +247,9 @@ test.describe('zh Sprint 5 — statistics, tables, and formatting', () => {
         '已使用的 Random Walk NFT · Cosmic Signature',
       ],
       [`/zh/user/${ADDRESS}`, '落笔花费', undefined],
-      [
-        `/zh/user/stellar-selection-eth/${ADDRESS}`,
-        '此参与者获配的星选 ETH',
-        '星选 ETH · Cosmic Signature',
-      ],
-      [
-        `/zh/user/stellar-selection-nft/${ADDRESS}`,
-        '此参与者获配的星选 NFT',
-        '星选 NFT · Cosmic Signature',
-      ],
+      // The record pages name their track in the H1 ("星选 · ETH"); the participant is the trail.
+      [`/zh/user/stellar-selection-eth/${ADDRESS}`, '星选 · ETH', '星选 ETH · Cosmic Signature'],
+      [`/zh/user/stellar-selection-nft/${ADDRESS}`, '星选 · NFT', '星选 NFT · Cosmic Signature'],
       [
         `/zh/system-event/${CYCLE}/100/200`,
         `第 ${CYCLE} 个周期前的配置`,
@@ -274,15 +271,20 @@ test.describe('zh Sprint 5 — statistics, tables, and formatting', () => {
       '/zh/statistics',
       '统计：演绎周期、落笔、NFT 与 CST · Cosmic Signature',
     );
+    // The figure's explanation is a client island: a hover that lands before it hydrates
+    // opens nothing, so the page settles first (it used to be torn down and rebuilt by a
+    // hydration mismatch, which detached the trigger instead).
+    await waitForStableLayout(page);
     // The header figure's explanation is named after its label.
     const tooltipTrigger = page.getByRole('button', { name: '查看“当前演绎周期”的更多信息' });
     await tooltipTrigger.scrollIntoViewIfNeeded();
     await openTooltip(tooltipTrigger);
     await expectTooltipFullyVisible(page, /当前索引的演绎周期编号/);
     await dismissOpenTooltips(page);
-
-    await openZhRoute(page, '/zh/named-nfts', '已命名 NFT · Cosmic Signature');
-    await expect(page.getByText(/1月1日 \d{2}:34/, { exact: true })).toBeVisible();
+    // The cycle's opening (11:34 UTC), in the zh calendar style and the reader's zone,
+    // named inline; the year shows only outside the current one. (The named NFTs page
+    // this used to check is a gallery of plates now, with no dates.)
+    await expect(page.getByText(/^(2026年)?1月1日 19:34 UTC\+8$/)).toBeVisible();
 
     await openZhRoute(page, '/zh/statistics/tokens', '代币分布统计 · Cosmic Signature');
     // The supply summary dates the reading in the zh calendar style.

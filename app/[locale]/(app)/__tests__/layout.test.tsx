@@ -250,10 +250,11 @@ describe('RootDocument Vercel Analytics contract', () => {
     expect(bodyMatch![1]).toContain('<SpeedInsights />');
   });
 
-  it('neither root layout reads request headers (static-rendering contract)', () => {
+  it('no root layout reads request headers (static-rendering contract)', () => {
     for (const layoutPath of [
       resolvePath(__dirname, '..', 'layout.tsx'),
       resolvePath(__dirname, '..', '..', '(landing)', 'layout.tsx'),
+      resolvePath(__dirname, '..', '..', '(embed)', 'layout.tsx'),
     ]) {
       const source = readFileSync(layoutPath, 'utf-8');
       expect(source).not.toMatch(/next\/headers/);

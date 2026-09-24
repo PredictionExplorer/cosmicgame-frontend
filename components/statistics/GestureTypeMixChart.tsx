@@ -32,6 +32,7 @@ import {
 import {
   CHART_MARGIN,
   GRID_PROPS,
+  MAX_BAR_SIZE,
   TOOLTIP_PROPS,
   X_AXIS_PROPS,
   Y_AXIS_PROPS,
@@ -108,7 +109,7 @@ const MixBars = memo(function MixBars({
           domain={yAxis.domain}
           ticks={yAxis.ticks}
           tickFormatter={yAxis.format}
-          width={40}
+          width={yAxis.width}
           allowDecimals={false}
         />
         <Tooltip {...TOOLTIP_PROPS} content={<MixTooltip withTime={interval < 86_400} />} />
@@ -119,6 +120,7 @@ const MixBars = memo(function MixBars({
             stackId="mix"
             fill={GESTURE_METHOD_COLOR[method]}
             radius={index === GESTURE_METHODS.length - 1 ? [2, 2, 0, 0] : 0}
+            maxBarSize={MAX_BAR_SIZE}
             isAnimationActive={false}
           />
         ))}

@@ -20,11 +20,31 @@ jest.mock('next/navigation', () => ({
 }));
 jest.mock('../../../../../../../components/statistics/EnduranceTimelineChart', () => ({
   __esModule: true,
-  default: ({ round, isLive }: { round: number; isLive: boolean }) => (
-    <div data-testid="endurance-chart">
-      {round}
-      {isLive ? ' live' : ' final'}
-    </div>
+  default: function MockEnduranceTimelineChart({
+    round,
+    isLive,
+    laneLimit,
+  }: {
+    round: number;
+    isLive: boolean;
+    laneLimit?: number | null;
+  }) {
+    const { useChartLinksOpenNewWindow } = jest.requireActual<
+      typeof import('@/components/statistics/charts/timeline')
+    >('@/components/statistics/charts/timeline');
+    return (
+      <div
+        data-testid="endurance-chart"
+        data-lane-limit={String(laneLimit)}
+        data-new-window-links={String(useChartLinksOpenNewWindow())}
+      >
+        {round}
+        {isLive ? ' live' : ' final'}
+      </div>
+    );
+  },
+  EnduranceTimelineSkeleton: ({ lanes }: { lanes?: number }) => (
+    <div role="status" data-testid="endurance-skeleton" data-lanes={String(lanes)} />
   ),
 }));
 
@@ -74,6 +94,38 @@ describe('EmbedEnduranceChart', () => {
     rerender(<EmbedEnduranceChart roundNum={1} />);
     expect(screen.getByText('Final')).toBeInTheDocument();
     expect(screen.getByTestId('endurance-chart')).toHaveTextContent('1 final');
+  });
+
+  it('draws every lane: the embed is a page of its own, never a scroll box in one', () => {
+    mockUseDashboardInfo.mockReturnValue(dashboard({ data: { CurRoundNum: 3 } }));
+    render(<EmbedEnduranceChart roundNum={1} />);
+    expect(screen.getByTestId('endurance-chart')).toHaveAttribute('data-lane-limit', 'null');
+  });
+
+  it('opens the chart’s links in a new window, like its source link', () => {
+    mockUseDashboardInfo.mockReturnValue(dashboard({ data: { CurRoundNum: 3 } }));
+    render(<EmbedEnduranceChart roundNum={1} />);
+    expect(screen.getByTestId('endurance-chart')).toHaveAttribute('data-new-window-links', 'true');
+    expect(screen.getByRole('link', { name: /opens in a new window/ })).toHaveAttribute(
+      'target',
+      '_blank',
+    );
+  });
+
+  it('puts the badge and the chart in the server render from the server read', () => {
+    // The client's dashboard has not answered: the server's live cycle decides.
+    mockUseDashboardInfo.mockReturnValue(dashboard({ isLoading: true }));
+    render(<EmbedEnduranceChart roundNum={1} seedLiveCycle={3} expectedLanes={19} />);
+    expect(screen.getByText('Final')).toBeInTheDocument();
+    expect(screen.getByTestId('endurance-chart')).toHaveTextContent('1 final');
+  });
+
+  it('never 404s from the server read alone, and sizes the wait to its lane count', () => {
+    mockUseDashboardInfo.mockReturnValue(dashboard({ isLoading: true }));
+    render(<EmbedEnduranceChart roundNum={4} seedLiveCycle={3} expectedLanes={19} />);
+    expect(mockNotFound).not.toHaveBeenCalled();
+    expect(screen.queryByText('Live cycle')).not.toBeInTheDocument();
+    expect(screen.getByTestId('endurance-skeleton')).toHaveAttribute('data-lanes', '19');
   });
 
   it('treats a cycle past the live one as not found, never as live', () => {

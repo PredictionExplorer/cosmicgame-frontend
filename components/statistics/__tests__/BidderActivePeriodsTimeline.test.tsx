@@ -73,6 +73,43 @@ describe('BidderActivePeriodsTimeline', () => {
     expect(left).toBeLessThanOrEqual(100);
   });
 
+  it('says a lane has no active period instead of leaving it blank', () => {
+    // Regression: participants whose gestures were never within six hours drew empty lanes.
+    const CAROL = '0x0000000000000000000000000000000000000c0c';
+    mockUseTopBidderActivePeriods.mockReturnValue(
+      ok({
+        TopBidders: [...top, { BidderAid: 3, BidderAddr: CAROL, NumBids: 7 }],
+        ActivePeriods: periods,
+      }),
+    );
+    render(<BidderActivePeriodsTimeline label="Active periods" />);
+    const lanes = within(screen.getByRole('group', { name: 'Active periods' })).getAllByRole(
+      'group',
+    );
+    expect(within(lanes[2]!).queryAllByRole('img')).toHaveLength(0);
+    expect(within(lanes[2]!).getByText('No active period')).toBeInTheDocument();
+  });
+
+  it('pins a tapped period in the readout, since a finger has no hover', async () => {
+    const user = userEvent.setup();
+    const { container } = render(<BidderActivePeriodsTimeline label="Active periods" />);
+    const group = screen.getByRole('group', { name: 'Active periods' });
+    const mark = within(group).getAllByRole('img')[1]!;
+    await user.click(mark);
+    await user.unhover(group);
+    const readout = container.querySelector('[aria-live="polite"]')!;
+    expect(readout.textContent).toBe(mark.getAttribute('aria-label'));
+  });
+
+  it('puts the address above its lane on a phone, so the plot spans the width', () => {
+    render(<BidderActivePeriodsTimeline label="Active periods" />);
+    const lane = within(screen.getByRole('group', { name: 'Active periods' })).getAllByRole(
+      'group',
+    )[0]!;
+    expect(lane).toHaveClass('grid-cols-1');
+    expect(lane.className).toContain('sm:grid-cols-[minmax(7.5rem,11rem)_minmax(0,1fr)]');
+  });
+
   it('keeps one tab stop and steps through periods with the arrow keys', async () => {
     const user = userEvent.setup();
     const { container } = render(<BidderActivePeriodsTimeline label="Active periods" />);

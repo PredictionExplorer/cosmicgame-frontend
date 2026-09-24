@@ -31,7 +31,8 @@ export interface AnchorDistributionRow {
 /** Props for the user anchoring section. */
 export interface UserAnchoringSectionProps {
   address: string;
-  userInfo: UserProfileInfo;
+  /** The profile record, or null for an address without one (its Random Walk totals read as none). */
+  userInfo: UserProfileInfo | null;
   cstAnchorActions: AnchorAction[];
   rwlkAnchorActions: AnchorAction[];
   cstAnchorDistributions: AnchorDistributionRow[];
@@ -83,7 +84,7 @@ export function UserAnchoringSection({
     0,
   );
 
-  const rwlkStats = userInfo.StakingStatisticsRWalk;
+  const rwlkStats = userInfo?.StakingStatisticsRWalk;
   const hasCstActivity = cstAnchorActions.length > 0 || cstAnchorDistributions.length > 0;
   const hasRwlkActivity =
     (rwlkStats?.TotalNumStakeActions ?? 0) > 0 || rwlkAnchorActions.length > 0;

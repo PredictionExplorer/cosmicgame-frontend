@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { act, checkA11y, render, screen, within } from '@/test-utils';
 
 import EnduranceTimelineChart from '../EnduranceTimelineChart';
+import { ChartLinksOpenNewWindow } from '../charts/timeline';
 
 const mockUseGestureListByCycle = jest.fn();
 const mockUseRoundInfo = jest.fn();
@@ -32,6 +33,12 @@ const gestures = [
 
 const ok = <T,>(data: T) => ({ data, isLoading: false, isError: false, refetch: jest.fn() });
 
+/** A summary line by its whole text: the address inside it is a link of its own. */
+const summaryLine = (pattern: RegExp) => (_: string, element: Element | null) =>
+  element?.tagName === 'SPAN' &&
+  element.classList.contains('block') &&
+  pattern.test(element.textContent ?? '');
+
 beforeEach(() => {
   jest.clearAllMocks();
   mockUseGestureListByCycle.mockReturnValue(ok(gestures));
@@ -44,9 +51,9 @@ describe('EnduranceTimelineChart', () => {
     render(<EnduranceTimelineChart round={2} isLive label="Endurance" />);
     const figure = screen.getByRole('figure', { name: 'Endurance' });
     expect(
-      within(figure).getByText(/^Endurance Champion: 0xb1b2….*held 1[67]h/i),
+      within(figure).getByText(summaryLine(/^Endurance Champion: 0xb1b2….*held 1[67]h/i)),
     ).toBeInTheDocument();
-    expect(within(figure).getByText(/^Chrono-Warrior: /)).toBeInTheDocument();
+    expect(within(figure).getByText(summaryLine(/^Chrono-Warrior: /))).toBeInTheDocument();
   });
 
   it('lays the time axis and every lane on the same columns, so they cannot drift apart', () => {
@@ -110,6 +117,100 @@ describe('EnduranceTimelineChart', () => {
     }
   });
 
+  it('links each summary address to its participant, in the identifier face', () => {
+    render(<EnduranceTimelineChart round={2} isLive label="Endurance" />);
+    const figure = screen.getByRole('figure', { name: 'Endurance' });
+    const caption = figure.querySelector('figcaption')!;
+    const links = within(caption).getAllByRole('link');
+    expect(links).toHaveLength(2);
+    for (const link of links) {
+      expect(link).toHaveClass('type-mono');
+      expect(link.getAttribute('href')).toMatch(/^\/user\/0x/);
+      expect(link).not.toHaveAttribute('target');
+    }
+  });
+
+  it('opens its participants in a new window inside an embed, and says so', async () => {
+    // Regression: the embed's summary addresses turned the embed window into the app,
+    // while its own source link opened a new window.
+    const user = userEvent.setup();
+    render(
+      <ChartLinksOpenNewWindow>
+        <EnduranceTimelineChart round={2} isLive label="Endurance" />
+      </ChartLinksOpenNewWindow>,
+    );
+    const caption = screen.getByRole('figure', { name: 'Endurance' }).querySelector('figcaption')!;
+    await user.click(screen.getByRole('button', { name: 'View as table' }));
+    const table = screen.getByRole('table', { name: 'Endurance' });
+    const links = [...within(caption).getAllByRole('link'), ...within(table).getAllByRole('link')];
+    expect(links).toHaveLength(4);
+    for (const link of links) {
+      expect(link).toHaveAttribute('target', '_blank');
+      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+      expect(link).toHaveAccessibleName(/\(opens in a new window\)$/);
+      expect(link.getAttribute('href')).toMatch(/^\/user\/0x/);
+    }
+  });
+
+  it('shows the longest holders first and the rest behind "Show all", never in a scroll box', async () => {
+    // Regression: lanes past 14 hid in a nested scroll area whose mask made the 14th look last.
+    const user = userEvent.setup();
+    const many = Array.from({ length: 16 }, (_, index) => ({
+      TimeStamp: T0 + index * HOUR,
+      BidderAddr: `0x${(index + 1).toString(16).padStart(40, '0')}`,
+    }));
+    mockUseGestureListByCycle.mockReturnValue(ok(many));
+    render(<EnduranceTimelineChart round={2} isLive label="Endurance" />);
+    const gantt = screen.getByRole('group', { name: 'Lead stints by participant' });
+    expect(within(gantt).getAllByRole('group')).toHaveLength(14);
+    expect(gantt.closest('[class*="overflow-y-auto"]')).toBeNull();
+    expect(screen.getByText('Showing 14 of 16 addresses that held the lead')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Show all 16' }));
+    expect(within(gantt).getAllByRole('group')).toHaveLength(16);
+    // Every lane is in view: the caption says so rather than "Showing 16 of 16".
+    expect(screen.getByText('Showing all 16 addresses that held the lead')).toBeInTheDocument();
+    expect(screen.queryByText(/Showing 16 of 16/)).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Show the top 14' })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
+  });
+
+  it('draws every lane when the page asks for all of them', () => {
+    const many = Array.from({ length: 16 }, (_, index) => ({
+      TimeStamp: T0 + index * HOUR,
+      BidderAddr: `0x${(index + 1).toString(16).padStart(40, '0')}`,
+    }));
+    mockUseGestureListByCycle.mockReturnValue(ok(many));
+    render(<EnduranceTimelineChart round={2} isLive label="Endurance" laneLimit={null} />);
+    const gantt = screen.getByRole('group', { name: 'Lead stints by participant' });
+    expect(within(gantt).getAllByRole('group')).toHaveLength(16);
+    expect(screen.queryByRole('button', { name: /^Show all/ })).not.toBeInTheDocument();
+  });
+
+  it('pins a tapped stint in the readout, since a finger has no hover', async () => {
+    const user = userEvent.setup();
+    const { container } = render(<EnduranceTimelineChart round={2} isLive label="Endurance" />);
+    const gantt = screen.getByRole('group', { name: 'Lead stints by participant' });
+    const readout = container.querySelector('[aria-live="polite"]')!;
+    const stint = within(gantt).getAllByRole('img')[1]!;
+    await user.click(stint);
+    await user.unhover(gantt);
+    expect(readout.textContent).toBe(stint.getAttribute('aria-label'));
+  });
+
+  it('holds the Gantt shape at the expected lane count while the gestures load', () => {
+    mockUseGestureListByCycle.mockReturnValue({ ...ok(undefined), isLoading: true });
+    const { container } = render(
+      <EnduranceTimelineChart round={2} isLive label="Endurance" expectedLanes={19} />,
+    );
+    const status = screen.getByRole('status', { name: /loading/i });
+    expect(status.querySelectorAll('.bg-surface-sunken')).toHaveLength(19);
+    // The caption's two lines are held too, so the view switch below does not move.
+    expect(container.querySelector('figcaption')).toBeInTheDocument();
+  });
+
   it('switches to the records as lines', async () => {
     const user = userEvent.setup();
     render(<EnduranceTimelineChart round={2} isLive label="Endurance" />);
@@ -132,7 +233,9 @@ describe('EnduranceTimelineChart', () => {
     render(<EnduranceTimelineChart round={1} isLive={false} label="Endurance" />);
     expect(mockUseRoundInfo).toHaveBeenCalledWith(1);
     // Bob's last stint now runs 7h, under Alice's 10h opening hold.
-    expect(screen.getByText(/^Endurance Champion: 0xa1b2….*held 10h/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(summaryLine(/^Endurance Champion: 0xa1b2….*held 10h/i)),
+    ).toBeInTheDocument();
   });
 
   it('asks for a cycle, and says when the cycle has no lead yet', () => {

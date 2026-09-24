@@ -40,6 +40,9 @@ describe('SectionShell', () => {
     const toggle = screen.getByRole('button', { name: 'Gesture spikes' });
     expect(toggle.closest('h2')).not.toBeNull();
     expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    // One heading line is 29px on a phone: on touch its own box grows to a
+    // 44px target and hands the space back (touch-hit-area), so nothing moves.
+    expect(toggle).toHaveClass('touch-hit-area');
     expect(screen.getByText('One sentence.')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Act' })).toBeInTheDocument();
 

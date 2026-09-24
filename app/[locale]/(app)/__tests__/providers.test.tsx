@@ -134,7 +134,7 @@ describe('Providers', () => {
     expect(screen.getByTestId('footer')).toBeInTheDocument();
   });
 
-  it.each(['/experimental-ui', '/gallery', '/statistics/participation', '/embed-example'])(
+  it.each(['/experimental-ui', '/gallery', '/statistics/participation'])(
     'keeps full site navigation on %s',
     (pathname) => {
       mockPathname.mockReturnValue(pathname);
@@ -146,21 +146,6 @@ describe('Providers', () => {
       expect(screen.getByTestId('header')).toBeInTheDocument();
       expect(screen.getByTestId('footer')).toBeInTheDocument();
       expect(document.querySelector('a[href="#main"]')).toBeInTheDocument();
-    },
-  );
-
-  it.each(['/embed', '/embed/statistics'])(
-    'omits navigation and background work in %s',
-    (pathname) => {
-      mockPathname.mockReturnValue(pathname);
-      render(
-        <Providers>
-          <main>Embedded content</main>
-        </Providers>,
-      );
-      expect(screen.queryByTestId('header')).not.toBeInTheDocument();
-      expect(screen.queryByTestId('footer')).not.toBeInTheDocument();
-      expect(document.querySelector('a[href="#main"]')).not.toBeInTheDocument();
     },
   );
 

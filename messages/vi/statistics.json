@@ -39,7 +39,11 @@
     "noDataTitle": "Chưa có dữ liệu",
     "sectionLoadErrorTitle": "Không tải được {title}",
     "serviceError": "Dịch vụ thống kê không phản hồi. Hãy thử lại sau ít phút.",
-    "definitions": "Định nghĩa"
+    "definitions": "Định nghĩa",
+    "listMissingTitle": "Danh sách chưa tải được",
+    "listMissingMessage": "Các số liệu khác trên trang cho thấy ở đây có dữ liệu, nhưng chưa nhận được. Hãy thử lại.",
+    "showSection": "Hiện",
+    "hideSection": "Ẩn"
   },
   "hub": {
     "loadErrorTitle": "Không tải được thống kê",
@@ -47,6 +51,7 @@
     "exploreTitle": "Khám phá thống kê",
     "exploreAria": "Các trang mục thống kê",
     "protocolEconomyTitle": "Dòng chảy của giao thức",
+    "relatedTitle": "Trang liên quan",
     "jsonLd": {
       "webPageName": "Thống kê giao thức Cosmic Signature",
       "webPageDescription": "Thống kê công khai của giao thức Cosmic Signature trên Arbitrum, gồm trạng thái chu kỳ trình diễn, nét bút, NFT, CST, neo giữ, dự trữ và dữ liệu phân bổ.",
@@ -69,7 +74,7 @@
       "title": "Chu kỳ {cycle} đến nay",
       "open": "Mở chu kỳ hiện tại",
       "opened": "Bắt đầu lúc",
-      "rhythmLabel": "Nét bút mỗi ngày, {days, number} ngày gần nhất",
+      "rhythmLabel": "Nét bút mỗi ngày (theo UTC), {days, number} ngày gần nhất",
       "rhythmSummary": "Tổng cộng: {total}. Ngày sôi động nhất: {date} ({peak}).",
       "rhythmEmpty": "Không có nét bút nào trong khoảng thời gian này.",
       "rhythmUnavailable": "Hiện chưa thể tải số nét bút theo ngày.",
@@ -120,9 +125,13 @@
       "label": "ETH Tinh tuyển đã nạp",
       "tooltip": "Tổng ETH đã phân bổ vào các quỹ Tinh tuyển qua các chu kỳ trình diễn được lập chỉ mục."
     },
-    "stellarSelectionEthRetrieved": {
-      "label": "ETH Tinh tuyển đã nhận về",
-      "tooltip": "Tổng ETH những người nhận được chọn đã nhận về từ các quỹ Tinh tuyển."
+    "chronoWarriorEthDeposited": {
+      "label": "ETH Chiến binh Thời gian đã nạp",
+      "tooltip": "Tổng ETH đã phân bổ cho Chiến binh Thời gian qua các chu kỳ trình diễn được lập chỉ mục, giữ trong Ví phân bổ cho đến khi người nhận nhận về."
+    },
+    "allocationsWalletEthRetrieved": {
+      "label": "ETH đã nhận về từ Ví phân bổ",
+      "tooltip": "ETH người nhận đã nhận về từ Ví phân bổ, gồm cả ETH Tinh tuyển và ETH Chiến binh Thời gian."
     },
     "totalSupplyErc20": {
       "label": "Tổng cung (ERC-20)",
@@ -272,6 +281,7 @@
       "cycleTimelines": "Chi tiết một chu kỳ"
     },
     "emptyCycleActivations": "Chưa có lần kích hoạt chu kỳ nào được lập chỉ mục",
+    "cycleActivationsCount": "Đã lập chỉ mục {count, number} lần kích hoạt",
     "cycleTimelinesDescription": "Chọn một chu kỳ để xem nét bút chia theo phương thức ra sao, ai giữ vị trí dẫn đầu, và cửa sổ hiệu chỉnh CST cùng chi phí CST thay đổi thế nào."
   },
   "anchoringPage": {
@@ -348,7 +358,8 @@
       "summaryNoSupply": "{count, plural, other {# địa chỉ}} đang nắm giữ CST, xếp theo số dư lớn nhất.",
       "share": "Tỷ lệ trên tổng cung",
       "shareHelp": "Số dư này tính theo tỷ lệ trên tổng cung CST."
-    }
+    },
+    "attachedContracts": "{count, number} hợp đồng ERC-721"
   },
   "attachedAssets": {
     "scopeAria": "Phạm vi NFT đính kèm",
@@ -377,7 +388,7 @@
       "empty": "Chưa có người tham gia nào khớp với bộ lọc này.",
       "columns": {
         "participant": "Người tham gia",
-        "allocationRate": "Tỷ lệ phân bổ",
+        "cyclesWithAllocation": "Chu kỳ có phân bổ",
         "gestures": "Nét bút",
         "spent": "Đã chi (ETH)",
         "received": "Đã nhận (ETH)",
@@ -433,9 +444,8 @@
       "received": "ETH nhận qua phân bổ",
       "receivedMore": "Nhận nhiều ETH hơn đã chi",
       "ofParticipants": "{part} trên {whole}",
-      "rank": "Thứ tự",
       "netHelp": "ETH nhận qua phân bổ trừ ETH đã chi cho nét bút. Không tính CST.",
-      "rateHelp": "Tỷ lệ số chu kỳ người này tham gia mà có nhận ít nhất một phân bổ.",
+      "cyclesHelp": "Số chu kỳ người này tham gia mà có nhận ít nhất một phân bổ.",
       "cycles": "{part} trên {whole, number} chu kỳ"
     }
   },
@@ -452,8 +462,8 @@
       "openingExcluded": "Nét bút trong giờ đầu sau khi mỗi chu kỳ mở không được tính — hoạt động lúc mở tập trung bất thường và sẽ làm lệch biểu đồ này.",
       "hour": "Giờ",
       "day": "Ngày",
-      "summaryDaily": "Nét bút, {range}: {total}. Ngày sôi động nhất: {date} ({peak}).",
-      "summaryHourly": "Nét bút, {range}: {total}. Giờ sôi động nhất: {date} ({peak})."
+      "summaryDaily": "Nét bút, {range}: {total}, không tính giờ đầu tiên của mỗi chu kỳ. Ngày sôi động nhất: {date} ({peak}).",
+      "summaryHourly": "Nét bút, {range}: {total}, không tính giờ đầu tiên của mỗi chu kỳ. Giờ sôi động nhất: {date} ({peak})."
     },
     "spikes": {
       "count": "Đợt tăng vọt ({count})",
@@ -466,7 +476,7 @@
       "loadErrorTitle": "Không tải được các đợt tăng vọt nét bút",
       "loadErrorMessage": "Không lấy được dữ liệu phát hiện đợt tăng vọt.",
       "empty": "Không phát hiện đợt tăng vọt nét bút nào trong lịch sử đã lập chỉ mục.",
-      "noneRecent": "Gần đây không có đợt tăng vọt.",
+      "noneRecent": "Gần đây không có đợt tăng vọt; đang hiển thị đợt gần nhất đã ghi nhận.",
       "selectEarlier": "Chọn số thứ tự ở trên để xem những đợt tăng hoạt động trước đó.",
       "emptyWindow": "Không có khoảng gộp theo giờ cho cửa sổ đợt tăng vọt đã chọn.",
       "optionAria": "Đợt tăng vọt ngày {date}, tối đa {peak} mỗi giờ"
@@ -480,11 +490,13 @@
       "loadErrorMessage": "Không lấy được dòng thời gian hoạt động của những người tham gia hàng đầu.",
       "empty": "Không tìm thấy khoảng hoạt động nét bút nào của những người tham gia hàng đầu.",
       "periods": "Khoảng hoạt động",
+      "noPeriods": "Không có khoảng hoạt động",
       "longest": "Khoảng dài nhất",
       "lastActive": "Hoạt động gần nhất",
-      "summary": "{count, number} người tham gia tích cực nhất, {range}. Nhiều nét bút nhất: {leader} ({gestures}).",
+      "summary": "{count, number} người tham gia tích cực nhất, {range}. Nhiều nét bút nhất: <who>{leader}</who> ({gestures}).",
       "laneLabel": "{rank}. {address}: {gestures, number} nét bút trong {periods, number} khoảng hoạt động",
-      "hint": "Trỏ vào hoặc chọn một khoảng để xem chi tiết; phím mũi tên chuyển giữa các khoảng."
+      "hint": "Trỏ vào hoặc chọn một khoảng để xem chi tiết; phím mũi tên chuyển giữa các khoảng.",
+      "hintTouch": "Chạm vào một khoảng để xem chi tiết."
     },
     "typeRatio": {
       "totalGestures": "Tổng số nét bút",
@@ -525,8 +537,8 @@
       "loadErrorTitle": "Không tải được dòng thời gian bền bỉ",
       "loadErrorMessage": "Không lấy được lịch sử nét bút của chu kỳ này.",
       "empty": "Chưa có hoạt động dẫn đầu trong chu kỳ này.",
-      "championSummary": "Quán quân Bền bỉ: {address} đã giữ {duration}",
-      "chronoSummary": "Chiến binh Thời gian: {address} đã giữ vị trí {duration}",
+      "championSummary": "Quán quân Bền bỉ: <who>{address}</who> đã giữ {duration}",
+      "chronoSummary": "Chiến binh Thời gian: <who>{address}</who> đã giữ vị trí {duration}",
       "gantt": "Gantt",
       "lineChart": "Biểu đồ đường",
       "openWindow": "Mở trong cửa sổ mới",
@@ -534,6 +546,11 @@
       "ganttLabel": "Các đoạn dẫn đầu theo người tham gia",
       "laneLabel": "{address}: {count, number} đoạn dẫn đầu, dài nhất {longest}",
       "hint": "Trỏ vào hoặc chọn một đoạn dẫn đầu để xem chi tiết; phím mũi tên chuyển giữa các đoạn.",
+      "hintTouch": "Chạm vào một đoạn dẫn đầu để xem chi tiết.",
+      "lanesAll": "Đang hiển thị tất cả {total, number} địa chỉ từng dẫn đầu",
+      "lanesShown": "Đang hiển thị {shown, number}/{total, number} địa chỉ từng dẫn đầu",
+      "showAllLanes": "Hiện tất cả {count, number}",
+      "showFewerLanes": "Chỉ hiện {count, number} địa chỉ đầu",
       "role": "Danh hiệu",
       "holds": "Số đoạn dẫn đầu",
       "longestHold": "Đoạn dài nhất",
@@ -575,7 +592,7 @@
       "clockBefore": "Thời gian còn lại trước đó",
       "gestureBy": "Nét bút của",
       "clickHint": "Nhấn vào chấm để mở giao dịch.",
-      "description": "Mỗi chấm là lượng CST thực trả cho một nét bút (thang log — chấm rỗng là không tốn chi phí). Sau mỗi nét bút CST, chi phí đặt lại ở gần gấp đôi lượng đã trả rồi giảm về không qua cửa sổ hiệu chỉnh. Đường đứt nét là thời gian còn lại của đồng hồ phân bổ ngay trước mỗi nét bút: khi đồng hồ cạn, đặt nét bút liên tục khiến chi phí không có thời gian giảm, nên giá phải trả leo thang. Nhấn vào một chấm để mở giao dịch của nó.",
+      "description": "Mỗi chấm là lượng CST thực trả cho một nét bút (thang log — chấm rỗng là không tốn chi phí). Sau mỗi nét bút CST, chi phí đặt lại ở gần gấp đôi lượng đã trả rồi giảm về không qua cửa sổ hiệu chỉnh. Đường đứt nét là thời gian còn lại của đồng hồ phân bổ ngay trước mỗi nét bút: khi đồng hồ cạn, đặt nét bút liên tục khiến chi phí không có thời gian giảm, nên giá phải trả leo thang.",
       "empty": "Không có nét bút CST trong chu kỳ này.",
       "selectCycle": "Chọn một chu kỳ để xem.",
       "loadErrorTitle": "Không tải được chi phí nét bút CST",

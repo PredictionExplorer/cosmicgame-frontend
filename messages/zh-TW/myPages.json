@@ -65,7 +65,7 @@
       "ownSubtitle": "你在每個演繹週期的落筆及其花費、獲配內容、NFT 與錨定。",
       "userSubtitle": "此地址在每個演繹週期的落筆及其花費、獲配內容、NFT 與錨定。",
       "emptyTitle": "暫無活動",
-      "emptyDescription": "此帳戶尚未參與任何週期。落筆即可開始。",
+      "emptyDescription": "此地址尚無落筆、分配或錨定紀錄。",
       "sections": {
         "gestureHistory": "落筆",
         "recipientHistory": "獲配紀錄",

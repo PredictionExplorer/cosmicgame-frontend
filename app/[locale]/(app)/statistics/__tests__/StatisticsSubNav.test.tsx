@@ -8,7 +8,9 @@ import { ALL_STATISTICS_SECTIONS } from '../statistics-sections';
 let mockPathname = '/statistics';
 jest.mock('next/navigation', () => ({
   usePathname: () => mockPathname,
+  useRouter: () => ({ prefetch: mockPrefetch, push: jest.fn(), replace: jest.fn() }),
 }));
+const mockPrefetch = jest.fn();
 
 jest.mock('next/link', () => ({
   __esModule: true,

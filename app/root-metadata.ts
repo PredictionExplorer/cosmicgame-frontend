@@ -35,8 +35,9 @@ export function openGraphLocale(locale: string): string {
 }
 
 /**
- * Site-wide metadata defaults shared by both root layouts
- * (`app/[locale]/(app)/layout.tsx` and `app/[locale]/(landing)/layout.tsx`).
+ * Site-wide metadata defaults shared by every root layout
+ * (`app/[locale]/(app)/layout.tsx`, `app/[locale]/(landing)/layout.tsx` and
+ * `app/[locale]/(embed)/layout.tsx`).
  *
  * `openGraph.images` and `twitter.images` are intentionally not set here.
  * Next.js auto-populates them from the file-system convention

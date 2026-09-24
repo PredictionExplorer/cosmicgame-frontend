@@ -7,22 +7,25 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { toFiniteNumber } from '@/utils/finiteNumber';
-import { formatAmount, formatTimeZoneLabel } from '@/utils/format';
+import { formatAmount } from '@/utils/format';
 import { useFormat } from '@/hooks/useFormat';
+import { useHydrated } from '@/hooks/useHydrated';
 import { useCTStatistics, useDashboardInfo } from '@/hooks/useApiQuery';
 import type { DashboardInfo } from '@/services/api/types';
 import { Amount } from '@/components/ui/amount';
-import { DateTime } from '@/components/ui/date-time';
+import { DateTime, useTimeZoneLabel } from '@/components/ui/date-time';
 import { ErrorState } from '@/components/ui/error-state';
 import { LiveStatus } from '@/components/ui/live-status';
 import { SkeletonDetailRows, SkeletonTable } from '@/components/ui/skeleton';
 import { UnknownValue } from '@/components/ui/unknown-value';
+import { SiteLink } from '@/components/layout/SiteLink';
 import { SectionShell } from '@/components/statistics/SectionShell';
 import { StatisticsGroup } from '@/components/statistics/StatisticsGroup';
 import { StatisticsItem } from '@/components/statistics/StatisticsItem';
 import { DefinitionsDisclosure } from '@/components/statistics/DefinitionsDisclosure';
 import { ReserveSplit } from '@/components/statistics/ReserveSplit';
 
+import { allocationsWalletEth } from './allocationsWallet';
 import { CycleRhythm } from './CycleRhythm';
 import { STATISTICS_SECTIONS, type StatisticsSectionDef } from './statistics-sections';
 
@@ -32,14 +35,17 @@ type SectionKey = StatisticsSectionDef['messageKey'];
  * One row of the section index: the page's name over what it covers, its
  * key figure on the right, and an arrow. The whole row is the link; rows are
  * divided by hairlines like a ledger, with the same inset as a table cell.
- * On a phone the figure moves under the description.
+ * On a phone the figure moves under the description. The row prefetches its
+ * page on hover or focus, not on sight (each page carries its own charts).
  */
 function SectionEntry({ section, figure }: { section: StatisticsSectionDef; figure: ReactNode }) {
   const t = useTranslations('statistics');
   return (
     <li className="border-b border-rule-faint">
-      <Link
+      <SiteLink
         href={section.href}
+        kind="internal"
+        prefetch="intent"
         className={cn(
           'group grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6 gap-y-1.5 px-4 py-4 no-underline sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:py-5',
           'focus-ring-inset transition-colors duration-fast hover:bg-surface',
@@ -60,8 +66,26 @@ function SectionEntry({ section, figure }: { section: StatisticsSectionDef; figu
           aria-hidden
           className="col-start-2 row-span-2 row-start-1 size-4 shrink-0 text-subtle transition-transform duration-fast group-hover:translate-x-0.5 group-hover:text-foreground motion-reduce:transition-none sm:col-start-3 sm:row-span-1"
         />
-      </Link>
+      </SiteLink>
     </li>
+  );
+}
+
+/**
+ * A moment in the reader's zone, as every other page prints it (the same
+ * opening reads the same here and on the current cycle), with the zone named
+ * inline so the figure never needs a caption: "Aug 11, 19:38 UTC-5".
+ */
+function LocalMoment({ timestamp }: { timestamp: number }) {
+  const zone = useTimeZoneLabel();
+  return (
+    <DateTime timestamp={timestamp}>
+      {(value) => (
+        <>
+          {value} <span className="text-subtle">{zone}</span>
+        </>
+      )}
+    </DateTime>
   );
 }
 
@@ -105,19 +129,32 @@ function sectionFigures(
   };
 }
 
+/** Pages a reader of the hub goes on to, listed once at its end. */
+const RELATED_LINKS = [
+  { href: '/how-it-works', key: 'howItWorks' },
+  { href: '/contracts', key: 'contracts' },
+  { href: '/faq', key: 'faq' },
+] as const;
+
 /**
  * Statistics hub body, under the header's figures (the active cycle and its
  * gestures, allocations distributed, NFTs imprinted, the contract balance):
  * this cycle's pulse and where its reserve goes, the section pages as an
- * index with a key figure each, and the protocol economy as three spec
- * sheets with one Definitions disclosure. No figure repeats the header.
+ * index with a key figure each, the protocol economy as three spec sheets
+ * with one Definitions disclosure, and the related pages last, so the
+ * section tabs sit right under the header's figures. No figure repeats the
+ * header. The dashboard is read after hydration only: the server renders the
+ * skeleton, and the first client render must match it.
  */
 const StatisticsHubPanel = () => {
   const t = useTranslations('statistics');
   const tCommon = useTranslations('common');
-  const tFormats = useTranslations('formats');
   const format = useFormat();
-  const { data, isLoading, isError, refetch } = useDashboardInfo();
+  const hydrated = useHydrated();
+  const dashboard = useDashboardInfo();
+  const { isError, refetch } = dashboard;
+  const data = hydrated ? dashboard.data : undefined;
+  const isLoading = !hydrated || dashboard.isLoading;
   const ctStatistics = useCTStatistics();
   const cstSupply = ctStatistics.isLoading
     ? undefined
@@ -167,6 +204,7 @@ const StatisticsHubPanel = () => {
     return numeric === null ? undefined : t(key, { count: numeric });
   };
   const opened = toFiniteNumber(data.TsRoundStart);
+  const wallet = allocationsWalletEth(main);
   const pendingRecipients = toFiniteNumber(main.NumWinnersWithPendingRaffleWithdrawal) ?? 0;
   const metric = (key: string) => t(`metrics.${key}.label`);
   const definition = (key: string) => ({
@@ -194,13 +232,9 @@ const StatisticsHubPanel = () => {
       >
         <div className="grid gap-x-12 gap-y-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
           <dl className="min-w-0 self-start border-t border-rule">
-            {/* UTC, the zone of the daily bars beside it: one zone on the hub, said once. */}
             <StatisticsItem
               title={t('hub.cycle.opened')}
-              value={
-                opened && opened > 0 ? <DateTime timestamp={opened} timeZone="utc" /> : count(null)
-              }
-              caption={tFormats('dateTime.timeZone', { zone: formatTimeZoneLabel('utc') })}
+              value={opened && opened > 0 ? <LocalMoment timestamp={opened} /> : count(null)}
             />
             <StatisticsItem
               title={metric('ethInGesturesCurrentCycle')}
@@ -243,13 +277,18 @@ const StatisticsHubPanel = () => {
               title={metric('totalSignatureAllocationsDistributed')}
               value={eth(data.TotalPrizesPaidAmountEth)}
             />
+            {/* The Allocations Wallet's two tracks, then what left it across both: same scope. */}
             <StatisticsItem
               title={metric('stellarSelectionEthDeposited')}
-              value={eth(main.TotalRaffleEthDeposits)}
+              value={eth(wallet.stellarDeposited)}
             />
             <StatisticsItem
-              title={metric('stellarSelectionEthRetrieved')}
-              value={eth(main.TotalRaffleEthWithdrawn)}
+              title={metric('chronoWarriorEthDeposited')}
+              value={eth(wallet.chronoDeposited)}
+            />
+            <StatisticsItem
+              title={metric('allocationsWalletEthRetrieved')}
+              value={eth(wallet.retrieved)}
               caption={
                 pendingRecipients > 0
                   ? t('hub.pendingRecipients', { count: pendingRecipients })
@@ -334,7 +373,8 @@ const StatisticsHubPanel = () => {
             ...[
               'totalSignatureAllocationsDistributed',
               'stellarSelectionEthDeposited',
-              'stellarSelectionEthRetrieved',
+              'chronoWarriorEthDeposited',
+              'allocationsWalletEthRetrieved',
             ].map(definition),
             {
               term: t('anchoringPage.stats.totalDistributions'),
@@ -357,6 +397,31 @@ const StatisticsHubPanel = () => {
           ]}
         />
       </SectionShell>
+
+      {/* A quiet list, not a section of its own: a small label, then the links. */}
+      <section aria-labelledby="statistics-related" className="border-t border-rule pt-8">
+        <h2 id="statistics-related" className="type-label text-subtle">
+          {t('hub.relatedTitle')}
+        </h2>
+        <nav aria-label={t('hub.seo.relatedPagesAria')} className="mt-3">
+          <ul className="flex flex-wrap gap-x-8 gap-y-1">
+            {RELATED_LINKS.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className="link-quiet group inline-flex min-h-11 items-center gap-1.5 type-body-sm text-foreground sm:min-h-8"
+                >
+                  {t(`hub.seo.links.${link.key}`)}
+                  <ArrowRight
+                    aria-hidden
+                    className="size-3.5 text-subtle transition-colors duration-fast group-hover:text-foreground"
+                  />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </section>
     </div>
   );
 };

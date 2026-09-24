@@ -125,6 +125,44 @@ describe('CstGestureCostView', () => {
     expect(screen.getByText('No CST gestures in this cycle.')).toBeInTheDocument();
   });
 
+  it('opens a cycle of fewer than three CST gestures on its table, not a near-empty plot', async () => {
+    // Regression: one CST gesture drew a 1,000–10,000 log plot with a single dot at its edge.
+    const user = userEvent.setup();
+    render(<CstGestureCostView gestures={gestures.slice(0, 2)} label="CST cost" />);
+    expect(screen.getByRole('table', { name: 'CST cost' })).toBeInTheDocument();
+    expect(screen.queryByTestId('composed-chart')).not.toBeInTheDocument();
+    const toggle = screen.getByRole('button', { name: 'View as table' });
+    expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await user.click(toggle);
+    expect(screen.getByTestId('composed-chart')).toBeInTheDocument();
+  });
+
+  it('draws small, light dots on a phone, where a joined run merges into a band', () => {
+    // jsdom has no matchMedia: the chart takes the narrow screen.
+    const { container } = render(<CstGestureCostView gestures={gestures} label="CST cost" />);
+    for (const dot of container.querySelectorAll('circle')) {
+      expect(dot).toHaveAttribute('r', '1.25');
+    }
+  });
+
+  it('keeps full dots on a wide screen with a short series', () => {
+    const matchMedia = jest.fn((query: string) => ({
+      matches: query === '(min-width: 640px)',
+      media: query,
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+    }));
+    Object.defineProperty(window, 'matchMedia', { configurable: true, value: matchMedia });
+    try {
+      const { container } = render(<CstGestureCostView gestures={gestures} label="CST cost" />);
+      for (const dot of container.querySelectorAll('circle')) {
+        expect(dot).toHaveAttribute('r', '2.25');
+      }
+    } finally {
+      delete (window as { matchMedia?: unknown }).matchMedia;
+    }
+  });
+
   it('has no axe violations', async () => {
     const { container } = render(<CstGestureCostView gestures={gestures} label="CST cost" />);
     await checkA11y(container);
