@@ -26,6 +26,8 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
 import { SkeletonTable } from '@/components/ui/skeleton';
 
+import { CountBreakdown, type CountPart } from './CountBreakdown';
+
 type AssetType = ClaimUnclaimedItem['AssetType'];
 
 /** What a claimable asset is, in words and figures: "0.25 ETH", "NFT 0x12…34 #5". */
@@ -252,7 +254,6 @@ const CycleDetailDialog = ({ round, onClose }: { round: number | null; onClose: 
  */
 export const ClaimsByRoundSection = () => {
   const t = useTranslations('statistics');
-  const format = useFormat();
   const [selected, setSelected] = useState<RoundClaimSummary | null>(null);
   const [exploreRound, setExploreRound] = useState<number | null>(null);
   const { data, isLoading, isError, refetch } = useClaimsByRound();
@@ -261,14 +262,11 @@ export const ClaimsByRoundSection = () => {
   const nowSec = Math.floor(useNow(30_000) / 1000);
 
   const columns = useMemo<DataTableColumn<RoundClaimSummary>[]>(() => {
-    const awarded = (row: RoundClaimSummary) =>
-      [
-        row.EthAwarded > 0 ? `${format.count(row.EthAwarded)} ETH` : null,
-        row.NftAwarded > 0 ? `${format.count(row.NftAwarded)} NFT` : null,
-        row.Erc20Awarded > 0 ? `${format.count(row.Erc20Awarded)} ERC-20` : null,
-      ]
-        .filter(Boolean)
-        .join(' · ');
+    const awarded = (row: RoundClaimSummary): CountPart[] => [
+      { key: 'eth', count: row.EthAwarded, unit: 'ETH' },
+      { key: 'nft', count: row.NftAwarded, unit: 'NFT' },
+      { key: 'erc20', count: row.Erc20Awarded, unit: 'ERC-20' },
+    ];
     return [
       {
         id: 'cycle',
@@ -280,8 +278,9 @@ export const ClaimsByRoundSection = () => {
       {
         id: 'awarded',
         header: t('performance.claims.columns.awarded'),
-        value: (row) => awarded(row) || null,
+        value: (row) => row.EthAwarded + row.NftAwarded + row.Erc20Awarded || null,
         whenBlank: 'empty',
+        cell: (row) => <CountBreakdown parts={awarded(row)} />,
       },
       {
         id: 'retrieved',
@@ -319,13 +318,19 @@ export const ClaimsByRoundSection = () => {
         header: t('performance.claims.columns.details'),
         align: 'right',
         cell: (row) => (
-          <Button variant="ghost" size="sm" onClick={() => setExploreRound(row.RoundNum)}>
+          <Button
+            variant="ghost"
+            size="sm"
+            // Every row's button reads "Explore"; its name says which cycle.
+            aria-label={t('performance.claims.exploreAria', { cycle: row.RoundNum })}
+            onClick={() => setExploreRound(row.RoundNum)}
+          >
             {t('performance.claims.explore')}
           </Button>
         ),
       },
     ];
-  }, [format, t]);
+  }, [t]);
 
   return (
     <div className="space-y-6">

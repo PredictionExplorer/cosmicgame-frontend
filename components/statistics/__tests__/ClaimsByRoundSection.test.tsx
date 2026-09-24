@@ -92,7 +92,8 @@ describe('ClaimsByRoundSection', () => {
   it('opens a cycle’s retrieval transactions, noting a retrieval by someone else', async () => {
     const user = userEvent.setup();
     render(<ClaimsByRoundSection />);
-    await user.click(screen.getAllByRole('button', { name: 'Explore' })[0]!);
+    // Each row's Explore button names its cycle.
+    await user.click(screen.getByRole('button', { name: 'Explore Cycle 12 retrievals' }));
     expect(mockUseClaimDetailByRound).toHaveBeenLastCalledWith(12);
     const dialog = screen.getByRole('dialog');
     expect(within(dialog).getByText(/Retrieved after the deadline by 0x2222/)).toBeInTheDocument();

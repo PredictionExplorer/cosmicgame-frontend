@@ -366,6 +366,7 @@
   },
   "attachedAssets": {
     "scopeAria": "Attached NFT scope",
+    "paginationLabel": "Attached NFT pages",
     "scopeAll": "All cycles",
     "scopeCurrent": "Current cycle",
     "nftTab": "NFTs (ERC-721)",
@@ -415,6 +416,7 @@
       "unclaimedCount": "{count} unretrieved",
       "viewUnclaimed": "View unretrieved assets",
       "explore": "Explore",
+      "exploreAria": "Explore Cycle {cycle} retrievals",
       "dialog": {
         "unclaimedTitle": "Unretrieved assets — Cycle {cycle}",
         "expired": "The retrieval window has closed. Anyone can now retrieve these assets for themselves.",

@@ -15,6 +15,8 @@ import { ErrorState } from '@/components/ui/error-state';
 import { SkeletonTable } from '@/components/ui/skeleton';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 
+import { CountBreakdown } from './CountBreakdown';
+
 /** The backend's order key for "most gestures first"; the table re-sorts client-side. */
 const GESTURE_ORDER = 'bids'; // lexicon-allow-backend-type
 
@@ -131,9 +133,14 @@ export const ParticipantOutcomesSection = () => {
         sortable: true,
         // Spent and received sit side by side above it on a phone; the difference stays on wider screens.
         priority: 'secondary',
-        // Signed, in the same ink as every other figure.
+        // Signed by the formatter, in the same ink as every other figure.
         cell: (row) =>
-          `${row.NetPlEth > 0 ? '+' : ''}${format.amount(row.NetPlEth, { unit: 'ETH', withUnit: false })}`,
+          format.amount(row.NetPlEth, {
+            unit: 'ETH',
+            context: 'table',
+            withUnit: false,
+            signDisplay: 'exceptZero',
+          }),
       },
       {
         id: 'rate',
@@ -145,10 +152,18 @@ export const ParticipantOutcomesSection = () => {
         sortable: true,
         cell: (row) => (
           <span className="inline-flex flex-col items-end">
-            <span>{format.percent(row.WinRate, { scale: 'ratio' })}</span>
+            {/* One decimal, as every percentage on the statistics pages. */}
+            <span>
+              {format.percent(row.WinRate, {
+                scale: 'ratio',
+                minimumFractionDigits: 1,
+                maximumFractionDigits: 1,
+              })}
+            </span>
             <span className="type-caption text-muted-foreground">
               {t('performance.outcomes.cycles', {
                 part: format.count(row.RoundsWon),
+                // A number, for the plural; the message formats it (#) in the locale's style.
                 whole: row.RoundsParticipated,
               })}
             </span>
@@ -166,16 +181,13 @@ export const ParticipantOutcomesSection = () => {
           row.PrizesCount > 0 ? (
             <span className="inline-flex flex-col items-end">
               <span>{format.count(row.PrizesCount)}</span>
-              {row.NftPrizesCount > 0 || row.CstPrizesCount > 0 ? (
-                <span className="type-caption text-muted-foreground">
-                  {[
-                    row.NftPrizesCount > 0 ? `${format.count(row.NftPrizesCount)} NFT` : null,
-                    row.CstPrizesCount > 0 ? `${format.count(row.CstPrizesCount)} CST` : null,
-                  ]
-                    .filter(Boolean)
-                    .join(' · ')}
-                </span>
-              ) : null}
+              <CountBreakdown
+                className="type-caption text-muted-foreground"
+                parts={[
+                  { key: 'nft', count: row.NftPrizesCount, unit: 'NFT' },
+                  { key: 'cst', count: row.CstPrizesCount, unit: 'CST' },
+                ]}
+              />
             </span>
           ) : (
             format.count(0)

@@ -68,6 +68,17 @@ describe('ParticipantOutcomesSection', () => {
     expect(screen.queryByText(/Biggest Spender|Net %/)).not.toBeInTheDocument();
   });
 
+  it('shows every allocation rate at one decimal and each count with its unit', () => {
+    render(<ParticipantOutcomesSection />);
+    const table = screen.getByRole('table');
+    // Regression: "50%" here beside "100.0%" in the retrievals table.
+    expect(within(table).getAllByText('50.0%')).toHaveLength(2);
+    expect(within(table).getAllByText('0.0%')).toHaveLength(1);
+    // The unit keeps its count on its line (a no-break space); the dot is visual only.
+    const nft = within(table).getAllByText((_, el) => el?.textContent === '1\u00a0NFT')[0]!;
+    expect(nft.parentElement!.textContent).toBe('1\u00a0NFT · 1\u00a0CST');
+  });
+
   it('refetches with the gesture floor a reader picks', async () => {
     const user = userEvent.setup();
     render(<ParticipantOutcomesSection />);

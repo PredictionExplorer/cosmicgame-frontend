@@ -366,6 +366,7 @@
   },
   "attachedAssets": {
     "scopeAria": "첨부된 NFT 범위",
+    "paginationLabel": "첨부된 NFT 페이지 이동",
     "scopeAll": "모든 사이클",
     "scopeCurrent": "현재 사이클",
     "nftTab": "NFT(ERC-721)",
@@ -415,6 +416,7 @@
       "unclaimedCount": "미회수 {count}건",
       "viewUnclaimed": "미회수 자산 보기",
       "explore": "탐색",
+      "exploreAria": "사이클 {cycle} 회수 내역 탐색",
       "dialog": {
         "unclaimedTitle": "미회수 자산: 사이클 {cycle}",
         "expired": "회수 기간이 종료되었습니다. 이제 누구나 이 자산을 회수할 수 있습니다.",

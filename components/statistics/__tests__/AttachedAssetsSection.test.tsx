@@ -74,7 +74,7 @@ function nftCards() {
  * no `link` role; reach them through the pagination landmark instead.
  */
 function pager() {
-  return screen.getByRole('navigation', { name: 'tables.pagination.label' });
+  return screen.getByRole('navigation', { name: 'Attached NFT pages' });
 }
 
 async function goToPage(user: ReturnType<typeof userEvent.setup>, page: string) {
@@ -172,7 +172,7 @@ describe('AttachedAssetsSection NFT paging', () => {
     await user.click(screen.getByRole('radio', { name: 'Current cycle' }));
 
     expect(
-      screen.queryByRole('navigation', { name: 'tables.pagination.label' }),
+      screen.queryByRole('navigation', { name: 'Attached NFT pages' }),
     ).not.toBeInTheDocument();
   });
 });

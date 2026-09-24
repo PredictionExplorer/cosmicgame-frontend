@@ -366,6 +366,7 @@
   },
   "attachedAssets": {
     "scopeAria": "Діапазон долучених NFT",
+    "paginationLabel": "Навігація сторінками: долучені NFT",
     "scopeAll": "Усі цикли",
     "scopeCurrent": "Поточний цикл",
     "nftTab": "NFT (ERC-721)",
@@ -415,6 +416,7 @@
       "unclaimedCount": "Не забрано: {count}",
       "viewUnclaimed": "Переглянути незабрані активи",
       "explore": "Переглянути",
+      "exploreAria": "Переглянути дані забирання за цикл {cycle}",
       "dialog": {
         "unclaimedTitle": "Незабрані активи — Цикл {cycle}",
         "expired": "Строк отримання минув. Тепер будь-хто може забрати решту активів собі.",

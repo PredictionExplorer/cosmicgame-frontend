@@ -366,6 +366,7 @@
   },
   "attachedAssets": {
     "scopeAria": "Phạm vi NFT đính kèm",
+    "paginationLabel": "Phân trang NFT đính kèm",
     "scopeAll": "Mọi chu kỳ",
     "scopeCurrent": "Chu kỳ hiện tại",
     "nftTab": "NFT (ERC-721)",
@@ -415,6 +416,7 @@
       "unclaimedCount": "{count} chưa nhận về",
       "viewUnclaimed": "Xem tài sản chưa nhận về",
       "explore": "Khám phá",
+      "exploreAria": "Khám phá dữ liệu nhận về của chu kỳ {cycle}",
       "dialog": {
         "unclaimedTitle": "Tài sản chưa nhận về — Chu kỳ {cycle}",
         "expired": "Thời hạn nhận về đã qua. Bất kỳ ai cũng có thể nhận về các tài sản còn lại cho mình.",

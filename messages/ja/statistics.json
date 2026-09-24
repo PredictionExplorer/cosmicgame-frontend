@@ -366,6 +366,7 @@
   },
   "attachedAssets": {
     "scopeAria": "添付NFTの範囲",
+    "paginationLabel": "添付NFTのページ送り",
     "scopeAll": "すべてのサイクル",
     "scopeCurrent": "現在のサイクル",
     "nftTab": "NFT（ERC-721）",
@@ -415,6 +416,7 @@
       "unclaimedCount": "未受け取り{count}件",
       "viewUnclaimed": "未受け取りのアセットを見る",
       "explore": "探索",
+      "exploreAria": "サイクル{cycle}の受け取りを探索",
       "dialog": {
         "unclaimedTitle": "未受け取りのアセット——サイクル{cycle}",
         "expired": "受け取り期間は終了しました。これらのアセットは誰でも取得できます。",

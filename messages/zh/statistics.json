@@ -366,6 +366,7 @@
   },
   "attachedAssets": {
     "scopeAria": "已附加 NFT 范围",
+    "paginationLabel": "已附加 NFT 的分页导航",
     "scopeAll": "所有周期",
     "scopeCurrent": "当前周期",
     "nftTab": "NFT（ERC-721）",
@@ -415,6 +416,7 @@
       "unclaimedCount": "{count} 项未取回",
       "viewUnclaimed": "查看未取回资产",
       "explore": "查看",
+      "exploreAria": "查看第 {cycle} 个周期的取回记录",
       "dialog": {
         "unclaimedTitle": "第 {cycle} 个周期的未取回资产",
         "expired": "取回窗口已结束，现在任何人都可执行超时取回。",

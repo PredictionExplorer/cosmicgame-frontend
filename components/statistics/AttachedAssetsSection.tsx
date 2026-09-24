@@ -127,6 +127,8 @@ export function AttachedAssetsSection({ currentRoundNum }: AttachedAssetsSection
                 pageSize={ITEMS_PER_PAGE}
                 total={visibleNfts.length}
                 onPageChange={setPage}
+                // Named for its grid, so it stands apart from the ledgers' pagination.
+                label={t('attachedAssets.paginationLabel')}
               />
             </>
           )}
