@@ -295,7 +295,10 @@ get the opaque page colour.
 `min(100% - 2 × gutter, 80rem)` on both hosts, and `PageShell` draws the same edge
 (a max-width plus gutter padding, so `max-w-none px-0` still opens a full-bleed page):
 a page's H1 starts on the header's edge at every width, which
-`e2e/content-edge.desktop.spec.ts` checks at 820, 1280, 1366 and 1600px. The other tokens are `--section-gap`
+`e2e/content-edge.desktop.spec.ts` checks at 820, 1280, 1366 and 1600px. The header is
+`--header-height` tall (56px below `sm`, where each of its controls is a 44px target, and 72px
+from `sm`), and everything pinned under it (`--sticky-offset`, sticky sub-navigation, the
+maintenance banner, page tops) derives from that one value. The other tokens are `--section-gap`
 (landing and long-form sections), `--block-gap` (data-page blocks), `--stack-gap`,
 `--row-h` (48px ledger rows), `--row-h-dense` (44px), `--measure-prose` (66ch) and
 `--measure-lede` (60ch).
