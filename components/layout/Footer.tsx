@@ -29,7 +29,7 @@ const Footer = () => {
         showBuild ? (
           <p
             data-testid="build-commit"
-            className="type-mono text-subtle [overflow-wrap:anywhere]"
+            className="type-mono whitespace-normal text-subtle [overflow-wrap:anywhere]"
             title={`${build.fullSha}${build.ref ? ` (${build.ref})` : ''}`}
           >
             {build.shortSha}
