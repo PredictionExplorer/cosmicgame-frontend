@@ -25,6 +25,7 @@
     "heading": "Lời nhắn nét bút",
     "description": "Mọi nét bút có kèm lời nhắn. Lọc theo trạng thái hiển thị, chu kỳ hoặc nội dung.",
     "readOnly": "Chỉ xem. Kết nối ví kiểm duyệt để ẩn hoặc khôi phục lời nhắn.",
+    "noRole": "Ví này không có vai trò vận hành trên chuỗi nên không thể ẩn hoặc khôi phục lời nhắn. Hãy kết nối ví vận hành để kiểm duyệt lời nhắn.",
     "loadError": "Không tải được lời nhắn nét bút.",
     "clearSearch": "Xóa tìm kiếm"
   },

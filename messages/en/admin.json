@@ -25,6 +25,7 @@
     "heading": "Gesture messages",
     "description": "Every gesture that carries a message. Filter by visibility, cycle or text.",
     "readOnly": "Read-only. Connect the moderator wallet to hide or restore messages.",
+    "noRole": "This wallet holds no on-chain operator role, so Hide and Restore are off. Connect an operator wallet to moderate messages.",
     "loadError": "The gesture messages could not be loaded.",
     "clearSearch": "Clear the search"
   },

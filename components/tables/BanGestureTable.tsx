@@ -40,6 +40,13 @@ interface BanGestureTableProps extends LedgerStateProps {
    * Hide and Restore column is not rendered at all.
    */
   moderatorAddress?: string | null;
+  /**
+   * Hide and Restore stand in each row but cannot be pressed: the wallet
+   * holds no operator role, or its roles are still being read.
+   */
+  actionsDisabled?: boolean;
+  /** The id of the line that says why the actions are off (their description). */
+  actionsDisabledReasonId?: string;
   /** A line under the title. */
   description?: ReactNode;
   /** Shown above the filters (the read-only notice). */
@@ -64,11 +71,15 @@ function ModerationAction({
   gesture,
   hidden,
   moderatorAddress,
+  disabled,
+  disabledReasonId,
   onChanged,
 }: {
   gesture: GestureHistory;
   hidden: boolean;
   moderatorAddress: string;
+  disabled: boolean;
+  disabledReasonId?: string;
   /** The request succeeded: the gesture is now hidden (`true`) or visible. */
   onChanged: (id: number, hidden: boolean) => void;
 }) {
@@ -102,6 +113,8 @@ function ModerationAction({
       size="sm"
       onClick={() => void run()}
       loading={busy}
+      disabled={disabled}
+      aria-describedby={disabled ? disabledReasonId : undefined}
       className="px-3"
     >
       {hidden ? t('banGesture.unban') : t('banGesture.ban')}
@@ -118,6 +131,8 @@ function ModerationAction({
 const BanGestureTable = ({
   gestureHistory,
   moderatorAddress = null,
+  actionsDisabled = false,
+  actionsDisabledReasonId,
   description,
   notice,
   ...state
@@ -265,12 +280,14 @@ const BanGestureTable = ({
             gesture={gesture}
             hidden={hiddenIds.has(gesture.EvtLogId)}
             moderatorAddress={moderatorAddress}
+            disabled={actionsDisabled}
+            disabledReasonId={actionsDisabledReasonId}
             onChanged={applyChange}
           />
         ),
       },
     ];
-  }, [t, hiddenIds, applyChange, moderatorAddress]);
+  }, [t, hiddenIds, applyChange, moderatorAddress, actionsDisabled, actionsDisabledReasonId]);
 
   const toolbar = (
     <div className="mb-4 space-y-4">

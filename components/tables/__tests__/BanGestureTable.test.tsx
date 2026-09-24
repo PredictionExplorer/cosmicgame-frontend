@@ -312,6 +312,29 @@ describe('BanGestureTable', () => {
     expect(screen.getAllByText('Hello world').length).toBeGreaterThanOrEqual(1);
   });
 
+  it('shows switched-off controls, described by their reason, when actions are disabled', async () => {
+    await act(async () => {
+      render(
+        <>
+          <p id="reason">No operator role.</p>
+          <BanGestureTable
+            gestureHistory={[createGestureHistory()]}
+            moderatorAddress={MODERATOR}
+            actionsDisabled
+            actionsDisabledReasonId="reason"
+          />
+        </>,
+      );
+    });
+    const buttons = screen.getAllByRole('button', { name: 'tables.banGesture.ban' });
+    for (const button of buttons) {
+      expect(button).toBeDisabled();
+      expect(button).toHaveAccessibleDescription('No operator role.');
+    }
+    await userEvent.click(buttons[0]!);
+    expect(mockBanGesture).not.toHaveBeenCalled();
+  });
+
   it('reviews 25 messages a page instead of all of them at once', async () => {
     const list = Array.from({ length: 60 }, (_, i) =>
       createGestureHistory({ EvtLogId: i + 1, Message: `Message ${i + 1}` }),
