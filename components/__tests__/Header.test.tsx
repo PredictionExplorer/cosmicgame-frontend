@@ -116,7 +116,6 @@ describe('Header', () => {
 
   it.each([
     ['/', 'nav.routes.observatory.label', 'page'],
-    ['/current-cycle', 'nav.routes.observatory.label', 'true'],
     ['/gallery', 'nav.routes.gallery.label', 'page'],
     ['/detail/25', 'nav.routes.gallery.label', 'true'],
   ])('marks the current section on %s', (path, name, current) => {
@@ -128,7 +127,50 @@ describe('Header', () => {
     );
   });
 
+  it('gives /current-cycle to Explore alone, where its panel row is', async () => {
+    mockPathname.mockReturnValue('/current-cycle');
+    const user = userEvent.setup();
+    render(<Header />);
+    const explore = within(primaryNav()).getByRole('button', { name: 'nav.menus.explore' });
+    expect(explore).toHaveAttribute('aria-current', 'true');
+    expect(
+      within(primaryNav()).getByRole('link', { name: 'nav.routes.observatory.label' }),
+    ).not.toHaveAttribute('aria-current');
+
+    await user.click(explore);
+    const menu = await screen.findByRole('menu');
+    expect(
+      within(menu).getByRole('menuitem', { name: /nav\.routes\.currentCycle\.label/ }),
+    ).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('centres the experimental glass pill behind full-height items', () => {
+    mockPathname.mockReturnValue('/experimental-ui');
+    render(<Header />);
+    const nav = primaryNav();
+    const pill = within(nav).getByTestId('header-nav-pill');
+    expect(pill).toHaveClass('liquid-glass-control', 'top-1/2', '-translate-y-1/2');
+    // The items keep the header's height, so the current mark sits on its rule.
+    const list = within(nav).getByRole('list');
+    expect(list).toHaveClass('h-full');
+    expect(list).not.toHaveClass('liquid-glass-control');
+  });
+
+  it('draws no glass pill on the ordinary routes', () => {
+    render(<Header />);
+    expect(within(primaryNav()).queryByTestId('header-nav-pill')).toBeNull();
+  });
+
+  it('reserves the shortcut key cap before the client knows the platform', () => {
+    render(<Header />);
+    const kbd = screen.getByTestId('search-shortcut');
+    // Always rendered at a width that fits "⌘K" and "Ctrl K".
+    expect(kbd).toHaveClass('min-w-12');
+    expect(kbd).toHaveAttribute('aria-hidden', 'true');
+  });
+
   it.each([
+    ['/current-cycle', 'nav.menus.explore'],
     ['/allocation-finalized', 'nav.menus.explore'],
     ['/user/0x1', 'nav.menus.explore'],
     ['/security', 'nav.menus.learn'],

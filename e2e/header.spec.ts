@@ -76,6 +76,16 @@ test.describe('Header', () => {
       'aria-current',
       'true',
     );
+
+    // The Current Cycle leads the Explore panel, so Explore alone claims it.
+    await page.goto('/current-cycle', { waitUntil: 'domcontentloaded' });
+    await expect(nav.getByRole('button', { name: /^Explore$/ })).toHaveAttribute(
+      'aria-current',
+      'true',
+    );
+    await expect(nav.getByRole('link', { name: 'Observatory' })).not.toHaveAttribute(
+      'aria-current',
+    );
   });
 
   test('Explore panel describes destinations and lists Public Goods', async ({ page }) => {

@@ -46,7 +46,7 @@ interface SiteRouteDefinition {
    * the Gallery). A route's own path always matches its sub-paths too.
    */
   readonly owns?: readonly string[];
-  /** Listed nested under another destination (Current Cycle under the Observatory). */
+  /** Listed nested under another destination in its section (a Statistics section under Statistics). */
   readonly parent?: string;
   /** Listed in the footer directories. The site map lists every route. */
   readonly footer?: boolean;
@@ -61,13 +61,6 @@ interface SiteRouteDefinition {
 const ROUTE_DEFINITIONS = {
   // Participate: where a visitor acts.
   observatory: { host: 'app', path: '/', section: 'participate', footer: true },
-  currentCycle: {
-    host: 'app',
-    path: '/current-cycle',
-    section: 'participate',
-    parent: 'observatory',
-    footer: true,
-  },
   imprint: { host: 'app', path: '/imprint', section: 'participate', footer: true },
 
   // Collection: the art.
@@ -82,7 +75,10 @@ const ROUTE_DEFINITIONS = {
   attachedNfts: { host: 'app', path: '/attached-nfts', section: 'collection', footer: true },
   usedRwlkNfts: { host: 'app', path: '/used-rwlk-nfts', section: 'collection', footer: true },
 
-  // Explore: protocol-wide figures, plus the participant and gesture views.
+  // Explore: the live cycle in full, protocol-wide figures, and the
+  // participant and gesture views. The header's Explore panel leads with
+  // the Current Cycle, so every surface files it here.
+  currentCycle: { host: 'app', path: '/current-cycle', section: 'explore', footer: true },
   statistics: { host: 'app', path: '/statistics', section: 'explore', footer: true },
   statisticsParticipation: {
     host: 'app',
@@ -494,12 +490,6 @@ export const STATISTICS_SECTION_ROUTE_IDS: readonly SiteRouteId[] = SITE_ROUTES.
   (candidate) => candidate.parent === 'statistics',
 ).map((candidate) => candidate.id);
 
-/** The header item that stands for a section, if any. */
-export function headerItemForSection(section: SiteSectionId | null): HeaderNavItem | null {
-  if (!section) return null;
-  return APP_HEADER_NAV.find((item) => item.sections.includes(section)) ?? null;
-}
-
 /** Every route the app header links to, for the crawl-path guard. */
 export function appHeaderRouteIds(): readonly SiteRouteId[] {
   const ids = new Set<SiteRouteId>();
@@ -523,8 +513,21 @@ export const ACCOUNT_ROUTE_IDS: readonly SiteRouteId[] = routesInSection('accoun
   (candidate) => candidate.id,
 );
 
+export interface LandingHeaderLink {
+  readonly id: SiteRouteId;
+  /**
+   * Use the compact name (`nav.routes.<id>.short`): next to the wordmark,
+   * "About" says what "About Cosmic Signature" says, in a third of the room.
+   */
+  readonly short?: true;
+}
+
 /** The landing header's page links, after the home page's section anchors. */
-export const LANDING_HEADER_ROUTE_IDS: readonly SiteRouteId[] = ['learnHub', 'whitePaper', 'about'];
+export const LANDING_HEADER_LINKS: readonly LandingHeaderLink[] = [
+  { id: 'learnHub' },
+  { id: 'whitePaper' },
+  { id: 'about', short: true },
+];
 
 /** The landing home's in-page sections, linked from the landing header. */
 export const LANDING_SECTION_ANCHORS = ['cycle', 'art', 'tracks'] as const;

@@ -9,6 +9,7 @@ import {
   ACCOUNT_ROUTE_IDS,
   APP_HEADER_NAV,
   FOOTER_SECTIONS,
+  LANDING_HEADER_LINKS,
   LEGAL_ROUTE_IDS,
   NOT_FOUND_ROUTE_IDS,
   OUTBOUND_LINKS,
@@ -20,7 +21,6 @@ import {
   classifyHref,
   footerRoutes,
   getSiteRoute,
-  headerItemForSection,
   locateSitePath,
   resolveRouteHref,
   routesInSection,
@@ -90,10 +90,12 @@ describe('site navigation taxonomy', () => {
         expect(lookup(catalog, `routes.${route.id}.label`)).toEqual(expect.any(String));
         expect(lookup(catalog, `routes.${route.id}.description`)).toEqual(expect.any(String));
       }
-      // Compact names: the statistics tabs and the route-group switchers.
+      // Compact names: the statistics tabs, the route-group switchers and
+      // the landing header's short links.
       for (const id of [
         ...STATISTICS_SECTION_ROUTE_IDS,
         ...Object.values(SITE_ROUTE_GROUPS).flat(),
+        ...LANDING_HEADER_LINKS.filter((link) => link.short).map((link) => link.id),
       ]) {
         expect(lookup(catalog, `routes.${id}.short`)).toEqual(expect.any(String));
       }
@@ -118,11 +120,20 @@ describe('site navigation taxonomy', () => {
     for (const link of OUTBOUND_LINKS) expect(OUTBOUND_ICONS[link.id]).toBeDefined();
   });
 
+  it('never draws two destinations with one glyph, nor a trophy or a gift', () => {
+    const icons = SITE_ROUTES.map((route) => SITE_ROUTE_ICONS[route.id]);
+    expect(new Set(icons).size).toBe(icons.length);
+    const names = icons.map((icon) => icon.displayName ?? '');
+    for (const retired of ['Trophy', 'Award', 'Medal', 'Gift', 'Crown', 'PenLine']) {
+      expect(names).not.toContain(retired);
+    }
+  });
+
   it('keeps parents inside their own section', () => {
     for (const route of SITE_ROUTES) {
       if (route.parent) expect(getSiteRoute(route.parent).section).toBe(route.section);
     }
-    expect(getSiteRoute('currentCycle').parent).toBe('observatory');
+    expect(getSiteRoute('statisticsTokens').parent).toBe('statistics');
   });
 
   it('only sends outbound links to third-party https hosts', () => {
@@ -136,7 +147,7 @@ describe('site navigation taxonomy', () => {
 describe('locateSitePath', () => {
   it.each([
     ['/', 'observatory', true, 'participate'],
-    ['/current-cycle', 'currentCycle', true, 'participate'],
+    ['/current-cycle', 'currentCycle', true, 'explore'],
     ['/gallery', 'gallery', true, 'collection'],
     ['/detail/25', 'gallery', false, 'collection'],
     ['/statistics/tokens', 'statisticsTokens', true, 'explore'],
@@ -207,8 +218,24 @@ describe('surfaces', () => {
       const items = APP_HEADER_NAV.filter((item) => item.sections.includes(section));
       expect(items).toHaveLength(section === 'account' ? 0 : 1);
     }
-    expect(headerItemForSection('records')).toMatchObject({ kind: 'panel', id: 'explore' });
-    expect(headerItemForSection(null)).toBeNull();
+    expect(APP_HEADER_NAV.find((item) => item.sections.includes('records'))).toMatchObject({
+      kind: 'panel',
+      id: 'explore',
+    });
+  });
+
+  it('files every panel row under a section its panel stands for', () => {
+    // Otherwise two header items claim one page: the panel highlights the row
+    // while another item carries aria-current for the row's section.
+    for (const item of APP_HEADER_NAV) {
+      if (item.kind !== 'panel') continue;
+      for (const panelEntry of [...item.primary, ...item.secondary.entries]) {
+        const routeIds =
+          panelEntry.kind === 'route' ? [panelEntry.id] : SITE_ROUTE_GROUPS[panelEntry.id];
+        for (const id of routeIds) expect(item.sections).toContain(getSiteRoute(id).section);
+      }
+      expect(item.sections).toContain(item.secondary.section);
+    }
   });
 
   it('opens the header with the Observatory', () => {
