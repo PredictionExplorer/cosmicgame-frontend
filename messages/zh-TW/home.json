@@ -527,13 +527,6 @@
     "monument": {
       "reserveLabel": "簽名分配",
       "reserveExtras": "+ 1,000 CST · 1 枚 Cosmic Signature NFT · 附加資產",
-      "youChip": "你",
-      "fullConsole": "開啟完整落筆控制台",
-      "chooseRwlkToken": "請在下方完整控制台中選擇你的 Random Walk 代幣",
-      "microcopy": "每次落筆都會延長收官倒數、增加一次星選資格，並可能銘刻參與 CST。",
-      "notifyAria": "在週期可收官前提醒我",
-      "notifyLabel": "收官前提醒：",
-      "notifyMinutes": "{minutes} 分鐘",
       "calendarTitle": "Cosmic Signature 第 {number} 個週期開啟",
       "calendarBody": "下一演繹週期即將開放落筆。第一筆會啟動收官倒數。",
       "calendarCta": "把開啟時間加入日曆"
@@ -541,12 +534,10 @@
     "board": {
       "title": "分配軌道",
       "subtitle": "本週期收官時發放的全部內容",
-      "tooltip": "目前演繹週期各條分配軌道的即時一覽：金額、目前持有者與現存紀錄。",
       "cstPlusNft": "1,000 CST + NFT",
-      "awaitingGesture": "等待第一筆",
-      "awaitingRecord": "暫無紀錄",
       "stellarStatus": "每一次落筆都是一份星選資格",
-      "fullBreakdown": "檢視完整分配明細"
+      "ethGroup": "來自週期儲備的 ETH",
+      "fixedGroup": "CST 與 NFT 分配"
     },
     "art": {
       "sectionAria": "精選鏈上藝術作品",
@@ -554,17 +545,9 @@
       "galleryCta": "畫廊",
       "viewAria": "檢視 Cosmic Signature {id}",
       "alt": "Cosmic Signature 藝術作品 {id} —— 確定性三體生成藝術",
-      "pairingNote": "確定性三體藝術，銘刻於鏈上。每枚簽名作品都配有 1,000 CST。"
-    },
-    "composer": {
-      "title": "以落筆發聲",
-      "subtitle": "留言與你的落筆一同上鏈",
-      "placeholder": "寫一條可選的鏈上留言……",
-      "note": "傳送即在 Arbitrum 上真實落筆——留言隨之上鏈，並顯示在落筆留言板中。",
-      "connectBody": "連接錢包即可落筆，並在落筆留言板中留言。",
-      "rwlkChip": "RWLK #{id}",
-      "rwlkChoose": "RWLK：選擇代幣",
-      "cstFree": "目前 CST 落筆免費"
+      "pairingNote": "確定性三體藝術，銘刻於鏈上。每枚簽名作品都配有 1,000 CST。",
+      "title": "Cosmic Signature {id}",
+      "titleNamed": "《{name}》"
     },
     "personal": {
       "title": "你的位置",
@@ -576,22 +559,23 @@
       "gestures": "{count, plural, =0 {本週期尚未落筆} other {本週期已落筆 # 次}}",
       "retrieve": "取回等待中的分配",
       "nothingWaiting": "暫無等待取回的分配",
-      "cstPreview": "此刻落筆約可銘刻 {amount} CST"
+      "cstPreview": "此刻落筆約可銘刻 {amount} CST",
+      "entryShare": "佔本週期星選資格的 {share}"
     },
-    "miniBar": {
-      "aria": "週期快捷台",
-      "reserve": "簽名分配",
-      "jump": "返回觀測台"
+    "console": {
+      "title": "落筆",
+      "methodLabel": "落筆方式",
+      "free": "免費",
+      "reward": "CST 銘刻預覽",
+      "minAccepted": "最低接受",
+      "messageHint": "留言與你的落筆一同上鏈"
     },
-    "story": {
-      "collapsedTitle": "關於 Cosmic Signature",
-      "collapsedSubtitle": "故事、作品，以及每個演繹週期如何凝成簽名",
-      "expand": "展開"
+    "standings": {
+      "title": "即時席位"
+    },
+    "links": {
+      "previousCycleDescription": "上一個收官週期的獲配者與分配"
     }
-  },
-  "mobileCta": {
-    "makeGesture": "落筆",
-    "preview": "預覽落筆選項"
   },
   "observatory": {
     "pulse": {

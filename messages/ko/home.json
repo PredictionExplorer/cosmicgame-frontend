@@ -527,13 +527,6 @@
     "monument": {
       "reserveLabel": "시그니처 배분",
       "reserveExtras": "+ 1,000 CST · Cosmic Signature NFT 1개 · 첨부 자산",
-      "youChip": "나",
-      "fullConsole": "전체 제스처 콘솔 열기",
-      "chooseRwlkToken": "아래 전체 콘솔에서 RandomWalk 토큰을 선택해 주세요",
-      "microcopy": "제스처마다 마감 시각이 연장되고 별빛 선정 자격이 기록됩니다. 경과 시간에 따라 참여 CST가 각인될 수도 있습니다.",
-      "notifyAria": "사이클 마감 전에 알림 받기",
-      "notifyLabel": "마감 전 알림:",
-      "notifyMinutes": "{minutes}분",
       "calendarTitle": "Cosmic Signature 사이클 {number} 시작",
       "calendarBody": "다음 퍼포먼스 사이클이 제스처를 받기 시작합니다. 첫 제스처가 마감 카운트다운을 시작합니다.",
       "calendarCta": "시작 시각을 캘린더에 추가"
@@ -541,12 +534,10 @@
     "board": {
       "title": "배분 경로",
       "subtitle": "이 사이클의 마감 시 배분 내역",
-      "tooltip": "현재 퍼포먼스 사이클의 모든 배분 경로와 그 금액, 현재 보유자, 현재 기록을 실시간으로 보여 줍니다.",
       "cstPlusNft": "1,000 CST + NFT",
-      "awaitingGesture": "첫 제스처 대기 중",
-      "awaitingRecord": "아직 기록 없음",
       "stellarStatus": "제스처 하나가 자격 하나",
-      "fullBreakdown": "전체 내역 보기"
+      "ethGroup": "사이클 준비금의 ETH",
+      "fixedGroup": "CST 및 NFT 배분"
     },
     "art": {
       "sectionAria": "주요 온체인 작품",
@@ -554,17 +545,9 @@
       "galleryCta": "갤러리",
       "viewAria": "Cosmic Signature {id} 보기",
       "alt": "Cosmic Signature 작품 {id}: 결정론적 삼체 제너러티브 아트",
-      "pairingNote": "온체인에 각인된 결정론적 삼체 아트. 모든 시그니처에는 1,000 CST가 함께합니다."
-    },
-    "composer": {
-      "title": "제스처로 전하는 한마디",
-      "subtitle": "메시지는 제스처와 함께 온체인에 기록됩니다",
-      "placeholder": "온체인에 남길 메시지 (선택)…",
-      "note": "전송하면 Arbitrum에 제스처가 기록되고, 함께 남긴 메시지가 제스처 채팅에 표시됩니다.",
-      "connectBody": "지갑을 연결하면 제스처를 남기고 제스처 채팅에 메시지를 올릴 수 있습니다.",
-      "rwlkChip": "RWLK #{id}",
-      "rwlkChoose": "RWLK: 토큰 선택",
-      "cstFree": "지금은 CST 제스처에 비용이 들지 않습니다"
+      "pairingNote": "온체인에 각인된 결정론적 삼체 아트. 모든 시그니처에는 1,000 CST가 함께합니다.",
+      "title": "Cosmic Signature {id}",
+      "titleNamed": "“{name}”"
     },
     "personal": {
       "title": "내 위치",
@@ -576,22 +559,23 @@
       "gestures": "{count, plural, =0 {이번 사이클에 아직 제스처 없음} other {이번 사이클 제스처 #개}}",
       "retrieve": "대기 중인 배분 회수",
       "nothingWaiting": "회수할 배분 없음",
-      "cstPreview": "지금 제스처를 남기면 약 {amount} CST 각인"
+      "cstPreview": "지금 제스처를 남기면 약 {amount} CST 각인",
+      "entryShare": "이번 사이클 별빛 선정 자격의 {share}"
     },
-    "miniBar": {
-      "aria": "사이클 간편 콘솔",
-      "reserve": "시그니처 배분",
-      "jump": "관측소로 돌아가기"
+    "console": {
+      "title": "제스처 남기기",
+      "methodLabel": "제스처 방식",
+      "free": "비용 없음",
+      "reward": "참여 CST 미리 보기",
+      "minAccepted": "최소 허용 수량",
+      "messageHint": "메시지는 제스처와 함께 온체인에 기록됩니다"
     },
-    "story": {
-      "collapsedTitle": "Cosmic Signature 소개",
-      "collapsedSubtitle": "이야기와 작품, 그리고 퍼포먼스 사이클이 시그니처가 되는 과정",
-      "expand": "펼치기"
+    "standings": {
+      "title": "실시간 현황"
+    },
+    "links": {
+      "previousCycleDescription": "지난 마감 사이클의 수령자와 배분"
     }
-  },
-  "mobileCta": {
-    "makeGesture": "제스처 남기기",
-    "preview": "제스처 옵션 미리 보기"
   },
   "observatory": {
     "pulse": {

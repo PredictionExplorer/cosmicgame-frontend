@@ -527,13 +527,6 @@
     "monument": {
       "reserveLabel": "Phân bổ Signature",
       "reserveExtras": "+ 1.000 CST · 1 Cosmic Signature NFT · tài sản đính kèm",
-      "youChip": "Bạn",
-      "fullConsole": "Mở bảng điều khiển nét bút đầy đủ",
-      "chooseRwlkToken": "Chọn token RandomWalk của bạn trong bảng điều khiển đầy đủ bên dưới",
-      "microcopy": "Mỗi nét bút kéo dài đếm ngược hoàn tất, được tính vào Tinh tuyển và có thể khắc CST tham gia.",
-      "notifyAria": "Thông báo cho tôi trước khi chu kỳ có thể hoàn tất",
-      "notifyLabel": "Nhắc tôi trước khi hoàn tất:",
-      "notifyMinutes": "{minutes} phút",
       "calendarTitle": "Chu kỳ Cosmic Signature #{number} mở",
       "calendarBody": "Chu kỳ trình diễn tiếp theo mở cho nét bút. Nét bút đầu tiên khởi động đếm ngược hoàn tất.",
       "calendarCta": "Thêm thời điểm mở vào lịch của bạn"
@@ -541,12 +534,10 @@
     "board": {
       "title": "Các luồng phân bổ",
       "subtitle": "Mọi thứ chu kỳ này phân phối khi hoàn tất",
-      "tooltip": "Góc nhìn trực tiếp về mọi luồng phân bổ trong chu kỳ trình diễn hiện tại: số lượng, người đang giữ và các kỷ lục đang đứng.",
       "cstPlusNft": "1.000 CST + NFT",
-      "awaitingGesture": "Đang chờ nét bút đầu tiên",
-      "awaitingRecord": "Chưa có kỷ lục",
       "stellarStatus": "mỗi nét bút là một lượt",
-      "fullBreakdown": "Xem chi tiết đầy đủ"
+      "ethGroup": "ETH từ Dự trữ chu kỳ",
+      "fixedGroup": "Phân bổ CST và NFT"
     },
     "art": {
       "sectionAria": "Tác phẩm trên chuỗi nổi bật",
@@ -554,17 +545,9 @@
       "galleryCta": "Phòng trưng bày",
       "viewAria": "Xem Cosmic Signature {id}",
       "alt": "Tác phẩm Cosmic Signature {id} — nghệ thuật tạo sinh ba vật thể tất định",
-      "pairingNote": "Nghệ thuật ba vật thể tất định, khắc trên chuỗi. Mỗi Signature đi cùng 1.000 CST."
-    },
-    "composer": {
-      "title": "Gửi lời nhắn qua nét bút",
-      "subtitle": "Lời nhắn được ghi trên chuỗi cùng nét bút",
-      "placeholder": "Viết một lời nhắn tùy chọn trên chuỗi…",
-      "note": "Gửi sẽ tạo một nét bút thật trên Arbitrum — lời nhắn đi kèm và xuất hiện trong Trò chuyện nét bút.",
-      "connectBody": "Kết nối ví để đặt nét bút và đăng lời nhắn lên Trò chuyện nét bút.",
-      "rwlkChip": "RWLK #{id}",
-      "rwlkChoose": "RWLK: chọn token",
-      "cstFree": "Nét bút CST hiện không tốn chi phí"
+      "pairingNote": "Nghệ thuật ba vật thể tất định, khắc trên chuỗi. Mỗi Signature đi cùng 1.000 CST.",
+      "title": "Cosmic Signature {id}",
+      "titleNamed": "“{name}”"
     },
     "personal": {
       "title": "Vị thế của bạn",
@@ -576,22 +559,23 @@
       "gestures": "{count, plural, =0 {Chưa có nét bút trong chu kỳ này} other {# nét bút trong chu kỳ này}}",
       "retrieve": "Nhận về các phân bổ đang chờ",
       "nothingWaiting": "Không có gì đang chờ nhận về",
-      "cstPreview": "CST ước tính khi đặt nét bút lúc này: ~{amount}"
+      "cstPreview": "CST ước tính khi đặt nét bút lúc này: ~{amount}",
+      "entryShare": "{share} số lượt Tinh tuyển của chu kỳ này"
     },
-    "miniBar": {
-      "aria": "Bảng điều khiển nhanh của chu kỳ",
-      "reserve": "Phân bổ Signature",
-      "jump": "Quay về Đài quan sát"
+    "console": {
+      "title": "Đặt nét bút",
+      "methodLabel": "Cách thanh toán",
+      "free": "Không tốn chi phí",
+      "reward": "Xem trước CST tham gia",
+      "minAccepted": "Mức chấp nhận tối thiểu",
+      "messageHint": "Lời nhắn được ghi trên chuỗi cùng nét bút"
     },
-    "story": {
-      "collapsedTitle": "Về Cosmic Signature",
-      "collapsedSubtitle": "Câu chuyện, tác phẩm và cách mỗi chu kỳ trình diễn trở thành một Signature",
-      "expand": "Mở rộng"
+    "standings": {
+      "title": "Thứ hạng trực tiếp"
+    },
+    "links": {
+      "previousCycleDescription": "Người nhận và phân bổ của chu kỳ vừa hoàn tất"
     }
-  },
-  "mobileCta": {
-    "makeGesture": "Đặt nét bút",
-    "preview": "Xem trước tùy chọn nét bút"
   },
   "observatory": {
     "pulse": {

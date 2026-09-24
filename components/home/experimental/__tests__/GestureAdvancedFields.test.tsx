@@ -1,78 +1,102 @@
-import '@testing-library/jest-dom';
+import userEvent from '@testing-library/user-event';
 
-import { render, screen, fireEvent } from '@/test-utils';
+import { checkA11y, fireEvent, render, screen } from '@/test-utils';
 
-import { GestureAdvancedFields, GestureAdvancedPanel } from '../GestureAdvancedFields';
+import { GestureAdvancedFields, type GestureAdvancedFieldsProps } from '../GestureAdvancedFields';
 
-const baseProps = {
-  gestureType: 'ETH',
-  contributionType: 'NFT',
-  setContributionType: jest.fn(),
-  message: '',
-  setMessage: jest.fn(),
-  nftDonateAddress: '',
-  setNftDonateAddress: jest.fn(),
-  nftId: '',
-  setNftId: jest.fn(),
-  tokenDonateAddress: '',
-  setTokenDonateAddress: jest.fn(),
-  tokenAmount: '',
-  setTokenAmount: jest.fn(),
-  setRwlkId: jest.fn(),
-  gestureCostPlus: 2,
-  setBidPricePlus: jest.fn(),
-  ethGestureInfo: { ETHPrice: 0.01, AuctionDuration: 0, SecondsElapsed: 0 },
-  gestureCstRewardAmountMin: 99,
-  setCstRewardTolerancePercent: jest.fn(),
-  setAcceptAnyCstReward: jest.fn(),
-  showAll: true,
-};
+function makeProps(
+  overrides: Partial<GestureAdvancedFieldsProps> = {},
+): GestureAdvancedFieldsProps {
+  return {
+    gestureType: 'ETH',
+    contributionType: 'NFT',
+    setContributionType: jest.fn(),
+    nftDonateAddress: '',
+    setNftDonateAddress: jest.fn(),
+    nftId: '',
+    setNftId: jest.fn(),
+    tokenDonateAddress: '',
+    setTokenDonateAddress: jest.fn(),
+    tokenAmount: '',
+    setTokenAmount: jest.fn(),
+    setRwlkId: jest.fn(),
+    gestureCostPlus: 2,
+    setBidPricePlus: jest.fn(),
+    ethGestureInfo: { AuctionDuration: 3600, SecondsElapsed: 900, ETHPrice: 0.1 },
+    gestureCstRewardAmountMin: 184.31,
+    cstRewardTolerancePercent: 1,
+    setCstRewardTolerancePercent: jest.fn(),
+    acceptAnyCstReward: false,
+    setAcceptAnyCstReward: jest.fn(),
+    showAll: true,
+    ...overrides,
+  };
+}
 
 describe('GestureAdvancedFields', () => {
-  beforeEach(() => jest.clearAllMocks());
+  it('labels the attachment fields for the chosen kind of asset', async () => {
+    const props = makeProps();
+    const { rerender } = render(<GestureAdvancedFields {...props} />);
 
-  it('stack layout renders every group once, in the accordion order', () => {
-    render(<GestureAdvancedFields {...baseProps} layout="stack" />);
-    const root = screen.getByTestId('gesture-advanced-fields');
-    expect(root).toHaveClass('space-y-4');
-    expect(screen.getAllByText('home.form.advanced.messageLabel')).toHaveLength(1);
-    expect(screen.getByText('home.form.advanced.attachIntro')).toBeInTheDocument();
-    expect(screen.getByText('home.form.advanced.minCstProtection.title')).toBeInTheDocument();
-    expect(screen.getByText('home.form.advanced.attachNft')).toBeInTheDocument();
-    expect(screen.getByText('home.form.advanced.collision.title')).toBeInTheDocument();
+    expect(screen.getByLabelText('home.form.advanced.nftContractLabel')).toBeInTheDocument();
+    expect(screen.getByLabelText('home.form.advanced.nftIdLabel')).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('radio', { name: 'home.form.advanced.attachToken' }));
+    expect(props.setContributionType).toHaveBeenCalledWith('Token');
+    expect(props.setRwlkId).toHaveBeenCalledWith(-1);
+
+    rerender(<GestureAdvancedFields {...props} contributionType="Token" />);
+    expect(screen.getByLabelText('home.form.advanced.tokenContractLabel')).toBeInTheDocument();
+    expect(screen.getByLabelText('home.form.advanced.tokenAmountLabel')).toBeInTheDocument();
   });
 
-  it('panel layout is a single uncapped column with the same groups', () => {
-    render(<GestureAdvancedFields {...baseProps} layout="panel" />);
-    const root = screen.getByTestId('gesture-advanced-fields');
-    expect(root).toHaveAttribute('data-layout', 'panel');
-    expect(root).not.toHaveClass('max-w-xl');
-    expect(screen.getAllByText('home.form.advanced.messageLabel')).toHaveLength(1);
-    expect(screen.getByText('home.form.advanced.minCstProtection.title')).toBeInTheDocument();
-    expect(screen.getByText('home.form.advanced.collision.title')).toBeInTheDocument();
-  });
+  it('clamps the collision buffer and quotes what the wallet sends', () => {
+    const props = makeProps();
+    render(<GestureAdvancedFields {...props} />);
 
-  it('hides the protection box before the first gesture and the collision box for CST', () => {
-    render(
-      <GestureAdvancedFields {...baseProps} layout="panel" showAll={false} gestureType="CST" />,
+    expect(screen.getByTestId('collision-buffer')).toHaveTextContent(
+      'home.form.advanced.collision.approxCost(amount=0.102)',
     );
-    expect(screen.queryByText('home.form.advanced.minCstProtection.title')).not.toBeInTheDocument();
-    expect(screen.queryByText('home.form.advanced.collision.title')).not.toBeInTheDocument();
+    const input = screen.getByLabelText('home.form.advanced.collision.raiseBy');
+    fireEvent.change(input, { target: { value: '99' } });
+    expect(props.setBidPricePlus).toHaveBeenLastCalledWith(50);
+    fireEvent.change(input, { target: { value: '-3' } });
+    expect(props.setBidPricePlus).toHaveBeenLastCalledWith(0);
   });
 
-  it('forwards edits to the shared form state', () => {
-    render(<GestureAdvancedFields {...baseProps} layout="panel" />);
-    fireEvent.change(screen.getByRole('textbox', { name: /home\.form\.advanced\.messageLabel/ }), {
-      target: { value: 'hello' },
-    });
-    expect(baseProps.setMessage).toHaveBeenCalledWith('hello');
+  it('offers the minimum CST protection only once CST gestures exist', () => {
+    const { rerender } = render(<GestureAdvancedFields {...makeProps()} />);
+    expect(screen.getByTestId('min-cst-protection')).toHaveTextContent(
+      'home.form.advanced.minCstProtection.minAmount(amount=184.31)',
+    );
+
+    rerender(<GestureAdvancedFields {...makeProps({ showAll: false })} />);
+    expect(screen.queryByTestId('min-cst-protection')).not.toBeInTheDocument();
   });
 
-  it('GestureAdvancedPanel wraps the panel layout under the Advanced heading', () => {
-    render(<GestureAdvancedPanel {...baseProps} />);
-    const panel = screen.getByTestId('gesture-advanced-panel');
-    expect(panel).toHaveAttribute('aria-label', 'home.form.advanced.title');
-    expect(panel).toContainElement(screen.getByTestId('gesture-advanced-fields'));
-    expect(screen.getByTestId('gesture-advanced-fields')).toHaveAttribute('data-layout', 'panel');
+  it('locks the tolerance while any reward is accepted', async () => {
+    const props = makeProps({ acceptAnyCstReward: true });
+    render(<GestureAdvancedFields {...props} />);
+
+    expect(
+      screen.getByLabelText('home.form.advanced.minCstProtection.toleranceLabel'),
+    ).toBeDisabled();
+    await userEvent.click(
+      screen.getByRole('checkbox', {
+        name: /home\.form\.advanced\.minCstProtection\.acceptAnyTitle/,
+      }),
+    );
+    expect(props.setAcceptAnyCstReward).toHaveBeenCalledWith(false);
+  });
+
+  it('has no collision buffer for a CST gesture', () => {
+    render(<GestureAdvancedFields {...makeProps({ gestureType: 'CST' })} />);
+
+    expect(screen.queryByTestId('collision-buffer')).not.toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<GestureAdvancedFields {...makeProps()} />);
+    await checkA11y(container);
   });
 });

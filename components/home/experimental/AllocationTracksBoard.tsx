@@ -1,338 +1,237 @@
 'use client';
 
-import type { ReactNode } from 'react';
-import { ArrowRight, ImageIcon, Layers, Users, Zap } from 'lucide-react';
-import { zeroAddress } from 'viem';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { formatSeconds, shortenHex } from '@/utils';
-
-import {
-  ChronoWarriorIcon,
-  EnduranceChampionIcon,
-  FinalCstGestureIcon,
-  PublicGoodsIcon,
-  SignatureAllocationIcon,
-  StellarSelectionIcon,
-} from '@/lib/conceptIcons';
-import { Link } from '@/i18n/navigation';
-import { InfoTooltip } from '@/components/ui/info-tooltip';
-import { Surface } from '@/components/ui/surface';
-import { useChampions } from '@/hooks/useChampions';
-import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
+import { Amount } from '@/components/ui/amount';
+import { ExplainedTerm } from '@/components/ui/explain-popover';
+import { SectionHeader } from '@/components/ui/section-header';
+import { UnknownValue } from '@/components/ui/unknown-value';
+import { deriveAllocationTrackAmounts } from '@/lib/allocationTracks';
 import { cn } from '@/lib/utils';
 import type { DashboardInfo } from '@/services/api';
+import { formatAmount, formatNumber } from '@/utils/format';
 
 interface AllocationTracksBoardProps {
   data: DashboardInfo | null;
-  account?: string | null;
   className?: string;
 }
 
 interface TrackRow {
   key: string;
-  icon: ReactNode;
-  title: string;
-  value: string;
-  detail: ReactNode;
-  href?: string;
-  isLive?: boolean;
-  emphasis?: 'signature' | 'none';
+  name: string;
+  definition: string;
+  /** The amount, or a fixed allocation in words ("1,000 CST + NFT"). */
+  amount: { eth: number } | { text: string };
+  detail: string;
+  /** Share of the Cycle Reserve in percent; drives the bar and the caption. */
+  share?: number | null;
+  /** Swatch colour of the track in the reserve bar. */
+  swatch?: string;
 }
 
-function sameAddress(left: string | null | undefined, right: string | null | undefined): boolean {
-  return !!left && !!right && left.toLowerCase() === right.toLowerCase();
-}
-
-function LeaderLine({
-  address,
-  duration,
-  emptyText,
-  account,
-  youLabel,
-  locale,
-}: {
-  address: string | null;
-  duration?: number;
-  emptyText: string;
-  account?: string | null;
-  youLabel: string;
-  locale: string;
-}) {
-  if (!address) {
-    return <span className="italic text-muted-foreground/70">{emptyText}</span>;
-  }
-  return (
-    <span className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5">
-      <span className="font-mono text-foreground/90">{shortenHex(address, 4)}</span>
-      {duration !== undefined && duration > 0 && (
-        <span className="tabular-nums">· {formatSeconds(duration, locale)}</span>
-      )}
-      {sameAddress(account, address) && (
-        <span className="rounded-full bg-emerald-500/20 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-emerald-400">
-          {youLabel}
-        </span>
-      )}
-    </span>
-  );
+function finitePercent(value: number | undefined): number | null {
+  return typeof value === 'number' && Number.isFinite(value) && value >= 0 ? value : null;
 }
 
 /**
- * The Deck's left flank: every allocation track of the current cycle as a
- * compact live scoreboard row — amount, current leader or recipient rule,
- * and a link deeper. Amounts come from the live dashboard read; leaders from
- * the champions snapshot.
+ * Everything the cycle distributes at finalization, once, as a ledger. The
+ * ETH tracks share the Cycle Reserve: a proportional bar shows the split and
+ * each row carries its colour, amount and share, down to the part that seeds
+ * the next cycle. The fixed CST and NFT allocations follow as a second group.
+ * Who currently holds each contested allocation lives in the standings, so
+ * no figure appears twice.
  */
-export function AllocationTracksBoard({
-  data,
-  account = null,
-  className,
-}: AllocationTracksBoardProps) {
+export function AllocationTracksBoard({ data, className }: AllocationTracksBoardProps) {
   const t = useTranslations('home');
-  const tTables = useTranslations('tables');
+  const tCommon = useTranslations('common');
   const locale = useLocale();
-  const champions = useChampions();
-
-  const ethAmount = (value: number) => t('allocation.amounts.eth', { amount: value.toFixed(4) });
-  const cstPlusNft = t('deck.board.cstPlusNft');
-  const youLabel = tTables('status.youBadge');
-
-  const latestAddress =
-    data?.LastBidderAddr && data.LastBidderAddr !== zeroAddress ? data.LastBidderAddr : null;
-  const chronoEth =
-    ((data?.CosmicGameBalanceEth ?? 0) * (data?.ChronoWarriorPercentage ?? 0)) / 100;
-  const publicGoodsEth = ((data?.CosmicGameBalanceEth ?? 0) * (data?.CharityPercentage ?? 0)) / 100;
-  const stellarEthRecipients = data?.NumRaffleEthWinnersBidding ?? 0;
-  const stellarNftRecipients = data?.NumRaffleNFTWinnersBidding ?? 0;
-  const rwlkAnchorRecipients = data?.NumRaffleNFTWinnersStakingRWalk ?? 0;
-
+  const amounts = deriveAllocationTrackAmounts(data);
   const recipients = (count: number) => t('allocation.recipientCount', { count });
+  const cstPlusNft = t('deck.board.cstPlusNft');
 
-  const rows: TrackRow[] = [
+  const ethTracks: TrackRow[] = [
     {
       key: 'signature',
-      icon: <SignatureAllocationIcon className="h-4 w-4" />,
-      title: t('allocation.cards.signature.name'),
-      value: ethAmount(data?.PrizeAmountEth ?? 0),
-      detail: (
-        <LeaderLine
-          address={champions.latestGesture.address ?? latestAddress}
-          duration={champions.latestGesture.holdDuration}
-          emptyText={t('deck.board.awaitingGesture')}
-          account={account}
-          youLabel={youLabel}
-          locale={locale}
-        />
-      ),
-      href: '/current-cycle',
-      isLive: !!(champions.latestGesture.address ?? latestAddress),
-      emphasis: 'signature',
+      name: t('allocation.cards.signature.name'),
+      definition: t('allocation.cards.signature.tooltip'),
+      amount: { eth: amounts.signatureEth },
+      detail: recipients(1),
+      share: finitePercent(data?.PrizePercentage),
+      swatch: 'bg-track-signature',
     },
     {
       key: 'chrono',
-      icon: <ChronoWarriorIcon className="h-4 w-4" />,
-      title: t('allocation.cards.chronoWarrior.name'),
-      value: ethAmount(chronoEth),
-      detail: (
-        <LeaderLine
-          address={champions.chrono.address}
-          duration={champions.chrono.duration}
-          emptyText={t('deck.board.awaitingRecord')}
-          account={account}
-          youLabel={youLabel}
-          locale={locale}
-        />
-      ),
-      href: '/faq#chrono-warrior',
-      isLive: champions.chrono.isLive,
-    },
-    {
-      key: 'endurance',
-      icon: <EnduranceChampionIcon className="h-4 w-4" />,
-      title: t('allocation.cards.endurance.name'),
-      value: cstPlusNft,
-      detail: (
-        <LeaderLine
-          address={champions.endurance.address}
-          duration={champions.endurance.duration}
-          emptyText={t('deck.board.awaitingRecord')}
-          account={account}
-          youLabel={youLabel}
-          locale={locale}
-        />
-      ),
-      href: '/faq#endurance-champion',
-      isLive: champions.endurance.isLive,
+      name: t('allocation.cards.chronoWarrior.name'),
+      definition: t('allocation.cards.chronoWarrior.tooltip'),
+      amount: { eth: amounts.chronoEth },
+      detail: recipients(1),
+      share: finitePercent(data?.ChronoWarriorPercentage),
+      swatch: 'bg-track-chrono',
     },
     {
       key: 'stellar-eth',
-      icon: <StellarSelectionIcon className="h-4 w-4" />,
-      title: t('allocation.cards.ethStellar.name'),
-      value: ethAmount(data?.RaffleAmountEth ?? 0),
-      detail: `${recipients(stellarEthRecipients)} · ${t('deck.board.stellarStatus')}`,
-    },
-    {
-      key: 'stellar-nft',
-      icon: <ImageIcon className="h-4 w-4" />,
-      title: t('allocation.cards.nftStellar.name'),
-      value: cstPlusNft,
-      detail: `${recipients(stellarNftRecipients)} · ${t('deck.board.stellarStatus')}`,
+      name: t('allocation.cards.ethStellar.name'),
+      definition: t('allocation.cards.ethStellar.tooltip'),
+      amount: { eth: amounts.stellarEth },
+      detail:
+        amounts.stellarEthRecipients > 0
+          ? `${recipients(amounts.stellarEthRecipients)} · ${t('allocation.amounts.ethEach', {
+              amount: formatAmount(amounts.stellarEthEach, {
+                unit: 'ETH',
+                locale,
+                withUnit: false,
+              }),
+            })}`
+          : recipients(0),
+      share: finitePercent(data?.RafflePercentage),
+      swatch: 'bg-track-stellar-eth',
     },
     {
       key: 'cosmic-anchor',
-      icon: <Users className="h-4 w-4" />,
-      title: t('allocation.cards.cosmicAnchor.name'),
-      value: ethAmount(data?.StakingAmountEth ?? 0),
+      name: t('allocation.cards.cosmicAnchor.name'),
+      definition: t('allocation.cards.cosmicAnchor.tooltip'),
+      amount: { eth: amounts.cosmicAnchorEth },
       detail: t('allocation.cards.cosmicAnchor.recipientLabel'),
-      href: '/anchoring',
-    },
-    {
-      key: 'rwlk-anchor',
-      icon: <Layers className="h-4 w-4" />,
-      title: t('allocation.cards.randomWalkAnchor.name'),
-      value: cstPlusNft,
-      detail: recipients(rwlkAnchorRecipients),
-      href: '/anchoring',
+      share: finitePercent(data?.StakingPercentage),
+      swatch: 'bg-track-anchoring',
     },
     {
       key: 'public-goods',
-      icon: <PublicGoodsIcon className="h-4 w-4" />,
-      title: t('allocation.cards.publicGoods.name'),
-      value: ethAmount(publicGoodsEth),
+      name: t('allocation.cards.publicGoods.name'),
+      definition: t('allocation.cards.publicGoods.tooltip', {
+        percent: String(data?.CharityPercentage ?? 0),
+      }),
+      amount: { eth: amounts.publicGoodsEth },
       detail: t('allocation.cards.publicGoods.recipientLabel'),
-      href: '/public-goods-contributions-cg',
+      share: finitePercent(data?.CharityPercentage),
+      swatch: 'bg-track-public-goods',
     },
     {
-      key: 'final-cst',
-      icon: <FinalCstGestureIcon className="h-4 w-4" />,
-      title: t('allocation.cards.finalCst.name'),
-      value: cstPlusNft,
-      detail: (
-        <LeaderLine
-          address={champions.lastCst.address}
-          emptyText={tTables('specialAllocation.awaitingCstGesture')}
-          account={account}
-          youLabel={youLabel}
-          locale={locale}
-        />
-      ),
+      key: 'next-cycle',
+      name: t('observatory.ribbon.nextCycleName'),
+      definition: t('observatory.ribbon.nextCycleTooltip'),
+      amount: { eth: amounts.nextCycleEth },
+      detail: t('observatory.ribbon.nextCycleDetail'),
+      share: amounts.nextCyclePercent,
+      swatch: 'bg-track-compounding',
     },
   ];
 
+  const fixedTracks: TrackRow[] = [
+    {
+      key: 'endurance',
+      name: t('allocation.cards.endurance.name'),
+      definition: t('allocation.cards.endurance.tooltip'),
+      amount: { text: cstPlusNft },
+      detail: recipients(1),
+    },
+    {
+      key: 'final-cst',
+      name: t('allocation.cards.finalCst.name'),
+      definition: t('allocation.cards.finalCst.tooltip'),
+      amount: { text: cstPlusNft },
+      detail: recipients(1),
+    },
+    {
+      key: 'stellar-nft',
+      name: t('allocation.cards.nftStellar.name'),
+      definition: t('allocation.cards.nftStellar.tooltip'),
+      amount: { text: cstPlusNft },
+      detail: `${recipients(amounts.stellarNftRecipients)} · ${t('deck.board.stellarStatus')}`,
+    },
+    {
+      key: 'rwlk-anchor',
+      name: t('allocation.cards.randomWalkAnchor.name'),
+      definition: t('allocation.cards.randomWalkAnchor.tooltip'),
+      amount: { text: cstPlusNft },
+      detail: recipients(amounts.rwlkAnchorRecipients),
+    },
+  ];
+
+  // The bar only draws when every share is known; a partial split would lie.
+  const barShares = ethTracks.every((track) => track.share != null)
+    ? ethTracks.filter((track) => (track.share ?? 0) > 0)
+    : null;
+  const shareLabel = (share: number | null | undefined) =>
+    share == null
+      ? null
+      : t('observatory.ribbon.percentOfReserve', {
+          percent: formatNumber(share, locale, { maximumFractionDigits: 1 }),
+        });
+
+  const renderRows = (tracks: readonly TrackRow[], withSwatch: boolean) => (
+    <ul className="divide-y divide-rule-faint">
+      {tracks.map((track) => (
+        <li
+          key={track.key}
+          data-testid={`track-row-${track.key}`}
+          className="grid grid-cols-[0.625rem_minmax(0,1fr)_auto] items-baseline gap-x-3 py-3"
+        >
+          <span
+            aria-hidden
+            className={cn('size-2.5 translate-y-px rounded-edge', withSwatch && track.swatch)}
+          />
+          <div className="min-w-0">
+            <p className="type-body-sm text-foreground">
+              <ExplainedTerm definition={track.definition}>{track.name}</ExplainedTerm>
+            </p>
+            <p className="mt-0.5 type-caption text-subtle">{track.detail}</p>
+          </div>
+          <div className="text-end">
+            <p className="type-figure-sm text-foreground">
+              {'eth' in track.amount ? (
+                data ? (
+                  <Amount value={track.amount.eth} unit="ETH" unitClassName="text-subtle" />
+                ) : (
+                  <UnknownValue label={tCommon('status.unavailable')} />
+                )
+              ) : (
+                track.amount.text
+              )}
+            </p>
+            {track.share != null ? (
+              <p className="mt-0.5 type-caption text-subtle">{shareLabel(track.share)}</p>
+            ) : null}
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+
   return (
-    <Surface
-      asChild
-      variant="glass-bordered"
-      radius="xl"
-      padding="none"
+    <section
+      aria-labelledby="allocation-tracks-title"
+      data-testid="allocation-tracks-board"
       className={cn('min-w-0', className)}
     >
-      <aside aria-labelledby="allocation-tracks-title" data-testid="allocation-tracks-board">
-        <div className="border-b border-white/[0.07] p-4">
-          <div className="flex items-center gap-2">
-            <h2
-              id="allocation-tracks-title"
-              className="font-display text-lg font-bold tracking-tight"
-            >
-              {t('deck.board.title')}
-            </h2>
-            <InfoTooltip content={t('deck.board.tooltip')} />
-          </div>
-          <p className="mt-0.5 text-xs text-muted-foreground">{t('deck.board.subtitle')}</p>
+      <SectionHeader
+        as="h2"
+        headingId="allocation-tracks-title"
+        title={t('deck.board.title')}
+        description={t('deck.board.subtitle')}
+        className="mb-5 sm:mb-6"
+      />
+
+      <h3 className="type-label text-muted-foreground">{t('deck.board.ethGroup')}</h3>
+      {barShares && barShares.length > 0 ? (
+        <div
+          aria-hidden
+          data-testid="reserve-split-bar"
+          className="mt-3 flex h-1.5 w-full gap-px overflow-hidden rounded-pill"
+        >
+          {barShares.map((track) => (
+            <span
+              key={track.key}
+              className={cn('h-full', track.swatch)}
+              style={{ flexGrow: track.share ?? 0, flexBasis: 0 }}
+            />
+          ))}
         </div>
+      ) : null}
+      <div className="mt-1">{renderRows(ethTracks, true)}</div>
 
-        <ol className="grid grid-cols-1 gap-1.5 p-3 lg:grid-cols-2 xl:grid-cols-1">
-          {rows.map((row) => {
-            const rowBody = (
-              <>
-                <span
-                  className={cn(
-                    'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
-                    row.emphasis === 'signature'
-                      ? 'bg-gradient-to-br from-primary/20 to-accent/20 text-primary'
-                      : 'bg-white/[0.05] text-muted-foreground',
-                  )}
-                >
-                  {row.icon}
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="flex items-start justify-between gap-2">
-                    {/* Wraps instead of truncating: at 320px several track
-                        names don't fit on one line, and an ellipsis hides
-                        which track the row is (mobile overflow audit). */}
-                    <span className="min-w-0 break-words text-xs font-semibold text-foreground">
-                      {row.title}
-                    </span>
-                    <span
-                      className={cn(
-                        'shrink-0 text-xs font-bold tabular-nums',
-                        row.emphasis === 'signature'
-                          ? 'bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent'
-                          : 'text-foreground/90',
-                      )}
-                    >
-                      {row.value}
-                    </span>
-                  </span>
-                  <span className="mt-0.5 flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
-                    {/* No truncate: the detail is a leader address + record
-                        duration — the content participants come for.
-                        LeaderLine flex-wraps itself; plain strings wrap on
-                        spaces. */}
-                    <span className="min-w-0 break-words">{row.detail}</span>
-                    {row.isLive && (
-                      <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-emerald-300">
-                        <Zap className="h-2.5 w-2.5" />
-                        {tTables('specialAllocation.liveGrowing')}
-                      </span>
-                    )}
-                    {row.href && (
-                      <ArrowRight className="h-3 w-3 shrink-0 text-muted-foreground/50" />
-                    )}
-                  </span>
-                </span>
-              </>
-            );
-            const rowClass = 'flex items-start gap-2.5 rounded-xl border p-2.5 transition-colors';
-            const rowTone =
-              row.emphasis === 'signature'
-                ? 'border-primary/25 bg-primary/[0.055]'
-                : 'border-white/[0.05] bg-white/[0.02]';
-
-            return (
-              <li key={row.key} data-testid={`track-row-${row.key}`}>
-                {row.href ? (
-                  <Link
-                    href={row.href}
-                    className={cn(
-                      rowClass,
-                      rowTone,
-                      'hover:border-primary/30 hover:bg-white/[0.05]',
-                    )}
-                  >
-                    {rowBody}
-                  </Link>
-                ) : (
-                  <div className={cn(rowClass, rowTone)}>{rowBody}</div>
-                )}
-              </li>
-            );
-          })}
-        </ol>
-
-        <div className="border-t border-white/[0.07] p-3">
-          <a
-            href="#allocation-breakdown"
-            className={cn(
-              'inline-flex items-center gap-1.5 px-1 text-xs font-semibold text-primary transition hover:text-foreground',
-              TOUCH_TARGET_TEXT_LINK_CLASS,
-            )}
-          >
-            {t('deck.board.fullBreakdown')}
-            <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-          </a>
-        </div>
-      </aside>
-    </Surface>
+      <h3 className="mt-6 type-label text-muted-foreground">{t('deck.board.fixedGroup')}</h3>
+      <div className="mt-1">{renderRows(fixedTracks, false)}</div>
+    </section>
   );
 }

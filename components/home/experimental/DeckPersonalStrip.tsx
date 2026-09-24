@@ -1,193 +1,93 @@
 'use client';
 
-import { useMemo } from 'react';
-import { ArrowRight, PackageOpen, Radio, Sparkles, User } from 'lucide-react';
+import { useId, useMemo } from 'react';
+import { ArrowRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { formatSeconds } from '@/utils';
-
-import { EnduranceChampionIcon, StellarSelectionIcon } from '@/lib/conceptIcons';
 import { Link } from '@/i18n/navigation';
-import { Surface } from '@/components/ui/surface';
+import { Amount } from '@/components/ui/amount';
+import { Button } from '@/components/ui/button';
 import { useApiData } from '@/contexts/ApiDataContext';
-import { useChampions } from '@/hooks/useChampions';
-import { getSelectionStanding } from '@/lib/selectionStanding';
+import { RetrieveIcon } from '@/lib/conceptIcons';
 import { cn } from '@/lib/utils';
-import { formatCstAmount } from '@/utils/cstGesture';
-import { formatFixed } from '@/utils/format';
-import type { DashboardInfo, GestureInfo } from '@/services/api';
+import type { GestureInfo } from '@/services/api';
+import { formatPercent, sameAddress } from '@/utils/format';
 
 interface DeckPersonalStripProps {
   account: string;
-  data: DashboardInfo | null;
+  /** The cycle's gestures, the connected wallet's among them. */
   gestures: GestureInfo[];
-  /** Estimated Participation CST a gesture would imprint right now. */
-  cstRewardPreview?: number | null;
   className?: string;
 }
 
-function sameAddress(left: string | null | undefined, right: string | null | undefined): boolean {
-  return !!left && !!right && left.toLowerCase() === right.toLowerCase();
-}
-
 /**
- * The connected wallet's cycle position in one glance: latest-gesture
- * standing, distance to the Endurance record, gestures made this cycle, and
- * whether anything is waiting to be retrieved. Renders only when a wallet is
- * connected (gated by the page).
+ * The connected wallet's place in the cycle, in one line under the
+ * standings: how many Gestures it made, what share of the cycle's Stellar
+ * Selection entries those are (a plain k of N, never a compounded chance),
+ * and whether anything is waiting to be retrieved. Whether the wallet holds
+ * a standing is marked on the standings row itself.
  */
-export function DeckPersonalStrip({
-  account,
-  data,
-  gestures,
-  cstRewardPreview = null,
-  className,
-}: DeckPersonalStripProps) {
+export function DeckPersonalStrip({ account, gestures, className }: DeckPersonalStripProps) {
   const t = useTranslations('home');
   const locale = useLocale();
-  const champions = useChampions();
+  const headingId = useId();
   const { apiData } = useApiData();
 
-  const isLatest = sameAddress(data?.LastBidderAddr, account);
   const myGestureCount = useMemo(
     () => gestures.filter((gesture) => sameAddress(gesture.BidderAddr, account)).length,
     [gestures, account],
   );
-  const standing = useMemo(
-    () =>
-      getSelectionStanding({
-        totalGestures: gestures.length,
-        myGestures: myGestureCount,
-        ethRecipients: data?.NumRaffleEthWinnersBidding ?? 1,
-        nftRecipients: data?.NumRaffleNFTWinnersBidding ?? 1,
-      }),
-    [
-      gestures.length,
-      myGestureCount,
-      data?.NumRaffleEthWinnersBidding,
-      data?.NumRaffleNFTWinnersBidding,
-    ],
-  );
+  const entryShare =
+    gestures.length > 0 && myGestureCount > 0 ? (myGestureCount / gestures.length) * 100 : null;
 
-  const { latestGesture } = champions;
-  const enduranceLabel =
-    isLatest && latestGesture.durationToBeat > 0
-      ? latestGesture.isExtendingEnduranceRecord
-        ? t('deck.personal.extending')
-        : t('deck.personal.enduranceIn', {
-            duration: formatSeconds(latestGesture.secondsUntilEnduranceChampion, locale),
-          })
-      : null;
-
+  const waitingEth = apiData.ETHRaffleToClaim ?? 0;
   const hasUnretrieved =
-    (apiData.ETHRaffleToClaim ?? 0) > 0 ||
+    waitingEth > 0 ||
     (apiData.NumDonatedNFTToClaim ?? 0) > 0 ||
     (apiData.UnretrievedAnchorDistribution ?? 0) > 0;
 
   return (
-    <Surface
-      asChild
-      variant="glass"
-      radius="lg"
-      padding="none"
-      className={cn('min-w-0', className)}
+    <section
+      aria-labelledby={headingId}
+      data-testid="deck-personal-strip"
+      className={cn(
+        'flex flex-wrap items-center justify-between gap-x-8 gap-y-3 border-b border-rule-faint py-4',
+        className,
+      )}
     >
-      <section aria-label={t('deck.personal.title')} data-testid="deck-personal-strip">
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-2.5 px-4 py-3">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-            {t('deck.personal.title')}
+      <div className="flex min-w-0 flex-wrap items-baseline gap-x-6 gap-y-1">
+        <h3 id={headingId} className="type-label text-muted-foreground">
+          {t('deck.personal.title')}
+        </h3>
+        <p className="type-body-sm text-foreground" data-testid="personal-gesture-count">
+          {t('deck.personal.gestures', { count: myGestureCount })}
+        </p>
+        {entryShare != null ? (
+          <p className="type-body-sm text-muted-foreground" data-testid="personal-entry-share">
+            {t('deck.personal.entryShare', {
+              share: formatPercent(entryShare, locale, { maximumFractionDigits: 2 }),
+            })}
           </p>
-
-          <span
-            data-testid="personal-standing"
-            className={cn(
-              'inline-flex items-center gap-1.5 text-xs font-medium',
-              isLatest ? 'text-emerald-300' : 'text-muted-foreground',
-            )}
-          >
-            <Radio className="h-3.5 w-3.5 shrink-0" aria-hidden />
-            {isLatest
-              ? `${t('deck.personal.leader')} · ${t('deck.personal.heldFor', {
-                  duration: formatSeconds(latestGesture.holdDuration, locale),
-                })}`
-              : t('deck.personal.notLeader')}
-          </span>
-
-          {enduranceLabel && (
-            <span
-              data-testid="personal-endurance"
-              className={cn(
-                'inline-flex items-center gap-1.5 text-xs font-medium',
-                latestGesture.isExtendingEnduranceRecord
-                  ? 'text-emerald-300'
-                  : 'text-[rgb(var(--solar-gold-rgb))]',
-              )}
-            >
-              <EnduranceChampionIcon className="h-3.5 w-3.5 shrink-0" aria-hidden />
-              {enduranceLabel}
-            </span>
-          )}
-
-          <span
-            data-testid="personal-gesture-count"
-            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground"
-          >
-            <User className="h-3.5 w-3.5 shrink-0" aria-hidden />
-            {t('deck.personal.gestures', { count: myGestureCount })}
-          </span>
-
-          {standing && (
-            <span
-              data-testid="personal-stellar-standing"
-              className="inline-flex items-center gap-1.5 text-xs tabular-nums text-muted-foreground"
-            >
-              <StellarSelectionIcon className="h-3.5 w-3.5 shrink-0" aria-hidden />
-              {t('status.standing.ethStellar')} {formatFixed(standing.stellarEth, 1)}%{' \u00b7 '}
-              {t('status.standing.nftStellar')} {formatFixed(standing.nft, 1)}%
-            </span>
-          )}
-
-          {cstRewardPreview != null && cstRewardPreview > 0 && (
-            <span
-              data-testid="personal-cst-preview"
-              className="inline-flex items-center gap-1.5 text-xs tabular-nums text-muted-foreground"
-            >
-              <Sparkles
-                className="h-3.5 w-3.5 shrink-0 text-[rgb(var(--impact-green-rgb))]"
-                aria-hidden
-              />
-              {t('deck.personal.cstPreview', { amount: formatCstAmount(cstRewardPreview) })}
-            </span>
-          )}
-
-          <span className="ms-auto">
-            {hasUnretrieved ? (
-              <Link
-                href="/my-allocations"
-                data-testid="personal-retrieve"
-                className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-semibold text-emerald-300 transition-colors hover:border-emerald-300/60"
-              >
-                <PackageOpen className="h-3.5 w-3.5" aria-hidden />
-                {apiData.ETHRaffleToClaim > 0
-                  ? `${t('deck.personal.retrieve')} · ${t('allocation.amounts.eth', {
-                      amount: apiData.ETHRaffleToClaim.toFixed(4),
-                    })}`
-                  : t('deck.personal.retrieve')}
-                <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-              </Link>
-            ) : (
-              <Link
-                href="/my-allocations"
-                data-testid="personal-allocations-link"
-                className="inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-primary"
-              >
-                {t('deck.personal.nothingWaiting')}
-                <ArrowRight className="h-3 w-3" aria-hidden />
-              </Link>
-            )}
-          </span>
-        </div>
-      </section>
-    </Surface>
+        ) : null}
+      </div>
+      {hasUnretrieved ? (
+        <Button asChild variant="secondary" size="sm" data-testid="personal-retrieve">
+          <Link href="/my-allocations">
+            <RetrieveIcon aria-hidden />
+            {t('deck.personal.retrieve')}
+            {waitingEth > 0 ? <Amount value={waitingEth} unit="ETH" /> : null}
+          </Link>
+        </Button>
+      ) : (
+        <Link
+          href="/my-allocations"
+          data-testid="personal-allocations-link"
+          className="link-quiet inline-flex min-h-11 items-center gap-1.5 type-body-sm text-muted-foreground hover:text-foreground sm:min-h-9"
+        >
+          {t('deck.personal.nothingWaiting')}
+          <ArrowRight className="size-3.5 text-subtle" aria-hidden />
+        </Link>
+      )}
+    </section>
   );
 }
