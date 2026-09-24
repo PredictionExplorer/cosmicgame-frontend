@@ -55,6 +55,12 @@ export interface PageHeaderProps {
   title: ReactNode;
   /** The lede under the H1: clamped to three lines on phones, with a "Read more" toggle. */
   subtitle?: ReactNode;
+  /**
+   * Clamp the lede on phones. Defaults to true for `data` and false for
+   * `reading`, whose lede is the page's thesis and must not hide words or
+   * shift the page when the client removes an unneeded "Read more".
+   */
+  clampLede?: boolean;
   variant?: PageHeaderVariant;
   /**
    * The section the page belongs to (components/layout/pageSections). On a
@@ -169,6 +175,7 @@ export function PageHeader({
   title,
   subtitle,
   variant = 'data',
+  clampLede = variant !== 'reading',
   section,
   sectionHub = false,
   breadcrumbs,
@@ -236,7 +243,8 @@ export function PageHeader({
       {eyebrowContent ? (
         <div
           className={cn(
-            'mb-3 type-eyebrow text-secondary sm:mb-4',
+            // The eyebrow pairs with the subtle tier everywhere (docs/design-system.md).
+            'mb-3 type-eyebrow text-subtle sm:mb-4',
             centered && 'flex justify-center',
           )}
         >
@@ -262,6 +270,7 @@ export function PageHeader({
           </TitleTag>
           {subtitle ? (
             <HeaderLede
+              clamp={clampLede}
               moreLabel={t('pageHeader.readMore')}
               lessLabel={t('pageHeader.readLess')}
               className={cn(

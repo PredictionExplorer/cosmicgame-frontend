@@ -11,6 +11,11 @@ export interface HeaderLedeProps {
   moreLabel: string;
   /** Button label once it is expanded. */
   lessLabel: string;
+  /**
+   * `false`: the lede is the page's thesis (a long read's header), shown in
+   * full on phones too, with no button to mount or remove after hydration.
+   */
+  clamp?: boolean;
   className?: string;
 }
 
@@ -22,7 +27,17 @@ export interface HeaderLedeProps {
  * server renders the button and the client removes it once it measures a
  * lede that fits: the common case never shifts the page.
  */
-export function HeaderLede({ children, moreLabel, lessLabel, className }: HeaderLedeProps) {
+export function HeaderLede({ clamp = true, ...props }: HeaderLedeProps) {
+  if (!clamp) return <p className={props.className}>{props.children}</p>;
+  return <ClampedLede {...props} />;
+}
+
+function ClampedLede({
+  children,
+  moreLabel,
+  lessLabel,
+  className,
+}: Omit<HeaderLedeProps, 'clamp'>) {
   const id = useId();
   const ref = useRef<HTMLParagraphElement>(null);
   const [expanded, setExpanded] = useState(false);

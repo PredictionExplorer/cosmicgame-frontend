@@ -30,6 +30,22 @@ describe('HeaderLede', () => {
     restore();
   });
 
+  it('shows a thesis lede in full, with no toggle to mount or remove after hydration', () => {
+    const html = renderToString(
+      <HeaderLede clamp={false} moreLabel="Read more" lessLabel="Show less">
+        The thesis of a long read.
+      </HeaderLede>,
+    );
+    expect(html).not.toContain('Read more');
+    render(
+      <HeaderLede clamp={false} moreLabel="Read more" lessLabel="Show less">
+        The thesis of a long read.
+      </HeaderLede>,
+    );
+    expect(screen.getByText('The thesis of a long read.')).not.toHaveClass('max-sm:line-clamp-3');
+    expect(screen.queryByRole('button')).toBeNull();
+  });
+
   it('renders the toggle on the server, where nothing is measured yet', () => {
     const html = renderToString(
       <HeaderLede moreLabel="Read more" lessLabel="Show less">
