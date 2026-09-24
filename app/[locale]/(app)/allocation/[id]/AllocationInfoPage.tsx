@@ -387,7 +387,9 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
     {
       id: 'recipients',
       label: t('details.statistics.cards.recipients.label'),
-      value: allocationInfo ? format.count(recipientCount) : pending,
+      // No wallet in the ledger yet (still indexing) reads as unknown, never
+      // "0" above the recipient cards.
+      value: allocationInfo ? (recipientCount > 0 ? format.count(recipientCount) : null) : pending,
       info: t('details.statistics.cards.recipients.tooltip'),
     },
   ];
