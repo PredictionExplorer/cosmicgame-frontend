@@ -13,6 +13,9 @@ import { CollectionPlates } from './CollectionPlates';
 import { LandingSection, SectionHeading } from './SectionHeading';
 import styles from './Landing.module.css';
 
+/** How many anchored Signatures the section shows (the closing band leaves them out). */
+export const ANCHORED_PLATE_COUNT = 3;
+
 interface AnchoringProps {
   anchoring: LandingContent['anchoring'];
   showcase: LandingContent['art']['showcase'];
@@ -30,10 +33,11 @@ export function Anchoring({ anchoring, showcase }: AnchoringProps) {
       <div className={cn(styles.twoUp, styles.twoUpReversed)}>
         <CollectionPlates
           pick="anchored"
-          count={3}
+          count={ANCHORED_PLATE_COUNT}
           artworkAlt={showcase.artworkAlt}
           viewAriaLabel={showcase.viewAriaLabel}
-          sizes="(min-width: 64rem) 36rem, 100vw"
+          leadSizes="(min-width: 64rem) 36rem, 100vw"
+          sizes="(min-width: 64rem) 18rem, 50vw"
           className={styles.anchoredPlates}
         />
         <div>

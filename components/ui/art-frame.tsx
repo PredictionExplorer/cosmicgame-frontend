@@ -411,6 +411,12 @@ export interface ArtFrameProps {
   /** Above the fold: load eagerly at high fetch priority. */
   priority?: boolean;
   /**
+   * Overrides the loading mode `priority` implies: `eager` for a plate the
+   * page has decided to fetch now (it is about to scroll into view) without
+   * raising its fetch priority.
+   */
+  loading?: 'lazy' | 'eager';
+  /**
    * Caption of the unavailable state ("Artwork unavailable"). Passed in, so
    * the primitive works on both hosts whatever catalogs a page loads.
    */
@@ -437,6 +443,7 @@ export function ArtFrame({
   alt,
   sizes,
   priority = false,
+  loading,
   unavailableLabel,
   unavailableDetail,
   density = 'full',
@@ -484,6 +491,7 @@ export function ArtFrame({
         alt={alt}
         sizes={sizes}
         priority={priority}
+        loading={loading}
         onError={chain.onError}
         onLoad={chain.onLoad}
         className="relative z-[1]"

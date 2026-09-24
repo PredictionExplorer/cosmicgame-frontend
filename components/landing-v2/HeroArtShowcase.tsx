@@ -22,7 +22,8 @@ import {
 import { Button } from '@/components/ui/button';
 
 import { showcaseArtworks, showcaseSources, type ShowcaseArtwork } from './showcase-art';
-import { useArtMotionAllowed, useOnScreen } from './useArtMotion';
+import { useSignatureLabel } from './signatureLabel';
+import { useArtMotionAllowed, useHydrated, useOnScreen } from './useArtMotion';
 import { useLandingShowcaseTokens } from './useLandingShowcaseTokens';
 import styles from './Landing.module.css';
 
@@ -113,10 +114,11 @@ function PlateLayer({
 export function HeroArtShowcase({ art }: { art: LandingHeroArtContent }) {
   const locale = useLocale();
   const t = useTranslations('landing.artwork');
-  const timerT = useTranslations('landing.timer');
+  const label = useSignatureLabel();
   const showcase = useLandingShowcaseTokens();
   const artworks = useMemo(() => showcaseArtworks(showcase.tokens), [showcase.tokens]);
   const motionAllowed = useArtMotionAllowed();
+  const hydrated = useHydrated();
   const figureRef = useRef<HTMLElement>(null);
   const onScreen = useOnScreen(figureRef);
 
@@ -131,10 +133,6 @@ export function HeroArtShowcase({ art }: { art: LandingHeroArtContent }) {
   const current = artworks[index % count] ?? artworks[0]!;
   const tokenLabel = formatId(current.TokenId);
   const unavailableLabel = t('unavailable');
-  /** The token's name, or the unnamed form ("Signature #000025"). */
-  const titleOf = (artwork: ShowcaseArtwork) =>
-    artwork.TokenName?.trim() || t('untitled', { tokenLabel: formatId(artwork.TokenId) });
-  const title = titleOf(current);
   const canRotate = motionAllowed && count > 1;
   const rotating = canRotate && !paused && !held && onScreen;
 
@@ -150,7 +148,7 @@ export function HeroArtShowcase({ art }: { art: LandingHeroArtContent }) {
     show(nextIndex);
     const next = artworks[nextIndex]!;
     setAnnouncement(
-      next.TokenName?.trim() ? `${titleOf(next)} ${formatId(next.TokenId)}` : titleOf(next),
+      next.TokenName?.trim() ? `${label.text(next)} ${formatId(next.TokenId)}` : label.text(next),
     );
   };
 
@@ -204,7 +202,7 @@ export function HeroArtShowcase({ art }: { art: LandingHeroArtContent }) {
         kind={classifyHref(detailHref, 'landing')}
         aria-label={art.viewAriaLabel.replace('{tokenLabel}', tokenLabel)}
         data-testid="hero-art-link"
-        className={cn(ART_PLATE_CLASS, 'block w-full')}
+        className={cn(ART_PLATE_CLASS, 'block w-full', styles.bleedPlate)}
       >
         {previousArtwork ? (
           <PlateLayer
@@ -228,19 +226,18 @@ export function HeroArtShowcase({ art }: { art: LandingHeroArtContent }) {
       </SiteLink>
       <figcaption className={styles.wallLabel}>
         <div className={styles.wallLabelText}>
-          <p className="type-body-md font-medium text-foreground [overflow-wrap:anywhere]">
-            {title}
-          </p>
-          <WallLabelMeta
-            items={[
-              <span key="id" className="type-mono">
-                {tokenLabel}
-              </span>,
-              current.RoundNum === undefined
-                ? null
-                : timerT('cycle.numbered', { number: current.RoundNum }),
-            ]}
-          />
+          {/* The title opens the same page as the plate: one target for the
+              pointer, one tab stop (the plate) for the keyboard. */}
+          <SiteLink
+            href={detailHref}
+            kind={classifyHref(detailHref, 'landing')}
+            tabIndex={-1}
+            aria-hidden="true"
+            className="link-quiet type-body-md font-medium text-foreground [overflow-wrap:anywhere]"
+          >
+            {label.title(current)}
+          </SiteLink>
+          <WallLabelMeta items={label.meta(current)} />
         </div>
         <div className={styles.wallControls}>
           <SiteLink
@@ -270,8 +267,18 @@ export function HeroArtShowcase({ art }: { art: LandingHeroArtContent }) {
                   onClick={() => setPaused((value) => !value)}
                   aria-label={paused ? t('resumeRotation') : t('pauseRotation')}
                 >
-                  {paused ? <Play aria-hidden /> : <Pause aria-hidden />}
+                  {/* Solid glyphs: an outlined pause reads as "00" beside a token number. */}
+                  {paused ? (
+                    <Play aria-hidden fill="currentColor" strokeWidth={0} />
+                  ) : (
+                    <Pause aria-hidden fill="currentColor" strokeWidth={0} />
+                  )}
                 </Button>
+              ) : !hydrated ? (
+                // Holds the pause button's place until the page knows whether
+                // the art may move, so Previous and Next never shift sideways.
+                // Reduced motion never gets the button, so it never holds a place.
+                <span aria-hidden className="size-11 shrink-0 motion-reduce:hidden sm:size-10" />
               ) : null}
               <Button
                 type="button"

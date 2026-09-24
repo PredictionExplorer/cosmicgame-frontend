@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ArrowRight, Pause, Play } from 'lucide-react';
+import { Pause, Play } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { formatId } from '@/utils/format/ids';
@@ -20,6 +20,7 @@ import {
   shortSeed,
   type ShowcaseArtwork,
 } from './showcase-art';
+import { useSignatureLabel } from './signatureLabel';
 import { useArtMotionAllowed, useOnScreen } from './useArtMotion';
 import styles from './Landing.module.css';
 
@@ -66,13 +67,13 @@ export function ArtAnimationPlate({
 }: ArtAnimationPlateProps) {
   const locale = useLocale();
   const t = useTranslations('landing.artwork');
-  const timerT = useTranslations('landing.timer');
+  const label = useSignatureLabel();
   const artwork: ShowcaseArtwork = FEATURED_LANDING_ART[1];
   const tokenLabel = formatId(artwork.TokenId);
 
   const motionAllowed = useArtMotionAllowed();
   const wide = useMediaQuery(AUTOPLAY_QUERY);
-  const plateRef = useRef<HTMLDivElement>(null);
+  const plateRef = useRef<HTMLAnchorElement>(null);
   const onScreen = useOnScreen(plateRef, APPROACH_MARGIN);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [choice, setChoice] = useState<Choice>('auto');
@@ -112,7 +113,14 @@ export function ArtAnimationPlate({
 
   return (
     <figure className={styles.animationFigure}>
-      <div ref={plateRef} className={cn(ART_PLATE_CLASS, 'w-full')}>
+      {/* The plate and the title are one destination: the plate is the tab stop. */}
+      <SiteLink
+        ref={plateRef}
+        href={detailHref}
+        kind={classifyHref(detailHref, 'landing')}
+        aria-label={viewAriaLabel.replace('{tokenLabel}', tokenLabel)}
+        className={cn(ART_PLATE_CLASS, 'block w-full')}
+      >
         <ArtFrame
           sources={showcaseSources(artwork)}
           alt={artworkAlt.replace('{tokenLabel}', tokenLabel)}
@@ -141,26 +149,19 @@ export function ArtAnimationPlate({
             )}
           />
         ) : null}
-      </div>
+      </SiteLink>
       <figcaption className={styles.wallLabel}>
         <div className={styles.wallLabelText}>
           <SiteLink
             href={detailHref}
             kind={classifyHref(detailHref, 'landing')}
-            aria-label={viewAriaLabel.replace('{tokenLabel}', tokenLabel)}
-            className="link-quiet type-body-md inline-flex items-center gap-1.5 font-medium text-foreground"
+            tabIndex={-1}
+            aria-hidden="true"
+            className="link-quiet type-body-md font-medium text-foreground"
           >
-            {t('untitled', { tokenLabel })}
-            <ArrowRight aria-hidden className="size-4 text-subtle" />
+            {label.title(artwork)}
           </SiteLink>
-          <WallLabelMeta
-            items={[
-              <span key="id" className="type-mono">
-                {tokenLabel}
-              </span>,
-              timerT('cycle.numbered', { number: artwork.RoundNum ?? 0 }),
-            ]}
-          />
+          <WallLabelMeta items={label.meta(artwork)} />
           {/* The seed on a line of its own: on a phone it never breaks the facts line. */}
           <p className="type-caption mt-0.5 flex items-baseline gap-1.5 text-subtle">
             {seedLabel}
@@ -176,7 +177,11 @@ export function ArtAnimationPlate({
             onClick={() => setChoice(wantsMotion ? 'pause' : 'play')}
             aria-label={wantsMotion ? t('pauseAnimation') : t('playAnimation')}
           >
-            {wantsMotion ? <Pause aria-hidden /> : <Play aria-hidden />}
+            {wantsMotion ? (
+              <Pause aria-hidden fill="currentColor" strokeWidth={0} />
+            ) : (
+              <Play aria-hidden fill="currentColor" strokeWidth={0} />
+            )}
           </Button>
         )}
       </figcaption>

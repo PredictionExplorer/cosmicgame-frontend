@@ -28,6 +28,7 @@ import {
   fetchLandingDashboardSnapshot,
   fetchLandingFinalizationTimeSec,
 } from './landing-cycle-data';
+import { useHydrated } from './useArtMotion';
 import styles from './EventHorizonCountdown.module.css';
 
 /** The base cadence; it quickens near the deadline (lib/pollingCadence). */
@@ -155,19 +156,6 @@ const STATEMENT_PHASES: ReadonlySet<PhaseCopyKey> = new Set([
   'confirming',
   'unavailable',
 ]);
-
-function subscribeNever(): () => void {
-  return () => {};
-}
-
-/** False in the server HTML and during hydration, true once the page runs. */
-function useHydrated(): boolean {
-  return useSyncExternalStore(
-    subscribeNever,
-    () => true,
-    () => false,
-  );
-}
 
 /**
  * The landing's live cycle clock: the same Cycle Finalization Time as the
