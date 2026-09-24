@@ -21,10 +21,10 @@ describe('Sprint 5 bilingual catalogs', () => {
     expect(leafPaths(zhFormats).sort()).toEqual(leafPaths(enFormats).sort());
   });
 
-  it('preserves the former statistics-copy English rendering', () => {
+  it('keeps the English statistics labels in sentence case around the coined terms', () => {
     expect(enStatistics.metrics.activePerformanceCycle.label).toBe('Active Performance Cycle');
-    expect(enStatistics.metrics.contractBalance.label).toBe('Contract Balance');
-    expect(enStatistics.metrics.cosmicSignatureNftsImprinted.shortLabel).toBe('NFTs Imprinted');
+    expect(enStatistics.metrics.contractBalance.label).toBe('Contract balance');
+    expect(enStatistics.metrics.cosmicSignatureNftsImprinted.shortLabel).toBe('NFTs imprinted');
     expect(enStatistics.sectionTooltips.enduranceTimeline).toContain('The widest bar');
     expect(enTables.statisticsTooltips.systemEnded).toBe(
       'Timestamp when the next system event replaced this one.',

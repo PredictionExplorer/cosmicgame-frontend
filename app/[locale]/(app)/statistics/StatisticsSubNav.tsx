@@ -28,7 +28,11 @@ function useStuck() {
     const top = Math.ceil(parseFloat(getComputedStyle(sticky).top) || 0);
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry) setStuck(!entry.isIntersecting && entry.boundingClientRect.top <= top);
+        if (!entry) return;
+        // Stuck once the sentinel has scrolled up past the offset, not while it sits below the
+        // fold. (Some observer shims report no box; treat that as not scrolled past.)
+        const sentinelTop = entry.boundingClientRect?.top ?? Number.POSITIVE_INFINITY;
+        setStuck(!entry.isIntersecting && sentinelTop <= top);
       },
       { rootMargin: `-${top}px 0px 0px 0px`, threshold: 0 },
     );
