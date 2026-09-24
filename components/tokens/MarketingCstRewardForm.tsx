@@ -1,7 +1,7 @@
 'use client';
 
 import { useId, useState, type FormEvent } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowRight, SendHorizontal } from 'lucide-react';
 import { getAddress, isAddress, parseUnits, zeroAddress } from 'viem';
@@ -15,6 +15,8 @@ import { useTxFlow, useTxStageLabel } from '@/hooks/useTxFlow';
 import { Link } from '@/i18n/navigation';
 import { sameAddress } from '@/utils/address';
 import { reportError } from '@/utils/errors';
+import { formatAmountParts, NBSP } from '@/utils/format';
+import { getLocaleConfig } from '@/i18n/localeConfig';
 import { AddressChip } from '@/components/ui/address-chip';
 import { Amount } from '@/components/ui/amount';
 import { Button } from '@/components/ui/button';
@@ -48,17 +50,53 @@ function normalizeAddress(value: string | null | undefined): `0x${string}` | nul
   return isAddress(trimmed) ? getAddress(trimmed) : null;
 }
 
+const groupMarks = new Map<string, string>();
+
+/** The thousands separator the reader's locale prints (a comma in en, a dot in vi). */
+function groupMarkFor(locale: string): string {
+  const { intlLocale } = getLocaleConfig(locale);
+  let mark = groupMarks.get(intlLocale);
+  if (mark === undefined) {
+    const parts = new Intl.NumberFormat(intlLocale).formatToParts(10_000);
+    mark = parts.find((part) => part.type === 'group')?.value ?? ',';
+    groupMarks.set(intlLocale, mark);
+  }
+  return mark;
+}
+
 /**
  * A typed amount as base units: digits with at most one decimal separator, a
  * dot or a comma (uk and vi readers type commas). `null` when it is not a
- * number, `'precision'` when it has more decimals than the token.
+ * number, `'precision'` when it has more decimals than the token, and
+ * `'grouping'` when it carries a thousands separator: whitespace between
+ * digits, both marks, a mark used twice, or the locale's own thousands mark
+ * before exactly three digits. The transfer cannot be undone, so "1,000" in
+ * English is refused rather than read as 1 CST.
  */
-export function parseCstAmount(text: string, decimals: number): bigint | null | 'precision' {
-  const normalized = text.trim().replace(',', '.');
+export function parseCstAmount(
+  text: string,
+  decimals: number,
+  locale: string = 'en',
+): bigint | null | 'precision' | 'grouping' {
+  const trimmed = text.trim();
+  // `\s` covers the no-break and narrow no-break spaces uk grouping prints.
+  if (/^[\d\s.,]+$/.test(trimmed) && /\d\s+\d/.test(trimmed)) return 'grouping';
+  const marks = trimmed.match(/[.,]/g) ?? [];
+  if (marks.length > 1 && /^\d{1,3}(?:[.,]\d{3})+(?:[.,]\d+)?$/.test(trimmed)) return 'grouping';
+  if (marks.length === 1 && marks[0] === groupMarkFor(locale) && /^\d+[.,]\d{3}$/.test(trimmed)) {
+    return 'grouping';
+  }
+  const normalized = trimmed.replace(',', '.');
   if (!/^\d+(\.\d+)?$/.test(normalized)) return null;
   const fraction = normalized.split('.')[1] ?? '';
   if (fraction.length > decimals) return 'precision';
   return parseUnits(normalized, decimals);
+}
+
+/** A CST amount in full precision, grouped in the reader's style: "1,000.5 CST". */
+function exactCst(amountWei: bigint, decimals: number, locale: string): string {
+  const parts = formatAmountParts(amountWei, { unit: 'CST', locale, context: 'exact', decimals });
+  return parts.exact ?? `${parts.number}${NBSP}${parts.unit ?? 'CST'}`;
 }
 
 /** The Outreach Reserve's CST balance and the token's decimals. */
@@ -108,6 +146,7 @@ export function MarketingCstRewardForm({
 }: MarketingCstRewardFormProps) {
   const t = useTranslations('admin');
   const tCommon = useTranslations('common');
+  const locale = useLocale();
   const queryClient = useQueryClient();
 
   const tx = useTxFlow();
@@ -126,14 +165,21 @@ export function MarketingCstRewardForm({
   const decimals = balance.data?.decimals ?? DEFAULT_DECIMALS;
   const unknown = <UnknownValue label={tCommon('status.unavailable')} />;
 
+  // What the typed amount will send, in the reader's own number style, so a
+  // misread separator shows before the irreversible transfer, not after it.
+  const typed = parseCstAmount(amount, decimals, locale);
+  const sends = typeof typed === 'bigint' && typed > 0n ? exactCst(typed, decimals, locale) : null;
+
   const validate = (): { recipient: `0x${string}`; amountWei: bigint } | null => {
     const next: FieldErrors = {};
     const to = normalizeAddress(recipient);
     if (!to || to.toLowerCase() === zeroAddress)
       next.recipient = t('outreachTransfer.form.errors.recipient');
-    const parsed = parseCstAmount(amount, decimals);
+    const parsed = parseCstAmount(amount, decimals, locale);
     if (parsed === 'precision') {
       next.amount = t('outreachTransfer.form.errors.precision', { decimals });
+    } else if (parsed === 'grouping') {
+      next.amount = t('outreachTransfer.form.errors.grouping');
     } else if (parsed === null || parsed <= 0n) {
       next.amount = t('outreachTransfer.form.errors.amount');
     } else if (balance.data && parsed > balance.data.balanceWei) {
@@ -262,7 +308,13 @@ export function MarketingCstRewardForm({
                 inputMode="decimal"
                 autoComplete="off"
                 aria-invalid={errors.amount ? true : undefined}
-                aria-describedby={`${amountId}-hint${errors.amount ? ` ${amountId}-error` : ''}`}
+                aria-describedby={[
+                  `${amountId}-hint`,
+                  sends ? `${amountId}-sends` : null,
+                  errors.amount ? `${amountId}-error` : null,
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
                 disabled={busy}
                 className="pe-14 tabular-nums"
               />
@@ -276,6 +328,15 @@ export function MarketingCstRewardForm({
             <p id={`${amountId}-hint`} className="type-caption text-subtle">
               {t('outreachTransfer.form.amountHint')}
             </p>
+            {sends ? (
+              <p
+                id={`${amountId}-sends`}
+                data-testid="outreach-sends"
+                className="type-body-sm text-foreground tabular-nums"
+              >
+                {t('outreachTransfer.form.sends', { amount: sends })}
+              </p>
+            ) : null}
             {errors.amount ? (
               <p id={`${amountId}-error`} className="type-caption text-critical">
                 {errors.amount}

@@ -86,6 +86,7 @@
       "recipient": "Recipient address",
       "amount": "Amount",
       "amountHint": "Use a dot or a comma for decimals.",
+      "sends": "Sends {amount}",
       "submit": "Send CST",
       "reserveHeading": "Outreach Reserve",
       "reserve": "Reserve address",
@@ -98,6 +99,7 @@
         "recipient": "Enter a valid address other than the zero address.",
         "amount": "Enter an amount greater than zero.",
         "precision": "{decimals, plural, one {Use at most # decimal place.} other {Use at most # decimal places.}}",
+        "grouping": "Leave out thousands separators: type 1000, not 1,000.",
         "insufficient": "The reserve holds less CST than this."
       }
     }

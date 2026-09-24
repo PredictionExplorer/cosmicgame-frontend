@@ -105,6 +105,25 @@ describe('parseCstAmount', () => {
     expect(parseCstAmount('1.2.3', 18)).toBeNull();
     expect(parseCstAmount('0.123', 2)).toBe('precision');
   });
+
+  // The transfer cannot be undone: an English operator typing "1,000" once sent 1 CST.
+  it('refuses a thousands separator instead of reading it as a decimal mark', () => {
+    expect(parseCstAmount('1,000', 18, 'en')).toBe('grouping');
+    expect(parseCstAmount('12,500', 18, 'zh')).toBe('grouping');
+    expect(parseCstAmount('1,000.5', 18, 'en')).toBe('grouping');
+    expect(parseCstAmount('1.000.000', 18, 'en')).toBe('grouping');
+    expect(parseCstAmount('1 000', 18, 'uk')).toBe('grouping');
+    expect(parseCstAmount('1\u00a0000', 18, 'uk')).toBe('grouping');
+    // Vietnamese groups thousands with a dot.
+    expect(parseCstAmount('1.000', 18, 'vi')).toBe('grouping');
+  });
+
+  it("keeps reading the locale's own decimal mark, three decimals included", () => {
+    expect(parseCstAmount('0.125', 18, 'en')).toBe(125n * 10n ** 15n);
+    expect(parseCstAmount('1,000', 18, 'vi')).toBe(10n ** 18n);
+    expect(parseCstAmount('0,125', 18, 'uk')).toBe(125n * 10n ** 15n);
+    expect(parseCstAmount('2,5', 18, 'en')).toBe(25n * 10n ** 17n);
+  });
 });
 
 describe('MarketingCstRewardForm', () => {
@@ -132,6 +151,30 @@ describe('MarketingCstRewardForm', () => {
 
     await fill(RECIPIENT, '11');
     expect(screen.getByText('The reserve holds less CST than this.')).toBeVisible();
+    expect(mockTx.flow.run).not.toHaveBeenCalled();
+  });
+
+  it('shows what the typed amount will send before anything is sent', async () => {
+    const user = userEvent.setup();
+    renderForm();
+    await screen.findByText('10', { exact: false, selector: 'data' });
+    const amountField = screen.getByLabelText('Amount');
+    expect(screen.queryByTestId('outreach-sends')).toBeNull();
+
+    await user.type(amountField, '2,5');
+    expect(screen.getByTestId('outreach-sends').textContent).toBe('Sends 2.5\u00a0CST');
+    expect(amountField.getAttribute('aria-describedby')).toContain(
+      screen.getByTestId('outreach-sends').id,
+    );
+    expect(mockTx.flow.run).not.toHaveBeenCalled();
+  });
+
+  it('refuses a grouped amount like 1,000 and sends nothing', async () => {
+    renderForm();
+    await screen.findByText('10', { exact: false, selector: 'data' });
+    await fill(RECIPIENT, '1,000');
+    expect(screen.getByText('Leave out thousands separators: type 1000, not 1,000.')).toBeVisible();
+    expect(screen.queryByTestId('outreach-sends')).toBeNull();
     expect(mockTx.flow.run).not.toHaveBeenCalled();
   });
 

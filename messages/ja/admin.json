@@ -86,6 +86,7 @@
       "recipient": "受領者のアドレス",
       "amount": "金額",
       "amountHint": "小数点にはピリオドまたはカンマを使えます。",
+      "sends": "送付額：{amount}",
       "submit": "CSTを送付",
       "reserveHeading": "広報準備金",
       "reserve": "準備金のアドレス",
@@ -98,6 +99,7 @@
         "recipient": "ゼロアドレス以外の有効なアドレスを入力してください。",
         "amount": "0より大きい金額を入力してください。",
         "precision": "{decimals, plural, other {小数点以下は#桁までです。}}",
+        "grouping": "桁区切りの記号を使わず、1000のように入力してください。",
         "insufficient": "準備金のCSTがこの金額より少ないです。"
       }
     }

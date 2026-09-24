@@ -86,6 +86,7 @@
       "recipient": "Địa chỉ người nhận",
       "amount": "Số lượng",
       "amountHint": "Dùng dấu chấm hoặc dấu phẩy cho phần thập phân.",
+      "sends": "Sẽ gửi {amount}",
       "submit": "Gửi CST",
       "reserveHeading": "Dự trữ truyền thông",
       "reserve": "Địa chỉ quỹ dự trữ",
@@ -98,6 +99,7 @@
         "recipient": "Nhập một địa chỉ hợp lệ khác địa chỉ 0.",
         "amount": "Nhập số lượng lớn hơn 0.",
         "precision": "{decimals, plural, other {Dùng tối đa # chữ số thập phân.}}",
+        "grouping": "Không dùng dấu phân cách hàng nghìn: nhập 1000, không phải 1.000.",
         "insufficient": "Quỹ dự trữ có ít CST hơn số lượng này."
       }
     }

@@ -86,6 +86,7 @@
       "recipient": "接收地址",
       "amount": "數額",
       "amountHint": "小數可用小數點或逗號。",
+      "sends": "將轉出 {amount}",
       "submit": "轉出 CST",
       "reserveHeading": "推廣儲備",
       "reserve": "儲備地址",
@@ -98,6 +99,7 @@
         "recipient": "請輸入有效地址，零地址除外。",
         "amount": "請輸入大於零的數額。",
         "precision": "{decimals, plural, other {最多使用 # 位小數。}}",
+        "grouping": "請勿使用千位分隔符：輸入 1000，而非 1,000。",
         "insufficient": "推廣儲備的 CST 少於此數額。"
       }
     }
