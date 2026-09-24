@@ -153,7 +153,7 @@
       "mixed": "A compact receipt for the community-attached assets that travel with the Signature Allocation. The Final Gesture participant receives {nftCount, plural, one {the attached NFT} other {all {nftCount} attached NFTs}} and {erc20Count, plural, one {the attached ERC-20 token deposit} other {all {erc20Count} attached ERC-20 token deposits}} when Cycle #{cycle} finalizes."
     },
     "bonusReceipt": {
-      "label": "Bonus Receipt",
+      "label": "Bonus receipt",
       "nftOnly": "{nftCount, plural, one {{nftCount} ERC-721 token} other {{nftCount} ERC-721 tokens}}",
       "erc20Only": "{erc20Count, plural, one {{erc20Count} ERC-20 deposit} other {{erc20Count} ERC-20 deposits}}",
       "mixed": "{nftCount, plural, one {{nftCount} ERC-721 token} other {{nftCount} ERC-721 tokens}} + {erc20Count, plural, one {{erc20Count} ERC-20 deposit} other {{erc20Count} ERC-20 deposits}}"
