@@ -69,9 +69,9 @@ beforeEach(() => {
 describe('AnchoringPanel', () => {
   it('renders the anchoring snapshot stats from the dashboard', () => {
     render(<AnchoringPanel />);
-    expect(screen.getByText('Cosmic Signature NFTs Anchored')).toBeInTheDocument();
+    expect(screen.getByText('Cosmic Signature NFTs anchored')).toBeInTheDocument();
     expect(screen.getAllByText('11').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText('Random Walk NFTs Anchored')).toBeInTheDocument();
+    expect(screen.getByText('Random Walk NFTs anchored')).toBeInTheDocument();
     expect(screen.getAllByText('26').length).toBeGreaterThanOrEqual(1);
   });
 
@@ -93,10 +93,11 @@ describe('AnchoringPanel', () => {
     );
     render(<AnchoringPanel />);
 
-    const card = screen.getByText('Active Anchor-holders').closest('div.border');
+    const card = screen.getByText('Active anchor-holders').closest('div.border');
     expect(card?.querySelector('.stat-card-value')).toHaveTextContent(/^3$/);
     // The per-kind counts below keep their own, per-kind label.
-    expect(screen.getByText('Active Cosmic Signature NFT Anchor-holders')).toBeInTheDocument();
+    // (The figure's label, and again as its term under Definitions.)
+    expect(screen.getAllByText('Active Cosmic Signature NFT anchor-holders')[0]).toBeVisible();
   });
 
   it('explains how the pool relates to unretrieved distributions', () => {

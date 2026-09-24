@@ -1,21 +1,20 @@
-// lexicon-allow-start: test ids mirror internal analytics component names
 import { render, screen, checkA11y } from '@/test-utils';
 
 import PerformancePanel from '../PerformancePanel';
 
-jest.mock('../../../../../../components/statistics/RoiLeaderboardSection', () => ({
-  RoiLeaderboardSection: () => <div data-testid="roi-leaderboard-section" />,
+jest.mock('../../../../../../components/statistics/ParticipantOutcomesSection', () => ({
+  ParticipantOutcomesSection: () => <div data-testid="participant-outcomes-section" />,
 }));
 jest.mock('../../../../../../components/statistics/ClaimsByRoundSection', () => ({
   ClaimsByRoundSection: () => <div data-testid="claims-by-round-section" />,
 }));
 
 describe('PerformancePanel', () => {
-  it('renders the leaderboard and claims sections with headings', () => {
+  it('renders the outcomes and retrievals sections under H2 headings', () => {
     render(<PerformancePanel />);
-    expect(screen.getByText('Participant Performance')).toBeInTheDocument();
-    expect(screen.getByTestId('roi-leaderboard-section')).toBeInTheDocument();
-    expect(screen.getByText('Allocation Retrievals by Cycle')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Spent and received' })).toBeVisible();
+    expect(screen.getByTestId('participant-outcomes-section')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Retrievals by cycle' })).toBeVisible();
     expect(screen.getByTestId('claims-by-round-section')).toBeInTheDocument();
   });
 
@@ -24,4 +23,3 @@ describe('PerformancePanel', () => {
     await checkA11y(container);
   });
 });
-// lexicon-allow-end

@@ -72,16 +72,9 @@ const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
   'components/nft/traits/ChaosMeter.tsx': 1,
   'components/nft/traits/NftTraitPanel.tsx': 1,
   'components/nft/traits/palette.ts': 2,
-  'components/statistics/BidTypeRatioChart.tsx': 1,
-  'components/statistics/RoiLeaderboardSection.tsx': 4,
-  'components/tokens/CSTTotalSupplyHistoryByBidChart.tsx': 1,
-  'components/tokens/CSTTotalSupplyHistoryChart.tsx': 1,
   'components/tokens/CstTransferForm.tsx': 2,
-  'components/tokens/CTBalanceDistributionChart.tsx': 1,
   'components/tokens/MarketingCstRewardForm.tsx': 2,
   'components/ui/stat-card.tsx': 1,
-  'components/user-statistics/HeroStats.tsx': 3,
-  'components/user-statistics/StellarSelectionPerformance.tsx': 3,
   'components/winnings/StellarSelectionAllocationsTable.tsx': 1,
 };
 

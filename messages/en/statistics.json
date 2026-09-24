@@ -289,7 +289,7 @@
       "perNftTooltip": "Current ETH Anchor Distribution per anchored Cosmic Signature NFT: on-chain pool divided by the indexed total of anchored NFTs.",
       "perNftNoneAnchored": "No anchored Cosmic Signature NFTs indexed yet",
       "activeHoldersLabel": "Active anchor-holders",
-      "activeHoldersTooltip": "Distinct wallets that currently anchor at least one Cosmic Signature or RandomWalk NFT. A wallet anchoring both kinds counts once."
+      "activeHoldersTooltip": "Distinct wallets that currently anchor at least one Cosmic Signature or Random Walk NFT. A wallet anchoring both kinds counts once."
     },
     "description": "Anchored NFTs are a core part of Cosmic Signature: Cosmic Signature NFTs share ETH Anchor Distributions, while Random Walk NFTs participate in Anchored-NFT Stellar Selection.",
     "historyLink": "View anchor history",

@@ -1,6 +1,6 @@
 import userEvent from '@testing-library/user-event';
 
-import { render, screen, checkA11y } from '@/test-utils';
+import { render, screen, checkA11y, within } from '@/test-utils';
 
 import TokensPanel from '../TokensPanel';
 import { createDashboardInfo } from '../../test-support/statisticsTestFixtures';
@@ -8,6 +8,7 @@ import { createDashboardInfo } from '../../test-support/statisticsTestFixtures';
 const mockUseDashboardInfo = jest.fn();
 const mockUseCSTDistribution = jest.fn();
 const mockUseCTBalancesDistribution = jest.fn();
+const mockUseCTStatistics = jest.fn();
 const mockUseDonationsNFTList = jest.fn();
 const mockUseDonationsERC20ByRound = jest.fn();
 
@@ -15,6 +16,7 @@ jest.mock('../../../../../../hooks/useApiQuery', () => ({
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
   useCSTDistribution: (...args: unknown[]) => mockUseCSTDistribution(...args),
   useCTBalancesDistribution: (...args: unknown[]) => mockUseCTBalancesDistribution(...args),
+  useCTStatistics: (...args: unknown[]) => mockUseCTStatistics(...args),
   useDonationsNFTList: (...args: unknown[]) => mockUseDonationsNFTList(...args),
   useDonationsERC20ByRound: (...args: unknown[]) => mockUseDonationsERC20ByRound(...args),
 }));
@@ -24,14 +26,8 @@ jest.mock('../../../../../../components/tokens/CSTokenDistributionTable', () => 
     <div data-testid="cs-token-distribution-table">{list.length} holders</div>
   ),
 }));
-jest.mock('../../../../../../components/tokens/CTBalanceDistributionTable', () => ({
-  CTBalanceDistributionTable: () => <div data-testid="ct-balance-distribution-table" />,
-}));
-jest.mock('../../../../../../components/tokens/CTBalanceDistributionChart', () => ({
-  CTBalanceDistributionChart: () => <div data-testid="ct-balance-distribution-chart" />,
-}));
-jest.mock('../../../../../../components/tokens/CSTTotalSupplyHistorySection', () => ({
-  CSTTotalSupplyHistorySection: () => <div data-testid="cst-total-supply-history-section" />,
+jest.mock('../../../../../../components/statistics/CstSupplyHistory', () => ({
+  CstSupplyHistory: () => <div data-testid="cst-supply-history" />,
 }));
 jest.mock('../../../../../../components/attachments/AttachedNFTDistributionTable', () => ({
   __esModule: true,
@@ -72,23 +68,37 @@ beforeEach(() => {
       { OwnerAddr: '0x2', OwnerAid: '2', BalanceFloat: 10080.58 },
     ]),
   );
+  mockUseCTStatistics.mockReturnValue(okQuery({ TotalSupplyEth: 44352.66 }));
   mockUseDonationsNFTList.mockReturnValue(okQuery(nfts));
   mockUseDonationsERC20ByRound.mockReturnValue(okQuery([]));
 });
 
 describe('TokensPanel', () => {
-  it('renders holder stat cards from distribution data', () => {
-    render(<TokensPanel />);
-    expect(screen.getByText('Cosmic Signature NFT Holders')).toBeInTheDocument();
-    expect(screen.getByText('CST (ERC-20) Holders')).toBeInTheDocument();
-    expect(screen.getByText('2')).toBeInTheDocument();
-  });
-
-  it('renders distribution sections with data', () => {
+  it('renders the distribution sections with data', () => {
     render(<TokensPanel />);
     expect(screen.getByTestId('cs-token-distribution-table')).toHaveTextContent('1 holders');
-    expect(screen.getByTestId('ct-balance-distribution-chart')).toBeInTheDocument();
-    expect(screen.getByTestId('cst-total-supply-history-section')).toBeInTheDocument();
+    expect(screen.getByTestId('cst-supply-history')).toBeInTheDocument();
+  });
+
+  it('lists every CST holder once, with its share of the supply, and says how many there are', () => {
+    render(<TokensPanel />);
+    // (The jest intl mock leaves ICU plurals unformatted; the supply is interpolated.)
+    expect(
+      screen.getByText(/Shares are of the total supply, 44,352\.66 CST\.$/),
+    ).toBeInTheDocument();
+    const ledger = screen.getByRole('table', { name: 'CST (ERC-20) balance distribution' });
+    // Two holders, largest first; no second chart repeating the same wallets.
+    const rows = within(ledger).getAllByRole('row').slice(1);
+    expect(rows).toHaveLength(2);
+    expect(rows[0]).toHaveTextContent('27.3%');
+    expect(rows[1]).toHaveTextContent('22.7%');
+  });
+
+  it('drops the share sentence to the holder count when the supply cannot be read', () => {
+    mockUseCTStatistics.mockReturnValue({ ...okQuery(undefined), isError: true });
+    render(<TokensPanel />);
+    expect(screen.getByText(/CST, largest balance first\.$/)).toBeInTheDocument();
+    expect(screen.queryByText(/Shares are of the total supply/)).not.toBeInTheDocument();
   });
 
   it('shows an error state with retry when a distribution query fails', async () => {
@@ -118,11 +128,11 @@ describe('TokensPanel', () => {
     it('filters to the current cycle when the scope toggle is used', async () => {
       const user = userEvent.setup();
       render(<TokensPanel />);
-      await user.click(screen.getByRole('button', { name: 'Current cycle' }));
+      await user.click(screen.getByRole('radio', { name: 'Current cycle' }));
       // Fixture dashboard has CurRoundNum 3; two of the three NFTs are from round 3.
       expect(screen.getAllByTestId('attached-nft-card')).toHaveLength(2);
-      expect(screen.getByRole('button', { name: 'Current cycle' })).toHaveAttribute(
-        'aria-pressed',
+      expect(screen.getByRole('radio', { name: 'Current cycle' })).toHaveAttribute(
+        'aria-checked',
         'true',
       );
     });
@@ -133,7 +143,7 @@ describe('TokensPanel', () => {
         okQuery([{ RecordId: 1, RoundNum: 1, DonorAddr: '0xd1', TokenAddr: '0xt1', TokenId: 1 }]),
       );
       render(<TokensPanel />);
-      await user.click(screen.getByRole('button', { name: 'Current cycle' }));
+      await user.click(screen.getByRole('radio', { name: 'Current cycle' }));
       expect(screen.getByText('No NFTs attached this cycle')).toBeInTheDocument();
     });
 
