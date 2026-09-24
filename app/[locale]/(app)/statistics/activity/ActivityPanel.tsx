@@ -8,6 +8,7 @@ import { Link } from '@/i18n/navigation';
 import { useDashboardInfo, useSystemModelist } from '@/hooks/useApiQuery';
 import { StatsSection } from '@/components/statistics/StatsSection';
 import { SectionShell } from '@/components/statistics/SectionShell';
+import { SkeletonChart } from '@/components/ui/skeleton';
 import { CycleScopeControl } from '@/components/statistics/CycleScopeControl';
 import { useCycleScope } from '@/components/statistics/useCycleScope';
 import { BidFrequencyChart } from '@/components/statistics/BidFrequencyChart';
@@ -23,13 +24,18 @@ import { SystemModesTable, type EventRow } from '@/components/tables/SystemModes
  * Gesture activity: frequency, spikes and the most active participants over
  * all time, then one cycle's story (method mix, lead history, Calibration
  * Window, CST cost) under the page's one cycle picker, kept in `?cycle=`,
- * and the cycle activations log.
+ * and the cycle activations log. The cycle charts mount only once the
+ * dashboard names the live cycle: until then the section shows a chart
+ * skeleton, and a failed read shows an error with a retry, never a chart's
+ * "not started" or "select a cycle" state for a cycle that is live.
  */
 const ActivityPanel = () => {
   const t = useTranslations('statistics');
-  const { data: dashboardData } = useDashboardInfo(undefined, { poll: false });
+  const dashboardQuery = useDashboardInfo(undefined, { poll: false });
   const systemModesQuery = useSystemModelist();
-  const scope = useCycleScope(dashboardData?.CurRoundNum ?? -1);
+  const liveCycle = dashboardQuery.data?.CurRoundNum ?? -1;
+  const scope = useCycleScope(liveCycle);
+  const cycleKnown = liveCycle >= 0;
   const systemModeChanges = (systemModesQuery.data ?? []) as EventRow[];
   const title = (key: string) => t(`activity.sections.${key}`);
 
@@ -50,11 +56,15 @@ const ActivityPanel = () => {
         <BidderActivePeriodsTimeline label={title('activePeriods')} />
       </StatsSection>
 
-      <SectionShell
+      <StatsSection
         id="cycle"
         title={title('cycleTimelines')}
         description={t('activity.cycleTimelinesDescription')}
         actions={<CycleScopeControl scope={scope} />}
+        isLoading={!cycleKnown && !dashboardQuery.isError}
+        isError={!cycleKnown && dashboardQuery.isError}
+        onRetry={() => dashboardQuery.refetch()}
+        skeleton={<SkeletonChart />}
       >
         <div className="space-y-12">
           <SectionShell
@@ -114,7 +124,7 @@ const ActivityPanel = () => {
             <CstGestureCostChart round={scope.cycle} label={title('cstCost')} />
           </SectionShell>
         </div>
-      </SectionShell>
+      </StatsSection>
 
       <StatsSection
         title={title('cycleActivations')}

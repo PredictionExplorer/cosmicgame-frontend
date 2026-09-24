@@ -158,6 +158,57 @@ describe('ActivityPanel', () => {
     expect(refetch).toHaveBeenCalled();
   });
 
+  it('holds the cycle section on a chart skeleton while the dashboard loads', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      isError: false,
+      refetch: jest.fn(),
+    });
+    render(<ActivityPanel />);
+    const section = screen
+      .getByRole('heading', { name: 'One cycle in detail' })
+      .closest('section')!;
+    expect(section).toHaveAttribute('aria-busy', 'true');
+    expect(within(section).getByRole('status')).toBeInTheDocument();
+    // No chart claims a state for a cycle it does not know yet.
+    for (const id of CYCLE_CHARTS) expect(screen.queryByTestId(id)).not.toBeInTheDocument();
+    expect(screen.queryByText(/hasn.t started yet/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/select a cycle/i)).not.toBeInTheDocument();
+    // The all-time charts do not wait for the dashboard.
+    expect(screen.getByTestId('gesture-frequency-chart')).toBeInTheDocument();
+  });
+
+  it('shows an error with a retry, not a chart state, when the dashboard read fails', async () => {
+    const user = userEvent.setup();
+    const refetch = jest.fn();
+    mockUseDashboardInfo.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      refetch,
+    });
+    render(<ActivityPanel />);
+    const section = screen
+      .getByRole('heading', { name: 'One cycle in detail' })
+      .closest('section')!;
+    expect(within(section).getByText(/failed to load one cycle in detail/i)).toBeInTheDocument();
+    for (const id of CYCLE_CHARTS) expect(screen.queryByTestId(id)).not.toBeInTheDocument();
+    expect(within(section).queryByRole('combobox')).not.toBeInTheDocument();
+
+    await user.click(within(section).getByRole('button', { name: /try again/i }));
+    expect(refetch).toHaveBeenCalled();
+  });
+
+  it('keeps the cycle charts when a later dashboard read fails', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      ...okQuery(createDashboardInfo()),
+      isError: true,
+    });
+    render(<ActivityPanel />);
+    for (const id of CYCLE_CHARTS) expect(screen.getByTestId(id)).toHaveTextContent(/^3/);
+  });
+
   it('requests the dashboard without polling', () => {
     render(<ActivityPanel />);
     expect(mockUseDashboardInfo).toHaveBeenCalledWith(undefined, { poll: false });
