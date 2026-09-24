@@ -1,30 +1,29 @@
 {
   "page": {
-    "title": "ETH 貢獻",
-    "subtitle": "直接向 Cosmic Signature 週期儲備貢獻 ETH",
-    "description": "無需落筆，也可直接向 Cosmic Signature 週期儲備貢獻 ETH。貢獻時可附上標題、留言和網址；每個週期貢獻額較高的參與者可能會展示在主頁。",
-    "formTitle": "貢獻 ETH",
-    "amountLabel": "金額（ETH）",
-    "informationLabel": "附加資訊",
-    "optionalJson": "（可選，JSON）",
-    "informationPlaceholder": "'{'\"name\": \"你的名稱\", \"message\": \"留言\"'}'",
-    "contribute": "貢獻",
-    "contributeWithInfo": "附帶資訊並貢獻",
-    "historyTitle": "貢獻記錄"
+    "historyTitle": "貢獻記錄",
+    "historyEmpty": "透過表格完成的貢獻會顯示在這裏，附帶的留言也會一併顯示。",
+    "historyError": "無法載入貢獻記錄。",
+    "jumpToForm": "貢獻 ETH"
   },
   "form": {
-    "defaultTitle": "貢獻 ETH",
-    "defaultDescription": "合約會將貢獻記入目前週期。",
-    "amountLabel": "金額（ETH）",
     "optional": "（可選）",
     "titleLabel": "標題",
     "titlePlaceholder": "貢獻標題",
     "urlLabel": "網址",
     "messageLabel": "留言",
     "messagePlaceholder": "可為這筆貢獻附上一段留言",
-    "contributeWithMessage": "附言並貢獻",
     "contributeEth": "貢獻 ETH",
-    "structuredHelp": "可選字段會以結構化 JSON 保存，並顯示在貢獻詳情頁。"
+    "title": "貢獻 ETH",
+    "description": "無需落筆，ETH 會直接進入當前週期的週期儲備。貢獻一經發送便無法撤回。",
+    "amountHint": "任意大於 0 的數量，從 {network} 上的錢包發送。",
+    "connectHint": "連接 {network} 上的錢包即可貢獻。",
+    "noteSummary": "附上公開留言",
+    "noteAdded": "已填寫",
+    "noteHint": "留言會隨貢獻一起記錄在鏈上，並顯示在其公開記錄頁。",
+    "urlError": "請填寫以 https:// 或 http:// 開頭的完整連結。",
+    "summary": "{amount} 將進入第 {cycle} 個週期的週期儲備。",
+    "summaryNoCycle": "{amount} 將進入週期儲備。",
+    "submitAmount": "貢獻 {amount}"
   },
   "detail": {
     "invalidId": "貢獻 ID 無效",

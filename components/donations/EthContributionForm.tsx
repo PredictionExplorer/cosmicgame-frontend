@@ -1,43 +1,43 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { useTranslations } from 'next-intl';
-import { parseEther } from 'viem';
-import { usePublicClient } from 'wagmi';
+import { useId, useRef, useState, type FormEvent } from 'react';
+import { ChevronDown } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
+import type { Address } from 'viem';
+import { useBalance, useConnection } from 'wagmi';
 
-import { useNotification } from '@/contexts/NotificationContext';
-import { useWalletUi } from '@/contexts/WalletUiContext';
-import { useActiveWeb3React } from '@/hooks/web3';
-import useCosmicGameContract from '@/hooks/useCosmicGameContract';
+import { cosmicGameAbi } from '@/contracts/generated';
+
+import { activeChain } from '@/config/chains';
+import { useContractAddresses } from '@/contexts/ContractAddressesContext';
+import { useDashboardInfo } from '@/hooks/useApiQuery';
+import { useNotify } from '@/hooks/useNotify';
+import { useTxFlow, useTxStageLabel } from '@/hooks/useTxFlow';
+import { REQUIRED_CHAIN_NAME } from '@/lib/chainGuard';
 import { cn } from '@/lib/utils';
-import { asWriteFn } from '@/utils/contractWrite';
-import { isUserRejection, reportError } from '@/utils/errors';
-import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
+import { decimalMarkFor, formatAmount } from '@/utils/format';
+import { AmountField } from '@/components/tokens/transfer/AmountField';
+import { parseTokenAmount } from '@/components/tokens/transfer/amount';
 import { Button } from '@/components/ui/button';
+import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { MessageTextarea } from '@/components/ui/message-textarea';
-import { Surface } from '@/components/ui/surface';
+import { TxStatus } from '@/components/ui/tx-status';
+import { ChainGuard } from '@/components/wallet/NetworkGuard';
 
-interface EthContributionFormProps {
-  className?: string;
-  description?: string;
-  onSuccess?: () => void | Promise<unknown>;
-  title?: string;
+/** The optional public note a contribution can carry, as the record page reads it. */
+export interface ContributionNote {
+  title: string;
+  message: string;
+  url: string;
 }
 
-function hasValidAmount(value: string) {
-  const trimmed = value.trim();
-  if (!trimmed) return false;
-  if (!/^\d+(\.\d+)?$/.test(trimmed)) return false;
-  const numericValue = Number(trimmed);
-  return Number.isFinite(numericValue) && numericValue > 0;
-}
+const EMPTY_NOTE: ContributionNote = { title: '', message: '', url: '' };
 
-function hasValidUrl(value: string) {
+/** True for an empty link or a full http(s) URL: the only links a note may carry. */
+export function isNoteUrl(value: string): boolean {
   const trimmed = value.trim();
   if (!trimmed) return true;
-
   try {
     const url = new URL(trimmed);
     return url.protocol === 'http:' || url.protocol === 'https:';
@@ -46,243 +46,244 @@ function hasValidUrl(value: string) {
   }
 }
 
-export function EthContributionForm({
-  className,
-  description,
-  onSuccess,
-  title,
-}: EthContributionFormProps) {
-  const t = useTranslations('ethContribution');
+/**
+ * The note as the JSON `donateEthWithInfo` stores, with empty fields left
+ * out; `null` when the note is empty, so the plain `donateEth` is used.
+ */
+export function contributionPayload(note: ContributionNote): string | null {
+  const entries = Object.entries(note)
+    .map(([key, value]) => [key, value.trim()] as const)
+    .filter(([, value]) => value.length > 0);
+  return entries.length > 0 ? JSON.stringify(Object.fromEntries(entries)) : null;
+}
+
+interface EthContributionFormProps {
+  /** Anchor id, so a header action can jump to the form on phones. */
+  id?: string;
+  /** Runs once a contribution confirms (refresh the history). */
+  onSuccess?: () => void | Promise<unknown>;
+  className?: string;
+}
+
+/**
+ * Contribute ETH to the Cycle Reserve, open to every visitor: the amount (with
+ * the wallet's balance once connected), an optional public note — title,
+ * message and link, stored as JSON the record page reads — and one commit
+ * button that names the amount. Without a wallet the button connects one; on
+ * the wrong network it switches. The write runs through `useTxFlow`, and the
+ * plain `donateEth` is used when there is no note.
+ */
+export function EthContributionForm({ id, onSuccess, className }: EthContributionFormProps) {
+  const t = useTranslations('ethContribution.form');
   const tToast = useTranslations('toasts');
-  const tWallet = useTranslations('wallet');
-  const resolvedDescription = description ?? t('form.defaultDescription');
-  const resolvedTitle = title ?? t('form.defaultTitle');
-  const [amount, setAmount] = useState('');
-  const [metadataTitle, setMetadataTitle] = useState('');
-  const [message, setMessage] = useState('');
-  const [url, setUrl] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const locale = useLocale();
+  const titleId = useId();
+  const { address } = useConnection();
+  const { cosmicGame } = useContractAddresses();
+  const { data: dashboard } = useDashboardInfo(undefined, { poll: false });
+  const { notify } = useNotify();
+  const { run, stage, isBusy } = useTxFlow();
+  const stageLabel = useTxStageLabel();
+  const { data: balance } = useBalance({
+    address,
+    chainId: activeChain.id,
+    query: { enabled: Boolean(address) },
+  });
 
-  const { account } = useActiveWeb3React();
-  const { requestConnectModal, warmConnectModal } = useWalletUi();
-  const cosmicGameContract = useCosmicGameContract();
-  const publicClient = usePublicClient();
-  const { setNotification } = useNotification();
+  const [amountText, setAmountText] = useState('');
+  const [amountTouched, setAmountTouched] = useState(false);
+  const [note, setNote] = useState<ContributionNote>(EMPTY_NOTE);
+  const [urlTouched, setUrlTouched] = useState(false);
+  const [noteOpen, setNoteOpen] = useState(false);
+  const amountRef = useRef<HTMLInputElement>(null);
+  const urlRef = useRef<HTMLInputElement>(null);
 
-  const amountIsValid = useMemo(() => hasValidAmount(amount), [amount]);
-  const urlIsValid = useMemo(() => hasValidUrl(url), [url]);
-  const hasMetadata = [metadataTitle, message, url].some((value) => value.trim().length > 0);
-  const canSubmit =
-    !!account && !!cosmicGameContract && amountIsValid && urlIsValid && !isSubmitting;
+  const amount = parseTokenAmount(amountText, {
+    max: balance?.value ?? null,
+    decimalMark: decimalMarkFor(locale) === ',' ? ',' : '.',
+  });
+  const urlValid = isNoteUrl(note.url);
+  const sendable = amount.error === null ? amount.wei : null;
+  const amountLabel =
+    sendable !== null ? formatAmount(sendable, { unit: 'ETH', locale, context: 'exact' }) : null;
+  const cycle = dashboard?.CurRoundNum;
 
-  const handleSubmit = async () => {
-    if (!account) {
-      setNotification({
-        text: tToast('contribution.connectWallet'),
-        type: 'error',
-        visible: true,
-      });
+  const updateNote = (field: keyof ContributionNote, value: string) =>
+    setNote((current) => ({ ...current, [field]: value }));
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setAmountTouched(true);
+    setUrlTouched(true);
+    if (sendable === null) {
+      amountRef.current?.focus();
+      return;
+    }
+    if (!urlValid) {
+      setNoteOpen(true);
+      urlRef.current?.focus();
       return;
     }
 
-    if (!amountIsValid) {
-      setNotification({
-        text: tToast('contribution.invalidAmount'),
-        type: 'error',
-        visible: true,
-      });
-      return;
-    }
-
-    if (!urlIsValid) {
-      setNotification({
-        text: tToast('contribution.invalidUrl'),
-        type: 'error',
-        visible: true,
-      });
-      return;
-    }
-
-    if (!cosmicGameContract) {
-      setNotification({
-        text: tToast('contribution.contractUnavailable'),
-        type: 'error',
-        visible: true,
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const value = parseEther(amount.trim());
-      let hash: `0x${string}`;
-
-      if (hasMetadata) {
-        const payload = JSON.stringify({
-          title: metadataTitle.trim(),
-          message: message.trim(),
-          url: url.trim(),
-        });
-        hash = await asWriteFn(cosmicGameContract.write.donateEthWithInfo)([payload], { value });
-      } else {
-        hash = await asWriteFn(cosmicGameContract.write.donateEth)([], { value });
-      }
-      const receipt = await publicClient?.waitForTransactionReceipt({ hash });
-      assertSuccessfulTransactionReceipt(receipt);
-
-      setNotification({
-        text: tToast(
-          hasMetadata ? 'contribution.formSubmittedWithInfo' : 'contribution.formSubmitted',
-          {
-            amount: amount.trim(),
-          },
-        ),
-        type: 'success',
-        visible: true,
-      });
-      setAmount('');
-      setMetadataTitle('');
-      setMessage('');
-      setUrl('');
-      await onSuccess?.();
-    } catch (error: unknown) {
-      if (isUserRejection(error)) {
-        setNotification({
-          text: tToast('walletTransactionCancelled'),
-          type: 'info',
-          visible: true,
-        });
-      } else {
-        reportError(error, 'ETH contribution error');
-        setNotification({
-          text: tToast('contribution.formFailed'),
-          type: 'error',
-          visible: true,
-        });
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
+    const payload = contributionPayload(note);
+    const value = sendable;
+    const shown = formatAmount(value, { unit: 'ETH', locale, context: 'exact', withUnit: false });
+    await run({
+      prepare: async () => {
+        if (cosmicGame) return true;
+        notify('error', tToast('contribution.contractUnavailable'));
+        return false;
+      },
+      // Explicit generics: inference through `TxWriteRequest` loses the
+      // function name, and with it the payable `value`.
+      write: (ctx) =>
+        payload
+          ? ctx.writeContract<typeof cosmicGameAbi, 'donateEthWithInfo', [string]>({
+              address: cosmicGame as Address,
+              abi: cosmicGameAbi,
+              functionName: 'donateEthWithInfo',
+              args: [payload],
+              value,
+            })
+          : ctx.writeContract<typeof cosmicGameAbi, 'donateEth', []>({
+              address: cosmicGame as Address,
+              abi: cosmicGameAbi,
+              functionName: 'donateEth',
+              value,
+            }),
+      successMessage: tToast(
+        payload ? 'contribution.formSubmittedWithInfo' : 'contribution.formSubmitted',
+        { amount: shown },
+      ),
+      failureMessage: tToast('contribution.formFailed'),
+      errorContext: 'eth-contribution',
+      onConfirmed: async () => {
+        setAmountText('');
+        setAmountTouched(false);
+        setNote(EMPTY_NOTE);
+        setUrlTouched(false);
+        setNoteOpen(false);
+        await onSuccess?.();
+      },
+    });
   };
 
+  const noteFilled = contributionPayload(note) !== null;
+  const busyLabel = isBusy ? stageLabel(stage) : null;
+
   return (
-    <Surface variant="solar" radius="xl" padding="lg" className={cn('mb-12 space-y-5', className)}>
-      <div className="space-y-2">
-        <h3 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
-          {resolvedTitle}
-        </h3>
-        <p className="type-body-sm text-muted-foreground">{resolvedDescription}</p>
-      </div>
+    <section
+      id={id}
+      aria-labelledby={titleId}
+      className={cn(
+        'scroll-mt-[var(--sticky-offset)] rounded-surface bg-surface p-5 sm:p-6',
+        className,
+      )}
+    >
+      <h2 id={titleId} className="type-heading-3 text-foreground">
+        {t('title')}
+      </h2>
+      <p className="mt-1.5 type-body-sm text-muted-foreground">{t('description')}</p>
 
-      {!account ? (
-        <div className="flex flex-col gap-3 rounded-lg border border-white/[0.08] bg-black/20 p-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-muted-foreground">
-            {tToast('contribution.connectWalletInline')}
-          </p>
-          <div className="sm:shrink-0">
-            <Button
-              onClick={requestConnectModal}
-              onPointerEnter={warmConnectModal}
-              onFocus={warmConnectModal}
-              data-testid="connect-wallet-button"
-            >
-              {tWallet('connect.button')}
-            </Button>
-          </div>
-        </div>
-      ) : null}
+      <form noValidate onSubmit={handleSubmit} className="mt-6 flex flex-col gap-6">
+        <AmountField
+          inputRef={amountRef}
+          value={amountText}
+          onChange={setAmountText}
+          onBlur={() => setAmountTouched(true)}
+          error={amountTouched ? amount.error : null}
+          unit="ETH"
+          available={address ? (balance?.value ?? null) : undefined}
+          hint={address ? undefined : t('amountHint', { network: REQUIRED_CHAIN_NAME })}
+          disabled={isBusy}
+        />
 
-      <div className="grid gap-4 lg:grid-cols-[220px_1fr]">
-        <div>
-          <Label
-            htmlFor="eth-contribution-amount"
-            className="mb-1.5 block text-xs text-muted-foreground"
-          >
-            {t('form.amountLabel')}
-          </Label>
-          <div className="flex items-center gap-2">
-            <Input
-              id="eth-contribution-amount"
-              inputMode="decimal"
-              placeholder="0.0"
-              value={amount}
-              onChange={(event) => setAmount(event.target.value)}
-              aria-invalid={amount.length > 0 && !amountIsValid}
+        <details
+          open={noteOpen}
+          onToggle={(event) => setNoteOpen(event.currentTarget.open)}
+          className="group border-t border-rule-faint pt-4"
+        >
+          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-control type-label text-foreground sm:min-h-8 [&::-webkit-details-marker]:hidden">
+            <span>
+              {t('noteSummary')}
+              <span className="ms-1.5 font-normal text-subtle">
+                {noteFilled && !noteOpen ? t('noteAdded') : t('optional')}
+              </span>
+            </span>
+            <ChevronDown
+              aria-hidden
+              className="size-4 shrink-0 text-subtle transition-transform duration-fast group-open:rotate-180"
             />
-            <span className="text-sm text-muted-foreground">ETH</span>
+          </summary>
+          <div className="mt-3 flex flex-col gap-5">
+            <p className="type-caption text-subtle">{t('noteHint')}</p>
+            <FormField label={t('titleLabel')}>
+              {(control) => (
+                <Input
+                  {...control}
+                  value={note.title}
+                  onChange={(event) => updateNote('title', event.target.value)}
+                  placeholder={t('titlePlaceholder')}
+                  maxLength={120}
+                  autoComplete="off"
+                  disabled={isBusy}
+                />
+              )}
+            </FormField>
+            <FormField label={t('messageLabel')}>
+              {(control) => (
+                <MessageTextarea
+                  {...control}
+                  value={note.message}
+                  onChange={(event) => updateNote('message', event.target.value)}
+                  placeholder={t('messagePlaceholder')}
+                  rows={3}
+                  disabled={isBusy}
+                />
+              )}
+            </FormField>
+            <FormField label={t('urlLabel')} error={urlTouched && !urlValid ? t('urlError') : null}>
+              {(control) => (
+                <Input
+                  {...control}
+                  ref={urlRef}
+                  type="url"
+                  inputMode="url"
+                  value={note.url}
+                  onChange={(event) => updateNote('url', event.target.value)}
+                  onBlur={() => setUrlTouched(true)}
+                  placeholder="https://"
+                  autoComplete="off"
+                  spellCheck={false}
+                  disabled={isBusy}
+                />
+              )}
+            </FormField>
           </div>
-          {amount.length > 0 && !amountIsValid ? (
-            <p className="mt-1.5 text-xs text-destructive">
-              {tToast('contribution.invalidAmount')}
+        </details>
+
+        <div className="flex flex-col gap-3 border-t border-rule-faint pt-5">
+          {amountLabel ? (
+            <p className="type-body-sm text-muted-foreground">
+              {cycle != null
+                ? t('summary', { amount: amountLabel, cycle })
+                : t('summaryNoCycle', { amount: amountLabel })}
             </p>
           ) : null}
+          {!address ? (
+            <p className="type-body-sm text-muted-foreground">
+              {t('connectHint', { network: REQUIRED_CHAIN_NAME })}
+            </p>
+          ) : null}
+          <ChainGuard requireConnection buttonClassName="w-full">
+            <Button type="submit" variant="commit" size="lg" loading={isBusy} className="w-full">
+              {busyLabel ??
+                (amountLabel ? t('submitAmount', { amount: amountLabel }) : t('contributeEth'))}
+            </Button>
+          </ChainGuard>
+          <TxStatus stage={stage} />
         </div>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <Label
-              htmlFor="eth-contribution-title"
-              className="mb-1.5 block text-xs text-muted-foreground"
-            >
-              {t('form.titleLabel')} <span className="opacity-50">{t('form.optional')}</span>
-            </Label>
-            <Input
-              id="eth-contribution-title"
-              placeholder={t('form.titlePlaceholder')}
-              value={metadataTitle}
-              onChange={(event) => setMetadataTitle(event.target.value)}
-            />
-          </div>
-          <div>
-            <Label
-              htmlFor="eth-contribution-url"
-              className="mb-1.5 block text-xs text-muted-foreground"
-            >
-              {t('form.urlLabel')} <span className="opacity-50">{t('form.optional')}</span>
-            </Label>
-            <Input
-              id="eth-contribution-url"
-              placeholder="https://example.com"
-              value={url}
-              onChange={(event) => setUrl(event.target.value)}
-              aria-invalid={!urlIsValid}
-            />
-            {!urlIsValid ? (
-              <p className="mt-1.5 text-xs text-destructive">
-                {tToast('contribution.invalidUrlInline')}
-              </p>
-            ) : null}
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <Label
-          htmlFor="eth-contribution-message"
-          className="mb-2 block text-sm font-semibold text-foreground"
-        >
-          {t('form.messageLabel')}{' '}
-          <span className="text-xs font-normal text-muted-foreground">{t('form.optional')}</span>
-        </Label>
-        <MessageTextarea
-          id="eth-contribution-message"
-          value={message}
-          rows={3}
-          placeholder={t('form.messagePlaceholder')}
-          onChange={(event) => setMessage(event.target.value)}
-        />
-      </div>
-
-      <div className="flex flex-col gap-2 pt-1 sm:flex-row sm:items-center">
-        <Button disabled={!canSubmit} onClick={handleSubmit}>
-          {isSubmitting
-            ? tToast('contribution.submitting')
-            : hasMetadata
-              ? t('form.contributeWithMessage')
-              : t('form.contributeEth')}
-        </Button>
-        <p className="text-xs text-muted-foreground">{t('form.structuredHelp')}</p>
-      </div>
-    </Surface>
+      </form>
+    </section>
   );
 }

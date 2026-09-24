@@ -1,30 +1,29 @@
 {
   "page": {
-    "title": "ETH 贡献",
-    "subtitle": "直接向 Cosmic Signature 周期储备贡献 ETH",
-    "description": "无需落笔，也可直接向 Cosmic Signature 周期储备贡献 ETH。贡献时可附上标题、留言和网址；每个周期贡献额较高的参与者可能会展示在首页。",
-    "formTitle": "贡献 ETH",
-    "amountLabel": "金额（ETH）",
-    "informationLabel": "附加信息",
-    "optionalJson": "（可选，JSON）",
-    "informationPlaceholder": "'{'\"name\": \"你的名称\", \"message\": \"留言\"'}'",
-    "contribute": "贡献",
-    "contributeWithInfo": "附带信息并贡献",
-    "historyTitle": "贡献记录"
+    "historyTitle": "贡献记录",
+    "historyEmpty": "通过表单完成的贡献会显示在这里，附带的留言也会一并显示。",
+    "historyError": "无法加载贡献记录。",
+    "jumpToForm": "贡献 ETH"
   },
   "form": {
-    "defaultTitle": "贡献 ETH",
-    "defaultDescription": "合约会将贡献记入当前周期。",
-    "amountLabel": "金额（ETH）",
     "optional": "（可选）",
     "titleLabel": "标题",
     "titlePlaceholder": "贡献标题",
     "urlLabel": "网址",
     "messageLabel": "留言",
     "messagePlaceholder": "可为这笔贡献附上一段留言",
-    "contributeWithMessage": "附言并贡献",
     "contributeEth": "贡献 ETH",
-    "structuredHelp": "可选字段会以结构化 JSON 保存，并显示在贡献详情页。"
+    "title": "贡献 ETH",
+    "description": "无需落笔，ETH 会直接进入当前周期的周期储备。贡献一经发送便无法撤回。",
+    "amountHint": "任意大于 0 的数量，从 {network} 上的钱包发送。",
+    "connectHint": "连接 {network} 上的钱包即可贡献。",
+    "noteSummary": "附上公开留言",
+    "noteAdded": "已填写",
+    "noteHint": "留言会随贡献一起记录在链上，并显示在其公开记录页。",
+    "urlError": "请填写以 https:// 或 http:// 开头的完整链接。",
+    "summary": "{amount} 将进入第 {cycle} 个周期的周期储备。",
+    "summaryNoCycle": "{amount} 将进入周期储备。",
+    "submitAmount": "贡献 {amount}"
   },
   "detail": {
     "invalidId": "贡献 ID 无效",

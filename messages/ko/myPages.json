@@ -299,77 +299,49 @@
   "transferCst": {
     "page": {
       "title": "CST 전송",
-      "subtitle": "Cosmic Signature CST 토큰을 다른 주소로 보냅니다.",
-      "sourceLabel": "연결된 지갑",
-      "description": "연결된 지갑에서 CST를 전송합니다. 트랜잭션은 지갑에서 서명되어 CST 토큰 컨트랙트로 바로 전송됩니다."
+      "subtitle": "연결된 지갑의 CST를 {network}의 다른 주소로 보냅니다."
     },
     "form": {
-      "title": "CST 전송",
-      "sourceWallet": "보내는 지갑",
-      "defaultDescription": "연결된 지갑에서 원하는 주소로 CST를 보냅니다.",
-      "available": "보낼 수 있는 CST",
-      "balanceReadError": "이 지갑의 CST 잔액을 읽을 수 없습니다. 잠시 후 다시 시도해 주세요.",
-      "decimalsReadWarning": "CST 소수 자릿수를 읽을 수 없어 18자리로 간주합니다.",
-      "recipientAddress": "받는 주소",
-      "amount": "수량",
-      "sendAria": "CST 보내기",
-      "sending": "보내는 중…",
       "send": "CST 보내기",
-      "viewHistory": "CST 전송 내역 보기",
-      "confirmed": "전송이 확인되었습니다.",
-      "viewTransaction": "트랜잭션 보기"
+      "sendAmount": "{amount} 보내기"
+    },
+    "guide": {
+      "from": "보내는 지갑",
+      "history": "내 CST 전송 내역",
+      "title": "보내기 전에",
+      "final": "전송은 되돌릴 수 없습니다. 잘못된 주소로 보낸 CST는 되찾을 수 없습니다.",
+      "network": "{network}에서 토큰을 보관할 수 있는 주소로만 보내세요.",
+      "paste": "주소는 직접 입력하지 말고 받는 지갑에서 복사해 주세요."
     }
   },
   "nftTransfer": {
     "defaultDescription": "Cosmic Signature NFT를 하나 이상 선택해 다른 지갑 주소로 보냅니다.",
     "marketplacePrompt": "NFT를 판매하거나 구매하려면 마켓플레이스를 이용할 수 있습니다.",
     "marketplace": "NFT 구매 또는 판매",
-    "sourceWallet": "보내는 지갑",
-    "ownedNfts": "보유 NFT",
-    "selected": "선택됨",
-    "recipientAddress": "받는 주소",
     "empty": "이 지갑에는 Cosmic Signature NFT가 없습니다.",
     "pickerTitle": "전송할 NFT 선택",
     "pickerSummary": "전송 가능한 NFT {total}개 중 {selected}개 선택됨",
     "selectAll": "전송 가능한 NFT 모두 선택",
-    "selectPage": "현재 페이지 선택",
     "clear": "선택 해제",
     "listAria": "Cosmic Signature NFT 목록",
-    "selectAria": "NFT #{id} 선택",
-    "nftLabel": "NFT #{id}",
-    "tokenId": "토큰 ID",
-    "customName": "사용자 지정 이름",
+    "selectAria": "NFT {id} 선택",
     "noCustomName": "지정된 이름 없음",
-    "generationCycle": "생성 사이클",
     "cycle": "사이클 {cycle}",
     "cycleUnavailable": "사이클 데이터 없음",
-    "status": "상태",
     "statusLabels": {
       "anchored": "앵커링됨 · 전송 전 해제 필요",
-      "ownerChanged": "소유자 변경됨 · 전송 전 새로 고침 필요",
-      "selected": "선택됨",
-      "transferable": "전송 가능"
+      "ownerChanged": "소유자 변경됨 · 전송 전 새로 고침 필요"
     },
     "progress": {
       "transferred": "NFT {total}개 중 {completed}개 전송 완료",
-      "stopped": "NFT #{id}에서 전송이 중단되었습니다",
-      "current": "현재 NFT: #{id}"
+      "stopped": "{total}개 중 {completed}개를 보낸 뒤 NFT {id}에서 멈췄습니다. 보내지 않은 NFT는 선택된 상태로 남아 있습니다."
     },
-    "confirmation": {
-      "latest": "최근 전송이 확인되었습니다.",
-      "multiple": "전송 {count}건이 확인되었습니다.",
-      "viewLatest": "최근 트랜잭션 보기"
-    },
-    "sendAria": "선택한 NFT 보내기",
-    "sending": "보내는 중…",
     "send": "선택한 NFT 보내기",
     "viewHistory": "NFT 전송 내역 보기",
-    "warning": {
-      "title": "받는 주소에 트랜잭션 기록이 없습니다",
-      "description": "이 주소에는 아직 트랜잭션이 없는 것으로 보입니다. NFT 전송은 되돌릴 수 없으니 보내기 전에 받는 주소를 다시 확인해 주세요.",
-      "cancel": "취소",
-      "continue": "전송 계속"
-    }
+    "review": {
+      "count": "{count, plural, other {NFT #개}}"
+    },
+    "sendCount": "{count, plural, other {NFT #개 보내기}}"
   },
   "transferHistory": {
     "loading": "불러오는 중…",

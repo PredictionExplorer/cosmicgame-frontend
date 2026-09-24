@@ -299,77 +299,49 @@
   "transferCst": {
     "page": {
       "title": "CSTの送付",
-      "subtitle": "Cosmic Signature CSTトークンを別のアドレスへ送ります。",
-      "sourceLabel": "接続中のウォレット",
-      "description": "接続中のウォレットからCSTを送付します。トランザクションはウォレットで署名され、CSTトークンコントラクトへ直接送られます。"
+      "subtitle": "接続中のウォレットから{network}上の別のアドレスへCSTを送ります。"
     },
     "form": {
-      "title": "CSTの送付",
-      "sourceWallet": "送付元ウォレット",
-      "defaultDescription": "接続中のウォレットから任意のアドレスへCSTを送ります。",
-      "available": "利用可能なCST",
-      "balanceReadError": "このウォレットのCST残高を読み取れませんでした。もう一度お試しください。",
-      "decimalsReadWarning": "CSTのdecimalsを読み取れないため、小数点以下18桁と仮定します。",
-      "recipientAddress": "送付先アドレス",
-      "amount": "数量",
-      "sendAria": "CSTを送る",
-      "sending": "送信中…",
       "send": "CSTを送る",
-      "viewHistory": "CST送付履歴を見る",
-      "confirmed": "送付が確認されました。",
-      "viewTransaction": "トランザクションを見る"
+      "sendAmount": "{amount}を送る"
+    },
+    "guide": {
+      "from": "送付元",
+      "history": "CSTの送付履歴",
+      "title": "送る前に",
+      "final": "送付は取り消せません。誤ったアドレスに送ったCSTは取り戻せません。",
+      "network": "{network}でトークンを保管できるアドレスにだけ送ってください。",
+      "paste": "アドレスは手入力せず、受け取るウォレットからコピーしてください。"
     }
   },
   "nftTransfer": {
     "defaultDescription": "Cosmic Signature NFTを1点以上選び、別のウォレットアドレスへ送ります。",
     "marketplacePrompt": "NFTを売買する場合は、マーケットプレイスで出品や購入ができます。",
     "marketplace": "NFTを売買する",
-    "sourceWallet": "送付元ウォレット",
-    "ownedNfts": "所有NFT",
-    "selected": "選択済み",
-    "recipientAddress": "送付先アドレス",
     "empty": "このウォレットにCosmic Signature NFTはありません。",
     "pickerTitle": "移転するNFTを選ぶ",
     "pickerSummary": "移転できる{total}点のうち{selected}点を選択中。",
     "selectAll": "移転できるものをすべて選択",
-    "selectPage": "このページを選択",
     "clear": "選択を解除",
     "listAria": "Cosmic Signature NFT",
-    "selectAria": "NFT #{id}を選択",
-    "nftLabel": "NFT #{id}",
-    "tokenId": "トークンID",
-    "customName": "カスタム名",
+    "selectAria": "NFT {id}を選択",
     "noCustomName": "カスタム名なし",
-    "generationCycle": "生成サイクル",
     "cycle": "サイクル{cycle}",
     "cycleUnavailable": "サイクルのデータを利用できません",
-    "status": "状態",
     "statusLabels": {
       "anchored": "係留中——移転する前に解除してください",
-      "ownerChanged": "所有者が変わりました——移転する前に再読み込みしてください",
-      "selected": "選択済み",
-      "transferable": "移転可能"
+      "ownerChanged": "所有者が変わりました——移転する前に再読み込みしてください"
     },
     "progress": {
       "transferred": "{total}点のうち{completed}点のNFTを移転しました",
-      "stopped": "NFT #{id}で移転が止まりました",
-      "current": "現在のNFT：#{id}"
+      "stopped": "{total}点のうち{completed}点を送ったところで、NFT {id}で止まりました。未送付のNFTは選択されたままです。"
     },
-    "confirmation": {
-      "latest": "最新の移転が確認されました。",
-      "multiple": "{count}件の移転が確認されました。",
-      "viewLatest": "最新のトランザクションを見る"
-    },
-    "sendAria": "選択したNFTを送る",
-    "sending": "送信中…",
     "send": "選択したNFTを送る",
     "viewHistory": "NFT移転履歴を見る",
-    "warning": {
-      "title": "送付先にトランザクション履歴がありません",
-      "description": "このアドレスにはまだトランザクションがないようです。送る前に送付先をもう一度確認してください。NFTの移転は取り消せません。",
-      "cancel": "キャンセル",
-      "continue": "移転を続ける"
-    }
+    "review": {
+      "count": "{count, plural, other {NFT #点}}"
+    },
+    "sendCount": "{count, plural, other {NFT #点を送る}}"
   },
   "transferHistory": {
     "loading": "読み込み中…",

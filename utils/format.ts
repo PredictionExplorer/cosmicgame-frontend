@@ -27,6 +27,7 @@ import { UNAVAILABLE_VALUE, formatAmount, formatNumber, type AmountUnit } from '
 export {
   NBSP,
   UNAVAILABLE_VALUE,
+  decimalMarkFor,
   formatAmount,
   formatAmountParts,
   formatCount,

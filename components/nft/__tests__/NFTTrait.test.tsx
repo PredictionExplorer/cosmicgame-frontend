@@ -64,8 +64,14 @@ jest.mock('../../../hooks/web3', () => ({
 }));
 
 const mockWaitForTransactionReceipt = jest.fn();
+const mockGetTransactionCount = jest.fn();
+const mockGetCode = jest.fn();
 jest.mock('wagmi', () => ({
-  usePublicClient: () => ({ waitForTransactionReceipt: mockWaitForTransactionReceipt }),
+  usePublicClient: () => ({
+    waitForTransactionReceipt: mockWaitForTransactionReceipt,
+    getTransactionCount: mockGetTransactionCount,
+    getCode: mockGetCode,
+  }),
 }));
 
 const mockEnsureCorrectChain = jest.fn<Promise<boolean>, []>();
@@ -178,10 +184,8 @@ beforeEach(() => {
   mockTransferFrom.mockResolvedValue('0xtransfer');
   mockSetNftName.mockResolvedValue('0xname');
   mockWaitForTransactionReceipt.mockResolvedValue({ status: 'success' });
-  Object.defineProperty(window, 'ethereum', {
-    configurable: true,
-    value: { request: jest.fn().mockResolvedValue('0x1') },
-  });
+  mockGetTransactionCount.mockResolvedValue(1);
+  mockGetCode.mockResolvedValue(undefined);
 });
 
 const baseNft = {
@@ -673,7 +677,7 @@ describe('NFTTrait', () => {
   });
 
   describe('transaction failure feedback', () => {
-    it('tells the user when no injected wallet is available to check the recipient', async () => {
+    it('checks the recipient through the public client, so wallets without window.ethereum can transfer', async () => {
       Object.defineProperty(window, 'ethereum', { configurable: true, value: undefined });
       withDashboard();
       withNft();
@@ -682,22 +686,15 @@ describe('NFTTrait', () => {
       fireEvent.click(screen.getByRole('button', { name: 'Set recipient' }));
       fireEvent.click(screen.getByRole('button', { name: 'Transfer test NFT' }));
 
-      await waitFor(() =>
-        expect(mockSetNotification).toHaveBeenCalledWith({
-          text: 'toasts.wallet.notReady',
-          type: 'error',
-          visible: true,
-        }),
-      );
-      expect(mockTransferFrom).not.toHaveBeenCalled();
+      await waitFor(() => expect(mockTransferFrom).toHaveBeenCalledTimes(1));
+      expect(mockGetTransactionCount).toHaveBeenCalledWith({
+        address: '0x1111111111111111111111111111111111111111',
+      });
     });
 
     it('reports and surfaces a failed recipient pre-check instead of doing nothing', async () => {
       const checkError = new Error('eth_getTransactionCount failed');
-      Object.defineProperty(window, 'ethereum', {
-        configurable: true,
-        value: { request: jest.fn().mockRejectedValue(checkError) },
-      });
+      mockGetTransactionCount.mockRejectedValue(checkError);
       withDashboard();
       withNft();
       render(<NFTTrait tokenId={5} />);
@@ -713,6 +710,7 @@ describe('NFTTrait', () => {
         }),
       );
       expect(mockReportError).toHaveBeenCalledWith(checkError, 'check transfer destination');
+      expect(mockTransferFrom).not.toHaveBeenCalled();
     });
   });
 

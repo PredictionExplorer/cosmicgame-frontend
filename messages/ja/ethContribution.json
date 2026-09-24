@@ -1,30 +1,29 @@
 {
   "page": {
-    "title": "ETH拠出",
-    "subtitle": "サイクル準備金へETHを直接拠出する",
-    "description": "一筆を入れずに、Cosmic Signatureのサイクル準備金へETHを直接拠出できます。タイトル、メッセージ、URLも任意で添えられます。拠出は現在のサイクルに記録されます。",
-    "formTitle": "拠出する",
-    "amountLabel": "金額（ETH）",
-    "informationLabel": "情報",
-    "optionalJson": "（任意、JSON）",
-    "informationPlaceholder": "'{'\"name\": \"名前\", \"message\": \"…\"'}'",
-    "contribute": "拠出",
-    "contributeWithInfo": "情報を添えて拠出",
-    "historyTitle": "拠出履歴"
+    "historyTitle": "拠出履歴",
+    "historyEmpty": "フォームから行った拠出が、添えたメモとともにここに表示されます。",
+    "historyError": "拠出履歴を読み込めませんでした。",
+    "jumpToForm": "ETHを拠出する"
   },
   "form": {
-    "defaultTitle": "ETHを拠出する",
-    "defaultDescription": "拠出はコントラクトによって進行中のサイクルに記録されます。",
-    "amountLabel": "金額（ETH）",
     "optional": "（任意）",
     "titleLabel": "タイトル",
     "titlePlaceholder": "拠出のタイトル",
     "urlLabel": "URL",
     "messageLabel": "メッセージ",
     "messagePlaceholder": "拠出に添えるメモ（任意）",
-    "contributeWithMessage": "メッセージを添えて拠出",
     "contributeEth": "ETHを拠出",
-    "structuredHelp": "任意項目に入力した内容は、拠出の詳細ページに表示されます。"
+    "title": "ETHを拠出する",
+    "description": "一筆を入れずに、ETHは現在のサイクルのサイクル準備金へ直接入ります。拠出は取り消せません。",
+    "amountHint": "{network}のウォレットから、0より大きい任意の数量を送れます。",
+    "connectHint": "拠出するには、{network}のウォレットを接続してください。",
+    "noteSummary": "公開メモを添える",
+    "noteAdded": "入力済み",
+    "noteHint": "メモは拠出とともにオンチェーンに記録され、公開の記録ページに表示されます。",
+    "urlError": "https://またはhttp://で始まる完全なリンクを入力してください。",
+    "summary": "{amount}がサイクル{cycle}のサイクル準備金に入ります。",
+    "summaryNoCycle": "{amount}がサイクル準備金に入ります。",
+    "submitAmount": "{amount}を拠出する"
   },
   "detail": {
     "invalidId": "拠出IDが無効です",

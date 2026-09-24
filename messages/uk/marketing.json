@@ -79,12 +79,8 @@
     "title": "Надіслати винагороду CST",
     "description": "Переказ CST із резерву просування. Під’єднаний гаманець має належати поточному скарбнику.",
     "reserveLabel": "Резерв просування",
-    "availableLabel": "Доступно CST",
     "ownerLabel": "Власник",
     "treasurerLabel": "Скарбник",
-    "unavailable": "Недоступно",
-    "recipientLabel": "Адреса отримувача",
-    "amountLabel": "Сума",
     "historyLink": "Переглянути перекази резерву просування"
   }
 }

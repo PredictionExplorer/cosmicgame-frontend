@@ -1,30 +1,29 @@
 {
   "page": {
-    "title": "Đóng góp ETH",
-    "subtitle": "Đóng góp ETH trực tiếp vào dự trữ chu kỳ của Cosmic Signature",
-    "description": "Đóng góp ETH vào dự trữ chu kỳ của Cosmic Signature mà không đặt nét bút. Bạn có thể gửi kèm tiêu đề, lời nhắn và URL. Người đóng góp nhiều nhất mỗi chu kỳ có thể được giới thiệu trên trang chủ.",
-    "formTitle": "Đóng góp",
-    "amountLabel": "Số tiền (ETH)",
-    "informationLabel": "Thông tin",
-    "optionalJson": "(tùy chọn, JSON)",
-    "informationPlaceholder": "'{'\"name\": \"Tên của bạn\", \"message\": \"…\"'}'",
-    "contribute": "Đóng góp",
-    "contributeWithInfo": "Đóng góp kèm thông tin",
-    "historyTitle": "Lịch sử đóng góp"
+    "historyTitle": "Lịch sử đóng góp",
+    "historyEmpty": "Các khoản đóng góp gửi qua biểu mẫu sẽ hiện ở đây, kèm lời nhắn nếu có.",
+    "historyError": "Không tải được lịch sử đóng góp.",
+    "jumpToForm": "Đóng góp ETH"
   },
   "form": {
-    "defaultTitle": "Đóng góp ETH",
-    "defaultDescription": "Hợp đồng ghi nhận các khoản đóng góp cho chu kỳ đang diễn ra.",
-    "amountLabel": "Số tiền (ETH)",
     "optional": "(tùy chọn)",
     "titleLabel": "Tiêu đề",
     "titlePlaceholder": "Tiêu đề đóng góp",
     "urlLabel": "URL",
     "messageLabel": "Lời nhắn",
     "messagePlaceholder": "Để lại một lời nhắn tùy chọn cùng khoản đóng góp",
-    "contributeWithMessage": "Đóng góp kèm lời nhắn",
     "contributeEth": "Đóng góp ETH",
-    "structuredHelp": "Thông tin tùy chọn sẽ xuất hiện trên trang chi tiết đóng góp."
+    "title": "Đóng góp ETH",
+    "description": "ETH của bạn đi thẳng vào dự trữ chu kỳ của chu kỳ hiện tại, không cần đặt nét bút. Khoản đóng góp không thể hoàn tác.",
+    "amountHint": "Bất kỳ số lượng nào lớn hơn 0, gửi từ ví trên {network}.",
+    "connectHint": "Kết nối ví trên {network} để đóng góp.",
+    "noteSummary": "Thêm lời nhắn công khai",
+    "noteAdded": "Đã thêm",
+    "noteHint": "Lời nhắn được lưu trên chuỗi cùng khoản đóng góp và hiện trên trang hồ sơ công khai của nó.",
+    "urlError": "Hãy dùng liên kết đầy đủ bắt đầu bằng https:// hoặc http://.",
+    "summary": "{amount} sẽ vào dự trữ chu kỳ của chu kỳ {cycle}.",
+    "summaryNoCycle": "{amount} sẽ vào dự trữ chu kỳ.",
+    "submitAmount": "Đóng góp {amount}"
   },
   "detail": {
     "invalidId": "Mã đóng góp không hợp lệ",

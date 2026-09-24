@@ -299,77 +299,49 @@
   "transferCst": {
     "page": {
       "title": "Переказати CST",
-      "subtitle": "Надішліть свої токени CST Cosmic Signature на іншу адресу.",
-      "sourceLabel": "Під’єднаний гаманець",
-      "description": "Переказуйте CST зі свого під’єднаного гаманця. Транзакцію підписує ваш гаманець, і вона надсилається безпосередньо в контракт токена CST."
+      "subtitle": "Надішліть CST з під’єднаного гаманця на іншу адресу в {network}."
     },
     "form": {
-      "title": "Переказати CST",
-      "sourceWallet": "Гаманець-відправник",
-      "defaultDescription": "Надішліть CST зі свого під’єднаного гаманця на будь-яку адресу.",
-      "available": "Доступно CST",
-      "balanceReadError": "Не вдалося прочитати баланс CST цього гаманця. Спробуйте ще раз.",
-      "decimalsReadWarning": "Не вдалося прочитати кількість десяткових знаків CST; використовуємо 18 знаків після коми.",
-      "recipientAddress": "Адреса отримувача",
-      "amount": "Сума",
-      "sendAria": "Надіслати CST",
-      "sending": "Надсилання…",
       "send": "Надіслати CST",
-      "viewHistory": "Переглянути історію переказів CST",
-      "confirmed": "Переказ підтверджено.",
-      "viewTransaction": "Переглянути транзакцію"
+      "sendAmount": "Надіслати {amount}"
+    },
+    "guide": {
+      "from": "Надсилаєте з",
+      "history": "Ваші перекази CST",
+      "title": "Перед надсиланням",
+      "final": "Переказ остаточний. CST, надіслані на хибну адресу, не повернути.",
+      "network": "Надсилайте лише на адресу, яка може зберігати токени в {network}.",
+      "paste": "Скопіюйте адресу з гаманця отримувача, а не вводьте її вручну."
     }
   },
   "nftTransfer": {
     "defaultDescription": "Виберіть один або кілька Cosmic Signature NFT і надішліть їх на адресу іншого гаманця.",
     "marketplacePrompt": "Хочете продати, а не надіслати напряму? Скористайтеся маркетплейсом, щоб виставити на продаж або придбати Cosmic Signature NFT.",
     "marketplace": "Купити або продати NFT",
-    "sourceWallet": "Гаманець-відправник",
-    "ownedNfts": "Ваші NFT",
-    "selected": "Вибрано",
-    "recipientAddress": "Адреса отримувача",
     "empty": "У цьому гаманці немає Cosmic Signature NFT.",
     "pickerTitle": "Виберіть NFT для передачі",
     "pickerSummary": "Вибрано {selected} з {total} NFT, доступних для передачі.",
     "selectAll": "Вибрати всі доступні",
-    "selectPage": "Вибрати сторінку",
     "clear": "Зняти вибір",
     "listAria": "Cosmic Signature NFT",
-    "selectAria": "Вибрати NFT #{id}",
-    "nftLabel": "NFT #{id}",
-    "tokenId": "ID токена",
-    "customName": "Власне ім’я",
+    "selectAria": "Вибрати NFT {id}",
     "noCustomName": "Без власного імені",
-    "generationCycle": "Цикл створення",
     "cycle": "Цикл {cycle}",
     "cycleUnavailable": "Дані циклу недоступні",
-    "status": "Статус",
     "statusLabels": {
       "anchored": "Закріплено — відкріпіть перед передачею",
-      "ownerChanged": "Власник змінився — оновіть перед передачею",
-      "selected": "Вибрано",
-      "transferable": "Можна передати"
+      "ownerChanged": "Власник змінився — оновіть перед передачею"
     },
     "progress": {
       "transferred": "Передано {completed} з {total} NFT",
-      "stopped": "Передачу зупинено на NFT #{id}",
-      "current": "Поточний NFT: #{id}"
+      "stopped": "Зупинено після {completed} з {total}, на NFT {id}. Ненадіслані NFT залишаються вибраними."
     },
-    "confirmation": {
-      "latest": "Останню передачу підтверджено.",
-      "multiple": "Підтверджено {count, plural, one {# передачу} few {# передачі} many {# передач} other {# передачі}}.",
-      "viewLatest": "Переглянути останню транзакцію"
-    },
-    "sendAria": "Надіслати вибрані NFT",
-    "sending": "Надсилання…",
     "send": "Надіслати вибрані NFT",
     "viewHistory": "Переглянути історію передач NFT",
-    "warning": {
-      "title": "Отримувач не має історії транзакцій",
-      "description": "Схоже, за цією адресою ще не було транзакцій. Перевірте отримувача ще раз перед надсиланням — передачу NFT не можна скасувати.",
-      "cancel": "Скасувати",
-      "continue": "Продовжити передачу"
-    }
+    "review": {
+      "count": "{count, plural, one {# NFT} few {# NFT} many {# NFT} other {# NFT}}"
+    },
+    "sendCount": "{count, plural, one {Надіслати # NFT} few {Надіслати # NFT} many {Надіслати # NFT} other {Надіслати # NFT}}"
   },
   "transferHistory": {
     "loading": "Завантаження…",

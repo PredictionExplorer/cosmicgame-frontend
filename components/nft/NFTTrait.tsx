@@ -46,6 +46,7 @@ import {
 import { useMetaMaskWatchAsset } from '@/hooks/useMetaMaskWatchAsset';
 import { useNow } from '@/hooks/useNow';
 import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
+import { readRecipientFacts } from '@/components/tokens/transfer/useRecipientFacts';
 
 import { NFTSeed } from './NFTMetadata';
 import { NFTOwnerActions } from './NFTOwnerActions';
@@ -259,23 +260,19 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
       });
       return;
     }
-    const { ethereum } = window as Window & {
-      ethereum?: { request: (args: { method: string; params: unknown[] }) => Promise<unknown> };
-    };
-    if (!ethereum) {
+    if (!publicClient) {
       setNotification({
-        text: tToasts('wallet.notReady'),
+        text: tToasts('transfer.nft.recipientCheckFailed'),
         type: 'error',
         visible: true,
       });
       return;
     }
     try {
-      const txCount = await ethereum.request({
-        method: 'eth_getTransactionCount',
-        params: [address, 'latest'],
-      });
-      if (Number(txCount) === 0) {
+      // The public client, not `window.ethereum`: WalletConnect and smart
+      // wallets inject no provider, and the check must work for them too.
+      const { transactionCount } = await readRecipientFacts(publicClient, address);
+      if (transactionCount === 0) {
         setOpenDialog(true);
       } else {
         await handleTransfer();

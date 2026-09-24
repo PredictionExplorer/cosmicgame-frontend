@@ -1,6 +1,6 @@
 import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import TransferCstPage from '../TransferCstPage';
 
@@ -9,22 +9,16 @@ const ACCOUNT = '0x1111111111111111111111111111111111111111';
 let mockAccount: string | null = ACCOUNT;
 let mockActive = true;
 
-jest.mock('../../../../../hooks/web3', () => ({
+jest.mock('@/hooks/web3', () => ({
   useActiveWeb3React: () => ({
     account: mockAccount,
     active: mockActive,
   }),
 }));
 
-jest.mock('../../../../../components/tokens/CstTransferForm', () => ({
-  CstTransferForm: ({
-    sourceAddress,
-    historyHref,
-  }: {
-    sourceAddress: string;
-    historyHref: string;
-  }) => (
-    <div data-testid="cst-transfer-form" data-source={sourceAddress} data-history={historyHref}>
+jest.mock('@/components/tokens/CstTransferForm', () => ({
+  CstTransferForm: ({ source }: { source: string }) => (
+    <div data-testid="cst-transfer-form" data-source={source}>
       Transfer form
     </div>
   ),
@@ -36,7 +30,7 @@ describe('TransferCstPage', () => {
     mockActive = true;
   });
 
-  it('shows a wallet-required empty state when disconnected', () => {
+  it('shows what connecting unlocks when no wallet is connected', () => {
     mockAccount = null;
     mockActive = false;
 
@@ -48,12 +42,24 @@ describe('TransferCstPage', () => {
     expect(screen.queryByTestId('cst-transfer-form')).not.toBeInTheDocument();
   });
 
-  it('renders the transfer form for the connected wallet', () => {
+  it('sends from the connected wallet, labelled by the page heading', () => {
     render(<TransferCstPage />);
 
-    const form = screen.getByTestId('cst-transfer-form');
-    expect(form).toHaveAttribute('data-source', ACCOUNT);
-    expect(form).toHaveAttribute('data-history', `/cosmic-token-transfer/${ACCOUNT}`);
+    expect(screen.getByTestId('cst-transfer-form')).toHaveAttribute('data-source', ACCOUNT);
+    expect(screen.getByRole('region', { name: 'myPages.transferCst.page.title' })).toContainElement(
+      screen.getByTestId('cst-transfer-form'),
+    );
+  });
+
+  it('shows the sending wallet, its CST history and what to check before sending', () => {
+    render(<TransferCstPage />);
+
+    expect(screen.getByText('myPages.transferCst.guide.from')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'myPages.transferCst.guide.history' })).toHaveAttribute(
+      'href',
+      `/cosmic-token-transfer/${ACCOUNT}`,
+    );
+    expect(screen.getByText('myPages.transferCst.guide.final')).toBeInTheDocument();
   });
 
   it('renders the Uniswap CST trade action in the page header', () => {
@@ -63,5 +69,10 @@ describe('TransferCstPage', () => {
       'href',
       CST_UNISWAP_SWAP_URL,
     );
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<TransferCstPage />);
+    await checkA11y(container);
   });
 });

@@ -299,77 +299,49 @@
   "transferCst": {
     "page": {
       "title": "Transfer CST",
-      "subtitle": "Send your Cosmic Signature CST tokens to another address.",
-      "sourceLabel": "Connected wallet",
-      "description": "Transfer CST from your connected wallet. The transaction is signed by your wallet and sent directly to the CST token contract."
+      "subtitle": "Send CST from your connected wallet to another address on {network}."
     },
     "form": {
-      "title": "Transfer CST",
-      "sourceWallet": "Source wallet",
-      "defaultDescription": "Send CST from your connected wallet to any address.",
-      "available": "Available CST",
-      "balanceReadError": "Unable to read this wallet’s CST balance. Please try again.",
-      "decimalsReadWarning": "Unable to read CST decimals; assuming 18 decimal places.",
-      "recipientAddress": "Recipient address",
-      "amount": "Amount",
-      "sendAria": "Send CST",
-      "sending": "Sending...",
       "send": "Send CST",
-      "viewHistory": "View CST transfer history",
-      "confirmed": "Transfer confirmed.",
-      "viewTransaction": "View transaction"
+      "sendAmount": "Send {amount}"
+    },
+    "guide": {
+      "from": "Sending from",
+      "history": "Your CST transfers",
+      "title": "Before you send",
+      "final": "Transfers are final. CST sent to a wrong address can't be recovered.",
+      "network": "Send only to an address that can hold tokens on {network}.",
+      "paste": "Copy the address from the receiving wallet rather than typing it."
     }
   },
   "nftTransfer": {
     "defaultDescription": "Select one or more Cosmic Signature NFTs and send them to another wallet address.",
     "marketplacePrompt": "Use the marketplace to buy or sell Cosmic Signature NFTs. To transfer directly to another wallet, continue below.",
     "marketplace": "Buy or sell NFTs",
-    "sourceWallet": "Source wallet",
-    "ownedNfts": "Owned NFTs",
-    "selected": "Selected",
-    "recipientAddress": "Recipient address",
     "empty": "You do not have any Cosmic Signature NFTs in this wallet.",
     "pickerTitle": "Choose NFTs to transfer",
     "pickerSummary": "{selected} selected of {total} transferable NFTs.",
     "selectAll": "Select all transferable",
-    "selectPage": "Select current page",
     "clear": "Clear selection",
     "listAria": "Cosmic Signature NFTs",
-    "selectAria": "Select NFT #{id}",
-    "nftLabel": "NFT #{id}",
-    "tokenId": "Token ID",
-    "customName": "Custom name",
+    "selectAria": "Select NFT {id}",
     "noCustomName": "No custom name",
-    "generationCycle": "Generation cycle",
     "cycle": "Cycle {cycle}",
     "cycleUnavailable": "Cycle data not available",
-    "status": "Status",
     "statusLabels": {
-      "anchored": "Anchored - release before transfer",
-      "ownerChanged": "Owner changed - refresh before transfer",
-      "selected": "Selected",
-      "transferable": "Transferable"
+      "anchored": "Anchored: release it first",
+      "ownerChanged": "Owner changed: refresh first"
     },
     "progress": {
       "transferred": "Transferred {completed} of {total} NFTs",
-      "stopped": "Transfer stopped at NFT #{id}",
-      "current": "Current NFT: #{id}"
+      "stopped": "Stopped after {completed} of {total}, at NFT {id}. The NFTs not sent are still selected."
     },
-    "confirmation": {
-      "latest": "Latest transfer confirmed.",
-      "multiple": "{count} transfers confirmed.",
-      "viewLatest": "View latest transaction"
-    },
-    "sendAria": "Send selected NFTs",
-    "sending": "Sending...",
-    "send": "Send Selected NFTs",
+    "send": "Send selected NFTs",
     "viewHistory": "View NFT transfer history",
-    "warning": {
-      "title": "Recipient has no transaction history",
-      "description": "This address appears to have no transactions yet. Double-check the recipient before sending; NFT transfers cannot be undone.",
-      "cancel": "Cancel",
-      "continue": "Continue transfer"
-    }
+    "review": {
+      "count": "{count, plural, one {# NFT} other {# NFTs}}"
+    },
+    "sendCount": "{count, plural, one {Send # NFT} other {Send # NFTs}}"
   },
   "transferHistory": {
     "loading": "Loading...",

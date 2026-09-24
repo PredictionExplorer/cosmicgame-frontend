@@ -102,71 +102,40 @@
   },
   "transfer": {
     "common": {
-      "sourceUnavailable": "Ví nguồn không khả dụng.",
-      "invalidRecipient": "Nhập một địa chỉ người nhận hợp lệ.",
-      "invalidAmount": "Nhập một số lượng CST hợp lệ.",
-      "invalidDecimals": "Nhập số lượng CST với số chữ số thập phân hợp lệ.",
-      "amountPositive": "Nhập một số lượng lớn hơn không."
+      "invalidRecipient": "Nhập một địa chỉ người nhận hợp lệ."
     },
     "cst": {
       "tokenUnavailable": "Địa chỉ token CST chưa có sẵn.",
-      "walletRequired": "Kết nối ví trước khi gửi CST.",
-      "sourceWalletRequired": "Kết nối ví nguồn trước khi gửi CST từ ví đó.",
-      "balanceLoading": "Số dư CST vẫn đang tải. Vui lòng thử lại sau ít phút.",
-      "insufficientBalance": "Số dư CST không đủ.",
-      "decimalsWarning": "Không đọc được số chữ số thập phân của CST; giả định 18 chữ số thập phân.",
       "confirmed": "Đã xác nhận chuyển CST.",
       "failed": "Không thể gửi CST. Vui lòng thử lại."
     },
     "nft": {
       "contractUnavailable": "Địa chỉ hợp đồng Cosmic Signature NFT chưa có sẵn.",
-      "walletRequired": "Kết nối ví trước khi gửi NFT.",
-      "sourceWalletRequired": "Kết nối ví nguồn trước khi gửi NFT từ ví đó.",
-      "recipientMustDiffer": "Nhập một địa chỉ người nhận khác với ví đang kết nối.",
       "selectOne": "Chọn ít nhất một NFT có thể chuyển giao.",
       "confirmed": "{count, plural, other {Đã xác nhận # lần chuyển giao NFT.}}",
       "detailTransferConfirmed": "Đã xác nhận chuyển giao NFT.",
       "recipientCheckFailed": "Không kiểm tra được địa chỉ người nhận. Hãy kiểm tra ví và kết nối mạng, rồi thử lại.",
       "failed": "Không thể gửi các NFT đã chọn. Vui lòng thử lại.",
-      "failedToken": "Không thể chuyển giao NFT #{tokenId}. Vui lòng thử lại.",
+      "failedToken": "Chưa gửi được NFT {tokenId}. Hãy kiểm tra ví rồi thử lại.",
       "nameSet": "Đã đổi tên token.",
       "nameCleared": "Đã xóa tên token.",
       "nameSetFailed": "Đã xảy ra lỗi khi đặt tên token. Vui lòng thử lại.",
       "nameClearFailed": "Đã xảy ra lỗi khi xóa tên token. Vui lòng thử lại."
     },
     "marketingCst": {
-      "tokenUnavailable": "Địa chỉ token CST chưa có sẵn.",
-      "walletRequired": "Kết nối ví trước khi chi CST phân bổ.",
       "reserveUnavailable": "Ví Dự trữ truyền thông không khả dụng.",
-      "treasurerUnavailable": "Thủ quỹ ví truyền thông không khả dụng.",
       "treasurerRequired": "Kết nối ví thủ quỹ hiện tại của Dự trữ truyền thông trước khi chi CST phân bổ.",
-      "balanceLoading": "Số dư CST của Dự trữ truyền thông vẫn đang tải. Vui lòng thử lại sau ít phút.",
-      "insufficientBalance": "Số dư CST của Dự trữ truyền thông không đủ.",
-      "decimalsWarning": "Không đọc được số chữ số thập phân của CST; giả định 18 chữ số thập phân.",
-      "balanceReadFailed": "Không đọc được số dư CST của Dự trữ truyền thông. Vui lòng thử lại.",
       "confirmed": "Đã xác nhận chuyển CST phân bổ truyền thông.",
       "failed": "Không thể chi CST phân bổ. Vui lòng thử lại.",
-      "loading": "Đang tải…",
       "pay": "Chi CST phân bổ",
-      "paying": "Đang chi…",
-      "viewTransaction": "Xem giao dịch"
+      "payAmount": "Gửi {amount}"
     }
   },
   "contribution": {
-    "connectWallet": "Vui lòng kết nối ví để đóng góp ETH.",
-    "connectWalletInline": "Kết nối ví để đóng góp ETH.",
-    "invalidAmount": "Nhập một số ETH lớn hơn 0.",
-    "invalidUrl": "Nhập một URL hợp lệ bắt đầu bằng http:// hoặc https://.",
-    "invalidUrlInline": "Dùng URL http:// hoặc https://.",
-    "contractUnavailable": "Vui lòng kết nối ví và đảm bảo bạn đang ở đúng mạng.",
+    "contractUnavailable": "Hợp đồng giao thức chưa sẵn sàng. Hãy tải lại trang rồi thử lại.",
     "formSubmitted": "Đã xác nhận đóng góp {amount} ETH.",
     "formSubmittedWithInfo": "Đã xác nhận đóng góp {amount} ETH kèm thông tin.",
-    "submitted": "Đã đóng góp {amount} ETH.",
-    "submittedWithInfo": "Đã đóng góp {amount} ETH kèm thông tin.",
     "formFailed": "Đóng góp ETH thất bại, hãy kiểm tra thông tin nhập và thử lại.",
-    "failed": "Đóng góp thất bại, vui lòng thử lại.",
-    "failedWithInfo": "Đóng góp kèm thông tin thất bại, hãy kiểm tra thông tin nhập.",
-    "submitting": "Đang gửi…",
     "publicGoodsVault": {
       "none": "Kho chưa có khoản nào dành cho Hàng hóa công cần chuyển.",
       "connectWallet": "Kết nối ví để chuyển khoản từ Kho Hàng hóa công.",

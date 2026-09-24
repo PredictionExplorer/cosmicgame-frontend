@@ -28,20 +28,20 @@ describe('Sprint 7 focused catalogs', () => {
   });
 
   it('contains complete Chinese route, form, status, tooltip, and ARIA copy', () => {
-    expect(zhEthContribution.page.title).toBe('ETH 贡献');
+    expect(zhEthContribution.page.historyTitle).toBe('贡献记录');
     expect(zhEthContribution.form.contributeEth).toBe('贡献 ETH');
     expect(zhEthContribution.detail.breadcrumbContributions).toBe('ETH 贡献');
     expect(zhPublicGoods.retrievals.title).toBe('公共物品取回');
     expect(zhMarketing.stats.infoAria).toContain('说明');
-    expect(zhMarketing.transferForm.recipientLabel).toBe('接收地址');
+    expect(zhMarketing.transferForm.historyLink).toContain('推广储备');
     expect(zhCoordination.page.title).toBe('协调变更');
     expect(zhCoordination.events.publicGoodsPercentage).toBe('公共物品比例已变更');
     expect(zhAdmin.outreachTransfer.restrictedTitle).toBe('访问受限');
   });
 
   it('pins the reviewed English rendering', () => {
-    expect(enEthContribution.page.title).toBe('ETH Contributions');
-    expect(enEthContribution.form.contributeWithMessage).toBe('Contribute with Message');
+    expect(enEthContribution.form.title).toBe('Contribute ETH');
+    expect(enEthContribution.form.submitAmount).toBe('Contribute {amount}');
     expect(enPublicGoods.protocol.title).toBe('Protocol Public-Goods Contributions');
     expect(enMarketing.hero.title).toBe(
       'Receive CST for <highlight>Spreading the Word</highlight>',

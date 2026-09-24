@@ -299,77 +299,49 @@
   "transferCst": {
     "page": {
       "title": "轉帳 CST",
-      "subtitle": "將 Cosmic Signature CST 代幣發送至其他地址。",
-      "sourceLabel": "已連接錢包",
-      "description": "從已連接錢包轉帳 CST。交易由錢包簽名，並直接發送至 CST 代幣合約。"
+      "subtitle": "將已連接錢包中的 CST 發送至 {network} 上的其他地址。"
     },
     "form": {
-      "title": "轉帳 CST",
-      "sourceWallet": "來源錢包",
-      "defaultDescription": "從已連接錢包將 CST 發送至任意地址。",
-      "available": "可用 CST",
-      "balanceReadError": "未能讀取此錢包的 CST 餘額，請重試。",
-      "decimalsReadWarning": "未能讀取 CST 小數位數，將按 18 位處理。",
-      "recipientAddress": "接收地址",
-      "amount": "數量",
-      "sendAria": "發送 CST",
-      "sending": "發送中…",
       "send": "發送 CST",
-      "viewHistory": "查看 CST 轉帳記錄",
-      "confirmed": "轉帳已確認。",
-      "viewTransaction": "查看交易"
+      "sendAmount": "發送 {amount}"
+    },
+    "guide": {
+      "from": "發送方",
+      "history": "你的 CST 轉帳記錄",
+      "title": "發送之前",
+      "final": "轉帳無法撤銷。發送到錯誤地址的 CST 無法找回。",
+      "network": "只發送到能在 {network} 上持有代幣的地址。",
+      "paste": "請從接收錢包複製地址，不要手動輸入。"
     }
   },
   "nftTransfer": {
     "defaultDescription": "選擇一枚或多枚 Cosmic Signature NFT，併發送至其他錢包地址。",
     "marketplacePrompt": "想買賣 NFT？可前往市場；如需直接轉移，請在下方繼續。",
     "marketplace": "買賣 NFT",
-    "sourceWallet": "來源錢包",
-    "ownedNfts": "持有的 NFT",
-    "selected": "已選擇",
-    "recipientAddress": "接收地址",
     "empty": "此錢包中沒有 Cosmic Signature NFT。",
     "pickerTitle": "選擇要轉移的 NFT",
     "pickerSummary": "可轉移 {total} 枚，已選擇 {selected} 枚。",
     "selectAll": "選擇全部可轉移項",
-    "selectPage": "選擇目前頁",
     "clear": "清除選擇",
     "listAria": "Cosmic Signature NFT",
-    "selectAria": "選擇 NFT #{id}",
-    "nftLabel": "NFT #{id}",
-    "tokenId": "代幣 ID",
-    "customName": "專屬名稱",
+    "selectAria": "選擇 NFT {id}",
     "noCustomName": "無專屬名稱",
-    "generationCycle": "生成週期",
     "cycle": "第 {cycle} 個週期",
     "cycleUnavailable": "暫無週期數據",
-    "status": "狀態",
     "statusLabels": {
       "anchored": "已錨定，請先解錨再轉移",
-      "ownerChanged": "持有者已變更，請重新整理後再轉移",
-      "selected": "已選擇",
-      "transferable": "可轉移"
+      "ownerChanged": "持有者已變更，請重新整理後再轉移"
     },
     "progress": {
       "transferred": "已轉移 {completed} 枚，共 {total} 枚",
-      "stopped": "NFT #{id} 未能轉移，操作已停止。",
-      "current": "目前 NFT：#{id}"
+      "stopped": "已發送 {completed} 枚（共 {total} 枚），在 NFT {id} 處停止。未發送的 NFT 仍保持選取。"
     },
-    "confirmation": {
-      "latest": "最新一筆轉移已確認。",
-      "multiple": "{count} 筆轉移已確認。",
-      "viewLatest": "查看最新交易"
-    },
-    "sendAria": "發送已選 NFT",
-    "sending": "發送中…",
     "send": "發送已選 NFT",
     "viewHistory": "查看 NFT 轉移記錄",
-    "warning": {
-      "title": "接收地址無交易記錄",
-      "description": "暫未查到該地址的交易記錄。發送前請再次核對；NFT 轉移無法撤銷。",
-      "cancel": "取消",
-      "continue": "繼續轉移"
-    }
+    "review": {
+      "count": "{count, plural, other {# 枚 NFT}}"
+    },
+    "sendCount": "{count, plural, other {發送 # 枚 NFT}}"
   },
   "transferHistory": {
     "loading": "載入中…",

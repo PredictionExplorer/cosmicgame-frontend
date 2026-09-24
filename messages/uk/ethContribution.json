@@ -1,30 +1,29 @@
 {
   "page": {
-    "title": "Внески ETH",
-    "subtitle": "Внески ETH безпосередньо до резерву циклу Cosmic Signature",
-    "description": "Внесіть ETH до резерву циклу Cosmic Signature, не роблячи жесту. За бажанням додайте заголовок, повідомлення та URL. Авторів найбільших внесків кожного циклу можуть представити на головній сторінці.",
-    "formTitle": "Зробити внесок",
-    "amountLabel": "Сума (ETH)",
-    "informationLabel": "Інформація",
-    "optionalJson": "(необов’язково, JSON)",
-    "informationPlaceholder": "'{'\"name\": \"Ваше ім’я\", \"message\": \"…\"'}'",
-    "contribute": "Зробити внесок",
-    "contributeWithInfo": "Внести з інформацією",
-    "historyTitle": "Історія внесків"
+    "historyTitle": "Історія внесків",
+    "historyEmpty": "Тут з’являться внески, зроблені через форму, разом із нотатками до них.",
+    "historyError": "Не вдалося завантажити історію внесків.",
+    "jumpToForm": "Внести ETH"
   },
   "form": {
-    "defaultTitle": "Зробити внесок ETH",
-    "defaultDescription": "Контракт записує внески до активного циклу.",
-    "amountLabel": "Сума (ETH)",
     "optional": "(необов’язково)",
     "titleLabel": "Заголовок",
     "titlePlaceholder": "Заголовок внеску",
     "urlLabel": "URL",
     "messageLabel": "Повідомлення",
     "messagePlaceholder": "За бажанням додайте до внеску нотатку",
-    "contributeWithMessage": "Внести з повідомленням",
     "contributeEth": "Внести ETH",
-    "structuredHelp": "Додаткова інформація з’явиться на сторінці внеску."
+    "title": "Зробити внесок ETH",
+    "description": "Ваш ETH надходить просто до резерву поточного циклу — без жесту. Внесок не можна скасувати.",
+    "amountHint": "Будь-яка сума понад 0 з гаманця в {network}.",
+    "connectHint": "Під’єднайте гаманець у {network}, щоб зробити внесок.",
+    "noteSummary": "Додати публічну нотатку",
+    "noteAdded": "Додано",
+    "noteHint": "Нотатка зберігається в блокчейні разом із внеском і показується на його публічній сторінці.",
+    "urlError": "Вкажіть повне посилання, що починається з https:// або http://.",
+    "summary": "{amount} надійде до резерву циклу {cycle}.",
+    "summaryNoCycle": "{amount} надійде до резерву циклу.",
+    "submitAmount": "Внести {amount}"
   },
   "detail": {
     "invalidId": "Недійсний ідентифікатор внеску",

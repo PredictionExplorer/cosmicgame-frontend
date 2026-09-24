@@ -79,12 +79,8 @@
     "title": "CST広報配分を送付",
     "description": "広報準備金コントラクトの`payReward`関数を呼び出します。接続中のウォレットが現在の財務担当者である必要があります。",
     "reserveLabel": "広報準備金",
-    "availableLabel": "利用可能なCST",
     "ownerLabel": "所有者",
     "treasurerLabel": "財務担当者",
-    "unavailable": "取得不可",
-    "recipientLabel": "送付先アドレス",
-    "amountLabel": "数量",
     "historyLink": "広報準備金の送付履歴を見る"
   }
 }

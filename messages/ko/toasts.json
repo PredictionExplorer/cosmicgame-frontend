@@ -102,71 +102,40 @@
   },
   "transfer": {
     "common": {
-      "sourceUnavailable": "보내는 지갑을 사용할 수 없습니다.",
-      "invalidRecipient": "올바른 받는 주소를 입력해 주세요.",
-      "invalidAmount": "올바른 CST 수량을 입력해 주세요.",
-      "invalidDecimals": "소수 자릿수가 올바른 CST 수량을 입력해 주세요.",
-      "amountPositive": "0보다 큰 수량을 입력해 주세요."
+      "invalidRecipient": "올바른 받는 주소를 입력해 주세요."
     },
     "cst": {
       "tokenUnavailable": "CST 토큰 주소를 아직 확인할 수 없습니다.",
-      "walletRequired": "CST를 보내기 전에 지갑을 연결해 주세요.",
-      "sourceWalletRequired": "CST를 보내려면 보내는 지갑을 먼저 연결해 주세요.",
-      "balanceLoading": "CST 잔액을 불러오는 중입니다. 잠시 후 다시 시도해 주세요.",
-      "insufficientBalance": "CST 잔액이 부족합니다.",
-      "decimalsWarning": "CST 소수 자릿수를 읽을 수 없어 18자리로 간주합니다.",
       "confirmed": "CST 전송이 확인되었습니다.",
       "failed": "CST를 보내지 못했습니다. 잠시 후 다시 시도해 주세요."
     },
     "nft": {
       "contractUnavailable": "Cosmic Signature NFT 컨트랙트 주소를 아직 확인할 수 없습니다.",
-      "walletRequired": "NFT를 보내기 전에 지갑을 연결해 주세요.",
-      "sourceWalletRequired": "NFT를 보내려면 보내는 지갑을 먼저 연결해 주세요.",
-      "recipientMustDiffer": "연결된 지갑과 다른 받는 주소를 입력해 주세요.",
       "selectOne": "전송 가능한 NFT를 하나 이상 선택해 주세요.",
       "confirmed": "{count, plural, other {NFT 전송 #건이 확인되었습니다.}}",
       "detailTransferConfirmed": "NFT 전송이 확인되었습니다.",
       "recipientCheckFailed": "받는 주소를 확인할 수 없습니다. 지갑과 네트워크 연결을 확인한 뒤 다시 시도해 주세요.",
       "failed": "선택한 NFT를 보내지 못했습니다. 잠시 후 다시 시도해 주세요.",
-      "failedToken": "NFT #{tokenId} 전송에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+      "failedToken": "NFT {tokenId} 전송에 실패했습니다. 지갑을 확인한 뒤 다시 시도해 주세요.",
       "nameSet": "토큰 이름이 변경되었습니다.",
       "nameCleared": "토큰 이름이 삭제되었습니다.",
       "nameSetFailed": "토큰 이름을 설정하는 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.",
       "nameClearFailed": "토큰 이름을 삭제하는 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
     },
     "marketingCst": {
-      "tokenUnavailable": "CST 토큰 주소를 아직 확인할 수 없습니다.",
-      "walletRequired": "CST 홍보 배분을 보내기 전에 지갑을 연결해 주세요.",
       "reserveUnavailable": "홍보 준비금 지갑을 사용할 수 없습니다.",
-      "treasurerUnavailable": "홍보 준비금 재무 담당자를 확인할 수 없습니다.",
       "treasurerRequired": "CST 홍보 배분을 보내려면 현재 재무 담당자 지갑을 연결해 주세요.",
-      "balanceLoading": "홍보 준비금 CST 잔액을 불러오는 중입니다. 잠시 후 다시 시도해 주세요.",
-      "insufficientBalance": "홍보 준비금 CST 잔액이 부족합니다.",
-      "decimalsWarning": "CST 소수 자릿수를 읽을 수 없어 18자리로 간주합니다.",
-      "balanceReadFailed": "홍보 준비금 CST 잔액을 읽을 수 없습니다. 잠시 후 다시 시도해 주세요.",
       "confirmed": "CST 홍보 배분 전송이 확인되었습니다.",
       "failed": "CST 홍보 배분을 보내지 못했습니다. 잠시 후 다시 시도해 주세요.",
-      "loading": "불러오는 중…",
       "pay": "CST 홍보 배분 보내기",
-      "paying": "보내는 중…",
-      "viewTransaction": "트랜잭션 보기"
+      "payAmount": "{amount} 보내기"
     }
   },
   "contribution": {
-    "connectWallet": "ETH를 기여하려면 지갑을 연결해 주세요.",
-    "connectWalletInline": "지갑을 연결하면 ETH를 기여할 수 있습니다.",
-    "invalidAmount": "0보다 큰 ETH 금액을 입력해 주세요.",
-    "invalidUrl": "http:// 또는 https://로 시작하는 올바른 URL을 입력해 주세요.",
-    "invalidUrlInline": "http:// 또는 https:// URL을 사용해 주세요.",
-    "contractUnavailable": "지갑을 연결하고 올바른 네트워크인지 확인해 주세요.",
+    "contractUnavailable": "프로토콜 컨트랙트를 아직 사용할 수 없습니다. 페이지를 새로 고친 뒤 다시 시도해 주세요.",
     "formSubmitted": "{amount} ETH 기여가 확인되었습니다.",
     "formSubmittedWithInfo": "정보를 포함한 {amount} ETH 기여가 확인되었습니다.",
-    "submitted": "{amount} ETH 기여가 완료되었습니다.",
-    "submittedWithInfo": "정보를 포함한 {amount} ETH 기여가 완료되었습니다.",
     "formFailed": "ETH 기여에 실패했습니다. 입력 내용을 확인한 뒤 다시 시도해 주세요.",
-    "failed": "기여에 실패했습니다. 잠시 후 다시 시도해 주세요.",
-    "failedWithInfo": "정보를 포함한 기여에 실패했습니다. 입력 내용을 확인해 주세요.",
-    "submitting": "제출 중…",
     "publicGoodsVault": {
       "none": "금고에 대기 중인 공공재 자금이 없습니다.",
       "connectWallet": "공공재 금고 자금을 전달하려면 지갑을 연결해 주세요.",

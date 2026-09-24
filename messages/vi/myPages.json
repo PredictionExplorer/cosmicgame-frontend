@@ -299,77 +299,49 @@
   "transferCst": {
     "page": {
       "title": "Chuyển CST",
-      "subtitle": "Gửi token CST của Cosmic Signature đến một địa chỉ khác.",
-      "sourceLabel": "Ví đang kết nối",
-      "description": "Chuyển CST từ ví đang kết nối. Giao dịch được ví của bạn ký và gửi trực tiếp đến hợp đồng token CST."
+      "subtitle": "Gửi CST từ ví đã kết nối của bạn đến một địa chỉ khác trên {network}."
     },
     "form": {
-      "title": "Chuyển CST",
-      "sourceWallet": "Ví nguồn",
-      "defaultDescription": "Gửi CST từ ví đang kết nối đến bất kỳ địa chỉ nào.",
-      "available": "CST khả dụng",
-      "balanceReadError": "Không đọc được số dư CST của ví này. Vui lòng thử lại.",
-      "decimalsReadWarning": "Không đọc được số chữ số thập phân của CST; giả định 18 chữ số thập phân.",
-      "recipientAddress": "Địa chỉ người nhận",
-      "amount": "Số lượng",
-      "sendAria": "Gửi CST",
-      "sending": "Đang gửi…",
       "send": "Gửi CST",
-      "viewHistory": "Xem lịch sử chuyển CST",
-      "confirmed": "Đã xác nhận chuyển CST.",
-      "viewTransaction": "Xem giao dịch"
+      "sendAmount": "Gửi {amount}"
+    },
+    "guide": {
+      "from": "Gửi từ",
+      "history": "Lịch sử chuyển CST của bạn",
+      "title": "Trước khi gửi",
+      "final": "Không thể hoàn tác giao dịch chuyển. CST gửi nhầm địa chỉ sẽ không thể khôi phục.",
+      "network": "Chỉ gửi đến địa chỉ có thể giữ token trên {network}.",
+      "paste": "Hãy sao chép địa chỉ từ ví nhận thay vì tự gõ."
     }
   },
   "nftTransfer": {
     "defaultDescription": "Chọn một hoặc nhiều Cosmic Signature NFT và gửi chúng đến một địa chỉ ví khác.",
     "marketplacePrompt": "Muốn bán thay vì gửi trực tiếp? Hãy dùng sàn để niêm yết hoặc sưu tầm Cosmic Signature NFT.",
     "marketplace": "Mua hoặc bán NFT",
-    "sourceWallet": "Ví nguồn",
-    "ownedNfts": "NFT đang sở hữu",
-    "selected": "Đã chọn",
-    "recipientAddress": "Địa chỉ người nhận",
     "empty": "Bạn không có Cosmic Signature NFT nào trong ví này.",
     "pickerTitle": "Chọn NFT để chuyển giao",
     "pickerSummary": "Đã chọn {selected} trong {total} NFT có thể chuyển giao.",
     "selectAll": "Chọn tất cả NFT có thể chuyển giao",
-    "selectPage": "Chọn trang hiện tại",
     "clear": "Bỏ chọn",
     "listAria": "Cosmic Signature NFT",
-    "selectAria": "Chọn NFT #{id}",
-    "nftLabel": "NFT #{id}",
-    "tokenId": "Mã token",
-    "customName": "Tên tùy chỉnh",
+    "selectAria": "Chọn NFT {id}",
     "noCustomName": "Không có tên tùy chỉnh",
-    "generationCycle": "Chu kỳ tạo",
     "cycle": "Chu kỳ {cycle}",
     "cycleUnavailable": "Không có dữ liệu chu kỳ",
-    "status": "Trạng thái",
     "statusLabels": {
       "anchored": "Đang neo giữ - gỡ neo trước khi chuyển giao",
-      "ownerChanged": "Chủ sở hữu đã thay đổi - tải lại trước khi chuyển giao",
-      "selected": "Đã chọn",
-      "transferable": "Có thể chuyển giao"
+      "ownerChanged": "Chủ sở hữu đã thay đổi - tải lại trước khi chuyển giao"
     },
     "progress": {
       "transferred": "Đã chuyển giao {completed} trong {total} NFT",
-      "stopped": "Chuyển giao dừng ở NFT #{id}",
-      "current": "NFT hiện tại: #{id}"
+      "stopped": "Đã dừng sau {completed}/{total}, tại NFT {id}. Các NFT chưa gửi vẫn được chọn."
     },
-    "confirmation": {
-      "latest": "Đã xác nhận lần chuyển giao mới nhất.",
-      "multiple": "Đã xác nhận {count} lần chuyển giao.",
-      "viewLatest": "Xem giao dịch mới nhất"
-    },
-    "sendAria": "Gửi các NFT đã chọn",
-    "sending": "Đang gửi…",
     "send": "Gửi NFT đã chọn",
     "viewHistory": "Xem lịch sử chuyển giao NFT",
-    "warning": {
-      "title": "Người nhận chưa có lịch sử giao dịch",
-      "description": "Địa chỉ này dường như chưa có giao dịch nào. Hãy kiểm tra kỹ người nhận trước khi gửi; việc chuyển giao NFT không thể hoàn tác.",
-      "cancel": "Hủy",
-      "continue": "Tiếp tục chuyển giao"
-    }
+    "review": {
+      "count": "{count, plural, other {# NFT}}"
+    },
+    "sendCount": "{count, plural, other {Gửi # NFT}}"
   },
   "transferHistory": {
     "loading": "Đang tải…",

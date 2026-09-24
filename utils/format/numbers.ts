@@ -73,8 +73,11 @@ function numberFormatter(intlLocale: string, options: Intl.NumberFormatOptions):
 
 const WHITESPACE = /^\s+$/u;
 
-/** The decimal mark formatters print for a locale. */
-function decimalMarkFor(locale: string | null | undefined): string {
+/**
+ * The decimal mark formatters print for a locale ("." in English, "," in
+ * Ukrainian and Vietnamese): what a number field should accept as one.
+ */
+export function decimalMarkFor(locale: string | null | undefined): string {
   const { decimalMark } = pickByLocale(NUMBER_CONVENTIONS, locale);
   if (decimalMark) return decimalMark;
   const parts = numberFormatter(getLocaleConfig(locale).intlLocale, {}).formatToParts(1.5);

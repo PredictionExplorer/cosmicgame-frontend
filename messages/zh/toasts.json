@@ -102,71 +102,40 @@
   },
   "transfer": {
     "common": {
-      "sourceUnavailable": "转出钱包暂不可用。",
-      "invalidRecipient": "请输入有效的接收地址。",
-      "invalidAmount": "请输入有效的 CST 数量。",
-      "invalidDecimals": "CST 数量的小数位数无效。",
-      "amountPositive": "请输入大于 0 的数量。"
+      "invalidRecipient": "请输入有效的接收地址。"
     },
     "cst": {
       "tokenUnavailable": "CST 代币地址暂不可用。",
-      "walletRequired": "请先连接钱包，再发送 CST。",
-      "sourceWalletRequired": "请连接转出钱包，再从该钱包发送 CST。",
-      "balanceLoading": "CST 余额仍在加载，请稍后重试。",
-      "insufficientBalance": "CST 余额不足。",
-      "decimalsWarning": "未能读取 CST 小数位数；将按 18 位小数处理。",
       "confirmed": "CST 转账已确认。",
       "failed": "未能发送 CST。请检查钱包与网络连接后重试。"
     },
     "nft": {
       "contractUnavailable": "Cosmic Signature NFT 合约地址暂不可用。",
-      "walletRequired": "请先连接钱包，再发送 NFT。",
-      "sourceWalletRequired": "请连接转出钱包，再从该钱包发送 NFT。",
-      "recipientMustDiffer": "接收地址不能与当前连接的钱包地址相同。",
       "selectOne": "请至少选择一枚可转移的 NFT。",
       "confirmed": "{count, number} 笔 NFT 转移已确认。",
       "detailTransferConfirmed": "NFT 转移已确认。",
       "recipientCheckFailed": "未能校验接收地址。请检查钱包与网络连接后重试。",
       "failed": "未能发送所选 NFT。请检查钱包与网络连接后重试。",
-      "failedToken": "未能转移 NFT #{tokenId}。请检查钱包与网络连接后重试。",
+      "failedToken": "NFT {tokenId} 未能发送，请检查钱包后重试。",
       "nameSet": "代币名称已成功更改。",
       "nameCleared": "代币名称已成功清除。",
       "nameSetFailed": "未能更改代币名称，请重试。",
       "nameClearFailed": "未能清除代币名称，请重试。"
     },
     "marketingCst": {
-      "tokenUnavailable": "CST 代币地址暂不可用。",
-      "walletRequired": "请先连接钱包，再拨付推广 CST。",
       "reserveUnavailable": "推广储备钱包暂不可用。",
-      "treasurerUnavailable": "推广钱包财务执行人地址暂不可用。",
       "treasurerRequired": "请连接当前推广钱包财务执行人的钱包，再拨付推广 CST。",
-      "balanceLoading": "推广储备的 CST 余额仍在加载，请稍后重试。",
-      "insufficientBalance": "推广储备的 CST 余额不足。",
-      "decimalsWarning": "未能读取 CST 小数位数；将按 18 位小数处理。",
-      "balanceReadFailed": "未能读取推广储备的 CST 余额，请重试。",
       "confirmed": "推广 CST 拨付已确认。",
       "failed": "未能拨付推广 CST。请检查钱包与网络连接后重试。",
-      "loading": "加载中…",
       "pay": "拨付推广 CST",
-      "paying": "拨付中…",
-      "viewTransaction": "查看交易"
+      "payAmount": "发送 {amount}"
     }
   },
   "contribution": {
-    "connectWallet": "请先连接钱包，再贡献 ETH。",
-    "connectWalletInline": "连接钱包后即可贡献 ETH。",
-    "invalidAmount": "请输入大于 0 的 ETH 数量。",
-    "invalidUrl": "请输入以 http:// 或 https:// 开头的有效网址。",
-    "invalidUrlInline": "请使用 http:// 或 https:// 网址。",
-    "contractUnavailable": "请连接钱包，并确认已切换至正确的网络。",
+    "contractUnavailable": "协议合约暂不可用，请刷新页面后重试。",
     "formSubmitted": "{amount} ETH 贡献已确认。",
     "formSubmittedWithInfo": "附带信息的 {amount} ETH 贡献已确认。",
-    "submitted": "{amount} ETH 贡献已确认。",
-    "submittedWithInfo": "附带信息的 {amount} ETH 贡献已确认。",
     "formFailed": "ETH 贡献失败。请检查输入、钱包与网络连接后重试。",
-    "failed": "ETH 贡献失败。请检查钱包与网络连接后重试。",
-    "failedWithInfo": "附带信息的 ETH 贡献失败。请检查输入、钱包与网络连接后重试。",
-    "submitting": "提交中…",
     "publicGoodsVault": {
       "none": "公共物品金库中暂无待转拨资金。",
       "connectWallet": "请连接钱包，再将公共物品金库资金转拨给 Protocol Guild。",

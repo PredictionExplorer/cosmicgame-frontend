@@ -79,12 +79,8 @@
     "title": "CST 홍보 배분 전달",
     "description": "홍보 준비금 컨트랙트의 `payReward` 함수를 호출합니다. 연결된 지갑이 현재 재무 담당자여야 합니다.",
     "reserveLabel": "홍보 준비금",
-    "availableLabel": "사용 가능 CST",
     "ownerLabel": "소유자",
     "treasurerLabel": "재무 담당자",
-    "unavailable": "사용 불가",
-    "recipientLabel": "수령 주소",
-    "amountLabel": "수량",
     "historyLink": "홍보 준비금 전송 내역 보기"
   }
 }

@@ -12,5 +12,49 @@
       "friday": "金",
       "saturday": "土"
     }
+  },
+  "transfer": {
+    "recipient": {
+      "label": "送付先アドレス",
+      "placeholder": "0x…",
+      "hint": "受け取るウォレットの完全な0xアドレスです。",
+      "errors": {
+        "required": "送付先アドレスを入力してください。",
+        "invalid": "アドレスは0xに続く40文字の英数字です。",
+        "checksum": "アドレスに入力ミスがあるようです。大文字と小文字がチェックサムと一致しません。",
+        "zero": "ゼロアドレスはトークンを受け取れません。",
+        "self": "送付元と同じウォレットです。"
+      },
+      "check": {
+        "checking": "{network}でこのアドレスを確認しています…",
+        "failed": "{network}でこのアドレスを確認できませんでした。送付はできます。",
+        "active": "{count, plural, other {{network}で#件のトランザクションを送信済みです。}}",
+        "fresh": "新しいアドレスです。{network}でトランザクションを送信したことがありません。",
+        "contract": "このアドレスはコントラクトで、受け取ったトークンを動かせない場合があります。",
+        "protocol": "{name}のコントラクトです。直接送られたトークンは受け付けません。"
+      }
+    },
+    "amount": {
+      "label": "数量",
+      "available": "利用可能：{amount}",
+      "availableUnknown": "残高を取得できません",
+      "max": "最大",
+      "maxAria": "残高の全額を入力：{amount}",
+      "errors": {
+        "required": "数量を入力してください。",
+        "format": "{example}のように数字で入力してください。",
+        "precision": "小数点以下は{decimals}桁までです。",
+        "zero": "0より大きい数量を入力してください。",
+        "exceedsBalance": "利用可能な{amount}を超えています。"
+      }
+    },
+    "review": {
+      "title": "確認",
+      "sending": "送付内容",
+      "to": "送付先",
+      "final": "送付は取り消せません。誤ったアドレスに送ったトークンは取り戻せません。",
+      "acknowledge": "アドレスを確認済みで、このアドレスに送ります。",
+      "acknowledgeRequired": "続けるには、アドレスを確認したことをチェックしてください。"
+    }
   }
 }
