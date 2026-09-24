@@ -253,7 +253,10 @@ export function CycleMonument({
             <Amount value={reserveEth} unit="ETH" unitClassName="type-body-lg text-subtle" />
           )}
         </div>
-        <p className="mt-1.5 type-caption text-subtle">{t('deck.monument.reserveExtras')}</p>
+        {/* What rides along with the ETH: named only when it is really there. */}
+        <p className="mt-1.5 type-caption text-subtle" data-testid="monument-reserve-extras">
+          {t(`deck.monument.extras.${attachedAssetVariant}`, attachedAssetValues)}
+        </p>
       </div>
 
       {children}
