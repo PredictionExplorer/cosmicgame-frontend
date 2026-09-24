@@ -23,7 +23,9 @@ interface FAQSearchProps {
  * The FAQ's own search, on the shared SearchField. "/" focuses it from
  * anywhere on the page outside a text field; ⌘K / Ctrl+K stays with the
  * site-wide command palette in the header. While a query is active, a
- * polite status line says how many questions match.
+ * polite status line says how many questions match. A query typed before
+ * the page hydrated is taken up once it has, instead of being wiped by the
+ * next render.
  */
 export function FAQSearch({
   value,
@@ -35,6 +37,13 @@ export function FAQSearch({
 }: FAQSearchProps) {
   const t = useTranslations('faq');
   const inputRef = useRef<HTMLInputElement>(null);
+  // What the field held when this component hydrated, read once on mount.
+  const atMount = useRef({ value, onChange });
+
+  useEffect(() => {
+    const typed = inputRef.current?.value ?? '';
+    if (typed && typed !== atMount.current.value) atMount.current.onChange(typed);
+  }, []);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey || e.defaultPrevented) return;
