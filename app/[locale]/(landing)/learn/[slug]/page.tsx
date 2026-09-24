@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, FileText, type LucideIcon } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { getLearnArticle, getLearnContent, getLearnSlugs } from '@/content/learn';
+import { WHITE_PAPER_PATH, getWhitePaperContent } from '@/content/white-paper';
 
 import { getSiteRoute, resolveRouteHref, type SiteRouteId } from '@/config/siteNav';
 import { SITE_ROUTE_ICONS } from '@/config/siteNavIcons';
@@ -80,7 +81,27 @@ export default async function LearnArticlePage({ params }: PageProps) {
   ]);
 
   const index = articles.findIndex((candidate) => candidate.slug === article.slug);
-  const next = articles[index + 1];
+  const nextGuide = articles[index + 1];
+  // The path goes on: each guide leads to the next, and the last to the white paper.
+  const next: NextReading = nextGuide
+    ? {
+        label: articleUi.nextGuideLabel,
+        number: String(index + 2).padStart(2, '0'),
+        title: nextGuide.cardTitle,
+        description: nextGuide.description,
+        href: `/learn/${nextGuide.slug}`,
+        icon: GUIDE_ICONS[nextGuide.slug],
+      }
+    : (() => {
+        const whitePaper = getWhitePaperContent(locale);
+        return {
+          label: hub.whitePaper.eyebrow,
+          title: whitePaper.breadcrumbLabel,
+          description: whitePaper.hero.subtitle,
+          href: WHITE_PAPER_PATH,
+          icon: FileText,
+        };
+      })();
   const minutes = guideMinutes(article, locale);
   const plate = signaturePlate(article.plate);
   const plateId = formatId(article.plate);
@@ -219,33 +240,31 @@ export default async function LearnArticlePage({ params }: PageProps) {
             })}
           </article>
 
-          {next ? (
-            <nav aria-label={articleUi.nextGuideLabel} className="mt-16 max-w-[46rem] lg:mt-20">
-              <Link
-                href={`/learn/${next.slug}`}
-                className="group flex items-start gap-5 rounded-surface border border-rule bg-surface p-5 transition-colors duration-fast hover:border-input hover:bg-surface-raised sm:p-7"
-              >
-                <span className="min-w-0 flex-1">
-                  <span className="flex flex-wrap items-center gap-x-3 gap-y-1 type-label text-subtle">
-                    <span className="text-secondary">{articleUi.nextGuideLabel}</span>
+          <nav aria-label={next.label} className="mt-16 max-w-[46rem] lg:mt-20">
+            <Link
+              href={next.href}
+              className="group flex items-start gap-5 rounded-surface border border-rule bg-surface p-5 transition-colors duration-fast hover:border-input hover:bg-surface-raised sm:p-7"
+            >
+              <span className="min-w-0 flex-1">
+                <span className="flex flex-wrap items-center gap-x-3 gap-y-1 type-label text-subtle">
+                  <span className="text-secondary">{next.label}</span>
+                  {next.number ? (
                     <span aria-hidden className="type-mono">
-                      {String(index + 2).padStart(2, '0')}
+                      {next.number}
                     </span>
-                  </span>
-                  <span className="mt-2 block type-heading-2 text-foreground">
-                    {next.cardTitle}
-                  </span>
-                  <span className="mt-2 block type-body-sm text-muted-foreground">
-                    {next.description}
-                  </span>
+                  ) : null}
                 </span>
-                <NextGuideIcon slug={next.slug} />
-              </Link>
-            </nav>
-          ) : null}
+                <span className="mt-2 block type-heading-2 text-foreground">{next.title}</span>
+                <span className="mt-2 block type-body-sm text-muted-foreground">
+                  {next.description}
+                </span>
+              </span>
+              <NextReadingIcon icon={next.icon} />
+            </Link>
+          </nav>
 
           <QuizPrompt
-            className={cn('max-w-[46rem]', next ? 'mt-10' : 'mt-16 lg:mt-20')}
+            className="mt-10 max-w-[46rem]"
             headingId="guide-quiz"
             heading={hub.quizCta.heading}
             body={hub.quizCta.body}
@@ -339,8 +358,19 @@ export default async function LearnArticlePage({ params }: PageProps) {
   );
 }
 
-function NextGuideIcon({ slug }: { slug: keyof typeof GUIDE_ICONS }) {
-  const Icon = GUIDE_ICONS[slug];
+/** Where a guide leads: the next guide on the reading path, or the white paper after the last. */
+interface NextReading {
+  /** "Next guide", or the white paper's "The full reference". */
+  label: string;
+  /** The next guide's place on the path ("04"); the white paper has none. */
+  number?: string;
+  title: string;
+  description: string;
+  href: string;
+  icon: LucideIcon;
+}
+
+function NextReadingIcon({ icon: Icon }: { icon: LucideIcon }) {
   return (
     <span className="mt-1 flex shrink-0 flex-col items-end gap-6">
       <Icon aria-hidden className="size-5 text-subtle" />
