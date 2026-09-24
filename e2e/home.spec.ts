@@ -301,23 +301,32 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     expect(description!).not.toMatch(/strategy bidding game/i);
   });
 
-  test('navigation hosts a cross-host Discover link to the marketing site', async ({ page }) => {
+  test('navigation links the project site on the landing host, in the same tab', async ({
+    page,
+  }) => {
     const isMobileViewport = await page.evaluate(() => window.innerWidth < 1024);
+    // The production origin in CI; the dev landing host when run against `next dev`.
+    const landingHome = /^https?:\/\/cosmicsignature\.(com|local:3000)\/?$/;
 
+    let projectSite;
     if (isMobileViewport) {
-      // On mobile the featured Discover card lives inside the drawer.
-      await page.getByRole('button', { name: 'menu' }).click();
-      const discover = page
-        .getByRole('dialog')
-        .locator('a[href="https://cosmicsignature.com"]')
-        .first();
-      await expect(discover).toBeVisible();
+      // On phones it closes the drawer's Learn section, after the host divider.
+      await page
+        .getByRole('banner')
+        .getByRole('button', { name: /^Open menu/ })
+        .click();
+      const drawer = page.getByRole('dialog', { name: 'Navigation' });
+      await drawer.locator('summary', { hasText: /^Learn$/ }).click();
+      projectSite = drawer.getByRole('link', { name: 'Project Site' });
     } else {
-      // On desktop it is the featured card at the bottom of the Help panel.
-      await page.getByRole('button', { name: /^Help$/ }).click();
-      const discover = page.locator('[role="menu"] a[href="https://cosmicsignature.com"]').first();
-      await expect(discover).toBeVisible();
-      await expect(discover).toContainText(/Discover/i);
+      // On desktop it closes the Learn panel's first column.
+      await page.getByRole('button', { name: /^Learn$/ }).click();
+      projectSite = page.getByRole('menu', { name: 'Learn' }).getByRole('menuitem', {
+        name: /^Project Site/,
+      });
     }
+    await expect(projectSite).toBeVisible();
+    await expect(projectSite).toHaveAttribute('href', landingHome);
+    await expect(projectSite).not.toHaveAttribute('target');
   });
 });

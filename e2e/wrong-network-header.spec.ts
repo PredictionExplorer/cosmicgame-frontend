@@ -57,12 +57,18 @@ async function headerFacts(page: Page) {
     const visible = (element: Element | null) =>
       !!element && getComputedStyle(element).display !== 'none';
     const box = (element: Element | null) => element?.getBoundingClientRect() ?? null;
+    // The header renders the phone (sheet) and desktop (menu) pills and shows
+    // one of them with CSS, so every lookup takes the one that is displayed.
+    const shown = (selector: string) =>
+      Array.from(document.querySelectorAll(selector)).find(
+        (element) => element.getClientRects().length > 0,
+      ) ?? null;
     const nav = document.querySelector('header nav');
-    const chip = document.querySelector('header [data-testid="wrong-network-chip"]');
-    const badge = document.querySelector('header [data-testid="wrong-network-badge"]');
-    const pill =
-      document.querySelector('header [data-testid="wallet-account-trigger"]') ??
-      document.querySelector('header [data-testid="wallet-menu-trigger"]');
+    const chip = shown('header [data-testid="wrong-network-chip"]');
+    const badge = shown('header [data-testid="wrong-network-badge"]');
+    const pill = shown(
+      'header [data-testid="wallet-account-trigger"], header [data-testid="wallet-menu-trigger"]',
+    );
     const pillBox = box(pill);
     const chipBox = visible(chip) ? box(chip) : null;
     return {
@@ -81,11 +87,11 @@ test.beforeEach(async ({ page }) => {
   await installWalletOnWrongNetwork(page);
 });
 
-for (const width of [320, 375, 390, 768, 1280]) {
+for (const width of [320, 375, 390, 768, 1024, 1280]) {
   test(`wrong network keeps the wallet pill in the header at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 800 });
     await page.goto('/faq', { waitUntil: 'domcontentloaded' });
-    await expect(page.locator('header [data-testid$="-trigger"]').first()).toBeVisible({
+    await expect(page.locator('header [data-testid$="-trigger"]:visible').first()).toBeVisible({
       timeout: 15_000,
     });
     await waitForStableLayout(page);
@@ -97,8 +103,9 @@ for (const width of [320, 375, 390, 768, 1280]) {
     expect(facts.pill!.left).toBeGreaterThanOrEqual(0);
     expect(facts.pill!.right).toBeLessThanOrEqual(facts.viewport);
 
-    if (width < 360 || width >= 1280) {
-      // No room for the chip: the pill itself carries the state.
+    if (width < 360 || width >= 1024) {
+      // No room for the chip (the navigation fills the row from 1024px):
+      // the pill itself carries the state.
       expect(facts.chip).toBeNull();
       expect(facts.badgeVisible).toBe(true);
     } else {

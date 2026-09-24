@@ -9,13 +9,36 @@ const label = common.themeSwitcher.label;
 const landingHeaders = { 'X-Forwarded-Host': 'cosmicsignature.com' };
 
 async function chooseTheme(page: Page, theme: (typeof SITE_THEMES)[number]) {
-  await page.getByRole('button', { name: label, exact: true }).click();
-  await page
-    .getByRole('menuitemradio', {
-      name: new RegExp(`^${common.themeSwitcher.themes[theme].name}`),
-    })
-    .click();
+  const name = common.themeSwitcher.themes[theme].name;
+  const headerButton = page.getByRole('button', { name: label, exact: true });
+  // A click that lands before hydration is dropped, so open until the popup is up.
+  if (await headerButton.isVisible()) {
+    const option = page.getByRole('menuitemradio', { name: new RegExp(`^${name}`) });
+    await expect(async () => {
+      if (!(await option.isVisible())) await headerButton.click();
+      await expect(option).toBeVisible({ timeout: 2_000 });
+    }).toPass();
+    await option.click();
+  } else {
+    // Phones (both hosts): the palette lives in the menu sheet, not the header.
+    const menuButton = page.getByRole('banner').getByRole('button', { name: /^Open menu/ });
+    const sheet = page.getByRole('dialog', { name: 'Navigation' });
+    await expect(async () => {
+      if (!(await sheet.isVisible())) await menuButton.click();
+      await expect(sheet).toBeVisible({ timeout: 2_000 });
+    }).toPass();
+    await sheet.getByRole('radio', { name, exact: true }).click();
+    await page.keyboard.press('Escape');
+    await expect(sheet).toBeHidden();
+  }
   await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
+}
+
+/** Where the palette is reached: the header's menu on wide screens, the menu button on phones. */
+function paletteEntry(page: Page, isMobile: boolean) {
+  return isMobile
+    ? page.getByRole('banner').getByRole('button', { name: /^Open menu/ })
+    : page.getByRole('button', { name: label, exact: true });
 }
 
 async function assertPaletteContrast(page: Page) {
@@ -123,7 +146,8 @@ for (const host of ['app', 'landing'] as const) {
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
         true,
       );
-      await expect(page.getByRole('button', { name: label, exact: true })).toBeInViewport();
+      // Phones reach the palette through the menu button; wider screens show it in the header.
+      await expect(paletteEntry(page, isMobile)).toBeInViewport();
       await page.screenshot({
         path: testInfo.outputPath(`${host}-${theme}.png`),
         animations: 'disabled',
@@ -138,12 +162,14 @@ for (const host of ['app', 'landing'] as const) {
       'background-color',
       [...logoColors].at(-1)!,
     );
-    await expect(page.getByRole('button', { name: label, exact: true })).toBeVisible();
+    await expect(paletteEntry(page, isMobile)).toBeVisible();
     expect(hydrationErrors).toEqual([]);
   });
 }
 
 test('palette menu works with the keyboard and follows a language change', async ({ page }) => {
+  // The header menus; phones reach the same palettes through the drawer.
+  await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/faq');
   const trigger = page.getByRole('button', { name: label, exact: true });
   await trigger.focus();

@@ -51,7 +51,12 @@ test.describe('zh locale smoke', () => {
       const drawer = page.getByRole('dialog');
       await expect(drawer.getByText('画廊', { exact: true })).toBeVisible();
       await expect(drawer.getByText('探索', { exact: true })).toBeVisible();
-      await expect(drawer.getByText('帮助', { exact: true })).toBeVisible();
+      // About sits in the Learn section, after the host divider. The section
+      // is open on this FAQ page (the visitor is inside it); open it otherwise.
+      const learn = drawer.locator('details', {
+        has: page.locator('summary', { hasText: /^学习$/ }),
+      });
+      if ((await learn.getAttribute('open')) === null) await learn.locator('summary').click();
       await expect(drawer.getByRole('link', { name: /关于 Cosmic Signature/ })).toHaveAttribute(
         'href',
         'https://cosmicsignature.com/zh/about',
@@ -60,8 +65,8 @@ test.describe('zh locale smoke', () => {
       const primary = page.getByRole('navigation', { name: '主导航' });
       await expect(primary.getByText('画廊', { exact: true })).toBeVisible();
       await expect(primary.getByText('探索', { exact: true })).toBeVisible();
-      await expect(primary.getByText('帮助', { exact: true })).toBeVisible();
-      await primary.getByRole('button', { name: '帮助' }).click();
+      await expect(primary.getByText('学习', { exact: true })).toBeVisible();
+      await primary.getByRole('button', { name: '学习' }).click();
       await expect(page.getByRole('menuitem', { name: /关于 Cosmic Signature/ })).toHaveAttribute(
         'href',
         'https://cosmicsignature.com/zh/about',
@@ -73,15 +78,18 @@ test.describe('zh locale smoke', () => {
     await page.goto('/zh/site-map');
     await expect(page.getByRole('heading', { level: 1, name: '网站地图' })).toBeVisible();
     await expect(page).toHaveTitle('网站地图 · Cosmic Signature');
-    await expect(page.getByText('个人工具', { exact: true })).toBeVisible();
-    await expect(page.getByRole('link', { name: /关于 Cosmic Signature/ })).toHaveAttribute(
+    const siteMap = page.getByRole('main');
+    await expect(
+      siteMap.getByRole('heading', { level: 2, name: '信任', exact: true }),
+    ).toBeVisible();
+    await expect(siteMap.getByRole('link', { name: /关于 Cosmic Signature/ })).toHaveAttribute(
       'href',
       'https://cosmicsignature.com/zh/about',
     );
 
     await page.goto('/zh/this-page-does-not-exist');
-    await expect(page.getByRole('heading', { level: 1, name: /404：找不到页面/ })).toBeVisible();
-    await expect(page.getByRole('link', { name: '返回首页' })).toHaveAttribute('href', '/zh');
+    await expect(page.getByRole('heading', { level: 1, name: '找不到页面' })).toBeVisible();
+    await expect(page.getByRole('link', { name: '前往观测台' })).toHaveAttribute('href', '/zh');
   });
 
   test('language switcher round-trips en -> zh -> en and persists the cookie', async ({

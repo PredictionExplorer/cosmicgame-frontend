@@ -133,14 +133,38 @@ export async function collectOverflowViolations(page: Page): Promise<OverflowVio
        * element's contents returns the actual line boxes and ignores
        * out-of-flow content, so it answers the question we care about: is any
        * text outside the box?
+       *
+       * Visually hidden text (the `sr-only` pattern: a 1px absolutely
+       * positioned box that clips its content, e.g. "(opens in a new tab)"
+       * inside an external link) still lays out its full line, but none of it
+       * is ever painted, so it is skipped.
        */
+      function visuallyHidden(node: Element | null, boundary: Element): boolean {
+        for (let current = node; current && current !== boundary; current = current.parentElement) {
+          const style = window.getComputedStyle(current);
+          if (
+            style.position === 'absolute' &&
+            style.overflow === 'hidden' &&
+            current.clientWidth <= 1 &&
+            current.clientHeight <= 1
+          ) {
+            return true;
+          }
+        }
+        return false;
+      }
+
       function textSpill(el: Element, contentLeft: number, contentRight: number): number {
-        const range = document.createRange();
-        range.selectNodeContents(el);
+        const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
         let spill = 0;
-        for (const line of Array.from(range.getClientRects())) {
-          if (line.width === 0) continue;
-          spill = Math.max(spill, line.right - contentRight, contentLeft - line.left);
+        for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+          if (visuallyHidden(node.parentElement, el)) continue;
+          const range = document.createRange();
+          range.selectNodeContents(node);
+          for (const line of Array.from(range.getClientRects())) {
+            if (line.width === 0) continue;
+            spill = Math.max(spill, line.right - contentRight, contentLeft - line.left);
+          }
         }
         return spill;
       }

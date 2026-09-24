@@ -112,6 +112,39 @@ test.describe('A11y smoke (WCAG 2.1 AA)', () => {
     });
   }
 
+  test('site chrome landmarks sit at the top level on both hosts and the 404', async ({
+    page,
+    context,
+  }) => {
+    // The landing header and footer once rendered inside <main>; the shells
+    // now own them on every page, the home and the 404 included.
+    for (const { path, landing } of [
+      { path: '/', landing: true },
+      { path: '/about', landing: true },
+      { path: '/learn/quality-assurance-not-found', landing: true },
+      { path: '/', landing: false },
+      { path: '/quality-assurance-route-not-found', landing: false },
+    ]) {
+      await context.setExtraHTTPHeaders(landing ? LANDING_HEADERS : {});
+      await page.goto(path, { waitUntil: 'domcontentloaded' });
+      await expect(page.getByRole('main')).toHaveCount(1);
+      const results = await new AxeBuilder({ page })
+        .withRules([
+          'landmark-banner-is-top-level',
+          'landmark-contentinfo-is-top-level',
+          'landmark-main-is-top-level',
+          'landmark-no-duplicate-banner',
+          'landmark-no-duplicate-contentinfo',
+          'landmark-no-duplicate-main',
+        ])
+        .analyze();
+      expect(
+        results.violations,
+        `${landing ? 'landing' : 'app'} ${path}: ${JSON.stringify(results.violations, null, 2)}`,
+      ).toEqual([]);
+    }
+  });
+
   test('skip link jumps to #main on Tab+Enter', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     // First Tab focuses the skip link (it's the first focusable in the tree).

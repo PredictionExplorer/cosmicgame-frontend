@@ -374,8 +374,9 @@ test.describe('Landing page @ cosmicsignature.com', () => {
     for (const path of ['/', '/vi']) {
       await page.goto(path, { waitUntil: 'domcontentloaded' });
       const directory = page.locator('footer').getByTestId('language-directory');
+      // Every link, folded or not: phones fold the directory behind its heading.
       const hrefs = await directory
-        .getByRole('link')
+        .locator('a[href]')
         .evaluateAll((links) => links.map((link) => link.getAttribute('href')));
       expect(hrefs).toEqual(
         routing.locales.map((locale) => (locale === routing.defaultLocale ? '/' : `/${locale}`)),
