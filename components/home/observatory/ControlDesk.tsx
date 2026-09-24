@@ -60,7 +60,7 @@ export const ControlDesk = forwardRef<HTMLDivElement, ControlDeskProps>(
                 so its two parts can take their own places in the page order. */}
             <div
               data-testid="control-desk-cycle"
-              className="contents lg:col-span-5 lg:flex lg:flex-col lg:rounded-surface lg:border lg:border-rule-faint lg:bg-surface/60 lg:p-5 xl:p-6"
+              className="contents lg:col-span-5 lg:flex lg:flex-col lg:rounded-surface lg:border lg:border-rule-faint lg:bg-surface/60 lg:px-5 lg:py-4 xl:px-6"
             >
               <div
                 data-testid="control-desk-clock"
@@ -76,7 +76,7 @@ export const ControlDesk = forwardRef<HTMLDivElement, ControlDeskProps>(
                 <div
                   data-testid="control-desk-calibration"
                   className={cn(
-                    'min-w-0 p-5 max-md:order-4 sm:p-6 lg:mt-4 lg:border-0 lg:border-t lg:border-rule-faint lg:bg-transparent lg:px-0 lg:pb-0 lg:pt-4',
+                    'min-w-0 p-5 max-md:order-4 sm:p-6 lg:mt-3.5 lg:border-0 lg:border-t lg:border-rule-faint lg:bg-transparent lg:px-0 lg:pb-0 lg:pt-3.5',
                     FRAME,
                     'lg:rounded-none',
                   )}
@@ -87,14 +87,17 @@ export const ControlDesk = forwardRef<HTMLDivElement, ControlDeskProps>(
             </div>
             <div
               data-testid="control-desk-standings"
-              className={cn('min-w-0 p-5 max-md:order-3 sm:p-6 lg:col-span-7 lg:p-5 xl:p-6', FRAME)}
+              className={cn(
+                'min-w-0 p-5 max-md:order-3 sm:p-6 lg:col-span-7 lg:px-5 lg:py-4 xl:px-6',
+                FRAME,
+              )}
             >
               {standings}
             </div>
             {gestureConsole && (
               <div
                 data-testid="control-desk-gesture"
-                className="min-w-0 rounded-surface bg-surface p-5 max-md:order-2 sm:p-6 lg:col-span-12 lg:px-8 lg:pb-8 lg:pt-5"
+                className="min-w-0 rounded-surface bg-surface p-5 max-md:order-2 sm:p-6 lg:col-span-12 lg:px-8 lg:pb-8 lg:pt-4"
               >
                 {gestureConsole}
               </div>

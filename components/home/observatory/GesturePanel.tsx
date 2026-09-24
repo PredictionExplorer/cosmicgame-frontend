@@ -636,7 +636,7 @@ export function GesturePanel({
           standing && '@min-[52rem]/gesture:grid-cols-[minmax(0,7fr)_minmax(0,4fr)]',
         )}
       >
-        <div className="min-w-0 space-y-4">
+        <div className="min-w-0 space-y-3.5">
           <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
             <h2 id={`gesture-panel-title-${variant}`} className="type-heading-3 text-foreground">
               {t('form.title')}

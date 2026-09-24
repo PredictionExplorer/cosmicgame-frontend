@@ -100,9 +100,9 @@ export function GestureMethodControl({
               aria-describedby={subordinate ? rwlkNoteId : undefined}
               onClick={() => onSelect(method.value)}
               className={cn(
-                'relative flex min-h-12 min-w-0 items-center justify-between gap-x-3 gap-y-0.5 rounded-[calc(var(--radius-control)-2px)] border border-transparent px-3 py-2 text-start',
+                'relative flex min-h-12 min-w-0 items-center justify-between gap-x-3 gap-y-0.5 rounded-[calc(var(--radius-control)-2px)] border border-transparent px-3 py-1.5 text-start',
                 columns &&
-                  '@min-[30rem]/gesture:min-h-14 @min-[30rem]/gesture:flex-col @min-[30rem]/gesture:items-start @min-[30rem]/gesture:justify-center',
+                  '@min-[30rem]/gesture:min-h-13 @min-[30rem]/gesture:flex-col @min-[30rem]/gesture:items-start @min-[30rem]/gesture:justify-center',
                 'transition-[background-color,color,box-shadow] duration-[var(--duration-fast)] ease-[var(--ease-out-soft)]',
                 isSelected
                   ? cn(

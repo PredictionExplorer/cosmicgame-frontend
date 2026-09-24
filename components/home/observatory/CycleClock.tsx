@@ -83,9 +83,11 @@ function ClockFigures(props: CountdownRenderProps) {
   return (
     <div
       data-testid="clock-figures"
+      // The size goes first: tailwind-merge drops a leading-* that precedes a
+      // text-[size], and the digits must set solid (line-height 1).
       className={cn(
-        'flex items-start justify-center gap-[0.12em] font-normal leading-none tracking-[-0.03em] text-foreground tabular-nums lining-nums slashed-zero',
         FIGURE_SIZE,
+        'flex items-start justify-center gap-[0.12em] font-normal leading-none tracking-[-0.03em] text-foreground tabular-nums lining-nums slashed-zero',
       )}
     >
       {groups.map((group, index) => (
@@ -209,7 +211,7 @@ export function CycleClock({
       </div>
 
       <div
-        className={cn('@container mt-3 flex items-end', READOUT_HEIGHT)}
+        className={cn('@container mt-2 flex items-end', READOUT_HEIGHT)}
         role="timer"
         aria-live="off"
         aria-label={t('chrono.timerAria', { label, status })}
@@ -226,8 +228,8 @@ export function CycleClock({
             <p
               data-testid="clock-display"
               className={cn(
-                'text-center font-medium leading-tight tracking-[-0.02em] text-balance',
                 WORD_SIZE,
+                'text-center font-medium leading-tight tracking-[-0.02em] text-balance',
                 cycleState.isReadyToFinalize ? PHASE_TEXT_CLASS.positive : 'text-foreground',
               )}
             >
@@ -289,7 +291,7 @@ export function CycleClock({
       {/* What the cycle is for: the Signature Allocation. */}
       <div
         data-testid="clock-reserve"
-        className="mt-4 border-t border-rule-faint pt-3.5 text-center"
+        className="mt-3.5 border-t border-rule-faint pt-3 text-center"
       >
         <p className="type-label text-subtle">
           <Term id="signatureAllocation">{t('observatory.clock.reserveLabel')}</Term>

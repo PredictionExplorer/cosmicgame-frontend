@@ -111,7 +111,7 @@ export function CalibrationStatus({
         )}
       </div>
 
-      <div className="mt-2.5 h-0.5 w-full rounded-pill bg-rule">
+      <div className="mt-2 h-0.5 w-full rounded-pill bg-rule">
         {progress && !progress.isEnded && (
           <div
             role="progressbar"
@@ -125,7 +125,7 @@ export function CalibrationStatus({
         )}
       </div>
 
-      <dl className="mt-2.5 grid gap-x-4 gap-y-1.5 @min-[22rem]/calibration:grid-cols-3">
+      <dl className="mt-2 grid gap-x-4 gap-y-1.5 @min-[22rem]/calibration:grid-cols-3">
         {FIGURES.map((figure) => (
           <div
             key={figure}
