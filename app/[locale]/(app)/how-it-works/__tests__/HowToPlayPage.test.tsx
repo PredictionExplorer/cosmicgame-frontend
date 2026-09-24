@@ -22,7 +22,7 @@ describe('HowToPlayPage', () => {
       'What a gesture can lead to',
       'Getting started',
       'Tips and strategy',
-      'Ready to make your first Gesture?',
+      'Ready to make your first gesture?',
     ]);
     expect(screen.getAllByTestId('cycle-diagram')).toHaveLength(1);
     // F231: no overview cards restating the lifecycle, and no second closing panel.
@@ -43,7 +43,7 @@ describe('HowToPlayPage', () => {
 
   it('closes with the gesture form and the FAQ in one section', () => {
     renderPage();
-    const cta = screen.getByRole('region', { name: 'Ready to make your first Gesture?' });
+    const cta = screen.getByRole('region', { name: 'Ready to make your first gesture?' });
     expect(cta).toContainElement(screen.getByRole('link', { name: 'Browse the FAQ' }));
     expect(screen.getByRole('link', { name: 'Browse the FAQ' })).toHaveAttribute('href', '/faq');
   });

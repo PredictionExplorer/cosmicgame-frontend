@@ -10,7 +10,7 @@ describe('CallToAction', () => {
   it('renders the heading', () => {
     render(<CallToAction callToAction={callToAction} />);
     expect(
-      screen.getByRole('heading', { level: 2, name: 'Ready to make your first Gesture?' }),
+      screen.getByRole('heading', { level: 2, name: 'Ready to make your first gesture?' }),
     ).toBeInTheDocument();
   });
 

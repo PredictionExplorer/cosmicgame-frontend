@@ -171,7 +171,7 @@ export const howItWorksTextEn = {
     ],
   },
   callToAction: {
-    heading: 'Ready to make your first Gesture?',
+    heading: 'Ready to make your first gesture?',
     // The JSX original rendered a literal "\u2019" because unicode escapes are
     // not processed inside JSX text; this is the intentional fix to a real ’.
     body: 'Join the active Performance Cycle. Connect your wallet and make your first gesture to start imprinting CST and shaping the cycle’s Signature.',
