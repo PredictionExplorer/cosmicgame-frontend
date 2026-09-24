@@ -10,6 +10,8 @@ export interface StatisticsGroupProps {
   className?: string;
   accentColor?: 'blue' | 'purple' | 'emerald' | 'amber';
   tooltip?: string;
+  /** The title's level in the page outline. Default 4 (a group under an h3 divider). */
+  headingLevel?: 2 | 3 | 4;
 }
 
 type AccentColor = NonNullable<StatisticsGroupProps['accentColor']>;
@@ -35,7 +37,9 @@ export function StatisticsGroup({
   className,
   accentColor,
   tooltip,
+  headingLevel = 4,
 }: StatisticsGroupProps) {
+  const Heading = (['h2', 'h3', 'h4'] as const)[headingLevel - 2]!;
   return (
     <div
       className={cn(
@@ -57,9 +61,9 @@ export function StatisticsGroup({
           </div>
         )}
         <div className="flex min-w-0 items-center gap-1.5">
-          <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+          <Heading className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
             {title}
-          </h4>
+          </Heading>
           {tooltip ? <InfoTooltip content={tooltip} label={title} /> : null}
         </div>
       </div>
