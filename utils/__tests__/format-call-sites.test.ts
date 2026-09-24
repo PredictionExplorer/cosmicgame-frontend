@@ -78,7 +78,6 @@ const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
   'components/tokens/CSTTotalSupplyHistoryChart.tsx': 1,
   'components/tokens/CstTransferForm.tsx': 2,
   'components/tokens/CTBalanceDistributionChart.tsx': 1,
-  'components/tokens/MarketingCstRewardForm.tsx': 2,
   'components/ui/stat-card.tsx': 1,
   'components/user-statistics/HeroStats.tsx': 3,
   'components/user-statistics/StellarSelectionPerformance.tsx': 3,

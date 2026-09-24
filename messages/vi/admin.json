@@ -1,30 +1,52 @@
 {
-  "page": {
-    "title": "Quản trị",
-    "subtitle": "Quản lý nét bút và quản trị hệ thống",
-    "gestureList": "Danh sách nét bút",
-    "loading": "Đang tải…"
+  "tools": {
+    "label": "Công cụ vận hành",
+    "moderation": "Kiểm duyệt",
+    "settings": "Thiết lập hợp đồng",
+    "outreachTransfer": "Chuyển CST truyền thông"
+  },
+  "wallet": {
+    "connected": "Ví đã kết nối",
+    "notConnected": "Chưa kết nối ví",
+    "restoring": "Đang khôi phục kết nối ví…",
+    "rolesLabel": "Vai trò trên chuỗi của ví này",
+    "rolesError": "Không đọc được vai trò trên chuỗi của ví.",
+    "rolesPartial": "Không đọc được một số vai trò trên chuỗi của ví.",
+    "roles": {
+      "protocolOwner": "Chủ sở hữu giao thức",
+      "outreachOwner": "Chủ sở hữu Dự trữ truyền thông",
+      "outreachTreasurer": "Thủ quỹ Dự trữ truyền thông",
+      "none": "Không có vai trò trên chuỗi"
+    }
+  },
+  "moderation": {
+    "title": "Kiểm duyệt lời nhắn",
+    "subtitle": "Ẩn một lời nhắn nét bút khỏi trang này hoặc khôi phục nó. Lời nhắn đã ẩn vẫn nằm trên chuỗi; chỉ trang này không hiển thị nữa.",
+    "heading": "Lời nhắn nét bút",
+    "description": "Mọi nét bút có kèm lời nhắn. Lọc theo trạng thái hiển thị, chu kỳ hoặc nội dung.",
+    "readOnly": "Chỉ xem. Kết nối ví kiểm duyệt để ẩn hoặc khôi phục lời nhắn.",
+    "loadError": "Không tải được lời nhắn nét bút.",
+    "clearSearch": "Xóa tìm kiếm"
   },
   "settings": {
-    "title": "Tham số quản trị",
-    "subtitle": "Chế độ chỉ đọc cho các địa chỉ hợp đồng và tham số của bảng điều khiển.",
-    "breadcrumbs": {
-      "home": "Trang chủ",
-      "admin": "Quản trị",
-      "settings": "Thiết lập"
-    },
-    "loading": "Đang tải…",
-    "contractTitle": "Hợp đồng Cosmic Signature",
-    "contractDescription": "Địa chỉ hợp đồng và tham số trên chuỗi từ API bảng điều khiển.",
-    "placeholders": {
-      "number": "Nhập số tại đây"
-    },
-    "actions": {
-      "setAddress": "Đặt địa chỉ",
-      "set": "Đặt"
+    "title": "Thiết lập hợp đồng",
+    "subtitle": "Địa chỉ hợp đồng và tham số của giao thức theo báo cáo của bảng điều khiển. Chỉ xem: chỉ chủ sở hữu giao thức mới thay đổi được các giá trị này, trên chuỗi.",
+    "loadError": "Không tải được thiết lập hợp đồng.",
+    "notReported": "API bảng điều khiển không cung cấp",
+    "contractsDescription": "Mọi hợp đồng của giao thức, kèm địa chỉ trên Arbiscan và, nếu đã xác minh, mã nguồn trên Sourcify.",
+    "groups": {
+      "contracts": "Hợp đồng",
+      "shares": "Tỷ lệ phân bổ",
+      "selection": "Tinh tuyển",
+      "timing": "Thời gian",
+      "cost": "Chi phí nét bút"
     },
     "values": {
       "divisorPercent": "{percent} (số chia {divisor})"
+    },
+    "status": {
+      "active": "Đang hoạt động",
+      "scheduled": "Đã lên lịch"
     },
     "fields": {
       "ethStellarRecipients": "Số người nhận ETH Tinh tuyển mỗi chu kỳ",
@@ -34,34 +56,50 @@
       "publicGoodsPercentage": "Tỷ lệ Hàng hóa công",
       "stellarSelectionPercentage": "Tỷ lệ Tinh tuyển",
       "anchorDistributionPercentage": "Tỷ lệ phân phối neo giữ",
-      "timeIncrease": "Mức tăng thời gian",
-      "allocationTimeout": "Thời hạn nhận về phân bổ Signature",
-      "priceIncrease": "Mức tăng giá",
+      "timeIncrease": "Mức tăng thời gian tăng thêm mỗi chu kỳ",
+      "allocationTimeout": "Thời hạn hoàn tất",
+      "priceIncrease": "Bước tăng chi phí nét bút ETH",
       "gestureTimeIncrement": "Thời gian cộng thêm cho mỗi nét bút",
-      "initialAllocationSeconds": "Số giây ban đầu đến phân bổ Signature",
+      "initialAllocationSeconds": "Mức tăng thời gian ban đầu",
       "initialGestureCostFraction": "Tỷ lệ chi phí nét bút ban đầu",
       "activationTime": "Thời điểm kích hoạt",
       "gestureRatio": "Tỷ lệ nét bút ETH so với CST",
-      "calibrationWindowLength": "Độ dài cửa sổ hiệu chỉnh CST khi mở chu kỳ",
-      "switchMode": "Chuyển chế độ"
-    },
-    "modes": {
-      "runtime": "Chế độ vận hành",
-      "maintenance": "Chế độ bảo trì"
+      "calibrationWindowLength": "Độ dài cửa sổ hiệu chỉnh CST khi mở chu kỳ"
     }
   },
   "outreachTransfer": {
     "title": "Chuyển CST truyền thông",
-    "subtitle": "Công cụ chuyển CST dành cho ví được phép quản lý Dự trữ truyền thông. Truy cập bằng liên kết trực tiếp.",
-    "roleReadError": "Không đọc được chủ sở hữu và thủ quỹ của Dự trữ truyền thông.",
-    "walletRequiredTitle": "Chưa kết nối ví",
-    "walletRequiredDescription": "Kết nối ví thủ quỹ hiện tại của Dự trữ truyền thông để chi CST phân bổ.",
-    "walletUnavailableTitle": "Ví truyền thông không khả dụng",
-    "walletUnavailableDescription": "Bảng điều khiển chưa cung cấp địa chỉ ví truyền thông.",
-    "rolesLoadingTitle": "Đang tải vai trò của Dự trữ truyền thông",
-    "rolesLoadingDescription": "Đang đọc thông tin chủ sở hữu và thủ quỹ từ hợp đồng Dự trữ truyền thông.",
+    "subtitle": "Gửi CST từ Dự trữ truyền thông cho người tham gia. Chỉ ví thủ quỹ của quỹ dự trữ mới gửi được.",
+    "treasurer": "Thủ quỹ",
+    "owner": "Chủ sở hữu",
+    "walletRequiredTitle": "Kết nối ví thủ quỹ để gửi CST",
+    "walletRequiredDescription": "Sau khi kết nối, trang này hiển thị số dư của Dự trữ truyền thông và, với thủ quỹ, biểu mẫu gửi CST.",
+    "walletUnavailableTitle": "Chưa có địa chỉ Dự trữ truyền thông",
+    "walletUnavailableDescription": "Bảng điều khiển chưa cung cấp địa chỉ Dự trữ truyền thông. Hãy tải lại trang sau ít phút.",
     "rolesErrorTitle": "Không đọc được vai trò của Dự trữ truyền thông",
-    "restrictedTitle": "Truy cập bị hạn chế",
-    "restrictedDescription": "Kết nối ví thủ quỹ hiện tại của Dự trữ truyền thông ({treasurer}) để sử dụng công cụ chuyển CST. Chủ sở hữu: {owner}."
+    "rolesErrorDescription": "Không có địa chỉ thủ quỹ nên trang này không biết ví này có được gửi hay không.",
+    "restrictedTitle": "Ví này không phải ví thủ quỹ",
+    "restrictedDescription": "Chỉ thủ quỹ của Dự trữ truyền thông mới gửi được CST từ quỹ này. Hãy kết nối ví thủ quỹ để tiếp tục.",
+    "form": {
+      "title": "Gửi CST",
+      "description": "Một giao dịch chuyển số lượng này từ Dự trữ truyền thông đến người nhận. Không thể hoàn tác.",
+      "recipient": "Địa chỉ người nhận",
+      "amount": "Số lượng",
+      "amountHint": "Dùng dấu chấm hoặc dấu phẩy cho phần thập phân.",
+      "submit": "Gửi CST",
+      "reserveHeading": "Dự trữ truyền thông",
+      "reserve": "Địa chỉ quỹ dự trữ",
+      "balance": "Số dư CST",
+      "history": "Các lần chuyển của Dự trữ truyền thông",
+      "balanceError": "Không đọc được số dư CST của quỹ dự trữ.",
+      "confirmed": "Đã gửi CST từ Dự trữ truyền thông.",
+      "failed": "Không gửi được CST. Hãy kiểm tra ví rồi thử lại.",
+      "errors": {
+        "recipient": "Nhập một địa chỉ hợp lệ khác địa chỉ 0.",
+        "amount": "Nhập số lượng lớn hơn 0.",
+        "precision": "{decimals, plural, other {Dùng tối đa # chữ số thập phân.}}",
+        "insufficient": "Quỹ dự trữ có ít CST hơn số lượng này."
+      }
+    }
   }
 }

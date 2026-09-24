@@ -133,23 +133,6 @@
       "nameCleared": "Đã xóa tên token.",
       "nameSetFailed": "Đã xảy ra lỗi khi đặt tên token. Vui lòng thử lại.",
       "nameClearFailed": "Đã xảy ra lỗi khi xóa tên token. Vui lòng thử lại."
-    },
-    "marketingCst": {
-      "tokenUnavailable": "Địa chỉ token CST chưa có sẵn.",
-      "walletRequired": "Kết nối ví trước khi chi CST phân bổ.",
-      "reserveUnavailable": "Ví Dự trữ truyền thông không khả dụng.",
-      "treasurerUnavailable": "Thủ quỹ ví truyền thông không khả dụng.",
-      "treasurerRequired": "Kết nối ví thủ quỹ hiện tại của Dự trữ truyền thông trước khi chi CST phân bổ.",
-      "balanceLoading": "Số dư CST của Dự trữ truyền thông vẫn đang tải. Vui lòng thử lại sau ít phút.",
-      "insufficientBalance": "Số dư CST của Dự trữ truyền thông không đủ.",
-      "decimalsWarning": "Không đọc được số chữ số thập phân của CST; giả định 18 chữ số thập phân.",
-      "balanceReadFailed": "Không đọc được số dư CST của Dự trữ truyền thông. Vui lòng thử lại.",
-      "confirmed": "Đã xác nhận chuyển CST phân bổ truyền thông.",
-      "failed": "Không thể chi CST phân bổ. Vui lòng thử lại.",
-      "loading": "Đang tải…",
-      "pay": "Chi CST phân bổ",
-      "paying": "Đang chi…",
-      "viewTransaction": "Xem giao dịch"
     }
   },
   "contribution": {
@@ -182,13 +165,6 @@
     "confirmed": "Đã xác nhận khắc Random Walk NFT.",
     "failed": "Chưa khắc được. Hãy kiểm tra ví và mạng, rồi thử lại.",
     "imprinting": "Đang khắc…"
-  },
-  "admin": {
-    "gestureBan": {
-      "banned": "Đã chặn nét bút.",
-      "unbanned": "Đã bỏ chặn nét bút.",
-      "failed": "Đã xảy ra lỗi"
-    }
   },
   "regionLabel": "Thông báo",
   "close": "Đóng thông báo",

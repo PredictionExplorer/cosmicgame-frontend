@@ -1,14 +1,13 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Search } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 import { formatCount } from '@/utils/format';
 import { Button } from '@/components/ui/button';
 import { DataTable, TableTag, type DataTableColumn } from '@/components/ui/data-table';
-import { Input } from '@/components/ui/input';
+import { SearchField } from '@/components/ui/search-field';
 import {
   Select,
   SelectContent,
@@ -16,14 +15,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { tabsListVariants, tabsTriggerVariants } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { GestureMethodTag } from '@/components/tables/GestureMethodTag';
 import type { LedgerStateProps } from '@/components/tables/ledger-props';
 import api from '@/services/api';
-import { useActiveWeb3React } from '@/hooks/web3';
 import { useNotification } from '@/contexts/NotificationContext';
-import getErrorMessage from '@/utils/alert';
-import { reportError, getEthErrorMessage } from '@/utils/errors';
+import { reportError } from '@/utils/errors';
 
 interface GestureHistory {
   EvtLogId: number;
@@ -37,6 +35,15 @@ interface GestureHistory {
 
 interface BanGestureTableProps extends LedgerStateProps {
   gestureHistory: GestureHistory[];
+  /**
+   * The connected moderator wallet. Without one the list is read-only: the
+   * Hide and Restore column is not rendered at all.
+   */
+  moderatorAddress?: string | null;
+  /** A line under the title. */
+  description?: ReactNode;
+  /** Shown above the filters (the read-only notice). */
+  notice?: ReactNode;
 }
 
 type Visibility = 'all' | 'visible' | 'hidden';
@@ -46,20 +53,23 @@ const ALL_CYCLES = 'all';
 /** Enough messages to review at once without a page of tens of thousands of pixels. */
 const MODERATION_PAGE_SIZE = 25;
 
-/** Hides a gesture's message from public view, or restores it. */
+/**
+ * Hides a gesture's message from public view, or restores it. The button
+ * keeps its label beside a spinner while the request runs and ignores
+ * further presses until it settles.
+ */
 function ModerationAction({
   gesture,
   hidden,
+  moderatorAddress,
   onChanged,
 }: {
   gesture: GestureHistory;
   hidden: boolean;
+  moderatorAddress: string;
   onChanged: () => Promise<void> | void;
 }) {
   const t = useTranslations('tables');
-  const tToast = useTranslations('toasts');
-  const locale = useLocale();
-  const { account } = useActiveWeb3React();
   const { setNotification } = useNotification();
   const [busy, setBusy] = useState(false);
 
@@ -67,23 +77,16 @@ function ModerationAction({
     setBusy(true);
     try {
       if (hidden) await api.unban_gesture(gesture.EvtLogId);
-      else await api.ban_bid(gesture.EvtLogId, account as string);
+      else await api.ban_bid(gesture.EvtLogId, moderatorAddress);
       await onChanged();
       setNotification({
         visible: true,
         type: 'success',
-        text: tToast(hidden ? 'admin.gestureBan.unbanned' : 'admin.gestureBan.banned'),
+        text: t(hidden ? 'banGesture.unbanned' : 'banGesture.banned'),
       });
     } catch (error) {
       reportError(error, hidden ? 'unban gesture' : 'ban gesture');
-      const rawMessage = getEthErrorMessage(error, tToast('admin.gestureBan.failed'), { locale });
-      if (rawMessage) {
-        setNotification({
-          visible: true,
-          type: 'error',
-          text: getErrorMessage(rawMessage) || rawMessage,
-        });
-      }
+      setNotification({ visible: true, type: 'error', text: t('banGesture.error') });
     } finally {
       setBusy(false);
     }
@@ -93,8 +96,8 @@ function ModerationAction({
     <Button
       variant={hidden ? 'outline' : 'ghost'}
       size="sm"
-      onClick={run}
-      disabled={busy}
+      onClick={() => void run()}
+      loading={busy}
       className="px-3"
     >
       {hidden ? t('banGesture.unban') : t('banGesture.ban')}
@@ -105,10 +108,18 @@ function ModerationAction({
 /**
  * Gesture messages for moderation, 25 at a time: filter by visibility, cycle
  * or text, then hide a message from public view or restore it. A hidden
- * message is marked with a tag and set in the subtle tier.
+ * message is marked with a tag and set in the subtle tier. Without a
+ * moderator wallet the same list is read-only.
  */
-const BanGestureTable = ({ gestureHistory, ...state }: BanGestureTableProps) => {
+const BanGestureTable = ({
+  gestureHistory,
+  moderatorAddress = null,
+  description,
+  notice,
+  ...state
+}: BanGestureTableProps) => {
   const t = useTranslations('tables');
+  const tAdmin = useTranslations('admin');
   const locale = useLocale();
   const [hiddenIds, setHiddenIds] = useState<ReadonlySet<number>>(() => new Set());
   const [visibility, setVisibility] = useState<Visibility>('all');
@@ -121,8 +132,7 @@ const BanGestureTable = ({ gestureHistory, ...state }: BanGestureTableProps) => 
   }, []);
 
   useEffect(() => {
-    // The moderation list is admin-only and cheap; it loads once and after
-    // every change.
+    // The hidden list is small; it loads once and after every change.
     void refreshHidden(); // eslint-disable-line react-hooks/set-state-in-effect -- async fetch on mount
   }, [refreshHidden]);
 
@@ -147,8 +157,8 @@ const BanGestureTable = ({ gestureHistory, ...state }: BanGestureTableProps) => 
     });
   }, [gestureHistory, hiddenIds, visibility, cycle, query, locale]);
 
-  const columns = useMemo<DataTableColumn<GestureHistory>[]>(
-    () => [
+  const columns = useMemo<DataTableColumn<GestureHistory>[]>(() => {
+    const base: DataTableColumn<GestureHistory>[] = [
       {
         id: 'date',
         kind: 'datetime',
@@ -216,6 +226,10 @@ const BanGestureTable = ({ gestureHistory, ...state }: BanGestureTableProps) => 
         stack: true,
         width: '100%',
       },
+    ];
+    if (!moderatorAddress) return base;
+    return [
+      ...base,
       {
         id: 'action',
         kind: 'text',
@@ -227,65 +241,62 @@ const BanGestureTable = ({ gestureHistory, ...state }: BanGestureTableProps) => 
           <ModerationAction
             gesture={gesture}
             hidden={hiddenIds.has(gesture.EvtLogId)}
+            moderatorAddress={moderatorAddress}
             onChanged={refreshHidden}
           />
         ),
       },
-    ],
-    [t, hiddenIds, refreshHidden],
-  );
+    ];
+  }, [t, hiddenIds, refreshHidden, moderatorAddress]);
 
   const toolbar = (
-    <div className="mb-4 flex flex-wrap items-center gap-3">
-      <div
-        role="group"
-        aria-label={t('banGesture.visibilityLabel')}
-        className="inline-flex rounded-control border border-input bg-surface-sunken p-0.5"
-      >
-        {VISIBILITY.map((option) => (
-          <button
-            key={option}
-            type="button"
-            aria-pressed={visibility === option}
-            onClick={() => setVisibility(option)}
-            className={cn(
-              'inline-flex h-11 items-center gap-1.5 rounded-[calc(var(--radius-control)-2px)] px-3 type-body-sm',
-              'text-muted-foreground transition-colors duration-[var(--duration-fast)] hover:text-foreground sm:h-8',
-              visibility === option && 'bg-surface-raised text-foreground',
-            )}
-          >
-            {t(`banGesture.filters.${option}`)}
-            <span className="tabular-nums text-subtle">{formatCount(counts[option], locale)}</span>
-          </button>
-        ))}
-      </div>
-      <Select value={cycle} onValueChange={setCycle}>
-        <SelectTrigger className="h-11 w-auto min-w-36 sm:h-9" aria-label={t('columns.cycle')}>
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={ALL_CYCLES}>{t('banGesture.allCycles')}</SelectItem>
-          {cycles.map((round) => (
-            <SelectItem key={round} value={String(round)}>
-              {t('allocation.cycle', { cycle: round })}
-            </SelectItem>
+    <div className="mb-4 space-y-4">
+      {notice}
+      <div className="flex flex-wrap items-center gap-3">
+        <div
+          role="group"
+          aria-label={t('banGesture.visibilityLabel')}
+          className={tabsListVariants({ variant: 'segmented' })}
+        >
+          {VISIBILITY.map((option) => (
+            <button
+              key={option}
+              type="button"
+              aria-pressed={visibility === option}
+              data-state={visibility === option ? 'active' : 'inactive'}
+              onClick={() => setVisibility(option)}
+              // 32px from sm, so the track (4px padding) matches the 40px fields beside it.
+              className={cn(tabsTriggerVariants({ variant: 'segmented' }), 'sm:min-h-8 sm:py-1')}
+            >
+              {t(`banGesture.filters.${option}`)}
+              <span className="tabular-nums text-subtle">
+                {formatCount(counts[option], locale)}
+              </span>
+            </button>
           ))}
-        </SelectContent>
-      </Select>
-      <label className="relative min-w-0 flex-1 basis-56">
-        <span className="sr-only">{t('banGesture.search')}</span>
-        <Search
-          aria-hidden
-          className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-subtle"
-        />
-        <Input
-          type="search"
+        </div>
+        <Select value={cycle} onValueChange={setCycle}>
+          <SelectTrigger className="h-11 w-auto min-w-36 sm:h-10" aria-label={t('columns.cycle')}>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={ALL_CYCLES}>{t('banGesture.allCycles')}</SelectItem>
+            {cycles.map((round) => (
+              <SelectItem key={round} value={String(round)}>
+                {t('allocation.cycle', { cycle: round })}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <SearchField
           value={query}
-          onChange={(event) => setQuery(event.target.value)}
+          onValueChange={setQuery}
+          aria-label={t('banGesture.search')}
           placeholder={t('banGesture.search')}
-          className="pl-9 sm:h-9"
+          clearLabel={tAdmin('moderation.clearSearch')}
+          containerClassName="min-w-0 flex-1 basis-56"
         />
-      </label>
+      </div>
     </div>
   );
 
@@ -296,6 +307,7 @@ const BanGestureTable = ({ gestureHistory, ...state }: BanGestureTableProps) => 
       data={rows}
       columns={columns}
       ariaLabel={t('names.gestureMessages')}
+      description={description}
       toolbar={gestureHistory.length > 0 ? toolbar : undefined}
       getRowKey={(gesture) => gesture.EvtLogId}
       emptyTitle={filtered ? t('banGesture.noMatches') : t('empty.gestureHistory')}

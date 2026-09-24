@@ -220,16 +220,16 @@
     "invalidAddress": "잘못된 주소"
   },
   "admin": {
-    "title": "관리자",
-    "description": "Cosmic Signature 프로토콜의 관리 도구입니다. 프로토콜 매개변수, 컨트랙트 설정, 시스템 구성을 관리합니다."
+    "title": "제스처 메시지 관리",
+    "description": "운영 도구: Cosmic Signature 사이트에서 제스처 메시지를 숨기거나 복원합니다."
   },
   "adminSettings": {
-    "title": "관리자 설정",
-    "description": "관리자 설정과 컨트랙트 관리 화면입니다."
+    "title": "컨트랙트 설정",
+    "description": "Cosmic Signature 컨트랙트 주소와 매개변수를 읽기 전용으로 보여 주는 운영 화면입니다."
   },
   "internalCstOutreachTransfer": {
     "title": "CST 홍보 전송",
-    "description": "설정된 홍보 준비금 지갑 서명자만 사용할 수 있는 제한된 CST 전송 도구입니다."
+    "description": "홍보 준비금 재무 담당자가 준비금에서 CST를 보내는 운영 도구입니다."
   },
   "embedEndurance": {
     "title": "수호 챔피언 및 시간의 전사 타임라인",

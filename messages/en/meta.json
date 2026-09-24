@@ -220,16 +220,16 @@
     "invalidAddress": "Invalid Address"
   },
   "admin": {
-    "title": "Admin",
-    "description": "Administrative controls for the Cosmic Signature protocol. Manage protocol parameters, contract settings, and system configuration."
+    "title": "Message moderation",
+    "description": "Operator tool: hide gesture messages from the Cosmic Signature site, or restore them."
   },
   "adminSettings": {
-    "title": "Admin Settings",
-    "description": "Administrative settings and contract management"
+    "title": "Contract settings",
+    "description": "Read-only operator view of the Cosmic Signature contract addresses and parameters."
   },
   "internalCstOutreachTransfer": {
-    "title": "CST Outreach Transfer",
-    "description": "Restricted CST transfer tool for the configured outreach reserve wallet signer."
+    "title": "CST outreach transfer",
+    "description": "Operator tool for the Outreach Reserve treasurer to send CST from the reserve."
   },
   "embedEndurance": {
     "title": "Endurance & Chrono Timeline",

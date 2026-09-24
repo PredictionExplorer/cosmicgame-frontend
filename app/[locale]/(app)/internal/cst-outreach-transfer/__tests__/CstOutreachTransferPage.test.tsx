@@ -3,7 +3,7 @@ import {
   TEST_MARKETING_WALLET,
 } from '@/test-utils/contractAddressesFixture';
 
-import { render, screen } from '@/test-utils';
+import { renderWithQuery as render, screen } from '@/test-utils';
 
 import CstOutreachTransferPage from '../CstOutreachTransferPage';
 
@@ -18,7 +18,11 @@ let mockAccount: string | null = TREASURER;
 let mockActive = true;
 let mockContractAddresses = TEST_APP_CONTRACT_ADDRESSES;
 
+// The page reads its roles through React Query: use the real one, not the empty stub.
+jest.mock('@tanstack/react-query', () => jest.requireActual('@tanstack/react-query'));
+
 jest.mock('wagmi', () => ({
+  useConnection: () => ({ status: 'connected' }),
   usePublicClient: () => ({
     readContract: (...args: unknown[]) => mockReadContract(...args),
   }),
@@ -84,62 +88,74 @@ describe('CstOutreachTransferPage', () => {
     setupRoleReads();
   });
 
-  it('shows a wallet-required empty state when disconnected', () => {
+  it('asks for the treasurer wallet when none is connected', () => {
     mockAccount = null;
     mockActive = false;
 
     render(<CstOutreachTransferPage />);
 
-    expect(screen.getByText('Wallet not connected')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Connect the treasurer wallet to send CST' }),
+    ).toBeInTheDocument();
+    expect(mockReadContract).not.toHaveBeenCalledWith(
+      expect.objectContaining({ functionName: 'payReward' }),
+    );
     expect(screen.queryByTestId('marketing-cst-reward-form')).not.toBeInTheDocument();
   });
 
-  it('shows a config error when the marketing wallet address is unavailable', () => {
+  it('says so when the Outreach Reserve address is not known yet', () => {
     mockContractAddresses = { ...TEST_APP_CONTRACT_ADDRESSES, marketing: '' };
 
     render(<CstOutreachTransferPage />);
 
-    expect(screen.getByText('Outreach Reserve wallet unavailable')).toBeInTheDocument();
+    expect(screen.getByText('Outreach Reserve address unavailable')).toBeInTheDocument();
     expect(screen.queryByTestId('marketing-cst-reward-form')).not.toBeInTheDocument();
   });
 
-  it('shows a loading state while reading owner and treasurer', async () => {
+  it('shows placeholder rows while the roles are read', () => {
     mockReadContract.mockReturnValue(new Promise(() => {}));
 
     render(<CstOutreachTransferPage />);
 
-    expect(await screen.findByText('Loading outreach reserve roles')).toBeInTheDocument();
+    expect(screen.getByRole('status')).toBeInTheDocument();
     expect(screen.queryByTestId('marketing-cst-reward-form')).not.toBeInTheDocument();
   });
 
-  it('shows an error state when owner or treasurer reads fail', async () => {
+  it('reports a failed role read and offers a retry', async () => {
     const err = new Error('role read failed');
     mockReadContract.mockRejectedValue(err);
 
     render(<CstOutreachTransferPage />);
 
-    expect(await screen.findByText('Unable to read outreach reserve roles')).toBeInTheDocument();
+    // One retry first (useOutreachRoleHolders), so allow for its delay.
+    expect(
+      await screen.findByText("The Outreach Reserve's roles could not be read", undefined, {
+        timeout: 4_000,
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
     expect(mockReportError).toHaveBeenCalledWith(err, 'MarketingWallet role read');
     expect(screen.queryByTestId('marketing-cst-reward-form')).not.toBeInTheDocument();
   });
 
-  it('restricts access when a non-treasurer wallet is connected', async () => {
+  it('tells any other wallet whose wallet the tool needs', async () => {
     mockAccount = OTHER_ACCOUNT;
 
     render(<CstOutreachTransferPage />);
 
-    expect(await screen.findByText('Access restricted')).toBeInTheDocument();
-    expect(screen.getByText(/current outreach reserve treasurer/i)).toBeInTheDocument();
+    expect(await screen.findByText('This wallet is not the treasurer')).toBeInTheDocument();
+    expect(screen.getByText('Treasurer')).toBeInTheDocument();
+    expect(screen.getByTitle(TREASURER)).toBeInTheDocument();
     expect(screen.queryByTestId('marketing-cst-reward-form')).not.toBeInTheDocument();
   });
 
-  it('restricts the owner when owner is not the current treasurer', async () => {
+  it('does not let the owner send when the owner is not the treasurer', async () => {
     mockAccount = OWNER;
     setupRoleReads(OWNER, TREASURER);
 
     render(<CstOutreachTransferPage />);
 
-    expect(await screen.findByText('Access restricted')).toBeInTheDocument();
+    expect(await screen.findByText('This wallet is not the treasurer')).toBeInTheDocument();
     expect(screen.queryByTestId('marketing-cst-reward-form')).not.toBeInTheDocument();
   });
 

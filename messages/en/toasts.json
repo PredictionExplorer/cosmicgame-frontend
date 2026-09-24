@@ -133,23 +133,6 @@
       "nameCleared": "Token name cleared.",
       "nameSetFailed": "An error occurred while setting the token name. Please try again.",
       "nameClearFailed": "An error occurred while clearing the token name. Please try again."
-    },
-    "marketingCst": {
-      "tokenUnavailable": "CST token address is not available yet.",
-      "walletRequired": "Connect your wallet to send a CST allocation.",
-      "reserveUnavailable": "Outreach reserve wallet is not available.",
-      "treasurerUnavailable": "The Outreach Reserve treasurer address is unavailable.",
-      "treasurerRequired": "Connect the Outreach Reserve treasurer wallet to send CST allocations.",
-      "balanceLoading": "Outreach reserve CST balance is still loading. Please try again in a moment.",
-      "insufficientBalance": "Insufficient outreach reserve CST balance.",
-      "decimalsWarning": "Unable to read CST decimals; assuming 18 decimal places.",
-      "balanceReadFailed": "Unable to read the outreach reserve CST balance. Please try again.",
-      "confirmed": "Outreach Reserve CST allocation confirmed.",
-      "failed": "Unable to send the CST allocation. Please try again.",
-      "loading": "Loading...",
-      "pay": "Send CST Allocation",
-      "paying": "Paying...",
-      "viewTransaction": "View transaction"
     }
   },
   "contribution": {
@@ -182,13 +165,6 @@
     "confirmed": "Random Walk NFT imprint confirmed.",
     "failed": "Imprint didn't go through. Check your wallet and network, then try again.",
     "imprinting": "Imprinting..."
-  },
-  "admin": {
-    "gestureBan": {
-      "banned": "Gesture was banned successfully!",
-      "unbanned": "Gesture was unbanned successfully!",
-      "failed": "An error occurred"
-    }
   },
   "regionLabel": "Notifications",
   "close": "Close notification",

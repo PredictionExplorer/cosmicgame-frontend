@@ -74,17 +74,5 @@
     "invalid": "以太坊地址無效",
     "heading": "此參與者的推廣分配",
     "loading": "載入中…"
-  },
-  "transferForm": {
-    "title": "撥付推廣 CST",
-    "description": "呼叫推廣儲備合約的 `payReward` 函式；目前連接的錢包必須屬於現任財務執行人。",
-    "reserveLabel": "推廣儲備",
-    "availableLabel": "可用 CST",
-    "ownerLabel": "所有者",
-    "treasurerLabel": "財務執行人",
-    "unavailable": "暫不可用",
-    "recipientLabel": "接收地址",
-    "amountLabel": "數量",
-    "historyLink": "檢視推廣儲備轉帳紀錄"
   }
 }

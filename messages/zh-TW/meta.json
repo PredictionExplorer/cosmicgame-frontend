@@ -220,16 +220,16 @@
     "description": "按演繹週期查看向 Cosmic Signature 協議直接貢獻的 ETH。"
   },
   "admin": {
-    "title": "管理",
-    "description": "Cosmic Signature 協議管理工具，用於檢視協議參數、合約設定與系統配置。"
+    "title": "落筆留言審核",
+    "description": "營運工具：在 Cosmic Signature 網站上隱藏或恢復落筆留言。"
   },
   "adminSettings": {
-    "title": "管理設定",
-    "description": "檢視 Cosmic Signature 的管理設定與合約配置。"
+    "title": "合約設定",
+    "description": "以唯讀方式檢視 Cosmic Signature 合約地址與參數的營運畫面。"
   },
   "internalCstOutreachTransfer": {
     "title": "CST 推廣轉帳",
-    "description": "僅供已配置推廣儲備錢包簽名者使用的受限 CST 轉帳工具。"
+    "description": "供推廣儲備財務執行人從儲備轉出 CST 的營運工具。"
   },
   "embedEndurance": {
     "title": "堅守與時之勇士時間線",

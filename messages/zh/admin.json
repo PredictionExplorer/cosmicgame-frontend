@@ -1,30 +1,52 @@
 {
-  "page": {
-    "title": "管理",
-    "subtitle": "管理落笔记录与系统设置",
-    "gestureList": "落笔列表",
-    "loading": "加载中…"
+  "tools": {
+    "label": "运营工具",
+    "moderation": "留言审核",
+    "settings": "合约设置",
+    "outreachTransfer": "推广转账"
+  },
+  "wallet": {
+    "connected": "已连接钱包",
+    "notConnected": "未连接钱包",
+    "restoring": "正在恢复钱包连接…",
+    "rolesLabel": "此钱包的链上角色",
+    "rolesError": "未能读取其链上角色。",
+    "rolesPartial": "部分链上角色未能读取。",
+    "roles": {
+      "protocolOwner": "协议所有者",
+      "outreachOwner": "推广储备所有者",
+      "outreachTreasurer": "推广储备财务执行人",
+      "none": "无链上角色"
+    }
+  },
+  "moderation": {
+    "title": "落笔留言审核",
+    "subtitle": "在本站隐藏或恢复落笔留言。隐藏的留言仍保留在链上，只是本站不再显示。",
+    "heading": "落笔留言",
+    "description": "所有附带留言的落笔。可按可见性、周期或文字筛选。",
+    "readOnly": "只读。连接审核员钱包后即可隐藏或恢复留言。",
+    "loadError": "未能加载落笔留言。",
+    "clearSearch": "清除搜索"
   },
   "settings": {
-    "title": "管理方法",
-    "subtitle": "以只读方式查看控制面板中的合约地址与参数。",
-    "breadcrumbs": {
-      "home": "首页",
-      "admin": "管理",
-      "settings": "设置"
-    },
-    "loading": "加载中…",
-    "contractTitle": "Cosmic Signature 合约",
-    "contractDescription": "控制面板 API 提供的合约地址与链上参数。",
-    "placeholders": {
-      "number": "在此输入数值"
-    },
-    "actions": {
-      "setAddress": "设置地址",
-      "set": "设置"
+    "title": "合约设置",
+    "subtitle": "控制面板所报告的协议合约地址与参数。只读：只有协议所有者能在链上更改这些数值。",
+    "loadError": "未能加载合约设置。",
+    "notReported": "控制面板 API 未提供",
+    "contractsDescription": "每个协议合约，附 Arbiscan 上的地址；已验证的合约另附 Sourcify 上的源代码。",
+    "groups": {
+      "contracts": "合约",
+      "shares": "分配比例",
+      "selection": "星选",
+      "timing": "时间参数",
+      "cost": "落笔价格"
     },
     "values": {
       "divisorPercent": "{percent}（除数 {divisor}）"
+    },
+    "status": {
+      "active": "已启用",
+      "scheduled": "待启用"
     },
     "fields": {
       "ethStellarRecipients": "每个周期的 ETH 星选获配者人数",
@@ -34,34 +56,50 @@
       "publicGoodsPercentage": "公共物品比例",
       "stellarSelectionPercentage": "星选比例",
       "anchorDistributionPercentage": "锚定派发比例",
-      "timeIncrease": "时间增量",
-      "allocationTimeout": "取回签名分配的超时时间",
-      "priceIncrease": "价格增幅",
+      "timeIncrease": "时间增量的每周期增幅",
+      "allocationTimeout": "专属收官期限",
+      "priceIncrease": "ETH 落笔价格增幅",
       "gestureTimeIncrement": "每笔落笔增加的时间",
-      "initialAllocationSeconds": "距签名分配的初始秒数",
+      "initialAllocationSeconds": "初始时间增量",
       "initialGestureCostFraction": "初始落笔价格比例",
       "activationTime": "启用时间",
       "gestureRatio": "ETH 与 CST 落笔比率",
-      "calibrationWindowLength": "周期开启时 CST 校准窗口时长",
-      "switchMode": "切换模式"
-    },
-    "modes": {
-      "runtime": "运行模式",
-      "maintenance": "维护模式"
+      "calibrationWindowLength": "周期开启时 CST 校准窗口时长"
     }
   },
   "outreachTransfer": {
     "title": "CST 推广转账",
-    "subtitle": "仅限通过此网址访问的转账工具，供已配置的推广储备钱包签名者使用。",
-    "roleReadError": "未能读取推广储备的所有者与财务执行人。",
-    "walletRequiredTitle": "未连接钱包",
-    "walletRequiredDescription": "请连接推广储备现任财务执行人的钱包，再拨付 CST 分配。",
-    "walletUnavailableTitle": "推广钱包暂不可用",
-    "walletUnavailableDescription": "控制面板尚未提供推广钱包地址。",
-    "rolesLoadingTitle": "正在加载推广储备角色",
-    "rolesLoadingDescription": "正在从合约读取 MarketingWallet 的所有者与财务执行人。",
-    "rolesErrorTitle": "未能读取推广储备角色",
-    "restrictedTitle": "访问受限",
-    "restrictedDescription": "请连接推广储备现任财务执行人（{treasurer}）的钱包，才能使用此转账工具。所有者：{owner}。"
+    "subtitle": "从推广储备向参与者转出 CST。只有推广储备的财务执行人钱包可以转出。",
+    "treasurer": "财务执行人",
+    "owner": "所有者",
+    "walletRequiredTitle": "连接财务执行人钱包以转出 CST",
+    "walletRequiredDescription": "连接后，此页面会显示推广储备的余额；若为财务执行人，还会显示转出 CST 的表单。",
+    "walletUnavailableTitle": "推广储备地址暂不可用",
+    "walletUnavailableDescription": "控制面板尚未提供推广储备的地址，请稍后重新加载页面。",
+    "rolesErrorTitle": "未能读取推广储备的角色",
+    "rolesErrorDescription": "没有财务执行人的地址，本页无法判断此钱包能否转出。",
+    "restrictedTitle": "此钱包不是财务执行人",
+    "restrictedDescription": "只有推广储备的财务执行人才能从中转出 CST。请连接财务执行人钱包后继续。",
+    "form": {
+      "title": "转出 CST",
+      "description": "一笔交易即把该数额从推广储备转给接收方，且无法撤销。",
+      "recipient": "接收地址",
+      "amount": "数额",
+      "amountHint": "小数可用小数点或逗号。",
+      "submit": "转出 CST",
+      "reserveHeading": "推广储备",
+      "reserve": "储备地址",
+      "balance": "CST 余额",
+      "history": "推广储备转账记录",
+      "balanceError": "未能读取推广储备的 CST 余额。",
+      "confirmed": "已从推广储备转出 CST。",
+      "failed": "CST 未能转出。请检查钱包后重试。",
+      "errors": {
+        "recipient": "请输入有效地址，零地址除外。",
+        "amount": "请输入大于零的数额。",
+        "precision": "{decimals, plural, other {最多使用 # 位小数。}}",
+        "insufficient": "推广储备的 CST 少于此数额。"
+      }
+    }
   }
 }

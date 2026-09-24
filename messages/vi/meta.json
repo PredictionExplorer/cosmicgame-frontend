@@ -220,16 +220,16 @@
     "invalidAddress": "Địa chỉ không hợp lệ"
   },
   "admin": {
-    "title": "Quản trị",
-    "description": "Bảng điều khiển quản trị của giao thức Cosmic Signature. Quản lý tham số giao thức, thiết lập hợp đồng và cấu hình hệ thống."
+    "title": "Kiểm duyệt lời nhắn",
+    "description": "Công cụ vận hành: ẩn hoặc khôi phục lời nhắn nét bút trên trang Cosmic Signature."
   },
   "adminSettings": {
-    "title": "Thiết lập quản trị",
-    "description": "Thiết lập quản trị và quản lý hợp đồng"
+    "title": "Thiết lập hợp đồng",
+    "description": "Trang vận hành chỉ xem, liệt kê địa chỉ hợp đồng và tham số của Cosmic Signature."
   },
   "internalCstOutreachTransfer": {
     "title": "Chuyển CST truyền thông",
-    "description": "Công cụ chuyển CST hạn chế dành cho người ký ví Dự trữ truyền thông đã cấu hình."
+    "description": "Công cụ vận hành để thủ quỹ Dự trữ truyền thông gửi CST từ quỹ dự trữ."
   },
   "embedEndurance": {
     "title": "Dòng thời gian Quán quân Bền bỉ và Chiến binh Thời gian",

@@ -74,17 +74,5 @@
     "invalid": "以太坊地址无效",
     "heading": "此参与者的推广分配",
     "loading": "加载中…"
-  },
-  "transferForm": {
-    "title": "拨付推广 CST",
-    "description": "调用推广储备合约的 `payReward` 函数；当前连接的钱包必须属于现任财务执行人。",
-    "reserveLabel": "推广储备",
-    "availableLabel": "可用 CST",
-    "ownerLabel": "所有者",
-    "treasurerLabel": "财务执行人",
-    "unavailable": "暂不可用",
-    "recipientLabel": "接收地址",
-    "amountLabel": "数量",
-    "historyLink": "查看推广储备转账记录"
   }
 }

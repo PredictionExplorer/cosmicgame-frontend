@@ -133,23 +133,6 @@
       "nameCleared": "代币名称已成功清除。",
       "nameSetFailed": "未能更改代币名称，请重试。",
       "nameClearFailed": "未能清除代币名称，请重试。"
-    },
-    "marketingCst": {
-      "tokenUnavailable": "CST 代币地址暂不可用。",
-      "walletRequired": "请先连接钱包，再拨付推广 CST。",
-      "reserveUnavailable": "推广储备钱包暂不可用。",
-      "treasurerUnavailable": "推广钱包财务执行人地址暂不可用。",
-      "treasurerRequired": "请连接当前推广钱包财务执行人的钱包，再拨付推广 CST。",
-      "balanceLoading": "推广储备的 CST 余额仍在加载，请稍后重试。",
-      "insufficientBalance": "推广储备的 CST 余额不足。",
-      "decimalsWarning": "未能读取 CST 小数位数；将按 18 位小数处理。",
-      "balanceReadFailed": "未能读取推广储备的 CST 余额，请重试。",
-      "confirmed": "推广 CST 拨付已确认。",
-      "failed": "未能拨付推广 CST。请检查钱包与网络连接后重试。",
-      "loading": "加载中…",
-      "pay": "拨付推广 CST",
-      "paying": "拨付中…",
-      "viewTransaction": "查看交易"
     }
   },
   "contribution": {
@@ -182,13 +165,6 @@
     "confirmed": "Random Walk NFT 铭刻已确认。",
     "failed": "铭刻未完成。请检查钱包与网络后重试。",
     "imprinting": "铭刻中…"
-  },
-  "admin": {
-    "gestureBan": {
-      "banned": "落笔已成功屏蔽。",
-      "unbanned": "落笔已取消屏蔽。",
-      "failed": "未能更新落笔审核状态，请重试。"
-    }
   },
   "regionLabel": "通知",
   "close": "关闭通知",

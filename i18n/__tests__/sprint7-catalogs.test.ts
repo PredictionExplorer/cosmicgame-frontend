@@ -33,10 +33,10 @@ describe('Sprint 7 focused catalogs', () => {
     expect(zhEthContribution.detail.breadcrumbContributions).toBe('ETH 贡献');
     expect(zhPublicGoods.retrievals.title).toBe('公共物品取回');
     expect(zhMarketing.stats.infoAria).toContain('说明');
-    expect(zhMarketing.transferForm.recipientLabel).toBe('接收地址');
+    expect(zhAdmin.outreachTransfer.form.recipient).toBe('接收地址');
     expect(zhCoordination.page.title).toBe('协调变更');
     expect(zhCoordination.events.publicGoodsPercentage).toBe('公共物品比例已变更');
-    expect(zhAdmin.outreachTransfer.restrictedTitle).toBe('访问受限');
+    expect(zhAdmin.outreachTransfer.restrictedTitle).toBe('此钱包不是财务执行人');
   });
 
   it('pins the reviewed English rendering', () => {
@@ -47,7 +47,7 @@ describe('Sprint 7 focused catalogs', () => {
       'Receive CST for <highlight>Spreading the Word</highlight>',
     );
     expect(enCoordination.page.title).toBe('Coordination Changes');
-    expect(enAdmin.settings.title).toBe('Administrative methods');
+    expect(enAdmin.settings.title).toBe('Contract settings');
   });
 
   it('uses glossary-safe Chinese for outreach and public-goods copy', () => {

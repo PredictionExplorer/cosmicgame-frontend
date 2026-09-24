@@ -239,11 +239,11 @@
     "voluntaryEmpty": "Các khoản đóng góp gửi thẳng đến Kho Hàng hóa công sẽ hiện ở đây. Kho giữ số tiền này cho đơn vị thụ hưởng được cấu hình trong hợp đồng."
   },
   "banGesture": {
-    "banned": "Đã chặn nét bút.",
-    "unbanned": "Đã bỏ chặn nét bút.",
-    "error": "Đã xảy ra lỗi",
-    "ban": "Chặn",
-    "unban": "Bỏ chặn",
+    "banned": "Đã ẩn lời nhắn.",
+    "unbanned": "Đã khôi phục lời nhắn.",
+    "error": "Không cập nhật được trạng thái lời nhắn. Hãy thử lại.",
+    "ban": "Ẩn",
+    "unban": "Khôi phục",
     "visibilityLabel": "Hiển thị lời nhắn",
     "hiddenTag": "Đã ẩn",
     "allCycles": "Tất cả chu kỳ",

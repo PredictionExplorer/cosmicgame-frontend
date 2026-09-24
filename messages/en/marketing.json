@@ -74,17 +74,5 @@
     "invalid": "Invalid Ethereum Address",
     "heading": "Outreach Allocations for This Participant",
     "loading": "Loading..."
-  },
-  "transferForm": {
-    "title": "Send a CST Allocation",
-    "description": "Send CST from the Outreach Reserve. Connect the current treasurer wallet to use this form.",
-    "reserveLabel": "Outreach reserve",
-    "availableLabel": "Available CST",
-    "ownerLabel": "Owner",
-    "treasurerLabel": "Treasurer",
-    "unavailable": "Unavailable",
-    "recipientLabel": "Recipient address",
-    "amountLabel": "Amount",
-    "historyLink": "View outreach reserve transfers"
   }
 }

@@ -133,23 +133,6 @@
       "nameCleared": "토큰 이름이 삭제되었습니다.",
       "nameSetFailed": "토큰 이름을 설정하는 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.",
       "nameClearFailed": "토큰 이름을 삭제하는 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
-    },
-    "marketingCst": {
-      "tokenUnavailable": "CST 토큰 주소를 아직 확인할 수 없습니다.",
-      "walletRequired": "CST 홍보 배분을 보내기 전에 지갑을 연결해 주세요.",
-      "reserveUnavailable": "홍보 준비금 지갑을 사용할 수 없습니다.",
-      "treasurerUnavailable": "홍보 준비금 재무 담당자를 확인할 수 없습니다.",
-      "treasurerRequired": "CST 홍보 배분을 보내려면 현재 재무 담당자 지갑을 연결해 주세요.",
-      "balanceLoading": "홍보 준비금 CST 잔액을 불러오는 중입니다. 잠시 후 다시 시도해 주세요.",
-      "insufficientBalance": "홍보 준비금 CST 잔액이 부족합니다.",
-      "decimalsWarning": "CST 소수 자릿수를 읽을 수 없어 18자리로 간주합니다.",
-      "balanceReadFailed": "홍보 준비금 CST 잔액을 읽을 수 없습니다. 잠시 후 다시 시도해 주세요.",
-      "confirmed": "CST 홍보 배분 전송이 확인되었습니다.",
-      "failed": "CST 홍보 배분을 보내지 못했습니다. 잠시 후 다시 시도해 주세요.",
-      "loading": "불러오는 중…",
-      "pay": "CST 홍보 배분 보내기",
-      "paying": "보내는 중…",
-      "viewTransaction": "트랜잭션 보기"
     }
   },
   "contribution": {
@@ -182,13 +165,6 @@
     "confirmed": "Random Walk NFT 각인이 확인되었습니다.",
     "failed": "각인이 완료되지 않았습니다. 지갑과 네트워크를 확인한 뒤 다시 시도해 주세요.",
     "imprinting": "각인 중…"
-  },
-  "admin": {
-    "gestureBan": {
-      "banned": "제스처가 차단되었습니다.",
-      "unbanned": "제스처 차단이 해제되었습니다.",
-      "failed": "오류가 발생했습니다"
-    }
   },
   "regionLabel": "알림",
   "close": "알림 닫기",

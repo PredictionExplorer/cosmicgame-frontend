@@ -1,391 +1,344 @@
 'use client';
 
-import { FormEvent, useEffect, useMemo, useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
-import { writeContract } from '@wagmi/core';
-import { useQueryClient } from '@tanstack/react-query';
-import { ArrowUpRight, Loader2, SendHorizontal } from 'lucide-react';
-import { toast } from 'sonner';
-import { formatUnits, getAddress, isAddress, parseUnits, zeroAddress } from 'viem';
-import { useConfig, usePublicClient } from 'wagmi';
+import { useId, useState, type FormEvent } from 'react';
+import { useTranslations } from 'next-intl';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { ArrowRight, SendHorizontal } from 'lucide-react';
+import { getAddress, isAddress, parseUnits, zeroAddress } from 'viem';
+import { usePublicClient } from 'wagmi';
 
 import { cosmicTokenAbi, marketingWalletAbi } from '@/contracts/abis';
-import { getExplorerUrl, shortenHex } from '@/utils';
 
 import { activeChain } from '@/config/chains';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
-import { useActiveWeb3React } from '@/hooks/web3';
-import { useRequireChain } from '@/hooks/useRequireChain';
+import { useTxFlow, useTxStageLabel } from '@/hooks/useTxFlow';
 import { Link } from '@/i18n/navigation';
-import { getEthErrorMessage, isUserRejection, reportError } from '@/utils/errors';
-import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
+import { sameAddress } from '@/utils/address';
+import { reportError } from '@/utils/errors';
+import { AddressChip } from '@/components/ui/address-chip';
+import { Amount } from '@/components/ui/amount';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { SectionHeader } from '@/components/ui/section-header';
+import { Skeleton } from '@/components/ui/skeleton';
+import { TxStatus } from '@/components/ui/tx-status';
+import { UnknownValue } from '@/components/ui/unknown-value';
+import { ChainGuard } from '@/components/wallet/NetworkGuard';
+
+/** CST is an 18-decimal ERC-20; the contract's own `decimals()` is read when it answers. */
+const DEFAULT_DECIMALS = 18;
 
 interface MarketingCstRewardFormProps {
-  marketingWalletAddress: string | null | undefined;
+  marketingWalletAddress: string;
   ownerAddress: string | null | undefined;
   treasurerAddress: string | null | undefined;
   historyHref?: string;
 }
 
-interface ValidReward {
-  recipient: `0x${string}`;
-  amountWei: bigint;
+interface ReserveBalance {
+  balanceWei: bigint;
+  decimals: number;
 }
+
+type FieldErrors = Partial<Record<'recipient' | 'amount', string>>;
 
 function normalizeAddress(value: string | null | undefined): `0x${string}` | null {
   const trimmed = value?.trim() ?? '';
-  if (!isAddress(trimmed)) return null;
-  return getAddress(trimmed) as `0x${string}`;
+  return isAddress(trimmed) ? getAddress(trimmed) : null;
 }
 
-function formatCstUnits(value: bigint | null, decimals: number): string {
-  if (value == null) return '...';
-  const formatted = Number(formatUnits(value, decimals));
-  if (!Number.isFinite(formatted)) return formatUnits(value, decimals);
-  return formatted < 10 ? formatted.toFixed(4) : formatted.toFixed(2);
+/**
+ * A typed amount as base units: digits with at most one decimal separator, a
+ * dot or a comma (uk and vi readers type commas). `null` when it is not a
+ * number, `'precision'` when it has more decimals than the token.
+ */
+export function parseCstAmount(text: string, decimals: number): bigint | null | 'precision' {
+  const normalized = text.trim().replace(',', '.');
+  if (!/^\d+(\.\d+)?$/.test(normalized)) return null;
+  const fraction = normalized.split('.')[1] ?? '';
+  if (fraction.length > decimals) return 'precision';
+  return parseUnits(normalized, decimals);
 }
 
+/** The Outreach Reserve's CST balance and the token's decimals. */
+function useReserveBalance(reserve: `0x${string}` | null) {
+  const publicClient = usePublicClient({ chainId: activeChain.id });
+  const { cosmicToken } = useContractAddresses();
+  return useQuery<ReserveBalance>({
+    queryKey: ['outreachReserveBalance', cosmicToken, reserve],
+    enabled: Boolean(publicClient && cosmicToken && reserve),
+    retry: 1,
+    queryFn: async () => {
+      const token = cosmicToken as `0x${string}`;
+      const decimals = await publicClient!
+        .readContract({ address: token, abi: cosmicTokenAbi, functionName: 'decimals' })
+        .then((value) => Number(value))
+        .catch(() => DEFAULT_DECIMALS);
+      try {
+        const balanceWei = (await publicClient!.readContract({
+          address: token,
+          abi: cosmicTokenAbi,
+          functionName: 'balanceOf',
+          args: [reserve],
+        })) as bigint;
+        return {
+          balanceWei,
+          decimals: Number.isFinite(decimals) ? decimals : DEFAULT_DECIMALS,
+        };
+      } catch (error) {
+        reportError(error, 'MarketingWallet CST balance read');
+        throw error;
+      }
+    },
+  });
+}
+
+/**
+ * Sends CST from the Outreach Reserve (`payReward`), for its treasurer: the
+ * reserve's balance and roles beside a two-field form whose mistakes are
+ * named under the field, and one commit action that runs through the shared
+ * transaction flow behind the chain guard.
+ */
 export function MarketingCstRewardForm({
   marketingWalletAddress,
   ownerAddress,
   treasurerAddress,
   historyHref,
 }: MarketingCstRewardFormProps) {
-  const t = useTranslations('toasts');
-  const tMarketing = useTranslations('marketing');
-  const locale = useLocale();
-  const decimalsReadWarning = t('transfer.marketingCst.decimalsWarning');
-  const balanceReadFailed = t('transfer.marketingCst.balanceReadFailed');
+  const t = useTranslations('admin');
+  const tCommon = useTranslations('common');
+  const queryClient = useQueryClient();
+
+  const tx = useTxFlow();
+  const stageLabel = useTxStageLabel();
+  const recipientId = useId();
+  const amountId = useId();
+
   const [recipient, setRecipient] = useState('');
   const [amount, setAmount] = useState('');
-  const [decimals, setDecimals] = useState(18);
-  const [balanceWei, setBalanceWei] = useState<bigint | null>(null);
-  const [balanceLoading, setBalanceLoading] = useState(false);
-  const [balanceError, setBalanceError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-  const [txHash, setTxHash] = useState<`0x${string}` | null>(null);
+  const [errors, setErrors] = useState<FieldErrors>({});
 
-  const config = useConfig();
-  const { ensureCorrectChain } = useRequireChain();
-  const publicClient = usePublicClient({ chainId: activeChain.id });
-  const queryClient = useQueryClient();
-  const contractAddrs = useContractAddresses();
-  const { account, active } = useActiveWeb3React();
+  const reserve = normalizeAddress(marketingWalletAddress);
+  const treasurer = normalizeAddress(treasurerAddress);
+  const owner = normalizeAddress(ownerAddress);
+  const balance = useReserveBalance(reserve);
+  const decimals = balance.data?.decimals ?? DEFAULT_DECIMALS;
+  const unknown = <UnknownValue label={tCommon('status.unavailable')} />;
 
-  const normalizedMarketingWallet = useMemo(
-    () => normalizeAddress(marketingWalletAddress),
-    [marketingWalletAddress],
-  );
-  const normalizedOwner = useMemo(() => normalizeAddress(ownerAddress), [ownerAddress]);
-  const normalizedTreasurer = useMemo(() => normalizeAddress(treasurerAddress), [treasurerAddress]);
-
-  useEffect(() => {
-    if (!publicClient || !contractAddrs.cosmicToken || !normalizedMarketingWallet) {
-      setBalanceWei(null);
-      return;
+  const validate = (): { recipient: `0x${string}`; amountWei: bigint } | null => {
+    const next: FieldErrors = {};
+    const to = normalizeAddress(recipient);
+    if (!to || to.toLowerCase() === zeroAddress)
+      next.recipient = t('outreachTransfer.form.errors.recipient');
+    const parsed = parseCstAmount(amount, decimals);
+    if (parsed === 'precision') {
+      next.amount = t('outreachTransfer.form.errors.precision', { decimals });
+    } else if (parsed === null || parsed <= 0n) {
+      next.amount = t('outreachTransfer.form.errors.amount');
+    } else if (balance.data && parsed > balance.data.balanceWei) {
+      next.amount = t('outreachTransfer.form.errors.insufficient');
     }
-
-    let cancelled = false;
-    const loadBalance = async () => {
-      setBalanceLoading(true);
-      setBalanceError(null);
-
-      try {
-        let nextDecimals = 18;
-        try {
-          nextDecimals = Number(
-            await publicClient.readContract({
-              address: contractAddrs.cosmicToken as `0x${string}`,
-              abi: cosmicTokenAbi,
-              functionName: 'decimals',
-            }),
-          );
-        } catch (err) {
-          reportError(err, 'MarketingWallet CST decimals read');
-          toast.warning(decimalsReadWarning);
-        }
-
-        const balance = (await publicClient.readContract({
-          address: contractAddrs.cosmicToken as `0x${string}`,
-          abi: cosmicTokenAbi,
-          functionName: 'balanceOf',
-          args: [normalizedMarketingWallet],
-        })) as bigint;
-
-        if (!cancelled) {
-          setDecimals(Number.isFinite(nextDecimals) ? nextDecimals : 18);
-          setBalanceWei(balance);
-        }
-      } catch (err) {
-        reportError(err, 'MarketingWallet CST balance read');
-        if (!cancelled) {
-          setBalanceWei(null);
-          setBalanceError(balanceReadFailed);
-        }
-      } finally {
-        if (!cancelled) setBalanceLoading(false);
-      }
-    };
-
-    void loadBalance();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [
-    balanceReadFailed,
-    contractAddrs.cosmicToken,
-    decimalsReadWarning,
-    normalizedMarketingWallet,
-    publicClient,
-  ]);
-
-  const validateReward = (): ValidReward | null => {
-    if (!contractAddrs.cosmicToken) {
-      toast.error(t('transfer.marketingCst.tokenUnavailable'));
-      return null;
-    }
-    if (!active || !account) {
-      toast.error(t('transfer.marketingCst.walletRequired'));
-      return null;
-    }
-    if (!normalizedMarketingWallet) {
-      toast.error(t('transfer.marketingCst.reserveUnavailable'));
-      return null;
-    }
-    if (!normalizedTreasurer) {
-      toast.error(t('transfer.marketingCst.treasurerUnavailable'));
-      return null;
-    }
-    if (account.toLowerCase() !== normalizedTreasurer.toLowerCase()) {
-      toast.error(t('transfer.marketingCst.treasurerRequired'));
-      return null;
-    }
-
-    const normalizedRecipient = normalizeAddress(recipient);
-    if (!normalizedRecipient || normalizedRecipient.toLowerCase() === zeroAddress) {
-      toast.error(t('transfer.common.invalidRecipient'));
-      return null;
-    }
-
-    const amountText = amount.trim();
-    if (!/^\d+(\.\d+)?$/.test(amountText)) {
-      toast.error(t('transfer.common.invalidAmount'));
-      return null;
-    }
-
-    let amountWei: bigint;
-    try {
-      amountWei = parseUnits(amountText, decimals);
-    } catch {
-      toast.error(t('transfer.common.invalidDecimals'));
-      return null;
-    }
-
-    if (amountWei <= 0n) {
-      toast.error(t('transfer.common.amountPositive'));
-      return null;
-    }
-    if (balanceWei == null) {
-      toast.error(t('transfer.marketingCst.balanceLoading'));
-      return null;
-    }
-    if (amountWei > balanceWei) {
-      toast.error(t('transfer.marketingCst.insufficientBalance'));
-      return null;
-    }
-
-    return { recipient: normalizedRecipient, amountWei };
+    setErrors(next);
+    if (next.recipient || next.amount || !to || typeof parsed !== 'bigint') return null;
+    return { recipient: to, amountWei: parsed };
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const validReward = validateReward();
-    if (!validReward || !normalizedMarketingWallet) return;
+    if (!reserve || !balance.data) return;
+    const reward = validate();
+    if (!reward) return;
 
-    // Busy first: the wallet's switch prompt can stay open for a while, and a
-    // second click must not send a second request (-32002). A wallet on
-    // another chain is asked to switch before the write (wagmi's
-    // writeContract would throw a chain mismatch instead).
-    setSubmitting(true);
-    if (!(await ensureCorrectChain())) {
-      setSubmitting(false);
-      return;
-    }
-    setTxHash(null);
-    try {
-      const hash = await writeContract(config, {
-        address: normalizedMarketingWallet,
-        abi: marketingWalletAbi,
-        functionName: 'payReward',
-        args: [validReward.recipient, validReward.amountWei],
-        account: account as `0x${string}`,
-        chainId: activeChain.id,
-      });
-
-      const receipt = await publicClient?.waitForTransactionReceipt({ hash });
-      assertSuccessfulTransactionReceipt(receipt);
-      setTxHash(hash);
-      setRecipient('');
-      setAmount('');
-      setBalanceWei((current) => (current == null ? current : current - validReward.amountWei));
-
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['userBalance', normalizedMarketingWallet] }),
-        queryClient.invalidateQueries({ queryKey: ['userBalance', validReward.recipient] }),
-        queryClient.invalidateQueries({ queryKey: ['ctTransfers', normalizedMarketingWallet] }),
-        queryClient.invalidateQueries({ queryKey: ['ctTransfers', validReward.recipient] }),
-        queryClient.invalidateQueries({ queryKey: ['ctBalancesDistribution'] }),
-        queryClient.invalidateQueries({ queryKey: ['dashboardInfo'] }),
-      ]);
-
-      toast.success(t('transfer.marketingCst.confirmed'));
-    } catch (err) {
-      if (isUserRejection(err)) {
-        toast.info(t('walletTransactionCancelled'));
-        return;
-      }
-      reportError(err, 'MarketingWallet payReward');
-      toast.error(getEthErrorMessage(err, t('transfer.marketingCst.failed'), { locale }));
-    } finally {
-      setSubmitting(false);
-    }
+    await tx.run({
+      // The page shows this form to the treasurer only; the contract checks again.
+      prepare: async (ctx) => sameAddress(ctx.account, treasurer),
+      write: (ctx) =>
+        ctx.writeContract({
+          address: reserve,
+          abi: marketingWalletAbi,
+          functionName: 'payReward',
+          args: [reward.recipient, reward.amountWei],
+        }),
+      successMessage: t('outreachTransfer.form.confirmed'),
+      failureMessage: t('outreachTransfer.form.failed'),
+      errorContext: 'MarketingWallet payReward',
+      onConfirmed: async () => {
+        setRecipient('');
+        setAmount('');
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ['outreachReserveBalance'] }),
+          queryClient.invalidateQueries({ queryKey: ['userBalance'] }),
+          queryClient.invalidateQueries({ queryKey: ['ctTransfers'] }),
+          queryClient.invalidateQueries({ queryKey: ['ctBalancesDistribution'] }),
+        ]);
+      },
+    });
   };
 
-  const submitDisabled =
-    submitting ||
-    balanceLoading ||
-    !active ||
-    !account ||
-    !normalizedMarketingWallet ||
-    !normalizedTreasurer ||
-    !contractAddrs.cosmicToken ||
-    Boolean(balanceError);
+  const facts = [
+    {
+      id: 'reserve',
+      label: t('outreachTransfer.form.reserve'),
+      value: reserve ? (
+        <AddressChip address={reserve} variant="plain" href={false} label={false} />
+      ) : (
+        unknown
+      ),
+    },
+    {
+      id: 'balance',
+      label: t('outreachTransfer.form.balance'),
+      value: balance.data ? (
+        <Amount value={balance.data.balanceWei} decimals={decimals} unit="CST" />
+      ) : balance.isError ? (
+        unknown
+      ) : (
+        <Skeleton className="h-4 w-24" />
+      ),
+    },
+    {
+      id: 'treasurer',
+      label: t('outreachTransfer.treasurer'),
+      value: treasurer ? (
+        <AddressChip address={treasurer} variant="plain" href={false} label={false} />
+      ) : (
+        unknown
+      ),
+    },
+    {
+      id: 'owner',
+      label: t('outreachTransfer.owner'),
+      value: owner ? (
+        <AddressChip address={owner} variant="plain" href={false} label={false} />
+      ) : (
+        unknown
+      ),
+    },
+  ];
+
+  const busy = tx.isBusy;
+  const canSubmit = Boolean(reserve && treasurer && balance.data);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{tMarketing('transferForm.title')}</CardTitle>
-        <CardDescription>{tMarketing('transferForm.description')}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="mb-6 grid gap-3 rounded-lg border border-white/[0.06] bg-white/[0.025] p-4 text-sm sm:grid-cols-2">
-          <div>
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">
-              {tMarketing('transferForm.reserveLabel')}
-            </p>
-            <p className="mt-1 font-mono text-foreground">
-              {normalizedMarketingWallet
-                ? shortenHex(normalizedMarketingWallet, 6)
-                : tMarketing('transferForm.unavailable')}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">
-              {tMarketing('transferForm.availableLabel')}
-            </p>
-            <p className="mt-1 font-semibold text-foreground">
-              {balanceLoading
-                ? t('transfer.marketingCst.loading')
-                : `${formatCstUnits(balanceWei, decimals)} CST`}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">
-              {tMarketing('transferForm.ownerLabel')}
-            </p>
-            <p className="mt-1 font-mono text-foreground">
-              {normalizedOwner
-                ? shortenHex(normalizedOwner, 6)
-                : tMarketing('transferForm.unavailable')}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">
-              {tMarketing('transferForm.treasurerLabel')}
-            </p>
-            <p className="mt-1 font-mono text-foreground">
-              {normalizedTreasurer
-                ? shortenHex(normalizedTreasurer, 6)
-                : tMarketing('transferForm.unavailable')}
-            </p>
-          </div>
-        </div>
-
-        {balanceError ? <p className="mb-4 text-sm text-destructive">{balanceError}</p> : null}
-
-        <form onSubmit={handleSubmit} className="space-y-5">
+    <div className="grid gap-x-16 gap-y-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:items-start">
+      <section aria-labelledby="outreach-send-heading" className="max-w-xl">
+        <SectionHeader
+          size="panel"
+          headingId="outreach-send-heading"
+          title={t('outreachTransfer.form.title')}
+          description={t('outreachTransfer.form.description')}
+        />
+        <form noValidate onSubmit={(event) => void handleSubmit(event)} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="marketing-cst-recipient">
-              {tMarketing('transferForm.recipientLabel')}
-            </Label>
+            <Label htmlFor={recipientId}>{t('outreachTransfer.form.recipient')}</Label>
             <Input
-              id="marketing-cst-recipient"
+              id={recipientId}
               value={recipient}
               onChange={(event) => setRecipient(event.target.value)}
-              placeholder="0x..."
+              placeholder="0x…"
               autoComplete="off"
-              disabled={submitting}
+              spellCheck={false}
+              aria-invalid={errors.recipient ? true : undefined}
+              aria-describedby={errors.recipient ? `${recipientId}-error` : undefined}
+              disabled={busy}
+              className="font-mono"
             />
+            {errors.recipient ? (
+              <p id={`${recipientId}-error`} className="type-caption text-critical">
+                {errors.recipient}
+              </p>
+            ) : null}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="marketing-cst-amount">{tMarketing('transferForm.amountLabel')}</Label>
-            <Input
-              id="marketing-cst-amount"
-              value={amount}
-              onChange={(event) => setAmount(event.target.value)}
-              placeholder="0.00"
-              inputMode="decimal"
-              autoComplete="off"
-              disabled={submitting}
-            />
-          </div>
-
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <Button
-              type="submit"
-              disabled={submitDisabled}
-              aria-label={t('transfer.marketingCst.pay')}
-            >
-              {submitting ? (
-                <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-              ) : (
-                <SendHorizontal className="h-4 w-4" aria-hidden />
-              )}
-              {submitting ? t('transfer.marketingCst.paying') : t('transfer.marketingCst.pay')}
-            </Button>
-
-            {historyHref ? (
-              <Link
-                href={historyHref}
-                className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+            <Label htmlFor={amountId}>{t('outreachTransfer.form.amount')}</Label>
+            <div className="relative">
+              <Input
+                id={amountId}
+                value={amount}
+                onChange={(event) => setAmount(event.target.value)}
+                placeholder="0"
+                inputMode="decimal"
+                autoComplete="off"
+                aria-invalid={errors.amount ? true : undefined}
+                aria-describedby={`${amountId}-hint${errors.amount ? ` ${amountId}-error` : ''}`}
+                disabled={busy}
+                className="pe-14 tabular-nums"
+              />
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-y-0 end-3 flex items-center type-label text-subtle"
               >
-                {tMarketing('transferForm.historyLink')}
-              </Link>
+                CST
+              </span>
+            </div>
+            <p id={`${amountId}-hint`} className="type-caption text-subtle">
+              {t('outreachTransfer.form.amountHint')}
+            </p>
+            {errors.amount ? (
+              <p id={`${amountId}-error`} className="type-caption text-critical">
+                {errors.amount}
+              </p>
             ) : null}
           </div>
-        </form>
 
-        {txHash ? (
-          <div className="mt-5 rounded-lg border border-emerald-400/20 bg-emerald-400/[0.06] p-4 text-sm">
-            <p className="font-medium text-emerald-200">{t('transfer.marketingCst.confirmed')}</p>
-            <a
-              href={getExplorerUrl('tx', txHash)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-2 inline-flex items-center gap-1 text-primary underline-offset-4 hover:underline"
-            >
-              {t('transfer.marketingCst.viewTransaction')}
-              <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
-            </a>
+          <div className="space-y-3 pt-2">
+            <ChainGuard>
+              <Button
+                type="submit"
+                variant="commit"
+                size="lg"
+                loading={busy}
+                disabled={!canSubmit}
+                className="w-full sm:w-auto"
+              >
+                <SendHorizontal aria-hidden />
+                {(busy && stageLabel(tx.stage)) || t('outreachTransfer.form.submit')}
+              </Button>
+            </ChainGuard>
+            <TxStatus stage={tx.stage} />
           </div>
+        </form>
+      </section>
+
+      <section
+        aria-labelledby="outreach-reserve-heading"
+        className="lg:border-s lg:border-rule-faint lg:ps-10"
+      >
+        <SectionHeader
+          size="panel"
+          as="h2"
+          headingId="outreach-reserve-heading"
+          title={t('outreachTransfer.form.reserveHeading')}
+        />
+        <dl className="border-t border-rule-faint">
+          {facts.map((fact) => (
+            <div
+              key={fact.id}
+              data-fact={fact.id}
+              className="flex min-h-12 items-center justify-between gap-4 border-b border-rule-faint py-2.5"
+            >
+              <dt className="type-body-sm text-muted-foreground">{fact.label}</dt>
+              <dd className="min-w-0 text-end type-figure-sm text-foreground">{fact.value}</dd>
+            </div>
+          ))}
+        </dl>
+        {balance.isError ? (
+          <p className="mt-3 type-caption text-critical">
+            {t('outreachTransfer.form.balanceError')}
+          </p>
         ) : null}
-      </CardContent>
-    </Card>
+        {historyHref ? (
+          <Link
+            href={historyHref}
+            className="link-quiet mt-5 inline-flex min-h-6 items-center gap-1.5 type-body-sm text-muted-foreground hover:text-foreground"
+          >
+            {t('outreachTransfer.form.history')}
+            <ArrowRight aria-hidden className="size-3.5 text-subtle" />
+          </Link>
+        ) : null}
+      </section>
+    </div>
   );
 }

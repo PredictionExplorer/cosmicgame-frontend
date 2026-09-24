@@ -220,16 +220,16 @@
     "invalidAddress": "無効なアドレス"
   },
   "admin": {
-    "title": "管理者",
-    "description": "Cosmic Signatureプロトコルの管理機能。プロトコルのパラメーター、コントラクトの設定、システム構成を管理する。"
+    "title": "一筆のメッセージ管理",
+    "description": "運営ツール：Cosmic Signatureのサイトで一筆のメッセージを非表示にしたり、元に戻したりします。"
   },
   "adminSettings": {
-    "title": "管理者設定",
-    "description": "管理者設定とコントラクトの管理"
+    "title": "コントラクト設定",
+    "description": "Cosmic Signatureのコントラクトアドレスとパラメーターを閲覧のみで表示する運営画面です。"
   },
   "internalCstOutreachTransfer": {
     "title": "CST広報送付",
-    "description": "設定された広報準備金ウォレットの署名者向けの、制限付きCST送付ツール。"
+    "description": "広報準備金の財務担当者が準備金からCSTを送付するための運営ツールです。"
   },
   "embedEndurance": {
     "title": "持久と時の戦士のタイムライン",

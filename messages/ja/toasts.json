@@ -133,23 +133,6 @@
       "nameCleared": "トークン名をクリアしました。",
       "nameSetFailed": "トークン名の設定中にエラーが発生しました。もう一度お試しください。",
       "nameClearFailed": "トークン名のクリア中にエラーが発生しました。もう一度お試しください。"
-    },
-    "marketingCst": {
-      "tokenUnavailable": "CSTトークンのアドレスはまだ利用できません。",
-      "walletRequired": "CST広報配分を送付する前にウォレットを接続してください。",
-      "reserveUnavailable": "広報準備金のウォレットを利用できません。",
-      "treasurerUnavailable": "広報ウォレットの財務担当者を利用できません。",
-      "treasurerRequired": "CST広報配分を送付するには、現在の広報ウォレットの財務担当者を接続してください。",
-      "balanceLoading": "広報準備金のCST残高はまだ読み込み中です。しばらくしてからもう一度お試しください。",
-      "insufficientBalance": "広報準備金のCST残高が不足しています。",
-      "decimalsWarning": "CSTのdecimalsを読み取れないため、小数点以下18桁と仮定します。",
-      "balanceReadFailed": "広報準備金のCST残高を読み取れませんでした。もう一度お試しください。",
-      "confirmed": "CST広報配分が確認されました。",
-      "failed": "CST広報配分を送付できませんでした。もう一度お試しください。",
-      "loading": "読み込み中…",
-      "pay": "CST広報配分を送付",
-      "paying": "送付中…",
-      "viewTransaction": "トランザクションを見る"
     }
   },
   "contribution": {
@@ -182,13 +165,6 @@
     "confirmed": "Random Walk NFTの刻印が確認されました。",
     "failed": "刻印が完了しませんでした。ウォレットとネットワークを確認してから、もう一度お試しください。",
     "imprinting": "刻印中…"
-  },
-  "admin": {
-    "gestureBan": {
-      "banned": "一筆を非表示にしました。",
-      "unbanned": "一筆の非表示を解除しました。",
-      "failed": "エラーが発生しました"
-    }
   },
   "regionLabel": "通知",
   "close": "通知を閉じる",

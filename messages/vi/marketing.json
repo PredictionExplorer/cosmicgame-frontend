@@ -74,17 +74,5 @@
     "invalid": "Địa chỉ Ethereum không hợp lệ",
     "heading": "Phân bổ truyền thông của người dùng",
     "loading": "Đang tải…"
-  },
-  "transferForm": {
-    "title": "Chi CST phân bổ",
-    "description": "Chuyển CST từ Dự trữ truyền thông. Ví đang kết nối phải là ví thủ quỹ hiện tại.",
-    "reserveLabel": "Dự trữ truyền thông",
-    "availableLabel": "CST khả dụng",
-    "ownerLabel": "Chủ sở hữu",
-    "treasurerLabel": "Thủ quỹ",
-    "unavailable": "Không khả dụng",
-    "recipientLabel": "Địa chỉ người nhận",
-    "amountLabel": "Số lượng",
-    "historyLink": "Xem các lần chuyển của Dự trữ truyền thông"
   }
 }

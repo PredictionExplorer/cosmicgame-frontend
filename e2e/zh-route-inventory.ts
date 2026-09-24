@@ -630,7 +630,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/admin',
     host: 'app',
     cluster: 'long-tail',
-    expectedText: '管理',
+    expectedText: '落笔留言审核',
   },
   {
     id: 'admin-settings',
@@ -639,7 +639,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/admin/admin',
     host: 'app',
     cluster: 'long-tail',
-    expectedText: '管理方法',
+    expectedText: '合约设置',
   },
   {
     id: 'internal-outreach-transfer',
