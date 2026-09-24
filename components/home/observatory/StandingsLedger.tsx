@@ -120,11 +120,13 @@ function LedgerRow({
       data-current={isYou || undefined}
       data-settling={settling || undefined}
       className={cn(
-        'relative py-2.5 transition-shadow duration-[var(--duration-settle)] ease-[var(--ease-out-soft)]',
-        // The connected wallet's row keeps its place and carries the 2px
-        // accent rule; a row whose holder just changed carries --live.
-        isYou && 'shadow-[inset_2px_0_0_hsl(var(--primary))] ps-3',
-        settling && 'shadow-[inset_2px_0_0_hsl(var(--live))] ps-3',
+        'relative py-2.5',
+        // The connected wallet's row carries a 2px accent rule and a row whose
+        // holder just changed a --live one. The rule hangs in the frame's
+        // gutter, so the row's columns stay aligned with the rest.
+        "before:pointer-events-none before:absolute before:inset-y-2 before:-start-3 before:w-0.5 before:rounded-pill before:bg-transparent before:transition-colors before:duration-[var(--duration-settle)] before:ease-[var(--ease-out-soft)] before:content-['']",
+        isYou && 'before:bg-primary',
+        settling && 'before:bg-live',
       )}
     >
       <div className={ROW_GRID}>
