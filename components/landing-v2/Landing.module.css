@@ -329,7 +329,6 @@
   display: flex;
   gap: 2px;
   height: clamp(2.75rem, 2.25rem + 1.5vw, 3.5rem);
-  margin-top: 1rem;
 }
 
 .segment {
