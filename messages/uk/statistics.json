@@ -74,7 +74,7 @@
       "title": "Цикл {cycle} наразі",
       "open": "Відкрити поточний цикл",
       "opened": "Розпочато",
-      "rhythmLabel": "Жести за день за UTC, останні {days, plural, one {# день} few {# дні} many {# днів} other {# дня}}",
+      "rhythmLabel": "Жести за день (UTC), останні {days, plural, one {# день} few {# дні} many {# днів} other {# дня}}",
       "rhythmSummary": "Разом: {total}. Найактивніший день: {date} ({peak}).",
       "rhythmEmpty": "За цей період жестів не було.",
       "rhythmUnavailable": "Щоденна кількість жестів зараз недоступна.",
