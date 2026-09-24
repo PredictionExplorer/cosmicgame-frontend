@@ -17,6 +17,7 @@ import { ErrorState } from '@/components/ui/error-state';
 import { SkeletonTable } from '@/components/ui/skeleton';
 
 import { ChartFigure } from './charts/ChartFigure';
+import { UtcTime } from './charts/UtcTime';
 import { formatDateRange } from './charts/labels';
 import { useTimeAxis } from './charts/axes';
 import {
@@ -144,13 +145,16 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
       },
       {
         id: 'last',
-        kind: 'datetime',
+        kind: 'text',
         header: t('charts.activePeriods.lastActive'),
         value: (row) => row.last,
+        // UTC, like the chart's axis.
+        cell: (row) =>
+          row.last === null ? null : <UtcTime timestamp={row.last} locale={locale} />,
         sortable: true,
       },
     ],
-    [t],
+    [locale, t],
   );
 
   const periodLabel = (period: BidderActivePeriod) =>

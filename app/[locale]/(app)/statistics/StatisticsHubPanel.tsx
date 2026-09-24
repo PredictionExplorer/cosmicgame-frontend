@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { toFiniteNumber } from '@/utils/finiteNumber';
-import { formatAmount } from '@/utils/format';
+import { formatAmount, formatTimeZoneLabel } from '@/utils/format';
 import { useFormat } from '@/hooks/useFormat';
 import { useCTStatistics, useDashboardInfo } from '@/hooks/useApiQuery';
 import type { DashboardInfo } from '@/services/api/types';
@@ -115,6 +115,7 @@ function sectionFigures(
 const StatisticsHubPanel = () => {
   const t = useTranslations('statistics');
   const tCommon = useTranslations('common');
+  const tFormats = useTranslations('formats');
   const format = useFormat();
   const { data, isLoading, isError, refetch } = useDashboardInfo();
   const ctStatistics = useCTStatistics();
@@ -193,9 +194,13 @@ const StatisticsHubPanel = () => {
       >
         <div className="grid gap-x-12 gap-y-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
           <dl className="min-w-0 self-start border-t border-rule">
+            {/* UTC, the zone of the daily bars beside it: one zone on the hub, said once. */}
             <StatisticsItem
               title={t('hub.cycle.opened')}
-              value={opened && opened > 0 ? <DateTime timestamp={opened} /> : count(null)}
+              value={
+                opened && opened > 0 ? <DateTime timestamp={opened} timeZone="utc" /> : count(null)
+              }
+              caption={tFormats('dateTime.timeZone', { zone: formatTimeZoneLabel('utc') })}
             />
             <StatisticsItem
               title={metric('ethInGesturesCurrentCycle')}

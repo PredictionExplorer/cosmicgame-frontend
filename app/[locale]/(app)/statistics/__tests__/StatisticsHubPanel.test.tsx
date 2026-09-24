@@ -201,6 +201,12 @@ describe('StatisticsHubPanel', () => {
     expect(container.querySelector('[data-live-state]')).not.toBeInTheDocument();
   });
 
+  it('dates the opening of the cycle in UTC, the zone of its daily bars, and says so once', () => {
+    render(<StatisticsHubPanel />);
+    // The jest intl mock prints the formats key with its values.
+    expect(screen.getAllByText('formats.dateTime.timeZone(zone=UTC)')).toHaveLength(1);
+  });
+
   it('keeps polling enabled on the hub dashboard query', () => {
     render(<StatisticsHubPanel />);
     // Hub is a live overview: it must not opt out of polling.

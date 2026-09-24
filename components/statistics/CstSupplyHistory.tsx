@@ -30,6 +30,7 @@ import { SkeletonChart } from '@/components/ui/skeleton';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 
 import { ChartFigure } from './charts/ChartFigure';
+import { UtcTime } from './charts/UtcTime';
 import { ChartLegend } from './charts/ChartLegend';
 import { ChartTooltipCard } from './charts/ChartTooltipCard';
 import { useLinearAxis, useTimeAxis } from './charts/axes';
@@ -261,10 +262,11 @@ export const CstSupplyHistory: FC<{ label: string }> = ({ label }) => {
           },
           {
             id: 'ts',
-            kind: 'datetime',
+            kind: 'text',
             header: t('charts.cstCost.when'),
             value: (row) => row.ts,
-            txHash: (row) => row.txHash,
+            // UTC, like the chart's axis.
+            cell: (row) => <UtcTime timestamp={row.ts} locale={locale} txHash={row.txHash} />,
             sortable: true,
           },
           amount('supply', t('charts.supply.totalSupply')),

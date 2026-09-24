@@ -35,6 +35,7 @@ import { ErrorState } from '@/components/ui/error-state';
 import { SkeletonChart } from '@/components/ui/skeleton';
 
 import { ChartFigure } from './charts/ChartFigure';
+import { UtcTime } from './charts/UtcTime';
 import { ChartLegend } from './charts/ChartLegend';
 import { ChartTooltipCard } from './charts/ChartTooltipCard';
 import { useDurationAxis, useElapsedHoursAxis } from './charts/axes';
@@ -234,10 +235,11 @@ export const CstGestureCostView: FC<CstGestureCostViewProps> = ({ gestures, labe
     () => [
       {
         id: 'ts',
-        kind: 'datetime',
+        kind: 'text',
         header: t('charts.cstCost.when'),
         value: (row) => row.ts,
-        txHash: (row) => row.txHash,
+        // UTC, like the chart's axis.
+        cell: (row) => <UtcTime timestamp={row.ts} locale={locale} txHash={row.txHash} />,
         sortable: true,
       },
       {
@@ -262,7 +264,7 @@ export const CstGestureCostView: FC<CstGestureCostViewProps> = ({ gestures, labe
         value: (row) => row.bidder,
       },
     ],
-    [t],
+    [locale, t],
   );
 
   if (series.points.length === 0) {
