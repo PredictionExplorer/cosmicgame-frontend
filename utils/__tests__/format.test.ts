@@ -11,17 +11,14 @@ import {
   formatAddress,
   formatAmount,
   formatAmountParts,
-  formatCSTValue,
   formatCount,
   formatDateTime,
   formatDateTimeTitle,
   formatDuration,
-  formatEthValue,
   formatNumber,
   formatPercent,
   formatRelativeTime,
   formatSeconds,
-  formatTableAmount,
   formatTimeZoneLabel,
   isZeroAddress,
   sameAddress,
@@ -496,30 +493,6 @@ describe('addresses', () => {
     expect(findKnownAddress(lower, contracts)).toBe('publicGoods');
     expect(findKnownAddress('0x0000000000000000000000000000000000000001', contracts)).toBeNull();
     expect(findKnownAddress(undefined, contracts)).toBeNull();
-  });
-});
-
-describe('legacy helpers delegate to the formatting layer', () => {
-  it('formatEthValue: grouped card ETH in every locale, "0 ETH" when missing', () => {
-    expect(formatEthValue(32.29391, 'en')).toBe(nb('32.2939~ETH'));
-    expect(formatEthValue(263113.6, 'en')).toBe(nb('263,113.6000~ETH'));
-    expect(formatEthValue(8.07351, 'vi')).toBe(nb('8,0735~ETH'));
-    expect(formatEthValue(undefined, 'en')).toBe(nb('0~ETH'));
-    expect(formatEthValue(Number.NaN, 'en')).toBe(nb('0~ETH'));
-  });
-
-  it('formatCSTValue: grouped card CST with 2 decimals, none when whole', () => {
-    expect(formatCSTValue(60872.26, 'en')).toBe(nb('60,872.26~CST'));
-    expect(formatCSTValue(1000, 'en')).toBe(nb('1,000~CST'));
-    expect(formatCSTValue(1000, 'uk')).toBe(nb('1~000~CST'));
-    expect(formatCSTValue(null, 'en')).toBe(nb('0~CST'));
-  });
-
-  it('formatTableAmount: unit-free fixed digits for ledger columns', () => {
-    expect(formatTableAmount(2.65478, 'en')).toBe('2.6548');
-    expect(formatTableAmount(0, 'en')).toBe('0');
-    expect(formatTableAmount(12.5, 'en', 'CST')).toBe('12.50');
-    expect(formatTableAmount(null, 'en')).toBe(UNAVAILABLE_VALUE);
   });
 });
 

@@ -34,7 +34,6 @@ const COMPOUNDED_ODDS = /1\s*-\s*Math\.pow\(\s*\(\s*[\w.]+\s*-\s*[\w.]+\s*\)\s*\
 /** Files that still compound the share; remove an entry when its file moves to the share. */
 const COMPOUNDING_BASELINE: readonly string[] = [
   'components/tables/StellarSelectionHolderTable.tsx',
-  'lib/selectionStanding.ts',
 ];
 
 /** Files that still read the deprecated compounded standing. */

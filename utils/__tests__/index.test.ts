@@ -1,11 +1,8 @@
 import {
   shortenHex,
-  parseBalance,
   formatId,
   convertTimestampToDateTime,
   formatSeconds,
-  formatEthValue,
-  formatCSTValue,
   getExplorerUrl,
   getAssetsUrl,
   getRWLKImageUrl,
@@ -34,29 +31,6 @@ describe('shortenHex', () => {
 
   it('returns strings too short to shorten unchanged', () => {
     expect(shortenHex('0x12', 4)).toBe('0x12');
-  });
-});
-
-describe('parseBalance', () => {
-  it('formats a balance with default 18 decimals', () => {
-    const result = parseBalance('1000000000000000000', 18, 2);
-    expect(result).toBe('1.00');
-  });
-
-  it('formats a zero balance', () => {
-    const result = parseBalance('0', 18, 4);
-    expect(result).toBe('0.0000');
-  });
-
-  it('handles different decimal values', () => {
-    expect(parseBalance('1000000', 6, 2)).toBe('1.00');
-    expect(parseBalance('1000000000000', 12, 2)).toBe('1.00');
-    expect(parseBalance('1234567890123456789', 18, 4)).toBe('1.2346');
-  });
-
-  it('handles bigint input', () => {
-    const result = parseBalance(BigInt('1000000000000000000'), 18, 2);
-    expect(result).toBe('1.00');
   });
 });
 
@@ -100,38 +74,6 @@ describe('formatSeconds', () => {
 
   it('returns space for negative values', () => {
     expect(formatSeconds(-1).trim()).toBe('');
-  });
-});
-
-describe('formatEthValue', () => {
-  it('formats a number as ETH with decimals', () => {
-    const result = formatEthValue(1.23456789, 'en');
-    expect(result).toContain('1.2346');
-    expect(result).toContain('ETH');
-  });
-
-  it('returns 0 ETH for zero input', () => {
-    expect(formatEthValue(0, 'en')).toBe('0\u00a0ETH');
-  });
-
-  it('keeps 4 decimals for large values too, so a figure reads the same everywhere', () => {
-    const result = formatEthValue(100.123, 'en');
-    expect(result).toBe('100.1230\u00a0ETH');
-  });
-});
-
-describe('formatCSTValue', () => {
-  it('formats whole values without decimals', () => {
-    expect(formatCSTValue(5, 'en')).toBe('5\u00a0CST');
-    expect(formatCSTValue(15, 'en')).toBe('15\u00a0CST');
-  });
-
-  it('formats fractional values with up to 2 decimals', () => {
-    expect(formatCSTValue(15.456, 'en')).toBe('15.46\u00a0CST');
-  });
-
-  it('formats zero', () => {
-    expect(formatCSTValue(0, 'en')).toBe('0\u00a0CST');
   });
 });
 

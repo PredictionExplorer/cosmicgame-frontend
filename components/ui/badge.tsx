@@ -77,17 +77,6 @@ const badgeVariants = cva(
 
 type BadgeTone = NonNullable<VariantProps<typeof badgeVariants>['tone']>;
 
-/** @deprecated Use `tone`. Kept so existing call sites render until they migrate. */
-type LegacyBadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline' | 'dot';
-
-const LEGACY_TONE: Record<LegacyBadgeVariant, BadgeTone> = {
-  default: 'accent',
-  secondary: 'accent',
-  destructive: 'critical',
-  outline: 'neutral',
-  dot: 'neutral',
-};
-
 const DOT_TONE: Record<BadgeTone, string> = {
   neutral: 'bg-subtle',
   accent: 'bg-primary',
@@ -99,11 +88,6 @@ const DOT_TONE: Record<BadgeTone, string> = {
 
 export interface BadgeProps
   extends React.HTMLAttributes<HTMLSpanElement>, VariantProps<typeof badgeVariants> {
-  /**
-   * @deprecated Use `tone` (`default`/`secondary` → `accent`, `destructive` →
-   * `critical`, `outline` → `neutral`, `dot` → `neutral` with `dot`).
-   */
-  variant?: LegacyBadgeVariant | null;
   /** A 6px mark in the tone's colour before the label. It breathes only for `tone="live"`. */
   dot?: boolean;
   /** A leading lucide icon, drawn at 14px and hidden from assistive technology. */
@@ -112,23 +96,11 @@ export interface BadgeProps
 
 const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
   (
-    {
-      className,
-      tone,
-      size,
-      shape,
-      mono,
-      overline,
-      variant,
-      dot = false,
-      icon,
-      children,
-      ...props
-    },
+    { className, tone, size, shape, mono, overline, dot = false, icon, children, ...props },
     ref,
   ) => {
-    const resolvedTone: BadgeTone = tone ?? (variant ? LEGACY_TONE[variant] : 'neutral');
-    const showDot = dot || variant === 'dot';
+    const resolvedTone: BadgeTone = tone ?? 'neutral';
+    const showDot = dot;
     return (
       <span
         ref={ref}

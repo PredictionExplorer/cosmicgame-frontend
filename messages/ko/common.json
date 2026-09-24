@@ -1,8 +1,4 @@
 {
-  "faqPage": {
-    "heading": "자주 묻는 질문",
-    "description": "프로토콜의 개념과 제스처의 작동 원리부터 흔히 생기는 오해까지, Cosmic Signature에 관한 질문에 답합니다."
-  },
   "languageSwitcher": {
     "label": "언어"
   },
@@ -69,8 +65,6 @@
     "loading": "불러오는 중",
     "loadingEllipsis": "불러오는 중…",
     "loadingDots": "불러오는 중…",
-    "noData": "데이터 없음",
-    "nothingHere": "아직 표시할 내용이 없습니다",
     "unavailable": "확인 불가"
   },
   "liveStatus": {

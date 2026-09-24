@@ -8,9 +8,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ExplainedTerm } from '@/components/ui/explain-popover';
 import { formatFixed } from '@/utils/format';
 
-/** @deprecated Icon tints are gone: colour belongs to the art and to live state. */
-type Accent = 'aurora' | 'nebula' | 'solar' | 'impact' | 'neutral';
-
 export type StatCardSize = 'hero' | 'md' | 'compact';
 
 export interface StatCardTrend {
@@ -89,12 +86,6 @@ interface StatCardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children' 
   semantics?: 'block' | 'definition';
   /** Extra text for assistive technology and search engines only (an sr-only `<dd>` or `<p>`). */
   srDescription?: ReactNode;
-  /** @deprecated Ignored: icons render in the subtle tier. */
-  accent?: Accent;
-  /** @deprecated Use `emphasis`. */
-  gradient?: boolean;
-  /** @deprecated Use `emphasis`. */
-  featured?: boolean;
   /** Optional trend badge rendered below the value. */
   trend?: StatCardTrend;
   /**
@@ -122,16 +113,13 @@ export function StatCard({
   emphasis,
   semantics = 'block',
   srDescription,
-  accent: _accent,
-  gradient = false,
-  featured = false,
   trend,
   caption,
   loading = false,
   className,
   ...rest
 }: StatCardProps) {
-  const isEmphasis = emphasis ?? (featured || gradient);
+  const isEmphasis = emphasis ?? false;
   const isDefinition = semantics === 'definition';
   const LabelTag = isDefinition ? 'dt' : 'div';
   const ValueTag = isDefinition ? 'dd' : 'div';

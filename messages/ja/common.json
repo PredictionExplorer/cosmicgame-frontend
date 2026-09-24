@@ -1,8 +1,4 @@
 {
-  "faqPage": {
-    "heading": "よくある質問",
-    "description": "プロトコルの概要から一筆の仕組み、よくある誤解まで、Cosmic Signatureに関する疑問にお答えします。"
-  },
   "languageSwitcher": {
     "label": "言語"
   },
@@ -69,8 +65,6 @@
     "loading": "読み込み中",
     "loadingEllipsis": "読み込み中…",
     "loadingDots": "読み込み中…",
-    "noData": "データがありません。",
-    "nothingHere": "まだ何もありません",
     "unavailable": "取得不可"
   },
   "liveStatus": {

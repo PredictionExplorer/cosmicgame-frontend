@@ -1,13 +1,7 @@
 import {
   formatSeconds,
   calculateTimeDiff,
-  formatEthValue,
-  formatCSTValue,
-  formatTableAmount,
-  toYyyymmdd,
-  fromYyyymmdd,
   supplyHistoryBootstrapRange,
-  supplyHistoryDateBounds,
   formatYyyymmddLabel,
   formatUnixTsLabel,
   formatUtcDateTimeStamp,
@@ -78,48 +72,6 @@ describe('formatUtcDateTimeStamp', () => {
   });
 });
 
-describe('formatTableAmount', () => {
-  it('renders zero as a bare 0', () => {
-    expect(formatTableAmount(0, 'en')).toBe('0');
-  });
-
-  it('renders dust below display precision as a bounded value', () => {
-    expect(formatTableAmount(0.00000001, 'en')).toBe('<0.0001');
-    expect(formatTableAmount(-0.00000001, 'en')).toBe('>-0.0001');
-  });
-
-  it('pads ETH to 4 fixed decimals so a column lines up', () => {
-    expect(formatTableAmount(0.1, 'en')).toBe('0.1000');
-    expect(formatTableAmount(1.5, 'en')).toBe('1.5000');
-    expect(formatTableAmount(0.135830123, 'en')).toBe('0.1358');
-    expect(formatTableAmount(3.100415642, 'en')).toBe('3.1004');
-  });
-
-  it('uses 2 fixed decimals for CST columns', () => {
-    expect(formatTableAmount(60872.256, 'en', 'CST')).toBe('60,872.26');
-  });
-
-  it('adds thousands separators for large values', () => {
-    expect(formatTableAmount(12096.254179, 'en')).toBe('12,096.2542');
-    expect(formatTableAmount(12096.254179, 'zh')).toBe('12,096.2542');
-  });
-
-  it('groups Ukrainian with a no-break space and keeps the token-amount dot', () => {
-    // docs/i18n/style-guide-uk.md §4: amounts keep the dot in every context.
-    expect(formatTableAmount(12096.254179, 'uk')).toBe('12\u00a0096.2542');
-  });
-
-  it('uses the Vietnamese dot grouping and comma decimal', () => {
-    expect(formatTableAmount(12096.254179, 'vi')).toBe('12.096,2542');
-  });
-
-  it('renders non-finite input as an em dash', () => {
-    expect(formatTableAmount(undefined, 'en')).toBe('—');
-    expect(formatTableAmount(null, 'en')).toBe('—');
-    expect(formatTableAmount(Number.NaN, 'en')).toBe('—');
-  });
-});
-
 describe('formatSeconds edge cases', () => {
   it('returns "1m" for exactly 60 seconds, without a trailing space', () => {
     expect(formatSeconds(60)).toBe('1m');
@@ -181,42 +133,6 @@ describe('calculateTimeDiff', () => {
   });
 });
 
-describe('formatEthValue', () => {
-  it('returns "0 ETH" for zero', () => {
-    expect(formatEthValue(0, 'en')).toBe('0\u00a0ETH');
-  });
-
-  it('returns 4 decimals for values less than 10', () => {
-    expect(formatEthValue(1.23456, 'en')).toBe('1.2346\u00a0ETH');
-  });
-
-  it('keeps 4 decimals for values 10 or greater, so one figure never reads two ways', () => {
-    expect(formatEthValue(10, 'en')).toBe('10.0000\u00a0ETH');
-    expect(formatEthValue(32.29391, 'en')).toBe('32.2939\u00a0ETH');
-    expect(formatEthValue(99.99999, 'en')).toBe('100.0000\u00a0ETH');
-  });
-
-  it('returns "0 ETH" for NaN-ish falsy value', () => {
-    expect(formatEthValue(NaN, 'en')).toBe('0\u00a0ETH');
-  });
-});
-
-describe('formatCSTValue', () => {
-  it('returns "0 CST" for zero', () => {
-    expect(formatCSTValue(0, 'en')).toBe('0\u00a0CST');
-  });
-
-  it('returns up to 2 decimals at any size', () => {
-    expect(formatCSTValue(5.6789, 'en')).toBe('5.68\u00a0CST');
-    expect(formatCSTValue(42.12345, 'en')).toBe('42.12\u00a0CST');
-  });
-
-  it('groups thousands and keeps whole amounts whole', () => {
-    expect(formatCSTValue(60872.26, 'en')).toBe('60,872.26\u00a0CST');
-    expect(formatCSTValue(1000, 'en')).toBe('1,000\u00a0CST');
-  });
-});
-
 describe('YYYYMMDD date helpers', () => {
   // Timestamps below are in 2026; pin the clock there so the compact form
   // keeps omitting the (current) year in every future year the suite runs.
@@ -226,14 +142,6 @@ describe('YYYYMMDD date helpers', () => {
 
   afterEach(() => {
     jest.restoreAllMocks();
-  });
-
-  it('converts ISO date to YYYYMMDD', () => {
-    expect(toYyyymmdd('2026-05-06')).toBe('20260506');
-  });
-
-  it('converts YYYYMMDD to ISO date', () => {
-    expect(fromYyyymmdd('20260506')).toBe('2026-05-06');
   });
 
   it('formats YYYYMMDD label', () => {
@@ -284,18 +192,5 @@ describe('YYYYMMDD date helpers', () => {
     const range = supplyHistoryBootstrapRange();
     expect(range.from).toBe('19700101');
     expect(range.to).toMatch(/^\d{8}$/);
-  });
-
-  it('returns min and max dates from supply history records', () => {
-    const bounds = supplyHistoryDateBounds([
-      { Date: '20260315' },
-      { Date: '20260101' },
-      { Date: '20260210' },
-    ]);
-    expect(bounds).toEqual({ from: '20260101', to: '20260315' });
-  });
-
-  it('returns null bounds for empty records', () => {
-    expect(supplyHistoryDateBounds([])).toBeNull();
   });
 });

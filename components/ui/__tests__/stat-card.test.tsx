@@ -30,17 +30,6 @@ describe('StatCard', () => {
     expect(container.firstElementChild).not.toHaveClass('border-rule-faint');
   });
 
-  it('maps the deprecated featured and gradient flags onto emphasis', () => {
-    const { container } = render(
-      <>
-        <StatCard label="a" value="1" featured />
-        <StatCard label="b" value="2" gradient />
-      </>,
-    );
-    const cards = container.querySelectorAll('[data-emphasis]');
-    expect(cards).toHaveLength(2);
-  });
-
   it.each([
     ['hero', 'type-figure-lg'],
     ['md', 'type-figure-md'],

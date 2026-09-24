@@ -57,8 +57,6 @@ interface AnchoredTokenCount {
 export type ConnectWalletPresentation = 'menu' | 'sheet' | 'responsive';
 
 interface ConnectWalletButtonProps {
-  /** @deprecated Pass `presentation` instead: true is 'sheet', false is 'menu'. */
-  isMobileView?: boolean;
   /**
    * How a connected wallet opens its account: a dropdown `menu`, a bottom
    * `sheet` for phones, or `responsive` (sheet under 768px, menu above,
@@ -475,8 +473,7 @@ const WalletPill = forwardRef<HTMLButtonElement, WalletPillProps>(function Walle
  * 768px, a bottom sheet on phones.
  */
 const ConnectWalletButton = ({
-  isMobileView,
-  presentation,
+  presentation = 'responsive',
   className,
   loading,
   balance,
@@ -488,8 +485,7 @@ const ConnectWalletButton = ({
 }: ConnectWalletButtonProps) => {
   const t = useTranslations('wallet');
   const { account } = useActiveWeb3React();
-  const mode: ConnectWalletPresentation =
-    presentation ?? (isMobileView === undefined ? 'responsive' : isMobileView ? 'sheet' : 'menu');
+  const mode: ConnectWalletPresentation = presentation;
 
   if (!account) {
     return (

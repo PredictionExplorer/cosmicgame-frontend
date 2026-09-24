@@ -1,8 +1,4 @@
 {
-  "faqPage": {
-    "heading": "释疑",
-    "description": "坦率解答关于 Cosmic Signature 的重要问题：协议是什么、落笔如何运作，以及它不是什么。"
-  },
   "languageSwitcher": {
     "label": "语言"
   },
@@ -69,8 +65,6 @@
     "loading": "加载中",
     "loadingEllipsis": "加载中…",
     "loadingDots": "加载中…",
-    "noData": "暂无数据",
-    "nothingHere": "暂无内容",
     "unavailable": "暂不可用"
   },
   "liveStatus": {

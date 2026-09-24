@@ -1,8 +1,4 @@
 {
-  "faqPage": {
-    "heading": "Clarifications",
-    "description": "Answers to common questions about Cosmic Signature, its protocol, and how gestures work."
-  },
   "languageSwitcher": {
     "label": "Language"
   },
@@ -69,8 +65,6 @@
     "loading": "Loading",
     "loadingEllipsis": "Loading…",
     "loadingDots": "Loading...",
-    "noData": "No data available.",
-    "nothingHere": "Nothing here yet",
     "unavailable": "Unavailable"
   },
   "liveStatus": {
