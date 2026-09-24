@@ -42,6 +42,7 @@ import { signatureCardSources } from './SignatureCard';
 interface CosmicSignatureNftTransferFormProps {
   sourceAddress: string | null | undefined;
   tokens: CSTTokenInfo[];
+  /** A line above the form; the page's own heading usually says enough. */
   description?: string;
   historyHref?: string;
 }
@@ -107,7 +108,6 @@ export function CosmicSignatureNftTransferForm({
   const tDetail = useTranslations('detail');
   const locale = useLocale();
   const recipientId = useId();
-  const resolvedDescription = description ?? t('nftTransfer.defaultDescription');
   const [recipient, setRecipient] = useState('');
   const [page, setPage] = useState(1);
   const [selectedTokenIds, setSelectedTokenIds] = useState<number[]>([]);
@@ -308,9 +308,11 @@ export function CosmicSignatureNftTransferForm({
   return (
     <>
       <div className="space-y-8">
-        <p className="max-w-[var(--measure-lede)] type-body-sm text-muted-foreground">
-          {resolvedDescription}
-        </p>
+        {description ? (
+          <p className="max-w-[var(--measure-lede)] type-body-sm text-muted-foreground">
+            {description}
+          </p>
+        ) : null}
 
         <form onSubmit={handleSubmit} className="space-y-8">
           <div className="max-w-2xl space-y-2">

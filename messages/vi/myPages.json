@@ -274,7 +274,6 @@
       "ownedTitle": "Cosmic Signature NFT tôi sở hữu",
       "transferTitle": "Chuyển giao NFT",
       "transferSubtitle": "Tùy chọn: gửi các Cosmic Signature NFT đã chọn đến một ví khác.",
-      "transferDescription": "Chỉ chọn NFT từ ví này khi bạn đã sẵn sàng gửi chúng đến địa chỉ khác.",
       "figures": {
         "owned": "Trong ví này",
         "anchored": "Đang neo giữ"
@@ -327,7 +326,6 @@
     }
   },
   "nftTransfer": {
-    "defaultDescription": "Chọn một hoặc nhiều Cosmic Signature NFT và gửi chúng đến một địa chỉ ví khác.",
     "sourceWallet": "Ví nguồn",
     "recipientAddress": "Địa chỉ người nhận",
     "empty": "Bạn không có Cosmic Signature NFT nào trong ví này.",

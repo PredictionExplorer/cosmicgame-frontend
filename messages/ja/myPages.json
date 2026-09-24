@@ -274,7 +274,6 @@
       "ownedTitle": "所有しているCosmic Signature NFT",
       "transferTitle": "NFTを移転",
       "transferSubtitle": "任意：選択したCosmic Signature NFTを別のウォレットへ送ります。",
-      "transferDescription": "別のウォレットへ送るNFTを選択してください。",
       "figures": {
         "owned": "このウォレット内",
         "anchored": "係留中"
@@ -327,7 +326,6 @@
     }
   },
   "nftTransfer": {
-    "defaultDescription": "Cosmic Signature NFTを1点以上選び、別のウォレットアドレスへ送ります。",
     "sourceWallet": "送付元ウォレット",
     "recipientAddress": "送付先アドレス",
     "empty": "このウォレットにCosmic Signature NFTはありません。",

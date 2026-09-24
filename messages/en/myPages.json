@@ -274,7 +274,6 @@
       "ownedTitle": "Cosmic Signature NFTs I own",
       "transferTitle": "Transfer NFTs",
       "transferSubtitle": "Optional: send selected Cosmic Signature NFTs to another wallet.",
-      "transferDescription": "Select NFTs from this wallet only when you are ready to send them to another address.",
       "figures": {
         "owned": "In this wallet",
         "anchored": "Anchored"
@@ -327,7 +326,6 @@
     }
   },
   "nftTransfer": {
-    "defaultDescription": "Select one or more Cosmic Signature NFTs and send them to another wallet address.",
     "sourceWallet": "Source wallet",
     "recipientAddress": "Recipient address",
     "empty": "You do not have any Cosmic Signature NFTs in this wallet.",

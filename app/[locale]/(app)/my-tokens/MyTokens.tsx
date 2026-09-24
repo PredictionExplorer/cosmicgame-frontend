@@ -136,7 +136,6 @@ export default function MyTokens() {
               <CosmicSignatureNftTransferForm
                 sourceAddress={account}
                 tokens={tokens}
-                description={t('tokens.page.transferDescription')}
                 historyHref={`/cosmic-signature-transfer/${account}`}
               />
             </TransferSection>

@@ -40,7 +40,7 @@ jest.mock('@/components/nft/CosmicSignatureNftTransferForm', () => ({
     sourceAddress: string;
     tokens: unknown[];
     historyHref: string;
-    description: string;
+    description?: string;
   }) => (
     <div
       data-testid="nft-transfer-form"
@@ -145,7 +145,8 @@ describe('MyTokens', () => {
     expect(form).toHaveAttribute('data-source', '0xUser');
     expect(form).toHaveAttribute('data-count', '2');
     expect(form).toHaveAttribute('data-history', '/cosmic-signature-transfer/0xUser');
-    expect(form).toHaveTextContent('myPages.tokens.page.transferDescription');
+    // The disclosure's own heading and subtitle introduce the form: no second description.
+    expect(form).toBeEmptyDOMElement();
   });
 
   it('has no accessibility violations', async () => {
