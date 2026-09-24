@@ -7,19 +7,11 @@
     "productDescription": "Cosmic Signature 的生成艺术 NFT，以三体物理模拟生成独一无二的图像。",
     "breadcrumbToken": "代币 #{id}"
   },
-  "breadcrumb": {
-    "tokenFallback": "代币 {id}"
-  },
-  "hero": {
-    "unnamedToken": "未命名代币"
-  },
   "badges": {
     "stellarSelectionRecipient": "星选获配者",
     "anchorRecipient": "锚定获配者",
     "cycleRecipient": "周期获配者",
     "enduranceChampion": "坚守冠军",
-    "receivedAsCycleRecipient": "这枚 NFT 在第 {round} 个周期分配给周期获配者。",
-    "receivedAs": "这枚 NFT 最初分配给{label}。",
     "eligibleForAnchoring": "可锚定",
     "eligibleForAnchoringTooltip": "这枚 Cosmic Signature NFT 尚未锚定过，锚定后即可累积 ETH 锚定派发。",
     "alreadyAnchored": "已锚定过",
@@ -32,13 +24,10 @@
     "copyPageLink": "复制页面链接"
   },
   "actions": {
-    "buyOrSellNfts": "买卖 NFT",
-    "viewCycleDetails": "查看第 {round} 个周期详情"
+    "buyOrSellNfts": "买卖 NFT"
   },
   "navigation": {
-    "label": "上一枚与下一枚签名",
-    "previousToken": "上一枚代币",
-    "nextToken": "下一枚代币"
+    "label": "上一枚与下一枚签名"
   },
   "sections": {
     "nameHistory": "命名记录",
@@ -72,25 +61,16 @@
   },
   "metadata": {
     "imprinted": "铭刻时间",
-    "imprintedTooltip": "这枚代币在链上铭刻的时间。点击可查看交易。",
     "cycle": "周期",
-    "cycleTooltip": "这枚代币所属的演绎周期。点击可查看周期详情。",
     "recipient": "获配者",
-    "recipientTooltip": "演绎周期中最初收到这枚代币的地址。",
     "owner": "持有者",
-    "ownerTooltip": "这枚代币的当前持有者，若经转移则可能与获配者不同。",
     "roundNumber": "第 {round} 个周期",
     "anchoring": "锚定",
     "seed": "种子",
     "seedTooltip": "用于生成这枚代币画面与特征的唯一随机种子。",
     "copySeed": "复制种子"
   },
-  "video": {
-    "watchAnimation": "观看动画",
-    "watchAnimationTooltip": "每枚 Cosmic Signature NFT 都有一段由种子生成的专属动画。点击即可观看。"
-  },
   "image": {
-    "defaultAlt": "NFT",
     "rendering": "正在渲染",
     "artworkUnavailable": "作品暂不可用"
   },

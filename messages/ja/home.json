@@ -678,7 +678,6 @@
   },
   "latestNfts": {
     "title": "最新のNFT",
-    "dividerAlt": "区切り",
     "previousAria": "前の最新NFT",
     "nextAria": "次の最新NFT",
     "empty": {

@@ -678,7 +678,6 @@
   },
   "latestNfts": {
     "title": "Latest NFTs",
-    "dividerAlt": "divider",
     "previousAria": "Previous latest NFTs",
     "nextAria": "Next latest NFTs",
     "empty": {

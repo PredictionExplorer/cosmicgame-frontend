@@ -7,19 +7,11 @@
     "productDescription": "절차적 온체인 아트 프로토콜 Cosmic Signature가 삼체 문제 물리로 렌더링한 고유한 제너러티브 NFT입니다.",
     "breadcrumbToken": "토큰 #{id}"
   },
-  "breadcrumb": {
-    "tokenFallback": "토큰 {id}"
-  },
-  "hero": {
-    "unnamedToken": "이름 없는 토큰"
-  },
   "badges": {
     "stellarSelectionRecipient": "별빛 선정 수령자",
     "anchorRecipient": "앵커링 수령자",
     "cycleRecipient": "사이클 수령자",
     "enduranceChampion": "수호 챔피언",
-    "receivedAsCycleRecipient": "사이클 {round}에서 사이클 수령자로 받음",
-    "receivedAs": "{label} 자격으로 받음",
     "eligibleForAnchoring": "앵커링 가능",
     "eligibleForAnchoringTooltip": "이 Cosmic Signature NFT는 아직 앵커링된 적이 없어, 앵커링하면 ETH 앵커링 지급을 받을 수 있습니다.",
     "alreadyAnchored": "이미 앵커링됨",
@@ -32,13 +24,10 @@
     "copyPageLink": "페이지 링크 복사"
   },
   "actions": {
-    "buyOrSellNfts": "NFT 구매 또는 판매",
-    "viewCycleDetails": "사이클 {round} 상세 보기"
+    "buyOrSellNfts": "NFT 구매 또는 판매"
   },
   "navigation": {
-    "label": "이전 및 다음 시그니처",
-    "previousToken": "이전 토큰",
-    "nextToken": "다음 토큰"
+    "label": "이전 및 다음 시그니처"
   },
   "sections": {
     "nameHistory": "이름 변경 내역",
@@ -72,25 +61,16 @@
   },
   "metadata": {
     "imprinted": "각인 일시",
-    "imprintedTooltip": "이 토큰이 온체인에 각인된 시점입니다. 클릭하면 트랜잭션을 볼 수 있습니다.",
     "cycle": "사이클",
-    "cycleTooltip": "이 토큰이 배분된 퍼포먼스 사이클입니다. 클릭하면 사이클 상세 정보를 볼 수 있습니다.",
     "recipient": "수령자",
-    "recipientTooltip": "퍼포먼스 사이클에서 이 토큰을 처음 받은 주소입니다.",
     "owner": "소유자",
-    "ownerTooltip": "이 토큰의 현재 보유자입니다. 토큰이 전송되었다면 수령자와 다를 수 있습니다.",
     "roundNumber": "사이클 {round}",
     "anchoring": "앵커링",
     "seed": "시드",
     "seedTooltip": "이 토큰의 작품과 특성을 생성하는 데 사용된 고유한 무작위 시드입니다.",
     "copySeed": "시드 복사"
   },
-  "video": {
-    "watchAnimation": "애니메이션 보기",
-    "watchAnimationTooltip": "모든 Cosmic Signature NFT에는 시드에서 비롯된 고유한 제너러티브 애니메이션이 있습니다. 클릭하면 재생됩니다."
-  },
   "image": {
-    "defaultAlt": "NFT",
     "rendering": "렌더링 중",
     "artworkUnavailable": "작품을 불러올 수 없습니다"
   },

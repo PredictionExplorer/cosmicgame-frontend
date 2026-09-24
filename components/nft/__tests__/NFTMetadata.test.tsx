@@ -4,19 +4,18 @@ import { normalizeTraitEntry, parseCosmicSignatureMetadata } from '@/lib/nftMeta
 
 import { render, screen, fireEvent, checkA11y, within, waitFor } from '@/test-utils';
 
-import { NFTMetadata, NFTSeed, NFTSpecList, type NFTMetadataProps } from '../NFTMetadata';
+import { NFTSeed, NFTSpecList, type NFTLedgerRecord } from '../NFTMetadata';
 
 jest.mock('../../../utils', () => ({
   getExplorerUrl: (type: string, hash: string) => `https://explorer/${type}/${hash}`,
   getRelativeTime: (ts: number) => `rel-${ts}`,
 }));
 
-const fullNft: NFTMetadataProps['nft'] = {
+const fullNft: NFTLedgerRecord = {
   TimeStamp: 1700000000,
   TxHash: '0xABC',
   WinnerAddr: '0x1111111111111111111111111111111111111111',
   CurOwnerAddr: '0x2222222222222222222222222222222222222222',
-  Seed: 'deadbeef',
   RecordType: 3,
   RoundNum: 42,
   Staked: false,
@@ -76,18 +75,18 @@ describe('NFTSpecList', () => {
     render(<NFTSpecList nft={fullNft} />);
     expect(within(row('spec-recipient')).getByRole('link')).toHaveAttribute(
       'href',
-      `/user/${fullNft!.WinnerAddr}`,
+      `/user/${fullNft.WinnerAddr}`,
     );
     expect(within(row('spec-owner')).getByRole('link')).toHaveAttribute(
       'href',
-      `/user/${fullNft!.CurOwnerAddr}`,
+      `/user/${fullNft.CurOwnerAddr}`,
     );
   });
 
   it('lets a protocol contract’s name wrap instead of cutting it short', () => {
     publishDashboardContractAddresses({
       ...emptyContractAddresses(),
-      charity: fullNft!.CurOwnerAddr!,
+      charity: fullNft.CurOwnerAddr!,
     });
     render(<NFTSpecList nft={fullNft} />);
     const name = within(row('spec-owner')).getByText('formats.address.known.publicGoods');
@@ -179,24 +178,5 @@ describe('NFTSeed', () => {
   it('renders nothing without a seed', () => {
     const { container } = render(<NFTSeed />);
     expect(container).toBeEmptyDOMElement();
-  });
-});
-
-describe('NFTMetadata (deprecated composition)', () => {
-  it('still renders the ledger and the seed for existing call sites', () => {
-    render(<NFTMetadata nft={fullNft} />);
-    expect(screen.getByTestId('nft-metadata')).toBeInTheDocument();
-    expect(screen.getByTestId('nft-spec-list')).toBeInTheDocument();
-    expect(screen.getByTestId('seed-value')).toHaveTextContent('deadbeef');
-  });
-
-  it('handles a null token gracefully', () => {
-    render(<NFTMetadata nft={null} />);
-    expect(screen.getByTestId('nft-metadata')).toBeInTheDocument();
-  });
-
-  it('has no accessibility violations', async () => {
-    const { container } = render(<NFTMetadata nft={fullNft} />);
-    await checkA11y(container);
   });
 });

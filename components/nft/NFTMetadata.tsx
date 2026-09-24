@@ -20,18 +20,16 @@ import { UnknownValue } from '@/components/ui/unknown-value';
 
 import { useTraitLabels } from './traits/useTraitLabels';
 
-export interface NFTMetadataProps {
-  nft: {
-    TimeStamp?: number;
-    TxHash?: string;
-    WinnerAddr?: string;
-    CurOwnerAddr?: string;
-    Seed?: string | number;
-    RecordType?: number;
-    RoundNum?: number;
-    Staked?: boolean;
-    WasUnstaked?: boolean;
-  } | null;
+/** The token record fields the provenance ledger reads. */
+export interface NFTLedgerRecord {
+  TimeStamp?: number;
+  TxHash?: string;
+  WinnerAddr?: string;
+  CurOwnerAddr?: string;
+  RecordType?: number;
+  RoundNum?: number;
+  Staked?: boolean;
+  WasUnstaked?: boolean;
 }
 
 /** How long the copied check stays on the seed's copy button. */
@@ -91,7 +89,7 @@ function ImprintAge({ timestamp }: { timestamp: number }) {
 }
 
 export interface NFTSpecListProps {
-  nft: NFTMetadataProps['nft'];
+  nft: NFTLedgerRecord | null;
   /** The token's traits: the allocation that delivered it. */
   entry?: NftTraitEntry | null;
   /** The token's rarity across the collection. */
@@ -303,21 +301,5 @@ export function NFTSeed({ seed, headingLevel = 2, className }: NFTSeedProps) {
         </button>
       </div>
     </section>
-  );
-}
-
-/**
- * NFTMetadata — the provenance ledger and the seed.
- *
- * @deprecated The detail page renders `NFTSpecList` in its wall label and
- * `NFTSeed` under the hero. This composition remains for existing call sites
- * and is removed in wave 4.
- */
-export function NFTMetadata({ nft }: NFTMetadataProps) {
-  return (
-    <div data-testid="nft-metadata" className="flex flex-col gap-6">
-      <NFTSpecList nft={nft} />
-      <NFTSeed seed={nft?.Seed} />
-    </div>
   );
 }

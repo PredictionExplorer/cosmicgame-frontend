@@ -678,7 +678,6 @@
   },
   "latestNfts": {
     "title": "최신 NFT",
-    "dividerAlt": "구분선",
     "previousAria": "이전 최신 NFT",
     "nextAria": "다음 최신 NFT",
     "empty": {

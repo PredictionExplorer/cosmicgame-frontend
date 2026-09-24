@@ -7,19 +7,11 @@
     "productDescription": "Cosmic Signatureから生まれたジェネラティブNFT。三体問題の物理シミュレーションが、一点ごとに異なる軌跡を描きます。",
     "breadcrumbToken": "トークン #{id}"
   },
-  "breadcrumb": {
-    "tokenFallback": "トークン{id}"
-  },
-  "hero": {
-    "unnamedToken": "名前のないトークン"
-  },
   "badges": {
     "stellarSelectionRecipient": "星選の受領者",
     "anchorRecipient": "係留の受領者",
     "cycleRecipient": "サイクル受領者",
     "enduranceChampion": "持久チャンピオン",
-    "receivedAsCycleRecipient": "サイクル{round}のサイクル受領者として受領",
-    "receivedAs": "{label}として受領",
     "eligibleForAnchoring": "係留可能",
     "eligibleForAnchoringTooltip": "このCosmic Signature NFTはまだ係留されたことがなく、係留するとETHの係留配分を受け取れます。",
     "alreadyAnchored": "係留済み",
@@ -32,13 +24,10 @@
     "copyPageLink": "ページリンクをコピー"
   },
   "actions": {
-    "buyOrSellNfts": "NFTを売買する",
-    "viewCycleDetails": "サイクル{round}の詳細を見る"
+    "buyOrSellNfts": "NFTを売買する"
   },
   "navigation": {
-    "label": "前後のシグネチャー",
-    "previousToken": "前のトークン",
-    "nextToken": "次のトークン"
+    "label": "前後のシグネチャー"
   },
   "sections": {
     "nameHistory": "名前の履歴",
@@ -72,25 +61,16 @@
   },
   "metadata": {
     "imprinted": "刻印日時",
-    "imprintedTooltip": "このトークンがオンチェーンに刻印された時刻です。クリックするとトランザクションを表示します。",
     "cycle": "サイクル",
-    "cycleTooltip": "このトークンが配分されたパフォーマンス・サイクルです。クリックするとサイクルの詳細を表示します。",
     "recipient": "受領者",
-    "recipientTooltip": "パフォーマンス・サイクルの中でこのトークンを最初に受領したアドレスです。",
     "owner": "所有者",
-    "ownerTooltip": "このトークンの現在の保有者です。トークンが移転されていれば受領者と異なることがあります。",
     "roundNumber": "サイクル{round}",
     "anchoring": "係留",
     "seed": "シード",
     "seedTooltip": "このトークンのアートワークと特性の生成に使われた唯一の乱数シードです。",
     "copySeed": "シードをコピー"
   },
-  "video": {
-    "watchAnimation": "アニメーションを見る",
-    "watchAnimationTooltip": "各Cosmic Signature NFTには、そのシードから導かれた固有のジェネラティブアニメーションがあります。クリックして再生します。"
-  },
   "image": {
-    "defaultAlt": "NFT",
     "rendering": "レンダリング中",
     "artworkUnavailable": "アートワークを利用できません"
   },

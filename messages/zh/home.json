@@ -678,7 +678,6 @@
   },
   "latestNfts": {
     "title": "最新 NFT",
-    "dividerAlt": "分隔线",
     "previousAria": "上一组最新 NFT",
     "nextAria": "下一组最新 NFT",
     "empty": {
