@@ -43,7 +43,8 @@ export async function CodeSeoSummary() {
               <h3 className="type-title">
                 <a
                   href={href}
-                  className="inline-flex items-start gap-1.5 text-primary underline-offset-4 hover:underline"
+                  // 24px tall at least: a text link's WCAG 2.5.8 target.
+                  className="inline-flex min-h-6 items-start gap-1.5 text-primary underline-offset-4 hover:underline"
                 >
                   {t(`repositories.items.${id}.title`)}
                   <ArrowUpRight aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
