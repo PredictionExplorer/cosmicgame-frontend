@@ -105,14 +105,12 @@ describe('GalleryTraitFacets', () => {
     expect(screen.getByLabelText('Class B: 1 NFTs')).toBeInTheDocument();
   });
 
-  it('shows the active count, match count, per-facet clear, and clear all', () => {
+  it('shows the active count, per-facet clear, and clear all', () => {
     const { props } = renderFacets({
       selected: { structure: ['Orbit Ribbons'], fate: ['Ejection'] },
       chaosRange: [20, 22],
-      matchCount: 1,
     });
-    expect(screen.getByText('3')).toBeInTheDocument();
-    expect(screen.getByText('1 NFTs match')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Traits\s*3/ })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Clear all' }));
     expect(props.onClearAll).toHaveBeenCalled();
     fireEvent.click(screen.getByRole('button', { name: 'Clear Structure' }));
@@ -190,44 +188,59 @@ describe('GalleryTraitFacets', () => {
 });
 
 describe('GalleryActiveFilters', () => {
-  it('renders removable chips for each selection and the chaos range', () => {
-    const onRemoveValue = jest.fn();
-    const onClearChaos = jest.fn();
-    const onClearAll = jest.fn();
-    render(
-      <GalleryActiveFilters
-        selected={{ structure: ['Orbit Ribbons'], fate: ['Ejection'] }}
-        chaosRange={[10, 40]}
-        onRemoveValue={onRemoveValue}
-        onClearChaos={onClearChaos}
-        onClearAll={onClearAll}
-      />,
-    );
+  function renderChips(overrides: Partial<Parameters<typeof GalleryActiveFilters>[0]> = {}) {
+    const props = {
+      status: 'all' as const,
+      search: '',
+      traits: {},
+      chaosRange: null,
+      onClearStatus: jest.fn(),
+      onClearSearch: jest.fn(),
+      onRemoveTrait: jest.fn(),
+      onClearChaos: jest.fn(),
+      ...overrides,
+    };
+    return { ...render(<GalleryActiveFilters {...props} />), props };
+  }
+
+  it('renders a removable chip for every active filter', () => {
+    const { props } = renderChips({
+      status: 'named',
+      search: 'numba',
+      traits: { structure: ['Orbit Ribbons'], fate: ['Ejection'] },
+      chaosRange: [10, 40],
+    });
     fireEvent.click(screen.getByRole('button', { name: 'Remove filter Structure: Orbit Ribbons' }));
-    expect(onRemoveValue).toHaveBeenCalledWith('structure', 'Orbit Ribbons');
+    expect(props.onRemoveTrait).toHaveBeenCalledWith('structure', 'Orbit Ribbons');
     fireEvent.click(screen.getByRole('button', { name: 'Clear Chaos' }));
-    expect(onClearChaos).toHaveBeenCalled();
-    fireEvent.click(screen.getByRole('button', { name: 'Clear all' }));
-    expect(onClearAll).toHaveBeenCalled();
+    expect(props.onClearChaos).toHaveBeenCalled();
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Remove filter gallery.toolbar.show: gallery.filters.named.label',
+      }),
+    );
+    expect(props.onClearStatus).toHaveBeenCalled();
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Remove filter search.gallery.submit: numba' }),
+    );
+    expect(props.onClearSearch).toHaveBeenCalled();
     expect(screen.getByText('10 to 40')).toBeInTheDocument();
+    expect(screen.getByRole('list', { name: 'Active trait filters' }).children).toHaveLength(5);
   });
 
   it('renders nothing without active filters', () => {
-    render(
-      <GalleryActiveFilters
-        selected={{}}
-        chaosRange={null}
-        onRemoveValue={noop}
-        onClearChaos={noop}
-        onClearAll={noop}
-      />,
-    );
+    renderChips();
     expect(screen.queryByTestId('active-trait-filters')).not.toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = renderChips({ traits: { fate: ['Ejection'] }, chaosRange: [1, 2] });
+    await checkA11y(container);
   });
 });
 
 describe('GalleryCollectionDna', () => {
-  it('renders proportional segments that filter on click', () => {
+  it('lists every value of a trait in the legend, hottest to coolest for spectral classes', () => {
     const onSelect = jest.fn();
     render(
       <GalleryCollectionDna
@@ -240,15 +253,33 @@ describe('GalleryCollectionDna', () => {
     fireEvent.click(within(fate).getByRole('button', { name: /^Ejection: 1\sNFTs/ }));
     expect(onSelect).toHaveBeenCalledWith('fate', 'Ejection');
     const spectral = screen.getByTestId('dna-spectralClass');
-    // Hottest to coolest: B before F.
     const labels = within(spectral)
       .getAllByRole('button')
       .map((button) => button.getAttribute('aria-label'));
+    expect(labels).toHaveLength(collectionTraits.facets.spectralClass?.length ?? 0);
     expect(labels[0]).toMatch(/^Class B/);
     expect(labels[1]).toMatch(/^Class F/);
   });
 
-  it('marks the selected segment pressed', () => {
+  it('shows the whole legend, however many values a trait has', () => {
+    const many = {
+      ...collectionTraits,
+      facets: {
+        ...collectionTraits.facets,
+        spectralClass: ['O', 'B', 'A', 'F', 'G', 'K', 'M'].map((value, index) => ({
+          value,
+          count: index + 1,
+          share: (index + 1) / 28,
+        })),
+      },
+    };
+    render(<GalleryCollectionDna collectionTraits={many} selected={{}} onSelect={noop} />);
+    const legend = within(screen.getByTestId('dna-spectralClass')).getByTestId('dna-legend');
+    expect(within(legend).getAllByRole('button')).toHaveLength(7);
+    expect(within(legend).getByRole('button', { name: /^Class M: 7/ })).toBeInTheDocument();
+  });
+
+  it('keeps the bar a picture and the legend the control', () => {
     render(
       <GalleryCollectionDna
         collectionTraits={collectionTraits}
@@ -256,31 +287,20 @@ describe('GalleryCollectionDna', () => {
         onSelect={noop}
       />,
     );
-    expect(screen.getByRole('button', { name: /^Ejection: 1\sNFTs/ })).toHaveAttribute(
+    const fate = screen.getByTestId('dna-fate');
+    const bar = within(fate).getByTestId('dna-bar');
+    expect(bar).toHaveAttribute('aria-hidden');
+    expect(within(bar).queryByRole('button', { hidden: true })).not.toBeInTheDocument();
+    expect(within(fate).getByRole('button', { name: /^Ejection: 1\sNFTs/ })).toHaveAttribute(
       'aria-pressed',
       'true',
     );
-    expect(screen.getByRole('button', { name: /^Eternal Dance: 1\sNFTs/ })).toHaveAttribute(
-      'aria-pressed',
-      'false',
-    );
-  });
-
-  it('draws a focused segment ring where the bar cannot clip or fade it', () => {
-    render(
-      <GalleryCollectionDna
-        collectionTraits={collectionTraits}
-        selected={{ fate: ['Ejection'] }}
-        onSelect={noop}
-      />,
-    );
-    const dimmed = screen.getByRole('button', { name: /^Eternal Dance: 1\sNFTs/ });
-    // An overflow-hidden bar clipped the ring, which sits outside the segment.
-    expect(dimmed.parentElement).not.toHaveClass('overflow-hidden');
-    // Opacity applies to an element's outline too: focus restores full strength.
-    expect(dimmed).toHaveClass('opacity-35', 'focus-visible:opacity-100');
-    // The shared outline, not a box-shadow ring of its own.
-    expect(dimmed.className).not.toMatch(/focus-visible:(?:outline-none|ring)/);
+    const other = within(fate).getByRole('button', { name: /^Eternal Dance: 1\sNFTs/ });
+    expect(other).toHaveAttribute('aria-pressed', 'false');
+    // A real target: 32px for a mouse, 44px for a finger.
+    expect(other).toHaveClass('min-h-8', 'pointer-coarse:min-h-11');
+    // The count is in the subtle tier, not an opacity-dimmed colour.
+    expect(within(other).getByText('1')).toHaveClass('text-subtle');
   });
 
   it('shows a loading state and hides itself when unavailable', () => {

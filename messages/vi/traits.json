@@ -142,20 +142,16 @@
   },
   "card": {
     "chaosAria": "Hỗn độn {value} trên {max}",
-    "chaosShort": "Hỗn độn {value}",
-    "syzygiesAria": "{count} sóc vọng",
-    "syzygiesShort": "{count} sóc vọng",
     "hueStripAria": "Sắc màu bảng màu của ba vật thể",
     "spectralAria": "Lớp quang phổ {value}",
     "fateAria": "Vận mệnh: {value}",
     "quickView": "Xem nhanh",
     "quickViewAria": "Xem nhanh Cosmic Signature {id}",
     "traitsPending": "Đang chờ dữ liệu đặc tính",
-    "traitsPendingTooltip": "Siêu dữ liệu đặc tính của Signature này chưa được công bố.",
-    "cycleShort": "CK{n}",
+    "traitSummary": "{structure} · {palette}",
     "cycleLong": "Chu kỳ {n}",
-    "cycleTooltip": "Được khắc trong chu kỳ {n}",
-    "viewCycle": "Xem chu kỳ {n}"
+    "viewCycle": "Xem chu kỳ {n}",
+    "anchoredState": "Đang neo giữ"
   },
   "rarity": {
     "rank": "#{rank}",
@@ -171,9 +167,6 @@
   },
   "facets": {
     "title": "Đặc tính",
-    "toggle": "Đặc tính",
-    "toggleWithCount": "Đặc tính · {count}",
-    "toggleAria": "Lọc theo đặc tính",
     "clearAll": "Xóa tất cả",
     "clearFacet": "Xóa {trait}",
     "activeAria": "Bộ lọc đặc tính đang bật",
@@ -185,13 +178,11 @@
     "chaosValue": "{min} đến {max}",
     "showMore": "Hiện thêm {count}",
     "showLess": "Thu gọn",
-    "sheetTitle": "Lọc theo đặc tính",
     "sheetDescription": "Thu hẹp kho lưu trữ theo bố cục, vật lý và nguồn gốc của từng Signature.",
     "loading": "Đang lập chỉ mục đặc tính…",
     "partial": "Chỉ mục đặc tính vẫn đang được bổ sung ({indexed} trên {total})",
     "unavailable": "Bộ lọc đặc tính hiện không khả dụng.",
-    "retry": "Thử lại",
-    "matches": "{count} NFT phù hợp"
+    "retry": "Thử lại"
   },
   "quickView": {
     "title": "Cosmic Signature {id}",
@@ -249,9 +240,8 @@
   },
   "dna": {
     "title": "DNA bộ sưu tập",
-    "subtitle": "Phân bố các đặc tính chính trong bộ sưu tập. Chọn một phần của biểu đồ để lọc phòng trưng bày.",
+    "subtitle": "Cách bộ sưu tập phân bố theo các đặc tính chính. Chọn một đặc tính để thu hẹp phòng trưng bày.",
     "segmentAria": "{value}: {count} NFT. Lọc theo đặc tính này.",
-    "legendCount": "{count}",
     "loading": "Đang đọc đặc tính của bộ sưu tập…"
   },
   "alt": {

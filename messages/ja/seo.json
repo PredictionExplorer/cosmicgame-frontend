@@ -307,7 +307,8 @@
     "cards": {
       "imprinted": "刻印済みNFT",
       "anchored": "係留中のNFT",
-      "named": "名前付きNFT"
+      "named": "名前付きNFT",
+      "cycles": "確定したサイクル"
     },
     "relatedAria": "ギャラリーの関連ページ",
     "links": {

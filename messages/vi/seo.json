@@ -307,7 +307,8 @@
     "cards": {
       "imprinted": "NFT đã khắc",
       "anchored": "NFT đang neo giữ",
-      "named": "NFT đã đặt tên"
+      "named": "NFT đã đặt tên",
+      "cycles": "Chu kỳ đã hoàn tất"
     },
     "relatedAria": "Các trang liên quan đến phòng trưng bày",
     "links": {

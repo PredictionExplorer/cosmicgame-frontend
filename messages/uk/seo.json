@@ -307,7 +307,8 @@
     "cards": {
       "imprinted": "Закарбовані NFT",
       "anchored": "Закріплені NFT",
-      "named": "Іменовані NFT"
+      "named": "Іменовані NFT",
+      "cycles": "Завершені цикли"
     },
     "relatedAria": "Пов’язані сторінки галереї",
     "links": {

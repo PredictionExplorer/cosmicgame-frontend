@@ -17,9 +17,14 @@ import { createMetadata } from '@/utils/seo';
 import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
 import { PageMessages } from '@/components/i18n/PageMessages';
 import { PageShell } from '@/components/ui/page-shell';
+import { SectionHeader } from '@/components/ui/section-header';
+
+import { readCollection } from '../publicDataReads';
+import { QuerySeed } from '../QuerySeed';
 
 import GalleryPage from './GalleryPage';
 import { GallerySeoSummary } from './GallerySeoSummary';
+import { GalleryView } from './GalleryView';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -53,12 +58,13 @@ export const revalidate = 300;
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const [t, meta, common, detail, latestImprint] = await Promise.all([
+  const [t, meta, common, detail, latestImprint, collection] = await Promise.all([
     getTranslations({ locale, namespace: 'gallery' }),
     getTranslations({ locale, namespace: 'meta' }),
     getTranslations({ locale, namespace: 'common' }),
     getTranslations({ locale, namespace: 'detail' }),
     loadLatestImprint(),
+    readCollection(),
   ]);
   const inLanguage = jsonLdInLanguage(locale);
 
@@ -98,13 +104,27 @@ export default async function Page({ params }: PageProps) {
               : []),
           ]}
         />
-        {/* The header renders outside the Suspense boundary: the grid reads the
-            URL and renders on the client, the H1 and figures stay in the HTML. */}
         <PageShell variant="data" backdrop="signature">
           <GallerySeoSummary actions={<NftMarketplaceButton variant="secondary" />} />
-          <Suspense>
-            <GalleryPage />
-          </Suspense>
+          {/*
+           * The collection read seeds the client's list query, so the first
+           * page of plates is in the static HTML. The body reads the URL, which
+           * makes it render on the client in the prerendered page: its fallback
+           * is the same view at the default query, so the plain /gallery never
+           * shifts and a filtered link swaps plates in place.
+           */}
+          <QuerySeed seeds={[{ queryKey: ['cstList'], data: collection.data, at: collection.at }]}>
+            <Suspense fallback={<GalleryView search="" />}>
+              <GalleryPage />
+            </Suspense>
+          </QuerySeed>
+          <section
+            aria-labelledby="gallery-about"
+            className="mt-16 border-t border-rule-faint pt-10 sm:mt-20"
+          >
+            <SectionHeader headingId="gallery-about" title={t('about.title')} />
+            <p className="type-prose text-muted-foreground">{t('about.description')}</p>
+          </section>
         </PageShell>
       </>
     </PageMessages>

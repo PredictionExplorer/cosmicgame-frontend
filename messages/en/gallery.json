@@ -6,37 +6,6 @@
   "jsonLd": {
     "name": "Cosmic Signature Gallery"
   },
-  "intro": {
-    "badge": "Generative archive",
-    "description": "Each Cosmic Signature NFT is a unique piece of generative art derived from an on-chain seed via three-body-problem physics simulations. In a typical cycle, 24 new NFTs are imprinted: four role NFTs, ten participant Stellar Selection NFTs, and ten Anchored-NFT Stellar Selection NFTs for RandomWalk NFT anchor-holders."
-  },
-  "featured": {
-    "viewAria": "View Cosmic Signature {id}",
-    "alt": "Cosmic Signature artwork {id}",
-    "emptyHint": "Collection artwork appears here once it has loaded.",
-    "badgeImprint": "Featured imprint",
-    "badgeArchive": "Archive",
-    "awaitingMetadata": "Awaiting metadata"
-  },
-  "card": {
-    "alt": "Cosmic Signature {id}",
-    "unnamed": "Unnamed",
-    "age": {
-      "justNow": "just now",
-      "minutes": "{count}m ago",
-      "hours": "{count}h ago",
-      "days": "{count}d ago",
-      "months": "{count}mo ago",
-      "years": "{count}y ago"
-    },
-    "tooltips": {
-      "round": "Imprinted in cycle {round}",
-      "anchored": "Currently anchored and receiving Anchor Distributions",
-      "customName": "This NFT has a custom name",
-      "identifier": "Unique sequential identifier for this COSMIC NFT",
-      "mintedOn": "Imprinted on {date}"
-    }
-  },
   "filters": {
     "ariaLabel": "Filter NFTs",
     "all": {
@@ -54,15 +23,14 @@
   },
   "sort": {
     "ariaLabel": "Sort order",
-    "tooltip": "Change the order NFTs are displayed",
-    "newest": "Newest First",
-    "oldest": "Oldest First",
-    "cycleDesc": "Cycle (High → Low)",
-    "cycleAsc": "Cycle (Low → High)",
-    "rarity": "Rarest First",
-    "chaosDesc": "Chaos (High → Low)",
-    "chaosAsc": "Chaos (Low → High)",
-    "syzygiesDesc": "Most Syzygies"
+    "newest": "Newest first",
+    "oldest": "Oldest first",
+    "cycleDesc": "Cycle (high → low)",
+    "cycleAsc": "Cycle (low → high)",
+    "rarity": "Rarest first",
+    "chaosDesc": "Chaos (high → low)",
+    "chaosAsc": "Chaos (low → high)",
+    "syzygiesDesc": "Most syzygies"
   },
   "list": {
     "headers": {
@@ -84,13 +52,27 @@
     "list": "List view"
   },
   "pagination": {
-    "showing": "Showing <value>{start}</value> - <value>{end}</value> of <value>{total}</value> NFTs",
-    "perPage": "Per page",
-    "perPageAria": "Items per page",
-    "perPageTooltip": "Number of NFTs displayed per page"
+    "perPage": "Per page"
   },
   "empty": {
     "title": "No NFTs found",
-    "description": "Try adjusting your search or filters to find what you're looking for."
+    "description": "No Signature matches these filters. Clear them to see the whole collection.",
+    "collectionTitle": "No Signatures yet",
+    "collectionDescription": "Each Signature appears here once its cycle is finalized and it is imprinted."
+  },
+  "about": {
+    "title": "About the collection",
+    "description": "Each Cosmic Signature NFT is a unique piece of generative art derived from an on-chain seed via three-body-problem physics simulations. In a typical cycle, 24 new NFTs are imprinted: four role NFTs, ten participant Stellar Selection NFTs, and ten Anchored-NFT Stellar Selection NFTs for RandomWalk NFT anchor-holders."
+  },
+  "toolbar": {
+    "filters": "Filters",
+    "filtersWithCount": "Filters · {count}",
+    "show": "Show",
+    "showResults": "{count, plural, one {Show # NFT} other {Show # NFTs}}"
+  },
+  "results": {
+    "total": "{count, plural, one {# NFT} other {# NFTs}}",
+    "filtered": "{count, number} of {total, plural, one {# NFT} other {# NFTs}}",
+    "regionLabel": "Signatures"
   }
 }

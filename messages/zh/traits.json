@@ -142,20 +142,16 @@
   },
   "card": {
     "chaosAria": "混沌度 {value}，上限 {max}",
-    "chaosShort": "混沌度 {value}",
-    "syzygiesAria": "{count} 次连珠",
-    "syzygiesShort": "{count} 次连珠",
     "hueStripAria": "三个天体的调色色相",
     "spectralAria": "光谱型 {value}",
     "fateAria": "命运：{value}",
     "quickView": "快速预览",
     "quickViewAria": "快速预览 Cosmic Signature {id}",
     "traitsPending": "特征待发布",
-    "traitsPendingTooltip": "这枚签名的特征元数据尚未发布。",
-    "cycleShort": "C{n}",
+    "traitSummary": "{structure} · {palette}",
     "cycleLong": "第 {n} 个周期",
-    "cycleTooltip": "铭刻于第 {n} 个周期。",
-    "viewCycle": "查看第 {n} 个周期"
+    "viewCycle": "查看第 {n} 个周期",
+    "anchoredState": "已锚定"
   },
   "rarity": {
     "rank": "#{rank}",
@@ -171,9 +167,6 @@
   },
   "facets": {
     "title": "特征",
-    "toggle": "特征",
-    "toggleWithCount": "特征 · {count}",
-    "toggleAria": "按特征筛选",
     "clearAll": "全部清除",
     "clearFacet": "清除{trait}",
     "activeAria": "已启用的特征筛选",
@@ -185,13 +178,11 @@
     "chaosValue": "{min} 至 {max}",
     "showMore": "再显示 {count} 项",
     "showLess": "收起",
-    "sheetTitle": "按特征筛选",
     "sheetDescription": "按每枚签名的构图、物理与来历缩小档案范围。",
     "loading": "正在索引特征…",
     "partial": "特征索引仍在补全（{indexed}/{total}）",
     "unavailable": "特征筛选暂不可用。",
-    "retry": "重试",
-    "matches": "{count} 枚 NFT 符合条件"
+    "retry": "重试"
   },
   "quickView": {
     "title": "Cosmic Signature {id}",
@@ -249,9 +240,8 @@
   },
   "dna": {
     "title": "作品集基因",
-    "subtitle": "档案在各项核心特征上的分布。选择某一段即可筛选画廊。",
+    "subtitle": "作品集在各项核心特征上的分布。选择一个特征即可筛选画廊。",
     "segmentAria": "{value}：{count} 枚 NFT。按此特征筛选。",
-    "legendCount": "{count}",
     "loading": "正在读取作品集特征…"
   },
   "alt": {

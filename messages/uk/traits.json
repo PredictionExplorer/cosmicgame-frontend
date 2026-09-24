@@ -142,20 +142,16 @@
   },
   "card": {
     "chaosAria": "Хаос {value} з {max}",
-    "chaosShort": "Хаос {value}",
-    "syzygiesAria": "{count, plural, one {# сизигія} few {# сизигії} many {# сизигій} other {# сизигії}}",
-    "syzygiesShort": "{count, plural, one {# сизигія} few {# сизигії} many {# сизигій} other {# сизигії}}",
     "hueStripAria": "Відтінки палітри трьох тіл",
     "spectralAria": "Спектральний клас {value}",
     "fateAria": "Доля: {value}",
     "quickView": "Швидкий перегляд",
     "quickViewAria": "Швидкий перегляд Cosmic Signature {id}",
     "traitsPending": "Очікування даних ознак",
-    "traitsPendingTooltip": "Метадані ознак цієї Сигнатури ще не опубліковано.",
-    "cycleShort": "Ц{n}",
+    "traitSummary": "{structure}, {palette}",
     "cycleLong": "Цикл {n}",
-    "cycleTooltip": "Закарбовано в циклі {n}",
-    "viewCycle": "Переглянути цикл {n}"
+    "viewCycle": "Переглянути цикл {n}",
+    "anchoredState": "Закріплено"
   },
   "rarity": {
     "rank": "#{rank}",
@@ -171,9 +167,6 @@
   },
   "facets": {
     "title": "Ознаки",
-    "toggle": "Ознаки",
-    "toggleWithCount": "Ознаки · {count}",
-    "toggleAria": "Фільтрувати за ознакою",
     "clearAll": "Очистити все",
     "clearFacet": "Очистити: {trait}",
     "activeAria": "Активні фільтри ознак",
@@ -185,13 +178,11 @@
     "chaosValue": "від {min} до {max}",
     "showMore": "Показати ще {count}",
     "showLess": "Показати менше",
-    "sheetTitle": "Фільтрувати за ознакою",
     "sheetDescription": "Звузьте архів за композицією, фізикою та походженням кожної Сигнатури.",
     "loading": "Індексування ознак…",
     "partial": "Індекс ознак ще заповнюється ({indexed} з {total})",
     "unavailable": "Фільтри ознак зараз недоступні.",
-    "retry": "Повторити",
-    "matches": "Знайдено {count} NFT"
+    "retry": "Повторити"
   },
   "quickView": {
     "title": "Cosmic Signature {id}",
@@ -249,9 +240,8 @@
   },
   "dna": {
     "title": "ДНК колекції",
-    "subtitle": "Розподіл головних ознак у колекції. Оберіть сегмент діаграми, щоб відфільтрувати галерею.",
+    "subtitle": "Як колекція розподіляється за головними ознаками. Оберіть ознаку, щоб звузити галерею.",
     "segmentAria": "{value}: {count} NFT. Фільтрувати за цією ознакою.",
-    "legendCount": "{count}",
     "loading": "Зчитування ознак колекції…"
   },
   "alt": {

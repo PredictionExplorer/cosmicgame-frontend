@@ -142,20 +142,16 @@
   },
   "card": {
     "chaosAria": "カオス{value}（最大{max}）",
-    "chaosShort": "カオス{value}",
-    "syzygiesAria": "朔望{count}回",
-    "syzygiesShort": "朔望{count}",
     "hueStripAria": "三つの天体のパレットの色相",
     "spectralAria": "スペクトル型{value}",
     "fateAria": "運命：{value}",
     "quickView": "クイックビュー",
     "quickViewAria": "Cosmic Signature {id}のクイックビュー",
     "traitsPending": "特性は準備中",
-    "traitsPendingTooltip": "このシグネチャーの特性メタデータはまだ公開されていません。",
-    "cycleShort": "C{n}",
+    "traitSummary": "{structure} · {palette}",
     "cycleLong": "サイクル{n}",
-    "cycleTooltip": "サイクル{n}で刻印",
-    "viewCycle": "サイクル{n}を見る"
+    "viewCycle": "サイクル{n}を見る",
+    "anchoredState": "係留中"
   },
   "rarity": {
     "rank": "#{rank}",
@@ -171,9 +167,6 @@
   },
   "facets": {
     "title": "特性",
-    "toggle": "特性",
-    "toggleWithCount": "特性 · {count}",
-    "toggleAria": "特性で絞り込む",
     "clearAll": "すべてクリア",
     "clearFacet": "{trait}をクリア",
     "activeAria": "有効な特性フィルター",
@@ -185,13 +178,11 @@
     "chaosValue": "{min}〜{max}",
     "showMore": "さらに{count}件を表示",
     "showLess": "表示を減らす",
-    "sheetTitle": "特性で絞り込む",
     "sheetDescription": "各シグネチャーの構図、物理、来歴でアーカイブを絞り込みます。",
     "loading": "特性をインデックス中…",
     "partial": "特性インデックスはまだ作成中です（{total}点中{indexed}点）",
     "unavailable": "特性フィルターは現在利用できません。",
-    "retry": "再試行",
-    "matches": "{count}点のNFTが一致"
+    "retry": "再試行"
   },
   "quickView": {
     "title": "Cosmic Signature {id}",
@@ -249,9 +240,8 @@
   },
   "dna": {
     "title": "コレクションDNA",
-    "subtitle": "アーカイブが主要な特性ごとにどう分かれているか。セグメントを選ぶとギャラリーを絞り込めます。",
+    "subtitle": "コレクションが主要な特性ごとにどう分かれているかを示します。特性を選ぶとギャラリーを絞り込めます。",
     "segmentAria": "{value}：{count}点のNFT。この特性で絞り込みます。",
-    "legendCount": "{count}",
     "loading": "コレクションの特性を読み取り中…"
   },
   "alt": {

@@ -1,12 +1,11 @@
 'use client';
 
-import { Dna } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import type { CollectionTraits } from '@/hooks/useNftTraits';
 import type { CategoricalTraitKey, FacetOption } from '@/lib/nftMetadata';
 import { cn } from '@/lib/utils';
-import { toIntlLocale } from '@/utils/format';
+import { formatCount } from '@/utils/format';
 import {
   SPECTRAL_CLASSES,
   camelTraitKey,
@@ -15,8 +14,6 @@ import {
   useTraitLabels,
 } from '@/components/nft/traits';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Surface } from '@/components/ui/surface';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 import type { TraitFilterState } from '../traitFilters';
 
@@ -26,33 +23,31 @@ export interface GalleryCollectionDnaProps {
   collectionTraits: CollectionTraits | null | undefined;
   selected: TraitFilterState;
   onSelect: (key: CategoricalTraitKey, value: string) => void;
+  /** The title's id, for a surrounding region's `aria-labelledby`. */
+  titleId?: string;
+  /** Hide the title and lede (a disclosure already names the panel). */
+  hideHeading?: boolean;
   className?: string;
 }
 
 const DNA_KEYS: readonly CategoricalTraitKey[] = ['fate', 'spectralClass', 'structure'];
 
-const BRAND_SEQUENCE = [
-  'rgb(var(--aurora-cyan-rgb))',
-  'rgb(var(--nebula-violet-rgb))',
-  'rgb(var(--solar-gold-rgb))',
-  'rgb(var(--chrono-rose-rgb))',
-  'rgb(var(--impact-green-rgb))',
-  'rgb(var(--stellar-white-rgb) / 0.7)',
-];
+/** The fixed data series (docs/design-system.md → Data series), for inline swatches. */
+const SERIES = [1, 2, 3, 4, 5, 6, 7, 8].map((n) => `hsl(var(--data-${n}))`);
 
-const FATE_COLORS: Record<string, string> = {
-  eternalDance: 'rgb(var(--impact-green-rgb))',
-  ejection: 'rgb(var(--chrono-rose-rgb))',
+/** The two fates keep one hue wherever they appear: a dance (green) and an ejection (pink). */
+const FATE_SERIES: Record<string, string> = {
+  eternalDance: 'hsl(var(--data-5))',
+  ejection: 'hsl(var(--data-4))',
 };
 
 function segmentColor(key: CategoricalTraitKey, value: string, index: number): string {
   if (key === 'spectralClass') return spectralClassColor(value);
-  if (key === 'fate')
-    return FATE_COLORS[camelTraitKey(value)] ?? BRAND_SEQUENCE[index % BRAND_SEQUENCE.length]!;
-  return BRAND_SEQUENCE[index % BRAND_SEQUENCE.length]!;
+  if (key === 'fate') return FATE_SERIES[camelTraitKey(value)] ?? SERIES[index % SERIES.length]!;
+  return SERIES[index % SERIES.length]!;
 }
 
-/** Spectral classes read hottest → coolest; everything else stays most-common-first. */
+/** Spectral classes read hottest to coolest; everything else stays most common first. */
 function orderOptions(key: CategoricalTraitKey, options: FacetOption[]): FacetOption[] {
   if (key !== 'spectralClass') return options;
   const rank = (value: string) => {
@@ -76,81 +71,86 @@ function DistributionBar({
   const t = useTranslations('traits');
   const locale = useLocale();
   const { typeLabel, valueLabel } = useTraitLabels();
-  const intl = toIntlLocale(locale);
   const ordered = orderOptions(traitKey, options);
   const anySelected = selected.length > 0;
+  const groupLabel = typeLabel(traitKey);
 
   return (
     <div className="min-w-0" data-testid={`dna-${traitKey}`}>
-      <p className="mb-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-        {typeLabel(traitKey)}
-      </p>
-      {/*
-       * The end segments round the bar themselves: an overflow-hidden bar
-       * would clip a focused segment's outline, which is drawn outside it.
-       */}
-      <div className="flex h-2.5 w-full gap-px rounded-full bg-white/[0.04]">
+      <p className="mb-2 type-label text-muted-foreground">{groupLabel}</p>
+      {/* The bar is the picture; the legend under it holds the controls. */}
+      <div aria-hidden className="flex h-2 w-full gap-px" data-testid="dna-bar">
         {ordered.map((option, index) => {
-          const color = segmentColor(traitKey, option.value, index);
-          const label = valueLabel(traitKey, option.value);
           const active = selected.includes(option.value);
           return (
-            <Tooltip key={option.value}>
-              <TooltipTrigger asChild>
-                <button
-                  type="button"
-                  onClick={() => onSelect(option.value)}
-                  aria-pressed={active}
-                  aria-label={t('dna.segmentAria', { value: label, count: option.count })}
-                  style={{ flexGrow: option.count, backgroundColor: color }}
-                  className={cn(
-                    'min-w-[3px] transition-opacity duration-200 first:rounded-l-full last:rounded-r-full',
-                    anySelected && !active ? 'opacity-35 hover:opacity-70' : 'hover:opacity-80',
-                    // Opacity would fade the segment's focus ring with it.
-                    'focus-visible:opacity-100',
-                  )}
-                />
-              </TooltipTrigger>
-              <TooltipContent side="top">
-                <p className="font-medium">{label}</p>
-                <p className="text-muted-foreground">{option.count.toLocaleString(intl)}</p>
-              </TooltipContent>
-            </Tooltip>
+            <span
+              key={option.value}
+              style={{
+                flexGrow: option.count,
+                backgroundColor: segmentColor(traitKey, option.value, index),
+              }}
+              className={cn(
+                'min-w-[3px] transition-opacity duration-base first:rounded-l-pill last:rounded-r-pill',
+                anySelected && !active && 'opacity-30',
+              )}
+            />
           );
         })}
       </div>
-      <ul className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
-        {ordered.slice(0, 6).map((option, index) => (
-          <li
-            key={option.value}
-            className="flex items-center gap-1.5 text-[11px] text-muted-foreground"
-          >
-            <span
-              aria-hidden
-              className="h-1.5 w-1.5 rounded-full"
-              style={{ backgroundColor: segmentColor(traitKey, option.value, index) }}
-            />
-            <span className={cn(selected.includes(option.value) && 'text-foreground')}>
-              {valueLabel(traitKey, option.value)}
-            </span>
-            <span className="font-mono tabular-nums text-muted-foreground/60">
-              {option.count.toLocaleString(intl)}
-            </span>
-          </li>
-        ))}
+      <ul
+        className="mt-2.5 flex flex-wrap gap-1.5"
+        aria-label={groupLabel}
+        data-testid="dna-legend"
+      >
+        {ordered.map((option, index) => {
+          const label = valueLabel(traitKey, option.value);
+          const active = selected.includes(option.value);
+          return (
+            <li key={option.value} className="min-w-0">
+              <button
+                type="button"
+                onClick={() => onSelect(option.value)}
+                aria-pressed={active}
+                aria-label={t('dna.segmentAria', { value: label, count: option.count })}
+                className={cn(
+                  'inline-flex min-h-8 max-w-full items-center gap-1.5 rounded-control border px-2 type-caption',
+                  'pointer-coarse:min-h-11 pointer-coarse:px-3',
+                  'transition-colors duration-fast',
+                  active
+                    ? 'border-primary/60 bg-primary/12 text-foreground'
+                    : 'border-rule-faint text-muted-foreground hover:border-input hover:text-foreground',
+                )}
+              >
+                <span
+                  aria-hidden
+                  className="size-2 shrink-0 rounded-full"
+                  style={{ backgroundColor: segmentColor(traitKey, option.value, index) }}
+                />
+                <span className="min-w-0 truncate">{label}</span>
+                <span className="tabular-nums text-subtle">
+                  {formatCount(option.count, locale)}
+                </span>
+              </button>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
 }
 
 /**
- * GalleryCollectionDna — three proportional bars (fate, spectral class,
- * structure) showing how the archive splits; every segment filters the gallery.
+ * GalleryCollectionDna — how the archive splits across its three defining
+ * traits (fate, spectral class, structure): a proportional bar each, and a
+ * complete legend whose entries filter the gallery to that value. Stacked in
+ * a narrow column (the rail, the sheet), three across in a wide one.
  */
 export function GalleryCollectionDna({
   collectionTraits,
   selected,
   onSelect,
+  titleId,
+  hideHeading = false,
   className,
 }: GalleryCollectionDnaProps) {
   const t = useTranslations('traits');
@@ -158,39 +158,35 @@ export function GalleryCollectionDna({
   if (collectionTraits && collectionTraits.rarity.total === 0) return null;
 
   return (
-    <Surface
-      variant="glass-bordered"
-      radius="lg"
-      padding="md"
-      className={cn('space-y-4', className)}
-      data-testid="collection-dna"
-    >
-      <div className="flex items-start gap-3">
-        <span className="mt-0.5 rounded-lg border border-primary/15 bg-primary/[0.06] p-2 text-primary">
-          <Dna className="h-4 w-4 text-white" aria-hidden />
-        </span>
-        <div>
-          <h2 className="text-sm font-semibold">{t('dna.title')}</h2>
-          <p className="text-xs text-muted-foreground">{t('dna.subtitle')}</p>
+    <div className={cn('@container', className)} data-testid="collection-dna">
+      {hideHeading ? null : (
+        <div className="mb-4">
+          <h2 id={titleId} className="type-title text-foreground">
+            {t('dna.title')}
+          </h2>
+          <p className="mt-1 type-body-sm text-muted-foreground">{t('dna.subtitle')}</p>
         </div>
-      </div>
+      )}
       {collectionTraits === undefined ? (
         <div
           role="status"
-          className="grid gap-6 md:grid-cols-3"
           aria-busy="true"
           aria-label={t('dna.loading')}
+          className="grid gap-5 @2xl:grid-cols-3 @2xl:gap-8"
         >
           {DNA_KEYS.map((key) => (
-            <div key={key} className="space-y-2">
-              <Skeleton className="h-3 w-16" />
-              <Skeleton className="h-2.5 w-full rounded-full" />
-              <Skeleton className="h-3 w-3/4" />
+            <div key={key} className="space-y-2.5">
+              <Skeleton className="h-3.5 w-20" />
+              <Skeleton className="h-2 w-full rounded-pill" />
+              <div className="flex gap-1.5">
+                <Skeleton className="h-8 w-24" />
+                <Skeleton className="h-8 w-20" />
+              </div>
             </div>
           ))}
         </div>
       ) : (
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 @2xl:grid-cols-3 @2xl:gap-8">
           {DNA_KEYS.map((key) => (
             <DistributionBar
               key={key}
@@ -202,6 +198,6 @@ export function GalleryCollectionDna({
           ))}
         </div>
       )}
-    </Surface>
+    </div>
   );
 }

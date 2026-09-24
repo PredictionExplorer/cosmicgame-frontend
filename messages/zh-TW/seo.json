@@ -307,7 +307,8 @@
     "cards": {
       "imprinted": "已銘刻 NFT",
       "anchored": "已錨定 NFT",
-      "named": "已命名 NFT"
+      "named": "已命名 NFT",
+      "cycles": "已收官週期"
     },
     "relatedAria": "畫廊相關頁面",
     "links": {

@@ -307,7 +307,8 @@
     "cards": {
       "imprinted": "각인된 NFT",
       "anchored": "앵커링된 NFT",
-      "named": "이름 붙인 NFT"
+      "named": "이름 붙인 NFT",
+      "cycles": "마감된 사이클"
     },
     "relatedAria": "갤러리 관련 페이지",
     "links": {

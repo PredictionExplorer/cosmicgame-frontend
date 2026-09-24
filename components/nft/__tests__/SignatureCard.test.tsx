@@ -1,0 +1,125 @@
+import { TOKEN_1_METADATA_V2 } from '@/lib/nftMetadata/__fixtures__/metadata';
+import { normalizeTraitEntry, parseCosmicSignatureMetadata } from '@/lib/nftMetadata';
+
+import { checkA11y, fireEvent, render, screen, within } from '@/test-utils';
+
+import { SignatureCard, SignatureGridSkeleton, signatureCardSources } from '../SignatureCard';
+
+jest.mock('next/image', () => ({
+  __esModule: true,
+  default: (props: Record<string, unknown>) => {
+    const { fill: _f, priority: _p, unoptimized: _u, fetchPriority: _fp, ...rest } = props;
+    return <img {...rest} />;
+  },
+}));
+
+const entry = normalizeTraitEntry(parseCosmicSignatureMetadata(TOKEN_1_METADATA_V2)!)!;
+
+const link = () => screen.getByRole('link');
+
+describe('SignatureCard', () => {
+  it('titles an unnamed Signature by its number and captions its structure and palette', () => {
+    render(<SignatureCard tokenId={1} seed="a1" entry={entry} sizes="400px" />);
+    const card = screen.getByTestId('signature-card');
+    expect(within(card).getByText('#000001')).toBeInTheDocument();
+    // The space before the dot does not break: a wrapped caption ends a line with it.
+    expect(card.textContent).toMatch(/Orbit Ribbons\u00a0· \S/);
+  });
+
+  it('puts the number in the caption of a named Signature', () => {
+    render(
+      <SignatureCard tokenId={25} seed="a1" name="Twisted Mind" entry={entry} sizes="400px" />,
+    );
+    expect(screen.getByText('Twisted Mind')).toBeInTheDocument();
+    expect(screen.getByText('#000025')).toHaveClass('type-mono');
+  });
+
+  it('is one link to the detail page, named by the alt text composed from the traits', () => {
+    render(
+      <SignatureCard tokenId={25} seed="a1" name="Twisted Mind" entry={entry} sizes="400px" />,
+    );
+    expect(link()).toHaveAttribute('href', '/detail/25');
+    expect(link()).toHaveAccessibleName(
+      /^“Twisted Mind”, Cosmic Signature #000025: Orbit Ribbons structure/,
+    );
+  });
+
+  it('says it is anchored to assistive technology and shows a quiet anchor', () => {
+    render(<SignatureCard tokenId={3} seed="a3" entry={entry} anchored sizes="400px" />);
+    expect(screen.getByTestId('anchored-mark')).toBeInTheDocument();
+    expect(link()).toHaveAccessibleName(/Anchored$/);
+  });
+
+  it('shows a skeleton caption while the traits load, and says when they are not published', () => {
+    const { rerender } = render(<SignatureCard tokenId={3} seed="a3" sizes="400px" />);
+    expect(screen.getByTestId('trait-skeleton')).toBeInTheDocument();
+    rerender(<SignatureCard tokenId={3} seed="a3" entry={null} sizes="400px" />);
+    expect(screen.getByText('Traits pending')).toBeInTheDocument();
+  });
+
+  it('draws the designed unavailable plate without a seed', () => {
+    render(<SignatureCard tokenId={9} seed={null} entry={null} sizes="400px" />);
+    expect(screen.getByTestId('pending-plate')).toBeInTheDocument();
+  });
+
+  it('keeps the quick view off the art, in the label row, for a mouse', () => {
+    const onQuickView = jest.fn();
+    render(
+      <SignatureCard tokenId={7} seed="a7" entry={entry} sizes="400px" onQuickView={onQuickView} />,
+    );
+    const button = screen.getByTestId('quick-view-button');
+    // A touch has no hover; tapping the card opens the page instead.
+    expect(button).toHaveClass('pointer-coarse:hidden');
+    // Outside the link, so it is never a control inside a control.
+    expect(link()).not.toContainElement(button);
+    fireEvent.click(button);
+    expect(onQuickView).toHaveBeenCalledWith(7);
+  });
+
+  it('adds extra caption facts where the page has them', () => {
+    render(
+      <SignatureCard
+        tokenId={7}
+        seed="a7"
+        entry={entry}
+        sizes="400px"
+        extraMeta={['Stellar Selection']}
+      />,
+    );
+    expect(link()).toHaveAccessibleName(/Stellar Selection/);
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(
+      <SignatureCard
+        tokenId={7}
+        seed="a7"
+        entry={entry}
+        anchored
+        sizes="400px"
+        onQuickView={jest.fn()}
+      />,
+    );
+    await checkA11y(container);
+  });
+});
+
+describe('signatureCardSources', () => {
+  it('starts with the thumbnail and falls back to the full-size files', () => {
+    const sources = signatureCardSources('0xAB');
+    expect(sources).toHaveLength(3);
+    expect(sources[0]).toMatch(/0xab\/thumb_card\.webp$/i);
+    expect(sources[1]).toMatch(/full\.webp$/);
+    expect(sources[2]).toMatch(/\.png$/);
+    expect(signatureCardSources(null)).toEqual([]);
+  });
+});
+
+describe('SignatureGridSkeleton', () => {
+  it('announces once and draws a plate per card', () => {
+    render(<SignatureGridSkeleton count={4} />);
+    const skeleton = screen.getByRole('status');
+    expect(skeleton.children).toHaveLength(4);
+    expect(screen.getAllByRole('status')).toHaveLength(1);
+  });
+});

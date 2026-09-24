@@ -87,7 +87,7 @@ test.describe('zh Sprint 3 — core dApp routes', () => {
       page.getByRole('heading', { level: 1, name: 'Cosmic Signature 画廊' }),
     ).toBeVisible();
     await expect(page.getByText('已铭刻 NFT', { exact: true })).toBeVisible();
-    await expect(page.getByRole('textbox', { name: '搜索 NFT' })).toBeVisible();
+    await expect(page.getByRole('searchbox', { name: '搜索 NFT' })).toBeVisible();
     await expect(page.getByText('全部', { exact: true }).first()).toBeVisible();
   });
 

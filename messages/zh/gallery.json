@@ -6,37 +6,6 @@
   "jsonLd": {
     "name": "Cosmic Signature 画廊"
   },
-  "intro": {
-    "badge": "生成艺术档案",
-    "description": "每枚 Cosmic Signature NFT 都是独一无二的生成艺术，由链上种子经三体问题物理模拟推演而成。通常每个周期会铭刻 24 枚新 NFT：4 枚角色 NFT，10 枚经参与者 NFT 星选发放，另有 10 枚经锚定 NFT 星选发放给 Random Walk NFT 锚定者。"
-  },
-  "featured": {
-    "viewAria": "查看 Cosmic Signature {id}",
-    "alt": "Cosmic Signature 作品 {id}",
-    "emptyHint": "索引到 NFT 后，真实作品会随即在此呈现。",
-    "badgeImprint": "精选铭刻",
-    "badgeArchive": "档案",
-    "awaitingMetadata": "等待元数据"
-  },
-  "card": {
-    "alt": "Cosmic Signature {id}",
-    "unnamed": "未命名",
-    "age": {
-      "justNow": "刚刚",
-      "minutes": "{count} 分钟前",
-      "hours": "{count} 小时前",
-      "days": "{count} 天前",
-      "months": "{count} 个月前",
-      "years": "{count} 年前"
-    },
-    "tooltips": {
-      "round": "铭刻于第 {round} 个周期。",
-      "anchored": "当前已锚定，正在累积锚定派发。",
-      "customName": "这枚 NFT 已设置专属名称。",
-      "identifier": "这枚 COSMIC NFT 的唯一顺序编号。",
-      "mintedOn": "铭刻于 {date}。"
-    }
-  },
   "filters": {
     "ariaLabel": "筛选 NFT",
     "all": {
@@ -54,7 +23,6 @@
   },
   "sort": {
     "ariaLabel": "排序方式",
-    "tooltip": "调整 NFT 的显示顺序。",
     "newest": "最新在前",
     "oldest": "最早在前",
     "cycleDesc": "周期（从高到低）",
@@ -84,13 +52,27 @@
     "list": "列表视图"
   },
   "pagination": {
-    "showing": "共 <value>{total}</value> 枚 NFT，当前显示第 <value>{start}</value> 至 <value>{end}</value> 枚",
-    "perPage": "每页",
-    "perPageAria": "每页显示数量",
-    "perPageTooltip": "每页显示的 NFT 数量。"
+    "perPage": "每页"
   },
   "empty": {
     "title": "未找到 NFT",
-    "description": "试试调整搜索或筛选条件。"
+    "description": "没有签名符合这些筛选条件。清除筛选即可查看完整作品集。",
+    "collectionTitle": "暂无签名",
+    "collectionDescription": "每件签名会在其周期收官、完成铭刻后出现在这里。"
+  },
+  "about": {
+    "title": "关于作品集",
+    "description": "每枚 Cosmic Signature NFT 都是独一无二的生成艺术，由链上种子经三体问题物理模拟推演而成。通常每个周期会铭刻 24 枚新 NFT：4 枚角色 NFT，10 枚经参与者 NFT 星选发放，另有 10 枚经锚定 NFT 星选发放给 Random Walk NFT 锚定者。"
+  },
+  "toolbar": {
+    "filters": "筛选",
+    "filtersWithCount": "筛选 · {count}",
+    "show": "显示",
+    "showResults": "显示 {count, number} 枚 NFT"
+  },
+  "results": {
+    "total": "{count, number} 枚 NFT",
+    "filtered": "{total, number} 枚 NFT 中的 {count, number} 枚",
+    "regionLabel": "签名"
   }
 }

@@ -307,7 +307,8 @@
     "cards": {
       "imprinted": "Imprinted NFTs",
       "anchored": "Anchored NFTs",
-      "named": "Named NFTs"
+      "named": "Named NFTs",
+      "cycles": "Finalized cycles"
     },
     "relatedAria": "Gallery related pages",
     "links": {

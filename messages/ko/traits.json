@@ -142,20 +142,16 @@
   },
   "card": {
     "chaosAria": "카오스 {max}점 만점에 {value}점",
-    "chaosShort": "카오스 {value}",
-    "syzygiesAria": "삭망 {count}회",
-    "syzygiesShort": "삭망 {count}회",
     "hueStripAria": "세 천체의 팔레트 색상",
     "spectralAria": "분광형 {value}",
     "fateAria": "운명: {value}",
     "quickView": "빠른 보기",
     "quickViewAria": "Cosmic Signature {id} 빠른 보기",
     "traitsPending": "특성 대기 중",
-    "traitsPendingTooltip": "이 시그니처의 특성 메타데이터가 아직 게시되지 않았습니다.",
-    "cycleShort": "C{n}",
+    "traitSummary": "{structure} · {palette}",
     "cycleLong": "사이클 {n}",
-    "cycleTooltip": "사이클 {n}에서 각인됨",
-    "viewCycle": "사이클 {n} 보기"
+    "viewCycle": "사이클 {n} 보기",
+    "anchoredState": "앵커링됨"
   },
   "rarity": {
     "rank": "#{rank}",
@@ -171,9 +167,6 @@
   },
   "facets": {
     "title": "특성",
-    "toggle": "특성",
-    "toggleWithCount": "특성 · {count}",
-    "toggleAria": "특성별 필터",
     "clearAll": "모두 지우기",
     "clearFacet": "{trait} 지우기",
     "activeAria": "적용된 특성 필터",
@@ -185,13 +178,11 @@
     "chaosValue": "{min}~{max}",
     "showMore": "{count}개 더 보기",
     "showLess": "접기",
-    "sheetTitle": "특성별 필터",
     "sheetDescription": "각 시그니처의 구도, 물리, 출처로 아카이브 범위를 좁힙니다.",
     "loading": "특성을 인덱싱하는 중…",
     "partial": "특성 인덱스를 아직 채우는 중 ({total}개 중 {indexed}개)",
     "unavailable": "지금은 특성 필터를 사용할 수 없습니다.",
-    "retry": "다시 시도",
-    "matches": "일치하는 NFT {count}개"
+    "retry": "다시 시도"
   },
   "quickView": {
     "title": "Cosmic Signature {id}",
@@ -249,9 +240,8 @@
   },
   "dna": {
     "title": "컬렉션 DNA",
-    "subtitle": "아카이브가 주요 특성별로 어떻게 나뉘는지 보여 줍니다. 구간을 선택하면 갤러리가 필터링됩니다.",
+    "subtitle": "컬렉션이 주요 특성별로 어떻게 나뉘는지 보여 줍니다. 특성을 선택하면 갤러리를 좁힐 수 있습니다.",
     "segmentAria": "{value}: NFT {count}개. 이 특성으로 필터링합니다.",
-    "legendCount": "{count}",
     "loading": "컬렉션 특성을 읽는 중…"
   },
   "alt": {

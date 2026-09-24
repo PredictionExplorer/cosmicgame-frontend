@@ -10,8 +10,8 @@ import { readDashboard } from '../publicDataReads';
 
 /**
  * The gallery header, rendered on the server: the collection hub's H1, lede,
- * one figure row (imprinted, anchored, named) and related pages. It is the
- * page's only header; the gallery renders it first.
+ * one figure row (imprinted, anchored, named, finalized cycles: a 2 × 2 grid
+ * on phones) and related pages. It is the page's only header.
  */
 export async function GallerySeoSummary({ actions }: { actions?: ReactNode } = {}) {
   const locale = await getLocale();
@@ -46,6 +46,12 @@ export async function GallerySeoSummary({ actions }: { actions?: ReactNode } = {
           id: 'named',
           label: t('gallerySummary.cards.named'),
           value: count(stats?.TotalNamedTokens),
+        },
+        {
+          // Cycles are numbered from 0, so the current one's number is how many have finalized.
+          id: 'cycles',
+          label: t('gallerySummary.cards.cycles'),
+          value: count(dashboard.data?.CurRoundNum),
         },
       ]}
       meta={dashboard.data ? <SnapshotStamp at={dashboard.at} /> : undefined}
