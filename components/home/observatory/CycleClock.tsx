@@ -363,8 +363,10 @@ export function CycleClock({
         </p>
         {/* The fixed extras, then the attached assets when there are any. The
             dots hang in clipped gutters, so a wrapped line never starts or
-            ends on one. Every line is a 24px box, the attached-assets link's
-            target size, so the line keeps its height when that link arrives. */}
+            ends on one; each item's words sit in their own box inside its
+            gutter, so only the padding, never text, meets the clip. Every line
+            is a 24px box, the attached-assets link's target size, so the line
+            keeps its height when that link arrives. */}
         <div className="mt-0.5 overflow-hidden">
           <ul
             role="list"
@@ -374,8 +376,12 @@ export function CycleClock({
               TOUCH_TARGET_TEXT_LINK_CLASS,
             )}
           >
-            <li className="ps-4">{t('observatory.clock.reserveExtraCst')}</li>
-            <li className={ITEM_SEPARATOR}>{t('observatory.clock.reserveExtraNft')}</li>
+            <li className="ps-4">
+              <span>{t('observatory.clock.reserveExtraCst')}</span>
+            </li>
+            <li className={ITEM_SEPARATOR}>
+              <span>{t('observatory.clock.reserveExtraNft')}</span>
+            </li>
             {attachedAssetCount > 0 && (
               <li className={ITEM_SEPARATOR} data-testid="clock-reserve-attached">
                 {attachedAssetsHref ? (
@@ -389,7 +395,9 @@ export function CycleClock({
                     {t('observatory.clock.reserveAttached', { count: attachedAssetCount })}
                   </a>
                 ) : (
-                  t('observatory.clock.reserveAttached', { count: attachedAssetCount })
+                  <span>
+                    {t('observatory.clock.reserveAttached', { count: attachedAssetCount })}
+                  </span>
                 )}
               </li>
             )}

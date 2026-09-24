@@ -217,7 +217,10 @@ export function AllocationLedger({ data, className }: AllocationLedgerProps) {
                   {track.href ? (
                     <Link
                       href={track.href}
-                      className="link-quiet type-label min-w-0 break-words text-foreground"
+                      className={cn(
+                        'link-quiet type-label min-w-0 break-words text-foreground',
+                        TOUCH_TARGET_TEXT_LINK_CLASS,
+                      )}
                     >
                       {track.name}
                     </Link>
