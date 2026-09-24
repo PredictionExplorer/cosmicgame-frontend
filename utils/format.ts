@@ -65,6 +65,7 @@ export {
   toIsoDuration,
   type DurationOptions,
 } from './format/durations';
+export { formatId } from './format/ids';
 export {
   checksumAddress,
   findKnownAddress,
@@ -170,11 +171,6 @@ export const weiToEthNumber = (value: BigNumberish, fallback = 0): number => {
   } catch {
     return fallback;
   }
-};
-
-/** Pads numeric ID with leading zeros for display (e.g., #000123). */
-export const formatId = (id: number | string): string => {
-  return `#${id.toString().padStart(6, '0')}`;
 };
 
 /** Converts HTML date input value (YYYY-MM-DD) to API date param (YYYYMMDD). */

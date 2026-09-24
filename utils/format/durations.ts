@@ -1,12 +1,3 @@
-import enFormats from '@/messages/en/formats.json';
-import jaFormats from '@/messages/ja/formats.json';
-import koFormats from '@/messages/ko/formats.json';
-import ukFormats from '@/messages/uk/formats.json';
-import viFormats from '@/messages/vi/formats.json';
-import zhFormats from '@/messages/zh/formats.json';
-import zhHkFormats from '@/messages/zh-HK/formats.json';
-import zhTwFormats from '@/messages/zh-TW/formats.json';
-
 import { pickByLocale, type LocaleRecord } from '@/i18n/locale';
 import { getLocaleConfig } from '@/i18n/localeConfig';
 
@@ -29,19 +20,22 @@ interface DurationUnitLabels {
 }
 
 /**
- * Compact duration units, from the `formats.durationCompact` catalog so plain
- * formatting utils (chart ticks, `formatDuration`) print exactly the units
- * that components using `useTranslations('formats')` do.
+ * Compact duration units (style-guide-*.md §5), kept here rather than read
+ * from the eight `formats.json` catalogs so every bundle that formats a
+ * number does not ship every locale's catalog. The catalogs keep the same
+ * units under `formats.durationCompact` for `useTranslations('formats')`
+ * consumers; `utils/__tests__/format-duration-units.test.ts` fails when the
+ * two drift, so change both together.
  */
 const DURATION_UNITS: LocaleRecord<DurationUnitLabels> = {
-  en: enFormats.durationCompact,
-  zh: zhFormats.durationCompact,
-  'zh-TW': zhTwFormats.durationCompact,
-  'zh-HK': zhHkFormats.durationCompact,
-  uk: ukFormats.durationCompact,
-  ko: koFormats.durationCompact,
-  ja: jaFormats.durationCompact,
-  vi: viFormats.durationCompact,
+  en: { days: 'd', hours: 'h', minutes: 'm', seconds: 's' },
+  zh: { days: '天', hours: '小时', minutes: '分', seconds: '秒' },
+  'zh-TW': { days: '天', hours: '小時', minutes: '分', seconds: '秒' },
+  'zh-HK': { days: '天', hours: '小時', minutes: '分', seconds: '秒' },
+  uk: { days: 'д', hours: 'год', minutes: 'хв', seconds: 'с' },
+  ko: { days: '일', hours: '시간', minutes: '분', seconds: '초' },
+  ja: { days: '日', hours: '時間', minutes: '分', seconds: '秒' },
+  vi: { days: 'ng', hours: 'g', minutes: 'ph', seconds: 's' },
 };
 
 /** Joins the tokens of one duration: a no-break space, or nothing without word spaces. */

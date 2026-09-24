@@ -325,10 +325,13 @@ locale ships complete or not at all.
 
 Formatting conventions live in two places: `i18n/localeConfig.ts` for non-text conventions
 (Intl tag, week start, word spacing, ellipsis, provider-error policy) and
-`LocaleRecord`-typed format registries in `utils/format.ts` / `utils/time.ts` for
-per-locale date/duration templates (compact duration units come from the
-`formats.durationCompact` message catalog, the single source shared with
-`useTranslations('formats')` consumers). The table below records the original migration:
+`LocaleRecord`-typed format registries in `utils/format/` / `utils/time.ts` for
+per-locale date/duration templates. Compact duration units live in
+`utils/format/durations.ts` (`DURATION_UNITS`), so formatting a number never ships all
+eight catalogs; `formats.durationCompact` keeps the same units for
+`useTranslations('formats')` consumers, and `utils/__tests__/format-duration-units.test.ts`
+fails when the two drift — change both together. The table below records the original
+migration:
 
 | Today                                                            | Change                                                                                 |
 | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
