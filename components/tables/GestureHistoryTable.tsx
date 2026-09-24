@@ -51,6 +51,12 @@ interface GestureHistoryTableProps extends LedgerStateProps {
    * gestures. Default `true`.
    */
   showHold?: boolean;
+  /**
+   * When the cycle ended (Unix seconds). The newest gesture held the lead
+   * until then, so a finished cycle's last hold is a fixed figure instead of
+   * a clock that keeps running. Omit it for the cycle in progress.
+   */
+  heldUntil?: number | null;
 }
 
 const CST_GESTURE = 2;
@@ -169,6 +175,7 @@ const GestureHistoryTable = ({
   showRound = true,
   showParticipant = true,
   showHold = true,
+  heldUntil = null,
   ...state
 }: GestureHistoryTableProps) => {
   const t = useTranslations('tables');
@@ -180,15 +187,17 @@ const GestureHistoryTable = ({
   );
 
   // How long each gesture stayed the latest one: until the next gesture in
-  // the list (which is newest first). The newest is still holding.
+  // the list (which is newest first). The newest holds until the cycle ends,
+  // or is still holding while it runs.
   const holds = useMemo(() => {
     const byId = new Map<number, number | null>();
     gestureHistory.forEach((gesture, index) => {
       const next = gestureHistory[index - 1];
-      byId.set(gesture.EvtLogId, next ? next.TimeStamp - gesture.TimeStamp : null);
+      const until = next ? next.TimeStamp : heldUntil;
+      byId.set(gesture.EvtLogId, until == null ? null : Math.max(0, until - gesture.TimeStamp));
     });
     return byId;
-  }, [gestureHistory]);
+  }, [gestureHistory, heldUntil]);
 
   const columns = useMemo<DataTableColumn<GestureHistory>[]>(() => {
     const cost = (gesture: GestureHistory) =>

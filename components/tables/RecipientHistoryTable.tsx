@@ -8,6 +8,7 @@ import { formatAddress, formatCount, formatNumber } from '@/utils/format';
 import { getExplorerUrl } from '@/utils/urls';
 import {
   allocationAmountUnit,
+  recipientKey,
   sumAllocatedEth,
   CST_RECORD_TYPES,
   NFT_RECORD_TYPES,
@@ -160,7 +161,7 @@ function groupByRecipient(records: readonly WinningHistoryEntry[]): RecipientGro
   const groups = new Map<string, RecipientGroup>();
   for (const record of records) {
     const address = record.WinnerAddr ?? '';
-    const key = address.toLowerCase();
+    const key = recipientKey(record);
     let group = groups.get(key);
     if (!group) {
       group = { address, records: [], sources: [], eth: 0, cst: 0, nfts: [] };

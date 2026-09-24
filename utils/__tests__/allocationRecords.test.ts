@@ -7,6 +7,7 @@ import {
   NFT_RECORD_TYPES,
   STELLAR_SELECTION_RECORD_TYPES,
   allocationAmountUnit,
+  countRecipients,
   sumAllocatedEth,
 } from '../allocationRecords';
 
@@ -67,5 +68,21 @@ describe('allocation totals', () => {
         { RecordType: 0 },
       ]),
     ).toBe(0);
+  });
+});
+
+describe('countRecipients', () => {
+  it('counts each recipient once, whatever the address case', () => {
+    // The allocation page's badge counted records (54) beside a table that
+    // lists one row per recipient (12).
+    expect(
+      countRecipients([
+        { WinnerAddr: '0xAbC' },
+        { WinnerAddr: '0xabc' },
+        { WinnerAddr: '0xdef' },
+        { WinnerAddr: null },
+        {},
+      ]),
+    ).toBe(3);
   });
 });
