@@ -76,7 +76,9 @@ interface NFTTraitProps {
   initialMetadata?: CosmicSignatureMetadata | null;
   /**
    * The token record the server already read, so the art and its wall label
-   * are in the first HTML paint. Omit to load it on the client.
+   * are in the first HTML paint. It is as old as the page's last ISR
+   * regeneration, so it is refreshed right after hydration. Omit to load it
+   * on the client.
    */
   initialToken?: CSTTokenInfo | null;
 }
@@ -160,7 +162,7 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
     data: nftRaw,
     isLoading: loadingNFT,
     refetch: refetchCSTInfo,
-  } = useCSTInfo(tokenId, initialToken);
+  } = useCSTInfo(tokenId, initialToken, { seedIsStale: true });
   const { data: nameHistory = [], refetch: refetchNameHistory } = useNameHistory(tokenId);
   const { data: transferHistoryRaw = [], refetch: refetchTransferHistory } =
     useCTOwnershipTransfers(tokenId);

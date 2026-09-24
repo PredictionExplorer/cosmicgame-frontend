@@ -238,7 +238,10 @@ describe('NFTTrait', () => {
     expect(screen.queryByTestId('nft-detail-skeleton')).not.toBeInTheDocument();
     expect(screen.getByTestId('hero-section')).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 1, name: 'MyToken' })).toBeInTheDocument();
-    expect(mockUseCSTInfo).toHaveBeenCalledWith(5, expect.objectContaining({ TokenId: 5 }));
+    // The ISR record can be days old: it paints first and is refreshed on mount.
+    expect(mockUseCSTInfo).toHaveBeenCalledWith(5, expect.objectContaining({ TokenId: 5 }), {
+      seedIsStale: true,
+    });
   });
 
   it('does not poll the dashboard on an art page', () => {
