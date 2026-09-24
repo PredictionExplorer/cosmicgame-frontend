@@ -25,31 +25,30 @@ export interface CalibrationStatusProps {
   className?: string;
 }
 
-/** Track colours by method: the same series as the method's segment and charts. */
-const TRACK_TONE = {
-  cst: 'text-method-cst',
-  eth: 'text-method-eth',
-} as const;
-
 interface PriceTrackProps {
   /** Share of the window elapsed, 0–100. */
   percent: number;
-  tone: keyof typeof TRACK_TONE;
   /** Accessible reading: the cost now and when it reaches its floor. */
   valueText: string;
   label: string;
 }
 
+/** The track's height in viewBox units (it is drawn 24px tall) and its inset. */
+const TRACK_HEIGHT = 24;
+const TRACK_INSET = 2;
+
 /**
- * The price the participant decides on, as a line: the Gesture Cost descends
- * linearly across the window, solid for the part already behind and dashed
+ * The price the participant decides on, as a 24px sparkline: the Gesture
+ * Cost descends linearly across the window from its opening price (top left)
+ * to its floor (bottom right), solid for the part already behind and dashed
  * for the part to come, with a dot at now. It is the window's progress bar,
- * drawn as the trend it represents.
+ * drawn as the trend it represents, in the foreground ink: amber beside the
+ * live dot would read as a warning.
  */
-function PriceTrack({ percent, tone, valueText, label }: PriceTrackProps) {
+function PriceTrack({ percent, valueText, label }: PriceTrackProps) {
   const now = Math.min(100, Math.max(0, percent));
-  // The line falls 14 of the 16 units from the start to the floor.
-  const nowY = 1 + (14 * now) / 100;
+  const fall = TRACK_HEIGHT - 2 * TRACK_INSET;
+  const nowY = TRACK_INSET + (fall * now) / 100;
   return (
     <div
       role="progressbar"
@@ -59,11 +58,11 @@ function PriceTrack({ percent, tone, valueText, label }: PriceTrackProps) {
       aria-valuenow={Math.round(now * 10) / 10}
       aria-valuetext={valueText}
       data-testid="calibration-track"
-      className={cn('relative h-4 min-w-0 flex-1', TRACK_TONE[tone])}
+      className="relative h-6 min-w-0 flex-1 text-foreground"
     >
       <svg
         aria-hidden
-        viewBox="0 0 100 16"
+        viewBox={`0 0 100 ${TRACK_HEIGHT}`}
         preserveAspectRatio="none"
         className="absolute inset-0 size-full overflow-visible"
       >
@@ -71,7 +70,7 @@ function PriceTrack({ percent, tone, valueText, label }: PriceTrackProps) {
           x1={now}
           y1={nowY}
           x2={100}
-          y2={15}
+          y2={TRACK_HEIGHT - TRACK_INSET}
           className="stroke-subtle"
           strokeWidth={1}
           strokeDasharray="2 3"
@@ -79,7 +78,7 @@ function PriceTrack({ percent, tone, valueText, label }: PriceTrackProps) {
         />
         <line
           x1={0}
-          y1={1}
+          y1={TRACK_INSET}
           x2={now}
           y2={nowY}
           stroke="currentColor"
@@ -91,7 +90,7 @@ function PriceTrack({ percent, tone, valueText, label }: PriceTrackProps) {
       <span
         aria-hidden
         className="absolute size-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-current ring-2 ring-background"
-        style={{ left: `${now}%`, top: `${(nowY / 16) * 100}%` }}
+        style={{ left: `${now}%`, top: `${(nowY / TRACK_HEIGHT) * 100}%` }}
       />
     </div>
   );
@@ -196,27 +195,33 @@ export function CalibrationStatus({
         />
       </div>
 
-      <div className="mt-2 flex min-w-0 items-center gap-3">
+      {/* The cost now stands where the line starts (top left) and the floor
+          where it ends (bottom right), so the row reads as the fall itself. */}
+      <div className="mt-2 flex min-w-0 items-stretch gap-3">
         <span
           data-testid="calibration-cost-now"
-          className="type-figure-sm shrink-0 text-foreground"
+          className="type-figure-sm shrink-0 self-start text-foreground"
         >
           {costNow ?? <ValuePending ch={9} />}
         </span>
         {progress ? (
           <PriceTrack
             percent={progress.percentComplete}
-            tone={firstGesture ? 'eth' : 'cst'}
             label={t('calibration.progressAria', { title })}
             valueText={[costNow, progress.isEnded ? endedMessage : floorReading]
               .filter(Boolean)
               .join(' · ')}
           />
         ) : (
-          <span className="h-px min-w-0 flex-1 bg-rule" aria-hidden />
+          <span className="h-px min-w-0 flex-1 self-center bg-rule" aria-hidden />
         )}
         {!firstGesture && (
-          <span className="type-caption shrink-0 text-subtle">{t('calibration.floor')}</span>
+          <span
+            data-testid="calibration-floor"
+            className="type-caption shrink-0 self-end leading-none text-subtle"
+          >
+            {t('calibration.floor')}
+          </span>
         )}
       </div>
 

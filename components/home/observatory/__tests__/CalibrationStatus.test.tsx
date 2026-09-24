@@ -43,7 +43,10 @@ describe('CalibrationStatus', () => {
       'aria-valuetext',
       '20\u00a0CST · home.calibration.reachesFloorIn(duration=45m)',
     );
-    expect(track).toHaveClass('text-method-cst');
+    // A 24px sparkline in the foreground ink, not a warning-coloured bar.
+    expect(track).toHaveClass('h-6', 'text-foreground');
+    // The floor is named where the line ends: bottom right.
+    expect(screen.getByTestId('calibration-floor')).toHaveClass('self-end');
   });
 
   it('keeps the window length and elapsed time in the explanation', () => {
@@ -60,7 +63,6 @@ describe('CalibrationStatus', () => {
     const window = screen.getByRole('region', { name: 'home.calibration.firstGestureTitle' });
     expect(within(window).getByTestId('calibration-cost-now')).toHaveTextContent('0.1 ETH');
     expect(within(window).getByRole('progressbar')).toHaveAttribute('aria-valuenow', '50');
-    expect(within(window).getByRole('progressbar')).toHaveClass('text-method-eth');
     expect(within(window).getByTestId('calibration-floor-in')).toHaveTextContent(
       'home.calibration.windowEndsIn(duration=15m)',
     );
