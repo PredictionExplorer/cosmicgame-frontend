@@ -12,6 +12,11 @@ export const privacyCopyVi = {
       'Trang web đo lượt truy cập và báo lỗi qua các dịch vụ được nêu tên bên dưới, và chỉ đặt các cookie được liệt kê bên dưới.',
     ],
   },
+  withoutErrorReports: {
+    inShortMeasure:
+      'Trang web đo lượt truy cập qua các dịch vụ được nêu tên bên dưới, và chỉ đặt các cookie được liệt kê bên dưới.',
+    improvement: 'Chúng tôi dùng dữ liệu sử dụng đã tổng hợp để sửa lỗi và cải thiện trang web.',
+  },
   introductionTitle: 'Giới thiệu',
   introduction: [
     'Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum, một mạng Layer 2 của Ethereum. Ứng dụng phi tập trung (dApp) này xử lý dữ liệu và quyền riêng tư theo cách khác với ứng dụng web truyền thống.',

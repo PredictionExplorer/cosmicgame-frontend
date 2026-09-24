@@ -28,7 +28,7 @@
       "description": "サイクルの受領者への配分として刻印されるERC-721 NFTコレクション"
     },
     "randomWalk": {
-      "name": "RandomWalk",
+      "name": "Random Walk NFT",
       "description": "一度だけの割引のためにETH一筆に添付するか、係留NFT星選の対象となるために係留できるRandomWalk NFTコレクション"
     },
     "council": {

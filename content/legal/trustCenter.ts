@@ -29,20 +29,26 @@ export interface TrustDocumentDate {
  */
 export const TRUST_DOCUMENT_DATES: Record<TrustCenterPage, TrustDocumentDate> = {
   security: { date: '2026-09-24', kind: 'updated' },
-  audits: { date: '2026-08-24', kind: 'reviewed' },
+  audits: { date: '2026-09-24', kind: 'updated' },
   risk: { date: '2026-09-24', kind: 'updated' },
-  terms: { date: '2026-07-20', kind: 'updated' },
+  terms: { date: '2026-09-24', kind: 'updated' },
   privacy: { date: '2026-09-24', kind: 'updated' },
 };
 
-/**
- * Each document's English source in the public frontend repository; its
- * commit history is the document's revision history ("Revision history ↗").
- */
-export const TRUST_DOCUMENT_SOURCES: Record<TrustCenterPage, string> = {
-  security: 'content/legal/SecurityContent.en.ts',
-  audits: 'content/legal/AuditsContent.en.ts',
-  risk: 'content/legal/RiskContent.en.ts',
-  terms: 'content/legal/TermsContent.en.ts',
-  privacy: 'content/legal/PrivacyContent.en.ts',
+/** The copy module each document is written in, one file per locale. */
+const TRUST_DOCUMENT_MODULES: Record<TrustCenterPage, string> = {
+  security: 'SecurityContent',
+  audits: 'AuditsContent',
+  risk: 'RiskContent',
+  terms: 'TermsContent',
+  privacy: 'PrivacyContent',
 };
+
+/**
+ * A document's source in the public frontend repository, in the reader's
+ * language (`content/legal/TermsContent.ko.ts`); its commit history is the
+ * document's revision history ("Revision history on GitHub ↗").
+ */
+export function trustDocumentSource(page: TrustCenterPage, locale: string): string {
+  return `content/legal/${TRUST_DOCUMENT_MODULES[page]}.${locale}.ts`;
+}

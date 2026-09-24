@@ -244,7 +244,7 @@ export const termsCopyJa = {
     {
       id: 'contact',
       subtitle: '連絡先',
-      text: '本利用規約についてご質問がある場合は、<discord>Discord</discord>、<x>X</x>、<frontendRepository>GitHubリポジトリ</frontendRepository>のいずれかでお問い合わせください。',
+      text: '本利用規約についてご質問がある場合は、<support>support@cosmicsignature.com</support>、<discord>Discord</discord>、<x>X</x>、<frontendRepository>GitHubリポジトリ</frontendRepository>のいずれかでお問い合わせください。',
     },
   ],
   // lexicon-allow-start: Howey-test denial copy must explicitly negate an investment framing.
@@ -255,8 +255,6 @@ export const termsCopyJa = {
   // lexicon-allow-end
   allocationsTable: {
     title: '配分トラックの一覧',
-    track: 'トラック',
-    none: 'なし',
     sharedBy: '{percent}（{count}人で分配）',
     each: '{count} × {amount}',
   },

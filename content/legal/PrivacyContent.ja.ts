@@ -12,6 +12,11 @@ export const privacyCopyJa = {
       'サイトは、下に記載したサービスを通じて訪問を計測し、エラーを報告します。設定するCookieは下に記載したものだけです。',
     ],
   },
+  withoutErrorReports: {
+    inShortMeasure:
+      'サイトは、下に記載したサービスを通じて訪問を計測します。設定するCookieは下に記載したものだけです。',
+    improvement: '集計した利用データを使って、不具合を修正し、サイトを改善します。',
+  },
   introductionTitle: 'はじめに',
   introduction: [
     'Cosmic Signatureは、Ethereumのレイヤー2ネットワークであるArbitrum上に築かれた分散型のブロックチェーンプロトコルです。分散型アプリケーション（dApp）として、データとプライバシーに関しては従来のウェブアプリケーションとは異なる方法で扱います。',

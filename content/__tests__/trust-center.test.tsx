@@ -16,7 +16,7 @@ import {
   sourcifyContractUrl,
   type OfficialContractId,
 } from '@/content/legal/officialAddresses';
-import { PrivacyContent } from '@/content/legal/PrivacyContent';
+import { PrivacyContent, privacyCopyForDeployment } from '@/content/legal/PrivacyContent';
 import { activePrivacyServices, activePrivacyStorage } from '@/content/legal/privacyInventory';
 import { RiskContent } from '@/content/legal/RiskContent';
 import { SecurityContent } from '@/content/legal/SecurityContent';
@@ -189,6 +189,22 @@ describe('Security', () => {
     }
   });
 
+  it('states the Sourcify match under the contracts heading, before the rows it covers', () => {
+    render(PAGES.security('en'));
+    const note = document.querySelector('[data-sourcify-note]');
+    const heading = screen.getByRole('heading', { name: 'Core contracts on Arbitrum One' });
+    const firstRow = heading.parentElement?.querySelector('dl > div');
+    expect(heading.compareDocumentPosition(note!)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(note!.compareDocumentPosition(firstRow!)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+
+  it('gives the community handles a touch pad', () => {
+    render(PAGES.security('en'));
+    const handle = screen.getByRole('link', { name: /@CosmicSignature/ });
+    expect(handle).toHaveAttribute('data-touch-target', 'extended');
+    expect(handle.className).toMatch(/min-h-6/);
+  });
+
   it('says where to report a vulnerability', () => {
     render(PAGES.security('en'));
     expect(screen.getByRole('link', { name: 'support@cosmicsignature.com' })).toHaveAttribute(
@@ -250,6 +266,16 @@ describe('Risk disclosures', () => {
     expect(text).toContain('afford to forgo');
   });
 
+  it('sets the short groups compactly, two to a row, and closes on what participants do', () => {
+    render(PAGES.risk('en'));
+    const groups = Array.from(document.querySelectorAll('main section[id]'));
+    expect(groups.map((group) => group.id)).not.toContain('participation');
+    expect(groups[0]?.parentElement?.className).toMatch(/xl:grid-cols-2/);
+    // No per-section way back to the contents on a page of short sections.
+    expect(screen.queryByRole('link', { name: 'Back to contents' })).toBeNull();
+    expect(screen.getByText('What participants do')).toBeInTheDocument();
+  });
+
   it('points each group at the Terms clause that states the rule', () => {
     render(PAGES.risk('en'));
     const hrefs = screen
@@ -290,35 +316,48 @@ describe('Terms of Service', () => {
     for (const item of items) expect(item.textContent).not.toMatch(/^•/);
   });
 
-  it('shows the allocation tracks at a glance from the protocol facts', () => {
+  // The tracks were listed twice back to back, a table (or a phone summary)
+  // and then the same tracks as clauses, so every figure appeared twice.
+  it('lists each allocation track once, with its figures from the protocol facts and its rule (regression)', () => {
     render(PAGES.terms('en'));
-    const table = screen.getByRole('table', { name: 'The allocation tracks at a glance' });
-    const rows = within(table).getAllByRole('row');
-    expect(rows).toHaveLength(12);
-    expect(within(table).getByText(`${protocolFacts.mainEthPercentage}%`)).toBeInTheDocument();
-    expect(within(table).getByText('4%, shared by 3')).toBeInTheDocument();
-    expect(within(table).getAllByText('10 × 1,000')).toHaveLength(2);
-  });
-
-  // On phones the table became eleven four-row records, about 2,100px of mostly
-  // empty cells; phones get one line per track instead, and the table from sm.
-  it('gives phones one summary line per track instead of the table', () => {
-    render(PAGES.terms('en'));
-    const table = screen.getByRole('table', { name: 'The allocation tracks at a glance' });
-    expect(table.closest('[class*="max-sm:hidden"]')).not.toBeNull();
-    const summary = document.querySelector('[data-allocations-summary]');
-    expect(summary).toHaveClass('sm:hidden');
-    const lines = Array.from(summary?.querySelectorAll(':scope > div') ?? []);
-    expect(lines).toHaveLength(11);
-    const signature = lines[0]?.querySelector('dd');
-    expect(signature).toHaveTextContent(
+    expect(screen.queryByRole('table')).toBeNull();
+    const list = document.querySelector('[data-allocation-tracks]');
+    expect(list).toHaveAttribute('aria-labelledby', 'allocations-tracks-title');
+    const tracks = Array.from(list?.querySelectorAll(':scope > div') ?? []);
+    expect(tracks).toHaveLength(11);
+    // Each track is the anchor of its clause, and states its rule once.
+    expect(tracks[0]).toHaveAttribute('id', 'allocations-signature');
+    const figures = (track: Element | undefined) => track?.querySelector('[data-track-figures]');
+    expect(figures(tracks[0])).toHaveTextContent(
       `ETH ${protocolFacts.mainEthPercentage}% · CST ${protocolFacts.specialAllocationCst.toLocaleString('en')} · NFT 1`,
     );
-    // A track without a figure in a column says nothing for it, rather than a dash.
-    const publicGoods = lines.find((line) => line.textContent?.includes('Public Goods'));
-    expect(publicGoods?.querySelector('dd')?.textContent).not.toMatch(/CST|NFT|—/);
-    // Each line links the clause that states the track's rule.
-    expect(lines[0]?.querySelector('a')).toHaveAttribute('href', '#allocations-signature');
+    expect(list).toHaveTextContent('4%, shared by 3');
+    expect(
+      tracks.filter((track) => figures(track)?.textContent?.includes('10 × 1,000')),
+    ).toHaveLength(2);
+    // A track without a figure in a unit says nothing for it, rather than a dash.
+    const publicGoods = tracks.find((track) => track.textContent?.includes('Public Goods'));
+    expect(figures(publicGoods)?.textContent).not.toMatch(/CST|NFT|—/);
+    for (const track of tracks) {
+      expect(track.querySelectorAll('dd')).toHaveLength(1);
+    }
+  });
+
+  it('marks a cited clause as the target, a little below the sticky header', () => {
+    render(PAGES.terms('en'));
+    for (const id of ['allocations-retrieval', 'allocations-signature', 'mechanics-random-walk']) {
+      const clause = document.getElementById(id);
+      expect(clause?.className).toMatch(/scroll-mt-6/);
+      expect(clause?.className).toMatch(/target:before:opacity-100/);
+    }
+  });
+
+  it('gives an email for questions about the Terms, as Privacy and Security do', () => {
+    render(PAGES.terms('en'));
+    expect(screen.getByRole('link', { name: 'support@cosmicsignature.com' })).toHaveAttribute(
+      'href',
+      'mailto:support@cosmicsignature.com',
+    );
   });
 
   it('links the licence, the notices and the contact channels', () => {
@@ -333,6 +372,51 @@ describe('Terms of Service', () => {
 });
 
 describe('Privacy Policy', () => {
+  // The policy said the site "reports errors through the named services
+  // below" while the services table, built from this deployment's
+  // configuration, listed no error-reporting service.
+  it.each(routing.locales)(
+    'names error reports only when an error-reporting service is listed (%s)',
+    (locale) => {
+      const copy = getPrivacyCopy(locale);
+      const withoutReports = privacyCopyForDeployment(copy, false);
+      const withReports = privacyCopyForDeployment(copy, true);
+      const improvement = (c: typeof copy) =>
+        c.sections
+          .find((section) => section.id === 'use')
+          ?.content.find((item) => item.id === 'improvement')?.text;
+      expect(withReports).toBe(copy);
+      expect(withoutReports.inShort.points).toHaveLength(copy.inShort.points.length);
+      expect(withoutReports.inShort.points.at(-1)).toBe(copy.withoutErrorReports.inShortMeasure);
+      expect(improvement(withoutReports)).toBe(copy.withoutErrorReports.improvement);
+      expect(withoutReports.withoutErrorReports.inShortMeasure).not.toBe(
+        copy.inShort.points.at(-1),
+      );
+    },
+  );
+
+  it('renders the policy this deployment may state', () => {
+    render(PAGES.privacy('en'));
+    const sentry = activePrivacyServices().some((service) => service.id === 'sentry');
+    const text = visibleText();
+    if (sentry) expect(text).toContain('reports errors');
+    else expect(text).not.toMatch(/error reports|reports errors/);
+  });
+
+  it('opens each phone record on its name, and leaves out what the title line carries', () => {
+    render(PAGES.privacy('en'));
+    const services = screen.getByRole('table', { name: 'Services we use' });
+    for (const row of within(services).getAllByRole('row').slice(1)) {
+      const cells = row.querySelectorAll('td');
+      expect(cells[0]).toHaveAttribute('data-phone', 'title');
+      expect(cells[cells.length - 1]).toHaveAttribute('data-phone', 'omit');
+    }
+    const storage = screen.getByRole('table', { name: 'Cookies and browser storage' });
+    const theme = within(storage).getByText('cs_theme').closest('td');
+    expect(theme).toHaveAttribute('data-phone', 'title');
+    expect(theme).toHaveTextContent(/Cookie.*·.*1 year/);
+  });
+
   it('lists the services and storage this deployment actually uses', () => {
     render(PAGES.privacy('en'));
     const services = screen.getByRole('table', { name: 'Services we use' });

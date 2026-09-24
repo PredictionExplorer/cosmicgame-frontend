@@ -28,7 +28,7 @@
       "description": "Колекція ERC-721 NFT, які закарбовуються як розподіли для отримувачів циклу"
     },
     "randomWalk": {
-      "name": "RandomWalk",
+      "name": "Random Walk NFT",
       "description": "NFT колекції Random Walk можна долучити до ETH-жесту для одноразової знижки або закріпити для участі в зоряному відборі закріплених NFT"
     },
     "council": {

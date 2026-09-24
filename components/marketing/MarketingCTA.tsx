@@ -1,6 +1,7 @@
 import { Mail } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
+import { cn } from '@/lib/utils';
 import { buttonVariants } from '@/components/ui/button';
 import { CopyButton } from '@/components/ui/copy-button';
 
@@ -32,7 +33,11 @@ export function MarketingCTA() {
       <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-6 lg:mt-6 lg:flex-col lg:items-start lg:gap-3">
         <a
           href={`mailto:${OUTREACH_EMAIL}`}
-          className={buttonVariants({ size: 'lg', className: 'self-start' })}
+          // A long label (vi) wraps inside the button rather than past a 320px screen.
+          className={cn(
+            buttonVariants({ size: 'lg' }),
+            'h-auto max-w-full self-start whitespace-normal py-2.5 text-start',
+          )}
         >
           <Mail aria-hidden />
           {t('contact')}

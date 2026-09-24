@@ -181,9 +181,10 @@ describe('localized legal content', () => {
     for (const { id } of TRUST_CENTER_PAGES) {
       expect(TRUST_DOCUMENT_DATES[id].date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     }
-    // The review date of the audit status; the text dates of the documents.
-    expect(TRUST_DOCUMENT_DATES.audits).toEqual({ date: '2026-08-24', kind: 'reviewed' });
-    expect(TRUST_DOCUMENT_DATES.terms).toEqual({ date: '2026-07-20', kind: 'updated' });
+    // The text dates of the documents: the audit copy and the Terms contact
+    // clause changed with the page overhaul.
+    expect(TRUST_DOCUMENT_DATES.audits).toEqual({ date: '2026-09-24', kind: 'updated' });
+    expect(TRUST_DOCUMENT_DATES.terms).toEqual({ date: '2026-09-24', kind: 'updated' });
     // No copy states a date of its own any more.
     for (const locale of routing.locales) {
       for (const getCopy of Object.values(GETTERS)) {

@@ -1,10 +1,4 @@
-import { formatCount } from '@/utils/format';
-
-import { AUDIT_FINDINGS_TOTAL, HACKEN_AUDIT } from './audit';
 import type { AuditsCopy } from './AuditsContent';
-
-const { findings, invariants } = HACKEN_AUDIT;
-const count = (value: number) => formatCount(value, 'ja');
 
 /** Japanese copy for /audits, rendered by AuditsContent. */
 export const auditsCopyJa: AuditsCopy = {
@@ -35,8 +29,8 @@ export const auditsCopyJa: AuditsCopy = {
     heading: 'Hackenによる独立監査',
     paragraphs: [
       `2025年後半、HackenはCosmic Signatureのスマートコントラクトの独立したセキュリティレビューを実施しました。対象は公開リポジトリの本番コントラクトで、各サイクルを動かす中核プロトコルから、CSTトークン、二つのNFTコレクション、係留ウォレット、それらを支えるウォレットとシステム管理のコントラクトまでを含みます。Hackenは2026年1月に最終報告書を公開しました。`,
-      `報告書には${count(AUDIT_FINDINGS_TOTAL)}件の所見が挙げられていますが、重大または高い深刻度のものはありません。中程度が${count(findings.medium)}件、低が${count(findings.low)}件、情報提供が${count(findings.informational)}件です。ほとんどは、チームが検討して受け入れた設計上のトレードオフを説明するもので、報告書は各所見をその状況とともに解説しています。`,
-      `手動のレビューに加えて、Hackenは${count(invariants.tested)}のシステム不変条件に対してファジングテストを実施しました。たとえば、プロトコルが保持するETHが常に、受け入れた額から支払った額を引いたものに等しいという条件などです。${count(invariants.held)}件すべてが${count(invariants.runs)}回の実行にわたって成立しました。`,
+      '報告書は各所見を深刻度と状況とともに示し、上の概要がその件数をまとめています。重大または高い深刻度のものはなく、ほとんどはチームが検討して受け入れた設計上のトレードオフを説明するものです。',
+      '手動のレビューに加えて、Hackenはシステム不変条件に対してファジングテストを実施しました。たとえば、プロトコルが保持するETHが常に、受け入れた額から支払った額を引いたものに等しいという条件などです。すべての不変条件が成立しました。',
     ],
   },
   analysis: {

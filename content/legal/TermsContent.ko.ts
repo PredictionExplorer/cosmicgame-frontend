@@ -54,7 +54,7 @@ export const termsCopyKo = {
         {
           id: 'dynamic-cst',
           subtitle: '동적 CST 각인',
-          text: '제스처로 각인되는 참여 CST의 양은 고정되어 있지 않습니다. 이전 제스처 이후 경과한 시간에 따라 달라지며, 제곱근 공식으로 계산됩니다. 매우 짧은 간격으로 이어지는 제스처는 각인되는 CST가 0일 수도 있습니다.',
+          text: '제스처로 각인되는 참여 CST의 양은 고정되어 있지 않습니다. 이전 제스처 이후 경과한 시간에 따라 달라지며, 제곱근 공식으로 계산됩니다. 매우 짧은 간격으로 이어지는 제스처는 각인되는 CST가 0이 될 수도 있습니다.',
         },
         {
           id: 'cst-window',
@@ -242,7 +242,7 @@ export const termsCopyKo = {
     {
       id: 'contact',
       subtitle: '문의처',
-      text: '본 이용약관에 관한 질문은 <discord>Discord</discord>, <x>X</x>, <frontendRepository>GitHub 저장소</frontendRepository> 중 한 곳으로 문의해 주세요.',
+      text: '본 이용약관에 관한 질문은 <support>support@cosmicsignature.com</support>, <discord>Discord</discord>, <x>X</x>, <frontendRepository>GitHub 저장소</frontendRepository> 중 한 곳으로 문의해 주세요.',
     },
   ],
   // lexicon-allow-start: Howey-test denial copy must explicitly negate an investment framing.
@@ -253,8 +253,6 @@ export const termsCopyKo = {
   // lexicon-allow-end
   allocationsTable: {
     title: '배분 경로 한눈에 보기',
-    track: '배분 경로',
-    none: '없음',
     sharedBy: '{percent}, {count}명 공동',
     each: '{count} × {amount}',
   },

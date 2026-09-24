@@ -28,7 +28,7 @@
       "description": "사이클 수령자에게 배분으로 각인되는 ERC-721 NFT 컬렉션"
     },
     "randomWalk": {
-      "name": "RandomWalk",
+      "name": "Random Walk NFT",
       "description": "ETH 제스처에 첨부해 1회 할인을 받거나, 앵커링하여 앵커링 NFT 별빛 선정 자격을 얻을 수 있는 RandomWalk NFT 컬렉션"
     },
     "council": {

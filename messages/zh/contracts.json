@@ -28,7 +28,7 @@
       "description": "作为周期分配铭刻给获配者的 ERC-721 NFT 系列"
     },
     "randomWalk": {
-      "name": "Random Walk",
+      "name": "Random Walk NFT",
       "description": "Random Walk NFT 系列，可附加至 ETH 落笔以获得一次价格减免，也可锚定以取得锚定 NFT 星选资格"
     },
     "council": {

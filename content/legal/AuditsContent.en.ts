@@ -1,10 +1,4 @@
-import { formatCount } from '@/utils/format';
-
-import { AUDIT_FINDINGS_TOTAL, HACKEN_AUDIT } from './audit';
 import type { AuditsCopy } from './AuditsContent';
-
-const { findings, invariants } = HACKEN_AUDIT;
-const count = (value: number) => formatCount(value, 'en');
 
 /** English copy for /audits, rendered by AuditsContent. */
 export const auditsCopyEn: AuditsCopy = {
@@ -34,9 +28,9 @@ export const auditsCopyEn: AuditsCopy = {
   audit: {
     heading: 'Independent audit by Hacken',
     paragraphs: [
-      'In late 2025, Hacken carried out an independent security review of the Cosmic Signature smart contracts. The engagement covered the production contracts in the public repository: the core protocol that runs each cycle, the CST token, both NFT collections, the anchoring wallets, and the wallet and system management contracts that support them.',
-      `The report lists ${count(AUDIT_FINDINGS_TOTAL)} findings, none of them critical or high severity: ${count(findings.medium)} medium, ${count(findings.low)} low and ${count(findings.informational)} informational. Most describe design tradeoffs the team reviewed and accepted, and the report explains each finding with its status.`,
-      `Alongside the manual review, Hacken ran fuzz tests against ${count(invariants.tested)} system invariants, properties such as the rule that the ETH the protocol holds always equals deposits minus withdrawals. All ${count(invariants.held)} held across ${count(invariants.runs)} runs.`,
+      'In late 2025, Hacken carried out an independent security review of the Cosmic Signature smart contracts. The engagement covered the production contracts in the public repository: the core protocol that runs each cycle, the CST token, both NFT collections, the anchoring wallets, and the wallet and system management contracts that support them. Hacken published the final report in January 2026.',
+      'The report lists each finding with its severity and its status; the summary above counts them. None is critical or high severity, and most describe design tradeoffs the team reviewed and accepted.',
+      'Alongside the manual review, Hacken fuzz-tested the system’s invariants, properties such as the rule that the ETH the protocol holds always equals deposits minus withdrawals. Every invariant held.',
     ],
   },
   analysis: {

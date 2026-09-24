@@ -1,10 +1,4 @@
-import { formatCount } from '@/utils/format';
-
-import { AUDIT_FINDINGS_TOTAL, HACKEN_AUDIT } from './audit';
 import type { AuditsCopy } from './AuditsContent';
-
-const { findings, invariants } = HACKEN_AUDIT;
-const count = (value: number) => formatCount(value, 'zh');
 
 /** Simplified Chinese copy for /audits, rendered by AuditsContent. */
 export const auditsCopyZh: AuditsCopy = {
@@ -35,8 +29,8 @@ export const auditsCopyZh: AuditsCopy = {
     heading: 'Hacken 独立审计',
     paragraphs: [
       `2025年末，Hacken 对 Cosmic Signature 智能合约进行了独立安全审查。审查范围覆盖公开仓库中的全部生产合约：驱动每个周期的核心协议、CST 代币、两个 NFT 系列、锚定钱包，以及配套的钱包与系统管理合约。最终报告于2026年1月发布。`,
-      `报告共列出 ${count(AUDIT_FINDINGS_TOTAL)} 项发现，其中没有严重或高危级别问题：${count(findings.medium)} 项为中危、${count(findings.low)} 项为低危、${count(findings.informational)} 项为提示性观察。多数发现属于团队已审阅并接受的设计取舍，报告对每项发现及其处理状态均有说明。`,
-      `除人工审查外，Hacken 还对 ${count(invariants.tested)} 项系统不变量进行了模糊测试，例如协议持有的 ETH 总额必须等于存入减去取回。全部 ${count(invariants.held)} 项不变量在 ${count(invariants.runs)} 次运行中均保持成立。`,
+      '报告逐项列出每项发现的严重级别与处理状态，上方摘要按级别统计了数量。其中没有严重或高危级别问题，多数属于团队已审阅并接受的设计取舍。',
+      '除人工审查外，Hacken 还对系统不变量进行了模糊测试，例如协议持有的 ETH 总额必须等于存入减去取回。所有不变量均保持成立。',
     ],
   },
   analysis: {

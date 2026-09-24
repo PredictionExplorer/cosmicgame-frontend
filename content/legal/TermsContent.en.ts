@@ -166,7 +166,7 @@ export const termsCopyEn = {
         {
           id: 'warranties',
           subtitle: 'No warranties',
-          text: "Cosmic Signature is provided 'as is' without warranties of any kind, either express or implied. We do not warrant that the platform will be uninterrupted, error-free, or free from harmful components.",
+          text: 'Cosmic Signature is provided “as is” without warranties of any kind, either express or implied. We do not warrant that the platform will be uninterrupted, error-free, or free from harmful components.',
         },
         {
           id: 'volatility',
@@ -242,7 +242,7 @@ export const termsCopyEn = {
     {
       id: 'contact',
       subtitle: 'Contact information',
-      text: 'If you have questions about these Terms of Service, please contact us on <discord>Discord</discord>, on <x>X</x> or through the <frontendRepository>GitHub repository</frontendRepository>.',
+      text: 'If you have questions about these Terms of Service, email <support>support@cosmicsignature.com</support>, or contact us on <discord>Discord</discord>, on <x>X</x> or through the <frontendRepository>GitHub repository</frontendRepository>.',
     },
   ],
   // lexicon-allow-start: Howey-test denial copy must explicitly negate an investment framing.
@@ -253,8 +253,6 @@ export const termsCopyEn = {
   // lexicon-allow-end
   allocationsTable: {
     title: 'The allocation tracks at a glance',
-    track: 'Track',
-    none: 'None',
     sharedBy: '{percent}, shared by {count}',
     each: '{count} × {amount}',
   },

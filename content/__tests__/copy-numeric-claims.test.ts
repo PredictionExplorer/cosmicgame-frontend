@@ -4,6 +4,13 @@ import { join } from 'path';
 import { getAllFaqItems, getFaqContent } from '@/content/faq';
 import { getLandingContent } from '@/content/landing';
 import { getLearnContent } from '@/content/learn';
+import {
+  getAuditsCopy,
+  getPrivacyCopy,
+  getRiskCopy,
+  getSecurityCopy,
+  getTermsCopy,
+} from '@/content/legal';
 import { protocolFacts } from '@/content/protocol-facts';
 import { getQuizContent } from '@/content/quiz';
 import { DURATION_NOUNS, type DurationNouns } from '@/test-utils/locale-expectations';
@@ -63,6 +70,13 @@ const sources: CopySource[] = [
     { name: `learn-${locale}`, locale, text: JSON.stringify(getLearnContent(locale).articles) },
     { name: `quiz-${locale}`, locale, text: JSON.stringify(getQuizContent(locale)) },
     { name: `messages-${locale}`, locale, text: readMessageCatalogs(locale) },
+    // The Trust Center documents state protocol figures too (the Terms'
+    // allocation tracks, the risk disclosures' hours and weeks).
+    { name: `terms-${locale}`, locale, text: JSON.stringify(getTermsCopy(locale)) },
+    { name: `risk-${locale}`, locale, text: JSON.stringify(getRiskCopy(locale)) },
+    { name: `privacy-${locale}`, locale, text: JSON.stringify(getPrivacyCopy(locale)) },
+    { name: `audits-${locale}`, locale, text: JSON.stringify(getAuditsCopy(locale)) },
+    { name: `security-${locale}`, locale, text: JSON.stringify(getSecurityCopy(locale)) },
   ]),
   { name: 'llms.txt', text: readPublicFile('llms.txt') },
   { name: 'llms-full.txt', text: readPublicFile('llms-full.txt') },

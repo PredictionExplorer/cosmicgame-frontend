@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { ArrowUpRight, ShieldCheck } from 'lucide-react';
 
 import {
@@ -73,9 +74,10 @@ export function formatSourcifyChecked(locale: string): string {
 /**
  * The one statement an address list makes about Sourcify ("Every address
  * with a Sourcify link is an exact match there, checked September 24,
- * 2026"), under the list's heading instead of a badge on every row.
+ * 2026"), under the list's heading instead of a badge on every row. `text`
+ * may be rich (a link to the contracts page).
  */
-export function SourcifyCheckedNote({ text, className }: { text: string; className?: string }) {
+export function SourcifyCheckedNote({ text, className }: { text: ReactNode; className?: string }) {
   return (
     <p
       data-sourcify-note

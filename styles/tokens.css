@@ -138,6 +138,9 @@
   --row-h-dense: 2.75rem;
   --measure-prose: 66ch;
   --measure-lede: 60ch;
+  /* A long document's one column (the Trust Center): every rule, ledger, table
+   * and callout ends on this edge; paragraphs keep --measure-prose inside it. */
+  --measure-document: 52rem;
 
   /* Retired radius names, aliased onto the scale above. */
   --radius-field: var(--radius-control);

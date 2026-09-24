@@ -82,6 +82,8 @@ function isAssetOrInfrastructurePath(pathname: string): boolean {
   return (
     pathname.startsWith('/_next/') ||
     pathname.startsWith('/api/') ||
+    // RFC 8615 well-known files (security.txt) have one fixed, unlocalized path.
+    pathname.startsWith('/.well-known/') ||
     /^\/(?:favicon|robots\.txt|sitemap\.xml|llms(?:-full)?\.txt|manifest\.webmanifest)/.test(
       pathname,
     ) ||

@@ -12,6 +12,11 @@ export const privacyCopyEn = {
       'The site measures visits and reports errors through the named services below, and sets only the cookies listed below.',
     ],
   },
+  withoutErrorReports: {
+    inShortMeasure:
+      'The site measures visits through the named services below, and sets only the cookies listed below.',
+    improvement: 'We use aggregated usage data to fix problems and improve the site.',
+  },
   introductionTitle: 'Introduction',
   introduction: [
     'Cosmic Signature is a procedural on-chain art protocol built on Arbitrum, an Ethereum Layer 2 network. As a decentralized application (dApp), it works differently from traditional web applications when it comes to data and privacy.',
