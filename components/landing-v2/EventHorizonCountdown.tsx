@@ -281,7 +281,7 @@ export function EventHorizonCountdown() {
           <p className="type-eyebrow text-subtle">
             {unavailable ? timerT('cycleClock') : timerT('liveClock')}
           </p>
-          <h2 className={cn('type-heading-1', styles.title)}>{title}</h2>
+          <h2 className={cn('type-heading-1', styles.title, loading && styles.pending)}>{title}</h2>
           {gestureCount !== null && gestureCount > 0 ? (
             <p className={cn('type-body-sm text-muted-foreground', styles.fact)}>
               {timerT('gestureCount', { count: gestureCount })}

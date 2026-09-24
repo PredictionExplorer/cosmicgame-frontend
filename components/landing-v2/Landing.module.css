@@ -124,7 +124,7 @@
 
   /* The headline shares its row with the plate: it sizes to its five columns. */
   .headline {
-    font-size: clamp(3rem, 0.75rem + 4.2vw, 4.75rem);
+    font-size: clamp(3rem, 0.75rem + 4.2vw, 4.5rem);
   }
 
   .heroArt {
@@ -249,6 +249,11 @@
   border-left: 1px solid var(--rule-faint);
 }
 
+.figure:nth-child(n + 3) {
+  margin-top: 1.25rem;
+  border-top: 1px solid var(--rule-faint);
+}
+
 .figureValue {
   overflow-wrap: anywhere;
 }
@@ -267,6 +272,11 @@
   .figure:first-child {
     padding-left: 0;
     border-left: 0;
+  }
+
+  .figure:nth-child(n + 3) {
+    margin-top: 0;
+    border-top: 0;
   }
 }
 

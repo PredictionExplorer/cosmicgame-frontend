@@ -34,7 +34,10 @@ export function Hero({ hero }: { hero: LandingContent['hero'] }) {
 
       <div className="site-container">
         <div className={styles.heroGrid}>
-          <p className={cn('type-eyebrow text-subtle', styles.heroEyebrow)}>{hero.eyebrow}</p>
+          <p className={cn('type-eyebrow text-subtle', styles.heroEyebrow)}>
+            {/* A line never starts with the separator: it stays with the word before it. */}
+            {hero.eyebrow.replace(' · ', '\u00a0· ')}
+          </p>
           <h1 id="landing-headline" className={cn('type-display-xl', styles.headline)}>
             {hero.headlineLead} <span className={styles.headlineAccent}>{hero.headlineAccent}</span>
           </h1>

@@ -119,9 +119,13 @@
   white-space: normal;
 }
 
-/* Without JavaScript the placeholder figures and the stamp would wait forever. */
+/*
+ * Without JavaScript the placeholder figures, the "reading the clock" title
+ * and the stamp would wait forever; the noscript line says why instead.
+ */
 @media (scripting: none) {
   .placeholder,
+  .pending,
   .stamp {
     display: none;
   }
