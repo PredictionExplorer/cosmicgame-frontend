@@ -213,32 +213,30 @@ describe('app home page (server shell)', () => {
 });
 
 describe('generateMetadata', () => {
-  it('uses the reserve description variant when the seed read succeeds', async () => {
-    mockGetDashboardInfoSeed.mockResolvedValue(dashboardSeed({ PrizeAmountEth: 0.625 }));
-
-    const metadata = await generateMetadata(pageProps);
-
-    expect(documentTitleOf(metadata)).toBe('Cosmic Signature');
-    expect(metadata.description).toContain('0.6250 ETH Cycle Reserve');
-    expect(metadata.openGraph).toEqual(expect.objectContaining({ locale: 'en_US' }));
-  });
-
-  it('formats a zero reserve like the historical description', async () => {
-    mockGetDashboardInfoSeed.mockResolvedValue(dashboardSeed({ PrizeAmountEth: 0 }));
-
-    const metadata = await generateMetadata(pageProps);
-
-    expect(metadata.description).toContain('0.0000 ETH Cycle Reserve');
-  });
-
-  it('falls back to the normalized reserve field when the wire field is absent', async () => {
+  it('names the Cycle Reserve with the contract balance, not the Signature Allocation', async () => {
+    // Regression (F026): the copy says "the {reserve} Cycle Reserve", but it
+    // was fed PrizeAmountEth, the Signature Allocation, about a quarter of it.
     mockGetDashboardInfoSeed.mockResolvedValue(
-      dashboardSeed({ PrizeAmountEth: undefined, CurPrizeAmountEth: 1.25 }),
+      dashboardSeed({ PrizeAmountEth: 8.0735, CosmicGameBalanceEth: 32.29386 }),
     );
 
     const metadata = await generateMetadata(pageProps);
 
-    expect(metadata.description).toContain('1.2500 ETH Cycle Reserve');
+    expect(documentTitleOf(metadata)).toBe('Cosmic Signature');
+    expect(metadata.description).toContain('32.2939\u00a0ETH Cycle Reserve');
+    expect(metadata.description).not.toContain('8.0735');
+    expect(metadata.openGraph).toEqual(expect.objectContaining({ locale: 'en_US' }));
+  });
+
+  it('keeps the reserve-free description when the balance is missing or empty', async () => {
+    for (const balance of [undefined, 0, Number.NaN]) {
+      mockGetDashboardInfoSeed.mockResolvedValue(dashboardSeed({ CosmicGameBalanceEth: balance }));
+
+      const metadata = await generateMetadata(pageProps);
+
+      expect(metadata.description).toContain('procedural on-chain art protocol on Arbitrum');
+      expect(metadata.description).not.toMatch(/\d ETH/);
+    }
   });
 
   it('falls back to the reserve-free description when the seed read fails', async () => {

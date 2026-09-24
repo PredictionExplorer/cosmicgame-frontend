@@ -1,103 +1,149 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { Fragment, type ReactNode } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
+import { Badge } from '@/components/ui/badge';
 import { LiveStatus } from '@/components/ui/live-status';
 import type { CyclePhase } from '@/lib/cycleState';
+import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
 import { Link } from '@/i18n/navigation';
 
-import { viewForPhase } from './phaseView';
+import { PHASE_TEXT_CLASS, viewForPhase } from './phaseView';
+import { ValuePending } from './ValuePending';
 
 export interface PulseBarProps {
   cycleNumber?: number | null;
   phase: CyclePhase;
-  gestureCount: number;
+  /** This cycle's Gestures; null while the count is unknown. */
+  gestureCount: number | null;
   /** Preformatted relative age of the newest gesture ("12s ago"); null hides it. */
   lastGestureAge?: string | null;
+  /** The connected wallet holds the Last Gesture: said once, in the first viewport. */
+  youHoldLatest?: boolean;
   /** Controls placed before the "New here?" link (the attention menu). */
   aside?: ReactNode;
   className?: string;
 }
 
 /**
- * The server-rendered page heading, live cycle status, and a short explanation
- * of the objective. Specialist navigation lives in the details below the stage.
+ * The Observatory's header strip on the shared content edge: the page H1, one
+ * live pill for the Cycle, the phase in words, the gesture count, and a quiet
+ * route to the walkthrough. The intro sentence stays short on phones so the
+ * clock starts in the first third of the screen.
  */
 export function PulseBar({
   cycleNumber = null,
   phase,
   gestureCount,
   lastGestureAge = null,
+  youHoldLatest = false,
   aside = null,
   className,
 }: PulseBarProps) {
   const t = useTranslations('home');
   const view = viewForPhase(phase);
 
+  const facts: { key: string; node: ReactNode; wide?: boolean }[] = [
+    {
+      key: 'phase',
+      node: (
+        <span
+          data-testid="pulse-phase-chip"
+          className={cn('type-label', PHASE_TEXT_CLASS[view.tone])}
+        >
+          {t(`chrono.phase.${view.messageKey}.label`)}
+        </span>
+      ),
+    },
+    {
+      key: 'count',
+      node: (
+        <span
+          data-testid="pulse-gesture-count"
+          className="type-label tabular-nums text-muted-foreground"
+        >
+          {gestureCount == null ? (
+            <ValuePending ch={10} />
+          ) : (
+            t('observatory.pulse.gestureCount', { count: gestureCount })
+          )}
+        </span>
+      ),
+    },
+  ];
+  if (lastGestureAge) {
+    facts.push({
+      key: 'age',
+      wide: true,
+      node: (
+        <span data-testid="pulse-last-gesture" className="type-label text-subtle">
+          {t('observatory.pulse.lastGestureAge', { age: lastGestureAge })}
+        </span>
+      ),
+    });
+  }
+
   return (
     <div
       data-testid="home-deck-header"
       className={cn(
-        'flex flex-col items-start gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-x-6 sm:gap-y-2',
+        'grid min-w-0 gap-x-8 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center xl:grid-cols-[auto_minmax(0,1fr)_auto]',
         className,
       )}
     >
-      <div className="min-w-0 w-full sm:flex-1">
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-          <h1
-            id="home-deck-title"
-            className="font-display text-lg font-semibold leading-tight tracking-tight text-foreground sm:text-xl"
-          >
-            {t('deck.title')}
-          </h1>
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/[0.10] bg-white/[0.04] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-              {/* Pulses only while the dashboard poll succeeds (liveFreshness). */}
-              <LiveStatus variant="dot" />
-              {cycleNumber == null
-                ? t('hero.cycleFallback')
-                : t('hero.cycleNumber', { number: String(cycleNumber) })}
-            </span>
-            <span
-              data-testid="pulse-phase-chip"
-              className={cn(
-                'inline-flex items-center rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em]',
-                view.iconClass,
-              )}
-            >
-              {t(`chrono.phase.${view.messageKey}.label`)}
-            </span>
-            <span
-              data-testid="pulse-gesture-count"
-              className="inline-flex items-center rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[11px] font-medium tabular-nums text-muted-foreground"
-            >
-              {t('observatory.pulse.gestureCount', { count: gestureCount })}
-            </span>
-            {lastGestureAge && (
+      <h1 id="home-deck-title" className="type-section min-w-0 text-foreground">
+        {t('deck.title')}
+      </h1>
+      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 sm:col-span-2 xl:col-span-1 xl:col-start-2 xl:row-start-1 xl:mt-0">
+        <Badge shape="pill" tone="neutral" className="gap-2 text-foreground">
+          {/* Breathes only while the dashboard poll succeeds (liveFreshness). */}
+          <LiveStatus variant="dot" />
+          {cycleNumber == null
+            ? t('hero.cycleFallback')
+            : t('hero.cycleNumber', { number: String(cycleNumber) })}
+        </Badge>
+        {facts.map((fact, index) => (
+          <Fragment key={fact.key}>
+            {index > 0 && (
               <span
-                data-testid="pulse-last-gesture"
-                className="hidden items-center rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[11px] font-medium tabular-nums text-muted-foreground sm:inline-flex"
+                aria-hidden
+                className={cn(
+                  'type-label text-subtle',
+                  fact.wide && 'max-sm:hidden xl:max-2xl:hidden',
+                )}
               >
-                {t('observatory.pulse.lastGestureAge', { age: lastGestureAge })}
+                ·
               </span>
             )}
-          </div>
-        </div>
-        <p className="mt-1 max-w-5xl text-xs leading-relaxed text-muted-foreground">
-          {t('deck.intro')}
-        </p>
+            {/* The age also reads in the ledger; it gives way where the
+                strip shares its row with the H1. */}
+            <span className={cn(fact.wide && 'max-sm:hidden xl:max-2xl:hidden')}>{fact.node}</span>
+          </Fragment>
+        ))}
+        {youHoldLatest && (
+          <Badge tone="positive" dot size="sm" data-testid="pulse-you-latest">
+            {t('observatory.standing.positionLatest')}
+          </Badge>
+        )}
       </div>
-      <div className="flex flex-wrap items-center gap-2">
+      <p className="type-body-sm mt-2.5 max-w-[72ch] text-muted-foreground max-sm:line-clamp-2 sm:col-span-2 xl:col-span-3 xl:mt-2 xl:max-w-none">
+        {t('deck.intro')}
+      </p>
+      {/* One set of routes: under the intro on phones, beside the H1 from sm. */}
+      <div className="mt-2 flex items-center gap-3 sm:col-start-2 sm:row-start-1 sm:mt-0 xl:col-start-3">
         {aside}
         <Link
           href="/how-it-works"
-          className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] min-h-11 px-3 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/35 hover:text-primary"
+          className={cn(
+            'link-quiet inline-flex items-center gap-1.5 type-label text-primary',
+            TOUCH_TARGET_TEXT_LINK_CLASS,
+          )}
         >
           {t('deck.newHere')}
-          <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+          <ArrowRight className="size-3.5" aria-hidden />
         </Link>
       </div>
     </div>

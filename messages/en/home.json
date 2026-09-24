@@ -9,45 +9,45 @@
     "phase": {
       "openingSoon": {
         "badge": "Opening soon",
-        "headline": "Next Cycle Opens Soon",
+        "headline": "Next cycle opens soon",
         "body": "{cycleLabel} is preparing to open. The countdown below shows exactly when Gestures become available.",
-        "cta": "View Cycle Details"
+        "cta": "View cycle details"
       },
       "waitingFirstGesture": {
         "badge": "Open for first Gesture",
-        "headline": "{cycleLabel} Is Open",
+        "headline": "{cycleLabel} is open",
         "body": "Make the first Gesture to start the finalization clock and begin shaping this cycle's Signature.",
         "cta": "Make the first Gesture"
       },
       "confirming": {
         "badge": "Verifying on-chain",
-        "headline": "Confirming the Final Moment",
+        "headline": "Confirming the final moment",
         "body": "The clock reached zero. Checking the chain for a last-second Gesture before the cycle can finalize.",
-        "cta": "View Cycle Details"
+        "cta": "View cycle details"
       },
       "readyToFinalize": {
         "badge": "Ready to finalize",
-        "headline": "Cycle Ready to Finalize",
+        "headline": "Cycle ready to finalize",
         "body": "The finalization clock reached zero. The cycle can now close and distribute its reserve on-chain.",
-        "cta": "Finalize Cycle"
+        "cta": "Finalize cycle"
       },
       "finalWindow": {
         "badge": "Final window",
-        "headline": "The Final Window Is Open",
+        "headline": "The final window is open",
         "body": "The finalization clock is the main event now. A new Gesture can still extend time and reshape the ending.",
         "cta": "Make a Gesture"
       },
       "loading": {
         "badge": "Syncing cycle state",
-        "headline": "Syncing the Cycle",
+        "headline": "Syncing the cycle",
         "body": "Reading protocol time and current cycle data before showing the live state.",
-        "cta": "View Cycle Details"
+        "cta": "View cycle details"
       },
       "unavailable": {
         "badge": "Clock unavailable",
-        "headline": "Cycle State Unavailable",
+        "headline": "Cycle state unavailable",
         "body": "The app could not reach the live cycle clock. Cycle details may still show the latest indexed data.",
-        "cta": "View Cycle Details"
+        "cta": "View cycle details"
       },
       "live": {
         "badge": "Live on Arbitrum",
@@ -70,14 +70,14 @@
         "body": "Protocol reserves flow across allocation tracks, including Protocol Guild."
       }
     },
-    "viewCycleDetails": "View Cycle Details",
+    "viewCycleDetails": "View cycle details",
     "artUnavailable": {
       "eyebrow": "Awaiting generated Signature",
       "body": "Real Cosmic Signature artwork will appear here once indexed token metadata is available."
     },
     "console": {
       "ariaLabel": "Current cycle observatory",
-      "eyebrow": "Observatory Console",
+      "eyebrow": "Observatory console",
       "cycleLoading": "Cycle loading",
       "parameters": "Parameters",
       "viewSignatureAria": "View Cosmic Signature {id}",
@@ -173,10 +173,10 @@
       }
     },
     "cta": {
-      "finalize": "Finalize Cycle",
+      "finalize": "Finalize cycle",
       "makeFirstGesture": "Make the first Gesture",
       "makeGesture": "Make a Gesture",
-      "viewCycle": "View Cycle"
+      "viewCycle": "View cycle"
     }
   },
   "phaseGuide": {
@@ -227,7 +227,7 @@
     "opensAt": "Cycle {cycle} opens at {dateTime}",
     "finalizesIn": "Cycle finalizes in",
     "finalizesInTooltip": "When this timer hits zero, the participant who made the Final Gesture may finalize the cycle and receive the Signature Allocation. Each new gesture extends the timer.",
-    "readyToFinalize": "Cycle Ready to Finalize",
+    "readyToFinalize": "Cycle ready to finalize",
     "clockReachedZero": "The finalization clock reached zero.",
     "metrics": {
       "signatureAllocation": "Signature Allocation",
@@ -249,21 +249,21 @@
       "duration": "Duration {duration}"
     },
     "standing": {
-      "title": "Your Cycle Standing",
+      "title": "Your cycle standing",
       "tooltip": "Shows your current Final Gesture standing and Stellar Selection frequency based on your gestures this cycle.",
       "leader": {
-        "base": "You made the most recent gesture. If no one else gestures, you receive the Signature Allocation ({amount} ETH, 1,000 CST, 1 Cosmic Signature NFT).",
-        "withNft": "You made the most recent gesture. If no one else gestures, you receive the Signature Allocation ({amount} ETH, 1,000 CST, 1 Cosmic Signature NFT, plus {nftCount, plural, one {the attached NFT} other {all # attached NFTs}} shown below).",
-        "withErc20": "You made the most recent gesture. If no one else gestures, you receive the Signature Allocation ({amount} ETH, 1,000 CST, 1 Cosmic Signature NFT, plus {erc20Count, plural, one {the attached ERC20 token deposit} other {all # attached ERC20 token deposits}} shown below).",
-        "withBoth": "You made the most recent gesture. If no one else gestures, you receive the Signature Allocation ({amount} ETH, 1,000 CST, 1 Cosmic Signature NFT, plus {nftCount, plural, one {the attached NFT} other {all # attached NFTs}} and {erc20Count, plural, one {the attached ERC20 token deposit} other {all # attached ERC20 token deposits}} shown below)."
+        "base": "You made the most recent Gesture. If no one else makes a Gesture before the clock reaches zero, you can finalize the cycle and receive the Signature Allocation ({amount} ETH, 1,000 CST, 1 Cosmic Signature NFT).",
+        "withNft": "You made the most recent Gesture. If no one else makes a Gesture before the clock reaches zero, you can finalize the cycle and receive the Signature Allocation ({amount} ETH, 1,000 CST, 1 Cosmic Signature NFT, plus {nftCount, plural, one {the attached NFT} other {all # attached NFTs}} shown below).",
+        "withErc20": "You made the most recent Gesture. If no one else makes a Gesture before the clock reaches zero, you can finalize the cycle and receive the Signature Allocation ({amount} ETH, 1,000 CST, 1 Cosmic Signature NFT, plus {erc20Count, plural, one {the attached ERC20 token deposit} other {all # attached ERC20 token deposits}} shown below).",
+        "withBoth": "You made the most recent Gesture. If no one else makes a Gesture before the clock reaches zero, you can finalize the cycle and receive the Signature Allocation ({amount} ETH, 1,000 CST, 1 Cosmic Signature NFT, plus {nftCount, plural, one {the attached NFT} other {all # attached NFTs}} and {erc20Count, plural, one {the attached ERC20 token deposit} other {all # attached ERC20 token deposits}} shown below)."
       },
-      "notLeader": "You are not the most recent participant — gesture again to take the lead, or remain eligible for Stellar Selection.",
+      "notLeader": "Another participant holds the Last Gesture. Your earlier Gestures stay in the Stellar Selection pool.",
       "ethStellar": "ETH Stellar Selection",
       "nftStellar": "NFT Stellar Selection"
     },
     "openCycle": {
       "cycleNumber": "Cycle {cycle}",
-      "title": "Open the Cycle",
+      "title": "Open the cycle",
       "body": "The Calibration Window for the first ETH gesture is open. Make your gesture."
     }
   },
@@ -281,18 +281,18 @@
     }
   },
   "form": {
-    "title": "Make Your Gesture",
+    "title": "Make your Gesture",
     "subtitle": "Choose a gesture method and participate in the active cycle.",
     "loadingAria": "Loading gesture form",
-    "methodLabel": "Gesture Method",
+    "methodLabel": "Gesture method",
     "method": {
       "eth": {
         "label": "ETH",
         "desc": "Pay with Ether"
       },
       "randomWalk": {
-        "label": "ETH + RWLK",
-        "desc": "50% discount"
+        "label": "ETH + Random Walk",
+        "desc": "ETH + Random Walk halves the ETH cost and needs an unused Random Walk NFT."
       },
       "cst": {
         "label": "CST",
@@ -307,7 +307,7 @@
     "cstTrade": "Need CST for this gesture method? Trade ETH for CST on Arbitrum through Uniswap.",
     "reward": {
       "economicsTitle": "CST Gesture Economics",
-      "previewTitle": "CST Reward Preview",
+      "previewTitle": "Participation CST",
       "economicsDescription": "Net CST is the Participation CST reward minus the current CST gesture cost.",
       "previewDescription": "Estimated dynamic CST you receive if this gesture lands. The amount depends on time since the previous gesture, and every gesture method has two protections: maximum cost and minimum CST reward.",
       "rewardLabel": "Reward",
@@ -321,11 +321,12 @@
       "minAcceptedTooltipAny": "Accept any CST reward sends a minimum accepted reward of 0, so the gesture can land with any dynamic CST reward, including none.",
       "netPositive": "The CST reward exceeds the CST cost if this lands.",
       "netNegative": "Most CST gestures spend more CST than they receive.",
-      "durationMismatch": "Using on-chain duration ({contractDuration}) because the API reported {apiDuration}."
+      "durationMismatch": "Using on-chain duration ({contractDuration}) because the API reported {apiDuration}.",
+      "minAcceptedLabel": "Minimum accepted"
     },
     "preview": "Preview the live gesture options here. Connect a wallet to write your message, attach assets, and submit the gesture on Arbitrum.",
     "advanced": {
-      "title": "Advanced",
+      "title": "Advanced options",
       "messageLabel": "Message",
       "messageOptionalHint": "(optional, {maxLength} chars)",
       "messageTooltipAria": "How gesture messages work",
@@ -333,7 +334,7 @@
       "messagePlaceholder": "Leave a message with your gesture...",
       "attachIntro": "Attach tokens or NFTs to your gesture, or adjust gesture-cost collision prevention.",
       "minCstProtection": {
-        "title": "Minimum CST Reward Protection",
+        "title": "Minimum CST reward protection",
         "body": "Participation CST uses a square-root formula based on elapsed time. This setting protects you if another gesture lands first and lowers the amount before your transaction confirms.",
         "acceptAnyAria": "Accept any CST reward",
         "acceptAnyTitle": "Accept any CST reward, including 0",
@@ -343,18 +344,20 @@
         "revertNote": "If the contract would imprint less CST than this minimum by the time your transaction lands, the gesture should revert instead of accepting a lower dynamic CST amount."
       },
       "attachNft": "Attach NFT",
-      "attachToken": "Attach Token",
-      "tokenContractLabel": "Contract Address",
+      "attachToken": "Attach token",
+      "tokenContractLabel": "Contract address",
       "tokenAmountLabel": "Amount",
-      "nftContractLabel": "NFT Contract Address",
+      "nftContractLabel": "NFT contract address",
       "nftIdLabel": "Token ID",
       "nftIdPlaceholder": "Token ID",
       "collision": {
-        "title": "Collision Prevention",
+        "title": "Collision prevention",
         "raiseBy": "Raise by",
         "approxCost": "≈ {amount} ETH",
         "note": "Adds {percent}% to the amount sent so the gesture still succeeds if another lands first in the same block. The contract charges only the current Gesture Cost and refunds the rest in the same transaction, unless the difference is too small to cover the gas."
-      }
+      },
+      "attachLabel": "Attach an asset",
+      "attachNone": "Nothing"
     },
     "submit": {
       "eth": "Gesture with ETH ({cost} ETH)",
@@ -363,17 +366,27 @@
       "cst": "Gesture with CST ({cost} CST)",
       "cstFree": "Gesture with CST (FREE GESTURE)",
       "generic": "Gesture with {method}",
-      "sendsNote": "Sends about {amount} ETH, including the {percent}% collision buffer."
+      "sendsNote": "Sends about {amount} ETH, including the {percent}% collision buffer.",
+      "action": {
+        "eth": "Gesture with ETH",
+        "randomWalk": "Gesture with ETH + Random Walk",
+        "cst": "Gesture with CST"
+      }
     },
     "processing": "Processing...",
     "finalGestureMade": "You made the final gesture for this cycle. When the timer ends, use Finalize Cycle below.",
-    "finalize": "Finalize Cycle",
+    "finalize": "Finalize cycle",
     "finalizeAvailableIn": "available in",
     "finalizeWaitNote": "Please wait for the participant who made the Final Gesture to finalize the cycle.",
     "connect": {
       "title": "Connect to submit your gesture",
-      "body": "Review the live gesture methods and costs above, then connect MetaMask or another wallet to submit on Arbitrum."
-    }
+      "body": "Review the live gesture methods and costs above, then connect MetaMask or another wallet to submit on Arbitrum.",
+      "cta": "Connect wallet to make a Gesture"
+    },
+    "message": {
+      "add": "Add a message"
+    },
+    "finalizeAtClock": "You hold the Last Gesture. Finalize the cycle at the clock."
   },
   "calibration": {
     "defaultTitle": "Calibration Window",
@@ -384,16 +397,16 @@
     "cstTitle": "CST Calibration Window",
     "cstSubtitle": "CST cost descends through this dynamic window. ETH gestures shorten it by about {decreasePercent}%; CST gestures lengthen it by about {increasePercent}%.",
     "cstEndedMessage": "Calibration Window ended — you can gesture for free.",
-    "dynamicDuration": "Dynamic Duration",
+    "dynamicDuration": "Dynamic duration",
     "progressLabel": "Progress",
     "percentComplete": "{percent} complete",
     "progressAria": "{title} progress",
-    "durationLabel": "Calibration Window Duration",
+    "durationLabel": "Calibration Window duration",
     "elapsedLabel": "Elapsed",
     "remainingLabel": "Remaining"
   },
   "allocation": {
-    "title": "Allocation Breakdown",
+    "title": "Allocation breakdown",
     "titleTooltip": "Allocations distributed when the cycle finalizes across more than ten tracks.",
     "recipientCount": "{count, plural, one {# recipient} other {# recipients}}",
     "amounts": {
@@ -513,8 +526,8 @@
       "cycleFinalized": "Cycle #{number} finalized. The allocation recipients are now settled."
     },
     "pending": {
-      "aria": "Your message, confirming on-chain",
-      "label": "Confirming"
+      "aria": "Your message, confirmed on-chain and indexing",
+      "label": "Indexing"
     },
     "eventCount": "{count, plural, =0 {No events yet} one {# event} other {# events}}"
   },
@@ -567,10 +580,10 @@
       "cstFree": "CST gestures are free right now"
     },
     "personal": {
-      "title": "Your position",
-      "leader": "You hold the latest Gesture",
+      "title": "Your cycle standing",
+      "leader": "You hold the Last Gesture",
       "heldFor": "held {duration}",
-      "notLeader": "You are not the latest participant",
+      "notLeader": "Another participant holds the Last Gesture",
       "enduranceIn": "Endurance record in {duration}",
       "extending": "Extending the Endurance record now",
       "gestures": "{count, plural, =0 {No gestures this cycle yet} one {# gesture this cycle} other {# gestures this cycle}}",
@@ -602,15 +615,27 @@
       "reserveLabel": "Signature Allocation",
       "reserveExtras": "+ 1,000 CST · 1 Cosmic Signature NFT · attached assets",
       "reserveUsd": "≈ {amount} USD",
-      "notifyAria": "Notify me before the cycle can finalize",
-      "notifyLabel": "Alert me before finalization:",
-      "notifyMinutes": "{minutes}m",
       "calendarTitle": "Cosmic Signature Cycle #{number} opens",
       "calendarBody": "The next Performance Cycle opens for Gestures. The first Gesture starts the finalization clock.",
-      "calendarCta": "Add the opening to your calendar"
+      "calendarCta": "Add the opening to your calendar",
+      "units": {
+        "days": "{count, plural, one {day} other {days}}",
+        "hours": "{count, plural, one {hour} other {hours}}",
+        "minutes": "{count, plural, one {minute} other {minutes}}",
+        "seconds": "{count, plural, one {second} other {seconds}}"
+      },
+      "state": {
+        "ready": "Ready to finalize",
+        "confirming": "Confirming"
+      },
+      "finalize": {
+        "exclusiveFor": "Only you can finalize for",
+        "openIn": "Anyone can finalize in",
+        "openNow": "Anyone can finalize now"
+      }
     },
     "standings": {
-      "title": "Live Standings",
+      "title": "Live standings",
       "tooltip": "Who holds each competitive track of this cycle right now. Timers run live; standings lock in only when the cycle finalizes.",
       "youBadge": "You",
       "latestName": "Latest Gesture",
@@ -642,23 +667,69 @@
       "tooltip": "Live view of every allocation track in the current Performance Cycle. Amounts grow with the reserve and distribute when the cycle finalizes.",
       "fullBreakdown": "View the full breakdown",
       "stellarStatus": "every Gesture is an entry",
-      "nextCycleName": "Next Cycle Seed",
+      "nextCycleName": "Next cycle seed",
       "nextCycleTooltip": "This share is not distributed at finalization — it stays in the reserve and seeds the next Performance Cycle.",
       "nextCycleDetail": "compounds forward",
       "percentOfReserve": "{percent}% of reserve"
     },
     "dock": {
       "aria": "Cycle quick actions",
-      "reserve": "Reserve",
       "openPanelAria": "Open the gesture panel"
     },
     "panel": {
       "microcopy": "Each gesture extends the finalization clock, may imprint Participation CST, and adds a Stellar Selection entry.",
       "sheetTitle": "Make a Gesture"
+    },
+    "ledger": {
+      "columns": {
+        "holder": "Holder",
+        "time": "Time held",
+        "allocation": "Allocation"
+      },
+      "passesIn": "Passes the Endurance record in {duration}",
+      "extendsIn": "Extends the Endurance record in {duration}",
+      "chronoMayClose": "Stops growing in {duration} if the current hold continues",
+      "finalCstNote": "Changes only with a CST Gesture",
+      "position": "Gesture position",
+      "challenge": {
+        "title": "Current Endurance hold",
+        "held": "Held",
+        "record": "Chrono record",
+        "passesIn": "Passes it in",
+        "extendsIn": "Extends it in"
+      },
+      "paid": "Paid",
+      "received": "Received"
+    },
+    "standing": {
+      "title": "Your cycle standing",
+      "position": "Position",
+      "positionLatest": "You hold the Last Gesture",
+      "positionOther": "Another participant holds the Last Gesture",
+      "positionNone": "No Gesture from you this cycle",
+      "positionTaken": "Your place was taken",
+      "takenBy": "Taken by",
+      "dismiss": "Dismiss",
+      "positionExclusive": "Only you can finalize",
+      "positionWindowEnded": "Your exclusive window ended",
+      "goToFinalize": "Go to finalize",
+      "thisCycle": "This cycle",
+      "gestures": "{count, plural, =0 {No Gestures yet} one {# of {total} Gestures} other {# of {total} Gestures}}",
+      "share": "{percent} of Stellar Selection entries",
+      "updating": "Updating after your Gesture",
+      "checkFailed": "Could not check",
+      "retry": "Retry",
+      "waiting": "Waiting to retrieve",
+      "waitingNothing": "Nothing",
+      "waitingNfts": "{count, plural, one {# NFT} other {# NFTs}}",
+      "retrieveHint": "Retrieve it on My Allocations",
+      "connectBody": "Connect a wallet to see where you stand, how many of this cycle's Gestures are yours and anything waiting to retrieve.",
+      "spent": "You spent this cycle",
+      "landed": "Your Gesture landed. You hold the Last Gesture."
     }
   },
   "cycleDetails": {
-    "title": "View Full Cycle Details",
+    "title": "View full cycle details",
     "subtitle": "Gesture history, leaderboards, contributions, and allocation distribution"
   },
   "publicGoods": {

@@ -12,7 +12,8 @@ import {
   getServerRenderTimeMs,
 } from '@/services/api/server';
 import { createMetadata } from '@/utils/seo';
-import { formatFixed } from '@/utils/format';
+import { formatAmount } from '@/utils/format';
+import { toFiniteNumber } from '@/utils/finiteNumber';
 import { JsonLd, jsonLdInLanguage, liveCycleJsonLd, visualArtworkJsonLd } from '@/utils/jsonLd';
 import type { CSTTokenInfo, DashboardInfo, GestureInfo, SpecialRecipients } from '@/services/api';
 import { PageMessages } from '@/components/i18n/PageMessages';
@@ -70,10 +71,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   // regeneration instead of the two separate axios calls this route made
   // per request historically.
   const dashboard = await getDashboardInfoSeed();
-  const reserve = dashboard?.PrizeAmountEth ?? dashboard?.CurPrizeAmountEth ?? null;
+  // The copy names the Cycle Reserve, which is the contract's balance (the
+  // base of every allocation track, lib/allocationTracks) — not the
+  // Signature Allocation, one quarter of it.
+  const reserve = toFiniteNumber(dashboard?.CosmicGameBalanceEth);
   const description =
-    reserve != null
-      ? t('home.descriptionWithReserve', { reserve: `${formatFixed(reserve, 4)} ETH` })
+    reserve != null && reserve > 0
+      ? t('home.descriptionWithReserve', {
+          reserve: formatAmount(reserve, { unit: 'ETH', locale, context: 'card' }),
+        })
       : t('home.description');
   return createMetadata(t('home.title'), description, undefined, '/', { locale });
 }
@@ -103,7 +109,9 @@ export default async function Page({ params }: PageProps) {
   // client rendering during prerender should fail the build loudly here,
   // not silently swap the page for an empty fallback.
   return (
-    <PageMessages namespaces={['currentCycle', 'detail', 'home', 'statistics', 'tables']}>
+    <PageMessages
+      namespaces={['currentCycle', 'detail', 'glossary', 'home', 'statistics', 'tables']}
+    >
       {/* Structured data for the running cycle, from the same ISR seed as the
           page itself (no request-state reads; ±15s staleness is fine). */}
       {liveCycleStartTs > 0 && (

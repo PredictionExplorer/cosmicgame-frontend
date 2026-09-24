@@ -1,72 +1,103 @@
 'use client';
 
+import { useId, type ReactNode } from 'react';
 import type { CountdownRenderProps } from 'react-countdown';
-import { ArrowUpRight, Clock3 } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { SmoothCountdown } from '@/components/common/SmoothCountdown';
 import { Amount } from '@/components/ui/amount';
 import { Button } from '@/components/ui/button';
 import { Duration } from '@/components/ui/duration';
+import type { PositionMoment } from '@/hooks/usePositionMoment';
+import { useTxStageLabel, type TxStage } from '@/hooks/useTxFlow';
+import { SignatureAllocationIcon } from '@/lib/conceptIcons';
 import { getCycleState } from '@/lib/cycleState';
 import { cn } from '@/lib/utils';
 import type { DashboardInfo } from '@/services/api';
+import { sameAddress } from '@/utils/format';
+import { toFiniteNumber } from '@/utils/finiteNumber';
 
-import { viewForPhase } from './phaseView';
+import type { GestureSubmitParts } from './gestureSubmitLabel';
+import { PHASE_TEXT_CLASS, viewForPhase } from './phaseView';
 
 export interface ActionDockProps {
-  /** True once the observatory stage scrolled out of view (desktop gate). */
-  stageOutOfView: boolean;
+  /**
+   * The in-page gesture form (or, from tablets up, the whole desk) is on
+   * screen. The dock then steps aside and leaves the tab order, so it never
+   * covers the form or duplicates it.
+   */
+  stepAside: boolean;
   data: DashboardInfo | null;
   loading: boolean;
   allocationTime: number;
   activationTime: number;
   now: number;
   finalizationConfirmed?: boolean;
-  /** Live-priced label of the currently selected method. */
-  submitLabel: string;
+  /** The selected method's live-priced label, as verb and price. */
+  submit: GestureSubmitParts;
+  isGesturing: boolean;
+  txStage: TxStage;
+  account?: string | null;
+  /** True once the deadline passed, on-chain state confirms it, and the cycle can close. */
+  canClaim: boolean;
+  isClaiming: boolean;
+  /** Timestamp (ms) after which any wallet may finalize. */
+  claimWait: number;
+  onFinalize: () => void;
+  /** The connected wallet's latest change of position. */
+  moment?: PositionMoment | null;
   /** Phones: open the bottom sheet hosting the gesture panel. */
   onOpenSheet: () => void;
-  /** Desktop: scroll back to the one gesture panel. */
+  /** Tablets and up: scroll back to the one gesture panel. */
   onJumpToPanel: () => void;
   className?: string;
 }
 
-/**
- * "6d 22:23:44" with the locale's day unit, joined by a no-break space so the
- * dock timer never stacks the days above the clock.
- */
-function renderCompactCountdown({ days, hours, minutes, seconds }: CountdownRenderProps) {
+function renderDockClock({ total }: CountdownRenderProps) {
   return (
     <Duration
-      seconds={days * 86_400 + hours * 3_600 + minutes * 60 + seconds}
+      seconds={Math.ceil(total / 1000)}
       variant="clock"
-      className="whitespace-nowrap font-mono text-sm font-semibold"
+      className="type-figure-sm text-foreground"
     />
   );
 }
 
 /**
- * The one persistent quick-action surface. It never submits a gesture itself
- * — it routes to the single gesture panel (bottom sheet on phones, scroll on
- * desktop), so the price shown and the price paid always come from the same
- * place. Phones see it whenever the cycle is active; desktop only once the
- * stage has scrolled away.
+ * The one persistent quick action: a single glass line with the clock, the
+ * Signature Allocation (or the wallet's own position when it changes) and one
+ * commit button. It never submits a gesture itself: on phones it opens the
+ * bottom sheet with the gesture panel, from tablets up it returns to the
+ * panel, so the price shown and the price paid come from the same place. It
+ * shows the live transaction stage while a Gesture is in flight, and at zero
+ * it turns into Finalize for whoever may finalize. While the in-page form is
+ * on screen the dock steps aside, so it never covers it.
  */
 export function ActionDock({
-  stageOutOfView,
+  stepAside,
   data,
   loading,
   allocationTime,
   activationTime,
   now,
   finalizationConfirmed,
-  submitLabel,
+  submit,
+  isGesturing,
+  txStage,
+  account = null,
+  canClaim,
+  isClaiming,
+  claimWait,
+  onFinalize,
+  moment = null,
   onOpenSheet,
   onJumpToPanel,
   className,
 }: ActionDockProps) {
   const t = useTranslations('home');
+  const stageLabel = useTxStageLabel();
+  const describedById = useId();
 
   const cycleState = getCycleState({
     data,
@@ -83,93 +114,128 @@ export function ActionDock({
     : allocationTime;
   const isRoundActive =
     cycleState.isGestureOpen || cycleState.isReadyToFinalize || cycleState.isConfirmingFinalization;
-  const reserveEth = data?.PrizeAmountEth ?? data?.CurPrizeAmountEth ?? 0;
+  const reserveEth = toFiniteNumber(data?.PrizeAmountEth ?? data?.CurPrizeAmountEth);
+  const isHolder = sameAddress(account, data?.LastBidderAddr);
 
   if (loading || !isRoundActive) return null;
 
-  const clock = (
-    <span className="flex min-w-0 items-center gap-2">
-      <Clock3 className={cn('h-4 w-4 shrink-0', view.iconClass)} aria-hidden />
-      {showCountdown ? (
-        <SmoothCountdown
-          date={targetMs}
-          initialNowMs={now}
-          renderer={renderCompactCountdown}
-          intervalMs={1000}
-        />
-      ) : (
-        <span className="truncate text-sm font-semibold">
-          {t(`chrono.phase.${view.messageKey}.label`)}
+  const finalizeMode =
+    cycleState.isReadyToFinalize && !!account && canClaim && (isHolder || claimWait <= now);
+  const hidden = stepAside;
+
+  // The line under the clock: the wallet's own moment when there is one,
+  // otherwise what the cycle is for.
+  let status: ReactNode;
+  if (moment?.kind === 'taken' && !isHolder) {
+    status = (
+      <span className={PHASE_TEXT_CLASS.attention}>{t('observatory.standing.positionTaken')}</span>
+    );
+  } else if (isHolder) {
+    status = (
+      <span className={PHASE_TEXT_CLASS.positive}>{t('observatory.standing.positionLatest')}</span>
+    );
+  } else {
+    status = (
+      <span className="inline-flex min-w-0 items-center gap-1.5">
+        <SignatureAllocationIcon className="size-3.5 shrink-0 text-subtle" aria-hidden />
+        <span className="sr-only min-[25rem]:not-sr-only">
+          {t('observatory.clock.reserveLabel')}
         </span>
-      )}
+        {reserveEth != null && (
+          <Amount value={reserveEth} unit="ETH" context="card" className="text-foreground" />
+        )}
+      </span>
+    );
+  }
+
+  const busy = isGesturing ? stageLabel(txStage) : null;
+  const gestureLabel = busy ?? (
+    <span className="flex min-w-0 flex-col items-center leading-tight">
+      <span className="text-sm font-semibold">{submit.action}</span>{' '}
+      {submit.cost && <span className="text-xs font-medium tabular-nums">{submit.cost}</span>}
     </span>
   );
 
   return (
-    <div className={cn('print:hidden', className)}>
-      {/* Phones: the dock is the permanent bridge to the gesture panel. */}
-      <div data-action-dock className="fixed inset-x-3 bottom-3 z-40 lg:hidden">
-        <section
-          aria-label={t('observatory.dock.aria')}
-          data-testid="action-dock-mobile"
-          className="flex items-center justify-between gap-3 rounded-2xl border border-white/[0.12] bg-card/95 px-3.5 py-2.5 shadow-[var(--elevation-3)] backdrop-blur-xl"
-        >
-          {/* A countdown is never squeezed (min-w-min: the column is at least as
-              wide as the no-wrap timer); a phase label gives way to the CTA and
-              truncates (min-w-0). Either way the reserve line wraps between
-              its label and the amount, never inside the amount. */}
-          <span className={cn('flex flex-col', showCountdown ? 'min-w-min' : 'min-w-0')}>
-            {clock}
-            <span className="mt-0.5 break-words text-[11px] leading-tight text-muted-foreground">
-              {t('observatory.dock.reserve')}{' '}
-              <Amount value={reserveEth} unit="ETH" className="font-semibold text-secondary" />
+    <div
+      data-action-dock
+      className={cn(
+        'fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 md:inset-x-0 md:bottom-4 md:px-4 print:hidden',
+        'transition-[transform,opacity] duration-[var(--duration-base)] ease-[var(--ease-out-expo)] motion-reduce:transition-none',
+        hidden && 'pointer-events-none translate-y-[calc(100%+1.5rem)] opacity-0',
+        className,
+      )}
+      aria-hidden={hidden || undefined}
+      inert={hidden || undefined}
+    >
+      <section
+        aria-label={t('observatory.dock.aria')}
+        data-testid="action-dock"
+        data-phase={cycleState.phase}
+        className="glass mx-auto flex min-h-16 max-w-2xl items-center justify-between gap-3 rounded-surface border border-rule px-3.5 py-2 shadow-float md:px-4"
+      >
+        <div data-testid="action-dock-status" className="flex min-w-0 flex-col gap-0.5">
+          {showCountdown ? (
+            <span role="timer" aria-live="off" className="whitespace-nowrap">
+              <SmoothCountdown
+                date={targetMs}
+                initialNowMs={now}
+                renderer={renderDockClock}
+                intervalMs={1000}
+              />
             </span>
-          </span>
-          {/* min-w-0 + whitespace-normal: RandomWalk labels carry a token id
-              and can outgrow a 320px viewport — wrap inside the pill instead
-              of forcing the dock wider than the screen. */}
+          ) : (
+            <span
+              className={cn(
+                'type-label min-w-0 break-words',
+                PHASE_TEXT_CLASS[view.tone] ?? 'text-foreground',
+              )}
+            >
+              {t(`chrono.phase.${view.messageKey}.label`)}
+            </span>
+          )}
+          <span className="type-caption min-w-0">{status}</span>
+        </div>
+
+        {finalizeMode ? (
           <Button
             variant="commit"
-            size="lg"
-            data-testid="dock-open-sheet"
-            onClick={onOpenSheet}
-            aria-label={t('observatory.dock.openPanelAria')}
-            className="h-auto min-h-11 min-w-0 rounded-full border-0 px-4 py-1.5 text-sm font-semibold leading-tight text-primary-foreground whitespace-normal"
+            data-testid="dock-finalize"
+            onClick={onFinalize}
+            loading={isClaiming}
+            className="min-h-12 shrink-0 px-4"
           >
-            {submitLabel}
+            {t('form.finalize')}
+            <ArrowRight aria-hidden />
           </Button>
-        </section>
-      </div>
-
-      {/* Desktop: appears only after the stage scrolls away. A plain div,
-          not a landmark — the phone dock already owns the labeled landmark,
-          and only one of the two is ever displayed per viewport. */}
-      {stageOutOfView && (
-        <div className="fixed inset-x-0 bottom-4 z-30 hidden px-4 lg:block motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-300">
-          <div
-            data-testid="action-dock-desktop"
-            className="mx-auto flex max-w-3xl items-center justify-between gap-4 rounded-full border border-white/[0.12] bg-card/95 px-5 py-2 shadow-[var(--elevation-3)] backdrop-blur-xl"
-          >
-            {clock}
-            <span className="flex min-w-0 items-center gap-2">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                {t('observatory.dock.reserve')}
-              </span>
-              <Amount value={reserveEth} unit="ETH" className="text-sm font-bold text-secondary" />
-            </span>
+        ) : (
+          <>
             <Button
               variant="commit"
-              size="sm"
+              data-testid="dock-open-sheet"
+              onClick={onOpenSheet}
+              loading={isGesturing}
+              aria-describedby={describedById}
+              className="h-auto min-h-12 min-w-0 shrink px-4 py-1.5 whitespace-normal md:hidden"
+            >
+              {gestureLabel}
+            </Button>
+            <Button
+              variant="commit"
               data-testid="dock-jump-to-panel"
               onClick={onJumpToPanel}
-              className="h-9 shrink-0 rounded-full border-0 px-4 text-xs font-semibold text-primary-foreground"
+              loading={isGesturing}
+              aria-describedby={describedById}
+              className="hidden h-auto min-h-12 min-w-0 shrink px-5 py-1.5 whitespace-normal md:inline-flex"
             >
-              {submitLabel}
-              <ArrowUpRight className="ml-1 h-3.5 w-3.5" aria-hidden />
+              {gestureLabel}
             </Button>
-          </div>
-        </div>
-      )}
+            <span id={describedById} className="sr-only">
+              {t('observatory.dock.openPanelAria')}
+            </span>
+          </>
+        )}
+      </section>
     </div>
   );
 }

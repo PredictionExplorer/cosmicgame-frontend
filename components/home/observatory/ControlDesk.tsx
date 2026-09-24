@@ -2,28 +2,36 @@
 
 import type { ReactNode } from 'react';
 import { forwardRef } from 'react';
-import { ChevronDown, Layers3 } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
+import { AllocationIcon } from '@/lib/conceptIcons';
 import { cn } from '@/lib/utils';
 
 export interface ControlDeskProps {
   header: ReactNode;
   clock: ReactNode;
   calibration?: ReactNode;
-  orientation?: ReactNode;
-  latestParticipant: ReactNode;
-  chronoEndurance: ReactNode;
+  standings: ReactNode;
   gestureConsole?: ReactNode;
-  personal?: ReactNode;
+  orientation?: ReactNode;
   allocationLedger: ReactNode;
   className?: string;
 }
 
-/** Cycle context comes first; the full-width action workspace follows it.
- * Keeping the variable-height form out of a side rail prevents an expanded
- * editor or attachment picker from leaving a blank column beside the overview.
- * Content stays in reading order and grows naturally at narrow/zoomed sizes.
+/** One region frame: a hairline on a faint surface, the only bordered level of its region. */
+const FRAME = 'rounded-surface border border-rule-faint bg-surface/60';
+
+/**
+ * The decision desk.
+ *
+ * From 1024px: row 1 is the Cycle column (clock, Signature Allocation and
+ * Calibration Window; 5 of 12) beside the Standings Ledger (7 of 12); row 2
+ * is the gesture form, full width, on the page's one quiet surface. From 768
+ * to 1023px it is one column in the same order, so a tablet never splits into
+ * cramped columns. On phones the form moves up under the clock, where a
+ * thumb reaches it first, and the standings and the Calibration Window follow.
+ * The frames are the only bordered level; inside them, space and hairlines.
  */
 export const ControlDesk = forwardRef<HTMLDivElement, ControlDeskProps>(
   (
@@ -31,11 +39,9 @@ export const ControlDesk = forwardRef<HTMLDivElement, ControlDeskProps>(
       header,
       clock,
       calibration,
-      orientation,
-      latestParticipant,
-      chronoEndurance,
+      standings,
       gestureConsole,
-      personal,
+      orientation,
       allocationLedger,
       className,
     },
@@ -43,87 +49,81 @@ export const ControlDesk = forwardRef<HTMLDivElement, ControlDeskProps>(
   ) => {
     const t = useTranslations('home');
     return (
-      <div data-testid="control-desk" className={cn('min-w-0 space-y-4', className)}>
+      <div data-testid="control-desk" className={cn('min-w-0', className)}>
         <div id="deck" ref={ref} className="scroll-mt-24">
-          <div data-testid="control-desk-header" className="pb-3">
-            {header}
-          </div>
-          <div data-testid="control-desk-grid" className="@container/desk grid min-w-0 gap-3">
+          <div data-testid="control-desk-header">{header}</div>
+          <div
+            data-testid="control-desk-grid"
+            className="mt-5 grid min-w-0 gap-4 md:gap-5 lg:mt-4 lg:grid-cols-12 lg:gap-5"
+          >
+            {/* The Cycle column. Below 1024px it dissolves (display: contents)
+                so its two parts can take their own places in the page order. */}
             <div
-              data-testid="control-desk-overview"
-              className="grid min-w-0 items-start gap-3 @min-[48rem]/desk:grid-cols-[minmax(0,0.85fr)_minmax(0,1.35fr)]"
+              data-testid="control-desk-cycle"
+              className="contents lg:col-span-5 lg:flex lg:flex-col lg:rounded-surface lg:border lg:border-rule-faint lg:bg-surface/60 lg:p-5 xl:p-6"
             >
-              <div className="grid min-w-0 gap-3">
-                <div
-                  data-testid="control-desk-clock"
-                  className="min-w-0 rounded-2xl border border-primary/15 bg-card"
-                >
-                  {clock}
-                </div>
-                {calibration && (
-                  <div data-testid="control-desk-calibration" className="min-w-0">
-                    {calibration}
-                  </div>
+              <div
+                data-testid="control-desk-clock"
+                className={cn(
+                  'min-w-0 p-5 max-md:order-1 sm:p-6 lg:border-0 lg:bg-transparent lg:p-0',
+                  FRAME,
+                  'lg:rounded-none',
                 )}
+              >
+                {clock}
               </div>
-              <div className="grid min-w-0 gap-3">
+              {calibration && (
                 <div
-                  data-testid="control-desk-latest"
-                  className="min-w-0 rounded-2xl border border-emerald-300/15 bg-card"
+                  data-testid="control-desk-calibration"
+                  className={cn(
+                    'min-w-0 p-5 max-md:order-4 sm:p-6 lg:mt-4 lg:border-0 lg:border-t lg:border-rule-faint lg:bg-transparent lg:px-0 lg:pb-0 lg:pt-4',
+                    FRAME,
+                    'lg:rounded-none',
+                  )}
                 >
-                  {latestParticipant}
+                  {calibration}
                 </div>
-                <div
-                  data-testid="control-desk-chrono"
-                  className="min-w-0 rounded-2xl border border-violet-300/15 bg-card"
-                >
-                  {chronoEndurance}
-                </div>
-              </div>
+              )}
+            </div>
+            <div
+              data-testid="control-desk-standings"
+              className={cn('min-w-0 p-5 max-md:order-3 sm:p-6 lg:col-span-7 lg:p-5 xl:p-6', FRAME)}
+            >
+              {standings}
             </div>
             {gestureConsole && (
               <div
                 data-testid="control-desk-gesture"
-                className="min-w-0 rounded-2xl border border-primary/20 bg-card"
+                className="min-w-0 rounded-surface bg-surface p-5 max-md:order-2 sm:p-6 lg:col-span-12 lg:px-8 lg:pb-8 lg:pt-5"
               >
                 {gestureConsole}
               </div>
             )}
           </div>
         </div>
-        {personal && (
-          <div
-            data-testid="control-desk-personal"
-            className="rounded-xl border border-white/10 bg-white/[0.02]"
-          >
-            {personal}
-          </div>
-        )}
         {orientation}
-        <div className="rounded-2xl border border-white/10 bg-card">
-          <details
-            id="allocation-breakdown"
-            data-testid="allocations-disclosure"
-            className="group/allocations scroll-mt-24"
-          >
-            <summary className="flex min-h-20 cursor-pointer list-none items-center gap-4 px-5 py-4 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary [&::-webkit-details-marker]:hidden sm:px-6">
-              <Layers3 className="h-5 w-5 shrink-0 text-primary" aria-hidden />
-              <span className="min-w-0 flex-1">
-                <span className="block text-base font-semibold text-foreground">
-                  {t('orientation.allocationsTitle')}
-                </span>
-                <span className="mt-1 block text-sm text-muted-foreground">
-                  {t('orientation.allocationsDescription')}
-                </span>
+        <details
+          id="allocation-breakdown"
+          data-testid="allocations-disclosure"
+          className={cn('group/allocations mt-6 scroll-mt-24', FRAME)}
+        >
+          <summary className="flex min-h-16 cursor-pointer list-none items-center gap-4 px-5 py-4 sm:px-6 [&::-webkit-details-marker]:hidden">
+            <AllocationIcon className="size-5 shrink-0 text-subtle" aria-hidden />
+            <span className="min-w-0 flex-1">
+              <span className="type-title block text-foreground">
+                {t('orientation.allocationsTitle')}
               </span>
-              <ChevronDown
-                className="h-5 w-5 shrink-0 text-muted-foreground transition-transform motion-reduce:transition-none group-open/allocations:rotate-180"
-                aria-hidden
-              />
-            </summary>
-            <div className="border-t border-white/10">{allocationLedger}</div>
-          </details>
-        </div>
+              <span className="type-body-sm mt-0.5 block text-muted-foreground">
+                {t('orientation.allocationsDescription')}
+              </span>
+            </span>
+            <ChevronDown
+              className="size-5 shrink-0 text-subtle transition-transform duration-[var(--duration-base)] group-open/allocations:rotate-180 motion-reduce:transition-none"
+              aria-hidden
+            />
+          </summary>
+          <div className="border-t border-rule-faint">{allocationLedger}</div>
+        </details>
       </div>
     );
   },

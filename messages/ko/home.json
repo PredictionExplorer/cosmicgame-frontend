@@ -252,12 +252,12 @@
       "title": "내 사이클 현황",
       "tooltip": "이번 사이클에서 남긴 제스처를 기준으로, 지금 최종 제스처 자리에 있는지와 별빛 선정 자격 수를 보여 줍니다.",
       "leader": {
-        "base": "최근 제스처를 남겼습니다. 다른 참여자가 제스처를 남기지 않으면 시그니처 배분({amount} ETH, 1,000 CST, Cosmic Signature NFT 1개)을 받습니다.",
-        "withNft": "최근 제스처를 남겼습니다. 다른 참여자가 제스처를 남기지 않으면 시그니처 배분({amount} ETH, 1,000 CST, Cosmic Signature NFT 1개, 그리고 아래에 표시된 {nftCount, plural, other {첨부 NFT #개}})을 받습니다.",
-        "withErc20": "최근 제스처를 남겼습니다. 다른 참여자가 제스처를 남기지 않으면 시그니처 배분({amount} ETH, 1,000 CST, Cosmic Signature NFT 1개, 그리고 아래에 표시된 {erc20Count, plural, other {첨부 ERC20 토큰 적립 #건}})을 받습니다.",
-        "withBoth": "최근 제스처를 남겼습니다. 다른 참여자가 제스처를 남기지 않으면 시그니처 배분({amount} ETH, 1,000 CST, Cosmic Signature NFT 1개, 그리고 아래에 표시된 {nftCount, plural, other {첨부 NFT #개}} 및 {erc20Count, plural, other {첨부 ERC20 토큰 적립 #건}})을 받습니다."
+        "base": "최근 제스처를 남겼습니다. 시계가 0이 되기 전에 다른 참여자가 제스처를 남기지 않으면 사이클을 마감하고 시그니처 배분({amount} ETH, 1,000 CST, Cosmic Signature NFT 1개)을 받을 수 있습니다.",
+        "withNft": "최근 제스처를 남겼습니다. 시계가 0이 되기 전에 다른 참여자가 제스처를 남기지 않으면 사이클을 마감하고 시그니처 배분({amount} ETH, 1,000 CST, Cosmic Signature NFT 1개, 그리고 아래에 표시된 {nftCount, plural, other {첨부 NFT #개}})을 받을 수 있습니다.",
+        "withErc20": "최근 제스처를 남겼습니다. 시계가 0이 되기 전에 다른 참여자가 제스처를 남기지 않으면 사이클을 마감하고 시그니처 배분({amount} ETH, 1,000 CST, Cosmic Signature NFT 1개, 그리고 아래에 표시된 {erc20Count, plural, other {첨부 ERC20 토큰 적립 #건}})을 받을 수 있습니다.",
+        "withBoth": "최근 제스처를 남겼습니다. 시계가 0이 되기 전에 다른 참여자가 제스처를 남기지 않으면 사이클을 마감하고 시그니처 배분({amount} ETH, 1,000 CST, Cosmic Signature NFT 1개, 그리고 아래에 표시된 {nftCount, plural, other {첨부 NFT #개}} 및 {erc20Count, plural, other {첨부 ERC20 토큰 적립 #건}})을 받을 수 있습니다."
       },
-      "notLeader": "최근 참여자가 아닙니다. 다시 제스처를 남겨 선두에 서거나, 별빛 선정 자격을 그대로 유지할 수 있습니다.",
+      "notLeader": "다른 참여자가 최근 제스처를 보유 중입니다. 이전 제스처는 별빛 선정에 계속 포함됩니다.",
       "ethStellar": "ETH 별빛 선정",
       "nftStellar": "NFT 별빛 선정"
     },
@@ -291,8 +291,8 @@
         "desc": "ETH로 지불"
       },
       "randomWalk": {
-        "label": "ETH + RWLK",
-        "desc": "50% 할인"
+        "label": "ETH + Random Walk",
+        "desc": "ETH + Random Walk는 ETH 비용을 절반으로 줄이며, 사용하지 않은 Random Walk NFT가 필요합니다."
       },
       "cst": {
         "label": "CST",
@@ -321,7 +321,8 @@
       "minAcceptedTooltipAny": "‘모든 참여 CST 허용’을 선택하면 최소 수량이 0으로 설정됩니다. 참여 CST가 0이어도 제스처 트랜잭션을 실행할 수 있습니다.",
       "netPositive": "이 제스처가 반영되면 각인되는 CST가 비용보다 많습니다.",
       "netNegative": "대부분의 CST 제스처는 받는 CST보다 더 많은 CST를 씁니다.",
-      "durationMismatch": "API 보고값({apiDuration})과 달라 온체인 지속 시간({contractDuration})을 사용합니다."
+      "durationMismatch": "API 보고값({apiDuration})과 달라 온체인 지속 시간({contractDuration})을 사용합니다.",
+      "minAcceptedLabel": "최소 허용 수량"
     },
     "preview": "실시간 제스처 옵션을 여기에서 미리 볼 수 있습니다. 지갑을 연결하면 메시지를 쓰고, 자산을 첨부하고, Arbitrum에 제스처를 제출할 수 있습니다.",
     "advanced": {
@@ -354,7 +355,9 @@
         "raiseBy": "인상 폭",
         "approxCost": "≈ {amount} ETH",
         "note": "같은 블록에서 다른 제스처가 먼저 처리되어도 제스처가 성공하도록 보내는 금액에 여유분 {percent}%를 더합니다. 컨트랙트는 현재 제스처 비용만 받고 나머지는 같은 트랜잭션에서 돌려줍니다. 다만 차액이 가스비보다 작으면 돌려주지 않습니다."
-      }
+      },
+      "attachLabel": "자산 첨부",
+      "attachNone": "첨부 안 함"
     },
     "submit": {
       "eth": "ETH로 제스처 남기기 ({cost} ETH)",
@@ -363,7 +366,12 @@
       "cst": "CST로 제스처 남기기 ({cost} CST)",
       "cstFree": "CST로 제스처 남기기 (비용 없음)",
       "generic": "{method} 제스처 남기기",
-      "sendsNote": "충돌 방지 여유분 {percent}%를 포함해 약 {amount} ETH를 보냅니다."
+      "sendsNote": "충돌 방지 여유분 {percent}%를 포함해 약 {amount} ETH를 보냅니다.",
+      "action": {
+        "eth": "ETH로 제스처 남기기",
+        "randomWalk": "ETH + Random Walk로 제스처 남기기",
+        "cst": "CST로 제스처 남기기"
+      }
     },
     "processing": "처리 중…",
     "finalGestureMade": "현재 가장 최근 제스처를 남긴 지갑입니다. 카운트다운이 0이 되면 아래의 ‘사이클 마감’에서 진행할 수 있습니다.",
@@ -372,8 +380,13 @@
     "finalizeWaitNote": "최종 제스처를 남긴 참여자가 사이클을 마감할 때까지 기다려 주세요.",
     "connect": {
       "title": "지갑 연결 후 제스처 남기기",
-      "body": "위의 실시간 제스처 방식과 비용을 확인한 뒤, MetaMask 또는 다른 지갑을 연결해 Arbitrum에 제출할 수 있습니다."
-    }
+      "body": "위의 실시간 제스처 방식과 비용을 확인한 뒤, MetaMask 또는 다른 지갑을 연결해 Arbitrum에 제출할 수 있습니다.",
+      "cta": "지갑 연결 후 제스처 남기기"
+    },
+    "message": {
+      "add": "메시지 추가"
+    },
+    "finalizeAtClock": "최근 제스처를 보유 중입니다. 시계 영역에서 사이클을 마감할 수 있습니다."
   },
   "calibration": {
     "defaultTitle": "보정 구간",
@@ -513,8 +526,8 @@
       "cycleFinalized": "사이클 {number} 마감이 완료되었습니다. 배분 수령자가 확정되었습니다."
     },
     "pending": {
-      "aria": "내 메시지, 온체인 확인 중",
-      "label": "확인 중"
+      "aria": "내 메시지, 온체인 확인 완료, 색인 중",
+      "label": "색인 중"
     },
     "eventCount": "{count, plural, =0 {아직 이벤트 없음} other {이벤트 #개}}"
   },
@@ -567,10 +580,10 @@
       "cstFree": "지금은 CST 제스처에 비용이 들지 않습니다"
     },
     "personal": {
-      "title": "내 위치",
-      "leader": "현재 가장 최근 제스처를 남긴 지갑입니다",
+      "title": "내 사이클 현황",
+      "leader": "최근 제스처 보유 중",
       "heldFor": "{duration} 유지",
-      "notLeader": "현재 가장 최근 제스처는 다른 지갑이 남겼습니다",
+      "notLeader": "다른 참여자가 최근 제스처를 보유 중입니다",
       "enduranceIn": "{duration} 뒤 선두 유지 기록 경신",
       "extending": "지금 선두 유지 기록을 늘려 가고 있습니다",
       "gestures": "{count, plural, =0 {이번 사이클에 아직 제스처 없음} other {이번 사이클 제스처 #개}}",
@@ -602,12 +615,24 @@
       "reserveLabel": "시그니처 배분",
       "reserveExtras": "+ 1,000 CST · Cosmic Signature NFT 1개 · 첨부 자산",
       "reserveUsd": "≈ {amount} USD",
-      "notifyAria": "사이클 마감 전에 알림 받기",
-      "notifyLabel": "마감 전 알림:",
-      "notifyMinutes": "{minutes}분",
       "calendarTitle": "Cosmic Signature 사이클 {number} 시작",
       "calendarBody": "다음 퍼포먼스 사이클이 제스처를 받기 시작합니다. 첫 제스처가 마감 카운트다운을 시작합니다.",
-      "calendarCta": "시작 시각을 캘린더에 추가"
+      "calendarCta": "시작 시각을 캘린더에 추가",
+      "units": {
+        "days": "{count, plural, other {일}}",
+        "hours": "{count, plural, other {시간}}",
+        "minutes": "{count, plural, other {분}}",
+        "seconds": "{count, plural, other {초}}"
+      },
+      "state": {
+        "ready": "마감 준비 완료",
+        "confirming": "확인 중"
+      },
+      "finalize": {
+        "exclusiveFor": "단독 마감 남은 시간",
+        "openIn": "누구나 마감 가능까지",
+        "openNow": "이제 누구나 마감할 수 있습니다"
+      }
     },
     "standings": {
       "title": "실시간 현황",
@@ -649,12 +674,58 @@
     },
     "dock": {
       "aria": "사이클 빠른 작업",
-      "reserve": "준비금",
       "openPanelAria": "제스처 패널 열기"
     },
     "panel": {
       "microcopy": "제스처마다 마감 시각이 연장되고 별빛 선정 자격이 기록됩니다. 경과 시간에 따라 참여 CST가 각인될 수도 있습니다.",
       "sheetTitle": "제스처 남기기"
+    },
+    "ledger": {
+      "columns": {
+        "holder": "보유자",
+        "time": "유지 시간",
+        "allocation": "배분"
+      },
+      "passesIn": "{duration} 후 수호 챔피언 기록을 넘어섭니다",
+      "extendsIn": "{duration} 후 수호 챔피언 기록을 연장합니다",
+      "chronoMayClose": "현재 유지가 이어지면 {duration} 후 증가가 멈춥니다",
+      "finalCstNote": "CST 제스처로만 바뀝니다",
+      "position": "제스처 순번",
+      "challenge": {
+        "title": "현재 수호 유지",
+        "held": "유지",
+        "record": "시간의 전사 기록",
+        "passesIn": "넘어서기까지",
+        "extendsIn": "연장까지"
+      },
+      "paid": "지불",
+      "received": "받음"
+    },
+    "standing": {
+      "title": "내 사이클 현황",
+      "position": "위치",
+      "positionLatest": "최근 제스처 보유 중",
+      "positionOther": "다른 참여자가 최근 제스처를 보유 중입니다",
+      "positionNone": "이번 사이클에 남긴 제스처가 없습니다",
+      "positionTaken": "다른 참여자가 자리를 대신했습니다",
+      "takenBy": "대신한 참여자",
+      "dismiss": "닫기",
+      "positionExclusive": "단독으로 마감할 수 있습니다",
+      "positionWindowEnded": "단독 마감 시간이 끝났습니다",
+      "goToFinalize": "마감하러 가기",
+      "thisCycle": "이번 사이클",
+      "gestures": "{count, plural, =0 {아직 제스처 없음} other {{total}개 중 #개}}",
+      "share": "별빛 선정 참여 항목의 {percent}",
+      "updating": "제스처 반영 중",
+      "checkFailed": "확인하지 못했습니다",
+      "retry": "다시 시도",
+      "waiting": "회수 대기",
+      "waitingNothing": "없음",
+      "waitingNfts": "{count, plural, other {NFT #개}}",
+      "retrieveHint": "내 배분에서 회수할 수 있습니다",
+      "connectBody": "지갑을 연결하면 내 위치, 이번 사이클의 내 제스처 수, 회수할 배분을 확인할 수 있습니다.",
+      "spent": "이번 사이클 사용액",
+      "landed": "제스처가 확인되었습니다. 최근 제스처를 보유 중입니다."
     }
   },
   "cycleDetails": {

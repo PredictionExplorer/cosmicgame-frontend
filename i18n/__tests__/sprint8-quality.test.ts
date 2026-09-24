@@ -51,7 +51,7 @@ const zhLongFormTooltips = asMap(
 );
 
 const immutableAccessibleLabel =
-  /^(?:ETH|CST|NFT|RWLK|ERC-20|ERC-721|ETH \+ RWLK|Layer 2|NFT #\{id\}|URL|ID|English|中文|GitHub|Discord|Arbiscan|MetaMask|WalletConnect|Coinbase Wallet|Safe|Uniswap|GeckoTerminal|Axiom Zero|Chaos Zero|X \(Twitter\)|Cosmic Signature(?: NFT)?|Random Walk NFT|Protocol Guild|Arbitrum(?: One)?|Ethereum|[0-9#.:+%/ -]+)$/;
+  /^(?:ETH|CST|NFT|RWLK|ERC-20|ERC-721|ETH \+ RWLK|ETH \+ Random Walk|Layer 2|NFT #\{id\}|URL|ID|English|中文|GitHub|Discord|Arbiscan|MetaMask|WalletConnect|Coinbase Wallet|Safe|Uniswap|GeckoTerminal|Axiom Zero|Chaos Zero|X \(Twitter\)|Cosmic Signature(?: NFT)?|Random Walk NFT|Protocol Guild|Arbitrum(?: One)?|Ethereum|[0-9#.:+%/ -]+)$/;
 
 describe('Sprint 8 catalog quality gates', () => {
   it('keeps every tooltip-family key present and translated', () => {

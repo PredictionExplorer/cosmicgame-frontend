@@ -60,6 +60,22 @@ describe('PulseBar', () => {
     );
   });
 
+  it('never shows a count it does not know', () => {
+    render(<PulseBar {...baseProps} gestureCount={null} />);
+    const count = screen.getByTestId('pulse-gesture-count');
+    expect(count).not.toHaveTextContent(/\d/);
+    expect(count).toHaveTextContent('Loading...');
+  });
+
+  it('says so in the masthead while the wallet holds the Last Gesture', () => {
+    const { rerender } = render(<PulseBar {...baseProps} />);
+    expect(screen.queryByTestId('pulse-you-latest')).not.toBeInTheDocument();
+    rerender(<PulseBar {...baseProps} youHoldLatest />);
+    expect(screen.getByTestId('pulse-you-latest')).toHaveTextContent(
+      'home.observatory.standing.positionLatest',
+    );
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(<PulseBar {...baseProps} />);
     await checkA11y(container);
