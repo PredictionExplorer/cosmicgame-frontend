@@ -1,6 +1,6 @@
 'use client';
 
-import { Fragment, useMemo, type ReactNode } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import { isAddress } from 'viem';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -179,27 +179,37 @@ function groupByRecipient(records: readonly WinningHistoryEntry[]): RecipientGro
   return [...groups.values()].sort((a, b) => b.eth - a.eth || b.cst - a.cst);
 }
 
-/** "11.0616 ETH · 1,000 CST · NFT #24": what a recipient received in the cycle. */
+/**
+ * "11.0616 ETH  1,000 CST  NFT #24": what a recipient received in the cycle.
+ * The items are spaced rather than joined by separators, so a long list
+ * wraps cleanly without a line that starts on a dot.
+ */
 function GroupSummary({ group }: { group: RecipientGroup }) {
-  const parts: ReactNode[] = [];
+  const parts: { key: string; node: ReactNode }[] = [];
   if (group.eth > 0) {
-    parts.push(<Amount value={group.eth} unit="ETH" context="table" unitClassName="text-subtle" />);
+    parts.push({
+      key: 'eth',
+      node: <Amount value={group.eth} unit="ETH" context="table" unitClassName="text-subtle" />,
+    });
   }
   if (group.cst > 0) {
-    parts.push(<Amount value={group.cst} unit="CST" context="card" unitClassName="text-subtle" />);
+    parts.push({
+      key: 'cst',
+      node: <Amount value={group.cst} unit="CST" context="card" unitClassName="text-subtle" />,
+    });
   }
-  for (const record of group.nfts) parts.push(<AllocationAsset record={record} />);
+  for (const record of group.nfts) {
+    parts.push({
+      key: `nft-${record.TokenId}-${record.RecordType}`,
+      node: <AllocationAsset record={record} />,
+    });
+  }
   return (
-    <span className="inline-flex flex-wrap items-baseline justify-end gap-x-2 gap-y-1">
-      {parts.map((part, index) => (
-        <Fragment key={index}>
-          {index > 0 ? (
-            <span aria-hidden className="text-subtle">
-              ·
-            </span>
-          ) : null}
-          <span className="whitespace-nowrap">{part}</span>
-        </Fragment>
+    <span className="inline-flex flex-wrap items-baseline justify-end gap-x-3 gap-y-1">
+      {parts.map((part) => (
+        <span key={part.key} className="whitespace-nowrap">
+          {part.node}
+        </span>
       ))}
     </span>
   );
@@ -380,7 +390,7 @@ export default function RecipientHistoryTable({
         header: t('columns.source'),
         value: (group) => group.sources.length,
         cell: (group) => (
-          <span className="inline-flex flex-wrap gap-1">
+          <span className="inline-flex flex-wrap justify-end gap-1 sm:justify-start">
             {group.sources.map((source) => (
               <TableTag key={source}>{t(`recipientHistory.sources.${source}`)}</TableTag>
             ))}

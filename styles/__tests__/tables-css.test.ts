@@ -87,9 +87,15 @@ describe('styles/tables.css', () => {
 
   it('drops labelled blank lines and secondary columns on phones', () => {
     expect(declaration(phoneRules, `${RECORD} td[data-empty='true']`, 'display')).toBe('none');
-    expect(declaration(phoneRules, ".cs-table td[data-priority='secondary']", 'display')).toBe(
-      'none',
+    expect(
+      declaration(phoneRules, ".cs-table tbody td[data-priority='secondary']", 'display'),
+    ).toBe('none');
+    // It has to outrank the record line that makes every cell a grid.
+    const recordIndex = phoneRules.findIndex((rule) => rule.selector === `${RECORD} tbody td`);
+    const secondaryIndex = phoneRules.findIndex((rule) =>
+      rule.selectors.includes(".cs-table tbody td[data-priority='secondary']"),
     );
+    expect(secondaryIndex).toBeGreaterThan(recordIndex);
   });
 
   it('keeps values at a readable size on phones', () => {

@@ -216,7 +216,8 @@ const BanGestureTable = ({ gestureHistory, ...state }: BanGestureTableProps) => 
         id: 'action',
         kind: 'text',
         header: <span className="sr-only">{t('columns.actions')}</span>,
-        label: t('columns.actions'),
+        // The button names itself; a phone record shows it unlabelled.
+        label: '',
         align: 'end',
         cell: (gesture) => (
           <ModerationAction

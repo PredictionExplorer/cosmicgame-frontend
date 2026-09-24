@@ -119,7 +119,7 @@ export interface DataTableColumn<T> {
   priority?: ColumnPriority;
   /** In a phone record, put the value under its label (long text). */
   stack?: boolean;
-  /** Drop the column when no row has a value, instead of showing an empty column. */
+  /** Drop the column on a page where no row has a value, instead of an empty column. */
   hideWhenEmpty?: boolean;
   /** Overrides the kind's alignment. Rarely right: headers follow it too. */
   align?: ColumnAlign;
@@ -265,6 +265,10 @@ function resolveColumn<T>(column: DataTableColumn<T>): ResolvedColumn<T> {
   };
 }
 
+function hasAnyValue<T>(col: ResolvedColumn<T>, rows: readonly T[]): boolean {
+  return !col.hasValue || rows.some((row) => !isBlankValue(col.valueOf(row)));
+}
+
 const HEADING_CLASS: Record<2 | 3 | 4, string> = {
   2: 'type-section',
   3: 'type-heading-3',
@@ -343,20 +347,16 @@ export function DataTable<T>({
   const wrapperRef = React.useRef<HTMLDivElement>(null);
 
   const resolved = React.useMemo(() => columns.map(resolveColumn), [columns]);
-  const visible = React.useMemo(
-    () =>
-      resolved.filter(
-        (col) =>
-          !col.column.hideWhenEmpty ||
-          !col.hasValue ||
-          data.some((row) => !isBlankValue(col.valueOf(row))),
-      ),
+  // Columns with a value somewhere in the data. The phone layout follows
+  // these, so it never switches between pages.
+  const datasetColumns = React.useMemo(
+    () => resolved.filter((col) => !col.column.hideWhenEmpty || hasAnyValue(col, data)),
     [resolved, data],
   );
 
   const layout: TableLayout =
     layoutProp === 'auto'
-      ? visible.length <= 3 && !visible.some((col) => col.column.stack)
+      ? datasetColumns.length <= 3 && !datasetColumns.some((col) => col.column.stack)
         ? 'compact'
         : 'cards'
       : layoutProp;
@@ -396,6 +396,11 @@ export function DataTable<T>({
   const page = Math.min(Math.max(controlledPage ?? uncontrolledPage, 1), pageCount);
   const pageRows = paginate ? sorted.slice((page - 1) * pageSize, page * pageSize) : sorted;
   const pageOffset = paginate ? (page - 1) * pageSize : 0;
+  // A column that may be empty shows only on pages where some row has it,
+  // so a page of gestures without messages carries no blank Message column.
+  const visible = datasetColumns.filter(
+    (col) => !col.column.hideWhenEmpty || hasAnyValue(col, pageRows),
+  );
 
   const goToPage = (next: number) => {
     setPageState({ page: next, key: resetPageKey, sortKey });
@@ -658,7 +663,9 @@ export function DataTable<T>({
                         })}
                         {renderDetails ? (
                           <ResponsiveTableCell
-                            label={t('details.header')}
+                            // The button names itself; a phone record shows
+                            // it alone at the end of its line, unlabelled.
+                            label=""
                             align="end"
                             nowrap
                             className={cellPadding}

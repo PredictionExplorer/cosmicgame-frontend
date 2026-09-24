@@ -174,33 +174,35 @@
 
   /*
    * A spec-sheet line: the label (the cell's own `data-label`, so it cannot
-   * drift from its column) at the start, the value at the end. The label
-   * takes what it needs up to 60% of the width and wraps beyond that, so a
-   * long Ukrainian or Vietnamese label never squeezes a value that wraps.
+   * drift from its column) at the start, the value at the end. Neither side
+   * ever shrinks below its longest word: the label keeps its whole line
+   * when it fits, and a longer value (a list of assets, a sentence) wraps
+   * in the space that remains, still flush with the end edge.
    */
   .cs-table:not([data-layout='compact']) tbody td {
     display: grid;
-    grid-template-columns: fit-content(60%) minmax(0, 1fr);
+    grid-template-columns: minmax(min-content, max-content) minmax(min-content, 1fr);
     align-items: baseline;
     column-gap: 1rem;
     padding: 0.6875rem 0;
     border-bottom: 1px solid var(--rule-faint);
-    /* Long hashes and messages break rather than widen the record. */
-    overflow-wrap: anywhere;
+    /* Long words break rather than widen the record. `break-word`, not
+     * `anywhere`: the latter lets a label's minimum shrink to one letter. */
+    overflow-wrap: break-word;
     /* A stray `whitespace-nowrap` must not push a record past the screen. */
     white-space: normal;
     text-align: end;
   }
 
-  /*
-   * A value that is one unit (a date, an amount, an address) keeps its whole
-   * width and the label takes the rest, wrapping only when it has to.
-   */
-  .cs-table:not([data-layout='compact']) tbody td[data-nowrap] {
-    grid-template-columns: minmax(0, 1fr) auto;
+  .cs-table:not([data-layout='compact']) tbody td:last-child {
+    border-bottom: 0;
   }
 
-  .cs-table:not([data-layout='compact']) tbody td:last-child {
+  /* The last line a reader sees has no rule under it, even when dropped
+   * (empty or secondary) cells follow it in the markup. */
+  .cs-table:not([data-layout='compact'])
+    tbody
+    td:not(:has(~ td:not([data-empty='true'], [data-priority='secondary']))) {
     border-bottom: 0;
   }
 
@@ -214,7 +216,7 @@
     letter-spacing: normal;
     text-transform: none;
     text-align: start;
-    overflow-wrap: break-word;
+    overflow-wrap: normal;
   }
 
   /* Every value sits at the end edge, whatever its desktop alignment. */
@@ -248,9 +250,13 @@
     display: none;
   }
 
-  /* Columns marked redundant on a phone, in either layout. */
-  .cs-table td[data-priority='secondary'],
-  .cs-table th[data-priority='secondary'] {
+  /*
+   * Columns marked redundant on a phone, in either layout. The selectors
+   * match the record rules' specificity and come after them, so a secondary
+   * cell cannot come back as a grid line.
+   */
+  .cs-table tbody td[data-priority='secondary'],
+  .cs-table thead th[data-priority='secondary'] {
     display: none;
   }
 
