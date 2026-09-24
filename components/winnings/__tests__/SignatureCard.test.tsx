@@ -63,6 +63,10 @@ describe('SignatureCard', () => {
     const figure = container.querySelector('figure');
     expect(figure).toHaveClass('row-span-4', 'grid-rows-subgrid');
     expect(container.querySelector('figcaption')).toHaveClass('row-span-3', 'grid-rows-subgrid');
+    // A shrinkable column at each level: a long recipient name wraps in the
+    // card instead of pushing it past a 320px phone's edge.
+    expect(figure).toHaveClass('grid-cols-1');
+    expect(container.querySelector('figcaption')).toHaveClass('grid-cols-1');
 
     rerender(
       <SignatureCard

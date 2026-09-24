@@ -693,7 +693,7 @@ function CycleRecord({
               <li
                 key={role.id}
                 data-testid={`recipient-card-${role.id}`}
-                className="row-span-4 grid grid-rows-subgrid pb-7 sm:pb-9"
+                className="row-span-4 grid grid-cols-1 grid-rows-subgrid pb-7 sm:pb-9"
               >
                 {hasToken ? (
                   <SignatureCard
@@ -727,7 +727,7 @@ function CycleRecord({
                     ) : null}
                   </SignatureCard>
                 ) : (
-                  <div className="row-span-4 grid grid-rows-subgrid">
+                  <div className="row-span-4 grid grid-cols-1 grid-rows-subgrid">
                     <PendingPlate density="compact" label={artworkUnavailable} className="mb-2" />
                     <h3 className="type-body-md font-medium text-foreground">
                       <Term id={ROLE_TERMS[role.id]}>
