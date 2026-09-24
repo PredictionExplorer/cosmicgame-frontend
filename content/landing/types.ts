@@ -172,11 +172,13 @@ export interface LandingFaqContent {
   readonly items: readonly LandingFaqItem[];
 }
 
-/** The closing band: recent Signatures and the way back into the app. */
+/** The closing band: recent Signatures and a next step in the app. */
 export interface LandingClosingContent {
   readonly eyebrow: string;
   readonly heading: string;
   readonly body: string;
+  /** The band's commit action: the app's gesture panel (the same link as The Cycle's). */
+  readonly gestureCta: LandingLink;
   readonly galleryCta: LandingLink;
 }
 

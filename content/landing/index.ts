@@ -143,6 +143,10 @@ function buildLandingContent(text: LandingText, locale: AppLocale): LandingConte
       eyebrow: text.closing.eyebrow,
       heading: text.closing.heading,
       body: text.closing.body,
+      gestureCta: {
+        label: text.cycle.gestureCtaLabel,
+        href: LANDING_STRUCTURE.cycle.gestureCtaHref,
+      },
       galleryCta: {
         label: text.hero.art.galleryCta,
         href: LANDING_STRUCTURE.closing.galleryCtaHref,

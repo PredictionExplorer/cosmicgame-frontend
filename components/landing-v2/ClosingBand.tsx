@@ -5,10 +5,11 @@ import type { LandingContent } from '@/content/landing';
 
 import { classifyHref } from '@/config/siteNav';
 import { localizeCrossHostHref } from '@/lib/hostRouting';
+import { cn } from '@/lib/utils';
 import { SiteLink } from '@/components/layout/SiteLink';
+import { buttonVariants } from '@/components/ui/button';
 
 import { CollectionPlates } from './CollectionPlates';
-import { OpenAppLink } from './OpenAppLink';
 import { LandingSection, SectionHeading } from './SectionHeading';
 import styles from './Landing.module.css';
 
@@ -18,12 +19,13 @@ interface ClosingBandProps {
 }
 
 /**
- * The page's last word: the newest Signatures and the way back into the app,
- * so a visitor who read to the end has a next step that is not the footer.
+ * The page's last word: the newest Signatures and a next step that is not
+ * the footer. Its commit action is to make a gesture, not "Open the app":
+ * the sticky header already offers that one, right above this band.
  */
 export function ClosingBand({ closing, showcase }: ClosingBandProps) {
   const locale = useLocale();
-  const gallery = closing.galleryCta;
+  const { gestureCta: gesture, galleryCta: gallery } = closing;
   return (
     <LandingSection labelledBy="landing-closing-heading" className={styles.closing}>
       <div className={styles.closingHead}>
@@ -34,7 +36,14 @@ export function ClosingBand({ closing, showcase }: ClosingBandProps) {
           description={closing.body}
         />
         <div className={styles.sectionActions}>
-          <OpenAppLink size="xl" variant="commit" />
+          <SiteLink
+            href={localizeCrossHostHref(gesture.href, locale)}
+            kind={classifyHref(gesture.href, 'landing')}
+            className={cn(buttonVariants({ variant: 'commit', size: 'xl' }), 'no-underline')}
+          >
+            {gesture.label}
+            <ArrowRight aria-hidden />
+          </SiteLink>
           <SiteLink
             href={localizeCrossHostHref(gallery.href, locale)}
             kind={classifyHref(gallery.href, 'landing')}

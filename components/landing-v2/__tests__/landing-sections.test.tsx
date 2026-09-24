@@ -213,7 +213,7 @@ describe('landing sections', () => {
   });
 
   describe('<ClosingBand />', () => {
-    it('ends the page with the newest Signatures and the way back into the app', () => {
+    it('ends the page with the newest Signatures and a gesture as its commit action', () => {
       mockShowcase.mockReturnValue(collection(8));
       render(<ClosingBand closing={content.closing} showcase={content.art.showcase} />);
       expect(plateIds(screen.getByTestId('collection-recent'))).toEqual([
@@ -224,9 +224,11 @@ describe('landing sections', () => {
         '56',
         '55',
       ]);
-      const app = screen.getByRole('link', { name: 'nav.cta.openApp' });
-      expect(app).toHaveAttribute('href', 'https://app.cosmicsignature.com');
-      expect(app.className).toMatch(/bg-signature-gradient/);
+      // Not a second "Open the app": the sticky header offers that one right above.
+      expect(screen.queryByRole('link', { name: 'nav.cta.openApp' })).not.toBeInTheDocument();
+      const gesture = screen.getByRole('link', { name: content.cycle.gestureCta.label });
+      expect(gesture).toHaveAttribute('href', 'https://app.cosmicsignature.com#make-gesture');
+      expect(gesture.className).toMatch(/bg-signature-gradient/);
       expect(screen.getByRole('link', { name: content.closing.galleryCta.label })).toHaveAttribute(
         'href',
         'https://app.cosmicsignature.com/gallery',
