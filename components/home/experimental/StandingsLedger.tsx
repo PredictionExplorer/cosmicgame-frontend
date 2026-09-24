@@ -141,7 +141,7 @@ export function StandingsLedger({
                 {paid === undefined ? (
                   <UnknownValue label={tTables('status.unavailable')} />
                 ) : (
-                  <Amount value={paid} unit={paidInCst ? 'CST' : 'ETH'} context="exact" />
+                  <Amount value={paid} unit={paidInCst ? 'CST' : 'ETH'} context="hero" />
                 )}
               </span>
             </span>

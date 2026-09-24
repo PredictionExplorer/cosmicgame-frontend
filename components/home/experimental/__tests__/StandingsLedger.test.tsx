@@ -142,7 +142,7 @@ describe('StandingsLedger', () => {
     const line = screen.getByTestId('standing-latest-gesture');
     expect(visibleText(line)).toContain('tables.specialAllocation.amountPaid');
     // The exact amount paid, in the method's own unit, and the method by name.
-    expect(visibleText(line)).toContain('210.9137 CST');
+    expect(visibleText(line)).toContain('210.91 CST');
     expect(visibleText(line)).toContain('home.form.method.cst.label');
     expect(within(line).getByRole('link')).toHaveAttribute('href', '/gesture/1135');
     expect(screen.getByTestId('standing-latest-progress')).toHaveTextContent(

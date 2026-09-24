@@ -703,14 +703,9 @@ const ExperimentalHomePage = ({
                       {t('deck.returnToCurrent')}
                     </Link>
                   </Button>
-                  <Button asChild variant="ghost" size="sm">
-                    <Link href="/how-it-works">
-                      {t('deck.newHere')}
-                      <ArrowRight aria-hidden />
-                    </Link>
-                  </Button>
                 </>
               }
+              related={[{ href: '/how-it-works', label: t('deck.newHere') }]}
               className="mb-8 pb-8 sm:mb-10 sm:pb-8"
             />
           </div>
