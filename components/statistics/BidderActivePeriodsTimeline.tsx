@@ -19,7 +19,12 @@ import { SkeletonTable } from '@/components/ui/skeleton';
 import { ChartFigure } from './charts/ChartFigure';
 import { formatDateRange } from './charts/labels';
 import { useTimeAxis } from './charts/axes';
-import { SERIES_COLOR } from './charts/theme';
+import {
+  SERIES_COLOR,
+  TIMELINE_LANE_FOCUS_CLASS,
+  TIMELINE_MARK_CLASS,
+  timelineMarkStyle,
+} from './charts/theme';
 import { useRovingStints } from './charts/useRovingStints';
 
 const TOP_N = 20;
@@ -218,7 +223,6 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
           aria-label={label}
           onKeyDown={roving.onKeyDown}
           onMouseLeave={() => setReadout(null)}
-          className="focus-ring-within"
         >
           {lanes.map((lane, row) => (
             <div
@@ -230,7 +234,10 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
                 gestures: lane.participant.NumBids,
                 periods: lane.periods.length,
               })}
-              className="grid grid-cols-[minmax(7.5rem,11rem)_minmax(0,1fr)] gap-x-3 border-b border-rule-faint"
+              className={cn(
+                'grid grid-cols-[minmax(7.5rem,11rem)_minmax(0,1fr)] gap-x-3 border-b border-rule-faint transition-colors duration-fast',
+                TIMELINE_LANE_FOCUS_CLASS,
+              )}
             >
               <div className="flex min-h-10 min-w-0 flex-col justify-center py-1 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
                 <span className="flex min-w-0 items-baseline gap-2">
@@ -280,12 +287,12 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
                       }}
                       onMouseEnter={() => setReadout(period)}
                       className={cn(
-                        'absolute inset-y-2.5 min-w-[3px] cursor-default rounded-edge opacity-80 transition-opacity duration-fast hover:opacity-100 focus-visible:opacity-100',
+                        TIMELINE_MARK_CLASS,
+                        'inset-y-2.5 cursor-default rounded-edge opacity-80 transition-opacity duration-fast [--mark-min:3px] hover:opacity-100',
                         readout === period && 'opacity-100',
                       )}
                       style={{
-                        left: percent(start),
-                        width: percent(width),
+                        ...timelineMarkStyle(start, width),
                         backgroundColor: SERIES_COLOR.gestures,
                       }}
                     />

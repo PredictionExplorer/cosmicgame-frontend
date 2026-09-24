@@ -39,9 +39,12 @@ import {
   CHART_MARGIN,
   GRID_PROPS,
   SERIES_COLOR,
+  TIMELINE_LANE_FOCUS_CLASS,
+  TIMELINE_MARK_CLASS,
   TOOLTIP_PROPS,
   X_AXIS_PROPS,
   Y_AXIS_PROPS,
+  timelineMarkStyle,
 } from './charts/theme';
 import { useRovingStints } from './charts/useRovingStints';
 
@@ -235,7 +238,9 @@ const EnduranceGanttView = memo(function EnduranceGanttView({ gantt }: { gantt: 
           : '',
     });
 
-  const grid = 'grid grid-cols-[minmax(6.5rem,10rem)_minmax(0,1fr)] gap-x-3';
+  // The end padding keeps a focused stint's ring, drawn outside the lane's
+  // last stint, clear of the scrolling frame's edge.
+  const grid = 'grid grid-cols-[minmax(6.5rem,10rem)_minmax(0,1fr)] gap-x-3 pe-1';
 
   return (
     <div className="space-y-3">
@@ -301,7 +306,11 @@ const EnduranceGanttView = memo(function EnduranceGanttView({ gantt }: { gantt: 
                 count: lane.stints.length,
                 longest: formatSeconds(lane.maxStintSeconds, locale),
               })}
-              className={cn(grid, 'border-b border-rule-faint py-1.5')}
+              className={cn(
+                grid,
+                'border-b border-rule-faint py-1.5 transition-colors duration-fast',
+                TIMELINE_LANE_FOCUS_CLASS,
+              )}
             >
               {/* The address stays whole; a title's tags sit on their own line under it. */}
               <div className="flex min-w-0 flex-col justify-center gap-1">
@@ -327,7 +336,8 @@ const EnduranceGanttView = memo(function EnduranceGanttView({ gantt }: { gantt: 
                   </span>
                 ) : null}
               </div>
-              <div className="relative min-h-6 self-center overflow-hidden rounded-edge bg-surface-sunken">
+              {/* No clipping: a focused stint draws its ring outside itself. */}
+              <div className="relative min-h-6 self-center rounded-edge bg-surface-sunken">
                 {axis.ticks.slice(1).map((tick) => (
                   <span
                     key={tick}
@@ -352,13 +362,16 @@ const EnduranceGanttView = memo(function EnduranceGanttView({ gantt }: { gantt: 
                       }}
                       onMouseEnter={() => setReadout({ lane, stint })}
                       className={cn(
-                        'absolute inset-y-1 min-w-[2px] rounded-edge transition-opacity duration-fast focus-ring-inset',
+                        TIMELINE_MARK_CLASS,
+                        'inset-y-1 rounded-edge transition-opacity duration-fast',
+                        ringRecord ? '[--mark-min:3px]' : '[--mark-min:2px]',
                         active || stint.isEnduranceChampion ? 'opacity-100' : 'opacity-75',
                       )}
                       style={{
-                        left: pct(stint.startHours / durHours),
-                        width: pct(stint.durationHours / durHours),
-                        minWidth: ringRecord ? 3 : 2,
+                        ...timelineMarkStyle(
+                          stint.startHours / durHours,
+                          stint.durationHours / durHours,
+                        ),
                         backgroundColor: stintColor(stint, lane),
                         boxShadow: ringRecord
                           ? 'inset 0 0 0 1.5px hsl(var(--foreground))'

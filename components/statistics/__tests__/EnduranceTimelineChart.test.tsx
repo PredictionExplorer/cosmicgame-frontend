@@ -84,8 +84,30 @@ describe('EnduranceTimelineChart', () => {
     act(() => stints[0]!.focus());
     const readout = container.querySelector('[aria-live="polite"]')!;
     expect(readout).toHaveTextContent(/^0x[ab]1b2….*held/i);
+    const firstReadout = readout.textContent;
+    // Each lane holds two stints: End moves focus to the lane's last one.
     await user.keyboard('{End}');
+    expect(stints[1]).toHaveFocus();
+    expect(stints[1]).toHaveAttribute('tabindex', '0');
     expect(stints.filter((stint) => stint.tabIndex === 0)).toHaveLength(1);
+    expect(readout.textContent).not.toBe(firstReadout);
+    await user.keyboard('{Home}');
+    expect(stints[0]).toHaveFocus();
+  });
+
+  it('draws the focused stint ring outside the stint, on a lane that does not clip it', () => {
+    // Regression: an inset ring on a 2-3px stint showed as a 1px sliver (WCAG 2.4.7).
+    render(<EnduranceTimelineChart round={2} isLive label="Endurance" />);
+    const gantt = screen.getByRole('group', { name: 'Lead stints by participant' });
+    for (const stint of within(gantt).getAllByRole('img')) {
+      expect(stint).not.toHaveClass('focus-ring-inset');
+      expect(stint).toHaveClass('focus-visible:outline-solid', 'focus-visible:z-10');
+      expect(stint.parentElement).not.toHaveClass('overflow-hidden');
+      expect(stint.style.getPropertyValue('--mark-at')).toMatch(/%$/);
+    }
+    for (const lane of within(gantt).getAllByRole('group')) {
+      expect(lane.className).toContain('has-[[role=img]:focus-visible]:bg-surface');
+    }
   });
 
   it('switches to the records as lines', async () => {

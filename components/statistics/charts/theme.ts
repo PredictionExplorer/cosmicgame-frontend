@@ -72,6 +72,28 @@ export const TOOLTIP_PROPS = {
 export const DOTS_MAX_POINTS = 40;
 
 /**
+ * A focusable mark on a timeline lane (a lead stint, an active period). The
+ * mark sits at `--mark-at` (a percentage of its lane, set inline) and never
+ * narrower than `--mark-min` (set per chart with `[--mark-min:2px]`), held
+ * inside the lane at its right end. The lane must not clip (no
+ * `overflow-hidden`): keyboard focus draws the shared ring outside the mark,
+ * lifts it over its neighbours and widens a sliver to 6px, so the ring
+ * reads as a ring rather than a line (WCAG 2.4.7). Pair it with
+ * `TIMELINE_LANE_FOCUS_CLASS` on the lane's row.
+ */
+export const TIMELINE_MARK_CLASS =
+  'absolute left-[min(var(--mark-at),calc(100%-var(--mark-min)))] min-w-[var(--mark-min)] focus-visible:z-10 focus-visible:opacity-100 focus-visible:outline-solid focus-visible:[--mark-min:0.375rem]';
+
+/** The row of a timeline lane: tinted while one of its marks has keyboard focus. */
+export const TIMELINE_LANE_FOCUS_CLASS = 'has-[[role=img]:focus-visible]:bg-surface';
+
+/** Inline position of a timeline mark: its start and width as fractions of the lane. */
+export function timelineMarkStyle(start: number, width: number): Record<string, string> {
+  const pct = (value: number) => `${Math.max(0, Math.min(100, value * 100))}%`;
+  return { '--mark-at': pct(start), width: pct(width) };
+}
+
+/**
  * Classes for the element that wraps a Recharts chart: tabular figures in the
  * SVG text, and the chart's keyboard focus drawn inside its own box.
  */

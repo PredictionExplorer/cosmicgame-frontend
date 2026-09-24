@@ -7,13 +7,20 @@ export interface RovingPosition {
   item: number;
 }
 
+/** Whether a key event's target is one of the registered marks. */
+function isMark(marks: ReadonlyMap<string, HTMLElement>, target: EventTarget): boolean {
+  for (const node of marks.values()) if (node === target) return true;
+  return false;
+}
+
 /**
  * One tab stop for a timeline of lanes (rows) of marks (stints, periods):
  * Tab enters on the current mark, Left and Right step along its lane, Up and
  * Down move to the nearest mark of the next lane that has one, Home and End
  * jump to the lane's ends. Marks render `tabIndex={isCurrent ? 0 : -1}` and
  * register themselves with `markRef`. `counts[row]` is the number of marks
- * in each lane.
+ * in each lane. Keys pressed on anything else inside the group (a lane's
+ * address link) keep their own meaning: scrolling the page, for one.
  */
 export function useRovingStints(counts: readonly number[]) {
   const [current, setCurrent] = useState<RovingPosition>({ row: 0, item: 0 });
@@ -38,6 +45,7 @@ export function useRovingStints(counts: readonly number[]) {
 
   const onKeyDown = useCallback(
     (event: KeyboardEvent<HTMLElement>) => {
+      if (!isMark(marks.current, event.target)) return;
       const { row, item } = position;
       const inRow = counts[row] ?? 0;
       const nearestRow = (from: number, step: 1 | -1): number | null => {

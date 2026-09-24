@@ -68,7 +68,7 @@ describe('BidderActivePeriodsTimeline', () => {
     expect(lanes[0]).toHaveAccessibleName(/^1\. 0x1Ec1…/);
     expect(within(lanes[0]!).getAllByRole('img')).toHaveLength(3);
     const latest = within(lanes[0]!).getAllByRole('img').at(-1)!;
-    const left = parseFloat((latest as HTMLElement).style.left);
+    const left = parseFloat((latest as HTMLElement).style.getPropertyValue('--mark-at'));
     expect(left).toBeGreaterThan(95);
     expect(left).toBeLessThanOrEqual(100);
   });
@@ -87,6 +87,33 @@ describe('BidderActivePeriodsTimeline', () => {
     await user.keyboard('{ArrowDown}');
     expect(bars[3]).toHaveFocus();
     expect(readout).toHaveTextContent(/^0x7406…/);
+  });
+
+  it('leaves the arrow keys alone on a lane address link', async () => {
+    const user = userEvent.setup();
+    render(<BidderActivePeriodsTimeline label="Active periods" />);
+    const group = screen.getByRole('group', { name: 'Active periods' });
+    expect(group).not.toHaveClass('focus-ring-within');
+    const link = within(group).getAllByRole('link')[0]!;
+    act(() => link.focus());
+    for (const key of ['{ArrowRight}', '{ArrowDown}', '{End}', '{Home}']) {
+      await user.keyboard(key);
+      expect(link).toHaveFocus();
+    }
+  });
+
+  it('draws a focused period ring outside the period and tints its lane', () => {
+    render(<BidderActivePeriodsTimeline label="Active periods" />);
+    for (const bar of screen.getAllByRole('img')) {
+      expect(bar).toHaveClass('focus-visible:outline-solid', 'focus-visible:z-10');
+      expect(bar.parentElement).not.toHaveClass('overflow-hidden');
+    }
+    const lanes = within(screen.getByRole('group', { name: 'Active periods' })).getAllByRole(
+      'group',
+    );
+    for (const lane of lanes) {
+      expect(lane.className).toContain('has-[[role=img]:focus-visible]:bg-surface');
+    }
   });
 
   it('lists the lanes as a table on request', async () => {
