@@ -1,7 +1,4 @@
-import { formatDateTime, formatTimeZoneLabel } from '@/utils/format';
-
 import { render, screen, within, checkA11y } from '@/test-utils';
-
 
 import GesturePage from '../[id]/GesturePage';
 
@@ -192,20 +189,14 @@ describe('GesturePage', () => {
     );
   });
 
-  it("prints its times in the reader's zone and names it, as the cycle's tables do", () => {
+  it('prints its times in UTC with the zone, so every reader cites the same instant', () => {
     const { container } = renderGesture();
     const times = container.querySelectorAll('time');
     expect(times).toHaveLength(2);
     // 1_780_045_566 is 2026-05-29 09:06:06 UTC; 1_780_049_166 an hour later.
     expect(times[0]).toHaveAttribute('dateTime', '2026-05-29T09:06:06.000Z');
-    const zone = formatTimeZoneLabel('local', new Date(1_780_045_566_000));
-    expect(times[0]).toHaveTextContent(
-      formatDateTime(1_780_045_566, { style: 'full', timeZone: 'local', showZone: true }),
-    );
-    expect(times[0]?.textContent?.endsWith(zone)).toBe(true);
-    expect(times[1]).toHaveTextContent(
-      formatDateTime(1_780_049_166, { style: 'full', timeZone: 'local', showZone: true }),
-    );
+    expect(times[0]).toHaveTextContent(/09:06:06\sUTC$/);
+    expect(times[1]).toHaveTextContent(/10:06:06\sUTC$/);
   });
 
   it('shows the method once, with the Random Walk NFT when one was used', () => {

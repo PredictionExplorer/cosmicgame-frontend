@@ -578,7 +578,7 @@ export function DataTable<T>({
           className={tableClassName}
         >
           <ResponsiveTableHead>
-            <tr role="row">
+            <tr>
               {visible.map((col) => (
                 <HeaderCell
                   key={col.column.id}

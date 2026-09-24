@@ -27,7 +27,13 @@ import { useAttachedNftMetadata } from '@/components/attachments/useAttachedNftM
 import { resolveGestureType } from '@/components/tables/GestureMethodTag';
 import { useDashboardInfo, useGestureInfo } from '@/hooks/useApiQuery';
 import type { GestureInfo } from '@/services/api';
-import { formatCount, formatNumber } from '@/utils/format';
+import {
+  NBSP,
+  UNAVAILABLE_VALUE,
+  formatCount,
+  formatNumber,
+  formatTimeZoneLabel,
+} from '@/utils/format';
 import { formatId } from '@/utils/format/ids';
 
 import { useGestureNeighbours } from './gestureNeighbours';
@@ -110,13 +116,26 @@ function metadataText(value: unknown): string | null {
 }
 
 /**
- * A citable instant: the full date in the reader's zone with the zone
- * printed ("May 29, 2026, 04:06:06 UTC-5"), the same zone the cycle's tables
- * use, so a gesture keeps its date on click-through and a quote of it still
- * names the zone. The exact instant and its age stay on hover.
+ * A citable instant: the full date in UTC with the zone printed, so two
+ * readers quoting the record quote the same time (the explorer's zone too).
+ * The age and the full date stay on hover.
  */
 function RecordTime({ timestamp }: { timestamp: number | null | undefined }) {
-  return <DateTime timestamp={timestamp} variant="full" showZone />;
+  return (
+    <DateTime timestamp={timestamp} variant="full" timeZone="utc">
+      {(value) =>
+        value === UNAVAILABLE_VALUE ? (
+          value
+        ) : (
+          <>
+            {value}
+            {NBSP}
+            <span className="text-subtle">{formatTimeZoneLabel('utc')}</span>
+          </>
+        )
+      }
+    </DateTime>
+  );
 }
 
 /** One label / value line of the record. */

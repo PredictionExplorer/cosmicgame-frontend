@@ -55,6 +55,24 @@ describe('ResponsiveTable roles', () => {
     expect(container.querySelector('th')).toHaveAttribute('role', 'columnheader');
     expect(container.querySelector('td')).toHaveAttribute('role', 'cell');
   });
+
+  it('gives a plain header <tr> its row role too', () => {
+    const { container } = render(
+      <ResponsiveTable aria-label="Test table">
+        <ResponsiveTableHead>
+          <tr>
+            <ResponsiveTableHeadCell>Cycle</ResponsiveTableHeadCell>
+          </tr>
+        </ResponsiveTableHead>
+        <ResponsiveTableBody>
+          <ResponsiveTableRow>
+            <ResponsiveTableCell label="Cycle">7</ResponsiveTableCell>
+          </ResponsiveTableRow>
+        </ResponsiveTableBody>
+      </ResponsiveTable>,
+    );
+    expect(container.querySelector('thead tr')).toHaveAttribute('role', 'row');
+  });
 });
 
 describe('ResponsiveTableCell labels', () => {

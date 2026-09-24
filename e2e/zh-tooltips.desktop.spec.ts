@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 import { dismissOpenTooltips, openTooltip } from './tooltip-helpers';
 import { mockZhQualityApi } from './zh-quality-mocks';
@@ -17,6 +17,40 @@ interface TooltipRoute {
    * trigger, so it carries no "更多信息" label and is opened by its text.
    */
   readonly explainedTerms?: readonly string[];
+  /** Data the route needs on top of the shared mocks for its triggers to render. */
+  readonly mock?: (page: Page) => Promise<void>;
+}
+
+/**
+ * Two outreach allocations: the ranking, whose Share column carries the
+ * page's explained header, renders only when there are records.
+ */
+async function mockOutreachRecords(page: Page): Promise<void> {
+  const reward = (id: number, address: string, cst: number) => ({
+    RecordId: id,
+    Tx: {
+      EvtLogId: 28000 + id,
+      BlockNum: 497387000 + id,
+      TxId: 8980 + id,
+      TxHash: `0x${String(id).padStart(64, '0')}`,
+      TimeStamp: 1787447000 + id,
+      DateTime: '2026-08-23T01:00:00Z',
+    },
+    Amount: `${cst}000000000000000000`,
+    AmountEth: cst,
+    MarketerAid: 970 + id,
+    MarketerAddr: address,
+  });
+  await page.route('**/marketing/rewards/global/**', async (route) => {
+    await route.fulfill({
+      json: {
+        MarketingRewards: [
+          reward(2, '0xe7eD7F31cd76CeD85861ec5bD37879cBA053e887', 3000),
+          reward(1, '0x5050000000000000000000000000000000000001', 1000),
+        ],
+      },
+    });
+  });
 }
 
 /*
@@ -24,9 +58,10 @@ interface TooltipRoute {
  * explained word itself, so pages carry fewer icon triggers than they did:
  * the statistics hub's figures moved into the page header (four section
  * icons remain), and the outreach page (/zh/marketing) explains its steps in
- * text with no trigger at all, so it is no longer listed. The coined terms on
- * the home ledger are covered as explained terms, and the home's allocation
- * tracks sit in a disclosure that the test opens before counting.
+ * text, keeping one explained header on its ranking, which needs records to
+ * render. The coined terms on the home ledger are covered as explained terms,
+ * and the home's allocation tracks sit in a disclosure that the test opens
+ * before counting.
  */
 const ROUTES: readonly TooltipRoute[] = [
   {
@@ -45,6 +80,7 @@ const ROUTES: readonly TooltipRoute[] = [
   { path: '/zh/anchoring', readyText: '锚定运作原理', minimum: 3 },
   { path: '/zh/statistics', readyText: '协议统计', minimum: 4 },
   { path: '/zh/contracts', readyText: 'Cosmic Signature 合约', minimum: 2 },
+  { path: '/zh/marketing', readyText: '推广分配', minimum: 1, mock: mockOutreachRecords },
 ];
 
 test.describe('Sprint 8 translated tooltip interaction coverage', () => {
@@ -54,6 +90,7 @@ test.describe('Sprint 8 translated tooltip interaction coverage', () => {
     }) => {
       test.slow();
       await mockZhQualityApi(page);
+      await route.mock?.(page);
       await page.emulateMedia({ reducedMotion: 'reduce' });
       await page.goto(route.path, { waitUntil: 'domcontentloaded' });
 

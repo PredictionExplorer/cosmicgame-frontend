@@ -177,12 +177,29 @@ export function ResponsiveTable({ className, layout = 'cards', ...props }: Respo
 
 export function ResponsiveTableHead({
   className,
+  children,
   ...props
 }: React.HTMLAttributes<HTMLTableSectionElement>) {
   // Not sticky: the container scrolls horizontally, which per spec forces the
   // other axis to `auto`, so a sticky header would stick to a box that never
   // scrolls vertically.
-  return <thead role="rowgroup" data-testid="thead" className={className} {...props} />;
+  return (
+    <thead role="rowgroup" data-testid="thead" className={className} {...props}>
+      {withRowRoles(children)}
+    </thead>
+  );
+}
+
+/**
+ * Header rows are often plain `<tr>`s (a column-group row, the header row);
+ * give each the row role the phone record would otherwise lose in WebKit.
+ */
+function withRowRoles(children: React.ReactNode): React.ReactNode {
+  return React.Children.map(children, (child) =>
+    React.isValidElement<{ role?: string }>(child) && child.type === 'tr' && !child.props.role
+      ? React.cloneElement(child, { role: 'row' })
+      : child,
+  );
 }
 
 export function ResponsiveTableBody({

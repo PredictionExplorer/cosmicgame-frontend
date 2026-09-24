@@ -11,18 +11,14 @@ import ERC20_ABI from '@/contracts/CosmicToken.json';
 
 import { formatAddress, type AmountUnit } from '@/utils/format';
 import { Amount } from '@/components/ui/amount';
-import {
-  DataTable,
-  ExternalTableLink,
-  KindValue,
-  type DataTableColumn,
-} from '@/components/ui/data-table';
+import { DataTable, ExternalTableLink, type DataTableColumn } from '@/components/ui/data-table';
 import { Duration } from '@/components/ui/duration';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { GestureMethodTag, resolveGestureType } from '@/components/tables/GestureMethodTag';
 import type { LedgerStateProps } from '@/components/tables/ledger-props';
 import { useBannedGestures } from '@/hooks/useApiQuery';
 import { useNow } from '@/hooks/useNow';
+import { DateTime } from '@/components/ui/date-time';
 
 interface GestureHistory {
   EvtLogId: number;
@@ -210,31 +206,12 @@ const GestureHistoryTable = ({
     const costUnit = (gesture: GestureHistory): AmountUnit =>
       resolveGestureType(gesture) === CST_GESTURE ? 'CST' : 'ETH';
 
-    const methodTag = (gesture: GestureHistory) => (
-      <GestureMethodTag
-        gestureType={resolveGestureType(gesture)}
-        unknownLabel={t('status.unknown')}
-      />
-    );
-    // A phone record reads as lines, not a spec sheet: the method rides on
-    // the date line (the type column is hidden there), and the cycle is shown
-    // only when the list spans more than one, so a participant's gestures in
-    // one cycle do not each repeat "Cycle 2".
-    const spansCycles = new Set(gestureHistory.map((gesture) => gesture.RoundNum)).size > 1;
-
     const all: (DataTableColumn<GestureHistory> | false)[] = [
       {
         id: 'datetime',
         kind: 'datetime',
         header: t('columns.datetime'),
         value: (gesture) => gesture.TimeStamp,
-        // The date stays inline so the row link's underline reaches it.
-        cell: (gesture, { value }) => (
-          <>
-            <KindValue kind="datetime" value={value} seconds />
-            <span className="ms-2 inline-block align-middle sm:hidden">{methodTag(gesture)}</span>
-          </>
-        ),
         seconds: true,
         sortable: true,
       },
@@ -269,16 +246,18 @@ const GestureHistoryTable = ({
         header: t('columns.cycle'),
         value: (gesture) => gesture.RoundNum,
         href: (gesture) => (gesture.RoundNum == null ? null : `/allocation/${gesture.RoundNum}`),
-        priority: spansCycles ? 'primary' : 'secondary',
       },
       {
         id: 'type',
         kind: 'text',
         header: t('columns.gestureType'),
         value: (gesture) => resolveGestureType(gesture),
-        cell: methodTag,
-        // On a phone the method sits on the date line instead.
-        priority: 'secondary',
+        cell: (gesture) => (
+          <GestureMethodTag
+            gestureType={resolveGestureType(gesture)}
+            unknownLabel={t('status.unknown')}
+          />
+        ),
       },
       showHold && {
         id: 'hold',
@@ -332,12 +311,17 @@ const GestureHistoryTable = ({
       },
     ];
     return all.filter((column): column is DataTableColumn<GestureHistory> => Boolean(column));
-  }, [t, showRound, showParticipant, showHold, holds, banned, gestureHistory]);
+  }, [t, showRound, showParticipant, showHold, holds, banned]);
+
+  const phoneColumns = useMemo(
+    () => withPhoneLines(columns, gestureHistory, t('status.unknown')),
+    [columns, gestureHistory, t],
+  );
 
   return (
     <DataTable
       data={gestureHistory}
-      columns={columns}
+      columns={phoneColumns}
       ariaLabel={t('gestureHistory.tableLabel')}
       getRowKey={(gesture) => gesture.EvtLogId}
       getRowHref={(gesture) => `/gesture/${gesture.EvtLogId}`}
@@ -347,5 +331,41 @@ const GestureHistoryTable = ({
     />
   );
 };
+
+/**
+ * On a phone a gesture reads as lines rather than a spec sheet: its method
+ * rides on the date line (the method column is hidden there, the tag beside
+ * a unit that already says CST was a line of its own), and the cycle shows
+ * only when the list spans more than one, so a participant's gestures in
+ * one cycle do not each repeat "Cycle 2". Wider screens keep every column.
+ */
+function withPhoneLines(
+  columns: DataTableColumn<GestureHistory>[],
+  gestures: readonly GestureHistory[],
+  unknownLabel: string,
+): DataTableColumn<GestureHistory>[] {
+  const spansCycles = new Set(gestures.map((gesture) => gesture.RoundNum)).size > 1;
+  return columns.map((column): DataTableColumn<GestureHistory> => {
+    if (column.id === 'type' || (column.id === 'cycle' && !spansCycles)) {
+      return { ...column, priority: 'secondary' };
+    }
+    if (column.id !== 'datetime') return column;
+    return {
+      ...column,
+      // The date stays inline, so the row link's underline still reaches it.
+      cell: (gesture, { value }) => (
+        <>
+          <DateTime timestamp={typeof value === 'number' ? value : null} seconds />
+          <span className="ms-2 inline-block align-middle sm:hidden">
+            <GestureMethodTag
+              gestureType={resolveGestureType(gesture)}
+              unknownLabel={unknownLabel}
+            />
+          </span>
+        </>
+      ),
+    };
+  });
+}
 
 export default GestureHistoryTable;
