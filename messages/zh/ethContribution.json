@@ -30,7 +30,6 @@
     "invalidId": "贡献 ID 无效",
     "title": "ETH 贡献详情",
     "loadingSubtitle": "正在加载贡献记录…",
-    "breadcrumbHome": "首页",
     "breadcrumbContributions": "ETH 贡献",
     "loading": "加载中…",
     "notFound": "未找到这笔贡献。",
@@ -60,9 +59,7 @@
     "invalidNumber": "周期编号无效",
     "title": "第 {cycle} 个周期的直接 ETH 贡献",
     "subtitle": "此周期记录的全部直接 ETH 贡献。",
-    "breadcrumbHome": "首页",
     "breadcrumbContributions": "ETH 贡献",
-    "breadcrumbCycle": "第 {cycle} 个周期",
     "loading": "加载中…"
   }
 }

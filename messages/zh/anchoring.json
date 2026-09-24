@@ -25,7 +25,6 @@
   "overview": {
     "errorTitle": "未能加载锚定数据",
     "errorMessage": "未能加载锚定数据，请稍后重试。",
-    "eyebrow": "锚定派发 · 实时",
     "title": "锚定派发",
     "subtitle": "查看全局锚定动态与派发记录",
     "intro": {
@@ -92,12 +91,9 @@
     }
   },
   "anchorActionDetail": {
-    "title": "锚定操作",
     "subtitle": "{token} NFT 锚定操作",
     "error": "未能加载锚定操作详情，请稍后重试。",
     "breadcrumbs": {
-      "home": "首页",
-      "myAnchors": "我的锚定",
       "action": "操作 #{id}"
     },
     "empty": "未找到该锚定操作记录。",
@@ -129,11 +125,6 @@
   "distributionsByToken": {
     "title": "代币 {tokenId} 的锚定派发明细",
     "subtitle": "{address} 的派发记录",
-    "breadcrumbs": {
-      "home": "首页",
-      "user": "用户",
-      "token": "代币 #{tokenId}"
-    },
     "details": {
       "anchorTitle": "锚定",
       "releaseTitle": "解锚",

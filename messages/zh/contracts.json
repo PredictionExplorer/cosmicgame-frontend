@@ -4,7 +4,6 @@
     "contracts": "合约"
   },
   "page": {
-    "eyebrow": "已验证合约 · Arbitrum",
     "title": "合约地址",
     "subtitle": "查看 Cosmic Signature 协议的链上地址、配置、源代码链接与验证背景。",
     "allocationAria": "分配轨道",
@@ -171,11 +170,9 @@
     "aria": "将公共物品金库余额转拨给 Protocol Guild"
   },
   "seo": {
-    "eyebrow": "已验证合约 · Arbitrum",
     "heading": "Cosmic Signature 合约",
     "description": "查阅 Cosmic Signature 在 Arbitrum 上的合约地址，并通过源代码与链上记录核验协议。",
     "partialFallback": "暂时无法获取最新合约地址。下方显示协议资料中已验证的代理合约与实现合约地址。",
-    "empty": "暂时无法获取最新合约地址。数据恢复后，下方表格会显示地址。",
     "relatedAria": "合约信任资源",
     "links": {
       "code": "查看 Cosmic Signature 源代码",

@@ -30,7 +30,6 @@
     "invalidId": "Invalid Contribution Id",
     "title": "Direct ETH Contribution Detail",
     "loadingSubtitle": "Loading contribution…",
-    "breadcrumbHome": "Home",
     "breadcrumbContributions": "ETH contributions",
     "loading": "Loading...",
     "notFound": "Contribution not found.",
@@ -60,9 +59,7 @@
     "invalidNumber": "Invalid Cycle Number",
     "title": "Direct (ETH) Contributions for Cycle {cycle}",
     "subtitle": "All direct ETH contributions recorded for this cycle.",
-    "breadcrumbHome": "Home",
     "breadcrumbContributions": "ETH contributions",
-    "breadcrumbCycle": "Cycle {cycle}",
     "loading": "Loading..."
   }
 }

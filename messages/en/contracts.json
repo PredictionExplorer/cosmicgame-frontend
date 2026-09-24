@@ -4,7 +4,6 @@
     "contracts": "Contracts"
   },
   "page": {
-    "eyebrow": "Verified Contracts · Arbitrum",
     "title": "Contract Addresses",
     "subtitle": "On-chain addresses, configuration, source links, and verification context for the Cosmic Signature protocol.",
     "allocationAria": "Allocation Tracks",
@@ -171,11 +170,9 @@
     "aria": "Forward Public Goods Vault balance to Protocol Guild"
   },
   "seo": {
-    "eyebrow": "Verified contracts · Arbitrum",
     "heading": "Cosmic Signature Contracts",
     "description": "Cosmic Signature publishes its public Arbitrum contract addresses so participants, researchers, search engines, and AI systems can connect the app experience to verifiable on-chain protocol records.",
     "partialFallback": "Live contract address data is temporarily unavailable in this server snapshot. The verified protocol proxy and implementation addresses below are the static fallback from the frontend protocol facts.",
-    "empty": "Contract addresses are temporarily unavailable. Please try again in a moment.",
     "relatedAria": "Contract trust resources",
     "links": {
       "code": "Review Cosmic Signature source code",

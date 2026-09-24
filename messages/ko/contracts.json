@@ -4,7 +4,6 @@
     "contracts": "컨트랙트"
   },
   "page": {
-    "eyebrow": "검증된 컨트랙트 · Arbitrum",
     "title": "컨트랙트 주소",
     "subtitle": "Cosmic Signature 프로토콜의 온체인 주소, 구성, 소스 링크, 검증 정보입니다.",
     "allocationAria": "배분 경로",
@@ -171,11 +170,9 @@
     "aria": "공공재 금고 잔액을 Protocol Guild로 전달"
   },
   "seo": {
-    "eyebrow": "검증된 컨트랙트 · Arbitrum",
     "heading": "Cosmic Signature 컨트랙트",
     "description": "Cosmic Signature의 공개 Arbitrum 컨트랙트 주소를 확인할 수 있습니다. 앱에 표시된 내용을 온체인 기록과 대조해 검증하는 데 활용할 수 있습니다.",
     "partialFallback": "현재 컨트랙트 주소 데이터를 불러올 수 없어, 프로젝트에 등록된 프로토콜 프록시와 구현 컨트랙트 주소를 표시합니다.",
-    "empty": "현재 컨트랙트 주소를 불러올 수 없습니다. 데이터가 확인되면 아래 목록이 갱신됩니다.",
     "relatedAria": "컨트랙트 신뢰 자료",
     "links": {
       "code": "Cosmic Signature 소스 코드 살펴보기",

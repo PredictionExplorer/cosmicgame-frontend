@@ -6,8 +6,7 @@
   "header": {
     "title": "Chi tiết nét bút",
     "loadingSubtitle": "Đang tải dữ liệu nét bút…",
-    "positionLabel": "Vị trí nét bút #{position}",
-    "positionFallback": "Vị trí nét bút"
+    "positionLabel": "Vị trí nét bút #{position}"
   },
   "empty": {
     "title": "Không tìm thấy thông tin nét bút.",

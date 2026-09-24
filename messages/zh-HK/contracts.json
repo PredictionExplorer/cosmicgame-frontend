@@ -4,7 +4,6 @@
     "contracts": "合約"
   },
   "page": {
-    "eyebrow": "已驗證合約 · Arbitrum",
     "title": "合約地址",
     "subtitle": "查看 Cosmic Signature 協議的鏈上地址、配置、源代碼連結與驗證背景。",
     "allocationAria": "分配軌道",
@@ -171,11 +170,9 @@
     "aria": "將公共物品金庫餘額轉撥給 Protocol Guild"
   },
   "seo": {
-    "eyebrow": "已驗證合約 · Arbitrum",
     "heading": "Cosmic Signature 合約",
     "description": "查閱 Cosmic Signature 在 Arbitrum 上的合約地址，並透過源代碼與鏈上記錄驗證協議。",
     "partialFallback": "暫時無法取得最新合約地址。下方顯示協議資料中已驗證的代理合約與實現合約地址。",
-    "empty": "暫時無法取得最新合約地址。數據恢復後，下方表格便會顯示地址。",
     "relatedAria": "合約信任資源",
     "links": {
       "code": "查看 Cosmic Signature 源代碼",

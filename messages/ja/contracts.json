@@ -4,7 +4,6 @@
     "contracts": "コントラクト"
   },
   "page": {
-    "eyebrow": "検証済みコントラクト · Arbitrum",
     "title": "コントラクトアドレス",
     "subtitle": "Cosmic Signatureプロトコルのオンチェーンアドレス、構成、ソースへのリンク、検証の背景。",
     "allocationAria": "配分トラック",
@@ -171,11 +170,9 @@
     "aria": "公共財金庫の残高をProtocol Guildへ送る"
   },
   "seo": {
-    "eyebrow": "検証済みコントラクト · Arbitrum",
     "heading": "Cosmic Signatureコントラクト",
     "description": "Cosmic Signatureの公開Arbitrumコントラクトを確認できます。アプリに表示された内容を、オンチェーンの記録と照らし合わせて検証するための資料です。",
     "partialFallback": "現在のコントラクトアドレスを取得できないため、以下にプロジェクトで公開しているプロキシと実装のアドレスを表示しています。",
-    "empty": "現在のコントラクトアドレスを取得できません。データが取得でき次第、下の一覧を更新します。",
     "relatedAria": "コントラクトの信頼性に関するリソース",
     "links": {
       "code": "Cosmic Signatureのソースコードを確認する",

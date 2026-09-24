@@ -30,7 +30,6 @@
     "invalidId": "Недійсний ідентифікатор внеску",
     "title": "Деталі прямого внеску ETH",
     "loadingSubtitle": "Завантаження внеску…",
-    "breadcrumbHome": "Головна",
     "breadcrumbContributions": "Внески ETH",
     "loading": "Завантаження…",
     "notFound": "Внесок не знайдено.",
@@ -60,9 +59,7 @@
     "invalidNumber": "Недійсний номер циклу",
     "title": "Прямі внески ETH у циклі {cycle}",
     "subtitle": "Усі прямі внески ETH, записані в цьому циклі.",
-    "breadcrumbHome": "Головна",
     "breadcrumbContributions": "Внески ETH",
-    "breadcrumbCycle": "Цикл {cycle}",
     "loading": "Завантаження…"
   }
 }

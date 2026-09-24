@@ -6,8 +6,7 @@
   "header": {
     "title": "Деталі жесту",
     "loadingSubtitle": "Завантаження даних жесту…",
-    "positionLabel": "Позиція жесту {position}",
-    "positionFallback": "Позиція жесту"
+    "positionLabel": "Позиція жесту {position}"
   },
   "empty": {
     "title": "Інформацію про жест не знайдено.",

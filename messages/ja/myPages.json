@@ -1,7 +1,5 @@
 {
   "shared": {
-    "home": "ホーム",
-    "user": "ユーザー",
     "loading": "読み込み中…",
     "unavailable": "取得不可",
     "yes": "はい",
@@ -14,7 +12,6 @@
     "recipient": "受領者"
   },
   "allocations": {
-    "eyebrow": "個人 · 配分",
     "title": "自分の配分",
     "subtitle": "未受け取りの配分をすべて確認して受け取る",
     "loadErrorTitle": "読み込みに失敗しました",
@@ -39,7 +36,6 @@
     "viewHistory": "配分履歴を見る"
   },
   "anchors": {
-    "eyebrow": "個人 · 係留",
     "title": "自分の係留",
     "subtitle": "係留中のNFTを管理し、Cosmic Signature NFTの配分を確認する",
     "tabs": {
@@ -383,10 +379,6 @@
       "outreach": "広報ウォレット",
       "stellarSelection": "星選ウォレット",
       "publicGoods": "公共財金庫"
-    },
-    "breadcrumbs": {
-      "nft": "NFT移転",
-      "cst": "CST送付"
     },
     "nft": {
       "title": "Cosmic Signature NFTの移転履歴",

@@ -35,7 +35,7 @@ const EthDonationByRoundPage = ({ round }: EthDonationByRoundPageProps) => {
     <PageShell variant="data" backdrop="signature" className="max-sm:pb-16">
       <div className="mx-auto max-w-5xl">
         <PageHeader
-          section="participate"
+          section="records"
           breadcrumbs={[{ label: t('cycle.breadcrumbContributions'), href: '/eth-contribution' }]}
           title={title}
           subtitle={t('cycle.subtitle')}

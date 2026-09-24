@@ -25,7 +25,6 @@
   "overview": {
     "errorTitle": "Lỗi khi tải dữ liệu neo giữ",
     "errorMessage": "Không tải được dữ liệu neo giữ. Vui lòng thử lại sau.",
-    "eyebrow": "Phân phối neo giữ · Trực tiếp",
     "title": "Phân phối neo giữ",
     "subtitle": "Tổng quan hoạt động neo giữ trong giao thức và lịch sử phân phối",
     "intro": {
@@ -92,12 +91,9 @@
     }
   },
   "anchorActionDetail": {
-    "title": "Thao tác neo giữ",
     "subtitle": "Thao tác neo giữ cho {token} NFT",
     "error": "Không tải được chi tiết thao tác neo giữ. Vui lòng thử lại sau.",
     "breadcrumbs": {
-      "home": "Trang chủ",
-      "myAnchors": "Neo giữ của tôi",
       "action": "Thao tác #{id}"
     },
     "empty": "Không tìm thấy dữ liệu cho thao tác neo giữ này.",
@@ -129,11 +125,6 @@
   "distributionsByToken": {
     "title": "Chi tiết phân phối neo giữ của token {tokenId}",
     "subtitle": "Phân phối cho {address}",
-    "breadcrumbs": {
-      "home": "Trang chủ",
-      "user": "Người dùng",
-      "token": "Token #{tokenId}"
-    },
     "details": {
       "anchorTitle": "Neo giữ",
       "releaseTitle": "Gỡ neo",

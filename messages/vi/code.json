@@ -10,7 +10,6 @@
     "github": "Xem mã nguồn của dự án tại <link>github.com/PredictionExplorer</link>."
   },
   "seo": {
-    "eyebrow": "Mã nguồn · nghệ thuật tất định",
     "heading": "Mã nguồn Cosmic Signature",
     "description": "Khám phá mã nguồn giao diện, backend Go, hợp đồng thông minh và công cụ tạo hình ảnh của Cosmic Signature. Trình xem bên dưới cho thấy cách seed trên chuỗi trở thành tác phẩm NFT có thể tái tạo.",
     "excerpt": "seed -> dòng ngẫu nhiên SHA3-256 -> mô phỏng ba vật thể -> bộ kết xuất quang phổ -> hình ảnh Cosmic Signature NFT",

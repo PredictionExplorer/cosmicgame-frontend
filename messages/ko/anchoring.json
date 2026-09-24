@@ -25,7 +25,6 @@
   "overview": {
     "errorTitle": "앵커링 데이터를 불러오지 못했습니다",
     "errorMessage": "앵커링 데이터를 불러올 수 없습니다. 잠시 후 다시 시도해 주세요.",
-    "eyebrow": "앵커링 지급 · 실시간",
     "title": "앵커링 지급",
     "subtitle": "전체 앵커링 활동과 지급 내역 개요",
     "intro": {
@@ -92,12 +91,9 @@
     }
   },
   "anchorActionDetail": {
-    "title": "앵커링 작업",
     "subtitle": "{token} NFT 앵커링 작업",
     "error": "앵커링 작업 상세 정보를 불러올 수 없습니다. 잠시 후 다시 시도해 주세요.",
     "breadcrumbs": {
-      "home": "홈",
-      "myAnchors": "내 앵커링",
       "action": "작업 #{id}"
     },
     "empty": "이 앵커링 작업의 데이터를 찾을 수 없습니다.",
@@ -129,11 +125,6 @@
   "distributionsByToken": {
     "title": "토큰 {tokenId}의 앵커링 지급 내역",
     "subtitle": "{address} 주소의 지급 내역",
-    "breadcrumbs": {
-      "home": "홈",
-      "user": "사용자",
-      "token": "토큰 #{tokenId}"
-    },
     "details": {
       "anchorTitle": "앵커링",
       "releaseTitle": "앵커링 해제",

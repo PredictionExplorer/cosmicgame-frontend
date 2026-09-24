@@ -25,7 +25,6 @@
   "overview": {
     "errorTitle": "未能載入錨定資料",
     "errorMessage": "未能載入錨定資料，請稍後再試。",
-    "eyebrow": "錨定配發 · 即時",
     "title": "錨定配發",
     "subtitle": "檢視整體錨定動態與配發紀錄",
     "intro": {
@@ -92,12 +91,9 @@
     }
   },
   "anchorActionDetail": {
-    "title": "錨定操作",
     "subtitle": "{token} NFT 錨定操作",
     "error": "未能載入錨定操作詳情，請稍後再試。",
     "breadcrumbs": {
-      "home": "首頁",
-      "myAnchors": "我的錨定",
       "action": "操作 #{id}"
     },
     "empty": "未找到該錨定操作紀錄。",
@@ -129,11 +125,6 @@
   "distributionsByToken": {
     "title": "代幣 {tokenId} 的錨定配發明細",
     "subtitle": "{address} 的配發紀錄",
-    "breadcrumbs": {
-      "home": "首頁",
-      "user": "使用者",
-      "token": "代幣 #{tokenId}"
-    },
     "details": {
       "anchorTitle": "錨定",
       "releaseTitle": "解錨",

@@ -97,7 +97,7 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
           <PageHeader
             title={t('detail.title')}
             subtitle={t('detail.loadingSubtitle')}
-            section="participate"
+            section="records"
             breadcrumbs={contributionsTrail}
           />
           <div className={cn(detailPanelClass, 'p-10 text-center')}>
@@ -115,7 +115,7 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
         <div className="mx-auto max-w-3xl">
           <PageHeader
             title={t('detail.title')}
-            section="participate"
+            section="records"
             breadcrumbs={contributionsTrail}
           />
           {isError ? (
@@ -138,7 +138,7 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
         <PageHeader
           title={t('detail.title')}
           subtitle={t('detail.subtitle', { id })}
-          section="participate"
+          section="records"
           breadcrumbs={contributionsTrail}
         />
 

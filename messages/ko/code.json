@@ -10,7 +10,6 @@
     "github": "공개 GitHub 조직은 <link>github.com/PredictionExplorer</link>에서 볼 수 있습니다."
   },
   "seo": {
-    "eyebrow": "소스 코드 · 결정론적 아트",
     "heading": "Cosmic Signature 소스 코드",
     "description": "Cosmic Signature의 프론트엔드, Go 백엔드, 스마트 컨트랙트, 이미지 생성 소스 코드를 살펴볼 수 있습니다. 아래 뷰어에서 온체인 시드가 재현 가능한 NFT 아트로 변환되는 과정을 확인할 수 있습니다.",
     "excerpt": "시드 -> SHA3-256 무작위 스트림 -> 삼체 시뮬레이션 -> 스펙트럼 렌더러 -> Cosmic Signature NFT 이미지",

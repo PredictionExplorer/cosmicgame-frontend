@@ -149,7 +149,7 @@ const EthDonations = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   return (
     <PageShell variant="data" backdrop="signature">
       {seoSummary ?? (
-        <PageHeader section="participate" title={t('page.title')} subtitle={t('page.subtitle')} />
+        <PageHeader section="records" title={t('page.title')} subtitle={t('page.subtitle')} />
       )}
 
       {!!account && (

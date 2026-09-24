@@ -25,7 +25,6 @@
   "overview": {
     "errorTitle": "Error loading anchoring data",
     "errorMessage": "Unable to load anchoring data. Please try again later.",
-    "eyebrow": "Anchor Distributions · Live",
     "title": "Anchor Distributions",
     "subtitle": "Overview of global anchoring activity and distribution history",
     "intro": {
@@ -92,12 +91,9 @@
     }
   },
   "anchorActionDetail": {
-    "title": "Anchor action",
     "subtitle": "Anchor Action for {token} NFT",
     "error": "Unable to load anchor action details. Please try again later.",
     "breadcrumbs": {
-      "home": "Home",
-      "myAnchors": "My Anchors",
       "action": "Action #{id}"
     },
     "empty": "No data found for this anchor action.",
@@ -129,11 +125,6 @@
   "distributionsByToken": {
     "title": "Anchor Distribution Details for Token {tokenId}",
     "subtitle": "Distributions for {address}",
-    "breadcrumbs": {
-      "home": "Home",
-      "user": "User",
-      "token": "Token #{tokenId}"
-    },
     "details": {
       "anchorTitle": "Anchor",
       "releaseTitle": "Release Anchor",
