@@ -4,7 +4,7 @@ import { createFakeTxFlow } from '@/test-utils/txFlow';
 
 import { checkA11y, fireEvent, render, screen, waitFor } from '@/test-utils';
 
-import { EthContributionForm, contributionPayload, isNoteUrl } from '../EthContributionForm';
+import { EthContributionForm } from '../EthContributionForm';
 
 const GAME = '0x9999999999999999999999999999999999999999';
 const mockTx = createFakeTxFlow();
@@ -161,23 +161,5 @@ describe('EthContributionForm', () => {
   it('has no accessibility violations', async () => {
     const { container } = render(<EthContributionForm />);
     await checkA11y(container);
-  });
-});
-
-describe('contribution notes', () => {
-  it('accepts only empty or http(s) links', () => {
-    expect(isNoteUrl('')).toBe(true);
-    expect(isNoteUrl('https://example.com/a')).toBe(true);
-    expect(isNoteUrl('http://example.com')).toBe(true);
-    expect(isNoteUrl('example.com')).toBe(false);
-    expect(isNoteUrl('javascript:alert(1)')).toBe(false);
-    expect(isNoteUrl('ipfs://cid')).toBe(false);
-  });
-
-  it('builds the JSON the record page reads, or null for an empty note', () => {
-    expect(contributionPayload({ title: ' ', message: '', url: '' })).toBeNull();
-    expect(contributionPayload({ title: 'Hi', message: '', url: 'https://a.b' })).toBe(
-      '{"title":"Hi","url":"https://a.b"}',
-    );
   });
 });

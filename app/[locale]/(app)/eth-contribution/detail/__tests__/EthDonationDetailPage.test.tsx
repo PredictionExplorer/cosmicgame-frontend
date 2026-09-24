@@ -1,89 +1,143 @@
-import { render, screen, checkA11y } from '@/test-utils';
+import { checkA11y, fireEvent, render, screen } from '@/test-utils';
 
 import EthDonationDetailPage from '../[id]/EthDonationDetailPage';
 
 const mockUseDonationsWithInfoById = jest.fn();
+const mockRefetch = jest.fn();
+const mockFetch = jest.fn();
 
-jest.mock('../../../../../../hooks/useApiQuery', () => ({
+jest.mock('@/hooks/useApiQuery', () => ({
   useDonationsWithInfoById: (...args: unknown[]) => mockUseDonationsWithInfoById(...args),
 }));
 
-jest.mock('../../../../../../utils', () => ({
-  getExplorerUrl: (type: string, hash: string) => `https://explorer/${type}/${hash}`,
-  convertTimestampToDateTime: (ts: number) => `date-${ts}`,
-  getMetadata: jest.fn(() => Promise.resolve({})),
-}));
-
-jest.mock('next/image', () => ({
-  __esModule: true,
-  default: (props: Record<string, unknown>) => <img {...props} />,
-}));
-
-beforeEach(() => jest.clearAllMocks());
-
-const baseDonation = {
-  TxHash: '0xTX123',
-  TimeStamp: 1000,
-  DonorAddr: '0xDonor',
+const DONOR = '0x4D3949CD8980E942eb9Dd24d4eCc27584a8D71fA';
+const DONATION = {
+  EvtLogId: 18955,
+  TxHash: '0x7545e61f9ae02f59dc2b1951edf97549b258eab28a40927f78178c11fec384c5',
+  TimeStamp: 1_782_078_578,
+  DonorAddr: DONOR,
   RoundNum: 3,
-  AmountEth: 5.25,
+  AmountEth: 20,
+  CGRecordId: 7,
+  DataJson: JSON.stringify({
+    title: 'For the builders',
+    message: 'Keep shipping.',
+    url: 'https://example.org/post',
+  }),
 };
 
+function withRecord(data: unknown, state: { isLoading?: boolean; isError?: boolean } = {}) {
+  mockUseDonationsWithInfoById.mockReturnValue({
+    data,
+    isLoading: false,
+    isError: false,
+    refetch: mockRefetch,
+    ...state,
+  });
+}
+
+const originalFetch = global.fetch;
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  global.fetch = mockFetch as unknown as typeof fetch;
+});
+
+afterAll(() => {
+  global.fetch = originalFetch;
+});
+
 describe('EthDonationDetailPage', () => {
-  it('shows error for negative id', () => {
-    mockUseDonationsWithInfoById.mockReturnValue({ data: null, isLoading: false });
-    render(<EthDonationDetailPage id={-1} />);
-    expect(screen.getByText('Invalid Contribution Id')).toBeInTheDocument();
+  it('leads with the amount, the contributor, the cycle and the date', () => {
+    withRecord(DONATION);
+    render(<EthDonationDetailPage id={7} />);
+
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'ethContribution.detail.title(id=7)',
+    );
+    expect(document.querySelector('[data-figure="amount"]')).toHaveTextContent('20.0000 ETH');
+    expect(document.querySelector('[data-figure="from"]')).toHaveTextContent('0x4D39');
+    expect(
+      screen.getByRole('link', { name: 'ethContribution.detail.cycleValue(cycle=3)' }),
+    ).toHaveAttribute('href', '/eth-contribution/round/3');
+    expect(document.querySelector('[data-figure="date"] time')).toBeInTheDocument();
   });
 
-  it('shows loading state', () => {
-    mockUseDonationsWithInfoById.mockReturnValue({ data: null, isLoading: true });
-    render(<EthDonationDetailPage id={1} />);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+  it("shows the contributor's note as a quote with its link, never fetching it", () => {
+    withRecord(DONATION);
+    render(<EthDonationDetailPage id={7} />);
+
+    expect(
+      screen.getByRole('heading', { name: 'ethContribution.detail.noteTitle' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('For the builders')).toBeInTheDocument();
+    expect(screen.getByText('Keep shipping.').closest('blockquote')).not.toBeNull();
+    const link = screen.getByRole('link', { name: /example\.org/ });
+    expect(link).toHaveAttribute('href', 'https://example.org/post');
+    expect(link).toHaveAttribute('rel', expect.stringContaining('nofollow'));
+    // Regression: the page used to fetch the note's URL (and, with none, its own origin).
+    expect(mockFetch).not.toHaveBeenCalled();
   });
 
-  it('shows "not found" when data is null', () => {
-    mockUseDonationsWithInfoById.mockReturnValue({ data: null, isLoading: false });
-    render(<EthDonationDetailPage id={1} />);
-    expect(screen.getByText('Contribution not found.')).toBeInTheDocument();
+  it('shows a note that is not the form JSON as stored', () => {
+    withRecord({ ...DONATION, DataJson: 'gm, builders' });
+    render(<EthDonationDetailPage id={7} />);
+
+    expect(screen.getByText('gm, builders').tagName).toBe('PRE');
+    expect(screen.getByText('ethContribution.detail.noteRawCaption')).toBeInTheDocument();
   });
 
-  it('renders contribution heading', () => {
-    mockUseDonationsWithInfoById.mockReturnValue({ data: baseDonation, isLoading: false });
-    render(<EthDonationDetailPage id={1} />);
-    expect(screen.getByText('Direct ETH Contribution Detail')).toBeInTheDocument();
+  it('gives the transaction its own row, linked to the explorer', () => {
+    withRecord(DONATION);
+    render(<EthDonationDetailPage id={7} />);
+
+    const transaction = screen.getByRole('link', { name: /0x7545/ });
+    expect(transaction).toHaveAttribute('href', expect.stringContaining(DONATION.TxHash));
+    expect(transaction).toHaveAttribute('target', '_blank');
   });
 
-  it('renders contributor address', () => {
-    mockUseDonationsWithInfoById.mockReturnValue({ data: baseDonation, isLoading: false });
-    render(<EthDonationDetailPage id={1} />);
-    expect(screen.getByText('0xDonor')).toBeInTheDocument();
-  });
+  it('explains a missing record and leads back to the list', () => {
+    withRecord(null);
+    render(<EthDonationDetailPage id={9} />);
 
-  it("links the cycle to that cycle's contribution list", () => {
-    mockUseDonationsWithInfoById.mockReturnValue({ data: baseDonation, isLoading: false });
-    render(<EthDonationDetailPage id={1} />);
-    expect(screen.getByRole('link', { name: /cycle 3/i })).toHaveAttribute(
+    expect(screen.getByText('ethContribution.detail.notFoundTitle(id=9)')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'ethContribution.detail.backToAll' })).toHaveAttribute(
       'href',
-      '/eth-contribution/round/3',
+      '/eth-contribution',
     );
   });
 
-  it('renders amount in ETH', () => {
-    mockUseDonationsWithInfoById.mockReturnValue({ data: baseDonation, isLoading: false });
-    render(<EthDonationDetailPage id={1} />);
-    expect(screen.getByText('5.25 ETH')).toBeInTheDocument();
+  it('refuses an invalid id without querying', () => {
+    withRecord(null);
+    render(<EthDonationDetailPage id={-1} />);
+
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'ethContribution.detail.invalidId',
+    );
+    expect(mockUseDonationsWithInfoById).toHaveBeenCalledWith(null);
   });
 
-  it('passes id to the hook', () => {
-    mockUseDonationsWithInfoById.mockReturnValue({ data: null, isLoading: false });
-    render(<EthDonationDetailPage id={42} />);
-    expect(mockUseDonationsWithInfoById).toHaveBeenCalledWith(42);
+  it('offers a retry when the record cannot be read', () => {
+    withRecord(undefined, { isError: true });
+    render(<EthDonationDetailPage id={7} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /try again/i }));
+    expect(mockRefetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps the heading and shows skeleton rows while loading', () => {
+    withRecord(undefined, { isLoading: true });
+    render(<EthDonationDetailPage id={7} />);
+
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'ethContribution.detail.title(id=7)',
+    );
+    expect(screen.getByRole('status', { name: 'tables.skeleton.loadingRows' })).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
-    mockUseDonationsWithInfoById.mockReturnValue({ data: baseDonation, isLoading: false });
-    const { container } = render(<EthDonationDetailPage id={1} />);
+    withRecord(DONATION);
+    const { container } = render(<EthDonationDetailPage id={7} />);
     await checkA11y(container);
   });
 });

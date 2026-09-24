@@ -557,7 +557,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: `/eth-contribution/detail/${contributionId}`,
     host: 'app',
     cluster: 'long-tail',
-    expectedText: 'ETH 贡献详情',
+    expectedText: `贡献 #${contributionId}`,
   },
   {
     id: 'eth-contribution-cycle',
@@ -566,7 +566,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: `/eth-contribution/round/${contributionId}`,
     host: 'app',
     cluster: 'long-tail',
-    expectedText: `第 ${contributionId} 个周期的直接 ETH 贡献`,
+    expectedText: `第 ${contributionId} 个周期的贡献`,
   },
   {
     id: 'public-goods-cg',

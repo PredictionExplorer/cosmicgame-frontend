@@ -25,37 +25,12 @@ import { MessageTextarea } from '@/components/ui/message-textarea';
 import { TxStatus } from '@/components/ui/tx-status';
 import { ChainGuard } from '@/components/wallet/NetworkGuard';
 
-/** The optional public note a contribution can carry, as the record page reads it. */
-export interface ContributionNote {
-  title: string;
-  message: string;
-  url: string;
-}
-
-const EMPTY_NOTE: ContributionNote = { title: '', message: '', url: '' };
-
-/** True for an empty link or a full http(s) URL: the only links a note may carry. */
-export function isNoteUrl(value: string): boolean {
-  const trimmed = value.trim();
-  if (!trimmed) return true;
-  try {
-    const url = new URL(trimmed);
-    return url.protocol === 'http:' || url.protocol === 'https:';
-  } catch {
-    return false;
-  }
-}
-
-/**
- * The note as the JSON `donateEthWithInfo` stores, with empty fields left
- * out; `null` when the note is empty, so the plain `donateEth` is used.
- */
-export function contributionPayload(note: ContributionNote): string | null {
-  const entries = Object.entries(note)
-    .map(([key, value]) => [key, value.trim()] as const)
-    .filter(([, value]) => value.length > 0);
-  return entries.length > 0 ? JSON.stringify(Object.fromEntries(entries)) : null;
-}
+import {
+  EMPTY_NOTE,
+  contributionPayload,
+  isNoteUrl,
+  type ContributionNote,
+} from './contributionNote';
 
 interface EthContributionFormProps {
   /** Anchor id, so a header action can jump to the form on phones. */

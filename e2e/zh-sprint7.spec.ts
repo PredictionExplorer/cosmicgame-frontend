@@ -249,13 +249,15 @@ test.describe('zh Sprint 7 — long-tail routes', () => {
     await expect(page.getByText('暂无贡献记录。')).toBeVisible();
 
     await openZh(page, '/zh/eth-contribution/detail/7');
-    await expect(page.getByRole('heading', { name: 'ETH 贡献详情', exact: true })).toBeVisible();
-    await expect(page.getByRole('link', { name: '第 7 个周期' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { level: 1, name: '贡献 #7', exact: true }),
+    ).toBeVisible();
+    await expect(page.getByRole('link', { name: '第 7 个周期', exact: true })).toBeVisible();
     await expect(page.getByText('贡献者留言')).toBeVisible();
 
     await openZh(page, '/zh/eth-contribution/round/7');
     await expect(
-      page.getByRole('heading', { name: '第 7 个周期的直接 ETH 贡献', exact: true }),
+      page.getByRole('heading', { name: '第 7 个周期的贡献', exact: true }),
     ).toBeVisible();
   });
 

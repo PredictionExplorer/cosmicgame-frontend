@@ -34,7 +34,6 @@ const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
   'app/[locale]/(app)/allocation-finalized/AllocationFinalizedPage.tsx': 1,
   'app/[locale]/(app)/allocation/[id]/AllocationInfoPage.tsx': 13,
   'app/[locale]/(app)/distributions-by-token/[address]/[tokenId]/RewardsByTokenPage.tsx': 2,
-  'app/[locale]/(app)/eth-contribution/detail/[id]/EthDonationDetailPage.tsx': 1,
   'app/[locale]/(app)/gesture/[id]/GesturePage.tsx': 2,
   'app/[locale]/(app)/my-allocations/MyWinnings.tsx': 1,
   'app/[locale]/(app)/my-anchors/MyAnchors.tsx': 1,
