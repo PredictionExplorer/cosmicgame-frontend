@@ -10,7 +10,6 @@ import {
   ImageIcon,
   Share2,
   Users,
-  Sparkles,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -23,6 +22,7 @@ import {
   AnchoringIcon,
   AttachedAssetsIcon,
   ChronoWarriorIcon,
+  ContributionIcon,
   EnduranceChampionIcon,
   FinalCstGestureIcon,
   GestureIcon,
@@ -604,7 +604,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
       tooltip: t('details.statistics.cards.uniqueAnchorHolders.tooltip'),
     },
     {
-      icon: <Sparkles className="h-3.5 w-3.5" />,
+      icon: <ContributionIcon className="h-3.5 w-3.5" />,
       label: t('details.statistics.cards.totalContributed.label'),
       value: formatEthValue(allocationInfo.RoundStats.TotalDonatedAmountEth ?? 0, locale),
       tooltip: t('details.statistics.cards.totalContributed.tooltip'),

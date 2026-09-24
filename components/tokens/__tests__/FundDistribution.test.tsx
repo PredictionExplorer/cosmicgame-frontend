@@ -110,6 +110,18 @@ describe('FundDistribution', () => {
     }
   });
 
+  it('draws each track with its concept icon', () => {
+    render(<FundDistribution data={createData()} />);
+    const glyph = (id: string) =>
+      [...(row(id).querySelector('svg')?.classList ?? [])].find((name) =>
+        name.startsWith('lucide-'),
+      );
+    // Anchor Distribution is Split everywhere (allocation pages, My Anchors);
+    // Anchor is the act of Anchoring, not its distribution.
+    expect(glyph('anchor')).toBe('lucide-split');
+    expect(glyph('nextCycle')).toBe('lucide-rotate-ccw');
+  });
+
   it('lists the tracks in the shared order', () => {
     render(<FundDistribution data={createData()} />);
     const order = Array.from(document.querySelectorAll('[data-track]')).map((element) =>

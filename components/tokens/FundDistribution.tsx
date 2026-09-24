@@ -5,7 +5,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
 
 import {
-  AnchoringIcon,
+  AnchorDistributionIcon,
   ChronoWarriorIcon,
   CompoundingReserveIcon,
   PublicGoodsIcon,
@@ -38,7 +38,7 @@ const TRACK_ICONS: Record<AllocationTrackId, ReactNode> = {
   signature: <SignatureAllocationIcon className="h-4 w-4" aria-hidden />,
   chrono: <ChronoWarriorIcon className="h-4 w-4" aria-hidden />,
   stellar: <StellarSelectionIcon className="h-4 w-4" aria-hidden />,
-  anchor: <AnchoringIcon className="h-4 w-4" aria-hidden />,
+  anchor: <AnchorDistributionIcon className="h-4 w-4" aria-hidden />,
   publicGoods: <PublicGoodsIcon className="h-4 w-4" aria-hidden />,
   nextCycle: <CompoundingReserveIcon className="h-4 w-4" aria-hidden />,
 };

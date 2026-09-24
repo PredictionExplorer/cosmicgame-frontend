@@ -1,11 +1,14 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { ArrowRight, ImageIcon, Layers, RefreshCw, Users } from 'lucide-react';
+import { ArrowRight, ImageIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import {
+  AnchorDistributionIcon,
+  AnchoringIcon,
   ChronoWarriorIcon,
+  CompoundingReserveIcon,
   EnduranceChampionIcon,
   PublicGoodsIcon,
   SignatureAllocationIcon,
@@ -95,7 +98,7 @@ export function AllocationLedger({ data, className }: AllocationLedgerProps) {
     },
     {
       key: 'cosmic-anchor',
-      icon: <Users className="h-3.5 w-3.5" aria-hidden />,
+      icon: <AnchorDistributionIcon className="h-3.5 w-3.5" aria-hidden />,
       name: t('allocation.cards.cosmicAnchor.name'),
       tooltip: t('allocation.cards.cosmicAnchor.tooltip'),
       amount: ethAmount(amounts.cosmicAnchorEth),
@@ -104,7 +107,7 @@ export function AllocationLedger({ data, className }: AllocationLedgerProps) {
     },
     {
       key: 'rwlk-anchor',
-      icon: <Layers className="h-3.5 w-3.5" aria-hidden />,
+      icon: <AnchoringIcon className="h-3.5 w-3.5" aria-hidden />,
       name: t('allocation.cards.randomWalkAnchor.name'),
       tooltip: t('allocation.cards.randomWalkAnchor.tooltip'),
       amount: cstPlusNft,
@@ -127,7 +130,7 @@ export function AllocationLedger({ data, className }: AllocationLedgerProps) {
       ? [
           {
             key: 'next-cycle',
-            icon: <RefreshCw className="h-3.5 w-3.5" aria-hidden />,
+            icon: <CompoundingReserveIcon className="h-3.5 w-3.5" aria-hidden />,
             name: t('observatory.ribbon.nextCycleName'),
             tooltip: t('observatory.ribbon.nextCycleTooltip'),
             amount: ethAmount(amounts.nextCycleEth),
