@@ -87,8 +87,14 @@ export function useEndgameChainSync({
 
   const hasTarget = Number.isFinite(targetMs) && targetMs > 0;
   const crossed = hasTarget && now >= targetMs;
+  // Only a zero-cross seen live, inside the endgame tail, waits for on-chain
+  // proof. A deadline that had already passed when the page (or a sleeping
+  // tab) woke up is proven by the server clock that placed it in the past:
+  // latching it would open a long-finished cycle on a false "Confirming"
+  // state, with no Finalize button, for the whole grace period.
+  const crossedLive = crossed && now - targetMs <= ENDGAME_TAIL_MS;
 
-  if (crossed && zeroCrossAtMsRef.current == null) {
+  if (crossedLive && zeroCrossAtMsRef.current == null) {
     zeroCrossAtMsRef.current = now;
   } else if (!crossed && zeroCrossAtMsRef.current != null) {
     // Deadline moved into the future (extension) or a new round started.
@@ -194,8 +200,9 @@ export function useEndgameChainSync({
 
   const zeroCrossAtMs = zeroCrossAtMsRef.current;
   const withinGrace = zeroCrossAtMs != null && now - zeroCrossAtMs < CONFIRMATION_GRACE_MS;
-  const isConfirmationPending =
-    crossed && effectiveEnabled && !isClaimedOnChain && !confirmedBySample && withinGrace;
+  // `active` covers the tail window, a readable contract and an unclaimed
+  // cycle: without it there is no sample to wait for, so the clock decides.
+  const isConfirmationPending = crossedLive && active && !confirmedBySample && withinGrace;
 
   return { isConfirmationPending, isClaimedOnChain, lastSample };
 }
