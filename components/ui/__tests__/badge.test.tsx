@@ -1,25 +1,76 @@
 import '@testing-library/jest-dom';
+import { Lock } from 'lucide-react';
+
 import { Badge } from '@/components/ui/badge';
 
 import { render, screen, checkA11y } from '@/test-utils';
 
 describe('Badge', () => {
-  it('renders with default variant', () => {
-    render(<Badge>Default</Badge>);
-    expect(screen.getByText('Default')).toBeInTheDocument();
+  it('renders a neutral tag by default', () => {
+    render(<Badge>Eligible for Anchoring</Badge>);
+    const badge = screen.getByText('Eligible for Anchoring');
+    expect(badge.tagName).toBe('SPAN');
+    expect(badge).toHaveAttribute('data-tone', 'neutral');
+    expect(badge).toHaveClass('rounded-edge', 'border-rule');
   });
 
-  it.each(['secondary', 'destructive', 'outline'] as const)(
-    'renders with %s variant',
-    (variant) => {
-      render(<Badge variant={variant}>{variant}</Badge>);
-      expect(screen.getByText(variant)).toBeInTheDocument();
+  it.each(['neutral', 'accent', 'positive', 'attention', 'critical', 'live'] as const)(
+    'renders the %s tone',
+    (tone) => {
+      render(<Badge tone={tone}>{tone}</Badge>);
+      expect(screen.getByText(tone)).toHaveAttribute('data-tone', tone);
     },
   );
 
-  it('renders children', () => {
-    render(<Badge>Badge Content</Badge>);
-    expect(screen.getByText('Badge Content')).toBeInTheDocument();
+  it.each([
+    ['default', 'accent'],
+    ['secondary', 'accent'],
+    ['destructive', 'critical'],
+    ['outline', 'neutral'],
+  ] as const)('maps the deprecated %s variant to the %s tone', (variant, tone) => {
+    render(<Badge variant={variant}>{variant}</Badge>);
+    expect(screen.getByText(variant)).toHaveAttribute('data-tone', tone);
+  });
+
+  it('never renders below the 12px caption floor', () => {
+    render(
+      <>
+        <Badge size="sm">Small</Badge>
+        <Badge size="md">Medium</Badge>
+      </>,
+    );
+    expect(screen.getByText('Small')).toHaveClass('type-caption');
+    expect(screen.getByText('Medium')).toHaveClass('type-label');
+  });
+
+  it('draws a dot that breathes only while live', () => {
+    const { container } = render(
+      <>
+        <Badge tone="positive" dot>
+          Growing
+        </Badge>
+        <Badge tone="live" dot shape="pill">
+          Live
+        </Badge>
+      </>,
+    );
+    const dots = container.querySelectorAll('[data-slot="badge-dot"]');
+    expect(dots).toHaveLength(2);
+    expect(dots[0]).toHaveAttribute('aria-hidden');
+    expect(dots[0]?.className).not.toMatch(/animate-live-dot/);
+    expect(dots[1]?.className).toMatch(/animate-live-dot/);
+    expect(screen.getByText('Live')).toHaveClass('rounded-pill');
+  });
+
+  it('sets token numbers in mono that never break', () => {
+    render(<Badge mono>#000025</Badge>);
+    expect(screen.getByText('#000025')).toHaveClass('font-mono', 'whitespace-nowrap');
+  });
+
+  it('hides a leading icon from assistive technology', () => {
+    render(<Badge icon={<Lock data-testid="lock" />}>Locked</Badge>);
+    expect(screen.getByTestId('lock').parentElement).toHaveAttribute('aria-hidden');
+    expect(screen.getByText('Locked')).toBeInTheDocument();
   });
 
   it('applies custom className', () => {
@@ -28,7 +79,14 @@ describe('Badge', () => {
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<Badge>Status</Badge>);
+    const { container } = render(
+      <p>
+        Status{' '}
+        <Badge tone="live" dot>
+          Live
+        </Badge>
+      </p>,
+    );
     await checkA11y(container);
   });
 });

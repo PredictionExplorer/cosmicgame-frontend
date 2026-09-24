@@ -15,6 +15,7 @@ import {
 } from '@/lib/conceptIcons';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 
 interface AllocationData {
@@ -240,10 +241,10 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
                   ))}
                 </div>
                 <div className="mt-2.5 flex items-center gap-1.5">
-                  <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                  <Badge size="sm">
                     {allocation.recipientLabel ??
                       t('allocation.recipientCount', { count: allocation.recipientCount ?? 0 })}
-                  </span>
+                  </Badge>
                 </div>
               </div>
             </div>
