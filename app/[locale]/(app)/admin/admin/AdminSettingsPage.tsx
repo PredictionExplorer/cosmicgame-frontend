@@ -42,7 +42,12 @@ interface ParameterRow {
   value: ReactNode | null;
 }
 
-/** A label and its value on one hairline-divided line. */
+/**
+ * A label and its value on one hairline-divided line. The label takes the
+ * room the value leaves, and the value wraps inside at most 60% of the row,
+ * so a long value ("Not reported by the dashboard API", a date and its
+ * badge) never squeezes the label to a syllable per line or runs off the edge.
+ */
 function SheetRow({
   label,
   children,
@@ -59,17 +64,26 @@ function SheetRow({
     <div
       data-parameter={id}
       className={cn(
-        'gap-x-8 gap-y-2 border-b border-rule-faint py-3',
+        'gap-y-2 border-b border-rule-faint py-3',
         wide
-          ? 'grid lg:grid-cols-[minmax(0,17rem)_minmax(0,1fr)] lg:items-baseline'
-          : 'flex min-h-12 items-center justify-between',
+          ? 'grid gap-x-8 lg:grid-cols-[minmax(0,17rem)_minmax(0,1fr)] lg:items-baseline'
+          : 'flex min-h-12 items-center justify-between gap-x-6',
       )}
     >
-      <dt className="min-w-0 type-body-sm text-muted-foreground">{label}</dt>
+      <dt
+        className={cn(
+          'min-w-0 type-body-sm text-muted-foreground',
+          !wide && 'flex-1 [overflow-wrap:break-word]',
+        )}
+      >
+        {label}
+      </dt>
       <dd
         className={cn(
           'min-w-0 text-foreground',
-          wide ? 'flex flex-col items-start gap-1.5' : 'shrink-0 text-end type-figure-sm',
+          wide
+            ? 'flex flex-col items-start gap-1.5'
+            : 'max-w-[60%] text-end type-figure-sm [overflow-wrap:break-word]',
         )}
       >
         {children}

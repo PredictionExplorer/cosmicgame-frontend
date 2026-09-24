@@ -143,6 +143,20 @@ describe('AdminSettingsPage', () => {
     );
   });
 
+  // A long value once kept its full width (shrink-0) and squeezed the label to a
+  // syllable per line on phones, clipping the value at the row's edge.
+  it.each(['ETH to CST Gesture ratio', 'Initial Gesture Cost fraction', 'Activation time'])(
+    'lets the %s value wrap beside a label that keeps its room',
+    (label) => {
+      render(<AdminSettingsPage />);
+      const term = screen.getByText(label, { selector: 'dt' });
+      const value = valueOf(label);
+      expect(value).not.toHaveClass('shrink-0');
+      expect(value).toHaveClass('min-w-0', 'max-w-[60%]', 'text-end');
+      expect(term).toHaveClass('min-w-0', 'flex-1');
+    },
+  );
+
   it('shows a dash, announced as unavailable, for a reported field it cannot read', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: { ...dashboard, TimeIncrease: 'n/a' },
