@@ -94,14 +94,17 @@
     },
     "publicGoodsProtocol": {
       "label": "프로토콜 공공재 기여",
+      "short": "프로토콜 기여",
       "description": "사이클마다 이루어진 공공재 배분"
     },
     "publicGoodsVoluntary": {
       "label": "자발적 공공재 기여",
+      "short": "자발적 기여",
       "description": "공공재 금고에 직접 보낸 기여"
     },
     "publicGoodsRetrievals": {
       "label": "공공재 회수 내역",
+      "short": "회수 내역",
       "description": "공공재 금고에서 전달된 자금"
     },
     "ethContributions": {

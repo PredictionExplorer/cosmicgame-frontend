@@ -94,14 +94,17 @@
     },
     "publicGoodsProtocol": {
       "label": "Đóng góp Hàng hóa công của giao thức",
+      "short": "Giao thức",
       "description": "Phân bổ Hàng hóa công của từng chu kỳ"
     },
     "publicGoodsVoluntary": {
       "label": "Đóng góp Hàng hóa công tự nguyện",
+      "short": "Tự nguyện",
       "description": "Các khoản gửi thẳng vào Kho Hàng hóa công"
     },
     "publicGoodsRetrievals": {
       "label": "Nhận về Hàng hóa công",
+      "short": "Nhận về",
       "description": "Các khoản chuyển từ Kho Hàng hóa công"
     },
     "ethContributions": {

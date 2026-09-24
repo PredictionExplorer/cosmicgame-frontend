@@ -94,14 +94,17 @@
     },
     "publicGoodsProtocol": {
       "label": "協議公共財資助",
+      "short": "協議資助",
       "description": "每個週期的公共財分配"
     },
     "publicGoodsVoluntary": {
       "label": "自願公共財資助",
+      "short": "自願資助",
       "description": "直接存入公共財金庫的貢獻"
     },
     "publicGoodsRetrievals": {
       "label": "公共財取回",
+      "short": "取回",
       "description": "從公共財金庫轉撥的資金"
     },
     "ethContributions": {

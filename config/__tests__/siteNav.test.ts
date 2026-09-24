@@ -90,7 +90,11 @@ describe('site navigation taxonomy', () => {
         expect(lookup(catalog, `routes.${route.id}.label`)).toEqual(expect.any(String));
         expect(lookup(catalog, `routes.${route.id}.description`)).toEqual(expect.any(String));
       }
-      for (const id of STATISTICS_SECTION_ROUTE_IDS) {
+      // Compact names: the statistics tabs and the route-group switchers.
+      for (const id of [
+        ...STATISTICS_SECTION_ROUTE_IDS,
+        ...Object.values(SITE_ROUTE_GROUPS).flat(),
+      ]) {
         expect(lookup(catalog, `routes.${id}.short`)).toEqual(expect.any(String));
       }
       for (const id of Object.keys(SITE_ROUTE_GROUPS)) {

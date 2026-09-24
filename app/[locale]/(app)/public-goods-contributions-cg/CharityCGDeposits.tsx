@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { PageHeader } from '@/components/layout/PageHeader';
+import { RouteGroupNav } from '@/components/layout/RouteGroupNav';
 import { PublicGoodsImpactCard } from '@/components/home/PublicGoodsImpactCard';
 import { PageShell } from '@/components/ui/page-shell';
 import {
@@ -23,6 +24,7 @@ const CharityCGDeposits = ({ seoSummary }: { seoSummary?: ReactNode }) => {
       {!seoSummary && (
         <PageHeader title={t('protocol.title')} titleLevel={2} subtitle={t('protocol.subtitle')} />
       )}
+      <RouteGroupNav group="publicGoods" current="publicGoodsProtocol" />
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
         {t('protocol.description')}
       </p>

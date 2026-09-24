@@ -94,14 +94,17 @@
     },
     "publicGoodsProtocol": {
       "label": "プロトコルの公共財拠出",
+      "short": "プロトコル拠出",
       "description": "各サイクルの公共財配分"
     },
     "publicGoodsVoluntary": {
       "label": "自発的な公共財拠出",
+      "short": "自発的な拠出",
       "description": "公共財金庫への直接の拠出"
     },
     "publicGoodsRetrievals": {
       "label": "公共財の受け取り",
+      "short": "受け取り",
       "description": "公共財金庫から送られた資金"
     },
     "ethContributions": {

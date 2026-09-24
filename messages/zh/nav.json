@@ -94,14 +94,17 @@
     },
     "publicGoodsProtocol": {
       "label": "协议公共物品资助",
+      "short": "协议资助",
       "description": "每个周期的公共物品分配"
     },
     "publicGoodsVoluntary": {
       "label": "自愿公共物品资助",
+      "short": "自愿资助",
       "description": "直接存入公共物品金库的贡献"
     },
     "publicGoodsRetrievals": {
       "label": "公共物品取回",
+      "short": "取回",
       "description": "从公共物品金库转拨的资金"
     },
     "ethContributions": {
