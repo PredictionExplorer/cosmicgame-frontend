@@ -529,8 +529,8 @@ export const LANDING_HEADER_LINKS: readonly LandingHeaderLink[] = [
   { id: 'about', short: true },
 ];
 
-/** The landing home's in-page sections, linked from the landing header. */
-export const LANDING_SECTION_ANCHORS = ['cycle', 'art', 'tracks'] as const;
+/** The landing home's in-page sections, linked from the landing header in page order. */
+export const LANDING_SECTION_ANCHORS = ['art', 'cycle', 'tracks'] as const;
 export type LandingSectionAnchor = (typeof LANDING_SECTION_ANCHORS)[number];
 
 /** Suggestions on both 404 pages, after its Observatory and Gallery buttons. */
