@@ -1,3 +1,5 @@
+import { SITE_NAME } from '@/utils/seo';
+
 import { MIDNIGHT_TOKENS, hslTripletToHex } from './palette';
 
 /**
@@ -33,10 +35,17 @@ export const BRAND_ICON_PATHS = {
   logo512: '/images/brand/logo-512.png',
 } as const;
 
+/**
+ * The icons as pages and the manifest link them: versioned, so a replaced
+ * file reaches browsers and installed apps that cached the old one.
+ */
 export const BRAND_ICON_URLS = {
   faviconIco: versioned(BRAND_ICON_PATHS.faviconIco),
   faviconSvg: versioned(BRAND_ICON_PATHS.faviconSvg),
   appleTouchIcon: versioned(BRAND_ICON_PATHS.appleTouchIcon),
+  icon192: versioned(BRAND_ICON_PATHS.icon192),
+  icon512: versioned(BRAND_ICON_PATHS.icon512),
+  maskable512: versioned(BRAND_ICON_PATHS.maskable512),
 } as const;
 
 export const BRAND_ICON_COLORS = {
@@ -53,7 +62,7 @@ export function smallMarkSvg(): string {
   const { plate, mark } = BRAND_ICON_COLORS;
   return [
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">',
-    '<title>Cosmic Signature</title>',
+    `<title>${SITE_NAME}</title>`,
     `<rect width="32" height="32" rx="7" fill="${plate}"/>`,
     `<g fill="none" stroke="${mark}" stroke-width="2.3">`,
     '<ellipse cx="16" cy="16" rx="11.8" ry="6.1" transform="rotate(40 16 16)"/>',

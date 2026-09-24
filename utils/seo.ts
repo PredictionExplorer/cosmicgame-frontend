@@ -29,11 +29,12 @@ export type CanonicalHost = 'app' | 'landing';
 export const SITE_NAME = 'Cosmic Signature';
 
 /**
- * The brand in 12 characters or fewer, where a launcher or home screen would
- * cut the full name off (the web manifest's `short_name`). The brand is
- * written in Latin letters in every locale, so one form serves all of them.
+ * The brand where a launcher or home screen has room for one word (the web
+ * manifest's `short_name`, 12 characters at most): the brand's first word,
+ * never an abbreviation it does not use elsewhere. The brand is written in
+ * Latin letters in every locale, so one form serves all of them.
  */
-export const SITE_SHORT_NAME = 'Cosmic Sig';
+export const SITE_SHORT_NAME = 'Cosmic';
 
 /** The protocol's X account, emitted as `twitter:site` on every page. */
 export const X_HANDLE = '@CosmicSignature';

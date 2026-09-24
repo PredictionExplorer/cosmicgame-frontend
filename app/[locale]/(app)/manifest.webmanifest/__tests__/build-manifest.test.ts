@@ -44,8 +44,10 @@ describe('web app manifest', () => {
     expect(manifest.theme_color).toBe('#090A11');
   });
 
+  // F312: the short name is the brand's own first word, not a new abbreviation.
   it('keeps the short name within what a launcher shows', () => {
     expect(SITE_SHORT_NAME.length).toBeLessThanOrEqual(12);
+    expect(SITE_NAME.startsWith(SITE_SHORT_NAME)).toBe(true);
   });
 
   it('lists PNG install icons, a maskable one, and files that exist', async () => {
@@ -58,7 +60,9 @@ describe('web app manifest', () => {
       ]),
     );
     for (const { src } of icons) {
-      expect(existsSync(join(process.cwd(), 'public', src))).toBe(true);
+      // Versioned like the page's own icon links, so a replaced file is refetched.
+      expect(src).toMatch(/\?v=\d+$/);
+      expect(existsSync(join(process.cwd(), 'public', src.replace(/\?.*$/, '')))).toBe(true);
     }
   });
 });

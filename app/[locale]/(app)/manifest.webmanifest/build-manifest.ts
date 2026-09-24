@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server';
 
 import { getLocaleConfig } from '@/i18n/localeConfig';
 import { routing } from '@/i18n/routing';
-import { BRAND_ICON_COLORS, BRAND_ICON_PATHS } from '@/lib/og/brandIcons';
+import { BRAND_ICON_COLORS, BRAND_ICON_URLS } from '@/lib/og/brandIcons';
 import { SITE_NAME, SITE_SHORT_NAME } from '@/utils/seo';
 
 /**
@@ -42,15 +42,15 @@ export async function buildWebManifest(locale: string): Promise<MetadataRoute.Ma
     background_color: BRAND_ICON_COLORS.plate,
     theme_color: BRAND_ICON_COLORS.plate,
     icons: [
-      { src: BRAND_ICON_PATHS.icon192, sizes: '192x192', type: 'image/png', purpose: 'any' },
-      { src: BRAND_ICON_PATHS.icon512, sizes: '512x512', type: 'image/png', purpose: 'any' },
+      { src: BRAND_ICON_URLS.icon192, sizes: '192x192', type: 'image/png', purpose: 'any' },
+      { src: BRAND_ICON_URLS.icon512, sizes: '512x512', type: 'image/png', purpose: 'any' },
       {
-        src: BRAND_ICON_PATHS.maskable512,
+        src: BRAND_ICON_URLS.maskable512,
         sizes: '512x512',
         type: 'image/png',
         purpose: 'maskable',
       },
-      { src: BRAND_ICON_PATHS.faviconSvg, sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
+      { src: BRAND_ICON_URLS.faviconSvg, sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
     ],
     categories: ['art'],
   };

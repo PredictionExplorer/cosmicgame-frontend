@@ -1,6 +1,7 @@
 import { getLocaleConfig } from '@/i18n/localeConfig';
 import { APP_ORIGIN, LANDING_ORIGIN } from '@/lib/hostRouting';
 import { BRAND_ICON_PATHS } from '@/lib/og/brandIcons';
+import { SITE_NAME } from '@/utils/seo';
 
 interface FAQItem {
   question: string;
@@ -14,7 +15,6 @@ export function jsonLdInLanguage(locale: string): string {
 
 const SITE_URL = LANDING_ORIGIN;
 const APP_URL = APP_ORIGIN;
-const SITE_NAME = 'Cosmic Signature';
 /** The orbit mark on the Midnight plate: square, opaque, 512px (`npm run brand:icons`). */
 const SITE_LOGO_URL = `${SITE_URL}${BRAND_ICON_PATHS.logo512}`;
 /**

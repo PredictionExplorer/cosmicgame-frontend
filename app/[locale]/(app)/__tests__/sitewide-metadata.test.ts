@@ -154,7 +154,7 @@ describe('site-wide localized page metadata', () => {
 
   it('gives every Chinese metadata pair localized copy instead of an English fallback', () => {
     for (const { title, description } of metadataPairs(zhMeta)) {
-      expect(`${title}${description}`).toMatch(/[㐀-鿿]/);
+      expect(`${title}${description}`).toMatch(/[\u3400-\u9fff]/);
     }
   });
 });
