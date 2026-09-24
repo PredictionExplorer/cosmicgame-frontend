@@ -32,7 +32,8 @@
       "used": "使用済み",
       "unused": "未使用",
       "use": "一筆に使う",
-      "empty": "このウォレットにはまだRandomWalk NFTがありません。"
+      "empty": "このウォレットにはまだRandomWalk NFTがありません。",
+      "error": "このウォレットのRandomWalk NFTを読み込めませんでした。"
     }
   },
   "seo": {

@@ -32,7 +32,8 @@
       "used": "사용됨",
       "unused": "미사용",
       "use": "제스처에 사용",
-      "empty": "이 지갑에는 아직 RandomWalk NFT가 없습니다."
+      "empty": "이 지갑에는 아직 RandomWalk NFT가 없습니다.",
+      "error": "이 지갑의 RandomWalk NFT를 읽을 수 없습니다."
     }
   },
   "seo": {

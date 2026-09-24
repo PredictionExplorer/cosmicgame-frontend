@@ -32,7 +32,8 @@
       "used": "Used",
       "unused": "Unused",
       "use": "Use in a gesture",
-      "empty": "This wallet holds no RandomWalk NFTs yet."
+      "empty": "This wallet holds no RandomWalk NFTs yet.",
+      "error": "The RandomWalk NFTs in this wallet could not be read."
     }
   },
   "seo": {

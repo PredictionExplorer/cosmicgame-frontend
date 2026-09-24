@@ -160,6 +160,24 @@ describe('Imprint', () => {
     );
   });
 
+  it('says when the wallet’s tokens cannot be read and reads them again on retry', async () => {
+    const user = userEvent.setup();
+    mockWalletOfOwner.mockRejectedValueOnce(new Error('rpc down'));
+    renderWithQuery(<Imprint />);
+
+    // Not a skeleton forever: the failure is named, with a retry.
+    const title = await screen.findByText('The RandomWalk NFTs in this wallet could not be read.');
+    expect(title.tagName).toBe('H3');
+
+    mockWalletOfOwner.mockResolvedValueOnce([5n]);
+    await user.click(screen.getByRole('button', { name: /errors\.state\.retry|Try again/ }));
+    const list = await screen.findByRole('list');
+    expect(within(list).getAllByRole('listitem')).toHaveLength(1);
+    expect(
+      screen.queryByText('The RandomWalk NFTs in this wallet could not be read.'),
+    ).not.toBeInTheDocument();
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = renderWithQuery(<Imprint />);
     await screen.findByRole('button', { name: 'Imprint now' });

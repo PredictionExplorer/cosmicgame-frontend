@@ -32,7 +32,8 @@
       "used": "已使用",
       "unused": "未使用",
       "use": "用於落筆",
-      "empty": "此錢包尚未持有 Random Walk NFT。"
+      "empty": "此錢包尚未持有 Random Walk NFT。",
+      "error": "無法讀取此錢包中的 Random Walk NFT。"
     }
   },
   "seo": {

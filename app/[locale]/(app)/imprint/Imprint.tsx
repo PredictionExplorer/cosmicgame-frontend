@@ -16,6 +16,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { Amount } from '@/components/ui/amount';
 import { ArtTag, WallLabel } from '@/components/ui/art-frame';
 import { Button, buttonVariants } from '@/components/ui/button';
+import { ErrorState } from '@/components/ui/error-state';
 import { PageShell } from '@/components/ui/page-shell';
 import { SectionHeader } from '@/components/ui/section-header';
 import { SkeletonText } from '@/components/ui/skeleton';
@@ -230,7 +231,14 @@ const Imprint = ({ seoSummary }: { seoSummary?: ReactNode }) => {
       {account ? (
         <section aria-labelledby="imprint-owned" className="mt-[calc(var(--block-gap)*1.5)]">
           <SectionHeader headingId="imprint-owned" title={t('page.myNfts')} />
-          {owned.tokens === null ? (
+          {owned.isError ? (
+            <ErrorState
+              variant="inline"
+              headingLevel={3}
+              title={t('page.owned.error')}
+              onRetry={owned.retry}
+            />
+          ) : owned.tokens === null ? (
             <SkeletonText lines={2} />
           ) : owned.tokens.length === 0 ? (
             <p className="type-body-sm text-muted-foreground">{t('page.owned.empty')}</p>

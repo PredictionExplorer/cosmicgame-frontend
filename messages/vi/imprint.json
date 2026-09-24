@@ -32,7 +32,8 @@
       "used": "Đã dùng",
       "unused": "Chưa dùng",
       "use": "Dùng cho nét bút",
-      "empty": "Ví này chưa có RandomWalk NFT nào."
+      "empty": "Ví này chưa có RandomWalk NFT nào.",
+      "error": "Không thể đọc RandomWalk NFT trong ví này."
     }
   },
   "seo": {

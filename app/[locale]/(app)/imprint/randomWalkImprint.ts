@@ -78,7 +78,11 @@ export function useImprintCost() {
 export const ownedRandomWalksKey = (account: string | null | undefined) =>
   ['rwlkOwned', account?.toLowerCase() ?? null] as const;
 
-/** The Random Walk NFTs an account holds, newest first. */
+/**
+ * The Random Walk NFTs an account holds, newest first: `tokens` is `null`
+ * until the first read lands, and `isError` says that read failed (a later
+ * failed refresh keeps the tokens already shown); `retry` reads again.
+ */
 export function useOwnedRandomWalks(account: string | null | undefined) {
   const contract = useRWLKNFTContract();
   const queryClient = useQueryClient();
@@ -94,6 +98,8 @@ export function useOwnedRandomWalks(account: string | null | undefined) {
   });
   return {
     tokens: query.data ?? null,
+    isError: query.isError && query.data === undefined,
+    retry: () => void query.refetch(),
     refresh: () => queryClient.invalidateQueries({ queryKey: ownedRandomWalksKey(account) }),
   };
 }
