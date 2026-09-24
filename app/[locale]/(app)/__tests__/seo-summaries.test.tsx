@@ -77,7 +77,29 @@ jest.mock('../../../../services/api/tokens', () => ({
 // lexicon-allow-end
 jest.mock('@/hooks/useApiQuery', () => ({
   useDashboardInfo: jest.fn(),
+  useCSTAnchorActions: jest.fn(() => mockClientList()),
+  useRWLKAnchorActions: jest.fn(() => mockClientList()),
+  useCSTAnchorDistributions: jest.fn(() => mockClientList()),
+  useGlobalRWLKAnchorImprints: jest.fn(() => mockClientList()),
 }));
+jest.mock('../imprint/randomWalkImprint', () => ({
+  useImprintCost: () => mockImprintCost(),
+}));
+jest.mock('../publicDataReads', () => ({
+  ...jest.requireActual('../publicDataReads'),
+  readGameOwner: () => mockGameOwner(),
+}));
+
+/** The page's own client queries, which fill an anchoring figure the server lost. */
+const mockClientList = jest.fn((): { data?: unknown[]; isPending: boolean; isError: boolean } => ({
+  data: undefined,
+  isPending: true,
+  isError: false,
+}));
+const mockImprintCost = jest.fn(() => ({ costWei: null as bigint | null, isError: false }));
+const mockGameOwner = jest.fn(() =>
+  Promise.resolve({ data: null as string | null, at: Date.UTC(2026, 8, 24) }),
+);
 
 const mockGetDashboardInfo = get_dashboard_info as jest.MockedFunction<typeof get_dashboard_info>;
 const mockUseDashboardInfo = useDashboardInfo as jest.MockedFunction<typeof useDashboardInfo>;
@@ -174,6 +196,9 @@ const figureValue = (id: string) => {
 
 describe('server-rendered page headers', () => {
   beforeEach(() => {
+    mockClientList.mockReturnValue({ data: undefined, isPending: true, isError: false });
+    mockImprintCost.mockReturnValue({ costWei: null, isError: false });
+    mockGameOwner.mockResolvedValue({ data: null, at: Date.UTC(2026, 8, 24) });
     mockGetLocale.mockResolvedValue('en');
     mockGetRoundList.mockResolvedValue([]);
     mockGetClaimHistory.mockResolvedValue([]);
@@ -437,7 +462,7 @@ describe('server-rendered page headers', () => {
     ['eth-contribution' as const, 'Direct ETH contributions', 'records', '/site-map#records'],
     ['attached-nfts' as const, 'Attached NFT Contributions', 'collection', '/gallery'],
     ['named-nfts' as const, 'Named Cosmic Signature NFTs', 'collection', '/gallery'],
-    ['used-rwlk-nfts' as const, 'Used RandomWalk NFTs', 'collection', '/gallery'],
+    ['used-rwlk-nfts' as const, 'Used Random Walk NFTs', 'collection', '/gallery'],
   ])(
     'renders %s as one header: H1, section eyebrow, snapshot and source',
     async (route, heading, section, hub) => {
@@ -543,25 +568,32 @@ describe('server-rendered page headers', () => {
       expect(screen.queryByText(/2,0\d\d/)).not.toBeInTheDocument();
     });
 
-    it('shows the ETH Gesture Cost from CurBidPriceEth, never the CST reward', async () => {
-      mockGetDashboardInfo.mockResolvedValue({
-        ...dashboard,
-        CurBidPriceEth: 0.10210695701197195,
-        ParticipationCstReward: 185.6693,
-      } as unknown as Awaited<ReturnType<typeof get_dashboard_info>>);
+    it('leads the imprint page with what an imprint costs, not the gesture it discounts', async () => {
+      mockUsedRwlkNfts.mockResolvedValue([{}, {}, {}] as Rows<typeof get_used_rwlk_nfts>);
+      mockImprintCost.mockReturnValue({ costWei: 100_000_000_000_000_000n, isError: false });
 
       render(await PublicDataRouteSeoSummary({ route: 'imprint' }));
 
-      // The same quote format as the home tabs and submit button (five significant digits),
-      // set like every other ETH figure: a no-break space and a muted unit.
-      expect(figureValue('cost').textContent).toBe('0.10211\u00a0ETH');
-      expect(within(figureValue('cost') as HTMLElement).getByText('ETH')).toHaveClass(
-        'text-muted-foreground',
-      );
-      expect(screen.queryByText(/185/)).not.toBeInTheDocument();
+      // Read from the chain like the panel, plus the buffer the imprint sends, at exact precision.
+      expect(figureValue('imprintCost')).toHaveTextContent(/^0\.1\d* ETH$/);
       expect(figureValue('discount')).toHaveTextContent(
         `${protocolFacts.randomWalkDiscountPercentage}%`,
       );
+      expect(figureValue('used')).toHaveTextContent(/^3$/);
+      // The gesture cost and the live cycle belong to the gesture form, not this header.
+      expect(document.querySelector('[data-figure="cost"]')).toBeNull();
+      expect(document.querySelector('[data-figure="cycle"]')).toBeNull();
+    });
+
+    it('shows the imprint cost as loading, then unavailable, never as zero', async () => {
+      const view = render(await PublicDataRouteSeoSummary({ route: 'imprint' }));
+      expect(figureValue('imprintCost').querySelector('[aria-busy="true"]')).not.toBeNull();
+      view.unmount();
+
+      mockImprintCost.mockReturnValue({ costWei: null, isError: true });
+      render(await PublicDataRouteSeoSummary({ route: 'imprint' }));
+      expect(figureValue('imprintCost')).toHaveTextContent(COMMON.unavailable);
+      expect(figureValue('imprintCost')).not.toHaveTextContent(/\d/);
     });
 
     it('shows Outreach CST Allocated in CST, not as an ETH reserve', async () => {
@@ -608,7 +640,6 @@ describe('server-rendered page headers', () => {
       // The table's rows: events from the latest system-mode change onward.
       expect(mockSystemEvents).toHaveBeenCalledWith(500, 9_999_999_999);
       expect(figureValue('records')).toHaveTextContent('3');
-      expect(figureValue('parameters')).toHaveTextContent('2');
       expect(figureValue('latest').querySelector('time')).toHaveAttribute(
         'datetime',
         new Date(1_786_100_000 * 1000).toISOString(),
@@ -619,6 +650,28 @@ describe('server-rendered page headers', () => {
       // No constant filler: the governance surface and the network are not figures.
       expect(document.querySelector('[data-figure="governance"]')).toBeNull();
       expect(document.querySelector('[data-figure="network"]')).toBeNull();
+      // The owner read failed here: unavailable, never a guess.
+      expect(figureValue('owner')).toHaveTextContent(COMMON.unavailable);
+    });
+
+    it('says who can still change the parameters: the owner, or that ownership is renounced', async () => {
+      mockGameOwner.mockResolvedValue({ data: WALLET_B, at: Date.UTC(2026, 8, 24) });
+      const owned = render(await PublicDataRouteSeoSummary({ route: 'coordination-changes' }));
+      expect(within(figureValue('owner') as HTMLElement).getByRole('link')).toHaveAttribute(
+        'href',
+        `/user/${WALLET_B}`,
+      );
+      owned.unmount();
+
+      mockGameOwner.mockResolvedValue({
+        data: '0x0000000000000000000000000000000000000000',
+        at: Date.UTC(2026, 8, 24),
+      });
+      render(await PublicDataRouteSeoSummary({ route: 'coordination-changes' }));
+      expect(figureValue('owner')).toHaveTextContent(
+        seoMessages.publicData.routes['coordination-changes'].cards.owner.renounced,
+      );
+      expect(within(figureValue('owner') as HTMLElement).queryByRole('link')).toBeNull();
     });
 
     it('shows the live Public Goods share, falling back to the documented one', async () => {
@@ -663,6 +716,38 @@ describe('server-rendered page headers', () => {
       expect(figureValue('latest')).toHaveTextContent(COMMON.unavailable);
       expect(figureValue('beneficiary')).toHaveTextContent(COMMON.unavailable);
       expect(figureValue('beneficiary')).not.toHaveTextContent('None yet');
+    });
+
+    it('lets the empty voluntary ledger lead instead of three zeros', async () => {
+      render(await PublicDataRouteSeoSummary({ route: 'public-goods-contributions-voluntary' }));
+      expect(document.querySelector('[data-figure]')).toBeNull();
+      expect(screen.getByText(COMMON.snapshot)).toBeInTheDocument();
+    });
+
+    it('leaves the protocol ETH total to the vault flow below the header', async () => {
+      render(await PublicDataRouteSeoSummary({ route: 'public-goods-contributions-cg' }));
+      expect(document.querySelector('[data-figure="totalEth"]')).toBeNull();
+      expect(figureValue('share')).toBeInTheDocument();
+    });
+
+    it('links Public Goods pages where their tabs do not go', async () => {
+      render(await PublicDataRouteSeoSummary({ route: 'public-goods-retrievals' }));
+      const related = screen.getByRole('navigation', { name: /related pages/ });
+      const hrefs = within(related)
+        .getAllByRole('link')
+        .map((link) => link.getAttribute('href'));
+      expect(hrefs).not.toContain('/public-goods-contributions-cg');
+      expect(hrefs).not.toContain('/public-goods-contributions-voluntary');
+      const guild = within(related).getByRole('link', { name: /Protocol Guild/ });
+      expect(guild).toHaveAttribute('target', '_blank');
+    });
+
+    it('dates the latest record with its year, as the ledger below does', async () => {
+      mockPublicGoodsDeposits.mockResolvedValue([
+        { AmountEth: 1, TimeStamp: 1_786_100_000 },
+      ] as Rows<typeof get_charity_cg_deposits>);
+      render(await PublicDataRouteSeoSummary({ route: 'public-goods-contributions-cg' }));
+      expect(figureValue('latest')).toHaveTextContent(/2026/);
     });
 
     it('names the documented Public Goods beneficiary on its chip', async () => {
@@ -737,6 +822,30 @@ describe('server-rendered page headers', () => {
       expect(figureValue('ethDeposits')).toHaveTextContent('1');
       expect(figureValue('stellarImprints')).toHaveTextContent('20');
       expect(document.querySelector('[data-figure="tokens"]')).toBeNull();
+    });
+
+    it('fills an anchoring figure the server could not read from the page’s own queries', async () => {
+      mockCstActions.mockRejectedValue(new Error('Network response was not OK'));
+      mockCstRewards.mockRejectedValue(new Error('Network response was not OK'));
+      mockRwalkImprints.mockRejectedValue(new Error('Network response was not OK'));
+      mockClientList.mockReturnValue({ data: [{}, {}], isPending: false, isError: false });
+
+      render(await PublicDataRouteSeoSummary({ route: 'anchoring' }));
+
+      // Two CST and two Random Walk actions from the client, never a bare dash.
+      expect(figureValue('actions')).toHaveTextContent(/^4$/);
+      expect(figureValue('ethDeposits')).toHaveTextContent(/^2$/);
+      expect(figureValue('stellarImprints')).toHaveTextContent(/^2$/);
+    });
+
+    it('says "Unavailable" only when the client read fails too', async () => {
+      mockCstRewards.mockRejectedValue(new Error('Network response was not OK'));
+      mockClientList.mockReturnValue({ data: undefined, isPending: false, isError: true });
+
+      render(await PublicDataRouteSeoSummary({ route: 'anchoring' }));
+
+      expect(figureValue('ethDeposits')).toHaveTextContent(COMMON.unavailable);
+      expect(figureValue('ethDeposits')).not.toHaveTextContent(/\d/);
     });
 
     it('renders a failed read as unavailable, never as a confident zero', async () => {

@@ -17,8 +17,7 @@
         },
         "cards": {
           "finalizedCycles": {
-            "label": "Finalized cycles",
-            "tooltip": "The number of Performance Cycles with finalized allocation data."
+            "label": "Finalized cycles"
           },
           "recipients": {
             "label": "Signature Allocation recipients",
@@ -29,14 +28,13 @@
             "tooltip": "The sum of Signature Allocation ETH across finalized cycles, based on cycle records."
           },
           "totalGestures": {
-            "label": "Total gestures",
-            "tooltip": "The cumulative number of gestures made across all finalized cycles."
+            "label": "Total gestures"
           }
         }
       },
       "anchoring": {
         "heading": "Anchor Distributions",
-        "description": "Track public Cosmic Signature NFT anchoring, ETH Anchor Distribution records, Random Walk NFT anchoring, and Anchored-NFT Stellar Selection imprints.",
+        "description": "Every anchored NFT, every ETH Anchor Distribution and every Stellar Selection imprint, as recorded on-chain.",
         "source": "Cosmic Signature public anchoring APIs",
         "links": {
           "statistics": "View anchoring statistics",
@@ -45,7 +43,8 @@
         },
         "cards": {
           "actions": {
-            "label": "Anchor / release actions"
+            "label": "Anchor / release actions",
+            "tooltip": "Each time a Cosmic Signature or Random Walk NFT was anchored or released."
           },
           "ethDeposits": {
             "label": "ETH Anchor Distribution deposits",
@@ -88,20 +87,20 @@
           "used": "View used Random Walk NFTs"
         },
         "cards": {
-          "cycle": {
-            "label": "Active Performance Cycle"
-          },
-          "cost": {
-            "label": "Current ETH Gesture Cost"
+          "imprintCost": {
+            "label": "Imprint cost"
           },
           "discount": {
             "label": "Random Walk discount"
+          },
+          "used": {
+            "label": "Random Walk NFTs used"
           }
         }
       },
       "eth-contribution": {
         "heading": "Direct ETH contributions",
-        "description": "Browse direct ETH contributions to the Cosmic Signature Cycle Reserve and the public notes, cycles, and contributor records attached to them.",
+        "description": "ETH sent straight to the Cycle Reserve, with each contributor’s note and cycle.",
         "source": "Cosmic Signature public contribution APIs",
         "links": {
           "reserve": "How the Cycle Reserve is split",
@@ -186,9 +185,9 @@
         }
       },
       "used-rwlk-nfts": {
-        "heading": "Used RandomWalk NFTs",
-        "description": "Review RandomWalk NFTs that have already been attached to ETH gestures for their one-time Gesture Cost reduction.",
-        "source": "Cosmic Signature public RandomWalk usage APIs",
+        "heading": "Used Random Walk NFTs",
+        "description": "Review Random Walk NFTs that have already been attached to ETH gestures for their one-time Gesture Cost reduction.",
+        "source": "Cosmic Signature public Random Walk usage APIs",
         "links": {
           "imprint": "Imprint Random Walk NFTs",
           "learn": "Learn how gestures work",
@@ -196,13 +195,13 @@
         },
         "cards": {
           "used": {
-            "label": "Used RandomWalk NFTs"
+            "label": "NFTs used"
           },
           "wallets": {
-            "label": "Participant Wallets"
+            "label": "Participant wallets"
           },
           "discount": {
-            "label": "One-Time Discount"
+            "label": "One-time discount"
           }
         }
       },
@@ -222,9 +221,10 @@
           "latest": {
             "label": "Latest change"
           },
-          "parameters": {
-            "label": "Parameters changed",
-            "tooltip": "How many distinct protocol parameters these records change. Only the contract owner can change them."
+          "owner": {
+            "label": "Contract owner",
+            "tooltip": "Only this address can change these parameters. Once ownership is renounced, the owner is the zero address and nothing can change them again.",
+            "renounced": "Renounced"
           }
         }
       },
@@ -234,43 +234,40 @@
         "source": "Cosmic Signature public-goods API",
         "links": {
           "learn": "Learn about public goods",
-          "retrievals": "View Public Goods retrievals",
-          "statistics": "View public-goods statistics"
+          "statistics": "View public-goods statistics",
+          "contracts": "Review the vault contract"
         },
         "cards": {
           "records": {
-            "label": "Protocol contribution records"
-          },
-          "totalEth": {
-            "label": "Protocol public-goods ETH"
+            "label": "Contributions"
           },
           "share": {
-            "label": "Share of each Cycle Reserve",
+            "label": "Share per cycle",
             "tooltip": "The share of each finalized Cycle Reserve that the protocol forwards to the Public Goods Vault."
           },
           "latest": {
-            "label": "Latest contribution"
+            "label": "Latest"
           }
         }
       },
       "public-goods-contributions-voluntary": {
         "heading": "Voluntary Public Goods contributions",
-        "description": "Browse voluntary public-goods contributions from the Cosmic Signature community, including cycle context and contributor records.",
+        "description": "ETH that anyone sends straight to the Public Goods Vault, for its beneficiary, currently Protocol Guild.",
         "source": "Cosmic Signature public-goods API",
         "links": {
           "direct": "View direct ETH contributions",
-          "protocol": "Protocol Public Goods contributions",
+          "learn": "Learn about public goods",
           "risk": "Read risk disclosures"
         },
         "cards": {
           "records": {
-            "label": "Voluntary contribution records"
+            "label": "Contributions"
           },
           "totalEth": {
-            "label": "Voluntary public-goods ETH"
+            "label": "ETH contributed"
           },
           "contributors": {
-            "label": "Contributor wallets"
+            "label": "Contributors"
           }
         }
       },
@@ -279,22 +276,22 @@
         "description": "Review retrievals from the Cosmic Signature Public Goods Vault, where cycle reserves forward support to the configured public-goods beneficiary — currently Protocol Guild.",
         "source": "Cosmic Signature public-goods API",
         "links": {
-          "protocol": "Protocol Public Goods contributions",
-          "voluntary": "Voluntary Public Goods contributions",
+          "learn": "Learn about public goods",
+          "protocolGuild": "Visit Protocol Guild",
           "contracts": "Review public contract addresses"
         },
         "cards": {
           "records": {
-            "label": "Public-goods retrieval records"
+            "label": "Retrievals"
           },
           "totalEth": {
-            "label": "Retrieved public-goods ETH"
+            "label": "ETH retrieved"
           },
           "latest": {
-            "label": "Latest retrieval"
+            "label": "Latest"
           },
           "beneficiary": {
-            "label": "Latest beneficiary",
+            "label": "Beneficiary",
             "tooltip": "The address that received the most recent retrieval from the Public Goods Vault. The configured beneficiary is currently Protocol Guild."
           }
         }

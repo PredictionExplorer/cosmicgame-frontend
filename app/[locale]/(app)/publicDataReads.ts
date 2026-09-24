@@ -1,5 +1,8 @@
 import { cache } from 'react';
+import { createPublicClient, http, isAddress, type Address } from 'viem';
 
+import { activeChain } from '@/config/chains';
+import { networkConfig } from '@/config/networks';
 import {
   get_staking_cst_actions,
   get_staking_cst_rewards,
@@ -67,6 +70,44 @@ export const readPublicGoodsDeposits = timedRead(() => get_charity_cg_deposits()
 export const readVoluntaryPublicGoods = timedRead(() => get_charity_voluntary());
 export const readPublicGoodsRetrievals = timedRead(() => get_charity_withdrawals());
 export const readSystemModes = timedRead(() => get_system_modelist());
+
+/** How long the header waits for the chain before it shows the owner as unavailable. */
+const OWNER_READ_TIMEOUT_MS = 5_000;
+
+/** `owner()` of an OpenZeppelin `Ownable` contract, the one read the header needs. */
+const OWNABLE_ABI = [
+  {
+    type: 'function',
+    name: 'owner',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'address' }],
+  },
+] as const;
+
+/**
+ * The protocol contract's owner, read from the chain: the only address that
+ * can change its parameters, or the zero address once ownership has been
+ * renounced. The contract's address comes from the dashboard read.
+ */
+export const readGameOwner = cache(async (): Promise<TimedRead<Address>> => {
+  const game = (await readDashboard()).data?.ContractAddrs?.CosmicGameAddr;
+  if (!game || !isAddress(game) || !networkConfig.rpcUrl) return { data: null, at: Date.now() };
+  try {
+    const client = createPublicClient({
+      chain: activeChain,
+      transport: http(networkConfig.rpcUrl, { timeout: OWNER_READ_TIMEOUT_MS, retryCount: 1 }),
+    });
+    const owner = await client.readContract({
+      address: game,
+      abi: OWNABLE_ABI,
+      functionName: 'owner',
+    });
+    return { data: owner, at: Date.now() };
+  } catch {
+    return { data: null, at: Date.now() };
+  }
+});
 
 /** The coordination events the /coordination-changes table lists. */
 export const readCoordinationEvents = cache(async () => {

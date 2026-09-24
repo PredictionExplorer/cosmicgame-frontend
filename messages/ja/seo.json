@@ -17,8 +17,7 @@
         },
         "cards": {
           "finalizedCycles": {
-            "label": "確定したサイクル",
-            "tooltip": "配分データが確定したパフォーマンス・サイクルの数。"
+            "label": "確定したサイクル"
           },
           "recipients": {
             "label": "シグネチャー配分の受領者",
@@ -29,14 +28,13 @@
             "tooltip": "サイクルの記録に基づく、確定したサイクルにわたるシグネチャー配分ETHの合計。"
           },
           "totalGestures": {
-            "label": "一筆の総数",
-            "tooltip": "確定したすべてのサイクルで入れられた一筆の累計。"
+            "label": "一筆の総数"
           }
         }
       },
       "anchoring": {
         "heading": "係留配分",
-        "description": "Cosmic Signature NFTの公開係留、ETH係留配分の記録、Random Walk NFTの係留、係留NFT星選の刻印を追う。",
+        "description": "オンチェーンに記録された、すべてのNFT係留、ETH係留配分、星選による刻印を確認できます。",
         "source": "Cosmic Signature公開係留API",
         "links": {
           "statistics": "係留統計を見る",
@@ -45,7 +43,8 @@
         },
         "cards": {
           "actions": {
-            "label": "係留 / 解除の操作"
+            "label": "係留 / 解除の操作",
+            "tooltip": "Cosmic Signature NFTまたはRandom Walk NFTを係留・解除した操作の回数です。"
           },
           "ethDeposits": {
             "label": "ETH係留配分の積立回数",
@@ -88,20 +87,20 @@
           "used": "使用済みのRandom Walk NFTを見る"
         },
         "cards": {
-          "cycle": {
-            "label": "進行中のパフォーマンス・サイクル"
-          },
-          "cost": {
-            "label": "現在のETH一筆の費用"
+          "imprintCost": {
+            "label": "刻印の費用"
           },
           "discount": {
             "label": "Random Walk割引"
+          },
+          "used": {
+            "label": "使用済みのRandom Walk NFT"
           }
         }
       },
       "eth-contribution": {
         "heading": "直接ETH拠出",
-        "description": "サイクル準備金へのETH拠出と、添えられたメモ、対象のサイクル、拠出者を確認できます。",
+        "description": "サイクル準備金へ直接送られたETHを、拠出者のメモと対象サイクルとともに確認できます。",
         "source": "Cosmic Signature公開拠出API",
         "links": {
           "reserve": "サイクル準備金の配分のしくみ",
@@ -222,9 +221,10 @@
           "latest": {
             "label": "直近の変更"
           },
-          "parameters": {
-            "label": "変更されたパラメーター",
-            "tooltip": "これらの記録で変更されたプロトコルのパラメーターの種類の数です。変更できるのはコントラクト所有者だけです。"
+          "owner": {
+            "label": "コントラクト所有者",
+            "tooltip": "これらのパラメーターを変更できるのはこのアドレスだけです。所有権が放棄されると所有者はゼロアドレスになり、以後は変更できません。",
+            "renounced": "所有権放棄済み"
           }
         }
       },
@@ -234,43 +234,40 @@
         "source": "Cosmic Signature公開公共財API",
         "links": {
           "learn": "公共財について学ぶ",
-          "retrievals": "公共財の受け取りを見る",
-          "statistics": "公共財の統計を見る"
+          "statistics": "公共財の統計を見る",
+          "contracts": "金庫のコントラクトを確認する"
         },
         "cards": {
           "records": {
-            "label": "プロトコル拠出の記録"
-          },
-          "totalEth": {
-            "label": "プロトコル公共財ETH"
+            "label": "拠出の記録"
           },
           "share": {
-            "label": "各サイクル準備金に占める割合",
+            "label": "サイクルごとの割合",
             "tooltip": "確定した各サイクル準備金のうち、プロトコルが公共財金庫へ送る割合です。"
           },
           "latest": {
-            "label": "直近の拠出"
+            "label": "直近"
           }
         }
       },
       "public-goods-contributions-voluntary": {
         "heading": "自発的な公共財拠出",
-        "description": "サイクルの文脈と拠出者の記録を含む、Cosmic Signatureコミュニティからの自発的な公共財拠出を見る。",
+        "description": "誰でも公共財金庫へ直接送れるETHで、設定された受け手——現在はProtocol Guild——に届けられます。",
         "source": "Cosmic Signature公開公共財API",
         "links": {
           "direct": "直接ETH拠出を見る",
-          "protocol": "プロトコルの公共財拠出",
+          "learn": "公共財について学ぶ",
           "risk": "リスク開示を読む"
         },
         "cards": {
           "records": {
-            "label": "自発的な拠出の記録"
+            "label": "拠出の記録"
           },
           "totalEth": {
-            "label": "自発的な公共財ETH"
+            "label": "拠出されたETH"
           },
           "contributors": {
-            "label": "拠出者ウォレット"
+            "label": "拠出者"
           }
         }
       },
@@ -279,22 +276,22 @@
         "description": "公共財金庫から、設定されている受け手への送付履歴を確認できます。現在の受け手はProtocol Guildです。",
         "source": "Cosmic Signature公開公共財API",
         "links": {
-          "protocol": "プロトコルの公共財拠出",
-          "voluntary": "自発的な公共財拠出",
+          "learn": "公共財について学ぶ",
+          "protocolGuild": "Protocol Guildを見る",
           "contracts": "公開コントラクトアドレスを確認する"
         },
         "cards": {
           "records": {
-            "label": "公共財受け取りの記録"
+            "label": "受け取りの記録"
           },
           "totalEth": {
-            "label": "受け取られた公共財ETH"
+            "label": "受け取られたETH"
           },
           "latest": {
-            "label": "直近の受け取り"
+            "label": "直近"
           },
           "beneficiary": {
-            "label": "直近の受け手",
+            "label": "受け手",
             "tooltip": "公共財金庫から直近に受け取られた資金の送付先アドレスです。現在設定されている受け手はProtocol Guildです。"
           }
         }

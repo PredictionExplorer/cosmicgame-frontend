@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
+import { classifyHref } from '@/config/siteNav';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { Breadcrumbs, type BreadcrumbItem } from '@/components/ui/breadcrumbs';
@@ -11,6 +12,7 @@ import { ScrollRail } from '@/components/ui/scroll-rail';
 import { UnknownValue } from '@/components/ui/unknown-value';
 import { HeaderLede } from '@/components/layout/HeaderLede';
 import { PAGE_SECTIONS, type PageSectionId } from '@/components/layout/pageSections';
+import { SiteLink } from '@/components/layout/SiteLink';
 import { useSiteNavCopy } from '@/components/layout/siteNavCopy';
 
 export type { PageSectionId } from '@/components/layout/pageSections';
@@ -141,10 +143,6 @@ const FIGURE_COLUMNS: Record<number, string> = {
   3: 'sm:grid-cols-3',
   4: 'sm:grid-cols-4',
 };
-
-function isExternalHref(href: string): boolean {
-  return /^https?:\/\//.test(href);
-}
 
 /**
  * The trail for a record page: Home, the section crumb (unless the section
@@ -320,11 +318,15 @@ export function PageHeader({
         >
           <ul className={cn('flex flex-wrap gap-2', centered && 'justify-center')}>
             {related.map((link) => {
-              const Icon = isExternalHref(link.href) ? ArrowUpRight : ArrowRight;
+              // Third-party pages open in a new tab and say so; the other host stays in this tab.
+              const kind = classifyHref(link.href, 'app');
+              const Icon = kind === 'internal' ? ArrowRight : ArrowUpRight;
               return (
                 <li key={link.href}>
-                  <Link
+                  <SiteLink
                     href={link.href}
+                    kind={kind}
+                    externalIcon={false}
                     className="group inline-flex min-h-8 items-center gap-1.5 rounded-control border border-rule px-3 type-label text-muted-foreground no-underline transition-colors duration-fast hover:border-input hover:text-foreground pointer-coarse:min-h-11"
                   >
                     {link.label}
@@ -332,7 +334,7 @@ export function PageHeader({
                       aria-hidden
                       className="size-3.5 shrink-0 text-subtle transition-colors duration-fast group-hover:text-foreground"
                     />
-                  </Link>
+                  </SiteLink>
                 </li>
               );
             })}

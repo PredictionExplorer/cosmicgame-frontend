@@ -17,8 +17,7 @@
         },
         "cards": {
           "finalizedCycles": {
-            "label": "Chu kỳ đã hoàn tất",
-            "tooltip": "Số chu kỳ trình diễn đã có dữ liệu phân bổ hoàn tất."
+            "label": "Chu kỳ đã hoàn tất"
           },
           "recipients": {
             "label": "Người nhận phân bổ Signature",
@@ -29,14 +28,13 @@
             "tooltip": "Tổng ETH phân bổ Signature qua các chu kỳ đã hoàn tất, dựa trên bản ghi chu kỳ."
           },
           "totalGestures": {
-            "label": "Tổng số nét bút",
-            "tooltip": "Tổng số nét bút tích lũy qua mọi chu kỳ đã hoàn tất."
+            "label": "Tổng số nét bút"
           }
         }
       },
       "anchoring": {
         "heading": "Phân phối neo giữ",
-        "description": "Theo dõi hoạt động neo giữ Cosmic Signature NFT công khai, các bản ghi phân phối neo giữ ETH, neo giữ Random Walk NFT và các lần khắc Tinh tuyển NFT neo giữ.",
+        "description": "Mọi lượt neo giữ NFT, mọi khoản phân phối neo giữ ETH và mọi lượt khắc Tinh tuyển, đúng như được ghi trên chuỗi.",
         "source": "Các API neo giữ công khai của Cosmic Signature",
         "links": {
           "statistics": "Xem thống kê neo giữ",
@@ -45,7 +43,8 @@
         },
         "cards": {
           "actions": {
-            "label": "Thao tác neo giữ / gỡ neo"
+            "label": "Thao tác neo giữ / gỡ neo",
+            "tooltip": "Mỗi lần một Cosmic Signature NFT hoặc Random Walk NFT được neo giữ hoặc gỡ neo."
           },
           "ethDeposits": {
             "label": "Số đợt nạp ETH phân phối neo giữ",
@@ -88,20 +87,20 @@
           "used": "Xem các Random Walk NFT đã sử dụng"
         },
         "cards": {
-          "cycle": {
-            "label": "Chu kỳ trình diễn đang diễn ra"
-          },
-          "cost": {
-            "label": "Chi phí nét bút ETH hiện tại"
+          "imprintCost": {
+            "label": "Chi phí khắc"
           },
           "discount": {
             "label": "Giảm giá Random Walk"
+          },
+          "used": {
+            "label": "Random Walk NFT đã sử dụng"
           }
         }
       },
       "eth-contribution": {
         "heading": "Đóng góp ETH trực tiếp",
-        "description": "Xem các khoản đóng góp ETH trực tiếp vào dự trữ chu kỳ Cosmic Signature cùng thông tin người đóng góp, chu kỳ và lời nhắn công khai.",
+        "description": "ETH gửi thẳng vào Dự trữ chu kỳ, kèm lời nhắn và chu kỳ của từng người đóng góp.",
         "source": "Các API đóng góp công khai của Cosmic Signature",
         "links": {
           "reserve": "Cách phân bổ dự trữ chu kỳ",
@@ -222,9 +221,10 @@
           "latest": {
             "label": "Thay đổi gần nhất"
           },
-          "parameters": {
-            "label": "Tham số đã thay đổi",
-            "tooltip": "Số tham số giao thức khác nhau mà các bản ghi này thay đổi. Chỉ chủ sở hữu hợp đồng mới có thể thay đổi chúng."
+          "owner": {
+            "label": "Chủ sở hữu hợp đồng",
+            "tooltip": "Chỉ địa chỉ này mới có thể thay đổi các tham số. Khi quyền sở hữu bị từ bỏ, chủ sở hữu trở thành địa chỉ 0 và không ai thay đổi được nữa.",
+            "renounced": "Đã từ bỏ quyền sở hữu"
           }
         }
       },
@@ -234,43 +234,40 @@
         "source": "Các API hàng hóa công công khai của Cosmic Signature",
         "links": {
           "learn": "Tìm hiểu về hàng hóa công",
-          "retrievals": "Xem các lần nhận về hàng hóa công",
-          "statistics": "Xem thống kê hàng hóa công"
+          "statistics": "Xem thống kê hàng hóa công",
+          "contracts": "Xem hợp đồng Kho"
         },
         "cards": {
           "records": {
-            "label": "Bản ghi đóng góp của giao thức"
-          },
-          "totalEth": {
-            "label": "ETH hàng hóa công của giao thức"
+            "label": "Lượt đóng góp"
           },
           "share": {
-            "label": "Tỷ lệ của mỗi Dự trữ chu kỳ",
+            "label": "Tỷ lệ mỗi chu kỳ",
             "tooltip": "Tỷ lệ của mỗi Dự trữ chu kỳ đã hoàn tất mà giao thức chuyển vào Kho Hàng hóa công."
           },
           "latest": {
-            "label": "Đóng góp gần nhất"
+            "label": "Gần nhất"
           }
         }
       },
       "public-goods-contributions-voluntary": {
         "heading": "Đóng góp Hàng hóa công tự nguyện",
-        "description": "Duyệt các khoản đóng góp hàng hóa công tự nguyện từ cộng đồng Cosmic Signature, gồm bối cảnh chu kỳ và bản ghi người đóng góp.",
+        "description": "ETH mà bất kỳ ai gửi thẳng vào Kho Hàng hóa công, dành cho đơn vị thụ hưởng — hiện là Protocol Guild.",
         "source": "Các API hàng hóa công công khai của Cosmic Signature",
         "links": {
           "direct": "Xem đóng góp ETH trực tiếp",
-          "protocol": "Đóng góp hàng hóa công của giao thức",
+          "learn": "Tìm hiểu về hàng hóa công",
           "risk": "Đọc công bố rủi ro"
         },
         "cards": {
           "records": {
-            "label": "Bản ghi đóng góp tự nguyện"
+            "label": "Lượt đóng góp"
           },
           "totalEth": {
-            "label": "ETH hàng hóa công tự nguyện"
+            "label": "ETH đã đóng góp"
           },
           "contributors": {
-            "label": "Ví người đóng góp"
+            "label": "Người đóng góp"
           }
         }
       },
@@ -279,22 +276,22 @@
         "description": "Xem các lần nhận về từ Kho Hàng hóa công của Cosmic Signature, nơi dự trữ chu kỳ chuyển hỗ trợ đến đơn vị thụ hưởng hàng hóa công đã cấu hình — hiện là Protocol Guild.",
         "source": "Các API hàng hóa công công khai của Cosmic Signature",
         "links": {
-          "protocol": "Đóng góp hàng hóa công của giao thức",
-          "voluntary": "Đóng góp hàng hóa công tự nguyện",
+          "learn": "Tìm hiểu về hàng hóa công",
+          "protocolGuild": "Truy cập Protocol Guild",
           "contracts": "Xem địa chỉ hợp đồng công khai"
         },
         "cards": {
           "records": {
-            "label": "Bản ghi nhận về hàng hóa công"
+            "label": "Lượt nhận về"
           },
           "totalEth": {
-            "label": "ETH hàng hóa công đã nhận về"
+            "label": "ETH đã nhận về"
           },
           "latest": {
-            "label": "Lần nhận về gần nhất"
+            "label": "Gần nhất"
           },
           "beneficiary": {
-            "label": "Đơn vị thụ hưởng gần nhất",
+            "label": "Đơn vị thụ hưởng",
             "tooltip": "Địa chỉ đã nhận khoản gần nhất từ Kho Hàng hóa công. Đơn vị thụ hưởng được cấu hình hiện là Protocol Guild."
           }
         }

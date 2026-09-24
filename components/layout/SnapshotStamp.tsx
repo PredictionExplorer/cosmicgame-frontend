@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 
-import { DateTime } from '@/components/ui/date-time';
+import { DateTime, useTimeZoneLabel } from '@/components/ui/date-time';
 
 export interface SnapshotStampProps {
   /**
@@ -14,16 +14,18 @@ export interface SnapshotStampProps {
 }
 
 /**
- * "Snapshot · Sep 23, 07:20" for `PageHeader`'s meta line: the time the
- * header's server-read figures were taken, as a `<time>` with the exact
- * instant on hover. UTC through hydration, then the reader's zone. Figures
- * that poll live use `LiveStatus` instead.
+ * "Snapshot · Sep 23, 07:20 UTC+3" for `PageHeader`'s meta line: the time
+ * the header's server-read figures were taken, with its zone (the ledgers
+ * below name theirs too), as a `<time>` with the exact instant on hover.
+ * UTC through hydration, then the reader's zone. Figures that poll live use
+ * `LiveStatus` instead.
  */
 export function SnapshotStamp({ at, className }: SnapshotStampProps) {
   const t = useTranslations('common');
+  const zone = useTimeZoneLabel();
   return (
     <DateTime timestamp={Math.floor(at / 1000)} className={className}>
-      {(date) => t('pageHeader.snapshot', { date })}
+      {(date) => t('pageHeader.snapshot', { date: `${date} ${zone}` })}
     </DateTime>
   );
 }

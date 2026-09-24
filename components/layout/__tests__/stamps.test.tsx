@@ -10,6 +10,8 @@ describe('SnapshotStamp', () => {
     const time = document.querySelector('time');
     expect(time).toHaveAttribute('datetime', '2026-09-23T07:20:30.000Z');
     expect(time).toHaveTextContent(/^common\.pageHeader\.snapshot\(date=Sep 23/);
+    // With its zone, as the ledgers below name theirs.
+    expect(time).toHaveTextContent(/UTC[+-]?\d*(:\d+)?\)$/);
   });
 });
 
