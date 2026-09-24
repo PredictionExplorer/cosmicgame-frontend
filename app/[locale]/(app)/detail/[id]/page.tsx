@@ -21,6 +21,7 @@ import { PageMessages } from '@/components/i18n/PageMessages';
 import { signatureTitle } from '@/components/nft/nftName';
 
 import DetailPage from './DetailPage';
+import { parseTokenId } from './tokenId';
 
 /**
  * ISR (was force-dynamic): token metadata is immutable once imprinted, so a
@@ -34,12 +35,6 @@ export const revalidate = 300;
 
 interface PageProps {
   params: Promise<{ locale: string; id: string }>;
-}
-
-function parseTokenId(id: string): number | null {
-  if (!/^\d+$/.test(id)) return null;
-  const tokenId = Number(id);
-  return Number.isSafeInteger(tokenId) ? tokenId : null;
 }
 
 function tokenImageUrl(seed: string | number | undefined): string {
