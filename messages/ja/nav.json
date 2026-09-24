@@ -154,7 +154,7 @@
     },
     "audits": {
       "label": "監査",
-      "description": "監査と形式検証の状況"
+      "description": "Hackenの監査と形式検証の仕様"
     },
     "contracts": {
       "label": "コントラクト",

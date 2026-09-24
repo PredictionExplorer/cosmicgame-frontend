@@ -63,7 +63,7 @@
   },
   "contracts": {
     "title": "コントラクト：検証済みのArbitrumスマートコントラクト",
-    "description": "Cosmic Signatureのスマートコントラクトアドレス、検証状況、監査、形式検証の注記、Arbitrumへのデプロイの詳細。"
+    "description": "Arbitrum One上のCosmic Signatureのすべてのスマートコントラクトアドレスと、エクスプローラーとSourcifyへのリンク。配分の内訳、プロトコルの設定、調律期間も確認できます。"
   },
   "terms": {
     "title": "利用規約",
@@ -83,7 +83,7 @@
   },
   "audits": {
     "title": "監査：検証とコントラクトのレビュー",
-    "description": "Cosmic Signatureのスマートコントラクトは、Hackenによる独立した監査を受けました。報告書、形式検証の背景、ソースコード検証のリソースを確認する。"
+    "description": "HackenによるCosmic Signatureコントラクトの独立監査の概要。深刻度別の所見、ファジングした不変条件、報告書の全文、リポジトリにある形式検証の仕様を確認できます。"
   },
   "code": {
     "title": "ソースコード：CC0のオンチェーンアート・プロトコル",

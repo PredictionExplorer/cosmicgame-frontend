@@ -149,7 +149,7 @@
   },
   "contracts": {
     "title": "合約：已驗證的 Arbitrum 智慧合約",
-    "description": "檢視 Cosmic Signature 智慧合約地址、驗證狀態、審計、形式化驗證說明與 Arbitrum 部署詳情。"
+    "description": "Cosmic Signature 在 Arbitrum One 上的全部智慧合約地址，附區塊瀏覽器與 Sourcify 連結，以及分配比例、協議設定與校準窗口。"
   },
   "terms": {
     "title": "服務條款",
@@ -173,7 +173,7 @@
   },
   "audits": {
     "title": "審計：驗證與合約審查",
-    "description": "Cosmic Signature 智慧合約已由 Hacken 完成獨立審計。檢視審計報告、形式化驗證背景與原始碼驗證資源。"
+    "description": "Hacken 對 Cosmic Signature 合約的獨立審計概覽：依嚴重程度分類的發現、模糊測試的不變量與完整報告，以及合約儲存庫中的形式化驗證規格。"
   },
   "code": {
     "title": "原始碼：CC0 鏈上藝術協議",

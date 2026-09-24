@@ -154,7 +154,7 @@
     },
     "audits": {
       "label": "Audits",
-      "description": "Audit and formal verification status"
+      "description": "The Hacken audit and formal verification specs"
     },
     "contracts": {
       "label": "Contracts",

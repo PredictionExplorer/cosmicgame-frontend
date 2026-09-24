@@ -63,7 +63,7 @@
   },
   "contracts": {
     "title": "Hợp đồng: hợp đồng thông minh Arbitrum đã xác minh",
-    "description": "Tra cứu địa chỉ hợp đồng thông minh Cosmic Signature, tình trạng xác minh, kiểm toán, ghi chú kiểm chứng hình thức và chi tiết triển khai trên Arbitrum."
+    "description": "Mọi địa chỉ hợp đồng thông minh Cosmic Signature trên Arbitrum One, kèm liên kết đến trình khám phá khối và Sourcify, cùng tỷ lệ phân bổ, cấu hình giao thức và các cửa sổ hiệu chỉnh."
   },
   "terms": {
     "title": "Điều khoản",
@@ -83,7 +83,7 @@
   },
   "audits": {
     "title": "Kiểm toán: xác minh và rà soát hợp đồng",
-    "description": "Các hợp đồng thông minh của Cosmic Signature đã được Hacken kiểm toán độc lập. Xem báo cáo, bối cảnh kiểm chứng hình thức và tài nguyên xác minh mã nguồn."
+    "description": "Tóm tắt kiểm toán độc lập của Hacken đối với các hợp đồng Cosmic Signature: phát hiện theo mức độ nghiêm trọng, các bất biến đã kiểm thử fuzz, báo cáo đầy đủ và đặc tả kiểm chứng hình thức trong kho mã."
   },
   "code": {
     "title": "Mã nguồn: giao thức nghệ thuật trên chuỗi CC0",

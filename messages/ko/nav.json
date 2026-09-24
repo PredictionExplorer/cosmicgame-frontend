@@ -154,7 +154,7 @@
     },
     "audits": {
       "label": "보안 감사",
-      "description": "보안 감사와 정형 검증 현황"
+      "description": "Hacken 보안 감사와 정형 검증 명세"
     },
     "contracts": {
       "label": "컨트랙트",

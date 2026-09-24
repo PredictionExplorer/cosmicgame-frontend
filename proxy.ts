@@ -21,8 +21,9 @@ export const config = {
      * lookahead exclusions here are the standard Vercel recipe. The web
      * manifest is localized (`/[locale]/manifest.webmanifest`), so the legacy
      * `/manifest.webmanifest` goes through next-intl to the English one.
+     * `.well-known` holds security.txt, which is the same on both hosts.
      */
-    '/((?!_next/static|_next/image|_next/data|favicon.ico|paint-worklet.js|robots.txt|sitemap.xml|sitemap-nfts.xml|llms(?:-full)?\\.txt|fonts|audio|images|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|avif|woff|woff2|ttf|eot|map|pdf)$).*)',
+    '/((?!_next/static|_next/image|_next/data|favicon.ico|paint-worklet.js|robots.txt|sitemap.xml|sitemap-nfts.xml|llms(?:-full)?\\.txt|\\.well-known|fonts|audio|images|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|avif|woff|woff2|ttf|eot|map|pdf)$).*)',
   ],
 };
 

@@ -154,7 +154,7 @@
     },
     "audits": {
       "label": "審計",
-      "description": "審計與形式化驗證狀態"
+      "description": "Hacken 審計與形式化驗證規格"
     },
     "contracts": {
       "label": "合約",
