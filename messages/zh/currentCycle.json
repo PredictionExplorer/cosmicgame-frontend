@@ -32,6 +32,13 @@
     "running": "已进行",
     "participants": "参与者"
   },
+  "standings": {
+    "title": "当前特别分配人选",
+    "latest": "最新参与者",
+    "lastGesture": "最新落笔",
+    "activeChallenge": "当前坚守进程",
+    "gestureLink": "落笔 #{position}"
+  },
   "allocations": {
     "recipientCount": "{count, number} 位获配者",
     "columns": {

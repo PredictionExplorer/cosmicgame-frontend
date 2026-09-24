@@ -32,6 +32,13 @@
     "running": "経過時間",
     "participants": "参加者"
   },
+  "standings": {
+    "title": "特別配分の先頭",
+    "latest": "最新の参加者",
+    "lastGesture": "最新の一筆",
+    "activeChallenge": "進行中の持久チャレンジ",
+    "gestureLink": "一筆#{position}"
+  },
   "allocations": {
     "recipientCount": "{count, plural, other {受領者#人}}",
     "columns": {

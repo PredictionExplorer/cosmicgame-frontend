@@ -32,6 +32,13 @@
     "running": "Триває",
     "participants": "Учасники"
   },
+  "standings": {
+    "title": "Лідери особливих розподілів",
+    "latest": "Останній учасник",
+    "lastGesture": "Останній жест",
+    "activeChallenge": "Поточна спроба витривалості",
+    "gestureLink": "Жест #{position}"
+  },
   "allocations": {
     "recipientCount": "{count, plural, one {# отримувач} few {# отримувачі} many {# отримувачів} other {# отримувача}}",
     "columns": {

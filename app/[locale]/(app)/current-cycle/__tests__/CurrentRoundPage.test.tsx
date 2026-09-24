@@ -65,19 +65,16 @@ jest.mock('../../../../../components/attachments/DonatedNFTPrizeShowcase', () =>
     ) : null,
 }));
 
-jest.mock('../../../../../components/tables/SpecialAllocationRecipients', () => ({
-  SpecialAllocationRecipients: (props: {
+jest.mock('../components/CycleStandings', () => ({
+  CycleStandings: (props: {
     latestParticipantAddress?: string | null;
-    latestMessage?: string;
-    latestGesture?: { EvtLogId?: number } | null;
-    showLastGesture?: boolean;
+    latestGesture?: { EvtLogId?: number; Message?: string } | null;
   }) => (
     <div
       data-testid="special-allocation-recipients"
-      data-message={props.latestMessage ?? ''}
+      data-message={props.latestGesture?.Message ?? ''}
       data-gesture-id={props.latestGesture?.EvtLogId ?? ''}
       data-latest-address={props.latestParticipantAddress ?? ''}
-      data-show-last-gesture={String(props.showLastGesture ?? false)}
     />
   ),
 }));
@@ -288,7 +285,6 @@ describe('CurrentRoundPage', () => {
     expect(standings).toHaveAttribute('data-message', 'gm');
     expect(standings).toHaveAttribute('data-gesture-id', '77');
     expect(standings).toHaveAttribute('data-latest-address', PARTICIPANT);
-    expect(standings).toHaveAttribute('data-show-last-gesture', 'true');
   });
 
   it('renders the attached-asset showcase only when the cycle has attached assets', () => {

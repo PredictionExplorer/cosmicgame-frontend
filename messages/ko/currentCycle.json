@@ -32,6 +32,13 @@
     "running": "진행 시간",
     "participants": "참여자"
   },
+  "standings": {
+    "title": "특별 배분 선두 참여자",
+    "latest": "최근 참여자",
+    "lastGesture": "최근 제스처",
+    "activeChallenge": "진행 중인 선두 도전",
+    "gestureLink": "제스처 #{position}"
+  },
   "allocations": {
     "recipientCount": "{count, plural, other {수령자 #명}}",
     "columns": {

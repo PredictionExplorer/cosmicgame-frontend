@@ -32,6 +32,13 @@
     "running": "Running for",
     "participants": "Participants"
   },
+  "standings": {
+    "title": "Special allocation leaders",
+    "latest": "Latest participant",
+    "lastGesture": "Last gesture",
+    "activeChallenge": "Active endurance challenge",
+    "gestureLink": "Gesture #{position}"
+  },
   "allocations": {
     "recipientCount": "{count, plural, one {# recipient} other {# recipients}}",
     "columns": {

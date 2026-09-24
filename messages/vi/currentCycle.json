@@ -32,6 +32,13 @@
     "running": "Đã diễn ra",
     "participants": "Người tham gia"
   },
+  "standings": {
+    "title": "Người dẫn đầu phân bổ đặc biệt",
+    "latest": "Người tham gia gần nhất",
+    "lastGesture": "Nét bút gần nhất",
+    "activeChallenge": "Thử thách Bền bỉ đang diễn ra",
+    "gestureLink": "Nét bút #{position}"
+  },
   "allocations": {
     "recipientCount": "{count, plural, other {# người nhận}}",
     "columns": {

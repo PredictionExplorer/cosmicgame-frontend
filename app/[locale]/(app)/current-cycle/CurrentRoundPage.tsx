@@ -11,7 +11,6 @@ import { ErrorState } from '@/components/ui/error-state';
 import { Skeleton, SkeletonTable } from '@/components/ui/skeleton';
 import { AttachedNFTAllocationShowcase } from '@/components/attachments/DonatedNFTPrizeShowcase';
 import type { DonatedERC20Token } from '@/components/attachments/AttachedERC20Table';
-import { SpecialAllocationRecipients } from '@/components/tables/SpecialAllocationRecipients';
 import type { EthDonation } from '@/components/tables/EthDonationTable';
 import type { AttachedNFT } from '@/services/api/types';
 import {
@@ -31,6 +30,7 @@ import { useNow } from '@/hooks/useNow';
 
 import { cyclePhaseView } from './cyclePhase';
 import { CycleDetails } from './components/CycleDetails';
+import { CycleStandings } from './components/CycleStandings';
 import { CycleStatus } from './components/CycleStatus';
 
 const EMPTY: never[] = [];
@@ -172,14 +172,12 @@ const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
             }
           />
           {hasStandings ? (
-            <div className="min-w-0 lg:col-span-7">
-              <SpecialAllocationRecipients
-                latestParticipantAddress={latestResolution.address}
-                latestGesture={latestResolution.gesture}
-                latestMessage={latestResolution.gesture?.Message ?? ''}
-                showLastGesture
-              />
-            </div>
+            <CycleStandings
+              headingId="cycle-standings-heading"
+              latestParticipantAddress={latestResolution.address}
+              latestGesture={latestResolution.gesture}
+              className="min-w-0 lg:col-span-7"
+            />
           ) : null}
         </section>
 
