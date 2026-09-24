@@ -111,6 +111,7 @@ export const landingTextZhTw = {
       '週期收官後，協議會沿各條分配軌道發放 ETH 與 CST 儲備，以表彰堅守、時機、投入與參與。約一半 ETH 儲備會滾入下一週期。',
     ethLabel: '每個週期儲備中的 ETH',
     fixedLabel: '每個週期的 CST 與 NFT',
+    fixedEach: `每位獲配者獲配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-TW')} CST 與 1 枚 Cosmic Signature NFT。`,
     items: {
       'signature-allocation': {
         title: '簽名分配',
@@ -138,24 +139,24 @@ export const landingTextZhTw = {
         body: '由程序化隨機選出的 3 位參與者均分；入選頻次隨落筆次數增加。',
       },
       'participant-nft-stellar-selection': {
-        amount: '10 枚 NFT',
+        amount: '10 位獲配者',
         title: '參與者 NFT 星選',
-        body: `程序化隨機選出 10 位參與者，每位獲配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-TW')} CST 與 1 枚 Cosmic Signature NFT。`,
+        body: '從本週期的參與者中程序化隨機選出。',
       },
       'anchored-nft-stellar-selection': {
-        amount: '10 枚 NFT',
+        amount: '10 位獲配者',
         title: '錨定 NFT 星選',
-        body: `程序化隨機選出 10 位 Random Walk NFT 錨定者，每位獲配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-TW')} CST 與 1 枚 Cosmic Signature NFT。`,
+        body: '從 Random Walk NFT 錨定者中程序化隨機選出。',
       },
       'endurance-champion': {
-        amount: `${protocolFacts.specialAllocationCst.toLocaleString('zh-TW')} CST`,
+        amount: '1 位獲配者',
         title: '堅守冠軍分配',
-        body: '連續堅守時間最長的參與者獲配 1,000 表彰 CST 與 1 枚 Cosmic Signature NFT。',
+        body: '連續堅守時間最長的參與者。',
       },
       'final-cst-gesture': {
-        amount: `${protocolFacts.specialAllocationCst.toLocaleString('zh-TW')} CST`,
+        amount: '1 位獲配者',
         title: 'CST 收官之筆分配',
-        body: '本週期最後一次使用 CST 落筆的參與者獲配 1,000 表彰 CST 與 1 枚 Cosmic Signature NFT。',
+        body: '本週期最後一次使用 CST 落筆的參與者。',
       },
     },
   },
@@ -217,11 +218,11 @@ export const landingTextZhTw = {
   verifiability: {
     eyebrow: '可驗證性',
     heading: '開放、已驗證、可復現。',
-    body: '任何人都能從種子重新生成簽名作品，獨立完成驗證。合約驗證、靜態分析說明和審計狀態會隨報告一同發布在應用程式中。Cosmic Signature 各儲存庫中的專案自有材料採用 CC0 1.0；第三方依賴、字型與素材仍適用各自的授權條款。',
+    body: '任何人都能從種子重新生成簽名作品，並對照應用程式中公開的合約、原始碼與審計狀態自行驗證。',
     pillars: [
       {
         title: 'CC0 1.0',
-        body: '專案自有的合約、著色器與渲染管線採用 CC0 1.0，不保留任何權利；第三方材料不在此範圍內。',
+        body: 'Cosmic Signature 各儲存庫中的專案自有材料（合約、著色器與渲染管線）採用 CC0 1.0，不保留任何權利；第三方依賴、字型與素材仍適用各自的授權條款。',
       },
       {
         title: '驗證狀態',

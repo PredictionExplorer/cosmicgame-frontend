@@ -1,4 +1,5 @@
-import { ArrowRight, BadgeCheck, Copyleft, Repeat, type LucideIcon } from 'lucide-react';
+import type { SVGProps } from 'react';
+import { ArrowRight, BadgeCheck, Repeat } from 'lucide-react';
 import { useLocale } from 'next-intl';
 
 import type { LandingContent } from '@/content/landing';
@@ -10,8 +11,31 @@ import { useSiteNavCopy } from '@/components/layout/siteNavCopy';
 import { SectionHeading } from './SectionHeading';
 import styles from './Landing.module.css';
 
+/**
+ * The public-domain mark: a slashed zero in a circle, drawn like a lucide
+ * glyph (24px box, currentColor stroke). Lucide has no CC0 mark, and its
+ * Copyleft glyph stands for the opposite idea (share-alike, rights kept).
+ */
+function PublicDomainMark({ strokeWidth = 2, ...props }: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <circle cx="12" cy="12" r="10" />
+      <ellipse cx="12" cy="12" rx="3.5" ry="5.5" />
+      <path d="M14.5 7.5 9.5 16.5" />
+    </svg>
+  );
+}
+
 /** The three pillars in copy order: CC0, verification status, reproducible art. */
-const PILLAR_ICONS: readonly LucideIcon[] = [Copyleft, BadgeCheck, Repeat];
+const PILLAR_ICONS = [PublicDomainMark, BadgeCheck, Repeat] as const;
 
 /** Where each claim can be checked: the trust pages in the app. */
 const EVIDENCE_ROUTES: readonly SiteRouteId[] = ['contracts', 'sourceCode', 'audits', 'security'];

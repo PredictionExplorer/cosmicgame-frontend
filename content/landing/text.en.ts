@@ -111,6 +111,7 @@ export const landingTextEn = {
       'When a cycle finalizes, the protocol distributes its ETH and CST reserves across allocation tracks that recognize endurance, timing, dedication, and participation. About half of the ETH reserve compounds into the next cycle.',
     ethLabel: 'ETH from each Cycle Reserve',
     fixedLabel: 'CST and NFTs, every cycle',
+    fixedEach: `Each recipient receives ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and one Cosmic Signature NFT.`,
     items: {
       'signature-allocation': {
         title: 'Signature Allocation',
@@ -138,24 +139,24 @@ export const landingTextEn = {
         body: 'Split across three randomly selected participants. Selection frequency scales with gestures made.',
       },
       'participant-nft-stellar-selection': {
-        amount: '10 NFTs',
+        amount: '10 recipients',
         title: 'NFT Stellar Selection — Participants',
-        body: `Ten randomly selected participants each receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and one Cosmic Signature NFT.`,
+        body: 'Selected at random from the cycle’s participants.',
       },
       'anchored-nft-stellar-selection': {
-        amount: '10 NFTs',
+        amount: '10 recipients',
         title: 'Anchored-NFT Stellar Selection',
-        body: `Ten randomly selected Random Walk NFT anchor-holders each receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and one Cosmic Signature NFT.`,
+        body: 'Selected at random from Random Walk NFT anchor-holders.',
       },
       'endurance-champion': {
-        amount: `${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST`,
+        amount: '1 recipient',
         title: 'Endurance Champion Allocation',
-        body: '1,000 Recognition CST and one Cosmic Signature NFT to the participant with the longest unbroken endurance window.',
+        body: 'The participant with the longest unbroken endurance window.',
       },
       'final-cst-gesture': {
-        amount: `${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST`,
+        amount: '1 recipient',
         title: 'Final CST Gesture Allocation',
-        body: '1,000 Recognition CST and one Cosmic Signature NFT to the participant who made the last CST gesture of the cycle.',
+        body: 'The participant who made the cycle’s last CST gesture.',
       },
     },
   },
@@ -217,11 +218,11 @@ export const landingTextEn = {
   verifiability: {
     eyebrow: 'Verifiability',
     heading: 'Open, verified, reproducible.',
-    body: 'Anyone can verify a Signature by regenerating it from its seed. Contract verification, static analysis notes, and audit status are published through the app as reports become available. Project-owned materials in the Cosmic Signature repositories are dedicated under CC0 1.0; third-party dependencies, fonts, and assets retain their own licenses.',
+    body: 'Anyone can regenerate a Signature from its seed and check the contracts, source code and audit status the app publishes.',
     pillars: [
       {
         title: 'CC0 1.0',
-        body: 'Project-owned contracts, shaders, and rendering pipelines. No rights reserved. Third-party materials are excluded.',
+        body: 'Project-owned materials in the Cosmic Signature repositories: contracts, shaders and rendering pipelines. No rights reserved; third-party dependencies, fonts and assets keep their own licenses.',
       },
       {
         title: 'Verification status',

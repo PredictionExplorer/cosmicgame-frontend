@@ -111,6 +111,7 @@ export const landingTextZh = {
       '周期收官后，协议会沿各条分配轨道发放 ETH 与 CST 储备，以表彰坚守、时机、投入与参与。约一半 ETH 储备会滚入下一周期。',
     ethLabel: '每个周期储备中的 ETH',
     fixedLabel: '每个周期的 CST 与 NFT',
+    fixedEach: `每位获配者获配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 与 1 枚 Cosmic Signature NFT。`,
     items: {
       'signature-allocation': {
         title: '签名分配',
@@ -138,24 +139,24 @@ export const landingTextZh = {
         body: '由程序化随机选出的 3 位参与者均分；入选频次随落笔次数增加。',
       },
       'participant-nft-stellar-selection': {
-        amount: '10 枚 NFT',
+        amount: '10 位获配者',
         title: '参与者 NFT 星选',
-        body: `程序化随机选出 10 位参与者，每位获配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 与 1 枚 Cosmic Signature NFT。`,
+        body: '从本周期的参与者中程序化随机选出。',
       },
       'anchored-nft-stellar-selection': {
-        amount: '10 枚 NFT',
+        amount: '10 位获配者',
         title: '锚定 NFT 星选',
-        body: `程序化随机选出 10 位 Random Walk NFT 锚定者，每位获配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 与 1 枚 Cosmic Signature NFT。`,
+        body: '从 Random Walk NFT 锚定者中程序化随机选出。',
       },
       'endurance-champion': {
-        amount: `${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST`,
+        amount: '1 位获配者',
         title: '坚守冠军分配',
-        body: '连续坚守时间最长的参与者获配 1,000 表彰 CST 与 1 枚 Cosmic Signature NFT。',
+        body: '连续坚守时间最长的参与者。',
       },
       'final-cst-gesture': {
-        amount: `${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST`,
+        amount: '1 位获配者',
         title: 'CST 收官之笔分配',
-        body: '本周期最后一次使用 CST 落笔的参与者获配 1,000 表彰 CST 与 1 枚 Cosmic Signature NFT。',
+        body: '本周期最后一次使用 CST 落笔的参与者。',
       },
     },
   },
@@ -217,11 +218,11 @@ export const landingTextZh = {
   verifiability: {
     eyebrow: '可验证性',
     heading: '开放、已验证、可复现。',
-    body: '任何人都能从种子重新生成签名作品，独立完成验证。合约验证、静态分析说明和审计状态会随报告一同发布在应用中。Cosmic Signature 各代码仓库中的项目自有材料采用 CC0 1.0；第三方依赖、字体与素材仍适用各自的许可证。',
+    body: '任何人都能从种子重新生成签名作品，并对照应用中公开的合约、源代码与审计状态自行核验。',
     pillars: [
       {
         title: 'CC0 1.0',
-        body: '项目自有的合约、着色器与渲染管线采用 CC0 1.0，不保留任何权利；第三方材料不在此范围内。',
+        body: 'Cosmic Signature 各代码仓库中的项目自有材料（合约、着色器与渲染管线）采用 CC0 1.0，不保留任何权利；第三方依赖、字体与素材仍适用各自的许可证。',
       },
       {
         title: '验证状态',

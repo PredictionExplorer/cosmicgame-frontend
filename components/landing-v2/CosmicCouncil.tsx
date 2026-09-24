@@ -20,7 +20,7 @@ export function CosmicCouncil({ council }: { council: LandingContent['council'] 
       <ol className={styles.rows}>
         {council.columns.map((column, index) => (
           <li key={column.title} className={styles.row}>
-            <span className="type-mono pt-0.5 text-subtle">
+            <span className="type-label pt-1 tabular-nums text-subtle">
               {String(index + 1).padStart(2, '0')}
             </span>
             <div className="min-w-0">

@@ -121,6 +121,27 @@ describe('landing sections', () => {
       expect(pickCollection(showcase, 'recent', 2).map((art) => art?.TokenId)).toEqual([30, 24]);
     });
 
+    it('never presents the bundled featured pieces as the newest on their own authority', () => {
+      const answered: LandingShowcase = {
+        status: 'ready',
+        tokens: [{ TokenId: 30, Seed: 'aa', Staked: false }],
+      };
+      expect(pickCollection(answered, 'recent', 6).map((art) => art?.TokenId)).toEqual([30]);
+      expect(pickCollection({ status: 'ready', tokens: [] }, 'recent', 6)).toEqual([]);
+    });
+
+    it('leaves out the plates another strip already shows', () => {
+      const showcase: LandingShowcase = {
+        status: 'ready',
+        tokens: [31, 30, 29, 28].map((id) => ({ TokenId: id, Seed: `s${id}`, Staked: id > 29 })),
+      };
+      const anchored = pickCollection(showcase, 'anchored', 3).map((art) => art!.TokenId);
+      expect(anchored).toEqual([31, 30]);
+      expect(
+        pickCollection(showcase, 'recent', 6, new Set(anchored)).map((art) => art?.TokenId),
+      ).toEqual([29, 28]);
+    });
+
     it('waits at the full count while loading and shows nothing when the read fails', () => {
       expect(pickCollection({ tokens: [], status: 'loading' }, 'anchored', 3)).toEqual([
         null,
@@ -197,9 +218,16 @@ describe('landing sections', () => {
       ]);
     });
 
-    it('names the repositories, not "this repository"', () => {
-      expect(content.verifiability.body).toMatch(/Cosmic Signature repositories/);
-      expect(content.verifiability.body).not.toMatch(/this repository/);
+    it('names the repositories, not "this repository", where it scopes the licence', () => {
+      const cc0 = content.verifiability.pillars[0]!;
+      expect(cc0.title).toBe('CC0 1.0');
+      expect(cc0.body).toMatch(/Cosmic Signature repositories/);
+      expect(cc0.body).not.toMatch(/this repository/);
+    });
+
+    it('opens with one sentence and leaves the licence to the CC0 pillar', () => {
+      expect(content.verifiability.body.split(/(?<=\.)\s/)).toHaveLength(1);
+      expect(content.verifiability.body).not.toMatch(/CC0|license/i);
     });
   });
 

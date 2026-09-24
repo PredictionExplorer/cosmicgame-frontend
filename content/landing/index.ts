@@ -111,6 +111,7 @@ function buildLandingContent(text: LandingText, locale: AppLocale): LandingConte
       description: text.tracks.description,
       ethLabel: text.tracks.ethLabel,
       fixedLabel: text.tracks.fixedLabel,
+      fixedEach: text.tracks.fixedEach,
       eth,
       fixed,
     },

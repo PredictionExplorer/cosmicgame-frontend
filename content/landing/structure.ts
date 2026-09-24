@@ -181,7 +181,7 @@ export interface LandingStageText {
  * Copy for one allocation track. Tracks without a fixed share in the
  * skeleton write their own figure, because its wording differs across
  * locales: the compounding remainder its approximate `percent` ("~50%"),
- * each CST and NFT track its `amount` ("1,000 CST", "10 NFTs").
+ * each CST and NFT track its recipient count as `amount` ("10 recipients").
  */
 type LandingTrackItemText<Item> = Item extends { readonly share: number }
   ? { readonly title: string; readonly body: string }
@@ -246,6 +246,7 @@ export type LandingText = {
     readonly description: string;
     readonly ethLabel: string;
     readonly fixedLabel: string;
+    readonly fixedEach: string;
     readonly items: {
       readonly [Item in
         | EthTrackStructure

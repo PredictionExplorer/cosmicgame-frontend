@@ -113,6 +113,7 @@ export const landingTextJa = {
       'サイクルが確定すると、プロトコルはETHとCSTの準備金を、継続の長さ、タイミング、関わり方、参加を反映する配分トラックへ配ります。ETH準備金のおよそ半分は次のサイクルへ累積します。',
     ethLabel: '各サイクル準備金のETH',
     fixedLabel: 'サイクルごとのCSTとNFT',
+    fixedEach: `受領者はそれぞれ${cst} CSTとCosmic Signature NFT 1点を受け取ります。`,
     items: {
       'signature-allocation': {
         title: 'シグネチャー配分',
@@ -140,24 +141,24 @@ export const landingTextJa = {
         body: '無作為に選ばれた3人の参加者で分け合います。選ばれる頻度は入れた一筆の数に応じて高まります。',
       },
       'participant-nft-stellar-selection': {
-        amount: 'NFT 10点',
+        amount: '受領者10人',
         title: 'NFT星選——参加者',
-        body: `無作為に選ばれた10人の参加者が、それぞれ${cst} CSTとCosmic Signature NFT 1点を受け取ります。`,
+        body: 'サイクルの参加者から無作為に選ばれます。',
       },
       'anchored-nft-stellar-selection': {
-        amount: 'NFT 10点',
+        amount: '受領者10人',
         title: '係留NFT星選',
-        body: `無作為に選ばれた10人のRandom Walk NFT係留者が、それぞれ${cst} CSTとCosmic Signature NFT 1点を受け取ります。`,
+        body: 'Random Walk NFTの係留者から無作為に選ばれます。',
       },
       'endurance-champion': {
-        amount: `${cst} CST`,
+        amount: '受領者1人',
         title: '持久チャンピオン配分',
-        body: '最新の一筆を入れた参加者として最も長く先頭を保持した参加者に、1,000 CSTの功労CSTとCosmic Signature NFT 1点が配分されます。',
+        body: '最新の一筆を入れた参加者として、最も長く途切れずに先頭を保持した参加者です。',
       },
       'final-cst-gesture': {
-        amount: `${cst} CST`,
+        amount: '受領者1人',
         title: '最後のCST一筆配分',
-        body: 'サイクルで最後のCST一筆を入れた参加者に、1,000 CSTの功労CSTとCosmic Signature NFT 1点が配分されます。',
+        body: 'サイクルで最後のCST一筆を入れた参加者です。',
       },
     },
   },
@@ -219,11 +220,11 @@ export const landingTextJa = {
   verifiability: {
     eyebrow: '検証可能性',
     heading: 'オープンで、検証済みで、再現可能。',
-    body: 'シグネチャーはシードから再生成することで誰でも検証できます。コントラクトの検証、静的解析の注記、監査の状況は、報告書が利用できるようになるにつれてアプリを通じて公開されます。Cosmic Signatureの各リポジトリにあるプロジェクト所有の素材はCC0 1.0で提供されます。第三者の依存関係、フォント、アセットはそれぞれのライセンスを保持します。',
+    body: 'シグネチャーは誰でもシードから再生成でき、アプリで公開しているコントラクト、ソースコード、監査の状況と照らし合わせて確認できます。',
     pillars: [
       {
         title: 'CC0 1.0',
-        body: 'プロジェクト所有のコントラクト、シェーダー、レンダリングパイプライン。権利は一切留保しません。第三者の素材は除きます。',
+        body: 'Cosmic Signatureの各リポジトリにあるプロジェクト所有の素材（コントラクト、シェーダー、レンダリングパイプライン）はCC0 1.0で提供され、権利は一切留保しません。第三者の依存関係、フォント、アセットはそれぞれのライセンスを保持します。',
       },
       {
         title: '検証状況',

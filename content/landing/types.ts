@@ -87,7 +87,11 @@ export interface LandingEthTrack {
 /** A fixed CST and NFT allocation made every cycle. */
 export interface LandingFixedTrack {
   readonly id: string;
-  /** "1,000 CST", "10 NFTs": each locale formats its own amount. */
+  /**
+   * How many recipients the track has each cycle ("10 recipients"); what
+   * each one receives is said once for the group (`fixedEach`). Each locale
+   * writes its own count phrase.
+   */
   readonly amount: string;
   readonly title: string;
   readonly body: string;
@@ -99,6 +103,8 @@ export interface LandingTracksContent {
   readonly description: string;
   readonly ethLabel: string;
   readonly fixedLabel: string;
+  /** What every fixed-track recipient receives: "Each recipient receives 1,000 CST and one …". */
+  readonly fixedEach: string;
   readonly eth: readonly LandingEthTrack[];
   readonly fixed: readonly LandingFixedTrack[];
 }
