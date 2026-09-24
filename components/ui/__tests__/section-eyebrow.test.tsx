@@ -28,20 +28,30 @@ describe('SectionEyebrow', () => {
   });
 
   it.each([
-    ['aurora', 'bg-[oklch(84.7%_0.149_213)]'],
-    ['nebula', 'bg-[oklch(50.4%_0.247_296)]'],
-    ['solar', 'bg-[oklch(82.4%_0.162_81)]'],
-    ['impact', 'bg-[oklch(77.1%_0.163_161)]'],
-    ['muted', 'bg-white/40'],
-  ])('dot tone=%s applies the right bg', (tone, expected) => {
+    ['aurora', 'bg-data-2'],
+    ['nebula', 'bg-data-1'],
+    ['solar', 'bg-data-3'],
+    ['impact', 'bg-data-5'],
+    ['rose', 'bg-data-4'],
+    ['muted', 'bg-subtle'],
+  ] as const)('dot tone=%s uses the %s token', (tone, expected) => {
     render(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      <SectionEyebrow tone={tone as any} data-testid="e">
+      <SectionEyebrow tone={tone} data-testid="e">
         x
       </SectionEyebrow>,
     );
     const dot = screen.getByTestId('e').querySelector('[aria-hidden]');
     expect(dot).toHaveClass(expected);
+  });
+
+  it('never pulses, even when a caller still asks for it', () => {
+    render(
+      <SectionEyebrow pulse data-testid="e">
+        Collection
+      </SectionEyebrow>,
+    );
+    const dot = screen.getByTestId('e').querySelector('[aria-hidden]');
+    expect(dot?.className).not.toMatch(/animate/);
   });
 
   it('has no accessibility violations', async () => {
