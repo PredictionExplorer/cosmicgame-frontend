@@ -1,3 +1,5 @@
+import userEvent from '@testing-library/user-event';
+
 import { TOKEN_1_METADATA_V2, TOKEN_7_METADATA_V2 } from '@/lib/nftMetadata/__fixtures__/metadata';
 import { normalizeTraitEntry, parseCosmicSignatureMetadata, scoreRarity } from '@/lib/nftMetadata';
 
@@ -125,6 +127,17 @@ describe('RarityRankChip', () => {
     expect(screen.getByTestId('rarity-rank-chip')).toHaveAttribute('aria-label', 'Rank 1 of 3');
     rerender(<RarityRankChip rarity={rarity.byId.get(7)} total={rarity.total} verbose />);
     expect(screen.getByTestId('rarity-rank-chip')).toHaveTextContent('Rank 2 of 3');
+  });
+
+  it('spells out the rarest trait from the keyboard, not only on hover', async () => {
+    const user = userEvent.setup();
+    render(<RarityRankChip rarity={rarity.byId.get(1)} total={rarity.total} verbose />);
+    const chip = screen.getByRole('button', { name: 'Rank 1 of 3' });
+    // The sentence is the chip's description before anything opens.
+    expect(chip).toHaveAccessibleDescription(/Rarity rank 1 of 3/);
+    chip.focus();
+    await user.keyboard('{Enter}');
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(/Rarest trait/);
   });
 
   it('renders nothing when unranked', () => {

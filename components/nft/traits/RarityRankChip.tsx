@@ -4,9 +4,10 @@ import { Gem } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import type { RarityInfo } from '@/lib/nftMetadata';
+import { TOUCH_TARGET_EXTENDED_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
 import { toIntlLocale } from '@/utils/format';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { ExplainPopover } from '@/components/ui/explain-popover';
 
 import { useTraitLabels } from './useTraitLabels';
 
@@ -37,7 +38,7 @@ function tierClass(rank: number, total: number): string {
 
 /**
  * RarityRankChip — the token's rarity rank across the collection (1 = rarest),
- * with the rarest trait spelled out in the tooltip.
+ * with the rarest trait spelled out in a toggletip.
  */
 export function RarityRankChip({
   rarity,
@@ -58,33 +59,38 @@ export function RarityRankChip({
     ? `${typeLabel(rarity.rarest.key)} · ${valueLabel(rarity.rarest.key, rarity.rarest.value)}`
     : null;
 
+  // The chip is its own toggletip: hovering shows the rarest trait, and a
+  // click, tap, Enter or Space pins it, so keyboard and touch readers get
+  // the same sentence as a mouse.
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <span
-          role="img"
-          className={cn(
-            'inline-flex items-center gap-1 rounded-md border font-mono tabular-nums backdrop-blur-sm cursor-help',
-            size === 'sm' ? 'px-1.5 py-0.5 type-caption' : 'px-2 py-1 text-xs',
-            tierClass(rarity.rank, total),
-            className,
-          )}
-          aria-label={t('rarity.rankOf', { rank, total: totalText })}
-          data-testid="rarity-rank-chip"
-        >
-          <Gem aria-hidden className={size === 'sm' ? 'h-2.5 w-2.5' : 'h-3 w-3'} />
-          <span aria-hidden>
-            {verbose ? t('rarity.rankOf', { rank, total: totalText }) : t('rarity.rank', { rank })}
-          </span>
+    <ExplainPopover
+      title={t('rarity.rankLabel')}
+      definition={
+        rarestText
+          ? t('rarity.tooltip', { rank, total: totalText, trait: rarestText })
+          : t('rarity.tooltipNoTrait', { rank, total: totalText })
+      }
+      side="bottom"
+      maxWidth={260}
+    >
+      <button
+        type="button"
+        data-touch-target="extended"
+        className={cn(
+          TOUCH_TARGET_EXTENDED_CLASS,
+          'inline-flex cursor-help items-center gap-1 rounded-md border font-mono tabular-nums backdrop-blur-sm',
+          size === 'sm' ? 'px-1.5 py-0.5 type-caption' : 'min-h-6 px-2 py-1 text-xs',
+          tierClass(rarity.rank, total),
+          className,
+        )}
+        aria-label={t('rarity.rankOf', { rank, total: totalText })}
+        data-testid="rarity-rank-chip"
+      >
+        <Gem aria-hidden className={size === 'sm' ? 'h-2.5 w-2.5' : 'h-3 w-3'} />
+        <span aria-hidden>
+          {verbose ? t('rarity.rankOf', { rank, total: totalText }) : t('rarity.rank', { rank })}
         </span>
-      </TooltipTrigger>
-      <TooltipContent side="bottom" className="max-w-[260px]">
-        <p>
-          {rarestText
-            ? t('rarity.tooltip', { rank, total: totalText, trait: rarestText })
-            : t('rarity.tooltipNoTrait', { rank, total: totalText })}
-        </p>
-      </TooltipContent>
-    </Tooltip>
+      </button>
+    </ExplainPopover>
   );
 }
