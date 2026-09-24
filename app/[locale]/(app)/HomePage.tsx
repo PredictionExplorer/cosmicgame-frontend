@@ -51,6 +51,7 @@ import { useHomeAnnouncer } from '@/hooks/useHomeAnnouncer';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { invalidateLiveGameQueries } from '@/hooks/useLiveGameDataRefresh';
 import { useNow } from '@/hooks/useNow';
+import { useOwnGestureOverlay } from '@/hooks/useOwnGestureOverlay';
 import { usePendingChatMessages } from '@/hooks/usePendingChatMessages';
 import { usePositionMoment } from '@/hooks/usePositionMoment';
 import { useLatestSignatures } from '@/hooks/useLatestSignatures';
@@ -72,7 +73,7 @@ import {
 import { deriveAllocationTrackAmounts } from '@/lib/allocationTracks';
 import { getCycleState, getDashboardActivationTime } from '@/lib/cycleState';
 import { resolveLatestGesture, type LatestParticipantEvidence } from '@/lib/latestGesture';
-import { fetchEndgameChainSample } from '@/lib/rpcRace';
+import { fetchEndgameChainSample, type EndgameChainSample } from '@/lib/rpcRace';
 import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
 import { getStableClientTargetTime, type ServerTimingSample } from '@/utils/time';
@@ -98,9 +99,6 @@ const MemoLatestSignature = memo(LatestSignature);
 /** The deadline's own read: the tab title trusts it while it keeps arriving. */
 const DEADLINE_FRESHNESS_KEYS = [['allocationTime']] as const;
 
-/** How long the wallet's own confirmed Gesture may stand in for an index that lags. */
-const OWN_GESTURE_OVERLAY_MS = 120_000;
-
 /** How long the sheet shows its confirmed state before it closes by itself. */
 const SHEET_SUCCESS_CLOSE_MS = 1_600;
 
@@ -110,32 +108,6 @@ export function resolveHomeNow(
   initialRenderAtMs = 0,
 ): number {
   return tickingNow || timingSample?.sampledAtMs || initialRenderAtMs;
-}
-
-/**
- * The connected wallet's Gesture, confirmed on-chain but not yet in the
- * indexed dashboard. Until the index counts it, every surface reads the
- * dashboard through this overlay, so the count, the Last Gesture, the hold,
- * the dock and the standing agree the moment the receipt arrives.
- */
-interface OwnGesture {
-  address: string;
-  cycle: number;
-  /** The Gesture count once this Gesture is included. */
-  count: number;
-  /** Unix seconds: the block time from a chain sample, or the page clock. */
-  timestampSec: number;
-  confirmedAtMs: number;
-}
-
-export function overlayOwnGesture(
-  dashboard: DashboardInfo | null,
-  own: OwnGesture | null,
-): DashboardInfo | null {
-  if (!dashboard || !own) return dashboard;
-  if (dashboard.CurRoundNum !== own.cycle) return dashboard;
-  if ((dashboard.CurNumBids ?? 0) >= own.count) return dashboard;
-  return { ...dashboard, CurNumBids: own.count, LastBidderAddr: own.address };
 }
 
 interface HomePageProps {
@@ -186,32 +158,34 @@ const HomePage = ({
     coherentInitialTimingSample ? 0 : undefined,
   );
 
-  // The wallet's own confirmed Gesture until the index includes it (F221).
-  const [ownGesture, setOwnGesture] = useState<OwnGesture | null>(null);
-  const data = useMemo(
-    () => overlayOwnGesture(dashboardData ?? null, ownGesture),
-    [dashboardData, ownGesture],
+  // The wallet's own confirmed Gesture until the index includes it (F221):
+  // every surface reads the dashboard through this overlay, so the count, the
+  // Last Gesture, the hold, the dock and the standing agree the moment the
+  // receipt arrives, and stay so while the chain still names the wallet.
+  const readChain = useMemo(
+    () => (cosmicGame ? () => fetchEndgameChainSample(cosmicGame) : null),
+    [cosmicGame],
   );
-  const ownGesturePending = data !== (dashboardData ?? null);
-  // Read by the receipt handler, so a second Gesture before the index catches
-  // up counts on top of the first rather than on the stale indexed count.
-  const dataRef = useRef(data);
-  useEffect(() => {
-    dataRef.current = data;
-  }, [data]);
-  useEffect(() => {
-    if (!ownGesture) return undefined;
-    // The index caught up (or a new cycle began): drop the overlay and
-    // re-read the wallet's own history, which now includes the Gesture.
-    if (!ownGesturePending && dashboardData) {
-      setOwnGesture(null);
-      void queryClient.invalidateQueries({ queryKey: ['userInfo', ownGesture.address] });
-      return undefined;
-    }
-    const expiresIn = ownGesture.confirmedAtMs + OWN_GESTURE_OVERLAY_MS - Date.now();
-    const id = window.setTimeout(() => setOwnGesture(null), Math.max(0, expiresIn));
-    return () => window.clearTimeout(id);
-  }, [dashboardData, ownGesture, ownGesturePending, queryClient]);
+  const storeChainSample = useCallback(
+    (sample: EndgameChainSample) => {
+      queryClient.setQueryData(['allocationTime'], sample.mainPrizeTimeSec);
+      queryClient.setQueryData(['currentTime'], sample.blockTimestampSec);
+    },
+    [queryClient],
+  );
+  const {
+    data,
+    own: ownGesture,
+    pending: ownGesturePending,
+    record: recordOwnGesture,
+  } = useOwnGestureOverlay({
+    dashboard: dashboardData ?? null,
+    readChain,
+    onChainSample: storeChainSample,
+    // The wallet's own history now includes the Gesture.
+    onIndexed: (address) => void queryClient.invalidateQueries({ queryKey: ['userInfo', address] }),
+    onError: reportError,
+  });
 
   const round = data?.CurRoundNum ?? -1;
   const initialGestureList = useMemo(
@@ -421,38 +395,14 @@ const HomePage = ({
 
   /**
    * The receipt is in: the wallet holds the Last Gesture. Record it for every
-   * surface at once (the overlay above), then read the chain directly so the
-   * clock extends from the contract's own deadline instead of waiting for the
-   * next indexed poll.
+   * surface at once (the overlay above), which also reads the chain directly
+   * so the clock extends from the contract's own deadline instead of waiting
+   * for the next indexed poll.
    */
   const recordConfirmedGesture = useCallback(() => {
     setGesturePulseKey((value) => value + 1);
-    if (!account) return;
-    const base = dataRef.current;
-    if (!base) return;
-    const confirmedAtMs = Date.now();
-    const own: OwnGesture = {
-      address: account,
-      cycle: base.CurRoundNum,
-      count: (base.CurNumBids ?? 0) + 1,
-      timestampSec: Math.floor((confirmedAtMs + offset) / 1000),
-      confirmedAtMs,
-    };
-    setOwnGesture(own);
-    if (!cosmicGame) return;
-    fetchEndgameChainSample(cosmicGame)
-      .then((sample) => {
-        if (sample.roundNum !== own.cycle) return;
-        queryClient.setQueryData(['allocationTime'], sample.mainPrizeTimeSec);
-        queryClient.setQueryData(['currentTime'], sample.blockTimestampSec);
-        if (sameAddress(sample.lastBidderAddress, own.address)) {
-          setOwnGesture((current) =>
-            current === own ? { ...own, timestampSec: sample.blockTimestampSec } : current,
-          );
-        }
-      })
-      .catch((e) => reportError(e, 'post-gesture chain sample'));
-  }, [account, cosmicGame, offset, queryClient]);
+    if (account) recordOwnGesture(account, offset);
+  }, [account, offset, recordOwnGesture]);
 
   // Optimistic chat rows until the indexer echoes them (F221).
   const { pending: pendingMessages, record: recordPendingMessage } =
@@ -621,6 +571,7 @@ const HomePage = ({
     account,
     latestAddress: loading ? undefined : data?.LastBidderAddr,
     cycle: data?.CurRoundNum,
+    gestureCount: data?.CurNumBids,
     nowMs: now,
   });
   const announcement = useHomeAnnouncer({

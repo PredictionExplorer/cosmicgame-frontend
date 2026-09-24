@@ -25,6 +25,8 @@ interface Baseline {
   cycle: number | null;
   /** Whether the wallet held the Last Gesture at the last observation; null before one. */
   isLatest: boolean | null;
+  /** The highest Gesture count seen this cycle; null before one. */
+  peakCount: number | null;
 }
 
 export interface UsePositionMomentArgs {
@@ -32,6 +34,12 @@ export interface UsePositionMomentArgs {
   /** The dashboard's latest participant; undefined while it is unknown. */
   latestAddress: string | null | undefined;
   cycle: number | null | undefined;
+  /**
+   * This cycle's Gesture count; undefined or null while unknown. A change of
+   * holder is a moment only when the count rose past anything seen before,
+   * so an index that falls back or catches up never reads as one.
+   */
+  gestureCount: number | null | undefined;
   /** The page's clock, which stamps the moment. */
   nowMs: number;
 }
@@ -49,6 +57,9 @@ export interface UsePositionMomentResult {
  * place. Only a change seen while the page is open counts — loading the page,
  * connecting a wallet or a new cycle sets a fresh baseline without a moment —
  * so a returning participant is never told their place "was just taken".
+ * And only a new Gesture moves a place: a holder that changes while the
+ * cycle's count does not rise past its highest reading (an overlay giving way
+ * to a lagging index, the index catching up) is a correction, not a moment.
  * `landed` fades after LANDED_MOMENT_MS; `taken` stays until dismissed or
  * until the wallet takes the place back.
  */
@@ -56,28 +67,48 @@ export function usePositionMoment({
   account,
   latestAddress,
   cycle,
+  gestureCount,
   nowMs,
 }: UsePositionMomentArgs): UsePositionMomentResult {
   const wallet = account ?? null;
   const cycleNumber = cycle ?? null;
   const known = latestAddress !== undefined && latestAddress !== null && latestAddress !== '';
   const isLatest = !!wallet && sameAddress(wallet, latestAddress);
+  const count =
+    typeof gestureCount === 'number' && Number.isFinite(gestureCount) ? gestureCount : null;
+  // The holder and the count are observed together, so a count that arrives
+  // before its holder cannot use up the rise that makes the change a moment.
+  const observedCount = known ? count : null;
 
   const [baseline, setBaseline] = useState<Baseline>({
     account: wallet,
     cycle: cycleNumber,
     isLatest: known ? isLatest : null,
+    peakCount: observedCount,
   });
   const [moment, setMoment] = useState<PositionMoment | null>(null);
+
+  const rose =
+    observedCount !== null && (baseline.peakCount === null || observedCount > baseline.peakCount);
 
   // Render-time state adjustment: compare with the last observation and
   // record at most one transition per change of the Last Gesture.
   if (baseline.account !== wallet || baseline.cycle !== cycleNumber) {
-    setBaseline({ account: wallet, cycle: cycleNumber, isLatest: known ? isLatest : null });
+    setBaseline({
+      account: wallet,
+      cycle: cycleNumber,
+      isLatest: known ? isLatest : null,
+      peakCount: observedCount,
+    });
     if (moment) setMoment(null);
-  } else if (known && baseline.isLatest !== isLatest) {
-    setBaseline({ ...baseline, isLatest });
-    if (wallet && baseline.isLatest !== null) {
+  } else if (known && (baseline.isLatest !== isLatest || rose)) {
+    setBaseline({
+      ...baseline,
+      isLatest,
+      peakCount: rose ? observedCount : baseline.peakCount,
+    });
+    const newGesture = rose && baseline.peakCount !== null;
+    if (wallet && baseline.isLatest !== null && baseline.isLatest !== isLatest && newGesture) {
       setMoment(
         isLatest
           ? { kind: 'landed', by: null, atMs: nowMs }
