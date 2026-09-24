@@ -6,13 +6,32 @@ import { SectionShell } from '../SectionShell';
 import { StatsSection } from '../StatsSection';
 
 describe('SectionShell', () => {
-  it('names the section by an H2 whose button folds the body away', async () => {
+  it('names the section by a plain H2 by default, with its sentence and actions', () => {
+    render(
+      <SectionShell
+        title="Gesture spikes"
+        description="One sentence."
+        actions={<a href="#x">Act</a>}
+      >
+        <p>Chart body</p>
+      </SectionShell>,
+    );
+    const heading = screen.getByRole('heading', { level: 2, name: 'Gesture spikes' });
+    expect(screen.getByRole('region', { name: 'Gesture spikes' })).toBeInTheDocument();
+    expect(heading.querySelector('button')).toBeNull();
+    expect(screen.getByText('One sentence.')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Act' })).toBeInTheDocument();
+    expect(screen.getByText('Chart body')).toBeVisible();
+  });
+
+  it('folds a collapsible section away from its H2 button', async () => {
     const user = userEvent.setup();
     render(
       <SectionShell
         title="Gesture spikes"
         description="One sentence."
         actions={<a href="#x">Act</a>}
+        collapsible
       >
         <p>Chart body</p>
       </SectionShell>,

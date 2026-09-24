@@ -52,7 +52,8 @@ export function CycleScopeControl({ scope }: { scope: CycleScope }) {
         </Button>
         <Select value={String(cycle)} onValueChange={(value) => setCycle(Number(value))}>
           <SelectTrigger aria-labelledby={labelId} className="w-auto min-w-36 tabular-nums">
-            <SelectValue>{label(cycle)}</SelectValue>
+            {/* The live state is the pill beside it; the menu names it per option. */}
+            <SelectValue>{t('charts.cyclePicker.option', { cycle })}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             {cycles.map((value) => (

@@ -44,9 +44,9 @@ describe('EnduranceTimelineChart', () => {
     render(<EnduranceTimelineChart round={2} isLive label="Endurance" />);
     const figure = screen.getByRole('figure', { name: 'Endurance' });
     expect(
-      within(figure).getByText(/^Endurance champion: 0xb1b2….*held 1[67]h/i),
+      within(figure).getByText(/^Endurance Champion: 0xb1b2….*held 1[67]h/i),
     ).toBeInTheDocument();
-    expect(within(figure).getByText(/^Chrono-warrior: /)).toBeInTheDocument();
+    expect(within(figure).getByText(/^Chrono-Warrior: /)).toBeInTheDocument();
   });
 
   it('draws a lane per address with its title spelled out for assistive technology', () => {
@@ -79,7 +79,7 @@ describe('EnduranceTimelineChart', () => {
     render(<EnduranceTimelineChart round={2} isLive label="Endurance" />);
     await user.click(screen.getByRole('tab', { name: 'Line chart' }));
     expect(screen.getByTestId('composed-chart')).toBeInTheDocument();
-    expect(screen.getByText('Endurance champion record')).toBeInTheDocument();
+    expect(screen.getByText('Endurance Champion record')).toBeInTheDocument();
   });
 
   it('lists every address that held the lead as a table', async () => {
@@ -96,7 +96,7 @@ describe('EnduranceTimelineChart', () => {
     render(<EnduranceTimelineChart round={1} isLive={false} label="Endurance" />);
     expect(mockUseRoundInfo).toHaveBeenCalledWith(1);
     // Bob's last stint now runs 7h, under Alice's 10h opening hold.
-    expect(screen.getByText(/^Endurance champion: 0xa1b2….*held 10h/i)).toBeInTheDocument();
+    expect(screen.getByText(/^Endurance Champion: 0xa1b2….*held 10h/i)).toBeInTheDocument();
   });
 
   it('asks for a cycle, and says when the cycle has no lead yet', () => {

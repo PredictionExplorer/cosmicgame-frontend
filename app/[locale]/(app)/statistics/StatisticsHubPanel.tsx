@@ -28,34 +28,37 @@ import { STATISTICS_SECTIONS, type StatisticsSectionDef } from './statistics-sec
 type SectionKey = StatisticsSectionDef['messageKey'];
 
 /**
- * One entry of the section index: the page's name with an arrow, what it
- * covers, and its key figure at the foot. The whole card is the link, the
- * one box a region may draw.
+ * One row of the section index: the page's name over what it covers, its
+ * key figure on the right, and an arrow. The whole row is the link; rows are
+ * divided by hairlines like a ledger, with the same inset as a table cell.
+ * On a phone the figure moves under the description.
  */
 function SectionEntry({ section, figure }: { section: StatisticsSectionDef; figure: ReactNode }) {
   const t = useTranslations('statistics');
   return (
-    <li className="min-w-0">
+    <li className="border-b border-rule-faint">
       <Link
         href={section.href}
         className={cn(
-          'group flex h-full flex-col rounded-surface border border-rule px-5 py-4 no-underline',
-          'transition-colors duration-fast hover:border-input hover:bg-surface',
+          'group grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6 gap-y-1.5 px-4 py-4 no-underline sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:py-5',
+          'focus-ring-inset transition-colors duration-fast hover:bg-surface',
         )}
       >
-        <span className="flex items-center justify-between gap-4">
-          <span className="type-title text-foreground">
+        <span className="col-start-1 row-start-1 min-w-0">
+          <span className="block type-title text-foreground">
             {t(`navigation.${section.messageKey}.label`)}
           </span>
-          <ArrowRight
-            aria-hidden
-            className="size-4 shrink-0 text-subtle transition-transform duration-fast group-hover:translate-x-0.5 group-hover:text-foreground motion-reduce:transition-none"
-          />
+          <span className="mt-0.5 block type-body-sm text-muted-foreground">
+            {t(`hub.index.${section.messageKey}`)}
+          </span>
         </span>
-        <span className="mt-1 type-body-sm text-muted-foreground">
-          {t(`hub.index.${section.messageKey}`)}
+        <span className="col-start-1 row-start-2 type-figure-sm text-foreground sm:col-start-2 sm:row-start-1 sm:text-right">
+          {figure}
         </span>
-        <span className="mt-auto pt-4 type-figure-sm text-foreground">{figure}</span>
+        <ArrowRight
+          aria-hidden
+          className="col-start-2 row-span-2 row-start-1 size-4 shrink-0 text-subtle transition-transform duration-fast group-hover:translate-x-0.5 group-hover:text-foreground motion-reduce:transition-none sm:col-start-3 sm:row-span-1"
+        />
       </Link>
     </li>
   );
@@ -211,7 +214,7 @@ const StatisticsHubPanel = () => {
 
       <SectionShell title={t('hub.exploreTitle')}>
         <nav aria-label={t('hub.exploreAria')}>
-          <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <ul className="border-t border-rule">
             {STATISTICS_SECTIONS.map((section) => (
               <SectionEntry
                 key={section.slug}
@@ -242,6 +245,11 @@ const StatisticsHubPanel = () => {
                   ? t('hub.pendingRecipients', { count: pendingRecipients })
                   : undefined
               }
+            />
+            <StatisticsItem
+              title={t('anchoringPage.stats.totalDistributions')}
+              value={eth(main.StakeStatisticsCST?.TotalRewardEth)}
+              href="/anchoring"
             />
             <StatisticsItem
               title={metric('outreachCstAllocated')}
@@ -313,22 +321,30 @@ const StatisticsHubPanel = () => {
           className="mt-10"
           label={t('shared.definitions')}
           items={[
-            'totalSignatureAllocationsDistributed',
-            'stellarSelectionEthDeposited',
-            'stellarSelectionEthRetrieved',
-            'outreachCstAllocated',
-            'totalSupplyErc20',
-            'totalCstConsumed',
-            'cstGestures',
-            'randomWalkNftsUsed',
-            'namedTokens',
-            'publicGoodsBalance',
-            'protocolContributions',
-            'voluntaryContributions',
-            'totalPublicGoodsRetrieved',
-            'totalContributedEth',
-            'attachedNfts',
-          ].map(definition)}
+            ...[
+              'totalSignatureAllocationsDistributed',
+              'stellarSelectionEthDeposited',
+              'stellarSelectionEthRetrieved',
+            ].map(definition),
+            {
+              term: t('anchoringPage.stats.totalDistributions'),
+              definition: t('anchoringTooltips.cstTotalAnchorDistributions'),
+            },
+            ...[
+              'outreachCstAllocated',
+              'totalSupplyErc20',
+              'totalCstConsumed',
+              'cstGestures',
+              'randomWalkNftsUsed',
+              'namedTokens',
+              'publicGoodsBalance',
+              'protocolContributions',
+              'voluntaryContributions',
+              'totalPublicGoodsRetrieved',
+              'totalContributedEth',
+              'attachedNfts',
+            ].map(definition),
+          ]}
         />
       </SectionShell>
     </div>
