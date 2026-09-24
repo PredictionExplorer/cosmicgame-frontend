@@ -30,6 +30,11 @@ jest.mock('../../../../../hooks/useEndgameChainSync', () => ({
   useEndgameChainSync: (...args: unknown[]) => mockUseEndgameChainSync(...args),
 }));
 
+const mockAccount = jest.fn((): string | null => null);
+jest.mock('../../../../../hooks/web3', () => ({
+  useActiveWeb3React: () => ({ account: mockAccount(), chainId: 42161, active: false }),
+}));
+
 jest.mock('../../../../../hooks/useLiveFreshness', () => ({
   useLiveFreshness: () => mockFreshness(),
 }));
@@ -92,15 +97,17 @@ function setupLoaded(overrides: Record<string, unknown> = {}, query: Record<stri
   });
 }
 
-function clock(allocationSec: number, activationSec = NOW_SEC - 3600) {
+function clock(allocationSec: number, activationSec = NOW_SEC - 3600, timeoutSec = 86_400) {
   mockUseAllocationFinalize.mockReturnValue({
     allocationTime: allocationSec * 1000,
     activationTime: activationSec,
+    timeoutFinalize: timeoutSec,
   });
 }
 
 beforeEach(() => {
   jest.clearAllMocks();
+  mockAccount.mockReturnValue(null);
   mockUseGestureListByCycle.mockReturnValue({ data: [], isPending: false, isError: false });
   mockUseDonationsNFTByRound.mockReturnValue({ data: [] });
   mockUseDonationsCGWithInfoByRound.mockReturnValue({ data: [] });
@@ -183,9 +190,10 @@ describe('CurrentRoundPage', () => {
     expect(screen.queryByRole('timer')).not.toBeInTheDocument();
   });
 
-  it('shows the ready state and points the finalize action at the home clock', () => {
+  it('offers the latest participant the finalize action at zero, on the home clock', () => {
     setupLoaded();
     clock(NOW_SEC - 60);
+    mockAccount.mockReturnValue(PARTICIPANT);
     render(<CurrentRoundPage />);
 
     expect(screen.getByTestId('live-badge')).toHaveTextContent(
@@ -194,6 +202,27 @@ describe('CurrentRoundPage', () => {
     expect(
       screen.getByRole('link', { name: /currentCycle\.hero\.cta\.finalizeCycle/ }),
     ).toHaveAttribute('href', '/');
+  });
+
+  it('points other visitors at the home clock until anyone may finalize', () => {
+    setupLoaded();
+    clock(NOW_SEC - 60);
+    const { unmount } = render(<CurrentRoundPage />);
+
+    expect(
+      screen.queryByRole('link', { name: /currentCycle\.hero\.cta\.finalizeCycle/ }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /currentCycle\.hero\.cta\.viewHomeClock/ }),
+    ).toHaveAttribute('href', '/');
+    unmount();
+
+    // The latest participant's window (the contract timeout) has passed.
+    clock(NOW_SEC - 120, NOW_SEC - 3600, 60);
+    render(<CurrentRoundPage />);
+    expect(
+      screen.getByRole('link', { name: /currentCycle\.hero\.cta\.finalizeCycle/ }),
+    ).toBeInTheDocument();
   });
 
   it('counts down to the opening before the cycle opens, with no standings', () => {

@@ -41,14 +41,39 @@ export interface CyclePhaseView {
   showsZero: boolean;
   /**
    * The page's one action. Gestures open the home gesture form; the clock and
-   * the finalize action live at the top of the home page.
+   * the finalize action live at the top of the home page. `commit` actions
+   * take the commit gradient; `neutral` ones (only looking) take the outline.
    */
-  cta: { key: CycleCtaKey; href: string };
+  cta: { key: CycleCtaKey; href: string; emphasis: 'commit' | 'neutral' };
 }
 
 export interface CyclePhaseInput extends Omit<CycleStateInput, 'loading'> {
   /** The dashboard's latest poll succeeded (see `useLiveFreshness`). */
   fresh: boolean;
+  /** The connected wallet, if any. */
+  account?: string | null;
+  /**
+   * Epoch ms from which anyone may finalize (the finalization time plus the
+   * contract's timeout for the latest participant), or null while unknown.
+   */
+  openFinalizationMs?: number | null;
+}
+
+/**
+ * Whether this viewer can finalize now: the latest participant as soon as
+ * the clock reaches zero, anyone once open finalization begins.
+ */
+function mayFinalize({
+  account,
+  openFinalizationMs,
+  data,
+  now,
+}: Pick<CyclePhaseInput, 'account' | 'openFinalizationMs' | 'data' | 'now'>): boolean {
+  const latest = data?.LastBidderAddr;
+  if (account && latest && account.toLowerCase() === latest.toLowerCase()) return true;
+  return (
+    typeof openFinalizationMs === 'number' && openFinalizationMs > 0 && now >= openFinalizationMs
+  );
 }
 
 /**
@@ -58,7 +83,12 @@ export interface CyclePhaseInput extends Omit<CycleStateInput, 'loading'> {
  * Before the browser clock has ticked (`now` is 0 during server rendering) or
  * while the finalization time is unknown, the phase is `loading`, not a guess.
  */
-export function cyclePhaseView({ fresh, ...input }: CyclePhaseInput): CyclePhaseView {
+export function cyclePhaseView({
+  fresh,
+  account,
+  openFinalizationMs,
+  ...input
+}: CyclePhaseInput): CyclePhaseView {
   const hasLastParticipant =
     !!input.data && input.data.TsRoundStart !== 0 && input.data.LastBidderAddr !== ZERO_ADDRESS;
   const loading = input.now <= 0 || (hasLastParticipant && input.allocationTime <= 0);
@@ -73,13 +103,18 @@ export function cyclePhaseView({ fresh, ...input }: CyclePhaseInput): CyclePhase
       ? input.allocationTime
       : null;
 
+  // At zero only the latest participant may finalize until open finalization
+  // begins; everyone else is sent to the home clock, which counts down to it.
+  const homeClock = { key: 'viewHomeClock', href: '/', emphasis: 'neutral' } as const;
   const cta: CyclePhaseView['cta'] = state.isOpeningSoon
-    ? { key: 'viewHomeClock', href: '/' }
+    ? homeClock
     : state.isReadyToFinalize
-      ? { key: 'finalizeCycle', href: '/' }
+      ? mayFinalize({ account, openFinalizationMs, data: input.data, now: input.now })
+        ? { key: 'finalizeCycle', href: '/', emphasis: 'commit' }
+        : homeClock
       : state.isWaitingForFirstGesture
-        ? { key: 'makeFirstGesture', href: '/#make-gesture' }
-        : { key: 'makeGesture', href: '/#make-gesture' };
+        ? { key: 'makeFirstGesture', href: '/#make-gesture', emphasis: 'commit' }
+        : { key: 'makeGesture', href: '/#make-gesture', emphasis: 'commit' };
 
   return {
     state,

@@ -179,7 +179,12 @@ export function CycleStatus({
       </div>
 
       <div className="mt-8">
-        <Button asChild variant="commit" size="lg" className="max-sm:w-full">
+        <Button
+          asChild
+          variant={phase.cta.emphasis === 'commit' ? 'commit' : 'outline'}
+          size="lg"
+          className="max-sm:w-full"
+        >
           <Link href={phase.cta.href}>
             {t(`hero.cta.${phase.cta.key}`)}
             <ArrowRight aria-hidden />

@@ -23,7 +23,7 @@ describe('cyclePhaseView', () => {
     expect(view.tone).toBe('live');
     expect(view.countdownTargetMs).toBe(NOW + 20 * HOUR);
     expect(view.showsZero).toBe(false);
-    expect(view.cta).toEqual({ key: 'makeGesture', href: '/#make-gesture' });
+    expect(view.cta).toEqual({ key: 'makeGesture', href: '/#make-gesture', emphasis: 'commit' });
   });
 
   it('stops breathing when the last poll failed, but keeps the phase', () => {
@@ -48,7 +48,35 @@ describe('cyclePhaseView', () => {
     expect(view.state.phase).toBe('ready-to-finalize');
     expect(view.tone).toBe('positive');
     expect(view.showsZero).toBe(true);
-    expect(view.cta).toEqual({ key: 'finalizeCycle', href: '/' });
+  });
+
+  describe('the finalize action at zero', () => {
+    const ready = (overrides: Partial<CyclePhaseInput> = {}) =>
+      cyclePhaseView(live({ allocationTime: NOW - 1000, ...overrides }));
+    const finalize = { key: 'finalizeCycle', href: '/', emphasis: 'commit' };
+    const homeClock = { key: 'viewHomeClock', href: '/', emphasis: 'neutral' };
+
+    it('is offered to the latest participant, whatever the address case', () => {
+      expect(ready({ account: PARTICIPANT.toLowerCase() }).cta).toEqual(finalize);
+    });
+
+    it('sends everyone else to the home clock until open finalization begins', () => {
+      expect(ready().cta).toEqual(homeClock);
+      expect(ready({ account: '0x1111111111111111111111111111111111111111' }).cta).toEqual(
+        homeClock,
+      );
+      expect(ready({ openFinalizationMs: NOW + 60_000 }).cta).toEqual(homeClock);
+    });
+
+    it('is offered to anyone once open finalization begins', () => {
+      expect(ready({ openFinalizationMs: NOW }).cta).toEqual(finalize);
+      expect(ready({ openFinalizationMs: NOW - 1 }).cta).toEqual(finalize);
+    });
+
+    it('is not offered to anyone while the opening of finalization is unknown', () => {
+      expect(ready({ openFinalizationMs: null }).cta).toEqual(homeClock);
+      expect(ready({ openFinalizationMs: 0 }).cta).toEqual(homeClock);
+    });
   });
 
   it('marks the final hour as needing attention', () => {
@@ -62,7 +90,7 @@ describe('cyclePhaseView', () => {
     );
     expect(view.state.phase).toBe('opening-soon');
     expect(view.countdownTargetMs).toBe(opensAt * 1000);
-    expect(view.cta).toEqual({ key: 'viewHomeClock', href: '/' });
+    expect(view.cta).toEqual({ key: 'viewHomeClock', href: '/', emphasis: 'neutral' });
   });
 
   it('asks for the first gesture when the cycle is open and empty', () => {

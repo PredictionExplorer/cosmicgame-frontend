@@ -26,6 +26,7 @@ import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
 import { useEndgameChainSync } from '@/hooks/useEndgameChainSync';
 import { useLiveFreshness } from '@/hooks/useLiveFreshness';
 import { useNow } from '@/hooks/useNow';
+import { useActiveWeb3React } from '@/hooks/web3';
 
 import { cyclePhaseView } from './cyclePhase';
 import { CycleDetails } from './components/CycleDetails';
@@ -102,7 +103,11 @@ const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
     return currentTimeRaw * 1000 - sampledAtMs;
   }, [currentTimeRaw, currentTimeUpdatedAt, currentTimeFallbackMs]);
 
-  const { allocationTime, activationTime } = useAllocationFinalize({ data, offset });
+  const { allocationTime, activationTime, timeoutFinalize } = useAllocationFinalize({
+    data,
+    offset,
+  });
+  const { account } = useActiveWeb3React();
   // Final-minute synchronizer: 1s direct-chain reads around the zero-cross so
   // the page doesn't declare the cycle finished on a stale countdown target.
   const endgame = useEndgameChainSync({ targetMs: allocationTime });
@@ -143,6 +148,11 @@ const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
     now: nowMs,
     finalizationConfirmed: !endgame.isConfirmationPending,
     fresh: freshness.state === 'live' || freshness.state === 'connecting',
+    account,
+    // Unknown until the contract's timeout is read: until then only the
+    // latest participant is offered the finalize action.
+    openFinalizationMs:
+      allocationTime > 0 && timeoutFinalize > 0 ? allocationTime + timeoutFinalize * 1000 : null,
   });
   // Standings exist once someone has gestured (known on the server too, unlike the phase).
   const hasStandings = data.TsRoundStart !== 0 && data.LastBidderAddr !== ZERO_ADDRESS;
