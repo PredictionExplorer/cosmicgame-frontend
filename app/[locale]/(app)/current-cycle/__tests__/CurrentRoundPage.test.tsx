@@ -1,23 +1,17 @@
-import { render, screen, checkA11y } from '@/test-utils';
+import { render, screen, checkA11y, fireEvent } from '@/test-utils';
 
 import CurrentRoundPage from '../CurrentRoundPage';
 
 const mockUseDashboardInfo = jest.fn();
-const mockUseGestureListByCycle = jest.fn().mockReturnValue({ data: [] });
+const mockRefetch = jest.fn();
+const mockUseGestureListByCycle = jest.fn();
 const mockUseDonationsNFTByRound = jest.fn().mockReturnValue({ data: [] });
 const mockUseDonationsCGWithInfoByRound = jest.fn().mockReturnValue({ data: [] });
 const mockUseDonationsERC20ByRound = jest.fn().mockReturnValue({ data: [] });
 const mockUseCurrentTime = jest.fn().mockReturnValue({ data: undefined });
-const mockUseAllocationFinalize = jest.fn().mockReturnValue({
-  allocationTime: 0,
-  activationTime: 0,
-});
-const mockUseEndgameChainSync = jest.fn().mockReturnValue({
-  isConfirmationPending: false,
-  isClaimedOnChain: false,
-  lastSample: null,
-});
-const mockCountdownProps: Array<Record<string, unknown>> = [];
+const mockUseAllocationFinalize = jest.fn();
+const mockUseEndgameChainSync = jest.fn();
+const mockFreshness = jest.fn();
 
 jest.mock('../../../../../hooks/useApiQuery', () => ({
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
@@ -36,28 +30,18 @@ jest.mock('../../../../../hooks/useEndgameChainSync', () => ({
   useEndgameChainSync: (...args: unknown[]) => mockUseEndgameChainSync(...args),
 }));
 
-jest.mock('../../../../../components/common/SmoothCountdown', () => ({
-  SmoothCountdown: (props: { date: number }) => {
-    mockCountdownProps.push(props as Record<string, unknown>);
-    return <div data-testid="countdown">countdown-target:{props.date}</div>;
-  },
+jest.mock('../../../../../hooks/useLiveFreshness', () => ({
+  useLiveFreshness: () => mockFreshness(),
 }));
 
-jest.mock('../../../../../components/common/Counter', () => ({
-  __esModule: true,
-  default: () => <div data-testid="counter" />,
-}));
-
-jest.mock('../../../../../components/home/RoundInfoSection', () => ({
-  RoundInfoSection: (props: Record<string, unknown>) => (
+jest.mock('../components/CycleDetails', () => ({
+  CycleDetails: (props: Record<string, unknown>) => (
     <div
-      data-testid="round-info-section"
-      data-round={props.data ? 'loaded' : 'none'}
-      data-nfts={(props.donatedNFTs as unknown[] | undefined)?.length ?? 0}
-      data-erc20={(props.donatedERC20Tokens as unknown[] | undefined)?.length ?? 0}
-    >
-      RoundInfoSection
-    </div>
+      data-testid="cycle-details"
+      data-nfts={(props.attachedNfts as unknown[]).length}
+      data-erc20={(props.attachedErc20 as unknown[]).length}
+      data-gestures-loading={String(props.gesturesLoading)}
+    />
   ),
 }));
 
@@ -77,9 +61,7 @@ jest.mock('../../../../../components/attachments/DonatedNFTPrizeShowcase', () =>
         data-count={nfts.length}
         data-erc20-count={erc20Tokens.length}
         data-cycle={cycleNumber}
-      >
-        Attached NFT Showcase
-      </section>
+      />
     ) : null,
 }));
 
@@ -96,46 +78,24 @@ jest.mock('../../../../../components/tables/SpecialAllocationRecipients', () => 
       data-gesture-id={props.latestGesture?.EvtLogId ?? ''}
       data-latest-address={props.latestParticipantAddress ?? ''}
       data-show-last-gesture={String(props.showLastGesture ?? false)}
-    >
-      Special Allocations
-    </div>
+    />
   ),
 }));
 
-beforeEach(() => {
-  jest.clearAllMocks();
-  mockUseGestureListByCycle.mockReturnValue({ data: [] });
-  mockUseDonationsNFTByRound.mockReturnValue({ data: [] });
-  mockUseDonationsCGWithInfoByRound.mockReturnValue({ data: [] });
-  mockUseDonationsERC20ByRound.mockReturnValue({ data: [] });
-  mockUseAllocationFinalize.mockReturnValue({
-    allocationTime: 0,
-    activationTime: 0,
-  });
-  mockUseEndgameChainSync.mockReturnValue({
-    isConfirmationPending: false,
-    isClaimedOnChain: false,
-    lastSample: null,
-  });
-  mockCountdownProps.length = 0;
-});
-
 const NOW_SEC = Math.floor(Date.now() / 1000);
+const PARTICIPANT = '0xAbCdEf1234567890AbCdEf1234567890AbCdEf12';
+const ZERO = '0x0000000000000000000000000000000000000000';
 
 const baseDashboardData = {
   CurRoundNum: 42,
   CurNumBids: 137,
   TsRoundStart: NOW_SEC - 7200,
-  LastBidderAddr: '0xAbCdEf1234567890AbCdEf1234567890AbCdEf12',
+  LastBidderAddr: PARTICIPANT,
   PrizeAmountEth: 5.1234,
   RaffleAmountEth: 1.5,
   CosmicGameBalanceEth: 20,
   CharityPercentage: 10,
-  GestureCostEth: 0.01,
   StakingAmountEth: 2,
-  NumRaffleEthRecipientsBidding: 5,
-  NumRaffleNFTRecipientsBidding: 3,
-  NumRaffleNFTRecipientsStakingRWalk: 2,
   CurRoundStats: {
     TotalBids: 137,
     TotalDonatedAmountEth: 0.75,
@@ -144,61 +104,69 @@ const baseDashboardData = {
   MainStats: {},
 };
 
-function setupLoaded(overrides: Record<string, unknown> = {}) {
+function setupLoaded(overrides: Record<string, unknown> = {}, query: Record<string, unknown> = {}) {
   const data = { ...baseDashboardData, ...overrides };
-  mockUseDashboardInfo.mockReturnValue({ data, isLoading: false, isError: false });
+  mockUseDashboardInfo.mockReturnValue({
+    data,
+    isLoading: false,
+    isError: false,
+    refetch: mockRefetch,
+    ...query,
+  });
 }
 
+function clock(allocationSec: number, activationSec = NOW_SEC - 3600) {
+  mockUseAllocationFinalize.mockReturnValue({
+    allocationTime: allocationSec * 1000,
+    activationTime: activationSec,
+  });
+}
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockUseGestureListByCycle.mockReturnValue({ data: [], isPending: false, isError: false });
+  mockUseDonationsNFTByRound.mockReturnValue({ data: [] });
+  mockUseDonationsCGWithInfoByRound.mockReturnValue({ data: [] });
+  mockUseDonationsERC20ByRound.mockReturnValue({ data: [] });
+  mockFreshness.mockReturnValue({ state: 'live', ageMs: 0, lastSuccessAtMs: Date.now() });
+  mockUseEndgameChainSync.mockReturnValue({
+    isConfirmationPending: false,
+    isClaimedOnChain: false,
+    lastSample: null,
+  });
+  clock(NOW_SEC + 20 * 3600);
+});
+
 describe('CurrentRoundPage', () => {
-  it('renders loading spinner while data loads', () => {
+  it('shows a skeleton while the first read is in flight', () => {
     mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true, isError: false });
     render(<CurrentRoundPage />);
-    expect(screen.getByRole('status')).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveAccessibleName('common.status.loading');
   });
 
-  it('renders error state on API failure', () => {
-    mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: false, isError: true });
+  it('shows the error state only when nothing has ever loaded, and retries by refetching', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      refetch: mockRefetch,
+    });
     render(<CurrentRoundPage />);
     expect(screen.getByText('currentCycle.error.title')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /retry|try/i }));
+    expect(mockRefetch).toHaveBeenCalledTimes(1);
   });
 
-  it('renders error state when data is null', () => {
-    mockUseDashboardInfo.mockReturnValue({ data: null, isLoading: false, isError: false });
+  it('keeps the page when a background poll fails after a successful load', () => {
+    setupLoaded({}, { isError: true, isRefetchError: true });
+    mockFreshness.mockReturnValue({ state: 'delayed', ageMs: 60_000, lastSuccessAtMs: 1 });
     render(<CurrentRoundPage />);
-    expect(screen.getByText('currentCycle.error.title')).toBeInTheDocument();
-  });
 
-  it('renders round number in heading', () => {
-    setupLoaded();
-    render(<CurrentRoundPage />);
+    expect(screen.queryByText('currentCycle.error.title')).not.toBeInTheDocument();
     expect(screen.getByText('currentCycle.hero.title(n=42)')).toBeInTheDocument();
-  });
-
-  it('renders LIVE badge', () => {
-    setupLoaded();
-    render(<CurrentRoundPage />);
-    expect(screen.getByTestId('live-badge')).toHaveTextContent('currentCycle.hero.status.live');
-  });
-
-  it('leaves the gesture count and opening time to the page header', () => {
-    setupLoaded();
-    render(<CurrentRoundPage />);
-    // The server header (CurrentCycleSeoSummary) carries them; the card does not repeat them.
-    expect(screen.queryByText(/currentCycle\.hero\.subtitle/)).not.toBeInTheDocument();
-  });
-
-  it('renders the four stat cards the header does not already show', () => {
-    setupLoaded();
-    render(<CurrentRoundPage />);
-
-    expect(screen.getByText('currentCycle.stats.stellarSelectionPool.label')).toBeInTheDocument();
-    expect(screen.getByText('currentCycle.stats.publicGoods.label')).toBeInTheDocument();
-    expect(screen.getByText('currentCycle.stats.contributedEth.label')).toBeInTheDocument();
-    expect(screen.getByText('currentCycle.stats.attachedNfts.label')).toBeInTheDocument();
-    // Gestures and the Signature Allocation are header figures, shown once per page.
-    expect(screen.queryByText('currentCycle.stats.totalGestures.label')).not.toBeInTheDocument();
-    expect(screen.queryByText('currentCycle.stats.cycleReserve.label')).not.toBeInTheDocument();
-    expect(screen.queryByText('5.1234 ETH')).not.toBeInTheDocument();
+    // The phase keeps its name but stops breathing, and the clock says it may be stale.
+    expect(screen.getByTestId('live-badge')).toHaveAttribute('data-tone', 'neutral');
+    expect(screen.getByText(/common\.liveStatus\.delayedCaveat/)).toBeInTheDocument();
   });
 
   it('renders the server header first, as the page’s only header', () => {
@@ -210,78 +178,20 @@ describe('CurrentRoundPage', () => {
     );
   });
 
-  it('displays formatted stellar selection pool value', () => {
+  it('names a running clock with the home clock’s live phase and a breathing badge', () => {
     setupLoaded();
     render(<CurrentRoundPage />);
-    expect(screen.getByText('1.5000 ETH')).toBeInTheDocument();
+
+    const badge = screen.getByTestId('live-badge');
+    expect(badge).toHaveTextContent('home.chrono.phase.live.label');
+    expect(badge).toHaveAttribute('data-tone', 'live');
+    expect(screen.getByRole('timer')).toHaveTextContent(/\d+:\d\d:\d\d/);
+    expect(screen.getByText('home.chrono.phase.live.status')).toBeInTheDocument();
   });
 
-  it('displays computed public goods amount', () => {
+  it('says "Confirming", not live, while the zero-cross awaits on-chain verification', () => {
     setupLoaded();
-    render(<CurrentRoundPage />);
-    expect(screen.getByText('2.0000 ETH')).toBeInTheDocument();
-  });
-
-  it('renders pre-activation countdown when the cycle has not opened yet', () => {
-    const activationSec = NOW_SEC + 3600;
-    setupLoaded({ TsRoundStart: 0 });
-    mockUseAllocationFinalize.mockReturnValue({
-      allocationTime: 0,
-      activationTime: activationSec,
-    });
-    render(<CurrentRoundPage />);
-
-    expect(screen.getByText('currentCycle.hero.status.openingSoon')).toBeInTheDocument();
-    expect(screen.getByText('currentCycle.hero.countdown.opensIn')).toBeInTheDocument();
-    expect(
-      screen.getByText(/currentCycle\.hero\.countdown\.opensAt\(n=42,date=.+\)/),
-    ).toBeInTheDocument();
-    expect(screen.getByTestId('countdown')).toBeInTheDocument();
-    expect(mockCountdownProps).toEqual(
-      expect.arrayContaining([expect.objectContaining({ date: activationSec * 1000 })]),
-    );
-    expect(screen.queryByText('currentCycle.hero.countdown.finalizesIn')).not.toBeInTheDocument();
-  });
-
-  it('renders countdown timer when allocation time is in the future', () => {
-    const futureTimeMs = (NOW_SEC + 3600) * 1000;
-    setupLoaded();
-    mockUseAllocationFinalize.mockReturnValue({
-      allocationTime: futureTimeMs,
-      activationTime: NOW_SEC - 60,
-    });
-    mockUseCurrentTime.mockReturnValue({ data: NOW_SEC, dataUpdatedAt: NOW_SEC * 1000 });
-    render(<CurrentRoundPage />);
-
-    expect(screen.getByText('currentCycle.hero.countdown.finalizesIn')).toBeInTheDocument();
-    expect(screen.getByTestId('countdown')).toBeInTheDocument();
-    expect(mockCountdownProps).toEqual(
-      expect.arrayContaining([expect.objectContaining({ date: futureTimeMs })]),
-    );
-  });
-
-  it('renders ready-to-finalize state when countdown has passed', () => {
-    const pastTimeMs = (NOW_SEC - 60) * 1000;
-    setupLoaded();
-    mockUseAllocationFinalize.mockReturnValue({
-      allocationTime: pastTimeMs,
-      activationTime: NOW_SEC - 3600,
-    });
-    mockUseCurrentTime.mockReturnValue({ data: NOW_SEC, dataUpdatedAt: NOW_SEC * 1000 });
-    render(<CurrentRoundPage />);
-
-    expect(screen.getByText('currentCycle.hero.countdown.readyTitle')).toBeInTheDocument();
-    expect(screen.getByText('currentCycle.hero.countdown.readyMessage')).toBeInTheDocument();
-  });
-
-  it('holds in the confirming state while the zero-cross awaits on-chain verification', () => {
-    const pastTimeMs = (NOW_SEC - 60) * 1000;
-    setupLoaded();
-    mockUseAllocationFinalize.mockReturnValue({
-      allocationTime: pastTimeMs,
-      activationTime: NOW_SEC - 3600,
-    });
-    mockUseCurrentTime.mockReturnValue({ data: NOW_SEC, dataUpdatedAt: NOW_SEC * 1000 });
+    clock(NOW_SEC - 60);
     mockUseEndgameChainSync.mockReturnValue({
       isConfirmationPending: true,
       isClaimedOnChain: false,
@@ -289,178 +199,120 @@ describe('CurrentRoundPage', () => {
     });
     render(<CurrentRoundPage />);
 
-    expect(screen.getByText('currentCycle.hero.countdown.confirmingTitle')).toBeInTheDocument();
-    expect(screen.queryByText('currentCycle.hero.countdown.readyTitle')).not.toBeInTheDocument();
+    const badge = screen.getByTestId('live-badge');
+    expect(badge).toHaveTextContent('home.chrono.phase.confirming.label');
+    expect(badge).toHaveAttribute('data-tone', 'attention');
+    expect(screen.queryByText('home.chrono.phase.live.label')).not.toBeInTheDocument();
+    expect(screen.queryByRole('timer')).not.toBeInTheDocument();
   });
 
-  it('does not show countdown or exhausted state when no last participant', () => {
-    setupLoaded({ LastBidderAddr: '0x0000000000000000000000000000000000000000' });
-    mockUseAllocationFinalize.mockReturnValue({
-      allocationTime: (NOW_SEC + 3600) * 1000,
-      activationTime: NOW_SEC - 60,
-    });
-    mockUseCurrentTime.mockReturnValue({ data: NOW_SEC });
-    render(<CurrentRoundPage />);
-
-    expect(screen.queryByText('currentCycle.hero.countdown.finalizesIn')).not.toBeInTheDocument();
-    expect(screen.queryByText('currentCycle.hero.countdown.readyTitle')).not.toBeInTheDocument();
-  });
-
-  it('does not render duplicate standalone latest participant card', () => {
+  it('shows the ready state and points the finalize action at the home clock', () => {
     setupLoaded();
+    clock(NOW_SEC - 60);
     render(<CurrentRoundPage />);
-    expect(screen.queryByText('Last Participant — Current Leader')).not.toBeInTheDocument();
+
+    expect(screen.getByTestId('live-badge')).toHaveTextContent(
+      'home.chrono.phase.readyToFinalize.label',
+    );
+    expect(
+      screen.getByRole('link', { name: /currentCycle\.hero\.cta\.finalizeCycle/ }),
+    ).toHaveAttribute('href', '/');
   });
 
-  it('does not show last participant when address is zero', () => {
-    setupLoaded({ LastBidderAddr: '0x0000000000000000000000000000000000000000' });
+  it('counts down to the opening before the cycle opens, with no standings', () => {
+    const activationSec = NOW_SEC + 3600;
+    setupLoaded({ TsRoundStart: 0, LastBidderAddr: ZERO });
+    clock(0, activationSec);
     render(<CurrentRoundPage />);
-    expect(screen.queryByText('Last Participant — Current Leader')).not.toBeInTheDocument();
+
+    expect(screen.getByTestId('live-badge')).toHaveTextContent(
+      'home.chrono.phase.openingSoon.label',
+    );
+    expect(
+      screen.getByText(/currentCycle\.hero\.countdown\.opensAt\(n=42,date=.+\)/),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('timer')).toBeInTheDocument();
+    expect(screen.queryByTestId('special-allocation-recipients')).not.toBeInTheDocument();
   });
 
-  it('renders SpecialAllocationRecipients in hero when there is a last participant', () => {
-    setupLoaded();
+  it('asks for the first gesture when the open cycle has none', () => {
+    setupLoaded({ TsRoundStart: 0, LastBidderAddr: ZERO });
+    clock(0, NOW_SEC - 60);
     render(<CurrentRoundPage />);
-    expect(screen.getByTestId('special-allocation-recipients')).toBeInTheDocument();
-  });
 
-  it('passes the complete latest gesture and message to SpecialAllocationRecipients', () => {
-    setupLoaded();
-    mockUseGestureListByCycle.mockReturnValue({
-      data: [
-        {
-          EvtLogId: 77,
-          BidderAddr: baseDashboardData.LastBidderAddr,
-          TimeStamp: NOW_SEC,
-          Message: 'gm',
-        },
-      ],
-    });
-    render(<CurrentRoundPage />);
-    expect(screen.getByTestId('special-allocation-recipients')).toHaveAttribute(
-      'data-message',
-      'gm',
-    );
-    expect(screen.getByTestId('special-allocation-recipients')).toHaveAttribute(
-      'data-gesture-id',
-      '77',
-    );
-    expect(screen.getByTestId('special-allocation-recipients')).toHaveAttribute(
-      'data-latest-address',
-      baseDashboardData.LastBidderAddr,
-    );
-    expect(screen.getByTestId('special-allocation-recipients')).toHaveAttribute(
-      'data-show-last-gesture',
-      'true',
-    );
-  });
-
-  it('does not render SpecialAllocationRecipients when no last participant', () => {
-    setupLoaded({ LastBidderAddr: '0x0000000000000000000000000000000000000000' });
-    render(<CurrentRoundPage />);
+    expect(
+      screen.getByRole('link', { name: /currentCycle\.hero\.cta\.makeFirstGesture/ }),
+    ).toHaveAttribute('href', '/#make-gesture');
     expect(screen.queryByTestId('special-allocation-recipients')).not.toBeInTheDocument();
   });
 
   it('points "Make a Gesture" at the home gesture form', () => {
     setupLoaded();
     render(<CurrentRoundPage />);
-    const cta = screen.getByRole('link', { name: /currentCycle\.hero\.cta\.makeGesture/ });
-    expect(cta).toHaveAttribute('href', '/#make-gesture');
+    expect(
+      screen.getByRole('link', { name: /currentCycle\.hero\.cta\.makeGesture/ }),
+    ).toHaveAttribute('href', '/#make-gesture');
   });
 
-  it('points the finalize CTA at the home clock, not the gesture form', () => {
+  it('lists the cycle figures the header does not show', () => {
     setupLoaded();
-    mockUseAllocationFinalize.mockReturnValue({
-      allocationTime: (NOW_SEC - 60) * 1000,
-      activationTime: NOW_SEC - 3600,
+    mockUseGestureListByCycle.mockReturnValue({
+      data: [
+        { EvtLogId: 1, BidderAddr: PARTICIPANT, TimeStamp: NOW_SEC },
+        { EvtLogId: 2, BidderAddr: PARTICIPANT, TimeStamp: NOW_SEC },
+        { EvtLogId: 3, BidderAddr: '0x1111111111111111111111111111111111111111', TimeStamp: 1 },
+      ],
+      isPending: false,
+      isError: false,
+    });
+    const { container } = render(<CurrentRoundPage />);
+    const figure = (id: string) => container.querySelector(`[data-figure="${id}"] dd`);
+
+    expect(figure('reserve')).toHaveTextContent('20.0000');
+    expect(figure('participants')).toHaveTextContent('2');
+    expect(figure('contributed')).toHaveTextContent('0.7500');
+    expect(figure('attachedNfts')).toHaveTextContent('4');
+    // The Signature Allocation is a header figure, shown once per page.
+    expect(screen.queryByText('5.1234')).not.toBeInTheDocument();
+  });
+
+  it('passes the latest gesture and its message to the standings', () => {
+    setupLoaded();
+    mockUseGestureListByCycle.mockReturnValue({
+      data: [{ EvtLogId: 77, BidderAddr: PARTICIPANT, TimeStamp: NOW_SEC, Message: 'gm' }],
+      isPending: false,
+      isError: false,
     });
     render(<CurrentRoundPage />);
-    const cta = screen.getByRole('link', { name: /currentCycle\.hero\.cta\.finalizeCycle/ });
-    expect(cta).toHaveAttribute('href', '/');
+    const standings = screen.getByTestId('special-allocation-recipients');
+    expect(standings).toHaveAttribute('data-message', 'gm');
+    expect(standings).toHaveAttribute('data-gesture-id', '77');
+    expect(standings).toHaveAttribute('data-latest-address', PARTICIPANT);
+    expect(standings).toHaveAttribute('data-show-last-gesture', 'true');
   });
 
-  it('has no "Back to Home" link: the site header already links home', () => {
+  it('renders the attached-asset showcase only when the cycle has attached assets', () => {
     setupLoaded();
-    render(<CurrentRoundPage />);
-    expect(screen.queryByRole('link', { name: /currentCycle\.nav\.backToHome/ })).toBeNull();
-  });
+    const { unmount } = render(<CurrentRoundPage />);
+    expect(screen.queryByTestId('attached-nft-showcase')).not.toBeInTheDocument();
+    unmount();
 
-  it('passes data to RoundInfoSection', () => {
-    setupLoaded();
-    render(<CurrentRoundPage />);
-    const section = screen.getByTestId('round-info-section');
-    expect(section).toHaveAttribute('data-round', 'loaded');
-  });
-
-  it('renders the attached NFT showcase near the top when current-cycle NFTs exist', () => {
-    setupLoaded();
-    mockUseDonationsNFTByRound.mockReturnValue({
-      data: [{ RecordId: 1 }, { RecordId: 2 }],
-    });
-
-    render(<CurrentRoundPage />);
-
-    expect(mockUseDonationsNFTByRound).toHaveBeenCalledWith(42);
-    expect(screen.getByTestId('attached-nft-showcase')).toHaveAttribute('data-count', '2');
-    expect(screen.getByTestId('attached-nft-showcase')).toHaveAttribute('data-erc20-count', '0');
-    expect(screen.getByTestId('attached-nft-showcase')).toHaveAttribute('data-cycle', '42');
-  });
-
-  it('renders the attached showcase near the top when current-cycle ERC20 tokens exist', () => {
-    setupLoaded();
+    mockUseDonationsNFTByRound.mockReturnValue({ data: [{ RecordId: 1 }, { RecordId: 2 }] });
     mockUseDonationsERC20ByRound.mockReturnValue({
       data: [{ EvtLogId: 1, TokenAddr: '0xToken', AmountDonatedEth: 5 }],
     });
-
     render(<CurrentRoundPage />);
-
-    expect(mockUseDonationsERC20ByRound).toHaveBeenCalledWith(42);
-    expect(screen.getByTestId('attached-nft-showcase')).toHaveAttribute('data-count', '0');
-    expect(screen.getByTestId('attached-nft-showcase')).toHaveAttribute('data-erc20-count', '1');
-    expect(screen.getByTestId('attached-nft-showcase')).toHaveAttribute('data-cycle', '42');
-  });
-
-  it('does not render the attached NFT showcase when no current-cycle NFTs exist', () => {
-    setupLoaded();
-    mockUseDonationsNFTByRound.mockReturnValue({ data: [] });
-
-    render(<CurrentRoundPage />);
-
-    expect(screen.queryByTestId('attached-nft-showcase')).not.toBeInTheDocument();
-  });
-
-  it('still passes attached NFTs to detailed RoundInfoSection', () => {
-    setupLoaded();
-    mockUseDonationsNFTByRound.mockReturnValue({
-      data: [{ RecordId: 1 }, { RecordId: 2 }, { RecordId: 3 }],
-    });
-
-    render(<CurrentRoundPage />);
-
-    expect(screen.getByTestId('round-info-section')).toHaveAttribute('data-nfts', '3');
-  });
-
-  it('still passes attached ERC20 tokens to detailed RoundInfoSection', () => {
-    setupLoaded();
-    mockUseDonationsERC20ByRound.mockReturnValue({
-      data: [
-        { EvtLogId: 1, TokenAddr: '0xToken1', AmountDonatedEth: 5 },
-        { EvtLogId: 2, TokenAddr: '0xToken2', AmountDonatedEth: 9 },
-      ],
-    });
-
-    render(<CurrentRoundPage />);
-
-    expect(screen.getByTestId('round-info-section')).toHaveAttribute('data-erc20', '2');
+    expect(mockUseDonationsNFTByRound).toHaveBeenCalledWith(42);
+    const showcase = screen.getByTestId('attached-nft-showcase');
+    expect(showcase).toHaveAttribute('data-count', '2');
+    expect(showcase).toHaveAttribute('data-erc20-count', '1');
+    expect(showcase).toHaveAttribute('data-cycle', '42');
+    expect(screen.getByTestId('cycle-details')).toHaveAttribute('data-nfts', '2');
+    expect(screen.getByTestId('cycle-details')).toHaveAttribute('data-erc20', '1');
   });
 
   it('has no accessibility violations', async () => {
     setupLoaded();
-    mockUseAllocationFinalize.mockReturnValue({
-      allocationTime: (NOW_SEC + 3600) * 1000,
-      activationTime: NOW_SEC - 60,
-    });
-    mockUseCurrentTime.mockReturnValue({ data: NOW_SEC });
     const { container } = render(<CurrentRoundPage />);
     await checkA11y(container);
   }, 15_000);

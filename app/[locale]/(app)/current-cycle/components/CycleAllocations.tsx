@@ -1,0 +1,260 @@
+'use client';
+
+import type { ReactNode } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
+
+import { ALLOCATION_TRACK_COLORS, type AllocationTrackId } from '@/config/allocationTracks';
+import { cn } from '@/lib/utils';
+import { Amount } from '@/components/ui/amount';
+import { ExplainedTerm } from '@/components/ui/explain-popover';
+import { SectionHeader } from '@/components/ui/section-header';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { UnknownValue } from '@/components/ui/unknown-value';
+import { FundDistribution, reserveTracks } from '@/components/tokens/FundDistribution';
+import type { DashboardInfo } from '@/services/api/types';
+import { toFiniteNumber } from '@/utils/finiteNumber';
+import { formatAmount, formatPercent } from '@/utils/format';
+
+/** The copy key of each allocation under `currentCycle.allocations.cards`. */
+type AllocationKey =
+  | 'signature'
+  | 'chronoWarrior'
+  | 'ethStellar'
+  | 'cosmicAnchor'
+  | 'publicGoods'
+  | 'nextCycle'
+  | 'nftStellar'
+  | 'randomWalkAnchor'
+  | 'endurance'
+  | 'finalCst';
+
+interface AllocationRow {
+  key: AllocationKey;
+  /** The reserve track the row draws from, for its share and colour. */
+  track?: AllocationTrackId;
+  name: string;
+  definition?: string;
+  receives: ReactNode;
+  recipients: ReactNode;
+}
+
+/** "a · b · c", each part kept whole. */
+function joinParts(parts: ReactNode[]): ReactNode {
+  return parts.map((part, index) => (
+    <span key={index} className="whitespace-nowrap">
+      {index > 0 ? <span className="px-1.5 text-subtle">·</span> : null}
+      {part}
+    </span>
+  ));
+}
+
+/**
+ * Everything this cycle allocates when it finalizes, once: the Cycle
+ * Reserve split as a proportional bar, then one ledger of every allocation
+ * with its share of the reserve (the tracks paid in ETH carry the bar's
+ * colours), what each recipient receives and how many recipients there are.
+ */
+export function CycleAllocations({ data, headingId }: { data: DashboardInfo; headingId: string }) {
+  const t = useTranslations('currentCycle');
+  const tContracts = useTranslations('contracts');
+  const tCommon = useTranslations('common');
+  const locale = useLocale();
+  const unknown = <UnknownValue label={tCommon('status.unavailable')} />;
+
+  const tracks = new Map(reserveTracks(data).map((track) => [track.id, track]));
+  const eth = (value: number | null | undefined) => {
+    const amount = toFiniteNumber(value);
+    return amount === null ? unknown : <Amount value={amount} unit="ETH" />;
+  };
+  const card = (key: AllocationKey, field: 'name' | 'tooltip', values?: Record<string, string>) =>
+    t(`allocations.cards.${key}.${field}`, values);
+  const recipients = (count: number | null | undefined) => {
+    const n = toFiniteNumber(count);
+    return n === null ? unknown : t('allocations.recipientCount', { count: n });
+  };
+
+  const cst = t('allocations.amounts.fixedCst');
+  const nft = t('allocations.amounts.nft');
+  const stellarEthRecipients = toFiniteNumber(data.NumRaffleEthWinnersBidding);
+  const stellarEth = toFiniteNumber(data.RaffleAmountEth);
+  const stellarEthEach =
+    stellarEth !== null && stellarEthRecipients ? stellarEth / stellarEthRecipients : null;
+
+  const rows: AllocationRow[] = [
+    {
+      key: 'signature',
+      track: 'signature',
+      name: card('signature', 'name'),
+      definition: card('signature', 'tooltip'),
+      receives: joinParts([
+        eth(data.PrizeAmountEth),
+        cst,
+        nft,
+        t('allocations.amounts.attachedTokens'),
+      ]),
+      recipients: recipients(1),
+    },
+    {
+      key: 'chronoWarrior',
+      track: 'chrono',
+      name: card('chronoWarrior', 'name'),
+      definition: card('chronoWarrior', 'tooltip'),
+      receives: joinParts([eth(tracks.get('chrono')?.eth), cst, nft]),
+      recipients: recipients(1),
+    },
+    {
+      key: 'ethStellar',
+      track: 'stellar',
+      name: card('ethStellar', 'name'),
+      definition: card('ethStellar', 'tooltip'),
+      receives:
+        stellarEthEach === null ? (
+          unknown
+        ) : (
+          <span className="whitespace-nowrap tabular-nums">
+            {t('allocations.amounts.ethEach', {
+              amount: formatAmount(stellarEthEach, { unit: 'ETH', locale, withUnit: false }),
+            })}
+          </span>
+        ),
+      recipients: recipients(stellarEthRecipients),
+    },
+    {
+      key: 'cosmicAnchor',
+      track: 'anchor',
+      name: card('cosmicAnchor', 'name'),
+      definition: card('cosmicAnchor', 'tooltip'),
+      receives: eth(data.StakingAmountEth),
+      recipients: t('allocations.cards.cosmicAnchor.recipientLabel'),
+    },
+    {
+      key: 'publicGoods',
+      track: 'publicGoods',
+      name: card('publicGoods', 'name'),
+      definition: card('publicGoods', 'tooltip', {
+        percent: String(toFiniteNumber(data.CharityPercentage) ?? '—'),
+      }),
+      receives: eth(tracks.get('publicGoods')?.eth),
+      recipients: t('allocations.cards.publicGoods.recipientLabel'),
+    },
+    {
+      key: 'nextCycle',
+      track: 'nextCycle',
+      name: tContracts('funds.segments.next.label'),
+      definition: tContracts('funds.segments.next.tooltip'),
+      receives: eth(tracks.get('nextCycle')?.eth),
+      recipients: t('hero.title', { n: data.CurRoundNum + 1 }),
+    },
+    {
+      key: 'nftStellar',
+      name: card('nftStellar', 'name'),
+      definition: card('nftStellar', 'tooltip'),
+      receives: joinParts([
+        t('allocations.amounts.fixedCstEach'),
+        t('allocations.amounts.nftEach'),
+      ]),
+      recipients: recipients(data.NumRaffleNFTWinnersBidding),
+    },
+    {
+      key: 'randomWalkAnchor',
+      name: card('randomWalkAnchor', 'name'),
+      definition: card('randomWalkAnchor', 'tooltip'),
+      receives: joinParts([
+        t('allocations.amounts.fixedCstEach'),
+        t('allocations.amounts.nftEach'),
+      ]),
+      recipients: recipients(data.NumRaffleNFTWinnersStakingRWalk),
+    },
+    {
+      key: 'endurance',
+      name: card('endurance', 'name'),
+      definition: card('endurance', 'tooltip'),
+      receives: joinParts([cst, nft]),
+      recipients: recipients(1),
+    },
+    {
+      key: 'finalCst',
+      name: card('finalCst', 'name'),
+      definition: card('finalCst', 'tooltip'),
+      receives: joinParts([cst, nft]),
+      recipients: recipients(1),
+    },
+  ];
+
+  const columns = {
+    allocation: t('allocations.columns.allocation'),
+    share: t('allocations.columns.share'),
+    receives: t('allocations.columns.receives'),
+    recipients: t('allocations.columns.recipients'),
+  };
+
+  return (
+    <section aria-labelledby={headingId} className="scroll-mt-24" id="allocations">
+      <SectionHeader
+        headingId={headingId}
+        title={t('sections.allocations.title')}
+        description={t('sections.allocations.description')}
+      />
+      <FundDistribution data={data} describe={false} className="mb-6" />
+      <Table labelledBy={headingId}>
+        <TableHeader>
+          <TableRow>
+            <TableHead>{columns.allocation}</TableHead>
+            <TableHead align="end">{columns.share}</TableHead>
+            <TableHead>{columns.receives}</TableHead>
+            <TableHead align="end">{columns.recipients}</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {rows.map((row) => {
+            const share = row.track ? (tracks.get(row.track)?.percent ?? null) : undefined;
+            return (
+              <TableRow key={row.key} data-allocation={row.key}>
+                <TableCell label={columns.allocation} className="text-foreground">
+                  <span className="inline-flex items-baseline gap-2.5">
+                    <span
+                      aria-hidden
+                      className={cn(
+                        'size-2.5 shrink-0 translate-y-px rounded-edge',
+                        row.track ? ALLOCATION_TRACK_COLORS[row.track] : 'border border-rule',
+                      )}
+                    />
+                    {row.definition ? (
+                      <ExplainedTerm definition={row.definition}>{row.name}</ExplainedTerm>
+                    ) : (
+                      row.name
+                    )}
+                  </span>
+                </TableCell>
+                <TableCell
+                  label={columns.share}
+                  align="end"
+                  numeric
+                  data-empty={share === undefined ? 'true' : undefined}
+                  className="text-foreground"
+                >
+                  {share === undefined
+                    ? null
+                    : share === null
+                      ? unknown
+                      : formatPercent(share, locale)}
+                </TableCell>
+                <TableCell label={columns.receives}>{row.receives}</TableCell>
+                <TableCell label={columns.recipients} align="end" numeric>
+                  {row.recipients}
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+    </section>
+  );
+}

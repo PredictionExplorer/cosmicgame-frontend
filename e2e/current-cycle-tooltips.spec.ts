@@ -17,14 +17,6 @@ const CURRENT_CYCLE_TOOLTIPS = [
     expected: /ETH portion of the Signature Allocation/,
   },
   {
-    label: 'Stellar Selection Pool',
-    expected: /randomly selected participants/,
-  },
-  {
-    label: 'Public Goods',
-    expected: /Cycle Reserve is forwarded to Protocol Guild/,
-  },
-  {
     label: 'Contributed ETH',
     expected: /Direct ETH contributions from the community/,
   },

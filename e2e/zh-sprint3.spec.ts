@@ -74,7 +74,7 @@ test.describe('zh Sprint 3 — core dApp routes', () => {
 
     await expect(page.getByText('落笔总次数', { exact: true }).first()).toBeVisible();
     await expectZhLabelTooltip(page, '落笔总次数', /本周期的落笔总次数/);
-    await expectZhLabelTooltip(page, '星选池', /程序化随机选出/);
+    await expectZhLabelTooltip(page, 'ETH 贡献', /本周期来自社区的直接 ETH 贡献/);
   });
 
   test('/zh/gallery renders Chinese archive controls', async ({ page }) => {

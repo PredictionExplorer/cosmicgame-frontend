@@ -37,6 +37,7 @@ export default async function Page({ params }: PageProps) {
         'contracts',
         'currentCycle',
         'detail',
+        'glossary',
         'home',
         'marketing',
         'statistics',

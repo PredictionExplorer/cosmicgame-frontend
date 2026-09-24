@@ -51,12 +51,12 @@ const RETIRED: Record<string, RetiredPattern> = {
   'text below the 12px floor': {
     use: 'type-caption (12px) or type-label (13px)',
     pattern: /(?<![\w-])text-\[(?:[5-9]|1[01])(?:\.\d+)?px\]/g,
-    baseline: 152,
+    baseline: 149,
   },
   'white-alpha surface or border': {
     use: 'bg-surface-sunken / bg-surface / bg-surface-raised, border-rule / border-rule-faint',
     pattern: /(?<![\w-])(?:bg|border(?:-[trblxy])?)-white\/(?:\[[\d.]+\]|\d+)/g,
-    baseline: 490,
+    baseline: 486,
   },
   'focus reset that replaces the shared outline': {
     use: 'the global :focus-visible outline (styles/focus-ring.css), focus-ring-inset or focus-ring-within',
@@ -67,7 +67,7 @@ const RETIRED: Record<string, RetiredPattern> = {
     use: 'type-heading-3 / type-title (Inter 600) below 24px, a display tier above',
     pattern:
       /font-display(?=[^'"`]*\bfont-(?:bold|extrabold|black)\b)|\bfont-(?:bold|extrabold|black)\b(?=[^'"`]*\bfont-display\b)/g,
-    baseline: 47,
+    baseline: 45,
   },
 };
 
