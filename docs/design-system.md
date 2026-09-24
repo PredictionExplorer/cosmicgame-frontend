@@ -120,6 +120,13 @@ and `fill`, inline styles), import the colour from `lib/theme/dataColors.ts`:
 the image inside with `object-fit: contain`. Nothing overlays, crops, dims or tints the
 artwork.
 
+**Sizes.** The media server publishes a 640px thumbnail and the 3456px original only.
+`signatureMedia` adds image-optimizer renditions at 1200 and 1920px between them
+(`withOptimizedRenditions` in `lib/artRenditions`, built with next/image's
+`getImageProps`), so a 720px plate at 2x or a phone at 3x fetches about 1.5× its slot
+instead of the original. It is for media on a host in `images.remotePatterns` only; a
+failed optimized file falls back along the plate's source chain.
+
 ### Browser chrome
 
 `THEME_CHROME` (`lib/theme/config.ts`) holds each palette's `--background` as hex. The
