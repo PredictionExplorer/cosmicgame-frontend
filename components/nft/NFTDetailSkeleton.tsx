@@ -12,7 +12,7 @@ const SPEC_ROWS = 6;
 export function NFTDetailSkeleton() {
   return (
     <div className="site-container" data-testid="nft-detail-skeleton" aria-busy="true">
-      <div className="grid items-start gap-x-12 gap-y-8 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,22rem)] xl:gap-x-16">
+      <div className="grid items-start gap-x-10 gap-y-8 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,20rem)] xl:grid-cols-[minmax(0,1fr)_minmax(18rem,22rem)] xl:gap-x-16">
         <div className="flex flex-col gap-3 max-sm:-mx-[var(--gutter)]">
           <PendingPlate busy className="max-sm:rounded-none" />
           <div className="flex items-center gap-2 max-sm:px-[var(--gutter)]">

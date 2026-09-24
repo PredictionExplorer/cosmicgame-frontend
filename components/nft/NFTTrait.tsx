@@ -84,7 +84,7 @@ interface NFTTraitProps {
 const NAME_REFETCH_DELAY_MS = 3000;
 
 /**
- * The plate's rendered width: the art column beside the 18–22rem wall label
+ * The plate's rendered width: the art column beside the 16–22rem wall label
  * from `lg` (at most the 80rem container less the label), the full screen
  * width below.
  */
@@ -410,7 +410,7 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
     <div className="site-container">
       <section
         aria-label={subject}
-        className="grid items-start gap-x-12 gap-y-8 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,22rem)] xl:gap-x-16"
+        className="grid items-start gap-x-10 gap-y-8 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,20rem)] xl:grid-cols-[minmax(0,1fr)_minmax(18rem,22rem)] xl:gap-x-16"
         data-testid="hero-section"
       >
         <SignatureViewer
