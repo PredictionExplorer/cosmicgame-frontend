@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, useState } from 'react';
+import { useId, type ReactNode } from 'react';
 import { Bell, BellRing } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -12,7 +12,6 @@ import {
   getNotificationPermission,
   useAttentionPreferences,
   type AlertMinutes,
-  type NotificationPermissionState,
 } from '@/hooks/useAttentionPreferences';
 import { previewGestureChime } from '@/hooks/useGestureChime';
 import { cn } from '@/lib/utils';
@@ -23,7 +22,9 @@ interface PreferenceRowProps {
   description: string;
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
-  children?: React.ReactNode;
+  /** The setting cannot work here (notifications blocked); the description says why. */
+  disabled?: boolean;
+  children?: ReactNode;
 }
 
 function PreferenceRow({
@@ -32,13 +33,20 @@ function PreferenceRow({
   description,
   checked,
   onCheckedChange,
+  disabled = false,
   children,
 }: PreferenceRowProps) {
   return (
     <div className="flex flex-col gap-2 py-3 first:pt-0 last:pb-0">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <label htmlFor={id} className="block cursor-pointer text-sm font-medium text-foreground">
+          <label
+            htmlFor={id}
+            className={cn(
+              'block text-sm font-medium',
+              disabled ? 'text-muted-foreground' : 'cursor-pointer text-foreground',
+            )}
+          >
             {label}
           </label>
           <p
@@ -52,6 +60,7 @@ function PreferenceRow({
           id={id}
           checked={checked}
           onCheckedChange={onCheckedChange}
+          disabled={disabled}
           aria-describedby={`${id}-description`}
           className="mt-0.5"
         />
@@ -76,10 +85,12 @@ export interface AttentionMenuProps {
 export function AttentionMenu({ className }: AttentionMenuProps) {
   const t = useTranslations('common');
   const { preferences, setSound, setTabTitle, setFinalizationAlert } = useAttentionPreferences();
-  const [permission, setPermission] = useState<NotificationPermissionState | null>(null);
   const baseId = useId();
   const anyOn = preferences.sound || preferences.finalizationAlert || preferences.tabTitle;
-  const currentPermission = permission ?? getNotificationPermission();
+  // Read on every render (the content only renders while open): a choice in
+  // the browser's permission prompt updates the preferences store, which
+  // re-renders this, and a later change in site settings shows on reopen.
+  const currentPermission = getNotificationPermission();
   const alertUnavailable = currentPermission === 'denied' || currentPermission === 'unsupported';
 
   const onSoundChange = (checked: boolean) => {
@@ -88,11 +99,11 @@ export function AttentionMenu({ className }: AttentionMenuProps) {
   };
 
   const onAlertChange = (checked: boolean) => {
-    void setFinalizationAlert(checked ? preferences.alertMinutes : null).then(setPermission);
+    void setFinalizationAlert(checked ? preferences.alertMinutes : null);
   };
 
   const onMinutesChange = (minutes: AlertMinutes) => {
-    void setFinalizationAlert(minutes).then(setPermission);
+    void setFinalizationAlert(minutes);
   };
 
   const BellIcon = anyOn ? BellRing : Bell;
@@ -152,6 +163,7 @@ export function AttentionMenu({ className }: AttentionMenuProps) {
             }
             checked={preferences.finalizationAlert && !alertUnavailable}
             onCheckedChange={onAlertChange}
+            disabled={alertUnavailable}
           >
             {preferences.finalizationAlert && !alertUnavailable && (
               <div

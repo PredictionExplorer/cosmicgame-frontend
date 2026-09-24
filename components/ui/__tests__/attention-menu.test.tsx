@@ -89,8 +89,19 @@ describe('AttentionMenu', () => {
     const user = await openMenu();
 
     expect(screen.getByText('common.attention.alert.blocked')).toBeInTheDocument();
-    await user.click(screen.getByRole('switch', { name: 'common.attention.alert.label' }));
+    const alertSwitch = screen.getByRole('switch', { name: 'common.attention.alert.label' });
+    // The switch does not look operable when it cannot work here.
+    expect(alertSwitch).toBeDisabled();
+    await user.click(alertSwitch);
     expect(stored().finalizationAlert).toBeFalsy();
+  });
+
+  it('disables the alert where the browser has no notifications', async () => {
+    Object.defineProperty(window, 'Notification', { configurable: true, value: undefined });
+    await openMenu();
+
+    expect(screen.getByText('common.attention.alert.unsupported')).toBeInTheDocument();
+    expect(screen.getByRole('switch', { name: 'common.attention.alert.label' })).toBeDisabled();
   });
 
   it('toggles the tab-title countdown', async () => {

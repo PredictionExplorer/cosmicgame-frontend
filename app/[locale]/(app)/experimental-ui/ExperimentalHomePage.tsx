@@ -17,8 +17,10 @@ import { useNotify } from '@/hooks/useNotify';
 import ConnectWalletButton from '@/components/common/ConnectWalletButton';
 import { SmoothCountdown } from '@/components/common/SmoothCountdown';
 import { Button } from '@/components/ui/button';
+import { AttentionMenu } from '@/components/ui/attention-menu';
 import { ErrorState } from '@/components/ui/error-state';
 import { GradientText } from '@/components/ui/gradient-text';
+import { LiveStatus } from '@/components/ui/live-status';
 import { Spinner } from '@/components/ui/spinner';
 import { PageShell } from '@/components/ui/page-shell';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -53,7 +55,7 @@ import { useHomeGestureFeed } from '@/hooks/useHomeGestureFeed';
 import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
 import { useEndgameChainSync } from '@/hooks/useEndgameChainSync';
 import { useAllocationNotification } from '@/hooks/useAllocationNotification';
-import { ALERT_MINUTE_CHOICES, useAttentionPreferences } from '@/hooks/useAttentionPreferences';
+import { useFinalizationAlertChoice } from '@/hooks/useFinalizationAlertChoice';
 import { useGestureChime } from '@/hooks/useGestureChime';
 import { invalidateLiveGameQueries } from '@/hooks/useLiveGameDataRefresh';
 import { useNow } from '@/hooks/useNow';
@@ -267,7 +269,6 @@ const ExperimentalHomePage = ({
   // Attention settings (chime, alert before finalization, tab-title
   // countdown) are opt-in per browser: nothing sounds or notifies until the
   // viewer turns it on (useAttentionPreferences).
-  const { preferences: attention, setFinalizationAlert } = useAttentionPreferences();
   useAllocationNotification({
     allocationTime: allocationFinalize.allocationTime,
     cycleNumber: dashboardData?.CurRoundNum ?? null,
@@ -276,17 +277,10 @@ const ExperimentalHomePage = ({
       t('notifications.finalizationSoonBody', { minutes: String(minutesLeft) }),
   });
 
-  // The clock's alert chips switch the opt-in alert: picking a threshold turns
-  // it on (asking for notification permission at that click); picking the
-  // active one turns it off.
-  const notifyThresholdMin = attention.finalizationAlert ? attention.alertMinutes : undefined;
-  const handleNotifyThresholdChange = useCallback(
-    (minutes: number) => {
-      const choice = ALERT_MINUTE_CHOICES.find((value) => value === minutes) ?? null;
-      void setFinalizationAlert(notifyThresholdMin === minutes ? null : choice);
-    },
-    [notifyThresholdMin, setFinalizationAlert],
-  );
+  // The clock's alert chips switch the opt-in alert (and say why when the
+  // browser blocks notifications).
+  const { thresholdMinutes: notifyThresholdMin, onThresholdChange: handleNotifyThresholdChange } =
+    useFinalizationAlertChoice();
 
   // Chime only for a connected viewer who opted in, when their Gesture was
   // just followed by someone else's.
@@ -812,7 +806,8 @@ const ExperimentalHomePage = ({
         >
           <div className="min-w-0">
             <div className="liquid-glass-control mb-2.5 inline-flex max-w-full items-center gap-2 rounded-full border border-white/[0.10] bg-white/[0.04] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-300 animate-live-dot" />
+              {/* Pulses only while the dashboard poll succeeds (liveFreshness). */}
+              <LiveStatus variant="dot" />
               {cycleNumber == null
                 ? t('hero.cycleFallback')
                 : t('hero.cycleNumber', { number: String(cycleNumber) })}
@@ -829,6 +824,8 @@ const ExperimentalHomePage = ({
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
+            {/* Chime, alert before finalization and tab countdown: all opt-in. */}
+            <AttentionMenu className="liquid-glass-control" />
             <Link
               href="/"
               data-testid="experimental-ui-return"

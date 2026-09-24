@@ -39,7 +39,7 @@ import { useChampions } from '@/hooks/useChampions';
 import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
 import { useEndgameChainSync } from '@/hooks/useEndgameChainSync';
 import { useAllocationNotification } from '@/hooks/useAllocationNotification';
-import { ALERT_MINUTE_CHOICES, useAttentionPreferences } from '@/hooks/useAttentionPreferences';
+import { useFinalizationAlertChoice } from '@/hooks/useFinalizationAlertChoice';
 import { useGestureChime } from '@/hooks/useGestureChime';
 import { invalidateLiveGameQueries } from '@/hooks/useLiveGameDataRefresh';
 import { useNow } from '@/hooks/useNow';
@@ -253,7 +253,6 @@ const HomePage = ({
   // Attention settings (chime, alert before finalization, tab-title
   // countdown) are opt-in per browser: nothing sounds or notifies until the
   // viewer turns it on (useAttentionPreferences).
-  const { preferences: attention, setFinalizationAlert } = useAttentionPreferences();
   useAllocationNotification({
     allocationTime: allocationFinalize.allocationTime,
     cycleNumber: dashboardData?.CurRoundNum ?? null,
@@ -262,17 +261,10 @@ const HomePage = ({
       t('notifications.finalizationSoonBody', { minutes: String(minutesLeft) }),
   });
 
-  // The clock's alert chips switch the opt-in alert: picking a threshold turns
-  // it on (asking for notification permission at that click); picking the
-  // active one turns it off.
-  const notifyThresholdMin = attention.finalizationAlert ? attention.alertMinutes : undefined;
-  const handleNotifyThresholdChange = useCallback(
-    (minutes: number) => {
-      const choice = ALERT_MINUTE_CHOICES.find((value) => value === minutes) ?? null;
-      void setFinalizationAlert(notifyThresholdMin === minutes ? null : choice);
-    },
-    [notifyThresholdMin, setFinalizationAlert],
-  );
+  // The clock's alert chips switch the opt-in alert (and say why when the
+  // browser blocks notifications).
+  const { thresholdMinutes: notifyThresholdMin, onThresholdChange: handleNotifyThresholdChange } =
+    useFinalizationAlertChoice();
 
   // Chime only for a connected viewer who opted in, when their Gesture was
   // just followed by someone else's.
