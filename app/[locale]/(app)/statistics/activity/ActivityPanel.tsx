@@ -1,6 +1,7 @@
 'use client';
 
 // lexicon-allow-start: internal analytics identifiers mirror backend wire names
+import dynamic from 'next/dynamic';
 import { ArrowUpRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -15,11 +16,33 @@ import { useCycleScope } from '@/components/statistics/useCycleScope';
 import { BidFrequencyChart } from '@/components/statistics/BidFrequencyChart';
 import { LastBidSpikeChart } from '@/components/statistics/LastBidSpikeChart';
 import { BidderActivePeriodsTimeline } from '@/components/statistics/BidderActivePeriodsTimeline';
-import { GestureTypeMixChart } from '@/components/statistics/GestureTypeMixChart';
-import CstCalibrationWindowChart from '@/components/statistics/CstCalibrationWindowChart';
-import CstGestureCostChart from '@/components/statistics/CstGestureCostChart';
-import EnduranceTimelineChart from '@/components/statistics/EnduranceTimelineChart';
 import { SystemModesTable, type EventRow } from '@/components/tables/SystemModesTable';
+
+/**
+ * The one-cycle charts sit below three all-time sections: each loads in its
+ * own chunk after the page, behind a skeleton of its height, so the page's
+ * first load carries only the charts at the top.
+ */
+const chartSkeleton = (height: number) =>
+  function ChartLoading() {
+    return <SkeletonChart height={height} bars={18} />;
+  };
+const GestureTypeMixChart = dynamic(
+  () => import('@/components/statistics/GestureTypeMixChart').then((m) => m.GestureTypeMixChart),
+  { ssr: false, loading: chartSkeleton(300) },
+);
+const EnduranceTimelineChart = dynamic(
+  () => import('@/components/statistics/EnduranceTimelineChart'),
+  { ssr: false, loading: chartSkeleton(320) },
+);
+const CstCalibrationWindowChart = dynamic(
+  () => import('@/components/statistics/CstCalibrationWindowChart'),
+  { ssr: false, loading: chartSkeleton(320) },
+);
+const CstGestureCostChart = dynamic(() => import('@/components/statistics/CstGestureCostChart'), {
+  ssr: false,
+  loading: chartSkeleton(320),
+});
 
 /**
  * Gesture activity: frequency, spikes and the most active participants over

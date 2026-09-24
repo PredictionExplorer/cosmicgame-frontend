@@ -17,6 +17,7 @@ import { ErrorState } from '@/components/ui/error-state';
 import { LiveStatus } from '@/components/ui/live-status';
 import { SkeletonDetailRows, SkeletonTable } from '@/components/ui/skeleton';
 import { UnknownValue } from '@/components/ui/unknown-value';
+import { SiteLink } from '@/components/layout/SiteLink';
 import { SectionShell } from '@/components/statistics/SectionShell';
 import { StatisticsGroup } from '@/components/statistics/StatisticsGroup';
 import { StatisticsItem } from '@/components/statistics/StatisticsItem';
@@ -34,14 +35,17 @@ type SectionKey = StatisticsSectionDef['messageKey'];
  * One row of the section index: the page's name over what it covers, its
  * key figure on the right, and an arrow. The whole row is the link; rows are
  * divided by hairlines like a ledger, with the same inset as a table cell.
- * On a phone the figure moves under the description.
+ * On a phone the figure moves under the description. The row prefetches its
+ * page on hover or focus, not on sight (each page carries its own charts).
  */
 function SectionEntry({ section, figure }: { section: StatisticsSectionDef; figure: ReactNode }) {
   const t = useTranslations('statistics');
   return (
     <li className="border-b border-rule-faint">
-      <Link
+      <SiteLink
         href={section.href}
+        kind="internal"
+        prefetch="intent"
         className={cn(
           'group grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6 gap-y-1.5 px-4 py-4 no-underline sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:py-5',
           'focus-ring-inset transition-colors duration-fast hover:bg-surface',
@@ -62,7 +66,7 @@ function SectionEntry({ section, figure }: { section: StatisticsSectionDef; figu
           aria-hidden
           className="col-start-2 row-span-2 row-start-1 size-4 shrink-0 text-subtle transition-transform duration-fast group-hover:translate-x-0.5 group-hover:text-foreground motion-reduce:transition-none sm:col-start-3 sm:row-span-1"
         />
-      </Link>
+      </SiteLink>
     </li>
   );
 }

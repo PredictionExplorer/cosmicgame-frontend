@@ -3,8 +3,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
-import { Link, usePathname } from '@/i18n/navigation';
+import { usePathname } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
+import { SiteLink } from '@/components/layout/SiteLink';
 import { ScrollRail } from '@/components/ui/scroll-rail';
 import { tabsListVariants, tabsTriggerVariants } from '@/components/ui/tabs';
 
@@ -49,7 +50,9 @@ function useStuck() {
  * each one is its own page — with the current one marked
  * `aria-current="page"`. The row scrolls sideways on a phone with edge fades
  * and keeps the current page in view (ScrollRail); once it floats over
- * content it takes the header's glass across the full width.
+ * content it takes the header's glass across the full width. The tabs
+ * prefetch on hover or focus, not on sight: every page behind them carries
+ * its own charts, and six viewport prefetches loaded them all with the hub.
  */
 export function StatisticsSubNav() {
   const pathname = usePathname();
@@ -81,8 +84,10 @@ export function StatisticsSubNav() {
               const current = isCurrentSection(section, pathname);
               return (
                 <li key={section.href} className="shrink-0">
-                  <Link
+                  <SiteLink
                     href={section.href}
+                    kind="internal"
+                    prefetch="intent"
                     aria-current={current ? 'page' : undefined}
                     className={cn(
                       tabsTriggerVariants({ variant: 'underline', scroll: true }),
@@ -90,7 +95,7 @@ export function StatisticsSubNav() {
                     )}
                   >
                     {t(`navigation.${section.messageKey}.label`)}
-                  </Link>
+                  </SiteLink>
                 </li>
               );
             })}

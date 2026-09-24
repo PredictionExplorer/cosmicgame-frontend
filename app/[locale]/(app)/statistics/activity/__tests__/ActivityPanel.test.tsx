@@ -1,9 +1,15 @@
 import userEvent from '@testing-library/user-event';
 
+import { flushDynamicImports } from '@/test-utils/dynamic';
+
 import { render, screen, checkA11y, within } from '@/test-utils';
 
 import ActivityPanel from '../ActivityPanel';
 import { createDashboardInfo } from '../../test-support/statisticsTestFixtures';
+
+// The code-split charts render synchronously once their modules resolve.
+jest.mock('next/dynamic', () => require('@/test-utils/dynamic').syncDynamic);
+beforeAll(() => flushDynamicImports());
 
 const mockUseDashboardInfo = jest.fn();
 const mockUseSystemModelist = jest.fn();

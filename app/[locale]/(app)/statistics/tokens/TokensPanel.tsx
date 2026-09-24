@@ -1,5 +1,6 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 
 import { toFiniteNumber } from '@/utils/finiteNumber';
@@ -15,9 +16,19 @@ import type { CTBalanceDistribution, TokenDistribution } from '@/services/api/ty
 import { StatsSection } from '@/components/statistics/StatsSection';
 import { AttachedAssetsSection } from '@/components/statistics/AttachedAssetsSection';
 import { CstHoldersLedger } from '@/components/statistics/CstHoldersLedger';
-import { CstSupplyHistory } from '@/components/statistics/CstSupplyHistory';
+import { SkeletonChart } from '@/components/ui/skeleton';
 import AttachedNFTDistributionTable from '@/components/attachments/AttachedNFTDistributionTable';
 import { CSTokenDistributionTable } from '@/components/tokens/CSTokenDistributionTable';
+
+/**
+ * The supply chart is the page's only Recharts figure, below two ledgers: it
+ * loads in its own chunk after the page, behind a skeleton of its height, so
+ * the charting library is not part of the page's first load.
+ */
+const CstSupplyHistory = dynamic(
+  () => import('@/components/statistics/CstSupplyHistory').then((m) => m.CstSupplyHistory),
+  { ssr: false, loading: () => <SkeletonChart height={300} bars={24} /> },
+);
 
 /**
  * Token distribution: who holds the Cosmic Signature NFTs, who holds CST and
