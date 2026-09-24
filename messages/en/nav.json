@@ -76,9 +76,9 @@
       "description": "When gestures happen, cycle by cycle"
     },
     "statisticsPerformance": {
-      "label": "Participant Performance Statistics",
-      "short": "Performance",
-      "description": "Cycle records and participant standings"
+      "label": "Participant Outcomes",
+      "short": "Outcomes",
+      "description": "Spent and received, retrievals by cycle"
     },
     "allocationRecipients": {
       "label": "Allocation Recipients",

@@ -1,118 +1,102 @@
 'use client';
 
-import { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
-import { Link } from '@/i18n/navigation';
-import { usePathname } from '@/i18n/navigation';
+import { Link, usePathname } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
+import { ScrollRail } from '@/components/ui/scroll-rail';
+import { tabsListVariants, tabsTriggerVariants } from '@/components/ui/tabs';
 
-import { ALL_STATISTICS_SECTIONS, STATISTICS_HUB } from './statistics-sections';
+import { ALL_STATISTICS_SECTIONS, isCurrentSection } from './statistics-sections';
 
 /**
- * Centres the active item of a horizontal scroller in view, moving only the
- * scroller (never the page), so a phone opened on a later section sees which
- * one it is in. Measured from the two boxes, not `offsetLeft`, which counts
- * from the item's offset parent (the sticky wrapper), not the scroller.
+ * Whether a sticky element is stuck under its `top` offset: a sentinel just
+ * above it has scrolled under the fixed header. Drives the glass band, which
+ * only appears once the bar floats over content.
  */
-export function centerActiveItem(scroller: HTMLElement, item: HTMLElement): void {
-  const scrollerBox = scroller.getBoundingClientRect();
-  const itemBox = item.getBoundingClientRect();
-  // The item's left edge in the scroller's content coordinates.
-  const itemLeft = itemBox.left - scrollerBox.left - scroller.clientLeft + scroller.scrollLeft;
-  const target = itemLeft - (scroller.clientWidth - itemBox.width) / 2;
-  const max = scroller.scrollWidth - scroller.clientWidth;
-  scroller.scrollLeft = Math.max(0, Math.min(target, max));
-}
+function useStuck() {
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const stickyRef = useRef<HTMLElement>(null);
+  const [stuck, setStuck] = useState(false);
 
-/** Which edges of a horizontal scroller hide content. */
-export function scrollEdges(scroller: HTMLElement): { start: boolean; end: boolean } {
-  const max = scroller.scrollWidth - scroller.clientWidth;
-  return { start: scroller.scrollLeft > 1, end: scroller.scrollLeft < max - 1 };
-}
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    const sticky = stickyRef.current;
+    if (!sentinel || !sticky || typeof IntersectionObserver === 'undefined') return;
+    // The resolved `top` of a sticky element is in pixels.
+    const top = Math.ceil(parseFloat(getComputedStyle(sticky).top) || 0);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry) return;
+        // Stuck once the sentinel has scrolled up past the offset, not while it sits below the
+        // fold. (Some observer shims report no box; treat that as not scrolled past.)
+        const sentinelTop = entry.boundingClientRect?.top ?? Number.POSITIVE_INFINITY;
+        setStuck(!entry.isIntersecting && sentinelTop <= top);
+      },
+      { rootMargin: `-${top}px 0px 0px 0px`, threshold: 0 },
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, []);
 
-/** The phone edge fade: only an edge with more pills behind it fades. */
-const EDGE_FADE = {
-  none: '',
-  start: 'max-sm:[mask-image:linear-gradient(to_right,transparent,black_1.5rem)]',
-  end: 'max-sm:[mask-image:linear-gradient(to_right,black_calc(100%-1.5rem),transparent)]',
-  both: 'max-sm:[mask-image:linear-gradient(to_right,transparent,black_1.5rem,black_calc(100%-1.5rem),transparent)]',
-} as const;
+  return { sentinelRef, stickyRef, stuck };
+}
 
 /**
- * Sticky secondary navigation between the statistics section pages.
- * Mirrors the FAQ category nav: pill links, horizontal scroll on mobile,
- * frosted background while stuck under the app header. On phones the row
- * scrolls the active section into view and fades the edges that hide pills.
+ * The statistics pages' sub-navigation: underline tabs set on the page
+ * header's bottom rule, sticky under the site header. Links, not ARIA tabs —
+ * each one is its own page — with the current one marked
+ * `aria-current="page"`. The row scrolls sideways on a phone with edge fades
+ * and keeps the current page in view (ScrollRail); once it floats over
+ * content it takes the header's glass across the full width.
  */
 export function StatisticsSubNav() {
   const pathname = usePathname();
   const t = useTranslations('statistics');
-  const scrollerRef = useRef<HTMLDivElement>(null);
-  const activeRef = useRef<HTMLAnchorElement>(null);
-  const [edges, setEdges] = useState({ start: false, end: false });
-
-  const updateEdges = useCallback(() => {
-    if (!scrollerRef.current) return;
-    const next = scrollEdges(scrollerRef.current);
-    setEdges((prev) => (prev.start === next.start && prev.end === next.end ? prev : next));
-  }, []);
-
-  useLayoutEffect(() => {
-    if (scrollerRef.current && activeRef.current) {
-      centerActiveItem(scrollerRef.current, activeRef.current);
-    }
-    updateEdges();
-  }, [pathname, updateEdges]);
-
-  useLayoutEffect(() => {
-    window.addEventListener('resize', updateEdges);
-    return () => window.removeEventListener('resize', updateEdges);
-  }, [updateEdges]);
-
-  const fade = edges.start ? (edges.end ? 'both' : 'start') : edges.end ? 'end' : 'none';
+  const { sentinelRef, stickyRef, stuck } = useStuck();
 
   return (
-    <div className="sticky top-[var(--sticky-offset)] z-30 -mx-4 mb-8 px-4">
+    <>
+      <div ref={sentinelRef} aria-hidden className="h-0" />
       <nav
+        ref={stickyRef}
         aria-label={t('navigation.ariaLabel')}
-        className="border-b border-white/[0.06] bg-background/85 py-3 backdrop-blur-xl"
+        data-stuck={stuck || undefined}
+        className={cn(
+          'sticky top-[var(--header-height)] z-30 mb-10 sm:mb-12',
+          // The glass band spans the viewport, behind the container-wide tab row.
+          'before:pointer-events-none before:absolute before:inset-y-0 before:left-1/2 before:-z-10 before:w-screen before:-translate-x-1/2 before:border-b before:border-rule before:opacity-0 before:glass before:transition-opacity before:duration-base',
+          'data-[stuck]:before:opacity-100',
+        )}
       >
-        <div
-          ref={scrollerRef}
-          onScroll={updateEdges}
-          data-fade={fade}
-          className={cn(
-            'flex items-center gap-2 overflow-x-auto scrollbar-none max-sm:px-3',
-            EDGE_FADE[fade],
-          )}
-        >
-          {ALL_STATISTICS_SECTIONS.map((section) => {
-            const Icon = section.icon;
-            const isActive =
-              section.href === STATISTICS_HUB.href
-                ? pathname === STATISTICS_HUB.href
-                : pathname === section.href || pathname.startsWith(`${section.href}/`);
-            return (
-              <Link
-                key={section.href}
-                ref={isActive ? activeRef : undefined}
-                href={section.href}
-                aria-current={isActive ? 'page' : undefined}
-                className={cn(
-                  'inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-3.5 py-2 text-sm font-medium no-underline transition-all duration-200',
-                  isActive
-                    ? 'bg-primary/15 text-primary shadow-sm shadow-primary/10'
-                    : 'text-muted-foreground hover:bg-white/[0.04] hover:text-foreground',
-                )}
-              >
-                <Icon className="h-3.5 w-3.5" aria-hidden />
-                {t(`navigation.${section.messageKey}.label`)}
-              </Link>
-            );
-          })}
-        </div>
+        <ScrollRail>
+          <ul
+            className={cn(
+              tabsListVariants({ variant: 'underline' }),
+              'w-max min-w-full flex-nowrap gap-0 sm:gap-2',
+            )}
+          >
+            {ALL_STATISTICS_SECTIONS.map((section) => {
+              const current = isCurrentSection(section, pathname);
+              return (
+                <li key={section.href} className="shrink-0">
+                  <Link
+                    href={section.href}
+                    aria-current={current ? 'page' : undefined}
+                    className={cn(
+                      tabsTriggerVariants({ variant: 'underline', scroll: true }),
+                      'focus-ring-inset no-underline',
+                    )}
+                  >
+                    {t(`navigation.${section.messageKey}.label`)}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </ScrollRail>
       </nav>
-    </div>
+    </>
   );
 }

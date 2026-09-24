@@ -41,7 +41,7 @@ export default async function Page({ params }: PageProps) {
   const url = localeHref(APP_ORIGIN, '/statistics', locale);
 
   return (
-    <PageMessages namespaces={['statistics', 'tables']}>
+    <PageMessages namespaces={['contracts', 'statistics', 'tables']}>
       <>
         <JsonLd
           data={[

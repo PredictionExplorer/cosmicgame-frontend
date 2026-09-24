@@ -46,8 +46,8 @@
     "description": "Tần suất nét bút theo thời gian, các đợt tăng vọt hoạt động, khoảng hoạt động của người tham gia, tỷ lệ loại nét bút, dòng thời gian chu kỳ và các lần kích hoạt chu kỳ."
   },
   "statisticsPerformance": {
-    "title": "Thống kê thành tích người tham gia",
-    "description": "Bảng xếp hạng thành tích người tham gia và kết quả phân bổ có thể nhận về của mọi chu kỳ trình diễn Cosmic Signature."
+    "title": "Kết quả của người tham gia",
+    "description": "Mỗi người tham gia đã chi bao nhiêu cho nét bút và nhận bao nhiêu phân bổ, cùng tình hình nhận về tài sản của từng chu kỳ."
   },
   "faq": {
     "title": "Câu hỏi thường gặp: giao thức nghệ thuật trên chuỗi Arbitrum",

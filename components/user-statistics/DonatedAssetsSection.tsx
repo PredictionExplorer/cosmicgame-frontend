@@ -1,10 +1,13 @@
-import { Coins } from 'lucide-react';
+'use client';
+
+import { useId, type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { AttachedAssetsIcon } from '@/lib/conceptIcons';
 import { Button } from '@/components/ui/button';
+import { ChainGuard } from '@/components/wallet/NetworkGuard';
 import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
+import { SkeletonTable } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import AttachedNFTTable from '@/components/attachments/AttachedNFTTable';
@@ -28,17 +31,47 @@ export interface DonatedAssetsSectionProps {
   onClaimAllERC20: () => void;
 }
 
-function TableSkeleton() {
+/** One kind of attached asset: an H3 with its explanation, a count to retrieve, the action, the ledger. */
+function AssetLedger({
+  title,
+  info,
+  pending,
+  action,
+  children,
+}: {
+  title: string;
+  info: string;
+  pending: string | null;
+  action: ReactNode;
+  children: ReactNode;
+}) {
+  const id = useId();
   return (
-    <div className="space-y-3" data-testid="table-skeleton">
-      <Skeleton className="h-10 w-full rounded-lg" />
-      <Skeleton className="h-10 w-full rounded-lg" />
-      <Skeleton className="h-10 w-full rounded-lg" />
-    </div>
+    <section aria-labelledby={id} className="min-w-0">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <h3 id={id} className="type-heading-3 text-foreground">
+            {title}
+          </h3>
+          <InfoTooltip content={info} label={title} />
+          {pending ? (
+            <Badge tone="attention" size="sm" dot>
+              {pending}
+            </Badge>
+          ) : null}
+        </div>
+        {action}
+      </div>
+      {children}
+    </section>
   );
 }
 
-/** Donated NFTs and ERC20 tokens sections with claim buttons, empty states, and loading skeletons. */
+/**
+ * Attached NFTs and ERC-20 tokens allocated to the address, each with the
+ * number still to retrieve and, on your own profile, the action that
+ * retrieves them all.
+ */
 export function DonatedAssetsSection({
   unclaimedNFTs,
   claimedNFTs,
@@ -58,33 +91,33 @@ export function DonatedAssetsSection({
   const unclaimedERC20Count = donatedERC20.filter((x) => !x.Claimed).length;
 
   return (
-    <>
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <p className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
-              {t('statistics.donatedAssets.nfts.title')}
-            </p>
-            <InfoTooltip content={t('statistics.donatedAssets.nfts.tooltip')} />
-            {unclaimedNFTs.length > 0 && (
-              <Badge variant="default" className="text-[10px] px-1.5 py-0">
-                {t('statistics.donatedAssets.nfts.unclaimed', {
-                  count: unclaimedNFTs.length,
-                })}
-              </Badge>
-            )}
-          </div>
-          {unclaimedNFTs.length > 0 && canClaim && (
-            <Button onClick={onClaimAllNFTs} disabled={isClaiming} size="sm">
-              {t('statistics.donatedAssets.nfts.claimAll')}
-            </Button>
-          )}
-        </div>
+    <div className="space-y-12">
+      <AssetLedger
+        title={t('statistics.donatedAssets.nfts.title')}
+        info={t('statistics.donatedAssets.nfts.tooltip')}
+        pending={
+          unclaimedNFTs.length > 0
+            ? t('statistics.donatedAssets.nfts.unclaimed', { count: unclaimedNFTs.length })
+            : null
+        }
+        action={
+          unclaimedNFTs.length > 0 && canClaim ? (
+            // On another network the action becomes "Switch to …" before anything is sent.
+            <ChainGuard explain={false}>
+              <Button onClick={onClaimAllNFTs} loading={isClaiming} size="sm">
+                {t('statistics.donatedAssets.nfts.claimAll')}
+              </Button>
+            </ChainGuard>
+          ) : null
+        }
+      >
         {loadingNFTs ? (
-          <TableSkeleton />
+          <SkeletonTable rows={3} columns={4} />
         ) : allNFTs.length === 0 ? (
           <EmptyState
-            icon={<AttachedAssetsIcon className="h-8 w-8 text-muted-foreground/50" />}
+            headingLevel={4}
+            variant="inline"
+            icon={<AttachedAssetsIcon className="size-5" />}
             title={t('statistics.donatedAssets.nfts.emptyTitle')}
             description={t('statistics.donatedAssets.nfts.emptyDescription')}
           />
@@ -95,34 +128,33 @@ export function DonatedAssetsSection({
             claimingTokens={claimingDonatedNFTs}
           />
         )}
-      </div>
+      </AssetLedger>
 
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <p className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
-              {t('statistics.donatedAssets.erc20.title')}
-            </p>
-            <InfoTooltip content={t('statistics.donatedAssets.erc20.tooltip')} />
-            {unclaimedERC20Count > 0 && (
-              <Badge variant="default" className="text-[10px] px-1.5 py-0">
-                {t('statistics.donatedAssets.erc20.unclaimed', {
-                  count: unclaimedERC20Count,
-                })}
-              </Badge>
-            )}
-          </div>
-          {unclaimedERC20Count > 0 && canClaim && (
-            <Button onClick={onClaimAllERC20} size="sm">
-              {t('statistics.donatedAssets.erc20.claimAll')}
-            </Button>
-          )}
-        </div>
+      <AssetLedger
+        title={t('statistics.donatedAssets.erc20.title')}
+        info={t('statistics.donatedAssets.erc20.tooltip')}
+        pending={
+          unclaimedERC20Count > 0
+            ? t('statistics.donatedAssets.erc20.unclaimed', { count: unclaimedERC20Count })
+            : null
+        }
+        action={
+          unclaimedERC20Count > 0 && canClaim ? (
+            <ChainGuard explain={false}>
+              <Button onClick={onClaimAllERC20} size="sm">
+                {t('statistics.donatedAssets.erc20.claimAll')}
+              </Button>
+            </ChainGuard>
+          ) : null
+        }
+      >
         {loadingERC20 ? (
-          <TableSkeleton />
+          <SkeletonTable rows={3} columns={4} />
         ) : donatedERC20.length === 0 ? (
           <EmptyState
-            icon={<Coins className="h-8 w-8 text-muted-foreground/50" />}
+            headingLevel={4}
+            variant="inline"
+            icon={<AttachedAssetsIcon className="size-5" />}
             title={t('statistics.donatedAssets.erc20.emptyTitle')}
             description={t('statistics.donatedAssets.erc20.emptyDescription')}
           />
@@ -132,7 +164,7 @@ export function DonatedAssetsSection({
             handleClaim={canClaim ? (onClaimERC20 ?? null) : null}
           />
         )}
-      </div>
-    </>
+      </AssetLedger>
+    </div>
   );
 }

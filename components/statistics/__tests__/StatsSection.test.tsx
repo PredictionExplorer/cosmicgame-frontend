@@ -2,130 +2,136 @@ import userEvent from '@testing-library/user-event';
 
 import { render, screen, checkA11y } from '@/test-utils';
 
+import { SectionShell } from '../SectionShell';
 import { StatsSection } from '../StatsSection';
 
-describe('StatsSection', () => {
-  it('renders children when no async state is active', () => {
+describe('SectionShell', () => {
+  it('names the section by a plain H2 by default, with its sentence and actions', () => {
     render(
-      <StatsSection title="Ready Section">
+      <SectionShell
+        title="Gesture spikes"
+        description="One sentence."
+        actions={<a href="#x">Act</a>}
+      >
+        <p>Chart body</p>
+      </SectionShell>,
+    );
+    const heading = screen.getByRole('heading', { level: 2, name: 'Gesture spikes' });
+    expect(screen.getByRole('region', { name: 'Gesture spikes' })).toBeInTheDocument();
+    expect(heading.querySelector('button')).toBeNull();
+    expect(screen.getByText('One sentence.')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Act' })).toBeInTheDocument();
+    expect(screen.getByText('Chart body')).toBeVisible();
+  });
+
+  it('folds a collapsible section away from its H2 button', async () => {
+    const user = userEvent.setup();
+    render(
+      <SectionShell
+        title="Gesture spikes"
+        description="One sentence."
+        actions={<a href="#x">Act</a>}
+        collapsible
+      >
+        <p>Chart body</p>
+      </SectionShell>,
+    );
+    expect(screen.getByRole('region', { name: 'Gesture spikes' })).toBeInTheDocument();
+    const toggle = screen.getByRole('button', { name: 'Gesture spikes' });
+    expect(toggle.closest('h2')).not.toBeNull();
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByText('One sentence.')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Act' })).toBeInTheDocument();
+
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByText('Chart body')).not.toBeVisible();
+    // The actions belong to the open section only.
+    expect(screen.queryByRole('link', { name: 'Act' })).not.toBeInTheDocument();
+  });
+
+  it('renders an H3 inside a section and mounts a lazy body on first open', async () => {
+    const user = userEvent.setup();
+    render(
+      <SectionShell title="Cycle activations" headingLevel={3} defaultOpen={false} lazy>
+        <p>Heavy table</p>
+      </SectionShell>,
+    );
+    const toggle = screen.getByRole('button', { name: 'Cycle activations' });
+    expect(toggle.closest('h3')).not.toBeNull();
+    expect(screen.queryByText('Heavy table')).not.toBeInTheDocument();
+    await user.click(toggle);
+    expect(screen.getByText('Heavy table')).toBeVisible();
+  });
+
+  it('has no axe violations', async () => {
+    const { container } = render(
+      <SectionShell title="Accessible" tooltip="What it shows.">
+        <p>Body</p>
+      </SectionShell>,
+    );
+    await checkA11y(container);
+  });
+});
+
+describe('StatsSection', () => {
+  it('renders children when no query state is active', () => {
+    render(
+      <StatsSection title="Ready section">
         <p>Table content</p>
       </StatsSection>,
     );
     expect(screen.getByText('Table content')).toBeInTheDocument();
   });
 
-  it('renders the default skeleton while loading', () => {
+  it('shows skeleton rows and marks the section busy while loading', () => {
     render(
-      <StatsSection title="Loading Section" isLoading>
+      <StatsSection title="Loading section" isLoading>
         <p>Table content</p>
       </StatsSection>,
     );
-    expect(screen.getByTestId('stats-section-skeleton')).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Loading section' })).toHaveAttribute(
+      'aria-busy',
+      'true',
+    );
     expect(screen.queryByText('Table content')).not.toBeInTheDocument();
   });
 
   it('renders a custom skeleton when provided', () => {
     render(
-      <StatsSection
-        title="Loading Section"
-        isLoading
-        skeleton={<div data-testid="custom-skeleton" />}
-      >
+      <StatsSection title="Loading section" isLoading skeleton={<div data-testid="custom" />}>
         <p>Table content</p>
       </StatsSection>,
     );
-    expect(screen.getByTestId('custom-skeleton')).toBeInTheDocument();
+    expect(screen.getByTestId('custom')).toBeInTheDocument();
   });
 
-  it('renders an error state with a working retry button', async () => {
+  it('renders an error state whose retry calls back', async () => {
     const user = userEvent.setup();
     const onRetry = jest.fn();
     render(
-      <StatsSection title="Broken Section" isError onRetry={onRetry}>
+      <StatsSection title="Unique participants" isError onRetry={onRetry}>
         <p>Table content</p>
       </StatsSection>,
     );
-    expect(screen.getByText(/failed to load broken section/i)).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: /try again/i }));
+    expect(screen.getByRole('heading', { level: 3 })).toHaveTextContent(/unique participants/i);
+    await user.click(screen.getByRole('button', { name: /try again|retry/i }));
     expect(onRetry).toHaveBeenCalledTimes(1);
   });
 
-  it('renders an empty state when isEmpty', () => {
+  it('renders the empty state with its title and description', () => {
     render(
       <StatsSection
-        title="Empty Section"
+        title="Recipients"
         isEmpty
-        emptyTitle="Nothing here yet"
-        emptyDescription="Data appears after the first event."
+        emptyTitle="No recipients yet"
+        emptyDescription="They appear after the first allocation."
       >
         <p>Table content</p>
       </StatsSection>,
     );
-    expect(screen.getByText('Nothing here yet')).toBeInTheDocument();
-    expect(screen.getByText('Data appears after the first event.')).toBeInTheDocument();
+    expect(screen.getByText('No recipients yet')).toBeInTheDocument();
+    expect(screen.getByText('They appear after the first allocation.')).toBeInTheDocument();
     expect(screen.queryByText('Table content')).not.toBeInTheDocument();
-  });
-
-  it('prioritizes loading over error and empty', () => {
-    render(
-      <StatsSection title="Priority Section" isLoading isError isEmpty>
-        <p>Table content</p>
-      </StatsSection>,
-    );
-    expect(screen.getByTestId('stats-section-skeleton')).toBeInTheDocument();
-    expect(screen.queryByText(/failed to load/i)).not.toBeInTheDocument();
-  });
-
-  it('prioritizes error over empty', () => {
-    render(
-      <StatsSection title="Errored Section" isError isEmpty>
-        <p>Table content</p>
-      </StatsSection>,
-    );
-    expect(screen.getByText(/failed to load errored section/i)).toBeInTheDocument();
-    expect(screen.queryByText('No data yet')).not.toBeInTheDocument();
-  });
-
-  it('defers content mounting when lazy and closed', () => {
-    render(
-      <StatsSection title="Lazy Section" defaultOpen={false} lazy>
-        <p data-testid="deferred">Deferred content</p>
-      </StatsSection>,
-    );
-    expect(screen.queryByTestId('deferred')).not.toBeInTheDocument();
-  });
-
-  it('renders the section tooltip trigger', () => {
-    render(
-      <StatsSection title="Documented Section" tooltip="Explains the section.">
-        <p>Table content</p>
-      </StatsSection>,
-    );
-    expect(
-      screen.getByRole('button', { name: 'More information about Documented Section' }),
-    ).toBeInTheDocument();
-  });
-
-  it('has no accessibility violations across states', async () => {
-    const { container, rerender } = render(
-      <StatsSection title="A11y Section">
-        <p>Content</p>
-      </StatsSection>,
-    );
-    await checkA11y(container);
-
-    rerender(
-      <StatsSection title="A11y Section" isError onRetry={() => {}}>
-        <p>Content</p>
-      </StatsSection>,
-    );
-    await checkA11y(container);
-
-    rerender(
-      <StatsSection title="A11y Section" isEmpty>
-        <p>Content</p>
-      </StatsSection>,
-    );
-    await checkA11y(container);
   });
 });

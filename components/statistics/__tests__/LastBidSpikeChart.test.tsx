@@ -1,11 +1,11 @@
-// lexicon-allow-start: analytics fixtures mirror backend wire names
+// lexicon-allow-start: analytics fixtures mirror sealed backend wire names
 import userEvent from '@testing-library/user-event';
 
 import type { BidSpike } from '@/services/api/types';
 
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen, within } from '@/test-utils';
 
-import { LastBidSpikeChart } from '../LastBidSpikeChart';
+import { LastBidSpikeChart, defaultSpikeIndex } from '../LastBidSpikeChart';
 
 const mockUseBidTimeBounds = jest.fn();
 const mockUseBiddingActivity = jest.fn();
@@ -16,118 +16,97 @@ jest.mock('../../../hooks/useApiQuery', () => ({
   useBiddingActivity: (...args: unknown[]) => mockUseBiddingActivity(...args),
   useBidFrequency: (...args: unknown[]) => mockUseBidFrequency(...args),
 }));
-
-jest.mock('../../../hooks/useNow', () => ({
-  useNow: () => 1_700_000_000_000,
-}));
-
-jest.mock('recharts', () => ({
-  ResponsiveContainer: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="responsive-container">{children}</div>
-  ),
-  BarChart: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="bar-chart">{children}</div>
-  ),
-  Bar: () => null,
-  XAxis: () => null,
-  YAxis: () => null,
-  CartesianGrid: () => null,
-  Tooltip: () => null,
-  ReferenceArea: () => null,
-}));
+jest.mock('../../../hooks/useNow', () => ({ useNow: () => NOW_SEC * 1000 }));
+jest.mock('recharts', () => require('@/test-utils/recharts').rechartsStub());
 
 const HOUR = 3600;
-const BASE = 1_690_000_000 - (1_690_000_000 % HOUR);
+/** 2026-08-12 00:00 UTC. */
+const AUG_12 = Date.UTC(2026, 7, 12) / 1000;
+const NOW_SEC = AUG_12 + 40 * 86_400;
 
-/** Backend `Index` values intentionally do NOT match array positions. */
-const spikes: BidSpike[] = [
-  {
-    Index: 7,
-    StartTs: BASE,
-    EndTs: BASE + HOUR,
-    PeakTs: BASE,
-    PeakNumBids: 10,
-    TotalBids: 14,
-    BucketCount: 2,
-  },
-  {
-    Index: 12,
-    StartTs: BASE + 10 * HOUR,
-    EndTs: BASE + 11 * HOUR,
-    PeakTs: BASE + 10 * HOUR,
-    PeakNumBids: 30,
-    TotalBids: 42,
-    BucketCount: 2,
-  },
+const spike = (index: number, peakTs: number, peak: number): BidSpike => ({
+  Index: index,
+  StartTs: peakTs - HOUR,
+  EndTs: peakTs + HOUR,
+  PeakTs: peakTs,
+  PeakNumBids: peak,
+  TotalBids: peak + 5,
+  BucketCount: 3,
+});
+
+const spikes = [
+  spike(0, AUG_12 + 9 * HOUR, 34),
+  spike(1, AUG_12 + 15 * HOUR, 20),
+  spike(2, AUG_12 + 20 * 86_400, 12),
 ];
 
-function okQuery<T>(data: T) {
-  return { data, isLoading: false, isError: false, refetch: jest.fn() };
-}
+const ok = <T,>(data: T) => ({ data, isLoading: false, isError: false, refetch: jest.fn() });
 
 beforeEach(() => {
   jest.clearAllMocks();
-  mockUseBidTimeBounds.mockReturnValue(okQuery({ MinTs: BASE - HOUR, MaxTs: BASE + 20 * HOUR }));
-  mockUseBiddingActivity.mockReturnValue(okQuery({ Spikes: spikes, RecentSpikeIndex: 1 }));
-  mockUseBidFrequency.mockReturnValue(okQuery([{ BucketTs: BASE, NumBids: 10 }]));
+  mockUseBidTimeBounds.mockReturnValue(ok({ MinTs: AUG_12 - 86_400, MaxTs: NOW_SEC }));
+  mockUseBiddingActivity.mockReturnValue(ok({ Spikes: spikes, RecentSpikeIndex: -1 }));
+  mockUseBidFrequency.mockReturnValue(
+    ok([
+      { BucketTs: AUG_12 + 19 * 86_400, NumBids: 2 },
+      { BucketTs: AUG_12 + 20 * 86_400, NumBids: 12 },
+    ]),
+  );
 });
 
-describe('LastBidSpikeChart spike selection', () => {
-  it('selects spikes by array position even when backend Index values differ (regression)', async () => {
+describe('defaultSpikeIndex', () => {
+  it('prefers the recent spike, else the latest by start', () => {
+    expect(defaultSpikeIndex(spikes, 1)).toBe(1);
+    expect(defaultSpikeIndex(spikes, -1)).toBe(2);
+    expect(defaultSpikeIndex([], -1)).toBeNull();
+  });
+});
+
+describe('LastBidSpikeChart', () => {
+  it('opens on the latest spike when none is recent, never on an empty frame', () => {
+    render(<LastBidSpikeChart label="Gesture spikes" />);
+    expect(screen.getByRole('radio', { checked: true })).toHaveAccessibleName(
+      /^Spike on Sep 1, 2026/,
+    );
+    expect(screen.getByTestId('bar-chart')).toHaveAttribute('data-point-count', '2');
+    expect(screen.getByText('No spikes recently.')).toBeInTheDocument();
+  });
+
+  it('names each spike by its date, and every one by its hour when two share a day', () => {
+    render(<LastBidSpikeChart label="Gesture spikes" />);
+    const names = screen.getAllByRole('radio').map((el) => el.closest('label')?.textContent);
+    // Regression: "Sep 1" sat beside "Aug 12 09:00" in a second format.
+    expect(names).toEqual(['Aug 12 09:00', 'Aug 12 15:00', 'Sep 1 00:00']);
+    expect(screen.getByRole('radiogroup', { name: /Spikes \(3\)/ })).toBeInTheDocument();
+  });
+
+  it('loads the hours around the spike a reader picks', async () => {
     const user = userEvent.setup();
-    render(<LastBidSpikeChart />);
-
-    // RecentSpikeIndex 1 → second spike selected on load.
-    expect(screen.getByText(/viewing spike #2/i)).toBeInTheDocument();
-
-    await user.click(screen.getByRole('button', { name: '#1' }));
-    expect(screen.getByText(/viewing spike #1/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '#1' })).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByRole('button', { name: '#2' })).toHaveAttribute('aria-pressed', 'false');
+    render(<LastBidSpikeChart label="Gesture spikes" />);
+    await user.click(screen.getByRole('radio', { name: /Aug 12.*09:00/ }));
+    const [from, to] = mockUseBidFrequency.mock.calls.at(-1)!;
+    expect(from as number).toBeLessThan(spikes[0]!.StartTs);
+    expect(to as number).toBeGreaterThan(spikes[0]!.EndTs);
   });
 
-  it('navigates between spikes with prev/next', async () => {
+  it('lists the hours as a table on request', async () => {
     const user = userEvent.setup();
-    render(<LastBidSpikeChart />);
-
-    const prev = screen.getByRole('button', { name: 'Previous spike' });
-    const next = screen.getByRole('button', { name: 'Next spike' });
-
-    // On the most recent spike (#2): next is disabled, prev works.
-    expect(next).toBeDisabled();
-    await user.click(prev);
-    expect(screen.getByText(/viewing spike #1/i)).toBeInTheDocument();
-    expect(prev).toBeDisabled();
-
-    await user.click(next);
-    expect(screen.getByText(/viewing spike #2/i)).toBeInTheDocument();
+    render(<LastBidSpikeChart label="Gesture spikes" />);
+    await user.click(screen.getByRole('button', { name: 'View as table' }));
+    expect(
+      within(screen.getByRole('table', { name: 'Gesture spikes' })).getByText('12'),
+    ).toBeInTheDocument();
   });
 
-  it('shows the spike metadata for the selected spike', () => {
-    render(<LastBidSpikeChart />);
-    expect(screen.getByText(/peak 30 gestures\/hr/i)).toBeInTheDocument();
+  it('says there are no spikes when the history has none', () => {
+    mockUseBiddingActivity.mockReturnValue(ok({ Spikes: [], RecentSpikeIndex: -1 }));
+    render(<LastBidSpikeChart label="Gesture spikes" />);
+    expect(screen.getByText('No gesture spikes detected in indexed history.')).toBeInTheDocument();
   });
 
-  it('shows an empty state when no spikes are detected', () => {
-    mockUseBiddingActivity.mockReturnValue(okQuery({ Spikes: [], RecentSpikeIndex: -1 }));
-    render(<LastBidSpikeChart />);
-    expect(screen.getByText(/no gesture spikes detected/i)).toBeInTheDocument();
-  });
-
-  it('shows an error state with retry when spike detection fails', async () => {
-    const user = userEvent.setup();
-    const refetch = jest.fn();
-    mockUseBiddingActivity.mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      isError: true,
-      refetch,
-    });
-    render(<LastBidSpikeChart />);
-    expect(screen.getByText(/failed to load gesture spikes/i)).toBeInTheDocument();
-
-    await user.click(screen.getByRole('button', { name: /try again/i }));
-    expect(refetch).toHaveBeenCalled();
+  it('has no axe violations', async () => {
+    const { container } = render(<LastBidSpikeChart label="Gesture spikes" />);
+    await checkA11y(container);
   });
 });
 // lexicon-allow-end

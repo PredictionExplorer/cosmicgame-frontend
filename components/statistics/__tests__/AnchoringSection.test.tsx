@@ -1,6 +1,6 @@
 import userEvent from '@testing-library/user-event';
 
-import { fireEvent, render, screen, checkA11y } from '@/test-utils';
+import { fireEvent, render, screen, checkA11y, within } from '@/test-utils';
 
 import {
   AnchoringSection,
@@ -23,58 +23,6 @@ jest.mock('../../tables/UniqueAnchorHoldersCSTTable', () => ({
 jest.mock('../../tables/UniqueAnchorHoldersRWLKTable', () => ({
   UniqueAnchorHoldersRWLKTable: () => <div data-testid="unique-rwlk-anchorHolders" />,
 }));
-jest.mock('../StatisticsItem', () => ({
-  StatisticsItem: ({
-    title,
-    value,
-    tooltip,
-  }: {
-    title: string;
-    value: React.ReactNode;
-    tooltip?: string;
-  }) => (
-    <div data-testid="statistics-item">
-      <span>{title}</span>
-      <span>{typeof value === 'number' ? String(value) : value}</span>
-      {tooltip && <span data-testid="anchoring-tooltip">{tooltip}</span>}
-    </div>
-  ),
-}));
-jest.mock('../StatisticsGroup', () => ({
-  StatisticsGroup: ({
-    title,
-    children,
-    tooltip,
-  }: {
-    title: string;
-    children: React.ReactNode;
-    tooltip?: string;
-  }) => (
-    <div data-testid="statistics-group">
-      <span>{title}</span>
-      {tooltip && <span data-testid="group-tooltip">{tooltip}</span>}
-      {children}
-    </div>
-  ),
-}));
-jest.mock('../CollapsibleSection', () => ({
-  CollapsibleSection: ({
-    title,
-    children,
-    tooltip,
-  }: {
-    title: string;
-    children: React.ReactNode;
-    tooltip?: string;
-  }) => (
-    <div data-testid="collapsible-section">
-      <span>{title}</span>
-      {tooltip && <span data-testid="section-tooltip">{tooltip}</span>}
-      {children}
-    </div>
-  ),
-}));
-
 function dataState<T>(data: T[] = [], overrides: Partial<AnchoringDataState<T>> = {}) {
   return { data, isLoading: false, isError: false, onRetry: jest.fn(), ...overrides };
 }
@@ -102,6 +50,14 @@ const defaultProps: AnchoringSectionProps = {
 
 type AnchorActionRecord = NonNullable<AnchoringSectionProps['cstAnchorActions']['data']>[number];
 
+/** The figure values of a tab's overview row (its first description list). */
+function overviewValues(panel: HTMLElement) {
+  const row = panel.querySelector('dl')!;
+  return within(row)
+    .getAllByRole('definition')
+    .map((figure) => figure.textContent);
+}
+
 const createAnchorAction = (overrides = {}): AnchorActionRecord =>
   ({
     EvtLogId: 1,
@@ -117,48 +73,69 @@ const createAnchorAction = (overrides = {}): AnchorActionRecord =>
 beforeEach(() => jest.clearAllMocks());
 
 describe('AnchoringSection', () => {
-  it('renders Cosmic Signature NFT anchoring stats', () => {
+  it('shows the Cosmic Signature overview as one figure row, grouped', () => {
     render(<AnchoringSection {...defaultProps} />);
-    expect(screen.getByText('10')).toBeInTheDocument();
-    expect(screen.getByText('50')).toBeInTheDocument();
+    const panel = screen.getByRole('tabpanel', { name: 'Cosmic Signature NFT' });
+    expect(overviewValues(panel)).toEqual([
+      '10',
+      '50',
+      '5',
+      expect.stringContaining('1.5'),
+      expect.stringContaining('0.3'),
+    ]);
   });
 
-  it('wraps CST stats in a StatisticsGroup', () => {
-    render(<AnchoringSection {...defaultProps} />);
-    expect(screen.getByText('Cosmic Signature NFT Anchoring Overview')).toBeInTheDocument();
+  it('shows an unread figure as unavailable, never as 0', () => {
+    render(
+      <AnchoringSection
+        {...defaultProps}
+        cstStats={{ NumActiveStakers: 10, TotalTokensStaked: 50 }}
+      />,
+    );
+    const panel = screen.getByRole('tabpanel', { name: 'Cosmic Signature NFT' });
+    // Deposits and both amounts were not read: the unknown dash, not a zero.
+    expect(overviewValues(panel)).toEqual([
+      '10',
+      '50',
+      '—common.status.unavailable',
+      '—common.status.unavailable',
+      '—common.status.unavailable',
+    ]);
   });
 
-  it('wraps tables in CollapsibleSections', () => {
+  it('keeps the figure definitions in one disclosure instead of an icon per label', () => {
     render(<AnchoringSection {...defaultProps} />);
-    const collapsible = screen.getAllByTestId('collapsible-section');
-    expect(collapsible.length).toBeGreaterThanOrEqual(3);
+    const panel = screen.getByRole('tabpanel', { name: 'Cosmic Signature NFT' });
+    const disclosure = within(panel).getByText('Definitions').closest('details')!;
+    expect(disclosure).not.toHaveAttribute('open');
+    expect(within(disclosure).getAllByRole('term')).toHaveLength(5);
+  });
+
+  it('gives each ledger its own H2 section', () => {
+    render(<AnchoringSection {...defaultProps} />);
+    const panel = screen.getByRole('tabpanel', { name: 'Cosmic Signature NFT' });
+    expect(
+      within(panel)
+        .getAllByRole('heading', { level: 2 })
+        .map((heading) => heading.textContent),
+    ).toEqual(['Anchor / release actions', 'Anchored tokens', 'Unique anchor-holders']);
   });
 
   it('renders anchor-action table for CST', () => {
     render(
       <AnchoringSection {...defaultProps} cstAnchorActions={dataState([createAnchorAction()])} />,
     );
-    expect(
-      screen.getAllByText('anchoring.tables.globalAnchorActions.headers.anchorDatetime.desktop')
-        .length,
-    ).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('anchoring.common.anchor').length).toBeGreaterThanOrEqual(1);
-  });
-
-  it('navigates from a CST anchor-action row', () => {
-    render(
-      <AnchoringSection {...defaultProps} cstAnchorActions={dataState([createAnchorAction()])} />,
-    );
-    const row = screen.getAllByText('anchoring.common.anchor')[0]!.closest('tr');
-    fireEvent.click(row!);
-    expect(mockPush).toHaveBeenCalledWith('/anchor-action/0/10');
   });
 
   it('shows a loading skeleton while anchor actions load', () => {
     render(
       <AnchoringSection {...defaultProps} cstAnchorActions={dataState([], { isLoading: true })} />,
     );
-    expect(screen.getAllByTestId('stats-section-skeleton').length).toBeGreaterThan(0);
+    const section = screen
+      .getByRole('heading', { name: 'Anchor / release actions' })
+      .closest('section');
+    expect(section).toHaveAttribute('aria-busy', 'true');
   });
 
   it('shows an error state with retry when anchor actions fail', () => {
@@ -179,19 +156,13 @@ describe('AnchoringSection', () => {
     expect(screen.getAllByText('No anchor actions yet').length).toBeGreaterThan(0);
   });
 
-  it('renders tab triggers', () => {
+  it('switches collections with named underline tabs', async () => {
+    const user = userEvent.setup();
     render(<AnchoringSection {...defaultProps} />);
-    const cstTab = screen.getByRole('tab', { name: 'Cosmic Signature NFT' });
-    const rwlkTab = screen.getByRole('tab', { name: 'Random Walk NFT' });
-    expect(cstTab).toHaveClass('whitespace-normal');
-    expect(rwlkTab).toHaveClass('whitespace-normal');
-    expect(screen.getByRole('tablist')).toHaveClass('flex-wrap');
-  });
-
-  it('renders tooltips on anchoring metrics', () => {
-    render(<AnchoringSection {...defaultProps} />);
-    const tooltips = screen.getAllByTestId('anchoring-tooltip');
-    expect(tooltips.length).toBeGreaterThan(0);
+    expect(screen.getByRole('tablist', { name: 'NFT collection' })).toBeInTheDocument();
+    await user.click(screen.getByRole('tab', { name: 'Random Walk NFT' }));
+    const panel = screen.getByRole('tabpanel', { name: 'Random Walk NFT' });
+    expect(overviewValues(panel)).toEqual(['3', '8', '20']);
   });
 
   it('explains imprinted-token anchoring counters', async () => {
@@ -205,27 +176,11 @@ describe('AnchoringSection', () => {
     ).toBeInTheDocument();
   });
 
-  it('explains anchoring overview groups', () => {
+  it('explains the ledgers once each, beside their titles', () => {
     render(<AnchoringSection {...defaultProps} />);
     expect(
-      screen.getByText(
-        'Cosmic Signature NFT anchoring shares ETH Anchor Distributions among currently anchored Cosmic Signature NFTs.',
-      ),
+      screen.getByRole('button', { name: /more information about anchor \/ release actions/i }),
     ).toBeInTheDocument();
-  });
-
-  it('explains anchoring drill-down collapsibles', () => {
-    render(<AnchoringSection {...defaultProps} />);
-    expect(
-      screen.getAllByText('Chronological anchor and release actions for the selected NFT type.')
-        .length,
-    ).toBeGreaterThan(0);
-    expect(
-      screen.getAllByText('Tokens currently anchored in the selected anchoring wallet.').length,
-    ).toBeGreaterThan(0);
-    expect(
-      screen.getAllByText('Wallets that have anchored or released the selected NFT type.').length,
-    ).toBeGreaterThan(0);
   });
 
   it('has no accessibility violations', async () => {

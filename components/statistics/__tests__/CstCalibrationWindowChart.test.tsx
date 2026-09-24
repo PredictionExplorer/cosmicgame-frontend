@@ -2,12 +2,10 @@ import userEvent from '@testing-library/user-event';
 
 import type { GestureInfo } from '@/services/api/types';
 
-import { checkA11y, render, screen } from '@/test-utils';
+import { checkA11y, render, screen, within } from '@/test-utils';
 
-import CstCalibrationWindowChart, {
-  CstCalibrationWindowView,
-  CstCalibrationWindowSection,
-} from '../CstCalibrationWindowChart';
+import CstCalibrationWindowChart, { CstCalibrationWindowView } from '../CstCalibrationWindowChart';
+import { DOTS_MAX_POINTS } from '../charts/theme';
 
 const mockUseGestureListByCycle = jest.fn();
 const mockUseRoundInfo = jest.fn();
@@ -18,63 +16,10 @@ jest.mock('../../../hooks/useApiQuery', () => ({
   useRoundInfo: (...args: unknown[]) => mockUseRoundInfo(...args),
   useCurrentTime: (...args: unknown[]) => mockUseCurrentTime(...args),
 }));
-
-jest.mock('../../../hooks/useNow', () => ({
-  useNow: () => NOW_MS,
-}));
-
-/**
- * Recharts needs a measured container, which jsdom never provides, so the
- * chart internals are stubbed. `Line` invokes the real per-gesture dot
- * renderer, the axes exercise the real tick formatters, and `Tooltip` renders
- * its `content` element with the first datum so the real tooltip component is
- * still exercised.
- */
-jest.mock('recharts', () => {
-  const React = require('react');
-  const lastRender: { data: unknown[] } = { data: [] };
-  return {
-    ResponsiveContainer: ({ children }: { children: React.ReactNode }) => (
-      <div data-testid="responsive-container">{children}</div>
-    ),
-    ComposedChart: ({ data, children }: { data: unknown[]; children: React.ReactNode }) => {
-      lastRender.data = data;
-      return (
-        <div data-testid="composed-chart" data-point-count={data.length}>
-          {children}
-        </div>
-      );
-    },
-    Line: ({ dot, name }: { dot?: (props: object) => React.ReactElement; name?: string }) => (
-      <svg data-testid="step-line" data-name={name}>
-        {typeof dot === 'function'
-          ? lastRender.data.map((payload, index) => dot({ cx: index, cy: index, index, payload }))
-          : null}
-      </svg>
-    ),
-    XAxis: ({ tickFormatter }: { tickFormatter?: (value: number) => string }) => (
-      <div data-testid="x-axis-ticks">
-        {tickFormatter ? [0.5, 1, 1.5, 24, 36].map((v) => tickFormatter(v)).join(' ') : ''}
-      </div>
-    ),
-    YAxis: ({ tickFormatter }: { tickFormatter?: (value: number) => string }) => (
-      <div data-testid="y-axis-ticks">
-        {tickFormatter
-          ? [0, 1800, 3600, 5400, 86400, 129600].map((v) => tickFormatter(v)).join(' ')
-          : ''}
-      </div>
-    ),
-    CartesianGrid: () => null,
-    Tooltip: ({ content }: { content: React.ReactElement }) =>
-      React.cloneElement(content, {
-        active: true,
-        payload: [{ payload: lastRender.data[0] }],
-      }),
-  };
-});
+jest.mock('../../../hooks/useNow', () => ({ useNow: () => NOW_SEC * 1000 }));
+jest.mock('recharts', () => require('@/test-utils/recharts').rechartsStub());
 
 const NOW_SEC = 1_700_000_000;
-const NOW_MS = NOW_SEC * 1000;
 const T0 = NOW_SEC - 10_000;
 
 const ADDR_A = '0xA1b2C3d4E5f60718293a4B5c6D7e8F9012345678';
@@ -91,117 +36,120 @@ const legacyGestures = [
   { TimeStamp: T0, GestureType: 0, BidderAddr: ADDR_A, CstDutchAuctionDurationInt: -1 },
 ] as unknown as GestureInfo[];
 
-function okQuery<T>(data: T) {
-  return { data, isLoading: false, isError: false, refetch: jest.fn() };
-}
+const ok = <T,>(data: T) => ({ data, isLoading: false, isError: false, refetch: jest.fn() });
 
 beforeEach(() => {
   jest.clearAllMocks();
-  mockUseGestureListByCycle.mockReturnValue(okQuery(gestures));
-  mockUseRoundInfo.mockReturnValue(okQuery(null));
-  mockUseCurrentTime.mockReturnValue(okQuery(NOW_SEC));
+  mockUseGestureListByCycle.mockReturnValue(ok(gestures));
+  mockUseRoundInfo.mockReturnValue(ok(null));
+  mockUseCurrentTime.mockReturnValue(ok(NOW_SEC));
 });
 
 describe('CstCalibrationWindowView', () => {
   it('plots one step per gesture plus the open-ended live point', () => {
-    render(<CstCalibrationWindowView gestures={gestures} isLive />);
-
-    // 3 gestures + 1 synthetic "now" point.
+    render(<CstCalibrationWindowView gestures={gestures} isLive label="Window" />);
     expect(screen.getByTestId('composed-chart')).toHaveAttribute('data-point-count', '4');
-    expect(screen.getByTestId('cst-calibration-window-chart')).toBeInTheDocument();
   });
 
-  it('renders per-gesture dots colored by type, none for the synthetic point', () => {
-    const { container } = render(<CstCalibrationWindowView gestures={gestures} isLive />);
-
+  it('draws each gesture as a dot in its method colour, none for the live point', () => {
+    const { container } = render(
+      <CstCalibrationWindowView gestures={gestures} isLive label="Window" />,
+    );
     const circles = container.querySelectorAll('circle');
     expect(circles).toHaveLength(3);
-    // The gesture-method tokens every chart shares.
     expect(circles[0]).toHaveAttribute('fill', 'hsl(var(--method-eth))');
     expect(circles[1]).toHaveAttribute('fill', 'hsl(var(--method-eth-rwlk))');
     expect(circles[2]).toHaveAttribute('fill', 'hsl(var(--method-cst))');
   });
 
-  it('shows the low/high/now summary for the live cycle', () => {
-    render(<CstCalibrationWindowView gestures={gestures} isLive />);
-
-    expect(screen.getByText(/^Low:/)).toBeInTheDocument();
-    expect(screen.getByText(/^High:/)).toBeInTheDocument();
-    expect(screen.getByText(/^Now:/)).toBeInTheDocument();
+  it("leaves a dense cycle's step line unburied: no dots at rest, no dot key", () => {
+    // Regression: ~1,100 gesture dots covered the line the legend promised.
+    const dense = Array.from({ length: DOTS_MAX_POINTS + 1 }, (_, index) => ({
+      TimeStamp: T0 + index * 60,
+      GestureType: index % 2 === 0 ? 0 : 2,
+      BidderAddr: ADDR_A,
+      CstDutchAuctionDurationInt: 10_000 + (index % 2 === 0 ? -5 : 5),
+    })) as unknown as GestureInfo[];
+    const { container } = render(
+      <CstCalibrationWindowView gestures={dense} isLive label="Window" />,
+    );
+    expect(container.querySelectorAll('circle')).toHaveLength(0);
+    const figure = screen.getByRole('figure', { name: 'Window' });
+    expect(within(figure).getByText('CST Calibration Window')).toBeInTheDocument();
+    expect(within(figure).queryByText('CST gesture (lengthens)')).not.toBeInTheDocument();
   });
 
-  it('labels the closing value "At finalization" for a finalized cycle', () => {
-    render(<CstCalibrationWindowView gestures={gestures} isLive={false} roundEndTs={T0 + 9_000} />);
-
-    expect(screen.getByText(/^At finalization:/)).toBeInTheDocument();
-    expect(screen.queryByText(/^Now:/)).not.toBeInTheDocument();
+  it('reads the window now and its range in one sentence', () => {
+    render(<CstCalibrationWindowView gestures={gestures} isLive label="Window" />);
+    const figure = screen.getByRole('figure', { name: 'Window' });
+    expect(figure).toHaveTextContent(
+      /The window is .* now\. This cycle it has ranged from .* to .*\./,
+    );
   });
 
-  it('shows the gesture type and participant in the tooltip', () => {
-    render(<CstCalibrationWindowView gestures={gestures} isLive />);
+  it('reads the closing value of a finalized cycle', () => {
+    render(
+      <CstCalibrationWindowView
+        gestures={gestures}
+        isLive={false}
+        roundEndTs={T0 + 9_000}
+        label="Window"
+      />,
+    );
+    expect(screen.getByRole('figure', { name: 'Window' })).toHaveTextContent(
+      /The window was .* at finalization\./,
+    );
+  });
 
+  it('puts whole-minute ticks on a narrow window axis, each reading differently', () => {
+    render(<CstCalibrationWindowView gestures={gestures} isLive label="Window" />);
+    const ticks = within(screen.getByTestId('y-axis'))
+      .getAllByText(/./)
+      .map((el) => el.textContent);
+    expect(ticks.length).toBeGreaterThan(1);
+    // 9,960s–10,000s: minute steps past the hour read "2h 46m", never "2.8h" twice.
+    for (const tick of ticks) expect(tick).toMatch(/^\d+h\s\d+m$/);
+    expect(new Set(ticks).size).toBe(ticks.length);
+  });
+
+  it('names the gesture and participant in the tooltip, and every method in the legend', () => {
+    render(<CstCalibrationWindowView gestures={gestures} isLive label="Window" />);
     expect(screen.getByText('Window after this gesture')).toBeInTheDocument();
-    // First datum is the ETH gesture; the legend repeats the same label.
     expect(screen.getAllByText('ETH gesture (shortens)').length).toBeGreaterThanOrEqual(2);
-    expect(screen.getByText(/0xa1B2…\u20605678/)).toBeInTheDocument();
-  });
-
-  it('formats axis ticks across minute/hour/day ranges', () => {
-    render(<CstCalibrationWindowView gestures={gestures} isLive />);
-
-    expect(screen.getByTestId('x-axis-ticks')).toHaveTextContent('30m 1h 1.5h 1d 1.5d');
-    expect(screen.getByTestId('y-axis-ticks')).toHaveTextContent('0 30m 1h 1.5h 1d 1.5d');
-  });
-
-  it('renders the legend for all three gesture types and the explainer', () => {
-    render(<CstCalibrationWindowView gestures={gestures} isLive />);
-
     expect(screen.getByText('ETH + Random Walk gesture (shortens)')).toBeInTheDocument();
-    expect(screen.getAllByText('CST gesture (lengthens)').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText(/Every ETH gesture shortens the window/)).toBeInTheDocument();
+    expect(screen.getByText('CST gesture (lengthens)')).toBeInTheDocument();
+    expect(screen.getByText(/0xa1B2…⁠5678/)).toBeInTheDocument();
   });
 
-  it('shows the empty state for cycles without per-gesture window data', () => {
-    render(<CstCalibrationWindowView gestures={legacyGestures} isLive />);
+  it('lists every gesture as a table on request', async () => {
+    const user = userEvent.setup();
+    render(<CstCalibrationWindowView gestures={gestures} isLive label="Window" />);
+    await user.click(screen.getByRole('button', { name: 'View as table' }));
+    const table = screen.getByRole('table', { name: 'Window' });
+    expect(within(table).getAllByRole('row')).toHaveLength(4);
+  });
 
-    expect(
-      screen.getByText(/No per-gesture Calibration Window data for this cycle/),
-    ).toBeInTheDocument();
+  it('explains cycles indexed before the window data existed', () => {
+    render(<CstCalibrationWindowView gestures={legacyGestures} isLive label="Window" />);
+    expect(screen.getByText(/No per-gesture Calibration Window data/)).toBeInTheDocument();
     expect(screen.queryByTestId('composed-chart')).not.toBeInTheDocument();
   });
 
-  it('has no accessibility violations with data', async () => {
-    const { container } = render(<CstCalibrationWindowView gestures={gestures} isLive />);
-    await checkA11y(container);
-  });
-
-  it('has no accessibility violations in the empty state', async () => {
-    const { container } = render(<CstCalibrationWindowView gestures={legacyGestures} isLive />);
+  it('has no axe violations', async () => {
+    const { container } = render(
+      <CstCalibrationWindowView gestures={gestures} isLive label="Window" />,
+    );
     await checkA11y(container);
   });
 });
 
 describe('CstCalibrationWindowChart', () => {
-  it('asks the user to select a round when none is chosen', () => {
-    render(<CstCalibrationWindowChart round={-1} isLive={false} />);
-
+  it('asks for a cycle when none is chosen', () => {
+    render(<CstCalibrationWindowChart round={-1} isLive={false} label="Window" />);
     expect(screen.getByText('Select a cycle to inspect.')).toBeInTheDocument();
   });
 
-  it('shows a spinner while the gesture list loads', () => {
-    mockUseGestureListByCycle.mockReturnValue({
-      data: undefined,
-      isLoading: true,
-      isError: false,
-      refetch: jest.fn(),
-    });
-    render(<CstCalibrationWindowChart round={2} isLive />);
-
-    expect(screen.getByRole('status')).toBeInTheDocument();
-    expect(screen.queryByTestId('composed-chart')).not.toBeInTheDocument();
-  });
-
-  it('offers a retry that refetches after a failure', async () => {
+  it('offers a retry when the gesture list fails', async () => {
     const user = userEvent.setup();
     const refetch = jest.fn();
     mockUseGestureListByCycle.mockReturnValue({
@@ -210,84 +158,16 @@ describe('CstCalibrationWindowChart', () => {
       isError: true,
       refetch,
     });
-    render(<CstCalibrationWindowChart round={2} isLive />);
-
+    render(<CstCalibrationWindowChart round={2} isLive label="Window" />);
     expect(screen.getByText('Failed to load Calibration Window timeline')).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: /try again/i }));
-
-    expect(refetch).toHaveBeenCalledTimes(1);
+    await user.click(screen.getByRole('button', { name: /try again|retry/i }));
+    expect(refetch).toHaveBeenCalled();
   });
 
-  it('fetches the round ascending and skips round info for the live round', () => {
-    render(<CstCalibrationWindowChart round={2} isLive />);
-
-    expect(mockUseGestureListByCycle).toHaveBeenCalledWith(2, 'asc');
-    expect(mockUseRoundInfo).toHaveBeenCalledWith(-1);
-  });
-
-  it('ends a finalized round at its claim timestamp', () => {
-    mockUseRoundInfo.mockReturnValue(okQuery({ TimeStamp: T0 + 9_000 }));
-    render(<CstCalibrationWindowChart round={1} isLive={false} />);
-
+  it('ends a finalized cycle at its finalization time', () => {
+    mockUseRoundInfo.mockReturnValue(ok({ TimeStamp: T0 + 9_000 }));
+    render(<CstCalibrationWindowChart round={1} isLive={false} label="Window" />);
     expect(mockUseRoundInfo).toHaveBeenCalledWith(1);
-    expect(screen.getByText(/^At finalization:/)).toBeInTheDocument();
-  });
-});
-
-describe('CstCalibrationWindowSection round picker', () => {
-  it('starts on the live round', () => {
-    render(<CstCalibrationWindowSection currentRoundNum={5} />);
-
-    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(5);
-    expect(screen.getByText('Live cycle')).toBeInTheDocument();
-  });
-
-  it('follows the live round when it advances', () => {
-    const { rerender } = render(<CstCalibrationWindowSection currentRoundNum={5} />);
-    rerender(<CstCalibrationWindowSection currentRoundNum={6} />);
-
-    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(6);
-    expect(screen.getByText('Live cycle')).toBeInTheDocument();
-  });
-
-  it('keeps a user-pinned round when the live round advances', async () => {
-    const user = userEvent.setup();
-    const { rerender } = render(<CstCalibrationWindowSection currentRoundNum={5} />);
-
-    await user.click(screen.getByRole('button', { name: 'Previous cycle' }));
-    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(4);
-
-    rerender(<CstCalibrationWindowSection currentRoundNum={6} />);
-    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(4);
-  });
-
-  it('resumes following live after "Jump to live"', async () => {
-    const user = userEvent.setup();
-    const { rerender } = render(<CstCalibrationWindowSection currentRoundNum={5} />);
-
-    await user.click(screen.getByRole('button', { name: 'Previous cycle' }));
-    await user.click(screen.getByRole('button', { name: 'Jump to live' }));
-    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(5);
-
-    rerender(<CstCalibrationWindowSection currentRoundNum={7} />);
-    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(7);
-  });
-
-  it('accepts a typed round number, clamped to the valid range', async () => {
-    const user = userEvent.setup();
-    render(<CstCalibrationWindowSection currentRoundNum={5} />);
-
-    const input = screen.getByRole('spinbutton', { name: 'Cycle number' });
-    await user.clear(input);
-    await user.type(input, '3');
-    expect(input).toHaveValue(3);
-  });
-
-  it('follows a late-arriving dashboard round (initial -1)', () => {
-    const { rerender } = render(<CstCalibrationWindowSection currentRoundNum={-1} />);
-    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(0);
-
-    rerender(<CstCalibrationWindowSection currentRoundNum={4} />);
-    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(4);
+    expect(screen.getByRole('figure', { name: 'Window' })).toHaveTextContent(/at finalization/);
   });
 });

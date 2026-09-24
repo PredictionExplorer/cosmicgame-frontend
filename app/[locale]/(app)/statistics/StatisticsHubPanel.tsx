@@ -1,366 +1,362 @@
 'use client';
 
-import { ArrowRight, Lock } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
+import type { ReactNode } from 'react';
+import { ArrowRight } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
-import { formatCSTValue, formatCount, formatEthValue } from '@/utils';
-
-import { AllocationIcon, CstTokenIcon, PublicGoodsIcon } from '@/lib/conceptIcons';
 import { Link } from '@/i18n/navigation';
+import { cn } from '@/lib/utils';
+import { toFiniteNumber } from '@/utils/finiteNumber';
+import { formatAmount, formatTimeZoneLabel } from '@/utils/format';
+import { useFormat } from '@/hooks/useFormat';
 import { useCTStatistics, useDashboardInfo } from '@/hooks/useApiQuery';
-import { Surface } from '@/components/ui/surface';
-import { SectionDivider } from '@/components/ui/section-divider';
-import { SkeletonStatCard } from '@/components/ui/skeleton';
+import type { DashboardInfo } from '@/services/api/types';
+import { Amount } from '@/components/ui/amount';
+import { DateTime } from '@/components/ui/date-time';
 import { ErrorState } from '@/components/ui/error-state';
-import { StatisticsItem } from '@/components/statistics/StatisticsItem';
+import { LiveStatus } from '@/components/ui/live-status';
+import { SkeletonDetailRows, SkeletonTable } from '@/components/ui/skeleton';
+import { UnknownValue } from '@/components/ui/unknown-value';
+import { SectionShell } from '@/components/statistics/SectionShell';
 import { StatisticsGroup } from '@/components/statistics/StatisticsGroup';
+import { StatisticsItem } from '@/components/statistics/StatisticsItem';
+import { DefinitionsDisclosure } from '@/components/statistics/DefinitionsDisclosure';
+import { ReserveSplit } from '@/components/statistics/ReserveSplit';
 
+import { CycleRhythm } from './CycleRhythm';
 import { STATISTICS_SECTIONS, type StatisticsSectionDef } from './statistics-sections';
 
+type SectionKey = StatisticsSectionDef['messageKey'];
+
 /**
- * A section page's card: what the page covers, as a link. It carries no
- * figure — the hub's headline figures are the header's, each shown once.
+ * One row of the section index: the page's name over what it covers, its
+ * key figure on the right, and an arrow. The whole row is the link; rows are
+ * divided by hairlines like a ledger, with the same inset as a table cell.
+ * On a phone the figure moves under the description.
  */
-function ExploreCard({ section }: { section: StatisticsSectionDef }) {
+function SectionEntry({ section, figure }: { section: StatisticsSectionDef; figure: ReactNode }) {
   const t = useTranslations('statistics');
-  const Icon = section.icon;
   return (
-    <Surface asChild variant="glass-bordered" radius="lg" padding="none" interactive>
-      <Link href={section.href} className="group block no-underline">
-        <div className="flex h-full flex-col p-5">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5">
-              <span
-                aria-hidden
-                className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/10 text-primary"
-              >
-                <Icon className="h-4 w-4" />
-              </span>
-              <h3 className="text-base font-semibold text-white">
-                {t(`navigation.${section.messageKey}.label`)}
-              </h3>
-            </div>
-            <ArrowRight
-              aria-hidden
-              className="h-4 w-4 shrink-0 text-primary transition-transform group-hover:translate-x-0.5"
-            />
-          </div>
-          <p className="mt-3 flex-1 text-sm leading-6 text-muted-foreground">
-            {t(`navigation.${section.messageKey}.description`)}
-          </p>
-        </div>
+    <li className="border-b border-rule-faint">
+      <Link
+        href={section.href}
+        className={cn(
+          'group grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6 gap-y-1.5 px-4 py-4 no-underline sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:py-5',
+          'focus-ring-inset transition-colors duration-fast hover:bg-surface',
+        )}
+      >
+        <span className="col-start-1 row-start-1 min-w-0">
+          <span className="block type-title text-foreground">
+            {t(`navigation.${section.messageKey}.label`)}
+          </span>
+          <span className="mt-0.5 block type-body-sm text-muted-foreground">
+            {t(`hub.index.${section.messageKey}`)}
+          </span>
+        </span>
+        <span className="col-start-1 row-start-2 type-figure-sm text-foreground sm:col-start-2 sm:row-start-1 sm:text-right">
+          {figure}
+        </span>
+        <ArrowRight
+          aria-hidden
+          className="col-start-2 row-span-2 row-start-1 size-4 shrink-0 text-subtle transition-transform duration-fast group-hover:translate-x-0.5 group-hover:text-foreground motion-reduce:transition-none sm:col-start-3 sm:row-span-1"
+        />
       </Link>
-    </Surface>
+    </li>
   );
 }
 
+/** The dashboard's all-time totals, with the gesture total the typed shape leaves out. */
+type MainStatsWire = DashboardInfo['MainStats'] & { TotalBids?: number };
+
 /**
- * Statistics hub body: links into the section pages and the protocol economy
- * groups. The headline figures (the active cycle and its gestures,
- * allocations distributed, NFTs imprinted, the contract balance) live in the
- * page header (StatisticsSeoSummary), read from the same dashboard query, and
- * the body does not repeat them.
+ * Each section page's key figure for the index, from the dashboard the hub
+ * already reads: a count in words ("37 participants"), or the unknown dash.
+ */
+function sectionFigures(
+  data: DashboardInfo,
+  cstSupply: number | null | undefined,
+  t: ReturnType<typeof useTranslations>,
+  unknown: ReactNode,
+  locale: string,
+): Record<Exclude<SectionKey, 'overview'>, ReactNode> {
+  const main = data.MainStats as MainStatsWire;
+  const count = (key: string, value: unknown) => {
+    const numeric = toFiniteNumber(value);
+    return numeric === null ? unknown : t(`hub.figures.${key}`, { count: numeric });
+  };
+  const cstAnchored = toFiniteNumber(main.StakeStatisticsCST?.TotalTokensStaked);
+  const rwlkAnchored = toFiniteNumber(main.StakeStatisticsRWalk?.TotalTokensStaked);
+  return {
+    participation: count('participants', main.NumUniqueBidders),
+    tokens:
+      cstSupply === undefined
+        ? null
+        : cstSupply === null
+          ? unknown
+          : t('hub.figures.supply', {
+              amount: formatAmount(cstSupply, { unit: 'CST', context: 'hero', locale }),
+            }),
+    anchoring: count(
+      'anchored',
+      cstAnchored === null || rwlkAnchored === null ? null : cstAnchored + rwlkAnchored,
+    ),
+    activity: count('gestures', main.TotalBids),
+    performance: count('cycles', data.CurRoundNum),
+  };
+}
+
+/**
+ * Statistics hub body, under the header's figures (the active cycle and its
+ * gestures, allocations distributed, NFTs imprinted, the contract balance):
+ * this cycle's pulse and where its reserve goes, the section pages as an
+ * index with a key figure each, and the protocol economy as three spec
+ * sheets with one Definitions disclosure. No figure repeats the header.
  */
 const StatisticsHubPanel = () => {
   const t = useTranslations('statistics');
-  const locale = useLocale();
-  const { data: dashboardData, isLoading: dashboardLoading, refetch } = useDashboardInfo();
-  const { data: ctStatisticsData } = useCTStatistics();
+  const tCommon = useTranslations('common');
+  const tFormats = useTranslations('formats');
+  const format = useFormat();
+  const { data, isLoading, isError, refetch } = useDashboardInfo();
+  const ctStatistics = useCTStatistics();
+  const cstSupply = ctStatistics.isLoading
+    ? undefined
+    : toFiniteNumber(ctStatistics.data?.TotalSupplyEth);
 
-  if (dashboardLoading) {
+  if (isLoading) {
     return (
-      <div data-testid="statistics-hub-loading">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <SkeletonStatCard key={i} className="h-48" />
-          ))}
-        </div>
+      <div data-testid="statistics-hub-loading" className="space-y-12">
+        <SkeletonDetailRows rows={3} />
+        <SkeletonTable rows={5} columns={2} />
       </div>
     );
   }
 
-  // A failed background poll keeps the last reading (TanStack sets isError
-  // but keeps data): the error replaces the hub only when nothing ever loaded.
-  if (!dashboardData) {
+  // A failed background poll keeps the last reading (TanStack Query sets
+  // isError but keeps data): the error replaces the hub only when nothing
+  // ever loaded, and a stale reading says so beside the cycle's title.
+  if (!data) {
     return (
       <ErrorState
+        headingLevel={2}
         title={t('hub.loadErrorTitle')}
         message={t('hub.loadErrorMessage')}
         onRetry={() => refetch()}
-        surface
       />
     );
   }
 
-  const data = dashboardData;
-  const cstAnchorStats = data.MainStats.StakeStatisticsCST;
-  const rwlkAnchorStats = data.MainStats.StakeStatisticsRWalk;
+  const main = data.MainStats;
+  const unknown = <UnknownValue label={tCommon('status.unavailable')} />;
+  const figures = sectionFigures(data, cstSupply, t, unknown, format.locale);
+  const eth = (value: unknown) => {
+    const numeric = toFiniteNumber(value);
+    return numeric === null ? unknown : <Amount value={numeric} unit="ETH" />;
+  };
+  const cst = (value: unknown) => {
+    const numeric = toFiniteNumber(value);
+    return numeric === null ? unknown : <Amount value={numeric} unit="CST" />;
+  };
+  const count = (value: unknown) => {
+    const numeric = toFiniteNumber(value);
+    return numeric === null ? unknown : format.count(numeric);
+  };
+  /** A caption that counts records ("8 transactions"), only when the count was read. */
+  const countCaption = (key: string, value: unknown) => {
+    const numeric = toFiniteNumber(value);
+    return numeric === null ? undefined : t(key, { count: numeric });
+  };
+  const opened = toFiniteNumber(data.TsRoundStart);
+  const pendingRecipients = toFiniteNumber(main.NumWinnersWithPendingRaffleWithdrawal) ?? 0;
+  const metric = (key: string) => t(`metrics.${key}.label`);
+  const definition = (key: string) => ({
+    term: t(`metrics.${key}.label`),
+    definition: t(`metrics.${key}.tooltip`),
+  });
 
   return (
-    <div data-testid="statistics-hub">
-      {/* Section explore cards */}
-      <SectionDivider title={t('hub.exploreTitle')} className="mb-6" />
-      <nav aria-label={t('hub.exploreAria')} className="mb-12">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {STATISTICS_SECTIONS.map((section) => (
-            <ExploreCard key={section.slug} section={section} />
-          ))}
-        </div>
-      </nav>
-
-      {/* Link to current cycle */}
-      <Surface
-        asChild
-        variant="aurora"
-        radius="lg"
-        padding="none"
-        interactive
-        className="mb-12 block no-underline"
+    <div data-testid="statistics-hub" className="space-y-12 sm:space-y-16">
+      <SectionShell
+        title={t('hub.cycle.title', { cycle: data.CurRoundNum })}
+        description={isError ? <LiveStatus variant="inline" /> : undefined}
+        actions={
+          <Link
+            href="/current-cycle"
+            className="link-quiet group inline-flex min-h-11 items-center gap-1.5 type-label text-foreground sm:min-h-8"
+          >
+            {t('hub.cycle.open')}
+            <ArrowRight
+              aria-hidden
+              className="size-3.5 text-subtle transition-colors duration-fast group-hover:text-foreground"
+            />
+          </Link>
+        }
       >
-        <Link href="/current-cycle" className="group">
-          <div className="flex items-center justify-between gap-4 p-5">
-            <div>
-              <p className="text-base font-semibold text-white">{t('hub.currentCycleTitle')}</p>
-              <p className="mt-1 text-sm text-muted-foreground">{t('hub.currentCycleSubtitle')}</p>
-            </div>
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[rgb(var(--aurora-cyan-rgb)/0.25)] bg-[rgb(var(--aurora-cyan-rgb)/0.10)]">
-              <ArrowRight
-                aria-hidden
-                className="h-5 w-5 text-primary transition-transform group-hover:translate-x-0.5"
-              />
-            </div>
-          </div>
-          <div
-            aria-hidden
-            className="h-1 bg-gradient-to-r from-[rgb(var(--aurora-cyan-rgb))] via-[rgb(var(--nebula-violet-rgb))] to-[rgb(var(--chrono-rose-rgb))] opacity-70"
-          />
-        </Link>
-      </Surface>
-
-      {/* Protocol economy */}
-      <SectionDivider title={t('hub.protocolEconomyTitle')} className="mb-6" />
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <StatisticsGroup
-          title={t('groups.allocationEconomy.label')}
-          icon={<AllocationIcon className="h-4 w-4" />}
-          accentColor="blue"
-          tooltip={t('groups.allocationEconomy.tooltip')}
-        >
-          <StatisticsItem
-            title={t('metrics.totalSignatureAllocationsDistributed.label')}
-            value={formatEthValue(Number(data.TotalPrizesPaidAmountEth) || 0, locale)}
-            tooltip={t('metrics.totalSignatureAllocationsDistributed.tooltip')}
-          />
-          <StatisticsItem
-            title={t('metrics.stellarSelectionEthDeposited.label')}
-            value={formatEthValue(data.MainStats.TotalRaffleEthDeposits, locale)}
-            tooltip={t('metrics.stellarSelectionEthDeposited.tooltip')}
-          />
-          <StatisticsItem
-            title={t('metrics.stellarSelectionEthRetrieved.label')}
-            value={formatEthValue(data.MainStats.TotalRaffleEthWithdrawn, locale)}
-            tooltip={t('metrics.stellarSelectionEthRetrieved.tooltip')}
-          />
-          <StatisticsItem
-            title={t('metrics.ethInGesturesCurrentCycle.label')}
-            value={formatEthValue(data.CurRoundStats?.TotalEthInBidsEth ?? 0, locale)}
-            tooltip={t('metrics.ethInGesturesCurrentCycle.tooltip')}
-          />
-          {(data.MainStats.NumWinnersWithPendingRaffleWithdrawal ?? 0) > 0 && (
-            <p className="mt-2 text-sm text-primary">
-              {t('hub.pendingStellarRetrievals', {
-                count: formatCount(
-                  data.MainStats.NumWinnersWithPendingRaffleWithdrawal ?? 0,
-                  locale,
-                ),
-                amount: formatEthValue(
-                  data.MainStats.TotalRaffleEthDeposits - data.MainStats.TotalRaffleEthWithdrawn,
-                  locale,
-                ),
-              })}
-            </p>
-          )}
-        </StatisticsGroup>
-
-        <StatisticsGroup
-          title={t('groups.tokenEconomy.label')}
-          icon={<CstTokenIcon className="h-4 w-4" />}
-          accentColor="purple"
-          tooltip={t('groups.tokenEconomy.tooltip')}
-        >
-          <StatisticsItem
-            title={t('metrics.totalSupplyErc20.label')}
-            value={formatCSTValue(ctStatisticsData?.TotalSupplyEth ?? 0, locale)}
-            tooltip={t('metrics.totalSupplyErc20.tooltip')}
-          />
-          <StatisticsItem
-            title={t('metrics.totalCstConsumed.label')}
-            value={formatCSTValue(data.MainStats.TotalCSTConsumedEth, locale)}
-            tooltip={t('metrics.totalCstConsumed.tooltip')}
-          />
-          <StatisticsItem
-            title={t('metrics.cstConsumedCurrentCycle.label')}
-            value={formatCSTValue(data.CurRoundStats?.TotalCstInBidsEth ?? 0, locale)}
-            tooltip={t('metrics.cstConsumedCurrentCycle.tooltip')}
-          />
-          <StatisticsItem
-            title={t('metrics.cstGestures.label')}
-            value={formatCount(data.MainStats.NumBidsCST, locale)}
-            tooltip={t('metrics.cstGestures.tooltip')}
-          />
-          <StatisticsItem
-            title={t('metrics.outreachCstAllocated.label')}
-            value={formatCSTValue(data.MainStats.TotalMktRewardsEth, locale)}
-            tooltip={t('metrics.outreachCstAllocated.tooltip')}
-          />
-          <StatisticsItem
-            title={t('metrics.outreachTransactions.label')}
-            value={
-              <Link className="text-inherit" href="/marketing">
-                {formatCount(data.MainStats.NumMktRewards, locale)}
-              </Link>
-            }
-            tooltip={t('metrics.outreachTransactions.tooltip')}
-          />
-          <StatisticsItem
-            title={t('metrics.randomWalkNftsUsed.label')}
-            value={
-              <Link className="text-inherit" href="/used-rwlk-nfts">
-                {formatCount(Number(data.NumRwalkTokensUsed), locale)}
-              </Link>
-            }
-            tooltip={t('metrics.randomWalkNftsUsed.tooltip')}
-          />
-          <StatisticsItem
-            title={t('metrics.namedTokens.label')}
-            value={
-              <Link className="text-inherit" href="/named-nfts">
-                {formatCount(data.MainStats.TotalNamedTokens, locale)}
-              </Link>
-            }
-            tooltip={t('metrics.namedTokens.tooltip')}
-          />
-        </StatisticsGroup>
-
-        <StatisticsGroup
-          title={t('groups.publicGoods.label')}
-          icon={<PublicGoodsIcon className="h-4 w-4" />}
-          accentColor="emerald"
-          tooltip={t('groups.publicGoods.tooltip')}
-        >
-          <StatisticsItem
-            title={t('metrics.publicGoodsBalance.label')}
-            value={formatEthValue(Number(data.CharityBalanceEth) || 0, locale)}
-            tooltip={t('metrics.publicGoodsBalance.tooltip')}
-          />
-          <StatisticsItem
-            title={t('metrics.attachedNfts.label')}
-            value={
-              <Link className="text-inherit" href="/attached-nfts">
-                {formatCount(Number(data.NumDonatedNFTs), locale)}
-              </Link>
-            }
-            tooltip={t('metrics.attachedNfts.tooltip')}
-          />
-          <StatisticsItem
-            title={t('metrics.totalContributedEth.label')}
-            value={
-              <Link
-                className="text-inherit"
-                href="/eth-contribution"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {formatEthValue(data.MainStats.TotalEthDonatedAmountEth ?? 0, locale)}
-              </Link>
-            }
-            tooltip={t('metrics.totalContributedEth.tooltip')}
-          />
-          {(data.MainStats.NumCosmicGameDonations ?? 0) > 0 && (
-            <>
-              <StatisticsItem
-                title={t('metrics.protocolContributions.label')}
-                value={
-                  <Link className="text-inherit" href="/public-goods-contributions-cg">
-                    {formatCount(data.MainStats.NumCosmicGameDonations, locale)}
-                  </Link>
-                }
-                tooltip={t('metrics.protocolContributions.tooltip')}
-              />
-              <StatisticsItem
-                title={t('metrics.protocolContributionsSum.label')}
-                value={
-                  <Link className="text-inherit" href="/public-goods-contributions-cg">
-                    {formatEthValue(data.MainStats.SumCosmicGameDonationsEth ?? 0, locale)}
-                  </Link>
-                }
-                tooltip={t('metrics.protocolContributionsSum.tooltip')}
-              />
-            </>
-          )}
-          {(Number(data.SumVoluntaryDonationsEth) || 0) > 0 && (
+        <div className="grid gap-x-12 gap-y-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+          <dl className="min-w-0 self-start border-t border-rule">
+            {/* UTC, the zone of the daily bars beside it: one zone on the hub, said once. */}
             <StatisticsItem
-              title={t('metrics.voluntaryContributions.label')}
+              title={t('hub.cycle.opened')}
               value={
-                <Link className="text-inherit" href="/public-goods-contributions-voluntary">
-                  {t('hub.voluntaryContributionSummary', {
-                    count: formatCount(Number(data.NumVoluntaryDonations) || 0, locale),
-                    amount: formatEthValue(Number(data.SumVoluntaryDonationsEth) || 0, locale),
-                  })}
-                </Link>
+                opened && opened > 0 ? <DateTime timestamp={opened} timeZone="utc" /> : count(null)
               }
-              tooltip={t('metrics.voluntaryContributions.tooltip')}
+              caption={tFormats('dateTime.timeZone', { zone: formatTimeZoneLabel('utc') })}
             />
-          )}
-          {(data.MainStats.NumWithdrawals ?? 0) > 0 && (
             <StatisticsItem
-              title={t('metrics.publicGoodsRetrievals.label')}
-              value={
-                <Link className="text-inherit" href="/public-goods-retrievals">
-                  {formatCount(data.MainStats.NumWithdrawals, locale)}
-                </Link>
-              }
-              tooltip={t('metrics.publicGoodsRetrievals.tooltip')}
+              title={metric('ethInGesturesCurrentCycle')}
+              value={eth(data.CurRoundStats?.TotalEthInBidsEth)}
             />
-          )}
-          <StatisticsItem
-            title={t('metrics.totalPublicGoodsRetrieved.label')}
-            value={formatEthValue(data.MainStats.SumWithdrawals ?? 0, locale)}
-            tooltip={t('metrics.totalPublicGoodsRetrieved.tooltip')}
-          />
-        </StatisticsGroup>
-      </div>
+            <StatisticsItem
+              title={metric('cstConsumedCurrentCycle')}
+              value={cst(data.CurRoundStats?.TotalCstInBidsEth)}
+            />
+          </dl>
+          <CycleRhythm />
+        </div>
+        <div className="mt-10 border-t border-rule-faint pt-8">
+          <h3 className="type-title text-foreground">{t('hub.cycle.splitTitle')}</h3>
+          <p className="mt-1 max-w-[var(--measure-lede)] type-body-sm text-muted-foreground">
+            {t('hub.cycle.splitDescription')}
+          </p>
+          <ReserveSplit data={data} className="mt-5" />
+        </div>
+      </SectionShell>
 
-      {/* Anchoring snapshot */}
-      <div className="mt-12">
-        <SectionDivider title={t('hub.anchoringGlanceTitle')} className="mb-6" />
-        <Surface
-          variant="gradient-border-accent"
-          radius="xl"
-          padding="lg"
-          data-testid="anchoring-at-a-glance"
-        >
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
-              {t('hub.anchoringGlanceDescription', {
-                cosmicCount: formatCount(cstAnchorStats.TotalTokensStaked ?? 0, locale),
-                randomWalkCount: formatCount(rwlkAnchorStats.TotalTokensStaked ?? 0, locale),
-              })}
-            </p>
-            <Link
-              href="/statistics/anchoring"
-              className="group inline-flex items-center gap-2 self-start whitespace-nowrap rounded-full border border-primary/25 bg-primary/10 px-4 py-2 text-sm font-semibold text-primary no-underline transition-colors hover:border-primary/45 hover:bg-primary/15 lg:self-auto"
-            >
-              <Lock className="h-4 w-4" aria-hidden />
-              {t('hub.anchoringGlanceLink')}
-              <ArrowRight
-                aria-hidden
-                className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+      <SectionShell title={t('hub.exploreTitle')}>
+        <nav aria-label={t('hub.exploreAria')}>
+          <ul className="border-t border-rule">
+            {STATISTICS_SECTIONS.map((section) => (
+              <SectionEntry
+                key={section.slug}
+                section={section}
+                figure={figures[section.messageKey as Exclude<SectionKey, 'overview'>]}
               />
-            </Link>
-          </div>
-        </Surface>
-      </div>
+            ))}
+          </ul>
+        </nav>
+      </SectionShell>
+
+      <SectionShell title={t('hub.protocolEconomyTitle')}>
+        <div className="grid gap-x-12 gap-y-10 lg:grid-cols-3">
+          <StatisticsGroup title={t('groups.allocationEconomy.label')}>
+            <StatisticsItem
+              title={metric('totalSignatureAllocationsDistributed')}
+              value={eth(data.TotalPrizesPaidAmountEth)}
+            />
+            <StatisticsItem
+              title={metric('stellarSelectionEthDeposited')}
+              value={eth(main.TotalRaffleEthDeposits)}
+            />
+            <StatisticsItem
+              title={metric('stellarSelectionEthRetrieved')}
+              value={eth(main.TotalRaffleEthWithdrawn)}
+              caption={
+                pendingRecipients > 0
+                  ? t('hub.pendingRecipients', { count: pendingRecipients })
+                  : undefined
+              }
+            />
+            <StatisticsItem
+              title={t('anchoringPage.stats.totalDistributions')}
+              value={eth(main.StakeStatisticsCST?.TotalRewardEth)}
+              href="/anchoring"
+            />
+            <StatisticsItem
+              title={metric('outreachCstAllocated')}
+              value={cst(main.TotalMktRewardsEth)}
+              caption={countCaption('hub.outreachTransactions', main.NumMktRewards)}
+              href="/marketing"
+            />
+          </StatisticsGroup>
+
+          <StatisticsGroup title={t('groups.tokenEconomy.label')}>
+            <StatisticsItem
+              title={metric('totalSupplyErc20')}
+              value={cstSupply === undefined ? count(null) : cst(cstSupply)}
+            />
+            <StatisticsItem
+              title={metric('totalCstConsumed')}
+              value={cst(main.TotalCSTConsumedEth)}
+            />
+            <StatisticsItem title={metric('cstGestures')} value={count(main.NumBidsCST)} />
+            <StatisticsItem
+              title={metric('randomWalkNftsUsed')}
+              value={count(data.NumRwalkTokensUsed)}
+              href="/used-rwlk-nfts"
+            />
+            <StatisticsItem
+              title={metric('namedTokens')}
+              value={count(main.TotalNamedTokens)}
+              href="/named-nfts"
+            />
+          </StatisticsGroup>
+
+          <StatisticsGroup title={t('groups.publicGoods.label')}>
+            <StatisticsItem
+              title={metric('publicGoodsBalance')}
+              value={eth(data.CharityBalanceEth)}
+            />
+            <StatisticsItem
+              title={metric('protocolContributions')}
+              value={eth(main.SumCosmicGameDonationsEth)}
+              caption={countCaption('hub.contributionCount', main.NumCosmicGameDonations)}
+              href="/public-goods-contributions-cg"
+            />
+            <StatisticsItem
+              title={metric('voluntaryContributions')}
+              value={eth(data.SumVoluntaryDonationsEth)}
+              caption={countCaption('hub.contributionCount', data.NumVoluntaryDonations)}
+              href="/public-goods-contributions-voluntary"
+            />
+            <StatisticsItem
+              title={metric('totalPublicGoodsRetrieved')}
+              value={eth(main.SumWithdrawals)}
+              caption={countCaption('hub.retrievalCount', main.NumWithdrawals)}
+              href="/public-goods-retrievals"
+            />
+            <StatisticsItem
+              title={metric('totalContributedEth')}
+              value={eth(main.TotalEthDonatedAmountEth)}
+              href="/eth-contribution"
+            />
+            <StatisticsItem
+              title={metric('attachedNfts')}
+              value={count(data.NumDonatedNFTs)}
+              href="/attached-nfts"
+            />
+          </StatisticsGroup>
+        </div>
+
+        <DefinitionsDisclosure
+          className="mt-10"
+          label={t('shared.definitions')}
+          items={[
+            ...[
+              'totalSignatureAllocationsDistributed',
+              'stellarSelectionEthDeposited',
+              'stellarSelectionEthRetrieved',
+            ].map(definition),
+            {
+              term: t('anchoringPage.stats.totalDistributions'),
+              definition: t('anchoringTooltips.cstTotalAnchorDistributions'),
+            },
+            ...[
+              'outreachCstAllocated',
+              'totalSupplyErc20',
+              'totalCstConsumed',
+              'cstGestures',
+              'randomWalkNftsUsed',
+              'namedTokens',
+              'publicGoodsBalance',
+              'protocolContributions',
+              'voluntaryContributions',
+              'totalPublicGoodsRetrieved',
+              'totalContributedEth',
+              'attachedNfts',
+            ].map(definition),
+          ]}
+        />
+      </SectionShell>
     </div>
   );
 };

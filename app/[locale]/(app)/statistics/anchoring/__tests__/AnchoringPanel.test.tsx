@@ -68,9 +68,11 @@ beforeEach(() => {
 
 describe('AnchoringPanel', () => {
   it('shows anchoring now as one strip of figures no collection tab repeats', () => {
-    const { container } = render(<AnchoringPanel />);
+    render(<AnchoringPanel />);
     expect(screen.getByRole('heading', { level: 2, name: 'Anchoring now' })).toBeInTheDocument();
-    const figures = [...container.querySelectorAll('[data-figure]')].map((el) =>
+    // The collection overviews below carry figures of their own.
+    const strip = screen.getByRole('region', { name: 'Anchoring now' });
+    const figures = [...strip.querySelectorAll('[data-figure]')].map((el) =>
       el.getAttribute('data-figure'),
     );
     expect(figures).toEqual(['pool', 'perNft', 'activeHolders']);
@@ -102,11 +104,13 @@ describe('AnchoringPanel', () => {
         { StakerAddr: '0xDDD', TotalTokensStaked: 0 },
       ]),
     );
-    const { container } = render(<AnchoringPanel />);
+    render(<AnchoringPanel />);
 
-    expect(container.querySelector('[data-figure="activeHolders"] dd')).toHaveTextContent(/^3$/);
+    const strip = screen.getByRole('region', { name: 'Anchoring now' });
+    expect(strip.querySelector('[data-figure="activeHolders"] dd')).toHaveTextContent(/^3$/);
     // The per-kind counts below keep their own, per-kind label.
-    expect(screen.getByText('Active Cosmic Signature NFT Anchor-holders')).toBeInTheDocument();
+    // (The figure's label, and again as its term under Definitions.)
+    expect(screen.getAllByText('Active Cosmic Signature NFT anchor-holders')[0]).toBeVisible();
   });
 
   it('explains how the pool relates to unretrieved distributions', () => {
@@ -135,7 +139,8 @@ describe('AnchoringPanel', () => {
       refetch: jest.fn(),
     });
     const { container } = render(<AnchoringPanel />);
-    for (const figure of container.querySelectorAll('[data-figure]')) {
+    const strip = screen.getByRole('region', { name: 'Anchoring now' });
+    for (const figure of strip.querySelectorAll('[data-figure]')) {
       expect(figure.querySelector('.animate-pulse')).toBeInTheDocument();
     }
     expect(container).not.toHaveTextContent('2.5000');

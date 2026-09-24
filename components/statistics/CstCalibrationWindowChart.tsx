@@ -12,8 +12,7 @@ import {
 } from 'recharts';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { formatDurationTick, formatHoursTick, formatSeconds, shortenHex } from '@/utils';
-
+import { formatAddress, formatHoursTick, formatSeconds } from '@/utils/format';
 import {
   getCstCalibrationTimeline,
   type CstCalibrationPoint,
@@ -22,90 +21,80 @@ import {
 import type { GestureInfo } from '@/services/api/types';
 import { useGestureListByCycle, useRoundInfo, useCurrentTime } from '@/hooks/useApiQuery';
 import { useNow } from '@/hooks/useNow';
-import { CyclePickerSection } from '@/components/statistics/CyclePickerSection';
-import { Spinner } from '@/components/ui/spinner';
-import { ErrorState } from '@/components/ui/error-state';
 import { GESTURE_METHOD_COLOR, gestureMethodColor } from '@/lib/theme/dataColors';
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
+import { SkeletonChart } from '@/components/ui/skeleton';
 
-const LINE_COLOR = 'hsl(var(--foreground) / 0.85)';
-// ETH gestures (with or without a RandomWalk NFT) shorten the window; CST gestures lengthen it.
-const ETH_COLOR = GESTURE_METHOD_COLOR.eth;
-const RWALK_COLOR = GESTURE_METHOD_COLOR.ethRandomWalk;
-const CST_COLOR = GESTURE_METHOD_COLOR.cst;
+import { ChartFigure } from './charts/ChartFigure';
+import { ChartLegend } from './charts/ChartLegend';
+import { ChartTooltipCard } from './charts/ChartTooltipCard';
+import { useDurationAxis, useElapsedHoursAxis } from './charts/axes';
+import {
+  CHART_MARGIN,
+  DOTS_MAX_POINTS,
+  GRID_PROPS,
+  SERIES_COLOR,
+  TOOLTIP_PROPS,
+  X_AXIS_PROPS,
+  Y_AXIS_PROPS,
+} from './charts/theme';
 
-const CHART_HEIGHT = 360;
+const CHART_HEIGHT = 320;
 
-function LegendDot({ color, label }: { color: string; label: string }) {
-  return (
-    <span className="inline-flex items-center gap-1.5">
-      <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} />
-      {label}
-    </span>
-  );
-}
+/** The method a gesture was made with, as its legend label key. */
+const METHOD_LABEL_KEY: Readonly<Record<number, string>> = {
+  0: 'charts.cstWindow.typeEth',
+  1: 'charts.cstWindow.typeRandomWalk',
+  2: 'charts.cstWindow.typeCst',
+};
 
-type WindowTooltipProps = {
+function WindowTooltip({
+  active,
+  payload,
+}: {
   active?: boolean;
   payload?: ReadonlyArray<{ payload?: CstCalibrationPoint }>;
-};
-
-function WindowTooltip({ active, payload }: WindowTooltipProps) {
+}) {
   const t = useTranslations('statistics');
   const locale = useLocale();
-  if (!active || !payload?.length) return null;
-  const point = payload[0]?.payload;
+  const point = active ? payload?.[0]?.payload : undefined;
   if (!point) return null;
-
-  const typeLabel =
-    point.gestureType === 2
-      ? t('charts.cstWindow.typeCst')
-      : point.gestureType === 1
-        ? t('charts.cstWindow.typeRandomWalk')
-        : point.gestureType === 0
-          ? t('charts.cstWindow.typeEth')
-          : null;
-
+  const methodKey = METHOD_LABEL_KEY[point.gestureType];
   return (
-    <div className="rounded-lg border border-border bg-popover/95 text-popover-foreground px-3 py-2 text-sm shadow-lg">
-      <p className="mb-2 font-medium text-foreground">
-        {t('charts.cstWindow.intoCycle', {
-          duration: formatHoursTick(point.hoursIntoRound, locale),
-        })}
-      </p>
-      <dl className="space-y-1 text-muted-foreground">
-        <div className="flex items-center justify-between gap-4">
-          <dt>{t('charts.cstWindow.windowAfter')}</dt>
-          <dd className="text-foreground">{formatSeconds(point.windowSeconds, locale)}</dd>
-        </div>
-        {typeLabel ? (
-          <div className="flex items-center justify-between gap-4">
-            <dt className="flex items-center gap-2">
-              <span
-                className="inline-block h-2.5 w-2.5 rounded-full"
-                style={{ backgroundColor: gestureMethodColor(point.gestureType) }}
-              />
-              {typeLabel}
-            </dt>
-            {point.bidder ? (
-              <dd className="font-mono text-foreground">{shortenHex(point.bidder, 4)}</dd>
-            ) : null}
-          </div>
-        ) : null}
-      </dl>
-    </div>
+    <ChartTooltipCard
+      title={t('charts.cstWindow.intoCycle', {
+        duration: formatHoursTick(point.hoursIntoRound, locale),
+      })}
+      rows={[
+        {
+          key: 'window',
+          label: t('charts.cstWindow.windowAfter'),
+          value: formatSeconds(point.windowSeconds, locale),
+          color: SERIES_COLOR.measure,
+          shape: 'line',
+        },
+        ...(methodKey
+          ? [
+              {
+                key: 'method',
+                label: t(methodKey),
+                value: point.bidder ? formatAddress(point.bidder) : '',
+                color: gestureMethodColor(point.gestureType),
+                shape: 'dot' as const,
+              },
+            ]
+          : []),
+      ]}
+    />
   );
 }
 
-type DotProps = {
-  cx?: number;
-  cy?: number;
-  index?: number;
-  payload?: CstCalibrationPoint;
-};
+type DotProps = { cx?: number; cy?: number; index?: number; payload?: CstCalibrationPoint };
 
-/** Colored per-gesture marker; the synthetic end point renders no dot. */
-function gestureDot(props: DotProps) {
-  const { cx, cy, index, payload } = props;
+/** A dot per gesture in its method's colour; the synthetic end point draws none. */
+function gestureDot({ cx, cy, index, payload }: DotProps) {
   if (cx === undefined || cy === undefined || !payload || payload.gestureType < 0) {
     return <g key={`dot-${index}`} />;
   }
@@ -115,69 +104,81 @@ function gestureDot(props: DotProps) {
       key={`dot-${index}`}
       cx={cx}
       cy={cy}
-      r={isCst ? 2.5 : 1.5}
+      r={isCst ? 2.25 : 1.5}
       fill={gestureMethodColor(payload.gestureType)}
-      fillOpacity={isCst ? 0.95 : 0.7}
+      fillOpacity={isCst ? 0.95 : 0.8}
       stroke="none"
     />
   );
 }
 
+/** The hovered gesture, ringed in its method's colour. */
+function activeGestureDot({ cx, cy, payload }: DotProps) {
+  if (cx === undefined || cy === undefined || !payload) return <g />;
+  return (
+    <circle
+      cx={cx}
+      cy={cy}
+      r={4}
+      fill={
+        payload.gestureType < 0 ? SERIES_COLOR.measure : gestureMethodColor(payload.gestureType)
+      }
+      stroke="hsl(var(--background))"
+      strokeWidth={1.5}
+    />
+  );
+}
+
 /**
- * Step chart of the timeline, memoized on `points` so it doesn't repaint on
- * the page's periodic re-renders.
+ * Whether every gesture draws its dot at rest. A cycle of a thousand
+ * gestures would bury the step line under its dots, so above
+ * `DOTS_MAX_POINTS` the line reads alone and a gesture's method shows on
+ * hover, in the tooltip and in the table.
  */
+export function drawsGestureDots(points: readonly CstCalibrationPoint[]): boolean {
+  return points.length <= DOTS_MAX_POINTS;
+}
+
 const CalibrationChartView = memo(function CalibrationChartView({
   points,
+  minSeconds,
+  maxSeconds,
 }: {
   points: CstCalibrationPoint[];
+  minSeconds: number;
+  maxSeconds: number;
 }) {
-  const t = useTranslations('statistics');
-  const locale = useLocale();
-
+  const dots = drawsGestureDots(points);
+  const xAxis = useElapsedHoursAxis(points[points.length - 1]?.hoursIntoRound ?? 0);
+  const yAxis = useDurationAxis(minSeconds, maxSeconds);
   return (
     <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
-      <ComposedChart data={points} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border) / 0.6)" />
+      <ComposedChart data={points} margin={CHART_MARGIN}>
+        <CartesianGrid {...GRID_PROPS} />
         <XAxis
+          {...X_AXIS_PROPS}
           dataKey="hoursIntoRound"
           type="number"
-          domain={[0, 'dataMax']}
-          tickFormatter={(h) => formatHoursTick(Number(h), locale)}
-          tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
-          interval="preserveStartEnd"
-          minTickGap={32}
-          label={{
-            value: t('charts.cstWindow.timeIntoCycle'),
-            position: 'insideBottom',
-            offset: -4,
-            fill: 'hsl(var(--muted-foreground) / 0.8)',
-            fontSize: 11,
-          }}
+          domain={xAxis.domain}
+          ticks={xAxis.ticks}
+          tickFormatter={xAxis.format}
         />
         <YAxis
-          domain={[
-            (dataMin: number) => Math.max(0, Math.floor(dataMin * 0.92)),
-            (dataMax: number) => Math.ceil(dataMax * 1.05),
-          ]}
-          tickFormatter={(v) => formatDurationTick(Number(v), locale)}
-          tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
-          width={48}
+          {...Y_AXIS_PROPS}
+          domain={yAxis.domain}
+          ticks={yAxis.ticks}
+          tickFormatter={yAxis.format}
+          width={44}
         />
-        <Tooltip
-          content={<WindowTooltip />}
-          isAnimationActive={false}
-          allowEscapeViewBox={{ x: false, y: false }}
-          wrapperStyle={{ pointerEvents: 'none', zIndex: 10 }}
-        />
+        <Tooltip {...TOOLTIP_PROPS} content={<WindowTooltip />} />
         <Line
           type="stepAfter"
           dataKey="windowSeconds"
-          name={t('charts.cstWindow.window')}
-          stroke={LINE_COLOR}
-          strokeWidth={1.5}
-          dot={gestureDot}
-          activeDot={{ r: 4 }}
+          stroke={SERIES_COLOR.measure}
+          strokeOpacity={dots ? 0.7 : 1}
+          strokeWidth={dots ? 1.25 : 1.5}
+          dot={dots ? gestureDot : false}
+          activeDot={activeGestureDot}
           isAnimationActive={false}
         />
       </ComposedChart>
@@ -185,33 +186,41 @@ const CalibrationChartView = memo(function CalibrationChartView({
   );
 });
 
+type WindowRow = {
+  hours: number;
+  method: string;
+  participant: string | null;
+  window: number;
+};
+
 type CstCalibrationWindowViewProps = {
-  /** The cycle's gesture list (any order; invalid/legacy entries are skipped). */
+  /** The cycle's gesture list (any order; invalid or legacy entries are skipped). */
   gestures: GestureInfo[];
-  /** True when showing the in-progress cycle (timeline stays open at "now"). */
+  /** True when showing the in-progress cycle (the timeline stays open at "now"). */
   isLive: boolean;
   /** Finalized cycles end at their claim timestamp; ignored when `isLive`. */
   roundEndTs?: number;
+  /** Names the figure. */
+  label: string;
 };
 
 /**
- * CST Calibration Window step chart for one cycle: the window length after
- * every gesture, with per-gesture markers colored by type (ETH and RandomWalk
- * gestures shorten the window, CST gestures lengthen it).
+ * The CST Calibration Window over one cycle: the window after every gesture
+ * as a step line, each gesture a dot in its method's colour (ETH and Random
+ * Walk gestures shorten it, CST gestures lengthen it) while the cycle is
+ * small enough for the dots to leave the line readable, on whole-hour ticks.
  */
 export const CstCalibrationWindowView: FC<CstCalibrationWindowViewProps> = ({
   gestures,
   isLive,
   roundEndTs = 0,
+  label,
 }) => {
   const t = useTranslations('statistics');
   const locale = useLocale();
-
   const { data: serverNow } = useCurrentTime();
   const clientNow = Math.floor(useNow(60_000) / 1000);
   const nowSec = serverNow && serverNow > 0 ? serverNow : clientNow;
-  // Only the live cycle depends on "now"; quantize to whole minutes so the
-  // memo (and the chart) updates at most once a minute.
   const nowForCalc = isLive ? Math.floor(nowSec / 60) * 60 : 0;
 
   const timeline: CstCalibrationTimeline = useMemo(
@@ -219,44 +228,111 @@ export const CstCalibrationWindowView: FC<CstCalibrationWindowViewProps> = ({
     [gestures, isLive, roundEndTs, nowForCalc],
   );
 
+  const rows = useMemo<WindowRow[]>(
+    () =>
+      timeline.points
+        .filter((point) => point.gestureType >= 0)
+        .map((point) => ({
+          hours: point.hoursIntoRound,
+          method: t(METHOD_LABEL_KEY[point.gestureType] ?? 'charts.cstWindow.typeEth'),
+          participant: point.bidder || null,
+          window: point.windowSeconds,
+        })),
+    [t, timeline.points],
+  );
+
+  const columns = useMemo<DataTableColumn<WindowRow>[]>(
+    () => [
+      {
+        id: 'hours',
+        kind: 'text',
+        header: t('charts.cstWindow.timeIntoCycle'),
+        value: (row) => row.hours,
+        cell: (row) => formatHoursTick(row.hours, locale),
+        sortable: true,
+      },
+      {
+        id: 'method',
+        kind: 'text',
+        header: t('charts.cstWindow.method'),
+        value: (row) => row.method,
+      },
+      {
+        id: 'participant',
+        kind: 'address',
+        header: t('charts.activePeriods.participant'),
+        value: (row) => row.participant,
+      },
+      {
+        id: 'window',
+        kind: 'duration',
+        header: t('charts.cstWindow.windowAfter'),
+        value: (row) => row.window,
+        sortable: true,
+      },
+    ],
+    [locale, t],
+  );
+
   if (timeline.points.length === 0) {
-    return (
-      <p className="py-8 text-center text-sm text-muted-foreground">
-        {t('charts.cstWindow.empty')}
-      </p>
-    );
+    return <EmptyState headingLevel={4} variant="inline" title={t('charts.cstWindow.empty')} />;
   }
 
   return (
-    <div className="space-y-3" data-testid="cst-calibration-window-chart">
-      <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-muted-foreground">
-        <span>
-          {t('charts.cstWindow.summaryMin', {
-            duration: formatSeconds(timeline.minSeconds, locale),
-          })}
-        </span>
-        <span>
-          {t('charts.cstWindow.summaryMax', {
-            duration: formatSeconds(timeline.maxSeconds, locale),
-          })}
-        </span>
-        <span className="text-foreground">
-          {t(isLive ? 'charts.cstWindow.summaryCurrent' : 'charts.cstWindow.summaryFinal', {
-            duration: formatSeconds(timeline.currentSeconds, locale),
-          })}
-        </span>
+    <ChartFigure
+      label={label}
+      summary={t(isLive ? 'charts.cstWindow.summaryLive' : 'charts.cstWindow.summaryFinal', {
+        current: formatSeconds(timeline.currentSeconds, locale),
+        low: formatSeconds(timeline.minSeconds, locale),
+        high: formatSeconds(timeline.maxSeconds, locale),
+      })}
+      legend={
+        <ChartLegend
+          items={[
+            {
+              key: 'window',
+              label: t('charts.cstWindow.window'),
+              color: SERIES_COLOR.measure,
+              shape: 'line',
+            },
+            // The legend keys only what the plot draws: a dense cycle has no
+            // dots at rest, and its tooltip names the hovered gesture's method.
+            ...(drawsGestureDots(timeline.points)
+              ? ([
+                  {
+                    key: 'eth',
+                    label: t('charts.cstWindow.typeEth'),
+                    color: GESTURE_METHOD_COLOR.eth,
+                    shape: 'dot',
+                  },
+                  {
+                    key: 'rwlk',
+                    label: t('charts.cstWindow.typeRandomWalk'),
+                    color: GESTURE_METHOD_COLOR.ethRandomWalk,
+                    shape: 'dot',
+                  },
+                  {
+                    key: 'cst',
+                    label: t('charts.cstWindow.typeCst'),
+                    color: GESTURE_METHOD_COLOR.cst,
+                    shape: 'dot',
+                  },
+                ] as const)
+              : []),
+          ]}
+        />
+      }
+      note={t('charts.cstWindow.description')}
+      table={<DataTable data={rows} columns={columns} ariaLabel={label} />}
+    >
+      <div data-testid="cst-calibration-window-chart">
+        <CalibrationChartView
+          points={timeline.points}
+          minSeconds={timeline.minSeconds}
+          maxSeconds={timeline.maxSeconds}
+        />
       </div>
-
-      <CalibrationChartView points={timeline.points} />
-
-      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-        <LegendDot color={ETH_COLOR} label={t('charts.cstWindow.typeEth')} />
-        <LegendDot color={RWALK_COLOR} label={t('charts.cstWindow.typeRandomWalk')} />
-        <LegendDot color={CST_COLOR} label={t('charts.cstWindow.typeCst')} />
-      </div>
-
-      <p className="text-xs text-muted-foreground">{t('charts.cstWindow.description')}</p>
-    </div>
+    </ChartFigure>
   );
 };
 
@@ -264,63 +340,46 @@ type CstCalibrationWindowChartProps = {
   round: number;
   /** True when `round` is the in-progress round (open-ended at "now"). */
   isLive: boolean;
+  /** Names the figure. */
+  label: string;
 };
 
-/** Fetching wrapper: loads the cycle's gesture list and renders the chart. */
-const CstCalibrationWindowChart: FC<CstCalibrationWindowChartProps> = ({ round, isLive }) => {
+/** Loads the cycle's gesture list and renders the Calibration Window chart. */
+const CstCalibrationWindowChart: FC<CstCalibrationWindowChartProps> = ({
+  round,
+  isLive,
+  label,
+}) => {
   const t = useTranslations('statistics');
   const hasRound = round >= 0;
   const { data: gestures, isLoading, isError, refetch } = useGestureListByCycle(round, 'asc');
-
-  // Finalized cycles end at their claim timestamp; the live cycle stays open.
   const { data: roundInfo } = useRoundInfo(hasRound && !isLive ? round : -1);
   const roundEndTs = !isLive && roundInfo?.TimeStamp ? roundInfo.TimeStamp : 0;
 
   if (!hasRound) {
     return (
-      <p className="py-8 text-center text-sm text-muted-foreground">
-        {t('charts.cstWindow.selectCycle')}
-      </p>
+      <EmptyState headingLevel={4} variant="inline" title={t('charts.cstWindow.selectCycle')} />
     );
   }
-  if (isLoading) {
-    return (
-      <div className="flex justify-center py-16">
-        <Spinner />
-      </div>
-    );
-  }
+  if (isLoading) return <SkeletonChart height={CHART_HEIGHT} bars={18} />;
   if (isError) {
     return (
       <ErrorState
+        headingLevel={4}
         title={t('charts.cstWindow.loadErrorTitle')}
         message={t('charts.cstWindow.loadErrorMessage')}
         onRetry={() => refetch()}
       />
     );
   }
-
   return (
-    <CstCalibrationWindowView gestures={gestures ?? []} isLive={isLive} roundEndTs={roundEndTs} />
+    <CstCalibrationWindowView
+      gestures={gestures ?? []}
+      isLive={isLive}
+      roundEndTs={roundEndTs}
+      label={label}
+    />
   );
 };
-
-type CstCalibrationWindowSectionProps = {
-  /** The current in-progress round number (from dashboard CurRoundNum). */
-  currentRoundNum: number;
-};
-
-/**
- * Round picker + Calibration Window chart. Defaults to the current cycle and
- * lets you step back through finalized cycles to compare their calibration
- * dynamics.
- */
-export const CstCalibrationWindowSection: FC<CstCalibrationWindowSectionProps> = ({
-  currentRoundNum,
-}) => (
-  <CyclePickerSection currentRoundNum={currentRoundNum}>
-    {(selectedRound, isLive) => <CstCalibrationWindowChart round={selectedRound} isLive={isLive} />}
-  </CyclePickerSection>
-);
 
 export default CstCalibrationWindowChart;

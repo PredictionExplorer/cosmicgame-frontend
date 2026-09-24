@@ -1,96 +1,134 @@
 'use client';
 
 // lexicon-allow-start: internal analytics identifiers mirror backend wire names
-import { Activity, BarChart3, Flame, Users } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
+import { Link } from '@/i18n/navigation';
 import { useDashboardInfo, useSystemModelist } from '@/hooks/useApiQuery';
 import { StatsSection } from '@/components/statistics/StatsSection';
+import { SectionShell } from '@/components/statistics/SectionShell';
+import { SkeletonChart } from '@/components/ui/skeleton';
+import { CycleScopeControl } from '@/components/statistics/CycleScopeControl';
+import { useCycleScope } from '@/components/statistics/useCycleScope';
 import { BidFrequencyChart } from '@/components/statistics/BidFrequencyChart';
 import { LastBidSpikeChart } from '@/components/statistics/LastBidSpikeChart';
 import { BidderActivePeriodsTimeline } from '@/components/statistics/BidderActivePeriodsTimeline';
-import { BidTypeRatioChart } from '@/components/statistics/BidTypeRatioChart';
-import { CstCalibrationWindowSection } from '@/components/statistics/CstCalibrationWindowChart';
-import { CstGestureCostSection } from '@/components/statistics/CstGestureCostChart';
-import { EnduranceTimelineSection } from '@/components/statistics/EnduranceTimelineChart';
+import { GestureTypeMixChart } from '@/components/statistics/GestureTypeMixChart';
+import CstCalibrationWindowChart from '@/components/statistics/CstCalibrationWindowChart';
+import CstGestureCostChart from '@/components/statistics/CstGestureCostChart';
+import EnduranceTimelineChart from '@/components/statistics/EnduranceTimelineChart';
 import { SystemModesTable, type EventRow } from '@/components/tables/SystemModesTable';
 
-/** Gesture activity charts, cycle timelines, and system events. */
+/**
+ * Gesture activity: frequency, spikes and the most active participants over
+ * all time, then one cycle's story (method mix, lead history, Calibration
+ * Window, CST cost) under the page's one cycle picker, kept in `?cycle=`,
+ * and the cycle activations log. The cycle charts mount only once the
+ * dashboard names the live cycle: until then the section shows a chart
+ * skeleton, and a failed read shows an error with a retry, never a chart's
+ * "not started" or "select a cycle" state for a cycle that is live.
+ */
 const ActivityPanel = () => {
   const t = useTranslations('statistics');
-  const { data: dashboardData } = useDashboardInfo(undefined, { poll: false });
+  const dashboardQuery = useDashboardInfo(undefined, { poll: false });
   const systemModesQuery = useSystemModelist();
-
-  const curRoundNum = dashboardData?.CurRoundNum ?? -1;
+  const liveCycle = dashboardQuery.data?.CurRoundNum ?? -1;
+  const scope = useCycleScope(liveCycle);
+  const cycleKnown = liveCycle >= 0;
   const systemModeChanges = (systemModesQuery.data ?? []) as EventRow[];
+  const title = (key: string) => t(`activity.sections.${key}`);
 
   return (
-    <div className="space-y-4" data-testid="activity-panel">
-      <StatsSection
-        title={t('activity.sections.frequency')}
-        tooltip={t('sectionTooltips.gestureFrequency')}
-        icon={<BarChart3 className="h-3.5 w-3.5" />}
-      >
-        <BidFrequencyChart />
+    <div className="space-y-12 sm:space-y-16" data-testid="activity-panel">
+      <StatsSection title={title('frequency')} tooltip={t('sectionTooltips.gestureFrequency')}>
+        <BidFrequencyChart label={title('frequency')} />
+      </StatsSection>
+
+      <StatsSection title={title('spikes')} tooltip={t('sectionTooltips.gestureSpikes')}>
+        <LastBidSpikeChart label={title('spikes')} />
       </StatsSection>
 
       <StatsSection
-        title={t('activity.sections.spikes')}
-        tooltip={t('sectionTooltips.gestureSpikes')}
-        icon={<Flame className="h-3.5 w-3.5" />}
-      >
-        <LastBidSpikeChart />
-      </StatsSection>
-
-      <StatsSection
-        title={t('activity.sections.activePeriods')}
+        title={title('activePeriods')}
         tooltip={t('sectionTooltips.participantActivePeriods')}
-        icon={<Users className="h-3.5 w-3.5" />}
       >
-        <BidderActivePeriodsTimeline />
+        <BidderActivePeriodsTimeline label={title('activePeriods')} />
       </StatsSection>
 
       <StatsSection
-        title={t('activity.sections.typeDistribution')}
-        tooltip={t('sectionTooltips.gestureTypeDistribution')}
-        icon={<Activity className="h-3.5 w-3.5" />}
+        id="cycle"
+        title={title('cycleTimelines')}
+        description={t('activity.cycleTimelinesDescription')}
+        actions={<CycleScopeControl scope={scope} />}
+        isLoading={!cycleKnown && !dashboardQuery.isError}
+        isError={!cycleKnown && dashboardQuery.isError}
+        onRetry={() => dashboardQuery.refetch()}
+        skeleton={<SkeletonChart />}
       >
-        <div className="mb-4">
-          <span className="inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-            {t('activity.currentCycleOnly')}
-          </span>
+        <div className="space-y-12">
+          <SectionShell
+            headingLevel={3}
+            title={title('typeDistribution')}
+            tooltip={t('sectionTooltips.gestureTypeDistribution')}
+          >
+            <GestureTypeMixChart
+              round={scope.cycle}
+              isLive={scope.isLive}
+              label={title('typeDistribution')}
+            />
+          </SectionShell>
+
+          <SectionShell
+            headingLevel={3}
+            title={title('enduranceTimeline')}
+            tooltip={t('sectionTooltips.enduranceTimeline')}
+            actions={
+              scope.cycle >= 0 ? (
+                <Link
+                  href={`/embed/endurance/${scope.cycle}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="link-quiet group inline-flex min-h-11 items-center gap-1.5 type-label text-muted-foreground hover:text-foreground sm:min-h-8"
+                >
+                  {t('charts.endurance.openWindow')}
+                  <ArrowUpRight aria-hidden className="size-3.5 text-subtle" />
+                </Link>
+              ) : null
+            }
+          >
+            <EnduranceTimelineChart
+              round={scope.cycle}
+              isLive={scope.isLive}
+              label={title('enduranceTimeline')}
+            />
+          </SectionShell>
+
+          <SectionShell
+            headingLevel={3}
+            title={title('cstWindow')}
+            tooltip={t('sectionTooltips.cstWindow')}
+          >
+            <CstCalibrationWindowChart
+              round={scope.cycle}
+              isLive={scope.isLive}
+              label={title('cstWindow')}
+            />
+          </SectionShell>
+
+          <SectionShell
+            headingLevel={3}
+            title={title('cstCost')}
+            tooltip={t('sectionTooltips.cstCost')}
+          >
+            <CstGestureCostChart round={scope.cycle} label={title('cstCost')} />
+          </SectionShell>
         </div>
-        <BidTypeRatioChart roundStartTs={dashboardData?.TsRoundStart ?? 0} />
       </StatsSection>
 
       <StatsSection
-        title={t('activity.sections.enduranceTimeline')}
-        tooltip={t('sectionTooltips.enduranceTimeline')}
-        icon={<Activity className="h-3.5 w-3.5" />}
-      >
-        <EnduranceTimelineSection currentRoundNum={curRoundNum} />
-      </StatsSection>
-
-      <StatsSection
-        title={t('activity.sections.cstWindow')}
-        tooltip={t('sectionTooltips.cstWindow')}
-        icon={<Activity className="h-3.5 w-3.5" />}
-      >
-        <CstCalibrationWindowSection currentRoundNum={curRoundNum} />
-      </StatsSection>
-
-      <StatsSection
-        title={t('activity.sections.cstCost')}
-        tooltip={t('sectionTooltips.cstCost')}
-        icon={<Activity className="h-3.5 w-3.5" />}
-      >
-        <CstGestureCostSection currentRoundNum={curRoundNum} />
-      </StatsSection>
-
-      <StatsSection
-        title={t('activity.sections.cycleActivations')}
+        title={title('cycleActivations')}
         tooltip={t('sectionTooltips.cycleActivations')}
-        icon={<Activity className="h-3.5 w-3.5" />}
         defaultOpen={false}
         lazy
         isLoading={systemModesQuery.isLoading}

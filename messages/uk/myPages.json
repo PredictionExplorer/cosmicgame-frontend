@@ -9,6 +9,7 @@
     "to": "Кому",
     "tokenId": "ID токена",
     "cycle": "Цикл",
+    "cycleNumber": "Цикл {cycle}",
     "recipient": "Отримувач"
   },
   "allocations": {
@@ -69,80 +70,99 @@
   "statistics": {
     "page": {
       "invalidAddress": "Недійсна адреса",
-      "ariaOwn": "Моя статистика",
-      "ariaUser": "Статистика користувача",
       "ownTitle": "Моя статистика",
-      "userTitle": "Профіль користувача",
-      "ownSubtitle": "Ваші показники та історія активності",
-      "userSubtitle": "Перегляд статистики та активності іншого учасника",
+      "ownSubtitle": "Ваші жести та їхня вартість, отримані розподіли, ваші NFT і закріплення в усіх перформанс-циклах.",
+      "userSubtitle": "Жести цієї адреси та їхня вартість, отримані нею розподіли, її NFT і закріплення в усіх перформанс-циклах.",
       "emptyTitle": "Активності ще немає",
       "emptyDescription": "Цей обліковий запис ще не брав участі в перформанс-циклах. Зробіть жест, щоб почати.",
       "sections": {
-        "gestureHistory": "Історія жестів",
-        "recipientHistory": "Історія отримувача",
+        "gestureHistory": "Жести",
+        "recipientHistory": "Отримані розподіли",
         "anchoring": "Закріплення",
-        "tokenHoldings": "Токени у власності",
+        "artworks": "Cosmic Signature NFT",
         "outreachAllocations": "Розподіли просування",
-        "claimableAssets": "Активи, які можна забрати"
-      }
+        "claimableAssets": "Долучені активи"
+      },
+      "participant": "Учасник",
+      "loadErrorTitle": "Не вдалося завантажити статистику цієї адреси",
+      "loadErrorMessage": "Сервіс статистики не відповідає. Спробуйте ще раз за хвилину."
     },
-    "hero": {
-      "ethBalance": {
-        "label": "Баланс ETH",
-        "tooltip": "Ваш поточний баланс ETH у цьому гаманці."
-      },
-      "cstBalance": {
-        "label": "Баланс CST",
-        "tooltip": "Ваш баланс токенів CST (ERC-20) із жестів, розподілів CST визнання та переказів."
-      },
-      "signatureAllocations": {
-        "label": "Отримано розподілів Сигнатури",
-        "tooltip": "Кількість розподілів Сигнатури, які забрав цей гаманець."
-      },
-      "totalEth": {
-        "label": "Усього ETH зоряного відбору",
-        "tooltip": "Загальна сума ETH, розподілена через зоряний відбір за всі цикли, включно із забраними й незабраними сумами."
-      },
+    "figures": {
       "gestures": {
-        "label": "Зроблено жестів",
-        "tooltip": "Загальна кількість жестів, які ви зробили за всі перформанс-цикли."
+        "label": "Жести",
+        "caption": "{count, plural, one {у # циклі} few {у # циклах} many {у # циклах} other {у # циклу}}"
       },
-      "selectionFrequency": {
-        "label": "Частота відбору",
-        "tooltip": "Ваша найвища частота зоряного відбору в поточному циклі, обчислена за часткою ваших жестів у загальній кількості та числом обраних отримувачів."
+      "spent": {
+        "label": "Витрачено на жести",
+        "caption": "а також {amount}",
+        "info": "ETH, які ця адреса сплатила за свої жести в ETH. Жести в CST оплачуються в CST, ця сума показана нижче. Вартість жестів не повертається."
+      },
+      "received": {
+        "label": "Отримано",
+        "caption": "{count, plural, one {з # розподілу} few {з # розподілів} many {з # розподілів} other {з # розподілу}}",
+        "info": "ETH, які ця адреса отримала через розподіли: Розподіл Сигнатури, Воїн часу та зоряний відбір. CST, NFT і надходження за закріплення наведено нижче."
+      },
+      "balance": {
+        "label": "Баланс гаманця"
       }
     },
-    "activity": {
-      "title": "Огляд активності",
-      "groups": {
-        "gestures": "Жести",
-        "stellarSelections": "Зоряні відбори",
-        "anchoring": "Закріплення"
+    "titles": {
+      "label": "Відзнаки",
+      "signatureAllocation": "Розподіл Сигнатури",
+      "enduranceChampion": "Чемпіон витривалості",
+      "chronoWarrior": "Воїн часу",
+      "finalCstGesture": "Завершальний CST-жест",
+      "entry": "{title} · {count, plural, one {цикл {cycles}} few {цикли {cycles}} many {цикли {cycles}} other {цикли {cycles}}}"
+    },
+    "selection": {
+      "title": "Пул зоряного відбору · цикл {cycle}",
+      "share": "{mine} з {total} жестів",
+      "caption": "Під час завершення циклу з усіх жестів цього циклу відбувається {eth} відборів ETH і {nft} відборів NFT з повторенням. Кожен жест враховується один раз.",
+      "captionGeneric": "Під час завершення циклу зоряний відбір відбувається з усіх жестів цього циклу з повторенням. Кожен жест враховується один раз."
+    },
+    "overview": {
+      "title": "Коротко",
+      "gestures": {
+        "title": "Жести",
+        "largest": "Найбільший жест в ETH",
+        "firstCycle": "Перший цикл",
+        "latest": "Останній жест"
       },
-      "gesturesMade": {
-        "label": "Зроблено жестів",
-        "tooltip": "Усього жестів за всі цикли."
+      "stellarSelection": {
+        "title": "Зоряний відбір",
+        "ethSelections": "Відбори ETH",
+        "ethAllocated": "Розподілено ETH",
+        "ethRetrieved": "Забрано ETH",
+        "nfts": "Відібрано NFT"
       },
-      "maxGesture": {
-        "label": "Найдорожчий жест",
-        "tooltip": "Найбільша сума, сплачена за один жест."
+      "nfts": {
+        "title": "Cosmic Signature NFT",
+        "received": "Отримано",
+        "toRetrieve": "Долучені NFT, які можна забрати",
+        "transfers": "Передачі"
       },
-      "ethSelections": {
-        "label": "Розподіли зоряного відбору ETH",
-        "tooltip": "Кількість отриманих вами розподілів зоряного відбору ETH."
+      "anchoring": {
+        "title": "Закріплення",
+        "anchoredNow": "Закріплено зараз",
+        "actions": "Дії закріплення та відкріплення",
+        "distributions": "Надходження за закріплення"
       },
-      "nftsReceived": {
-        "label": "Отримано NFT",
-        "tooltip": "Cosmic Signature NFT, отримані через закарбування зоряного відбору."
-      },
-      "anchorActions": {
-        "label": "Дії закріплення",
-        "tooltip": "Загальна кількість дій закріплення та відкріплення RandomWalk NFT."
-      },
-      "distributionsReceived": {
-        "label": "Усього надходжень за закріплення",
-        "tooltip": "Загальна сума надходжень за закріплення в ETH від закріплення Cosmic Signature NFT, включно із забраними й незабраними сумами."
+      "definitions": {
+        "label": "Визначення",
+        "largest": "Найбільший окремий жест в ETH, зроблений цією адресою.",
+        "ethAllocated": "ETH, розподілені цій адресі через зоряний відбір в усіх циклах, забрані чи ні.",
+        "selectionNfts": "Cosmic Signature NFT, закарбовані для цієї адреси через зоряний відбір.",
+        "nftsReceived": "Cosmic Signature NFT, отримані цією адресою в усіх циклах через будь-який розподіл.",
+        "toRetrieve": "Долучені NFT, розподілені цій адресі разом із Розподілом Сигнатури, які ще не забрано.",
+        "distributions": "Надходження в ETH за закріплення Cosmic Signature NFT, забрані чи ні."
       }
+    },
+    "artworks": {
+      "emptyTitle": "Немає Cosmic Signature NFT",
+      "emptyDescription": "Тут з’являться Cosmic Signature NFT, які належать цій адресі.",
+      "showAll": "Показати всі ({count})",
+      "showFewer": "Показати менше",
+      "anchoredTag": "Закріплено"
     },
     "quickActions": {
       "anchor": {
@@ -154,91 +174,35 @@
         "description": "Узяти участь у поточному циклі"
       },
       "transfers": {
-        "label": "Переглянути передачі NFT",
+        "label": "Передачі NFT",
         "description": "Історія передач Cosmic Signature NFT"
       },
       "stellarSelection": {
         "label": "Історія зоряного відбору",
         "description": "Ваші розподіли зоряного відбору та депозити ETH"
-      }
-    },
-    "stellarSelection": {
-      "currentFrequency": "Частота відбору в поточному циклі",
-      "ethProbability": {
-        "label": "Зоряний відбір ETH",
-        "tooltip": "Ваша частота відбору для розподілу зоряного відбору ETH у цьому циклі — за вашою часткою в загальній кількості жестів і кількістю обраних отримувачів зоряного відбору ETH."
       },
-      "nftProbability": {
-        "label": "Зоряний відбір NFT",
-        "tooltip": "Ваша частота відбору для закарбування Cosmic Signature NFT через зоряний відбір у цьому циклі — за вашою часткою в загальній кількості жестів."
-      },
-      "totalEth": {
-        "label": "Усього ETH зоряного відбору",
-        "tooltip": "Загальна сума ETH, розподілена через зоряний відбір за всі цикли, включно із забраними й незабраними сумами."
-      },
-      "ethRetrieved": {
-        "label": "Забрано ETH",
-        "tooltip": "ETH, уже забраний із розподілів зоряного відбору у ваш гаманець."
-      },
-      "unretrievedNfts": {
-        "label": "Незабрані NFT",
-        "tooltip": "Долучені NFT, отримані разом із розподілом Сигнатури, але ще не забрані."
-      },
-      "stellarSelectionNfts": {
-        "label": "NFT зоряного відбору",
-        "tooltip": "Cosmic Signature NFT, закарбовані через зоряний відбір."
-      },
-      "allocationNfts": {
-        "label": "NFT розподілів",
-        "tooltip": "Усього Cosmic Signature NFT, отриманих як розподіли (усі типи закарбування разом)."
-      },
-      "cosmicSignatureNfts": {
-        "label": "Отримано Cosmic Signature NFT",
-        "tooltip": "Усього Cosmic Signature NFT, отриманих за всі цикли."
-      }
+      "label": "Що далі"
     },
     "anchoring": {
       "tabs": {
-        "cosmicSignature": "Закріплення Cosmic Signature",
-        "randomWalk": "Закріплення Random Walk"
+        "label": "Тип NFT",
+        "cosmicSignature": "Cosmic Signature NFT",
+        "randomWalk": "Random Walk NFT"
       },
       "empty": {
         "cosmicSignatureTitle": "Активності закріплення ще немає",
-        "cosmicSignatureDescription": "Закріпіть свої Cosmic Signature NFT, щоб отримувати надходження за закріплення в ETH кожного циклу.",
+        "cosmicSignatureDescription": "Закріплені Cosmic Signature NFT ділять надходження в ETH за закріплення кожного циклу.",
         "randomWalkTitle": "Закріплень RandomWalk ще немає",
-        "randomWalkDescription": "Закріпіть свої RandomWalk NFT, щоб узяти участь у зоряному відборі закріплених NFT."
+        "randomWalkDescription": "Закріплені RandomWalk NFT беруть участь у зоряному відборі закріплених NFT."
       },
       "stats": {
-        "anchorActions": {
-          "label": "Дії закріплення",
-          "cosmicSignatureTooltip": "Скільки разів ви закріплювали Cosmic Signature NFT.",
-          "randomWalkTooltip": "Скільки разів ви закріплювали RandomWalk NFT."
-        },
-        "releaseActions": {
-          "label": "Дії відкріплення",
-          "cosmicSignatureTooltip": "Скільки разів ви відкріплювали закріплені Cosmic Signature NFT.",
-          "randomWalkTooltip": "Скільки разів ви відкріплювали закріплені RandomWalk NFT."
-        },
-        "nftsWithDistributions": {
-          "label": "NFT з надходженнями",
-          "tooltip": "Кількість закріплених Cosmic Signature NFT, які накопичили надходження за закріплення."
-        },
-        "totalDistributions": {
-          "label": "Усього надходжень",
-          "tooltip": "Загальна сума надходжень за закріплення в ETH (забрані + незабрані)."
-        },
-        "unretrievedDistributions": {
-          "label": "Незабрані надходження",
-          "tooltip": "Надходження за закріплення, нараховані, але ще не забрані у ваш гаманець."
-        },
-        "nftsAnchored": {
-          "label": "Закріплено NFT",
-          "tooltip": "Усього закріплених зараз RandomWalk NFT."
-        },
-        "nftsImprinted": {
-          "label": "Закарбовано NFT",
-          "tooltip": "Cosmic Signature NFT, отримані через зоряний відбір закріплених NFT."
-        }
+        "anchorActions": "Дії закріплення",
+        "releaseActions": "Дії відкріплення",
+        "totalDistributions": "Надходження за закріплення",
+        "unretrievedDistributions": "Ще не забрано",
+        "nftsAnchored": "Закріплено зараз",
+        "nftsImprinted": "Закарбовано NFT",
+        "acrossNfts": "{count, plural, one {за # NFT} few {за # NFT} many {за # NFT} other {за # NFT}}"
       },
       "sections": {
         "actions": "Дії закріплення та відкріплення",
@@ -252,19 +216,19 @@
     "donatedAssets": {
       "nfts": {
         "title": "Отримані долучені NFT",
-        "tooltip": "NFT, долучені іншими учасниками й отримані як частина розподілу Сигнатури. Незабрані NFT можна забрати у свій гаманець.",
+        "tooltip": "NFT, долучені іншими учасниками до жестів і розподілені цій адресі разом із Розподілом Сигнатури. Отримувач може забрати ті, що ще не забрані.",
         "unclaimed": "Не забрано: {count}",
         "claimAll": "Забрати всі NFT",
         "emptyTitle": "Долучених NFT немає",
-        "emptyDescription": "Ви ще не отримували долучених NFT через розподіл Сигнатури."
+        "emptyDescription": "Цій адресі ще не розподілено долучених NFT."
       },
       "erc20": {
         "title": "Долучені токени ERC-20",
-        "tooltip": "Токени ERC-20, долучені іншими учасниками. Незабрані токени можна забрати у свій гаманець.",
+        "tooltip": "Токени ERC-20, долучені іншими учасниками до жестів і розподілені цій адресі. Отримувач може забрати ті, що ще не забрані.",
         "unclaimed": "Не забрано: {count}",
         "claimAll": "Забрати всі токени",
         "emptyTitle": "Долучених токенів немає",
-        "emptyDescription": "Ви ще не отримували долучених токенів ERC-20."
+        "emptyDescription": "Цій адресі ще не розподілено долучених токенів ERC-20."
       }
     }
   },

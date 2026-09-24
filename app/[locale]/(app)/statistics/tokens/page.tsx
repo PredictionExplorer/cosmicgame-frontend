@@ -7,7 +7,15 @@ import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
 import { STATISTICS_SECTIONS } from '../statistics-sections';
+import { readDashboard } from '../../publicDataReads';
 import { StatisticsPageIntro } from '../StatisticsPageIntro';
+import {
+  CstHoldersFigure,
+  CstSupplyFigure,
+  DashboardCountFigure,
+  NftHoldersFigure,
+} from '../StatisticsFigures';
+import { dashboardCount } from '../dashboardCounts';
 
 import TokensPanel from './TokensPanel';
 
@@ -42,6 +50,7 @@ export default async function Page({ params }: PageProps) {
   const title = t(`navigation.${section.messageKey}.title`);
   const description = t(`navigation.${section.messageKey}.description`);
   const inLanguage = jsonLdInLanguage(locale);
+  const dashboard = await readDashboard();
 
   return (
     <PageMessages namespaces={['detail', 'marketing', 'statistics', 'tables']}>
@@ -63,7 +72,41 @@ export default async function Page({ params }: PageProps) {
             ),
           ]}
         />
-        <StatisticsPageIntro title={title} description={description} />
+        <StatisticsPageIntro
+          title={title}
+          description={description}
+          figures={[
+            {
+              id: 'nftHolders',
+              label: t('metrics.cosmicSignatureNftHolders.label'),
+              info: t('metrics.cosmicSignatureNftHolders.tooltip'),
+              value: <NftHoldersFigure />,
+            },
+            {
+              id: 'cstHolders',
+              label: t('metrics.cstErc20Holders.label'),
+              info: t('metrics.cstErc20Holders.tooltip'),
+              value: <CstHoldersFigure />,
+            },
+            {
+              id: 'cstSupply',
+              label: t('metrics.totalSupplyErc20.label'),
+              info: t('metrics.totalSupplyErc20.tooltip'),
+              value: <CstSupplyFigure />,
+            },
+            {
+              id: 'attachedNfts',
+              label: t('metrics.attachedNfts.label'),
+              info: t('metrics.attachedNfts.tooltip'),
+              value: (
+                <DashboardCountFigure
+                  metric="attachedNfts"
+                  seed={dashboard.data ? dashboardCount(dashboard.data, 'attachedNfts') : undefined}
+                />
+              ),
+            },
+          ]}
+        />
         <TokensPanel />
       </>
     </PageMessages>

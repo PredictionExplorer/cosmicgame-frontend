@@ -5,69 +5,46 @@ import { InfoTooltip } from '@/components/ui/info-tooltip';
 
 export interface StatisticsGroupProps {
   title: string;
-  icon?: ReactNode;
+  /** One explanation for the group, beside its title. Figure definitions go in `DefinitionsDisclosure`. */
+  info?: string;
+  /** The heading's level in the page outline. Default 3 (a group inside an H2 section). */
+  headingLevel?: 2 | 3 | 4;
+  /**
+   * `list` (default): one column of rows. `grid`: the rows flow into two
+   * columns from `sm` and five from `xl`, for a short overview that would
+   * otherwise leave most of a wide screen empty.
+   */
+  layout?: 'list' | 'grid';
   children: ReactNode;
   className?: string;
-  accentColor?: 'blue' | 'purple' | 'emerald' | 'amber';
-  tooltip?: string;
-  /** The title's level in the page outline. Default 4 (a group under an h3 divider). */
-  headingLevel?: 2 | 3 | 4;
 }
 
-type AccentColor = NonNullable<StatisticsGroupProps['accentColor']>;
+const LAYOUT_CLASS = {
+  list: '',
+  grid: 'sm:grid sm:grid-cols-2 sm:gap-x-10 xl:grid-cols-5 xl:gap-x-8',
+} as const;
 
-const accentBorderMap: Record<AccentColor, string> = {
-  blue: 'border-l-[rgb(var(--aurora-cyan-rgb))]',
-  purple: 'border-l-[rgb(var(--nebula-violet-rgb))]',
-  emerald: 'border-l-[rgb(var(--impact-green-rgb))]',
-  amber: 'border-l-[rgb(var(--solar-gold-rgb))]',
-};
-
-const accentBgMap: Record<AccentColor, string> = {
-  blue: 'bg-[rgb(var(--aurora-cyan-rgb)/0.10)] text-[rgb(var(--aurora-cyan-rgb))]',
-  purple: 'bg-[rgb(var(--nebula-violet-rgb)/0.10)] text-[rgb(var(--nebula-violet-rgb))]',
-  emerald: 'bg-[rgb(var(--impact-green-rgb)/0.10)] text-[rgb(var(--impact-green-rgb))]',
-  amber: 'bg-[rgb(var(--solar-gold-rgb)/0.10)] text-[rgb(var(--solar-gold-rgb))]',
-};
-
+/**
+ * StatisticsGroup — a titled spec sheet of figures: the title in
+ * `type-title` over a `--rule`, then `StatisticsItem` rows divided by
+ * `--rule-faint` hairlines. No box, no accent edge, no icon tile.
+ */
 export function StatisticsGroup({
   title,
-  icon,
+  info,
+  headingLevel = 3,
+  layout = 'list',
   children,
   className,
-  accentColor,
-  tooltip,
-  headingLevel = 4,
 }: StatisticsGroupProps) {
   const Heading = (['h2', 'h3', 'h4'] as const)[headingLevel - 2]!;
   return (
-    <div
-      className={cn(
-        'rounded-xl border border-white/[0.06] bg-white/[0.02] transition-colors hover:bg-white/[0.03]',
-        accentColor && 'border-l-2',
-        accentColor && accentBorderMap[accentColor],
-        className,
-      )}
-    >
-      <div className="flex items-center gap-2.5 border-b border-white/[0.06] px-5 py-3.5">
-        {icon && (
-          <div
-            className={cn(
-              'flex h-7 w-7 shrink-0 items-center justify-center rounded-md',
-              accentColor ? accentBgMap[accentColor] : 'bg-primary/10 text-primary',
-            )}
-          >
-            {icon}
-          </div>
-        )}
-        <div className="flex min-w-0 items-center gap-1.5">
-          <Heading className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-            {title}
-          </Heading>
-          {tooltip ? <InfoTooltip content={tooltip} label={title} /> : null}
-        </div>
+    <div className={cn('min-w-0', className)}>
+      <div className="flex items-center gap-2 border-b border-rule pb-3">
+        <Heading className="type-title text-foreground">{title}</Heading>
+        {info ? <InfoTooltip content={info} label={title} /> : null}
       </div>
-      <div className="px-3 py-2">{children}</div>
+      <dl className={LAYOUT_CLASS[layout]}>{children}</dl>
     </div>
   );
 }

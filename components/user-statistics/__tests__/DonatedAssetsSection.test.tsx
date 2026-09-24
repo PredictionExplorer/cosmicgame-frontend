@@ -15,6 +15,21 @@ jest.mock('../../attachments/AttachedERC20Table', () => ({
   ),
 }));
 
+let mockWalletChainId: number | undefined;
+jest.mock('wagmi', () => ({
+  ...jest.requireActual('../../../__mocks__/wagmi'),
+  useConnection: () => ({
+    address: mockWalletChainId ? '0xUser' : undefined,
+    isConnected: mockWalletChainId !== undefined,
+    chainId: mockWalletChainId,
+    status: mockWalletChainId ? 'connected' : 'disconnected',
+  }),
+}));
+
+beforeEach(() => {
+  mockWalletChainId = undefined;
+});
+
 const noop = () => {};
 
 const defaultProps: DonatedAssetsSectionProps = {
@@ -41,12 +56,16 @@ describe('DonatedAssetsSection', () => {
 
   it('shows skeleton loading for NFTs', () => {
     render(<DonatedAssetsSection {...defaultProps} loadingNFTs={true} />);
-    expect(screen.getAllByTestId('table-skeleton').length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByRole('status', { name: 'tables.skeleton.loadingRows' }).length,
+    ).toBeGreaterThan(0);
   });
 
   it('shows skeleton loading for ERC20', () => {
     render(<DonatedAssetsSection {...defaultProps} loadingERC20={true} />);
-    expect(screen.getAllByTestId('table-skeleton').length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByRole('status', { name: 'tables.skeleton.loadingRows' }).length,
+    ).toBeGreaterThan(0);
   });
 
   it('shows empty state when no attached NFTs', () => {
@@ -92,6 +111,16 @@ describe('DonatedAssetsSection', () => {
     } as unknown as DonatedAssetsSectionProps['donatedERC20'][0];
     render(<DonatedAssetsSection {...defaultProps} donatedERC20={[token]} />);
     expect(screen.getByText('myPages.statistics.donatedAssets.erc20.claimAll')).toBeInTheDocument();
+  });
+
+  it('offers the network switch instead of Retrieve all on another chain', () => {
+    mockWalletChainId = 8453;
+    const nft = { RecordId: 1, Index: 0, TokenId: 1, TokenAddr: '0xabc', RoundNum: 1 };
+    render(<DonatedAssetsSection {...defaultProps} unclaimedNFTs={[nft] as never[]} />);
+    expect(
+      screen.queryByText('myPages.statistics.donatedAssets.nfts.claimAll'),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /wallet\.network\.switchTo/ })).toBeInTheDocument();
   });
 
   it('hides claim buttons when canClaim is false', () => {

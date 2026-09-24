@@ -1,8 +1,8 @@
 import statisticsMessages from '@/messages/en/statistics.json';
 
-import { render, screen, checkA11y } from '@/test-utils';
+import { act, render, screen, checkA11y } from '@/test-utils';
 
-import { StatisticsSubNav, centerActiveItem, scrollEdges } from '../StatisticsSubNav';
+import { StatisticsSubNav } from '../StatisticsSubNav';
 import { ALL_STATISTICS_SECTIONS } from '../statistics-sections';
 
 let mockPathname = '/statistics';
@@ -16,6 +16,32 @@ jest.mock('next/link', () => ({
     <a {...props}>{children}</a>
   ),
 }));
+
+/** Reports the sentinel above the bar as a browser would: its box and whether it is in view. */
+type ObserverCallback = (entries: Partial<IntersectionObserverEntry>[]) => void;
+let observe: ObserverCallback = () => {};
+const OriginalIntersectionObserver = global.IntersectionObserver;
+
+beforeEach(() => {
+  global.IntersectionObserver = class {
+    constructor(callback: ObserverCallback) {
+      observe = callback;
+    }
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+    takeRecords() {
+      return [];
+    }
+  } as unknown as typeof IntersectionObserver;
+});
+
+afterEach(() => {
+  global.IntersectionObserver = OriginalIntersectionObserver;
+});
+
+const sentinelAt = (top: number, isIntersecting: boolean) =>
+  act(() => observe([{ isIntersecting, boundingClientRect: { top } as DOMRectReadOnly }]));
 
 describe('StatisticsSubNav', () => {
   it('renders one link per statistics section', () => {
@@ -52,65 +78,21 @@ describe('StatisticsSubNav', () => {
     const { container } = render(<StatisticsSubNav />);
     await checkA11y(container);
   });
-});
 
-describe('centerActiveItem', () => {
-  /**
-   * A scroller and an item with the layout jsdom does not compute. The
-   * scroller starts `inset` px from its offset parent (the sticky wrapper),
-   * which `offsetLeft` would wrongly count.
-   */
-  function layout(item: { left: number; width: number }, inset = 28, scrollLeft = 0) {
-    const scroller = {
-      clientWidth: 360,
-      clientLeft: 0,
-      scrollWidth: 900,
-      scrollLeft,
-      getBoundingClientRect: () => ({ left: inset }),
-    } as unknown as HTMLElement;
-    const element = {
-      // Viewport position: the scroller's inset plus the item's place in the row,
-      // minus how far the row is scrolled.
-      getBoundingClientRect: () => ({ left: inset + item.left - scrollLeft, width: item.width }),
-    } as unknown as HTMLElement;
-    return { scroller, item: element };
-  }
+  it('takes the glass band only once it floats over the content', () => {
+    mockPathname = '/statistics';
+    render(<StatisticsSubNav />);
+    const nav = screen.getByRole('navigation', { name: 'Statistics sections' });
+    expect(nav).not.toHaveAttribute('data-stuck');
 
-  it('scrolls a later section to the middle of the row', () => {
-    // Regression: on phones the active "Anchoring" pill loaded off-screen.
-    const { scroller, item } = layout({ left: 520, width: 120 });
-    centerActiveItem(scroller, item);
-    expect(scroller.scrollLeft).toBe(520 - (360 - 120) / 2);
-  });
+    // The sentinel scrolled up under the header: the bar is stuck.
+    sentinelAt(-120, false);
+    expect(nav).toHaveAttribute('data-stuck', 'true');
 
-  it('measures from the scroller, not from the offset parent it sits inside', () => {
-    // Regression: offsetLeft counted the wrapper's inset, so centring was off by ~28px.
-    const { scroller, item } = layout({ left: 520, width: 120 }, 28, 100);
-    centerActiveItem(scroller, item);
-    expect(scroller.scrollLeft).toBe(520 - (360 - 120) / 2);
-  });
-
-  it('never scrolls past either end of the row', () => {
-    const first = layout({ left: 0, width: 100 });
-    centerActiveItem(first.scroller, first.item);
-    expect(first.scroller.scrollLeft).toBe(0);
-
-    const last = layout({ left: 820, width: 80 });
-    centerActiveItem(last.scroller, last.item);
-    expect(last.scroller.scrollLeft).toBe(900 - 360);
-  });
-});
-
-describe('scrollEdges', () => {
-  const scroller = (scrollLeft: number, scrollWidth = 900) =>
-    ({ clientWidth: 360, scrollWidth, scrollLeft }) as unknown as HTMLElement;
-
-  it('fades only the edges with pills behind them', () => {
-    // At the start the first pill is in full view: no fade on the left.
-    expect(scrollEdges(scroller(0))).toEqual({ start: false, end: true });
-    expect(scrollEdges(scroller(200))).toEqual({ start: true, end: true });
-    expect(scrollEdges(scroller(540))).toEqual({ start: true, end: false });
-    // A row that fits fades nowhere.
-    expect(scrollEdges(scroller(0, 360))).toEqual({ start: false, end: false });
+    // Back in view, or below the fold on a short page: not stuck.
+    sentinelAt(300, true);
+    expect(nav).not.toHaveAttribute('data-stuck');
+    sentinelAt(2000, false);
+    expect(nav).not.toHaveAttribute('data-stuck');
   });
 });

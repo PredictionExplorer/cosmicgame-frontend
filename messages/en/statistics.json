@@ -3,33 +3,33 @@
     "ariaLabel": "Statistics sections",
     "overview": {
       "label": "Overview",
-      "title": "Cosmic Signature Protocol Statistics",
+      "title": "Cosmic Signature protocol statistics",
       "description": "Historical data and overall metrics for the Cosmic Signature protocol on Arbitrum, with detailed sections for participation, tokens, anchoring, activity, and performance."
     },
     "participation": {
       "label": "Participation",
-      "title": "Participation Statistics",
+      "title": "Participation statistics",
       "description": "Unique participants, allocation recipients, and ETH contributors indexed across all Cosmic Signature Performance Cycles."
     },
     "tokens": {
       "label": "Tokens",
-      "title": "Token Distribution Statistics",
+      "title": "Token distribution statistics",
       "description": "Cosmic Signature NFT ownership, CST (ERC-20) balance distribution, total supply history, and assets attached to gestures."
     },
     "anchoring": {
       "label": "Anchoring",
-      "title": "Anchoring Statistics",
+      "title": "Anchoring statistics",
       "description": "Anchor and release actions, currently anchored tokens, and unique anchor-holders for Cosmic Signature and Random Walk NFTs."
     },
     "activity": {
       "label": "Activity",
-      "title": "Gesture Activity Statistics",
+      "title": "Gesture activity statistics",
       "description": "Gesture frequency over time, activity spikes, participant active periods, gesture-type mix, cycle timelines, and cycle activations."
     },
     "performance": {
-      "label": "Performance",
-      "title": "Participant Performance Statistics",
-      "description": "Participant performance leaderboard and retrievable allocation outcomes for every Cosmic Signature Performance Cycle."
+      "label": "Outcomes",
+      "title": "Participant outcomes",
+      "description": "What each participant spent on gestures and received in allocations, and how every cycle’s retrievable assets were retrieved."
     }
   },
   "breadcrumbs": {
@@ -38,21 +38,15 @@
   "shared": {
     "noDataTitle": "No data yet",
     "sectionLoadErrorTitle": "Failed to load {title}",
-    "serviceError": "The statistics service did not respond. Try again in a moment."
+    "serviceError": "The statistics service did not respond. Try again in a moment.",
+    "definitions": "Definitions"
   },
   "hub": {
     "loadErrorTitle": "Failed to load statistics",
     "loadErrorMessage": "The statistics service did not respond. Try again in a moment.",
-    "exploreTitle": "Explore Statistics",
+    "exploreTitle": "Explore statistics",
     "exploreAria": "Statistics section pages",
-    "currentCycleTitle": "Looking for current cycle data?",
-    "currentCycleSubtitle": "View gesture history, leaderboards, and live cycle details",
-    "protocolEconomyTitle": "Protocol Economy",
-    "anchoringGlanceTitle": "Anchoring at a Glance",
-    "anchoringGlanceDescription": "{cosmicCount} Cosmic Signature NFTs and {randomWalkCount} Random Walk NFTs are currently anchored. See anchor actions, anchored tokens, and unique anchor-holders on the anchoring statistics page.",
-    "anchoringGlanceLink": "Anchoring statistics",
-    "pendingStellarRetrievals": "{count} recipients have yet to retrieve funds totaling {amount}",
-    "voluntaryContributionSummary": "{count} totaling {amount}",
+    "protocolEconomyTitle": "Protocol economy",
     "jsonLd": {
       "webPageName": "Cosmic Signature Protocol Statistics",
       "webPageDescription": "Public Cosmic Signature protocol statistics on Arbitrum, including Performance Cycle status, gestures, NFTs, CST, anchoring, reserves, and allocation data.",
@@ -60,8 +54,8 @@
       "datasetDescription": "A summary of public Cosmic Signature activity indexed from Arbitrum smart contracts by the Cosmic Signature API."
     },
     "seo": {
-      "heading": "Cosmic Signature Protocol Statistics",
-      "description": "Explore Cosmic Signature activity on Arbitrum: Performance Cycles, gestures, NFTs, CST, anchoring, reserves, and allocations. The tables below show the latest available protocol data.",
+      "heading": "Protocol statistics",
+      "description": "Explore Cosmic Signature activity on Arbitrum: Performance Cycles, gestures, NFTs, CST, anchoring, reserves, and allocations.",
       "relatedPagesAria": "Statistics related pages",
       "links": {
         "currentCycle": "View the current Performance Cycle",
@@ -70,7 +64,36 @@
         "faq": "Read the Cosmic Signature FAQ"
       },
       "gesturesCaption": "{count, plural, one {# gesture} other {# gestures}} this cycle"
-    }
+    },
+    "cycle": {
+      "title": "Cycle {cycle} so far",
+      "open": "Open the current cycle",
+      "opened": "Opened",
+      "rhythmLabel": "Gestures per day, last {days, plural, one {# day} other {# days}}",
+      "rhythmSummary": "Total: {total}. Busiest day: {date} ({peak}).",
+      "rhythmEmpty": "No gestures in this period.",
+      "rhythmUnavailable": "Daily gesture counts are unavailable right now.",
+      "splitTitle": "Where the Cycle Reserve goes",
+      "splitDescription": "When the cycle finalizes, the Cycle Reserve is split between the allocation tracks below. What remains carries into the next cycle."
+    },
+    "index": {
+      "participation": "Who takes part: participants, recipients and ETH contributors.",
+      "tokens": "Who holds the NFTs and CST, the supply over time, and attached assets.",
+      "anchoring": "Anchored NFTs, their holders and Anchor Distributions.",
+      "activity": "When gestures happen, the most active participants, and each cycle in detail.",
+      "performance": "What each participant spent and received, and retrievals by cycle."
+    },
+    "figures": {
+      "participants": "{count, plural, one {# participant} other {# participants}}",
+      "anchored": "{count, plural, one {# NFT anchored} other {# NFTs anchored}}",
+      "gestures": "{count, plural, one {# gesture} other {# gestures}}",
+      "cycles": "{count, plural, one {# cycle completed} other {# cycles completed}}",
+      "supply": "Supply: {amount}"
+    },
+    "pendingRecipients": "{count, plural, one {# recipient has} other {# recipients have}} yet to retrieve",
+    "outreachTransactions": "{count, plural, one {# transaction} other {# transactions}}",
+    "contributionCount": "{count, plural, one {# contribution} other {# contributions}}",
+    "retrievalCount": "{count, plural, one {# retrieval} other {# retrievals}}"
   },
   "metrics": {
     "activePerformanceCycle": {
@@ -78,43 +101,43 @@
       "tooltip": "The current Performance Cycle number indexed by the public Cosmic Signature API."
     },
     "allocationsDistributed": {
-      "label": "Allocations Distributed",
+      "label": "Allocations distributed",
       "tooltip": "Indexed allocation records across all cycles. Includes recipient allocations and protocol allocation markers such as Anchor Distribution deposits."
     },
     "cosmicSignatureNftsImprinted": {
-      "shortLabel": "NFTs Imprinted",
+      "shortLabel": "NFTs imprinted",
       "tooltip": "Cumulative count of Cosmic Signature NFT ERC-721 tokens imprinted by the protocol across all indexed cycles. A value of 0 means the statistics API is currently reporting no indexed imprints for this counter."
     },
     "contractBalance": {
-      "label": "Contract Balance",
+      "label": "Contract balance",
       "tooltip": "ETH currently held by the Cosmic Signature protocol contract before future allocations, retrievals, or cycle transitions."
     },
     "totalSignatureAllocationsDistributed": {
-      "label": "Total Signature Allocations Distributed",
+      "label": "Total Signature Allocations distributed",
       "tooltip": "Total ETH distributed through Signature Allocations across indexed cycles."
     },
     "stellarSelectionEthDeposited": {
-      "label": "Stellar Selection ETH Deposited",
+      "label": "Stellar Selection ETH deposited",
       "tooltip": "Total ETH allocated into Stellar Selection pools across indexed Performance Cycles."
     },
     "stellarSelectionEthRetrieved": {
-      "label": "Stellar Selection ETH Retrieved",
+      "label": "Stellar Selection ETH retrieved",
       "tooltip": "Total ETH retrieved by selected recipients from Stellar Selection pools."
     },
     "totalSupplyErc20": {
-      "label": "Total Supply (ERC-20)",
+      "label": "Total supply (ERC-20)",
       "tooltip": "Current total supply of CST tokens, the ERC-20 token used for participation and coordination."
     },
     "totalCstConsumed": {
-      "label": "Total CST Consumed",
+      "label": "Total CST consumed",
       "tooltip": "Cumulative CST spent by participants when making CST gestures."
     },
     "cstConsumedCurrentCycle": {
-      "label": "CST Consumed This Cycle",
+      "label": "CST consumed this cycle",
       "tooltip": "CST spent by participants making CST gestures during the active Performance Cycle so far."
     },
     "ethInGesturesCurrentCycle": {
-      "label": "ETH in Gestures This Cycle",
+      "label": "ETH in gestures this cycle",
       "tooltip": "Total ETH paid by participants in ETH gestures during the active Performance Cycle so far."
     },
     "cstGestures": {
@@ -122,39 +145,39 @@
       "tooltip": "Number of gestures made with CST instead of ETH across indexed cycles."
     },
     "outreachCstAllocated": {
-      "label": "Outreach CST Allocated",
+      "label": "Outreach CST allocated",
       "tooltip": "CST sent from the Outreach Reserve to outreach and ecosystem contributors so far, separate from per-gesture Participation CST and NFT-paired Recognition CST."
     },
     "outreachTransactions": {
-      "label": "Outreach Transactions",
+      "label": "Outreach transactions",
       "tooltip": "Number of indexed Outreach Reserve distribution transactions."
     },
     "randomWalkNftsUsed": {
-      "label": "Random Walk NFTs Used",
+      "label": "Random Walk NFTs used",
       "tooltip": "Random Walk NFTs already attached to ETH gestures for a one-time Gesture Cost reduction."
     },
     "namedTokens": {
-      "label": "Named Tokens",
+      "label": "Named tokens",
       "tooltip": "Cosmic Signature NFTs that currently have a custom owner-assigned name."
     },
     "uniqueParticipants": {
-      "label": "Unique Participants",
+      "label": "Unique participants",
       "tooltip": "Unique wallet addresses that have made at least one indexed gesture."
     },
     "uniqueRecipients": {
-      "label": "Unique Recipients",
+      "label": "Unique recipients",
       "tooltip": "Unique wallet addresses that have received at least one indexed allocation from the protocol."
     },
     "uniqueEthContributors": {
-      "label": "Unique ETH Contributors",
+      "label": "Unique ETH contributors",
       "tooltip": "Unique wallet addresses that contributed ETH to the protocol."
     },
     "cosmicSignatureNftHolders": {
-      "label": "Cosmic Signature NFT Holders",
+      "label": "Cosmic Signature NFT holders",
       "tooltip": "Unique wallet addresses currently holding at least one Cosmic Signature NFT."
     },
     "cstErc20Holders": {
-      "label": "CST (ERC-20) Holders",
+      "label": "CST (ERC-20) holders",
       "tooltip": "Unique wallet addresses currently holding CST ERC-20 tokens."
     },
     "attachedNfts": {
@@ -162,45 +185,45 @@
       "tooltip": "ERC-721 tokens attached to gestures by participants and indexed by the app."
     },
     "publicGoodsBalance": {
-      "label": "Public Goods Balance",
+      "label": "Public Goods balance",
       "tooltip": "ETH allocated to the Public Goods Beneficiary and still reflected in indexed protocol balances."
     },
     "totalContributedEth": {
-      "label": "Total Contributed ETH",
+      "label": "Total contributed ETH",
       "tooltip": "Total ETH contributed to the protocol across all indexed cycles."
     },
     "protocolContributions": {
-      "label": "Protocol Contributions",
+      "label": "Protocol contributions",
       "tooltip": "Number of indexed public-goods contribution transactions sent through the Cosmic Signature protocol."
     },
     "protocolContributionsSum": {
-      "label": "Protocol Contributions Sum",
+      "label": "Protocol contributions sum",
       "tooltip": "Total ETH contributed through indexed Cosmic Signature protocol public-goods contribution transactions."
     },
     "voluntaryContributions": {
-      "label": "Voluntary Contributions",
+      "label": "Voluntary contributions",
       "tooltip": "ETH contributions made voluntarily by community members outside required cycle flows."
     },
     "publicGoodsRetrievals": {
-      "label": "Public Goods Retrievals",
+      "label": "Public Goods retrievals",
       "tooltip": "Number of indexed retrieval transactions from the Public Goods Vault."
     },
     "totalPublicGoodsRetrieved": {
-      "label": "Total Public Goods Retrieved",
+      "label": "Total Public Goods retrieved",
       "tooltip": "Total ETH retrieved from the Public Goods Vault."
     }
   },
   "groups": {
     "allocationEconomy": {
-      "label": "Allocation Economy",
+      "label": "Allocation economy",
       "tooltip": "Cumulative allocation records and ETH flows produced when Performance Cycles finalize."
     },
     "tokenEconomy": {
-      "label": "Token Economy",
+      "label": "Token economy",
       "tooltip": "CST and NFT counters. CST is the ERC-20 token; Cosmic Signature NFTs are ERC-721 tokens."
     },
     "publicGoods": {
-      "label": "Public Goods & Contributions",
+      "label": "Public Goods & contributions",
       "tooltip": "Protocol balances and contribution flows related to public goods and attached assets."
     }
   },
@@ -238,26 +261,23 @@
     "rwlkGroup": "Random Walk NFT anchoring provides eligibility for Anchored-NFT Stellar Selection allocations."
   },
   "activity": {
-    "heading": "Gesture Activity",
+    "heading": "Gesture activity",
     "sections": {
-      "frequency": "Gesture Frequency Over Time",
-      "spikes": "Gesture Spikes",
-      "activePeriods": "Top 20 Participant Active Periods",
-      "typeDistribution": "Gesture Type Distribution",
-      "enduranceTimeline": "Endurance & Chrono Timeline",
-      "cstWindow": "CST Calibration Window Timeline",
-      "cstCost": "CST Gesture Cost Over Time",
-      "cycleActivations": "Cycle Activations"
+      "frequency": "Gesture frequency over time",
+      "spikes": "Gesture spikes",
+      "activePeriods": "Top 20 participant active periods",
+      "typeDistribution": "Gesture type distribution",
+      "enduranceTimeline": "Endurance & Chrono timeline",
+      "cstWindow": "CST Calibration Window timeline",
+      "cstCost": "CST gesture cost over time",
+      "cycleActivations": "Cycle activations",
+      "cycleTimelines": "One cycle in detail"
     },
-    "currentCycleOnly": "Current cycle only",
-    "emptyCycleActivations": "No cycle activations indexed yet"
+    "emptyCycleActivations": "No cycle activations indexed yet",
+    "cycleTimelinesDescription": "Choose a cycle to see how its gestures split between methods, who held the lead, and how the CST Calibration Window and CST cost moved."
   },
   "anchoringPage": {
     "snapshot": {
-      "cosmicSignatureLabel": "Cosmic Signature NFTs anchored",
-      "cosmicSignatureTooltip": "Total number of Cosmic Signature NFTs currently anchored in the protocol and sharing Anchor Distributions.",
-      "randomWalkLabel": "Random Walk NFTs anchored",
-      "randomWalkTooltip": "Total number of Random Walk NFTs currently anchored and eligible for Anchored-NFT Stellar Selection.",
       "poolLabel": "Anchor Distribution pool",
       "poolTooltip": "ETH currently allocated to the Anchor Distribution pool for Cosmic Signature NFT anchor-holders.",
       "poolCaption": "Deposited when this cycle finalizes; earlier deposits not yet retrieved show as Unretrieved.",
@@ -272,25 +292,26 @@
     "historyLink": "Anchor Distributions history",
     "tabs": {
       "cosmicSignature": "Cosmic Signature NFT",
-      "randomWalk": "Random Walk NFT"
+      "randomWalk": "Random Walk NFT",
+      "label": "NFT collection"
     },
     "groups": {
-      "cosmicSignature": "Cosmic Signature NFT Anchoring Overview",
-      "randomWalk": "RWLK Anchoring Overview"
+      "cosmicSignature": "Cosmic Signature NFT anchoring overview",
+      "randomWalk": "RWLK anchoring overview"
     },
     "stats": {
-      "activeHoldersCosmicSignature": "Active Cosmic Signature NFT Anchor-holders",
-      "activeHoldersRandomWalk": "Active Random Walk NFT Anchor-holders",
-      "distributionDeposits": "Number of Anchor-Distribution Deposits",
+      "activeHoldersCosmicSignature": "Active Cosmic Signature NFT anchor-holders",
+      "activeHoldersRandomWalk": "Active Random Walk NFT anchor-holders",
+      "distributionDeposits": "Number of Anchor Distribution deposits",
       "totalDistributions": "Total Anchor Distributions",
-      "tokensImprinted": "Total Tokens Imprinted",
-      "tokensAnchored": "Total Tokens Anchored",
+      "tokensImprinted": "Total tokens imprinted",
+      "tokensAnchored": "Total tokens anchored",
       "unretrievedDistributions": "Unretrieved Anchor Distributions"
     },
     "tables": {
-      "actions": "Anchor / Release Actions",
-      "anchoredTokens": "Anchored Tokens",
-      "uniqueHolders": "Unique Anchor-holders"
+      "actions": "Anchor / release actions",
+      "anchoredTokens": "Anchored tokens",
+      "uniqueHolders": "Unique anchor-holders"
     },
     "empty": {
       "actions": "No anchor actions yet",
@@ -300,9 +321,9 @@
   },
   "participation": {
     "sections": {
-      "participants": "Unique Participants",
-      "recipients": "Unique Recipients",
-      "contributors": "Unique ETH Contributors"
+      "participants": "Unique participants",
+      "recipients": "Unique recipients",
+      "contributors": "Unique ETH contributors"
     },
     "empty": {
       "participantsTitle": "No participants yet",
@@ -316,10 +337,10 @@
   "tokens": {
     "sections": {
       "nftDistribution": "Cosmic Signature NFT (ERC-721)",
-      "cstDistribution": "CST (ERC-20) Balance Distribution",
-      "totalSupply": "CST Total Supply",
-      "attachedDistribution": "Attached Token Distribution",
-      "attachedAssets": "Attached Assets"
+      "cstDistribution": "CST (ERC-20) balance distribution",
+      "totalSupply": "CST total supply",
+      "attachedDistribution": "Attached token distribution",
+      "attachedAssets": "Attached assets"
     },
     "empty": {
       "nftTitle": "No Cosmic Signature NFTs imprinted yet",
@@ -331,10 +352,17 @@
     "supplyTabs": {
       "date": "By date",
       "gesture": "By gesture"
+    },
+    "holders": {
+      "summary": "{count, plural, one {# address holds} other {# addresses hold}} CST, largest balance first. Shares are of the total supply, {supply}.",
+      "summaryNoSupply": "{count, plural, one {# address holds} other {# addresses hold}} CST, largest balance first.",
+      "share": "Share of supply",
+      "shareHelp": "This balance as a share of the total CST supply."
     }
   },
   "attachedAssets": {
     "scopeAria": "Attached NFT scope",
+    "paginationLabel": "Attached NFT pages",
     "scopeAll": "All cycles",
     "scopeCurrent": "Current cycle",
     "nftTab": "NFTs (ERC-721)",
@@ -349,32 +377,21 @@
     "erc20Description": "ERC-20 tokens attached to gestures during the current Performance Cycle."
   },
   "performance": {
-    "leaderboardTitle": "Participant Performance",
-    "claimsTitle": "Allocation Retrievals by Cycle",
+    "leaderboardTitle": "Spent and received",
+    "claimsTitle": "Retrievals by cycle",
     "leaderboard": {
-      "description": "Net ETH and net percentage for each participant across all cycles. Figures are <em>ETH-only</em>: ETH received from allocations minus ETH spent on gestures. CST and NFT allocations are shown separately as context. No ETH net percentage is shown for participants who spent only CST.",
-      "sort": {
-        "netEth": "Highest Net ETH",
-        "netPercent": "Highest Net %",
-        "allocationRate": "Best Allocation Rate",
-        "spender": "Biggest Spender",
-        "nfts": "Most NFTs"
-      },
-      "minimumGestures": "Min gestures",
-      "cstOnly": "(CST-only)",
-      "cstOnlyTooltip": "No ETH spent (CST-only participant)",
-      "noEthReceivedTooltip": "No ETH received back yet — this participant has not received an ETH allocation so far",
+      "description": "What each participant with at least the chosen number of gestures spent on gestures, and what came back as ETH allocations, across every cycle. Figures are in ETH; CST spent and NFT and CST allocations are shown beneath them.",
+      "minimumGestures": "Minimum gestures",
       "loadErrorTitle": "Failed to load the performance leaderboard",
       "loadErrorMessage": "The statistics service did not respond. Try again in a moment.",
       "empty": "No participants match this filter yet.",
       "columns": {
         "participant": "Participant",
-        "allocationRate": "Allocation Rate",
+        "allocationRate": "Allocation rate",
         "gestures": "Gestures",
         "spent": "Spent (ETH)",
         "received": "Received (ETH)",
         "net": "Net (ETH)",
-        "netPercent": "Net %",
         "allocations": "Allocations"
       }
     },
@@ -395,6 +412,7 @@
       "unclaimedCount": "{count} unretrieved",
       "viewUnclaimed": "View unretrieved assets",
       "explore": "Explore",
+      "exploreAria": "Explore Cycle {cycle} retrievals",
       "dialog": {
         "unclaimedTitle": "Unretrieved assets — Cycle {cycle}",
         "expired": "The retrieval window has closed. Anyone can now retrieve these assets for themselves.",
@@ -406,20 +424,31 @@
         "exploreDescription": "View retrieval transactions, the time taken by each recipient, and the tokens attached during this cycle.",
         "claimTransactions": "Retrieval transactions",
         "noClaims": "No retrievals recorded for this cycle.",
-        "claimedAfter": "Retrieved After",
+        "claimedAfter": "Retrieved after",
         "when": "When",
         "transaction": "Transaction",
         "sweptBy": "Retrieved after the deadline by {address}",
         "attachedTokens": "Attached tokens",
         "noAttached": "No tokens attached this cycle.",
         "token": "Token",
-        "attachedBy": "Attached By"
+        "attachedBy": "Attached by"
       },
       "assets": {
         "eth": "ETH",
         "nft": "Attached NFT",
         "erc20": "Attached ERC-20"
       }
+    },
+    "outcomes": {
+      "participants": "Participants with {min}+ gestures",
+      "spent": "ETH spent on gestures",
+      "received": "ETH received in allocations",
+      "receivedMore": "Received more ETH than spent",
+      "ofParticipants": "{part} of {whole}",
+      "rank": "Position",
+      "netHelp": "ETH received in allocations minus ETH spent on gestures. CST is not included.",
+      "rateHelp": "The share of the cycles this participant took part in where they received at least one allocation.",
+      "cycles": "{part} of {whole, plural, one {# cycle} other {# cycles}}"
     }
   },
   "charts": {
@@ -432,7 +461,11 @@
       "loadErrorTitle": "Failed to load gesture frequency",
       "loadErrorMessage": "Could not fetch gesture frequency for the selected range.",
       "empty": "No gesture activity in this time range.",
-      "openingExcluded": "Gestures in the first hour after each cycle opens are excluded — opening activity is unusually concentrated and would otherwise skew this chart."
+      "openingExcluded": "Gestures in the first hour after each cycle opens are excluded — opening activity is unusually concentrated and would otherwise skew this chart.",
+      "hour": "Hour",
+      "day": "Day",
+      "summaryDaily": "Gestures, {range}: {total}. Busiest day: {date} ({peak}).",
+      "summaryHourly": "Gestures, {range}: {total}. Busiest hour: {date} ({peak})."
     },
     "spikes": {
       "count": "Spikes ({count})",
@@ -447,46 +480,48 @@
       "empty": "No gesture spikes detected in indexed history.",
       "noneRecent": "No spikes recently.",
       "selectEarlier": "Select a spike above to inspect an earlier period of activity.",
-      "emptyWindow": "No hourly data for the selected spike window."
+      "emptyWindow": "No hourly data for the selected spike window.",
+      "optionAria": "Spike on {date}, peak of {peak} per hour"
     },
     "activePeriods": {
       "description": "Active periods for the top {count} participants: at least 2 gestures, with no more than 6 hours between consecutive gestures. Each bar represents one active period.",
       "participant": "Participant",
-      "ariaLabel": "{address}: {count} gestures from {start} to {end}",
+      "ariaLabel": "{address}: {count, plural, one {# gesture} other {# gestures}} from {start} to {end}",
       "tooltipSummary": "{count} gestures · {minutes} min span",
       "loadErrorTitle": "Failed to load active periods",
       "loadErrorMessage": "Could not fetch top participant activity timeline.",
-      "empty": "No active gesture periods found for top participants."
+      "empty": "No active gesture periods found for top participants.",
+      "periods": "Active periods",
+      "longest": "Longest period",
+      "lastActive": "Last active",
+      "summary": "{count, plural, one {The most active participant} other {The # most active participants}}, {range}. Most gestures: {leader} ({gestures}).",
+      "laneLabel": "{rank}. {address}: {gestures, plural, one {# gesture} other {# gestures}} in {periods, plural, one {# active period} other {# active periods}}",
+      "hint": "Point at or select a period for its details; arrow keys move between periods."
     },
     "typeRatio": {
       "totalGestures": "Total gestures",
       "sampleEvery": "Sample every",
-      "interpolation": "Line style",
       "intervals": {
         "oneHour": "1h",
         "sixHours": "6h",
         "twelveHours": "12h",
         "oneDay": "1d"
       },
-      "linear": "Linear",
-      "step": "Step",
-      "smooth": "Smooth",
       "notStarted": "The current cycle hasn’t started yet.",
       "loadErrorTitle": "Failed to load gesture-type distribution",
       "loadErrorMessage": "Could not fetch the gesture-type composition for the current cycle.",
-      "empty": "No gesture activity in the current cycle yet.",
-      "description": "Each sample is the gesture-type mix within that window (per-interval, not cumulative). Windows with no gestures show 0% for all types."
+      "empty": "No gesture activity in the current cycle yet."
     },
     "endurance": {
       "timeIntoCycle": "Time into cycle",
       "intoCycle": "{duration} into cycle",
       "currentLeadWindow": "Current lead window",
       "enduranceRecord": "Endurance record",
-      "enduranceChampionRecord": "Endurance champion record",
-      "chronoRecord": "Chrono-warrior record",
+      "enduranceChampionRecord": "Endurance Champion record",
+      "chronoRecord": "Chrono-Warrior record",
       "leadHeldBy": "Lead held by",
-      "legendEndurance": "Endurance champion (longest single hold)",
-      "legendChrono": "Chrono-warrior (longest reign)",
+      "legendEndurance": "Endurance Champion (longest single hold)",
+      "legendChrono": "Chrono-Warrior (longest reign)",
       "legendLead": "Lead held",
       "legendNewRecord": "New record set",
       "enduranceChampion": "Endurance Champion",
@@ -497,25 +532,34 @@
       "roleEndurance": " (Endurance Champion)",
       "roleNewRecord": " (new record)",
       "stintAria": "{address} • held {duration} • {from} → {to} into cycle{role}",
-      "description": "Each bar is a lead stint — an address holding the lead from one gesture until the next gesture arrives. Bar width is how long they held the lead. Amber-outlined bars set a new endurance record at the time; the violet bar is the single longest hold of all (Endurance Champion); the rose lane held the title longest overall (Chrono-Warrior). Hover a bar for details.",
+      "description": "Each bar is a lead stint: an address holding the lead from one gesture until the next gesture arrives. Bar width is how long the lead was held. Outlined bars set a new endurance record at the time. The Endurance Champion has the longest single stint; the Chrono-Warrior held the Endurance Champion title longest overall. The legend shows their colors.",
       "selectCycle": "Select a cycle to inspect.",
       "loadErrorTitle": "Failed to load endurance timeline",
       "loadErrorMessage": "Could not fetch the gesture history for this cycle.",
       "empty": "No lead activity in this cycle yet.",
-      "championSummary": "Endurance champion: {address} held {duration}",
-      "chronoSummary": "Chrono-warrior: {address} reigned {duration}",
+      "championSummary": "Endurance Champion: {address} held {duration}",
+      "chronoSummary": "Chrono-Warrior: {address} reigned {duration}",
       "gantt": "Gantt",
       "lineChart": "Line chart",
-      "openWindowAria": "Open chart in a new window",
-      "openWindowTitle": "Open in new window"
+      "openWindow": "Open in a new window",
+      "leadHeldByValue": "Lead held by {address}",
+      "ganttLabel": "Lead stints by participant",
+      "laneLabel": "{address}: {count, plural, one {# stint} other {# stints}} in the lead, longest {longest}",
+      "hint": "Point at or select a stint for its details; arrow keys move between stints.",
+      "role": "Title",
+      "holds": "Stints in the lead",
+      "longestHold": "Longest stint",
+      "totalHeld": "Total time in the lead",
+      "viewLabel": "Chart view"
     },
     "cyclePicker": {
       "cycle": "Cycle",
       "previousCycleAria": "Previous cycle",
       "nextCycleAria": "Next cycle",
-      "cycleNumberAria": "Cycle number",
       "liveCycle": "Live cycle",
-      "jumpLive": "Jump to live"
+      "jumpLive": "Jump to live",
+      "option": "Cycle {cycle}",
+      "optionLive": "Cycle {cycle} (live)"
     },
     "cstWindow": {
       "timeIntoCycle": "Time into cycle",
@@ -525,15 +569,14 @@
       "typeEth": "ETH gesture (shortens)",
       "typeRandomWalk": "ETH + Random Walk gesture (shortens)",
       "typeCst": "CST gesture (lengthens)",
-      "summaryMin": "Low: {duration}",
-      "summaryMax": "High: {duration}",
-      "summaryCurrent": "Now: {duration}",
-      "summaryFinal": "At finalization: {duration}",
-      "description": "The CST Calibration Window sets how long a CST gesture's cost takes to descend from its starting value to free. Every ETH gesture shortens the window slightly; every CST gesture lengthens it. Each dot is a gesture, colored by type; the line is the window in effect after it.",
+      "summaryFinal": "The window was {current} at finalization. During the cycle it ranged from {low} to {high}.",
+      "description": "The CST Calibration Window sets how long a CST gesture's cost takes to descend from its starting value to free. Every ETH gesture shortens the window slightly; every CST gesture lengthens it. The line steps at every gesture to the window in effect after it; the table lists each gesture and its type.",
       "empty": "No per-gesture Calibration Window data for this cycle. Cycles indexed before the V2 events do not include it.",
       "selectCycle": "Select a cycle to inspect.",
       "loadErrorTitle": "Failed to load Calibration Window timeline",
-      "loadErrorMessage": "Could not fetch the gesture history for this cycle."
+      "loadErrorMessage": "Could not fetch the gesture history for this cycle.",
+      "method": "Gesture method",
+      "summaryLive": "The window is {current} now. This cycle it has ranged from {low} to {high}."
     },
     "cstCost": {
       "timeIntoCycle": "Time into cycle",
@@ -544,38 +587,51 @@
       "clockBefore": "Clock remaining before",
       "gestureBy": "Gesture by",
       "clickHint": "Click the dot to open the transaction.",
-      "summaryMax": "Highest cost: {amount} ({when} into cycle)",
-      "summaryTotal": "Total consumed: {amount}",
-      "summaryCount": "{count} CST gestures",
-      "description": "Each dot is the CST actually paid for a gesture (log scale — hollow dots were free). After every CST gesture the cost resets near twice the paid amount and descends to free across the Calibration Window. The dashed rose line shows the allocation clock remaining right before each gesture: when the clock runs low, rapid gesturing leaves the cost no time to descend, so paid prices escalate. Click a dot to open its transaction.",
+      "description": "Each dot is the CST actually paid for a gesture (log scale — hollow dots were free). After every CST gesture the cost resets near twice the paid amount and descends to free across the Calibration Window. The dashed line shows the allocation clock remaining right before each gesture: when the clock runs low, rapid gesturing leaves the cost no time to descend, so paid prices escalate. Click a dot to open its transaction.",
       "empty": "No CST gestures in this cycle.",
       "selectCycle": "Select a cycle to inspect.",
       "loadErrorTitle": "Failed to load CST gesture costs",
-      "loadErrorMessage": "Could not fetch the gesture history for this cycle."
+      "loadErrorMessage": "Could not fetch the gesture history for this cycle.",
+      "when": "When",
+      "summary": "{count, plural, one {# CST gesture} other {# CST gestures}} consumed {total}. The highest cost was {max}, {when} into the cycle."
     },
     "supply": {
       "totalSupply": "Total supply",
-      "imprint": "Imprint",
-      "consume": "Burn",
+      "imprint": "Imprinted",
+      "consume": "Burned",
       "net": "Net",
-      "numGestures": "Num gestures",
-      "from": "From",
-      "to": "To",
-      "update": "Update chart",
-      "invalidRange": "Start date must be on or before end date.",
+      "numGestures": "Gestures",
       "loadErrorTitle": "Failed to load supply history",
       "loadDateError": "Could not fetch CST total supply for the selected range.",
       "emptyDate": "No supply history for this date range.",
       "gesture": "Gesture {number}",
-      "gestureType": "Gesture type",
-      "gestureInfoId": "Gesture info id",
       "loadGestureError": "Could not fetch CST total supply by gesture.",
-      "emptyGesture": "No supply history by gesture."
+      "emptyGesture": "No supply history by gesture.",
+      "view": "View",
+      "range": "Range",
+      "rangeDays": "{days, plural, one {# day} other {# days}}",
+      "rangeYear": "Past year",
+      "rangeAll": "All time",
+      "legend": "Total supply, CST",
+      "gestureNumber": "Gesture",
+      "summary": "Total supply on {date}: {supply}. Over {range}, {imprinted} imprinted and {burned} burned."
     },
-    "balance": {
-      "outreachWallet": "Outreach Wallet",
-      "others": "Others"
+    "viewTable": "View as table",
+    "mix": {
+      "eth": "ETH",
+      "ethRandomWalk": "ETH with Random Walk NFT",
+      "cst": "CST",
+      "total": "{count, plural, one {# gesture} other {# gestures}} in all",
+      "window": "Window starting",
+      "summary": "Gestures this cycle: {total}. ETH {eth} ({ethShare}), ETH with Random Walk NFT {rwlk} ({rwlkShare}), CST {cst} ({cstShare}).",
+      "intervalAria": "{hours, plural, one {Every hour} other {Every # hours}}"
     }
+  },
+  "embed": {
+    "title": "Endurance timeline · Cycle {cycle}",
+    "final": "Final",
+    "source": "Open in Cosmic Signature",
+    "opensNewWindow": "(opens in a new window)"
   },
   "recipientHistory": {
     "pageTitle": "My Allocation History",

@@ -27,9 +27,9 @@
       "description": "Tần suất nét bút theo thời gian, các đợt tăng vọt hoạt động, khoảng hoạt động của người tham gia, tỷ lệ loại nét bút, dòng thời gian chu kỳ và các lần kích hoạt chu kỳ."
     },
     "performance": {
-      "label": "Thành tích",
-      "title": "Thống kê thành tích người tham gia",
-      "description": "Bảng xếp hạng thành tích người tham gia và kết quả phân bổ có thể nhận về của mọi chu kỳ trình diễn Cosmic Signature."
+      "label": "Kết quả",
+      "title": "Kết quả của người tham gia",
+      "description": "Mỗi người tham gia đã chi bao nhiêu cho nét bút và nhận bao nhiêu phân bổ, cùng tình hình nhận về tài sản của từng chu kỳ."
     }
   },
   "breadcrumbs": {
@@ -38,21 +38,15 @@
   "shared": {
     "noDataTitle": "Chưa có dữ liệu",
     "sectionLoadErrorTitle": "Không tải được {title}",
-    "serviceError": "Dịch vụ thống kê không phản hồi. Hãy thử lại sau ít phút."
+    "serviceError": "Dịch vụ thống kê không phản hồi. Hãy thử lại sau ít phút.",
+    "definitions": "Định nghĩa"
   },
   "hub": {
     "loadErrorTitle": "Không tải được thống kê",
     "loadErrorMessage": "Dịch vụ thống kê không phản hồi. Hãy thử lại sau ít phút.",
     "exploreTitle": "Khám phá thống kê",
     "exploreAria": "Các trang mục thống kê",
-    "currentCycleTitle": "Tìm dữ liệu chu kỳ hiện tại?",
-    "currentCycleSubtitle": "Xem lịch sử nét bút, bảng xếp hạng và chi tiết chu kỳ trực tiếp",
     "protocolEconomyTitle": "Dòng chảy của giao thức",
-    "anchoringGlanceTitle": "Tổng quan neo giữ",
-    "anchoringGlanceDescription": "{cosmicCount} Cosmic Signature NFT và {randomWalkCount} RandomWalk NFT hiện đang neo giữ. Xem thao tác neo giữ, token đang neo giữ và người neo giữ riêng biệt trên trang thống kê neo giữ.",
-    "anchoringGlanceLink": "Thống kê neo giữ",
-    "pendingStellarRetrievals": "{count} người nhận chưa nhận về tổng cộng {amount}",
-    "voluntaryContributionSummary": "{count} với tổng cộng {amount}",
     "jsonLd": {
       "webPageName": "Thống kê giao thức Cosmic Signature",
       "webPageDescription": "Thống kê công khai của giao thức Cosmic Signature trên Arbitrum, gồm trạng thái chu kỳ trình diễn, nét bút, NFT, CST, neo giữ, dự trữ và dữ liệu phân bổ.",
@@ -60,7 +54,7 @@
       "datasetDescription": "Bản tóm tắt có thể thu thập về hoạt động công khai của giao thức Cosmic Signature, được lập chỉ mục từ các hợp đồng thông minh Arbitrum và API của Cosmic Signature."
     },
     "seo": {
-      "heading": "Thống kê giao thức Cosmic Signature",
+      "heading": "Thống kê giao thức",
       "description": "Theo dõi hoạt động Cosmic Signature trên Arbitrum: chu kỳ trình diễn, nét bút, NFT, CST, neo giữ, dự trữ và các khoản phân bổ.",
       "relatedPagesAria": "Các trang liên quan đến thống kê",
       "links": {
@@ -70,7 +64,36 @@
         "faq": "Đọc câu hỏi thường gặp về Cosmic Signature"
       },
       "gesturesCaption": "{count, plural, other {# nét bút}} trong chu kỳ này"
-    }
+    },
+    "cycle": {
+      "title": "Chu kỳ {cycle} đến nay",
+      "open": "Mở chu kỳ hiện tại",
+      "opened": "Bắt đầu lúc",
+      "rhythmLabel": "Nét bút mỗi ngày, {days, number} ngày gần nhất",
+      "rhythmSummary": "Tổng cộng: {total}. Ngày sôi động nhất: {date} ({peak}).",
+      "rhythmEmpty": "Không có nét bút nào trong khoảng thời gian này.",
+      "rhythmUnavailable": "Hiện chưa thể tải số nét bút theo ngày.",
+      "splitTitle": "Dự trữ chu kỳ đi về đâu",
+      "splitDescription": "Khi chu kỳ hoàn tất, Dự trữ chu kỳ được chia theo các luồng phân bổ dưới đây. Phần còn lại chuyển sang chu kỳ kế tiếp."
+    },
+    "index": {
+      "participation": "Ai đang tham gia: người tham gia, người nhận và người đóng góp ETH.",
+      "tokens": "Ai nắm giữ NFT và CST, tổng cung theo thời gian và tài sản đính kèm.",
+      "anchoring": "NFT đang neo giữ, người neo giữ và phân phối neo giữ.",
+      "activity": "Nét bút diễn ra khi nào, những người tham gia tích cực nhất và chi tiết từng chu kỳ.",
+      "performance": "Mỗi người tham gia đã chi và nhận bao nhiêu, cùng tình hình nhận về theo chu kỳ."
+    },
+    "figures": {
+      "participants": "{count, plural, other {# người tham gia}}",
+      "anchored": "{count, plural, other {# NFT đang neo giữ}}",
+      "gestures": "{count, plural, other {# nét bút}}",
+      "cycles": "{count, plural, other {# chu kỳ đã hoàn tất}}",
+      "supply": "Tổng cung: {amount}"
+    },
+    "pendingRecipients": "{count, plural, other {# người nhận chưa nhận về}}",
+    "outreachTransactions": "{count, plural, other {# giao dịch}}",
+    "contributionCount": "{count, plural, other {# khoản đóng góp}}",
+    "retrievalCount": "{count, plural, other {# lần nhận về}}"
   },
   "metrics": {
     "activePerformanceCycle": {
@@ -247,17 +270,14 @@
       "enduranceTimeline": "Dòng thời gian Quán quân Bền bỉ và Chiến binh Thời gian",
       "cstWindow": "Dòng thời gian cửa sổ hiệu chỉnh CST",
       "cstCost": "Chi phí nét bút CST theo thời gian",
-      "cycleActivations": "Kích hoạt chu kỳ"
+      "cycleActivations": "Kích hoạt chu kỳ",
+      "cycleTimelines": "Chi tiết một chu kỳ"
     },
-    "currentCycleOnly": "Chỉ chu kỳ hiện tại",
-    "emptyCycleActivations": "Chưa có lần kích hoạt chu kỳ nào được lập chỉ mục"
+    "emptyCycleActivations": "Chưa có lần kích hoạt chu kỳ nào được lập chỉ mục",
+    "cycleTimelinesDescription": "Chọn một chu kỳ để xem nét bút chia theo phương thức ra sao, ai giữ vị trí dẫn đầu, và cửa sổ hiệu chỉnh CST cùng chi phí CST thay đổi thế nào."
   },
   "anchoringPage": {
     "snapshot": {
-      "cosmicSignatureLabel": "Cosmic Signature NFT đang neo giữ",
-      "cosmicSignatureTooltip": "Tổng số Cosmic Signature NFT hiện đang neo giữ trong giao thức và chia sẻ phân phối neo giữ.",
-      "randomWalkLabel": "Random Walk NFT đang neo giữ",
-      "randomWalkTooltip": "Tổng số Random Walk NFT hiện đang neo giữ và thuộc diện Tinh tuyển NFT neo giữ.",
       "poolLabel": "Quỹ phân phối neo giữ",
       "poolTooltip": "ETH hiện được phân bổ vào quỹ phân phối neo giữ cho những người neo giữ Cosmic Signature NFT.",
       "poolCaption": "Được nạp khi chu kỳ này hoàn tất; các đợt nạp trước chưa nhận về hiển thị ở mục “Chưa nhận về”.",
@@ -272,7 +292,8 @@
     "historyLink": "Xem lịch sử neo giữ",
     "tabs": {
       "cosmicSignature": "Cosmic Signature NFT",
-      "randomWalk": "RandomWalk NFT"
+      "randomWalk": "RandomWalk NFT",
+      "label": "Bộ sưu tập NFT"
     },
     "groups": {
       "cosmicSignature": "Tổng quan neo giữ Cosmic Signature NFT",
@@ -331,10 +352,17 @@
     "supplyTabs": {
       "date": "Theo ngày",
       "gesture": "Theo nét bút"
+    },
+    "holders": {
+      "summary": "{count, plural, other {# địa chỉ}} đang nắm giữ CST, xếp theo số dư lớn nhất. Tỷ lệ tính trên tổng cung {supply}.",
+      "summaryNoSupply": "{count, plural, other {# địa chỉ}} đang nắm giữ CST, xếp theo số dư lớn nhất.",
+      "share": "Tỷ lệ trên tổng cung",
+      "shareHelp": "Số dư này tính theo tỷ lệ trên tổng cung CST."
     }
   },
   "attachedAssets": {
     "scopeAria": "Phạm vi NFT đính kèm",
+    "paginationLabel": "Phân trang NFT đính kèm",
     "scopeAll": "Mọi chu kỳ",
     "scopeCurrent": "Chu kỳ hiện tại",
     "nftTab": "NFT (ERC-721)",
@@ -349,21 +377,11 @@
     "erc20Description": "Các token ERC-20 đính kèm vào nét bút trong chu kỳ trình diễn hiện tại."
   },
   "performance": {
-    "leaderboardTitle": "Thành tích người tham gia",
-    "claimsTitle": "Nhận về phân bổ theo chu kỳ",
+    "leaderboardTitle": "Đã chi và đã nhận",
+    "claimsTitle": "Nhận về theo chu kỳ",
     "leaderboard": {
-      "description": "ETH ròng và tỷ lệ ròng theo từng người tham gia, qua mọi chu kỳ. Các con số <em>chỉ tính ETH</em> — ETH nhận từ phân bổ trừ ETH đã chi cho nét bút; phân bổ CST và NFT được hiển thị làm bối cảnh. Người tham gia chỉ dùng CST không có số liệu ETH ròng.",
-      "sort": {
-        "netEth": "ETH ròng cao nhất",
-        "netPercent": "% ròng cao nhất",
-        "allocationRate": "Tỷ lệ phân bổ tốt nhất",
-        "spender": "Chi nhiều nhất",
-        "nfts": "Nhiều NFT nhất"
-      },
+      "description": "Mỗi người tham gia đạt số nét bút tối thiểu đã chọn đã chi bao nhiêu cho nét bút và được phân bổ bao nhiêu ETH, trên mọi chu kỳ. Số liệu tính bằng ETH; CST đã chi cùng phân bổ NFT và CST hiển thị bên dưới.",
       "minimumGestures": "Số nét bút tối thiểu",
-      "cstOnly": "(chỉ CST)",
-      "cstOnlyTooltip": "Không chi ETH (người tham gia chỉ dùng CST)",
-      "noEthReceivedTooltip": "Chưa có ETH quay về — người tham gia này chưa nhận phân bổ ETH nào đến nay",
       "loadErrorTitle": "Không tải được bảng xếp hạng thành tích",
       "loadErrorMessage": "Dịch vụ thống kê không phản hồi. Hãy thử lại sau ít phút.",
       "empty": "Chưa có người tham gia nào khớp với bộ lọc này.",
@@ -374,7 +392,6 @@
         "spent": "Đã chi (ETH)",
         "received": "Đã nhận (ETH)",
         "net": "Ròng (ETH)",
-        "netPercent": "% ròng",
         "allocations": "Phân bổ"
       }
     },
@@ -395,6 +412,7 @@
       "unclaimedCount": "{count} chưa nhận về",
       "viewUnclaimed": "Xem tài sản chưa nhận về",
       "explore": "Khám phá",
+      "exploreAria": "Khám phá dữ liệu nhận về của chu kỳ {cycle}",
       "dialog": {
         "unclaimedTitle": "Tài sản chưa nhận về — Chu kỳ {cycle}",
         "expired": "Thời hạn nhận về đã qua. Bất kỳ ai cũng có thể nhận về các tài sản còn lại cho mình.",
@@ -420,6 +438,17 @@
         "nft": "NFT đính kèm",
         "erc20": "ERC-20 đính kèm"
       }
+    },
+    "outcomes": {
+      "participants": "Người tham gia có từ {min} nét bút",
+      "spent": "ETH đã chi cho nét bút",
+      "received": "ETH nhận qua phân bổ",
+      "receivedMore": "Nhận nhiều ETH hơn đã chi",
+      "ofParticipants": "{part} trên {whole}",
+      "rank": "Thứ tự",
+      "netHelp": "ETH nhận qua phân bổ trừ ETH đã chi cho nét bút. Không tính CST.",
+      "rateHelp": "Tỷ lệ số chu kỳ người này tham gia mà có nhận ít nhất một phân bổ.",
+      "cycles": "{part} trên {whole, number} chu kỳ"
     }
   },
   "charts": {
@@ -432,7 +461,11 @@
       "loadErrorTitle": "Không tải được tần suất nét bút",
       "loadErrorMessage": "Không lấy được tần suất nét bút cho khoảng đã chọn.",
       "empty": "Không có hoạt động nét bút trong khoảng thời gian này.",
-      "openingExcluded": "Nét bút trong giờ đầu sau khi mỗi chu kỳ mở không được tính — hoạt động lúc mở tập trung bất thường và sẽ làm lệch biểu đồ này."
+      "openingExcluded": "Nét bút trong giờ đầu sau khi mỗi chu kỳ mở không được tính — hoạt động lúc mở tập trung bất thường và sẽ làm lệch biểu đồ này.",
+      "hour": "Giờ",
+      "day": "Ngày",
+      "summaryDaily": "Nét bút, {range}: {total}. Ngày sôi động nhất: {date} ({peak}).",
+      "summaryHourly": "Nét bút, {range}: {total}. Giờ sôi động nhất: {date} ({peak})."
     },
     "spikes": {
       "count": "Đợt tăng vọt ({count})",
@@ -447,35 +480,37 @@
       "empty": "Không phát hiện đợt tăng vọt nét bút nào trong lịch sử đã lập chỉ mục.",
       "noneRecent": "Gần đây không có đợt tăng vọt.",
       "selectEarlier": "Chọn số thứ tự ở trên để xem những đợt tăng hoạt động trước đó.",
-      "emptyWindow": "Không có khoảng gộp theo giờ cho cửa sổ đợt tăng vọt đã chọn."
+      "emptyWindow": "Không có khoảng gộp theo giờ cho cửa sổ đợt tăng vọt đã chọn.",
+      "optionAria": "Đợt tăng vọt ngày {date}, tối đa {peak} mỗi giờ"
     },
     "activePeriods": {
       "description": "Khoảng hoạt động của {count} người tham gia hàng đầu (≥2 nét bút với khoảng cách ≤6 giờ giữa hai nét bút liên tiếp). Mỗi thanh là một đợt.",
       "participant": "Người tham gia",
-      "ariaLabel": "{address}: {count} nét bút từ {start} đến {end}",
+      "ariaLabel": "{address}: {count, number} nét bút từ {start} đến {end}",
       "tooltipSummary": "{count} nét bút · kéo dài {minutes} phút",
       "loadErrorTitle": "Không tải được các khoảng hoạt động",
       "loadErrorMessage": "Không lấy được dòng thời gian hoạt động của những người tham gia hàng đầu.",
-      "empty": "Không tìm thấy khoảng hoạt động nét bút nào của những người tham gia hàng đầu."
+      "empty": "Không tìm thấy khoảng hoạt động nét bút nào của những người tham gia hàng đầu.",
+      "periods": "Khoảng hoạt động",
+      "longest": "Khoảng dài nhất",
+      "lastActive": "Hoạt động gần nhất",
+      "summary": "{count, number} người tham gia tích cực nhất, {range}. Nhiều nét bút nhất: {leader} ({gestures}).",
+      "laneLabel": "{rank}. {address}: {gestures, number} nét bút trong {periods, number} khoảng hoạt động",
+      "hint": "Trỏ vào hoặc chọn một khoảng để xem chi tiết; phím mũi tên chuyển giữa các khoảng."
     },
     "typeRatio": {
       "totalGestures": "Tổng số nét bút",
       "sampleEvery": "Lấy mẫu mỗi",
-      "interpolation": "Nội suy",
       "intervals": {
         "oneHour": "1 giờ",
         "sixHours": "6 giờ",
         "twelveHours": "12 giờ",
         "oneDay": "1 ngày"
       },
-      "linear": "Tuyến tính",
-      "step": "Bậc",
-      "smooth": "Mượt",
       "notStarted": "Chu kỳ hiện tại chưa bắt đầu.",
       "loadErrorTitle": "Không tải được phân bố loại nét bút",
       "loadErrorMessage": "Không lấy được cơ cấu loại nét bút của chu kỳ hiện tại.",
-      "empty": "Chưa có hoạt động nét bút trong chu kỳ hiện tại.",
-      "description": "Mỗi mẫu là tỷ lệ loại nét bút trong cửa sổ đó (theo từng khoảng, không tích lũy). Cửa sổ không có nét bút hiển thị 0% cho mọi loại."
+      "empty": "Chưa có hoạt động nét bút trong chu kỳ hiện tại."
     },
     "endurance": {
       "timeIntoCycle": "Thời gian trong chu kỳ",
@@ -497,7 +532,7 @@
       "roleEndurance": " (Quán quân Bền bỉ)",
       "roleNewRecord": " (kỷ lục mới)",
       "stintAria": "{address} • đã giữ {duration} • {from} → {to} trong chu kỳ{role}",
-      "description": "Mỗi thanh là một đoạn dẫn đầu — một địa chỉ giữ vị trí dẫn đầu từ một nét bút đến khi nét bút kế tiếp xuất hiện. Độ rộng thanh là thời gian họ dẫn đầu. Thanh viền hổ phách lập kỷ lục bền bỉ mới tại thời điểm đó; thanh tím là lần giữ đơn lẻ dài nhất (Quán quân Bền bỉ); làn hồng giữ danh hiệu lâu nhất tổng thể (Chiến binh Thời gian). Di chuột lên thanh để xem chi tiết.",
+      "description": "Mỗi thanh là một đoạn dẫn đầu — một địa chỉ giữ vị trí dẫn đầu từ một nét bút đến khi nét bút kế tiếp xuất hiện. Độ rộng thanh là thời gian dẫn đầu. Thanh có viền lập kỷ lục bền bỉ mới tại thời điểm đó. Quán quân Bền bỉ có lần giữ đơn lẻ dài nhất; Chiến binh Thời gian giữ danh hiệu Quán quân Bền bỉ lâu nhất tổng thể. Chú giải cho biết màu của từng danh hiệu.",
       "selectCycle": "Chọn một chu kỳ để xem.",
       "loadErrorTitle": "Không tải được dòng thời gian bền bỉ",
       "loadErrorMessage": "Không lấy được lịch sử nét bút của chu kỳ này.",
@@ -506,16 +541,25 @@
       "chronoSummary": "Chiến binh Thời gian: {address} đã giữ vị trí {duration}",
       "gantt": "Gantt",
       "lineChart": "Biểu đồ đường",
-      "openWindowAria": "Mở biểu đồ trong cửa sổ mới",
-      "openWindowTitle": "Mở trong cửa sổ mới"
+      "openWindow": "Mở trong cửa sổ mới",
+      "leadHeldByValue": "Dẫn đầu: {address}",
+      "ganttLabel": "Các đoạn dẫn đầu theo người tham gia",
+      "laneLabel": "{address}: {count, number} đoạn dẫn đầu, dài nhất {longest}",
+      "hint": "Trỏ vào hoặc chọn một đoạn dẫn đầu để xem chi tiết; phím mũi tên chuyển giữa các đoạn.",
+      "role": "Danh hiệu",
+      "holds": "Số đoạn dẫn đầu",
+      "longestHold": "Đoạn dài nhất",
+      "totalHeld": "Tổng thời gian dẫn đầu",
+      "viewLabel": "Kiểu biểu đồ"
     },
     "cyclePicker": {
       "cycle": "Chu kỳ",
       "previousCycleAria": "Chu kỳ trước",
       "nextCycleAria": "Chu kỳ sau",
-      "cycleNumberAria": "Số chu kỳ",
       "liveCycle": "Chu kỳ trực tiếp",
-      "jumpLive": "Đến chu kỳ trực tiếp"
+      "jumpLive": "Đến chu kỳ trực tiếp",
+      "option": "Chu kỳ {cycle}",
+      "optionLive": "Chu kỳ {cycle} (đang diễn ra)"
     },
     "cstWindow": {
       "timeIntoCycle": "Thời gian trong chu kỳ",
@@ -525,15 +569,14 @@
       "typeEth": "Nét bút ETH (rút ngắn)",
       "typeRandomWalk": "Nét bút ETH + RandomWalk (rút ngắn)",
       "typeCst": "Nét bút CST (kéo dài)",
-      "summaryMin": "Thấp: {duration}",
-      "summaryMax": "Cao: {duration}",
-      "summaryCurrent": "Hiện tại: {duration}",
-      "summaryFinal": "Khi hoàn tất: {duration}",
-      "description": "Cửa sổ hiệu chỉnh CST quyết định chi phí một nét bút CST mất bao lâu để giảm từ giá khởi điểm về không. Mỗi nét bút ETH rút ngắn cửa sổ một chút; mỗi nét bút CST kéo dài nó. Mỗi chấm là một nét bút, tô màu theo loại; đường kẻ là cửa sổ có hiệu lực sau nét bút đó.",
+      "summaryFinal": "Khi hoàn tất, cửa sổ là {current}. Trong chu kỳ, cửa sổ dao động từ {low} đến {high}.",
+      "description": "Cửa sổ hiệu chỉnh CST quyết định chi phí một nét bút CST mất bao lâu để giảm từ giá khởi điểm về không. Mỗi nét bút ETH rút ngắn cửa sổ một chút; mỗi nét bút CST kéo dài nó. Đường kẻ đổi ở mỗi nét bút sang cửa sổ có hiệu lực sau nét bút đó; bảng liệt kê từng nét bút và loại của nó.",
       "empty": "Không có dữ liệu cửa sổ hiệu chỉnh theo từng nét bút cho chu kỳ này. Các chu kỳ được lập chỉ mục trước các sự kiện V2 không có dữ liệu này.",
       "selectCycle": "Chọn một chu kỳ để xem.",
       "loadErrorTitle": "Không tải được dòng thời gian cửa sổ hiệu chỉnh",
-      "loadErrorMessage": "Không lấy được lịch sử nét bút của chu kỳ này."
+      "loadErrorMessage": "Không lấy được lịch sử nét bút của chu kỳ này.",
+      "method": "Phương thức nét bút",
+      "summaryLive": "Hiện cửa sổ là {current}. Trong chu kỳ này, cửa sổ dao động từ {low} đến {high}."
     },
     "cstCost": {
       "timeIntoCycle": "Thời gian trong chu kỳ",
@@ -544,14 +587,13 @@
       "clockBefore": "Thời gian còn lại trước đó",
       "gestureBy": "Nét bút của",
       "clickHint": "Nhấn vào chấm để mở giao dịch.",
-      "summaryMax": "Cao nhất: {amount} ({when} trong chu kỳ)",
-      "summaryTotal": "Tổng đã tiêu thụ: {amount}",
-      "summaryCount": "{count} nét bút CST",
-      "description": "Mỗi chấm là lượng CST thực trả cho một nét bút (thang log — chấm rỗng là không tốn chi phí). Sau mỗi nét bút CST, chi phí đặt lại ở gần gấp đôi lượng đã trả rồi giảm về không qua cửa sổ hiệu chỉnh. Đường hồng đứt nét là thời gian còn lại của đồng hồ phân bổ ngay trước mỗi nét bút: khi đồng hồ cạn, đặt nét bút liên tục khiến chi phí không có thời gian giảm, nên giá phải trả leo thang. Nhấn vào một chấm để mở giao dịch của nó.",
+      "description": "Mỗi chấm là lượng CST thực trả cho một nét bút (thang log — chấm rỗng là không tốn chi phí). Sau mỗi nét bút CST, chi phí đặt lại ở gần gấp đôi lượng đã trả rồi giảm về không qua cửa sổ hiệu chỉnh. Đường đứt nét là thời gian còn lại của đồng hồ phân bổ ngay trước mỗi nét bút: khi đồng hồ cạn, đặt nét bút liên tục khiến chi phí không có thời gian giảm, nên giá phải trả leo thang. Nhấn vào một chấm để mở giao dịch của nó.",
       "empty": "Không có nét bút CST trong chu kỳ này.",
       "selectCycle": "Chọn một chu kỳ để xem.",
       "loadErrorTitle": "Không tải được chi phí nét bút CST",
-      "loadErrorMessage": "Không lấy được lịch sử nét bút của chu kỳ này."
+      "loadErrorMessage": "Không lấy được lịch sử nét bút của chu kỳ này.",
+      "when": "Thời điểm",
+      "summary": "{count, number} nét bút CST đã tiêu thụ {total}. Chi phí cao nhất là {max}, sau {when} kể từ đầu chu kỳ."
     },
     "supply": {
       "totalSupply": "Tổng cung",
@@ -559,23 +601,37 @@
       "consume": "Đốt",
       "net": "Ròng",
       "numGestures": "Số nét bút",
-      "from": "Từ",
-      "to": "Đến",
-      "update": "Cập nhật biểu đồ",
-      "invalidRange": "Ngày bắt đầu phải trước hoặc bằng ngày kết thúc.",
       "loadErrorTitle": "Không tải được lịch sử nguồn cung",
       "loadDateError": "Không lấy được tổng cung CST cho khoảng đã chọn.",
       "emptyDate": "Không có lịch sử nguồn cung cho khoảng ngày này.",
       "gesture": "Nét bút {number}",
-      "gestureType": "Loại nét bút",
-      "gestureInfoId": "Mã thông tin nét bút",
       "loadGestureError": "Không lấy được tổng cung CST theo nét bút.",
-      "emptyGesture": "Không có lịch sử nguồn cung theo nét bút."
+      "emptyGesture": "Không có lịch sử nguồn cung theo nét bút.",
+      "view": "Chế độ xem",
+      "range": "Khoảng thời gian",
+      "rangeDays": "{days, number} ngày",
+      "rangeYear": "1 năm qua",
+      "rangeAll": "Toàn bộ",
+      "legend": "Tổng cung (CST)",
+      "gestureNumber": "Nét bút số",
+      "summary": "Tổng cung ngày {date}: {supply}. Trong {range}, đã khắc {imprinted} và đốt {burned}."
     },
-    "balance": {
-      "outreachWallet": "Ví truyền thông",
-      "others": "Khác"
+    "viewTable": "Xem dạng bảng",
+    "mix": {
+      "eth": "ETH",
+      "ethRandomWalk": "ETH + RandomWalk NFT",
+      "cst": "CST",
+      "total": "Tổng cộng {count, number} nét bút",
+      "window": "Khung bắt đầu",
+      "summary": "Nét bút trong chu kỳ này: {total}. ETH {eth} ({ethShare}), ETH + RandomWalk NFT {rwlk} ({rwlkShare}), CST {cst} ({cstShare}).",
+      "intervalAria": "{hours, plural, other {Mỗi # giờ}}"
     }
+  },
+  "embed": {
+    "title": "Dòng thời gian bền bỉ · Chu kỳ {cycle}",
+    "final": "Đã hoàn tất",
+    "source": "Mở trong Cosmic Signature",
+    "opensNewWindow": "(mở trong cửa sổ mới)"
   },
   "recipientHistory": {
     "pageTitle": "Lịch sử phân bổ của tôi",

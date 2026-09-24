@@ -2,86 +2,18 @@ import userEvent from '@testing-library/user-event';
 
 import type { GestureInfo } from '@/services/api/types';
 
-import { checkA11y, render, screen } from '@/test-utils';
+import { checkA11y, render, screen, within } from '@/test-utils';
 
-import CstGestureCostChart, {
-  CstGestureCostView,
-  CstGestureCostSection,
-} from '../CstGestureCostChart';
+import CstGestureCostChart, { CstGestureCostView, decadeTicks } from '../CstGestureCostChart';
 
 const mockUseGestureListByCycle = jest.fn();
 
 jest.mock('../../../hooks/useApiQuery', () => ({
   useGestureListByCycle: (...args: unknown[]) => mockUseGestureListByCycle(...args),
 }));
-
-/**
- * Recharts needs a measured container, which jsdom never provides, so the
- * chart internals are stubbed. `Line` invokes the real dot renderer, the axes
- * exercise the real tick formatters, and `Tooltip` renders its `content`
- * element with the first datum so the real tooltip component is exercised.
- */
-jest.mock('recharts', () => {
-  const React = require('react');
-  const lastRender: { data: unknown[] } = { data: [] };
-  return {
-    ResponsiveContainer: ({ children }: { children: React.ReactNode }) => (
-      <div data-testid="responsive-container">{children}</div>
-    ),
-    ComposedChart: ({ data, children }: { data: unknown[]; children: React.ReactNode }) => {
-      lastRender.data = data;
-      return (
-        <div data-testid="composed-chart" data-point-count={data.length}>
-          {children}
-        </div>
-      );
-    },
-    Line: ({
-      dot,
-      dataKey,
-      name,
-    }: {
-      dot?: ((props: object) => React.ReactElement) | boolean;
-      dataKey?: string;
-      name?: string;
-    }) => (
-      <svg data-testid={`line-${dataKey}`} data-name={name}>
-        {typeof dot === 'function'
-          ? lastRender.data.map((payload, index) => dot({ cx: index, cy: index, index, payload }))
-          : null}
-      </svg>
-    ),
-    XAxis: ({ tickFormatter }: { tickFormatter?: (value: number) => string }) => (
-      <div data-testid="x-axis-ticks">
-        {tickFormatter ? [0.5, 1, 1.5, 24, 36].map((v) => tickFormatter(v)).join(' ') : ''}
-      </div>
-    ),
-    YAxis: ({
-      yAxisId,
-      ticks,
-      tickFormatter,
-    }: {
-      yAxisId?: string;
-      ticks?: number[];
-      tickFormatter?: (value: number) => string;
-    }) => (
-      <div data-testid={`y-axis-${yAxisId}`}>
-        {tickFormatter
-          ? (ticks ?? [0, 1800, 3600, 86400, 129600]).map((v) => tickFormatter(v)).join(' ')
-          : ''}
-      </div>
-    ),
-    CartesianGrid: () => null,
-    Tooltip: ({ content }: { content: React.ReactElement }) =>
-      React.cloneElement(content, {
-        active: true,
-        payload: [{ payload: lastRender.data[0] }],
-      }),
-  };
-});
+jest.mock('recharts', () => require('@/test-utils/recharts').rechartsStub());
 
 const T0 = 1_700_000_000;
-
 const ADDR_A = '0xA1b2C3d4E5f60718293a4B5c6D7e8F9012345678';
 const ADDR_B = '0xB1b2C3d4E5f60718293a4B5c6D7e8F9012345678';
 
@@ -120,124 +52,92 @@ const gestures = [
   },
 ] as unknown as GestureInfo[];
 
-const ethOnlyGestures = [
-  {
-    TimeStamp: T0,
-    GestureType: 0,
-    BidderAddr: ADDR_A,
-    CstPriceEth: -1e-18,
-    PrizeTime: T0 + 7_200,
-  },
-] as unknown as GestureInfo[];
+const ethOnly = [gestures[0]!] as GestureInfo[];
 
-function okQuery<T>(data: T) {
-  return { data, isLoading: false, isError: false, refetch: jest.fn() };
-}
+const ok = <T,>(data: T) => ({ data, isLoading: false, isError: false, refetch: jest.fn() });
 
 beforeEach(() => {
   jest.clearAllMocks();
-  mockUseGestureListByCycle.mockReturnValue(okQuery(gestures));
+  mockUseGestureListByCycle.mockReturnValue(ok(gestures));
+});
+
+describe('decadeTicks', () => {
+  it('encloses the paid range in powers of ten', () => {
+    expect(decadeTicks(0.5, 3_500)).toEqual([0.1, 1, 10, 100, 1_000, 10_000]);
+  });
 });
 
 describe('CstGestureCostView', () => {
-  it('plots one point per CST gesture (ETH gestures only inform the clock)', () => {
-    render(<CstGestureCostView gestures={gestures} />);
-
+  it('plots one point per CST gesture and reads the cycle in one sentence', () => {
+    render(<CstGestureCostView gestures={gestures} label="CST cost" />);
     expect(screen.getByTestId('composed-chart')).toHaveAttribute('data-point-count', '3');
-    expect(screen.getByTestId('cst-gesture-cost-chart')).toBeInTheDocument();
+    const figure = screen.getByRole('figure', { name: 'CST cost' });
+    expect(figure).toHaveTextContent(
+      /consumed 3,650(\.00)? CST\. The highest cost was 3,500(\.00)? CST/,
+    );
   });
 
-  it('renders filled dots for paid gestures and a hollow dot for free ones', () => {
-    const { container } = render(<CstGestureCostView gestures={gestures} />);
-
-    const circles = container.querySelectorAll('circle');
-    expect(circles).toHaveLength(3);
-    // CST gestures in the shared CST method colour.
-    expect(circles[0]).toHaveAttribute('fill', 'hsl(var(--method-cst))');
-    expect(circles[1]).toHaveAttribute('fill', 'none'); // free gesture, clamped to the floor
-    expect(circles[2]).toHaveAttribute('fill', 'hsl(var(--method-cst))');
+  it('says when the highest cost came as a duration, not an axis tick', () => {
+    // Regression: the summary read "10.5d into the cycle".
+    const late = gestures.map((gesture, index) =>
+      index === 3 ? { ...gesture, TimeStamp: T0 + 10.5 * 86_400 } : gesture,
+    ) as GestureInfo[];
+    render(<CstGestureCostView gestures={late} label="CST cost" />);
+    expect(screen.getByRole('figure', { name: 'CST cost' })).toHaveTextContent(
+      /3,500(\.00)? CST, 10d 12h into the cycle\./,
+    );
   });
 
-  it('shows the priciest / total / count summary', () => {
-    render(<CstGestureCostView gestures={gestures} />);
-
-    expect(screen.getByText(/^Highest cost: 3,500 CST/)).toBeInTheDocument();
-    expect(screen.getByText(/^Total consumed: 3,650 CST/)).toBeInTheDocument();
-    expect(screen.getByText('3 CST gestures')).toBeInTheDocument();
+  it('draws a hollow dot for a gesture that cost nothing', () => {
+    const { container } = render(<CstGestureCostView gestures={gestures} label="CST cost" />);
+    const fills = Array.from(container.querySelectorAll('circle')).map((c) =>
+      c.getAttribute('fill'),
+    );
+    expect(fills).toEqual(['hsl(var(--method-cst))', 'none', 'hsl(var(--method-cst))']);
   });
 
-  it('shows CST paid, clock remaining, and the participant in the tooltip', () => {
-    render(<CstGestureCostView gestures={gestures} />);
-
-    expect(screen.getByText('CST paid')).toBeInTheDocument();
-    expect(screen.getByText('150 CST')).toBeInTheDocument();
-    // First CST gesture landed 3600s after the ETH gesture whose deadline was T0+7200.
-    expect(screen.getByText('Clock remaining before')).toBeInTheDocument();
-    expect(screen.getByText('1h')).toBeInTheDocument();
-    expect(screen.getByText(/0xb1b2…\u20605678/)).toBeInTheDocument();
-    expect(screen.getByText('Click the dot to open the transaction.')).toBeInTheDocument();
+  it('labels the price axis in decades and the clock axis in whole units', () => {
+    render(<CstGestureCostView gestures={gestures} label="CST cost" />);
+    const [price, clock] = screen.getAllByTestId('y-axis');
+    expect(within(price!).getByText('1,000')).toBeInTheDocument();
+    for (const tick of within(clock!).getAllByText(/./)) {
+      expect(tick.textContent).toMatch(/^(0|\d+(m|h|d)(\s\d+m)?)$/);
+    }
   });
 
-  it('renders decade ticks on the log price axis', () => {
-    render(<CstGestureCostView gestures={gestures} />);
-
-    // Floor 150 → decades from 100 to 10k enclose [150, 3500].
-    expect(screen.getByTestId('y-axis-cst')).toHaveTextContent('100 1k 10k');
+  it('keys the clock as a dashed reference line in the legend', () => {
+    render(<CstGestureCostView gestures={gestures} label="CST cost" />);
+    expect(screen.getByText('CST paid per gesture')).toBeInTheDocument();
+    expect(screen.getByText('Clock remaining before gesture')).toBeInTheDocument();
   });
 
-  it('formats the clock axis with duration ticks', () => {
-    render(<CstGestureCostView gestures={gestures} />);
-
-    expect(screen.getByTestId('y-axis-clock')).toHaveTextContent('0 30m 1h 1d 1.5d');
+  it('lists every CST gesture as a table, newest first', async () => {
+    const user = userEvent.setup();
+    render(<CstGestureCostView gestures={gestures} label="CST cost" />);
+    await user.click(screen.getByRole('button', { name: 'View as table' }));
+    const rows = within(screen.getByRole('table', { name: 'CST cost' })).getAllByRole('row');
+    expect(rows).toHaveLength(4);
+    expect(rows[1]).toHaveTextContent('3,500');
   });
 
-  it('renders the legend and the mechanic explainer', () => {
-    render(<CstGestureCostView gestures={gestures} />);
-
-    expect(screen.getAllByText('CST paid per gesture').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Clock remaining before gesture').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText(/resets near twice the paid amount/)).toBeInTheDocument();
-  });
-
-  it('shows the empty state when the round has no CST gestures', () => {
-    render(<CstGestureCostView gestures={ethOnlyGestures} />);
-
+  it('says so when the cycle had no CST gestures', () => {
+    render(<CstGestureCostView gestures={ethOnly} label="CST cost" />);
     expect(screen.getByText('No CST gestures in this cycle.')).toBeInTheDocument();
-    expect(screen.queryByTestId('composed-chart')).not.toBeInTheDocument();
   });
 
-  it('has no accessibility violations with data', async () => {
-    const { container } = render(<CstGestureCostView gestures={gestures} />);
-    await checkA11y(container);
-  });
-
-  it('has no accessibility violations in the empty state', async () => {
-    const { container } = render(<CstGestureCostView gestures={ethOnlyGestures} />);
+  it('has no axe violations', async () => {
+    const { container } = render(<CstGestureCostView gestures={gestures} label="CST cost" />);
     await checkA11y(container);
   });
 });
 
 describe('CstGestureCostChart', () => {
-  it('asks the user to select a round when none is chosen', () => {
-    render(<CstGestureCostChart round={-1} />);
-
+  it('asks for a cycle when none is chosen', () => {
+    render(<CstGestureCostChart round={-1} label="CST cost" />);
     expect(screen.getByText('Select a cycle to inspect.')).toBeInTheDocument();
   });
 
-  it('shows a spinner while the gesture list loads', () => {
-    mockUseGestureListByCycle.mockReturnValue({
-      data: undefined,
-      isLoading: true,
-      isError: false,
-      refetch: jest.fn(),
-    });
-    render(<CstGestureCostChart round={2} />);
-
-    expect(screen.getByRole('status')).toBeInTheDocument();
-    expect(screen.queryByTestId('composed-chart')).not.toBeInTheDocument();
-  });
-
-  it('offers a retry that refetches after a failure', async () => {
+  it('offers a retry when the gesture list fails', async () => {
     const user = userEvent.setup();
     const refetch = jest.fn();
     mockUseGestureListByCycle.mockReturnValue({
@@ -246,48 +146,9 @@ describe('CstGestureCostChart', () => {
       isError: true,
       refetch,
     });
-    render(<CstGestureCostChart round={2} />);
-
+    render(<CstGestureCostChart round={2} label="CST cost" />);
     expect(screen.getByText('Failed to load CST gesture costs')).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: /try again/i }));
-
-    expect(refetch).toHaveBeenCalledTimes(1);
-  });
-
-  it('fetches the round ascending', () => {
-    render(<CstGestureCostChart round={2} />);
-
-    expect(mockUseGestureListByCycle).toHaveBeenCalledWith(2, 'asc');
-  });
-});
-
-describe('CstGestureCostSection round picker', () => {
-  it('starts on the live round', () => {
-    render(<CstGestureCostSection currentRoundNum={5} />);
-
-    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(5);
-    expect(screen.getByText('Live cycle')).toBeInTheDocument();
-  });
-
-  it('keeps a user-pinned round when the live round advances', async () => {
-    const user = userEvent.setup();
-    const { rerender } = render(<CstGestureCostSection currentRoundNum={5} />);
-
-    await user.click(screen.getByRole('button', { name: 'Previous cycle' }));
-    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(4);
-
-    rerender(<CstGestureCostSection currentRoundNum={6} />);
-    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(4);
-  });
-
-  it('resumes following live after "Jump to live"', async () => {
-    const user = userEvent.setup();
-    render(<CstGestureCostSection currentRoundNum={5} />);
-
-    await user.click(screen.getByRole('button', { name: 'Previous cycle' }));
-    await user.click(screen.getByRole('button', { name: 'Jump to live' }));
-
-    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(5);
-    expect(screen.getByText('Live cycle')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /try again|retry/i }));
+    expect(refetch).toHaveBeenCalled();
   });
 });

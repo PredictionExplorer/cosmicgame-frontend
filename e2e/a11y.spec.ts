@@ -75,7 +75,7 @@ const zhRoutes: ReadonlyArray<{
     path: '/zh/statistics',
     label: 'statistics',
     assertAccessibleName: async (page) =>
-      expect(page.getByRole('heading', { name: 'Cosmic Signature 协议统计' })).toBeVisible(),
+      expect(page.getByRole('heading', { name: '协议统计' })).toBeVisible(),
   },
   {
     path: '/zh/faq',
@@ -227,9 +227,7 @@ test.describe('A11y smoke (WCAG 2.1 AA)', () => {
       path: '/uk/statistics',
       label: 'statistics',
       assertAccessibleName: async (page) =>
-        expect(
-          page.getByRole('heading', { name: 'Статистика протоколу Cosmic Signature' }),
-        ).toBeVisible(),
+        expect(page.getByRole('heading', { name: 'Статистика протоколу' })).toBeVisible(),
     },
     {
       path: '/uk/faq',

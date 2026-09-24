@@ -76,9 +76,9 @@
       "description": "サイクルごとの一筆のタイミング"
     },
     "statisticsPerformance": {
-      "label": "参加者の実績統計",
-      "short": "実績",
-      "description": "サイクルの記録と参加者の順位"
+      "label": "参加者の結果",
+      "short": "結果",
+      "description": "支出と受領、サイクル別の受け取り"
     },
     "allocationRecipients": {
       "label": "配分の受領者",

@@ -27,9 +27,9 @@
       "description": "檢視落筆頻次、活動峰值、參與者活躍時段、落筆類型佔比、週期時間線與週期啟用紀錄。"
     },
     "performance": {
-      "label": "表現",
-      "title": "參與者表現統計",
-      "description": "檢視參與者表現榜，以及 Cosmic Signature 各演繹週期中可取回資產的處理情況。"
+      "label": "結果",
+      "title": "參與者結果",
+      "description": "每位參與者在落筆上的支出與獲配的分配，以及各週期可取回資產的取回情況。"
     }
   },
   "breadcrumbs": {
@@ -38,21 +38,15 @@
   "shared": {
     "noDataTitle": "暫無資料",
     "sectionLoadErrorTitle": "未能載入{title}",
-    "serviceError": "統計服務暫未回應，請稍後再試。"
+    "serviceError": "統計服務暫未回應，請稍後再試。",
+    "definitions": "術語說明"
   },
   "hub": {
     "loadErrorTitle": "未能載入統計資料",
     "loadErrorMessage": "統計服務暫未回應，請稍後再試。",
     "exploreTitle": "瀏覽統計",
     "exploreAria": "統計分類頁面",
-    "currentCycleTitle": "想檢視目前週期數據？",
-    "currentCycleSubtitle": "檢視落筆歷史、排行榜與即時週期詳情",
     "protocolEconomyTitle": "協議資料",
-    "anchoringGlanceTitle": "錨定概覽",
-    "anchoringGlanceDescription": "目前共有 {cosmicCount} 枚 Cosmic Signature NFT 與 {randomWalkCount} 枚 Random Walk NFT 處於錨定狀態。前往錨定統計頁面，可檢視錨定操作、已錨定代幣與獨立錨定者。",
-    "anchoringGlanceLink": "檢視錨定統計",
-    "pendingStellarRetrievals": "{count} 位獲配者尚未取回共計 {amount}",
-    "voluntaryContributionSummary": "{count} 筆，共計 {amount}",
     "jsonLd": {
       "webPageName": "Cosmic Signature 協議統計",
       "webPageDescription": "Cosmic Signature 在 Arbitrum 上的公開協議統計，包括演繹週期狀態、落筆、NFT、CST、錨定、儲備與分配資料。",
@@ -60,7 +54,7 @@
       "datasetDescription": "可供檢索的 Cosmic Signature 公開活動摘要，資料由 Arbitrum 智慧合約與 Cosmic Signature API 索引。"
     },
     "seo": {
-      "heading": "Cosmic Signature 協議統計",
+      "heading": "協議統計",
       "description": "本頁彙總 Cosmic Signature 在 Arbitrum 上的公開協議活動，包括演繹週期狀態、落筆、Cosmic Signature NFT、CST、錨定、儲備與分配資料。",
       "relatedPagesAria": "統計相關頁面",
       "links": {
@@ -70,7 +64,36 @@
         "faq": "閱讀 Cosmic Signature 常見問題"
       },
       "gesturesCaption": "本週期落筆 {count, number} 次"
-    }
+    },
+    "cycle": {
+      "title": "第 {cycle} 個週期至今",
+      "open": "前往目前週期",
+      "opened": "開啟時間",
+      "rhythmLabel": "每日落筆，近 {days, number} 天",
+      "rhythmSummary": "合計 {total} 次。最活躍的一天：{date}（{peak} 次）。",
+      "rhythmEmpty": "這段時間沒有落筆。",
+      "rhythmUnavailable": "暫時無法取得每日落筆次數。",
+      "splitTitle": "週期儲備的去向",
+      "splitDescription": "週期收官時，週期儲備按下列分配軌道拆分，餘下部分滾入下一個週期。"
+    },
+    "index": {
+      "participation": "誰在參與：參與者、獲配者與 ETH 貢獻者。",
+      "tokens": "誰持有 NFT 與 CST、供應量的變化，以及附加資產。",
+      "anchoring": "已錨定的 NFT、錨定者與錨定配發。",
+      "activity": "落筆何時發生、最活躍的參與者，以及每個週期的細節。",
+      "performance": "每位參與者的花費與獲配，以及各週期的取回情況。"
+    },
+    "figures": {
+      "participants": "{count, plural, other {# 位參與者}}",
+      "anchored": "{count, plural, other {已錨定 # 個 NFT}}",
+      "gestures": "{count, plural, other {# 次落筆}}",
+      "cycles": "{count, plural, other {已完成 # 個週期}}",
+      "supply": "供應量 {amount}"
+    },
+    "pendingRecipients": "{count, plural, other {# 位獲配者尚未取回}}",
+    "outreachTransactions": "{count, plural, other {# 筆交易}}",
+    "contributionCount": "{count, plural, other {# 筆貢獻}}",
+    "retrievalCount": "{count, plural, other {取回 # 次}}"
   },
   "metrics": {
     "activePerformanceCycle": {
@@ -247,17 +270,14 @@
       "enduranceTimeline": "堅守與時之勇士時間線",
       "cstWindow": "CST 校準窗口時間線",
       "cstCost": "CST 落筆價格走勢",
-      "cycleActivations": "週期啟用紀錄"
+      "cycleActivations": "週期啟用紀錄",
+      "cycleTimelines": "單一週期詳情"
     },
-    "currentCycleOnly": "僅目前週期",
-    "emptyCycleActivations": "暫無已索引的週期啟用紀錄"
+    "emptyCycleActivations": "暫無已索引的週期啟用紀錄",
+    "cycleTimelinesDescription": "選擇一個週期，檢視其落筆方式的構成、領先者的更替，以及 CST 校準窗口與 CST 成本的變化。"
   },
   "anchoringPage": {
     "snapshot": {
-      "cosmicSignatureLabel": "已錨定 Cosmic Signature NFT",
-      "cosmicSignatureTooltip": "協議中目前已錨定並共享錨定配發的 Cosmic Signature NFT 總數。",
-      "randomWalkLabel": "已錨定 Random Walk NFT",
-      "randomWalkTooltip": "目前已錨定且具備錨定 NFT 星選資格的 Random Walk NFT 總數。",
       "poolLabel": "錨定配發池",
       "poolTooltip": "目前分配至 Cosmic Signature NFT 錨定者配發池的 ETH。",
       "poolCaption": "本週期收官時存入；此前已存入但尚未取回的部分計入「未取回」。",
@@ -272,7 +292,8 @@
     "historyLink": "檢視錨定歷史",
     "tabs": {
       "cosmicSignature": "Cosmic Signature NFT",
-      "randomWalk": "Random Walk NFT"
+      "randomWalk": "Random Walk NFT",
+      "label": "NFT 系列"
     },
     "groups": {
       "cosmicSignature": "Cosmic Signature NFT 錨定概覽",
@@ -331,10 +352,17 @@
     "supplyTabs": {
       "date": "按日期",
       "gesture": "按落筆"
+    },
+    "holders": {
+      "summary": "{count, plural, other {共 # 個地址持有 CST}}，按餘額從高到低排列。佔比以總供應量 {supply} 計算。",
+      "summaryNoSupply": "{count, plural, other {共 # 個地址持有 CST}}，按餘額從高到低排列。",
+      "share": "佔供應量",
+      "shareHelp": "該餘額佔 CST 總供應量的比例。"
     }
   },
   "attachedAssets": {
     "scopeAria": "已附加 NFT 範圍",
+    "paginationLabel": "已附加 NFT 的分頁導覽",
     "scopeAll": "所有週期",
     "scopeCurrent": "目前週期",
     "nftTab": "NFT（ERC-721）",
@@ -349,21 +377,11 @@
     "erc20Description": "目前演繹週期內隨落筆附加的 ERC-20 代幣。"
   },
   "performance": {
-    "leaderboardTitle": "參與者表現",
-    "claimsTitle": "按週期檢視分配取回",
+    "leaderboardTitle": "支出與獲配",
+    "claimsTitle": "各週期的取回",
     "leaderboard": {
-      "description": "彙總所有週期中每位參與者的淨 ETH 與淨值比例。資料僅計算 <em>ETH</em>：獲配的 ETH 減去落筆支出的 ETH；CST 與 NFT 分配僅作為背景資訊展示。僅使用 CST 的參與者不顯示 ETH 淨值比例。",
-      "sort": {
-        "netEth": "淨 ETH 最高",
-        "netPercent": "淨值比例最高",
-        "allocationRate": "獲配率最高",
-        "spender": "ETH 支出最多",
-        "nfts": "NFT 最多"
-      },
+      "description": "所有週期中，每位達到所選落筆次數的參與者在落筆上的支出，以及以 ETH 分配形式獲配的金額。數值以 ETH 計；CST 支出以及 NFT 與 CST 分配顯示在其下方。",
       "minimumGestures": "最低落筆次數",
-      "cstOnly": "（僅 CST）",
-      "cstOnlyTooltip": "未支出 ETH（僅使用 CST 的參與者）",
-      "noEthReceivedTooltip": "尚未獲配 ETH，因此目前淨值比例表示全部支出。",
       "loadErrorTitle": "未能載入參與者表現榜",
       "loadErrorMessage": "統計服務暫未回應，請稍後再試。",
       "empty": "暫無符合篩選條件的參與者。",
@@ -374,7 +392,6 @@
         "spent": "支出（ETH）",
         "received": "獲配（ETH）",
         "net": "淨值（ETH）",
-        "netPercent": "淨值比例",
         "allocations": "分配"
       }
     },
@@ -395,6 +412,7 @@
       "unclaimedCount": "{count} 項未取回",
       "viewUnclaimed": "檢視未取回資產",
       "explore": "檢視",
+      "exploreAria": "檢視第 {cycle} 個週期的取回紀錄",
       "dialog": {
         "unclaimedTitle": "第 {cycle} 個週期的未取回資產",
         "expired": "取回窗口已結束，現在任何人都可執行超時取回。",
@@ -420,6 +438,17 @@
         "nft": "已附加 NFT",
         "erc20": "已附加 ERC-20"
       }
+    },
+    "outcomes": {
+      "participants": "落筆 {min} 次以上的參與者",
+      "spent": "落筆支出的 ETH",
+      "received": "以分配獲配的 ETH",
+      "receivedMore": "獲配 ETH 多於支出",
+      "ofParticipants": "{whole} 位中的 {part} 位",
+      "rank": "序號",
+      "netHelp": "以分配獲配的 ETH 減去落筆支出的 ETH，不含 CST。",
+      "rateHelp": "該參與者參與的週期中，至少獲配一次分配的週期所佔比例。",
+      "cycles": "{whole, number} 個週期中的 {part} 個"
     }
   },
   "charts": {
@@ -432,7 +461,11 @@
       "loadErrorTitle": "未能載入落筆頻次",
       "loadErrorMessage": "未能取得所選時間範圍內的落筆頻次。",
       "empty": "此時間範圍內暫無落筆活動。",
-      "openingExcluded": "每個週期開啟後的首小時不計入統計。該時段活動通常高度集中，納入後會使圖表失真。"
+      "openingExcluded": "每個週期開啟後的首小時不計入統計。該時段活動通常高度集中，納入後會使圖表失真。",
+      "hour": "小時",
+      "day": "日期",
+      "summaryDaily": "{range} 共 {total} 次落筆。最活躍的一天：{date}（{peak} 次）。",
+      "summaryHourly": "{range} 共 {total} 次落筆。最活躍的一小時：{date}（{peak} 次）。"
     },
     "spikes": {
       "count": "峰值（{count}）",
@@ -447,35 +480,37 @@
       "empty": "索引歷史中未檢測到落筆峰值。",
       "noneRecent": "近期暫無峰值。",
       "selectEarlier": "選擇上方峰值編號，可回看更早的活動突增時段。",
-      "emptyWindow": "所選峰值區間內暫無小時資料。"
+      "emptyWindow": "所選峰值區間內暫無小時資料。",
+      "optionAria": "{date} 的峰值，每小時最多 {peak} 次"
     },
     "activePeriods": {
       "description": "展示前 {count} 位參與者的活躍時段（至少 2 次落筆，且相鄰落筆間隔不超過 6 小時）。每個條形代表一段活躍區間。",
       "participant": "參與者",
-      "ariaLabel": "{address}：{count} 次落筆，時間從 {start} 至 {end}",
+      "ariaLabel": "{address}：{count, number} 次落筆，時間從 {start} 至 {end}",
       "tooltipSummary": "{count} 次落筆 · 持續 {minutes} 分鐘",
       "loadErrorTitle": "未能載入活躍時段",
       "loadErrorMessage": "未能取得活躍參與者時間線。",
-      "empty": "活躍參與者中暫無符合條件的落筆時段。"
+      "empty": "活躍參與者中暫無符合條件的落筆時段。",
+      "periods": "活躍時段",
+      "longest": "最長時段",
+      "lastActive": "最近活躍",
+      "summary": "{range} 最活躍的 {count, number} 位參與者。落筆最多：{leader}（{gestures} 次）。",
+      "laneLabel": "第 {rank} 名 {address}：{gestures, number} 次落筆，{periods, number} 個活躍時段",
+      "hint": "指向或選取某個時段即可檢視詳情；方向鍵可在時段間移動。"
     },
     "typeRatio": {
       "totalGestures": "落筆總數",
       "sampleEvery": "取樣間隔",
-      "interpolation": "連線方式",
       "intervals": {
         "oneHour": "1小時",
         "sixHours": "6小時",
         "twelveHours": "12小時",
         "oneDay": "1天"
       },
-      "linear": "直線",
-      "step": "階梯",
-      "smooth": "平滑",
       "notStarted": "目前週期尚未開始。",
       "loadErrorTitle": "未能載入落筆類型分佈",
       "loadErrorMessage": "未能取得目前週期的落筆類型構成。",
-      "empty": "目前週期暫無落筆活動。",
-      "description": "每個取樣點顯示對應時間窗口內的落筆類型佔比，而非累計值。沒有落筆的窗口中，各類型均顯示為 0%。"
+      "empty": "目前週期暫無落筆活動。"
     },
     "endurance": {
       "timeIntoCycle": "週期內時間",
@@ -497,7 +532,7 @@
       "roleEndurance": "（堅守冠軍）",
       "roleNewRecord": "（刷新紀錄）",
       "stintAria": "{address} · 保持領先 {duration} · 週期開始後 {from} → {to}{role}",
-      "description": "每個條形代表一段領先時段：從一次落筆取得領先，到下一次落筆改寫領先者。條形寬度表示保持領先的時長。琥珀色描邊表示當時刷新了堅守紀錄；紫色條形是全週期最長的單次領先時段（堅守冠軍）；玫紅色軌道則是在堅守冠軍位置上連續在位最久的時之勇士。懸停即可檢視詳情。",
+      "description": "每個條形代表一段領先時段：從一次落筆取得領先，到下一次落筆改寫領先者。條形寬度表示保持領先的時長。帶描邊的條形表示當時刷新了堅守紀錄。堅守冠軍擁有最長的單次領先時段；時之勇士則在堅守冠軍位置上累計在位最久。二者的顏色見圖例。",
       "selectCycle": "請選擇要檢視的週期。",
       "loadErrorTitle": "未能載入堅守時間線",
       "loadErrorMessage": "未能取得此週期的落筆歷史。",
@@ -506,16 +541,25 @@
       "chronoSummary": "時之勇士：{address}，在位 {duration}",
       "gantt": "甘特圖",
       "lineChart": "折線圖",
-      "openWindowAria": "在新視窗中開啟圖表",
-      "openWindowTitle": "在新視窗中開啟"
+      "openWindow": "在新視窗中開啟",
+      "leadHeldByValue": "領先者：{address}",
+      "ganttLabel": "各參與者的領先時段",
+      "laneLabel": "{address}：領先 {count, number} 次，最長 {longest}",
+      "hint": "指向或選取某段領先時段即可檢視詳情；方向鍵可在時段間移動。",
+      "role": "稱號",
+      "holds": "領先次數",
+      "longestHold": "最長領先",
+      "totalHeld": "領先總時長",
+      "viewLabel": "圖表檢視"
     },
     "cyclePicker": {
       "cycle": "週期",
       "previousCycleAria": "上一個週期",
       "nextCycleAria": "下一個週期",
-      "cycleNumberAria": "週期編號",
       "liveCycle": "目前週期",
-      "jumpLive": "回到目前週期"
+      "jumpLive": "回到目前週期",
+      "option": "第 {cycle} 個週期",
+      "optionLive": "第 {cycle} 個週期（進行中）"
     },
     "cstWindow": {
       "timeIntoCycle": "週期內時間",
@@ -525,15 +569,14 @@
       "typeEth": "ETH 落筆（縮短）",
       "typeRandomWalk": "ETH + Random Walk 落筆（縮短）",
       "typeCst": "CST 落筆（延長）",
-      "summaryMin": "最短：{duration}",
-      "summaryMax": "最長：{duration}",
-      "summaryCurrent": "目前：{duration}",
-      "summaryFinal": "收官時：{duration}",
-      "description": "CST 校準窗口決定 CST 落筆價格從起始值衰減到免費所需的時間。每次 ETH 落筆都會略微縮短窗口；每次 CST 落筆則會延長它。每個圓點代表一次落筆，顏色區分類型；折線表示該次落筆之後生效的窗口長度。",
+      "summaryFinal": "收官時窗口為 {current}，週期內介於 {low} 與 {high} 之間。",
+      "description": "CST 校準窗口決定 CST 落筆價格從起始值衰減到免費所需的時間。每次 ETH 落筆都會略微縮短窗口；每次 CST 落筆則會延長它。折線在每次落筆時躍變為之後生效的窗口長度；表格列出每次落筆及其類型。",
       "empty": "此週期沒有逐筆校準窗口資料。V2 事件之前索引的週期不包含該資料。",
       "selectCycle": "請選擇要檢視的週期。",
       "loadErrorTitle": "未能載入校準窗口時間線",
-      "loadErrorMessage": "未能取得此週期的落筆歷史。"
+      "loadErrorMessage": "未能取得此週期的落筆歷史。",
+      "method": "落筆方式",
+      "summaryLive": "目前窗口為 {current}，本週期內介於 {low} 與 {high} 之間。"
     },
     "cstCost": {
       "timeIntoCycle": "週期內時間",
@@ -544,14 +587,13 @@
       "clockBefore": "落筆前剩餘時間",
       "gestureBy": "落筆者",
       "clickHint": "點選圓點可檢視交易。",
-      "summaryMax": "最貴：{amount}（週期開始後 {when}）",
-      "summaryTotal": "總消耗：{amount}",
-      "summaryCount": "{count} 次 CST 落筆",
-      "description": "每個圓點代表一次 CST 落筆的實際支付金額（對數刻度——空心圓點表示免費）。每次 CST 落筆後，價格會以約兩倍於落筆價格重新開始，並在校準窗口內回落到免費。玫紅色虛線表示每次落筆前分配時鐘的剩餘時間：當時鐘接近歸零時，密集落筆讓價格來不及回落，落筆價格隨之飆升。點選圓點可檢視交易。",
+      "description": "每個圓點代表一次 CST 落筆的實際支付金額（對數刻度——空心圓點表示免費）。每次 CST 落筆後，價格會以約兩倍於落筆價格重新開始，並在校準窗口內回落到免費。虛線表示每次落筆前分配時鐘的剩餘時間：當時鐘接近歸零時，密集落筆讓價格來不及回落，落筆價格隨之飆升。點選圓點可檢視交易。",
       "empty": "此週期沒有 CST 落筆。",
       "selectCycle": "請選擇要檢視的週期。",
       "loadErrorTitle": "未能載入 CST 落筆價格",
-      "loadErrorMessage": "未能取得此週期的落筆歷史。"
+      "loadErrorMessage": "未能取得此週期的落筆歷史。",
+      "when": "時間",
+      "summary": "{count, number} 次 CST 落筆共消耗 {total}。最高成本為 {max}，出現在週期開始後 {when}。"
     },
     "supply": {
       "totalSupply": "總供應量",
@@ -559,23 +601,37 @@
       "consume": "消耗",
       "net": "淨變化",
       "numGestures": "落筆次數",
-      "from": "開始日期",
-      "to": "結束日期",
-      "update": "更新圖表",
-      "invalidRange": "開始日期不得晚於結束日期。",
       "loadErrorTitle": "未能載入供應量歷史",
       "loadDateError": "未能取得所選日期範圍內的 CST 總供應量。",
       "emptyDate": "此日期範圍內暫無供應量歷史。",
       "gesture": "第 {number} 筆落筆",
-      "gestureType": "落筆類型",
-      "gestureInfoId": "落筆資訊 ID",
       "loadGestureError": "未能按落筆取得 CST 總供應量。",
-      "emptyGesture": "暫無按落筆紀錄的供應量歷史。"
+      "emptyGesture": "暫無按落筆紀錄的供應量歷史。",
+      "view": "檢視方式",
+      "range": "範圍",
+      "rangeDays": "{days, number} 天",
+      "rangeYear": "近一年",
+      "rangeAll": "全部",
+      "legend": "總供應量（CST）",
+      "gestureNumber": "落筆序號",
+      "summary": "{date} 總供應量：{supply}。{range} 期間銘刻 {imprinted}，消耗 {burned}。"
     },
-    "balance": {
-      "outreachWallet": "推廣錢包",
-      "others": "其他"
+    "viewTable": "以表格檢視",
+    "mix": {
+      "eth": "ETH",
+      "ethRandomWalk": "ETH 搭配 Random Walk NFT",
+      "cst": "CST",
+      "total": "共 {count, number} 次落筆",
+      "window": "時段起點",
+      "summary": "本週期落筆 {total} 次：ETH {eth} 次（{ethShare}），ETH 搭配 Random Walk NFT {rwlk} 次（{rwlkShare}），CST {cst} 次（{cstShare}）。",
+      "intervalAria": "{hours, plural, other {每 # 小時}}"
     }
+  },
+  "embed": {
+    "title": "堅守時間線 · 第 {cycle} 個週期",
+    "final": "已收官",
+    "source": "在 Cosmic Signature 中開啟",
+    "opensNewWindow": "（在新視窗中開啟）"
   },
   "recipientHistory": {
     "pageTitle": "我的分配歷史",

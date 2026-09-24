@@ -27,9 +27,9 @@
       "description": "時間ごとの一筆の頻度、活動の急増、参加者の活動期間、一筆の種類の構成、サイクルのタイムライン、サイクルの有効化。"
     },
     "performance": {
-      "label": "実績",
-      "title": "参加者の実績統計",
-      "description": "すべてのCosmic Signatureパフォーマンス・サイクルにおける参加者の実績順位表と、受け取れる配分の結果。"
+      "label": "結果",
+      "title": "参加者の結果",
+      "description": "参加者ごとの一筆への支出と配分の受け取り、そして各サイクルの受け取り可能な資産の受け取り状況。"
     }
   },
   "breadcrumbs": {
@@ -38,21 +38,15 @@
   "shared": {
     "noDataTitle": "データはまだありません",
     "sectionLoadErrorTitle": "{title}を読み込めませんでした",
-    "serviceError": "統計サービスから応答がありませんでした。しばらくしてからもう一度お試しください。"
+    "serviceError": "統計サービスから応答がありませんでした。しばらくしてからもう一度お試しください。",
+    "definitions": "用語の説明"
   },
   "hub": {
     "loadErrorTitle": "統計を読み込めませんでした",
     "loadErrorMessage": "統計サービスから応答がありませんでした。しばらくしてからもう一度お試しください。",
     "exploreTitle": "統計を探索",
     "exploreAria": "統計のセクションページ",
-    "currentCycleTitle": "現在のサイクルのデータをお探しですか？",
-    "currentCycleSubtitle": "一筆の履歴、順位表、ライブのサイクル詳細を見る",
     "protocolEconomyTitle": "プロトコルの経済",
-    "anchoringGlanceTitle": "係留の概観",
-    "anchoringGlanceDescription": "現在、{cosmicCount}点のCosmic Signature NFTと{randomWalkCount}点のRandomWalk NFTが係留されています。係留操作、係留中のトークン、ユニーク係留者は係留統計ページで確認できます。",
-    "anchoringGlanceLink": "係留統計",
-    "pendingStellarRetrievals": "{count}人の受領者が、合計{amount}の資金をまだ受け取っていません",
-    "voluntaryContributionSummary": "{count}件、合計{amount}",
     "jsonLd": {
       "webPageName": "Cosmic Signatureプロトコル統計",
       "webPageDescription": "パフォーマンス・サイクルの状態、一筆、NFT、CST、係留、準備金、配分データを含む、Arbitrum上のCosmic Signatureプロトコルの公開統計。",
@@ -60,7 +54,7 @@
       "datasetDescription": "ArbitrumスマートコントラクトとCosmic Signature APIの記録に基づく、プロトコルの公開活動の集計です。"
     },
     "seo": {
-      "heading": "Cosmic Signatureプロトコル統計",
+      "heading": "プロトコル統計",
       "description": "Arbitrum上の公開記録に基づくプロトコル統計です。サイクルの状態、一筆、NFT、CST、係留、準備金、配分の推移を確認できます。",
       "relatedPagesAria": "統計の関連ページ",
       "links": {
@@ -70,7 +64,36 @@
         "faq": "Cosmic Signatureのよくある質問を読む"
       },
       "gesturesCaption": "このサイクルで{count, plural, other {#筆}}"
-    }
+    },
+    "cycle": {
+      "title": "サイクル{cycle}の現況",
+      "open": "現在のサイクルを開く",
+      "opened": "開始日時",
+      "rhythmLabel": "日ごとの一筆（直近{days, number}日）",
+      "rhythmSummary": "合計{total}筆。最も活発な日：{date}（{peak}筆）。",
+      "rhythmEmpty": "この期間の一筆はありません。",
+      "rhythmUnavailable": "現在、日ごとの一筆の件数を取得できません。",
+      "splitTitle": "サイクル準備金の行き先",
+      "splitDescription": "サイクルが確定すると、サイクル準備金は以下の配分トラックに分かれます。残りは次のサイクルに引き継がれます。"
+    },
+    "index": {
+      "participation": "参加者、受領者、ETH拠出者の顔ぶれ。",
+      "tokens": "NFTとCSTの保有者、供給量の推移、添付されたアセット。",
+      "anchoring": "係留中のNFT、係留者、係留配分。",
+      "activity": "一筆のタイミング、最も活発な参加者、各サイクルの詳細。",
+      "performance": "参加者ごとの支出と受領額、サイクルごとの受け取り状況。"
+    },
+    "figures": {
+      "participants": "{count, plural, other {参加者#人}}",
+      "anchored": "{count, plural, other {#点のNFTを係留中}}",
+      "gestures": "{count, plural, other {#筆}}",
+      "cycles": "{count, plural, other {完了したサイクル#件}}",
+      "supply": "供給量{amount}"
+    },
+    "pendingRecipients": "{count, plural, other {未受け取りの受領者#人}}",
+    "outreachTransactions": "{count, plural, other {トランザクション#件}}",
+    "contributionCount": "{count, plural, other {拠出#件}}",
+    "retrievalCount": "{count, plural, other {受け取り#件}}"
   },
   "metrics": {
     "activePerformanceCycle": {
@@ -247,17 +270,14 @@
       "enduranceTimeline": "持久と時の戦士のタイムライン",
       "cstWindow": "CST調律期間のタイムライン",
       "cstCost": "CST一筆の費用の推移",
-      "cycleActivations": "サイクルの有効化"
+      "cycleActivations": "サイクルの有効化",
+      "cycleTimelines": "サイクルの詳細"
     },
-    "currentCycleOnly": "現在のサイクルのみ",
-    "emptyCycleActivations": "インデックス済みのサイクル有効化はまだありません"
+    "emptyCycleActivations": "インデックス済みのサイクル有効化はまだありません",
+    "cycleTimelinesDescription": "サイクルを選ぶと、一筆の方法の内訳、先頭の推移、CST調律期間とCSTコストの変化を確認できます。"
   },
   "anchoringPage": {
     "snapshot": {
-      "cosmicSignatureLabel": "係留中のCosmic Signature NFT",
-      "cosmicSignatureTooltip": "プロトコルに現在係留され、係留配分を分け合っているCosmic Signature NFTの総数。",
-      "randomWalkLabel": "係留中のRandom Walk NFT",
-      "randomWalkTooltip": "現在係留され、係留NFT星選の対象となっているRandom Walk NFTの総数。",
       "poolLabel": "係留配分プール",
       "poolTooltip": "Cosmic Signature NFTの係留者のために係留配分プールに現在配分されているETH。",
       "poolCaption": "このサイクルの確定時に積み立てられます。以前の積立分でまだ受け取られていないものは「未受け取り」に表示されます。",
@@ -272,7 +292,8 @@
     "historyLink": "係留の履歴を見る",
     "tabs": {
       "cosmicSignature": "Cosmic Signature NFT",
-      "randomWalk": "RandomWalk NFT"
+      "randomWalk": "RandomWalk NFT",
+      "label": "NFTコレクション"
     },
     "groups": {
       "cosmicSignature": "Cosmic Signature NFT係留の概要",
@@ -331,10 +352,17 @@
     "supplyTabs": {
       "date": "日付別",
       "gesture": "一筆別"
+    },
+    "holders": {
+      "summary": "{count, plural, other {#件のアドレス}}がCSTを保有しています（残高の多い順）。割合は総供給量{supply}に対するものです。",
+      "summaryNoSupply": "{count, plural, other {#件のアドレス}}がCSTを保有しています（残高の多い順）。",
+      "share": "供給量に占める割合",
+      "shareHelp": "この残高がCST総供給量に占める割合です。"
     }
   },
   "attachedAssets": {
     "scopeAria": "添付NFTの範囲",
+    "paginationLabel": "添付NFTのページ送り",
     "scopeAll": "すべてのサイクル",
     "scopeCurrent": "現在のサイクル",
     "nftTab": "NFT（ERC-721）",
@@ -349,21 +377,11 @@
     "erc20Description": "現在のパフォーマンス・サイクル中に一筆に添付されたERC-20トークン。"
   },
   "performance": {
-    "leaderboardTitle": "参加者の実績",
-    "claimsTitle": "サイクル別の配分の受け取り",
+    "leaderboardTitle": "支出と受領",
+    "claimsTitle": "サイクル別の受け取り",
     "leaderboard": {
-      "description": "すべてのサイクルにわたる、参加者ごとの純ETHと増減率。数値は<em>ETHのみ</em>で、配分で受け取ったETHから一筆に使ったETHを引いたものです。CSTとNFTの配分は参考として示します。CSTだけを使った参加者にはETHの増減は表示されません。",
-      "sort": {
-        "netEth": "純ETHが多い順",
-        "netPercent": "純増減率が高い順",
-        "allocationRate": "配分率が高い順",
-        "spender": "支出が多い順",
-        "nfts": "NFTが多い順"
-      },
+      "description": "選んだ筆数以上の参加者ごとに、すべてのサイクルで一筆に支払った額と、ETHの配分として受け取った額を示します。数値はETH建てで、支払ったCSTとNFT・CSTの配分はその下に表示します。",
       "minimumGestures": "最小筆数",
-      "cstOnly": "（CSTのみ）",
-      "cstOnlyTooltip": "ETHの支出なし（CSTのみの参加者）",
-      "noEthReceivedTooltip": "まだETHを受け取っていません。この参加者はこれまでETHの配分を受けていません",
       "loadErrorTitle": "実績の順位表を読み込めませんでした",
       "loadErrorMessage": "統計サービスから応答がありませんでした。しばらくしてからもう一度お試しください。",
       "empty": "この絞り込みに一致する参加者はまだいません。",
@@ -374,7 +392,6 @@
         "spent": "支出（ETH）",
         "received": "受領（ETH）",
         "net": "純額（ETH）",
-        "netPercent": "純増減率",
         "allocations": "配分"
       }
     },
@@ -395,6 +412,7 @@
       "unclaimedCount": "未受け取り{count}件",
       "viewUnclaimed": "未受け取りのアセットを見る",
       "explore": "探索",
+      "exploreAria": "サイクル{cycle}の受け取りを探索",
       "dialog": {
         "unclaimedTitle": "未受け取りのアセット——サイクル{cycle}",
         "expired": "受け取り期間は終了しました。これらのアセットは誰でも取得できます。",
@@ -420,6 +438,17 @@
         "nft": "添付されたNFT",
         "erc20": "添付されたERC-20"
       }
+    },
+    "outcomes": {
+      "participants": "{min}筆以上の参加者",
+      "spent": "一筆に支払ったETH",
+      "received": "配分で受け取ったETH",
+      "receivedMore": "支払いより多くのETHを受け取った参加者",
+      "ofParticipants": "{whole}人中{part}人",
+      "rank": "順番",
+      "netHelp": "配分で受け取ったETHから、一筆に支払ったETHを引いた額です。CSTは含みません。",
+      "rateHelp": "この参加者が参加したサイクルのうち、少なくとも一つの配分を受け取ったサイクルの割合です。",
+      "cycles": "{whole, number}サイクル中{part}"
     }
   },
   "charts": {
@@ -432,7 +461,11 @@
       "loadErrorTitle": "一筆の頻度を読み込めませんでした",
       "loadErrorMessage": "選択した範囲の一筆の頻度を取得できませんでした。",
       "empty": "この期間に一筆の活動はありません。",
-      "openingExcluded": "各サイクルの開始後1時間の一筆は除外しています。開始直後の活動は極端に集中するため、含めるとこのグラフが歪んでしまいます。"
+      "openingExcluded": "各サイクルの開始後1時間の一筆は除外しています。開始直後の活動は極端に集中するため、含めるとこのグラフが歪んでしまいます。",
+      "hour": "時間",
+      "day": "日付",
+      "summaryDaily": "{range}の一筆は{total}筆。最も活発な日：{date}（{peak}筆）。",
+      "summaryHourly": "{range}の一筆は{total}筆。最も活発な時間帯：{date}（{peak}筆）。"
     },
     "spikes": {
       "count": "急増（{count}）",
@@ -447,35 +480,37 @@
       "empty": "インデックス済みの履歴に一筆の急増は検出されていません。",
       "noneRecent": "最近の急増はありません。",
       "selectEarlier": "上で急増の番号を選ぶと過去にさかのぼり、以前の活動の急増を調べられます。",
-      "emptyWindow": "選択した急増の期間に時間別の集計はありません。"
+      "emptyWindow": "選択した急増の期間に時間別の集計はありません。",
+      "optionAria": "{date}の急増、毎時最大{peak}筆"
     },
     "activePeriods": {
       "description": "活動が多い上位{count}人の参加者を表示しています。間隔が6時間以内で2筆以上続いた期間を、一つの活動期間としてまとめています。各バーがその期間を表します。",
       "participant": "参加者",
-      "ariaLabel": "{address}：{start}から{end}まで{count}筆",
+      "ariaLabel": "{address}：{start}から{end}まで{count, number}筆",
       "tooltipSummary": "{count}筆 · {minutes}分間",
       "loadErrorTitle": "活動期間を読み込めませんでした",
       "loadErrorMessage": "上位参加者の活動タイムラインを取得できませんでした。",
-      "empty": "上位参加者の活動期間は見つかりませんでした。"
+      "empty": "上位参加者の活動期間は見つかりませんでした。",
+      "periods": "活動期間",
+      "longest": "最長の期間",
+      "lastActive": "最終活動",
+      "summary": "{range}で最も活発な参加者{count, number}人。一筆が最も多いのは{leader}（{gestures}筆）。",
+      "laneLabel": "{rank}位：{address}、{gestures, number}筆、活動期間{periods, number}件",
+      "hint": "期間を指すか選択すると詳細が表示されます。矢印キーで期間を移動できます。"
     },
     "typeRatio": {
       "totalGestures": "一筆の総数",
       "sampleEvery": "サンプル間隔",
-      "interpolation": "補間",
       "intervals": {
         "oneHour": "1時間",
         "sixHours": "6時間",
         "twelveHours": "12時間",
         "oneDay": "1日"
       },
-      "linear": "線形",
-      "step": "段階",
-      "smooth": "滑らか",
       "notStarted": "現在のサイクルはまだ始まっていません。",
       "loadErrorTitle": "一筆の種類の分布を読み込めませんでした",
       "loadErrorMessage": "現在のサイクルの一筆の種類の構成を取得できませんでした。",
-      "empty": "現在のサイクルに一筆の活動はまだありません。",
-      "description": "各サンプルは、その区間内の一筆の種類の構成です（区間ごとで、累積ではありません）。一筆のない区間はすべての種類が0%になります。"
+      "empty": "現在のサイクルに一筆の活動はまだありません。"
     },
     "endurance": {
       "timeIntoCycle": "サイクル開始からの時間",
@@ -497,7 +532,7 @@
       "roleEndurance": "（持久チャンピオン）",
       "roleNewRecord": "（新記録）",
       "stintAria": "{address} • 保持{duration} • 開始から{from} → {to}{role}",
-      "description": "各バーは先頭の保持区間です。あるアドレスが一筆を入れてから次の一筆が届くまで先頭を保った時間で、バーの幅がその長さを表します。琥珀色の枠のバーはその時点での新しい持久記録、紫のバーは全体で最も長い単一の保持（持久チャンピオン）、薔薇色のレーンは称号を最も長く保った参加者（時の戦士）です。バーにカーソルを合わせると詳細が表示されます。",
+      "description": "各バーは先頭の保持区間です。あるアドレスが一筆を入れてから次の一筆が届くまで先頭を保った時間で、バーの幅がその長さを表します。枠付きのバーはその時点での新しい持久記録です。持久チャンピオンは単一の保持が最も長い参加者、時の戦士は持久チャンピオンの称号を最も長く保った参加者です。それぞれの色は凡例に示しています。",
       "selectCycle": "調べるサイクルを選んでください。",
       "loadErrorTitle": "持久のタイムラインを読み込めませんでした",
       "loadErrorMessage": "このサイクルの一筆の履歴を取得できませんでした。",
@@ -506,16 +541,25 @@
       "chronoSummary": "時の戦士：{address}が{duration}保持",
       "gantt": "ガント",
       "lineChart": "折れ線グラフ",
-      "openWindowAria": "グラフを新しいウィンドウで開く",
-      "openWindowTitle": "新しいウィンドウで開く"
+      "openWindow": "新しいウィンドウで開く",
+      "leadHeldByValue": "先頭：{address}",
+      "ganttLabel": "参加者ごとの先頭の保持区間",
+      "laneLabel": "{address}：先頭の保持{count, number}回、最長{longest}",
+      "hint": "保持区間を指すか選択すると詳細が表示されます。矢印キーで区間を移動できます。",
+      "role": "称号",
+      "holds": "先頭の保持回数",
+      "longestHold": "最長の保持",
+      "totalHeld": "先頭の保持合計",
+      "viewLabel": "グラフの表示"
     },
     "cyclePicker": {
       "cycle": "サイクル",
       "previousCycleAria": "前のサイクル",
       "nextCycleAria": "次のサイクル",
-      "cycleNumberAria": "サイクル番号",
       "liveCycle": "ライブのサイクル",
-      "jumpLive": "ライブへ移動"
+      "jumpLive": "ライブへ移動",
+      "option": "サイクル{cycle}",
+      "optionLive": "サイクル{cycle}（進行中）"
     },
     "cstWindow": {
       "timeIntoCycle": "サイクル開始からの時間",
@@ -525,15 +569,14 @@
       "typeEth": "ETH一筆（短くする）",
       "typeRandomWalk": "ETH + RandomWalk一筆（短くする）",
       "typeCst": "CST一筆（長くする）",
-      "summaryMin": "最短：{duration}",
-      "summaryMax": "最長：{duration}",
-      "summaryCurrent": "現在：{duration}",
-      "summaryFinal": "確定時：{duration}",
-      "description": "CST調律期間は、CST一筆の費用が開始値から費用なしまで下がるのにかかる時間を決めます。ETH一筆はそれぞれ期間をわずかに短くし、CST一筆はそれぞれ長くします。各点は種類ごとに色分けされた一筆で、線はその後に有効な期間です。",
+      "summaryFinal": "確定時の期間は{current}です。サイクル中は{low}から{high}の間で推移しました。",
+      "description": "CST調律期間は、CST一筆の費用が開始値から費用なしまで下がるのにかかる時間を決めます。ETH一筆はそれぞれ期間をわずかに短くし、CST一筆はそれぞれ長くします。線は一筆ごとに、その後に有効な期間へ切り替わります。表には各一筆とその種類を載せています。",
       "empty": "このサイクルには一筆ごとの調律期間データがありません。V2イベントより前にインデックスされたサイクルには含まれていません。",
       "selectCycle": "調べるサイクルを選んでください。",
       "loadErrorTitle": "調律期間のタイムラインを読み込めませんでした",
-      "loadErrorMessage": "このサイクルの一筆の履歴を取得できませんでした。"
+      "loadErrorMessage": "このサイクルの一筆の履歴を取得できませんでした。",
+      "method": "一筆の方法",
+      "summaryLive": "現在の期間は{current}です。このサイクルでは{low}から{high}の間で推移しています。"
     },
     "cstCost": {
       "timeIntoCycle": "サイクル開始からの時間",
@@ -544,14 +587,13 @@
       "clockBefore": "直前の残り時間",
       "gestureBy": "一筆を入れた参加者",
       "clickHint": "点をクリックするとトランザクションを開きます。",
-      "summaryMax": "最高額：{amount}（開始から{when}）",
-      "summaryTotal": "消費合計：{amount}",
-      "summaryCount": "CST一筆{count}筆",
-      "description": "点はそれぞれ、一筆に実際に支払われたCSTです（対数目盛。白抜きの点は費用なし）。CST一筆のたびに費用は支払額の約2倍にリセットされ、調律期間をかけて費用なしまで下がります。薔薇色の破線は各一筆の直前に残っていた確定までの残り時間です。時計が少なくなると一筆が続いて費用の下がる時間がなくなり、支払額が上がっていきます。点をクリックするとトランザクションを開きます。",
+      "description": "点はそれぞれ、一筆に実際に支払われたCSTです（対数目盛。白抜きの点は費用なし）。CST一筆のたびに費用は支払額の約2倍にリセットされ、調律期間をかけて費用なしまで下がります。破線は各一筆の直前に残っていた確定までの残り時間です。時計が少なくなると一筆が続いて費用の下がる時間がなくなり、支払額が上がっていきます。点をクリックするとトランザクションを開きます。",
       "empty": "このサイクルにCST一筆はありません。",
       "selectCycle": "調べるサイクルを選んでください。",
       "loadErrorTitle": "CST一筆の費用を読み込めませんでした",
-      "loadErrorMessage": "このサイクルの一筆の履歴を取得できませんでした。"
+      "loadErrorMessage": "このサイクルの一筆の履歴を取得できませんでした。",
+      "when": "日時",
+      "summary": "CST一筆は{count, number}筆、消費合計は{total}です。最高額は開始から{when}時点の{max}です。"
     },
     "supply": {
       "totalSupply": "総供給量",
@@ -559,23 +601,37 @@
       "consume": "焼却",
       "net": "純増減",
       "numGestures": "筆数",
-      "from": "開始",
-      "to": "終了",
-      "update": "グラフを更新",
-      "invalidRange": "開始日は終了日と同じか、それより前でなければなりません。",
       "loadErrorTitle": "供給量の履歴を読み込めませんでした",
       "loadDateError": "選択した範囲のCST総供給量を取得できませんでした。",
       "emptyDate": "この期間の供給量の履歴はありません。",
       "gesture": "一筆{number}",
-      "gestureType": "一筆の種類",
-      "gestureInfoId": "一筆の情報ID",
       "loadGestureError": "一筆別のCST総供給量を取得できませんでした。",
-      "emptyGesture": "一筆別の供給量の履歴はありません。"
+      "emptyGesture": "一筆別の供給量の履歴はありません。",
+      "view": "表示",
+      "range": "期間",
+      "rangeDays": "{days, number}日",
+      "rangeYear": "直近1年",
+      "rangeAll": "全期間",
+      "legend": "総供給量（CST）",
+      "gestureNumber": "一筆の番号",
+      "summary": "{date}時点の総供給量は{supply}です。{range}の期間に{imprinted}が刻印され、{burned}が焼却されました。"
     },
-    "balance": {
-      "outreachWallet": "広報ウォレット",
-      "others": "その他"
+    "viewTable": "表で表示",
+    "mix": {
+      "eth": "ETH",
+      "ethRandomWalk": "ETH + RandomWalk NFT",
+      "cst": "CST",
+      "total": "合計{count, number}筆",
+      "window": "区間の開始",
+      "summary": "このサイクルの一筆は{total}筆です。内訳はETHが{eth}筆（{ethShare}）、ETH + RandomWalk NFTが{rwlk}筆（{rwlkShare}）、CSTが{cst}筆（{cstShare}）です。",
+      "intervalAria": "{hours, plural, other {#時間ごと}}"
     }
+  },
+  "embed": {
+    "title": "持久のタイムライン・サイクル{cycle}",
+    "final": "確定済み",
+    "source": "Cosmic Signatureで開く",
+    "opensNewWindow": "（新しいウィンドウで開きます）"
   },
   "recipientHistory": {
     "pageTitle": "自分の配分履歴",

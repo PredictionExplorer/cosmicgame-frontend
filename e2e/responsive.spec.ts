@@ -1,5 +1,35 @@
 import { test, expect } from '@playwright/test';
 
+import { MOBILE_AUDIT_SAMPLE_TEXT, mockMobileAuditApi } from './mobile-audit-fixtures';
+
+// lexicon-allow-start: the fixture mirrors sealed backend wire keys.
+/** A participant with history in every profile section, at the widest figures the UI takes. */
+const POPULATED_PROFILE = {
+  UserInfo: {
+    Address: MOBILE_AUDIT_SAMPLE_TEXT.longAddress,
+    NumBids: 12_345,
+    NumPrizes: 87,
+    MaxBidAmount: 1.2345678,
+    MaxWinAmount: 123.4567891,
+    CosmicSignatureNumTransfers: 42,
+    TotalCSTokensWon: 1_234_567.891,
+    SumRaffleEthWinnings: 12.3456789,
+    SumRaffleEthWithdrawal: 98.7654321,
+    UnclaimedNFTs: 3,
+    NumRaffleEthWinnings: 64,
+    RaffleNFTsCount: 21,
+    RewardNFTsCount: 9,
+    StakingStatisticsRWalk: {
+      TotalNumStakeActions: 30,
+      TotalNumUnstakeActions: 12,
+      TotalTokensStaked: 18,
+      TotalTokensMinted: 5,
+    },
+  },
+  Gestures: [],
+};
+// lexicon-allow-end
+
 async function expectNoHorizontalPageOverflow(page: import('@playwright/test').Page) {
   const { bodyWidth, viewportWidth } = await page.evaluate(() => ({
     bodyWidth: document.body.scrollWidth,
@@ -9,24 +39,30 @@ async function expectNoHorizontalPageOverflow(page: import('@playwright/test').P
 }
 
 async function openStatisticsAnchorActions(page: import('@playwright/test').Page) {
-  const anchoringHeading = page.getByRole('heading', { name: 'Anchoring Statistics' });
+  const anchoringHeading = page.getByRole('heading', { level: 1, name: 'Anchoring statistics' });
   await anchoringHeading.scrollIntoViewIfNeeded();
   await expect(anchoringHeading).toBeVisible();
 
   const cstTab = page.getByRole('tab', { name: /Cosmic Signature NFT/i });
-  const rwlkTab = page.getByRole('tab', { name: /RandomWalk NFT/i });
+  const rwlkTab = page.getByRole('tab', { name: /Random ?Walk NFT/i });
   await expect(cstTab).toBeVisible();
   await rwlkTab.click();
   await expect(rwlkTab).toHaveAttribute('aria-selected', 'true');
   await cstTab.click();
   await expect(cstTab).toHaveAttribute('aria-selected', 'true');
 
-  const actionsToggle = page.getByRole('button', { name: /Anchor \/ Release Actions/i }).first();
-  await actionsToggle.scrollIntoViewIfNeeded();
-  await expect(actionsToggle).toBeVisible();
-  if ((await actionsToggle.getAttribute('aria-expanded')) === 'false') {
-    await actionsToggle.click();
-  }
+  const actions = page.getByRole('heading', { name: /Anchor \/ release actions/i }).first();
+  await actions.scrollIntoViewIfNeeded();
+  await expect(actions).toBeVisible();
+}
+
+/** No child widens the layout viewport past the device (the fixed header sizes against it). */
+async function expectLayoutViewportFits(page: import('@playwright/test').Page) {
+  const { clientWidth, viewportWidth } = await page.evaluate(() => ({
+    clientWidth: document.documentElement.clientWidth,
+    viewportWidth: window.innerWidth,
+  }));
+  expect(clientWidth).toBe(viewportWidth);
 }
 
 test.describe('Responsive - Mobile viewport', () => {
@@ -77,6 +113,40 @@ test.describe('Responsive - Mobile viewport', () => {
     const response = await page.goto('/statistics', { waitUntil: 'networkidle' });
     expect(response?.status()).toBe(200);
     await expect(page.locator('body')).not.toHaveText('Internal Server Error');
+    await expectNoHorizontalPageOverflow(page);
+    await expectLayoutViewportFits(page);
+  });
+
+  test('a participant profile never widens the phone layout viewport', async ({ page }) => {
+    // Regression (F139): a wide child on a populated profile widened the layout viewport,
+    // so the fixed header pushed Connect off screen while scrollWidth still looked fine.
+    // Deterministic: the dense table fixtures plus a populated user/info, not a live address.
+    await mockMobileAuditApi(page);
+    await page.route('**/api/cosmicgame/**', async (route) => {
+      if (!new URL(route.request().url()).pathname.includes('/user/info/')) {
+        await route.fallback();
+        return;
+      }
+      await route.fulfill({ json: POPULATED_PROFILE });
+    });
+    const response = await page.goto(`/user/${MOBILE_AUDIT_SAMPLE_TEXT.longAddress}`, {
+      waitUntil: 'networkidle',
+    });
+    expect(response?.status()).toBe(200);
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    // Populated: the fixture's gesture count is on the page.
+    await expect(page.getByText('12,345').first()).toBeVisible();
+    await expectLayoutViewportFits(page);
+  });
+
+  test('statistics activity keeps its charts and controls inside 375px', async ({ page }) => {
+    const response = await page.goto('/statistics/activity', { waitUntil: 'networkidle' });
+    expect(response?.status()).toBe(200);
+    const cycle = page.getByRole('heading', { level: 2, name: 'One cycle in detail' });
+    await cycle.scrollIntoViewIfNeeded();
+    await expect(cycle).toBeVisible();
+    await expectNoHorizontalPageOverflow(page);
+    await expectLayoutViewportFits(page);
   });
 
   test('statistics anchoring remains readable without page overflow at 375px', async ({ page }) => {

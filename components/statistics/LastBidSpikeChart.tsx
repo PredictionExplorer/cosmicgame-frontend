@@ -12,280 +12,268 @@ import {
   ResponsiveContainer,
   ReferenceArea,
 } from 'recharts';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { formatGroupedNumber, formatUnixTsLabel } from '@/utils';
-
+import { formatUnixTsLabel } from '@/utils/format';
 import { useBiddingActivity, useBidFrequency, useBidTimeBounds } from '@/hooks/useApiQuery';
+import { useFormat } from '@/hooks/useFormat';
 import { useNow } from '@/hooks/useNow';
 import type { BidFrequencyBucket, BidSpike } from '@/services/api/types';
-import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
+import { SkeletonChart } from '@/components/ui/skeleton';
+import { SegmentedControl } from '@/components/ui/segmented-control';
 
-const CHART_HEIGHT = 320;
-const BAR_COLOR = 'hsl(var(--chart-1))';
-const SPIKE_COLOR = 'rgba(239, 68, 68, 0.18)';
-const SPIKE_INTERVAL_SECS = 3600;
-const VIEW_PADDING_SECS = 12 * 3600;
-const DEFAULT_LOOKBACK_SECS = 365 * 86400;
+import { ChartFigure } from './charts/ChartFigure';
+import { ChartTooltipCard } from './charts/ChartTooltipCard';
+import { formatMonthDay, formatMonthDayHour } from './charts/labels';
+import { useCountAxis, useTimeAxis } from './charts/axes';
+import {
+  CHART_MARGIN,
+  GRID_PROPS,
+  SERIES_COLOR,
+  TOOLTIP_PROPS,
+  X_AXIS_PROPS,
+  Y_AXIS_PROPS,
+} from './charts/theme';
 
-type ChartPoint = {
-  bucketTs: number;
-  label: string;
-  numBids: number;
-};
+const CHART_HEIGHT = 280;
+const HOUR = 3_600;
+const VIEW_PADDING_SECS = 12 * HOUR;
+const DEFAULT_LOOKBACK_SECS = 365 * 86_400;
 
-function alignHour(ts: number): number {
-  return Math.floor(ts / SPIKE_INTERVAL_SECS) * SPIKE_INTERVAL_SECS;
-}
+type ChartPoint = { bucketTs: number; numBids: number };
+
+const alignHour = (ts: number): number => Math.floor(ts / HOUR) * HOUR;
 
 function spikeViewRange(spike: BidSpike): { initTs: number; finTs: number } {
-  const initTs = alignHour(spike.StartTs - VIEW_PADDING_SECS);
-  const finTs = alignHour(spike.EndTs + VIEW_PADDING_SECS) + SPIKE_INTERVAL_SECS;
-  return { initTs, finTs };
+  return {
+    initTs: alignHour(spike.StartTs - VIEW_PADDING_SECS),
+    finTs: alignHour(spike.EndTs + VIEW_PADDING_SECS) + HOUR,
+  };
 }
 
-function toChartPoints(records: BidFrequencyBucket[], locale: string): ChartPoint[] {
-  return records.map((r) => ({
-    bucketTs: r.BucketTs,
-    label: formatUnixTsLabel(r.BucketTs, true, locale),
-    numBids: r.NumBids ?? 0,
-  }));
+/**
+ * The spike a reader lands on: the recent one when the backend flags one,
+ * else the latest by start time (the array order is not guaranteed).
+ */
+export function defaultSpikeIndex(spikes: readonly BidSpike[], recentIndex: number): number | null {
+  if (spikes.length === 0) return null;
+  if (recentIndex >= 0 && recentIndex < spikes.length) return recentIndex;
+  let latest = 0;
+  spikes.forEach((spike, index) => {
+    if (spike.StartTs > spikes[latest]!.StartTs) latest = index;
+  });
+  return latest;
 }
 
-type SpikeTooltipProps = {
+function SpikeTooltip({
+  active,
+  payload,
+}: {
   active?: boolean;
   payload?: ReadonlyArray<{ payload?: ChartPoint }>;
-};
-
-function SpikeTooltip({ active, payload }: SpikeTooltipProps) {
+}) {
   const t = useTranslations('statistics');
-  if (!active || !payload?.length) return null;
-  const point = payload[0]?.payload;
+  const locale = useLocale();
+  const format = useFormat();
+  const point = active ? payload?.[0]?.payload : undefined;
   if (!point) return null;
-
   return (
-    <div className="rounded-lg border border-border bg-background/95 px-3 py-2 text-sm shadow-lg">
-      <p className="mb-1 font-medium text-foreground">{point.label}</p>
-      <p className="text-muted-foreground">
-        {t('charts.spikes.gestures', { count: point.numBids })}
-      </p>
-    </div>
+    <ChartTooltipCard
+      title={formatUnixTsLabel(point.bucketTs, true, locale)}
+      rows={[
+        {
+          key: 'gestures',
+          label: t('charts.frequency.gestures'),
+          value: format.count(point.numBids),
+          color: SERIES_COLOR.gestures,
+        },
+      ]}
+    />
   );
 }
 
 type LastBidSpikeChartProps = {
   enabled?: boolean;
+  /** Names the figure (the section's title). */
+  label: string;
 };
 
-/** Hourly frequency chart focused on gesture spikes, with navigation between detected spikes. */
-export const LastBidSpikeChart: FC<LastBidSpikeChartProps> = ({ enabled = true }) => {
+/**
+ * Hours when gestures came much faster than around them. Opens on the
+ * recent spike, or the latest one, never on an empty frame; each spike is
+ * picked by its date, and the hours around it are drawn with the spike
+ * shaded.
+ */
+export const LastBidSpikeChart: FC<LastBidSpikeChartProps> = ({ enabled = true, label }) => {
   const t = useTranslations('statistics');
   const locale = useLocale();
+  const format = useFormat();
   const { data: bounds } = useBidTimeBounds(enabled);
   const nowSec = Math.floor(useNow(60_000) / 1000);
 
   const { initTs, finTs } = useMemo(() => {
     const maxTs = bounds?.MaxTs && bounds.MaxTs > 0 ? bounds.MaxTs : nowSec;
     const minTs = bounds?.MinTs && bounds.MinTs > 0 ? bounds.MinTs : maxTs - DEFAULT_LOOKBACK_SECS;
-    const lookbackStart = Math.max(minTs, maxTs - DEFAULT_LOOKBACK_SECS);
-    return { initTs: lookbackStart, finTs: maxTs + SPIKE_INTERVAL_SECS };
+    return { initTs: Math.max(minTs, maxTs - DEFAULT_LOOKBACK_SECS), finTs: maxTs + HOUR };
   }, [bounds, nowSec]);
 
   const { data, isLoading, isError, refetch } = useBiddingActivity(
     initTs,
     finTs,
-    SPIKE_INTERVAL_SECS,
+    HOUR,
     enabled && initTs > 0,
   );
 
-  const spikes = data?.Spikes ?? [];
-  const recentSpikeIndex = data?.RecentSpikeIndex ?? -1;
+  const spikes = useMemo(() => data?.Spikes ?? [], [data?.Spikes]);
+  const recentIndex = data?.RecentSpikeIndex ?? -1;
+  const [picked, setPicked] = useState<number | null>(null);
+  const selectedIndex =
+    picked !== null && picked < spikes.length ? picked : defaultSpikeIndex(spikes, recentIndex);
+  const spike = selectedIndex !== null ? spikes[selectedIndex] : undefined;
+  const viewRange = spike ? spikeViewRange(spike) : null;
 
-  const [selectedIndexOverride, setSelectedIndexOverride] = useState<number | null>(null);
-  const selectedIndex = selectedIndexOverride ?? (recentSpikeIndex >= 0 ? recentSpikeIndex : null);
-
-  const selectedSpike = selectedIndex !== null ? spikes[selectedIndex] : undefined;
-
-  const viewRange = selectedSpike ? spikeViewRange(selectedSpike) : null;
-
-  const {
-    data: windowFrequency,
-    isLoading: windowLoading,
-    isError: windowError,
-    refetch: refetchWindow,
-  } = useBidFrequency(
+  const hours = useBidFrequency(
     viewRange?.initTs ?? 0,
     viewRange?.finTs ?? 0,
-    SPIKE_INTERVAL_SECS,
+    HOUR,
     enabled && viewRange !== null,
   );
-
-  const chartData = useMemo(
-    () => toChartPoints(windowFrequency ?? [], locale),
-    [windowFrequency, locale],
+  const points = useMemo<ChartPoint[]>(
+    () =>
+      (hours.data ?? []).map((r: BidFrequencyBucket) => ({
+        bucketTs: r.BucketTs,
+        numBids: r.NumBids ?? 0,
+      })),
+    [hours.data],
   );
 
-  const spikeLabelStart = selectedSpike
-    ? formatUnixTsLabel(selectedSpike.StartTs, true, locale)
-    : '';
-  const spikeLabelEnd = selectedSpike ? formatUnixTsLabel(selectedSpike.EndTs, true, locale) : '';
+  const peakInWindow = points.reduce((max, point) => Math.max(max, point.numBids), 0);
+  const xAxis = useTimeAxis(
+    (viewRange?.initTs ?? 0) - HOUR / 2,
+    (viewRange?.finTs ?? HOUR) - HOUR / 2,
+  );
+  const yAxis = useCountAxis(peakInWindow);
 
-  const goPrev = () => {
-    if (selectedIndex === null || selectedIndex <= 0) return;
-    setSelectedIndexOverride(selectedIndex - 1);
-  };
+  const columns = useMemo<DataTableColumn<ChartPoint>[]>(
+    () => [
+      {
+        id: 'hour',
+        kind: 'text',
+        header: t('charts.frequency.hour'),
+        value: (row) => row.bucketTs,
+        cell: (row) => formatUnixTsLabel(row.bucketTs, true, locale),
+      },
+      {
+        id: 'gestures',
+        kind: 'count',
+        header: t('charts.frequency.gestures'),
+        value: (row) => row.numBids,
+      },
+    ],
+    [locale, t],
+  );
 
-  const goNext = () => {
-    if (selectedIndex === null || selectedIndex >= spikes.length - 1) return;
-    setSelectedIndexOverride(selectedIndex + 1);
-  };
+  // A chip names its spike by day; when two spikes share a day, every chip
+  // shows its hour, so the row reads in one format.
+  const days = spikes.map((item) => formatMonthDay(item.PeakTs, locale));
+  const withHour = new Set(days).size < days.length;
+  const options = spikes.map((item, index) => ({
+    value: String(index),
+    label: withHour ? formatMonthDayHour(item.PeakTs, locale) : days[index]!,
+    ariaLabel: t('charts.spikes.optionAria', {
+      date: formatUnixTsLabel(item.PeakTs, true, locale),
+      peak: format.count(item.PeakNumBids),
+    }),
+  }));
 
-  const showEmptyRecent =
-    !isLoading && spikes.length > 0 && recentSpikeIndex < 0 && selectedIndex === null;
-
-  const chartLoading = isLoading || (selectedSpike !== undefined && windowLoading);
-  const chartError = isError || windowError;
+  const state =
+    isLoading || (spike !== undefined && hours.isLoading) ? (
+      <SkeletonChart height={CHART_HEIGHT} bars={24} />
+    ) : isError || hours.isError ? (
+      <ErrorState
+        headingLevel={3}
+        title={t('charts.spikes.loadErrorTitle')}
+        message={t('charts.spikes.loadErrorMessage')}
+        onRetry={() => {
+          void refetch();
+          void hours.refetch();
+        }}
+      />
+    ) : !spike ? (
+      <EmptyState headingLevel={3} variant="inline" title={t('charts.spikes.empty')} />
+    ) : points.length === 0 ? (
+      <EmptyState headingLevel={3} variant="inline" title={t('charts.spikes.emptyWindow')} />
+    ) : null;
 
   return (
-    <div className="space-y-4" data-testid="last-bid-spike-chart">
-      {spikes.length > 0 ? (
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <span className="shrink-0 text-xs uppercase tracking-wider text-muted-foreground">
-              {t('charts.spikes.count', { count: formatGroupedNumber(spikes.length, locale) })}
-            </span>
-            {/* Selection is by array position — the backend `Index` field is not
-                guaranteed to match the array order, and mixing the two broke
-                prev/next navigation. Scrolls horizontally when many spikes exist. */}
-            <div
-              role="group"
-              aria-label={t('charts.spikes.groupAria')}
-              className="flex items-center gap-2 overflow-x-auto py-1 scrollbar-none"
-            >
-              {spikes.map((spike, arrayIndex) => (
-                <Button
-                  key={`${spike.StartTs}-${spike.EndTs}`}
-                  type="button"
-                  size="sm"
-                  variant={selectedIndex === arrayIndex ? 'default' : 'outline'}
-                  aria-pressed={selectedIndex === arrayIndex}
-                  onClick={() => setSelectedIndexOverride(arrayIndex)}
-                  className="shrink-0 font-mono text-xs"
-                >
-                  #{arrayIndex + 1}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={goPrev}
-              disabled={selectedIndex === null || selectedIndex <= 0}
-              aria-label={t('charts.spikes.previousAria')}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={goNext}
-              disabled={selectedIndex === null || selectedIndex >= spikes.length - 1}
-              aria-label={t('charts.spikes.nextAria')}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-            {selectedSpike ? (
-              <p className="text-xs text-muted-foreground">
-                {t('charts.spikes.summary', {
-                  peak: formatGroupedNumber(selectedSpike.PeakNumBids, locale),
-                  total: formatGroupedNumber(selectedSpike.TotalBids, locale),
-                  date: formatUnixTsLabel(selectedSpike.PeakTs, true, locale),
-                })}
-              </p>
-            ) : null}
-          </div>
-        </div>
-      ) : null}
-
-      {chartLoading ? (
-        <div className="flex justify-center py-16">
-          <Spinner />
-        </div>
-      ) : chartError ? (
-        <ErrorState
-          title={t('charts.spikes.loadErrorTitle')}
-          message={t('charts.spikes.loadErrorMessage')}
-          onRetry={() => {
-            void refetch();
-            void refetchWindow();
-          }}
-        />
-      ) : spikes.length === 0 ? (
-        <p className="py-8 text-center text-sm text-muted-foreground">{t('charts.spikes.empty')}</p>
-      ) : showEmptyRecent ? (
-        <div className="rounded-lg border border-dashed border-border py-12 text-center">
-          <p className="text-sm text-muted-foreground">{t('charts.spikes.noneRecent')}</p>
-          <p className="mt-2 text-xs text-muted-foreground/80">
-            {t('charts.spikes.selectEarlier')}
-          </p>
-        </div>
-      ) : selectedSpike && chartData.length > 0 ? (
-        <div className="space-y-2">
-          <p className="text-xs text-muted-foreground">
-            {t('charts.spikes.viewing', {
-              index: selectedIndex! + 1,
-              start: spikeLabelStart,
-              end: spikeLabelEnd,
-            })}
-          </p>
-          <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
-            <BarChart data={chartData} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border) / 0.6)" />
-              <XAxis
-                dataKey="bucketTs"
-                type="number"
-                domain={['dataMin', 'dataMax']}
-                tickFormatter={(ts) => formatUnixTsLabel(Number(ts), true, locale)}
-                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }}
-                interval="preserveStartEnd"
-                minTickGap={40}
-              />
-              <YAxis
-                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
-                allowDecimals={false}
-                width={40}
-              />
-              <Tooltip content={<SpikeTooltip />} />
+    <ChartFigure
+      label={label}
+      summary={
+        spike
+          ? t('charts.spikes.summary', {
+              date: formatUnixTsLabel(spike.PeakTs, true, locale),
+              peak: format.count(spike.PeakNumBids),
+              total: format.count(spike.TotalBids),
+            })
+          : undefined
+      }
+      controls={
+        spikes.length > 0 ? (
+          <SegmentedControl
+            scroll
+            label={t('charts.spikes.count', { count: format.count(spikes.length) })}
+            value={String(selectedIndex ?? 0)}
+            onValueChange={(value) => setPicked(Number(value))}
+            options={options}
+          />
+        ) : null
+      }
+      state={state}
+      note={recentIndex < 0 && spikes.length > 0 ? t('charts.spikes.noneRecent') : undefined}
+      table={<DataTable data={points} columns={columns} ariaLabel={label} />}
+    >
+      <div data-testid="last-bid-spike-chart">
+        <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
+          <BarChart data={points} margin={CHART_MARGIN} barCategoryGap="12%">
+            <CartesianGrid {...GRID_PROPS} />
+            <XAxis
+              {...X_AXIS_PROPS}
+              dataKey="bucketTs"
+              type="number"
+              domain={xAxis.domain}
+              ticks={xAxis.ticks}
+              tickFormatter={xAxis.format}
+            />
+            <YAxis
+              {...Y_AXIS_PROPS}
+              domain={yAxis.domain}
+              ticks={yAxis.ticks}
+              tickFormatter={yAxis.format}
+              width={40}
+              allowDecimals={false}
+            />
+            <Tooltip {...TOOLTIP_PROPS} content={<SpikeTooltip />} />
+            {spike ? (
               <ReferenceArea
-                x1={alignHour(selectedSpike.StartTs)}
-                x2={selectedSpike.EndTs}
-                fill={SPIKE_COLOR}
+                x1={alignHour(spike.StartTs) - HOUR / 2}
+                x2={alignHour(spike.EndTs) + HOUR / 2}
+                fill="hsl(var(--foreground) / 0.08)"
                 strokeOpacity={0}
               />
-              <Bar
-                dataKey="numBids"
-                fill={BAR_COLOR}
-                radius={[2, 2, 0, 0]}
-                isAnimationActive={false}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-          <p className="text-xs text-muted-foreground">{t('charts.frequency.openingExcluded')}</p>
-        </div>
-      ) : (
-        <p className="py-8 text-center text-sm text-muted-foreground">
-          {t('charts.spikes.emptyWindow')}
-        </p>
-      )}
-    </div>
+            ) : null}
+            <Bar
+              dataKey="numBids"
+              fill={SERIES_COLOR.gestures}
+              radius={[2, 2, 0, 0]}
+              isAnimationActive={false}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </ChartFigure>
   );
 };
 // lexicon-allow-end

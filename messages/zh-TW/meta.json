@@ -107,8 +107,8 @@
     "description": "檢視落筆頻次、活動峰值、參與者活躍時段、落筆類型佔比、週期時間線與週期啟用紀錄。"
   },
   "statisticsPerformance": {
-    "title": "參與者表現統計",
-    "description": "檢視參與者表現榜，以及 Cosmic Signature 各演繹週期中可取回資產的處理情況。"
+    "title": "參與者結果",
+    "description": "每位參與者在落筆上的支出與獲配的分配，以及各週期可取回資產的取回情況。"
   },
   "recipientHistory": {
     "title": "我的分配歷史",
