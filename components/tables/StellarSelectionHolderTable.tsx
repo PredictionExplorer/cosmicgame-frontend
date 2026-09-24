@@ -54,7 +54,8 @@ function poolEntriesFrom(list: readonly GestureInfo[]): PoolEntry[] {
  * The cycle's Stellar Selection pool by participant: three short columns, so
  * it stays a real table on a phone. The connected wallet's row stays at its
  * true position, marked "You", with its position above the table. Under the
- * table, how many selections finalization draws from the pool.
+ * table, how many selections finalization draws from the pool; the tab's note
+ * says how they are drawn (with replacement), so the caption only counts.
  */
 const StellarSelectionHolderTable = ({
   list,

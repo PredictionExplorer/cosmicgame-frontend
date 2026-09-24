@@ -284,7 +284,7 @@
     "removed": "토큰 이름이 삭제되었습니다."
   },
   "stellarSelection": {
-    "draws": "사이클이 확정되면 이 풀에서 ETH 선정 {eth}건과 NFT 선정 {nft}건이 복원 추출 방식으로 이루어집니다."
+    "draws": "사이클이 확정되면 이 풀에서 ETH 선정 {eth}건과 NFT 선정 {nft}건이 이루어집니다."
   },
   "recipientHistory": {
     "sources": {

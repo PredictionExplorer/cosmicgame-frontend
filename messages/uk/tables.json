@@ -284,7 +284,7 @@
     "removed": "Ім’я токена видалено."
   },
   "stellarSelection": {
-    "draws": "Під час завершення циклу з цього пулу обирають з повторенням: ETH — {eth}, NFT — {nft}."
+    "draws": "Відбори з цього пулу під час завершення циклу: ETH — {eth}, NFT — {nft}."
   },
   "recipientHistory": {
     "sources": {

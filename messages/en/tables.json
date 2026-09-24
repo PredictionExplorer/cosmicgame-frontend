@@ -284,7 +284,7 @@
     "removed": "Token name was removed."
   },
   "stellarSelection": {
-    "draws": "At finalization, {eth} ETH and {nft} NFT selections are drawn from this pool, with replacement."
+    "draws": "At finalization, {eth} ETH and {nft} NFT selections are drawn from this pool."
   },
   "recipientHistory": {
     "sources": {
