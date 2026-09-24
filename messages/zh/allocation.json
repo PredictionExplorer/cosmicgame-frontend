@@ -95,7 +95,7 @@
         },
         "uniqueAnchorHolders": {
           "label": "独立锚定者",
-          "tooltip": "本周期内拥有已锚定代币的独立地址数量。"
+          "tooltip": "本周期内拥有已锚定 NFT 的独立地址数量。"
         },
         "totalContributed": {
           "label": "ETH 贡献",

@@ -91,11 +91,11 @@
           "label": "첨부된 NFT"
         },
         "anchoredTokens": {
-          "label": "앵커링된 토큰"
+          "label": "앵커링된 NFT"
         },
         "uniqueAnchorHolders": {
           "label": "고유 앵커링 보유자",
-          "tooltip": "이 사이클 동안 토큰을 앵커링해 둔 서로 다른 주소의 개수를 나타냅니다."
+          "tooltip": "이 사이클 동안 NFT를 앵커링해 둔 서로 다른 주소의 개수를 나타냅니다."
         },
         "totalContributed": {
           "label": "기여된 ETH",

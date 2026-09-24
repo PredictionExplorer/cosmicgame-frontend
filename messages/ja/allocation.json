@@ -91,11 +91,11 @@
           "label": "添付されたNFT"
         },
         "anchoredTokens": {
-          "label": "係留中のトークン"
+          "label": "係留中のNFT"
         },
         "uniqueAnchorHolders": {
           "label": "ユニーク係留者",
-          "tooltip": "このサイクル中にトークンを係留していた異なるアドレスの数。"
+          "tooltip": "このサイクル中にNFTを係留していた異なるアドレスの数。"
         },
         "totalContributed": {
           "label": "拠出されたETH",

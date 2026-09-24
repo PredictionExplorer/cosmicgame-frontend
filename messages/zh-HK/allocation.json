@@ -95,7 +95,7 @@
         },
         "uniqueAnchorHolders": {
           "label": "獨立錨定者",
-          "tooltip": "本週期內擁有已錨定代幣的獨立地址數量。"
+          "tooltip": "本週期內擁有已錨定 NFT 的獨立地址數量。"
         },
         "totalContributed": {
           "label": "ETH 貢獻",

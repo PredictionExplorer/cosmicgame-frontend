@@ -91,11 +91,11 @@
           "label": "NFT đính kèm"
         },
         "anchoredTokens": {
-          "label": "Token đang neo giữ"
+          "label": "NFT đang neo giữ"
         },
         "uniqueAnchorHolders": {
           "label": "Người neo giữ riêng biệt",
-          "tooltip": "Số địa chỉ riêng biệt có token neo giữ trong chu kỳ này."
+          "tooltip": "Số địa chỉ riêng biệt có NFT neo giữ trong chu kỳ này."
         },
         "totalContributed": {
           "label": "ETH đã đóng góp",
@@ -179,7 +179,7 @@
       "title": "Phân bổ Signature của chu kỳ #{cycle}",
       "successTitle": "Chúc mừng! Phân bổ Signature của chu kỳ #{cycle} là của bạn",
       "lede": "Những gì người đặt nét bút cuối cùng nhận được khi chu kỳ hoàn tất.",
-      "successLede": "Bạn đã đặt nét bút cuối cùng của chu kỳ {cycle}. ETH, CST và Cosmic Signature này đã có trong ví của bạn.",
+      "successLede": "Bạn đã đặt nét bút cuối cùng của chu kỳ #{cycle}. ETH, CST và Cosmic Signature này đã có trong ví của bạn.",
       "componentsTitle": "Phân bổ gồm những gì",
       "eth": "ETH",
       "cst": "CST",

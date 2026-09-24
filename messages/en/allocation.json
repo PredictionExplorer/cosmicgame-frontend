@@ -91,11 +91,11 @@
           "label": "Attached NFTs"
         },
         "anchoredTokens": {
-          "label": "Anchored tokens"
+          "label": "Anchored NFTs"
         },
         "uniqueAnchorHolders": {
           "label": "Unique anchor-holders",
-          "tooltip": "How many unique addresses had tokens anchored during this cycle."
+          "tooltip": "How many unique addresses had NFTs anchored during this cycle."
         },
         "totalContributed": {
           "label": "Contributed ETH",
@@ -179,7 +179,7 @@
       "title": "Cycle #{cycle} Signature Allocation",
       "successTitle": "Congratulations! The Cycle #{cycle} Signature Allocation is yours",
       "lede": "What the participant who made the Final Gesture received when the cycle was finalized.",
-      "successLede": "You made the Final Gesture of Cycle {cycle}. The ETH, the CST and this Signature are now in your wallet.",
+      "successLede": "You made the Final Gesture of Cycle #{cycle}. The ETH, the CST and this Signature are now in your wallet.",
       "componentsTitle": "What the allocation holds",
       "eth": "ETH",
       "cst": "CST",

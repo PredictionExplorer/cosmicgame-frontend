@@ -157,7 +157,7 @@
     "releaseNote": "Releasing is permanent. You confirm on the next screen before your wallet opens.",
     "anchoredOn": "Anchored <date></date>",
     "accrued": "{amount} accrued",
-    "cycle": "Cycle {cycle}",
+    "cycle": "Cycle #{cycle}",
     "open": "Open {title}",
     "settled": {
       "anchored": "Anchored · updating",
