@@ -1,7 +1,7 @@
 import { summarizePendingRetrievals } from '../pendingRetrievals';
 
 describe('summarizePendingRetrievals', () => {
-  it('adds the Prizes Wallet ETH, Chrono-Warrior included', () => {
+  it('adds every ETH allocation waiting, Chrono-Warrior included', () => {
     expect(
       summarizePendingRetrievals({ ETHRaffleToClaim: 0.1, ETHChronoWarriorToClaim: 0.25 }),
     ).toEqual({ eth: 0.35, anchorEth: 0, nfts: 0, hasAny: true });

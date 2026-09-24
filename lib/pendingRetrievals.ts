@@ -11,7 +11,7 @@ export interface PendingRetrievalSource {
 }
 
 export interface PendingRetrievals {
-  /** ETH allocations in the Prizes Wallet (Stellar Selection and Chrono-Warrior). */
+  /** ETH allocations waiting in the allocation wallet (Stellar Selection and Chrono-Warrior). */
   eth: number;
   /** Anchor Distribution ETH that can be retrieved now. */
   anchorEth: number;
