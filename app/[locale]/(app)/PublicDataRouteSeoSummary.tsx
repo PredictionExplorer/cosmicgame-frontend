@@ -197,6 +197,8 @@ interface FigureSpec {
   hasTooltip?: boolean;
   /** A date: kept at figure-md beside the counts (see `PageHeaderFigure.size`). */
   size?: 'md';
+  /** A short count: three of them share one phone row (see `PageHeaderFigure.compact`). */
+  compact?: boolean;
 }
 
 interface RouteFigures {
@@ -307,6 +309,7 @@ async function getRouteFigures(
         reads: [cstActions, rwalkActions, ethDeposits, stellarImprints],
         // A figure whose server read failed is filled on the client from the
         // page's own queries, so the header never contradicts the ledgers.
+        // Three short counts: one row on phones.
         figures: [
           {
             key: 'actions',
@@ -317,6 +320,7 @@ async function getRouteFigures(
                 <AnchoringFigure id="actions" />
               ),
             hasTooltip: true,
+            compact: true,
           },
           {
             key: 'ethDeposits',
@@ -326,6 +330,7 @@ async function getRouteFigures(
               <AnchoringFigure id="ethDeposits" />
             ),
             hasTooltip: true,
+            compact: true,
           },
           {
             key: 'stellarImprints',
@@ -335,6 +340,7 @@ async function getRouteFigures(
               <AnchoringFigure id="stellarImprints" />
             ),
             hasTooltip: true,
+            compact: true,
           },
         ],
       };
@@ -624,6 +630,7 @@ export async function PublicDataRouteSeoSummary({
         ),
       info: figure.hasTooltip ? t(`${prefix}.cards.${figure.key}.tooltip`) : undefined,
       size: figure.size,
+      compact: figure.compact,
     };
   });
 

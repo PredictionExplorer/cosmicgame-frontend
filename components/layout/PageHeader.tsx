@@ -39,10 +39,16 @@ export interface PageHeaderFigure {
   /**
    * `md` keeps a long value — a date, an address — at the figure-md size on
    * wide screens too, where counts and amounts step up to figure-lg: a
-   * timestamp set at 32px outweighs the figures it dates. On phones an `md`
-   * figure takes the row's full width, after the paired figures.
+   * timestamp set at 32px outweighs the figures it dates. On phones `md`
+   * figures come after the paired ones: one takes the row's full width, two
+   * share it.
    */
   size?: 'md';
+  /**
+   * A short count, a few characters wide. Three compact figures share one
+   * row on phones instead of stacking as three label-and-value rows.
+   */
+  compact?: boolean;
 }
 
 /** A related page, rendered as a quiet chip under the header. */
@@ -400,20 +406,32 @@ export function PageHeaderTabs({
 }
 
 /**
- * The layout of the figure row on phones. Full-width figures (`size: 'md'`:
- * dates, addresses) sit under a two-column grid of the others; when the
- * others are an odd number, which would leave a hole in that grid, every
- * figure becomes a label-and-value row instead.
+ * The layout of the figure row on phones:
+ * - `strip`: three compact figures (short counts) side by side.
+ * - `grid`: two columns; figures with `size: 'md'` (dates, addresses) sit
+ *   under the paired others, across the full width, or side by side when
+ *   there are two of them.
+ * - `rows`: when the paired figures are an odd number, which would leave a
+ *   hole in the grid, every figure becomes a label-and-value row instead.
  */
-export function figurePhoneLayout(figures: readonly PageHeaderFigure[]): 'grid' | 'rows' {
+export function figurePhoneLayout(figures: readonly PageHeaderFigure[]): 'grid' | 'rows' | 'strip' {
+  if (figures.length === 3 && figures.every((figure) => figure.compact)) return 'strip';
   const paired = figures.filter((figure) => figure.size !== 'md').length;
   return figures.length > 1 && paired % 2 === 1 ? 'rows' : 'grid';
 }
 
+/** The phone columns of the figure row, by layout. */
+const PHONE_FIGURE_LAYOUT_CLASS: Record<ReturnType<typeof figurePhoneLayout>, string> = {
+  grid: 'grid-cols-2 max-sm:-mb-3',
+  strip: 'grid-cols-3 max-sm:-mb-3',
+  rows: 'grid-cols-1 max-sm:flex max-sm:flex-col max-sm:divide-y max-sm:divide-rule',
+};
+
 /**
  * The header's figure row: label over value, one row divided by hairlines
- * from `lg`, a grid by count from `sm`, and on phones a two-column grid or a
- * list of label-and-value rows (see `figurePhoneLayout`).
+ * from `lg`, a grid by count from `sm`, and on phones a two-column grid,
+ * three short counts side by side, or a list of label-and-value rows (see
+ * `figurePhoneLayout`).
  *
  * Every figure is a subgrid of three shared rows (label, value, caption), so
  * values sit on one baseline however their labels wrap and whatever their
@@ -430,16 +448,18 @@ export function PageHeaderFigures({
 }) {
   const t = useTranslations('common');
   const unavailable = t('status.unavailable');
-  const rows = figurePhoneLayout(figures) === 'rows';
+  const layout = figurePhoneLayout(figures);
+  const rows = layout === 'rows';
+  // Two full-width figures (a date and an address) share the last phone row
+  // rather than taking one row each; a single one keeps the full width.
+  const pairWideFigures = figures.filter((figure) => figure.size === 'md').length === 2;
   return (
     <dl
-      data-layout={rows ? 'rows' : 'grid'}
+      data-layout={layout}
       className={cn(
         // Phones: tighter rhythm, so the header stays near the top of the first screen.
         'mt-4 grid gap-x-4 gap-y-1 sm:mt-8 sm:gap-x-6',
-        rows
-          ? 'grid-cols-1 max-sm:flex max-sm:flex-col max-sm:divide-y max-sm:divide-rule'
-          : 'grid-cols-2 max-sm:-mb-3',
+        PHONE_FIGURE_LAYOUT_CLASS[layout],
         FIGURE_COLUMNS[Math.min(figures.length, 4)],
         'sm:-mb-5',
         'lg:mb-0 lg:grid-flow-col lg:grid-cols-none lg:grid-rows-[auto_auto_auto] lg:auto-cols-[minmax(0,max-content)] lg:justify-start lg:gap-x-0 lg:divide-x lg:divide-rule',
@@ -454,7 +474,8 @@ export function PageHeaderFigures({
             'row-span-3 grid min-w-0 grid-rows-subgrid content-start pb-3 sm:pb-5 lg:px-8 lg:pb-0 lg:first:pl-0 lg:last:pr-0',
             rows
               ? 'max-sm:flex max-sm:flex-wrap max-sm:items-baseline max-sm:gap-x-4 max-sm:py-2 max-sm:first:pt-0 max-sm:last:pb-0'
-              : figure.size === 'md' && 'max-sm:order-last max-sm:col-span-2',
+              : figure.size === 'md' &&
+                  cn('max-sm:order-last', !pairWideFigures && 'max-sm:col-span-2'),
           )}
         >
           <dt className="self-end type-label text-subtle">

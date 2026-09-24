@@ -218,20 +218,37 @@ describe('PageHeader', () => {
       expect(caption).toHaveClass('after:content-[attr(data-caption)]');
     });
 
-    it('puts full-width figures after the pairs on phones, or lists every figure as rows', () => {
+    it('puts wide figures after the pairs on phones, or lists every figure as rows', () => {
       const figure = (id: string, size?: 'md') => ({ id, label: id, value: '1', size });
       const { rerender } = render(
+        <PageHeader
+          title="Ledger"
+          figures={[figure('records'), figure('share'), figure('latest', 'md')]}
+        />,
+      );
+      expect(document.querySelector('dl')).toHaveAttribute('data-layout', 'grid');
+      // One wide figure takes the full row after the pair.
+      expect(document.querySelector('[data-figure="latest"]')).toHaveClass(
+        'max-sm:order-last',
+        'max-sm:col-span-2',
+      );
+      expect(document.querySelector('[data-figure="records"]')).not.toHaveClass(
+        'max-sm:col-span-2',
+      );
+
+      // Two wide figures (a date and an address) share the last row instead
+      // of taking a full row each.
+      rerender(
         <PageHeader
           title="Record"
           figures={[figure('amount'), figure('cycle'), figure('from', 'md'), figure('date', 'md')]}
         />,
       );
-      expect(document.querySelector('dl')).toHaveAttribute('data-layout', 'grid');
-      expect(document.querySelector('[data-figure="from"]')).toHaveClass(
-        'max-sm:order-last',
-        'max-sm:col-span-2',
-      );
-      expect(document.querySelector('[data-figure="amount"]')).not.toHaveClass('max-sm:col-span-2');
+      for (const id of ['from', 'date']) {
+        const wide = document.querySelector(`[data-figure="${id}"]`);
+        expect(wide).toHaveClass('max-sm:order-last');
+        expect(wide).not.toHaveClass('max-sm:col-span-2');
+      }
 
       // Three paired figures would leave a hole beside the third.
       rerender(
@@ -269,6 +286,21 @@ describe('PageHeader', () => {
         );
         expect(document.querySelector(`[data-figure="${id}"] dd`)).toHaveClass('self-baseline');
       }
+    });
+
+    it('sets three compact counts side by side on phones', () => {
+      const figure = (id: string, compact = true) => ({ id, label: id, value: '12', compact });
+      const { rerender } = render(
+        <PageHeader title="Anchoring" figures={['a', 'b', 'c'].map((id) => figure(id))} />,
+      );
+      expect(document.querySelector('dl')).toHaveAttribute('data-layout', 'strip');
+      expect(document.querySelector('dl')).toHaveClass('grid-cols-3', 'sm:grid-cols-3');
+
+      // One figure that is not a short count keeps the rows.
+      rerender(
+        <PageHeader title="Ledger" figures={[figure('a'), figure('b'), figure('total', false)]} />,
+      );
+      expect(document.querySelector('dl')).toHaveAttribute('data-layout', 'rows');
     });
 
     it('lists an odd count as rows on phones, so no grid cell is left empty', () => {

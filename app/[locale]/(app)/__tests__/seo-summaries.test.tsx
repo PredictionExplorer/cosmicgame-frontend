@@ -822,6 +822,8 @@ describe('server-rendered page headers', () => {
       expect(figureValue('ethDeposits')).toHaveTextContent('1');
       expect(figureValue('stellarImprints')).toHaveTextContent('20');
       expect(document.querySelector('[data-figure="tokens"]')).toBeNull();
+      // Three short counts: one row on phones, not three stacked rows.
+      expect(document.querySelector('dl')).toHaveAttribute('data-layout', 'strip');
     });
 
     it('fills an anchoring figure the server could not read from the page’s own queries', async () => {
