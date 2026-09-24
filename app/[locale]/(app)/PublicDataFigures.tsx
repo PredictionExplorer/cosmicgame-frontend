@@ -8,12 +8,8 @@ import {
   useGlobalRWLKAnchorImprints,
   useRWLKAnchorActions,
 } from '@/hooks/useApiQuery';
-import { Amount } from '@/components/ui/amount';
 import { UnknownValue } from '@/components/ui/unknown-value';
 import { formatCount } from '@/utils/format';
-import { imprintSendValueWei } from '@/utils/gestureQuote';
-
-import { useImprintCost } from './imprint/randomWalkImprint';
 
 /**
  * Client figures for the server-rendered page headers
@@ -125,17 +121,4 @@ export function AnchoringFigure({ id }: { id: AnchoringFigureId }) {
   if (id === 'actions') return <AnchorActionsFigure />;
   if (id === 'ethDeposits') return <EthDepositsFigure />;
   return <StellarImprintsFigure />;
-}
-
-/**
- * The /imprint header's imprint cost: the contract's current cost plus the
- * small buffer the imprint sends, read from the chain like the page's own
- * panel and set in the same exact-precision `Amount`.
- */
-export function ImprintCostFigure() {
-  const { costWei, isError } = useImprintCost();
-  if (costWei !== null) {
-    return <Amount value={imprintSendValueWei(costWei)} unit="ETH" context="exact" />;
-  }
-  return isError ? <UnavailableFigure /> : <PendingFigure />;
 }

@@ -17,7 +17,7 @@ import { sumAllocatedEth } from '@/utils/allocationRecords';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import { formatCount, formatPercent, sameAddress } from '@/utils/format';
 
-import { AnchoringFigure, ImprintCostFigure } from './PublicDataFigures';
+import { AnchoringFigure } from './PublicDataFigures';
 import {
   readAnchorCstActions,
   readAnchorEthDeposits,
@@ -33,6 +33,7 @@ import {
   readNamedNfts,
   readPublicGoodsDeposits,
   readPublicGoodsRetrievals,
+  readRandomWalkImprinted,
   readRoundList,
   readUsedRwlkNfts,
   readVoluntaryPublicGoods,
@@ -371,18 +372,24 @@ async function getRouteFigures(
       };
     }
     case 'imprint': {
-      // The page's own subject: what an imprint costs (read from the chain,
-      // like the panel), what it is worth and how many have been used.
-      const used = await readUsedRwlkNfts();
+      // The page's own subject: how many Random Walk NFTs exist (read from
+      // the contract), what one is worth and how many have been used. What an
+      // imprint costs is the panel's to say, once, where it is paid.
+      const [imprinted, used] = await Promise.all([readRandomWalkImprinted(), readUsedRwlkNfts()]);
       return {
-        reads: [used],
+        reads: [imprinted, used],
         figures: [
-          { key: 'imprintCost', value: <ImprintCostFigure /> },
+          {
+            key: 'imprinted',
+            value: imprinted.data === null ? null : count(imprinted.data),
+            compact: true,
+          },
           {
             key: 'discount',
             value: formatPercent(protocolFacts.randomWalkDiscountPercentage, locale),
+            compact: true,
           },
-          { key: 'used', value: used.data && count(used.data.length) },
+          { key: 'used', value: used.data && count(used.data.length), compact: true },
         ],
       };
     }

@@ -80,15 +80,15 @@
       "imprint": {
         "heading": "Khắc Random Walk NFT",
         "description": "Khắc Random Walk NFT để tham gia Cosmic Signature. Mỗi Random Walk NFT chưa sử dụng có thể được đính kèm vào một nét bút ETH để giảm 50% chi phí nét bút.",
-        "source": "Các API cấu hình giao thức công khai của Cosmic Signature",
+        "source": "Hợp đồng Random Walk NFT và các API công khai của Cosmic Signature",
         "links": {
           "cycle": "Mở chu kỳ trình diễn đang diễn ra",
           "learn": "Tìm hiểu cách nét bút vận hành",
           "used": "Xem các Random Walk NFT đã sử dụng"
         },
         "cards": {
-          "imprintCost": {
-            "label": "Chi phí khắc"
+          "imprinted": {
+            "label": "Random Walk NFT đã khắc"
           },
           "discount": {
             "label": "Giảm giá Random Walk"

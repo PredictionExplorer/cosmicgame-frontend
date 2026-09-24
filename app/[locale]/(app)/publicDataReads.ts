@@ -71,8 +71,8 @@ export const readVoluntaryPublicGoods = timedRead(() => get_charity_voluntary())
 export const readPublicGoodsRetrievals = timedRead(() => get_charity_withdrawals());
 export const readSystemModes = timedRead(() => get_system_modelist());
 
-/** How long the header waits for the chain before it shows the owner as unavailable. */
-const OWNER_READ_TIMEOUT_MS = 5_000;
+/** How long the header waits for the chain before it shows a figure as unavailable. */
+const CHAIN_READ_TIMEOUT_MS = 5_000;
 
 /** `owner()` of an OpenZeppelin `Ownable` contract, the one read the header needs. */
 const OWNABLE_ABI = [
@@ -85,6 +85,26 @@ const OWNABLE_ABI = [
   },
 ] as const;
 
+/** `nextTokenId()` of the Random Walk NFT contract: how many have been imprinted. */
+const NEXT_TOKEN_ID_ABI = [
+  {
+    type: 'function',
+    name: 'nextTokenId',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint256' }],
+  },
+] as const;
+
+/** A public client for one short, bounded read, or null when no RPC is configured. */
+function chainClient() {
+  if (!networkConfig.rpcUrl) return null;
+  return createPublicClient({
+    chain: activeChain,
+    transport: http(networkConfig.rpcUrl, { timeout: CHAIN_READ_TIMEOUT_MS, retryCount: 1 }),
+  });
+}
+
 /**
  * The protocol contract's owner, read from the chain: the only address that
  * can change its parameters, or the zero address once ownership has been
@@ -92,18 +112,36 @@ const OWNABLE_ABI = [
  */
 export const readGameOwner = cache(async (): Promise<TimedRead<Address>> => {
   const game = (await readDashboard()).data?.ContractAddrs?.CosmicGameAddr;
-  if (!game || !isAddress(game) || !networkConfig.rpcUrl) return { data: null, at: Date.now() };
+  const client = chainClient();
+  if (!game || !isAddress(game) || !client) return { data: null, at: Date.now() };
   try {
-    const client = createPublicClient({
-      chain: activeChain,
-      transport: http(networkConfig.rpcUrl, { timeout: OWNER_READ_TIMEOUT_MS, retryCount: 1 }),
-    });
     const owner = await client.readContract({
       address: game,
       abi: OWNABLE_ABI,
       functionName: 'owner',
     });
     return { data: owner, at: Date.now() };
+  } catch {
+    return { data: null, at: Date.now() };
+  }
+});
+
+/**
+ * How many Random Walk NFTs have been imprinted, read from the Random Walk
+ * contract (token ids start at 0, so the next id is the count). The
+ * contract's address comes from the dashboard read.
+ */
+export const readRandomWalkImprinted = cache(async (): Promise<TimedRead<number>> => {
+  const randomWalk = (await readDashboard()).data?.ContractAddrs?.RandomWalkAddr;
+  const client = chainClient();
+  if (!randomWalk || !isAddress(randomWalk) || !client) return { data: null, at: Date.now() };
+  try {
+    const next = await client.readContract({
+      address: randomWalk,
+      abi: NEXT_TOKEN_ID_ABI,
+      functionName: 'nextTokenId',
+    });
+    return { data: Number(next), at: Date.now() };
   } catch {
     return { data: null, at: Date.now() };
   }

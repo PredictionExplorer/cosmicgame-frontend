@@ -80,15 +80,15 @@
       "imprint": {
         "heading": "Закарбувати Random Walk NFT",
         "description": "Закарбуйте Random Walk NFT для участі в Cosmic Signature. Кожен невикористаний Random Walk NFT можна долучити до одного ETH-жесту зі зниженням вартості жесту на 50%.",
-        "source": "Публічні API конфігурації протоколу Cosmic Signature",
+        "source": "Контракт Random Walk NFT і публічні API Cosmic Signature",
         "links": {
           "cycle": "Відкрити активний перформанс-цикл",
           "learn": "Дізнатися, як працюють жести",
           "used": "Переглянути використані Random Walk NFT"
         },
         "cards": {
-          "imprintCost": {
-            "label": "Вартість закарбування"
+          "imprinted": {
+            "label": "Закарбовані Random Walk NFT"
           },
           "discount": {
             "label": "Знижка Random Walk"

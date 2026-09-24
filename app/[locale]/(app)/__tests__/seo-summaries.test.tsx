@@ -82,12 +82,10 @@ jest.mock('@/hooks/useApiQuery', () => ({
   useCSTAnchorDistributions: jest.fn(() => mockClientList()),
   useGlobalRWLKAnchorImprints: jest.fn(() => mockClientList()),
 }));
-jest.mock('../imprint/randomWalkImprint', () => ({
-  useImprintCost: () => mockImprintCost(),
-}));
 jest.mock('../publicDataReads', () => ({
   ...jest.requireActual('../publicDataReads'),
   readGameOwner: () => mockGameOwner(),
+  readRandomWalkImprinted: () => mockRandomWalkImprinted(),
 }));
 
 /** The page's own client queries, which fill an anchoring figure the server lost. */
@@ -96,9 +94,11 @@ const mockClientList = jest.fn((): { data?: unknown[]; isPending: boolean; isErr
   isPending: true,
   isError: false,
 }));
-const mockImprintCost = jest.fn(() => ({ costWei: null as bigint | null, isError: false }));
 const mockGameOwner = jest.fn(() =>
   Promise.resolve({ data: null as string | null, at: Date.UTC(2026, 8, 24) }),
+);
+const mockRandomWalkImprinted = jest.fn(() =>
+  Promise.resolve({ data: null as number | null, at: Date.UTC(2026, 8, 24) }),
 );
 
 const mockGetDashboardInfo = get_dashboard_info as jest.MockedFunction<typeof get_dashboard_info>;
@@ -197,7 +197,7 @@ const figureValue = (id: string) => {
 describe('server-rendered page headers', () => {
   beforeEach(() => {
     mockClientList.mockReturnValue({ data: undefined, isPending: true, isError: false });
-    mockImprintCost.mockReturnValue({ costWei: null, isError: false });
+    mockRandomWalkImprinted.mockResolvedValue({ data: null, at: Date.UTC(2026, 8, 24) });
     mockGameOwner.mockResolvedValue({ data: null, at: Date.UTC(2026, 8, 24) });
     mockGetLocale.mockResolvedValue('en');
     mockGetRoundList.mockResolvedValue([]);
@@ -568,32 +568,35 @@ describe('server-rendered page headers', () => {
       expect(screen.queryByText(/2,0\d\d/)).not.toBeInTheDocument();
     });
 
-    it('leads the imprint page with what an imprint costs, not the gesture it discounts', async () => {
+    it('leads the imprint page with the Random Walk NFTs themselves, and leaves the cost to the panel', async () => {
       mockUsedRwlkNfts.mockResolvedValue([{}, {}, {}] as Rows<typeof get_used_rwlk_nfts>);
-      mockImprintCost.mockReturnValue({ costWei: 100_000_000_000_000_000n, isError: false });
+      mockRandomWalkImprinted.mockResolvedValue({ data: 4115, at: Date.UTC(2026, 8, 24) });
 
       render(await PublicDataRouteSeoSummary({ route: 'imprint' }));
 
-      // Read from the chain like the panel, plus the buffer the imprint sends, at exact precision.
-      expect(figureValue('imprintCost')).toHaveTextContent(/^0\.1\d* ETH$/);
+      // Read from the Random Walk contract.
+      expect(figureValue('imprinted')).toHaveTextContent(/^4,115$/);
       expect(figureValue('discount')).toHaveTextContent(
         `${protocolFacts.randomWalkDiscountPercentage}%`,
       );
       expect(figureValue('used')).toHaveTextContent(/^3$/);
-      // The gesture cost and the live cycle belong to the gesture form, not this header.
-      expect(document.querySelector('[data-figure="cost"]')).toBeNull();
-      expect(document.querySelector('[data-figure="cycle"]')).toBeNull();
+      // The imprint cost is the panel's figure, shown once where it is paid;
+      // the gesture cost and the live cycle belong to the gesture form.
+      for (const id of ['imprintCost', 'cost', 'cycle']) {
+        expect(document.querySelector(`[data-figure="${id}"]`)).toBeNull();
+      }
+      // Three short figures: one row on phones.
+      expect(document.querySelector('dl')).toHaveAttribute('data-layout', 'strip');
+      // The source names where the figures come from: the chain and the API.
+      expect(
+        screen.getByText(new RegExp(seoMessages.publicData.routes.imprint.source)),
+      ).toBeInTheDocument();
     });
 
-    it('shows the imprint cost as loading, then unavailable, never as zero', async () => {
-      const view = render(await PublicDataRouteSeoSummary({ route: 'imprint' }));
-      expect(figureValue('imprintCost').querySelector('[aria-busy="true"]')).not.toBeNull();
-      view.unmount();
-
-      mockImprintCost.mockReturnValue({ costWei: null, isError: true });
+    it('shows the imprinted count as unavailable when the chain read fails, never as zero', async () => {
       render(await PublicDataRouteSeoSummary({ route: 'imprint' }));
-      expect(figureValue('imprintCost')).toHaveTextContent(COMMON.unavailable);
-      expect(figureValue('imprintCost')).not.toHaveTextContent(/\d/);
+      expect(figureValue('imprinted')).toHaveTextContent(COMMON.unavailable);
+      expect(figureValue('imprinted')).not.toHaveTextContent(/\d/);
     });
 
     it('shows Outreach CST Allocated in CST, not as an ETH reserve', async () => {

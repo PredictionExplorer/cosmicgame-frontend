@@ -80,15 +80,15 @@
       "imprint": {
         "heading": "銘刻 Random Walk NFT",
         "description": "銘刻 Random Walk NFT，以參與 Cosmic Signature。每枚尚未使用的 Random Walk NFT 都可附加至一筆 ETH 落筆，使落筆價格降低 50%。",
-        "source": "Cosmic Signature 公開協議配置 API",
+        "source": "Random Walk NFT 合約與 Cosmic Signature 公開 API",
         "links": {
           "cycle": "打開目前演繹週期",
           "learn": "了解落筆機制",
           "used": "查看已使用的 Random Walk NFT"
         },
         "cards": {
-          "imprintCost": {
-            "label": "銘刻價格"
+          "imprinted": {
+            "label": "已銘刻的 Random Walk NFT"
           },
           "discount": {
             "label": "Random Walk 減免"
