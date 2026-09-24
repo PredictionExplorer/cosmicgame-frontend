@@ -6,28 +6,37 @@
   "page": {
     "title": "Random Walk NFT 각인",
     "subtitle": "Random Walk NFT를 보유하면 ETH 제스처 비용이 50% 할인됩니다",
-    "description": "각 RandomWalk NFT는 이 할인에 한 번만 쓸 수 있으므로, 가장 효과적인 순간을 골라 사용하는 것이 좋습니다. 이 제스처 첨부는 앵커링 NFT 별빛 선정 자격을 위한 RandomWalk NFT 앵커링과는 별개입니다.",
+    "description": "각 Random Walk NFT는 이 할인에 한 번만 쓸 수 있으므로, 가장 효과적인 순간을 골라 사용하는 것이 좋습니다. 이 제스처 첨부는 앵커링 NFT 별빛 선정 자격을 위한 Random Walk NFT 앵커링과는 별개입니다.",
     "currentCost": "현재 각인 비용",
     "costBreakdown": "컨트랙트 비용 {base} ETH에 확인 전에 비용이 올라도 각인이 성공하도록 여유분 {percent}%를 더한 금액입니다.",
     "submit": "지금 각인하기",
-    "myNfts": "내 Random Walk NFT"
+    "myNfts": "내 Random Walk NFT",
+    "panelAria": "Random Walk NFT 각인",
+    "tokenAlt": "Random Walk NFT {id}",
+    "connect": "지갑을 연결하면 Random Walk NFT를 각인할 수 있습니다. 연결만으로는 아무것도 서명하지 않습니다.",
+    "why": {
+      "title": "각인으로 얻는 것"
+    },
+    "compare": {
+      "label": "Random Walk NFT를 첨부한 ETH 제스처 비용",
+      "caption": "현재 ETH 제스처 비용에서 {percent}% 할인되며, NFT마다 한 번만 쓸 수 있습니다."
+    },
+    "success": {
+      "eyebrow": "각인 완료",
+      "title": "새 Random Walk NFT: {id}",
+      "description": "ETH 제스처에 첨부하면 제스처 비용이 한 번 {percent}% 할인됩니다.",
+      "use": "제스처에 사용하기",
+      "again": "하나 더 각인하기"
+    },
+    "owned": {
+      "used": "사용됨",
+      "unused": "미사용",
+      "use": "제스처에 사용",
+      "empty": "이 지갑에는 아직 Random Walk NFT가 없습니다.",
+      "error": "이 지갑의 Random Walk NFT를 읽을 수 없습니다."
+    }
   },
   "seo": {
-    "eyebrow": "RandomWalk NFT 각인 · Arbitrum",
-    "heading": "RandomWalk NFT 각인",
-    "description": "Cosmic Signature 참여를 위해 RandomWalk NFT를 각인합니다. 사용하지 않은 RandomWalk NFT는 ETH 제스처 한 건에 첨부해 제스처 비용을 50% 할인받을 수 있습니다.",
-    "source": "Cosmic Signature 공개 프로토콜 구성 API",
-    "lastUpdated": "최종 업데이트: {date}. 데이터 출처: {source}.",
-    "relatedAria": "RandomWalk NFT 각인 관련 페이지",
-    "cards": {
-      "cycle": "현재 퍼포먼스 사이클",
-      "cost": "현재 ETH 제스처 비용",
-      "discount": "RandomWalk 할인"
-    },
-    "links": {
-      "cycle": "현재 퍼포먼스 사이클 열기",
-      "learn": "제스처 작동 원리 알아보기",
-      "used": "사용된 RandomWalk NFT 보기"
-    }
+    "heading": "Random Walk NFT 각인"
   }
 }

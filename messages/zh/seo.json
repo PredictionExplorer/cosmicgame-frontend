@@ -320,7 +320,6 @@
     "heading": "当前 Cosmic Signature 演绎周期",
     "description": "本页追踪当前 Cosmic Signature 演绎周期，包括公开落笔次数、周期储备、已附加资产、分配轨道与收官状态。",
     "cards": {
-      "cycle": "周期",
       "gestures": "落笔总次数",
       "signatureAllocation": "签名分配",
       "opened": "开启时间"

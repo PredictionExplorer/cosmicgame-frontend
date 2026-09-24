@@ -64,7 +64,7 @@ function ExploreCard({ section }: { section: StatisticsSectionDef }) {
 const StatisticsHubPanel = () => {
   const t = useTranslations('statistics');
   const locale = useLocale();
-  const { data: dashboardData, isLoading: dashboardLoading, isError, refetch } = useDashboardInfo();
+  const { data: dashboardData, isLoading: dashboardLoading, refetch } = useDashboardInfo();
   const { data: ctStatisticsData } = useCTStatistics();
 
   if (dashboardLoading) {
@@ -79,7 +79,9 @@ const StatisticsHubPanel = () => {
     );
   }
 
-  if (isError || !dashboardData) {
+  // A failed background poll keeps the last reading (TanStack sets isError
+  // but keeps data): the error replaces the hub only when nothing ever loaded.
+  if (!dashboardData) {
     return (
       <ErrorState
         title={t('hub.loadErrorTitle')}

@@ -35,6 +35,7 @@ export default async function Page({ params }: PageProps) {
   setRequestLocale(locale);
   const content = getHowItWorksContent(locale);
   const inLanguage = jsonLdInLanguage(locale);
+  const tDetail = await getTranslations({ locale, namespace: 'detail' });
 
   return (
     <>
@@ -55,7 +56,7 @@ export default async function Page({ params }: PageProps) {
           ),
         ]}
       />
-      <HowToPlayPage content={content} />
+      <HowToPlayPage content={content} unavailableLabel={tDetail('image.artworkUnavailable')} />
     </>
   );
 }

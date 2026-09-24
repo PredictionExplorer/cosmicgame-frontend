@@ -35,15 +35,29 @@ export const ART_HEIGHT = 2234;
 export const SIGNATURE_ART_CLASS = 'aspect-art bg-art-ground object-contain';
 
 /**
- * The plate and its 1px print edge. The edge is a pseudo-element above the
- * image (the plate's own inset shadow would sit under it) and brightens on
- * hover and keyboard focus: the plate's only interaction signal.
+ * The plate's 1px print edge: a pseudo-element above the image (the plate's
+ * own inset shadow would sit under it) that brightens on hover and keyboard
+ * focus, the plate's only interaction signal.
  */
-export const ART_PLATE_CLASS = cn(
-  'art-plate isolate',
+const PLATE_EDGE_CLASS = cn(
   "after:pointer-events-none after:absolute after:inset-0 after:z-[2] after:rounded-[inherit] after:content-['']",
   'after:shadow-[var(--art-edge)] after:transition-shadow after:duration-[var(--duration-fast)]',
   'hover:after:shadow-[var(--art-edge-active)] focus-within:after:shadow-[var(--art-edge-active)]',
+);
+
+/** The Signature plate at the native 3456:2234 ratio, with its print edge. */
+export const ART_PLATE_CLASS = cn('art-plate isolate', PLATE_EDGE_CLASS);
+
+/**
+ * The same plate for media that keeps its own ratio (Random Walk and
+ * third-party NFTs): the black ground, the edge radius and the print edge,
+ * with no aspect ratio of its own, so the image inside sets the height.
+ * Put it on the link or box that holds the image; captions go in a
+ * WallLabel below.
+ */
+export const MEDIA_PLATE_CLASS = cn(
+  'relative isolate block overflow-hidden rounded-edge bg-art-ground',
+  PLATE_EDGE_CLASS,
 );
 
 /** One rendition of an artwork: its URL and its pixel width. */

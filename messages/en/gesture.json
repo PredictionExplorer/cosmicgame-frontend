@@ -4,70 +4,57 @@
     "help": "The gesture ID in the address must be a whole number, zero or greater."
   },
   "header": {
-    "title": "Gesture details",
-    "loadingSubtitle": "Loading gesture data…",
-    "positionLabel": "Gesture Position #{position}"
+    "title": "Gesture #{position}",
+    "fallback": "Gesture",
+    "explorer": "View transaction"
   },
   "empty": {
     "title": "No gesture information found.",
     "help": "Check the gesture ID. A recent gesture may take a moment to appear."
   },
+  "figures": {
+    "cost": "Gesture Cost",
+    "participationCst": "Participation CST",
+    "cycle": "Cycle"
+  },
+  "method": {
+    "eth": "ETH",
+    "ethRandomWalk": "ETH + Random Walk NFT",
+    "cst": "CST"
+  },
   "sections": {
-    "transaction": {
-      "title": "Transaction and cycle",
-      "description": "When the gesture was made and which cycle it belongs to."
-    },
-    "cost": {
-      "title": "Cost and Participation CST",
-      "description": "What was paid and the Participation CST imprinted by this gesture."
-    },
-    "type": {
-      "title": "Gesture type",
-      "description": "Whether a Random Walk NFT or CST was used for this gesture."
-    },
-    "erc20": {
-      "title": "Attached ERC-20",
-      "description": "Optional ERC-20 token attached to this gesture."
-    },
-    "nft": {
-      "title": "Attached NFT",
-      "description": "Metadata for the NFT attached to this gesture, when present."
+    "details": {
+      "title": "Record"
     },
     "message": {
-      "title": "Message",
-      "description": "Message left by the participant with this gesture."
+      "title": "Message"
+    },
+    "nft": {
+      "title": "Attached NFT"
     }
   },
   "rows": {
-    "datetime": "Date and time",
-    "datetimeHelp": "Opens the transaction on the block explorer",
-    "participantAddress": "Participant address",
-    "cycleNumber": "Cycle number",
-    "cycleValue": "Cycle {round}",
-    "gestureCost": "Gesture cost",
-    "participationCst": "Participation CST",
-    "attachedRandomWalk": "Random Walk NFT used for this ETH gesture",
-    "paidWithCst": "Paid with CST (ERC-20)",
-    "randomWalkId": "Random Walk NFT ID",
-    "erc20Address": "Attached ERC-20 contract address",
+    "participant": "Participant",
+    "finalizationTime": "Finalization time after this gesture",
+    "transaction": "Transaction",
+    "erc20": "Attached ERC-20",
     "erc20Amount": "Attached ERC-20 token amount",
-    "nftAddress": "Attached NFT contract address",
-    "nftId": "Attached NFT ID",
-    "nftTokenUri": "NFT metadata URI"
+    "nftContract": "Attached NFT contract address",
+    "nftId": "Attached NFT ID"
   },
-  "values": {
-    "yes": "Yes",
-    "no": "No"
+  "nav": {
+    "aria": "Neighbouring gestures",
+    "previous": "Previous gesture",
+    "next": "Next gesture",
+    "all": "All gestures in Cycle {cycle}"
   },
   "nftPreview": {
-    "heading": "Preview and metadata",
     "collectionName": "Collection name",
     "artist": "Artist",
     "platform": "Platform",
     "description": "Description"
   },
   "randomWalk": {
-    "previewAria": "Random Walk NFT preview",
     "heading": "Random Walk NFT"
   }
 }

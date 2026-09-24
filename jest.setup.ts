@@ -152,8 +152,21 @@ jest.mock('next-intl', () => {
           value && typeof value === 'object' ? (value as Record<string, unknown>)[part] : undefined,
         messages,
       );
+  // Enough ICU for English catalogs: `{name}`, `{name, number}` and a
+  // `{name, plural, one {…} other {…}}` block (with `#` for the count).
+  const interpolatePlurals = (message: string, values?: Record<string, unknown>) =>
+    message.replace(
+      /\{(\w+), plural, one \{([^{}]*)\} other \{([^{}]*)\}\}/g,
+      (match, name: string, one: string, other: string) => {
+        const value = values?.[name];
+        if (typeof value !== 'number') return match;
+        return (value === 1 ? one : other).replace(/#/g, String(value));
+      },
+    );
   const interpolate = (message: string, values?: Record<string, unknown>) =>
-    message.replace(/\{(\w+)\}/g, (_match, name: string) => String(values?.[name] ?? `{${name}}`));
+    interpolatePlurals(message, values)
+      .replace(/\{(\w+), number\}/g, (_match, name: string) => `{${name}}`)
+      .replace(/\{(\w+)\}/g, (_match, name: string) => String(values?.[name] ?? `{${name}}`));
 
   const useTranslations = (namespace?: string) => {
     const prefix = namespace ? `${namespace}.` : '';

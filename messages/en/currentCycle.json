@@ -1,45 +1,24 @@
 {
   "error": {
-    "title": "Failed to load cycle data",
-    "message": "Please refresh the page to try again."
+    "title": "Cycle data didn’t load",
+    "message": "Check your connection and try again."
   },
   "status": {
     "notStarted": "Not started"
   },
   "hero": {
     "title": "Cycle #{n}",
-    "status": {
-      "openingSoon": "Opening soon",
-      "awaitingFirstGesture": "Awaiting first Gesture",
-      "readyToFinalize": "Ready to finalize",
-      "live": "Live"
-    },
     "cta": {
-      "viewHomeClock": "View Home Clock",
-      "finalizeCycle": "Finalize Cycle",
-      "makeFirstGesture": "Make the first Gesture",
-      "makeGesture": "Make a Gesture"
+      "viewHomeClock": "View the home clock",
+      "finalizeCycle": "Finalize the cycle",
+      "makeFirstGesture": "Make the first gesture",
+      "makeGesture": "Make a gesture"
     },
     "countdown": {
-      "opensIn": "Cycle opens in",
-      "opensAt": "Cycle {n} opens at {date}",
-      "finalizesIn": "Cycle finalizes in",
-      "finalizesTooltip": "When this timer hits zero, the participant who made the Final Gesture may finalize the cycle and retrieve the Signature Allocation. Each new gesture extends the timer.",
-      "readyTitle": "Cycle Ready to Finalize",
-      "readyMessage": "The finalization clock reached zero.",
-      "confirmingTitle": "Confirming the Final Moment",
-      "confirmingMessage": "The clock reached zero. Checking the chain for a last-second Gesture before the cycle can finalize."
+      "opensAt": "Cycle {n} opens at {date}"
     }
   },
   "stats": {
-    "stellarSelectionPool": {
-      "label": "Stellar Selection Pool",
-      "tooltip": "ETH split across {count} randomly selected participants when the cycle finalizes."
-    },
-    "publicGoods": {
-      "label": "Public Goods",
-      "tooltip": "{percent}% of the Cycle Reserve is forwarded to Protocol Guild each cycle."
-    },
     "contributedEth": {
       "label": "Contributed ETH",
       "tooltip": "Direct ETH contributions from the community this cycle."
@@ -49,17 +28,81 @@
       "tooltip": "NFTs attached to gestures by the community this cycle."
     }
   },
+  "figures": {
+    "running": "Running for",
+    "participants": "Participants"
+  },
+  "allocations": {
+    "recipientCount": "{count, plural, one {# recipient} other {# recipients}}",
+    "columns": {
+      "allocation": "Allocation",
+      "share": "Share of reserve",
+      "receives": "Each recipient receives",
+      "recipients": "Recipients"
+    },
+    "amounts": {
+      "ethEach": "{amount} ETH each",
+      "fixedCst": "1,000 CST",
+      "fixedCstEach": "1,000 CST each",
+      "nft": "1 Cosmic Signature NFT",
+      "nftEach": "1 Cosmic Signature NFT each",
+      "attachedTokens": "Attached tokens (if any)"
+    },
+    "cards": {
+      "signature": {
+        "name": "Signature Allocation",
+        "tooltip": "After the countdown reaches zero, the participant who made the Final Gesture may finalize the cycle and retrieve this allocation: ETH, 1,000 CST, a Cosmic Signature NFT, and attached tokens."
+      },
+      "chronoWarrior": {
+        "name": "Chrono-Warrior Allocation",
+        "tooltip": "The participant who held the Endurance Champion position for the longest consecutive interval receives a percentage of the Cycle Reserve and a Cosmic Signature NFT."
+      },
+      "ethStellar": {
+        "name": "ETH Stellar Selection",
+        "tooltip": "Participants are selected at random from the cycle entries to share an allocation of ETH."
+      },
+      "cosmicAnchor": {
+        "name": "Cosmic Signature anchor-holders",
+        "tooltip": "Anchor-holders of Cosmic Signature NFTs share the per-cycle Anchor Distribution.",
+        "recipientLabel": "Proportional · all anchor-holders"
+      },
+      "publicGoods": {
+        "name": "Public Goods",
+        "tooltip": "{percent}% of every Cycle Reserve is forwarded to Protocol Guild, the funding mechanism for 170+ Ethereum core contributors.",
+        "recipientLabel": "Protocol Guild"
+      },
+      "nftStellar": {
+        "name": "NFT Stellar Selection",
+        "tooltip": "Participants are selected at random from the cycle entries to receive Recognition CST and Cosmic Signature NFTs."
+      },
+      "randomWalkAnchor": {
+        "name": "Random Walk anchor-holders",
+        "tooltip": "Anchor-holders of Random Walk NFTs may receive Recognition CST and Cosmic Signature NFTs."
+      },
+      "endurance": {
+        "name": "Endurance Champion",
+        "tooltip": "The participant who remained the most recent gesture maker for the longest consecutive interval. Receives a Recognition CST imprint of 1,000 CST and a Cosmic Signature NFT."
+      },
+      "finalCst": {
+        "name": "Final CST Gesture",
+        "tooltip": "The participant who made the last CST gesture of the cycle receives a Recognition CST imprint of 1,000 CST and a Cosmic Signature NFT."
+      }
+    }
+  },
   "sections": {
-    "allocationTracks": {
-      "title": "Allocation Tracks",
-      "tooltip": "How the Cycle Reserve distributes across allocation tracks: Signature Allocation, Chrono-Warrior, Stellar Selection, Public Goods, Anchor Distribution, and the Compounding Cycle Reserve."
+    "allocations": {
+      "title": "Allocation breakdown",
+      "description": "How the Cycle Reserve distributes across allocation tracks: Signature Allocation, Chrono-Warrior, Stellar Selection, Public Goods, Anchor Distribution, and the Compounding Cycle Reserve."
+    },
+    "participants": {
+      "title": "Participants this cycle"
     },
     "stellarSelectionEntries": {
-      "title": "Stellar Selection Entries",
+      "title": "Stellar Selection entries",
       "tooltip": "Each gesture adds a Stellar Selection entry. More entries increase the chance of receiving ETH or a Cosmic Signature NFT, but do not guarantee an allocation."
     },
     "topEthSpenders": {
-      "title": "Top ETH Spenders",
+      "title": "Top ETH spenders",
       "tooltip": "Participant addresses ranked by total ETH spent on gestures this cycle."
     },
     "enduranceChampions": {
@@ -67,15 +110,15 @@
       "tooltip": "Participants ranked by how long they remained the most-recent gesture maker. The one with the longest consecutive interval receives a Recognition CST imprint of 1,000 CST and a Cosmic Signature NFT."
     },
     "gestureHistory": {
-      "title": "Gesture History — Cycle {n}",
+      "title": "Gesture history",
       "tooltip": "Chronological record of every gesture made in this cycle, newest first."
     },
     "ethContributions": {
-      "title": "ETH Contributions",
+      "title": "ETH contributions",
       "tooltip": "Direct ETH contributions made by community members during this cycle."
     },
     "cycleRules": {
-      "title": "Cycle Rules",
+      "title": "Cycle rules",
       "tooltip": "Key rules and allocation mechanics for this cycle."
     }
   },
@@ -84,19 +127,14 @@
     "participation": "When you gesture, you may imprint <em>dynamic Participation CST</em>. The amount uses a square-root formula based on how long it has been since the previous gesture.",
     "calibration": "ETH gestures shorten the CST Calibration Window by about {decreasePercent}%; CST gestures lengthen it by about {increasePercent}%.",
     "stellarSelection": "Each gesture records one Stellar Selection entry. {ethEntries} entries receive {rafflePercent}% of the Cycle Reserve. {nftEntries} additional Selection recipients and {anchorHolders} Random Walk NFT anchor-holders receive a Cosmic Signature NFT.",
-    "publicGoods": "Protocol Guild receives {percent}% of the Cycle Reserve (at least {amount} ETH) each cycle."
-  },
-  "footer": {
-    "contractBalance": "Contract Balance",
-    "cycleDuration": "Cycle Duration",
-    "uniqueParticipants": "Unique Participants"
+    "publicGoods": "Protocol Guild receives {percent}% of the Cycle Reserve (at least {amount} ETH) each cycle.",
+    "learnMore": "How a cycle works"
   },
   "attachedTokens": {
-    "title": "Attached Tokens",
+    "title": "Attached tokens",
     "tooltip": "NFTs and ERC-20 tokens attached to gestures for the cycle’s allocation recipient.",
-    "erc721Tab": "ERC721 Tokens",
-    "erc20Tab": "ERC20 Tokens",
-    "erc721Empty": "No ERC721 tokens were attached this cycle."
+    "erc721Tab": "ERC-721 tokens",
+    "erc20Tab": "ERC-20 tokens"
   },
   "showcase": {
     "badge": "Included in Signature Allocation",
@@ -108,7 +146,7 @@
       "mixed": "A compact receipt for the community-attached assets that travel with the Signature Allocation. The Final Gesture participant receives {nftCount, plural, one {the attached NFT} other {all {nftCount} attached NFTs}} and {erc20Count, plural, one {the attached ERC-20 token deposit} other {all {erc20Count} attached ERC-20 token deposits}} when Cycle #{cycle} finalizes."
     },
     "bonusReceipt": {
-      "label": "Bonus Receipt",
+      "label": "Bonus receipt",
       "nftOnly": "{nftCount, plural, one {{nftCount} ERC-721 token} other {{nftCount} ERC-721 tokens}}",
       "erc20Only": "{erc20Count, plural, one {{erc20Count} ERC-20 deposit} other {{erc20Count} ERC-20 deposits}}",
       "mixed": "{nftCount, plural, one {{nftCount} ERC-721 token} other {{nftCount} ERC-721 tokens}} + {erc20Count, plural, one {{erc20Count} ERC-20 deposit} other {{erc20Count} ERC-20 deposits}}"

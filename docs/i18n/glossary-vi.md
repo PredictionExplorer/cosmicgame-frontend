@@ -240,13 +240,13 @@ tiền (banned), never yêu cầu / claim (a demand), never thu hồi (to revoke
 (banned — the Vietnamese crypto word for _mint_), never phát hành (issuance — paperwork
 register), never tạo (to create — generic), never khắc ghi (to remember deeply — idiom).
 
-| English                | Tiếng Việt          |
-| ---------------------- | ------------------- |
-| Imprint (verb)         | khắc                |
-| Imprinted at           | thời điểm khắc      |
-| Imprint RandomWalk NFT | Khắc RandomWalk NFT |
-| Imprinted (trait)      | Đã khắc             |
-| premine                | khắc trước          |
+| English                 | Tiếng Việt           |
+| ----------------------- | -------------------- |
+| Imprint (verb)          | khắc                 |
+| Imprinted at            | thời điểm khắc       |
+| Imprint Random Walk NFT | Khắc Random Walk NFT |
+| Imprinted (trait)       | Đã khắc              |
+| premine                 | khắc trước           |
 
 ### Endurance Champion → Quán quân Bền bỉ; Chrono-Warrior → Chiến binh Thời gian
 

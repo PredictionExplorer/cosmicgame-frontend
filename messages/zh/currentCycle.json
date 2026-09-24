@@ -1,19 +1,13 @@
 {
   "error": {
     "title": "未能加载周期数据",
-    "message": "请刷新页面重试。"
+    "message": "请检查网络连接后重试。"
   },
   "status": {
     "notStarted": "尚未开始"
   },
   "hero": {
     "title": "第 {n} 个周期",
-    "status": {
-      "openingSoon": "即将开启",
-      "awaitingFirstGesture": "等待第一笔",
-      "readyToFinalize": "已可收官",
-      "live": "进行中"
-    },
     "cta": {
       "viewHomeClock": "查看首页时钟",
       "finalizeCycle": "收官",
@@ -21,25 +15,10 @@
       "makeGesture": "落笔"
     },
     "countdown": {
-      "opensIn": "周期开启倒计时",
-      "opensAt": "第 {n} 个周期将于 {date} 开启",
-      "finalizesIn": "周期收官倒计时",
-      "finalizesTooltip": "倒计时归零后，写下收官之笔的参与者即可收官，并取回签名分配。每一次新落笔都会延长倒计时。",
-      "readyTitle": "周期已可收官",
-      "readyMessage": "收官倒计时已归零。",
-      "confirmingTitle": "正在确认收官时刻",
-      "confirmingMessage": "倒计时已归零。正在链上核验最后一刻是否有新落笔延长周期。"
+      "opensAt": "第 {n} 个周期将于 {date} 开启"
     }
   },
   "stats": {
-    "stellarSelectionPool": {
-      "label": "星选池",
-      "tooltip": "周期收官时，这部分 ETH 将由程序化随机选出的 {count} 位参与者均分。"
-    },
-    "publicGoods": {
-      "label": "公共物品",
-      "tooltip": "每个周期，周期储备的 {percent}% 会转拨给 Protocol Guild。"
-    },
     "contributedEth": {
       "label": "ETH 贡献",
       "tooltip": "本周期来自社区的直接 ETH 贡献。"
@@ -49,10 +28,74 @@
       "tooltip": "本周期社区随落笔附加的 NFT。"
     }
   },
+  "figures": {
+    "running": "已进行",
+    "participants": "参与者"
+  },
+  "allocations": {
+    "recipientCount": "{count, number} 位获配者",
+    "columns": {
+      "allocation": "分配",
+      "share": "储备比例",
+      "receives": "每位获配者获得",
+      "recipients": "获配者"
+    },
+    "amounts": {
+      "ethEach": "每位 {amount} ETH",
+      "fixedCst": "1,000 CST",
+      "fixedCstEach": "每位 1,000 CST",
+      "nft": "1 枚 Cosmic Signature NFT",
+      "nftEach": "每位 1 枚 Cosmic Signature NFT",
+      "attachedTokens": "已附加代币（如有）"
+    },
+    "cards": {
+      "signature": {
+        "name": "签名分配",
+        "tooltip": "倒计时归零后，写下收官之笔的参与者可取回这份分配：ETH、1,000 CST、一枚 Cosmic Signature NFT，以及已附加的代币。"
+      },
+      "chronoWarrior": {
+        "name": "时之勇士分配",
+        "tooltip": "单次连续保持坚守冠军位置最久的参与者，将获配周期储备的一定比例与一枚 Cosmic Signature NFT。"
+      },
+      "ethStellar": {
+        "name": "ETH 星选",
+        "tooltip": "协议从本周期的星选资格中程序化随机选出参与者，均分一份 ETH 分配。"
+      },
+      "cosmicAnchor": {
+        "name": "Cosmic Signature 锚定",
+        "tooltip": "每个周期的锚定派发，由 Cosmic Signature NFT 的锚定者按比例分得。",
+        "recipientLabel": "按比例 · 全体锚定者"
+      },
+      "publicGoods": {
+        "name": "公共物品",
+        "tooltip": "每个周期，周期储备的 {percent}% 都会转拨给 Protocol Guild——为 170 多位以太坊核心贡献者提供资助的机制。",
+        "recipientLabel": "Protocol Guild"
+      },
+      "nftStellar": {
+        "name": "NFT 星选",
+        "tooltip": "协议从本周期的星选资格中程序化随机选出参与者，每位获配表彰 CST 与 Cosmic Signature NFT。"
+      },
+      "randomWalkAnchor": {
+        "name": "Random Walk 锚定者",
+        "tooltip": "Random Walk NFT 的锚定者可能获配表彰 CST 与 Cosmic Signature NFT。"
+      },
+      "endurance": {
+        "name": "坚守冠军",
+        "tooltip": "单次连续保持最新落笔者位置最久的参与者，将获得一次表彰 CST 铭刻（1,000 CST），并获配一枚 Cosmic Signature NFT。"
+      },
+      "finalCst": {
+        "name": "CST 收官之笔",
+        "tooltip": "本周期最后一次以 CST 落笔的参与者，将获得一次表彰 CST 铭刻（1,000 CST），并获配一枚 Cosmic Signature NFT。"
+      }
+    }
+  },
   "sections": {
-    "allocationTracks": {
-      "title": "分配轨道",
-      "tooltip": "周期储备如何沿各条分配轨道发放：签名分配、时之勇士、星选、公共物品、锚定派发与滚动储备。"
+    "allocations": {
+      "title": "分配一览",
+      "description": "周期储备如何沿各条分配轨道发放：签名分配、时之勇士、星选、公共物品、锚定派发与滚动储备。"
+    },
+    "participants": {
+      "title": "本周期参与者"
     },
     "stellarSelectionEntries": {
       "title": "星选资格",
@@ -67,7 +110,7 @@
       "tooltip": "按参与者保持最新落笔者位置的时长排序。单次连续时长最长者将获得一次表彰 CST 铭刻（1,000 CST），并获配一枚 Cosmic Signature NFT。"
     },
     "gestureHistory": {
-      "title": "第 {n} 个周期落笔历史",
+      "title": "落笔历史",
       "tooltip": "按时间顺序记录本周期的每一次落笔，最新的排在最前。"
     },
     "ethContributions": {
@@ -84,19 +127,14 @@
     "participation": "落笔时，你可能铭刻<em>动态的参与 CST</em>，具体数量取决于距上一笔经过的时间，并按其平方根计算。",
     "calibration": "ETH 落笔会使 CST 校准窗口缩短约 {decreasePercent}%；CST 落笔则使其延长约 {increasePercent}%。",
     "stellarSelection": "每一笔都计入一次星选资格。周期收官时，周期储备的 {rafflePercent}% 将由程序化随机选出的 {ethEntries} 位 ETH 星选获配者均分；另有 {nftEntries} 位星选获配者与 {anchorHolders} 位 Random Walk NFT 锚定者，各获配一枚 Cosmic Signature NFT。",
-    "publicGoods": "每个周期，Protocol Guild 都会收到周期储备的 {percent}%（至少 {amount} ETH）。"
-  },
-  "footer": {
-    "contractBalance": "合约余额",
-    "cycleDuration": "周期时长",
-    "uniqueParticipants": "独立参与者"
+    "publicGoods": "每个周期，Protocol Guild 都会收到周期储备的 {percent}%（至少 {amount} ETH）。",
+    "learnMore": "了解周期如何运作"
   },
   "attachedTokens": {
     "title": "已附加代币",
     "tooltip": "社区随落笔附加的 NFT 与 ERC-20 代币，用于充实周期储备。",
     "erc721Tab": "ERC-721 代币",
-    "erc20Tab": "ERC-20 代币",
-    "erc721Empty": "本周期暂无已附加的 ERC-721 代币。"
+    "erc20Tab": "ERC-20 代币"
   },
   "showcase": {
     "badge": "计入签名分配",

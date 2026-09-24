@@ -79,13 +79,13 @@
         }
       },
       "imprint": {
-        "heading": "RandomWalk NFT 각인",
-        "description": "Cosmic Signature 참여를 위해 RandomWalk NFT를 각인합니다. 사용하지 않은 RandomWalk NFT는 ETH 제스처 하나에 첨부해 제스처 비용을 50% 낮출 수 있습니다.",
+        "heading": "Random Walk NFT 각인",
+        "description": "Cosmic Signature 참여를 위해 Random Walk NFT를 각인합니다. 사용하지 않은 Random Walk NFT는 ETH 제스처 하나에 첨부해 제스처 비용을 50% 낮출 수 있습니다.",
         "source": "Cosmic Signature 공개 프로토콜 구성 API",
         "links": {
           "cycle": "진행 중인 퍼포먼스 사이클 열기",
           "learn": "제스처 알아보기",
-          "used": "사용된 RandomWalk NFT 보기"
+          "used": "사용된 Random Walk NFT 보기"
         },
         "cards": {
           "cycle": {
@@ -95,7 +95,7 @@
             "label": "현재 ETH 제스처 비용"
           },
           "discount": {
-            "label": "RandomWalk 할인"
+            "label": "Random Walk 할인"
           }
         }
       },
@@ -190,7 +190,7 @@
         "description": "일회성 제스처 비용 할인을 위해 이미 ETH 제스처에 첨부된 RandomWalk NFT를 확인할 수 있습니다.",
         "source": "Cosmic Signature 공개 RandomWalk 사용 기록 API",
         "links": {
-          "imprint": "RandomWalk NFT 각인",
+          "imprint": "Random Walk NFT 각인",
           "learn": "제스처 알아보기",
           "cycle": "현재 사이클 데이터 보기"
         },
@@ -320,7 +320,6 @@
     "heading": "현재 Cosmic Signature 퍼포먼스 사이클",
     "description": "진행 중인 사이클의 제스처 수, 준비금, 첨부 자산, 배분 경로, 마감 상태를 확인할 수 있습니다. 최신 데이터는 아래 화면에 표시됩니다.",
     "cards": {
-      "cycle": "사이클",
       "gestures": "총 제스처 수",
       "signatureAllocation": "시그니처 배분",
       "opened": "시작 시각"

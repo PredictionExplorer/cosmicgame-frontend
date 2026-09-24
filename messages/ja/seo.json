@@ -79,13 +79,13 @@
         }
       },
       "imprint": {
-        "heading": "RandomWalk NFTの刻印",
-        "description": "Cosmic Signatureに参加するためにRandomWalk NFTを刻印します。未使用のRandomWalk NFTはそれぞれ1回のETH一筆に添付でき、一筆の費用が50%引き下げられます。",
+        "heading": "Random Walk NFTの刻印",
+        "description": "Cosmic Signatureに参加するためにRandom Walk NFTを刻印します。未使用のRandom Walk NFTはそれぞれ1回のETH一筆に添付でき、一筆の費用が50%引き下げられます。",
         "source": "Cosmic Signature公開プロトコル構成API",
         "links": {
           "cycle": "進行中のパフォーマンス・サイクルを開く",
           "learn": "一筆の仕組みを学ぶ",
-          "used": "使用済みのRandomWalk NFTを見る"
+          "used": "使用済みのRandom Walk NFTを見る"
         },
         "cards": {
           "cycle": {
@@ -95,7 +95,7 @@
             "label": "現在のETH一筆の費用"
           },
           "discount": {
-            "label": "RandomWalk割引"
+            "label": "Random Walk割引"
           }
         }
       },
@@ -190,7 +190,7 @@
         "description": "ETH一筆の割引に使用済みのRandomWalk NFTを確認できます。割引に使えるのは、各NFTにつき一度だけです。",
         "source": "Cosmic Signature公開RandomWalk使用API",
         "links": {
-          "imprint": "RandomWalk NFTを刻印する",
+          "imprint": "Random Walk NFTを刻印する",
           "learn": "一筆の仕組みを学ぶ",
           "cycle": "現在のサイクルデータを見る"
         },
@@ -320,7 +320,6 @@
     "heading": "現在のCosmic Signatureパフォーマンス・サイクル",
     "description": "進行中のサイクルの筆数、準備金、添付されたアセット、配分トラック、確定状況を確認できます。最新のデータは下の操作画面に表示されます。",
     "cards": {
-      "cycle": "サイクル",
       "gestures": "一筆の総数",
       "signatureAllocation": "シグネチャー配分",
       "opened": "開始日時"

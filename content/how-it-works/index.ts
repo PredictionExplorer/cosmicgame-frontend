@@ -31,30 +31,30 @@ function buildHowItWorksContent(text: HowItWorksText): HowItWorksContent {
       primaryCta: { label: text.hero.primaryCtaLabel, href: structure.hero.primaryCtaHref },
       secondaryCta: { label: text.hero.secondaryCtaLabel, href: structure.hero.secondaryCtaHref },
     },
-    overview: {
-      heading: text.overview.heading,
-      subhead: text.overview.subhead,
-      cards: [
-        { number: structure.overviewCardNumbers[0], ...text.overview.cards[0] },
-        { number: structure.overviewCardNumbers[1], ...text.overview.cards[1] },
-        { number: structure.overviewCardNumbers[2], ...text.overview.cards[2] },
-      ],
-    },
     rewardBreakdown: text.rewardBreakdown,
     gameCycle: text.gameCycle,
+    payoff: {
+      heading: text.payoff.heading,
+      body: text.payoff.body,
+      caption: text.payoff.caption.replace('{cycle}', String(structure.payoffSample.cycle)),
+      link: {
+        label: text.payoff.linkLabel,
+        href: `/detail/${structure.payoffSample.tokenId}`,
+      },
+      sample: structure.payoffSample,
+    },
     stepByStep: text.stepByStep,
     proTips: text.proTips,
-    faqCallout: {
-      heading: text.faqCallout.heading,
-      body: text.faqCallout.body,
-      cta: { label: text.faqCallout.ctaLabel, href: structure.faqCalloutCtaHref },
-    },
     callToAction: {
       heading: text.callToAction.heading,
       body: text.callToAction.body,
       primaryCta: {
         label: text.callToAction.primaryCtaLabel,
         href: structure.callToAction.primaryCtaHref,
+      },
+      faqCta: {
+        label: text.callToAction.faqCtaLabel,
+        href: structure.callToAction.faqCtaHref,
       },
       discordCta: {
         label: text.callToAction.discordCtaLabel,

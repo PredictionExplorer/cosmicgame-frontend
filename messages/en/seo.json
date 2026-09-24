@@ -79,13 +79,13 @@
         }
       },
       "imprint": {
-        "heading": "Imprint RandomWalk NFT",
-        "description": "Imprint RandomWalk NFTs for Cosmic Signature participation. Each unused RandomWalk NFT can be attached to one ETH gesture for a 50% Gesture Cost reduction.",
+        "heading": "Imprint Random Walk NFT",
+        "description": "Imprint Random Walk NFTs for Cosmic Signature participation. Each unused Random Walk NFT can be attached to one ETH gesture for a 50% Gesture Cost reduction.",
         "source": "Cosmic Signature public protocol configuration APIs",
         "links": {
           "cycle": "Open the active Performance Cycle",
           "learn": "Learn how gestures work",
-          "used": "View used RandomWalk NFTs"
+          "used": "View used Random Walk NFTs"
         },
         "cards": {
           "cycle": {
@@ -95,7 +95,7 @@
             "label": "Current ETH Gesture Cost"
           },
           "discount": {
-            "label": "RandomWalk Discount"
+            "label": "Random Walk discount"
           }
         }
       },
@@ -190,7 +190,7 @@
         "description": "Review RandomWalk NFTs that have already been attached to ETH gestures for their one-time Gesture Cost reduction.",
         "source": "Cosmic Signature public RandomWalk usage APIs",
         "links": {
-          "imprint": "Imprint RandomWalk NFTs",
+          "imprint": "Imprint Random Walk NFTs",
           "learn": "Learn how gestures work",
           "cycle": "View current cycle data"
         },
@@ -320,8 +320,7 @@
     "heading": "Current Cosmic Signature Performance Cycle",
     "description": "Follow the active Cosmic Signature Performance Cycle: gestures, the Cycle Reserve, attached assets, allocation tracks, and finalization status. The display below updates with live protocol data.",
     "cards": {
-      "cycle": "Cycle",
-      "gestures": "Total Gestures",
+      "gestures": "Total gestures",
       "signatureAllocation": "Signature Allocation",
       "opened": "Opened"
     },

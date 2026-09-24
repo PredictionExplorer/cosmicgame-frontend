@@ -18,91 +18,60 @@ function FAQSearchWrapper({ onChange }: { onChange: (v: string) => void }) {
   );
 }
 
+const input = () => screen.getByRole('searchbox', { name: 'Search frequently asked questions' });
+
 describe('FAQSearch', () => {
-  it('renders search input with correct placeholder', () => {
+  it('renders the shared search field with its placeholder', () => {
     render(<FAQSearch value="" onChange={jest.fn()} />);
-    const input = screen.getByPlaceholderText('Search questions...');
-    expect(input).toBeInTheDocument();
-    expect(input).toHaveAttribute('aria-label', 'Search frequently asked questions');
+    expect(input()).toHaveAttribute('placeholder', 'Search questions…');
   });
 
-  it('renders the "/" shortcut hint when empty', () => {
-    render(<FAQSearch value="" onChange={jest.fn()} />);
-    expect(screen.getByText('/')).toBeInTheDocument();
-    expect(screen.queryByText('⌘')).not.toBeInTheDocument();
-  });
-
-  it('shows clear button when value is non-empty', () => {
-    render(<FAQSearch value="test" onChange={jest.fn()} />);
-    expect(screen.getByRole('button', { name: 'Clear search' })).toBeInTheDocument();
-  });
-
-  it('hides keyboard shortcut when filtering', () => {
-    render(<FAQSearch value="test" onChange={jest.fn()} />);
-    expect(screen.queryByText('⌘')).not.toBeInTheDocument();
-  });
-
-  it('calls onChange when typing', async () => {
+  it('shows a clear button once there is text, and clears through onChange', async () => {
     const user = userEvent.setup();
     const onChange = jest.fn();
-    render(<FAQSearchWrapper onChange={onChange} />);
-    const input = screen.getByPlaceholderText('Search questions...');
-    await user.type(input, 'test');
-    expect(onChange).toHaveBeenCalledTimes(4);
-    expect(onChange).toHaveBeenNthCalledWith(1, 't');
-    expect(onChange).toHaveBeenNthCalledWith(2, 'te');
-    expect(onChange).toHaveBeenNthCalledWith(3, 'tes');
-    expect(onChange).toHaveBeenNthCalledWith(4, 'test');
-  });
-
-  it('calls onChange when clear button clicked', async () => {
-    const user = userEvent.setup();
-    const onChange = jest.fn();
-    render(<FAQSearch value="test" onChange={onChange} />);
-    const clearBtn = screen.getByRole('button', { name: 'Clear search' });
-    await user.click(clearBtn);
+    render(<FAQSearch value="wallet" onChange={onChange} />);
+    await user.click(screen.getByRole('button', { name: 'Clear search' }));
     expect(onChange).toHaveBeenCalledWith('');
   });
 
-  it('shows result count when filtering', () => {
-    render(<FAQSearch value="test" onChange={jest.fn()} resultCount={5} totalCount={20} />);
-    expect(screen.getByText('Showing 5 of 20 questions')).toBeInTheDocument();
+  it('reports every keystroke', async () => {
+    const user = userEvent.setup();
+    const onChange = jest.fn();
+    render(<FAQSearchWrapper onChange={onChange} />);
+    await user.type(input(), 'test');
+    expect(onChange).toHaveBeenCalledTimes(4);
+    expect(onChange).toHaveBeenLastCalledWith('test');
   });
 
-  it('shows "No questions found" message when resultCount is 0', () => {
-    render(<FAQSearch value="test" onChange={jest.fn()} resultCount={0} totalCount={20} />);
-    expect(
-      screen.getByText('No questions found. Try a different search term.'),
-    ).toBeInTheDocument();
+  it('announces how many questions match while filtering', () => {
+    const { rerender } = render(
+      <FAQSearch value="gas" onChange={jest.fn()} resultCount={5} totalCount={20} />,
+    );
+    expect(screen.getByRole('status')).toHaveTextContent('Showing 5 of 20 questions');
+
+    rerender(<FAQSearch value="xyz" onChange={jest.fn()} resultCount={0} totalCount={20} />);
+    expect(screen.getByRole('status')).toHaveTextContent(/No questions found/);
+
+    rerender(<FAQSearch value="" onChange={jest.fn()} resultCount={5} totalCount={20} />);
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
   });
 
-  it('does not show result count when not filtering', () => {
-    render(<FAQSearch value="" onChange={jest.fn()} resultCount={5} totalCount={20} />);
-    expect(screen.queryByText('Showing 5 of 20 questions')).not.toBeInTheDocument();
-  });
-
-  it('focuses input on "/"', () => {
+  it('focuses the field on "/"', () => {
     render(<FAQSearch value="" onChange={jest.fn()} />);
-    const input = screen.getByPlaceholderText('Search questions...');
-    expect(document.activeElement).not.toBe(input);
-
     const event = new KeyboardEvent('keydown', { key: '/', cancelable: true });
     document.dispatchEvent(event);
-
-    expect(document.activeElement).toBe(input);
+    expect(document.activeElement).toBe(input());
     expect(event.defaultPrevented).toBe(true);
   });
 
   it('leaves Cmd+K and Ctrl+K to the site-wide command palette', () => {
     render(<FAQSearch value="" onChange={jest.fn()} />);
-    const input = screen.getByPlaceholderText('Search questions...');
-
     for (const modifier of [{ metaKey: true }, { ctrlKey: true }]) {
       const event = new KeyboardEvent('keydown', { key: 'k', cancelable: true, ...modifier });
       document.dispatchEvent(event);
       expect(event.defaultPrevented).toBe(false);
     }
-    expect(document.activeElement).not.toBe(input);
+    expect(document.activeElement).not.toBe(input());
   });
 
   it('types "/" into another field instead of stealing focus', () => {

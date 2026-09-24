@@ -74,7 +74,7 @@ test.describe('zh Sprint 3 — core dApp routes', () => {
 
     await expect(page.getByText('落笔总次数', { exact: true }).first()).toBeVisible();
     await expectZhLabelTooltip(page, '落笔总次数', /本周期的落笔总次数/);
-    await expectZhLabelTooltip(page, '星选池', /程序化随机选出/);
+    await expectZhLabelTooltip(page, 'ETH 贡献', /本周期来自社区的直接 ETH 贡献/);
   });
 
   test('/zh/gallery renders Chinese archive controls', async ({ page }) => {
@@ -145,9 +145,13 @@ test.describe('zh Sprint 3 — core dApp routes', () => {
 
     await page.goto('/zh/gesture/9101', { waitUntil: 'networkidle' });
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
-    await expect(page.getByText('落笔详情', { exact: true }).first()).toBeVisible();
-    await expect(page.getByText('交易与周期', { exact: true }).first()).toBeVisible();
-    await expect(page.getByText('落笔价格与参与 CST', { exact: true }).first()).toBeVisible();
+    // The mock carries no cycle position, so the H1 is the plain noun.
+    await expect(page.getByRole('heading', { level: 1, name: '落笔', exact: true })).toBeVisible();
+    await expect(
+      page.getByRole('main').getByRole('heading', { level: 2, name: '记录', exact: true }),
+    ).toBeVisible();
+    await expect(page.locator('[data-figure="cost"]')).toContainText('落笔价格');
+    await expect(page.locator('[data-figure="participationCst"]')).toContainText('参与 CST');
   });
 
   test('/zh/how-it-works renders the Chinese protocol guide', async ({ page }) => {
@@ -168,7 +172,7 @@ test.describe('zh Sprint 3 — core dApp routes', () => {
     await page.goto('/how-it-works');
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
     await expect(
-      page.getByRole('heading', { level: 1, name: /How Cosmic Signature Works/ }),
+      page.getByRole('heading', { level: 1, name: 'How Cosmic Signature works' }),
     ).toBeVisible();
   });
 });

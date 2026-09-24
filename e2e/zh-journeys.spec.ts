@@ -45,8 +45,11 @@ test.describe('Sprint 8 deterministic Chinese journeys', () => {
     await expect(page.getByText('落笔总次数', { exact: true }).first()).toBeVisible();
 
     await page.goto(`/zh/gesture/${gestureId}`, { waitUntil: 'domcontentloaded' });
-    await expect(page.getByText('落笔详情', { exact: true }).first()).toBeVisible();
-    await expect(page.getByText('交易与周期', { exact: true }).first()).toBeVisible();
+    // The quality mock carries no cycle position, so the H1 is the plain noun.
+    await expect(page.getByRole('heading', { level: 1, name: '落笔', exact: true })).toBeVisible();
+    await expect(
+      page.getByRole('main').getByRole('heading', { level: 2, name: '记录', exact: true }),
+    ).toBeVisible();
   });
 
   test('keeps the anchoring journey localized without a wallet write', async ({ page }) => {
@@ -71,7 +74,7 @@ test.describe('Sprint 8 deterministic Chinese journeys', () => {
 
   test('supports Chinese FAQ search and hash deep links', async ({ page }) => {
     await page.goto('/zh/faq', { waitUntil: 'domcontentloaded' });
-    const search = page.getByRole('textbox', { name: '搜索常见问题' });
+    const search = page.getByRole('searchbox', { name: '搜索常见问题' });
     await search.fill('锚定');
     await expect(page.getByText(/共 67 个问题，当前显示 \d+ 个/)).toBeVisible();
     await expect(page.getByRole('button', { name: '锚定如何运作？', exact: true })).toBeVisible();

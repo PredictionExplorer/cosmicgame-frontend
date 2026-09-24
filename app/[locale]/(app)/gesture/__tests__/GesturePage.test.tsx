@@ -3,7 +3,6 @@ import { render, screen, within, checkA11y } from '@/test-utils';
 import GesturePage from '../[id]/GesturePage';
 
 const mockUseGestureInfo = jest.fn();
-
 const mockUseDashboardInfo = jest.fn((): { data?: { CurRoundNum: number }; isError?: boolean } => ({
   data: { CurRoundNum: 9 },
 }));
@@ -12,18 +11,30 @@ jest.mock('../../../../../hooks/useApiQuery', () => ({
   useDashboardInfo: () => mockUseDashboardInfo(),
 }));
 
-jest.mock('axios', () => ({
-  get: jest.fn(() => Promise.resolve({ data: {} })),
+const mockNeighbours = jest.fn(() => ({
+  previous: null as { id: number; position: number } | null,
+  next: null as { id: number; position: number } | null,
+}));
+jest.mock('../[id]/gestureNeighbours', () => ({
+  useGestureNeighbours: () => mockNeighbours(),
 }));
 
-jest.mock('../../../../../utils', () => ({
-  getExplorerUrl: (type: string, hash: string) => `https://explorer/${type}/${hash}`,
-  convertTimestampToDateTime: (ts: number) => `date-${ts}`,
+const mockNftMetadata = jest.fn(
+  (): { isLoading: boolean; data: Record<string, string> | null | undefined } => ({
+    isLoading: false,
+    data: undefined,
+  }),
+);
+jest.mock('../../../../../components/attachments/useAttachedNftMetadata', () => ({
+  useAttachedNftMetadata: () => mockNftMetadata(),
 }));
 
-jest.mock('../../../../../components/nft/RandomWalkNFT', () => ({
-  __esModule: true,
-  default: ({ tokenId }: { tokenId: number }) => <div data-testid="rwlk-nft">{tokenId}</div>,
+jest.mock('../../../../../components/nft/RandomWalkPlate', () => ({
+  RandomWalkPlate: ({ tokenId, alt }: { tokenId: number; alt: string }) => (
+    <div data-testid="rwlk-nft" data-alt={alt}>
+      {tokenId}
+    </div>
+  ),
 }));
 
 jest.mock('../../../../../components/nft/NFTImage', () => ({
@@ -33,19 +44,23 @@ jest.mock('../../../../../components/nft/NFTImage', () => ({
   ),
 }));
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockNeighbours.mockReturnValue({ previous: null, next: null });
+});
 
 const baseGestureInfo = {
-  TxHash: '0xABC',
-  TimeStamp: 1000,
-  BidderAddr: '0xBidder',
+  TxHash: '0x45d7ecb96a242458dd991de97272332c0dc02fdac341af3a0cf549c4f30b0582',
+  TimeStamp: 1_780_045_566,
+  BidderAddr: '0x76Cd6127403163a2a74Aa4b6968579DC6435034e',
   RoundNum: 5,
   BidPosition: 7,
   GestureType: 0,
-  GestureCostEth: 1.5,
+  GestureCostEth: 0.10211,
   NumCSTTokensEth: 0,
   ERC20RewardAmountEth: 100,
   RWalkNFTId: -1,
+  PrizeTime: 1_780_049_166,
   DonatedERC20TokenAddr: '',
   DonatedERC20TokenAmountEth: 0,
   NFTDonationTokenAddr: '',
@@ -54,60 +69,52 @@ const baseGestureInfo = {
   Message: 'Hello World',
 };
 
+function renderGesture(overrides: Record<string, unknown> = {}, gestureId = 1) {
+  mockUseGestureInfo.mockReturnValue({
+    data: { ...baseGestureInfo, ...overrides },
+    isLoading: false,
+  });
+  return render(<GesturePage gestureId={gestureId} />);
+}
+
+const figure = (container: HTMLElement, id: string) =>
+  container.querySelector(`[data-figure="${id}"]`);
+
 describe('GesturePage', () => {
-  it('shows error for negative gesture id', () => {
+  it('explains an invalid gesture id', () => {
     mockUseGestureInfo.mockReturnValue({ data: null, isLoading: false });
     render(<GesturePage gestureId={-1} />);
-    expect(screen.getByText('gesture.invalid.title')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'gesture.invalid.title' })).toBeInTheDocument();
   });
 
-  it('shows loading state', () => {
-    mockUseGestureInfo.mockReturnValue({ data: null, isLoading: true });
+  it('shows the record’s rows as a skeleton while it loads', () => {
+    mockUseGestureInfo.mockReturnValue({ data: undefined, isLoading: true });
     render(<GesturePage gestureId={1} />);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByRole('status')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('gesture.header.fallback');
   });
 
-  it('shows "no gesture information" when data is null', () => {
+  it('says when no gesture was found', () => {
     mockUseGestureInfo.mockReturnValue({ data: null, isLoading: false });
     render(<GesturePage gestureId={1} />);
-    expect(screen.getByText('gesture.empty.title')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'gesture.empty.title' })).toBeInTheDocument();
   });
 
-  it('names the gesture by its position in the H1, falling back to the generic title', () => {
-    mockUseGestureInfo.mockReturnValue({ data: baseGestureInfo, isLoading: false });
-    const { unmount } = render(<GesturePage gestureId={1} />);
-    expect(
-      screen.getByRole('heading', { name: 'gesture.header.positionLabel(position=7)', level: 1 }),
-    ).toBeInTheDocument();
-    unmount();
-
-    mockUseGestureInfo.mockReturnValue({
-      data: { ...baseGestureInfo, BidPosition: undefined },
-      isLoading: false,
-    });
-    render(<GesturePage gestureId={1} />);
-    expect(
-      screen.getByRole('heading', { name: 'gesture.header.title', level: 1 }),
-    ).toBeInTheDocument();
-  });
-
-  it('shows the gesture position (bid_position) instead of the event-log id', () => {
-    mockUseGestureInfo.mockReturnValue({
-      data: { ...baseGestureInfo, BidPosition: 7 },
-      isLoading: false,
-    });
-    render(<GesturePage gestureId={23514} />);
+  it('names the gesture by its place in the cycle, never by its record id (F173)', () => {
+    renderGesture({ BidPosition: 1141 }, 23514);
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-      'gesture.header.positionLabel(position=7)',
+      'gesture.header.title(position=1141)',
     );
-    expect(
-      screen.queryByText('gesture.header.positionLabel(position=23514)'),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/23514/)).not.toBeInTheDocument();
+  });
+
+  it('falls back to the generic title without a position', () => {
+    renderGesture({ BidPosition: undefined });
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('gesture.header.fallback');
   });
 
   it('places a finalized cycle’s gesture under that cycle’s record', () => {
-    mockUseGestureInfo.mockReturnValue({ data: baseGestureInfo, isLoading: false });
-    render(<GesturePage gestureId={1} />);
+    renderGesture();
     const trail = screen.getByRole('navigation', { name: 'common.accessibility.breadcrumb' });
     expect(
       within(trail)
@@ -121,9 +128,8 @@ describe('GesturePage', () => {
   });
 
   it('places a live cycle’s gesture under the current cycle', () => {
-    mockUseDashboardInfo.mockReturnValueOnce({ data: { CurRoundNum: 5 } });
-    mockUseGestureInfo.mockReturnValue({ data: baseGestureInfo, isLoading: false });
-    render(<GesturePage gestureId={1} />);
+    mockUseDashboardInfo.mockReturnValue({ data: { CurRoundNum: 5 } });
+    renderGesture();
     const trail = screen.getByRole('navigation', { name: 'common.accessibility.breadcrumb' });
     expect(
       within(trail)
@@ -134,146 +140,184 @@ describe('GesturePage', () => {
       ['common.pageHeader.sections.explore', '/statistics'],
       ['common.pageHeader.crumbs.cycle(cycle=5)', '/current-cycle'],
     ]);
+    expect(screen.getByRole('link', { name: /gesture\.nav\.all/ })).toHaveAttribute(
+      'href',
+      '/current-cycle#gesture-history',
+    );
+    mockUseDashboardInfo.mockReturnValue({ data: { CurRoundNum: 9 } });
   });
 
   it('does not guess the cycle’s page before the dashboard says which cycle is live', () => {
     mockUseDashboardInfo.mockReturnValueOnce({ data: undefined });
-    mockUseGestureInfo.mockReturnValue({ data: baseGestureInfo, isLoading: false });
-    render(<GesturePage gestureId={1} />);
+    renderGesture();
     const trail = screen.getByRole('navigation', { name: 'common.accessibility.breadcrumb' });
     expect(within(trail).getAllByRole('link')).toHaveLength(1);
-    expect(within(trail).queryByText('common.pageHeader.crumbs.cycle(cycle=5)')).toBeNull();
   });
 
   it('takes the cycle as finalized when the dashboard cannot be read', () => {
     mockUseDashboardInfo.mockReturnValueOnce({ data: undefined, isError: true });
-    mockUseGestureInfo.mockReturnValue({ data: baseGestureInfo, isLoading: false });
-    render(<GesturePage gestureId={1} />);
+    renderGesture();
     const trail = screen.getByRole('navigation', { name: 'common.accessibility.breadcrumb' });
     expect(
       within(trail).getByRole('link', { name: 'common.pageHeader.crumbs.cycle(cycle=5)' }),
     ).toHaveAttribute('href', '/allocation/5');
   });
 
-  it('renders participant address', () => {
-    mockUseGestureInfo.mockReturnValue({ data: baseGestureInfo, isLoading: false });
-    render(<GesturePage gestureId={1} />);
-    expect(screen.getByText('0xBidder')).toBeInTheDocument();
-  });
-
-  it('renders round number', () => {
-    mockUseGestureInfo.mockReturnValue({ data: baseGestureInfo, isLoading: false });
-    render(<GesturePage gestureId={1} />);
-    expect(screen.getByRole('link', { name: 'gesture.rows.cycleValue(round=5)' })).toHaveAttribute(
+  it('carries the cost exactly, the Participation CST and the cycle as header figures', () => {
+    const { container } = renderGesture();
+    expect(figure(container, 'cost')).toHaveTextContent('0.10211');
+    expect(figure(container, 'cost')).toHaveTextContent('ETH');
+    expect(figure(container, 'participationCst')).toHaveTextContent('100');
+    expect(within(figure(container, 'cycle') as HTMLElement).getByRole('link')).toHaveAttribute(
       'href',
       '/allocation/5',
     );
   });
 
-  it('renders ETH gesture cost for GestureType !== 2', () => {
-    mockUseGestureInfo.mockReturnValue({ data: baseGestureInfo, isLoading: false });
-    render(<GesturePage gestureId={1} />);
-    expect(screen.getByText('1.50 ETH')).toBeInTheDocument();
-  });
-
-  it('renders CST gesture cost for GestureType === 2', () => {
-    mockUseGestureInfo.mockReturnValue({
-      data: { ...baseGestureInfo, GestureType: 2, NumCSTTokensEth: 50 },
-      isLoading: false,
+  it('prices a CST gesture in CST, at two decimals like the Participation CST', () => {
+    const { container } = renderGesture({
+      GestureType: 2,
+      GestureCostEth: -1e-18,
+      EthPriceEth: -1e-18,
+      CstPriceEth: 411.52783099128,
     });
-    render(<GesturePage gestureId={1} />);
-    expect(screen.getByText('50.0000 CST')).toBeInTheDocument();
+    expect(figure(container, 'cost')).toHaveTextContent('411.53 CST');
+    // The exact amount stays on hover.
+    expect(figure(container, 'cost')?.querySelector('data')).toHaveAttribute(
+      'title',
+      expect.stringContaining('411.52783099128'),
+    );
   });
 
-  it('renders live-shape CST cost and Participation CST for gesture 18482', () => {
-    mockUseGestureInfo.mockReturnValue({
-      data: {
-        ...baseGestureInfo,
-        GestureType: 2,
-        CstCost: 411.52783099128,
-        NumCSTokensEth: 411.52783099128,
-        NumCSTTokensEth: 411.52783099128,
-        CstPriceEth: 411.52783099128,
-        ParticipationCST: 100,
-        CSTRewardEth: 100,
-        ERC20RewardAmountEth: 100,
-      },
-      isLoading: false,
+  it('prints its times in UTC with the zone, so every reader cites the same instant', () => {
+    const { container } = renderGesture();
+    const times = container.querySelectorAll('time');
+    expect(times).toHaveLength(2);
+    // 1_780_045_566 is 2026-05-29 09:06:06 UTC; 1_780_049_166 an hour later.
+    expect(times[0]).toHaveAttribute('dateTime', '2026-05-29T09:06:06.000Z');
+    expect(times[0]).toHaveTextContent(/09:06:06\sUTC$/);
+    expect(times[1]).toHaveTextContent(/10:06:06\sUTC$/);
+  });
+
+  it('shows the method once, with the Random Walk NFT when one was used', () => {
+    const { unmount } = renderGesture();
+    expect(screen.getAllByTestId('gesture-method')[0]).toHaveTextContent('gesture.method.eth');
+    expect(screen.queryByTestId('rwlk-nft')).not.toBeInTheDocument();
+    unmount();
+
+    renderGesture({ GestureType: 1, RWalkNFTId: 42 });
+    expect(screen.getAllByTestId('gesture-method')[0]).toHaveTextContent(
+      'gesture.method.ethRandomWalk',
+    );
+    expect(screen.getByText('#000042')).toBeInTheDocument();
+    expect(screen.getByTestId('rwlk-nft')).toHaveTextContent('42');
+    // No yes/no rows for the method.
+    expect(screen.queryByText(/values\.(yes|no)/)).not.toBeInTheDocument();
+  });
+
+  it('quotes the message only when there is one', () => {
+    const { unmount } = renderGesture();
+    expect(screen.getByTestId('gesture-message')).toHaveTextContent('Hello World');
+    unmount();
+
+    renderGesture({ Message: '   ' });
+    expect(screen.queryByTestId('gesture-message')).not.toBeInTheDocument();
+    expect(screen.queryByText('gesture.sections.message.title')).not.toBeInTheDocument();
+  });
+
+  it('shows an unknown cost as unavailable instead of a fake zero', () => {
+    const { container } = renderGesture({ GestureCostEth: undefined, EthPriceEth: undefined });
+    expect(figure(container, 'cost')).toHaveTextContent('common.status.unavailable');
+  });
+
+  it('links the participant and the transaction proof', () => {
+    renderGesture();
+    expect(
+      screen
+        .getAllByRole('link')
+        .some((link) =>
+          link.getAttribute('href')?.includes('/user/0x76Cd6127403163a2a74Aa4b6968579DC6435034e'),
+        ),
+    ).toBe(true);
+    expect(screen.getByRole('link', { name: /gesture\.header\.explorer/ })).toHaveAttribute(
+      'href',
+      expect.stringContaining(baseGestureInfo.TxHash),
+    );
+  });
+
+  it('shows the attached ERC-20 when present', () => {
+    renderGesture({
+      DonatedERC20TokenAddr: '0x1111111111111111111111111111111111111111',
+      DonatedERC20TokenAmountEth: 2000,
+    });
+    expect(screen.getByText('gesture.rows.erc20')).toBeInTheDocument();
+    expect(screen.getByText('2,000')).toBeInTheDocument();
+  });
+
+  describe('attached NFT', () => {
+    const attached = {
+      NFTDonationTokenAddr: '0x2222222222222222222222222222222222222222',
+      NFTDonationTokenId: 8489,
+      NFTTokenURI: 'https://example.org/token/8489',
+    };
+
+    it('lists only the metadata the token URI names', () => {
+      mockNftMetadata.mockReturnValue({
+        isLoading: false,
+        data: {
+          image: 'https://example.org/8489.png',
+          name: 'Rexy #8489',
+          collection_name: 'Rexy',
+        },
+      });
+      renderGesture(attached);
+
+      expect(screen.getByTestId('nft-image')).toHaveAttribute(
+        'src',
+        'https://example.org/8489.png',
+      );
+      expect(screen.getByTestId('nft-image')).toHaveAttribute('alt', 'Rexy #8489');
+      expect(screen.getByText('gesture.nftPreview.collectionName')).toBeInTheDocument();
+      expect(screen.getByText('Rexy')).toBeInTheDocument();
+      // No dash rows for fields the metadata does not carry.
+      expect(screen.queryByText('gesture.nftPreview.artist')).not.toBeInTheDocument();
+      expect(screen.queryByText('gesture.nftPreview.platform')).not.toBeInTheDocument();
     });
 
-    render(<GesturePage gestureId={18482} />);
+    it('holds a busy plate while the metadata loads, then the unavailable art when it fails', () => {
+      mockNftMetadata.mockReturnValue({ isLoading: true, data: undefined });
+      const { unmount } = renderGesture(attached);
+      expect(screen.getByTestId('pending-plate')).toHaveAttribute('aria-busy', 'true');
+      expect(screen.queryByTestId('nft-image')).not.toBeInTheDocument();
+      unmount();
 
-    const costSection = screen.getByRole('region', { name: 'gesture.sections.cost.title' });
-    expect(within(costSection).getByText('411.5278 CST')).toBeInTheDocument();
-    expect(within(costSection).getByText('gesture.rows.participationCst')).toBeInTheDocument();
-    expect(within(costSection).getByText('100.00 CST')).toBeInTheDocument();
-    expect(within(costSection).queryByText('0.00 CST')).not.toBeInTheDocument();
-  });
-
-  it('shows explicit missing values instead of fake zeroes', () => {
-    mockUseGestureInfo.mockReturnValue({
-      data: {
-        ...baseGestureInfo,
-        GestureType: 2,
-        CstCost: undefined,
-        NumCSTokensEth: undefined,
-        NumCSTTokensEth: undefined,
-        CstPriceEth: undefined,
-        ParticipationCST: undefined,
-        CSTRewardEth: undefined,
-        ERC20RewardAmountEth: undefined,
-      },
-      isLoading: false,
+      mockNftMetadata.mockReturnValue({ isLoading: false, data: null });
+      renderGesture(attached);
+      expect(screen.getByTestId('nft-image')).not.toHaveAttribute('src');
+      expect(screen.getByText('gesture.rows.nftId')).toBeInTheDocument();
+      expect(screen.queryByText('gesture.nftPreview.collectionName')).not.toBeInTheDocument();
     });
-
-    render(<GesturePage gestureId={18482} />);
-
-    const costSection = screen.getByRole('region', { name: 'gesture.sections.cost.title' });
-    expect(within(costSection).getAllByText('—')).toHaveLength(2);
   });
 
-  it('renders message', () => {
-    mockUseGestureInfo.mockReturnValue({ data: baseGestureInfo, isLoading: false });
-    render(<GesturePage gestureId={1} />);
-    expect(screen.getByText('Hello World')).toBeInTheDocument();
-  });
-
-  it('shows "No" for ETH + RandomWalk attachment when RWalkNFTId < 0', () => {
-    mockUseGestureInfo.mockReturnValue({ data: baseGestureInfo, isLoading: false });
-    render(<GesturePage gestureId={1} />);
-    expect(screen.getByText('gesture.rows.attachedRandomWalk')).toBeInTheDocument();
-    const noTexts = screen.getAllByText('gesture.values.no');
-    expect(noTexts.length).toBeGreaterThanOrEqual(1);
-  });
-
-  it('shows RWLK NFT id when RWalkNFTId >= 0', () => {
-    mockUseGestureInfo.mockReturnValue({
-      data: { ...baseGestureInfo, RWalkNFTId: 42 },
-      isLoading: false,
+  it('steps to the previous and next gesture of the cycle', () => {
+    mockNeighbours.mockReturnValue({
+      previous: { id: 101, position: 6 },
+      next: { id: 108, position: 8 },
     });
-    render(<GesturePage gestureId={1} />);
-    expect(screen.getByText('gesture.rows.randomWalkId')).toBeInTheDocument();
-    const matches = screen.getAllByText('42');
-    expect(matches.length).toBeGreaterThanOrEqual(1);
-  });
-
-  it('shows attached ERC20 info when present', () => {
-    mockUseGestureInfo.mockReturnValue({
-      data: {
-        ...baseGestureInfo,
-        DonatedERC20TokenAddr: '0xToken',
-        DonatedERC20TokenAmountEth: 10.5,
-      },
-      isLoading: false,
-    });
-    render(<GesturePage gestureId={1} />);
-    expect(screen.getByText('gesture.rows.erc20Address')).toBeInTheDocument();
-    expect(screen.getByText('0xToken')).toBeInTheDocument();
+    renderGesture();
+    const nav = screen.getByRole('navigation', { name: 'gesture.nav.aria' });
+    expect(within(nav).getByRole('link', { name: /gesture\.nav\.previous/ })).toHaveAttribute(
+      'href',
+      '/gesture/101',
+    );
+    expect(within(nav).getByRole('link', { name: /gesture\.nav\.next/ })).toHaveAttribute(
+      'href',
+      '/gesture/108',
+    );
   });
 
   it('has no accessibility violations', async () => {
-    mockUseGestureInfo.mockReturnValue({ data: baseGestureInfo, isLoading: false });
-    const { container } = render(<GesturePage gestureId={1} />);
+    const { container } = renderGesture();
     await checkA11y(container);
   });
 });

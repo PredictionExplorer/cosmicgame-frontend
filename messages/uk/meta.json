@@ -107,8 +107,8 @@
     "description": "Деталі надходжень за закріплення для конкретного Cosmic Signature NFT — історія надходжень ETH за циклами, стан забирання та сукупні надходження за закріплення."
   },
   "mint": {
-    "title": "Закарбувати RandomWalk NFT",
-    "description": "Закарбуйте RandomWalk NFT на Cosmic Signature. Кожен невикористаний RandomWalk NFT можна долучити до одного ETH-жесту зі знижкою 50% на вартість ETH-жесту."
+    "title": "Закарбувати Random Walk NFT",
+    "description": "Закарбуйте Random Walk NFT на Cosmic Signature. Кожен невикористаний Random Walk NFT можна долучити до одного ETH-жесту зі знижкою 50% на вартість ETH-жесту."
   },
   "systemEvent": {
     "title": "Системні події",

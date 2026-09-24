@@ -857,6 +857,41 @@ body:has([data-maintenance-banner]) .home-control-shell {
   animation: shimmer 3s linear infinite;
 }
 
+/*
+ * Accordion bodies (components/ui/accordion) open and close over the height
+ * Radix measures into --radix-accordion-content-height, only when motion is
+ * welcome. Utilities, so the primitive's data-[state] variants apply them.
+ */
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+@utility animate-accordion-down {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: accordion-down var(--duration-base) var(--ease-gallery);
+  }
+}
+
+@utility animate-accordion-up {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: accordion-up var(--duration-fast) var(--ease-gallery);
+  }
+}
+
 .gradient-border-card {
   position: relative;
 }

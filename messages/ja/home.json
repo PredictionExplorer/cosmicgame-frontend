@@ -722,6 +722,7 @@
     "searchAria": "IDでRandom Walk NFTを検索",
     "tokenAria": "Random Walk NFT {id}",
     "empty": "見つかりませんでした",
+    "imprint": "Random Walk NFTを刻印する",
     "none": "このウォレットには未使用のRandom Walk NFTがありません。",
     "loading": "このウォレットのRandom Walk NFTを読み込み中…"
   },

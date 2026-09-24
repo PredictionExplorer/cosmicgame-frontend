@@ -1,25 +1,41 @@
 'use client';
 
 import { useCallback, useEffect, useRef } from 'react';
-import { Search, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
+import { SearchField } from '@/components/ui/search-field';
 
 interface FAQSearchProps {
   value: string;
+  /**
+   * The query `resultCount` was computed for, when results lag the field
+   * (a debounced search). Defaults to `value`.
+   */
+  activeQuery?: string;
   onChange: (value: string) => void;
   resultCount?: number;
   totalCount?: number;
   className?: string;
 }
 
-export function FAQSearch({ value, onChange, resultCount, totalCount, className }: FAQSearchProps) {
+/**
+ * The FAQ's own search, on the shared SearchField. "/" focuses it from
+ * anywhere on the page outside a text field; ⌘K / Ctrl+K stays with the
+ * site-wide command palette in the header. While a query is active, a
+ * polite status line says how many questions match.
+ */
+export function FAQSearch({
+  value,
+  activeQuery = value,
+  onChange,
+  resultCount,
+  totalCount,
+  className,
+}: FAQSearchProps) {
   const t = useTranslations('faq');
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // "/" jumps to this page's own search; ⌘K / Ctrl+K stays with the site-wide
-  // command palette in the header, which it advertises on every page.
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey || e.defaultPrevented) return;
     const target = e.target as HTMLElement | null;
@@ -35,47 +51,27 @@ export function FAQSearch({ value, onChange, resultCount, totalCount, className 
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 
-  const isFiltering = value.length > 0;
+  const isFiltering = value.trim().length > 0 && activeQuery.trim().length > 0;
 
   return (
-    <div className={cn('relative mx-auto w-full max-w-xl', className)}>
-      <div className="relative">
-        <Search className="absolute left-4 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-muted-foreground/60" />
-        <input
-          ref={inputRef}
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={t('search.placeholder')}
-          aria-label={t('search.ariaLabel')}
-          className="h-12 w-full rounded-xl border border-white/[0.08] bg-white/[0.03] pl-11 pr-24 text-sm text-foreground placeholder:text-muted-foreground/50 transition-all duration-200 focus:border-primary/40 focus:bg-white/[0.05] focus:outline-none focus:ring-2 focus:ring-primary/20 backdrop-blur-sm"
-        />
-
-        <div className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-2">
-          {isFiltering ? (
-            <button
-              onClick={() => onChange('')}
-              aria-label={t('search.clearAria')}
-              className="flex h-7 items-center rounded-md px-2 text-xs text-muted-foreground transition-colors hover:bg-white/[0.06] hover:text-foreground"
-            >
-              <X className="mr-1 h-3 w-3" />
-              {t('search.clear')}
-            </button>
-          ) : (
-            <kbd className="pointer-events-none hidden h-6 select-none items-center gap-1 rounded-md border border-white/[0.08] bg-white/[0.04] px-2 font-mono text-[10px] text-muted-foreground/50 sm:inline-flex">
-              /
-            </kbd>
-          )}
-        </div>
-      </div>
-
-      {isFiltering && resultCount !== undefined && totalCount !== undefined && (
-        <p className="mt-2 text-center text-xs text-muted-foreground/70" aria-live="polite">
-          {resultCount === 0
+    <div className={cn('w-full max-w-xl', className)}>
+      <SearchField
+        ref={inputRef}
+        size="lg"
+        value={value}
+        onValueChange={onChange}
+        placeholder={t('search.placeholder')}
+        aria-label={t('search.ariaLabel')}
+        clearLabel={t('search.clearAria')}
+        enterKeyHint="search"
+      />
+      <p className="mt-2 min-h-[1.1rem] type-caption text-subtle" role="status" aria-live="polite">
+        {isFiltering && resultCount !== undefined && totalCount !== undefined
+          ? resultCount === 0
             ? t('search.noResults')
-            : t('search.resultCount', { resultCount, totalCount })}
-        </p>
-      )}
+            : t('search.resultCount', { resultCount, totalCount })
+          : null}
+      </p>
     </div>
   );
 }

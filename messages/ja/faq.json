@@ -1,24 +1,21 @@
 {
   "hero": {
-    "title": "Cosmic Signature<accent>よくある質問</accent>",
+    "title": "Cosmic Signatureよくある質問",
     "breadcrumb": "よくある質問",
     "subtitle": "初めての参加から詳しい仕組みまで、Cosmic Signatureの疑問に答えます。",
-    "answerCount": "{count}件以上の回答",
-    "answerCountTooltip": "Cosmic Signatureのあらゆる側面を網羅した詳しい回答です。",
-    "categoryCount": "{count}カテゴリー",
-    "alwaysUpdated": "常に最新"
+    "answerCount": "{count, number}件の回答",
+    "categoryCount": "{count, number}カテゴリー"
   },
   "search": {
     "placeholder": "質問を検索…",
     "ariaLabel": "よくある質問を検索",
-    "clear": "クリア",
     "clearAria": "検索をクリア",
     "noResults": "質問が見つかりません。別の語句で検索してみてください。",
     "resultCount": "{totalCount}件中{resultCount}件を表示"
   },
   "navigation": {
     "ariaLabel": "よくある質問のカテゴリー",
-    "all": "すべて"
+    "heading": "目次"
   },
   "category": {
     "expandAll": "すべて開く",
@@ -30,13 +27,16 @@
     "copyLinkAria": "この質問へのリンクをコピー"
   },
   "popular": {
-    "heading": "よく読まれている質問",
-    "tooltip": "新しい参加者から最も多く寄せられる質問です。"
+    "heading": "よく読まれている質問"
   },
   "empty": {
     "heading": "質問が見つかりません",
-    "descriptionPrefix": "別の語句で検索するか、",
-    "clearAction": "検索をクリアしてください"
+    "description": "別の語句で検索するか、検索をクリアしてすべての質問をご覧ください。",
+    "clearAction": "検索をクリア"
+  },
+  "glossary": {
+    "title": "用語集",
+    "description": "Cosmic Signatureで使う独自の用語と、その定義です。"
   },
   "contact": {
     "heading": "ほかに知りたいことはありますか？",
@@ -45,26 +45,6 @@
     "discord": "Discord"
   },
   "tooltips": {
-    "enduranceChampion": {
-      "term": "持久チャンピオン",
-      "content": "パフォーマンス・サイクルの中で、最新の一筆の位置を最も長く途切れずに保った参加者に与えられる特別な称号です。"
-    },
-    "chronoWarrior": {
-      "term": "時の戦士",
-      "content": "持久チャンピオンの称号を最も長く連続して保持した参加者に与えられる称号です。"
-    },
-    "calibrationWindow": {
-      "term": "調律期間",
-      "content": "一筆の費用が高い水準から始まり、調律上限から調律下限へ向かって時間とともに下がっていく価格決定の期間です。待てば待つほど費用は下がります。"
-    },
-    "cosmicCouncil": {
-      "term": "宇宙評議会",
-      "content": "CST保有者が調整提案を提出し、支持または反対を表明するオンチェーンの調整機関です。たとえば、各サイクルの公共財配分を受け取る公共財の受け手を選びます。"
-    },
-    "cst": {
-      "term": "CST",
-      "content": "一筆を入れた際に刻印されることがあるERC-20トークンです。一筆の費用に使うほか、宇宙評議会の調整ウェイトにもなります。"
-    },
     "erc20": {
       "term": "ERC-20",
       "content": "代替可能（交換可能）なトークンのために広く使われているEthereumのトークン規格です。"

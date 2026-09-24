@@ -1,132 +1,63 @@
 import userEvent from '@testing-library/user-event';
-
-import { faqContentEn } from '@/content/faq';
+import { BookA, Rocket } from 'lucide-react';
 
 import { render, screen, checkA11y } from '@/test-utils';
 
-import { CategoryNav } from '../components/CategoryNav';
+import { CategoryNav, categoryAnchor, type CategoryNavEntry } from '../components/CategoryNav';
 
-const faqCategories = faqContentEn.categories;
+const entries: CategoryNavEntry[] = [
+  { id: 'getting-started', label: 'Getting Started', count: 8, icon: Rocket },
+  { id: 'game-mechanics', label: 'Cycle Mechanics', count: 14, icon: Rocket },
+  { id: 'glossary', label: 'Glossary', icon: BookA },
+];
+
+function renderNav(activeId: string | null = null, onSelect = jest.fn()) {
+  render(<CategoryNav entries={entries} activeId={activeId} onSelect={onSelect} />);
+  return onSelect;
+}
 
 describe('CategoryNav', () => {
-  const onCategoryClick = jest.fn();
-
-  beforeEach(() => {
-    onCategoryClick.mockClear();
-    window.scrollTo = jest.fn();
+  it('is one labelled navigation landmark', () => {
+    renderNav();
+    expect(screen.getAllByRole('navigation', { name: 'FAQ categories' })).toHaveLength(1);
   });
 
-  it('renders "All" button', () => {
-    render(
-      <CategoryNav
-        categories={faqCategories}
-        activeCategory={null}
-        onCategoryClick={onCategoryClick}
-      />,
-    );
-    expect(screen.getByRole('button', { name: /^All$/i })).toBeInTheDocument();
-  });
-
-  it('renders a button for each category', () => {
-    render(
-      <CategoryNav
-        categories={faqCategories}
-        activeCategory={null}
-        onCategoryClick={onCategoryClick}
-      />,
-    );
-    for (const cat of faqCategories) {
-      expect(screen.getByRole('button', { name: new RegExp(cat.title, 'i') })).toBeInTheDocument();
+  it('links every category and the glossary to its section', () => {
+    renderNav();
+    for (const entry of entries) {
+      expect(screen.getByRole('link', { name: new RegExp(entry.label) })).toHaveAttribute(
+        'href',
+        `#${categoryAnchor(entry.id)}`,
+      );
     }
   });
 
-  it('shows question count for each category', () => {
-    render(
-      <CategoryNav
-        categories={faqCategories}
-        activeCategory={null}
-        onCategoryClick={onCategoryClick}
-      />,
-    );
-    const gettingStarted = faqCategories.find((c) => c.id === 'getting-started');
-    expect(gettingStarted).toBeDefined();
-    expect(screen.getByText(String(gettingStarted!.items.length))).toBeInTheDocument();
+  it('shows how many questions each category holds', () => {
+    renderNav();
+    expect(screen.getByRole('link', { name: /Getting Started/ })).toHaveTextContent('8');
+    expect(screen.getByRole('link', { name: /Glossary/ })).not.toHaveTextContent(/\d/);
   });
 
-  it('highlights active category', () => {
-    render(
-      <CategoryNav
-        categories={faqCategories}
-        activeCategory="allocations-and-rewards"
-        onCategoryClick={onCategoryClick}
-      />,
+  it('marks the section being read', () => {
+    renderNav('game-mechanics');
+    expect(screen.getByRole('link', { name: /Cycle Mechanics/ })).toHaveAttribute(
+      'aria-current',
+      'location',
     );
-    const allocationsButton = screen.getByRole('button', { name: /Allocations & Distributions/i });
-    expect(allocationsButton).toHaveClass('text-primary');
+    expect(screen.getByRole('link', { name: /Getting Started/ })).not.toHaveAttribute(
+      'aria-current',
+    );
   });
 
-  it('highlights "All" when activeCategory is null', () => {
-    render(
-      <CategoryNav
-        categories={faqCategories}
-        activeCategory={null}
-        onCategoryClick={onCategoryClick}
-      />,
-    );
-    const allButton = screen.getByRole('button', { name: /^All$/i });
-    expect(allButton).toHaveClass('text-primary');
-  });
-
-  it('calls onCategoryClick(null) when "All" clicked', async () => {
+  it('hands the choice to the page instead of jumping', async () => {
     const user = userEvent.setup();
-    render(
-      <CategoryNav
-        categories={faqCategories}
-        activeCategory="getting-started"
-        onCategoryClick={onCategoryClick}
-      />,
-    );
-    const allButton = screen.getByRole('button', { name: /^All$/i });
-    await user.click(allButton);
-    expect(onCategoryClick).toHaveBeenCalledTimes(1);
-    expect(onCategoryClick).toHaveBeenCalledWith(null);
-  });
-
-  it('calls onCategoryClick(categoryId) when category clicked', async () => {
-    const user = userEvent.setup();
-    render(
-      <CategoryNav
-        categories={faqCategories}
-        activeCategory={null}
-        onCategoryClick={onCategoryClick}
-      />,
-    );
-    const cycleMechanicsButton = screen.getByRole('button', { name: /Cycle Mechanics/i });
-    await user.click(cycleMechanicsButton);
-    expect(onCategoryClick).toHaveBeenCalledTimes(1);
-    expect(onCategoryClick).toHaveBeenCalledWith('game-mechanics');
-  });
-
-  it('has correct aria-label on nav', () => {
-    render(
-      <CategoryNav
-        categories={faqCategories}
-        activeCategory={null}
-        onCategoryClick={onCategoryClick}
-      />,
-    );
-    const nav = screen.getByRole('navigation', { name: 'FAQ categories' });
-    expect(nav).toBeInTheDocument();
+    const onSelect = renderNav();
+    await user.click(screen.getByRole('link', { name: /Cycle Mechanics/ }));
+    expect(onSelect).toHaveBeenCalledWith('game-mechanics');
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(
-      <CategoryNav
-        categories={faqCategories}
-        activeCategory={null}
-        onCategoryClick={onCategoryClick}
-      />,
-    );
-    await checkA11y(container);
+    renderNav('getting-started');
+    await checkA11y(document.body);
   });
 });

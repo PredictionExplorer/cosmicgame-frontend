@@ -79,13 +79,13 @@
         }
       },
       "imprint": {
-        "heading": "Закарбувати RandomWalk NFT",
-        "description": "Закарбуйте RandomWalk NFT для участі в Cosmic Signature. Кожен невикористаний RandomWalk NFT можна долучити до одного ETH-жесту зі зниженням вартості жесту на 50%.",
+        "heading": "Закарбувати Random Walk NFT",
+        "description": "Закарбуйте Random Walk NFT для участі в Cosmic Signature. Кожен невикористаний Random Walk NFT можна долучити до одного ETH-жесту зі зниженням вартості жесту на 50%.",
         "source": "Публічні API конфігурації протоколу Cosmic Signature",
         "links": {
           "cycle": "Відкрити активний перформанс-цикл",
           "learn": "Дізнатися, як працюють жести",
-          "used": "Переглянути використані RandomWalk NFT"
+          "used": "Переглянути використані Random Walk NFT"
         },
         "cards": {
           "cycle": {
@@ -95,7 +95,7 @@
             "label": "Поточна вартість ETH-жесту"
           },
           "discount": {
-            "label": "Знижка RandomWalk"
+            "label": "Знижка Random Walk"
           }
         }
       },
@@ -190,7 +190,7 @@
         "description": "Перегляньте RandomWalk NFT, які вже долучено до ETH-жестів для одноразового зниження вартості жесту.",
         "source": "Публічні API використання RandomWalk Cosmic Signature",
         "links": {
-          "imprint": "Закарбувати RandomWalk NFT",
+          "imprint": "Закарбувати Random Walk NFT",
           "learn": "Дізнатися, як працюють жести",
           "cycle": "Переглянути дані поточного циклу"
         },
@@ -320,7 +320,6 @@
     "heading": "Поточний перформанс-цикл Cosmic Signature",
     "description": "Дані поточного перформанс-циклу Cosmic Signature: кількість жестів, резерв, долучені активи, напрями розподілу та стан завершення.",
     "cards": {
-      "cycle": "Цикл",
       "gestures": "Усього жестів",
       "signatureAllocation": "Розподіл Сигнатури",
       "opened": "Відкрито"

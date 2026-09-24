@@ -4,70 +4,57 @@
     "help": "ID жесту в URL має бути невід’ємним цілим числом."
   },
   "header": {
-    "title": "Деталі жесту",
-    "loadingSubtitle": "Завантаження даних жесту…",
-    "positionLabel": "Позиція жесту {position}"
+    "title": "Жест #{position}",
+    "fallback": "Жест",
+    "explorer": "Переглянути транзакцію"
   },
   "empty": {
     "title": "Інформацію про жест не знайдено.",
     "help": "Можливо, ID недійсний або дані про жест ще не оновлено."
   },
+  "figures": {
+    "cost": "Вартість жесту",
+    "participationCst": "CST участі",
+    "cycle": "Цикл"
+  },
+  "method": {
+    "eth": "ETH",
+    "ethRandomWalk": "ETH + Random Walk NFT",
+    "cst": "CST"
+  },
   "sections": {
-    "transaction": {
-      "title": "Транзакція та цикл",
-      "description": "Коли зроблено жест і до якого циклу він належить."
-    },
-    "cost": {
-      "title": "Вартість і CST участі",
-      "description": "Скільки сплачено та скільки CST участі закарбовано цим жестом."
-    },
-    "type": {
-      "title": "Тип жесту",
-      "description": "Чи використано для цього жесту Random Walk NFT або CST."
-    },
-    "erc20": {
-      "title": "Долучений ERC-20",
-      "description": "Необов’язковий ERC-20-токен, долучений до цього жесту."
-    },
-    "nft": {
-      "title": "Долучений NFT",
-      "description": "Метадані NFT, долученого до цього жесту, якщо він є."
+    "details": {
+      "title": "Запис"
     },
     "message": {
-      "title": "Повідомлення",
-      "description": "Повідомлення, яке учасник залишив разом із цим жестом."
+      "title": "Повідомлення"
+    },
+    "nft": {
+      "title": "Долучений NFT"
     }
   },
   "rows": {
-    "datetime": "Дата й час жесту",
-    "datetimeHelp": "Відкриває транзакцію в оглядачі блоків",
-    "participantAddress": "Адреса учасника",
-    "cycleNumber": "Номер циклу",
-    "cycleValue": "Цикл {round}",
-    "gestureCost": "Вартість жесту",
-    "participationCst": "CST участі",
-    "attachedRandomWalk": "RandomWalk NFT долучено до ETH-жесту:",
-    "paidWithCst": "Сплачено в CST (ERC-20):",
-    "randomWalkId": "ID RandomWalkNFT:",
-    "erc20Address": "Адреса долученого ERC-20-токена:",
-    "erc20Amount": "Кількість долучених токенів ERC-20:",
-    "nftAddress": "Адреса контракту долученого NFT:",
-    "nftId": "ID долученого NFT:",
-    "nftTokenUri": "URI токена NFT:"
+    "participant": "Учасник",
+    "finalizationTime": "Час завершення після цього жесту",
+    "transaction": "Транзакція",
+    "erc20": "Долучений ERC-20",
+    "erc20Amount": "Кількість долучених токенів ERC-20",
+    "nftContract": "Адреса контракту долученого NFT",
+    "nftId": "ID долученого NFT"
   },
-  "values": {
-    "yes": "Так",
-    "no": "Ні"
+  "nav": {
+    "aria": "Сусідні жести",
+    "previous": "Попередній жест",
+    "next": "Наступний жест",
+    "all": "Усі жести циклу {cycle}"
   },
   "nftPreview": {
-    "heading": "Попередній перегляд і метадані",
     "collectionName": "Назва колекції",
     "artist": "Автор",
     "platform": "Платформа",
     "description": "Опис"
   },
   "randomWalk": {
-    "previewAria": "Попередній перегляд Random Walk NFT",
     "heading": "Random Walk NFT"
   }
 }

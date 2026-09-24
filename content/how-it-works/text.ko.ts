@@ -19,36 +19,11 @@ export const howItWorksTextKo = {
     pageLabel: '작동 원리',
   },
   hero: {
-    heading: 'Cosmic Signature <accent>작동 원리</accent>',
+    heading: 'Cosmic Signature 작동 원리',
     paragraph:
       '제스처를 남기고, 시간을 지켜보며, 시그니처를 함께 빚어냅니다. 참여자는 퍼포먼스 사이클 동안 제스처를 남기고, 사이클 마감 시각이 지나면 사이클을 마감할 수 있습니다. 배분은 시그니처 배분, 앵커링 지급, Protocol Guild를 비롯한 10개가 넘는 경로로 이루어집니다.',
     primaryCtaLabel: '제스처 남기기',
-    secondaryCtaLabel: '자세히 알아보기',
-  },
-  overview: {
-    heading: '작동 원리',
-    subhead: '참여하고 사이클 준비금을 쌓아 가는 세 단계',
-    cards: [
-      {
-        title: '제스처',
-        description:
-          'ETH 또는 CST(ERC-20)로 제스처를 남깁니다. 제스처마다 사이클 마감 시각이 연장되고, 별빛 선정 자격이 기록되며, 시그니처가 조금씩 빚어집니다.',
-        tooltip: `제스처는 ETH 또는 CST 토큰(ERC-20)으로 남길 수 있습니다. ETH 제스처에 Random Walk NFT를 첨부하면 ETH 제스처 비용을 한 번 ${protocolFacts.randomWalkDiscountPercentage}% 할인받습니다.`,
-      },
-      {
-        title: '지속',
-        description:
-          '사이클은 마감 시각이 지날 때까지 이어집니다. 새 제스처마다 저장된 마감 시각에 현재 시간 증가량이 더해집니다.',
-        tooltip:
-          '시간 증가량은 약 1시간에서 시작해 사이클을 거치며 조금씩 늘어납니다. CST 제스처 비용은 동적인 보정 구간을 따르며, ETH 제스처와 CST 제스처가 이 구간을 서로 반대 방향으로 움직입니다.',
-      },
-      {
-        title: '수령',
-        description:
-          '사이클이 마감되면 시그니처 배분, 별빛 선정, 앵커링 지급 등 여러 배분의 대상이 됩니다.',
-        tooltip: `최종 제스처를 남긴 참여자는 사이클 준비금의 ${protocolFacts.mainEthPercentage}%, ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST, Cosmic Signature NFT를 받습니다. 별빛 선정 수령자, 앵커링 보유자, 다른 참여자도 배분을 받습니다.`,
-      },
-    ],
+    secondaryCtaLabel: '현재 사이클 보기',
   },
   rewardBreakdown: {
     heading: '제스처가 이어 주는 배분',
@@ -120,10 +95,16 @@ export const howItWorksTextKo = {
       },
     ],
   },
+  payoff: {
+    heading: '모든 사이클은 시그니처로 마무리됩니다',
+    body: '모든 제스처가 사이클의 작품을 빚어냅니다. 사이클이 마감되면 시그니처가 Cosmic Signature NFT로 각인되어 시그니처 배분과 함께 최종 제스처를 남긴 참여자에게 전달됩니다.',
+    caption: '사이클 {cycle}의 시그니처',
+    linkLabel: '이 시그니처 보기',
+  },
   stepByStep: {
     heading: '시작하기',
     subhead: '지갑 연결부터 첫 제스처까지 세 단계',
-    stepLabel: '단계',
+    stepLabel: '{n}단계',
     steps: [
       {
         title: '지갑 연결',
@@ -141,7 +122,6 @@ export const howItWorksTextKo = {
         tooltip:
           '가스 비용은 네트워크 상황과 작업 내용에 따라 달라집니다. 제스처 비용과 별도로 필요하므로, 전송 전에 지갑에 표시된 예상 비용을 확인해 주세요.',
         highlights: [
-          '사이클 마감 시각을 확인합니다. 제스처마다 저장된 마감 시각에 현재 시간 증가량이 더해집니다.',
           '제스처를 남기기 전에 현재 ETH 또는 CST 제스처 비용을 확인합니다.',
           '실시간 참여 CST 미리 보기를 확인합니다. 이 양은 이전 제스처 이후 흐른 시간에 따라 달라집니다.',
           '시그니처 배분 금액을 보고 예상되는 ETH 배분 규모를 확인합니다.',
@@ -153,9 +133,7 @@ export const howItWorksTextKo = {
         tooltip: `Random Walk NFT 하나는 ETH 제스처 비용 ${protocolFacts.randomWalkDiscountPercentage}% 할인에 한 번만 쓸 수 있으므로, 때를 잘 골라 쓰는 것이 좋습니다.`,
         highlights: [
           `ETH 또는 CST(ERC-20)로 제스처를 남깁니다. ETH 제스처에는 Random Walk NFT를 첨부해 비용을 ${protocolFacts.randomWalkDiscountPercentage}% 할인받을 수도 있습니다.`,
-          '‘제스처 남기기’를 누르고 지갑에서 트랜잭션을 확인합니다.',
-          '제스처는 사이클 마감 시각을 연장하고 ETH/CST 비용 상태를 갱신합니다.',
-          '모든 제스처는 별빛 선정 자격을 기록하며, 동적 참여 CST를 자동으로 각인할 수 있습니다.',
+          '방식과 비용이 표시된 제스처 버튼(예: ‘ETH로 제스처 남기기’)을 누르고 지갑에서 트랜잭션을 확인합니다.',
         ],
       },
     ],
@@ -166,47 +144,29 @@ export const howItWorksTextKo = {
     tips: [
       {
         title: '두 보정 구간을 함께 살피기',
-        description:
-          'ETH 제스처 비용과 CST 제스처 비용은 각각의 실시간 구간을 따르며, 제스처마다 CST 구간이 달라집니다.',
-        tooltip:
-          'ETH 제스처는 CST 보정 구간을 조금 줄이고, CST 제스처는 조금 늘립니다. 앱의 실시간 패널에서 현재 비용 경로를 볼 수 있습니다.',
+        body: 'ETH 제스처는 CST 보정 구간을 조금 줄이고, CST 제스처는 조금 늘립니다. 앱의 실시간 패널에서 현재 비용 경로를 볼 수 있습니다.',
       },
       {
         title: 'Random Walk NFT 첨부하기',
-        description: `Random Walk NFT를 보유하면 ETH 제스처 비용을 한 번 ${protocolFacts.randomWalkDiscountPercentage}% 할인받을 수 있습니다.`,
-        tooltip:
-          'Random Walk NFT 하나는 할인에 한 번만 쓸 수 있습니다. 비용이 높은 제스처에 아껴 쓰면 효과가 가장 큽니다.',
+        body: 'Random Walk NFT 하나는 할인에 한 번만 쓸 수 있습니다. 비용이 높은 제스처에 아껴 쓰면 효과가 가장 큽니다.',
       },
       {
         title: '제스처 한 번에 별빛 선정 자격 한 건',
-        description:
-          'ETH 제스처와 CST 제스처 모두 한 번마다 사이클 마감 시 진행되는 별빛 선정 자격이 한 건씩 기록됩니다.',
-        tooltip: `ETH 별빛 선정 수령자 세 명이 사이클 준비금의 ${protocolFacts.stellarSelectionEthPercentage}%를 나누어 받습니다. NFT 별빛 선정 수령자 열 명과 Random Walk NFT 앵커링 보유자 열 명은 각각 ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST와 Cosmic Signature NFT를 받습니다.`,
+        body: `ETH 별빛 선정 수령자 세 명이 사이클 준비금의 ${protocolFacts.stellarSelectionEthPercentage}%를 나누어 받습니다. NFT 별빛 선정 수령자 열 명과 Random Walk NFT 앵커링 보유자 열 명은 각각 ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST와 Cosmic Signature NFT를 받습니다.`,
       },
       {
         title: '전용 지갑 사용하기',
-        description:
-          '스마트 컨트랙트는 온체인에서 소스가 공개 검증되어 있지만, 참여 전용 지갑을 따로 쓰면 안전성이 한층 높아집니다.',
-        tooltip:
-          '전용 지갑은 프로토콜 활동을 주요 보유 자산과 분리해 보안을 높입니다. 보안 감사와 검증 상태는 보안 감사 페이지에 공개되어 있습니다.',
+        body: '전용 지갑은 프로토콜 활동을 주요 보유 자산과 분리해 보안을 높입니다. 보안 감사와 검증 상태는 보안 감사 페이지에 공개되어 있습니다.',
       },
       {
         title: '마감 시각 지켜보기',
-        description: '제스처마다 저장된 사이클 마감 시각에 현재 시간 증가량이 더해집니다.',
-        tooltip:
-          '마감 직전에 제스처를 남기면 최종 제스처 자리에 가장 가까워지지만, 사이클이 마감되기 전까지는 다른 참여자가 뒤이어 제스처를 남길 수 있습니다.',
+        body: '마감 직전에 제스처를 남기면 최종 제스처 자리에 가장 가까워지지만, 사이클이 마감되기 전까지는 다른 참여자가 뒤이어 제스처를 남길 수 있습니다.',
       },
       {
         title: 'CST로 제스처 남기기',
-        description: 'CST 보정 구간을 통해 CST를 또 하나의 제스처 수단으로 쓸 수 있습니다.',
-        tooltip: `CST 제스처는 별빛 선정 자격을 기록하고, 사이클 마감 시각을 연장하고, 동적 참여 CST를 각인할 수 있으며, CST 보정 구간을 약 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}% 늘립니다.`,
+        body: `CST 제스처는 별빛 선정 자격을 기록하고, 사이클 마감 시각을 연장하고, 동적 참여 CST를 각인할 수 있으며, CST 보정 구간을 약 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}% 늘립니다.`,
       },
     ],
-  },
-  faqCallout: {
-    heading: '궁금한 점이 있나요?',
-    body: '사이클 메커니즘, 배분 경로, 토큰 등 Cosmic Signature에 관한 자세한 답은 자주 묻는 질문에 정리되어 있습니다.',
-    ctaLabel: '자주 묻는 질문 보기',
   },
   callToAction: {
     heading: '첫 제스처를 남길 준비가 되었나요?',
@@ -214,6 +174,7 @@ export const howItWorksTextKo = {
     // not processed inside JSX text; this is the intentional fix to a real ’.
     body: '지금 진행 중인 퍼포먼스 사이클에 참여해 주세요. 지갑을 연결하고 첫 제스처를 남기면 참여 CST가 각인될 수 있고, 사이클의 시그니처가 빚어지기 시작합니다.',
     primaryCtaLabel: '제스처 남기기',
+    faqCtaLabel: '자주 묻는 질문 보기',
     discordCtaLabel: 'Discord',
     twitterCtaLabel: 'Twitter / X',
   },

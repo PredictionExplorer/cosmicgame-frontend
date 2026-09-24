@@ -722,6 +722,7 @@
     "searchAria": "ID로 Random Walk NFT 검색",
     "tokenAria": "Random Walk NFT {id}",
     "empty": "검색 결과가 없습니다",
+    "imprint": "Random Walk NFT 각인",
     "none": "이 지갑에는 사용하지 않은 Random Walk NFT가 없습니다.",
     "loading": "이 지갑의 Random Walk NFT 읽는 중…"
   },

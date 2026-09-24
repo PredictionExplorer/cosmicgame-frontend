@@ -330,8 +330,9 @@ const GalleryPage = () => {
   }, []);
 
   // An empty grid would read as "no Signatures exist yet", which is a very
-  // different statement from "the archive could not be read".
-  if (isError) {
+  // different statement from "the archive could not be read". A failed
+  // refetch keeps the collection already on screen.
+  if (isError && !nfts) {
     return (
       <ErrorState
         title={t('error.title')}

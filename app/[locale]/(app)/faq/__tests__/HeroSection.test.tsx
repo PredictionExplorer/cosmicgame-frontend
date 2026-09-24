@@ -1,41 +1,18 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+import { routing } from '@/i18n/routing';
+
 import { render, screen, checkA11y } from '@/test-utils';
 
 import { HeroSection } from '../components/HeroSection';
 
-jest.mock('framer-motion', () => {
-  const React = require('react');
-  const cache: Record<string, React.ForwardRefExoticComponent<unknown>> = {};
-  return {
-    motion: new Proxy(
-      {},
-      {
-        get: (_target: unknown, prop: string) => {
-          if (!cache[prop]) {
-            const Comp = React.forwardRef(function MotionProxy(
-              props: Record<string, unknown>,
-              ref: React.Ref<HTMLElement>,
-            ) {
-              const {
-                initial: _i,
-                animate: _a,
-                whileInView: _w,
-                viewport: _v,
-                transition: _t,
-                variants: _va,
-                custom: _c,
-                ...rest
-              } = props;
-              return React.createElement(prop, { ...rest, ref });
-            });
-            Comp.displayName = `motion.${prop}`;
-            cache[prop] = Comp;
-          }
-          return cache[prop];
-        },
-      },
-    ),
-  };
-});
+const faqTitle = (locale: string): string =>
+  (
+    JSON.parse(readFileSync(join(process.cwd(), 'messages', locale, 'faq.json'), 'utf8')) as {
+      hero: { title: string };
+    }
+  ).hero.title;
 
 jest.mock('../components/FAQSearch', () => ({
   FAQSearch: (props: Record<string, unknown>) => (
@@ -52,9 +29,21 @@ describe('HeroSection', () => {
     categoryCount: 8,
   };
 
-  it('renders the heading', () => {
+  it('renders the H1 as one plain string, in the reading size', () => {
     render(<HeroSection {...defaultProps} />);
-    expect(screen.getByRole('heading', { name: /Cosmic Signature FAQ/i })).toBeInTheDocument();
+    const heading = screen.getByRole('heading', { level: 1 });
+    expect(heading).toHaveTextContent(/^Cosmic Signature FAQ$/);
+    // One text node: the raw server HTML reads "Cosmic Signature FAQ" with no markup inside.
+    expect(heading.childNodes).toHaveLength(1);
+    expect(heading).toHaveClass('type-display-md');
+  });
+
+  it('writes the title as one plain string in every locale, with no space beside Japanese (F152)', () => {
+    for (const locale of routing.locales) {
+      expect(faqTitle(locale)).not.toMatch(/<\/?accent>/);
+    }
+    // Regression: the halves were joined with a JSX space, giving "Cosmic Signature よくある質問".
+    expect(faqTitle('ja')).toBe('Cosmic Signatureよくある質問');
   });
 
   it('names the Learn section in the eyebrow, linked to its hub', () => {
@@ -65,40 +54,23 @@ describe('HeroSection', () => {
     );
   });
 
-  it('renders one H1 in the reading size', () => {
-    render(<HeroSection {...defaultProps} />);
-    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
-    expect(screen.getByRole('heading', { level: 1 })).toHaveClass('type-display-md');
-  });
-
-  it('renders the subtitle text', () => {
+  it('renders the subtitle', () => {
     render(<HeroSection {...defaultProps} />);
     expect(
-      screen.getByText(
-        /Everything you need to know about Cosmic Signature — from getting started to the finer protocol mechanics\./,
-      ),
+      screen.getByText(/Everything you need to know about Cosmic Signature/),
     ).toBeInTheDocument();
   });
 
-  it('displays total count in stats', () => {
-    render(<HeroSection {...defaultProps} totalCount={100} />);
-    expect(screen.getByText('100+ Answers')).toBeInTheDocument();
-  });
-
-  it('displays category count in stats', () => {
-    render(<HeroSection {...defaultProps} categoryCount={12} />);
-    expect(screen.getByText('12 Categories')).toBeInTheDocument();
-  });
-
-  it('renders "Always Updated" text', () => {
+  it('says exactly how many answers and categories there are', () => {
     render(<HeroSection {...defaultProps} />);
-    expect(screen.getByText('Always Updated')).toBeInTheDocument();
+    expect(screen.getByText(/50 answers/)).toHaveTextContent('50 answers · 8 categories');
+    expect(screen.queryByText(/\+/)).not.toBeInTheDocument();
+    expect(screen.queryByText('Always Updated')).not.toBeInTheDocument();
   });
 
   it('passes search props through to FAQSearch', () => {
-    render(<HeroSection {...defaultProps} searchValue="wallet" resultCount={3} totalCount={50} />);
-    const faqSearch = screen.getByTestId('faq-search');
-    expect(faqSearch).toHaveAttribute('data-value', 'wallet');
+    render(<HeroSection {...defaultProps} searchValue="wallet" />);
+    expect(screen.getByTestId('faq-search')).toHaveAttribute('data-value', 'wallet');
   });
 
   it('has no accessibility violations', async () => {

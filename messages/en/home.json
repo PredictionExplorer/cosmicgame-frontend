@@ -722,6 +722,7 @@
     "searchAria": "Find a Random Walk NFT by ID",
     "tokenAria": "Random Walk NFT {id}",
     "empty": "No matching NFT found",
+    "imprint": "Imprint a Random Walk NFT",
     "none": "This wallet holds no unused Random Walk NFT.",
     "loading": "Reading this wallet’s Random Walk NFTs…"
   },

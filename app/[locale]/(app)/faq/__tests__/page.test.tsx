@@ -109,7 +109,15 @@ describe('app/faq/page.tsx', () => {
   describe('Page component', () => {
     beforeEach(() => {
       jest.clearAllMocks();
-      window.scrollTo = jest.fn();
+      Element.prototype.scrollIntoView = jest.fn();
+      window.matchMedia =
+        window.matchMedia ??
+        ((query: string) =>
+          ({
+            matches: false,
+            media: query,
+            addEventListener: jest.fn(),
+          }) as unknown as MediaQueryList);
       window.requestAnimationFrame = (callback: FrameRequestCallback) => {
         callback(0);
         return 1;
@@ -121,22 +129,20 @@ describe('app/faq/page.tsx', () => {
       expect(screen.getByRole('heading', { name: /cosmic signature faq/i })).toBeInTheDocument();
     });
 
-    it('scrolls the popular allocation card to its canonical hash anchor', async () => {
+    it('scrolls the popular allocation question to its canonical hash anchor', async () => {
       const user = userEvent.setup();
       render(await Page(pageProps));
       const getElementById = jest.spyOn(document, 'getElementById');
-      const [popularCard] = screen.getAllByRole('button', {
-        name: /What is the Signature Allocation\?/i,
-      });
+      const popular = screen.getByRole('link', { name: /What is the Signature Allocation\?/i });
+      expect(popular).toHaveAttribute('href', '#main-allocation');
 
-      await user.click(popularCard!);
+      await user.click(popular);
 
       expect(getElementById).toHaveBeenCalledWith('main-allocation');
       expect(getElementById).not.toHaveBeenCalledWith('what-is-the-main-allocation');
-      expect(window.scrollTo).toHaveBeenCalledWith({
-        top: expect.any(Number),
-        behavior: 'smooth',
-      });
+      expect(Element.prototype.scrollIntoView).toHaveBeenCalledWith(
+        expect.objectContaining({ block: 'start' }),
+      );
       getElementById.mockRestore();
     });
 

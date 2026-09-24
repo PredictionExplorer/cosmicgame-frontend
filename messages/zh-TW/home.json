@@ -722,6 +722,7 @@
     "searchAria": "依 ID 搜尋 Random Walk NFT",
     "tokenAria": "Random Walk NFT 編號 {id}",
     "empty": "找不到符合的 NFT",
+    "imprint": "銘刻一枚 Random Walk NFT",
     "none": "此錢包沒有未使用過的 Random Walk NFT。",
     "loading": "正在讀取此錢包的 Random Walk NFT…"
   },

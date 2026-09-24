@@ -79,6 +79,7 @@
   },
   "funding": {
     "short": "{network}上のウォレット残高は{available} ETHです。この一筆には約{required} ETHとネットワーク手数料が必要です。",
+    "shortImprint": "{network}上のウォレット残高は{available} ETHです。この刻印には約{required} ETHとネットワーク手数料が必要です。",
     "howTo": "{network}でETHを用意する方法"
   }
 }

@@ -1,19 +1,13 @@
 {
   "error": {
     "title": "Không tải được dữ liệu chu kỳ",
-    "message": "Vui lòng tải lại trang để thử lại."
+    "message": "Hãy kiểm tra kết nối rồi thử lại."
   },
   "status": {
     "notStarted": "Chưa bắt đầu"
   },
   "hero": {
     "title": "Chu kỳ #{n}",
-    "status": {
-      "openingSoon": "Sắp mở",
-      "awaitingFirstGesture": "Đang chờ nét bút đầu tiên",
-      "readyToFinalize": "Sẵn sàng hoàn tất",
-      "live": "Đang diễn ra"
-    },
     "cta": {
       "viewHomeClock": "Xem đồng hồ trang chủ",
       "finalizeCycle": "Hoàn tất chu kỳ",
@@ -21,25 +15,10 @@
       "makeGesture": "Đặt nét bút"
     },
     "countdown": {
-      "opensIn": "Chu kỳ mở sau",
-      "opensAt": "Chu kỳ {n} mở vào {date}",
-      "finalizesIn": "Chu kỳ hoàn tất sau",
-      "finalizesTooltip": "Khi bộ đếm này về không, người tham gia đặt nét bút cuối cùng có thể hoàn tất chu kỳ và nhận về phân bổ Signature. Mỗi nét bút mới kéo dài bộ đếm.",
-      "readyTitle": "Chu kỳ sẵn sàng hoàn tất",
-      "readyMessage": "Đếm ngược hoàn tất đã về không.",
-      "confirmingTitle": "Đang kiểm tra trạng thái chu kỳ",
-      "confirmingMessage": "Đếm ngược đã về 0. Đang kiểm tra xem có nét bút nào vừa được ghi nhận trên chuỗi trước khi cho phép hoàn tất chu kỳ."
+      "opensAt": "Chu kỳ {n} mở vào {date}"
     }
   },
   "stats": {
-    "stellarSelectionPool": {
-      "label": "Quỹ Tinh tuyển",
-      "tooltip": "ETH được chia cho {count} người tham gia được chọn ngẫu nhiên khi chu kỳ hoàn tất."
-    },
-    "publicGoods": {
-      "label": "Hàng hóa công",
-      "tooltip": "{percent}% Dự trữ chu kỳ được chuyển đến Protocol Guild mỗi chu kỳ."
-    },
     "contributedEth": {
       "label": "ETH đã đóng góp",
       "tooltip": "Các khoản đóng góp ETH trực tiếp từ cộng đồng trong chu kỳ này."
@@ -49,10 +28,74 @@
       "tooltip": "Các NFT cộng đồng đã đính kèm vào nét bút trong chu kỳ này."
     }
   },
+  "figures": {
+    "running": "Đã diễn ra",
+    "participants": "Người tham gia"
+  },
+  "allocations": {
+    "recipientCount": "{count, plural, other {# người nhận}}",
+    "columns": {
+      "allocation": "Phân bổ",
+      "share": "Tỷ lệ dự trữ",
+      "receives": "Mỗi người nhận được",
+      "recipients": "Người nhận"
+    },
+    "amounts": {
+      "ethEach": "{amount} ETH mỗi người",
+      "fixedCst": "1.000 CST",
+      "fixedCstEach": "1.000 CST mỗi người",
+      "nft": "1 Cosmic Signature NFT",
+      "nftEach": "1 Cosmic Signature NFT mỗi người",
+      "attachedTokens": "Token đính kèm (nếu có)"
+    },
+    "cards": {
+      "signature": {
+        "name": "Phân bổ Signature",
+        "tooltip": "Người tham gia đặt nét bút cuối cùng khi đếm ngược về không có thể nhận về phân bổ này: ETH, 1.000 CST, một Cosmic Signature NFT và các token đính kèm."
+      },
+      "chronoWarrior": {
+        "name": "Phân bổ Chiến binh Thời gian",
+        "tooltip": "Người tham gia giữ vị trí Quán quân Bền bỉ trong khoảng liên tục dài nhất nhận một tỷ lệ Dự trữ chu kỳ và một Cosmic Signature NFT."
+      },
+      "ethStellar": {
+        "name": "ETH Tinh tuyển",
+        "tooltip": "Người tham gia được chọn ngẫu nhiên từ các lượt trong chu kỳ để chia một phần phân bổ ETH."
+      },
+      "cosmicAnchor": {
+        "name": "Neo giữ Cosmic Signature",
+        "tooltip": "Người neo giữ Cosmic Signature NFT chia sẻ phân phối neo giữ của mỗi chu kỳ.",
+        "recipientLabel": "Theo tỷ lệ · mọi người neo giữ"
+      },
+      "publicGoods": {
+        "name": "Hàng hóa công",
+        "tooltip": "{percent}% của mỗi Dự trữ chu kỳ được chuyển đến Protocol Guild, cơ chế tài trợ cho hơn 170 người đóng góp cốt lõi cho Ethereum.",
+        "recipientLabel": "Protocol Guild"
+      },
+      "nftStellar": {
+        "name": "NFT Tinh tuyển",
+        "tooltip": "Người tham gia được chọn ngẫu nhiên từ các lượt trong chu kỳ để nhận CST ghi nhận và Cosmic Signature NFT."
+      },
+      "randomWalkAnchor": {
+        "name": "Người neo giữ Random Walk",
+        "tooltip": "Người neo giữ Random Walk NFT có thể nhận CST ghi nhận và Cosmic Signature NFT."
+      },
+      "endurance": {
+        "name": "Quán quân Bền bỉ",
+        "tooltip": "Người tham gia giữ vị trí người đặt nét bút gần nhất trong khoảng liên tục dài nhất. Nhận 1.000 CST ghi nhận và một Cosmic Signature NFT."
+      },
+      "finalCst": {
+        "name": "Nét bút CST cuối cùng",
+        "tooltip": "Người tham gia đặt nét bút CST cuối cùng của chu kỳ nhận 1.000 CST ghi nhận và một Cosmic Signature NFT."
+      }
+    }
+  },
   "sections": {
-    "allocationTracks": {
-      "title": "Các luồng phân bổ",
-      "tooltip": "Cách Dự trữ chu kỳ được phân phối qua các luồng phân bổ: phân bổ Signature, Chiến binh Thời gian, Tinh tuyển, Hàng hóa công, phân phối neo giữ và Dự trữ tích lũy."
+    "allocations": {
+      "title": "Chi tiết phân bổ",
+      "description": "Cách Dự trữ chu kỳ được phân phối qua các luồng phân bổ: phân bổ Signature, Chiến binh Thời gian, Tinh tuyển, Hàng hóa công, phân phối neo giữ và Dự trữ tích lũy."
+    },
+    "participants": {
+      "title": "Người tham gia chu kỳ này"
     },
     "stellarSelectionEntries": {
       "title": "Lượt Tinh tuyển",
@@ -67,7 +110,7 @@
       "tooltip": "Người tham gia xếp theo thời gian giữ vị trí người đặt nét bút gần nhất. Người có khoảng thời gian liên tục dài nhất nhận 1.000 CST ghi nhận và một Cosmic Signature NFT."
     },
     "gestureHistory": {
-      "title": "Lịch sử nét bút — Chu kỳ {n}",
+      "title": "Lịch sử nét bút",
       "tooltip": "Bản ghi theo thời gian của mọi nét bút trong chu kỳ này, mới nhất trước."
     },
     "ethContributions": {
@@ -84,19 +127,14 @@
     "participation": "Khi đặt nét bút, bạn có thể khắc <em>CST tham gia động</em>. Số lượng tính theo công thức căn bậc hai dựa trên khoảng thời gian kể từ nét bút trước.",
     "calibration": "Nét bút ETH rút ngắn cửa sổ hiệu chỉnh CST khoảng {decreasePercent}%; nét bút CST kéo dài cửa sổ này khoảng {increasePercent}%.",
     "stellarSelection": "Mỗi nét bút ghi nhận một lượt Tinh tuyển. {ethEntries} lượt nhận {rafflePercent}% Dự trữ chu kỳ. {nftEntries} người nhận Tinh tuyển khác và {anchorHolders} người neo giữ Random Walk NFT nhận một Cosmic Signature NFT.",
-    "publicGoods": "Protocol Guild nhận {percent}% Dự trữ chu kỳ (ít nhất {amount} ETH) mỗi chu kỳ."
-  },
-  "footer": {
-    "contractBalance": "Số dư hợp đồng",
-    "cycleDuration": "Thời lượng chu kỳ",
-    "uniqueParticipants": "Người tham gia riêng biệt"
+    "publicGoods": "Protocol Guild nhận {percent}% Dự trữ chu kỳ (ít nhất {amount} ETH) mỗi chu kỳ.",
+    "learnMore": "Cách một chu kỳ vận hành"
   },
   "attachedTokens": {
     "title": "Token đính kèm",
     "tooltip": "NFT và token ERC-20 do cộng đồng đính kèm vào nét bút để làm giàu Dự trữ chu kỳ.",
-    "erc721Tab": "Token ERC721",
-    "erc20Tab": "Token ERC20",
-    "erc721Empty": "Không có token ERC721 nào được đính kèm trong chu kỳ này."
+    "erc721Tab": "Token ERC-721",
+    "erc20Tab": "Token ERC-20"
   },
   "showcase": {
     "badge": "Nằm trong phân bổ Signature",

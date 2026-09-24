@@ -1,9 +1,10 @@
 import { useMemo, useState, type FC, type ChangeEvent } from 'react';
-import { Search } from 'lucide-react';
+import { ArrowRight, Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { formatId } from '@/utils';
 
+import { Link } from '@/i18n/navigation';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
@@ -81,7 +82,7 @@ const PaginationRWLKGrid: FC<PaginationRWLKGridProps> = ({
   );
 
   // Nothing to search until the wallet's NFTs are read, and nothing to
-  // search when it holds none: then one sentence says so.
+  // search when it holds none: then one sentence says so, and where to get one.
   if (loading) {
     return (
       <div
@@ -96,12 +97,16 @@ const PaginationRWLKGrid: FC<PaginationRWLKGridProps> = ({
   }
   if (data.length === 0) {
     return (
-      <p
-        data-testid="rwlk-none"
-        className={cn('type-caption text-subtle', compact ? 'mt-1' : 'mt-8')}
-      >
-        {t('rwlkGrid.none')}
-      </p>
+      <div data-testid="rwlk-none" className={compact ? 'mt-1' : 'mt-8'}>
+        <p className="type-caption text-subtle">{t('rwlkGrid.none')}</p>
+        <Link
+          href="/imprint"
+          className="link mt-1 inline-flex min-h-6 items-center gap-1 type-caption"
+        >
+          {t('rwlkGrid.imprint')}
+          <ArrowRight aria-hidden className="size-3.5" />
+        </Link>
+      </div>
     );
   }
 

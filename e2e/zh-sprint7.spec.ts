@@ -330,20 +330,14 @@ test.describe('zh Sprint 7 — long-tail routes', () => {
         },
       });
     });
-    // The full special-allocation cards (with participant profile links)
-    // live on the cycle details page; the home standings link to gestures.
+    // The cycle details page shows the home's standings ledger; every holder
+    // links to their participant page inside the locale.
     await openZh(page, '/zh/current-cycle');
-    const latestCard = page.getByTestId('special-allocation-card-latest-participant').first();
-    await expect(latestCard).toBeVisible({ timeout: 30_000 });
-    await expect(latestCard.getByRole('link', { name: latestParticipant })).toHaveAttribute(
-      'href',
-      `/zh/user/${latestParticipant}`,
-    );
-    const chronoCard = page.getByTestId('special-allocation-card-chrono-warrior').first();
-    await expect(chronoCard.getByRole('link', { name: chronoWarrior })).toHaveAttribute(
-      'href',
-      `/zh/user/${chronoWarrior}`,
-    );
+    const latestRow = page.getByTestId('latest-participant-intel').first();
+    await expect(latestRow).toBeVisible({ timeout: 30_000 });
+    await expect(latestRow.locator(`a[href="/zh/user/${latestParticipant}"]`)).toBeVisible();
+    const chronoRow = page.getByTestId('chrono-role-summary').first();
+    await expect(chronoRow.locator(`a[href="/zh/user/${chronoWarrior}"]`)).toBeVisible();
   });
 
   test('renders the localized endurance embed and keeps noindex,nofollow', async ({ page }) => {

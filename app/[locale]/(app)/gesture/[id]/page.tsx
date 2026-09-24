@@ -30,7 +30,7 @@ export default async function Page({ params }: PageProps) {
   const { locale, id } = await params;
   setRequestLocale(locale);
   return (
-    <PageMessages namespaces={['detail', 'gesture']}>
+    <PageMessages namespaces={['detail', 'gesture', 'tables']}>
       <GesturePage gestureId={parseInt(id, 10)} />
     </PageMessages>
   );

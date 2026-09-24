@@ -15,11 +15,12 @@ export const ALLOCATION_TRACK_IDS = [
 export type AllocationTrackId = (typeof ALLOCATION_TRACK_IDS)[number];
 
 /**
- * Background utility for each track's bar segment and legend swatch, from the named track
- * tokens (--track-*, styles/themes.css). Data categories keep fixed hues in every palette: the
- * palette primary and secondary are close lilacs in Midnight and Nebula, so they cannot tell
- * two tracks apart. The one map for every chart of the split, on both hosts (the landing's
- * AllocationBar draws the compounding remainder hatched in the same hue).
+ * Background utility for each track's bar segment and legend swatch: the design system's
+ * `--track-*` series (docs/design-system.md, "Data series"). They are fixed hues in every
+ * palette (styles/themes.css), 4.5:1 or more on every surface, and no two tracks share one:
+ * the palette primary and secondary are close lilacs in Midnight and Nebula, so they cannot
+ * tell two tracks apart. The one map for every chart of the split, on both hosts (the
+ * landing's AllocationBar draws the compounding remainder hatched in the same hue).
  */
 export const ALLOCATION_TRACK_COLORS: Readonly<Record<AllocationTrackId, string>> = {
   signature: 'bg-track-signature',

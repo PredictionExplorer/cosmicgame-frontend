@@ -1,24 +1,21 @@
 {
   "hero": {
-    "title": "Cosmic Signature <accent>자주 묻는 질문</accent>",
+    "title": "Cosmic Signature 자주 묻는 질문",
     "breadcrumb": "자주 묻는 질문",
     "subtitle": "처음 시작하는 방법부터 심화 메커니즘까지, Cosmic Signature에 관해 알아야 할 내용을 한곳에 모았습니다.",
-    "answerCount": "답변 {count}개 이상",
-    "answerCountTooltip": "Cosmic Signature의 모든 측면을 아우르는 상세한 답변입니다.",
-    "categoryCount": "{count}개 카테고리",
-    "alwaysUpdated": "항상 최신"
+    "answerCount": "답변 {count, number}개",
+    "categoryCount": "{count, number}개 카테고리"
   },
   "search": {
     "placeholder": "질문 검색…",
     "ariaLabel": "자주 묻는 질문 검색",
-    "clear": "지우기",
     "clearAria": "검색어 지우기",
     "noResults": "질문을 찾지 못했습니다. 다른 검색어로 시도해 주세요.",
     "resultCount": "전체 {totalCount}개 중 {resultCount}개 표시"
   },
   "navigation": {
     "ariaLabel": "자주 묻는 질문 카테고리",
-    "all": "전체"
+    "heading": "목차"
   },
   "category": {
     "expandAll": "모두 펼치기",
@@ -30,13 +27,16 @@
     "copyLinkAria": "이 질문의 링크 복사"
   },
   "popular": {
-    "heading": "인기 질문",
-    "tooltip": "새 참여자가 가장 많이 묻는 질문입니다."
+    "heading": "인기 질문"
   },
   "empty": {
     "heading": "질문을 찾지 못했습니다",
-    "descriptionPrefix": "다른 검색어로 시도하거나",
-    "clearAction": "검색어를 지워 주세요"
+    "description": "다른 검색어로 시도하거나 검색어를 지우고 모든 질문을 확인해 주세요.",
+    "clearAction": "검색어 지우기"
+  },
+  "glossary": {
+    "title": "용어집",
+    "description": "Cosmic Signature에서 쓰는 고유 용어와 그 정의입니다."
   },
   "contact": {
     "heading": "아직 궁금한 점이 남았나요?",
@@ -45,26 +45,6 @@
     "discord": "Discord"
   },
   "tooltips": {
-    "enduranceChampion": {
-      "term": "수호 챔피언",
-      "content": "퍼포먼스 사이클 안에서 최근 제스처 자리를 끊기지 않고 가장 오래 지킨 참여자에게 주어지는 특별한 칭호입니다."
-    },
-    "chronoWarrior": {
-      "term": "시간의 전사",
-      "content": "수호 챔피언 자리를 가장 오랫동안 연속으로 지킨 참여자에게 주어지는 칭호입니다."
-    },
-    "calibrationWindow": {
-      "term": "보정 구간",
-      "content": "제스처 비용이 보정 상한에서 시작해 시간이 지날수록 보정 하한을 향해 내려가는 가격 결정 구간입니다. 오래 기다릴수록 비용이 낮아집니다."
-    },
-    "cosmicCouncil": {
-      "term": "우주 평의회",
-      "content": "CST 보유자가 조율 제안을 올리고 찬성이나 반대를 표명하는 온체인 조율 기구입니다. 예를 들어 사이클마다 공공재 배분을 받는 공공재 수령처를 여기서 선정합니다."
-    },
-    "cst": {
-      "term": "CST",
-      "content": "제스처를 남길 때 각인될 수 있는 ERC-20 토큰입니다. 제스처 비용으로 사용할 수 있으며, 우주 평의회에서 조율 가중치를 나타냅니다."
-    },
     "erc20": {
       "term": "ERC-20",
       "content": "널리 쓰이는 이더리움 토큰 표준으로, 서로 대체할 수 있는 토큰에 적용됩니다."

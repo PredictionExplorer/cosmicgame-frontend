@@ -32,7 +32,7 @@ export default async function Page({ params }: PageProps) {
   ]);
 
   return (
-    <PageMessages namespaces={['faq']}>
+    <PageMessages namespaces={['faq', 'glossary']}>
       <>
         <JsonLd data={faqPageJsonLd(allItems, inLanguage)} />
         <JsonLd

@@ -1,11 +1,11 @@
 'use client';
 
-import { forwardRef, Fragment, useCallback, useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
-import { ChevronsUpDown, Link2 } from 'lucide-react';
+import { forwardRef, useCallback, useMemo, useState } from 'react';
+import { Check, ChevronsUpDown, Link2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { type FAQCategory as FAQCategoryType, type FAQItem } from '@/content/faq';
+import { protocolFacts } from '@/content/protocol-facts';
 
 import {
   Accordion,
@@ -13,87 +13,19 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { InfoTooltip } from '@/components/ui/info-tooltip';
+import { Button } from '@/components/ui/button';
 
-import { FAQ_ICONS } from './faqIcons';
+import {
+  EXPLAINED_AD_HOC_KEYS,
+  EXPLAINED_GLOSSARY_IDS,
+  enrichAnswer,
+  highlightMatches,
+  normalizeForMatch,
+  type AnswerTerm,
+} from './answerText';
 
-const TOOLTIP_KEYS = [
-  'enduranceChampion',
-  'chronoWarrior',
-  'calibrationWindow',
-  'cosmicCouncil',
-  'cst',
-  'erc20',
-  'erc721',
-  'layer2',
-  'rollup',
-  'randomWalkNft',
-  'renounceOwnership',
-] as const;
-
-interface TooltipTerm {
-  term: string;
-  content: string;
-}
-
-function normalizeForMatch(value: string): string {
-  return value.normalize('NFKC').toLowerCase();
-}
-
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-export function enrichWithTooltips(
-  text: string,
-  tooltipTerms: readonly TooltipTerm[],
-): React.ReactNode[] {
-  const sortedTerms = tooltipTerms
-    .filter(({ term }) => term.length > 0)
-    .sort((a, b) => b.term.length - a.term.length);
-  if (sortedTerms.length === 0) return [text];
-
-  const pattern = new RegExp(
-    `(${sortedTerms.map(({ term }) => escapeRegExp(term)).join('|')})`,
-    'giu',
-  );
-  const parts = text.split(pattern);
-  const termsByNormalizedValue = new Map(
-    sortedTerms.map((entry) => [normalizeForMatch(entry.term), entry] as const),
-  );
-  const seen = new Set<string>();
-
-  return parts.map((part, i) => {
-    const normalizedPart = normalizeForMatch(part);
-    const matchedTerm = termsByNormalizedValue.get(normalizedPart);
-    if (matchedTerm && !seen.has(normalizedPart)) {
-      seen.add(normalizedPart);
-      return (
-        <Fragment key={i}>
-          <span className="font-medium text-foreground">{part}</span>
-          <InfoTooltip content={matchedTerm.content} side="top" maxWidth={280} />
-        </Fragment>
-      );
-    }
-    return <Fragment key={i}>{part}</Fragment>;
-  });
-}
-
-function highlightSearch(text: string, query: string): React.ReactNode {
-  if (!query.trim()) return text;
-  const regex = new RegExp(`(${escapeRegExp(query)})`, 'giu');
-  const normalizedQuery = normalizeForMatch(query);
-  const parts = text.split(regex);
-  return parts.map((part, i) =>
-    normalizeForMatch(part) === normalizedQuery ? (
-      <mark key={i} className="rounded-sm bg-primary/25 px-0.5 text-foreground">
-        {part}
-      </mark>
-    ) : (
-      part
-    ),
-  );
-}
+/** Contract identifiers the answers quote, set as code. */
+const ANSWER_CODE = [protocolFacts.dynamicCstRewardFormula];
 
 interface FAQCategoryProps {
   category: FAQCategoryType;
@@ -103,144 +35,164 @@ interface FAQCategoryProps {
   onExpandAll: (categoryId: string) => void;
 }
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: 'easeOut' as const } },
-};
-
+/**
+ * One FAQ category: its heading, an "Expand all" toggle and the questions as
+ * a hairline-divided accordion. Every answer stays in the HTML, closed ones
+ * `hidden="until-found"`, so crawlers and find-in-page still reach them;
+ * a search opens every matching answer with the match marked, and the
+ * reader can close them again until the query changes.
+ * Answers keep a reading measure, explain coined terms in place from the
+ * glossary and set contract identifiers as code.
+ */
 export const FAQCategorySection = forwardRef<HTMLElement, FAQCategoryProps>(
   function FAQCategorySection(
     { category, searchQuery, expandedItems, onItemToggle, onExpandAll },
     ref,
   ) {
     const t = useTranslations('faq');
+    const tGlossary = useTranslations('glossary');
     const [copiedId, setCopiedId] = useState<string | null>(null);
-    const Icon = FAQ_ICONS[category.icon];
-    const allExpanded = category.items.every((item) => expandedItems.includes(item.id));
-    const tooltipTerms = useMemo(
-      () =>
-        TOOLTIP_KEYS.map((key) => ({
-          term: t(`tooltips.${key}.term`),
-          content: t(`tooltips.${key}.content`),
+    const query = searchQuery.trim();
+    const searching = query.length > 0;
+    // The answers a reader closed during a search, kept for that query only:
+    // a new query opens every match again.
+    const [searchClosed, setSearchClosed] = useState<{ query: string; ids: readonly string[] }>({
+      query: '',
+      ids: [],
+    });
+
+    const terms = useMemo<AnswerTerm[]>(
+      () => [
+        ...EXPLAINED_GLOSSARY_IDS.map((glossaryId) => ({
+          term: tGlossary(`terms.${glossaryId}.term`),
+          glossaryId,
         })),
-      [t],
+        ...EXPLAINED_AD_HOC_KEYS.map((key) => ({
+          term: t(`tooltips.${key}.term`),
+          definition: t(`tooltips.${key}.content`),
+        })),
+      ],
+      [t, tGlossary],
     );
 
     const filteredItems = useMemo(() => {
-      if (!searchQuery.trim()) return category.items;
-      const q = normalizeForMatch(searchQuery);
+      if (!searching) return category.items;
+      const q = normalizeForMatch(query);
       return category.items.filter(
         (item) =>
           normalizeForMatch(item.question).includes(q) ||
           normalizeForMatch(item.answer).includes(q),
       );
-    }, [category.items, searchQuery]);
+    }, [category.items, query, searching]);
 
     const copyLink = useCallback((item: FAQItem) => {
       const anchor = item.hashAnchor || item.id;
       const url = `${window.location.origin}${window.location.pathname}#${anchor}`;
-      navigator.clipboard.writeText(url).then(() => {
+      void navigator.clipboard.writeText(url).then(() => {
         setCopiedId(item.id);
-        setTimeout(() => setCopiedId(null), 2000);
+        window.setTimeout(() => setCopiedId(null), 2000);
       });
     }, []);
 
     if (filteredItems.length === 0) return null;
 
-    const accordionValue = expandedItems.filter((id) =>
-      filteredItems.some((item) => item.id === id),
-    );
+    // A match may sit in an answer only, so every matching answer opens with
+    // the search; the reader can still close one.
+    const closedForQuery = searchClosed.query === query ? searchClosed.ids : [];
+    const openIds = searching
+      ? filteredItems.map((item) => item.id).filter((id) => !closedForQuery.includes(id))
+      : expandedItems.filter((id) => filteredItems.some((item) => item.id === id));
+    const allExpanded = category.items.every((item) => expandedItems.includes(item.id));
+    const headingId = `faq-cat-${category.id}`;
 
     return (
-      <motion.section
+      <section
         ref={ref}
         id={`faq-category-${category.id}`}
-        aria-labelledby={`faq-cat-${category.id}`}
-        variants={fadeUp}
-        initial={false}
-        whileInView="visible"
-        viewport={{ once: true, margin: '-60px' }}
-        className="scroll-mt-40"
+        aria-labelledby={headingId}
+        className="scroll-mt-[calc(var(--header-height)+4.5rem)] lg:scroll-mt-[var(--sticky-offset)]"
       >
-        <div className="mb-5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/15 bg-primary/[0.06]">
-              <Icon className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <h2
-                id={`faq-cat-${category.id}`}
-                className="font-display text-lg font-bold tracking-tight sm:text-xl"
-              >
-                {searchQuery ? highlightSearch(category.title, searchQuery) : category.title}
-              </h2>
-              <p className="text-xs text-muted-foreground">{category.description}</p>
-            </div>
+        <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3 border-b border-rule pb-4">
+          <div className="min-w-0">
+            <h2 id={headingId} className="type-section">
+              {searching ? highlightMatches(category.title, searchQuery) : category.title}
+            </h2>
+            <p className="mt-1.5 type-body-sm text-muted-foreground">{category.description}</p>
           </div>
-          <button
-            onClick={() => onExpandAll(category.id)}
-            className="hidden items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-foreground sm:inline-flex"
-            aria-label={allExpanded ? t('category.collapseAllAria') : t('category.expandAllAria')}
-          >
-            <ChevronsUpDown className="h-3.5 w-3.5" />
-            {allExpanded ? t('category.collapseAll') : t('category.expandAll')}
-          </button>
-        </div>
+          {searching ? null : (
+            <Button
+              variant="quiet"
+              size="sm"
+              onClick={() => onExpandAll(category.id)}
+              aria-label={allExpanded ? t('category.collapseAllAria') : t('category.expandAllAria')}
+              aria-expanded={allExpanded}
+            >
+              <ChevronsUpDown aria-hidden />
+              {allExpanded ? t('category.collapseAll') : t('category.expandAll')}
+            </Button>
+          )}
+        </header>
 
         <Accordion
           type="multiple"
-          value={accordionValue}
+          value={openIds}
           onValueChange={(values) => {
-            const currentIds = new Set(accordionValue);
-            const newIds = new Set(values);
-
-            for (const id of newIds) {
-              if (!currentIds.has(id)) onItemToggle(category.id, id);
+            if (searching) {
+              setSearchClosed({
+                query,
+                ids: filteredItems.map((item) => item.id).filter((id) => !values.includes(id)),
+              });
+              return;
             }
-            for (const id of currentIds) {
-              if (!newIds.has(id)) onItemToggle(category.id, id);
-            }
+            const current = new Set(openIds);
+            const next = new Set(values);
+            for (const id of next) if (!current.has(id)) onItemToggle(category.id, id);
+            for (const id of current) if (!next.has(id)) onItemToggle(category.id, id);
           }}
-          className="space-y-2"
         >
-          {filteredItems.map((item) => (
-            <AccordionItem
-              key={item.id}
-              value={item.id}
-              id={item.hashAnchor || item.id}
-              className="group rounded-xl border border-white/[0.06] bg-white/[0.015] px-5 transition-colors data-[state=open]:border-primary/20 data-[state=open]:bg-white/[0.03]"
-            >
-              <AccordionTrigger className="py-4 text-left text-[15px] font-semibold leading-snug hover:no-underline sm:text-base [&>svg]:text-muted-foreground/40">
-                {searchQuery ? highlightSearch(item.question, searchQuery) : item.question}
-              </AccordionTrigger>
-              <AccordionContent forceMount className="pb-5">
-                {/* Several answers embed contract identifiers such as
-                    `mainPrizeTimeIncrementInMicroSeconds`, which are wider than
-                    a phone screen on their own. */}
-                <p className="text-sm leading-relaxed text-muted-foreground [overflow-wrap:anywhere]">
-                  {searchQuery
-                    ? highlightSearch(item.answer, searchQuery)
-                    : enrichWithTooltips(item.answer, tooltipTerms)}
-                </p>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    copyLink(item);
-                  }}
-                  // Height alone was under the touch target, so this grows
-                  // vertically only. Widening it with a negative margin would
-                  // push it outside the accordion's `overflow-hidden` box.
-                  className="mt-1 inline-flex min-h-11 items-center gap-1.5 text-xs text-muted-foreground/50 transition-colors hover:text-primary sm:mt-3 sm:min-h-0"
-                  aria-label={t('category.copyLinkAria')}
-                >
-                  <Link2 className="h-3 w-3" />
-                  {copiedId === item.id ? t('category.copied') : t('category.copyLink')}
-                </button>
-              </AccordionContent>
-            </AccordionItem>
-          ))}
+          {filteredItems.map((item) => {
+            const open = openIds.includes(item.id);
+            return (
+              <AccordionItem
+                key={item.id}
+                value={item.id}
+                id={item.hashAnchor || item.id}
+                className="scroll-mt-[calc(var(--header-height)+4.5rem)] border-b border-rule-faint lg:scroll-mt-[var(--sticky-offset)]"
+              >
+                <AccordionTrigger className="gap-6 py-5 text-start type-title text-foreground hover:no-underline hover:text-primary [&>svg]:size-5 [&>svg]:text-subtle">
+                  {/* One flex item: a highlighted match stays inline in the question
+                      (the trigger is a flex row) and in its accessible name. */}
+                  <span className="min-w-0">
+                    {searching ? highlightMatches(item.question, searchQuery) : item.question}
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent hiddenUntilFound={!open} className="pb-6">
+                  <p className="type-prose text-muted-foreground">
+                    {searching
+                      ? highlightMatches(item.answer, searchQuery)
+                      : enrichAnswer(item.answer, terms, ANSWER_CODE)}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => copyLink(item)}
+                    className="mt-3 inline-flex min-h-11 items-center gap-1.5 rounded-control type-caption text-subtle transition-colors duration-fast hover:text-foreground sm:min-h-8"
+                    aria-label={t('category.copyLinkAria')}
+                  >
+                    {copiedId === item.id ? (
+                      <Check className="size-3.5 text-positive" aria-hidden />
+                    ) : (
+                      <Link2 className="size-3.5" aria-hidden />
+                    )}
+                    <span aria-live="polite">
+                      {copiedId === item.id ? t('category.copied') : t('category.copyLink')}
+                    </span>
+                  </button>
+                </AccordionContent>
+              </AccordionItem>
+            );
+          })}
         </Accordion>
-      </motion.section>
+      </section>
     );
   },
 );

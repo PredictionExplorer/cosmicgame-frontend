@@ -9,25 +9,34 @@
     "description": "Each Random Walk NFT gives this reduction once, so you choose the moment. This one-time use is separate from anchoring Random Walk NFTs for Anchored-NFT Stellar Selection eligibility.",
     "currentCost": "Current imprint cost",
     "costBreakdown": "Contract cost {base} ETH, plus a {percent}% buffer so the imprint still succeeds if the cost rises before it confirms.",
-    "submit": "Imprint Now",
-    "myNfts": "My Random Walk NFTs"
+    "submit": "Imprint now",
+    "myNfts": "Your Random Walk NFTs",
+    "panelAria": "Imprint a Random Walk NFT",
+    "tokenAlt": "Random Walk NFT {id}",
+    "connect": "Connect a wallet to imprint a Random Walk NFT. Connecting signs nothing.",
+    "why": {
+      "title": "What an imprint gives you"
+    },
+    "compare": {
+      "label": "ETH Gesture Cost with a Random Walk NFT",
+      "caption": "{percent}% off the current ETH Gesture Cost, once per NFT."
+    },
+    "success": {
+      "eyebrow": "Imprinted",
+      "title": "Random Walk NFT {id} is yours",
+      "description": "Attach it to an ETH gesture for a one-time {percent}% reduction in the Gesture Cost.",
+      "use": "Use it in a gesture",
+      "again": "Imprint another"
+    },
+    "owned": {
+      "used": "Used",
+      "unused": "Unused",
+      "use": "Use in a gesture",
+      "empty": "This wallet holds no Random Walk NFTs yet.",
+      "error": "The Random Walk NFTs in this wallet could not be read."
+    }
   },
   "seo": {
-    "eyebrow": "Random Walk NFT imprinting · Arbitrum",
-    "heading": "Imprint Random Walk NFT",
-    "description": "Imprint a Random Walk NFT to use with Cosmic Signature. Each unused NFT can be attached to one ETH gesture for a 50% Gesture Cost reduction.",
-    "source": "Cosmic Signature public protocol configuration APIs",
-    "lastUpdated": "Last updated: {date}. Source: {source}.",
-    "relatedAria": "Related Random Walk NFT pages",
-    "cards": {
-      "cycle": "Active Performance Cycle",
-      "cost": "Current ETH Gesture Cost",
-      "discount": "Random Walk NFT reduction"
-    },
-    "links": {
-      "cycle": "Open the active Performance Cycle",
-      "learn": "Learn how gestures work",
-      "used": "View used Random Walk NFTs"
-    }
+    "heading": "Imprint Random Walk NFT"
   }
 }

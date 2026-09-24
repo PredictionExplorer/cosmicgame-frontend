@@ -233,8 +233,63 @@ describe('StandingsLedger', () => {
     }
   });
 
+  it('draws placeholder rows, never "no record yet", until the holders are first read', () => {
+    render(
+      <StandingsLedger
+        {...baseProps}
+        champions={makeChampions({ isLoading: true, hasData: false })}
+      />,
+    );
+    const ledger = screen.getByTestId('standings-ledger');
+    expect(ledger).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getAllByTestId('standings-ledger-skeleton-row')).toHaveLength(4);
+    expect(within(ledger).queryByRole('link')).not.toBeInTheDocument();
+    expect(ledger).not.toHaveTextContent('tables.specialAllocation.noEnduranceRecord');
+    expect(screen.queryByTestId('chrono-active-challenge')).not.toBeInTheDocument();
+    expect(within(ledger).getByText('common.status.loading')).toHaveClass('sr-only');
+  });
+
+  it('sits one level deeper, introduced by a line, inside the cycle page', () => {
+    render(
+      <StandingsLedger
+        {...baseProps}
+        headingLevel={3}
+        headingId="cycle-standings-heading"
+        description="tables.specialAllocation.headingHelp"
+      />,
+    );
+    const ledger = screen.getByRole('region', { name: 'home.observatory.standings.title' });
+    expect(within(ledger).getByRole('heading', { level: 3 })).toHaveAttribute(
+      'id',
+      'cycle-standings-heading',
+    );
+    expect(within(ledger).getAllByRole('heading', { level: 4 })).toHaveLength(4);
+    expect(within(ledger).queryByRole('heading', { level: 2 })).not.toBeInTheDocument();
+    expect(screen.getByText('tables.specialAllocation.headingHelp')).toBeVisible();
+    // Every holder still leads to their participant page.
+    const hrefs = within(ledger)
+      .getAllByRole('link')
+      .map((link) => link.getAttribute('href'));
+    expect(hrefs).toEqual(
+      expect.arrayContaining([`/user/${LATEST}`, `/user/${ENDURANCE}`, `/user/${CHRONO}`]),
+    );
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(<StandingsLedger {...baseProps} account={LATEST} />);
+    await checkA11y(container);
+  });
+
+  it('has no accessibility violations at heading level 3 or while loading', async () => {
+    const { container, rerender } = render(<StandingsLedger {...baseProps} headingLevel={3} />);
+    await checkA11y(container);
+    rerender(
+      <StandingsLedger
+        {...baseProps}
+        headingLevel={3}
+        champions={makeChampions({ isLoading: true, hasData: false })}
+      />,
+    );
     await checkA11y(container);
   });
 });

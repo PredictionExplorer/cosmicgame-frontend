@@ -108,7 +108,7 @@ const publicPages: PublicPage[] = [
   {
     path: '/how-it-works',
     host: APP_HOST,
-    h1: 'How Cosmic Signature Works',
+    h1: 'How Cosmic Signature works',
     richH1: true,
     jsonLd: ['WebPage', 'BreadcrumbList'],
   },
@@ -166,7 +166,7 @@ const publicPages: PublicPage[] = [
   {
     path: '/uk/faq',
     host: APP_HOST,
-    h1: 'Cosmic Signature Поширені запитання',
+    h1: 'Поширені запитання про Cosmic Signature',
     richH1: true,
     jsonLd: ['Organization', 'WebSite', 'WebApplication', 'FAQPage', 'BreadcrumbList'],
   },

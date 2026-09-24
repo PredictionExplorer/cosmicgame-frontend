@@ -1,4 +1,6 @@
 import {
+  ART_PLATE_CLASS,
+  MEDIA_PLATE_CLASS,
   ArtFrame,
   ArtTag,
   PendingPlate,
@@ -198,6 +200,26 @@ describe('ArtFrame', () => {
       <ArtFrame sources={[PNG]} alt="Art" sizes="100vw" unavailableLabel="Unavailable" />,
     );
     await checkA11y(container);
+  });
+});
+
+describe('MEDIA_PLATE_CLASS', () => {
+  it('is the art plate without its ratio: the ground, the radius and the print edge', () => {
+    expect(ART_PLATE_CLASS).toContain('art-plate');
+    expect(MEDIA_PLATE_CLASS).not.toContain('art-plate');
+    expect(MEDIA_PLATE_CLASS).not.toMatch(/aspect-/);
+    for (const part of ['bg-art-ground', 'rounded-edge', 'overflow-hidden', 'isolate']) {
+      expect(MEDIA_PLATE_CLASS.split(' ')).toContain(part);
+    }
+    // The same edge, above the image, brightening on hover and focus.
+    for (const part of [
+      'after:shadow-[var(--art-edge)]',
+      'hover:after:shadow-[var(--art-edge-active)]',
+      'focus-within:after:shadow-[var(--art-edge-active)]',
+    ]) {
+      expect(MEDIA_PLATE_CLASS.split(' ')).toContain(part);
+      expect(ART_PLATE_CLASS.split(' ')).toContain(part);
+    }
   });
 });
 

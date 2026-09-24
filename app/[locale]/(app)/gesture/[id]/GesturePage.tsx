@@ -1,86 +1,83 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import type { ReactNode } from 'react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { getExplorerUrl } from '@/utils';
-
 import { Link } from '@/i18n/navigation';
-import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
-import {
-  DefinitionList,
-  DetailRow,
-  SectionCard,
-  detailLinkClass,
-  detailPanelClass,
-} from '@/components/detail-page/DetailPageChrome';
+import { GESTURE_METHOD_BG_CLASS, type GestureMethod } from '@/lib/theme/dataColors';
+import { cn } from '@/lib/utils';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { AddressChip } from '@/components/ui/address-chip';
+import { Amount } from '@/components/ui/amount';
+import { Badge } from '@/components/ui/badge';
 import type { BreadcrumbItem } from '@/components/ui/breadcrumbs';
+import { buttonVariants } from '@/components/ui/button';
+import { DateTime } from '@/components/ui/date-time';
+import { EmptyState } from '@/components/ui/empty-state';
 import { LinkifiedText } from '@/components/ui/linkified-text';
 import { PageShell } from '@/components/ui/page-shell';
-import RandomWalkNFT from '@/components/nft/RandomWalkNFT';
+import { MEDIA_PLATE_CLASS, PendingPlate } from '@/components/ui/art-frame';
+import { SkeletonDetailRows } from '@/components/ui/skeleton';
+import { TxExplorerLink } from '@/components/ui/tx-status';
+import { UnknownValue } from '@/components/ui/unknown-value';
+import { RandomWalkPlate } from '@/components/nft/RandomWalkPlate';
 import NFTImage from '@/components/nft/NFTImage';
+import { useAttachedNftMetadata } from '@/components/attachments/useAttachedNftMetadata';
+import { resolveGestureType } from '@/components/tables/GestureMethodTag';
 import { useDashboardInfo, useGestureInfo } from '@/hooks/useApiQuery';
-import { cn } from '@/lib/utils';
 import type { GestureInfo } from '@/services/api';
-import { formatFixed } from '@/utils/format';
+import {
+  NBSP,
+  UNAVAILABLE_VALUE,
+  formatCount,
+  formatNumber,
+  formatTimeZoneLabel,
+} from '@/utils/format';
+import { formatId } from '@/utils/format/ids';
 
-interface NFTTokenURI {
-  image?: string;
-  collection_name?: string;
-  artist?: string;
-  platform?: string;
-  description?: string;
-  [key: string]: unknown;
-}
+import { useGestureNeighbours } from './gestureNeighbours';
 
-function firstNonNegativeNumber(...values: Array<number | undefined>): number | undefined {
-  return values.find((value) => typeof value === 'number' && Number.isFinite(value) && value >= 0);
-}
+/** The API's numeric gesture types (GestureMethodTag). */
+const CST_GESTURE = 2;
 
-function formatAmount(
-  amount: number | undefined,
-  unit: string,
-  decimals: { fractional: number; standard: number },
-): string {
-  if (amount === undefined) return '—';
-  const precision = amount > 0 && amount < 1 ? decimals.fractional : decimals.standard;
-  return `${formatFixed(amount, precision)} ${unit}`;
-}
-
-function getCstGestureCost(gestureInfo: GestureInfo): number | undefined {
-  return firstNonNegativeNumber(
-    gestureInfo.CstCost,
-    gestureInfo.NumCSTokensEth,
-    gestureInfo.NumCSTTokensEth,
-    gestureInfo.CstPriceEth,
+/**
+ * The first real amount among the API's aliases for one field: a positive
+ * one wins over a 0 left in a legacy alias, and a 0 counts only when every
+ * alias agrees (a free CST gesture). Negative sentinels (-1e-18) are skipped.
+ */
+function firstAmount(...values: Array<number | undefined>): number | undefined {
+  const finite = values.filter(
+    (value): value is number => typeof value === 'number' && Number.isFinite(value),
   );
+  return finite.find((value) => value > 0) ?? finite.find((value) => value === 0);
 }
 
-function getEthGestureCost(gestureInfo: GestureInfo): number | undefined {
-  return firstNonNegativeNumber(gestureInfo.GestureCostEth, gestureInfo.EthPriceEth);
-}
-
-function getParticipationCST(gestureInfo: GestureInfo): number | undefined {
-  return firstNonNegativeNumber(
-    gestureInfo.ParticipationCST,
-    gestureInfo.CSTRewardEth,
-    gestureInfo.ERC20RewardAmountEth,
-  );
-}
-
-// Amount unit suffixes (ETH/CST) are glossary keep-in-English terms.
-function formatGestureCost(gestureInfo: GestureInfo): string {
-  if (gestureInfo.GestureType === 2) {
-    return formatAmount(getCstGestureCost(gestureInfo), 'CST', { fractional: 7, standard: 4 });
+/** What the gesture cost, in its own currency (CST gestures pay in CST). */
+export function gestureCost(gesture: GestureInfo): {
+  value: number | undefined;
+  unit: 'ETH' | 'CST';
+} {
+  if (resolveGestureType(gesture) === CST_GESTURE) {
+    return {
+      unit: 'CST',
+      value: firstAmount(
+        gesture.CstCost,
+        gesture.NumCSTokensEth,
+        gesture.NumCSTTokensEth,
+        gesture.CstPriceEth,
+      ),
+    };
   }
-
-  return formatAmount(getEthGestureCost(gestureInfo), 'ETH', { fractional: 7, standard: 2 });
+  return {
+    unit: 'ETH',
+    value: firstAmount(gesture.GestureCostEth, gesture.EthPriceEth),
+  };
 }
 
-function formatParticipationCST(gestureInfo: GestureInfo): string {
-  return formatAmount(getParticipationCST(gestureInfo), 'CST', { fractional: 7, standard: 2 });
+/** The Participation CST the gesture imprinted. */
+export function participationCst(gesture: GestureInfo): number | undefined {
+  return firstAmount(gesture.ParticipationCST, gesture.CSTRewardEth, gesture.ERC20RewardAmountEth);
 }
 
 type CommonTranslate = (key: string, values?: Record<string, string | number>) => string;
@@ -113,6 +110,51 @@ export function gestureTrail(
   };
 }
 
+/** A metadata field when the token URI actually carries text for it. */
+function metadataText(value: unknown): string | null {
+  return typeof value === 'string' && value.trim() ? value.trim() : null;
+}
+
+/**
+ * A citable instant: the full date in UTC with the zone printed, so two
+ * readers quoting the record quote the same time (the explorer's zone too).
+ * The age and the full date stay on hover.
+ */
+function RecordTime({ timestamp }: { timestamp: number | null | undefined }) {
+  return (
+    <DateTime timestamp={timestamp} variant="full" timeZone="utc">
+      {(value) =>
+        value === UNAVAILABLE_VALUE ? (
+          value
+        ) : (
+          <>
+            {value}
+            {NBSP}
+            <span className="text-subtle">{formatTimeZoneLabel('utc')}</span>
+          </>
+        )
+      }
+    </DateTime>
+  );
+}
+
+/** One label / value line of the record. */
+function RecordRow({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="grid gap-1 py-3.5 sm:grid-cols-[minmax(0,13rem)_minmax(0,1fr)] sm:items-baseline sm:gap-8">
+      <dt className="type-label text-subtle">{label}</dt>
+      <dd className="min-w-0 type-body-sm text-foreground">{children}</dd>
+    </div>
+  );
+}
+
+/**
+ * One gesture as a record people can cite: the H1 names it by its place in
+ * the cycle, the header carries what it cost, what it imprinted and its
+ * cycle, and the meta line how it was paid, when (with the explorer proof).
+ * The participant's message is quoted when there is one. Previous and next
+ * step through the cycle by position.
+ */
 const GesturePage = ({ gestureId }: { gestureId: number }) => {
   const t = useTranslations('gesture');
   const tCommon = useTranslations('common');
@@ -122,34 +164,127 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
   const { data: dashboard, isError: dashboardFailed } = useDashboardInfo(undefined, {
     poll: false,
   });
-
-  const [tokenURI, setTokenURI] = useState<NFTTokenURI | null>(null);
-
-  useEffect(() => {
-    if (gestureInfo?.NFTTokenURI) {
-      axios.get(gestureInfo.NFTTokenURI).then(({ data }) => setTokenURI(data));
-    }
-  }, [gestureInfo]);
+  const neighbours = useGestureNeighbours(gestureInfo?.RoundNum, gestureInfo?.BidPosition);
+  // The shared reader races the IPFS gateways and falls back to the
+  // contract's own tokenURI, so third-party art resolves where a single
+  // cross-origin fetch would be refused.
+  const nftMetadata = useAttachedNftMetadata(gestureInfo?.NFTTokenURI, {
+    tokenAddr: gestureInfo?.NFTDonationTokenAddr,
+    tokenId: (gestureInfo?.NFTDonationTokenId ?? -1) >= 0 ? gestureInfo?.NFTDonationTokenId : null,
+  });
+  const tokenURI = nftMetadata.data ?? null;
 
   if (gestureId < 0) {
     return (
-      <PageShell variant="form">
-        <div className={cn(detailPanelClass, 'mx-auto max-w-lg p-8 text-center')}>
-          <p className="font-display text-lg font-semibold text-foreground">{t('invalid.title')}</p>
-          <p className="mt-2 text-sm text-muted-foreground">{t('invalid.help')}</p>
+      <PageShell variant="detail">
+        <EmptyState
+          variant="page"
+          headingLevel={2}
+          title={t('invalid.title')}
+          description={t('invalid.help')}
+        />
+      </PageShell>
+    );
+  }
+
+  const unknown = <UnknownValue label={tCommon('status.unavailable')} />;
+  const position = gestureInfo?.BidPosition;
+  const hasPosition = typeof position === 'number' && position > 0;
+  const cycle = gestureInfo?.RoundNum;
+  const { section, trail } = gestureTrail(
+    cycle,
+    dashboardFailed ? null : dashboard?.CurRoundNum,
+    dashboardFailed,
+    (key, values) => tCommon(key, values),
+  );
+  const cycleHref =
+    typeof cycle === 'number' && !dashboardFailed && dashboard?.CurRoundNum === cycle
+      ? '/current-cycle#gesture-history'
+      : `/allocation/${cycle}`;
+  // A position is an ordinal, not a quantity: no digit grouping ("#1141").
+  const title = hasPosition
+    ? t('header.title', { position: String(position) })
+    : t('header.fallback');
+
+  if (loading || !gestureInfo) {
+    return (
+      <PageShell variant="detail" backdrop="signature">
+        <div className="mx-auto max-w-3xl">
+          <PageHeader section={section} breadcrumbs={trail} title={title} />
+          {loading ? (
+            <SkeletonDetailRows rows={6} />
+          ) : (
+            <EmptyState headingLevel={2} title={t('empty.title')} description={t('empty.help')} />
+          )}
         </div>
       </PageShell>
     );
   }
 
-  const gesturePosition = gestureInfo?.BidPosition;
-  const hasPosition = gesturePosition !== undefined && gesturePosition !== null;
-  const { section, trail } = gestureTrail(
-    gestureInfo?.RoundNum,
-    dashboardFailed ? null : dashboard?.CurRoundNum,
-    dashboardFailed,
-    (key, values) => tCommon(key, values),
+  const cost = gestureCost(gestureInfo);
+  const reward = participationCst(gestureInfo);
+  const rwlkId = (gestureInfo.RWalkNFTId ?? -1) >= 0 ? (gestureInfo.RWalkNFTId as number) : null;
+  const method: GestureMethod =
+    resolveGestureType(gestureInfo) === CST_GESTURE
+      ? 'cst'
+      : rwlkId !== null
+        ? 'ethRandomWalk'
+        : 'eth';
+  const message = gestureInfo.Message?.trim() ?? '';
+  const hasNft = !!gestureInfo.NFTDonationTokenAddr && (gestureInfo.NFTDonationTokenId ?? -1) >= 0;
+  const finalizationTime =
+    typeof gestureInfo.PrizeTime === 'number' && gestureInfo.PrizeTime > 0
+      ? gestureInfo.PrizeTime
+      : null;
+
+  const methodBadge = (
+    <Badge
+      data-testid="gesture-method"
+      icon={<span className={cn('block size-1.5 rounded-full', GESTURE_METHOD_BG_CLASS[method])} />}
+    >
+      {t(`method.${method}`)}
+      {rwlkId !== null ? <span className="font-mono tabular-nums">{formatId(rwlkId)}</span> : null}
+    </Badge>
   );
+
+  const stepLink = (direction: 'previous' | 'next') => {
+    const target = neighbours[direction];
+    if (!target) return null;
+    return (
+      <Link
+        href={`/gesture/${target.id}`}
+        rel={direction === 'previous' ? 'prev' : 'next'}
+        // Phones: equal halves side by side, or equal full-width rows once
+        // the labels no longer fit two to a line (vi at 320px).
+        className={cn(
+          buttonVariants({ variant: 'outline', size: 'sm' }),
+          'max-sm:grow max-sm:basis-40',
+        )}
+      >
+        {direction === 'previous' ? <ArrowLeft aria-hidden /> : null}
+        <span>
+          {t(`nav.${direction}`)}
+          <span className="sr-only">
+            {' '}
+            {t('header.title', { position: String(target.position) })}
+          </span>
+        </span>
+        {direction === 'next' ? <ArrowRight aria-hidden /> : null}
+      </Link>
+    );
+  };
+  const hasSteps = !!(neighbours.previous || neighbours.next);
+  const nftMetadataRows = (
+    [
+      ['collectionName', t('nftPreview.collectionName'), tokenURI?.collection_name],
+      ['artist', t('nftPreview.artist'), tokenURI?.artist],
+      ['platform', t('nftPreview.platform'), tokenURI?.platform],
+      ['description', t('nftPreview.description'), tokenURI?.description],
+    ] as const
+  ).flatMap(([key, label, raw]) => {
+    const value = metadataText(raw);
+    return value ? [{ key, label, value }] : [];
+  });
 
   return (
     <PageShell variant="detail" backdrop="signature" className="max-sm:pb-16">
@@ -157,211 +292,177 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
         <PageHeader
           section={section}
           breadcrumbs={trail}
-          title={
-            hasPosition
-              ? t('header.positionLabel', { position: gesturePosition })
-              : t('header.title')
+          title={title}
+          figures={[
+            {
+              id: 'cost',
+              label: t('figures.cost'),
+              value:
+                cost.value === undefined ? null : (
+                  // An ETH price reads as the wallet quoted it; CST at two decimals, like the
+                  // Participation CST beside it (the exact amount is on hover).
+                  <Amount
+                    value={cost.value}
+                    unit={cost.unit}
+                    context={cost.unit === 'ETH' ? 'exact' : 'card'}
+                  />
+                ),
+            },
+            {
+              id: 'participationCst',
+              label: t('figures.participationCst'),
+              value: reward === undefined ? null : <Amount value={reward} unit="CST" />,
+            },
+            {
+              id: 'cycle',
+              label: t('figures.cycle'),
+              value:
+                typeof cycle === 'number' ? (
+                  <Link href={cycleHref} className="link-quiet">
+                    {formatCount(cycle, locale)}
+                  </Link>
+                ) : null,
+            },
+          ]}
+          meta={
+            <>
+              {methodBadge}
+              <RecordTime timestamp={gestureInfo.TimeStamp} />
+              <TxExplorerLink hash={gestureInfo.TxHash} label={t('header.explorer')} />
+            </>
           }
-          subtitle={loading ? t('header.loadingSubtitle') : undefined}
+          actions={
+            hasSteps ? (
+              <nav aria-label={t('nav.aria')} className="flex flex-wrap gap-2 max-sm:w-full">
+                {stepLink('previous')}
+                {stepLink('next')}
+              </nav>
+            ) : undefined
+          }
         />
 
-        {loading ? (
-          <div className={cn(detailPanelClass, 'p-10 text-center')}>
-            <p className="text-sm font-medium text-muted-foreground">
-              {tCommon('status.loadingDots')}
-            </p>
-          </div>
-        ) : !gestureInfo ? (
-          <div className={cn(detailPanelClass, 'p-10 text-center')}>
-            <p className="font-medium text-foreground">{t('empty.title')}</p>
-            <p className="mt-2 text-sm text-muted-foreground">{t('empty.help')}</p>
-          </div>
-        ) : (
-          <>
-            <SectionCard
-              sectionId="bid-section-tx"
-              title={t('sections.transaction.title')}
-              description={t('sections.transaction.description')}
-            >
-              <DefinitionList>
-                <DetailRow label={t('rows.datetime')}>
-                  <a
-                    href={getExplorerUrl('tx', gestureInfo.TxHash)}
-                    className={detailLinkClass}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <HydrationSafeDateTime timestamp={gestureInfo.TimeStamp} locale={locale} />
-                  </a>
-                  <span className="mt-1 block text-xs text-muted-foreground">
-                    {t('rows.datetimeHelp')}
-                  </span>
-                </DetailRow>
-                <DetailRow label={t('rows.participantAddress')}>
-                  <Link
-                    href={`/user/${gestureInfo.BidderAddr}`}
-                    className={cn(detailLinkClass, 'font-mono text-[13px] break-all')}
-                  >
-                    {gestureInfo.BidderAddr}
-                  </Link>
-                </DetailRow>
-                <DetailRow label={t('rows.cycleNumber')}>
-                  <Link href={`/allocation/${gestureInfo.RoundNum}`} className={detailLinkClass}>
-                    {t('rows.cycleValue', { round: gestureInfo.RoundNum })}
-                  </Link>
-                </DetailRow>
-              </DefinitionList>
-            </SectionCard>
+        <div className="space-y-12">
+          {message ? (
+            <figure data-testid="gesture-message">
+              <figcaption className="type-label text-subtle">
+                {t('sections.message.title')}
+              </figcaption>
+              <blockquote className="mt-3 border-l-2 border-primary pl-5 type-prose whitespace-pre-wrap text-foreground [overflow-wrap:anywhere]">
+                <LinkifiedText text={message} />
+              </blockquote>
+            </figure>
+          ) : null}
 
-            <SectionCard
-              sectionId="bid-section-amount"
-              title={t('sections.cost.title')}
-              description={t('sections.cost.description')}
-            >
-              <DefinitionList>
-                <DetailRow label={t('rows.gestureCost')}>
-                  <span className="font-mono tabular-nums text-foreground">
-                    {formatGestureCost(gestureInfo)}
-                  </span>
-                </DetailRow>
-                <DetailRow label={t('rows.participationCst')}>
-                  <span className="font-mono tabular-nums">
-                    {formatParticipationCST(gestureInfo)}
-                  </span>
-                </DetailRow>
-              </DefinitionList>
-            </SectionCard>
+          <section aria-labelledby="gesture-record-heading">
+            <h2 id="gesture-record-heading" className="mb-2 type-heading-3 text-foreground">
+              {t('sections.details.title')}
+            </h2>
+            <dl className="divide-y divide-rule-faint border-y border-rule">
+              <RecordRow label={t('rows.participant')}>
+                <AddressChip
+                  address={gestureInfo.BidderAddr}
+                  display="responsive"
+                  variant="plain"
+                />
+              </RecordRow>
+              <RecordRow label={t('rows.finalizationTime')}>
+                {finalizationTime === null ? unknown : <RecordTime timestamp={finalizationTime} />}
+              </RecordRow>
+              <RecordRow label={t('rows.transaction')}>
+                <span className="type-hash text-muted-foreground">{gestureInfo.TxHash}</span>
+              </RecordRow>
+              {gestureInfo.DonatedERC20TokenAddr ? (
+                <>
+                  <RecordRow label={t('rows.erc20')}>
+                    <AddressChip
+                      address={gestureInfo.DonatedERC20TokenAddr}
+                      variant="plain"
+                      display="responsive"
+                    />
+                  </RecordRow>
+                  <RecordRow label={t('rows.erc20Amount')}>
+                    <span className="tabular-nums">
+                      {formatNumber(gestureInfo.DonatedERC20TokenAmountEth ?? null, locale, {
+                        maximumFractionDigits: 4,
+                      })}
+                    </span>
+                  </RecordRow>
+                </>
+              ) : null}
+            </dl>
+          </section>
 
-            <SectionCard
-              sectionId="bid-section-type"
-              title={t('sections.type.title')}
-              description={t('sections.type.description')}
-            >
-              <DefinitionList>
-                <DetailRow label={t('rows.attachedRandomWalk')}>
-                  {(gestureInfo.RWalkNFTId ?? -1) < 0 ? t('values.no') : t('values.yes')}
-                </DetailRow>
-                <DetailRow label={t('rows.paidWithCst')}>
-                  {gestureInfo.GestureType === 2 ? t('values.yes') : t('values.no')}
-                </DetailRow>
-                {(gestureInfo.RWalkNFTId ?? -1) >= 0 ? (
-                  <DetailRow label={t('rows.randomWalkId')}>
-                    <span className="font-mono tabular-nums">{gestureInfo.RWalkNFTId}</span>
-                  </DetailRow>
-                ) : null}
-              </DefinitionList>
-            </SectionCard>
+          {rwlkId !== null ? (
+            <section aria-labelledby="gesture-rwlk-heading">
+              <h2 id="gesture-rwlk-heading" className="mb-4 type-heading-3 text-foreground">
+                {t('randomWalk.heading')}
+              </h2>
+              {/* The header's method badge already names the token number. */}
+              <RandomWalkPlate
+                tokenId={rwlkId}
+                alt={`${t('randomWalk.heading')} ${formatId(rwlkId)}`}
+                className="max-w-xs"
+              />
+            </section>
+          ) : null}
 
-            {gestureInfo.DonatedERC20TokenAddr ? (
-              <SectionCard
-                sectionId="bid-section-erc20"
-                title={t('sections.erc20.title')}
-                description={t('sections.erc20.description')}
-              >
-                <DefinitionList>
-                  <DetailRow label={t('rows.erc20Address')}>
-                    <span className="font-mono text-[13px] break-all">
-                      {gestureInfo.DonatedERC20TokenAddr}
-                    </span>
-                  </DetailRow>
-                  <DetailRow label={t('rows.erc20Amount')}>
-                    <span className="font-mono tabular-nums">
-                      {(gestureInfo.DonatedERC20TokenAmountEth ?? 0).toFixed(2)}
-                    </span>
-                  </DetailRow>
-                </DefinitionList>
-              </SectionCard>
-            ) : null}
-
-            {gestureInfo.NFTDonationTokenAddr !== '' && gestureInfo.NFTDonationTokenId !== -1 ? (
-              <SectionCard
-                sectionId="bid-section-nft"
-                title={t('sections.nft.title')}
-                description={t('sections.nft.description')}
-              >
-                <DefinitionList>
-                  <DetailRow label={t('rows.nftAddress')}>
-                    <span className="font-mono text-[13px] break-all">
-                      {gestureInfo.NFTDonationTokenAddr}
-                    </span>
-                  </DetailRow>
-                  <DetailRow label={t('rows.nftId')}>
-                    <span className="font-mono tabular-nums">{gestureInfo.NFTDonationTokenId}</span>
-                  </DetailRow>
-                  <DetailRow label={t('rows.nftTokenUri')}>
-                    <span className="break-all text-xs text-muted-foreground">
-                      {gestureInfo.NFTTokenURI}
-                    </span>
-                  </DetailRow>
-                </DefinitionList>
-                <div className="border-t border-white/[0.06] px-4 py-5 sm:px-5">
-                  <p className="mb-4 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                    {t('nftPreview.heading')}
-                  </p>
-                  <div className="grid gap-8 md:grid-cols-[minmax(0,280px)_minmax(0,1fr)]">
-                    <div className="rounded-lg border border-white/[0.06] bg-black/20 p-3">
-                      <NFTImage src={tokenURI?.image} className="bg-contain" />
-                    </div>
-                    <div className="space-y-4 text-sm">
-                      <div>
-                        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                          {t('nftPreview.collectionName')}
-                        </p>
-                        <p className="mt-0.5 text-foreground">{tokenURI?.collection_name ?? '—'}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                          {t('nftPreview.artist')}
-                        </p>
-                        <p className="mt-0.5 text-foreground">{tokenURI?.artist ?? '—'}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                          {t('nftPreview.platform')}
-                        </p>
-                        <p className="mt-0.5 text-foreground">{tokenURI?.platform ?? '—'}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                          {t('nftPreview.description')}
-                        </p>
-                        <p className="mt-0.5 whitespace-pre-wrap text-foreground/90">
-                          {tokenURI?.description ?? '—'}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+          {hasNft ? (
+            <section aria-labelledby="gesture-nft-heading">
+              <h2 id="gesture-nft-heading" className="mb-4 type-heading-3 text-foreground">
+                {t('sections.nft.title')}
+              </h2>
+              <div className="grid gap-8 sm:grid-cols-[minmax(0,15rem)_minmax(0,1fr)]">
+                {/* The media keeps its own ratio: the well does not stretch to the list beside it. */}
+                <div className={cn(MEDIA_PLATE_CLASS, 'self-start')}>
+                  {nftMetadata.isLoading ? (
+                    <PendingPlate variant="media" busy />
+                  ) : (
+                    <NFTImage
+                      src={tokenURI?.image}
+                      fallbackSrc={tokenURI?.imageFallback}
+                      alt={
+                        metadataText(tokenURI?.name) ??
+                        `${t('sections.nft.title')} ${gestureInfo.NFTDonationTokenId}`
+                      }
+                    />
+                  )}
                 </div>
-              </SectionCard>
-            ) : null}
-
-            <SectionCard
-              sectionId="bid-section-message"
-              title={t('sections.message.title')}
-              description={t('sections.message.description')}
-            >
-              <div className="px-4 py-4 sm:px-5">
-                <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
-                  {gestureInfo.Message ? <LinkifiedText text={gestureInfo.Message} /> : '\u2014'}
-                </p>
+                <dl className="self-start divide-y divide-rule-faint border-y border-rule">
+                  <RecordRow label={t('rows.nftContract')}>
+                    <AddressChip
+                      address={gestureInfo.NFTDonationTokenAddr as string}
+                      variant="plain"
+                      display="short"
+                    />
+                  </RecordRow>
+                  <RecordRow label={t('rows.nftId')}>
+                    <span className="type-mono">{gestureInfo.NFTDonationTokenId}</span>
+                  </RecordRow>
+                  {/* Collection, artist and platform are optional metadata: a row
+                      appears only when the token URI names it. */}
+                  {nftMetadataRows.map(({ key, label, value }) => (
+                    <RecordRow key={key} label={label}>
+                      {key === 'description' ? (
+                        <span className="whitespace-pre-wrap text-muted-foreground">{value}</span>
+                      ) : (
+                        value
+                      )}
+                    </RecordRow>
+                  ))}
+                </dl>
               </div>
-            </SectionCard>
+            </section>
+          ) : null}
 
-            {(gestureInfo.RWalkNFTId ?? -1) >= 0 ? (
-              <section
-                className={cn(detailPanelClass, 'p-5')}
-                aria-label={t('randomWalk.previewAria')}
-              >
-                <h2 className="mb-4 font-display text-lg font-semibold tracking-tight text-foreground">
-                  {t('randomWalk.heading')}
-                </h2>
-                <div className="mx-auto max-w-md sm:mx-0">
-                  <RandomWalkNFT tokenId={gestureInfo.RWalkNFTId!} selectable={false} />
-                </div>
-              </section>
-            ) : null}
-          </>
-        )}
+          {typeof cycle === 'number' ? (
+            <p>
+              <Link href={cycleHref} className="link inline-flex items-center gap-1.5 type-body-sm">
+                {t('nav.all', { cycle: formatCount(cycle, locale) })}
+                <ArrowRight aria-hidden className="size-3.5" />
+              </Link>
+            </p>
+          ) : null}
+        </div>
       </div>
     </PageShell>
   );

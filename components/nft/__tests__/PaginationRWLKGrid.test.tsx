@@ -32,11 +32,15 @@ describe('PaginationRWLKGrid', () => {
     expect(screen.queryByText('home.rwlkGrid.empty')).not.toBeInTheDocument();
   });
 
-  it('says a wallet without NFTs holds none, never that a search found nothing', () => {
+  it('says a wallet without NFTs holds none and links to imprint one (F091)', () => {
     render(<PaginationRWLKGrid loading={false} data={[]} />);
     expect(screen.getByText('home.rwlkGrid.none')).toBeInTheDocument();
     expect(screen.queryByText('home.rwlkGrid.empty')).not.toBeInTheDocument();
     expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'home.rwlkGrid.imprint' })).toHaveAttribute(
+      'href',
+      '/imprint',
+    );
   });
 
   it('renders search input', () => {

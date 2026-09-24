@@ -722,6 +722,7 @@
     "searchAria": "Tìm Random Walk NFT theo mã",
     "tokenAria": "Random Walk NFT {id}",
     "empty": "Không tìm thấy NFT phù hợp",
+    "imprint": "Khắc một Random Walk NFT",
     "none": "Ví này không có Random Walk NFT nào chưa dùng.",
     "loading": "Đang đọc Random Walk NFT của ví này…"
   },

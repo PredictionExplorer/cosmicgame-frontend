@@ -258,4 +258,14 @@ describe('FundingNotice', () => {
       screen.getByRole('link', { name: 'wallet.funding.howTo(network=Arbitrum Sepolia)' }),
     ).toHaveAttribute('href', '/faq#how-to-get-eth-on-arbitrum');
   });
+
+  it('names the imprint, not a gesture, when the ETH is for an imprint', () => {
+    mockWalletChainId = 421614;
+    mockBalance = { value: 10n ** 15n };
+    render(<FundingNotice requiredWei={2n * 10n ** 16n} purpose="imprint" />);
+
+    expect(screen.getByTestId('funding-notice')).toHaveTextContent(
+      'wallet.funding.shortImprint(available=0.0010,required=0.0200,network=Arbitrum Sepolia)',
+    );
+  });
 });

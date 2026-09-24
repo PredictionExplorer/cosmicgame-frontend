@@ -9,8 +9,9 @@ import { readDashboard } from '../publicDataReads';
 
 /**
  * The /current-cycle page header, rendered on the server: H1, lede and
- * related pages, with the cycle's live figures (cycle, gestures, Signature
- * Allocation, opening time). The figures read the same polled dashboard query
+ * related pages, with the cycle's live figures (gestures, Signature
+ * Allocation, opening time); the status block below names the cycle itself,
+ * so the number is not repeated here. The figures read the same polled dashboard query
  * as the page body and start from this request's server read, so the server
  * HTML holds them; the live status says how fresh they are.
  */
@@ -29,7 +30,6 @@ export async function CurrentCycleSeoSummary() {
       titleId="current-cycle-heading"
       subtitle={t('currentCycleSummary.description')}
       figures={[
-        { id: 'cycle', label: t('currentCycleSummary.cards.cycle'), value: figure('cycle') },
         {
           id: 'gestures',
           label: t('currentCycleSummary.cards.gestures'),

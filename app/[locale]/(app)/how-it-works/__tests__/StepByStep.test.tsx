@@ -1,84 +1,47 @@
-import { howItWorksContentEn } from '@/content/how-it-works';
-
-import { TooltipProvider } from '@/components/ui/tooltip';
+import { getHowItWorksContent, howItWorksContentEn } from '@/content/how-it-works';
 
 import { render, screen, checkA11y } from '@/test-utils';
 
 import { StepByStep } from '../components/StepByStep';
 
-jest.mock('framer-motion', () => {
-  const React = require('react');
-  const cache: Record<string, React.ForwardRefExoticComponent<unknown>> = {};
-  return {
-    motion: new Proxy(
-      {},
-      {
-        get: (_target: unknown, prop: string) => {
-          if (!cache[prop]) {
-            const Comp = React.forwardRef(function MotionProxy(
-              props: Record<string, unknown>,
-              ref: React.Ref<HTMLElement>,
-            ) {
-              const {
-                initial: _i,
-                animate: _a,
-                whileInView: _w,
-                viewport: _v,
-                transition: _t,
-                variants: _va,
-                ...rest
-              } = props;
-              return React.createElement(prop, { ...rest, ref });
-            });
-            Comp.displayName = `motion.${prop}`;
-            cache[prop] = Comp;
-          }
-          return cache[prop];
-        },
-      },
-    ),
-  };
-});
-
-const renderWithTooltip = (ui: React.ReactElement) =>
-  render(<TooltipProvider>{ui}</TooltipProvider>);
-
 const stepByStep = howItWorksContentEn.stepByStep;
 
 describe('StepByStep', () => {
   it('renders the section heading', () => {
-    renderWithTooltip(<StepByStep stepByStep={stepByStep} />);
-    expect(screen.getByRole('heading', { name: 'Getting Started' })).toBeInTheDocument();
+    render(<StepByStep stepByStep={stepByStep} />);
+    expect(screen.getByRole('heading', { level: 2, name: 'Getting started' })).toBeInTheDocument();
   });
 
-  it('renders all three step titles', () => {
-    renderWithTooltip(<StepByStep stepByStep={stepByStep} />);
-    expect(screen.getByText('Connect Your Wallet')).toBeInTheDocument();
-    expect(screen.getByText('Check the Gesture Cost')).toBeInTheDocument();
-    expect(screen.getByText('Make Your Gesture')).toBeInTheDocument();
+  it('numbers the three steps in sentence case', () => {
+    render(<StepByStep stepByStep={stepByStep} />);
+    expect(screen.getByText('Step 1')).toBeInTheDocument();
+    expect(screen.getByText('Step 2')).toBeInTheDocument();
+    expect(screen.getByText('Step 3')).toBeInTheDocument();
+    for (const step of stepByStep.steps) {
+      expect(screen.getByRole('heading', { level: 3, name: step.title })).toBeInTheDocument();
+    }
   });
 
-  it('renders step labels with correct numbering', () => {
-    renderWithTooltip(<StepByStep stepByStep={stepByStep} />);
-    expect(screen.getByText('STEP 01')).toBeInTheDocument();
-    expect(screen.getByText('STEP 02')).toBeInTheDocument();
-    expect(screen.getByText('STEP 03')).toBeInTheDocument();
+  it('lets each locale place the step number, with no space beside Japanese', () => {
+    const ja = getHowItWorksContent('ja').stepByStep;
+    render(<StepByStep stepByStep={ja} />);
+    expect(screen.getByText('ステップ1')).toBeInTheDocument();
+    expect(getHowItWorksContent('ko').stepByStep.stepLabel).toBe('{n}단계');
   });
 
-  it('renders every highlight bullet from the content module', () => {
-    renderWithTooltip(<StepByStep stepByStep={stepByStep} />);
+  it('renders every checklist item from the content module', () => {
+    render(<StepByStep stepByStep={stepByStep} />);
     for (const step of stepByStep.steps) {
       for (const highlight of step.highlights) {
         expect(screen.getByText(highlight)).toBeInTheDocument();
       }
     }
-    expect(screen.getByText(/Connect Wallet/)).toBeInTheDocument();
     expect(screen.getByText(/Press the gesture button/)).toBeInTheDocument();
     expect(screen.queryByText(/Gesture Now/)).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = renderWithTooltip(<StepByStep stepByStep={stepByStep} />);
+    const { container } = render(<StepByStep stepByStep={stepByStep} />);
     await checkA11y(container);
   });
 });

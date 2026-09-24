@@ -11,6 +11,7 @@ import { DateTime } from '@/components/ui/date-time';
 import { Duration } from '@/components/ui/duration';
 import { ExplainedTerm } from '@/components/ui/explain-popover';
 import { LiveStatus } from '@/components/ui/live-status';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Term } from '@/components/ui/term';
 import { UnknownValue } from '@/components/ui/unknown-value';
 import type { ChampionsState } from '@/hooks/useChampions';
@@ -68,6 +69,15 @@ export interface StandingsLedgerProps {
   chronoEth: number | null;
   /** The connected wallet's latest change of position, for the landed line. */
   moment?: PositionMoment | null;
+  /**
+   * The ledger's heading level; its four roles take the next one. 2 on the
+   * home desk, 3 inside the cycle page's status section.
+   */
+  headingLevel?: 2 | 3;
+  /** Id of the ledger's heading (it labels the section). */
+  headingId?: string;
+  /** A line under the heading that says what the ledger holds, where a page introduces it. */
+  description?: ReactNode;
   className?: string;
 }
 
@@ -89,6 +99,8 @@ function useSettle(value: string | null): boolean {
 
 interface LedgerRowProps {
   testId: string;
+  /** The role's heading element: one level below the ledger's heading. */
+  headingAs: 'h3' | 'h4';
   icon: LucideIcon;
   role: ReactNode;
   holder: string | null;
@@ -101,6 +113,7 @@ interface LedgerRowProps {
 
 function LedgerRow({
   testId,
+  headingAs: RoleHeading,
   icon: Icon,
   role,
   holder,
@@ -132,11 +145,11 @@ function LedgerRow({
       )}
     >
       <div className={ROW_GRID}>
-        <h3 className="flex min-w-0 items-start gap-2 type-label font-medium text-foreground">
+        <RoleHeading className="flex min-w-0 items-start gap-2 type-label font-medium text-foreground">
           <Icon className="mt-px size-4 shrink-0 text-subtle" aria-hidden />
           {/* The role's text, not the icon, gives the row its baseline. */}
           <span className="min-w-0 self-baseline">{role}</span>
-        </h3>
+        </RoleHeading>
         <dl className={cn('mt-2 grid gap-y-1.5 @[30rem]/ledger:mt-0', FIELDS_GRID)}>
           <div className="flex min-w-0 items-baseline justify-between gap-3 @[30rem]/ledger:block">
             <dt className="type-label text-subtle @[30rem]/ledger:sr-only">
@@ -396,6 +409,29 @@ function GestureFacts({ gesture, pending }: { gesture: GestureInfo | null; pendi
   );
 }
 
+/** Four placeholder rows in the ledger's own template while the holders are read. */
+function LedgerSkeleton() {
+  return (
+    <>
+      {[0, 1, 2, 3].map((row) => (
+        <li key={row} data-testid="standings-ledger-skeleton-row" aria-hidden className="py-2.5">
+          <div className={ROW_GRID}>
+            <span className="flex items-center gap-2">
+              <Skeleton className="size-4 shrink-0 rounded-edge" />
+              <Skeleton className="h-3.5 w-32" />
+            </span>
+            <span className="mt-2 flex flex-col gap-1.5 @[30rem]/ledger:col-span-3 @[30rem]/ledger:mt-0 @[30rem]/ledger:grid @[30rem]/ledger:grid-cols-subgrid">
+              <Skeleton className="h-3.5 w-28" />
+              <Skeleton className="h-3.5 w-16" />
+              <Skeleton className="h-3.5 w-20 @[30rem]/ledger:justify-self-end" />
+            </span>
+          </div>
+        </li>
+      ))}
+    </>
+  );
+}
+
 /**
  * The Standings Ledger: the four roles a Gesture can change — Last Gesture,
  * Endurance Champion, Chrono-Warrior and Final CST Gesture — as four aligned
@@ -406,7 +442,11 @@ function GestureFacts({ gesture, pending }: { gesture: GestureInfo | null; pendi
  * the connected wallet's row carries the accent rule and a "You" tag.
  *
  * Holds are shown only when they are measured against a real clock; before
- * hydration they read as pending, never as a confident 0s or 0%.
+ * hydration they read as pending, never as a confident 0s or 0%. Until the
+ * holders are first read the rows are placeholders, never "no record yet".
+ *
+ * The one standings ledger of the app: the home desk (heading level 2) and
+ * the current-cycle page (level 3, with a description) both render it.
  */
 export function StandingsLedger({
   champions,
@@ -416,6 +456,9 @@ export function StandingsLedger({
   account = null,
   chronoEth,
   moment = null,
+  headingLevel = 2,
+  headingId = 'standings-ledger-title',
+  description,
   className,
 }: StandingsLedgerProps) {
   const t = useTranslations('home.observatory');
@@ -427,6 +470,9 @@ export function StandingsLedger({
   const clockKnown = latest.isTimeKnown !== false;
   const hasEnduranceRecord = !!endurance.address;
   const latestIsYou = sameAddress(account, latest.address);
+  const loading = champions.isLoading && !champions.hasData;
+  const Heading = headingLevel === 2 ? 'h2' : 'h3';
+  const roleHeading = headingLevel === 2 ? 'h3' : 'h4';
 
   // What changes the Last Gesture row next: its hold measured against the
   // Endurance record. Unknown until the clock is.
@@ -458,20 +504,27 @@ export function StandingsLedger({
     };
   })();
 
-  const showChallenge = !!chrono.address && chronoChallenge.hasDetails && !chronoChallenge.isLive;
+  const showChallenge =
+    !loading && !!chrono.address && chronoChallenge.hasDetails && !chronoChallenge.isLive;
 
   return (
     <section
-      aria-labelledby="standings-ledger-title"
+      aria-labelledby={headingId}
+      aria-busy={loading || undefined}
       data-testid="standings-ledger"
       className={cn('@container/ledger min-w-0', className)}
     >
       <header className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h2 id="standings-ledger-title" className="type-title text-foreground">
+        <Heading id={headingId} className="type-title text-foreground">
           {t('standings.title')}
-        </h2>
+        </Heading>
         <LiveStatus variant="inline" still queryKeys={[['currentSpecialWinners']]} />
       </header>
+      {description && (
+        <p className="mt-1.5 max-w-[var(--measure-lede)] type-body-sm text-muted-foreground">
+          {description}
+        </p>
+      )}
 
       {/* The column heads, once, for sighted readers; every value carries its own label. */}
       <div
@@ -485,149 +538,165 @@ export function StandingsLedger({
       </div>
 
       <ul role="list" className="mt-3 divide-y divide-rule-faint @[30rem]/ledger:mt-0">
-        <LedgerRow
-          testId="latest-participant-intel"
-          icon={GestureIcon}
-          role={
-            <ExplainedTerm definition={t('standings.latestTooltip')}>
-              {tTables('specialAllocation.lastGesture')}
-            </ExplainedTerm>
-          }
-          holder={latest.address}
-          emptyText={tTables('specialAllocation.noLatestGesture')}
-          account={account}
-          time={
-            latest.address ? (
-              <TimeHeld seconds={latest.holdDuration} live={false} pending={!clockKnown} />
-            ) : (
-              <UnknownValue label={tTables('specialAllocation.noLatestGesture')} />
-            )
-          }
-          allocation={
-            <span className="type-label text-muted-foreground">
-              {tHome('observatory.clock.reserveLabel')}
-            </span>
-          }
-        >
-          {latest.address && (
-            <div className="space-y-2.5">
-              {latestProgress ? (
-                latestProgress.showBar ? (
-                  <RecordProgress
-                    percent={latestProgress.percent}
-                    live={latestProgress.live}
-                    label={tTables('specialAllocation.progressAria')}
-                    caption={latestProgress.caption}
+        {loading ? (
+          <LedgerSkeleton />
+        ) : (
+          <>
+            <LedgerRow
+              headingAs={roleHeading}
+              testId="latest-participant-intel"
+              icon={GestureIcon}
+              role={
+                <ExplainedTerm definition={t('standings.latestTooltip')}>
+                  {tTables('specialAllocation.lastGesture')}
+                </ExplainedTerm>
+              }
+              holder={latest.address}
+              emptyText={tTables('specialAllocation.noLatestGesture')}
+              account={account}
+              time={
+                latest.address ? (
+                  <TimeHeld seconds={latest.holdDuration} live={false} pending={!clockKnown} />
+                ) : (
+                  <UnknownValue label={tTables('specialAllocation.noLatestGesture')} />
+                )
+              }
+              allocation={
+                <span className="type-label text-muted-foreground">
+                  {tHome('observatory.clock.reserveLabel')}
+                </span>
+              }
+            >
+              {latest.address && (
+                <div className="space-y-2.5">
+                  {latestProgress ? (
+                    latestProgress.showBar ? (
+                      <RecordProgress
+                        percent={latestProgress.percent}
+                        live={latestProgress.live}
+                        label={tTables('specialAllocation.progressAria')}
+                        caption={latestProgress.caption}
+                      />
+                    ) : (
+                      <p data-testid="latest-participant-status" className="type-caption text-live">
+                        {latestProgress.caption}
+                      </p>
+                    )
+                  ) : (
+                    <ValuePending ch={28} className="type-caption" />
+                  )}
+                  {latestIsYou && moment?.kind === 'landed' && (
+                    <p data-testid="latest-participant-landed" className="type-label text-positive">
+                      {t('standing.landed')}
+                    </p>
+                  )}
+                  {showLastGesture && (
+                    <GestureFacts gesture={latestGesture} pending={gestureDetailsPending} />
+                  )}
+                </div>
+              )}
+            </LedgerRow>
+
+            <LedgerRow
+              headingAs={roleHeading}
+              testId="control-desk-endurance"
+              icon={EnduranceChampionIcon}
+              role={
+                <Term id="enduranceChampion">{tTables('specialAllocation.enduranceChampion')}</Term>
+              }
+              holder={endurance.address}
+              emptyText={tTables('specialAllocation.noEnduranceRecord')}
+              account={account}
+              time={
+                endurance.address ? (
+                  <TimeHeld
+                    seconds={endurance.duration}
+                    live={endurance.isLive}
+                    pending={endurance.isLive && !clockKnown}
+                    caption={endurance.isLive ? tTables('specialAllocation.growingNow') : undefined}
                   />
                 ) : (
-                  <p data-testid="latest-participant-status" className="type-caption text-live">
-                    {latestProgress.caption}
-                  </p>
+                  <UnknownValue label={tTables('specialAllocation.noEnduranceRecord')} />
                 )
-              ) : (
-                <ValuePending ch={28} className="type-caption" />
-              )}
-              {latestIsYou && moment?.kind === 'landed' && (
-                <p data-testid="latest-participant-landed" className="type-label text-positive">
-                  {t('standing.landed')}
-                </p>
-              )}
-              {showLastGesture && (
-                <GestureFacts gesture={latestGesture} pending={gestureDetailsPending} />
-              )}
-            </div>
-          )}
-        </LedgerRow>
+              }
+              allocation={
+                <span className="type-figure-sm text-foreground">{t('standings.cstPlusNft')}</span>
+              }
+            />
 
-        <LedgerRow
-          testId="control-desk-endurance"
-          icon={EnduranceChampionIcon}
-          role={
-            <Term id="enduranceChampion">{tTables('specialAllocation.enduranceChampion')}</Term>
-          }
-          holder={endurance.address}
-          emptyText={tTables('specialAllocation.noEnduranceRecord')}
-          account={account}
-          time={
-            endurance.address ? (
-              <TimeHeld
-                seconds={endurance.duration}
-                live={endurance.isLive}
-                pending={endurance.isLive && !clockKnown}
-                caption={endurance.isLive ? tTables('specialAllocation.growingNow') : undefined}
-              />
-            ) : (
-              <UnknownValue label={tTables('specialAllocation.noEnduranceRecord')} />
-            )
-          }
-          allocation={
-            <span className="type-figure-sm text-foreground">{t('standings.cstPlusNft')}</span>
-          }
-        />
+            <LedgerRow
+              headingAs={roleHeading}
+              testId="chrono-role-summary"
+              icon={ChronoWarriorIcon}
+              role={<Term id="chronoWarrior">{tTables('specialAllocation.chronoWarrior')}</Term>}
+              holder={chrono.address}
+              emptyText={tTables('specialAllocation.noChronoRecord')}
+              account={account}
+              time={
+                chrono.address ? (
+                  <TimeHeld
+                    seconds={chrono.duration}
+                    live={chrono.isLive}
+                    caption={chrono.isLive ? tTables('specialAllocation.growingNow') : undefined}
+                  />
+                ) : (
+                  <UnknownValue label={tTables('specialAllocation.noChronoRecord')} />
+                )
+              }
+              allocation={
+                chronoEth != null ? (
+                  <Amount
+                    value={chronoEth}
+                    unit="ETH"
+                    context="card"
+                    className="type-figure-sm text-foreground"
+                  />
+                ) : (
+                  <UnknownValue label={tCommon('status.unavailable')} />
+                )
+              }
+            >
+              {chrono.isLive &&
+                chrono.willStopGrowingIn !== undefined &&
+                chrono.willStopGrowingIn > 0 && (
+                  <p
+                    data-testid="chrono-next-change"
+                    className="type-caption text-muted-foreground"
+                  >
+                    {t('ledger.chronoMayClose', {
+                      duration: format.duration(chrono.willStopGrowingIn),
+                    })}
+                  </p>
+                )}
+            </LedgerRow>
 
-        <LedgerRow
-          testId="chrono-role-summary"
-          icon={ChronoWarriorIcon}
-          role={<Term id="chronoWarrior">{tTables('specialAllocation.chronoWarrior')}</Term>}
-          holder={chrono.address}
-          emptyText={tTables('specialAllocation.noChronoRecord')}
-          account={account}
-          time={
-            chrono.address ? (
-              <TimeHeld
-                seconds={chrono.duration}
-                live={chrono.isLive}
-                caption={chrono.isLive ? tTables('specialAllocation.growingNow') : undefined}
-              />
-            ) : (
-              <UnknownValue label={tTables('specialAllocation.noChronoRecord')} />
-            )
-          }
-          allocation={
-            chronoEth != null ? (
-              <Amount
-                value={chronoEth}
-                unit="ETH"
-                context="card"
-                className="type-figure-sm text-foreground"
-              />
-            ) : (
-              <UnknownValue label={tCommon('status.unavailable')} />
-            )
-          }
-        >
-          {chrono.isLive &&
-            chrono.willStopGrowingIn !== undefined &&
-            chrono.willStopGrowingIn > 0 && (
-              <p data-testid="chrono-next-change" className="type-caption text-muted-foreground">
-                {t('ledger.chronoMayClose', {
-                  duration: format.duration(chrono.willStopGrowingIn),
-                })}
-              </p>
-            )}
-        </LedgerRow>
-
-        <LedgerRow
-          testId="final-cst-role-summary"
-          icon={FinalCstGestureIcon}
-          role={<Term id="finalCstGesture">{tTables('specialAllocation.finalCstGesture')}</Term>}
-          holder={lastCst.address}
-          emptyText={tTables('specialAllocation.awaitingCstGesture')}
-          account={account}
-          time={
-            // This role holds no timer: a dash for sighted readers, the reason for everyone.
-            <span data-testid="final-cst-note">
-              <span aria-hidden className="type-figure-sm text-subtle">
-                —
-              </span>
-              <span className="sr-only">{t('ledger.finalCstNote')}</span>
-            </span>
-          }
-          allocation={
-            <span className="type-figure-sm text-foreground">{t('standings.cstPlusNft')}</span>
-          }
-        />
+            <LedgerRow
+              headingAs={roleHeading}
+              testId="final-cst-role-summary"
+              icon={FinalCstGestureIcon}
+              role={
+                <Term id="finalCstGesture">{tTables('specialAllocation.finalCstGesture')}</Term>
+              }
+              holder={lastCst.address}
+              emptyText={tTables('specialAllocation.awaitingCstGesture')}
+              account={account}
+              time={
+                // This role holds no timer: a dash for sighted readers, the reason for everyone.
+                <span data-testid="final-cst-note">
+                  <span aria-hidden className="type-figure-sm text-subtle">
+                    —
+                  </span>
+                  <span className="sr-only">{t('ledger.finalCstNote')}</span>
+                </span>
+              }
+              allocation={
+                <span className="type-figure-sm text-foreground">{t('standings.cstPlusNft')}</span>
+              }
+            />
+          </>
+        )}
       </ul>
+      {loading && <span className="sr-only">{tCommon('status.loading')}</span>}
 
       {showChallenge && (
         <div
