@@ -74,6 +74,14 @@
     "title": "转账 CST",
     "description": "将 Cosmic Signature CST 代币转账至其他钱包地址。"
   },
+  "cosmicSignatureTransfers": {
+    "title": "NFT 转移记录 · {address}",
+    "description": "铭刻给此地址的 Cosmic Signature NFT，以及它收到或发出的每一枚。"
+  },
+  "cosmicTokenTransfers": {
+    "title": "CST 转账记录 · {address}",
+    "description": "铭刻给此地址的 CST、它收发的 CST，以及它的 CST 落笔所消耗的 CST。"
+  },
   "siteMap": {
     "title": "网站地图",
     "description": "浏览 Cosmic Signature 协议的各个部分，包括落笔、NFT 画廊、锚定、统计、分配与公共物品资助。"
@@ -130,6 +138,12 @@
   "userStellarSelectionNft": {
     "title": "星选 NFT",
     "description": "查看此参与者通过星选获配的全部 Cosmic Signature NFT。"
+  },
+  "systemEvent": {
+    "title": "第 {cycle} 个周期前的配置",
+    "description": "第 {cycle} 个周期开启前，合约所有者变更的协议参数，每项均附新值与交易。",
+    "titleInitial": "初始配置",
+    "descriptionInitial": "首个周期开启前，合约所有者设定的协议参数，每项均附取值与交易。"
   },
   "faq": {
     "title": "常见问题：Arbitrum 链上艺术协议",
@@ -192,16 +206,20 @@
     "description": "参与 Cosmic Signature 推广并获得 CST 分配。查看推广贡献榜、分配记录与参与方式。"
   },
   "outreachAddress": {
-    "description": "查看指定 Cosmic Signature 推广贡献者的推广记录与 CST 分配。",
-    "title": "推广分配 · {address}"
+    "title": "推广分配 · {address}",
+    "description": "查看指定 Cosmic Signature 推广贡献者的推广记录与 CST 分配。"
   },
   "ethContribution": {
     "title": "直接 ETH 贡献",
     "description": "直接向 Cosmic Signature 周期储备贡献 ETH，并查看完整贡献记录。"
   },
   "ethContributionDetail": {
-    "description": "查看指定 ETH 贡献的贡献者地址、金额、所属周期与可选留言。",
-    "title": "贡献 #{id}"
+    "title": "贡献 #{id}",
+    "description": "查看指定 ETH 贡献的贡献者地址、金额、所属周期与可选留言。"
+  },
+  "ethContributionByCycle": {
+    "title": "第 {cycle} 个周期的贡献",
+    "description": "第 {cycle} 个周期内直接贡献给周期储备的 ETH。"
   },
   "admin": {
     "title": "落笔留言审核",
@@ -302,23 +320,5 @@
       "title": "Cosmic Signature 是彩\u7968、赌\u573a或投\u8d44产品吗？",
       "description": "Cosmic Signature 是程序化链上艺术协议，不是彩\u7968、赌\u573a、赌\u535a产品或投\u8d44产品。"
     }
-  },
-  "cosmicTokenTransfers": {
-    "title": "CST 转账记录 · {address}",
-    "description": "铭刻给此地址的 CST、它收发的 CST，以及它的 CST 落笔所消耗的 CST。"
-  },
-  "cosmicSignatureTransfers": {
-    "title": "NFT 转移记录 · {address}",
-    "description": "铭刻给此地址的 Cosmic Signature NFT，以及它收到或发出的每一枚。"
-  },
-  "ethContributionByCycle": {
-    "title": "第 {cycle} 个周期的贡献",
-    "description": "第 {cycle} 个周期内直接贡献给周期储备的 ETH。"
-  },
-  "systemEvent": {
-    "title": "第 {cycle} 个周期前的配置",
-    "description": "第 {cycle} 个周期开启前，合约所有者变更的协议参数，每项均附新值与交易。",
-    "titleInitial": "初始配置",
-    "descriptionInitial": "首个周期开启前，合约所有者设定的协议参数，每项均附取值与交易。"
   }
 }

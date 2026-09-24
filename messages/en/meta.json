@@ -110,6 +110,12 @@
     "title": "Imprint Random Walk NFT",
     "description": "Imprint a Random Walk NFT on Cosmic Signature. Each unused Random Walk NFT can be attached to one ETH gesture for a 50% ETH Gesture Cost discount."
   },
+  "systemEvent": {
+    "title": "Configuration before cycle {cycle}",
+    "description": "The protocol parameters the contract owner changed before cycle {cycle} opened, each with its new value and transaction.",
+    "titleInitial": "Initial configuration",
+    "descriptionInitial": "The protocol parameters the contract owner set before the first cycle opened, each with its value and transaction."
+  },
   "currentCycleFull": {
     "title": "Current Performance Cycle",
     "description": "Full details for the active Performance Cycle: gesture history, leaderboards, attached contributions, and allocation distribution."
@@ -155,16 +161,20 @@
     "description": "Contribute to Cosmic Signature outreach and receive CST allocations. See top ecosystem contributors, allocation history, and how to take part."
   },
   "outreachAddress": {
-    "description": "Outreach allocation history and CST allocations for a Cosmic Signature ecosystem contributor. Review referral activity and contributions.",
-    "title": "Outreach allocations · {address}"
+    "title": "Outreach allocations · {address}",
+    "description": "Outreach allocation history and CST allocations for a Cosmic Signature ecosystem contributor. Review referral activity and contributions."
   },
   "ethContribution": {
     "title": "Direct ETH Contributions",
     "description": "Contribute ETH directly to the Cosmic Signature Cycle Reserve and view the complete contribution history, with each contributor’s cycle and note."
   },
   "ethContributionDetail": {
-    "description": "Details of a specific ETH contribution to the Cosmic Signature Cycle Reserve — contributor address, amount, cycle, and optional note.",
-    "title": "Contribution #{id}"
+    "title": "Contribution #{id}",
+    "description": "Details of a specific ETH contribution to the Cosmic Signature Cycle Reserve — contributor address, amount, cycle, and optional note."
+  },
+  "ethContributionByCycle": {
+    "title": "Cycle {cycle} contributions",
+    "description": "Direct ETH contributions to the Cycle Reserve during cycle {cycle}."
   },
   "myStatistics": {
     "title": "My Statistics",
@@ -177,6 +187,14 @@
   "transferCst": {
     "title": "Transfer CST",
     "description": "Send your Cosmic Signature CST tokens to another wallet address."
+  },
+  "cosmicSignatureTransfers": {
+    "title": "NFT transfers · {address}",
+    "description": "Cosmic Signature NFTs imprinted to this address, and every one it received or sent."
+  },
+  "cosmicTokenTransfers": {
+    "title": "CST transfers · {address}",
+    "description": "CST imprinted to this address, received and sent by it, and consumed by its CST gestures."
   },
   "usedRwlkNfts": {
     "title": "Used RandomWalk NFTs",
@@ -302,23 +320,5 @@
       "title": "Is Cosmic Signature a \u004cottery, \u0043asino, or \u0049nvestment?",
       "description": "Cosmic Signature is a procedural on-chain art protocol, not a \u006cottery, \u0063asino, \u0067ambling product, or \u0069nvestment product."
     }
-  },
-  "cosmicTokenTransfers": {
-    "title": "CST transfers · {address}",
-    "description": "CST imprinted to this address, received and sent by it, and consumed by its CST gestures."
-  },
-  "cosmicSignatureTransfers": {
-    "title": "NFT transfers · {address}",
-    "description": "Cosmic Signature NFTs imprinted to this address, and every one it received or sent."
-  },
-  "ethContributionByCycle": {
-    "title": "Cycle {cycle} contributions",
-    "description": "Direct ETH contributions to the Cycle Reserve during cycle {cycle}."
-  },
-  "systemEvent": {
-    "title": "Configuration before cycle {cycle}",
-    "description": "The protocol parameters the contract owner changed before cycle {cycle} opened, each with its new value and transaction.",
-    "titleInitial": "Initial configuration",
-    "descriptionInitial": "The protocol parameters the contract owner set before the first cycle opened, each with its value and transaction."
   }
 }

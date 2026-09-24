@@ -110,6 +110,12 @@
     "title": "Random Walk NFT 각인",
     "description": "Cosmic Signature에서 Random Walk NFT를 각인합니다. 사용하지 않은 Random Walk NFT는 ETH 제스처 하나에 첨부해 ETH 제스처 비용을 50% 할인받을 수 있습니다."
   },
+  "systemEvent": {
+    "title": "사이클 {cycle} 이전 구성",
+    "description": "사이클 {cycle} 시작 전에 컨트랙트 소유자가 변경한 프로토콜 매개변수와 각각의 새 값, 트랜잭션입니다.",
+    "titleInitial": "초기 구성",
+    "descriptionInitial": "첫 사이클 시작 전에 컨트랙트 소유자가 설정한 프로토콜 매개변수와 각각의 값, 트랜잭션입니다."
+  },
   "currentCycleFull": {
     "title": "현재 퍼포먼스 사이클",
     "description": "진행 중인 퍼포먼스 사이클의 전체 정보입니다. 제스처 내역, 순위표, 첨부된 기여, 배분 현황을 확인할 수 있습니다."
@@ -155,16 +161,20 @@
     "description": "Cosmic Signature를 널리 알리는 데 기여하면 CST 배분을 받을 수 있습니다. 상위 생태계 기여자, 배분 내역, 참여 방법을 확인할 수 있습니다."
   },
   "outreachAddress": {
-    "description": "Cosmic Signature 생태계 기여자 한 명의 홍보 배분 내역과 CST 배분입니다. 추천 활동과 기여 내역을 확인할 수 있습니다.",
-    "title": "홍보 배분 · {address}"
+    "title": "홍보 배분 · {address}",
+    "description": "Cosmic Signature 생태계 기여자 한 명의 홍보 배분 내역과 CST 배분입니다. 추천 활동과 기여 내역을 확인할 수 있습니다."
   },
   "ethContribution": {
     "title": "직접 ETH 기여",
     "description": "제스처를 남기지 않고 Cosmic Signature 사이클 준비금에 ETH를 직접 기여하고, 공개된 기여 내역을 확인할 수 있습니다."
   },
   "ethContributionDetail": {
-    "description": "사이클 준비금에 기여한 ETH의 상세 정보입니다. 기여자 주소, 금액, 사이클, 함께 남긴 메모를 확인할 수 있습니다.",
-    "title": "기여 #{id}"
+    "title": "기여 #{id}",
+    "description": "사이클 준비금에 기여한 ETH의 상세 정보입니다. 기여자 주소, 금액, 사이클, 함께 남긴 메모를 확인할 수 있습니다."
+  },
+  "ethContributionByCycle": {
+    "title": "사이클 {cycle}의 기여",
+    "description": "사이클 {cycle} 동안 사이클 준비금에 직접 기여한 ETH입니다."
   },
   "myStatistics": {
     "title": "내 통계",
@@ -177,6 +187,14 @@
   "transferCst": {
     "title": "CST 전송",
     "description": "보유한 Cosmic Signature CST 토큰을 다른 지갑 주소로 전송합니다."
+  },
+  "cosmicSignatureTransfers": {
+    "title": "NFT 전송 내역 · {address}",
+    "description": "이 주소에 각인된 Cosmic Signature NFT와 이 주소가 받거나 보낸 모든 NFT입니다."
+  },
+  "cosmicTokenTransfers": {
+    "title": "CST 전송 내역 · {address}",
+    "description": "이 주소에 각인된 CST, 이 주소가 받고 보낸 CST, 그리고 CST 제스처로 소모한 CST입니다."
   },
   "usedRwlkNfts": {
     "title": "사용된 RandomWalk NFT",
@@ -302,23 +320,5 @@
       "title": "Cosmic Signature는 \uBCF5\uAD8C이나 \uCE74\uC9C0\uB178, \uD22C\uC790 상품인가요?",
       "description": "Cosmic Signature는 절차적 온체인 아트 프로토콜이며, \uBCF5\uAD8C도 \uCE74\uC9C0\uB178도 \uB3C4\uBC15 상품도 \uD22C\uC790 상품도 아닙니다."
     }
-  },
-  "cosmicTokenTransfers": {
-    "title": "CST 전송 내역 · {address}",
-    "description": "이 주소에 각인된 CST, 이 주소가 받고 보낸 CST, 그리고 CST 제스처로 소모한 CST입니다."
-  },
-  "cosmicSignatureTransfers": {
-    "title": "NFT 전송 내역 · {address}",
-    "description": "이 주소에 각인된 Cosmic Signature NFT와 이 주소가 받거나 보낸 모든 NFT입니다."
-  },
-  "ethContributionByCycle": {
-    "title": "사이클 {cycle}의 기여",
-    "description": "사이클 {cycle} 동안 사이클 준비금에 직접 기여한 ETH입니다."
-  },
-  "systemEvent": {
-    "title": "사이클 {cycle} 이전 구성",
-    "description": "사이클 {cycle} 시작 전에 컨트랙트 소유자가 변경한 프로토콜 매개변수와 각각의 새 값, 트랜잭션입니다.",
-    "titleInitial": "초기 구성",
-    "descriptionInitial": "첫 사이클 시작 전에 컨트랙트 소유자가 설정한 프로토콜 매개변수와 각각의 값, 트랜잭션입니다."
   }
 }
