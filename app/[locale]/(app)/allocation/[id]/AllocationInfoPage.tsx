@@ -149,15 +149,8 @@ function distributedEth(
 /** A tab's label with its count, or a short skeleton while the count loads. */
 function TabCount({ count, loading }: { count: number; loading: boolean }) {
   const format = useFormat();
-  if (loading) {
-    // A span, not the block Skeleton: it sits inside the tab's button.
-    return (
-      <span
-        aria-hidden
-        className="ml-2 inline-block h-4 w-6 animate-pulse rounded-edge bg-muted/70 motion-reduce:animate-none"
-      />
-    );
-  }
+  // A span: it sits inside the tab's button.
+  if (loading) return <Skeleton as="span" className="ml-2 inline-block h-4 w-6" />;
   if (count === 0) return null;
   return (
     <Badge size="sm" className="ml-2 tabular-nums">

@@ -50,7 +50,7 @@ export function DetailMetric({
       <dt className="type-caption text-subtle">{label}</dt>
       <dd
         className={cn(
-          'mt-0.5 break-words text-xs font-medium leading-4 tabular-nums slashed-zero',
+          'mt-0.5 break-words type-label tabular-nums slashed-zero',
           tone === 'live' ? 'text-live' : 'text-foreground',
         )}
       >

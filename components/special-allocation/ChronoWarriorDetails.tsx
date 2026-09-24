@@ -2,11 +2,9 @@
 
 import { useTranslations } from 'next-intl';
 
-import { shortenHex } from '@/utils';
-
+import { AddressChip } from '@/components/ui/address-chip';
 import type { ChampionsState } from '@/hooks/useChampions';
 import { useFormat } from '@/hooks/useFormat';
-import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 
 import { DetailMetric } from './DetailMetric';
@@ -76,19 +74,15 @@ export function ChronoWarriorDetails({
         : t('specialAllocation.waitingToOvertake'),
   };
 
-  const challengerLink = (full: boolean) =>
+  // The one address display: short hex (the full address on hover), linked to the participant.
+  const challengerLink = () =>
     challenge.address ? (
-      <Link
-        href={`/user/${challenge.address}`}
-        title={challenge.address}
-        aria-label={challenge.address}
-        className={cn(
-          'mt-0.5 inline-block type-mono-sm text-foreground transition-colors duration-fast hover:text-primary',
-          full ? 'break-all' : 'whitespace-nowrap',
-        )}
-      >
-        {full ? challenge.address : shortenHex(challenge.address, 6)}
-      </Link>
+      <AddressChip
+        address={challenge.address}
+        variant="plain"
+        showCopy={false}
+        className="mt-0.5 flex type-body-sm text-foreground"
+      />
     ) : null;
 
   if (dashboard) {
@@ -109,7 +103,7 @@ export function ChronoWarriorDetails({
                 <LiveDot />
                 {t('specialAllocation.activeEnduranceChallenge')}
               </p>
-              {challengerLink(false)}
+              {challengerLink()}
             </div>
             {challenge.duration !== undefined && (
               <DetailMetric
@@ -225,7 +219,7 @@ export function ChronoWarriorDetails({
               <LiveDot />
               {t('specialAllocation.activeEnduranceChallenge')}
             </p>
-            {challengerLink(!compact)}
+            {challengerLink()}
             <div
               className={cn(
                 'mt-1.5 grid',

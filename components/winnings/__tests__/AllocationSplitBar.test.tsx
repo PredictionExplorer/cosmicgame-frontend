@@ -22,6 +22,24 @@ describe('AllocationSplitBar', () => {
     expect(drawn[0]).toHaveClass('bg-track-signature');
   });
 
+  it('keeps the legend a valid description list: each group holds only a dt and a dd', () => {
+    const { container } = render(
+      <AllocationSplitBar
+        label="Split"
+        unavailableLabel="Unavailable"
+        segments={[
+          { id: 'signature', label: 'Signature Allocation', percent: 60 },
+          { id: 'chrono', label: 'Chrono-Warrior', percent: 40 },
+        ]}
+      />,
+    );
+    const groups = container.querySelectorAll('dl > div');
+    expect(groups).toHaveLength(2);
+    for (const group of groups) {
+      expect([...group.children].map((child) => child.tagName)).toEqual(['DT', 'DD']);
+    }
+  });
+
   it('lists each track with its ETH and share when the split is of a real cycle', () => {
     const { container } = render(
       <AllocationSplitBar

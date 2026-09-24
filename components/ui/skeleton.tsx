@@ -35,12 +35,30 @@ const skeletonVariants = cva(
 );
 
 export interface SkeletonProps
-  extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof skeletonVariants> {}
+  extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof skeletonVariants> {
+  /**
+   * `span` where the placeholder sits in phrasing content, such as a count
+   * inside a tab's button (a `div` is not allowed there). Pass `inline-block`.
+   */
+  as?: 'div' | 'span';
+}
 
 export const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
-  ({ className, shine, ...props }, ref) => (
-    <div ref={ref} aria-hidden className={cn(skeletonVariants({ shine }), className)} {...props} />
-  ),
+  ({ as = 'div', className, shine, ...props }, ref) =>
+    as === 'span' ? (
+      <span
+        aria-hidden
+        className={cn(skeletonVariants({ shine }), className)}
+        {...(props as React.HTMLAttributes<HTMLSpanElement>)}
+      />
+    ) : (
+      <div
+        ref={ref}
+        aria-hidden
+        className={cn(skeletonVariants({ shine }), className)}
+        {...props}
+      />
+    ),
 );
 Skeleton.displayName = 'Skeleton';
 

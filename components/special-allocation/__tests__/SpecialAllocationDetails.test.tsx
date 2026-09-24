@@ -73,10 +73,10 @@ describe('ChronoWarriorDetails', () => {
       'text-live',
     );
     const active = screen.getByTestId('chrono-active-challenge');
-    expect(within(active).getByRole('link', { name: CHALLENGER })).toHaveAttribute(
-      'href',
-      `/user/${CHALLENGER}`,
-    );
+    // An AddressChip: short hex, the full address on hover, linked to the participant.
+    const challenger = within(active).getByRole('link', { name: /^0x1111/ });
+    expect(challenger).toHaveAttribute('href', `/user/${CHALLENGER}`);
+    expect(challenger).toHaveAttribute('title', CHALLENGER);
     expect(screen.getByTestId('chrono-challenge-record-to-beat')).toHaveTextContent('30m');
     expect(
       within(screen.getByTestId('chrono-challenge-record-to-beat')).getByText('30m'),

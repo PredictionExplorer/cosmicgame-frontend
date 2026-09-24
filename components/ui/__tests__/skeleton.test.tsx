@@ -40,6 +40,19 @@ describe('Skeleton', () => {
     expect(screen.getByTestId('skeleton')).toHaveAttribute('aria-hidden');
   });
 
+  it('renders as a span where only phrasing content is allowed (inside a button)', () => {
+    render(
+      <button type="button">
+        Gestures
+        <Skeleton as="span" data-testid="skeleton" className="inline-block h-4 w-6" />
+      </button>,
+    );
+    const skeleton = screen.getByTestId('skeleton');
+    expect(skeleton.tagName).toBe('SPAN');
+    expect(skeleton).toHaveClass('animate-pulse', 'inline-block');
+    expect(skeleton).toHaveAttribute('aria-hidden');
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(<Skeleton className="h-12 w-12" />);
     await checkA11y(container);

@@ -84,19 +84,22 @@ export function AllocationSplitBar({
               data-track={segment.id}
               className="flex min-h-11 items-center gap-3 border-b border-rule-faint py-2.5"
             >
-              <span
-                aria-hidden
-                className={cn(
-                  'size-2.5 shrink-0 rounded-full',
-                  ALLOCATION_TRACK_COLORS[segment.id],
-                )}
-              />
-              <dt className="min-w-0 flex-1 type-body-sm text-muted-foreground">
-                {segment.definition ? (
-                  <ExplainedTerm definition={segment.definition}>{segment.label}</ExplainedTerm>
-                ) : (
-                  segment.label
-                )}
+              {/* The swatch belongs to the term: a dl's div holds only dt and dd. */}
+              <dt className="flex min-w-0 flex-1 items-center gap-3 type-body-sm text-muted-foreground">
+                <span
+                  aria-hidden
+                  className={cn(
+                    'size-2.5 shrink-0 rounded-full',
+                    ALLOCATION_TRACK_COLORS[segment.id],
+                  )}
+                />
+                <span className="min-w-0">
+                  {segment.definition ? (
+                    <ExplainedTerm definition={segment.definition}>{segment.label}</ExplainedTerm>
+                  ) : (
+                    segment.label
+                  )}
+                </span>
               </dt>
               <dd className="flex shrink-0 items-baseline gap-3 type-figure-sm text-foreground">
                 {showAmounts ? (

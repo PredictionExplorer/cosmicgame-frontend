@@ -63,7 +63,11 @@ describe('ChronoEnduranceIntel', () => {
       within(screen.getByTestId('final-cst-role-summary')).getByRole('link', { name: FINAL_CST }),
     ).toBeInTheDocument();
     const challenge = screen.getByTestId('chrono-active-challenge');
-    expect(within(challenge).getByRole('link', { name: ENDURANCE })).toBeInTheDocument();
+    // The challenger reads as an AddressChip: short hex, the full address on hover.
+    expect(within(challenge).getByRole('link', { name: /^0x1111/ })).toHaveAttribute(
+      'title',
+      ENDURANCE,
+    );
     expect(screen.getByTestId('chrono-challenge-segment')).toHaveTextContent('20m');
     expect(screen.getByTestId('chrono-challenge-record-to-beat')).toHaveTextContent('30m');
     expect(screen.getByTestId('chrono-challenge-next-change')).toHaveTextContent('10m 1s');
