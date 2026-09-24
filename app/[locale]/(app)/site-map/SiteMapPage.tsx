@@ -61,7 +61,7 @@ function SiteMapSection({
   return (
     <section
       aria-labelledby={headingId}
-      className="break-inside-avoid border-t border-rule max-sm:border-rule-faint sm:mb-10 sm:pt-6"
+      className="break-inside-avoid border-t border-rule max-sm:border-rule-faint max-sm:first:border-t-0 sm:mb-10 sm:pt-6"
     >
       <PhoneFold
         headingId={headingId}
