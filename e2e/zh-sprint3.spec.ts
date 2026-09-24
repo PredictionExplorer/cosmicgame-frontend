@@ -147,7 +147,9 @@ test.describe('zh Sprint 3 — core dApp routes', () => {
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
     // The mock carries no cycle position, so the H1 is the plain noun.
     await expect(page.getByRole('heading', { level: 1, name: '落笔', exact: true })).toBeVisible();
-    await expect(page.getByRole('heading', { level: 2, name: '记录', exact: true })).toBeVisible();
+    await expect(
+      page.getByRole('main').getByRole('heading', { level: 2, name: '记录', exact: true }),
+    ).toBeVisible();
     await expect(page.locator('[data-figure="cost"]')).toContainText('落笔价格');
     await expect(page.locator('[data-figure="participationCst"]')).toContainText('参与 CST');
   });
