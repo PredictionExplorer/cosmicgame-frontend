@@ -17,11 +17,11 @@
         },
         "cards": {
           "finalizedCycles": {
-            "label": "Finalized Cycles",
+            "label": "Finalized cycles",
             "tooltip": "The number of Performance Cycles with finalized allocation data."
           },
           "recipients": {
-            "label": "Signature Allocation Recipients",
+            "label": "Signature Allocation recipients",
             "tooltip": "Distinct wallets that received the Signature Allocation by making the Final Gesture."
           },
           "totalEth": {
@@ -29,7 +29,7 @@
             "tooltip": "The sum of Signature Allocation ETH across finalized cycles, based on cycle records."
           },
           "totalGestures": {
-            "label": "Total Gestures",
+            "label": "Total gestures",
             "tooltip": "The cumulative number of gestures made across all finalized cycles."
           }
         }
@@ -142,25 +142,25 @@
         }
       },
       "allocation-finalized": {
-        "heading": "Retrieved Allocations",
-        "description": "Inspect public allocation retrieval records from Cosmic Signature, including ETH receipts, Cosmic Signature NFT allocations, and Stellar Selection distributions.",
+        "heading": "Finalized Allocations",
+        "description": "What each finalized cycle allocated, from its Signature Allocation to every Stellar Selection and Anchor Distribution record.",
         "source": "Cosmic Signature public allocation retrieval APIs",
         "links": {
-          "allocation": "View allocation recipients",
+          "myAllocations": "Retrieve your allocations",
           "statistics": "View aggregate statistics",
           "contracts": "Review verified contracts"
         },
         "cards": {
           "records": {
-            "label": "Allocation Records",
+            "label": "Allocation records",
             "tooltip": "Every allocation record across finalized cycles, including ETH, CST and NFT allocations."
           },
           "eth": {
-            "label": "ETH Allocated",
+            "label": "ETH allocated",
             "tooltip": "The sum of Signature Allocation, Chrono-Warrior, Stellar Selection and Anchor Distribution ETH across finalized cycles. CST and NFT allocations are not included."
           },
           "recipients": {
-            "label": "Recipient Wallets"
+            "label": "Recipient wallets"
           }
         }
       },

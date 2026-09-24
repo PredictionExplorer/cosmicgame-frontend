@@ -59,8 +59,8 @@
     "description": "查看 Cosmic Signature 单次锚定操作的代币类型、锚定数量与锚定派发的取回状态。"
   },
   "allocationRetrieved": {
-    "title": "已取回分配",
-    "description": "查看 Cosmic Signature 已取回分配的详情，包括收到的 ETH、Cosmic Signature NFT 分配与星选分配。"
+    "title": "已收官的分配",
+    "description": "每个已收官的 Cosmic Signature 周期的签名分配，以及 ETH、CST 与 Cosmic Signature NFT 分配记录的汇总。"
   },
   "myStatistics": {
     "title": "我的统计",

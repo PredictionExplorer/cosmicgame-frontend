@@ -6,6 +6,7 @@ import { useCallback } from 'react';
 import { useQuery, useQueryClient, type UseQueryResult } from '@tanstack/react-query';
 
 import api from '@/services/api';
+import { isRecordNotFound } from '@/services/api/readError';
 import {
   getLiveDataPollIntervalMs,
   getRemainingMsFromServerClock,
@@ -169,6 +170,15 @@ export function useRoundList() {
   });
 }
 
+/** Retries left after a failed read: the app default of two (see providers). */
+const READ_RETRIES = 2;
+
+/**
+ * A finalized cycle's record. The API answers 400 for a cycle it holds no
+ * record of (the live cycle, one that has not started, one not indexed yet):
+ * that answer is final, so it is not retried, and pages read it with
+ * `isRecordNotFound(error)` to show "no record" instead of an error.
+ */
 export function useRoundInfo(roundNum: number) {
   return useQuery<RoundInfo | null>({
     queryKey: ['roundInfo', roundNum],
@@ -176,6 +186,7 @@ export function useRoundInfo(roundNum: number) {
     /** Backend serves `rounds/info/0`; the previous `> 0` guard broke first-cycle finalize UX. */
     enabled: Number.isFinite(roundNum) && roundNum >= 0,
     staleTime: 30_000,
+    retry: (failureCount, error) => !isRecordNotFound(error) && failureCount < READ_RETRIES,
   });
 }
 

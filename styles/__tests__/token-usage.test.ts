@@ -46,17 +46,17 @@ const RETIRED: Record<string, RetiredPattern> = {
     // (WCAG exempts inactive controls).
     pattern:
       /(?<!disabled:)(?<![\w-])text-(?:muted-foreground|white)\/(?:[0-5]?\d|60|\[0?\.[0-6]\d*\])(?![\w.])/g,
-    baseline: 48,
+    baseline: 37,
   },
   'text below the 12px floor': {
     use: 'type-caption (12px) or type-label (13px)',
     pattern: /(?<![\w-])text-\[(?:[5-9]|1[01])(?:\.\d+)?px\]/g,
-    baseline: 29,
+    baseline: 15,
   },
   'white-alpha surface or border': {
     use: 'bg-surface-sunken / bg-surface / bg-surface-raised, border-rule / border-rule-faint',
     pattern: /(?<![\w-])(?:bg|border(?:-[trblxy])?)-white\/(?:\[[\d.]+\]|\d+)/g,
-    baseline: 128,
+    baseline: 99,
   },
   'focus reset that replaces the shared outline': {
     use: 'the global :focus-visible outline (styles/focus-ring.css), focus-ring-inset or focus-ring-within',

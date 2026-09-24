@@ -116,7 +116,7 @@
       "description": "Mọi thay đổi tham số của giao thức"
     },
     "retrievedAllocations": {
-      "label": "Phân bổ đã nhận về",
+      "label": "Phân bổ đã hoàn tất",
       "description": "Bản ghi phân bổ của các chu kỳ đã hoàn tất"
     },
     "howItWorks": {

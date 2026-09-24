@@ -39,7 +39,17 @@ export default async function Page({ params }: PageProps) {
 
   setRequestLocale(locale);
   return (
-    <PageMessages namespaces={['allocation', 'detail', 'marketing', 'tables']}>
+    <PageMessages
+      namespaces={[
+        'allocation',
+        'contracts',
+        'detail',
+        'glossary',
+        'marketing',
+        'tables',
+        'traits',
+      ]}
+    >
       <AllocationInfoPage roundNum={cycleId} />
     </PageMessages>
   );

@@ -1,186 +1,200 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { getAddress, isAddress } from 'viem';
-import { useLocale, useTranslations } from 'next-intl';
-
-import { getExplorerUrl } from '@/utils';
+import { ArrowRight } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
-import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
-import { useStellarSelectionNFTAllocationsByUser } from '@/hooks/useApiQuery';
-import { CustomPagination } from '@/components/common/CustomPagination';
-import { PageHeader } from '@/components/layout/PageHeader';
-import { useParticipantTrail } from '@/components/layout/participantTrail';
+import type { PageHeaderFigure } from '@/components/layout/PageHeader';
+import { ArtTag, PendingPlate } from '@/components/ui/art-frame';
+import { buttonVariants } from '@/components/ui/button';
+import { DateTime } from '@/components/ui/date-time';
+import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
 import { PageShell } from '@/components/ui/page-shell';
+import { TablePagination } from '@/components/ui/pagination';
+import { Skeleton } from '@/components/ui/skeleton';
+import { SignatureCard } from '@/components/winnings/SignatureCard';
 import {
-  TablePrimary,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryContainer,
-  TablePrimaryHead,
-  TablePrimaryHeadCell,
-  TablePrimaryRow,
-} from '@/components/styled';
+  InvalidParticipantState,
+  STELLAR_SELECTION_FAQ_HREF,
+  StellarSelectionHeader,
+  participantAddress,
+} from '@/components/winnings/StellarSelectionHeader';
+import { useSignatureIndex } from '@/components/winnings/useSignatureIndex';
+import { useStellarSelectionNFTAllocationsByUser } from '@/hooks/useApiQuery';
+import { useFormat } from '@/hooks/useFormat';
+import { StellarSelectionIcon } from '@/lib/conceptIcons';
+import { formatId } from '@/utils/format/ids';
+import type { StellarSelectionNFTRecipient } from '@/services/api/types';
 
-interface StellarSelectionNFTAllocation {
-  EvtLogId: number;
-  TxHash: string;
-  TimeStamp: number;
-  RoundNum: number;
-  IsRWalk: boolean;
-  IsStaker: boolean;
-  TokenId: number;
+/** Plates per page: four rows of three on a desktop, six rows of two on a phone. */
+const PAGE_SIZE = 12;
+
+const GRID_CLASS = 'grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 lg:grid-cols-3 lg:gap-x-8';
+
+type SelectionSource = 'participant' | 'anchorHolder';
+
+/**
+ * Who the NFT was selected as: a participant (by their gestures), or an
+ * anchor-holder, of a Random Walk NFT or of a Cosmic Signature NFT.
+ */
+function selectionSource(row: StellarSelectionNFTRecipient): SelectionSource {
+  return row.IsStaker ? 'anchorHolder' : 'participant';
 }
 
-function NFTWinningsRow({ row }: { row: StellarSelectionNFTAllocation }) {
-  const t = useTranslations('tables');
-  const locale = useLocale();
-  if (!row) return <TablePrimaryRow />;
-
-  const { TxHash, TimeStamp, RoundNum, IsRWalk, IsStaker, TokenId } = row;
-
-  return (
-    <TablePrimaryRow>
-      <TablePrimaryCell label={t('columns.datetime')}>
-        <a
-          className="text-inherit"
-          href={getExplorerUrl('tx', TxHash)}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <HydrationSafeDateTime timestamp={TimeStamp} locale={locale} />
-        </a>
-      </TablePrimaryCell>
-
-      <TablePrimaryCell label={t('columns.cycle')} align="center">
-        <Link
-          href={`/allocation/${RoundNum}`}
-          className="font-mono text-inherit"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {RoundNum}
-        </Link>
-      </TablePrimaryCell>
-
-      <TablePrimaryCell label={t('statisticsColumns.isRandomWalk')} align="center">
-        {IsRWalk ? t('status.yes') : t('status.no')}
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('statisticsColumns.isAnchorHolder')} align="center">
-        {IsStaker ? t('status.yes') : t('status.no')}
-      </TablePrimaryCell>
-
-      <TablePrimaryCell label={t('columns.tokenId')} align="center">
-        <Link href={`/detail/${TokenId}`} className="font-mono text-inherit">
-          {TokenId}
-        </Link>
-      </TablePrimaryCell>
-    </TablePrimaryRow>
-  );
-}
-
-function NFTWinningsTable({ list }: { list: StellarSelectionNFTAllocation[] }) {
-  const t = useTranslations('tables');
-  const tStatistics = useTranslations('statistics');
-  const PER_PAGE = 10;
-  const [currentPage, setCurrentPage] = useState(1);
-
-  if (!list.length) {
-    return <p>{tStatistics('stellarSelectionNft.empty')}</p>;
-  }
-
-  const startIndex = (currentPage - 1) * PER_PAGE;
-  const endIndex = currentPage * PER_PAGE;
-  const currentItems = list.slice(startIndex, endIndex);
-
-  return (
-    <>
-      <TablePrimaryContainer>
-        <TablePrimary>
-          <TablePrimaryHead>
-            <tr>
-              <TablePrimaryHeadCell align="left">{t('columns.datetime')}</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>{t('columns.cycle')}</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>{t('statisticsColumns.isRandomWalk')}</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>{t('statisticsColumns.isAnchorHolder')}</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>{t('columns.tokenId')}</TablePrimaryHeadCell>
-            </tr>
-          </TablePrimaryHead>
-          <TablePrimaryBody>
-            {currentItems.map((row) => (
-              <NFTWinningsRow key={row.EvtLogId} row={row} />
-            ))}
-          </TablePrimaryBody>
-        </TablePrimary>
-      </TablePrimaryContainer>
-
-      <CustomPagination
-        page={currentPage}
-        setPage={setCurrentPage}
-        totalLength={list.length}
-        perPage={PER_PAGE}
-      />
-    </>
-  );
-}
-
+/**
+ * The Cosmic Signature NFTs Stellar Selection allocated to a participant,
+ * shown as the art itself: each Signature on its plate with a wall label
+ * (name or number, cycle and date, and what the participant was selected
+ * as), newest first.
+ */
 function UserStellarSelectionNFTPage({ address: rawAddress }: { address: string }) {
   const t = useTranslations('statistics');
-  const validatedAddress =
-    rawAddress && isAddress(rawAddress.toLowerCase())
-      ? getAddress(rawAddress.toLowerCase())
-      : 'Invalid Address';
+  const tDetail = useTranslations('detail');
+  const format = useFormat();
+  const address = participantAddress(rawAddress);
+  const [page, setPage] = useState(1);
 
-  const invalidAddress = !validatedAddress || validatedAddress === 'Invalid Address';
-  const participantTrail = useParticipantTrail(invalidAddress ? null : validatedAddress);
+  const { data, isLoading, isError, refetch } = useStellarSelectionNFTAllocationsByUser(address);
+  const signatures = useSignatureIndex();
 
-  const { data: winningsRaw, isLoading } = useStellarSelectionNFTAllocationsByUser(
-    invalidAddress ? null : validatedAddress,
+  const rows = useMemo(
+    () =>
+      [...(data ?? [])]
+        .filter((row) => typeof row.TokenId === 'number')
+        .sort((a, b) => (b.TimeStamp ?? 0) - (a.TimeStamp ?? 0)),
+    [data],
   );
+  const cycles = useMemo(() => new Set(rows.map((row) => row.RoundNum)).size, [rows]);
 
-  const stellarSelectionNfts = useMemo(
-    () => ({
-      data: [...((winningsRaw as StellarSelectionNFTAllocation[] | undefined) ?? [])].sort(
-        (a, b) => b.TimeStamp - a.TimeStamp,
-      ),
-      loading: isLoading,
-    }),
-    [winningsRaw, isLoading],
-  );
-
-  if (invalidAddress) {
+  if (!address) {
     return (
       <PageShell variant="data" backdrop="signature">
-        <PageHeader
-          section="explore"
-          breadcrumbs={participantTrail}
-          title={t('stellarSelectionNft.invalidAddress')}
-        />
+        <InvalidParticipantState />
       </PageShell>
     );
   }
 
+  const pending = <Skeleton className="h-7 w-12" />;
+  const figures: PageHeaderFigure[] = [
+    {
+      id: 'count',
+      label: t('stellarSelectionNft.figures.count'),
+      value: isLoading ? pending : format.count(rows.length),
+    },
+    {
+      id: 'cycles',
+      label: t('stellarSelectionNft.figures.cycles'),
+      value: isLoading ? pending : format.count(cycles),
+    },
+  ];
+
+  const visible = rows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
   return (
     <PageShell variant="data" backdrop="signature">
-      <PageHeader
-        section="explore"
-        breadcrumbs={participantTrail}
-        title={t('stellarSelectionNft.heading')}
-      >
-        <p className="mt-5 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-sm text-muted-foreground">
-          <span>{t('stellarSelectionNft.user')}</span>
-          <span className="min-w-0 break-all font-mono">{validatedAddress}</span>
-        </p>
-      </PageHeader>
+      <StellarSelectionHeader
+        kind="nft"
+        address={address}
+        // An address with nothing selected yet (or whose read failed) reads from its state alone.
+        figures={isError || (!isLoading && rows.length === 0) ? undefined : figures}
+      />
 
-      <div className="mt-8">
-        {stellarSelectionNfts.loading ? (
-          <p className="text-lg font-semibold">{t('stellarSelectionNft.loading')}</p>
-        ) : (
-          <NFTWinningsTable list={stellarSelectionNfts.data} />
-        )}
-      </div>
+      {isError ? (
+        <ErrorState
+          variant="page"
+          headingLevel={2}
+          title={t('stellarSelectionNft.errorTitle')}
+          message={t('stellarSelectionPages.errorMessage')}
+          onRetry={() => void refetch()}
+        />
+      ) : isLoading ? (
+        <ul className={GRID_CLASS} aria-busy="true" aria-label={t('stellarSelectionNft.gridLabel')}>
+          {Array.from({ length: 6 }, (_, index) => (
+            <li key={index} className="flex flex-col gap-3">
+              <PendingPlate busy density="compact" />
+              <Skeleton className="h-4 w-3/5" />
+              <Skeleton className="h-3 w-2/5" />
+            </li>
+          ))}
+        </ul>
+      ) : rows.length === 0 ? (
+        <EmptyState
+          variant="page"
+          headingLevel={2}
+          icon={<StellarSelectionIcon aria-hidden className="size-6" />}
+          title={t('stellarSelectionNft.emptyTitle')}
+          description={t('stellarSelectionNft.emptyDescription')}
+          action={
+            <Link
+              href={STELLAR_SELECTION_FAQ_HREF}
+              className={buttonVariants({ variant: 'outline', size: 'sm' })}
+            >
+              {t('stellarSelectionPages.howItWorks')}
+              <ArrowRight aria-hidden className="size-4" />
+            </Link>
+          }
+        />
+      ) : (
+        <section aria-label={t('stellarSelectionNft.gridLabel')} className="mb-10">
+          {signatures.state === 'failed' ? (
+            <ErrorState
+              variant="inline"
+              headingLevel={2}
+              tone="warning"
+              title={t('stellarSelectionNft.artFailed')}
+              onRetry={signatures.retry}
+              className="mb-6"
+            />
+          ) : null}
+          <ul className={GRID_CLASS}>
+            {visible.map((row) => {
+              const tokenId = row.TokenId as number;
+              const entry = signatures.get(tokenId);
+              const id = formatId(tokenId);
+              return (
+                <li key={`${row.EvtLogId ?? tokenId}-${tokenId}`}>
+                  <SignatureCard
+                    tokenId={tokenId}
+                    seed={entry?.seed}
+                    artState={signatures.state}
+                    title={entry?.name ?? t('stellarSelectionNft.unnamed', { id })}
+                    meta={[
+                      entry?.name ? <span className="type-mono">{id}</span> : null,
+                      typeof row.RoundNum === 'number' ? (
+                        <Link href={`/allocation/${row.RoundNum}`} className="link-quiet">
+                          {t('stellarSelectionNft.cycle', { cycle: row.RoundNum })}
+                        </Link>
+                      ) : null,
+                      row.TimeStamp ? <DateTime timestamp={row.TimeStamp} /> : null,
+                    ]}
+                    // Two short tags rather than one long one, so neither wraps in a phone column.
+                    tags={
+                      <>
+                        <ArtTag>{t(`stellarSelectionNft.sources.${selectionSource(row)}`)}</ArtTag>
+                        {row.IsStaker && row.IsRWalk ? (
+                          <ArtTag>{t('stellarSelectionNft.sources.randomWalk')}</ArtTag>
+                        ) : null}
+                      </>
+                    }
+                    sizes="(min-width: 1024px) 26rem, (min-width: 640px) 45vw, 50vw"
+                    unavailableLabel={tDetail('image.artworkUnavailable')}
+                    unavailableDetail={id}
+                  />
+                </li>
+              );
+            })}
+          </ul>
+          <TablePagination
+            page={page}
+            pageSize={PAGE_SIZE}
+            total={rows.length}
+            onPageChange={setPage}
+            className="mt-10"
+          />
+        </section>
+      )}
     </PageShell>
   );
 }

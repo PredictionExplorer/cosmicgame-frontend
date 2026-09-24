@@ -36,7 +36,7 @@ export default async function Page({ params }: PageProps) {
   setRequestLocale(locale);
 
   return (
-    <PageMessages namespaces={['allocation']}>
+    <PageMessages namespaces={['allocation', 'detail', 'tables', 'traits']}>
       <Suspense>
         <AllocationFinalizedPage
           seoSummary={<PublicDataRouteSeoSummary route="allocation-finalized" />}

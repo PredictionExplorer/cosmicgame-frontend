@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import type { Hash } from 'viem';
 
+import { tokenClaimKey, uniqueRounds, type TokenClaim } from '@/utils/allocationRetrieval';
 import { useApiData } from '@/contexts/ApiDataContext';
 import { useNotify } from '@/hooks/useNotify';
 import { useTxFlow, type TxResult } from '@/hooks/useTxFlow';
@@ -11,9 +12,23 @@ import { assertTransactionHash } from '@/utils/transactions';
 import useStellarSelectionWalletContract from './useStellarSelectionWalletContract';
 
 interface ClaimingState {
+  /** The one-transaction retrieval of everything PrizesWallet holds for the wallet. */
+  everything: boolean;
   raffleETH: boolean;
   donatedNFT: boolean;
   donatedERC20: boolean;
+}
+
+/** What `retrieveEverything` sends in its single `withdrawEverything` transaction. */
+export interface RetrieveEverythingRequest {
+  /** Cycles with unretrieved ETH (duplicates are dropped). */
+  ethRounds: readonly number[];
+  /** Attached ERC-20 tokens, with raw base-unit amounts. */
+  tokenClaims: readonly TokenClaim[];
+  /** PrizesWallet indexes of attached NFTs. */
+  nftIndexes: readonly number[];
+  /** The success toast, written by the page that knows what was retrieved. */
+  successMessage: string;
 }
 
 type ClaimingFlag = keyof ClaimingState;
@@ -21,8 +36,10 @@ type ClaimingFlag = keyof ClaimingState;
 const NOT_RUN: TxResult = { status: 'aborted' };
 
 /**
- * Retrieve operations for the My Allocations page: Stellar Selection ETH,
- * attached NFTs (single + batch) and attached ERC-20 tokens.
+ * Retrieve operations for the My Allocations page: everything at once
+ * (`withdrawEverything`: ETH, attached ERC-20 tokens and attached NFTs in one
+ * transaction), Stellar Selection ETH, attached NFTs (single + batch) and
+ * attached ERC-20 tokens (single + batch).
  *
  * Every write runs through `useTxFlow`: the chain guard, the single lifecycle
  * toast (confirm in wallet → pending with an explorer link → confirmed), a
@@ -41,11 +58,14 @@ export function useClaimAllocations(onSuccess?: () => void) {
   const { run: runTx, stage: txStage } = useTxFlow();
 
   const [isClaiming, setIsClaiming] = useState<ClaimingState>({
+    everything: false,
     raffleETH: false,
     donatedNFT: false,
     donatedERC20: false,
   });
   const [claimingDonatedNFTs, setClaimingDonatedNFTs] = useState<number[]>([]);
+  /** `tokenClaimKey`s of the attached tokens being retrieved one by one. */
+  const [claimingDonatedTokens, setClaimingDonatedTokens] = useState<string[]>([]);
 
   // Post-transaction effects must never setState on an unmounted component
   // (the person can navigate away while a transaction is pending).
@@ -107,11 +127,41 @@ export function useClaimAllocations(onSuccess?: () => void) {
     [],
   );
 
+  const retrieveEverything = useCallback(
+    async ({
+      ethRounds,
+      tokenClaims,
+      nftIndexes,
+      successMessage,
+    }: RetrieveEverythingRequest): Promise<void> => {
+      await withFlag('everything', () =>
+        retrieve(
+          (contract) => {
+            // Inside the flow, so a display-unit amount fails like any other
+            // write, before anything is sent.
+            const tokens = tokenClaims.map((claim) => ({
+              ...claim,
+              amount: toDonatedErc20ClaimAmountBigInt(claim.amount),
+            }));
+            return contract.write.withdrawEverything?.([
+              uniqueRounds(ethRounds),
+              tokens,
+              [...new Set(nftIndexes)],
+            ]);
+          },
+          successMessage,
+          'retrieve everything',
+        ),
+      );
+    },
+    [retrieve, withFlag],
+  );
+
   const retrieveAllStellarSelectionETH = useCallback(
-    async (roundNums: number[]): Promise<void> => {
+    async (roundNums: readonly number[]): Promise<void> => {
       await withFlag('raffleETH', () =>
         retrieve(
-          (contract) => contract.write.withdrawEverything?.([roundNums, [], []]),
+          (contract) => contract.write.withdrawEverything?.([uniqueRounds(roundNums), [], []]),
           t('claim.stellarEthSuccess'),
           'retrieve all Stellar Selection ETH',
         ),
@@ -157,8 +207,10 @@ export function useClaimAllocations(onSuccess?: () => void) {
       tokenAddr: string,
       amount: string | number | bigint,
     ): Promise<void> => {
-      await withFlag('donatedERC20', () =>
-        retrieve(
+      const key = tokenClaimKey(roundNum, tokenAddr);
+      setClaimingDonatedTokens((prev) => [...prev, key]);
+      try {
+        await retrieve(
           (contract) =>
             contract.write.claimDonatedToken?.([
               roundNum,
@@ -167,10 +219,14 @@ export function useClaimAllocations(onSuccess?: () => void) {
             ]),
           t('claim.tokenSuccess'),
           'retrieve attached ERC20 token',
-        ),
-      );
+        );
+      } finally {
+        if (mountedRef.current) {
+          setClaimingDonatedTokens((prev) => prev.filter((pending) => pending !== key));
+        }
+      }
     },
-    [retrieve, t, withFlag],
+    [retrieve, t],
   );
 
   const claimAllDonatedERC20 = useCallback(
@@ -203,8 +259,10 @@ export function useClaimAllocations(onSuccess?: () => void) {
   return {
     isClaiming,
     claimingDonatedNFTs,
+    claimingDonatedTokens,
     /** Shared lifecycle of the latest retrieve, for a `TxStatus` strip. */
     txStage,
+    retrieveEverything,
     retrieveAllStellarSelectionETH,
     claimDonatedNFT,
     claimAllDonatedNFTs,

@@ -35,6 +35,11 @@
  *                       tail of secondary tables, badges, and admin-gated
  *                       routes (get_banned_bids answers 403 to ordinary
  *                       clients) where an empty result is a truthful answer.
+ *
+ * A read that rejects does so with an `ApiReadError` (./readError) carrying the
+ * HTTP status, so a page can tell a record the server does not hold
+ * (`isRecordNotFound`: `rounds/info/{n}` answers 400 for the live cycle) from a
+ * read that failed.
  */
 import axios, {
   isAxiosError,
@@ -53,6 +58,7 @@ import {
 } from '@/lib/serverRotation';
 import { reportError } from '@/utils/errors';
 
+import { ApiReadError } from './readError';
 import type { RoundInfo } from './types';
 
 /** True when the failed request was aimed at our Cosmic Game or main NFT API (not arbitrary third-party URLs). */
@@ -500,13 +506,18 @@ export function assertApiEnvelope(response: AxiosResponse): void {
 /**
  * Normalizes a failed read into the error React Query surfaces.
  *
- * Transport failures collapse to one message (the status is already on the
- * Sentry report); schema mismatches and backend envelope errors keep their own
- * message, which is the part that says *which field* broke.
+ * Transport failures collapse to one message (the detail is already on the
+ * Sentry report) but keep the HTTP status, which is what tells "no such
+ * record" from "the read failed"; schema mismatches and backend envelope
+ * errors keep their own message, which is the part that says *which field*
+ * broke.
  */
 function toReadError(err: unknown): Error {
   if (!isAxiosError(err) && err instanceof Error) return err;
-  return new Error('Network response was not OK');
+  return new ApiReadError(
+    'Network response was not OK',
+    isAxiosError(err) ? err.response?.status : undefined,
+  );
 }
 
 /**

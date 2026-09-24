@@ -3,10 +3,11 @@
 import { MessageSquare } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { formatSeconds, shortenHex } from '@/utils';
+import { shortenHex } from '@/utils';
 
 import { useHydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import type { ChampionsState } from '@/hooks/useChampions';
+import { useFormat } from '@/hooks/useFormat';
 import { Link } from '@/i18n/navigation';
 import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
@@ -46,6 +47,11 @@ export interface LatestParticipantDetailsProps {
   dashboard?: boolean;
 }
 
+/** The 6px mark of something changing right now; the text beside it is the word. */
+function LiveDot() {
+  return <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-live" />;
+}
+
 function LatestGestureProgress({
   latest,
   hasEnduranceRecord,
@@ -53,19 +59,20 @@ function LatestGestureProgress({
   dashboard,
 }: Pick<LatestParticipantDetailsProps, 'latest' | 'hasEnduranceRecord' | 'compact' | 'dashboard'>) {
   const t = useTranslations('tables');
-  const locale = useLocale();
+  const format = useFormat();
 
   if (!hasEnduranceRecord) {
     return (
-      <div
+      <p
         data-testid="latest-participant-status"
         className={cn(
-          'rounded-lg border border-emerald-400/20 bg-emerald-400/[0.06] text-xs text-emerald-300',
+          'flex items-center gap-2 rounded-control bg-surface-sunken type-caption text-foreground',
           compact ? 'px-2.5 py-1.5' : 'mt-3 px-3 py-2',
         )}
       >
+        <LiveDot />
         {t('specialAllocation.firstRecordForming')}
-      </div>
+      </p>
     );
   }
 
@@ -75,8 +82,12 @@ function LatestGestureProgress({
     return (
       <p
         data-testid="latest-participant-remaining"
-        className={cn('type-caption text-positive', compact ? 'px-2.5 py-1.5' : 'mt-3 px-3 py-2')}
+        className={cn(
+          'flex items-center gap-2 rounded-control bg-surface-sunken type-caption text-live',
+          compact ? 'px-2.5 py-1.5' : 'mt-3 px-3 py-2',
+        )}
       >
+        <LiveDot />
         {t('specialAllocation.extendingRecord')}
       </p>
     );
@@ -85,24 +96,29 @@ function LatestGestureProgress({
   const progress = Math.floor(latest.progressToEnduranceChampion);
   const remainingCopy = latest.isCurrentEnduranceChampion
     ? t('specialAllocation.needsToExtend', {
-        duration: formatSeconds(latest.secondsUntilEnduranceChampion, locale),
+        duration: format.duration(latest.secondsUntilEnduranceChampion),
       })
     : t('specialAllocation.needsToBecomeChampion', {
-        duration: formatSeconds(latest.secondsUntilEnduranceChampion, locale),
+        duration: format.duration(latest.secondsUntilEnduranceChampion),
       });
 
   return (
     <div
       className={cn(
-        'rounded-lg border border-white/[0.06] bg-black/10',
+        'rounded-control bg-surface-sunken',
         compact ? 'px-2.5 py-1.5' : 'mt-3 px-3 py-2',
       )}
     >
       <div className="flex items-center justify-between gap-3">
-        <span data-testid="latest-participant-remaining" className="text-xs text-muted-foreground">
+        <span
+          data-testid="latest-participant-remaining"
+          className="type-caption text-muted-foreground"
+        >
           {remainingCopy}
         </span>
-        <span className="shrink-0 font-mono text-xs tabular-nums text-primary">{progress}%</span>
+        <span className="shrink-0 text-xs font-medium tabular-nums slashed-zero text-foreground">
+          {format.percent(progress)}
+        </span>
       </div>
       <div
         role="progressbar"
@@ -110,18 +126,18 @@ function LatestGestureProgress({
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={progress}
-        className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/[0.08]"
+        className="mt-1.5 h-1.5 overflow-hidden rounded-pill bg-rule"
       >
         <div
-          className="h-full rounded-full bg-gradient-to-r from-primary to-accent transition-all duration-500"
+          className="h-full rounded-pill bg-primary transition-[width] duration-slow motion-reduce:transition-none"
           style={{ width: `${latest.progressToEnduranceChampion}%` }}
         />
       </div>
       {!dashboard && latest.durationToBeat > 0 && (
-        <p className="mt-1 text-[10px] text-muted-foreground">
+        <p className="mt-1 type-caption text-subtle">
           {t('specialAllocation.progressAmounts', {
-            current: formatSeconds(latest.holdDuration, locale),
-            target: formatSeconds(latest.durationToBeat, locale),
+            current: format.duration(latest.holdDuration),
+            target: format.duration(latest.durationToBeat),
           })}
         </p>
       )}
@@ -166,6 +182,9 @@ function LatestGestureDetails({
         : t('status.no')
     : t('status.unavailable');
   const gestureAddress = latestGesture?.BidderAddr ?? latestAddress;
+  const syncingCopy = gestureDetailsPending
+    ? t('specialAllocation.gestureDetailsSyncing')
+    : t('specialAllocation.gestureDetailsUnavailable');
 
   if (dashboard) {
     return (
@@ -173,14 +192,14 @@ function LatestGestureDetails({
         {latestGesture &&
           gestureAddress &&
           gestureAddress.toLowerCase() !== latestAddress?.toLowerCase() && (
-            <p className="mb-1 flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
+            <p className="mb-1 flex flex-wrap items-center gap-1 type-caption text-subtle">
               {t('specialAllocation.gestureBy')}
               <Link
                 href={`/user/${gestureAddress}`}
                 aria-label={gestureAddress}
                 title={gestureAddress}
                 className={cn(
-                  'font-mono text-foreground hover:text-primary',
+                  'type-mono-sm text-foreground transition-colors duration-fast hover:text-primary',
                   TOUCH_TARGET_TEXT_LINK_CLASS,
                 )}
               >
@@ -192,11 +211,9 @@ function LatestGestureDetails({
           <p
             data-testid="latest-participant-gesture-syncing"
             role="status"
-            className="py-2 text-xs leading-relaxed text-muted-foreground"
+            className="py-2 type-caption text-muted-foreground"
           >
-            {gestureDetailsPending
-              ? t('specialAllocation.gestureDetailsSyncing')
-              : t('specialAllocation.gestureDetailsUnavailable')}
+            {syncingCopy}
           </p>
         ) : (
           <div className="grid grid-cols-2 gap-x-3 gap-y-2 @min-[340px]/gesture:grid-cols-3 @min-[680px]/gesture:grid-cols-6">
@@ -204,7 +221,6 @@ function LatestGestureDetails({
               testId="latest-participant-paid-amount"
               label={t('specialAllocation.amountPaid')}
               value={formatGesturePayment(latestGesture, t('status.unavailable'))}
-              tone="emerald"
               unframed
             />
             <DetailMetric
@@ -214,7 +230,6 @@ function LatestGestureDetails({
                 getParticipationCST(latestGesture),
                 t('status.unavailable'),
               )}
-              tone="emerald"
               unframed
             />
             <div className="min-w-0">
@@ -226,7 +241,7 @@ function LatestGestureDetails({
               {hasRandomWalkToken(latestGesture) && (
                 <p
                   data-testid="latest-participant-random-walk"
-                  className="mt-0.5 text-xs leading-4 text-muted-foreground"
+                  className="mt-0.5 type-caption text-subtle"
                 >
                   {randomWalkStatus}
                 </p>
@@ -251,9 +266,9 @@ function LatestGestureDetails({
             {getAttachedAssetLabels(latestGesture).length > 0 && (
               <dl
                 data-testid="latest-participant-attached-assets"
-                className="col-span-full flex flex-wrap gap-x-1 text-xs leading-4"
+                className="col-span-full flex flex-wrap gap-x-1 type-caption"
               >
-                <dt className="text-muted-foreground">{t('specialAllocation.attachedAssets')}</dt>
+                <dt className="text-subtle">{t('specialAllocation.attachedAssets')}</dt>
                 <dd className="font-medium text-foreground">
                   {formatAttachedAssets(latestGesture, t('status.none'))}
                 </dd>
@@ -269,23 +284,22 @@ function LatestGestureDetails({
     <div
       data-testid="latest-participant-gesture-details"
       className={cn(
-        '@container/gesture rounded-xl border border-emerald-400/20 bg-gradient-to-br from-emerald-400/[0.07] via-white/[0.025] to-transparent shadow-[0_0_30px_-22px_rgba(52,211,153,0.75)]',
-        compact ? 'p-2.5' : 'mt-3 p-3',
+        '@container/gesture min-w-0',
+        compact
+          ? 'rounded-control bg-surface-sunken p-2.5'
+          : 'mt-3 border-t border-rule-faint pt-3',
       )}
     >
-      <div className="mb-1.5 flex items-center gap-2">
-        <div className="h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_12px_rgba(110,231,183,0.9)]" />
-        <p className="text-[10px] font-medium uppercase tracking-wider text-emerald-300">
-          {t('specialAllocation.lastGesture')}
-        </p>
+      <div className="mb-1.5 flex flex-wrap items-center gap-x-2">
+        <p className="type-label text-muted-foreground">{t('specialAllocation.lastGesture')}</p>
         {latestGesture && gestureAddress && (
-          <span className="ml-auto flex min-w-0 items-center gap-1 text-[9px] text-muted-foreground">
+          <span className="ml-auto flex min-w-0 items-center gap-1 type-caption text-subtle">
             <span>{t('specialAllocation.gestureBy')}</span>
             <Link
               href={`/user/${gestureAddress}`}
               aria-label={gestureAddress}
               className={cn(
-                'shrink-0 font-mono text-foreground transition-colors hover:text-primary',
+                'shrink-0 type-mono-sm text-foreground transition-colors duration-fast hover:text-primary',
                 TOUCH_TARGET_TEXT_LINK_CLASS,
               )}
               title={gestureAddress}
@@ -299,74 +313,77 @@ function LatestGestureDetails({
         <div
           data-testid="latest-participant-gesture-syncing"
           role="status"
-          className="flex min-h-20 items-center rounded-lg border border-white/[0.06] bg-black/10 px-3 py-2 text-xs leading-relaxed text-muted-foreground"
+          className={cn(
+            'flex min-h-20 items-center py-2 type-caption text-muted-foreground',
+            !compact && 'rounded-control bg-surface-sunken px-3',
+          )}
         >
-          {gestureDetailsPending
-            ? t('specialAllocation.gestureDetailsSyncing')
-            : t('specialAllocation.gestureDetailsUnavailable')}
+          {syncingCopy}
         </div>
       ) : (
-        <>
-          <div
-            className={cn(
-              'grid gap-1.5',
-              compact ? 'grid-cols-2 @min-[420px]/gesture:grid-cols-3' : 'sm:grid-cols-2',
+        <div
+          className={cn(
+            'grid',
+            compact
+              ? 'grid-cols-2 gap-x-3 gap-y-2 @min-[420px]/gesture:grid-cols-3'
+              : 'gap-1.5 @min-[420px]/gesture:grid-cols-2',
+          )}
+        >
+          <DetailMetric
+            testId="latest-participant-paid-amount"
+            label={t('specialAllocation.amountPaid')}
+            value={formatGesturePayment(latestGesture, t('status.unavailable'))}
+            unframed={compact}
+          />
+          <DetailMetric
+            label={t('specialAllocation.method')}
+            value={formatGestureMethod(latestGesture, t('status.unknown'))}
+            unframed={compact}
+          />
+          <DetailMetric
+            testId="latest-participant-cst-received"
+            label={t('specialAllocation.cstReceived')}
+            value={formatReceivedCstAmount(
+              getParticipationCST(latestGesture),
+              t('status.unavailable'),
             )}
-          >
+            unframed={compact}
+          />
+          <DetailMetric
+            testId="latest-participant-random-walk"
+            label={t('specialAllocation.randomWalk')}
+            value={randomWalkStatus}
+            unframed={compact}
+          />
+          <DetailMetric
+            label={t('specialAllocation.gestureTime')}
+            value={hasGestureTime ? gestureTime : t('status.unavailable')}
+            unframed={compact}
+          />
+          <DetailMetric
+            testId="latest-participant-gesture-id"
+            label={t('specialAllocation.gesturePosition')}
+            value={
+              typeof latestGesture.BidPosition === 'number'
+                ? `#${latestGesture.BidPosition}`
+                : t('status.unavailable')
+            }
+            unframed={compact}
+          />
+          {getAttachedAssetLabels(latestGesture).length > 0 && (
             <DetailMetric
-              testId="latest-participant-paid-amount"
-              label={t('specialAllocation.amountPaid')}
-              value={formatGesturePayment(latestGesture, t('status.unavailable'))}
-              tone="emerald"
-              compact={compact}
-            />
-            <DetailMetric
-              label={t('specialAllocation.method')}
-              value={formatGestureMethod(latestGesture, t('status.unknown'))}
-              compact={compact}
-            />
-            <DetailMetric
-              testId="latest-participant-cst-received"
-              label={t('specialAllocation.cstReceived')}
-              value={formatReceivedCstAmount(
-                getParticipationCST(latestGesture),
-                t('status.unavailable'),
-              )}
-              tone="emerald"
-              compact={compact}
-            />
-            <DetailMetric
-              testId="latest-participant-random-walk"
-              label={t('specialAllocation.randomWalk')}
-              value={randomWalkStatus}
-              compact={compact}
-            />
-            <DetailMetric
-              label={t('specialAllocation.gestureTime')}
-              value={hasGestureTime ? gestureTime : t('status.unavailable')}
-              compact={compact}
-            />
-            <DetailMetric
-              testId="latest-participant-gesture-id"
-              label={t('specialAllocation.gesturePosition')}
-              value={
-                typeof latestGesture.BidPosition === 'number'
-                  ? `#${latestGesture.BidPosition}`
-                  : t('status.unavailable')
+              testId="latest-participant-attached-assets"
+              label={t('specialAllocation.attachedAssets')}
+              value={formatAttachedAssets(latestGesture, t('status.none'))}
+              unframed={compact}
+              className={
+                compact
+                  ? 'col-span-2 @min-[420px]/gesture:col-span-3'
+                  : '@min-[420px]/gesture:col-span-2'
               }
-              compact={compact}
             />
-            {getAttachedAssetLabels(latestGesture).length > 0 && (
-              <DetailMetric
-                testId="latest-participant-attached-assets"
-                label={t('specialAllocation.attachedAssets')}
-                value={formatAttachedAssets(latestGesture, t('status.none'))}
-                compact={compact}
-                className={compact ? 'col-span-2 @min-[420px]/gesture:col-span-3' : undefined}
-              />
-            )}
-          </div>
-        </>
+          )}
+        </div>
       )}
     </div>
   );
@@ -377,7 +394,9 @@ function LatestGestureDetails({
  *
  * It deliberately distinguishes the CST already received from the current
  * gesture from the allocation package the participant is merely in line for
- * if the cycle finalizes now.
+ * if the cycle finalizes now. Inside a card it groups with hairlines and
+ * sunken wells, never a second bordered box; amounts stay in ink, and only
+ * the forming record carries the live colour.
  */
 export function LatestParticipantDetails({
   latest,
@@ -418,20 +437,16 @@ export function LatestParticipantDetails({
         <div
           data-testid="latest-participant-allocation-package"
           className={cn(
-            'rounded-lg border border-primary/20 bg-primary/[0.055]',
+            'rounded-control bg-surface-sunken',
             compact ? 'px-2.5 py-2' : 'mt-3 px-3 py-2.5',
           )}
         >
-          <p className="text-[10px] font-medium uppercase tracking-wider text-primary/90">
-            {allocationPackage.label}
-          </p>
-          <p className="mt-0.5 text-xs font-semibold text-foreground">
+          <p className="type-caption text-subtle">{allocationPackage.label}</p>
+          <p className="mt-0.5 type-label tabular-nums slashed-zero text-foreground">
             {allocationPackage.primary}
           </p>
           {allocationPackage.secondary && (
-            <p className="mt-0.5 text-[10px] leading-relaxed text-muted-foreground">
-              {allocationPackage.secondary}
-            </p>
+            <p className="mt-0.5 type-caption text-subtle">{allocationPackage.secondary}</p>
           )}
         </div>
       )}
@@ -439,12 +454,14 @@ export function LatestParticipantDetails({
         <div
           data-testid="latest-participant-message"
           className={cn(
-            'flex items-start gap-2 rounded-lg bg-white/[0.03]',
-            dashboard ? 'py-1' : compact ? 'p-2.5' : 'mt-3 p-3',
+            'flex items-start gap-2',
+            dashboard
+              ? 'py-1'
+              : cn('rounded-control bg-surface-sunken', compact ? 'p-2.5' : 'mt-3 p-3'),
           )}
         >
-          <MessageSquare className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground/50" />
-          <p className="line-clamp-2 break-words text-xs text-amber-300/90">
+          <MessageSquare aria-hidden className="mt-0.5 size-3.5 shrink-0 text-subtle" />
+          <p className="line-clamp-2 break-words type-caption text-muted-foreground">
             &ldquo;{cleanMessage}&rdquo;
           </p>
         </div>

@@ -116,7 +116,7 @@
       "description": "프로토콜 매개변수의 모든 변경"
     },
     "retrievedAllocations": {
-      "label": "회수된 배분",
+      "label": "마감된 배분",
       "description": "마감된 사이클의 배분 기록"
     },
     "howItWorks": {

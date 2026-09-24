@@ -116,7 +116,7 @@
       "description": "Every change to the protocol’s parameters"
     },
     "retrievedAllocations": {
-      "label": "Retrieved Allocations",
+      "label": "Finalized Allocations",
       "description": "Allocation records across finalized cycles"
     },
     "howItWorks": {

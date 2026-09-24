@@ -1,119 +1,154 @@
-import { checkA11y, render, screen } from '@/test-utils';
+import userEvent from '@testing-library/user-event';
+
+import { checkA11y, render, screen, within } from '@/test-utils';
 
 import UserStellarSelectionNFTPage from '../stellar-selection-nft/[address]/UserStellarSelectionNFTPage';
 
-const mockUseStellarSelectionNFTAllocationsByUser = jest.fn().mockReturnValue({
-  data: undefined,
-  isLoading: false,
-  error: null,
-});
+const ADDRESS = '0x1234567890123456789012345678901234567890';
 
+const mockUseStellarSelectionNFTAllocationsByUser = jest.fn();
 jest.mock('../../../../../hooks/useApiQuery', () => ({
   useStellarSelectionNFTAllocationsByUser: (...args: unknown[]) =>
     mockUseStellarSelectionNFTAllocationsByUser(...args),
+  useCSTList: () => mockUseCSTList(),
 }));
 
-beforeEach(() => jest.clearAllMocks());
+const mockUseCSTList = jest.fn();
+const INDEX = {
+  data: [
+    { TokenId: 42, Seed: 'abc123', TokenName: 'Orbit Study' },
+    { TokenId: 43, Seed: 'def456', TokenName: '' },
+  ],
+  isLoading: false,
+};
+
+const ROWS = [
+  {
+    EvtLogId: 1,
+    TxHash: '0xabc',
+    TimeStamp: 1_700_000_000,
+    RoundNum: 1,
+    IsRWalk: false,
+    IsStaker: false,
+    TokenId: 42,
+  },
+  {
+    EvtLogId: 2,
+    TxHash: '0xdef',
+    TimeStamp: 1_700_000_100,
+    RoundNum: 2,
+    IsRWalk: true,
+    IsStaker: true,
+    TokenId: 43,
+  },
+];
+
+const mockRefetch = jest.fn();
+
+function withRows(data: unknown, isLoading = false) {
+  mockUseStellarSelectionNFTAllocationsByUser.mockReturnValue({
+    data,
+    isLoading,
+    refetch: mockRefetch,
+  });
+}
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  withRows(ROWS);
+  mockUseCSTList.mockReturnValue(INDEX);
+});
 
 describe('UserStellarSelectionNFTPage', () => {
-  const validAddr = '0x1234567890123456789012345678901234567890';
-
-  it('shows loading when query is loading', () => {
-    mockUseStellarSelectionNFTAllocationsByUser.mockReturnValue({
-      data: undefined,
-      isLoading: true,
-      error: null,
-    });
-    render(<UserStellarSelectionNFTPage address={validAddr} />);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
-  });
-
-  it('shows invalid address message for bad addresses', () => {
-    mockUseStellarSelectionNFTAllocationsByUser.mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      error: null,
-    });
-    render(<UserStellarSelectionNFTPage address="bad" />);
-    expect(screen.getByText('Invalid Address')).toBeInTheDocument();
-  });
-
-  it('renders winnings after loading', () => {
-    mockUseStellarSelectionNFTAllocationsByUser.mockReturnValue({
-      data: [
-        {
-          EvtLogId: 1,
-          TxHash: '0xabc',
-          TimeStamp: 1000000,
-          RoundNum: 1,
-          IsRWalk: false,
-          IsStaker: true,
-          TokenId: 42,
-        },
-      ],
-      isLoading: false,
-      error: null,
-    });
-    render(<UserStellarSelectionNFTPage address={validAddr} />);
+  it('shows each Signature on its plate with a wall label, newest first', () => {
+    render(<UserStellarSelectionNFTPage address={ADDRESS} />);
     expect(
-      screen.getByText('Stellar Selection NFTs allocated to this participant'),
+      screen.getByRole('heading', { level: 1, name: 'Stellar Selection · NFTs' }),
+    ).toBeInTheDocument();
+
+    const cards = screen.getAllByRole('figure');
+    expect(cards).toHaveLength(2);
+    // The newest is token 43, unnamed: it reads by its number.
+    expect(
+      within(cards[0]!).getByRole('link', { name: 'Cosmic Signature #000043' }),
+    ).toHaveAttribute('href', '/detail/43');
+    // Two short tags, so neither wraps into a box that fills a phone column.
+    expect(cards[0]).toHaveTextContent('Anchor-holder');
+    expect(cards[0]).toHaveTextContent('Random Walk');
+    expect(within(cards[1]!).getByRole('link', { name: 'Orbit Study' })).toBeInTheDocument();
+    expect(cards[1]).toHaveTextContent('#000042');
+    expect(cards[1]).toHaveTextContent('Participant');
+  });
+
+  it('counts the NFTs and the cycles they came from', () => {
+    const { container } = render(<UserStellarSelectionNFTPage address={ADDRESS} />);
+    expect(container.querySelector('[data-figure="count"]')).toHaveTextContent('2');
+    expect(container.querySelector('[data-figure="cycles"]')).toHaveTextContent('2');
+  });
+
+  it('holds the grid with pending plates while it loads', () => {
+    withRows(undefined, true);
+    render(<UserStellarSelectionNFTPage address={ADDRESS} />);
+    expect(screen.getByRole('list', { name: 'Stellar Selection NFTs' })).toHaveAttribute(
+      'aria-busy',
+      'true',
+    );
+    expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+  });
+
+  it('shows the designed empty state', () => {
+    withRows([]);
+    render(<UserStellarSelectionNFTPage address={ADDRESS} />);
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'No Stellar Selection NFTs yet' }),
     ).toBeInTheDocument();
   });
 
-  it('shows empty state when no winnings', () => {
+  it('shows a failed read as an error with a retry, never as "no NFTs yet"', async () => {
     mockUseStellarSelectionNFTAllocationsByUser.mockReturnValue({
-      data: [],
+      data: undefined,
       isLoading: false,
-      error: null,
+      isError: true,
+      refetch: mockRefetch,
     });
-    render(<UserStellarSelectionNFTPage address={validAddr} />);
-    expect(screen.getByText('No NFT allocations yet.')).toBeInTheDocument();
+    render(<UserStellarSelectionNFTPage address={ADDRESS} />);
+    expect(
+      screen.getByRole('heading', { level: 2, name: "Couldn't load the Stellar Selection NFTs" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('No Stellar Selection NFTs yet')).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: /try again/i }));
+    expect(mockRefetch).toHaveBeenCalledTimes(1);
   });
 
-  it('sorts winnings by timestamp descending', () => {
-    mockUseStellarSelectionNFTAllocationsByUser.mockReturnValue({
-      data: [
-        {
-          EvtLogId: 1,
-          TxHash: '0x1',
-          TimeStamp: 100,
-          RoundNum: 1,
-          IsRWalk: false,
-          IsStaker: false,
-          TokenId: 1,
-        },
-        {
-          EvtLogId: 2,
-          TxHash: '0x2',
-          TimeStamp: 300,
-          RoundNum: 2,
-          IsRWalk: true,
-          IsStaker: true,
-          TokenId: 2,
-        },
-        {
-          EvtLogId: 3,
-          TxHash: '0x3',
-          TimeStamp: 200,
-          RoundNum: 3,
-          IsRWalk: false,
-          IsStaker: false,
-          TokenId: 3,
-        },
-      ],
+  it('holds busy plates while the collection index loads, never "Artwork unavailable"', () => {
+    mockUseCSTList.mockReturnValue({ data: undefined, isLoading: true });
+    render(<UserStellarSelectionNFTPage address={ADDRESS} />);
+    for (const plate of screen.getAllByTestId('pending-plate')) {
+      expect(plate).toHaveAttribute('aria-busy', 'true');
+    }
+    expect(screen.queryByText('detail.image.artworkUnavailable')).not.toBeInTheDocument();
+  });
+
+  it('says once that the artwork could not be loaded when the index fails', () => {
+    mockUseCSTList.mockReturnValue({
+      data: undefined,
       isLoading: false,
-      error: null,
+      isError: true,
+      refetch: jest.fn(),
     });
-    render(<UserStellarSelectionNFTPage address={validAddr} />);
+    render(<UserStellarSelectionNFTPage address={ADDRESS} />);
+    expect(screen.getAllByText("The artwork couldn't be loaded")).toHaveLength(1);
+  });
+
+  it('explains an address that is not an address', () => {
+    render(<UserStellarSelectionNFTPage address="bad" />);
     expect(
-      screen.getByText('Stellar Selection NFTs allocated to this participant'),
+      screen.getByRole('heading', { level: 1, name: 'Not a valid address' }),
     ).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(
-      <UserStellarSelectionNFTPage address="0x1234567890123456789012345678901234567890" />,
-    );
+    const { container } = render(<UserStellarSelectionNFTPage address={ADDRESS} />);
     await checkA11y(container);
   });
 });

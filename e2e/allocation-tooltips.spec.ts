@@ -1,6 +1,11 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
-import { expectAllLabelTooltips } from './tooltip-helpers';
+import {
+  dismissOpenTooltips,
+  expectAllLabelTooltips,
+  expectTooltipFullyVisible,
+  openTooltip,
+} from './tooltip-helpers';
 
 const ALLOCATION_LIST_TOOLTIPS = [
   {
@@ -8,67 +13,69 @@ const ALLOCATION_LIST_TOOLTIPS = [
     expected: /Active cycles and separate allocation retrieval records are excluded/,
   },
   {
-    label: 'Cycle Reserve Split',
+    label: 'Cycle reserve split',
     expected: /ETH reserve is allocated across protocol tracks/,
   },
+];
+
+/** Split legend entries and role names explain themselves: the word is the trigger. */
+const ALLOCATION_LIST_TERMS = [
   {
-    label: 'Signature',
-    expected: /main ETH allocation/,
+    label: 'Signature Allocation',
+    expected: /retrieved by the participant who made the Final Gesture/,
   },
-  {
-    label: 'Stellar ETH',
-    expected: /selection frequency/,
-  },
-  {
-    label: 'Next cycle',
-    expected: /compounds into the next Performance Cycle/,
-  },
+  { label: 'Stellar Selection', expected: /randomly selected participants/ },
+  { label: 'Next cycle', expected: /Compounding Cycle Reserve/ },
 ];
 
 const ALLOCATION_DETAIL_TOOLTIPS = [
   {
-    label: 'Signature Allocation ETH',
+    label: 'Signature Allocation',
     expected: /ETH portion of the Signature Allocation retrieved by the participant/,
   },
   {
-    label: 'Public Goods',
-    expected: /Public Goods Beneficiary/,
+    label: 'Recipients',
+    expected: /received at least one allocation this cycle/,
   },
   {
-    label: 'Anchor Distribution',
-    expected: /distributed in proportion to each wallet's number of anchored Cosmic Signature NFTs/,
+    label: 'Allocation distribution',
+    expected: /How the ETH distributed this cycle splits across allocation tracks/,
   },
   {
-    label: 'Stellar Selection Pool',
-    expected: /allocated to the Stellar Selection pool/,
-  },
-  {
-    label: 'Total Gestures',
-    expected: /total number of gestures made during this cycle/,
-  },
-  {
-    label: 'Attached NFTs',
-    expected: /NFTs attached to gestures by participants/,
-  },
-  {
-    label: 'Total Contributed',
-    expected: /ERC-20 token contributions attached to gestures/,
-  },
-  {
-    label: 'Cycle Statistics',
+    label: 'Cycle statistics',
     expected: /Key metrics summarizing this cycle/,
   },
   {
-    label: 'Allocation Distribution',
-    expected: /How the ETH distributed this cycle splits across allocation tracks/,
+    label: 'Contributed ETH',
+    expected: /Direct ETH contributions from the community/,
   },
 ];
+
+const ALLOCATION_DETAIL_TERMS = [
+  { label: 'Chrono-Warrior', expected: /Endurance Champion/ },
+  { label: 'Public Goods', expected: /Public Goods Beneficiary/ },
+];
+
+async function expectTermTooltips(
+  page: Page,
+  terms: readonly { label: string; expected: RegExp }[],
+): Promise<void> {
+  for (const { label, expected } of terms) {
+    await dismissOpenTooltips(page);
+    const trigger = page.getByRole('button', { name: label, exact: true }).first();
+    await trigger.scrollIntoViewIfNeeded();
+    await openTooltip(trigger);
+    await expectTooltipFullyVisible(page, expected);
+    await dismissOpenTooltips(page);
+  }
+}
 
 test.describe('/allocation tooltips', () => {
   test('opens representative allocation list tooltips', async ({ page }) => {
     await page.goto('/allocation', { waitUntil: 'networkidle' });
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await expectAllLabelTooltips(page, ALLOCATION_LIST_TOOLTIPS);
+    await expectTermTooltips(page, ALLOCATION_LIST_TERMS);
   });
 
   test('opens allocation list recipient tooltip from the Radix replacement for title=', async ({
@@ -87,5 +94,6 @@ test.describe('/allocation tooltips', () => {
     await page.goto('/allocation/1', { waitUntil: 'networkidle' });
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await expectAllLabelTooltips(page, ALLOCATION_DETAIL_TOOLTIPS);
+    await expectTermTooltips(page, ALLOCATION_DETAIL_TERMS);
   });
 });

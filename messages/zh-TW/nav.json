@@ -116,7 +116,7 @@
       "description": "協議參數的每一次變更"
     },
     "retrievedAllocations": {
-      "label": "已取回分配",
+      "label": "已收官的分配",
       "description": "各已收官週期的分配紀錄"
     },
     "howItWorks": {

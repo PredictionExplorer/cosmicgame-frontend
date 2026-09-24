@@ -1,25 +1,34 @@
 'use client';
 
+import { ArrowRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { getLocaleConfig } from '@/i18n/localeConfig';
-import { PageShell } from '@/components/ui/page-shell';
-import { useActiveWeb3React } from '@/hooks/web3';
-import RecipientHistoryTable from '@/components/tables/RecipientHistoryTable';
-import { useClaimHistoryByUser } from '@/hooks/useApiQuery';
-import { ErrorState } from '@/components/ui/error-state';
-import { EmptyState } from '@/components/ui/empty-state';
-import { WalletRequiredState } from '@/components/wallet/WalletRequiredState';
+import { Link } from '@/i18n/navigation';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { useSiteNavCopy } from '@/components/layout/siteNavCopy';
+import { buttonVariants } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
+import { PageShell } from '@/components/ui/page-shell';
+import RecipientHistoryTable from '@/components/tables/RecipientHistoryTable';
+import { WalletRequiredState } from '@/components/wallet/WalletRequiredState';
+import { useClaimHistoryByUser } from '@/hooks/useApiQuery';
+import { useActiveWeb3React } from '@/hooks/web3';
+import { AllocationIcon } from '@/lib/conceptIcons';
 
+/**
+ * Every allocation the connected wallet has received, across all finalized
+ * cycles, with whether each was retrieved. Retrieval itself happens on My
+ * Allocations, which the header links.
+ */
 function WinningHistory() {
   const t = useTranslations('statistics');
   const tWallet = useTranslations('wallet');
+  const nav = useSiteNavCopy();
   const locale = useLocale();
   const { account } = useActiveWeb3React();
-  const { data, isLoading: loading, error: queryError } = useClaimHistoryByUser(account);
-  const winningHistory = data ?? null;
-  const error = queryError?.message ?? null;
+  const { data, isLoading, error, refetch } = useClaimHistoryByUser(account);
 
   if (!account) {
     return (
@@ -38,38 +47,53 @@ function WinningHistory() {
     );
   }
 
+  const history = data ?? [];
+
   return (
     <PageShell variant="data" backdrop="signature">
       <PageHeader
         section="account"
-        title={t('recipientHistory.connectedTitle')}
-        subtitle={t('recipientHistory.subtitle')}
+        title={t('recipientHistory.pageTitle')}
+        subtitle={t('recipientHistory.connectedDescription')}
+        related={[
+          { href: '/my-allocations', label: nav.routeLabel('myAllocations') },
+          { href: '/allocation', label: nav.routeLabel('allocationRecipients') },
+        ]}
       />
-      <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        {t('recipientHistory.connectedDescription')}
-      </p>
 
       {error ? (
         <ErrorState
+          headingLevel={2}
           title={t('recipientHistory.loadError')}
           message={
             getLocaleConfig(locale).showRawProviderErrors
-              ? error
+              ? error.message
               : t('recipientHistory.loadErrorDescription')
           }
+          onRetry={() => void refetch()}
         />
-      ) : !loading && (!winningHistory || winningHistory.length === 0) ? (
+      ) : !isLoading && history.length === 0 ? (
         <EmptyState
+          variant="page"
+          headingLevel={2}
+          icon={<AllocationIcon aria-hidden className="size-6" />}
           title={t('recipientHistory.emptyTitle')}
           description={t('recipientHistory.emptyDescription')}
+          action={
+            <Link href="/" className={buttonVariants({ variant: 'outline', size: 'sm' })}>
+              {nav.routeLabel('observatory')}
+              <ArrowRight aria-hidden className="size-4" />
+            </Link>
+          }
         />
       ) : (
         <RecipientHistoryTable
-          winningHistory={winningHistory ?? []}
-          loading={loading}
+          winningHistory={history}
+          loading={isLoading}
           showClaimedStatus
           showWinnerAddr={false}
           showSummary
+          className="mb-10"
         />
       )}
     </PageShell>

@@ -13,27 +13,36 @@
   },
   "allocations": {
     "title": "自分の配分",
-    "subtitle": "未受け取りの配分をすべて確認して受け取る",
-    "loadErrorTitle": "読み込みに失敗しました",
-    "loadErrorMessage": "未受け取りの配分データを読み込めませんでした",
+    "subtitle": "プロトコルがこのウォレットのために確保した配分を、ここでまとめて受け取れます。",
+    "loadErrorTitle": "配分を読み込めませんでした",
+    "loadErrorMessage": "未受け取りの配分を読み込めませんでした。しばらくしてからもう一度お試しください。",
+    "summary": {
+      "title": "受け取り可能",
+      "description": "1回のトランザクションで、このウォレットのETH、添付されたNFT、添付されたトークンを受け取ります。",
+      "eth": "ETH配分",
+      "nfts": "添付されたNFT",
+      "tokens": "添付されたトークン",
+      "anchor": "係留配分",
+      "cycles": "{count, plural, other {#サイクル分}}",
+      "anchorCaption": "下の欄で個別に受け取ります",
+      "retrieveEverything": "まとめて受け取る",
+      "retrieveBy": "<date></date>までに受け取ってください。期限を過ぎると誰でも受け取れます。",
+      "expired": "受け取り期限は<date></date>に過ぎました。ほかの誰かが受け取るまでは、引き続き受け取れます。",
+      "success": "すべてウォレットに受け取りました。"
+    },
+    "nothing": {
+      "title": "受け取れる配分はありません",
+      "description": "確定したサイクルでこのウォレットにETH、NFT、トークンが配分されると、受け取るまでここに表示されます。"
+    },
     "sections": {
-      "eth": "受け取れるETH配分",
-      "anchors": "Cosmic Signature NFTの係留配分",
+      "eth": "ETH配分",
+      "ethDescription": "星選と時の戦士のETHは、受け取るまでサイクルごとに保管されます。",
+      "anchors": "係留配分",
+      "anchorsDescription": "係留コントラクトが、係留中のCosmic Signature NFTに配分するETHです。",
       "nfts": "添付されたNFT",
       "erc20": "添付されたERC-20トークン"
     },
-    "empty": {
-      "ethTitle": "ETH配分はまだありません",
-      "ethDescription": "一筆を入れると星選の対象になります。ETH配分の受領者に選ばれると、ここで確認できます。",
-      "nftTitle": "添付されたNFTはありません",
-      "nftDescription": "このウォレットに配分された添付NFTがここに表示されます。",
-      "erc20Title": "添付されたトークンはありません",
-      "erc20Description": "このウォレットに配分された添付ERC-20トークンがここに表示されます。"
-    },
-    "retrievable": "受け取り可能：",
-    "retrieving": "受け取り中…",
-    "retrieveAll": "すべて受け取る",
-    "viewHistory": "配分履歴を見る"
+    "retrieveAll": "すべて受け取る"
   },
   "anchors": {
     "title": "自分の係留",
@@ -389,14 +398,42 @@
       "value": "数量（CST）"
     }
   },
-  "stellarSelectionAllocations": {
-    "datetime": "日時",
-    "cycle": "サイクル",
-    "recipient": "受領者",
-    "expirationDate": "有効期限",
-    "amount": "金額（ETH）",
-    "retrieved": "受け取り済み",
-    "expired": "{date}（期限切れ）",
-    "remaining": "{date}（{remaining}）"
+  "ethAllocations": {
+    "columns": {
+      "cycle": "サイクル",
+      "source": "配分元",
+      "allocated": "配分日時",
+      "amount": "金額",
+      "deadline": "受け取り期限",
+      "status": "状態"
+    },
+    "cycle": "サイクル{cycle}",
+    "sources": {
+      "stellarSelection": "星選",
+      "chronoWarrior": "時の戦士"
+    },
+    "status": {
+      "retrieved": "受け取り済み",
+      "waiting": "未受け取り"
+    },
+    "deadline": {
+      "remaining": "残り{remaining}",
+      "expired": "期限切れ",
+      "help": "この日時までは受領者だけがETHを受け取れます。期限後は誰でも受け取れます。"
+    }
+  },
+  "attached": {
+    "columns": {
+      "nft": "NFT",
+      "token": "トークン",
+      "cycle": "サイクル",
+      "contributor": "添付した人",
+      "attached": "添付日時",
+      "amount": "数量",
+      "action": "操作"
+    },
+    "tokenNumber": "トークン#{id}",
+    "retrieve": "受け取る",
+    "retrieveItem": "{item}を受け取る"
   }
 }

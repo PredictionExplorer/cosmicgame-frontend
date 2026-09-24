@@ -102,17 +102,30 @@ describe('AllocationRecipientsPage', () => {
     expect(screen.getByText(`~${protocolFacts.compoundingReservePercentage}%`)).toBeInTheDocument();
   });
 
-  it('renders help tooltips for allocation track labels', () => {
+  it('names every track by its canonical label, which explains itself', () => {
     mockUseRoundList.mockReturnValue({ data: [], isLoading: false });
     render(<AllocationRecipientsPage />);
 
-    for (const track of ['signature', 'chrono', 'stellar', 'anchor', 'publicGoods', 'nextCycle']) {
-      expect(
-        screen.getByRole('button', {
-          name: `More information about allocation.recipients.reserveSplit.tracks.${track}.label`,
-        }),
-      ).toBeInTheDocument();
+    // The labels and definitions are the ones /contracts uses (contracts.funds.segments).
+    for (const label of [
+      'Signature Allocation',
+      'Chrono-Warrior',
+      'Stellar Selection',
+      'Anchor Distribution',
+      'Public Goods',
+      'Next cycle',
+    ]) {
+      expect(screen.getByRole('button', { name: label })).toBeInTheDocument();
     }
+  });
+
+  it('draws the split as one bar that names every share for screen readers', () => {
+    mockUseRoundList.mockReturnValue({ data: [], isLoading: false });
+    render(<AllocationRecipientsPage />);
+    const bar = screen.getByRole('img', { name: /allocation\.recipients\.reserveSplit\.label/ });
+    expect(bar.getAttribute('aria-label')).toContain(
+      `Signature Allocation ${protocolFacts.mainEthPercentage}%`,
+    );
   });
 
   describe('page header', () => {

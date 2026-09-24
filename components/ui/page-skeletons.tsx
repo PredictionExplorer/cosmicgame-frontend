@@ -176,29 +176,32 @@ export function CycleAllocationSkeleton() {
   return (
     <PageShell variant="data" backdrop="signature">
       <LoadingRegion>
-        <div aria-hidden className="mb-10 border-b border-rule-faint pb-10">
-          <Skeleton shine={false} className="mb-6 h-3.5 w-40" />
-          <Skeleton className="h-12 w-56 sm:h-16" />
-          <Skeleton className="mt-4 h-10 w-64" />
-          <div className="mt-5 space-y-2.5">
-            <Skeleton className="h-3.5 w-72" />
-            <Skeleton className="h-3.5 w-56" />
+        <div aria-hidden className="mb-10 border-b border-rule pb-10">
+          <Skeleton shine={false} className="mb-5 h-3.5 w-48" />
+          <Skeleton className="h-10 w-44 sm:h-12" />
+          <div className="mt-8 flex flex-wrap gap-x-12 gap-y-4">
+            {['w-36', 'w-16', 'w-12'].map((width) => (
+              <div key={width} className="space-y-2">
+                <Skeleton shine={false} className="h-3 w-24" />
+                <Skeleton className={cn('h-8', width)} />
+              </div>
+            ))}
           </div>
         </div>
         <Skeleton className="mb-6 h-7 w-52" />
-        <div aria-hidden className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div aria-hidden className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className={cn(panel, 'p-5')}>
-              <div className="flex items-center gap-3">
-                <Skeleton className="size-9 rounded-control" />
-                <Skeleton className="h-4 w-32" />
-              </div>
-              <SkeletonDetailRows announce={false} rows={3} className="mt-3" />
+            <div key={i} className="flex flex-col gap-3">
+              <SkeletonArtPlate />
+              <Skeleton className="h-4 w-3/5" />
+              <Skeleton shine={false} className="h-3.5 w-2/5" />
             </div>
           ))}
         </div>
-        <div className={cn(panel, 'mt-12 p-2 sm:p-3')}>
-          <SkeletonTable announce={false} rows={8} columns={4} />
+        <Skeleton className="mb-6 mt-16 h-7 w-60" />
+        <Skeleton aria-hidden className="h-2.5 w-full rounded-pill" />
+        <div className="mt-12">
+          <SkeletonTable announce={false} rows={6} columns={4} />
         </div>
       </LoadingRegion>
     </PageShell>

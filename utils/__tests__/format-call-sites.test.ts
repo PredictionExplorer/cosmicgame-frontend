@@ -31,14 +31,10 @@ const FIXED_DECIMAL_CALL = /\.toFixed\(|\bformatFixed\(/g;
 
 /** Remaining fixed-decimal calls per file; lower as call sites migrate. */
 const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
-  'app/[locale]/(app)/allocation-finalized/AllocationFinalizedPage.tsx': 1,
-  'app/[locale]/(app)/allocation/[id]/AllocationInfoPage.tsx': 13,
   'app/[locale]/(app)/cosmic-token-transfer/[address]/CosmicTokenTransfersPage.tsx': 1,
   'app/[locale]/(app)/distributions-by-token/[address]/[tokenId]/RewardsByTokenPage.tsx': 2,
   'app/[locale]/(app)/eth-contribution/detail/[id]/EthDonationDetailPage.tsx': 1,
-  'app/[locale]/(app)/my-allocations/MyWinnings.tsx': 1,
   'app/[locale]/(app)/my-anchors/MyAnchors.tsx': 1,
-  'app/[locale]/(app)/user/stellar-selection-eth/[address]/UserStellarSelectionETHPage.tsx': 2,
   'components/anchoring/AnchorDistributionsTable.tsx': 2,
   'components/anchoring/AnchoredTokensTable.tsx': 1,
   'components/anchoring/CSTAnchorDistributionsByDepositTable.tsx': 3,
@@ -60,7 +56,6 @@ const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
   'components/ui/stat-card.tsx': 1,
   'components/user-statistics/HeroStats.tsx': 3,
   'components/user-statistics/StellarSelectionPerformance.tsx': 3,
-  'components/winnings/StellarSelectionAllocationsTable.tsx': 1,
 };
 
 /**

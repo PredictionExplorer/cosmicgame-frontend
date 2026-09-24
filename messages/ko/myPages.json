@@ -13,27 +13,36 @@
   },
   "allocations": {
     "title": "내 배분",
-    "subtitle": "아직 회수하지 않은 배분을 한곳에서 확인하고 회수합니다",
-    "loadErrorTitle": "불러오지 못했습니다",
-    "loadErrorMessage": "미회수 배분 데이터를 불러오지 못했습니다",
+    "subtitle": "프로토콜이 이 지갑에 마련한 배분을 한곳에서 모두 회수합니다.",
+    "loadErrorTitle": "배분을 불러오지 못했습니다",
+    "loadErrorMessage": "미회수 배분 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
+    "summary": {
+      "title": "회수 가능",
+      "description": "한 번의 트랜잭션으로 이 지갑에 보관된 ETH, 첨부된 NFT, 첨부된 토큰을 회수합니다.",
+      "eth": "ETH 배분",
+      "nfts": "첨부된 NFT",
+      "tokens": "첨부된 토큰",
+      "anchor": "앵커링 지급",
+      "cycles": "{count, plural, other {사이클 #개}}",
+      "anchorCaption": "아래에서 따로 회수합니다",
+      "retrieveEverything": "한 번에 모두 회수",
+      "retrieveBy": "<date></date>까지 회수해 주세요. 이후에는 누구나 회수할 수 있습니다.",
+      "expired": "회수 기한이 <date></date>에 지났습니다. 다른 사람이 회수하기 전까지는 계속 회수할 수 있습니다.",
+      "success": "모든 항목을 지갑으로 회수했습니다."
+    },
+    "nothing": {
+      "title": "지금은 회수할 항목이 없습니다",
+      "description": "마감된 사이클에서 이 지갑에 ETH, NFT 또는 토큰이 배분되면 회수할 때까지 여기에 표시됩니다."
+    },
     "sections": {
-      "eth": "회수 가능한 ETH 배분",
-      "anchors": "Cosmic Signature NFT 앵커링 지급",
+      "eth": "ETH 배분",
+      "ethDescription": "별빛 선정과 시간의 전사 ETH는 회수할 때까지 사이클별로 보관됩니다.",
+      "anchors": "앵커링 지급",
+      "anchorsDescription": "앵커링 컨트랙트가 앵커링된 Cosmic Signature NFT에 지급하는 ETH입니다.",
       "nfts": "첨부된 NFT",
       "erc20": "첨부된 ERC-20 토큰"
     },
-    "empty": {
-      "ethTitle": "아직 ETH 배분이 없습니다",
-      "ethDescription": "제스처를 남겨 별빛 선정에 참여하면 ETH 배분을 받을 수 있습니다.",
-      "nftTitle": "첨부된 NFT가 없습니다",
-      "nftDescription": "이 지갑에 배분된 첨부 NFT가 여기에 표시됩니다.",
-      "erc20Title": "첨부된 토큰이 없습니다",
-      "erc20Description": "이 지갑에 배분된 첨부 ERC-20 토큰이 여기에 표시됩니다."
-    },
-    "retrievable": "회수 가능:",
-    "retrieving": "회수 중…",
-    "retrieveAll": "모두 회수",
-    "viewHistory": "배분 내역 보기"
+    "retrieveAll": "모두 회수"
   },
   "anchors": {
     "title": "내 앵커링",
@@ -389,14 +398,42 @@
       "value": "수량(CST)"
     }
   },
-  "stellarSelectionAllocations": {
-    "datetime": "일시",
-    "cycle": "사이클",
-    "recipient": "수령자",
-    "expirationDate": "만료일",
-    "amount": "금액(ETH)",
-    "retrieved": "회수 여부",
-    "expired": "{date} (만료)",
-    "remaining": "{date} ({remaining} 남음)"
+  "ethAllocations": {
+    "columns": {
+      "cycle": "사이클",
+      "source": "출처",
+      "allocated": "배분 시각",
+      "amount": "금액",
+      "deadline": "회수 기한",
+      "status": "상태"
+    },
+    "cycle": "사이클 {cycle}",
+    "sources": {
+      "stellarSelection": "별빛 선정",
+      "chronoWarrior": "시간의 전사"
+    },
+    "status": {
+      "retrieved": "회수 완료",
+      "waiting": "미회수"
+    },
+    "deadline": {
+      "remaining": "{remaining} 남음",
+      "expired": "기한 만료",
+      "help": "이 날짜까지는 수령자만 ETH를 회수할 수 있습니다. 이후에는 누구나 회수할 수 있습니다."
+    }
+  },
+  "attached": {
+    "columns": {
+      "nft": "NFT",
+      "token": "토큰",
+      "cycle": "사이클",
+      "contributor": "첨부한 지갑",
+      "attached": "첨부 시각",
+      "amount": "수량",
+      "action": "작업"
+    },
+    "tokenNumber": "토큰 #{id}",
+    "retrieve": "회수",
+    "retrieveItem": "{item} 회수"
   }
 }

@@ -579,13 +579,12 @@
   },
   "recipientHistory": {
     "pageTitle": "我的分配歷史",
-    "connectedTitle": "我的分配記錄",
     "subtitle": "查看過去取回的分配與發放記錄",
-    "connectedDescription": "查看所有 Cosmic Signature 演繹週期中的完整分配歷史，包括簽名分配取回、星選 ETH 分配、Cosmic Signature NFT 分配與錨定派發。",
+    "connectedDescription": "此錢包在各週期收到的每一筆分配，以及是否已取回。",
     "loadError": "未能載入分配歷史",
     "loadErrorDescription": "請稍後再試。",
     "emptyTitle": "暫無分配",
-    "emptyDescription": "此錢包目前沒有分配記錄。"
+    "emptyDescription": "當已收官的週期向此錢包分配時，記錄會顯示在這裏。"
   },
   "namedNfts": {
     "title": "已命名 Cosmic Signature NFT",
@@ -620,21 +619,46 @@
     }
   },
   "stellarSelectionEth": {
-    "invalidAddress": "地址無效",
-    "user": "參與者",
-    "heading": "此參與者獲配的星選 ETH",
-    "retrievable": "可取回分配共 {amount} ETH",
-    "retrieveAll": "全部取回",
-    "empty": "暫無星選 ETH。"
+    "heading": "星選 · ETH",
+    "lede": "<term>星選</term>按週期分配給此參與者的 ETH。",
+    "figures": {
+      "total": "累計分配",
+      "count": "分配次數",
+      "waiting": "尚未取回"
+    },
+    "tableLabel": "星選 ETH 分配",
+    "emptyTitle": "暫無星選 ETH",
+    "emptyDescription": "當已收官的週期為此地址選出 ETH 分配時，會顯示在這裏。",
+    "errorTitle": "無法載入星選 ETH",
+    "retrieve": "取回 ETH"
   },
   "stellarSelectionNft": {
-    "invalidAddress": "地址無效",
-    "user": "參與者",
-    "heading": "此參與者獲配的星選 NFT",
-    "loading": "載入中…",
-    "empty": "暫無 NFT 分配。",
-    "isRandomWalk": "來自 Random Walk",
-    "isAnchorHolder": "錨定者"
+    "heading": "星選 · NFT",
+    "lede": "<term>星選</term>分配給此參與者的 Cosmic Signature NFT。",
+    "figures": {
+      "count": "NFT 數量",
+      "cycles": "週期數"
+    },
+    "gridLabel": "星選 NFT",
+    "unnamed": "Cosmic Signature {id}",
+    "cycle": "第 {cycle} 個週期",
+    "sources": {
+      "participant": "參與者",
+      "randomWalk": "Random Walk",
+      "anchorHolder": "錨定者"
+    },
+    "emptyTitle": "暫無星選 NFT",
+    "emptyDescription": "當已收官的週期為此地址選出 Cosmic Signature NFT 時，會顯示在這裏。",
+    "errorTitle": "無法載入星選 NFT",
+    "artFailed": "無法載入作品"
+  },
+  "stellarSelectionPages": {
+    "invalidTitle": "地址無效",
+    "invalidDescription": "請檢查連結中的地址：它以 0x 開頭，後接 40 個十六進制字元。",
+    "participant": "參與者",
+    "profile": "參與者統計",
+    "howItWorks": "星選如何運作",
+    "errorMessage": "暫時無法讀取該地址的分配，請稍後再試。"
   },
   "systemEvent": {
     "titleBeforeCycle": "第 {cycle} 個週期前的系統配置",

@@ -66,12 +66,82 @@ describe('useClaimAllocations', () => {
   it('starts idle, with every flag false and the shared stage exposed', () => {
     const { result } = renderHook(() => useClaimAllocations());
     expect(result.current.isClaiming).toEqual({
+      everything: false,
       raffleETH: false,
       donatedNFT: false,
       donatedERC20: false,
     });
     expect(result.current.claimingDonatedNFTs).toEqual([]);
+    expect(result.current.claimingDonatedTokens).toEqual([]);
     expect(result.current.txStage).toEqual({ status: 'idle' });
+  });
+
+  describe('retrieveEverything', () => {
+    it('sends ETH cycles, raw token amounts and NFT indexes in one withdrawEverything', async () => {
+      const onSuccess = jest.fn();
+      const { result } = renderHook(() => useClaimAllocations(onSuccess));
+      await act(async () => {
+        await result.current.retrieveEverything({
+          ethRounds: [3, 1, 3],
+          tokenClaims: [{ roundNum: 1, tokenAddress: '0xA', amount: '1500000000000000000' }],
+          nftIndexes: [9, 4, 9],
+          successMessage: 'Everything retrieved.',
+        });
+      });
+
+      expect(mockWriteWithdrawEverything).toHaveBeenCalledTimes(1);
+      expect(mockWriteWithdrawEverything).toHaveBeenCalledWith([
+        [1, 3],
+        [{ roundNum: 1, tokenAddress: '0xA', amount: 1500000000000000000n }],
+        [9, 4],
+      ]);
+      expect(mockTx.runs).toHaveLength(1);
+      expect(mockTx.lastSuccessMessage()).toBe('Everything retrieved.');
+      expect(mockFetchStatusData).toHaveBeenCalledTimes(1);
+      expect(onSuccess).toHaveBeenCalledTimes(1);
+      expect(result.current.isClaiming.everything).toBe(false);
+    });
+
+    it('holds its own flag while the transaction runs', async () => {
+      let release!: (hash: string) => void;
+      mockWriteWithdrawEverything.mockImplementationOnce(
+        () => new Promise<string>((resolve) => (release = resolve)),
+      );
+      const { result } = renderHook(() => useClaimAllocations());
+
+      let pending!: Promise<void>;
+      await act(async () => {
+        pending = result.current.retrieveEverything({
+          ethRounds: [1],
+          tokenClaims: [],
+          nftIndexes: [],
+          successMessage: 'done',
+        });
+        await Promise.resolve();
+      });
+      expect(result.current.isClaiming.everything).toBe(true);
+      expect(result.current.isClaiming.raffleETH).toBe(false);
+
+      await act(async () => {
+        release('0xtx1');
+        await pending;
+      });
+      expect(result.current.isClaiming.everything).toBe(false);
+    });
+
+    it('never sends a display-denominated token amount', async () => {
+      const { result } = renderHook(() => useClaimAllocations());
+      await act(async () => {
+        await result.current.retrieveEverything({
+          ethRounds: [1],
+          tokenClaims: [{ roundNum: 1, tokenAddress: '0xA', amount: '0.5' }],
+          nftIndexes: [],
+          successMessage: 'done',
+        });
+      });
+      expect(mockWriteWithdrawEverything).not.toHaveBeenCalled();
+      expect(mockTx.lastFailureMessage()).toBe('toasts.claim.failed');
+    });
   });
 
   describe('retrieveAllStellarSelectionETH', () => {
@@ -89,6 +159,14 @@ describe('useClaimAllocations', () => {
       expect(mockFetchStatusData).toHaveBeenCalledTimes(1);
       expect(onSuccess).toHaveBeenCalledTimes(1);
       expect(result.current.isClaiming.raffleETH).toBe(false);
+    });
+
+    it('lists each cycle once: PrizesWallet holds one ETH balance per cycle', async () => {
+      const { result } = renderHook(() => useClaimAllocations());
+      await act(async () => {
+        await result.current.retrieveAllStellarSelectionETH([7, 5, 7, 5, 6]);
+      });
+      expect(mockWriteWithdrawEverything).toHaveBeenCalledWith([[5, 6, 7], [], []]);
     });
 
     it('holds the flag while the transaction runs', async () => {
@@ -204,6 +282,27 @@ describe('useClaimAllocations', () => {
       expect(mockTx.lastSuccessMessage()).toBe('toasts.claim.tokenSuccess');
     });
 
+    it('marks the token being retrieved until its transaction ends', async () => {
+      let release!: (hash: string) => void;
+      mockWriteClaimDonatedToken.mockImplementationOnce(
+        () => new Promise<string>((resolve) => (release = resolve)),
+      );
+      const { result } = renderHook(() => useClaimAllocations());
+
+      let pending!: Promise<void>;
+      await act(async () => {
+        pending = result.current.claimDonatedERC20(5, '0xToKeN', '10');
+        await Promise.resolve();
+      });
+      expect(result.current.claimingDonatedTokens).toEqual(['5:0xtoken']);
+
+      await act(async () => {
+        release('0xtx4');
+        await pending;
+      });
+      expect(result.current.claimingDonatedTokens).toEqual([]);
+    });
+
     it('fails inside the flow, before any write, for display-denominated amounts', async () => {
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
@@ -271,6 +370,7 @@ describe('useClaimAllocations', () => {
     const { result, rerender } = renderHook(() => useClaimAllocations());
     const first = result.current;
     rerender();
+    expect(result.current.retrieveEverything).toBe(first.retrieveEverything);
     expect(result.current.retrieveAllStellarSelectionETH).toBe(
       first.retrieveAllStellarSelectionETH,
     );

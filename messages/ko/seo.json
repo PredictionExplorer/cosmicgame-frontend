@@ -142,11 +142,11 @@
         }
       },
       "allocation-finalized": {
-        "heading": "회수된 배분",
-        "description": "Cosmic Signature의 공개 배분 회수 기록을 살펴볼 수 있습니다. ETH 수령, Cosmic Signature NFT 배분, 별빛 선정 배분이 포함됩니다.",
+        "heading": "마감된 배분",
+        "description": "마감된 각 사이클의 배분 내역입니다. 시그니처 배분부터 모든 별빛 선정 및 앵커링 지급 기록까지 확인할 수 있습니다.",
         "source": "Cosmic Signature 공개 배분 회수 API",
         "links": {
-          "allocation": "배분 수령자 보기",
+          "myAllocations": "내 배분 회수",
           "statistics": "종합 통계 보기",
           "contracts": "검증된 컨트랙트 확인"
         },

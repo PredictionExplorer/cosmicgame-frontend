@@ -142,11 +142,11 @@
         }
       },
       "allocation-finalized": {
-        "heading": "已取回分配",
-        "description": "查看 Cosmic Signature 的公開分配取回記錄，包括收到的 ETH、Cosmic Signature NFT 分配與星選分配。",
+        "heading": "已收官的分配",
+        "description": "每個已收官週期的分配情況，由簽名分配到每一項星選與錨定派發記錄。",
         "source": "Cosmic Signature 公開分配取回 API",
         "links": {
-          "allocation": "查看分配名錄",
+          "myAllocations": "取回你的分配",
           "statistics": "查看彙總統計",
           "contracts": "查閱已驗證合約"
         },

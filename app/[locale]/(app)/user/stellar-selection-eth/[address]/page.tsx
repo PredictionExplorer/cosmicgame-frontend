@@ -34,7 +34,7 @@ export default async function Page({
   const { locale, address } = await params;
   setRequestLocale(locale);
   return (
-    <PageMessages namespaces={['statistics', 'tables']}>
+    <PageMessages namespaces={['glossary', 'myPages', 'statistics', 'tables']}>
       <UserStellarSelectionETHPage address={address} />
     </PageMessages>
   );

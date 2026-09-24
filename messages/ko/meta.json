@@ -151,8 +151,8 @@
     "description": "Cosmic Signature 커뮤니티가 공공재 금고에 자발적으로 기여한 내역입니다. 기여금은 지정된 공공재 수령처를 지원합니다."
   },
   "allocationRetrieved": {
-    "title": "회수된 배분",
-    "description": "Cosmic Signature 프로토콜에서 회수된 배분의 상세 내역입니다. ETH 수령, Cosmic Signature NFT 배분, 별빛 선정 배분을 확인할 수 있습니다."
+    "title": "마감된 배분",
+    "description": "마감된 모든 Cosmic Signature 사이클의 시그니처 배분과 ETH, CST, Cosmic Signature NFT 배분 기록의 합계입니다."
   },
   "outreach": {
     "title": "홍보 배분",

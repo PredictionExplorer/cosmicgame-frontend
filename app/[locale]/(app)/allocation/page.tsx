@@ -36,7 +36,7 @@ export default async function Page({ params }: PageProps) {
   setRequestLocale(locale);
 
   return (
-    <PageMessages namespaces={['allocation', 'tables']}>
+    <PageMessages namespaces={['allocation', 'contracts', 'tables']}>
       <PublicDataQuerySeed route="allocation">
         <AllocationRecipientsPage
           seoSummary={

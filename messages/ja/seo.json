@@ -142,11 +142,11 @@
         }
       },
       "allocation-finalized": {
-        "heading": "受け取り済みの配分",
-        "description": "ETHの受領、Cosmic Signature NFTの配分、星選の配分を含む、Cosmic Signatureの公開配分受け取り記録を調べる。",
+        "heading": "確定した配分",
+        "description": "確定した各サイクルの配分を、シグネチャー配分から星選と係留配分のすべての記録まで確認できます。",
         "source": "Cosmic Signature公開配分受け取りAPI",
         "links": {
-          "allocation": "配分の受領者を見る",
+          "myAllocations": "自分の配分を受け取る",
           "statistics": "集計統計を見る",
           "contracts": "検証済みコントラクトを確認する"
         },
