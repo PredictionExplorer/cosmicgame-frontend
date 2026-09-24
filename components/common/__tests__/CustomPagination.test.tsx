@@ -66,6 +66,7 @@ describe('CustomPagination', () => {
 
     const input = screen.getByLabelText('tables.pagination.goToPageAria');
     fireEvent.change(input, { target: { value: '999' } });
+    fireEvent.blur(input);
 
     expect(defaultProps.setPage).toHaveBeenCalledWith(30);
   });

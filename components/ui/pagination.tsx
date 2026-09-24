@@ -135,6 +135,57 @@ export function visiblePages(current: number, total: number): (number | 'ellipsi
 /** From this many pages, a "Go to page" field joins the buttons (from `sm` up). */
 const GO_TO_PAGE_THRESHOLD = 30;
 
+/**
+ * "Go to page": a number the reader types and then commits with Enter or by
+ * leaving the field. Typing "37" must not visit page 3 on the way, and
+ * clearing the field to type afresh must not snap it back, so the field
+ * holds a draft of its own until it is committed.
+ */
+function GoToPage({
+  current,
+  pageCount,
+  onGo,
+}: {
+  current: number;
+  pageCount: number;
+  onGo: (page: number) => void;
+}) {
+  const t = useTranslations('tables');
+  const [draft, setDraft] = React.useState<string | null>(null);
+
+  const commit = () => {
+    if (draft === null) return;
+    const value = Number(draft);
+    setDraft(null);
+    if (draft.trim() !== '' && Number.isFinite(value) && value > 0) onGo(Math.trunc(value));
+  };
+
+  return (
+    <label className="hidden items-center gap-2 whitespace-nowrap type-caption text-subtle sm:flex">
+      {t('pagination.goToPage')}
+      <Input
+        type="number"
+        inputMode="numeric"
+        className="h-9 w-20 tabular-nums"
+        value={draft ?? String(current)}
+        min={1}
+        max={pageCount}
+        aria-label={t('pagination.goToPageAria')}
+        onChange={(event) => setDraft(event.target.value)}
+        onBlur={commit}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            commit();
+          } else if (event.key === 'Escape' && draft !== null) {
+            setDraft(null);
+          }
+        }}
+      />
+    </label>
+  );
+}
+
 export interface TablePaginationProps {
   /** The current page, 1-based. */
   page: number;
@@ -165,15 +216,28 @@ export function TablePagination({
 }: TablePaginationProps) {
   const t = useTranslations('tables');
   const locale = useLocale();
+  // What a screen reader hears after the reader pages: the new range, once.
+  // The visible range is not a live region, because a live table (the
+  // cycle's gestures) changes its total on its own and would otherwise
+  // announce itself whenever a gesture lands.
+  const [announcement, setAnnouncement] = React.useState('');
   const pageCount = pageCountFor(total, pageSize);
   const current = Math.min(Math.max(page, 1), pageCount);
   const paged = pageCount > 1;
 
   if (!paged && !caption) return null;
 
-  const from = (current - 1) * pageSize + 1;
-  const to = Math.min(current * pageSize, total);
-  const goTo = (next: number) => onPageChange(Math.min(Math.max(next, 1), pageCount));
+  const rangeOf = (target: number) =>
+    t('pagination.range', {
+      from: formatCount((target - 1) * pageSize + 1, locale),
+      to: formatCount(Math.min(target * pageSize, total), locale),
+      total: formatCount(total, locale),
+    });
+  const goTo = (next: number) => {
+    const target = Math.min(Math.max(next, 1), pageCount);
+    if (target !== current) setAnnouncement(rangeOf(target));
+    onPageChange(target);
+  };
 
   return (
     <div
@@ -184,19 +248,16 @@ export function TablePagination({
         className,
       )}
     >
-      <p className="type-caption text-subtle tabular-nums" aria-live="polite">
-        {paged ? (
-          <span>
-            {t('pagination.range', {
-              from: formatCount(from, locale),
-              to: formatCount(to, locale),
-              total: formatCount(total, locale),
-            })}
-          </span>
-        ) : null}
+      <p className="type-caption text-subtle tabular-nums">
+        {paged ? <span>{rangeOf(current)}</span> : null}
         {paged && caption ? <span aria-hidden> · </span> : null}
         {caption ? <span>{caption}</span> : null}
       </p>
+      {paged ? (
+        <p role="status" className="sr-only">
+          {announcement}
+        </p>
+      ) : null}
 
       {paged ? (
         <div className="flex items-center gap-x-4">
@@ -241,22 +302,7 @@ export function TablePagination({
           </Pagination>
 
           {pageCount >= GO_TO_PAGE_THRESHOLD ? (
-            <label className="hidden items-center gap-2 whitespace-nowrap type-caption text-subtle sm:flex">
-              {t('pagination.goToPage')}
-              <Input
-                type="number"
-                inputMode="numeric"
-                className="h-9 w-20 tabular-nums"
-                value={current}
-                min={1}
-                max={pageCount}
-                aria-label={t('pagination.goToPageAria')}
-                onChange={(event) => {
-                  const value = Number(event.target.value);
-                  if (Number.isFinite(value) && value > 0) goTo(Math.trunc(value));
-                }}
-              />
-            </label>
+            <GoToPage current={current} pageCount={pageCount} onGo={goTo} />
           ) : null}
         </div>
       ) : null}

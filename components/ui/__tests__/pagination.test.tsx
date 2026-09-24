@@ -76,10 +76,62 @@ describe('TablePagination', () => {
 
   it('clamps the go-to field to the pages that exist', () => {
     render(<TablePagination {...props} />);
-    fireEvent.change(screen.getByLabelText('tables.pagination.goToPageAria'), {
-      target: { value: '999' },
-    });
+    const field = screen.getByLabelText('tables.pagination.goToPageAria');
+    fireEvent.change(field, { target: { value: '999' } });
+    fireEvent.keyDown(field, { key: 'Enter' });
     expect(props.onPageChange).toHaveBeenCalledWith(57);
+  });
+
+  it('goes to a typed page only once it is committed', async () => {
+    // Regression: the field followed every keystroke, so typing "37" visited
+    // page 3 first, and clearing it snapped straight back to the page.
+    const user = userEvent.setup();
+    render(<TablePagination {...props} page={5} />);
+    const field = screen.getByLabelText('tables.pagination.goToPageAria');
+
+    await user.clear(field);
+    expect(field).toHaveValue(null);
+    await user.type(field, '37');
+    expect(field).toHaveValue(37);
+    expect(props.onPageChange).not.toHaveBeenCalled();
+
+    await user.keyboard('{Enter}');
+    expect(props.onPageChange).toHaveBeenCalledTimes(1);
+    expect(props.onPageChange).toHaveBeenCalledWith(37);
+  });
+
+  it('commits the typed page when the field is left, and forgets a cleared one', async () => {
+    const user = userEvent.setup();
+    render(<TablePagination {...props} page={5} />);
+    const field = screen.getByLabelText('tables.pagination.goToPageAria');
+
+    await user.clear(field);
+    await user.tab();
+    expect(props.onPageChange).not.toHaveBeenCalled();
+    expect(field).toHaveValue(5);
+
+    await user.clear(field);
+    await user.type(field, '12');
+    await user.tab();
+    expect(props.onPageChange).toHaveBeenCalledWith(12);
+  });
+
+  it('announces the new range after paging, not whenever the total changes', async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(<TablePagination {...props} />);
+    const status = screen.getByRole('status');
+    // The visible range is not a live region: a live table's total changes
+    // on its own, and that must not be read out.
+    expect(
+      screen.getByText('tables.pagination.range(from=1,to=20,total=1,140)'),
+    ).not.toHaveAttribute('aria-live');
+    expect(status).toBeEmptyDOMElement();
+
+    rerender(<TablePagination {...props} total={1141} />);
+    expect(status).toBeEmptyDOMElement();
+
+    await user.click(screen.getByRole('button', { name: 'tables.pagination.nextAria' }));
+    expect(status).toHaveTextContent('tables.pagination.range(from=21,to=40,total=1,141)');
   });
 
   it('offers no go-to field for a short table', () => {
