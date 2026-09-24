@@ -204,11 +204,15 @@ export function deriveFeedSystemEvents({
 
     // ETH adjusts the window length without resetting its start. A shorter
     // window can reach its floor at the Gesture itself, never retroactively.
+    // V3 gestures repurpose this field for the CST price decline multiplier
+    // (~1.7e16), so anything beyond a plausible window (one year) is ignored
+    // like the legacy -1 sentinel.
     const calibrationDuration = gesture.CstDutchAuctionDurationInt;
     if (
       typeof calibrationDuration === 'number' &&
       Number.isSafeInteger(calibrationDuration) &&
-      calibrationDuration >= 0
+      calibrationDuration >= 0 &&
+      calibrationDuration <= 31_536_000
     ) {
       const nominalReadyAt = calibrationStart + calibrationDuration;
       const readyAt = Math.max(gesture.TimeStamp, nominalReadyAt);

@@ -30,6 +30,17 @@ describe('getCstCalibrationTimeline', () => {
     expect(result.currentSeconds).toBe(0);
   });
 
+  it('ignores V3 gestures whose duration field carries the price decline multiplier', () => {
+    // V3 BidPlaced events repurpose the V2 window field for an 18-decimal
+    // fixed-point multiplier (~1.7e16); such values must not chart as seconds.
+    const result = getCstCalibrationTimeline([
+      gesture(1000, 1.75e16, 0, '0xAlice'),
+      gesture(2000, 1.73e16, 2, '0xBob'),
+    ]);
+    expect(result.points).toEqual([]);
+    expect(result.currentSeconds).toBe(0);
+  });
+
   it('builds one step per gesture and extends the last window to the round end', () => {
     const result = getCstCalibrationTimeline(
       [
