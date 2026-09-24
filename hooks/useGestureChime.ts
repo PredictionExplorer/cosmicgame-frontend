@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 
 import { useAttentionPreferences } from '@/hooks/useAttentionPreferences';
+import { sameAddress } from '@/utils/address';
 import { reportError } from '@/utils/errors';
 
 /** 0.9 s mono MP3 (about 6 KB), fetched only after the viewer turns sound on. */
@@ -54,10 +55,6 @@ async function playGestureChime(): Promise<void> {
 /** Test-only: drop the cached audio element. */
 export function resetGestureChimeForTest(): void {
   chimeElement = null;
-}
-
-function sameAddress(left: string | null | undefined, right: string | null | undefined): boolean {
-  return !!left && !!right && left.toLowerCase() === right.toLowerCase();
 }
 
 export interface GestureChimeInput {
