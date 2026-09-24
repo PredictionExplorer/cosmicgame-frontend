@@ -13,27 +13,36 @@
   },
   "allocations": {
     "title": "Phân bổ của tôi",
-    "subtitle": "Xem và nhận về mọi phân bổ đang chờ của bạn",
-    "loadErrorTitle": "Không tải được",
-    "loadErrorMessage": "Không tải được dữ liệu phân bổ đang chờ",
+    "subtitle": "Mọi phân bổ giao thức dành cho ví này, nhận về tất cả tại một nơi.",
+    "loadErrorTitle": "Không tải được phân bổ của bạn",
+    "loadErrorMessage": "Không tải được các phân bổ đang chờ. Hãy thử lại sau giây lát.",
+    "summary": {
+      "title": "Sẵn sàng nhận về",
+      "description": "Một giao dịch nhận về ETH, NFT đính kèm và token đính kèm đang chờ ví này.",
+      "eth": "Phân bổ ETH",
+      "nfts": "NFT đính kèm",
+      "tokens": "Token đính kèm",
+      "anchor": "Phân phối neo giữ",
+      "cycles": "{count, plural, other {Từ # chu kỳ}}",
+      "anchorCaption": "Nhận về riêng ở bên dưới",
+      "retrieveEverything": "Nhận về tất cả một lần",
+      "retrieveBy": "Hãy nhận về trước <date></date>. Sau thời điểm đó, bất kỳ ai cũng có thể nhận về.",
+      "expired": "Hạn nhận về đã qua vào <date></date>. Bạn vẫn có thể nhận về cho đến khi có người khác nhận trước.",
+      "success": "Đã nhận về tất cả vào ví của bạn."
+    },
+    "nothing": {
+      "title": "Hiện chưa có gì để nhận về",
+      "description": "Khi một chu kỳ đã hoàn tất phân bổ ETH, NFT hoặc token cho ví này, chúng sẽ chờ ở đây cho đến khi bạn nhận về."
+    },
     "sections": {
-      "eth": "Phân bổ ETH có thể nhận về",
-      "anchors": "Phân phối neo giữ Cosmic Signature NFT",
+      "eth": "Phân bổ ETH",
+      "ethDescription": "ETH từ Tinh tuyển và Chiến binh Thời gian được giữ theo từng chu kỳ cho đến khi bạn nhận về.",
+      "anchors": "Phân phối neo giữ",
+      "anchorsDescription": "ETH mà hợp đồng neo giữ trả cho các Cosmic Signature NFT bạn đang neo giữ.",
       "nfts": "NFT đính kèm",
       "erc20": "Token ERC-20 đính kèm"
     },
-    "empty": {
-      "ethTitle": "Chưa có phân bổ ETH",
-      "ethDescription": "Mỗi nét bút được tính vào Tinh tuyển, qua đó bạn có thể nhận phân bổ ETH.",
-      "nftTitle": "Không có NFT đính kèm",
-      "nftDescription": "NFT đính kèm được phân bổ cho ví này sẽ xuất hiện tại đây.",
-      "erc20Title": "Không có token đính kèm",
-      "erc20Description": "Token ERC-20 đính kèm được phân bổ cho ví này sẽ xuất hiện tại đây."
-    },
-    "retrievable": "Có thể nhận về:",
-    "retrieving": "Đang nhận về…",
-    "retrieveAll": "Nhận về tất cả",
-    "viewHistory": "Xem lịch sử phân bổ"
+    "retrieveAll": "Nhận về tất cả"
   },
   "anchors": {
     "title": "Neo giữ của tôi",
@@ -398,14 +407,42 @@
       "value": "Giá trị (CST)"
     }
   },
-  "stellarSelectionAllocations": {
-    "datetime": "Thời điểm",
-    "cycle": "Chu kỳ",
-    "recipient": "Người nhận",
-    "expirationDate": "Ngày hết hạn",
-    "amount": "Số tiền (ETH)",
-    "retrieved": "Đã nhận về",
-    "expired": "{date} (Đã hết hạn)",
-    "remaining": "{date} ({remaining})"
+  "ethAllocations": {
+    "columns": {
+      "cycle": "Chu kỳ",
+      "source": "Nguồn",
+      "allocated": "Thời điểm phân bổ",
+      "amount": "Số tiền",
+      "deadline": "Hạn nhận về",
+      "status": "Trạng thái"
+    },
+    "cycle": "Chu kỳ {cycle}",
+    "sources": {
+      "stellarSelection": "Tinh tuyển",
+      "chronoWarrior": "Chiến binh Thời gian"
+    },
+    "status": {
+      "retrieved": "Đã nhận về",
+      "waiting": "Chưa nhận về"
+    },
+    "deadline": {
+      "remaining": "còn {remaining}",
+      "expired": "Đã hết hạn",
+      "help": "Trước thời điểm này, chỉ người nhận mới có thể nhận về ETH. Sau đó, bất kỳ ai cũng có thể nhận về."
+    }
+  },
+  "attached": {
+    "columns": {
+      "nft": "NFT",
+      "token": "Token",
+      "cycle": "Chu kỳ",
+      "contributor": "Người đính kèm",
+      "attached": "Thời điểm đính kèm",
+      "amount": "Số lượng",
+      "action": "Thao tác"
+    },
+    "tokenNumber": "Token #{id}",
+    "retrieve": "Nhận về",
+    "retrieveItem": "Nhận về {item}"
   }
 }

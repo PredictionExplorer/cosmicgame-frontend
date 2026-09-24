@@ -46,7 +46,7 @@ const RETIRED: Record<string, RetiredPattern> = {
     // (WCAG exempts inactive controls).
     pattern:
       /(?<!disabled:)(?<![\w-])text-(?:muted-foreground|white)\/(?:[0-5]?\d|60|\[0?\.[0-6]\d*\])(?![\w.])/g,
-    baseline: 102,
+    baseline: 99,
   },
   'text below the 12px floor': {
     use: 'type-caption (12px) or type-label (13px)',

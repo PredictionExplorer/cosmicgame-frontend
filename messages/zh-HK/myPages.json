@@ -13,27 +13,36 @@
   },
   "allocations": {
     "title": "我的分配",
-    "subtitle": "查看並取回所有未取回分配",
+    "subtitle": "協議為此錢包預留的所有分配，都可以在這裏一併取回。",
     "loadErrorTitle": "未能載入分配",
     "loadErrorMessage": "未能載入待取回分配數據，請稍後再試。",
+    "summary": {
+      "title": "可取回",
+      "description": "一筆交易即可取回為此錢包保留的 ETH、已附加 NFT 和已附加代幣。",
+      "eth": "ETH 分配",
+      "nfts": "已附加 NFT",
+      "tokens": "已附加代幣",
+      "anchor": "錨定派發",
+      "cycles": "{count, plural, other {來自 # 個週期}}",
+      "anchorCaption": "在下方另行取回",
+      "retrieveEverything": "一次全部取回",
+      "retrieveBy": "請在 <date></date> 前取回，之後任何人都可以取回。",
+      "expired": "取回期限已於 <date></date> 截止。在其他人取回之前，你仍可取回。",
+      "success": "已全部取回到你的錢包。"
+    },
+    "nothing": {
+      "title": "目前沒有可取回的分配",
+      "description": "已收官週期分配給此錢包的 ETH、NFT 或代幣會保留在這裏，直到你取回。"
+    },
     "sections": {
-      "eth": "可取回的 ETH 分配",
-      "anchors": "Cosmic Signature NFT 錨定派發",
+      "eth": "ETH 分配",
+      "ethDescription": "星選與時之勇士的 ETH 按週期保留，直到你取回。",
+      "anchors": "錨定派發",
+      "anchorsDescription": "錨定合約為你已錨定的 Cosmic Signature NFT 派發的 ETH。",
       "nfts": "已附加 NFT",
       "erc20": "已附加 ERC-20 代幣"
     },
-    "empty": {
-      "ethTitle": "暫無 ETH 分配",
-      "ethDescription": "落筆後即可參與 ETH 星選，獲配結果由協議在鏈上確定。",
-      "nftTitle": "暫無已附加 NFT",
-      "nftDescription": "分配給此錢包的已附加 NFT 會顯示在這裏。",
-      "erc20Title": "暫無已附加代幣",
-      "erc20Description": "分配給此錢包的已附加 ERC-20 代幣會顯示在這裏。"
-    },
-    "retrievable": "可取回：",
-    "retrieving": "取回中…",
-    "retrieveAll": "全部取回",
-    "viewHistory": "查看分配記錄"
+    "retrieveAll": "全部取回"
   },
   "anchors": {
     "title": "我的錨定",
@@ -398,14 +407,42 @@
       "value": "數量（CST）"
     }
   },
-  "stellarSelectionAllocations": {
-    "datetime": "日期時間",
-    "cycle": "週期",
-    "recipient": "獲配者",
-    "expirationDate": "到期時間",
-    "amount": "金額（ETH）",
-    "retrieved": "已取回",
-    "expired": "{date}（已過期）",
-    "remaining": "{date}（剩餘 {remaining}）"
+  "ethAllocations": {
+    "columns": {
+      "cycle": "週期",
+      "source": "來源",
+      "allocated": "分配時間",
+      "amount": "金額",
+      "deadline": "取回期限",
+      "status": "狀態"
+    },
+    "cycle": "第 {cycle} 個週期",
+    "sources": {
+      "stellarSelection": "星選",
+      "chronoWarrior": "時之勇士"
+    },
+    "status": {
+      "retrieved": "已取回",
+      "waiting": "未取回"
+    },
+    "deadline": {
+      "remaining": "剩餘 {remaining}",
+      "expired": "已過期",
+      "help": "在此日期前只有獲配者可以取回 ETH，之後任何人都可以取回。"
+    }
+  },
+  "attached": {
+    "columns": {
+      "nft": "NFT",
+      "token": "代幣",
+      "cycle": "週期",
+      "contributor": "附加者",
+      "attached": "附加時間",
+      "amount": "數量",
+      "action": "操作"
+    },
+    "tokenNumber": "代幣 #{id}",
+    "retrieve": "取回",
+    "retrieveItem": "取回 {item}"
   }
 }

@@ -37,7 +37,6 @@ const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
   'app/[locale]/(app)/distributions-by-token/[address]/[tokenId]/RewardsByTokenPage.tsx': 2,
   'app/[locale]/(app)/eth-contribution/detail/[id]/EthDonationDetailPage.tsx': 1,
   'app/[locale]/(app)/gesture/[id]/GesturePage.tsx': 2,
-  'app/[locale]/(app)/my-allocations/MyWinnings.tsx': 1,
   'app/[locale]/(app)/my-anchors/MyAnchors.tsx': 1,
   'app/[locale]/(app)/page.tsx': 1,
   'app/[locale]/(app)/user/stellar-selection-eth/[address]/UserStellarSelectionETHPage.tsx': 2,
@@ -82,7 +81,6 @@ const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
   'components/ui/stat-card.tsx': 1,
   'components/user-statistics/HeroStats.tsx': 3,
   'components/user-statistics/StellarSelectionPerformance.tsx': 3,
-  'components/winnings/StellarSelectionAllocationsTable.tsx': 1,
 };
 
 /**

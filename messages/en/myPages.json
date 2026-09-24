@@ -13,27 +13,36 @@
   },
   "allocations": {
     "title": "My Allocations",
-    "subtitle": "View and retrieve all your pending allocations",
-    "loadErrorTitle": "Unable to load allocations",
-    "loadErrorMessage": "Pending allocations could not be loaded. Please try again.",
-    "sections": {
-      "eth": "Retrievable ETH Allocations",
-      "anchors": "Cosmic Signature NFT Anchor Distributions",
+    "subtitle": "What the protocol has set aside for this wallet, and one place to retrieve it all.",
+    "loadErrorTitle": "Couldn't load your allocations",
+    "loadErrorMessage": "Your pending allocations could not be loaded. Try again in a moment.",
+    "summary": {
+      "title": "Ready to retrieve",
+      "description": "One transaction retrieves the ETH, attached NFTs and attached tokens held for this wallet.",
+      "eth": "ETH allocations",
       "nfts": "Attached NFTs",
-      "erc20": "Attached ERC-20 Tokens"
+      "tokens": "Attached tokens",
+      "anchor": "Anchor Distributions",
+      "cycles": "{count, plural, one {From # cycle} other {From # cycles}}",
+      "anchorCaption": "Retrieved separately below",
+      "retrieveEverything": "Retrieve everything",
+      "retrieveBy": "Retrieve by <date></date>. After that, anyone can retrieve it.",
+      "expired": "The deadline passed on <date></date>. You can still retrieve these until someone else does.",
+      "success": "Everything is retrieved to your wallet."
     },
-    "empty": {
-      "ethTitle": "No ETH allocations yet",
-      "ethDescription": "Each gesture adds an ETH Stellar Selection entry. The protocol determines allocations when the cycle finalizes.",
-      "nftTitle": "No attached NFTs",
-      "nftDescription": "Attached NFTs allocated to this wallet will appear here.",
-      "erc20Title": "No attached tokens",
-      "erc20Description": "Attached ERC-20 tokens allocated to this wallet will appear here."
+    "nothing": {
+      "title": "Nothing to retrieve right now",
+      "description": "When a finalized cycle allocates ETH, NFTs or tokens to this wallet, they wait here until you retrieve them."
     },
-    "retrievable": "Retrievable:",
-    "retrieving": "Retrieving...",
-    "retrieveAll": "Retrieve All",
-    "viewHistory": "View Allocation History"
+    "sections": {
+      "eth": "ETH allocations",
+      "ethDescription": "Stellar Selection and Chrono-Warrior ETH, held for each cycle until you retrieve it.",
+      "anchors": "Anchor Distributions",
+      "anchorsDescription": "ETH the anchoring contract pays to your anchored Cosmic Signature NFTs.",
+      "nfts": "Attached NFTs",
+      "erc20": "Attached ERC-20 tokens"
+    },
+    "retrieveAll": "Retrieve all"
   },
   "anchors": {
     "title": "My Anchors",
@@ -398,14 +407,42 @@
       "value": "Value (CST)"
     }
   },
-  "stellarSelectionAllocations": {
-    "datetime": "Date and time",
-    "cycle": "Cycle",
-    "recipient": "Recipient",
-    "expirationDate": "Expiration Date",
-    "amount": "Amount (ETH)",
-    "retrieved": "Retrieved",
-    "expired": "{date} (Expired)",
-    "remaining": "{date} ({remaining})"
+  "ethAllocations": {
+    "columns": {
+      "cycle": "Cycle",
+      "source": "Source",
+      "allocated": "Allocated",
+      "amount": "Amount",
+      "deadline": "Retrieve by",
+      "status": "Status"
+    },
+    "cycle": "Cycle {cycle}",
+    "sources": {
+      "stellarSelection": "Stellar Selection",
+      "chronoWarrior": "Chrono-Warrior"
+    },
+    "status": {
+      "retrieved": "Retrieved",
+      "waiting": "Not retrieved"
+    },
+    "deadline": {
+      "remaining": "{remaining} left",
+      "expired": "Expired",
+      "help": "Until this date only the recipient can retrieve the ETH. After it, anyone can."
+    }
+  },
+  "attached": {
+    "columns": {
+      "nft": "NFT",
+      "token": "Token",
+      "cycle": "Cycle",
+      "contributor": "Attached by",
+      "attached": "Attached",
+      "amount": "Amount",
+      "action": "Action"
+    },
+    "tokenNumber": "Token #{id}",
+    "retrieve": "Retrieve",
+    "retrieveItem": "Retrieve {item}"
   }
 }
