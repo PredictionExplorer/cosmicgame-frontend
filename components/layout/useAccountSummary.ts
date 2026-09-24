@@ -12,12 +12,17 @@ import useCosmicSignatureContract from '@/hooks/useCosmicSignatureContract';
 import useRWLKNFTContract from '@/hooks/useRWLKNFTContract';
 import { useActiveWeb3React } from '@/hooks/web3';
 
+/**
+ * The wallet's balances. `null` is a figure that could not be read (the API or
+ * a balanceOf call failed, or has not answered yet): the menu shows it as
+ * unavailable, never as 0.
+ */
 export interface AccountBalances {
-  ETH: number;
-  CosmicToken: number;
+  ETH: number | null;
+  CosmicToken: number | null;
   /** Cosmic Signature NFTs the wallet holds now (balanceOf), not ever received. */
-  CosmicSignature: number;
-  RWLK: number;
+  CosmicSignature: number | null;
+  RWLK: number | null;
 }
 
 export interface AccountSummary {
@@ -31,11 +36,13 @@ export interface AccountSummary {
   retrievableEth: number | null;
 }
 
-function toWeiNumber(value: unknown): number {
+/** A wei amount from the API in ether, or null when the field is missing or malformed. */
+export function weiToEther(value: unknown): number | null {
+  if (value === null || value === undefined || value === '') return null;
   try {
     return Number(formatEther(BigInt(String(value))));
   } catch {
-    return 0;
+    return null;
   }
 }
 
@@ -62,7 +69,7 @@ export function useAccountSummary(): AccountSummary {
     refetchInterval: HEADER_POLL_INTERVAL_MS,
     refetchIntervalInBackground: false,
   });
-  const { data: rwlkCount } = useQuery({
+  const { data: rwlkCount, isLoading: isLoadingRwlk } = useQuery({
     queryKey: ['header', 'rwlkNftBalance', owner],
     queryFn: async () => (rwlkBalanceOf && owner ? Number(await rwlkBalanceOf([owner])) : 0),
     enabled: !!owner && !!rwlkBalanceOf,
@@ -82,12 +89,12 @@ export function useAccountSummary(): AccountSummary {
     return {
       account: account ?? null,
       balance: {
-        ETH: userBalance ? toWeiNumber(userBalance.ETH_Balance) : 0,
-        CosmicToken: userBalance ? toWeiNumber(userBalance.CosmicTokenBalance) : 0,
-        CosmicSignature: csCount ?? 0,
-        RWLK: rwlkCount ?? 0,
+        ETH: userBalance ? weiToEther(userBalance.ETH_Balance) : null,
+        CosmicToken: userBalance ? weiToEther(userBalance.CosmicTokenBalance) : null,
+        CosmicSignature: csCount ?? null,
+        RWLK: rwlkCount ?? null,
       },
-      loading: !!account && (isLoadingBalance || isLoadingCs),
+      loading: !!account && (isLoadingBalance || isLoadingCs || isLoadingRwlk),
       anchored: { cst: cstokens?.length, rwalk: rwlktokens?.length },
       hasRetrievable,
       retrievableEth: account ? retrievableEth : null,
@@ -100,6 +107,7 @@ export function useAccountSummary(): AccountSummary {
     rwlkCount,
     isLoadingBalance,
     isLoadingCs,
+    isLoadingRwlk,
     cstokens,
     rwlktokens,
   ]);

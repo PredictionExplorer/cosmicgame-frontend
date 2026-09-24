@@ -4,7 +4,7 @@ import { CHAOS_ZERO_PREDICTIONS_URL } from '@/config/predictions';
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 
-import { fireEvent, render, screen, within } from '@/test-utils';
+import { fireEvent, render, screen, waitFor, within } from '@/test-utils';
 
 import ConnectWalletButton from '../ConnectWalletButton';
 
@@ -217,6 +217,59 @@ describe('ConnectWalletButton', () => {
       expect(mockDisconnectAsync).toHaveBeenCalledTimes(1);
     });
 
+    it('shows the account title once, not again over the pages', async () => {
+      renderWalletButton({ presentation: 'sheet' });
+      fireEvent.click(screen.getByTestId('wallet-account-trigger'));
+      const sheet = await screen.findByRole('dialog');
+      expect(within(sheet).getAllByText('wallet.account.heading')).toHaveLength(1);
+      expect(within(sheet).queryByText('nav.sections.account')).toBeNull();
+      expect(within(sheet).getByRole('navigation')).toHaveAccessibleName('nav.sections.account');
+    });
+
+    it('closes the sheet when an account page is picked', async () => {
+      renderWalletButton({ presentation: 'sheet' });
+      fireEvent.click(screen.getByTestId('wallet-account-trigger'));
+      const sheet = await screen.findByRole('dialog');
+
+      // jsdom cannot follow the link; the router (mocked) would.
+      const stayHere = (event: Event) => event.preventDefault();
+      document.addEventListener('click', stayHere);
+      try {
+        fireEvent.click(within(sheet).getByRole('link', { name: /nav\.routes\.myAnchors\.label/ }));
+      } finally {
+        document.removeEventListener('click', stayHere);
+      }
+
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      expect(screen.getByTestId('wallet-account-trigger')).toHaveAttribute('data-state', 'closed');
+    });
+
+    it('closes the sheet when the route changes under it (back, forward)', async () => {
+      const navigation = jest.requireMock('next/navigation') as { usePathname: () => string };
+      const realPathname = navigation.usePathname;
+      let pathname = '/';
+      navigation.usePathname = () => pathname;
+      try {
+        const { rerender } = renderWalletButton({ presentation: 'sheet' });
+        fireEvent.click(screen.getByTestId('wallet-account-trigger'));
+        expect(await screen.findByRole('dialog')).toBeInTheDocument();
+
+        pathname = '/my-anchors';
+        rerender(
+          <ConnectWalletButton
+            presentation="sheet"
+            loading={false}
+            balance={{ ETH: 1, CosmicToken: 25, CosmicSignature: 2, RWLK: 3 }}
+            stakedTokenCount={{ cst: 4, rwalk: 5 }}
+          />,
+        );
+
+        await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      } finally {
+        navigation.usePathname = realPathname;
+      }
+    });
+
     it('keeps the deprecated isMobileView prop working', () => {
       render(
         <ConnectWalletButton
@@ -229,6 +282,20 @@ describe('ConnectWalletButton', () => {
       expect(screen.getByTestId('wallet-account-trigger')).toBeInTheDocument();
       expect(screen.queryByTestId('wallet-menu-trigger')).toBeNull();
     });
+  });
+
+  it('shows a figure it could not read as unavailable, never as zero', async () => {
+    renderWalletButton({
+      balance: { ETH: 1, CosmicToken: null, CosmicSignature: null, RWLK: 3 },
+    });
+    const { menu } = await openMenu();
+    const cst = within(menu).getByText('wallet.balances.cst').closest('div')!;
+    expect(within(cst).getByText('common.status.unavailable')).toBeInTheDocument();
+    expect(within(cst).queryByText('0')).toBeNull();
+    const nfts = within(menu).getByText('wallet.balances.cosmicNfts').closest('div')!;
+    expect(within(nfts).getByText('common.status.unavailable')).toBeInTheDocument();
+    const rwlk = within(menu).getByText('wallet.balances.rwlkNfts').closest('div')!;
+    expect(within(rwlk).getByText('3')).toBeInTheDocument();
   });
 
   it('renders both triggers, chosen by CSS, in the responsive header mode', () => {

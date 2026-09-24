@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
+import { forwardRef, useState, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { Check, ChevronDown, Copy, Wallet } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -25,6 +25,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { UnknownValue } from '@/components/ui/unknown-value';
 import { AddCstToMetaMaskButton } from '@/components/common/AddCstToMetaMaskButton';
 import { NavRowContent } from '@/components/layout/NavRow';
 import { SiteLink } from '@/components/layout/SiteLink';
@@ -39,12 +40,13 @@ import {
 import { useWalletAccount } from '@/hooks/useWalletAccount';
 import { useActiveWeb3React } from '@/hooks/web3';
 
+/** A figure the header could not read is `null` and renders as unavailable, never as 0. */
 interface Balance {
-  ETH: number;
-  CosmicToken: number;
+  ETH: number | null;
+  CosmicToken: number | null;
   /** Cosmic Signature NFTs the wallet holds now. */
-  CosmicSignature: number;
-  RWLK: number;
+  CosmicSignature: number | null;
+  RWLK: number | null;
 }
 
 interface AnchoredTokenCount {
@@ -115,10 +117,13 @@ function AccountPages({
   variant,
   hasUnclaimedRewards,
   retrievableEth,
+  onNavigate,
 }: {
   variant: 'menu' | 'list';
   hasUnclaimedRewards: boolean;
   retrievableEth: number | null;
+  /** The sheet closes itself when a page is picked (the menu closes on select). */
+  onNavigate?: () => void;
 }) {
   const copy = useSiteNavCopy();
   const currentRoute = useCurrentRoute();
@@ -133,6 +138,7 @@ function AccountPages({
             href={getSiteRoute(id).path}
             kind="internal"
             aria-current={current ? 'page' : undefined}
+            onClick={onNavigate}
             className={cn(
               'group/row flex w-full cursor-pointer items-center gap-3 rounded-control px-2 no-underline',
               variant === 'menu' ? 'py-1.5' : 'min-h-11 py-2 hover:bg-muted',
@@ -173,13 +179,23 @@ function BalanceFigure({
   loading,
 }: {
   label: string;
-  value: string;
+  /** `null`: the read failed, so the figure is unknown rather than zero. */
+  value: string | null;
   loading: boolean;
 }) {
+  const commonT = useTranslations('common');
   return (
     <div className="flex min-w-0 flex-col">
       <dt className="type-caption text-subtle">{label}</dt>
-      <dd className="type-figure-sm text-foreground">{loading ? '…' : value}</dd>
+      <dd className="type-figure-sm text-foreground">
+        {loading ? (
+          '…'
+        ) : value === null ? (
+          <UnknownValue label={commonT('status.unavailable')} />
+        ) : (
+          value
+        )}
+      </dd>
     </div>
   );
 }
@@ -188,8 +204,10 @@ function BalanceFigure({
 function AccountBalances({ loading, balance, stakedTokenCount }: AccountDetailsProps) {
   const t = useTranslations('wallet');
   const locale = useLocale();
-  const count = (value: number | undefined) =>
-    value === undefined ? '…' : formatCount(value, locale);
+  const count = (value: number | null | undefined) =>
+    value === undefined ? '…' : value === null ? null : formatCount(value, locale);
+  const amount = (value: number | null, unit: 'ETH' | 'CST') =>
+    value === null ? null : formatAmount(value, { unit, locale, context: 'card', withUnit: false });
   return (
     <section className="px-2 py-2">
       <h3 className="type-eyebrow pb-2 text-subtle">{t('labels.balancesHeading')}</h3>
@@ -197,22 +215,12 @@ function AccountBalances({ loading, balance, stakedTokenCount }: AccountDetailsP
         <BalanceFigure
           loading={loading}
           label={t('balances.eth')}
-          value={formatAmount(balance.ETH, {
-            unit: 'ETH',
-            locale,
-            context: 'card',
-            withUnit: false,
-          })}
+          value={amount(balance.ETH, 'ETH')}
         />
         <BalanceFigure
           loading={loading}
           label={t('balances.cst')}
-          value={formatAmount(balance.CosmicToken, {
-            unit: 'CST',
-            locale,
-            context: 'card',
-            withUnit: false,
-          })}
+          value={amount(balance.CosmicToken, 'CST')}
         />
         <BalanceFigure
           loading={loading}
@@ -334,30 +342,42 @@ function AccountMenu(props: AccountDetailsProps & { trigger: ReactNode }) {
 function AccountSheet(props: AccountDetailsProps & { trigger: ReactNode }) {
   const t = useTranslations('wallet');
   const copy = useSiteNavCopy();
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+  // The header stays mounted across client navigation, so any route change
+  // (a link here, browser back or forward) closes the sheet over the old page.
+  const [openedOn, setOpenedOn] = useState(pathname);
+  if (openedOn !== pathname) {
+    setOpenedOn(pathname);
+    setOpen(false);
+  }
+  const close = () => setOpen(false);
+
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       {props.trigger}
       <SheetContent
         side="bottom"
         aria-describedby={undefined}
         className="max-h-[88dvh] overflow-y-auto rounded-t-surface border-t border-rule bg-background p-0 pb-[env(safe-area-inset-bottom)]"
       >
-        <div className="flex h-14 items-center border-b border-rule-faint pl-5 pr-16">
+        <div className="flex h-[var(--header-height)] items-center border-b border-rule-faint pl-5 pr-16">
           <SheetTitle className="type-eyebrow text-subtle">{t('account.heading')}</SheetTitle>
         </div>
         <div className="px-5 pb-4 pt-4">
           <WalletAccountPanel />
         </div>
+        {/* The sheet's title already says "Account": the pages need no second heading. */}
         <nav
           aria-label={copy.sectionTitle('account')}
           className="border-t border-rule-faint px-3 py-2"
         >
-          <p className="type-eyebrow px-2 pb-1 pt-2 text-subtle">{copy.sectionTitle('account')}</p>
           <ul>
             <AccountPages
               variant="list"
               hasUnclaimedRewards={props.hasUnclaimedRewards}
               retrievableEth={props.retrievableEth}
+              onNavigate={close}
             />
           </ul>
         </nav>
