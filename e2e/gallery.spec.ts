@@ -94,7 +94,8 @@ test.describe('Gallery on a phone', () => {
     const sheet = page.getByTestId('gallery-filter-sheet');
     await expect(sheet).toBeVisible();
     await expect(sheet.getByRole('radiogroup', { name: 'Filter NFTs' })).toBeVisible();
-    await sheet.getByRole('button', { name: /^Show \d+/ }).click();
+    // The footer's primary action (the trait facets also have 'Show N more').
+    await sheet.getByRole('button', { name: /^Show \d+ NFTs?$/ }).click();
     await expect(sheet).toBeHidden();
   });
 });
