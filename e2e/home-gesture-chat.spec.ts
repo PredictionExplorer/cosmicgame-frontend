@@ -49,8 +49,11 @@ async function expectDecisionDashboardInViewport(page: Page) {
 /** Opens the optional message editor, which recedes behind one control until wanted. */
 async function openMessageEditor(panel: Locator) {
   const toggle = panel.getByTestId('gesture-message-toggle');
-  if ((await toggle.getAttribute('aria-expanded')) !== 'true') await toggle.click();
-  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  // A click that lands before hydration only focuses the toggle; try again.
+  await expect(async () => {
+    if ((await toggle.getAttribute('aria-expanded')) !== 'true') await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true', { timeout: 2000 });
+  }).toPass();
 }
 
 /** The expanded editor can extend the form, but every control must remain reachable. */
