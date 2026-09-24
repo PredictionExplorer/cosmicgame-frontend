@@ -145,8 +145,10 @@ test.describe('zh Sprint 3 — core dApp routes', () => {
 
     await page.goto('/zh/gesture/9101', { waitUntil: 'networkidle' });
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
-    // The mock carries no cycle position, so the H1 is the plain noun.
-    await expect(page.getByRole('heading', { level: 1, name: '落笔', exact: true })).toBeVisible();
+    // The mock carries no cycle position, so the H1 names the record by its id.
+    await expect(
+      page.getByRole('heading', { level: 1, name: '落笔记录 9101', exact: true }),
+    ).toBeVisible();
     await expect(
       page.getByRole('main').getByRole('heading', { level: 2, name: '记录', exact: true }),
     ).toBeVisible();

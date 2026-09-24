@@ -5,12 +5,17 @@
   },
   "header": {
     "title": "제스처 #{position}",
-    "fallback": "제스처",
+    "fallback": "제스처 기록 {id}",
     "explorer": "트랜잭션 보기"
   },
   "empty": {
     "title": "제스처 정보를 찾을 수 없습니다.",
-    "help": "ID가 잘못되었거나 아직 제스처 데이터가 반영되지 않았을 수 있습니다."
+    "help": "ID가 잘못되었거나 아직 제스처 데이터가 반영되지 않았을 수 있습니다.",
+    "action": "현재 사이클 보기"
+  },
+  "error": {
+    "title": "제스처 기록을 불러오지 못했습니다",
+    "message": "연결 상태를 확인한 뒤 다시 시도해 주세요."
   },
   "figures": {
     "cost": "제스처 비용",
@@ -37,6 +42,8 @@
     "participant": "참여자",
     "finalizationTime": "이 제스처 이후 마감 시각",
     "transaction": "트랜잭션",
+    "copyHash": "트랜잭션 해시 복사",
+    "hashCopied": "트랜잭션 해시를 복사했습니다",
     "erc20": "첨부된 ERC-20",
     "erc20Amount": "첨부된 ERC-20 토큰 수량",
     "nftContract": "첨부된 NFT 토큰 주소",

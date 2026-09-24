@@ -96,6 +96,8 @@
   },
   "gestureDetail": {
     "title": "一筆の情報",
+    "titleFor": "一筆#{position} · サイクル{cycle}",
+    "titleForId": "一筆の記録{id}",
     "description": "Cosmic Signatureプロトコルの一筆について、タイムスタンプ、参加者アドレス、一筆の費用、サイクルの文脈を含む詳しい情報を見る。"
   },
   "coordinationChanges": {

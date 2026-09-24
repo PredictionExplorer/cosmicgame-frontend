@@ -40,6 +40,8 @@
   },
   "gestureDetail": {
     "title": "落筆詳情",
+    "titleFor": "落筆 #{position} · 第 {cycle} 個週期",
+    "titleForId": "落筆紀錄 {id}",
     "description": "檢視 Cosmic Signature 協議中單次落筆的詳細資訊：時間戳、參與者地址、落筆價格與所屬週期。"
   },
   "currentCycleFull": {

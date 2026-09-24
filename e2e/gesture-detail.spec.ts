@@ -10,10 +10,17 @@ test.describe('Gesture detail page', () => {
   test('shows gesture information fields', async ({ page }) => {
     await page.goto('/gesture/1', { waitUntil: 'networkidle' });
     // One H1: "Gesture #N" (its place in the cycle) once the gesture is indexed
-    // with its position, "Gesture" otherwise.
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText(/^(Gesture #\d+|Gesture)$/);
+    // with its position, "Gesture record <id>" otherwise.
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+      /^(Gesture #\d+|Gesture record 1)$/,
+    );
+    // The record, a record that does not exist, or a read that failed (with a retry).
     await expect(
-      page.getByRole('heading', { name: /^(Record|No gesture information found\.)$/ }).first(),
+      page
+        .getByRole('heading', {
+          name: /^(Record|No gesture information found\.|Gesture record didn’t load)$/,
+        })
+        .first(),
     ).toBeVisible();
   });
 

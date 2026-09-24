@@ -45,8 +45,10 @@ test.describe('Sprint 8 deterministic Chinese journeys', () => {
     await expect(page.getByText('落笔总次数', { exact: true }).first()).toBeVisible();
 
     await page.goto(`/zh/gesture/${gestureId}`, { waitUntil: 'domcontentloaded' });
-    // The quality mock carries no cycle position, so the H1 is the plain noun.
-    await expect(page.getByRole('heading', { level: 1, name: '落笔', exact: true })).toBeVisible();
+    // The quality mock carries no cycle position, so the H1 names the record by its id.
+    await expect(
+      page.getByRole('heading', { level: 1, name: `落笔记录 ${gestureId}`, exact: true }),
+    ).toBeVisible();
     await expect(
       page.getByRole('main').getByRole('heading', { level: 2, name: '记录', exact: true }),
     ).toBeVisible();

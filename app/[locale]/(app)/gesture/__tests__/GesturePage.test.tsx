@@ -1,4 +1,6 @@
-import { render, screen, within, checkA11y } from '@/test-utils';
+import { formatTimeZoneLabel } from '@/utils/format';
+
+import { fireEvent, render, screen, within, checkA11y } from '@/test-utils';
 
 import GesturePage from '../[id]/GesturePage';
 
@@ -91,13 +93,42 @@ describe('GesturePage', () => {
     mockUseGestureInfo.mockReturnValue({ data: undefined, isLoading: true });
     render(<GesturePage gestureId={1} />);
     expect(screen.getByRole('status')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('gesture.header.fallback');
+    // D080: until the record names its place, the H1 names the record by its id.
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'gesture.header.fallback(id=1)',
+    );
   });
 
-  it('says when no gesture was found', () => {
-    mockUseGestureInfo.mockReturnValue({ data: null, isLoading: false });
+  it('says when no gesture was found, and where to go instead (D321)', () => {
+    mockUseGestureInfo.mockReturnValue({ data: null, isLoading: false, isError: false });
     render(<GesturePage gestureId={1} />);
     expect(screen.getByRole('heading', { name: 'gesture.empty.title' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /gesture\.empty\.action/ })).toHaveAttribute(
+      'href',
+      '/current-cycle',
+    );
+    expect(screen.queryByRole('heading', { name: 'gesture.error.title' })).not.toBeInTheDocument();
+  });
+
+  it('tells a failed read apart from a missing record, and retries it (D321)', () => {
+    const refetch = jest.fn();
+    mockUseGestureInfo.mockReturnValue({ data: null, isLoading: false, isError: true, refetch });
+    render(<GesturePage gestureId={1} />);
+    expect(screen.getByRole('heading', { name: 'gesture.error.title' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'gesture.empty.title' })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /retry|try/i }));
+    expect(refetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('sets the record on the site’s content edge, holding only the record to a reading width (D256)', () => {
+    renderGesture();
+    expect(screen.getByRole('heading', { level: 1 }).closest('.max-w-3xl')).toBeNull();
+    expect(
+      screen
+        .getByRole('heading', { level: 2, name: 'gesture.sections.details.title' })
+        .closest('.max-w-3xl'),
+    ).not.toBeNull();
+    expect(document.querySelector('.mx-auto.max-w-3xl')).toBeNull();
   });
 
   it('names the gesture by its place in the cycle, never by its record id (F173)', () => {
@@ -108,9 +139,12 @@ describe('GesturePage', () => {
     expect(screen.queryByText(/23514/)).not.toBeInTheDocument();
   });
 
-  it('falls back to the generic title without a position', () => {
-    renderGesture({ BidPosition: undefined });
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('gesture.header.fallback');
+  it('falls back to the record’s id without a position', () => {
+    renderGesture({ BidPosition: undefined }, 29434);
+    // An id, not a quantity: no digit grouping.
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'gesture.header.fallback(id=29434)',
+    );
   });
 
   it('places a finalized cycle’s gesture under that cycle’s record', () => {
@@ -189,14 +223,14 @@ describe('GesturePage', () => {
     );
   });
 
-  it('prints its times in UTC with the zone, so every reader cites the same instant', () => {
+  it('prints its times in the reader’s zone and names that zone, as every page does (D275)', () => {
     const { container } = renderGesture();
     const times = container.querySelectorAll('time');
     expect(times).toHaveLength(2);
-    // 1_780_045_566 is 2026-05-29 09:06:06 UTC; 1_780_049_166 an hour later.
+    // The instant itself stays machine-readable in UTC.
     expect(times[0]).toHaveAttribute('dateTime', '2026-05-29T09:06:06.000Z');
-    expect(times[0]).toHaveTextContent(/09:06:06\sUTC$/);
-    expect(times[1]).toHaveTextContent(/10:06:06\sUTC$/);
+    const zone = formatTimeZoneLabel('local');
+    for (const time of times) expect(time.textContent?.endsWith(` ${zone}`)).toBe(true);
   });
 
   it('shows the method once, with the Random Walk NFT when one was used', () => {
@@ -239,10 +273,19 @@ describe('GesturePage', () => {
           link.getAttribute('href')?.includes('/user/0x76Cd6127403163a2a74Aa4b6968579DC6435034e'),
         ),
     ).toBe(true);
-    expect(screen.getByRole('link', { name: /gesture\.header\.explorer/ })).toHaveAttribute(
-      'href',
-      expect.stringContaining(baseGestureInfo.TxHash),
-    );
+    // The meta line's proof and the transaction row's icon link go to the same explorer page.
+    const proofs = screen.getAllByRole('link', { name: /gesture\.header\.explorer/ });
+    expect(proofs).toHaveLength(2);
+    for (const proof of proofs) {
+      expect(proof).toHaveAttribute('href', expect.stringContaining(baseGestureInfo.TxHash));
+      expect(proof).toHaveAttribute('target', '_blank');
+    }
+  });
+
+  it('lets the transaction hash be copied from its row (D080)', () => {
+    renderGesture();
+    const row = screen.getByText(baseGestureInfo.TxHash).closest('div') as HTMLElement;
+    expect(within(row).getByRole('button', { name: 'gesture.rows.copyHash' })).toBeInTheDocument();
   });
 
   it('shows the attached ERC-20 when present', () => {
@@ -305,15 +348,25 @@ describe('GesturePage', () => {
       next: { id: 108, position: 8 },
     });
     renderGesture();
-    const nav = screen.getByRole('navigation', { name: 'gesture.nav.aria' });
-    expect(within(nav).getByRole('link', { name: /gesture\.nav\.previous/ })).toHaveAttribute(
-      'href',
-      '/gesture/101',
-    );
-    expect(within(nav).getByRole('link', { name: /gesture\.nav\.next/ })).toHaveAttribute(
-      'href',
-      '/gesture/108',
-    );
+    // Beside the title from `sm`, after the record on phones (one is hidden at each width).
+    const [header, phone] = screen.getAllByRole('navigation', { name: 'gesture.nav.aria' });
+    expect(header).toHaveClass('max-sm:hidden');
+    expect(phone).toHaveClass('sm:hidden');
+    const record = screen.getByRole('heading', {
+      level: 2,
+      name: 'gesture.sections.details.title',
+    });
+    expect(record.compareDocumentPosition(phone!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    for (const nav of [header!, phone!]) {
+      expect(within(nav).getByRole('link', { name: /gesture\.nav\.previous/ })).toHaveAttribute(
+        'href',
+        '/gesture/101',
+      );
+      expect(within(nav).getByRole('link', { name: /gesture\.nav\.next/ })).toHaveAttribute(
+        'href',
+        '/gesture/108',
+      );
+    }
   });
 
   it('has no accessibility violations', async () => {

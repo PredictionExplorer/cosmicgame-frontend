@@ -96,6 +96,8 @@
   },
   "gestureDetail": {
     "title": "Gesture Information",
+    "titleFor": "Gesture #{position} · Cycle #{cycle}",
+    "titleForId": "Gesture record {id}",
     "description": "View detailed gesture information including timestamp, participant address, gesture cost, and cycle context for the Cosmic Signature protocol."
   },
   "coordinationChanges": {

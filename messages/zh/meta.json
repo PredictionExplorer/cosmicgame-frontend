@@ -40,6 +40,8 @@
   },
   "gestureDetail": {
     "title": "落笔详情",
+    "titleFor": "落笔 #{position} · 第 {cycle} 个周期",
+    "titleForId": "落笔记录 {id}",
     "description": "查看 Cosmic Signature 协议中单次落笔的详细信息：时间戳、参与者地址、落笔价格与所属周期。"
   },
   "currentCycleFull": {

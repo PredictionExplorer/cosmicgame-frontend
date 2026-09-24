@@ -5,12 +5,17 @@
   },
   "header": {
     "title": "一筆#{position}",
-    "fallback": "一筆",
+    "fallback": "一筆の記録{id}",
     "explorer": "トランザクションを見る"
   },
   "empty": {
     "title": "一筆の情報が見つかりません。",
-    "help": "IDが正しくないか、一筆のデータがまだ反映されていない可能性があります。"
+    "help": "IDが正しくないか、一筆のデータがまだ反映されていない可能性があります。",
+    "action": "現在のサイクルを見る"
+  },
+  "error": {
+    "title": "一筆の記録を読み込めませんでした",
+    "message": "接続を確認して、もう一度お試しください。"
   },
   "figures": {
     "cost": "一筆の費用",
@@ -37,6 +42,8 @@
     "participant": "参加者",
     "finalizationTime": "この一筆の後の確定時刻",
     "transaction": "トランザクション",
+    "copyHash": "トランザクションハッシュをコピー",
+    "hashCopied": "トランザクションハッシュをコピーしました",
     "erc20": "添付されたERC-20",
     "erc20Amount": "添付されたERC-20トークンの数量",
     "nftContract": "添付されたNFTトークンのアドレス",
