@@ -75,8 +75,13 @@ export function CstHoldersLedger({
                   style={{ width: `${Math.max(1, Math.min(100, row.share * 100))}%` }}
                 />
               </span>
-              <span className="tabular-nums">
-                {format.percent(row.share, { scale: 'ratio', maximumFractionDigits: 1 })}
+              {/* A fixed slot (the widest share, "100.0 %", fits), so every bar starts at one x. */}
+              <span className="min-w-[7ch] text-right tabular-nums">
+                {format.percent(row.share, {
+                  scale: 'ratio',
+                  minimumFractionDigits: 1,
+                  maximumFractionDigits: 1,
+                })}
               </span>
             </span>
           ),
