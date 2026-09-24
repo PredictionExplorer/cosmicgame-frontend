@@ -2,6 +2,8 @@ import { decodeErrorResult, formatEther, type Abi, type Hex } from 'viem';
 
 import { cosmicGameAbi } from '@/contracts/abis';
 
+import { formatAmount } from '@/utils/format/numbers';
+
 /**
  * Contract-revert error helpers.
  *
@@ -56,6 +58,12 @@ export interface ContractErrorOptions {
   gestureCurrency?: GestureCurrency;
   displayedPrice?: number;
   displayedPriceWei?: bigint | null;
+  /**
+   * Formats the amounts in a cost-changed message the way the form showed
+   * them (the `exact` precision, the locale's separators: vi "0,10211").
+   * Default `en`.
+   */
+  locale?: string;
 }
 
 export interface ContractErrorDescriptor {
@@ -135,12 +143,23 @@ function getPriceChangeDescriptor(
   const delta = requiredAmount - displayedPrice;
   if (delta <= 0) return null;
 
-  if ((options.gestureCurrency ?? 'ETH') === 'CST') {
+  const currency = options.gestureCurrency ?? 'ETH';
+  // The catalog prints the unit after each placeholder, so the number goes
+  // in alone, through the one precision policy the form uses.
+  const amount = (value: number) =>
+    formatAmount(value, {
+      unit: currency,
+      context: 'exact',
+      locale: options.locale,
+      withUnit: false,
+    });
+
+  if (currency === 'CST') {
     return {
       key: 'gesture.contractErrors.cstCostChanged',
       values: {
-        required: requiredAmount.toFixed(6),
-        maximum: displayedPrice.toFixed(6),
+        required: amount(requiredAmount),
+        maximum: amount(displayedPrice),
       },
       errorName,
     };
@@ -149,8 +168,10 @@ function getPriceChangeDescriptor(
   return {
     key: 'gesture.contractErrors.ethCostChanged',
     values: {
-      increase: delta.toFixed(6),
-      required: requiredAmount.toFixed(6),
+      // The exact policy rounds to six places, which also drops the float
+      // noise a difference of two 18-decimal amounts carries.
+      increase: amount(delta),
+      required: amount(requiredAmount),
     },
     errorName,
   };

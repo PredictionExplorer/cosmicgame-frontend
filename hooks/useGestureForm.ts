@@ -7,7 +7,6 @@ import { formatEther, isAddress, parseEther, parseUnits, type TransactionReceipt
 import { randomWalkNftAbi as NFT_ABI, cosmicTokenAbi as ERC20_ABI } from '@/contracts/abis';
 import { cosmicGameAbi } from '@/contracts/abis';
 
-import { getLocaleConfig } from '@/i18n/localeConfig';
 import api from '@/services/api';
 import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import useRWLKNFTContract from '@/hooks/useRWLKNFTContract';
@@ -17,6 +16,7 @@ import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { ERC721_INTERFACE_ID, GESTURE_GAS_LIMIT } from '@/config/constants';
 import { isTransientNetworkError, reportError, reportErrorThrottled } from '@/utils/errors';
 import { getContractErrorDescriptor } from '@/utils/contractErrors';
+import { formatAmount } from '@/utils/format/numbers';
 import {
   type CosmicGameGestureFunctionName,
   pickGestureWriteAbi,
@@ -26,12 +26,7 @@ import {
 import { useNotify } from '@/hooks/useNotify';
 import { useTxFlow, type TxApprovalStep } from '@/hooks/useTxFlow';
 import { useCTPrice, useGestureEthCost, useUsedRWLKNFTs } from '@/hooks/useApiQuery';
-import {
-  formatCstAmount,
-  mapCTPriceInfo,
-  type CstAuctionDurations,
-  type CstGestureData,
-} from '@/utils/cstGesture';
+import { mapCTPriceInfo, type CstAuctionDurations, type CstGestureData } from '@/utils/cstGesture';
 import { REQUIRED_CHAIN_NAME } from '@/lib/chainGuard';
 import { sumImprintedTo } from '@/lib/receiptTransfers';
 import { clampCollisionBufferPercent } from '@/utils/gestureQuote';
@@ -317,9 +312,11 @@ export function useGestureForm() {
     };
   }, [contractAddrs.cosmicGame, cosmicGameContract, publicClient, uxScenario]);
 
-  const intlLocale = getLocaleConfig(locale).intlLocale;
-  const formatEthAmount = (wei: bigint) =>
-    Number(formatEther(wei)).toLocaleString(intlLocale, { maximumFractionDigits: 6 });
+  // Amounts in validation and success messages follow the one precision
+  // policy the form itself uses (`exact`: up to six places, the locale's
+  // separators, no padded zeros). The catalogs print the unit themselves.
+  const formatWei = (wei: bigint, unit: 'ETH' | 'CST') =>
+    formatAmount(wei, { unit, locale, context: 'exact', withUnit: false });
 
   const isContractAddress = async (address: string) => {
     if (!isAddress(address)) return false;
@@ -575,9 +572,7 @@ export function useGestureForm() {
   const gestureSuccessMessage = (receipt: TransactionReceipt) => {
     const imprinted = sumImprintedTo(receipt.logs, contractAddrs.cosmicToken, account);
     if (imprinted <= 0n) return t('gesture.confirmed');
-    return t('gesture.confirmedWithCst', {
-      cst: formatCstAmount(Number(formatEther(imprinted))),
-    });
+    return t('gesture.confirmedWithCst', { cst: formatWei(imprinted, 'CST') });
   };
 
   const estimateDonationGas = async (
@@ -689,8 +684,8 @@ export function useGestureForm() {
             notify(
               'error',
               t('gesture.validation.insufficientEth', {
-                required: formatEthAmount(ethGestureCost),
-                available: formatEthAmount(balance),
+                required: formatWei(ethGestureCost, 'ETH'),
+                available: formatWei(balance, 'ETH'),
                 network: REQUIRED_CHAIN_NAME,
               }),
             );
@@ -726,7 +721,11 @@ export function useGestureForm() {
         successMessage: gestureSuccessMessage,
         onConfirmed: () => clearAttachment(attachment),
         describeError: (err) => {
-          const descriptor = getContractErrorDescriptor(err, ethGestureInfo?.ETHPrice);
+          const descriptor = getContractErrorDescriptor(err, {
+            gestureCurrency: 'ETH',
+            displayedPrice: ethGestureInfo?.ETHPrice,
+            locale,
+          });
           return descriptor ? t(descriptor.key, descriptor.values) : null;
         },
         failureMessage: t('gesture.transaction.failed'),
@@ -773,8 +772,8 @@ export function useGestureForm() {
               notify(
                 'error',
                 t('gesture.validation.insufficientCst', {
-                  required: formatCstAmount(Number(formatEther(limit))),
-                  available: formatCstAmount(Number(formatEther(balance))),
+                  required: formatWei(limit, 'CST'),
+                  available: formatWei(balance, 'CST'),
                 }),
               );
               return false;
@@ -810,6 +809,7 @@ export function useGestureForm() {
           const descriptor = getContractErrorDescriptor(err, {
             gestureCurrency: 'CST',
             displayedPriceWei: priceMaxLimit,
+            locale,
           });
           if (descriptor) return t(descriptor.key, descriptor.values);
           return info.kind === 'would-revert' || info.kind === 'reverted'

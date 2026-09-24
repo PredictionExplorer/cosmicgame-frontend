@@ -33,7 +33,7 @@ describe('getContractErrorDescriptor', () => {
       }),
     ).toEqual({
       key: 'gesture.contractErrors.cstCostChanged',
-      values: { required: '1.500000', maximum: '1.000000' },
+      values: { required: '1.5', maximum: '1' },
       errorName: 'InsufficientReceivedBidAmount',
     });
   });
@@ -41,8 +41,22 @@ describe('getContractErrorDescriptor', () => {
   it('describes an ETH cost rise with the increase and the new cost', () => {
     expect(getContractErrorDescriptor(costRose(), 1)).toEqual({
       key: 'gesture.contractErrors.ethCostChanged',
-      values: { increase: '0.500000', required: '1.500000' },
+      values: { increase: '0.5', required: '1.5' },
       errorName: 'InsufficientReceivedBidAmount',
+    });
+  });
+
+  it("formats the amounts in the reader's locale, without padded zeros", () => {
+    // Regression: a vi participant saw 0,10211 ETH in the form and
+    // "0.102110 ETH" in the toast.
+    const err = makeRevertError('InsufficientReceivedBidAmount', [
+      'gesture cost changed',
+      102110000000000000n,
+      100000000000000000n,
+    ]);
+    expect(getContractErrorDescriptor(err, { displayedPrice: 0.1, locale: 'vi' })?.values).toEqual({
+      increase: '0,00211',
+      required: '0,10211',
     });
   });
 
