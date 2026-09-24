@@ -235,8 +235,8 @@
       },
       "ethGesture": "ETH 제스처",
       "ethGestureTooltip": "지금 ETH로 제스처를 남기는 데 드는 비용",
-      "randomWalkGesture": "ETH + RandomWalk 제스처",
-      "randomWalkGestureTooltip": "ETH 제스처에 RandomWalk NFT를 첨부하면 ETH 제스처 비용이 50% 할인됩니다",
+      "randomWalkGesture": "ETH + Random Walk 제스처",
+      "randomWalkGestureTooltip": "ETH 제스처에 Random Walk NFT를 첨부하면 ETH 제스처 비용이 50% 할인됩니다",
       "cstGesture": "CST 제스처",
       "cstGestureTooltip": "CST로 남기는 제스처입니다. 비용은 실시간 보정 구간을 따라 내려가며, CST 제스처는 구간을 늘리고 ETH 제스처는 줄입니다.",
       "free": "0 CST",
@@ -265,9 +265,9 @@
   },
   "ticker": {
     "openLatestAria": "최근 제스처 {id} 열기",
-    "gestureLine": "{address}의 {kind, select, cst {CST 제스처} randomWalk {ETH + RandomWalk 제스처} other {ETH 제스처}}",
+    "gestureLine": "{address}의 {kind, select, cst {CST 제스처} randomWalk {ETH + Random Walk 제스처} other {ETH 제스처}}",
     "paymentUnavailable": "비용 동기화 중…",
-    "rwlkToken": "RandomWalk #{id}",
+    "rwlkToken": "Random Walk #{id}",
     "age": {
       "justNow": "방금",
       "seconds": "{count}초 전",
@@ -359,8 +359,8 @@
     },
     "submit": {
       "eth": "ETH로 제스처 남기기 ({cost} ETH)",
-      "randomWalkWithToken": "ETH + RandomWalk 토큰 {tokenId} 제스처 남기기 ({cost} ETH)",
-      "randomWalk": "ETH + RandomWalk로 제스처 남기기",
+      "randomWalkWithToken": "ETH + Random Walk 토큰 {tokenId} 제스처 남기기 ({cost} ETH)",
+      "randomWalk": "ETH + Random Walk로 제스처 남기기",
       "cst": "CST로 제스처 남기기 ({cost} CST)",
       "cstFree": "CST로 제스처 남기기 (0 CST + 가스 비용)",
       "generic": "{method} 제스처 남기기",
@@ -439,8 +439,8 @@
         "tooltip": "사이클 참여 기록 가운데 무작위로 선정된 참여자가 공로 CST와 Cosmic Signature NFT를 받습니다."
       },
       "randomWalkAnchor": {
-        "name": "RandomWalk 앵커링 보유자",
-        "tooltip": "RandomWalk NFT 앵커링 보유자는 공로 CST와 Cosmic Signature NFT를 받을 수 있습니다."
+        "name": "Random Walk 앵커링 보유자",
+        "tooltip": "Random Walk NFT 앵커링 보유자는 공로 CST와 Cosmic Signature NFT를 받을 수 있습니다."
       },
       "cosmicAnchor": {
         "name": "Cosmic Signature 앵커링",

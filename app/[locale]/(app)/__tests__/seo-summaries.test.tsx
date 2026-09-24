@@ -437,7 +437,7 @@ describe('server-rendered page headers', () => {
     ['eth-contribution' as const, 'Direct ETH contributions', 'records', null],
     ['attached-nfts' as const, 'Attached NFT Contributions', 'collection', '/gallery'],
     ['named-nfts' as const, 'Named Cosmic Signature NFTs', 'collection', '/gallery'],
-    ['used-rwlk-nfts' as const, 'Used RandomWalk NFTs', 'collection', '/gallery'],
+    ['used-rwlk-nfts' as const, 'Used Random Walk NFTs', 'collection', '/gallery'],
   ])(
     'renders %s as one header: H1, section eyebrow, snapshot and source',
     async (route, heading, section, hub) => {

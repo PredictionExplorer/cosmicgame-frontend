@@ -392,6 +392,13 @@ screen. `stack` puts long text under its label. Blank cells and `priority: 'seco
 columns drop out, so no empty labelled line is left behind. The connected wallet's
 record carries its 2px accent rule down the start edge.
 
+The records keep table semantics: every part of `ResponsiveTable` and the static `Table`
+states its role (`table`, `rowgroup`, `row`, `columnheader`, `cell`), because WebKit drops
+the implicit roles of a table restyled with `display: block`, and the drawn label has
+empty alternative text (`content: attr(data-label) / ''`), so a screen reader hears the
+column header once rather than twice. A table built from raw `<tr>`/`<td>` inside these
+primitives states the same roles.
+
 A table stays a real table on phones (`layout="compact"`) only when every column a phone
 shows is a compact kind (`address`, `link`, `amount`, `count`, `percent`, `status`) and
 there are at most three: `phoneLayoutFor` decides it from the columns. A date, a
@@ -435,6 +442,25 @@ and a "You" tag, and the row keeps its ranked place. A line above the table give
 position ("#3 of 37") and a "Show my row" button that jumps to its page.
 `currentRowSummary` adds figures to that line. Never append "(You)" to the address
 text.
+
+## Copy
+
+Catalogs carry the text exactly as it renders; nothing transforms case. In English:
+
+- **Sentence case** for headings, labels, buttons, tabs and table headers: "Make a
+  gesture", "Number of gestures", "Gesture type".
+- **Common nouns stay lower case** after the start of a sentence: gesture, cycle,
+  allocation, recipient. "a new gesture", "ETH and CST gestures", "Cycle 12" (a
+  numbered cycle is a name, like "Chapter 12").
+- **Named quantities, reserves, windows and roles keep their capitals**: Gesture Cost,
+  Gesture Chat, Cycle Finalization Time, Cycle Reserve, Calibration Window, Signature
+  Allocation, Stellar Selection, Endurance Champion, Chrono-Warrior, the Last Gesture
+  (the role: "You hold the Last Gesture"), the Final CST Gesture.
+- **Random Walk NFT** is two words in every locale; `RandomWalk` is only the contract's
+  name (`contracts.entries.*.name`, `formats.address.known.randomWalk`).
+
+`i18n/__tests__/english-copy.test.ts` enforces the last two rules; its allowlist holds
+the strings a parallel change still owned, and may only shrink.
 
 ## Retired patterns
 

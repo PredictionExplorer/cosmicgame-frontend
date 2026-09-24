@@ -188,8 +188,8 @@
       "empty": {
         "cosmicSignatureTitle": "係留の活動はまだありません",
         "cosmicSignatureDescription": "係留されたCosmic Signature NFTは、サイクルごとのETHの係留配分を分け合います。",
-        "randomWalkTitle": "RandomWalkの係留はまだありません",
-        "randomWalkDescription": "係留されたRandomWalk NFTは係留NFT星選に参加します。"
+        "randomWalkTitle": "Random Walkの係留はまだありません",
+        "randomWalkDescription": "係留されたRandom Walk NFTは係留NFT星選に参加します。"
       },
       "stats": {
         "anchorActions": "係留操作",
@@ -258,7 +258,7 @@
       "allocationType": "配分の種類",
       "types": {
         "stellarSelection": "Cosmic Signature NFT星選",
-        "anchoredNftSelection": "係留NFT星選（RandomWalk係留者）",
+        "anchoredNftSelection": "係留NFT星選（Random Walk係留者）",
         "signatureAllocation": "シグネチャー配分の受領者（サイクル{cycle}）",
         "enduranceChampion": "持久チャンピオン",
         "lastCstParticipant": "最後のCST参加者"

@@ -48,8 +48,8 @@
       "description": "NFT, долучені до жестів у різних циклах"
     },
     "usedRwlkNfts": {
-      "label": "Використані RandomWalk NFT",
-      "description": "RandomWalk NFT, уже використані для нижчої вартості жесту"
+      "label": "Використані Random Walk NFT",
+      "description": "Random Walk NFT, уже використані для нижчої вартості жесту"
     },
     "statistics": {
       "label": "Статистика",

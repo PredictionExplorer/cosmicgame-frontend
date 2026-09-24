@@ -5,10 +5,8 @@ const UTILS_DIR = resolve(__dirname, '..');
 
 const UTIL_FILES = [
   'address.ts',
-  'alert.ts',
   'analytics.ts',
   'contractErrors.ts',
-  'contractWrite.ts',
   'endurance.ts',
   'errors.ts',
   'format.ts',
@@ -74,13 +72,11 @@ const files: FileEntry[] = UTIL_FILES.map((name) => {
 
 const EXPECTED_COUNTS: Record<string, number> = {
   'address.ts': 1,
-  'alert.ts': 1,
   'analytics.ts': 3,
   'contractErrors.ts': 3,
-  'contractWrite.ts': 1,
   'endurance.ts': 3,
   'errors.ts': 6,
-  'format.ts': 14,
+  'format.ts': 7,
   'format/addresses.ts': 6,
   'format/dates.ts': 10,
   'format/durations.ts': 6,
@@ -111,9 +107,9 @@ describe('Utils JSDoc coverage', () => {
   });
 
   describe('no function is missing from the inventory', () => {
-    it('total exported functions/constants across all util files is 81', () => {
+    it('total exported functions/constants across all util files is 72', () => {
       const total = files.reduce((sum, f) => sum + f.exports.length, 0);
-      expect(total).toBe(81);
+      expect(total).toBe(72);
     });
   });
 

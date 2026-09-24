@@ -158,7 +158,7 @@
     "recipients": "Унікальні отримувачі",
     "ethContributors": "Унікальні автори внесків ETH",
     "cstAnchorHolders": "Власники закріплених Cosmic Signature NFT",
-    "rwlkAnchorHolders": "Власники закріплених RandomWalk NFT",
+    "rwlkAnchorHolders": "Власники закріплених Random Walk NFT",
     "publicGoodsContributions": "Внески в суспільні блага",
     "publicGoodsRetrievals": "Забрані кошти суспільних благ",
     "outreachAllocations": "Розподіли з резерву просування",
@@ -395,7 +395,7 @@
     "contractAddress": "Адреса контракту",
     "numberOfNfts": "Кількість NFT",
     "namedNftTokenId": "ID токена",
-    "isRandomWalk": "Через RandomWalk",
+    "isRandomWalk": "Через Random Walk",
     "isAnchorHolder": "Власник закріплення"
   },
   "statisticsTooltips": {

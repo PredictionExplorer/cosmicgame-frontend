@@ -186,9 +186,9 @@
         }
       },
       "used-rwlk-nfts": {
-        "heading": "사용된 RandomWalk NFT",
-        "description": "일회성 제스처 비용 할인을 위해 이미 ETH 제스처에 첨부된 RandomWalk NFT를 확인할 수 있습니다.",
-        "source": "Cosmic Signature 공개 RandomWalk 사용 기록 API",
+        "heading": "사용된 Random Walk NFT",
+        "description": "일회성 제스처 비용 할인을 위해 이미 ETH 제스처에 첨부된 Random Walk NFT를 확인할 수 있습니다.",
+        "source": "Cosmic Signature 공개 Random Walk 사용 기록 API",
         "links": {
           "imprint": "Random Walk NFT 각인",
           "learn": "제스처 알아보기",
@@ -196,7 +196,7 @@
         },
         "cards": {
           "used": {
-            "label": "사용된 RandomWalk NFT"
+            "label": "사용된 Random Walk NFT"
           },
           "wallets": {
             "label": "참여자 지갑"
@@ -405,7 +405,7 @@
       "subhead": "제스처마다 사이클이 늘어나고 시그니처가 빚어지며, 참여 CST가 각인될 수 있습니다.",
       "methods": {
         "eth": "ETH 제스처",
-        "ethRandomWalk": "ETH + RandomWalk 제스처",
+        "ethRandomWalk": "ETH + Random Walk 제스처",
         "cst": "CST 제스처"
       }
     },

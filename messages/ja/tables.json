@@ -158,7 +158,7 @@
     "recipients": "ユニーク受領者",
     "ethContributors": "ユニークETH拠出者",
     "cstAnchorHolders": "Cosmic Signature NFTの係留者",
-    "rwlkAnchorHolders": "RandomWalk NFTの係留者",
+    "rwlkAnchorHolders": "Random Walk NFTの係留者",
     "publicGoodsContributions": "公共財拠出の記録",
     "publicGoodsRetrievals": "公共財の受け取り記録",
     "outreachAllocations": "広報準備金の配分記録",
@@ -395,7 +395,7 @@
     "contractAddress": "コントラクトアドレス",
     "numberOfNfts": "NFTの数",
     "namedNftTokenId": "トークンID",
-    "isRandomWalk": "RandomWalkか",
+    "isRandomWalk": "Random Walkか",
     "isAnchorHolder": "係留者か"
   },
   "statisticsTooltips": {

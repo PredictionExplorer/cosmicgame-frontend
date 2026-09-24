@@ -62,7 +62,7 @@
   },
   "about": {
     "title": "About the collection",
-    "description": "Each Cosmic Signature NFT is a unique piece of generative art derived from an on-chain seed via three-body-problem physics simulations. Anyone can reproduce a Signature from protocol records, and each one belongs to a specific cycle. In a typical cycle, 24 new NFTs are imprinted: four role NFTs, ten participant Stellar Selection NFTs, and ten Anchored-NFT Stellar Selection NFTs for RandomWalk NFT anchor-holders."
+    "description": "Each Cosmic Signature NFT is a unique piece of generative art derived from an on-chain seed via three-body-problem physics simulations. Anyone can reproduce a Signature from protocol records, and each one belongs to a specific cycle. In a typical cycle, 24 new NFTs are imprinted: four role NFTs, ten participant Stellar Selection NFTs, and ten Anchored-NFT Stellar Selection NFTs for Random Walk NFT anchor-holders."
   },
   "toolbar": {
     "filters": "Filters",

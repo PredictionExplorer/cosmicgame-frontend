@@ -53,7 +53,7 @@
     },
     "rwalkAnchor": {
       "name": "RWLK Anchoring Wallet",
-      "description": "Anchoring contract for RandomWalk NFTs"
+      "description": "Anchoring contract for Random Walk NFTs"
     }
   },
   "categories": {
@@ -158,7 +158,7 @@
       "nftLabel": "NFT Stellar Selection recipients",
       "nftTooltip": "Number of participants randomly selected to receive Cosmic Signature NFTs each cycle",
       "anchorLabel": "Anchored-NFT Stellar Selection recipients",
-      "anchorTooltip": "Number of RandomWalk NFT anchor-holders randomly selected to receive Cosmic Signature NFTs each cycle"
+      "anchorTooltip": "Number of Random Walk NFT anchor-holders randomly selected to receive Cosmic Signature NFTs each cycle"
     },
     "cstComplete": "The window has run its full length, so the CST Gesture Cost stays at its floor until the next CST gesture restarts it.",
     "ethClosed": "The cycle's first gesture closed this window; the ETH Gesture Cost now steps up with each gesture.",

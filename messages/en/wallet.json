@@ -14,9 +14,9 @@
     "eth": "ETH",
     "cst": "CST",
     "cosmicNfts": "Cosmic Signature NFTs",
-    "rwlkNfts": "RandomWalk NFTs",
+    "rwlkNfts": "Random Walk NFTs",
     "anchoredCst": "Anchored Cosmic Signature NFTs",
-    "anchoredRwlk": "Anchored RandomWalk NFTs"
+    "anchoredRwlk": "Anchored Random Walk NFTs"
   },
   "labels": {
     "balancesHeading": "Balances"

@@ -53,7 +53,7 @@
     },
     "rwalkAnchor": {
       "name": "RWLK係留ウォレット",
-      "description": "RandomWalk NFTの係留コントラクト"
+      "description": "Random Walk NFTの係留コントラクト"
     }
   },
   "categories": {
@@ -158,7 +158,7 @@
       "nftLabel": "NFT星選（参加者）",
       "nftTooltip": "サイクルごとにCosmic Signature NFTを受け取るために無作為に選ばれる参加者の数",
       "anchorLabel": "NFT星選（係留RWLK）",
-      "anchorTooltip": "サイクルごとにCosmic Signature NFTを受け取るために無作為に選ばれるRandomWalk NFT係留者の数"
+      "anchorTooltip": "サイクルごとにCosmic Signature NFTを受け取るために無作為に選ばれるRandom Walk NFT係留者の数"
     },
     "cstComplete": "期間が最後まで経過したため、次のCSTの一筆で始まり直すまで、CSTの一筆の費用は最低値のままです。",
     "ethClosed": "このサイクルの最初の一筆でこの期間は閉じました。以後、ETHの一筆の費用は一筆ごとに上がります。",

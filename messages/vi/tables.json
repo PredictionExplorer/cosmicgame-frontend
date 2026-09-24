@@ -158,7 +158,7 @@
     "recipients": "Người nhận riêng biệt",
     "ethContributors": "Người đóng góp ETH riêng biệt",
     "cstAnchorHolders": "Người neo giữ Cosmic Signature NFT",
-    "rwlkAnchorHolders": "Người neo giữ RandomWalk NFT",
+    "rwlkAnchorHolders": "Người neo giữ Random Walk NFT",
     "publicGoodsContributions": "Các khoản đóng góp Hàng hóa công",
     "publicGoodsRetrievals": "Các lần nhận về Hàng hóa công",
     "outreachAllocations": "Phân bổ từ Dự trữ truyền thông",
@@ -395,7 +395,7 @@
     "contractAddress": "Địa chỉ hợp đồng",
     "numberOfNfts": "Số NFT",
     "namedNftTokenId": "Mã token",
-    "isRandomWalk": "Là RandomWalk",
+    "isRandomWalk": "Là Random Walk",
     "isAnchorHolder": "Là người neo giữ"
   },
   "statisticsTooltips": {

@@ -188,8 +188,8 @@
       "empty": {
         "cosmicSignatureTitle": "Активності закріплення ще немає",
         "cosmicSignatureDescription": "Закріплені Cosmic Signature NFT ділять надходження в ETH за закріплення кожного циклу.",
-        "randomWalkTitle": "Закріплень RandomWalk ще немає",
-        "randomWalkDescription": "Закріплені RandomWalk NFT беруть участь у зоряному відборі закріплених NFT."
+        "randomWalkTitle": "Закріплень Random Walk ще немає",
+        "randomWalkDescription": "Закріплені Random Walk NFT беруть участь у зоряному відборі закріплених NFT."
       },
       "stats": {
         "anchorActions": "Дії закріплення",
@@ -258,7 +258,7 @@
       "allocationType": "Тип розподілу",
       "types": {
         "stellarSelection": "Зоряний відбір Cosmic Signature NFT",
-        "anchoredNftSelection": "Зоряний відбір закріплених NFT (власник закріплення RandomWalk)",
+        "anchoredNftSelection": "Зоряний відбір закріплених NFT (власник закріплення Random Walk)",
         "signatureAllocation": "Отримувач розподілу Сигнатури (цикл {cycle})",
         "enduranceChampion": "Чемпіон витривалості",
         "lastCstParticipant": "Автор останнього CST-жесту"

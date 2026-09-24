@@ -186,9 +186,9 @@
         }
       },
       "used-rwlk-nfts": {
-        "heading": "Використані RandomWalk NFT",
-        "description": "Перегляньте RandomWalk NFT, які вже долучено до ETH-жестів для одноразового зниження вартості жесту.",
-        "source": "Публічні API використання RandomWalk Cosmic Signature",
+        "heading": "Використані Random Walk NFT",
+        "description": "Перегляньте Random Walk NFT, які вже долучено до ETH-жестів для одноразового зниження вартості жесту.",
+        "source": "Публічні API використання Random Walk Cosmic Signature",
         "links": {
           "imprint": "Закарбувати Random Walk NFT",
           "learn": "Дізнатися, як працюють жести",
@@ -196,7 +196,7 @@
         },
         "cards": {
           "used": {
-            "label": "Використані RandomWalk NFT"
+            "label": "Використані Random Walk NFT"
           },
           "wallets": {
             "label": "Гаманці учасників"
@@ -405,7 +405,7 @@
       "subhead": "Кожен жест подовжує цикл, формує Сигнатуру та може закарбувати CST участі.",
       "methods": {
         "eth": "ETH-жест",
-        "ethRandomWalk": "ETH-жест + RandomWalk",
+        "ethRandomWalk": "ETH-жест + Random Walk",
         "cst": "CST-жест"
       }
     },

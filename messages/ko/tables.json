@@ -158,7 +158,7 @@
     "recipients": "고유 수령자",
     "ethContributors": "고유 ETH 기여자",
     "cstAnchorHolders": "Cosmic Signature NFT 앵커링 보유자",
-    "rwlkAnchorHolders": "RandomWalk NFT 앵커링 보유자",
+    "rwlkAnchorHolders": "Random Walk NFT 앵커링 보유자",
     "publicGoodsContributions": "공공재 기여 내역",
     "publicGoodsRetrievals": "공공재 회수 내역",
     "outreachAllocations": "홍보 준비금 배분 내역",
@@ -395,7 +395,7 @@
     "contractAddress": "컨트랙트 주소",
     "numberOfNfts": "NFT 수",
     "namedNftTokenId": "토큰 ID",
-    "isRandomWalk": "RandomWalk 여부",
+    "isRandomWalk": "Random Walk 여부",
     "isAnchorHolder": "앵커링 보유자 여부"
   },
   "statisticsTooltips": {

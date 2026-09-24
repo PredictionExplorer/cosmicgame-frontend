@@ -45,7 +45,7 @@ const TOOLTIP_LABELS_AND_COPY: Array<{ label: string; expected: RegExp }> = [
   },
   {
     label: 'Anchored-NFT Stellar Selection recipients',
-    expected: /Number of RandomWalk NFT anchor-holders randomly selected/,
+    expected: /Number of Random Walk NFT anchor-holders randomly selected/,
   },
   // Allocation tracks
   { label: 'Signature Allocation', expected: /participant who made the Final Gesture/ },

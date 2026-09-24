@@ -188,8 +188,8 @@
       "empty": {
         "cosmicSignatureTitle": "아직 앵커링 활동이 없습니다",
         "cosmicSignatureDescription": "앵커링된 Cosmic Signature NFT는 매 사이클의 ETH 앵커링 지급을 나눠 받습니다.",
-        "randomWalkTitle": "아직 RandomWalk 앵커링이 없습니다",
-        "randomWalkDescription": "앵커링된 RandomWalk NFT는 앵커링 NFT 별빛 선정에 참여합니다."
+        "randomWalkTitle": "아직 Random Walk 앵커링이 없습니다",
+        "randomWalkDescription": "앵커링된 Random Walk NFT는 앵커링 NFT 별빛 선정에 참여합니다."
       },
       "stats": {
         "anchorActions": "앵커링 작업",
@@ -258,7 +258,7 @@
       "allocationType": "배분 유형",
       "types": {
         "stellarSelection": "Cosmic Signature NFT 별빛 선정",
-        "anchoredNftSelection": "앵커링 NFT 별빛 선정(RandomWalk 앵커링 보유자)",
+        "anchoredNftSelection": "앵커링 NFT 별빛 선정(Random Walk 앵커링 보유자)",
         "signatureAllocation": "시그니처 배분 수령자(사이클 {cycle})",
         "enduranceChampion": "수호 챔피언",
         "lastCstParticipant": "최종 CST 참여자"

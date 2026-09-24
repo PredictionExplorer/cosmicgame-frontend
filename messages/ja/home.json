@@ -235,8 +235,8 @@
       },
       "ethGesture": "ETH一筆",
       "ethGestureTooltip": "ETHで一筆を入れる現在の費用",
-      "randomWalkGesture": "ETH + RandomWalk一筆",
-      "randomWalkGestureTooltip": "RandomWalk NFTをETH一筆に添付すると、ETH一筆の費用が50%引き下げられます",
+      "randomWalkGesture": "ETH + Random Walk一筆",
+      "randomWalkGestureTooltip": "Random Walk NFTをETH一筆に添付すると、ETH一筆の費用が50%引き下げられます",
       "cstGesture": "CST一筆",
       "cstGestureTooltip": "CSTで一筆を入れます。費用はライブの調律期間を通じて下がり、CST一筆はその期間を長く、ETH一筆は短くします。",
       "free": "0 CST",
@@ -265,9 +265,9 @@
   },
   "ticker": {
     "openLatestAria": "最新の一筆{id}を開く",
-    "gestureLine": "{address}が{kind, select, cst {CST一筆} randomWalk {ETH + RandomWalk一筆} other {ETH一筆}}を入れました",
+    "gestureLine": "{address}が{kind, select, cst {CST一筆} randomWalk {ETH + Random Walk一筆} other {ETH一筆}}を入れました",
     "paymentUnavailable": "費用を同期中…",
-    "rwlkToken": "RandomWalk #{id}",
+    "rwlkToken": "Random Walk #{id}",
     "age": {
       "justNow": "たった今",
       "seconds": "{count}秒前",
@@ -359,8 +359,8 @@
     },
     "submit": {
       "eth": "ETHで一筆（{cost} ETH）",
-      "randomWalkWithToken": "ETH + RandomWalkトークン{tokenId}で一筆（{cost} ETH）",
-      "randomWalk": "ETH + RandomWalkで一筆",
+      "randomWalkWithToken": "ETH + Random Walkトークン{tokenId}で一筆（{cost} ETH）",
+      "randomWalk": "ETH + Random Walkで一筆",
       "cst": "CSTで一筆（{cost} CST）",
       "cstFree": "CSTで一筆（0 CSTとガス代）",
       "generic": "{method}で一筆",
@@ -439,8 +439,8 @@
         "tooltip": "サイクルの対象の中から無作為に選ばれた参加者が功労CSTとCosmic Signature NFTを受け取ります。"
       },
       "randomWalkAnchor": {
-        "name": "RandomWalk係留者",
-        "tooltip": "RandomWalk NFTの係留者は功労CSTとCosmic Signature NFTを受け取ることがあります。"
+        "name": "Random Walk係留者",
+        "tooltip": "Random Walk NFTの係留者は功労CSTとCosmic Signature NFTを受け取ることがあります。"
       },
       "cosmicAnchor": {
         "name": "Cosmic Signatureの係留",

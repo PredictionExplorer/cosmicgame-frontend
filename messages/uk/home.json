@@ -235,8 +235,8 @@
       },
       "ethGesture": "ETH-жест",
       "ethGestureTooltip": "Поточна вартість жесту за ETH",
-      "randomWalkGesture": "ETH-жест + RandomWalk",
-      "randomWalkGestureTooltip": "Вартість ETH-жесту зменшується на 50%, якщо до нього долучити RandomWalk NFT",
+      "randomWalkGesture": "ETH-жест + Random Walk",
+      "randomWalkGestureTooltip": "Вартість ETH-жесту зменшується на 50%, якщо до нього долучити Random Walk NFT",
       "cstGesture": "CST-жест",
       "cstGestureTooltip": "Жест за CST. Вартість знижується протягом поточного вікна калібрування, яке CST-жести подовжують, а ETH-жести скорочують.",
       "free": "0 CST",
@@ -265,9 +265,9 @@
   },
   "ticker": {
     "openLatestAria": "Відкрити останній жест {id}",
-    "gestureLine": "{address} робить {kind, select, cst {CST-жест} randomWalk {ETH-жест з RandomWalk} other {ETH-жест}}",
+    "gestureLine": "{address} робить {kind, select, cst {CST-жест} randomWalk {ETH-жест з Random Walk} other {ETH-жест}}",
     "paymentUnavailable": "вартість синхронізується…",
-    "rwlkToken": "RandomWalk {id}",
+    "rwlkToken": "Random Walk {id}",
     "age": {
       "justNow": "щойно",
       "seconds": "{count}с тому",
@@ -359,8 +359,8 @@
     },
     "submit": {
       "eth": "Зробити ETH-жест ({cost} ETH)",
-      "randomWalkWithToken": "Зробити ETH-жест + RandomWalk {tokenId} ({cost} ETH)",
-      "randomWalk": "Зробити ETH-жест + RandomWalk",
+      "randomWalkWithToken": "Зробити ETH-жест + Random Walk {tokenId} ({cost} ETH)",
+      "randomWalk": "Зробити ETH-жест + Random Walk",
       "cst": "Зробити CST-жест ({cost} CST)",
       "cstFree": "Зробити CST-жест (0 CST + газ)",
       "generic": "Зробити жест: {method}",
@@ -439,8 +439,8 @@
         "tooltip": "Учасників випадково відбирають серед записів циклу для отримання CST визнання та Cosmic Signature NFT."
       },
       "randomWalkAnchor": {
-        "name": "Власники закріплень RandomWalk",
-        "tooltip": "Власники закріплень RandomWalk NFT можуть отримати CST визнання та Cosmic Signature NFT."
+        "name": "Власники закріплень Random Walk",
+        "tooltip": "Власники закріплень Random Walk NFT можуть отримати CST визнання та Cosmic Signature NFT."
       },
       "cosmicAnchor": {
         "name": "Закріплення Cosmic Signature",

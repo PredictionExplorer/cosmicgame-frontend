@@ -54,7 +54,7 @@
     },
     "contractErrors": {
       "insufficientReceivedBidAmount": "現在の一筆の費用が、送金した金額を上回っています。",
-      "usedRandomWalkNft": "このRandomWalk NFTはすでに一筆に使われています。",
+      "usedRandomWalkNft": "このRandom Walk NFTはすでに一筆に使われています。",
       "callerIsNotNftOwner": "このNFTの所有者ではありません。",
       "roundIsInactive": "現在のサイクルは有効ではありません。",
       "tooLongBidMessage": "一筆のメッセージが長すぎます。",

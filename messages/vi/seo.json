@@ -186,9 +186,9 @@
         }
       },
       "used-rwlk-nfts": {
-        "heading": "RandomWalk NFT đã sử dụng",
-        "description": "Xem các RandomWalk NFT đã được đính kèm vào nét bút ETH để hưởng mức giảm chi phí nét bút một lần.",
-        "source": "Các API sử dụng RandomWalk công khai của Cosmic Signature",
+        "heading": "Random Walk NFT đã sử dụng",
+        "description": "Xem các Random Walk NFT đã được đính kèm vào nét bút ETH để hưởng mức giảm chi phí nét bút một lần.",
+        "source": "Các API sử dụng Random Walk công khai của Cosmic Signature",
         "links": {
           "imprint": "Khắc Random Walk NFT",
           "learn": "Tìm hiểu cách nét bút vận hành",
@@ -196,7 +196,7 @@
         },
         "cards": {
           "used": {
-            "label": "RandomWalk NFT đã sử dụng"
+            "label": "Random Walk NFT đã sử dụng"
           },
           "wallets": {
             "label": "Ví người tham gia"
@@ -405,7 +405,7 @@
       "subhead": "Mỗi nét bút kéo dài chu kỳ, định hình Signature và có thể khắc CST tham gia.",
       "methods": {
         "eth": "Nét bút ETH",
-        "ethRandomWalk": "Nét bút ETH + RandomWalk",
+        "ethRandomWalk": "Nét bút ETH + Random Walk",
         "cst": "Nét bút CST"
       }
     },
