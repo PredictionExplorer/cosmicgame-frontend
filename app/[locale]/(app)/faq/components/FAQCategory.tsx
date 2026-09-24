@@ -39,7 +39,8 @@ interface FAQCategoryProps {
  * One FAQ category: its heading, an "Expand all" toggle and the questions as
  * a hairline-divided accordion. Every answer stays in the HTML, closed ones
  * `hidden="until-found"`, so crawlers and find-in-page still reach them;
- * while a search runs, every matching answer is open with the match marked.
+ * a search opens every matching answer with the match marked, and the
+ * reader can close them again until the query changes.
  * Answers keep a reading measure, explain coined terms in place from the
  * glossary and set contract identifiers as code.
  */
@@ -51,7 +52,14 @@ export const FAQCategorySection = forwardRef<HTMLElement, FAQCategoryProps>(
     const t = useTranslations('faq');
     const tGlossary = useTranslations('glossary');
     const [copiedId, setCopiedId] = useState<string | null>(null);
-    const searching = searchQuery.trim().length > 0;
+    const query = searchQuery.trim();
+    const searching = query.length > 0;
+    // The answers a reader closed during a search, kept for that query only:
+    // a new query opens every match again.
+    const [searchClosed, setSearchClosed] = useState<{ query: string; ids: readonly string[] }>({
+      query: '',
+      ids: [],
+    });
 
     const terms = useMemo<AnswerTerm[]>(
       () => [
@@ -69,13 +77,13 @@ export const FAQCategorySection = forwardRef<HTMLElement, FAQCategoryProps>(
 
     const filteredItems = useMemo(() => {
       if (!searching) return category.items;
-      const q = normalizeForMatch(searchQuery);
+      const q = normalizeForMatch(query);
       return category.items.filter(
         (item) =>
           normalizeForMatch(item.question).includes(q) ||
           normalizeForMatch(item.answer).includes(q),
       );
-    }, [category.items, searchQuery, searching]);
+    }, [category.items, query, searching]);
 
     const copyLink = useCallback((item: FAQItem) => {
       const anchor = item.hashAnchor || item.id;
@@ -88,9 +96,11 @@ export const FAQCategorySection = forwardRef<HTMLElement, FAQCategoryProps>(
 
     if (filteredItems.length === 0) return null;
 
-    // A match may sit in an answer only, so every matching answer is open during a search.
+    // A match may sit in an answer only, so every matching answer opens with
+    // the search; the reader can still close one.
+    const closedForQuery = searchClosed.query === query ? searchClosed.ids : [];
     const openIds = searching
-      ? filteredItems.map((item) => item.id)
+      ? filteredItems.map((item) => item.id).filter((id) => !closedForQuery.includes(id))
       : expandedItems.filter((id) => filteredItems.some((item) => item.id === id));
     const allExpanded = category.items.every((item) => expandedItems.includes(item.id));
     const headingId = `faq-cat-${category.id}`;
@@ -127,7 +137,13 @@ export const FAQCategorySection = forwardRef<HTMLElement, FAQCategoryProps>(
           type="multiple"
           value={openIds}
           onValueChange={(values) => {
-            if (searching) return;
+            if (searching) {
+              setSearchClosed({
+                query,
+                ids: filteredItems.map((item) => item.id).filter((id) => !values.includes(id)),
+              });
+              return;
+            }
             const current = new Set(openIds);
             const next = new Set(values);
             for (const id of next) if (!current.has(id)) onItemToggle(category.id, id);

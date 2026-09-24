@@ -151,6 +151,39 @@ describe('FAQCategorySection', () => {
     expect(document.querySelector('mark')).toHaveTextContent('share');
   });
 
+  it('lets the reader close a matching answer during a search, until the query changes', async () => {
+    const user = userEvent.setup();
+    const onItemToggle = jest.fn();
+    const { rerender } = renderFAQCategory({ searchQuery: 'Anchoring', onItemToggle });
+    const trigger = screen.getByRole('button', { name: /How does Anchoring work\?/ });
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+
+    await user.click(trigger);
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(body('q2')).toHaveAttribute('hidden', 'until-found');
+    // Closing during a search does not touch the reader's own open set.
+    expect(onItemToggle).not.toHaveBeenCalled();
+
+    await user.click(trigger);
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    await user.click(trigger);
+
+    // A new query opens every match again.
+    rerender(
+      <FAQCategorySection
+        category={mockCategory}
+        searchQuery="Anchoring pays"
+        expandedItems={[]}
+        onItemToggle={onItemToggle}
+        onExpandAll={jest.fn()}
+      />,
+    );
+    expect(screen.getByRole('button', { name: /How does Anchoring work\?/ })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
+  });
+
   it('renders nothing when the search matches nothing in this category', () => {
     const { container } = renderFAQCategory({ searchQuery: 'xyznonexistent' });
     expect(container.firstChild).toBeNull();
