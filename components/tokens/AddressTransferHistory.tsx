@@ -8,21 +8,18 @@ import { getAddress, isAddress } from 'viem';
 import { Link } from '@/i18n/navigation';
 import { EXPLORER_NAME } from '@/lib/chainGuard';
 import { AnchoringIcon, ImprintIcon } from '@/lib/conceptIcons';
-import { formatAmount, formatCount, formatId } from '@/utils/format';
+import { formatAmount, formatCount } from '@/utils/format';
 import { getExplorerUrl } from '@/utils/urls';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { useCSTTransfers, useCTTransfers } from '@/hooks/useApiQuery';
+import { TokenCell } from '@/components/anchoring/TokenCell';
+import { useSignatureSeeds } from '@/components/anchoring/useSignatureSeeds';
 import { LedgerPage } from '@/components/ledger/LedgerPage';
 import { PageHeader, PageHeaderTabs, type PageHeaderFigure } from '@/components/layout/PageHeader';
 import { useParticipantTrail } from '@/components/layout/participantTrail';
 import { AddressChip } from '@/components/ui/address-chip';
 import { Amount } from '@/components/ui/amount';
-import {
-  DataTable,
-  TableLink,
-  useTablePageSize,
-  type DataTableColumn,
-} from '@/components/ui/data-table';
+import { DataTable, useTablePageSize, type DataTableColumn } from '@/components/ui/data-table';
 import { EmptyState } from '@/components/ui/empty-state';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -160,6 +157,11 @@ export function AddressTransferHistory({
   const cst = useCTTransfers(asset === 'cst' ? address : null);
   const nft = useCSTTransfers(asset === 'nft' ? address : null);
   const query = asset === 'cst' ? cst : nft;
+  // The NFT rows are artworks but carry no seed: one collection read (the
+  // gallery's) draws every row's plate.
+  const { pending: seedsPending, seedFor } = useSignatureSeeds(
+    asset === 'nft' && (nft.data?.length ?? 0) > 0,
+  );
 
   const entries = useMemo<TransferEntry[]>(() => {
     if (!address) return [];
@@ -273,18 +275,23 @@ export function AddressTransferHistory({
         kind: 'link',
         header: tTables('columns.tokenId'),
         value: (entry) => entry.tokenId,
+        // The artwork's plate beside its number: the rows are Signatures.
         cell: (entry) =>
           entry.tokenId === null ? null : (
-            <TableLink href={`/detail/${entry.tokenId}`} className="type-mono">
-              {formatId(entry.tokenId)}
-            </TableLink>
+            <TokenCell
+              collection="cosmicSignature"
+              tokenId={entry.tokenId}
+              seed={seedFor(entry.tokenId)}
+              seedPending={seedsPending}
+              thumbnail
+            />
           ),
         sortable: true,
-        width: '9rem',
+        width: '12rem',
       },
       counterparty,
     ];
-  }, [address, asset, t, tFormats, tTables]);
+  }, [address, asset, seedFor, seedsPending, t, tFormats, tTables]);
 
   // While the history loads a figure is a skeleton, with its caption line
   // held open; when it fails, the header's unavailable dash (`null`). Totals

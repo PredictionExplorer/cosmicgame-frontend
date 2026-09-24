@@ -10,11 +10,15 @@ const WEI = 1_000_000_000_000_000_000n;
 
 const mockUseCTTransfers = jest.fn();
 const mockUseCSTTransfers = jest.fn();
+const mockUseCSTList = jest.fn();
 const mockRefetch = jest.fn();
 
 jest.mock('@/hooks/useApiQuery', () => ({
   useCTTransfers: (...args: unknown[]) => mockUseCTTransfers(...args),
   useCSTTransfers: (...args: unknown[]) => mockUseCSTTransfers(...args),
+  useCSTList: (...args: unknown[]) => mockUseCSTList(...args),
+  // The plate looks a token up itself only when the collection read lacks it.
+  useCSTInfo: () => ({ data: undefined, isLoading: false, isError: false }),
 }));
 
 jest.mock('@/contexts/ContractAddressesContext', () => ({
@@ -82,6 +86,12 @@ beforeEach(() => {
   jest.clearAllMocks();
   mockUseCTTransfers.mockReturnValue(query(CST_ROWS));
   mockUseCSTTransfers.mockReturnValue(query(NFT_ROWS));
+  mockUseCSTList.mockReturnValue(
+    query([
+      { TokenId: 24, Seed: 'aa24' },
+      { TokenId: 25, Seed: 'bb25' },
+    ]),
+  );
 });
 
 describe('AddressTransferHistory — CST', () => {
@@ -218,6 +228,24 @@ describe('AddressTransferHistory — NFT', () => {
     );
     expect(mockUseCSTTransfers).toHaveBeenCalledWith(ME);
     expect(mockUseCTTransfers).toHaveBeenCalledWith(null);
+  });
+
+  it('shows each artwork on its plate beside the number, from one collection read', () => {
+    render(<AddressTransferHistory asset="nft" address={ME} />);
+
+    // One read of the collection serves every row: no lookup per token.
+    expect(mockUseCSTList).toHaveBeenCalledWith({ enabled: true });
+    const [, firstRow] = within(table()).getAllByRole('row');
+    const plate = firstRow?.querySelector('img') ?? null;
+    expect(plate).not.toBeNull();
+    // Decorative beside the number that names the token.
+    expect(plate).toHaveAttribute('alt', '');
+    expect(plate?.getAttribute('srcset') ?? plate?.getAttribute('src')).toMatch(/aa24/);
+  });
+
+  it('reads no collection for the CST history', () => {
+    render(<AddressTransferHistory asset="cst" address={ME} />);
+    expect(mockUseCSTList).toHaveBeenCalledWith({ enabled: false });
   });
 
   it('reads an NFT moved into the anchoring wallet as anchored, not sent (regression)', () => {
