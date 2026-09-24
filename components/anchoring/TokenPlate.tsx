@@ -30,6 +30,11 @@ export interface TokenPlateProps {
    */
   seed?: string | number | null;
   /**
+   * The caller is still reading the seed (a ledger's batched read): show the
+   * pending plate instead of starting a lookup of its own.
+   */
+  seedPending?: boolean;
+  /**
    * Alt text. Pass `''` where the plate sits beside its own caption (a grid
    * card, a ledger cell), so the token is not announced twice.
    */
@@ -51,6 +56,7 @@ export function TokenPlate({
   collection,
   tokenId,
   seed,
+  seedPending = false,
   alt,
   sizes,
   density = 'compact',
@@ -58,11 +64,12 @@ export function TokenPlate({
   className,
 }: TokenPlateProps) {
   const t = useTranslations('anchoring');
-  const needsLookup = collection === 'cosmicSignature' && seed === undefined;
+  const waiting = collection === 'cosmicSignature' && seed === undefined && seedPending;
+  const needsLookup = collection === 'cosmicSignature' && seed === undefined && !seedPending;
   const lookup = useCSTInfo(needsLookup ? tokenId : null);
   const resolvedSeed = needsLookup ? lookup.data?.Seed : seed;
 
-  if (needsLookup && lookup.isLoading) {
+  if (waiting || (needsLookup && lookup.isLoading)) {
     return (
       <PendingPlate busy density="compact" alt={alt} className={cn('rounded-edge', className)} />
     );

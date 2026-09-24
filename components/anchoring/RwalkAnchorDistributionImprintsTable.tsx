@@ -8,6 +8,7 @@ import type { AnchorDistributionImprint } from '@/services/api';
 
 import { TokenCell } from './TokenCell';
 import type { AnchoringLedgerProps } from './ledgerProps';
+import { useSignatureSeeds } from './useSignatureSeeds';
 
 interface RwalkAnchorDistributionImprintsTableProps extends AnchoringLedgerProps {
   list: AnchorDistributionImprint[];
@@ -30,6 +31,8 @@ export const RwalkAnchorDistributionImprintsTable = ({
   ...state
 }: RwalkAnchorDistributionImprintsTableProps) => {
   const t = useTranslations('anchoring');
+  // The rows carry no seed: one collection read serves every thumbnail.
+  const { pending: seedsPending, seedFor } = useSignatureSeeds(list.length > 0);
 
   const columns = useMemo<DataTableColumn<AnchorDistributionImprint>[]>(
     () =>
@@ -39,7 +42,15 @@ export const RwalkAnchorDistributionImprintsTable = ({
           kind: 'link',
           header: t('tables.randomWalkImprints.columns.tokenId'),
           value: (row) => row.TokenId,
-          cell: (row) => <TokenCell collection="cosmicSignature" tokenId={row.TokenId} thumbnail />,
+          cell: (row) => (
+            <TokenCell
+              collection="cosmicSignature"
+              tokenId={row.TokenId}
+              seed={seedFor(row.TokenId)}
+              seedPending={seedsPending}
+              thumbnail
+            />
+          ),
         } satisfies DataTableColumn<AnchorDistributionImprint>,
         showRecipient
           ? ({
@@ -64,7 +75,7 @@ export const RwalkAnchorDistributionImprintsTable = ({
           txHash: (row) => row.TxHash,
         } satisfies DataTableColumn<AnchorDistributionImprint>,
       ].filter((column) => column !== null),
-    [showRecipient, t],
+    [seedFor, seedsPending, showRecipient, t],
   );
 
   return (

@@ -11,6 +11,8 @@ export interface TokenCellProps {
   tokenId: number;
   /** A Cosmic Signature's seed, when the row carries it (saves a lookup). */
   seed?: string | number | null;
+  /** The table is still reading its seeds in one batch: the plate waits instead of looking up. */
+  seedPending?: boolean;
   /** Show the artwork beside the number: for ledgers whose rows are artworks. */
   thumbnail?: boolean;
 }
@@ -21,7 +23,13 @@ export interface TokenCellProps {
  * optional 56px plate beside it. The plate is decorative; the number names
  * the token.
  */
-export function TokenCell({ collection, tokenId, seed, thumbnail = false }: TokenCellProps) {
+export function TokenCell({
+  collection,
+  tokenId,
+  seed,
+  seedPending,
+  thumbnail = false,
+}: TokenCellProps) {
   const href = anchorTokenHref(collection, tokenId);
   const number = <span className="font-mono tabular-nums">{formatId(tokenId)}</span>;
   const link =
@@ -38,6 +46,7 @@ export function TokenCell({ collection, tokenId, seed, thumbnail = false }: Toke
         collection={collection}
         tokenId={tokenId}
         seed={seed}
+        seedPending={seedPending}
         alt=""
         sizes="56px"
         className="w-14 shrink-0"

@@ -5,8 +5,10 @@ import { checkA11y, render, screen } from '@/test-utils';
 import { RwalkAnchorDistributionImprintsTable } from '../RwalkAnchorDistributionImprintsTable';
 
 const mockUseCSTInfo = jest.fn();
+const mockUseCSTList = jest.fn();
 jest.mock('@/hooks/useApiQuery', () => ({
   useCSTInfo: (tokenId: number | null) => mockUseCSTInfo(tokenId),
+  useCSTList: (options: { enabled?: boolean }) => mockUseCSTList(options),
 }));
 
 const RECIPIENT = '0x95d2bA09182101f577Fb21D080FD9Bc0D916011C';
@@ -24,6 +26,13 @@ const imprint = (
 });
 
 beforeEach(() => {
+  mockUseCSTList.mockReturnValue({
+    data: [
+      { TokenId: 38, Seed: 'seed38' },
+      { TokenId: 39, Seed: 'seed39' },
+    ],
+    isLoading: false,
+  });
   mockUseCSTInfo.mockImplementation((tokenId: number | null) => ({
     data: tokenId === null ? undefined : { TokenId: tokenId, Seed: 'abc' },
     isLoading: false,
@@ -34,11 +43,39 @@ describe('RwalkAnchorDistributionImprintsTable', () => {
   it('shows each imprint by its artwork, recipient, cycle and transaction', () => {
     render(<RwalkAnchorDistributionImprintsTable list={[imprint()]} />);
     expect(screen.getByTestId('art-frame')).toBeInTheDocument();
-    expect(mockUseCSTInfo).toHaveBeenCalledWith(38);
     expect(screen.getByRole('link', { name: '#000038' })).toHaveAttribute('href', '/detail/38');
     expect(document.querySelector(`a[href="/user/${RECIPIENT}"]`)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: '1' })).toHaveAttribute('href', '/allocation/1');
     expect(document.querySelector('a[href*="0ximprint"]')).toHaveAttribute('target', '_blank');
+  });
+
+  it('reads every thumbnail’s seed from one collection read, not a lookup per row', () => {
+    render(
+      <RwalkAnchorDistributionImprintsTable
+        list={[imprint(), imprint({ EvtLogId: 25990, TokenId: 39 })]}
+      />,
+    );
+    expect(screen.getAllByTestId('art-frame')).toHaveLength(2);
+    expect(mockUseCSTList).toHaveBeenCalledWith({ enabled: true });
+    expect(mockUseCSTInfo).not.toHaveBeenCalledWith(38);
+    expect(mockUseCSTInfo).not.toHaveBeenCalledWith(39);
+  });
+
+  it('waits for the collection read instead of looking each token up', () => {
+    mockUseCSTList.mockReturnValue({ data: undefined, isLoading: true });
+    render(<RwalkAnchorDistributionImprintsTable list={[imprint()]} />);
+    expect(screen.queryByTestId('art-frame')).not.toBeInTheDocument();
+    expect(mockUseCSTInfo).not.toHaveBeenCalledWith(38);
+  });
+
+  it('looks up a token the collection read does not have', () => {
+    render(<RwalkAnchorDistributionImprintsTable list={[imprint({ TokenId: 51 })]} />);
+    expect(mockUseCSTInfo).toHaveBeenCalledWith(51);
+  });
+
+  it('skips the collection read for an empty ledger', () => {
+    render(<RwalkAnchorDistributionImprintsTable list={[]} />);
+    expect(mockUseCSTList).toHaveBeenCalledWith({ enabled: false });
   });
 
   it('drops the recipient column on a page about one address', () => {
