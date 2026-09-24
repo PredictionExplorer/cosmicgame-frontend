@@ -5,6 +5,7 @@ import {
   icuSignature,
   pluralCategoriesFor,
   strictProblems,
+  unitSpacingProblems,
 } from '../i18n-parity-core';
 
 describe('flattenMessages', () => {
@@ -223,6 +224,7 @@ describe('checkSourceNamespace', () => {
       invalidValues: [],
       syntaxErrors: [],
       pluralGaps: [],
+      unitSpacing: [],
     });
     expect(
       checkSourceNamespace('n', { bad: '{n, plural, other {#}}', broken: '{' }, 'en-US'),
@@ -232,6 +234,7 @@ describe('checkSourceNamespace', () => {
       invalidValues: [],
       syntaxErrors: [expect.stringMatching(/^broken: /)],
       pluralGaps: ['bad: {n, plural} lacks one'],
+      unitSpacing: [],
     });
   });
 
@@ -244,6 +247,66 @@ describe('checkSourceNamespace', () => {
       invalidValues: ['count', 'list', 'nil'],
       syntaxErrors: [],
       pluralGaps: [],
+      unitSpacing: [],
     });
+  });
+
+  it('holds the source to no-break number–unit joins as well', () => {
+    const report = checkSourceNamespace('n', { cost: 'Gesture with ETH ({cost} ETH)' }, 'en-US');
+    expect(report.unitSpacing).toEqual([
+      'cost: "{cost} ETH" needs a no-break space (U+00A0) before the unit',
+    ]);
+  });
+});
+
+describe('number formatting parity', () => {
+  const compare = (source: string, translation: string) =>
+    compareNamespace({
+      namespace: 'n',
+      source: { m: source },
+      translation: { m: translation },
+      intlLocale: 'zh-CN',
+    });
+
+  it('rejects a translation that prints a formatted source number bare', () => {
+    const report = compare('{count, plural, one {# Gesture} other {# Gestures}}', '{count} 次落笔');
+    expect(report.numberFormatGaps).toEqual([
+      'm: {count} is a formatted number in the source; write {count, number} or # inside its plural',
+    ]);
+    expect(strictProblems(report)).toContainEqual(expect.stringMatching(/^number format: m: /));
+  });
+
+  it('accepts {n, number} or # in the translation', () => {
+    const source = '{count, plural, one {# Gesture} other {# Gestures}}';
+    expect(compare(source, '{count, number} 次落笔').numberFormatGaps).toEqual([]);
+    expect(compare(source, '{count, plural, other {# 次落笔}}').numberFormatGaps).toEqual([]);
+    expect(compare('{n, number} items', '{n, number} 项').numberFormatGaps).toEqual([]);
+  });
+
+  it('leaves arguments the source prints bare alone', () => {
+    expect(compare('Cycle {cycle}', '第 {cycle} 个周期').numberFormatGaps).toEqual([]);
+  });
+
+  it('counts # inside a select branch of the plural, not a nested plural', () => {
+    const signature = icuSignature(
+      '{n, plural, other {{kind, select, a {# a} other {# b}}}} {m, plural, other {{n, plural, other {#}}}}',
+    );
+    expect([...signature.numberArguments].sort()).toEqual(['n']);
+  });
+});
+
+describe('unitSpacingProblems', () => {
+  it('flags quantity placeholders and plural counts before a unit', () => {
+    expect(
+      unitSpacingProblems(
+        '{amount} ETH, {cost} CST, {nftCount} NFT, {count, plural, other {# NFTs}}',
+      ),
+    ).toEqual(['{amount} ETH', '{cost} CST', '{nftCount} NFT', '# NFTs']);
+  });
+
+  it('leaves names that read as adjectives, and joins that already use U+00A0', () => {
+    expect(unitSpacingProblems('Anchor Action for {token} NFT · Cycle {cycle} ETH')).toEqual([]);
+    expect(unitSpacingProblems('{amount}\u00a0ETH')).toEqual([]);
+    expect(unitSpacingProblems('{amount} ETHER')).toEqual([]);
   });
 });

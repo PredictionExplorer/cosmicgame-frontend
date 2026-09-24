@@ -223,11 +223,11 @@
         "distributionAmountEth": "지급 금액(ETH)",
         "unretrievedAmountEth": "미회수 금액(ETH)"
       },
-      "summary": "회수 가능한 지급액: {amount} ETH",
+      "summary": "회수 가능한 지급액: {amount} ETH",
       "releaseAll": "모두 해제 및 회수",
       "dialog": {
         "title": "토큰 해제 및 지급액 회수",
-        "description": "<strong>앵커링된 Cosmic Signature NFT가 모두 해제되며</strong>, 누적된 지급액 <amountStrong>{amount} ETH</amountStrong>가 지갑으로 전달됩니다.",
+        "description": "<strong>앵커링된 Cosmic Signature NFT가 모두 해제되며</strong>, 누적된 지급액 <amountStrong>{amount} ETH</amountStrong>가 지갑으로 전달됩니다.",
         "warning": "<strong>되돌릴 수 없는 작업입니다.</strong> 한 번 해제한 Cosmic Signature NFT는 다시 앵커링할 수 없습니다. 앵커링을 완전히 끝내려는 경우에만 진행해 주세요.",
         "confirm": "해제 및 회수"
       }

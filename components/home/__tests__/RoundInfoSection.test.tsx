@@ -151,7 +151,7 @@ describe('RoundInfoSection', () => {
 
   it('displays formatted contract balance in footer', () => {
     render(<RoundInfoSection {...defaultProps} />);
-    expect(screen.getByText('20.00 ETH')).toBeInTheDocument();
+    expect(screen.getByText('20.0000 ETH')).toBeInTheDocument();
   });
 
   it('displays unique participant count in footer', () => {

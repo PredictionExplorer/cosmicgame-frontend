@@ -37,7 +37,7 @@
     "wrongChain": "钱包尚未连接完成，或当前网络与应用不一致。请切换至应用所用网络后重试。"
   },
   "gesture": {
-    "simulated": "模拟落笔已完成，计时延长 {seconds} 秒。",
+    "simulated": "模拟落笔已完成，计时延长 {seconds, number} 秒。",
     "confirmed": "落笔已确认，周期继续推进。",
     "validation": {
       "notNftOwner": "当前钱包并未持有这枚 NFT。",
@@ -61,15 +61,15 @@
       "tooLongBidMessage": "落笔留言过长。",
       "wrongBidType": "所选落笔类型不正确。",
       "fundTransferFailed": "资金转移失败。",
-      "ethCostChanged": "ETH 落笔价格已升至 {required} ETH，比提交时高 {increase} ETH。请重试。",
-      "cstCostChanged": "交易处理期间，CST 落笔价格已变化。当前需 {required} CST，超过你设置的 {maximum} CST 上限。请刷新后重试。"
+      "ethCostChanged": "ETH 落笔价格已升至 {required} ETH，比提交时高 {increase} ETH。请重试。",
+      "cstCostChanged": "交易处理期间，CST 落笔价格已变化。当前需 {required} CST，超过你设置的 {maximum} CST 上限。请刷新后重试。"
     }
   },
   "anchor": {
     "walletNotReady": "钱包尚未连接完成，或当前网络与应用不一致。请切换至应用所用网络后重试。",
-    "anchored": "{count} 枚 NFT 已锚定至协议。",
-    "released": "已完成 {count} 项解锚操作。",
-    "releasedWithDistributions": "已完成 {count} 项解锚操作，累积的 ETH 锚定派发已取回至钱包。",
+    "anchored": "{count, number} 枚 NFT 已锚定至协议。",
+    "released": "已完成 {count, number} 项解锚操作。",
+    "releasedWithDistributions": "已完成 {count, number} 项解锚操作，累积的 ETH 锚定派发已取回至钱包。",
     "failed": "锚定交易未能完成。请检查钱包与网络连接后重试。"
   },
   "allocation": {
@@ -90,9 +90,9 @@
     "failed": "未能取回分配。请检查钱包与网络连接后重试。",
     "stellarEthSuccess": "星选 ETH 已取回至钱包。",
     "nftSuccess": "已附加 NFT 已取回至钱包。",
-    "nftsSuccess": "已将 {count} 枚已附加 NFT 取回至钱包。",
+    "nftsSuccess": "已将 {count, number} 枚已附加 NFT 取回至钱包。",
     "tokenSuccess": "已附加 ERC-20 代币已取回至钱包。",
-    "tokensSuccess": "已将 {count} 笔已附加 ERC-20 代币取回至钱包。",
+    "tokensSuccess": "已将 {count, number} 笔已附加 ERC-20 代币取回至钱包。",
     "retrieving": "取回中…"
   },
   "transfer": {
@@ -119,7 +119,7 @@
       "sourceWalletRequired": "请连接转出钱包，再从该钱包发送 NFT。",
       "recipientMustDiffer": "接收地址不能与当前连接的钱包地址相同。",
       "selectOne": "请至少选择一枚可转移的 NFT。",
-      "confirmed": "{count} 笔 NFT 转移已确认。",
+      "confirmed": "{count, number} 笔 NFT 转移已确认。",
       "detailTransferConfirmed": "NFT 转移已确认。",
       "recipientCheckFailed": "未能校验接收地址。请检查钱包与网络连接后重试。",
       "failed": "未能发送所选 NFT。请检查钱包与网络连接后重试。",
@@ -154,10 +154,10 @@
     "invalidUrl": "请输入以 http:// 或 https:// 开头的有效网址。",
     "invalidUrlInline": "请使用 http:// 或 https:// 网址。",
     "contractUnavailable": "请连接钱包，并确认已切换至正确的网络。",
-    "formSubmitted": "{amount} ETH 贡献已确认。",
-    "formSubmittedWithInfo": "附带信息的 {amount} ETH 贡献已确认。",
-    "submitted": "{amount} ETH 贡献已确认。",
-    "submittedWithInfo": "附带信息的 {amount} ETH 贡献已确认。",
+    "formSubmitted": "{amount} ETH 贡献已确认。",
+    "formSubmittedWithInfo": "附带信息的 {amount} ETH 贡献已确认。",
+    "submitted": "{amount} ETH 贡献已确认。",
+    "submittedWithInfo": "附带信息的 {amount} ETH 贡献已确认。",
     "formFailed": "ETH 贡献失败。请检查输入、钱包与网络连接后重试。",
     "failed": "ETH 贡献失败。请检查钱包与网络连接后重试。",
     "failedWithInfo": "附带信息的 ETH 贡献失败。请检查输入、钱包与网络连接后重试。",

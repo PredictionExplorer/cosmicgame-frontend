@@ -178,7 +178,7 @@
     "clearFacet": "Xóa {trait}",
     "activeAria": "Bộ lọc đặc tính đang bật",
     "removeFilter": "Bỏ bộ lọc {trait}: {value}",
-    "optionAria": "{value}: {count} NFT",
+    "optionAria": "{value}: {count} NFT",
     "chaosRange": "Khoảng hỗn độn",
     "chaosMin": "Hỗn độn tối thiểu",
     "chaosMax": "Hỗn độn tối đa",
@@ -191,7 +191,7 @@
     "partial": "Chỉ mục đặc tính vẫn đang được bổ sung ({indexed} trên {total})",
     "unavailable": "Bộ lọc đặc tính hiện không khả dụng.",
     "retry": "Thử lại",
-    "matches": "{count} NFT phù hợp"
+    "matches": "{count} NFT phù hợp"
   },
   "quickView": {
     "title": "Cosmic Signature {id}",
@@ -250,7 +250,7 @@
   "dna": {
     "title": "DNA bộ sưu tập",
     "subtitle": "Phân bố các đặc tính chính trong bộ sưu tập. Chọn một phần của biểu đồ để lọc phòng trưng bày.",
-    "segmentAria": "{value}: {count} NFT. Lọc theo đặc tính này.",
+    "segmentAria": "{value}: {count} NFT. Lọc theo đặc tính này.",
     "legendCount": "{count}",
     "loading": "Đang đọc đặc tính của bộ sưu tập…"
   }

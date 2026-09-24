@@ -74,7 +74,7 @@ describe('AllocationTable', () => {
     render(<AllocationTable list={[createAllocation()]} loading={false} />);
     expect(screen.getByText('tables.allocation.cycle(cycle=1)')).toBeInTheDocument();
     expect(screen.getByText(convertTimestampToDateTime(1701346718))).toBeInTheDocument();
-    expect(mockConvertTimestampToDateTime).toHaveBeenCalledWith(1701346718, false, 'en');
+    expect(document.querySelector('time[datetime="2023-11-30T12:18:38.000Z"]')).toBeInTheDocument();
     expect(screen.getByText('1.5000 ETH')).toBeInTheDocument();
     expect(screen.getByText('42')).toBeInTheDocument();
     expect(screen.getByText('2.5000')).toBeInTheDocument();

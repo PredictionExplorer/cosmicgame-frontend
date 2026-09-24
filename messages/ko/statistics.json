@@ -650,7 +650,7 @@
     "invalidAddress": "유효하지 않은 주소",
     "user": "사용자",
     "heading": "이 참여자에게 배분된 별빛 선정 ETH",
-    "retrievable": "회수 가능한 배분: {amount} ETH",
+    "retrievable": "회수 가능한 배분: {amount} ETH",
     "retrieveAll": "모두 회수",
     "empty": "아직 별빛 선정 ETH가 없습니다."
   },

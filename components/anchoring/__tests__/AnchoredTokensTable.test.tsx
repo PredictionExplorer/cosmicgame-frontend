@@ -146,7 +146,7 @@ describe('AnchoredTokensTable', () => {
     });
     expect(screen.getAllByText('55').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('7').length).toBeGreaterThanOrEqual(1);
-    expect(mockConvertTimestampToDateTime).toHaveBeenCalledWith(1701346718, false, 'en');
+    expect(document.querySelector('time[datetime="2023-11-30T12:18:38.000Z"]')).toBeInTheDocument();
   });
 
   it('renders CST row data', async () => {

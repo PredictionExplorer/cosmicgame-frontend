@@ -14,6 +14,10 @@
  *     placeholder or tag renders as raw text),
  *   - plural completeness: every `plural` / `selectordinal` block covers the
  *     locale's CLDR categories (`one/few/many/other` for uk, `other` for zh),
+ *   - number formatting: an argument the source formats as a number (`#`,
+ *     `{n, number}`) stays formatted, so the count is grouped ("1,135"),
+ *   - unit spacing (source too): a quantity placeholder or `#` joins its unit
+ *     (ETH, CST, USD, NFT) with U+00A0, never a plain space,
  *   - untranslated namespace: a catalog whose every value equals the source
  *     is a copied file, not a translation.
  *
@@ -64,44 +68,71 @@ export interface IcuSignature {
     readonly type: 'cardinal' | 'ordinal';
     readonly categories: ReadonlySet<string>;
   }[];
+  /**
+   * Arguments the message formats as numbers: `{n, number}`, or a plural
+   * whose branches print `#`. Intl groups these ("1,135"); a bare `{n}` is
+   * stringified without grouping ("1135").
+   */
+  readonly numberArguments: ReadonlySet<string>;
+  /** Arguments printed bare, as `{n}`, anywhere in the message. */
+  readonly bareArguments: ReadonlySet<string>;
 }
 
-function walk(
-  elements: readonly MessageFormatElement[],
-  args: Set<string>,
-  tags: Set<string>,
-  plurals: IcuSignature['plurals'][number][],
-): void {
+interface SignatureAccumulator {
+  readonly args: Set<string>;
+  readonly tags: Set<string>;
+  readonly plurals: IcuSignature['plurals'][number][];
+  readonly numberArguments: Set<string>;
+  readonly bareArguments: Set<string>;
+}
+
+/** Whether `#` appears in these elements outside a nested plural (which owns its own `#`). */
+function printsPound(elements: readonly MessageFormatElement[]): boolean {
+  return elements.some(
+    (element) =>
+      element.type === TYPE.pound ||
+      (element.type === TYPE.tag && printsPound(element.children)) ||
+      (element.type === TYPE.select &&
+        Object.values(element.options).some((option) => printsPound(option.value))),
+  );
+}
+
+function walk(elements: readonly MessageFormatElement[], acc: SignatureAccumulator): void {
   for (const element of elements) {
     switch (element.type) {
       case TYPE.argument:
+        acc.args.add(element.value);
+        acc.bareArguments.add(element.value);
+        break;
       case TYPE.number:
+        acc.args.add(element.value);
+        acc.numberArguments.add(element.value);
+        break;
       case TYPE.date:
       case TYPE.time:
-        args.add(element.value);
+        acc.args.add(element.value);
         break;
       case TYPE.select:
-        args.add(element.value);
-        for (const option of Object.values(element.options)) {
-          walk(option.value, args, tags, plurals);
-        }
+        acc.args.add(element.value);
+        for (const option of Object.values(element.options)) walk(option.value, acc);
         break;
       case TYPE.plural: {
         const plural = element as PluralElement;
-        args.add(plural.value);
-        plurals.push({
+        acc.args.add(plural.value);
+        acc.plurals.push({
           argument: plural.value,
           type: plural.pluralType ?? 'cardinal',
           categories: new Set(Object.keys(plural.options).filter((key) => !key.startsWith('='))),
         });
-        for (const option of Object.values(plural.options)) {
-          walk(option.value, args, tags, plurals);
+        if (Object.values(plural.options).some((option) => printsPound(option.value))) {
+          acc.numberArguments.add(plural.value);
         }
+        for (const option of Object.values(plural.options)) walk(option.value, acc);
         break;
       }
       case TYPE.tag:
-        tags.add(element.value);
-        walk(element.children, args, tags, plurals);
+        acc.tags.add(element.value);
+        walk(element.children, acc);
         break;
       default:
         // literal, pound
@@ -112,11 +143,47 @@ function walk(
 
 /** Parses an ICU message and summarizes the placeholders it depends on. Throws on syntax errors. */
 export function icuSignature(message: string): IcuSignature {
-  const args = new Set<string>();
-  const tags = new Set<string>();
-  const plurals: IcuSignature['plurals'][number][] = [];
-  walk(parse(message, { requiresOtherClause: true }), args, tags, plurals);
-  return { arguments: args, tags, plurals };
+  const acc: SignatureAccumulator = {
+    args: new Set(),
+    tags: new Set(),
+    plurals: [],
+    numberArguments: new Set(),
+    bareArguments: new Set(),
+  };
+  walk(parse(message, { requiresOtherClause: true }), acc);
+  return {
+    arguments: acc.args,
+    tags: acc.tags,
+    plurals: acc.plurals,
+    numberArguments: acc.numberArguments,
+    bareArguments: acc.bareArguments,
+  };
+}
+
+/**
+ * Placeholders that carry a quantity by name. A plain space between one of
+ * these (or a plural's `#`) and a unit lets the line break inside the value
+ * ("0.10 / ETH"); names such as `{token}` or `{cycle}` precede a unit as an
+ * adjective ("{token} NFT") and are left alone.
+ */
+const QUANTITY_PLACEHOLDER =
+  /^(?:amount|cost|price|value|total|sum|balance|count|increase|required|maximum|minimum|reward|fee|completed|selected|\w+(?:Count|Amount|Cost|Eth|Cst))$/;
+
+const UNIT_AFTER_SPACE =
+  /(\{(\w+)(?:,\s*number[^}]*)?\}|#) (ETH|CST|USD|RWLK|NFTs?)(?![\p{L}\p{N}])/gu;
+
+/**
+ * `{amount} ETH` written with a plain space where U+00A0 belongs: the number
+ * and its unit are one value and must never wrap apart (docs/i18n/README.md
+ * §4). Returns each offending join once, as written.
+ */
+export function unitSpacingProblems(message: string): readonly string[] {
+  const found = new Set<string>();
+  for (const match of message.matchAll(UNIT_AFTER_SPACE)) {
+    const placeholder = match[2];
+    if (placeholder === undefined || QUANTITY_PLACEHOLDER.test(placeholder)) found.add(match[0]);
+  }
+  return [...found];
 }
 
 const pluralCategoryCache = new Map<string, readonly string[]>();
@@ -151,6 +218,13 @@ export interface NamespaceReport {
   readonly signatureMismatches: readonly string[];
   /** `key: argument → missing categories` for incomplete plural blocks. */
   readonly pluralGaps: readonly string[];
+  /**
+   * `key: {argument}` where the source formats a number (`#`, `{n, number}`)
+   * and the translation prints it bare, ungrouped ("1135 次" beside "1,000 CST").
+   */
+  readonly numberFormatGaps: readonly string[];
+  /** `key: "{amount} ETH"` joins with a plain space where U+00A0 belongs. */
+  readonly unitSpacing: readonly string[];
   /** True when every value is a verbatim copy of the source (a copied file). */
   readonly untranslated: boolean;
 }
@@ -182,6 +256,8 @@ export function compareNamespace({
   const syntaxErrors: string[] = [];
   const signatureMismatches: string[] = [];
   const pluralGaps: string[] = [];
+  const numberFormatGaps: string[] = [];
+  const unitSpacing: string[] = [];
 
   for (const [key, sourceValue] of sourceLeaves) {
     if (!translatedLeaves.has(key)) {
@@ -250,6 +326,21 @@ export function compareNamespace({
         pluralGaps.push(`${key}: {${plural.argument}, plural} lacks ${absent.join(', ')}`);
       }
     }
+
+    for (const argument of sourceSignature.numberArguments) {
+      const printedBare =
+        translatedSignature.bareArguments.has(argument) &&
+        !sourceSignature.bareArguments.has(argument);
+      if (!translatedSignature.numberArguments.has(argument) || printedBare) {
+        numberFormatGaps.push(
+          `${key}: {${argument}} is a formatted number in the source; write {${argument}, number} or # inside its plural`,
+        );
+      }
+    }
+
+    for (const join of unitSpacingProblems(translatedValue)) {
+      unitSpacing.push(`${key}: "${join}" needs a no-break space (U+00A0) before the unit`);
+    }
   }
 
   const extra = [...translatedLeaves.keys()].filter((key) => !sourceLeaves.has(key));
@@ -266,6 +357,8 @@ export function compareNamespace({
     syntaxErrors,
     signatureMismatches,
     pluralGaps,
+    numberFormatGaps,
+    unitSpacing,
     untranslated: comparable > 0 && identical.length === comparable,
   };
 }
@@ -280,6 +373,8 @@ export function strictProblems(report: NamespaceReport): readonly string[] {
     ...report.syntaxErrors.map((entry) => `icu syntax: ${entry}`),
     ...report.signatureMismatches.map((entry) => `icu signature: ${entry}`),
     ...report.pluralGaps.map((entry) => `plural: ${entry}`),
+    ...report.numberFormatGaps.map((entry) => `number format: ${entry}`),
+    ...report.unitSpacing.map((entry) => `unit spacing: ${entry}`),
     ...(report.untranslated ? [`untranslated: every value equals the source catalog`] : []),
   ];
 }
@@ -352,18 +447,22 @@ export function compareContent(area: string, source: unknown, translation: unkno
 }
 
 /**
- * Checks the source catalog against itself: only ICU syntax and plural
- * completeness apply (parity with itself is trivially true).
+ * Checks the source catalog against itself: ICU syntax, plural completeness
+ * and number–unit spacing apply (parity with itself is trivially true).
  */
 export function checkSourceNamespace(
   namespace: string,
   source: Messages,
   intlLocale: string,
-): Pick<NamespaceReport, 'namespace' | 'empty' | 'invalidValues' | 'syntaxErrors' | 'pluralGaps'> {
+): Pick<
+  NamespaceReport,
+  'namespace' | 'empty' | 'invalidValues' | 'syntaxErrors' | 'pluralGaps' | 'unitSpacing'
+> {
   const empty: string[] = [];
   const invalidValues: string[] = [];
   const syntaxErrors: string[] = [];
   const pluralGaps: string[] = [];
+  const unitSpacing: string[] = [];
   for (const [key, value] of flattenMessages(source)) {
     if (typeof value !== 'string') {
       invalidValues.push(key);
@@ -387,6 +486,9 @@ export function checkSourceNamespace(
         pluralGaps.push(`${key}: {${plural.argument}, plural} lacks ${absent.join(', ')}`);
       }
     }
+    for (const join of unitSpacingProblems(value)) {
+      unitSpacing.push(`${key}: "${join}" needs a no-break space (U+00A0) before the unit`);
+    }
   }
-  return { namespace, empty, invalidValues, syntaxErrors, pluralGaps };
+  return { namespace, empty, invalidValues, syntaxErrors, pluralGaps, unitSpacing };
 }

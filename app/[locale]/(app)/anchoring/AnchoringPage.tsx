@@ -61,7 +61,7 @@ const AnchoringPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
     () => [
       {
         label: t('overview.stats.pool.label'),
-        value: formatEthValue(dashboardData?.StakingAmountEth ?? 0),
+        value: formatEthValue(dashboardData?.StakingAmountEth ?? 0, locale),
         tooltip: t('overview.stats.pool.tooltip'),
         icon: <Coins className="h-4 w-4" />,
         featured: true,

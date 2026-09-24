@@ -50,7 +50,7 @@
       "syncing": "同步中"
     },
     "liveClock": "实时周期时钟",
-    "gestureCount": "{count} 次落笔",
+    "gestureCount": "{count, number} 次落笔",
     "sameClock": "与应用内时钟同步",
     "status": {
       "ready": "已可收官",

@@ -78,7 +78,7 @@
       "nftToken": "NFT 토큰"
     },
     "share": {
-      "summary": "Cosmic Signature 사이클 {cycle}\n시그니처 배분: {amount} ETH\n수령자: {recipient}\n제스처 수: {gestures}\n{url}",
+      "summary": "Cosmic Signature 사이클 {cycle}\n시그니처 배분: {amount} ETH\n수령자: {recipient}\n제스처 수: {gestures}\n{url}",
       "success": "사이클 요약이 클립보드에 복사되었습니다"
     },
     "invalid": {
@@ -144,19 +144,19 @@
       "segments": {
         "signature": {
           "label": "시그니처 배분",
-          "tooltip": "최종 제스처를 남긴 참여자가 회수한 {amount} ETH"
+          "tooltip": "최종 제스처를 남긴 참여자가 회수한 {amount} ETH"
         },
         "publicGoods": {
           "label": "공공재",
-          "tooltip": "공공재 수령처(Protocol Guild)로 전달된 {amount} ETH"
+          "tooltip": "공공재 수령처(Protocol Guild)로 전달된 {amount} ETH"
         },
         "anchor": {
           "label": "앵커링 지급",
-          "tooltip": "각 지갑이 앵커링한 Cosmic Signature NFT 수에 비례해 지급된 {amount} ETH"
+          "tooltip": "각 지갑이 앵커링한 Cosmic Signature NFT 수에 비례해 지급된 {amount} ETH"
         },
         "stellar": {
           "label": "별빛 선정",
-          "tooltip": "별빛 선정 풀에 배분된 {amount} ETH"
+          "tooltip": "별빛 선정 풀에 배분된 {amount} ETH"
         }
       }
     },

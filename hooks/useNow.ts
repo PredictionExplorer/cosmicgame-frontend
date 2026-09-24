@@ -60,7 +60,10 @@ function getSubscribe(intervalMs: number): (cb: () => void) => () => void {
   if (!fn) {
     fn = (callback: () => void) => {
       const t = getTicker(intervalMs);
-      if (t.lastTick === 0) t.lastTick = Date.now();
+      // An idle ticker's last tick is stale (the page that used it may have
+      // unmounted minutes ago): restart the clock for its first subscriber.
+      // React re-reads the snapshot after subscribing and re-renders if it moved.
+      if (t.lastTick === 0 || t.subscribers.size === 0) t.lastTick = Date.now();
       t.subscribers.add(callback);
       startIfNeeded(t);
       return () => {

@@ -161,8 +161,8 @@ describe('CstGestureCostView', () => {
   it('shows the priciest / total / count summary', () => {
     render(<CstGestureCostView gestures={gestures} />);
 
-    expect(screen.getByText(/^Highest cost: 3500\.00 CST/)).toBeInTheDocument();
-    expect(screen.getByText(/^Total consumed: 3650\.00 CST/)).toBeInTheDocument();
+    expect(screen.getByText(/^Highest cost: 3,500 CST/)).toBeInTheDocument();
+    expect(screen.getByText(/^Total consumed: 3,650 CST/)).toBeInTheDocument();
     expect(screen.getByText('3 CST gestures')).toBeInTheDocument();
   });
 
@@ -170,11 +170,11 @@ describe('CstGestureCostView', () => {
     render(<CstGestureCostView gestures={gestures} />);
 
     expect(screen.getByText('CST paid')).toBeInTheDocument();
-    expect(screen.getByText('150.00 CST')).toBeInTheDocument();
+    expect(screen.getByText('150 CST')).toBeInTheDocument();
     // First CST gesture landed 3600s after the ETH gesture whose deadline was T0+7200.
     expect(screen.getByText('Clock remaining before')).toBeInTheDocument();
     expect(screen.getByText('1h')).toBeInTheDocument();
-    expect(screen.getByText(/0xB1b2/)).toBeInTheDocument();
+    expect(screen.getByText(/0xb1b2…\u20605678/)).toBeInTheDocument();
     expect(screen.getByText('Click the dot to open the transaction.')).toBeInTheDocument();
   });
 

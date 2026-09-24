@@ -75,19 +75,19 @@ function SupplyTooltip({ active, payload }: SupplyTooltipProps) {
       <dl className="space-y-1 text-muted-foreground">
         <div className="flex justify-between gap-4">
           <dt>{t('charts.supply.totalSupply')}</dt>
-          <dd className="text-foreground">{formatCSTValue(point.totalSupplyEth)}</dd>
+          <dd className="text-foreground">{formatCSTValue(point.totalSupplyEth, locale)}</dd>
         </div>
         <div className="flex justify-between gap-4">
           <dt>{t('charts.supply.imprint')}</dt>
-          <dd className="text-foreground">{formatCSTValue(point.mintAmountEth)}</dd>
+          <dd className="text-foreground">{formatCSTValue(point.mintAmountEth, locale)}</dd>
         </div>
         <div className="flex justify-between gap-4">
           <dt>{t('charts.supply.consume')}</dt>
-          <dd className="text-foreground">{formatCSTValue(point.burnAmountEth)}</dd>
+          <dd className="text-foreground">{formatCSTValue(point.burnAmountEth, locale)}</dd>
         </div>
         <div className="flex justify-between gap-4">
           <dt>{t('charts.supply.net')}</dt>
-          <dd className="text-foreground">{formatCSTValue(point.amountEth)}</dd>
+          <dd className="text-foreground">{formatCSTValue(point.amountEth, locale)}</dd>
         </div>
         <div className="flex justify-between gap-4">
           <dt>{t('charts.supply.numGestures')}</dt>

@@ -86,11 +86,11 @@ describe('BidderActivePeriodsTimeline', () => {
   it('draws one lane per ranked participant with a link and a gesture count', () => {
     render(<BidderActivePeriodsTimeline />);
 
-    const aliceLink = screen.getByRole('link', { name: '0xAAAA....1111' });
+    const aliceLink = screen.getByRole('link', { name: '0xaAaA…\u20601111' });
     expect(aliceLink).toHaveAttribute('href', `/user/${ALICE}`);
     expect(aliceLink).toHaveAttribute('title', ALICE);
     expect(screen.getByText('(9)')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: '0xBBBB....2222' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: '0xBbbb…\u20602222' })).toBeInTheDocument();
   });
 
   it('gives every burst an accessible description of who, how many and when', () => {
@@ -99,7 +99,7 @@ describe('BidderActivePeriodsTimeline', () => {
     const bars = screen.getAllByRole('img');
     expect(bars).toHaveLength(periodsResponse.ActivePeriods.length);
     expect(
-      screen.getByRole('img', { name: /^0xAAAA00\.\.\.\.001111: 5 gestures from .+ to .+$/ }),
+      screen.getByRole('img', { name: /^0xaAaA…\u20601111: 5 gestures from .+ to .+$/ }),
     ).toBeInTheDocument();
   });
 
@@ -216,7 +216,7 @@ describe('BidderActivePeriodsTimeline', () => {
     );
     render(<BidderActivePeriodsTimeline />);
 
-    expect(screen.getByRole('link', { name: '0xAAAA....1111' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: '0xaAaA…\u20601111' })).toBeInTheDocument();
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 

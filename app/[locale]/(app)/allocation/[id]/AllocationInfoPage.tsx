@@ -603,7 +603,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
     {
       icon: <Sparkles className="h-3.5 w-3.5" />,
       label: t('details.statistics.cards.totalContributed.label'),
-      value: formatEthValue(allocationInfo.RoundStats.TotalDonatedAmountEth ?? 0),
+      value: formatEthValue(allocationInfo.RoundStats.TotalDonatedAmountEth ?? 0, locale),
       tooltip: t('details.statistics.cards.totalContributed.tooltip'),
     },
   ];

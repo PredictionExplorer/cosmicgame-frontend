@@ -106,9 +106,9 @@ describe('RewardsByTokenPage', () => {
     render(<RewardsByTokenPage address="0xUser" tokenId={42} />);
     fireEvent.click(screen.getByRole('button', { name: 'anchoring.common.aria.expandRow' }));
 
-    expect(mockConvertTimestampToDateTime).toHaveBeenCalledWith(1000, false, 'en');
-    expect(mockConvertTimestampToDateTime).toHaveBeenCalledWith(2000, false, 'en');
-    expect(mockConvertTimestampToDateTime).toHaveBeenCalledWith(3000, false, 'en');
+    expect(document.querySelector('time[datetime="1970-01-01T00:16:40.000Z"]')).toBeInTheDocument();
+    expect(document.querySelector('time[datetime="1970-01-01T00:33:20.000Z"]')).toBeInTheDocument();
+    expect(document.querySelector('time[datetime="1970-01-01T00:50:00.000Z"]')).toBeInTheDocument();
   });
 
   it('handles empty response', () => {

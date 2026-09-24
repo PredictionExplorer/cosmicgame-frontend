@@ -152,7 +152,7 @@ describe('BiddingActivitySection', () => {
     expect(screen.getByTestId('bid-frequency-chart')).toBeInTheDocument();
     expect(screen.getByText(/viewing spike #1/i)).toBeInTheDocument();
     expect(screen.getByTestId('bidder-active-periods-timeline')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: '0xAAAA....1111' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: '0xaAaA…\u20601111' })).toBeInTheDocument();
   });
 
   it('collapses a section without unmounting the others', async () => {

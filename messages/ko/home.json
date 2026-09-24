@@ -252,10 +252,10 @@
       "title": "내 사이클 현황",
       "tooltip": "이번 사이클에서 남긴 제스처를 기준으로, 지금 최종 제스처 자리에 있는지와 별빛 선정 자격 수를 보여 줍니다.",
       "leader": {
-        "base": "최근 제스처를 남겼습니다. 다른 참여자가 제스처를 남기지 않으면 시그니처 배분({amount} ETH, 1,000 CST, Cosmic Signature NFT 1개)을 받습니다.",
-        "withNft": "최근 제스처를 남겼습니다. 다른 참여자가 제스처를 남기지 않으면 시그니처 배분({amount} ETH, 1,000 CST, Cosmic Signature NFT 1개, 그리고 아래에 표시된 {nftCount, plural, other {첨부 NFT #개}})을 받습니다.",
-        "withErc20": "최근 제스처를 남겼습니다. 다른 참여자가 제스처를 남기지 않으면 시그니처 배분({amount} ETH, 1,000 CST, Cosmic Signature NFT 1개, 그리고 아래에 표시된 {erc20Count, plural, other {첨부 ERC20 토큰 적립 #건}})을 받습니다.",
-        "withBoth": "최근 제스처를 남겼습니다. 다른 참여자가 제스처를 남기지 않으면 시그니처 배분({amount} ETH, 1,000 CST, Cosmic Signature NFT 1개, 그리고 아래에 표시된 {nftCount, plural, other {첨부 NFT #개}} 및 {erc20Count, plural, other {첨부 ERC20 토큰 적립 #건}})을 받습니다."
+        "base": "최근 제스처를 남겼습니다. 다른 참여자가 제스처를 남기지 않으면 시그니처 배분({amount} ETH, 1,000 CST, Cosmic Signature NFT 1개)을 받습니다.",
+        "withNft": "최근 제스처를 남겼습니다. 다른 참여자가 제스처를 남기지 않으면 시그니처 배분({amount} ETH, 1,000 CST, Cosmic Signature NFT 1개, 그리고 아래에 표시된 {nftCount, plural, other {첨부 NFT #개}})을 받습니다.",
+        "withErc20": "최근 제스처를 남겼습니다. 다른 참여자가 제스처를 남기지 않으면 시그니처 배분({amount} ETH, 1,000 CST, Cosmic Signature NFT 1개, 그리고 아래에 표시된 {erc20Count, plural, other {첨부 ERC20 토큰 적립 #건}})을 받습니다.",
+        "withBoth": "최근 제스처를 남겼습니다. 다른 참여자가 제스처를 남기지 않으면 시그니처 배분({amount} ETH, 1,000 CST, Cosmic Signature NFT 1개, 그리고 아래에 표시된 {nftCount, plural, other {첨부 NFT #개}} 및 {erc20Count, plural, other {첨부 ERC20 토큰 적립 #건}})을 받습니다."
       },
       "notLeader": "최근 참여자가 아닙니다. 다시 제스처를 남겨 선두에 서거나, 별빛 선정 자격을 그대로 유지할 수 있습니다.",
       "ethStellar": "ETH 별빛 선정",
@@ -313,7 +313,7 @@
       "rewardLabel": "참여 CST",
       "costLabel": "비용",
       "netLabel": "순 CST",
-      "cstAmount": "{amount} CST",
+      "cstAmount": "{amount} CST",
       "minAccepted": "최소 허용 수량: {value}",
       "minAcceptedAny": "0 CST를 포함한 모든 수량",
       "minAcceptedAria": "최소 허용 CST의 의미",
@@ -339,7 +339,7 @@
         "acceptAnyTitle": "0을 포함한 모든 참여 CST 허용",
         "acceptAnyBody": "허용할 참여 CST의 최소 수량을 0으로 설정합니다. 확인 전에 참여 CST 수량이 바뀌어도 제스처를 실행하려면 이 옵션을 선택해 주세요.",
         "toleranceLabel": "참여 CST 감소 허용 폭",
-        "minAmount": "최소 {amount} CST",
+        "minAmount": "최소 {amount} CST",
         "revertNote": "확인 시점에 각인되는 CST가 이 최소 수량보다 적으면 제스처 트랜잭션이 취소됩니다."
       },
       "attachNft": "NFT 첨부",
@@ -352,15 +352,15 @@
       "collision": {
         "title": "충돌 방지",
         "raiseBy": "인상 폭",
-        "approxCost": "≈ {amount} ETH",
+        "approxCost": "≈ {amount} ETH",
         "note": "두 제스처가 같은 블록에 들어갈 때의 충돌을 피하기 위해 제스처 비용을 {percent}% 올립니다. 비용이 영구적으로 오르는 것은 아닙니다."
       }
     },
     "submit": {
-      "eth": "ETH로 제스처 남기기 ({cost} ETH)",
-      "randomWalkWithToken": "ETH + RandomWalk 토큰 {tokenId} 제스처 남기기 ({cost} ETH)",
+      "eth": "ETH로 제스처 남기기 ({cost} ETH)",
+      "randomWalkWithToken": "ETH + RandomWalk 토큰 {tokenId} 제스처 남기기 ({cost} ETH)",
       "randomWalk": "ETH + RandomWalk로 제스처 남기기",
-      "cst": "CST로 제스처 남기기 ({cost} CST)",
+      "cst": "CST로 제스처 남기기 ({cost} CST)",
       "cstFree": "CST로 제스처 남기기 (비용 없음)",
       "generic": "{method} 제스처 남기기"
     },
@@ -396,8 +396,8 @@
     "titleTooltip": "사이클이 마감될 때 10개가 넘는 경로로 배분되는 내역입니다.",
     "recipientCount": "{count, plural, other {수령자 #명}}",
     "amounts": {
-      "eth": "{amount} ETH",
-      "ethEach": "각 {amount} ETH",
+      "eth": "{amount} ETH",
+      "ethEach": "각 {amount} ETH",
       "fixedCst": "1,000 CST",
       "fixedCstEach": "각 1,000 CST",
       "nft": "Cosmic Signature NFT 1개",
@@ -456,11 +456,11 @@
     "messageAria": "{address}의 제스처 메시지",
     "openPositionAria": "{position}번째 제스처 열기",
     "badge": {
-      "eth": "{amount} ETH",
+      "eth": "{amount} ETH",
       "ethFallback": "ETH",
-      "ethRwlk": "{amount} ETH + RWLK",
+      "ethRwlk": "{amount} ETH + RWLK",
       "rwlkFallback": "ETH + RWLK",
-      "cst": "{amount} CST",
+      "cst": "{amount} CST",
       "cstFallback": "CST"
     },
     "history": {
@@ -575,7 +575,7 @@
       "gestures": "{count, plural, =0 {이번 사이클에 아직 제스처 없음} other {이번 사이클 제스처 #개}}",
       "retrieve": "대기 중인 배분 회수",
       "nothingWaiting": "회수할 배분 없음",
-      "cstPreview": "지금 제스처를 남기면 약 {amount} CST 각인"
+      "cstPreview": "지금 제스처를 남기면 약 {amount} CST 각인"
     },
     "miniBar": {
       "aria": "사이클 간편 콘솔",
@@ -600,7 +600,7 @@
     "clock": {
       "reserveLabel": "시그니처 배분",
       "reserveExtras": "+ 1,000 CST · Cosmic Signature NFT 1개 · 첨부 자산",
-      "reserveUsd": "≈ {amount} USD",
+      "reserveUsd": "≈ {amount} USD",
       "notifyAria": "사이클 마감 전에 알림 받기",
       "notifyLabel": "마감 전 알림:",
       "notifyMinutes": "{minutes}분",

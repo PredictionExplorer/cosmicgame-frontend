@@ -18,5 +18,27 @@
     "minutes": "분",
     "seconds": "초",
     "leftPattern": "{duration} 남음"
+  },
+  "address": {
+    "zero": "제로 주소",
+    "imprinted": "각인",
+    "consumed": "소모",
+    "self": "이 주소",
+    "known": {
+      "protocol": "Cosmic Signature 프로토콜",
+      "implementation": "구현 컨트랙트",
+      "cst": "Cosmic Signature CST 토큰",
+      "nft": "Cosmic Signature NFT",
+      "randomWalk": "RandomWalk",
+      "council": "우주 평의회",
+      "publicGoods": "공공재 금고",
+      "outreach": "홍보 준비금",
+      "allocations": "배분 지갑",
+      "cosmicAnchor": "Cosmic Signature NFT 앵커링 지갑",
+      "rwalkAnchor": "RWLK 앵커링 지갑"
+    }
+  },
+  "dateTime": {
+    "timeZone": "시간대: {zone}"
   }
 }

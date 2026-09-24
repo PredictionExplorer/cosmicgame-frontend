@@ -78,7 +78,7 @@
       "nftToken": "NFT Token"
     },
     "share": {
-      "summary": "Cycle #{cycle} — Cosmic Signature\nSignature Allocation: {amount} ETH\nRecipient: {recipient}\nGestures: {gestures}\n{url}",
+      "summary": "Cycle #{cycle} — Cosmic Signature\nSignature Allocation: {amount} ETH\nRecipient: {recipient}\nGestures: {gestures}\n{url}",
       "success": "Cycle summary copied to clipboard"
     },
     "invalid": {
@@ -144,19 +144,19 @@
       "segments": {
         "signature": {
           "label": "Signature Allocation",
-          "tooltip": "{amount} ETH retrieved by the participant who made the Final Gesture."
+          "tooltip": "{amount} ETH retrieved by the participant who made the Final Gesture."
         },
         "publicGoods": {
           "label": "Public Goods",
-          "tooltip": "{amount} ETH forwarded to the Public Goods Beneficiary (Protocol Guild)."
+          "tooltip": "{amount} ETH forwarded to the Public Goods Beneficiary (Protocol Guild)."
         },
         "anchor": {
           "label": "Anchor Distribution",
-          "tooltip": "{amount} ETH distributed in proportion to each wallet's number of anchored Cosmic Signature NFTs."
+          "tooltip": "{amount} ETH distributed in proportion to each wallet's number of anchored Cosmic Signature NFTs."
         },
         "stellar": {
           "label": "Stellar Selection",
-          "tooltip": "{amount} ETH allocated to the Stellar Selection pool."
+          "tooltip": "{amount} ETH allocated to the Stellar Selection pool."
         }
       }
     },

@@ -73,8 +73,7 @@
   "address": {
     "invalid": "Invalid Ethereum Address",
     "heading": "Outreach Allocations for This Participant",
-    "loading": "Loading...",
-    "outreachWallet": "Outreach Reserve Wallet"
+    "loading": "Loading..."
   },
   "transferForm": {
     "title": "Send a CST Allocation",

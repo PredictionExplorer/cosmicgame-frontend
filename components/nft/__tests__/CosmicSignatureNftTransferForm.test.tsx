@@ -147,7 +147,7 @@ describe('CosmicSignatureNftTransferForm', () => {
       createToken({ TokenId: 2, TokenName: 'Beta', EvtLogId: 2 }),
     ]);
 
-    expect(screen.getAllByText('0x111111....111111')).toHaveLength(1);
+    expect(screen.getAllByText('0x1111…\u20601111')).toHaveLength(1);
     expect(screen.getByText('Alpha')).toBeInTheDocument();
     expect(screen.getByText('Beta')).toBeInTheDocument();
     expect(screen.getAllByLabelText(/myPages\.nftTransfer\.selectAria/)).toHaveLength(2);
@@ -210,7 +210,7 @@ describe('CosmicSignatureNftTransferForm', () => {
     ]);
 
     expect(screen.queryByText('Current Owner')).not.toBeInTheDocument();
-    expect(screen.getByTestId('nft-transfer-picker')).not.toHaveTextContent('0x111111....111111');
+    expect(screen.getByTestId('nft-transfer-picker')).not.toHaveTextContent('0x1111…\u20601111');
     expect(screen.getByTestId('nft-transfer-picker')).not.toHaveTextContent('0x222222....222222');
     expect(document.querySelector(`a[href="/user/${SOURCE}"]`)).toBeNull();
     expect(document.querySelector(`a[href="/user/${OTHER_SOURCE}"]`)).toBeNull();

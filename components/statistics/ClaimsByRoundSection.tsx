@@ -53,7 +53,7 @@ const CountBadge = ({ n, label }: { n: number; label: string }) => {
 const ItemDetail = ({ item }: { item: ClaimUnclaimedItem }) => {
   const locale = useLocale();
   if (item.AssetType === 'ETH') {
-    return <span>{formatEthValue(item.AmountEth)}</span>;
+    return <span>{formatEthValue(item.AmountEth, locale)}</span>;
   }
   if (item.AssetType === 'ERC721') {
     return (
@@ -177,7 +177,7 @@ const TxLink = ({ hash }: { hash: string }) =>
 const TxnAssetDetail = ({ txn }: { txn: ClaimTxn }) => {
   const t = useTranslations('statistics');
   const locale = useLocale();
-  if (txn.AssetType === 'ETH') return <span>{formatEthValue(txn.AmountEth)}</span>;
+  if (txn.AssetType === 'ETH') return <span>{formatEthValue(txn.AmountEth, locale)}</span>;
   if (txn.AssetType === 'ERC721')
     return (
       <span>
@@ -463,7 +463,7 @@ const Row = ({
             })}
             {cycle.EthUnclaimedEth > 0 && (
               <span className="text-muted-foreground">
-                · {formatEthValue(cycle.EthUnclaimedEth)}
+                · {formatEthValue(cycle.EthUnclaimedEth, locale)}
               </span>
             )}
           </button>

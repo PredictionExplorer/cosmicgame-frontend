@@ -98,7 +98,7 @@ export function ActivitySummary({
               },
               {
                 label: t('statistics.activity.maxGesture.label'),
-                value: formatEthValue(userInfo.MaxBidAmount ?? 0),
+                value: formatEthValue(userInfo.MaxBidAmount ?? 0, locale),
                 tooltip: t('statistics.activity.maxGesture.tooltip'),
               },
             ]}
@@ -132,7 +132,7 @@ export function ActivitySummary({
               },
               {
                 label: t('statistics.activity.distributionsReceived.label'),
-                value: formatEthValue(totalAnchorDistributionEth),
+                value: formatEthValue(totalAnchorDistributionEth, locale),
                 tooltip: t('statistics.activity.distributionsReceived.tooltip'),
               },
             ]}

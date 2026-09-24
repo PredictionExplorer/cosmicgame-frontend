@@ -73,8 +73,7 @@
   "address": {
     "invalid": "以太坊地址無效",
     "heading": "此參與者的推廣分配",
-    "loading": "載入中…",
-    "outreachWallet": "推廣錢包"
+    "loading": "載入中…"
   },
   "transferForm": {
     "title": "撥付推廣 CST",

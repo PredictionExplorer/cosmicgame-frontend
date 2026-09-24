@@ -73,7 +73,11 @@ describe('StellarSelectionAllocationsTable', () => {
   it('renders a winning row with correct data', async () => {
     await renderAndFlush([winning]);
     const interactive = within(screen.getByTestId('table-primary'));
-    expect(interactive.getByText('date-1700000000')).toBeInTheDocument();
+    expect(
+      screen
+        .getByTestId('table-primary')
+        .querySelector('time[datetime="2023-11-14T22:13:20.000Z"]'),
+    ).toBeInTheDocument();
     expect(interactive.getByText('42')).toBeInTheDocument();
     expect(interactive.getByText('1.2345678')).toBeInTheDocument();
     expect(interactive.getByText('myPages.shared.no')).toBeInTheDocument();

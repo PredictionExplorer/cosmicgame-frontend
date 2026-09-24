@@ -252,10 +252,10 @@
       "title": "このサイクルでの位置",
       "tooltip": "このサイクルで最新の一筆を入れた参加者と、一筆の数に応じた星選の選定頻度を確認できます。",
       "leader": {
-        "base": "最新の一筆を入れたのはこのウォレットです。他に誰も一筆を入れなければ、シグネチャー配分（{amount} ETH、1,000 CST、Cosmic Signature NFT 1点）を受け取ります。",
-        "withNft": "最新の一筆を入れたのはこのウォレットです。他に誰も一筆を入れなければ、シグネチャー配分（{amount} ETH、1,000 CST、Cosmic Signature NFT 1点、さらに下に示す{nftCount, plural, other {添付された#点のNFTすべて}}）を受け取ります。",
-        "withErc20": "最新の一筆を入れたのはこのウォレットです。他に誰も一筆を入れなければ、シグネチャー配分（{amount} ETH、1,000 CST、Cosmic Signature NFT 1点、さらに下に示す{erc20Count, plural, other {添付された#件のERC20トークン添付分すべて}}）を受け取ります。",
-        "withBoth": "最新の一筆を入れたのはこのウォレットです。他に誰も一筆を入れなければ、シグネチャー配分（{amount} ETH、1,000 CST、Cosmic Signature NFT 1点、さらに下に示す{nftCount, plural, other {添付された#点のNFT}}と{erc20Count, plural, other {添付された#件のERC20トークン添付分}}のすべて）を受け取ります。"
+        "base": "最新の一筆を入れたのはこのウォレットです。他に誰も一筆を入れなければ、シグネチャー配分（{amount} ETH、1,000 CST、Cosmic Signature NFT 1点）を受け取ります。",
+        "withNft": "最新の一筆を入れたのはこのウォレットです。他に誰も一筆を入れなければ、シグネチャー配分（{amount} ETH、1,000 CST、Cosmic Signature NFT 1点、さらに下に示す{nftCount, plural, other {添付された#点のNFTすべて}}）を受け取ります。",
+        "withErc20": "最新の一筆を入れたのはこのウォレットです。他に誰も一筆を入れなければ、シグネチャー配分（{amount} ETH、1,000 CST、Cosmic Signature NFT 1点、さらに下に示す{erc20Count, plural, other {添付された#件のERC20トークン添付分すべて}}）を受け取ります。",
+        "withBoth": "最新の一筆を入れたのはこのウォレットです。他に誰も一筆を入れなければ、シグネチャー配分（{amount} ETH、1,000 CST、Cosmic Signature NFT 1点、さらに下に示す{nftCount, plural, other {添付された#点のNFT}}と{erc20Count, plural, other {添付された#件のERC20トークン添付分}}のすべて）を受け取ります。"
       },
       "notLeader": "現在、最新の一筆を入れたのは別の参加者です。もう一度一筆を入れられます。追加しなくても、星選の対象には引き続き含まれます。",
       "ethStellar": "ETH星選",
@@ -313,7 +313,7 @@
       "rewardLabel": "参加CST",
       "costLabel": "費用",
       "netLabel": "純CST",
-      "cstAmount": "{amount} CST",
+      "cstAmount": "{amount} CST",
       "minAccepted": "最小数量：{value}",
       "minAcceptedAny": "0 CSTを含め、数量を問わず受け入れる",
       "minAcceptedAria": "受け入れるCSTの最小数量について",
@@ -339,7 +339,7 @@
         "acceptAnyTitle": "0を含むどの参加CSTでも受け入れる",
         "acceptAnyBody": "受け入れる最小数量を0に設定します。確認前に参加CSTの数量が変わっても、一筆を成立させたい場合に選択してください。",
         "toleranceLabel": "許容する減少幅",
-        "minAmount": "最小{amount} CST",
+        "minAmount": "最小{amount} CST",
         "revertNote": "確認時に刻印されるCSTがこの最小数量を下回ると、一筆のトランザクションは取り消されます。"
       },
       "attachNft": "NFTを添付",
@@ -352,15 +352,15 @@
       "collision": {
         "title": "衝突防止",
         "raiseBy": "上乗せ幅",
-        "approxCost": "≈ {amount} ETH",
+        "approxCost": "≈ {amount} ETH",
         "note": "二つの一筆が同じブロックに届いたときの衝突を避けるため、一筆の費用を{percent}%上乗せします。費用が恒久的に上がるわけではありません。"
       }
     },
     "submit": {
-      "eth": "ETHで一筆（{cost} ETH）",
-      "randomWalkWithToken": "ETH + RandomWalkトークン{tokenId}で一筆（{cost} ETH）",
+      "eth": "ETHで一筆（{cost} ETH）",
+      "randomWalkWithToken": "ETH + RandomWalkトークン{tokenId}で一筆（{cost} ETH）",
       "randomWalk": "ETH + RandomWalkで一筆",
-      "cst": "CSTで一筆（{cost} CST）",
+      "cst": "CSTで一筆（{cost} CST）",
       "cstFree": "CSTで一筆（費用なし）",
       "generic": "{method}で一筆"
     },
@@ -396,8 +396,8 @@
     "titleTooltip": "サイクルが確定したときに、10を超えるトラックへ配られる配分。",
     "recipientCount": "{count, plural, other {受領者#人}}",
     "amounts": {
-      "eth": "{amount} ETH",
-      "ethEach": "各{amount} ETH",
+      "eth": "{amount} ETH",
+      "ethEach": "各{amount} ETH",
       "fixedCst": "1,000 CST",
       "fixedCstEach": "各1,000 CST",
       "nft": "Cosmic Signature NFT 1点",
@@ -456,11 +456,11 @@
     "messageAria": "{address}からの一筆のメッセージ",
     "openPositionAria": "一筆の順位{position}を開く",
     "badge": {
-      "eth": "{amount} ETH",
+      "eth": "{amount} ETH",
       "ethFallback": "ETH",
-      "ethRwlk": "{amount} ETH + RWLK",
+      "ethRwlk": "{amount} ETH + RWLK",
       "rwlkFallback": "ETH + RWLK",
-      "cst": "{amount} CST",
+      "cst": "{amount} CST",
       "cstFallback": "CST"
     },
     "history": {
@@ -600,7 +600,7 @@
     "clock": {
       "reserveLabel": "シグネチャー配分",
       "reserveExtras": "+ 1,000 CST · Cosmic Signature NFT 1点 · 添付されたアセット",
-      "reserveUsd": "≈ {amount} USD",
+      "reserveUsd": "≈ {amount} USD",
       "notifyAria": "サイクルが確定できるようになる前に通知する",
       "notifyLabel": "確定前に通知：",
       "notifyMinutes": "{minutes}分",

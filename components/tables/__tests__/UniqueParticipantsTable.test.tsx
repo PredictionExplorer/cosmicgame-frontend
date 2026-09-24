@@ -44,12 +44,12 @@ describe('UniqueParticipantsTable', () => {
   it('renders participant data', () => {
     render(<UniqueParticipantsTable list={[createParticipant()]} />);
     expect(screen.getByText('42')).toBeInTheDocument();
-    expect(screen.getByText('1.234567')).toBeInTheDocument();
+    expect(screen.getByText('1.2346')).toBeInTheDocument();
   });
 
-  it('formats MaxBidAmountEth without a trailing-zero wall', () => {
+  it('formats MaxBidAmountEth to the fixed 4-decimal table precision', () => {
     render(<UniqueParticipantsTable list={[createParticipant({ MaxBidAmountEth: 0.1 })]} />);
-    expect(screen.getByText('0.1')).toBeInTheDocument();
+    expect(screen.getByText('0.1000')).toBeInTheDocument();
   });
 
   it('renders zero and dust amounts distinctly', () => {

@@ -178,7 +178,7 @@
     "clearFacet": "Очистити: {trait}",
     "activeAria": "Активні фільтри ознак",
     "removeFilter": "Прибрати фільтр {trait}: {value}",
-    "optionAria": "{value}: {count} NFT",
+    "optionAria": "{value}: {count} NFT",
     "chaosRange": "Діапазон хаосу",
     "chaosMin": "Мінімальний хаос",
     "chaosMax": "Максимальний хаос",
@@ -191,7 +191,7 @@
     "partial": "Індекс ознак ще заповнюється ({indexed} з {total})",
     "unavailable": "Фільтри ознак зараз недоступні.",
     "retry": "Повторити",
-    "matches": "Знайдено {count} NFT"
+    "matches": "Знайдено {count} NFT"
   },
   "quickView": {
     "title": "Cosmic Signature {id}",
@@ -250,7 +250,7 @@
   "dna": {
     "title": "ДНК колекції",
     "subtitle": "Розподіл головних ознак у колекції. Оберіть сегмент діаграми, щоб відфільтрувати галерею.",
-    "segmentAria": "{value}: {count} NFT. Фільтрувати за цією ознакою.",
+    "segmentAria": "{value}: {count} NFT. Фільтрувати за цією ознакою.",
     "legendCount": "{count}",
     "loading": "Зчитування ознак колекції…"
   }

@@ -73,8 +73,7 @@
   "address": {
     "invalid": "Недійсна адреса Ethereum",
     "heading": "Винагороди за просування для учасника",
-    "loading": "Завантаження…",
-    "outreachWallet": "Гаманець просування"
+    "loading": "Завантаження…"
   },
   "transferForm": {
     "title": "Надіслати винагороду CST",

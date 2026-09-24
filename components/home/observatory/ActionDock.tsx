@@ -5,7 +5,9 @@ import { ArrowUpRight, Clock3 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { SmoothCountdown } from '@/components/common/SmoothCountdown';
+import { Amount } from '@/components/ui/amount';
 import { Button } from '@/components/ui/button';
+import { Duration } from '@/components/ui/duration';
 import { getCycleState } from '@/lib/cycleState';
 import { cn } from '@/lib/utils';
 import type { DashboardInfo } from '@/services/api';
@@ -30,18 +32,17 @@ export interface ActionDockProps {
   className?: string;
 }
 
-function pad(value: number): string {
-  return String(value).padStart(2, '0');
-}
-
+/**
+ * "6d 22:23:44" with the locale's day unit, joined by a no-break space so the
+ * dock timer never stacks the days above the clock.
+ */
 function renderCompactCountdown({ days, hours, minutes, seconds }: CountdownRenderProps) {
   return (
-    // One unbreakable run: squeezed by a long Korean button label, the
-    // countdown used to wrap its last digit (or its days) onto a new line.
-    <span className="whitespace-nowrap font-mono text-sm font-semibold tabular-nums">
-      {days > 0 ? `${days}d ` : ''}
-      {pad(hours)}:{pad(minutes)}:{pad(seconds)}
-    </span>
+    <Duration
+      seconds={days * 86_400 + hours * 3_600 + minutes * 60 + seconds}
+      variant="clock"
+      className="whitespace-nowrap font-mono text-sm font-semibold"
+    />
   );
 }
 
@@ -113,13 +114,15 @@ export function ActionDock({
           data-testid="action-dock-mobile"
           className="flex items-center justify-between gap-3 rounded-2xl border border-white/[0.12] bg-card/95 px-3.5 py-2.5 shadow-[var(--elevation-3)] backdrop-blur-xl"
         >
-          <span className="flex min-w-0 flex-col">
+          {/* A countdown is never squeezed (min-w-min: the column is at least as
+              wide as the no-wrap timer); a phase label gives way to the CTA and
+              truncates (min-w-0). Either way the reserve line wraps between
+              its label and the amount, never inside the amount. */}
+          <span className={cn('flex flex-col', showCountdown ? 'min-w-min' : 'min-w-0')}>
             {clock}
-            {/* Wraps instead of truncating: the CTA carries a long live-cost
-                label, and at 320px an ellipsis would hide the reserve amount. */}
-            <span className="mt-0.5 break-words text-[11px] leading-tight tabular-nums text-muted-foreground">
+            <span className="mt-0.5 break-words text-[11px] leading-tight text-muted-foreground">
               {t('observatory.dock.reserve')}{' '}
-              <span className="font-semibold text-secondary">{reserveEth.toFixed(4)} ETH</span>
+              <Amount value={reserveEth} unit="ETH" className="font-semibold text-secondary" />
             </span>
           </span>
           {/* min-w-0 + whitespace-normal: RandomWalk labels carry a token id
@@ -130,7 +133,7 @@ export function ActionDock({
             data-testid="dock-open-sheet"
             onClick={onOpenSheet}
             aria-label={t('observatory.dock.openPanelAria')}
-            className="min-h-11 min-w-0 rounded-full border-0 px-4 text-sm font-semibold leading-tight text-primary-foreground whitespace-normal"
+            className="h-auto min-h-11 min-w-0 rounded-full border-0 px-4 py-1.5 text-sm font-semibold leading-tight text-primary-foreground whitespace-normal"
           >
             {submitLabel}
           </Button>
@@ -151,9 +154,7 @@ export function ActionDock({
               <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                 {t('observatory.dock.reserve')}
               </span>
-              <span className="text-sm font-bold tabular-nums text-secondary">
-                {reserveEth.toFixed(4)} ETH
-              </span>
+              <Amount value={reserveEth} unit="ETH" className="text-sm font-bold text-secondary" />
             </span>
             <Button
               size="sm"

@@ -580,7 +580,7 @@
       "clickHint": "Click the dot to open the transaction.",
       "summaryMax": "Highest cost: {amount} ({when} into cycle)",
       "summaryTotal": "Total consumed: {amount}",
-      "summaryCount": "{count} CST gestures",
+      "summaryCount": "{count} CST gestures",
       "description": "Each dot is the CST actually paid for a gesture (log scale — hollow dots were free). After every CST gesture the cost resets near twice the paid amount and descends to free across the Calibration Window. The dashed rose line shows the allocation clock remaining right before each gesture: when the clock runs low, rapid gesturing leaves the cost no time to descend, so paid prices escalate. Click a dot to open its transaction.",
       "empty": "No CST gestures in this cycle.",
       "selectCycle": "Select a cycle to inspect.",
@@ -650,7 +650,7 @@
     "invalidAddress": "Invalid Address",
     "user": "User",
     "heading": "Stellar Selection ETH allocated to this participant",
-    "retrievable": "Your retrievable allocations are {amount} ETH",
+    "retrievable": "Your retrievable allocations are {amount} ETH",
     "retrieveAll": "Retrieve All",
     "empty": "No Stellar Selection ETH yet."
   },

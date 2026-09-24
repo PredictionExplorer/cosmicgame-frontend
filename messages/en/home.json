@@ -252,10 +252,10 @@
       "title": "Your Cycle Standing",
       "tooltip": "Shows your current Final Gesture standing and Stellar Selection frequency based on your gestures this cycle.",
       "leader": {
-        "base": "You made the most recent gesture. If no one else gestures, you receive the Signature Allocation ({amount} ETH, 1,000 CST, 1 Cosmic Signature NFT).",
-        "withNft": "You made the most recent gesture. If no one else gestures, you receive the Signature Allocation ({amount} ETH, 1,000 CST, 1 Cosmic Signature NFT, plus {nftCount, plural, one {the attached NFT} other {all # attached NFTs}} shown below).",
-        "withErc20": "You made the most recent gesture. If no one else gestures, you receive the Signature Allocation ({amount} ETH, 1,000 CST, 1 Cosmic Signature NFT, plus {erc20Count, plural, one {the attached ERC20 token deposit} other {all # attached ERC20 token deposits}} shown below).",
-        "withBoth": "You made the most recent gesture. If no one else gestures, you receive the Signature Allocation ({amount} ETH, 1,000 CST, 1 Cosmic Signature NFT, plus {nftCount, plural, one {the attached NFT} other {all # attached NFTs}} and {erc20Count, plural, one {the attached ERC20 token deposit} other {all # attached ERC20 token deposits}} shown below)."
+        "base": "You made the most recent gesture. If no one else gestures, you receive the Signature Allocation ({amount} ETH, 1,000 CST, 1 Cosmic Signature NFT).",
+        "withNft": "You made the most recent gesture. If no one else gestures, you receive the Signature Allocation ({amount} ETH, 1,000 CST, 1 Cosmic Signature NFT, plus {nftCount, plural, one {the attached NFT} other {all # attached NFTs}} shown below).",
+        "withErc20": "You made the most recent gesture. If no one else gestures, you receive the Signature Allocation ({amount} ETH, 1,000 CST, 1 Cosmic Signature NFT, plus {erc20Count, plural, one {the attached ERC20 token deposit} other {all # attached ERC20 token deposits}} shown below).",
+        "withBoth": "You made the most recent gesture. If no one else gestures, you receive the Signature Allocation ({amount} ETH, 1,000 CST, 1 Cosmic Signature NFT, plus {nftCount, plural, one {the attached NFT} other {all # attached NFTs}} and {erc20Count, plural, one {the attached ERC20 token deposit} other {all # attached ERC20 token deposits}} shown below)."
       },
       "notLeader": "You are not the most recent participant — gesture again to take the lead, or remain eligible for Stellar Selection.",
       "ethStellar": "ETH Stellar Selection",
@@ -313,7 +313,7 @@
       "rewardLabel": "Reward",
       "costLabel": "Cost",
       "netLabel": "Net CST",
-      "cstAmount": "{amount} CST",
+      "cstAmount": "{amount} CST",
       "minAccepted": "Min accepted: {value}",
       "minAcceptedAny": "any reward, including 0 CST",
       "minAcceptedAria": "What Min accepted CST means",
@@ -339,7 +339,7 @@
         "acceptAnyTitle": "Accept any CST reward, including 0",
         "acceptAnyBody": "Sends a minimum accepted CST reward of 0. Use this when you prefer the gesture to land even if the dynamic CST amount changes before confirmation.",
         "toleranceLabel": "Allow reward to move down by",
-        "minAmount": "min {amount} CST",
+        "minAmount": "min {amount} CST",
         "revertNote": "If the contract would imprint less CST than this minimum by the time your transaction lands, the gesture should revert instead of accepting a lower dynamic CST amount."
       },
       "attachNft": "Attach NFT",
@@ -352,15 +352,15 @@
       "collision": {
         "title": "Collision Prevention",
         "raiseBy": "Raise by",
-        "approxCost": "≈ {amount} ETH",
+        "approxCost": "≈ {amount} ETH",
         "note": "Bumps Gesture Cost by {percent}% to avoid collision when two gestures land in the same block. Does not permanently raise the cost."
       }
     },
     "submit": {
-      "eth": "Gesture with ETH ({cost} ETH)",
-      "randomWalkWithToken": "Gesture with ETH + RandomWalk token {tokenId} ({cost} ETH)",
+      "eth": "Gesture with ETH ({cost} ETH)",
+      "randomWalkWithToken": "Gesture with ETH + RandomWalk token {tokenId} ({cost} ETH)",
       "randomWalk": "Gesture with ETH + RandomWalk",
-      "cst": "Gesture with CST ({cost} CST)",
+      "cst": "Gesture with CST ({cost} CST)",
       "cstFree": "Gesture with CST (FREE GESTURE)",
       "generic": "Gesture with {method}"
     },
@@ -396,8 +396,8 @@
     "titleTooltip": "Allocations distributed when the cycle finalizes across more than ten tracks.",
     "recipientCount": "{count, plural, one {# recipient} other {# recipients}}",
     "amounts": {
-      "eth": "{amount} ETH",
-      "ethEach": "{amount} ETH each",
+      "eth": "{amount} ETH",
+      "ethEach": "{amount} ETH each",
       "fixedCst": "1,000 CST",
       "fixedCstEach": "1,000 CST each",
       "nft": "1 Cosmic Signature NFT",
@@ -456,11 +456,11 @@
     "messageAria": "Gesture message from {address}",
     "openPositionAria": "Open gesture position {position}",
     "badge": {
-      "eth": "{amount} ETH",
+      "eth": "{amount} ETH",
       "ethFallback": "ETH",
-      "ethRwlk": "{amount} ETH + RWLK",
+      "ethRwlk": "{amount} ETH + RWLK",
       "rwlkFallback": "ETH + RWLK",
-      "cst": "{amount} CST",
+      "cst": "{amount} CST",
       "cstFallback": "CST"
     },
     "history": {
@@ -575,7 +575,7 @@
       "gestures": "{count, plural, =0 {No gestures this cycle yet} one {# gesture this cycle} other {# gestures this cycle}}",
       "retrieve": "Retrieve waiting allocations",
       "nothingWaiting": "Nothing waiting to retrieve",
-      "cstPreview": "A gesture now imprints ~{amount} CST"
+      "cstPreview": "A gesture now imprints ~{amount} CST"
     },
     "miniBar": {
       "aria": "Cycle quick console",
@@ -600,7 +600,7 @@
     "clock": {
       "reserveLabel": "Signature Allocation",
       "reserveExtras": "+ 1,000 CST · 1 Cosmic Signature NFT · attached assets",
-      "reserveUsd": "≈ {amount} USD",
+      "reserveUsd": "≈ {amount} USD",
       "notifyAria": "Notify me before the cycle can finalize",
       "notifyLabel": "Alert me before finalization:",
       "notifyMinutes": "{minutes}m",

@@ -3,7 +3,7 @@
 // lexicon-allow-start: component name and backend field names preserve existing API/chart contract
 
 import { useMemo, type FC } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import {
   LineChart,
   Line,
@@ -66,6 +66,7 @@ type SupplyByBidTooltipProps = {
 
 function SupplyByBidTooltip({ active, payload }: SupplyByBidTooltipProps) {
   const t = useTranslations('statistics');
+  const locale = useLocale();
   if (!active || !payload?.length) return null;
   const point = payload[0]?.payload as ChartPoint | undefined;
   if (!point) return null;
@@ -79,19 +80,19 @@ function SupplyByBidTooltip({ active, payload }: SupplyByBidTooltipProps) {
       <dl className="space-y-1 text-muted-foreground">
         <div className="flex justify-between gap-4">
           <dt>{t('charts.supply.totalSupply')}</dt>
-          <dd className="text-foreground">{formatCSTValue(point.totalSupplyEth)}</dd>
+          <dd className="text-foreground">{formatCSTValue(point.totalSupplyEth, locale)}</dd>
         </div>
         <div className="flex justify-between gap-4">
           <dt>{t('charts.supply.imprint')}</dt>
-          <dd className="text-foreground">{formatCSTValue(point.mintAmountEth)}</dd>
+          <dd className="text-foreground">{formatCSTValue(point.mintAmountEth, locale)}</dd>
         </div>
         <div className="flex justify-between gap-4">
           <dt>{t('charts.supply.consume')}</dt>
-          <dd className="text-foreground">{formatCSTValue(point.burnAmountEth)}</dd>
+          <dd className="text-foreground">{formatCSTValue(point.burnAmountEth, locale)}</dd>
         </div>
         <div className="flex justify-between gap-4">
           <dt>{t('charts.supply.net')}</dt>
-          <dd className="text-foreground">{formatCSTValue(point.amountEth)}</dd>
+          <dd className="text-foreground">{formatCSTValue(point.amountEth, locale)}</dd>
         </div>
         <div className="flex justify-between gap-4">
           <dt>{t('charts.supply.gestureType')}</dt>

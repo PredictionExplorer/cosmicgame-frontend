@@ -122,7 +122,7 @@ describe('CstTransferForm', () => {
     await renderReadyForm();
 
     expect(screen.getByText('Test source')).toBeInTheDocument();
-    expect(screen.getByText('0x111111....111111')).toBeInTheDocument();
+    expect(screen.getByText('0x1111…\u20601111')).toBeInTheDocument();
     expect(screen.getByText('100.00 CST')).toBeInTheDocument();
     expect(
       screen.getByRole('link', { name: 'myPages.transferCst.form.viewHistory' }),

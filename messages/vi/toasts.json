@@ -61,15 +61,15 @@
       "tooLongBidMessage": "Lời nhắn nét bút của bạn quá dài.",
       "wrongBidType": "Đã chọn sai loại nét bút.",
       "fundTransferFailed": "Chuyển tiền thất bại.",
-      "ethCostChanged": "Chi phí nét bút đã tăng {increase} ETH trong khi giao dịch của bạn đang được gửi. Chi phí mới cần thiết là {required} ETH. Vui lòng thử lại.",
-      "cstCostChanged": "Chi phí nét bút CST đã thay đổi trong khi giao dịch của bạn đang được gửi, có thể do một nét bút khác đã đến trước. Hợp đồng yêu cầu {required} CST, cao hơn mức tối đa {maximum} CST của bạn. Hãy làm mới và thử lại."
+      "ethCostChanged": "Chi phí nét bút đã tăng {increase} ETH trong khi giao dịch của bạn đang được gửi. Chi phí mới cần thiết là {required} ETH. Vui lòng thử lại.",
+      "cstCostChanged": "Chi phí nét bút CST đã thay đổi trong khi giao dịch của bạn đang được gửi, có thể do một nét bút khác đã đến trước. Hợp đồng yêu cầu {required} CST, cao hơn mức tối đa {maximum} CST của bạn. Hãy làm mới và thử lại."
     }
   },
   "anchor": {
     "walletNotReady": "Ví vẫn đang kết nối hoặc MetaMask đang ở sai chuỗi. Hãy chuyển sang mạng của ứng dụng và thử lại.",
-    "anchored": "{count, plural, other {# NFT đã được neo giữ với giao thức.}}",
-    "released": "{count, plural, other {Đã gỡ neo cho # NFT đã chọn.}}",
-    "releasedWithDistributions": "{count, plural, other {Đã gỡ neo cho # NFT và nhận về ETH tích lũy từ phân phối neo giữ.}}",
+    "anchored": "{count, plural, other {# NFT đã được neo giữ với giao thức.}}",
+    "released": "{count, plural, other {Đã gỡ neo cho # NFT đã chọn.}}",
+    "releasedWithDistributions": "{count, plural, other {Đã gỡ neo cho # NFT và nhận về ETH tích lũy từ phân phối neo giữ.}}",
     "failed": "Không thể hoàn thành giao dịch neo giữ. Hãy kiểm tra ví và kết nối mạng, rồi thử lại."
   },
   "allocation": {
@@ -90,7 +90,7 @@
     "failed": "Đã xảy ra lỗi",
     "stellarEthSuccess": "Đã nhận về ETH Tinh tuyển vào ví của bạn.",
     "nftSuccess": "Đã nhận về NFT đính kèm vào ví của bạn.",
-    "nftsSuccess": "{count, plural, other {Đã nhận về # NFT đính kèm vào ví của bạn.}}",
+    "nftsSuccess": "{count, plural, other {Đã nhận về # NFT đính kèm vào ví của bạn.}}",
     "tokenSuccess": "Đã nhận về token ERC-20 đính kèm vào ví của bạn.",
     "tokensSuccess": "{count, plural, other {Đã nhận về # token ERC-20 đính kèm vào ví của bạn.}}",
     "retrieving": "Đang nhận về…"
@@ -154,10 +154,10 @@
     "invalidUrl": "Nhập một URL hợp lệ bắt đầu bằng http:// hoặc https://.",
     "invalidUrlInline": "Dùng URL http:// hoặc https://.",
     "contractUnavailable": "Vui lòng kết nối ví và đảm bảo bạn đang ở đúng mạng.",
-    "formSubmitted": "Đã xác nhận đóng góp {amount} ETH.",
-    "formSubmittedWithInfo": "Đã xác nhận đóng góp {amount} ETH kèm thông tin.",
-    "submitted": "Đã đóng góp {amount} ETH.",
-    "submittedWithInfo": "Đã đóng góp {amount} ETH kèm thông tin.",
+    "formSubmitted": "Đã xác nhận đóng góp {amount} ETH.",
+    "formSubmittedWithInfo": "Đã xác nhận đóng góp {amount} ETH kèm thông tin.",
+    "submitted": "Đã đóng góp {amount} ETH.",
+    "submittedWithInfo": "Đã đóng góp {amount} ETH kèm thông tin.",
     "formFailed": "Đóng góp ETH thất bại, hãy kiểm tra thông tin nhập và thử lại.",
     "failed": "Đóng góp thất bại, vui lòng thử lại.",
     "failedWithInfo": "Đóng góp kèm thông tin thất bại, hãy kiểm tra thông tin nhập.",

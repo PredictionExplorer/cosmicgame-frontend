@@ -69,7 +69,7 @@ export function HeroStats({
       },
       {
         label: t('statistics.hero.totalEth.label'),
-        value: formatEthValue(totalEthWon),
+        value: formatEthValue(totalEthWon, locale),
         tooltip: t('statistics.hero.totalEth.tooltip'),
         icon: <Gem className="h-4 w-4" />,
       },

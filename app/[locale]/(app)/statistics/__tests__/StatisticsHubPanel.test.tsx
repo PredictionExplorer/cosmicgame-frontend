@@ -48,7 +48,7 @@ describe('StatisticsHubPanel', () => {
     expect(screen.getByText('Total Cycles')).toBeInTheDocument();
     expect(screen.getByText('Allocations Distributed', { selector: 'p' })).toBeInTheDocument();
     expect(screen.getByText('Contract Balance')).toBeInTheDocument();
-    expect(screen.getByText('36.16 ETH')).toBeInTheDocument();
+    expect(screen.getByText('36.1595 ETH')).toBeInTheDocument();
   });
 
   it('renders an explore card linking to every section page', () => {
@@ -76,6 +76,26 @@ describe('StatisticsHubPanel', () => {
     expect(screen.getByText('Allocation Economy')).toBeInTheDocument();
     expect(screen.getByText('Token Economy')).toBeInTheDocument();
     expect(screen.getByText('Public Goods & Contributions')).toBeInTheDocument();
+  });
+
+  it('groups every count, like the amounts beside it', () => {
+    const base = createDashboardInfo();
+    mockDashboard({
+      data: createDashboardInfo({
+        NumRwalkTokensUsed: 3_101,
+        MainStats: {
+          ...base.MainStats,
+          NumBidsCST: 1_254,
+          NumMktRewards: 2_048,
+          TotalNamedTokens: 4_096,
+        },
+      }),
+    });
+    render(<StatisticsHubPanel />);
+    for (const count of ['1,254', '2,048', '4,096', '3,101']) {
+      expect(screen.getByText(count)).toBeInTheDocument();
+    }
+    expect(screen.queryByText('1254')).not.toBeInTheDocument();
   });
 
   it('does not render the heavy detail sections on the hub', () => {

@@ -221,7 +221,7 @@ test.describe('home gesture chat', () => {
     const challenge = page.getByTestId('chrono-active-challenge');
     await expect(challenge).toBeVisible();
     await expect(challenge).toContainText('Active Endurance Challenge');
-    await expect(challenge).toContainText('0x111111....111111');
+    await expect(challenge).toContainText('0x1111…\u20601111');
     await expect(
       challenge.getByRole('link', {
         name: '0x1111111111111111111111111111111111111111',

@@ -27,6 +27,23 @@ describe('AuctionInfo', () => {
     ).toBeVisible();
   });
 
+  it.each([
+    [true, '@min-[26rem]:grid-cols-3'],
+    [false, '@lg:grid-cols-3'],
+  ])('sizes the value grid by its own card (compact=%s), not the viewport', (compact, columns) => {
+    // The card sits in the gesture panel and the side column, which stay
+    // narrow on wide screens: a viewport breakpoint let the no-wrap values collide.
+    render(<AuctionInfo compact={compact} secondsElapsed={1350} auctionDuration={5400} />);
+    const grid = screen.getAllByRole('term')[0]?.closest('dl');
+    expect(grid?.closest('section')).toHaveClass('@container');
+    expect(grid).toHaveClass(columns);
+    expect(grid?.className).not.toMatch(/(^|\s)(sm|min-\[26rem\]):grid-cols-3/);
+    // A narrow compact card reads each value as one "label … value" row.
+    const cell = screen.getAllByRole('term')[0]?.parentElement;
+    if (compact) expect(cell).toHaveClass('justify-between', '@min-[26rem]:block');
+    else expect(cell).not.toHaveClass('justify-between');
+  });
+
   it('preserves the ended state and all timing values in compact mode', () => {
     render(<AuctionInfo compact secondsElapsed={6000} auctionDuration={5400} />);
 

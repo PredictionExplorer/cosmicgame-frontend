@@ -311,7 +311,7 @@ export const GestureStatus = ({
                           {t('status.metrics.cstWindow')}
                         </span>
                         <span className="font-mono tabular-nums text-[rgb(var(--impact-green-rgb))]">
-                          {formatCstProgressPercent(cstAuctionProgress.percentComplete)}
+                          {formatCstProgressPercent(cstAuctionProgress.percentComplete, locale)}
                         </span>
                       </div>
                       <div

@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 
 import type { LandingHeroArtContent } from '@/content/landing';
 
-import { formatId } from '@/utils/format';
+import { formatId } from '@/utils/format/ids';
 import { getAssetsUrl, getThumbUrl } from '@/utils/urls';
 import { Link } from '@/i18n/navigation';
 import { APP_ORIGIN, localizeCrossHostHref } from '@/lib/hostRouting';

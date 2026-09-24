@@ -256,7 +256,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
       >
         {address && !isOwnProfile && (
           <div className="mt-5 flex">
-            <AddressChip address={address} truncateLength={8} />
+            <AddressChip address={address} display="responsive" />
           </div>
         )}
       </PageHeader>

@@ -764,7 +764,7 @@ describe('HomePage', () => {
 
     const challenge = screen.getByTestId('chrono-active-challenge');
     expect(challenge).toHaveTextContent('tables.specialAllocation.activeEnduranceChallenge');
-    expect(challenge).toHaveTextContent('0xEndura....uranc');
+    expect(challenge).toHaveTextContent('0xEndurance');
     expect(screen.getByTestId('chrono-challenge-segment')).toHaveTextContent('20m');
     expect(screen.getByTestId('chrono-challenge-record-to-beat')).toHaveTextContent('30m');
     expect(screen.getByTestId('chrono-challenge-next-change')).toHaveTextContent('10m 1s');

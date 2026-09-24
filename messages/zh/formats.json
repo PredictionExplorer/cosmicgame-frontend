@@ -18,5 +18,27 @@
     "minutes": "分",
     "seconds": "秒",
     "leftPattern": "剩余{duration}"
+  },
+  "address": {
+    "zero": "零地址",
+    "imprinted": "铭刻",
+    "consumed": "消耗",
+    "self": "此地址",
+    "known": {
+      "protocol": "Cosmic Signature 协议",
+      "implementation": "实现合约",
+      "cst": "Cosmic Signature CST 代币",
+      "nft": "Cosmic Signature NFT",
+      "randomWalk": "Random Walk",
+      "council": "宇宙议会",
+      "publicGoods": "公共物品金库",
+      "outreach": "推广储备",
+      "allocations": "分配钱包",
+      "cosmicAnchor": "Cosmic Signature NFT 锚定钱包",
+      "rwalkAnchor": "RWLK 锚定钱包"
+    }
+  },
+  "dateTime": {
+    "timeZone": "时区：{zone}"
   }
 }

@@ -57,7 +57,9 @@ describe('RecipientHistoryTable', () => {
     const entry = createEntry();
     render(<RecipientHistoryTable winningHistory={[entry]} />);
     expect(screen.getByText(convertTimestampToDateTime(entry.TimeStamp))).toBeInTheDocument();
-    expect(mockConvertTimestampToDateTime).toHaveBeenCalledWith(entry.TimeStamp, false, 'en');
+    expect(
+      document.querySelector(`time[datetime="${new Date(entry.TimeStamp * 1000).toISOString()}"]`),
+    ).toBeInTheDocument();
   });
 
   it('renders record type text for Main ETH Allocation', () => {

@@ -49,7 +49,9 @@ describe('MarketingRewardsTable', () => {
     const reward = createReward();
     render(<MarketingRewardsTable list={[reward]} />);
     expect(screen.getByText(convertTimestampToDateTime(reward.TimeStamp))).toBeInTheDocument();
-    expect(mockConvertTimestampToDateTime).toHaveBeenCalledWith(reward.TimeStamp, false, 'en');
+    expect(
+      document.querySelector(`time[datetime="${new Date(reward.TimeStamp * 1000).toISOString()}"]`),
+    ).toBeInTheDocument();
   });
 
   it('renders amount', () => {

@@ -46,10 +46,13 @@ export function PublicGoodsImpactCard({
 
   if (variant === 'compact') {
     const stats = [
-      { label: t('publicGoods.thisCycle'), value: formatEthValue(currentCycleEth) },
-      { label: t('publicGoods.stats.lifetime'), value: formatEthValue(lifetimeContributedEth) },
-      { label: t('publicGoods.stats.vault'), value: formatEthValue(vaultBalanceEth) },
-      { label: t('publicGoods.stats.retrieved'), value: formatEthValue(retrievedEth) },
+      { label: t('publicGoods.thisCycle'), value: formatEthValue(currentCycleEth, locale) },
+      {
+        label: t('publicGoods.stats.lifetime'),
+        value: formatEthValue(lifetimeContributedEth, locale),
+      },
+      { label: t('publicGoods.stats.vault'), value: formatEthValue(vaultBalanceEth, locale) },
+      { label: t('publicGoods.stats.retrieved'), value: formatEthValue(retrievedEth, locale) },
     ];
 
     return (
@@ -165,21 +168,21 @@ export function PublicGoodsImpactCard({
         >
           <StatCard
             label={t('publicGoods.stats.lifetime')}
-            value={formatEthValue(lifetimeContributedEth)}
+            value={formatEthValue(lifetimeContributedEth, locale)}
             icon={<HeartHandshake className="h-4 w-4" />}
             accent="impact"
             tooltip={t('publicGoods.stats.lifetimeTooltip')}
           />
           <StatCard
             label={t('publicGoods.stats.vault')}
-            value={formatEthValue(vaultBalanceEth)}
+            value={formatEthValue(vaultBalanceEth, locale)}
             icon={<Vault className="h-4 w-4" />}
             accent="impact"
             tooltip={t('publicGoods.stats.vaultTooltip')}
           />
           <StatCard
             label={t('publicGoods.stats.retrieved')}
-            value={formatEthValue(retrievedEth)}
+            value={formatEthValue(retrievedEth, locale)}
             icon={<ArrowUpRight className="h-4 w-4" />}
             accent="impact"
             tooltip={t('publicGoods.stats.retrievedTooltip')}

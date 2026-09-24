@@ -96,7 +96,7 @@
     "participation": "Khi đặt nét bút, bạn có thể khắc <em>CST tham gia động</em>. Số lượng tính theo công thức căn bậc hai dựa trên khoảng thời gian kể từ nét bút trước.",
     "calibration": "Nét bút ETH rút ngắn cửa sổ hiệu chỉnh CST khoảng {decreasePercent}%; nét bút CST kéo dài cửa sổ này khoảng {increasePercent}%.",
     "stellarSelection": "Mỗi nét bút ghi nhận một lượt Tinh tuyển. {ethEntries} lượt nhận {rafflePercent}% Dự trữ chu kỳ. {nftEntries} người nhận Tinh tuyển khác và {anchorHolders} người neo giữ Random Walk NFT nhận một Cosmic Signature NFT.",
-    "publicGoods": "Protocol Guild nhận {percent}% Dự trữ chu kỳ (ít nhất {amount} ETH) mỗi chu kỳ."
+    "publicGoods": "Protocol Guild nhận {percent}% Dự trữ chu kỳ (ít nhất {amount} ETH) mỗi chu kỳ."
   },
   "footer": {
     "contractBalance": "Số dư hợp đồng",
@@ -115,9 +115,9 @@
     "heading": "Tài sản đính kèm trong chu kỳ này",
     "cycleFallback": "hiện tại",
     "description": {
-      "nftOnly": "Tài sản cộng đồng đính kèm thuộc phân bổ Signature. Khi chu kỳ #{cycle} hoàn tất, người đặt nét bút cuối cùng nhận {nftCount, plural, other {toàn bộ {nftCount} NFT đính kèm}}.",
+      "nftOnly": "Tài sản cộng đồng đính kèm thuộc phân bổ Signature. Khi chu kỳ #{cycle} hoàn tất, người đặt nét bút cuối cùng nhận {nftCount, plural, other {toàn bộ {nftCount} NFT đính kèm}}.",
       "erc20Only": "Tài sản cộng đồng đính kèm thuộc phân bổ Signature. Khi chu kỳ #{cycle} hoàn tất, người đặt nét bút cuối cùng nhận {erc20Count, plural, other {toàn bộ {erc20Count} khoản nạp token ERC-20 đính kèm}}.",
-      "mixed": "Tài sản cộng đồng đính kèm thuộc phân bổ Signature. Khi chu kỳ #{cycle} hoàn tất, người đặt nét bút cuối cùng nhận {nftCount, plural, other {toàn bộ {nftCount} NFT đính kèm}} và {erc20Count, plural, other {toàn bộ {erc20Count} khoản nạp token ERC-20 đính kèm}}."
+      "mixed": "Tài sản cộng đồng đính kèm thuộc phân bổ Signature. Khi chu kỳ #{cycle} hoàn tất, người đặt nét bút cuối cùng nhận {nftCount, plural, other {toàn bộ {nftCount} NFT đính kèm}} và {erc20Count, plural, other {toàn bộ {erc20Count} khoản nạp token ERC-20 đính kèm}}."
     },
     "bonusReceipt": {
       "label": "Tài sản bổ sung",
@@ -136,9 +136,9 @@
       "recipientRuleValue": "Nét bút cuối cùng"
     },
     "remainder": {
-      "nftOnly": "Đang hiển thị một số tài sản. Trang chi tiết chu kỳ còn có {nftCount, plural, other {{nftCount} NFT đính kèm khác}}.",
+      "nftOnly": "Đang hiển thị một số tài sản. Trang chi tiết chu kỳ còn có {nftCount, plural, other {{nftCount} NFT đính kèm khác}}.",
       "erc20Only": "Đang hiển thị một số tài sản. Trang chi tiết chu kỳ còn có {erc20Count, plural, other {{erc20Count} khoản nạp token ERC-20 đính kèm khác}}.",
-      "mixed": "Đang hiển thị một số tài sản. Trang chi tiết chu kỳ còn có {nftCount, plural, other {{nftCount} NFT đính kèm khác}} và {erc20Count, plural, other {{erc20Count} khoản nạp token ERC-20 đính kèm khác}}."
+      "mixed": "Đang hiển thị một số tài sản. Trang chi tiết chu kỳ còn có {nftCount, plural, other {{nftCount} NFT đính kèm khác}} và {erc20Count, plural, other {{erc20Count} khoản nạp token ERC-20 đính kèm khác}}."
     },
     "nftCard": {
       "badge": "ERC-721",

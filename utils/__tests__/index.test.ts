@@ -14,14 +14,14 @@ import {
 } from '@/utils/index';
 
 describe('shortenHex', () => {
-  it('shortens a standard Ethereum address', () => {
+  it('shortens a standard Ethereum address to the checksummed 0x + 4 … 4 form', () => {
     const addr = '0x1234567890abcdef1234567890abcdef12345678';
-    expect(shortenHex(addr, 4)).toBe('0x1234....5678');
+    expect(shortenHex(addr, 4)).toBe('0x1234…\u20605678');
   });
 
-  it('shortens with custom length', () => {
+  it('ignores the legacy length so every address reads the same', () => {
     const addr = '0x1234567890abcdef1234567890abcdef12345678';
-    expect(shortenHex(addr, 6)).toBe('0x123456....345678');
+    expect(shortenHex(addr, 6)).toBe('0x1234…\u20605678');
   });
 
   it('returns empty string for falsy input', () => {
@@ -33,11 +33,8 @@ describe('shortenHex', () => {
     expect(shortenHex(undefined as unknown as string, 4)).toBe('');
   });
 
-  it('handles very short strings', () => {
-    const short = '0x12';
-    const result = shortenHex(short, 4);
-    expect(result).toContain('0x');
-    expect(result).toContain('....');
+  it('returns strings too short to shorten unchanged', () => {
+    expect(shortenHex('0x12', 4)).toBe('0x12');
   });
 });
 
@@ -75,17 +72,17 @@ describe('formatId', () => {
 });
 
 describe('convertTimestampToDateTime', () => {
-  it('converts a Unix timestamp to a date string', () => {
+  it('converts a Unix timestamp to a date string, with the year of a past year', () => {
     // 1609459200 = 2021-01-01 00:00 UTC; output varies by timezone (e.g. Jan 01 or Dec 31)
     const result = convertTimestampToDateTime(1609459200);
-    expect(result).toMatch(/^[A-Za-z]{3} \d{2}, \d{2}:\d{2}$/);
+    expect(result).toMatch(/^[A-Za-z]{3} \d{2}, 202[01], \d{2}:\d{2}$/);
   });
 
   it('includes seconds when flag is set', () => {
     const withSeconds = convertTimestampToDateTime(1609459200, true);
     const without = convertTimestampToDateTime(1609459200, false);
-    expect(withSeconds).toMatch(/^[A-Za-z]{3} \d{2}, \d{2}:\d{2}:\d{2}$/);
-    expect(without).toMatch(/^[A-Za-z]{3} \d{2}, \d{2}:\d{2}$/);
+    expect(withSeconds).toMatch(/^[A-Za-z]{3} \d{2}, 202[01], \d{2}:\d{2}:\d{2}$/);
+    expect(without).toMatch(/^[A-Za-z]{3} \d{2}, 202[01], \d{2}:\d{2}$/);
   });
 });
 
@@ -109,32 +106,33 @@ describe('formatSeconds', () => {
 
 describe('formatEthValue', () => {
   it('formats a number as ETH with decimals', () => {
-    const result = formatEthValue(1.23456789);
+    const result = formatEthValue(1.23456789, 'en');
     expect(result).toContain('1.2346');
     expect(result).toContain('ETH');
   });
 
   it('returns 0 ETH for zero input', () => {
-    expect(formatEthValue(0)).toBe('0 ETH');
+    expect(formatEthValue(0, 'en')).toBe('0\u00a0ETH');
   });
 
-  it('uses 2 decimals for large values', () => {
-    const result = formatEthValue(100.123);
-    expect(result).toBe('100.12 ETH');
+  it('keeps 4 decimals for large values too, so a figure reads the same everywhere', () => {
+    const result = formatEthValue(100.123, 'en');
+    expect(result).toBe('100.1230\u00a0ETH');
   });
 });
 
 describe('formatCSTValue', () => {
-  it('formats small values with 4 decimals', () => {
-    expect(formatCSTValue(5)).toBe('5.0000 CST');
+  it('formats whole values without decimals', () => {
+    expect(formatCSTValue(5, 'en')).toBe('5\u00a0CST');
+    expect(formatCSTValue(15, 'en')).toBe('15\u00a0CST');
   });
 
-  it('formats larger values with 2 decimals', () => {
-    expect(formatCSTValue(15)).toBe('15.00 CST');
+  it('formats fractional values with up to 2 decimals', () => {
+    expect(formatCSTValue(15.456, 'en')).toBe('15.46\u00a0CST');
   });
 
   it('formats zero', () => {
-    expect(formatCSTValue(0)).toBe('0 CST');
+    expect(formatCSTValue(0, 'en')).toBe('0\u00a0CST');
   });
 });
 

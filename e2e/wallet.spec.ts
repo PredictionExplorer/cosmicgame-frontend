@@ -144,7 +144,7 @@ test.describe('Wallet connection state (disconnected)', () => {
     await expect(dialog).toBeVisible();
     await dialog.getByRole('button', { name: /^MetaMask$/i }).click();
 
-    await expect(page.getByText(/0x1234\.{4}5678/).first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/0x1234…\u20605678/).first()).toBeVisible({ timeout: 10_000 });
     await expect(inlineMessage).toHaveValue(draft);
     await expect
       .poll(() => page.evaluate(() => window.__mockEthereumRequests ?? []))
@@ -339,7 +339,7 @@ test.describe('Wallet connection state (disconnected)', () => {
     await dialog.getByRole('button', { name: /^MetaMask$/i }).click();
 
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
-    await expect(page.getByText(/0x1234\.{4}5678/).first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/0x1234…\u20605678/).first()).toBeVisible({ timeout: 10_000 });
     await expect
       .poll(() => page.evaluate(() => window.__mockEthereumRequests ?? []))
       .toContain('eth_requestAccounts');

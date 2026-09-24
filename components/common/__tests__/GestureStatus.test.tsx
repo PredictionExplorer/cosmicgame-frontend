@@ -144,7 +144,7 @@ describe('GestureStatus', () => {
     expect(screen.getByText('50%')).toBeInTheDocument();
     // formatSeconds emits a trailing separator space, preserved inside the
     // mocked message values: "duration=1h 30m ".
-    expect(screen.getByText('home.status.metrics.duration(duration=1h 30m )')).toBeInTheDocument();
+    expect(screen.getByText('home.status.metrics.duration(duration=1h 30m)')).toBeInTheDocument();
     expect(
       screen.getByRole('progressbar', { name: 'home.status.metrics.cstWindowProgressAria' }),
     ).toHaveAttribute('aria-valuenow', '50');

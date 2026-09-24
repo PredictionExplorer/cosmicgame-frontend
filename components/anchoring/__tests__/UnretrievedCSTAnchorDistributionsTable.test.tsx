@@ -163,7 +163,7 @@ describe('UnretrievedCSTAnchorDistributionsTable', () => {
     expect(
       (await screen.findAllByText(convertTimestampToDateTime(1701346718))).length,
     ).toBeGreaterThanOrEqual(1);
-    expect(mockConvertTimestampToDateTime).toHaveBeenCalledWith(1701346718, false, 'en');
+    expect(document.querySelector('time[datetime="2023-11-30T12:18:38.000Z"]')).toBeInTheDocument();
     expect((await screen.findAllByText('5')).length).toBeGreaterThanOrEqual(1);
     expect((await screen.findAllByText('2 / 10')).length).toBeGreaterThanOrEqual(1);
     expect((await screen.findAllByText('3')).length).toBeGreaterThanOrEqual(1);

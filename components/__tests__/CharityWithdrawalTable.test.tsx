@@ -29,7 +29,7 @@ describe('CharityWithdrawalTable', () => {
     expect(
       screen.getByText(convertTimestampToDateTime(mockData[0]!.TimeStamp)),
     ).toBeInTheDocument();
-    expect(screen.getByText(mockData[0]!.DestinationAddr)).toBeInTheDocument();
+    expect(screen.getByText('0x555e…\u20600e60')).toBeInTheDocument();
     expect(screen.getByText(mockData[0]!.AmountEth.toFixed(6))).toBeInTheDocument();
   });
 

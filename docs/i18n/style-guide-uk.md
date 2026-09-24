@@ -89,9 +89,10 @@ ICU message so that **every placeholder sits in the nominative** and needs no ag
 - **No space** before `: ; ? ! , .`; one space after.
 - **Percent:** no space before % (50%). This matches the on-screen formatters and the
   numeric-claims test that pins every percentage to `protocol-facts.ts`.
-- **Decimals in token amounts:** keep the dot the formatters print (0.0001 ETH, 1.5 CST)
-  so prose matches the UI and the numeric-claims regex. Ukrainian comma decimals appear
-  only where `Intl.NumberFormat('uk-UA')` produces them (tables, grouped numbers).
+- **Decimals in token amounts:** keep the dot the formatters print (0.0001 ETH, 1.5 CST,
+  12.5%) so prose matches the UI and the numeric-claims regex. The formatting layer
+  (`utils/format.ts`) prints the dot in every context, tables included, grouped with a
+  no-break space (12 096.2542), so a figure never reads two ways on one screen.
 - **Thousands** in prose: a no-break space (U+00A0), which is also what Intl produces —
   1 000 CST, 24 000 CST, 1 000 000. Never the English comma (1,000 reads as a decimal
   in Ukrainian). The numeric-claims test accepts both separators, so the guard still

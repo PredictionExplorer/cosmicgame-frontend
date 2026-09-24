@@ -325,10 +325,13 @@ locale ships complete or not at all.
 
 Formatting conventions live in two places: `i18n/localeConfig.ts` for non-text conventions
 (Intl tag, week start, word spacing, ellipsis, provider-error policy) and
-`LocaleRecord`-typed format registries in `utils/format.ts` / `utils/time.ts` for
-per-locale date/duration templates (compact duration units come from the
-`formats.durationCompact` message catalog, the single source shared with
-`useTranslations('formats')` consumers). The table below records the original migration:
+`LocaleRecord`-typed format registries in `utils/format/` / `utils/time.ts` for
+per-locale date/duration templates. Compact duration units live in
+`utils/format/durations.ts` (`DURATION_UNITS`), so formatting a number never ships all
+eight catalogs; `formats.durationCompact` keeps the same units for
+`useTranslations('formats')` consumers, and `utils/__tests__/format-duration-units.test.ts`
+fails when the two drift — change both together. The table below records the original
+migration:
 
 | Today                                                            | Change                                                                                 |
 | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
@@ -340,8 +343,57 @@ per-locale date/duration templates (compact duration units come from the
 | `components/ui/date-picker.tsx` weekday labels `Su…Sa`           | zh: `日 一 二 三 四 五 六`; week starts Monday for zh                                  |
 | `react-countdown` renderers                                      | Localized unit labels via `formats.json`                                               |
 
-English output must remain byte-identical — every formatting change is guarded by
-existing unit tests plus new zh cases.
+That migration kept English output byte-identical. The formatting layer (§4.1) then
+changed English on purpose, to one standard for every locale: a number and its unit
+joined by U+00A0, the year on any date outside the current year, ETH at 4 decimals in
+cards, and grouped CST ("60,764.15 CST"). Every formatting change is guarded by unit
+tests in all eight locales (`utils/__tests__/format*.test.ts`).
+
+### 4.1 The formatting layer
+
+Every displayed number, amount, date, duration and address goes through
+`utils/format.ts` (implementation in `utils/format/`), tested in all locales by
+`utils/__tests__/format.test.ts`:
+
+| Value           | Function                                   | Component                                    |
+| --------------- | ------------------------------------------ | -------------------------------------------- |
+| ETH / CST / USD | `formatAmount(value, { unit, context })`   | `<Amount>` (`components/ui/amount.tsx`)      |
+| count           | `formatCount`                              | ICU `{n, number}` or plural `#`              |
+| percentage      | `formatPercent` (percentage points)        | —                                            |
+| date-time       | `formatDateTime`, `formatDateTimeTitle`    | `<DateTime>` (`components/ui/date-time.tsx`) |
+| duration        | `formatDuration` (`compact` or `clock`)    | `<Duration>` (`components/ui/duration.tsx`)  |
+| address / hash  | `formatAddress` (0x1Ec1…E990, checksummed) | `<AddressChip>`                              |
+
+- **Precision policy** (`AmountContext`): `table` pads to fixed digits so columns line
+  up (ETH 4, CST 2), renders zero as `0` and dust as `<0.0001`; `card` (default) keeps
+  ETH at 4 digits and CST at 0–2 (a protocol constant reads 1,000 CST); `hero` trims
+  trailing zeros; `exact` (an amount about to be paid) keeps up to 6 digits and never
+  bounds.
+- **Numbers** come from `Intl` for the locale's `intlLocale`, with one documented
+  deviation: `uk` prints token amounts and percentages with the dot (§4 of its style
+  guide), grouped with U+00A0. `vi` keeps Intl's comma decimal and dot grouping.
+- **No-break joins:** a number and its unit, and the tokens of one duration, are joined
+  by U+00A0 so they never wrap apart. Catalogs follow the same rule (`{amount} ETH`
+  with U+00A0), enforced by `i18n:strict` (§7).
+- **Addresses** shorten to `0x` + 4 … 4 around one U+2026, followed by U+2060 WORD
+  JOINER: line breaking allows a break after an ellipsis, and the joiner removes it, so
+  the short form never wraps even without `whitespace-nowrap`. Tests that pin a short
+  address write it as `'0x1234…\u20605678'`; copy buttons copy the full address.
+- **Dates:** the compact form adds the year when it is not the current one; `<DateTime>`
+  renders `<time dateTime title>` with UTC through hydration and the reader's zone after
+  it, the full date, zone (as a UTC offset) and age on hover. State the zone once per
+  table with `<TimeZoneNote>`.
+- Token amounts in messages are passed as strings from `formatAmount`; counts are passed
+  as numbers and formatted by the message (`{count, number}` or `#`).
+- **Locale is never defaulted where it can be forgotten:** the legacy helpers
+  `formatEthValue`, `formatCSTValue` and `formatTableAmount` require it, and `<Amount>`,
+  `<DateTime>`, `<Duration>` and the hydration-safe date helpers fall back to
+  `useLocale()`, never to `'en'`.
+- **Guards:** `format-call-sites.test.ts` ratchets raw `toFixed`/`formatFixed` and private
+  amount formatters (each baseline entry must equal the file's current count, so it only
+  goes down); `format-known-addresses.test.ts` pins `formats.address.known.*` to the
+  /contracts names; `format-landing-entry.test.ts` keeps the landing on leaf modules
+  (`formatId` from `@/utils/format/ids`), never the `@/utils/format` barrel.
 
 ## 5. Fonts
 
@@ -497,7 +549,11 @@ Noto cut per glyph is their intended rendering.
    compares each namespace against `messages/en/**` and checks key parity, ICU syntax
    (the same `@formatjs` parser next-intl uses), placeholder parity (same `{arguments}`,
    no invented `<tags>`), plural completeness against the locale's CLDR categories
-   (`one/few/many/other` for uk, `other` for zh, ko, ja, and vi), and verbatim-copy catalogs. It
+   (`one/few/many/other` for uk, `other` for zh, ko, ja, and vi), number-format parity
+   (an argument the English formats as a number, `#` or `{n, number}`, is never printed
+   bare and ungrouped), no-break unit joins in every catalog including the English
+   (`{amount}`, `{cost}`, `{count}`… or `#` before ETH, CST, USD or NFT takes U+00A0), and
+   verbatim-copy catalogs. It
    then reports every long-form content area (`scripts/i18n-content-areas.ts`) as the
    share of prose still identical to the English, and `--strict` fails an area that is
    untranslated — a scaffolded module cannot ship as a translation. `npm run

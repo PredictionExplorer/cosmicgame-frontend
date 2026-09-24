@@ -1,4 +1,5 @@
 import {
+  NBSP,
   UNAVAILABLE_VALUE,
   formatCSTValue,
   formatEthValue,
@@ -122,39 +123,39 @@ describe('weiToEthNumber', () => {
 });
 
 describe('formatEthValue / formatCSTValue treat negatives as real values', () => {
+  /** "~" stands for the no-break space that joins a number to its unit. */
+  const nb = (text: string) => text.replace(/~/g, NBSP);
+
   it('renders a negative ETH amount instead of "0 ETH"', () => {
-    expect(formatEthValue(-0.5)).toBe('-0.5000 ETH');
-    expect(formatEthValue(-42.5)).toBe('-42.5000 ETH');
+    expect(formatEthValue(-0.5, 'en')).toBe(nb('-0.5000~ETH'));
+    expect(formatEthValue(-42.5, 'en')).toBe(nb('-42.5000~ETH'));
   });
 
   it('renders a negative CST amount instead of "0 CST"', () => {
-    expect(formatCSTValue(-0.5)).toBe('-0.5000 CST');
-    expect(formatCSTValue(-42.5)).toBe('-42.5000 CST');
+    expect(formatCSTValue(-0.5, 'en')).toBe(nb('-0.50~CST'));
+    expect(formatCSTValue(-42.5, 'en')).toBe(nb('-42.50~CST'));
   });
 
   it('still collapses zero and non-finite values to the zero label', () => {
-    expect(formatEthValue(0)).toBe('0 ETH');
-    expect(formatEthValue(-0)).toBe('0 ETH');
-    expect(formatEthValue(Number.NaN)).toBe('0 ETH');
-    expect(formatEthValue(Number.POSITIVE_INFINITY)).toBe('0 ETH');
-    expect(formatEthValue(undefined)).toBe('0 ETH');
-    expect(formatEthValue(null)).toBe('0 ETH');
+    expect(formatEthValue(0, 'en')).toBe(nb('0~ETH'));
+    expect(formatEthValue(-0, 'en')).toBe(nb('0~ETH'));
+    expect(formatEthValue(Number.NaN, 'en')).toBe(nb('0~ETH'));
+    expect(formatEthValue(Number.POSITIVE_INFINITY, 'en')).toBe(nb('0~ETH'));
+    expect(formatEthValue(undefined, 'en')).toBe(nb('0~ETH'));
+    expect(formatEthValue(null, 'en')).toBe(nb('0~ETH'));
 
-    expect(formatCSTValue(0)).toBe('0 CST');
-    expect(formatCSTValue(Number.NaN)).toBe('0 CST');
-    expect(formatCSTValue(undefined)).toBe('0 CST');
-    expect(formatCSTValue(null)).toBe('0 CST');
+    expect(formatCSTValue(0, 'en')).toBe(nb('0~CST'));
+    expect(formatCSTValue(Number.NaN, 'en')).toBe(nb('0~CST'));
+    expect(formatCSTValue(undefined, 'en')).toBe(nb('0~CST'));
+    expect(formatCSTValue(null, 'en')).toBe(nb('0~CST'));
   });
 
-  it('keeps the historical positive output', () => {
-    expect(formatEthValue(1.23456)).toBe('1.2346 ETH');
-    expect(formatEthValue(10)).toBe('10.00 ETH');
-    expect(formatCSTValue(5.6789)).toBe('5.6789 CST');
-    expect(formatCSTValue(42.12345)).toBe('42.12 CST');
-  });
-
-  it('keeps the signed (not absolute) threshold, so every negative gets 4 decimals', () => {
-    expect(formatEthValue(-20)).toBe('-20.0000 ETH');
-    expect(formatCSTValue(-20)).toBe('-20.0000 CST');
+  it('applies one precision per unit, whatever the magnitude or sign', () => {
+    expect(formatEthValue(1.23456, 'en')).toBe(nb('1.2346~ETH'));
+    expect(formatEthValue(10, 'en')).toBe(nb('10.0000~ETH'));
+    expect(formatEthValue(-20, 'en')).toBe(nb('-20.0000~ETH'));
+    expect(formatCSTValue(5.6789, 'en')).toBe(nb('5.68~CST'));
+    expect(formatCSTValue(42.12345, 'en')).toBe(nb('42.12~CST'));
+    expect(formatCSTValue(-20, 'en')).toBe(nb('-20~CST'));
   });
 });

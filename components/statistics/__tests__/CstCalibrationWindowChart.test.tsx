@@ -143,7 +143,7 @@ describe('CstCalibrationWindowView', () => {
     expect(screen.getByText('Window after this gesture')).toBeInTheDocument();
     // First datum is the ETH gesture; the legend repeats the same label.
     expect(screen.getAllByText('ETH gesture (shortens)').length).toBeGreaterThanOrEqual(2);
-    expect(screen.getByText(/0xA1b2/)).toBeInTheDocument();
+    expect(screen.getByText(/0xa1B2…\u20605678/)).toBeInTheDocument();
   });
 
   it('formats axis ticks across minute/hour/day ranges', () => {
