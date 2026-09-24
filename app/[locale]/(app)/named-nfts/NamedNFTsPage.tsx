@@ -83,7 +83,7 @@ const NamedNFTsPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
                 {t('namedNfts.galleryLink')}
                 <ArrowRight
                   aria-hidden
-                  className="size-4 text-subtle transition-transform duration-fast group-hover:translate-x-0.5"
+                  className="size-4 text-subtle transition-transform duration-[var(--duration-fast)] group-hover:translate-x-0.5"
                 />
               </Link>
             </p>

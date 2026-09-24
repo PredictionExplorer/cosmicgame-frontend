@@ -44,7 +44,7 @@ function FilterChip({
         type="button"
         onClick={onRemove}
         aria-label={removeLabel}
-        className="relative inline-flex size-6 shrink-0 items-center justify-center rounded-edge text-subtle transition-colors duration-fast hover:bg-surface-raised hover:text-foreground pointer-coarse:after:absolute pointer-coarse:after:-inset-2.5 pointer-coarse:after:content-['']"
+        className="relative inline-flex size-6 shrink-0 items-center justify-center rounded-edge text-subtle transition-colors duration-[var(--duration-fast)] hover:bg-surface-raised hover:text-foreground pointer-coarse:after:absolute pointer-coarse:after:-inset-2.5 pointer-coarse:after:content-['']"
       >
         <X aria-hidden className="size-3.5" />
       </button>

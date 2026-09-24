@@ -90,7 +90,7 @@ function DistributionBar({
                 backgroundColor: segmentColor(traitKey, option.value, index),
               }}
               className={cn(
-                'min-w-[3px] transition-opacity duration-base first:rounded-l-pill last:rounded-r-pill',
+                'min-w-[3px] transition-opacity duration-[var(--duration-base)] first:rounded-l-pill last:rounded-r-pill',
                 anySelected && !active && 'opacity-30',
               )}
             />
@@ -115,7 +115,7 @@ function DistributionBar({
                 className={cn(
                   'inline-flex min-h-8 max-w-full items-center gap-1.5 rounded-control border px-2 type-caption',
                   'pointer-coarse:min-h-11 pointer-coarse:px-3',
-                  'transition-colors duration-fast',
+                  'transition-colors duration-[var(--duration-fast)]',
                   active
                     ? 'border-primary/60 bg-primary/12 text-foreground'
                     : 'border-rule-faint text-muted-foreground hover:border-input hover:text-foreground',

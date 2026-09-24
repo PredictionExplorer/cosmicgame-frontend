@@ -88,7 +88,7 @@ const AttachedNFT = ({ nft, showRecord = false, className }: AttachedNFTProps) =
       : link.label;
 
   const plate = (
-    <div className="relative aspect-square overflow-hidden rounded-edge bg-art-ground shadow-[var(--art-edge)] transition-shadow duration-fast group-hover:shadow-[var(--art-edge-active)]">
+    <div className="relative aspect-square overflow-hidden rounded-edge bg-art-ground shadow-[var(--art-edge)] transition-shadow duration-[var(--duration-fast)] group-hover:shadow-[var(--art-edge-active)]">
       <NFTImage
         src={metadata?.image}
         fallbackSrc={metadata?.imageFallback}

@@ -92,7 +92,7 @@ function FacetOptions({
           <li key={option.value}>
             <label
               className={cn(
-                'flex min-h-9 cursor-pointer items-center gap-2.5 rounded-control px-2 type-body-sm transition-colors duration-fast hover:bg-surface-raised',
+                'flex min-h-9 cursor-pointer items-center gap-2.5 rounded-control px-2 type-body-sm transition-colors duration-[var(--duration-fast)] hover:bg-surface-raised',
                 'pointer-coarse:min-h-11',
                 checked ? 'text-foreground' : 'text-muted-foreground',
               )}

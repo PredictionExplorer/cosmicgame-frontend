@@ -484,14 +484,17 @@ function DnaDisclosureButton({ open, onToggle }: { open: boolean; onToggle: () =
       onClick={onToggle}
       aria-expanded={open}
       aria-controls="gallery-dna-panel"
-      className="hidden min-h-8 items-center gap-1.5 rounded-control px-2 type-label text-muted-foreground transition-colors duration-fast hover:bg-surface-raised hover:text-foreground lg:inline-flex"
+      className="hidden min-h-8 items-center gap-1.5 rounded-control px-2 type-label text-muted-foreground transition-colors duration-[var(--duration-fast)] hover:bg-surface-raised hover:text-foreground lg:inline-flex"
       data-testid="dna-toggle"
     >
       <Dna aria-hidden className="size-4 text-subtle" />
       {t('dna.title')}
       <ChevronDown
         aria-hidden
-        className={cn('size-3.5 transition-transform duration-fast', open && 'rotate-180')}
+        className={cn(
+          'size-3.5 transition-transform duration-[var(--duration-fast)]',
+          open && 'rotate-180',
+        )}
       />
     </button>
   );

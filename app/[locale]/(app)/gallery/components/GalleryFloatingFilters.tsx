@@ -57,7 +57,7 @@ export function GalleryFloatingFilters({
     <div
       className={cn(
         'fixed inset-x-0 bottom-[max(1rem,env(safe-area-inset-bottom))] z-40 flex justify-center lg:hidden',
-        'pointer-events-none motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-4 motion-safe:duration-base',
+        'pointer-events-none motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-4 motion-safe:duration-[var(--duration-base)]',
       )}
       data-testid="floating-filters"
     >

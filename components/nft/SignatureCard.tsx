@@ -153,7 +153,7 @@ export function SignatureCard({
             <span
               aria-hidden
               className={cn(
-                '-mt-1 flex size-8 shrink-0 items-center justify-center transition-opacity duration-fast',
+                '-mt-1 flex size-8 shrink-0 items-center justify-center transition-opacity duration-[var(--duration-fast)]',
                 !anchored && 'pointer-coarse:hidden',
                 onQuickView &&
                   'pointer-fine:group-hover:opacity-0 pointer-fine:group-focus-within:opacity-0',
@@ -175,7 +175,7 @@ export function SignatureCard({
           className={cn(
             'absolute end-0 inline-flex size-8 items-center justify-center rounded-control text-subtle',
             LABEL_TOP,
-            'transition-[opacity,color,background-color] duration-fast',
+            'transition-[opacity,color,background-color] duration-[var(--duration-fast)]',
             'hover:bg-surface-raised hover:text-foreground',
             // A touch has no hover: tapping the card opens the detail page.
             'pointer-coarse:hidden',

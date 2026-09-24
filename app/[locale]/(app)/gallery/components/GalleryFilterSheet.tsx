@@ -45,7 +45,7 @@ export function GalleryFilterSheet({
           className={cn(
             'fixed inset-x-0 bottom-0 z-50 flex max-h-[88dvh] flex-col rounded-t-surface border-t border-rule bg-surface-raised shadow-float',
             'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom',
-            'data-[state=closed]:duration-base data-[state=open]:duration-slow motion-reduce:animate-none',
+            'data-[state=closed]:duration-[var(--duration-base)] data-[state=open]:duration-[var(--duration-slow)] motion-reduce:animate-none',
             'sm:inset-x-auto sm:right-0 sm:top-0 sm:h-full sm:max-h-none sm:w-[26rem] sm:rounded-none sm:border-l sm:border-t-0',
             'sm:data-[state=closed]:slide-out-to-right sm:data-[state=open]:slide-in-from-right',
           )}
