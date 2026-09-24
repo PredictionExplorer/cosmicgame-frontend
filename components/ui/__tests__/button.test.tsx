@@ -1,4 +1,7 @@
 import '@testing-library/jest-dom';
+import { useState } from 'react';
+import userEvent from '@testing-library/user-event';
+
 import { Button } from '@/components/ui/button';
 
 import { render, screen, fireEvent, checkA11y } from '@/test-utils';
@@ -86,10 +89,66 @@ describe('Button', () => {
     );
     const button = screen.getByRole('button', { name: 'Retrieve' });
     expect(button).toHaveAttribute('aria-busy', 'true');
-    expect(button).toBeDisabled();
+    expect(button).toHaveAttribute('aria-disabled', 'true');
+    // Busy, not unavailable: a natively disabled button would drop focus.
+    expect(button).not.toBeDisabled();
     expect(button.querySelector('[data-slot="button-spinner"]')).toHaveAttribute('aria-hidden');
     fireEvent.click(button);
     expect(handleClick).not.toHaveBeenCalled();
+  });
+
+  it('keeps keyboard focus on a button that turns busy when pressed', async () => {
+    const user = userEvent.setup();
+    const handleClick = jest.fn();
+    function PendingAction() {
+      const [busy, setBusy] = useState(false);
+      return (
+        <Button
+          loading={busy}
+          onClick={() => {
+            handleClick();
+            setBusy(true);
+          }}
+        >
+          Retrieve
+        </Button>
+      );
+    }
+    render(<PendingAction />);
+    const button = screen.getByRole('button', { name: 'Retrieve' });
+
+    await user.tab();
+    expect(button).toHaveFocus();
+    await user.keyboard('{Enter}');
+    expect(button).toHaveAttribute('aria-busy', 'true');
+    expect(button).toHaveFocus();
+
+    // Further presses are ignored while the action is pending.
+    await user.keyboard('{Enter}');
+    await user.keyboard(' ');
+    expect(handleClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not submit its form while busy', () => {
+    const handleSubmit = jest.fn((event: React.FormEvent) => event.preventDefault());
+    render(
+      <form onSubmit={handleSubmit}>
+        <Button type="submit" loading>
+          Make a gesture
+        </Button>
+      </form>,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Make a gesture' }));
+    expect(handleSubmit).not.toHaveBeenCalled();
+  });
+
+  it('stays natively disabled when unavailable, even while loading', () => {
+    render(
+      <Button loading disabled>
+        Retrieve
+      </Button>,
+    );
+    expect(screen.getByRole('button', { name: 'Retrieve' })).toBeDisabled();
   });
 
   it('keeps a caller’s own aria-busy when it is not loading', () => {

@@ -31,6 +31,12 @@ import { cn } from '@/lib/utils';
  * settle only when motion is allowed), and shows `aria-pressed="true"` as a
  * held state for toggle buttons. `loading` keeps the label, adds an inline
  * spinner and marks the button busy; it renders only without `asChild`.
+ *
+ * A busy button is `aria-disabled`, never natively `disabled`: a disabled
+ * element drops keyboard focus, so a keyboard user who submits a form (or
+ * signs a transaction) would be thrown back to the top of the page at the
+ * moment the action starts. Clicks, Enter and Space are swallowed instead
+ * until `loading` clears. Native `disabled` stays for real unavailability.
  */
 const buttonVariants = cva(
   [
@@ -92,8 +98,9 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   /**
-   * A pending action: keeps the label, adds an inline spinner, disables the
-   * button and sets `aria-busy`. Ignored with `asChild`.
+   * A pending action: keeps the label and focus, adds an inline spinner,
+   * sets `aria-busy` and `aria-disabled`, and ignores presses until it
+   * clears. Ignored with `asChild`.
    */
   loading?: boolean;
 }
@@ -114,27 +121,37 @@ function ButtonSpinner() {
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, loading = false, children, ...props }, ref) => {
-    const classes = cn(
-      buttonVariants({ variant, size }),
-      // A pending action is busy, not unavailable: it keeps full contrast.
-      loading && !asChild && 'disabled:opacity-100',
-      className,
-    );
+  (
+    { className, variant, size, asChild = false, loading = false, children, onClick, ...props },
+    ref,
+  ) => {
+    const classes = cn(buttonVariants({ variant, size }), className);
     if (asChild) {
       return (
-        <Slot className={classes} ref={ref} {...props}>
+        <Slot className={classes} ref={ref} onClick={onClick} {...props}>
           {children}
         </Slot>
       );
     }
+    // A pending action is busy, not unavailable: it keeps full contrast and
+    // keyboard focus, and only its presses are ignored.
+    const busy = loading && !props.disabled;
     return (
       <button
         className={classes}
         ref={ref}
         {...props}
-        disabled={props.disabled || loading}
+        aria-disabled={busy ? true : props['aria-disabled']}
         aria-busy={loading ? true : props['aria-busy']}
+        onClick={(event) => {
+          if (busy) {
+            // Also cancels a submit button's form submission.
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+          }
+          onClick?.(event);
+        }}
       >
         {loading ? <ButtonSpinner /> : null}
         {children}
