@@ -22,7 +22,8 @@ describe('allocation tracks', () => {
   it('gives every track its own palette-token color', () => {
     const colors = ALLOCATION_TRACK_IDS.map((id) => ALLOCATION_TRACK_COLORS[id]);
     expect(new Set(colors).size).toBe(ALLOCATION_TRACK_IDS.length);
-    for (const color of colors) expect(color).not.toMatch(/#[0-9a-f]{3,8}/i);
+    // The design system's track series (docs/design-system.md, "Data series").
+    for (const color of colors) expect(color).toMatch(/^bg-track-[a-z-]+$/);
   });
 
   it('completes the distributed shares with the next-cycle remainder', () => {
