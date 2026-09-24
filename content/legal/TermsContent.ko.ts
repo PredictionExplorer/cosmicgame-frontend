@@ -74,7 +74,7 @@ export const termsCopyKo = {
         {
           id: 'random-walk',
           subtitle: 'Random Walk NFT 비용 할인',
-          text: 'Random Walk NFT를 ETH 제스처에 한 번 첨부하면 ETH 제스처 비용을 50% 할인받을 수 있습니다. 이 작업은 영구적이며 취소할 수 없습니다. 한 번 사용된 Random Walk NFT는 비용 할인에 다시 사용할 수 없습니다.',
+          text: `Random Walk NFT를 ETH 제스처에 한 번 첨부하면 ETH 제스처 비용을 ${protocolFacts.randomWalkDiscountPercentage}% 할인받을 수 있습니다. 이 작업은 영구적이며 취소할 수 없습니다. 한 번 사용된 Random Walk NFT는 비용 할인에 다시 사용할 수 없습니다.`,
         },
       ],
     },
@@ -176,7 +176,7 @@ export const termsCopyKo = {
         {
           id: 'audits',
           subtitle: '스마트 컨트랙트 보안 감사',
-          text: '회사는 스마트 컨트랙트의 보안을 확보하기 위해 노력하지만, 어떠한 보안 감사도 완전한 보안을 보장할 수 없습니다. 사용자는 자신의 책임으로 플랫폼을 이용합니다.',
+          text: '회사는 스마트 컨트랙트의 보안을 확보하기 위해 노력하지만, 어떠한 보안 감사도 완전한 보안을 보장할 수 없습니다. 감사에서 확인한 범위는 <audits>보안 감사</audits> 페이지에 있습니다. 사용자는 자신의 책임으로 플랫폼을 이용합니다.',
         },
       ],
     },
@@ -188,34 +188,15 @@ export const termsCopyKo = {
           id: 'intro',
           text: '사용자는 다음의 금지 행위를 하지 않는 데 동의합니다:',
         },
-        {
-          id: 'exploit',
-          text: '• 버그, 결함, 취약점을 이용하여 프로토콜 메커니즘을 조작하거나 악용하려는 시도',
-        },
-        {
-          id: 'automation',
-          text: '• 봇, 스크립트, 자동화 도구를 사용하여 플랫폼과 상호작용하는 행위',
-        },
-        {
-          id: 'collusion',
-          text: '• 어떠한 형태의 시장 조작이나 다른 사용자와의 담합',
-        },
-        {
-          id: 'security',
-          text: '• 플랫폼의 보안을 해킹하거나 역설계하거나 훼손하려는 시도',
-        },
-        {
-          id: 'law',
-          text: '• 적용되는 법령이나 규정의 위반',
-        },
-        {
-          id: 'accounts',
-          text: '• 부당한 이점을 얻기 위해 여러 계정을 만드는 행위',
-        },
-        {
-          id: 'malicious',
-          text: '• 악성 콘텐츠를 업로드하거나 서비스 거부 공격을 시도하는 행위',
-        },
+      ],
+      bullets: [
+        '버그, 결함, 취약점을 이용하여 프로토콜 메커니즘을 조작하거나 악용하려는 시도',
+        '봇, 스크립트, 자동화 도구를 사용하여 플랫폼과 상호작용하는 행위',
+        '어떠한 형태의 시장 조작이나 다른 사용자와의 담합',
+        '플랫폼의 보안을 해킹하거나 역설계하거나 훼손하려는 시도',
+        '적용되는 법령이나 규정의 위반',
+        '부당한 이점을 얻기 위해 여러 계정을 만드는 행위',
+        '악성 콘텐츠를 업로드하거나 서비스 거부 공격을 시도하는 행위',
       ],
     },
   ],
@@ -224,7 +205,7 @@ export const termsCopyKo = {
     {
       id: 'intellectual-property',
       subtitle: '지식재산권',
-      text: '저장소 루트의 LICENSE 파일이 적용되는 프로젝트 소유 자료는 CC0 1.0에 따라 퍼블릭 도메인으로 헌정됩니다. 제3자 의존성, 글꼴, 에셋, 그 밖의 제3자 자료는 각자의 라이선스를 유지하며 이 헌정에 포함되지 않습니다. 자세한 내용은 THIRD_PARTY_NOTICES.md에서 확인할 수 있습니다. CC0는 상표권이나 특허권을 포기하지 않습니다. CC0 또는 명시된 오픈 소스 라이선스가 적용되지 않는 자료는 해당 권리자의 소유로 남으며, 적용되는 지식재산권 법률에 따라 보호됩니다. 프로토콜을 통해 받은 NFT는 해당 토큰의 소유권을 부여하지만, 명시적으로 밝히지 않는 한 그 기반이 되는 지식재산권은 부여하지 않습니다.',
+      text: '저장소 루트의 <license>LICENSE</license> 파일이 적용되는 프로젝트 소유 자료는 CC0 1.0에 따라 퍼블릭 도메인으로 헌정됩니다. 제3자 의존성, 글꼴, 에셋, 그 밖의 제3자 자료는 각자의 라이선스를 유지하며 이 헌정에 포함되지 않습니다. 자세한 내용은 <notices>THIRD_PARTY_NOTICES.md</notices> 파일에서 확인할 수 있습니다. CC0는 상표권이나 특허권을 포기하지 않습니다. CC0 또는 명시된 오픈 소스 라이선스가 적용되지 않는 자료는 해당 권리자의 소유로 남으며, 적용되는 지식재산권 법률에 따라 보호됩니다. 프로토콜을 통해 받은 NFT는 해당 토큰의 소유권을 부여하지만, 명시적으로 밝히지 않는 한 그 기반이 되는 지식재산권은 부여하지 않습니다.',
     },
     // lexicon-allow-start: boilerplate limitation-of-liability language must preserve "profits".
     {
@@ -261,7 +242,7 @@ export const termsCopyKo = {
     {
       id: 'contact',
       subtitle: '문의처',
-      text: '본 이용약관에 관한 질문은 공식 커뮤니티 채널이나 GitHub 저장소를 통해 문의해 주세요.',
+      text: '본 이용약관에 관한 질문은 <discord>Discord</discord>, <x>X</x>, <frontendRepository>GitHub 저장소</frontendRepository> 중 한 곳으로 문의해 주세요.',
     },
   ],
   // lexicon-allow-start: Howey-test denial copy must explicitly negate an investment framing.
@@ -270,6 +251,13 @@ export const termsCopyKo = {
     text: 'Cosmic Signature 참여에는 금전적 위험이 따릅니다. 암호화폐와 NFT 시장은 변동성이 매우 크며, 사용자는 제스처의 가치를 되돌려 받지 못할 수 있습니다. 자금을 잃더라도 생활에 지장이 없는 범위에서만 참여해 주세요. Cosmic Signature는 투자 상품이 아니며, 토큰 가격이나 향후 동향에 관해 어떠한 진술도 하지 않으며, 투자로서의 참여를 권유하지 않습니다. 참여하기 전에 항상 스스로 조사하고 재정 상황을 신중하게 고려해 주세요.',
   },
   // lexicon-allow-end
+  allocationsTable: {
+    title: '배분 경로 한눈에 보기',
+    track: '배분 경로',
+    none: '없음',
+    sharedBy: '{percent}, {count}명 공동',
+    each: '{count} × {amount}',
+  },
   acknowledgment: {
     title: '확인',
     text: 'Cosmic Signature를 이용함으로써 사용자는 본 이용약관을 읽고 이해했으며 이에 구속되는 데 동의함을 확인합니다. 또한 사용자는 블록체인 기술, 암호화폐, NFT와 관련된 위험을 이해하고 있음을 확인합니다.',

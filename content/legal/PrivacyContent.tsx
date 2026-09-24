@@ -1,23 +1,36 @@
-'use client';
-
 import type { ReactNode } from 'react';
-import { motion } from 'framer-motion';
-import { Database, Eye, Lock, Shield, UserCheck, type LucideIcon } from 'lucide-react';
+import { Check } from 'lucide-react';
 
-import { PageHeader } from '@/components/layout/PageHeader';
-import { ReviewedStamp } from '@/components/layout/ReviewedStamp';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { PageShell } from '@/components/ui/page-shell';
-import { cn } from '@/lib/utils';
+import type { LegalDocumentLabels } from '@/content/legal/labels';
 
-import { LegalSectionHeading } from './LegalSectionHeading';
-import { TRUST_DOCUMENT_DATES } from './trustCenter';
+import { LegalDocument } from '@/components/legal/LegalDocument';
+import { LegalClause, LegalParagraph } from '@/components/legal/LegalProse';
+import { RichText } from '@/components/legal/RichText';
+import { SiteLink } from '@/components/layout/SiteLink';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+
+import {
+  activePrivacyServices,
+  activePrivacyStorage,
+  type PrivacyServiceId,
+  type PrivacyStorageEntry,
+  type PrivacyStorageId,
+} from './privacyInventory';
 
 export type PrivacySectionId = 'collection' | 'use' | 'security' | 'sharing' | 'rights';
 
 export interface PrivacyItem {
+  /** The clause's anchor inside its section: `/privacy#<section>-<id>`. */
   readonly id: string;
   readonly subtitle: string;
+  /** Rich text: `<tag>…</tag>` links a `LEGAL_LINKS` entry. */
   readonly text: string;
 }
 
@@ -30,113 +43,263 @@ export interface PrivacySection {
 export interface PrivacyCopy {
   readonly title: string;
   readonly subtitle: string;
+  /** Three plain sentences above the policy. */
+  readonly inShort: { readonly title: string; readonly points: readonly string[] };
   readonly introductionTitle: string;
   readonly introduction: readonly string[];
   readonly sections: readonly PrivacySection[];
+  readonly services: {
+    readonly heading: string;
+    readonly intro: string;
+    readonly columns: {
+      readonly service: string;
+      readonly purpose: string;
+      readonly data: string;
+      readonly policy: string;
+    };
+    readonly policyLink: string;
+    /** For Cosmic Signature's own service: this policy covers it. */
+    readonly ownPolicy: string;
+    /** Read by screen readers where a service publishes no policy of its own. */
+    readonly none: string;
+    readonly items: Readonly<
+      Record<PrivacyServiceId, { readonly purpose: string; readonly data: string }>
+    >;
+  };
+  readonly storage: {
+    readonly heading: string;
+    readonly intro: string;
+    readonly columns: {
+      readonly name: string;
+      readonly kind: string;
+      readonly purpose: string;
+      readonly lifetime: string;
+    };
+    readonly kinds: Readonly<Record<PrivacyStorageEntry['kind'], string>>;
+    readonly lifetimes: Readonly<Record<PrivacyStorageEntry['lifetime'], string>>;
+    readonly items: Readonly<Record<PrivacyStorageId, string>>;
+  };
   readonly additionalTitle: string;
   readonly additional: readonly PrivacyItem[];
-  readonly notice: {
-    readonly title: string;
-    readonly text: string;
-  };
 }
 
-const legalCard = 'rounded-2xl border border-border bg-card shadow-none';
+function Clauses({
+  sectionId,
+  items,
+  locale,
+}: {
+  sectionId: string;
+  items: readonly PrivacyItem[];
+  locale: string;
+}) {
+  return items.map((item) => (
+    <LegalClause
+      key={item.id}
+      id={`${sectionId}-${item.id}`}
+      heading={item.subtitle}
+      text={item.text}
+      locale={locale}
+    />
+  ));
+}
 
-const SECTION_ICONS: Record<PrivacySectionId, LucideIcon> = {
-  collection: Database,
-  use: Lock,
-  security: Shield,
-  sharing: Eye,
-  rights: UserCheck,
-};
-
-/**
- * The privacy policy in the Trust Center template: the reading header with
- * the document date and the Trust Center tabs, then the sections.
- */
-export function PrivacyContent({ copy, tabs }: { copy: PrivacyCopy; tabs?: ReactNode }) {
-  const documentDate = TRUST_DOCUMENT_DATES.privacy;
+function ServicesTable({ copy, locale }: { copy: PrivacyCopy['services']; locale: string }) {
+  const { columns } = copy;
   return (
-    <PageShell variant="form" className="max-sm:pb-16">
-      <PageHeader
-        variant="reading"
-        section="trust"
-        title={copy.title}
-        subtitle={copy.subtitle}
-        meta={
-          documentDate ? (
-            <ReviewedStamp date={documentDate.date} kind={documentDate.kind} />
-          ) : undefined
-        }
-        tabs={tabs}
-      />
-
-      <div className="mx-auto max-w-4xl space-y-8">
-        <Card className={legalCard}>
-          <CardHeader>
-            <LegalSectionHeading icon={Shield}>{copy.introductionTitle}</LegalSectionHeading>
-          </CardHeader>
-          <CardContent className="space-y-4 text-muted-foreground">
-            {copy.introduction.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
-            ))}
-          </CardContent>
-        </Card>
-
-        {copy.sections.map((section, index) => {
-          const Icon = SECTION_ICONS[section.id];
+    <Table labelledBy="services-heading">
+      <TableHeader>
+        <TableRow>
+          <TableHead>{columns.service}</TableHead>
+          <TableHead>{columns.purpose}</TableHead>
+          <TableHead>{columns.data}</TableHead>
+          <TableHead className="whitespace-nowrap">{columns.policy}</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {activePrivacyServices().map((service) => {
+          let policy: ReactNode;
+          if (service.policy) {
+            // A span keeps the link out of the phone record's whole-value rule
+            // (inline-block), which would drop the arrow onto its own line.
+            policy = (
+              <span className="inline-flex">
+                <SiteLink
+                  href={service.policy}
+                  kind="external"
+                  className="link inline-flex min-h-6 items-center gap-1 whitespace-nowrap"
+                >
+                  {copy.policyLink}
+                </SiteLink>
+              </span>
+            );
+          } else if (service.id === 'api') {
+            policy = copy.ownPolicy;
+          } else {
+            policy = (
+              <>
+                <span aria-hidden className="text-subtle">
+                  —
+                </span>
+                <span className="sr-only">{copy.none}</span>
+              </>
+            );
+          }
           return (
-            <motion.div
-              key={section.id}
-              initial={false}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.05 }}
-            >
-              <Card className={legalCard}>
-                <CardHeader>
-                  <LegalSectionHeading icon={Icon}>{section.title}</LegalSectionHeading>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {section.content.map((item) => (
-                    <div key={item.id} className="space-y-2">
-                      <h3 className="font-semibold text-foreground">{item.subtitle}</h3>
-                      <p className="leading-8 text-muted-foreground">{item.text}</p>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            </motion.div>
+            <TableRow key={service.id}>
+              <TableCell label={columns.service} className="font-medium text-foreground">
+                {service.name}
+              </TableCell>
+              <TableCell label={columns.purpose} stack>
+                <RichText text={copy.items[service.id].purpose} locale={locale} />
+              </TableCell>
+              <TableCell label={columns.data} stack>
+                <RichText text={copy.items[service.id].data} locale={locale} />
+              </TableCell>
+              <TableCell label={columns.policy}>{policy}</TableCell>
+            </TableRow>
           );
         })}
+      </TableBody>
+    </Table>
+  );
+}
 
-        <Card className={legalCard}>
-          <CardHeader>
-            <LegalSectionHeading>{copy.additionalTitle}</LegalSectionHeading>
-          </CardHeader>
-          <CardContent className="space-y-6 text-muted-foreground">
-            {copy.additional.map((item) => (
-              <div key={item.id} className="space-y-2">
-                <h3 className="font-semibold text-foreground">{item.subtitle}</h3>
-                <p className="leading-relaxed">{item.text}</p>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+function StorageTable({ copy }: { copy: PrivacyCopy['storage'] }) {
+  const { columns } = copy;
+  return (
+    <Table labelledBy="storage-heading">
+      <TableHeader>
+        <TableRow>
+          <TableHead>{columns.name}</TableHead>
+          <TableHead>{columns.kind}</TableHead>
+          <TableHead>{columns.purpose}</TableHead>
+          <TableHead>{columns.lifetime}</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {activePrivacyStorage().map((entry) => (
+          <TableRow key={entry.id}>
+            <TableCell label={columns.name}>
+              <span className="flex flex-col gap-0.5">
+                {entry.names.map((name) => (
+                  <code key={name} className="type-mono leading-6 text-foreground">
+                    {name}
+                  </code>
+                ))}
+              </span>
+            </TableCell>
+            <TableCell label={columns.kind} className="whitespace-nowrap">
+              {copy.kinds[entry.kind]}
+            </TableCell>
+            <TableCell label={columns.purpose} stack>
+              {copy.items[entry.id]}
+            </TableCell>
+            <TableCell label={columns.lifetime}>{copy.lifetimes[entry.lifetime]}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+}
 
-        <Card className={cn(legalCard, 'border-primary/25 bg-primary/[0.06]')}>
-          <CardContent className="p-6">
-            <div className="flex items-start gap-4">
-              <Shield className="mt-0.5 h-6 w-6 shrink-0 text-primary" aria-hidden />
-              <div className="space-y-2">
-                <h3 className="font-semibold text-foreground">{copy.notice.title}</h3>
-                <p className="leading-8 text-muted-foreground">{copy.notice.text}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </PageShell>
+/** The three sentences to read first, as a quiet checked list. */
+function InShort({ copy, locale }: { copy: PrivacyCopy['inShort']; locale: string }) {
+  return (
+    <section
+      aria-labelledby="privacy-in-short-title"
+      className="max-w-[var(--measure-prose)] border-s-2 border-primary py-1 ps-5"
+    >
+      <h2 id="privacy-in-short-title" className="type-title text-foreground">
+        {copy.title}
+      </h2>
+      <ul className="mt-3 space-y-2.5">
+        {copy.points.map((point) => (
+          <li key={point} className="flex gap-3 type-prose text-muted-foreground">
+            <Check aria-hidden className="mt-1.5 size-4 shrink-0 text-primary" />
+            <span>
+              <RichText text={point} locale={locale} />
+            </span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+/**
+ * The privacy policy in the Trust Center template: what matters in three
+ * sentences, then the policy, including the services this deployment loads
+ * and the cookies and browser storage it sets, both listed from the same
+ * configuration that turns them on (content/legal/privacyInventory).
+ */
+export function PrivacyContent({
+  copy,
+  locale,
+  labels,
+}: {
+  copy: PrivacyCopy;
+  locale: string;
+  labels: LegalDocumentLabels;
+}) {
+  const section = (id: PrivacySectionId) => {
+    const found = copy.sections.find((candidate) => candidate.id === id);
+    return found
+      ? [
+          {
+            id,
+            heading: found.title,
+            content: <Clauses sectionId={id} items={found.content} locale={locale} />,
+          },
+        ]
+      : [];
+  };
+
+  return (
+    <LegalDocument
+      page="privacy"
+      labels={labels}
+      title={copy.title}
+      intro={copy.subtitle}
+      summary={<InShort copy={copy.inShort} locale={locale} />}
+      sections={[
+        {
+          id: 'introduction',
+          heading: copy.introductionTitle,
+          content: copy.introduction.map((paragraph) => (
+            <LegalParagraph key={paragraph} text={paragraph} locale={locale} />
+          )),
+        },
+        ...section('collection'),
+        ...section('use'),
+        {
+          id: 'services',
+          heading: copy.services.heading,
+          content: (
+            <>
+              <LegalParagraph text={copy.services.intro} locale={locale} />
+              <ServicesTable copy={copy.services} locale={locale} />
+            </>
+          ),
+        },
+        {
+          id: 'storage',
+          heading: copy.storage.heading,
+          content: (
+            <>
+              <LegalParagraph text={copy.storage.intro} locale={locale} />
+              <StorageTable copy={copy.storage} />
+            </>
+          ),
+        },
+        ...section('security'),
+        ...section('sharing'),
+        ...section('rights'),
+        {
+          id: 'additional',
+          heading: copy.additionalTitle,
+          content: <Clauses sectionId="additional" items={copy.additional} locale={locale} />,
+        },
+      ]}
+    />
   );
 }

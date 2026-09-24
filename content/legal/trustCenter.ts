@@ -1,7 +1,8 @@
 /**
- * The Trust Center: the five trust and legal pages, which share one template —
- * the reading header (display-md H1, the Trust Center eyebrow, the document
- * date, these pages as tabs), then sections under `LegalSectionHeading`.
+ * The Trust Center: the five trust and legal pages, which share one template
+ * (components/legal/LegalDocument) — the reading header (display-md H1, the
+ * Trust Center eyebrow, the document date, these pages as tabs), then the
+ * sections with their contents rail.
  */
 export const TRUST_CENTER_PAGES = [
   { id: 'security', href: '/security' },
@@ -21,13 +22,27 @@ export interface TrustDocumentDate {
 }
 
 /**
- * The dates the documents themselves state: when the terms and the privacy
- * policy last changed, and when the audit status was last reviewed. Security
- * and the risk disclosures state no date, so their headers show none rather
- * than an invented one.
+ * The dates the documents state, once for every locale: when the text of the
+ * terms, the privacy policy, the security page and the risk disclosures last
+ * changed, and when the audit status was last reviewed. Change a date in the
+ * same commit as the text it dates.
  */
-export const TRUST_DOCUMENT_DATES: Partial<Record<TrustCenterPage, TrustDocumentDate>> = {
+export const TRUST_DOCUMENT_DATES: Record<TrustCenterPage, TrustDocumentDate> = {
+  security: { date: '2026-09-24', kind: 'updated' },
   audits: { date: '2026-08-24', kind: 'reviewed' },
+  risk: { date: '2026-09-24', kind: 'updated' },
   terms: { date: '2026-07-20', kind: 'updated' },
-  privacy: { date: '2026-07-20', kind: 'updated' },
+  privacy: { date: '2026-09-24', kind: 'updated' },
+};
+
+/**
+ * Each document's English source in the public frontend repository; its
+ * commit history is the document's revision history ("Revision history ↗").
+ */
+export const TRUST_DOCUMENT_SOURCES: Record<TrustCenterPage, string> = {
+  security: 'content/legal/SecurityContent.en.ts',
+  audits: 'content/legal/AuditsContent.en.ts',
+  risk: 'content/legal/RiskContent.en.ts',
+  terms: 'content/legal/TermsContent.en.ts',
+  privacy: 'content/legal/PrivacyContent.en.ts',
 };

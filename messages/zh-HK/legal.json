@@ -6,5 +6,12 @@
     "risk": "風險披露",
     "security": "安全",
     "audits": "審計"
+  },
+  "document": {
+    "contents": "本頁內容",
+    "backToTop": "返回頁首",
+    "backToContents": "返回目錄",
+    "sectionLink": "連結到本節：{section}",
+    "revisionHistory": "修訂記錄"
   }
 }

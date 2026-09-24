@@ -80,7 +80,7 @@ export const termsCopyVi = {
         {
           id: 'random-walk',
           subtitle: 'Giảm chi phí với Random Walk NFT',
-          text: 'Một Random Walk NFT có thể được đính kèm một lần vào nét bút ETH để giảm 50% chi phí nét bút ETH. Hành động này là vĩnh viễn và không thể hoàn tác. Sau khi sử dụng, Random Walk NFT không thể dùng lại để giảm chi phí.',
+          text: `Một Random Walk NFT có thể được đính kèm một lần vào nét bút ETH để giảm ${protocolFacts.randomWalkDiscountPercentage}% chi phí nét bút ETH. Hành động này là vĩnh viễn và không thể hoàn tác. Sau khi sử dụng, Random Walk NFT không thể dùng lại để giảm chi phí.`,
         },
       ],
     },
@@ -182,7 +182,7 @@ export const termsCopyVi = {
         {
           id: 'audits',
           subtitle: 'Kiểm toán hợp đồng thông minh',
-          text: 'Dù chúng tôi nỗ lực bảo đảm an toàn cho các hợp đồng thông minh của mình, không cuộc kiểm toán nào có thể bảo đảm an toàn tuyệt đối. Bạn sử dụng nền tảng với rủi ro của chính mình.',
+          text: 'Dù chúng tôi nỗ lực bảo đảm an toàn cho các hợp đồng thông minh của mình, không cuộc kiểm toán nào có thể bảo đảm an toàn tuyệt đối; xem <audits>Kiểm toán</audits> để biết những gì đã được kiểm tra. Bạn sử dụng nền tảng với rủi ro của chính mình.',
         },
       ],
     },
@@ -194,34 +194,15 @@ export const termsCopyVi = {
           id: 'intro',
           text: 'Bạn đồng ý không thực hiện bất kỳ hành vi bị cấm nào sau đây:',
         },
-        {
-          id: 'exploit',
-          text: '• Cố tình thao túng hoặc lợi dụng cơ chế giao thức thông qua lỗi, trục trặc hoặc lỗ hổng',
-        },
-        {
-          id: 'automation',
-          text: '• Dùng bot, kịch bản hoặc công cụ tự động để tương tác với nền tảng',
-        },
-        {
-          id: 'collusion',
-          text: '• Tham gia bất kỳ hình thức thao túng thị trường hoặc thông đồng với người dùng khác',
-        },
-        {
-          id: 'security',
-          text: '• Cố tình tấn công, dịch ngược hoặc phá vỡ bảo mật của nền tảng',
-        },
-        {
-          id: 'law',
-          text: '• Vi phạm bất kỳ luật hoặc quy định áp dụng nào',
-        },
-        {
-          id: 'accounts',
-          text: '• Tạo nhiều tài khoản để giành lợi thế không công bằng',
-        },
-        {
-          id: 'malicious',
-          text: '• Tải lên nội dung độc hại hoặc cố tình tấn công từ chối dịch vụ',
-        },
+      ],
+      bullets: [
+        'Cố tình thao túng hoặc lợi dụng cơ chế giao thức thông qua lỗi, trục trặc hoặc lỗ hổng',
+        'Dùng bot, kịch bản hoặc công cụ tự động để tương tác với nền tảng',
+        'Tham gia bất kỳ hình thức thao túng thị trường hoặc thông đồng với người dùng khác',
+        'Cố tình tấn công, dịch ngược hoặc phá vỡ bảo mật của nền tảng',
+        'Vi phạm bất kỳ luật hoặc quy định áp dụng nào',
+        'Tạo nhiều tài khoản để giành lợi thế không công bằng',
+        'Tải lên nội dung độc hại hoặc cố tình tấn công từ chối dịch vụ',
       ],
     },
   ],
@@ -230,7 +211,7 @@ export const termsCopyVi = {
     {
       id: 'intellectual-property',
       subtitle: 'Sở hữu trí tuệ',
-      text: 'Tài liệu của dự án thuộc phạm vi tệp LICENSE ở thư mục gốc của kho mã được công bố theo CC0 1.0. Các phụ thuộc bên thứ ba, phông chữ, tài sản và tài liệu bên thứ ba khác giữ giấy phép riêng của chúng và không nằm trong phạm vi đó; xem THIRD_PARTY_NOTICES.md. CC0 không từ bỏ quyền nhãn hiệu hay quyền sáng chế. Bất kỳ tài liệu nào không thuộc phạm vi CC0 hoặc một giấy phép mã nguồn mở đã nêu vẫn thuộc sở hữu của chủ thể quyền tương ứng và được bảo hộ theo luật sở hữu trí tuệ áp dụng. NFT nhận qua giao thức trao cho bạn quyền sở hữu token cụ thể đó, nhưng không trao quyền sở hữu trí tuệ nền tảng trừ khi được nêu rõ.',
+      text: 'Tài liệu của dự án thuộc phạm vi tệp <license>LICENSE</license> ở thư mục gốc của kho mã được công bố theo CC0 1.0. Các phụ thuộc bên thứ ba, phông chữ, tài sản và tài liệu bên thứ ba khác giữ giấy phép riêng của chúng và không nằm trong phạm vi đó; xem <notices>THIRD_PARTY_NOTICES.md</notices>. CC0 không từ bỏ quyền nhãn hiệu hay quyền sáng chế. Bất kỳ tài liệu nào không thuộc phạm vi CC0 hoặc một giấy phép mã nguồn mở đã nêu vẫn thuộc sở hữu của chủ thể quyền tương ứng và được bảo hộ theo luật sở hữu trí tuệ áp dụng. NFT nhận qua giao thức trao cho bạn quyền sở hữu token cụ thể đó, nhưng không trao quyền sở hữu trí tuệ nền tảng trừ khi được nêu rõ.',
     },
     // lexicon-allow-start: boilerplate limitation-of-liability language must preserve "profits".
     {
@@ -267,7 +248,7 @@ export const termsCopyVi = {
     {
       id: 'contact',
       subtitle: 'Thông tin liên hệ',
-      text: 'Nếu bạn có câu hỏi về Điều khoản dịch vụ này, vui lòng liên hệ với chúng tôi qua các kênh cộng đồng chính thức hoặc kho mã GitHub.',
+      text: 'Nếu bạn có câu hỏi về Điều khoản dịch vụ này, hãy liên hệ với chúng tôi trên <discord>Discord</discord>, <x>X</x> hoặc qua <frontendRepository>kho mã GitHub</frontendRepository>.',
     },
   ],
   // lexicon-allow-start: Howey-test denial copy must explicitly negate an investment framing.
@@ -276,6 +257,13 @@ export const termsCopyVi = {
     text: 'Tham gia Cosmic Signature có rủi ro tài chính. Thị trường tiền mã hóa và NFT biến động rất mạnh, và bạn có thể mất giá trị đã bỏ vào các nét bút. Không bao giờ đặt nét bút bằng số tiền bạn không thể chấp nhận mất. Cosmic Signature không phải là sản phẩm đầu tư, không đưa ra cam kết nào về giá token hay diễn biến tương lai, và không mời gọi tham gia như một khoản đầu tư. Hãy luôn tự tìm hiểu và cân nhắc kỹ tình hình tài chính của mình trước khi tham gia.',
   },
   // lexicon-allow-end
+  allocationsTable: {
+    title: 'Tổng quan các luồng phân bổ',
+    track: 'Luồng',
+    none: 'Không có',
+    sharedBy: '{percent}, chia cho {count} người',
+    each: '{count} × {amount}',
+  },
   acknowledgment: {
     title: 'Xác nhận',
     text: 'Khi sử dụng Cosmic Signature, bạn xác nhận rằng mình đã đọc, hiểu và đồng ý chịu ràng buộc bởi Điều khoản dịch vụ này. Bạn cũng xác nhận rằng mình hiểu các rủi ro gắn với công nghệ blockchain, tiền mã hóa và NFT.',

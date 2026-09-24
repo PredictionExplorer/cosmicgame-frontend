@@ -6,5 +6,12 @@
     "risk": "Розкриття ризиків",
     "security": "Безпека",
     "audits": "Аудити"
+  },
+  "document": {
+    "contents": "На цій сторінці",
+    "backToTop": "Угору",
+    "backToContents": "До змісту",
+    "sectionLink": "Посилання на розділ «{section}»",
+    "revisionHistory": "Історія змін"
   }
 }

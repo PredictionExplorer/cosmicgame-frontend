@@ -6,5 +6,12 @@
     "risk": "위험 고지",
     "security": "보안",
     "audits": "보안 감사"
+  },
+  "document": {
+    "contents": "이 페이지의 내용",
+    "backToTop": "맨 위로",
+    "backToContents": "목차로 돌아가기",
+    "sectionLink": "섹션 링크: {section}",
+    "revisionHistory": "개정 이력"
   }
 }

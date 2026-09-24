@@ -1,12 +1,13 @@
 import { getPrivacyCopy } from '@/content/legal';
+import type { LegalDocumentLabels } from '@/content/legal/labels';
 import { PrivacyContent } from '@/content/legal/PrivacyContent';
-import { TrustCenterTabs } from '@/content/legal/TrustCenterTabs';
 
-export default function PrivacyPage({ locale = 'en' }: { locale?: string }) {
-  return (
-    <PrivacyContent
-      copy={getPrivacyCopy(locale)}
-      tabs={<TrustCenterTabs current="privacy" locale={locale} />}
-    />
-  );
+export default function PrivacyPage({
+  locale,
+  labels,
+}: {
+  locale: string;
+  labels: LegalDocumentLabels;
+}) {
+  return <PrivacyContent copy={getPrivacyCopy(locale)} locale={locale} labels={labels} />;
 }

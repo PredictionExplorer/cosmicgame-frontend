@@ -3,7 +3,15 @@ import type { PrivacyCopy } from './PrivacyContent';
 export const privacyCopyZh = {
   title: '隐私政策',
   subtitle:
-    '我们重视你的隐私。本政策说明你与 Cosmic Signature 去中心化应用交互时，我们如何收集、使用及保护相关信息。',
+    'Cosmic Signature 如何处理你使用应用与项目网站时的信息：哪些内容在链上公开、网站统计与存储哪些数据，以及各项服务会收到哪些数据。',
+  inShort: {
+    title: '要点',
+    points: [
+      '你的钱包地址以及你在链上的一切操作都公开且永久：任何人都能在 Arbitrum 上读取，任何人都无法删除。',
+      '连接钱包只会共享公开地址。我们绝不会索取你的助记词、私钥或密码，也不会收集你的姓名或电子邮箱地址。',
+      '网站通过下方列出的服务统计访问并报告错误，并且只设置下方列出的 Cookie。',
+    ],
+  },
   introductionTitle: '引言',
   introduction: [
     'Cosmic Signature 是构建在 Arbitrum（以太坊二层网络）上的程序化链上艺术协议。作为去中心化应用（dApp），我们在数据与隐私方面的运作方式不同于传统 Web 应用。',
@@ -27,7 +35,7 @@ export const privacyCopyZh = {
         {
           id: 'usage',
           subtitle: '使用数据',
-          text: '为改进服务，我们可能收集匿名使用数据，例如访问的页面、在平台停留的时间及总体交互模式。',
+          text: '我们统计网站的使用情况：浏览的页面、页面加载速度、来源网站，以及访问所在的国家或地区、浏览器与设备类型。执行这些统计的分析服务列在<privacyServices>我们使用的服务</privacyServices>中。',
         },
       ],
     },
@@ -43,12 +51,12 @@ export const privacyCopyZh = {
         {
           id: 'improvement',
           subtitle: '改进平台',
-          text: '我们使用汇总后的匿名数据改进平台、修复缺陷并开发新功能。',
+          text: '我们使用汇总后的使用数据与错误报告修复缺陷、改进网站。',
         },
         {
           id: 'communication',
           subtitle: '沟通',
-          text: '我们可能使用相关信息发送平台的重要更新，例如安全通知或协议机制的重大变更。',
+          text: '我们不收集电子邮箱地址或其他联系方式，因此不会直接联系你。公告（包括安全通知与协议变更）会发布在 <x>X</x> 与 <discord>Discord</discord> 上。',
         },
       ],
     },
@@ -64,7 +72,7 @@ export const privacyCopyZh = {
         {
           id: 'infrastructure',
           subtitle: '基础设施安全',
-          text: '我们的 Web 基础设施采用行业标准安全措施，包括 HTTPS 加密、安全托管与定期安全审计。',
+          text: '本网站仅通过 HTTPS 提供，托管于 Vercel 平台。智能合约已接受独立审计，详见<audits>审计</audits>。',
         },
         {
           id: 'passwords',
@@ -85,7 +93,7 @@ export const privacyCopyZh = {
         {
           id: 'third-party',
           subtitle: '第三方服务',
-          text: '我们可能使用第三方服务进行分析、托管及基础设施运营。这些服务受其各自隐私政策约束；我们会确保其符合适当的数据保护标准。',
+          text: '<privacyServices>我们使用的服务</privacyServices>中列出的服务会收到该处所述的数据，并按照各自的隐私政策处理；表格中附有链接。',
         },
         {
           id: 'legal',
@@ -111,7 +119,7 @@ export const privacyCopyZh = {
         {
           id: 'cookies',
           subtitle: 'Cookie 偏好',
-          text: '本网站可能使用 Cookie 提供基础功能。你可以通过浏览器管理 Cookie 设置。',
+          text: '本网站只设置<privacyStorage>Cookie 与浏览器存储</privacyStorage>中列出的 Cookie。你可以在浏览器设置中删除或阻止它们；网站仍可正常使用，只是不会记住你的配色与语言。',
         },
       ],
     },
@@ -126,12 +134,12 @@ export const privacyCopyZh = {
     {
       id: 'changes',
       subtitle: '政策变更',
-      text: '我们可能不时更新本隐私政策。若有变更，我们会在本页面发布新版隐私政策并更新“最后更新”日期，以此通知你。建议定期查看本隐私政策，了解是否发生变更。',
+      text: '我们可能不时更新本隐私政策。每次变更都会发布在本页面，并更新页首的“最后更新”日期；每项变更也可在本政策的<privacyHistory>修订历史</privacyHistory>中查看。',
     },
     {
       id: 'contact',
       subtitle: '联系方式',
-      text: '如对本隐私政策有任何疑问，请通过官方社区渠道或 GitHub 仓库联系我们。',
+      text: '如对本隐私政策有任何疑问，请发送邮件至 <support>support@cosmicsignature.com</support>，或通过 <discord>Discord</discord>、<x>X</x> 联系我们。',
     },
     {
       id: 'international',
@@ -139,8 +147,80 @@ export const privacyCopyZh = {
       text: 'Cosmic Signature 在全球均可访问的 Arbitrum（以太坊二层网络）上结算。使用本平台，即表示你确认相关信息可能在世界各地处理及存储。',
     },
   ],
-  notice: {
-    title: '重要说明：区块链透明性',
-    text: '区块链交易公开且永久存在。你的钱包地址以及与智能合约的全部交互均公开可见，并且无法删除。这是区块链技术的基本特征，并非我们隐私措施的局限。',
+  services: {
+    heading: '我们使用的服务',
+    intro: '本网站使用以下服务。各项服务按照其自身的隐私政策处理所列数据。',
+    columns: {
+      service: '服务',
+      purpose: '用途',
+      data: '收到的数据',
+      policy: '隐私政策',
+    },
+    policyLink: '政策',
+    ownPolicy: '本政策',
+    none: '未列出',
+    items: {
+      vercel: {
+        purpose: '托管并传输网站',
+        data: '请求日志中的 IP 地址与浏览器信息',
+      },
+      vercelAnalytics: {
+        purpose: '统计页面浏览量并衡量页面速度，不使用 Cookie',
+        data: '浏览的页面、来源网站、国家或地区、浏览器与设备类型',
+      },
+      googleAnalytics: {
+        purpose: '衡量访问者如何使用网站',
+        data: '浏览的页面、大致位置、浏览器与设备（通过 Cookie）',
+      },
+      sentry: {
+        purpose: '报告错误以便修复',
+        data: '错误本身、所在页面、浏览器信息，以及出错前片刻的回放（所有文字与输入均已遮蔽）',
+      },
+      api: {
+        purpose: '提供页面显示的协议数据',
+        data: '你打开的记录，包括你查询的任何钱包地址',
+      },
+      rpc: {
+        purpose: '读取 Arbitrum 上的合约，并转发你签署的交易',
+        data: 'IP 地址、被读取的地址以及你发送的交易',
+      },
+      walletConnect: {
+        purpose: '连接移动端钱包与扫码钱包',
+        data: '你的钱包地址，以及网站与钱包之间的加密消息',
+      },
+      coingecko: {
+        purpose: '提供以美元计价的 ETH 与 CST 价格',
+        data: '页面显示美元价格时的 IP 地址',
+      },
+    },
+  },
+  storage: {
+    heading: 'Cookie 与浏览器存储',
+    intro:
+      '网站会在你的设备上存储以下内容，均不包含你的姓名或联系方式。Cookie 会随请求发送；浏览器存储只保留在你的设备上。',
+    columns: {
+      name: '名称',
+      kind: '类型',
+      purpose: '用途',
+      lifetime: '保留期限',
+    },
+    kinds: {
+      cookie: 'Cookie',
+      browser: '浏览器存储',
+    },
+    lifetimes: {
+      oneYear: '1 年',
+      twoYears: '2 年',
+      untilCleared: '直到你清除为止',
+    },
+    items: {
+      themeCookie: '在两个 Cosmic Signature 网站上记住你的配色',
+      localeCookie: '记住你选择的语言',
+      gaCookies: '为 Google Analytics 区分重复访问',
+      themeStorage: '在本网站记住你的配色',
+      attention: '记住你的收官前提醒与声音设置',
+      explainer: '记住你已关闭周期说明',
+      wallet: '记住你连接过的钱包，以便应用重新连接',
+    },
   },
 } as const satisfies PrivacyCopy;
