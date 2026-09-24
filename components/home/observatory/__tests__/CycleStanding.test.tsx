@@ -152,7 +152,25 @@ describe('CycleStanding', () => {
     expect(screen.getByTestId('personal-standing')).toHaveTextContent(
       'home.observatory.standing.positionNone',
     );
-    expect(screen.getByTestId('personal-gesture-count')).not.toHaveTextContent('share');
+    // One row says it; no second "None from you yet" repeats it (F223).
+    expect(screen.queryByTestId('personal-gesture-count')).not.toBeInTheDocument();
+    expect(screen.getByTestId('personal-retrieve-status')).toBeInTheDocument();
+  });
+
+  it('keeps the count row while a confirmed Gesture is still being indexed', () => {
+    render(
+      <CycleStanding
+        {...baseProps}
+        participation={{ status: 'ready', gestures: 0, spentEth: 0, spentCst: 0 }}
+        participationUpdating
+      />,
+    );
+    expect(screen.getByTestId('personal-standing')).not.toHaveTextContent(
+      'home.observatory.standing.positionNone',
+    );
+    expect(screen.getByTestId('personal-gesture-count')).toHaveTextContent(
+      'home.observatory.standing.updating',
+    );
   });
 
   it('says in one sentence what connecting adds, with no column of empty dashes', () => {

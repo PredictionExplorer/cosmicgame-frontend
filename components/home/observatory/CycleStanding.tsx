@@ -179,11 +179,18 @@ export function CycleStanding({
         ),
       };
     }
-    if (participation.status === 'ready' && participation.gestures === 0) {
-      return { value: t('positionNone'), caption: undefined };
+    if (
+      !participationUpdating &&
+      participation.status === 'ready' &&
+      participation.gestures === 0
+    ) {
+      return { value: t('positionNone'), caption: undefined, none: true };
     }
     return { value: t('positionOther'), caption: undefined };
   })();
+  // "No Gesture from you this cycle" already says what the count would: one
+  // row, not two that repeat each other (F223).
+  const showCount = !('none' in position && position.none);
 
   const thisCycle = (() => {
     if (participationUpdating) {
@@ -283,12 +290,14 @@ export function CycleStanding({
           value={position.value}
           caption={position.caption}
         />
-        <Row
-          testId="personal-gesture-count"
-          label={t('thisCycle')}
-          value={thisCycle.value}
-          caption={thisCycle.caption}
-        />
+        {showCount && (
+          <Row
+            testId="personal-gesture-count"
+            label={t('thisCycle')}
+            value={thisCycle.value}
+            caption={thisCycle.caption}
+          />
+        )}
         <Row
           testId="personal-retrieve-status"
           label={t('waiting')}
