@@ -43,10 +43,14 @@ describe('getGestureSubmitLabel', () => {
     );
   });
 
-  it("quotes in the locale's decimal separator", () => {
+  it("quotes with the format layer's decimal mark, as every other figure on the page", () => {
+    expect(
+      getGestureSubmitLabel({ ...baseInput, locale: 'vi', ethPrice: 0.10210695701197195 }),
+    ).toBe(JSON.stringify({ key: 'form.submit.eth', cost: '0,10211' }));
+    // Ukrainian keeps the dot (docs/i18n/style-guide-uk.md), like the allocation beside it.
     expect(
       getGestureSubmitLabel({ ...baseInput, locale: 'uk', ethPrice: 0.10210695701197195 }),
-    ).toBe(JSON.stringify({ key: 'form.submit.eth', cost: '0,10211' }));
+    ).toBe(JSON.stringify({ key: 'form.submit.eth', cost: '0.10211' }));
   });
 
   it('applies the RandomWalk reduction used by the form', () => {
