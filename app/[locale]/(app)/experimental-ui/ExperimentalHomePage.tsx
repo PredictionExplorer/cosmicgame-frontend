@@ -798,9 +798,16 @@ const ExperimentalHomePage = ({
                     {t('deck.newHere')}
                     <ArrowRight aria-hidden className="size-3.5 shrink-0" />
                   </Link>
-                  <div className="flex items-center gap-2">
-                    <AttentionMenu className="rounded-control sm:h-9 sm:w-9" />
-                    <Button asChild variant="outline" size="sm" className="shrink-0">
+                  <div className="flex max-w-full items-center gap-2">
+                    <AttentionMenu className="shrink-0 rounded-control sm:h-9 sm:w-9" />
+                    {/* A long label (uk) wraps inside the button on a 320px phone
+                        rather than widen the page. */}
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="min-w-0 max-sm:h-auto max-sm:whitespace-normal max-sm:py-2 max-sm:text-center"
+                    >
                       <Link href="/" data-testid="experimental-ui-return">
                         {t('deck.returnToCurrent')}
                       </Link>
