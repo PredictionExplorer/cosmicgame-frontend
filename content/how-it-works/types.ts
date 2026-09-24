@@ -23,33 +23,30 @@ export interface HowItWorksBreadcrumbsContent {
 
 export interface HowItWorksHeroContent {
   /**
-   * The H1 as one string per locale, the accented words marked
-   * `<accent>…</accent>`: each locale owns its word order and spacing
-   * (Japanese sets no space between a Latin name and Japanese text).
+   * The H1 as one plain string per locale: each locale owns its word order
+   * and spacing (Japanese sets no space between a Latin name and Japanese text).
    */
   readonly heading: string;
   readonly paragraph: string;
   readonly primaryCta: HowItWorksLink;
-  /** In-page anchor CTA (plain `<a>`), e.g. `#protocol-overview`. */
+  /** The live cycle, where the mechanism can be watched. */
   readonly secondaryCta: HowItWorksLink;
 }
 
-export interface HowItWorksOverviewCard {
-  readonly number: string;
-  readonly title: string;
-  readonly description: string;
-  readonly tooltip: string;
+/** A real, finalized Cosmic Signature shown as the cycle's payoff. */
+export interface HowItWorksArtSample {
+  readonly tokenId: number;
+  readonly cycle: number;
+  readonly seed: string;
 }
 
-/**
- * Fixed-length tuples keep the per-item icon/accent visuals (which stay in the
- * components) safely zippable under `noUncheckedIndexedAccess`, and force the
- * Chinese translation to keep structure parity with the English content.
- */
-export interface HowItWorksOverviewContent {
+export interface HowItWorksPayoffContent {
   readonly heading: string;
-  readonly subhead: string;
-  readonly cards: readonly [HowItWorksOverviewCard, HowItWorksOverviewCard, HowItWorksOverviewCard];
+  readonly body: string;
+  /** The wall label, with the cycle number filled in. */
+  readonly caption: string;
+  readonly link: HowItWorksLink;
+  readonly sample: HowItWorksArtSample;
 }
 
 export interface HowItWorksRewardItem {
@@ -97,15 +94,18 @@ export interface HowItWorksStep {
 export interface HowItWorksStepByStepContent {
   readonly heading: string;
   readonly subhead: string;
-  /** Visible prefix before the zero-padded ordinal, rendered as e.g. "STEP 01". */
+  /**
+   * The step's eyebrow, `{n}` replaced with its number: each locale places
+   * the number and its spacing ("Step 1", "ステップ1", "1단계", "第 1 步").
+   */
   readonly stepLabel: string;
   readonly steps: readonly [HowItWorksStep, HowItWorksStep, HowItWorksStep];
 }
 
+/** A tip: its title and the strategy behind it. */
 export interface HowItWorksTip {
   readonly title: string;
-  readonly description: string;
-  readonly tooltip: string;
+  readonly body: string;
 }
 
 export interface HowItWorksProTipsContent {
@@ -121,16 +121,11 @@ export interface HowItWorksProTipsContent {
   ];
 }
 
-export interface HowItWorksFaqCalloutContent {
-  readonly heading: string;
-  readonly body: string;
-  readonly cta: HowItWorksLink;
-}
-
 export interface HowItWorksCallToActionContent {
   readonly heading: string;
   readonly body: string;
   readonly primaryCta: HowItWorksLink;
+  readonly faqCta: HowItWorksLink;
   readonly discordCta: HowItWorksLink;
   readonly twitterCta: HowItWorksLink;
 }
@@ -140,11 +135,10 @@ export interface HowItWorksContent {
   readonly jsonLd: HowItWorksJsonLdContent;
   readonly breadcrumbs: HowItWorksBreadcrumbsContent;
   readonly hero: HowItWorksHeroContent;
-  readonly overview: HowItWorksOverviewContent;
   readonly rewardBreakdown: HowItWorksRewardBreakdownContent;
   readonly gameCycle: HowItWorksGameCycleContent;
+  readonly payoff: HowItWorksPayoffContent;
   readonly stepByStep: HowItWorksStepByStepContent;
   readonly proTips: HowItWorksProTipsContent;
-  readonly faqCallout: HowItWorksFaqCalloutContent;
   readonly callToAction: HowItWorksCallToActionContent;
 }

@@ -4,84 +4,42 @@ import { render, screen, checkA11y } from '@/test-utils';
 
 import { CallToAction } from '../components/CallToAction';
 
-jest.mock('framer-motion', () => {
-  const React = require('react');
-  const cache: Record<string, React.ForwardRefExoticComponent<unknown>> = {};
-  return {
-    motion: new Proxy(
-      {},
-      {
-        get: (_target: unknown, prop: string) => {
-          if (!cache[prop]) {
-            const Comp = React.forwardRef(function MotionProxy(
-              props: Record<string, unknown>,
-              ref: React.Ref<HTMLElement>,
-            ) {
-              const {
-                initial: _i,
-                animate: _a,
-                whileInView: _w,
-                viewport: _v,
-                transition: _t,
-                variants: _va,
-                ...rest
-              } = props;
-              return React.createElement(prop, { ...rest, ref });
-            });
-            Comp.displayName = `motion.${prop}`;
-            cache[prop] = Comp;
-          }
-          return cache[prop];
-        },
-      },
-    ),
-  };
-});
-
-jest.mock('next/link', () => ({
-  __esModule: true,
-  default: ({ children, ...props }: { children: React.ReactNode; href: string }) => (
-    <a {...props}>{children}</a>
-  ),
-}));
-
 const callToAction = howItWorksContentEn.callToAction;
 
 describe('CallToAction', () => {
-  it('renders the CTA heading', () => {
+  it('renders the heading', () => {
     render(<CallToAction callToAction={callToAction} />);
     expect(
-      screen.getByRole('heading', { name: 'Ready to Make Your First Gesture?' }),
+      screen.getByRole('heading', { level: 2, name: 'Ready to make your first Gesture?' }),
     ).toBeInTheDocument();
   });
 
-  it('renders the description text with a typographic apostrophe', () => {
+  it('renders the body with a typographic apostrophe', () => {
     render(<CallToAction callToAction={callToAction} />);
     expect(screen.getByText(callToAction.body)).toBeInTheDocument();
-    // Regression guard: the copy previously rendered a literal "\u2019"
-    // because unicode escapes are not processed inside JSX text.
+    // Regression guard: the copy once rendered a literal "’" from JSX text.
     expect(screen.getByText(/shaping the cycle’s Signature\./)).toBeInTheDocument();
     expect(screen.queryByText(/\\u2019/)).not.toBeInTheDocument();
   });
 
-  it('renders the Make a Gesture link pointing to the Observatory', () => {
+  it('offers the gesture form and the FAQ', () => {
     render(<CallToAction callToAction={callToAction} />);
-    const link = screen.getByRole('link', { name: 'Make a Gesture' });
-    expect(link).toHaveAttribute('href', '/');
+    expect(screen.getByRole('link', { name: 'Make a Gesture' })).toHaveAttribute(
+      'href',
+      '/#make-gesture',
+    );
+    expect(screen.getByRole('link', { name: 'Browse the FAQ' })).toHaveAttribute('href', '/faq');
   });
 
-  it('renders Discord link with correct href', () => {
+  it('opens the community channels in a new tab, Discord through its public invite', () => {
     render(<CallToAction callToAction={callToAction} />);
-    const link = screen.getByRole('link', { name: /Discord/ });
-    expect(link).toHaveAttribute('href', expect.stringContaining('discord.com'));
-    expect(link).toHaveAttribute('target', '_blank');
-  });
-
-  it('renders Twitter/X link with correct href', () => {
-    render(<CallToAction callToAction={callToAction} />);
-    const link = screen.getByRole('link', { name: /Twitter/ });
-    expect(link).toHaveAttribute('href', expect.stringContaining('x.com'));
-    expect(link).toHaveAttribute('target', '_blank');
+    const discord = screen.getByRole('link', { name: /Discord/ });
+    expect(discord).toHaveAttribute('href', 'https://discord.gg/bGnPn96Qwt');
+    expect(discord).toHaveAttribute('target', '_blank');
+    expect(discord).toHaveAttribute('rel', 'noopener noreferrer');
+    const x = screen.getByRole('link', { name: /Twitter/ });
+    expect(x).toHaveAttribute('href', expect.stringContaining('x.com'));
+    expect(x).toHaveAttribute('target', '_blank');
   });
 
   it('has no accessibility violations', async () => {

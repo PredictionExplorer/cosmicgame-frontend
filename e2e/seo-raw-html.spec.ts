@@ -108,7 +108,7 @@ const publicPages: PublicPage[] = [
   {
     path: '/how-it-works',
     host: APP_HOST,
-    h1: 'How Cosmic Signature Works',
+    h1: 'How Cosmic Signature works',
     richH1: true,
     jsonLd: ['WebPage', 'BreadcrumbList'],
   },

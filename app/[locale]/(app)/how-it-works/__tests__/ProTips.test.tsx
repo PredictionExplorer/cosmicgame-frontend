@@ -1,79 +1,36 @@
 import { howItWorksContentEn } from '@/content/how-it-works';
 
-import { TooltipProvider } from '@/components/ui/tooltip';
-
 import { render, screen, checkA11y } from '@/test-utils';
 
 import { ProTips } from '../components/ProTips';
-
-jest.mock('framer-motion', () => {
-  const React = require('react');
-  const cache: Record<string, React.ForwardRefExoticComponent<unknown>> = {};
-  return {
-    motion: new Proxy(
-      {},
-      {
-        get: (_target: unknown, prop: string) => {
-          if (!cache[prop]) {
-            const Comp = React.forwardRef(function MotionProxy(
-              props: Record<string, unknown>,
-              ref: React.Ref<HTMLElement>,
-            ) {
-              const {
-                initial: _i,
-                animate: _a,
-                whileInView: _w,
-                viewport: _v,
-                transition: _t,
-                variants: _va,
-                ...rest
-              } = props;
-              return React.createElement(prop, { ...rest, ref });
-            });
-            Comp.displayName = `motion.${prop}`;
-            cache[prop] = Comp;
-          }
-          return cache[prop];
-        },
-      },
-    ),
-  };
-});
-
-const renderWithTooltip = (ui: React.ReactElement) =>
-  render(<TooltipProvider>{ui}</TooltipProvider>);
 
 const proTips = howItWorksContentEn.proTips;
 
 describe('ProTips', () => {
   it('renders the section heading', () => {
-    renderWithTooltip(<ProTips proTips={proTips} />);
-    expect(screen.getByText('Pro Tips & Strategy')).toBeInTheDocument();
-  });
-
-  it('renders all six tip titles', () => {
-    renderWithTooltip(<ProTips proTips={proTips} />);
-    expect(screen.getByText('Watch Both Calibration Windows')).toBeInTheDocument();
-    expect(screen.getByText('Attach a Random Walk NFT')).toBeInTheDocument();
-    expect(screen.getByText('One Gesture, One Stellar Selection Entry')).toBeInTheDocument();
-    expect(screen.getByText('Use a Burner Wallet')).toBeInTheDocument();
-    expect(screen.getByText('Watch the Finalization Time')).toBeInTheDocument();
-    expect(screen.getByText('Gesture with CST')).toBeInTheDocument();
-  });
-
-  it('renders every tip description from the content module', () => {
-    renderWithTooltip(<ProTips proTips={proTips} />);
-    for (const tip of proTips.tips) {
-      expect(screen.getByText(tip.description)).toBeInTheDocument();
-    }
-    expect(screen.getByText(/one-time 50% ETH Gesture Cost reduction/)).toBeInTheDocument();
+    render(<ProTips proTips={proTips} />);
     expect(
-      screen.getByText(/smart contracts are publicly source-verified on-chain/),
+      screen.getByRole('heading', { level: 2, name: 'Tips and strategy' }),
     ).toBeInTheDocument();
   });
 
+  it('shows each tip with its reasoning in the open, not behind a tooltip', () => {
+    render(<ProTips proTips={proTips} />);
+    expect(screen.getAllByRole('listitem')).toHaveLength(6);
+    for (const tip of proTips.tips) {
+      expect(screen.getByRole('heading', { level: 3, name: tip.title })).toBeInTheDocument();
+      expect(screen.getByText(tip.body)).toBeInTheDocument();
+    }
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  });
+
+  it('never advises stacking entries', () => {
+    render(<ProTips proTips={proTips} />);
+    expect(screen.queryByText(/Stack/i)).not.toBeInTheDocument();
+  });
+
   it('has no accessibility violations', async () => {
-    const { container } = renderWithTooltip(<ProTips proTips={proTips} />);
+    const { container } = render(<ProTips proTips={proTips} />);
     await checkA11y(container);
   });
 });

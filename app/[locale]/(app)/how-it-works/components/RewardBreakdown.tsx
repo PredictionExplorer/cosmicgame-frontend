@@ -1,94 +1,50 @@
-'use client';
-
-import { motion } from 'framer-motion';
-import { ImageIcon } from 'lucide-react';
+import { ImageIcon, type LucideIcon } from 'lucide-react';
 
 import type { HowItWorksContent } from '@/content/how-it-works';
 
-import { ImprintIcon, SignatureAllocationIcon, StellarSelectionIcon } from '@/lib/conceptIcons';
-import { InfoTooltip } from '@/components/ui/info-tooltip';
+import { CstTokenIcon, SignatureAllocationIcon, StellarSelectionIcon } from '@/lib/conceptIcons';
+import { ExplainedTerm } from '@/components/ui/explain-popover';
+import { SectionHeader } from '@/components/ui/section-header';
 
-const containerVariants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.12 } },
-};
+/** One concept icon per item, in the content's order. */
+const ICONS: readonly [LucideIcon, LucideIcon, LucideIcon, LucideIcon] = [
+  CstTokenIcon,
+  StellarSelectionIcon,
+  ImageIcon,
+  SignatureAllocationIcon,
+];
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: 'easeOut' as const } },
-};
-
+/**
+ * What one gesture can lead to: four outcomes on the page's hairline, each
+ * with its concept icon, a title that explains itself on tap, and one
+ * sentence. No tiles: the drawing above carries the colour.
+ */
 export function RewardBreakdown({
   rewardBreakdown,
 }: {
   rewardBreakdown: HowItWorksContent['rewardBreakdown'];
 }) {
-  const rewards = [
-    {
-      Icon: ImprintIcon,
-      accent: 'from-cyan-400/20 to-blue-500/20',
-      iconColor: 'text-cyan-400',
-      ...rewardBreakdown.items[0],
-    },
-    {
-      Icon: StellarSelectionIcon,
-      accent: 'from-purple-400/20 to-pink-500/20',
-      iconColor: 'text-purple-400',
-      ...rewardBreakdown.items[1],
-    },
-    {
-      Icon: ImageIcon,
-      accent: 'from-amber-400/20 to-orange-500/20',
-      iconColor: 'text-amber-400',
-      ...rewardBreakdown.items[2],
-    },
-    {
-      Icon: SignatureAllocationIcon,
-      accent: 'from-emerald-400/20 to-teal-500/20',
-      iconColor: 'text-emerald-400',
-      ...rewardBreakdown.items[3],
-    },
-  ];
-
   return (
-    <section aria-labelledby="rewards-heading" className="py-8 sm:py-10">
-      <div className="mb-10 max-w-3xl">
-        <h2 id="rewards-heading" className="type-display-sm">
-          {rewardBreakdown.heading}
-        </h2>
-        <p className="mt-2 text-sm text-muted-foreground">{rewardBreakdown.subhead}</p>
-      </div>
-
-      <motion.div
-        variants={containerVariants}
-        initial={false}
-        whileInView="visible"
-        viewport={{ once: true, margin: '-60px' }}
-        className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
-      >
-        {rewards.map((reward) => (
-          <motion.div
-            key={reward.title}
-            variants={itemVariants}
-            className="group relative rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 transition-colors hover:bg-white/[0.04]"
-          >
-            <div
-              className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br ${reward.accent}`}
-            >
-              <reward.Icon className={`h-5 w-5 ${reward.iconColor}`} />
-            </div>
-
-            <div className="flex items-start gap-1.5">
-              <h3 className="font-display text-lg font-bold">{reward.title}</h3>
-              <InfoTooltip content={reward.tooltip} />
-            </div>
-
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              {reward.description}
-            </p>
-          </motion.div>
-        ))}
-      </motion.div>
+    <section aria-labelledby="rewards-heading">
+      <SectionHeader
+        headingId="rewards-heading"
+        title={rewardBreakdown.heading}
+        description={rewardBreakdown.subhead}
+      />
+      <ul className="mt-8 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+        {rewardBreakdown.items.map((item, index) => {
+          const Icon = ICONS[index] ?? ImageIcon;
+          return (
+            <li key={item.title} className="border-t border-rule pt-5">
+              <Icon aria-hidden className="size-5 text-primary" strokeWidth={1.75} />
+              <h3 className="mt-4 type-title text-foreground">
+                <ExplainedTerm definition={item.tooltip}>{item.title}</ExplainedTerm>
+              </h3>
+              <p className="mt-2 type-body-sm text-muted-foreground">{item.description}</p>
+            </li>
+          );
+        })}
+      </ul>
     </section>
   );
 }

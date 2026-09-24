@@ -1,6 +1,18 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+import { routing } from '@/i18n/routing';
+
 import { render, screen, checkA11y } from '@/test-utils';
 
 import { HeroSection } from '../components/HeroSection';
+
+const faqTitle = (locale: string): string =>
+  (
+    JSON.parse(readFileSync(join(process.cwd(), 'messages', locale, 'faq.json'), 'utf8')) as {
+      hero: { title: string };
+    }
+  ).hero.title;
 
 jest.mock('../components/FAQSearch', () => ({
   FAQSearch: (props: Record<string, unknown>) => (
@@ -24,6 +36,14 @@ describe('HeroSection', () => {
     // One text node: the raw server HTML reads "Cosmic Signature FAQ" with no markup inside.
     expect(heading.childNodes).toHaveLength(1);
     expect(heading).toHaveClass('type-display-md');
+  });
+
+  it('writes the title as one plain string in every locale, with no space beside Japanese (F152)', () => {
+    for (const locale of routing.locales) {
+      expect(faqTitle(locale)).not.toMatch(/<\/?accent>/);
+    }
+    // Regression: the halves were joined with a JSX space, giving "Cosmic Signature よくある質問".
+    expect(faqTitle('ja')).toBe('Cosmic Signatureよくある質問');
   });
 
   it('names the Learn section in the eyebrow, linked to its hub', () => {

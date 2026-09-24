@@ -168,7 +168,7 @@ test.describe('zh Sprint 3 — core dApp routes', () => {
     await page.goto('/how-it-works');
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
     await expect(
-      page.getByRole('heading', { level: 1, name: /How Cosmic Signature Works/ }),
+      page.getByRole('heading', { level: 1, name: 'How Cosmic Signature works' }),
     ).toBeVisible();
   });
 });

@@ -1,66 +1,24 @@
-'use client';
-
-import { motion } from 'framer-motion';
-import { Shield, TrendingDown, ImageIcon, Clock, Zap } from 'lucide-react';
-
 import type { HowItWorksContent } from '@/content/how-it-works';
 
-import { StellarSelectionIcon } from '@/lib/conceptIcons';
-import { InfoTooltip } from '@/components/ui/info-tooltip';
+import { SectionHeader } from '@/components/ui/section-header';
 
-const containerVariants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.08 } },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' as const } },
-};
-
+/** Tips and strategy: each tip's title and the reasoning behind it, as a quiet index. */
 export function ProTips({ proTips }: { proTips: HowItWorksContent['proTips'] }) {
-  const tips = [
-    { Icon: TrendingDown, ...proTips.tips[0] },
-    { Icon: ImageIcon, ...proTips.tips[1] },
-    { Icon: StellarSelectionIcon, ...proTips.tips[2] },
-    { Icon: Shield, ...proTips.tips[3] },
-    { Icon: Clock, ...proTips.tips[4] },
-    { Icon: Zap, ...proTips.tips[5] },
-  ];
-
   return (
-    <section aria-labelledby="tips-heading" className="py-8 sm:py-10">
-      <div className="mb-10 max-w-3xl">
-        <h2 id="tips-heading" className="type-display-sm">
-          {proTips.heading}
-        </h2>
-        <p className="mt-2 text-sm text-muted-foreground">{proTips.subhead}</p>
-      </div>
-
-      <motion.div
-        variants={containerVariants}
-        initial={false}
-        whileInView="visible"
-        viewport={{ once: true, margin: '-60px' }}
-        className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-      >
-        {tips.map((tip) => (
-          <motion.div
-            key={tip.title}
-            variants={itemVariants}
-            className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 transition-colors hover:bg-white/[0.04]"
-          >
-            <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-              <tip.Icon className="h-5 w-5 text-primary" />
-            </div>
-            <div className="flex items-start gap-1.5">
-              <h3 className="font-display text-base font-bold">{tip.title}</h3>
-              <InfoTooltip content={tip.tooltip} />
-            </div>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{tip.description}</p>
-          </motion.div>
+    <section aria-labelledby="tips-heading">
+      <SectionHeader
+        headingId="tips-heading"
+        title={proTips.heading}
+        description={proTips.subhead}
+      />
+      <ul className="mt-8 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+        {proTips.tips.map((tip) => (
+          <li key={tip.title} className="border-t border-rule pt-5">
+            <h3 className="type-title text-foreground">{tip.title}</h3>
+            <p className="mt-2 type-body-sm text-muted-foreground">{tip.body}</p>
+          </li>
         ))}
-      </motion.div>
+      </ul>
     </section>
   );
 }
