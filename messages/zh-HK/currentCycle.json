@@ -65,7 +65,7 @@
       },
       "chronoWarrior": {
         "name": "時之勇士分配",
-        "tooltip": "單次連續保持堅守冠軍位置最久的參與者，將獲配週期儲備的一定比例與一枚 Cosmic Signature NFT。"
+        "tooltip": "單次連續保持堅守冠軍位置最久的參與者，將獲配週期儲備中一定比例的 ETH、1,000 CST 與一枚 Cosmic Signature NFT。"
       },
       "ethStellar": {
         "name": "ETH 星選",
@@ -73,7 +73,7 @@
       },
       "cosmicAnchor": {
         "name": "錨定派發",
-        "tooltip": "每個週期的錨定派發，由 Cosmic Signature NFT 的錨定者按比例分得。",
+        "tooltip": "週期儲備中以 ETH 計的一份，收官時由所有已錨定的 Cosmic Signature NFT 平均分享。",
         "recipientLabel": "按比例 · 全體錨定者"
       },
       "publicGoods": {

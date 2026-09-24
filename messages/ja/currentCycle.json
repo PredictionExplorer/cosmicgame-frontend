@@ -65,7 +65,7 @@
       },
       "chronoWarrior": {
         "name": "時の戦士配分",
-        "tooltip": "持久チャンピオンの称号を最も長く連続して保持した参加者が、サイクル準備金の一定割合とCosmic Signature NFTを受け取ります。"
+        "tooltip": "持久チャンピオンの称号を最も長く連続して保持した参加者が、サイクル準備金の一定割合のETH、1,000 CST、Cosmic Signature NFTを受け取ります。"
       },
       "ethStellar": {
         "name": "ETH星選",
@@ -73,7 +73,7 @@
       },
       "cosmicAnchor": {
         "name": "係留配分",
-        "tooltip": "Cosmic Signature NFTの係留者はサイクルごとの係留配分を分け合います。",
+        "tooltip": "サイクル準備金のうちETH建ての一部で、確定時に係留されたすべてのCosmic Signature NFTで均等に分けられます。",
         "recipientLabel": "比例配分 · すべての係留者"
       },
       "publicGoods": {

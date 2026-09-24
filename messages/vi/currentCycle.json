@@ -65,7 +65,7 @@
       },
       "chronoWarrior": {
         "name": "Phân bổ Chiến binh Thời gian",
-        "tooltip": "Người tham gia giữ vị trí Quán quân Bền bỉ trong khoảng liên tục dài nhất nhận một tỷ lệ Dự trữ chu kỳ và một Cosmic Signature NFT."
+        "tooltip": "Người tham gia giữ vị trí Quán quân Bền bỉ trong khoảng liên tục dài nhất nhận một tỷ lệ Dự trữ chu kỳ bằng ETH, 1.000 CST và một Cosmic Signature NFT."
       },
       "ethStellar": {
         "name": "ETH Tinh tuyển",
@@ -73,7 +73,7 @@
       },
       "cosmicAnchor": {
         "name": "Phân phối neo giữ",
-        "tooltip": "Người neo giữ Cosmic Signature NFT chia sẻ phân phối neo giữ của mỗi chu kỳ.",
+        "tooltip": "Một phần Dự trữ chu kỳ bằng ETH, được chia đều cho mọi Cosmic Signature NFT đang neo giữ khi chu kỳ hoàn tất.",
         "recipientLabel": "Theo tỷ lệ · mọi người neo giữ"
       },
       "publicGoods": {
