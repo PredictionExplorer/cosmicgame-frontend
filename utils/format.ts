@@ -50,11 +50,13 @@ export {
   formatUnixTsLabel,
   formatUtcDateTimeStamp,
   formatYyyymmddLabel,
+  formatZonedDateTimeParts,
   toIsoDateTime,
   type DateTimeOptions,
   type DateTimeTitleOptions,
   type DateTimeZone,
   type TimestampTimeZone,
+  type ZonedDateTimeParts,
 } from './format/dates';
 export {
   calculateTimeDiff,

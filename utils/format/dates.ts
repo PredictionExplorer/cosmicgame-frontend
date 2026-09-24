@@ -246,8 +246,15 @@ export function formatDateTime(
   const date = toDate(timestamp);
   if (!date) return UNAVAILABLE_VALUE;
   if (showZone) {
-    const plain = formatDateTime(timestamp, { locale, style, seconds, year, timeZone, now });
-    return pickByLocale(ZONE_TEMPLATES, locale)(plain, formatTimeZoneLabel(timeZone, date));
+    const zoned = formatZonedDateTimeParts(timestamp, {
+      locale,
+      style,
+      seconds,
+      year,
+      timeZone,
+      now,
+    });
+    return zoned ? `${zoned.lead}${zoned.zone}${zoned.trail}` : UNAVAILABLE_VALUE;
   }
   const parts = calendarParts(date, timeZone);
   const withYear =
@@ -289,6 +296,34 @@ export function formatTimeZoneLabel(
   const hours = Math.floor(Math.abs(offsetMinutes) / 60);
   const minutes = Math.abs(offsetMinutes) % 60;
   return `UTC${sign}${hours}${minutes ? `:${pad2(minutes)}` : ''}`;
+}
+
+/** A date-time with its zone, split so the zone can be set apart from the value. */
+export interface ZonedDateTimeParts {
+  /** Everything before the zone: "Sep 22, 23:04 ", "9月22日 23:04（". */
+  readonly lead: string;
+  /** The zone label: "UTC-5". */
+  readonly zone: string;
+  /** Anything after it: "", "）". */
+  readonly trail: string;
+}
+
+/**
+ * `formatDateTime(…, { showZone: true })` in three parts, so `<DateTime
+ * showZone>` can set the zone in the subtle tier like a unit. `null` when the
+ * timestamp is not a real date.
+ */
+export function formatZonedDateTimeParts(
+  timestamp: number | null | undefined,
+  options: Omit<DateTimeOptions, 'showZone'> = {},
+): ZonedDateTimeParts | null {
+  const date = toDate(timestamp);
+  if (!date) return null;
+  const { locale = 'en', timeZone = 'local' } = options;
+  const plain = formatDateTime(timestamp, { ...options, showZone: false });
+  const marker = '\u0000';
+  const [lead = '', trail = ''] = pickByLocale(ZONE_TEMPLATES, locale)(plain, marker).split(marker);
+  return { lead, zone: formatTimeZoneLabel(timeZone, date), trail };
 }
 
 export interface DateTimeTitleOptions {

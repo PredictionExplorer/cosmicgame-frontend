@@ -20,6 +20,7 @@ import {
   formatRelativeTime,
   formatSeconds,
   formatTimeZoneLabel,
+  formatZonedDateTimeParts,
   isZeroAddress,
   sameAddress,
   shortenHex,
@@ -517,6 +518,12 @@ describe('typographic details', () => {
     expect(formatDateTime(at, { locale: 'ja', timeZone: 'utc', now, showZone: true })).toBe(
       '9月22日 23:04（UTC）',
     );
+    expect(formatZonedDateTimeParts(at, { locale: 'ja', timeZone: 'utc', now })).toEqual({
+      lead: '9月22日 23:04（',
+      zone: 'UTC',
+      trail: '）',
+    });
+    expect(formatZonedDateTimeParts(null)).toBeNull();
   });
 
   it('pads the day only where dates stack in a column', () => {

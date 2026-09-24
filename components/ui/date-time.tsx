@@ -9,6 +9,7 @@ import {
   formatDateTimeTitle,
   formatRelativeTime,
   formatTimeZoneLabel,
+  formatZonedDateTimeParts,
   toIsoDateTime,
   type DateTimeZone,
 } from '@/utils/format';
@@ -122,24 +123,40 @@ export function DateTime({
   }
 
   const now = nowMs > 0 ? nowMs : undefined;
-  const absolute = formatDateTime(timestamp, {
+  const options = {
     locale: resolvedLocale,
-    style: variant === 'full' ? 'full' : 'compact',
+    style: variant === 'full' ? ('full' as const) : ('compact' as const),
     seconds,
     year,
     timeZone: zone,
     now,
-    showZone,
-  });
-  const value =
-    variant === 'relative' && now
-      ? formatRelativeTime(timestamp, { locale: resolvedLocale, now })
-      : absolute;
+  };
+  const absolute = formatDateTime(timestamp, { ...options, showZone });
+  const relative = variant === 'relative' && now;
+  const value = relative
+    ? formatRelativeTime(timestamp, { locale: resolvedLocale, now })
+    : absolute;
   const title = formatDateTimeTitle(timestamp, { locale: resolvedLocale, timeZone: zone, now });
+  // The zone reads like a unit: subtle, and in proportional figures, so
+  // "UTC-5" does not take a tabular figure's spacing inside a readout.
+  const zoned =
+    showZone && !relative && !children ? formatZonedDateTimeParts(timestamp, options) : null;
 
   return (
     <time dateTime={iso} title={title} className={cn('whitespace-nowrap', className)} {...rest}>
-      {children ? children(value) : value}
+      {children ? (
+        children(value)
+      ) : zoned ? (
+        <>
+          {zoned.lead}
+          <span data-slot="zone" className="text-subtle [font-variant-numeric:normal]">
+            {zoned.zone}
+          </span>
+          {zoned.trail}
+        </>
+      ) : (
+        value
+      )}
     </time>
   );
 }

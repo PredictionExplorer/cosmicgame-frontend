@@ -91,6 +91,23 @@ describe('DateTime', () => {
     render(<DateTime timestamp={NEW_YEAR} timeZone="utc" className="text-xs" />);
     expect(screen.getByText('Jan 01, 00:30')).toHaveClass('whitespace-nowrap', 'text-xs');
   });
+
+  it('names its zone like a unit when it stands alone', () => {
+    const { container } = render(<DateTime timestamp={NEW_YEAR} timeZone="utc" showZone />);
+    const time = container.querySelector('time');
+    expect(time).toHaveTextContent('Jan 01, 00:30 UTC');
+    const zone = time?.querySelector('[data-slot="zone"]');
+    expect(zone).toHaveTextContent(/^UTC$/);
+    expect(zone).toHaveClass('text-subtle');
+  });
+
+  it("keeps the locale's own brackets around the zone", () => {
+    const { container } = render(
+      <DateTime timestamp={NEW_YEAR} timeZone="utc" locale="ja" showZone />,
+    );
+    expect(container.querySelector('time')).toHaveTextContent('1月1日 00:30（UTC）');
+    expect(container.querySelector('[data-slot="zone"]')).toHaveTextContent(/^UTC$/);
+  });
 });
 
 describe('time zone captions', () => {
