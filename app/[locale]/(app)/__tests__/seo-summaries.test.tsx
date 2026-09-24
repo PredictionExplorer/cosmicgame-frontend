@@ -264,14 +264,49 @@ describe('server-rendered page headers', () => {
       expect(document.querySelector('[data-live-state]')).toBeInTheDocument();
     });
 
-    it('renders unknown live figures as unavailable, never as zero', async () => {
+    it('renders the server read before the first client read', async () => {
+      mockUseDashboardInfo.mockReturnValue({
+        data: undefined,
+        isLoading: true,
+      } as unknown as ReturnType<typeof useDashboardInfo>);
+      render(await StatisticsSeoSummary());
+      expect(figureValue('activePerformanceCycle')).toHaveTextContent('42');
+      expect(figureValue('contractBalance')).toHaveTextContent('12.3400 ETH');
+    });
+
+    it('renders a figure the dashboard lacks as unavailable, never as zero', async () => {
+      const withoutBalance = { ...dashboard, CosmicGameBalanceEth: undefined };
+      mockGetDashboardInfo.mockResolvedValue(
+        withoutBalance as unknown as Awaited<ReturnType<typeof get_dashboard_info>>,
+      );
+      mockUseDashboardInfo.mockReturnValue({
+        data: undefined,
+        isLoading: true,
+      } as unknown as ReturnType<typeof useDashboardInfo>);
+      render(await StatisticsSeoSummary());
+      expect(figureValue('contractBalance')).toHaveTextContent(COMMON.unavailable);
+      expect(figureValue('contractBalance')).not.toHaveTextContent(/\d/);
+    });
+
+    it('waits for the client read when the server read failed', async () => {
+      mockGetDashboardInfo.mockRejectedValue(new Error('offline'));
+      mockUseDashboardInfo.mockReturnValue({
+        data: undefined,
+        isLoading: true,
+      } as unknown as ReturnType<typeof useDashboardInfo>);
+      render(await StatisticsSeoSummary());
+      expect(figureValue('contractBalance')).not.toHaveTextContent(COMMON.unavailable);
+      expect(figureValue('contractBalance')).not.toHaveTextContent(/\d/);
+    });
+
+    it('says unavailable once neither read has the figure', async () => {
+      mockGetDashboardInfo.mockRejectedValue(new Error('offline'));
       mockUseDashboardInfo.mockReturnValue({
         data: undefined,
         isLoading: false,
       } as unknown as ReturnType<typeof useDashboardInfo>);
       render(await StatisticsSeoSummary());
       expect(figureValue('contractBalance')).toHaveTextContent(COMMON.unavailable);
-      expect(figureValue('contractBalance')).not.toHaveTextContent(/\d/);
     });
   });
 
@@ -336,6 +371,26 @@ describe('server-rendered page headers', () => {
       'href',
       '/',
     );
+  });
+
+  it('holds the server-read cycle figures before the first client read', async () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+    } as unknown as ReturnType<typeof useDashboardInfo>);
+    render(await CurrentCycleSeoSummary());
+    expect(figureValue('cycle')).toHaveTextContent('42');
+    expect(figureValue('gestures')).toHaveTextContent('17');
+    expect(figureValue('signatureAllocation')).toHaveTextContent('5.5000 ETH');
+  });
+
+  it('prefers the client read over the server read', async () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: { ...dashboard, CurNumBids: 18 },
+      isLoading: false,
+    } as unknown as ReturnType<typeof useDashboardInfo>);
+    render(await CurrentCycleSeoSummary());
+    expect(figureValue('gestures')).toHaveTextContent('18');
   });
 
   it.each([

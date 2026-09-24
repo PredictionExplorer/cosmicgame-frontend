@@ -4,6 +4,8 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { LiveStatus } from '@/components/ui/live-status';
 
 import { DashboardFigure } from '../DashboardFigure';
+import { dashboardSeed, type DashboardMetric } from '../dashboardMetrics';
+import { readDashboard } from '../publicDataReads';
 
 import { ActiveCycleGesturesCaption } from './ActiveCycleGesturesCaption';
 
@@ -11,12 +13,17 @@ import { ActiveCycleGesturesCaption } from './ActiveCycleGesturesCaption';
  * The statistics hub header, rendered on the server: the hub's one headline
  * figure row (the active cycle with its gestures, allocations distributed,
  * NFTs imprinted, contract balance), read from the same polled dashboard
- * query as the hub panel, so no metric appears twice. Render it inside
- * `DashboardQuerySeed` so the server HTML holds the figures.
+ * query as the hub panel, so no metric appears twice. The figures start from
+ * this request's server read, so the server HTML holds them.
  */
 export async function StatisticsSeoSummary() {
   const locale = await getLocale();
   const t = await getTranslations({ locale, namespace: 'statistics' });
+  const dashboard = await readDashboard();
+  const seed = (metric: DashboardMetric) => dashboardSeed(dashboard.data, metric);
+  const figure = (metric: DashboardMetric) => (
+    <DashboardFigure metric={metric} seed={seed(metric)} />
+  );
 
   return (
     <PageHeader
@@ -29,26 +36,26 @@ export async function StatisticsSeoSummary() {
         {
           id: 'activePerformanceCycle',
           label: t('metrics.activePerformanceCycle.label'),
-          value: <DashboardFigure metric="cycle" />,
+          value: figure('cycle'),
           info: t('metrics.activePerformanceCycle.tooltip'),
-          caption: <ActiveCycleGesturesCaption />,
+          caption: <ActiveCycleGesturesCaption seed={seed('gestures')} />,
         },
         {
           id: 'allocationsDistributed',
           label: t('metrics.allocationsDistributed.label'),
-          value: <DashboardFigure metric="allocations" />,
+          value: figure('allocations'),
           info: t('metrics.allocationsDistributed.tooltip'),
         },
         {
           id: 'cosmicSignatureNftsImprinted',
           label: t('metrics.cosmicSignatureNftsImprinted.shortLabel'),
-          value: <DashboardFigure metric="imprinted" />,
+          value: figure('imprinted'),
           info: t('metrics.cosmicSignatureNftsImprinted.tooltip'),
         },
         {
           id: 'contractBalance',
           label: t('metrics.contractBalance.label'),
-          value: <DashboardFigure metric="balance" />,
+          value: figure('balance'),
           info: t('metrics.contractBalance.tooltip'),
         },
       ]}

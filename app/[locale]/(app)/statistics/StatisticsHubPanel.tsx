@@ -15,7 +15,7 @@ import { ErrorState } from '@/components/ui/error-state';
 import { StatisticsItem } from '@/components/statistics/StatisticsItem';
 import { StatisticsGroup } from '@/components/statistics/StatisticsGroup';
 
-import { totalAllocationsDistributed } from '../DashboardFigure';
+import { totalAllocationsDistributed } from '../dashboardMetrics';
 
 import { STATISTICS_SECTIONS, type StatisticsSectionDef } from './statistics-sections';
 

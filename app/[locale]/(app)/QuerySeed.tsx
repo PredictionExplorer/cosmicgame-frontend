@@ -8,12 +8,7 @@ export interface QuerySeedEntry {
   queryKey: QueryKey;
   /** The server read's result; `null` (a failed read) seeds nothing. */
   data: unknown;
-  /**
-   * When the data was read (epoch ms); React Query dates the entry to it and
-   * refreshes it once stale. `0` marks a seed that must never count as a live
-   * reading (the live dashboard), so `LiveStatus` says "Connecting" until the
-   * first client fetch.
-   */
+  /** When the data was read (epoch ms); React Query dates the entry to it and refreshes it once stale. */
   at: number;
 }
 
@@ -34,12 +29,17 @@ export function QuerySeed({ seeds, children }: { seeds: QuerySeedEntry[]; childr
 
 /**
  * Seeds the live dashboard (`useDashboardInfo`) from this request's server
- * read, dated 0 so the first client poll replaces it right after hydration.
+ * read, dated to that read. The app shell creates the dashboard query before
+ * any page renders, so React Query hydrates this seed right after hydration
+ * (not into the server HTML — page headers carry their own server values,
+ * see `DashboardFigure`): the page body then renders the server's data at
+ * once instead of waiting for its first poll. A hydrated seed is not a fetch,
+ * so `LiveStatus` keeps saying "Connecting" until the first poll succeeds.
  */
 export async function DashboardQuerySeed({ children }: { children: ReactNode }) {
   const dashboard = await readDashboard();
   return (
-    <QuerySeed seeds={[{ queryKey: ['dashboardInfo'], data: dashboard.data, at: 0 }]}>
+    <QuerySeed seeds={[{ queryKey: ['dashboardInfo'], data: dashboard.data, at: dashboard.at }]}>
       {children}
     </QuerySeed>
   );

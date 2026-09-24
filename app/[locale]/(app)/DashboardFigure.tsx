@@ -8,74 +8,47 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { UnknownValue } from '@/components/ui/unknown-value';
 import { useFormat } from '@/hooks/useFormat';
 import { useDashboardInfo } from '@/hooks/useApiQuery';
-import type { DashboardInfo } from '@/services/api/types';
-import { toFiniteNumber } from '@/utils/finiteNumber';
 
-/** Allocation rows: the cg_prize row count, else the aggregated recipient counts. */
-export function totalAllocationsDistributed(data: DashboardInfo): number | null {
-  return toFiniteNumber(
-    data.CgPrizeRowCount ??
-      data.MainStats?.CgPrizeRowCount ??
-      data.TotalPrizeAwards ??
-      data.MainStats?.TotalPrizeAwards ??
-      data.TotalPrizes,
-  );
-}
+import { dashboardMetricValue, type DashboardMetric } from './dashboardMetrics';
 
-export type DashboardMetric =
-  | 'cycle'
-  | 'gestures'
-  | 'reserve'
-  | 'balance'
-  | 'imprinted'
-  | 'allocations'
-  | 'opened';
+export type { DashboardMetric } from './dashboardMetrics';
 
 /**
  * One figure of the live dashboard for a page header. It reads the same
- * polled query as the page body (seeded on the server by `DashboardQuerySeed`),
- * so the header and the body can never show two values for one metric, and
- * the server HTML already holds the number.
+ * polled query as the page body, so the header and the body never show two
+ * values for one metric. Until the client's first read arrives it shows
+ * `seed`, the value the server read for this render, so the server HTML
+ * holds the number and hydration does not flicker.
  */
-export function DashboardFigure({ metric }: { metric: DashboardMetric }) {
+export function DashboardFigure({
+  metric,
+  seed,
+}: {
+  metric: DashboardMetric;
+  /** The server-read value (`dashboardSeed`); undefined when the server read failed. */
+  seed?: number | null;
+}) {
   const t = useTranslations('common');
   const format = useFormat();
   const { data, isLoading } = useDashboardInfo();
+  const value = data ? dashboardMetricValue(data, metric) : seed;
 
-  if (!data) {
+  if (value === undefined) {
     return isLoading ? (
       <Skeleton className="mt-1 h-6 w-20" aria-hidden />
     ) : (
       <UnknownValue label={t('status.unavailable')} />
     );
   }
-
-  const unknown = <UnknownValue label={t('status.unavailable')} />;
-  const count = (value: unknown) => {
-    const numeric = toFiniteNumber(value);
-    return numeric === null ? unknown : format.count(numeric);
-  };
-  const eth = (value: unknown) => {
-    const numeric = toFiniteNumber(value);
-    return numeric === null ? unknown : <Amount value={numeric} unit="ETH" />;
-  };
+  if (value === null) return <UnknownValue label={t('status.unavailable')} />;
 
   switch (metric) {
-    case 'cycle':
-      return count(data.CurRoundNum);
-    case 'gestures':
-      return count(data.CurNumBids);
     case 'reserve':
-      return eth(data.PrizeAmountEth ?? data.CurPrizeAmountEth);
     case 'balance':
-      return eth(data.CosmicGameBalanceEth);
-    case 'imprinted':
-      return count(data.MainStats?.NumCSTokenMints);
-    case 'allocations':
-      return count(totalAllocationsDistributed(data));
-    case 'opened': {
-      const opened = toFiniteNumber(data.TsRoundStart);
-      return opened ? <DateTime timestamp={opened} /> : unknown;
-    }
+      return <Amount value={value} unit="ETH" />;
+    case 'opened':
+      return <DateTime timestamp={value} />;
+    default:
+      return format.count(value);
   }
 }
