@@ -4,10 +4,6 @@
     "unavailable": "Недоступно",
     "yes": "Так",
     "no": "Ні",
-    "datetime": "Дата й час",
-    "from": "Від кого",
-    "to": "Кому",
-    "tokenId": "ID токена",
     "cycle": "Цикл",
     "recipient": "Отримувач"
   },
@@ -344,30 +340,55 @@
     "sendCount": "{count, plural, one {Надіслати # NFT} few {Надіслати # NFT} many {Надіслати # NFT} other {Надіслати # NFT}}"
   },
   "transferHistory": {
-    "loading": "Завантаження…",
-    "walletLabels": {
-      "cosmicSignatureAnchoring": "Гаманець закріплення Cosmic Signature NFT",
-      "randomWalkAnchoring": "Гаманець закріплення RandomWalk",
-      "outreach": "Гаманець просування",
-      "stellarSelection": "Гаманець зоряного відбору",
-      "publicGoods": "Сховище суспільних благ"
-    },
     "nft": {
-      "title": "Передачі Cosmic Signature NFT",
+      "title": "Передачі NFT",
       "empty": "Передач NFT ще немає.",
-      "invalidAddress": {
-        "title": "Недійсна адреса",
-        "description": "Введіть дійсну адресу гаманця, щоб переглянути історію передач NFT."
+      "lede": "Cosmic Signature NFT, закарбовані на цю адресу, і кожен, який вона отримала чи надіслала.",
+      "emptyDescription": "NFT з’являється на адресі, коли його на неї закарбовують або надсилають з іншого гаманця.",
+      "figures": {
+        "imprinted": "Закарбовано",
+        "received": "Отримано",
+        "sent": "Надіслано"
       }
     },
     "cst": {
-      "title": "Перекази токена CST Cosmic Signature",
+      "title": "Перекази CST",
       "empty": "Переказів CST ще немає.",
-      "invalidAddress": {
-        "title": "Недійсна адреса",
-        "description": "Введіть дійсну адресу гаманця, щоб переглянути історію переказів CST."
-      },
-      "value": "Сума (CST)"
+      "lede": "CST, закарбовані на цю адресу, отримані й надіслані нею, а також витрачені на її жести за CST.",
+      "emptyDescription": "CST з’являються на адресі, коли жест їх закарбовує або інший гаманець їх надсилає.",
+      "figures": {
+        "received": "Отримано",
+        "sent": "Надіслано",
+        "net": "Чиста зміна",
+        "imprintedCaption": "Закарбовано: {amount}",
+        "consumedCaption": "Витрачено: {amount}"
+      }
+    },
+    "switcherLabel": "Історія цієї адреси",
+    "viewOnExplorer": "Переглянути в {explorer}",
+    "error": "Не вдалося завантажити історію цієї адреси.",
+    "count": "{count, plural, one {# запис} few {# записи} many {# записів} other {# запису}}",
+    "activity": {
+      "imprinted": "Закарбовано",
+      "received": "Отримано",
+      "sent": "Надіслано",
+      "consumed": "Витрачено"
+    },
+    "filter": {
+      "label": "Показати",
+      "all": "Усі",
+      "in": "Вхідні",
+      "out": "Вихідні",
+      "empty": "У цьому напрямку ще нічого немає."
+    },
+    "columns": {
+      "activity": "Дія",
+      "counterparty": "Інша сторона"
+    },
+    "invalidAddress": {
+      "title": "Недійсна адреса",
+      "description": "У посиланні має бути повна адреса: 0x і 40 літер та цифр.",
+      "action": "Переглянути учасників"
     }
   },
   "stellarSelectionAllocations": {

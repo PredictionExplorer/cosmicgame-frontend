@@ -4,10 +4,6 @@
     "unavailable": "暫不可用",
     "yes": "是",
     "no": "否",
-    "datetime": "日期時間",
-    "from": "轉出方",
-    "to": "接收方",
-    "tokenId": "代幣 ID",
     "cycle": "週期",
     "recipient": "獲配者"
   },
@@ -344,30 +340,55 @@
     "sendCount": "{count, plural, other {傳送 # 枚 NFT}}"
   },
   "transferHistory": {
-    "loading": "載入中…",
-    "walletLabels": {
-      "cosmicSignatureAnchoring": "Cosmic Signature NFT 錨定錢包",
-      "randomWalkAnchoring": "Random Walk NFT 錨定錢包",
-      "outreach": "推廣錢包",
-      "stellarSelection": "星選錢包",
-      "publicGoods": "公共財金庫"
-    },
     "nft": {
-      "title": "Cosmic Signature NFT 轉移紀錄",
+      "title": "NFT 轉移紀錄",
       "empty": "暫無 NFT 轉移紀錄。",
-      "invalidAddress": {
-        "title": "地址無效",
-        "description": "請輸入有效的錢包地址以檢視 NFT 轉移紀錄。"
+      "lede": "銘刻給此地址的 Cosmic Signature NFT，以及它收到或傳出的每一枚。",
+      "emptyDescription": "NFT 銘刻給該地址或由其他錢包傳來時，紀錄會顯示在這裡。",
+      "figures": {
+        "imprinted": "銘刻",
+        "received": "收到",
+        "sent": "傳出"
       }
     },
     "cst": {
-      "title": "Cosmic Signature CST 轉帳紀錄",
+      "title": "CST 轉帳紀錄",
       "empty": "暫無 CST 轉帳紀錄。",
-      "invalidAddress": {
-        "title": "地址無效",
-        "description": "請輸入有效的錢包地址以檢視 CST 轉帳紀錄。"
-      },
-      "value": "數量（CST）"
+      "lede": "銘刻給此地址的 CST、它收發的 CST，以及它的 CST 落筆所消耗的 CST。",
+      "emptyDescription": "落筆為地址銘刻 CST，或其他錢包傳來 CST 時，紀錄會顯示在這裡。",
+      "figures": {
+        "received": "收到",
+        "sent": "傳出",
+        "net": "淨變化",
+        "imprintedCaption": "其中銘刻：{amount}",
+        "consumedCaption": "其中消耗：{amount}"
+      }
+    },
+    "switcherLabel": "該地址的轉移紀錄",
+    "viewOnExplorer": "在 {explorer} 查看",
+    "error": "無法載入該地址的轉移紀錄。",
+    "count": "{count, plural, other {# 筆紀錄}}",
+    "activity": {
+      "imprinted": "銘刻",
+      "received": "收到",
+      "sent": "傳出",
+      "consumed": "消耗"
+    },
+    "filter": {
+      "label": "顯示",
+      "all": "全部",
+      "in": "轉入",
+      "out": "轉出",
+      "empty": "該方向暫無紀錄。"
+    },
+    "columns": {
+      "activity": "類型",
+      "counterparty": "對方地址"
+    },
+    "invalidAddress": {
+      "title": "地址無效",
+      "description": "連結中需要完整地址：0x 加 40 位字母和數字。",
+      "action": "瀏覽參與者"
     }
   },
   "stellarSelectionAllocations": {

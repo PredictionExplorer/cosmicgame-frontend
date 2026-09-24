@@ -4,10 +4,6 @@
     "unavailable": "暂不可用",
     "yes": "是",
     "no": "否",
-    "datetime": "日期时间",
-    "from": "转出方",
-    "to": "接收方",
-    "tokenId": "代币 ID",
     "cycle": "周期",
     "recipient": "获配者"
   },
@@ -344,30 +340,55 @@
     "sendCount": "{count, plural, other {发送 # 枚 NFT}}"
   },
   "transferHistory": {
-    "loading": "加载中…",
-    "walletLabels": {
-      "cosmicSignatureAnchoring": "Cosmic Signature NFT 锚定钱包",
-      "randomWalkAnchoring": "Random Walk NFT 锚定钱包",
-      "outreach": "推广钱包",
-      "stellarSelection": "星选钱包",
-      "publicGoods": "公共物品金库"
-    },
     "nft": {
-      "title": "Cosmic Signature NFT 转移记录",
+      "title": "NFT 转移记录",
       "empty": "暂无 NFT 转移记录。",
-      "invalidAddress": {
-        "title": "地址无效",
-        "description": "请输入有效的钱包地址以查看 NFT 转移记录。"
+      "lede": "铭刻给此地址的 Cosmic Signature NFT，以及它收到或发出的每一枚。",
+      "emptyDescription": "NFT 铭刻给该地址或由其他钱包发来时，记录会显示在这里。",
+      "figures": {
+        "imprinted": "铭刻",
+        "received": "收到",
+        "sent": "发出"
       }
     },
     "cst": {
-      "title": "Cosmic Signature CST 转账记录",
+      "title": "CST 转账记录",
       "empty": "暂无 CST 转账记录。",
-      "invalidAddress": {
-        "title": "地址无效",
-        "description": "请输入有效的钱包地址以查看 CST 转账记录。"
-      },
-      "value": "数量（CST）"
+      "lede": "铭刻给此地址的 CST、它收发的 CST，以及它的 CST 落笔所消耗的 CST。",
+      "emptyDescription": "落笔为地址铭刻 CST，或其他钱包发来 CST 时，记录会显示在这里。",
+      "figures": {
+        "received": "收到",
+        "sent": "发出",
+        "net": "净变化",
+        "imprintedCaption": "其中铭刻：{amount}",
+        "consumedCaption": "其中消耗：{amount}"
+      }
+    },
+    "switcherLabel": "该地址的转移记录",
+    "viewOnExplorer": "在 {explorer} 查看",
+    "error": "无法加载该地址的转移记录。",
+    "count": "{count, plural, other {# 条记录}}",
+    "activity": {
+      "imprinted": "铭刻",
+      "received": "收到",
+      "sent": "发出",
+      "consumed": "消耗"
+    },
+    "filter": {
+      "label": "显示",
+      "all": "全部",
+      "in": "转入",
+      "out": "转出",
+      "empty": "该方向暂无记录。"
+    },
+    "columns": {
+      "activity": "类型",
+      "counterparty": "对方地址"
+    },
+    "invalidAddress": {
+      "title": "地址无效",
+      "description": "链接中需要完整地址：0x 加 40 位字母和数字。",
+      "action": "浏览参与者"
     }
   },
   "stellarSelectionAllocations": {

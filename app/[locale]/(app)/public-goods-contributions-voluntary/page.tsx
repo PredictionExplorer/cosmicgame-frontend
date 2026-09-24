@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
+import { RouteGroupNav } from '@/components/layout/RouteGroupNav';
 
 import { PublicDataQuerySeed } from '../PublicDataQuerySeed';
 import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
@@ -39,7 +40,12 @@ export default async function Page({ params }: PageProps) {
     <PageMessages namespaces={['marketing', 'publicGoods', 'tables']}>
       <PublicDataQuerySeed route="public-goods-contributions-voluntary">
         <CharityDepositsVoluntary
-          seoSummary={<PublicDataRouteSeoSummary route="public-goods-contributions-voluntary" />}
+          header={
+            <PublicDataRouteSeoSummary
+              route="public-goods-contributions-voluntary"
+              tabs={<RouteGroupNav group="publicGoods" current="publicGoodsVoluntary" />}
+            />
+          }
         />
       </PublicDataQuerySeed>
     </PageMessages>

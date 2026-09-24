@@ -4,10 +4,6 @@
     "unavailable": "Unavailable",
     "yes": "Yes",
     "no": "No",
-    "datetime": "Date and time",
-    "from": "From",
-    "to": "To",
-    "tokenId": "Token ID",
     "cycle": "Cycle",
     "recipient": "Recipient"
   },
@@ -344,30 +340,55 @@
     "sendCount": "{count, plural, one {Send # NFT} other {Send # NFTs}}"
   },
   "transferHistory": {
-    "loading": "Loading...",
-    "walletLabels": {
-      "cosmicSignatureAnchoring": "Cosmic Signature NFT Anchoring Wallet",
-      "randomWalkAnchoring": "Random Walk Anchoring Wallet",
-      "outreach": "Outreach Wallet",
-      "stellarSelection": "Stellar Selection Wallet",
-      "publicGoods": "Public Goods Vault"
-    },
     "nft": {
-      "title": "Cosmic Signature Transfers",
+      "title": "NFT transfers",
       "empty": "No NFT transfers yet.",
-      "invalidAddress": {
-        "title": "Invalid address",
-        "description": "Enter a valid wallet address to view NFT transfer history."
+      "lede": "Cosmic Signature NFTs imprinted to this address, and every one it received or sent.",
+      "emptyDescription": "An NFT reaches an address when it is imprinted to it or sent from another wallet.",
+      "figures": {
+        "imprinted": "Imprinted",
+        "received": "Received",
+        "sent": "Sent"
       }
     },
     "cst": {
-      "title": "Cosmic Signature CST Token Transfers",
+      "title": "CST transfers",
       "empty": "No CST transfers yet.",
-      "invalidAddress": {
-        "title": "Invalid address",
-        "description": "Enter a valid wallet address to view CST transfer history."
-      },
-      "value": "Value (CST)"
+      "lede": "CST imprinted to this address, received and sent by it, and consumed by its CST gestures.",
+      "emptyDescription": "CST reaches an address when a gesture imprints it or another wallet sends it.",
+      "figures": {
+        "received": "Received",
+        "sent": "Sent",
+        "net": "Net change",
+        "imprintedCaption": "Imprinted: {amount}",
+        "consumedCaption": "Consumed: {amount}"
+      }
+    },
+    "switcherLabel": "Transfers of this address",
+    "viewOnExplorer": "View on {explorer}",
+    "error": "The transfers of this address couldn't be loaded.",
+    "count": "{count, plural, one {# transfer} other {# transfers}}",
+    "activity": {
+      "imprinted": "Imprinted",
+      "received": "Received",
+      "sent": "Sent",
+      "consumed": "Consumed"
+    },
+    "filter": {
+      "label": "Show",
+      "all": "All",
+      "in": "Incoming",
+      "out": "Outgoing",
+      "empty": "Nothing in this direction yet."
+    },
+    "columns": {
+      "activity": "Activity",
+      "counterparty": "Counterparty"
+    },
+    "invalidAddress": {
+      "title": "Invalid address",
+      "description": "The link needs a full address: 0x followed by 40 letters and digits.",
+      "action": "Browse participants"
     }
   },
   "stellarSelectionAllocations": {

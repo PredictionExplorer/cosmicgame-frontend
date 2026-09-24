@@ -4,10 +4,6 @@
     "unavailable": "取得不可",
     "yes": "はい",
     "no": "いいえ",
-    "datetime": "日時",
-    "from": "送付元",
-    "to": "送付先",
-    "tokenId": "トークンID",
     "cycle": "サイクル",
     "recipient": "受領者"
   },
@@ -344,30 +340,55 @@
     "sendCount": "{count, plural, other {NFT #点を送る}}"
   },
   "transferHistory": {
-    "loading": "読み込み中…",
-    "walletLabels": {
-      "cosmicSignatureAnchoring": "Cosmic Signature NFT係留ウォレット",
-      "randomWalkAnchoring": "RandomWalk係留ウォレット",
-      "outreach": "広報ウォレット",
-      "stellarSelection": "星選ウォレット",
-      "publicGoods": "公共財金庫"
-    },
     "nft": {
-      "title": "Cosmic Signature NFTの移転履歴",
+      "title": "NFTの移転履歴",
       "empty": "NFTの移転はまだありません。",
-      "invalidAddress": {
-        "title": "無効なアドレス",
-        "description": "NFT移転履歴を見るには、有効なウォレットアドレスを入力してください。"
+      "lede": "このアドレスに刻印されたCosmic Signature NFTと、受け取ったり送ったりしたすべてのNFTです。",
+      "emptyDescription": "NFTがこのアドレスに刻印されるか、別のウォレットから送られると、ここに表示されます。",
+      "figures": {
+        "imprinted": "刻印",
+        "received": "受け取り",
+        "sent": "送付"
       }
     },
     "cst": {
-      "title": "Cosmic Signature CSTの送付履歴",
+      "title": "CSTの送付履歴",
       "empty": "CSTの送付はまだありません。",
-      "invalidAddress": {
-        "title": "無効なアドレス",
-        "description": "CST送付履歴を見るには、有効なウォレットアドレスを入力してください。"
-      },
-      "value": "数量（CST）"
+      "lede": "このアドレスに刻印されたCST、受け取ったCSTと送ったCST、そしてCSTでの一筆に消費したCSTです。",
+      "emptyDescription": "一筆でCSTが刻印されるか、別のウォレットから送られると、ここに表示されます。",
+      "figures": {
+        "received": "受け取り",
+        "sent": "送付",
+        "net": "純増減",
+        "imprintedCaption": "うち刻印：{amount}",
+        "consumedCaption": "うち消費：{amount}"
+      }
+    },
+    "switcherLabel": "このアドレスの移転履歴",
+    "viewOnExplorer": "{explorer}で見る",
+    "error": "このアドレスの移転履歴を読み込めませんでした。",
+    "count": "{count, plural, other {#件}}",
+    "activity": {
+      "imprinted": "刻印",
+      "received": "受け取り",
+      "sent": "送付",
+      "consumed": "消費"
+    },
+    "filter": {
+      "label": "表示",
+      "all": "すべて",
+      "in": "受け取り",
+      "out": "送り出し",
+      "empty": "この方向の記録はまだありません。"
+    },
+    "columns": {
+      "activity": "内容",
+      "counterparty": "相手アドレス"
+    },
+    "invalidAddress": {
+      "title": "無効なアドレス",
+      "description": "リンクには完全なアドレス（0xに続く40文字の英数字）が必要です。",
+      "action": "参加者を見る"
     }
   },
   "stellarSelectionAllocations": {

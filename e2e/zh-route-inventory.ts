@@ -296,7 +296,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: `/cosmic-signature-transfer/${address}`,
     host: 'app',
     cluster: 'transactions',
-    expectedText: 'Cosmic Signature NFT 转移记录',
+    expectedText: 'NFT 转移记录',
   },
   {
     id: 'cst-transfer-history',
@@ -305,7 +305,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: `/cosmic-token-transfer/${address}`,
     host: 'app',
     cluster: 'transactions',
-    expectedText: 'Cosmic Signature CST 转账记录',
+    expectedText: 'CST 转账记录',
   },
   {
     id: 'token-distributions',

@@ -1,52 +1,90 @@
-import { render, screen, checkA11y } from '@/test-utils';
+import { checkA11y, fireEvent, render, screen } from '@/test-utils';
 
 import CharityCGDeposits from '../CharityCGDeposits';
 
 const mockUseCharityCGDeposits = jest.fn();
 const mockUseDashboardInfo = jest.fn();
+const mockRefetch = jest.fn();
 
-jest.mock('../../../../../hooks/useApiQuery', () => ({
+jest.mock('@/hooks/useApiQuery', () => ({
   useCharityCGDeposits: (...args: unknown[]) => mockUseCharityCGDeposits(...args),
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
 }));
 
-jest.mock('../../../../../components/tables/CharityDepositTable', () => ({
-  CharityDepositTable: ({ list, loading }: { list: unknown[]; loading?: boolean }) => (
+jest.mock('@/components/tables/CharityDepositTable', () => ({
+  CharityDepositTable: ({
+    list,
+    loading,
+    error,
+    onRetry,
+  }: {
+    list: unknown[];
+    loading?: boolean;
+    error?: string;
+    onRetry?: () => void;
+  }) => (
     <div data-testid="deposit-table" data-loading={loading ? 'true' : undefined}>
       rows: {list.length}
+      {error ? (
+        <button type="button" onClick={onRetry}>
+          {error}
+        </button>
+      ) : null}
     </div>
   ),
 }));
 
+const HEADER = <h1>Protocol Public Goods contributions</h1>;
+
+function withDeposits(
+  data: unknown[] | undefined,
+  state: { isLoading?: boolean; isError?: boolean } = {},
+) {
+  mockUseCharityCGDeposits.mockReturnValue({
+    data,
+    isLoading: false,
+    isError: false,
+    refetch: mockRefetch,
+    ...state,
+  });
+}
+
 beforeEach(() => {
   jest.clearAllMocks();
   mockUseDashboardInfo.mockReturnValue({ data: undefined });
+  withDeposits([]);
 });
 
 describe('CharityCGDeposits', () => {
-  it('renders the heading', () => {
-    mockUseCharityCGDeposits.mockReturnValue({ data: [], isLoading: false });
-    render(<CharityCGDeposits />);
-    expect(screen.getByText('Protocol Public-Goods Contributions')).toBeInTheDocument();
+  it('renders the server header it is given', () => {
+    render(<CharityCGDeposits header={HEADER} />);
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'Protocol Public Goods contributions',
+    );
   });
 
-  it('shows loading state', () => {
-    mockUseCharityCGDeposits.mockReturnValue({ data: [], isLoading: true });
-    render(<CharityCGDeposits />);
+  it('hands the loading state to the ledger', () => {
+    withDeposits(undefined, { isLoading: true });
+    render(<CharityCGDeposits header={HEADER} />);
     expect(screen.getByTestId('deposit-table')).toHaveAttribute('data-loading', 'true');
   });
 
   it('renders the table when loaded', () => {
-    mockUseCharityCGDeposits.mockReturnValue({
-      data: [{ id: 1 }, { id: 2 }],
-      isLoading: false,
-    });
-    render(<CharityCGDeposits />);
+    withDeposits([{ id: 1 }, { id: 2 }]);
+    render(<CharityCGDeposits header={HEADER} />);
     expect(screen.getByTestId('deposit-table')).toHaveTextContent('rows: 2');
   });
 
-  it('moves the compact Public Goods summary above the protocol-forward table', () => {
-    mockUseCharityCGDeposits.mockReturnValue({ data: [], isLoading: false });
+  it('offers a retry when the records cannot be read', () => {
+    withDeposits(undefined, { isError: true });
+    render(<CharityCGDeposits header={HEADER} />);
+    fireEvent.click(
+      screen.getByRole('button', { name: "The Public Goods records couldn't be loaded." }),
+    );
+    expect(mockRefetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('puts the compact Public Goods summary above the protocol-forward table', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: {
         CharityPercentage: 7,
@@ -57,7 +95,7 @@ describe('CharityCGDeposits', () => {
       },
     });
 
-    render(<CharityCGDeposits />);
+    render(<CharityCGDeposits header={HEADER} />);
 
     const summary = screen.getByTestId('public-goods-impact-card');
     const table = screen.getByTestId('deposit-table');
@@ -66,15 +104,8 @@ describe('CharityCGDeposits', () => {
     expect(summary).toHaveTextContent('0.7000 ETH');
   });
 
-  it('renders empty table when no data', () => {
-    mockUseCharityCGDeposits.mockReturnValue({ data: [], isLoading: false });
-    render(<CharityCGDeposits />);
-    expect(screen.getByTestId('deposit-table')).toHaveTextContent('rows: 0');
-  });
-
   it('has no accessibility violations', async () => {
-    mockUseCharityCGDeposits.mockReturnValue({ data: [], isLoading: false });
-    const { container } = render(<CharityCGDeposits />);
+    const { container } = render(<CharityCGDeposits header={HEADER} />);
     await checkA11y(container);
   });
 });

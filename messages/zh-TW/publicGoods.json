@@ -1,14 +1,3 @@
 {
-  "protocol": {
-    "title": "協議公共財資助",
-    "subtitle": "Cosmic Signature 協議自動轉入公共財金庫的資金"
-  },
-  "voluntary": {
-    "title": "自願公共財資助",
-    "subtitle": "社群成員自願轉入公共財金庫的資金"
-  },
-  "retrievals": {
-    "title": "公共財取回",
-    "subtitle": "從公共財金庫取回的資金"
-  }
+  "loadError": "無法載入公共財紀錄。"
 }

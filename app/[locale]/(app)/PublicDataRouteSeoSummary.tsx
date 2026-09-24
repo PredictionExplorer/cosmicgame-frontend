@@ -544,6 +544,8 @@ export interface PublicDataRouteSeoSummaryProps {
   note?: ReactNode;
   /** Right-aligned actions, from the page. */
   actions?: ReactNode;
+  /** Sibling pages as `PageHeaderTabs` on the header's bottom rule (e.g. `RouteGroupNav`). */
+  tabs?: ReactNode;
 }
 
 /**
@@ -556,6 +558,7 @@ export async function PublicDataRouteSeoSummary({
   route,
   note,
   actions,
+  tabs,
 }: PublicDataRouteSeoSummaryProps) {
   const locale = await getLocale();
   const t = await getTranslations({ locale, namespace: 'seo' });
@@ -588,6 +591,7 @@ export async function PublicDataRouteSeoSummary({
       subtitle={t(`${prefix}.description`)}
       figures={headerFigures}
       actions={actions}
+      tabs={tabs}
       meta={
         readAt !== null || note ? (
           <>

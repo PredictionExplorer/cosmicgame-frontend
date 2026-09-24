@@ -17,18 +17,20 @@ jest.mock('../../../../../components/tables/CharityWithdrawalTable', () => ({
   ),
 }));
 
+const HEADER = <h1>Public Goods retrievals</h1>;
+
 beforeEach(() => jest.clearAllMocks());
 
 describe('CharityWithdrawals', () => {
-  it('renders the heading', () => {
+  it('renders the server header it is given', () => {
     mockUseCharityWithdrawals.mockReturnValue({ data: [], isLoading: false });
-    render(<CharityWithdrawals />);
-    expect(screen.getByText('Public Goods Retrievals')).toBeInTheDocument();
+    render(<CharityWithdrawals header={HEADER} />);
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Public Goods retrievals');
   });
 
   it('shows loading state', () => {
     mockUseCharityWithdrawals.mockReturnValue({ data: [], isLoading: true });
-    render(<CharityWithdrawals />);
+    render(<CharityWithdrawals header={HEADER} />);
     expect(screen.getByTestId('withdrawal-table')).toHaveAttribute('data-loading', 'true');
   });
 
@@ -37,19 +39,19 @@ describe('CharityWithdrawals', () => {
       data: [{ id: 1 }, { id: 2 }, { id: 3 }],
       isLoading: false,
     });
-    render(<CharityWithdrawals />);
+    render(<CharityWithdrawals header={HEADER} />);
     expect(screen.getByTestId('withdrawal-table')).toHaveTextContent('rows: 3');
   });
 
   it('does not show loading when data is ready', () => {
     mockUseCharityWithdrawals.mockReturnValue({ data: [], isLoading: false });
-    render(<CharityWithdrawals />);
+    render(<CharityWithdrawals header={HEADER} />);
     expect(screen.getByTestId('withdrawal-table')).not.toHaveAttribute('data-loading');
   });
 
   it('has no accessibility violations', async () => {
     mockUseCharityWithdrawals.mockReturnValue({ data: [], isLoading: false });
-    const { container } = render(<CharityWithdrawals />);
+    const { container } = render(<CharityWithdrawals header={HEADER} />);
     await checkA11y(container);
   });
 });

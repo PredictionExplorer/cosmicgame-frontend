@@ -1,24 +1,17 @@
-import { Anchor, Coins } from 'lucide-react';
-
 import { checkA11y, render, screen } from '@/test-utils';
 
 import { LedgerPage } from '../LedgerPage';
-import { LedgerSwitcher } from '../LedgerSwitcher';
 
 describe('LedgerPage', () => {
-  it('renders the header, the switcher and the body in one main landmark', () => {
+  it('renders the header and the body in one main landmark', () => {
     render(
-      <LedgerPage
-        header={<h1>CST transfers</h1>}
-        switcher={<nav aria-label="Transfers">switcher</nav>}
-      >
+      <LedgerPage header={<h1>CST transfers</h1>}>
         <table aria-label="Transfers ledger" />
       </LedgerPage>,
     );
 
     const main = screen.getByRole('main');
     expect(main).toContainElement(screen.getByRole('heading', { level: 1 }));
-    expect(main).toContainElement(screen.getByRole('navigation', { name: 'Transfers' }));
     expect(main).toContainElement(screen.getByRole('table', { name: 'Transfers ledger' }));
   });
 
@@ -47,26 +40,13 @@ describe('LedgerPage', () => {
     expect(body?.className).toContain('max-w-3xl');
     expect(body?.className).not.toContain('mx-auto');
   });
-});
-
-describe('LedgerSwitcher', () => {
-  const items = [
-    { href: '/cosmic-token-transfer/0xabc', label: 'CST transfers', icon: Coins, current: true },
-    { href: '/cosmic-signature-transfer/0xabc', label: 'NFT transfers', icon: Anchor },
-  ];
-
-  it('links every sibling and marks the current one', () => {
-    render(<LedgerSwitcher label="Transfers of this address" items={items} />);
-
-    const nav = screen.getByRole('navigation', { name: 'Transfers of this address' });
-    const current = screen.getByRole('link', { name: 'CST transfers' });
-    expect(nav).toContainElement(current);
-    expect(current).toHaveAttribute('aria-current', 'page');
-    expect(screen.getByRole('link', { name: 'NFT transfers' })).not.toHaveAttribute('aria-current');
-  });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<LedgerSwitcher label="Transfers" items={items} />);
+    const { container } = render(
+      <LedgerPage header={<h1>Ledger</h1>} aside={<section aria-label="Form">form</section>}>
+        <p>ledger</p>
+      </LedgerPage>,
+    );
     await checkA11y(container);
   });
 });

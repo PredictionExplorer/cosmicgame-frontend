@@ -4,10 +4,6 @@
     "unavailable": "확인 불가",
     "yes": "예",
     "no": "아니요",
-    "datetime": "일시",
-    "from": "보낸 주소",
-    "to": "받는 주소",
-    "tokenId": "토큰 ID",
     "cycle": "사이클",
     "recipient": "수령자"
   },
@@ -344,30 +340,55 @@
     "sendCount": "{count, plural, other {NFT #개 보내기}}"
   },
   "transferHistory": {
-    "loading": "불러오는 중…",
-    "walletLabels": {
-      "cosmicSignatureAnchoring": "Cosmic Signature NFT 앵커링 지갑",
-      "randomWalkAnchoring": "RandomWalk 앵커링 지갑",
-      "outreach": "홍보 지갑",
-      "stellarSelection": "별빛 선정 지갑",
-      "publicGoods": "공공재 금고"
-    },
     "nft": {
-      "title": "Cosmic Signature NFT 전송 내역",
+      "title": "NFT 전송 내역",
       "empty": "아직 NFT 전송이 없습니다.",
-      "invalidAddress": {
-        "title": "잘못된 주소",
-        "description": "NFT 전송 내역을 보려면 올바른 지갑 주소를 입력해 주세요."
+      "lede": "이 주소에 각인된 Cosmic Signature NFT와 이 주소가 받거나 보낸 모든 NFT입니다.",
+      "emptyDescription": "NFT가 이 주소에 각인되거나 다른 지갑에서 전송되면 여기에 표시됩니다.",
+      "figures": {
+        "imprinted": "각인",
+        "received": "받음",
+        "sent": "보냄"
       }
     },
     "cst": {
-      "title": "Cosmic Signature CST 토큰 전송 내역",
+      "title": "CST 전송 내역",
       "empty": "아직 CST 전송이 없습니다.",
-      "invalidAddress": {
-        "title": "잘못된 주소",
-        "description": "CST 전송 내역을 보려면 올바른 지갑 주소를 입력해 주세요."
-      },
-      "value": "수량(CST)"
+      "lede": "이 주소에 각인된 CST, 이 주소가 받고 보낸 CST, 그리고 CST 제스처로 소모한 CST입니다.",
+      "emptyDescription": "제스처로 CST가 각인되거나 다른 지갑이 CST를 보내면 여기에 표시됩니다.",
+      "figures": {
+        "received": "받은 수량",
+        "sent": "보낸 수량",
+        "net": "순변동",
+        "imprintedCaption": "각인: {amount}",
+        "consumedCaption": "소모: {amount}"
+      }
+    },
+    "switcherLabel": "이 주소의 전송 내역",
+    "viewOnExplorer": "{explorer}에서 보기",
+    "error": "이 주소의 전송 내역을 불러오지 못했습니다.",
+    "count": "{count, plural, other {#건}}",
+    "activity": {
+      "imprinted": "각인",
+      "received": "받음",
+      "sent": "보냄",
+      "consumed": "소모"
+    },
+    "filter": {
+      "label": "표시",
+      "all": "전체",
+      "in": "받은 내역",
+      "out": "보낸 내역",
+      "empty": "이 방향의 내역이 아직 없습니다."
+    },
+    "columns": {
+      "activity": "내역",
+      "counterparty": "상대 주소"
+    },
+    "invalidAddress": {
+      "title": "잘못된 주소",
+      "description": "링크에 0x 뒤에 영문자와 숫자 40자가 이어지는 전체 주소가 필요합니다.",
+      "action": "참여자 둘러보기"
     }
   },
   "stellarSelectionAllocations": {

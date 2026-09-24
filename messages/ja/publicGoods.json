@@ -1,14 +1,3 @@
 {
-  "protocol": {
-    "title": "プロトコルの公共財拠出",
-    "subtitle": "Cosmic Signatureプロトコルから公共財金庫への自動送付"
-  },
-  "voluntary": {
-    "title": "自発的な公共財拠出",
-    "subtitle": "コミュニティメンバーによる公共財金庫への自発的な拠出"
-  },
-  "retrievals": {
-    "title": "公共財の受け取り",
-    "subtitle": "公共財金庫から受け取られた資金"
-  }
+  "loadError": "公共財の記録を読み込めませんでした。"
 }
