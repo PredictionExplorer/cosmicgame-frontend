@@ -87,7 +87,7 @@ const zhRoutes: ReadonlyArray<{
     path: '/zh/eth-contribution',
     label: 'long-tail contribution',
     assertAccessibleName: async (page) =>
-      expect(page.getByRole('heading', { name: 'ETH 贡献', exact: true }).first()).toBeVisible(),
+      expect(page.getByRole('heading', { level: 1, name: '直接 ETH 贡献' })).toBeVisible(),
   },
 ];
 
@@ -208,9 +208,7 @@ test.describe('A11y smoke (WCAG 2.1 AA)', () => {
       path: '/uk/eth-contribution',
       label: 'long-tail contribution',
       assertAccessibleName: async (page) =>
-        expect(
-          page.getByRole('heading', { name: 'Внески ETH', exact: true }).first(),
-        ).toBeVisible(),
+        expect(page.getByRole('heading', { level: 1, name: 'Прямі внески ETH' })).toBeVisible(),
     },
   ];
 

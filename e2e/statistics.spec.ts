@@ -16,12 +16,13 @@ test.describe('Statistics hub', () => {
     await page.goto('/statistics', { waitUntil: 'networkidle' });
   });
 
-  test('shows the SEO summary and headline stats', async ({ page }) => {
+  test('shows the page header and its headline figures', async ({ page }) => {
     await expect(
       page.getByRole('heading', { name: 'Cosmic Signature Protocol Statistics' }),
     ).toBeVisible({ timeout: 15000 });
-    await expect(page.getByText(/Total Cycles/i).first()).toBeVisible();
-    await expect(page.getByText(/Contract Balance/i).first()).toBeVisible();
+    await expect(page.getByText('Active Performance Cycle', { exact: true })).toBeVisible();
+    await expect(page.getByText('Allocations Distributed', { exact: true })).toBeVisible();
+    await expect(page.getByText('Contract Balance', { exact: true })).toBeVisible();
   });
 
   test('shows the protocol economy groups', async ({ page }) => {

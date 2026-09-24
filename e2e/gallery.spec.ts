@@ -13,7 +13,9 @@ test.describe('Gallery page', () => {
   });
 
   test('renders NFT cards', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: /NFT Gallery/i })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Cosmic Signature Gallery' }),
+    ).toBeVisible();
     await expect(page.getByText(/Showing 1 -|There is no NFT yet/i).first()).toBeVisible();
   });
 

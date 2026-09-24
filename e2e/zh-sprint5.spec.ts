@@ -278,14 +278,14 @@ test.describe('zh Sprint 5 — statistics, tables, and formatting', () => {
       '/zh/statistics',
       '统计：演绎周期、落笔、NFT 与 CST · Cosmic Signature',
     );
-    const label = page.getByText('周期总数', { exact: true }).first();
+    const label = page.getByText('当前演绎周期', { exact: true }).first();
     const tooltipTrigger = label
       .locator('xpath=ancestor::*[.//button][1]')
       .locator('button')
       .first();
     await tooltipTrigger.scrollIntoViewIfNeeded();
     await openTooltip(tooltipTrigger);
-    await expectTooltipFullyVisible(page, /协议上线以来/);
+    await expectTooltipFullyVisible(page, /当前索引的演绎周期编号/);
     await dismissOpenTooltips(page);
 
     await openZhRoute(page, '/zh/named-nfts', '已命名 NFT · Cosmic Signature');

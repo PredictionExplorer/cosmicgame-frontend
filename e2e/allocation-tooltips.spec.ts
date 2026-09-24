@@ -4,8 +4,8 @@ import { expectAllLabelTooltips } from './tooltip-helpers';
 
 const ALLOCATION_LIST_TOOLTIPS = [
   {
-    label: 'Finalized round records only',
-    expected: /Pending cycles and unrelated allocation retrieval records are not included/,
+    label: 'Finalized cycle records only',
+    expected: /Active cycles and separate allocation retrieval records are excluded/,
   },
   {
     label: 'Cycle Reserve Split',

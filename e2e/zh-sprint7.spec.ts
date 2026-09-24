@@ -245,7 +245,7 @@ test.describe('zh Sprint 7 — long-tail routes', () => {
 
   test('renders Chinese ETH contribution list, detail, and cycle routes', async ({ page }) => {
     await openZh(page, '/zh/eth-contribution');
-    await expect(page.getByRole('heading', { name: 'ETH 贡献', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: '直接 ETH 贡献' })).toBeVisible();
     await expect(page.getByText('暂无贡献记录。')).toBeVisible();
 
     await openZh(page, '/zh/eth-contribution/detail/7');
@@ -274,7 +274,7 @@ test.describe('zh Sprint 7 — long-tail routes', () => {
 
   test('renders Chinese outreach overview and participant history', async ({ page }) => {
     await openZh(page, '/zh/marketing');
-    await expect(page.getByRole('heading', { name: /推广 Cosmic Signature/ })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: '推广分配' })).toBeVisible();
     await expect(page.getByRole('heading', { name: '推广分配记录', exact: true })).toBeVisible();
     await expect(page.getByText('暂无推广分配')).toBeVisible();
 

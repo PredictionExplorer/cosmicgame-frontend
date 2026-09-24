@@ -61,9 +61,9 @@ test.describe('zh Sprint 6 — FAQ, legal, trust, contracts, code, and imprint',
     const routes: Array<[string, string]> = [
       ['/zh/terms', '服务条款'],
       ['/zh/privacy', '隐私政策'],
-      ['/zh/risk-disclosures', 'Cosmic Signature 风险披露'],
-      ['/zh/security', 'Cosmic Signature 安全'],
-      ['/zh/audits', 'Cosmic Signature 审计'],
+      ['/zh/risk-disclosures', '风险披露'],
+      ['/zh/security', '安全'],
+      ['/zh/audits', '审计'],
     ];
 
     for (const [path, heading] of routes) {

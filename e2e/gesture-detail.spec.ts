@@ -9,10 +9,13 @@ test.describe('Gesture detail page', () => {
 
   test('shows gesture information fields', async ({ page }) => {
     await page.goto('/gesture/1', { waitUntil: 'networkidle' });
-    // The page header always shows "Gesture Position" (with "#N" once indexed).
-    await expect(page.getByText(/Gesture Position/i).first()).toBeVisible();
+    // One H1: "Gesture Position #N" once the gesture is indexed with its position,
+    // "Gesture details" otherwise.
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+      /^(Gesture Position #\d+|Gesture details)$/,
+    );
     await expect(
-      page.getByText(/Gesture details|No gesture information found/i).first(),
+      page.getByText(/Transaction and cycle|No gesture information found/i).first(),
     ).toBeVisible();
   });
 

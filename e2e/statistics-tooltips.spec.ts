@@ -8,22 +8,6 @@ const HUB_TOOLTIPS = [
     expected: /current Performance Cycle number indexed/,
   },
   {
-    label: 'Active Cycle Gestures',
-    expected: /indexed gestures made in the active Performance Cycle/,
-  },
-  {
-    label: 'Protocol Contract Balance',
-    expected: /ETH currently held by the Cosmic Signature protocol contract/,
-  },
-  {
-    label: 'Cosmic Signature NFTs Imprinted',
-    expected: /Cumulative count of Cosmic Signature NFT ERC-721 tokens imprinted/,
-  },
-  {
-    label: 'Total Cycles',
-    expected: /Total Performance Cycles completed or currently indexed/,
-  },
-  {
     label: 'Allocations Distributed',
     expected: /Indexed allocation records across all cycles/,
   },
@@ -44,7 +28,7 @@ const HUB_TOOLTIPS = [
     expected: /Cumulative allocation records and ETH flows/,
   },
   {
-    label: 'RandomWalk NFTs Used',
+    label: 'Random Walk NFTs Used',
     expected: /attached to ETH gestures for a one-time Gesture Cost reduction/,
   },
 ];

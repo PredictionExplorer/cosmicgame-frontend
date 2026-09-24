@@ -15,7 +15,7 @@ const ROUTES = [
   { path: '/zh/statistics', readyText: 'Cosmic Signature 协议统计', minimum: 5 },
   { path: '/zh/contracts', readyText: 'Cosmic Signature 合约', minimum: 2 },
   { path: '/zh/faq', readyText: 'Cosmic Signature 常见问题', minimum: 1 },
-  { path: '/zh/marketing', readyText: '推广 Cosmic Signature', minimum: 1 },
+  { path: '/zh/marketing', readyText: '推广分配', minimum: 1 },
 ] as const;
 
 test.describe('Sprint 8 translated tooltip interaction coverage', () => {
