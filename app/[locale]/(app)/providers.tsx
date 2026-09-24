@@ -29,7 +29,7 @@ import { useLiveGameDataRefresh } from '@/hooks/useLiveGameDataRefresh';
 import { reportError } from '@/utils/errors';
 import { installGlobalErrorHandlers } from '@/utils/globalErrorHandlers';
 import { getClientBuildInfo } from '@/lib/buildInfo';
-import { motionTokens } from '@/lib/motion';
+import { baseTransition } from '@/lib/motion';
 import { getApiBase, getApiOrigin, getRpcUrl } from '@/lib/serverRotation';
 
 // NOTE: RainbowKit (provider, modal, stylesheet) is intentionally NOT
@@ -156,17 +156,6 @@ const particleOptions: ISourceOptions = {
 };
 
 const envValidation = getEnvValidation();
-
-/**
- * Framer Motion defaults for the app host: honour the OS "reduce motion"
- * setting (transforms and layout animations are skipped; opacity still
- * fades) and use the shared duration and easing tokens wherever a component
- * does not set its own transition. The landing shell sets the same policy.
- */
-const APP_MOTION_TRANSITION = {
-  duration: motionTokens.duration.base,
-  ease: motionTokens.ease.outExpo,
-} as const;
 
 function EnvErrorScreen({ missing }: { missing: string[] }) {
   const t = useTranslations('errors');
@@ -325,7 +314,11 @@ export function Providers({
           <LiveGameDataRefresh />
           <WalletUiProvider>
             {engineReady && !bareEmbed && <ParticleBackdrop />}
-            <MotionConfig reducedMotion="user" transition={APP_MOTION_TRANSITION}>
+            {/* Framer Motion defaults for the app host: honour the OS "reduce
+                motion" setting (transforms and layout animations are skipped;
+                opacity still fades) and use the shared transition token
+                wherever a component sets none. The landing shell does the same. */}
+            <MotionConfig reducedMotion="user" transition={baseTransition}>
               <ErrorBoundary>
                 <CookiesProvider>
                   <AnchoredTokenProvider>
