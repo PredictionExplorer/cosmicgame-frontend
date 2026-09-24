@@ -156,7 +156,8 @@
       "emptyTitle": "保有しているCosmic Signature NFTはありません",
       "emptyDescription": "このアドレスが保有するCosmic Signature NFTがここに表示されます。",
       "showAll": "すべて表示（{count}点）",
-      "showFewer": "閉じる"
+      "showFewer": "閉じる",
+      "anchoredTag": "係留中"
     },
     "quickActions": {
       "anchor": {

@@ -156,7 +156,8 @@
       "emptyTitle": "No Cosmic Signature NFTs held",
       "emptyDescription": "Cosmic Signature NFTs this address holds appear here.",
       "showAll": "Show all {count}",
-      "showFewer": "Show fewer"
+      "showFewer": "Show fewer",
+      "anchoredTag": "Anchored"
     },
     "quickActions": {
       "label": "Next steps",

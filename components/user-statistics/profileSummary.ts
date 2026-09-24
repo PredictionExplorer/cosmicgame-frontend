@@ -127,3 +127,35 @@ export function summarizeAllocations(records: readonly AllocationRecordLike[]): 
     }),
   };
 }
+
+/** The fields a profile plate reads from an anchored Cosmic Signature NFT. */
+export interface AnchoredArtwork {
+  TokenId: number;
+  TokenName?: string;
+  RoundNum?: number;
+  Seed?: string;
+}
+
+/**
+ * The anchored Cosmic Signature NFTs of a `user/info` payload, as plates. The
+ * anchoring wallet holds them, so the address's own token list leaves them
+ * out; each row nests its token under `TokenInfo`.
+ */
+export function anchoredArtworks(rows: readonly unknown[]): AnchoredArtwork[] {
+  return rows.flatMap((row) => {
+    const nested =
+      row && typeof row === 'object' ? (row as { TokenInfo?: unknown }).TokenInfo : null;
+    const info = nested && typeof nested === 'object' ? (nested as Record<string, unknown>) : null;
+    const id = toFiniteNumber(info?.TokenId);
+    if (!info || id === null || id < 0) return [];
+    const cycle = toFiniteNumber(info.RoundNum);
+    return [
+      {
+        TokenId: id,
+        TokenName: typeof info.TokenName === 'string' ? info.TokenName : undefined,
+        RoundNum: cycle ?? undefined,
+        Seed: typeof info.Seed === 'string' ? info.Seed : undefined,
+      },
+    ];
+  });
+}

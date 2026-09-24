@@ -33,6 +33,23 @@ describe('ProfileArtworks', () => {
     expect(screen.getAllByRole('link')).toHaveLength(11);
   });
 
+  it('hangs anchored Signatures too, tagged, without repeating a held one', () => {
+    render(
+      <ProfileArtworks
+        tokens={[token(3)]}
+        anchored={[
+          { TokenId: 3, Seed: 'seed3' },
+          { TokenId: 9, Seed: 'seed9', RoundNum: 0 },
+        ]}
+        loading={false}
+      />,
+    );
+    const links = screen.getAllByRole('link');
+    expect(links.map((link) => link.getAttribute('href'))).toEqual(['/detail/9', '/detail/3']);
+    expect(links[0]).toHaveTextContent('myPages.statistics.artworks.anchoredTag');
+    expect(links[1]).not.toHaveTextContent('myPages.statistics.artworks.anchoredTag');
+  });
+
   it('explains an empty collection', () => {
     render(<ProfileArtworks tokens={[]} loading={false} />);
     expect(screen.getByText('myPages.statistics.artworks.emptyTitle')).toBeInTheDocument();

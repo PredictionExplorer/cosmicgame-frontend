@@ -77,6 +77,8 @@ export const ParticipantOutcomesSection = () => {
         label: t('performance.outcomes.rank'),
         cell: (_row, { index }) => format.count(index + 1),
         width: '3rem',
+        // A phone record is already one participant; its place in the list says the rest.
+        priority: 'secondary',
       },
       {
         id: 'participant',
@@ -128,6 +130,8 @@ export const ParticipantOutcomesSection = () => {
         help: t('performance.outcomes.netHelp'),
         value: (row) => row.NetPlEth,
         sortable: true,
+        // Spent and received sit side by side above it on a phone; the difference stays on wider screens.
+        priority: 'secondary',
         // Signed, in the same ink as every other figure.
         cell: (row) =>
           `${row.NetPlEth > 0 ? '+' : ''}${format.amount(row.NetPlEth, { unit: 'ETH', withUnit: false })}`,

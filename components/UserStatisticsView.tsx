@@ -45,7 +45,11 @@ import type { DonatedERC20Token } from './attachments/AttachedERC20Table';
 import GestureHistoryTable from './tables/GestureHistoryTable';
 import RecipientHistoryTable from './tables/RecipientHistoryTable';
 import MarketingRewardsTable from './tables/MarketingRewardsTable';
-import { summarizeAllocations, summarizeGestures } from './user-statistics/profileSummary';
+import {
+  anchoredArtworks,
+  summarizeAllocations,
+  summarizeGestures,
+} from './user-statistics/profileSummary';
 import type { UserProfileInfo } from './user-statistics/types';
 import { ProfileHeader } from './user-statistics/ProfileHeader';
 import { ProfileOverview } from './user-statistics/ProfileOverview';
@@ -281,7 +285,11 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
           />
 
           <SectionShell title={t('statistics.page.sections.artworks')}>
-            <ProfileArtworks tokens={cstListRaw ?? []} loading={loadingCST} />
+            <ProfileArtworks
+              tokens={cstListRaw ?? []}
+              anchored={anchoredArtworks(userInfoRaw?.CurrentlyStakedTokens ?? [])}
+              loading={loadingCST}
+            />
           </SectionShell>
 
           <SectionShell title={t('statistics.page.sections.gestureHistory')}>

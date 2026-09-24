@@ -1,4 +1,4 @@
-import { summarizeAllocations, summarizeGestures } from '../profileSummary';
+import { anchoredArtworks, summarizeAllocations, summarizeGestures } from '../profileSummary';
 
 describe('summarizeGestures', () => {
   it('sums what was paid in each currency and counts the cycles', () => {
@@ -64,5 +64,28 @@ describe('summarizeAllocations', () => {
 
   it('counts every record', () => {
     expect(summarizeAllocations(history).records).toBe(7);
+  });
+});
+
+describe('anchoredArtworks', () => {
+  it('reads each anchored token from its nested TokenInfo', () => {
+    expect(
+      anchoredArtworks([
+        {
+          StakeActionId: 1,
+          TokenInfo: { TokenId: 0, TokenName: '', RoundNum: 0, Seed: '2a34' },
+        },
+        { TokenInfo: { TokenId: 41, TokenName: 'Twisted Mind', RoundNum: 1, Seed: 'ff' } },
+      ]),
+    ).toEqual([
+      { TokenId: 0, TokenName: '', RoundNum: 0, Seed: '2a34' },
+      { TokenId: 41, TokenName: 'Twisted Mind', RoundNum: 1, Seed: 'ff' },
+    ]);
+  });
+
+  it('skips rows without a readable token id', () => {
+    expect(
+      anchoredArtworks([null, {}, { TokenInfo: { TokenId: 'x' } }, { TokenInfo: { TokenId: -1 } }]),
+    ).toEqual([]);
   });
 });

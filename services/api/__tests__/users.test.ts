@@ -86,6 +86,35 @@ describe('users API', () => {
       expect(result?.Gestures[0]).toHaveProperty('TxHash', '0xabc');
     });
 
+    it('reads the anchored Cosmic Signature NFTs from the per-collection map', async () => {
+      // Regression: the API keys anchored tokens by collection, and the flattener dropped
+      // the whole map, so a profile counted none of its anchored Cosmic Signature NFTs.
+      mockedAxios.get.mockResolvedValue({
+        data: {
+          Addr: '0x1234',
+          CurrentlyStakedTokens: {
+            CST: [{ TokenInfo: { TokenId: 0 }, Tx: { TxHash: '0xabc' } }],
+            RWalk: [{ TokenId: 7 }, { TokenId: 8 }],
+          },
+        },
+      });
+
+      const result = await get_user_info('0x1234');
+
+      expect(result?.CurrentlyStakedTokens).toHaveLength(1);
+      expect(result?.CurrentlyStakedTokens[0]).toHaveProperty('TxHash', '0xabc');
+    });
+
+    it('still reads a flat anchored-token list', async () => {
+      mockedAxios.get.mockResolvedValue({
+        data: { Addr: '0x1234', CurrentlyStakedTokens: [{ TokenId: 1 }, { TokenId: 2 }] },
+      });
+
+      const result = await get_user_info('0x1234');
+
+      expect(result?.CurrentlyStakedTokens).toHaveLength(2);
+    });
+
     it('rejects a UserInfo block with non-numeric totals', async () => {
       mockedAxios.get.mockResolvedValue({
         data: { Addr: '0x1234', UserInfo: { NumBids: 'many', NumPrizes: 1 } },

@@ -156,7 +156,8 @@
       "emptyTitle": "未持有 Cosmic Signature NFT",
       "emptyDescription": "此地址持有的 Cosmic Signature NFT 會顯示在這裡。",
       "showAll": "顯示全部 {count} 枚",
-      "showFewer": "收合"
+      "showFewer": "收合",
+      "anchoredTag": "已錨定"
     },
     "quickActions": {
       "anchor": {

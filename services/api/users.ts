@@ -42,6 +42,18 @@ import type {
 } from './types';
 
 /**
+ * The anchored Cosmic Signature NFTs in a `user/info` payload. The API keys the
+ * anchored tokens by collection (`{ CST: [...], RWalk: [...] }`); an older
+ * payload sent the Cosmic Signature list alone.
+ */
+const anchoredCosmicSignatureTokens = (value: unknown): unknown =>
+  Array.isArray(value)
+    ? value
+    : value && typeof value === 'object'
+      ? (value as { CST?: unknown }).CST
+      : undefined;
+
+/**
  * Fetches comprehensive user profile including flattened gestures, allocations, tokens, anchoring,
  * and donation lists. Required read with strict validation of the `UserInfo` totals — a wallet
  * page that quietly renders zeros is worse than one that says the read failed.
@@ -60,7 +72,9 @@ export function get_user_info(
         Gestures: flattenGestureArray(data.Gestures ?? data.Bids ?? []),
         PrizeHistory: flattenTxArray(data.PrizeHistory || []),
         CosmicSignatureTokensOwned: flattenTxArray(data.CosmicSignatureTokensOwned || []),
-        CurrentlyStakedTokens: flattenTxArray(data.CurrentlyStakedTokens || []),
+        CurrentlyStakedTokens: flattenTxArray(
+          anchoredCosmicSignatureTokens(data.CurrentlyStakedTokens) ?? [],
+        ),
         DonatedNFTsClaimed: flattenTxArray(data.DonatedNFTsClaimed || []),
         DonatedTokensClaimed: flattenTxArray(data.DonatedTokensClaimed || []),
         ERC20Transfers: flattenTxArray(data.ERC20Transfers || []),
