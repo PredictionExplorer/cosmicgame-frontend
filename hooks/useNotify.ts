@@ -19,13 +19,15 @@ export function useNotify() {
   );
 
   /**
-   * Explains a failed wallet or RPC call in one localized sentence — the
-   * classified cause when there is one (not enough ETH, wrong network, wallet
-   * busy, offline…), otherwise `fallback` — and offers the technical details
+   * Explains a failed wallet or RPC read in one localized sentence — the
+   * classified cause when there is one (wrong network, wallet busy,
+   * offline…), otherwise `fallback` — and offers the technical details
    * behind "Copy details". Raw provider text is never shown, in any locale.
-   * A wallet rejection is a neutral "cancelled" notice.
+   * The toast keeps the normal duration, and a repeat of the same failure
+   * replaces it instead of stacking. A wallet rejection is a neutral
+   * "cancelled" notice.
    *
-   * New transaction flows should use `useTxFlow`, which does this for you.
+   * Transactions use `useTxFlow`, whose failures stay until dismissed.
    */
   const notifyErrorFromEthers = useCallback(
     (err: unknown, fallback?: string) => {

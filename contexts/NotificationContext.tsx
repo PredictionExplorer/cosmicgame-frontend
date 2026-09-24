@@ -16,11 +16,20 @@ export interface NotificationState {
   visible: boolean;
   /**
    * Technical details behind the message (a classified wallet or RPC
-   * error). When present the toast gets a "Copy details" action for support
-   * and stays until dismissed; the details themselves are never shown.
+   * error). When present the toast gets a "Copy details" action for support;
+   * the details themselves are never shown.
    */
   details?: string;
-  /** Replaces the toast with the same id instead of stacking another. */
+  /**
+   * Keep the toast until it is dismissed. For transaction failures, which
+   * someone may need to read or copy; read errors keep the normal duration.
+   */
+  sticky?: boolean;
+  /**
+   * Replaces the toast with the same id instead of stacking another. Toasts
+   * with `details` default to an id derived from their message, so a read
+   * that keeps failing (a re-run effect, a retry) shows one toast, not a pile.
+   */
   id?: string;
 }
 
@@ -33,8 +42,6 @@ interface NotificationContextValue {
 }
 
 const NotificationContext = createContext<NotificationContextValue | undefined>(undefined);
-
-let detailToastSequence = 0;
 
 /**
  * Builds the toast dispatcher. The translator is read through a ref so the
@@ -53,15 +60,15 @@ function useToastDispatcher(): SetNotification {
 
     if (!notification.visible) return;
 
-    const { text: message, details } = notification;
-    const id = notification.id ?? (details ? `notice-${++detailToastSequence}` : undefined);
+    const { text: message, details, sticky = false } = notification;
+    const id = notification.id ?? (details ? `notice:${notification.type}:${message}` : undefined);
     const options: ExternalToast | undefined =
-      details || id
+      details || id || sticky
         ? {
             ...(id ? { id } : {}),
+            ...(sticky ? { duration: Number.POSITIVE_INFINITY } : {}),
             ...(details
               ? {
-                  duration: Number.POSITIVE_INFINITY,
                   action: {
                     label: tRef.current('tx.copyDetails'),
                     onClick: (event: { preventDefault: () => void }) => {

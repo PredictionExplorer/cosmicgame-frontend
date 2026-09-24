@@ -227,7 +227,7 @@ describe('useNotification', () => {
 });
 
 describe('technical details', () => {
-  it('keeps an error with details open and offers a Copy details action', () => {
+  it('offers a Copy details action and keeps the normal duration for a read error', () => {
     const writeText = jest.fn().mockResolvedValue(undefined);
     Object.assign(navigator, { clipboard: { writeText } });
     const { result } = renderHook(() => useNotification(), { wrapper });
@@ -244,10 +244,10 @@ describe('technical details', () => {
     expect(mockToastError).toHaveBeenCalledWith(
       'Friendly sentence',
       expect.objectContaining({
-        duration: Number.POSITIVE_INFINITY,
         action: expect.objectContaining({ label: 'toasts.tx.copyDetails' }),
       }),
     );
+    expect(mockToastError.mock.calls[0]![1]).not.toHaveProperty('duration');
     const [, options] = mockToastError.mock.calls[0] as [
       string,
       { action: { onClick: (event: { preventDefault: () => void }) => void } },
@@ -256,6 +256,44 @@ describe('technical details', () => {
     options.action.onClick({ preventDefault });
     expect(preventDefault).toHaveBeenCalled();
     expect(writeText).toHaveBeenCalledWith('InsufficientFundsError: insufficient funds');
+  });
+
+  it('shows a repeated read error once instead of stacking copies', () => {
+    const { result } = renderHook(() => useNotification(), { wrapper });
+    const failure = {
+      text: 'Could not load your NFTs.',
+      type: 'error' as const,
+      visible: true,
+      details: 'HttpRequestError: 429',
+    };
+
+    act(() => {
+      result.current.setNotification(failure);
+      result.current.setNotification(failure);
+    });
+
+    const [first, second] = mockToastError.mock.calls as [string, { id: string }][];
+    expect(first![1].id).toBeTruthy();
+    expect(second![1].id).toBe(first![1].id);
+  });
+
+  it('keeps a sticky failure open until dismissed', () => {
+    const { result } = renderHook(() => useNotification(), { wrapper });
+
+    act(() => {
+      result.current.setNotification({
+        text: 'Transfer did not go through.',
+        type: 'error',
+        visible: true,
+        details: 'TxRevertedError',
+        sticky: true,
+      });
+    });
+
+    expect(mockToastError).toHaveBeenCalledWith(
+      'Transfer did not go through.',
+      expect.objectContaining({ duration: Number.POSITIVE_INFINITY }),
+    );
   });
 
   it('replaces the toast with the same id instead of stacking another', () => {
