@@ -19,26 +19,26 @@ const makeData = (overrides: Record<string, unknown> = {}) =>
     ...overrides,
   }) as never;
 
+const NBSP = String.fromCharCode(160);
+
 describe('AllocationLedger', () => {
-  it('renders every allocation amount in one ledger', () => {
+  it('renders every allocation amount in one ledger, the unit bound to its figure', () => {
     render(<AllocationLedger data={makeData()} />);
 
     const expected = [
-      ['signature', 'home.allocation.amounts.eth(amount=1.5000)'],
-      ['chrono', 'home.allocation.amounts.eth(amount=0.8000)'],
+      ['signature', `1.5000${NBSP}ETH`],
+      ['chrono', `0.8000${NBSP}ETH`],
       ['endurance', 'home.observatory.standings.cstPlusNft'],
-      ['stellar-eth', 'home.allocation.amounts.eth(amount=0.4000)'],
+      ['stellar-eth', `0.4000${NBSP}ETH`],
       ['stellar-nft', 'home.observatory.standings.cstPlusNft'],
-      ['cosmic-anchor', 'home.allocation.amounts.eth(amount=0.6000)'],
+      ['cosmic-anchor', `0.6000${NBSP}ETH`],
       ['rwlk-anchor', 'home.observatory.standings.cstPlusNft'],
-      ['public-goods', 'home.allocation.amounts.eth(amount=0.7000)'],
-      ['next-cycle', 'home.allocation.amounts.eth(amount=5.0000)'],
+      ['public-goods', `0.7000${NBSP}ETH`],
+      ['next-cycle', `5.0000${NBSP}ETH`],
     ] as const;
 
     for (const [key, amount] of expected) {
-      expect(
-        within(screen.getByTestId(`ledger-track-${key}`)).getByText(amount),
-      ).toBeInTheDocument();
+      expect(screen.getByTestId(`ledger-track-${key}`).textContent).toContain(amount);
     }
   });
 
@@ -57,33 +57,33 @@ describe('AllocationLedger', () => {
     ).toHaveAttribute('href', '/current-cycle#allocation-breakdown');
   });
 
-  it('links high-context tracks to their relevant detail pages', () => {
+  it('links high-context tracks by name, with the definition beside the link rather than in it', () => {
     render(<AllocationLedger data={makeData()} />);
 
-    expect(within(screen.getByTestId('ledger-track-signature')).getByRole('link')).toHaveAttribute(
-      'href',
-      '/current-cycle',
-    );
-    expect(within(screen.getByTestId('ledger-track-chrono')).getByRole('link')).toHaveAttribute(
-      'href',
-      '/faq#chrono-warrior',
-    );
-    expect(
-      within(screen.getByTestId('ledger-track-public-goods')).getByRole('link'),
-    ).toHaveAttribute('href', '/public-goods-contributions-cg');
+    for (const [key, href] of [
+      ['signature', '/current-cycle'],
+      ['chrono', '/faq#chrono-warrior'],
+      ['public-goods', '/public-goods-contributions-cg'],
+    ] as const) {
+      const track = screen.getByTestId(`ledger-track-${key}`);
+      const link = within(track).getByRole('link');
+      expect(link).toHaveAttribute('href', href);
+      // An explanation button nested inside a link is not operable on its own.
+      expect(link.querySelector('button')).toBeNull();
+      expect(within(track).getByRole('button', { name: /more information/i })).toBeVisible();
+    }
+    expect(within(screen.getByTestId('ledger-track-stellar-eth')).queryByRole('link')).toBeNull();
   });
 
-  it('uses a single-row desktop grid and a horizontal snap strip below xl', () => {
+  it('sets the tracks as a ruled list in one, two or three columns', () => {
     render(<AllocationLedger data={makeData()} />);
 
-    expect(screen.getByTestId('allocation-ledger-list')).toHaveClass(
-      'flex',
-      'overflow-x-auto',
-      'snap-x',
-      'xl:grid',
-      'xl:grid-cols-9',
-      'xl:overflow-visible',
-    );
+    const list = screen.getByTestId('allocation-ledger-list');
+    expect(list).toHaveClass('grid', 'sm:grid-cols-2', 'xl:grid-cols-3');
+    expect(list).not.toHaveClass('overflow-x-auto');
+    for (const row of within(list).getAllByRole('listitem')) {
+      expect(row).toHaveClass('border-t', 'border-rule-faint');
+    }
   });
 
   it('omits the next-cycle amount when the live percentage set is incomplete', () => {
@@ -91,13 +91,11 @@ describe('AllocationLedger', () => {
     expect(screen.queryByTestId('ledger-track-next-cycle')).not.toBeInTheDocument();
   });
 
-  it('renders stable zero values while live data is unavailable', () => {
+  it('reads amounts as pending, never as 0 ETH, before the dashboard arrives', () => {
     render(<AllocationLedger data={null} />);
-    expect(
-      within(screen.getByTestId('ledger-track-signature')).getByText(
-        'home.allocation.amounts.eth(amount=0.0000)',
-      ),
-    ).toBeInTheDocument();
+    const signature = screen.getByTestId('ledger-track-signature');
+    expect(signature).not.toHaveTextContent(/0\.0000/);
+    expect(within(signature).getByText('Loading...')).toBeInTheDocument();
     expect(screen.queryByTestId('ledger-track-next-cycle')).not.toBeInTheDocument();
   });
 

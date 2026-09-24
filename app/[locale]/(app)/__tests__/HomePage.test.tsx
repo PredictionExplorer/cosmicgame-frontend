@@ -643,16 +643,8 @@ describe('HomePage', () => {
 
     await openDisclosure(user, 'allocations-disclosure');
 
-    expect(
-      within(screen.getByTestId('ledger-track-signature')).getByText(
-        'home.allocation.amounts.eth(amount=1.5000)',
-      ),
-    ).toBeInTheDocument();
-    expect(
-      within(screen.getByTestId('ledger-track-public-goods')).getByText(
-        'home.allocation.amounts.eth(amount=0.7000)',
-      ),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId('ledger-track-signature')).toHaveTextContent('1.5000 ETH');
+    expect(screen.getByTestId('ledger-track-public-goods')).toHaveTextContent('0.7000 ETH');
     // The full percentage set is present, so the rollover chip appears too.
     expect(screen.getByTestId('ledger-track-next-cycle')).toBeInTheDocument();
     expect(

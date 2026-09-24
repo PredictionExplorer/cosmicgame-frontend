@@ -26,7 +26,7 @@ export function ParticipationGuide({ className }: ParticipationGuideProps) {
           <li key={step} className="flex min-w-0 items-start gap-3">
             <span
               aria-hidden="true"
-              className="flex size-6 shrink-0 items-center justify-center rounded-full border border-white/15 text-xs font-medium tabular-nums text-muted-foreground"
+              className="flex size-6 shrink-0 items-center justify-center type-caption rounded-full border border-rule tabular-nums text-muted-foreground"
             >
               {index + 1}
             </span>

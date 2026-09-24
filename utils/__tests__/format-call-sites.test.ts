@@ -56,8 +56,6 @@ const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
   'components/home/experimental/DeckMiniBar.tsx': 1,
   'components/home/experimental/DeckPersonalStrip.tsx': 3,
   'components/home/experimental/GestureStatus.tsx': 6,
-  'components/home/HomeObservatoryHero.tsx': 1,
-  'components/home/observatory/AllocationLedger.tsx': 1,
   'components/home/PublicGoodsImpactCard.tsx': 2,
   'components/home/RoundInfoSection.tsx': 1,
   'components/marketing/MarketingStats.tsx': 1,
@@ -85,7 +83,6 @@ const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
 const LOCAL_AMOUNT_FORMATTER = /\b(?:function|const)\s+format(?:Eth|Cst|CST|EthValue|Amount)\b/;
 const LOCAL_AMOUNT_FORMATTER_BASELINE: readonly string[] = [
   'app/[locale]/(app)/gesture/[id]/GesturePage.tsx',
-  'components/home/HomeObservatoryHero.tsx',
 ];
 
 const fixedDecimalCount = (file: string): number =>

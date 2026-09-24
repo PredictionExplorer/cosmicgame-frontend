@@ -5,10 +5,12 @@ import { ArrowRight, Fingerprint, Orbit, Radio, Sparkles } from 'lucide-react';
 import { LazyMotion, domAnimation, m } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { formatId, getAssetsUrl, toIntlLocale } from '@/utils';
+import { formatId, getAssetsUrl } from '@/utils';
 
+import { formatCount, formatPercent } from '@/utils/format';
 import { PublicGoodsIcon } from '@/lib/conceptIcons';
 import { Link } from '@/i18n/navigation';
+import { Amount } from '@/components/ui/amount';
 import { Button } from '@/components/ui/button';
 import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
 import { GradientText } from '@/components/ui/gradient-text';
@@ -48,13 +50,12 @@ const storyCards = [
 ] as const;
 
 const toneClasses: Record<(typeof storyCards)[number]['tone'], string> = {
-  aurora:
-    'border-[rgb(var(--aurora-cyan-rgb)/0.22)] bg-[rgb(var(--aurora-cyan-rgb)/0.08)] text-primary',
-  nebula:
-    'border-[rgb(var(--nebula-violet-rgb)/0.24)] bg-[rgb(var(--nebula-violet-rgb)/0.10)] text-[rgb(var(--nebula-violet-rgb))]',
-  impact:
-    'border-[rgb(var(--impact-green-rgb)/0.24)] bg-[rgb(var(--impact-green-rgb)/0.10)] text-[rgb(var(--impact-green-rgb))]',
+  aurora: 'text-primary',
+  nebula: 'text-nebula-violet',
+  impact: 'text-impact-green',
 };
+
+const STAT_CLASS = 'min-w-0 rounded-control border border-rule-faint bg-surface-sunken p-3';
 
 function getHeroPhaseView(phase: CyclePhase) {
   switch (phase) {
@@ -64,7 +65,7 @@ function getHeroPhaseView(phase: CyclePhase) {
         headlineUsesCycleLabel: false,
         bodyUsesCycleLabel: true,
         badgeDotClass: 'bg-[rgb(var(--impact-green-rgb))] animate-live-dot',
-        bodyClass: 'text-foreground/90 font-medium sm:text-xl',
+        bodyClass: 'text-foreground',
       };
     case 'waiting-first-gesture':
       return {
@@ -72,7 +73,7 @@ function getHeroPhaseView(phase: CyclePhase) {
         headlineUsesCycleLabel: true,
         bodyUsesCycleLabel: false,
         badgeDotClass: 'bg-[rgb(var(--impact-green-rgb))] animate-live-dot',
-        bodyClass: 'text-foreground/90 font-medium sm:text-xl',
+        bodyClass: 'text-foreground',
       };
     case 'confirming':
       return {
@@ -80,7 +81,7 @@ function getHeroPhaseView(phase: CyclePhase) {
         headlineUsesCycleLabel: false,
         bodyUsesCycleLabel: false,
         badgeDotClass: 'bg-primary animate-pulse-glow',
-        bodyClass: 'text-foreground/90 font-medium sm:text-xl',
+        bodyClass: 'text-foreground',
       };
     case 'ready-to-finalize':
       return {
@@ -88,7 +89,7 @@ function getHeroPhaseView(phase: CyclePhase) {
         headlineUsesCycleLabel: false,
         bodyUsesCycleLabel: false,
         badgeDotClass: 'bg-[rgb(var(--impact-green-rgb))] animate-signature-pulse',
-        bodyClass: 'text-foreground/90 font-medium sm:text-xl',
+        bodyClass: 'text-foreground',
       };
     case 'final-hour':
     case 'final-ten':
@@ -98,7 +99,7 @@ function getHeroPhaseView(phase: CyclePhase) {
         headlineUsesCycleLabel: false,
         bodyUsesCycleLabel: false,
         badgeDotClass: 'bg-[rgb(var(--chrono-rose-rgb))] animate-pulse-glow',
-        bodyClass: 'text-foreground/90',
+        bodyClass: 'text-foreground',
       };
     case 'loading':
       return {
@@ -113,7 +114,7 @@ function getHeroPhaseView(phase: CyclePhase) {
         messageKey: 'unavailable',
         headlineUsesCycleLabel: false,
         bodyUsesCycleLabel: false,
-        badgeDotClass: 'bg-white/50',
+        badgeDotClass: 'bg-muted-foreground',
         bodyClass: 'text-muted-foreground',
       };
     case 'approach':
@@ -123,7 +124,7 @@ function getHeroPhaseView(phase: CyclePhase) {
         messageKey: 'live',
         headlineUsesCycleLabel: false,
         bodyUsesCycleLabel: false,
-        badgeDotClass: 'bg-emerald-300 animate-live-dot',
+        badgeDotClass: 'bg-live animate-live-dot',
         bodyClass: 'text-muted-foreground',
       };
   }
@@ -137,24 +138,16 @@ function ObservatoryArtworkUnavailable() {
   const t = useTranslations('home');
 
   return (
-    <div className="relative flex aspect-video min-h-[220px] overflow-hidden rounded-2xl border border-white/[0.08] bg-black/20">
+    <div className="relative flex aspect-video min-h-[220px] overflow-hidden rounded-surface border border-rule-faint bg-surface-sunken">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_28%_20%,rgb(var(--aurora-cyan-rgb)/0.18),transparent_34%),radial-gradient(circle_at_78%_15%,rgb(var(--nebula-violet-rgb)/0.20),transparent_38%)]" />
       <div className="pointer-events-none absolute inset-x-10 top-1/2 h-px -translate-y-1/2 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
       <div className="pointer-events-none absolute left-1/2 top-1/2 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary/20 bg-primary/10 blur-sm" />
       <div className="relative z-[1] m-auto max-w-xs px-6 text-center">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">
-          {t('hero.artUnavailable.eyebrow')}
-        </p>
-        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          {t('hero.artUnavailable.body')}
-        </p>
+        <p className="type-eyebrow text-primary">{t('hero.artUnavailable.eyebrow')}</p>
+        <p className="type-body-sm mt-3 text-muted-foreground">{t('hero.artUnavailable.body')}</p>
       </div>
     </div>
   );
-}
-
-function formatEth(value: number | undefined): string {
-  return `${(value ?? 0).toFixed(4)} ETH`;
 }
 
 function useAnimatedNumber(value: number, durationMs = 650): number {
@@ -251,7 +244,7 @@ export function HomeObservatoryHero({
             <m.div variants={staggerVariants} className="flex min-w-0 flex-col justify-center">
               <m.div
                 variants={itemVariants}
-                className="mb-5 inline-flex w-fit max-w-full items-center gap-2 rounded-full border border-white/[0.10] bg-white/[0.04] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground sm:tracking-[0.22em]"
+                className="type-eyebrow mb-5 inline-flex w-fit max-w-full items-center gap-2 rounded-pill border border-rule bg-surface-sunken px-3 py-1.5 text-muted-foreground"
               >
                 <span className="relative flex h-2 w-2">
                   <span
@@ -268,18 +261,11 @@ export function HomeObservatoryHero({
                 <GradientText
                   as={headingLevel}
                   id="home-observatory-title"
-                  className="font-display text-4xl font-bold leading-[0.96] tracking-tight sm:text-5xl lg:text-6xl"
+                  className="type-display-md"
                 >
                   {headline}
                 </GradientText>
-                <p
-                  className={cn(
-                    'mt-5 max-w-2xl text-base leading-relaxed sm:text-lg',
-                    phaseView.bodyClass,
-                  )}
-                >
-                  {body}
-                </p>
+                <p className={cn('type-body-lg mt-5 max-w-2xl', phaseView.bodyClass)}>{body}</p>
               </m.div>
 
               <m.div
@@ -288,24 +274,19 @@ export function HomeObservatoryHero({
               >
                 {storyCards.map(({ icon: Icon, messageKey, tone }) => (
                   <m.div key={messageKey} variants={itemVariants}>
-                    <Surface
-                      variant="glass"
-                      radius="lg"
-                      padding="md"
-                      className="h-full border-white/[0.08] bg-white/[0.035]"
-                    >
+                    <Surface variant="outlined" padding="md" className="h-full">
                       <div
                         className={cn(
-                          'mb-3 flex h-9 w-9 items-center justify-center rounded-xl border',
+                          'mb-3 flex size-9 items-center justify-center rounded-control border border-rule-faint bg-surface-sunken',
                           toneClasses[tone],
                         )}
                       >
-                        <Icon className="h-4 w-4" />
+                        <Icon className="size-4" aria-hidden />
                       </div>
-                      <h3 className="text-sm font-semibold text-foreground">
+                      <h3 className="type-title text-foreground">
                         {t(`hero.story.${messageKey}.title`)}
                       </h3>
-                      <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                      <p className="type-body-sm mt-2 text-muted-foreground">
                         {t(`hero.story.${messageKey}.body`)}
                       </p>
                     </Surface>
@@ -347,13 +328,13 @@ export function HomeObservatoryHero({
                   <div className="flex items-center gap-3">
                     <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-primary/12 ring-1 ring-primary/20">
                       <Radio className="h-5 w-5 text-primary" />
-                      <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-emerald-400 animate-live-dot" />
+                      <span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-live animate-live-dot" />
                     </div>
                     <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                      <p className="type-eyebrow text-muted-foreground">
                         {t('hero.console.eyebrow')}
                       </p>
-                      <h2 className="font-display text-2xl font-bold tracking-tight">
+                      <h2 className="type-heading-2 text-foreground">
                         {cycleNumber == null
                           ? t('hero.console.cycleLoading')
                           : t('hero.cycleNumber', { number: String(cycleNumber) })}
@@ -362,7 +343,7 @@ export function HomeObservatoryHero({
                   </div>
                   <Link
                     href="/coordination-changes"
-                    className="rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/35 hover:text-primary"
+                    className="type-caption rounded-pill border border-rule-faint bg-surface-sunken px-3 py-1.5 text-muted-foreground transition-colors hover:border-primary/35 hover:text-primary"
                   >
                     {t('hero.console.parameters')}
                   </Link>
@@ -377,7 +358,7 @@ export function HomeObservatoryHero({
                       id: formatId(bannerToken.id),
                     })}
                   >
-                    <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-black/20">
+                    <div className="relative overflow-hidden rounded-surface border border-rule-faint bg-surface-sunken">
                       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_28%_20%,rgb(var(--aurora-cyan-rgb)/0.16),transparent_34%),radial-gradient(circle_at_78%_15%,rgb(var(--nebula-violet-rgb)/0.18),transparent_38%)]" />
                       {/* No `priority`: since the Deck redesign this section renders
                           below the first viewport, so preloading the artwork would
@@ -390,7 +371,7 @@ export function HomeObservatoryHero({
                         className="relative transition-transform duration-700 group-hover:scale-[1.025]"
                       />
                       <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/70 via-black/25 to-transparent px-4 pb-4 pt-12">
-                        <span className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.08] px-3 py-1 text-[11px] font-medium text-white/90 backdrop-blur-sm">
+                        <span className="glass type-caption inline-flex items-center gap-2 rounded-pill border border-rule px-3 py-1 text-foreground">
                           <Sparkles className="h-3.5 w-3.5 text-primary" />
                           {t('hero.console.signatureBadge', { id: formatId(bannerToken.id) })}
                         </span>
@@ -403,29 +384,29 @@ export function HomeObservatoryHero({
                 )}
 
                 <div className="mt-4 grid grid-cols-2 gap-2 min-[400px]:grid-cols-3">
-                  <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-3">
-                    <p className="break-words text-[10px] uppercase tracking-[0.12em] text-muted-foreground sm:tracking-[0.18em]">
+                  <div className={STAT_CLASS}>
+                    <p className="type-eyebrow text-muted-foreground">
                       {t('hero.console.stats.gestures')}
                     </p>
-                    <p className="mt-1 break-words text-lg font-bold tabular-nums">
-                      {Math.round(animatedGestureCount).toLocaleString(toIntlLocale(locale))}
+                    <p className="type-figure-md mt-1 break-words text-foreground">
+                      {formatCount(Math.round(animatedGestureCount), locale)}
                     </p>
                   </div>
-                  <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-3">
-                    <p className="break-words text-[10px] uppercase tracking-[0.12em] text-muted-foreground sm:tracking-[0.18em]">
+                  <div className={STAT_CLASS}>
+                    <p className="type-eyebrow text-muted-foreground">
                       {t('hero.console.stats.signature')}
                     </p>
-                    <p className="mt-1 break-words text-sm font-bold tabular-nums">
-                      {formatEth(animatedSignatureAllocation)}
+                    <p className="type-figure-sm mt-1 break-words text-foreground">
+                      <Amount value={animatedSignatureAllocation} unit="ETH" context="card" />
                     </p>
                   </div>
-                  <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-3">
-                    <p className="break-words text-[10px] uppercase tracking-[0.12em] text-muted-foreground sm:tracking-[0.18em]">
+                  <div className={STAT_CLASS}>
+                    <p className="type-eyebrow text-muted-foreground">
                       {t('hero.console.stats.publicGoods')}
                     </p>
-                    <p className="mt-1 break-words text-sm font-bold tabular-nums">
+                    <p className="type-figure-sm mt-1 break-words text-foreground">
                       {publicGoodsPercentage > 0
-                        ? `${publicGoodsPercentage}%`
+                        ? formatPercent(publicGoodsPercentage, locale)
                         : t('hero.console.stats.publicGoodsFallback')}
                     </p>
                   </div>
@@ -434,7 +415,7 @@ export function HomeObservatoryHero({
                 {hasPreviousCycle ? (
                   <Link
                     href={`/allocation/${previousCycle}`}
-                    className="mt-4 flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.025] px-4 py-3 text-sm text-muted-foreground transition-all duration-300 hover:border-primary/25 hover:bg-white/[0.045] hover:text-primary"
+                    className="type-body-sm mt-4 flex items-center justify-between rounded-control border border-rule-faint bg-surface-sunken px-4 py-3 text-muted-foreground transition-colors duration-[var(--duration-base)] hover:border-primary/25 hover:bg-surface hover:text-primary"
                   >
                     {t('hero.console.previousAllocations', { number: String(previousCycle) })}
                     <ArrowRight className="h-4 w-4" />

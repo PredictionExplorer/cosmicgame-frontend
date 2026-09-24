@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import type { ComponentType, ReactNode, SVGProps } from 'react';
 import { ArrowRight, ImageIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -14,6 +14,7 @@ import {
   SignatureAllocationIcon,
   StellarSelectionIcon,
 } from '@/lib/conceptIcons';
+import { Amount } from '@/components/ui/amount';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Link } from '@/i18n/navigation';
 import { deriveAllocationTrackAmounts } from '@/lib/allocationTracks';
@@ -21,59 +22,69 @@ import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
 import type { DashboardInfo } from '@/services/api';
 
+import { ValuePending } from './ValuePending';
+
 export interface AllocationLedgerProps {
   data: DashboardInfo | null;
   className?: string;
 }
 
+type TrackIcon = ComponentType<SVGProps<SVGSVGElement>>;
+
 interface LedgerTrack {
   key: string;
-  icon: ReactNode;
+  icon: TrackIcon;
   name: string;
   tooltip: string;
-  amount: string;
+  /** ETH for the track, or a fixed description for the CST + NFT tracks. */
+  amount: { eth: number } | { text: string };
   detail: string;
   href?: string;
-  tone?: 'signature' | 'impact' | 'default';
+  tone?: 'signature' | 'impact';
 }
 
+const ICON_TONE: Record<NonNullable<LedgerTrack['tone']> | 'default', string> = {
+  signature: 'text-primary',
+  impact: 'text-impact-green',
+  default: 'text-subtle',
+};
+
 /**
- * Border-divided allocation ledger for the home control desk.
- *
- * Every live amount is visible in one compact desktop row. Phones retain the
- * same complete dataset in a horizontal snap strip rather than duplicating a
- * second full allocation-card section lower on the page.
+ * Every allocation track of the cycle as one ruled ledger: the track, who it
+ * goes to, and its live amount in tabular figures. One column on phones, two
+ * from tablets up, three on wide screens. Each name opens its detail page
+ * where there is one, and each carries its definition beside it; a figure the
+ * dashboard has not reported yet reads as pending, never as 0 ETH.
  */
 export function AllocationLedger({ data, className }: AllocationLedgerProps) {
   const t = useTranslations('home');
   const amounts = deriveAllocationTrackAmounts(data);
-  const ethAmount = (value: number) => t('allocation.amounts.eth', { amount: value.toFixed(4) });
-  const cstPlusNft = t('observatory.standings.cstPlusNft');
+  const cstPlusNft = { text: t('observatory.standings.cstPlusNft') };
   const recipients = (count: number) => t('allocation.recipientCount', { count });
 
   const tracks: LedgerTrack[] = [
     {
       key: 'signature',
-      icon: <SignatureAllocationIcon className="h-3.5 w-3.5" aria-hidden />,
+      icon: SignatureAllocationIcon,
       name: t('allocation.cards.signature.name'),
       tooltip: t('allocation.cards.signature.tooltip'),
-      amount: ethAmount(amounts.signatureEth),
+      amount: { eth: amounts.signatureEth },
       detail: recipients(1),
       href: '/current-cycle',
       tone: 'signature',
     },
     {
       key: 'chrono',
-      icon: <ChronoWarriorIcon className="h-3.5 w-3.5" aria-hidden />,
+      icon: ChronoWarriorIcon,
       name: t('allocation.cards.chronoWarrior.name'),
       tooltip: t('allocation.cards.chronoWarrior.tooltip'),
-      amount: ethAmount(amounts.chronoEth),
+      amount: { eth: amounts.chronoEth },
       detail: recipients(1),
       href: '/faq#chrono-warrior',
     },
     {
       key: 'endurance',
-      icon: <EnduranceChampionIcon className="h-3.5 w-3.5" aria-hidden />,
+      icon: EnduranceChampionIcon,
       name: t('allocation.cards.endurance.name'),
       tooltip: t('allocation.cards.endurance.tooltip'),
       amount: cstPlusNft,
@@ -82,15 +93,15 @@ export function AllocationLedger({ data, className }: AllocationLedgerProps) {
     },
     {
       key: 'stellar-eth',
-      icon: <StellarSelectionIcon className="h-3.5 w-3.5" aria-hidden />,
+      icon: StellarSelectionIcon,
       name: t('allocation.cards.ethStellar.name'),
       tooltip: t('allocation.cards.ethStellar.tooltip'),
-      amount: ethAmount(amounts.stellarEth),
+      amount: { eth: amounts.stellarEth },
       detail: recipients(amounts.stellarEthRecipients),
     },
     {
       key: 'stellar-nft',
-      icon: <ImageIcon className="h-3.5 w-3.5" aria-hidden />,
+      icon: ImageIcon,
       name: t('allocation.cards.nftStellar.name'),
       tooltip: t('allocation.cards.nftStellar.tooltip'),
       amount: cstPlusNft,
@@ -98,16 +109,16 @@ export function AllocationLedger({ data, className }: AllocationLedgerProps) {
     },
     {
       key: 'cosmic-anchor',
-      icon: <AnchorDistributionIcon className="h-3.5 w-3.5" aria-hidden />,
+      icon: AnchorDistributionIcon,
       name: t('allocation.cards.cosmicAnchor.name'),
       tooltip: t('allocation.cards.cosmicAnchor.tooltip'),
-      amount: ethAmount(amounts.cosmicAnchorEth),
+      amount: { eth: amounts.cosmicAnchorEth },
       detail: t('allocation.cards.cosmicAnchor.recipientLabel'),
       href: '/anchoring',
     },
     {
       key: 'rwlk-anchor',
-      icon: <AnchoringIcon className="h-3.5 w-3.5" aria-hidden />,
+      icon: AnchoringIcon,
       name: t('allocation.cards.randomWalkAnchor.name'),
       tooltip: t('allocation.cards.randomWalkAnchor.tooltip'),
       amount: cstPlusNft,
@@ -116,12 +127,12 @@ export function AllocationLedger({ data, className }: AllocationLedgerProps) {
     },
     {
       key: 'public-goods',
-      icon: <PublicGoodsIcon className="h-3.5 w-3.5" aria-hidden />,
+      icon: PublicGoodsIcon,
       name: t('allocation.cards.publicGoods.name'),
       tooltip: t('allocation.cards.publicGoods.tooltip', {
         percent: String(data?.CharityPercentage ?? 0),
       }),
-      amount: ethAmount(amounts.publicGoodsEth),
+      amount: { eth: amounts.publicGoodsEth },
       detail: t('allocation.cards.publicGoods.recipientLabel'),
       href: '/public-goods-contributions-cg',
       tone: 'impact',
@@ -130,118 +141,98 @@ export function AllocationLedger({ data, className }: AllocationLedgerProps) {
       ? [
           {
             key: 'next-cycle',
-            icon: <CompoundingReserveIcon className="h-3.5 w-3.5" aria-hidden />,
+            icon: CompoundingReserveIcon,
             name: t('observatory.ribbon.nextCycleName'),
             tooltip: t('observatory.ribbon.nextCycleTooltip'),
-            amount: ethAmount(amounts.nextCycleEth),
+            amount: { eth: amounts.nextCycleEth },
             detail: t('observatory.ribbon.nextCycleDetail'),
           } satisfies LedgerTrack,
         ]
       : []),
   ];
 
+  const amountOf = (track: LedgerTrack): ReactNode => {
+    if ('text' in track.amount) {
+      return <span className="type-label text-muted-foreground">{track.amount.text}</span>;
+    }
+    return data ? (
+      <Amount value={track.amount.eth} unit="ETH" context="card" />
+    ) : (
+      <ValuePending ch={10} />
+    );
+  };
+
   return (
     <section
       id="allocation-ledger"
       aria-labelledby="allocation-ledger-title"
       data-testid="allocation-ledger"
-      className={cn('min-w-0 border-t border-white/[0.08]', className)}
+      className={cn('min-w-0 px-5 pb-5 pt-4 sm:px-6', className)}
     >
-      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-3 py-1">
-        <div className="flex min-w-0 items-center gap-2">
-          <h2
-            id="allocation-ledger-title"
-            className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground"
-          >
+      <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+        <div className="flex min-w-0 items-center gap-1.5">
+          <h2 id="allocation-ledger-title" className="type-label text-foreground">
             {t('observatory.ribbon.title')}
           </h2>
-          <InfoTooltip content={t('observatory.ribbon.tooltip')} />
-          <span className="hidden text-[10px] text-muted-foreground/70 sm:inline">
-            {t('observatory.ribbon.subtitle')}
-          </span>
+          <InfoTooltip
+            content={t('observatory.ribbon.tooltip')}
+            label={t('observatory.ribbon.title')}
+          />
         </div>
         <Link
           href="/current-cycle#allocation-breakdown"
           className={cn(
-            'inline-flex items-center gap-1 text-[10px] font-semibold text-primary transition hover:text-foreground',
+            'link-quiet type-label inline-flex items-center gap-1 text-primary',
             TOUCH_TARGET_TEXT_LINK_CLASS,
           )}
         >
           {t('observatory.ribbon.fullBreakdown')}
-          <ArrowRight className="h-3 w-3" aria-hidden />
+          <ArrowRight className="size-3.5" aria-hidden />
         </Link>
-      </div>
+      </header>
+      <p className="type-caption mt-0.5 text-subtle">{t('observatory.ribbon.subtitle')}</p>
 
       <ul
+        role="list"
         data-testid="allocation-ledger-list"
-        className="flex snap-x snap-mandatory overflow-x-auto border-t border-white/[0.06] xl:grid xl:grid-cols-9 xl:snap-none xl:overflow-visible"
+        className="mt-3 grid gap-x-8 sm:grid-cols-2 xl:grid-cols-3"
       >
         {tracks.map((track) => {
-          const content = (
-            <>
-              <span className="flex items-start gap-1.5">
-                <span
-                  className={cn(
-                    'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded',
-                    track.tone === 'signature'
-                      ? 'bg-primary/12 text-primary'
-                      : track.tone === 'impact'
-                        ? 'bg-[rgb(var(--impact-green-rgb)/0.12)] text-[rgb(var(--impact-green-rgb))]'
-                        : 'bg-white/[0.05] text-muted-foreground',
-                  )}
-                >
-                  {track.icon}
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="flex items-start gap-1">
-                    <span className="min-w-0 break-words text-[10px] font-semibold leading-tight text-foreground">
-                      {track.name}
-                    </span>
-                    <InfoTooltip content={track.tooltip} className="ml-auto shrink-0" />
-                  </span>
-                  <span
-                    className={cn(
-                      'mt-0.5 block text-xs font-bold tabular-nums',
-                      track.tone === 'signature'
-                        ? 'text-primary'
-                        : track.tone === 'impact'
-                          ? 'text-[rgb(var(--impact-green-rgb))]'
-                          : 'text-foreground/90',
-                    )}
-                  >
-                    {track.amount}
-                  </span>
-                  <span className="mt-0.5 block break-words text-[9px] leading-tight text-muted-foreground">
-                    {track.detail}
-                  </span>
-                </span>
-              </span>
-            </>
-          );
-
+          const Icon = track.icon;
           return (
             <li
               key={track.key}
               data-testid={`ledger-track-${track.key}`}
-              className={cn(
-                'min-w-[10rem] flex-1 snap-start border-r border-white/[0.06] last:border-r-0 xl:min-w-0',
-                track.tone === 'signature'
-                  ? 'bg-primary/[0.035]'
-                  : track.tone === 'impact'
-                    ? 'bg-[rgb(var(--impact-green-rgb)/0.025)]'
-                    : 'bg-black/[0.06]',
-              )}
+              className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-baseline gap-x-3 border-t border-rule-faint py-2.5"
             >
-              {track.href ? (
-                <Link
-                  href={track.href}
-                  className="block h-full p-2 transition-colors hover:bg-white/[0.035]"
-                >
-                  {content}
-                </Link>
-              ) : (
-                <div className="h-full p-2">{content}</div>
-              )}
+              <Icon
+                className={cn(
+                  'size-4 shrink-0 translate-y-0.5',
+                  ICON_TONE[track.tone ?? 'default'],
+                )}
+                aria-hidden
+              />
+              <span className="min-w-0">
+                <span className="flex min-w-0 items-center gap-1">
+                  {track.href ? (
+                    <Link
+                      href={track.href}
+                      className="link-quiet type-label min-w-0 break-words text-foreground"
+                    >
+                      {track.name}
+                    </Link>
+                  ) : (
+                    <span className="type-label min-w-0 break-words text-foreground">
+                      {track.name}
+                    </span>
+                  )}
+                  <InfoTooltip content={track.tooltip} label={track.name} className="shrink-0" />
+                </span>
+                <span className="type-caption block text-subtle">{track.detail}</span>
+              </span>
+              <span className="type-figure-sm whitespace-nowrap text-end text-foreground">
+                {amountOf(track)}
+              </span>
             </li>
           );
         })}
