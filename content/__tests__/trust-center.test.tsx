@@ -300,6 +300,27 @@ describe('Terms of Service', () => {
     expect(within(table).getAllByText('10 × 1,000')).toHaveLength(2);
   });
 
+  // On phones the table became eleven four-row records, about 2,100px of mostly
+  // empty cells; phones get one line per track instead, and the table from sm.
+  it('gives phones one summary line per track instead of the table', () => {
+    render(PAGES.terms('en'));
+    const table = screen.getByRole('table', { name: 'The allocation tracks at a glance' });
+    expect(table.closest('[class*="max-sm:hidden"]')).not.toBeNull();
+    const summary = document.querySelector('[data-allocations-summary]');
+    expect(summary).toHaveClass('sm:hidden');
+    const lines = Array.from(summary?.querySelectorAll(':scope > div') ?? []);
+    expect(lines).toHaveLength(11);
+    const signature = lines[0]?.querySelector('dd');
+    expect(signature).toHaveTextContent(
+      `ETH ${protocolFacts.mainEthPercentage}% · CST ${protocolFacts.specialAllocationCst.toLocaleString('en')} · NFT 1`,
+    );
+    // A track without a figure in a column says nothing for it, rather than a dash.
+    const publicGoods = lines.find((line) => line.textContent?.includes('Public Goods'));
+    expect(publicGoods?.querySelector('dd')?.textContent).not.toMatch(/CST|NFT|—/);
+    // Each line links the clause that states the track's rule.
+    expect(lines[0]?.querySelector('a')).toHaveAttribute('href', '#allocations-signature');
+  });
+
   it('links the licence, the notices and the contact channels', () => {
     render(PAGES.terms('en'));
     expect(screen.getByRole('link', { name: /^LICENSE/ }).getAttribute('href')).toMatch(
