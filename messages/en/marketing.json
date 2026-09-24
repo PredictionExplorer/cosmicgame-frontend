@@ -4,18 +4,18 @@
     "steps": {
       "promote": {
         "title": "Promote",
-        "description": "Share Cosmic Signature across social media, blogs, and communities.",
-        "detail": "Create content, share referral links, write blog posts, or produce videos about Cosmic Signature to qualify."
+        "description": "Tell people about Cosmic Signature on social media, blogs and in communities.",
+        "detail": "Posts, referral links, articles and videos all count."
       },
       "verify": {
         "title": "Get verified",
-        "description": "Our team reviews and verifies your promotional activity.",
-        "detail": "The team reviews the reach, quality, and authenticity of your outreach before approving an allocation."
+        "description": "Our team checks your outreach.",
+        "detail": "It looks at reach, quality and authenticity before approving an allocation."
       },
       "receive": {
         "title": "Receive CST",
-        "description": "Receive CST token allocations directly to your wallet.",
-        "detail": "Once verified, CST tokens are sent on-chain to your wallet address. Allocations scale with the impact of your outreach."
+        "description": "The allocation arrives as CST in your wallet.",
+        "detail": "It is sent on-chain once your outreach is verified, and its size reflects the outreach's impact."
       }
     },
     "description": "Three steps, from telling people about Cosmic Signature to CST in your wallet."

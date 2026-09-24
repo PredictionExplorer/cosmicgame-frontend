@@ -5,17 +5,17 @@
       "promote": {
         "title": "开展推广",
         "description": "在社交平台、博客和社区中介绍 Cosmic Signature。",
-        "detail": "可创作内容、分享推荐链接、撰写博客文章或制作视频，参与 Cosmic Signature 推广。"
+        "detail": "文章、推荐链接、博客与视频均可。"
       },
       "verify": {
         "title": "接受核验",
-        "description": "团队会审阅并核验推广行动。",
-        "detail": "推广团队会综合评估传播范围、内容质量与真实性，再确认相应分配。"
+        "description": "团队会核验推广行动。",
+        "detail": "确认分配前，会评估传播范围、内容质量与真实性。"
       },
       "receive": {
         "title": "获得 CST",
-        "description": "CST 分配会直接发放至钱包。",
-        "detail": "核验完成后，CST 将通过链上交易发送至钱包地址；分配额会参考推广行动的实际影响。"
+        "description": "分配以 CST 直接发放至钱包。",
+        "detail": "核验完成后通过链上交易发送，分配额取决于推广的实际影响。"
       }
     },
     "description": "通过 3 个步骤参与 Cosmic Signature 推广并获得分配。"

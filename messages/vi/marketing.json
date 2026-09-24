@@ -4,18 +4,18 @@
     "steps": {
       "promote": {
         "title": "Giới thiệu",
-        "description": "Chia sẻ Cosmic Signature trên mạng xã hội, blog và các cộng đồng.",
-        "detail": "Tạo nội dung, chia sẻ liên kết giới thiệu, viết bài blog hoặc làm video về Cosmic Signature để đủ điều kiện."
+        "description": "Giới thiệu Cosmic Signature trên mạng xã hội, blog và các cộng đồng.",
+        "detail": "Bài đăng, liên kết giới thiệu, bài viết và video đều được tính."
       },
       "verify": {
         "title": "Xác minh hoạt động",
-        "description": "Đội ngũ xem xét và xác minh hoạt động giới thiệu của bạn.",
-        "detail": "Đội ngũ truyền thông đánh giá độ lan tỏa, chất lượng và tính xác thực của hoạt động giới thiệu trước khi duyệt phân bổ."
+        "description": "Đội ngũ xác minh hoạt động giới thiệu của bạn.",
+        "detail": "Trước khi duyệt phân bổ, đội ngũ đánh giá độ lan tỏa, chất lượng và tính xác thực."
       },
       "receive": {
         "title": "Nhận CST",
-        "description": "Nhận phân bổ token CST trực tiếp vào ví của bạn.",
-        "detail": "Sau khi được xác minh, token CST được gửi trên chuỗi đến địa chỉ ví của bạn. Mức phân bổ tăng theo tác động của hoạt động truyền thông."
+        "description": "Phân bổ được gửi bằng CST thẳng vào ví của bạn.",
+        "detail": "Token được gửi trên chuỗi sau khi xác minh, và mức phân bổ tùy theo tác động của hoạt động giới thiệu."
       }
     },
     "description": "Ba bước, từ giới thiệu Cosmic Signature đến khi CST về ví của bạn."

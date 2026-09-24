@@ -5,17 +5,17 @@
       "promote": {
         "title": "알리기",
         "description": "소셜 미디어, 블로그, 커뮤니티에서 Cosmic Signature를 소개합니다.",
-        "detail": "콘텐츠 제작, 추천 링크 공유, 블로그 글 작성, 영상 제작 등 Cosmic Signature를 알리는 활동이면 자격이 됩니다."
+        "detail": "게시물, 추천 링크, 글, 영상 모두 해당됩니다."
       },
       "verify": {
         "title": "검증받기",
-        "description": "팀이 홍보 활동을 검토하고 검증합니다.",
-        "detail": "홍보 팀이 홍보 활동의 도달 범위, 품질, 진정성을 평가한 뒤 홍보 배분을 승인합니다."
+        "description": "팀이 홍보 활동을 검증합니다.",
+        "detail": "배분을 승인하기 전에 도달 범위, 품질, 진정성을 평가합니다."
       },
       "receive": {
         "title": "CST 받기",
-        "description": "CST 홍보 배분이 지갑으로 직접 전달됩니다.",
-        "detail": "검증이 끝나면 CST가 온체인으로 지갑 주소에 전송됩니다. 배분 규모는 홍보 활동의 영향력에 따라 달라집니다."
+        "description": "홍보 배분이 CST로 지갑에 직접 전달됩니다.",
+        "detail": "검증이 끝나면 온체인으로 전송되며, 배분 규모는 홍보 활동의 영향력에 따라 달라집니다."
       }
     },
     "description": "Cosmic Signature를 알리는 일부터 지갑으로 CST를 받기까지 세 단계입니다."
