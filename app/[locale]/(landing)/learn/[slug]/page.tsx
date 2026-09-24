@@ -300,20 +300,30 @@ export default async function LearnArticlePage({ params }: PageProps) {
               </div>
               <div>
                 <h2 className="type-label text-subtle">{articleUi.verifyLinksLabel}</h2>
-                <ul className="mt-3 grid grid-cols-2 gap-2">
+                <ul className="mt-3 divide-y divide-rule-faint border-y border-rule-faint">
                   {VERIFY_ROUTES.map((routeId) => {
                     const route = getSiteRoute(routeId);
                     const target = resolveRouteHref(route, 'landing', locale);
                     const Icon = SITE_ROUTE_ICONS[routeId];
                     return (
-                      <li key={routeId} className="min-w-0">
+                      <li key={routeId}>
                         <SiteLink
                           href={target.href}
                           kind={target.kind}
-                          className="flex min-h-11 items-center gap-2 rounded-control border border-rule px-3 py-2 type-label text-muted-foreground transition-colors duration-fast hover:border-input hover:text-foreground"
+                          className="group flex min-h-11 items-center gap-3 py-2.5 type-body-sm text-foreground hover:text-primary"
+                          externalIconClassName="ml-auto"
                         >
-                          <Icon aria-hidden className="size-4 shrink-0 text-subtle" />
+                          <Icon
+                            aria-hidden
+                            className="size-4 shrink-0 text-subtle transition-colors group-hover:text-primary"
+                          />
                           <span className="min-w-0">{nav(`routes.${routeId}.label`)}</span>
+                          {target.kind === 'external' ? null : (
+                            <ArrowRight
+                              aria-hidden
+                              className="ml-auto size-3.5 shrink-0 text-subtle transition-colors group-hover:text-primary"
+                            />
+                          )}
                         </SiteLink>
                       </li>
                     );
