@@ -21,10 +21,17 @@ export const CYCLE_SECTIONS = [
 ] as const;
 
 /**
- * What every section above needs, so a jump lands below the site header and
- * this bar rather than under them.
+ * What every section above needs, so a jump lands its heading just below
+ * this bar. The page's scroll padding (`--sticky-offset`) already clears the
+ * site header; the margin adds the bar (at most 2.75rem, its phone touch
+ * height) and a 0.75rem gap, so the end of the previous section never shows
+ * between the bar and the heading.
  */
-export const CYCLE_SECTION_SCROLL_MARGIN = 'scroll-mt-[calc(var(--header-height)+4.5rem)]';
+export const CYCLE_SECTION_SCROLL_MARGIN = 'scroll-mt-[3.5rem]';
+
+/** The reading band, 25–35% down the viewport: a section crossing it is the one being read. */
+const READING_BAND_MARGIN = '-25% 0px -65% 0px';
+const READING_BAND_BOTTOM = 0.35;
 
 /** Whether the bar is stuck under the site header (its sentinel scrolled past it). */
 function useStuck() {
@@ -70,17 +77,32 @@ export function CycleSectionNav({ hasStandings }: { hasStandings: boolean }) {
   const [active, setActive] = useState<string | null>(null);
   const ids = sections.map((section) => section.id).join(' ');
 
-  // The entry for the section in the reading band is the current one.
+  // The first section (in page order) crossing the reading band is the
+  // current one. In a gap between sections the one above stays current; above
+  // the first section (the page header) none is.
   useEffect(() => {
     if (typeof IntersectionObserver === 'undefined') return;
+    const order = ids.split(' ');
+    const crossing = new Set<string>();
     const observer = new IntersectionObserver(
       (entries) => {
-        const visible = entries.find((entry) => entry.isIntersecting);
-        if (visible) setActive(visible.target.id);
+        for (const entry of entries) {
+          if (entry.isIntersecting) crossing.add(entry.target.id);
+          else crossing.delete(entry.target.id);
+        }
+        const current = order.find((id) => crossing.has(id));
+        if (current) {
+          setActive(current);
+          return;
+        }
+        const first = order.map((id) => document.getElementById(id)).find(Boolean);
+        if (first && first.getBoundingClientRect().top > window.innerHeight * READING_BAND_BOTTOM) {
+          setActive(null);
+        }
       },
-      { rootMargin: '-25% 0px -65% 0px' },
+      { rootMargin: READING_BAND_MARGIN },
     );
-    for (const id of ids.split(' ')) {
+    for (const id of order) {
       const element = document.getElementById(id);
       if (element) observer.observe(element);
     }

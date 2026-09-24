@@ -5,6 +5,7 @@ import { render, screen, checkA11y, fireEvent, within } from '@/test-utils';
 import { AttachedTokensSection, ATTACHED_NFTS_PER_PAGE } from '../components/AttachedTokensSection';
 import { CycleAllocations } from '../components/CycleAllocations';
 import { CycleRules } from '../components/CycleRules';
+import { CYCLE_SECTION_SCROLL_MARGIN } from '../components/CycleSectionNav';
 
 jest.mock('../components/AttachedNftPlate', () => ({
   AttachedNftPlate: ({ nft }: { nft: { RecordId: number } }) => (
@@ -197,9 +198,7 @@ describe('CycleRules', () => {
     );
     expect(screen.getByText(/anchorHolders=1,200/)).toBeInTheDocument();
     // The section is a target of the page's section bar.
-    expect(document.getElementById('rules')).toHaveClass(
-      'scroll-mt-[calc(var(--header-height)+4.5rem)]',
-    );
+    expect(document.getElementById('rules')).toHaveClass(CYCLE_SECTION_SCROLL_MARGIN);
   });
 
   it('reads the rules from the live parameters and links to the full explanation', () => {
