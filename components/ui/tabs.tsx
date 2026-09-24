@@ -33,9 +33,11 @@ const tabsListVariants = cva('min-w-0 items-center text-muted-foreground', {
   variants: {
     variant: {
       // The list is content-height below `sm` so its triggers can reach the
-      // 44px touch target; a fixed height would pin them to 32px.
-      segmented:
-        'inline-flex h-auto justify-center gap-1 rounded-control border border-rule-faint bg-surface-sunken p-1',
+      // 44px touch target; a fixed height would pin them to 32px. The sunken
+      // fill alone draws the track: a default border would survive a
+      // caller's `border-b` (tailwind-merge keeps both) and box in lists
+      // that reshape themselves into a rule.
+      segmented: 'inline-flex h-auto justify-center gap-1 rounded-control bg-surface-sunken p-1',
       underline: 'flex h-auto justify-start gap-1 border-b border-rule',
       pills: 'flex h-auto flex-wrap justify-start gap-2',
     },

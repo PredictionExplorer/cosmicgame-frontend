@@ -28,6 +28,15 @@ function renderTabs(props: Partial<React.ComponentProps<typeof TabsList>> = {}) 
 }
 
 describe('Tabs', () => {
+  it('lets a caller reshape the segmented list into a bottom rule without boxing it', () => {
+    // /user's anchoring tabs: a full default border would survive the
+    // caller's `border-b` and draw a square box around the row.
+    renderTabs({ className: 'rounded-none border-b border-border bg-transparent p-0' });
+    const list = screen.getByRole('tablist', { name: 'Cycle records' });
+    expect(list).toHaveClass('border-b');
+    expect(list).not.toHaveClass('border');
+  });
+
   it.each(['segmented', 'underline', 'pills'] as const)(
     'marks the selected %s tab with its own indicator',
     (variant) => {
