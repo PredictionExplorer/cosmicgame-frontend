@@ -83,7 +83,7 @@ export const mediumQuestionsTextZhHk = {
   },
   'participation-cst-timing': {
     prompt:
-      '按上線參數，兩筆落筆分別銘刻參與 CST：一筆落在上一筆之後 1 秒，另一筆終結了一整天的沉默。兩者大約各銘刻多少？',
+      '按上線參數，兩筆落筆分別銘刻參與 CST：一筆落在上一筆之後 1 秒，另一筆終結了一整天的沉默。兩者大約各銘刻多少？',
     options: {
       a: `約 ${oneSecondExample.cst} CST 與約 ${oneDayExample.cst} CST——數量隨經過時間的平方根增長。`,
       b: `每筆固定 ${cst(100)} CST，與時機無關。`,
@@ -147,12 +147,12 @@ export const mediumQuestionsTextZhHk = {
   'nft-selection-count': {
     prompt: '參與者 NFT 星選每次發放什麼？共選出多少次？',
     options: {
-      a: `${cst(protocolFacts.specialAllocationCst)} CST 與 1 枚 Cosmic Signature NFT，從落筆資格池中共選出 ${protocolFacts.nftStellarSelectionRecipients} 次。`,
+      a: `${cst(protocolFacts.specialAllocationCst)} CST 與 1 枚 Cosmic Signature NFT，從落筆資格池中共選出 ${protocolFacts.nftStellarSelectionRecipients} 次。`,
       b: `一份 ETH 份額，共選出 ${protocolFacts.ethStellarSelectionRecipients} 次。`,
       c: `${cst(protocolFacts.outreachReserveCst)} CST，只選出一次。`,
       d: `只有 NFT，共選出 ${protocolFacts.typicalNftsPerCycle} 次。`,
     },
-    explanation: `參與者 NFT 星選選出 ${protocolFacts.nftStellarSelectionRecipients} 次，每次攜帶 ${cst(protocolFacts.specialAllocationCst)} CST 與 1 枚 NFT。表彰 CST 總是與 NFT 同行——收官時的每份 NFT 發放都是這樣成對出現的。`,
+    explanation: `參與者 NFT 星選選出 ${protocolFacts.nftStellarSelectionRecipients} 次，每次攜帶 ${cst(protocolFacts.specialAllocationCst)} CST 與 1 枚 NFT。表彰 CST 總是與 NFT 同行——收官時的每份 NFT 發放都是這樣成對出現的。`,
     referenceLabel: '白皮書 §5.1 · 收官時的發放',
   },
   'draws-with-replacement': {

@@ -60,7 +60,7 @@ export const landingTextZhHk = {
     eyebrow: '藝術',
     heading: '三體軌跡，由鏈上種子生成。',
     description:
-      '每枚 Cosmic Signature NFT 都呈現 3 個天體在牛頓引力下的運動軌跡。三體運動天生混沌。沒有 AI，沒有訓練數據，只有確定性的物理。同一種子生成的畫面逐像素一致。',
+      '每枚 Cosmic Signature NFT 都呈現 3 個天體在牛頓引力下的運動軌跡。三體運動天生混沌。沒有 AI，沒有訓練數據，只有確定性的物理。同一種子生成的畫面逐像素一致。',
     showcase: {
       viewAriaLabel: '查看 Cosmic Signature {tokenLabel}',
       artworkAlt: 'Cosmic Signature 作品 {tokenLabel}',
@@ -73,7 +73,7 @@ export const landingTextZhHk = {
       },
       simulation: {
         title: '模擬',
-        body: '十萬組候選構型分別透過四階 Yoshida 辛積分器演算，每組推進 1,000,000 個物理步。',
+        body: '十萬組候選構型分別透過四階 Yoshida 辛積分器演算，每組推進 1,000,000 個物理步。',
       },
       selection: {
         title: '篩選',
@@ -89,17 +89,17 @@ export const landingTextZhHk = {
       },
       'spectral-render': {
         title: '光譜渲染',
-        body: '從 380 至 700 納米劃分 64 個波長區間，以隨速度變化的線寬和景深渲染軌跡。',
+        body: '從 380 至 700 納米劃分 64 個波長區間，以隨速度變化的線寬和景深渲染軌跡。',
       },
       signature: {
         title: '簽名',
-        body: 'AgX 色調映射、輝光、OpenSimplex 星雲層與色彩分級共同完成畫面。最終生成一張 16 位 PNG 與一段 30 秒 H.265 影片。',
+        body: 'AgX 色調映射、輝光、OpenSimplex 星雲層與色彩分級共同完成畫面。最終生成一張 16 位 PNG 與一段 30 秒 H.265 影片。',
       },
     },
     facts: {
       imprinted: { label: '已銘刻' },
       resolution: { label: '原生解像度' },
-      animation: { label: '動畫', value: '30 秒 · 60 fps' },
+      animation: { label: '動畫', value: '30 秒 · 60 fps' },
       license: { label: '授權條款' },
     },
   },
@@ -111,11 +111,11 @@ export const landingTextZhHk = {
       '週期收官後，協議會沿各條分配軌道發放 ETH 與 CST 儲備，以表彰堅守、時機、投入與參與。約一半 ETH 儲備會滾入下一週期。',
     ethLabel: '每個週期儲備中的 ETH',
     fixedLabel: '每個週期的 CST 與 NFT',
-    fixedEach: `每位獲配者獲配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST 與 1 枚 Cosmic Signature NFT。`,
+    fixedEach: `每位獲配者獲配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST 與 1 枚 Cosmic Signature NFT。`,
     items: {
       'signature-allocation': {
         title: '簽名分配',
-        body: '寫下收官之筆的參與者獲配。其中包括 1,000 CST 與 1 枚 Cosmic Signature NFT。',
+        body: '寫下收官之筆的參與者獲配。其中包括 1,000 CST 與 1 枚 Cosmic Signature NFT。',
       },
       'compounding-reserve': {
         percent: '約 50%',
@@ -124,7 +124,7 @@ export const landingTextZhHk = {
       },
       'chrono-warrior': {
         title: '時之勇士分配',
-        body: `單次連續保持堅守冠軍身份時間最長的參與者獲配。其中包括 ${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST 與 1 枚 Cosmic Signature NFT。`,
+        body: `單次連續保持堅守冠軍身份時間最長的參與者獲配。其中包括 ${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST 與 1 枚 Cosmic Signature NFT。`,
       },
       'public-goods': {
         title: '公共物品分配',
@@ -136,7 +136,7 @@ export const landingTextZhHk = {
       },
       'eth-stellar-selection': {
         title: 'ETH 星選',
-        body: '由程序化隨機選出的 3 位參與者均分；入選頻次隨落筆次數增加。',
+        body: '由程序化隨機選出的 3 位參與者均分；入選頻次隨落筆次數增加。',
       },
       'participant-nft-stellar-selection': {
         amount: '10 位獲配者',
@@ -169,7 +169,7 @@ export const landingTextZhHk = {
       '每個週期累積 ETH，解錨時取回',
       '沒有固定期限、沒有罰則；每枚 NFT 解錨後不可再錨定',
       '姊妹系列 Random Walk NFT 也可以錨定',
-      `已錨定的 Random Walk NFT 可獲得錨定 NFT 星選資格：${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST 與 1 枚 Cosmic Signature NFT，不含 ETH`,
+      `已錨定的 Random Walk NFT 可獲得錨定 NFT 星選資格：${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST 與 1 枚 Cosmic Signature NFT，不含 ETH`,
     ],
     ctaLabel: '前往應用程式錨定',
   },
@@ -202,7 +202,7 @@ export const landingTextZhHk = {
     columns: [
       {
         title: '協調提案',
-        body: '獲委託權重不少於 100 CST 的地址均可提交提案。協調延遲為 2 天，協調期為 2 週。',
+        body: '獲委託權重不少於 100 CST 的地址均可提交提案。協調延遲為 2 天，協調期為 2 週。',
       },
       {
         title: '協調權重',
@@ -249,7 +249,7 @@ export const landingTextZhHk = {
       {
         question: '這件藝術作品在技術上是什麼？',
         answer:
-          '每枚 Cosmic Signature NFT 都由確定性三體模擬渲染而成，模擬遵循牛頓引力。鏈上種子從 100,000 條候選軌道中選出一條；這些軌道均由四階 Yoshida 辛積分器模擬，再透過 64 個波長區間進行光譜渲染，並以 OKLab 混合色彩。整套管線以 CC0 完全開源，任何人都能從種子復現簽名作品。',
+          '每枚 Cosmic Signature NFT 都由確定性三體模擬渲染而成，模擬遵循牛頓引力。鏈上種子從 100,000 條候選軌道中選出一條；這些軌道均由四階 Yoshida 辛積分器模擬，再透過 64 個波長區間進行光譜渲染，並以 OKLab 混合色彩。整套管線以 CC0 完全開源，任何人都能從種子復現簽名作品。',
       },
       {
         question: 'ETH 分配來自哪裏？',

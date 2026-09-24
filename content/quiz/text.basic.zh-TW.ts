@@ -238,9 +238,9 @@ export const basicQuestionsTextZhTw = {
     prompt: '典型週期會銘刻多少枚 Cosmic Signature NFT？',
     options: {
       a: `${protocolFacts.typicalNftsPerCycle} 枚`,
-      b: '1 枚',
+      b: '1 枚',
       c: `${protocolFacts.nftStellarSelectionRecipients} 枚`,
-      d: '100 枚',
+      d: '100 枚',
     },
     explanation: `典型週期銘刻 ${protocolFacts.typicalNftsPerCycle} 枚 NFT：${protocolFacts.roleNftsPerCycle} 枚角色 NFT（受益方、時之勇士、堅守冠軍、CST 收官之筆）、${protocolFacts.nftStellarSelectionRecipients} 枚參與者 NFT 星選、${protocolFacts.anchoredRwlkNftSelectionRecipients} 枚錨定 NFT 星選。跳過某條軌道的週期會少銘刻幾枚。`,
     referenceLabel: '白皮書 §5.1 · 收官時的發放',

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { ArtFrame, WallLabel } from '@/components/ui/art-frame';
+import { withMonoId } from '@/components/ui/mono-id';
 import { cn } from '@/lib/utils';
 import { formatId } from '@/utils/format/ids';
 
@@ -47,6 +48,8 @@ export function SignaturePlate({
   className,
 }: SignaturePlateProps) {
   const number = formatId(art.tokenId);
+  // "Cosmic Signature #000013": the number in the identifier face.
+  const title = withMonoId(copy.title, number);
   return (
     <figure className={cn('min-w-0', className)}>
       <ArtFrame
@@ -63,10 +66,10 @@ export function SignaturePlate({
         title={
           href ? (
             <a href={href} className="link-quiet">
-              {copy.title}
+              {title}
             </a>
           ) : (
-            copy.title
+            title
           )
         }
         meta={[

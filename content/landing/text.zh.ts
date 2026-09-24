@@ -60,7 +60,7 @@ export const landingTextZh = {
     eyebrow: '艺术',
     heading: '三体轨迹，由链上种子生成。',
     description:
-      '每枚 Cosmic Signature NFT 都呈现 3 个天体在牛顿引力下的运动轨迹。三体运动天生混沌。没有 AI，没有训练数据，只有确定性的物理。同一种子生成的画面逐像素一致。',
+      '每枚 Cosmic Signature NFT 都呈现 3 个天体在牛顿引力下的运动轨迹。三体运动天生混沌。没有 AI，没有训练数据，只有确定性的物理。同一种子生成的画面逐像素一致。',
     showcase: {
       viewAriaLabel: '查看 Cosmic Signature {tokenLabel}',
       artworkAlt: 'Cosmic Signature 作品 {tokenLabel}',
@@ -73,7 +73,7 @@ export const landingTextZh = {
       },
       simulation: {
         title: '模拟',
-        body: '十万组候选构型分别通过四阶 Yoshida 辛积分器演算，每组推进 1,000,000 个物理步。',
+        body: '十万组候选构型分别通过四阶 Yoshida 辛积分器演算，每组推进 1,000,000 个物理步。',
       },
       selection: {
         title: '筛选',
@@ -89,17 +89,17 @@ export const landingTextZh = {
       },
       'spectral-render': {
         title: '光谱渲染',
-        body: '从 380 至 700 纳米划分 64 个波长区间，以随速度变化的线宽和景深渲染轨迹。',
+        body: '从 380 至 700 纳米划分 64 个波长区间，以随速度变化的线宽和景深渲染轨迹。',
       },
       signature: {
         title: '签名',
-        body: 'AgX 色调映射、辉光、OpenSimplex 星云层与色彩分级共同完成画面。最终生成一张 16 位 PNG 与一段 30 秒 H.265 视频。',
+        body: 'AgX 色调映射、辉光、OpenSimplex 星云层与色彩分级共同完成画面。最终生成一张 16 位 PNG 与一段 30 秒 H.265 视频。',
       },
     },
     facts: {
       imprinted: { label: '已铭刻' },
       resolution: { label: '原生分辨率' },
-      animation: { label: '动画', value: '30 秒 · 60 fps' },
+      animation: { label: '动画', value: '30 秒 · 60 fps' },
       license: { label: '许可协议' },
     },
   },
@@ -111,11 +111,11 @@ export const landingTextZh = {
       '周期收官后，协议会沿各条分配轨道发放 ETH 与 CST 储备，以表彰坚守、时机、投入与参与。约一半 ETH 储备会滚入下一周期。',
     ethLabel: '每个周期储备中的 ETH',
     fixedLabel: '每个周期的 CST 与 NFT',
-    fixedEach: `每位获配者获配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 与 1 枚 Cosmic Signature NFT。`,
+    fixedEach: `每位获配者获配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 与 1 枚 Cosmic Signature NFT。`,
     items: {
       'signature-allocation': {
         title: '签名分配',
-        body: '写下收官之笔的参与者获配。其中包括 1,000 CST 与 1 枚 Cosmic Signature NFT。',
+        body: '写下收官之笔的参与者获配。其中包括 1,000 CST 与 1 枚 Cosmic Signature NFT。',
       },
       'compounding-reserve': {
         percent: '约 50%',
@@ -124,7 +124,7 @@ export const landingTextZh = {
       },
       'chrono-warrior': {
         title: '时之勇士分配',
-        body: `单次连续保持坚守冠军身份时间最长的参与者获配。其中包括 ${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 与 1 枚 Cosmic Signature NFT。`,
+        body: `单次连续保持坚守冠军身份时间最长的参与者获配。其中包括 ${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 与 1 枚 Cosmic Signature NFT。`,
       },
       'public-goods': {
         title: '公共物品分配',
@@ -136,7 +136,7 @@ export const landingTextZh = {
       },
       'eth-stellar-selection': {
         title: 'ETH 星选',
-        body: '由程序化随机选出的 3 位参与者均分；入选频次随落笔次数增加。',
+        body: '由程序化随机选出的 3 位参与者均分；入选频次随落笔次数增加。',
       },
       'participant-nft-stellar-selection': {
         amount: '10 位获配者',
@@ -169,7 +169,7 @@ export const landingTextZh = {
       '每个周期累积 ETH，解锚时取回',
       '无固定期限、无罚则；每枚 NFT 解锚后不可再锚定',
       '姊妹系列 Random Walk NFT 也可以锚定',
-      `已锚定的 Random Walk NFT 可获得锚定 NFT 星选资格：${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 与 1 枚 Cosmic Signature NFT，不含 ETH`,
+      `已锚定的 Random Walk NFT 可获得锚定 NFT 星选资格：${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 与 1 枚 Cosmic Signature NFT，不含 ETH`,
     ],
     ctaLabel: '前往应用锚定',
   },
@@ -202,7 +202,7 @@ export const landingTextZh = {
     columns: [
       {
         title: '协调提案',
-        body: '获委托权重不少于 100 CST 的地址均可提交提案。协调延迟为 2 天，协调期为 2 周。',
+        body: '获委托权重不少于 100 CST 的地址均可提交提案。协调延迟为 2 天，协调期为 2 周。',
       },
       {
         title: '协调权重',
@@ -249,7 +249,7 @@ export const landingTextZh = {
       {
         question: '这件艺术作品在技术上是什么？',
         answer:
-          '每枚 Cosmic Signature NFT 都由确定性三体模拟渲染而成，模拟遵循牛顿引力。链上种子从 100,000 条候选轨道中选出一条；这些轨道均由四阶 Yoshida 辛积分器模拟，再通过 64 个波长区间进行光谱渲染，并以 OKLab 混合色彩。整套管线以 CC0 完全开源，任何人都能从种子复现签名作品。',
+          '每枚 Cosmic Signature NFT 都由确定性三体模拟渲染而成，模拟遵循牛顿引力。链上种子从 100,000 条候选轨道中选出一条；这些轨道均由四阶 Yoshida 辛积分器模拟，再通过 64 个波长区间进行光谱渲染，并以 OKLab 混合色彩。整套管线以 CC0 完全开源，任何人都能从种子复现签名作品。',
       },
       {
         question: 'ETH 分配来自哪里？',

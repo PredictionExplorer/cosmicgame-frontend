@@ -3,24 +3,9 @@ import { useLocale, useTranslations } from 'next-intl';
 
 import { formatId } from '@/utils/format/ids';
 import { getLocaleConfig } from '@/i18n/localeConfig';
+import { withMonoId } from '@/components/ui/mono-id';
 
 import type { ShowcaseArtwork } from './showcase-art';
-
-/**
- * Sets the token number inside a line of text in the identifier face
- * ("Signature #000023"), wherever the locale's template puts it.
- */
-export function withMonoId(text: string, tokenLabel: string): ReactNode {
-  const at = text.indexOf(tokenLabel);
-  if (at < 0) return text;
-  return (
-    <>
-      {text.slice(0, at)}
-      <span className="font-mono">{tokenLabel}</span>
-      {text.slice(at + tokenLabel.length)}
-    </>
-  );
-}
 
 type LabelledArtwork = Pick<ShowcaseArtwork, 'TokenId' | 'TokenName' | 'RoundNum' | 'ImprintedAt'>;
 
