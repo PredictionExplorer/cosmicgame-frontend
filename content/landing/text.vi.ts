@@ -23,7 +23,7 @@ export const landingTextVi = {
   },
 
   hero: {
-    eyebrow: 'Giao thức nghệ thuật tạo sinh trên chuỗi · Arbitrum',
+    eyebrow: 'Giao thức nghệ thuật tạo sinh trên chuỗi · Arbitrum',
     headline: 'Nghệ thuật từ từng nét bút.',
     headlineLead: 'Nghệ thuật từ',
     headlineAccent: 'từng nét bút.',

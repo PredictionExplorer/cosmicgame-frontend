@@ -16,9 +16,12 @@ import styles from './Landing.module.css';
 /**
  * The landing hero: the headline beside a Signature on its black plate, the
  * loop in one sentence, one commit action and one quiet one, then the live
- * cycle clock. On phones the plate follows the headline directly, so the art
- * is in the first screen. The header belongs to the landing shell, and the
- * trust evidence lives with Verifiability, not here.
+ * cycle clock. The source order is the reading order (headline, lede,
+ * actions, then the exhibit), so keyboard and screen-reader users reach the
+ * primary action before the exhibit's controls; on phones the grid draws the
+ * plate directly under the headline, so the art is in the first screen. The
+ * header belongs to the landing shell, and the trust evidence lives with
+ * Verifiability, not here.
  *
  * A server component: only the exhibit and the clock hydrate.
  */
@@ -34,17 +37,13 @@ export function Hero({ hero }: { hero: LandingContent['hero'] }) {
 
       <div className="site-container">
         <div className={styles.heroGrid}>
-          <p className={cn('type-eyebrow text-subtle', styles.heroEyebrow)}>
-            {/* A line never starts with the separator: it stays with the word before it. */}
-            {hero.eyebrow.replace(' · ', '\u00a0· ')}
-          </p>
+          <p className={cn('type-eyebrow text-subtle', styles.heroEyebrow)}>{hero.eyebrow}</p>
           <h1 id="landing-headline" className={cn('type-display-xl', styles.headline)}>
             {hero.headlineLead} <span className={styles.headlineAccent}>{hero.headlineAccent}</span>
           </h1>
-          <div className={styles.heroArt}>
-            <HeroArtShowcase art={hero.art} />
-          </div>
-          <p className={cn('type-lede text-muted-foreground', styles.subhead)}>{hero.subhead}</p>
+          <p className={cn('type-body-md text-muted-foreground sm:type-lede', styles.subhead)}>
+            {hero.subhead}
+          </p>
           <div className={styles.actions}>
             {/* Same tab and a forward arrow: the app is Cosmic Signature too. */}
             <SiteLink
@@ -62,6 +61,9 @@ export function Hero({ hero }: { hero: LandingContent['hero'] }) {
             >
               {hero.secondaryCta.label}
             </SiteLink>
+          </div>
+          <div className={styles.heroArt}>
+            <HeroArtShowcase art={hero.art} />
           </div>
         </div>
 

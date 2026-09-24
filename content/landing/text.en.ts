@@ -21,7 +21,7 @@ export const landingTextEn = {
   },
 
   hero: {
-    eyebrow: 'Procedural on-chain art protocol · Arbitrum',
+    eyebrow: 'Procedural on-chain art protocol · Arbitrum',
     headline: 'Art, shaped by every gesture.',
     headlineLead: 'Art, shaped by',
     headlineAccent: 'every gesture.',

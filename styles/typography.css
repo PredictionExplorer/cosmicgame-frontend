@@ -28,15 +28,24 @@
 
 /* ── Display: Clash Display, 28px and up ─────────────────────────────── */
 
-/* Landing hero only. */
+/*
+ * Landing hero only. The headline spans the column on phones and tablets
+ * (40 → 64px, so two lines stay two lines on a 390px phone) and shares its
+ * row with the art plate from 64rem, where it sizes to five of twelve
+ * columns (48 → 72px).
+ */
 @utility type-display-xl {
   font-family: var(--font-family-display);
-  font-size: clamp(3.5rem, 4vw + 2rem, 5.75rem); /* 56 → 92px */
+  font-size: clamp(2.5rem, 1.25rem + 6vw, 4rem); /* 40 → 64px */
   line-height: 1;
   font-weight: var(--display-weight);
   letter-spacing: calc(-0.03em * var(--display-tracking-scale));
   text-wrap: balance;
   overflow-wrap: break-word;
+
+  @media (width >= 64rem) {
+    font-size: clamp(3rem, 0.75rem + 4.2vw, 4.5rem); /* 48 → 72px */
+  }
 }
 
 /* Landing section H2s. */

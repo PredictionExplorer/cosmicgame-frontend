@@ -21,7 +21,7 @@ export const landingTextZh = {
   },
 
   hero: {
-    eyebrow: '程序化链上艺术协议 · Arbitrum',
+    eyebrow: '程序化链上艺术协议 · Arbitrum',
     headline: '每一次落笔， 都在塑造艺术。',
     headlineLead: '每一次落笔，',
     headlineAccent: '都在塑造艺术。',

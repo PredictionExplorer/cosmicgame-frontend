@@ -47,19 +47,31 @@ describe('<Hero />', () => {
     expect(secondaryCta.className).not.toMatch(/bg-signature-gradient/);
   });
 
-  it('shows the art inside the hero, before the lede on phones', () => {
+  it('reads headline, lede and actions before the exhibit and its controls', () => {
+    // Regression: the plate sat between the H1 and the lede in the source, so
+    // focus met five exhibit controls before the primary action. The grid
+    // still draws the plate under the headline on phones (Landing.module.css).
     const { container } = render(<Hero hero={hero} />);
-    const showcase = screen.getByTestId('hero-art-showcase');
-    const subhead = screen.getByText(hero.subhead);
-    // DOM order is the phone order: headline, art, lede, actions.
-    expect(
-      screen.getByRole('heading', { level: 1 }).compareDocumentPosition(showcase) &
-        Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
-    expect(
-      showcase.compareDocumentPosition(subhead) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
+    const inOrder = [
+      screen.getByRole('heading', { level: 1 }),
+      screen.getByText(hero.subhead),
+      screen.getByRole('link', { name: /open the app/i }),
+      screen.getByRole('link', { name: hero.secondaryCta.label }),
+      screen.getByTestId('hero-art-showcase'),
+    ];
+    for (let index = 1; index < inOrder.length; index += 1) {
+      expect(
+        inOrder[index - 1]!.compareDocumentPosition(inOrder[index]!) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+    }
     expect(container.querySelector('img')).toHaveAttribute('fetchpriority', 'high');
+  });
+
+  it('sets its type from the tokens alone', () => {
+    render(<Hero hero={hero} />);
+    expect(screen.getByRole('heading', { level: 1 })).toHaveClass('type-display-xl');
+    expect(screen.getByText(hero.subhead)).toHaveClass('type-body-md', 'sm:type-lede');
   });
 
   it('leaves the site header to the landing shell, outside <main>', () => {

@@ -2,6 +2,7 @@ import { getLandingContent, landingContentEn, landingContentZh } from '@/content
 
 import { CST_GECKOTERMINAL_POOL_URL } from '@/config/geckoterminal';
 import { outboundLinks } from '@/config/siteNav';
+import { routing } from '@/i18n/routing';
 
 const landingContent = landingContentEn;
 
@@ -42,6 +43,16 @@ describe('landing content shape', () => {
 
   it('hero declares the primary CTA as the app subdomain', () => {
     expect(landingContent.hero.primaryCta.href).toBe('https://app.cosmicsignature.com');
+  });
+
+  it('keeps the hero eyebrow separator with the word before it, in every locale', () => {
+    // The copy carries the no-break space; the component no longer edits translated text.
+    const noBreakSpace = String.fromCharCode(0xa0);
+    for (const locale of routing.locales) {
+      const { eyebrow } = getLandingContent(locale).hero;
+      expect(eyebrow).toContain(`${noBreakSpace}· `);
+      expect(eyebrow).not.toContain(' ·');
+    }
   });
 
   it('cycle section explains a cycle in exactly three ordered steps', () => {

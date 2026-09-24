@@ -21,7 +21,7 @@ export const landingTextUk = {
   },
 
   hero: {
-    eyebrow: 'Процедурний протокол ончейн-мистецтва · Arbitrum',
+    eyebrow: 'Процедурний протокол ончейн-мистецтва · Arbitrum',
     headline: 'Мистецтво, яке творить кожен жест.',
     headlineLead: 'Мистецтво, яке творить',
     headlineAccent: 'кожен жест.',

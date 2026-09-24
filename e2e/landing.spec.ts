@@ -462,8 +462,28 @@ test.describe('Landing page @ cosmicsignature.com', () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     const plate = page.getByTestId('hero-art-link');
+    const primary = page
+      .locator('main')
+      .getByRole('link', { name: /open the app/i })
+      .first();
     await expect(plate).toBeInViewport({ ratio: 1 });
-    await expect(page.getByRole('link', { name: /open the app/i }).first()).toBeInViewport();
+    await expect(primary).toBeInViewport();
+    // Drawn above the action, but read (and focused) after it.
+    const plateBox = await plate.boundingBox();
+    const primaryBox = await primary.boundingBox();
+    expect(plateBox!.y).toBeLessThan(primaryBox!.y);
+  });
+
+  test('reaches the primary action by keyboard before the exhibit controls', async ({ page }) => {
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    const hero = page.locator('[aria-labelledby="landing-headline"]');
+    const primary = hero.getByRole('link', { name: /open the app/i });
+    const firstControl = hero.getByRole('button').first();
+    const order = await primary.evaluate(
+      (node, other) => node.compareDocumentPosition(other as Node),
+      await firstControl.elementHandle(),
+    );
+    expect(order & 4 /* Node.DOCUMENT_POSITION_FOLLOWING */).toBeTruthy();
   });
 
   test('opens the FAQ with what a participant does, not with a denial', async ({ page }) => {

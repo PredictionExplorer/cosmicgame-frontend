@@ -21,7 +21,7 @@ export const landingTextKo = {
   },
 
   hero: {
-    eyebrow: '절차적 온체인 아트 프로토콜 · Arbitrum',
+    eyebrow: '절차적 온체인 아트 프로토콜 · Arbitrum',
     headline: '모든 제스처가 아트를 만듭니다.',
     headlineLead: '모든 제스처가',
     headlineAccent: '아트를 만듭니다.',

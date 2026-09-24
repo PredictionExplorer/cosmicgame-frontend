@@ -23,7 +23,7 @@ export const landingTextJa = {
   },
 
   hero: {
-    eyebrow: 'プロシージャル・オンチェーンアート・プロトコル · Arbitrum',
+    eyebrow: 'プロシージャル・オンチェーンアート・プロトコル · Arbitrum',
     headline: '一筆ごとに、 アートが生まれます。',
     headlineLead: '一筆ごとに、',
     headlineAccent: 'アートが生まれます。',
