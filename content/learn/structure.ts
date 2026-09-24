@@ -182,6 +182,11 @@ type LearnArticleText<Article extends LearnArticleStructureItem> = {
   readonly h1: string;
   /** A short title for the hub's cards, without the brand name. */
   readonly cardTitle: string;
+  /**
+   * The card's one line (at most 90 characters, no brand name): what the
+   * reader finds in the guide. `description` stays the search snippet.
+   */
+  readonly cardDescription: string;
   readonly summary: string;
   /**
    * Sections stay fully in the text modules because their count legitimately

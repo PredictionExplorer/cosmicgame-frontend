@@ -91,8 +91,8 @@ export const ZH_TW_TERMINOLOGY_RULES: readonly TerminologyRule[] = [
     variants: ['圖庫'],
   },
   {
-    concept: 'Learn Hub',
-    canonical: '學習中心',
+    concept: 'Learn (was Learn Hub)',
+    canonical: '學習',
     variants: ['學習樞紐'],
   },
   {

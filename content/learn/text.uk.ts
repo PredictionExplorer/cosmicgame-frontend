@@ -16,7 +16,7 @@ const answerabilitySections: readonly LearnSection[] = [
     heading: 'Як перевірити цю тему',
     body: [
       'Поточні дані протоколу, верифіковані адреси контрактів, ресурси вихідного коду та статистику перевіряйте на офіційних сторінках застосунку. Сторінка контрактів пов’язує пояснення протоколу з адресами в мережі Arbitrum, а сторінка статистики вказує джерело даних і час оновлення.',
-      'Якщо факт може змінюватися, актуальним джерелом вважайте сторінку застосунку з поточними даними. Якщо факт пояснює, як працює протокол, стабільним пояснювальним джерелом вважайте статтю Навчального центру, поширені запитання, умови використання або сторінки безпеки, аудитів і розкриття ризиків.',
+      'Якщо факт може змінюватися, актуальним джерелом вважайте сторінку застосунку з поточними даними. Якщо факт пояснює, як працює протокол, стабільним пояснювальним джерелом вважайте статтю з розділу «Навчання», поширені запитання, умови використання або сторінки безпеки, аудитів і розкриття ризиків.',
     ],
   },
   {
@@ -34,11 +34,11 @@ const answerabilitySections: readonly LearnSection[] = [
   },
 ];
 
-/** Український текст Навчального центру, ключі — за скелетом у structure.ts. */
+/** Український текст розділу «Навчання», ключі — за скелетом у structure.ts. */
 export const learnTextUk = {
   hub: {
     meta: {
-      title: 'Навчальний центр Cosmic Signature | Ончейн-мистецтво, перформанс-цикли та Arbitrum',
+      title: 'Як працює Cosmic Signature | Ончейн-мистецтво, перформанс-цикли та Arbitrum',
       description:
         'Як працює Cosmic Signature: перформанс-цикли, жести, CST, NFT-мистецтво трьох тіл, контракти на Arbitrum, закріплення, суспільні блага та роз’яснення ризиків.',
     },
@@ -99,6 +99,8 @@ export const learnTextUk = {
   articles: {
     'what-is-cosmic-signature': {
       cardTitle: 'Що таке протокол',
+      cardDescription:
+        'Процедурне мистецтво на Arbitrum, яке формують жести кожного перформанс-циклу.',
       title: 'Що таке Cosmic Signature? | Cosmic Signature',
       description:
         'Cosmic Signature — процедурний протокол ончейн-мистецтва на Arbitrum, де жести перформанс-циклу формують детерміновані NFT-твори на основі задачі трьох тіл.',
@@ -143,6 +145,8 @@ export const learnTextUk = {
     },
     'how-the-performance-cycle-works': {
       cardTitle: 'Перформанс-цикл',
+      cardDescription:
+        'Як цикл відкривається, триває за своїм відліком, завершується й розподіляє резерв.',
       title: 'Як працює перформанс-цикл Cosmic Signature | Cosmic Signature',
       description:
         'Дізнайтеся, як перформанс-цикли Cosmic Signature на Arbitrum поєднують вікна калібрування, жести, завершення та напрями розподілу.',
@@ -187,6 +191,7 @@ export const learnTextUk = {
     },
     'how-gestures-work': {
       cardTitle: 'Як працюють жести',
+      cardDescription: 'Скільки коштує жест з ETH чи CST, що він фіксує і як подовжує відлік.',
       title: 'Як працюють жести в Cosmic Signature | Cosmic Signature',
       description:
         'Розберіться в ETH-жестах, CST-жестах, вартості жесту, CST участі й у тому, як жести формують кожен перформанс-цикл Cosmic Signature.',
@@ -231,6 +236,7 @@ export const learnTextUk = {
     },
     'three-body-nft-art': {
       cardTitle: 'Мистецтво трьох тіл',
+      cardDescription: 'Як ончейн-сід і фізика трьох тіл щоразу дають той самий твір.',
       title: 'Як Cosmic Signature створює NFT-мистецтво трьох тіл | Cosmic Signature',
       description:
         'Технічне пояснення того, як детерміновані NFT-твори Cosmic Signature генеруються з ончейн-сідів і фізики задачі трьох тіл.',
@@ -275,6 +281,7 @@ export const learnTextUk = {
     },
     'cosmic-signature-on-arbitrum': {
       cardTitle: 'Протокол на Arbitrum',
+      cardDescription: 'Чому протокол працює на Arbitrum, мережі другого рівня Ethereum.',
       title: 'Cosmic Signature на Arbitrum | Cosmic Signature',
       description:
         'Чому Cosmic Signature працює на Arbitrum і як протокол використовує інфраструктуру другого рівня (Layer 2) Ethereum для ончейн-мистецтва.',
@@ -308,6 +315,7 @@ export const learnTextUk = {
     },
     'contracts-security-verification': {
       cardTitle: 'Контракти й верифікація',
+      cardDescription: 'Де знайти контракти й вихідний код і як перевірити їх самостійно.',
       title: 'Контракти, безпека та верифікація Cosmic Signature | Cosmic Signature',
       description:
         'Знайдіть смарт-контракти Cosmic Signature, вихідний код, відомості про верифікацію та контекст безпеки протоколу на Arbitrum.',
@@ -345,6 +353,7 @@ export const learnTextUk = {
     },
     'cst-token-and-cosmic-council': {
       cardTitle: 'CST і Космічна Рада',
+      cardDescription: 'Що таке CST, як його закарбовують і як власники координують протокол.',
       title: 'CST і Космічна Рада | Cosmic Signature',
       description:
         'Дізнайтеся, як токени CST пов’язані з жестами, координацією протоколу та Космічною Радою.',
@@ -379,6 +388,8 @@ export const learnTextUk = {
     },
     'anchoring-nfts': {
       cardTitle: 'Закріплення NFT',
+      cardDescription:
+        'Як закріплені NFT отримують надходження за закріплення з кожного циклу і як їх відкріпити.',
       title: 'Закріплення NFT Cosmic Signature | Cosmic Signature',
       description:
         'Як працює закріплення NFT Cosmic Signature, надходження ETH за закріплення та право Random Walk NFT на участь у зоряному відборі.',
@@ -413,6 +424,7 @@ export const learnTextUk = {
     },
     'protocol-guild-public-goods': {
       cardTitle: 'Суспільні блага й Protocol Guild',
+      cardDescription: 'Як частина кожного резерву циклу доходить до розробників ядра Ethereum.',
       title: 'Cosmic Signature і суспільні блага Ethereum | Cosmic Signature',
       description:
         'Як Cosmic Signature спрямовує розподіл на суспільні блага до Protocol Guild — механізму фінансування розробників базового протоколу Ethereum.',
@@ -449,6 +461,7 @@ export const learnTextUk = {
     },
     'collecting-and-trading-cosmic-signature': {
       cardTitle: 'Колекціонування та торгівля',
+      cardDescription: 'Де торгують NFT і CST і що перевірити перед угодою.',
       title: 'Колекціонування та торгівля NFT Cosmic Signature і CST | Cosmic Signature',
       description:
         'Де торгують активами Cosmic Signature: NFT-маркетплейс Axiom Zero без комісії, обмін CST через Uniswap на Arbitrum і ринок прогнозів Chaos Zero для циклів.',
@@ -496,6 +509,7 @@ export const learnTextUk = {
     // lexicon-allow-start: явні формулювання заперечення для пошукових роботів і комплаєнсу.
     'not-a-lottery-not-an-investment': {
       cardTitle: 'Чим протокол не є',
+      cardDescription: 'Чим протокол не є і чому ця різниця важлива.',
       title: 'Cosmic Signature — це лотерея, казино чи інвестиція? | Cosmic Signature',
       description:
         'Cosmic Signature — це процедурний протокол ончейн-мистецтва, а не лотерея, казино, азартна гра чи інвестиційний продукт.',

@@ -101,7 +101,7 @@ export default async function LearnIndexPage({ params }: PageProps) {
                       slug={article.slug}
                       number={number}
                       title={article.cardTitle}
-                      description={article.description}
+                      description={article.cardDescription}
                       readingTime={
                         guideMinutes(article, locale) >= MIN_MINUTES_SHOWN
                           ? fillTemplate(articleUi.readingTimeTemplate, {

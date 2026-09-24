@@ -20,7 +20,7 @@ export const basicQuestionsTextEn = {
       'Cosmic Signature is a procedural art protocol: timed Performance Cycles fill with gestures, and finalization imprints deterministic three-body artwork. No AI is involved anywhere in the pipeline — the art is physics computed from a seed, which is the opposite of a text-prompt image service.',
     funFact:
       'The name collides with COSMIC, a well-known cancer mutation database. The protocol has nothing to do with it — a disambiguation the docs state outright.',
-    referenceLabel: 'Learn: What Is Cosmic Signature?',
+    referenceLabel: 'Learn: What is Cosmic Signature?',
   },
   'what-is-a-gesture': {
     prompt: 'In protocol terms, what is a gesture?',

@@ -345,7 +345,7 @@ Interface vocabulary — no coinage needed, but fixed for consistency:
 | Gallery                              | 갤러리                                 |                                                     |
 | How It Works                         | 작동 원리                              | never 이용 방법 (a help page), 작동 방식            |
 | FAQ / Clarifications                 | 자주 묻는 질문                         | nav and page heading alike                          |
-| Learn Hub                            | 학습 센터                              |                                                     |
+| Learn (was Learn Hub)                | 학습                                   | prose: 학습 가이드                                  |
 | About                                | Cosmic Signature 소개                  | short form in nav: 소개                             |
 | Statistics                           | 통계                                   |                                                     |
 | My Statistics / My Tokens            | 내 통계 / 내 토큰                      | 내, never 나의 or 저의                              |

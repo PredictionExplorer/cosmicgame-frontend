@@ -334,7 +334,7 @@ Interface vocabulary — no coinage needed, but fixed for consistency:
 | Gallery                              | Phòng trưng bày                                       | the art word; never thư viện (a library)                    |
 | How It Works                         | Cách hoạt động                                        | never hướng dẫn sử dụng (a help page)                       |
 | FAQ / Clarifications                 | Câu hỏi thường gặp                                    | nav and page heading alike                                  |
-| Learn Hub                            | Trung tâm học tập                                     | nav short form: Học                                         |
+| Learn (was Learn Hub)                | Tìm hiểu                                              | quiz references: Học                                        |
 | About                                | Về Cosmic Signature                                   | nav short form: Giới thiệu                                  |
 | Statistics                           | Thống kê                                              |                                                             |
 | My Statistics / My Tokens            | Thống kê của tôi / NFT của tôi                        | "của tôi" after the noun                                    |

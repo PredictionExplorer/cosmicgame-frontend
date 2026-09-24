@@ -32,6 +32,7 @@ function buildLearnContent(text: LearnText): LearnContent {
         description: string;
         h1: string;
         cardTitle: string;
+        cardDescription: string;
         summary: string;
         sections: readonly LearnSection[];
         relatedLabels: readonly string[];
@@ -63,6 +64,7 @@ function buildLearnContent(text: LearnText): LearnContent {
         description: articleText.description,
         h1: articleText.h1,
         cardTitle: articleText.cardTitle,
+        cardDescription: articleText.cardDescription,
         updated: article.updated,
         summary: articleText.summary,
         schemaType: article.schemaType,

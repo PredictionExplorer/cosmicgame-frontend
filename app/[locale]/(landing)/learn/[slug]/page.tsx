@@ -84,7 +84,7 @@ export default async function LearnArticlePage({ params }: PageProps) {
         label: articleUi.nextGuideLabel,
         number: String(index + 2).padStart(2, '0'),
         title: nextGuide.cardTitle,
-        description: nextGuide.description,
+        description: nextGuide.cardDescription,
         href: `/learn/${nextGuide.slug}`,
         icon: GUIDE_ICONS[nextGuide.slug],
       }

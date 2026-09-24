@@ -16,7 +16,7 @@ const answerabilitySections: readonly LearnSection[] = [
     heading: '이 주제를 확인하는 방법',
     body: [
       '실시간 프로토콜 데이터, 검증된 컨트랙트 주소, 소스 코드 자료, 통계는 공식 앱 페이지에서 확인합니다. 컨트랙트 페이지는 프로토콜 설명을 Arbitrum 주소와 연결하고, 통계 페이지는 데이터 출처와 업데이트 시각을 표시합니다.',
-      '비용이나 사이클 상태처럼 바뀌는 값은 앱에서 확인해 주세요. 작동 원리와 참여 조건은 학습 센터, 자주 묻는 질문, 이용약관, 보안, 보안 감사, 위험 고지에서 자세히 설명합니다.',
+      '비용이나 사이클 상태처럼 바뀌는 값은 앱에서 확인해 주세요. 작동 원리와 참여 조건은 학습 가이드, 자주 묻는 질문, 이용약관, 보안, 보안 감사, 위험 고지에서 자세히 설명합니다.',
     ],
   },
   {
@@ -98,6 +98,8 @@ export const learnTextKo = {
   articles: {
     'what-is-cosmic-signature': {
       cardTitle: '프로토콜이란',
+      cardDescription:
+        '퍼포먼스 사이클마다 남긴 제스처가 빚어내는 Arbitrum 위의 절차적 아트입니다.',
       title: 'Cosmic Signature란 무엇인가요? | Cosmic Signature',
       description:
         'Cosmic Signature는 Arbitrum 위의 절차적 온체인 아트 프로토콜입니다. 퍼포먼스 사이클 동안 남긴 제스처가 결정론적 삼체 NFT 작품을 빚어냅니다.',
@@ -138,6 +140,8 @@ export const learnTextKo = {
     },
     'how-the-performance-cycle-works': {
       cardTitle: '퍼포먼스 사이클',
+      cardDescription:
+        '사이클이 열리고, 마감 시각을 따라 진행되고, 마감되어 준비금을 배분하는 과정입니다.',
       title: 'Cosmic Signature 퍼포먼스 사이클의 작동 원리 | Cosmic Signature',
       description:
         'Cosmic Signature 퍼포먼스 사이클이 Arbitrum에서 보정 구간, 제스처, 마감, 배분 경로를 어떻게 운용하는지 알아봅니다.',
@@ -182,6 +186,8 @@ export const learnTextKo = {
     },
     'how-gestures-work': {
       cardTitle: '제스처의 작동 원리',
+      cardDescription:
+        'ETH 제스처와 CST 제스처의 비용, 기록되는 내용, 마감 시각이 늘어나는 방식입니다.',
       title: 'Cosmic Signature에서 제스처가 작동하는 원리 | Cosmic Signature',
       description:
         'ETH 제스처, CST 제스처, 제스처 비용, 참여 CST, 그리고 제스처가 각 Cosmic Signature 퍼포먼스 사이클을 빚어내는 과정을 이해합니다.',
@@ -226,6 +232,7 @@ export const learnTextKo = {
     },
     'three-body-nft-art': {
       cardTitle: '삼체 아트',
+      cardDescription: '온체인 시드와 삼체 물리가 언제나 같은 작품을 만들어 내는 방식입니다.',
       title: 'Cosmic Signature가 삼체 NFT 아트를 생성하는 원리 | Cosmic Signature',
       description:
         '온체인 시드와 삼체 물리로 생성되는 결정론적 Cosmic Signature NFT 작품을 기술적으로 설명합니다.',
@@ -270,6 +277,7 @@ export const learnTextKo = {
     },
     'cosmic-signature-on-arbitrum': {
       cardTitle: 'Arbitrum 위의 프로토콜',
+      cardDescription: '프로토콜이 이더리움 레이어 2 네트워크인 Arbitrum에서 운영되는 이유입니다.',
       title: 'Arbitrum 위의 Cosmic Signature | Cosmic Signature',
       description:
         'Cosmic Signature가 Arbitrum에서 운영되는 이유와 프로토콜이 온체인 아트를 위해 이더리움 레이어 2 인프라를 활용하는 방식을 설명합니다.',
@@ -303,6 +311,7 @@ export const learnTextKo = {
     },
     'contracts-security-verification': {
       cardTitle: '컨트랙트와 검증',
+      cardDescription: '컨트랙트와 소스 코드를 찾아 직접 검증하는 방법입니다.',
       title: 'Cosmic Signature 컨트랙트, 보안, 검증 | Cosmic Signature',
       description:
         'Arbitrum 프로토콜인 Cosmic Signature의 스마트 컨트랙트, 소스 코드, 검증, 보안 맥락을 확인합니다.',
@@ -336,6 +345,8 @@ export const learnTextKo = {
     },
     'cst-token-and-cosmic-council': {
       cardTitle: 'CST와 우주 평의회',
+      cardDescription:
+        'CST란 무엇이고 어떻게 각인되며, 보유자가 프로토콜을 어떻게 조율하는지 설명합니다.',
       title: 'CST와 우주 평의회 | Cosmic Signature',
       description: 'CST 토큰이 제스처, 프로토콜 조율, 우주 평의회와 어떻게 연결되는지 알아봅니다.',
       h1: 'CST와 우주 평의회',
@@ -369,6 +380,7 @@ export const learnTextKo = {
     },
     'anchoring-nfts': {
       cardTitle: 'NFT 앵커링',
+      cardDescription: '앵커링된 NFT가 사이클마다 앵커링 지급을 나누는 방식과 해제 규칙입니다.',
       title: 'Cosmic Signature NFT 앵커링 | Cosmic Signature',
       description:
         'Cosmic Signature NFT의 앵커링, ETH 앵커링 지급, Random Walk NFT의 별빛 선정 자격이 어떻게 작동하는지 설명합니다.',
@@ -403,6 +415,7 @@ export const learnTextKo = {
     },
     'protocol-guild-public-goods': {
       cardTitle: '공공재와 Protocol Guild',
+      cardDescription: '모든 사이클 준비금의 일부가 이더리움 핵심 기여자에게 전달되는 방식입니다.',
       title: 'Cosmic Signature와 이더리움 공공재 | Cosmic Signature',
       description:
         'Cosmic Signature가 이더리움 핵심 기여자를 위한 자금 지원 메커니즘인 Protocol Guild로 공공재 배분을 전달하는 방식을 설명합니다.',
@@ -436,6 +449,7 @@ export const learnTextKo = {
     },
     'collecting-and-trading-cosmic-signature': {
       cardTitle: '수집과 거래',
+      cardDescription: 'NFT와 CST가 거래되는 곳과 거래 전에 확인할 점입니다.',
       title: 'Cosmic Signature NFT와 CST의 수집과 거래 | Cosmic Signature',
       description:
         'Cosmic Signature 자산이 거래되는 곳: 수수료 없는 Axiom Zero NFT 마켓플레이스, Arbitrum의 Uniswap CST 교환, 사이클을 다루는 Chaos Zero 예측 시장.',
@@ -483,6 +497,7 @@ export const learnTextKo = {
     // lexicon-allow-start: explicit denial language for crawler and compliance clarity.
     'not-a-lottery-not-an-investment': {
       cardTitle: '프로토콜이 아닌 것',
+      cardDescription: '이 프로토콜이 무엇이 아닌지, 그 차이가 왜 중요한지 설명합니다.',
       title: 'Cosmic Signature는 복권이나 카지노, 투자 상품인가요? | Cosmic Signature',
       description:
         'Cosmic Signature는 절차적 온체인 아트 프로토콜이며, 복권도, 카지노도, 도박 상품도, 투자 상품도 아닙니다.',

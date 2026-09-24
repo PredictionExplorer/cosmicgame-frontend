@@ -308,7 +308,7 @@ Interface vocabulary — no coinage needed, but fixed for consistency:
 | Gallery                              | ギャラリー                                      | never 画廊                                              |
 | How It Works                         | 仕組み                                          | never 使い方 (a help page)                              |
 | FAQ / Clarifications                 | よくある質問                                    | nav and page heading alike                              |
-| Learn Hub                            | 学習ハブ                                        |                                                         |
+| Learn (was Learn Hub)                | 学ぶ                                            |                                                         |
 | About                                | Cosmic Signatureについて                        | short form in nav: 概要                                 |
 | Statistics                           | 統計                                            |                                                         |
 | My Statistics / My Tokens            | 自分の統計 / 自分のNFT                          | 自分の, never 私の or マイ                              |

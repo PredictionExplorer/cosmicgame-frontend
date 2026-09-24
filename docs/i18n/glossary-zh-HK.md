@@ -72,7 +72,7 @@ As in [glossary-zh.md §1](./glossary-zh.md#1-term-formation-rules造词规则),
 | Gallery                            | 畫廊                       | 畫廊                       |                                           |
 | How It Works                       | 運作原理                   | 運作原理                   |                                           |
 | FAQ / Clarifications               | 常見問題 / 釋疑            | 常見問題 / 釋疑            |                                           |
-| Learn Hub                          | 學習中心                   | 學習中心                   |                                           |
+| Learn (was Learn Hub)              | 學習                       | 學習                       | prose: 學習指南                           |
 | Home (nav, "back to")              | **主頁**                   | 首頁                       |                                           |
 | Site Map                           | 網站地圖                   | 網站導覽                   |                                           |
 | Statistics                         | 統計                       | 統計                       |                                           |

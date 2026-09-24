@@ -72,7 +72,7 @@ Interface vocabulary, fixed for consistency. The zh-HK column is a reviewer's ai
 | Gallery                            | 畫廊                             | 畫廊                       | not 圖庫                                            |
 | How It Works                       | 運作原理                         | 運作原理                   |                                                     |
 | FAQ / Clarifications               | 常見問題 / 釋疑                  | 常見問題 / 釋疑            |                                                     |
-| Learn Hub                          | 學習中心                         | 學習中心                   |                                                     |
+| Learn (was Learn Hub)              | 學習                             | 學習                       | prose: 學習指南                                     |
 | Home (nav, "back to")              | 首頁                             | 主頁                       |                                                     |
 | Site Map                           | **網站導覽**                     | 網站地圖                   | the Taiwan convention for a site map page           |
 | Statistics                         | 統計                             | 統計                       |                                                     |

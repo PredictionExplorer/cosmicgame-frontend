@@ -121,6 +121,12 @@ describe('learn reading path', () => {
       // A card title is short and does not repeat the brand.
       expect(article.cardTitle).not.toContain('Cosmic Signature');
       expect(article.cardTitle.length).toBeLessThan(article.h1.length + 12);
+      // The card's line says what the guide holds, in one short line, and is
+      // not the search snippet, which leads with the brand.
+      expect(article.cardDescription.trim()).not.toBe('');
+      expect(article.cardDescription).not.toContain('Cosmic Signature');
+      expect([...article.cardDescription].length).toBeLessThanOrEqual(90);
+      expect(article.cardDescription).not.toBe(article.description);
       expect(signaturePlate(article.plate)).toBeDefined();
     }
     expect(articleUi.appendix.length).toBeGreaterThan(0);

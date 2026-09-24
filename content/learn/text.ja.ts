@@ -99,6 +99,8 @@ export const learnTextJa = {
   articles: {
     'what-is-cosmic-signature': {
       cardTitle: 'プロトコルとは',
+      cardDescription:
+        'パフォーマンス・サイクルごとの一筆が形づくる、Arbitrum上のプロシージャルなアートです。',
       title: 'Cosmic Signatureとは？ | Cosmic Signature',
       description:
         'Cosmic Signatureは、パフォーマンス・サイクルの一筆が決定論的な三体NFTアートワークを形づくる、Arbitrum上のプロシージャル・オンチェーンアート・プロトコルです。',
@@ -139,6 +141,8 @@ export const learnTextJa = {
     },
     'how-the-performance-cycle-works': {
       cardTitle: 'パフォーマンス・サイクル',
+      cardDescription:
+        'サイクルが始まり、確定時刻に沿って進み、確定して準備金を配分するまでの流れです。',
       title: 'Cosmic Signatureのパフォーマンス・サイクルの仕組み | Cosmic Signature',
       description:
         'Cosmic Signatureのパフォーマンス・サイクルがArbitrum上で調律期間、一筆、確定、配分トラックをどう使うかを学ぶ。',
@@ -183,6 +187,7 @@ export const learnTextJa = {
     },
     'how-gestures-work': {
       cardTitle: '一筆の仕組み',
+      cardDescription: 'ETHとCSTの一筆にかかる費用、記録される内容、確定時刻が延びる仕組みです。',
       title: 'Cosmic Signatureにおける一筆の仕組み | Cosmic Signature',
       description:
         'ETH一筆、CST一筆、一筆の費用、参加CST、そして一筆が各Cosmic Signatureパフォーマンス・サイクルをどう形づくるかを理解する。',
@@ -227,6 +232,7 @@ export const learnTextJa = {
     },
     'three-body-nft-art': {
       cardTitle: '三体アート',
+      cardDescription: 'オンチェーンのシードと三体物理が、毎回同じ作品を生み出す仕組みです。',
       title: 'Cosmic Signatureが三体NFTアートを生成する仕組み | Cosmic Signature',
       description:
         'オンチェーンのシードと三体物理から生成される決定論的なCosmic Signature NFTアートワークの技術的な解説。',
@@ -271,6 +277,7 @@ export const learnTextJa = {
     },
     'cosmic-signature-on-arbitrum': {
       cardTitle: 'Arbitrum上のプロトコル',
+      cardDescription: 'プロトコルがEthereumのレイヤー2ネットワークであるArbitrumで動く理由です。',
       title: 'Arbitrum上のCosmic Signature | Cosmic Signature',
       description:
         'Cosmic SignatureがArbitrumで動く理由と、プロトコルがオンチェーンアートのためにEthereumレイヤー2のインフラをどう使うか。',
@@ -304,6 +311,7 @@ export const learnTextJa = {
     },
     'contracts-security-verification': {
       cardTitle: 'コントラクトと検証',
+      cardDescription: 'コントラクトとソースコードの在りかと、自分で検証する方法です。',
       title: 'Cosmic Signatureのコントラクト、セキュリティ、検証 | Cosmic Signature',
       description:
         'Arbitrumプロトコルの、Cosmic Signatureスマートコントラクト、ソースコード、検証、セキュリティの背景。',
@@ -341,6 +349,8 @@ export const learnTextJa = {
     },
     'cst-token-and-cosmic-council': {
       cardTitle: 'CSTと宇宙評議会',
+      cardDescription:
+        'CSTとは何か、どう刻印されるか、保有者がプロトコルをどう調整するかを説明します。',
       title: 'CSTと宇宙評議会 | Cosmic Signature',
       description: 'CSTトークンが一筆、プロトコルの調整、宇宙評議会とどう関わるかを学ぶ。',
       h1: 'CSTと宇宙評議会',
@@ -374,6 +384,8 @@ export const learnTextJa = {
     },
     'anchoring-nfts': {
       cardTitle: 'NFTの係留',
+      cardDescription:
+        '係留したNFTがサイクルごとの係留配分をどう分け合うかと、係留解除の決まりです。',
       title: 'Cosmic Signature NFTの係留 | Cosmic Signature',
       description: 'Cosmic Signature NFTの係留、ETH係留配分、Random Walk NFTの対象資格の仕組み。',
       h1: 'Cosmic Signature NFTの係留',
@@ -407,6 +419,7 @@ export const learnTextJa = {
     },
     'protocol-guild-public-goods': {
       cardTitle: '公共財とProtocol Guild',
+      cardDescription: 'すべてのサイクル準備金の一部が、Ethereumのコア貢献者に届く仕組みです。',
       title: 'Cosmic SignatureとEthereumの公共財 | Cosmic Signature',
       description:
         'Cosmic Signatureが公共財配分を、Ethereumコア貢献者の資金支援メカニズムであるProtocol Guildへどう届けるか。',
@@ -440,6 +453,7 @@ export const learnTextJa = {
     },
     'collecting-and-trading-cosmic-signature': {
       cardTitle: '収集と取引',
+      cardDescription: 'NFTとCSTの取引場所と、取引の前に確かめることです。',
       title: 'Cosmic Signature NFTとCSTの収集と取引 | Cosmic Signature',
       description:
         'Cosmic Signatureのアセットが取引される場所：手数料ゼロのAxiom Zero NFTマーケットプレイス、Arbitrum上のUniswapでのCSTスワップ、サイクルについてのChaos Zero予測市場。',
@@ -487,6 +501,7 @@ export const learnTextJa = {
     // lexicon-allow-start: explicit denial language for crawler and compliance clarity.
     'not-a-lottery-not-an-investment': {
       cardTitle: 'プロトコルではないもの',
+      cardDescription: 'このプロトコルが何ではないのか、その違いがなぜ大切かを説明します。',
       title: 'Cosmic Signatureは宝くじ、カジノ、投資ですか？ | Cosmic Signature',
       description:
         'Cosmic Signatureはプロシージャル・オンチェーンアート・プロトコルであり、宝くじ、カジノ、ギャンブル商品、投資商品ではありません。',
