@@ -5,23 +5,80 @@
   },
   "primaryLabel": "主導航",
   "menuLabel": "打開選單",
+  "menuLabelWithAlert": "打開選單，有可取回的分配",
   "drawerTitle": "導航",
-  "sections": {
-    "protocol": "協議",
-    "ecosystem": "生態",
-    "myAccount": "我的帳戶"
+  "menus": {
+    "explore": "探索",
+    "learn": "學習"
   },
-  "links": {
+  "sections": {
+    "participate": "參與",
+    "collection": "作品集",
+    "explore": "探索",
+    "records": "記錄",
+    "learn": "學習",
+    "trust": "信任",
+    "account": "帳戶",
+    "ecosystem": "生態",
+    "community": "社區"
+  },
+  "routes": {
+    "observatory": {
+      "label": "觀測台",
+      "description": "在進行中的週期落筆"
+    },
+    "currentCycle": {
+      "label": "目前週期",
+      "description": "進行中週期的全貌：每一筆落筆與目前排名"
+    },
+    "imprint": {
+      "label": "銘刻 Random Walk NFT",
+      "description": "銘刻 Random Walk NFT，降低落筆價格"
+    },
     "gallery": {
       "label": "畫廊",
       "description": "瀏覽所有已銘刻的簽名作品"
     },
-    "explore": {
-      "label": "探索"
+    "namedNfts": {
+      "label": "已命名 NFT",
+      "description": "由所有者命名的簽名作品"
     },
-    "currentCycle": {
-      "label": "目前週期",
-      "description": "查看正在塑造目前週期的即時落筆"
+    "attachedNfts": {
+      "label": "已附加 NFT 貢獻",
+      "description": "各週期中附加到落筆的 NFT"
+    },
+    "usedRwlkNfts": {
+      "label": "已使用的 Random Walk NFT",
+      "description": "已用於降低落筆價格的 Random Walk NFT"
+    },
+    "statistics": {
+      "label": "統計",
+      "description": "協議全局指標與記錄"
+    },
+    "statisticsParticipation": {
+      "label": "參與統計",
+      "short": "參與",
+      "description": "參與者與落筆的歷史變化"
+    },
+    "statisticsTokens": {
+      "label": "代幣分佈統計",
+      "short": "代幣",
+      "description": "CST 與 NFT 的供應量與持有人"
+    },
+    "statisticsAnchoring": {
+      "label": "錨定統計",
+      "short": "錨定",
+      "description": "錨定總量與歷史記錄"
+    },
+    "statisticsActivity": {
+      "label": "落筆活動統計",
+      "short": "活動",
+      "description": "每個週期中落筆發生的時間"
+    },
+    "statisticsPerformance": {
+      "label": "參與者表現統計",
+      "short": "表現",
+      "description": "週期記錄與參與者排名"
     },
     "allocationRecipients": {
       "label": "分配名錄",
@@ -29,22 +86,35 @@
     },
     "anchorDistributions": {
       "label": "錨定派發",
-      "description": "查看已錨定的 NFT 及其派發"
+      "description": "已錨定的 NFT 及其派發"
     },
-    "outreachReserve": {
-      "label": "推廣儲備",
-      "description": "查看社區推廣動態"
+    "outreachAllocations": {
+      "label": "推廣分配",
+      "description": "從推廣儲備分配的 CST"
     },
-    "statistics": {
-      "label": "統計",
-      "description": "查看協議全局指標與記錄"
+    "publicGoodsProtocol": {
+      "label": "協議公共物品資助",
+      "description": "每個週期的公共物品分配"
     },
-    "contracts": {
-      "label": "合約",
-      "description": "查看已驗證的地址與源代碼"
+    "publicGoodsVoluntary": {
+      "label": "自願公共物品資助",
+      "description": "直接存入公共物品金庫的貢獻"
     },
-    "help": {
-      "label": "幫助"
+    "publicGoodsRetrievals": {
+      "label": "公共物品取回",
+      "description": "從公共物品金庫轉撥的資金"
+    },
+    "ethContributions": {
+      "label": "直接 ETH 貢獻",
+      "description": "直接貢獻的 ETH 及其附言"
+    },
+    "coordinationChanges": {
+      "label": "協調變更",
+      "description": "協議參數的每一次變更"
+    },
+    "retrievedAllocations": {
+      "label": "已取回分配",
+      "description": "各已收官週期的分配記錄"
     },
     "howItWorks": {
       "label": "運作原理",
@@ -52,36 +122,168 @@
     },
     "faq": {
       "label": "常見問題",
-      "description": "查看常見問題解答"
+      "description": "常見問題解答"
     },
-    "about": {
-      "label": "關於 Cosmic Signature",
-      "description": "了解協議背後的故事"
-    },
-    "learn": {
+    "learnHub": {
       "label": "學習中心",
-      "description": "閱讀指南與深度解讀"
+      "description": "協議、藝術與參與方式指南"
     },
     "whitePaper": {
       "label": "白皮書",
       "description": "協議機制與設計的完整說明"
     },
-    "discover": {
-      "label": "探索 Cosmic Signature",
-      "description": "了解藝術、故事與協議"
+    "quiz": {
+      "label": "知識測驗",
+      "description": "分三個等級檢驗你的理解"
     },
-    "myDashboard": "我的儀表板",
-    "myAllocations": "我的分配",
-    "myNfts": "我的 NFT",
-    "myAnchors": "我的錨定",
-    "recipientHistory": "獲配記錄"
+    "about": {
+      "label": "關於 Cosmic Signature",
+      "description": "協議背後的故事"
+    },
+    "projectSite": {
+      "label": "項目官網",
+      "description": "一覽藝術、故事與協議"
+    },
+    "security": {
+      "label": "安全",
+      "description": "如何驗證協議並保障自身安全"
+    },
+    "audits": {
+      "label": "審計",
+      "description": "審計與形式化驗證狀態"
+    },
+    "contracts": {
+      "label": "合約",
+      "description": "Arbitrum 上已驗證的合約地址"
+    },
+    "sourceCode": {
+      "label": "源代碼",
+      "description": "渲染管線與合約源代碼"
+    },
+    "riskDisclosures": {
+      "label": "風險披露",
+      "description": "參與前需要了解的事項"
+    },
+    "terms": {
+      "label": "服務條款",
+      "description": "使用應用程式與參與協議時適用的條款"
+    },
+    "privacy": {
+      "label": "私隱政策",
+      "description": "錢包數據、分析與鏈上透明度"
+    },
+    "siteMap": {
+      "label": "網站地圖",
+      "description": "按欄目排列的所有頁面"
+    },
+    "myStatistics": {
+      "label": "我的統計",
+      "description": "你的落筆、分配與錨定"
+    },
+    "myAllocations": {
+      "label": "我的分配",
+      "description": "等待你取回的分配"
+    },
+    "myNfts": {
+      "label": "我的 NFT",
+      "description": "你錢包中的簽名作品"
+    },
+    "myAnchors": {
+      "label": "我的錨定",
+      "description": "錨定 NFT 並取回其派發"
+    },
+    "allocationHistory": {
+      "label": "我的分配歷史",
+      "description": "你的錢包獲得的所有分配"
+    },
+    "transferCst": {
+      "label": "轉帳 CST",
+      "description": "將 CST 發送到其他地址"
+    }
+  },
+  "groups": {
+    "publicGoods": {
+      "label": "公共物品",
+      "description": "對以太坊核心貢獻者的所有資助"
+    }
+  },
+  "outbound": {
+    "uniswap": {
+      "label": "在 Uniswap 上兌換 CST",
+      "description": "在 Arbitrum 上用 ETH 兌換 CST"
+    },
+    "axiomZero": {
+      "label": "Axiom Zero",
+      "description": "零手續費 NFT 市場"
+    },
+    "chaosZero": {
+      "label": "Chaos Zero",
+      "description": "獨立的預測市場"
+    },
+    "geckoTerminal": {
+      "label": "GeckoTerminal",
+      "description": "CST 池的價格與流動性"
+    },
+    "x": {
+      "label": "X（Twitter）",
+      "description": "新聞與公告"
+    },
+    "discord": {
+      "label": "Discord",
+      "description": "與社區交流"
+    },
+    "github": {
+      "label": "GitHub",
+      "description": "開源代碼庫"
+    },
+    "protocolGuild": {
+      "label": "Protocol Guild",
+      "description": "公共物品分配的接收方"
+    }
+  },
+  "link": {
+    "newTab": "（在新分頁中打開）",
+    "onHost": "位於 {host}"
+  },
+  "cta": {
+    "openApp": "打開應用程式"
+  },
+  "search": {
+    "trigger": "搜尋",
+    "triggerLabel": "搜尋頁面與記錄",
+    "title": "搜尋 Cosmic Signature",
+    "placeholder": "搜尋頁面，或貼上地址、代幣、週期或落筆 ID",
+    "listLabel": "結果",
+    "groups": {
+      "jump": "前往"
+    },
+    "results": {
+      "address": "參與者 {address}",
+      "token": "簽名作品 {id}",
+      "cycle": "第 {cycle} 個週期",
+      "gesture": "落筆 ID {id}",
+      "transaction": "在 {explorer} 上查看交易"
+    },
+    "descriptions": {
+      "address": "該地址的落筆、分配與 NFT",
+      "token": "作品、特徵與歷史",
+      "cycle": "該週期的分配名錄",
+      "gesture": "該落筆的價格、方式與留言",
+      "transaction": "在新分頁中打開區塊瀏覽器"
+    },
+    "empty": "沒有與「{query}」相符的結果。請嘗試頁面名稱、地址或數字。",
+    "keys": {
+      "move": "移動",
+      "open": "打開",
+      "close": "關閉"
+    }
+  },
+  "drawer": {
+    "preferences": "偏好設定",
+    "palette": "配色"
   },
   "ecosystem": {
-    "groupLabel": "Cosmic Signature 生態",
     "uniswap": {
-      "name": "兌換 CST",
-      "product": "Uniswap",
-      "tagline": "在 Uniswap 上用 ETH 兌換 CST",
       "ariaLabel": "在 Uniswap 上兌換 CST",
       "defaultLabel": "在 Uniswap 上兌換 CST",
       "shortLabel": "兌換 CST"
@@ -91,21 +293,15 @@
       "shortLabel": "查看 CST 池"
     },
     "axiomZero": {
-      "name": "Axiom Zero",
-      "product": "NFT 市場",
-      "tagline": "在零手續費市場收藏 Cosmic Signature NFT",
       "ariaLabel": "Axiom Zero NFT 市場",
       "defaultLabel": "Axiom Zero 上的 NFT",
       "menuLabel": "Axiom Zero 市場",
       "shortLabel": "Axiom Zero"
     },
     "chaosZero": {
-      "name": "Chaos Zero",
-      "product": "預測市場",
-      "tagline": "預測協議每個週期的結果",
-      "ariaLabel": "前往 Chaos Zero 參與預測",
-      "defaultLabel": "在 Chaos Zero 上參與預測",
-      "menuLabel": "Chaos Zero 預測",
+      "ariaLabel": "Chaos Zero 預測市場",
+      "defaultLabel": "Chaos Zero",
+      "menuLabel": "Chaos Zero",
       "shortLabel": "Chaos Zero"
     }
   },

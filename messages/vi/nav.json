@@ -5,23 +5,80 @@
   },
   "primaryLabel": "Điều hướng chính",
   "menuLabel": "Menu",
+  "menuLabelWithAlert": "Menu, có phân bổ đang chờ nhận về",
   "drawerTitle": "Điều hướng",
-  "sections": {
-    "protocol": "Giao thức",
-    "ecosystem": "Hệ sinh thái",
-    "myAccount": "Tài khoản của tôi"
+  "menus": {
+    "explore": "Khám phá",
+    "learn": "Tìm hiểu"
   },
-  "links": {
+  "sections": {
+    "participate": "Tham gia",
+    "collection": "Bộ sưu tập",
+    "explore": "Khám phá",
+    "records": "Bản ghi",
+    "learn": "Tìm hiểu",
+    "trust": "Tin cậy",
+    "account": "Tài khoản",
+    "ecosystem": "Hệ sinh thái",
+    "community": "Cộng đồng"
+  },
+  "routes": {
+    "observatory": {
+      "label": "Đài quan sát",
+      "description": "Đặt nét bút trong chu kỳ đang diễn ra"
+    },
+    "currentCycle": {
+      "label": "Chu kỳ hiện tại",
+      "description": "Toàn cảnh chu kỳ đang diễn ra: mọi nét bút và thứ hạng"
+    },
+    "imprint": {
+      "label": "Khắc RandomWalk NFT",
+      "description": "Khắc RandomWalk NFT để giảm chi phí nét bút"
+    },
     "gallery": {
       "label": "Phòng trưng bày",
       "description": "Mọi Signature đã được khắc đến nay"
     },
-    "explore": {
-      "label": "Khám phá"
+    "namedNfts": {
+      "label": "NFT đã đặt tên",
+      "description": "Các Signature được chủ sở hữu đặt tên"
     },
-    "currentCycle": {
-      "label": "Chu kỳ hiện tại",
-      "description": "Những nét bút đang định hình chu kỳ này"
+    "attachedNfts": {
+      "label": "Đóng góp NFT đính kèm",
+      "description": "Các NFT đính kèm vào nét bút qua các chu kỳ"
+    },
+    "usedRwlkNfts": {
+      "label": "RandomWalk NFT đã sử dụng",
+      "description": "RandomWalk NFT đã dùng để giảm chi phí nét bút"
+    },
+    "statistics": {
+      "label": "Thống kê",
+      "description": "Số liệu và kỷ lục toàn giao thức"
+    },
+    "statisticsParticipation": {
+      "label": "Thống kê tham gia",
+      "short": "Tham gia",
+      "description": "Người tham gia và nét bút theo thời gian"
+    },
+    "statisticsTokens": {
+      "label": "Thống kê phân bố token",
+      "short": "Token",
+      "description": "Nguồn cung và người nắm giữ CST, NFT"
+    },
+    "statisticsAnchoring": {
+      "label": "Thống kê neo giữ",
+      "short": "Neo giữ",
+      "description": "Tổng số và lịch sử neo giữ"
+    },
+    "statisticsActivity": {
+      "label": "Thống kê hoạt động nét bút",
+      "short": "Hoạt động",
+      "description": "Thời điểm các nét bút diễn ra qua từng chu kỳ"
+    },
+    "statisticsPerformance": {
+      "label": "Thống kê thành tích người tham gia",
+      "short": "Thành tích",
+      "description": "Kỷ lục chu kỳ và thứ hạng người tham gia"
     },
     "allocationRecipients": {
       "label": "Người nhận phân bổ",
@@ -31,20 +88,33 @@
       "label": "Phân phối neo giữ",
       "description": "NFT đang neo giữ và các khoản phân phối tương ứng"
     },
-    "outreachReserve": {
-      "label": "Dự trữ truyền thông",
-      "description": "Hoạt động truyền thông cộng đồng"
+    "outreachAllocations": {
+      "label": "Phân bổ truyền thông",
+      "description": "CST được phân bổ từ Dự trữ truyền thông"
     },
-    "statistics": {
-      "label": "Thống kê",
-      "description": "Số liệu và kỷ lục toàn giao thức"
+    "publicGoodsProtocol": {
+      "label": "Đóng góp Hàng hóa công của giao thức",
+      "description": "Phân bổ Hàng hóa công của từng chu kỳ"
     },
-    "contracts": {
-      "label": "Hợp đồng",
-      "description": "Địa chỉ đã xác minh và mã nguồn"
+    "publicGoodsVoluntary": {
+      "label": "Đóng góp Hàng hóa công tự nguyện",
+      "description": "Các khoản gửi thẳng vào Kho Hàng hóa công"
     },
-    "help": {
-      "label": "Trợ giúp"
+    "publicGoodsRetrievals": {
+      "label": "Nhận về Hàng hóa công",
+      "description": "Các khoản chuyển từ Kho Hàng hóa công"
+    },
+    "ethContributions": {
+      "label": "Đóng góp ETH trực tiếp",
+      "description": "ETH được đóng góp trực tiếp kèm ghi chú"
+    },
+    "coordinationChanges": {
+      "label": "Thay đổi điều phối",
+      "description": "Mọi thay đổi tham số của giao thức"
+    },
+    "retrievedAllocations": {
+      "label": "Phân bổ đã nhận về",
+      "description": "Bản ghi phân bổ của các chu kỳ đã hoàn tất"
     },
     "howItWorks": {
       "label": "Cách hoạt động",
@@ -54,34 +124,166 @@
       "label": "Câu hỏi thường gặp",
       "description": "Giải đáp những câu hỏi phổ biến"
     },
-    "about": {
-      "label": "Về Cosmic Signature",
-      "description": "Câu chuyện phía sau giao thức"
-    },
-    "learn": {
+    "learnHub": {
       "label": "Trung tâm học tập",
-      "description": "Hướng dẫn và bài viết chuyên sâu"
+      "description": "Hướng dẫn về giao thức, tác phẩm và cách tham gia"
     },
     "whitePaper": {
       "label": "Sách trắng",
       "description": "Tài liệu tham chiếu đầy đủ về giao thức"
     },
-    "discover": {
-      "label": "Khám phá Cosmic Signature",
-      "description": "Nghệ thuật, câu chuyện và giao thức"
+    "quiz": {
+      "label": "Trắc nghiệm",
+      "description": "Kiểm tra hiểu biết của bạn qua ba cấp độ"
     },
-    "myDashboard": "Bảng điều khiển của tôi",
-    "myAllocations": "Phân bổ của tôi",
-    "myNfts": "NFT của tôi",
-    "myAnchors": "Neo giữ của tôi",
-    "recipientHistory": "Lịch sử nhận phân bổ"
+    "about": {
+      "label": "Về Cosmic Signature",
+      "description": "Câu chuyện phía sau giao thức"
+    },
+    "projectSite": {
+      "label": "Trang dự án",
+      "description": "Tác phẩm, câu chuyện và giao thức trong một trang"
+    },
+    "security": {
+      "label": "Bảo mật",
+      "description": "Cách xác minh giao thức và giữ an toàn"
+    },
+    "audits": {
+      "label": "Kiểm toán",
+      "description": "Tình trạng kiểm toán và kiểm chứng hình thức"
+    },
+    "contracts": {
+      "label": "Hợp đồng",
+      "description": "Địa chỉ hợp đồng đã xác minh trên Arbitrum"
+    },
+    "sourceCode": {
+      "label": "Mã nguồn",
+      "description": "Quy trình kết xuất và mã nguồn hợp đồng"
+    },
+    "riskDisclosures": {
+      "label": "Công bố rủi ro",
+      "description": "Những điều cần hiểu trước khi tham gia"
+    },
+    "terms": {
+      "label": "Điều khoản dịch vụ",
+      "description": "Điều khoản sử dụng ứng dụng và tham gia"
+    },
+    "privacy": {
+      "label": "Chính sách quyền riêng tư",
+      "description": "Dữ liệu ví, phân tích và tính minh bạch trên chuỗi"
+    },
+    "siteMap": {
+      "label": "Sơ đồ trang",
+      "description": "Mọi trang, xếp theo mục"
+    },
+    "myStatistics": {
+      "label": "Thống kê của tôi",
+      "description": "Nét bút, phân bổ và neo giữ của bạn"
+    },
+    "myAllocations": {
+      "label": "Phân bổ của tôi",
+      "description": "Các khoản phân bổ đang chờ bạn nhận về"
+    },
+    "myNfts": {
+      "label": "NFT của tôi",
+      "description": "Các Signature trong ví của bạn"
+    },
+    "myAnchors": {
+      "label": "Neo giữ của tôi",
+      "description": "Neo giữ NFT và nhận về phần phân phối"
+    },
+    "allocationHistory": {
+      "label": "Lịch sử phân bổ của tôi",
+      "description": "Mọi khoản phân bổ đến ví của bạn"
+    },
+    "transferCst": {
+      "label": "Chuyển CST",
+      "description": "Gửi CST đến một địa chỉ khác"
+    }
+  },
+  "groups": {
+    "publicGoods": {
+      "label": "Hàng hóa công",
+      "description": "Nguồn lực cho các nhà phát triển cốt lõi của Ethereum"
+    }
+  },
+  "outbound": {
+    "uniswap": {
+      "label": "Giao dịch CST trên Uniswap",
+      "description": "Hoán đổi ETH sang CST trên Arbitrum"
+    },
+    "axiomZero": {
+      "label": "Axiom Zero",
+      "description": "Sàn NFT không thu phí"
+    },
+    "chaosZero": {
+      "label": "Chaos Zero",
+      "description": "Thị trường dự đoán độc lập"
+    },
+    "geckoTerminal": {
+      "label": "GeckoTerminal",
+      "description": "Giá và thanh khoản của pool CST"
+    },
+    "x": {
+      "label": "X (Twitter)",
+      "description": "Tin tức và thông báo"
+    },
+    "discord": {
+      "label": "Discord",
+      "description": "Trò chuyện với cộng đồng"
+    },
+    "github": {
+      "label": "GitHub",
+      "description": "Kho mã nguồn mở"
+    },
+    "protocolGuild": {
+      "label": "Protocol Guild",
+      "description": "Đơn vị nhận phân bổ Hàng hóa công"
+    }
+  },
+  "link": {
+    "newTab": "(mở trong thẻ mới)",
+    "onHost": "trên {host}"
+  },
+  "cta": {
+    "openApp": "Mở ứng dụng"
+  },
+  "search": {
+    "trigger": "Tìm kiếm",
+    "triggerLabel": "Tìm trang và bản ghi",
+    "title": "Tìm kiếm trên Cosmic Signature",
+    "placeholder": "Tìm trang, hoặc dán địa chỉ, token, chu kỳ hay ID nét bút",
+    "listLabel": "Kết quả",
+    "groups": {
+      "jump": "Đi tới"
+    },
+    "results": {
+      "address": "Người tham gia {address}",
+      "token": "Signature {id}",
+      "cycle": "Chu kỳ #{cycle}",
+      "gesture": "Nét bút có ID {id}",
+      "transaction": "Giao dịch trên {explorer}"
+    },
+    "descriptions": {
+      "address": "Nét bút, phân bổ và NFT của địa chỉ này",
+      "token": "Tác phẩm, đặc điểm và lịch sử",
+      "cycle": "Người nhận phân bổ của chu kỳ này",
+      "gesture": "Chi phí, phương thức và lời nhắn của nét bút này",
+      "transaction": "Mở trình khám phá khối trong thẻ mới"
+    },
+    "empty": "Không có kết quả cho “{query}”. Thử tên trang, địa chỉ hoặc một con số.",
+    "keys": {
+      "move": "Di chuyển",
+      "open": "Mở",
+      "close": "Đóng"
+    }
+  },
+  "drawer": {
+    "preferences": "Tùy chọn",
+    "palette": "Bảng màu"
   },
   "ecosystem": {
-    "groupLabel": "Hệ sinh thái Cosmic Signature",
     "uniswap": {
-      "name": "Giao dịch CST",
-      "product": "Uniswap",
-      "tagline": "Hoán đổi ETH sang CST trên Uniswap",
       "ariaLabel": "Giao dịch CST trên Uniswap",
       "defaultLabel": "Giao dịch CST trên Uniswap",
       "shortLabel": "Giao dịch CST"
@@ -91,21 +293,15 @@
       "shortLabel": "Xem pool CST"
     },
     "axiomZero": {
-      "name": "Axiom Zero",
-      "product": "Sàn NFT",
-      "tagline": "Sưu tầm Cosmic Signature NFT trên sàn không thu phí",
       "ariaLabel": "Sàn NFT Axiom Zero",
       "defaultLabel": "NFT trên Axiom Zero",
       "menuLabel": "Sàn Axiom Zero",
       "shortLabel": "Axiom Zero"
     },
     "chaosZero": {
-      "name": "Chaos Zero",
-      "product": "Thị trường dự đoán",
-      "tagline": "Đưa ra dự đoán cho từng chu kỳ của giao thức",
-      "ariaLabel": "Đưa ra dự đoán trên Chaos Zero",
-      "defaultLabel": "Dự đoán trên Chaos Zero",
-      "menuLabel": "Dự đoán Chaos Zero",
+      "ariaLabel": "Thị trường dự đoán Chaos Zero",
+      "defaultLabel": "Chaos Zero",
+      "menuLabel": "Chaos Zero",
       "shortLabel": "Chaos Zero"
     }
   },

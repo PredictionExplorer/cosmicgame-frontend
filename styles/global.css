@@ -117,6 +117,12 @@
   --font-family-display: var(--display-font-stack);
   --font-display: var(--display-font-stack);
   --font-mono: var(--mono-font-stack);
+  /*
+   * The brand face (`font-brand`): Clash Display in every locale. The
+   * wordmark is a Latin logotype, so no html:lang() rule may swap it; the
+   * uk and vi display stacks would otherwise redraw the logo in Onest.
+   */
+  --font-brand: var(--font-clash-display), 'ClashDisplay-Variable', system-ui, sans-serif;
 
   /*
    * Tailwind v4 only generates `xs:` / `max-xs:` variants for a breakpoint it

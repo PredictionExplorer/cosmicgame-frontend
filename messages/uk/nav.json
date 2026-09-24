@@ -5,23 +5,80 @@
   },
   "primaryLabel": "Основна навігація",
   "menuLabel": "Меню",
+  "menuLabelWithAlert": "Меню. Є розподіли, які можна забрати",
   "drawerTitle": "Навігація",
-  "sections": {
-    "protocol": "Протокол",
-    "ecosystem": "Екосистема",
-    "myAccount": "Мій обліковий запис"
+  "menus": {
+    "explore": "Огляд",
+    "learn": "Навчання"
   },
-  "links": {
+  "sections": {
+    "participate": "Участь",
+    "collection": "Колекція",
+    "explore": "Огляд",
+    "records": "Записи",
+    "learn": "Навчання",
+    "trust": "Довіра",
+    "account": "Обліковий запис",
+    "ecosystem": "Екосистема",
+    "community": "Спільнота"
+  },
+  "routes": {
+    "observatory": {
+      "label": "Обсерваторія",
+      "description": "Зробіть жест у поточному циклі"
+    },
+    "currentCycle": {
+      "label": "Поточний цикл",
+      "description": "Поточний цикл повністю: кожен жест і кожна позиція"
+    },
+    "imprint": {
+      "label": "Закарбувати RandomWalk NFT",
+      "description": "Закарбуйте RandomWalk NFT, щоб знизити вартість жесту"
+    },
     "gallery": {
       "label": "Галерея",
       "description": "Усі Сигнатури, закарбовані дотепер"
     },
-    "explore": {
-      "label": "Огляд"
+    "namedNfts": {
+      "label": "Іменовані NFT",
+      "description": "Сигнатури, яким власники дали імена"
     },
-    "currentCycle": {
-      "label": "Поточний цикл",
-      "description": "Жести, які зараз формують поточний цикл"
+    "attachedNfts": {
+      "label": "Долучені NFT-внески",
+      "description": "NFT, долучені до жестів у різних циклах"
+    },
+    "usedRwlkNfts": {
+      "label": "Використані RandomWalk NFT",
+      "description": "RandomWalk NFT, уже використані для нижчої вартості жесту"
+    },
+    "statistics": {
+      "label": "Статистика",
+      "description": "Показники та рекорди всього протоколу"
+    },
+    "statisticsParticipation": {
+      "label": "Статистика участі",
+      "short": "Участь",
+      "description": "Учасники й жести з часом"
+    },
+    "statisticsTokens": {
+      "label": "Статистика розподілу токенів",
+      "short": "Токени",
+      "description": "Пропозиція та власники CST і NFT"
+    },
+    "statisticsAnchoring": {
+      "label": "Статистика закріплень",
+      "short": "Закріплення",
+      "description": "Підсумки та історія закріплень"
+    },
+    "statisticsActivity": {
+      "label": "Статистика активності жестів",
+      "short": "Активність",
+      "description": "Коли відбуваються жести, цикл за циклом"
+    },
+    "statisticsPerformance": {
+      "label": "Статистика результатів учасників",
+      "short": "Результати",
+      "description": "Рекорди циклів і позиції учасників"
     },
     "allocationRecipients": {
       "label": "Отримувачі розподілів",
@@ -31,20 +88,33 @@
       "label": "Надходження за закріплення",
       "description": "Закріплені NFT та їхні надходження"
     },
-    "outreachReserve": {
-      "label": "Резерв просування",
-      "description": "Як спільнота просуває протокол"
+    "outreachAllocations": {
+      "label": "Розподіли за просування",
+      "description": "CST, розподілені з резерву просування"
     },
-    "statistics": {
-      "label": "Статистика",
-      "description": "Показники та рекорди всього протоколу"
+    "publicGoodsProtocol": {
+      "label": "Внески протоколу у суспільні блага",
+      "description": "Розподіл на суспільні блага в кожному циклі"
     },
-    "contracts": {
-      "label": "Контракти",
-      "description": "Верифіковані адреси та вихідний код"
+    "publicGoodsVoluntary": {
+      "label": "Добровільні внески у суспільні блага",
+      "description": "Внески, надіслані прямо до сховища суспільних благ"
     },
-    "help": {
-      "label": "Довідка"
+    "publicGoodsRetrievals": {
+      "label": "Забрані кошти суспільних благ",
+      "description": "Кошти, перераховані зі сховища суспільних благ"
+    },
+    "ethContributions": {
+      "label": "Прямі внески ETH",
+      "description": "ETH, внесений напряму, разом із нотатками"
+    },
+    "coordinationChanges": {
+      "label": "Зміни координації",
+      "description": "Кожна зміна параметрів протоколу"
+    },
+    "retrievedAllocations": {
+      "label": "Забрані розподіли",
+      "description": "Записи розподілів завершених циклів"
     },
     "howItWorks": {
       "label": "Як це працює",
@@ -54,34 +124,166 @@
       "label": "Поширені запитання",
       "description": "Відповіді на типові запитання"
     },
-    "about": {
-      "label": "Про Cosmic Signature",
-      "description": "Історія створення протоколу"
-    },
-    "learn": {
+    "learnHub": {
       "label": "Навчальний центр",
-      "description": "Посібники та докладні пояснення"
+      "description": "Посібники про протокол, мистецтво та участь"
     },
     "whitePaper": {
       "label": "Біла книга",
       "description": "Повний довідник протоколу"
     },
-    "discover": {
-      "label": "Знайомство з Cosmic Signature",
-      "description": "Мистецтво, історія та протокол"
+    "quiz": {
+      "label": "Тест знань",
+      "description": "Перевірте себе на трьох рівнях"
     },
-    "myDashboard": "Мій кабінет",
-    "myAllocations": "Мої розподіли",
-    "myNfts": "Мої NFT",
-    "myAnchors": "Мої закріплення",
-    "recipientHistory": "Історія отримувачів"
+    "about": {
+      "label": "Про Cosmic Signature",
+      "description": "Історія створення протоколу"
+    },
+    "projectSite": {
+      "label": "Сайт проєкту",
+      "description": "Мистецтво, історія та протокол коротко"
+    },
+    "security": {
+      "label": "Безпека",
+      "description": "Як перевірити протокол і захистити себе"
+    },
+    "audits": {
+      "label": "Аудити",
+      "description": "Стан аудиту та формальної верифікації"
+    },
+    "contracts": {
+      "label": "Контракти",
+      "description": "Верифіковані адреси контрактів на Arbitrum"
+    },
+    "sourceCode": {
+      "label": "Вихідний код",
+      "description": "Конвеєр рендерингу та код контрактів"
+    },
+    "riskDisclosures": {
+      "label": "Розкриття ризиків",
+      "description": "Що варто знати перед участю"
+    },
+    "terms": {
+      "label": "Умови використання",
+      "description": "Умови користування застосунком та участі"
+    },
+    "privacy": {
+      "label": "Політика конфіденційності",
+      "description": "Дані гаманця, аналітика та прозорість блокчейну"
+    },
+    "siteMap": {
+      "label": "Мапа сайту",
+      "description": "Усі сторінки за розділами"
+    },
+    "myStatistics": {
+      "label": "Моя статистика",
+      "description": "Ваші жести, розподіли та закріплення"
+    },
+    "myAllocations": {
+      "label": "Мої розподіли",
+      "description": "Розподіли, які можна забрати"
+    },
+    "myNfts": {
+      "label": "Мої NFT",
+      "description": "Сигнатури у вашому гаманці"
+    },
+    "myAnchors": {
+      "label": "Мої закріплення",
+      "description": "Закріплюйте NFT і забирайте надходження"
+    },
+    "allocationHistory": {
+      "label": "Історія моїх розподілів",
+      "description": "Усі розподіли на ваш гаманець"
+    },
+    "transferCst": {
+      "label": "Переказати CST",
+      "description": "Надішліть CST на іншу адресу"
+    }
+  },
+  "groups": {
+    "publicGoods": {
+      "label": "Суспільні блага",
+      "description": "Усі внески на підтримку ключових розробників Ethereum"
+    }
+  },
+  "outbound": {
+    "uniswap": {
+      "label": "Обміняти CST на Uniswap",
+      "description": "Обмін ETH на CST у мережі Arbitrum"
+    },
+    "axiomZero": {
+      "label": "Axiom Zero",
+      "description": "NFT-маркетплейс без комісій"
+    },
+    "chaosZero": {
+      "label": "Chaos Zero",
+      "description": "Незалежний ринок прогнозів"
+    },
+    "geckoTerminal": {
+      "label": "GeckoTerminal",
+      "description": "Ціна та ліквідність пулу CST"
+    },
+    "x": {
+      "label": "X (Twitter)",
+      "description": "Новини та оголошення"
+    },
+    "discord": {
+      "label": "Discord",
+      "description": "Спілкування зі спільнотою"
+    },
+    "github": {
+      "label": "GitHub",
+      "description": "Відкриті репозиторії"
+    },
+    "protocolGuild": {
+      "label": "Protocol Guild",
+      "description": "Отримувач розподілу на суспільні блага"
+    }
+  },
+  "link": {
+    "newTab": "(відкриється в новій вкладці)",
+    "onHost": "на {host}"
+  },
+  "cta": {
+    "openApp": "Відкрити застосунок"
+  },
+  "search": {
+    "trigger": "Пошук",
+    "triggerLabel": "Пошук сторінок і записів",
+    "title": "Пошук на Cosmic Signature",
+    "placeholder": "Шукайте сторінку або вставте адресу, токен, цикл чи ID жесту",
+    "listLabel": "Результати",
+    "groups": {
+      "jump": "Перейти"
+    },
+    "results": {
+      "address": "Учасник {address}",
+      "token": "Сигнатура {id}",
+      "cycle": "Цикл {cycle}",
+      "gesture": "Жест з ID {id}",
+      "transaction": "Транзакція в {explorer}"
+    },
+    "descriptions": {
+      "address": "Жести, розподіли та NFT цієї адреси",
+      "token": "Твір, його риси та історія",
+      "cycle": "Отримувачі розподілів цього циклу",
+      "gesture": "Вартість, спосіб і повідомлення цього жесту",
+      "transaction": "Відкриє оглядач блоків у новій вкладці"
+    },
+    "empty": "Нічого не знайдено за запитом «{query}». Спробуйте назву сторінки, адресу або число.",
+    "keys": {
+      "move": "Вибір",
+      "open": "Відкрити",
+      "close": "Закрити"
+    }
+  },
+  "drawer": {
+    "preferences": "Налаштування",
+    "palette": "Палітра"
   },
   "ecosystem": {
-    "groupLabel": "Екосистема Cosmic Signature",
     "uniswap": {
-      "name": "Обмін CST",
-      "product": "Uniswap",
-      "tagline": "Обмін ETH на CST через Uniswap",
       "ariaLabel": "Обміняти CST на Uniswap",
       "defaultLabel": "Обміняти CST на Uniswap",
       "shortLabel": "Обмін CST"
@@ -91,21 +293,15 @@
       "shortLabel": "Пул CST"
     },
     "axiomZero": {
-      "name": "Axiom Zero",
-      "product": "NFT-маркетплейс",
-      "tagline": "Колекціонуйте Cosmic Signature NFT на маркетплейсі без комісій",
       "ariaLabel": "NFT-маркетплейс Axiom Zero",
       "defaultLabel": "NFT на Axiom Zero",
       "menuLabel": "Маркетплейс Axiom Zero",
       "shortLabel": "Axiom Zero"
     },
     "chaosZero": {
-      "name": "Chaos Zero",
-      "product": "Ринок прогнозів",
-      "tagline": "Робіть прогнози щодо кожного циклу протоколу",
-      "ariaLabel": "Робити прогнози на Chaos Zero",
-      "defaultLabel": "Прогнози на Chaos Zero",
-      "menuLabel": "Прогнози Chaos Zero",
+      "ariaLabel": "Ринок прогнозів Chaos Zero",
+      "defaultLabel": "Chaos Zero",
+      "menuLabel": "Chaos Zero",
       "shortLabel": "Chaos Zero"
     }
   },
