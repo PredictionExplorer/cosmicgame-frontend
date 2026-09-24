@@ -27,6 +27,7 @@ import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { LinkifiedText } from '@/components/ui/linkified-text';
 import { LiveStatus } from '@/components/ui/live-status';
 import { Spinner } from '@/components/ui/spinner';
+import { tabsListVariants, tabsTriggerVariants } from '@/components/ui/tabs';
 import { TxExplorerLink } from '@/components/ui/tx-status';
 import type { GestureFeedSystemEvent } from '@/components/home/deck/feedSystemEvents';
 import { useBannedGestures } from '@/hooks/useApiQuery';
@@ -332,34 +333,40 @@ function MessageRow({
     >
       <div
         data-testid="gesture-message-meta"
-        className="flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1"
+        className="flex min-w-0 items-center justify-between gap-3"
       >
-        <AddressChip address={gesture.BidderAddr} variant="plain" label={false} />
-        {isOwn && (
-          <Badge tone="accent" size="sm">
-            {t('chat.you')}
-          </Badge>
-        )}
-        <span data-testid="gesture-method-badge" className="type-caption text-subtle">
-          {methodTag}
+        <span className="flex min-w-0 items-center gap-2">
+          <AddressChip address={gesture.BidderAddr} variant="plain" label={false} />
+          {isOwn && (
+            <Badge tone="accent" size="sm">
+              {t('chat.you')}
+            </Badge>
+          )}
         </span>
-        {gestureId != null && (
-          <Link
-            href={`/gesture/${gestureId}`}
-            className="link-quiet type-caption tabular-nums text-subtle hover:text-foreground"
-            aria-label={t('chat.openPositionAria', { position: String(position ?? gestureId) })}
-          >
-            #{position ?? gestureId}
-          </Link>
-        )}
         <DateTime
           timestamp={gesture.TimeStamp}
           variant="relative"
-          className="type-caption ms-auto text-subtle"
+          className="type-caption shrink-0 text-subtle"
         />
       </div>
       <p className="type-body-sm mt-1.5 whitespace-pre-wrap text-foreground [overflow-wrap:anywhere]">
         <LinkifiedText text={message} />
+      </p>
+      {/* How the Gesture was made: the method and cost, and its place in the cycle. */}
+      <p className="type-caption mt-1.5 flex flex-wrap items-center gap-x-2 text-subtle">
+        <span data-testid="gesture-method-badge">{methodTag}</span>
+        {gestureId != null && (
+          <>
+            <span aria-hidden>·</span>
+            <Link
+              href={`/gesture/${gestureId}`}
+              className="link-quiet tabular-nums text-subtle hover:text-foreground"
+              aria-label={t('chat.openPositionAria', { position: String(position ?? gestureId) })}
+            >
+              #{position ?? gestureId}
+            </Link>
+          </>
+        )}
       </p>
     </article>
   );
@@ -573,24 +580,25 @@ export function GestureMessageChat({
       </header>
 
       {hasFeedContent && !isLoading && !error && (
-        <div
-          role="group"
-          aria-label={t('chat.viewLabel')}
-          className="flex shrink-0 gap-1 border-b border-rule-faint px-5 py-2 sm:px-6 print:hidden"
-        >
-          {(['messages', 'all'] as const).map((option) => (
-            <Button
-              key={option}
-              type="button"
-              size="sm"
-              variant={view === option ? 'secondary' : 'ghost'}
-              aria-pressed={view === option}
-              onClick={() => setView(option)}
-              className={cn('h-8 min-h-8 px-3', view !== option && 'text-muted-foreground')}
-            >
-              {t(`chat.view.${option}`)}
-            </Button>
-          ))}
+        <div className="shrink-0 border-b border-rule-faint px-5 py-2.5 sm:px-6 print:hidden">
+          <div
+            role="group"
+            aria-label={t('chat.viewLabel')}
+            className={tabsListVariants({ variant: 'segmented' })}
+          >
+            {(['messages', 'all'] as const).map((option) => (
+              <button
+                key={option}
+                type="button"
+                aria-pressed={view === option}
+                data-state={view === option ? 'active' : 'inactive'}
+                onClick={() => setView(option)}
+                className={tabsTriggerVariants({ variant: 'segmented' })}
+              >
+                {t(`chat.view.${option}`)}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 

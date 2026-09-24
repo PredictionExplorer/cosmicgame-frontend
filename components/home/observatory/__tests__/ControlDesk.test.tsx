@@ -2,7 +2,7 @@ import userEvent from '@testing-library/user-event';
 
 import { render, screen, within, checkA11y } from '@/test-utils';
 
-import { ControlDesk } from '../ControlDesk';
+import { AllocationsDisclosure, ControlDesk } from '../ControlDesk';
 
 const regions = {
   header: <h1>Observatory</h1>,
@@ -12,7 +12,6 @@ const regions = {
   gestureConsole: <section aria-label="Gesture form">Form</section>,
   standing: <section aria-label="Your standing">Standing</section>,
   art: <section aria-label="Latest Signature">Art</section>,
-  allocationLedger: <p>Ledger</p>,
 };
 
 describe('ControlDesk', () => {
@@ -101,7 +100,11 @@ describe('ControlDesk', () => {
 
   it('keeps the allocation breakdown in a native disclosure', async () => {
     const user = userEvent.setup();
-    render(<ControlDesk {...regions} />);
+    render(
+      <AllocationsDisclosure>
+        <p>Ledger</p>
+      </AllocationsDisclosure>,
+    );
     const disclosure = screen.getByTestId('allocations-disclosure');
     expect(disclosure).not.toHaveAttribute('open');
     await user.click(within(disclosure).getByText('home.orientation.allocationsTitle'));

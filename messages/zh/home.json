@@ -188,8 +188,8 @@
     },
     "steps": {
       "openingSoon": {
-        "label": "即将开启",
-        "detail": "下一周期已排定，正待开启。"
+        "label": "开启",
+        "detail": "每个周期都在排定的时间开启。"
       },
       "firstGesture": {
         "label": "第一笔",
@@ -197,7 +197,7 @@
       },
       "open": {
         "label": "周期进行中",
-        "detail": "每一笔都在塑造签名，也在延长时间。"
+        "detail": "每一笔都让落笔者成为最新落笔者，并可能延长倒计时。"
       },
       "finalWindow": {
         "label": "最后窗口",
@@ -205,7 +205,7 @@
       },
       "finalization": {
         "label": "收官",
-        "detail": "写下收官之笔的参与者可为周期收官。"
+        "detail": "归零后，最新落笔者可收官并获得签名分配；短暂窗口过后，任何人都可收官。"
       },
       "allocation": {
         "label": "分配",
@@ -739,20 +739,6 @@
   },
   "orientation": {
     "title": "周期如何运作",
-    "steps": {
-      "enter": {
-        "title": "写下一笔",
-        "body": "支付 ETH 或 CST，钱包会立即收到参与 CST。"
-      },
-      "extend": {
-        "title": "保持最新落笔的位置",
-        "body": "每次新落笔都会替换最新落笔者，并可能延长倒计时。"
-      },
-      "finalize": {
-        "title": "归零后收官",
-        "body": "最新落笔者可收官并获得签名分配。收官交易确认前，仍可继续落笔。"
-      }
-    },
     "costsNote": "其他参与者取代你的位置时，落笔所花费的 ETH 或 CST 不会退还。交易 Gas 费始终使用 ETH 支付。",
     "allocationsTitle": "周期储备如何分配",
     "allocationsDescription": "查看全部分配，包括星选与公共物品。",

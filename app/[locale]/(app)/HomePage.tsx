@@ -2,7 +2,7 @@
 
 import { memo, useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { zeroAddress } from 'viem';
-import { ArrowRight, ChevronDown } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { LazyMotion, domAnimation } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
@@ -17,17 +17,20 @@ import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { CyclePhaseGuide } from '@/components/home/CyclePhaseGuide';
 import { GestureMessageChat } from '@/components/home/GestureMessageChat';
-import { HomeObservatoryHero } from '@/components/home/HomeObservatoryHero';
 import { deriveFeedSystemEvents } from '@/components/home/deck/feedSystemEvents';
 import { ActionDock } from '@/components/home/observatory/ActionDock';
 import { AllocationLedger } from '@/components/home/observatory/AllocationLedger';
-import { ControlDesk } from '@/components/home/observatory/ControlDesk';
+import {
+  AllocationsDisclosure,
+  ControlDesk,
+  DESK_FRAME,
+} from '@/components/home/observatory/ControlDesk';
+import { HomeStory } from '@/components/home/observatory/HomeStory';
 import { CycleClock } from '@/components/home/observatory/CycleClock';
 import { CalibrationStatus } from '@/components/home/observatory/CalibrationStatus';
 import { CycleStanding, CycleStandingPreview } from '@/components/home/observatory/CycleStanding';
 import { GesturePanel } from '@/components/home/observatory/GesturePanel';
 import { LatestSignature } from '@/components/home/observatory/LatestSignature';
-import { ParticipationGuide } from '@/components/home/observatory/ParticipationGuide';
 import { PulseBar } from '@/components/home/observatory/PulseBar';
 import { StandingsLedger } from '@/components/home/observatory/StandingsLedger';
 import { getGestureSubmitParts } from '@/components/home/observatory/gestureSubmitLabel';
@@ -70,6 +73,7 @@ import { getCycleState, getDashboardActivationTime } from '@/lib/cycleState';
 import { resolveLatestGesture, type LatestParticipantEvidence } from '@/lib/latestGesture';
 import { fetchEndgameChainSample } from '@/lib/rpcRace';
 import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
+import { cn } from '@/lib/utils';
 import { getStableClientTargetTime, type ServerTimingSample } from '@/utils/time';
 import { sameAddress } from '@/utils/format';
 import {
@@ -86,7 +90,6 @@ import { deriveLiveCstGestureData } from '@/utils/cstGesture';
 // feed alone renders dozens of rows — which directly reduces main-thread
 // churn (INP) on mid-range phones. Their props are kept referentially
 // stable below (useMemo'd arrays, useCallback handlers).
-const MemoHomeObservatoryHero = memo(HomeObservatoryHero);
 const MemoGestureMessageChat = memo(GestureMessageChat);
 const MemoAttachedNFTAllocationShowcase = memo(AttachedNFTAllocationShowcase);
 const MemoLatestSignature = memo(LatestSignature);
@@ -292,14 +295,6 @@ const HomePage = ({
   // list so the plate is in the HTML, and a finalization that imprints new
   // Signatures refetches it through the dashboard's imprint count.
   const latestSignatures = useLatestSignatures(imprintedTokenCount, initialLatestSignatures);
-  const newestSignature = latestSignatures.signatures[0] ?? null;
-  const bannerToken = useMemo(
-    () =>
-      newestSignature?.Seed
-        ? { seed: `0x${String(newestSignature.Seed)}`, id: newestSignature.TokenId }
-        : null,
-    [newestSignature],
-  );
 
   const gestureForm = useGestureForm();
   const hasCurrentGesture = !!data && data.LastBidderAddr !== zeroAddress;
@@ -654,10 +649,6 @@ const HomePage = ({
   );
   const scrollToClock = useCallback(() => scrollToElement('cycle-clock'), [scrollToElement]);
 
-  const handlePrimaryCtaClick = useCallback(() => {
-    scrollToGesturePanel();
-  }, [scrollToGesturePanel]);
-
   // Method switches reset any picked RandomWalk token so a stale token can't
   // ride along silently.
   const handleSelectGestureType = useCallback(
@@ -891,61 +882,66 @@ const HomePage = ({
               loading={latestSignatures.isLoading}
             />
           }
-          orientation={<ParticipationGuide />}
-          allocationLedger={<AllocationLedger data={data} />}
         />
 
-        {/* Activity and attached assets follow the current cycle controls. */}
-        <div className="mt-8">
-          <div
-            data-testid="home-feed-actions"
-            className="flex flex-wrap items-center justify-end gap-x-5 gap-y-1"
-          >
-            <Link
-              href="/current-cycle"
-              data-testid="cycle-details-link-card"
-              className={`${TOUCH_TARGET_TEXT_LINK_CLASS} link-quiet inline-flex items-center gap-1 type-label text-primary`}
-            >
-              {t('cycleDetails.title')}
-              <ArrowRight className="size-3.5" aria-hidden />
-            </Link>
-            {hasPreviousCycle && (
-              <Link
-                href={`/allocation/${previousCycle}`}
-                data-testid="previous-cycle-link-card"
-                className={`${TOUCH_TARGET_TEXT_LINK_CLASS} link-quiet inline-flex items-center gap-1 type-label text-muted-foreground hover:text-foreground`}
-              >
-                {t('hero.console.previousAllocations', { number: String(previousCycle) })}
-                <ArrowRight className="size-3.5" aria-hidden />
-              </Link>
-            )}
+        {/* Row 3: the conversation beside where the cycle is now (F169, F296).
+            Messages lead the chat; the guide explains the loop as the six
+            steps with the current one marked, and carries the cycle links. */}
+        <div
+          data-testid="home-feed-layout"
+          className="mt-6 grid min-w-0 gap-4 md:gap-5 lg:grid-cols-12 lg:items-stretch"
+        >
+          <div data-testid="home-feed-column" className="min-w-0 lg:col-span-7">
+            <MemoGestureMessageChat
+              gestures={chatGestures}
+              pagination={chatPagination}
+              serverModerated={feed.mode === 'paged'}
+              isLoading={feed.isLoading}
+              error={Boolean(feed.error)}
+              onRetry={feed.retry}
+              account={account}
+              resetKey={feed.resetKey}
+              cycleNumber={round >= 0 ? round : undefined}
+              pulseKey={gesturePulseKey}
+              onJoinCta={!loading && isRoundActive ? handleJoinChatCta : undefined}
+              systemEvents={feedSystemEvents}
+              pendingMessages={pendingMessages}
+              className="lg:h-full print:h-auto"
+            />
           </div>
-
-          <div data-testid="home-feed-layout" className="mt-3 grid items-start gap-4">
-            <div data-testid="home-feed-column" className="min-w-0">
-              {/* Desktop sizes the panel; chat caps its reading area on phones. */}
-              <MemoGestureMessageChat
-                gestures={chatGestures}
-                pagination={chatPagination}
-                serverModerated={feed.mode === 'paged'}
-                isLoading={feed.isLoading}
-                error={Boolean(feed.error)}
-                onRetry={feed.retry}
-                account={account}
-                resetKey={feed.resetKey}
-                cycleNumber={round >= 0 ? round : undefined}
-                pulseKey={gesturePulseKey}
-                onJoinCta={!loading && isRoundActive ? handleJoinChatCta : undefined}
-                systemEvents={feedSystemEvents}
-                pendingMessages={pendingMessages}
-                className="lg:h-[clamp(20rem,48vh,28rem)] print:h-auto"
-              />
-            </div>
-          </div>
+          <CyclePhaseGuide
+            phase={cycleState.phase}
+            className={cn(DESK_FRAME, 'p-5 sm:p-6 lg:col-span-5')}
+            cycleLinks={
+              <span data-testid="home-feed-actions" className="contents">
+                <Link
+                  href="/current-cycle"
+                  data-testid="cycle-details-link-card"
+                  className={`${TOUCH_TARGET_TEXT_LINK_CLASS} link-quiet inline-flex items-center gap-1 type-label text-primary`}
+                >
+                  {t('cycleDetails.title')}
+                  <ArrowRight className="size-3.5" aria-hidden />
+                </Link>
+                {hasPreviousCycle && (
+                  <Link
+                    href={`/allocation/${previousCycle}`}
+                    data-testid="previous-cycle-link-card"
+                    className={`${TOUCH_TARGET_TEXT_LINK_CLASS} link-quiet inline-flex items-center gap-1 type-label text-primary`}
+                  >
+                    {t('hero.console.previousAllocations', { number: String(previousCycle) })}
+                    <ArrowRight className="size-3.5" aria-hidden />
+                  </Link>
+                )}
+              </span>
+            }
+          />
         </div>
 
-        {/* Receipts use the full content width. A tall attachment list in the
-            artwork rail would leave an equally tall blank below the chat. */}
+        <AllocationsDisclosure className="mt-6">
+          <AllocationLedger data={data} />
+        </AllocationsDisclosure>
+
+        {/* Receipts use the full content width. */}
         {hasAttachedAssets && (
           <div data-testid="home-attached-assets" className="mt-6">
             <MemoAttachedNFTAllocationShowcase
@@ -957,45 +953,7 @@ const HomePage = ({
           </div>
         )}
 
-        <details
-          data-testid="home-story-section"
-          className="group/story mt-6 rounded-surface border border-rule-faint bg-surface/60"
-        >
-          <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 type-title text-foreground sm:px-6 [&::-webkit-details-marker]:hidden">
-            {t('orientation.storyTitle')}
-            <ChevronDown
-              className="size-5 text-subtle transition-transform duration-[var(--duration-base)] motion-reduce:transition-none group-open/story:rotate-180"
-              aria-hidden
-            />
-          </summary>
-          <div className="border-t border-rule-faint p-3 sm:p-5">
-            <MemoHomeObservatoryHero
-              data={data}
-              bannerToken={bannerToken}
-              canOpenGesturePanel={!loading && isRoundActive}
-              phase={cycleState.phase}
-              onPrimaryCtaClick={handlePrimaryCtaClick}
-              headingLevel="h2"
-            />
-            <CyclePhaseGuide
-              data={data}
-              loading={loading}
-              allocationTime={allocationTime}
-              activationTime={activationTime}
-              now={now}
-              finalizationConfirmed={finalizationConfirmed}
-            />
-            <Link
-              href="/experimental-ui"
-              prefetch={false}
-              data-testid="experimental-ui-entry"
-              className="link-quiet inline-flex min-h-11 items-center gap-2 px-2 text-sm text-muted-foreground hover:text-foreground"
-            >
-              {t('deck.experimentalUi')}
-              <ArrowRight className="size-4" aria-hidden />
-            </Link>
-          </div>
-        </details>
+        <HomeStory className="mt-6" />
       </PageShell>
 
       {/* The one persistent quick-action surface: routes to the gesture

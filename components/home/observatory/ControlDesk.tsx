@@ -20,8 +20,6 @@ export interface ControlDeskProps {
   standingOnPhones?: boolean;
   /** The latest Signature: beside the form from 1024px, after the Calibration Window on phones. */
   art?: ReactNode;
-  orientation?: ReactNode;
-  allocationLedger: ReactNode;
   className?: string;
 }
 
@@ -52,13 +50,10 @@ export const ControlDesk = forwardRef<HTMLDivElement, ControlDeskProps>(
       standing,
       standingOnPhones = true,
       art,
-      orientation,
-      allocationLedger,
       className,
     },
     ref,
   ) => {
-    const t = useTranslations('home');
     return (
       <div data-testid="control-desk" className={cn('min-w-0', className)}>
         <div id="deck" ref={ref} className="scroll-mt-24">
@@ -145,31 +140,48 @@ export const ControlDesk = forwardRef<HTMLDivElement, ControlDeskProps>(
             )}
           </div>
         </div>
-        {orientation}
-        <details
-          id="allocation-breakdown"
-          data-testid="allocations-disclosure"
-          className={cn('group/allocations mt-6 scroll-mt-24', FRAME)}
-        >
-          <summary className="flex min-h-16 cursor-pointer list-none items-center gap-4 px-5 py-4 sm:px-6 [&::-webkit-details-marker]:hidden">
-            <AllocationIcon className="size-5 shrink-0 text-subtle" aria-hidden />
-            <span className="min-w-0 flex-1">
-              <span className="type-title block text-foreground">
-                {t('orientation.allocationsTitle')}
-              </span>
-              <span className="type-body-sm mt-0.5 block text-muted-foreground">
-                {t('orientation.allocationsDescription')}
-              </span>
-            </span>
-            <ChevronDown
-              className="size-5 shrink-0 text-subtle transition-transform duration-[var(--duration-base)] group-open/allocations:rotate-180 motion-reduce:transition-none"
-              aria-hidden
-            />
-          </summary>
-          <div className="border-t border-rule-faint">{allocationLedger}</div>
-        </details>
       </div>
     );
   },
 );
 ControlDesk.displayName = 'ControlDesk';
+
+export interface AllocationsDisclosureProps {
+  children: ReactNode;
+  className?: string;
+}
+
+/**
+ * Where the cycle reserve goes: the full allocation ledger behind a native
+ * disclosure, so it stays in the server HTML and opens from the keyboard.
+ */
+export function AllocationsDisclosure({ children, className }: AllocationsDisclosureProps) {
+  const t = useTranslations('home');
+  return (
+    <details
+      id="allocation-breakdown"
+      data-testid="allocations-disclosure"
+      className={cn('group/allocations scroll-mt-24', FRAME, className)}
+    >
+      <summary className="flex min-h-16 cursor-pointer list-none items-center gap-4 px-5 py-4 sm:px-6 [&::-webkit-details-marker]:hidden">
+        <AllocationIcon className="size-5 shrink-0 text-subtle" aria-hidden />
+        <span className="min-w-0 flex-1">
+          <span className="type-title block text-foreground">
+            {t('orientation.allocationsTitle')}
+          </span>
+          <span className="type-body-sm mt-0.5 block text-muted-foreground">
+            {t('orientation.allocationsDescription')}
+          </span>
+        </span>
+        <ChevronDown
+          className="size-5 shrink-0 text-subtle transition-transform duration-[var(--duration-base)] group-open/allocations:rotate-180 motion-reduce:transition-none"
+          aria-hidden
+        />
+      </summary>
+      <div className="border-t border-rule-faint">{children}</div>
+    </details>
+  );
+}
+
+/** The frame every desk region shares; exported for the page's own regions. */
+export const DESK_FRAME = FRAME;

@@ -188,8 +188,8 @@
     },
     "steps": {
       "openingSoon": {
-        "label": "Sắp mở",
-        "detail": "Chu kỳ tiếp theo đã được lên lịch và đang chờ mở."
+        "label": "Mở chu kỳ",
+        "detail": "Mỗi chu kỳ mở vào thời điểm đã lên lịch."
       },
       "firstGesture": {
         "label": "Nét bút đầu tiên",
@@ -197,7 +197,7 @@
       },
       "open": {
         "label": "Chu kỳ mở",
-        "detail": "Nét bút định hình Signature và kéo dài thời gian."
+        "detail": "Mỗi nét bút giành vị trí gần nhất và có thể kéo dài đồng hồ."
       },
       "finalWindow": {
         "label": "Cửa sổ cuối",
@@ -205,7 +205,7 @@
       },
       "finalization": {
         "label": "Hoàn tất",
-        "detail": "Người đặt nét bút cuối cùng có thể khép lại chu kỳ."
+        "detail": "Khi về 0, người tham gia gần nhất có thể hoàn tất chu kỳ và nhận phân bổ Signature; sau một khoảng ngắn, ai cũng có thể hoàn tất."
       },
       "allocation": {
         "label": "Phân bổ",
@@ -739,20 +739,6 @@
   },
   "orientation": {
     "title": "Cách chu kỳ hoạt động",
-    "steps": {
-      "enter": {
-        "title": "Đặt nét bút",
-        "body": "Thanh toán bằng ETH hoặc CST. Ví nhận CST tham gia ngay lập tức."
-      },
-      "extend": {
-        "title": "Giữ vị trí gần nhất",
-        "body": "Mỗi nét bút mới thay thế người tham gia gần nhất và có thể kéo dài đếm ngược."
-      },
-      "finalize": {
-        "title": "Hoàn tất khi về 0",
-        "body": "Người tham gia gần nhất có thể hoàn tất để nhận phân bổ Signature. Vẫn có thể đặt nét bút cho đến khi giao dịch hoàn tất được xác nhận."
-      }
-    },
     "costsNote": "ETH hoặc CST đã dùng cho nét bút không được hoàn trả khi người khác thay thế vị trí của bạn. Phí gas giao dịch luôn được thanh toán bằng ETH.",
     "allocationsTitle": "Dự trữ chu kỳ được phân bổ ra sao",
     "allocationsDescription": "Xem mọi phân bổ, bao gồm Tinh tuyển và Hàng hóa công.",

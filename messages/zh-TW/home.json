@@ -188,8 +188,8 @@
     },
     "steps": {
       "openingSoon": {
-        "label": "即將開啟",
-        "detail": "下一週期已排定，正待開啟。"
+        "label": "開啟",
+        "detail": "每個週期都在排定的時間開啟。"
       },
       "firstGesture": {
         "label": "第一筆",
@@ -197,7 +197,7 @@
       },
       "open": {
         "label": "週期進行中",
-        "detail": "每一筆都在塑造簽名，也在延長時間。"
+        "detail": "每一筆都讓落筆者成為最新落筆者，並可能延長倒數。"
       },
       "finalWindow": {
         "label": "最後窗口",
@@ -205,7 +205,7 @@
       },
       "finalization": {
         "label": "收官",
-        "detail": "寫下收官之筆的參與者可為週期收官。"
+        "detail": "歸零後，最新落筆者可收官並獲得簽名分配；短暫窗口過後，任何人都可收官。"
       },
       "allocation": {
         "label": "分配",
@@ -739,20 +739,6 @@
   },
   "orientation": {
     "title": "週期如何運作",
-    "steps": {
-      "enter": {
-        "title": "寫下一筆",
-        "body": "支付 ETH 或 CST，錢包會立即收到參與 CST。"
-      },
-      "extend": {
-        "title": "保持最新落筆的位置",
-        "body": "每次新落筆都會替換最新落筆者，並可能延長倒數。"
-      },
-      "finalize": {
-        "title": "歸零後收官",
-        "body": "最新落筆者可收官並獲得簽名分配。收官交易確認前，仍可繼續落筆。"
-      }
-    },
     "costsNote": "其他參與者取代你的位置時，落筆所花費的 ETH 或 CST 不會退還。交易 Gas 費一律使用 ETH 支付。",
     "allocationsTitle": "週期儲備如何分配",
     "allocationsDescription": "檢視全部分配，包括星選與公共財。",

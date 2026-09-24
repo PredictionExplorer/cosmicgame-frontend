@@ -603,7 +603,8 @@ describe('HomePage', () => {
     expect(desk).toContainElement(standings);
     expect(desk).toContainElement(calibration);
     expect(desk).toContainElement(panel);
-    expect(desk).toContainElement(ledger);
+    // The full allocation ledger follows the desk and the conversation.
+    expect(desk).not.toContainElement(ledger);
     expect(clock).toBeVisible();
     expect(panel).toBeVisible();
     expect(latest).toBeVisible();
@@ -1015,7 +1016,7 @@ describe('HomePage', () => {
 
   /* ── Below the fold ─────────────────────────────────────────── */
 
-  it('keeps personal state and allocations inside the desk before feed and education', () => {
+  it('keeps personal state in the desk, then the chat beside the cycle guide, then detail', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
@@ -1031,15 +1032,22 @@ describe('HomePage', () => {
     const desk = screen.getByTestId('control-desk');
     const strip = screen.getByTestId('cycle-standing');
     const feed = screen.getByTestId('home-feed-layout');
-    const ledger = screen.getByTestId('allocation-ledger');
+    const guide = screen.getByTestId('cycle-phase-guide');
+    const disclosure = screen.getByTestId('allocations-disclosure');
     const story = screen.getByTestId('home-story-section');
-    const phaseGuide = within(story).getByText('home.phaseGuide.title');
 
     expect(desk).toContainElement(strip);
-    expect(desk).toContainElement(ledger);
     expect(desk.compareDocumentPosition(feed)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
-    expect(story).toContainElement(phaseGuide);
-    expect(phaseGuide).not.toBeVisible();
+    // The phase stepper is promoted out of the story, beside the chat (F296).
+    expect(feed).toContainElement(guide);
+    expect(guide).toBeVisible();
+    expect(guide).toHaveAttribute('data-step', 'open');
+    expect(story).not.toContainElement(guide);
+    expect(feed.compareDocumentPosition(disclosure)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(disclosure.compareDocumentPosition(story)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    // No duplicate newcomer explainer and no public experimental link (F280).
+    expect(screen.queryByText('home.phaseGuide.explainer.title')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('experimental-ui-entry')).not.toBeInTheDocument();
     expect(screen.queryByText('home.allocation.title')).not.toBeInTheDocument();
   });
 
@@ -1152,51 +1160,32 @@ describe('HomePage', () => {
     expect(screen.queryByTestId('attached-nft-showcase')).not.toBeInTheDocument();
   });
 
-  it('reveals the story with a level-2 heading while preserving the single page H1', async () => {
+  it('tells the story behind the art in notes with level-3 headings under one page H1', async () => {
     const user = userEvent.setup();
-    mockUseDashboardInfo.mockReturnValue({
-      data: makeDashboardData({ CurRoundNum: 7, CurNumBids: 42, PrizeAmountEth: 2.75 }),
-      isLoading: false,
-    });
+    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
 
     render(<HomePage />);
 
-    const story = await openDisclosure(user, 'home-story-section');
-    expect(
-      within(story).getByRole('heading', { level: 2, name: 'home.hero.phase.live.headline' }),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole('heading', { level: 1, name: 'home.hero.phase.live.headline' }),
-    ).not.toBeInTheDocument();
-  });
-
-  it('starts the story collapsed without depending on a saved visit and toggles on demand', async () => {
-    const user = userEvent.setup();
-    mockUseDashboardInfo.mockReturnValue({
-      data: makeDashboardData(),
-      isLoading: false,
-    });
-
-    render(<HomePage />);
     const story = screen.getByTestId('home-story-section');
-    const headline = within(story).getByText('home.hero.phase.live.headline');
     expect(story).not.toHaveAttribute('open');
-    expect(headline).not.toBeVisible();
     expect(window.localStorage.getItem('cosmic-observatory-visited')).toBeNull();
+    const note = within(story).getByRole('heading', {
+      level: 3,
+      name: 'home.hero.story.gestures.title',
+    });
+    expect(note).not.toBeVisible();
 
     await openDisclosure(user, 'home-story-section');
-    expect(headline).toBeVisible();
-    expect(within(story).getByRole('link', { name: 'home.deck.experimentalUi' })).toHaveAttribute(
-      'href',
-      '/experimental-ui',
-    );
-    expect(screen.getByTestId('home-deck-header')).not.toContainElement(
-      screen.getByTestId('experimental-ui-entry'),
-    );
+    expect(note).toBeVisible();
+    expect(
+      within(story).getByRole('link', { name: /home\.latestSignature\.gallery/ }),
+    ).toHaveAttribute('href', '/gallery');
+    // The art hangs on the desk; the story does not repeat it.
+    expect(within(story).queryByRole('img')).not.toBeInTheDocument();
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
 
     await user.click(within(story).getByText('home.orientation.storyTitle'));
     expect(story).not.toHaveAttribute('open');
-    expect(headline).not.toBeVisible();
   });
 
   it('shows one plate of the newest Signature instead of repeating the gallery', () => {
@@ -1851,47 +1840,6 @@ describe('HomePage', () => {
     expect(mockGestureForm.getLastGestureHash).toHaveBeenCalled();
   });
 
-  it('hero primary action only scrolls to the gesture panel when the cycle is active', async () => {
-    const user = userEvent.setup();
-    const { scrollIntoView, restore } = mockScrollIntoView();
-    mockUseDashboardInfo.mockReturnValue({
-      data: makeDashboardData(),
-      isLoading: false,
-    });
-
-    try {
-      render(<HomePage />);
-
-      const story = await openDisclosure(user, 'home-story-section');
-      await user.click(within(story).getByRole('button', { name: /home\.hero\.phase\.live\.cta/ }));
-
-      expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' });
-      expect(document.getElementById('make-gesture')).toHaveFocus();
-      expect(mockGestureForm.onGesture).not.toHaveBeenCalled();
-      expect(mockGestureForm.onGestureWithCST).not.toHaveBeenCalled();
-    } finally {
-      restore();
-    }
-  });
-
-  it('respects reduced motion when the story action moves focus to the form', async () => {
-    const user = userEvent.setup();
-    const { scrollIntoView, restore } = mockScrollIntoView(true);
-    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
-
-    try {
-      render(<HomePage />);
-      const story = await openDisclosure(user, 'home-story-section');
-      await user.click(within(story).getByRole('button', { name: /home\.hero\.phase\.live\.cta/ }));
-
-      expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'instant', block: 'start' });
-      expect(document.getElementById('make-gesture')).toHaveFocus();
-      expect(mockGestureForm.onGesture).not.toHaveBeenCalled();
-    } finally {
-      restore();
-    }
-  });
-
   /* ── Action dock and mobile sheet ───────────────────────────── */
 
   it('keeps the action dock priced with the shared submit label', () => {
@@ -2076,9 +2024,8 @@ describe('HomePage', () => {
 
     expect(screen.getByTestId('latest-participant-intel')).toBeVisible();
     expect(screen.getByTestId('allocation-ledger')).toBeVisible();
-    expect(screen.getByTestId('experimental-ui-entry')).toBeVisible();
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     expect(container.querySelectorAll('#allocation-breakdown')).toHaveLength(1);
-    await checkA11y(container, { rules: { 'heading-order': { enabled: false } } });
+    await checkA11y(container);
   });
 });

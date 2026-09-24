@@ -188,8 +188,8 @@
     },
     "steps": {
       "openingSoon": {
-        "label": "Opening soon",
-        "detail": "The next cycle is scheduled and waiting to open."
+        "label": "Opening",
+        "detail": "Each cycle opens at its scheduled time."
       },
       "firstGesture": {
         "label": "First Gesture",
@@ -197,7 +197,7 @@
       },
       "open": {
         "label": "Open Cycle",
-        "detail": "Gestures shape the Signature and extend time."
+        "detail": "Each Gesture takes the latest position and can extend the clock."
       },
       "finalWindow": {
         "label": "Final Window",
@@ -205,7 +205,7 @@
       },
       "finalization": {
         "label": "Finalization",
-        "detail": "The Final Gesture participant can close the cycle."
+        "detail": "At zero, the latest participant can finalize and receive the Signature Allocation; after a short window, anyone can."
       },
       "allocation": {
         "label": "Allocation",
@@ -739,20 +739,6 @@
   },
   "orientation": {
     "title": "How this cycle works",
-    "steps": {
-      "enter": {
-        "title": "Make a Gesture",
-        "body": "Pay ETH or CST. Your wallet receives Participation CST immediately."
-      },
-      "extend": {
-        "title": "Hold the latest position",
-        "body": "Each new Gesture replaces the latest participant and can extend the clock."
-      },
-      "finalize": {
-        "title": "Finalize after zero",
-        "body": "The latest participant can finalize to receive the Signature Allocation. Gestures remain open until confirmation."
-      }
-    },
     "costsNote": "ETH or CST spent on a Gesture is not refunded when another participant takes your place. Transaction gas is always paid in ETH.",
     "allocationsTitle": "Where the cycle reserve goes",
     "allocationsDescription": "See every allocation, including Stellar Selection and public goods.",
