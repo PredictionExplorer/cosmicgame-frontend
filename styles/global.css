@@ -246,6 +246,24 @@
 }
 
 /*
+ * Korean display punctuation. Hangul in a heading falls through Clash to the
+ * Korean cut, but ASCII ! , . : ? stay in Clash, whose period is a heavy
+ * square block beside the thin Hangul strokes (만듭니다.). This alias, first
+ * in the Korean display stack, sets only those marks in the platform's
+ * Korean face; Latin words (Cosmic Signature, ETH) keep Clash. One face
+ * covers every weight, so the marks are never synthesised bold.
+ */
+@font-face {
+  font-family: 'CS Korean Display Punctuation';
+  src:
+    local('Apple SD Gothic Neo'), local('AppleSDGothicNeo-Regular'), local('Noto Sans CJK KR'),
+    local('NotoSansCJKkr-Regular'), local('Noto Sans KR'), local('Source Han Sans K'),
+    local('Malgun Gothic');
+  font-weight: 100 900;
+  unicode-range: U+0021, U+002C, U+002E, U+003A, U+003F;
+}
+
+/*
  * Simplified Chinese: the mainland cut of Noto Sans CJK, then the platform
  * faces. Unlayered next to :root for the same reason as the Ukrainian
  * override below.
@@ -284,6 +302,9 @@ html:lang(zh-HK) {
  */
 html:lang(ko) {
   --cjk-font-stack: var(--font-noto-kr), 'Apple SD Gothic Neo', 'Malgun Gothic';
+  --display-font-stack:
+    'CS Korean Display Punctuation', var(--font-clash-display), 'ClashDisplay-Variable',
+    var(--cjk-font-stack), sans-serif;
   word-break: keep-all;
 }
 
@@ -495,6 +516,29 @@ body:has([data-maintenance-banner]) .home-control-shell {
   }
 
   /*
+   * Chinese has no phrase-aware breaking, and balanced lines break wherever
+   * the midpoint falls, often inside a word (让周 / 期储备, 由链 / 上种子).
+   * `keep-all` breaks Han text only at punctuation and spaces, so a heading
+   * turns its line at a comma (十余条轨道， / 让周期储备循轨而行。); a clause too
+   * long for the line still wraps through `overflow-wrap: anywhere`, which
+   * also keeps the heading's min-content from widening its column. Korean
+   * keeps its document-wide keep-all and Japanese its auto-phrase below.
+   */
+  :is(h1, h2, h3, [class*='type-display-'], [class*='type-heading-'], .type-section):lang(zh) {
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+
+  /*
+   * A Chinese placeholder (搜索问题……) is Chinese text in a field whose face
+   * is Inter first: set it in the locale's CJK stack so its ellipsis is the
+   * centred Chinese mark, not six Latin dots on the baseline.
+   */
+  :where(input, textarea):lang(zh)::placeholder {
+    font-family: var(--cjk-font-stack), sans-serif;
+  }
+
+  /*
    * Japanese has no spaces to break at, so short text wraps wherever the line
    * ends — often mid-word (シグネチャー配 | 分, 確 | 定できる). `auto-phrase`
    * asks the browser to break between phrases instead (Chrome 119+, BudouX);
@@ -512,7 +556,10 @@ body:has([data-maintenance-banner]) .home-control-shell {
     .type-title,
     .type-lede,
     .type-body-lg,
+    [class*='type-body-md'],
+    [class*='type-body-sm'],
     .type-label,
+    [class*='type-eyebrow'],
     .type-caption,
     summary,
     button,

@@ -50,7 +50,7 @@ describe('StatCard', () => {
     const value = screen.getByText('1,135');
     expect(value).toHaveClass(sizeClass);
     // The type-figure tokens carry the numerals; compact sets them itself.
-    if (size === 'compact') expect(value).toHaveClass('tabular-nums', 'slashed-zero');
+    if (size === 'compact') expect(value).toHaveClass('tabular-nums', 'lining-nums');
   });
 
   it('keeps the label in sentence case and hyphenates it instead of chopping a word', () => {

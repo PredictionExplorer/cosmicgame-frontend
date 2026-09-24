@@ -45,7 +45,7 @@ const cardVariants = cva(
 const VALUE_CLASS: Record<StatCardSize, string> = {
   hero: 'type-figure-lg',
   md: 'type-figure-md',
-  compact: 'font-sans text-base font-medium leading-snug tabular-nums lining-nums slashed-zero',
+  compact: 'font-sans text-base font-medium leading-snug tabular-nums lining-nums',
 };
 
 const VALUE_GAP: Record<StatCardSize, string> = {

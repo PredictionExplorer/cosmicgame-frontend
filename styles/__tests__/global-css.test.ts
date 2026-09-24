@@ -178,11 +178,11 @@ describe('global typography guarantees', () => {
     expect(body).toContain('text-transform: none');
   });
 
-  it('sets figures in Inter with tabular, lining numerals and a slashed zero', () => {
+  it('sets figures in Inter with tabular, lining numerals (no zero feature to promise)', () => {
     for (const tier of ['xl', 'lg', 'md', 'sm']) {
       const body = typographyCss.slice(typographyCss.indexOf(`@utility type-figure-${tier} {`));
       const rule = body.slice(0, body.indexOf('}'));
-      expect(rule).toContain('font-variant-numeric: tabular-nums lining-nums slashed-zero');
+      expect(rule).toContain('font-variant-numeric: tabular-nums lining-nums;');
       // Named, not inherited: a figure inside a font-display or font-mono
       // parent would otherwise turn Clash (round zero) or JetBrains Mono.
       expect(rule).toContain('font-family: var(--body-font-stack)');
