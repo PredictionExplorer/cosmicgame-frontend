@@ -79,6 +79,24 @@ describe('ParticipantOutcomesSection', () => {
     expect(nft.parentElement!.textContent).toBe('1\u00a0NFT · 1\u00a0CST');
   });
 
+  it('prints a zero spend at the table precision of the figures beside it', () => {
+    // Regression: a bare "0" under Spent beside "0.0000" under Received and Net.
+    mockUseOutcomes.mockReturnValue(
+      ok([entry('0x4444444444444444444444444444444444444444', 3, 0, 0)]),
+    );
+    render(<ParticipantOutcomesSection />);
+    const [, row] = within(screen.getByRole('table')).getAllByRole('row');
+    const figures = within(row!)
+      .getAllByRole('cell')
+      .map((cell) => cell.textContent);
+    // Spent (with its CST caption), Received and Net.
+    expect(figures.slice(3, 6).map((text) => text?.slice(0, 6))).toEqual([
+      '0.0000',
+      '0.0000',
+      '0.0000',
+    ]);
+  });
+
   it('refetches with the gesture floor a reader picks', async () => {
     const user = userEvent.setup();
     render(<ParticipantOutcomesSection />);

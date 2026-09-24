@@ -11,9 +11,9 @@ jest.mock('@/hooks/useApiQuery', () => ({
 }));
 
 const VALID_ADDRESS = '0x1234567890abcdef1234567890abcdef12345678';
-// The unit joins its number with a no-break space.
-const SMALL_NOTE =
-  'Muted amounts are allocations of less than 0.01\u00a0CST, too small to show at this precision.';
+// The note sits beside the table's row range (the tables catalog renders
+// keys in tests); the unit joins its number with a no-break space.
+const SMALL_NOTE = 'tables.outreach.dustNote(amount=0.01\u00a0CST)';
 
 const reward = (id: number, amount: number, timestamp: number): MarketingReward => ({
   EvtLogId: id,
@@ -83,18 +83,30 @@ describe('MarketingRewardsPage', () => {
 
   it('mutes and explains allocations too small to show, only when there are some', () => {
     mockUseMarketingRewardsByUser.mockReturnValue(
-      query({ data: [reward(1, 10, 1_700_000_000), reward(2, 3e-15, 1_700_000_100)] }),
+      query({
+        data: [
+          reward(1, 10, 1_700_000_000),
+          reward(2, 3e-15, 1_700_000_100),
+          reward(3, 0, 1_700_000_200),
+        ],
+      }),
     );
     const { unmount } = render(<MarketingRewardsPage address={VALID_ADDRESS} />);
+    // The allocations sit under their own heading, with the note beside the
+    // row range rather than as a paragraph of its own above the table.
     expect(
-      screen.getByText((_, node) => node?.tagName === 'P' && node.textContent === SMALL_NOTE),
+      screen.getByRole('heading', { level: 2, name: 'tables.outreach.allocationsTitle' }),
     ).toBeVisible();
+    const pager = document.querySelector('[data-slot="table-pagination"]');
+    expect(pager?.textContent).toContain(SMALL_NOTE);
     expect(screen.getByText('<0.01')).toHaveClass('text-subtle');
+    // A true zero is not dust: it keeps the column's digits and its ink.
+    expect(screen.getByText('0.00')).not.toHaveClass('text-subtle');
     unmount();
 
     mockUseMarketingRewardsByUser.mockReturnValue(query({ data: [reward(1, 10, 1_700_000_000)] }));
     render(<MarketingRewardsPage address={VALID_ADDRESS} />);
-    expect(screen.queryByText(/Muted amounts/)).toBeNull();
+    expect(screen.queryByText(/tables\.outreach\.dustNote/)).toBeNull();
   });
 
   it('shows no date figures, and an explained empty table, without allocations', () => {

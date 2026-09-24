@@ -3,7 +3,13 @@
 import type { ReactNode } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { formatCount, formatPercent, type AmountInput, type AmountUnit } from '@/utils/format';
+import {
+  formatAmountParts,
+  formatCount,
+  formatPercent,
+  type AmountInput,
+  type AmountUnit,
+} from '@/utils/format';
 import { AddressChip } from '@/components/ui/address-chip';
 import { Amount } from '@/components/ui/amount';
 import { DateTime } from '@/components/ui/date-time';
@@ -43,6 +49,17 @@ export function blankShowsUnknown(kind: ColumnKind, whenBlank?: 'empty' | 'unkno
 
 const toNumber = (value: SortValue): number =>
   typeof value === 'bigint' ? Number(value) : Number(value);
+
+/**
+ * Whether a ledger shows this amount as a bound ("<0.0001") because it is
+ * too small for the column's digits: a test transfer of a few base units.
+ * Such a figure is set in the subtle tier, with the exact value on hover,
+ * so dust never reads like a real allocation beside it.
+ */
+export function isDustAmount(value: AmountInput, unit: AmountUnit, locale: string): boolean {
+  const { number, exact } = formatAmountParts(value, { unit, locale, context: 'table' });
+  return exact !== null && /^(?:<|>-)/.test(number);
+}
 
 interface KindValueProps extends KindOptions {
   kind: ColumnKind;
@@ -92,6 +109,7 @@ export function KindValue({
           context="table"
           showUnit={showUnit}
           unitClassName="text-subtle"
+          className={isDustAmount(value as AmountInput, unit, locale) ? 'text-subtle' : undefined}
         />
       );
     case 'count':

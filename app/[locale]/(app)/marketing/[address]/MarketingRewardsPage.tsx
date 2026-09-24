@@ -6,13 +6,10 @@ import { useLocale, useTranslations } from 'next-intl';
 import { getAddress, isAddress } from 'viem';
 
 import { Link } from '@/i18n/navigation';
-import { formatAmount, formatCount } from '@/utils/format';
+import { formatCount } from '@/utils/format';
 import { useMarketingRewardsByUser } from '@/hooks/useApiQuery';
 import type { MarketingReward } from '@/services/api/types';
-import {
-  SMALL_ALLOCATION_CST,
-  summarizeOutreachAllocations,
-} from '@/components/marketing/outreachTotals';
+import { summarizeOutreachAllocations } from '@/components/marketing/outreachTotals';
 import { LedgerPage } from '@/components/ledger/LedgerPage';
 import { PageHeader, type PageHeaderFigure } from '@/components/layout/PageHeader';
 import { AddressChip } from '@/components/ui/address-chip';
@@ -36,6 +33,7 @@ interface MarketingRewardsPageProps {
  */
 export default function MarketingRewardsPage({ address: rawAddress }: MarketingRewardsPageProps) {
   const t = useTranslations('marketing');
+  const tTables = useTranslations('tables');
   const locale = useLocale();
   const address = isAddress(rawAddress.toLowerCase()) ? getAddress(rawAddress.toLowerCase()) : null;
   const query = useMarketingRewardsByUser(address ?? undefined);
@@ -133,20 +131,10 @@ export default function MarketingRewardsPage({ address: rawAddress }: MarketingR
     <LedgerPage header={header} width="narrow">
       <MarketingRewardsTable
         list={rewards}
+        title={tTables('outreach.allocationsTitle')}
         loading={query.isLoading}
         error={query.isError ? t('loadError') : undefined}
         onRetry={() => void query.refetch()}
-        description={
-          summary.smallAllocations > 0
-            ? t('address.smallNote', {
-                amount: formatAmount(SMALL_ALLOCATION_CST, {
-                  unit: 'CST',
-                  locale,
-                  context: 'table',
-                }),
-              })
-            : undefined
-        }
         emptyDescription={t('address.emptyDescription')}
       />
     </LedgerPage>

@@ -91,22 +91,18 @@
     "cycleHash": "№ циклу",
     "round": "Цикл",
     "participant": "Учасник",
-    "participantAddress": "Адреса учасника",
     "recipient": "Отримувач",
-    "recipientAddress": "Адреса отримувача",
     "gestureCount": "Жести",
-    "numberOfGestures": "Кількість жестів",
     "gestureType": "Тип жесту",
     "gestureDuration": "Тривалість жесту",
     "gestureInfo": "Про жест",
     "gestureCost": "Вартість",
     "allocation": "Розподіл",
-    "allocationsReceived": "Отримано розподілів",
+    "allocationsReceived": "Розподіли (усі види)",
     "maxAllocationEth": "Макс. розподіл Сигнатури (ETH)",
-    "allocationsSumEth": "Сума розподілів (ETH)",
+    "allocationsSumEth": "Отримано ETH",
     "anchorActionId": "ID дії закріплення",
     "anchorHolder": "Власник закріплення",
-    "anchorHolderAddress": "Адреса власника закріплення",
     "holder": "Власник",
     "numberOfNfts": "Кількість NFT",
     "date": "Дата",
@@ -127,9 +123,9 @@
     "destinationAddress": "Адреса призначення",
     "from": "Від",
     "to": "Кому",
-    "type": "Тип",
     "event": "Подія",
     "newValue": "Нове значення",
+    "previousValue": "Попереднє значення",
     "recordType": "Тип запису",
     "source": "Джерело",
     "received": "Отримано",
@@ -144,14 +140,13 @@
     "maxGestureEth": "Макс. жест (ETH)",
     "numberOfContributions": "Кількість внесків",
     "totalContributedEth": "Усього внесено (ETH)",
-    "numberOfStellarEntries": "Записи зоряного відбору",
-    "ethSelectionProbability": "Ймовірність отримати ETH",
-    "nftSelectionProbability": "Ймовірність отримати NFT",
     "expirationDate": "Дата закінчення",
     "started": "Початок",
     "ended": "Кінець",
     "actions": "Дії",
-    "selected": "Обрано"
+    "selected": "Обрано",
+    "gesturesThisCycle": "Жести цього циклу",
+    "shareOfPool": "Частка пулу"
   },
   "names": {
     "participants": "Унікальні учасники",
@@ -200,6 +195,10 @@
   "details": {
     "header": "Докладніше"
   },
+  "message": {
+    "showAll": "Показати все",
+    "showLess": "Згорнути"
+  },
   "skeleton": {
     "loadingText": "Завантаження тексту",
     "loadingStat": "Завантаження показника",
@@ -215,21 +214,25 @@
   },
   "allocation": {
     "cycle": "Цикл {cycle}",
-    "openDetails": "Відкрити докладну структуру розподілу для циклу {cycle}.",
-    "allocationHelp": "Сума розподілу Сигнатури та гаманець отримувача в цьому циклі.",
     "gestures": "Жести",
-    "gesturesHelp": "Загальна кількість жестів у цьому циклі.",
-    "nftsHelp": "NFT, долучені до жестів у цьому циклі.",
-    "stellarHelp": "ETH, спрямований до пулу зоряного відбору.",
-    "anchorHelp": "ETH, спрямований на надходження за закріплення.",
-    "distributedHelp": "Cosmic Signature NFT, передані через зоряний відбір.",
     "listAria": "Отримувачі розподілів за циклами",
+    "groups": {
+      "eth": "ETH за напрямами розподілу",
+      "nfts": "NFT"
+    },
     "columns": {
       "finalized": "Завершено",
+      "signature": "Розподіл Сигнатури",
       "signatureEth": "Розподіл Сигнатури (ETH)",
+      "chrono": "Воїн часу",
       "chronoEth": "Воїн часу (ETH)",
+      "stellar": "Зоряний відбір",
       "stellarEth": "Зоряний відбір (ETH)",
+      "anchor": "Надходження за закріплення",
       "anchorEth": "Надходження за закріплення (ETH)",
+      "publicGoods": "Суспільні блага",
+      "publicGoodsEth": "Суспільні блага (ETH)",
+      "attached": "Долучені",
       "nftsAttached": "Долучені NFT",
       "nftsViaStellar": "NFT через зоряний відбір"
     }
@@ -240,6 +243,10 @@
   },
   "publicGoods": {
     "voluntaryEmpty": "Внески, надіслані безпосередньо до сховища суспільних благ, з’являться тут. Сховище зберігає їх для бенефіціара, визначеного в налаштуваннях контракту."
+  },
+  "outreach": {
+    "allocationsTitle": "Розподіли",
+    "dustNote": "Приглушені суми — це розподіли менше ніж {amount}, замалі для показу з такою точністю."
   },
   "banGesture": {
     "banned": "Повідомлення приховано.",
@@ -259,9 +266,8 @@
     }
   },
   "ethContribution": {
-    "withInfo": "Внесок із повідомленням",
-    "simple": "Простий внесок",
-    "viewContribution": "Переглянути внесок {id}"
+    "withNote": "З нотаткою",
+    "viewContribution": "Внесок №{id}"
   },
   "endurance": {
     "liveHelp": "Останній жест досі належить цьому учаснику, тому його період лідерства триває.",
@@ -269,18 +275,16 @@
     "chronoWarrior": "Воїн часу"
   },
   "gestureHistory": {
-    "randomWalkGesture": "Жест зроблено з RandomWalk NFT (ID {id})",
-    "randomWalkImageAlt": "RWLK NFT",
-    "cstGesture": "Жест зроблено за токени CST",
-    "ethGesture": "Жест зроблено за ETH",
-    "nftAttached": ", а також долучено токен ({address}) з ID {id}",
-    "erc20AttachedPrefix": ", а також долучено {amount}",
-    "attachedSuffix": " (ERC-20)",
     "tableLabel": "Історія жестів",
-    "viewGesture": "Переглянути жест {id}"
+    "viewGesture": "Жест #{position}",
+    "attached": "Долучено",
+    "randomWalkToken": "Random Walk {id}"
   },
   "nameHistory": {
     "removed": "Ім’я токена видалено."
+  },
+  "stellarSelection": {
+    "draws": "Відбори з цього пулу під час завершення циклу: ETH — {eth}, NFT — {nft}."
   },
   "recipientHistory": {
     "sources": {
@@ -295,13 +299,18 @@
       "attachedErc20Timeout": "Долучений ERC-20 (забирання після тайм-ауту)",
       "stellarEthTimeout": "Зоряний відбір ETH (забирання після тайм-ауту)"
     },
+    "sourceTags": {
+      "anchoredStellarSelection": "Відбір закріплених NFT"
+    },
     "nft": "NFT #{id}",
+    "nftCount": "{count, plural, one {# NFT} few {# NFT} many {# NFT} other {# NFT}}",
     "readyToRetrieve": "Можна забрати",
     "retrieve": "Забрати",
     "retrieved": "Забрано",
     "allAnchorHolders": "Усі власники закріплених Cosmic Signature NFT",
     "showRecords": "{count, plural, one {Показати # запис} few {Показати # записи} many {Показати # записів} other {Показати # запису}}",
     "hideRecords": "Сховати записи",
+    "recordsHeader": "Записи",
     "totals": {
       "eth": "Отримано ETH",
       "cst": "Отримано CST",
@@ -358,25 +367,19 @@
     "printReign": "Лідерство: {duration}"
   },
   "systemModes": {
-    "viewEvent": "Переглянути системну подію: {scope}"
+    "viewEvent": "зміни параметрів"
   },
   "uniqueAnchorHolders": {
-    "numAnchorActions": "Кількість закріплень",
     "anchors": "Закріплення",
-    "numReleaseActions": "Кількість відкріплень",
     "releases": "Відкріплення",
-    "totalImprintedTokens": "Усього закарбовано токенів",
     "imprinted": "Закарбовано",
-    "totalAnchoredTokens": "Усього закріплено токенів",
-    "anchored": "Закріплено",
-    "totalDistributionEth": "Усього надходжень (ETH)",
-    "distributed": "Надходження",
-    "unretrievedDistributionEth": "Не забрано (ETH)",
-    "unretrieved": "Не забрано"
+    "anchored": "Закріплено зараз",
+    "distributedEth": "Надходження (ETH)",
+    "unretrievedEth": "Не забрано (ETH)"
   },
   "statisticsColumns": {
-    "ownerAddress": "Адреса власника",
-    "numberOfTokensOwned": "Кількість токенів",
+    "ownerAddress": "Власник",
+    "numberOfTokensOwned": "NFT у власності",
     "cstBalance": "Баланс (CST)",
     "contractAddress": "Адреса контракту",
     "numberOfNfts": "Кількість NFT",
@@ -385,29 +388,9 @@
     "isAnchorHolder": "Власник закріплення"
   },
   "statisticsTooltips": {
-    "participantAddress": "Адреса гаманця, що зробив щонайменше один проіндексований жест.",
-    "numberOfGestures": "Загальна кількість проіндексованих жестів цього гаманця.",
-    "maxGestureEth": "Найбільший окремий жест в ETH, зафіксований для цього гаманця.",
-    "recipientAddress": "Адреса гаманця, що отримав один або більше проіндексованих розподілів протоколу.",
-    "allocationsReceived": "Кількість проіндексованих розподілів, отриманих цим гаманцем.",
-    "maxAllocationEth": "Найбільший розподіл Сигнатури, який цей отримувач отримав за завершальний жест; 0, якщо не отримував жодного. ETH Воїна часу та зоряного відбору враховано лише в сумі.",
-    "allocationsSumEth": "Загальна сума розподілів ETH, проіндексованих для цього отримувача.",
-    "contributorAddress": "Адреса гаманця, що зробив внесок ETH до протоколу.",
-    "numberOfContributions": "Кількість проіндексованих транзакцій внесків ETH із цього гаманця.",
-    "totalContributedEth": "Загальна сума ETH, внесена цим гаманцем.",
-    "ownerAddress": "Адреса гаманця, який зараз володіє токенами, показаними в цьому рядку.",
-    "numberOfTokensOwned": "Кількість токенів Cosmic Signature NFT (ERC-721), якими володіє цей гаманець.",
+    "maxAllocationEth": "Найбільший розподіл Сигнатури, який цей отримувач отримав за завершальний жест; прочерк, якщо не отримував жодного. ETH Воїна часу та зоряного відбору враховано лише в стовпці «Отримано ETH».",
+    "allocationsSumEth": "Усі розподіли ETH, які отримав цей отримувач. Розподіли NFT і CST враховано в стовпці «Розподіли (усі види)», але ETH до цієї суми вони не додають.",
     "cstBalance": "Поточний баланс CST (ERC-20) цього гаманця.",
-    "anchorHolderAddress": "Адреса гаманця, що закріплював або відкріплював токени.",
-    "numAnchorActions": "Кількість проіндексованих транзакцій закріплення з цього гаманця.",
-    "numReleaseActions": "Кількість проіндексованих транзакцій відкріплення з цього гаманця.",
-    "totalImprintedTokens": "Загальна кількість токенів, закарбованих для цього власника закріплення через відповідний потік закріплення або розподілу.",
-    "totalAnchoredTokens": "Поточна або сукупна кількість закріплених токенів, зафіксована для цього гаманця.",
-    "totalDistributionEth": "Загальна сума надходжень за закріплення в ETH, проіндексована для цього гаманця.",
-    "unretrievedDistributionEth": "Надходження за закріплення в ETH, які цей гаманець ще може забрати.",
-    "systemRound": "Цикл або контекст розгортання для цієї системної події.",
-    "systemStarted": "Момент, коли ця системна подія стала активною.",
-    "systemEnded": "Момент, коли наступна системна подія замінила цю.",
     "attachedNftContractAddress": "Адреса контракту ERC-721 для токенів, долучених до жестів.",
     "attachedNftCount": "Кількість NFT із цього контракту, долучених до жестів."
   }

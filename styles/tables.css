@@ -83,6 +83,13 @@
   text-decoration-color: currentColor;
 }
 
+/* A dense ledger (`links="quiet"` on DataTable): its links keep their ink
+ * and show the underline only on hover and keyboard focus, so a row of
+ * three links does not compete with the text it exists for. */
+.cs-table[data-links='quiet'] td a:not(:hover, :focus-visible) {
+  text-decoration-color: transparent;
+}
+
 /*
  * Scroll cue. A wide table scrolls inside its own container, and while more
  * of it lies beyond an edge, that edge fades out. It is driven by the

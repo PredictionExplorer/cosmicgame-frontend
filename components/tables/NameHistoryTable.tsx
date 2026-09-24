@@ -12,7 +12,11 @@ interface NameHistoryTableProps extends LedgerStateProps {
   list?: NameHistoryRecord[];
 }
 
-/** A token's names over time, each change linked to its transaction. */
+/**
+ * A token's names over time, each change linked to its transaction. Two
+ * short columns stay a table on a phone: one line per change rather than a
+ * record repeating "Date / Token name".
+ */
 const NameHistoryTable = ({ list = [], ...state }: NameHistoryTableProps) => {
   const t = useTranslations('tables');
 
@@ -48,6 +52,7 @@ const NameHistoryTable = ({ list = [], ...state }: NameHistoryTableProps) => {
       ariaLabel={t('names.nameHistory')}
       getRowKey={(row) => row.EvtLogId}
       emptyTitle={t('empty.history')}
+      layout="compact"
       {...state}
     />
   );

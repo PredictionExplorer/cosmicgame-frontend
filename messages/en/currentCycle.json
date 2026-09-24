@@ -99,7 +99,7 @@
     },
     "stellarSelectionEntries": {
       "title": "Stellar Selection entries",
-      "tooltip": "Each gesture adds a Stellar Selection entry. More entries increase the chance of receiving ETH or a Cosmic Signature NFT, but do not guarantee an allocation."
+      "tooltip": "Each gesture adds one entry to this cycle’s Stellar Selection pool, and every selection at finalization is drawn from the whole pool, with replacement. The table shows each participant’s share of the pool."
     },
     "topEthSpenders": {
       "title": "Top ETH spenders",

@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { ArrowDown, ArrowUp, ChevronDown } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, ChevronDown } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
@@ -41,6 +41,7 @@ import {
   type SortValue,
 } from './column-kinds';
 import { KindValue, blankShowsUnknown } from './kind-value';
+import { useDataTableWidth, type DataTableWidthMode } from './table-width';
 import { useCompactFit } from './use-compact-fit';
 import { DEFAULT_PAGE_SIZE, PHONE_PAGE_SIZE, usePhoneLayout } from './use-page-size';
 
@@ -117,6 +118,14 @@ export interface DataTableColumn<T> {
   /** What a blank value's dash says to a screen reader ("None"). Default "Unavailable". */
   blankLabel?: string;
 
+  /**
+   * A heading shared by consecutive columns ("ETH by track"): a row above
+   * the headers spans them, so each sub-header can drop the unit and the
+   * words it shares. Phone records use each column's own `label`, so give
+   * a grouped column a `label` that reads alone ("Chrono-Warrior (ETH)").
+   */
+  group?: string;
+
   /** `secondary`: dropped from phone records. */
   priority?: ColumnPriority;
   /** In a phone record, put the value under its label (long text). */
@@ -149,8 +158,19 @@ export interface DataTableProps<T> {
   description?: React.ReactNode;
   /** Controls at the end of the title row (a filter, a link). */
   actions?: React.ReactNode;
+  /**
+   * A line under the title that shows in every state, loading, empty and
+   * error included (a read-only notice), so it never moves the table when
+   * the rows arrive.
+   */
+  notice?: React.ReactNode;
   /** A bar between the title and the table (filters). */
   toolbar?: React.ReactNode;
+  /**
+   * A note under the table beside the row range ("Muted amounts are below
+   * 0.01 CST"), after the time zone when the table shows dates.
+   */
+  caption?: React.ReactNode;
 
   /** Stable key per row. Defaults to the index, which re-mounts rows on sort. */
   getRowKey?: (row: T, index: number) => React.Key;
@@ -160,7 +180,14 @@ export interface DataTableProps<T> {
    * row follows it too. Return `null` for a row without a destination.
    */
   getRowHref?: (row: T, index: number) => string | null | undefined;
-  /** Accessible name of the row link, when the first cell alone is ambiguous. */
+  /**
+   * Words a screen reader hears after the row link's visible text, naming
+   * where it leads ("Gesture #1143" after "Sep 24, 07:31:51"). They are
+   * appended, never substituted: the link's name always starts with what it
+   * shows, so a voice user can say what they see (WCAG 2.5.3 Label in
+   * Name). Leave it out when the visible text already names the
+   * destination ("Cycle 12").
+   */
   getRowLabel?: (row: T, index: number) => string;
   /** The column that carries the row link and the "You" tag. Default: the first. */
   rowLinkColumn?: string;
@@ -184,6 +211,8 @@ export interface DataTableProps<T> {
   renderDetails?: (row: T) => React.ReactNode;
   /** The disclosure button's text for a row, expanded or not. */
   detailsLabel?: (row: T, expanded: boolean) => string;
+  /** The disclosure column's header ("Records"). Default "Details". */
+  detailsHeader?: string;
 
   loading?: boolean;
   /** Placeholder rows while loading. Default 5. */
@@ -218,6 +247,24 @@ export interface DataTableProps<T> {
   layout?: 'auto' | TableLayout;
   /** Row height: `comfortable` 48px (default) or `compact` 40px. */
   density?: 'comfortable' | 'compact';
+  /**
+   * How wide the table runs on a wide screen. `auto` (default) keeps a short
+   * ledger (four columns or fewer) at one reading width, 56rem, so a row is
+   * not a 1,200px scan from its address to its figure and short ledgers
+   * stacked on a page share a right edge. `fill` always runs the full width
+   * of its container. Without this prop the table takes the width of the
+   * nearest `<DataTableWidth>`, which a page sets when it stacks short and
+   * wide ledgers. The empty and error states always take the full width, so
+   * they stay centred on their section.
+   */
+  width?: DataTableWidthMode;
+  /**
+   * `quiet` underlines a cell's links only on hover and keyboard focus, for
+   * a dense ledger whose every row carries several (a date, an address, a
+   * cycle) that would compete with the text being read. The links keep
+   * their foreground ink, and the row itself shows that it is interactive.
+   */
+  links?: 'underlined' | 'quiet';
   /** Classes on the outer wrapper. */
   className?: string;
   /** Classes on the `<table>` (a `min-width` for a wide ledger). */
@@ -256,6 +303,32 @@ function resolveColumn<T>(column: DataTableColumn<T>): ResolvedColumn<T> {
 
 function hasAnyValue<T>(col: ResolvedColumn<T>, rows: readonly T[]): boolean {
   return !col.hasValue || rows.some((row) => !isBlankValue(col.valueOf(row)));
+}
+
+/**
+ * The most columns a ledger can have and still stop at the reading width
+ * under `width="auto"`. One width for all of them, so short ledgers stacked
+ * on one page (three columns, then four) end at the same right edge.
+ */
+const FIT_MAX_COLUMNS = 4;
+const FIT_WIDTH_CLASS = 'max-w-4xl';
+
+/** Consecutive columns under one `group` heading, and the ungrouped gaps between them. */
+interface ColumnGroupCell {
+  key: string;
+  group: string | null;
+  span: number;
+}
+
+function columnGroups<T>(columns: readonly ResolvedColumn<T>[]): ColumnGroupCell[] {
+  const cells: ColumnGroupCell[] = [];
+  for (const col of columns) {
+    const group = col.column.group ?? null;
+    const last = cells[cells.length - 1];
+    if (last && last.group === group) last.span += 1;
+    else cells.push({ key: col.column.id, group, span: 1 });
+  }
+  return cells;
 }
 
 const HEADING_CLASS: Record<2 | 3 | 4, string> = {
@@ -324,7 +397,9 @@ export function DataTable<T>({
   headingLevel = 2,
   description,
   actions,
+  notice,
   toolbar,
+  caption,
   getRowKey,
   getRowHref,
   getRowLabel,
@@ -334,6 +409,7 @@ export function DataTable<T>({
   currentRowSummary,
   renderDetails,
   detailsLabel,
+  detailsHeader,
   loading = false,
   skeletonRows = 5,
   error,
@@ -350,6 +426,8 @@ export function DataTable<T>({
   resetPageKey,
   layout: layoutProp = 'auto',
   density = 'comfortable',
+  width: widthProp,
+  links = 'underlined',
   className,
   tableClassName,
 }: DataTableProps<T>) {
@@ -360,6 +438,7 @@ export function DataTable<T>({
   const wrapperRef = React.useRef<HTMLDivElement>(null);
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const isPhone = usePhoneLayout();
+  const width = useDataTableWidth(widthProp);
 
   const resolved = React.useMemo(() => columns.map(resolveColumn), [columns]);
   // Columns with a value somewhere in the data. The phone layout follows
@@ -469,6 +548,14 @@ export function DataTable<T>({
   // heading, or takes the table's place in the outline when it has none.
   const stateHeadingLevel = title ? (Math.min(headingLevel + 1, 4) as 3 | 4) : headingLevel;
   const columnCount = visible.length + (renderDetails ? 1 : 0);
+  // Measured on the whole data set, so the width holds from page to page.
+  // Only the table itself (and its loading rows) stops there: the empty and
+  // error states below take the section's full width, so they stay centred.
+  const fitClass =
+    width === 'auto' && datasetColumns.length + (renderDetails ? 1 : 0) <= FIT_MAX_COLUMNS
+      ? FIT_WIDTH_CLASS
+      : undefined;
+  const groups = visible.some((col) => col.column.group) ? columnGroups(visible) : null;
 
   const toggleDetails = (key: React.Key) =>
     setExpanded((current) => {
@@ -501,6 +588,7 @@ export function DataTable<T>({
     return (
       <div ref={wrapperRef} className={className}>
         {header}
+        {notice}
         <ErrorState
           title={errorTitle}
           message={error}
@@ -515,6 +603,7 @@ export function DataTable<T>({
     return (
       <div ref={wrapperRef} className={className}>
         {header}
+        {notice}
         {toolbar}
         <EmptyState
           icon={emptyIcon}
@@ -533,9 +622,10 @@ export function DataTable<T>({
     <div
       ref={wrapperRef}
       data-slot="data-table"
-      className={cn('scroll-mt-[calc(var(--header-height,4.5rem)+1rem)]', className)}
+      className={cn('scroll-mt-[calc(var(--header-height,4.5rem)+1rem)]', fitClass, className)}
     >
       {header}
+      {notice}
       {toolbar}
 
       {currentRow !== undefined && !showSkeleton ? (
@@ -575,9 +665,34 @@ export function DataTable<T>({
           aria-label={title ? undefined : ariaLabel}
           aria-labelledby={title ? headingId : undefined}
           aria-busy={loading || undefined}
+          data-links={links === 'quiet' ? 'quiet' : undefined}
           className={tableClassName}
         >
           <ResponsiveTableHead>
+            {groups ? (
+              // A group heading is a column header that spans its columns
+              // (`scope="col"` with `colSpan`: the table has no <colgroup>
+              // for a `colgroup` scope to point at). The cells over ungrouped
+              // columns hold nothing, so assistive tech skips them.
+              <tr data-slot="column-groups">
+                {groups.map((cell) =>
+                  cell.group ? (
+                    <th
+                      key={cell.key}
+                      colSpan={cell.span}
+                      scope="col"
+                      data-align="center"
+                      className="border-b border-rule-faint px-4 pt-3 pb-1.5 align-bottom type-label text-subtle print:!text-foreground"
+                    >
+                      {cell.group}
+                    </th>
+                  ) : (
+                    <td key={cell.key} colSpan={cell.span} aria-hidden="true" />
+                  ),
+                )}
+                {renderDetails ? <td aria-hidden="true" /> : null}
+              </tr>
+            ) : null}
             <tr>
               {visible.map((col) => (
                 <HeaderCell
@@ -592,7 +707,7 @@ export function DataTable<T>({
               ))}
               {renderDetails ? (
                 <ResponsiveTableHeadCell align="end">
-                  <span className="sr-only">{t('details.header')}</span>
+                  {detailsHeader ?? t('details.header')}
                 </ResponsiveTableHeadCell>
               ) : null}
             </tr>
@@ -648,13 +763,13 @@ export function DataTable<T>({
                           let content = renderCell(col, row, { index, value, isCurrent });
                           const carriesRow = col.column.id === linkColumnId;
                           if (carriesRow && href) {
+                            const destination = getRowLabel?.(row, index);
                             content = (
-                              <Link
-                                href={href}
-                                className={TABLE_LINK_CLASS}
-                                aria-label={getRowLabel?.(row, index)}
-                              >
+                              <Link href={href} className={TABLE_LINK_CLASS}>
                                 {content}
+                                {destination ? (
+                                  <span className="sr-only"> {destination}</span>
+                                ) : null}
                               </Link>
                             );
                           }
@@ -744,7 +859,15 @@ export function DataTable<T>({
           pageSize={paginate ? pageSize : Math.max(sorted.length, 1)}
           total={sorted.length}
           onPageChange={goToPage}
-          caption={hasDatetime ? <TimeZoneNote /> : undefined}
+          caption={
+            hasDatetime || caption ? (
+              <>
+                {hasDatetime ? <TimeZoneNote /> : null}
+                {hasDatetime && caption ? <span aria-hidden> · </span> : null}
+                {caption}
+              </>
+            ) : undefined
+          }
           label={t('pagination.labelFor', { table: ariaLabel })}
         />
       ) : null}
@@ -810,9 +933,23 @@ function HeaderCell<T>({
     </span>
   ) : null;
 
-  // A sortable header reads like every other header until it is sorted: only
-  // the active column shows its arrow, so no header holds a gap for an
-  // invisible icon.
+  // A sortable header keeps its label where every other header has it: only
+  // the active column shows its arrow in the text. Pointing at, or tabbing
+  // to, an unsorted one shows a faint two-way arrow in the cell's padding
+  // (outside the label, so nothing moves) to say the column can be sorted.
+  const hint =
+    column.sortable && !active ? (
+      <ArrowUpDown
+        aria-hidden
+        data-slot="sort-hint"
+        className={cn(
+          'pointer-events-none absolute top-1/2 size-3.5 -translate-y-1/2 text-subtle opacity-0',
+          'transition-opacity duration-[var(--duration-fast)]',
+          'group-hover/sort:opacity-100 group-focus-visible/sort:opacity-100',
+          leads ? 'end-full me-0.5' : 'start-full ms-0.5',
+        )}
+      />
+    ) : null;
   const label = column.sortable ? (
     <button
       type="button"
@@ -822,11 +959,12 @@ function HeaderCell<T>({
       data-touch-target="extended"
       className={cn(
         TOUCH_TARGET_EXTENDED_CLASS,
-        'inline-block min-w-0 max-w-full rounded-sm [text-align:inherit]',
+        'group/sort inline-block min-w-0 max-w-full rounded-sm [text-align:inherit]',
         'transition-colors duration-[var(--duration-fast)] hover:text-foreground',
         active && 'text-foreground',
       )}
     >
+      {hint}
       {leads ? arrow : null}
       <span>{column.header}</span>
       {leads ? null : arrow}

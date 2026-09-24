@@ -112,14 +112,69 @@ describe('BanGestureTable', () => {
     expect(screen.getAllByText('Test message').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('keeps a long unbroken message within its record', async () => {
-    // Regression: as a start-aligned flex item the message sized itself to
-    // one unbroken word and ran 680px past a 320px phone record.
+  it('keeps a long unbroken message within its column', async () => {
+    // Regression: `break-words` does not lower a cell's min-content width, so
+    // one 90-character run widened the whole table past 1440px and clipped
+    // every message at its edge. The message breaks anywhere instead, and the
+    // other columns keep fixed widths from `lg`.
     const message = 'ThisIsAnIntentionallyUnbrokenGestureMessage'.repeat(4);
     await act(async () => {
       render(<BanGestureTable gestureHistory={[createGestureHistory({ Message: message })]} />);
     });
-    expect(screen.getAllByText(message)[0]).toHaveClass('max-w-full', 'break-words');
+    expect(screen.getAllByText(message)[0]).toHaveClass('[overflow-wrap:anywhere]');
+    expect(screen.getByRole('table')).toHaveClass('lg:table-fixed');
+  });
+
+  it('shows the filters and the notice before the list arrives, so nothing shifts', async () => {
+    await act(async () => {
+      render(
+        <BanGestureTable
+          gestureHistory={[]}
+          loading
+          notice={<p data-testid="notice">Read-only</p>}
+        />,
+      );
+    });
+    expect(screen.getByTestId('notice')).toBeInTheDocument();
+    const filters = screen.getByRole('group', { name: 'tables.banGesture.visibilityLabel' });
+    for (const button of filters.querySelectorAll('button')) expect(button).toBeDisabled();
+    expect(screen.getByRole('searchbox', { name: 'tables.banGesture.search' })).toBeDisabled();
+  });
+
+  it('keeps the read-only notice when the list cannot be read', async () => {
+    await act(async () => {
+      render(
+        <BanGestureTable
+          gestureHistory={[]}
+          error="Could not load"
+          notice={<p data-testid="notice">Read-only</p>}
+        />,
+      );
+    });
+    expect(screen.getByTestId('notice')).toBeInTheDocument();
+    expect(screen.getByText('Could not load')).toBeInTheDocument();
+  });
+
+  it('leads each phone record with the message and one line of who, when and how', async () => {
+    const { container } = await act(async () =>
+      render(<BanGestureTable gestureHistory={[createGestureHistory({ RoundNum: 5 })]} />),
+    );
+    // Date, participant, cycle and method leave a phone record...
+    for (const label of [
+      'tables.columns.date',
+      'tables.columns.participant',
+      'tables.columns.cycle',
+      'tables.columns.gestureType',
+    ]) {
+      expect(container.querySelector(`tbody td[data-label="${label}"]`)).toHaveAttribute(
+        'data-priority',
+        'secondary',
+      );
+    }
+    // ...and come back as one quiet line under the message.
+    const message = container.querySelector('tbody td[data-label="tables.columns.message"]');
+    expect(message).toHaveTextContent('tables.allocation.cycle(cycle=5)');
+    expect(message?.querySelector('time')).not.toBeNull();
   });
 
   it('calls get_banned_bids on mount', async () => {

@@ -10,6 +10,8 @@ const mockUseClaimHistoryByUser = jest.fn();
 const mockUseUserInfo = jest.fn();
 const mockUseUserBalance = jest.fn();
 const mockUseCSTTokensByUser = jest.fn();
+const mockUseMarketingRewardsByUser = jest.fn();
+const mockMarketingRewardsTable = jest.fn();
 
 jest.mock('../../hooks/useApiQuery', () => ({
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
@@ -19,7 +21,7 @@ jest.mock('../../hooks/useApiQuery', () => ({
   useCSTTokensByUser: (...args: unknown[]) => mockUseCSTTokensByUser(...args),
   useCSTAnchorActionsByUser: () => list,
   useRWLKAnchorActionsByUser: () => list,
-  useMarketingRewardsByUser: () => list,
+  useMarketingRewardsByUser: (...args: unknown[]) => mockUseMarketingRewardsByUser(...args),
   useAnchorDistributionsByUser: () => list,
   useCSTAnchorDistributionsRetrievedByUser: () => list,
   useCSTAnchorDistributionsByUserByDeposit: () => list,
@@ -69,7 +71,10 @@ jest.mock('../tables/RecipientHistoryTable', () => ({
 }));
 jest.mock('../tables/MarketingRewardsTable', () => ({
   __esModule: true,
-  default: () => <div data-testid="marketing-rewards-table" />,
+  default: (props: Record<string, unknown>) => {
+    mockMarketingRewardsTable(props);
+    return <div data-testid="marketing-rewards-table" />;
+  },
 }));
 
 const ADDRESS = '0xA169574D0d353E3010997A3E64846b7D1B2a63B6';
@@ -126,6 +131,7 @@ beforeEach(() => {
     data: { CosmicTokenBalance: '1000000000000000000', ETH_Balance: '2000000000000000000' },
   });
   mockUseCSTTokensByUser.mockReturnValue(list);
+  mockUseMarketingRewardsByUser.mockReturnValue(list);
 });
 
 describe('UserStatisticsView', () => {
@@ -221,6 +227,25 @@ describe('UserStatisticsView', () => {
     }
     expect(screen.getByTestId('gesture-history-table')).toBeInTheDocument();
     expect(screen.getByTestId('profile-artworks')).toBeInTheDocument();
+  });
+
+  it('lists outreach allocations under the section heading alone', () => {
+    mockUseMarketingRewardsByUser.mockReturnValue({
+      data: [{ EvtLogId: 1, TxHash: '0x1', TimeStamp: 100, MarketerAddr: ADDRESS, AmountEth: 5 }],
+      isLoading: false,
+    });
+    render(<UserStatisticsView address={ADDRESS} isOwnProfile={false} />);
+    expect(
+      screen.getByRole('heading', {
+        level: 2,
+        name: 'myPages.statistics.page.sections.outreachAllocations',
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId('marketing-rewards-table')).toBeInTheDocument();
+    // The section names the ledger; the table adds no "Allocations" heading under it.
+    expect(mockMarketingRewardsTable).toHaveBeenCalledWith(
+      expect.not.objectContaining({ title: expect.anything() }),
+    );
   });
 
   it('shows your own statistics with next steps', () => {

@@ -48,8 +48,12 @@ describe('GestureHistoryTable', () => {
     expect(screen.getByText(shortenHex(mockData[0]!.BidderAddr, 6))).toBeInTheDocument();
     // The cost reads at the ledger precision with its unit, never "Ξ".
     expect(screen.getByText('0.1004').textContent).toBe('0.1004\u00a0ETH');
-    // The cycle links to its allocation page.
-    expect(screen.getByRole('link', { name: '4' })).toHaveAttribute('href', '/allocation/4');
+    // The cycle reads "Cycle 4" and links to its allocation page (the live
+    // cycle is not known here, so every cycle leads to its record).
+    expect(screen.getByRole('link', { name: 'tables.allocation.cycle(cycle=4)' })).toHaveAttribute(
+      'href',
+      '/allocation/4',
+    );
     expect(screen.getByText(mockData[0]!.Message)).toBeInTheDocument();
     // The method is a tag, not a row tint.
     expect(screen.getAllByText('ETH').length).toBeGreaterThanOrEqual(2);
@@ -104,6 +108,7 @@ describe('GestureHistoryTable', () => {
   test('pages 20 gestures at a time, each leading to its gesture page', () => {
     const list = Array.from({ length: 25 }, (_, i) => ({
       EvtLogId: 1000 + i,
+      BidPosition: 25 - i,
       TimeStamp: 1701346718 - i * 60,
       BidderAddr: '0x555eced709352759Ed0f1317dfC0a5FEf1310e60',
       GestureType: 0,
@@ -112,9 +117,37 @@ describe('GestureHistoryTable', () => {
     }));
     const { container } = render(<GestureHistoryTable gestureHistory={list} showRound={false} />);
     expect(container.querySelectorAll('tbody tr')).toHaveLength(20);
+    // WCAG 2.5.3: the link's name starts with the date it shows (plus the
+    // method tag that rides on the date line on phones; CSS hides it from
+    // sm, jsdom does not), then names the gesture by the number its own
+    // page carries in its title.
+    const date = convertTimestampToDateTime(list[0]!.TimeStamp, true);
+    const link = screen.getByRole('link', {
+      name: `${date} ETH tables.gestureHistory.viewGesture(position=25)`,
+    });
+    expect(link).toHaveAttribute('href', '/gesture/1000');
+    expect(link).not.toHaveAttribute('aria-label');
+  });
+
+  test('names a gesture link by its date alone when its position is unknown', () => {
+    render(
+      <GestureHistoryTable
+        gestureHistory={[
+          {
+            EvtLogId: 77,
+            TimeStamp: 1701346718,
+            BidderAddr: '0x555eced709352759Ed0f1317dfC0a5FEf1310e60',
+            GestureType: 0,
+            EthPriceEth: 0.1,
+          },
+        ]}
+        showRound={false}
+      />,
+    );
+    // The date and the phone-only method tag on its line, nothing after them.
     expect(
-      screen.getByRole('link', { name: 'tables.gestureHistory.viewGesture(id=1000)' }),
-    ).toHaveAttribute('href', '/gesture/1000');
+      screen.getByRole('link', { name: `${convertTimestampToDateTime(1701346718, true)} ETH` }),
+    ).toHaveAttribute('href', '/gesture/77');
   });
 
   test("drops who and how long on a participant's own page", () => {
@@ -164,7 +197,7 @@ describe('GestureHistoryTable', () => {
     expect(holds).toEqual(['1h 0m 39s', '10m']);
   });
 
-  test('uses localized alt text for the Random Walk NFT image', () => {
+  test('names the Random Walk NFT a gesture used as a link, with no image to break', () => {
     render(
       <GestureHistoryTable
         gestureHistory={[
@@ -174,14 +207,65 @@ describe('GestureHistoryTable', () => {
             BidderAddr: '0x555eced709352759Ed0f1317dfC0a5FEf1310e60',
             GestureType: 1,
             EthPriceEth: 0.1,
-            RWalkNFTId: 42,
+            RWalkNFTId: 987654,
           },
         ]}
         showRound={false}
       />,
     );
 
-    expect(screen.getByAltText('tables.gestureHistory.randomWalkImageAlt')).toBeInTheDocument();
+    const walk = screen.getByText('tables.gestureHistory.randomWalkToken(id=#987654)');
+    expect(walk.closest('a')).toHaveAttribute('href', 'https://randomwalknft.com/detail/987654');
+    expect(document.querySelector('td img')).toBeNull();
+  });
+
+  test('lists an attached NFT as data, linked to the token', () => {
+    render(
+      <GestureHistoryTable
+        gestureHistory={[
+          {
+            EvtLogId: 4,
+            TimeStamp: 1701346718,
+            BidderAddr: '0x555eced709352759Ed0f1317dfC0a5FEf1310e60',
+            GestureType: 0,
+            EthPriceEth: 0.1,
+            NFTDonationTokenAddr: '0xabcdef0123456789abcdef0123456789abcdef01',
+            NFTDonationTokenId: 123456,
+          },
+        ]}
+        showRound={false}
+      />,
+    );
+
+    expect(screen.getByText('tables.gestureHistory.attached')).toBeInTheDocument();
+    const nft = screen.getByText('tables.recipientHistory.nft(id=123456)');
+    expect(nft.closest('a')?.getAttribute('href')).toMatch(
+      /\/token\/0xabcdef0123456789abcdef0123456789abcdef01\?a=123456$/,
+    );
+  });
+
+  test('shows a long message in two lines with a way to read all of it', () => {
+    const message = 'x'.repeat(400);
+    render(
+      <GestureHistoryTable
+        gestureHistory={[
+          {
+            EvtLogId: 5,
+            TimeStamp: 1701346718,
+            BidderAddr: '0x555eced709352759Ed0f1317dfC0a5FEf1310e60',
+            GestureType: 0,
+            EthPriceEth: 0.1,
+            Message: message,
+          },
+        ]}
+        showRound={false}
+      />,
+    );
+    const text = screen.getByText(message);
+    // Never a hover-only tooltip: the text is in the cell, clamped by CSS,
+    // and breaks anywhere rather than widen the table.
+    expect(text).toHaveClass('sm:line-clamp-2', '[overflow-wrap:anywhere]');
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
   });
 
   test('reads as lines on a phone: the method on the date line, the cycle only when it varies', () => {

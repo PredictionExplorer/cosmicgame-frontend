@@ -91,22 +91,18 @@
     "cycleHash": "周期编号",
     "round": "周期",
     "participant": "参与者",
-    "participantAddress": "参与者地址",
     "recipient": "获配者",
-    "recipientAddress": "获配者地址",
     "gestureCount": "落笔次数",
-    "numberOfGestures": "落笔次数",
     "gestureType": "落笔类型",
     "gestureDuration": "落笔时长",
     "gestureInfo": "落笔信息",
     "gestureCost": "价格",
     "allocation": "分配",
-    "allocationsReceived": "获配次数",
+    "allocationsReceived": "获配次数（全部类型）",
     "maxAllocationEth": "最高签名分配（ETH）",
-    "allocationsSumEth": "分配总额（ETH）",
+    "allocationsSumEth": "获配 ETH",
     "anchorActionId": "锚定操作 ID",
     "anchorHolder": "锚定者",
-    "anchorHolderAddress": "锚定者地址",
     "holder": "持有者",
     "numberOfNfts": "NFT 数量",
     "date": "日期",
@@ -127,9 +123,9 @@
     "destinationAddress": "目标地址",
     "from": "转出方",
     "to": "接收方",
-    "type": "类型",
     "event": "事件",
     "newValue": "新值",
+    "previousValue": "原值",
     "recordType": "记录类型",
     "source": "来源",
     "received": "获配",
@@ -144,14 +140,13 @@
     "maxGestureEth": "最高 ETH 落笔",
     "numberOfContributions": "贡献次数",
     "totalContributedEth": "贡献总额（ETH）",
-    "numberOfStellarEntries": "星选资格数",
-    "ethSelectionProbability": "ETH 获配概率",
-    "nftSelectionProbability": "NFT 获配概率",
     "expirationDate": "到期时间",
     "started": "开始时间",
     "ended": "结束时间",
     "actions": "操作",
-    "selected": "已选择"
+    "selected": "已选择",
+    "gesturesThisCycle": "本周期落笔次数",
+    "shareOfPool": "池中占比"
   },
   "names": {
     "participants": "独立参与者",
@@ -200,6 +195,10 @@
   "details": {
     "header": "详情"
   },
+  "message": {
+    "showAll": "展开全文",
+    "showLess": "收起"
+  },
   "skeleton": {
     "loadingText": "正在加载文本",
     "loadingStat": "正在加载统计数据",
@@ -215,21 +214,25 @@
   },
   "allocation": {
     "cycle": "第 {cycle} 个周期",
-    "openDetails": "打开第 {cycle} 个周期的分配明细。",
-    "allocationHelp": "这一周期的签名分配金额与获配钱包。",
     "gestures": "落笔",
-    "gesturesHelp": "这一周期的落笔总次数。",
-    "nftsHelp": "这一周期内随落笔附加的 NFT 数量。",
-    "stellarHelp": "分配至星选池的 ETH。",
-    "anchorHelp": "分配至锚定派发的 ETH。",
-    "distributedHelp": "通过星选发放的 Cosmic Signature NFT 数量。",
     "listAria": "按周期排列的获配者列表",
+    "groups": {
+      "eth": "各分配轨道 ETH",
+      "nfts": "NFT"
+    },
     "columns": {
       "finalized": "收官时间",
+      "signature": "签名分配",
       "signatureEth": "签名分配（ETH）",
+      "chrono": "时之勇士",
       "chronoEth": "时之勇士（ETH）",
+      "stellar": "星选",
       "stellarEth": "星选（ETH）",
+      "anchor": "锚定派发",
       "anchorEth": "锚定派发（ETH）",
+      "publicGoods": "公共物品",
+      "publicGoodsEth": "公共物品（ETH）",
+      "attached": "附加",
       "nftsAttached": "附加 NFT",
       "nftsViaStellar": "星选 NFT"
     }
@@ -240,6 +243,10 @@
   },
   "publicGoods": {
     "voluntaryEmpty": "直接转入公共物品金库的资助会显示在这里，由金库为当前配置的公共物品受益方保管。"
+  },
+  "outreach": {
+    "allocationsTitle": "分配记录",
+    "dustNote": "灰色数额为少于 {amount} 的分配，按当前精度无法完整显示。"
   },
   "banGesture": {
     "banned": "留言已隐藏。",
@@ -259,9 +266,8 @@
     }
   },
   "ethContribution": {
-    "withInfo": "附带信息的贡献",
-    "simple": "普通贡献",
-    "viewContribution": "查看贡献 {id}"
+    "withNote": "附带留言",
+    "viewContribution": "贡献 #{id}"
   },
   "endurance": {
     "liveHelp": "这位参与者也是最新落笔者，因此坚守时段仍在增长。",
@@ -269,18 +275,16 @@
     "chronoWarrior": "时之勇士"
   },
   "gestureHistory": {
-    "randomWalkGesture": "使用 Random Walk NFT 落笔（ID：{id}）",
-    "randomWalkImageAlt": "Random Walk NFT",
-    "cstGesture": "使用 CST 代币落笔",
-    "ethGesture": "使用 ETH 落笔",
-    "nftAttached": "，并附加了代币（{address}），ID 为 {id}",
-    "erc20AttachedPrefix": "，并附加了 {amount}",
-    "attachedSuffix": " 代币",
     "tableLabel": "落笔历史",
-    "viewGesture": "查看落笔 {id}"
+    "viewGesture": "落笔 #{position}",
+    "attached": "附加",
+    "randomWalkToken": "Random Walk {id}"
   },
   "nameHistory": {
     "removed": "代币名称已移除。"
+  },
+  "stellarSelection": {
+    "draws": "周期确定时，协议会从本池中选取 {eth} 次 ETH 星选与 {nft} 次 NFT 星选。"
   },
   "recipientHistory": {
     "sources": {
@@ -295,13 +299,18 @@
       "attachedErc20Timeout": "附加 ERC-20（超时取回）",
       "stellarEthTimeout": "ETH 星选（超时取回）"
     },
+    "sourceTags": {
+      "anchoredStellarSelection": "锚定 NFT 星选"
+    },
     "nft": "NFT #{id}",
+    "nftCount": "{count, plural, other {# 个 NFT}}",
     "readyToRetrieve": "可取回",
     "retrieve": "取回",
     "retrieved": "已取回",
     "allAnchorHolders": "全部 Cosmic Signature NFT 锚定者",
     "showRecords": "{count, plural, other {查看 # 条记录}}",
     "hideRecords": "收起记录",
+    "recordsHeader": "记录",
     "totals": {
       "eth": "获配 ETH",
       "cst": "获配 CST",
@@ -358,25 +367,19 @@
     "printReign": "在位：{duration}"
   },
   "systemModes": {
-    "viewEvent": "查看{scope}的系统事件"
+    "viewEvent": "参数变更记录"
   },
   "uniqueAnchorHolders": {
-    "numAnchorActions": "锚定次数",
     "anchors": "锚定",
-    "numReleaseActions": "解锚次数",
     "releases": "解锚",
-    "totalImprintedTokens": "铭刻代币总数",
     "imprinted": "已铭刻",
-    "totalAnchoredTokens": "锚定代币总数",
-    "anchored": "已锚定",
-    "totalDistributionEth": "锚定派发总额（ETH）",
-    "distributed": "已派发",
-    "unretrievedDistributionEth": "未取回锚定派发（ETH）",
-    "unretrieved": "未取回"
+    "anchored": "当前锚定",
+    "distributedEth": "已派发（ETH）",
+    "unretrievedEth": "未取回（ETH）"
   },
   "statisticsColumns": {
-    "ownerAddress": "持有者地址",
-    "numberOfTokensOwned": "持有代币数",
+    "ownerAddress": "持有者",
+    "numberOfTokensOwned": "持有 NFT 数",
     "cstBalance": "余额（CST）",
     "contractAddress": "合约地址",
     "numberOfNfts": "NFT 数量",
@@ -385,29 +388,9 @@
     "isAnchorHolder": "锚定者"
   },
   "statisticsTooltips": {
-    "participantAddress": "至少完成过一笔已索引落笔的钱包地址。",
-    "numberOfGestures": "此钱包完成的已索引落笔总次数。",
-    "maxGestureEth": "此钱包记录中金额最高的一笔 ETH 落笔。",
-    "recipientAddress": "收到过一次或多次协议已索引分配的钱包地址。",
-    "allocationsReceived": "此钱包收到的已索引分配次数。",
-    "maxAllocationEth": "此获配者因写下收官之笔而获得的最高一笔签名分配；从未获得则为 0。时之勇士与星选的 ETH 只计入总额。",
-    "allocationsSumEth": "此获配者的已索引 ETH 分配总额。",
-    "contributorAddress": "曾向协议贡献 ETH 的钱包地址。",
-    "numberOfContributions": "此钱包发起的已索引 ETH 贡献交易数。",
-    "totalContributedEth": "此钱包贡献的 ETH 总额。",
-    "ownerAddress": "当前持有本行所示代币余额的钱包地址。",
-    "numberOfTokensOwned": "此钱包持有的 Cosmic Signature NFT（ERC-721）数量。",
+    "maxAllocationEth": "此获配者因写下收官之笔而获得的最高一笔签名分配；从未获得则显示短横线。时之勇士与星选的 ETH 只计入获配 ETH。",
+    "allocationsSumEth": "此获配者获得的全部 ETH 分配。NFT 与 CST 分配计入“获配次数（全部类型）”，但不计入此处的 ETH。",
     "cstBalance": "此钱包当前的 CST（ERC-20）余额。",
-    "anchorHolderAddress": "曾锚定或解锚代币的钱包地址。",
-    "numAnchorActions": "此钱包发起的已索引锚定交易数。",
-    "numReleaseActions": "此钱包发起的已索引解锚交易数。",
-    "totalImprintedTokens": "通过相关锚定或分配流程为此锚定者铭刻的代币总数。",
-    "totalAnchoredTokens": "统计 API 为此钱包报告的当前或累计锚定代币数。",
-    "totalDistributionEth": "为此钱包索引的 ETH 锚定派发总额。",
-    "unretrievedDistributionEth": "此钱包仍可取回的 ETH 锚定派发。",
-    "systemRound": "此系统事件所属的周期或部署阶段。",
-    "systemStarted": "此系统事件开始生效的时间。",
-    "systemEnded": "下一系统事件取代此事件的时间。",
     "attachedNftContractAddress": "随落笔附加的代币所属 ERC-721 合约地址。",
     "attachedNftCount": "此合约中已随落笔附加的 NFT 数量。"
   }

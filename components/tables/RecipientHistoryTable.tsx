@@ -12,6 +12,7 @@ import {
   sumAllocatedEth,
   CST_RECORD_TYPES,
   NFT_RECORD_TYPES,
+  STELLAR_SELECTION_RECORD_TYPES,
 } from '@/utils/allocationRecords';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import { AddressChip } from '@/components/ui/address-chip';
@@ -27,6 +28,7 @@ import {
 import { DateTime } from '@/components/ui/date-time';
 import { UnknownValue } from '@/components/ui/unknown-value';
 import type { LedgerStateProps } from '@/components/tables/ledger-props';
+import { useCycleHref } from '@/components/tables/useCycleHref';
 import type { WinningHistoryEntry } from '@/services/api/types';
 
 export type { WinningHistoryEntry };
@@ -181,11 +183,15 @@ function groupByRecipient(records: readonly WinningHistoryEntry[]): RecipientGro
 }
 
 /**
- * "11.0616 ETH  1,000 CST  NFT #24": what a recipient received in the cycle.
- * The items are spaced rather than joined by separators, so a long list
- * wraps cleanly without a line that starts on a dot.
+ * "3.5397 ETH  9,000 CST  9 NFTs": what a recipient received in the cycle,
+ * one figure per kind. A single NFT is named and linked ("NFT #24"); several
+ * are counted, and their numbers are in the expanded records, so a row
+ * never wraps into a ragged run of links. The items are spaced rather than
+ * joined by separators, so a narrow cell wraps without a line that starts
+ * on a dot.
  */
 function GroupSummary({ group }: { group: RecipientGroup }) {
+  const t = useTranslations('tables');
   const parts: { key: string; node: ReactNode }[] = [];
   if (group.eth > 0) {
     parts.push({
@@ -199,10 +205,17 @@ function GroupSummary({ group }: { group: RecipientGroup }) {
       node: <Amount value={group.cst} unit="CST" context="card" unitClassName="text-subtle" />,
     });
   }
-  for (const record of group.nfts) {
+  const [onlyNft] = group.nfts;
+  if (group.nfts.length === 1 && onlyNft) {
+    parts.push({ key: 'nft', node: <AllocationAsset record={onlyNft} /> });
+  } else if (group.nfts.length > 1) {
     parts.push({
-      key: `nft-${record.TokenId}-${record.RecordType}`,
-      node: <AllocationAsset record={record} />,
+      key: 'nfts',
+      node: (
+        <span className="tabular-nums text-foreground">
+          {t('recipientHistory.nftCount', { count: group.nfts.length })}
+        </span>
+      ),
     });
   }
   return (
@@ -292,6 +305,7 @@ export default function RecipientHistoryTable({
   ...state
 }: RecipientHistoryTableProps) {
   const t = useTranslations('tables');
+  const cycleHref = useCycleHref();
   const records = useMemo(() => winningHistory ?? [], [winningHistory]);
   const sourceLabel = (recordType: number) => {
     const source = ALLOCATION_SOURCE_BY_RECORD_TYPE[recordType];
@@ -331,7 +345,16 @@ export default function RecipientHistoryTable({
         kind: 'link',
         header: t('columns.cycle'),
         value: (record) => record.RoundNum,
-        href: (record) => `/allocation/${record.RoundNum}`,
+        // "Cycle 2", not a bare "2": a word-wide target that says where it
+        // leads, and the live cycle leads to its page, not to a record that
+        // does not exist yet.
+        cell: (record) =>
+          typeof record.RoundNum === 'number' ? (
+            <TableLink href={cycleHref(record.RoundNum)}>
+              {t('allocation.cycle', { cycle: record.RoundNum })}
+            </TableLink>
+          ) : null,
+        nowrap: true,
         sortable: true,
       },
       {
@@ -350,10 +373,17 @@ export default function RecipientHistoryTable({
         id: 'position',
         kind: 'count',
         header: t('columns.position'),
+        // Only a Stellar Selection has a place among the cycle's selections
+        // ("#3"); the API's index is 0-based, and every other allocation
+        // reports 0, which would read as a meaningless "Position 0".
         value: (record) =>
-          typeof record.WinnerIndex === 'number' && record.WinnerIndex >= 0
-            ? record.WinnerIndex
+          STELLAR_SELECTION_RECORD_TYPES.has(record.RecordType) &&
+          typeof record.WinnerIndex === 'number' &&
+          record.WinnerIndex >= 0
+            ? record.WinnerIndex + 1
             : null,
+        cell: (_record, { value }) =>
+          typeof value === 'number' ? <span className="tabular-nums">#{value}</span> : null,
         whenBlank: 'empty',
         hideWhenEmpty: true,
         // An ordering index within the cycle; phone records drop it.
@@ -369,7 +399,7 @@ export default function RecipientHistoryTable({
       },
     ];
     return all.filter((column): column is DataTableColumn<WinningHistoryEntry> => Boolean(column));
-  }, [t, showWinnerAddr, showRoundColumn, showClaimedStatus]);
+  }, [t, showWinnerAddr, showRoundColumn, showClaimedStatus, cycleHref]);
 
   const groups = useMemo(
     () => (groupBy === 'recipient' ? groupByRecipient(records) : []),
@@ -393,7 +423,12 @@ export default function RecipientHistoryTable({
         cell: (group) => (
           <span className="inline-flex flex-wrap justify-end gap-1 sm:justify-start">
             {group.sources.map((source) => (
-              <TableTag key={source}>{t(`recipientHistory.sources.${source}`)}</TableTag>
+              <TableTag key={source}>
+                {/* A tag takes the short form the NFT pages use ("Anchored Selection"). */}
+                {source === 'anchoredStellarSelection'
+                  ? t('recipientHistory.sourceTags.anchoredStellarSelection')
+                  : t(`recipientHistory.sources.${source}`)}
+              </TableTag>
             ))}
           </span>
         ),
@@ -424,6 +459,8 @@ export default function RecipientHistoryTable({
           emptyTitle={t('empty.history')}
           pageSize={perPage}
           layout="cards"
+          // The sources and the summary each keep one line on a wide screen.
+          width="fill"
           renderDetails={(group) => (
             <ul className="divide-y divide-rule-faint">
               {group.records.map((record, index) => (
@@ -449,6 +486,7 @@ export default function RecipientHistoryTable({
               ? t('recipientHistory.hideRecords')
               : t('recipientHistory.showRecords', { count: group.records.length })
           }
+          detailsHeader={t('recipientHistory.recordsHeader')}
           {...state}
           className={undefined}
         />

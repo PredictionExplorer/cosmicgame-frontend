@@ -83,42 +83,38 @@
     "unavailable": "Unavailable",
     "undefined": "Undefined",
     "deployment": "Deployment",
-    "currentlyActive": "Currently Active"
+    "currentlyActive": "Currently active"
   },
   "columns": {
     "cycle": "Cycle",
-    "cycleNumber": "Cycle Num",
+    "cycleNumber": "Cycle",
     "cycleHash": "Cycle #",
     "round": "Cycle",
     "participant": "Participant",
-    "participantAddress": "Participant Address",
     "recipient": "Recipient",
-    "recipientAddress": "Recipient Address",
     "gestureCount": "Gestures",
-    "numberOfGestures": "Number of Gestures",
-    "gestureType": "Gesture Type",
-    "gestureDuration": "Gesture Duration",
-    "gestureInfo": "Gesture Info",
+    "gestureType": "Gesture type",
+    "gestureDuration": "Gesture duration",
+    "gestureInfo": "Gesture info",
     "gestureCost": "Cost",
     "allocation": "Allocation",
-    "allocationsReceived": "Allocations Received",
-    "maxAllocationEth": "Max Signature Allocation (ETH)",
-    "allocationsSumEth": "Allocations Sum (ETH)",
-    "anchorActionId": "Anchor Action ID",
+    "allocationsReceived": "Allocations (all kinds)",
+    "maxAllocationEth": "Largest Signature Allocation (ETH)",
+    "allocationsSumEth": "ETH received",
+    "anchorActionId": "Anchor action ID",
     "anchorHolder": "Anchor-holder",
-    "anchorHolderAddress": "Anchor-holder Address",
     "holder": "Holder",
-    "numberOfNfts": "Number of NFTs",
+    "numberOfNfts": "NFTs",
     "date": "Date",
-    "dateTime": "Date & Time",
+    "dateTime": "Date and time",
     "datetime": "Date",
     "dateTimeCompact": "Date",
     "amount": "Amount",
     "amountEth": "Amount (ETH)",
     "amountCst": "Amount (CST)",
     "tokenId": "Token ID",
-    "tokenName": "Token Name",
-    "tokenAddress": "Token Address",
+    "tokenName": "Token name",
+    "tokenAddress": "Token address",
     "retrieved": "Retrieved",
     "status": "Status",
     "message": "Message",
@@ -127,31 +123,30 @@
     "destinationAddress": "Destination address",
     "from": "From",
     "to": "To",
-    "type": "Type",
     "event": "Event",
     "newValue": "New value",
-    "recordType": "Record Type",
+    "previousValue": "Previous value",
+    "recordType": "Record type",
     "source": "Source",
     "received": "Received",
     "position": "Position",
     "note": "Note",
-    "userAddress": "User Address",
-    "spentAmountEth": "Spent Amount (ETH)",
+    "userAddress": "User address",
+    "spentAmountEth": "Spent (ETH)",
     "contributionAmountEth": "Contribution amount (ETH)",
     "retrievalAmountEth": "Retrieval amount (ETH)",
-    "distributionAmountEth": "Distribution Amount (ETH)",
+    "distributionAmountEth": "Distribution (ETH)",
     "outreachContributor": "Outreach contributor",
-    "maxGestureEth": "Max Gesture (ETH)",
-    "numberOfContributions": "Number of Contributions",
-    "totalContributedEth": "Total Contributed Amount (ETH)",
-    "numberOfStellarEntries": "Number of Stellar Selection Entries",
-    "ethSelectionProbability": "ETH allocation probability",
-    "nftSelectionProbability": "NFT allocation probability",
-    "expirationDate": "Expiration Date",
+    "maxGestureEth": "Largest gesture (ETH)",
+    "numberOfContributions": "Contributions",
+    "totalContributedEth": "Total contributed (ETH)",
+    "expirationDate": "Expiration date",
     "started": "Started",
     "ended": "Ended",
     "actions": "Actions",
-    "selected": "Selected"
+    "selected": "Selected",
+    "gesturesThisCycle": "Gestures this cycle",
+    "shareOfPool": "Share of pool"
   },
   "names": {
     "participants": "Unique participants",
@@ -200,6 +195,10 @@
   "details": {
     "header": "Details"
   },
+  "message": {
+    "showAll": "Show all",
+    "showLess": "Show less"
+  },
   "skeleton": {
     "loadingText": "Loading text",
     "loadingStat": "Loading stat",
@@ -215,21 +214,25 @@
   },
   "allocation": {
     "cycle": "Cycle {cycle}",
-    "openDetails": "Open the detailed allocation breakdown for cycle #{cycle}.",
-    "allocationHelp": "Signature Allocation amount and recipient wallet for this cycle.",
     "gestures": "Gestures",
-    "gesturesHelp": "Total gestures made during this cycle.",
-    "nftsHelp": "NFTs attached to gestures during this cycle.",
-    "stellarHelp": "ETH allocated to the Stellar Selection pool.",
-    "anchorHelp": "ETH allocated to Anchor Distributions.",
-    "distributedHelp": "Cosmic Signature NFTs distributed via Stellar Selection.",
     "listAria": "Allocation recipients by cycle",
+    "groups": {
+      "eth": "ETH by track",
+      "nfts": "NFTs"
+    },
     "columns": {
       "finalized": "Finalized",
+      "signature": "Signature Allocation",
       "signatureEth": "Signature Allocation (ETH)",
+      "chrono": "Chrono-Warrior",
       "chronoEth": "Chrono-Warrior (ETH)",
+      "stellar": "Stellar Selection",
       "stellarEth": "Stellar Selection (ETH)",
+      "anchor": "Anchor Distribution",
       "anchorEth": "Anchor Distribution (ETH)",
+      "publicGoods": "Public Goods",
+      "publicGoodsEth": "Public Goods (ETH)",
+      "attached": "Attached",
       "nftsAttached": "NFTs attached",
       "nftsViaStellar": "NFTs via Stellar Selection"
     }
@@ -240,6 +243,10 @@
   },
   "publicGoods": {
     "voluntaryEmpty": "Contributions sent straight to the Public Goods Vault appear here. The vault holds them for its configured Public Goods recipient."
+  },
+  "outreach": {
+    "allocationsTitle": "Allocations",
+    "dustNote": "Muted amounts are allocations of less than {amount}, too small to show at this precision."
   },
   "banGesture": {
     "banned": "Message hidden.",
@@ -259,9 +266,8 @@
     }
   },
   "ethContribution": {
-    "withInfo": "Contribution with info",
-    "simple": "Simple contribution",
-    "viewContribution": "View contribution {id}"
+    "withNote": "With note",
+    "viewContribution": "Contribution #{id}"
   },
   "endurance": {
     "liveHelp": "This participant is also the latest gesture maker, so this endurance window is still growing.",
@@ -269,18 +275,16 @@
     "chronoWarrior": "Chrono-Warrior"
   },
   "gestureHistory": {
-    "randomWalkGesture": "Gesture made with Random Walk NFT #{id}",
-    "randomWalkImageAlt": "RWLK NFT",
-    "cstGesture": "Gesture made with CST",
-    "ethGesture": "Gesture made with ETH",
-    "nftAttached": " and a token ({address}) with ID {id} was attached",
-    "erc20AttachedPrefix": " and {amount}",
-    "attachedSuffix": " was attached",
     "tableLabel": "Gesture history",
-    "viewGesture": "View gesture {id}"
+    "viewGesture": "Gesture #{position}",
+    "attached": "Attached",
+    "randomWalkToken": "Random Walk {id}"
   },
   "nameHistory": {
     "removed": "Token name was removed."
+  },
+  "stellarSelection": {
+    "draws": "At finalization, {eth} ETH and {nft} NFT selections are drawn from this pool."
   },
   "recipientHistory": {
     "sources": {
@@ -295,13 +299,18 @@
       "attachedErc20Timeout": "Attached ERC-20 (timeout retrieval)",
       "stellarEthTimeout": "ETH Stellar Selection (timeout retrieval)"
     },
+    "sourceTags": {
+      "anchoredStellarSelection": "Anchored Selection"
+    },
     "nft": "NFT #{id}",
+    "nftCount": "{count, plural, one {# NFT} other {# NFTs}}",
     "readyToRetrieve": "Ready to retrieve",
     "retrieve": "Retrieve",
     "retrieved": "Retrieved",
     "allAnchorHolders": "All Cosmic Signature NFT anchor-holders",
     "showRecords": "{count, plural, one {Show # record} other {Show # records}}",
     "hideRecords": "Hide records",
+    "recordsHeader": "Records",
     "totals": {
       "eth": "ETH received",
       "cst": "CST received",
@@ -358,56 +367,30 @@
     "printReign": "Reign: {duration}"
   },
   "systemModes": {
-    "viewEvent": "View system event for {scope}"
+    "viewEvent": "parameter changes"
   },
   "uniqueAnchorHolders": {
-    "numAnchorActions": "Num Anchor Actions",
     "anchors": "Anchors",
-    "numReleaseActions": "Num Release Actions",
     "releases": "Releases",
-    "totalImprintedTokens": "Total Imprinted Tokens",
     "imprinted": "Imprinted",
-    "totalAnchoredTokens": "Total Anchored Tokens",
-    "anchored": "Anchored",
-    "totalDistributionEth": "Total Distribution (ETH)",
-    "distributed": "Distributed",
-    "unretrievedDistributionEth": "Unretrieved Distribution (ETH)",
-    "unretrieved": "Unretrieved"
+    "anchored": "Anchored now",
+    "distributedEth": "Distributed (ETH)",
+    "unretrievedEth": "Unretrieved (ETH)"
   },
   "statisticsColumns": {
-    "ownerAddress": "Owner Address",
-    "numberOfTokensOwned": "Number of Tokens Owned",
+    "ownerAddress": "Holder",
+    "numberOfTokensOwned": "NFTs held",
     "cstBalance": "Balance (CST)",
-    "contractAddress": "Contract Address",
-    "numberOfNfts": "Number of NFTs",
-    "namedNftTokenId": "Token Id",
+    "contractAddress": "Contract address",
+    "numberOfNfts": "NFTs",
+    "namedNftTokenId": "Token ID",
     "isRandomWalk": "Is Random Walk",
     "isAnchorHolder": "Is Anchor-holder"
   },
   "statisticsTooltips": {
-    "participantAddress": "Wallet address that made at least one indexed gesture.",
-    "numberOfGestures": "Total indexed gestures made by this wallet.",
-    "maxGestureEth": "Largest single ETH-denominated gesture recorded for this wallet.",
-    "recipientAddress": "Wallet address that received one or more indexed protocol allocations.",
-    "allocationsReceived": "Number of indexed allocations received by this wallet.",
-    "maxAllocationEth": "Largest Signature Allocation this recipient received for making a Final Gesture; 0 if it never received one. Chrono-Warrior and Stellar Selection ETH count only toward the sum.",
-    "allocationsSumEth": "Total ETH allocations indexed for this recipient.",
-    "contributorAddress": "Wallet address that contributed ETH to the protocol.",
-    "numberOfContributions": "Number of indexed ETH contribution transactions from this wallet.",
-    "totalContributedEth": "Total ETH contributed by this wallet.",
-    "ownerAddress": "Wallet address currently holding the token balance shown in this row.",
-    "numberOfTokensOwned": "Number of Cosmic Signature NFT ERC-721 tokens held by this wallet.",
+    "maxAllocationEth": "Largest Signature Allocation this recipient received for making a Final Gesture; a dash if it never received one. Chrono-Warrior and Stellar Selection ETH count only toward the ETH received.",
+    "allocationsSumEth": "Every ETH allocation this recipient has received. NFT and CST allocations count toward Allocations (all kinds) but add no ETH here.",
     "cstBalance": "Current CST ERC-20 balance for this wallet.",
-    "anchorHolderAddress": "Wallet address that anchored or released tokens.",
-    "numAnchorActions": "Number of indexed anchor transactions made by this wallet.",
-    "numReleaseActions": "Number of indexed release transactions made by this wallet.",
-    "totalImprintedTokens": "Total tokens imprinted for this anchor-holder through anchoring or allocations.",
-    "totalAnchoredTokens": "Current or cumulative anchored-token count reported for this wallet.",
-    "totalDistributionEth": "Total ETH Anchor Distribution indexed for this wallet.",
-    "unretrievedDistributionEth": "ETH Anchor Distribution still available for this wallet to retrieve.",
-    "systemRound": "Cycle or deployment context for this system event.",
-    "systemStarted": "Timestamp when this system event became active.",
-    "systemEnded": "Timestamp when the next system event replaced this one.",
     "attachedNftContractAddress": "ERC-721 contract address for tokens attached to gestures.",
     "attachedNftCount": "Number of NFTs from this contract that have been attached to gestures."
   }

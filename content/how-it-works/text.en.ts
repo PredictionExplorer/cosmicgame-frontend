@@ -86,7 +86,7 @@ export const howItWorksTextEn = {
         label: 'Stellar Selections',
         description: `Three ETH Stellar Selection recipients share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve. Ten NFT Stellar Selection recipients plus ten Anchored-NFT Stellar Selection recipients each receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and a Cosmic Signature NFT.`,
         tooltip:
-          'Each gesture adds an entry. More entries increase the chance of selection but do not guarantee it. Anchored Random Walk NFTs take part in a separate Stellar Selection.',
+          'Each gesture adds one entry, and every selection is drawn from all of the cycle’s entries, with replacement. Anchored Random Walk NFTs take part in a separate Stellar Selection.',
       },
       {
         label: 'The next cycle begins',

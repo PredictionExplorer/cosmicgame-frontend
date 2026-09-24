@@ -21,7 +21,7 @@ describe('UniqueRecipientsTable', () => {
 
   it('renders table headers', () => {
     render(<UniqueRecipientsTable list={[createRecipient()]} />);
-    expect(screen.getAllByText('tables.columns.recipientAddress').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.recipient').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('tables.columns.allocationsReceived').length).toBeGreaterThanOrEqual(
       1,
     );
@@ -29,6 +29,17 @@ describe('UniqueRecipientsTable', () => {
     expect(screen.getAllByText('tables.columns.allocationsSumEth').length).toBeGreaterThanOrEqual(
       1,
     );
+  });
+
+  it('explains only the derived figures: the largest allocation and the ETH sum', () => {
+    render(<UniqueRecipientsTable list={[createRecipient()]} />);
+    const triggers = screen.getAllByRole('button', {
+      name: /^tables\.tableHeaderHelp\.explainColumn/,
+    });
+    expect(triggers.map((trigger) => trigger.getAttribute('aria-label'))).toEqual([
+      'tables.tableHeaderHelp.explainColumn(column=tables.columns.maxAllocationEth)',
+      'tables.tableHeaderHelp.explainColumn(column=tables.columns.allocationsSumEth)',
+    ]);
   });
 
   it('renders recipient data', () => {
@@ -50,6 +61,17 @@ describe('UniqueRecipientsTable', () => {
     );
     expect(screen.getByText('0.1000')).toBeInTheDocument();
     expect(screen.getByText('0.2000')).toBeInTheDocument();
+  });
+
+  it('shows a dash, not 0.0000, for a wallet that never received a Signature Allocation', () => {
+    render(
+      <UniqueRecipientsTable
+        list={[createRecipient({ AllocationsCount: 8, MaxWinAmountEth: 0, PrizesSum: 0 })]}
+      />,
+    );
+    expect(screen.getByText('tables.status.none')).toBeInTheDocument();
+    // The ETH sum is a real zero and keeps the column's digits.
+    expect(screen.getByText('0.0000')).toBeInTheDocument();
   });
 
   it('shows 20 rows a page with the row range', () => {

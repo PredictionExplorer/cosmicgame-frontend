@@ -99,7 +99,7 @@
     },
     "stellarSelectionEntries": {
       "title": "星選の対象",
-      "tooltip": "一筆ごとに星選の対象が1件記録されます。一筆が多いほど、ETHまたはCosmic Signature NFTの配分に選ばれる頻度が高まります。"
+      "tooltip": "一筆ごとに、このサイクルの星選プールに1件が記録されます。サイクルの確定時には、すべての星選がプール全体から復元抽出で選ばれます。表には参加者ごとのプール内の割合が表示されます。"
     },
     "topEthSpenders": {
       "title": "ETH支出の上位",

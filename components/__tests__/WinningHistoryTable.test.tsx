@@ -73,11 +73,34 @@ describe('RecipientHistoryTable', () => {
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
-  it('links the cycle in the same tab', () => {
+  it('links the cycle in the same tab, as "Cycle 42" rather than a bare number', () => {
     render(<RecipientHistoryTable winningHistory={[createEntry({ RoundNum: 42 })]} />);
-    const cycle = screen.getByRole('link', { name: '42' });
+    const cycle = screen.getByRole('link', { name: 'tables.allocation.cycle(cycle=42)' });
     expect(cycle).toHaveAttribute('href', '/allocation/42');
     expect(cycle).not.toHaveAttribute('target');
+  });
+
+  it('numbers only a Stellar Selection by its place among the selections, from 1', () => {
+    const { container } = render(
+      <RecipientHistoryTable
+        winningHistory={[
+          createEntry({ RecordType: 0, WinnerIndex: 0, TxHash: '0x1' }),
+          createEntry({ RecordType: 12, TokenId: 30, WinnerIndex: 2, TxHash: '0x2' }),
+        ]}
+      />,
+    );
+    const positions = [
+      ...container.querySelectorAll('tbody td[data-label="tables.columns.position"]'),
+    ].map((cell) => cell.textContent);
+    // The Signature Allocation has no place to number; the selection was the third.
+    expect(positions).toEqual(['', '#3']);
+  });
+
+  it('drops the position column when no record is a Stellar Selection', () => {
+    render(<RecipientHistoryTable winningHistory={[createEntry({ WinnerIndex: 0 })]} />);
+    expect(
+      screen.queryByRole('columnheader', { name: 'tables.columns.position' }),
+    ).not.toBeInTheDocument();
   });
 
   it('shows the recipient column only when asked', () => {
@@ -177,6 +200,40 @@ describe('RecipientHistoryTable', () => {
       expect(rows[0]).toHaveTextContent('1,000');
       expect(rows[0]).toHaveTextContent('tables.recipientHistory.nft(id=24)');
       expect(rows[1]).toHaveTextContent('tables.recipientHistory.sources.stellarSelection');
+      // The disclosure column is named on screen.
+      expect(
+        screen.getByRole('columnheader', { name: 'tables.recipientHistory.recordsHeader' }),
+      ).toBeInTheDocument();
+    });
+
+    it('counts several NFTs instead of listing every number in the row', () => {
+      const { container } = render(
+        <RecipientHistoryTable
+          winningHistory={[
+            createEntry({ RecordType: 7, AmountEth: 3.5397, WinnerAddr: BOB, TxHash: '0x1' }),
+            ...[26, 27, 29, 30].map((id, index) =>
+              createEntry({ RecordType: 12, TokenId: id, WinnerAddr: BOB, TxHash: `0x${index}` }),
+            ),
+          ]}
+          groupBy="recipient"
+        />,
+      );
+      const row = container.querySelector('tbody tr');
+      expect(row).toHaveTextContent('3.5397');
+      expect(row).toHaveTextContent('tables.recipientHistory.nftCount(count=4)');
+      expect(row).not.toHaveTextContent('tables.recipientHistory.nft(id=26)');
+    });
+
+    it('tags an Anchored-NFT Stellar Selection by the short form the NFT pages use', () => {
+      const { container } = render(
+        <RecipientHistoryTable
+          winningHistory={[createEntry({ RecordType: 13, TokenId: 31, WinnerAddr: BOB })]}
+          groupBy="recipient"
+        />,
+      );
+      const row = container.querySelector('tbody tr');
+      expect(row).toHaveTextContent('tables.recipientHistory.sourceTags.anchoredStellarSelection');
+      expect(row).not.toHaveTextContent('tables.recipientHistory.sources.anchoredStellarSelection');
     });
 
     it('expands a recipient to their individual records', async () => {

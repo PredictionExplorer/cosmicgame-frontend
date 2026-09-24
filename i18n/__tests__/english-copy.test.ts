@@ -56,7 +56,6 @@ const RANDOM_WALK_ALLOWLIST = new Set([
   'statistics:usedRwlkNfts.emptyTitle',
   'statistics:usedRwlkNfts.loadError',
   'statistics:usedRwlkNfts.loadErrorTitle',
-  'tables:gestureHistory.randomWalkGesture',
 ]);
 
 const CAPITALISED_GESTURE_ALLOWLIST = new Set([
@@ -71,8 +70,6 @@ const CAPITALISED_GESTURE_ALLOWLIST = new Set([
   'home:calibration.firstGestureTitle',
   // Rewritten by parallel changes.
   'admin:settings.fields.gestureRatio',
-  'tables:columns.numberOfGestures',
-  'tables:columns.maxGestureEth',
 ]);
 
 /** A capitalised common-noun gesture: not the role or a named quantity. */

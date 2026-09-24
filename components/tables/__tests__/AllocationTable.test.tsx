@@ -68,37 +68,70 @@ describe('AllocationTable', () => {
     expect(screen.getByText('tables.empty.recipientCyclesDescription')).toBeInTheDocument();
   });
 
-  it('lays every cycle out in one aligned ledger', () => {
-    render(<AllocationTable list={[createAllocation()]} loading={false} />);
+  it('lays every cycle out in one aligned ledger, its tracks under one ETH heading', () => {
+    const { container } = render(<AllocationTable list={[createAllocation()]} loading={false} />);
 
     expect(screen.getByRole('table', { name: 'tables.allocation.listAria' })).toBeInTheDocument();
-    // A header's textContent also carries its tooltip's hidden description.
-    const headers = screen
-      .getAllByRole('columnheader')
-      .map((th) => th.textContent?.replace(/tables\.allocation\.\w+Help$/, ''));
-    expect(headers).toEqual(
-      expect.arrayContaining([
-        'tables.columns.cycle',
-        'tables.allocation.columns.finalized',
-        'tables.allocation.columns.signatureEth',
-        'tables.allocation.columns.chronoEth',
-        'tables.allocation.columns.stellarEth',
-        'tables.allocation.columns.anchorEth',
-        'tables.allocation.columns.nftsViaStellar',
-      ]),
-    );
+    const [groupRow, headerRow] = [...container.querySelectorAll('thead tr')];
+    // "ETH by track" spans the five tracks, in the order of the reserve
+    // split; "NFTs" spans the two NFT counts.
+    const groups = [...groupRow!.querySelectorAll('th')].map((th) => [
+      th.textContent,
+      th.getAttribute('colspan'),
+    ]);
+    expect(groups).toEqual([
+      ['tables.allocation.groups.eth', '5'],
+      ['tables.allocation.groups.nfts', '2'],
+    ]);
+    const headers = [...headerRow!.querySelectorAll('th')].map((th) => th.textContent);
+    expect(headers).toEqual([
+      'tables.columns.cycle',
+      'tables.allocation.columns.finalized',
+      'tables.columns.recipient',
+      'tables.allocation.columns.signature',
+      'tables.allocation.columns.chrono',
+      'tables.allocation.columns.stellar',
+      'tables.allocation.columns.anchor',
+      'tables.allocation.columns.publicGoods',
+      'tables.allocation.gestures',
+      'tables.allocation.columns.attached',
+      'tables.allocation.columns.stellar',
+    ]);
     const signature = screen.getByRole('columnheader', {
-      name: 'tables.allocation.columns.signatureEth',
+      name: 'tables.allocation.columns.signature',
     });
     expect(signature).toHaveAttribute('data-align', 'end');
   });
 
+  it('names each grouped value in full in a phone record', () => {
+    const { container } = render(<AllocationTable list={[createAllocation()]} loading={false} />);
+    const labels = [...container.querySelectorAll('tbody tr:first-child td')].map((cell) =>
+      cell.getAttribute('data-label'),
+    );
+    expect(labels).toEqual(
+      expect.arrayContaining([
+        'tables.allocation.columns.signatureEth',
+        'tables.allocation.columns.publicGoodsEth',
+        'tables.allocation.columns.nftsAttached',
+        'tables.allocation.columns.nftsViaStellar',
+      ]),
+    );
+    // Attached NFTs stay on a phone: the record has room for them.
+    const attached = container.querySelector(
+      'tbody td[data-label="tables.allocation.columns.nftsAttached"]',
+    );
+    expect(attached).toHaveAttribute('data-priority', 'primary');
+  });
+
   it('shows each track amount without a repeated unit, and counts grouped', () => {
-    render(<AllocationTable list={[createAllocation()]} loading={false} />);
+    render(
+      <AllocationTable list={[createAllocation({ CharityAmountETH: 3.0972 })]} loading={false} />,
+    );
     expect(screen.getByText('1.5000')).toBeInTheDocument();
     expect(screen.getByText('0.4000')).toBeInTheDocument();
     expect(screen.getByText('2.5000')).toBeInTheDocument();
     expect(screen.getByText('0.7500')).toBeInTheDocument();
+    expect(screen.getByText('3.0972')).toBeInTheDocument();
     expect(screen.getByText('1,042')).toBeInTheDocument();
   });
 
@@ -109,21 +142,24 @@ describe('AllocationTable', () => {
     expect(links.some((link) => link.getAttribute('href') === `/user/${addr}`)).toBe(true);
   });
 
-  it('leaves the Recipient blank when a cycle has none', () => {
+  it('says a finalized cycle’s missing date or recipient could not be read', () => {
     const { container } = render(
-      <AllocationTable list={[createAllocation({ WinnerAddr: '' })]} loading={false} />,
+      <AllocationTable
+        list={[createAllocation({ WinnerAddr: '', TimeStamp: 0 })]}
+        loading={false}
+      />,
     );
     const recipient = container.querySelector('tbody td[data-kind="address"]');
-    expect(recipient).toHaveAttribute('data-empty', 'true');
+    expect(recipient).not.toHaveAttribute('data-empty');
+    expect(screen.getAllByText('tables.status.unavailable')).toHaveLength(2);
   });
 
   it('leads each row to its cycle page, from the cycle cell and from anywhere on the row', async () => {
     const user = userEvent.setup();
     render(<AllocationTable list={[createAllocation({ RoundNum: 7 })]} loading={false} />);
 
-    const link = screen.getByRole('link', {
-      name: 'tables.allocation.openDetails(cycle=7)',
-    });
+    // The visible "Cycle 7" names the link on its own.
+    const link = screen.getByRole('link', { name: 'tables.allocation.cycle(cycle=7)' });
     expect(link).toHaveAttribute('href', '/allocation/7');
     expect(within(link).getByText('tables.allocation.cycle(cycle=7)')).toBeInTheDocument();
 
@@ -131,7 +167,7 @@ describe('AllocationTable', () => {
     expect(mockPush).toHaveBeenCalledWith('/allocation/7');
   });
 
-  it('carries each explanation once, on its column header', () => {
+  it('needs no info button: the grouped headers name every column in full', () => {
     render(
       <AllocationTable
         list={[createAllocation({ RoundNum: 1 }), createAllocation({ RoundNum: 2 })]}
@@ -139,8 +175,8 @@ describe('AllocationTable', () => {
       />,
     );
     expect(
-      screen.getAllByRole('button', { name: /tables\.tableHeaderHelp\.explainColumn/ }),
-    ).toHaveLength(6);
+      screen.queryAllByRole('button', { name: /tables\.tableHeaderHelp\.explainColumn/ }),
+    ).toHaveLength(0);
   });
 
   it('shows 20 cycles a page', () => {

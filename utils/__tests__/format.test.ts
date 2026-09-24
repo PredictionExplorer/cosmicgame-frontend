@@ -104,7 +104,10 @@ describe('formatAmount', () => {
   });
 
   it('renders zero as a bare 0 and dust as a bound instead of a wall of zeros', () => {
-    expect(formatAmount(0, { unit: 'ETH', context: 'table', withUnit: false })).toBe('0');
+    // A ledger column keeps its digits for zero, so its decimal points line up.
+    expect(formatAmount(0, { unit: 'ETH', context: 'table', withUnit: false })).toBe('0.0000');
+    expect(formatAmount(0, { unit: 'CST', context: 'table', withUnit: false })).toBe('0.00');
+    expect(formatAmount(0, { unit: 'ETH', context: 'table', locale: 'vi' })).toBe(nb('0,0000~ETH'));
     expect(formatAmount(0, { unit: 'ETH' })).toBe(nb('0~ETH'));
     expect(formatAmount(-0, { unit: 'CST' })).toBe(nb('0~CST'));
     expect(formatAmount(0.0000001, { unit: 'ETH', context: 'table' })).toBe(nb('<0.0001~ETH'));

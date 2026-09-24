@@ -87,7 +87,7 @@ export const howItWorksTextJa = {
         label: '星選',
         description: `3人のETH星選受領者がサイクル準備金の${protocolFacts.stellarSelectionEthPercentage}%を分け合います。10人のNFT星選受領者と10人の係留NFT星選受領者が、それぞれ${cst} CSTとCosmic Signature NFTを受け取ります。`,
         tooltip:
-          '対象は一筆ごとに記録されます。一筆が多いほど選ばれる頻度は高くなります。Random Walk NFTの係留者には別の星選があります。',
+          '対象は一筆ごとに1件記録され、すべての星選はサイクルの対象全体から復元抽出で選ばれます。Random Walk NFTの係留者には別の星選があります。',
       },
       {
         label: '次のサイクル',

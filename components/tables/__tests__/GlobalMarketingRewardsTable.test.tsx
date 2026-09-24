@@ -45,6 +45,28 @@ describe('GlobalMarketingRewardsTable', () => {
     expect(amount.textContent).toBe('100.10\u00a0CST');
   });
 
+  it('mutes dust like every ledger and explains it beside the row range', () => {
+    render(
+      <GlobalMarketingRewardsTable
+        list={[
+          createReward({ EvtLogId: 1, AmountEth: 400 }),
+          createReward({ EvtLogId: 2, AmountEth: 3e-15 }),
+          createReward({ EvtLogId: 3, AmountEth: 0 }),
+        ]}
+      />,
+    );
+    expect(screen.getByText('<0.01')).toHaveClass('text-subtle');
+    expect(screen.getByText('400.00')).not.toHaveClass('text-subtle');
+    // A true zero is not dust.
+    expect(screen.getByText('0.00')).not.toHaveClass('text-subtle');
+    expect(screen.getByText(/tables\.outreach\.dustNote/)).toBeInTheDocument();
+  });
+
+  it('says nothing about dust when there is none', () => {
+    render(<GlobalMarketingRewardsTable list={[createReward()]} />);
+    expect(screen.queryByText(/tables\.outreach\.dustNote/)).not.toBeInTheDocument();
+  });
+
   it('sets rel="noopener noreferrer" on all target="_blank" links', () => {
     render(<GlobalMarketingRewardsTable list={[createReward()]} />);
     const links = screen.getAllByRole('link');

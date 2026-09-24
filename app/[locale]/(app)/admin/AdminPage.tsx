@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl';
 import { Lock } from 'lucide-react';
 
 import BanGestureTable from '@/components/tables/BanGestureTable';
-import { ConnectWalletAction } from '@/components/wallet/ConnectWalletAction';
 import { useGestureList } from '@/hooks/useApiQuery';
 import { useActiveWeb3React } from '@/hooks/web3';
 
@@ -31,22 +30,18 @@ export default function AdminPage() {
       error={isError && messages === null ? t('moderation.loadError') : undefined}
       onRetry={() => void refetch()}
       moderatorAddress={moderatorAddress}
+      // One line, no second Connect button: the site header's Connect is
+      // always in view, and the operator header already says no wallet is
+      // connected.
       notice={
         moderatorAddress ? null : (
-          <div
+          <p
             data-testid="moderation-read-only"
-            className="flex flex-col gap-3 rounded-surface bg-surface px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+            className="flex items-start gap-2.5 rounded-surface bg-surface px-4 py-3 type-body-sm text-muted-foreground"
           >
-            <p className="flex items-start gap-2.5 type-body-sm text-muted-foreground">
-              <Lock aria-hidden className="mt-0.5 size-4 shrink-0 text-subtle" />
-              {t('moderation.readOnly')}
-            </p>
-            <ConnectWalletAction
-              variant="outline"
-              size="sm"
-              className="shrink-0 self-start sm:self-auto"
-            />
-          </div>
+            <Lock aria-hidden className="mt-0.5 size-4 shrink-0 text-subtle" />
+            {t('moderation.readOnly')}
+          </p>
         )
       }
     />

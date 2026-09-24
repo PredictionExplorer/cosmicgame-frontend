@@ -30,7 +30,6 @@ export const SystemModesTable = ({ list, ...state }: SystemModesTableProps) => {
         id: 'cycle',
         kind: 'text',
         header: t('columns.round'),
-        help: t('statisticsTooltips.systemRound'),
         value: (row) => row.RoundNum,
         cell: (row) =>
           row.RoundNum ? t('allocation.cycle', { cycle: row.RoundNum }) : t('status.deployment'),
@@ -40,14 +39,12 @@ export const SystemModesTable = ({ list, ...state }: SystemModesTableProps) => {
         id: 'started',
         kind: 'datetime',
         header: t('columns.started'),
-        help: t('statisticsTooltips.systemStarted'),
         value: (row) => row.TimeStamp,
       },
       {
         id: 'ended',
         kind: 'datetime',
         header: t('columns.ended'),
-        help: t('statisticsTooltips.systemEnded'),
         value: (row) => row.TimeStamp,
         cell: (_row, { index }) => {
           const next = index > 0 ? list[index - 1] : undefined;
@@ -69,13 +66,7 @@ export const SystemModesTable = ({ list, ...state }: SystemModesTableProps) => {
       ariaLabel={t('names.cycleActivations')}
       getRowKey={(row) => row.EvtLogId}
       getRowHref={(row) => `/system-event/${row.RoundNum}/${row.EvtLogId}/${row.NextEvtLogId}`}
-      getRowLabel={(row) =>
-        t('systemModes.viewEvent', {
-          scope: row.RoundNum
-            ? t('allocation.cycle', { cycle: row.RoundNum })
-            : t('status.deployment'),
-        })
-      }
+      getRowLabel={() => t('systemModes.viewEvent')}
       emptyTitle={t('empty.modeChanges')}
       {...state}
     />

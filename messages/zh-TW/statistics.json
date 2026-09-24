@@ -411,8 +411,7 @@
       "allClaimed": "已全部取回",
       "unclaimedCount": "{count} 項未取回",
       "viewUnclaimed": "檢視未取回資產",
-      "explore": "檢視",
-      "exploreAria": "檢視第 {cycle} 個週期的取回紀錄",
+      "cycleDetails": "第 {cycle} 個週期詳情",
       "dialog": {
         "unclaimedTitle": "第 {cycle} 個週期的未取回資產",
         "expired": "取回窗口已結束，現在任何人都可執行超時取回。",
@@ -420,7 +419,6 @@
         "asset": "資產",
         "recipient": "獲配者",
         "detail": "詳情",
-        "exploreTitle": "檢視第 {cycle} 個週期",
         "exploreDescription": "檢視取回交易、每位獲配者的處理時長，以及本週期附加的代幣。",
         "claimTransactions": "取回交易",
         "noClaims": "本週期暫無取回紀錄。",

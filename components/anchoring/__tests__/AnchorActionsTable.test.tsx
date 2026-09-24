@@ -36,8 +36,11 @@ describe('AnchorActionsTable', () => {
 
   it('leads each row to its anchor-action record', () => {
     render(<AnchorActionsTable list={[action()]} IsRwalk />);
+    // The row link reads its visible date first, then where it leads (WCAG 2.5.3).
     expect(
-      screen.getByRole('link', { name: 'anchoring.anchorActionDetail.breadcrumbs.action(id=5)' }),
+      screen.getByRole('link', {
+        name: /\S anchoring\.anchorActionDetail\.breadcrumbs\.action\(id=5\)$/,
+      }),
     ).toHaveAttribute('href', '/anchor-action/1/5');
   });
 

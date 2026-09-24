@@ -1,9 +1,11 @@
 'use client';
 
 import { useMemo } from 'react';
+import { MessageSquare } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
-import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+import { DataTable, TableLink, type DataTableColumn } from '@/components/ui/data-table';
+import { UnknownValue } from '@/components/ui/unknown-value';
 import type { LedgerStateProps } from '@/components/tables/ledger-props';
 
 export interface EthDonation {
@@ -19,16 +21,17 @@ export interface EthDonation {
 
 interface EthDonationTableProps extends LedgerStateProps {
   list: EthDonation[];
-  /** Show whether each contribution carried a note. Default `true`. */
+  /** Show whether each contribution carried a note (the Note column). Default `true`. */
   showType?: boolean;
   /** Show the cycle column; a page about one cycle hides it. Default `true`. */
   showCycle?: boolean;
 }
 
 /**
- * Direct ETH contributions to the Cycle Reserve. A contribution with a note
- * leads to its detail page; a plain one links its date to the transaction.
- * The cycle links to that cycle's contribution list.
+ * Direct ETH contributions to the Cycle Reserve, newest first. A
+ * contribution with a note says "With note" and leads to its record page;
+ * one without shows a dash and links its date to the transaction. The cycle
+ * links to that cycle's contribution list.
  */
 const EthDonationTable = ({
   list,
@@ -59,18 +62,34 @@ const EthDonationTable = ({
         sortable: true,
       },
       showType && {
-        id: 'type',
+        id: 'note',
         kind: 'text',
-        header: t('columns.type'),
-        value: (row) =>
-          row.RecordType ? t('ethContribution.withInfo') : t('ethContribution.simple'),
+        header: t('columns.note'),
+        // One bit per row, in the form's own words: the contract calls a
+        // contribution with a note `donateEthWithInfo`.
+        value: (row) => (row.RecordType > 0 ? t('ethContribution.withNote') : null),
+        cell: (row) =>
+          row.RecordType > 0 ? (
+            <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-foreground">
+              <MessageSquare aria-hidden className="size-3.5 shrink-0 text-subtle" />
+              {t('ethContribution.withNote')}
+            </span>
+          ) : (
+            <UnknownValue label={t('status.none')} />
+          ),
       },
       showCycle && {
         id: 'cycle',
         kind: 'link',
         header: t('columns.round'),
         value: (row) => Number(row.RoundNum),
-        href: (row) => `/eth-contribution/round/${row.RoundNum}`,
+        // "Cycle 5", not a bare "5": a word-wide target that says where it leads.
+        cell: (row) => (
+          <TableLink href={`/eth-contribution/round/${row.RoundNum}`}>
+            {t('allocation.cycle', { cycle: String(row.RoundNum) })}
+          </TableLink>
+        ),
+        nowrap: true,
         sortable: true,
       },
       {
@@ -98,8 +117,9 @@ const EthDonationTable = ({
       ariaLabel={t('names.ethContributions')}
       getRowKey={(row) => row.EvtLogId}
       getRowHref={(row) => (hasDetail(row) ? `/eth-contribution/detail/${row.CGRecordId}` : null)}
-      getRowLabel={(row) => t('ethContribution.viewContribution', { id: row.CGRecordId })}
+      getRowLabel={(row) => t('ethContribution.viewContribution', { id: String(row.CGRecordId) })}
       emptyTitle={t('empty.contributions')}
+      initialSort={{ id: 'datetime', direction: 'desc' }}
       {...state}
     />
   );

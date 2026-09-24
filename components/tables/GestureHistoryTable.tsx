@@ -1,21 +1,28 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import Image from 'next/image';
 import { usePublicClient } from 'wagmi';
 import { formatUnits } from 'viem';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
-import { getRWLKImageUrl, getExplorerUrl } from '@/utils';
+import { getExplorerUrl } from '@/utils';
 import ERC20_ABI from '@/contracts/CosmicToken.json';
 
-import { formatAddress, type AmountUnit } from '@/utils/format';
+import { NBSP, formatAddress, formatId, formatNumber, type AmountUnit } from '@/utils/format';
+import { anchorTokenHref } from '@/components/anchoring/anchorLinks';
 import { Amount } from '@/components/ui/amount';
-import { DataTable, ExternalTableLink, type DataTableColumn } from '@/components/ui/data-table';
+import {
+  DataTable,
+  ExternalTableLink,
+  TableLink,
+  type DataTableColumn,
+} from '@/components/ui/data-table';
 import { Duration } from '@/components/ui/duration';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ClampedText } from '@/components/tables/ClampedText';
 import { GestureMethodTag, resolveGestureType } from '@/components/tables/GestureMethodTag';
 import type { LedgerStateProps } from '@/components/tables/ledger-props';
+import { useCycleHref } from '@/components/tables/useCycleHref';
 import { useBannedGestures } from '@/hooks/useApiQuery';
 import { useNow } from '@/hooks/useNow';
 import { DateTime } from '@/components/ui/date-time';
@@ -28,6 +35,8 @@ interface GestureHistory {
   CstPriceEth?: number;
   GestureType: number;
   RoundNum?: number;
+  /** The gesture's place in its cycle ("Gesture #1143" on its own page). */
+  BidPosition?: number;
   RWalkNFTId?: number;
   NFTDonationTokenAddr?: string;
   NFTDonationTokenId?: number;
@@ -63,18 +72,36 @@ interface GestureHistoryTableProps extends LedgerStateProps {
 const CST_GESTURE = 2;
 const RANDOM_WALK_GESTURE = 1;
 
+/**
+ * A link that is a flex item stops being inline text, so it needs its own
+ * 24px target (WCAG 2.5.8) rather than borrowing the line's.
+ */
+const INFO_LINK_CLASS = 'inline-flex min-h-6 items-center whitespace-nowrap';
+
+const randomWalkId = (gesture: GestureHistory): number | null =>
+  resolveGestureType(gesture) === RANDOM_WALK_GESTURE &&
+  typeof gesture.RWalkNFTId === 'number' &&
+  gesture.RWalkNFTId >= 0
+    ? gesture.RWalkNFTId
+    : null;
+
 function hasGestureInfo(gesture: GestureHistory): boolean {
   return (
-    (resolveGestureType(gesture) === RANDOM_WALK_GESTURE && Boolean(gesture.RWalkNFTId)) ||
+    randomWalkId(gesture) !== null ||
     Boolean(gesture.NFTDonationTokenAddr) ||
     Boolean(gesture.DonatedERC20TokenAddr)
   );
 }
 
+type Erc20Meta =
+  | { status: 'pending' }
+  | { status: 'ready'; symbol: string; decimals: number }
+  | { status: 'failed' };
+
 /** Reads an attached ERC-20's symbol and decimals from its contract. */
-function useErc20Meta(tokenAddr: string | undefined) {
+function useErc20Meta(tokenAddr: string | undefined): Erc20Meta {
   const publicClient = usePublicClient();
-  const [meta, setMeta] = useState<{ symbol: string; decimals: number } | null>(null);
+  const [meta, setMeta] = useState<Erc20Meta>({ status: 'pending' });
 
   useEffect(() => {
     if (!tokenAddr || !publicClient) return;
@@ -87,66 +114,89 @@ function useErc20Meta(tokenAddr: string | undefined) {
       .then(([symbol, decimals]) => {
         if (cancelled) return;
         const parsed = Number(decimals);
-        setMeta({ symbol: String(symbol), decimals: Number.isFinite(parsed) ? parsed : 18 });
+        setMeta({
+          status: 'ready',
+          symbol: String(symbol),
+          decimals: Number.isFinite(parsed) ? parsed : 18,
+        });
       })
       .catch(() => {
-        // A missing or non-standard ERC-20 leaves the amount unlabelled
-        // rather than breaking the row.
+        // A missing or non-standard ERC-20 is shown by its address, with
+        // the amount read at the usual 18 decimals.
+        if (!cancelled) setMeta({ status: 'failed' });
       });
     return () => {
       cancelled = true;
     };
   }, [tokenAddr, publicClient]);
 
-  return meta;
+  // Without a client there is nothing to read: show the address instead.
+  return publicClient ? meta : { status: 'failed' };
 }
 
-/** What else the gesture carried: a Random Walk NFT, an attached NFT or ERC-20. */
+/** An attached ERC-20: its amount in the token's own decimals and its symbol, linked to the token. */
+function AttachedErc20({ address, amount }: { address: string; amount: string | undefined }) {
+  const locale = useLocale();
+  const meta = useErc20Meta(address);
+  if (meta.status === 'pending') {
+    return <Skeleton className="inline-block h-3.5 w-24 align-middle" />;
+  }
+  let units: bigint;
+  try {
+    units = BigInt(amount || '0');
+  } catch {
+    units = BigInt(0);
+  }
+  const decimals = meta.status === 'ready' ? meta.decimals : 18;
+  const figure = formatNumber(Number(formatUnits(units, decimals)), locale, {
+    maximumFractionDigits: 4,
+  });
+  const symbol = meta.status === 'ready' ? meta.symbol : formatAddress(address);
+  return (
+    <ExternalTableLink href={getExplorerUrl('token', address)} className={INFO_LINK_CLASS}>
+      <span className="tabular-nums">{figure}</span>
+      {NBSP}
+      {symbol}
+    </ExternalTableLink>
+  );
+}
+
+/**
+ * What else the gesture carried, as data rather than a sentence (its method
+ * is already in the Gesture type column): the Random Walk NFT it used, and
+ * any NFT or ERC-20 attached to it, each linked to the token.
+ */
 function GestureInfo({ gesture }: { gesture: GestureHistory }) {
   const t = useTranslations('tables');
-  const erc20 = useErc20Meta(gesture.DonatedERC20TokenAddr);
-  const gestureType = resolveGestureType(gesture);
+  const walk = randomWalkId(gesture);
+  const attachedLabel = <span className="text-subtle">{t('gestureHistory.attached')}</span>;
 
   return (
-    <span className="break-words">
-      {gestureType === RANDOM_WALK_GESTURE && gesture.RWalkNFTId ? (
-        <>
-          {t('gestureHistory.randomWalkGesture', { id: gesture.RWalkNFTId })}{' '}
-          <Image
-            src={getRWLKImageUrl(gesture.RWalkNFTId.toString().padStart(6, '0'))}
-            width={32}
-            height={32}
-            className="inline rounded-edge align-middle"
-            alt={t('gestureHistory.randomWalkImageAlt')}
-            unoptimized
-          />
-        </>
+    <span className="inline-flex max-w-full flex-col items-start gap-1">
+      {walk !== null ? (
+        <ExternalTableLink href={anchorTokenHref('randomWalk', walk)} className={INFO_LINK_CLASS}>
+          {t('gestureHistory.randomWalkToken', { id: formatId(walk) })}
+        </ExternalTableLink>
       ) : null}
-      {gesture.NFTDonationTokenAddr || gesture.DonatedERC20TokenAddr ? (
-        <>
-          {gestureType === CST_GESTURE && t('gestureHistory.cstGesture')}
-          {gestureType === 0 && t('gestureHistory.ethGesture')}
-          {gesture.NFTDonationTokenAddr
-            ? t('gestureHistory.nftAttached', {
-                address: formatAddress(gesture.NFTDonationTokenAddr),
-                id: String(gesture.NFTDonationTokenId),
-              })
-            : null}
-          {gesture.DonatedERC20TokenAddr ? (
-            <>
-              {t('gestureHistory.erc20AttachedPrefix', {
-                amount: formatUnits(
-                  BigInt(gesture.DonatedERC20TokenAmount || '0'),
-                  erc20?.decimals ?? 18,
-                ),
-              })}{' '}
-              <ExternalTableLink href={getExplorerUrl('token', gesture.DonatedERC20TokenAddr)}>
-                {erc20?.symbol ?? formatAddress(gesture.DonatedERC20TokenAddr)}
-              </ExternalTableLink>
-              {t('gestureHistory.attachedSuffix')}
-            </>
-          ) : null}
-        </>
+      {gesture.NFTDonationTokenAddr ? (
+        <span className="inline-flex flex-wrap items-baseline gap-x-1.5">
+          {attachedLabel}
+          <ExternalTableLink
+            href={`${getExplorerUrl('token', gesture.NFTDonationTokenAddr)}?a=${gesture.NFTDonationTokenId ?? ''}`}
+            className={INFO_LINK_CLASS}
+          >
+            {t('recipientHistory.nft', { id: String(gesture.NFTDonationTokenId ?? '') })}
+          </ExternalTableLink>
+        </span>
+      ) : null}
+      {gesture.DonatedERC20TokenAddr ? (
+        <span className="inline-flex flex-wrap items-baseline gap-x-1.5">
+          {attachedLabel}
+          <AttachedErc20
+            address={gesture.DonatedERC20TokenAddr}
+            amount={gesture.DonatedERC20TokenAmount}
+          />
+        </span>
       ) : null}
     </span>
   );
@@ -181,6 +231,7 @@ const GestureHistoryTable = ({
 }: GestureHistoryTableProps) => {
   const t = useTranslations('tables');
   const { data: bannedGestures } = useBannedGestures();
+  const cycleHref = useCycleHref();
 
   const banned = useMemo(
     () => new Set((bannedGestures ?? []).map((entry: { bid_id: number }) => entry.bid_id)),
@@ -245,7 +296,14 @@ const GestureHistoryTable = ({
         kind: 'link',
         header: t('columns.cycle'),
         value: (gesture) => gesture.RoundNum,
-        href: (gesture) => (gesture.RoundNum == null ? null : `/allocation/${gesture.RoundNum}`),
+        // "Cycle 2", not a bare "2": a word-wide target that says where it leads.
+        cell: (gesture) =>
+          gesture.RoundNum == null ? null : (
+            <TableLink href={cycleHref(gesture.RoundNum)}>
+              {t('allocation.cycle', { cycle: gesture.RoundNum })}
+            </TableLink>
+          ),
+        nowrap: true,
       },
       {
         id: 'type',
@@ -290,28 +348,13 @@ const GestureHistoryTable = ({
         value: (gesture) =>
           !banned.has(gesture.EvtLogId) && gesture.Message ? gesture.Message : null,
         cell: (_gesture, { value }) =>
-          value ? (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                {/*
-                 * On a phone the message wraps in full: a hover tooltip never
-                 * opens on touch, and tapping the row opens the gesture.
-                 */}
-                <span className="block break-words sm:max-w-[18rem] sm:truncate">
-                  {String(value)}
-                </span>
-              </TooltipTrigger>
-              <TooltipContent className="max-w-[min(20rem,90vw)] break-words">
-                {String(value)}
-              </TooltipContent>
-            </Tooltip>
-          ) : null,
+          value ? <ClampedText text={String(value)} className="sm:max-w-[22rem]" /> : null,
         hideWhenEmpty: true,
         stack: true,
       },
     ];
     return all.filter((column): column is DataTableColumn<GestureHistory> => Boolean(column));
-  }, [t, showRound, showParticipant, showHold, holds, banned]);
+  }, [t, showRound, showParticipant, showHold, holds, banned, cycleHref]);
 
   const phoneColumns = useMemo(
     () => withPhoneLines(columns, gestureHistory, t('status.unknown')),
@@ -325,7 +368,13 @@ const GestureHistoryTable = ({
       ariaLabel={t('gestureHistory.tableLabel')}
       getRowKey={(gesture) => gesture.EvtLogId}
       getRowHref={(gesture) => `/gesture/${gesture.EvtLogId}`}
-      getRowLabel={(gesture) => t('gestureHistory.viewGesture', { id: gesture.EvtLogId })}
+      // The date names the link; the words after it say which gesture it
+      // opens, by the number that page shows in its title.
+      getRowLabel={(gesture) =>
+        typeof gesture.BidPosition === 'number' && gesture.BidPosition > 0
+          ? t('gestureHistory.viewGesture', { position: String(gesture.BidPosition) })
+          : ''
+      }
       emptyTitle={t('empty.gestures')}
       {...state}
     />

@@ -84,7 +84,7 @@ export const howItWorksTextKo = {
         label: '별빛 선정',
         description: `ETH 별빛 선정 수령자 세 명이 사이클 준비금의 ${protocolFacts.stellarSelectionEthPercentage}%를 나누어 받습니다. NFT 별빛 선정 수령자 열 명과 앵커링 NFT 별빛 선정 수령자 열 명은 각각 ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST와 Cosmic Signature NFT를 받습니다.`,
         tooltip:
-          '자격은 제스처마다 기록됩니다. 제스처가 많을수록 선정 빈도가 높아집니다. Random Walk NFT 앵커링 보유자에게는 별도의 별빛 선정이 있습니다.',
+          '자격은 제스처마다 1건씩 기록되며, 모든 선정은 사이클의 전체 자격 가운데 복원 추출 방식으로 이루어집니다. Random Walk NFT 앵커링 보유자에게는 별도의 별빛 선정이 있습니다.',
       },
       {
         label: '다음 사이클',

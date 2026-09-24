@@ -5,8 +5,16 @@ import { useLocale, useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 import { formatCount } from '@/utils/format';
+import { AddressChip } from '@/components/ui/address-chip';
 import { Button } from '@/components/ui/button';
-import { DataTable, TableTag, type DataTableColumn } from '@/components/ui/data-table';
+import {
+  DataTable,
+  TableLink,
+  TableTag,
+  TxProofLink,
+  type DataTableColumn,
+} from '@/components/ui/data-table';
+import { DateTime } from '@/components/ui/date-time';
 import { SearchField } from '@/components/ui/search-field';
 import {
   Select,
@@ -16,9 +24,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { tabsListVariants, tabsTriggerVariants } from '@/components/ui/tabs';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { ClampedText } from '@/components/tables/ClampedText';
 import { GestureMethodTag } from '@/components/tables/GestureMethodTag';
 import type { LedgerStateProps } from '@/components/tables/ledger-props';
+import { useCycleHref } from '@/components/tables/useCycleHref';
 import api from '@/services/api';
 import { useNotification } from '@/contexts/NotificationContext';
 import { reportError } from '@/utils/errors';
@@ -42,7 +51,10 @@ interface BanGestureTableProps extends LedgerStateProps {
   moderatorAddress?: string | null;
   /** A line under the title. */
   description?: ReactNode;
-  /** Shown above the filters (the read-only notice). */
+  /**
+   * Shown above the filters in every state, loading and error included (the
+   * read-only notice), so it never moves the list when the rows arrive.
+   */
   notice?: ReactNode;
 }
 
@@ -52,6 +64,8 @@ const VISIBILITY: readonly Visibility[] = ['all', 'visible', 'hidden'];
 const ALL_CYCLES = 'all';
 /** Enough messages to review at once without a page of tens of thousands of pixels. */
 const MODERATION_PAGE_SIZE = 25;
+/** Placeholder rows while the list loads: about a first screen of messages. */
+const MODERATION_SKELETON_ROWS = 8;
 
 /**
  * Hides a gesture's message from public view, or restores it. The button
@@ -110,10 +124,43 @@ function ModerationAction({
 }
 
 /**
+ * Where and when a message was written, as one quiet line under it on a
+ * phone record ("0x1Ec1…E990 · Cycle 42 · ETH · Sep 24, 07:49"), so the
+ * record opens on the message being moderated. A wide screen shows the same
+ * facts in their own columns instead.
+ */
+function MessageMeta({ gesture, cycleHref }: { gesture: GestureHistory; cycleHref: string }) {
+  const t = useTranslations('tables');
+  return (
+    <span className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 type-caption text-subtle sm:hidden">
+      <AddressChip address={gesture.BidderAddr} variant="plain" showCopy={false} />
+      <span aria-hidden>·</span>
+      {/* Flex items, not inline text: each link carries its own 24px target. */}
+      <TableLink href={cycleHref} className="inline-flex min-h-6 items-center">
+        {t('allocation.cycle', { cycle: gesture.RoundNum })}
+      </TableLink>
+      <span aria-hidden>·</span>
+      <GestureMethodTag gestureType={gesture.GestureType} unknownLabel={t('status.unknown')} />
+      <span aria-hidden>·</span>
+      <TxProofLink hash={gesture.TxHash} className="inline-flex min-h-6 items-center">
+        <DateTime timestamp={gesture.TimeStamp} />
+      </TxProofLink>
+    </span>
+  );
+}
+
+/**
  * Gesture messages for moderation, 25 at a time: filter by visibility, cycle
  * or text, then hide a message from public view or restore it. A hidden
  * message is marked with a tag and set in the subtle tier. Without a
  * moderator wallet the same list is read-only.
+ *
+ * The message is what is being judged, so it leads: it takes the width a
+ * wide row has left, two lines at a time with "Show all" for the rest, and
+ * it breaks anywhere, so a spam URL or a run of letters with no spaces can
+ * never push the table wider than the page. Links in the row show their
+ * underline only on hover and focus. On a phone each record opens on the
+ * message, with who, which cycle, how and when on one line beneath it.
  */
 const BanGestureTable = ({
   gestureHistory,
@@ -125,6 +172,8 @@ const BanGestureTable = ({
   const t = useTranslations('tables');
   const tAdmin = useTranslations('admin');
   const locale = useLocale();
+  const cycleHref = useCycleHref();
+  const loading = Boolean(state.loading) && gestureHistory.length === 0;
   const [hiddenIds, setHiddenIds] = useState<ReadonlySet<number>>(() => new Set());
   const [visibility, setVisibility] = useState<Visibility>('all');
   const [cycle, setCycle] = useState<string>(ALL_CYCLES);
@@ -181,6 +230,9 @@ const BanGestureTable = ({
   }, [gestureHistory, hiddenIds, visibility, cycle, query, locale]);
 
   const columns = useMemo<DataTableColumn<GestureHistory>[]>(() => {
+    // Date, who, cycle and method keep a fixed width from `lg`, so the
+    // message column takes exactly what is left; a phone record shows them
+    // on one line under the message instead (MessageMeta).
     const base: DataTableColumn<GestureHistory>[] = [
       {
         id: 'date',
@@ -188,19 +240,29 @@ const BanGestureTable = ({
         header: t('columns.date'),
         value: (gesture) => gesture.TimeStamp,
         txHash: (gesture) => gesture.TxHash,
+        width: '9.5rem',
+        priority: 'secondary',
       },
       {
         id: 'participant',
         kind: 'address',
         header: t('columns.participant'),
         value: (gesture) => gesture.BidderAddr,
+        width: '8.5rem',
+        priority: 'secondary',
       },
       {
         id: 'cycle',
         kind: 'link',
         header: t('columns.cycle'),
         value: (gesture) => gesture.RoundNum,
-        href: (gesture) => `/allocation/${gesture.RoundNum}`,
+        cell: (gesture) => (
+          <TableLink href={cycleHref(gesture.RoundNum)}>
+            {t('allocation.cycle', { cycle: gesture.RoundNum })}
+          </TableLink>
+        ),
+        nowrap: true,
+        width: '6.5rem',
         priority: 'secondary',
       },
       {
@@ -211,6 +273,8 @@ const BanGestureTable = ({
         cell: (gesture) => (
           <GestureMethodTag gestureType={gesture.GestureType} unknownLabel={t('status.unknown')} />
         ),
+        headerClassName: 'whitespace-nowrap',
+        width: '7.5rem',
         priority: 'secondary',
       },
       {
@@ -221,33 +285,17 @@ const BanGestureTable = ({
         cell: (gesture) => {
           const hidden = hiddenIds.has(gesture.EvtLogId);
           return (
-            <span className="flex flex-col items-start gap-1">
+            <span className="flex min-w-0 flex-col items-start gap-1">
               {hidden ? <TableTag>{t('banGesture.hiddenTag')}</TableTag> : null}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  {/*
-                   * Two lines on a desktop row, the whole message on a phone.
-                   * `max-w-full`: as a start-aligned flex item the span would
-                   * otherwise size to an unbroken word and never wrap it.
-                   */}
-                  <span
-                    className={cn(
-                      'block max-w-full break-words sm:line-clamp-2',
-                      hidden ? 'text-subtle' : 'text-foreground',
-                    )}
-                  >
-                    {gesture.Message}
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent className="max-w-[min(24rem,90vw)] break-words">
-                  {gesture.Message}
-                </TooltipContent>
-              </Tooltip>
+              <ClampedText
+                text={gesture.Message ?? ''}
+                className={hidden ? 'text-subtle' : 'text-foreground'}
+              />
+              <MessageMeta gesture={gesture} cycleHref={cycleHref(gesture.RoundNum)} />
             </span>
           );
         },
         stack: true,
-        width: '100%',
       },
     ];
     if (!moderatorAddress) return base;
@@ -260,6 +308,7 @@ const BanGestureTable = ({
         // The button names itself; a phone record shows it unlabelled.
         label: '',
         align: 'end',
+        width: '7rem',
         cell: (gesture) => (
           <ModerationAction
             gesture={gesture}
@@ -270,56 +319,57 @@ const BanGestureTable = ({
         ),
       },
     ];
-  }, [t, hiddenIds, applyChange, moderatorAddress]);
+  }, [t, hiddenIds, applyChange, moderatorAddress, cycleHref]);
 
+  // The filters are there from the first paint, disabled until the list
+  // arrives, so the rows land under them rather than pushing them in.
   const toolbar = (
-    <div className="mb-4 space-y-4">
-      {notice}
-      <div className="flex flex-wrap items-center gap-3">
-        <div
-          role="group"
-          aria-label={t('banGesture.visibilityLabel')}
-          className={tabsListVariants({ variant: 'segmented' })}
-        >
-          {VISIBILITY.map((option) => (
-            <button
-              key={option}
-              type="button"
-              aria-pressed={visibility === option}
-              data-state={visibility === option ? 'active' : 'inactive'}
-              onClick={() => setVisibility(option)}
-              // 32px from sm, so the track (4px padding) matches the 40px fields beside it.
-              className={cn(tabsTriggerVariants({ variant: 'segmented' }), 'sm:min-h-8 sm:py-1')}
-            >
-              {t(`banGesture.filters.${option}`)}
-              <span className="tabular-nums text-subtle">
-                {formatCount(counts[option], locale)}
-              </span>
-            </button>
-          ))}
-        </div>
-        <Select value={cycle} onValueChange={setCycle}>
-          <SelectTrigger className="h-11 w-auto min-w-36 sm:h-10" aria-label={t('columns.cycle')}>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={ALL_CYCLES}>{t('banGesture.allCycles')}</SelectItem>
-            {cycles.map((round) => (
-              <SelectItem key={round} value={String(round)}>
-                {t('allocation.cycle', { cycle: round })}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <SearchField
-          value={query}
-          onValueChange={setQuery}
-          aria-label={t('banGesture.search')}
-          placeholder={t('banGesture.search')}
-          clearLabel={tAdmin('moderation.clearSearch')}
-          containerClassName="min-w-0 flex-1 basis-56"
-        />
+    <div className="mb-4 flex flex-wrap items-center gap-3">
+      <div
+        role="group"
+        aria-label={t('banGesture.visibilityLabel')}
+        className={tabsListVariants({ variant: 'segmented' })}
+      >
+        {VISIBILITY.map((option) => (
+          <button
+            key={option}
+            type="button"
+            aria-pressed={visibility === option}
+            data-state={visibility === option ? 'active' : 'inactive'}
+            onClick={() => setVisibility(option)}
+            disabled={loading}
+            // 32px from sm, so the track (4px padding) matches the 40px fields beside it.
+            className={cn(tabsTriggerVariants({ variant: 'segmented' }), 'sm:min-h-8 sm:py-1')}
+          >
+            {t(`banGesture.filters.${option}`)}
+            <span className="tabular-nums text-subtle">
+              {loading ? '–' : formatCount(counts[option], locale)}
+            </span>
+          </button>
+        ))}
       </div>
+      <Select value={cycle} onValueChange={setCycle} disabled={loading}>
+        <SelectTrigger className="h-11 w-auto min-w-36 sm:h-10" aria-label={t('columns.cycle')}>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value={ALL_CYCLES}>{t('banGesture.allCycles')}</SelectItem>
+          {cycles.map((round) => (
+            <SelectItem key={round} value={String(round)}>
+              {t('allocation.cycle', { cycle: round })}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <SearchField
+        value={query}
+        onValueChange={setQuery}
+        aria-label={t('banGesture.search')}
+        placeholder={t('banGesture.search')}
+        clearLabel={tAdmin('moderation.clearSearch')}
+        disabled={loading}
+        containerClassName="min-w-0 flex-1 basis-56"
+      />
     </div>
   );
 
@@ -331,12 +381,19 @@ const BanGestureTable = ({
       columns={columns}
       ariaLabel={t('names.gestureMessages')}
       description={description}
-      toolbar={gestureHistory.length > 0 ? toolbar : undefined}
+      notice={notice ? <div className="mb-4">{notice}</div> : undefined}
+      // An empty list has nothing to filter; a filtered-out one keeps the
+      // filters so they can be cleared.
+      toolbar={gestureHistory.length > 0 || loading ? toolbar : undefined}
       getRowKey={(gesture) => gesture.EvtLogId}
       emptyTitle={filtered ? t('banGesture.noMatches') : t('empty.gestureHistory')}
       pageSize={MODERATION_PAGE_SIZE}
       resetPageKey={`${visibility}|${cycle}|${query}`}
       layout="cards"
+      links="quiet"
+      width="fill"
+      tableClassName="lg:table-fixed"
+      skeletonRows={MODERATION_SKELETON_ROWS}
       {...state}
     />
   );

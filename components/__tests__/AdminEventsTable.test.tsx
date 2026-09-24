@@ -141,16 +141,35 @@ describe('AdminEventsTable', () => {
       StringValue: '',
     };
 
-    test('explains an event with an info button, not a warning icon', () => {
+    test('explains an event on its own name, not with an icon after every row', () => {
       render(<AdminEventsTable list={[base]} />);
-      const explain = screen.getByRole('button', {
-        name: /statistics\.systemEvent\.explainEvent|Explain/,
-      });
-      // InfoTooltip draws the ⓘ beside its button, inside the same wrapper.
-      expect(explain.closest('[data-slot="info-tooltip"]')?.querySelector('svg')).toHaveClass(
-        'lucide-info',
-      );
+      // The name is the trigger (a dotted underline, one tab stop), so the
+      // row carries no ⓘ button and no warning icon.
+      const name = document.querySelector('tbody td [role="button"]');
+      expect(name).toHaveAttribute('aria-describedby');
+      expect(name).toHaveAttribute('tabindex', '0');
+      expect(document.querySelector('[data-slot="info-tooltip"]')).toBeNull();
       expect(document.querySelector('.lucide-circle-alert, .lucide-alert-circle')).toBeNull();
+    });
+
+    test('shows what a parameter changed from, beside what it changed to', () => {
+      const { container } = render(
+        <AdminEventsTable
+          list={[
+            { ...base, EvtLogId: 1, RecordType: 25, IntegerValue: 1800, TimeStamp: 1_700_000_000 },
+            { ...base, EvtLogId: 2, RecordType: 25, IntegerValue: 3600, TimeStamp: 1_700_100_000 },
+          ]}
+        />,
+      );
+      const rows = [...container.querySelectorAll('tbody tr')].map((row) =>
+        [...row.querySelectorAll('td')].map((cell) => cell.textContent),
+      );
+      // Newest first: 1h replaced 30m; the first change has no earlier value.
+      expect(rows[0]).toEqual(expect.arrayContaining(['1h', '30m']));
+      expect(rows[1]?.at(-1)).toBe('');
+      expect(
+        screen.getByRole('columnheader', { name: /tables\.columns\.previousValue/ }),
+      ).toHaveAttribute('data-priority', 'secondary');
     });
 
     test('reads the CST Calibration Window length as a duration', () => {

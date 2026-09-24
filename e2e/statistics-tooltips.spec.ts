@@ -90,7 +90,7 @@ test.describe('/statistics tooltips', () => {
       // included, so its column names are visible text.
       const participantsTable = page
         .getByRole('table')
-        .filter({ hasText: 'Participant Address' })
+        .filter({ hasText: 'Largest gesture (ETH)' })
         .first();
       await participantsTable.scrollIntoViewIfNeeded();
       await expect(participantsTable).toHaveAttribute('data-layout', 'compact');
@@ -101,14 +101,14 @@ test.describe('/statistics tooltips', () => {
       // cell repeats it from `data-label` via CSS `::before`.
       const recipientsTable = page
         .getByRole('table')
-        .filter({ hasText: 'Recipient Address' })
+        .filter({ hasText: 'Allocations (all kinds)' })
         .first();
       await expect(recipientsTable).toHaveAttribute('data-layout', 'cards');
       const firstRecipientRow = recipientsTable.locator('tbody tr').first();
       await firstRecipientRow.scrollIntoViewIfNeeded();
       await expect(firstRecipientRow.locator('td').first()).toHaveAttribute(
         'data-label',
-        'Recipient Address',
+        'Recipient',
       );
 
       const renderedLabels = await firstRecipientRow.locator('td').evaluateAll((cells) =>
@@ -120,14 +120,19 @@ test.describe('/statistics tooltips', () => {
         ),
       );
       expect(renderedLabels).toEqual(
-        expect.arrayContaining(['Recipient Address', 'Allocations Received']),
+        expect.arrayContaining(['Recipient', 'Allocations (all kinds)', 'ETH received']),
       );
       return;
     }
 
+    // Only a derived figure carries an explanation; a plain column does not.
     await expectLabelTooltip(page, {
-      label: 'Participant Address',
-      expected: /Wallet address that made at least one indexed gesture/,
+      label: 'ETH received',
+      expected: /NFT and CST allocations count toward Allocations \(all kinds\)/,
     });
+    const participantsHeader = page.getByRole('columnheader', { name: 'Participant', exact: true });
+    await expect(participantsHeader.locator('button[aria-label^="Explain column:"]')).toHaveCount(
+      0,
+    );
   });
 });

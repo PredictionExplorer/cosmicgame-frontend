@@ -411,8 +411,7 @@
       "allClaimed": "すべて受け取り済み",
       "unclaimedCount": "未受け取り{count}件",
       "viewUnclaimed": "未受け取りのアセットを見る",
-      "explore": "探索",
-      "exploreAria": "サイクル{cycle}の受け取りを探索",
+      "cycleDetails": "サイクル{cycle}の詳細",
       "dialog": {
         "unclaimedTitle": "未受け取りのアセット——サイクル{cycle}",
         "expired": "受け取り期間は終了しました。これらのアセットは誰でも取得できます。",
@@ -420,7 +419,6 @@
         "asset": "アセット",
         "recipient": "受領者",
         "detail": "詳細",
-        "exploreTitle": "サイクル{cycle}を探索",
         "exploreDescription": "受領者ごとの受け取りトランザクション、受け取りまでの時間、このサイクルに添付されたトークンを確認できます。",
         "claimTransactions": "受け取りトランザクション",
         "noClaims": "このサイクルに記録された受け取りはありません。",

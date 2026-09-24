@@ -181,8 +181,9 @@ export type AmountUnit = 'ETH' | 'CST' | 'USD';
  * Where an amount is shown, which sets its precision:
  *
  * - `table`: ledger columns. Fixed digits so decimals line up (ETH 4, CST 2,
- *   USD 2), zero as a bare "0", dust as a bound ("<0.0001"). Pair with
- *   `withUnit: false` when the column header names the unit.
+ *   USD 2), zero included ("0.0000" under "0.1562"), dust as a bound
+ *   ("<0.0001"). Pair with `withUnit: false` when the column header names
+ *   the unit. Every other context prints zero as a bare "0".
  * - `card` (default): stat cards, summaries, chart tooltips. ETH keeps a
  *   fixed 4 digits; CST shows 2, or none for a whole amount, so a protocol
  *   constant reads "1,000 CST" beside "103,782.40 CST"; USD rounds to whole
@@ -349,7 +350,13 @@ export function formatAmountParts(value: AmountInput, options: AmountOptions): A
   let number: string;
   let lossy: boolean;
   if (numeric === 0) {
-    number = formatWithConventions(0, locale, { maximumFractionDigits: 0 });
+    // A ledger column keeps its digits for zero too, so every row's decimal
+    // point lines up; a card or a sentence says a plain "0".
+    const digits = context === 'table' ? policy.minimumFractionDigits : 0;
+    number = formatWithConventions(0, locale, {
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits,
+    });
     lossy = false;
   } else if (policy.dust != null && magnitude < policy.dust) {
     const bound = formatWithConventions(policy.dust, locale, {

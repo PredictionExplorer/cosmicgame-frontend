@@ -91,22 +91,18 @@
     "cycleHash": "サイクル",
     "round": "サイクル",
     "participant": "参加者",
-    "participantAddress": "参加者アドレス",
     "recipient": "受領者",
-    "recipientAddress": "受領者アドレス",
     "gestureCount": "筆数",
-    "numberOfGestures": "筆数",
     "gestureType": "一筆の種類",
     "gestureDuration": "保持時間",
     "gestureInfo": "一筆の情報",
     "gestureCost": "費用",
     "allocation": "配分",
-    "allocationsReceived": "受け取った配分",
+    "allocationsReceived": "配分（すべての種類）",
     "maxAllocationEth": "最大シグネチャー配分（ETH）",
-    "allocationsSumEth": "配分合計（ETH）",
+    "allocationsSumEth": "受け取ったETH",
     "anchorActionId": "係留操作ID",
     "anchorHolder": "係留者",
-    "anchorHolderAddress": "係留者アドレス",
     "holder": "保有者",
     "numberOfNfts": "NFTの数",
     "date": "日付",
@@ -127,9 +123,9 @@
     "destinationAddress": "送付先アドレス",
     "from": "送付元",
     "to": "送付先",
-    "type": "種類",
     "event": "イベント",
     "newValue": "新しい値",
+    "previousValue": "以前の値",
     "recordType": "記録の種類",
     "source": "配分元",
     "received": "受領",
@@ -144,14 +140,13 @@
     "maxGestureEth": "最大一筆（ETH）",
     "numberOfContributions": "拠出件数",
     "totalContributedEth": "拠出総額（ETH）",
-    "numberOfStellarEntries": "星選の対象件数",
-    "ethSelectionProbability": "ETHに選ばれる確率",
-    "nftSelectionProbability": "NFTに選ばれる確率",
     "expirationDate": "有効期限",
     "started": "開始",
     "ended": "終了",
     "actions": "操作",
-    "selected": "選択済み"
+    "selected": "選択済み",
+    "gesturesThisCycle": "このサイクルの筆数",
+    "shareOfPool": "プール内の割合"
   },
   "names": {
     "participants": "ユニーク参加者",
@@ -200,6 +195,10 @@
   "details": {
     "header": "詳細"
   },
+  "message": {
+    "showAll": "すべて表示",
+    "showLess": "折りたたむ"
+  },
   "skeleton": {
     "loadingText": "テキストを読み込み中",
     "loadingStat": "統計を読み込み中",
@@ -215,21 +214,25 @@
   },
   "allocation": {
     "cycle": "サイクル{cycle}",
-    "openDetails": "サイクル{cycle}の詳しい配分の内訳を開きます。",
-    "allocationHelp": "このサイクルのシグネチャー配分の金額と受領者ウォレット。",
     "gestures": "筆数",
-    "gesturesHelp": "このサイクル中に入れられた一筆の総数。",
-    "nftsHelp": "このサイクル中に一筆に添付されたNFT。",
-    "stellarHelp": "星選プールに配分されたETH。",
-    "anchorHelp": "係留配分に配分されたETH。",
-    "distributedHelp": "星選を通じて配られたCosmic Signature NFT。",
     "listAria": "サイクルごとの配分の受領者",
+    "groups": {
+      "eth": "配分トラック別ETH",
+      "nfts": "NFT"
+    },
     "columns": {
       "finalized": "確定日時",
+      "signature": "シグネチャー配分",
       "signatureEth": "シグネチャー配分（ETH）",
+      "chrono": "時の戦士",
       "chronoEth": "時の戦士（ETH）",
+      "stellar": "星選",
       "stellarEth": "星選（ETH）",
+      "anchor": "係留配分",
       "anchorEth": "係留配分（ETH）",
+      "publicGoods": "公共財",
+      "publicGoodsEth": "公共財（ETH）",
+      "attached": "添付",
       "nftsAttached": "添付されたNFT",
       "nftsViaStellar": "星選によるNFT"
     }
@@ -240,6 +243,10 @@
   },
   "publicGoods": {
     "voluntaryEmpty": "公共財金庫へ直接送られた拠出がここに表示されます。金庫は、設定されている公共財の受け手のためにこの資金を保管します。"
+  },
+  "outreach": {
+    "allocationsTitle": "配分の記録",
+    "dustNote": "薄く表示された数量は{amount}未満の配分で、この精度では表示しきれません。"
   },
   "banGesture": {
     "banned": "メッセージを非表示にしました。",
@@ -259,9 +266,8 @@
     }
   },
   "ethContribution": {
-    "withInfo": "情報付きの拠出",
-    "simple": "シンプルな拠出",
-    "viewContribution": "拠出{id}を見る"
+    "withNote": "メモあり",
+    "viewContribution": "拠出 #{id}"
   },
   "endurance": {
     "liveHelp": "この参加者は最新の一筆を入れた参加者でもあるため、この持久の期間はまだ伸びています。",
@@ -269,18 +275,16 @@
     "chronoWarrior": "時の戦士"
   },
   "gestureHistory": {
-    "randomWalkGesture": "RandomWalk NFT（ID = {id}）を使って一筆が入れられました",
-    "randomWalkImageAlt": "RWLK NFT",
-    "cstGesture": "CSTトークンを使って一筆が入れられました",
-    "ethGesture": "ETHを使って一筆が入れられました",
-    "nftAttached": "。さらにトークン（{address}）のID {id}が添付されました",
-    "erc20AttachedPrefix": "。さらに{amount}",
-    "attachedSuffix": "が添付されました",
     "tableLabel": "一筆の履歴",
-    "viewGesture": "一筆{id}を見る"
+    "viewGesture": "一筆#{position}",
+    "attached": "添付",
+    "randomWalkToken": "Random Walk {id}"
   },
   "nameHistory": {
     "removed": "トークン名が削除されました。"
+  },
+  "stellarSelection": {
+    "draws": "サイクルの確定時に、このプールからETHの星選{eth}件とNFTの星選{nft}件が選ばれます。"
   },
   "recipientHistory": {
     "sources": {
@@ -295,13 +299,18 @@
       "attachedErc20Timeout": "添付されたERC-20（タイムアウト後の受け取り）",
       "stellarEthTimeout": "ETH星選（タイムアウト後の受け取り）"
     },
+    "sourceTags": {
+      "anchoredStellarSelection": "係留星選"
+    },
     "nft": "NFT #{id}",
+    "nftCount": "{count, plural, other {#点のNFT}}",
     "readyToRetrieve": "受け取り可能",
     "retrieve": "受け取る",
     "retrieved": "受け取り済み",
     "allAnchorHolders": "Cosmic Signature NFTのすべての係留者",
     "showRecords": "{count, plural, other {#件の記録を表示}}",
     "hideRecords": "記録を閉じる",
+    "recordsHeader": "記録",
     "totals": {
       "eth": "受領したETH",
       "cst": "受領したCST",
@@ -358,25 +367,19 @@
     "printReign": "保持期間：{duration}"
   },
   "systemModes": {
-    "viewEvent": "{scope}のシステムイベントを見る"
+    "viewEvent": "パラメーターの変更履歴"
   },
   "uniqueAnchorHolders": {
-    "numAnchorActions": "係留操作数",
     "anchors": "係留",
-    "numReleaseActions": "解除操作数",
     "releases": "解除",
-    "totalImprintedTokens": "刻印トークン総数",
     "imprinted": "刻印",
-    "totalAnchoredTokens": "係留トークン総数",
-    "anchored": "係留中",
-    "totalDistributionEth": "配分総額（ETH）",
-    "distributed": "配付済み",
-    "unretrievedDistributionEth": "未受け取り配分（ETH）",
-    "unretrieved": "未受け取り"
+    "anchored": "現在係留中",
+    "distributedEth": "配付済み（ETH）",
+    "unretrievedEth": "未受け取り（ETH）"
   },
   "statisticsColumns": {
-    "ownerAddress": "所有者アドレス",
-    "numberOfTokensOwned": "保有トークン数",
+    "ownerAddress": "保有者",
+    "numberOfTokensOwned": "保有NFT数",
     "cstBalance": "残高（CST）",
     "contractAddress": "コントラクトアドレス",
     "numberOfNfts": "NFTの数",
@@ -385,29 +388,9 @@
     "isAnchorHolder": "係留者か"
   },
   "statisticsTooltips": {
-    "participantAddress": "インデックス済みの一筆を少なくとも1回入れたウォレットアドレス。",
-    "numberOfGestures": "このウォレットが入れたインデックス済みの一筆の総数。",
-    "maxGestureEth": "このウォレットで記録されたETH建ての一筆のうち最大のもの。",
-    "recipientAddress": "インデックス済みのプロトコル配分を1件以上受け取ったウォレットアドレス。",
-    "allocationsReceived": "このウォレットが受け取ったインデックス済みの配分の件数。",
-    "maxAllocationEth": "最後の一筆によってこの受領者が受け取ったシグネチャー配分の最大値です。受け取ったことがなければ0です。時の戦士と星選のETHは合計にのみ含まれます。",
-    "allocationsSumEth": "この受領者に対してインデックスされたETH配分の合計。",
-    "contributorAddress": "プロトコルへETHを拠出したウォレットアドレス。",
-    "numberOfContributions": "このウォレットからのインデックス済みETH拠出トランザクションの件数。",
-    "totalContributedEth": "このウォレットが拠出したETHの総額。",
-    "ownerAddress": "この行に示すトークン残高を現在保有しているウォレットアドレス。",
-    "numberOfTokensOwned": "このウォレットが保有するCosmic Signature NFT（ERC-721）トークンの数。",
+    "maxAllocationEth": "最後の一筆によってこの受領者が受け取ったシグネチャー配分の最大値です。受け取ったことがなければダッシュで表示されます。時の戦士と星選のETHは受け取ったETHにのみ含まれます。",
+    "allocationsSumEth": "この受領者が受け取ったすべてのETH配分です。NFTとCSTの配分は「配分（すべての種類）」に数えられますが、このETHには加算されません。",
     "cstBalance": "このウォレットの現在のCST（ERC-20）残高。",
-    "anchorHolderAddress": "トークンを係留または解除したウォレットアドレス。",
-    "numAnchorActions": "このウォレットが行ったインデックス済みの係留トランザクションの数。",
-    "numReleaseActions": "このウォレットが行ったインデックス済みの解除トランザクションの数。",
-    "totalImprintedTokens": "関連する係留または配分の流れを通じてこの係留者のために刻印されたトークンの総数。",
-    "totalAnchoredTokens": "このウォレットについて報告された、現在または累計の係留トークン数。",
-    "totalDistributionEth": "このウォレットに対してインデックスされたETH係留配分の総額。",
-    "unretrievedDistributionEth": "このウォレットがまだ受け取れるETH係留配分。",
-    "systemRound": "このシステムイベントのサイクルまたはデプロイの文脈。",
-    "systemStarted": "このシステムイベントが有効になった時刻。",
-    "systemEnded": "次のシステムイベントがこれに置き換わった時刻。",
     "attachedNftContractAddress": "一筆に添付されたトークンのERC-721コントラクトアドレス。",
     "attachedNftCount": "このコントラクトのNFTのうち、一筆に添付されたものの数。"
   }

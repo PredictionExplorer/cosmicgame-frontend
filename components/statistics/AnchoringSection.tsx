@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { useFormat } from '@/hooks/useFormat';
 import { PageHeaderFigures, type PageHeaderFigure } from '@/components/layout/PageHeader';
 import { Amount } from '@/components/ui/amount';
+import { DataTableWidth } from '@/components/ui/data-table';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { GlobalAnchorActionsTable } from '@/components/anchoring/GlobalAnchorActionsTable';
 import { GlobalAnchoredTokensTable } from '@/components/anchoring/GlobalAnchoredTokensTable';
@@ -74,7 +75,9 @@ function AnchoringTableSection<T>({
       isEmpty={(state.data ?? []).length === 0}
       emptyTitle={emptyTitle}
     >
-      {children}
+      {/* The tab stacks five-column and four-column ledgers: every one runs
+          the full width, so they share a right edge. */}
+      <DataTableWidth value="fill">{children}</DataTableWidth>
     </StatsSection>
   );
 }

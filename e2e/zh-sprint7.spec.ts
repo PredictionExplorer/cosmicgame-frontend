@@ -246,13 +246,22 @@ test.describe('zh Sprint 7 — long-tail routes', () => {
   test('renders Chinese ETH contribution list, detail, and cycle routes', async ({ page }) => {
     await openZh(page, '/zh/eth-contribution');
     await expect(page.getByRole('heading', { level: 1, name: '直接 ETH 贡献' })).toBeVisible();
-    await expect(page.getByText('暂无贡献记录。')).toBeVisible();
+    await expect(page.getByRole('heading', { name: '暂无贡献记录', exact: true })).toBeVisible();
 
     await openZh(page, '/zh/eth-contribution/detail/7');
     await expect(
       page.getByRole('heading', { level: 1, name: '贡献 #7', exact: true }),
     ).toBeVisible();
-    await expect(page.getByRole('link', { name: '第 7 个周期', exact: true })).toBeVisible();
+    // The record leads with its facts: the cycle is a figure under its
+    // localized label, linked to that cycle's contributions.
+    const cycleFigure = page
+      .getByRole('definition')
+      .filter({ has: page.getByRole('link', { name: '7', exact: true }) });
+    await expect(cycleFigure.getByRole('link')).toHaveAttribute(
+      'href',
+      '/zh/eth-contribution/round/7',
+    );
+    await expect(page.getByRole('term').filter({ hasText: /^周期$/ })).toBeVisible();
     await expect(page.getByText('贡献者留言')).toBeVisible();
 
     await openZh(page, '/zh/eth-contribution/round/7');
@@ -302,10 +311,10 @@ test.describe('zh Sprint 7 — long-tail routes', () => {
     await expect(page.getByRole('heading', { name: '落笔留言审核', exact: true })).toBeVisible();
     const gestureRow = page.getByRole('row', { name: /Review locale link/ });
     await expect(gestureRow).toBeVisible();
-    await expect(gestureRow.getByRole('link', { name: '7', exact: true })).toHaveAttribute(
-      'href',
-      '/zh/allocation/7',
-    );
+    // A cycle reads "第 7 个周期", never a bare "7", and leads to its record.
+    await expect(
+      gestureRow.getByRole('link', { name: '第 7 个周期', exact: true }),
+    ).toHaveAttribute('href', '/zh/allocation/7');
 
     await openZh(page, '/zh/admin/admin');
     await expect(page.getByRole('heading', { name: '合约设置', exact: true })).toBeVisible();

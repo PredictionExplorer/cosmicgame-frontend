@@ -14,7 +14,8 @@ import type {
   RoundClaimSummary,
 } from '@/services/api/types';
 import { Button } from '@/components/ui/button';
-import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+import { DataTable, TableLink, type DataTableColumn } from '@/components/ui/data-table';
+import { useCycleHref } from '@/components/tables/useCycleHref';
 import {
   Dialog,
   DialogContent,
@@ -196,9 +197,8 @@ const CycleDetailDialog = ({ round, onClose }: { round: number | null; onClose: 
     <Dialog open={round != null} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-4xl">
         <DialogHeader className={DIALOG_HEADER_CLASS}>
-          <DialogTitle>
-            {t('performance.claims.dialog.exploreTitle', { cycle: round ?? 0 })}
-          </DialogTitle>
+          {/* The title repeats the button that opened it ("Cycle 12 details"). */}
+          <DialogTitle>{t('performance.claims.cycleDetails', { cycle: round ?? 0 })}</DialogTitle>
           <DialogDescription>{t('performance.claims.dialog.exploreDescription')}</DialogDescription>
         </DialogHeader>
         {isLoading ? (
@@ -254,6 +254,8 @@ const CycleDetailDialog = ({ round, onClose }: { round: number | null; onClose: 
  */
 export const ClaimsByRoundSection = () => {
   const t = useTranslations('statistics');
+  const tTables = useTranslations('tables');
+  const cycleHref = useCycleHref();
   const [selected, setSelected] = useState<RoundClaimSummary | null>(null);
   const [exploreRound, setExploreRound] = useState<number | null>(null);
   const { data, isLoading, isError, refetch } = useClaimsByRound();
@@ -270,8 +272,15 @@ export const ClaimsByRoundSection = () => {
     return [
       {
         id: 'cycle',
+        kind: 'link',
         header: t('performance.claims.columns.cycle'),
         value: (row) => row.RoundNum,
+        // "Cycle 2", not a bare "2": a word-wide link to the cycle's record.
+        cell: (row) => (
+          <TableLink href={cycleHref(row.RoundNum)}>
+            {tTables('allocation.cycle', { cycle: row.RoundNum })}
+          </TableLink>
+        ),
         sortable: true,
         nowrap: true,
       },
@@ -318,19 +327,15 @@ export const ClaimsByRoundSection = () => {
         header: t('performance.claims.columns.details'),
         align: 'right',
         cell: (row) => (
-          <Button
-            variant="ghost"
-            size="sm"
-            // Every row's button reads "Explore"; its name says which cycle.
-            aria-label={t('performance.claims.exploreAria', { cycle: row.RoundNum })}
-            onClick={() => setExploreRound(row.RoundNum)}
-          >
-            {t('performance.claims.explore')}
+          // The visible words name the cycle ("Cycle 12 details"), so every
+          // row's button says what it opens without an aria-label.
+          <Button variant="ghost" size="sm" onClick={() => setExploreRound(row.RoundNum)}>
+            {t('performance.claims.cycleDetails', { cycle: row.RoundNum })}
           </Button>
         ),
       },
     ];
-  }, [t]);
+  }, [t, tTables, cycleHref]);
 
   return (
     <div className="space-y-6">

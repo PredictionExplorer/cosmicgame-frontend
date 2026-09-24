@@ -25,6 +25,7 @@ export {
 } from './column-kinds';
 export { ExternalTableLink, TableLink, TableTag, TxProofLink, YouBadge } from './cells';
 export { KindValue } from './kind-value';
+export { DataTableWidth, useDataTableWidth, type DataTableWidthMode } from './table-width';
 export {
   DEFAULT_PAGE_SIZE,
   PHONE_PAGE_SIZE,

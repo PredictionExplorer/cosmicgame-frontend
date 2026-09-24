@@ -1,10 +1,11 @@
 'use client';
 
 import { useMemo } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
 import type { LedgerStateProps } from '@/components/tables/ledger-props';
+import { useOutreachDustNote } from '@/components/tables/outreachDust';
 import type { MarketingReward } from '@/services/api/types';
 
 export type { MarketingReward };
@@ -14,14 +15,18 @@ interface GlobalMarketingRewardsTableProps extends LedgerStateProps {
 }
 
 /**
- * Every Outreach Reserve allocation: when (linked to its transaction), to
- * whom (linked to that contributor's outreach history) and how much CST.
+ * Every Outreach Reserve allocation, newest first: when (linked to its
+ * transaction), to whom (linked to that contributor's outreach history) and
+ * how much CST. Dust ("<0.01") is muted, with a note beside the row range,
+ * exactly as on a contributor's own page.
  */
 export const GlobalMarketingRewardsTable = ({
   list,
   ...state
 }: GlobalMarketingRewardsTableProps) => {
   const t = useTranslations('tables');
+  const locale = useLocale();
+  const dustNote = useOutreachDustNote(list, locale);
 
   const columns = useMemo<DataTableColumn<MarketingReward>[]>(
     () => [
@@ -60,6 +65,8 @@ export const GlobalMarketingRewardsTable = ({
       ariaLabel={t('names.outreachAllocations')}
       getRowKey={(row) => row.EvtLogId}
       emptyTitle={t('empty.outreachAllocations')}
+      initialSort={{ id: 'datetime', direction: 'desc' }}
+      caption={dustNote}
       {...state}
     />
   );

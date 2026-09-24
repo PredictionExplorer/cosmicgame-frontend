@@ -91,22 +91,18 @@
     "cycleHash": "Chu kỳ #",
     "round": "Chu kỳ",
     "participant": "Người tham gia",
-    "participantAddress": "Địa chỉ người tham gia",
     "recipient": "Người nhận",
-    "recipientAddress": "Địa chỉ người nhận",
     "gestureCount": "Nét bút",
-    "numberOfGestures": "Số nét bút",
     "gestureType": "Loại nét bút",
     "gestureDuration": "Thời gian giữ",
     "gestureInfo": "Thông tin nét bút",
     "gestureCost": "Chi phí",
     "allocation": "Phân bổ",
-    "allocationsReceived": "Phân bổ đã nhận",
+    "allocationsReceived": "Phân bổ (mọi loại)",
     "maxAllocationEth": "Phân bổ Signature lớn nhất (ETH)",
-    "allocationsSumEth": "Tổng phân bổ (ETH)",
+    "allocationsSumEth": "ETH đã nhận",
     "anchorActionId": "Mã thao tác neo giữ",
     "anchorHolder": "Người neo giữ",
-    "anchorHolderAddress": "Địa chỉ người neo giữ",
     "holder": "Người giữ",
     "numberOfNfts": "Số NFT",
     "date": "Ngày",
@@ -127,9 +123,9 @@
     "destinationAddress": "Địa chỉ đích",
     "from": "Từ",
     "to": "Đến",
-    "type": "Loại",
     "event": "Sự kiện",
     "newValue": "Giá trị mới",
+    "previousValue": "Giá trị trước",
     "recordType": "Loại bản ghi",
     "source": "Nguồn",
     "received": "Đã nhận",
@@ -144,14 +140,13 @@
     "maxGestureEth": "Nét bút lớn nhất (ETH)",
     "numberOfContributions": "Số lần đóng góp",
     "totalContributedEth": "Tổng số tiền đã đóng góp (ETH)",
-    "numberOfStellarEntries": "Số lượt Tinh tuyển",
-    "ethSelectionProbability": "Tần suất được chọn nhận ETH",
-    "nftSelectionProbability": "Tần suất được chọn nhận NFT",
     "expirationDate": "Ngày hết hạn",
     "started": "Bắt đầu",
     "ended": "Kết thúc",
     "actions": "Thao tác",
-    "selected": "Đã chọn"
+    "selected": "Đã chọn",
+    "gesturesThisCycle": "Nét bút trong chu kỳ này",
+    "shareOfPool": "Tỷ lệ trong nhóm"
   },
   "names": {
     "participants": "Người tham gia riêng biệt",
@@ -200,6 +195,10 @@
   "details": {
     "header": "Chi tiết"
   },
+  "message": {
+    "showAll": "Xem tất cả",
+    "showLess": "Thu gọn"
+  },
   "skeleton": {
     "loadingText": "Đang tải văn bản",
     "loadingStat": "Đang tải số liệu",
@@ -215,21 +214,25 @@
   },
   "allocation": {
     "cycle": "Chu kỳ {cycle}",
-    "openDetails": "Mở chi tiết phân bổ của chu kỳ #{cycle}.",
-    "allocationHelp": "Số tiền phân bổ Signature và ví người nhận của chu kỳ này.",
     "gestures": "Nét bút",
-    "gesturesHelp": "Tổng số nét bút đã đặt trong chu kỳ này.",
-    "nftsHelp": "Các NFT đính kèm vào nét bút trong chu kỳ này.",
-    "stellarHelp": "ETH phân bổ vào quỹ Tinh tuyển.",
-    "anchorHelp": "ETH phân bổ cho phân phối neo giữ.",
-    "distributedHelp": "Cosmic Signature NFT được phân phối qua Tinh tuyển.",
     "listAria": "Người nhận phân bổ theo chu kỳ",
+    "groups": {
+      "eth": "ETH theo luồng phân bổ",
+      "nfts": "NFT"
+    },
     "columns": {
       "finalized": "Hoàn tất lúc",
+      "signature": "Phân bổ Signature",
       "signatureEth": "Phân bổ Signature (ETH)",
+      "chrono": "Chiến binh Thời gian",
       "chronoEth": "Chiến binh Thời gian (ETH)",
+      "stellar": "Tinh tuyển",
       "stellarEth": "Tinh tuyển (ETH)",
+      "anchor": "Phân phối neo giữ",
       "anchorEth": "Phân phối neo giữ (ETH)",
+      "publicGoods": "Hàng hóa công",
+      "publicGoodsEth": "Hàng hóa công (ETH)",
+      "attached": "Đính kèm",
       "nftsAttached": "NFT đính kèm",
       "nftsViaStellar": "NFT qua Tinh tuyển"
     }
@@ -240,6 +243,10 @@
   },
   "publicGoods": {
     "voluntaryEmpty": "Các khoản đóng góp gửi thẳng đến Kho Hàng hóa công sẽ hiện ở đây. Kho giữ số tiền này cho đơn vị thụ hưởng được cấu hình trong hợp đồng."
+  },
+  "outreach": {
+    "allocationsTitle": "Các phân bổ",
+    "dustNote": "Các số in mờ là phân bổ dưới {amount}, quá nhỏ để hiển thị ở độ chính xác này."
   },
   "banGesture": {
     "banned": "Đã ẩn lời nhắn.",
@@ -259,9 +266,8 @@
     }
   },
   "ethContribution": {
-    "withInfo": "Đóng góp kèm thông tin",
-    "simple": "Đóng góp đơn giản",
-    "viewContribution": "Xem đóng góp {id}"
+    "withNote": "Có lời nhắn",
+    "viewContribution": "Đóng góp #{id}"
   },
   "endurance": {
     "liveHelp": "Nét bút gần nhất vẫn thuộc về người tham gia này, nên thời gian dẫn đầu tiếp tục tăng.",
@@ -269,18 +275,16 @@
     "chronoWarrior": "Chiến binh Thời gian"
   },
   "gestureHistory": {
-    "randomWalkGesture": "Nét bút được đặt bằng RandomWalk NFT (mã = {id})",
-    "randomWalkImageAlt": "RWLK NFT",
-    "cstGesture": "Nét bút được đặt bằng token CST",
-    "ethGesture": "Nét bút được đặt bằng ETH",
-    "nftAttached": " và một token ({address}) có mã {id} đã được đính kèm",
-    "erc20AttachedPrefix": " và {amount}",
-    "attachedSuffix": " đã được đính kèm",
     "tableLabel": "Lịch sử nét bút",
-    "viewGesture": "Xem nét bút {id}"
+    "viewGesture": "Nét bút #{position}",
+    "attached": "Đính kèm",
+    "randomWalkToken": "Random Walk {id}"
   },
   "nameHistory": {
     "removed": "Tên token đã bị xóa."
+  },
+  "stellarSelection": {
+    "draws": "Khi chu kỳ được chốt, {eth} lượt chọn ETH và {nft} lượt chọn NFT được thực hiện trong nhóm này."
   },
   "recipientHistory": {
     "sources": {
@@ -295,13 +299,18 @@
       "attachedErc20Timeout": "ERC-20 đính kèm (nhận về sau thời hạn)",
       "stellarEthTimeout": "ETH Tinh tuyển (nhận về sau thời hạn)"
     },
+    "sourceTags": {
+      "anchoredStellarSelection": "Tinh tuyển neo giữ"
+    },
     "nft": "NFT #{id}",
+    "nftCount": "{count, plural, other {# NFT}}",
     "readyToRetrieve": "Có thể nhận về",
     "retrieve": "Nhận về",
     "retrieved": "Đã nhận về",
     "allAnchorHolders": "Tất cả người neo giữ Cosmic Signature NFT",
     "showRecords": "{count, plural, other {Xem # bản ghi}}",
     "hideRecords": "Ẩn bản ghi",
+    "recordsHeader": "Bản ghi",
     "totals": {
       "eth": "ETH đã nhận",
       "cst": "CST đã nhận",
@@ -358,25 +367,19 @@
     "printReign": "Thời gian giữ vị trí: {duration}"
   },
   "systemModes": {
-    "viewEvent": "Xem sự kiện hệ thống của {scope}"
+    "viewEvent": "thay đổi tham số"
   },
   "uniqueAnchorHolders": {
-    "numAnchorActions": "Số thao tác neo giữ",
     "anchors": "Neo giữ",
-    "numReleaseActions": "Số thao tác gỡ neo",
     "releases": "Gỡ neo",
-    "totalImprintedTokens": "Tổng token đã khắc",
     "imprinted": "Đã khắc",
-    "totalAnchoredTokens": "Tổng token đang neo giữ",
     "anchored": "Đang neo giữ",
-    "totalDistributionEth": "Tổng phân phối (ETH)",
-    "distributed": "Đã phân phối",
-    "unretrievedDistributionEth": "Phân phối chưa nhận về (ETH)",
-    "unretrieved": "Chưa nhận về"
+    "distributedEth": "Đã phân phối (ETH)",
+    "unretrievedEth": "Chưa nhận về (ETH)"
   },
   "statisticsColumns": {
-    "ownerAddress": "Địa chỉ chủ sở hữu",
-    "numberOfTokensOwned": "Số token sở hữu",
+    "ownerAddress": "Người giữ",
+    "numberOfTokensOwned": "Số NFT nắm giữ",
     "cstBalance": "Số dư (CST)",
     "contractAddress": "Địa chỉ hợp đồng",
     "numberOfNfts": "Số NFT",
@@ -385,29 +388,9 @@
     "isAnchorHolder": "Là người neo giữ"
   },
   "statisticsTooltips": {
-    "participantAddress": "Địa chỉ ví đã đặt ít nhất một nét bút được lập chỉ mục.",
-    "numberOfGestures": "Tổng số nét bút được lập chỉ mục của ví này.",
-    "maxGestureEth": "Nét bút tính bằng ETH lớn nhất được ghi nhận cho ví này.",
-    "recipientAddress": "Địa chỉ ví đã nhận một hoặc nhiều phân bổ giao thức được lập chỉ mục.",
-    "allocationsReceived": "Số phân bổ được lập chỉ mục mà ví này đã nhận.",
-    "maxAllocationEth": "Phân bổ Signature lớn nhất người nhận này nhận được nhờ đặt nét bút cuối cùng; bằng 0 nếu chưa từng nhận. ETH Chiến binh Thời gian và Tinh tuyển chỉ được tính vào tổng.",
-    "allocationsSumEth": "Tổng phân bổ ETH được lập chỉ mục cho người nhận này.",
-    "contributorAddress": "Địa chỉ ví đã đóng góp ETH cho giao thức.",
-    "numberOfContributions": "Số giao dịch đóng góp ETH được lập chỉ mục từ ví này.",
-    "totalContributedEth": "Tổng ETH ví này đã đóng góp.",
-    "ownerAddress": "Địa chỉ ví hiện đang nắm giữ số dư token hiển thị ở hàng này.",
-    "numberOfTokensOwned": "Số token ERC-721 Cosmic Signature NFT ví này đang nắm giữ.",
+    "maxAllocationEth": "Phân bổ Signature lớn nhất người nhận này nhận được nhờ đặt nét bút cuối cùng; hiển thị dấu gạch nếu chưa từng nhận. ETH Chiến binh Thời gian và Tinh tuyển chỉ được tính vào ETH đã nhận.",
+    "allocationsSumEth": "Mọi phân bổ ETH mà người nhận này đã nhận. Phân bổ NFT và CST được tính vào “Phân bổ (mọi loại)” nhưng không cộng thêm ETH ở đây.",
     "cstBalance": "Số dư CST ERC-20 hiện tại của ví này.",
-    "anchorHolderAddress": "Địa chỉ ví đã neo giữ hoặc gỡ neo token.",
-    "numAnchorActions": "Số giao dịch neo giữ được lập chỉ mục của ví này.",
-    "numReleaseActions": "Số giao dịch gỡ neo được lập chỉ mục của ví này.",
-    "totalImprintedTokens": "Tổng token được khắc cho người neo giữ này thông qua luồng neo giữ hoặc phân bổ tương ứng.",
-    "totalAnchoredTokens": "Số token đang neo giữ hiện tại hoặc tích lũy được báo cáo cho ví này.",
-    "totalDistributionEth": "Tổng phân phối neo giữ ETH được lập chỉ mục cho ví này.",
-    "unretrievedDistributionEth": "Phân phối neo giữ ETH ví này vẫn có thể nhận về.",
-    "systemRound": "Bối cảnh chu kỳ hoặc triển khai của sự kiện hệ thống này.",
-    "systemStarted": "Dấu thời gian khi sự kiện hệ thống này bắt đầu có hiệu lực.",
-    "systemEnded": "Dấu thời gian khi sự kiện hệ thống tiếp theo thay thế sự kiện này.",
     "attachedNftContractAddress": "Địa chỉ hợp đồng ERC-721 của các token đính kèm vào nét bút.",
     "attachedNftCount": "Số NFT từ hợp đồng này đã được đính kèm vào nét bút."
   }
