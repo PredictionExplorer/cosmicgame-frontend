@@ -289,6 +289,10 @@ const Contracts = ({ seoSummary, addresses, initialContractAddrs = null }: Contr
   // Dashboard figures: `undefined` while the dashboard loads, `null` when a field is missing.
   const dashboardNumber = (value: unknown): Read<number> =>
     loading && !data ? undefined : toFiniteNumber(value);
+  // Whether the cycle has a gesture decides the ETH window's state; unknown until the
+  // dashboard answers, never read as "no gestures".
+  const gestureCount = dashboardNumber(data?.CurNumBids);
+  const cycleHasGestures = typeof gestureCount === 'number' ? gestureCount > 0 : gestureCount;
 
   return (
     <PageShell variant="data" backdrop="signature">
@@ -341,7 +345,7 @@ const Contracts = ({ seoSummary, addresses, initialContractAddrs = null }: Contr
           cst={cstWindow}
           eth={ethWindow}
           cstStartingCost={cstStartingCost}
-          cycleHasGestures={(data?.CurNumBids ?? 0) > 0}
+          cycleHasGestures={cycleHasGestures}
         />
 
         <PublicGoodsVaultAction

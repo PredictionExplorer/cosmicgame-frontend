@@ -29,8 +29,12 @@ export interface CalibrationWindowsProps {
   eth: Reading;
   /** The CST window's starting cost (CST); `undefined` while read, `null` when it failed. */
   cstStartingCost: number | null | undefined;
-  /** The cycle already has a gesture: the ETH window no longer prices anything. */
-  cycleHasGestures: boolean;
+  /**
+   * The cycle already has a gesture: the ETH window no longer prices anything.
+   * `undefined` while the dashboard loads, `null` when it could not be read: the
+   * ETH window's state is then unknown, never guessed as running or complete.
+   */
+  cycleHasGestures: boolean | null | undefined;
 }
 
 /** Re-renders once a second while `active`, so a running window's figures advance. */
@@ -65,9 +69,12 @@ export function CalibrationWindows({
   const t = useTranslations('contracts');
   const now = useNow(Boolean(cst || eth));
   const cstStatus = cst ? calibrationWindowStatus(cst, now) : cst;
-  const ethStatus = eth
-    ? calibrationWindowStatus(eth, now, { closedEarly: cycleHasGestures })
-    : eth;
+  // The ETH window's state needs both its reading and whether the cycle has a gesture.
+  const ethStatus = !eth
+    ? eth
+    : typeof cycleHasGestures === 'boolean'
+      ? calibrationWindowStatus(eth, now, { closedEarly: cycleHasGestures })
+      : cycleHasGestures;
 
   return (
     <section aria-labelledby="calibration-windows-heading">
@@ -80,6 +87,7 @@ export function CalibrationWindows({
         <WindowPanel
           id="cst"
           title={t('parameters.cstTitle')}
+          reading={cst}
           status={cstStatus}
           durationDefinition={t('parameters.cstDurationTooltip', {
             increase: protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture,
@@ -96,6 +104,7 @@ export function CalibrationWindows({
         <WindowPanel
           id="eth"
           title={t('parameters.ethTitle')}
+          reading={eth}
           status={ethStatus}
           durationDefinition={t('parameters.ethDurationTooltip')}
           elapsedDefinition={t('parameters.ethElapsedTooltip')}
@@ -115,6 +124,7 @@ export function CalibrationWindows({
 function WindowPanel({
   id,
   title,
+  reading,
   status,
   durationDefinition,
   elapsedDefinition,
@@ -123,6 +133,9 @@ function WindowPanel({
 }: {
   id: string;
   title: string;
+  /** The window's own reading: its length reads even while its state is unknown. */
+  reading: Reading;
+  /** Where the window stands: `undefined` while that is being read, `null` when unknown. */
   status: CalibrationWindowStatus | null | undefined;
   durationDefinition: string;
   elapsedDefinition: string;
@@ -145,7 +158,14 @@ function WindowPanel({
       id: 'duration',
       label: t('parameters.duration'),
       definition: durationDefinition,
-      value: value((ready) => <Duration seconds={ready.durationSeconds} />),
+      value:
+        reading === undefined ? (
+          pending
+        ) : reading === null ? (
+          unknown
+        ) : (
+          <Duration seconds={Math.max(0, reading.durationSeconds)} />
+        ),
     },
     ...(running
       ? [

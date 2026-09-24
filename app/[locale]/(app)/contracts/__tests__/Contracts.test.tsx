@@ -262,6 +262,31 @@ describe('Contracts', () => {
     expect(eth()?.textContent).not.toContain('Elapsed');
   });
 
+  // The ETH window's state depends on whether the cycle has a gesture. A loading or
+  // failed dashboard once read as "no gestures", so the window showed Running or
+  // Complete until the dashboard arrived, and stayed wrong when it never did.
+  it('keeps the ETH window state unknown until the dashboard says whether the cycle has gestures', async () => {
+    mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true });
+    mockUseContractNoSigner.mockReturnValue(contractReads());
+    const { rerender } = render(<Contracts />);
+    const cst = () => document.querySelector('[data-window="cst"]');
+    const eth = () => document.querySelector('[data-window="eth"]');
+    await waitFor(() => expect(cst()).toHaveAttribute('data-state', 'running'));
+    expect(eth()).toHaveAttribute('data-state', 'loading');
+    expect(eth()?.textContent).not.toMatch(/Running|Complete|Closed/);
+    // Its length is the window's own reading and shows regardless.
+    expect(eth()?.querySelector('dd')).toHaveTextContent(/2\s*h/);
+
+    mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: false, isError: true });
+    rerender(<Contracts />);
+    expect(eth()).toHaveAttribute('data-state', 'unknown');
+    expect(eth()?.textContent).not.toMatch(/Running|Complete|Closed/);
+
+    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+    rerender(<Contracts />);
+    expect(eth()).toHaveAttribute('data-state', 'closed');
+  });
+
   it('refreshes the participation CST preview live', async () => {
     const liveCstGlobals = globalThis as LiveCstPreviewTestGlobals;
     liveCstGlobals.__COSMIC_ENABLE_LIVE_CST_PREVIEW_TEST_TIMERS__ = true;
