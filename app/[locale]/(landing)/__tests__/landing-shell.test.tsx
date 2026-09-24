@@ -5,17 +5,19 @@ import { getLandingContent } from '@/content/landing';
 import { routing } from '@/i18n/routing';
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 
-import { checkA11y, render, screen, within } from '@/test-utils';
+import { act, checkA11y, render, screen, within } from '@/test-utils';
 
 import { LandingShell } from '../landing-shell';
 
 const mockPathname = jest.spyOn(jest.requireMock('next/navigation'), 'usePathname');
 const mockLocale = jest.spyOn(jest.requireMock('next-intl'), 'useLocale');
 
+const SECTIONS = { cycle: 'The Cycle', art: 'The Art', tracks: 'Allocation Tracks' };
+
 function renderShell(locale = 'en') {
   mockLocale.mockReturnValue(locale);
   return render(
-    <LandingShell footer={getLandingContent(locale).footer}>
+    <LandingShell footer={getLandingContent(locale).footer} sections={SECTIONS}>
       <main id="main" tabIndex={-1}>
         <h1>Page content</h1>
       </main>
@@ -23,55 +25,107 @@ function renderShell(locale = 'en') {
   );
 }
 
-describe('Landing subpage chrome', () => {
+describe('Landing chrome', () => {
   beforeEach(() => {
     mockPathname.mockReturnValue('/about');
     mockLocale.mockReturnValue('en');
   });
 
-  it.each(['/about', '/learn', '/learn/gesture', '/white-paper', '/quiz', '/quiz/1'])(
-    'renders a complete header and footer around %s',
+  it.each(['/', '/landing-site', '/about', '/learn', '/learn/gesture', '/white-paper', '/quiz'])(
+    'places one header and one footer around <main> on %s',
     (pathname) => {
       mockPathname.mockReturnValue(pathname);
       renderShell();
-      expect(screen.getAllByRole('banner')).toHaveLength(1);
-      expect(screen.getAllByRole('contentinfo')).toHaveLength(1);
-      expect(screen.getAllByRole('main')).toHaveLength(1);
-      const navigation = screen.getByRole('navigation', { name: 'nav.primaryLabel' });
-      for (const href of ['/about', '/learn', '/white-paper']) {
-        expect(navigation.querySelector(`a[href="${href}"]`)).toBeInTheDocument();
-      }
-      expect(screen.getByRole('contentinfo')).toContainElement(
+      const banner = screen.getByRole('banner');
+      const footer = screen.getByRole('contentinfo');
+      const main = screen.getByRole('main');
+      expect(main).not.toContainElement(banner);
+      expect(main).not.toContainElement(footer);
+      expect(footer).toContainElement(
         screen.getByRole('navigation', { name: 'common.languageSwitcher.label' }),
       );
     },
   );
 
-  it.each(['/', '/landing-site'])('does not duplicate the home composition on %s', (pathname) => {
-    mockPathname.mockReturnValue(pathname);
+  it('links the home sections in place on the home page and back to them elsewhere', () => {
+    mockPathname.mockReturnValue('/');
+    const { unmount } = renderShell();
+    const onHome = screen.getAllByRole('navigation', { name: 'nav.primaryLabel' })[0]!;
+    expect(within(onHome).getByRole('link', { name: 'The Cycle' })).toHaveAttribute(
+      'href',
+      '#cycle',
+    );
+    unmount();
+
+    mockPathname.mockReturnValue('/about');
     renderShell();
-    expect(screen.queryByRole('banner')).not.toBeInTheDocument();
-    expect(screen.queryByRole('contentinfo')).not.toBeInTheDocument();
+    const onAbout = screen.getAllByRole('navigation', { name: 'nav.primaryLabel' })[0]!;
+    expect(within(onAbout).getByRole('link', { name: 'The Cycle' })).toHaveAttribute(
+      'href',
+      '/#cycle',
+    );
   });
 
-  it('identifies the current section on article pages', () => {
+  it('identifies the current page on article pages', () => {
     mockPathname.mockReturnValue('/learn/gesture');
     renderShell();
-    const navigation = screen.getByRole('navigation', { name: 'nav.primaryLabel' });
-    expect(within(navigation).getByRole('link', { name: 'footer.links.learn' })).toHaveAttribute(
-      'aria-current',
-      'page',
-    );
+    const navigation = screen.getAllByRole('navigation', { name: 'nav.primaryLabel' })[0]!;
     expect(
-      within(navigation).getByRole('link', { name: 'footer.links.about' }),
+      within(navigation).getByRole('link', { name: 'nav.routes.learnHub.label' }),
+    ).toHaveAttribute('aria-current', 'true');
+    expect(
+      within(navigation).getByRole('link', { name: 'nav.routes.about.label' }),
     ).not.toHaveAttribute('aria-current');
+  });
+
+  it('shows "Open the app" on reading pages, in the same tab', () => {
+    renderShell();
+    const open = within(screen.getByRole('banner')).getByRole('link', { name: 'nav.cta.openApp' });
+    expect(open).toHaveAttribute('href', localeHref(APP_ORIGIN, '/', 'en'));
+    expect(open).not.toHaveAttribute('target');
+  });
+
+  it('leaves "Open the app" to the hero until it scrolls away on the home page', () => {
+    let report: (entries: Array<{ isIntersecting: boolean }>) => void = () => {};
+    const observe = jest.fn();
+    Object.defineProperty(window, 'IntersectionObserver', {
+      configurable: true,
+      writable: true,
+      value: jest.fn((callback: typeof report) => {
+        report = callback;
+        return { observe, disconnect: jest.fn() };
+      }),
+    });
+    mockPathname.mockReturnValue('/');
+    mockLocale.mockReturnValue('en');
+    render(
+      <LandingShell footer={getLandingContent('en').footer} sections={SECTIONS}>
+        <main id="main" tabIndex={-1}>
+          <section aria-labelledby="landing-headline">
+            <h1 id="landing-headline">Hero</h1>
+          </section>
+        </main>
+      </LandingShell>,
+    );
+    const banner = screen.getByRole('banner');
+    act(() => report([{ isIntersecting: true }]));
+    expect(within(banner).queryByRole('link', { name: 'nav.cta.openApp' })).toBeNull();
+    act(() => report([{ isIntersecting: false }]));
+    expect(within(banner).getByRole('link', { name: 'nav.cta.openApp' })).toBeInTheDocument();
+    delete (window as { IntersectionObserver?: unknown }).IntersectionObserver;
+  });
+
+  it('resolves the FAQ to the app on every landing page', () => {
+    renderShell();
+    expect(
+      within(screen.getByRole('contentinfo')).getByRole('link', { name: 'nav.routes.faq.label' }),
+    ).toHaveAttribute('href', localeHref(APP_ORIGIN, '/faq', 'en'));
   });
 
   it.each(routing.locales)('preserves the %s locale when opening the app', (locale) => {
     renderShell(locale);
-    const navigation = screen.getByRole('navigation', { name: 'nav.primaryLabel' });
     expect(
-      within(navigation).getByRole('link', { name: 'landing.timer.openLiveCycle' }),
+      within(screen.getByRole('banner')).getByRole('link', { name: 'nav.cta.openApp' }),
     ).toHaveAttribute('href', localeHref(APP_ORIGIN, '/', locale));
     expect(screen.getByRole('contentinfo')).toHaveTextContent(
       getLandingContent(locale).footer.tagline,

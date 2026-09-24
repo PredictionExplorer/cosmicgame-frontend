@@ -1,15 +1,12 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { ArrowRight, ArrowUpRight, ChevronDown } from 'lucide-react';
+import { ArrowRight, ChevronDown } from 'lucide-react';
 import { useLocale } from 'next-intl';
 
 import type { LandingContent, LandingLink } from '@/content/landing';
 
 import { Link } from '@/i18n/navigation';
-import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
-import { BrandMark } from '@/components/layout/BrandMark';
-import { ThemeSwitcher } from '@/components/theme/ThemeSwitcher';
 import { ReducedMotionFallback } from '@/components/three/ReducedMotionFallback';
 import { useCanRenderHeroCanvas } from '@/components/three/hero-canvas-gate';
 import { localizeCrossHostHref } from '@/lib/hostRouting';
@@ -31,9 +28,13 @@ function HeroBackdrop() {
 
 export function Hero({
   hero,
-  navigation = [],
 }: {
   hero: LandingContent['hero'];
+  /**
+   * @deprecated The landing header (components/landing-v2/LandingHeader),
+   * rendered by the landing shell on every page, owns the navigation now.
+   * Ignored.
+   */
   navigation?: readonly LandingLink[];
 }) {
   const locale = useLocale();
@@ -43,25 +44,6 @@ export function Hero({
       <div className={styles.backdrop} aria-hidden="true">
         <HeroBackdrop />
       </div>
-      <header role="banner" className={styles.header}>
-        <Link href="/" className={styles.brand}>
-          <BrandMark className={styles.brandIcon} />
-          <span className={styles.brandName}>
-            Cosmic <span className={styles.brandSecond}>Signature</span>
-          </span>
-        </Link>
-        <nav className={styles.navigation}>
-          {navigation.map((item) => (
-            <Link key={item.href} href={item.href}>
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-        <div className={styles.preferences}>
-          <ThemeSwitcher />
-          <LanguageSwitcher variant="compact" />
-        </div>
-      </header>
 
       <div className={styles.heroInner}>
         <div className={styles.heroGrid}>
@@ -76,13 +58,14 @@ export function Hero({
             </h1>
             <p className={styles.subhead}>{hero.subhead}</p>
             <div className={styles.actions}>
+              {/* Same tab and a forward arrow: the app is Cosmic Signature too.
+                  The new-tab arrow is reserved for third-party sites. */}
               <Link
                 href={localizeCrossHostHref(hero.primaryCta.href, locale)}
                 className={styles.primaryAction}
-                rel="noopener"
               >
                 {hero.primaryCta.label}
-                <ArrowUpRight size={18} aria-hidden="true" />
+                <ArrowRight size={18} aria-hidden="true" />
               </Link>
               <Link href={hero.secondaryCta.href} className={styles.secondaryAction}>
                 {hero.secondaryCta.label}
@@ -93,7 +76,7 @@ export function Hero({
               {[hero.statisticsCta, hero.galleryCta].map((item) => (
                 <Link key={item.href} href={localizeCrossHostHref(item.href, locale)}>
                   {item.label}
-                  <ArrowUpRight size={14} aria-hidden="true" />
+                  <ArrowRight size={14} aria-hidden="true" />
                 </Link>
               ))}
             </div>

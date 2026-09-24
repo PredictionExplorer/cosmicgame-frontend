@@ -31,64 +31,10 @@
   mask-image: linear-gradient(#000, #000 50%, transparent);
 }
 
-.header,
+/* The hero shares the header's content edge (site-container). */
 .heroInner {
-  width: min(100% - 3rem, 80rem);
+  width: min(100% - 2 * var(--gutter), 80rem);
   margin-inline: auto;
-}
-
-.header {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
-  min-height: 5.25rem;
-  border-bottom: 1px solid hsl(var(--border));
-}
-
-.brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  min-height: 44px;
-  flex-shrink: 0;
-  font-family: var(--font-family-display);
-  font-size: 1.125rem;
-  font-weight: 600;
-  letter-spacing: -0.03em;
-}
-
-.brandIcon {
-  width: 2.25rem;
-  height: 2.25rem;
-}
-.brandSecond {
-  color: hsl(var(--secondary));
-}
-.navigation {
-  display: flex;
-  align-items: center;
-  gap: clamp(1rem, 2.2vw, 2.5rem);
-}
-.navigation a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  color: hsl(var(--muted-foreground));
-  font-size: 0.8125rem;
-  transition: color 180ms;
-}
-.navigation a:hover {
-  color: hsl(var(--foreground));
-}
-.preferences {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  gap: 0.5rem;
-}
-.heroInner {
   padding-top: clamp(2.5rem, 4vw, 4rem);
 }
 .heroGrid {
@@ -423,20 +369,6 @@
 }
 
 @media (width < 64rem) {
-  .header {
-    flex-wrap: wrap;
-    gap: 0.5rem 1rem;
-    padding-block: 1rem;
-    min-height: auto;
-  }
-  .navigation {
-    order: 3;
-    width: 100%;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    column-gap: 1.5rem;
-    row-gap: 0;
-  }
   .heroGrid {
     gap: 2rem;
   }
@@ -453,29 +385,9 @@
 }
 
 @media (width < 48rem) {
-  .header,
-  .heroInner,
   .sectionInner,
   .disclaimer {
     width: calc(100% - 2.5rem);
-  }
-  .header {
-    gap: 0.5rem;
-  }
-  .brand {
-    gap: 0.5rem;
-    font-size: 1rem;
-  }
-  .brandIcon {
-    width: 1.75rem;
-    height: 1.75rem;
-  }
-  .navigation {
-    justify-content: space-between;
-    column-gap: 0.75rem;
-  }
-  .navigation a {
-    font-size: 0.6875rem;
   }
   .heroGrid {
     grid-template-columns: minmax(0, 1fr);
@@ -527,15 +439,6 @@
   }
   .cycleStage h3 {
     margin-top: 0;
-  }
-}
-
-@media (width < 26rem) {
-  .brandName {
-    line-height: 1.15;
-  }
-  .brandSecond {
-    display: block;
   }
 }
 
