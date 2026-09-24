@@ -1,6 +1,7 @@
 import {
   buildOpenSeaAssetUrl,
   getAttachedNftTokenId,
+  nameCarriesTokenId,
   normalizeHttpUrl,
   resolveAttachedNftExplorerLink,
   resolveAttachedNftLink,
@@ -9,6 +10,19 @@ import {
 const CONTRACT = '0x1234567890abcdef1234567890abcdef12345678';
 
 describe('attachedNftLinks', () => {
+  describe('nameCarriesTokenId', () => {
+    it('finds the number in a padded or plain name', () => {
+      expect(nameCarriesTokenId('Random Walk #004079', '4079')).toBe(true);
+      expect(nameCarriesTokenId('GBC #8489', '8489')).toBe(true);
+    });
+
+    it('does not match a number that only contains the id', () => {
+      expect(nameCarriesTokenId('Rexy #31140', '3114')).toBe(false);
+      expect(nameCarriesTokenId('Sky Study', '7')).toBe(false);
+      expect(nameCarriesTokenId('GBC #8489', null)).toBe(false);
+    });
+  });
+
   describe('getAttachedNftTokenId', () => {
     it('prefers NFTTokenId over TokenId', () => {
       expect(getAttachedNftTokenId({ NFTTokenId: 42, TokenId: 7 })).toBe('42');

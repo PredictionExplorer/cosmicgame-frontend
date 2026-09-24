@@ -134,6 +134,15 @@ describe('UsedRwlkNftsPage', () => {
     expect(refetch).toHaveBeenCalled();
   });
 
+  it('never says nothing was used under a header that counted uses', () => {
+    mockUseUsedRWLKNFTs.mockReturnValue(state());
+    render(<UsedRwlkNftsPage snapshotCount={3} />);
+    expect(screen.queryByRole('heading', { name: 'No RandomWalk NFTs used yet' })).toBeNull();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Used RandomWalk NFTs could not be loaded' }),
+    ).toBeInTheDocument();
+  });
+
   it('has no accessibility violations', async () => {
     mockUseUsedRWLKNFTs.mockReturnValue(state({ data: [record()] }));
     const { container } = render(<UsedRwlkNftsPage />);

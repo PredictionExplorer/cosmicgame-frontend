@@ -12,6 +12,7 @@ import { toFiniteNumber } from '@/utils/finiteNumber';
 import { useUsedRWLKNFTs } from '@/hooks/useApiQuery';
 import type { UsedRWLKNFT } from '@/services/api/types';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { useWallPage } from '@/components/nft/useWallPage';
 import { AddressChip } from '@/components/ui/address-chip';
 import { ArtFrame } from '@/components/ui/art-frame';
 import { TableLink } from '@/components/ui/data-table';
@@ -72,23 +73,42 @@ const SIZES = '(min-width: 1280px) 19rem, (min-width: 768px) 33vw, 50vw';
 /** Plates in the first viewport, which load eagerly. */
 const EAGER_CARDS = 4;
 
+export interface UsedRwlkNftsPageProps {
+  /** The server-rendered page header, the page's only header. */
+  seoSummary?: ReactNode;
+  /**
+   * How many uses the header's server snapshot counted (`null` when it could
+   * not read them). An empty list under a non-zero snapshot is a read that
+   * failed, not an empty record.
+   */
+  snapshotCount?: number | null;
+  /** The page in the URL (`UsedRwlkNftsRoute`); without it the page is local. */
+  page?: number;
+  onPageChange?: (page: number) => void;
+}
+
 /**
  * The RandomWalk NFTs gestures have used, hung as works: each on its black
  * plate (RandomWalk renders share the Signatures' ratio and black ground),
  * linked to its page on the RandomWalk site, with the cycle, when, and the
  * participant whose gesture used it. Newest first, twelve a page.
- *
- * `seoSummary` is the server-rendered page header, the page's only header.
  */
-const UsedRwlkNftsPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
+const UsedRwlkNftsPage = ({
+  seoSummary,
+  snapshotCount = null,
+  page: controlledPage,
+  onPageChange,
+}: UsedRwlkNftsPageProps) => {
   const t = useTranslations('statistics');
   const { data, isLoading, isError, refetch } = useUsedRWLKNFTs();
   const records = useMemo(() => newestFirst(toUsedRwlkNftRecords(data ?? [])), [data]);
-  const [page, setPage] = useState(1);
+  const [localPage, setLocalPage] = useState(1);
   const wallRef = useRef<HTMLDivElement>(null);
   const pageCount = Math.max(1, Math.ceil(records.length / PAGE_SIZE));
-  const current = Math.min(page, pageCount);
+  const current = Math.min(controlledPage ?? localPage, pageCount);
   const visible = records.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
+  // The header counted uses a moment ago: an empty refresh failed.
+  const refreshFailed = !isLoading && records.length === 0 && (snapshotCount ?? 0) > 0;
 
   return (
     <PageShell variant="data" backdrop="signature">
@@ -100,7 +120,7 @@ const UsedRwlkNftsPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
         />
       )}
 
-      {isError ? (
+      {isError || refreshFailed ? (
         <ErrorState
           title={t('usedRwlkNfts.loadErrorTitle')}
           message={t('usedRwlkNfts.loadError')}
@@ -137,7 +157,8 @@ const UsedRwlkNftsPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
             pageSize={PAGE_SIZE}
             total={records.length}
             onPageChange={(next) => {
-              setPage(next);
+              if (onPageChange) onPageChange(next);
+              else setLocalPage(next);
               wallRef.current?.scrollIntoView?.({ block: 'start' });
             }}
             className="mt-10 border-t border-rule-faint pt-5 sm:pl-0"
@@ -218,6 +239,16 @@ function UsedRandomWalkCard({
       </p>
     </article>
   );
+}
+
+/**
+ * The page with its page number in the URL (`?page=2`), so Back from a cycle
+ * or a participant returns to the same plates. The route renders it under
+ * Suspense with the first page as the prerendered fallback.
+ */
+export function UsedRwlkNftsRoute(props: Omit<UsedRwlkNftsPageProps, 'page' | 'onPageChange'>) {
+  const { page, setPage } = useWallPage();
+  return <UsedRwlkNftsPage {...props} page={page} onPageChange={setPage} />;
 }
 
 export default UsedRwlkNftsPage;

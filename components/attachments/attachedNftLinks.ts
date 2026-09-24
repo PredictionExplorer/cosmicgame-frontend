@@ -40,6 +40,16 @@ export function getAttachedNftTokenId(
   return value === '' ? null : value;
 }
 
+/**
+ * Whether a metadata name already carries the token number ("Random Walk
+ * #004079" for token 4079), so a caption need not repeat it.
+ */
+export function nameCarriesTokenId(name: string, tokenId: string | null): boolean {
+  if (!name || !tokenId || !/^\d+$/.test(tokenId)) return false;
+  const digits = tokenId.replace(/^0+(?=\d)/, '');
+  return new RegExp(`(^|\\D)0*${digits}(\\D|$)`).test(name);
+}
+
 export function normalizeHttpUrl(value: unknown): string | null {
   if (typeof value !== 'string') return null;
   const trimmed = value.trim();
