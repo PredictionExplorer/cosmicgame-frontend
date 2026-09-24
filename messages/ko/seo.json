@@ -45,7 +45,8 @@
         },
         "cards": {
           "actions": {
-            "label": "앵커링 / 해제 작업"
+            "label": "앵커링 / 해제 작업",
+            "tooltip": "앵커링이 열린 뒤 Cosmic Signature NFT와 Random Walk NFT에서 이루어진 모든 앵커링과 해제입니다."
           },
           "ethDeposits": {
             "label": "ETH 앵커링 지급 적립 횟수",

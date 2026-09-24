@@ -75,8 +75,19 @@ jest.mock('../../../../services/api/tokens', () => ({
   get_used_rwlk_nfts: jest.fn(),
 }));
 // lexicon-allow-end
+/** The anchoring header's counts read the page's seeded client queries (AnchoringHeaderCount). */
+const mockAnchorLists: Record<'cstActions' | 'rwlkActions' | 'deposits' | 'imprints', unknown[]> = {
+  cstActions: [],
+  rwlkActions: [],
+  deposits: [],
+  imprints: [],
+};
 jest.mock('@/hooks/useApiQuery', () => ({
   useDashboardInfo: jest.fn(),
+  useCSTAnchorActions: () => ({ data: mockAnchorLists.cstActions, isLoading: false }),
+  useRWLKAnchorActions: () => ({ data: mockAnchorLists.rwlkActions, isLoading: false }),
+  useCSTAnchorDistributions: () => ({ data: mockAnchorLists.deposits, isLoading: false }),
+  useGlobalRWLKAnchorImprints: () => ({ data: mockAnchorLists.imprints, isLoading: false }),
 }));
 
 const mockGetDashboardInfo = get_dashboard_info as jest.MockedFunction<typeof get_dashboard_info>;
@@ -735,6 +746,11 @@ describe('server-rendered page headers', () => {
       mockRwalkImprints.mockResolvedValue(
         Array.from({ length: 20 }, () => ({})) as Rows<typeof get_staking_rwalk_mints_global>,
       );
+      // The page seeds its client queries from the same reads, and the counts render from them.
+      mockAnchorLists.cstActions = [{}];
+      mockAnchorLists.rwlkActions = [{}];
+      mockAnchorLists.deposits = [{}];
+      mockAnchorLists.imprints = Array.from({ length: 20 }, () => ({}));
 
       render(await PublicDataRouteSeoSummary({ route: 'anchoring' }));
 

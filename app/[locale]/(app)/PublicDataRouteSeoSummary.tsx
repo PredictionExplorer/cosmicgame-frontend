@@ -7,6 +7,7 @@ import { protocolFacts } from '@/content/protocol-facts';
 import { PageHeader, type PageHeaderFigure } from '@/components/layout/PageHeader';
 import type { PageSectionId } from '@/components/layout/pageSections';
 import { SnapshotStamp } from '@/components/layout/SnapshotStamp';
+import { AnchoringHeaderCount } from '@/components/anchoring/AnchoringHeaderCount';
 import { AddressChip } from '@/components/ui/address-chip';
 import { Amount } from '@/components/ui/amount';
 import { DateTime } from '@/components/ui/date-time';
@@ -297,24 +298,20 @@ async function getRouteFigures(route: SeoSummaryRoute, locale: string): Promise<
         readAnchorEthDeposits(),
         readAnchorStellarImprints(),
       ]);
+      // The counts render from the page's seeded client queries (anchoring/page.tsx), so a
+      // read that failed here is read again in the browser instead of cached as a dash.
       return {
         reads: [cstActions, rwalkActions, ethDeposits, stellarImprints],
         figures: [
-          {
-            key: 'actions',
-            value:
-              cstActions.data &&
-              rwalkActions.data &&
-              count(cstActions.data.length + rwalkActions.data.length),
-          },
+          { key: 'actions', value: <AnchoringHeaderCount metric="actions" />, hasTooltip: true },
           {
             key: 'ethDeposits',
-            value: ethDeposits.data && count(ethDeposits.data.length),
+            value: <AnchoringHeaderCount metric="ethDeposits" />,
             hasTooltip: true,
           },
           {
             key: 'stellarImprints',
-            value: stellarImprints.data && count(stellarImprints.data.length),
+            value: <AnchoringHeaderCount metric="stellarImprints" />,
             hasTooltip: true,
           },
         ],

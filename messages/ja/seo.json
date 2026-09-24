@@ -45,7 +45,8 @@
         },
         "cards": {
           "actions": {
-            "label": "係留 / 解除の操作"
+            "label": "係留 / 解除の操作",
+            "tooltip": "係留の開始以来、Cosmic Signature NFTとRandom Walk NFTで行われたすべての係留と解除です。"
           },
           "ethDeposits": {
             "label": "ETH係留配分の積立回数",
