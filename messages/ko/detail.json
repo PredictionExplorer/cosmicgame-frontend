@@ -3,9 +3,7 @@
     "title": "유효하지 않은 토큰 ID"
   },
   "jsonLd": {
-    "productName": "Cosmic Signature NFT #{id}",
-    "productDescription": "절차적 온체인 아트 프로토콜 Cosmic Signature가 삼체 문제 물리로 렌더링한 고유한 제너러티브 NFT입니다.",
-    "breadcrumbToken": "토큰 #{id}"
+    "productDescription": "절차적 온체인 아트 프로토콜 Cosmic Signature가 삼체 문제 물리로 렌더링한 고유한 제너러티브 NFT입니다."
   },
   "badges": {
     "stellarSelectionRecipient": "별빛 선정 수령자",

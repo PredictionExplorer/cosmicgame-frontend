@@ -1,3 +1,19 @@
+/** The part of the `traits` translator a Signature's title needs (server or client). */
+export type SignatureTitleTranslator = (key: 'quickView.title', values: { id: string }) => string;
+
+/**
+ * A Signature's title wherever the page names it: its name, or "Cosmic
+ * Signature #000025" for an unnamed one. The detail H1, its breadcrumb trail
+ * and its structured data (BreadcrumbList, Product) all use it, so the
+ * visible and structured names cannot drift apart.
+ */
+export function signatureTitle(
+  t: SignatureTitleTranslator,
+  { id, name }: { id: string; name?: string | null },
+): string {
+  return name?.trim() || t('quickView.title', { id });
+}
+
 /** The most a Cosmic Signature NFT name holds on-chain, in UTF-8 bytes. */
 export const NFT_NAME_MAX_BYTES = 32;
 

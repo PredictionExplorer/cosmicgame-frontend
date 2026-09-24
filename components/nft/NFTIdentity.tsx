@@ -11,6 +11,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { WallLabelMeta } from '@/components/ui/art-frame';
 
 import { NFTSpecList, type NFTSpecListProps } from './NFTMetadata';
+import { signatureTitle } from './nftName';
 import { useTraitLabels } from './traits/useTraitLabels';
 
 export interface NFTIdentityProps {
@@ -51,7 +52,7 @@ export function NFTIdentity({
   const tTraits = useTranslations('traits');
   const { valueLabel } = useTraitLabels();
   const id = formatId(tokenId);
-  const title = name ?? tTraits('quickView.title', { id });
+  const title = signatureTitle(tTraits, { id, name });
 
   return (
     <div

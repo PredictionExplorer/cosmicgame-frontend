@@ -3,9 +3,7 @@
     "title": "Mã token không hợp lệ"
   },
   "jsonLd": {
-    "productName": "Cosmic Signature NFT #{id}",
-    "productDescription": "Cosmic Signature NFT là tác phẩm tạo sinh độc nhất trên chuỗi, được tạo từ mô phỏng bài toán ba vật thể.",
-    "breadcrumbToken": "Token #{id}"
+    "productDescription": "Cosmic Signature NFT là tác phẩm tạo sinh độc nhất trên chuỗi, được tạo từ mô phỏng bài toán ba vật thể."
   },
   "badges": {
     "stellarSelectionRecipient": "Người nhận Tinh tuyển",

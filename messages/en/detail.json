@@ -3,9 +3,7 @@
     "title": "Invalid token ID"
   },
   "jsonLd": {
-    "productName": "Cosmic Signature NFT #{id}",
-    "productDescription": "Unique generative NFT from the Cosmic Signature procedural on-chain art protocol, rendered from three-body problem physics.",
-    "breadcrumbToken": "Token #{id}"
+    "productDescription": "Unique generative NFT from the Cosmic Signature procedural on-chain art protocol, rendered from three-body problem physics."
   },
   "badges": {
     "stellarSelectionRecipient": "Stellar Selection Recipient",

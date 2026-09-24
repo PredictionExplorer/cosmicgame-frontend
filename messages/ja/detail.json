@@ -3,9 +3,7 @@
     "title": "トークンIDが無効です"
   },
   "jsonLd": {
-    "productName": "Cosmic Signature NFT #{id}",
-    "productDescription": "Cosmic Signatureから生まれたジェネラティブNFT。三体問題の物理シミュレーションが、一点ごとに異なる軌跡を描きます。",
-    "breadcrumbToken": "トークン #{id}"
+    "productDescription": "Cosmic Signatureから生まれたジェネラティブNFT。三体問題の物理シミュレーションが、一点ごとに異なる軌跡を描きます。"
   },
   "badges": {
     "stellarSelectionRecipient": "星選の受領者",

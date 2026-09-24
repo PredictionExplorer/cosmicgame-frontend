@@ -3,9 +3,7 @@
     "title": "Недійсний ID токена"
   },
   "jsonLd": {
-    "productName": "Cosmic Signature NFT {id}",
-    "productDescription": "Унікальний генеративний NFT протоколу ончейн-мистецтва Cosmic Signature, створений за допомогою фізичної симуляції задачі трьох тіл.",
-    "breadcrumbToken": "Токен {id}"
+    "productDescription": "Унікальний генеративний NFT протоколу ончейн-мистецтва Cosmic Signature, створений за допомогою фізичної симуляції задачі трьох тіл."
   },
   "badges": {
     "stellarSelectionRecipient": "Отримувач зоряного відбору",

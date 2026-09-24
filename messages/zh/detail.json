@@ -3,9 +3,7 @@
     "title": "代币 ID 无效"
   },
   "jsonLd": {
-    "productName": "Cosmic Signature NFT #{id}",
-    "productDescription": "Cosmic Signature 的生成艺术 NFT，以三体物理模拟生成独一无二的图像。",
-    "breadcrumbToken": "代币 #{id}"
+    "productDescription": "Cosmic Signature 的生成艺术 NFT，以三体物理模拟生成独一无二的图像。"
   },
   "badges": {
     "stellarSelectionRecipient": "星选获配者",
