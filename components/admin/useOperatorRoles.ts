@@ -80,8 +80,10 @@ export function useProtocolOwner() {
 
 export interface OperatorRolesState {
   /**
-   * `loading` while a read is in flight, `error` when one failed (the roles
-   * listed come from the reads that succeeded), otherwise `ready`.
+   * `loading` until every read has answered, including a read still waiting
+   * for its contract address or client (a disabled query), so the real owner
+   * never sees "No on-chain role" first; `error` when one failed (the roles
+   * listed come from the reads that succeeded); otherwise `ready`.
    */
   status: 'loading' | 'ready' | 'error';
   /** The roles `account` holds, in `OPERATOR_ROLES` order. */
@@ -99,7 +101,8 @@ export function useOperatorRoles(account: string | null | undefined): OperatorRo
   if (sameAddress(account, outreach.data?.owner)) roles.push('outreachOwner');
   if (sameAddress(account, outreach.data?.treasurer)) roles.push('outreachTreasurer');
 
-  const status = reads.some((read) => read.isLoading)
+  // `isPending`: no answer yet, whether the read is in flight or not yet enabled.
+  const status = reads.some((read) => read.isPending)
     ? 'loading'
     : reads.some((read) => read.isError)
       ? 'error'

@@ -11,6 +11,8 @@ const TREASURER = '0x3333333333333333333333333333333333333333';
 const STRANGER = '0x4444444444444444444444444444444444444444';
 
 const mockReadContract = jest.fn();
+const mockPublicClient = { readContract: (...args: unknown[]) => mockReadContract(...args) };
+let mockClientReady = true;
 let mockWallet: { account: string | null; active: boolean } = { account: null, active: false };
 
 // Roles are read through React Query: use the real one, not the empty stub.
@@ -18,9 +20,7 @@ jest.mock('@tanstack/react-query', () => jest.requireActual('@tanstack/react-que
 
 jest.mock('wagmi', () => ({
   useConnection: () => ({ status: 'disconnected' }),
-  usePublicClient: () => ({
-    readContract: (...args: unknown[]) => mockReadContract(...args),
-  }),
+  usePublicClient: () => (mockClientReady ? mockPublicClient : undefined),
 }));
 
 jest.mock('../../../hooks/web3', () => ({
@@ -49,6 +49,7 @@ function setupRoles({ fail = false } = {}) {
 beforeEach(() => {
   jest.clearAllMocks();
   mockWallet = { account: null, active: false };
+  mockClientReady = true;
   setupRoles();
 });
 
@@ -113,6 +114,22 @@ describe('OperatorWalletStatus', () => {
     mockWallet = { account: STRANGER, active: true };
     render(<OperatorWalletStatus />);
     expect(await screen.findByText('No on-chain role')).toBeInTheDocument();
+  });
+
+  // A role read waiting for its client (a disabled query) once counted as answered,
+  // so the protocol owner saw "No on-chain role" before the roles loaded.
+  it('keeps the roles loading while a read cannot start yet, never claiming none', async () => {
+    mockWallet = { account: PROTOCOL_OWNER, active: true };
+    mockClientReady = false;
+    const { rerender } = render(<OperatorWalletStatus />);
+    expect(screen.queryByText('No on-chain role')).not.toBeInTheDocument();
+    expect(screen.getByTestId('operator-wallet').querySelector('.animate-pulse')).not.toBeNull();
+    expect(mockReadContract).not.toHaveBeenCalled();
+
+    mockClientReady = true;
+    rerender(<OperatorWalletStatus />);
+    const roles = await screen.findByRole('list', { name: 'On-chain roles of this wallet' });
+    expect(within(roles).getByText('Protocol owner')).toBeInTheDocument();
   });
 
   it('says the roles could not be read rather than claiming none', async () => {
