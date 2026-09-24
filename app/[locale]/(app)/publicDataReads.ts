@@ -17,6 +17,7 @@ import { get_marketing_rewards } from '@/services/api/marketing';
 import { get_claim_history, get_dashboard_info, get_round_list } from '@/services/api/rounds';
 import {
   COORDINATION_EVENTS_END_ID,
+  coordinationStartId,
   get_system_events,
   get_system_modelist,
 } from '@/services/api/system';
@@ -64,16 +65,6 @@ export const readPublicGoodsDeposits = timedRead(() => get_charity_cg_deposits()
 export const readVoluntaryPublicGoods = timedRead(() => get_charity_voluntary());
 export const readPublicGoodsRetrievals = timedRead(() => get_charity_withdrawals());
 export const readSystemModes = timedRead(() => get_system_modelist());
-
-/**
- * The first event-log id the coordination table lists: the latest system-mode
- * change, or 0 when none is indexed (the same rule as `get_coordination_events`
- * and the client table).
- */
-export function coordinationStartId(modes: readonly { EvtLogId?: unknown }[] | null): number {
-  const id = Number(modes?.[0]?.EvtLogId);
-  return Number.isFinite(id) ? id : 0;
-}
 
 /** The coordination events the /coordination-changes table lists. */
 export const readCoordinationEvents = cache(async () => {
