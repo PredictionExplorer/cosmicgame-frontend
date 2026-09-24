@@ -116,11 +116,14 @@ describe('MarketingRewards', () => {
     expect(screen.getByLabelText('Loading outreach allocations')).toBeInTheDocument();
   });
 
-  it('shows loading state when dashboard is loading', () => {
-    mockUseMarketingRewards.mockReturnValue({ data: [], isLoading: false });
+  it('holds the figures’ place while the dashboard loads, and shows the ledgers', () => {
+    mockUseMarketingRewards.mockReturnValue({ data: sampleRewards, isLoading: false });
     mockUseDashboardInfo.mockReturnValue({ data: null, isLoading: true });
     render(<MarketingRewards />);
-    expect(screen.getByLabelText('Loading outreach allocations')).toBeInTheDocument();
+    // Not "unavailable" figures while the read is still on its way.
+    expect(screen.queryByTestId('stats')).not.toBeInTheDocument();
+    expect(screen.getByTestId('leaderboard')).toHaveTextContent('Leaderboard: 2');
+    expect(screen.getByTestId('history')).toBeInTheDocument();
   });
 
   it('renders all sections when loaded', () => {
@@ -182,12 +185,17 @@ describe('MarketingRewards', () => {
     expect(stats).toHaveAttribute('data-marketers', '0');
   });
 
-  it('does not render sections while loading', () => {
+  it('renders what needs no data at once, and holds the rest in place while it loads', () => {
+    // The page used to wait behind one spinner until both reads landed.
     mockUseMarketingRewards.mockReturnValue({ data: [], isLoading: true });
     render(<MarketingRewards />);
 
-    expect(screen.queryByTestId('hero')).not.toBeInTheDocument();
+    expect(screen.getByTestId('hero')).toBeInTheDocument();
+    expect(screen.getByTestId('how-it-works')).toBeInTheDocument();
+    expect(screen.getByTestId('cta')).toBeInTheDocument();
     expect(screen.queryByTestId('stats')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('leaderboard')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('history')).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
