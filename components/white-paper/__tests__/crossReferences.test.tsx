@@ -45,6 +45,17 @@ describe('white paper cross-references', () => {
     ]);
   });
 
+  it('links a number held to its measure word by a no-break space', () => {
+    // The Chinese editions keep 第 5.2 节 on one line with U+00A0 before 节.
+    expect(splitReferences('见第 5.2\u00A0节和第 12、13\u00A0节。', 'zh', targets)).toEqual([
+      '见',
+      { text: '第 5.2\u00A0节', id: 'endurance-and-chrono' },
+      '和',
+      { text: '第 12、13\u00A0节', id: targets.get('12') },
+      '。',
+    ]);
+  });
+
   it('leaves text without references, and unknown numbers, untouched', () => {
     expect(splitReferences('No references here.', 'en', targets)).toEqual(['No references here.']);
     expect(splitReferences('Section 99 does not exist.', 'en', targets)).toEqual([

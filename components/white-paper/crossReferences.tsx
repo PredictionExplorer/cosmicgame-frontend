@@ -14,33 +14,35 @@ import { pickByLocale, type LocaleRecord } from '@/i18n/locale';
  * paragraph never reads as a patchwork of linked and plain references; a
  * single section number; or an appendix letter. Japanese writes each end
  * of a range as its own reference (第3節から第5節), so both ends link.
+ * Spaces match any whitespace: the copy keeps a number with its measure word
+ * or noun by a no-break space (第 12 节, розділ 5).
  */
 const NUM = String.raw`\d+(?:\.\d+)?`;
 const REFERENCE_PATTERNS: LocaleRecord<RegExp> = {
   en: new RegExp(
-    String.raw`\bSections (${NUM}) (?:through|to|and) ${NUM}|\bSection (${NUM})|\bAppendix ([AB])\b`,
+    String.raw`\bSections\s(${NUM})\s(?:through|to|and)\s${NUM}|\bSection\s(${NUM})|\bAppendix\s([AB])\b`,
     'g',
   ),
   zh: new RegExp(
-    String.raw`第 ?(${NUM}) ?(?:至|、) ?${NUM} ?节|第 ?(${NUM}) ?节|附录 ?([AB])`,
+    String.raw`第\s?(${NUM})\s?(?:至|、)\s?${NUM}\s?节|第\s?(${NUM})\s?节|附录\s?([AB])`,
     'g',
   ),
   'zh-TW': new RegExp(
-    String.raw`第 ?(${NUM}) ?(?:至|、) ?${NUM} ?節|第 ?(${NUM}) ?節|附錄 ?([AB])`,
+    String.raw`第\s?(${NUM})\s?(?:至|、)\s?${NUM}\s?節|第\s?(${NUM})\s?節|附錄\s?([AB])`,
     'g',
   ),
   'zh-HK': new RegExp(
-    String.raw`第 ?(${NUM}) ?(?:至|、) ?${NUM} ?節|第 ?(${NUM}) ?節|附錄 ?([AB])`,
+    String.raw`第\s?(${NUM})\s?(?:至|、)\s?${NUM}\s?節|第\s?(${NUM})\s?節|附錄\s?([AB])`,
     'g',
   ),
   uk: new RegExp(
-    String.raw`[Рр]озділ(?:и|ах) (${NUM})(?:–| і | та )${NUM}|[Рр]озділ(?:і|у|а)? (${NUM})|[Дд]одат(?:ок|ку|ка) ([AB])`,
+    String.raw`[Рр]озділ(?:и|ах)\s(${NUM})(?:–|\sі\s|\sта\s)${NUM}|[Рр]озділ(?:і|у|а)?\s(${NUM})|[Дд]одат(?:ок|ку|ка)\s([AB])`,
     'g',
   ),
-  ko: new RegExp(String.raw`(${NUM})~${NUM}절|(${NUM})절|부록 ?([AB])`, 'g'),
+  ko: new RegExp(String.raw`(${NUM})~${NUM}절|(${NUM})절|부록\s?([AB])`, 'g'),
   ja: new RegExp(String.raw`第(${NUM})節|付録([AB])`, 'g'),
   vi: new RegExp(
-    String.raw`[Cc]ác mục (${NUM}) (?:đến|và) ${NUM}|Mục (${NUM})(?! (?:và|đến) \d)|Phụ lục ([AB])`,
+    String.raw`[Cc]ác\smục\s(${NUM})\s(?:đến|và)\s${NUM}|Mục\s(${NUM})(?!\s(?:và|đến)\s\d)|Phụ\slục\s([AB])`,
     'g',
   ),
 };
