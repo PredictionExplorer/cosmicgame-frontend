@@ -280,8 +280,8 @@ test.describe('zh Sprint 5 — statistics, tables, and formatting', () => {
     );
     const label = page.getByText('周期总数', { exact: true }).first();
     const tooltipTrigger = label
-      .locator('xpath=ancestor::*[.//button][1]')
-      .locator('button')
+      .locator('xpath=ancestor::*[.//button or .//*[@role="button"]][1]')
+      .locator('button, [role="button"]')
       .first();
     await tooltipTrigger.scrollIntoViewIfNeeded();
     await openTooltip(tooltipTrigger);

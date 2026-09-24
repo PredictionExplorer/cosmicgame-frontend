@@ -2,9 +2,10 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Gem, Lock, Tag, Trophy } from 'lucide-react';
+import { Gem, Lock, Tag } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
+import { CycleIcon } from '@/lib/conceptIcons';
 import { cn } from '@/lib/utils';
 import { toIntlLocale } from '@/utils/format';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -73,7 +74,7 @@ const statCards: {
   {
     key: 'rounds',
     labelKey: 'hero.cycles.label',
-    icon: Trophy,
+    icon: CycleIcon,
     tooltipKey: 'hero.cycles.tooltip',
   },
 ];

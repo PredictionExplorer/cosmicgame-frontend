@@ -3,23 +3,18 @@
 import type { ReactNode } from 'react';
 import { useState, useMemo } from 'react';
 import { zeroAddress } from 'viem';
-import {
-  ArrowLeft,
-  ArrowRight,
-  Hash,
-  Trophy,
-  Shuffle,
-  Heart,
-  Coins,
-  ImageIcon,
-  Radio,
-  Zap,
-} from 'lucide-react';
+import { ArrowLeft, ArrowRight, Hash, ImageIcon, Radio, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { getEnduranceChampions, formatEthValue } from '@/utils';
 
+import {
+  ContributionIcon,
+  CycleReserveIcon,
+  PublicGoodsIcon,
+  StellarSelectionIcon,
+} from '@/lib/conceptIcons';
 import { Link } from '@/i18n/navigation';
 import { PageShell } from '@/components/ui/page-shell';
 import { StatCard } from '@/components/ui/stat-card';
@@ -309,14 +304,14 @@ const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
         <StatCard
           label={t('stats.cycleReserve.label')}
           value={formatEthValue(data.PrizeAmountEth ?? 0, locale)}
-          icon={<Trophy className="h-4 w-4" />}
+          icon={<CycleReserveIcon className="h-4 w-4" />}
           tooltip={t('stats.cycleReserve.tooltip')}
           gradient
         />
         <StatCard
           label={t('stats.stellarSelectionPool.label')}
           value={formatEthValue(data.RaffleAmountEth ?? 0, locale)}
-          icon={<Shuffle className="h-4 w-4" />}
+          icon={<StellarSelectionIcon className="h-4 w-4" />}
           tooltip={t('stats.stellarSelectionPool.tooltip', {
             count: data.NumRaffleEthWinnersBidding ?? 0,
           })}
@@ -324,13 +319,13 @@ const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
         <StatCard
           label={t('stats.publicGoods.label')}
           value={formatEthValue(charityAmount, locale)}
-          icon={<Heart className="h-4 w-4" />}
+          icon={<PublicGoodsIcon className="h-4 w-4" />}
           tooltip={t('stats.publicGoods.tooltip', { percent: data.CharityPercentage ?? 0 })}
         />
         <StatCard
           label={t('stats.contributedEth.label')}
           value={formatEthValue(data.CurRoundStats?.TotalDonatedAmountEth ?? 0, locale)}
-          icon={<Coins className="h-4 w-4" />}
+          icon={<ContributionIcon className="h-4 w-4" />}
           tooltip={t('stats.contributedEth.tooltip')}
         />
         <StatCard

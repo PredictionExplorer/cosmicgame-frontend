@@ -46,9 +46,27 @@ describe('StatisticsHubPanel', () => {
   it('renders headline stat cards from the dashboard', () => {
     render(<StatisticsHubPanel />);
     expect(screen.getByText('Total Cycles')).toBeInTheDocument();
-    expect(screen.getByText('Allocations Distributed', { selector: 'p' })).toBeInTheDocument();
+    // The StatCard label is a Term (the card has a tooltip); the economy row
+    // of the same name further down the panel has its own explanation.
+    const [headline] = screen.getAllByRole('button', {
+      name: 'More information about Allocations Distributed',
+    });
+    expect(headline).toHaveTextContent('Allocations Distributed');
     expect(screen.getByText('Contract Balance')).toBeInTheDocument();
     expect(screen.getByText('36.1595 ETH')).toBeInTheDocument();
+  });
+
+  it('gives each headline figure its own pictogram', () => {
+    render(<StatisticsHubPanel />);
+    // Allocations Distributed and NFTs Imprinted sit side by side: one
+    // concept, one glyph, and never the same glyph for two concepts.
+    const headline = screen.getByTestId('statistics-hub').firstElementChild;
+    const glyphs = [...(headline?.querySelectorAll('svg') ?? [])].map(
+      (svg) => [...svg.classList].find((name) => name.startsWith('lucide-')) ?? '',
+    );
+    expect(glyphs).toHaveLength(4);
+    expect(new Set(glyphs).size).toBe(glyphs.length);
+    expect(glyphs).toEqual(expect.arrayContaining(['lucide-layers', 'lucide-stamp']));
   });
 
   it('renders an explore card linking to every section page', () => {

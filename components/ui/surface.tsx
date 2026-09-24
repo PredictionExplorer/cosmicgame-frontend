@@ -5,36 +5,57 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 /**
- * Surface — the single visual container primitive.
+ * Surface — the single container primitive.
  *
- * Consolidates the ~80 inline `rounded-xl border border-white/[0.06]
- * bg-white/[0.02]` instances and the `.gradient-border-card` CSS into one
- * typed component. Card, StatCard, table containers, empty/error states,
- * dialog bodies, etc. all compose from this.
+ * Four roles (Black Plate direction: at most one bordered level per region;
+ * group inside it with space, a --rule-faint hairline or a sunken well):
+ *
+ *   plain     no box at all
+ *   quiet     --surface fill, no border: the one control group of a view
+ *   outlined  a 1px --rule on a faint surface: link cards, index rows, panels
+ *   raised    --surface-raised with the float shadow: layers over content
+ *
+ * The earlier variants stay as aliases so existing call sites render on the
+ * token ladder instead of white alpha fills, which turned the warm and teal
+ * palettes grey: `glass` and `solid` read as outlined, `glass-bordered` as
+ * outlined with the stronger rule, `elevated` as raised, and the tinted
+ * `aurora`/`nebula`/`solar`/`impact` as outlined (colour belongs to the art
+ * and to live state). Card is outlined.
  */
-
 const surfaceVariants = cva('relative min-w-0 overflow-hidden text-card-foreground', {
   variants: {
     variant: {
-      glass: 'border border-white/[0.10] bg-white/[0.03]',
-      'glass-bordered': 'border border-white/[0.16] bg-white/[0.04]',
-      solid: 'border border-border bg-card',
-      'gradient-border': 'gradient-border-card bg-card',
-      'gradient-border-accent': 'gradient-border-card gradient-border-card-accent bg-card',
-      elevated: 'border border-border bg-card shadow-[var(--elevation-3)]',
-      aurora: 'border border-[rgb(var(--aurora-cyan-rgb)/0.18)] bg-card',
-      nebula: 'border border-secondary/20 bg-card',
-      solar: 'border border-[rgb(var(--solar-gold-rgb)/0.20)] bg-card',
-      impact: 'border border-[rgb(var(--impact-green-rgb)/0.20)] bg-card',
       plain: '',
+      quiet: 'bg-surface',
+      outlined: 'border border-rule-faint bg-surface/60',
+      raised: 'border border-rule bg-surface-raised shadow-float',
+      /** @deprecated Use `outlined`. */
+      glass: 'border border-rule-faint bg-surface/60',
+      /** @deprecated Use `outlined`. */
+      'glass-bordered': 'border border-rule bg-surface/60',
+      /** @deprecated Use `outlined` or `quiet`. */
+      solid: 'border border-rule bg-surface',
+      /** The signature ring, for the one emphasised card of a region. */
+      'gradient-border': 'gradient-border-card bg-surface',
+      'gradient-border-accent': 'gradient-border-card gradient-border-card-accent bg-surface',
+      /** @deprecated Use `raised`. */
+      elevated: 'border border-rule bg-surface-raised shadow-float',
+      /** @deprecated Use `outlined`. */
+      aurora: 'border border-rule-faint bg-surface/60',
+      /** @deprecated Use `outlined`. */
+      nebula: 'border border-rule-faint bg-surface/60',
+      /** @deprecated Use `outlined`. */
+      solar: 'border border-rule-faint bg-surface/60',
+      /** @deprecated Use `outlined`. */
+      impact: 'border border-rule-faint bg-surface/60',
     },
     radius: {
       none: 'rounded-none',
-      sm: 'rounded-md',
-      md: 'rounded-[var(--radius-card)]',
-      lg: 'rounded-[var(--radius-surface)]',
-      xl: 'rounded-[var(--radius-hero)]',
-      pill: 'rounded-full',
+      sm: 'rounded-control',
+      md: 'rounded-surface',
+      lg: 'rounded-surface',
+      xl: 'rounded-surface',
+      pill: 'rounded-pill',
     },
     padding: {
       none: '',
@@ -44,12 +65,12 @@ const surfaceVariants = cva('relative min-w-0 overflow-hidden text-card-foregrou
       xl: 'p-8',
     },
     interactive: {
-      true: 'transition-colors duration-[var(--duration-fast)] hover:border-secondary/30 hover:bg-white/[0.05] focus-within:border-secondary/30',
+      true: 'transition-colors duration-[var(--duration-fast)] ease-[var(--ease-out-soft)] hover:border-rule hover:bg-surface focus-within:border-rule',
       false: '',
     },
   },
   defaultVariants: {
-    variant: 'glass',
+    variant: 'outlined',
     radius: 'md',
     padding: 'none',
     interactive: false,

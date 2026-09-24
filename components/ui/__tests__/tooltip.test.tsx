@@ -1,11 +1,12 @@
 import '@testing-library/jest-dom';
 
 import type { MouseEvent, ReactNode } from 'react';
+import userEvent from '@testing-library/user-event';
 
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-import { render, screen, fireEvent } from '@/test-utils';
+import { render, screen, fireEvent, waitFor } from '@/test-utils';
 
 function renderTooltip(trigger: ReactNode, content = 'Helpful tooltip') {
   return render(
@@ -179,12 +180,23 @@ describe('Tooltip', () => {
 });
 
 describe('InfoTooltip', () => {
-  it('uses an accessible button trigger by default', () => {
-    render(<InfoTooltip content="Extra context" />);
+  it('names the button by the label it explains and describes it with the full text', () => {
+    render(<InfoTooltip content="Extra context" label="Total Cycles" />);
 
-    expect(
-      screen.getByRole('button', { name: 'More information: Extra context' }),
-    ).toBeInTheDocument();
+    const trigger = screen.getByRole('button', { name: 'More information about Total Cycles' });
+    expect(trigger).toHaveAccessibleDescription('Extra context');
+  });
+
+  it('never truncates the explanation into the accessible name', () => {
+    const longContent =
+      'This explanation is intentionally extremely long so that a derived accessible name would need truncation to stay readable.';
+    render(<InfoTooltip content={longContent} />);
+
+    const trigger = screen.getByRole('button', { name: 'More information' });
+    // aria-describedby, not the ARIA 1.3 aria-description some browsers and
+    // screen readers do not expose: the text is always announced.
+    expect(trigger).toHaveAccessibleDescription(longContent);
+    expect(trigger).not.toHaveAttribute('aria-description');
   });
 
   it('allows callers to customize the trigger label', () => {
@@ -193,52 +205,23 @@ describe('InfoTooltip', () => {
     expect(screen.getByRole('button', { name: 'Explain cycle timing' })).toBeInTheDocument();
   });
 
-  it('derives a contextual trigger label from the related metric label', () => {
-    render(<InfoTooltip content="Extra context" label="Total Cycles" />);
+  it('is a 24px button at every width, with a 44px hit area on coarse pointers', () => {
+    render(<InfoTooltip content="Extra context" label="Total Cycles" className="ml-1.5" />);
 
-    expect(
-      screen.getByRole('button', { name: 'More information about Total Cycles' }),
-    ).toBeInTheDocument();
-  });
-
-  it('derives unique trigger labels from content so duplicate generic names cannot occur', () => {
-    render(
-      <>
-        <InfoTooltip content="First metric explanation" />
-        <InfoTooltip content="Second metric explanation" />
-      </>,
-    );
-
-    expect(
-      screen.getByRole('button', { name: 'More information: First metric explanation' }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: 'More information: Second metric explanation' }),
-    ).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Show more information' })).not.toBeInTheDocument();
-  });
-
-  it('truncates very long content when deriving the default trigger label', () => {
-    const longContent =
-      'This explanation is intentionally extremely long so that the accessible name needs truncation to stay readable for screen reader users.';
-    render(<InfoTooltip content={longContent} />);
-
-    const trigger = screen.getByRole('button', { name: /^More information: This explanation/ });
-    const ariaLabel = trigger.getAttribute('aria-label')!;
-    expect(ariaLabel.endsWith('...')).toBe(true);
-    expect(ariaLabel.length).toBeLessThanOrEqual('More information: '.length + 72);
+    const trigger = screen.getByRole('button', { name: 'More information about Total Cycles' });
+    // The button's own box is 24px, which is what automated audits measure;
+    // the 16px icon beside it keeps the row's layout and the caller's margin.
+    expect(trigger).toHaveClass('size-6', 'pointer-coarse:after:size-11');
+    expect(trigger.className).not.toMatch(/sm:after:hidden/);
+    const wrapper = trigger.closest('[data-slot="info-tooltip"]');
+    expect(wrapper).toHaveClass('text-subtle', 'ml-1.5');
+    expect(wrapper?.querySelector('svg')).toHaveClass('size-4');
   });
 
   it('opens from the accessible button on touch', async () => {
-    render(
-      <TooltipProvider delayDuration={0}>
-        <InfoTooltip content="Mobile users can read this help text." />
-      </TooltipProvider>,
-    );
+    render(<InfoTooltip content="Mobile users can read this help text." label="Help" />);
 
-    const trigger = screen.getByRole('button', {
-      name: 'More information: Mobile users can read this help text.',
-    });
+    const trigger = screen.getByRole('button', { name: 'More information about Help' });
     touchPointerDown(trigger);
     fireEvent.click(trigger);
 
@@ -247,63 +230,65 @@ describe('InfoTooltip', () => {
     );
   });
 
-  it('inherits timing from a shared root provider instead of mounting its own provider', async () => {
-    render(
-      <TooltipProvider delayDuration={0} skipDelayDuration={0}>
-        <InfoTooltip content="Shared provider tooltip A" ariaLabel="Open A" />
-        <InfoTooltip content="Shared provider tooltip B" ariaLabel="Open B" />
-      </TooltipProvider>,
-    );
+  it('opens on hover, stays open while pointed at, and closes after the pointer leaves', async () => {
+    const user = userEvent.setup();
+    render(<InfoTooltip content="Hover explanation" label="Hovered" />);
 
-    const triggerA = screen.getByRole('button', { name: 'Open A' });
-    touchPointerDown(triggerA);
-    fireEvent.click(triggerA);
-    expect(await screen.findByRole('tooltip')).toHaveTextContent('Shared provider tooltip A');
+    const trigger = screen.getByRole('button', { name: 'More information about Hovered' });
+    await user.hover(trigger);
+    const tooltip = await screen.findByRole('tooltip');
+    expect(tooltip).toHaveTextContent('Hover explanation');
 
-    fireEvent.keyDown(document, { key: 'Escape' });
-    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
-
-    const triggerB = screen.getByRole('button', { name: 'Open B' });
-    touchPointerDown(triggerB);
-    fireEvent.click(triggerB);
-    expect(await screen.findByRole('tooltip')).toHaveTextContent('Shared provider tooltip B');
+    await user.unhover(trigger);
+    await waitFor(() => expect(screen.queryByRole('tooltip')).not.toBeInTheDocument());
   });
 
-  it('uses the widened default max width for readable long-form content', async () => {
+  it('toggles on a second press and closes on Escape without moving focus', async () => {
+    const user = userEvent.setup();
+    render(<InfoTooltip content="Pinned explanation" label="Pinned" />);
+
+    const trigger = screen.getByRole('button', { name: 'More information about Pinned' });
+    await user.click(trigger);
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Pinned explanation');
+    expect(trigger).toHaveFocus();
+
+    await user.click(trigger);
+    await waitFor(() => expect(screen.queryByRole('tooltip')).not.toBeInTheDocument());
+
+    await user.click(trigger);
+    expect(await screen.findByRole('tooltip')).toBeInTheDocument();
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('tooltip')).not.toBeInTheDocument());
+    expect(trigger).toHaveFocus();
+  });
+
+  it('caps the card at the requested width for a readable line length', async () => {
     render(
-      <TooltipProvider delayDuration={0}>
-        <InfoTooltip content="This is long-form tooltip content that should have a readable default line length." />
-      </TooltipProvider>,
+      <InfoTooltip content="This is long-form tooltip content with a readable line length." />,
     );
 
-    const trigger = screen.getByRole('button', {
-      name: /^More information: This is long-form tooltip content/,
-    });
+    const trigger = screen.getByRole('button', { name: 'More information' });
     touchPointerDown(trigger);
     fireEvent.click(trigger);
 
-    const [tooltipCopy] = await screen.findAllByText(/long-form tooltip content/);
-    expect(tooltipCopy).toHaveStyle({
-      maxWidth: '280px',
-    });
+    const tooltip = await screen.findByRole('tooltip');
+    expect(tooltip.style.maxWidth).toContain('280px');
   });
 
   it('renders open content even when the trigger sits in an overflow:hidden ancestor', async () => {
-    render(
-      <TooltipProvider delayDuration={0}>
-        <div style={{ overflow: 'hidden', width: 80, height: 20 }}>
-          <InfoTooltip content="Escapes clipped ancestor" />
-        </div>
-      </TooltipProvider>,
+    const { container } = render(
+      <div style={{ overflow: 'hidden', width: 80, height: 20 }}>
+        <InfoTooltip content="Escapes clipped ancestor" />
+      </div>,
     );
 
-    const trigger = screen.getByRole('button', {
-      name: 'More information: Escapes clipped ancestor',
-    });
+    const trigger = screen.getByRole('button', { name: 'More information' });
     touchPointerDown(trigger);
     fireEvent.click(trigger);
 
-    expect(await screen.findByRole('tooltip')).toHaveTextContent('Escapes clipped ancestor');
+    const tooltip = await screen.findByRole('tooltip');
+    expect(tooltip).toHaveTextContent('Escapes clipped ancestor');
+    expect(container.contains(tooltip)).toBe(false);
   });
 });
 

@@ -200,7 +200,10 @@ describe('FAQCategorySection', () => {
       </p>,
     );
 
-    expect(document.body).toHaveTextContent('坚守冠军由坚守冠军规则确定。');
+    // The definition is in the DOM only as the trigger's hidden description.
+    const visible = document.body.cloneNode(true) as HTMLElement;
+    visible.querySelectorAll('[hidden]').forEach((node) => node.remove());
+    expect(visible).toHaveTextContent('坚守冠军由坚守冠军规则确定。');
     expect(screen.getAllByRole('button', { name: /^More information/ })).toHaveLength(1);
   });
 

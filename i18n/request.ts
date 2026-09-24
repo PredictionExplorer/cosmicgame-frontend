@@ -26,6 +26,7 @@ export const NAMESPACES = [
   'forms',
   'gallery',
   'gesture',
+  'glossary',
   'home',
   'imprint',
   'landing',

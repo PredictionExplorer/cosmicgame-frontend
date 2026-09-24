@@ -99,7 +99,7 @@ function tooltipTriggerForLabel(page: Page, label: string): Locator {
     .getByText(label, { exact: true })
     .first()
     .locator('xpath=..')
-    .locator('button[aria-label^="More information"]')
+    .locator(':is(button, [role="button"])[aria-label^="More information"]')
     .first();
 }
 
@@ -205,7 +205,7 @@ test.describe('/contracts tooltips', () => {
     // Bound the test by counting triggers on the page. We loop a max of N to
     // keep the test from running forever if the page grows; we just want a
     // sanity-check that no trigger silently fails to open.
-    const triggers = page.locator('button[aria-label^="More information"]');
+    const triggers = page.locator(':is(button, [role="button"])[aria-label^="More information"]');
     const count = await triggers.count();
     expect(count, 'expected at least one tooltip trigger on /contracts').toBeGreaterThan(0);
 

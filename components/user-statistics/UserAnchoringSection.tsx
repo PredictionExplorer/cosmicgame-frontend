@@ -1,8 +1,9 @@
-import { Lock, Unlock, Coins, Gift, Layers } from 'lucide-react';
+import { Lock, Unlock, Coins, Layers } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { formatEthValue } from '@/utils';
 
+import { AnchorDistributionIcon, ImprintIcon } from '@/lib/conceptIcons';
 import type { AnchorAction, AnchorDistributionImprint } from '@/services/api';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { StatCard } from '@/components/ui/stat-card';
@@ -135,7 +136,7 @@ export function UserAnchoringSection({
                 <StatCard
                   label={t('statistics.anchoring.stats.unretrievedDistributions.label')}
                   value={formatEthValue(unclaimedRewardEth, locale)}
-                  icon={<Gift className="h-3.5 w-3.5" />}
+                  icon={<AnchorDistributionIcon className="h-3.5 w-3.5" />}
                   tooltip={t('statistics.anchoring.stats.unretrievedDistributions.tooltip')}
                   featured={unclaimedRewardEth > 0}
                   gradient={unclaimedRewardEth > 0}
@@ -210,7 +211,7 @@ export function UserAnchoringSection({
                 <StatCard
                   label={t('statistics.anchoring.stats.nftsImprinted.label')}
                   value={(rwlkStats?.TotalTokensMinted ?? 0).toLocaleString(locale)}
-                  icon={<Gift className="h-3.5 w-3.5" />}
+                  icon={<ImprintIcon className="h-3.5 w-3.5" />}
                   tooltip={t('statistics.anchoring.stats.nftsImprinted.tooltip')}
                 />
               </div>

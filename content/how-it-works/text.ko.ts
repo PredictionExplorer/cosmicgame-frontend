@@ -180,9 +180,9 @@ export const howItWorksTextKo = {
           'Random Walk NFT 하나는 할인에 한 번만 쓸 수 있습니다. 비용이 높은 제스처에 아껴 쓰면 효과가 가장 큽니다.',
       },
       {
-        title: '별빛 선정 자격 쌓기',
+        title: '제스처 한 번에 별빛 선정 자격 한 건',
         description:
-          '제스처마다 별빛 선정 자격이 한 건씩 기록됩니다. 제스처가 많을수록 선정 빈도가 높아집니다.',
+          'ETH 제스처와 CST 제스처 모두 한 번마다 사이클 마감 시 진행되는 별빛 선정 자격이 한 건씩 기록됩니다.',
         tooltip: `ETH 별빛 선정 수령자 세 명이 사이클 준비금의 ${protocolFacts.stellarSelectionEthPercentage}%를 나누어 받습니다. NFT 별빛 선정 수령자 열 명과 Random Walk NFT 앵커링 보유자 열 명은 각각 ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST와 Cosmic Signature NFT를 받습니다.`,
       },
       {

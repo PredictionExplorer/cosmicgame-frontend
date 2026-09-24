@@ -1,11 +1,12 @@
 'use client';
 
-import { ArrowUpRight, HeartHandshake, Vault } from 'lucide-react';
+import { ArrowUpRight, Vault } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { getLandingContent } from '@/content/landing';
 import { formatEthValue } from '@/utils';
 
+import { PublicGoodsIcon } from '@/lib/conceptIcons';
 import { Link } from '@/i18n/navigation';
 import type { DashboardInfo } from '@/services/api';
 import { StatCard } from '@/components/ui/stat-card';
@@ -169,7 +170,7 @@ export function PublicGoodsImpactCard({
           <StatCard
             label={t('publicGoods.stats.lifetime')}
             value={formatEthValue(lifetimeContributedEth, locale)}
-            icon={<HeartHandshake className="h-4 w-4" />}
+            icon={<PublicGoodsIcon className="h-4 w-4" />}
             accent="impact"
             tooltip={t('publicGoods.stats.lifetimeTooltip')}
           />

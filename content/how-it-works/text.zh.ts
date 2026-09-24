@@ -171,8 +171,8 @@ export const howItWorksTextZh = {
         tooltip: '每枚 Random Walk NFT 仅可用于一次价格减免。留到落笔价格较高时使用，效果更佳。',
       },
       {
-        title: '积累星选资格',
-        description: '每一笔都会计入一次星选资格；落笔越多，入选频次越高。',
+        title: '每一笔都计入星选',
+        description: '每一笔 ETH 或 CST 落笔，都会为周期收官时的星选记录一次资格。',
         tooltip: `3 位 ETH 星选获配者均分周期储备的 ${protocolFacts.stellarSelectionEthPercentage}%；10 位参与者 NFT 获配者与 10 位 Random Walk NFT 锚定者，每位获配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 与 1 枚 Cosmic Signature NFT。`,
       },
       {

@@ -5,36 +5,43 @@ import { Surface } from '@/components/ui/surface';
 import { render, screen, checkA11y } from '@/test-utils';
 
 describe('Surface', () => {
-  it('renders with default glass variant classes', () => {
+  it('renders the outlined role by default, on tokens rather than white alpha', () => {
     render(<Surface data-testid="s">body</Surface>);
     const el = screen.getByTestId('s');
-    expect(el).toHaveClass('border', 'bg-white/[0.03]');
+    expect(el).toHaveClass('border', 'border-rule-faint', 'rounded-surface');
+    expect(el.className).not.toMatch(/white\//);
   });
 
   it.each([
-    ['glass', 'bg-white/[0.03]'],
-    ['glass-bordered', 'bg-white/[0.04]'],
-    ['solid', 'bg-card'],
+    ['plain', null],
+    ['quiet', 'bg-surface'],
+    ['outlined', 'border-rule-faint'],
+    ['raised', 'shadow-float'],
+    ['glass', 'border-rule-faint'],
+    ['glass-bordered', 'border-rule'],
+    ['solid', 'bg-surface'],
     ['gradient-border', 'gradient-border-card'],
     ['gradient-border-accent', 'gradient-border-card-accent'],
-    ['elevated', 'shadow-[var(--elevation-3)]'],
-  ])('applies variant=%s classes', (variant, expected) => {
+    ['elevated', 'shadow-float'],
+    ['solar', 'border-rule-faint'],
+  ] as const)('applies variant=%s', (variant, expected) => {
     render(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      <Surface variant={variant as any} data-testid="s">
+      <Surface variant={variant} data-testid="s">
         body
       </Surface>,
     );
-    expect(screen.getByTestId('s')).toHaveClass(expected);
+    const el = screen.getByTestId('s');
+    if (expected) expect(el).toHaveClass(expected);
+    else expect(el).not.toHaveClass('border');
   });
 
-  it('applies radius variants', () => {
+  it('lands every radius on the four-value scale', () => {
     render(
-      <Surface radius="lg" data-testid="s">
+      <Surface radius="xl" data-testid="s">
         body
       </Surface>,
     );
-    expect(screen.getByTestId('s')).toHaveClass('rounded-[var(--radius-surface)]');
+    expect(screen.getByTestId('s')).toHaveClass('rounded-surface');
   });
 
   it('supports padding variants', () => {

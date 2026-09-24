@@ -2,23 +2,30 @@ import { cn } from '@/lib/utils';
 
 interface SectionDividerProps {
   title?: string;
+  /** The title's element; `h3` by default. Use `p` when the divider is not a heading. */
+  as?: 'h2' | 'h3' | 'h4' | 'p';
   className?: string;
 }
 
-export function SectionDivider({ title, className }: SectionDividerProps) {
+/**
+ * SectionDivider — a hairline between groups on one page, optionally with a
+ * centred kicker. It separates; it is not the section-heading tier (use
+ * `SectionHeader` for a titled section).
+ */
+export function SectionDivider({ title, as: Title = 'h3', className }: SectionDividerProps) {
   if (title) {
     return (
       <div className={cn('flex items-center gap-4 py-2', className)}>
-        <div className="h-px flex-1 bg-white/10" />
+        <div aria-hidden className="h-px flex-1 bg-rule-faint" />
         {/* A long divider title has to wrap on a phone; `nowrap` pushed it
             straight through the rules on either side. */}
-        <h3 className="min-w-0 break-words px-2 py-1 text-center type-eyebrow text-muted-foreground">
+        <Title className="min-w-0 break-words px-2 py-1 text-center type-eyebrow text-subtle">
           {title}
-        </h3>
-        <div className="h-px flex-1 bg-white/10" />
+        </Title>
+        <div aria-hidden className="h-px flex-1 bg-rule-faint" />
       </div>
     );
   }
 
-  return <div className={cn('h-px bg-white/10', className)} />;
+  return <div role="separator" className={cn('h-px bg-rule-faint', className)} />;
 }

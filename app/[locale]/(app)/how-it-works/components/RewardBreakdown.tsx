@@ -1,10 +1,11 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Coins, Ticket, ImageIcon, Trophy } from 'lucide-react';
+import { ImageIcon } from 'lucide-react';
 
 import type { HowItWorksContent } from '@/content/how-it-works';
 
+import { ImprintIcon, SignatureAllocationIcon, StellarSelectionIcon } from '@/lib/conceptIcons';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 
 const containerVariants = {
@@ -24,13 +25,13 @@ export function RewardBreakdown({
 }) {
   const rewards = [
     {
-      Icon: Coins,
+      Icon: ImprintIcon,
       accent: 'from-cyan-400/20 to-blue-500/20',
       iconColor: 'text-cyan-400',
       ...rewardBreakdown.items[0],
     },
     {
-      Icon: Ticket,
+      Icon: StellarSelectionIcon,
       accent: 'from-purple-400/20 to-pink-500/20',
       iconColor: 'text-purple-400',
       ...rewardBreakdown.items[1],
@@ -42,7 +43,7 @@ export function RewardBreakdown({
       ...rewardBreakdown.items[2],
     },
     {
-      Icon: Trophy,
+      Icon: SignatureAllocationIcon,
       accent: 'from-emerald-400/20 to-teal-500/20',
       iconColor: 'text-emerald-400',
       ...rewardBreakdown.items[3],

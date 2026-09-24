@@ -160,7 +160,9 @@ describe('AuctionParameters tooltips', () => {
     if (!row) {
       throw new Error(`Could not find tooltip row for label "${label}"`);
     }
-    const trigger = row.querySelector<HTMLElement>('button[aria-label^="More information"]');
+    const trigger = row.querySelector<HTMLElement>(
+      'button[aria-label^="More information"], [role="button"][aria-label^="More information"]',
+    );
     if (!trigger) {
       throw new Error(`Could not find tooltip trigger next to label "${label}"`);
     }
@@ -227,7 +229,7 @@ describe('AuctionParameters tooltips', () => {
     expect(durationLabels.length).toBeGreaterThanOrEqual(2);
     const cstDurationRow = durationLabels[0]!.parentElement!;
     const cstDurationTrigger = cstDurationRow.querySelector<HTMLElement>(
-      'button[aria-label^="More information"]',
+      'button[aria-label^="More information"], [role="button"][aria-label^="More information"]',
     )!;
     const event = new MouseEvent('pointerdown', { bubbles: true, cancelable: true });
     Object.defineProperty(event, 'pointerType', { value: 'touch' });

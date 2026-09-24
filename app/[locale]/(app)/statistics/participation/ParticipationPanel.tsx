@@ -1,11 +1,12 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Award, Gift, TrendingUp, Users } from 'lucide-react';
+import { TrendingUp, Users } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { formatGroupedNumber } from '@/utils';
 
+import { ContributionIcon, RecipientIcon } from '@/lib/conceptIcons';
 import { countActiveAnchorHolders } from '@/utils/anchoringStats';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import {
@@ -79,14 +80,14 @@ const ParticipationPanel = () => {
         <StatCard
           label={t('metrics.uniqueRecipients.label')}
           value={count(mainStats?.NumUniqueWinners)}
-          icon={<Award className="h-4 w-4" />}
+          icon={<RecipientIcon className="h-4 w-4" />}
           tooltip={t('metrics.uniqueRecipients.tooltip')}
           loading={dashboardLoading}
         />
         <StatCard
           label={t('metrics.uniqueEthContributors.label')}
           value={count(mainStats?.NumUniqueDonors)}
-          icon={<Gift className="h-4 w-4" />}
+          icon={<ContributionIcon className="h-4 w-4" />}
           tooltip={t('metrics.uniqueEthContributors.tooltip')}
           loading={dashboardLoading}
         />
@@ -117,7 +118,7 @@ const ParticipationPanel = () => {
         <StatsSection
           title={t('participation.sections.recipients')}
           tooltip={t('sectionTooltips.uniqueRecipients')}
-          icon={<Award className="h-3.5 w-3.5" />}
+          icon={<RecipientIcon className="h-3.5 w-3.5" />}
           isLoading={recipientsQuery.isLoading}
           isError={recipientsQuery.isError}
           onRetry={() => recipientsQuery.refetch()}
@@ -131,7 +132,7 @@ const ParticipationPanel = () => {
         <StatsSection
           title={t('participation.sections.contributors')}
           tooltip={t('sectionTooltips.uniqueEthContributors')}
-          icon={<Gift className="h-3.5 w-3.5" />}
+          icon={<ContributionIcon className="h-3.5 w-3.5" />}
           isLoading={donorsQuery.isLoading}
           isError={donorsQuery.isError}
           onRetry={() => donorsQuery.refetch()}

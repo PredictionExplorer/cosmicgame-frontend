@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { Layers, TrendingUp, Gift } from 'lucide-react';
+import { Layers, TrendingUp } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
+import { AnchorDistributionIcon } from '@/lib/conceptIcons';
 import { PageShell } from '@/components/ui/page-shell';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -92,7 +93,7 @@ const MyAnchors = () => {
         label: t('anchors.stats.unretrieved.label'),
         value: unclaimedRewardEth > 0 ? `${unclaimedRewardEth.toFixed(4)} ETH` : '0 ETH',
         tooltip: t('anchors.stats.unretrieved.tooltip'),
-        icon: <Gift className="h-4 w-4" />,
+        icon: <AnchorDistributionIcon className="h-4 w-4" />,
         featured: true,
         gradient: true,
       },

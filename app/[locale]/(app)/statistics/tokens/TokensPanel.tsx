@@ -1,8 +1,9 @@
 'use client';
 
-import { Coins, Gift, Layers, TrendingUp, Users } from 'lucide-react';
+import { Coins, Layers, TrendingUp, Users } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
+import { AttachedAssetsIcon } from '@/lib/conceptIcons';
 import {
   useCSTDistribution,
   useCTBalancesDistribution,
@@ -52,7 +53,7 @@ const TokensPanel = () => {
         <StatCard
           label={t('metrics.attachedNfts.label')}
           value={Number(dashboardData?.NumDonatedNFTs ?? 0)}
-          icon={<Gift className="h-4 w-4" />}
+          icon={<AttachedAssetsIcon className="h-4 w-4" />}
           tooltip={t('metrics.attachedNfts.tooltip')}
           loading={dashboardLoading}
           featured
@@ -102,7 +103,7 @@ const TokensPanel = () => {
         <StatsSection
           title={t('tokens.sections.attachedDistribution')}
           tooltip={t('sectionTooltips.attachedTokenDistribution')}
-          icon={<Gift className="h-3.5 w-3.5" />}
+          icon={<AttachedAssetsIcon className="h-3.5 w-3.5" />}
           defaultOpen={false}
           lazy
           isLoading={dashboardLoading}

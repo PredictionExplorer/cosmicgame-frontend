@@ -1,6 +1,7 @@
-import { Gift, Coins } from 'lucide-react';
+import { Coins } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
+import { AttachedAssetsIcon } from '@/lib/conceptIcons';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -83,7 +84,7 @@ export function DonatedAssetsSection({
           <TableSkeleton />
         ) : allNFTs.length === 0 ? (
           <EmptyState
-            icon={<Gift className="h-8 w-8 text-muted-foreground/50" />}
+            icon={<AttachedAssetsIcon className="h-8 w-8 text-muted-foreground/50" />}
             title={t('statistics.donatedAssets.nfts.emptyTitle')}
             description={t('statistics.donatedAssets.nfts.emptyDescription')}
           />

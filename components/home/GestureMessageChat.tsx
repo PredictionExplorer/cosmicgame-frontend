@@ -7,14 +7,10 @@ import {
   CircleCheck,
   Clock3,
   Copy,
-  Crown,
-  Flag,
-  Hourglass,
   Info,
   MessageCircle,
   Radio,
   Sparkles,
-  Swords,
   TimerReset,
   Users,
   type LucideIcon,
@@ -44,6 +40,13 @@ import { useNow } from '@/hooks/useNow';
 import { cn } from '@/lib/utils';
 import { TOUCH_TARGET_ICON_CLASS, TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import type { GestureInfo } from '@/services/api';
+import {
+  CalibrationWindowIcon,
+  ChronoWarriorIcon,
+  CycleIcon,
+  EnduranceChampionIcon,
+  FinalCstGestureIcon,
+} from '@/lib/conceptIcons';
 
 import styles from './GestureMessageChat.module.css';
 
@@ -52,15 +55,15 @@ type EventTone = 'endurance' | 'chrono' | 'clock' | 'cycle' | 'calibration' | 'c
 // Text labels and icon silhouettes carry the same distinctions as the color.
 const EVENT_PRESENTATION = {
   cycleStart: { icon: Sparkles, tone: 'cycle' },
-  cycleOpen: { icon: Flag, tone: 'cycle' },
-  enduranceGrowing: { icon: Crown, tone: 'endurance' },
-  enduranceRecord: { icon: Crown, tone: 'endurance' },
-  chronoLead: { icon: Swords, tone: 'chrono' },
-  chronoReignEnded: { icon: Swords, tone: 'chrono' },
-  finalCstLeader: { icon: Flag, tone: 'cst' },
+  cycleOpen: { icon: CycleIcon, tone: 'cycle' },
+  enduranceGrowing: { icon: EnduranceChampionIcon, tone: 'endurance' },
+  enduranceRecord: { icon: EnduranceChampionIcon, tone: 'endurance' },
+  chronoLead: { icon: ChronoWarriorIcon, tone: 'chrono' },
+  chronoReignEnded: { icon: ChronoWarriorIcon, tone: 'chrono' },
+  finalCstLeader: { icon: FinalCstGestureIcon, tone: 'cst' },
   newParticipant: { icon: Users, tone: 'community' },
   gestureMilestone: { icon: Radio, tone: 'community' },
-  cstCalibrationReady: { icon: Hourglass, tone: 'calibration' },
+  cstCalibrationReady: { icon: CalibrationWindowIcon, tone: 'calibration' },
   finalWindow: { icon: Clock3, tone: 'clock' },
   clockExtended: { icon: TimerReset, tone: 'clock' },
   clockReopened: { icon: TimerReset, tone: 'clock' },

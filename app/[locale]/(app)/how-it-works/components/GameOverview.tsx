@@ -1,10 +1,10 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Gavel, Timer, Trophy } from 'lucide-react';
 
 import type { HowItWorksContent } from '@/content/how-it-works';
 
+import { FinalizationTimeIcon, GestureIcon, SignatureAllocationIcon } from '@/lib/conceptIcons';
 import { GradientText } from '@/components/styled';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 
@@ -20,9 +20,9 @@ const itemVariants = {
 
 export function GameOverview({ overview }: { overview: HowItWorksContent['overview'] }) {
   const cards = [
-    { Icon: Gavel, ...overview.cards[0] },
-    { Icon: Timer, ...overview.cards[1] },
-    { Icon: Trophy, ...overview.cards[2] },
+    { Icon: GestureIcon, ...overview.cards[0] },
+    { Icon: FinalizationTimeIcon, ...overview.cards[1] },
+    { Icon: SignatureAllocationIcon, ...overview.cards[2] },
   ];
 
   return (

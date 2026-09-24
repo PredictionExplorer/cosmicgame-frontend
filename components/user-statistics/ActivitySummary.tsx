@@ -1,10 +1,10 @@
 'use client';
 
-import { Gavel, Ticket, Layers } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { formatEthValue } from '@/utils';
 
+import { AnchoringIcon, GestureIcon, StellarSelectionIcon } from '@/lib/conceptIcons';
 import { cn } from '@/lib/utils';
 import { Card } from '@/components/ui/card';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
@@ -88,7 +88,7 @@ export function ActivitySummary({
         </h3>
         <div className="activity-overview-grid grid grid-cols-1 gap-6 sm:grid-cols-3 sm:divide-x sm:divide-white/[0.06] print:!block print:space-y-5 print:!divide-none">
           <StatGroup
-            icon={<Gavel className="h-3.5 w-3.5" />}
+            icon={<GestureIcon className="h-3.5 w-3.5" />}
             title={t('statistics.activity.groups.gestures')}
             stats={[
               {
@@ -104,7 +104,7 @@ export function ActivitySummary({
             ]}
           />
           <StatGroup
-            icon={<Ticket className="h-3.5 w-3.5" />}
+            icon={<StellarSelectionIcon className="h-3.5 w-3.5" />}
             title={t('statistics.activity.groups.stellarSelections')}
             className="sm:pl-6"
             stats={[
@@ -121,7 +121,7 @@ export function ActivitySummary({
             ]}
           />
           <StatGroup
-            icon={<Layers className="h-3.5 w-3.5" />}
+            icon={<AnchoringIcon className="h-3.5 w-3.5" />}
             title={t('statistics.activity.groups.anchoring')}
             className="sm:pl-6"
             stats={[

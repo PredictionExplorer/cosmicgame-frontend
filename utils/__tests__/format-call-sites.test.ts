@@ -52,7 +52,6 @@ const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
   'components/attachments/DonatedNFTPrizeShowcase.tsx': 2,
   'components/common/Allocation.tsx': 5,
   'components/common/ConnectWalletButton.tsx': 2,
-  'components/common/GestureStatus.tsx': 7,
   'components/home/AuctionInfo.tsx': 1,
   'components/home/deck/DeckPersonalStrip.tsx': 3,
   'components/home/experimental/Allocation.tsx': 5,

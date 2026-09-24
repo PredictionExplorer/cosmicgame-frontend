@@ -1,11 +1,12 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { Coins, Crown, Lock, MessageSquare, Swords, User, Zap } from 'lucide-react';
+import { Lock, MessageSquare, User, Zap } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { formatSeconds } from '@/utils';
 
+import { ChronoWarriorIcon, EnduranceChampionIcon, FinalCstGestureIcon } from '@/lib/conceptIcons';
 import { useHydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { useChampions, type ChampionsState } from '@/hooks/useChampions';
@@ -658,7 +659,7 @@ export const SpecialAllocationRecipients = ({
     {
       key: 'endurance',
       testId: 'endurance-champion',
-      icon: <Crown className="h-5 w-5" />,
+      icon: <EnduranceChampionIcon className="h-5 w-5" />,
       title: t('specialAllocation.enduranceChampion'),
       tooltip: t('specialAllocation.enduranceTooltip'),
       address: champions.endurance.address,
@@ -676,7 +677,7 @@ export const SpecialAllocationRecipients = ({
     {
       key: 'chrono',
       testId: 'chrono-warrior',
-      icon: <Swords className="h-5 w-5" />,
+      icon: <ChronoWarriorIcon className="h-5 w-5" />,
       title: t('specialAllocation.chronoWarrior'),
       tooltip: t('specialAllocation.chronoTooltip'),
       address: champions.chrono.address,
@@ -699,7 +700,7 @@ export const SpecialAllocationRecipients = ({
     {
       key: 'lastcst',
       testId: 'final-cst-gesture',
-      icon: <Coins className="h-5 w-5" />,
+      icon: <FinalCstGestureIcon className="h-5 w-5" />,
       title: t('specialAllocation.finalCstGesture'),
       tooltip: t('specialAllocation.finalCstTooltip'),
       address: champions.lastCst.address,

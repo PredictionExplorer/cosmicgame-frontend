@@ -170,8 +170,8 @@ export const howItWorksTextZhHk = {
         tooltip: '每枚 Random Walk NFT 僅可用於一次價格減免。留到落筆價格較高時使用，效果更佳。',
       },
       {
-        title: '積累星選資格',
-        description: '每一筆都會計入一次星選資格；落筆越多，入選頻次越高。',
+        title: '每一筆都計入星選',
+        description: '每一筆 ETH 或 CST 落筆，都會為週期收官時的星選記錄一次資格。',
         tooltip: `3 位 ETH 星選獲配者均分週期儲備的 ${protocolFacts.stellarSelectionEthPercentage}%；10 位參與者 NFT 獲配者與 10 位 Random Walk NFT 錨定者，每位獲配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST 與 1 枚 Cosmic Signature NFT。`,
       },
       {

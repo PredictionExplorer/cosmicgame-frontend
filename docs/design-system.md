@@ -329,6 +329,125 @@ counts may only fall. When a change removes some, lower the baseline in the same
 | Hand-rolled uppercase labels with `tracking-[0.2em]`      | `type-label`, or `type-eyebrow` once per section                      |
 | Clash or mono for amounts and durations                   | `type-figure-*`                                                       |
 | `rounded-[var(--radius-card)]`                            | `rounded-surface`                                                     |
+| Gavel, ticket, trophy, crown, sword, gift, dice icons     | The concept's icon from `lib/conceptIcons` (ESLint enforces it)       |
+| `capitalize` on a button label                            | The label written in sentence case in the catalog                     |
+| A hand-built pill (`rounded-full px-2 text-[10px]`)       | `Badge` with a `tone`                                                 |
+| An ⓘ after every label                                    | `Term` or `ExplainedTerm` on the word; one `InfoTooltip` per section  |
+| A one-line "Loading…" panel                               | The skeleton of the layout it replaces                                |
+| `max-w-7xl px-5 lg:px-12` on a section                    | `Container` (`site-container`)                                        |
+
+## Component inventory
+
+The primitives every page composes from, one per job. Import from `components/ui`
+(or `lib/conceptIcons` for icons). When a page needs something this list does not
+cover, extend the primitive with a variant or an optional prop; do not build a
+parallel one. Everything in `components/styled` is deprecated and maps onto a row
+below (the module header lists the mapping); wave 4 deletes it.
+
+### Actions
+
+| Primitive        | Import                 | Use                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ---------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Button`         | `components/ui/button` | Every action that is not a link in running text. `variant`: `default` (solid primary), `commit` (the signature gradient, the one action a view exists for: make a gesture, imprint, retrieve, finalize; at most one per view), `secondary`, `outline`, `ghost`, `quiet`, `link`, `destructive`. `size`: `sm`, `default`, `lg`, `xl` (56px commit in the dock and forms), `icon`. `loading` keeps the label and keyboard focus beside a spinner: the button is `aria-busy` and `aria-disabled` and ignores presses, never natively `disabled` (native `disabled` is for real unavailability). `aria-pressed` shows a held toggle. |
+| `buttonVariants` | `components/ui/button` | The same recipe on a `Link` (`className={buttonVariants({ variant: 'outline' })}`), or use `<Button asChild>`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+
+Labels are authored in sentence case in every catalog and render as written; the
+button never transforms case. Every variant eases colour, border, shadow, filter and
+transform together and answers a press (an instant darken and a 2% settle when motion
+is allowed). Touch targets reach 44px below `sm`.
+
+### Tags, states and explanations
+
+| Primitive           | Import                          | Use                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ------------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Badge`             | `components/ui/badge`           | A short tag or state beside a value. `tone`: `neutral` (hairline rule, the default), `accent`, `positive`, `attention`, `critical`, `live`. `size`: `sm` (12px) or `md` (13px). `mono` for token numbers, `dot` for a 6px state mark (it breathes only for `live`), `icon`, `shape="pill"` only for the live Cycle state, `overline` for a rare uppercase status (the `type-eyebrow` face, uncased in CJK by its own rule). At most two per wall label. `variant` is deprecated. |
+| `Term`              | `components/ui/term`            | A coined word that explains itself from the glossary: `<Term id="calibrationWindow" />`, `<Term id="stellarSelection">Stellar Selections</Term>`. Dotted underline, short definition on hover, the long one pinned by click, tap, Enter or Space (and announced), one tab stop. The trigger is an inline `<span role="button">`, so a long term wraps with its sentence. The page must declare `'glossary'` in `<PageMessages>`.                                                 |
+| `ExplainedTerm`     | `components/ui/explain-popover` | The same trigger for a word outside the glossary: `<ExplainedTerm definition="…">ERC-20</ExplainedTerm>` (`details`, `title` optional). `announce="moreInformation"` names a figure label "More information about {label}" (StatCard uses it).                                                                                                                                                                                                                                   |
+| `InfoTooltip`       | `components/ui/info-tooltip`    | One ⓘ per section or group, and where a decision depends on the explanation. Pass `label` at every new call site (the button is named "More information about {label}"; without it, just "More information"). A 16px icon under a 24px button (44px hit area on coarse pointers); `className` still positions and colours the icon.                                                                                                                                              |
+| `ExplainPopover`    | `components/ui/explain-popover` | The hover-and-pin card behind all three, for a custom trigger. The definition is the trigger's description through `aria-describedby` (a `hidden` copy beside it), and pinning announces `details` through a polite live region.                                                                                                                                                                                                                                                 |
+| `GLOSSARY_TERM_IDS` | `lib/glossary`                  | The 18 glossary ids and `GlossaryTermId`, server-safe: map over them in a server component with `getTranslations('glossary')`. `gesture`, `cycle`, `cycleFinalizationTime`, `calibrationWindow`, `cycleReserve`, `signatureAllocation`, `finalCstGesture`, `enduranceChampion`, `chronoWarrior`, `stellarSelection`, `anchoring`, `anchorDistribution`, `retrieve`, `imprint`, `publicGoods`, `outreachReserve`, `cosmicCouncil`, `cst`.                                         |
+
+`messages/<locale>/glossary.json` is the single source of the coined vocabulary's
+definitions (`terms.<id>.term`, `.short`, `.long`) in all 8 locales, aligned with
+`docs/i18n/glossary-*.md` and the FAQ. It is a page namespace, not chrome: a page that
+renders `<Term>` lists `'glossary'` in its `<PageMessages namespaces>`, and the i18n
+scoping test fails until it does. Point new explanations of a coined term at it rather
+than writing another definition.
+
+### Concept icons
+
+`lib/conceptIcons.ts` gives each coined concept one lucide glyph, used everywhere that
+concept appears: Gesture `PenLine`, Performance Cycle `Orbit`, Cycle Finalization Time
+`Timer`, Calibration Window `Gauge`, Cycle Reserve `Vault`, Compounding Cycle Reserve
+`RotateCcw`, allocation `Layers`, recipient `UserCheck`, Signature Allocation
+`Signature`, Final CST Gesture `Flag`, Endurance Champion `Hourglass`, Chrono-Warrior
+`History`, Stellar Selection `Shuffle`, Anchoring `Anchor`, Anchor Distribution `Split`,
+Retrieve `ArrowDownToLine`, Imprint `Stamp`, Public Goods `Sprout`, Outreach Reserve
+`Megaphone`, Cosmic Council `Landmark`, ETH contribution `ArrowUpFromLine`, attached
+assets `Paperclip`, CST as a token `Coins`.
+
+Import the named export in JSX (`import { GestureIcon } from '@/lib/conceptIcons'`) so a
+page bundles only its glyphs; `CONCEPT_ICONS` is for data-driven maps. Two concepts that
+sit side by side never share a glyph. ESLint rejects the auction, lottery, prize and game
+glyphs (gavel, tickets, dice, gamepads, trophies, medals, crowns, swords, gifts, piggy
+banks, hand-coins, heart-handshakes, clovers, card suits) under every lucide alias
+(`Trophy`, `TrophyIcon`, `LucideTrophy`) and from their per-icon module paths
+(`OFF_LEXICON_ICON_NAMES` and `OFF_LEXICON_ICON_MODULES` in `eslint.config.mjs`).
+
+### Figures and sections
+
+| Primitive        | Import                          | Use                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ---------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `StatCard`       | `components/ui/stat-card`       | One labelled figure. `size`: `hero` (32px, `type-figure-lg`), `md` (20px, `type-figure-md`, the default), `compact` (16px). `emphasis` draws the signature ring on the one figure a row exists for (at most one per row; `featured` and `gradient` are deprecated aliases). `tooltip` turns the label into an `ExplainedTerm`. `semantics="definition"` renders `dt`/`dd` inside a `<dl>`, with `srDescription` as an sr-only `dd`. `caption`, `trend`, `loading`. Server-safe. |
+| `StatGrid`       | `components/ui/stat-card`       | The responsive row for one card size (`compact` is two across from the smallest phone; `md` one across below `sm`).                                                                                                                                                                                                                                                                                                                                                             |
+| `SectionHeader`  | `components/ui/section-header`  | The section-heading tier. `as` (`h2` default, `h3`, `h4`) fits the outline; `size` `page` (`type-section`) or `panel` (`type-heading-3`); `eyebrow`, `description`, one `info`, right-aligned `actions`, `headingId` for `aria-labelledby`. Server-safe.                                                                                                                                                                                                                        |
+| `Section`        | `components/ui/section`         | A revealed `<section>` that renders `SectionHeader` and labels itself by it.                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `SectionDivider` | `components/ui/section-divider` | A hairline between groups of one page, optionally with a centred kicker (`as` sets its element). It separates; it is not a heading tier.                                                                                                                                                                                                                                                                                                                                        |
+| `SectionEyebrow` | `components/ui/section-eyebrow` | The page kicker chip above an H1. Its dot never pulses (`pulse` is ignored); live data shows through `LiveStatus`.                                                                                                                                                                                                                                                                                                                                                              |
+
+### Layout and surfaces
+
+| Primitive    | Import                      | Use                                                                                                                                                                                                                                                           |
+| ------------ | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Container`  | `components/ui/container`   | The content edge. `size="site"` (the default: `site-container`, the header's and footer's edge), `wide` (90rem, the app-home desk only), `reading` (one prose measure). Legacy fixed sizes remain, deprecated. Never hand-roll `max-w-7xl px-*` on a section. |
+| `PageShell`  | `components/ui/page-shell`  | The page's `<main>` and backdrop.                                                                                                                                                                                                                             |
+| `Surface`    | `components/ui/surface`     | `plain`, `quiet` (a fill, no border: the one control group), `outlined` (the default: one hairline on a faint surface), `raised` (floating layers). Old variants are aliases on the token ladder. At most one bordered level per region.                      |
+| `Card`       | `components/ui/card`        | Surface's `outlined` role with header, title (`type-heading-3`), description and content slots.                                                                                                                                                               |
+| `ScrollRail` | `components/ui/scroll-rail` | One row that scrolls sideways with edge fades only while there is more that way, keeping the current item (`data-state="active"`, `aria-current="page"`, `aria-selected`) in view. For tabs, sub-navigation and chip rows.                                    |
+
+### Navigation within a page
+
+| Primitive                                 | Import               | Use                                                                                                                                                                                                                                                                                                                             |
+| ----------------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Tabs`                                    | `components/ui/tabs` | `TabsList variant`: `segmented` (the default: views of one thing, a sunken track with no border), `underline` (page sub-navigation), `pills` (short sets and filters); `scroll` puts the row on a `ScrollRail`. Pick the variant rather than reshaping a list with classes. Radix keeps arrow keys, Home, End and one tab stop. |
+| `tabsListVariants`, `tabsTriggerVariants` | `components/ui/tabs` | The same look for link-based sub-navigation: mark the current link `aria-current="page"`.                                                                                                                                                                                                                                       |
+
+### Forms
+
+| Primitive                          | Import                                      | Use                                                                                                                                                                                                          |
+| ---------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `Input`, `MessageTextarea`         | `components/ui/input`, `…/message-textarea` | A sunken field with the 3:1 `--input` edge and 16px text below `sm` (iOS does not zoom). Shared recipe: `fieldSurface` in `components/ui/item-highlight`.                                                    |
+| `SearchField`                      | `components/ui/search-field`                | The one search input: the icon above the fill, a clear button (`clearLabel`), an optional ⌘K / Ctrl K `shortcutKey`, `size` `md` or `lg`. Pair with `<Button type="submit">` when the search runs on submit. |
+| `Select`                           | `components/ui/select`                      | The field surface for the trigger; options mark `data-highlighted` with a primary fill and a 2px bar (6.5:1 or more in every palette), so keyboard focus is always visible.                                  |
+| `DropdownMenu`                     | `components/ui/dropdown-menu`               | Menus share the same highlighted row (`itemHighlight`) and floating surface (`floatingSurface`).                                                                                                             |
+| `Checkbox`, `RadioGroup`, `Switch` | `components/ui/…`                           | A 2px-cornered box (it reads as a checkbox, not a radio), a round radio, a switch; all on the shared focus outline.                                                                                          |
+
+### Loading, empty and error
+
+| Primitive      | Import                         | Use                                                                                                                                                                                                                                                                                                                                                                       |
+| -------------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Skeletons      | `components/ui/skeleton`       | Placeholders in the shape and at the height of what they replace: `SkeletonTable` (ledger rows plus the phone card layout), `SkeletonDetailRows`, `SkeletonStatGrid`, `SkeletonStatCard`, `SkeletonPageHeader`, `SkeletonArtPlate`, `SkeletonChart`, `SkeletonNFTCard`, `SkeletonText`. Each announces once; pass `announce={false}` inside a skeleton that already does. |
+| Page skeletons | `components/ui/page-skeletons` | Route-level `loading.tsx` bodies for record pages: `RecordDetailSkeleton`, `LedgerPageSkeleton`, `NftDetailSkeleton`, `ProfileSkeleton`, `CycleAllocationSkeleton`, `SkeletonSectionCard`.                                                                                                                                                                                |
+| `EmptyState`   | `components/ui/empty-state`    | Nothing here yet, and what would fill it. `variant` `page`, `panel` (the default) or `inline`; `headingLevel` 2–4.                                                                                                                                                                                                                                                        |
+| `ErrorState`   | `components/ui/error-state`    | Something could not be read or done, with a retry. Same variants; status colour on the icon tile only.                                                                                                                                                                                                                                                                    |
+| `LoadingState` | `components/ui/loading-state`  | A blocking wait with nothing to preview (a transaction confirming). For content on its way, use a skeleton.                                                                                                                                                                                                                                                               |
+| `UnknownValue` | `components/ui/unknown-value`  | A figure that could not be read: a dash with a screen-reader label, never `0`.                                                                                                                                                                                                                                                                                            |
+
+### Data and identifiers (wave 1)
+
+`Amount`, `DateTime`, `Duration`, `AddressChip`, `LiveStatus`, `TxStatus`,
+`ResponsiveTable` and `Pagination` are documented with the formatting layer and the
+transaction kit; see `docs/` and each module's header.
 
 ## Tests
 
@@ -346,3 +465,10 @@ counts may only fall. When a change removes some, lower the baseline in the same
 - `lib/__tests__/fonts-policy.test.ts`, `lib/__tests__/fonts.test.ts` and
   `lib/__tests__/display-font-coverage.test.ts` cover font delivery and script coverage.
 - `lib/theme/__tests__/config.test.ts` pins `THEME_CHROME` to the palettes.
+- `lib/__tests__/conceptIcons.test.ts` keeps one distinct, lexicon-safe glyph per concept and
+  checks the ESLint name and module patterns against lucide's real exports.
+- `components/ui/__tests__/term.test.tsx` checks the glossary in all 8 locales (every term
+  with a term, short and long definition) and the Term interaction: an inline trigger,
+  Enter and Space, the hidden description and the announced details.
+- `components/ui/__tests__/page-skeletons.test.tsx` checks that every dynamic record route
+  has a `loading.tsx`.

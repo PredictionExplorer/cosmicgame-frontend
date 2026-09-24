@@ -45,6 +45,13 @@ const row = (id: string) => {
   return element;
 };
 
+/** The row as a reader sees it: without the ⓘ button's hidden description. */
+const visibleRow = (id: string) => {
+  const copy = row(id).cloneNode(true) as HTMLElement;
+  copy.querySelectorAll('[hidden]').forEach((node) => node.remove());
+  return copy;
+};
+
 describe('FundDistribution', () => {
   it('renders the container', () => {
     render(<FundDistribution data={createData()} />);
@@ -103,6 +110,18 @@ describe('FundDistribution', () => {
     }
   });
 
+  it('draws each track with its concept icon', () => {
+    render(<FundDistribution data={createData()} />);
+    const glyph = (id: string) =>
+      [...(row(id).querySelector('svg')?.classList ?? [])].find((name) =>
+        name.startsWith('lucide-'),
+      );
+    // Anchor Distribution is Split everywhere (allocation pages, My Anchors);
+    // Anchor is the act of Anchoring, not its distribution.
+    expect(glyph('anchor')).toBe('lucide-split');
+    expect(glyph('nextCycle')).toBe('lucide-rotate-ccw');
+  });
+
   it('lists the tracks in the shared order', () => {
     render(<FundDistribution data={createData()} />);
     const order = Array.from(document.querySelectorAll('[data-track]')).map((element) =>
@@ -115,16 +134,16 @@ describe('FundDistribution', () => {
     render(<FundDistribution />);
     expect(screen.getByTestId('fund-distribution')).toBeInTheDocument();
     expect(row('signature')).toHaveTextContent('common.status.unavailable');
-    expect(row('signature')).not.toHaveTextContent(/\d/);
+    expect(visibleRow('signature')).not.toHaveTextContent(/\d/);
     // The remainder is unknown while any share is unknown.
-    expect(row('nextCycle')).not.toHaveTextContent(/\d/);
+    expect(visibleRow('nextCycle')).not.toHaveTextContent(/\d/);
     expect(screen.queryByTestId(/^fund-track-fill-/)).not.toBeInTheDocument();
   });
 
   it('shows the ETH amount as unavailable when the reserve balance is unread', () => {
     render(<FundDistribution data={createData({ CosmicGameBalanceEth: undefined })} />);
     expect(row('signature')).toHaveTextContent('25%');
-    expect(row('signature')).not.toHaveTextContent('ETH');
+    expect(visibleRow('signature')).not.toHaveTextContent('ETH');
     expect(row('signature')).toHaveTextContent('common.status.unavailable');
   });
 

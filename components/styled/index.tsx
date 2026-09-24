@@ -1,6 +1,22 @@
+/**
+ * @deprecated Parallel primitives left from the MUI migration. Every export
+ * here has a counterpart in components/ui; wave 3 moves the call sites and
+ * wave 4 deletes this module. Do not add to it.
+ *
+ *   TablePrimary*             → ResponsiveTable* (components/ui/responsive-table)
+ *   GradientText              → GradientText (components/ui/gradient-text)
+ *   SearchField, CustomTextField, StyledInput → Input or SearchField (components/ui)
+ *   SearchButton, ConnectButton, MobileConnectButton → Button (components/ui/button)
+ *   StyledCard, VideoCard, CodeWrapper, GradientBorder, NFTImageWrapper → Surface
+ *   MainWrapper               → PageShell (components/ui/page-shell)
+ *   SectionWrapper, CenterBox, SearchBox → Container and plain layout classes
+ *   NFTSkeleton               → SkeletonArtPlate (components/ui/skeleton)
+ */
 import React from 'react';
 
 import { cn } from '@/lib/utils';
+import { GradientText as UiGradientText } from '@/components/ui/gradient-text';
+import { Input } from '@/components/ui/input';
 import {
   ResponsiveTable,
   ResponsiveTableBody,
@@ -11,12 +27,14 @@ import {
   ResponsiveTableRow,
 } from '@/components/ui/responsive-table';
 
+/** @deprecated Use the `link` utility on an `<a>` (styles/global.css). */
 export function StyledLink({ className, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) {
   // These frequently wrap IPFS URIs and contract addresses, which have no
   // natural break opportunity and otherwise run off a narrow screen.
   return <a className={cn('break-words text-white underline', className)} {...props} />;
 }
 
+/** @deprecated Use `Surface` (components/ui/surface). */
 export function StyledCard({
   className,
   variant: _variant = 'default',
@@ -39,12 +57,19 @@ export function StyledCard({
  * shows beside the value, and making it explicit is what stops a cell from
  * inheriting the wrong column's label.
  */
+/** @deprecated Import `ResponsiveTableContainer` from components/ui/responsive-table. */
 export const TablePrimaryContainer = ResponsiveTableContainer;
+/** @deprecated Import `ResponsiveTable` from components/ui/responsive-table. */
 export const TablePrimary = ResponsiveTable;
+/** @deprecated Import `ResponsiveTableHead` from components/ui/responsive-table. */
 export const TablePrimaryHead = ResponsiveTableHead;
+/** @deprecated Import `ResponsiveTableBody` from components/ui/responsive-table. */
 export const TablePrimaryBody = ResponsiveTableBody;
+/** @deprecated Import `ResponsiveTableHeadCell` from components/ui/responsive-table. */
 export const TablePrimaryHeadCell = ResponsiveTableHeadCell;
+/** @deprecated Import `ResponsiveTableCell` from components/ui/responsive-table. */
 export const TablePrimaryCell = ResponsiveTableCell;
+/** @deprecated Import `ResponsiveTableRow` from components/ui/responsive-table. */
 export const TablePrimaryRow = ResponsiveTableRow;
 
 /**
@@ -68,6 +93,7 @@ export function TableResponsiveHeaderLabel({
   );
 }
 
+/** @deprecated Use `Link` from '@/i18n/navigation' with the `link-quiet` utility. */
 export function NavLink({ className, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) {
   return (
     <a
@@ -119,6 +145,7 @@ export function DrawerList({ className, ...props }: React.HTMLAttributes<HTMLDiv
   );
 }
 
+/** @deprecated Unused wallet pill; the header renders `ConnectWalletButton`. */
 export function Wallet({
   className,
   label,
@@ -137,6 +164,7 @@ export function Wallet({
   );
 }
 
+/** @deprecated Use `Button` (components/ui/button). */
 export function ConnectButton({
   className,
   ...props
@@ -144,6 +172,7 @@ export function ConnectButton({
   return <button className={cn('ml-auto', className)} {...props} />;
 }
 
+/** @deprecated Use `Button` (components/ui/button). */
 export function MobileConnectButton({
   className,
   ...props
@@ -151,6 +180,7 @@ export function MobileConnectButton({
   return <ConnectButton className={cn('mr-auto', className)} {...props} />;
 }
 
+/** @deprecated Use `PageShell` (components/ui/page-shell). */
 export function MainWrapper({ className, id, ...props }: React.HTMLAttributes<HTMLElement>) {
   return (
     <main
@@ -165,6 +195,7 @@ export function MainWrapper({ className, id, ...props }: React.HTMLAttributes<HT
   );
 }
 
+/** @deprecated Use plain flex classes. */
 export function CenterBox({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
@@ -174,10 +205,12 @@ export function CenterBox({ className, ...props }: React.HTMLAttributes<HTMLDivE
   );
 }
 
+/** @deprecated Unused. */
 export function CounterWrapper({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return <div className={cn('flex justify-end items-center', className)} {...props} />;
 }
 
+/** @deprecated Unused. */
 export function CounterItemWrapper({
   className,
   style,
@@ -195,10 +228,12 @@ export function CounterItemWrapper({
   );
 }
 
+/** @deprecated Unused. */
 export function CounterItem({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return <div className={cn('w-1/4 py-2 box-border max-sm:w-4/5', className)} {...props} />;
 }
 
+/** @deprecated Use the `art-plate` utility. */
 export function NFTImageWrapper({
   className,
   style,
@@ -213,6 +248,7 @@ export function NFTImageWrapper({
   );
 }
 
+/** @deprecated Use `SkeletonArtPlate` (components/ui/skeleton). */
 export function NFTSkeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
@@ -222,14 +258,17 @@ export function NFTSkeleton({ className, ...props }: React.HTMLAttributes<HTMLDi
   );
 }
 
+/** @deprecated Unused. */
 export function NFTCheckMark({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return <div className={cn('absolute top-0 left-0', className)} {...props} />;
 }
 
+/** @deprecated Unused. */
 export function NFTInfoWrapper({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return <div className={cn('absolute top-4 left-5', className)} {...props} />;
 }
 
+/** @deprecated Use plain flex classes around `SearchField`. */
 export function SearchBox({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
@@ -239,18 +278,20 @@ export function SearchBox({ className, ...props }: React.HTMLAttributes<HTMLDivE
   );
 }
 
+/**
+ * @deprecated Use `SearchField` from components/ui/search-field (icon, clear
+ * button, 16px on phones). This thin wrapper renders the shared `Input`.
+ */
 export function SearchField({ className, ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
-    <input
-      className={cn(
-        'mr-2 w-full max-w-[360px] flex h-11 rounded-md border border-input bg-background px-3 py-2 text-base sm:text-[15px] ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 max-xs:mr-0 max-xs:mb-4 max-xs:max-w-none',
-        className,
-      )}
+    <Input
+      className={cn('mr-2 max-w-[360px] max-xs:mr-0 max-xs:mb-4 max-xs:max-w-none', className)}
       {...props}
     />
   );
 }
 
+/** @deprecated Use `<Button type="submit">` (components/ui/button). */
 export function SearchButton({
   className,
   ...props
@@ -266,6 +307,7 @@ export function SearchButton({
   );
 }
 
+/** @deprecated Use `Surface` (components/ui/surface). */
 export function VideoCard({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
@@ -275,28 +317,17 @@ export function VideoCard({ className, ...props }: React.HTMLAttributes<HTMLDivE
   );
 }
 
+/** @deprecated Use `Section` or `Container` (components/ui). */
 export function SectionWrapper({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return <div className={cn('py-16 max-sm:py-8', className)} {...props} />;
 }
 
-export function GradientText({
-  className,
-  as: Component = 'span',
-  ...props
-}: React.HTMLAttributes<HTMLElement> & { as?: React.ElementType }) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const AnyComponent = Component as any;
-  return (
-    <AnyComponent
-      className={cn(
-        'bg-gradient-to-r from-secondary to-primary bg-clip-text text-transparent',
-        className,
-      )}
-      {...props}
-    />
-  );
+/** @deprecated Import `GradientText` from components/ui/gradient-text. */
+export function GradientText(props: React.ComponentProps<typeof UiGradientText>) {
+  return <UiGradientText {...props} />;
 }
 
+/** @deprecated Use `Surface variant="gradient-border"` (components/ui/surface). */
 export function GradientBorder({
   className,
   style,
@@ -311,6 +342,7 @@ export function GradientBorder({
   );
 }
 
+/** @deprecated Use `Surface` (components/ui/surface). */
 export function CodeWrapper({ className, style, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
@@ -324,21 +356,15 @@ export function CodeWrapper({ className, style, ...props }: React.HTMLAttributes
   );
 }
 
+/** @deprecated Use `Input` (components/ui/input); this thin wrapper renders it. */
 export function CustomTextField({
   className,
   ...props
 }: React.InputHTMLAttributes<HTMLInputElement>) {
-  return (
-    <input
-      className={cn(
-        'flex h-11 sm:h-10 w-full rounded-md border border-input bg-background px-4 py-3 text-base sm:text-[15px] ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-        className,
-      )}
-      {...props}
-    />
-  );
+  return <Input className={cn('px-4', className)} {...props} />;
 }
 
+/** @deprecated Use `Input type="number"` (components/ui/input). */
 export function StyledInput({ className, ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
@@ -351,6 +377,7 @@ export function StyledInput({ className, ...props }: React.InputHTMLAttributes<H
   );
 }
 
+/** @deprecated Use `DropdownMenuItem` (components/ui/dropdown-menu). */
 export function PrimaryMenuItem({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div

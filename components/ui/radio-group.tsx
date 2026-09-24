@@ -47,13 +47,16 @@ const RadioGroupItem = React.forwardRef<HTMLInputElement, RadioGroupItemProps>(
           checked={checked}
           onChange={() => context.onValueChange?.(value)}
           className={cn(
-            'peer h-4 w-4 shrink-0 appearance-none rounded-full border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 checked:border-primary',
+            'peer size-4 shrink-0 appearance-none rounded-full border border-input bg-surface-sunken transition-colors duration-[var(--duration-fast)] hover:enabled:border-foreground/60 disabled:cursor-not-allowed disabled:opacity-50 checked:border-primary',
             className,
           )}
           {...props}
         />
         {checked && (
-          <Circle className="pointer-events-none absolute h-4 w-4 p-0.5 fill-current text-primary" />
+          <Circle
+            aria-hidden
+            className="pointer-events-none absolute size-4 p-1 fill-current text-primary"
+          />
         )}
       </div>
     );

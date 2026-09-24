@@ -1,30 +1,17 @@
 import type { HTMLAttributes, ReactNode } from 'react';
 import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
+import { cva } from 'class-variance-authority';
 
 import { cn } from '@/lib/utils';
-import { InfoTooltip } from '@/components/ui/info-tooltip';
+import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ExplainedTerm } from '@/components/ui/explain-popover';
 import { formatFixed } from '@/utils/format';
 
+/** @deprecated Icon tints are gone: colour belongs to the art and to live state. */
 type Accent = 'aurora' | 'nebula' | 'solar' | 'impact' | 'neutral';
 
-const ACCENT: Record<Accent, { icon: string }> = {
-  aurora: {
-    icon: 'bg-[rgb(var(--aurora-cyan-rgb)/0.15)] text-[rgb(var(--aurora-cyan-rgb))]',
-  },
-  nebula: {
-    icon: 'bg-secondary/10 text-secondary',
-  },
-  solar: {
-    icon: 'bg-[rgb(var(--solar-gold-rgb)/0.15)] text-[rgb(var(--solar-gold-rgb))]',
-  },
-  impact: {
-    icon: 'bg-[rgb(var(--impact-green-rgb)/0.15)] text-[rgb(var(--impact-green-rgb))]',
-  },
-  neutral: {
-    icon: 'bg-white/[0.06] text-primary/60',
-  },
-};
+export type StatCardSize = 'hero' | 'md' | 'compact';
 
 export interface StatCardTrend {
   /** Positive = up, negative = down, 0 = flat. */
@@ -34,18 +21,81 @@ export interface StatCardTrend {
   invertSentiment?: boolean;
 }
 
+const cardVariants = cva(
+  'relative min-w-0 rounded-surface print:overflow-visible print:border print:border-border',
+  {
+    variants: {
+      size: {
+        hero: 'p-6 sm:p-7',
+        md: 'p-5',
+        compact: 'px-4 py-3.5',
+      },
+      emphasis: {
+        // One edge, drawn by the gradient ring alone: a visible border under
+        // it read as a doubled outline. The transparent border keeps the card
+        // the same height as its neighbours in the row.
+        true: 'gradient-border-card gradient-border-card-accent border border-transparent bg-primary/[0.04]',
+        false: 'border border-rule-faint bg-surface/60',
+      },
+    },
+    defaultVariants: { size: 'md', emphasis: false },
+  },
+);
+
+const VALUE_CLASS: Record<StatCardSize, string> = {
+  hero: 'type-figure-lg',
+  md: 'type-figure-md',
+  compact: 'font-sans text-base font-medium leading-snug tabular-nums lining-nums slashed-zero',
+};
+
+const VALUE_GAP: Record<StatCardSize, string> = {
+  hero: 'mt-4',
+  md: 'mt-3',
+  compact: 'mt-1.5',
+};
+
+const SKELETON_CLASS: Record<StatCardSize, string> = {
+  hero: 'h-9 w-3/5',
+  md: 'h-6.5 w-2/3',
+  compact: 'h-5 w-1/2',
+};
+
 interface StatCardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'title'> {
   label: string;
   value: ReactNode;
+  /** A 16px concept icon (lib/conceptIcons) beside the label. */
   icon?: ReactNode;
+  /**
+   * What the figure means. The label becomes an `<ExplainedTerm>`: a dotted
+   * underline that opens the explanation on hover, click or tap, named "More
+   * information about {label}", instead of an extra ⓘ icon and tab stop.
+   */
   tooltip?: string;
-  /** Apply a brand accent to the icon. */
+  /**
+   * `hero` (32px, `type-figure-lg`) for the one headline figure of a page,
+   * `md` (20px, `type-figure-md`) for figure rows, `compact` (16px) for rows
+   * inside a panel.
+   */
+  size?: StatCardSize;
+  /**
+   * Draws the card with the signature ring. At most one per row: it marks the
+   * figure the row exists for, so a second one cancels both.
+   */
+  emphasis?: boolean;
+  /**
+   * `definition` renders the label as `<dt>` and the value as `<dd>`, for a
+   * card placed inside a `<dl>` (server-rendered summaries).
+   */
+  semantics?: 'block' | 'definition';
+  /** Extra text for assistive technology and search engines only (an sr-only `<dd>` or `<p>`). */
+  srDescription?: ReactNode;
+  /** @deprecated Ignored: icons render in the subtle tier. */
   accent?: Accent;
-  /** Apply a gradient to the value (deprecated — prefer accent). */
+  /** @deprecated Use `emphasis`. */
   gradient?: boolean;
-  /** Featured variant renders a gradient border. */
+  /** @deprecated Use `emphasis`. */
   featured?: boolean;
-  /** Optional trend pill rendered below the value. */
+  /** Optional trend badge rendered below the value. */
   trend?: StatCardTrend;
   /**
    * A visible line under the value that qualifies it (for example why a figure is unknown).
@@ -55,12 +105,24 @@ interface StatCardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children' 
   loading?: boolean;
 }
 
+/**
+ * StatCard — one labelled figure: the label (13px, sentence case, hyphenated
+ * at a syllable rather than chopped mid-word in a narrow column), the value
+ * in tabular Inter figures, and an optional caption or trend.
+ *
+ * Server-safe: no client hooks of its own (the `<ExplainedTerm>` label is a
+ * client island only when `tooltip` is set). Lay rows out with `<StatGrid>`.
+ */
 export function StatCard({
   label,
   value,
   icon,
   tooltip,
-  accent = 'neutral',
+  size = 'md',
+  emphasis,
+  semantics = 'block',
+  srDescription,
+  accent: _accent,
   gradient = false,
   featured = false,
   trend,
@@ -69,99 +131,138 @@ export function StatCard({
   className,
   ...rest
 }: StatCardProps) {
-  const palette = ACCENT[accent];
+  const isEmphasis = emphasis ?? (featured || gradient);
+  const isDefinition = semantics === 'definition';
+  const LabelTag = isDefinition ? 'dt' : 'div';
+  const ValueTag = isDefinition ? 'dd' : 'div';
+  const DetailTag = isDefinition ? 'dd' : 'p';
+
   return (
     <div
       {...rest}
-      className={cn(
-        'relative min-w-0 overflow-hidden rounded-[var(--radius-card)] border p-5',
-        'print:overflow-visible',
-        featured
-          ? 'gradient-border-card gradient-border-card-accent bg-secondary/[0.04] print:border print:border-border'
-          : 'border-white/[0.10] bg-white/[0.02]',
-        className,
-      )}
+      data-size={size}
+      data-emphasis={isEmphasis || undefined}
+      className={cn(cardVariants({ size, emphasis: isEmphasis }), className)}
     >
-      <div className="relative z-[1] flex items-start justify-between gap-2">
-        {/* `min-w-0` on both levels: flex items default to `min-width: auto`,
-            which stops a long label from ever wrapping and pushes the card
-            wider than its grid column on narrow screens. */}
-        <div className="flex min-w-0 items-center gap-1.5">
-          <p className="type-eyebrow min-w-0 break-words text-muted-foreground print:!text-foreground/80">
-            {label}
-          </p>
-          {tooltip ? <InfoTooltip content={tooltip} label={label} /> : null}
-        </div>
+      {/* The label row is the <dt> itself, so a definition-list card stays
+          valid HTML (dt and dd must be children of the group). `min-w-0`
+          lets a long label wrap inside a narrow grid column. */}
+      <LabelTag className="relative z-[1] flex items-start justify-between gap-3">
+        <span
+          className={cn(
+            'min-w-0 hyphens-auto text-subtle print:!text-foreground/80',
+            size === 'compact' ? 'type-caption font-medium' : 'type-label',
+          )}
+        >
+          {tooltip ? (
+            <ExplainedTerm definition={tooltip} announce="moreInformation">
+              {label}
+            </ExplainedTerm>
+          ) : (
+            label
+          )}
+        </span>
         {icon ? (
-          <div
+          <span
+            aria-hidden
             className={cn(
-              'flex h-7 w-7 shrink-0 items-center justify-center rounded-md transition-colors',
-              'duration-[var(--duration-fast)]',
-              featured ? 'bg-primary/15 text-primary' : palette.icon,
+              'flex shrink-0 items-center [&_svg]:size-4',
+              isEmphasis ? 'text-primary' : 'text-subtle',
+              size === 'compact' && '[&_svg]:size-3.5',
             )}
           >
             {icon}
-          </div>
+          </span>
         ) : null}
-      </div>
+      </LabelTag>
       {loading ? (
-        <Skeleton className="mt-3 h-7 w-2/3" />
+        // The placeholder sits in the value's own element, so a definition
+        // card keeps only <dt> and <dd> children inside its <dl> group.
+        <ValueTag aria-busy className={cn('relative z-[1]', VALUE_GAP[size])}>
+          <Skeleton className={SKELETON_CLASS[size]} />
+        </ValueTag>
       ) : (
-        <div
+        <ValueTag
           className={cn(
-            'stat-card-value relative z-[1] mt-4 break-words text-2xl font-medium tracking-tight tabular-nums text-foreground',
+            'stat-card-value relative z-[1] min-w-0 break-words text-foreground',
             'print:!text-foreground print:!shadow-none print:[-webkit-text-fill-color:hsl(var(--foreground))]',
-            gradient && 'text-secondary',
-            featured && !gradient && 'text-white print:!text-foreground',
+            VALUE_GAP[size],
+            VALUE_CLASS[size],
           )}
         >
           {value}
-        </div>
+        </ValueTag>
       )}
-      {!loading && trend ? <StatTrend {...trend} /> : null}
+      {!loading && trend ? <StatTrend {...trend} as={DetailTag} /> : null}
       {!loading && caption ? (
-        <p className="relative z-[1] mt-2 type-body-sm text-muted-foreground">{caption}</p>
+        <DetailTag className="relative z-[1] mt-2 type-caption text-subtle">{caption}</DetailTag>
       ) : null}
+      {srDescription ? <DetailTag className="sr-only">{srDescription}</DetailTag> : null}
     </div>
   );
 }
 
-function StatTrend({ delta, label, invertSentiment = false }: StatCardTrend) {
+function StatTrend({
+  delta,
+  label,
+  invertSentiment = false,
+  as: Tag,
+}: StatCardTrend & { as: 'dd' | 'p' }) {
   const isUp = delta > 0;
   const isFlat = delta === 0;
   const isGood = isFlat ? null : invertSentiment ? !isUp : isUp;
   const Arrow = isUp ? ArrowUpRight : ArrowDownRight;
   const pct = `${isUp ? '+' : ''}${formatFixed(delta, 1)}%`;
   return (
-    <div className="mt-2.5 flex items-center gap-2 type-body-sm">
-      <span
-        className={cn(
-          'inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 type-mono-sm',
-          isFlat && 'bg-white/[0.06] text-muted-foreground',
-          isGood === true &&
-            'bg-[rgb(var(--impact-green-rgb)/0.12)] text-[rgb(var(--impact-green-rgb))]',
-          isGood === false &&
-            'bg-[rgb(var(--chrono-rose-rgb)/0.12)] text-[rgb(var(--chrono-rose-rgb))]',
-        )}
+    <Tag className="relative z-[1] mt-2.5 flex flex-wrap items-center gap-2 type-caption">
+      <Badge
+        size="sm"
+        tone={isGood === null ? 'neutral' : isGood ? 'positive' : 'critical'}
+        icon={isFlat ? undefined : <Arrow />}
+        className="tabular-nums"
       >
-        {!isFlat ? <Arrow className="h-3 w-3" aria-hidden /> : null}
         {pct}
-      </span>
-      <span className="text-muted-foreground">{label}</span>
-    </div>
+      </Badge>
+      <span className="text-subtle">{label}</span>
+    </Tag>
   );
 }
 
-export function StatCardSkeleton({ className }: { className?: string }) {
+const gridVariants = cva('grid gap-3 sm:gap-4', {
+  variants: {
+    size: {
+      // Two across from the smallest phone: compact figures are short.
+      compact: 'grid-cols-2 lg:grid-cols-4',
+      // One across below `sm`: a 24px ETH figure and a long uk or vi label
+      // do not fit a 170px column.
+      md: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
+      hero: 'grid-cols-1 md:grid-cols-2',
+    },
+  },
+  defaultVariants: { size: 'md' },
+});
+
+export interface StatGridProps extends HTMLAttributes<HTMLDivElement> {
+  /** Matches the `size` of the cards inside. */
+  size?: StatCardSize;
+}
+
+/** StatGrid — the responsive row for StatCards of one size. */
+export function StatGrid({ size, className, ...props }: StatGridProps) {
+  return <div className={cn(gridVariants({ size }), className)} {...props} />;
+}
+
+export function StatCardSkeleton({
+  className,
+  size = 'md',
+}: {
+  className?: string;
+  size?: StatCardSize;
+}) {
   return (
-    <div
-      className={cn(
-        'rounded-[var(--radius-card)] border border-white/[0.10] bg-white/[0.02] p-5',
-        className,
-      )}
-    >
-      <Skeleton className="h-3 w-24" />
-      <Skeleton className="mt-3 h-7 w-2/3" />
+    <div aria-hidden className={cn(cardVariants({ size, emphasis: false }), className)}>
+      <Skeleton className="h-3.5 w-24" />
+      <Skeleton className={cn(VALUE_GAP[size], SKELETON_CLASS[size])} />
     </div>
   );
 }

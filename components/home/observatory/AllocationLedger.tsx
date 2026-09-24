@@ -1,20 +1,19 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import {
-  ArrowRight,
-  Crown,
-  ImageIcon,
-  Layers,
-  RefreshCw,
-  Shuffle,
-  Sprout,
-  Swords,
-  Trophy,
-  Users,
-} from 'lucide-react';
+import { ArrowRight, ImageIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
+import {
+  AnchorDistributionIcon,
+  AnchoringIcon,
+  ChronoWarriorIcon,
+  CompoundingReserveIcon,
+  EnduranceChampionIcon,
+  PublicGoodsIcon,
+  SignatureAllocationIcon,
+  StellarSelectionIcon,
+} from '@/lib/conceptIcons';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Link } from '@/i18n/navigation';
 import { deriveAllocationTrackAmounts } from '@/lib/allocationTracks';
@@ -55,7 +54,7 @@ export function AllocationLedger({ data, className }: AllocationLedgerProps) {
   const tracks: LedgerTrack[] = [
     {
       key: 'signature',
-      icon: <Trophy className="h-3.5 w-3.5" aria-hidden />,
+      icon: <SignatureAllocationIcon className="h-3.5 w-3.5" aria-hidden />,
       name: t('allocation.cards.signature.name'),
       tooltip: t('allocation.cards.signature.tooltip'),
       amount: ethAmount(amounts.signatureEth),
@@ -65,7 +64,7 @@ export function AllocationLedger({ data, className }: AllocationLedgerProps) {
     },
     {
       key: 'chrono',
-      icon: <Swords className="h-3.5 w-3.5" aria-hidden />,
+      icon: <ChronoWarriorIcon className="h-3.5 w-3.5" aria-hidden />,
       name: t('allocation.cards.chronoWarrior.name'),
       tooltip: t('allocation.cards.chronoWarrior.tooltip'),
       amount: ethAmount(amounts.chronoEth),
@@ -74,7 +73,7 @@ export function AllocationLedger({ data, className }: AllocationLedgerProps) {
     },
     {
       key: 'endurance',
-      icon: <Crown className="h-3.5 w-3.5" aria-hidden />,
+      icon: <EnduranceChampionIcon className="h-3.5 w-3.5" aria-hidden />,
       name: t('allocation.cards.endurance.name'),
       tooltip: t('allocation.cards.endurance.tooltip'),
       amount: cstPlusNft,
@@ -83,7 +82,7 @@ export function AllocationLedger({ data, className }: AllocationLedgerProps) {
     },
     {
       key: 'stellar-eth',
-      icon: <Shuffle className="h-3.5 w-3.5" aria-hidden />,
+      icon: <StellarSelectionIcon className="h-3.5 w-3.5" aria-hidden />,
       name: t('allocation.cards.ethStellar.name'),
       tooltip: t('allocation.cards.ethStellar.tooltip'),
       amount: ethAmount(amounts.stellarEth),
@@ -99,7 +98,7 @@ export function AllocationLedger({ data, className }: AllocationLedgerProps) {
     },
     {
       key: 'cosmic-anchor',
-      icon: <Users className="h-3.5 w-3.5" aria-hidden />,
+      icon: <AnchorDistributionIcon className="h-3.5 w-3.5" aria-hidden />,
       name: t('allocation.cards.cosmicAnchor.name'),
       tooltip: t('allocation.cards.cosmicAnchor.tooltip'),
       amount: ethAmount(amounts.cosmicAnchorEth),
@@ -108,7 +107,7 @@ export function AllocationLedger({ data, className }: AllocationLedgerProps) {
     },
     {
       key: 'rwlk-anchor',
-      icon: <Layers className="h-3.5 w-3.5" aria-hidden />,
+      icon: <AnchoringIcon className="h-3.5 w-3.5" aria-hidden />,
       name: t('allocation.cards.randomWalkAnchor.name'),
       tooltip: t('allocation.cards.randomWalkAnchor.tooltip'),
       amount: cstPlusNft,
@@ -117,7 +116,7 @@ export function AllocationLedger({ data, className }: AllocationLedgerProps) {
     },
     {
       key: 'public-goods',
-      icon: <Sprout className="h-3.5 w-3.5" aria-hidden />,
+      icon: <PublicGoodsIcon className="h-3.5 w-3.5" aria-hidden />,
       name: t('allocation.cards.publicGoods.name'),
       tooltip: t('allocation.cards.publicGoods.tooltip', {
         percent: String(data?.CharityPercentage ?? 0),
@@ -131,7 +130,7 @@ export function AllocationLedger({ data, className }: AllocationLedgerProps) {
       ? [
           {
             key: 'next-cycle',
-            icon: <RefreshCw className="h-3.5 w-3.5" aria-hidden />,
+            icon: <CompoundingReserveIcon className="h-3.5 w-3.5" aria-hidden />,
             name: t('observatory.ribbon.nextCycleName'),
             tooltip: t('observatory.ribbon.nextCycleTooltip'),
             amount: ethAmount(amounts.nextCycleEth),

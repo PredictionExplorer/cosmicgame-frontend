@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Calendar, Trophy, Award, User, Copy, Check } from 'lucide-react';
+import { Calendar, User, Copy, Check } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { getExplorerUrl, getRelativeTime } from '@/utils';
 
+import { CycleIcon, RecipientIcon } from '@/lib/conceptIcons';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { TOUCH_TARGET_ICON_CLASS } from '@/lib/touch-target';
@@ -132,13 +133,13 @@ export function NFTMetadata({ nft }: NFTMetadataProps) {
         <StatCard
           label={t('metadata.cycle')}
           value={roundDisplay}
-          icon={<Trophy className="h-4 w-4" />}
+          icon={<CycleIcon className="h-4 w-4" />}
           tooltip={t('metadata.cycleTooltip')}
         />
         <StatCard
           label={t('metadata.recipient')}
           value={recipientDisplay}
-          icon={<Award className="h-4 w-4" />}
+          icon={<RecipientIcon className="h-4 w-4" />}
           tooltip={t('metadata.recipientTooltip')}
         />
         <StatCard

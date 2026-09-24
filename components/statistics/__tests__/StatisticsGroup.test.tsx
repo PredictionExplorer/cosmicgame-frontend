@@ -1,4 +1,4 @@
-import { Trophy } from 'lucide-react';
+import { Layers } from 'lucide-react';
 import userEvent from '@testing-library/user-event';
 
 import { render, screen, checkA11y } from '@/test-utils';
@@ -26,7 +26,7 @@ describe('StatisticsGroup', () => {
 
   it('renders an icon when provided', () => {
     render(
-      <StatisticsGroup title="Group" icon={<Trophy data-testid="icon" className="h-4 w-4" />}>
+      <StatisticsGroup title="Group" icon={<Layers data-testid="icon" className="h-4 w-4" />}>
         <p>Content</p>
       </StatisticsGroup>,
     );
@@ -56,7 +56,7 @@ describe('StatisticsGroup', () => {
     render(
       <StatisticsGroup
         title="Tokens"
-        icon={<Trophy data-testid="icon" className="h-4 w-4" />}
+        icon={<Layers data-testid="icon" className="h-4 w-4" />}
         accentColor="purple"
       >
         <p>Content</p>
@@ -103,7 +103,7 @@ describe('StatisticsGroup', () => {
 
   it('has no accessibility violations', async () => {
     const { container } = render(
-      <StatisticsGroup title="Test Group" icon={<Trophy className="h-4 w-4" />}>
+      <StatisticsGroup title="Test Group" icon={<Layers className="h-4 w-4" />}>
         <p>Accessible content</p>
       </StatisticsGroup>,
     );

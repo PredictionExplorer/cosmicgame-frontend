@@ -182,9 +182,9 @@ export const howItWorksTextEn = {
           'Each Random Walk NFT can be used once for the cost reduction. Save it for a higher-cost gesture to maximize the effect.',
       },
       {
-        title: 'Stack Stellar Selection Entries',
+        title: 'One Gesture, One Stellar Selection Entry',
         description:
-          'Each gesture records one Stellar Selection entry. More gestures means higher Selection frequency.',
+          'Each ETH or CST gesture records one entry for the Stellar Selection at the end of the cycle.',
         tooltip: `Three ETH Stellar Selection recipients share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve. Ten participant NFT recipients and ten Random Walk NFT anchor-holders each receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and a Cosmic Signature NFT.`,
       },
       {

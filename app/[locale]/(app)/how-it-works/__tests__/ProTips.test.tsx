@@ -55,7 +55,7 @@ describe('ProTips', () => {
     renderWithTooltip(<ProTips proTips={proTips} />);
     expect(screen.getByText('Watch Both Calibration Windows')).toBeInTheDocument();
     expect(screen.getByText('Attach a Random Walk NFT')).toBeInTheDocument();
-    expect(screen.getByText('Stack Stellar Selection Entries')).toBeInTheDocument();
+    expect(screen.getByText('One Gesture, One Stellar Selection Entry')).toBeInTheDocument();
     expect(screen.getByText('Use a Burner Wallet')).toBeInTheDocument();
     expect(screen.getByText('Watch the Finalization Time')).toBeInTheDocument();
     expect(screen.getByText('Gesture with CST')).toBeInTheDocument();

@@ -13,6 +13,19 @@ const reactHooksPlugin = nextCoreWebVitals.find((c) => c.plugins?.['react-hooks'
   'react-hooks'
 ];
 
+/**
+ * lucide-react glyphs that depict auction, lottery, prize or game imagery:
+ * gavels, tickets, dice, gamepads, trophies, medals, crowns, swords, gift
+ * boxes, piggy banks, coin hands, clovers and card suits. Matches every
+ * export alias of a glyph (`Trophy`, `TrophyIcon`, `LucideTrophy`).
+ * lib/__tests__/conceptIcons.test.ts reads both patterns from this file.
+ */
+const OFF_LEXICON_ICON_NAMES =
+  '^(?:Lucide)?(?:Gavel|Ticket\\w*|Dices?|Dice[1-6]|Gamepad\\w*|Joystick|Trophy|Medal|Award|Crown|Swords?|Gift|PiggyBank|HandCoins|HandHeart|HeartHandshake|Clover|Spade|Club|Cherry)(?:Icon)?$';
+/** The same glyphs imported from their own module (`lucide-react/dist/esm/icons/trophy`). */
+const OFF_LEXICON_ICON_MODULES =
+  '^lucide-react/.*/icons/(?:gavel|ticket[\\w-]*|dices?|dice-[1-6]|gamepad[\\w-]*|joystick|trophy|medal|award|crown|swords?|gift|piggy-bank|hand-coins|hand-heart|heart-handshake|clover|spade|club|cherry)(?:\\.[cm]?js)?$';
+
 const config = [
   ...nextCoreWebVitals,
   {
@@ -79,6 +92,25 @@ const config = [
               importNames: ['useAccount', 'useAccountEffect', 'useSwitchAccount'],
               message:
                 'Deprecated in wagmi 3: use useConnection, useConnectionEffect or useSwitchConnection.',
+            },
+          ],
+          // The lexicon keeps auction, lottery, prize and game vocabulary out
+          // of the copy; these glyphs would bring the same imagery back.
+          // Coined concepts have one icon each in lib/conceptIcons.ts. A name
+          // pattern, not a list, so the `…Icon` and `Lucide…` aliases lucide
+          // exports for every glyph cannot slip past, and a regex for the
+          // per-icon module paths.
+          patterns: [
+            {
+              group: ['lucide-react'],
+              importNamePattern: OFF_LEXICON_ICON_NAMES,
+              message:
+                'Auction, lottery, prize and game imagery is off-lexicon (AGENTS.md). Use the concept icon from @/lib/conceptIcons.',
+            },
+            {
+              regex: OFF_LEXICON_ICON_MODULES,
+              message:
+                'Auction, lottery, prize and game imagery is off-lexicon (AGENTS.md). Use the concept icon from @/lib/conceptIcons.',
             },
           ],
         },

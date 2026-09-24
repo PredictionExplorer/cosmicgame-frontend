@@ -2,12 +2,13 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Copy, Check, ExternalLink, Gavel, Timer } from 'lucide-react';
+import { Copy, Check, ExternalLink, Timer } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { protocolFacts } from '@/content/protocol-facts';
 import { formatSeconds } from '@/utils';
 
+import { CalibrationWindowIcon } from '@/lib/conceptIcons';
 import { useClipboard } from '@/hooks/useClipboard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
@@ -187,7 +188,7 @@ export function AuctionParameters({
         <motion.div variants={fadeUp}>
           <AuctionCard
             title={t('parameters.cstTitle')}
-            icon={<Gavel className="h-4 w-4" />}
+            icon={<CalibrationWindowIcon className="h-4 w-4" />}
             items={[
               {
                 label: t('parameters.duration'),

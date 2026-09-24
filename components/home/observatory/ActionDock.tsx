@@ -129,6 +129,7 @@ export function ActionDock({
               and can outgrow a 320px viewport — wrap inside the pill instead
               of forcing the dock wider than the screen. */}
           <Button
+            variant="commit"
             size="lg"
             data-testid="dock-open-sheet"
             onClick={onOpenSheet}
@@ -157,6 +158,7 @@ export function ActionDock({
               <Amount value={reserveEth} unit="ETH" className="text-sm font-bold text-secondary" />
             </span>
             <Button
+              variant="commit"
               size="sm"
               data-testid="dock-jump-to-panel"
               onClick={onJumpToPanel}

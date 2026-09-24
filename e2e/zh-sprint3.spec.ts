@@ -18,15 +18,15 @@ import { dismissOpenTooltips, expectTooltipFullyVisible, openTooltip } from './t
  */
 function zhTooltipTriggerForLabel(page: Page, label: string): Locator {
   const zhTooltipButtonSelector = [
-    'button[aria-label^="更多信息"]',
-    'button[aria-label^="查看“"]',
+    ':is(button, [role="button"])[aria-label^="更多信息"]',
+    ':is(button, [role="button"])[aria-label^="查看“"]',
     'button[aria-label^="说明“"]',
   ].join(', ');
 
   return page
     .getByText(label, { exact: true })
     .first()
-    .locator('xpath=ancestor::*[.//button][1]')
+    .locator('xpath=ancestor::*[.//button or .//*[@role="button"]][1]')
     .locator(zhTooltipButtonSelector)
     .first();
 }

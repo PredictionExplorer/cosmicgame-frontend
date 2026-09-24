@@ -312,14 +312,14 @@ describe('font configuration policy', () => {
     }
   });
 
-  it('limits Title-Case button labels to English', () => {
-    // Button variants use Tailwind `capitalize`; cased languages other than
-    // English write labels in sentence case, so the transform is switched off
-    // for every non-English document (unlayered, to outrank utilities).
-    const ruleIndex = css.indexOf("html:not([lang='en']) .capitalize {");
-    expect(ruleIndex).toBeGreaterThan(-1);
-    expect(css.slice(ruleIndex - 1, ruleIndex)).toBe('\n');
-    expect(css.slice(ruleIndex, css.indexOf('}', ruleIndex))).toContain('text-transform: none');
+  it('renders button labels as written in every language', () => {
+    // Labels are authored in sentence case in every catalog, so no case
+    // transform is needed and none is applied: `capitalize` on the Button
+    // variants once turned "Make a gesture" into "Make A Gesture" and needed
+    // a per-language override here.
+    expect(css).not.toContain('.capitalize');
+    const button = readFileSync(resolve(ROOT, 'components', 'ui', 'button.tsx'), 'utf8');
+    expect(button).not.toMatch(/\bcapitalize\b/);
   });
 
   it('ships the referenced local font files in public/fonts', () => {

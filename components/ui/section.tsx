@@ -6,6 +6,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '@/lib/utils';
 import { fadeRise, useMotionVariants } from '@/lib/motion';
+import { SectionHeader, type SectionHeaderProps } from '@/components/ui/section-header';
 
 const sectionVariants = cva('relative', {
   variants: {
@@ -18,19 +19,9 @@ const sectionVariants = cva('relative', {
   defaultVariants: { density: 'comfortable' },
 });
 
-const headerAlign = cva('mb-8 max-w-3xl', {
-  variants: {
-    align: {
-      left: 'text-left',
-      center: 'mx-auto text-center',
-    },
-  },
-  defaultVariants: { align: 'left' },
-});
-
 interface SectionProps
   extends Omit<React.HTMLAttributes<HTMLElement>, 'title'>, VariantProps<typeof sectionVariants> {
-  /** Small uppercase chip rendered above the title. */
+  /** A short kicker above the title, once per section. */
   eyebrow?: React.ReactNode;
   title?: React.ReactNode;
   description?: React.ReactNode;
@@ -39,6 +30,10 @@ interface SectionProps
   disableReveal?: boolean;
   /** Slot for extra header actions (right-aligned on desktop). */
   actions?: React.ReactNode;
+  /** The title's heading element (`h2` by default). */
+  headingAs?: SectionHeaderProps['as'];
+  /** One explanation for the whole section, beside its title. */
+  info?: SectionHeaderProps['info'];
 }
 
 export function Section({
@@ -50,6 +45,8 @@ export function Section({
   align = 'left',
   disableReveal = false,
   actions,
+  headingAs,
+  info,
   id,
   children,
 }: SectionProps) {
@@ -57,35 +54,29 @@ export function Section({
   const ref = React.useRef<HTMLElement | null>(null);
   const inView = useInView(ref, { once: true, amount: 0.2 });
 
-  const hasHeader = eyebrow || title || description || actions;
+  const headingId = id ? `${id}-heading` : undefined;
 
   return (
     <motion.section
       ref={ref}
       id={id}
+      aria-labelledby={title ? headingId : undefined}
       className={cn(sectionVariants({ density }), className)}
       variants={variants}
       initial={disableReveal ? undefined : 'initial'}
       animate={disableReveal || inView ? 'animate' : 'initial'}
     >
-      {hasHeader ? (
-        <header
-          className={cn(
-            headerAlign({ align }),
-            actions && 'flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between',
-          )}
-        >
-          <div>
-            {eyebrow ? (
-              <div className="mb-3 type-eyebrow text-muted-foreground">{eyebrow}</div>
-            ) : null}
-            {title ? <h2 className="type-heading-1 text-foreground">{title}</h2> : null}
-            {description ? (
-              <p className="mt-3 type-body-md text-muted-foreground">{description}</p>
-            ) : null}
-          </div>
-          {actions ? <div className="flex shrink-0 gap-2">{actions}</div> : null}
-        </header>
+      {title ? (
+        <SectionHeader
+          as={headingAs}
+          headingId={headingId}
+          title={title}
+          eyebrow={eyebrow}
+          description={description}
+          info={info}
+          actions={actions}
+          align={align === 'center' ? 'center' : 'start'}
+        />
       ) : null}
       {children}
     </motion.section>

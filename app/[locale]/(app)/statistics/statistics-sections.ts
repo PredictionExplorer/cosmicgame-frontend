@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { Activity, Anchor, Coins, LayoutGrid, Trophy, Users } from 'lucide-react';
+import { Activity, Anchor, Coins, LayoutGrid, ListOrdered, Users } from 'lucide-react';
 
 /**
  * Single source of truth for the statistics section pages: powers the sticky
@@ -50,7 +50,7 @@ export const STATISTICS_SECTIONS: StatisticsSectionDef[] = [
     slug: 'performance',
     href: '/statistics/performance',
     messageKey: 'performance',
-    icon: Trophy,
+    icon: ListOrdered,
   },
 ];
 

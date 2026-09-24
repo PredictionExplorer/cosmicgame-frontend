@@ -1,20 +1,18 @@
 'use client';
 
 import { type FC } from 'react';
-import {
-  Trophy,
-  Shuffle,
-  ImageIcon,
-  Layers,
-  Swords,
-  Crown,
-  Coins,
-  Users,
-  Sprout,
-} from 'lucide-react';
+import { ImageIcon, Layers, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 
+import {
+  ChronoWarriorIcon,
+  EnduranceChampionIcon,
+  FinalCstGestureIcon,
+  PublicGoodsIcon,
+  SignatureAllocationIcon,
+  StellarSelectionIcon,
+} from '@/lib/conceptIcons';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
@@ -64,7 +62,7 @@ const Allocation: FC<AllocationProps> = ({ data, hideHeading = false }) => {
 
   const allocations: AllocationCardData[] = [
     {
-      icon: <Trophy className="h-5 w-5" />,
+      icon: <SignatureAllocationIcon className="h-5 w-5" />,
       name: t('allocation.cards.signature.name'),
       tooltip: t('allocation.cards.signature.tooltip'),
       amounts: [
@@ -80,7 +78,7 @@ const Allocation: FC<AllocationProps> = ({ data, hideHeading = false }) => {
       featured: true,
     },
     {
-      icon: <Sprout className="h-5 w-5" />,
+      icon: <PublicGoodsIcon className="h-5 w-5" />,
       name: t('allocation.cards.publicGoods.name'),
       tooltip: t('allocation.cards.publicGoods.tooltip', {
         percent: String(data?.CharityPercentage ?? 0),
@@ -98,7 +96,7 @@ const Allocation: FC<AllocationProps> = ({ data, hideHeading = false }) => {
       impact: true,
     },
     {
-      icon: <Shuffle className="h-5 w-5" />,
+      icon: <StellarSelectionIcon className="h-5 w-5" />,
       name: t('allocation.cards.ethStellar.name'),
       tooltip: t('allocation.cards.ethStellar.tooltip'),
       amounts: [
@@ -132,7 +130,7 @@ const Allocation: FC<AllocationProps> = ({ data, hideHeading = false }) => {
       recipientLabel: t('allocation.cards.cosmicAnchor.recipientLabel'),
     },
     {
-      icon: <Swords className="h-5 w-5" />,
+      icon: <ChronoWarriorIcon className="h-5 w-5" />,
       name: t('allocation.cards.chronoWarrior.name'),
       tooltip: t('allocation.cards.chronoWarrior.tooltip'),
       amounts: [
@@ -149,7 +147,7 @@ const Allocation: FC<AllocationProps> = ({ data, hideHeading = false }) => {
       faqLink: '/faq#chrono-warrior',
     },
     {
-      icon: <Crown className="h-5 w-5" />,
+      icon: <EnduranceChampionIcon className="h-5 w-5" />,
       name: t('allocation.cards.endurance.name'),
       tooltip: t('allocation.cards.endurance.tooltip'),
       amounts: [t('allocation.amounts.fixedCst'), t('allocation.amounts.nft')],
@@ -157,7 +155,7 @@ const Allocation: FC<AllocationProps> = ({ data, hideHeading = false }) => {
       faqLink: '/faq#endurance-champion',
     },
     {
-      icon: <Coins className="h-5 w-5" />,
+      icon: <FinalCstGestureIcon className="h-5 w-5" />,
       name: t('allocation.cards.finalCst.name'),
       tooltip: t('allocation.cards.finalCst.tooltip'),
       amounts: [t('allocation.amounts.fixedCst'), t('allocation.amounts.nft')],

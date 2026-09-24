@@ -1,0 +1,94 @@
+{
+  "terms": {
+    "gesture": {
+      "term": "落筆",
+      "short": "參與者在週期內以 ETH 或 CST 完成的一次鏈上操作，會延長收官倒數，並為簽名添上一筆。",
+      "long": "每一筆都會把目前的時間增量計入週期收官時間，為星選記錄一次資格，並可能銘刻參與 CST。每個週期的第一筆必須以 ETH 落筆，此後 ETH 與 CST 落筆可自由交替。"
+    },
+    "cycle": {
+      "term": "演繹週期",
+      "short": "協議的一次完整運行：從開場的校準窗口開始，到收官並發放各項分配為止。",
+      "long": "週期沒有固定長度：週期收官時間走完、且有人執行收官後，週期才結束。屆時約一半的週期儲備會作為滾動儲備進入下一個週期。"
+    },
+    "cycleFinalizationTime": {
+      "term": "週期收官時間",
+      "short": "週期可以收官的時刻。第一筆落筆啟動收官倒數，之後的每一筆都會延長它。",
+      "long": "倒數歸零後，寫下收官之筆的參與者可以執行收官，並取回簽名分配。在週期真正收官之前仍可繼續落筆，每一筆都會再次把時間往後推。"
+    },
+    "calibrationWindow": {
+      "term": "校準窗口",
+      "short": "落筆價格從校準上限向校準下限逐步下降的時段；等待越久，價格越低。",
+      "long": "ETH 落筆與 CST 落筆各有獨立的窗口。CST 窗口保存在鏈上，並在每一筆後變化：CST 落筆會讓它略微變長，ETH 落筆會讓它略微變短。"
+    },
+    "cycleReserve": {
+      "term": "週期儲備",
+      "short": "為目前週期持有的 ETH。ETH 落筆與貢獻會注入其中，收官時各項分配從中撥出。",
+      "long": "週期收官時，每條分配軌道按固定份額獲配：簽名分配、星選、錨定配發、時之勇士、公共財，以及開啟下一個週期的滾動儲備。"
+    },
+    "signatureAllocation": {
+      "term": "簽名分配",
+      "short": "週期收官之筆所對應的分配：一份以 ETH 計的週期儲備、表彰 CST 與一枚 Cosmic Signature NFT。",
+      "long": "寫下收官之筆的參與者可以執行收官並取回這份分配，並優先取回附加在落筆上的代幣與 NFT。若其未在專屬時段內收官，則由執行收官者獲配。"
+    },
+    "finalCstGesture": {
+      "term": "CST 收官之筆",
+      "short": "週期內最後一次以 CST 完成的落筆。",
+      "long": "週期收官時，寫下這一筆的參與者將獲配表彰 CST 與一枚 Cosmic Signature NFT。"
+    },
+    "enduranceChampion": {
+      "term": "堅守冠軍",
+      "short": "一個週期內，連續保持「最近一筆落筆者」身份時間最長的參與者。",
+      "long": "這段時間即下一筆到來之前最長的間隔。週期收官時，堅守冠軍將獲配表彰 CST 與一枚 Cosmic Signature NFT。"
+    },
+    "chronoWarrior": {
+      "term": "時之勇士",
+      "short": "一個週期內，連續保持堅守冠軍身份時間最長的參與者。",
+      "long": "堅守冠軍是保持最近一筆最久的人，時之勇士則是保持堅守冠軍身份最久的人。收官時，時之勇士將獲配一份以 ETH 計的週期儲備、表彰 CST 與一枚 Cosmic Signature NFT。"
+    },
+    "stellarSelection": {
+      "term": "星選",
+      "short": "協議在收官時進行的隨機選取，在已記錄的資格之間發放分配。",
+      "long": "每一筆都會記錄一次資格。收官時，合約藉助鏈上隨機源選取資格，發放 ETH 與 Cosmic Signature NFT 分配；已錨定的 Random Walk NFT 參與另一輪獨立的星選。同一地址可能被多次選中。"
+    },
+    "anchoring": {
+      "term": "錨定",
+      "short": "將 Cosmic Signature NFT 或 Random Walk NFT 錨定到協議，使其參與錨定配發或錨定 NFT 星選。",
+      "long": "已錨定的 Cosmic Signature NFT 共享每個已收官週期的錨定配發；已錨定的 Random Walk NFT 參與獨立的星選。每枚 NFT 只能錨定一次，解錨後無法再次錨定。"
+    },
+    "anchorDistribution": {
+      "term": "錨定配發",
+      "short": "每個已收官週期中，由已錨定的 Cosmic Signature NFT 平均分享的 ETH 份額。",
+      "long": "NFT 保持錨定期間，配發會持續累積，並在解錨時一併發放。若收官時沒有任何 Cosmic Signature NFT 處於錨定狀態，這份份額將留在週期儲備中。"
+    },
+    "retrieve": {
+      "term": "取回",
+      "short": "把協議為你保管的分配轉入你的錢包。",
+      "long": "分配會保存在分配錢包中，直到獲配者取回。超過取回期限後，合約允許任何人取回尚未取回的分配，因此請及時取回。"
+    },
+    "imprint": {
+      "term": "銘刻",
+      "short": "在鏈上產生新的 Cosmic Signature NFT 或新的 CST。",
+      "long": "收官時會銘刻本週期的 Cosmic Signature NFT 與表彰 CST，每一筆落筆也可能銘刻參與 CST。每枚 Cosmic Signature NFT 都由其鏈上種子產生。"
+    },
+    "publicGoods": {
+      "term": "公共財",
+      "short": "每個週期儲備中轉撥給公共財受益方的份額，目前受益方為 Protocol Guild。",
+      "long": "Protocol Guild 為以太坊核心貢獻者提供資助。按照設計，合約所有權移交宇宙議會後，將由議會選定受益方。"
+    },
+    "outreachReserve": {
+      "term": "推廣儲備",
+      "short": "每個週期銘刻的一筆 CST，發放給幫助更多人了解協議的貢獻者。",
+      "long": "發放對象為生態貢獻者，每一次發放都記錄在鏈上。"
+    },
+    "cosmicCouncil": {
+      "term": "宇宙議會",
+      "short": "鏈上協調機構。CST 持有者可在此提交協調提案，並表達支持或反對。",
+      "long": "委託後的 CST 構成協調權重。按照設計，合約所有權移交議會後，議會將負責協議參數，例如公共財受益方；目前這些設定仍由協議所有者管理。"
+    },
+    "cst": {
+      "term": "CST",
+      "short": "Cosmic Signature Token，協議的 ERC-20 代幣。",
+      "long": "落筆可能銘刻 CST，CST 也可用於支付 CST 落筆，所付 CST 會被銷毀。委託後的 CST 在宇宙議會中構成協調權重。"
+    }
+  }
+}

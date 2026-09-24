@@ -2,11 +2,11 @@
 
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
-import { Trophy, Gavel, Layers, Users } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { AllocationIcon, CycleIcon, GestureIcon, RecipientIcon } from '@/lib/conceptIcons';
 import { ALLOCATION_TRACK_COLORS } from '@/config/allocationTracks';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
@@ -183,7 +183,7 @@ const AllocationRecipientsPage = ({ seoSummary }: { seoSummary?: ReactNode }) =>
             data-testid="summary-stat-total-cycles"
             label={t('recipients.stats.totalCycles.label')}
             value={summaryStats.totalRounds}
-            icon={<Layers className="h-4 w-4" />}
+            icon={<CycleIcon className="h-4 w-4" />}
             accent="aurora"
             tooltip={t('recipients.stats.totalCycles.tooltip')}
           />
@@ -191,7 +191,7 @@ const AllocationRecipientsPage = ({ seoSummary }: { seoSummary?: ReactNode }) =>
             data-testid="summary-stat-total-eth-distributed"
             label={t('recipients.stats.totalEth.label')}
             value={`${summaryStats.totalEth.toFixed(2)} ETH`}
-            icon={<Trophy className="h-4 w-4" />}
+            icon={<AllocationIcon className="h-4 w-4" />}
             accent="solar"
             tooltip={t('recipients.stats.totalEth.tooltip')}
           />
@@ -199,7 +199,7 @@ const AllocationRecipientsPage = ({ seoSummary }: { seoSummary?: ReactNode }) =>
             data-testid="summary-stat-total-gestures"
             label={t('recipients.stats.totalGestures.label')}
             value={summaryStats.totalGestures.toLocaleString(locale)}
-            icon={<Gavel className="h-4 w-4" />}
+            icon={<GestureIcon className="h-4 w-4" />}
             accent="nebula"
             tooltip={t('recipients.stats.totalGestures.tooltip')}
           />
@@ -207,7 +207,7 @@ const AllocationRecipientsPage = ({ seoSummary }: { seoSummary?: ReactNode }) =>
             data-testid="summary-stat-unique-recipients"
             label={t('recipients.stats.uniqueRecipients.label')}
             value={summaryStats.uniqueRecipients}
-            icon={<Users className="h-4 w-4" />}
+            icon={<RecipientIcon className="h-4 w-4" />}
             accent="impact"
             tooltip={t('recipients.stats.uniqueRecipients.tooltip')}
           />

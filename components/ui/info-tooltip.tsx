@@ -1,22 +1,47 @@
 'use client';
 
 import { Info } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
-import { getLocaleConfig } from '@/i18n/localeConfig';
 import { cn } from '@/lib/utils';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { ExplainPopover } from '@/components/ui/explain-popover';
 
 interface InfoTooltipProps {
   content: string;
+  /** Layout and colour of the icon in its row (margins, `ml-auto`, a text colour). */
   className?: string;
   iconClassName?: string;
   side?: 'top' | 'right' | 'bottom' | 'left';
   maxWidth?: number;
+  /** Overrides the accessible name. Prefer `label`. */
   ariaLabel?: string;
+  /**
+   * What the icon explains, usually the visible label beside it. The button
+   * is named "More information about {label}" and the card is headed by it.
+   * Pass it at every new call site; without it every icon on a page shares
+   * the name "More information" and only its description tells them apart.
+   */
   label?: string;
 }
 
+/**
+ * InfoTooltip — an ⓘ that explains the label or heading it follows.
+ *
+ * Use it once per section or group, and where a decision depends on the
+ * explanation (the Calibration Window, a non-refundable spend). For a coined
+ * word in a sentence or a figure label, use `<Term>` or `<ExplainedTerm>`
+ * instead: the word itself opens the explanation, so the row gains no icon
+ * and no extra tab stop.
+ *
+ * The 16px icon sets the layout box, so the row keeps its height and a
+ * caller's margins and colour apply to the icon as before. Over it sits the
+ * button itself, 24px square (the WCAG 2.5.8 minimum, and the box automated
+ * audits measure), extended to a 44px hit area on coarse pointers by a
+ * transparent pseudo-element. Hover shows the explanation; a click, tap,
+ * Enter or Space pins it. The full text is the button's description
+ * (`aria-describedby`), so the name stays short and is never a truncated
+ * sentence.
+ */
 export function InfoTooltip({
   content,
   className,
@@ -27,43 +52,31 @@ export function InfoTooltip({
   label,
 }: InfoTooltipProps) {
   const t = useTranslations('tooltips');
-  const locale = useLocale();
-  const defaultAriaLabel =
-    content.length > 72
-      ? `${content.slice(0, 69).trimEnd()}${getLocaleConfig(locale).ellipsis}`
-      : content;
-  const resolvedAriaLabel =
-    ariaLabel ??
-    (label
-      ? t('moreInformationAbout', { label })
-      : t('moreInformation', { content: defaultAriaLabel }));
+  const name = ariaLabel ?? (label ? t('moreInformationAbout', { label }) : t('moreInformation'));
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
+    <span
+      data-slot="info-tooltip"
+      className={cn(
+        'relative ml-0.5 inline-flex shrink-0 align-middle text-subtle',
+        'transition-colors duration-[var(--duration-fast)] ease-[var(--ease-out-soft)] hover:text-foreground has-[[data-state=open]]:text-foreground',
+        className,
+      )}
+    >
+      <Info aria-hidden className={cn('size-4', iconClassName)} />
+      <ExplainPopover title={label} definition={content} side={side} maxWidth={maxWidth}>
         <button
           type="button"
-          aria-label={resolvedAriaLabel}
-          // The icon sits inline beside a label, so it cannot grow to 44px
-          // without pushing that row taller. Instead a transparent
-          // pseudo-element extends the hit area to 44px around the icon,
-          // leaving layout untouched. `data-touch-target` tells the mobile
-          // audit to verify the real hit area rather than the icon's box.
+          aria-label={name}
+          // `data-touch-target` tells the mobile audit to measure the real
+          // hit area (the pseudo-element) rather than the button's box.
           data-touch-target="extended"
           className={cn(
-            'relative inline-flex cursor-help appearance-none items-center border-0 bg-transparent p-0 align-middle text-muted-foreground/50 transition-colors hover:text-primary/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
-            "after:absolute after:left-1/2 after:top-1/2 after:h-11 after:w-11 after:-translate-x-1/2 after:-translate-y-1/2 after:content-[''] sm:after:hidden",
-            className,
+            'absolute left-1/2 top-1/2 size-6 -translate-x-1/2 -translate-y-1/2 cursor-help rounded-full',
+            "pointer-coarse:after:absolute pointer-coarse:after:left-1/2 pointer-coarse:after:top-1/2 pointer-coarse:after:size-11 pointer-coarse:after:-translate-x-1/2 pointer-coarse:after:-translate-y-1/2 pointer-coarse:after:content-['']",
           )}
-        >
-          <Info className={cn('h-3.5 w-3.5 text-current', iconClassName)} />
-        </button>
-      </TooltipTrigger>
-      <TooltipContent side={side}>
-        <p className="text-xs leading-relaxed" style={{ maxWidth }}>
-          {content}
-        </p>
-      </TooltipContent>
-    </Tooltip>
+        />
+      </ExplainPopover>
+    </span>
   );
 }

@@ -2,9 +2,10 @@
 
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Info } from 'lucide-react';
+import { Info } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
+import { OutreachReserveIcon } from '@/lib/conceptIcons';
 import { cn } from '@/lib/utils';
 import { TOUCH_TARGET_EXTENDED_CLASS } from '@/lib/touch-target';
 import { AddressLink } from '@/components/common/AddressLink';
@@ -55,7 +56,7 @@ export function TopMarketersLeaderboard({ rewards }: TopMarketersLeaderboardProp
   return (
     <section aria-labelledby="leaderboard-heading" className="py-8 sm:py-10">
       <div className="mb-10 flex items-center justify-center gap-2">
-        <Trophy className="h-5 w-5 text-primary" />
+        <OutreachReserveIcon className="h-5 w-5 text-primary" aria-hidden />
         <h2
           id="leaderboard-heading"
           className="font-display text-2xl font-bold tracking-tight sm:text-3xl"

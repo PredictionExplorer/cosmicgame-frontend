@@ -1,22 +1,21 @@
 'use client';
 
 import { type FC } from 'react';
-import {
-  Trophy,
-  Shuffle,
-  ImageIcon,
-  Layers,
-  Swords,
-  Crown,
-  Coins,
-  Users,
-  Sprout,
-} from 'lucide-react';
+import { ImageIcon, Layers, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 
+import {
+  ChronoWarriorIcon,
+  EnduranceChampionIcon,
+  FinalCstGestureIcon,
+  PublicGoodsIcon,
+  SignatureAllocationIcon,
+  StellarSelectionIcon,
+} from '@/lib/conceptIcons';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 
 interface AllocationData {
@@ -45,7 +44,6 @@ interface AllocationCardData {
   recipientLabel?: string;
   faqLink?: string;
   featured?: boolean;
-  impact?: boolean;
 }
 
 const cardVariants = {
@@ -62,7 +60,7 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
 
   const allocations: AllocationCardData[] = [
     {
-      icon: <Trophy className="h-5 w-5" />,
+      icon: <SignatureAllocationIcon className="h-5 w-5" />,
       name: t('allocation.cards.signature.name'),
       tooltip: t('allocation.cards.signature.tooltip'),
       amounts: [
@@ -78,7 +76,7 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
       featured: true,
     },
     {
-      icon: <Sprout className="h-5 w-5" />,
+      icon: <PublicGoodsIcon className="h-5 w-5" />,
       name: t('allocation.cards.publicGoods.name'),
       tooltip: t('allocation.cards.publicGoods.tooltip', {
         percent: String(data?.CharityPercentage ?? 0),
@@ -93,10 +91,9 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
       ],
       recipientLabel: t('allocation.cards.publicGoods.recipientLabel'),
       faqLink: '/faq',
-      impact: true,
     },
     {
-      icon: <Shuffle className="h-5 w-5" />,
+      icon: <StellarSelectionIcon className="h-5 w-5" />,
       name: t('allocation.cards.ethStellar.name'),
       tooltip: t('allocation.cards.ethStellar.tooltip'),
       amounts: [
@@ -130,7 +127,7 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
       recipientLabel: t('allocation.cards.cosmicAnchor.recipientLabel'),
     },
     {
-      icon: <Swords className="h-5 w-5" />,
+      icon: <ChronoWarriorIcon className="h-5 w-5" />,
       name: t('allocation.cards.chronoWarrior.name'),
       tooltip: t('allocation.cards.chronoWarrior.tooltip'),
       amounts: [
@@ -147,7 +144,7 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
       faqLink: '/faq#chrono-warrior',
     },
     {
-      icon: <Crown className="h-5 w-5" />,
+      icon: <EnduranceChampionIcon className="h-5 w-5" />,
       name: t('allocation.cards.endurance.name'),
       tooltip: t('allocation.cards.endurance.tooltip'),
       amounts: [t('allocation.amounts.fixedCst'), t('allocation.amounts.nft')],
@@ -155,7 +152,7 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
       faqLink: '/faq#endurance-champion',
     },
     {
-      icon: <Coins className="h-5 w-5" />,
+      icon: <FinalCstGestureIcon className="h-5 w-5" />,
       name: t('allocation.cards.finalCst.name'),
       tooltip: t('allocation.cards.finalCst.tooltip'),
       amounts: [t('allocation.amounts.fixedCst'), t('allocation.amounts.nft')],
@@ -166,9 +163,7 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
   return (
     <div className="mt-12">
       <div className="flex items-center gap-2 mb-6">
-        <h3 className="font-display text-lg font-semibold tracking-tight">
-          {t('allocation.title')}
-        </h3>
+        <h3 className="type-heading-3 text-foreground">{t('allocation.title')}</h3>
         <InfoTooltip content={t('allocation.titleTooltip')} />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -180,41 +175,30 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
             initial="hidden"
             animate="visible"
             className={cn(
-              'group relative rounded-xl border p-4 transition-all duration-300 hover:bg-white/[0.04]',
-              allocation.impact
-                ? 'border-[oklch(77.1%_0.163_161)]/30 bg-[rgb(var(--impact-green-rgb)/0.04)] glow-impact'
-                : allocation.featured
-                  ? 'gradient-border-card gradient-border-card-accent bg-white/[0.03] sm:col-span-2 lg:col-span-2'
-                  : 'border-white/[0.06] bg-white/[0.02]',
+              'group relative rounded-surface p-4 transition-colors duration-[var(--duration-fast)]',
+              allocation.featured
+                ? 'gradient-border-card gradient-border-card-accent bg-primary/[0.04] sm:col-span-2 lg:col-span-2'
+                : 'border border-rule-faint bg-surface/60 hover:bg-surface',
             )}
           >
             <div className="flex items-start gap-3">
               <div
                 className={cn(
-                  'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors',
-                  allocation.impact
-                    ? 'bg-[rgb(var(--impact-green-rgb)/0.12)] text-[rgb(var(--impact-green-rgb))]'
-                    : allocation.featured
-                      ? 'bg-gradient-to-br from-primary/20 to-accent/20 text-primary'
-                      : 'bg-white/[0.06] text-muted-foreground group-hover:text-primary',
+                  'flex h-9 w-9 shrink-0 items-center justify-center rounded-control border border-rule-faint bg-surface-sunken transition-colors duration-[var(--duration-fast)]',
+                  allocation.featured ? 'text-primary' : 'text-subtle group-hover:text-foreground',
                 )}
               >
                 {allocation.icon}
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
-                  <span
-                    className={cn(
-                      'text-sm font-semibold',
-                      allocation.featured || allocation.impact ? 'text-white' : 'text-white/90',
-                    )}
-                  >
+                  <span className="type-title text-foreground">
                     {allocation.faqLink ? (
                       <Link
                         href={allocation.faqLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="hover:text-primary transition-colors"
+                        className="link-quiet"
                       >
                         {allocation.name}
                       </Link>
@@ -229,12 +213,10 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
                     <p
                       key={amount}
                       className={cn(
-                        'text-sm',
-                        allocation.impact
-                          ? 'font-medium text-[rgb(var(--impact-green-rgb))]'
-                          : allocation.featured
-                            ? 'font-medium bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent'
-                            : 'text-muted-foreground',
+                        'type-body-sm tabular-nums',
+                        allocation.featured
+                          ? 'font-medium text-foreground'
+                          : 'text-muted-foreground',
                       )}
                     >
                       {amount}
@@ -242,10 +224,10 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
                   ))}
                 </div>
                 <div className="mt-2.5 flex items-center gap-1.5">
-                  <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                  <Badge size="sm">
                     {allocation.recipientLabel ??
                       t('allocation.recipientCount', { count: allocation.recipientCount ?? 0 })}
-                  </span>
+                  </Badge>
                 </div>
               </div>
             </div>

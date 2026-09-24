@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { Trophy, Ticket, Heart, Layers, Coins, AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { getExplorerUrl, shortenHex } from '@/utils';
@@ -18,6 +18,16 @@ import {
   TablePrimaryHeadCell,
   TablePrimary,
 } from '@/components/styled';
+import {
+  AnchorDistributionIcon,
+  AnchoringIcon,
+  AttachedAssetsIcon,
+  ChronoWarriorIcon,
+  EnduranceChampionIcon,
+  FinalCstGestureIcon,
+  SignatureAllocationIcon,
+  StellarSelectionIcon,
+} from '@/lib/conceptIcons';
 import { cn } from '@/lib/utils';
 import type { WinningHistoryEntry } from '@/services/api/types';
 import { allocationAmountUnit } from '@/utils/allocationRecords';
@@ -26,56 +36,80 @@ export type { WinningHistoryEntry };
 
 /** Backend `cg_prize.ptype` / API `RecordType` — must match black-site prize history labels. */
 const RECORD_TYPE_MAP: Record<number, { icon: ReactNode; textKey: string }> = {
-  0: { icon: <Ticket className="h-5 w-5" />, textKey: 'recipientHistory.types.mainEth' },
-  1: { icon: <Coins className="h-5 w-5" />, textKey: 'recipientHistory.types.mainCst' },
-  2: { icon: <Heart className="h-5 w-5" />, textKey: 'recipientHistory.types.mainNft' },
-  3: { icon: <Ticket className="h-5 w-5" />, textKey: 'recipientHistory.types.finalCstNft' },
+  0: {
+    icon: <SignatureAllocationIcon className="h-5 w-5" />,
+    textKey: 'recipientHistory.types.mainEth',
+  },
+  1: {
+    icon: <SignatureAllocationIcon className="h-5 w-5" />,
+    textKey: 'recipientHistory.types.mainCst',
+  },
+  2: {
+    icon: <SignatureAllocationIcon className="h-5 w-5" />,
+    textKey: 'recipientHistory.types.mainNft',
+  },
+  3: {
+    icon: <FinalCstGestureIcon className="h-5 w-5" />,
+    textKey: 'recipientHistory.types.finalCstNft',
+  },
   4: {
-    icon: <Coins className="h-5 w-5" />,
+    icon: <FinalCstGestureIcon className="h-5 w-5" />,
     textKey: 'recipientHistory.types.finalCstRecognition',
   },
-  5: { icon: <Trophy className="h-5 w-5" />, textKey: 'recipientHistory.types.enduranceNft' },
+  5: {
+    icon: <EnduranceChampionIcon className="h-5 w-5" />,
+    textKey: 'recipientHistory.types.enduranceNft',
+  },
   6: {
-    icon: <Coins className="h-5 w-5" />,
+    icon: <EnduranceChampionIcon className="h-5 w-5" />,
     textKey: 'recipientHistory.types.enduranceRecognition',
   },
-  7: { icon: <Trophy className="h-5 w-5" />, textKey: 'recipientHistory.types.chronoEth' },
-  8: { icon: <Coins className="h-5 w-5" />, textKey: 'recipientHistory.types.chronoCst' },
-  9: { icon: <Ticket className="h-5 w-5" />, textKey: 'recipientHistory.types.chronoNft' },
+  7: {
+    icon: <ChronoWarriorIcon className="h-5 w-5" />,
+    textKey: 'recipientHistory.types.chronoEth',
+  },
+  8: {
+    icon: <ChronoWarriorIcon className="h-5 w-5" />,
+    textKey: 'recipientHistory.types.chronoCst',
+  },
+  9: {
+    icon: <ChronoWarriorIcon className="h-5 w-5" />,
+    textKey: 'recipientHistory.types.chronoNft',
+  },
   10: {
-    icon: <Trophy className="h-5 w-5" />,
+    icon: <StellarSelectionIcon className="h-5 w-5" />,
     textKey: 'recipientHistory.types.participantStellarEth',
   },
   11: {
-    icon: <Coins className="h-5 w-5" />,
+    icon: <StellarSelectionIcon className="h-5 w-5" />,
     textKey: 'recipientHistory.types.participantStellarCst',
   },
   12: {
-    icon: <Layers className="h-5 w-5" />,
+    icon: <StellarSelectionIcon className="h-5 w-5" />,
     textKey: 'recipientHistory.types.participantStellarNft',
   },
   13: {
-    icon: <Coins className="h-5 w-5" />,
+    icon: <AnchoringIcon className="h-5 w-5" />,
     textKey: 'recipientHistory.types.anchorStellarCst',
   },
   14: {
-    icon: <Layers className="h-5 w-5" />,
+    icon: <AnchoringIcon className="h-5 w-5" />,
     textKey: 'recipientHistory.types.anchorStellarNft',
   },
   15: {
-    icon: <Ticket className="h-5 w-5" />,
+    icon: <AnchorDistributionIcon className="h-5 w-5" />,
     textKey: 'recipientHistory.types.anchorDistributionEth',
   },
   16: {
-    icon: <Heart className="h-5 w-5" />,
+    icon: <AttachedAssetsIcon className="h-5 w-5" />,
     textKey: 'recipientHistory.types.attachedNftRetrieval',
   },
   17: {
-    icon: <Coins className="h-5 w-5" />,
+    icon: <AttachedAssetsIcon className="h-5 w-5" />,
     textKey: 'recipientHistory.types.attachedErc20Retrieval',
   },
   18: {
-    icon: <Trophy className="h-5 w-5" />,
+    icon: <StellarSelectionIcon className="h-5 w-5" />,
     textKey: 'recipientHistory.types.stellarEthRetrieval',
   },
 };
