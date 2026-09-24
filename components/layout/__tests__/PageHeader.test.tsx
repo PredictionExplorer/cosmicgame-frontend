@@ -188,20 +188,17 @@ describe('PageHeader', () => {
       expect(label.closest('dt')).not.toBeNull();
     });
 
-    it('lets an odd last figure span both phone columns', () => {
-      render(
-        <PageHeader
-          title="Ledger"
-          figures={[
-            { id: 'a', label: 'A', value: '1' },
-            { id: 'b', label: 'B', value: '2' },
-            { id: 'c', label: 'C', value: '3' },
-          ]}
-        />,
+    it('lists an odd count as rows on phones, so no grid cell is left empty', () => {
+      const figure = (id: string) => ({ id, label: id.toUpperCase(), value: '1' });
+      const { rerender } = render(
+        <PageHeader title="Ledger" figures={['a', 'b', 'c'].map(figure)} />,
       );
-      expect(document.querySelector('dl')).toHaveClass(
-        'max-sm:[&>div:last-child:nth-child(odd)]:col-span-2',
-      );
+      expect(document.querySelector('dl')).toHaveAttribute('data-layout', 'rows');
+      expect(document.querySelector('dl')).toHaveClass('grid-cols-1', 'sm:grid-cols-3');
+
+      rerender(<PageHeader title="Ledger" figures={['a', 'b', 'c', 'd'].map(figure)} />);
+      expect(document.querySelector('dl')).toHaveAttribute('data-layout', 'grid');
+      expect(document.querySelector('dl')).toHaveClass('grid-cols-2', 'sm:grid-cols-4');
     });
 
     it('names each figure info button after its label', () => {

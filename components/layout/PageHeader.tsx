@@ -371,10 +371,11 @@ export function PageHeaderTabs({
 }
 
 /**
- * The header's figure row: label over value, a two-column grid on phones (an
- * odd last figure spans both columns, so no cell is left empty) and one row
- * divided by hairlines from `lg`. Each figure appears once per page — the
- * page body never repeats it in a second stat row.
+ * The header's figure row: label over value, one row divided by hairlines
+ * from `lg`. On phones an even count is a two-column grid (2×2 for four); an
+ * odd count, which would leave an empty cell, is a list of label-and-value
+ * rows between hairlines. Each figure appears once per page — the page body
+ * never repeats it in a second stat row.
  */
 export function PageHeaderFigures({
   figures,
@@ -385,12 +386,14 @@ export function PageHeaderFigures({
 }) {
   const t = useTranslations('common');
   const unavailable = t('status.unavailable');
+  const rows = figures.length > 1 && figures.length % 2 === 1;
   return (
     <dl
+      data-layout={rows ? 'rows' : 'grid'}
       className={cn(
         // Phones: tighter rhythm, so the header stays near the top of the first screen.
-        'mt-4 grid grid-cols-2 gap-x-4 gap-y-3 sm:mt-8 sm:gap-x-6 sm:gap-y-5',
-        'max-sm:[&>div:last-child:nth-child(odd)]:col-span-2',
+        'mt-4 grid gap-x-4 sm:mt-8 sm:gap-x-6 sm:gap-y-5',
+        rows ? 'grid-cols-1 max-sm:divide-y max-sm:divide-rule' : 'grid-cols-2 gap-y-3',
         FIGURE_COLUMNS[Math.min(figures.length, 4)],
         'lg:flex lg:flex-wrap lg:gap-x-0 lg:divide-x lg:divide-rule',
         className,
@@ -400,7 +403,11 @@ export function PageHeaderFigures({
         <div
           key={figure.id}
           data-figure={figure.id}
-          className="min-w-0 lg:px-8 lg:first:pl-0 lg:last:pr-0"
+          className={cn(
+            'min-w-0 lg:px-8 lg:first:pl-0 lg:last:pr-0',
+            rows &&
+              'max-sm:flex max-sm:flex-wrap max-sm:items-baseline max-sm:justify-between max-sm:gap-x-4 max-sm:py-2 max-sm:first:pt-0 max-sm:last:pb-0',
+          )}
         >
           <dt className="type-label text-subtle">
             {/* The label is its own text node, so the dt reads exactly as the label. */}
@@ -419,11 +426,18 @@ export function PageHeaderFigures({
             ) : null}
           </dt>
           {/* A date may wrap in a narrow column rather than overflow it. */}
-          <dd className="mt-1 type-figure-md text-foreground [&_time]:whitespace-normal lg:type-figure-lg">
+          <dd
+            className={cn(
+              'mt-1 type-figure-md text-foreground [&_time]:whitespace-normal lg:type-figure-lg',
+              rows && 'max-sm:mt-0 max-sm:text-right',
+            )}
+          >
             {figure.value === null ? <UnknownValue label={unavailable} /> : figure.value}
           </dd>
           {figure.caption ? (
-            <dd className="mt-0.5 type-caption text-subtle">{figure.caption}</dd>
+            <dd className={cn('mt-0.5 type-caption text-subtle', rows && 'max-sm:basis-full')}>
+              {figure.caption}
+            </dd>
           ) : null}
         </div>
       ))}
