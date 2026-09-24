@@ -75,6 +75,19 @@ describe('AddressChip', () => {
     expect(link.getAttribute('title')).toMatch(/^formats\.address\.known\.publicGoods · 0x/);
   });
 
+  it('truncates a contract name by default and lets it wrap where asked', () => {
+    publishDashboardContractAddresses({ ...emptyContractAddresses(), charity: ADDRESS });
+    const { rerender } = render(<AddressChip address={ADDRESS} variant="plain" />);
+    expect(screen.getByText('formats.address.known.publicGoods')).toHaveClass('truncate');
+    rerender(<AddressChip address={ADDRESS} variant="plain" wrapLabel />);
+    const name = screen.getByText('formats.address.known.publicGoods');
+    expect(name).not.toHaveClass('truncate');
+    expect(name).toHaveClass('whitespace-normal');
+    // Hex keeps its one unbreakable short form either way.
+    rerender(<AddressChip address={ADDRESS} label={false} wrapLabel />);
+    expect(screen.getByRole('link').textContent).toMatch(SHORT);
+  });
+
   it('shows hex anyway when labels are turned off, and honours an explicit label', () => {
     publishDashboardContractAddresses({ ...emptyContractAddresses(), charity: ADDRESS });
     const { rerender } = render(<AddressChip address={ADDRESS} label={false} />);

@@ -1,3 +1,4 @@
+import { emptyContractAddresses, publishDashboardContractAddresses } from '@/config/networks';
 import { TOKEN_1_METADATA_V2 } from '@/lib/nftMetadata/__fixtures__/metadata';
 import { normalizeTraitEntry, parseCosmicSignatureMetadata } from '@/lib/nftMetadata';
 
@@ -29,6 +30,10 @@ function row(testId: string) {
 }
 
 describe('NFTSpecList', () => {
+  afterEach(() => {
+    publishDashboardContractAddresses(emptyContractAddresses());
+  });
+
   it('lists the provenance as label / value rows of one ledger', () => {
     render(<NFTSpecList nft={fullNft} />);
     const list = screen.getByTestId('nft-spec-list');
@@ -39,13 +44,14 @@ describe('NFTSpecList', () => {
     );
   });
 
-  it('links the cycle to its allocation page', () => {
+  it('links the cycle to its allocation page, marked as a link at rest', () => {
     render(<NFTSpecList nft={fullNft} />);
-    expect(
-      within(row('spec-cycle')).getByRole('link', {
-        name: 'detail.metadata.roundNumber(round=42)',
-      }),
-    ).toHaveAttribute('href', '/allocation/42');
+    const cycle = within(row('spec-cycle')).getByRole('link', {
+      name: 'detail.metadata.roundNumber(round=42)',
+    });
+    expect(cycle).toHaveAttribute('href', '/allocation/42');
+    // The quiet underline only shows on hover, so a trailing arrow says it leads on.
+    expect(cycle.querySelector('svg.lucide-arrow-right')).not.toBeNull();
   });
 
   it('links the imprint date to its transaction and ages it once the time is known', async () => {
@@ -78,6 +84,16 @@ describe('NFTSpecList', () => {
     );
   });
 
+  it('lets a protocol contract’s name wrap instead of cutting it short', () => {
+    publishDashboardContractAddresses({
+      ...emptyContractAddresses(),
+      charity: fullNft!.CurOwnerAddr!,
+    });
+    render(<NFTSpecList nft={fullNft} />);
+    const name = within(row('spec-owner')).getByText('formats.address.known.publicGoods');
+    expect(name).not.toHaveClass('truncate');
+  });
+
   it('shows the rarity rank with the rarest trait when the collection is indexed', () => {
     render(
       <NFTSpecList
@@ -101,6 +117,7 @@ describe('NFTSpecList', () => {
       name: 'detail.badges.eligibleForAnchoring',
     });
     expect(eligible).toHaveAttribute('href', '/anchoring');
+    expect(eligible.querySelector('svg.lucide-arrow-right')).not.toBeNull();
 
     rerender(<NFTSpecList nft={{ ...fullNft, Staked: true }} />);
     const anchored = within(row('spec-anchoring')).getByText('detail.badges.alreadyAnchored');

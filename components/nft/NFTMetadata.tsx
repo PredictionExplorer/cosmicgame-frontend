@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
-import { ArrowUpRight, Check, Copy } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Check, Copy } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { getExplorerUrl, getRelativeTime } from '@/utils';
@@ -53,6 +53,19 @@ interface SpecRowProps {
   testId?: string;
 }
 
+/** An internal link in the ledger: quiet text with a trailing arrow, so it reads as a way on. */
+function LedgerLink({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <Link href={href} className="link-quiet group inline-flex min-h-6 items-center gap-1">
+      {children}
+      <ArrowRight
+        aria-hidden
+        className="size-3.5 shrink-0 text-subtle transition-colors duration-[var(--duration-fast)] group-hover:text-foreground"
+      />
+    </Link>
+  );
+}
+
 /** One label / value row of the spec-sheet ledger. */
 function SpecRow({ label, children, caption, testId }: SpecRowProps) {
   return (
@@ -92,8 +105,8 @@ export interface NFTSpecListProps {
  * NFTSpecList — the provenance ledger of the detail page's wall label: cycle,
  * imprint (linked to its transaction), allocation, recipient and owner, rarity
  * and anchoring. Unknown values read as unknown, never as a confident blank.
- * Anchoring is stated in a neutral tone: a token that has been anchored is not
- * an error.
+ * Links carry a trailing arrow (up-right when they leave the site). Anchoring
+ * is stated in a neutral tone: a token that has been anchored is not an error.
  */
 export function NFTSpecList({ nft, entry, rarity, rarityTotal = 0, className }: NFTSpecListProps) {
   const t = useTranslations('detail');
@@ -119,12 +132,9 @@ export function NFTSpecList({ nft, entry, rarity, rarityTotal = 0, className }: 
     >
       <SpecRow label={t('metadata.cycle')} testId="spec-cycle">
         {nft?.RoundNum != null ? (
-          <Link
-            href={`/allocation/${nft.RoundNum}`}
-            className="link-quiet inline-flex min-h-6 items-center"
-          >
+          <LedgerLink href={`/allocation/${nft.RoundNum}`}>
             {t('metadata.roundNumber', { round: nft.RoundNum })}
-          </Link>
+          </LedgerLink>
         ) : (
           unknown
         )}
@@ -162,12 +172,22 @@ export function NFTSpecList({ nft, entry, rarity, rarityTotal = 0, className }: 
         </SpecRow>
       ) : null}
 
+      {/* A protocol contract's name ("Cosmic Signature NFT Anchoring Wallet")
+          wraps here: the ledger is the one place its full name should read. */}
       <SpecRow label={t('metadata.recipient')} testId="spec-recipient">
-        {nft?.WinnerAddr ? <AddressChip address={nft.WinnerAddr} variant="plain" /> : unknown}
+        {nft?.WinnerAddr ? (
+          <AddressChip address={nft.WinnerAddr} variant="plain" wrapLabel />
+        ) : (
+          unknown
+        )}
       </SpecRow>
 
       <SpecRow label={t('metadata.owner')} testId="spec-owner">
-        {nft?.CurOwnerAddr ? <AddressChip address={nft.CurOwnerAddr} variant="plain" /> : unknown}
+        {nft?.CurOwnerAddr ? (
+          <AddressChip address={nft.CurOwnerAddr} variant="plain" wrapLabel />
+        ) : (
+          unknown
+        )}
       </SpecRow>
 
       {rarity && rarityTotal > 0 ? (
@@ -206,9 +226,7 @@ export function NFTSpecList({ nft, entry, rarity, rarityTotal = 0, className }: 
           testId="spec-anchoring"
         >
           {anchoringEligible ? (
-            <Link href="/anchoring" className="link-quiet inline-flex min-h-6 items-center">
-              {t('badges.eligibleForAnchoring')}
-            </Link>
+            <LedgerLink href="/anchoring">{t('badges.eligibleForAnchoring')}</LedgerLink>
           ) : (
             <span>{t('badges.alreadyAnchored')}</span>
           )}
