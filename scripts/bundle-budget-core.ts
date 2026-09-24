@@ -16,8 +16,7 @@ export const DEFAULT_BUDGET_KB = 640;
 
 /**
  * Landing-home client payload budget. The landing must stay lean: it ships
- * no wallet stack and its three.js hero is a desktop-only dynamic chunk that
- * this manifest-based measurement intentionally excludes.
+ * no wallet stack and no WebGL (its hero atmosphere is static CSS).
  */
 export const DEFAULT_LANDING_BUDGET_KB = 320;
 

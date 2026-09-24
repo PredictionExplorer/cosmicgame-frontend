@@ -1,30 +1,16 @@
 'use client';
 
-import dynamic from 'next/dynamic';
 import { ArrowRight, ChevronDown } from 'lucide-react';
 import { useLocale } from 'next-intl';
 
 import type { LandingContent } from '@/content/landing';
 
 import { Link } from '@/i18n/navigation';
-import { ReducedMotionFallback } from '@/components/three/ReducedMotionFallback';
-import { useCanRenderHeroCanvas } from '@/components/three/hero-canvas-gate';
 import { localizeCrossHostHref } from '@/lib/hostRouting';
 
 import { EventHorizonCountdown } from './EventHorizonCountdown';
 import { HeroArtShowcase } from './HeroArtShowcase';
 import styles from './Landing.module.css';
-
-const HeroCanvas = dynamic(
-  () => import('@/components/three/HeroCanvas').then((m) => m.HeroCanvas),
-  { ssr: false, loading: () => <ReducedMotionFallback /> },
-);
-
-function HeroBackdrop() {
-  // Keep the WebGL download out of phone and reduced-motion visits entirely.
-  const canRenderCanvas = useCanRenderHeroCanvas();
-  return canRenderCanvas ? <HeroCanvas /> : <ReducedMotionFallback />;
-}
 
 /** The landing hero. The navigation belongs to the landing shell's LandingHeader. */
 export function Hero({ hero }: { hero: LandingContent['hero'] }) {
@@ -32,9 +18,9 @@ export function Hero({ hero }: { hero: LandingContent['hero'] }) {
 
   return (
     <section className={styles.hero} aria-labelledby="landing-headline">
-      <div className={styles.backdrop} aria-hidden="true">
-        <HeroBackdrop />
-      </div>
+      {/* The palette's atmosphere (::before) and a static starfield kept to the
+          gutters: no canvas, no motion, nothing behind a line of text. */}
+      <div className={`starfield ${styles.starfield}`} aria-hidden="true" />
 
       <div className={styles.heroInner}>
         <div className={styles.heroGrid}>

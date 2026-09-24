@@ -4,51 +4,13 @@ import { landingContentEn } from '@/content/landing';
 
 import { Hero } from '@/components/landing-v2/Hero';
 
-// HeroCanvas uses dynamic() + ssr:false, which renders a loading state on
-// the server and first client render. We don't need to assert the WebGL;
-// we just need the section chrome to render. Mounting the stub is the
-// observable proxy for "the three.js chunk import was triggered".
-jest.mock('next/dynamic', () => () => {
-  const Stub = () => <div data-testid="hero-canvas-stub" />;
-  Stub.displayName = 'HeroCanvasStub';
-  return Stub;
-});
-
-jest.mock('@/components/three/ReducedMotionFallback', () => ({
-  ReducedMotionFallback: () => <div data-testid="reduced-motion-fallback" />,
-}));
-
 jest.mock('../EventHorizonCountdown', () => ({
   EventHorizonCountdown: () => (
     <section aria-label="Live Performance Cycle countdown" data-testid="event-horizon-countdown" />
   ),
 }));
 
-function installMatchMedia({
-  highQuality,
-  reducedMotion = false,
-}: {
-  highQuality: boolean;
-  reducedMotion?: boolean;
-}) {
-  Object.defineProperty(window, 'matchMedia', {
-    writable: true,
-    configurable: true,
-    value: jest.fn((query: string) => ({
-      matches: query.includes('prefers-reduced-motion') ? reducedMotion : highQuality,
-      media: query,
-      addEventListener: jest.fn(),
-      removeEventListener: jest.fn(),
-      onchange: null,
-      dispatchEvent: jest.fn(),
-    })),
-  });
-}
-
 describe('<Hero />', () => {
-  beforeEach(() => {
-    installMatchMedia({ highQuality: true });
-  });
   it('renders the lexicon-safe headline', () => {
     render(<Hero hero={landingContentEn.hero} />);
     const heading = screen.getByRole('heading', { level: 1 });
@@ -111,26 +73,12 @@ describe('<Hero />', () => {
     expect(text).not.toMatch(/\bwinner(?:s)?\b/i);
   });
 
-  it('mounts the hero canvas on large viewports without reduced motion', () => {
-    render(<Hero hero={landingContentEn.hero} />);
-    expect(screen.getByTestId('hero-canvas-stub')).toBeInTheDocument();
-  });
-
-  it('never triggers the three.js dynamic import on small viewports', () => {
-    // The gate must run OUTSIDE the dynamically imported component: mounting
-    // it is what downloads the ~320KB three.js chunk, which phones render
-    // nothing with. The static gradient fallback renders instead.
-    installMatchMedia({ highQuality: false });
-    render(<Hero hero={landingContentEn.hero} />);
-    expect(screen.queryByTestId('hero-canvas-stub')).not.toBeInTheDocument();
-    expect(screen.getByTestId('reduced-motion-fallback')).toBeInTheDocument();
-  });
-
-  it('never triggers the three.js dynamic import under reduced motion', () => {
-    installMatchMedia({ highQuality: true, reducedMotion: true });
-    render(<Hero hero={landingContentEn.hero} />);
-    expect(screen.queryByTestId('hero-canvas-stub')).not.toBeInTheDocument();
-    expect(screen.getByTestId('reduced-motion-fallback')).toBeInTheDocument();
+  it('draws its atmosphere without a canvas or WebGL', () => {
+    // The 16%-opacity three.js scene cost ~314 KB gzip on desktop and threw
+    // without WebGL; the hero is static CSS now, in every browser.
+    const { container } = render(<Hero hero={landingContentEn.hero} />);
+    expect(container.querySelector('canvas')).toBeNull();
+    expect(container.querySelector('.starfield')).toHaveAttribute('aria-hidden', 'true');
   });
 
   it('keeps the LCP candidates visible at first paint (no opacity-0 wrappers)', () => {

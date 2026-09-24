@@ -21,14 +21,13 @@
   opacity: var(--atmosphere-strength);
 }
 
-.backdrop {
+.starfield {
+  --starfield-column: 80rem;
   position: absolute;
   inset: 0;
   z-index: -1;
-  overflow: hidden;
-  opacity: 0.16;
   pointer-events: none;
-  mask-image: linear-gradient(#000, #000 50%, transparent);
+  opacity: var(--atmosphere-strength);
 }
 
 /* The hero shares the header's content edge (site-container). */
