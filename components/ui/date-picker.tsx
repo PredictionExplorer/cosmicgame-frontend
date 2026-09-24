@@ -96,9 +96,9 @@ function CalendarPanel({ viewMonth, onViewMonthChange, selected, onSelect }: Cal
               key={day.format('YYYY-MM-DD')}
               type="button"
               className={cn(
-                'flex h-8 w-8 items-center justify-center rounded-md text-sm transition-colors',
-                'hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                !isCurrentMonth && 'text-muted-foreground/50',
+                'flex h-8 w-8 items-center justify-center rounded-control text-sm tabular-nums transition-colors duration-[var(--duration-fast)]',
+                'hover:bg-surface-raised',
+                !isCurrentMonth && 'text-subtle',
                 isSelected && 'bg-primary text-primary-foreground hover:bg-primary',
                 !isSelected && isToday && 'border border-primary/50',
               )}

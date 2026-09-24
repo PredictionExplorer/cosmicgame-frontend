@@ -20,10 +20,10 @@ interface ListNavItemProps {
 
 const pillClasses = (isActive: boolean) =>
   cn(
-    'group inline-flex cursor-pointer items-center gap-1.5 rounded-full px-4 py-2 text-[13px] font-medium leading-none tracking-[0.015em] outline-none transition-colors duration-[var(--duration-fast)]',
+    'group inline-flex cursor-pointer items-center gap-1.5 rounded-pill px-4 py-2 type-label leading-none outline-none transition-colors duration-[var(--duration-fast)]',
     isActive
-      ? 'bg-white/[0.08] text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]'
-      : 'text-white/65 hover:bg-white/[0.05] hover:text-white',
+      ? 'bg-surface-raised text-foreground'
+      : 'text-muted-foreground hover:bg-surface hover:text-foreground',
   );
 
 const isExternalRoute = (route?: string) => !!route && /^https?:\/\//.test(route);
@@ -38,7 +38,7 @@ const PanelRow: FC<{ item: NavDescriptor; active: boolean }> = ({ item, active }
           'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border transition-colors duration-[var(--duration-fast)]',
           active
             ? 'border-primary/40 bg-primary/10 text-primary'
-            : 'border-white/[0.07] bg-white/[0.04] text-white/55 group-data-[highlighted]/row:border-primary/30 group-data-[highlighted]/row:text-primary',
+            : 'border-rule-faint bg-surface-sunken text-subtle group-data-[highlighted]/row:border-primary/40 group-data-[highlighted]/row:text-primary',
         )}
         aria-hidden
       >
@@ -52,23 +52,23 @@ const PanelRow: FC<{ item: NavDescriptor; active: boolean }> = ({ item, active }
         <span
           className={cn(
             'flex items-center gap-1.5 text-sm font-medium leading-tight',
-            active ? 'text-primary' : 'text-white',
+            active ? 'text-primary' : 'text-foreground',
           )}
         >
           {item.title}
           {item.external ? (
-            <ArrowUpRight className="h-3 w-3 shrink-0 text-white/35" aria-hidden />
+            <ArrowUpRight className="h-3 w-3 shrink-0 text-subtle" aria-hidden />
           ) : null}
         </span>
         {item.description ? (
-          <span className="mt-0.5 text-xs leading-snug text-white/45">{item.description}</span>
+          <span className="mt-0.5 type-caption leading-snug text-subtle">{item.description}</span>
         ) : null}
       </span>
     </>
   );
 
   const rowClassName =
-    'group/row flex w-full cursor-pointer items-center gap-3 rounded-xl px-2.5 py-2 no-underline outline-none transition-colors duration-[var(--duration-fast)] data-[highlighted]:bg-white/[0.05]';
+    'group/row flex w-full cursor-pointer items-center gap-3 rounded-control px-2.5 py-2 no-underline outline-none transition-colors duration-[var(--duration-fast)] data-[highlighted]:bg-primary/10';
 
   return (
     <DropdownMenuItem asChild className="p-0 focus:bg-transparent">
@@ -97,13 +97,13 @@ const PanelFeaturedRow: FC<{ item: NavDescriptor }> = ({ item }) => {
         {Icon ? <Icon className="h-4 w-4" /> : null}
       </span>
       <span className="flex min-w-0 flex-col">
-        <span className="text-sm font-medium leading-tight text-white">{item.title}</span>
+        <span className="text-sm font-medium leading-tight text-foreground">{item.title}</span>
         {item.description ? (
-          <span className="mt-0.5 text-xs leading-snug text-white/55">{item.description}</span>
+          <span className="mt-0.5 type-caption leading-snug text-subtle">{item.description}</span>
         ) : null}
       </span>
       <ArrowUpRight
-        className="ml-auto h-4 w-4 shrink-0 text-white/45 transition-transform duration-[var(--duration-fast)] group-data-[highlighted]/card:translate-x-0.5 group-data-[highlighted]/card:-translate-y-0.5 group-data-[highlighted]/card:text-white"
+        className="ml-auto h-4 w-4 shrink-0 text-subtle transition-transform duration-[var(--duration-fast)] group-data-[highlighted]/card:translate-x-0.5 group-data-[highlighted]/card:-translate-y-0.5 group-data-[highlighted]/card:text-foreground"
         aria-hidden
       />
     </>
@@ -114,7 +114,7 @@ const PanelFeaturedRow: FC<{ item: NavDescriptor }> = ({ item }) => {
       <a
         href={item.route}
         rel="noopener"
-        className="group/card relative mt-1.5 flex w-full cursor-pointer items-center gap-3 overflow-hidden rounded-xl border border-white/[0.08] bg-[linear-gradient(120deg,rgb(var(--aurora-cyan-rgb)/0.07),rgb(var(--nebula-violet-rgb)/0.14))] px-3 py-3 no-underline outline-none transition-colors duration-[var(--duration-fast)] data-[highlighted]:border-[rgb(var(--aurora-cyan-rgb)/0.35)]"
+        className="group/card relative mt-1.5 flex w-full cursor-pointer items-center gap-3 overflow-hidden rounded-control border border-rule-faint bg-surface px-3 py-3 no-underline outline-none transition-colors duration-[var(--duration-fast)] data-[highlighted]:border-primary/50 data-[highlighted]:bg-primary/10"
       >
         {card}
       </a>
@@ -148,19 +148,19 @@ const ListNavItem: FC<ListNavItemProps> = ({ nav }) => {
       <DropdownMenuTrigger
         className={cn(
           pillClasses(isActive),
-          'data-[state=open]:bg-white/[0.08] data-[state=open]:text-white',
+          'data-[state=open]:bg-surface-raised data-[state=open]:text-foreground',
         )}
       >
         {nav.title}
         <ChevronDown
-          className="h-3.5 w-3.5 text-white/40 transition-transform duration-[var(--duration-base)] ease-[var(--ease-out-expo)] group-data-[state=open]:rotate-180"
+          className="h-3.5 w-3.5 text-subtle transition-transform duration-[var(--duration-base)] ease-[var(--ease-out-expo)] group-data-[state=open]:rotate-180"
           aria-hidden
         />
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="center"
         sideOffset={14}
-        className="w-[300px] rounded-2xl border-white/[0.08] bg-popover/95 p-2 shadow-[var(--elevation-4)] backdrop-blur-2xl"
+        className="glass w-[300px] rounded-surface p-2"
       >
         {rows.map((child, i) => {
           const childActive = !!(

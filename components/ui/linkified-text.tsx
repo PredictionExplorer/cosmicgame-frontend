@@ -74,15 +74,15 @@ export function LinkifiedText({ text }: LinkifiedTextProps) {
           if (!open) closeDialog();
         }}
       >
-        <DialogContent className="max-w-md rounded-xl border-white/10">
+        <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <ShieldAlert aria-hidden="true" className="h-5 w-5 shrink-0 text-amber-300" />
+              <ShieldAlert aria-hidden="true" className="h-5 w-5 shrink-0 text-attention" />
               {t('externalLink.title')}
             </DialogTitle>
             <DialogDescription>{t('externalLink.description')}</DialogDescription>
           </DialogHeader>
-          <div className="flex items-start gap-2 rounded-lg border border-white/[0.08] bg-white/[0.03] p-3">
+          <div className="flex items-start gap-2 rounded-control border border-rule-faint bg-surface-sunken p-3">
             <p
               data-testid="external-link-destination"
               className="min-w-0 flex-1 break-all font-mono text-sm text-foreground/95"
@@ -93,16 +93,12 @@ export function LinkifiedText({ text }: LinkifiedTextProps) {
               type="button"
               onClick={handleCopy}
               aria-label={copied ? t('externalLink.copied') : t('externalLink.copy')}
-              className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-muted-foreground/60 transition-colors hover:bg-white/[0.06] hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              className="relative inline-flex size-6 shrink-0 items-center justify-center rounded-control text-subtle transition-colors duration-[var(--duration-fast)] after:absolute after:left-1/2 after:top-1/2 after:size-11 after:-translate-x-1/2 after:-translate-y-1/2 after:content-[''] hover:bg-surface-raised hover:text-foreground"
             >
-              {copied ? (
-                <Check className="h-4 w-4 text-emerald-400" />
-              ) : (
-                <Copy className="h-4 w-4" />
-              )}
+              {copied ? <Check className="h-4 w-4 text-positive" /> : <Copy className="h-4 w-4" />}
             </button>
           </div>
-          <p className="text-xs text-muted-foreground">{t('externalLink.warning')}</p>
+          <p className="type-caption text-muted-foreground">{t('externalLink.warning')}</p>
           <DialogFooter>
             <Button variant="outline" onClick={closeDialog}>
               {t('actions.cancel')}
