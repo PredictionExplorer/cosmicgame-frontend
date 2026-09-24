@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { LedgerPage } from '@/components/ledger/LedgerPage';
-import { EthContributionForm } from '@/components/donations/EthContributionForm';
+import { EthContributionForm } from '@/components/contributions/EthContributionForm';
 import EthDonationTable, { type EthDonation } from '@/components/tables/EthDonationTable';
 import { useDonationsBoth } from '@/hooks/useApiQuery';
 

@@ -467,7 +467,7 @@ plus the site-wide SEO finish.
 
 | Route                                   | Sources                                                    | E   | T   | R   | Q   |
 | --------------------------------------- | ---------------------------------------------------------- | --- | --- | --- | --- |
-| `/eth-contribution`                     | `(app)/eth-contribution/`, `components/donations/`         | ✅  | ✅  | ✅  | ✅  |
+| `/eth-contribution`                     | `(app)/eth-contribution/`, `components/contributions/`     | ✅  | ✅  | ✅  | ✅  |
 | `/eth-contribution/detail/[id]`         | `(app)/eth-contribution/detail/`                           | ✅  | ✅  | ✅  | ✅  |
 | `/eth-contribution/round/[round]`       | `(app)/eth-contribution/round/`                            | ✅  | ✅  | ✅  | ✅  |
 | `/public-goods-contributions-cg`        | `(app)/public-goods-contributions-cg/`                     | ✅  | ✅  | ✅  | ✅  |

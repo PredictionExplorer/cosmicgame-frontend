@@ -10,7 +10,7 @@ jest.mock('@/hooks/useApiQuery', () => ({
   useDonationsBoth: (...args: unknown[]) => mockUseDonationsBoth(...args),
 }));
 
-jest.mock('@/components/donations/EthContributionForm', () => ({
+jest.mock('@/components/contributions/EthContributionForm', () => ({
   EthContributionForm: ({ id, onSuccess }: { id?: string; onSuccess?: () => void }) => (
     <section id={id} aria-label="contribution form">
       <button type="button" onClick={onSuccess}>
