@@ -151,10 +151,47 @@ describe('UserStatisticsView', () => {
     expect(refetch).toHaveBeenCalled();
   });
 
-  it('shows the empty state when the address has no activity', () => {
+  it('shows the empty state only when every source is empty', () => {
     mockUseUserInfo.mockReturnValue({ ...defaultHookReturn, data: null });
+    mockUseClaimHistoryByUser.mockReturnValue({ ...defaultHookReturn, data: [] });
     render(<UserStatisticsView address={ADDRESS} isOwnProfile={false} />);
     expect(screen.getByText('myPages.statistics.page.emptyTitle')).toBeInTheDocument();
+    expect(screen.queryByTestId('winning-history-table')).not.toBeInTheDocument();
+  });
+
+  it('keeps allocations, anchoring and attached assets for an address without a profile record', () => {
+    // Regression: a recipient who never made a gesture (no UserInfo) saw its allocation
+    // figures in the header above "No activity yet", with every section and Retrieve hidden.
+    mockUseUserInfo.mockReturnValue({
+      ...defaultHookReturn,
+      data: { UserInfo: null, Gestures: [], CurrentlyStakedTokens: [] },
+    });
+    render(<UserStatisticsView address={ADDRESS} isOwnProfile={false} />);
+    expect(screen.queryByText('myPages.statistics.page.emptyTitle')).not.toBeInTheDocument();
+    for (const key of [
+      'page.sections.gestureHistory',
+      'page.sections.recipientHistory',
+      'page.sections.anchoring',
+      'page.sections.claimableAssets',
+    ]) {
+      expect(
+        screen.getByRole('heading', { level: 2, name: `myPages.statistics.${key}` }),
+      ).toBeInTheDocument();
+    }
+    expect(screen.getByTestId('winning-history-table')).toBeInTheDocument();
+    expect(screen.getByTestId('user-anchoring-section')).toBeInTheDocument();
+    expect(screen.getByTestId('attached-assets-section')).toBeInTheDocument();
+    // The figures that only the profile record carries are left out, not shown as zeros.
+    expect(
+      screen.queryByRole('heading', { level: 2, name: 'myPages.statistics.overview.title' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('waits for every source before calling the page empty', () => {
+    mockUseUserInfo.mockReturnValue({ ...defaultHookReturn, data: null });
+    mockUseClaimHistoryByUser.mockReturnValue({ ...defaultHookReturn, isLoading: true });
+    render(<UserStatisticsView address={ADDRESS} isOwnProfile={false} />);
+    expect(screen.queryByText('myPages.statistics.page.emptyTitle')).not.toBeInTheDocument();
   });
 
   it('names another participant by address, never as "you"', () => {

@@ -56,6 +56,13 @@ describe('UserAnchoringSection', () => {
     expect(screen.getByTestId('user-anchoring-section')).toBeInTheDocument();
   });
 
+  it('shows the anchor actions of an address without a profile record', () => {
+    render(<UserAnchoringSection {...defaultProps} userInfo={null} />);
+    const figure = (id: string) => document.querySelector(`[data-figure="${id}"]`);
+    expect(figure('anchors')).toHaveTextContent('1');
+    expect(screen.getByTestId('anchor-actions-table')).toBeInTheDocument();
+  });
+
   it('renders tab triggers', () => {
     render(<UserAnchoringSection {...defaultProps} />);
     expect(

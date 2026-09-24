@@ -84,6 +84,11 @@ function tokenBalance(wei: string | undefined): number | null {
  * this cycle's Stellar Selection share as a plain count, the figures behind
  * its history once each, its Cosmic Signature NFTs on their plates, and the
  * ledgers: gestures, allocations, anchoring, outreach and attached assets.
+ *
+ * Each section stands on its own data. An address that never made a gesture
+ * can still hold allocations, anchors and attached assets to retrieve, so a
+ * missing profile record hides only the figures it carries; the page says
+ * "no activity" only once every source has answered and all are empty.
  */
 const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) => {
   const t = useTranslations('myPages');
@@ -115,7 +120,8 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
     useCSTAnchorActionsByUser(address);
   const { data: rwlkAnchorActions = [], isLoading: loadingRWLKActions } =
     useRWLKAnchorActionsByUser(address);
-  const { data: marketingRewardsRaw = [] } = useMarketingRewardsByUser(address);
+  const { data: marketingRewardsRaw = [], isLoading: loadingMarketing } =
+    useMarketingRewardsByUser(address);
   const { data: cstListRaw = [], isLoading: loadingCST } = useCSTTokensByUser(address);
   const { data: cstStakingRewardsRaw = [], isLoading: loadingStakingRewards } =
     useAnchorDistributionsByUser(address);
@@ -231,6 +237,33 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
   }
 
   const headerLoading = userInfoQuery.isLoading || claimsQuery.isLoading || loadingBalance;
+  const anyLoading =
+    userInfoQuery.isLoading ||
+    claimsQuery.isLoading ||
+    loadingCST ||
+    loadingCSTActions ||
+    loadingRWLKActions ||
+    loadingStakingRewards ||
+    loadingMarketing ||
+    loadingClaimedNFTs ||
+    loadingUnclaimedNFTs ||
+    loadingERC20;
+  const anchoredTokens = userInfoRaw?.CurrentlyStakedTokens ?? [];
+  const hasActivity =
+    gestureHistory.length > 0 ||
+    claimHistory.length > 0 ||
+    (cstListRaw?.length ?? 0) > 0 ||
+    anchoredTokens.length > 0 ||
+    cstAnchorActions.length > 0 ||
+    rwlkAnchorActions.length > 0 ||
+    anchorActions > 0 ||
+    cstAnchorDistributions.length > 0 ||
+    marketingRewards.length > 0 ||
+    claimedDonatedNFTsList.length > 0 ||
+    unclaimedDonatedNFTsList.length > 0 ||
+    donatedERC20List.length > 0;
+  // A read that failed is not "nothing": only answered, empty sources make the page empty.
+  const allEmpty = !anyLoading && !hasActivity && !userInfoQuery.isError && !claimsQuery.isError;
 
   return (
     <PageShell variant="data" className={SHELL_CLASS}>
@@ -247,14 +280,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
         <div data-testid="statistics-loading-skeleton">
           <SkeletonTable rows={6} columns={4} />
         </div>
-      ) : userInfoQuery.isError ? (
-        <ErrorState
-          headingLevel={2}
-          title={t('statistics.page.loadErrorTitle')}
-          message={t('statistics.page.loadErrorMessage')}
-          onRetry={() => userInfoQuery.refetch()}
-        />
-      ) : !userInfo || !gestureSummary ? (
+      ) : allEmpty ? (
         <EmptyState
           variant="page"
           headingLevel={2}
@@ -274,30 +300,43 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
             />
           ) : null}
 
-          <ProfileOverview
-            address={address}
-            userInfo={userInfo}
-            gestures={gestureSummary}
-            latestGestureTs={latestGestureTs}
-            anchoredNow={anchoredNow}
-            anchorActions={anchorActions}
-            anchorDistributionsEth={totalAnchorDistributionEth}
-          />
+          {/* The figures come from the profile record; an address without one skips them. */}
+          {userInfo && gestureSummary ? (
+            <ProfileOverview
+              address={address}
+              userInfo={userInfo}
+              gestures={gestureSummary}
+              latestGestureTs={latestGestureTs}
+              anchoredNow={anchoredNow}
+              anchorActions={anchorActions}
+              anchorDistributionsEth={totalAnchorDistributionEth}
+            />
+          ) : null}
 
           <SectionShell title={t('statistics.page.sections.artworks')}>
             <ProfileArtworks
               tokens={cstListRaw ?? []}
-              anchored={anchoredArtworks(userInfoRaw?.CurrentlyStakedTokens ?? [])}
+              anchored={anchoredArtworks(anchoredTokens)}
               loading={loadingCST}
             />
           </SectionShell>
 
           <SectionShell title={t('statistics.page.sections.gestureHistory')}>
-            <GestureHistoryTable
-              gestureHistory={gestureHistory}
-              showParticipant={false}
-              showHold={false}
-            />
+            {userInfoQuery.isError ? (
+              <ErrorState
+                headingLevel={3}
+                title={t('statistics.page.loadErrorTitle')}
+                message={t('statistics.page.loadErrorMessage')}
+                onRetry={() => userInfoQuery.refetch()}
+              />
+            ) : (
+              // An empty list says "No gestures yet" inside the section.
+              <GestureHistoryTable
+                gestureHistory={gestureHistory}
+                showParticipant={false}
+                showHold={false}
+              />
+            )}
           </SectionShell>
 
           <SectionShell title={t('statistics.page.sections.recipientHistory')}>

@@ -70,7 +70,7 @@
       "ownSubtitle": "Your gestures and what they cost, what you received, your NFTs and your anchors, across every Performance Cycle.",
       "userSubtitle": "This address’s gestures and what they cost, what it received, its NFTs and its anchors, across every Performance Cycle.",
       "emptyTitle": "No activity yet",
-      "emptyDescription": "This address has not taken part in a Performance Cycle yet.",
+      "emptyDescription": "This address has no gestures, allocations or anchors yet.",
       "sections": {
         "gestureHistory": "Gestures",
         "recipientHistory": "Allocations received",

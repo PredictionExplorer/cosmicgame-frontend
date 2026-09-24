@@ -70,7 +70,7 @@
       "ownSubtitle": "你在每个演绎周期的落笔及其花费、获配内容、NFT 与锚定。",
       "userSubtitle": "此地址在每个演绎周期的落笔及其花费、获配内容、NFT 与锚定。",
       "emptyTitle": "暂无活动",
-      "emptyDescription": "此账户尚未参与任何周期。落笔即可开始。",
+      "emptyDescription": "此地址尚无落笔、分配或锚定记录。",
       "sections": {
         "gestureHistory": "落笔",
         "recipientHistory": "获配记录",

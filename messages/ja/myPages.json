@@ -70,7 +70,7 @@
       "ownSubtitle": "すべてのパフォーマンス・サイクルにわたる、自分の一筆とその費用、受け取った配分、NFTと係留です。",
       "userSubtitle": "すべてのパフォーマンス・サイクルにわたる、このアドレスの一筆とその費用、受け取った配分、NFTと係留です。",
       "emptyTitle": "活動はまだありません",
-      "emptyDescription": "このアカウントはまだパフォーマンス・サイクルに参加していません。一筆を入れて始めましょう。",
+      "emptyDescription": "このアドレスには一筆、配分、係留の記録がまだありません。",
       "sections": {
         "gestureHistory": "一筆",
         "recipientHistory": "受け取った配分",
