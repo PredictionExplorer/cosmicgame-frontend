@@ -215,6 +215,7 @@ const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
                 gestureDetailsPending={latestResolution.isSyncing}
                 account={account}
                 chronoEth={trackAmounts.chronoEth}
+                signatureEth={trackAmounts.signatureEth}
                 className="min-w-0"
               />
             </div>
