@@ -605,8 +605,11 @@ transaction kit; see `docs/` and each module's header. Three rules to know:
 
 - **Dates.** Every date is in the reader's zone. A table states it once
   (`<TimeZoneNote>`); a date that stands alone, a record page or a header figure, prints
-  it with `<DateTime showZone>` ("Sep 22, 2026, 23:04:45 UTC-5"). Only the compact style
-  pads a one-digit day ("Jan 05") so a column lines up; the full style writes it as is.
+  it with `<DateTime showZone>` ("Sep 22, 2026, 23:04:45 UTC-5"), which sets the zone like
+  a unit (subtle, proportional figures) inside the locale's own template ("9月22日
+  23:04（UTC-5）"); `formatZonedDateTimeParts` gives the same three parts to other markup.
+  Only the compact style pads a one-digit day ("Jan 05") so a column lines up; the full
+  style writes it as is.
 - **Signed amounts.** `formatAmount` with any `signDisplay` prints the true minus sign
   (U+2212), level with the "+" beside it.
 - **Class merging.** `cn()` knows the `type-*` tiers: a later tier replaces an earlier
