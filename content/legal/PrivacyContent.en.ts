@@ -198,6 +198,8 @@ export const privacyCopyEn = {
       themeStorage: 'Remembers your palette on this site',
       attention: 'Remembers your finalization alert and sound settings',
       explainer: 'Remembers that you closed the Cycle explainer',
+      observatory:
+        'Remembers a return visit to the experimental home, so its introduction starts collapsed',
       wallet: 'Remembers which wallet you connected, so the app can reconnect it',
     },
   },

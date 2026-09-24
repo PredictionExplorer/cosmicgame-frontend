@@ -220,6 +220,7 @@ export const privacyCopyZh = {
       themeStorage: '在本网站记住你的配色',
       attention: '记住你的收官前提醒与声音设置',
       explainer: '记住你已关闭周期说明',
+      observatory: '记住你曾访问实验版首页，再次访问时其介绍默认收起',
       wallet: '记住你连接过的钱包，以便应用重新连接',
     },
   },

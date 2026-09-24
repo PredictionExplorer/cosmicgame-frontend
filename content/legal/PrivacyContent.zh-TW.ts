@@ -220,6 +220,7 @@ export const privacyCopyZhTw = {
       themeStorage: '在本網站記住你的配色',
       attention: '記住你的收官前提醒與聲音設定',
       explainer: '記住你已關閉週期說明',
+      observatory: '記住你曾造訪實驗版首頁，再次造訪時其介紹預設收合',
       wallet: '記住你連接過的錢包，讓應用程式可以重新連接',
     },
   },

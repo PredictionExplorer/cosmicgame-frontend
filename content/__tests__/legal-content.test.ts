@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import {
@@ -12,7 +12,12 @@ import { LEGAL_LINKS, isLegalLinkId } from '@/content/legal/links';
 import { privacyCopyEn } from '@/content/legal/PrivacyContent.en';
 import { privacyCopyZh } from '@/content/legal/PrivacyContent.zh';
 import type { PrivacyCopy } from '@/content/legal/PrivacyContent';
-import { ATTENTION_STORAGE_KEY, EXPLAINER_STORAGE_KEY } from '@/content/legal/privacyInventory';
+import {
+  activePrivacyStorage,
+  ATTENTION_STORAGE_KEY,
+  EXPLAINER_STORAGE_KEY,
+  OBSERVATORY_VISITED_STORAGE_KEY,
+} from '@/content/legal/privacyInventory';
 import { RISK_GROUP_IDS } from '@/content/legal/RiskContent';
 import { termsCopyEn } from '@/content/legal/TermsContent.en';
 import { termsCopyZh } from '@/content/legal/TermsContent.zh';
@@ -191,6 +196,36 @@ describe('localized legal content', () => {
       'utf8',
     );
     expect(explainer).toContain(`'${EXPLAINER_STORAGE_KEY}'`);
+    // The experimental home's returning-visitor marker was once missing from the policy.
+    const observatory = readFileSync(
+      join(process.cwd(), 'app/[locale]/(app)/experimental-ui/ExperimentalHomePage.tsx'),
+      'utf8',
+    );
+    expect(observatory).toContain(`'${OBSERVATORY_VISITED_STORAGE_KEY}'`);
+    expect(activePrivacyStorage().flatMap((entry) => entry.names)).toEqual(
+      expect.arrayContaining([
+        ATTENTION_STORAGE_KEY,
+        EXPLAINER_STORAGE_KEY,
+        OBSERVATORY_VISITED_STORAGE_KEY,
+      ]),
+    );
+  });
+
+  it('lists every storage key the app declares', () => {
+    const listed = new Set(activePrivacyStorage().flatMap((entry) => entry.names));
+    const declared = /(?:STORAGE_KEY|StorageKey) = '([a-z0-9-]+)'/g;
+    const keys = ['app', 'components', 'hooks', 'lib', 'contexts'].flatMap((dir) =>
+      (readdirSync(join(process.cwd(), dir), { recursive: true }) as string[])
+        .filter((file) => /\.tsx?$/.test(file) && !file.includes('__tests__'))
+        .flatMap((file) =>
+          Array.from(
+            readFileSync(join(process.cwd(), dir, file), 'utf8').matchAll(declared),
+            (match) => match[1] ?? '',
+          ),
+        ),
+    );
+    expect(keys).toEqual(expect.arrayContaining(['cosmic-observatory-visited']));
+    for (const key of keys) expect(listed).toContain(key);
   });
 
   it('describes Arbitrum settlement and smart-contract custody accurately', () => {

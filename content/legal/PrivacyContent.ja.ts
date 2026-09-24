@@ -221,6 +221,7 @@ export const privacyCopyJa = {
       themeStorage: 'このサイトで選んだカラーテーマを記憶',
       attention: '確定前の通知とサウンドの設定を記憶',
       explainer: 'サイクルの説明を閉じたことを記憶',
+      observatory: '実験版ホームを訪れたことを記憶し、次回は紹介を折りたたんで表示',
       wallet: '接続したウォレットを記憶し、アプリが再接続できるようにする',
     },
   },

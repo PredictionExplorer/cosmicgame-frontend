@@ -221,6 +221,7 @@ export const privacyCopyKo = {
       themeStorage: '이 사이트에서 색상 테마를 기억',
       attention: '마감 전 알림과 소리 설정을 기억',
       explainer: '사이클 안내를 닫은 것을 기억',
+      observatory: '실험용 홈 재방문을 기억해 소개를 접힌 상태로 표시',
       wallet: '연결한 지갑을 기억해 앱이 다시 연결할 수 있게 함',
     },
   },

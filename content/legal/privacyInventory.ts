@@ -11,8 +11,8 @@ import { GA_TRACKING_ID } from '@/utils/analytics';
  * Checked against app/root-document.tsx (Vercel Web Analytics, Speed
  * Insights, the optional GA4 tag), sentry.client.config.ts, config/wagmi.ts
  * (RainbowKit, WalletConnect), hooks/useTokenPrice.ts (CoinGecko) and the
- * storage keys below. The two keys owned by client modules are written out
- * here (a server module cannot import a value from a 'use client' file); the
+ * storage keys below. The keys owned by client modules are written out here
+ * (a server module cannot import a value from a 'use client' file); the
  * privacy test pins them to their sources.
  */
 
@@ -20,6 +20,8 @@ import { GA_TRACKING_ID } from '@/utils/analytics';
 export const ATTENTION_STORAGE_KEY = 'cosmic-attention-preferences';
 /** components/home/CyclePhaseGuide.tsx `explainerStorageKey`. */
 export const EXPLAINER_STORAGE_KEY = 'cosmic-cycle-explainer-dismissed';
+/** app/[locale]/(app)/experimental-ui/ExperimentalHomePage.tsx `STORY_VISITED_STORAGE_KEY`. */
+export const OBSERVATORY_VISITED_STORAGE_KEY = 'cosmic-observatory-visited';
 
 export const PRIVACY_SERVICE_IDS = [
   'vercel',
@@ -98,6 +100,7 @@ export const PRIVACY_STORAGE_IDS = [
   'themeStorage',
   'attention',
   'explainer',
+  'observatory',
   'wallet',
 ] as const;
 
@@ -152,6 +155,13 @@ const STORAGE: Record<PrivacyStorageId, PrivacyStorageEntry & { readonly active:
   explainer: {
     id: 'explainer',
     names: [EXPLAINER_STORAGE_KEY],
+    kind: 'browser',
+    lifetime: 'untilCleared',
+    active: true,
+  },
+  observatory: {
+    id: 'observatory',
+    names: [OBSERVATORY_VISITED_STORAGE_KEY],
     kind: 'browser',
     lifetime: 'untilCleared',
     active: true,

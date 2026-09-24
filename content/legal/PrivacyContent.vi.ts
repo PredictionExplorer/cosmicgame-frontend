@@ -221,6 +221,8 @@ export const privacyCopyVi = {
       themeStorage: 'Ghi nhớ bảng màu của bạn trên trang này',
       attention: 'Ghi nhớ cài đặt nhắc nhở và âm thanh của bạn',
       explainer: 'Ghi nhớ rằng bạn đã đóng phần giải thích chu kỳ',
+      observatory:
+        'Ghi nhớ rằng bạn đã ghé trang chủ thử nghiệm, để phần giới thiệu được thu gọn ở lần sau',
       wallet: 'Ghi nhớ ví bạn đã kết nối để ứng dụng có thể kết nối lại',
     },
   },
