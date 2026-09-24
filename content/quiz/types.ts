@@ -57,7 +57,17 @@ export interface QuizHubContent {
   };
   /** `{count}` placeholder, e.g. "{count} questions". */
   readonly questionCountTemplate: string;
+  /** `{minutes}` placeholder: the estimated time a tier takes, e.g. "About {minutes} min". */
+  readonly durationTemplate: string;
+  /** `{level}` and `{max}` placeholders: the accessible name of a tier's difficulty meter. */
+  readonly difficultyTemplate: string;
+  /** `{correct}` and `{total}` placeholders: the reader's best result on a tier. */
+  readonly bestTemplate: string;
+  /** `{current}` and `{total}` placeholders: a tier with a saved run in progress. */
+  readonly inProgressTemplate: string;
   readonly startLabel: string;
+  /** The hub card's action while a run is in progress. */
+  readonly resumeLabel: string;
 }
 
 export interface QuizMasteryRank {
@@ -69,11 +79,27 @@ export interface QuizRunnerUi {
   readonly intro: {
     readonly keyboardHint: string;
     readonly beginLabel: string;
+    /** The primary action when this browser holds a run in progress. */
+    readonly resumeLabel: string;
+    /** Discards the saved run and starts a fresh shuffle. */
+    readonly startOverLabel: string;
+    /** Heading of the rank ladder on the start card. */
+    readonly ranksHeading: string;
+    /** `{percent}` placeholder: the share of correct answers a rank starts at. */
+    readonly rankFromTemplate: string;
   };
   /** `{current}` and `{total}` placeholders. */
   readonly progressTemplate: string;
   readonly correctFeedback: readonly string[];
   readonly incorrectFeedback: readonly string[];
+  /** `{letter}` placeholder: names the correct option after a wrong answer. */
+  readonly correctAnswerTemplate: string;
+  /** Marks the reader's own pick (visually hidden on options, visible in the review). */
+  readonly yourAnswerLabel: string;
+  /** Marks the correct option (visually hidden on options, visible in the review). */
+  readonly correctAnswerLabel: string;
+  /** Visually hidden after a link that opens a new tab. */
+  readonly newTabNote: string;
   /** `{count}` placeholder; shown from three consecutive correct answers. */
   readonly streakTemplate: string;
   readonly explanationHeading: string;
@@ -97,6 +123,8 @@ export interface QuizRunnerUi {
     readonly noMissesNote: string;
     readonly restartLabel: string;
     readonly hubLabel: string;
+    /** `{tier}` placeholder: the next tier's title, offered from half the answers right. */
+    readonly nextTierTemplate: string;
   };
 }
 

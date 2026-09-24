@@ -1,13 +1,13 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 
 import { quizContentEn } from '@/content/quiz';
 import type { QuizTier } from '@/content/quiz';
 
-import { QuizRunner } from '@/components/quiz/QuizRunner';
+import { QuizRunner, type QuizRunnerProps } from '@/components/quiz/QuizRunner';
+import { attemptStorageKey, bestScoreStorageKey } from '@/components/quiz/quizProgress';
 
-// Render motion elements as plain DOM and AnimatePresence as a passthrough so
-// question transitions resolve synchronously in jsdom (matches the mock
-// pattern used across the suite, e.g. FAQCategory.test.tsx).
+// Render motion elements as plain DOM so question transitions resolve
+// synchronously in jsdom (matches the mock pattern used across the suite).
 jest.mock('framer-motion', () => {
   const React = require('react');
   const cache: Record<string, unknown> = {};
@@ -83,11 +83,30 @@ const tier: QuizTier = {
 
 const ui = quizContentEn.ui;
 
+const props: QuizRunnerProps = {
+  tier,
+  ui,
+  locale: 'en',
+  hubHref: '/quiz',
+  rankFloors: {
+    observer: null,
+    participant: 'From 50%',
+    enduranceChampion: 'From 75%',
+    chronoWarrior: 'From 95%',
+  },
+  bestTemplate: quizContentEn.hub.bestTemplate,
+  nextTier: { title: 'Medium', href: '/quiz/medium' },
+};
+
+const SESSION_KEY = attemptStorageKey('en', 'basic');
+
 describe('<QuizRunner />', () => {
   beforeEach(() => {
     // Pin the Fisher-Yates shuffle to a no-op so the attempt keeps the
     // authored question and option order and assertions stay deterministic.
     jest.spyOn(Math, 'random').mockReturnValue(0.9999999);
+    window.sessionStorage.clear();
+    window.localStorage.clear();
   });
 
   afterEach(() => {
@@ -95,13 +114,19 @@ describe('<QuizRunner />', () => {
   });
 
   function begin() {
-    render(<QuizRunner tier={tier} ui={ui} hubHref="/quiz" />);
+    render(<QuizRunner {...props} />);
     fireEvent.click(screen.getByTestId('quiz-begin'));
   }
 
-  it('renders the intro with the keyboard hint before starting', () => {
-    render(<QuizRunner tier={tier} ui={ui} hubHref="/quiz" />);
-    expect(screen.getByText(ui.intro.keyboardHint)).toBeInTheDocument();
+  it('opens on the goal, not on a question that has not started', () => {
+    render(<QuizRunner {...props} />);
+    const start = screen.getByTestId('quiz-start');
+    expect(start).toHaveTextContent(ui.intro.keyboardHint);
+    expect(within(start).getByRole('list', { name: ui.intro.ranksHeading })).toBeInTheDocument();
+    expect(start).toHaveTextContent('From 75%');
+    // The progress line belongs to a running attempt only.
+    expect(screen.queryByTestId('quiz-progress')).not.toBeInTheDocument();
+    expect(start).not.toHaveTextContent('Question 1 of 2');
     expect(screen.queryByText('First stub prompt?')).not.toBeInTheDocument();
   });
 
@@ -110,7 +135,7 @@ describe('<QuizRunner />', () => {
       <>
         <a href="#main">Skip to content</a>
         <main id="main" tabIndex={-1}>
-          <QuizRunner tier={tier} ui={ui} hubHref="/quiz" />
+          <QuizRunner {...props} />
         </main>
       </>,
     );
@@ -132,7 +157,48 @@ describe('<QuizRunner />', () => {
     expect(screen.getByTestId('quiz-progress')).toHaveTextContent('Question 1 of 2');
   });
 
-  it('walks a full attempt: feedback, explanation, reference, summary, and study list', () => {
+  it('opens references in a new tab, so following one keeps the attempt', () => {
+    begin();
+    fireEvent.click(screen.getByText('First distractor one'));
+    const link = screen.getByRole('link', { name: /White paper — Gestures/ });
+    expect(link).toHaveAttribute('href', '/white-paper#gestures');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(link).toHaveAccessibleName(expect.stringContaining(ui.newTabNote));
+  });
+
+  it('keeps focus on the answer, names the correct option and marks the picks', () => {
+    begin();
+    const wrong = screen.getByTestId('quiz-option-2');
+    wrong.focus();
+    fireEvent.click(wrong);
+
+    // Options stay focusable: they are aria-disabled, never natively disabled.
+    expect(wrong).not.toBeDisabled();
+    expect(wrong).toHaveAttribute('aria-disabled', 'true');
+    expect(wrong).toHaveAccessibleName(expect.stringContaining(`(${ui.yourAnswerLabel})`));
+    expect(screen.getByTestId('quiz-option-1')).toHaveAccessibleName(
+      expect.stringContaining(`(${ui.correctAnswerLabel})`),
+    );
+
+    // Focus moves to the feedback, whose status names the correct letter.
+    const feedback = screen.getByTestId('quiz-feedback');
+    expect(feedback).toHaveFocus();
+    expect(screen.getByTestId('quiz-feedback-status')).toHaveTextContent(
+      'The correct answer is A.',
+    );
+    expect(feedback).toHaveAccessibleName(expect.stringContaining('The correct answer is A.'));
+
+    // A second click changes nothing.
+    fireEvent.click(screen.getByTestId('quiz-option-3'));
+    expect(screen.getByTestId('quiz-option-3')).toHaveAttribute('data-state', 'other');
+
+    // Next moves focus to the new question's heading.
+    fireEvent.click(screen.getByTestId('quiz-next'));
+    expect(screen.getByRole('heading', { level: 2, name: 'Second stub prompt?' })).toHaveFocus();
+  });
+
+  it('walks a full attempt: feedback, explanation, reference, summary and review', () => {
     begin();
 
     expect(screen.getByTestId('quiz-progress')).toHaveTextContent('Question 1 of 2');
@@ -143,10 +209,6 @@ describe('<QuizRunner />', () => {
     const feedback = screen.getByTestId('quiz-feedback');
     expect(feedback).toHaveTextContent('First stub explanation.');
     expect(feedback).toHaveTextContent('First stub fun fact.');
-    expect(screen.getByRole('link', { name: /White paper — Gestures/ })).toHaveAttribute(
-      'href',
-      '/white-paper#gestures',
-    );
 
     fireEvent.click(screen.getByTestId('quiz-next'));
     expect(screen.getByTestId('quiz-progress')).toHaveTextContent('Question 2 of 2');
@@ -154,36 +216,111 @@ describe('<QuizRunner />', () => {
     // Answer question two correctly via the keyboard shortcut (option 2 = 'b').
     fireEvent.keyDown(window, { key: '2' });
     expect(screen.getByTestId('quiz-feedback')).toHaveTextContent('Second stub explanation.');
+    expect(screen.getByTestId('quiz-feedback-status')).not.toHaveTextContent('correct answer is');
 
     // Finish via the Enter shortcut.
     fireEvent.keyDown(window, { key: 'Enter' });
     const summary = screen.getByTestId('quiz-summary');
     expect(summary).toHaveTextContent('1 of 2 correct');
     expect(summary).toHaveTextContent(ui.summary.ranks.participant.name);
+    expect(screen.getByRole('heading', { level: 2, name: '1 of 2 correct' })).toHaveFocus();
 
-    // The missed question appears in the study list with its reference link.
-    expect(summary).toHaveTextContent('First stub prompt?');
-    expect(screen.getByRole('link', { name: /White paper — Gestures/ })).toHaveAttribute(
-      'href',
-      '/white-paper#gestures',
+    // The review shows the pick, the correct answer and the explanation.
+    const review = screen.getByTestId('quiz-review');
+    expect(review).toHaveTextContent('First stub prompt?');
+    expect(review).toHaveTextContent('B. First distractor one');
+    expect(review).toHaveTextContent('A. First correct option');
+    expect(review).toHaveTextContent('First stub explanation.');
+    expect(within(review).getByRole('link', { name: /White paper — Gestures/ })).toHaveAttribute(
+      'target',
+      '_blank',
     );
     expect(summary).not.toHaveTextContent('Second stub prompt?');
+
+    // Half right: the next tier is on offer.
+    expect(screen.getByTestId('quiz-next-tier')).toHaveAttribute('href', '/quiz/medium');
+    expect(screen.getByTestId('quiz-next-tier')).toHaveTextContent('Continue to Medium');
   });
 
-  it('locks options after answering and restart returns to a fresh first question', () => {
+  it('keeps the best score in this browser', () => {
     begin();
-
     fireEvent.click(screen.getByText('First correct option'));
-    expect(screen.getByTestId('quiz-option-2')).toBeDisabled();
-
     fireEvent.click(screen.getByTestId('quiz-next'));
     fireEvent.click(screen.getByText('Second correct option'));
     fireEvent.click(screen.getByTestId('quiz-next'));
 
     expect(screen.getByTestId('quiz-summary')).toHaveTextContent('2 of 2 correct');
     expect(screen.getByText(ui.summary.noMissesNote)).toBeInTheDocument();
+    expect(JSON.parse(window.localStorage.getItem(bestScoreStorageKey('basic'))!)).toEqual({
+      correct: 2,
+      total: 2,
+    });
 
     fireEvent.click(screen.getByTestId('quiz-restart'));
     expect(screen.getByTestId('quiz-progress')).toHaveTextContent('Question 1 of 2');
+  });
+
+  it('does not suggest the next tier below half right', () => {
+    begin();
+    fireEvent.click(screen.getByText('First distractor one'));
+    fireEvent.click(screen.getByTestId('quiz-next'));
+    fireEvent.click(screen.getByText('Second distractor one'));
+    fireEvent.click(screen.getByTestId('quiz-next'));
+
+    expect(screen.getByTestId('quiz-summary')).toHaveTextContent('0 of 2 correct');
+    expect(screen.queryByTestId('quiz-next-tier')).not.toBeInTheDocument();
+  });
+
+  it('saves the run as it goes and offers to resume it after a reload', () => {
+    const { unmount } = render(<QuizRunner {...props} />);
+    fireEvent.click(screen.getByTestId('quiz-begin'));
+    fireEvent.click(screen.getByText('First distractor one'));
+    fireEvent.click(screen.getByTestId('quiz-next'));
+    expect(window.sessionStorage.getItem(SESSION_KEY)).not.toBeNull();
+    unmount();
+
+    // A new visit (a reload, or Back from a reference) starts on the start card.
+    render(<QuizRunner {...props} />);
+    const start = screen.getByTestId('quiz-start');
+    expect(start).toHaveTextContent('Question 2 of 2');
+    act(() => {
+      fireEvent.click(screen.getByTestId('quiz-resume'));
+    });
+    expect(screen.getByTestId('quiz-progress')).toHaveTextContent('Question 2 of 2');
+    expect(screen.getByText('Second stub prompt?')).toBeInTheDocument();
+
+    // The earlier answer still counts.
+    fireEvent.click(screen.getByText('Second correct option'));
+    fireEvent.click(screen.getByTestId('quiz-next'));
+    expect(screen.getByTestId('quiz-summary')).toHaveTextContent('1 of 2 correct');
+  });
+
+  it('starts over from a clean slate when asked', () => {
+    const { unmount } = render(<QuizRunner {...props} />);
+    fireEvent.click(screen.getByTestId('quiz-begin'));
+    fireEvent.click(screen.getByText('First correct option'));
+    unmount();
+
+    render(<QuizRunner {...props} />);
+    fireEvent.click(screen.getByTestId('quiz-begin'));
+    expect(screen.getByTestId('quiz-progress')).toHaveTextContent('Question 1 of 2');
+    expect(screen.queryByTestId('quiz-feedback')).not.toBeInTheDocument();
+  });
+
+  it('ignores a saved run that no longer matches the tier', () => {
+    window.sessionStorage.setItem(
+      SESSION_KEY,
+      JSON.stringify({
+        v: 1,
+        phase: 'running',
+        questionIds: ['first-question', 'removed-question'],
+        optionIdsByQuestion: {},
+        answers: [],
+        currentIndex: 0,
+      }),
+    );
+    render(<QuizRunner {...props} />);
+    expect(screen.queryByTestId('quiz-resume')).not.toBeInTheDocument();
+    expect(window.sessionStorage.getItem(SESSION_KEY)).toBeNull();
   });
 });

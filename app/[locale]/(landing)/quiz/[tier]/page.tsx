@@ -2,11 +2,26 @@ import type { Metadata, ResolvingMetadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { QUIZ_PATH, QUIZ_TIER_IDS, getQuizContent, isQuizTierId } from '@/content/quiz';
+import {
+  QUIZ_PATH,
+  QUIZ_TIER_IDS,
+  getQuizContent,
+  isQuizTierId,
+  type QuizRunnerUi,
+} from '@/content/quiz';
 
+import { PageHeader } from '@/components/layout/PageHeader';
+import { DifficultyMeter } from '@/components/quiz/DifficultyMeter';
 import { QuizRunner } from '@/components/quiz/QuizRunner';
-import { Link } from '@/i18n/navigation';
+import {
+  RANK_BANDS,
+  estimatedMinutes,
+  fillTemplate,
+  type QuizRankKey,
+} from '@/components/quiz/quizProgress';
+import { ReadingMain } from '@/components/reading/ReadingMain';
 import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
+import { formatCount, formatPercent } from '@/utils/format/numbers';
 import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage } from '@/utils/jsonLd';
 import { createPageMetadata } from '@/utils/seo';
 
@@ -43,18 +58,35 @@ export async function generateMetadata(
   );
 }
 
+/** Where each rank starts, for the ladder: "From 50%", and nothing for the first rank. */
+function rankFloors(ui: QuizRunnerUi, locale: string): Record<QuizRankKey, string | null> {
+  return Object.fromEntries(
+    RANK_BANDS.map(({ rank, threshold }) => [
+      rank,
+      threshold === 0
+        ? null
+        : fillTemplate(ui.intro.rankFromTemplate, {
+            percent: formatPercent(threshold * 100, locale),
+          }),
+    ]),
+  ) as Record<QuizRankKey, string | null>;
+}
+
 export default async function QuizTierPage({ params }: PageProps) {
   const { locale, tier: tierParam } = await params;
   setRequestLocale(locale);
   if (!isQuizTierId(tierParam)) notFound();
 
   const { hub, ui, tiers } = getQuizContent(locale);
-  const tier = tiers.find((candidate) => candidate.id === tierParam);
+  const tierIndex = tiers.findIndex((candidate) => candidate.id === tierParam);
+  const tier = tiers[tierIndex];
   if (!tier) notFound();
+  const nextTier = tiers[tierIndex + 1];
 
   const t = await getTranslations({ locale, namespace: 'meta' });
   const inLanguage = jsonLdInLanguage(locale);
   const pageUrl = localeHref(LANDING_ORIGIN, `${QUIZ_PATH}/${tier.id}`, locale);
+  const questionCount = tier.questions.length;
 
   const quizJsonLd = {
     '@context': 'https://schema.org',
@@ -70,11 +102,7 @@ export default async function QuizTierPage({ params }: PageProps) {
   };
 
   return (
-    <main
-      id="main"
-      tabIndex={-1}
-      className="relative mx-auto max-w-3xl px-4 pb-16 pt-12 sm:px-6 lg:pb-20 lg:pt-20"
-    >
+    <ReadingMain>
       <JsonLd
         data={[
           breadcrumbJsonLd(
@@ -89,31 +117,50 @@ export default async function QuizTierPage({ params }: PageProps) {
         ]}
       />
 
-      <nav aria-label={hub.breadcrumbs.ariaLabel} className="mb-8 text-sm text-white/60">
-        <Link href="/" className="hover:text-white">
-          {hub.breadcrumbs.homeLabel}
-        </Link>
-        <span className="mx-2">/</span>
-        <Link href={QUIZ_PATH} className="hover:text-white">
-          {hub.breadcrumbs.quizLabel}
-        </Link>
-        <span className="mx-2">/</span>
-        <span className="text-white/80">{tier.title}</span>
-      </nav>
+      <div className="mx-auto max-w-[46rem]">
+        <PageHeader
+          variant="reading"
+          breadcrumbs={[{ label: hub.breadcrumbs.quizLabel, href: QUIZ_PATH }]}
+          title={tier.title}
+          subtitle={tier.description}
+          meta={
+            <>
+              <span className="tabular-nums">
+                {fillTemplate(hub.questionCountTemplate, {
+                  count: formatCount(questionCount, locale),
+                })}
+              </span>
+              <span className="tabular-nums">
+                {fillTemplate(hub.durationTemplate, {
+                  minutes: estimatedMinutes(questionCount),
+                })}
+              </span>
+              <span className="inline-flex items-center gap-2">
+                <DifficultyMeter
+                  level={tierIndex + 1}
+                  max={tiers.length}
+                  label={fillTemplate(hub.difficultyTemplate, {
+                    level: tierIndex + 1,
+                    max: tiers.length,
+                  })}
+                />
+              </span>
+            </>
+          }
+        />
 
-      <header>
-        <p className="type-eyebrow text-primary/80">
-          {hub.eyebrow}
-          {' · '}
-          {hub.questionCountTemplate.replace('{count}', String(tier.questions.length))}
-        </p>
-        <h1 className="mt-4 type-display-lg text-balance text-foreground">{tier.title}</h1>
-        <p className="mt-6 type-body-lg text-muted-foreground">{tier.description}</p>
-      </header>
-
-      <div className="mt-10">
-        <QuizRunner tier={tier} ui={ui} hubHref={QUIZ_PATH} />
+        <QuizRunner
+          tier={tier}
+          ui={ui}
+          locale={locale}
+          hubHref={QUIZ_PATH}
+          rankFloors={rankFloors(ui, locale)}
+          bestTemplate={hub.bestTemplate}
+          nextTier={
+            nextTier ? { title: nextTier.title, href: `${QUIZ_PATH}/${nextTier.id}` } : undefined
+          }
+        />
       </div>
-    </main>
+    </ReadingMain>
   );
 }
