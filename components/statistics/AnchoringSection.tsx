@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 
+import { cn } from '@/lib/utils';
 import { useFormat } from '@/hooks/useFormat';
 import { PageHeaderFigures, type PageHeaderFigure } from '@/components/layout/PageHeader';
 import { Amount } from '@/components/ui/amount';
@@ -89,6 +90,19 @@ const FIGURES_LAYOUT =
   'mt-0 sm:mt-0 sm:[&>div]:flex sm:[&>div]:flex-col sm:[&>div>dt]:grow lg:[&>div]:px-6';
 
 /**
+ * The Cosmic Signature strip's four figures: 2 + 2 on a tablet, then one row
+ * of four from `lg`, never a lone fourth figure wrapped under three (the
+ * header strip's wrapping flex row does that at 1024px, and wider in
+ * Ukrainian). The two counts take less room than the two ETH amounts, and the
+ * columns pad a little less than the page header's, so an amount keeps its
+ * line at 1024px.
+ */
+const CST_FIGURES_LAYOUT = cn(
+  FIGURES_LAYOUT,
+  'sm:grid-cols-2 lg:grid lg:grid-cols-[repeat(2,minmax(0,4fr))_repeat(2,minmax(0,5fr))] lg:[&>div]:px-5',
+);
+
+/**
  * The anchoring statistics, one underline tab per NFT kind: the kind's own
  * figures (the anchored counts of both kinds lead the page above the tabs),
  * its Definitions disclosure, then the actions, anchored NFTs and
@@ -164,7 +178,7 @@ export function AnchoringSection({
 
       <TabsContent value="cst" className="mt-8 space-y-12 sm:space-y-16">
         <div>
-          <PageHeaderFigures figures={cstFigures} className={FIGURES_LAYOUT} />
+          <PageHeaderFigures figures={cstFigures} className={CST_FIGURES_LAYOUT} />
           <DefinitionsDisclosure
             className="mt-6"
             label={t('shared.definitions')}
