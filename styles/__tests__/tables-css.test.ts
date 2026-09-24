@@ -155,6 +155,16 @@ describe('styles/tables.css', () => {
     expect(declaration(phoneRules, label, 'color')).toBe('hsl(var(--subtle-foreground))');
   });
 
+  it('lets a named address wrap in a compact table instead of forcing records', () => {
+    // Regression: "Cosmic Signature NFT Anchoring Wallet" was wider than the
+    // owner column at 390px, so the holders table fell back to records.
+    const address = ".cs-table[data-layout='compact'] td[data-kind='address']";
+    expect(declaration(phoneRules, address, 'text-wrap-mode')).toBe('wrap');
+    expect(declaration(phoneRules, `${address} > [data-slot='value'] *`, 'text-wrap-mode')).toBe(
+      'wrap',
+    );
+  });
+
   it('drops labelled blank lines and secondary columns on phones', () => {
     expect(declaration(phoneRules, `${RECORD} td[data-empty='true']`, 'display')).toBe('none');
     expect(

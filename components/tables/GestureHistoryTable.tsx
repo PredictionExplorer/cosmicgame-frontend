@@ -11,7 +11,12 @@ import ERC20_ABI from '@/contracts/CosmicToken.json';
 
 import { formatAddress, type AmountUnit } from '@/utils/format';
 import { Amount } from '@/components/ui/amount';
-import { DataTable, ExternalTableLink, type DataTableColumn } from '@/components/ui/data-table';
+import {
+  DataTable,
+  ExternalTableLink,
+  KindValue,
+  type DataTableColumn,
+} from '@/components/ui/data-table';
 import { Duration } from '@/components/ui/duration';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { GestureMethodTag, resolveGestureType } from '@/components/tables/GestureMethodTag';
@@ -205,12 +210,31 @@ const GestureHistoryTable = ({
     const costUnit = (gesture: GestureHistory): AmountUnit =>
       resolveGestureType(gesture) === CST_GESTURE ? 'CST' : 'ETH';
 
+    const methodTag = (gesture: GestureHistory) => (
+      <GestureMethodTag
+        gestureType={resolveGestureType(gesture)}
+        unknownLabel={t('status.unknown')}
+      />
+    );
+    // A phone record reads as lines, not a spec sheet: the method rides on
+    // the date line (the type column is hidden there), and the cycle is shown
+    // only when the list spans more than one, so a participant's gestures in
+    // one cycle do not each repeat "Cycle 2".
+    const spansCycles = new Set(gestureHistory.map((gesture) => gesture.RoundNum)).size > 1;
+
     const all: (DataTableColumn<GestureHistory> | false)[] = [
       {
         id: 'datetime',
         kind: 'datetime',
         header: t('columns.datetime'),
         value: (gesture) => gesture.TimeStamp,
+        // The date stays inline so the row link's underline reaches it.
+        cell: (gesture, { value }) => (
+          <>
+            <KindValue kind="datetime" value={value} seconds />
+            <span className="ms-2 inline-block align-middle sm:hidden">{methodTag(gesture)}</span>
+          </>
+        ),
         seconds: true,
         sortable: true,
       },
@@ -245,18 +269,16 @@ const GestureHistoryTable = ({
         header: t('columns.cycle'),
         value: (gesture) => gesture.RoundNum,
         href: (gesture) => (gesture.RoundNum == null ? null : `/allocation/${gesture.RoundNum}`),
+        priority: spansCycles ? 'primary' : 'secondary',
       },
       {
         id: 'type',
         kind: 'text',
         header: t('columns.gestureType'),
         value: (gesture) => resolveGestureType(gesture),
-        cell: (gesture) => (
-          <GestureMethodTag
-            gestureType={resolveGestureType(gesture)}
-            unknownLabel={t('status.unknown')}
-          />
-        ),
+        cell: methodTag,
+        // On a phone the method sits on the date line instead.
+        priority: 'secondary',
       },
       showHold && {
         id: 'hold',
@@ -310,7 +332,7 @@ const GestureHistoryTable = ({
       },
     ];
     return all.filter((column): column is DataTableColumn<GestureHistory> => Boolean(column));
-  }, [t, showRound, showParticipant, showHold, holds, banned]);
+  }, [t, showRound, showParticipant, showHold, holds, banned, gestureHistory]);
 
   return (
     <DataTable
