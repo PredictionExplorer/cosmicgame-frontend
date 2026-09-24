@@ -155,7 +155,7 @@
     "releaseSelected": "{count, plural, other {#件のNFTを解除}}",
     "approvalNote": "初回はウォレットが2回確認します。まず係留コントラクトがこのコレクションのNFTを預かることを承認し、次に係留を確定します。",
     "releaseNote": "解除は取り消せません。ウォレットが開く前に、次の画面でもう一度確認します。",
-    "anchoredOn": "{date}に係留",
+    "anchoredOn": "<date></date>に係留",
     "accrued": "{amount}を積立済み",
     "cycle": "サイクル{cycle}",
     "open": "{title}を開く",

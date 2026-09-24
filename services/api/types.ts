@@ -472,6 +472,8 @@ export interface AnchoredTokenInfo {
     TokenId: number;
     Seed?: number;
     StakeActionId?: number;
+    /** The token's name; empty when it has none. */
+    TokenName?: string;
   };
   StakeTimeStamp: number;
   IsRWLK?: boolean;

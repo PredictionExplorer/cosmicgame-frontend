@@ -6,10 +6,10 @@ import { useTranslations } from 'next-intl';
 import type { TxResult } from '@/hooks/useTxFlow';
 import type { TxStage } from '@/lib/txStage';
 import type { AnchorAction, AnchorDistributionImprint, AnchoredTokenInfo } from '@/services/api';
-import { DateTime } from '@/components/ui/date-time';
 import { SectionHeader } from '@/components/ui/section-header';
 
 import AnchorActionsTable from './AnchorActionsTable';
+import { AnchoredOn } from './AnchoredOn';
 import { AnchorTokenGrid, type AnchorGridItem } from './AnchorTokenGrid';
 import { RwalkAnchorDistributionImprintsTable } from './RwalkAnchorDistributionImprintsTable';
 
@@ -54,13 +54,9 @@ export function RWLKAnchoringPanel({
         .map((row) => ({
           key: row.StakeActionId,
           tokenId: row.StakedTokenId,
-          meta: [
-            <DateTime key="anchored" timestamp={row.StakeTimeStamp}>
-              {(date) => t('picker.anchoredOn', { date })}
-            </DateTime>,
-          ],
+          meta: [<AnchoredOn key="anchored" timestamp={row.StakeTimeStamp} />],
         })),
-    [anchoredTokens, t],
+    [anchoredTokens],
   );
 
   const availableItems = useMemo<AnchorGridItem[]>(

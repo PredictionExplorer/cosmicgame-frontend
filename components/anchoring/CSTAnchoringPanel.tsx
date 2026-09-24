@@ -8,11 +8,11 @@ import type { TxResult } from '@/hooks/useTxFlow';
 import type { TxStage } from '@/lib/txStage';
 import type { AnchorAction, AnchoredTokenInfo, CSTTokenInfo, RewardsByToken } from '@/services/api';
 import { Link } from '@/i18n/navigation';
-import { DateTime } from '@/components/ui/date-time';
 import { SectionHeader } from '@/components/ui/section-header';
 import { buttonVariants } from '@/components/ui/button';
 
 import AnchorActionsTable from './AnchorActionsTable';
+import { AnchoredOn } from './AnchoredOn';
 import { AnchorDistributionsTable } from './AnchorDistributionsTable';
 import { AnchorTokenGrid, type AnchorGridItem } from './AnchorTokenGrid';
 
@@ -23,7 +23,12 @@ export interface CSTAnchoringPanelProps {
   account: string;
   anchoredTokens: readonly AnchoredTokenInfo[];
   availableTokens: readonly CSTTokenInfo[];
-  anchorDistributions: readonly RewardsByToken[];
+  /**
+   * The wallet's per-NFT Anchor Distributions summary; `null` while it loads
+   * or when the read failed. It lists only NFTs that have received a deposit,
+   * so an anchored NFT without a row has accrued 0 ETH.
+   */
+  anchorDistributions: readonly RewardsByToken[] | null;
   actions: AnchorAction[];
   /** Anchors token ids; resolves with the transaction's outcome. */
   onAnchor: (tokenIds: number[]) => Promise<TxResult>;
@@ -56,7 +61,10 @@ export function CSTAnchoringPanel({
   const format = useFormat();
 
   const accruedByToken = useMemo(
-    () => new Map(anchorDistributions.map((row) => [row.TokenId, row.RewardToCollectEth ?? 0])),
+    () =>
+      anchorDistributions === null
+        ? null
+        : new Map(anchorDistributions.map((row) => [row.TokenId, row.RewardToCollectEth ?? 0])),
     [anchorDistributions],
   );
 
@@ -69,21 +77,17 @@ export function CSTAnchoringPanel({
           const info = row.TokenInfo;
           const actionId = info?.StakeActionId ?? row.StakeActionId;
           if (!info || typeof actionId !== 'number') return [];
-          const accruedEth = accruedByToken.get(info.TokenId) ?? null;
-          // The anchored-token row nests the full token record, name included.
-          const name: unknown = (info as Record<string, unknown>).TokenName;
+          // Unknown until the summary is read; after that, no row means no deposit yet.
+          const accruedEth =
+            accruedByToken === null ? null : (accruedByToken.get(info.TokenId) ?? 0);
           return [
             {
               key: actionId,
               tokenId: info.TokenId,
               seed: info.Seed ?? null,
-              name: typeof name === 'string' ? name : null,
+              name: info.TokenName ?? null,
               accruedEth,
-              meta: [
-                <DateTime key="anchored" timestamp={row.StakeTimeStamp}>
-                  {(date) => t('picker.anchoredOn', { date })}
-                </DateTime>,
-              ],
+              meta: [<AnchoredOn key="anchored" timestamp={row.StakeTimeStamp} />],
               detail:
                 accruedEth === null
                   ? null
@@ -154,7 +158,7 @@ export function CSTAnchoringPanel({
           description={t('panels.cosmicSignature.distributionsDescription')}
         />
         <AnchorDistributionsTable
-          list={[...anchorDistributions]}
+          list={[...(anchorDistributions ?? [])]}
           address={account}
           loading={loading}
         />

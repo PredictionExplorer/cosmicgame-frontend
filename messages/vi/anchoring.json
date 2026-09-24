@@ -155,7 +155,7 @@
     "releaseSelected": "{count, plural, other {Gỡ neo # NFT}}",
     "approvalNote": "Lần đầu, ví sẽ hỏi hai lần: trước tiên cho phép hợp đồng neo giữ giữ các NFT của bộ sưu tập này, sau đó xác nhận neo giữ.",
     "releaseNote": "Gỡ neo không thể hoàn tác. Bạn sẽ xác nhận ở màn hình tiếp theo trước khi ví mở ra.",
-    "anchoredOn": "Neo giữ {date}",
+    "anchoredOn": "Neo giữ <date></date>",
     "accrued": "Đã tích lũy {amount}",
     "cycle": "Chu kỳ {cycle}",
     "open": "Mở {title}",

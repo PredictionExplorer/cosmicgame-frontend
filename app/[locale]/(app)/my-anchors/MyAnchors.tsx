@@ -199,7 +199,7 @@ const MyAnchors = () => {
               account={account}
               anchoredTokens={anchoredCst}
               availableTokens={availableCst}
-              anchorDistributions={distributions.data ?? []}
+              anchorDistributions={distributions.data ?? null}
               actions={cstActions.data ?? []}
               onAnchor={runFor(CST_GRIDS.available, (ids) => anchor(ids, false))}
               onRelease={runFor(CST_GRIDS.anchored, (ids) => release(ids, false))}

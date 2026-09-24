@@ -155,7 +155,7 @@
     "releaseSelected": "{count, plural, other {解錨 # 枚 NFT}}",
     "approvalNote": "第一次操作時，錢包會請求兩次：先授權錨定合約持有該系列的 NFT，再確認錨定。",
     "releaseNote": "解錨不可撤銷。錢包彈出前，你還會在下一步再次確認。",
-    "anchoredOn": "{date} 錨定",
+    "anchoredOn": "<date></date> 錨定",
     "accrued": "已累計 {amount}",
     "cycle": "第 {cycle} 個週期",
     "open": "開啟 {title}",

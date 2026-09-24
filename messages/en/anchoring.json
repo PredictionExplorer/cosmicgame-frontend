@@ -155,7 +155,7 @@
     "releaseSelected": "{count, plural, one {Release # NFT} other {Release # NFTs}}",
     "approvalNote": "The first time, your wallet asks twice: once to let the anchoring contract hold this collection’s NFTs, then to anchor.",
     "releaseNote": "Releasing is permanent. You confirm on the next screen before your wallet opens.",
-    "anchoredOn": "Anchored {date}",
+    "anchoredOn": "Anchored <date></date>",
     "accrued": "{amount} accrued",
     "cycle": "Cycle {cycle}",
     "open": "Open {title}",

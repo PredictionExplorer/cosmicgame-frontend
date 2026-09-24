@@ -5,11 +5,12 @@ import type { AnchoredTokenInfo, CSTTokenInfo } from '@/services/api';
 
 import { render, screen } from '@/test-utils';
 
-import type { AnchorGridItem, AnchorTokenGridProps } from '../AnchorTokenGrid';
+import { sumAccruedEth, type AnchorGridItem, type AnchorTokenGridProps } from '../AnchorTokenGrid';
 import { CSTAnchoringPanel, CST_GRIDS } from '../CSTAnchoringPanel';
 
 const grids: Record<string, AnchorTokenGridProps> = {};
 jest.mock('../AnchorTokenGrid', () => ({
+  ...jest.requireActual('../AnchorTokenGrid'),
   AnchorTokenGrid: (props: AnchorTokenGridProps) => {
     grids[props.id] = props;
     return <section data-testid={props.id}>{props.title}</section>;
@@ -67,9 +68,23 @@ describe('CSTAnchoringPanel', () => {
     expect(grid.items[1]).toMatchObject({ tokenId: 9, name: 'Twisted Mind', accruedEth: 0.1562 });
   });
 
-  it('reads no accrued ETH as unknown rather than zero', () => {
+  it('releases an anchored NFT with no summary row for 0 ETH', () => {
+    // Regression: the summary lists only NFTs that have received a deposit, so
+    // an NFT anchored since the last one has no row. Reading that as unknown
+    // made the release dialog say "Unavailable" for any selection including it.
     renderPanel();
-    expect(grids[CST_GRIDS.anchored]!.items[0]!.accruedEth).toBeNull();
+    const [unpaid, paid] = grids[CST_GRIDS.anchored]!.items;
+    expect(unpaid).toMatchObject({ tokenId: 4, accruedEth: 0 });
+    expect(unpaid!.detail).toBe('anchoring.picker.accrued(amount=0\u00a0ETH)');
+    expect(sumAccruedEth([unpaid!, paid!])).toBeCloseTo(0.1562);
+  });
+
+  it('reads accrued ETH as unknown while the summary is unread or failed', () => {
+    renderPanel({ anchorDistributions: null });
+    for (const item of grids[CST_GRIDS.anchored]!.items) {
+      expect(item.accruedEth).toBeNull();
+      expect(item.detail).toBeNull();
+    }
   });
 
   it('offers the wallet’s NFTs to anchor by token id, with their cycle', () => {
