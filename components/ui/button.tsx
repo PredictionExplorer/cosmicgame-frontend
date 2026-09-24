@@ -115,7 +115,12 @@ function ButtonSpinner() {
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, loading = false, children, ...props }, ref) => {
-    const classes = cn(buttonVariants({ variant, size, className }));
+    const classes = cn(
+      buttonVariants({ variant, size }),
+      // A pending action is busy, not unavailable: it keeps full contrast.
+      loading && !asChild && 'disabled:opacity-100',
+      className,
+    );
     if (asChild) {
       return (
         <Slot className={classes} ref={ref} {...props}>
@@ -129,7 +134,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         {...props}
         disabled={props.disabled || loading}
-        aria-busy={loading || undefined}
+        aria-busy={loading ? true : props['aria-busy']}
       >
         {loading ? <ButtonSpinner /> : null}
         {children}

@@ -92,6 +92,11 @@ describe('Button', () => {
     expect(handleClick).not.toHaveBeenCalled();
   });
 
+  it('keeps a caller’s own aria-busy when it is not loading', () => {
+    render(<Button aria-busy>Opening</Button>);
+    expect(screen.getByRole('button', { name: 'Opening' })).toHaveAttribute('aria-busy', 'true');
+  });
+
   it('shows a held state for a toggle button', () => {
     render(
       <Button variant="outline" aria-pressed>
