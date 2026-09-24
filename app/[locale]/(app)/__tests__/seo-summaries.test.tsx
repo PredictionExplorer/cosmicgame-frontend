@@ -359,6 +359,17 @@ describe('server-rendered page headers', () => {
     expect(
       screen.getByRole('heading', { level: 2, name: 'Project repositories' }),
     ).toBeInTheDocument();
+    // Each repository heading is its name alone (regression: "Frontend (opens in
+    // a new tab)"); the link says it opens a new tab through its description.
+    for (const heading of screen.getAllByRole('heading', { level: 3 })) {
+      expect(heading.textContent).not.toMatch(/new tab/i);
+      const link = within(heading).getByRole('link');
+      expect(link).toHaveAttribute('target', '_blank');
+      expect(link).toHaveAccessibleDescription('nav.link.newTab');
+    }
+    // The IPFS artifact and GitHub are linked where they are evidence, not as chips.
+    const related = screen.getByRole('navigation', { name: /related/i });
+    expect(within(related).queryByRole('link', { name: /IPFS|GitHub/ })).toBeNull();
   });
 
   it('renders the gallery header with the collection figures', async () => {

@@ -49,18 +49,7 @@
       "scheduled": "待啟用"
     },
     "fields": {
-      "ethStellarRecipients": "每個週期的 ETH 星選獲配者人數",
-      "nftStellarRecipients": "每個週期的 NFT 星選獲配者人數",
-      "nftHolderRecipients": "每個週期的 NFT 持有者獲配人數",
-      "signatureAllocationPercentage": "簽名分配比例",
-      "publicGoodsPercentage": "公共物品比例",
-      "stellarSelectionPercentage": "星選比例",
-      "anchorDistributionPercentage": "錨定派發比例",
       "timeIncrease": "時間增量的每週期增幅",
-      "allocationTimeout": "專屬收官期限",
-      "priceIncrease": "ETH 落筆價格增幅",
-      "gestureTimeIncrement": "每筆落筆增加的時間",
-      "initialAllocationSeconds": "初始時間增量",
       "initialGestureCostFraction": "初始落筆價格比例",
       "activationTime": "啟用時間",
       "gestureRatio": "ETH 與 CST 落筆比率",

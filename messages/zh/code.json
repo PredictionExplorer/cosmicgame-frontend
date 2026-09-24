@@ -48,8 +48,6 @@
     "description": "查看 Cosmic Signature 的前端、Go 后端、智能合约与图像生成源代码。通过下方查看器，了解链上种子如何生成可复现的 NFT 艺术作品。",
     "relatedAria": "源代码相关页面",
     "links": {
-      "ipfs": "查看 IPFS 上已发布的源代码",
-      "github": "打开 GitHub 组织",
       "contracts": "查看已验证合约",
       "security": "阅读安全说明",
       "gallery": "浏览生成的 NFT 艺术"

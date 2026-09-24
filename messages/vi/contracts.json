@@ -108,7 +108,7 @@
         "tooltip": "Chi phí nét bút ETH dùng tham số bước tăng này. Chi phí nét bút CST đi theo cửa sổ hiệu chỉnh CST trực tiếp."
       },
       "timeIncrement": {
-        "label": "Mức tăng thời gian",
+        "label": "Thời gian cộng thêm cho mỗi nét bút",
         "tooltip": "Mỗi nét bút cộng thêm khoảng thời gian này vào thời điểm hoàn tất chu kỳ. Mức tăng lớn thêm {percent}% sau mỗi chu kỳ."
       },
       "cstPreview": {
@@ -120,13 +120,18 @@
         "tooltip": "Khoảng thời gian người đặt nét bút cuối cùng có để hoàn tất chu kỳ trước khi cửa sổ hoàn tất mở ra cho bất kỳ ai"
       },
       "initial": {
-        "label": "Mức tăng thời gian ban đầu",
+        "label": "Thời lượng chu kỳ ban đầu",
         "tooltip": "Thời điểm hoàn tất chu kỳ ban đầu được cộng thêm khi nét bút đầu tiên được đặt"
       },
       "message": {
         "label": "Độ dài lời nhắn tối đa",
         "tooltip": "Số ký tự tối đa được phép trong lời nhắn của nét bút"
       }
+    },
+    "groups": {
+      "gestures": "Nét bút",
+      "timing": "Thời gian",
+      "selection": "Tinh tuyển"
     }
   },
   "parameters": {

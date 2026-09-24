@@ -28,7 +28,7 @@ function whenIdle(task: () => void): () => void {
 }
 
 export interface ConnectWalletActionProps extends Omit<ButtonProps, 'onClick' | 'children'> {
-  /** Replaces the default "Connect Wallet" label. */
+  /** Replaces the default "Connect wallet" label. */
   label?: ReactNode;
   /** Leading wallet icon (default on). */
   showIcon?: boolean;

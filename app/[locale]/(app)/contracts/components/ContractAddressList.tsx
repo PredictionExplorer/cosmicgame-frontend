@@ -104,7 +104,7 @@ function ContractAddressRow({
   return (
     <li
       data-contract={contract.id}
-      className="grid gap-x-10 gap-y-2 py-5 lg:grid-cols-[minmax(0,18rem)_minmax(0,1fr)] xl:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] xl:items-center"
+      className="grid gap-x-10 gap-y-2 py-5 lg:grid-cols-[minmax(0,18rem)_minmax(0,1fr)] xl:grid-cols-[minmax(0,1fr)_auto_17rem] xl:items-center"
     >
       <div className="min-w-0 lg:row-span-2 xl:row-span-1">
         <p className="type-title text-foreground">{contract.name}</p>
@@ -119,9 +119,10 @@ function ContractAddressRow({
         href={false}
         className="type-hash self-start whitespace-normal text-foreground xl:self-center"
       />
-      <div className="flex min-w-0 flex-col items-start gap-2">
+      {/* The evidence closes the row at xl, in a fixed column, so every address starts on one line. */}
+      <div className="flex min-w-0 flex-col items-start gap-2 xl:items-end">
         <ContractEvidence address={contract.address} labels={evidence} />
-        {market ? <div className="flex flex-wrap gap-2">{market}</div> : null}
+        {market ? <div className="flex flex-wrap gap-2 xl:justify-end">{market}</div> : null}
       </div>
     </li>
   );

@@ -49,18 +49,7 @@
       "scheduled": "Scheduled"
     },
     "fields": {
-      "ethStellarRecipients": "Number of ETH Stellar Selection recipients per cycle",
-      "nftStellarRecipients": "Number of NFT Stellar Selection recipients per cycle",
-      "nftHolderRecipients": "Number of NFT holder recipients per cycle",
-      "signatureAllocationPercentage": "Signature Allocation percentage",
-      "publicGoodsPercentage": "Public Goods percentage",
-      "stellarSelectionPercentage": "Stellar Selection percentage",
-      "anchorDistributionPercentage": "Anchor Distribution percentage",
       "timeIncrease": "Time increment growth per cycle",
-      "allocationTimeout": "Finalization timeout",
-      "priceIncrease": "ETH Gesture Cost step-up",
-      "gestureTimeIncrement": "Time added per gesture",
-      "initialAllocationSeconds": "Initial time increment",
       "initialGestureCostFraction": "Initial Gesture Cost fraction",
       "activationTime": "Activation time",
       "gestureRatio": "ETH to CST Gesture ratio",

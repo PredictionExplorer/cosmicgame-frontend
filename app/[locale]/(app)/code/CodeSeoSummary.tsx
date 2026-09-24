@@ -1,10 +1,12 @@
 import { getLocale, getTranslations } from 'next-intl/server';
 
-import { GITHUB_ORGANIZATION_URL, IMAGE_GENERATION_IPFS_URL } from '@/content/code/structure';
-
 import { PageHeader } from '@/components/layout/PageHeader';
 
-/** The /code page header, rendered on the server: H1, lede and related sources. */
+/**
+ * The /code page header, rendered on the server: H1, lede and related pages.
+ * The IPFS artifact and the GitHub organisation are linked once, where they
+ * are evidence: under the viewer and in the repository list.
+ */
 export async function CodeSeoSummary() {
   const locale = await getLocale();
   const t = await getTranslations({ locale, namespace: 'code' });
@@ -15,8 +17,6 @@ export async function CodeSeoSummary() {
       titleId="code-heading"
       subtitle={t('seo.description')}
       related={[
-        { href: IMAGE_GENERATION_IPFS_URL, label: t('seo.links.ipfs') },
-        { href: GITHUB_ORGANIZATION_URL, label: t('seo.links.github') },
         { href: '/contracts', label: t('seo.links.contracts') },
         { href: '/security', label: t('seo.links.security') },
         { href: '/gallery', label: t('seo.links.gallery') },

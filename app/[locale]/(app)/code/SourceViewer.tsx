@@ -83,7 +83,9 @@ export function SourceViewer({
         role="region"
         aria-label={regionLabel}
         data-wrap={wrap}
-        className="group/code max-h-[70vh] overflow-auto type-hash leading-[1.7] focus-visible:outline-offset-[-2px]"
+        // Every character as written: no programming ligatures (`->` stays two
+        // glyphs), since what a reader checks here is what they copy.
+        className="group/code max-h-[70vh] overflow-auto type-hash leading-[1.7] [font-feature-settings:'zero'_1,'calt'_0,'liga'_0] [font-variant-ligatures:none] focus-visible:outline-offset-[-2px]"
       >
         {children}
       </pre>

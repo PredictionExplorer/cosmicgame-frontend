@@ -49,18 +49,7 @@
       "scheduled": "예정"
     },
     "fields": {
-      "ethStellarRecipients": "사이클별 ETH 별빛 선정 수령자 수",
-      "nftStellarRecipients": "사이클별 NFT 별빛 선정 수령자 수",
-      "nftHolderRecipients": "사이클별 NFT 보유자 수령자 수",
-      "signatureAllocationPercentage": "시그니처 배분 비율",
-      "publicGoodsPercentage": "공공재 비율",
-      "stellarSelectionPercentage": "별빛 선정 비율",
-      "anchorDistributionPercentage": "앵커링 지급 비율",
       "timeIncrease": "사이클별 시간 증가량 증가율",
-      "allocationTimeout": "마감 제한 시간",
-      "priceIncrease": "ETH 제스처 비용 인상률",
-      "gestureTimeIncrement": "제스처당 추가되는 시간",
-      "initialAllocationSeconds": "초기 시간 증가량",
       "initialGestureCostFraction": "초기 제스처 비용 비율",
       "activationTime": "활성화 시각",
       "gestureRatio": "ETH 제스처 대 CST 제스처 비율",

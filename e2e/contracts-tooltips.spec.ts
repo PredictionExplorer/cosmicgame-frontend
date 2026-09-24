@@ -15,7 +15,7 @@ const TOOLTIP_LABELS_AND_COPY: Array<{ label: string; expected: RegExp }> = [
     expected: /ETH gesture cost uses this step-up parameter/,
   },
   {
-    label: 'Time increment',
+    label: 'Time added per gesture',
     expected:
       /Each gesture adds this much time to the Cycle Finalization Time\. The increment grows by \d+(?:\.\d+)?% with each cycle\./,
   },
@@ -28,7 +28,7 @@ const TOOLTIP_LABELS_AND_COPY: Array<{ label: string; expected: RegExp }> = [
     expected: /Time the Final Gesture participant has to finalize the cycle/,
   },
   {
-    label: 'Initial time increment',
+    label: 'Initial cycle duration',
     expected: /The initial Cycle Finalization Time added when the first gesture is made/,
   },
   {
@@ -134,7 +134,7 @@ test.describe('/contracts tooltips', () => {
   test("an explained label's card is portaled out of <main>, so no section clips it", async ({
     page,
   }) => {
-    const trigger = tooltipTriggerForLabel(page, 'Initial time increment');
+    const trigger = tooltipTriggerForLabel(page, 'Initial cycle duration');
     await trigger.scrollIntoViewIfNeeded();
     await trigger.click();
 

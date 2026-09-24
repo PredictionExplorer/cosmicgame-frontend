@@ -108,7 +108,7 @@
         "tooltip": "ETH 落筆價格採用此階梯增幅參數；CST 落筆價格則依據即時 CST 校準窗口變化。"
       },
       "timeIncrement": {
-        "label": "時間增量",
+        "label": "每筆落筆增加的時間",
         "tooltip": "每筆落筆向週期收官倒數增加的時長。每個週期收官後，增量增長 {percent}%。"
       },
       "cstPreview": {
@@ -120,13 +120,18 @@
         "tooltip": "收官之筆參與者完成週期收官的專屬時間；期限結束後，公開收官窗口將向所有人開放。"
       },
       "initial": {
-        "label": "初始時間增量",
+        "label": "初始週期時長",
         "tooltip": "首筆落筆後加入週期收官倒數的初始時長。"
       },
       "message": {
         "label": "訊息長度上限",
         "tooltip": "落筆訊息允許輸入的最大字符數。"
       }
+    },
+    "groups": {
+      "gestures": "落筆",
+      "timing": "時間",
+      "selection": "星選"
     }
   },
   "parameters": {

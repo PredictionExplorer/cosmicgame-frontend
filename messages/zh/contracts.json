@@ -108,7 +108,7 @@
         "tooltip": "ETH 落笔价格采用此阶梯增幅参数；CST 落笔价格则依据实时 CST 校准窗口变化。"
       },
       "timeIncrement": {
-        "label": "时间增量",
+        "label": "每笔落笔增加的时间",
         "tooltip": "每笔落笔向周期收官倒计时增加的时长。每个周期收官后，增量增长 {percent}%。"
       },
       "cstPreview": {
@@ -120,13 +120,18 @@
         "tooltip": "收官之笔参与者完成周期收官的专属时间；期限结束后，公开收官窗口将向所有人开放。"
       },
       "initial": {
-        "label": "初始时间增量",
+        "label": "初始周期时长",
         "tooltip": "首笔落笔后加入周期收官倒计时的初始时长。"
       },
       "message": {
         "label": "消息长度上限",
         "tooltip": "落笔消息允许输入的最大字符数。"
       }
+    },
+    "groups": {
+      "gestures": "落笔",
+      "timing": "时间",
+      "selection": "星选"
     }
   },
   "parameters": {

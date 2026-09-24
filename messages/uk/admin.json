@@ -49,18 +49,7 @@
       "scheduled": "Заплановано"
     },
     "fields": {
-      "ethStellarRecipients": "Кількість отримувачів зоряного відбору ETH за цикл",
-      "nftStellarRecipients": "Кількість отримувачів зоряного відбору NFT за цикл",
-      "nftHolderRecipients": "Кількість отримувачів серед власників NFT за цикл",
-      "signatureAllocationPercentage": "Відсоток розподілу Сигнатури",
-      "publicGoodsPercentage": "Відсоток на суспільні блага",
-      "stellarSelectionPercentage": "Відсоток зоряного відбору",
-      "anchorDistributionPercentage": "Відсоток надходжень за закріплення",
       "timeIncrease": "Зростання приросту часу за цикл",
-      "allocationTimeout": "Час очікування до відкритого завершення",
-      "priceIncrease": "Крок зростання вартості ETH-жесту",
-      "gestureTimeIncrement": "Час, що додається за жест",
-      "initialAllocationSeconds": "Початковий приріст часу",
       "initialGestureCostFraction": "Початкова частка вартості жесту",
       "activationTime": "Час активації",
       "gestureRatio": "Співвідношення ETH-жестів до CST-жестів",

@@ -108,7 +108,7 @@
         "tooltip": "ETH gesture cost uses this step-up parameter. CST gesture cost follows the live CST Calibration Window."
       },
       "timeIncrement": {
-        "label": "Time increment",
+        "label": "Time added per gesture",
         "tooltip": "Each gesture adds this much time to the Cycle Finalization Time. The increment grows by {percent}% with each cycle."
       },
       "cstPreview": {
@@ -120,13 +120,18 @@
         "tooltip": "Time the Final Gesture participant has to finalize the cycle before the Open-Finalization Window opens to anyone"
       },
       "initial": {
-        "label": "Initial time increment",
+        "label": "Initial cycle duration",
         "tooltip": "The initial Cycle Finalization Time added when the first gesture is made"
       },
       "message": {
         "label": "Message length limit",
         "tooltip": "Maximum character length allowed in gesture messages"
       }
+    },
+    "groups": {
+      "gestures": "Gestures",
+      "timing": "Timing",
+      "selection": "Stellar Selection"
     }
   },
   "parameters": {
