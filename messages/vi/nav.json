@@ -286,9 +286,6 @@
   "drawer": {
     "preferences": "Tùy chọn"
   },
-  "footer": {
-    "linksAndLanguages": "Liên kết và ngôn ngữ"
-  },
   "ecosystem": {
     "uniswap": {
       "ariaLabel": "Giao dịch CST trên Uniswap",

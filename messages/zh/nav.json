@@ -286,9 +286,6 @@
   "drawer": {
     "preferences": "偏好设置"
   },
-  "footer": {
-    "linksAndLanguages": "链接与语言"
-  },
   "ecosystem": {
     "uniswap": {
       "ariaLabel": "在 Uniswap 上兑换 CST",

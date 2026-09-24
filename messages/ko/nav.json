@@ -286,9 +286,6 @@
   "drawer": {
     "preferences": "환경 설정"
   },
-  "footer": {
-    "linksAndLanguages": "링크 및 언어"
-  },
   "ecosystem": {
     "uniswap": {
       "ariaLabel": "Uniswap에서 CST 거래",

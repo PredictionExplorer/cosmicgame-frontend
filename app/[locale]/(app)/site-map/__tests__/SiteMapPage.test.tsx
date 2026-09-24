@@ -1,5 +1,3 @@
-import userEvent from '@testing-library/user-event';
-
 import { OUTBOUND_LINKS, SITE_ROUTES, SITE_SECTION_IDS, siteHostLabel } from '@/config/siteNav';
 import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { appSitemapRoutes } from '@/lib/seoRoutes';
@@ -60,12 +58,43 @@ describe('SiteMapPage', () => {
     expect(whitePaper).not.toHaveAttribute('target');
   });
 
-  it('lists the learn articles under the Learn Hub', () => {
+  it('lists the learn articles as the Learn Hub guides, in a band under the columns', () => {
     render(<SiteMapPage articles={ARTICLES} />);
-    expect(screen.getByRole('link', { name: 'What Is Cosmic Signature?' })).toHaveAttribute(
+    const guides = screen
+      .getByRole('heading', { level: 2, name: 'nav.routes.learnHub.label' })
+      .closest('section')!;
+    expect(guides).toHaveAttribute('id', 'guides');
+    expect(within(guides).getByRole('link', { name: 'What Is Cosmic Signature?' })).toHaveAttribute(
       'href',
       localeHref(LANDING_ORIGIN, '/learn/what-is-cosmic-signature', 'en'),
     );
+    // Not inside the Learn section, whose column they used to double.
+    const learn = screen
+      .getByRole('heading', { level: 2, name: 'nav.sections.learn' })
+      .closest('section')!;
+    expect(within(learn).queryByRole('link', { name: 'What Is Cosmic Signature?' })).toBeNull();
+  });
+
+  it('names the Trust section above the heading instead of a trail that repeats the H1', () => {
+    render(<SiteMapPage />);
+    expect(
+      screen.queryByRole('navigation', { name: 'common.accessibility.breadcrumb' }),
+    ).toBeNull();
+    expect(screen.getByRole('link', { name: 'nav.sections.trust' })).toHaveAttribute(
+      'href',
+      '/security',
+    );
+  });
+
+  it('anchors each section by its id, where page headers lead the Records eyebrow', () => {
+    render(<SiteMapPage />);
+    for (const section of SITE_SECTION_IDS) {
+      expect(
+        screen
+          .getByRole('heading', { level: 2, name: `nav.sections.${section}` })
+          .closest('section'),
+      ).toHaveAttribute('id', section);
+    }
   });
 
   it('opens ecosystem and community links in a new tab', () => {
@@ -88,27 +117,12 @@ describe('SiteMapPage', () => {
     }
   });
 
-  it('folds each section on phones with CSS, keeping its line and its links in the HTML', async () => {
-    render(<SiteMapPage articles={ARTICLES} />);
-    const toggles = screen.getAllByRole('button', { expanded: false });
-    // Every section of the taxonomy, plus the ecosystem and community.
-    expect(toggles).toHaveLength(SITE_SECTION_IDS.length + 2);
-    for (const toggle of toggles) {
-      expect(toggle).toHaveClass('sm:hidden');
-      const panel = document.getElementById(toggle.getAttribute('aria-controls') ?? '')!;
-      expect(panel).toHaveClass('max-sm:hidden');
-      expect(within(panel).getAllByRole('link').length).toBeGreaterThan(0);
-    }
-    expect(screen.getByText('siteMap.sections.learn')).not.toHaveClass('max-sm:hidden');
-
-    const learn = screen.getByRole('button', { name: /nav\.sections\.learn/ });
-    await userEvent.setup().click(learn);
-    expect(learn).toHaveAttribute('aria-expanded', 'true');
-    expect(document.getElementById(learn.getAttribute('aria-controls') ?? '')).not.toHaveClass(
-      'max-sm:hidden',
-    );
-    // The section landmark is still named by its heading.
-    expect(screen.getByRole('region', { name: /nav\.sections\.learn/ })).toBeInTheDocument();
+  it('never folds: every link shows at every width, without script, two names a row on phones', () => {
+    const { container } = render(<SiteMapPage articles={ARTICLES} />);
+    expect(screen.queryByRole('button')).toBeNull();
+    expect(container.querySelector('[class*="max-sm:hidden"] a')).toBeNull();
+    const learn = screen.getByRole('region', { name: /nav\.sections\.learn/ });
+    expect(within(learn).getByRole('list')).toHaveClass('grid-cols-2', 'sm:flex');
   });
 
   it('does not expose the hidden outreach transfer tool', () => {

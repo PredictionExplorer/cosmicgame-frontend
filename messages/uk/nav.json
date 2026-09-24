@@ -286,9 +286,6 @@
   "drawer": {
     "preferences": "Налаштування"
   },
-  "footer": {
-    "linksAndLanguages": "Посилання та мови"
-  },
   "ecosystem": {
     "uniswap": {
       "ariaLabel": "Обміняти CST на Uniswap",

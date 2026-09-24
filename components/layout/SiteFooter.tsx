@@ -25,16 +25,21 @@ import { Wordmark } from './Wordmark';
 const LINK_CLASS =
   'link-quiet inline-flex min-h-10 max-w-full items-center gap-1 py-1 text-sm text-muted-foreground transition-colors duration-150 hover:text-foreground sm:min-h-8';
 
-/** A phone fold's heading row: 44px, the touch target the toggle over it needs. */
-const FOLD_HEADING_CLASS =
-  'type-eyebrow flex min-h-11 items-center pr-10 text-subtle sm:min-h-0 sm:pr-0';
+/** A group's heading: a 44px row on phones, the touch target the fold toggle over it needs. */
+const GROUP_HEADING_CLASS = 'type-eyebrow flex min-h-11 items-center text-subtle sm:min-h-0';
+const FOLD_HEADING_CLASS = cn(GROUP_HEADING_CLASS, 'pr-10 sm:pr-0');
 const FOLD_TOGGLE_CLASS = 'h-11';
 
-/** A route as a footer link; sibling groups collapse to one row. */
-function footerEntries(section: (typeof FOOTER_SECTIONS)[number]) {
+/**
+ * A route as a footer link; sibling groups collapse to one row. The landing
+ * footer leaves out nested destinations (the Statistics sections): it points
+ * visitors into the app, and the full directory is the site map's job.
+ */
+function footerEntries(section: (typeof FOOTER_SECTIONS)[number], host: SiteHost) {
   const seen = new Set<string>();
   const entries: { key: string; route: SiteRoute; group?: keyof typeof SITE_ROUTE_GROUPS }[] = [];
   for (const route of footerRoutes(section)) {
+    if (host === 'landing' && route.parent) continue;
     if (route.group) {
       if (seen.has(route.group)) continue;
       seen.add(route.group);
@@ -51,24 +56,19 @@ function footerEntries(section: (typeof FOOTER_SECTIONS)[number]) {
 }
 
 /**
- * One row of the "links and languages" group: a small heading, then its
- * links; heading and links share a line from 640px.
+ * The ecosystem or community links: a fold on phones, and from 640px a row
+ * with its heading beside the links.
  */
-function FooterRow({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <div className="min-w-0 pb-3 sm:flex sm:items-baseline sm:gap-6 sm:pb-0">
-      <h3 className="type-eyebrow pb-1 pt-1 text-subtle sm:min-w-32 sm:shrink-0 sm:pb-0 sm:pt-0">
-        {title}
-      </h3>
-      {children}
-    </div>
-  );
-}
-
-function OutboundRow({ group }: { group: OutboundGroupId }) {
+function OutboundGroup({ group }: { group: OutboundGroupId }) {
   const copy = useSiteNavCopy();
   return (
-    <FooterRow title={copy.sectionTitle(group)}>
+    <PhoneFold
+      heading={copy.sectionTitle(group)}
+      headingClassName={cn(FOLD_HEADING_CLASS, 'sm:min-w-32 sm:shrink-0')}
+      toggleClassName={FOLD_TOGGLE_CLASS}
+      className="border-b border-rule-faint sm:flex sm:items-baseline sm:gap-6 sm:border-b-0"
+      panelClassName="pb-3 sm:flex-1 sm:pb-0"
+    >
       <ul className="grid grid-cols-2 gap-x-4 sm:flex sm:flex-wrap sm:gap-x-5">
         {outboundLinks(group).map((link) => (
           <li key={link.id} className="min-w-0">
@@ -78,7 +78,7 @@ function OutboundRow({ group }: { group: OutboundGroupId }) {
           </li>
         ))}
       </ul>
-    </FooterRow>
+    </PhoneFold>
   );
 }
 
@@ -94,6 +94,11 @@ interface SiteFooterProps {
   action?: ReactNode;
   /** Extra lines under the copyright (e.g. the preview build's commit). */
   meta?: ReactNode;
+  /**
+   * The section directory and the ecosystem and community links. The site
+   * map, which is that directory, turns them off rather than repeat itself.
+   */
+  directory?: boolean;
 }
 
 /**
@@ -104,12 +109,21 @@ interface SiteFooterProps {
  *
  * A server component wherever its parent is one (the landing shell gets it
  * as a slot); only the phone folds (`PhoneFold`), the links and the language
- * directory hydrate. On phones the six sections fold behind their headings
- * and the ecosystem, community and language rows share one more fold, the
- * tagline gives way, and the legal line keeps clear of a fixed action dock
- * (`--dock-clearance`, set in styles/global.css while one is on the page).
+ * directory hydrate. On phones the six sections and the ecosystem and
+ * community rows fold behind their headings (without script they stay
+ * open), while the languages always show, the tagline gives way, and the
+ * legal line keeps clear of a fixed action dock (`--dock-clearance`, set in
+ * styles/global.css while one is on the page).
  */
-export function SiteFooter({ host, tagline, copyright, colophon, action, meta }: SiteFooterProps) {
+export function SiteFooter({
+  host,
+  tagline,
+  copyright,
+  colophon,
+  action,
+  meta,
+  directory = true,
+}: SiteFooterProps) {
   const t = useTranslations('common');
   const navT = useTranslations('nav');
   const locale = useLocale();
@@ -136,57 +150,65 @@ export function SiteFooter({ host, tagline, copyright, colophon, action, meta }:
           {action ? <div className="shrink-0">{action}</div> : null}
         </div>
 
-        <nav
-          aria-label={t('accessibility.footer')}
-          className="grid border-t border-rule-faint sm:grid-cols-3 sm:gap-x-6 sm:gap-y-10 sm:pt-10 lg:grid-cols-6"
-        >
-          {FOOTER_SECTIONS.map((section) => (
-            <PhoneFold
-              key={section}
-              heading={copy.sectionTitle(section)}
-              headingClassName={cn(FOLD_HEADING_CLASS, 'sm:pb-3')}
-              toggleClassName={FOLD_TOGGLE_CLASS}
-              className="border-b border-rule-faint sm:border-b-0"
-              panelClassName="pb-3 sm:pb-0"
-            >
-              <ul>
-                {footerEntries(section).map(({ key, route, group }) => {
-                  const target = resolveRouteHref(route, host, locale);
-                  return (
-                    <li key={key} className={cn('min-w-0', route.parent && 'sm:pl-3')}>
-                      <SiteLink
-                        href={target.href}
-                        kind={target.kind}
-                        prefetch="intent"
-                        className={LINK_CLASS}
-                      >
-                        {group ? copy.groupLabel(group) : copy.routeLabel(route.id)}
-                      </SiteLink>
-                    </li>
-                  );
-                })}
-              </ul>
-            </PhoneFold>
-          ))}
-        </nav>
+        {directory ? (
+          <nav
+            aria-label={t('accessibility.footer')}
+            className="grid border-t border-rule-faint sm:grid-cols-3 sm:gap-x-6 sm:gap-y-10 sm:pt-10 lg:grid-cols-6"
+          >
+            {FOOTER_SECTIONS.map((section) => (
+              <PhoneFold
+                key={section}
+                heading={copy.sectionTitle(section)}
+                headingClassName={cn(FOLD_HEADING_CLASS, 'sm:pb-3')}
+                toggleClassName={FOLD_TOGGLE_CLASS}
+                className="border-b border-rule-faint sm:border-b-0"
+                panelClassName="pb-3 sm:pb-0"
+              >
+                <ul>
+                  {footerEntries(section, host).map(({ key, route, group }) => {
+                    const target = resolveRouteHref(route, host, locale);
+                    return (
+                      <li key={key} className={cn('min-w-0', route.parent && 'sm:pl-3')}>
+                        <SiteLink
+                          href={target.href}
+                          kind={target.kind}
+                          prefetch="intent"
+                          className={LINK_CLASS}
+                        >
+                          {group ? copy.groupLabel(group) : copy.routeLabel(route.id)}
+                        </SiteLink>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </PhoneFold>
+            ))}
+          </nav>
+        ) : null}
 
-        {/* From 640px three rows under the directory; on phones one fold. */}
-        <PhoneFold
-          heading={navT('footer.linksAndLanguages')}
-          headingClassName={cn(FOLD_HEADING_CLASS, 'sm:sr-only')}
-          toggleClassName={FOLD_TOGGLE_CLASS}
-          className="border-b border-rule-faint sm:mt-10 sm:border-b-0 sm:border-t sm:py-6"
-          panelClassName="pb-1 sm:grid sm:gap-y-3 sm:pb-0"
+        {/* From 640px three rows under the directory; on phones two folds and the languages. */}
+        <div
+          className={cn(
+            'border-rule-faint sm:grid sm:gap-y-3 sm:py-6',
+            directory ? 'sm:mt-10 sm:border-t' : 'border-t',
+          )}
         >
-          <OutboundRow group="ecosystem" />
-          <OutboundRow group="community" />
-          <FooterRow title={t('languageSwitcher.label')}>
+          {directory ? (
+            <>
+              <OutboundGroup group="ecosystem" />
+              <OutboundGroup group="community" />
+            </>
+          ) : null}
+          <div className="min-w-0 border-b border-rule-faint pb-3 sm:flex sm:items-baseline sm:gap-6 sm:border-b-0 sm:pb-0">
+            <h2 className={cn(GROUP_HEADING_CLASS, 'sm:min-w-32 sm:shrink-0')}>
+              {t('languageSwitcher.label')}
+            </h2>
             <LanguageDirectory
               hideLabel
               className="max-sm:[&_ul]:grid max-sm:[&_ul]:grid-cols-2 max-sm:[&_ul]:gap-x-4 sm:[&_a]:min-h-8"
             />
-          </FooterRow>
-        </PhoneFold>
+          </div>
+        </div>
 
         <div className="flex flex-col gap-3 border-rule-faint pb-[calc(1.5rem+var(--dock-clearance,0px))] pt-5 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:border-t sm:pt-6">
           <div className="type-caption flex flex-col gap-1 text-subtle">

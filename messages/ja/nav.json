@@ -286,9 +286,6 @@
   "drawer": {
     "preferences": "設定"
   },
-  "footer": {
-    "linksAndLanguages": "リンクと言語"
-  },
   "ecosystem": {
     "uniswap": {
       "ariaLabel": "UniswapでCSTを取引",
