@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { ArrowRight, ChevronDown } from 'lucide-react';
 import { useLocale } from 'next-intl';
 
-import type { LandingContent, LandingLink } from '@/content/landing';
+import type { LandingContent } from '@/content/landing';
 
 import { Link } from '@/i18n/navigation';
 import { ReducedMotionFallback } from '@/components/three/ReducedMotionFallback';
@@ -26,17 +26,8 @@ function HeroBackdrop() {
   return canRenderCanvas ? <HeroCanvas /> : <ReducedMotionFallback />;
 }
 
-export function Hero({
-  hero,
-}: {
-  hero: LandingContent['hero'];
-  /**
-   * @deprecated The landing header (components/landing-v2/LandingHeader),
-   * rendered by the landing shell on every page, owns the navigation now.
-   * Ignored.
-   */
-  navigation?: readonly LandingLink[];
-}) {
+/** The landing hero. The navigation belongs to the landing shell's LandingHeader. */
+export function Hero({ hero }: { hero: LandingContent['hero'] }) {
   const locale = useLocale();
 
   return (

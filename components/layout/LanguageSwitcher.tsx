@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, ChevronDown, Globe } from 'lucide-react';
+import { ChevronDown, Globe } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { usePathname, useRouter } from '@/i18n/navigation';
@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-export type LanguageSwitcherVariant = 'pill' | 'compact' | 'list' | 'select';
+export type LanguageSwitcherVariant = 'pill' | 'compact' | 'select';
 
 interface LanguageSwitcherProps {
   className?: string;
@@ -26,7 +26,7 @@ interface LanguageSwitcherProps {
    * chevron, opening a radio menu of every language. `compact` — the same
    * menu behind an icon-only trigger for narrow headers. `select` — a native
    * select, the smallest control for a drawer's preferences row (the phone
-   * opens its own picker). `list` — every language laid out as a radio group.
+   * opens its own picker).
    */
   variant?: LanguageSwitcherVariant;
 }
@@ -75,41 +75,6 @@ export function LanguageSwitcher({ className, variant = 'pill' }: LanguageSwitch
           className="pointer-events-none absolute right-2.5 size-4 text-subtle"
         />
       </label>
-    );
-  }
-
-  if (variant === 'list') {
-    return (
-      <div className={cn('space-y-2', className)}>
-        <p className="type-eyebrow flex items-center gap-2 px-1 text-subtle">
-          <Globe className="h-3.5 w-3.5" aria-hidden />
-          {label}
-        </p>
-        <div role="radiogroup" aria-label={label} className="grid gap-1.5">
-          {routing.locales.map((option) => {
-            const selected = option === locale;
-            return (
-              <button
-                key={option}
-                type="button"
-                role="radio"
-                lang={option}
-                aria-checked={selected}
-                onClick={() => switchTo(option)}
-                className={cn(
-                  'flex min-h-11 items-center justify-between gap-2 rounded-control border px-3.5 py-2 text-left text-sm transition-colors',
-                  selected
-                    ? 'border-secondary/40 bg-secondary/10 text-foreground'
-                    : 'border-rule-faint bg-surface-sunken text-muted-foreground hover:border-input hover:text-foreground',
-                )}
-              >
-                <span>{LOCALE_LABELS[option]}</span>
-                {selected && <Check className="h-4 w-4 shrink-0 text-secondary" aria-hidden />}
-              </button>
-            );
-          })}
-        </div>
-      </div>
     );
   }
 
