@@ -39,7 +39,9 @@ export function CopyButton({ value, label, copiedLabel, className }: CopyButtonP
   );
 
   const handleCopy = async () => {
-    await copy(value);
+    // A refused copy says nothing rather than claim success; the value
+    // stays on screen to select by hand.
+    if (!(await copy(value))) return;
     setCopied(true);
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => setCopied(false), COPIED_FEEDBACK_MS);

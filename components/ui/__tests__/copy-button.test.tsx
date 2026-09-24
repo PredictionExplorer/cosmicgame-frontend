@@ -32,6 +32,19 @@ describe('CopyButton', () => {
     expect(screen.getByRole('status')).toHaveTextContent('');
   });
 
+  it('never confirms a copy the browser refused (regression)', async () => {
+    Object.defineProperty(navigator, 'clipboard', { value: undefined, configurable: true });
+    document.execCommand = jest.fn().mockReturnValue(false);
+    render(<CopyButton value="team@example.org" label="Copy email" copiedLabel="Email copied" />);
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Copy email' }));
+    });
+    expect(document.execCommand).toHaveBeenCalledWith('copy');
+    expect(screen.getByRole('button', { name: 'Copy email' })).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('');
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(
       <CopyButton value="team@example.org" label="Copy email" copiedLabel="Email copied" />,
