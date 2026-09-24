@@ -806,9 +806,10 @@ const HomePage = ({
       <PageShell
         variant="data"
         backdrop="hero"
-        // The shared content edge (--gutter), widened to the desk's 90rem
-        // (Container size="wide") so the header's edge and the desk agree.
-        className="home-control-shell w-[calc(100%-2*var(--gutter))] max-w-none px-0 pb-16 pt-[calc(var(--header-height)+1.5rem)] max-sm:pt-[calc(var(--header-height)+1rem)] sm:px-0 xl:max-w-[90rem]"
+        // The site's one content edge (site-container: the gutter, capped at
+        // 80rem), so the desk lines up with the header and footer at every
+        // width instead of overhanging them on wide screens.
+        className="home-control-shell w-[min(100%-2*var(--gutter),80rem)] max-w-none px-0 pb-16 pt-[calc(var(--header-height)+1.5rem)] max-sm:pt-[calc(var(--header-height)+1rem)] sm:px-0"
       >
         {uxScenario && (
           <div className="mb-3 rounded-control bg-attention-surface px-3 py-1.5 type-caption text-attention">
