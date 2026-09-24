@@ -14,6 +14,7 @@ import type { DashboardInfo } from '@/services/api/types';
 import { Amount } from '@/components/ui/amount';
 import { DateTime } from '@/components/ui/date-time';
 import { ErrorState } from '@/components/ui/error-state';
+import { LiveStatus } from '@/components/ui/live-status';
 import { SkeletonDetailRows, SkeletonTable } from '@/components/ui/skeleton';
 import { UnknownValue } from '@/components/ui/unknown-value';
 import { SectionShell } from '@/components/statistics/SectionShell';
@@ -130,7 +131,10 @@ const StatisticsHubPanel = () => {
     );
   }
 
-  if (isError || !data) {
+  // A failed background poll keeps the last reading (TanStack Query sets
+  // isError but keeps data): the error replaces the hub only when nothing
+  // ever loaded, and a stale reading says so beside the cycle's title.
+  if (!data) {
     return (
       <ErrorState
         headingLevel={2}
@@ -173,6 +177,7 @@ const StatisticsHubPanel = () => {
     <div data-testid="statistics-hub" className="space-y-12 sm:space-y-16">
       <SectionShell
         title={t('hub.cycle.title', { cycle: data.CurRoundNum })}
+        description={isError ? <LiveStatus variant="inline" /> : undefined}
         actions={
           <Link
             href="/current-cycle"

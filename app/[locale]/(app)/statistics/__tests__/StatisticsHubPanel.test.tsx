@@ -187,6 +187,20 @@ describe('StatisticsHubPanel', () => {
     expect(refetch).toHaveBeenCalled();
   });
 
+  it('keeps the hub on screen when a background poll fails after a load', () => {
+    mockDashboard({ isError: true });
+    const { container } = render(<StatisticsHubPanel />);
+    expect(screen.getByTestId('statistics-hub')).toBeInTheDocument();
+    expect(screen.queryByText(hub.loadErrorTitle)).not.toBeInTheDocument();
+    // The stale reading is flagged quietly beside the cycle's title.
+    expect(container.querySelector('[data-live-state]')).toBeInTheDocument();
+  });
+
+  it('shows no freshness note while the polls succeed', () => {
+    const { container } = render(<StatisticsHubPanel />);
+    expect(container.querySelector('[data-live-state]')).not.toBeInTheDocument();
+  });
+
   it('keeps polling enabled on the hub dashboard query', () => {
     render(<StatisticsHubPanel />);
     // Hub is a live overview: it must not opt out of polling.
