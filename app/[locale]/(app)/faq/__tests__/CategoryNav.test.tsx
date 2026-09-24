@@ -22,6 +22,16 @@ describe('CategoryNav', () => {
     expect(screen.getAllByRole('navigation', { name: 'FAQ categories' })).toHaveLength(1);
   });
 
+  it('rides above the sections that scroll under it', () => {
+    renderNav();
+    // A bare `z-sticky-nav` generates no CSS, and the category headers' buttons
+    // then painted over the bar.
+    expect(screen.getByRole('navigation', { name: 'FAQ categories' })).toHaveClass(
+      'sticky',
+      'z-[var(--z-sticky-nav)]',
+    );
+  });
+
   it('links every category and the glossary to its section', () => {
     renderNav();
     for (const entry of entries) {

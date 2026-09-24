@@ -43,8 +43,10 @@ export function CategoryNav({ entries, activeId, onSelect, className }: Category
     <nav
       aria-label={t('navigation.ariaLabel')}
       className={cn(
-        // Phones and tablets: a glass bar under the header, bleeding to the page gutters.
-        'glass sticky top-[var(--header-height)] z-sticky-nav -mx-4 border-b border-rule px-4 py-2 sm:-mx-6 sm:px-6',
+        // Phones and tablets: a glass bar under the header, bleeding to the page
+        // gutters, raised over the sections that scroll under it. (Tailwind's
+        // `z-*` scale reads `--z-index-*`, so the layer token goes in brackets.)
+        'glass sticky top-[var(--header-height)] z-[var(--z-sticky-nav)] -mx-4 border-b border-rule px-4 py-2 sm:-mx-6 sm:px-6',
         // Desktop: the contents column.
         'lg:top-[var(--sticky-offset)] lg:mx-0 lg:max-h-[calc(100dvh-var(--sticky-offset)-1.5rem)] lg:self-start lg:overflow-y-auto lg:border-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-none',
         className,
