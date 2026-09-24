@@ -2,7 +2,6 @@
   "formats": {
     "cycle": "Chu kỳ {cycle}",
     "cycleHash": "Chu kỳ #{cycle}",
-    "token": "Token #{token}",
     "cosmicSignatureToken": "Cosmic Signature #{token}"
   },
   "recipients": {
@@ -180,12 +179,11 @@
       "successTitle": "Chúc mừng! Phân bổ Signature của chu kỳ {cycle} là của bạn",
       "lede": "Những gì người đặt nét bút cuối cùng nhận được khi chu kỳ hoàn tất.",
       "successLede": "Bạn đã đặt nét bút cuối cùng của chu kỳ {cycle}. ETH, CST và Cosmic Signature này đã có trong ví của bạn.",
-      "componentsTitle": "Phân bổ Signature",
+      "componentsTitle": "Phân bổ gồm những gì",
       "eth": "ETH",
       "cst": "CST",
       "nft": "Cosmic Signature NFT",
       "attached": "NFT đính kèm",
-      "attachedTokens": "{count, plural, other {# NFT đính kèm}} (ERC-721)",
       "recipient": "Người nhận",
       "finalized": "Hoàn tất",
       "viewTransaction": "Xem giao dịch"

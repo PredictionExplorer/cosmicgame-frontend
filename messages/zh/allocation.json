@@ -2,7 +2,6 @@
   "formats": {
     "cycle": "第 {cycle} 个周期",
     "cycleHash": "第 {cycle} 个周期",
-    "token": "代币 #{token}",
     "cosmicSignatureToken": "Cosmic Signature #{token}"
   },
   "recipients": {
@@ -180,12 +179,11 @@
       "successTitle": "恭喜！你获得了第 {cycle} 个周期的签名分配",
       "lede": "周期收官时，写下收官之笔的参与者获得的签名分配。",
       "successLede": "你写下了第 {cycle} 个周期的收官之笔。ETH、CST 和这枚 Cosmic Signature 已在你的钱包中。",
-      "componentsTitle": "签名分配",
+      "componentsTitle": "分配包含的内容",
       "eth": "ETH",
       "cst": "CST",
       "nft": "Cosmic Signature NFT",
       "attached": "已附加 NFT",
-      "attachedTokens": "{count, number} 枚已附加 NFT（ERC-721）",
       "recipient": "获配者",
       "finalized": "收官时间",
       "viewTransaction": "查看交易"

@@ -2,7 +2,6 @@
   "formats": {
     "cycle": "Cycle {cycle}",
     "cycleHash": "Cycle #{cycle}",
-    "token": "Token #{token}",
     "cosmicSignatureToken": "Cosmic Signature #{token}"
   },
   "recipients": {
@@ -121,7 +120,7 @@
         "gestures": "No gestures were made in this cycle.",
         "endurance": "No Endurance Champion data available for this cycle.",
         "stellar": "No Stellar Selection recipients for this cycle.",
-        "anchoring": "No Anchor Distributions distributed in this cycle.",
+        "anchoring": "No Anchor Distributions in this cycle.",
         "nfts": "No NFTs were attached to gestures in this cycle.",
         "erc20": "No ERC-20 tokens were attached to gestures in this cycle."
       },
@@ -180,12 +179,11 @@
       "successTitle": "Congratulations! The Cycle {cycle} Signature Allocation is yours",
       "lede": "What the participant who made the Final Gesture received when the cycle was finalized.",
       "successLede": "You made the Final Gesture of Cycle {cycle}. The ETH, the CST and this Signature are now in your wallet.",
-      "componentsTitle": "Signature Allocation",
+      "componentsTitle": "What the allocation holds",
       "eth": "ETH",
       "cst": "CST",
       "nft": "Cosmic Signature NFT",
       "attached": "Attached NFTs",
-      "attachedTokens": "{count, plural, one {# attached NFT} other {# attached NFTs}} (ERC-721)",
       "recipient": "Recipient",
       "finalized": "Finalized",
       "viewTransaction": "View transaction"

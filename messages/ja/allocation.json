@@ -2,7 +2,6 @@
   "formats": {
     "cycle": "サイクル{cycle}",
     "cycleHash": "サイクル{cycle}",
-    "token": "トークン #{token}",
     "cosmicSignatureToken": "Cosmic Signature #{token}"
   },
   "recipients": {
@@ -121,7 +120,7 @@
         "gestures": "このサイクルでは一筆は入れられませんでした。",
         "endurance": "このサイクルの持久チャンピオンのデータはありません。",
         "stellar": "このサイクルには星選の受領者がいません。",
-        "anchoring": "このサイクルでは係留配分は配られませんでした。",
+        "anchoring": "このサイクルに係留配分はありません。",
         "nfts": "このサイクルでは一筆にNFTは添付されませんでした。",
         "erc20": "このサイクルでは一筆にERC-20トークンは添付されませんでした。"
       },
@@ -180,12 +179,11 @@
       "successTitle": "おめでとうございます。サイクル{cycle}のシグネチャー配分を受け取りました",
       "lede": "サイクルの確定時に、最後の一筆を入れた参加者が受け取った配分です。",
       "successLede": "サイクル{cycle}の最後の一筆を入れました。ETH、CST、このCosmic Signatureはすでにウォレットにあります。",
-      "componentsTitle": "シグネチャー配分",
+      "componentsTitle": "配分の内容",
       "eth": "ETH",
       "cst": "CST",
       "nft": "Cosmic Signature NFT",
       "attached": "添付されたNFT",
-      "attachedTokens": "{count, plural, other {添付されたNFT #点}}（ERC-721）",
       "recipient": "受領者",
       "finalized": "確定日時",
       "viewTransaction": "トランザクションを見る"

@@ -28,6 +28,7 @@ import { SpecList, SpecRow } from '@/components/winnings/SpecList';
 import { useSignatureIndex } from '@/components/winnings/useSignatureIndex';
 import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import { useCSTInfo, useRoundInfo, useRoundList } from '@/hooks/useApiQuery';
+import { useFormat } from '@/hooks/useFormat';
 import { useNow } from '@/hooks/useNow';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { AllocationIcon } from '@/lib/conceptIcons';
@@ -265,6 +266,7 @@ function FinalizedSignature({
 }) {
   const t = useTranslations('allocation');
   const tDetail = useTranslations('detail');
+  const format = useFormat();
   const hasToken = allocation.TokenId >= 0;
   const { data: token, isLoading: loadingToken } = useCSTInfo(hasToken ? allocation.TokenId : null);
   const nowMs = useNow(60_000);
@@ -326,7 +328,8 @@ function FinalizedSignature({
         </h2>
         <SpecList className="mt-4">
           <SpecRow label={t('finalized.result.eth')}>
-            <Amount value={allocation.AmountEth} unit="ETH" context="exact" />
+            {/* The precision of the cycle's own page (its header figure); the full value is on hover. */}
+            <Amount value={allocation.AmountEth} unit="ETH" context="hero" />
           </SpecRow>
           <SpecRow label={t('finalized.result.cst')}>
             <Amount value={allocation.CSTAmountEth} unit="CST" />
@@ -340,7 +343,7 @@ function FinalizedSignature({
           ) : null}
           {attached > 0 ? (
             <SpecRow label={t('finalized.result.attached')}>
-              {t('finalized.result.attachedTokens', { count: attached })}
+              <span className="tabular-nums">{format.count(attached)}</span>
             </SpecRow>
           ) : null}
           <SpecRow label={t('finalized.result.recipient')}>

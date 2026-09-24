@@ -389,6 +389,19 @@ describe('AllocationInfoPage', () => {
       }
     });
 
+    it('says what each role received: CST for every role, and the Chrono-Warrior its ETH', () => {
+      renderCycle();
+      const signature = screen.getByTestId('recipient-card-signature');
+      expect(signature).toHaveTextContent(/1,000.CST/);
+      // The Signature Allocation's ETH is the header's figure, not repeated on its card.
+      expect(signature).not.toHaveTextContent(/1\.5\d*.ETH/);
+      const chrono = screen.getByTestId('recipient-card-chrono');
+      expect(chrono).toHaveTextContent(/0\.2000.ETH/);
+      expect(chrono).toHaveTextContent(/1,000.CST/);
+      expect(screen.getByTestId('recipient-card-endurance')).toHaveTextContent(/1,000.CST/);
+      expect(screen.getByTestId('recipient-card-finalCst')).toHaveTextContent(/1,000.CST/);
+    });
+
     it('leaves out a role nobody filled', () => {
       renderCycle(1, { LastCstBidderAddr: '', LastCstBidderERC721TokenId: -1 });
       expect(screen.queryByTestId('recipient-card-finalCst')).not.toBeInTheDocument();

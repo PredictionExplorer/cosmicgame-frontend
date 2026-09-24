@@ -92,7 +92,7 @@ test.describe('zh Sprint 4 — transactions and holdings routes', () => {
         name: `第 ${SPRINT4_MOCK_CYCLE} 个周期的签名分配`,
       }),
     ).toBeVisible();
-    await expect(page.getByRole('heading', { level: 2, name: '签名分配' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: '分配包含的内容' })).toBeVisible();
   });
 
   test('/zh/anchoring renders localized anchoring overview and metadata', async ({ page }) => {

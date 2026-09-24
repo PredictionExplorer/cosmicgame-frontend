@@ -2,7 +2,6 @@
   "formats": {
     "cycle": "Цикл {cycle}",
     "cycleHash": "Цикл {cycle}",
-    "token": "Токен #{token}",
     "cosmicSignatureToken": "Cosmic Signature #{token}"
   },
   "recipients": {
@@ -180,12 +179,11 @@
       "successTitle": "Вітаємо! Розподіл Сигнатури циклу {cycle} — ваш",
       "lede": "Що отримав автор завершального жесту, коли цикл було завершено.",
       "successLede": "Ви зробили завершальний жест циклу {cycle}. ETH, CST і цей Cosmic Signature NFT уже у вашому гаманці.",
-      "componentsTitle": "Розподіл Сигнатури",
+      "componentsTitle": "Що містить розподіл",
       "eth": "ETH",
       "cst": "CST",
       "nft": "Cosmic Signature NFT",
       "attached": "Долучені NFT",
-      "attachedTokens": "{count, plural, one {# долучений NFT} few {# долучені NFT} many {# долучених NFT} other {# долученого NFT}} (ERC-721)",
       "recipient": "Отримувач",
       "finalized": "Завершено",
       "viewTransaction": "Переглянути транзакцію"

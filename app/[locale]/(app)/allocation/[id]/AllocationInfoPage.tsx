@@ -18,7 +18,7 @@ import {
 } from '@/components/layout/PageHeader';
 import { AddressChip } from '@/components/ui/address-chip';
 import { Amount } from '@/components/ui/amount';
-import { PendingPlate } from '@/components/ui/art-frame';
+import { PendingPlate, WallLabelMeta } from '@/components/ui/art-frame';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { DateTime } from '@/components/ui/date-time';
@@ -80,25 +80,55 @@ interface CycleRole {
   id: RoleId;
   address: string;
   tokenId: number;
+  /**
+   * What the role received besides its Signature. The Signature Allocation's ETH is the
+   * header's figure, so its card names only the CST.
+   */
+  eth: number | null;
+  cst: number | null;
 }
 
 function cycleRoles(cycle: RoundInfo): CycleRole[] {
   const roles: CycleRole[] = [
-    { id: 'signature', address: cycle.WinnerAddr, tokenId: cycle.TokenId },
-    { id: 'chrono', address: cycle.ChronoWarriorAddr, tokenId: cycle.ChronoWarriorNftTokenId },
+    {
+      id: 'signature',
+      address: cycle.WinnerAddr,
+      tokenId: cycle.TokenId,
+      eth: null,
+      cst: toFiniteNumber(cycle.CSTAmountEth),
+    },
+    {
+      id: 'chrono',
+      address: cycle.ChronoWarriorAddr,
+      tokenId: cycle.ChronoWarriorNftTokenId,
+      eth: toFiniteNumber(cycle.ChronoWarriorAmountEth),
+      cst: toFiniteNumber(cycle.ChronoWarriorCstAmountEth),
+    },
     {
       id: 'endurance',
       address: cycle.EnduranceWinnerAddr,
       tokenId: toFiniteNumber(cycle.EnduranceERC721TokenId) ?? -1,
+      eth: null,
+      cst: toFiniteNumber(cycle.EnduranceERC20AmountEth),
     },
     {
       id: 'finalCst',
       address: cycle.LastCstBidderAddr,
       tokenId: toFiniteNumber(cycle.LastCstBidderERC721TokenId) ?? -1,
+      eth: null,
+      cst: toFiniteNumber(cycle.LastCstBidderERC20AmountEth),
     },
   ];
   // A role nobody filled (no CST gesture in the cycle, say) has neither holder nor token.
   return roles.filter((role) => Boolean(role.address) || role.tokenId >= 0);
+}
+
+/** What a role received besides its Signature, as wall-label facts ("3.5397 ETH", "1,000 CST"). */
+function roleAmounts(role: CycleRole): ReactNode[] {
+  return [
+    role.eth !== null && role.eth > 0 ? <Amount key="eth" value={role.eth} unit="ETH" /> : null,
+    role.cst !== null && role.cst > 0 ? <Amount key="cst" value={role.cst} unit="CST" /> : null,
+  ];
 }
 
 /** The ETH tracks a finalized cycle distributed, in the order every chart of the split uses. */
@@ -598,16 +628,21 @@ function CycleRecord({
   }));
 
   const contributed = toFiniteNumber(cycle.RoundStats?.TotalDonatedAmountEth);
+  // A count the record does not carry is unknown (the header's dash), never a confident 0.
+  const count = (value: unknown) => {
+    const known = toFiniteNumber(value);
+    return known === null ? null : format.count(known);
+  };
   const statistics: PageHeaderFigure[] = [
     {
       id: 'attachedNfts',
       label: t('details.statistics.cards.attachedNfts.label'),
-      value: format.count(toFiniteNumber(cycle.RoundStats?.TotalDonatedNFTs) ?? 0),
+      value: count(cycle.RoundStats?.TotalDonatedNFTs),
     },
     {
       id: 'anchoredTokens',
       label: t('details.statistics.cards.anchoredTokens.label'),
-      value: format.count(toFiniteNumber(cycle.StakingNumStakedTokens) ?? 0),
+      value: count(cycle.StakingNumStakedTokens),
     },
     {
       id: 'uniqueAnchorHolders',
@@ -674,6 +709,7 @@ function CycleRecord({
                       <Link key="token" href={`/detail/${role.tokenId}`} className="link type-mono">
                         {id}
                       </Link>,
+                      ...roleAmounts(role),
                     ]}
                     sizes="(min-width: 1024px) 18rem, 50vw"
                     priority={index < 2}
@@ -695,6 +731,7 @@ function CycleRecord({
                         {t(`details.recipientSection.cards.${role.id}.title`)}
                       </Term>
                     </h3>
+                    <WallLabelMeta items={roleAmounts(role)} />
                     <AddressChip address={role.address} />
                   </div>
                 )}

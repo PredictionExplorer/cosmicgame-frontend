@@ -124,13 +124,16 @@ describe('AllocationFinalizedPage', () => {
     roundInfo(ALLOCATION);
     render(<AllocationFinalizedPage />);
     const section = screen.getByTestId('finalized-signature');
-    expect(section).toHaveTextContent('1.234567');
+    // The precision of the cycle's own page, not six decimals.
+    expect(section).toHaveTextContent('1.2346');
+    expect(section).not.toHaveTextContent('1.234567');
     expect(section).toHaveTextContent('1,000');
     expect(within(section).getAllByRole('link', { name: /#000099/ })[0]).toHaveAttribute(
       'href',
       '/detail/99',
     );
-    expect(section).toHaveTextContent('allocation.finalized.result.attachedTokens(count=3)');
+    // The row's label already says "Attached NFTs": the value is the count alone.
+    expect(section).toHaveTextContent('allocation.finalized.result.attached3');
     expect(within(section).getByRole('link', { name: /View Cycle|viewCycle/ })).toHaveAttribute(
       'href',
       '/allocation/5',

@@ -2,7 +2,6 @@
   "formats": {
     "cycle": "사이클 {cycle}",
     "cycleHash": "사이클 {cycle}",
-    "token": "토큰 #{token}",
     "cosmicSignatureToken": "Cosmic Signature #{token}"
   },
   "recipients": {
@@ -180,12 +179,11 @@
       "successTitle": "축하합니다. 사이클 {cycle} 시그니처 배분을 받았습니다",
       "lede": "사이클이 마감될 때 최종 제스처를 남긴 참여자가 받은 배분입니다.",
       "successLede": "사이클 {cycle}의 최종 제스처를 남겼습니다. ETH, CST, 이 Cosmic Signature가 지갑에 들어왔습니다.",
-      "componentsTitle": "시그니처 배분",
+      "componentsTitle": "배분에 포함된 항목",
       "eth": "ETH",
       "cst": "CST",
       "nft": "Cosmic Signature NFT",
       "attached": "첨부된 NFT",
-      "attachedTokens": "{count, plural, other {첨부된 NFT #개}} (ERC-721)",
       "recipient": "수령자",
       "finalized": "마감 시각",
       "viewTransaction": "트랜잭션 보기"

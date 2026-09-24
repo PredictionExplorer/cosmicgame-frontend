@@ -7,6 +7,7 @@ import NFTImage from '@/components/nft/NFTImage';
 import { useAttachedErc20Metadata } from '@/components/attachments/useAttachedErc20Metadata';
 import { useAttachedNftMetadata } from '@/components/attachments/useAttachedNftMetadata';
 import { PendingPlate } from '@/components/ui/art-frame';
+import { UnknownValue } from '@/components/ui/unknown-value';
 import { Button } from '@/components/ui/button';
 import {
   DataTable,
@@ -111,9 +112,10 @@ function AttachedTokenIdentity({ address }: { address: string }) {
 
 function TokenAmount({ row }: { row: AttachedTokenRetrievalRow }) {
   const format = useFormat();
+  const tCommon = useTranslations('common');
   const { data: metadata } = useAttachedErc20Metadata(row.TokenAddr);
   const amount = toFiniteNumber(row.DonateClaimDiffEth);
-  if (amount === null) return null;
+  if (amount === null) return <UnknownValue label={tCommon('status.unavailable')} />;
   return (
     <span className="whitespace-nowrap tabular-nums">
       {format.number(amount, { maximumFractionDigits: 4 })}
