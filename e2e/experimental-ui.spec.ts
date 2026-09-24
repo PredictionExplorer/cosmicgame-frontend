@@ -123,12 +123,46 @@ test.describe('experimental UI', () => {
     expect(positions.board).toBeLessThan(positions.chat);
     expect(positions.scrollWidth).toBeLessThanOrEqual(positions.clientWidth + 1);
 
+    // The header's actions and its related link share one row on phones.
+    const header = page.getByTestId('home-deck-header');
+    await expect(header.getByTestId('experimental-ui-new-here')).toBeVisible();
+    await expect(header.getByRole('navigation')).toBeHidden();
+    const rows = await page.evaluate(() => {
+      const top = (testId: string) =>
+        document.querySelector(`[data-testid="${testId}"]`)?.getBoundingClientRect().top ?? 0;
+      return { back: top('experimental-ui-return'), newHere: top('experimental-ui-new-here') };
+    });
+    expect(Math.abs(rows.back - rows.newHere)).toBeLessThan(12);
+
     // The dock carries the clock and the priced action, and opens the same console.
     await expect(page.getByTestId('action-dock-mobile')).toBeVisible();
     await page.getByTestId('dock-open-sheet').click();
     await expect(
       page.locator('[data-testid="gesture-console"][data-variant="sheet"]'),
     ).toBeVisible();
+    // The dialog is named by the heading it shows.
+    await expect(page.getByRole('dialog', { name: 'Make a Gesture' })).toBeVisible();
+  });
+
+  test('keeps keyboard focus clear of the phone dock', async ({ page, isMobile }) => {
+    test.skip(!isMobile, 'the dock floats over phones only');
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openExperiment(page);
+    await expect(page.getByTestId('action-dock-mobile')).toBeVisible();
+
+    // Tab to the art's Pause control, which first paints under the dock.
+    const toggle = page.getByTestId('art-motion-toggle');
+    for (let press = 0; press < 40; press += 1) {
+      await page.keyboard.press('Tab');
+      if (await toggle.evaluate((node) => node === document.activeElement)) break;
+    }
+    await expect(toggle).toBeFocused();
+    const overlap = await page.evaluate(() => {
+      const focused = document.activeElement!.getBoundingClientRect();
+      const dock = document.querySelector('[data-action-dock]')!.getBoundingClientRect();
+      return focused.bottom - dock.top;
+    });
+    expect(overlap).toBeLessThanOrEqual(0);
   });
 
   test('pauses the artwork and remembers it', async ({ page, isMobile }) => {
