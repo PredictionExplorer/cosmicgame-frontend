@@ -579,13 +579,12 @@
   },
   "recipientHistory": {
     "pageTitle": "自分の配分履歴",
-    "connectedTitle": "自分の配分の履歴",
     "subtitle": "過去の配分の受け取りと配分を見る",
-    "connectedDescription": "すべてのCosmic Signatureパフォーマンス・サイクルにわたる配分の完全な履歴を追います。シグネチャー配分の受け取り、星選ETHの配分、Cosmic Signature NFTの配分、係留配分を含みます。",
+    "connectedDescription": "このウォレットがサイクルごとに受け取ったすべての配分と、それぞれを受け取り済みかどうかです。",
     "loadError": "配分の履歴を読み込めませんでした",
     "loadErrorDescription": "しばらくしてからもう一度お試しください。",
     "emptyTitle": "配分はまだありません",
-    "emptyDescription": "現在、記録された配分はありません。"
+    "emptyDescription": "確定したサイクルでこのウォレットに配分があると、ここに記録されます。"
   },
   "namedNfts": {
     "title": "名前付きCosmic Signature NFT",

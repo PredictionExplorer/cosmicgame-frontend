@@ -579,13 +579,12 @@
   },
   "recipientHistory": {
     "pageTitle": "내 배분 내역",
-    "connectedTitle": "내 배분 내역",
     "subtitle": "지난 배분 회수 및 수령 내역 보기",
-    "connectedDescription": "모든 Cosmic Signature 퍼포먼스 사이클에 걸친 전체 배분 내역을 확인할 수 있습니다. 시그니처 배분 회수, ETH 별빛 선정 배분, Cosmic Signature NFT 배분, 앵커링 지급이 포함됩니다.",
+    "connectedDescription": "이 지갑이 사이클마다 받은 모든 배분과 각 배분의 회수 여부입니다.",
     "loadError": "배분 내역을 불러오지 못했습니다",
     "loadErrorDescription": "잠시 후 다시 시도해 주세요.",
     "emptyTitle": "아직 배분이 없습니다",
-    "emptyDescription": "현재 기록된 배분이 없습니다."
+    "emptyDescription": "마감된 사이클에서 이 지갑에 배분이 이루어지면 여기에 기록됩니다."
   },
   "namedNfts": {
     "title": "이름 붙인 Cosmic Signature NFT",

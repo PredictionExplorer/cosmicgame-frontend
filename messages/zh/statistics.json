@@ -579,13 +579,12 @@
   },
   "recipientHistory": {
     "pageTitle": "我的分配历史",
-    "connectedTitle": "我的分配记录",
     "subtitle": "查看过去取回的分配与发放记录",
-    "connectedDescription": "查看所有 Cosmic Signature 演绎周期中的完整分配历史，包括签名分配取回、星选 ETH 分配、Cosmic Signature NFT 分配与锚定派发。",
+    "connectedDescription": "此钱包在各周期收到的每一笔分配，以及是否已取回。",
     "loadError": "未能加载分配历史",
     "loadErrorDescription": "请稍后重试。",
     "emptyTitle": "暂无分配",
-    "emptyDescription": "此钱包目前没有分配记录。"
+    "emptyDescription": "当已收官的周期向此钱包分配时，记录会显示在这里。"
   },
   "namedNfts": {
     "title": "已命名 Cosmic Signature NFT",

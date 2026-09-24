@@ -579,13 +579,12 @@
   },
   "recipientHistory": {
     "pageTitle": "My Allocation History",
-    "connectedTitle": "History of My Allocations",
     "subtitle": "View your past allocation retrievals and distributions",
-    "connectedDescription": "Track your complete allocation history across all Cosmic Signature Performance Cycles. This includes Signature Allocation retrievals, Stellar Selection ETH allocations, Cosmic Signature NFT allocations, and Anchor Distributions.",
+    "connectedDescription": "Every allocation this wallet has received, cycle by cycle, and whether each was retrieved.",
     "loadError": "Failed to load allocation history",
     "loadErrorDescription": "Please try again in a moment.",
     "emptyTitle": "No allocations yet",
-    "emptyDescription": "You currently have no recorded allocations."
+    "emptyDescription": "When a finalized cycle allocates something to this wallet, it is recorded here."
   },
   "namedNfts": {
     "title": "Named Cosmic Signature NFTs",
