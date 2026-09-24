@@ -117,13 +117,13 @@ const publicPages: PublicPage[] = [
   {
     path: '/contracts',
     host: APP_HOST,
-    h1: 'Cosmic Signature Contracts',
+    h1: 'Cosmic Signature contracts',
     jsonLd: ['WebPage', 'BreadcrumbList'],
   },
   {
     path: '/code',
     host: APP_HOST,
-    h1: 'Cosmic Signature Source Code',
+    h1: 'Cosmic Signature source code',
     jsonLd: ['WebPage', 'BreadcrumbList'],
   },
   {

@@ -5,14 +5,47 @@
   },
   "viewer": {
     "title": "コードビューアー",
-    "subtitle": "シードを画像に変換する生成コードを見る",
-    "description": "以下のコードは、スマートコントラクトが生成したシードを画像に変換します。IPFSでも公開しています：",
-    "github": "公開GitHub組織は<link>github.com/PredictionExplorer</link>にあります。"
+    "description": "各シードを画像と動画に変換するRustプログラムです。同じファイルをIPFSでも公開しています。",
+    "language": "Rust",
+    "lines": "{count, plural, other {#行}}",
+    "codeAria": "画像生成のソースコード（Rust）",
+    "copy": "コードをコピー",
+    "copied": "コピーしました",
+    "wrap": "行を折り返す",
+    "ipfs": "IPFS",
+    "github": "GitHub",
+    "cid": "IPFSコンテンツ識別子"
+  },
+  "pipeline": {
+    "heading": "シードから画像まで",
+    "description": "以下のコードがNFTのシードを作品に変える手順です。",
+    "galleryLink": "ギャラリーで画像を見る",
+    "steps": {
+      "seed": {
+        "label": "シード",
+        "description": "NFTのシードで、刻印時にオンチェーンに記録されます。"
+      },
+      "stream": {
+        "label": "SHA3-256乱数ストリーム",
+        "description": "シードをハッシュ化し、再現可能な乱数バイト列を生成します。"
+      },
+      "simulation": {
+        "label": "三体シミュレーション",
+        "description": "ストリームから三つの天体の質量、位置、速度を決め、軌道を計算します。"
+      },
+      "renderer": {
+        "label": "スペクトルレンダラー",
+        "description": "各天体の軌跡を、スペクトルに沿って少しずつ変わる色で描きます。"
+      },
+      "image": {
+        "label": "Cosmic Signature NFT画像",
+        "description": "最後のフレームが画像に、すべてのフレームが動画になります。同じシードからは常に同じ結果が得られます。"
+      }
+    }
   },
   "seo": {
     "heading": "Cosmic Signatureソースコード",
     "description": "Cosmic Signatureのフロントエンド、Goバックエンド、スマートコントラクト、画像生成のソースコードを公開しています。以下のビューアーで、オンチェーンのシードから再現可能なNFTアートを生成する仕組みを確認できます。",
-    "excerpt": "シード -> SHA3-256乱数ストリーム -> 三体シミュレーション -> スペクトルレンダラー -> Cosmic Signature NFT画像",
     "relatedAria": "ソースコードの関連ページ",
     "links": {
       "ipfs": "公開済みのIPFSソースアーティファクトを開く",

@@ -15,7 +15,7 @@ export interface ContractEvidenceLabels {
 }
 
 const SOURCE_LINK_CLASS =
-  'link-quiet inline-flex min-h-6 items-center gap-1 text-muted-foreground transition-colors duration-fast hover:text-foreground';
+  'link-quiet inline-flex min-h-6 items-center gap-1 text-muted-foreground transition-colors duration-[var(--duration-fast)] hover:text-foreground';
 
 /**
  * Where to check a contract without trusting this site: the address on the

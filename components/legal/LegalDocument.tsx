@@ -74,7 +74,7 @@ export function LegalDocument({
               <SiteLink
                 href={frontendFileHistory(source)}
                 kind="external"
-                className="link-quiet inline-flex min-h-6 items-center gap-1 transition-colors duration-fast hover:text-foreground"
+                className="link-quiet inline-flex min-h-6 items-center gap-1 transition-colors duration-[var(--duration-fast)] hover:text-foreground"
               >
                 {labels.revisionHistory}
               </SiteLink>
@@ -99,7 +99,7 @@ export function LegalDocument({
                 </span>
                 <ChevronDown
                   aria-hidden
-                  className="size-4 shrink-0 text-subtle transition-transform duration-fast group-open:rotate-180"
+                  className="size-4 shrink-0 text-subtle transition-transform duration-[var(--duration-fast)] group-open:rotate-180"
                 />
               </summary>
               <ol className="border-t border-rule-faint px-4 py-2">
@@ -107,7 +107,7 @@ export function LegalDocument({
                   <li key={id}>
                     <a
                       href={`#${id}`}
-                      className="flex min-h-11 items-center type-body-sm text-muted-foreground transition-colors duration-fast hover:text-foreground"
+                      className="flex min-h-11 items-center type-body-sm text-muted-foreground transition-colors duration-[var(--duration-fast)] hover:text-foreground"
                     >
                       {label}
                     </a>
@@ -165,7 +165,7 @@ function LegalSection({
         <a
           href={`#${id}`}
           aria-label={anchorLabel}
-          className="mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-control text-subtle opacity-0 transition-opacity duration-fast group-hover/anchor:opacity-100 hover:text-primary focus-visible:opacity-100 max-sm:hidden"
+          className="mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-control text-subtle opacity-0 transition-opacity duration-[var(--duration-fast)] group-hover/anchor:opacity-100 hover:text-primary focus-visible:opacity-100 max-sm:hidden"
         >
           <Link2 aria-hidden className="size-4" />
         </a>
@@ -174,7 +174,7 @@ function LegalSection({
       <p className="mt-8 lg:hidden">
         <a
           href="#contents"
-          className="inline-flex min-h-6 items-center gap-1.5 type-label text-subtle transition-colors duration-fast hover:text-foreground"
+          className="inline-flex min-h-6 items-center gap-1.5 type-label text-subtle transition-colors duration-[var(--duration-fast)] hover:text-foreground"
         >
           <ArrowUp aria-hidden className="size-3.5" />
           {backLabel}

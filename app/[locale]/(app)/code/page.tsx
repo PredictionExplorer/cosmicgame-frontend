@@ -5,9 +5,12 @@ import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage, webPageJsonLd } from '@/utils/jsonLd';
 import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
+import { PageShell } from '@/components/ui/page-shell';
 
+import { CodeRepositories } from './CodeRepositories';
 import { CodeSeoSummary } from './CodeSeoSummary';
 import CodeViewer from './CodeViewer';
+import { RenderPipeline } from './RenderPipeline';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -24,6 +27,11 @@ export async function generateMetadata(
   });
 }
 
+/**
+ * /code: the repositories, the render pipeline and the image generation
+ * program, all rendered on the server. Only the viewer's toolbar (wrap and
+ * copy) runs on the client.
+ */
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
@@ -55,7 +63,14 @@ export default async function Page({ params }: PageProps) {
             ),
           ]}
         />
-        <CodeViewer seoSummary={<CodeSeoSummary />} />
+        <PageShell variant="data" backdrop="signature">
+          <CodeSeoSummary />
+          <div className="space-y-16 sm:space-y-20">
+            <CodeRepositories />
+            <RenderPipeline />
+            <CodeViewer />
+          </div>
+        </PageShell>
       </>
     </PageMessages>
   );

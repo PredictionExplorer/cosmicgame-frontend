@@ -11,6 +11,7 @@ import { useDashboardInfo } from '@/hooks/useApiQuery';
 import { render, screen, within } from '@/test-utils';
 
 import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
+import { CodeRepositories } from '../code/CodeRepositories';
 import { CodeSeoSummary } from '../code/CodeSeoSummary';
 import { ContractsSeoSummary } from '../contracts/ContractsSeoSummary';
 import { CurrentCycleSeoSummary } from '../current-cycle/CurrentCycleSeoSummary';
@@ -316,7 +317,7 @@ describe('server-rendered page headers', () => {
       render(await ContractsSeoSummary());
 
       expect(
-        screen.getByRole('heading', { level: 1, name: 'Cosmic Signature Contracts' }),
+        screen.getByRole('heading', { level: 1, name: 'Cosmic Signature contracts' }),
       ).toBeInTheDocument();
       expect(screen.getByText(`Chain ${networkConfig.chainId}`)).toBeInTheDocument();
       // The address grid in the page body lists every contract (with verified fallbacks).
@@ -337,9 +338,14 @@ describe('server-rendered page headers', () => {
   });
 
   it('renders the code header and the crawlable repository index', async () => {
-    render(await CodeSeoSummary());
+    render(
+      <>
+        {await CodeSeoSummary()}
+        <CodeRepositories />
+      </>,
+    );
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Cosmic Signature Source Code' }),
+      screen.getByRole('heading', { level: 1, name: 'Cosmic Signature source code' }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('heading', { level: 2, name: 'Project repositories' }),

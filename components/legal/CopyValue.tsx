@@ -55,7 +55,7 @@ export function CopyValue({
         aria-label={copyLabel}
         data-touch-target="extended"
         className={cn(
-          'inline-flex size-6 shrink-0 items-center justify-center rounded-control text-subtle transition-colors duration-fast hover:text-foreground',
+          'inline-flex size-6 shrink-0 items-center justify-center rounded-control text-subtle transition-colors duration-[var(--duration-fast)] hover:text-foreground',
           TOUCH_TARGET_EXTENDED_CLASS,
         )}
       >

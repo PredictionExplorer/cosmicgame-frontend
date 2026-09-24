@@ -86,7 +86,7 @@ export function LegalContentsRail({
                 href={`#${id}`}
                 aria-current={active === id ? 'location' : undefined}
                 className={cn(
-                  'focus-ring-inset -ms-px block border-s-2 py-1.5 ps-4 type-body-sm transition-colors duration-fast',
+                  'focus-ring-inset -ms-px block border-s-2 py-1.5 ps-4 type-body-sm transition-colors duration-[var(--duration-fast)]',
                   active === id
                     ? 'border-primary text-foreground'
                     : 'border-transparent text-muted-foreground hover:border-input hover:text-foreground',
@@ -99,7 +99,7 @@ export function LegalContentsRail({
         </ol>
         <a
           href="#main"
-          className="mt-6 inline-flex min-h-6 items-center gap-1.5 type-label text-subtle transition-colors duration-fast hover:text-foreground"
+          className="mt-6 inline-flex min-h-6 items-center gap-1.5 type-label text-subtle transition-colors duration-[var(--duration-fast)] hover:text-foreground"
         >
           <ArrowUp aria-hidden className="size-3.5" />
           {backToTop}

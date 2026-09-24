@@ -209,12 +209,12 @@ export function LegalResourceList({
               id={link}
               locale={locale}
               externalIcon={false}
-              className="group inline-flex min-h-6 items-center gap-1.5 type-title text-foreground transition-colors duration-fast hover:text-primary"
+              className="group inline-flex min-h-6 items-center gap-1.5 type-title text-foreground transition-colors duration-[var(--duration-fast)] hover:text-primary"
             >
               {label}
               <Arrow
                 aria-hidden
-                className="size-4 shrink-0 text-subtle transition-colors duration-fast group-hover:text-primary"
+                className="size-4 shrink-0 text-subtle transition-colors duration-[var(--duration-fast)] group-hover:text-primary"
               />
             </LegalLink>
             {description ? (
