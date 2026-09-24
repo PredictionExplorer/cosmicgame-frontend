@@ -4,7 +4,7 @@ import {
   PendingPlate,
   WallLabel,
   WallLabelMeta,
-  renditionLoader,
+  renditionSrcSet,
   type ArtRendition,
 } from '@/components/ui/art-frame';
 
@@ -19,15 +19,43 @@ const RENDITIONS: readonly ArtRendition[] = [
   { src: THUMB, width: 640 },
 ];
 
-describe('renditionLoader', () => {
-  it('maps each requested width to the narrowest published rendition at least that wide', () => {
-    const loader = renditionLoader(RENDITIONS);
-    expect(loader({ src: THUMB, width: 320 })).toBe(THUMB);
-    expect(loader({ src: THUMB, width: 640 })).toBe(THUMB);
-    expect(loader({ src: THUMB, width: 750 })).toBe(FULL_WEBP);
-    expect(loader({ src: THUMB, width: 3840 })).toBe(FULL_WEBP);
+describe('renditionSrcSet', () => {
+  it('lists each published file once at its real width, narrowest first', () => {
+    expect(renditionSrcSet(RENDITIONS)).toBe(`${THUMB} 640w, ${FULL_WEBP} 3456w`);
+    expect(renditionSrcSet([{ src: '', width: 320 }, ...RENDITIONS])).toBe(
+      `${THUMB} 640w, ${FULL_WEBP} 3456w`,
+    );
   });
 });
+
+/**
+ * jsdom never loads images, so `complete` stays false. These stub it on the
+ * rendition `<img>` alone (next/image marks its own with data-nimg) to stand
+ * for an image that settled before hydration.
+ */
+function stubSettledRenditionImage(naturalWidth: number): () => void {
+  const proto = HTMLImageElement.prototype;
+  const complete = Object.getOwnPropertyDescriptor(proto, 'complete')!;
+  const natural = Object.getOwnPropertyDescriptor(proto, 'naturalWidth')!;
+  const isRendition = (image: HTMLImageElement) =>
+    image.hasAttribute('srcset') && !image.hasAttribute('data-nimg');
+  Object.defineProperty(proto, 'complete', {
+    configurable: true,
+    get(this: HTMLImageElement) {
+      return isRendition(this) || Boolean(complete.get?.call(this));
+    },
+  });
+  Object.defineProperty(proto, 'naturalWidth', {
+    configurable: true,
+    get(this: HTMLImageElement) {
+      return isRendition(this) ? naturalWidth : Number(natural.get?.call(this) ?? 0);
+    },
+  });
+  return () => {
+    Object.defineProperty(proto, 'complete', complete);
+    Object.defineProperty(proto, 'naturalWidth', natural);
+  };
+}
 
 describe('ArtFrame', () => {
   it('offers the published renditions as a responsive srcset on the black plate', () => {
@@ -40,13 +68,45 @@ describe('ArtFrame', () => {
       />,
     );
     const img = screen.getByAltText('Cosmic Signature #000025');
-    const srcset = img.getAttribute('srcset') ?? '';
-    expect(srcset).toContain(`${THUMB} 640w`);
-    expect(srcset).toContain(FULL_WEBP);
+    // Exactly the two published files, at their true widths: no invented sizes.
+    expect(img).toHaveAttribute('srcset', `${THUMB} 640w, ${FULL_WEBP} 3456w`);
+    expect(img).toHaveAttribute('src', THUMB);
     expect(img).toHaveAttribute('sizes', '(min-width: 1024px) 60vw, 100vw');
     expect(img).toHaveAttribute('width', '3456');
     expect(img).toHaveAttribute('height', '2234');
     expect(screen.getByTestId('art-frame')).toHaveClass('art-plate');
+  });
+
+  it('replays a rendition that failed before hydration, moving on to the fallback', () => {
+    const restore = stubSettledRenditionImage(0);
+    try {
+      render(
+        <ArtFrame
+          sources={[RENDITIONS, PNG]}
+          alt="Art"
+          sizes="100vw"
+          unavailableLabel="Unavailable"
+        />,
+      );
+      expect(screen.getByAltText('Art')).toHaveAttribute('src', PNG);
+    } finally {
+      restore();
+    }
+  });
+
+  it('replays a rendition that loaded before hydration, lifting the loading mark', async () => {
+    const restore = stubSettledRenditionImage(3456);
+    try {
+      render(
+        <ArtFrame sources={[RENDITIONS]} alt="Art" sizes="100vw" unavailableLabel="Unavailable" />,
+      );
+      await waitFor(() =>
+        expect(screen.getByTestId('art-frame')).toHaveAttribute('data-status', 'loaded'),
+      );
+      expect(screen.getByAltText('Art')).toHaveAttribute('srcset');
+    } finally {
+      restore();
+    }
   });
 
   it('loads eagerly at high priority above the fold, lazily otherwise', () => {

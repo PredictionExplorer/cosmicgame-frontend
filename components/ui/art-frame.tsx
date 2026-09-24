@@ -9,7 +9,7 @@ import {
   type ReactNode,
   type SyntheticEvent,
 } from 'react';
-import Image, { type ImageLoader } from 'next/image';
+import Image from 'next/image';
 import { ImageOff } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -80,14 +80,14 @@ function sortedRenditions(renditions: readonly ArtRendition[]): ArtRendition[] {
 }
 
 /**
- * A next/image loader over pre-rendered renditions. Each width next/image
- * asks for maps to the narrowest rendition at least that wide, so the srcset
- * offers exactly the files the media server publishes.
+ * The `srcset` of a responsive set: each published file once, at its real
+ * pixel width (`…/thumb_card.webp 640w, …/full.webp 3456w`), so the browser
+ * weighs the files that exist against `sizes` and the pixel density.
  */
-export function renditionLoader(renditions: readonly ArtRendition[]): ImageLoader {
-  const sorted = sortedRenditions(renditions);
-  const widest = sorted[sorted.length - 1];
-  return ({ width }) => (sorted.find((rendition) => rendition.width >= width) ?? widest)?.src ?? '';
+export function renditionSrcSet(renditions: readonly ArtRendition[]): string {
+  return sortedRenditions(renditions)
+    .map((rendition) => `${rendition.src} ${rendition.width}w`)
+    .join(', ');
 }
 
 /** Remote URLs bypass the Next optimizer: arbitrary NFT hosts are not in remotePatterns. */
@@ -181,9 +181,21 @@ export interface ArtImageProps {
 }
 
 /**
- * One source of a chain as a next/image: a responsive set through the
- * rendition loader, a local file through the optimizer, a remote file as is.
- * A fallback swaps the source on the same element.
+ * An image that settled before hydration fired its load or error event
+ * before React listened. Replaying it once the element is attached lets the
+ * source chain move on (or mark the art loaded) either way; the chain's
+ * handlers ignore a repeat.
+ */
+function replaySettledImage(image: HTMLImageElement | null): void {
+  if (!image?.complete) return;
+  image.dispatchEvent(new Event(image.naturalWidth > 0 ? 'load' : 'error'));
+}
+
+/**
+ * One source of a chain. A responsive set is a plain `<img>` whose srcset
+ * lists the published files at their real widths (the media server already
+ * publishes every size, so the optimizer has nothing to add); a single file
+ * is a next/image, through the optimizer when local and as is when remote.
  */
 export function ArtImage({
   source,
@@ -197,20 +209,43 @@ export function ArtImage({
   onLoad,
 }: ArtImageProps) {
   const set = typeof source === 'string' ? null : sortedRenditions(source);
-  // The narrowest rendition is the `src`; the loader maps every width
-  // next/image asks for onto the published files.
-  const src = set ? (set[0]?.src ?? '') : (source as string);
+  const loadingMode = loading ?? (priority ? 'eager' : 'lazy');
+  const fetchPriority = priority ? 'high' : undefined;
+
+  if (set) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element -- the srcset is the published renditions at their real widths; next/image would invent widths for them.
+      <img
+        ref={replaySettledImage}
+        src={set[0]?.src ?? ''}
+        srcSet={renditionSrcSet(set)}
+        sizes={sizes}
+        alt={alt}
+        width={ART_WIDTH}
+        height={ART_HEIGHT}
+        loading={loadingMode}
+        fetchPriority={fetchPriority}
+        decoding="async"
+        onError={onError}
+        onLoad={onLoad}
+        // As next/image does: a broken image's alt text never flashes on the plate.
+        className={cn('text-transparent', className)}
+        style={style}
+      />
+    );
+  }
+
+  const src = source as string;
   return (
     <Image
       src={src}
-      loader={set ? renditionLoader(set) : undefined}
-      unoptimized={!set && isRemote(src)}
+      unoptimized={isRemote(src)}
       alt={alt}
       width={ART_WIDTH}
       height={ART_HEIGHT}
       sizes={sizes}
-      loading={loading ?? (priority ? 'eager' : 'lazy')}
-      fetchPriority={priority ? 'high' : undefined}
+      loading={loadingMode}
+      fetchPriority={fetchPriority}
       onError={onError}
       onLoad={onLoad}
       className={className}
