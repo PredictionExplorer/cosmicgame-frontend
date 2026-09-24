@@ -299,6 +299,9 @@
       "attachedErc20Timeout": "添付されたERC-20（タイムアウト後の受け取り）",
       "stellarEthTimeout": "ETH星選（タイムアウト後の受け取り）"
     },
+    "sourceTags": {
+      "anchoredStellarSelection": "係留星選"
+    },
     "nft": "NFT #{id}",
     "nftCount": "{count, plural, other {#点のNFT}}",
     "readyToRetrieve": "受け取り可能",

@@ -423,7 +423,12 @@ export default function RecipientHistoryTable({
         cell: (group) => (
           <span className="inline-flex flex-wrap justify-end gap-1 sm:justify-start">
             {group.sources.map((source) => (
-              <TableTag key={source}>{t(`recipientHistory.sources.${source}`)}</TableTag>
+              <TableTag key={source}>
+                {/* A tag takes the short form the NFT pages use ("Anchored Selection"). */}
+                {source === 'anchoredStellarSelection'
+                  ? t('recipientHistory.sourceTags.anchoredStellarSelection')
+                  : t(`recipientHistory.sources.${source}`)}
+              </TableTag>
             ))}
           </span>
         ),

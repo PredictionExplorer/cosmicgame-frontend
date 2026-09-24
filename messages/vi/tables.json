@@ -299,6 +299,9 @@
       "attachedErc20Timeout": "ERC-20 đính kèm (nhận về sau thời hạn)",
       "stellarEthTimeout": "ETH Tinh tuyển (nhận về sau thời hạn)"
     },
+    "sourceTags": {
+      "anchoredStellarSelection": "Tinh tuyển neo giữ"
+    },
     "nft": "NFT #{id}",
     "nftCount": "{count, plural, other {# NFT}}",
     "readyToRetrieve": "Có thể nhận về",

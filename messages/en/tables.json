@@ -299,6 +299,9 @@
       "attachedErc20Timeout": "Attached ERC-20 (timeout retrieval)",
       "stellarEthTimeout": "ETH Stellar Selection (timeout retrieval)"
     },
+    "sourceTags": {
+      "anchoredStellarSelection": "Anchored Selection"
+    },
     "nft": "NFT #{id}",
     "nftCount": "{count, plural, one {# NFT} other {# NFTs}}",
     "readyToRetrieve": "Ready to retrieve",

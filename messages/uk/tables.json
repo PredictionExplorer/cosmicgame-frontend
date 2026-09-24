@@ -299,6 +299,9 @@
       "attachedErc20Timeout": "Долучений ERC-20 (забирання після тайм-ауту)",
       "stellarEthTimeout": "Зоряний відбір ETH (забирання після тайм-ауту)"
     },
+    "sourceTags": {
+      "anchoredStellarSelection": "Відбір закріплених NFT"
+    },
     "nft": "NFT #{id}",
     "nftCount": "{count, plural, one {# NFT} few {# NFT} many {# NFT} other {# NFT}}",
     "readyToRetrieve": "Можна забрати",

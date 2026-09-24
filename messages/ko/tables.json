@@ -299,6 +299,9 @@
       "attachedErc20Timeout": "첨부 ERC-20(기한 만료 회수)",
       "stellarEthTimeout": "ETH 별빛 선정(기한 만료 회수)"
     },
+    "sourceTags": {
+      "anchoredStellarSelection": "앵커링 선정"
+    },
     "nft": "NFT #{id}",
     "nftCount": "{count, plural, other {NFT #개}}",
     "readyToRetrieve": "회수 가능",

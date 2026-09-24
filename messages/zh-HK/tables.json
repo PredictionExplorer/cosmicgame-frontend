@@ -299,6 +299,9 @@
       "attachedErc20Timeout": "附加 ERC-20（超時取回）",
       "stellarEthTimeout": "ETH 星選（超時取回）"
     },
+    "sourceTags": {
+      "anchoredStellarSelection": "錨定 NFT 星選"
+    },
     "nft": "NFT #{id}",
     "nftCount": "{count, plural, other {# 個 NFT}}",
     "readyToRetrieve": "可取回",

@@ -224,6 +224,18 @@ describe('RecipientHistoryTable', () => {
       expect(row).not.toHaveTextContent('tables.recipientHistory.nft(id=26)');
     });
 
+    it('tags an Anchored-NFT Stellar Selection by the short form the NFT pages use', () => {
+      const { container } = render(
+        <RecipientHistoryTable
+          winningHistory={[createEntry({ RecordType: 13, TokenId: 31, WinnerAddr: BOB })]}
+          groupBy="recipient"
+        />,
+      );
+      const row = container.querySelector('tbody tr');
+      expect(row).toHaveTextContent('tables.recipientHistory.sourceTags.anchoredStellarSelection');
+      expect(row).not.toHaveTextContent('tables.recipientHistory.sources.anchoredStellarSelection');
+    });
+
     it('expands a recipient to their individual records', async () => {
       const user = userEvent.setup();
       render(<RecipientHistoryTable winningHistory={ledger} groupBy="recipient" />);
