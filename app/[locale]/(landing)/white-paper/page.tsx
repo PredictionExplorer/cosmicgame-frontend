@@ -54,7 +54,8 @@ function sectionTitle(section: WhitePaperSection): string {
   return /^\d+$/.test(section.number) ? `${section.number}. ${section.heading}` : section.heading;
 }
 
-function BlockView({ block }: { block: WhitePaperBlock }) {
+/** `headingId`: the id of the heading the block sits under, which names its tables. */
+function BlockView({ block, headingId }: { block: WhitePaperBlock; headingId: string }) {
   switch (block.kind) {
     case 'paragraph':
       return <p className="text-base leading-8 text-muted-foreground">{block.text}</p>;
@@ -82,16 +83,15 @@ function BlockView({ block }: { block: WhitePaperBlock }) {
         </p>
       );
     case 'table': {
-      const [firstColumn = ''] = block.table.columns;
       return (
         <div>
           {/*
            * The shared static ledger: on a phone each row becomes a labelled
            * record instead of a table cropped mid-word, and anything still too
-           * wide scrolls in a named, keyboard-reachable region with a fading
-           * edge (styles/tables.css).
+           * wide scrolls in a keyboard-reachable region with a fading edge
+           * (styles/tables.css). The section heading names the table.
            */}
-          <Table label={firstColumn}>
+          <Table labelledBy={headingId}>
             <TableHeader>
               <TableRow>
                 {block.table.columns.map((column) => (
@@ -131,11 +131,11 @@ function BlockView({ block }: { block: WhitePaperBlock }) {
   }
 }
 
-function Blocks({ blocks }: { blocks: readonly WhitePaperBlock[] }) {
+function Blocks({ blocks, headingId }: { blocks: readonly WhitePaperBlock[]; headingId: string }) {
   return (
     <div className="space-y-5">
       {blocks.map((block, index) => (
-        <BlockView key={`${index}-${block.kind}`} block={block} />
+        <BlockView key={`${index}-${block.kind}`} block={block} headingId={headingId} />
       ))}
     </div>
   );
@@ -155,7 +155,7 @@ function SubsectionView({ subsection }: { subsection: WhitePaperSubsection }) {
         {subsection.number} {subsection.heading}
       </h3>
       <div className="mt-4">
-        <Blocks blocks={subsection.blocks} />
+        <Blocks blocks={subsection.blocks} headingId={`${subsection.id}-heading`} />
       </div>
     </section>
   );
@@ -313,7 +313,7 @@ export default async function WhitePaperPage({ params }: PageProps) {
             </h2>
             {section.blocks.length > 0 ? (
               <div className="mt-5">
-                <Blocks blocks={section.blocks} />
+                <Blocks blocks={section.blocks} headingId={`${section.id}-heading`} />
               </div>
             ) : null}
             {section.subsections?.length ? (

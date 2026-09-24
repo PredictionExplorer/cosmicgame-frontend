@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { cn } from '@/lib/utils';
+import { ResponsiveTableContainer } from '@/components/ui/responsive-table';
 
 /**
  * Static ledger primitives: the same `.cs-table` layout as the app's
@@ -11,9 +12,12 @@ import { cn } from '@/lib/utils';
  * - Every cell names its column (`label`), which a phone shows beside the
  *   value when the row becomes a record; `stack` puts long text under its
  *   label instead.
- * - A table wider than its column scrolls inside `Table`'s own container,
- *   which fades the edge with more content beyond it and, given a `label`,
- *   is a named region reachable from the keyboard.
+ * - The table is named by the heading it sits under (`labelledBy`, an id)
+ *   or by `label`. A table wider than its column scrolls inside `Table`'s
+ *   own container, which fades the edge with more content beyond it and,
+ *   only while it overflows, is a named region reachable from the keyboard.
+ *   That one check is the only client code, in ResponsiveTableContainer;
+ *   the rows stay server-rendered.
  *
  * Interactive data tables use `<DataTable>` (`@/components/ui/data-table`).
  */
@@ -22,9 +26,11 @@ type Align = 'start' | 'end' | 'center';
 
 interface TableProps extends React.TableHTMLAttributes<HTMLTableElement> {
   /**
-   * Names the table's scroll container, which then becomes a focusable
-   * region so a wide table can be scrolled from the keyboard.
+   * The id of the heading the table sits under, which names the table and,
+   * while it overflows, its scroll region. Prefer it to `label`.
    */
+  labelledBy?: string;
+  /** Names the table (and its scroll region) when no heading does. */
   label?: string;
   /** Phone layout: `cards` (default) turns rows into records; `compact` keeps a table. */
   layout?: 'cards' | 'compact';
@@ -33,18 +39,21 @@ interface TableProps extends React.TableHTMLAttributes<HTMLTableElement> {
 }
 
 const Table = React.forwardRef<HTMLTableElement, TableProps>(
-  ({ className, label, layout = 'cards', containerClassName, ...props }, ref) => (
-    <div
-      {...(label ? { role: 'region', 'aria-label': label, tabIndex: 0 } : {})}
-      className={cn('cs-table-scroll relative w-full min-w-0 overflow-x-auto', containerClassName)}
+  ({ className, labelledBy, label, layout = 'cards', containerClassName, ...props }, ref) => (
+    <ResponsiveTableContainer
+      labelledBy={labelledBy}
+      label={label}
+      className={cn('w-full', containerClassName)}
     >
       <table
         ref={ref}
         data-layout={layout}
+        aria-labelledby={labelledBy}
+        aria-label={labelledBy ? undefined : label}
         className={cn('cs-table w-full border-collapse text-sm', className)}
         {...props}
       />
-    </div>
+    </ResponsiveTableContainer>
   ),
 );
 Table.displayName = 'Table';

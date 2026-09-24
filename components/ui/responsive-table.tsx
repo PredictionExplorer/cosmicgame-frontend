@@ -88,6 +88,8 @@ interface ResponsiveTableContainerProps extends React.HTMLAttributes<HTMLDivElem
    * keyboard; a table that fits adds no tab stop.
    */
   label?: string;
+  /** Names the scroll region after an element on the page (the table's heading), by id. */
+  labelledBy?: string;
   /**
    * `plain` (default): no box, because the section around a table is its one
    * frame. `framed`: a hairline box for a table that stands alone on a page.
@@ -103,6 +105,7 @@ export function ResponsiveTableContainer({
   className,
   children,
   label,
+  labelledBy,
   variant = 'plain',
   ref,
   ...props
@@ -117,14 +120,18 @@ export function ResponsiveTableContainer({
     [ref],
   );
 
+  const name = labelledBy
+    ? { 'aria-labelledby': labelledBy }
+    : label
+      ? { 'aria-label': label }
+      : null;
+
   return (
     <div
       ref={setRef}
       // Only a container that actually scrolls is a tab stop, and it is only a
       // landmark when it has a name: a nameless region is worse than none.
-      {...(overflowing
-        ? { tabIndex: 0, ...(label ? { role: 'region', 'aria-label': label } : {}) }
-        : {})}
+      {...(overflowing ? { tabIndex: 0, ...(name ? { role: 'region', ...name } : {}) } : {})}
       data-overflowing={overflowing ? 'true' : undefined}
       className={cn(
         SCROLL_CLASS,
