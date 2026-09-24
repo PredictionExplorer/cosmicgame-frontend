@@ -7,28 +7,23 @@
     },
     "phases": {
       "loading": {
-        "title": "사이클 시각 동기화 중",
-        "body": "카운트다운을 표시하기 전에 실시간 프로토콜 시계를 읽고 있습니다."
+        "title": "사이클 시각 동기화 중"
       },
       "openingSoon": {
-        "title": "{cycle} 시작이 다가옵니다",
-        "body": "다음 사이클이 시작을 준비하고 있습니다. 이 카운트다운이 0이 되면 제스처를 남길 수 있습니다."
+        "title": "{cycle} 시작이 다가옵니다"
       },
       "waitingFirstGesture": {
         "title": "{cycle}, 첫 제스처를 기다립니다",
         "body": "첫 제스처를 남기면 마감 카운트다운이 시작되고 다음 시그니처가 모습을 갖추기 시작합니다."
       },
       "approach": {
-        "title": "{cycle} 마감까지",
-        "body": "사이클이 진행 중입니다. 모든 제스처가 시그니처를 빚어내고 마감 카운트다운을 연장할 수 있습니다."
+        "title": "{cycle} 마감까지"
       },
       "finalHour": {
-        "title": "{cycle}, 마지막 한 시간에 들어섭니다",
-        "body": "새 제스처를 남기면 마감까지 남은 시간이 늘어나고 시그니처에 새로운 흔적이 더해집니다."
+        "title": "{cycle}, 마지막 한 시간에 들어섭니다"
       },
       "nearHorizon": {
-        "title": "{cycle}, 마감 시각이 다가옵니다",
-        "body": "사이클 마감까지 얼마 남지 않았습니다. 마지막까지 제스처가 더해질 때마다 작품은 달라집니다."
+        "title": "{cycle}, 마감 시각이 다가옵니다"
       },
       "ready": {
         "title": "{cycle}, 마감할 준비가 되었습니다",
@@ -39,33 +34,35 @@
         "body": "이 페이지에서 프로토콜 시계에 연결하지 못했습니다. 최신 사이클 상태는 앱에서 확인할 수 있습니다."
       },
       "live": {
-        "title": "{cycle} 마감까지",
-        "body": "앱과 동일한 사이클 마감 시각을 표시합니다. 제스처마다 시그니처가 모습을 갖추고, 마감까지 남은 시간이 늘어날 수 있습니다."
+        "title": "{cycle} 마감까지"
       }
     },
-    "staticClock": {
-      "waitingFirstGesture": "첫 제스처 대기 중",
-      "ready": "00:00",
-      "unavailable": "시계 연결 불가",
-      "syncing": "동기화 중"
-    },
     "liveClock": "실시간 사이클 시계",
+    "cycleClock": "사이클 시계",
     "gestureCount": "{count, plural, other {제스처 #개}}",
-    "sameClock": "앱과 같은 시계",
-    "status": {
-      "ready": "마감 준비 완료",
-      "openingSoon": "사이클 시작 카운트다운",
-      "waitingFirstGesture": "열려 있으며 첫 제스처를 기다리는 중",
-      "synchronized": "프로토콜 시간에 동기화된 카운트다운"
+    "units": {
+      "days": "일",
+      "hours": "시간",
+      "minutes": "분",
+      "seconds": "초"
     },
-    "viewCstPool": "GeckoTerminal의 CST 풀",
-    "eventHorizon": "사건의 지평선",
+    "duration": {
+      "days": "{count, plural, other {#일}}",
+      "hours": "{count, plural, other {#시간}}",
+      "minutes": "{count, plural, other {#분}}",
+      "seconds": "{count, plural, other {#초}}"
+    },
+    "currentCycle": "현재 사이클 열기",
+    "noscript": "실시간 시계를 보려면 JavaScript가 필요합니다. 앱에는 현재 사이클이 항상 표시됩니다.",
     "countdownAria": "{label}: {duration}",
-    "durationPart": "{value}{unit}",
     "durationSeparator": " "
   },
   "artwork": {
     "previous": "이전 작품",
-    "next": "다음 작품"
+    "next": "다음 작품",
+    "pauseRotation": "작품 전환 일시 정지",
+    "resumeRotation": "작품 전환 다시 시작",
+    "playAnimation": "애니메이션 재생",
+    "pauseAnimation": "애니메이션 일시 정지"
   }
 }

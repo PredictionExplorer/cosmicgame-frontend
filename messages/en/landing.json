@@ -7,28 +7,23 @@
     },
     "phases": {
       "loading": {
-        "title": "Synchronizing the cycle horizon",
-        "body": "Reading the live protocol clock before the countdown appears."
+        "title": "Synchronizing the cycle horizon"
       },
       "openingSoon": {
-        "title": "{cycle} opens soon",
-        "body": "The next cycle is preparing to open. When this countdown reaches zero, Gestures become available."
+        "title": "{cycle} opens soon"
       },
       "waitingFirstGesture": {
         "title": "{cycle} is waiting for its first Gesture",
         "body": "The first Gesture ignites the Cycle Finalization Time and starts shaping the next Signature."
       },
       "approach": {
-        "title": "{cycle} finalizes in",
-        "body": "The cycle is live. Each Gesture shapes the Signature and can extend the finalization clock."
+        "title": "{cycle} finalizes in"
       },
       "finalHour": {
-        "title": "{cycle} is entering the final hour",
-        "body": "Every new Gesture can extend the horizon and leave one more trace on the evolving Signature."
+        "title": "{cycle} is entering the final hour"
       },
       "nearHorizon": {
-        "title": "{cycle} is near the horizon",
-        "body": "The Cycle Finalization Time is almost here. The next moments decide the final shape."
+        "title": "{cycle} is near the horizon"
       },
       "ready": {
         "title": "{cycle} is ready to finalize",
@@ -39,33 +34,35 @@
         "body": "The landing page could not reach the protocol clock. Open the app for the latest cycle state."
       },
       "live": {
-        "title": "{cycle} finalizes in",
-        "body": "This is the same live Cycle Finalization Time shown in the app. Each Gesture shapes the Signature and can extend the horizon."
+        "title": "{cycle} finalizes in"
       }
     },
-    "staticClock": {
-      "waitingFirstGesture": "Awaiting first Gesture",
-      "ready": "00:00",
-      "unavailable": "Clock unavailable",
-      "syncing": "Syncing"
-    },
     "liveClock": "Live cycle clock",
+    "cycleClock": "Cycle clock",
     "gestureCount": "{count, plural, one {# Gesture} other {# Gestures}}",
-    "sameClock": "Same clock as the app",
-    "status": {
-      "ready": "Ready to finalize",
-      "openingSoon": "Countdown to cycle opening",
-      "waitingFirstGesture": "Open and waiting for the first Gesture",
-      "synchronized": "Countdown synchronized to protocol time"
+    "units": {
+      "days": "days",
+      "hours": "hours",
+      "minutes": "minutes",
+      "seconds": "seconds"
     },
-    "viewCstPool": "CST pool on GeckoTerminal",
-    "eventHorizon": "Event horizon",
+    "duration": {
+      "days": "{count, plural, one {# day} other {# days}}",
+      "hours": "{count, plural, one {# hour} other {# hours}}",
+      "minutes": "{count, plural, one {# minute} other {# minutes}}",
+      "seconds": "{count, plural, one {# second} other {# seconds}}"
+    },
+    "currentCycle": "Open the current cycle",
+    "noscript": "The live clock needs JavaScript. The app always shows the current cycle.",
     "countdownAria": "{label}: {duration}",
-    "durationPart": "{value} {unit}",
     "durationSeparator": ", "
   },
   "artwork": {
     "previous": "Previous artwork",
-    "next": "Next artwork"
+    "next": "Next artwork",
+    "pauseRotation": "Pause the artwork rotation",
+    "resumeRotation": "Resume the artwork rotation",
+    "playAnimation": "Play the animation",
+    "pauseAnimation": "Pause the animation"
   }
 }

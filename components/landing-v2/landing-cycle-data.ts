@@ -1,5 +1,6 @@
 'use client';
 
+import { toFiniteNumber } from '@/utils/finiteNumber';
 import { getApiBase } from '@/lib/serverRotation';
 
 /**
@@ -9,8 +10,8 @@ import { getApiBase } from '@/lib/serverRotation';
  * the axios client plus the full zod schema module (~90 KB gzip — the
  * largest chunk in the landing bundle) onto the marketing host for three
  * display-only reads. These fetch helpers shape-check exactly the handful
- * of fields the countdown consumes and degrade to null on any failure,
- * which the timer renders as its "unavailable" state.
+ * of fields the countdown consumes and degrade to null on any failure; the
+ * clock keeps its last good value of each read (landing-cycle-clock.ts).
  */
 
 /** Structural subset of the dashboard read the landing timer consumes. */
@@ -38,12 +39,8 @@ async function fetchJson(path: string): Promise<Record<string, unknown> | null> 
   }
 }
 
-function toFiniteNumber(value: unknown): number | null {
-  return typeof value === 'number' && Number.isFinite(value) ? value : null;
-}
-
 function toOptionalFiniteNumber(value: unknown): number | undefined {
-  return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+  return toFiniteNumber(value) ?? undefined;
 }
 
 /** Unix seconds when the current cycle can finalize, or null when unknown. */

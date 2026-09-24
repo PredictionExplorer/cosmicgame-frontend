@@ -1,19 +1,12 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
 
-import { CST_GECKOTERMINAL_POOL_URL } from '@/config/geckoterminal';
-
 import {
   fetchLandingCurrentTimeSec,
   fetchLandingDashboardSnapshot,
   fetchLandingFinalizationTimeSec,
   type LandingDashboardSnapshot,
 } from '../landing-cycle-data';
-import { EventHorizonCountdown, getLandingCycleTimerSnapshot } from '../EventHorizonCountdown';
-
-jest.mock('next/image', () => ({
-  __esModule: true,
-  default: (props: Record<string, unknown>) => <img {...props} />,
-}));
+import { EventHorizonCountdown, POLL_INTERVAL_MS } from '../EventHorizonCountdown';
 
 // The countdown reads through the zod-free landing-cycle-data module (NOT
 // the services/api barrel — that would drag axios+zod into the landing).
@@ -23,154 +16,31 @@ jest.mock('../landing-cycle-data', () => ({
   fetchLandingDashboardSnapshot: jest.fn(),
 }));
 
-const mockFetchFinalization = fetchLandingFinalizationTimeSec as jest.MockedFunction<
-  typeof fetchLandingFinalizationTimeSec
->;
-const mockFetchCurrentTime = fetchLandingCurrentTimeSec as jest.MockedFunction<
-  typeof fetchLandingCurrentTimeSec
->;
-const mockFetchDashboard = fetchLandingDashboardSnapshot as jest.MockedFunction<
-  typeof fetchLandingDashboardSnapshot
->;
+const mockFetchFinalization = jest.mocked(fetchLandingFinalizationTimeSec);
+const mockFetchCurrentTime = jest.mocked(fetchLandingCurrentTimeSec);
+const mockFetchDashboard = jest.mocked(fetchLandingDashboardSnapshot);
 
 function dashboard(overrides: Partial<LandingDashboardSnapshot> = {}): LandingDashboardSnapshot {
   return {
-    CurRoundNum: 12,
-    CurNumBids: 34,
+    CurRoundNum: 21,
+    CurNumBids: 55,
     TsRoundStart: 1,
     LastBidderAddr: '0x1111111111111111111111111111111111111111',
     ...overrides,
   };
 }
 
-describe('getLandingCycleTimerSnapshot', () => {
-  const sampledAtMs = 1_000_000;
-  const activeSample = {
-    targetServerTimeSec: 8_200,
-    currentServerTimeSec: 1_000,
-    dashboard: dashboard(),
-    sampledAtMs,
-  };
-
-  it('builds a live countdown snapshot from the same server target and server clock shape used by the app', () => {
-    const snapshot = getLandingCycleTimerSnapshot({
-      sample: activeSample,
-      nowMs: sampledAtMs,
-    });
-
-    expect(snapshot.phase).toBe('approach');
-    expect(snapshot.targetMs).toBe(sampledAtMs + 7_200_000);
-    expect(snapshot.finalizationTargetMs).toBe(sampledAtMs + 7_200_000);
-    expect(snapshot.showCountdown).toBe(true);
-    expect(snapshot.shards).toEqual([
-      { unit: 'days', value: 0 },
-      { unit: 'hours', value: 2 },
-      { unit: 'minutes', value: 0 },
-      { unit: 'seconds', value: 0 },
-    ]);
-    expect(snapshot.gestureCount).toBe(34);
-  });
-
-  it('moves through urgency phases as Cycle Finalization Time approaches', () => {
-    expect(
-      getLandingCycleTimerSnapshot({
-        sample: activeSample,
-        nowMs: activeSample.sampledAtMs + 61 * 60 * 1000,
-      }).phase,
-    ).toBe('final-hour');
-    expect(
-      getLandingCycleTimerSnapshot({
-        sample: activeSample,
-        nowMs: activeSample.sampledAtMs + 116 * 60 * 1000,
-      }).phase,
-    ).toBe('final-ten');
-    expect(
-      getLandingCycleTimerSnapshot({
-        sample: activeSample,
-        nowMs: activeSample.sampledAtMs + 119 * 60 * 1000 + 10_000,
-      }).phase,
-    ).toBe('final-minute');
-  });
-
-  it('counts down to cycle opening when dashboard activation time is in the future', () => {
-    const activationTime = sampledAtMs / 1000 + 900;
-    const snapshot = getLandingCycleTimerSnapshot({
-      sample: {
-        ...activeSample,
-        dashboard: dashboard({
-          CurRoundStats: { ActivationTime: activationTime },
-          TsRoundStart: 0,
-        }),
-      },
-      nowMs: sampledAtMs,
-    });
-
-    expect(snapshot.phase).toBe('opening-soon');
-    expect(snapshot.targetMs).toBe(activationTime * 1000);
-    expect(snapshot.finalizationTargetMs).toBe(sampledAtMs + 7_200_000);
-    expect(snapshot.showCountdown).toBe(true);
-  });
-
-  it('projects activation through a chain clock that is ahead of the browser', () => {
-    const snapshot = getLandingCycleTimerSnapshot({
-      sample: {
-        ...activeSample,
-        currentServerTimeSec: 100_000,
-        dashboard: dashboard({
-          CurRoundStats: { ActivationTime: 100_600 },
-          TsRoundStart: 0,
-          LastBidderAddr: '0x0000000000000000000000000000000000000000',
-        }),
-      },
-      nowMs: sampledAtMs,
-    });
-
-    expect(snapshot.phase).toBe('opening-soon');
-    expect(snapshot.targetMs).toBe(sampledAtMs + 600_000);
-    expect(snapshot.remainingMs).toBe(600_000);
-  });
-
-  it('shows ready-to-finalize when the backend target has passed', () => {
-    const snapshot = getLandingCycleTimerSnapshot({
-      sample: activeSample,
-      nowMs: activeSample.sampledAtMs + 7_300_000,
-    });
-
-    expect(snapshot.phase).toBe('ready-to-finalize');
-  });
-
-  it('shows a waiting state before the first Gesture starts the horizon', () => {
-    const snapshot = getLandingCycleTimerSnapshot({
-      sample: {
-        ...activeSample,
-        dashboard: dashboard({
-          TsRoundStart: 0,
-          LastBidderAddr: '0x0000000000000000000000000000000000000000',
-        }),
-      },
-      nowMs: sampledAtMs,
-    });
-
-    expect(snapshot.phase).toBe('waiting-first-gesture');
-    expect(snapshot.remainingMs).toBe(0);
-    expect(snapshot.showCountdown).toBe(false);
-  });
-
-  it('uses a loading snapshot before live data arrives', () => {
-    const snapshot = getLandingCycleTimerSnapshot({ sample: null, nowMs: sampledAtMs });
-
-    expect(snapshot.phase).toBe('loading');
-  });
-});
+const clockValues = () =>
+  screen.getAllByTestId('countdown-value').map((value) => value.textContent);
 
 describe('<EventHorizonCountdown />', () => {
   const nowMs = 1_700_000_000_000;
 
   beforeEach(() => {
     jest.spyOn(Date, 'now').mockReturnValue(nowMs);
-    mockFetchFinalization.mockResolvedValue(1_700_007_200);
+    mockFetchFinalization.mockResolvedValue(1_700_007_265);
     mockFetchCurrentTime.mockResolvedValue(1_700_000_000);
-    mockFetchDashboard.mockResolvedValue(dashboard({ CurRoundNum: 21, CurNumBids: 55 }));
+    mockFetchDashboard.mockResolvedValue(dashboard());
   });
 
   afterEach(() => {
@@ -178,37 +48,99 @@ describe('<EventHorizonCountdown />', () => {
     jest.useRealTimers();
   });
 
-  it('renders the live Event Horizon timer with cycle context from the backend', async () => {
+  it('keeps the final structure while the first reading is on its way', () => {
+    mockFetchFinalization.mockReturnValue(new Promise(() => {}));
     render(<EventHorizonCountdown />);
 
-    expect(screen.getByTestId('event-horizon-countdown')).toBeInTheDocument();
-    await waitFor(() => {
-      expect(
-        screen.getByRole('heading', {
-          name: /landing\.timer\.phases\.approach\.title/,
-        }),
-      ).toBeInTheDocument();
-    });
-
-    expect(screen.getByRole('timer')).toHaveAccessibleName(/landing\.timer\.countdownAria/);
-    expect(screen.getByText(/landing\.timer\.gestureCount\(count=55\)/)).toBeInTheDocument();
-    expect(screen.getByText('landing.timer.sameClock')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /nav\.cta\.openApp/i })).toHaveAttribute(
-      'href',
-      'https://app.cosmicsignature.com',
+    // Four dashed figures at their final size, so nothing reflows on arrival.
+    const placeholder = screen.getByTestId('countdown-placeholder');
+    expect(placeholder).toHaveTextContent('––');
+    expect(placeholder.querySelectorAll('[data-testid="countdown-value"]')).toHaveLength(0);
+    expect(screen.getByRole('timer')).toHaveAccessibleName(
+      /^landing\.timer\.phases\.loading\.title/,
     );
-
-    const poolLink = screen.getByRole('link', { name: 'landing.timer.viewCstPool' });
-    expect(poolLink).toHaveAttribute('href', CST_GECKOTERMINAL_POOL_URL);
-    expect(poolLink).toHaveAttribute('target', '_blank');
-    expect(poolLink).toHaveAttribute('rel', 'noopener noreferrer');
-    expect(poolLink.querySelector('img')).toHaveAttribute(
-      'src',
-      '/images/brands/geckoterminal-symbol.svg',
-    );
+    expect(screen.getByRole('status')).toHaveTextContent('common.liveStatus.connecting');
   });
 
-  it('renders an unavailable state when the protocol clock cannot be reached', async () => {
+  it('shows the live Cycle Finalization Time as type, with the gesture count', async () => {
+    render(<EventHorizonCountdown />);
+
+    await waitFor(() => expect(clockValues()).toEqual(['00', '02', '01', '05']));
+    expect(
+      screen.getByRole('heading', { name: /landing\.timer\.phases\.approach\.title/ }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('landing.timer.gestureCount(count=55)')).toBeInTheDocument();
+    expect(screen.getByTestId('event-horizon-countdown')).toHaveAttribute('data-fresh', 'true');
+    expect(screen.getByRole('link', { name: /landing\.timer\.currentCycle/ })).toHaveAttribute(
+      'href',
+      'https://app.cosmicsignature.com/current-cycle',
+    );
+    // The market link belongs to the footer's ecosystem row, not the clock.
+    expect(screen.queryByRole('link', { name: /GeckoTerminal/i })).not.toBeInTheDocument();
+  });
+
+  it('keeps the visible clock and its accessible duration in sync without announcing every tick', async () => {
+    jest.useFakeTimers({ doNotFake: ['Date'] });
+    render(<EventHorizonCountdown />);
+
+    await waitFor(() => expect(clockValues()).toEqual(['00', '02', '01', '05']));
+    const timer = screen.getByRole('timer');
+    expect(timer).toHaveAttribute('aria-live', 'off');
+    expect(screen.getByTestId('countdown-units')).toHaveAttribute('aria-hidden', 'true');
+    expect(timer).toHaveAccessibleName(/landing\.timer\.duration\.seconds\(count=5\)/);
+
+    jest.mocked(Date.now).mockReturnValue(nowMs + 1_000);
+    act(() => {
+      jest.advanceTimersByTime(1_000);
+    });
+
+    expect(clockValues()).toEqual(['00', '02', '01', '04']);
+    expect(timer).toHaveAccessibleName(/landing\.timer\.duration\.seconds\(count=4\)/);
+  });
+
+  it('never discards its last good reading when a poll fails', async () => {
+    jest.useFakeTimers({ doNotFake: ['Date'] });
+    render(<EventHorizonCountdown />);
+    await waitFor(() => expect(clockValues()).toEqual(['00', '02', '01', '05']));
+
+    // The next poll loses every read.
+    mockFetchFinalization.mockResolvedValue(null);
+    mockFetchCurrentTime.mockResolvedValue(null);
+    mockFetchDashboard.mockResolvedValue(null);
+    jest.mocked(Date.now).mockReturnValue(nowMs + POLL_INTERVAL_MS);
+    await act(async () => {
+      jest.advanceTimersByTime(POLL_INTERVAL_MS);
+    });
+
+    await waitFor(() =>
+      expect(screen.getByTestId('event-horizon-countdown')).toHaveAttribute('data-fresh', 'false'),
+    );
+    // Still counting from the last reading, and saying the reading is not fresh.
+    expect(clockValues()).toEqual(['00', '02', '00', '53']);
+    expect(
+      screen.getByRole('heading', { name: /landing\.timer\.phases\.approach\.title/ }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('common.liveStatus.reconnecting');
+    expect(
+      screen.queryByRole('heading', { name: /landing\.timer\.phases\.unavailable\.title/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('does not announce ready to finalize when only the finalization time failed', async () => {
+    mockFetchFinalization.mockResolvedValue(null);
+    render(<EventHorizonCountdown />);
+
+    await waitFor(() => expect(mockFetchFinalization).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(screen.getByRole('timer')).toHaveAccessibleName(
+        /^landing\.timer\.phases\.loading\.title/,
+      ),
+    );
+    expect(screen.queryByText(/phases\.ready/)).not.toBeInTheDocument();
+    expect(screen.getByTestId('countdown-placeholder')).toBeInTheDocument();
+  });
+
+  it('sends the visitor to the app when the clock could never be read', async () => {
     // The fetch helpers degrade to null on any failure (they never throw).
     mockFetchFinalization.mockResolvedValue(null);
     mockFetchCurrentTime.mockResolvedValue(null);
@@ -216,52 +148,27 @@ describe('<EventHorizonCountdown />', () => {
 
     render(<EventHorizonCountdown />);
 
-    await waitFor(() => {
+    await waitFor(() =>
       expect(
-        screen.getByRole('heading', { name: 'landing.timer.phases.unavailable.title' }),
-      ).toBeInTheDocument();
-    });
+        screen.getByRole('heading', { name: /landing\.timer\.phases\.unavailable\.title/ }),
+      ).toBeInTheDocument(),
+    );
+    // No "live" claim and no dead instrument: the eyebrow drops "live" and
+    // the readout becomes a way into the app.
+    expect(screen.getByText('landing.timer.cycleClock')).toBeInTheDocument();
+    expect(screen.queryByText('landing.timer.liveClock')).not.toBeInTheDocument();
     expect(screen.getByText('landing.timer.phases.unavailable.body')).toBeInTheDocument();
-    expect(screen.queryByText('landing.timer.status.synchronized')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /nav\.cta\.openApp/ })).toHaveAttribute(
+      'href',
+      'https://app.cosmicsignature.com',
+    );
+    expect(screen.queryByTestId('countdown-units')).not.toBeInTheDocument();
     expect(screen.queryByText(/landing\.timer\.gestureCount/)).not.toBeInTheDocument();
   });
 
-  it('keeps the visible clock and accessible duration in sync without announcing every tick', async () => {
-    jest.useFakeTimers({ doNotFake: ['Date'] });
-    mockFetchFinalization.mockResolvedValue(1_700_007_265);
-
-    render(<EventHorizonCountdown />);
-
-    await waitFor(() => {
-      expect(screen.getAllByTestId('countdown-value').map((value) => value.textContent)).toEqual([
-        '00',
-        '02',
-        '01',
-        '05',
-      ]);
-    });
-    expect(screen.getByRole('timer')).toHaveAttribute('aria-live', 'off');
-    expect(screen.getByTestId('countdown-units')).toHaveAttribute('aria-hidden', 'true');
-    expect(screen.getByRole('timer')).toHaveAccessibleName(/value=5/);
-
-    jest.mocked(Date.now).mockReturnValue(nowMs + 1_000);
-    act(() => {
-      jest.advanceTimersByTime(1_000);
-    });
-
-    expect(screen.getAllByTestId('countdown-value').map((value) => value.textContent)).toEqual([
-      '00',
-      '02',
-      '01',
-      '04',
-    ]);
-    expect(screen.getByRole('timer')).toHaveAccessibleName(/value=4/);
-  });
-
-  it('renders waiting state without a ticking countdown', async () => {
+  it('waits for the first Gesture without a ticking countdown', async () => {
     mockFetchDashboard.mockResolvedValue(
       dashboard({
-        CurRoundNum: 21,
         CurNumBids: 0,
         TsRoundStart: 0,
         LastBidderAddr: '0x0000000000000000000000000000000000000000',
@@ -270,14 +177,14 @@ describe('<EventHorizonCountdown />', () => {
 
     render(<EventHorizonCountdown />);
 
-    await waitFor(() => {
+    await waitFor(() =>
       expect(
-        screen.getByRole('heading', {
-          name: /landing\.timer\.phases\.waitingFirstGesture\.title/,
-        }),
-      ).toBeInTheDocument();
-    });
-    expect(screen.getByText('landing.timer.staticClock.waitingFirstGesture')).toBeInTheDocument();
-    expect(screen.queryByText('landing.timer.status.synchronized')).not.toBeInTheDocument();
+        screen.getByRole('heading', { name: /landing\.timer\.phases\.waitingFirstGesture\.title/ }),
+      ).toBeInTheDocument(),
+    );
+    expect(screen.getByText('landing.timer.phases.waitingFirstGesture.body')).toBeInTheDocument();
+    expect(screen.queryByTestId('countdown-units')).not.toBeInTheDocument();
+    // "0 Gestures" says nothing: the count appears once there is one.
+    expect(screen.queryByText(/landing\.timer\.gestureCount/)).not.toBeInTheDocument();
   });
 });
