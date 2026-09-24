@@ -107,4 +107,17 @@ describe('allocatedOnOneDay', () => {
     expect(allocatedOnOneDay({ first: 1_787_443_199, latest: 1_787_443_200 })).toBe(false);
     expect(allocatedOnOneDay({ first: null, latest: null })).toBe(false);
   });
+
+  it('compares days in the zone the dates are shown in, not in UTC (regression)', () => {
+    // 2026-08-22 23:30 and 2026-08-23 00:30 UTC: two UTC days, one day in
+    // Los Angeles (16:30 and 17:30), where the header showed two dates.
+    const acrossUtcMidnight = { first: 1_787_441_400, latest: 1_787_445_000 };
+    expect(allocatedOnOneDay(acrossUtcMidnight, 'utc')).toBe(false);
+    expect(allocatedOnOneDay(acrossUtcMidnight, 'America/Los_Angeles')).toBe(true);
+    // 2026-08-22 14:30 and 15:30 UTC: one UTC day, two days in Tokyo (23:30
+    // and 00:30), where one date stood for allocations on two days.
+    const acrossTokyoMidnight = { first: 1_787_409_000, latest: 1_787_412_600 };
+    expect(allocatedOnOneDay(acrossTokyoMidnight, 'utc')).toBe(true);
+    expect(allocatedOnOneDay(acrossTokyoMidnight, 'Asia/Tokyo')).toBe(false);
+  });
 });

@@ -8,6 +8,7 @@ import { getAddress, isAddress } from 'viem';
 import { Link } from '@/i18n/navigation';
 import { formatAmount, formatCount } from '@/utils/format';
 import { useMarketingRewardsByUser } from '@/hooks/useApiQuery';
+import { useHydrated } from '@/hooks/useHydrated';
 import type { MarketingReward } from '@/services/api/types';
 import {
   SMALL_ALLOCATION_CST,
@@ -44,6 +45,8 @@ export default function MarketingRewardsPage({ address: rawAddress }: MarketingR
   const query = useMarketingRewardsByUser(address ?? undefined);
   const rewards = query.data ?? NO_REWARDS;
   const summary = useMemo(() => summarizeOutreachAllocations(rewards), [rewards]);
+  // The zone <DateTime> shows the dates in: UTC until hydration, then the reader's.
+  const dateZone = useHydrated() ? 'local' : 'utc';
 
   const trail = [{ label: t('address.parent'), href: '/marketing' }];
 
@@ -67,7 +70,7 @@ export default function MarketingRewardsPage({ address: rawAddress }: MarketingR
   // Each date once, at figure-md and without the current year: allocations
   // that all arrived on one day get a single date, not a first and a latest
   // minutes apart that each wrap onto two lines on a phone.
-  if (ready && summary.allocations > 0 && allocatedOnOneDay(summary)) {
+  if (ready && summary.allocations > 0 && allocatedOnOneDay(summary, dateZone)) {
     figures.push({
       id: 'allocated',
       label: t('address.figures.allocated'),

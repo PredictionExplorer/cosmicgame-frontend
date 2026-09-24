@@ -1,3 +1,4 @@
+import type { DateTimeZone } from '@/utils/format';
 import type { MarketingReward } from '@/services/api/types';
 
 /**
@@ -84,13 +85,26 @@ export function summarizeOutreachAllocations(rewards: readonly MarketingReward[]
   return { totalCst, allocations: rewards.length, smallAllocations, first, latest };
 }
 
-const SECONDS_PER_DAY = 86_400;
+/** The calendar day (YYYY-MM-DD) of a Unix time in a zone. */
+function calendarDay(seconds: number, timeZone: DateTimeZone): string {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: timeZone === 'local' ? undefined : timeZone === 'utc' ? 'UTC' : timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date(seconds * 1000));
+}
 
 /**
- * Whether every allocation arrived on one calendar day (UTC): the header then
- * dates them once instead of a first and a latest a few minutes apart.
+ * Whether every allocation arrived on one calendar day in the zone the page
+ * shows its dates in (`<DateTime>`: UTC until hydration, then the reader's
+ * zone): the header then dates them once instead of a first and a latest a
+ * few minutes apart, and never gives one date to two of the reader's days.
  */
-export function allocatedOnOneDay({ first, latest }: Pick<OutreachSummary, 'first' | 'latest'>) {
+export function allocatedOnOneDay(
+  { first, latest }: Pick<OutreachSummary, 'first' | 'latest'>,
+  timeZone: DateTimeZone = 'utc',
+) {
   if (first === null || latest === null) return false;
-  return Math.floor(first / SECONDS_PER_DAY) === Math.floor(latest / SECONDS_PER_DAY);
+  return calendarDay(first, timeZone) === calendarDay(latest, timeZone);
 }
