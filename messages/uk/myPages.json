@@ -1,12 +1,7 @@
 {
   "shared": {
-    "loading": "Завантаження…",
     "unavailable": "Недоступно",
-    "yes": "Так",
-    "no": "Ні",
-    "cycle": "Цикл",
-    "cycleNumber": "Цикл {cycle}",
-    "recipient": "Отримувач"
+    "cycleNumber": "Цикл {cycle}"
   },
   "allocations": {
     "title": "Мої розподіли",
@@ -244,25 +239,6 @@
       },
       "emptyTitle": "У цьому гаманці ще немає Сигнатур",
       "emptyDescription": "Тут з’являться Сигнатури, які ви отримаєте в розподілі або придбаєте на маркетплейсі."
-    },
-    "table": {
-      "empty": "Токенів ще немає.",
-      "details": "Деталі",
-      "datetime": "Дата й час",
-      "tokenId": "ID токена",
-      "tokenName": "Назва токена",
-      "cycle": "Цикл",
-      "recipientAddress": "Адреса отримувача",
-      "currentlyAnchored": "Закріплено зараз?",
-      "anchoredOnce": "Було закріплено?",
-      "allocationType": "Тип розподілу",
-      "types": {
-        "stellarSelection": "Зоряний відбір Cosmic Signature NFT",
-        "anchoredNftSelection": "Зоряний відбір закріплених NFT (власник закріплення Random Walk)",
-        "signatureAllocation": "Отримувач розподілу Сигнатури (цикл {cycle})",
-        "enduranceChampion": "Чемпіон витривалості",
-        "lastCstParticipant": "Автор останнього CST-жесту"
-      }
     }
   },
   "transferCst": {

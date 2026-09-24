@@ -56,7 +56,7 @@ const RETIRED: Record<string, RetiredPattern> = {
   'white-alpha surface or border': {
     use: 'bg-surface-sunken / bg-surface / bg-surface-raised, border-rule / border-rule-faint',
     pattern: /(?<![\w-])(?:bg|border(?:-[trblxy])?)-white\/(?:\[[\d.]+\]|\d+)/g,
-    baseline: 7,
+    baseline: 3,
   },
   'focus reset that replaces the shared outline': {
     use: 'the global :focus-visible outline (styles/focus-ring.css), focus-ring-inset or focus-ring-within',

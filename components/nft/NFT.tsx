@@ -1,7 +1,7 @@
 import { formatId, getAssetsUrl, getThumbUrl } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
-import { NFTSkeleton } from '@/components/styled';
+import { SkeletonArtPlate } from '@/components/ui/skeleton';
 
 import NFTImage from './NFTImage';
 
@@ -24,7 +24,7 @@ const NFT = ({ nft }: { nft: NFTProps }) => {
   return (
     <div className="group relative overflow-hidden rounded-surface border border-rule bg-surface transition-colors duration-[var(--duration-fast)] hover:border-input">
       {!nft ? (
-        <NFTSkeleton />
+        <SkeletonArtPlate />
       ) : (
         <Link href={`/detail/${nft.TokenId}`} className="block no-underline">
           <NFTImage

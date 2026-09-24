@@ -1,12 +1,7 @@
 {
   "shared": {
-    "loading": "載入中…",
     "unavailable": "暫不可用",
-    "yes": "是",
-    "no": "否",
-    "cycle": "週期",
-    "cycleNumber": "第 {cycle} 個週期",
-    "recipient": "獲配者"
+    "cycleNumber": "第 {cycle} 個週期"
   },
   "allocations": {
     "title": "我的分配",
@@ -244,25 +239,6 @@
       },
       "emptyTitle": "此錢包中還沒有簽名",
       "emptyDescription": "你在分配中獲得或在市場上購入的簽名會顯示在這裡。"
-    },
-    "table": {
-      "empty": "暫無代幣。",
-      "details": "詳情",
-      "datetime": "日期時間",
-      "tokenId": "代幣 ID",
-      "tokenName": "代幣名稱",
-      "cycle": "週期",
-      "recipientAddress": "獲配者地址",
-      "currentlyAnchored": "目前已錨定",
-      "anchoredOnce": "曾錨定",
-      "allocationType": "分配類型",
-      "types": {
-        "stellarSelection": "Cosmic Signature NFT 星選",
-        "anchoredNftSelection": "錨定 NFT 星選（Random Walk NFT 錨定者）",
-        "signatureAllocation": "簽名分配獲配者（第 {cycle} 個週期）",
-        "enduranceChampion": "堅守冠軍",
-        "lastCstParticipant": "CST 收官之筆獲配者"
-      }
     }
   },
   "transferCst": {

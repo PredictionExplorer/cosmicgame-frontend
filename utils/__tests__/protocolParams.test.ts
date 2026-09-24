@@ -1,24 +1,9 @@
 import {
-  formatPercentPoints,
   initialDurationSeconds,
   percentFromDivisor,
   secondsFromMicroseconds,
   secondsOrNull,
 } from '../protocolParams';
-
-describe('formatPercentPoints', () => {
-  it('formats percentage points with the sign attached', () => {
-    expect(formatPercentPoints(25, 'en')).toBe('25%');
-    expect(formatPercentPoints(0.5, 'en')).toBe('0.5%');
-    expect(formatPercentPoints(100 / 3, 'en')).toBe('33.33%');
-  });
-
-  it("uses the locale's digits and never puts a space before the sign", () => {
-    expect(formatPercentPoints(12.5, 'uk')).toBe('12.5%');
-    expect(formatPercentPoints(12.5, 'vi')).toBe('12,5%');
-    expect(formatPercentPoints(12.5, 'ja')).toBe('12.5%');
-  });
-});
 
 describe('percentFromDivisor', () => {
   it('turns a divisor into its percentage', () => {

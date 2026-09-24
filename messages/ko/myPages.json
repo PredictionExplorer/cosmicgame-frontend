@@ -1,12 +1,7 @@
 {
   "shared": {
-    "loading": "불러오는 중…",
     "unavailable": "확인 불가",
-    "yes": "예",
-    "no": "아니요",
-    "cycle": "사이클",
-    "cycleNumber": "사이클 {cycle}",
-    "recipient": "수령자"
+    "cycleNumber": "사이클 {cycle}"
   },
   "allocations": {
     "title": "내 배분",
@@ -244,25 +239,6 @@
       },
       "emptyTitle": "이 지갑에는 아직 시그니처가 없습니다",
       "emptyDescription": "배분으로 받거나 마켓플레이스에서 구매한 시그니처가 여기에 표시됩니다."
-    },
-    "table": {
-      "empty": "아직 토큰이 없습니다.",
-      "details": "상세",
-      "datetime": "일시",
-      "tokenId": "토큰 ID",
-      "tokenName": "토큰 이름",
-      "cycle": "사이클",
-      "recipientAddress": "수령자 주소",
-      "currentlyAnchored": "앵커링 여부",
-      "anchoredOnce": "앵커링 이력",
-      "allocationType": "배분 유형",
-      "types": {
-        "stellarSelection": "Cosmic Signature NFT 별빛 선정",
-        "anchoredNftSelection": "앵커링 NFT 별빛 선정(Random Walk 앵커링 보유자)",
-        "signatureAllocation": "시그니처 배분 수령자(사이클 {cycle})",
-        "enduranceChampion": "수호 챔피언",
-        "lastCstParticipant": "최종 CST 참여자"
-      }
     }
   },
   "transferCst": {

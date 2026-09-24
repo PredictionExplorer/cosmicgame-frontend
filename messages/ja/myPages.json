@@ -1,12 +1,7 @@
 {
   "shared": {
-    "loading": "読み込み中…",
     "unavailable": "取得不可",
-    "yes": "はい",
-    "no": "いいえ",
-    "cycle": "サイクル",
-    "cycleNumber": "サイクル{cycle}",
-    "recipient": "受領者"
+    "cycleNumber": "サイクル{cycle}"
   },
   "allocations": {
     "title": "自分の配分",
@@ -244,25 +239,6 @@
       },
       "emptyTitle": "このウォレットにはまだシグネチャーがありません",
       "emptyDescription": "配分で受け取ったシグネチャーや、マーケットプレイスで購入したシグネチャーがここに表示されます。"
-    },
-    "table": {
-      "empty": "トークンはまだありません。",
-      "details": "詳細",
-      "datetime": "日時",
-      "tokenId": "トークンID",
-      "tokenName": "トークン名",
-      "cycle": "サイクル",
-      "recipientAddress": "受領者アドレス",
-      "currentlyAnchored": "現在係留中？",
-      "anchoredOnce": "係留したことがある？",
-      "allocationType": "配分の種類",
-      "types": {
-        "stellarSelection": "Cosmic Signature NFT星選",
-        "anchoredNftSelection": "係留NFT星選（Random Walk係留者）",
-        "signatureAllocation": "シグネチャー配分の受領者（サイクル{cycle}）",
-        "enduranceChampion": "持久チャンピオン",
-        "lastCstParticipant": "最後のCST参加者"
-      }
     }
   },
   "transferCst": {

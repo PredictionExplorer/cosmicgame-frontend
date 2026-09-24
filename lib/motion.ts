@@ -67,20 +67,6 @@ export const fadeRiseStagger: Variants = {
   exit: { transition: { staggerChildren: stagger.children / 2, staggerDirection: -1 } },
 };
 
-export const scaleIn: Variants = {
-  initial: { opacity: 0, scale: offset.scaleFrom },
-  animate: {
-    opacity: 1,
-    scale: 1,
-    transition: { duration: duration.base, ease: ease.outExpo },
-  },
-  exit: {
-    opacity: 0,
-    scale: offset.scaleFrom,
-    transition: { duration: duration.fast, ease: ease.outSoft },
-  },
-};
-
 export const slideInRight: Variants = {
   initial: { opacity: 0, x: offset.slide },
   animate: { opacity: 1, x: 0, transition: { duration: duration.base, ease: ease.outExpo } },
@@ -89,39 +75,6 @@ export const slideInRight: Variants = {
     x: offset.slide,
     transition: { duration: duration.fast, ease: ease.outSoft },
   },
-};
-
-export const pageTransition: Variants = {
-  initial: { opacity: 0, y: offset.slide },
-  animate: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: duration.page, ease: ease.outExpo },
-  },
-  exit: {
-    opacity: 0,
-    y: offset.slide,
-    transition: { duration: 0.25, ease: ease.outSoft },
-  },
-};
-
-export const dialogMotion: Variants = {
-  initial: { opacity: 0, scale: offset.scaleFrom },
-  animate: {
-    opacity: 1,
-    scale: 1,
-    transition: { duration: 0.25, ease: ease.outExpo },
-  },
-  exit: {
-    opacity: 0,
-    scale: offset.scaleFrom,
-    transition: { duration: duration.fast, ease: ease.outSoft },
-  },
-};
-
-export const hoverLift: Transition = {
-  duration: duration.fast,
-  ease: ease.outSoft,
 };
 
 const REDUCED: Variants = {
@@ -148,11 +101,6 @@ export function useMotionVariants(variants: Variants): Variants {
   if (!reduced) return variants;
   if (variants === fadeRiseStagger) return REDUCED_STAGGER;
   return REDUCED;
-}
-
-export function useMotionTransition(transition: Transition = baseTransition): Transition {
-  const reduced = usePrefersReducedMotion();
-  return reduced ? { duration: 0 } : transition;
 }
 
 /**

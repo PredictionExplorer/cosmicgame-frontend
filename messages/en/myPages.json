@@ -1,12 +1,7 @@
 {
   "shared": {
-    "loading": "Loading...",
     "unavailable": "Unavailable",
-    "yes": "Yes",
-    "no": "No",
-    "cycle": "Cycle",
-    "cycleNumber": "Cycle {cycle}",
-    "recipient": "Recipient"
+    "cycleNumber": "Cycle {cycle}"
   },
   "allocations": {
     "title": "My Allocations",
@@ -244,25 +239,6 @@
       },
       "emptyTitle": "No Signatures in this wallet yet",
       "emptyDescription": "Signatures you receive in an allocation or buy on the marketplace appear here."
-    },
-    "table": {
-      "empty": "No tokens yet.",
-      "details": "Details",
-      "datetime": "Date and time",
-      "tokenId": "Token ID",
-      "tokenName": "Token Name",
-      "cycle": "Cycle",
-      "recipientAddress": "Recipient Address",
-      "currentlyAnchored": "Currently Anchored?",
-      "anchoredOnce": "Anchored Once?",
-      "allocationType": "Allocation Type",
-      "types": {
-        "stellarSelection": "Cosmic Signature NFT Stellar Selection",
-        "anchoredNftSelection": "Anchored-NFT Stellar Selection (Random Walk anchor-holder)",
-        "signatureAllocation": "Signature Allocation Recipient (#{cycle})",
-        "enduranceChampion": "Endurance Champion",
-        "lastCstParticipant": "Final CST Gesture recipient"
-      }
     }
   },
   "transferCst": {

@@ -1,14 +1,7 @@
 import '@testing-library/jest-dom';
 import { renderHook } from '@testing-library/react';
 
-import {
-  fadeRise,
-  fadeRiseStagger,
-  motionTokens,
-  scaleIn,
-  useMotionTransition,
-  useMotionVariants,
-} from '@/lib/motion';
+import { fadeRise, fadeRiseStagger, motionTokens, useMotionVariants } from '@/lib/motion';
 
 describe('motion tokens', () => {
   it('exposes a consistent duration ramp', () => {
@@ -31,13 +24,6 @@ describe('variants', () => {
   it('fadeRise has initial + animate states', () => {
     expect(fadeRise.initial).toEqual({ opacity: 0, y: 8 });
     expect(fadeRise.animate).toEqual(expect.objectContaining({ opacity: 1, y: 0 }));
-  });
-
-  it('scaleIn starts at offset.scaleFrom', () => {
-    expect(scaleIn.initial).toEqual({
-      opacity: 0,
-      scale: motionTokens.offset.scaleFrom,
-    });
   });
 });
 
@@ -84,36 +70,5 @@ describe('useMotionVariants', () => {
     mockMatchMedia(true);
     const { result } = renderHook(() => useMotionVariants(fadeRiseStagger));
     expect(result.current.animate).toEqual({ transition: { staggerChildren: 0 } });
-  });
-});
-
-describe('useMotionTransition', () => {
-  function mockMatchMedia(matches: boolean) {
-    Object.defineProperty(window, 'matchMedia', {
-      writable: true,
-      configurable: true,
-      value: (query: string) => ({
-        matches,
-        media: query,
-        onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn(),
-        dispatchEvent: jest.fn(),
-      }),
-    });
-  }
-
-  it('returns the provided transition under normal motion', () => {
-    mockMatchMedia(false);
-    const { result } = renderHook(() => useMotionTransition({ duration: 0.5, ease: 'easeOut' }));
-    expect(result.current).toEqual({ duration: 0.5, ease: 'easeOut' });
-  });
-
-  it('returns duration: 0 under prefers-reduced-motion', () => {
-    mockMatchMedia(true);
-    const { result } = renderHook(() => useMotionTransition({ duration: 0.5, ease: 'easeOut' }));
-    expect(result.current).toEqual({ duration: 0 });
   });
 });

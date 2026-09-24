@@ -1,6 +1,5 @@
 import {
   DATA_POLL_INTERVAL_MS,
-  STATS_POLL_INTERVAL_MS,
   HEADER_POLL_INTERVAL_MS,
   NOTIFICATION_AUTO_HIDE_MS,
   GESTURE_GAS_LIMIT,
@@ -19,20 +18,6 @@ describe('config/constants', () => {
 
     it('is positive', () => {
       expect(DATA_POLL_INTERVAL_MS).toBeGreaterThan(0);
-    });
-  });
-
-  describe('STATS_POLL_INTERVAL_MS', () => {
-    it('equals 5 000', () => {
-      expect(STATS_POLL_INTERVAL_MS).toBe(5_000);
-    });
-
-    it('is a number', () => {
-      expect(typeof STATS_POLL_INTERVAL_MS).toBe('number');
-    });
-
-    it('is positive', () => {
-      expect(STATS_POLL_INTERVAL_MS).toBeGreaterThan(0);
     });
   });
 
@@ -97,8 +82,7 @@ describe('config/constants', () => {
   });
 
   describe('interval ordering', () => {
-    it('STATS_POLL_INTERVAL_MS <= DATA_POLL_INTERVAL_MS <= HEADER_POLL_INTERVAL_MS', () => {
-      expect(STATS_POLL_INTERVAL_MS).toBeLessThanOrEqual(DATA_POLL_INTERVAL_MS);
+    it('DATA_POLL_INTERVAL_MS <= HEADER_POLL_INTERVAL_MS', () => {
       expect(DATA_POLL_INTERVAL_MS).toBeLessThanOrEqual(HEADER_POLL_INTERVAL_MS);
     });
   });
@@ -113,7 +97,6 @@ describe('config/constants', () => {
         'GESTURE_GAS_LIMIT',
         'HEADER_POLL_INTERVAL_MS',
         'NOTIFICATION_AUTO_HIDE_MS',
-        'STATS_POLL_INTERVAL_MS',
       ]);
     });
   });
