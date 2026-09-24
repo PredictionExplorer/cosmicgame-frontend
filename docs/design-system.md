@@ -348,10 +348,14 @@ above that spans them ("ETH by track" over Signature Allocation, Chrono-Warrior,
 each sub-header stays on one or two lines; give each grouped column a `label` that reads
 alone ("Chrono-Warrior (ETH)") for its phone record.
 
-**Width.** With `width="auto"` (the default) a short ledger stops at a reading width,
-three columns at 48rem and four at 56rem, so a row is not a 1,200px scan from its
-address to its figure. `width="fill"` runs the full width (a moderation list whose
-message takes what is left).
+**Width.** With `width="auto"` (the default) a short ledger, four columns or fewer, stops
+at one reading width, 56rem, so a row is not a 1,200px scan from its address to its
+figure and short ledgers stacked on a page share a right edge. `width="fill"` runs the
+full width (a moderation list whose message takes what is left). A page that stacks
+short and wide ledgers sets one width for all of them with `<DataTableWidth value="fill">`
+(the anchoring tabs); a table's own `width` still wins. Only the table stops at the
+reading width: its empty and error states take the section's full width, so they stay
+centred on it.
 
 **Amounts.** An amount column prints the table precision (ETH 4 digits, CST 2), zero
 included ("0.0000" under "0.1562"). Dust too small for it reads as a bound ("<0.0001")

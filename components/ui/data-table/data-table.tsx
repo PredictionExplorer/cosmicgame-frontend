@@ -41,6 +41,7 @@ import {
   type SortValue,
 } from './column-kinds';
 import { KindValue, blankShowsUnknown } from './kind-value';
+import { useDataTableWidth, type DataTableWidthMode } from './table-width';
 import { useCompactFit } from './use-compact-fit';
 import { DEFAULT_PAGE_SIZE, PHONE_PAGE_SIZE, usePhoneLayout } from './use-page-size';
 
@@ -248,11 +249,15 @@ export interface DataTableProps<T> {
   density?: 'comfortable' | 'compact';
   /**
    * How wide the table runs on a wide screen. `auto` (default) keeps a short
-   * ledger at a reading width, so a row is not a 1,200px scan from its
-   * address to its figure: three columns or fewer stop at 48rem, four at
-   * 56rem. `fill` always runs the full width of its container.
+   * ledger (four columns or fewer) at one reading width, 56rem, so a row is
+   * not a 1,200px scan from its address to its figure and short ledgers
+   * stacked on a page share a right edge. `fill` always runs the full width
+   * of its container. Without this prop the table takes the width of the
+   * nearest `<DataTableWidth>`, which a page sets when it stacks short and
+   * wide ledgers. The empty and error states always take the full width, so
+   * they stay centred on their section.
    */
-  width?: 'auto' | 'fill';
+  width?: DataTableWidthMode;
   /**
    * `quiet` underlines a cell's links only on hover and keyboard focus, for
    * a dense ledger whose every row carries several (a date, an address, a
@@ -300,13 +305,13 @@ function hasAnyValue<T>(col: ResolvedColumn<T>, rows: readonly T[]): boolean {
   return !col.hasValue || rows.some((row) => !isBlankValue(col.valueOf(row)));
 }
 
-/** The widest a short ledger runs under `width="auto"`, by its column count. */
-const FIT_WIDTH_CLASS: Readonly<Record<number, string>> = {
-  1: 'max-w-3xl',
-  2: 'max-w-3xl',
-  3: 'max-w-3xl',
-  4: 'max-w-4xl',
-};
+/**
+ * The most columns a ledger can have and still stop at the reading width
+ * under `width="auto"`. One width for all of them, so short ledgers stacked
+ * on one page (three columns, then four) end at the same right edge.
+ */
+const FIT_MAX_COLUMNS = 4;
+const FIT_WIDTH_CLASS = 'max-w-4xl';
 
 /** Consecutive columns under one `group` heading, and the ungrouped gaps between them. */
 interface ColumnGroupCell {
@@ -421,7 +426,7 @@ export function DataTable<T>({
   resetPageKey,
   layout: layoutProp = 'auto',
   density = 'comfortable',
-  width = 'auto',
+  width: widthProp,
   links = 'underlined',
   className,
   tableClassName,
@@ -433,6 +438,7 @@ export function DataTable<T>({
   const wrapperRef = React.useRef<HTMLDivElement>(null);
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const isPhone = usePhoneLayout();
+  const width = useDataTableWidth(widthProp);
 
   const resolved = React.useMemo(() => columns.map(resolveColumn), [columns]);
   // Columns with a value somewhere in the data. The phone layout follows
@@ -543,8 +549,12 @@ export function DataTable<T>({
   const stateHeadingLevel = title ? (Math.min(headingLevel + 1, 4) as 3 | 4) : headingLevel;
   const columnCount = visible.length + (renderDetails ? 1 : 0);
   // Measured on the whole data set, so the width holds from page to page.
+  // Only the table itself (and its loading rows) stops there: the empty and
+  // error states below take the section's full width, so they stay centred.
   const fitClass =
-    width === 'auto' ? FIT_WIDTH_CLASS[datasetColumns.length + (renderDetails ? 1 : 0)] : undefined;
+    width === 'auto' && datasetColumns.length + (renderDetails ? 1 : 0) <= FIT_MAX_COLUMNS
+      ? FIT_WIDTH_CLASS
+      : undefined;
   const groups = visible.some((col) => col.column.group) ? columnGroups(visible) : null;
 
   const toggleDetails = (key: React.Key) =>
@@ -576,7 +586,7 @@ export function DataTable<T>({
 
   if (error) {
     return (
-      <div ref={wrapperRef} className={cn(fitClass, className)}>
+      <div ref={wrapperRef} className={className}>
         {header}
         {notice}
         <ErrorState
@@ -591,7 +601,7 @@ export function DataTable<T>({
 
   if (!loading && data.length === 0) {
     return (
-      <div ref={wrapperRef} className={cn(fitClass, className)}>
+      <div ref={wrapperRef} className={className}>
         {header}
         {notice}
         {toolbar}
@@ -660,23 +670,27 @@ export function DataTable<T>({
         >
           <ResponsiveTableHead>
             {groups ? (
+              // A group heading is a column header that spans its columns
+              // (`scope="col"` with `colSpan`: the table has no <colgroup>
+              // for a `colgroup` scope to point at). The cells over ungrouped
+              // columns hold nothing, so assistive tech skips them.
               <tr data-slot="column-groups">
                 {groups.map((cell) =>
                   cell.group ? (
                     <th
                       key={cell.key}
                       colSpan={cell.span}
-                      scope="colgroup"
+                      scope="col"
                       data-align="center"
                       className="border-b border-rule-faint px-4 pt-3 pb-1.5 align-bottom type-label text-subtle print:!text-foreground"
                     >
                       {cell.group}
                     </th>
                   ) : (
-                    <td key={cell.key} colSpan={cell.span} />
+                    <td key={cell.key} colSpan={cell.span} aria-hidden="true" />
                   ),
                 )}
-                {renderDetails ? <td /> : null}
+                {renderDetails ? <td aria-hidden="true" /> : null}
               </tr>
             ) : null}
             <tr>

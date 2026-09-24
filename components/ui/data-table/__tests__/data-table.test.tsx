@@ -1,6 +1,11 @@
 import userEvent from '@testing-library/user-event';
 
-import { DataTable, nextSort, type DataTableColumn } from '@/components/ui/data-table';
+import {
+  DataTable,
+  DataTableWidth,
+  nextSort,
+  type DataTableColumn,
+} from '@/components/ui/data-table';
 
 import { checkA11y, render, screen, within } from '@/test-utils';
 
@@ -581,21 +586,59 @@ describe('DataTable framing', () => {
   const wrapper = (container: HTMLElement) =>
     container.querySelector('[data-slot="data-table"]') as HTMLElement;
 
-  it('keeps a short ledger at a reading width instead of stretching it', () => {
-    const three = render(
-      <DataTable ariaLabel="Holders" data={rows} columns={columns.slice(0, 3)} />,
-    );
-    expect(wrapper(three.container)).toHaveClass('max-w-3xl');
-    three.unmount();
-
-    const four = render(<DataTable ariaLabel="Holders" data={rows} columns={columns} />);
-    expect(wrapper(four.container)).toHaveClass('max-w-4xl');
-    four.unmount();
+  it('keeps every short ledger at one reading width instead of stretching it', () => {
+    // Two, three and four columns share the width, so short ledgers stacked
+    // on one page end at the same right edge.
+    for (const count of [2, 3, 4]) {
+      const { container, unmount } = render(
+        <DataTable ariaLabel="Holders" data={rows} columns={columns.slice(0, count)} />,
+      );
+      expect(wrapper(container)).toHaveClass('max-w-4xl');
+      unmount();
+    }
 
     const fill = render(
       <DataTable ariaLabel="Holders" data={rows} columns={columns} width="fill" />,
     );
     expect(wrapper(fill.container).className).not.toMatch(/max-w-/);
+  });
+
+  it('takes the width a page sets for its ledgers, unless it names its own', () => {
+    const { container } = render(
+      <DataTableWidth value="fill">
+        <div data-testid="shared">
+          <DataTable ariaLabel="Holders" data={rows} columns={columns} />
+        </div>
+        <div data-testid="own">
+          <DataTable ariaLabel="Owners" data={rows} columns={columns} width="auto" />
+        </div>
+      </DataTableWidth>,
+    );
+    const [shared, own] = [...container.querySelectorAll('[data-slot="data-table"]')];
+    expect(shared!.className).not.toMatch(/max-w-/);
+    expect(own).toHaveClass('max-w-4xl');
+  });
+
+  it('centres the empty and error states on the whole section, not the reading width', () => {
+    // The cap belongs to the table: a state that replaces it keeps the full
+    // width, so its centred title sits in the middle of the section.
+    const empty = render(
+      <DataTable ariaLabel="Holders" data={[]} columns={columns} emptyTitle="Nothing yet" />,
+    );
+    expect(screen.getByText('Nothing yet')).toBeInTheDocument();
+    expect(empty.container.innerHTML).not.toMatch(/max-w-(3|4)xl/);
+    empty.unmount();
+
+    const failed = render(
+      <DataTable ariaLabel="Holders" data={[]} columns={columns} error="The list is down." />,
+    );
+    expect(screen.getByText('The list is down.')).toBeInTheDocument();
+    expect(failed.container.innerHTML).not.toMatch(/max-w-(3|4)xl/);
+    failed.unmount();
+
+    // While the rows load, the placeholder table already has the reading width.
+    const loading = render(<DataTable ariaLabel="Holders" data={[]} columns={columns} loading />);
+    expect(wrapper(loading.container)).toHaveClass('max-w-4xl');
   });
 
   it('lets a wide ledger run the full width', () => {
@@ -633,10 +676,13 @@ describe('DataTable framing', () => {
       ['TH', 'Activity', '2'],
       ['TD', '', '1'],
     ]);
-    expect(screen.getByRole('columnheader', { name: 'Activity' })).toHaveAttribute(
-      'scope',
-      'colgroup',
-    );
+    // A spanning column header: the table has no <colgroup> for a
+    // `colgroup` scope to refer to.
+    expect(screen.getByRole('columnheader', { name: 'Activity' })).toHaveAttribute('scope', 'col');
+    // The blank cells over ungrouped columns are not announced.
+    for (const blank of groupRow!.querySelectorAll('td')) {
+      expect(blank).toHaveAttribute('aria-hidden', 'true');
+    }
   });
 
   it('keeps a notice in every state, so it never moves the table', () => {
