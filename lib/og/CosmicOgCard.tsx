@@ -8,13 +8,17 @@
  *   - plate: a text column beside one Signature on its black plate, the
  *            wall label in the plate's lower band. Brand cards, token pages,
  *            a cycle's allocations, a participant with one Signature.
- *   - strip: title above up to three plates with their token numbers. The
+ *   - strip: title above two or three plates with their token numbers. The
  *            gallery and participants holding several Signatures.
  *
  * Artwork is contained, never cropped, dimmed or overlaid (the art-ground
  * rule of the design direction). All text is 28px or larger so it stays
- * legible at the 400–500px width previews are shown at, and every text
- * stack is sized to its box (lib/og/layout.ts) so nothing collides.
+ * legible at the 400–500px width previews are shown at.
+ *
+ * Every block of text is measured in the embedded faces and set as explicit
+ * lines (lib/og/layout.ts, `planCosmicOgCard`): each line is known to fit its
+ * column and each stack its box before anything is drawn, and text that must
+ * be cut ends on a whole sentence or a whole word with the locale's ellipsis.
  *
  * Satori constraints: inline styles only, `display: flex` on every element
  * with more than one child, no CSS variables, no `text-transform` (eyebrows
@@ -23,16 +27,18 @@
 
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
+import { SITE_NAME } from '@/utils/seo';
+
 import {
   CLASH_DISPLAY_500,
   JETBRAINS_MONO_500,
-  fontFamily,
-  type OgLineBreak,
+  cssFontFamily,
+  fontFamilies,
   type OgTypography,
 } from './fonts';
-import { fitStack, type StackFit, type StackMetrics } from './layout';
+import { fitList, fitStack, layoutBlock, type StackPlan, type TextBlock } from './layout';
+import type { OgMeasure, OgTextFace, OgTextStyle } from './measure';
 import { OG_ATMOSPHERE, OG_COLORS } from './palette';
-import { lineBreakUnits } from './text';
 
 /** Standard Open Graph dimensions consumed by every embed. */
 export const COSMIC_OG_SIZE = { width: 1200, height: 630 } as const;
@@ -51,6 +57,10 @@ export interface OgPlate {
 
 export interface CosmicOgCardProps {
   typography: OgTypography;
+  /** Measures text in the faces the card embeds (`createOgMeasure`). */
+  measure: OgMeasure;
+  /** The locale's ellipsis, for text cut to fit. */
+  ellipsis: string;
   /** Tinted orbit mark (`orbitMarkDataUri`). */
   markSrc: string;
   eyebrow?: string;
@@ -65,69 +75,220 @@ export interface CosmicOgCardProps {
   art?: readonly OgPlate[];
 }
 
-const BRAND = 'Cosmic Signature';
 const WIDTH = COSMIC_OG_SIZE.width;
 const HEIGHT = COSMIC_OG_SIZE.height;
 /** Plate card: the black plate's width; the render is contained in it. */
 export const PLATE_WIDTH = 680;
+/** Plate card: the wall label's inset from the plate's edges. */
+const LABEL_INSET = 40;
 const STRIP_GAP = 20;
 const STRIP_PADDING_X = 64;
-const STRIP_PLATE_WIDTH = Math.floor((WIDTH - 2 * STRIP_PADDING_X - 2 * STRIP_GAP) / 3);
+const STRIP_WIDTH = WIDTH - 2 * STRIP_PADDING_X;
+const STRIP_PLATE_HEIGHT = Math.round(Math.floor((STRIP_WIDTH - 2 * STRIP_GAP) / 3) / ART_RATIO);
 
 /** The 28px floor every line of card text respects. */
 const SMALL_TEXT = 28;
 const SMALL_LINE = 1.2;
 const STACK_GAP = 22;
+const FOOTER_GAP = 32;
 
-const MONO = fontFamily([JETBRAINS_MONO_500]);
-const WORDMARK = fontFamily([CLASH_DISPLAY_500]);
+/**
+ * Room a text stack has between the wordmark and the footer of each layout,
+ * with at least 28px of air above and below it (see each layout's padding).
+ */
+export const OG_TEXT_BOXES = {
+  text: { width: WIDTH - 160, height: 341 },
+  plate: { width: WIDTH - PLATE_WIDTH - 64 - 48, height: 381 },
+  strip: { width: STRIP_WIDTH, height: 175 },
+} as const;
 
-function metricsFor(typography: OgTypography, monoTitle: boolean): StackMetrics {
+const TITLE_SIZES = {
+  text: [80, 72, 64, 56, 48],
+  plate: [64, 58, 52, 46, 40],
+  strip: [60, 54, 48, 42],
+} as const;
+
+/** Lines a title may take, and the fewer it takes when a smaller size allows. */
+const TITLE_LINES = {
+  text: { preferredLines: 2, maxLines: 3 },
+  plate: { preferredLines: 3, maxLines: 4 },
+  strip: { preferredLines: 1, maxLines: 2 },
+} as const;
+
+/** Subhead sizes by layout; the strip card has no subhead. */
+const SUBHEAD_SIZES = { text: [32, 30, 28], plate: [28] } as const;
+
+const MONO: OgTextFace = { families: fontFamilies([JETBRAINS_MONO_500]), weight: 500 };
+const WORDMARK: OgTextFace = { families: fontFamilies([CLASH_DISPLAY_500]), weight: 500 };
+
+/** The faces a locale's card sets each role in. */
+function facesFor(typography: OgTypography, monoTitle: boolean) {
+  const { cjk } = typography;
+  const body = fontFamilies(typography.body);
   return {
-    titleLineHeight: typography.cjk ? 1.22 : monoTitle ? 1.12 : 1.04,
-    subheadLineHeight: typography.cjk ? 1.55 : 1.36,
-    eyebrowBlock: SMALL_TEXT * SMALL_LINE + STACK_GAP,
-    gap: STACK_GAP,
+    title: monoTitle
+      ? MONO
+      : {
+          families: fontFamilies(typography.display),
+          weight: typography.displayWeight,
+          letterSpacingEm: cjk ? 0 : -0.03,
+          spaceFamilies: typography.titleSpaces && fontFamilies([typography.titleSpaces]),
+        },
+    eyebrow: { families: body, weight: 500, letterSpacingEm: cjk ? 0 : 0.12 },
+    body: { families: body, weight: 400 },
+    label: { families: body, weight: 500 },
+  } satisfies Record<string, OgTextFace>;
+}
+
+function lineHeights(typography: OgTypography, monoTitle: boolean) {
+  return {
+    title: typography.cjk ? 1.22 : monoTitle ? 1.12 : 1.04,
+    subhead: typography.cjk ? 1.55 : 1.36,
   };
 }
 
-/**
- * A block of text clamped to `lines`. Renderer-broken text gets an ellipsis;
- * word- and phrase-broken text is a wrapping row of unbreakable units (a
- * Korean word, a Japanese phrase), cut at the last whole line.
- */
-function Clamped({
-  text,
-  mode,
-  lines,
-  style,
-}: {
-  text: string;
-  mode: OgLineBreak;
-  lines: number;
-  style: CSSProperties & { fontSize: number; lineHeight: number };
-}): ReactElement {
-  const units = lineBreakUnits(text, mode);
-  if (!units) {
-    return <div style={{ display: 'block', lineClamp: lines, ...style }}>{text}</div>;
+type Layout = keyof typeof OG_TEXT_BOXES;
+
+/** What a card draws, laid out: which layout, and every block of text as lines. */
+export type OgCardPlan =
+  | { layout: 'text'; stack: StackPlan; fact: string }
+  | { layout: 'plate'; stack: StackPlan; plate: OgPlate; label?: TextBlock }
+  | { layout: 'strip'; stack: StackPlan; plates: readonly OgPlate[] };
+
+function planStack(props: CosmicOgCardProps, layout: Layout): StackPlan {
+  const { typography, measure, ellipsis, eyebrow, title, subhead, monoTitle = false } = props;
+  const faces = facesFor(typography, monoTitle);
+  const heights = lineHeights(typography, monoTitle);
+  return fitStack(
+    {
+      ...OG_TEXT_BOXES[layout],
+      gap: STACK_GAP,
+      ellipsis,
+      eyebrow: eyebrow
+        ? {
+            spec: {
+              text: eyebrow,
+              face: faces.eyebrow,
+              lineBreak: typography.subheadBreak,
+              lineHeight: SMALL_LINE,
+            },
+            size: SMALL_TEXT,
+            maxLines: 2,
+          }
+        : undefined,
+      title: {
+        spec: {
+          text: title,
+          face: faces.title,
+          lineBreak: monoTitle ? 'anywhere' : typography.titleBreak,
+          lineHeight: heights.title,
+          textWrap: 'balance',
+          // Chinese breaks between any two characters, so a break inside a
+          // clause may split a word (以链 / 上种子): prefer one on a clause.
+          keepClauses: typography.cjk && typography.titleBreak === 'anywhere' && !monoTitle,
+        },
+        sizes: TITLE_SIZES[layout],
+        ...TITLE_LINES[layout],
+      },
+      subhead:
+        subhead && layout !== 'strip'
+          ? {
+              spec: {
+                text: subhead,
+                face: faces.body,
+                lineBreak: typography.subheadBreak,
+                lineHeight: heights.subhead,
+                textWrap: 'pretty',
+              },
+              sizes: SUBHEAD_SIZES[layout],
+            }
+          : undefined,
+    },
+    measure,
+  );
+}
+
+const smallStyle = (face: OgTextFace): OgTextStyle => ({ ...face, size: SMALL_TEXT });
+
+/** Lays the card out: the layout its art calls for, and every line of text it draws. */
+export function planCosmicOgCard(props: CosmicOgCardProps): OgCardPlan {
+  const art = props.art ?? [];
+  if (art.length >= 2) {
+    return { layout: 'strip', stack: planStack(props, 'strip'), plates: art.slice(0, 3) };
   }
+  const { typography, measure, ellipsis } = props;
+  const faces = facesFor(typography, props.monoTitle ?? false);
+  const [plate] = art;
+  if (plate) {
+    const label = plate.label
+      ? layoutBlock(
+          {
+            text: plate.label,
+            face: faces.label,
+            lineBreak: typography.subheadBreak,
+            lineHeight: SMALL_LINE,
+          },
+          SMALL_TEXT,
+          PLATE_WIDTH - 2 * LABEL_INSET,
+          measure,
+          { maxLines: 1, ellipsis },
+        )
+      : undefined;
+    return { layout: 'plate', stack: planStack(props, 'plate'), plate, label };
+  }
+  const domainWidth = measure(props.domain, smallStyle(faces.body));
+  const factWidth = OG_TEXT_BOXES.text.width - FOOTER_GAP - domainWidth;
+  const fact = props.fact ? fitList(props.fact, smallStyle(faces.body), factWidth, measure) : '';
+  return { layout: 'text', stack: planStack(props, 'text'), fact };
+}
+
+function faceStyle(face: OgTextFace): CSSProperties {
+  return {
+    fontFamily: cssFontFamily(face.families),
+    fontWeight: face.weight,
+    letterSpacing: face.letterSpacingEm ? `${face.letterSpacingEm}em` : 0,
+  };
+}
+
+/** A laid-out block: one unwrapped line per row, exactly as measured. */
+function Lines({
+  block,
+  face,
+  color,
+}: {
+  block: TextBlock;
+  face: OgTextFace;
+  color: string;
+}): ReactElement {
   return (
     <div
       style={{
         display: 'flex',
-        flexWrap: 'wrap',
-        maxHeight: Math.ceil(lines * style.fontSize * style.lineHeight),
-        overflow: 'hidden',
-        ...style,
+        flexDirection: 'column',
+        ...faceStyle(face),
+        fontSize: block.size,
+        lineHeight: block.lineHeight,
+        whiteSpace: 'nowrap',
+        color,
       }}
     >
-      {units.map((unit, index) => (
-        <span key={index} style={{ display: 'flex', marginRight: unit.spaceAfter ? '0.28em' : 0 }}>
-          {unit.text}
-        </span>
+      {block.lines.map((line, index) => (
+        <div key={index} style={{ display: 'flex' }}>
+          {block.wordGap === undefined ? line : gappedWords(line, block.wordGap)}
+        </div>
       ))}
     </div>
   );
+}
+
+/** A line's words, its spaces drawn as gaps of the measured width. */
+function gappedWords(line: string, gap: number): ReactElement[] {
+  const words = line.split(' ');
+  return words.map((word, index) => (
+    <span key={index} style={{ marginRight: index < words.length - 1 ? gap : 0 }}>
+      {word}
+    </span>
+  ));
 }
 
 function Wordmark({ markSrc, size = 30 }: { markSrc: string; size?: number }): ReactElement {
@@ -139,30 +300,25 @@ function Wordmark({ markSrc, size = 30 }: { markSrc: string; size?: number }): R
       <div
         style={{
           display: 'flex',
-          fontFamily: WORDMARK,
-          fontWeight: 500,
+          ...faceStyle(WORDMARK),
           fontSize: size,
           letterSpacing: '-0.01em',
           color: OG_COLORS.text,
         }}
       >
-        {BRAND}
+        {SITE_NAME}
       </div>
     </div>
   );
 }
 
 function SmallText({
-  typography,
+  face,
   children,
-  mono = false,
-  weight = 400,
   align = 'left',
 }: {
-  typography: OgTypography;
+  face: OgTextFace;
   children: ReactNode;
-  mono?: boolean;
-  weight?: 400 | 500;
   align?: 'left' | 'right';
 }): ReactElement {
   return (
@@ -170,10 +326,10 @@ function SmallText({
       style={{
         display: 'flex',
         justifyContent: align === 'right' ? 'flex-end' : 'flex-start',
-        fontFamily: mono ? MONO : fontFamily(typography.body),
-        fontWeight: weight,
+        ...faceStyle(face),
         fontSize: SMALL_TEXT,
         lineHeight: SMALL_LINE,
+        whiteSpace: 'nowrap',
         color: OG_COLORS.subtle,
       }}
     >
@@ -182,70 +338,26 @@ function SmallText({
   );
 }
 
-interface TextStackProps {
-  typography: OgTypography;
-  eyebrow?: string;
-  title: string;
-  monoTitle: boolean;
-  subhead?: string;
-  width: number;
-  fit: StackFit;
-}
-
 function TextStack({
+  plan,
   typography,
-  eyebrow,
-  title,
   monoTitle,
-  subhead,
   width,
-  fit,
-}: TextStackProps): ReactElement {
-  const { cjk } = typography;
-  const metrics = metricsFor(typography, monoTitle);
+}: {
+  plan: StackPlan;
+  typography: OgTypography;
+  monoTitle: boolean;
+  width: number;
+}): ReactElement {
+  const faces = facesFor(typography, monoTitle);
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: STACK_GAP, width }}>
-      {eyebrow ? (
-        <div
-          style={{
-            display: 'flex',
-            fontFamily: fontFamily(typography.body),
-            fontWeight: 500,
-            fontSize: SMALL_TEXT,
-            lineHeight: SMALL_LINE,
-            letterSpacing: cjk ? 0 : '0.12em',
-            color: OG_COLORS.subtle,
-          }}
-        >
-          {eyebrow}
-        </div>
+      {plan.eyebrow ? (
+        <Lines block={plan.eyebrow} face={faces.eyebrow} color={OG_COLORS.subtle} />
       ) : null}
-      <Clamped
-        text={title}
-        mode={monoTitle ? 'anywhere' : typography.titleBreak}
-        lines={fit.titleLines}
-        style={{
-          fontFamily: monoTitle ? MONO : fontFamily(typography.display),
-          fontWeight: monoTitle ? 500 : typography.displayWeight,
-          fontSize: fit.titleSize,
-          lineHeight: metrics.titleLineHeight,
-          letterSpacing: cjk || monoTitle ? 0 : '-0.03em',
-          color: OG_COLORS.text,
-        }}
-      />
-      {subhead && fit.subheadLines > 0 ? (
-        <Clamped
-          text={subhead}
-          mode={typography.subheadBreak}
-          lines={fit.subheadLines}
-          style={{
-            fontFamily: fontFamily(typography.body),
-            fontWeight: 400,
-            fontSize: fit.subheadSize,
-            lineHeight: metrics.subheadLineHeight,
-            color: OG_COLORS.muted,
-          }}
-        />
+      <Lines block={plan.title} face={faces.title} color={OG_COLORS.text} />
+      {plan.subhead ? (
+        <Lines block={plan.subhead} face={faces.body} color={OG_COLORS.muted} />
       ) : null}
     </div>
   );
@@ -290,39 +402,26 @@ const ground: CSSProperties = {
   color: OG_COLORS.text,
 };
 
-/** Room a text stack has between the wordmark and the footer of each layout. */
-const TEXT_CARD = { width: WIDTH - 160, height: 341 };
-const PLATE_CARD = { width: WIDTH - PLATE_WIDTH - 64 - 48, height: 381 };
-const STRIP_CARD = { width: WIDTH - 2 * STRIP_PADDING_X, height: 175 };
-
-function TextCard(props: CosmicOgCardProps): ReactElement {
-  const { typography, markSrc, eyebrow, title, monoTitle = false, subhead, fact, domain } = props;
-  const fit = fitStack(
-    {
-      title,
-      titleBreak: typography.titleBreak,
-      subhead,
-      subheadBreak: typography.subheadBreak,
-      hasEyebrow: Boolean(eyebrow),
-      ...TEXT_CARD,
-      titleSizes: [80, 72, 64, 56, 48],
-      subheadSizes: [32, 30, 28],
-      maxTitleLines: 3,
-    },
-    metricsFor(typography, monoTitle),
-  );
+function TextCard({
+  props,
+  stack,
+  fact,
+}: {
+  props: CosmicOgCardProps;
+  stack: StackPlan;
+  fact: string;
+}): ReactElement {
+  const { typography, markSrc, monoTitle = false, domain } = props;
+  const body = facesFor(typography, monoTitle).body;
   return (
     <div style={{ ...ground, flexDirection: 'column', padding: '64px 80px 60px' }}>
       <Wordmark markSrc={markSrc} />
       <div style={{ display: 'flex', flex: 1, alignItems: 'center' }}>
         <TextStack
+          plan={stack}
           typography={typography}
-          eyebrow={eyebrow}
-          title={title}
           monoTitle={monoTitle}
-          subhead={subhead}
-          width={TEXT_CARD.width}
-          fit={fit}
+          width={OG_TEXT_BOXES.text.width}
         />
       </div>
       <div
@@ -330,13 +429,13 @@ function TextCard(props: CosmicOgCardProps): ReactElement {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          gap: 32,
+          gap: FOOTER_GAP,
           paddingTop: 28,
           borderTop: `1px solid ${OG_COLORS.rule}`,
         }}
       >
-        <SmallText typography={typography}>{fact ?? ''}</SmallText>
-        <SmallText typography={typography} align="right">
+        <SmallText face={body}>{fact}</SmallText>
+        <SmallText face={body} align="right">
           {domain}
         </SmallText>
       </div>
@@ -344,22 +443,19 @@ function TextCard(props: CosmicOgCardProps): ReactElement {
   );
 }
 
-function PlateCard(props: CosmicOgCardProps & { plate: OgPlate }): ReactElement {
-  const { typography, markSrc, eyebrow, title, monoTitle = false, subhead, domain, plate } = props;
-  const fit = fitStack(
-    {
-      title,
-      titleBreak: typography.titleBreak,
-      subhead,
-      subheadBreak: typography.subheadBreak,
-      hasEyebrow: Boolean(eyebrow),
-      ...PLATE_CARD,
-      titleSizes: [64, 58, 52, 46, 40],
-      subheadSizes: [28],
-      maxTitleLines: 4,
-    },
-    metricsFor(typography, monoTitle),
-  );
+function PlateCard({
+  props,
+  stack,
+  plate,
+  label,
+}: {
+  props: CosmicOgCardProps;
+  stack: StackPlan;
+  plate: OgPlate;
+  label?: TextBlock;
+}): ReactElement {
+  const { typography, markSrc, monoTitle = false, domain } = props;
+  const faces = facesFor(typography, monoTitle);
   return (
     <div style={{ ...ground, flexDirection: 'row' }}>
       <div
@@ -373,15 +469,12 @@ function PlateCard(props: CosmicOgCardProps & { plate: OgPlate }): ReactElement 
       >
         <Wordmark markSrc={markSrc} size={28} />
         <TextStack
+          plan={stack}
           typography={typography}
-          eyebrow={eyebrow}
-          title={title}
           monoTitle={monoTitle}
-          subhead={subhead}
-          width={PLATE_CARD.width}
-          fit={fit}
+          width={OG_TEXT_BOXES.plate.width}
         />
-        <SmallText typography={typography}>{domain}</SmallText>
+        <SmallText face={faces.body}>{domain}</SmallText>
       </div>
       <div
         style={{
@@ -396,11 +489,17 @@ function PlateCard(props: CosmicOgCardProps & { plate: OgPlate }): ReactElement 
         }}
       >
         <Plate plate={plate} width={PLATE_WIDTH} height={Math.round(PLATE_WIDTH / ART_RATIO)} />
-        {plate.label ? (
-          <div style={{ display: 'flex', position: 'absolute', left: 40, right: 40, bottom: 30 }}>
-            <SmallText typography={typography} weight={500}>
-              {plate.label}
-            </SmallText>
+        {label ? (
+          <div
+            style={{
+              display: 'flex',
+              position: 'absolute',
+              left: LABEL_INSET,
+              right: LABEL_INSET,
+              bottom: 30,
+            }}
+          >
+            <Lines block={label} face={faces.label} color={OG_COLORS.subtle} />
           </div>
         ) : null}
       </div>
@@ -408,22 +507,27 @@ function PlateCard(props: CosmicOgCardProps & { plate: OgPlate }): ReactElement 
   );
 }
 
-function StripCard(props: CosmicOgCardProps & { plates: readonly OgPlate[] }): ReactElement {
-  const { typography, markSrc, eyebrow, title, monoTitle = false, domain, plates } = props;
-  const fit = fitStack(
-    {
-      title,
-      titleBreak: typography.titleBreak,
-      subheadBreak: typography.subheadBreak,
-      hasEyebrow: Boolean(eyebrow),
-      ...STRIP_CARD,
-      titleSizes: [60, 54, 48, 42],
-      subheadSizes: [28],
-      maxTitleLines: 2,
-    },
-    metricsFor(typography, monoTitle),
-  );
-  const plateHeight = Math.round(STRIP_PLATE_WIDTH / ART_RATIO);
+/**
+ * Two or three plates across the full measure. Three fill it edge to edge; two
+ * share it, each render contained in the middle of a wider plate, so the
+ * strip never ends in an empty third.
+ */
+function stripPlateWidth(count: number): number {
+  return Math.floor((STRIP_WIDTH - (count - 1) * STRIP_GAP) / count);
+}
+
+function StripCard({
+  props,
+  stack,
+  plates,
+}: {
+  props: CosmicOgCardProps;
+  stack: StackPlan;
+  plates: readonly OgPlate[];
+}): ReactElement {
+  const { typography, markSrc, monoTitle = false, domain } = props;
+  const faces = facesFor(typography, monoTitle);
+  const plateWidth = stripPlateWidth(plates.length);
   return (
     <div
       style={{
@@ -435,27 +539,16 @@ function StripCard(props: CosmicOgCardProps & { plates: readonly OgPlate[] }): R
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Wordmark markSrc={markSrc} size={28} />
-        <SmallText typography={typography} align="right">
+        <SmallText face={faces.body} align="right">
           {domain}
         </SmallText>
       </div>
-      <TextStack
-        typography={typography}
-        eyebrow={eyebrow}
-        title={title}
-        monoTitle={monoTitle}
-        width={STRIP_CARD.width}
-        fit={fit}
-      />
+      <TextStack plan={stack} typography={typography} monoTitle={monoTitle} width={STRIP_WIDTH} />
       <div style={{ display: 'flex', gap: STRIP_GAP }}>
-        {plates.slice(0, 3).map((plate, index) => (
+        {plates.map((plate, index) => (
           <div key={index} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <Plate plate={plate} width={STRIP_PLATE_WIDTH} height={plateHeight} radius={2} />
-            {plate.number ? (
-              <SmallText typography={typography} mono weight={500}>
-                {plate.number}
-              </SmallText>
-            ) : null}
+            <Plate plate={plate} width={plateWidth} height={STRIP_PLATE_HEIGHT} radius={2} />
+            {plate.number ? <SmallText face={MONO}>{plate.number}</SmallText> : null}
           </div>
         ))}
       </div>
@@ -464,9 +557,13 @@ function StripCard(props: CosmicOgCardProps & { plates: readonly OgPlate[] }): R
 }
 
 export function CosmicOgCard(props: CosmicOgCardProps): ReactElement {
-  const art = props.art ?? [];
-  if (art.length >= 2) return <StripCard {...props} plates={art} />;
-  const [plate] = art;
-  if (plate) return <PlateCard {...props} plate={plate} />;
-  return <TextCard {...props} />;
+  const plan = planCosmicOgCard(props);
+  switch (plan.layout) {
+    case 'strip':
+      return <StripCard props={props} stack={plan.stack} plates={plan.plates} />;
+    case 'plate':
+      return <PlateCard props={props} stack={plan.stack} plate={plan.plate} label={plan.label} />;
+    case 'text':
+      return <TextCard props={props} stack={plan.stack} fact={plan.fact} />;
+  }
 }

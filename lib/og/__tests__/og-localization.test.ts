@@ -176,12 +176,14 @@ describe('share-card typography', () => {
     }
   });
 
-  it('breaks Korean only between words and Japanese titles only between phrases', () => {
+  // F228: a card is display type read at thumbnail size; a word split across
+  // lines (オープ/ンソース) is the first thing the eye catches.
+  it('breaks Korean only between words and Japanese only between phrases', () => {
     expect(OG_TYPOGRAPHY.ko).toEqual(
       expect.objectContaining({ titleBreak: 'words', subheadBreak: 'words' }),
     );
     expect(OG_TYPOGRAPHY.ja).toEqual(
-      expect.objectContaining({ titleBreak: 'phrases', subheadBreak: 'anywhere' }),
+      expect.objectContaining({ titleBreak: 'phrases', subheadBreak: 'phrases' }),
     );
     for (const locale of CHINESE_LOCALES) {
       expect(OG_TYPOGRAPHY[locale].titleBreak).toBe('anywhere');

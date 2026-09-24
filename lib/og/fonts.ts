@@ -32,12 +32,13 @@ export interface OgFontFile {
 }
 
 /**
- * Where a line may break.
- *   - `anywhere`: between any two characters (Chinese; Latin at spaces).
+ * Where a line may break (lib/og/text.ts `breakUnits`).
+ *   - `anywhere`: between any two ideographs, and at spaces (Chinese; Latin,
+ *     Cyrillic and Vietnamese), never before a closing mark.
  *   - `words`: only at spaces, never inside a word (Korean, like the site's
  *     `word-break: keep-all`).
- *   - `phrases`: only between phrases (Japanese titles, like the site's
- *     `word-break: auto-phrase`).
+ *   - `phrases`: only between phrases (Japanese, like the site's
+ *     `word-break: auto-phrase` headings).
  */
 export type OgLineBreak = 'anywhere' | 'words' | 'phrases';
 
@@ -55,6 +56,12 @@ export interface OgTypography {
   readonly cjk: boolean;
   readonly titleBreak: OgLineBreak;
   readonly subheadBreak: OgLineBreak;
+  /**
+   * The face a title's word spaces are set in, when not its lead face: CJK
+   * titles lead with Clash Display for their Latin, whose hairline space
+   * would run Korean words together, so the script face spaces them.
+   */
+  readonly titleSpaces?: OgFontFile;
 }
 
 /*
@@ -200,6 +207,7 @@ const cjk = (
   displayWeight: 700,
   body: [...BODY_LATIN, notoRegular],
   cjk: true,
+  titleSpaces: notoBold,
   ...breaks,
 });
 
@@ -227,8 +235,10 @@ export const OG_TYPOGRAPHY: LocaleRecord<OgTypography> = {
   uk: alphabetic(ONEST_500),
   // Korean is space-delimited: a word never splits between syllables.
   ko: cjk(NOTO_KR_700, NOTO_KR_400, { titleBreak: 'words', subheadBreak: 'words' }),
-  // Japanese titles break between phrases; running text keeps per-character breaking.
-  ja: cjk(NOTO_JP_700, NOTO_JP_400, { titleBreak: 'phrases', subheadBreak: 'anywhere' }),
+  // Japanese breaks between phrases. The site's running text breaks per
+  // character, but a card is display type read at thumbnail size, where a
+  // word split across lines (オープ/ンソース) is the first thing the eye catches.
+  ja: cjk(NOTO_JP_700, NOTO_JP_400, { titleBreak: 'phrases', subheadBreak: 'phrases' }),
   vi: alphabetic(ONEST_500),
 };
 
@@ -243,9 +253,14 @@ export function getOgTypography(locale: string | undefined): OgTypography {
   return pickByLocale(OG_TYPOGRAPHY, locale);
 }
 
-/** CSS `font-family` value for a stack. */
-export function fontFamily(stack: readonly OgFontFile[]): string {
-  return Array.from(new Set(stack.map(({ family }) => `'${family}'`))).join(', ');
+/** A stack's families in fallback order, each once. */
+export function fontFamilies(stack: readonly OgFontFile[]): string[] {
+  return Array.from(new Set(stack.map(({ family }) => family)));
+}
+
+/** CSS `font-family` value for a list of families: `'Clash Display', 'Inter'`. */
+export function cssFontFamily(families: readonly string[]): string {
+  return families.map((family) => `'${family}'`).join(', ');
 }
 
 /** Every distinct file a locale's cards embed. */
