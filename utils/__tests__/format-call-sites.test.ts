@@ -47,7 +47,6 @@ const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
   'components/anchoring/GlobalAnchorDistributionsTable.tsx': 2,
   'components/anchoring/RetrievedCSTAnchorDistributionsTable.tsx': 2,
   'components/anchoring/UnretrievedCSTAnchorDistributionsTable.tsx': 5,
-  'components/attachments/DonatedNFTPrizeShowcase.tsx': 2,
   'components/common/Allocation.tsx': 5,
   'components/home/AuctionInfo.tsx': 1,
   'components/home/deck/DeckPersonalStrip.tsx': 3,

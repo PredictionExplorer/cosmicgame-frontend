@@ -2,19 +2,21 @@
 
 import type { ReactNode } from 'react';
 import { formatUnits } from 'viem';
-import { ExternalLink, ImageOff, Sparkles } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { ArrowUpRight, ImageOff } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 
-import { getExplorerUrl, shortenHex } from '@/utils';
+import { getExplorerUrl } from '@/utils';
 
+import { formatAddress, formatNumber } from '@/utils/format';
 import { AttachedAssetsIcon } from '@/lib/conceptIcons';
-import { Link } from '@/i18n/navigation';
-import NFTImage from '@/components/nft/NFTImage';
-import { InfoTooltip } from '@/components/ui/info-tooltip';
-import { Surface } from '@/components/ui/surface';
 import { cn } from '@/lib/utils';
 import type { AttachedNFT, DonatedERC20Token } from '@/services/api/types';
-import { formatFixed } from '@/utils/format';
+import NFTImage from '@/components/nft/NFTImage';
+import { AddressChip } from '@/components/ui/address-chip';
+import { Badge } from '@/components/ui/badge';
+import { buttonVariants } from '@/components/ui/button';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
+import { Surface } from '@/components/ui/surface';
 
 import {
   buildOpenSeaAssetUrl,
@@ -30,29 +32,31 @@ import { TokenLogo } from './TokenLogo';
 const MAX_NFT_PREVIEW = 4;
 const MAX_ERC20_PREVIEW = 4;
 
-type AssetTone = 'nft' | 'erc20';
+type ShowcaseVariant = 'default' | 'rail';
 
-const assetTones: Record<AssetTone, { card: string; media: string; chip: string }> = {
-  nft: {
-    card: 'bg-[linear-gradient(135deg,rgb(255_255_255/0.046),rgb(255_255_255/0.016)_50%,rgb(var(--nebula-violet-rgb)/0.075))]',
-    media: 'shadow-[0_0_70px_-36px_rgb(var(--nebula-violet-rgb)/0.9)]',
-    chip: 'border-[rgb(var(--nebula-violet-rgb)/0.24)] bg-[rgb(var(--nebula-violet-rgb)/0.10)] text-[rgb(var(--stellar-white-rgb))]',
-  },
-  erc20: {
-    card: 'bg-[linear-gradient(135deg,rgb(var(--impact-green-rgb)/0.085),rgb(255_255_255/0.018)_54%,rgb(var(--aurora-cyan-rgb)/0.07))]',
-    media: 'shadow-[0_0_70px_-36px_rgb(var(--impact-green-rgb)/0.9)]',
-    chip: 'border-[rgb(var(--impact-green-rgb)/0.22)] bg-[rgb(var(--impact-green-rgb)/0.10)] text-[rgb(var(--impact-green-rgb))]',
-  },
-};
+/**
+ * The frame every asset in the showcase hangs in: a landscape well the same
+ * size for an NFT's art (on the black plate) and an ERC-20's logo, so a mixed
+ * row lines up.
+ */
+const ASSET_FRAME_CLASS =
+  'relative mx-auto flex aspect-[4/3] max-h-[420px] w-full max-w-3xl items-center justify-center overflow-hidden rounded-edge';
 
 interface AttachedNFTAllocationShowcaseProps {
   nfts: AttachedNFT[];
   erc20Tokens?: DonatedERC20Token[];
   cycleNumber?: number;
   className?: string;
-  variant?: 'default' | 'rail';
+  variant?: ShowcaseVariant;
 }
 
+/**
+ * The assets attached to a cycle's Signature Allocation: a header that says
+ * what travels with the allocation and to whom, one hairline band of facts,
+ * then up to four NFTs on black plates and four ERC-20 deposits, each with a
+ * wall label (name, collection or token, number and contributor) and its
+ * outbound links. `rail` stacks everything for a narrow column.
+ */
 export function AttachedNFTAllocationShowcase({
   nfts,
   erc20Tokens = [],
@@ -64,6 +68,7 @@ export function AttachedNFTAllocationShowcase({
 
   if (nfts.length === 0 && erc20Tokens.length === 0) return null;
 
+  const rail = variant === 'rail';
   const cycleLabel =
     cycleNumber ?? nfts[0]?.RoundNum ?? erc20Tokens[0]?.RoundNum ?? t('showcase.cycleFallback');
   const previewNfts = nfts.slice(0, MAX_NFT_PREVIEW);
@@ -104,132 +109,123 @@ export function AttachedNFTAllocationShowcase({
           ? t('showcase.remainder.erc20Only', { erc20Count: hiddenErc20Count })
           : '';
 
+  // One asset gets the featured layout (art beside its label at wide sizes);
+  // a rail stacks; otherwise the grid follows the count so no row is ragged
+  // when it need not be.
+  const single = totalPreviewCount === 1;
+  const gridClass = rail
+    ? 'grid-cols-1'
+    : single
+      ? 'grid-cols-1'
+      : totalPreviewCount === 2
+        ? 'sm:grid-cols-2'
+        : totalPreviewCount === 4
+          ? 'sm:grid-cols-2 xl:grid-cols-4'
+          : 'sm:grid-cols-2 lg:grid-cols-3';
+  const layout: AssetLayout = single && !rail ? 'featured' : 'tile';
+
   return (
     <section
       data-testid="attached-nft-showcase"
       data-variant={variant}
       aria-labelledby="attached-nft-allocation-title"
-      className={cn('print-motion-visible', variant === 'rail' ? 'my-0' : 'my-8', className)}
+      className={cn('print-motion-visible', rail ? 'my-0' : 'my-8', className)}
     >
-      <Surface variant="gradient-border-accent" radius="xl" padding="none" className="isolate">
-        <div className="pointer-events-none absolute -left-20 top-10 h-52 w-52 rounded-full bg-[rgb(var(--solar-gold-rgb)/0.16)] blur-3xl" />
-        <div className="pointer-events-none absolute -right-20 -top-16 h-64 w-64 rounded-full bg-primary/18 blur-3xl" />
-        <div className="pointer-events-none absolute bottom-0 left-1/2 h-32 w-3/5 -translate-x-1/2 bg-[radial-gradient(ellipse,rgb(var(--aurora-cyan-rgb)/0.14),transparent_68%)] blur-2xl" />
-
-        <div className={cn('relative p-5', variant === 'rail' ? 'sm:p-6' : 'sm:p-7 lg:p-8')}>
-          <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
-            <div className="max-w-3xl">
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[rgb(var(--solar-gold-rgb)/0.22)] bg-[rgb(var(--solar-gold-rgb)/0.10)] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-[rgb(var(--solar-gold-rgb))]">
-                <Sparkles className="h-3.5 w-3.5" />
-                {t('showcase.badge')}
-              </div>
-              <h2
-                id="attached-nft-allocation-title"
-                className={cn(
-                  'font-display text-2xl font-bold tracking-tight text-white',
-                  variant === 'default' && 'sm:text-3xl',
-                )}
-              >
-                {t('showcase.heading')}
-              </h2>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
-                {receiptDescription}
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.04] px-4 py-3 shadow-[0_18px_70px_-48px_rgb(var(--aurora-cyan-rgb)/0.9)]">
-              <AttachedAssetsIcon className="h-5 w-5 text-primary" />
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  {t('showcase.bonusReceipt.label')}
-                </p>
-                <p className="text-sm font-bold text-white">{allocationSummary}</p>
-              </div>
-            </div>
-          </div>
-
-          <div
+      <Surface
+        variant="outlined"
+        padding="none"
+        className={cn('p-5', rail ? 'sm:p-6' : 'sm:p-7 lg:p-8')}
+      >
+        <header className="max-w-3xl">
+          <p className="flex items-center gap-2 type-eyebrow text-secondary">
+            <AttachedAssetsIcon aria-hidden className="size-4" />
+            {t('showcase.badge')}
+          </p>
+          <h2
+            id="attached-nft-allocation-title"
+            className={cn('mt-3 text-foreground', rail ? 'type-heading-3' : 'type-heading-2')}
+          >
+            {t('showcase.heading')}
+          </h2>
+          <p
             className={cn(
-              'mb-6 grid gap-2 sm:grid-cols-2',
-              variant === 'default' ? 'lg:grid-cols-4' : 'xl:grid-cols-2 2xl:grid-cols-4',
+              'mt-3 max-w-[var(--measure-lede)] text-muted-foreground',
+              rail ? 'type-body-sm' : 'type-body-md',
             )}
           >
-            <SummaryChip
-              label={t('showcase.summary.assetsIncluded')}
-              value={String(totalAssetCount)}
-            />
-            <SummaryChip
-              label={t('showcase.summary.cycle')}
-              value={t('showcase.summary.cycleValue', { cycle: cycleLabel })}
-            />
-            <SummaryChip label={t('showcase.summary.preview')} value={previewCopy} />
-            <SummaryChip
-              label={t('showcase.summary.recipientRule')}
-              value={t('showcase.summary.recipientRuleValue')}
-            />
-          </div>
+            {receiptDescription}
+          </p>
+        </header>
 
-          <div
-            className={cn(
-              'grid items-start gap-4',
-              totalPreviewCount === 1
-                ? 'grid-cols-1'
-                : variant === 'rail'
-                  ? 'grid-cols-1'
-                  : totalPreviewCount === 3 || totalPreviewCount > 4
-                    ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3'
-                    : 'grid-cols-1 md:grid-cols-2',
-            )}
-          >
-            {previewNfts.map((nft, index) => (
-              <AttachedNFTAllocationCard
-                key={String(
-                  nft.RecordId ?? `${nft.TokenAddr}-${getAttachedNftTokenId(nft) ?? index}`,
-                )}
-                nft={nft}
-                featured={index === 0}
-                variant={variant}
-              />
-            ))}
-            {previewErc20Tokens.map((token, index) => (
-              <AttachedERC20AllocationCard
-                key={String(token.EvtLogId ?? `${token.TokenAddr}-${token.RoundNum}-${index}`)}
-                token={token}
-                variant={variant}
-              />
-            ))}
-          </div>
+        <dl
+          className={cn(
+            'mt-6 grid grid-cols-2 gap-x-6 gap-y-4 border-y border-rule-faint py-4',
+            !rail && 'lg:grid-cols-4',
+          )}
+        >
+          <SummaryFact label={t('showcase.bonusReceipt.label')} value={allocationSummary} />
+          <SummaryFact
+            label={t('showcase.summary.cycle')}
+            value={t('showcase.summary.cycleValue', { cycle: cycleLabel })}
+          />
+          <SummaryFact label={t('showcase.summary.preview')} value={previewCopy} />
+          <SummaryFact
+            label={t('showcase.summary.recipientRule')}
+            value={t('showcase.summary.recipientRuleValue')}
+          />
+        </dl>
 
-          {remainderCopy ? (
-            <p className="mt-4 rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-3 text-sm text-muted-foreground">
-              {remainderCopy}
-            </p>
-          ) : null}
+        <div className={cn('mt-6 grid items-start gap-x-6 gap-y-10', gridClass)}>
+          {previewNfts.map((nft, index) => (
+            <AttachedNFTAllocationCard
+              key={String(
+                nft.RecordId ?? `${nft.TokenAddr}-${getAttachedNftTokenId(nft) ?? index}`,
+              )}
+              nft={nft}
+              featured={index === 0}
+              layout={layout}
+            />
+          ))}
+          {previewErc20Tokens.map((token, index) => (
+            <AttachedERC20AllocationCard
+              key={String(token.EvtLogId ?? `${token.TokenAddr}-${token.RoundNum}-${index}`)}
+              token={token}
+              layout={layout}
+            />
+          ))}
         </div>
+
+        {remainderCopy ? (
+          <p className="mt-8 border-t border-rule-faint pt-4 type-body-sm text-muted-foreground">
+            {remainderCopy}
+          </p>
+        ) : null}
       </Surface>
     </section>
   );
 }
 
-function formatDisplayDecimal(value: string) {
-  const [whole, fraction] = value.split('.');
-  if (!fraction) return whole;
-  const trimmedFraction = fraction.replace(/0+$/, '').slice(0, 8).replace(/0+$/, '');
-  return trimmedFraction ? `${whole}.${trimmedFraction}` : whole;
+type AssetLayout = 'featured' | 'tile';
+
+/** Display precision: up to 8 decimals below 1 (small balances), 4 above. */
+function amountDigits(amount: number): number {
+  return Math.abs(amount) < 1 && amount !== 0 ? 8 : 4;
 }
 
-function formatFiniteAmount(amount: number) {
-  if (!Number.isFinite(amount)) return '0';
-  const precision = Math.abs(amount) < 1 && amount !== 0 ? 8 : 4;
-  return formatDisplayDecimal(amount.toFixed(precision));
+function formatAttachedAmount(amount: number, locale: string): string {
+  return formatNumber(amount, locale, { maximumFractionDigits: amountDigits(amount) });
 }
 
-function getAttachedErc20Amount(token: DonatedERC20Token, decimals: number, unknownLabel: string) {
+function getAttachedErc20Amount(
+  token: DonatedERC20Token,
+  decimals: number,
+  locale: string,
+): string | null {
   if (typeof token.AmountDonatedEth === 'number' && Number.isFinite(token.AmountDonatedEth)) {
-    return formatFiniteAmount(token.AmountDonatedEth);
+    return formatAttachedAmount(token.AmountDonatedEth, locale);
   }
   if (typeof token.AmountEth === 'number' && Number.isFinite(token.AmountEth)) {
-    return formatFiniteAmount(token.AmountEth);
+    return formatAttachedAmount(token.AmountEth, locale);
   }
 
   const rawAmount =
@@ -240,73 +236,98 @@ function getAttachedErc20Amount(token: DonatedERC20Token, decimals: number, unkn
         : '';
   if (/^\d+$/.test(rawAmount)) {
     try {
-      return formatDisplayDecimal(formatUnits(BigInt(rawAmount), decimals));
+      const amount = Number(formatUnits(BigInt(rawAmount), decimals));
+      return Number.isFinite(amount) ? formatAttachedAmount(amount, locale) : null;
     } catch {
-      return unknownLabel;
+      return null;
     }
   }
-  return unknownLabel;
+  return null;
 }
 
-function SummaryChip({ label, value }: { label: string; value: string }) {
+function SummaryFact({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] px-3 py-2.5">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-        {label}
-      </p>
-      <p className="mt-1 truncate text-sm font-semibold text-white">{value}</p>
+    <div className="min-w-0">
+      <dt className="type-caption text-subtle">{label}</dt>
+      <dd className="mt-1 type-body-sm font-medium text-foreground [overflow-wrap:anywhere]">
+        {value}
+      </dd>
     </div>
   );
 }
 
-function AssetCardShell({ tone, children }: { tone: AssetTone; children: ReactNode }) {
+/** The featured layout puts the frame beside the label once the card is wide enough. */
+function AssetLayoutGrid({ layout, children }: { layout: AssetLayout; children: ReactNode }) {
   return (
-    <article
-      className={cn(
-        '@container group relative min-w-0 overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.035] p-4 transition-all duration-300',
-        'hover:-translate-y-0.5 hover:border-white/[0.14] hover:bg-white/[0.05]',
-        'before:pointer-events-none before:absolute before:inset-x-5 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/30 before:to-transparent',
-        assetTones[tone].card,
-      )}
-    >
-      {children}
+    <article className="@container min-w-0">
+      <div
+        className={cn(
+          'grid min-w-0 gap-5',
+          layout === 'featured' &&
+            '@2xl:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] @2xl:items-center @2xl:gap-10',
+        )}
+      >
+        {children}
+      </div>
     </article>
   );
 }
 
-function AssetTypeBadge({
-  tone,
-  children,
-  tooltip,
+function AssetFacts({ children }: { children: ReactNode }) {
+  return (
+    <dl className="mt-4 grid grid-cols-2 gap-x-4 border-t border-rule-faint pt-3">{children}</dl>
+  );
+}
+
+function AssetFact({ label, value }: { label: string; value: ReactNode }) {
+  return (
+    <div className="min-w-0">
+      <dt className="type-caption text-subtle">{label}</dt>
+      {/* min-h-6 matches the address link's touch height, so both values share a baseline. */}
+      <dd className="mt-0.5 flex min-h-6 min-w-0 items-center overflow-hidden whitespace-nowrap type-mono-sm text-foreground">
+        {value}
+      </dd>
+    </div>
+  );
+}
+
+function AssetAction({
+  href,
+  label,
+  primary = false,
 }: {
-  tone: AssetTone;
-  children: ReactNode;
-  tooltip?: string;
+  href: string;
+  label: string;
+  primary?: boolean;
 }) {
   return (
-    <span
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium',
-        assetTones[tone].chip,
+        buttonVariants({ variant: primary ? 'outline' : 'ghost', size: 'sm' }),
+        'gap-1.5',
       )}
     >
-      {children}
-      {tooltip ? <InfoTooltip content={tooltip} /> : null}
-    </span>
+      {label}
+      <ArrowUpRight aria-hidden className="size-3.5 text-subtle" />
+    </a>
   );
 }
 
 function AttachedNFTAllocationCard({
   nft,
   featured,
-  variant,
+  layout,
 }: {
   nft: AttachedNFT;
   featured: boolean;
-  variant: AttachedNFTAllocationShowcaseProps['variant'];
+  layout: AssetLayout;
 }) {
   const t = useTranslations('currentCycle');
   const tStatistics = useTranslations('statistics');
+  const locale = useLocale();
   const { data: metadata, isError } = useAttachedNftMetadata(nft.NFTTokenURI, {
     tokenAddr: nft.TokenAddr,
     tokenId: getAttachedNftTokenId(nft),
@@ -344,271 +365,203 @@ function AttachedNFTAllocationCard({
   const imageAlt = metadata?.name
     ? t('showcase.nftCard.imageAlt', { name: metadata.name })
     : t('showcase.nftCard.imageAltFallback');
-  const mediaClassName = cn(
-    'group/media mx-auto flex aspect-[4/3] max-h-[420px] w-full max-w-3xl items-center justify-center overflow-hidden rounded-xl border border-white/[0.08] bg-black/25 p-2',
-    assetTones.nft.media,
+  const frameClassName = cn(
+    ASSET_FRAME_CLASS,
+    'group/media bg-art-ground shadow-[var(--art-edge)] transition-shadow duration-[var(--duration-fast)]',
+    primaryLink.href && 'hover:shadow-[var(--art-edge-active)]',
+  );
+  const image = (
+    <NFTImage
+      src={metadata?.image}
+      fallbackSrc={metadata?.imageFallback}
+      alt={imageAlt}
+      priority={featured}
+      sizes={
+        layout === 'featured'
+          ? '(min-width: 1024px) 40rem, 100vw'
+          : '(min-width: 1280px) 20rem, (min-width: 640px) 50vw, 100vw'
+      }
+      className="h-full w-full bg-transparent object-contain"
+    />
   );
 
   return (
-    <AssetCardShell tone="nft">
-      <div
-        className={cn(
-          'grid min-w-0 items-start gap-4',
-          variant === 'default' && '@xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]',
-        )}
-      >
-        <div>
-          {primaryLink.href ? (
-            <a
-              href={primaryLink.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={mediaClassName}
-              aria-label={t('showcase.nftCard.mediaAria', { label: primaryLabel, title })}
-              data-testid="nft-allocation-media"
-            >
-              <NFTImage
-                src={metadata?.image}
-                fallbackSrc={metadata?.imageFallback}
-                alt={imageAlt}
-                priority={featured}
-                sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 720px"
-                className="max-h-[396px] transition-transform duration-500 group-hover/media:scale-[1.025]"
-              />
-            </a>
-          ) : (
-            <div className={mediaClassName} data-testid="nft-allocation-media">
-              <NFTImage
-                src={metadata?.image}
-                fallbackSrc={metadata?.imageFallback}
-                alt={imageAlt}
-                priority={featured}
-                sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 720px"
-                className="max-h-[396px]"
-              />
-            </div>
-          )}
+    <AssetLayoutGrid layout={layout}>
+      {primaryLink.href ? (
+        <a
+          href={primaryLink.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={frameClassName}
+          aria-label={t('showcase.nftCard.mediaAria', { label: primaryLabel, title })}
+          data-testid="nft-allocation-media"
+        >
+          {image}
+        </a>
+      ) : (
+        <div className={frameClassName} data-testid="nft-allocation-media">
+          {image}
+        </div>
+      )}
+
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge tone="neutral" size="sm">
+            {t('showcase.nftCard.badge')}
+          </Badge>
+          {estimate ? (
+            <Badge tone="neutral" size="sm">
+              {t('showcase.nftCard.floorEstimate', {
+                price: formatNumber(estimate.floorPriceEth, locale, { maximumFractionDigits: 3 }),
+                currency: estimate.currency,
+              })}
+              <InfoTooltip content={t('showcase.nftCard.floorTooltip')} />
+            </Badge>
+          ) : null}
         </div>
 
-        <div className="flex min-w-0 flex-col justify-between gap-4">
-          <div>
-            <div className="mb-3 flex flex-wrap items-center gap-2">
-              <AssetTypeBadge tone="nft">{t('showcase.nftCard.badge')}</AssetTypeBadge>
-              {estimate ? (
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-[rgb(var(--solar-gold-rgb)/0.25)] bg-[rgb(var(--solar-gold-rgb)/0.10)] px-2.5 py-1 text-xs font-medium text-[rgb(var(--solar-gold-rgb))]">
-                  {t('showcase.nftCard.floorEstimate', {
-                    price: formatFixed(estimate.floorPriceEth, 3),
-                    currency: estimate.currency,
-                  })}
-                  <InfoTooltip content={t('showcase.nftCard.floorTooltip')} />
-                </span>
-              ) : null}
-            </div>
+        <h3 className="mt-3 truncate type-title text-foreground">{title}</h3>
+        <p className="mt-0.5 truncate type-caption text-subtle">{subtitle}</p>
 
-            <h3 className="truncate font-display text-xl font-bold tracking-tight text-white">
-              {title}
-            </h3>
-            <p className="mt-1 truncate text-sm text-muted-foreground">{subtitle}</p>
+        {isError ? (
+          <p className="mt-3 flex items-center gap-2 type-caption text-subtle">
+            <ImageOff aria-hidden className="size-3.5 shrink-0" />
+            {t('showcase.nftCard.metadataUnavailable')}
+          </p>
+        ) : metadata?.description && layout === 'featured' ? (
+          <p className="mt-3 line-clamp-3 type-body-sm text-muted-foreground">
+            {metadata.description}
+          </p>
+        ) : null}
 
-            {isError ? (
-              <p className="mt-3 inline-flex items-center gap-2 rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-xs text-muted-foreground">
-                <ImageOff className="h-3.5 w-3.5" />
-                {t('showcase.nftCard.metadataUnavailable')}
-              </p>
-            ) : metadata?.description && featured ? (
-              <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
-                {metadata.description}
-              </p>
-            ) : null}
-          </div>
+        <AssetFacts>
+          <AssetFact
+            label={t('showcase.facts.tokenId')}
+            value={
+              tokenId
+                ? t('showcase.facts.tokenIdValue', { id: tokenId })
+                : t('showcase.facts.unknown')
+            }
+          />
+          <AssetFact
+            label={t('showcase.facts.attachedBy')}
+            value={
+              nft.DonorAddr ? (
+                <AddressChip address={nft.DonorAddr} variant="plain" showCopy={false} />
+              ) : (
+                t('showcase.facts.unknown')
+              )
+            }
+          />
+        </AssetFacts>
 
-          <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <AssetFact
-                label={t('showcase.facts.tokenId')}
-                value={
-                  tokenId
-                    ? t('showcase.facts.tokenIdValue', { id: tokenId })
-                    : t('showcase.facts.unknown')
-                }
-              />
-              <AssetFact
-                label={t('showcase.facts.attachedBy')}
-                value={
-                  nft.DonorAddr ? (
-                    <Link href={`/user/${nft.DonorAddr}`} className="hover:text-primary">
-                      {shortenHex(nft.DonorAddr, 5)}
-                    </Link>
-                  ) : (
-                    t('showcase.facts.unknown')
-                  )
-                }
-              />
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {primaryLink.href ? (
-                <AssetAction href={primaryLink.href} label={primaryLabel} primary />
-              ) : null}
-              {openSeaUrl && primaryLink.href !== openSeaUrl ? (
-                <AssetAction href={openSeaUrl} label={t('showcase.nftCard.openSea')} />
-              ) : null}
-              {explorerLink.href ? (
-                <AssetAction href={explorerLink.href} label={t('showcase.nftCard.explorer')} />
-              ) : null}
-            </div>
-          </div>
+        <div className="mt-4 flex flex-wrap gap-1">
+          {primaryLink.href ? (
+            <AssetAction href={primaryLink.href} label={primaryLabel} primary />
+          ) : null}
+          {openSeaUrl && primaryLink.href !== openSeaUrl ? (
+            <AssetAction href={openSeaUrl} label={t('showcase.nftCard.openSea')} />
+          ) : null}
+          {explorerLink.href ? (
+            <AssetAction href={explorerLink.href} label={t('showcase.nftCard.explorer')} />
+          ) : null}
         </div>
       </div>
-    </AssetCardShell>
+    </AssetLayoutGrid>
   );
 }
 
 function AttachedERC20AllocationCard({
   token,
-  variant,
+  layout,
 }: {
   token: DonatedERC20Token;
-  variant: AttachedNFTAllocationShowcaseProps['variant'];
+  layout: AssetLayout;
 }) {
   const t = useTranslations('currentCycle');
+  const locale = useLocale();
   const { data: metadata } = useAttachedErc20Metadata(token.TokenAddr);
   const symbol = metadata?.symbol || t('showcase.erc20Card.symbolFallback');
-  const amount = getAttachedErc20Amount(
-    token,
-    metadata?.decimals ?? 18,
-    t('showcase.erc20Card.unknownAmount'),
-  );
+  const amount =
+    getAttachedErc20Amount(token, metadata?.decimals ?? 18, locale) ??
+    t('showcase.erc20Card.unknownAmount');
   const tokenName = metadata?.name || t('showcase.erc20Card.nameFallback');
   const explorerHref = token.TokenAddr ? getExplorerUrl('token', token.TokenAddr) : '';
   const logoSource = metadata?.logoSource ?? t('showcase.erc20Card.logoSourceFallback');
 
   return (
-    <AssetCardShell tone="erc20">
-      <div
-        className={cn(
-          'grid min-w-0 items-start gap-4',
-          variant === 'default' && '@xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]',
-        )}
-      >
-        <TokenLogo
-          logoURI={metadata?.logoURI}
-          symbol={symbol}
-          name={tokenName}
-          className={assetTones.erc20.media}
-        />
+    <AssetLayoutGrid layout={layout}>
+      <TokenLogo
+        logoURI={metadata?.logoURI}
+        symbol={symbol}
+        name={tokenName}
+        className={cn(ASSET_FRAME_CLASS, 'bg-surface-sunken')}
+      />
 
-        <div className="flex min-w-0 flex-col justify-between gap-4">
-          <div>
-            <div className="mb-3 flex flex-wrap items-center gap-2">
-              <AssetTypeBadge
-                tone="erc20"
-                tooltip={
-                  metadata?.logoURI
-                    ? t('showcase.erc20Card.badgeTooltipLogo', { source: logoSource })
-                    : t('showcase.erc20Card.badgeTooltipDefault')
-                }
-              >
-                {t('showcase.erc20Card.badge')}
-              </AssetTypeBadge>
-            </div>
-
-            <h3
-              className="mt-4 inline-flex max-w-full items-baseline gap-2 rounded-2xl border border-[rgb(var(--impact-green-rgb)/0.24)] bg-[linear-gradient(135deg,rgb(var(--impact-green-rgb)/0.13),rgb(var(--aurora-cyan-rgb)/0.08))] px-4 py-3 shadow-[0_0_70px_-34px_rgb(var(--impact-green-rgb)/0.9)]"
-              data-testid="erc20-attached-amount"
-              aria-label={`${amount} ${symbol}`}
-            >
-              <span className="font-display text-3xl font-bold tracking-tight bg-gradient-to-r from-[rgb(var(--impact-green-rgb))] via-[rgb(var(--aurora-cyan-rgb))] to-primary bg-clip-text text-transparent sm:text-4xl">
-                {amount}
-              </span>{' '}
-              <span className="text-base font-semibold text-white/85 sm:text-lg">{symbol}</span>
-            </h3>
-            <p className="mt-1 truncate text-sm text-muted-foreground">{tokenName}</p>
-          </div>
-
-          <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <AssetFact
-                label={t('showcase.facts.token')}
-                value={
-                  explorerHref ? (
-                    <a
-                      href={explorerHref}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="hover:text-primary"
-                    >
-                      {shortenHex(token.TokenAddr, 5)}
-                    </a>
-                  ) : (
-                    t('showcase.facts.unknown')
-                  )
-                }
-              />
-              <AssetFact
-                label={t('showcase.facts.attachedBy')}
-                value={
-                  token.DonorAddr ? (
-                    <Link href={`/user/${token.DonorAddr}`} className="hover:text-primary">
-                      {shortenHex(token.DonorAddr, 5)}
-                    </Link>
-                  ) : (
-                    t('showcase.facts.unknown')
-                  )
-                }
-              />
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {explorerHref ? (
-                <AssetAction
-                  href={explorerHref}
-                  label={t('showcase.erc20Card.viewToken', { symbol })}
-                  primary
-                />
-              ) : null}
-            </div>
-          </div>
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge tone="neutral" size="sm">
+            {t('showcase.erc20Card.badge')}
+            <InfoTooltip
+              content={
+                metadata?.logoURI
+                  ? t('showcase.erc20Card.badgeTooltipLogo', { source: logoSource })
+                  : t('showcase.erc20Card.badgeTooltipDefault')
+              }
+            />
+          </Badge>
         </div>
+
+        <h3
+          className="mt-3 flex min-w-0 flex-wrap items-baseline gap-x-2"
+          data-testid="erc20-attached-amount"
+          aria-label={`${amount} ${symbol}`}
+        >
+          <span className="type-figure-lg tabular-nums text-foreground">{amount}</span>{' '}
+          <span className="type-title text-muted-foreground">{symbol}</span>
+        </h3>
+        <p className="mt-0.5 truncate type-caption text-subtle">{tokenName}</p>
+
+        <AssetFacts>
+          <AssetFact
+            label={t('showcase.facts.token')}
+            value={
+              explorerHref ? (
+                <a
+                  href={explorerHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="link-quiet"
+                >
+                  {formatAddress(token.TokenAddr)}
+                </a>
+              ) : (
+                t('showcase.facts.unknown')
+              )
+            }
+          />
+          <AssetFact
+            label={t('showcase.facts.attachedBy')}
+            value={
+              token.DonorAddr ? (
+                <AddressChip address={token.DonorAddr} variant="plain" showCopy={false} />
+              ) : (
+                t('showcase.facts.unknown')
+              )
+            }
+          />
+        </AssetFacts>
+
+        {explorerHref ? (
+          <div className="mt-4 flex flex-wrap gap-1">
+            <AssetAction
+              href={explorerHref}
+              label={t('showcase.erc20Card.viewToken', { symbol })}
+              primary
+            />
+          </div>
+        ) : null}
       </div>
-    </AssetCardShell>
-  );
-}
-
-function AssetFact({ label, value }: { label: string; value: ReactNode }) {
-  return (
-    <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-3 transition-colors group-hover:bg-white/[0.045]">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-        {label}
-      </p>
-      <div className="mt-1 truncate font-mono text-xs text-white">{value}</div>
-    </div>
-  );
-}
-
-function AssetAction({
-  href,
-  label,
-  primary = false,
-}: {
-  href: string;
-  label: string;
-  primary?: boolean;
-}) {
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={cn(
-        'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
-        primary
-          ? 'border-primary/30 bg-primary/12 text-primary hover:bg-primary/18'
-          : 'border-white/[0.08] bg-white/[0.035] text-muted-foreground hover:border-primary/25 hover:text-primary',
-      )}
-    >
-      {label}
-      <ExternalLink className="h-3.5 w-3.5" />
-    </a>
+    </AssetLayoutGrid>
   );
 }
