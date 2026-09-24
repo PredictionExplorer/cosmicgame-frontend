@@ -11,15 +11,22 @@ describe('Button', () => {
     expect(button).toHaveClass('inline-flex');
   });
 
-  it.each(['default', 'destructive', 'outline', 'secondary', 'ghost', 'link', 'text'] as const)(
-    'renders with variant="%s"',
-    (variant) => {
-      render(<Button variant={variant}>{variant} button</Button>);
-      expect(screen.getByRole('button', { name: new RegExp(variant, 'i') })).toBeInTheDocument();
-    },
-  );
+  it.each([
+    'default',
+    'commit',
+    'destructive',
+    'outline',
+    'secondary',
+    'ghost',
+    'quiet',
+    'link',
+    'text',
+  ] as const)('renders with variant="%s"', (variant) => {
+    render(<Button variant={variant}>{variant} button</Button>);
+    expect(screen.getByRole('button', { name: new RegExp(variant, 'i') })).toBeInTheDocument();
+  });
 
-  it.each(['default', 'sm', 'lg', 'icon'] as const)('renders with size="%s"', (size) => {
+  it.each(['default', 'sm', 'lg', 'xl', 'icon'] as const)('renders with size="%s"', (size) => {
     render(<Button size={size}>btn</Button>);
     expect(screen.getByRole('button', { name: /btn/i })).toBeInTheDocument();
   });
@@ -51,6 +58,47 @@ describe('Button', () => {
   it('applies custom className', () => {
     render(<Button className="custom-class">Styled</Button>);
     expect(screen.getByRole('button', { name: /styled/i })).toHaveClass('custom-class');
+  });
+
+  it('renders labels as written, never in forced Title Case', () => {
+    for (const variant of ['default', 'commit', 'outline', 'secondary'] as const) {
+      const { unmount } = render(<Button variant={variant}>Make a gesture</Button>);
+      expect(screen.getByRole('button', { name: 'Make a gesture' })).not.toHaveClass('capitalize');
+      unmount();
+    }
+  });
+
+  it('eases every property that changes on hover and press', () => {
+    render(<Button>Ease</Button>);
+    const button = screen.getByRole('button', { name: 'Ease' });
+    const transition = [...button.classList].find((name) => name.startsWith('transition-'));
+    expect(transition).toEqual(expect.stringContaining('filter'));
+    expect(transition).toEqual(expect.stringContaining('transform'));
+    expect(button.className).toMatch(/active:/);
+  });
+
+  it('keeps its label, shows a spinner and reports busy while loading', () => {
+    const handleClick = jest.fn();
+    render(
+      <Button loading onClick={handleClick}>
+        Retrieve
+      </Button>,
+    );
+    const button = screen.getByRole('button', { name: 'Retrieve' });
+    expect(button).toHaveAttribute('aria-busy', 'true');
+    expect(button).toBeDisabled();
+    expect(button.querySelector('[data-slot="button-spinner"]')).toHaveAttribute('aria-hidden');
+    fireEvent.click(button);
+    expect(handleClick).not.toHaveBeenCalled();
+  });
+
+  it('shows a held state for a toggle button', () => {
+    render(
+      <Button variant="outline" aria-pressed>
+        Compact
+      </Button>,
+    );
+    expect(screen.getByRole('button', { name: 'Compact', pressed: true })).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

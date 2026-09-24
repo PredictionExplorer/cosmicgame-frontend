@@ -361,17 +361,6 @@ html:lang(vi) {
 }
 
 /*
- * Title-Case button labels are an English convention: the Button variants
- * apply Tailwind's `capitalize`, which would turn «Під’єднати гаманець» into
- * «Під’єднати Гаманець». Every other language writes UI labels in sentence
- * case (CJK has no case), so the transform is English-only. Unlayered so it
- * outranks the utilities layer that defines `.capitalize`.
- */
-html:not([lang='en']) .capitalize {
-  text-transform: none;
-}
-
-/*
  * The home control desk uses a tighter header offset than generic inner
  * pages. When maintenance copy adds a second fixed bar, restore enough
  * clearance without making every normal visit pay for an absent banner.
