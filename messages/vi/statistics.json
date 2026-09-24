@@ -613,6 +613,7 @@
     "tableLabel": "Phân bổ ETH Tinh tuyển",
     "emptyTitle": "Chưa có ETH Tinh tuyển",
     "emptyDescription": "Khi một chu kỳ đã hoàn tất chọn địa chỉ này để phân bổ ETH, khoản phân bổ sẽ xuất hiện tại đây.",
+    "errorTitle": "Không tải được ETH Tinh tuyển",
     "retrieve": "Nhận về ETH"
   },
   "stellarSelectionNft": {
@@ -627,18 +628,21 @@
     "cycle": "Chu kỳ {cycle}",
     "sources": {
       "participant": "Người tham gia",
-      "randomWalkAnchor": "Người neo giữ Random Walk",
+      "randomWalk": "Random Walk",
       "anchorHolder": "Người neo giữ"
     },
     "emptyTitle": "Chưa có NFT Tinh tuyển",
-    "emptyDescription": "Khi một chu kỳ đã hoàn tất chọn địa chỉ này cho một Cosmic Signature NFT, NFT đó sẽ xuất hiện tại đây."
+    "emptyDescription": "Khi một chu kỳ đã hoàn tất chọn địa chỉ này cho một Cosmic Signature NFT, NFT đó sẽ xuất hiện tại đây.",
+    "errorTitle": "Không tải được NFT Tinh tuyển",
+    "artFailed": "Không tải được tác phẩm"
   },
   "stellarSelectionPages": {
     "invalidTitle": "Địa chỉ không hợp lệ",
     "invalidDescription": "Hãy kiểm tra địa chỉ trong liên kết: địa chỉ bắt đầu bằng 0x và có 40 ký tự thập lục phân.",
     "participant": "Người tham gia",
     "profile": "Hồ sơ người tham gia",
-    "howItWorks": "Tinh tuyển hoạt động thế nào"
+    "howItWorks": "Tinh tuyển hoạt động thế nào",
+    "errorMessage": "Không đọc được các phân bổ của địa chỉ này. Bạn hãy thử lại sau giây lát."
   },
   "systemEvent": {
     "titleBeforeCycle": "Cấu hình hệ thống được thiết lập trước chu kỳ {cycle}",

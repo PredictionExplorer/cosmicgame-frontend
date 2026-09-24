@@ -1,3 +1,5 @@
+import userEvent from '@testing-library/user-event';
+
 import { checkA11y, render, screen, within } from '@/test-utils';
 
 import UserStellarSelectionNFTPage from '../stellar-selection-nft/[address]/UserStellarSelectionNFTPage';
@@ -8,14 +10,17 @@ const mockUseStellarSelectionNFTAllocationsByUser = jest.fn();
 jest.mock('../../../../../hooks/useApiQuery', () => ({
   useStellarSelectionNFTAllocationsByUser: (...args: unknown[]) =>
     mockUseStellarSelectionNFTAllocationsByUser(...args),
-  useCSTList: () => ({
-    data: [
-      { TokenId: 42, Seed: 'abc123', TokenName: 'Orbit Study' },
-      { TokenId: 43, Seed: 'def456', TokenName: '' },
-    ],
-    isLoading: false,
-  }),
+  useCSTList: () => mockUseCSTList(),
 }));
+
+const mockUseCSTList = jest.fn();
+const INDEX = {
+  data: [
+    { TokenId: 42, Seed: 'abc123', TokenName: 'Orbit Study' },
+    { TokenId: 43, Seed: 'def456', TokenName: '' },
+  ],
+  isLoading: false,
+};
 
 const ROWS = [
   {
@@ -38,13 +43,20 @@ const ROWS = [
   },
 ];
 
+const mockRefetch = jest.fn();
+
 function withRows(data: unknown, isLoading = false) {
-  mockUseStellarSelectionNFTAllocationsByUser.mockReturnValue({ data, isLoading });
+  mockUseStellarSelectionNFTAllocationsByUser.mockReturnValue({
+    data,
+    isLoading,
+    refetch: mockRefetch,
+  });
 }
 
 beforeEach(() => {
   jest.clearAllMocks();
   withRows(ROWS);
+  mockUseCSTList.mockReturnValue(INDEX);
 });
 
 describe('UserStellarSelectionNFTPage', () => {
@@ -60,7 +72,9 @@ describe('UserStellarSelectionNFTPage', () => {
     expect(
       within(cards[0]!).getByRole('link', { name: 'Cosmic Signature #000043' }),
     ).toHaveAttribute('href', '/detail/43');
-    expect(cards[0]).toHaveTextContent('Random Walk anchor-holder');
+    // Two short tags, so neither wraps into a box that fills a phone column.
+    expect(cards[0]).toHaveTextContent('Anchor-holder');
+    expect(cards[0]).toHaveTextContent('Random Walk');
     expect(within(cards[1]!).getByRole('link', { name: 'Orbit Study' })).toBeInTheDocument();
     expect(cards[1]).toHaveTextContent('#000042');
     expect(cards[1]).toHaveTextContent('Participant');
@@ -88,6 +102,42 @@ describe('UserStellarSelectionNFTPage', () => {
     expect(
       screen.getByRole('heading', { level: 2, name: 'No Stellar Selection NFTs yet' }),
     ).toBeInTheDocument();
+  });
+
+  it('shows a failed read as an error with a retry, never as "no NFTs yet"', async () => {
+    mockUseStellarSelectionNFTAllocationsByUser.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      refetch: mockRefetch,
+    });
+    render(<UserStellarSelectionNFTPage address={ADDRESS} />);
+    expect(
+      screen.getByRole('heading', { level: 2, name: "Couldn't load the Stellar Selection NFTs" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('No Stellar Selection NFTs yet')).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: /try again/i }));
+    expect(mockRefetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('holds busy plates while the collection index loads, never "Artwork unavailable"', () => {
+    mockUseCSTList.mockReturnValue({ data: undefined, isLoading: true });
+    render(<UserStellarSelectionNFTPage address={ADDRESS} />);
+    for (const plate of screen.getAllByTestId('pending-plate')) {
+      expect(plate).toHaveAttribute('aria-busy', 'true');
+    }
+    expect(screen.queryByText('detail.image.artworkUnavailable')).not.toBeInTheDocument();
+  });
+
+  it('says once that the artwork could not be loaded when the index fails', () => {
+    mockUseCSTList.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      refetch: jest.fn(),
+    });
+    render(<UserStellarSelectionNFTPage address={ADDRESS} />);
+    expect(screen.getAllByText("The artwork couldn't be loaded")).toHaveLength(1);
   });
 
   it('explains an address that is not an address', () => {

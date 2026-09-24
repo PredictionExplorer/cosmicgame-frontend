@@ -44,7 +44,9 @@ export interface EthAllocationsTableProps {
   /** Where each allocation came from; off where the page already says (Stellar Selection · ETH). */
   showSource?: boolean;
   loading?: boolean;
+  /** A failed read: the message under `errorTitle`, with a retry. Never shown as empty. */
   error?: ReactNode;
+  errorTitle?: string;
   onRetry?: () => void;
   emptyTitle?: string;
   emptyDescription?: string;

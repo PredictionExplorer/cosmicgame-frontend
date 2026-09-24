@@ -613,6 +613,7 @@
     "tableLabel": "Stellar Selection ETH allocations",
     "emptyTitle": "No Stellar Selection ETH yet",
     "emptyDescription": "When a finalized cycle selects this address for ETH, the allocation appears here.",
+    "errorTitle": "Couldn't load the Stellar Selection ETH",
     "retrieve": "Retrieve ETH"
   },
   "stellarSelectionNft": {
@@ -627,18 +628,21 @@
     "cycle": "Cycle {cycle}",
     "sources": {
       "participant": "Participant",
-      "randomWalkAnchor": "Random Walk anchor-holder",
+      "randomWalk": "Random Walk",
       "anchorHolder": "Anchor-holder"
     },
     "emptyTitle": "No Stellar Selection NFTs yet",
-    "emptyDescription": "When a finalized cycle selects this address for a Cosmic Signature NFT, it appears here."
+    "emptyDescription": "When a finalized cycle selects this address for a Cosmic Signature NFT, it appears here.",
+    "errorTitle": "Couldn't load the Stellar Selection NFTs",
+    "artFailed": "The artwork couldn't be loaded"
   },
   "stellarSelectionPages": {
     "invalidTitle": "Not a valid address",
     "invalidDescription": "Check the address in the link: it starts with 0x and has 40 hexadecimal characters.",
     "participant": "Participant",
     "profile": "Participant profile",
-    "howItWorks": "How Stellar Selection works"
+    "howItWorks": "How Stellar Selection works",
+    "errorMessage": "The allocations of this address couldn't be read. Try again in a moment."
   },
   "systemEvent": {
     "titleBeforeCycle": "System Configuration Made Before Cycle {cycle}",

@@ -613,6 +613,7 @@
     "tableLabel": "星選のETH配分",
     "emptyTitle": "星選ETHはまだありません",
     "emptyDescription": "確定したサイクルでこのアドレスがETH配分に選ばれると、ここに表示されます。",
+    "errorTitle": "星選のETHを読み込めませんでした",
     "retrieve": "ETHを受け取る"
   },
   "stellarSelectionNft": {
@@ -627,18 +628,21 @@
     "cycle": "サイクル{cycle}",
     "sources": {
       "participant": "参加者",
-      "randomWalkAnchor": "Random Walkの係留者",
+      "randomWalk": "Random Walk",
       "anchorHolder": "係留者"
     },
     "emptyTitle": "星選NFTはまだありません",
-    "emptyDescription": "確定したサイクルでこのアドレスがCosmic Signature NFTに選ばれると、ここに表示されます。"
+    "emptyDescription": "確定したサイクルでこのアドレスがCosmic Signature NFTに選ばれると、ここに表示されます。",
+    "errorTitle": "星選のNFTを読み込めませんでした",
+    "artFailed": "作品を読み込めませんでした"
   },
   "stellarSelectionPages": {
     "invalidTitle": "無効なアドレス",
     "invalidDescription": "リンクのアドレスを確認してください。アドレスは0xで始まり、16進数の文字が40個続きます。",
     "participant": "参加者",
     "profile": "参加者プロフィール",
-    "howItWorks": "星選の仕組み"
+    "howItWorks": "星選の仕組み",
+    "errorMessage": "このアドレスの配分を読み取れませんでした。少し時間をおいてもう一度お試しください。"
   },
   "systemEvent": {
     "titleBeforeCycle": "サイクル{cycle}より前に設定されたシステム構成",

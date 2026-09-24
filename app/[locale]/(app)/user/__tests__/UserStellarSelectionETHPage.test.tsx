@@ -115,6 +115,21 @@ describe('UserStellarSelectionETHPage', () => {
     );
   });
 
+  it('shows a failed read as an error with a retry, never as "no ETH yet"', () => {
+    mockUseStellarSelectionDepositsByUser.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      refetch: mockRefetch,
+    });
+    render(<UserStellarSelectionETHPage address={ADDRESS} />);
+    expect(screen.getByText("Couldn't load the Stellar Selection ETH")).toBeInTheDocument();
+    expect(screen.queryByText('No Stellar Selection ETH yet')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Retrieve ETH/ })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /try again/i }));
+    expect(mockRefetch).toHaveBeenCalledTimes(1);
+  });
+
   it('explains an address that is not an address', () => {
     render(<UserStellarSelectionETHPage address="not-an-address" />);
     expect(

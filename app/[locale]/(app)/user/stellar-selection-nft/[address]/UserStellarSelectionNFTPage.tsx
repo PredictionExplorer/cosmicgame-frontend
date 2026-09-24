@@ -10,6 +10,7 @@ import { ArtTag, PendingPlate } from '@/components/ui/art-frame';
 import { buttonVariants } from '@/components/ui/button';
 import { DateTime } from '@/components/ui/date-time';
 import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
 import { PageShell } from '@/components/ui/page-shell';
 import { TablePagination } from '@/components/ui/pagination';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -32,15 +33,14 @@ const PAGE_SIZE = 12;
 
 const GRID_CLASS = 'grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 lg:grid-cols-3 lg:gap-x-8';
 
-type SelectionSource = 'participant' | 'randomWalkAnchor' | 'anchorHolder';
+type SelectionSource = 'participant' | 'anchorHolder';
 
 /**
  * Who the NFT was selected as: a participant (by their gestures), or an
- * anchor-holder of a Random Walk NFT or of a Cosmic Signature NFT.
+ * anchor-holder, of a Random Walk NFT or of a Cosmic Signature NFT.
  */
 function selectionSource(row: StellarSelectionNFTRecipient): SelectionSource {
-  if (!row.IsStaker) return 'participant';
-  return row.IsRWalk ? 'randomWalkAnchor' : 'anchorHolder';
+  return row.IsStaker ? 'anchorHolder' : 'participant';
 }
 
 /**
@@ -56,7 +56,7 @@ function UserStellarSelectionNFTPage({ address: rawAddress }: { address: string 
   const address = participantAddress(rawAddress);
   const [page, setPage] = useState(1);
 
-  const { data, isLoading } = useStellarSelectionNFTAllocationsByUser(address);
+  const { data, isLoading, isError, refetch } = useStellarSelectionNFTAllocationsByUser(address);
   const signatures = useSignatureIndex();
 
   const rows = useMemo(
@@ -97,11 +97,19 @@ function UserStellarSelectionNFTPage({ address: rawAddress }: { address: string 
       <StellarSelectionHeader
         kind="nft"
         address={address}
-        // An address with nothing selected yet reads from the empty state alone.
-        figures={!isLoading && rows.length === 0 ? undefined : figures}
+        // An address with nothing selected yet (or whose read failed) reads from its state alone.
+        figures={isError || (!isLoading && rows.length === 0) ? undefined : figures}
       />
 
-      {isLoading ? (
+      {isError ? (
+        <ErrorState
+          variant="page"
+          headingLevel={2}
+          title={t('stellarSelectionNft.errorTitle')}
+          message={t('stellarSelectionPages.errorMessage')}
+          onRetry={() => void refetch()}
+        />
+      ) : isLoading ? (
         <ul className={GRID_CLASS} aria-busy="true" aria-label={t('stellarSelectionNft.gridLabel')}>
           {Array.from({ length: 6 }, (_, index) => (
             <li key={index} className="flex flex-col gap-3">
@@ -130,6 +138,16 @@ function UserStellarSelectionNFTPage({ address: rawAddress }: { address: string 
         />
       ) : (
         <section aria-label={t('stellarSelectionNft.gridLabel')} className="mb-10">
+          {signatures.state === 'failed' ? (
+            <ErrorState
+              variant="inline"
+              headingLevel={2}
+              tone="warning"
+              title={t('stellarSelectionNft.artFailed')}
+              onRetry={signatures.retry}
+              className="mb-6"
+            />
+          ) : null}
           <ul className={GRID_CLASS}>
             {visible.map((row) => {
               const tokenId = row.TokenId as number;
@@ -140,6 +158,7 @@ function UserStellarSelectionNFTPage({ address: rawAddress }: { address: string 
                   <SignatureCard
                     tokenId={tokenId}
                     seed={entry?.seed}
+                    artState={signatures.state}
                     title={entry?.name ?? t('stellarSelectionNft.unnamed', { id })}
                     meta={[
                       entry?.name ? <span className="type-mono">{id}</span> : null,
@@ -150,8 +169,14 @@ function UserStellarSelectionNFTPage({ address: rawAddress }: { address: string 
                       ) : null,
                       row.TimeStamp ? <DateTime timestamp={row.TimeStamp} /> : null,
                     ]}
+                    // Two short tags rather than one long one, so neither wraps in a phone column.
                     tags={
-                      <ArtTag>{t(`stellarSelectionNft.sources.${selectionSource(row)}`)}</ArtTag>
+                      <>
+                        <ArtTag>{t(`stellarSelectionNft.sources.${selectionSource(row)}`)}</ArtTag>
+                        {row.IsStaker && row.IsRWalk ? (
+                          <ArtTag>{t('stellarSelectionNft.sources.randomWalk')}</ArtTag>
+                        ) : null}
+                      </>
                     }
                     sizes="(min-width: 1024px) 26rem, (min-width: 640px) 45vw, 50vw"
                     unavailableLabel={tDetail('image.artworkUnavailable')}

@@ -56,7 +56,7 @@ const UserStellarSelectionETHPage = ({ address: rawAddress }: { address: string 
   const address = participantAddress(rawAddress);
   const { account } = useActiveWeb3React();
 
-  const { data, isLoading, refetch } = useStellarSelectionDepositsByUser(address);
+  const { data, isLoading, isError, refetch } = useStellarSelectionDepositsByUser(address);
   const { retrieveAllStellarSelectionETH, isClaiming, txStage } = useClaimAllocations(refetch);
 
   const rows = useMemo(() => (data ?? []) as EthAllocationRow[], [data]);
@@ -103,8 +103,8 @@ const UserStellarSelectionETHPage = ({ address: rawAddress }: { address: string 
       <StellarSelectionHeader
         kind="eth"
         address={address}
-        // An address with nothing selected yet reads from the empty state alone.
-        figures={!isLoading && rows.length === 0 ? undefined : figures}
+        // An address with nothing selected yet (or whose read failed) reads from its state alone.
+        figures={isError || (!isLoading && rows.length === 0) ? undefined : figures}
         actions={
           canRetrieve ? (
             <ChainGuard requireConnection>
@@ -131,6 +131,9 @@ const UserStellarSelectionETHPage = ({ address: rawAddress }: { address: string 
         showSource={false}
         showStatus
         loading={isLoading}
+        error={isError ? t('stellarSelectionPages.errorMessage') : undefined}
+        errorTitle={t('stellarSelectionEth.errorTitle')}
+        onRetry={() => void refetch()}
         headingLevel={2}
         emptyTitle={t('stellarSelectionEth.emptyTitle')}
         emptyDescription={t('stellarSelectionEth.emptyDescription')}

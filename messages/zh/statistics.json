@@ -613,6 +613,7 @@
     "tableLabel": "星选 ETH 分配",
     "emptyTitle": "暂无星选 ETH",
     "emptyDescription": "当已收官的周期为此地址选出 ETH 分配时，会显示在这里。",
+    "errorTitle": "无法加载星选 ETH",
     "retrieve": "取回 ETH"
   },
   "stellarSelectionNft": {
@@ -627,18 +628,21 @@
     "cycle": "第 {cycle} 个周期",
     "sources": {
       "participant": "参与者",
-      "randomWalkAnchor": "Random Walk 锚定者",
+      "randomWalk": "Random Walk",
       "anchorHolder": "锚定者"
     },
     "emptyTitle": "暂无星选 NFT",
-    "emptyDescription": "当已收官的周期为此地址选出 Cosmic Signature NFT 时，会显示在这里。"
+    "emptyDescription": "当已收官的周期为此地址选出 Cosmic Signature NFT 时，会显示在这里。",
+    "errorTitle": "无法加载星选 NFT",
+    "artFailed": "无法加载作品"
   },
   "stellarSelectionPages": {
     "invalidTitle": "地址无效",
     "invalidDescription": "请检查链接中的地址：它以 0x 开头，后跟 40 个十六进制字符。",
     "participant": "参与者",
     "profile": "参与者统计",
-    "howItWorks": "星选如何运作"
+    "howItWorks": "星选如何运作",
+    "errorMessage": "暂时无法读取该地址的分配，请稍后重试。"
   },
   "systemEvent": {
     "titleBeforeCycle": "第 {cycle} 个周期前的系统配置",

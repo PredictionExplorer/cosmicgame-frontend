@@ -613,6 +613,7 @@
     "tableLabel": "ETH-розподіли зоряного відбору",
     "emptyTitle": "ETH зоряного відбору ще немає",
     "emptyDescription": "Коли завершений цикл вибере цю адресу для розподілу ETH, розподіл з’явиться тут.",
+    "errorTitle": "Не вдалося завантажити ETH зоряного відбору",
     "retrieve": "Забрати ETH"
   },
   "stellarSelectionNft": {
@@ -627,18 +628,21 @@
     "cycle": "Цикл {cycle}",
     "sources": {
       "participant": "Учасник",
-      "randomWalkAnchor": "Власник закріпленого Random Walk",
+      "randomWalk": "Random Walk",
       "anchorHolder": "Власник закріплення"
     },
     "emptyTitle": "NFT зоряного відбору ще немає",
-    "emptyDescription": "Коли завершений цикл вибере цю адресу для Cosmic Signature NFT, він з’явиться тут."
+    "emptyDescription": "Коли завершений цикл вибере цю адресу для Cosmic Signature NFT, він з’явиться тут.",
+    "errorTitle": "Не вдалося завантажити NFT зоряного відбору",
+    "artFailed": "Не вдалося завантажити твори"
   },
   "stellarSelectionPages": {
     "invalidTitle": "Недійсна адреса",
     "invalidDescription": "Перевірте адресу в посиланні: вона починається з 0x і має 40 шістнадцяткових символів.",
     "participant": "Учасник",
     "profile": "Профіль учасника",
-    "howItWorks": "Як працює зоряний відбір"
+    "howItWorks": "Як працює зоряний відбір",
+    "errorMessage": "Не вдалося прочитати розподіли цієї адреси. Спробуйте ще раз за мить."
   },
   "systemEvent": {
     "titleBeforeCycle": "Системна конфігурація, встановлена перед циклом {cycle}",

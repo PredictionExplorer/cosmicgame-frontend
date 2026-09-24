@@ -613,6 +613,7 @@
     "tableLabel": "별빛 선정 ETH 배분",
     "emptyTitle": "아직 별빛 선정 ETH가 없습니다",
     "emptyDescription": "마감된 사이클에서 이 주소가 ETH 배분에 선정되면 여기에 표시됩니다.",
+    "errorTitle": "별빛 선정 ETH를 불러오지 못했습니다",
     "retrieve": "ETH 회수"
   },
   "stellarSelectionNft": {
@@ -627,18 +628,21 @@
     "cycle": "사이클 {cycle}",
     "sources": {
       "participant": "참여자",
-      "randomWalkAnchor": "Random Walk 앵커링 보유자",
+      "randomWalk": "Random Walk",
       "anchorHolder": "앵커링 보유자"
     },
     "emptyTitle": "아직 별빛 선정 NFT가 없습니다",
-    "emptyDescription": "마감된 사이클에서 이 주소가 Cosmic Signature NFT에 선정되면 여기에 표시됩니다."
+    "emptyDescription": "마감된 사이클에서 이 주소가 Cosmic Signature NFT에 선정되면 여기에 표시됩니다.",
+    "errorTitle": "별빛 선정 NFT를 불러오지 못했습니다",
+    "artFailed": "작품을 불러오지 못했습니다"
   },
   "stellarSelectionPages": {
     "invalidTitle": "유효하지 않은 주소",
     "invalidDescription": "링크의 주소를 확인해 주세요. 주소는 0x로 시작하며 16진수 문자 40개로 이루어집니다.",
     "participant": "참여자",
     "profile": "참여자 프로필",
-    "howItWorks": "별빛 선정 작동 원리"
+    "howItWorks": "별빛 선정 작동 원리",
+    "errorMessage": "이 주소의 배분을 읽지 못했습니다. 잠시 후 다시 시도해 주세요."
   },
   "systemEvent": {
     "titleBeforeCycle": "사이클 {cycle} 이전에 설정된 시스템 구성",
