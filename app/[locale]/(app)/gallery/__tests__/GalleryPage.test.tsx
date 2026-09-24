@@ -228,6 +228,20 @@ describe('GalleryPage', () => {
       expect(screen.queryByLabelText('search.gallery.ariaLabel')).not.toBeInTheDocument();
     });
 
+    it('keeps the collection on screen when a refetch fails after a load (F154)', () => {
+      mockUseCSTList.mockReturnValue({
+        data: mockNFTs,
+        isLoading: false,
+        isError: true,
+        refetch: jest.fn(),
+      });
+
+      render(<GalleryPage />);
+
+      expect(screen.queryByText('gallery.error.title')).not.toBeInTheDocument();
+      expect(screen.queryByText('gallery.empty.title')).not.toBeInTheDocument();
+    });
+
     it('refetches the collection when the retry action is used', () => {
       const refetch = jest.fn();
       mockUseCSTList.mockReturnValue({

@@ -144,6 +144,13 @@ describe('StatisticsHubPanel', () => {
     expect(refetch).toHaveBeenCalled();
   });
 
+  it('keeps the hub on screen when a background poll fails after a load (F154)', () => {
+    mockDashboard({ isError: true });
+    render(<StatisticsHubPanel />);
+    expect(screen.getByTestId('statistics-hub')).toBeInTheDocument();
+    expect(screen.queryByText('Failed to load statistics')).not.toBeInTheDocument();
+  });
+
   it('keeps polling enabled on the hub dashboard query', () => {
     render(<StatisticsHubPanel />);
     // Hub is a live overview: it must not opt out of polling.
