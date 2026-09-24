@@ -689,7 +689,8 @@
   },
   "rwlkGrid": {
     "searchPlaceholder": "NFT ID 입력",
-    "searchIconAlt": "검색 아이콘",
+    "searchAria": "ID로 RandomWalk NFT 검색",
+    "tokenAria": "RandomWalk NFT {id}",
     "empty": "검색 결과가 없습니다"
   },
   "orientation": {

@@ -689,7 +689,8 @@
   },
   "rwlkGrid": {
     "searchPlaceholder": "輸入 NFT ID",
-    "searchIconAlt": "搜尋圖標",
+    "searchAria": "按 ID 搜尋 RandomWalk NFT",
+    "tokenAria": "RandomWalk NFT {id}",
     "empty": "找不到相符的 NFT"
   },
   "orientation": {

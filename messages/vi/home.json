@@ -689,7 +689,8 @@
   },
   "rwlkGrid": {
     "searchPlaceholder": "Nhập mã NFT",
-    "searchIconAlt": "biểu tượng tìm kiếm",
+    "searchAria": "Tìm RandomWalk NFT theo mã",
+    "tokenAria": "RandomWalk NFT {id}",
     "empty": "Không tìm thấy NFT phù hợp"
   },
   "orientation": {

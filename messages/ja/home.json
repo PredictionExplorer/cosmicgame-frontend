@@ -689,7 +689,8 @@
   },
   "rwlkGrid": {
     "searchPlaceholder": "NFT IDを入力",
-    "searchIconAlt": "検索アイコン",
+    "searchAria": "IDでRandomWalk NFTを検索",
+    "tokenAria": "RandomWalk NFT {id}",
     "empty": "見つかりませんでした"
   },
   "orientation": {
