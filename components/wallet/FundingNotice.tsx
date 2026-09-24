@@ -16,8 +16,12 @@ export const FUNDING_HELP_HREF = '/faq#how-to-get-eth-on-arbitrum';
 export interface FundingNoticeProps {
   /** ETH the action needs before gas (the Gesture Cost), in wei; null while unknown. */
   requiredWei: bigint | null | undefined;
+  /** What the ETH is for, so the notice names the action ("This imprint needs…"). */
+  purpose?: 'gesture' | 'imprint';
   className?: string;
 }
+
+const SHORT_KEY = { gesture: 'funding.short', imprint: 'funding.shortImprint' } as const;
 
 /**
  * Tells a connected participant, before they press submit, that their wallet
@@ -26,7 +30,7 @@ export interface FundingNoticeProps {
  * unknown, when no wallet is connected, or when the balance covers the cost
  * (the submit-time check stays as the backstop, since gas is not included).
  */
-export function FundingNotice({ requiredWei, className }: FundingNoticeProps) {
+export function FundingNotice({ requiredWei, purpose = 'gesture', className }: FundingNoticeProps) {
   const t = useTranslations('wallet');
   const locale = useLocale();
   const { address } = useConnection();
@@ -51,7 +55,7 @@ export function FundingNotice({ requiredWei, className }: FundingNoticeProps) {
       <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
       <div className="min-w-0">
         <p className="text-foreground">
-          {t('funding.short', {
+          {t(SHORT_KEY[purpose], {
             available: formatAmount(balance.value, { unit: 'ETH', locale, withUnit: false }),
             required: formatAmount(requiredWei, { unit: 'ETH', locale, withUnit: false }),
             network: REQUIRED_CHAIN_NAME,

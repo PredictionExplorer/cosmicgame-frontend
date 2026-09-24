@@ -79,6 +79,7 @@
   },
   "funding": {
     "short": "錢包在 {network} 上有 {available} ETH。本次落筆約需 {required} ETH 及網路手續費。",
+    "shortImprint": "錢包在 {network} 上有 {available} ETH。本次銘刻約需 {required} ETH 及網路手續費。",
     "howTo": "如何在 {network} 上取得 ETH"
   }
 }

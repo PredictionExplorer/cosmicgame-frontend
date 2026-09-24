@@ -79,6 +79,7 @@
   },
   "funding": {
     "short": "지갑의 {network} 잔액은 {available} ETH입니다. 이 제스처에는 약 {required} ETH와 네트워크 수수료가 필요합니다.",
+    "shortImprint": "지갑의 {network} 잔액은 {available} ETH입니다. 이번 각인에는 약 {required} ETH와 네트워크 수수료가 필요합니다.",
     "howTo": "{network} 네트워크에서 ETH를 준비하는 방법"
   }
 }

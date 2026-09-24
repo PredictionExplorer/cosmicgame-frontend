@@ -170,7 +170,7 @@ const Imprint = ({ seoSummary }: { seoSummary?: ReactNode }) => {
             })}
           </p>
         ) : null}
-        <FundingNotice requiredWei={sendValue} className="mt-6" />
+        <FundingNotice requiredWei={sendValue} purpose="imprint" className="mt-6" />
         <div className="mt-6">
           <ChainGuard requireConnection buttonClassName="w-full" className="w-full">
             <Button
