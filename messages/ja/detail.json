@@ -91,6 +91,7 @@
   },
   "image": {
     "defaultAlt": "NFT",
+    "rendering": "レンダリング中",
     "artworkUnavailable": "アートワークを利用できません"
   },
   "viewer": {

@@ -91,6 +91,7 @@
   },
   "image": {
     "defaultAlt": "NFT",
+    "rendering": "렌더링 중",
     "artworkUnavailable": "작품을 불러올 수 없습니다"
   },
   "viewer": {

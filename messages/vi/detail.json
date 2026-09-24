@@ -91,6 +91,7 @@
   },
   "image": {
     "defaultAlt": "NFT",
+    "rendering": "Đang kết xuất",
     "artworkUnavailable": "Tác phẩm không khả dụng"
   },
   "viewer": {

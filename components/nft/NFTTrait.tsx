@@ -48,6 +48,7 @@ import {
   useCTOwnershipTransfers,
 } from '@/hooks/useApiQuery';
 import { useMetaMaskWatchAsset } from '@/hooks/useMetaMaskWatchAsset';
+import { useNow } from '@/hooks/useNow';
 import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
 
 import { NFTSeed } from './NFTMetadata';
@@ -57,7 +58,7 @@ import { NFTIdentity } from './NFTIdentity';
 import { NFTNeighbourNav, neighbourIds } from './NFTNeighbourNav';
 import { NFTShareMenu } from './NFTShareMenu';
 import { SignatureViewer } from './SignatureViewer';
-import { composeSignatureAlt, signatureMedia } from './signatureArt';
+import { composeSignatureAlt, isRenderPending, signatureMedia } from './signatureArt';
 import { NftTraitPanel } from './traits/NftTraitPanel';
 
 interface NFTDetailInfo extends CSTTokenInfo {
@@ -180,6 +181,9 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
   const rarity = collectionTraits?.rarity.byId.get(tokenId) ?? null;
 
   const media = useMemo(() => signatureMedia(nft?.Seed), [nft?.Seed]);
+  // A token imprinted moments ago may not have its render published yet.
+  const nowMs = useNow(60_000);
+  const renderPending = isRenderPending(nft?.TimeStamp, nowMs);
 
   const router = useRouter();
   const nftContract = useCosmicSignatureContract();
@@ -418,7 +422,7 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
           alt={alt}
           subject={subject}
           tokenLabel={id}
-          unavailableLabel={t('image.artworkUnavailable')}
+          unavailableLabel={renderPending ? t('image.rendering') : t('image.artworkUnavailable')}
           sizes={PLATE_SIZES}
           navigation={<NFTNeighbourNav tokenId={tokenId} total={totalImprints} />}
           // Never taller than the screen leaves room for; full-bleed on phones.

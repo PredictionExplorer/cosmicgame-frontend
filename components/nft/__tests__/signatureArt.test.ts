@@ -6,7 +6,9 @@ import {
 } from '@/lib/nftMetadata';
 
 import {
+  RENDER_WINDOW_SECONDS,
   SIGNATURE_THUMB_WIDTH,
+  isRenderPending,
   composeSignatureAlt,
   signatureMedia,
   signatureSources,
@@ -60,6 +62,24 @@ describe('signatureMedia', () => {
     expect(signatureMedia(null)).toBeNull();
     expect(signatureMedia('')).toBeNull();
     expect(signatureMedia('0x')).toBeNull();
+  });
+});
+
+describe('isRenderPending', () => {
+  const imprintedAt = 1_700_000_000;
+
+  it('is true only within the render window after imprinting', () => {
+    expect(isRenderPending(imprintedAt, (imprintedAt + 60) * 1000)).toBe(true);
+    expect(isRenderPending(imprintedAt, (imprintedAt + RENDER_WINDOW_SECONDS - 1) * 1000)).toBe(
+      true,
+    );
+    expect(isRenderPending(imprintedAt, (imprintedAt + RENDER_WINDOW_SECONDS) * 1000)).toBe(false);
+  });
+
+  it('is false before the page knows the time, or without an imprint time', () => {
+    expect(isRenderPending(imprintedAt, 0)).toBe(false);
+    expect(isRenderPending(undefined, Date.now())).toBe(false);
+    expect(isRenderPending(0, Date.now())).toBe(false);
   });
 });
 

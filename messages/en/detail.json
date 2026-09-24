@@ -91,6 +91,7 @@
   },
   "image": {
     "defaultAlt": "NFT",
+    "rendering": "Rendering",
     "artworkUnavailable": "Artwork unavailable"
   },
   "viewer": {

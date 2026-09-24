@@ -368,6 +368,36 @@ describe('NFTTrait', () => {
     expect(mockTotalSupply).not.toHaveBeenCalled();
   });
 
+  it('says "Rendering" when a just-imprinted token has no artwork yet', async () => {
+    withDashboard();
+    withNft({ TimeStamp: Math.floor(Date.now() / 1000) - 60 });
+    withNameHistory();
+    render(<NFTTrait tokenId={5} />);
+    let art = screen.queryByAltText('“MyToken”, Cosmic Signature #000005');
+    while (art && art.tagName === 'IMG') {
+      fireEvent.error(art);
+      art = screen.queryByAltText('“MyToken”, Cosmic Signature #000005');
+    }
+    const plate = await screen.findByRole('img', { name: '“MyToken”, Cosmic Signature #000005' });
+    expect(plate).toHaveTextContent('detail.image.rendering');
+    expect(plate).toHaveTextContent('#000005');
+  });
+
+  it('says "Artwork unavailable" when an older token’s artwork cannot load', () => {
+    withDashboard();
+    withNft();
+    withNameHistory();
+    render(<NFTTrait tokenId={5} />);
+    let art = screen.queryByAltText('“MyToken”, Cosmic Signature #000005');
+    while (art && art.tagName === 'IMG') {
+      fireEvent.error(art);
+      art = screen.queryByAltText('“MyToken”, Cosmic Signature #000005');
+    }
+    expect(
+      screen.getByRole('img', { name: '“MyToken”, Cosmic Signature #000005' }),
+    ).toHaveTextContent('detail.image.artworkUnavailable');
+  });
+
   it('keeps the quiet action row: share and the marketplace', () => {
     withDashboard();
     withNft();
