@@ -39,7 +39,7 @@ export default async function Page({ params }: PageProps) {
   const pageUrl = localeHref(APP_ORIGIN, '/imprint', locale);
 
   return (
-    <PageMessages namespaces={['imprint']}>
+    <PageMessages namespaces={['imprint', 'detail', 'tables']}>
       <>
         <JsonLd
           data={[
