@@ -90,7 +90,7 @@ export const howItWorksTextVi = {
         label: 'Tinh tuyển',
         description: `Ba người nhận ETH Tinh tuyển chia ${protocolFacts.stellarSelectionEthPercentage}% Dự trữ chu kỳ. Mười người nhận NFT Tinh tuyển cộng mười người nhận Tinh tuyển NFT neo giữ, mỗi người nhận ${cstAmount} CST và một Cosmic Signature NFT.`,
         tooltip:
-          'Lượt được ghi nhận theo từng nét bút. Càng nhiều nét bút, tần suất được chọn càng cao. Người neo giữ Random Walk NFT có một Tinh tuyển riêng.',
+          'Lượt được ghi nhận theo từng nét bút, và mỗi lượt chọn được thực hiện trong toàn bộ lượt của chu kỳ, có hoàn lại. Người neo giữ Random Walk NFT có một Tinh tuyển riêng.',
       },
       {
         label: 'Chu kỳ tiếp theo',

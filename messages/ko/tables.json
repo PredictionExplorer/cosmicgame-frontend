@@ -91,22 +91,18 @@
     "cycleHash": "사이클",
     "round": "사이클",
     "participant": "참여자",
-    "participantAddress": "참여자 주소",
     "recipient": "수령자",
-    "recipientAddress": "수령자 주소",
     "gestureCount": "제스처 수",
-    "numberOfGestures": "제스처 수",
     "gestureType": "제스처 유형",
     "gestureDuration": "유지 시간",
     "gestureInfo": "제스처 정보",
     "gestureCost": "비용",
     "allocation": "배분",
-    "allocationsReceived": "받은 배분",
+    "allocationsReceived": "배분(전체 유형)",
     "maxAllocationEth": "최대 시그니처 배분(ETH)",
-    "allocationsSumEth": "배분 합계(ETH)",
+    "allocationsSumEth": "받은 ETH",
     "anchorActionId": "앵커링 작업 ID",
     "anchorHolder": "앵커링 보유자",
-    "anchorHolderAddress": "앵커링 보유자 주소",
     "holder": "보유자",
     "numberOfNfts": "NFT 수",
     "date": "날짜",
@@ -127,14 +123,14 @@
     "destinationAddress": "대상 주소",
     "from": "보낸 주소",
     "to": "받는 주소",
-    "type": "유형",
     "event": "이벤트",
     "newValue": "새 값",
+    "previousValue": "이전 값",
     "recordType": "기록 유형",
     "source": "배분 구분",
     "received": "수령",
     "position": "순번",
-    "note": "비고",
+    "note": "메모",
     "userAddress": "사용자 주소",
     "spentAmountEth": "사용 금액(ETH)",
     "contributionAmountEth": "기여 금액(ETH)",
@@ -144,14 +140,13 @@
     "maxGestureEth": "최대 제스처(ETH)",
     "numberOfContributions": "기여 횟수",
     "totalContributedEth": "총 기여 금액(ETH)",
-    "numberOfStellarEntries": "별빛 선정 자격 수",
-    "ethSelectionProbability": "ETH 선정 확률",
-    "nftSelectionProbability": "NFT 선정 확률",
     "expirationDate": "만료일",
     "started": "시작",
     "ended": "종료",
     "actions": "작업",
-    "selected": "선택됨"
+    "selected": "선택됨",
+    "gesturesThisCycle": "이번 사이클 제스처 수",
+    "shareOfPool": "풀 비중"
   },
   "names": {
     "participants": "고유 참여자",
@@ -200,6 +195,10 @@
   "details": {
     "header": "상세"
   },
+  "message": {
+    "showAll": "전체 보기",
+    "showLess": "접기"
+  },
   "skeleton": {
     "loadingText": "텍스트 불러오는 중",
     "loadingStat": "통계 불러오는 중",
@@ -215,21 +214,25 @@
   },
   "allocation": {
     "cycle": "사이클 {cycle}",
-    "openDetails": "사이클 {cycle}의 상세 배분 내역을 엽니다.",
-    "allocationHelp": "이 사이클의 시그니처 배분 금액과 수령자 지갑입니다.",
     "gestures": "제스처",
-    "gesturesHelp": "이 사이클에서 남긴 제스처 합계입니다.",
-    "nftsHelp": "이 사이클에서 제스처에 첨부된 NFT입니다.",
-    "stellarHelp": "별빛 선정 풀에 배분된 ETH입니다.",
-    "anchorHelp": "앵커링 지급에 배분된 ETH입니다.",
-    "distributedHelp": "별빛 선정으로 전달된 Cosmic Signature NFT입니다.",
     "listAria": "사이클별 배분 수령자",
+    "groups": {
+      "eth": "배분 경로별 ETH",
+      "nfts": "NFT"
+    },
     "columns": {
       "finalized": "마감 시각",
+      "signature": "시그니처 배분",
       "signatureEth": "시그니처 배분(ETH)",
+      "chrono": "시간의 전사",
       "chronoEth": "시간의 전사(ETH)",
+      "stellar": "별빛 선정",
       "stellarEth": "별빛 선정(ETH)",
+      "anchor": "앵커링 지급",
       "anchorEth": "앵커링 지급(ETH)",
+      "publicGoods": "공공재",
+      "publicGoodsEth": "공공재(ETH)",
+      "attached": "첨부",
       "nftsAttached": "첨부 NFT",
       "nftsViaStellar": "별빛 선정 NFT"
     }
@@ -240,6 +243,10 @@
   },
   "publicGoods": {
     "voluntaryEmpty": "공공재 금고로 직접 보낸 기여가 여기에 표시됩니다. 금고는 이 자금을 지정된 공공재 수령처를 위해 보관합니다."
+  },
+  "outreach": {
+    "allocationsTitle": "배분 내역",
+    "dustNote": "흐리게 표시된 수량은 {amount} 미만의 배분으로, 이 정밀도에서는 표시되지 않습니다."
   },
   "banGesture": {
     "banned": "메시지를 숨겼습니다.",
@@ -259,9 +266,8 @@
     }
   },
   "ethContribution": {
-    "withInfo": "정보 포함 기여",
-    "simple": "일반 기여",
-    "viewContribution": "기여 {id} 보기"
+    "withNote": "메모 있음",
+    "viewContribution": "기여 #{id}"
   },
   "endurance": {
     "liveHelp": "이 참여자는 최근 제스처를 남긴 참여자이기도 하므로, 선두 유지 구간이 아직 늘어나는 중입니다.",
@@ -269,18 +275,16 @@
     "chronoWarrior": "시간의 전사"
   },
   "gestureHistory": {
-    "randomWalkGesture": "RandomWalk NFT로 남긴 제스처(ID {id})",
-    "randomWalkImageAlt": "RWLK NFT 이미지",
-    "cstGesture": "CST 토큰으로 남긴 제스처",
-    "ethGesture": "ETH로 남긴 제스처",
-    "nftAttached": " · NFT {address}(ID {id}) 첨부",
-    "erc20AttachedPrefix": " · {amount}",
-    "attachedSuffix": " 첨부",
     "tableLabel": "제스처 내역",
-    "viewGesture": "제스처 {id} 보기"
+    "viewGesture": "제스처 #{position}",
+    "attached": "첨부",
+    "randomWalkToken": "Random Walk {id}"
   },
   "nameHistory": {
     "removed": "토큰 이름이 삭제되었습니다."
+  },
+  "stellarSelection": {
+    "draws": "사이클이 확정되면 이 풀에서 ETH 선정 {eth}건과 NFT 선정 {nft}건이 복원 추출 방식으로 이루어집니다."
   },
   "recipientHistory": {
     "sources": {
@@ -296,12 +300,14 @@
       "stellarEthTimeout": "ETH 별빛 선정(기한 만료 회수)"
     },
     "nft": "NFT #{id}",
+    "nftCount": "{count, plural, other {NFT #개}}",
     "readyToRetrieve": "회수 가능",
     "retrieve": "회수",
     "retrieved": "회수 완료",
     "allAnchorHolders": "모든 Cosmic Signature NFT 앵커링 보유자",
     "showRecords": "{count, plural, other {기록 #건 보기}}",
     "hideRecords": "기록 숨기기",
+    "recordsHeader": "기록",
     "totals": {
       "eth": "수령한 ETH",
       "cst": "수령한 CST",
@@ -372,25 +378,19 @@
     "printReign": "유지 기간: {duration}"
   },
   "systemModes": {
-    "viewEvent": "{scope} 시스템 이벤트 보기"
+    "viewEvent": "매개변수 변경 내역"
   },
   "uniqueAnchorHolders": {
-    "numAnchorActions": "앵커링 작업 수",
     "anchors": "앵커링 수",
-    "numReleaseActions": "해제 작업 수",
     "releases": "해제 수",
-    "totalImprintedTokens": "각인 토큰 합계",
     "imprinted": "각인 수",
-    "totalAnchoredTokens": "앵커링 토큰 합계",
-    "anchored": "앵커링 토큰",
-    "totalDistributionEth": "지급 합계(ETH)",
-    "distributed": "지급",
-    "unretrievedDistributionEth": "미회수 지급(ETH)",
-    "unretrieved": "미회수"
+    "anchored": "현재 앵커링",
+    "distributedEth": "지급(ETH)",
+    "unretrievedEth": "미회수(ETH)"
   },
   "statisticsColumns": {
-    "ownerAddress": "소유자 주소",
-    "numberOfTokensOwned": "보유 토큰 수",
+    "ownerAddress": "보유자",
+    "numberOfTokensOwned": "보유 NFT 수",
     "cstBalance": "잔액(CST)",
     "contractAddress": "컨트랙트 주소",
     "numberOfNfts": "NFT 수",
@@ -399,29 +399,9 @@
     "isAnchorHolder": "앵커링 보유자 여부"
   },
   "statisticsTooltips": {
-    "participantAddress": "인덱싱된 제스처를 한 번 이상 남긴 지갑 주소입니다.",
-    "numberOfGestures": "이 지갑이 남긴 인덱싱된 제스처 합계입니다.",
-    "maxGestureEth": "이 지갑에 기록된 ETH 기준 단일 제스처 가운데 가장 큰 값입니다.",
-    "recipientAddress": "인덱싱된 프로토콜 배분을 한 건 이상 받은 지갑 주소입니다.",
-    "allocationsReceived": "이 지갑이 받은 인덱싱된 배분 건수를 나타냅니다.",
     "maxAllocationEth": "최종 제스처로 이 수령자가 받은 시그니처 배분 가운데 가장 큰 값이며, 받은 적이 없으면 0입니다. 시간의 전사와 별빛 선정 ETH는 합계에만 반영됩니다.",
-    "allocationsSumEth": "이 수령자에게 인덱싱된 ETH 배분 합계입니다.",
-    "contributorAddress": "프로토콜에 ETH를 기여한 지갑 주소입니다.",
-    "numberOfContributions": "이 지갑에서 보낸 인덱싱된 ETH 기여 트랜잭션 건수를 나타냅니다.",
-    "totalContributedEth": "이 지갑이 기여한 ETH 합계입니다.",
-    "ownerAddress": "이 행에 표시된 토큰 잔액을 현재 보유한 지갑 주소입니다.",
-    "numberOfTokensOwned": "이 지갑이 보유한 Cosmic Signature NFT(ERC-721) 토큰 수를 나타냅니다.",
+    "allocationsSumEth": "이 수령자가 받은 모든 ETH 배분입니다. NFT와 CST 배분은 배분 수에는 포함되지만 이 ETH 합계에는 더해지지 않습니다.",
     "cstBalance": "이 지갑의 현재 CST(ERC-20) 잔액입니다.",
-    "anchorHolderAddress": "토큰을 앵커링하거나 앵커링 해제한 지갑 주소입니다.",
-    "numAnchorActions": "이 지갑이 실행한 인덱싱된 앵커링 트랜잭션 건수를 나타냅니다.",
-    "numReleaseActions": "이 지갑이 실행한 인덱싱된 앵커링 해제 트랜잭션 건수를 나타냅니다.",
-    "totalImprintedTokens": "해당 앵커링 또는 배분 흐름을 통해 이 앵커링 보유자에게 각인된 토큰 합계입니다.",
-    "totalAnchoredTokens": "이 지갑에 집계된 현재 또는 누적 앵커링 토큰 수를 나타냅니다.",
-    "totalDistributionEth": "이 지갑에 인덱싱된 ETH 앵커링 지급 합계입니다.",
-    "unretrievedDistributionEth": "이 지갑이 아직 회수할 수 있는 ETH 앵커링 지급입니다.",
-    "systemRound": "이 시스템 이벤트가 속한 사이클 또는 배포 맥락입니다.",
-    "systemStarted": "이 시스템 이벤트가 활성화된 시각입니다.",
-    "systemEnded": "다음 시스템 이벤트가 이 이벤트를 대체한 시각입니다.",
     "attachedNftContractAddress": "제스처에 첨부된 토큰의 ERC-721 컨트랙트 주소입니다.",
     "attachedNftCount": "이 컨트랙트에서 제스처에 첨부된 NFT 수를 나타냅니다."
   }

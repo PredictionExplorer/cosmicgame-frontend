@@ -81,7 +81,7 @@ export const howItWorksTextZhHk = {
         label: '星選',
         description: `3 位 ETH 星選獲配者均分週期儲備的 ${protocolFacts.stellarSelectionEthPercentage}%；參與者 NFT 星選與錨定 NFT 星選各選出 10 位獲配者，每位獲配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST 與 1 枚 Cosmic Signature NFT。`,
         tooltip:
-          '星選資格隨每一筆計入；落筆越多，入選頻次越高。Random Walk NFT 錨定者另有單獨的星選。',
+          '星選資格隨每一筆計入；每次星選都從本週期的全部落筆中選取，同一筆落筆可再次獲選。Random Walk NFT 錨定者另有單獨的星選。',
       },
       {
         label: '下一週期',

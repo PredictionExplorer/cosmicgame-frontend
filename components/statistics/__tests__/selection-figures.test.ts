@@ -5,9 +5,9 @@ import { join, relative } from 'node:path';
  * Stellar Selection figures are computed in one place (lib/selectionStanding.ts)
  * and shown as a linear share of the cycle's gestures. Compounding that share
  * into a chance of "at least one" selection (1 - ((N - k) / N)^m) reads as
- * lottery odds that climb toward 100% with every paid entry, so no new file
- * may do it. The files listed below still do and are migrating; the lists
- * may only shrink.
+ * lottery odds that climb toward 100% with every paid entry, so no file but
+ * lib/selectionStanding.ts (whose deprecated standing still does it) may.
+ * The lists may only shrink.
  */
 
 const ROOT = process.cwd();
@@ -32,10 +32,7 @@ const files = SCANNED.flatMap((dir) => sourceFiles(join(ROOT, dir))).map((path) 
 const COMPOUNDED_ODDS = /1\s*-\s*Math\.pow\(\s*\(\s*[\w.]+\s*-\s*[\w.]+\s*\)\s*\/\s*[\w.]+/;
 
 /** Files that still compound the share; remove an entry when its file moves to the share. */
-const COMPOUNDING_BASELINE: readonly string[] = [
-  'components/tables/StellarSelectionHolderTable.tsx',
-  'lib/selectionStanding.ts',
-];
+const COMPOUNDING_BASELINE: readonly string[] = ['lib/selectionStanding.ts'];
 
 /** Files that still read the deprecated compounded standing. */
 const STANDING_CONSUMER_BASELINE: readonly string[] = [];
@@ -79,5 +76,13 @@ describe('Stellar Selection figures', () => {
     const view = files.find((file) => file.path === 'components/UserStatisticsView.tsx');
     expect(view?.text).toMatch(/getSelectionShare/);
     expect(view?.text).not.toMatch(/Math\.pow/);
+  });
+
+  it('computes the cycle pool table’s share linearly, through lib/selectionStanding', () => {
+    const table = files.find(
+      (file) => file.path === 'components/tables/StellarSelectionHolderTable.tsx',
+    );
+    expect(table?.text).toMatch(/getSelectionShare/);
+    expect(table?.text).not.toMatch(/Math\.pow/);
   });
 });

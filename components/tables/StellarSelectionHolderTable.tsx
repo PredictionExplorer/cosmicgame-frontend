@@ -1,59 +1,60 @@
 'use client';
 
 import { useMemo } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
-import { sameAddress } from '@/utils/format';
+import { formatCount, sameAddress } from '@/utils/format';
+import { getSelectionShare } from '@/lib/selectionStanding';
 import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
 import type { LedgerStateProps } from '@/components/tables/ledger-props';
 import { useActiveWeb3React } from '@/hooks/web3';
 import type { GestureInfo } from '@/services/api';
 
-interface Holder {
+interface PoolEntry {
   userAddr: string;
-  count: number;
-  ethProbability: number;
-  NFTProbability: number;
+  /** The participant's gestures this cycle: their entries in the pool. */
+  gestures: number;
+  /** Their part of the pool, from 0 to 1 (lib/selectionStanding). */
+  share: number;
 }
 
 interface StellarSelectionHolderTableProps extends LedgerStateProps {
   list: GestureInfo[];
+  /** ETH Stellar Selections drawn at finalization, when the dashboard carries them. */
   numRaffleEthWinner?: number;
+  /** NFT Stellar Selections drawn at finalization. */
   numRaffleNFTWinner?: number;
 }
 
 /**
- * Stellar Selection entries per participant this cycle (one per gesture),
- * most first, with the chance of at least one ETH or NFT selection given the
- * cycle's number of selections.
+ * Each participant's entries in this cycle's Stellar Selection pool (one per
+ * gesture), most first, with their linear share of the pool. The share is
+ * the count it comes from divided by every gesture of the cycle, computed in
+ * lib/selectionStanding; it is never compounded into a chance of "at least
+ * one" selection, which climbs toward 100% with every paid entry.
  */
-function holdersFrom(
-  list: readonly GestureInfo[],
-  ethSelections: number,
-  nftSelections: number,
-): Holder[] {
-  const counts = new Map<string, { userAddr: string; count: number }>();
+function poolEntriesFrom(list: readonly GestureInfo[]): PoolEntry[] {
+  const counts = new Map<string, { userAddr: string; gestures: number }>();
   for (const gesture of list) {
     const key = gesture.BidderAddr.toLowerCase();
-    const entry = counts.get(key) ?? { userAddr: gesture.BidderAddr, count: 0 };
-    entry.count += 1;
+    const entry = counts.get(key) ?? { userAddr: gesture.BidderAddr, gestures: 0 };
+    entry.gestures += 1;
     counts.set(key, entry);
   }
-  const total = list.length;
   return [...counts.values()]
-    .map(({ userAddr, count }) => ({
+    .map(({ userAddr, gestures }) => ({
       userAddr,
-      count,
-      ethProbability: 1 - Math.pow((total - count) / total, ethSelections),
-      NFTProbability: 1 - Math.pow((total - count) / total, nftSelections),
+      gestures,
+      share: getSelectionShare({ totalGestures: list.length, myGestures: gestures })?.share ?? 0,
     }))
-    .sort((a, b) => b.count - a.count);
+    .sort((a, b) => b.gestures - a.gestures);
 }
 
 /**
- * The cycle's Stellar Selection entries by participant. The connected
- * wallet's row stays at its true position, marked "You", with its position
- * above the table; it is never lifted to the top.
+ * The cycle's Stellar Selection pool by participant: three short columns, so
+ * it stays a real table on a phone. The connected wallet's row stays at its
+ * true position, marked "You", with its position above the table. Under the
+ * table, how many selections finalization draws from the pool.
  */
 const StellarSelectionHolderTable = ({
   list,
@@ -62,61 +63,59 @@ const StellarSelectionHolderTable = ({
   ...state
 }: StellarSelectionHolderTableProps) => {
   const t = useTranslations('tables');
+  const locale = useLocale();
   const { account } = useActiveWeb3React();
-  const ready = Boolean(numRaffleEthWinner && numRaffleNFTWinner);
 
-  const holders = useMemo(
-    () =>
-      ready && list.length > 0
-        ? holdersFrom(list, numRaffleEthWinner ?? 1, numRaffleNFTWinner ?? 1)
-        : [],
-    [ready, list, numRaffleEthWinner, numRaffleNFTWinner],
-  );
+  const entries = useMemo(() => poolEntriesFrom(list), [list]);
 
-  const columns = useMemo<DataTableColumn<Holder>[]>(
+  const columns = useMemo<DataTableColumn<PoolEntry>[]>(
     () => [
       {
-        id: 'holder',
+        id: 'participant',
         kind: 'address',
-        header: t('columns.holder'),
+        header: t('columns.participant'),
         value: (row) => row.userAddr,
       },
       {
-        id: 'entries',
+        id: 'gestures',
         kind: 'count',
-        header: t('columns.numberOfStellarEntries'),
-        value: (row) => row.count,
+        header: t('columns.gesturesThisCycle'),
+        value: (row) => row.gestures,
       },
       {
-        id: 'ethProbability',
+        id: 'share',
         kind: 'percent',
-        header: t('columns.ethSelectionProbability'),
-        value: (row) => row.ethProbability,
-        percentScale: 'ratio',
-      },
-      {
-        id: 'nftProbability',
-        kind: 'percent',
-        header: t('columns.nftSelectionProbability'),
-        value: (row) => row.NFTProbability,
+        header: t('columns.shareOfPool'),
+        value: (row) => row.share,
         percentScale: 'ratio',
       },
     ],
     [t],
   );
 
+  const drawsKnown =
+    typeof numRaffleEthWinner === 'number' &&
+    numRaffleEthWinner > 0 &&
+    typeof numRaffleNFTWinner === 'number' &&
+    numRaffleNFTWinner > 0;
+
   return (
     <DataTable
-      data={holders}
+      data={entries}
       columns={columns}
       ariaLabel={t('names.stellarSelectionEntries')}
       getRowKey={(row) => row.userAddr}
       isCurrentRow={(row) => sameAddress(row.userAddr, account)}
       emptyTitle={t('empty.stellarEntries')}
+      caption={
+        drawsKnown
+          ? t('stellarSelection.draws', {
+              eth: formatCount(numRaffleEthWinner, locale),
+              nft: formatCount(numRaffleNFTWinner, locale),
+            })
+          : undefined
+      }
       {...state}
-      // The chances need the cycle's selection counts; until they arrive the
-      // rows are placeholders rather than an empty table.
-      loading={state.loading || (list.length > 0 && !ready)}
     />
   );
 };

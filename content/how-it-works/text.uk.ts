@@ -85,7 +85,7 @@ export const howItWorksTextUk = {
         label: 'Зоряні відбори',
         description: `Три отримувачі зоряного відбору ETH ділять ${protocolFacts.stellarSelectionEthPercentage}% резерву циклу. Десять отримувачів зоряного відбору NFT і десять отримувачів зоряного відбору закріплених NFT отримують по ${protocolFacts.specialAllocationCst.toLocaleString('uk-UA')} CST і по одному Cosmic Signature NFT.`,
         tooltip:
-          'Запис додається за кожен жест. Що більше жестів, то вища частота відбору. Для власників закріплених Random Walk NFT діє окремий зоряний відбір.',
+          'Запис додається за кожен жест, і кожен відбір відбувається з усіх записів циклу з повторенням. Для власників закріплених Random Walk NFT діє окремий зоряний відбір.',
       },
       {
         label: 'Наступний цикл',

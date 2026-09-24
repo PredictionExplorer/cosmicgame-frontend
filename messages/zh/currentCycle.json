@@ -99,7 +99,7 @@
     },
     "stellarSelectionEntries": {
       "title": "星选资格",
-      "tooltip": "每一笔都计入一次星选资格；落笔越多，获得 ETH 或 Cosmic Signature NFT 分配的概率越高。"
+      "tooltip": "每次落笔都会在本周期的星选池中计入一次；周期确定时，每次星选都从整个池中选取，同一笔落笔可再次获选。下表列出每位参与者在池中的占比。"
     },
     "topEthSpenders": {
       "title": "ETH 支出排行",

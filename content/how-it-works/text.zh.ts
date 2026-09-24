@@ -81,7 +81,7 @@ export const howItWorksTextZh = {
         label: '星选',
         description: `3 位 ETH 星选获配者均分周期储备的 ${protocolFacts.stellarSelectionEthPercentage}%；参与者 NFT 星选与锚定 NFT 星选各选出 10 位获配者，每位获配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 与 1 枚 Cosmic Signature NFT。`,
         tooltip:
-          '星选资格随每一笔计入；落笔越多，入选频次越高。Random Walk NFT 锚定者另有单独的星选。',
+          '星选资格随每一笔计入；每次星选都从本周期的全部落笔中选取，同一笔落笔可再次获选。Random Walk NFT 锚定者另有单独的星选。',
       },
       {
         label: '下一周期',
