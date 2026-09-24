@@ -276,7 +276,7 @@ test.describe('Wallet connection state (disconnected)', () => {
     ).toBeDisabled();
 
     // Message, advanced options and the action share the form's main column;
-    // from tablets up the wallet's standing sits beside it.
+    // from 1024px the wallet's standing sits beside the form, outside it.
     const messageBox = (await panel.getByTestId('gesture-panel-message').boundingBox())!;
     const actionBox = (await panel.getByTestId('gesture-panel-action').boundingBox())!;
     const collapsedBox = (await advanced.boundingBox())!;
@@ -285,7 +285,7 @@ test.describe('Wallet connection state (disconnected)', () => {
     expect(actionBox.x).toBeCloseTo(messageBox.x, 0);
     expect(actionBox.width).toBeCloseTo(messageBox.width, 0);
     if (!isMobile) {
-      const standingBox = (await panel.getByTestId('gesture-panel-standing').boundingBox())!;
+      const standingBox = (await page.getByTestId('control-desk-standing').boundingBox())!;
       expect(messageBox.x + messageBox.width).toBeLessThanOrEqual(standingBox.x);
     }
 
