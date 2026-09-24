@@ -30,14 +30,13 @@ import { landingLink } from '@/components/learn/guides';
 import { Callout, PROSE_CLASS, splitRunIn, termLabel } from '@/components/reading/prose';
 import { ReadingMain } from '@/components/reading/ReadingMain';
 import { SignaturePlate } from '@/components/reading/SignaturePlate';
+import { getSignaturePlateCopy } from '@/components/reading/signaturePlateCopy';
 import { SIGNATURE_PLATES } from '@/components/reading/signaturePlates';
 import { fillTemplate } from '@/components/reading/template';
 import { Badge } from '@/components/ui/badge';
 import { SectionHeader } from '@/components/ui/section-header';
 import { Link } from '@/i18n/navigation';
 import { APP_ORIGIN, LANDING_ORIGIN, localeHref, localizeCrossHostHref } from '@/lib/hostRouting';
-import { formatOgCycle } from '@/lib/og/copy';
-import { formatId } from '@/utils/format/ids';
 import { formatPercent } from '@/utils/format/numbers';
 import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
@@ -93,8 +92,7 @@ export default async function AboutPage({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
   const content = getAboutContent(locale);
-  const traits = await getTranslations({ locale, namespace: 'traits' });
-  const detail = await getTranslations({ locale, namespace: 'detail' });
+  const plateCopy = await getSignaturePlateCopy(locale);
   const nav = await getTranslations({ locale, namespace: 'nav' });
   const inLanguage = jsonLdInLanguage(locale);
   const pageUrl = localeHref(LANDING_ORIGIN, content.metadata.path, locale);
@@ -111,7 +109,6 @@ export default async function AboutPage({ params }: PageProps) {
   };
   const principles = principlesOf(locale);
   const readWhitePaperLabel = getLearnContent(locale).hub.whitePaper.readLabel;
-  const plateId = formatId(ABOUT_PLATE.tokenId);
   const linksById = new Map(content.officialResources.links.map((link) => [link.id, link]));
 
   return (
@@ -155,12 +152,7 @@ export default async function AboutPage({ params }: PageProps) {
           priority
           href={localizeCrossHostHref(`${APP_ORIGIN}/detail/${ABOUT_PLATE.tokenId}`, locale)}
           sizes="(min-width: 1024px) 36rem, 100vw"
-          copy={{
-            alt: traits('quickView.title', { id: plateId }),
-            title: traits('quickView.title', { id: plateId }),
-            cycle: formatOgCycle(locale, ABOUT_PLATE.cycle),
-            unavailable: detail('image.artworkUnavailable'),
-          }}
+          copy={plateCopy(ABOUT_PLATE)}
         />
       </header>
 

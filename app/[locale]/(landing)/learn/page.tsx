@@ -12,15 +12,14 @@ import { guideMinutes } from '@/components/learn/guides';
 import { QuizPrompt } from '@/components/learn/QuizPrompt';
 import { ReadingMain } from '@/components/reading/ReadingMain';
 import { SignaturePlate } from '@/components/reading/SignaturePlate';
+import { getSignaturePlateCopy } from '@/components/reading/signaturePlateCopy';
 import { SIGNATURE_PLATES } from '@/components/reading/signaturePlates';
 import { fillTemplate } from '@/components/reading/template';
 import { SectionHeader } from '@/components/ui/section-header';
 import { buttonVariants } from '@/components/ui/button';
 import { Link } from '@/i18n/navigation';
 import { APP_ORIGIN, LANDING_ORIGIN, localeHref, localizeCrossHostHref } from '@/lib/hostRouting';
-import { formatOgCycle } from '@/lib/og/copy';
 import { cn } from '@/lib/utils';
-import { formatId } from '@/utils/format/ids';
 import { JsonLd, breadcrumbJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
 
@@ -56,9 +55,7 @@ export default async function LearnIndexPage({ params }: PageProps) {
   setRequestLocale(locale);
   const { hub, articleUi, articles } = getLearnContent(locale);
   const whitePaper = getWhitePaperContent(locale);
-  const traits = await getTranslations({ locale, namespace: 'traits' });
-  const detail = await getTranslations({ locale, namespace: 'detail' });
-  const plateId = formatId(WHITE_PAPER_PLATE.tokenId);
+  const plateCopy = await getSignaturePlateCopy(locale);
 
   return (
     <ReadingMain>
@@ -163,12 +160,7 @@ export default async function LearnIndexPage({ params }: PageProps) {
                     locale,
                   )}
                   sizes="(min-width: 1024px) 22rem, (min-width: 768px) 15rem, 100vw"
-                  copy={{
-                    alt: traits('quickView.title', { id: plateId }),
-                    title: traits('quickView.title', { id: plateId }),
-                    cycle: formatOgCycle(locale, WHITE_PAPER_PLATE.cycle),
-                    unavailable: detail('image.artworkUnavailable'),
-                  }}
+                  copy={plateCopy(WHITE_PAPER_PLATE)}
                 />
               </section>
             ) : null}

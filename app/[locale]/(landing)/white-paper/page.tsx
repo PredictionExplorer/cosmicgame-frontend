@@ -39,14 +39,13 @@ import {
 import { ReadingMain } from '@/components/reading/ReadingMain';
 import { readingMinutes } from '@/components/reading/readingTime';
 import { SignaturePlate } from '@/components/reading/SignaturePlate';
+import { getSignaturePlateCopy } from '@/components/reading/signaturePlateCopy';
 import { SIGNATURE_PLATES } from '@/components/reading/signaturePlates';
 import { fillTemplate } from '@/components/reading/template';
 import { CycleTimeline } from '@/components/white-paper/CycleTimeline';
 import { referenceTargets, withReferences } from '@/components/white-paper/crossReferences';
 import { APP_ORIGIN, LANDING_ORIGIN, localeHref, localizeCrossHostHref } from '@/lib/hostRouting';
-import { formatOgCycle } from '@/lib/og/copy';
 import { cn } from '@/lib/utils';
-import { formatId } from '@/utils/format/ids';
 import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
 
@@ -307,8 +306,7 @@ export default async function WhitePaperPage({ params }: PageProps) {
   const inLanguage = jsonLdInLanguage(locale);
   const pageUrl = localeHref(LANDING_ORIGIN, content.metadata.path, locale);
   const pdfUrl = `${LANDING_ORIGIN}${content.hero.downloadHref}`;
-  const detail = await getTranslations({ locale, namespace: 'detail' });
-  const traits = await getTranslations({ locale, namespace: 'traits' });
+  const plateCopy = await getSignaturePlateCopy(locale);
   const minutes = readingMinutes(paperText(content), locale);
   const targets = referenceTargets(content);
   const renderText = (text: string) => withReferences(text, locale, targets);
@@ -384,20 +382,13 @@ export default async function WhitePaperPage({ params }: PageProps) {
       body: (
         <div className="grid gap-x-6 gap-y-8 sm:grid-cols-2">
           {[SIGNATURE_PLATES[23], SIGNATURE_PLATES[24]].map((art) => {
-            const id = formatId(art.tokenId);
             return (
               <SignaturePlate
                 key={art.tokenId}
                 art={art}
                 href={localizeCrossHostHref(`${APP_ORIGIN}/detail/${art.tokenId}`, locale)}
                 sizes="(min-width: 1024px) 30rem, (min-width: 640px) 45vw, 100vw"
-                copy={{
-                  alt: traits('quickView.title', { id }),
-                  title: traits('quickView.title', { id }),
-                  cycle: formatOgCycle(locale, art.cycle),
-                  seedLabel: figures.art.seedLabel,
-                  unavailable: detail('image.artworkUnavailable'),
-                }}
+                copy={{ ...plateCopy(art), seedLabel: figures.art.seedLabel }}
               />
             );
           })}

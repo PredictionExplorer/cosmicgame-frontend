@@ -17,14 +17,13 @@ import { ReadingContents } from '@/components/reading/ContentsNav';
 import { PROSE_CLASS, ReadingHeading } from '@/components/reading/prose';
 import { ReadingMain } from '@/components/reading/ReadingMain';
 import { SignaturePlate } from '@/components/reading/SignaturePlate';
+import { getSignaturePlateCopy } from '@/components/reading/signaturePlateCopy';
 import { signaturePlate } from '@/components/reading/signaturePlates';
 import { fillTemplate } from '@/components/reading/template';
 import { Link } from '@/i18n/navigation';
 import { APP_ORIGIN, LANDING_ORIGIN, localeHref, localizeCrossHostHref } from '@/lib/hostRouting';
-import { formatOgCycle } from '@/lib/og/copy';
 import { cn } from '@/lib/utils';
 import { formatYyyymmddLabel } from '@/utils/format/dates';
-import { formatId } from '@/utils/format/ids';
 import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
 
@@ -71,11 +70,10 @@ export default async function LearnArticlePage({ params }: PageProps) {
   if (!article) notFound();
   const { hub, articleUi, articles } = getLearnContent(locale);
   const inLanguage = jsonLdInLanguage(locale);
-  const [common, nav, traits, detail] = await Promise.all([
+  const [common, nav, plateCopy] = await Promise.all([
     getTranslations({ locale, namespace: 'common' }),
     getTranslations({ locale, namespace: 'nav' }),
-    getTranslations({ locale, namespace: 'traits' }),
-    getTranslations({ locale, namespace: 'detail' }),
+    getSignaturePlateCopy(locale),
   ]);
 
   const index = articles.findIndex((candidate) => candidate.slug === article.slug);
@@ -102,7 +100,6 @@ export default async function LearnArticlePage({ params }: PageProps) {
       })();
   const minutes = guideMinutes(article, locale);
   const plate = signaturePlate(article.plate);
-  const plateId = formatId(article.plate);
 
   const url = localeHref(LANDING_ORIGIN, `/learn/${article.slug}`, locale);
   const articleJsonLd = {
@@ -133,12 +130,7 @@ export default async function LearnArticlePage({ params }: PageProps) {
           art={plate}
           href={localizeCrossHostHref(`${APP_ORIGIN}/detail/${plate.tokenId}`, locale)}
           sizes={width === '100vw' ? '100vw' : `(min-width: 1024px) ${width}, 100vw`}
-          copy={{
-            alt: traits('quickView.title', { id: plateId }),
-            title: traits('quickView.title', { id: plateId }),
-            cycle: formatOgCycle(locale, plate.cycle),
-            unavailable: detail('image.artworkUnavailable'),
-          }}
+          copy={plateCopy(plate)}
         />
       )
     : null;
