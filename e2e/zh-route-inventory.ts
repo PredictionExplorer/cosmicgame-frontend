@@ -314,7 +314,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: `/distributions-by-token/${address}/${tokenId}`,
     host: 'app',
     cluster: 'transactions',
-    expectedText: `代币 ${tokenId} 的锚定派发明细`,
+    expectedText: `Cosmic Signature #${String(tokenId).padStart(6, '0')} 的锚定派发`,
   },
 
   // Sprint 5 — statistics and public data tables.

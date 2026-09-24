@@ -152,7 +152,7 @@ function RewardsByTokenPage({ address, tokenId }: { address: string; tokenId: nu
       <PageHeader
         section="explore"
         breadcrumbs={participantTrail}
-        title={t('distributionsByToken.title', { tokenId })}
+        title={t('distributionsByToken.title', { id: formatId(tokenId) })}
         subtitle={t('distributionsByToken.subtitle')}
         figures={figures}
       />

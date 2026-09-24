@@ -76,7 +76,7 @@
       "pool": {
         "label": "锚定派发池",
         "definition": "本周期为已锚定的 Cosmic Signature NFT 预留的 ETH。周期收官时存入，并按各锚定者锚定的 NFT 数量按比例派发。",
-        "caption": "本周期周期储备的 {percentage}%，收官时存入"
+        "caption": "当前周期储备的 {percentage}%，于周期收官时存入"
       },
       "anchored": {
         "label": "已锚定的 Cosmic Signature NFT",
@@ -119,11 +119,11 @@
       },
       "cosmicSignature": {
         "question": "Cosmic Signature NFT 锚定如何运作？",
-        "answer": "锚定 Cosmic Signature NFT 后，可从锚定派发池获得 ETH。每个周期，周期储备的 6% 会按 NFT 锚定数量派发给锚定者。派发自动累积，解锚时一并取回。若周期收官时没有已锚定的 Cosmic Signature NFT，这部分份额将留在周期储备中。"
+        "answer": "锚定 Cosmic Signature NFT 后，可从锚定派发池获得 ETH。每个周期，周期储备的 {percentage}% 会按 NFT 锚定数量派发给锚定者。派发自动累积，解锚时一并取回。若周期收官时没有已锚定的 Cosmic Signature NFT，这部分份额将留在周期储备中。"
       },
       "randomWalk": {
         "question": "Random Walk NFT 锚定如何运作？",
-        "answer": "锚定 Random Walk NFT 后即可参与锚定 NFT 星选。每个周期，协议会通过链上随机机制选取已锚定的 Random Walk NFT，共 10 次。每次获选后，对应的锚定者都会获配 1,000 CST 和一枚新铭刻的 Cosmic Signature NFT；同一枚 NFT 在后续选取中仍可再次获选。Random Walk NFT 锚定不会获得 ETH。"
+        "answer": "锚定 Random Walk NFT 后即可参与锚定 NFT 星选。每个周期，协议会通过链上随机机制选取已锚定的 Random Walk NFT，共 {selections} 次。每次获选后，对应的锚定者都会获配 {cst, number} CST 和一枚新铭刻的 Cosmic Signature NFT；同一枚 NFT 在同一周期内可多次获选。Random Walk NFT 锚定不会获得 ETH。"
       },
       "calculation": {
         "question": "锚定派发如何计算？",
@@ -159,7 +159,6 @@
     "accrued": "已累计 {amount}",
     "cycle": "第 {cycle} 个周期",
     "open": "打开 {title}",
-    "opensNewTab": "（在新标签页打开）",
     "settled": {
       "anchored": "已锚定 · 更新中",
       "released": "已解锚 · 更新中"
@@ -179,10 +178,7 @@
       "unknown": "暂不可用",
       "note": "根据已索引的存入估算，实际金额以合约支付为准。"
     },
-    "warning": {
-      "title": "此操作不可撤销。",
-      "body": "解锚后的 NFT 永远无法再次锚定。"
-    },
+    "warning": "<b>此操作不可撤销。</b>解锚后的 NFT 永远无法再次锚定。",
     "keep": "保持锚定",
     "confirm": "{count, plural, other {解锚 # 枚 NFT}}"
   },
@@ -213,7 +209,7 @@
     "timeline": {
       "title": "时间线",
       "anchored": "已锚定",
-      "anchoredCount": "此操作后该系列的锚定总数：{count}",
+      "anchoredCount": "此操作后锚定总数：{count, plural, other {# 枚 NFT}}",
       "released": "已解锚",
       "retrieved": "已取回 {amount}",
       "stillAnchored": "仍在锚定中",
@@ -228,7 +224,7 @@
     }
   },
   "distributionsByToken": {
-    "title": "代币 {tokenId} 的锚定派发明细",
+    "title": "Cosmic Signature {id} 的锚定派发",
     "subtitle": "该 NFT 锚定期间参与的每一笔 ETH 锚定派发存入。",
     "label": "锚定派发存入",
     "error": "无法加载该 NFT 的存入记录，请稍后重试。",
@@ -244,7 +240,7 @@
       "releaseTitle": "解锚",
       "anchoredDatetime": "锚定时间",
       "releasedDatetime": "解锚时间",
-      "anchoredNfts": "该系列锚定总数",
+      "anchoredNfts": "锚定总数",
       "distribution": "已取回",
       "action": "锚定操作",
       "stillAnchored": "仍在锚定中：ETH 将在解锚时取回。",
@@ -269,8 +265,8 @@
       "label": "锚定与解锚操作",
       "headers": {
         "anchorDatetime": {
-          "desktop": "锚定时间",
-          "mobile": "日期时间",
+          "desktop": "日期",
+          "mobile": "日期",
           "tooltip": "锚定或解锚操作的索引时间。"
         },
         "actionType": {
@@ -305,7 +301,7 @@
         },
         "anchorDatetime": {
           "desktop": "锚定时间",
-          "mobile": "日期时间",
+          "mobile": "锚定时间",
           "tooltip": "代币锚定的时间。"
         },
         "actionId": {

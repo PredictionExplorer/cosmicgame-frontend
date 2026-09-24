@@ -77,9 +77,7 @@ export function AnchorTimeline({ collection, anchor, release, className }: Ancho
         when={provenDate(anchor)}
       >
         <p className="type-caption text-subtle">
-          {t('anchorActionDetail.timeline.anchoredCount', {
-            count: format.count(anchor.NumStakedNFTs),
-          })}
+          {t('anchorActionDetail.timeline.anchoredCount', { count: anchor.NumStakedNFTs })}
         </p>
       </TimelineEvent>
 

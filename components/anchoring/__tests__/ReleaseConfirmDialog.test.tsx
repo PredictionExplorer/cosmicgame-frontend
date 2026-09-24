@@ -36,8 +36,7 @@ describe('ReleaseConfirmDialog', () => {
     expect(within(dialog).getByText('anchoring.release.title(count=2)')).toBeInTheDocument();
     expect(within(dialog).getByText('#000009')).toBeInTheDocument();
     expect(within(dialog).getByText('#000014')).toBeInTheDocument();
-    expect(within(dialog).getByText('anchoring.release.warning.title')).toBeInTheDocument();
-    expect(within(dialog).getByText('anchoring.release.warning.body')).toBeInTheDocument();
+    expect(within(dialog).getByText('anchoring.release.warning')).toBeInTheDocument();
   });
 
   it('estimates the ETH a Cosmic Signature release retrieves', () => {

@@ -70,7 +70,7 @@ export const AnchorDistributionsTable = ({
       ariaLabel={t('tables.tokenDistributions.label')}
       getRowKey={(row) => row.TokenId}
       getRowHref={(row) => tokenDistributionsHref(address, row.TokenId)}
-      getRowLabel={(row) => t('distributionsByToken.title', { tokenId: row.TokenId })}
+      getRowLabel={(row) => t('distributionsByToken.title', { id: formatId(row.TokenId) })}
       emptyTitle={t('common.empty.distributions.title')}
       emptyDescription={t('common.empty.distributions.description')}
       headingLevel={headingLevel}

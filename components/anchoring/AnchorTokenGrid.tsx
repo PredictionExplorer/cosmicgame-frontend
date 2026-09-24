@@ -290,6 +290,7 @@ function AnchorTokenCard({
   onToggle,
 }: AnchorTokenCardProps) {
   const t = useTranslations('anchoring');
+  const tTables = useTranslations('tables');
   const checkboxId = useId();
   const number = formatId(item.tokenId);
   const name = item.name?.trim() || null;
@@ -315,13 +316,16 @@ function AnchorTokenCard({
       rel="noopener noreferrer"
       className={openClass}
       data-touch-target="extended"
-      aria-label={`${openLabel} ${t('picker.opensNewTab')}`}
     >
       <ArrowUpRight aria-hidden className="size-4" />
+      <span className="sr-only">
+        {openLabel} {tTables('links.newTab')}
+      </span>
     </a>
   ) : (
-    <Link href={href} className={openClass} data-touch-target="extended" aria-label={openLabel}>
+    <Link href={href} className={openClass} data-touch-target="extended">
       <ArrowRight aria-hidden className="size-4" />
+      <span className="sr-only">{openLabel}</span>
     </Link>
   );
 

@@ -22,7 +22,7 @@ describe('AnchorDistributionsTable', () => {
   it('leads each NFT to its deposit-by-deposit record', () => {
     render(<AnchorDistributionsTable list={[{ TokenId: 9 }]} address={ADDRESS} />);
     expect(
-      screen.getByRole('link', { name: 'anchoring.distributionsByToken.title(tokenId=9)' }),
+      screen.getByRole('link', { name: 'anchoring.distributionsByToken.title(id=#000009)' }),
     ).toHaveAttribute('href', `/distributions-by-token/${ADDRESS}/9`);
   });
 

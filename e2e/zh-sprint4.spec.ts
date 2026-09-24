@@ -188,7 +188,7 @@ test.describe('zh Sprint 4 — transactions and holdings routes', () => {
     await expect(
       page.getByRole('heading', {
         level: 1,
-        name: `代币 ${SPRINT4_MOCK_TOKEN_ID} 的锚定派发明细`,
+        name: `Cosmic Signature #${String(SPRINT4_MOCK_TOKEN_ID).padStart(6, '0')} 的锚定派发`,
       }),
     ).toBeVisible();
     await expect(page.getByText('锚定派发（ETH）', { exact: true }).first()).toBeVisible();

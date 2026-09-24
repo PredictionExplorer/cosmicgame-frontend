@@ -1,6 +1,8 @@
 import { ChevronDown } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
+import { protocolFacts } from '@/content/protocol-facts';
+
 import { cn } from '@/lib/utils';
 import { SectionHeader } from '@/components/ui/section-header';
 
@@ -23,6 +25,12 @@ interface AnchoringQuestionsProps {
  */
 export function AnchoringQuestions({ className }: AnchoringQuestionsProps) {
   const t = useTranslations('anchoring');
+  // The answers quote the protocol's constants, never their own copies of them.
+  const values = {
+    percentage: protocolFacts.anchorDistributionPercentage,
+    selections: protocolFacts.anchoredRwlkNftSelectionRecipients,
+    cst: protocolFacts.specialAllocationCst,
+  };
 
   return (
     <section
@@ -52,7 +60,7 @@ export function AnchoringQuestions({ className }: AnchoringQuestionsProps) {
               />
             </summary>
             <p className="pb-5 pe-8 type-body-sm leading-relaxed text-muted-foreground">
-              {t(`questions.items.${id}.answer`)}
+              {t(`questions.items.${id}.answer`, values)}
             </p>
           </details>
         ))}

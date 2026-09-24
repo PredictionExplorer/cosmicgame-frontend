@@ -36,7 +36,10 @@ describe('AnchoringQuestions', () => {
     ).toBeInTheDocument();
     const questions = screen.getAllByText(/anchoring\.questions\.items\.\w+\.question/);
     expect(questions).toHaveLength(5);
-    const answer = screen.getByText('anchoring.questions.items.anchorOnce.answer');
+    // The answers quote the protocol's constants rather than hard-coding them.
+    const answer = screen.getByText(
+      'anchoring.questions.items.anchorOnce.answer(percentage=6,selections=10,cst=1000)',
+    );
     const disclosure = answer.closest('details');
     expect(disclosure).not.toHaveAttribute('open');
     await user.click(screen.getByText('anchoring.questions.items.anchorOnce.question'));

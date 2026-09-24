@@ -46,10 +46,8 @@ export interface ReleaseConfirmDialogProps {
   retrievableEth?: number | null;
   /** Starts the release. The dialog stays open, showing progress, until the caller closes it. */
   onConfirm: () => void;
-  /** The transaction stage of the release, shown under the actions while it runs. */
+  /** The transaction stage of this dialog's release, shown under the actions while it runs. */
   stage: TxStage;
-  /** Whether `stage` belongs to this dialog's release (another flow may own the wallet). */
-  showStage?: boolean;
 }
 
 /**
@@ -68,10 +66,9 @@ export function ReleaseConfirmDialog({
   retrievableEth,
   onConfirm,
   stage,
-  showStage = true,
 }: ReleaseConfirmDialogProps) {
   const t = useTranslations('anchoring');
-  const busy = showStage && isTxBusy(stage);
+  const busy = isTxBusy(stage);
   const listed = tokens?.slice(0, LISTED_TOKENS) ?? [];
   const hidden = (tokens?.length ?? 0) - listed.length;
   const isSignature = collection === 'cosmicSignature';
@@ -138,12 +135,14 @@ export function ReleaseConfirmDialog({
         <div className="flex gap-3 rounded-control border-s-2 border-critical bg-critical-surface px-3.5 py-3">
           <OctagonAlert aria-hidden className="mt-0.5 size-4 shrink-0 text-critical" />
           <p className="type-body-sm text-foreground">
-            <strong className="font-semibold">{t('release.warning.title')}</strong>{' '}
-            {t('release.warning.body')}
+            {/* One message, so each locale sets its own spacing after the lead sentence. */}
+            {t.rich('release.warning', {
+              b: (chunks) => <strong className="font-semibold">{chunks}</strong>,
+            })}
           </p>
         </div>
 
-        {showStage && stage.status !== 'idle' ? <TxStatus stage={stage} /> : null}
+        {stage.status !== 'idle' ? <TxStatus stage={stage} /> : null}
 
         <DialogFooter className="gap-2 sm:space-x-0">
           <DialogClose asChild>

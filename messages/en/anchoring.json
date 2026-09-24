@@ -76,7 +76,7 @@
       "pool": {
         "label": "Anchor Distribution pool",
         "definition": "The ETH this cycle sets aside for anchored Cosmic Signature NFTs. It is deposited when the cycle finalizes and shared in proportion to how many NFTs each anchor-holder has anchored.",
-        "caption": "{percentage}% of this cycle’s Cycle Reserve, deposited when it finalizes"
+        "caption": "{percentage}% of the current Cycle Reserve, deposited when the cycle finalizes"
       },
       "anchored": {
         "label": "Anchored Cosmic Signature NFTs",
@@ -115,23 +115,23 @@
     "items": {
       "whatIsAnchoring": {
         "question": "What is anchoring?",
-        "answer": "Anchoring lets you dedicate NFTs to the protocol. Cosmic Signature NFT anchors receive ETH Anchor Distributions, while Random Walk NFT anchors enter Anchored-NFT Stellar Selection. You can release an anchor at any time to reclaim your NFTs; Cosmic Signature NFT releases also retrieve accumulated ETH distributions. Important: each NFT can be anchored only once, ever — once released, that NFT can never be anchored again."
+        "answer": "Anchoring places your NFTs with the protocol’s anchoring contracts. Anchored Cosmic Signature NFTs receive ETH Anchor Distributions, and anchored Random Walk NFTs enter the Anchored-NFT Stellar Selection. You can release an anchor at any time to get your NFTs back; releasing a Cosmic Signature NFT also retrieves the ETH it has accrued. Each NFT can be anchored only once: after a release, it can never be anchored again."
       },
       "cosmicSignature": {
         "question": "How does Cosmic Signature NFT anchoring work?",
-        "answer": "Anchor your Cosmic Signature NFTs to receive ETH from the Anchor Distribution pool. Each cycle, 6% of the Cycle Reserve is distributed proportionally among all Cosmic Signature NFT anchor-holders based on how many NFTs they have anchored. Distributions accumulate automatically and are paid out when you release an anchor. If no Cosmic Signature NFTs are anchored when a cycle finalizes, that cycle's share stays in the Cycle Reserve."
+        "answer": "Anchor your Cosmic Signature NFTs to receive ETH from the Anchor Distribution pool. Each cycle, {percentage}% of the Cycle Reserve is shared among all Cosmic Signature NFT anchor-holders in proportion to how many NFTs each has anchored. Distributions accumulate on their own and are retrieved when you release an anchor. If no Cosmic Signature NFT is anchored when a cycle finalizes, that cycle’s share stays in the Cycle Reserve."
       },
       "randomWalk": {
         "question": "How does Random Walk NFT anchoring work?",
-        "answer": "Anchor your Random Walk NFTs to take part in Anchored-NFT Stellar Selection. Each cycle, ten selections are drawn among anchored Random Walk NFTs through on-chain random selection; each selection receives 1,000 CST and one newly imprinted Cosmic Signature NFT. Selections are drawn with replacement, so the same anchor-holder can be selected more than once. Random Walk anchors receive no ETH."
+        "answer": "Anchor your Random Walk NFTs to take part in the Anchored-NFT Stellar Selection. Each cycle it picks {selections} of the anchored Random Walk NFTs at random on-chain, and every pick gives that NFT’s anchor-holder {cst, number} CST and one newly imprinted Cosmic Signature NFT. The same NFT can be picked more than once in a cycle. Random Walk anchors receive no ETH."
       },
       "calculation": {
         "question": "How are distributions calculated?",
-        "answer": "Cosmic Signature NFT Anchor Distributions are proportional: if you have anchored one tenth of all anchored Cosmic Signature NFTs, you receive one tenth of each ETH distribution deposit. Random Walk NFT anchoring uses an on-chain random-selection mechanism for Anchored-NFT Stellar Selection, so anchoring more Random Walk NFTs increases your selection chance rather than an ETH distribution share."
+        "answer": "Cosmic Signature NFT Anchor Distributions are proportional: if you have anchored one tenth of all anchored Cosmic Signature NFTs, you receive one tenth of each ETH Anchor Distribution deposit. Random Walk NFTs take part in the Anchored-NFT Stellar Selection instead, so anchoring more of them makes it more likely that one of yours is picked; it does not give you an ETH share."
       },
       "anchorOnce": {
         "question": "Can I anchor an NFT again after releasing it?",
-        "answer": "No. The anchoring contracts record every NFT that has ever been anchored, and an NFT is allowed to be anchored only once. Releasing an anchor pays out any accumulated ETH distributions (for Cosmic Signature NFTs) and returns the NFT to your wallet, but permanently ends that NFT's anchoring eligibility. Only release when you want to exit anchoring for that NFT entirely."
+        "answer": "No. The anchoring contracts record every NFT that has ever been anchored, and each NFT can be anchored only once. Releasing an anchor returns the NFT to your wallet and, for a Cosmic Signature NFT, retrieves the ETH it has accrued, but it ends that NFT’s anchoring for good. Release only when you are done anchoring that NFT."
       }
     }
   },
@@ -159,7 +159,6 @@
     "accrued": "{amount} accrued",
     "cycle": "Cycle {cycle}",
     "open": "Open {title}",
-    "opensNewTab": "(opens in a new tab)",
     "settled": {
       "anchored": "Anchored · updating",
       "released": "Released · updating"
@@ -179,10 +178,7 @@
       "unknown": "Unavailable",
       "note": "Estimated from indexed deposits. The contract pays the exact amount."
     },
-    "warning": {
-      "title": "This is permanent.",
-      "body": "A released NFT can never be anchored again."
-    },
+    "warning": "<b>This is permanent.</b> A released NFT can never be anchored again.",
     "keep": "Keep anchored",
     "confirm": "{count, plural, one {Release # NFT} other {Release # NFTs}}"
   },
@@ -213,7 +209,7 @@
     "timeline": {
       "title": "Timeline",
       "anchored": "Anchored",
-      "anchoredCount": "Anchored in the collection after this action: {count}",
+      "anchoredCount": "{count, plural, one {# NFT} other {# NFTs}} anchored in total after this action",
       "released": "Released",
       "retrieved": "Retrieved {amount}",
       "stillAnchored": "Still anchored",
@@ -228,7 +224,7 @@
     }
   },
   "distributionsByToken": {
-    "title": "Anchor Distribution details for token {tokenId}",
+    "title": "Anchor Distributions for Cosmic Signature {id}",
     "subtitle": "Every ETH Anchor Distribution deposit this NFT has shared in while anchored.",
     "label": "Anchor Distribution deposits",
     "error": "The deposits for this NFT could not be loaded. Try again in a moment.",
@@ -244,7 +240,7 @@
       "releaseTitle": "Release",
       "anchoredDatetime": "Anchored",
       "releasedDatetime": "Released",
-      "anchoredNfts": "Anchored in the collection",
+      "anchoredNfts": "Anchored in total",
       "distribution": "Retrieved",
       "action": "Anchor action",
       "stillAnchored": "Still anchored: the ETH is retrieved when the anchor is released.",
@@ -270,7 +266,7 @@
       "headers": {
         "anchorDatetime": {
           "desktop": "Date",
-          "mobile": "Datetime",
+          "mobile": "Date",
           "tooltip": "Timestamp when the anchor or release action was indexed."
         },
         "actionType": {
@@ -305,7 +301,7 @@
         },
         "anchorDatetime": {
           "desktop": "Anchored",
-          "mobile": "Datetime",
+          "mobile": "Anchored",
           "tooltip": "Timestamp when the token was anchored."
         },
         "actionId": {

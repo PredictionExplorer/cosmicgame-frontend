@@ -65,7 +65,7 @@ describe('RewardsByTokenPage', () => {
     expect(
       screen.getByRole('heading', {
         level: 1,
-        name: 'anchoring.distributionsByToken.title(tokenId=0)',
+        name: 'anchoring.distributionsByToken.title(id=#000000)',
       }),
     ).toBeInTheDocument();
     expect(
