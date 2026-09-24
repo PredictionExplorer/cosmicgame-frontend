@@ -9,7 +9,9 @@ jest.mock('@tanstack/react-query', () => jest.requireActual('@tanstack/react-que
 jest.mock('../publicDataReads', () => ({ readDashboard: jest.fn() }));
 
 function SeededValue() {
-  const data = useQueryClient().getQueryData<string>(['probe']);
+  const client = useQueryClient();
+  const data = client.getQueryData<string | null>(['probe']);
+  if (data === null) return <p>seeded as absent</p>;
   return <p>{data ?? 'no seed'}</p>;
 }
 
@@ -40,6 +42,16 @@ describe('QuerySeed', () => {
       </QuerySeed>,
     );
     expect(screen.getByText('no seed')).toBeInTheDocument();
+  });
+
+  it('seeds a record the API does not hold as the null answer its hook gives', () => {
+    delete process.env.PLAYWRIGHT;
+    renderWithQuery(
+      <QuerySeed seeds={[{ queryKey: ['probe'], data: null, at: Date.now(), absent: true }]}>
+        <SeededValue />
+      </QuerySeed>,
+    );
+    expect(screen.getByText('seeded as absent')).toBeInTheDocument();
   });
 
   it('seeds nothing under the e2e harness, whose specs mock the API in the browser', () => {

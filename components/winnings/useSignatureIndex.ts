@@ -23,14 +23,16 @@ export type SignatureArtState = 'loading' | 'failed' | 'ready';
  * embeds its cycle's full allocation ledger, so per-token reads cost more
  * until the collection is some ten times larger; a batched seed endpoint is
  * the lasting fix. A token newer than the index is simply absent: its plate
- * shows the designed unavailable state.
+ * shows the designed unavailable state. Pass `enabled: false` when every
+ * plate already has its seed (a cycle's record carries its Signature's):
+ * nothing is read, and the state is `ready`.
  */
-export function useSignatureIndex(): {
+export function useSignatureIndex({ enabled = true }: { enabled?: boolean } = {}): {
   get: (tokenId: number) => SignatureIndexEntry | undefined;
   state: SignatureArtState;
   retry: () => void;
 } {
-  const { data, isLoading, isError, refetch } = useCSTList();
+  const { data, isLoading, isError, refetch } = useCSTList({ enabled });
   const index = useMemo(() => {
     const byId = new Map<number, SignatureIndexEntry>();
     for (const token of data ?? []) {

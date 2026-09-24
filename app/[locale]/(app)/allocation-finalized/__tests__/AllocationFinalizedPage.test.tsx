@@ -20,7 +20,7 @@ jest.mock('../../../../../hooks/useApiQuery', () => ({
   useRoundInfo: (...args: unknown[]) => mockUseRoundInfo(...args),
   useCSTInfo: (...args: unknown[]) => mockUseCSTInfo(...args),
   useRoundList: (...args: unknown[]) => mockUseRoundList(...args),
-  useCSTList: () => mockUseCSTList(),
+  useCSTList: (...args: unknown[]) => mockUseCSTList(...args),
 }));
 
 const mockUseCSTList = jest.fn();
@@ -325,6 +325,27 @@ describe('AllocationFinalizedPage', () => {
     expect(refetch).toHaveBeenCalledTimes(1);
   });
 
+  it('draws the index from the seeds its cycles carry, without reading the collection', () => {
+    query = new URLSearchParams('');
+    mockUseRoundList.mockReturnValue({
+      data: [
+        {
+          RoundNum: 1,
+          TokenId: 24,
+          TokenSeed: '5084a8',
+          AmountEth: 11.06,
+          TimeStamp: 1_700_000_000,
+        },
+      ],
+      isLoading: false,
+    });
+    mockUseCSTList.mockReturnValue({ data: undefined, isLoading: false });
+    render(<Page seoSummary={<h1>Summary</h1>} />);
+    expect(mockUseCSTList).toHaveBeenCalledWith({ enabled: false });
+    expect(screen.getByTestId('art-frame')).toBeInTheDocument();
+    expect(screen.queryByTestId('pending-plate')).not.toBeInTheDocument();
+  });
+
   it('never calls the index art unavailable while the collection index loads', () => {
     query = new URLSearchParams('');
     mockUseRoundList.mockReturnValue({
@@ -344,6 +365,15 @@ describe('AllocationFinalizedPage', () => {
     const section = screen.getByTestId('finalized-signature');
     expect(within(section).getByTestId('pending-plate')).toHaveAttribute('aria-busy', 'true');
     expect(within(section).queryByText('detail.image.artworkUnavailable')).not.toBeInTheDocument();
+  });
+
+  it('draws the received Signature from its record while the token read adds the name', () => {
+    roundInfo({ ...ALLOCATION, TokenSeed: 'abc' });
+    mockUseCSTInfo.mockReturnValue({ data: undefined, isLoading: true });
+    render(<Page />);
+    const section = screen.getByTestId('finalized-signature');
+    expect(within(section).getByTestId('art-frame')).toBeInTheDocument();
+    expect(within(section).queryByTestId('pending-plate')).not.toBeInTheDocument();
   });
 
   it('treats a cycle parameter that is not a number as no cycle', () => {

@@ -38,6 +38,8 @@ import { toFiniteNumber } from '@/utils/finiteNumber';
 import { sameAddress } from '@/utils/format';
 import { formatId } from '@/utils/format/ids';
 
+import { FinalizedSignatureSkeleton } from './FinalizedSignatureSkeleton';
+
 /** Poll interval while waiting for the next cycle to become active (chain activation time). */
 const ACTIVATION_POLL_MS = 4000;
 /** Poll interval while the indexer has not yet recorded the cycle a participant just finalized. */
@@ -220,6 +222,8 @@ interface FinalizedAllocation {
   AmountEth: number;
   CSTAmountEth: number;
   TokenId: number;
+  /** The Signature's seed, from the record itself: the art needs no token read. */
+  TokenSeed?: string | number;
   TxHash: string;
   TimeStamp: number;
   RoundStats: { TotalDonatedNFTs?: unknown };
@@ -249,7 +253,11 @@ function FinalizedSignature({
   const name = typeof token?.TokenName === 'string' ? token.TokenName.trim() : '';
   const rendering = isRenderPending(allocation.TimeStamp, nowMs);
   const attached = toFiniteNumber(allocation.RoundStats?.TotalDonatedNFTs) ?? 0;
-  const sources = useMemo(() => signatureSources(signatureMedia(token?.Seed)), [token?.Seed]);
+  // The record carries its Signature's seed; the token read adds the name (and the seed when
+  // an older record lacks it).
+  const seed = token?.Seed ?? allocation.TokenSeed;
+  const artPending = seed === undefined && loadingToken;
+  const sources = useMemo(() => signatureSources(signatureMedia(seed)), [seed]);
 
   return (
     <section
@@ -261,7 +269,7 @@ function FinalizedSignature({
         {hasToken ? (
           <Link href={`/detail/${allocation.TokenId}`} tabIndex={-1} aria-hidden className="block">
             {/* The seed is on its way: a busy plate, never "Artwork unavailable". */}
-            {loadingToken ? (
+            {artPending ? (
               <PendingPlate busy />
             ) : (
               <SignatureReveal
@@ -440,34 +448,6 @@ function NextSteps() {
   );
 }
 
-/** The layout of FinalizedSignature while it loads, so nothing moves when it arrives. */
-function FinalizedSignatureSkeleton({ label }: { label: string }) {
-  return (
-    <div
-      role="status"
-      aria-label={label}
-      className="grid gap-x-12 gap-y-10 lg:grid-cols-12 lg:items-start"
-    >
-      <div className="flex flex-col gap-4 lg:col-span-7">
-        <PendingPlate busy />
-        <Skeleton className="h-5 w-56" />
-        <Skeleton className="h-3.5 w-40" />
-      </div>
-      <div className="lg:col-span-5">
-        <Skeleton className="h-6 w-48" />
-        <div className="mt-4 divide-y divide-rule-faint border-y border-rule-faint">
-          {Array.from({ length: 5 }, (_, index) => (
-            <div key={index} className="flex min-h-[var(--row-h)] items-center justify-between">
-              <Skeleton className="h-3.5 w-24" />
-              <Skeleton className="h-4 w-32" />
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 /**
  * Without a cycle: the latest finalized cycles, each shown by the Signature it imprinted, and
  * the way to every cycle.
@@ -476,11 +456,14 @@ function FinalizedCycleIndex() {
   const t = useTranslations('allocation');
   const tDetail = useTranslations('detail');
   const { data: cycles, isLoading, isError, refetch } = useRoundList();
-  const signatures = useSignatureIndex();
   const latest = useMemo(
     () => [...(cycles ?? [])].sort((a, b) => b.RoundNum - a.RoundNum).slice(0, INDEX_CYCLES),
     [cycles],
   );
+  // Each record carries its Signature's seed; the collection is read only for one that lacks it.
+  const signatures = useSignatureIndex({
+    enabled: latest.some((round) => round.TokenSeed === undefined),
+  });
 
   let body: ReactNode;
   if (!cycles && isError) {
@@ -526,8 +509,8 @@ function FinalizedCycleIndex() {
                 <li key={round.RoundNum}>
                   <SignatureCard
                     tokenId={round.TokenId}
-                    seed={signatures.get(round.TokenId)?.seed}
-                    artState={signatures.state}
+                    seed={round.TokenSeed ?? signatures.get(round.TokenId)?.seed}
+                    artState={round.TokenSeed === undefined ? signatures.state : 'ready'}
                     href={`/allocation/${round.RoundNum}`}
                     title={t('formats.cycleHash', { cycle: round.RoundNum })}
                     meta={[
