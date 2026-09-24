@@ -690,7 +690,8 @@
     "searchPlaceholder": "輸入 NFT ID",
     "searchAria": "依 ID 搜尋 RandomWalk NFT",
     "tokenAria": "RandomWalk NFT 編號 {id}",
-    "empty": "找不到符合的 NFT"
+    "empty": "此錢包中沒有未使用的 Random Walk NFT。",
+    "imprint": "銘刻一枚 Random Walk NFT"
   },
   "orientation": {
     "title": "週期如何運作",

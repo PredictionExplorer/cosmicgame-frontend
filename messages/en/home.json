@@ -690,7 +690,8 @@
     "searchPlaceholder": "Enter NFT ID",
     "searchAria": "Find a RandomWalk NFT by ID",
     "tokenAria": "RandomWalk NFT {id}",
-    "empty": "Nothing Found!"
+    "empty": "This wallet holds no unused RandomWalk NFTs.",
+    "imprint": "Imprint a RandomWalk NFT"
   },
   "orientation": {
     "title": "How this cycle works",

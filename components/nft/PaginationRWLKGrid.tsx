@@ -1,9 +1,10 @@
 import { useState, useEffect, type FC, type ChangeEvent } from 'react';
-import { Search } from 'lucide-react';
+import { ArrowRight, Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { formatId } from '@/utils';
 
+import { Link } from '@/i18n/navigation';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import {
@@ -169,9 +170,18 @@ const PaginationRWLKGrid: FC<PaginationRWLKGridProps> = ({
         </>
       )}
 
-      {/* Empty State */}
+      {/* The wallet has no unused RandomWalk NFT: say so, and where to get one. */}
       {!loading && data.length === 0 && (
-        <p className="text-base text-center text-foreground">{t('rwlkGrid.empty')}</p>
+        <div data-testid="rwlk-grid-empty" className="py-4 text-center">
+          <p className="type-body-sm text-muted-foreground">{t('rwlkGrid.empty')}</p>
+          <Link
+            href="/imprint"
+            className="link mt-2 inline-flex min-h-6 items-center gap-1 type-body-sm"
+          >
+            {t('rwlkGrid.imprint')}
+            <ArrowRight aria-hidden className="size-3.5" />
+          </Link>
+        </div>
       )}
     </div>
   );

@@ -690,7 +690,8 @@
     "searchPlaceholder": "NFT ID 입력",
     "searchAria": "ID로 RandomWalk NFT 검색",
     "tokenAria": "RandomWalk NFT {id}",
-    "empty": "검색 결과가 없습니다"
+    "empty": "이 지갑에는 사용하지 않은 RandomWalk NFT가 없습니다.",
+    "imprint": "RandomWalk NFT 각인"
   },
   "orientation": {
     "title": "사이클 작동 원리",

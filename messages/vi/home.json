@@ -690,7 +690,8 @@
     "searchPlaceholder": "Nhập mã NFT",
     "searchAria": "Tìm RandomWalk NFT theo mã",
     "tokenAria": "RandomWalk NFT {id}",
-    "empty": "Không tìm thấy NFT phù hợp"
+    "empty": "Ví này không có RandomWalk NFT nào chưa sử dụng.",
+    "imprint": "Khắc một RandomWalk NFT"
   },
   "orientation": {
     "title": "Cách chu kỳ hoạt động",

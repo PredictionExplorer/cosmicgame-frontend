@@ -30,9 +30,13 @@ describe('PaginationRWLKGrid', () => {
     expect(container.querySelector('.animate-spin')).toBeInTheDocument();
   });
 
-  it('renders empty state when no data', () => {
+  it('says the wallet has no unused RandomWalk NFT and links to imprint one (F091)', () => {
     render(<PaginationRWLKGrid loading={false} data={[]} />);
     expect(screen.getByText('home.rwlkGrid.empty')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'home.rwlkGrid.imprint' })).toHaveAttribute(
+      'href',
+      '/imprint',
+    );
   });
 
   it('renders search input', () => {
