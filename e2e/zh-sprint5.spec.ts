@@ -256,7 +256,8 @@ test.describe('zh Sprint 5 — statistics, tables, and formatting', () => {
       [
         `/zh/system-event/${CYCLE}/100/200`,
         `第 ${CYCLE} 个周期前的配置`,
-        '系统事件 · Cosmic Signature',
+        // The tab names the window by its cycle, as the H1 does.
+        `第 ${CYCLE} 个周期前的配置 · Cosmic Signature`,
       ],
     ];
 
@@ -288,7 +289,11 @@ test.describe('zh Sprint 5 — statistics, tables, and formatting', () => {
     // The supply summary dates the reading in the zh calendar style.
     await expect(page.getByText(/^2026年1月1日 总供应量：1,000\sCST。/)).toBeVisible();
 
-    await openZhRoute(page, `/zh/system-event/${CYCLE}/100/200`, '系统事件 · Cosmic Signature');
+    await openZhRoute(
+      page,
+      `/zh/system-event/${CYCLE}/100/200`,
+      `第 ${CYCLE} 个周期前的配置 · Cosmic Signature`,
+    );
     const eventTooltipTrigger = page.getByRole('button', {
       name: '说明“公共物品比例已变更”事件',
     });

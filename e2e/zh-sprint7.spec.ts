@@ -253,7 +253,10 @@ test.describe('zh Sprint 7 — long-tail routes', () => {
     await expect(
       page.getByRole('heading', { level: 1, name: '贡献 #7', exact: true }),
     ).toBeVisible();
-    await expect(page.getByRole('link', { name: '第 7 个周期', exact: true })).toBeVisible();
+    // The Cycle figure's number links the cycle's contributions and says so.
+    await expect(
+      page.getByRole('link', { name: '第 7 个周期的全部贡献', exact: true }),
+    ).toHaveAttribute('href', '/zh/eth-contribution/round/7');
     await expect(page.getByText('贡献者留言')).toBeVisible();
 
     await openZh(page, '/zh/eth-contribution/round/7');

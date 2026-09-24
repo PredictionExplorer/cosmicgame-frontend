@@ -60,9 +60,10 @@ describe('EthDonationDetailPage', () => {
     expect(from).toHaveTextContent('0x4D39');
     // The contributor sits in the figure's type, not in a 12px chip.
     expect(from?.querySelector('.text-xs')).toBeNull();
-    const cycle = screen.getByRole('link', { name: '3' });
+    // The link names where it leads, and its visible number is part of that name.
+    const cycle = screen.getByRole('link', { name: 'ethContribution.detail.cycleLink(cycle=3)' });
     expect(cycle).toHaveAttribute('href', '/eth-contribution/round/3');
-    expect(cycle).toHaveAttribute('title', 'ethContribution.detail.cycleLink(cycle=3)');
+    expect(cycle).toHaveTextContent('3');
     expect(document.querySelector('[data-figure="date"] time')).toBeInTheDocument();
     for (const id of ['from', 'date']) {
       expect(document.querySelector(`[data-figure="${id}"] dd`)).not.toHaveClass(

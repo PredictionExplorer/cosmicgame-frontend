@@ -156,7 +156,8 @@ test.describe('zh Sprint 4 — transactions and holdings routes', () => {
     await openZhRoute(
       page,
       `/zh/cosmic-signature-transfer/${SPRINT4_MOCK_ADDRESS}`,
-      'NFT 转移记录 · Cosmic Signature',
+      // The tab names whose history it is (the short address carries a word joiner).
+      'NFT 转移记录 · 0x1111…\u20601111 · Cosmic Signature',
     );
     await expect(page.getByRole('heading', { level: 1, name: 'NFT 转移记录' })).toBeVisible();
     await expect(page.getByText('暂无 NFT 转移记录。', { exact: true })).toBeVisible();
@@ -166,7 +167,7 @@ test.describe('zh Sprint 4 — transactions and holdings routes', () => {
     await openZhRoute(
       page,
       `/zh/cosmic-token-transfer/${SPRINT4_MOCK_ADDRESS}`,
-      'CST 转账记录 · Cosmic Signature',
+      'CST 转账记录 · 0x1111…\u20601111 · Cosmic Signature',
     );
     await expect(page.getByRole('heading', { level: 1, name: 'CST 转账记录' })).toBeVisible();
     await expect(page.getByText('暂无 CST 转账记录。', { exact: true })).toBeVisible();

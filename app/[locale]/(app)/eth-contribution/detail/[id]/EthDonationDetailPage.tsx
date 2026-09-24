@@ -99,8 +99,11 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
       id: 'cycle',
       label: t('figures.cycle'),
       value: data ? (
+        // The figure shows the number; the link says where it leads ("All
+        // contributions in cycle 7"), which a title attribute did not announce.
         <Link
           href={`/eth-contribution/round/${data.RoundNum}`}
+          aria-label={t('cycleLink', { cycle: data.RoundNum })}
           title={t('cycleLink', { cycle: data.RoundNum })}
           className="link-quiet"
         >

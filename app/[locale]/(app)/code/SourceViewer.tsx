@@ -53,6 +53,8 @@ export function SourceViewer({
             aria-pressed={wrap}
             aria-label={t('viewer.wrap')}
             onClick={() => setWrap((value) => !value)}
+            // Icon alone on phones: a 44px square.
+            className="max-sm:min-w-11"
           >
             <WrapText aria-hidden />
             <span aria-hidden className="max-sm:hidden">
@@ -65,6 +67,7 @@ export function SourceViewer({
             size="sm"
             aria-label={t('viewer.copy')}
             onClick={() => void handleCopy()}
+            className="max-sm:min-w-11"
           >
             {copied ? <Check aria-hidden className="text-positive" /> : <Copy aria-hidden />}
             <span aria-hidden className="max-sm:hidden">
@@ -84,8 +87,9 @@ export function SourceViewer({
         aria-label={regionLabel}
         data-wrap={wrap}
         // Every character as written: no programming ligatures (`->` stays two
-        // glyphs), since what a reader checks here is what they copy.
-        className="group/code max-h-[70vh] overflow-auto type-hash leading-[1.7] [font-feature-settings:'zero'_1,'calt'_0,'liga'_0] [font-variant-ligatures:none] focus-visible:outline-offset-[-2px]"
+        // glyphs), since what a reader checks here is what they copy. On phones
+        // each line is 24px, so its number is a 24px link target.
+        className="group/code max-h-[70vh] overflow-auto type-hash leading-[1.7] [font-feature-settings:'zero'_1,'calt'_0,'liga'_0] [font-variant-ligatures:none] focus-visible:outline-offset-[-2px] max-sm:leading-6"
       >
         {children}
       </pre>
