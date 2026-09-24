@@ -10,24 +10,31 @@
     "currentCost": "当前铭刻价格",
     "costBreakdown": "合约价格 {base} ETH，另加 {percent}% 余量，以免确认前价格上涨导致铭刻失败。",
     "submit": "铭刻",
-    "myNfts": "我的 Random Walk NFT"
+    "myNfts": "我的 Random Walk NFT",
+    "panelAria": "铭刻 Random Walk NFT",
+    "connect": "连接钱包即可铭刻 Random Walk NFT。连接本身不会签署任何内容。",
+    "why": {
+      "title": "铭刻能带来什么"
+    },
+    "compare": {
+      "label": "附加 Random Walk NFT 后的 ETH 落笔价格",
+      "caption": "比当前 ETH 落笔价格低 {percent}%，每枚 NFT 仅限一次。"
+    },
+    "success": {
+      "eyebrow": "铭刻完成",
+      "title": "Random Walk NFT {id} 已归你所有",
+      "description": "将它附加到一笔 ETH 落笔，即可一次性降低 {percent}% 的落笔价格。",
+      "use": "用于落笔",
+      "again": "再铭刻一枚"
+    },
+    "owned": {
+      "used": "已使用",
+      "unused": "未使用",
+      "use": "用于落笔",
+      "empty": "此钱包尚未持有 Random Walk NFT。"
+    }
   },
   "seo": {
-    "eyebrow": "Random Walk NFT 铭刻 · Arbitrum",
-    "heading": "铭刻 Random Walk NFT",
-    "description": "铭刻用于参与 Cosmic Signature 的 Random Walk NFT。每枚尚未使用的 Random Walk NFT 都可附加至一笔 ETH 落笔，使落笔价格降低 50%。",
-    "source": "Cosmic Signature 公共协议配置 API",
-    "lastUpdated": "更新时间：{date}。数据来源：{source}。",
-    "relatedAria": "Random Walk NFT 铭刻相关页面",
-    "cards": {
-      "cycle": "当前演绎周期",
-      "cost": "当前 ETH 落笔价格",
-      "discount": "Random Walk 减免"
-    },
-    "links": {
-      "cycle": "打开当前演绎周期",
-      "learn": "了解落笔机制",
-      "used": "查看已使用的 Random Walk NFT"
-    }
+    "heading": "铭刻 Random Walk NFT"
   }
 }

@@ -10,24 +10,31 @@
     "currentCost": "現在の刻印費用",
     "costBreakdown": "コントラクト上の費用{base} ETHに、確定前に費用が上がっても刻印が成功するよう{percent}%を上乗せしています。",
     "submit": "今すぐ刻印",
-    "myNfts": "自分のRandom Walk NFT"
+    "myNfts": "自分のRandom Walk NFT",
+    "panelAria": "Random Walk NFTの刻印",
+    "connect": "ウォレットを接続するとRandom Walk NFTを刻印できます。接続だけでは何も署名されません。",
+    "why": {
+      "title": "刻印で得られるもの"
+    },
+    "compare": {
+      "label": "Random Walk NFTを添えたETH一筆の費用",
+      "caption": "現在のETH一筆の費用から{percent}%割引。各NFTにつき一度だけです。"
+    },
+    "success": {
+      "eyebrow": "刻印完了",
+      "title": "Random Walk NFT {id}を刻印しました",
+      "description": "ETHの一筆に添えると、一度だけ一筆の費用が{percent}%割引されます。",
+      "use": "一筆に使う",
+      "again": "もう一つ刻印する"
+    },
+    "owned": {
+      "used": "使用済み",
+      "unused": "未使用",
+      "use": "一筆に使う",
+      "empty": "このウォレットにはまだRandom Walk NFTがありません。"
+    }
   },
   "seo": {
-    "eyebrow": "RandomWalk NFTの刻印 · Arbitrum",
-    "heading": "RandomWalk NFTの刻印",
-    "description": "Cosmic Signatureに参加するためにRandomWalk NFTを刻印します。未使用のRandomWalk NFTはそれぞれ1回のETH一筆に添付でき、一筆の費用が50%引き下げられます。",
-    "source": "Cosmic Signature公開プロトコル構成API",
-    "lastUpdated": "最終更新：{date}。データソース：{source}。",
-    "relatedAria": "RandomWalk NFTの刻印の関連ページ",
-    "cards": {
-      "cycle": "進行中のパフォーマンス・サイクル",
-      "cost": "現在のETH一筆の費用",
-      "discount": "RandomWalk割引"
-    },
-    "links": {
-      "cycle": "進行中のパフォーマンス・サイクルを開く",
-      "learn": "一筆の仕組みを学ぶ",
-      "used": "使用済みのRandomWalk NFTを見る"
-    }
+    "heading": "RandomWalk NFTの刻印"
   }
 }

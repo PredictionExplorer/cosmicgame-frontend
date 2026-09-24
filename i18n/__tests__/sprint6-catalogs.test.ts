@@ -40,6 +40,6 @@ describe('Sprint 6 focused catalogs', () => {
     expect(enFaq.search.placeholder).toBe('Search questions…');
     expect(enContracts.page.title).toBe('Contract Addresses');
     expect(enCode.viewer.title).toBe('Code Viewer');
-    expect(enImprint.page.submit).toBe('Imprint Now');
+    expect(enImprint.page.submit).toBe('Imprint now');
   });
 });

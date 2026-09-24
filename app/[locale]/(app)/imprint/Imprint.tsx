@@ -1,176 +1,269 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { ArrowRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { formatEther } from 'viem';
 import { usePublicClient } from 'wagmi';
-import { Sparkles } from 'lucide-react';
-import { toast } from 'sonner';
 
+import { randomWalkNftAbi } from '@/contracts/generated';
+import { protocolFacts } from '@/content/protocol-facts';
+
+import { activeChain } from '@/config/chains';
+import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { Link } from '@/i18n/navigation';
-import { Button } from '@/components/ui/button';
-import { PageShell } from '@/components/ui/page-shell';
+import { cn } from '@/lib/utils';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { SectionDivider } from '@/components/ui/section-divider';
+import { Amount } from '@/components/ui/amount';
+import { Badge } from '@/components/ui/badge';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { PageShell } from '@/components/ui/page-shell';
+import { SectionHeader } from '@/components/ui/section-header';
+import { SkeletonText } from '@/components/ui/skeleton';
+import { TxStatus } from '@/components/ui/tx-status';
 import { UnknownValue } from '@/components/ui/unknown-value';
+import { ChainGuard } from '@/components/wallet/NetworkGuard';
+import { FundingNotice } from '@/components/wallet/FundingNotice';
+import RandomWalkNFT from '@/components/nft/RandomWalkNFT';
+import { useDashboardInfo, useUsedRWLKNFTs } from '@/hooks/useApiQuery';
+import { useTxFlow, useTxStageLabel } from '@/hooks/useTxFlow';
+import { useActiveWeb3React } from '@/hooks/web3';
+import { formatId } from '@/utils/format/ids';
+import { toFiniteNumber } from '@/utils/finiteNumber';
 import {
   IMPRINT_COST_BUFFER_PERCENT,
-  formatEthQuote,
+  ethGestureBaseCost,
   imprintSendValueWei,
 } from '@/utils/gestureQuote';
-import useRWLKNFTContract from '@/hooks/useRWLKNFTContract';
-import { useActiveWeb3React } from '@/hooks/web3';
-import { asWriteFn } from '@/utils/contractWrite';
-import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
-import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
+import { formatAmount } from '@/utils/format';
 
+import { imprintedTokenId, useImprintCost, useOwnedRandomWalks } from './randomWalkImprint';
+
+/** The contract's own names for its imprint cost read and its imprint write. */
+const IMPRINT_COST_READ = 'getMintPrice'; // lexicon-allow-abi
+const IMPRINT_WRITE = 'mint'; // lexicon-allow-abi
+
+/** The home gesture form, opened with a Random Walk NFT selected. */
+export const gestureWithRandomWalkHref = (tokenId: number) =>
+  `/?randomwalk=1&tokenId=${tokenId}#make-gesture`;
+
+/**
+ * Imprint a Random Walk NFT: the page's one commit action, behind the wallet
+ * and network guard, run through the shared transaction flow. The panel
+ * shows the value the imprint sends (the contract cost plus a small buffer),
+ * then the new token itself with the way to use it; below, the reader's own
+ * Random Walk NFTs, marked used or unused.
+ */
 const Imprint = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('imprint');
-  const toastT = useTranslations('toasts');
+  const tToasts = useTranslations('toasts');
   const tCommon = useTranslations('common');
   const locale = useLocale();
-  // The contract's current imprint cost in wei; `null` until the read succeeds.
-  const [contractCostWei, setContractCostWei] = useState<bigint | null>(null);
-  const [costReadFailed, setCostReadFailed] = useState(false);
-  const [nftIds, setNftIds] = useState<number[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const { account } = useActiveWeb3React();
-  const publicClient = usePublicClient();
-  const nftContract = useRWLKNFTContract();
+  const { randomWalkNft } = useContractAddresses();
+  const publicClient = usePublicClient({ chainId: activeChain.id });
+  const tx = useTxFlow();
+  const stageLabel = useTxStageLabel();
+  const { costWei, isError: costFailed } = useImprintCost();
+  const owned = useOwnedRandomWalks(account);
+  const { data: usedData } = useUsedRWLKNFTs();
+  const { data: dashboard } = useDashboardInfo(undefined, { poll: false });
+  const [imprinted, setImprinted] = useState<number | null>(null);
 
-  const handleImprint = async () => {
-    if (!nftContract) {
-      toast.error(toastT('imprint.contractUnavailable'));
-      return;
-    }
-    setIsSubmitting(true);
-    try {
-      const abiImprintCost = (await nftContract.read.getMintPrice?.()) as bigint; // lexicon-allow-abi
+  const sendValue = costWei === null ? null : imprintSendValueWei(costWei);
+  const usedIds = new Set((usedData ?? []).map((entry) => Number(entry.RWalkTokenId)));
+  const ethGestureCost = toFiniteNumber(dashboard?.CurBidPriceEth);
+  const discount = protocolFacts.randomWalkDiscountPercentage;
 
-      const hash = await asWriteFn(nftContract.write.mint)({
-        // lexicon-allow-abi
-        value: imprintSendValueWei(abiImprintCost),
-      });
-      const receipt = await publicClient?.waitForTransactionReceipt({ hash });
-      assertSuccessfulTransactionReceipt(receipt);
-      toast.success(toastT('imprint.confirmed'));
-    } catch (err: unknown) {
-      if (isUserRejection(err)) {
-        toast.info(toastT('walletTransactionCancelled'));
-        return;
-      }
-      reportError(err, 'imprint RWLK NFT');
-      toast.error(getEthErrorMessage(err, toastT('imprint.failed'), { locale }));
-    } finally {
-      setIsSubmitting(false);
-    }
+  const imprint = async () => {
+    if (!randomWalkNft || !publicClient) return;
+    const contract = { address: randomWalkNft as `0x${string}`, abi: randomWalkNftAbi };
+    let value = sendValue ?? 0n;
+    let tokenId: number | null = null;
+    await tx.run({
+      prepare: async () => {
+        // The cost rises with every imprint: send what the contract asks for now.
+        const cost = (await publicClient.readContract({
+          ...contract,
+          functionName: IMPRINT_COST_READ,
+        })) as bigint;
+        value = imprintSendValueWei(cost);
+      },
+      write: (ctx) =>
+        ctx.writeContract<typeof randomWalkNftAbi, typeof IMPRINT_WRITE, readonly []>({
+          address: contract.address,
+          abi: randomWalkNftAbi,
+          functionName: IMPRINT_WRITE,
+          value,
+        }),
+      onConfirmed: async (receipt, ctx) => {
+        tokenId = imprintedTokenId(receipt, ctx.account, contract.address);
+        setImprinted(tokenId);
+        await owned.refresh();
+      },
+      successMessage: () =>
+        tokenId === null
+          ? tToasts('imprint.confirmed')
+          : t('page.success.title', { id: formatId(tokenId) }),
+      failureMessage: tToasts('imprint.failed'),
+      errorContext: 'imprint RWLK NFT',
+    });
   };
 
-  useEffect(() => {
-    if (!nftContract) return;
-    let cancelled = false;
-    const getData = async () => {
-      try {
-        const abiImprintCost = await nftContract.read.getMintPrice?.(); // lexicon-allow-abi
-        if (cancelled) return;
-        if (typeof abiImprintCost !== 'bigint')
-          throw new Error('Imprint cost read returned no value');
-        setContractCostWei(abiImprintCost);
-      } catch (err) {
-        if (cancelled) return;
-        setCostReadFailed(true);
-        reportError(err, 'read RWLK imprint cost');
-      }
-    };
-    void getData();
-    return () => {
-      cancelled = true;
-    };
-  }, [nftContract]);
+  const costFigure =
+    sendValue === null ? (
+      <UnknownValue label={tCommon(costFailed ? 'status.unavailable' : 'status.loading')} />
+    ) : (
+      <Amount value={sendValue} unit="ETH" context="exact" />
+    );
 
-  useEffect(() => {
-    const getTokens = async () => {
-      try {
-        const tokens = (await nftContract!.read.walletOfOwner?.([account])) as readonly bigint[];
-        const nftIds = tokens
-          .map((t) => Number(t))
-          .sort()
-          .reverse();
-        setNftIds(nftIds);
-      } catch (err) {
-        reportError(err, 'get user NFT tokens');
-      }
-    };
-
-    if (account && nftContract) {
-      getTokens();
-    }
-  }, [nftContract, account]);
+  const panel =
+    imprinted !== null ? (
+      <div data-testid="imprint-success">
+        <p className="type-label text-subtle">{t('page.success.eyebrow')}</p>
+        <h2 className="mt-2 type-heading-3 text-foreground">
+          {t('page.success.title', { id: formatId(imprinted) })}
+        </h2>
+        <div className="mt-5 max-w-60">
+          <RandomWalkNFT tokenId={imprinted} selectable={false} />
+        </div>
+        <p className="mt-5 type-body-sm text-muted-foreground">
+          {t('page.success.description', { percent: discount })}
+        </p>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link
+            href={gestureWithRandomWalkHref(imprinted)}
+            className={buttonVariants({ variant: 'default' })}
+          >
+            {t('page.success.use')}
+            <ArrowRight aria-hidden />
+          </Link>
+          <Button
+            variant="quiet"
+            onClick={() => {
+              setImprinted(null);
+              tx.reset();
+            }}
+          >
+            {t('page.success.again')}
+          </Button>
+        </div>
+      </div>
+    ) : (
+      <>
+        <p className="type-label text-subtle">{t('page.currentCost')}</p>
+        <p className="mt-2 type-figure-lg text-foreground" data-testid="imprint-send-value">
+          {costFigure}
+        </p>
+        {costWei !== null ? (
+          <p className="mt-2 type-caption text-subtle" data-testid="imprint-cost-breakdown">
+            {t('page.costBreakdown', {
+              base: formatAmount(costWei, {
+                unit: 'ETH',
+                locale,
+                context: 'exact',
+                withUnit: false,
+              }),
+              percent: IMPRINT_COST_BUFFER_PERCENT,
+            })}
+          </p>
+        ) : null}
+        <FundingNotice requiredWei={sendValue} className="mt-6" />
+        <div className="mt-6">
+          <ChainGuard requireConnection buttonClassName="w-full" className="w-full">
+            <Button
+              variant="commit"
+              size="xl"
+              className="w-full"
+              onClick={() => void imprint()}
+              loading={tx.isBusy}
+              disabled={sendValue === null || !randomWalkNft}
+            >
+              {stageLabel(tx.stage) ?? t('page.submit')}
+            </Button>
+          </ChainGuard>
+          {account ? null : <p className="mt-3 type-caption text-subtle">{t('page.connect')}</p>}
+          <TxStatus stage={tx.stage} className="mt-4 empty:mt-0" />
+        </div>
+      </>
+    );
 
   return (
-    <PageShell variant="form">
+    <PageShell variant="data">
       {seoSummary ?? (
         <PageHeader section="participate" title={t('page.title')} subtitle={t('page.subtitle')} />
       )}
 
-      <p className="mb-8 max-w-prose type-body-md text-muted-foreground">{t('page.description')}</p>
+      <div className="grid gap-12 lg:grid-cols-12 lg:gap-x-16">
+        <section
+          aria-label={t('page.panelAria')}
+          className="rounded-surface bg-surface p-6 sm:p-8 lg:order-2 lg:col-span-5 lg:self-start"
+        >
+          {panel}
+        </section>
 
-      <div className="flex flex-col items-center">
-        <div className="rounded-2xl border border-primary/20 bg-gradient-to-b from-primary/[0.06] to-transparent p-8 text-center max-w-md w-full">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 mx-auto mb-4">
-            <Sparkles className="h-8 w-8 text-primary" />
-          </div>
-          {/* The value an imprint sends at the cost read on load (the cost plus the buffer),
-              quoted to five significant digits like every ETH cost; the contract's own cost and
-              the buffer are broken out underneath. The imprint re-reads the cost when it is
-              sent, so the wallet shows the exact wei, which differs only if the cost moved. */}
-          <p className="text-3xl font-bold font-display" data-testid="imprint-send-value">
-            {contractCostWei === null ? (
-              <UnknownValue
-                label={tCommon(costReadFailed ? 'status.unavailable' : 'status.loading')}
-              />
-            ) : (
-              <>
-                {formatEthQuote(Number(formatEther(imprintSendValueWei(contractCostWei))), locale)}{' '}
-                <span className="text-primary">ETH</span>
-              </>
-            )}
-          </p>
-          <p className="text-sm text-muted-foreground mt-2">{t('page.currentCost')}</p>
-          {contractCostWei !== null ? (
-            <p
-              className="mt-2 text-xs leading-relaxed text-muted-foreground tabular-nums"
-              data-testid="imprint-cost-breakdown"
-            >
-              {t('page.costBreakdown', {
-                base: formatEthQuote(Number(formatEther(contractCostWei)), locale),
-                percent: IMPRINT_COST_BUFFER_PERCENT,
-              })}
+        <section aria-labelledby="imprint-why" className="min-w-0 lg:order-1 lg:col-span-7">
+          <SectionHeader headingId="imprint-why" title={t('page.why.title')} />
+          <p className="type-prose text-muted-foreground">{t('page.description')}</p>
+          {/* What the imprint is for, priced now: the header already shows the full cost. */}
+          <div className="mt-8 border-l-2 border-primary pl-5" data-testid="imprint-gesture-cost">
+            <p className="type-label text-subtle">{t('page.compare.label')}</p>
+            <p className="mt-1 type-figure-md text-foreground">
+              {ethGestureCost === null ? (
+                <UnknownValue label={tCommon('status.unavailable')} />
+              ) : (
+                <Amount
+                  value={ethGestureBaseCost(ethGestureCost, 'RandomWalk')}
+                  unit="ETH"
+                  context="exact"
+                />
+              )}
             </p>
-          ) : null}
-          <Button size="lg" onClick={handleImprint} className="w-full mt-6" disabled={isSubmitting}>
-            {isSubmitting ? toastT('imprint.imprinting') : t('page.submit')}
-          </Button>
-        </div>
+            <p className="mt-1 type-caption text-subtle">
+              {t('page.compare.caption', { percent: discount })}
+            </p>
+          </div>
+        </section>
       </div>
 
-      {nftIds.length > 0 && (
-        <div className="mt-16">
-          <SectionDivider title={t('page.myNfts')} className="mb-6" />
-          <div className="flex flex-wrap gap-2">
-            {nftIds.map((tokenId) => (
-              <Link
-                key={tokenId}
-                href={`/?randomwalk=true&tokenId=${tokenId}`}
-                className="inline-flex items-center rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-1.5 text-sm font-mono hover:bg-white/[0.06] transition-colors"
-              >
-                #{tokenId}
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
+      {account ? (
+        <section aria-labelledby="imprint-owned" className="mt-[calc(var(--block-gap)*1.5)]">
+          <SectionHeader headingId="imprint-owned" title={t('page.myNfts')} />
+          {owned.tokens === null ? (
+            <SkeletonText lines={2} />
+          ) : owned.tokens.length === 0 ? (
+            <p className="type-body-sm text-muted-foreground">{t('page.owned.empty')}</p>
+          ) : (
+            <ul className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
+              {owned.tokens.map((tokenId) => {
+                const used = usedIds.has(tokenId);
+                return (
+                  <li key={tokenId} data-token={tokenId}>
+                    <RandomWalkNFT tokenId={tokenId} selectable={false} />
+                    <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+                      <span className="type-mono text-foreground">{formatId(tokenId)}</span>
+                      <Badge size="sm" tone={used ? 'neutral' : 'positive'}>
+                        {used ? t('page.owned.used') : t('page.owned.unused')}
+                      </Badge>
+                    </div>
+                    {used ? null : (
+                      <Link
+                        href={gestureWithRandomWalkHref(tokenId)}
+                        className={cn(
+                          'link mt-2 inline-flex min-h-6 items-center gap-1 type-body-sm',
+                        )}
+                      >
+                        {t('page.owned.use')}
+                        <ArrowRight aria-hidden className="size-3.5" />
+                      </Link>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+      ) : null}
     </PageShell>
   );
 };

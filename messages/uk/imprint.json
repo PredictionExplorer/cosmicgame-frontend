@@ -10,24 +10,31 @@
     "currentCost": "Поточна вартість закарбування",
     "costBreakdown": "Вартість у контракті {base} ETH плюс {percent}% запасу, щоб закарбування пройшло, навіть якщо вартість зросте до підтвердження.",
     "submit": "Закарбувати",
-    "myNfts": "Мої Random Walk NFT"
+    "myNfts": "Мої Random Walk NFT",
+    "panelAria": "Закарбувати Random Walk NFT",
+    "connect": "Під’єднайте гаманець, щоб закарбувати Random Walk NFT. Під’єднання нічого не підписує.",
+    "why": {
+      "title": "Що дає закарбування"
+    },
+    "compare": {
+      "label": "Вартість ETH-жесту з Random Walk NFT",
+      "caption": "На {percent}% менше за поточну вартість ETH-жесту, один раз для кожного NFT."
+    },
+    "success": {
+      "eyebrow": "Закарбовано",
+      "title": "Random Walk NFT {id} тепер ваш",
+      "description": "Долучіть його до ETH-жесту, щоб один раз зменшити вартість жесту на {percent}%.",
+      "use": "Використати в жесті",
+      "again": "Закарбувати ще один"
+    },
+    "owned": {
+      "used": "Використано",
+      "unused": "Не використано",
+      "use": "Використати в жесті",
+      "empty": "У цьому гаманці ще немає Random Walk NFT."
+    }
   },
   "seo": {
-    "eyebrow": "Закарбування RandomWalk NFT · Arbitrum",
-    "heading": "Закарбувати RandomWalk NFT",
-    "description": "Закарбуйте RandomWalk NFT для участі в Cosmic Signature. Кожен невикористаний RandomWalk NFT можна долучити до одного ETH-жесту й зменшити вартість жесту на 50%.",
-    "source": "публічні API конфігурації протоколу Cosmic Signature",
-    "lastUpdated": "Оновлено: {date}. Джерело: {source}.",
-    "relatedAria": "Пов’язані сторінки про закарбування RandomWalk NFT",
-    "cards": {
-      "cycle": "Активний перформанс-цикл",
-      "cost": "Поточна вартість ETH-жесту",
-      "discount": "Знижка RandomWalk"
-    },
-    "links": {
-      "cycle": "Відкрити активний перформанс-цикл",
-      "learn": "Як працюють жести",
-      "used": "Переглянути використані RandomWalk NFT"
-    }
+    "heading": "Закарбувати RandomWalk NFT"
   }
 }

@@ -1,303 +1,160 @@
 import userEvent from '@testing-library/user-event';
-import { toast } from 'sonner';
 
-import { checkA11y, render, screen, waitFor } from '@/test-utils';
+import { createFakeTxFlow } from '@/test-utils/txFlow';
+
+import { checkA11y, renderWithQuery, screen, waitFor, within } from '@/test-utils';
 
 import Imprint from '../Imprint';
 
-const mockImprint = jest.fn();
-const DEFAULT_IMPRINT_COST_WEI = BigInt(1000000000000000);
-const mockGetImprintCost = jest.fn(() => Promise.resolve(DEFAULT_IMPRINT_COST_WEI));
-const mockWalletOfOwner = jest.fn(() => Promise.resolve([] as readonly bigint[]));
-const mockWaitForTxReceipt = jest.fn().mockResolvedValue({ status: 'success' });
+const CONTRACT = '0x895a6F444BE4ba9d124F61DF736605792B35D66b';
+const COST_WEI = 90_498_000_000_000_000n; // 0.090498 ETH
 
+// The real query client: the cost and the owned tokens are queries.
+jest.mock('@tanstack/react-query', () => jest.requireActual('@tanstack/react-query'));
+
+const mockTx = createFakeTxFlow('0xUser' as `0x${string}`);
+jest.mock('../../../../../hooks/useTxFlow', () => ({
+  useTxFlow: () => mockTx.flow,
+  useTxStageLabel: () => () => null,
+}));
+
+const mockGetImprintCost = jest.fn(() => Promise.resolve(COST_WEI));
+const mockWalletOfOwner = jest.fn(() => Promise.resolve([] as readonly bigint[]));
 jest.mock('../../../../../hooks/useRWLKNFTContract', () => ({
   __esModule: true,
   default: () => ({
-    read: {
-      getMintPrice: mockGetImprintCost,
-      walletOfOwner: mockWalletOfOwner,
-    },
-    write: {
-      mint: mockImprint,
-    },
+    read: { getMintPrice: mockGetImprintCost, walletOfOwner: mockWalletOfOwner }, // lexicon-allow-abi
   }),
 }));
 
-const mockUseActiveWeb3React = jest.fn(() => ({ account: '0xUser' as string | null }));
-jest.mock('../../../../../hooks/web3', () => ({
-  useActiveWeb3React: () => mockUseActiveWeb3React(),
-}));
-
+const mockReadContract = jest.fn(() => Promise.resolve(COST_WEI));
 jest.mock('wagmi', () => ({
-  usePublicClient: () => ({
-    waitForTransactionReceipt: mockWaitForTxReceipt,
-  }),
+  ...jest.requireActual('../../../../../__mocks__/wagmi'),
+  usePublicClient: () => ({ readContract: mockReadContract }),
 }));
 
-jest.mock('viem', () => ({
-  formatEther: (val: bigint) => (Number(val) / 1e18).toString(),
-  parseEther: (val: string) => BigInt(Math.round(parseFloat(val) * 1e18)),
+const mockAccount = jest.fn<string | null, []>(() => '0xUser');
+jest.mock('../../../../../hooks/web3', () => ({
+  useActiveWeb3React: () => ({ account: mockAccount() }),
 }));
 
-jest.mock('../../../../../utils', () => ({
-  parseBalance: (val: bigint) => (Number(val) / 1e18).toString(),
+jest.mock('../../../../../contexts/ContractAddressesContext', () => ({
+  useContractAddresses: () => ({ randomWalkNft: CONTRACT }),
 }));
 
-const mockReportError = jest.fn<void, [unknown, string]>();
-const mockIsUserRejection = jest.fn<boolean, [unknown]>(() => false);
-const mockIsEthProviderError = jest.fn<boolean, [unknown]>(() => false);
-const mockGetEthErrorMessage = jest.fn<string, [unknown, string?]>(
-  (_error, fallback) => fallback ?? 'Imprint failed',
-);
-
-jest.mock('../../../../../utils/errors', () => ({
-  isUserRejection: (err: unknown) => mockIsUserRejection(err),
-  isEthProviderError: (err: unknown) => mockIsEthProviderError(err),
-  reportError: (err: unknown, ctx: string) => mockReportError(err, ctx),
-  getEthErrorMessage: (err: unknown, fallback?: string) => mockGetEthErrorMessage(err, fallback),
+const mockUsed = jest.fn(() => ({ data: [] as { RWalkTokenId: number }[] }));
+jest.mock('../../../../../hooks/useApiQuery', () => ({
+  useDashboardInfo: () => ({ data: { CurBidPriceEth: 0.10211 } }),
+  useUsedRWLKNFTs: () => mockUsed(),
 }));
 
-jest.mock('../../../../../utils/contractWrite', () => ({
-  asWriteFn: (fn: (...a: unknown[]) => unknown) => fn,
+jest.mock('../../../../../components/nft/RandomWalkNFT', () => ({
+  __esModule: true,
+  default: ({ tokenId }: { tokenId: number }) => <div data-testid="rwlk-art">{tokenId}</div>,
 }));
 
-jest.mock('sonner', () => ({
-  toast: {
-    error: jest.fn(),
-    info: jest.fn(),
-    success: jest.fn(),
-  },
+jest.mock('../../../../../components/wallet/FundingNotice', () => ({
+  FundingNotice: () => null,
+}));
+
+jest.mock('../../../../../components/wallet/NetworkGuard', () => ({
+  ChainGuard: ({
+    children,
+    requireConnection,
+  }: {
+    children: React.ReactNode;
+    requireConnection?: boolean;
+  }) =>
+    requireConnection && !mockAccount() ? <button type="button">Connect Wallet</button> : children,
+}));
+
+jest.mock('../randomWalkImprint', () => ({
+  ...jest.requireActual('../randomWalkImprint'),
+  imprintedTokenId: () => 4242,
 }));
 
 beforeEach(() => {
   jest.clearAllMocks();
-  // Reset here rather than at the end of a test body, which a failing assertion would skip.
-  mockGetImprintCost.mockResolvedValue(DEFAULT_IMPRINT_COST_WEI);
+  mockTx.reset();
+  mockAccount.mockReturnValue('0xUser');
+  mockWalletOfOwner.mockResolvedValue([]);
+  mockUsed.mockReturnValue({ data: [] });
 });
 
-async function renderImprint(overrides?: { account?: string | null; tokens?: readonly bigint[] }) {
-  if (overrides?.account !== undefined) {
-    mockUseActiveWeb3React.mockReturnValueOnce({ account: overrides.account });
-  }
-  if (overrides?.tokens) {
-    mockWalletOfOwner.mockResolvedValueOnce(overrides.tokens);
-  }
-  const result = render(<Imprint />);
-  await waitFor(() => {
-    expect(mockGetImprintCost).toHaveBeenCalled();
-  }).catch(() => {});
-  await waitFor(() => {}).catch(() => {});
-  return result;
-}
-
-describe('Mint', () => {
-  it('renders the page header', async () => {
-    await renderImprint();
-    expect(screen.getByText('Imprint Random Walk NFT')).toBeInTheDocument();
-  });
-
-  it('renders the Mint now button', async () => {
-    await renderImprint();
-    expect(screen.getByRole('button', { name: 'Imprint Now' })).toBeInTheDocument();
-  });
-
-  it('renders the My Random Walk NFTs section when tokens exist', async () => {
-    mockWalletOfOwner.mockResolvedValueOnce([BigInt(1)] as readonly bigint[]);
-    render(<Imprint />);
-    expect(await screen.findByText('My Random Walk NFTs')).toBeInTheDocument();
-  });
-
-  it('displays mint price with ETH label', async () => {
-    await renderImprint();
-    expect(await screen.findByText('ETH')).toBeInTheDocument();
-    expect(screen.getByText('Current imprint cost')).toBeInTheDocument();
-  });
-
-  it('displays the value it sends at the current cost, with the contract cost broken out', async () => {
-    // Regression: the page once showed cost × 1.01 + 0.008 ETH while sending cost × 1.01.
-    mockGetImprintCost.mockResolvedValue(BigInt('91300000000000000'));
-    const user = userEvent.setup();
-    mockImprint.mockResolvedValueOnce('0xTxHash');
-    render(<Imprint />);
-
-    expect(await screen.findByTestId('imprint-send-value')).toHaveTextContent('0.092213 ETH');
-    expect(screen.getByTestId('imprint-cost-breakdown')).toHaveTextContent(
-      'Contract cost 0.0913 ETH, plus a 1% buffer',
-    );
-
-    await user.click(screen.getByRole('button', { name: 'Imprint Now' }));
+describe('Imprint', () => {
+  it('shows the value it sends — the contract cost plus the buffer — never a guessed 0', async () => {
+    renderWithQuery(<Imprint />);
+    expect(screen.getByTestId('imprint-send-value')).not.toHaveTextContent(/^0/);
     await waitFor(() =>
-      expect(mockImprint).toHaveBeenCalledWith({ value: BigInt('92213000000000000') }),
+      expect(screen.getByTestId('imprint-send-value')).toHaveTextContent('0.091403'),
     );
+    expect(screen.getByTestId('imprint-cost-breakdown')).toHaveTextContent('0.090498');
   });
 
-  it('shows the cost as unavailable, not 0 ETH, when the read fails', async () => {
-    mockGetImprintCost.mockRejectedValueOnce(new Error('RPC down'));
-    render(<Imprint />);
-
-    await waitFor(() =>
-      expect(screen.getByTestId('imprint-send-value')).toHaveTextContent(
-        'common.status.unavailable',
-      ),
-    );
-    expect(screen.getByTestId('imprint-send-value')).not.toHaveTextContent(/\d/);
+  it('asks a disconnected visitor to connect instead of offering an imprint', async () => {
+    mockAccount.mockReturnValue(null);
+    renderWithQuery(<Imprint />);
+    expect(screen.getByRole('button', { name: 'Connect Wallet' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Imprint now' })).not.toBeInTheDocument();
+    expect(
+      screen.getByText('Connect a wallet to imprint a Random Walk NFT. Connecting signs nothing.'),
+    ).toBeInTheDocument();
   });
 
-  it('calls getMintPrice on mount', async () => {
-    await renderImprint();
-    expect(mockGetImprintCost).toHaveBeenCalled();
-  });
-
-  it('calls walletOfOwner with account on mount', async () => {
-    await renderImprint();
-    expect(mockWalletOfOwner).toHaveBeenCalledWith(['0xUser']);
-  });
-
-  it('renders NFT links when walletOfOwner returns tokens', async () => {
-    const tokens: readonly bigint[] = [BigInt(3), BigInt(1), BigInt(2)];
-    mockWalletOfOwner.mockResolvedValueOnce(tokens);
-    render(<Imprint />);
-    const link = await screen.findByText('#3');
-    expect(link).toBeInTheDocument();
-  });
-
-  it('Mint button calls mint with 1.01x price', async () => {
+  it('imprints through the transaction flow at the cost read just before sending', async () => {
     const user = userEvent.setup();
-    mockImprint.mockResolvedValueOnce('0xTxHash');
-    render(<Imprint />);
+    renderWithQuery(<Imprint />);
+    const submit = await screen.findByRole('button', { name: 'Imprint now' });
+    await waitFor(() => expect(submit).toBeEnabled());
+    await user.click(submit);
 
-    await user.click(screen.getByRole('button', { name: 'Imprint Now' }));
-
-    await waitFor(() => {
-      expect(mockImprint).toHaveBeenCalledWith(
-        expect.objectContaining({ value: expect.anything() }),
-      );
-    });
-  });
-
-  it('waits for transaction receipt after successful mint', async () => {
-    const user = userEvent.setup();
-    mockImprint.mockResolvedValueOnce('0xTxHash');
-    render(<Imprint />);
-
-    await user.click(screen.getByRole('button', { name: 'Imprint Now' }));
-
-    await waitFor(() => {
-      expect(mockWaitForTxReceipt).toHaveBeenCalledWith({ hash: '0xTxHash' });
-    });
-    expect(toast.success).toHaveBeenCalledWith('toasts.imprint.confirmed');
-  });
-
-  it('does not call reportError on user rejection', async () => {
-    const user = userEvent.setup();
-    const rejectionErr = { code: 4001, message: 'User rejected' };
-    mockImprint.mockRejectedValueOnce(rejectionErr);
-    mockIsUserRejection.mockReturnValueOnce(true);
-    render(<Imprint />);
-
-    await user.click(screen.getByRole('button', { name: 'Imprint Now' }));
-
-    await waitFor(() => {
-      expect(mockIsUserRejection).toHaveBeenCalledWith(rejectionErr);
-    });
-    expect(mockReportError).not.toHaveBeenCalled();
-    expect(toast.info).toHaveBeenCalledWith('toasts.walletTransactionCancelled');
-  });
-
-  it('calls reportError on non-user-rejection error', async () => {
-    const user = userEvent.setup();
-    const imprintErr = new Error('RPC failed');
-    mockImprint.mockRejectedValueOnce(imprintErr);
-    mockIsUserRejection.mockReturnValueOnce(false);
-    mockIsEthProviderError.mockReturnValueOnce(false);
-    render(<Imprint />);
-
-    await user.click(screen.getByRole('button', { name: 'Imprint Now' }));
-
-    await waitFor(() => {
-      expect(mockReportError).toHaveBeenCalledWith(imprintErr, 'imprint RWLK NFT');
-    });
-    expect(toast.error).toHaveBeenCalledWith('toasts.imprint.failed');
-  });
-
-  it('shows the locale-safe toast fallback for provider errors', async () => {
-    const user = userEvent.setup();
-    const providerErr = new Error('Provider error');
-    mockImprint.mockRejectedValueOnce(providerErr);
-    mockIsUserRejection.mockReturnValueOnce(false);
-    mockIsEthProviderError.mockReturnValueOnce(true);
-    mockGetEthErrorMessage.mockReturnValueOnce('toasts.imprint.failed');
-    render(<Imprint />);
-
-    await user.click(screen.getByRole('button', { name: 'Imprint Now' }));
-
-    await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith('toasts.imprint.failed');
-    });
-  });
-
-  it('treats a reverted receipt as an error instead of success', async () => {
-    const user = userEvent.setup();
-    mockImprint.mockResolvedValueOnce('0xTxHash');
-    mockWaitForTxReceipt.mockResolvedValueOnce({ status: 'reverted' });
-    render(<Imprint />);
-
-    await user.click(screen.getByRole('button', { name: 'Imprint Now' }));
-
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('toasts.imprint.failed'));
-    expect(toast.success).not.toHaveBeenCalled();
-  });
-
-  it('shows the localized pending label while imprinting', async () => {
-    const user = userEvent.setup();
-    let resolveImprint!: (hash: string) => void;
-    mockImprint.mockReturnValueOnce(
-      new Promise((resolve) => {
-        resolveImprint = resolve;
+    expect(mockReadContract).toHaveBeenCalled();
+    expect(mockTx.writeContract).toHaveBeenCalledWith(
+      expect.objectContaining({
+        address: CONTRACT,
+        functionName: 'mint', // lexicon-allow-abi
+        value: 91_402_980_000_000_000n,
       }),
     );
-    render(<Imprint />);
-
-    await user.click(screen.getByRole('button', { name: 'Imprint Now' }));
-    expect(await screen.findByText('toasts.imprint.imprinting')).toBeInTheDocument();
-
-    resolveImprint('0xTxHash');
-    await waitFor(() => expect(toast.success).toHaveBeenCalledWith('toasts.imprint.confirmed'));
   });
 
-  it('renders NFT links sorted descending', async () => {
-    const tokens: readonly bigint[] = [BigInt(1), BigInt(5), BigInt(3)];
-    mockWalletOfOwner.mockResolvedValueOnce(tokens);
-    render(<Imprint />);
+  it('shows the new token and how to use it once the imprint confirms', async () => {
+    const user = userEvent.setup();
+    renderWithQuery(<Imprint />);
+    const submit = await screen.findByRole('button', { name: 'Imprint now' });
+    await waitFor(() => expect(submit).toBeEnabled());
+    await user.click(submit);
 
-    await screen.findByText('#5');
-    const links = screen.getAllByRole('link');
-    const nftLinks = links.filter((l) => l.getAttribute('href')?.includes('randomwalk'));
-    const ids = nftLinks.map((l) => l.textContent);
-    expect(ids).toEqual(['#5', '#3', '#1']);
+    const success = await screen.findByTestId('imprint-success');
+    expect(within(success).getByRole('heading')).toHaveTextContent('Random Walk NFT #004242');
+    expect(within(success).getByRole('link', { name: /Use it in a gesture/ })).toHaveAttribute(
+      'href',
+      '/?randomwalk=1&tokenId=4242#make-gesture',
+    );
+    expect(mockTx.lastSuccessMessage()).toBe('Random Walk NFT #004242 is yours');
+    // The owned list refreshes to include it.
+    expect(mockWalletOfOwner.mock.calls.length).toBeGreaterThan(1);
   });
 
-  it('NFT links have correct href format', async () => {
-    const tokens: readonly bigint[] = [BigInt(7)];
-    mockWalletOfOwner.mockResolvedValueOnce(tokens);
-    render(<Imprint />);
+  it('lists the wallet’s Random Walk NFTs, newest first, marking used ones', async () => {
+    mockWalletOfOwner.mockResolvedValue([3n, 12n, 7n]);
+    mockUsed.mockReturnValue({ data: [{ RWalkTokenId: 7 }] });
+    renderWithQuery(<Imprint />);
 
-    const link = await screen.findByText('#7');
-    expect(link.closest('a')).toHaveAttribute('href', '/?randomwalk=true&tokenId=7');
-  });
-
-  it('does not call walletOfOwner when account is null', async () => {
-    mockUseActiveWeb3React.mockReturnValue({ account: null });
-    mockWalletOfOwner.mockClear();
-    render(<Imprint />);
-    await waitFor(() => expect(mockGetImprintCost).toHaveBeenCalled());
-    expect(mockWalletOfOwner).not.toHaveBeenCalled();
-    mockUseActiveWeb3React.mockReturnValue({ account: '0xUser' });
+    const list = await screen.findByRole('list');
+    const items = within(list).getAllByRole('listitem');
+    expect(items.map((item) => item.getAttribute('data-token'))).toEqual(['12', '7', '3']);
+    expect(items[1]).toHaveTextContent('Used');
+    expect(within(items[1]!).queryByRole('link')).toBeNull();
+    expect(within(items[0]!).getByRole('link', { name: /Use in a gesture/ })).toHaveAttribute(
+      'href',
+      '/?randomwalk=1&tokenId=12#make-gesture',
+    );
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = await renderImprint();
+    const { container } = renderWithQuery(<Imprint />);
+    await screen.findByRole('button', { name: 'Imprint now' });
     await checkA11y(container);
   });
 });

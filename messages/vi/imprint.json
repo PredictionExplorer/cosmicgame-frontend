@@ -10,24 +10,31 @@
     "currentCost": "Chi phí khắc hiện tại",
     "costBreakdown": "Chi phí trong hợp đồng {base} ETH, cộng thêm {percent}% dự phòng để lượt khắc vẫn thành công nếu chi phí tăng trước khi được xác nhận.",
     "submit": "Khắc ngay",
-    "myNfts": "Random Walk NFT của tôi"
+    "myNfts": "Random Walk NFT của tôi",
+    "panelAria": "Khắc Random Walk NFT",
+    "connect": "Kết nối ví để khắc Random Walk NFT. Việc kết nối không ký bất cứ điều gì.",
+    "why": {
+      "title": "Việc khắc mang lại gì cho bạn"
+    },
+    "compare": {
+      "label": "Chi phí nét bút ETH khi đính kèm Random Walk NFT",
+      "caption": "Thấp hơn {percent}% so với chi phí nét bút ETH hiện tại, mỗi NFT một lần."
+    },
+    "success": {
+      "eyebrow": "Đã khắc",
+      "title": "Random Walk NFT {id} giờ là của bạn",
+      "description": "Đính kèm vào một nét bút ETH để được giảm {percent}% chi phí nét bút một lần.",
+      "use": "Dùng cho một nét bút",
+      "again": "Khắc thêm một NFT"
+    },
+    "owned": {
+      "used": "Đã dùng",
+      "unused": "Chưa dùng",
+      "use": "Dùng cho nét bút",
+      "empty": "Ví này chưa có Random Walk NFT nào."
+    }
   },
   "seo": {
-    "eyebrow": "Khắc RandomWalk NFT · Arbitrum",
-    "heading": "Khắc RandomWalk NFT",
-    "description": "Khắc RandomWalk NFT để tham gia Cosmic Signature. Mỗi RandomWalk NFT chưa sử dụng có thể được đính kèm vào một nét bút ETH để giảm 50% chi phí nét bút.",
-    "source": "Các API cấu hình giao thức công khai của Cosmic Signature",
-    "lastUpdated": "Cập nhật: {date}. Nguồn: {source}.",
-    "relatedAria": "Các trang liên quan đến Khắc RandomWalk NFT",
-    "cards": {
-      "cycle": "Chu kỳ trình diễn đang diễn ra",
-      "cost": "Chi phí nét bút ETH hiện tại",
-      "discount": "Giảm giá RandomWalk"
-    },
-    "links": {
-      "cycle": "Mở chu kỳ trình diễn đang diễn ra",
-      "learn": "Tìm hiểu cách nét bút vận hành",
-      "used": "Xem các RandomWalk NFT đã sử dụng"
-    }
+    "heading": "Khắc RandomWalk NFT"
   }
 }
