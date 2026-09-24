@@ -1,15 +1,13 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { ArrowRight, Coins, Hash, Heart, Layers, Lock, Trophy, Wallet } from 'lucide-react';
+import { ArrowRight, Coins, Heart, Lock, Trophy } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { formatCSTValue, formatCount, formatEthValue } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
 import { useCTStatistics, useDashboardInfo } from '@/hooks/useApiQuery';
-import type { DashboardInfo } from '@/services/api/types';
-import { StatCard } from '@/components/ui/stat-card';
 import { Surface } from '@/components/ui/surface';
 import { SectionDivider } from '@/components/ui/section-divider';
 import { SkeletonStatCard } from '@/components/ui/skeleton';
@@ -17,19 +15,9 @@ import { ErrorState } from '@/components/ui/error-state';
 import { StatisticsItem } from '@/components/statistics/StatisticsItem';
 import { StatisticsGroup } from '@/components/statistics/StatisticsGroup';
 
-import { STATISTICS_SECTIONS, type StatisticsSectionDef } from './statistics-sections';
+import { totalAllocationsDistributed } from '../DashboardFigure';
 
-/** Prefer DB row count from cg_prize; fall back to aggregated recipient counts. */
-function getTotalAllocationsDistributed(data: DashboardInfo): number {
-  return Number(
-    data.CgPrizeRowCount ??
-      data.MainStats?.CgPrizeRowCount ??
-      data.TotalPrizeAwards ??
-      data.MainStats?.TotalPrizeAwards ??
-      data.TotalPrizes ??
-      0,
-  );
-}
+import { STATISTICS_SECTIONS, type StatisticsSectionDef } from './statistics-sections';
 
 interface ExploreCardProps {
   section: StatisticsSectionDef;
@@ -74,7 +62,11 @@ function ExploreCard({ section, headline, headlineLabel }: ExploreCardProps) {
   );
 }
 
-/** Statistics hub: headline metrics, protocol economy groups, and links into the section pages. */
+/**
+ * Statistics hub body: links into the section pages and the protocol economy
+ * groups. The headline figures live in the page header (StatisticsSeoSummary),
+ * read from the same dashboard query, so they appear once.
+ */
 const StatisticsHubPanel = () => {
   const t = useTranslations('statistics');
   const locale = useLocale();
@@ -84,12 +76,7 @@ const StatisticsHubPanel = () => {
   if (dashboardLoading) {
     return (
       <div data-testid="statistics-hub-loading">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <SkeletonStatCard key={i} />
-          ))}
-        </div>
-        <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 3 }).map((_, i) => (
             <SkeletonStatCard key={i} className="h-48" />
           ))}
@@ -110,7 +97,7 @@ const StatisticsHubPanel = () => {
   }
 
   const data = dashboardData;
-  const totalAllocationsDistributed = getTotalAllocationsDistributed(data);
+  const allocationsDistributed = totalAllocationsDistributed(data) ?? 0;
   const cstAnchorStats = data.MainStats.StakeStatisticsCST;
   const rwlkAnchorStats = data.MainStats.StakeStatisticsRWalk;
   const totalAnchored = cstAnchorStats.TotalTokensStaked + rwlkAnchorStats.TotalTokensStaked;
@@ -133,42 +120,13 @@ const StatisticsHubPanel = () => {
       headlineLabel: t('hub.headlines.gesturesThisCycle'),
     },
     performance: {
-      headline: formatCount(totalAllocationsDistributed, locale),
+      headline: formatCount(allocationsDistributed, locale),
       headlineLabel: t('hub.headlines.allocationsDistributed'),
     },
   };
 
   return (
     <div data-testid="statistics-hub">
-      {/* Headline metrics */}
-      <div className="mb-10 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
-        <StatCard
-          label={t('metrics.totalCycles.label')}
-          value={formatCount(data.CurRoundNum, locale)}
-          icon={<Hash className="h-4 w-4" />}
-          tooltip={t('metrics.totalCycles.tooltip')}
-        />
-        <StatCard
-          label={t('metrics.allocationsDistributed.label')}
-          value={formatCount(totalAllocationsDistributed, locale)}
-          icon={<Trophy className="h-4 w-4" />}
-          tooltip={t('metrics.allocationsDistributed.tooltip')}
-        />
-        <StatCard
-          label={t('metrics.cosmicSignatureNftsImprinted.shortLabel')}
-          value={formatCount(data.MainStats.NumCSTokenMints, locale)}
-          icon={<Layers className="h-4 w-4" />}
-          tooltip={t('metrics.cosmicSignatureNftsImprinted.tooltip')}
-        />
-        <StatCard
-          label={t('metrics.contractBalance.label')}
-          value={formatEthValue(data.CosmicGameBalanceEth ?? 0, locale)}
-          icon={<Wallet className="h-4 w-4" />}
-          tooltip={t('metrics.contractBalance.tooltip')}
-          gradient
-        />
-      </div>
-
       {/* Section explore cards */}
       <SectionDivider title={t('hub.exploreTitle')} className="mb-6" />
       <nav aria-label={t('hub.exploreAria')} className="mb-12">
@@ -226,7 +184,7 @@ const StatisticsHubPanel = () => {
             title={t('metrics.numAllocationsDistributed.label')}
             value={
               <Link href="/allocation" className="text-inherit">
-                {totalAllocationsDistributed}
+                {formatCount(allocationsDistributed, locale)}
               </Link>
             }
             tooltip={t('metrics.numAllocationsDistributed.tooltip')}

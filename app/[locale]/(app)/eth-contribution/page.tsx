@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
+import { PublicDataQuerySeed } from '../PublicDataQuerySeed';
 import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
 
 import EthDonations from './EthDonations';
@@ -36,7 +37,9 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <PageMessages namespaces={['ethContribution', 'marketing', 'tables']}>
-      <EthDonations seoSummary={<PublicDataRouteSeoSummary route="eth-contribution" />} />
+      <PublicDataQuerySeed route="eth-contribution">
+        <EthDonations seoSummary={<PublicDataRouteSeoSummary route="eth-contribution" />} />
+      </PublicDataQuerySeed>
     </PageMessages>
   );
 }

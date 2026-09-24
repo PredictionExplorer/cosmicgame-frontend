@@ -63,7 +63,7 @@ export default async function Page({ params }: PageProps) {
             ),
           ]}
         />
-        <StatisticsPageIntro eyebrow={t('intro.eyebrow')} title={title} description={description} />
+        <StatisticsPageIntro title={title} description={description} />
         <TokensPanel />
       </>
     </PageMessages>

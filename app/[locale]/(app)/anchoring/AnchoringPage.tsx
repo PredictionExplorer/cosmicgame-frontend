@@ -24,7 +24,6 @@ import { ErrorState } from '@/components/ui/error-state';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
 import { SectionDivider } from '@/components/ui/section-divider';
-import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 import { Surface } from '@/components/ui/surface';
 import { UnknownValue } from '@/components/ui/unknown-value';
 import { formatEthValue } from '@/utils/format';
@@ -120,17 +119,10 @@ const AnchoringPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
 
   return (
     <PageShell variant="data" backdrop="signature">
-      {seoSummary}
-      {!seoSummary && (
+      {seoSummary ?? (
         <PageHeader
-          align="left"
-          eyebrow={
-            <SectionEyebrow tone="aurora" pulse>
-              {t('overview.eyebrow')}
-            </SectionEyebrow>
-          }
+          section="records"
           title={t('overview.title')}
-          titleLevel={2}
           subtitle={t('overview.subtitle')}
         />
       )}

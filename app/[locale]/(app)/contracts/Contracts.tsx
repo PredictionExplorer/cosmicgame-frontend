@@ -22,7 +22,6 @@ import { percentFromDivisor } from '@/utils/protocolParams';
 import useContractNoSigner from '@/hooks/useContractNoSigner';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { SectionDivider } from '@/components/ui/section-divider';
-import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 
 import { NetworkBadge } from './components/NetworkBadge';
 import { FundDistribution } from './components/FundDistribution';
@@ -275,22 +274,9 @@ const Contracts = ({ seoSummary }: { seoSummary?: ReactNode }) => {
 
   return (
     <PageShell variant="data" backdrop="signature">
-      {seoSummary}
-      {seoSummary ? (
-        <div className="mb-8">
-          <NetworkBadge chainName={networkConfig.chainName} chainId={networkConfig.chainId} />
-        </div>
-      ) : (
-        <PageHeader
-          eyebrow={
-            <SectionEyebrow tone="aurora" pulse>
-              {t('page.eyebrow')}
-            </SectionEyebrow>
-          }
-          title={t('page.title')}
-          titleLevel={2}
-          subtitle={t('page.subtitle')}
-        >
+      {/* The server-rendered header (ContractsSeoSummary) is the page's only header. */}
+      {seoSummary ?? (
+        <PageHeader section="trust" title={t('page.title')} subtitle={t('page.subtitle')}>
           <NetworkBadge chainName={networkConfig.chainName} chainId={networkConfig.chainId} />
         </PageHeader>
       )}

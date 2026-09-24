@@ -6,6 +6,8 @@ import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage, webPageJsonLd } from '@/uti
 import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
+import { DashboardQuerySeed } from '../QuerySeed';
+
 import Contracts from './Contracts';
 import { ContractsSeoSummary } from './ContractsSeoSummary';
 
@@ -62,7 +64,9 @@ export default async function Page({ params }: PageProps) {
             ),
           ]}
         />
-        <Contracts seoSummary={<ContractsSeoSummary />} />
+        <DashboardQuerySeed>
+          <Contracts seoSummary={<ContractsSeoSummary />} />
+        </DashboardQuerySeed>
       </>
     </PageMessages>
   );

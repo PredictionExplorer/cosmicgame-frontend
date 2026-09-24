@@ -6,8 +6,9 @@ import statisticsMessages from '@/messages/en/statistics.json';
 import zhSeoMessages from '@/messages/zh/seo.json';
 
 import { HomeObservatoryHero } from '@/components/home/HomeObservatoryHero';
+import { useDashboardInfo } from '@/hooks/useApiQuery';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, within } from '@/test-utils';
 
 import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
 import { CodeSeoSummary } from '../code/CodeSeoSummary';
@@ -28,10 +29,16 @@ import {
   get_staking_rwalk_actions,
   get_staking_rwalk_mints_global,
 } from '../../../../services/api/anchoring';
-import { get_donations_both, get_donations_nft_list } from '../../../../services/api/donations';
-import { get_coordination_events } from '../../../../services/api/system';
+import {
+  get_charity_cg_deposits,
+  get_charity_withdrawals,
+  get_donations_both,
+  get_donations_nft_list,
+} from '../../../../services/api/donations';
+import { get_system_events, get_system_modelist } from '../../../../services/api/system';
 import { get_named_nfts, get_used_rwlk_nfts } from '../../../../services/api/tokens';
 // lexicon-allow-end
+import { networkConfig } from '../../../../config/networks';
 
 // lexicon-allow-start: test mocks mirror sealed API module filenames.
 jest.mock('../../../../services/api/rounds', () => ({
@@ -56,15 +63,21 @@ jest.mock('../../../../services/api/marketing', () => ({
   get_marketing_rewards: jest.fn(),
 }));
 jest.mock('../../../../services/api/system', () => ({
-  get_coordination_events: jest.fn(() => Promise.resolve([])),
+  COORDINATION_EVENTS_END_ID: 9_999_999_999,
+  get_system_modelist: jest.fn(() => Promise.resolve([])),
+  get_system_events: jest.fn(() => Promise.resolve([])),
 }));
 jest.mock('../../../../services/api/tokens', () => ({
   get_named_nfts: jest.fn(),
   get_used_rwlk_nfts: jest.fn(),
 }));
 // lexicon-allow-end
+jest.mock('@/hooks/useApiQuery', () => ({
+  useDashboardInfo: jest.fn(),
+}));
 
 const mockGetDashboardInfo = get_dashboard_info as jest.MockedFunction<typeof get_dashboard_info>;
+const mockUseDashboardInfo = useDashboardInfo as jest.MockedFunction<typeof useDashboardInfo>;
 const mockGetLocale = getLocale as jest.MockedFunction<typeof getLocale>;
 const mockGetRoundList = get_round_list as jest.MockedFunction<typeof get_round_list>;
 const mockGetClaimHistory = get_claim_history as jest.MockedFunction<typeof get_claim_history>;
@@ -86,9 +99,14 @@ const mockRwalkImprints = get_staking_rwalk_mints_global as jest.MockedFunction<
 const mockDirectContributions = get_donations_both as jest.MockedFunction<
   typeof get_donations_both
 >;
-const mockCoordinationEvents = get_coordination_events as jest.MockedFunction<
-  typeof get_coordination_events
+const mockPublicGoodsDeposits = get_charity_cg_deposits as jest.MockedFunction<
+  typeof get_charity_cg_deposits
 >;
+const mockPublicGoodsRetrievals = get_charity_withdrawals as jest.MockedFunction<
+  typeof get_charity_withdrawals
+>;
+const mockSystemModes = get_system_modelist as jest.MockedFunction<typeof get_system_modelist>;
+const mockSystemEvents = get_system_events as jest.MockedFunction<typeof get_system_events>;
 const mockAttachedNfts = get_donations_nft_list as jest.MockedFunction<
   typeof get_donations_nft_list
 >;
@@ -101,8 +119,12 @@ const dashboard = {
   PrizeAmountEth: 5.5,
   CurPrizeAmountEth: 5.5,
   CosmicGameBalanceEth: 12.34,
+  CgPrizeRowCount: 107,
+  TsRoundStart: 1_786_000_000,
   MainStats: {
     NumCSTokenMints: 240,
+    TotalNamedTokens: 3,
+    StakeStatisticsCST: { TotalTokensStaked: 22 },
   },
   ContractAddrs: {
     CosmicGameAddr: '0x1111111111111111111111111111111111111111',
@@ -128,7 +150,26 @@ const WALLET_E = `0x${'e4'.repeat(20)}`;
 /** The recipient production records on Anchor Distribution (type 15) rows: not a wallet. */
 const ANCHOR_DISTRIBUTION_RECIPIENT = '(All CS NFT Stakers)'; // lexicon-allow-backend-type
 
-describe('server-visible SEO summaries', () => {
+type Rows<F extends (...args: never[]) => unknown> = Awaited<ReturnType<F>>;
+
+/**
+ * PageHeader renders its shared chrome strings from the `common` catalog, which the
+ * next-intl test mock answers with message keys.
+ */
+const COMMON = {
+  section: (id: string) => `common.pageHeader.sections.${id}`,
+  unavailable: 'common.status.unavailable',
+  snapshot: /^common\.pageHeader\.snapshot\(date=/,
+};
+
+/** The rendered value of the header figure with the given id. */
+const figureValue = (id: string) => {
+  const figure = document.querySelector(`[data-figure="${id}"] dd`);
+  if (!figure) throw new Error(`no header figure ${id}`);
+  return figure;
+};
+
+describe('server-rendered page headers', () => {
   beforeEach(() => {
     mockGetLocale.mockResolvedValue('en');
     mockGetRoundList.mockResolvedValue([]);
@@ -136,26 +177,33 @@ describe('server-visible SEO summaries', () => {
     mockGetDashboardInfo.mockResolvedValue(
       dashboard as unknown as Awaited<ReturnType<typeof get_dashboard_info>>,
     );
-    mockMarketingRewards.mockResolvedValue([{ MarketerAddr: WALLET_A }] as Awaited<
-      ReturnType<typeof get_marketing_rewards>
+    mockUseDashboardInfo.mockReturnValue({
+      data: dashboard,
+      isLoading: false,
+    } as unknown as ReturnType<typeof useDashboardInfo>);
+    mockMarketingRewards.mockResolvedValue([{ MarketerAddr: WALLET_A }] as Rows<
+      typeof get_marketing_rewards
     >);
-    mockCstActions.mockResolvedValue([{}] as Awaited<ReturnType<typeof get_staking_cst_actions>>);
-    mockRwalkActions.mockResolvedValue([{}] as Awaited<
-      ReturnType<typeof get_staking_rwalk_actions>
-    >);
-    mockDirectContributions.mockResolvedValue([{ AmountEth: 1, DonorAddr: WALLET_A }] as Awaited<
-      ReturnType<typeof get_donations_both>
+    mockCstActions.mockResolvedValue([{}] as Rows<typeof get_staking_cst_actions>);
+    mockRwalkActions.mockResolvedValue([{}] as Rows<typeof get_staking_rwalk_actions>);
+    mockDirectContributions.mockResolvedValue([{ AmountEth: 1, DonorAddr: WALLET_A }] as Rows<
+      typeof get_donations_both
     >);
     mockCstRewards.mockResolvedValue([]);
     mockRwalkImprints.mockResolvedValue([]);
-    mockCoordinationEvents.mockResolvedValue([]);
-    mockAttachedNfts.mockResolvedValue([{ TokenAddr: WALLET_A, DonorAddr: WALLET_B }] as Awaited<
-      ReturnType<typeof get_donations_nft_list>
+    mockPublicGoodsDeposits.mockResolvedValue([]);
+    mockPublicGoodsRetrievals.mockResolvedValue([]);
+    mockSystemModes.mockResolvedValue([]);
+    mockSystemEvents.mockResolvedValue([]);
+    mockAttachedNfts.mockResolvedValue([{ TokenAddr: WALLET_A, DonorAddr: WALLET_B }] as Rows<
+      typeof get_donations_nft_list
     >);
-    mockNamedNfts.mockResolvedValue([{ TokenId: 1, CurOwnerAddr: WALLET_A }] as Awaited<
-      ReturnType<typeof get_named_nfts>
+    mockNamedNfts.mockResolvedValue([{ TokenId: 1, CurOwnerAddr: WALLET_A }] as Rows<
+      typeof get_named_nfts
     >);
-    mockUsedRwlkNfts.mockResolvedValue([{}] as Awaited<ReturnType<typeof get_used_rwlk_nfts>>);
+    mockUsedRwlkNfts.mockResolvedValue([{ BidderAddr: WALLET_A }] as Rows<
+      typeof get_used_rwlk_nfts
+    >);
   });
 
   it('renders the app home H1 and crawlable app links in the live hero', () => {
@@ -182,62 +230,98 @@ describe('server-visible SEO summaries', () => {
     expect(screen.getByText('17')).toBeInTheDocument();
   });
 
-  it('renders crawler-visible statistics facts and related links', async () => {
-    render(await StatisticsSeoSummary());
+  describe('statistics hub', () => {
+    it('renders one H1, the Insights eyebrow and one live figure row', async () => {
+      render(await StatisticsSeoSummary());
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: statisticsMessages.hub.seo.heading }),
-    ).toBeInTheDocument();
-    expect(screen.getByText('42')).toBeInTheDocument();
-    expect(
-      screen.getByRole('link', { name: statisticsMessages.hub.seo.links.contracts }),
-    ).toHaveAttribute('href', '/contracts');
-    expect(
-      screen.getByText(statisticsMessages.metrics.cosmicSignatureNftsImprinted.label),
-    ).toBeInTheDocument();
-    for (const metric of [
-      'activePerformanceCycle',
-      'activeCycleGestures',
-      'contractBalance',
-      'cosmicSignatureNftsImprinted',
-    ] as const) {
+      expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
       expect(
-        screen.getByText(statisticsMessages.metrics[metric].seoDescription),
+        screen.getByRole('heading', { level: 1, name: statisticsMessages.hub.seo.heading }),
       ).toBeInTheDocument();
-    }
+      // The hub names its section without linking to itself.
+      expect(screen.getByText(COMMON.section('insights'))).not.toHaveAttribute('href');
+      expect(figureValue('activePerformanceCycle')).toHaveTextContent('42');
+      // The gestures caption sits under the cycle figure.
+      expect(document.querySelectorAll('[data-figure="activePerformanceCycle"] dd')).toHaveLength(
+        2,
+      );
+      expect(figureValue('allocationsDistributed')).toHaveTextContent('107');
+      expect(figureValue('cosmicSignatureNftsImprinted')).toHaveTextContent('240');
+      expect(figureValue('contractBalance')).toHaveTextContent('12.3400 ETH');
+      expect(
+        screen.getByRole('link', { name: statisticsMessages.hub.seo.links.contracts }),
+      ).toHaveAttribute('href', '/contracts');
+      expect(
+        screen.getByRole('button', {
+          name: `More information about ${statisticsMessages.metrics.activePerformanceCycle.label}`,
+        }),
+      ).toBeInTheDocument();
+    });
+
+    it('shows live freshness instead of a server render time', async () => {
+      render(await StatisticsSeoSummary());
+      expect(screen.queryByText(/Last updated/)).not.toBeInTheDocument();
+      expect(document.querySelector('[data-live-state]')).toBeInTheDocument();
+    });
+
+    it('renders unknown live figures as unavailable, never as zero', async () => {
+      mockUseDashboardInfo.mockReturnValue({
+        data: undefined,
+        isLoading: false,
+      } as unknown as ReturnType<typeof useDashboardInfo>);
+      render(await StatisticsSeoSummary());
+      expect(figureValue('contractBalance')).toHaveTextContent(COMMON.unavailable);
+      expect(figureValue('contractBalance')).not.toHaveTextContent(/\d/);
+    });
+  });
+
+  describe('contracts', () => {
+    it('renders the header without repeating the body’s address list', async () => {
+      render(await ContractsSeoSummary());
+
+      expect(
+        screen.getByRole('heading', { level: 1, name: 'Cosmic Signature Contracts' }),
+      ).toBeInTheDocument();
+      expect(screen.getByText(`Chain ${networkConfig.chainId}`)).toBeInTheDocument();
+      // The address grid in the page body lists every contract (with verified fallbacks).
+      expect(
+        screen.queryByText('0x1111111111111111111111111111111111111111'),
+      ).not.toBeInTheDocument();
+      expect(screen.getByRole('link', { name: COMMON.section('trust') })).toHaveAttribute(
+        'href',
+        '/security',
+      );
+    });
+
+    it('says when the addresses come from the verified fallback', async () => {
+      mockGetDashboardInfo.mockRejectedValue(new Error('offline'));
+      render(await ContractsSeoSummary());
+      expect(screen.getByText(/static fallback/)).toBeInTheDocument();
+    });
+  });
+
+  it('renders the code header and the crawlable repository index', async () => {
+    render(await CodeSeoSummary());
     expect(
-      screen.getByRole('button', {
-        name: `More information about ${statisticsMessages.metrics.activePerformanceCycle.label}`,
-      }),
+      screen.getByRole('heading', { level: 1, name: 'Cosmic Signature Source Code' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('button', {
-        name: `More information about ${statisticsMessages.metrics.cosmicSignatureNftsImprinted.label}`,
-      }),
+      screen.getByRole('heading', { level: 2, name: 'Project repositories' }),
     ).toBeInTheDocument();
   });
 
-  it('renders contract addresses in raw server content', async () => {
-    render(await ContractsSeoSummary());
-
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Cosmic Signature Contracts' }),
-    ).toBeInTheDocument();
-    expect(screen.getByText('0x1111111111111111111111111111111111111111')).toBeInTheDocument();
-    expect(screen.getByText(protocolFacts.contractAddresses.implementation)).toBeInTheDocument();
-    expect(
-      screen.queryByText('0x7739148013777c485AD9f3d971e1005Eca686661'),
-    ).not.toBeInTheDocument();
-    expect(screen.getByText('MarketplaceAddr')).toBeInTheDocument();
-    expect(screen.getByText('0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb')).toBeInTheDocument();
-  });
-
-  it('renders gallery and current-cycle H1 summaries', async () => {
+  it('renders the gallery header with the collection figures', async () => {
     render(await GallerySeoSummary());
     expect(
       screen.getByRole('heading', { level: 1, name: 'Cosmic Signature Gallery' }),
     ).toBeInTheDocument();
+    expect(figureValue('imprinted')).toHaveTextContent('240');
+    expect(figureValue('anchored')).toHaveTextContent('22');
+    expect(figureValue('named')).toHaveTextContent('3');
+    expect(screen.getByText(COMMON.snapshot)).toBeInTheDocument();
+  });
 
+  it('renders the current-cycle header with live cycle figures', async () => {
     render(await CurrentCycleSeoSummary());
     expect(
       screen.getByRole('heading', {
@@ -245,40 +329,66 @@ describe('server-visible SEO summaries', () => {
         name: 'Current Cosmic Signature Performance Cycle',
       }),
     ).toBeInTheDocument();
+    expect(figureValue('cycle')).toHaveTextContent('42');
+    expect(figureValue('gestures')).toHaveTextContent('17');
+    expect(figureValue('signatureAllocation')).toHaveTextContent('5.5000 ETH');
+    expect(screen.getByRole('link', { name: COMMON.section('participate') })).toHaveAttribute(
+      'href',
+      '/',
+    );
   });
 
   it.each([
-    ['anchoring' as const, 'Anchor Distributions'],
-    ['marketing' as const, 'Outreach Allocations'],
-    ['eth-contribution' as const, 'Direct ETH Contributions'],
-    ['attached-nfts' as const, 'Attached NFT Contributions'],
-    ['named-nfts' as const, 'Named Cosmic Signature NFTs'],
-    ['used-rwlk-nfts' as const, 'Used RandomWalk NFTs'],
-  ])('renders crawlable data-route summary for %s', async (route, heading) => {
-    render(await PublicDataRouteSeoSummary({ route }));
+    ['anchoring' as const, 'Anchor Distributions', 'records', '/site-map'],
+    ['marketing' as const, 'Outreach Allocations', 'records', '/site-map'],
+    ['eth-contribution' as const, 'Direct ETH Contributions', 'participate', '/'],
+    ['attached-nfts' as const, 'Attached NFT Contributions', 'collection', '/gallery'],
+    ['named-nfts' as const, 'Named Cosmic Signature NFTs', 'collection', '/gallery'],
+    ['used-rwlk-nfts' as const, 'Used RandomWalk NFTs', 'collection', '/gallery'],
+  ])(
+    'renders %s as one header: H1, section eyebrow, snapshot and source',
+    async (route, heading, section, hub) => {
+      render(await PublicDataRouteSeoSummary({ route }));
 
-    expect(screen.getByRole('heading', { level: 1, name: heading })).toBeInTheDocument();
-    expect(screen.getByText(/Last updated: .+ Source: /i)).toBeInTheDocument();
+      expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+      expect(screen.getByRole('heading', { level: 1, name: heading })).toBeInTheDocument();
+      expect(
+        screen.getByRole('link', {
+          name: COMMON.section(section),
+        }),
+      ).toHaveAttribute('href', hub);
+      expect(screen.getByText(COMMON.snapshot)).toBeInTheDocument();
+      expect(screen.getByText(/^Source: /)).toBeInTheDocument();
+      // The eyebrow names the section, never the H1 with "· Arbitrum".
+      expect(screen.queryByText(/· Arbitrum/)).not.toBeInTheDocument();
+    },
+  );
+
+  it('drops the snapshot stamp when every read failed', async () => {
+    mockDirectContributions.mockRejectedValue(new Error('Network response was not OK'));
+    render(await PublicDataRouteSeoSummary({ route: 'eth-contribution' }));
+    expect(screen.queryByText(COMMON.snapshot)).not.toBeInTheDocument();
+    expect(screen.queryByText(/^Source: /)).not.toBeInTheDocument();
   });
 
-  it('renders allocation totals from finalized rounds instead of claim history', async () => {
+  it('renders allocation totals from finalized rounds, gestures included', async () => {
     mockGetRoundList.mockResolvedValue([
-      { AmountEth: 1.25, WinnerAddr: WALLET_A },
-      { AmountEth: 2.5, WinnerAddr: WALLET_B },
-      { AmountEth: 3, WinnerAddr: WALLET_A },
-    ] as Awaited<ReturnType<typeof get_round_list>>);
+      { AmountEth: 1.25, WinnerAddr: WALLET_A, RoundStats: { TotalBids: 10 } },
+      { AmountEth: 2.5, WinnerAddr: WALLET_B, RoundStats: { TotalBids: 20 } },
+      { AmountEth: 3, WinnerAddr: WALLET_A, RoundStats: { TotalBids: 30 } },
+    ] as Rows<typeof get_round_list>);
     mockGetClaimHistory.mockResolvedValue([
       { AmountEth: 24_009.1377, WinnerAddr: WALLET_C },
-    ] as unknown as Awaited<ReturnType<typeof get_claim_history>>);
+    ] as unknown as Rows<typeof get_claim_history>);
 
-    render(await PublicDataRouteSeoSummary({ route: 'allocation' }));
+    render(await PublicDataRouteSeoSummary({ route: 'allocation', note: <span>scope</span> }));
 
     expect(mockGetClaimHistory).not.toHaveBeenCalled();
-    expect(screen.getByText('Total Signature Allocation ETH')).toBeInTheDocument();
-    expect(screen.getByText('6.75 ETH')).toBeInTheDocument();
-    expect(screen.getByText('Signature Allocation Recipients')).toBeInTheDocument();
-    expect(screen.getByText('2')).toBeInTheDocument();
-    expect(screen.queryByText('Signature Allocation ETH Retrieved')).not.toBeInTheDocument();
+    expect(figureValue('finalizedCycles')).toHaveTextContent(/^3$/);
+    expect(figureValue('recipients')).toHaveTextContent(/^2$/);
+    expect(figureValue('totalEth')).toHaveTextContent('6.7500 ETH');
+    expect(figureValue('totalGestures')).toHaveTextContent('60');
+    expect(screen.getByText('scope')).toBeInTheDocument();
     expect(
       screen.getByRole('button', {
         name: 'More information about Total Signature Allocation ETH',
@@ -286,16 +396,33 @@ describe('server-visible SEO summaries', () => {
     ).toBeInTheDocument();
   });
 
+  it('links anchoring to its statistics section, not the statistics overview', async () => {
+    render(await PublicDataRouteSeoSummary({ route: 'anchoring' }));
+    expect(
+      screen.getByRole('link', {
+        name: seoMessages.publicData.routes.anchoring.links.statistics,
+      }),
+    ).toHaveAttribute('href', '/statistics/anchoring');
+  });
+
+  it('sends direct ETH contributors to how the Cycle Reserve is split', async () => {
+    render(await PublicDataRouteSeoSummary({ route: 'eth-contribution' }));
+    const copy = seoMessages.publicData.routes['eth-contribution'];
+    expect(copy.description).toMatch(/Cycle Reserve/);
+    expect(copy.description).not.toMatch(/Public Goods Vault/);
+    const related = screen.getByRole('navigation', { name: /related pages/ });
+    expect(within(related).getByRole('link', { name: copy.links.reserve })).toHaveAttribute(
+      'href',
+      '/how-it-works',
+    );
+    expect(within(related).getByRole('link', { name: copy.links.protocol })).toHaveAttribute(
+      'href',
+      '/public-goods-contributions-cg',
+    );
+    expect(within(related).getAllByRole('link')).toHaveLength(3);
+  });
+
   describe('figures reconcile with their data source', () => {
-    type Rows<F extends (...args: never[]) => unknown> = Awaited<ReturnType<F>>;
-
-    /** The rendered figure of the summary card with the given catalog key. */
-    const cardFigure = (key: string) => {
-      const card = document.querySelector(`[data-summary-card="${key}"] dd`);
-      if (!card) throw new Error(`no summary card ${key}`);
-      return card;
-    };
-
     it('sums only ETH allocation record types into ETH Allocated', async () => {
       // The /allocation-finalized card once read "48,028 ETH": every 1,000 CST row was
       // summed as 1,000 ETH, and a timeout retrieval (type 18) repeats a type-10 deposit.
@@ -314,10 +441,10 @@ describe('server-visible SEO summaries', () => {
 
       const copy = seoMessages.publicData.routes['allocation-finalized'].cards;
       expect(screen.getByText(copy.eth.label)).toBeInTheDocument();
-      expect(cardFigure('eth')).toHaveTextContent('17.7157 ETH');
-      expect(cardFigure('records')).toHaveTextContent('8');
+      expect(figureValue('eth')).toHaveTextContent('17.7157 ETH');
+      expect(figureValue('records')).toHaveTextContent('8');
       // A, B, C and E: the placeholder is not a wallet, and case does not split a wallet.
-      expect(cardFigure('recipients')).toHaveTextContent(/^4$/);
+      expect(figureValue('recipients')).toHaveTextContent(/^4$/);
       expect(screen.queryByText(/2,0\d\d/)).not.toBeInTheDocument();
     });
 
@@ -331,9 +458,11 @@ describe('server-visible SEO summaries', () => {
       render(await PublicDataRouteSeoSummary({ route: 'imprint' }));
 
       // The same quote format as the home tabs and submit button (five significant digits).
-      expect(cardFigure('cost')).toHaveTextContent(/^0\.10211 ETH$/);
+      // jest-dom normalizes the no-break space before the unit to a plain space.
+      expect(figureValue('cost')).toHaveTextContent(/^0\.10211\sETH$/);
+      expect(figureValue('cost').textContent).toBe('0.10211 ETH');
       expect(screen.queryByText(/185/)).not.toBeInTheDocument();
-      expect(cardFigure('discount')).toHaveTextContent(
+      expect(figureValue('discount')).toHaveTextContent(
         `${protocolFacts.randomWalkDiscountPercentage}%`,
       );
     });
@@ -348,11 +477,11 @@ describe('server-visible SEO summaries', () => {
 
       const copy = seoMessages.publicData.routes.marketing.cards;
       expect(screen.getByText(copy.allocatedCst.label)).toBeInTheDocument();
-      expect(cardFigure('allocatedCst')).toHaveTextContent('5,999 CST');
+      expect(figureValue('allocatedCst')).toHaveTextContent('5,999 CST');
       expect(screen.queryByText(/5,999 ETH/)).not.toBeInTheDocument();
     });
 
-    it('builds the direct-contribution cards from the table source', async () => {
+    it('builds the direct-contribution figures from the table source', async () => {
       const rows = [
         { AmountEth: 20, DonorAddr: '0x4D3949CD8980E942eb9Dd24d4eCc27584a8D71fA' },
         { AmountEth: 10, DonorAddr: WALLET_B },
@@ -364,17 +493,96 @@ describe('server-visible SEO summaries', () => {
       render(await PublicDataRouteSeoSummary({ route: 'eth-contribution' }));
 
       expect(mockDirectContributions).toHaveBeenCalled();
-      expect(cardFigure('records')).toHaveTextContent(String(rows.length));
-      expect(cardFigure('totalEth')).toHaveTextContent('30.5 ETH');
-      expect(cardFigure('contributors')).toHaveTextContent('2');
+      expect(figureValue('records')).toHaveTextContent(String(rows.length));
+      expect(figureValue('totalEth')).toHaveTextContent('30.5000 ETH');
+      expect(figureValue('contributors')).toHaveTextContent('2');
     });
 
-    it('counts the coordination events the table lists, not the mode list', async () => {
-      mockCoordinationEvents.mockResolvedValue([{}, {}] as Rows<typeof get_coordination_events>);
+    it('counts the coordination events the table lists, with the latest change', async () => {
+      mockSystemModes.mockResolvedValue([{ EvtLogId: 500 }] as Rows<typeof get_system_modelist>);
+      mockSystemEvents.mockResolvedValue([
+        { RecordType: 3, TimeStamp: 1_786_000_000 },
+        { RecordType: 3, TimeStamp: 1_786_100_000 },
+        { RecordType: 7, TimeStamp: 1_785_000_000 },
+      ] as Rows<typeof get_system_events>);
 
       render(await PublicDataRouteSeoSummary({ route: 'coordination-changes' }));
 
-      expect(cardFigure('records')).toHaveTextContent('2');
+      // The table's rows: events from the latest system-mode change onward.
+      expect(mockSystemEvents).toHaveBeenCalledWith(500, 9_999_999_999);
+      expect(figureValue('records')).toHaveTextContent('3');
+      expect(figureValue('parameters')).toHaveTextContent('2');
+      expect(figureValue('latest').querySelector('time')).toHaveAttribute(
+        'datetime',
+        new Date(1_786_100_000 * 1000).toISOString(),
+      );
+      // No constant filler: the governance surface and the network are not figures.
+      expect(document.querySelector('[data-figure="governance"]')).toBeNull();
+      expect(document.querySelector('[data-figure="network"]')).toBeNull();
+    });
+
+    it('shows the live Public Goods share, falling back to the documented one', async () => {
+      mockGetDashboardInfo.mockResolvedValue({
+        ...dashboard,
+        CharityPercentage: 9,
+      } as unknown as Awaited<ReturnType<typeof get_dashboard_info>>);
+      const view = render(
+        await PublicDataRouteSeoSummary({ route: 'public-goods-contributions-cg' }),
+      );
+      expect(figureValue('share')).toHaveTextContent('9%');
+      view.unmount();
+
+      mockGetDashboardInfo.mockRejectedValue(new Error('offline'));
+      render(await PublicDataRouteSeoSummary({ route: 'public-goods-contributions-cg' }));
+      expect(figureValue('share')).toHaveTextContent(`${protocolFacts.publicGoodsPercentage}%`);
+      expect(document.querySelector('[data-figure="track"]')).toBeNull();
+    });
+
+    it('names the latest Public Goods beneficiary from the retrievals', async () => {
+      mockPublicGoodsRetrievals.mockResolvedValue([
+        { AmountEth: 1, TimeStamp: 100, DestinationAddr: WALLET_B },
+        { AmountEth: 2, TimeStamp: 200, DestinationAddr: WALLET_C },
+      ] as Rows<typeof get_charity_withdrawals>);
+
+      render(await PublicDataRouteSeoSummary({ route: 'public-goods-retrievals' }));
+
+      expect(figureValue('totalEth')).toHaveTextContent('3.0000 ETH');
+      expect(within(figureValue('beneficiary') as HTMLElement).getByRole('link')).toHaveAttribute(
+        'href',
+        `/user/${WALLET_C}`,
+      );
+    });
+
+    it('omits the owners figure when the names endpoint carries no owners', async () => {
+      // Regression: the endpoint returns names without owner fields, which printed
+      // "Current Owners 0" beside 3 named NFTs.
+      mockNamedNfts.mockResolvedValue([
+        { TokenId: 1, TokenName: 'NUMBA 1' },
+        { TokenId: 25, TokenName: 'Twisted Mind' },
+      ] as Rows<typeof get_named_nfts>);
+
+      render(await PublicDataRouteSeoSummary({ route: 'named-nfts' }));
+
+      expect(figureValue('named')).toHaveTextContent('2');
+      expect(document.querySelector('[data-figure="owners"]')).toBeNull();
+      expect(figureValue('imprinted')).toHaveTextContent('240');
+    });
+
+    it('counts the owners the names endpoint does return', async () => {
+      render(await PublicDataRouteSeoSummary({ route: 'named-nfts' }));
+      expect(figureValue('owners')).toHaveTextContent(/^1$/);
+    });
+
+    it('counts participant wallets for used RandomWalk NFTs instead of a constant scope', async () => {
+      mockUsedRwlkNfts.mockResolvedValue([
+        { BidderAddr: WALLET_A },
+        { BidderAddr: WALLET_A },
+        { BidderAddr: WALLET_B },
+      ] as Rows<typeof get_used_rwlk_nfts>);
+      render(await PublicDataRouteSeoSummary({ route: 'used-rwlk-nfts' }));
+      expect(figureValue('used')).toHaveTextContent('3');
+      expect(figureValue('wallets')).toHaveTextContent('2');
+      expect(document.querySelector('[data-figure="scope"]')).toBeNull();
     });
 
     it('splits anchoring records into ETH deposits and Stellar Selection imprints', async () => {
@@ -385,10 +593,10 @@ describe('server-visible SEO summaries', () => {
 
       render(await PublicDataRouteSeoSummary({ route: 'anchoring' }));
 
-      expect(cardFigure('actions')).toHaveTextContent('2');
-      expect(cardFigure('ethDeposits')).toHaveTextContent('1');
-      expect(cardFigure('stellarImprints')).toHaveTextContent('20');
-      expect(document.querySelector('[data-summary-card="tokens"]')).toBeNull();
+      expect(figureValue('actions')).toHaveTextContent('2');
+      expect(figureValue('ethDeposits')).toHaveTextContent('1');
+      expect(figureValue('stellarImprints')).toHaveTextContent('20');
+      expect(document.querySelector('[data-figure="tokens"]')).toBeNull();
     });
 
     it('renders a failed read as unavailable, never as a confident zero', async () => {
@@ -397,23 +605,21 @@ describe('server-visible SEO summaries', () => {
       render(await PublicDataRouteSeoSummary({ route: 'eth-contribution' }));
 
       for (const key of ['records', 'totalEth', 'contributors']) {
-        const figure = cardFigure(key);
-        expect(figure).toHaveTextContent(seoMessages.publicData.common.unavailable);
+        const figure = figureValue(key);
+        expect(figure).toHaveTextContent(COMMON.unavailable);
         expect(figure).toHaveTextContent('—');
         expect(figure).not.toHaveTextContent(/\d/);
       }
     });
 
-    it('marks only the cards whose read failed as unavailable', async () => {
+    it('marks only the figures whose read failed as unavailable', async () => {
       mockGetDashboardInfo.mockRejectedValue(new Error('Network response was not OK'));
 
       render(await PublicDataRouteSeoSummary({ route: 'marketing' }));
 
-      expect(cardFigure('allocatedCst')).toHaveTextContent(
-        seoMessages.publicData.common.unavailable,
-      );
-      expect(cardFigure('records')).toHaveTextContent('1');
-      expect(cardFigure('contributors')).toHaveTextContent('1');
+      expect(figureValue('allocatedCst')).toHaveTextContent(COMMON.unavailable);
+      expect(figureValue('records')).toHaveTextContent('1');
+      expect(figureValue('contributors')).toHaveTextContent('1');
     });
   });
 
@@ -424,7 +630,7 @@ describe('server-visible SEO summaries', () => {
     const copy = zhSeoMessages.publicData.routes.allocation;
     expect(screen.getByRole('heading', { level: 1, name: copy.heading })).toBeInTheDocument();
     expect(screen.getByText(copy.cards.totalEth.label)).toBeInTheDocument();
-    expect(copy.cards.totalEth.tooltip).toMatch(/[\u3400-\u9fff]/);
+    expect(copy.cards.totalEth.tooltip).toMatch(/[㐀-鿿]/);
     expect(
       screen.getByRole('button', {
         name: `More information about ${copy.cards.totalEth.label}`,
@@ -434,11 +640,11 @@ describe('server-visible SEO summaries', () => {
       'href',
       '/statistics',
     );
-    expect(screen.getByText(/更新时间：/)).toBeInTheDocument();
+    expect(screen.getByText(/^数据来源：/)).toBeInTheDocument();
     expect(screen.queryByText(/initial HTML for search engines/i)).not.toBeInTheDocument();
   });
 
-  it('renders all dedicated SEO summaries with Chinese headings and links', async () => {
+  it('renders all dedicated headers with Chinese headings and links', async () => {
     mockGetLocale.mockResolvedValue('zh');
 
     const gallery = render(await GallerySeoSummary());

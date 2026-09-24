@@ -3,18 +3,7 @@
 import type { ReactNode } from 'react';
 import { useState, useMemo } from 'react';
 import { zeroAddress } from 'viem';
-import {
-  ArrowLeft,
-  ArrowRight,
-  Hash,
-  Trophy,
-  Shuffle,
-  Heart,
-  Coins,
-  ImageIcon,
-  Radio,
-  Zap,
-} from 'lucide-react';
+import { ArrowRight, Shuffle, Heart, Coins, ImageIcon, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -42,8 +31,6 @@ import {
   useDonationsERC20ByRound,
   useCurrentTime,
 } from '@/hooks/useApiQuery';
-import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
-import { cn } from '@/lib/utils';
 import { resolveLatestGesture } from '@/lib/latestGesture';
 import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
 import { useEndgameChainSync } from '@/hooks/useEndgameChainSync';
@@ -61,6 +48,11 @@ const sectionFade = {
   }),
 };
 
+/**
+ * `seoSummary` is the server-rendered page header, the page's only header: it
+ * carries the cycle, gesture count, Signature Allocation and opening time, so
+ * the body starts with the clock and never repeats those figures.
+ */
 const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('currentCycle');
   const locale = useLocale();
@@ -101,7 +93,6 @@ const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   // the page doesn't declare the cycle finished on a stale countdown target.
   const endgame = useEndgameChainSync({ targetMs: allocationTime });
   const finalizationConfirmed = !endgame.isConfirmationPending;
-  const roundStartedDate = useHydrationSafeDateTime(data?.TsRoundStart ?? 0, false, locale);
   const activationDate = useHydrationSafeDateTime(activationTime, true, locale);
 
   const championList = useMemo(() => {
@@ -114,10 +105,12 @@ const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const [donatedTokensTab, setDonatedTokensTab] = useState(0);
   const perPage = 12;
 
+  const header = seoSummary;
+
   if (isLoading) {
     return (
       <PageShell variant="data" backdrop="signature">
-        {seoSummary}
+        {header}
         <div className="flex items-center justify-center py-16">
           <Spinner size="lg" />
         </div>
@@ -128,8 +121,9 @@ const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   if (isError || !data) {
     return (
       <PageShell variant="data" backdrop="signature">
-        {seoSummary}
+        {header}
         <ErrorState
+          headingLevel={2}
           title={t('error.title')}
           message={t('error.message')}
           onRetry={() => window.location.reload()}
@@ -137,8 +131,6 @@ const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
       </PageShell>
     );
   }
-
-  const roundStarted = data.TsRoundStart ? roundStartedDate : t('status.notStarted');
 
   const hasStarted = data.TsRoundStart !== 0;
   const hasLastParticipant = data.LastBidderAddr !== zeroAddress;
@@ -163,42 +155,23 @@ const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
       : !hasLastParticipant
         ? t('hero.cta.makeFirstGesture')
         : t('hero.cta.makeGesture');
+  // The gesture CTAs open the home Observatory at its gesture form; the clock
+  // and finalize CTAs open its top, where the clock and the finalize action are.
+  const primaryCtaHref = isPreActivation || isGesturesExhausted ? '/' : '/#make-gesture';
 
   const charityAmount =
     (Number(data.CosmicGameBalanceEth) || 0) * ((data.CharityPercentage ?? 0) / 100);
 
   return (
     <PageShell variant="data" backdrop="signature">
-      {seoSummary}
-      {/* Back navigation */}
-      <Link
-        href="/"
-        className={cn(
-          'inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-white transition-colors mb-6',
-          TOUCH_TARGET_TEXT_LINK_CLASS,
-        )}
-      >
-        <ArrowLeft className="h-3.5 w-3.5" />
-        {t('nav.backToHome')}
-      </Link>
+      {header}
 
       {/* ===== HERO SECTION ===== */}
       {/* No gradient-border-card (mask pseudo): Chrome/Skia PDF often drops nested content in that compositing path. */}
       <div className="relative mb-10 flex flex-col gap-8 overflow-hidden rounded-2xl border border-border bg-card p-5 print:overflow-visible sm:p-8">
-        {/* Header row: LIVE badge + round info */}
+        {/* Card title and status; the header above carries the cycle's figures. */}
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-              <Radio className="h-5 w-5 text-primary" />
-              <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-400 animate-live-dot" />
-            </div>
-            <div>
-              <h2 className="type-display-sm">{t('hero.title', { n: data.CurRoundNum })}</h2>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {t('hero.subtitle', { date: roundStarted, count: data.CurNumBids })}
-              </p>
-            </div>
-          </div>
+          <h2 className="type-section">{t('hero.title', { n: data.CurRoundNum })}</h2>
           <span
             data-testid="live-badge"
             className={
@@ -278,7 +251,7 @@ const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
         {/* CTA Button */}
         <div className="flex justify-center">
           <Button asChild size="lg" className="font-semibold">
-            <Link href="/">
+            <Link href={primaryCtaHref}>
               {primaryCtaLabel} <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
@@ -298,21 +271,8 @@ const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
         variants={sectionFade}
         initial="hidden"
         animate="visible"
-        className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-12"
+        className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-12"
       >
-        <StatCard
-          label={t('stats.totalGestures.label')}
-          value={data.CurNumBids}
-          icon={<Hash className="h-4 w-4" />}
-          tooltip={t('stats.totalGestures.tooltip')}
-        />
-        <StatCard
-          label={t('stats.cycleReserve.label')}
-          value={formatEthValue(data.PrizeAmountEth ?? 0, locale)}
-          icon={<Trophy className="h-4 w-4" />}
-          tooltip={t('stats.cycleReserve.tooltip')}
-          gradient
-        />
         <StatCard
           label={t('stats.stellarSelectionPool.label')}
           value={formatEthValue(data.RaffleAmountEth ?? 0, locale)}

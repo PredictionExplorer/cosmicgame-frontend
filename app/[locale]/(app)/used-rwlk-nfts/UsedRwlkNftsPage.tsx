@@ -10,7 +10,6 @@ import { Link } from '@/i18n/navigation';
 import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
-import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 import {
   TablePrimary,
   TablePrimaryBody,
@@ -94,40 +93,24 @@ const UsedRwlkNftsTable = ({ list }: { list: UsedRwlkNftRecord[] }) => {
   );
 };
 
+/** `seoSummary` is the server-rendered page header, the page's only header. */
 const UsedRwlkNftsPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('statistics');
-  const locale = useLocale();
   const perPage = 5;
   const [curPage, setCurPage] = useState(1);
   const { data: list = [], isLoading: loading } = useUsedRWLKNFTs();
 
   return (
     <PageShell variant="data" backdrop="signature">
-      {seoSummary}
-      {seoSummary ? (
-        <div className="mb-8">
-          <SectionEyebrow tone="nebula">
-            {t('usedRwlkNfts.eyebrow', { count: list.length.toLocaleString(locale) })}
-          </SectionEyebrow>
-        </div>
-      ) : (
+      {seoSummary ?? (
         <PageHeader
-          align="left"
-          eyebrow={
-            <SectionEyebrow tone="nebula">
-              {t('usedRwlkNfts.eyebrow', { count: list.length.toLocaleString(locale) })}
-            </SectionEyebrow>
-          }
+          section="collection"
           title={t('usedRwlkNfts.title')}
-          titleLevel={2}
           subtitle={t('usedRwlkNfts.subtitle')}
         />
       )}
-      <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        {t('usedRwlkNfts.description')}
-      </p>
 
-      <div className="mt-12">
+      <div>
         {loading ? (
           <p className="text-lg font-semibold">{t('usedRwlkNfts.loading')}</p>
         ) : list.length > 0 ? (

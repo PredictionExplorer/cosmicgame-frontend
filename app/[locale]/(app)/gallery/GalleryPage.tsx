@@ -16,7 +16,6 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
 import { ErrorState } from '@/components/ui/error-state';
 import { PageShell } from '@/components/ui/page-shell';
-import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 import {
   Sheet,
   SheetContent,
@@ -67,7 +66,18 @@ function isNumeric(value: string) {
 /** Viewport at which the trait facets live in a sidebar instead of a sheet. */
 const RAIL_MEDIA_QUERY = '(min-width: 1024px)';
 
-const GalleryPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
+interface GalleryPageProps {
+  /** The server-rendered page header, the page's only header. */
+  seoSummary?: ReactNode;
+  /**
+   * The route renders the page shell and the header itself, outside this
+   * component's Suspense boundary, so the H1 and figures stay in the static
+   * HTML while the grid (which reads the URL) renders on the client.
+   */
+  bare?: boolean;
+}
+
+const GalleryPage = ({ seoSummary, bare = false }: GalleryPageProps) => {
   const t = useTranslations('gallery');
   const tTraits = useTranslations('traits');
   const { data: nfts, isLoading, isError, refetch } = useCSTList();
@@ -339,47 +349,38 @@ const GalleryPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
     }
   }, []);
 
-  const pageHeader = seoSummary ? (
-    <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
-      <SectionEyebrow tone="aurora" pulse>
-        {stats.total > 0
-          ? t('page.eyebrowImprinted', { count: stats.total })
-          : t('page.eyebrowLive')}
-      </SectionEyebrow>
-      <NftMarketplaceButton variant="secondary" />
-    </div>
-  ) : (
+  // The server-rendered header (GallerySeoSummary) is the page's only header.
+  const pageHeader = seoSummary ?? (
     <PageHeader
-      align="left"
-      eyebrow={
-        <SectionEyebrow tone="aurora" pulse>
-          {stats.total > 0
-            ? t('page.eyebrowImprinted', { count: stats.total })
-            : t('page.eyebrowLive')}
-        </SectionEyebrow>
-      }
+      section="collection"
+      sectionHub
       title={t('page.title')}
-      titleLevel={2}
       subtitle={t('page.subtitle')}
       actions={<NftMarketplaceButton variant="secondary" />}
     />
   );
+  const headerOutside = bare || Boolean(seoSummary);
+  const shell = (children: ReactNode) =>
+    bare ? (
+      <>{children}</>
+    ) : (
+      <PageShell variant="data" backdrop="signature">
+        {pageHeader}
+        {children}
+      </PageShell>
+    );
 
   // An empty grid would read as "no Signatures exist yet", which is a very
   // different statement from "the archive could not be read".
   if (isError) {
-    return (
-      <PageShell variant="data" backdrop="signature">
-        {seoSummary}
-        {pageHeader}
-        <ErrorState
-          title={t('error.title')}
-          message={t('error.message')}
-          headingLevel={3}
-          onRetry={() => void refetch()}
-          surface
-        />
-      </PageShell>
+    return shell(
+      <ErrorState
+        title={t('error.title')}
+        message={t('error.message')}
+        headingLevel={2}
+        onRetry={() => void refetch()}
+        surface
+      />,
     );
   }
 
@@ -397,11 +398,8 @@ const GalleryPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
     />
   );
 
-  return (
-    <PageShell variant="data" backdrop="signature">
-      {seoSummary}
-      {pageHeader}
-
+  return shell(
+    <>
       <Surface
         variant="nebula"
         radius="xl"
@@ -493,7 +491,8 @@ const GalleryPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
         </div>
       </Surface>
 
-      <GalleryHero stats={stats} loading={isLoading} />
+      {/* The server header carries the collection's figures; show them once. */}
+      {headerOutside ? null : <GalleryHero stats={stats} loading={isLoading} />}
 
       <GalleryCollectionDna
         collectionTraits={traitsForUi}
@@ -594,7 +593,7 @@ const GalleryPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
         collectionTraits={traitsForUi}
         onSelectTrait={handleSelectTrait}
       />
-    </PageShell>
+    </>,
   );
 };
 

@@ -1,24 +1,18 @@
-import { SectionEyebrow } from '@/components/ui/section-eyebrow';
+import { PageHeader } from '@/components/layout/PageHeader';
 
 /**
- * Server-rendered heading block for statistics section pages. Keeps an h1 and
- * intro copy in the initial HTML for crawlers while the interactive content
- * hydrates client-side.
+ * Server-rendered header for the statistics section pages: the shared
+ * `PageHeader` with the Insights eyebrow linked to the hub, so the H1 and
+ * intro are in the initial HTML while the panels hydrate.
  */
 export function StatisticsPageIntro({
-  eyebrow,
   title,
   description,
 }: {
-  eyebrow: string;
+  /** @deprecated The eyebrow is the section (Insights), set by the header. */
+  eyebrow?: string;
   title: string;
   description: string;
 }) {
-  return (
-    <header className="mb-10 border-b border-border pb-10">
-      <SectionEyebrow tone="aurora">{eyebrow}</SectionEyebrow>
-      <h1 className="mt-4 type-display-lg text-foreground">{title}</h1>
-      <p className="mt-3 max-w-3xl type-body-lg text-muted-foreground">{description}</p>
-    </header>
-  );
+  return <PageHeader section="insights" title={title} subtitle={description} />;
 }

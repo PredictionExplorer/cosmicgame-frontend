@@ -124,16 +124,50 @@ describe('GalleryPage', () => {
     { state: 'loaded', isLoading: false, isError: false },
     { state: 'loading', isLoading: true, isError: false },
     { state: 'failed', isLoading: false, isError: true },
-  ])('keeps the primary heading and marketplace action inside main when $state', (query) => {
+  ])('renders the server header as the only header inside main when $state', (query) => {
     mockUseCSTList.mockReturnValue({ ...query, data: [], refetch: jest.fn() });
     render(<GalleryPage seoSummary={<h1>Collection overview</h1>} />);
 
     const main = screen.getByRole('main');
     expect(main).toContainElement(screen.getByRole('heading', { level: 1 }));
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     expect(screen.queryByText('gallery.page.title')).not.toBeInTheDocument();
+    // The marketplace action and the collection figures live in the server header.
+    expect(
+      screen.queryByRole('link', { name: 'nav.ecosystem.axiomZero.ariaLabel' }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText('gallery.hero.totalImprinted.label')).not.toBeInTheDocument();
+  });
+
+  it('keeps its own heading and marketplace action inside main without a server header', () => {
+    mockUseCSTList.mockReturnValue({
+      isLoading: false,
+      isError: false,
+      data: [],
+      refetch: jest.fn(),
+    });
+    render(<GalleryPage />);
+
+    const main = screen.getByRole('main');
+    expect(main).toContainElement(
+      screen.getByRole('heading', { level: 1, name: 'gallery.page.title' }),
+    );
     expect(main).toContainElement(
       screen.getByRole('link', { name: 'nav.ecosystem.axiomZero.ariaLabel' }),
     );
+  });
+
+  it('renders only the body in bare mode: the route renders the shell and header', () => {
+    mockUseCSTList.mockReturnValue({
+      isLoading: false,
+      isError: false,
+      data: [],
+      refetch: jest.fn(),
+    });
+    render(<GalleryPage bare />);
+
+    expect(screen.queryByRole('main')).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument();
   });
 
   it('shows skeleton loading state', () => {

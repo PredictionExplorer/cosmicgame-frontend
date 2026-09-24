@@ -11,23 +11,20 @@ import {
 } from '@/components/tables/CharityDepositTable';
 import { useCharityVoluntary } from '@/hooks/useApiQuery';
 
+/** `seoSummary` is the server-rendered page header, the page's only header. */
 const CharityDepositsVoluntary = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('publicGoods');
   const { data: voluntaryDeposits = [], isLoading: loading } = useCharityVoluntary();
 
   return (
     <PageShell variant="data" backdrop="signature">
-      {seoSummary}
-      {!seoSummary && (
+      {seoSummary ?? (
         <PageHeader
+          section="records"
           title={t('voluntary.title')}
-          titleLevel={2}
           subtitle={t('voluntary.subtitle')}
         />
       )}
-      <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        {t('voluntary.description')}
-      </p>
       {loading ? (
         <p className="text-lg font-semibold" role="status">
           {t('loading')}

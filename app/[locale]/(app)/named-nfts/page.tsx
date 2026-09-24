@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
+import { PublicDataQuerySeed } from '../PublicDataQuerySeed';
 import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
 
 import NamedNFTsPage from './NamedNFTsPage';
@@ -35,7 +36,9 @@ export default async function Page({ params }: PageProps) {
   setRequestLocale(locale);
   return (
     <PageMessages namespaces={['statistics', 'tables']}>
-      <NamedNFTsPage seoSummary={<PublicDataRouteSeoSummary route="named-nfts" />} />
+      <PublicDataQuerySeed route="named-nfts">
+        <NamedNFTsPage seoSummary={<PublicDataRouteSeoSummary route="named-nfts" />} />
+      </PublicDataQuerySeed>
     </PageMessages>
   );
 }

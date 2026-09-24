@@ -1,122 +1,65 @@
 import { getLocale, getTranslations } from 'next-intl/server';
 
-import { Link } from '@/i18n/navigation';
-import { InfoTooltip } from '@/components/ui/info-tooltip';
-import { get_dashboard_info } from '@/services/api/rounds';
-import { formatUtcDateTimeStamp, toIntlLocale } from '@/utils/format';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { LiveStatus } from '@/components/ui/live-status';
 
-function formatNumber(value: unknown, locale: string, unavailable: string): string {
-  const numeric = Number(value);
-  return Number.isFinite(numeric)
-    ? new Intl.NumberFormat(toIntlLocale(locale)).format(numeric)
-    : unavailable;
-}
+import { DashboardFigure } from '../DashboardFigure';
 
-function formatEth(value: unknown, locale: string, unavailable: string): string {
-  const numeric = Number(value);
-  return Number.isFinite(numeric)
-    ? `${new Intl.NumberFormat(toIntlLocale(locale), {
-        maximumFractionDigits: 4,
-      }).format(numeric)} ETH`
-    : unavailable;
-}
+import { ActiveCycleGesturesCaption } from './ActiveCycleGesturesCaption';
 
-interface SummaryMetricProps {
-  label: string;
-  value: string;
-  tooltip: string;
-  description: string;
-}
-
-function SummaryMetric({ label, value, tooltip, description }: SummaryMetricProps) {
-  return (
-    <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
-      <dt className="flex items-center gap-1.5 text-xs uppercase tracking-[0.18em] text-muted-foreground">
-        <span>{label}</span>
-        <InfoTooltip content={tooltip} label={label} />
-      </dt>
-      <dd className="mt-2 font-display text-2xl font-medium text-foreground">{value}</dd>
-      <dd className="sr-only">{description}</dd>
-    </div>
-  );
-}
-
+/**
+ * The statistics hub header, rendered on the server: the hub's one headline
+ * figure row (the active cycle with its gestures, allocations distributed,
+ * NFTs imprinted, contract balance), read from the same polled dashboard
+ * query as the hub panel, so no metric appears twice. Render it inside
+ * `DashboardQuerySeed` so the server HTML holds the figures.
+ */
 export async function StatisticsSeoSummary() {
   const locale = await getLocale();
   const t = await getTranslations({ locale, namespace: 'statistics' });
-  const updatedAt = new Date();
-  // Resolve to null on transport failure so ISR builds never crash on a
-  // temporarily unreachable API; the summary falls back to static copy.
-  const data = await get_dashboard_info().catch(() => null);
-  const hasLiveData = data !== null;
-  const mainStats = data?.MainStats;
 
   return (
-    <section aria-labelledby="statistics-heading" className="mb-12 border-b border-border pb-10">
-      <p className="type-eyebrow text-primary/80">{t('hub.seo.eyebrow')}</p>
-      <h1 id="statistics-heading" className="mt-4 type-display-lg text-foreground">
-        {t('hub.seo.heading')}
-      </h1>
-      <p className="mt-4 max-w-3xl type-body-lg text-muted-foreground">
-        {t('hub.seo.description')}
-      </p>
-      <p className="mt-3 type-body-sm text-muted-foreground">
-        {t('hub.seo.lastUpdated', { date: formatUtcDateTimeStamp(updatedAt, locale) })}
-        {!hasLiveData ? t('hub.seo.unavailableSuffix') : ''}
-      </p>
-
-      <dl className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <SummaryMetric
-          label={t('metrics.activePerformanceCycle.label')}
-          value={formatNumber(data?.CurRoundNum, locale, t('hub.seo.unavailable'))}
-          tooltip={t('metrics.activePerformanceCycle.tooltip')}
-          description={t('metrics.activePerformanceCycle.seoDescription')}
-        />
-        <SummaryMetric
-          label={t('metrics.activeCycleGestures.label')}
-          value={formatNumber(data?.CurNumBids, locale, t('hub.seo.unavailable'))}
-          tooltip={t('metrics.activeCycleGestures.tooltip')}
-          description={t('metrics.activeCycleGestures.seoDescription')}
-        />
-        <SummaryMetric
-          label={t('metrics.contractBalance.seoLabel')}
-          value={formatEth(data?.CosmicGameBalanceEth, locale, t('hub.seo.unavailable'))}
-          tooltip={t('metrics.contractBalance.tooltip')}
-          description={t('metrics.contractBalance.seoDescription')}
-        />
-        <SummaryMetric
-          label={t('metrics.cosmicSignatureNftsImprinted.label')}
-          value={formatNumber(mainStats?.NumCSTokenMints, locale, t('hub.seo.unavailable'))}
-          tooltip={t('metrics.cosmicSignatureNftsImprinted.tooltip')}
-          description={t('metrics.cosmicSignatureNftsImprinted.seoDescription')}
-        />
-      </dl>
-
-      <p className="mt-6 type-body-sm text-muted-foreground">{t('hub.seo.dataSource')}</p>
-      <nav aria-label={t('hub.seo.relatedPagesAria')} className="mt-5">
-        <ul className="flex flex-wrap gap-3 text-sm">
-          <li>
-            <Link href="/current-cycle" className="text-primary underline-offset-4 hover:underline">
-              {t('hub.seo.links.currentCycle')}
-            </Link>
-          </li>
-          <li>
-            <Link href="/how-it-works" className="text-primary underline-offset-4 hover:underline">
-              {t('hub.seo.links.howItWorks')}
-            </Link>
-          </li>
-          <li>
-            <Link href="/contracts" className="text-primary underline-offset-4 hover:underline">
-              {t('hub.seo.links.contracts')}
-            </Link>
-          </li>
-          <li>
-            <Link href="/faq" className="text-primary underline-offset-4 hover:underline">
-              {t('hub.seo.links.faq')}
-            </Link>
-          </li>
-        </ul>
-      </nav>
-    </section>
+    <PageHeader
+      section="insights"
+      sectionHub
+      title={t('hub.seo.heading')}
+      titleId="statistics-heading"
+      subtitle={t('hub.seo.description')}
+      figures={[
+        {
+          id: 'activePerformanceCycle',
+          label: t('metrics.activePerformanceCycle.label'),
+          value: <DashboardFigure metric="cycle" />,
+          info: t('metrics.activePerformanceCycle.tooltip'),
+          caption: <ActiveCycleGesturesCaption />,
+        },
+        {
+          id: 'allocationsDistributed',
+          label: t('metrics.allocationsDistributed.label'),
+          value: <DashboardFigure metric="allocations" />,
+          info: t('metrics.allocationsDistributed.tooltip'),
+        },
+        {
+          id: 'cosmicSignatureNftsImprinted',
+          label: t('metrics.cosmicSignatureNftsImprinted.shortLabel'),
+          value: <DashboardFigure metric="imprinted" />,
+          info: t('metrics.cosmicSignatureNftsImprinted.tooltip'),
+        },
+        {
+          id: 'contractBalance',
+          label: t('metrics.contractBalance.label'),
+          value: <DashboardFigure metric="balance" />,
+          info: t('metrics.contractBalance.tooltip'),
+        },
+      ]}
+      meta={<LiveStatus variant="inline" />}
+      related={[
+        { href: '/current-cycle', label: t('hub.seo.links.currentCycle') },
+        { href: '/how-it-works', label: t('hub.seo.links.howItWorks') },
+        { href: '/contracts', label: t('hub.seo.links.contracts') },
+        { href: '/faq', label: t('hub.seo.links.faq') },
+      ]}
+      relatedLabel={t('hub.seo.relatedPagesAria')}
+    />
   );
 }

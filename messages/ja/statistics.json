@@ -32,9 +32,6 @@
       "description": "すべてのCosmic Signatureパフォーマンス・サイクルにおける参加者の実績順位表と、受け取れる配分の結果。"
     }
   },
-  "intro": {
-    "eyebrow": "プロトコル統計 · Arbitrum"
-  },
   "breadcrumbs": {
     "statistics": "統計"
   },
@@ -70,12 +67,8 @@
       "datasetDescription": "ArbitrumスマートコントラクトとCosmic Signature APIの記録に基づく、プロトコルの公開活動の集計です。"
     },
     "seo": {
-      "eyebrow": "プロトコル統計 · Arbitrum",
       "heading": "Cosmic Signatureプロトコル統計",
       "description": "Arbitrum上の公開記録に基づくプロトコル統計です。サイクルの状態、一筆、NFT、CST、係留、準備金、配分の推移を確認できます。",
-      "lastUpdated": "最終更新：{date}",
-      "unavailableSuffix": "。現在は最新データを取得できないため、プロトコルの説明のみ表示しています。",
-      "dataSource": "データは、Arbitrum上の活動を集計するCosmic Signatureの公開APIから取得しています。仕組みと検証の詳細は、以下の関連ページをご覧ください。",
       "relatedPagesAria": "統計の関連ページ",
       "links": {
         "currentCycle": "現在のパフォーマンス・サイクルを見る",
@@ -83,19 +76,17 @@
         "contracts": "検証済みのArbitrumコントラクトを確認する",
         "faq": "Cosmic Signatureのよくある質問を読む"
       },
-      "unavailable": "取得不可"
+      "gesturesCaption": "このサイクルで{count, plural, other {#筆}}"
     }
   },
   "metrics": {
     "activePerformanceCycle": {
       "label": "進行中のパフォーマンス・サイクル",
-      "tooltip": "公開のCosmic Signature APIがインデックスしている現在のパフォーマンス・サイクル番号。",
-      "seoDescription": "Arbitrum上のCosmic Signatureの活動からインデックスされた現在のパフォーマンス・サイクル番号。"
+      "tooltip": "公開のCosmic Signature APIがインデックスしている現在のパフォーマンス・サイクル番号。"
     },
     "activeCycleGestures": {
       "label": "進行中サイクルの一筆",
-      "tooltip": "進行中のパフォーマンス・サイクルでこれまでに入れられたインデックス済みの一筆の数。",
-      "seoDescription": "進行中のパフォーマンス・サイクルのインデックス済み筆数。"
+      "tooltip": "進行中のパフォーマンス・サイクルでこれまでに入れられたインデックス済みの一筆の数。"
     },
     "totalCycles": {
       "label": "総サイクル数",
@@ -108,14 +99,11 @@
     "cosmicSignatureNftsImprinted": {
       "label": "刻印されたCosmic Signature NFT",
       "shortLabel": "刻印されたNFT",
-      "tooltip": "インデックス済みのすべてのサイクルでプロトコルが刻印したCosmic Signature NFT（ERC-721）トークンの累計。値が0の場合、統計APIが現在このカウンターについてインデックス済みの刻印を報告していないことを意味します。",
-      "seoDescription": "インデックス済みのすべてのサイクルでプロトコルが刻印したCosmic Signature NFT（ERC-721）トークンの累計。"
+      "tooltip": "インデックス済みのすべてのサイクルでプロトコルが刻印したCosmic Signature NFT（ERC-721）トークンの累計。値が0の場合、統計APIが現在このカウンターについてインデックス済みの刻印を報告していないことを意味します。"
     },
     "contractBalance": {
       "label": "コントラクト残高",
-      "seoLabel": "プロトコルコントラクト残高",
-      "tooltip": "今後の配分、受け取り、サイクルの移行の前にCosmic Signatureプロトコルコントラクトが現在保有しているETH。",
-      "seoDescription": "今後の配分の流れの前にCosmic Signatureプロトコルコントラクトが現在保有しているETH。"
+      "tooltip": "今後の配分、受け取り、サイクルの移行の前にCosmic Signatureプロトコルコントラクトが現在保有しているETH。"
     },
     "numAllocationsDistributed": {
       "label": "配られた配分の件数",

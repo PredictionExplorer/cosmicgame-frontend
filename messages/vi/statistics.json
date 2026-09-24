@@ -32,9 +32,6 @@
       "description": "Bảng xếp hạng thành tích người tham gia và kết quả phân bổ có thể nhận về của mọi chu kỳ trình diễn Cosmic Signature."
     }
   },
-  "intro": {
-    "eyebrow": "Thống kê giao thức · Arbitrum"
-  },
   "breadcrumbs": {
     "statistics": "Thống kê"
   },
@@ -70,12 +67,8 @@
       "datasetDescription": "Bản tóm tắt có thể thu thập về hoạt động công khai của giao thức Cosmic Signature, được lập chỉ mục từ các hợp đồng thông minh Arbitrum và API của Cosmic Signature."
     },
     "seo": {
-      "eyebrow": "Thống kê giao thức · Arbitrum",
       "heading": "Thống kê giao thức Cosmic Signature",
       "description": "Theo dõi hoạt động Cosmic Signature trên Arbitrum: chu kỳ trình diễn, nét bút, NFT, CST, neo giữ, dự trữ và các khoản phân bổ.",
-      "lastUpdated": "Cập nhật lần cuối: {date}",
-      "unavailableSuffix": ". Dữ liệu hiện tại tạm thời không khả dụng. Bạn vẫn có thể xem phần giới thiệu về giao thức.",
-      "dataSource": "Dữ liệu lấy từ API công khai của Cosmic Signature, tổng hợp hoạt động hợp đồng trên Arbitrum. Các liên kết bên dưới giải thích cơ chế giao thức và cách xác minh.",
       "relatedPagesAria": "Các trang liên quan đến thống kê",
       "links": {
         "currentCycle": "Xem chu kỳ trình diễn hiện tại",
@@ -83,19 +76,17 @@
         "contracts": "Xem các hợp đồng Arbitrum đã xác minh",
         "faq": "Đọc câu hỏi thường gặp về Cosmic Signature"
       },
-      "unavailable": "Không khả dụng"
+      "gesturesCaption": "{count, plural, other {# nét bút}} trong chu kỳ này"
     }
   },
   "metrics": {
     "activePerformanceCycle": {
       "label": "Chu kỳ trình diễn đang diễn ra",
-      "tooltip": "Số chu kỳ trình diễn hiện tại được API công khai của Cosmic Signature lập chỉ mục.",
-      "seoDescription": "Số chu kỳ trình diễn hiện tại được lập chỉ mục từ hoạt động Cosmic Signature trên Arbitrum."
+      "tooltip": "Số chu kỳ trình diễn hiện tại được API công khai của Cosmic Signature lập chỉ mục."
     },
     "activeCycleGestures": {
       "label": "Nét bút của chu kỳ đang diễn ra",
-      "tooltip": "Số nét bút được lập chỉ mục đã đặt trong chu kỳ trình diễn đang diễn ra đến nay.",
-      "seoDescription": "Số nét bút được lập chỉ mục của chu kỳ trình diễn đang diễn ra."
+      "tooltip": "Số nét bút được lập chỉ mục đã đặt trong chu kỳ trình diễn đang diễn ra đến nay."
     },
     "totalCycles": {
       "label": "Tổng số chu kỳ",
@@ -108,14 +99,11 @@
     "cosmicSignatureNftsImprinted": {
       "label": "Cosmic Signature NFT đã khắc",
       "shortLabel": "NFT đã khắc",
-      "tooltip": "Số token ERC-721 Cosmic Signature NFT tích lũy mà giao thức đã khắc qua mọi chu kỳ được lập chỉ mục. Giá trị 0 nghĩa là API thống kê hiện không báo cáo lần khắc nào được lập chỉ mục cho bộ đếm này.",
-      "seoDescription": "Số token ERC-721 Cosmic Signature NFT tích lũy mà giao thức đã khắc qua mọi chu kỳ được lập chỉ mục."
+      "tooltip": "Số token ERC-721 Cosmic Signature NFT tích lũy mà giao thức đã khắc qua mọi chu kỳ được lập chỉ mục. Giá trị 0 nghĩa là API thống kê hiện không báo cáo lần khắc nào được lập chỉ mục cho bộ đếm này."
     },
     "contractBalance": {
       "label": "Số dư hợp đồng",
-      "seoLabel": "Số dư hợp đồng giao thức",
-      "tooltip": "ETH hiện được hợp đồng giao thức Cosmic Signature nắm giữ trước các phân bổ, lần nhận về hoặc chuyển tiếp chu kỳ trong tương lai.",
-      "seoDescription": "ETH hiện được hợp đồng giao thức Cosmic Signature nắm giữ trước các dòng phân bổ trong tương lai."
+      "tooltip": "ETH hiện được hợp đồng giao thức Cosmic Signature nắm giữ trước các phân bổ, lần nhận về hoặc chuyển tiếp chu kỳ trong tương lai."
     },
     "numAllocationsDistributed": {
       "label": "Số phân bổ đã phân phối",

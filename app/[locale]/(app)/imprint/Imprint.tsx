@@ -110,14 +110,11 @@ const Imprint = ({ seoSummary }: { seoSummary?: ReactNode }) => {
 
   return (
     <PageShell variant="form">
-      {seoSummary}
-      {!seoSummary && (
-        <PageHeader title={t('page.title')} titleLevel={2} subtitle={t('page.subtitle')} />
+      {seoSummary ?? (
+        <PageHeader section="participate" title={t('page.title')} subtitle={t('page.subtitle')} />
       )}
 
-      <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        {t('page.description')}
-      </p>
+      <p className="mb-8 max-w-prose type-body-md text-muted-foreground">{t('page.description')}</p>
 
       <div className="flex flex-col items-center">
         <div className="rounded-2xl border border-primary/20 bg-gradient-to-b from-primary/[0.06] to-transparent p-8 text-center max-w-md w-full">

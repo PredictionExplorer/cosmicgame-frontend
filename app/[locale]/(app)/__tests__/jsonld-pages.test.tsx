@@ -26,6 +26,10 @@ jest.mock('../contracts/Contracts', () => ({
 jest.mock('../contracts/ContractsSeoSummary', () => ({
   ContractsSeoSummary: () => <div data-testid="seo-summary" />,
 }));
+// The dashboard seed is an async server component (it awaits the API read).
+jest.mock('../QuerySeed', () => ({
+  DashboardQuerySeed: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
 jest.mock('../code/CodeViewer', () => ({
   __esModule: true,
   default: () => <div data-testid="page-body" />,

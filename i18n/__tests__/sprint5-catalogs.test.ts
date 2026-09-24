@@ -23,7 +23,7 @@ describe('Sprint 5 bilingual catalogs', () => {
 
   it('preserves the former statistics-copy English rendering', () => {
     expect(enStatistics.metrics.activePerformanceCycle.label).toBe('Active Performance Cycle');
-    expect(enStatistics.metrics.contractBalance.seoLabel).toBe('Protocol Contract Balance');
+    expect(enStatistics.metrics.contractBalance.label).toBe('Contract Balance');
     expect(enStatistics.metrics.cosmicSignatureNftsImprinted.shortLabel).toBe('NFTs Imprinted');
     expect(enStatistics.sectionTooltips.enduranceTimeline).toContain('The widest bar');
     expect(enTables.statisticsTooltips.systemEnded).toBe(

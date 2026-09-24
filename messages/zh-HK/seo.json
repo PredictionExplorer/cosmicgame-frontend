@@ -2,12 +2,11 @@
   "publicData": {
     "common": {
       "unavailable": "暫不可用",
-      "lastUpdated": "更新時間：{date}。數據來源：{source}。",
+      "source": "數據來源：{source}",
       "relatedPagesAria": "{heading}相關頁面"
     },
     "routes": {
       "allocation": {
-        "eyebrow": "分配歷史 · Arbitrum",
         "heading": "分配名錄",
         "description": "瀏覽 Cosmic Signature 已收官演繹週期的公開分配歷史，包括簽名分配、星選、錨定派發與公共物品資金流。",
         "source": "Cosmic Signature 公開週期 API",
@@ -28,11 +27,14 @@
           "totalEth": {
             "label": "簽名分配 ETH 總額",
             "tooltip": "根據週期記錄彙總的歷次簽名分配 ETH。"
+          },
+          "totalGestures": {
+            "label": "落筆總次數",
+            "tooltip": "所有已收官週期的累計落筆次數。"
           }
         }
       },
       "anchoring": {
-        "eyebrow": "錨定派發 · Arbitrum",
         "heading": "錨定派發",
         "description": "追蹤 Cosmic Signature NFT 錨定、ETH 錨定派發記錄、Random Walk NFT 錨定，以及錨定 NFT 星選銘刻。",
         "source": "Cosmic Signature 公開錨定 API",
@@ -56,7 +58,6 @@
         }
       },
       "marketing": {
-        "eyebrow": "推廣分配 · Arbitrum",
         "heading": "推廣分配",
         "description": "查看 Cosmic Signature 推廣分配歷史，以及向幫助更多人了解協議的生態貢獻者發放的 CST。",
         "source": "Cosmic Signature 公開推廣分配 API",
@@ -78,7 +79,6 @@
         }
       },
       "imprint": {
-        "eyebrow": "Random Walk NFT 銘刻 · Arbitrum",
         "heading": "銘刻 Random Walk NFT",
         "description": "銘刻 Random Walk NFT，以參與 Cosmic Signature。每枚尚未使用的 Random Walk NFT 都可附加至一筆 ETH 落筆，使落筆價格降低 50%。",
         "source": "Cosmic Signature 公開協議配置 API",
@@ -100,13 +100,12 @@
         }
       },
       "eth-contribution": {
-        "eyebrow": "直接 ETH 貢獻 · Arbitrum",
         "heading": "直接 ETH 貢獻",
         "description": "瀏覽直接轉入 Cosmic Signature 週期儲備的 ETH，以及隨這些記錄公開的留言、週期與貢獻者資訊。",
         "source": "Cosmic Signature 公開貢獻 API",
         "links": {
-          "protocol": "查看協議公共物品資助",
-          "voluntary": "查看自願公共物品資助",
+          "reserve": "週期儲備如何分配",
+          "protocol": "公共物品份額的去向",
           "risk": "閱讀風險披露"
         },
         "cards": {
@@ -122,7 +121,6 @@
         }
       },
       "attached-nfts": {
-        "eyebrow": "已附加 NFT 貢獻 · Arbitrum",
         "heading": "已附加 NFT 貢獻",
         "description": "瀏覽隨 Cosmic Signature 落筆附加的 NFT。週期收官時，已附加的 ERC-721 代幣會轉給簽名分配獲配者。",
         "source": "Cosmic Signature 公開已附加 NFT API",
@@ -144,7 +142,6 @@
         }
       },
       "allocation-finalized": {
-        "eyebrow": "已取回分配 · Arbitrum",
         "heading": "已取回分配",
         "description": "查看 Cosmic Signature 的公開分配取回記錄，包括收到的 ETH、Cosmic Signature NFT 分配與星選分配。",
         "source": "Cosmic Signature 公開分配取回 API",
@@ -168,7 +165,6 @@
         }
       },
       "named-nfts": {
-        "eyebrow": "已命名 NFT · Arbitrum",
         "heading": "已命名 Cosmic Signature NFT",
         "description": "瀏覽由持有者自定義名稱的 Cosmic Signature NFT，串聯代幣身份、畫廊發現與鏈上系列歷史。",
         "source": "Cosmic Signature 公開代幣 API",
@@ -184,14 +180,12 @@
           "owners": {
             "label": "目前持有者"
           },
-          "collection": {
-            "label": "系列",
-            "value": "Cosmic Signature ERC-721"
+          "imprinted": {
+            "label": "已銘刻 NFT"
           }
         }
       },
       "used-rwlk-nfts": {
-        "eyebrow": "Random Walk NFT 使用記錄 · Arbitrum",
         "heading": "已使用的 Random Walk NFT",
         "description": "查看已經附加至 ETH 落筆、並用掉一次性落筆價格減免資格的 Random Walk NFT。",
         "source": "Cosmic Signature 公開 Random Walk 使用 API",
@@ -204,17 +198,15 @@
           "used": {
             "label": "已使用的 Random Walk NFT"
           },
+          "wallets": {
+            "label": "參與者錢包"
+          },
           "discount": {
             "label": "一次性減免"
-          },
-          "scope": {
-            "label": "使用範圍",
-            "value": "每枚 NFT 可用於一筆落筆"
           }
         }
       },
       "coordination-changes": {
-        "eyebrow": "協調變更 · Arbitrum",
         "heading": "協調變更",
         "description": "查看 Cosmic Signature 的公開協調變更，包括影響後續週期的協議模式、參數更新與管理記錄。",
         "source": "Cosmic Signature 公開系統事件 API",
@@ -227,18 +219,16 @@
           "records": {
             "label": "協調變更記錄"
           },
-          "governance": {
-            "label": "協調主體",
-            "value": "宇宙議會"
+          "latest": {
+            "label": "最近變更"
           },
-          "network": {
-            "label": "網絡",
-            "value": "Arbitrum"
+          "parameters": {
+            "label": "變更的參數",
+            "tooltip": "這些記錄涉及的不同協議參數數量。只有合約所有者可以變更這些參數。"
           }
         }
       },
       "public-goods-contributions-cg": {
-        "eyebrow": "協議公共物品資助 · Arbitrum",
         "heading": "協議公共物品資助",
         "description": "追蹤 Cosmic Signature 各週期自動轉入公共物品金庫、併發往其目前受益方 Protocol Guild 的資金。",
         "source": "Cosmic Signature 公開公共物品 API",
@@ -254,14 +244,16 @@
           "totalEth": {
             "label": "協議公共物品 ETH"
           },
-          "track": {
-            "label": "分配軌道",
-            "value": "公共物品"
+          "share": {
+            "label": "每個週期儲備的份額",
+            "tooltip": "每個已收官週期儲備中由協議轉入公共物品金庫的份額。"
+          },
+          "latest": {
+            "label": "最近一次資助"
           }
         }
       },
       "public-goods-contributions-voluntary": {
-        "eyebrow": "自願公共物品資助 · Arbitrum",
         "heading": "自願公共物品資助",
         "description": "瀏覽 Cosmic Signature 社區自願提供的公共物品資金，包括所屬週期與貢獻者記錄。",
         "source": "Cosmic Signature 公開公共物品 API",
@@ -283,7 +275,6 @@
         }
       },
       "public-goods-retrievals": {
-        "eyebrow": "公共物品取回 · Arbitrum",
         "heading": "公共物品取回",
         "description": "查看 Cosmic Signature 公共物品金庫的取回記錄；週期儲備會由此轉向目前配置的公共物品受益方 Protocol Guild。",
         "source": "Cosmic Signature 公開公共物品 API",
@@ -299,25 +290,24 @@
           "totalEth": {
             "label": "已取回公共物品 ETH"
           },
-          "track": {
-            "label": "受益軌道",
-            "value": "公共物品金庫"
+          "latest": {
+            "label": "最近一次取回"
+          },
+          "beneficiary": {
+            "label": "最近受益方",
+            "tooltip": "最近一次從公共物品金庫取回的資金接收地址。目前設定的受益方為 Protocol Guild。"
           }
         }
       }
     }
   },
   "gallerySummary": {
-    "eyebrow": "確定性 NFT 藝術 · Arbitrum",
     "heading": "Cosmic Signature 畫廊",
     "description": "瀏覽由確定性三體物理、鏈上種子、光譜渲染與演繹週期數據共同生成的 Cosmic Signature NFT。每件簽名作品都可從協議記錄復現，並對應一個特定週期。",
-    "unavailable": "暫不可用",
     "cards": {
       "imprinted": "已銘刻 NFT",
-      "process": "作品生成方式",
-      "processValue": "三體模擬",
-      "license": "許可",
-      "licenseValue": "遵循 CC0"
+      "anchored": "已錨定 NFT",
+      "named": "已命名 NFT"
     },
     "relatedAria": "畫廊相關頁面",
     "links": {
@@ -327,14 +317,13 @@
     }
   },
   "currentCycleSummary": {
-    "eyebrow": "即時演繹週期 · Arbitrum",
     "heading": "目前 Cosmic Signature 演繹週期",
     "description": "本頁追蹤目前 Cosmic Signature 演繹週期，包括公開落筆次數、週期儲備、已附加資產、分配軌道與收官狀態。",
-    "unavailable": "暫不可用",
     "cards": {
       "cycle": "週期",
-      "gestures": "落筆",
-      "reserve": "儲備快照"
+      "gestures": "落筆總次數",
+      "signatureAllocation": "簽名分配",
+      "opened": "開啟時間"
     },
     "relatedAria": "目前週期相關頁面",
     "links": {

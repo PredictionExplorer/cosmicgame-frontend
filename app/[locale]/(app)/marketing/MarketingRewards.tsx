@@ -17,12 +17,17 @@ import { TopMarketersLeaderboard } from '@/components/marketing/TopMarketersLead
 import { RewardsHistorySection } from '@/components/marketing/RewardsHistorySection';
 import { MarketingCTA } from '@/components/marketing/MarketingCTA';
 
+/**
+ * `seoSummary` is the server-rendered page header, the page's only header. It
+ * carries the program's figures, so the page body does not repeat them.
+ */
 const MarketingRewards = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('marketing');
   const { data: marketingRewards, isLoading: rewardsLoading } = useMarketingRewards();
   const { data: dashboard, isLoading: dashboardLoading } = useDashboardInfo();
 
-  const loading = rewardsLoading || dashboardLoading;
+  // The dashboard only feeds the stat row, which the server header replaces.
+  const loading = rewardsLoading || (!seoSummary && dashboardLoading);
 
   const rewards = useMemo(() => (marketingRewards ?? []) as MarketingReward[], [marketingRewards]);
 
@@ -50,13 +55,16 @@ const MarketingRewards = ({ seoSummary }: { seoSummary?: ReactNode }) => {
 
   return (
     <PageShell variant="data" backdrop="signature">
-      {seoSummary}
-      <MarketingHero compact={Boolean(seoSummary)} />
-      <MarketingStats
-        totalAllocatedCst={totalAllocatedCst}
-        activeMarketers={activeMarketers}
-        rewardTransactions={rewardTransactions}
-      />
+      {seoSummary ?? (
+        <>
+          <MarketingHero />
+          <MarketingStats
+            totalAllocatedCst={totalAllocatedCst}
+            activeMarketers={activeMarketers}
+            rewardTransactions={rewardTransactions}
+          />
+        </>
+      )}
       <HowItWorks />
       <TopMarketersLeaderboard rewards={rewards} />
       <RewardsHistorySection rewards={rewards} />

@@ -32,9 +32,6 @@
       "description": "檢視參與者表現榜，以及 Cosmic Signature 各演繹週期中可取回資產的處理情況。"
     }
   },
-  "intro": {
-    "eyebrow": "協議統計 · Arbitrum"
-  },
   "breadcrumbs": {
     "statistics": "統計"
   },
@@ -70,12 +67,8 @@
       "datasetDescription": "可供檢索的 Cosmic Signature 公開活動摘要，資料由 Arbitrum 智慧合約與 Cosmic Signature API 索引。"
     },
     "seo": {
-      "eyebrow": "協議統計 · Arbitrum",
       "heading": "Cosmic Signature 協議統計",
       "description": "本頁彙總 Cosmic Signature 在 Arbitrum 上的公開協議活動，包括演繹週期狀態、落筆、Cosmic Signature NFT、CST、錨定、儲備與分配資料。",
-      "lastUpdated": "更新時間：{date}",
-      "unavailableSuffix": "。即時資料暫不可用，目前顯示協議機制說明。",
-      "dataSource": "資料來自 Cosmic Signature 公共 API，該 API 索引協議在 Arbitrum 上的智慧合約活動。可透過下方連結了解協議機制與驗證資訊。",
       "relatedPagesAria": "統計相關頁面",
       "links": {
         "currentCycle": "檢視目前演繹週期",
@@ -83,19 +76,17 @@
         "contracts": "檢視已驗證的 Arbitrum 合約",
         "faq": "閱讀 Cosmic Signature 常見問題"
       },
-      "unavailable": "暫不可用"
+      "gesturesCaption": "本週期落筆 {count, number} 次"
     }
   },
   "metrics": {
     "activePerformanceCycle": {
       "label": "目前演繹週期",
-      "tooltip": "Cosmic Signature 公共 API 目前索引的演繹週期編號。",
-      "seoDescription": "根據 Cosmic Signature 在 Arbitrum 上的活動索引得出的目前演繹週期編號。"
+      "tooltip": "Cosmic Signature 公共 API 目前索引的演繹週期編號。"
     },
     "activeCycleGestures": {
       "label": "目前週期落筆",
-      "tooltip": "目前週期內已索引的落筆次數。",
-      "seoDescription": "目前演繹週期內已索引的落筆次數。"
+      "tooltip": "目前週期內已索引的落筆次數。"
     },
     "totalCycles": {
       "label": "週期總數",
@@ -108,14 +99,11 @@
     "cosmicSignatureNftsImprinted": {
       "label": "已銘刻 Cosmic Signature NFT",
       "shortLabel": "已銘刻 NFT",
-      "tooltip": "協議在所有已索引週期中累計銘刻的 Cosmic Signature NFT（ERC-721）數量。若數值為 0，表示統計 API 目前未報告此計數器的銘刻紀錄。",
-      "seoDescription": "協議在所有已索引週期中累計銘刻的 Cosmic Signature NFT（ERC-721）數量。"
+      "tooltip": "協議在所有已索引週期中累計銘刻的 Cosmic Signature NFT（ERC-721）數量。若數值為 0，表示統計 API 目前未報告此計數器的銘刻紀錄。"
     },
     "contractBalance": {
       "label": "合約餘額",
-      "seoLabel": "協議合約餘額",
-      "tooltip": "Cosmic Signature 協議合約目前持有的 ETH，尚未進入後續分配、取回或週期轉換。",
-      "seoDescription": "Cosmic Signature 協議合約在後續分配流轉前持有的 ETH。"
+      "tooltip": "Cosmic Signature 協議合約目前持有的 ETH，尚未進入後續分配、取回或週期轉換。"
     },
     "numAllocationsDistributed": {
       "label": "已發放分配數量",

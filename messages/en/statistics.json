@@ -32,9 +32,6 @@
       "description": "Participant performance leaderboard and retrievable allocation outcomes for every Cosmic Signature Performance Cycle."
     }
   },
-  "intro": {
-    "eyebrow": "Protocol Statistics · Arbitrum"
-  },
   "breadcrumbs": {
     "statistics": "Statistics"
   },
@@ -70,12 +67,8 @@
       "datasetDescription": "A summary of public Cosmic Signature activity indexed from Arbitrum smart contracts by the Cosmic Signature API."
     },
     "seo": {
-      "eyebrow": "Protocol statistics · Arbitrum",
       "heading": "Cosmic Signature Protocol Statistics",
       "description": "Explore Cosmic Signature activity on Arbitrum: Performance Cycles, gestures, NFTs, CST, anchoring, reserves, and allocations. The tables below show the latest available protocol data.",
-      "lastUpdated": "Last updated: {date}",
-      "unavailableSuffix": ". Live data is temporarily unavailable; this page is showing explanatory protocol context.",
-      "dataSource": "Data comes from the public Cosmic Signature API, which indexes the protocol’s Arbitrum smart contract activity. The links below explain the protocol and its verification resources.",
       "relatedPagesAria": "Statistics related pages",
       "links": {
         "currentCycle": "View the current Performance Cycle",
@@ -83,19 +76,17 @@
         "contracts": "Review verified Arbitrum contracts",
         "faq": "Read the Cosmic Signature FAQ"
       },
-      "unavailable": "Unavailable"
+      "gesturesCaption": "{count, plural, one {# gesture} other {# gestures}} this cycle"
     }
   },
   "metrics": {
     "activePerformanceCycle": {
       "label": "Active Performance Cycle",
-      "tooltip": "The current Performance Cycle number indexed by the public Cosmic Signature API.",
-      "seoDescription": "Current Performance Cycle number indexed from Cosmic Signature activity on Arbitrum."
+      "tooltip": "The current Performance Cycle number indexed by the public Cosmic Signature API."
     },
     "activeCycleGestures": {
       "label": "Active Cycle Gestures",
-      "tooltip": "Number of indexed gestures made in the active Performance Cycle so far.",
-      "seoDescription": "Indexed gesture count for the active Performance Cycle."
+      "tooltip": "Number of indexed gestures made in the active Performance Cycle so far."
     },
     "totalCycles": {
       "label": "Total Cycles",
@@ -108,14 +99,11 @@
     "cosmicSignatureNftsImprinted": {
       "label": "Cosmic Signature NFTs Imprinted",
       "shortLabel": "NFTs Imprinted",
-      "tooltip": "Cumulative count of Cosmic Signature NFT ERC-721 tokens imprinted by the protocol across all indexed cycles. A value of 0 means the statistics API is currently reporting no indexed imprints for this counter.",
-      "seoDescription": "Cumulative Cosmic Signature NFT ERC-721 tokens imprinted by the protocol across all indexed cycles."
+      "tooltip": "Cumulative count of Cosmic Signature NFT ERC-721 tokens imprinted by the protocol across all indexed cycles. A value of 0 means the statistics API is currently reporting no indexed imprints for this counter."
     },
     "contractBalance": {
       "label": "Contract Balance",
-      "seoLabel": "Protocol Contract Balance",
-      "tooltip": "ETH currently held by the Cosmic Signature protocol contract before future allocations, retrievals, or cycle transitions.",
-      "seoDescription": "ETH currently held by the Cosmic Signature protocol contract before future allocation flows."
+      "tooltip": "ETH currently held by the Cosmic Signature protocol contract before future allocations, retrievals, or cycle transitions."
     },
     "numAllocationsDistributed": {
       "label": "Allocations Distributed",

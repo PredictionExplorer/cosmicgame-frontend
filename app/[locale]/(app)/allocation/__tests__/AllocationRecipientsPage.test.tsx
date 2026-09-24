@@ -115,40 +115,30 @@ describe('AllocationRecipientsPage', () => {
     }
   });
 
-  describe('summary statistics', () => {
-    it('renders summary stats when data is available', () => {
+  describe('page header', () => {
+    it('leaves the totals to the header instead of a second stat row', () => {
       mockUseRoundList.mockReturnValue({
         data: [
           createRound({ AmountEth: 1.5, WinnerAddr: '0xA', RoundStats: { TotalBids: 10 } }),
           createRound({ AmountEth: 2.5, WinnerAddr: '0xB', RoundStats: { TotalBids: 20 } }),
-          createRound({ AmountEth: 3.0, WinnerAddr: '0xA', RoundStats: { TotalBids: 30 } }),
         ],
         isLoading: false,
       });
-      render(<AllocationRecipientsPage />);
+      render(<AllocationRecipientsPage seoSummary={<h1>Allocation Recipients</h1>} />);
 
-      const statsContainer = screen.getByTestId('summary-stats');
-      expect(statsContainer).toBeInTheDocument();
-
-      expect(screen.getByTestId('summary-stat-total-cycles')).toHaveTextContent('3');
-      expect(screen.getByTestId('summary-stat-total-eth-distributed')).toHaveTextContent(
-        '7.00 ETH',
-      );
-      expect(screen.getByTestId('summary-stat-total-gestures')).toHaveTextContent('60');
-      expect(screen.getByTestId('summary-stat-unique-recipients')).toHaveTextContent('2');
+      // The server header (PublicDataRouteSeoSummary) carries cycles, recipients, ETH and
+      // gestures; the page body starts with the reserve split and the ledger.
+      expect(screen.queryByTestId('summary-stats')).not.toBeInTheDocument();
+      expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     });
 
-    it('does not render summary stats when data is empty', () => {
+    it('renders its own header with the records scope when rendered without the server one', () => {
       mockUseRoundList.mockReturnValue({ data: [], isLoading: false });
       render(<AllocationRecipientsPage />);
-      expect(screen.queryByTestId('summary-stats')).not.toBeInTheDocument();
-    });
-
-    it('shows skeleton loading for summary stats while loading', () => {
-      mockUseRoundList.mockReturnValue({ data: [], isLoading: true });
-      const { container } = render(<AllocationRecipientsPage />);
-      const skeletons = container.querySelectorAll('.animate-pulse');
-      expect(skeletons.length).toBeGreaterThan(0);
+      expect(
+        screen.getByRole('heading', { level: 1, name: 'allocation.recipients.header.title' }),
+      ).toBeInTheDocument();
+      expect(screen.getByText('allocation.recipients.header.scope')).toBeInTheDocument();
     });
   });
 

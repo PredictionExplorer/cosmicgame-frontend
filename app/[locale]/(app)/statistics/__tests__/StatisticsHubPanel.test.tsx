@@ -43,12 +43,12 @@ beforeEach(() => {
 });
 
 describe('StatisticsHubPanel', () => {
-  it('renders headline stat cards from the dashboard', () => {
+  it('leaves the headline figures to the page header', () => {
     render(<StatisticsHubPanel />);
-    expect(screen.getByText('Total Cycles')).toBeInTheDocument();
-    expect(screen.getByText('Allocations Distributed', { selector: 'p' })).toBeInTheDocument();
-    expect(screen.getByText('Contract Balance')).toBeInTheDocument();
-    expect(screen.getByText('36.1595 ETH')).toBeInTheDocument();
+    // StatisticsSeoSummary shows the cycle, allocations, imprints and balance once, from
+    // the same dashboard query; the panel no longer repeats them in a stat-card row.
+    expect(screen.queryByText('Total Cycles')).not.toBeInTheDocument();
+    expect(screen.queryByText('Contract Balance')).not.toBeInTheDocument();
   });
 
   it('renders an explore card linking to every section page', () => {

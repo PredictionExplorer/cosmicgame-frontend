@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
+import { PublicDataQuerySeed } from '../PublicDataQuerySeed';
 import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
 
 import UsedRwlkNftsPage from './UsedRwlkNftsPage';
@@ -35,7 +36,9 @@ export default async function Page({ params }: PageProps) {
   setRequestLocale(locale);
   return (
     <PageMessages namespaces={['statistics', 'tables']}>
-      <UsedRwlkNftsPage seoSummary={<PublicDataRouteSeoSummary route="used-rwlk-nfts" />} />
+      <PublicDataQuerySeed route="used-rwlk-nfts">
+        <UsedRwlkNftsPage seoSummary={<PublicDataRouteSeoSummary route="used-rwlk-nfts" />} />
+      </PublicDataQuerySeed>
     </PageMessages>
   );
 }
