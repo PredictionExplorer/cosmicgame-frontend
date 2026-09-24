@@ -243,6 +243,11 @@ describe('fetchAttachedNftImage', () => {
     const image = await fetchAttachedNftImage(`${GATEWAY}bafy/1.png`);
     expect(image?.contentType).toBe('image/png');
     expect(global.fetch).toHaveBeenCalledTimes(IPFS_GATEWAYS.length);
+    // Kept in the data cache: the optimizer's next width reuses the bytes.
+    expect(global.fetch).toHaveBeenCalledWith(
+      `${IPFS_GATEWAYS[1]}bafy/1.png`,
+      expect.objectContaining({ next: { revalidate: 604_800 } }),
+    );
   });
 
   it('refuses SVG, which could run script on our origin', async () => {

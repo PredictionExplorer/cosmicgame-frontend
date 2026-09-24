@@ -32,6 +32,13 @@ const RECORDS_REVALIDATE_SECONDS = 5 * 60;
 const SERVER_METADATA_TIMEOUT_MS = 8_000;
 /** One image read on the server. */
 const IMAGE_FETCH_TIMEOUT_MS = 15_000;
+/**
+ * How long an upstream image is kept in the data cache. The optimizer asks
+ * the image route once per rendered width; without the cache every width
+ * waited 4-6 s on a public IPFS gateway again (a phone thumbnail stayed a
+ * black plate). The data cache skips files over 2 MB, which are refetched.
+ */
+const IMAGE_REVALIDATE_SECONDS = 7 * 24 * 60 * 60;
 /** Larger files are left to the browser: the optimizer would only shrink them. */
 const MAX_IMAGE_BYTES = 25 * 1024 * 1024;
 
@@ -188,7 +195,8 @@ export interface AttachedNftImage {
 
 /**
  * Fetches an image from the first candidate that answers with a raster image
- * of an acceptable size, cancelling the others; `null` when none does.
+ * of an acceptable size, cancelling the others; `null` when none does. The
+ * bytes are kept in the data cache, so each later width is served at once.
  */
 export async function fetchAttachedNftImage(url: string): Promise<AttachedNftImage | null> {
   const candidates = imageUrlCandidates(url);
@@ -202,7 +210,7 @@ export async function fetchAttachedNftImage(url: string): Promise<AttachedNftIma
     const served = await Promise.any(
       candidates.map(async (candidate, index) => {
         const response = await fetchPublicHttps(candidate, {
-          cache: 'no-store',
+          next: { revalidate: IMAGE_REVALIDATE_SECONDS },
           signal: controllers[index]!.signal,
         });
         const contentType = (response.headers.get('content-type') ?? '')
