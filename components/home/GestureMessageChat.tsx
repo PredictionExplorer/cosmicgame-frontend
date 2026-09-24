@@ -111,6 +111,8 @@ const SYSTEM_EVENTS_PER_PAGE = 50;
 /** Messages a phone shows before "Show more"; the feed never scrolls inside the page. */
 const PHONE_MESSAGES = 6;
 const PHONE_MESSAGES_STEP = 10;
+/** Height of the fade at an edge of the desktop feed with more to scroll that way. */
+const SCROLL_FADE = '3rem';
 /** An event-only feed is limited by rows instead. */
 const PHONE_EVENT_ROWS = 8;
 
@@ -513,6 +515,30 @@ export function GestureMessageChat({
     }
   }, []);
 
+  // From 1024px the feed scrolls inside its frame: each edge fades while there
+  // is more to read that way, so the last visible row never ends at a hard cut.
+  const [scrollEdges, setScrollEdges] = useState({ top: false, bottom: false });
+  const measureScrollEdges = useCallback(() => {
+    const scroll = scrollRef.current;
+    if (!scroll) return;
+    const max = scroll.scrollHeight - scroll.clientHeight;
+    const next = { top: scroll.scrollTop > 1, bottom: max - scroll.scrollTop > 1 };
+    setScrollEdges((current) =>
+      current.top === next.top && current.bottom === next.bottom ? current : next,
+    );
+  }, []);
+  useEffect(() => {
+    const scroll = scrollRef.current;
+    if (!scroll || typeof ResizeObserver === 'undefined') return undefined;
+    const resize = new ResizeObserver(measureScrollEdges);
+    resize.observe(scroll);
+    return () => resize.disconnect();
+  }, [measureScrollEdges]);
+  const handleScroll = useCallback(() => {
+    rememberReadingPosition();
+    measureScrollEdges();
+  }, [measureScrollEdges, rememberReadingPosition]);
+
   // Keep the row being read at the same position when fresh messages arrive or
   // older history is appended. This also covers browsers without scroll anchoring.
   useLayoutEffect(() => {
@@ -532,7 +558,8 @@ export function GestureMessageChat({
     }
     previousResetKey.current = resetKey;
     rememberReadingPosition();
-  }, [rows, pendingMessages, isPrinting, resetKey, rememberReadingPosition]);
+    measureScrollEdges();
+  }, [rows, pendingMessages, isPrinting, resetKey, rememberReadingPosition, measureScrollEdges]);
 
   // Printing renders known history only; it never starts a network request.
   useEffect(() => {
@@ -560,6 +587,11 @@ export function GestureMessageChat({
   };
   const showMoreOnPhones = () =>
     setPhoneWindow({ key: resetKey, messages: phoneMessages + PHONE_MESSAGES_STEP });
+
+  const scrollMask =
+    !isPrinting && (scrollEdges.top || scrollEdges.bottom)
+      ? `linear-gradient(to bottom, transparent 0, #000 ${scrollEdges.top ? SCROLL_FADE : '0px'}, #000 calc(100% - ${scrollEdges.bottom ? SCROLL_FADE : '0px'}), transparent 100%)`
+      : undefined;
 
   const summary =
     cycleNumber != null
@@ -637,8 +669,11 @@ export function GestureMessageChat({
           role="region"
           aria-labelledby={titleId}
           tabIndex={0}
-          onScroll={isPrinting ? undefined : rememberReadingPosition}
+          onScroll={isPrinting ? undefined : handleScroll}
+          data-overflow-top={(!isPrinting && scrollEdges.top) || undefined}
+          data-overflow-bottom={(!isPrinting && scrollEdges.bottom) || undefined}
           className="focus-ring-inset px-5 sm:px-6 lg:absolute lg:inset-0 lg:overflow-y-auto lg:overscroll-y-contain lg:[scrollbar-gutter:stable] print:static print:overflow-visible"
+          style={scrollMask ? { maskImage: scrollMask, WebkitMaskImage: scrollMask } : undefined}
         >
           {isLoading ? (
             <div

@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import type { GestureFeedSystemEvent } from '@/components/home/deck/feedSystemEvents';
 import type { GestureInfo } from '@/services/api';
 
-import { render, screen, within, act, checkA11y } from '@/test-utils';
+import { render, screen, within, act, checkA11y, fireEvent } from '@/test-utils';
 
 import { GestureMessageChat, buildFeedRows, phoneVisibleRows } from '../GestureMessageChat';
 
@@ -370,6 +370,28 @@ describe('GestureMessageChat', () => {
     expect(after.filter((row) => row.classList.contains('max-lg:hidden'))).toHaveLength(4);
     await user.click(screen.getByRole('button', { name: 'home.chat.history.showMore' }));
     expect(screen.queryByRole('button', { name: 'home.chat.history.showMore' })).toBeNull();
+  });
+
+  it('fades the desktop feed at an edge only while there is more to scroll that way', () => {
+    const gestures = Array.from({ length: 12 }, (_, index) =>
+      makeGesture({ EvtLogId: index + 1, TimeStamp: 1_700_000_000 + index, Message: `m${index}` }),
+    );
+    render(<GestureMessageChat gestures={gestures} />);
+    const scroll = screen.getByTestId('gesture-message-chat-scroll');
+    // jsdom lays nothing out: a feed that fits shows no fade.
+    expect(scroll.style.maskImage).toBe('');
+
+    Object.defineProperty(scroll, 'scrollHeight', { configurable: true, value: 1200 });
+    Object.defineProperty(scroll, 'clientHeight', { configurable: true, value: 500 });
+    fireEvent.scroll(scroll);
+    expect(scroll).toHaveAttribute('data-overflow-bottom', 'true');
+    expect(scroll).not.toHaveAttribute('data-overflow-top');
+    expect(scroll.style.maskImage).toContain('calc(100% - 3rem)');
+
+    scroll.scrollTop = 700;
+    fireEvent.scroll(scroll);
+    expect(scroll).toHaveAttribute('data-overflow-top', 'true');
+    expect(scroll).not.toHaveAttribute('data-overflow-bottom');
   });
 
   it('pages an event-only history and resets its window for corrected history or a new cycle', async () => {
