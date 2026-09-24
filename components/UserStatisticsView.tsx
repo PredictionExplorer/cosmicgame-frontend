@@ -79,16 +79,11 @@ function tokenBalance(wei: string | undefined): number | null {
 }
 
 /**
- * A participant's profile (and your own statistics): an identity header
- * that sets what the address spent on gestures beside what it received,
- * this cycle's Stellar Selection share as a plain count, the figures behind
- * its history once each, its Cosmic Signature NFTs on their plates, and the
- * ledgers: gestures, allocations, anchoring, outreach and attached assets.
- *
- * Each section stands on its own data. An address that never made a gesture
- * can still hold allocations, anchors and attached assets to retrieve, so a
- * missing profile record hides only the figures it carries; the page says
- * "no activity" only once every source has answered and all are empty.
+ * A participant's profile (and your own statistics): the identity header,
+ * this cycle's Stellar Selection share, the figures behind its history, its
+ * NFTs, and the ledgers. Each section stands on its own data: an address
+ * with no gestures can still hold allocations, anchors and assets to
+ * retrieve, so "no activity" shows only once every source answered empty.
  */
 const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) => {
   const t = useTranslations('myPages');
