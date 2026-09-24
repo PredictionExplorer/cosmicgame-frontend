@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 
 import { formatSeconds } from '@/utils';
 
+import { sameAddress } from '@/utils/format';
 import { ChronoWarriorIcon, EnduranceChampionIcon, FinalCstGestureIcon } from '@/lib/conceptIcons';
 import { ChronoWarriorDetails } from '@/components/special-allocation/ChronoWarriorDetails';
 import { LatestParticipantDetails } from '@/components/special-allocation/LatestParticipantDetails';
@@ -184,10 +185,6 @@ function RoleCard({
       </div>
     </div>
   );
-}
-
-function sameAddress(left: string | null | undefined, right: string | null | undefined): boolean {
-  return !!left && !!right && left.toLowerCase() === right.toLowerCase();
 }
 
 /**
