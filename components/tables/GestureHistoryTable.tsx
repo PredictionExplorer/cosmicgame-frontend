@@ -71,6 +71,12 @@ interface GestureHistoryTableProps extends LedgerStateProps {
 const CST_GESTURE = 2;
 const RANDOM_WALK_GESTURE = 1;
 
+/**
+ * A link that is a flex item stops being inline text, so it needs its own
+ * 24px target (WCAG 2.5.8) rather than borrowing the line's.
+ */
+const INFO_LINK_CLASS = 'inline-flex min-h-6 items-center whitespace-nowrap';
+
 const randomWalkId = (gesture: GestureHistory): number | null =>
   resolveGestureType(gesture) === RANDOM_WALK_GESTURE &&
   typeof gesture.RWalkNFTId === 'number' &&
@@ -146,7 +152,7 @@ function AttachedErc20({ address, amount }: { address: string; amount: string | 
   });
   const symbol = meta.status === 'ready' ? meta.symbol : formatAddress(address);
   return (
-    <ExternalTableLink href={getExplorerUrl('token', address)} className="whitespace-nowrap">
+    <ExternalTableLink href={getExplorerUrl('token', address)} className={INFO_LINK_CLASS}>
       <span className="tabular-nums">{figure}</span>
       {NBSP}
       {symbol}
@@ -167,7 +173,7 @@ function GestureInfo({ gesture }: { gesture: GestureHistory }) {
   return (
     <span className="inline-flex max-w-full flex-col items-start gap-1">
       {walk !== null ? (
-        <ExternalTableLink href={anchorTokenHref('randomWalk', walk)} className="whitespace-nowrap">
+        <ExternalTableLink href={anchorTokenHref('randomWalk', walk)} className={INFO_LINK_CLASS}>
           {t('gestureHistory.randomWalkToken', { id: formatId(walk) })}
         </ExternalTableLink>
       ) : null}
@@ -176,7 +182,7 @@ function GestureInfo({ gesture }: { gesture: GestureHistory }) {
           {attachedLabel}
           <ExternalTableLink
             href={`${getExplorerUrl('token', gesture.NFTDonationTokenAddr)}?a=${gesture.NFTDonationTokenId ?? ''}`}
-            className="whitespace-nowrap"
+            className={INFO_LINK_CLASS}
           >
             {t('recipientHistory.nft', { id: String(gesture.NFTDonationTokenId ?? '') })}
           </ExternalTableLink>

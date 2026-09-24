@@ -48,8 +48,10 @@ export const TransferHistoryTable = ({ list, ...state }: TransferHistoryTablePro
           header: `${t('columns.from')} → ${t('columns.to')}`,
           label: `${t('columns.from')} → ${t('columns.to')}`,
           value: (row) => row.FromAddr,
+          // A protocol wallet shown by name ("Cosmic Signature NFT Anchoring
+          // Wallet") wraps onto more lines rather than being cut off.
           cell: (row) => (
-            <span className="inline-flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+            <span className="inline-flex min-w-0 max-w-full flex-wrap items-center gap-x-1.5 gap-y-0.5">
               <span className="sr-only">{t('columns.from')}</span>
               {row.FromAddr ? (
                 <AddressChip
@@ -57,12 +59,19 @@ export const TransferHistoryTable = ({ list, ...state }: TransferHistoryTablePro
                   variant="plain"
                   showCopy={false}
                   zeroRole="from"
+                  wrapLabel
                 />
               ) : null}
               <ArrowRight aria-hidden className="size-3.5 shrink-0 text-subtle" />
               <span className="sr-only">{t('columns.to')}</span>
               {row.ToAddr ? (
-                <AddressChip address={row.ToAddr} variant="plain" showCopy={false} zeroRole="to" />
+                <AddressChip
+                  address={row.ToAddr}
+                  variant="plain"
+                  showCopy={false}
+                  zeroRole="to"
+                  wrapLabel
+                />
               ) : null}
             </span>
           ),

@@ -135,11 +135,14 @@ function MessageMeta({ gesture, cycleHref }: { gesture: GestureHistory; cycleHre
     <span className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 type-caption text-subtle sm:hidden">
       <AddressChip address={gesture.BidderAddr} variant="plain" showCopy={false} />
       <span aria-hidden>·</span>
-      <TableLink href={cycleHref}>{t('allocation.cycle', { cycle: gesture.RoundNum })}</TableLink>
+      {/* Flex items, not inline text: each link carries its own 24px target. */}
+      <TableLink href={cycleHref} className="inline-flex min-h-6 items-center">
+        {t('allocation.cycle', { cycle: gesture.RoundNum })}
+      </TableLink>
       <span aria-hidden>·</span>
       <GestureMethodTag gestureType={gesture.GestureType} unknownLabel={t('status.unknown')} />
       <span aria-hidden>·</span>
-      <TxProofLink hash={gesture.TxHash}>
+      <TxProofLink hash={gesture.TxHash} className="inline-flex min-h-6 items-center">
         <DateTime timestamp={gesture.TimeStamp} />
       </TxProofLink>
     </span>
