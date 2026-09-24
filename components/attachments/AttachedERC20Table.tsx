@@ -30,6 +30,25 @@ interface DonatedERC20TableProps {
   headingLevel?: 2 | 3 | 4;
 }
 
+/**
+ * The amount that was attached. The Recipient's read (`by_user`) reports what
+ * is still held (`AmountDonated`, 0 once retrieved) beside what was retrieved,
+ * so the attached amount is their sum; the cycle's read (`by_round`) reports
+ * the attached amount itself (`AmountEth`). `null` when neither is known.
+ */
+export function attachedErc20Amount(
+  row: Pick<DonatedERC20Token, 'AmountDonated' | 'AmountDonatedEth' | 'AmountClaimedEth'> & {
+    AmountEth?: unknown;
+  },
+): number | null {
+  const held = toFiniteNumber(row.AmountDonatedEth);
+  const reportsHolding = row.AmountDonated !== undefined && row.AmountDonated !== null;
+  if (reportsHolding) {
+    return held === null ? null : held + (toFiniteNumber(row.AmountClaimedEth) ?? 0);
+  }
+  return toFiniteNumber(row.AmountEth) ?? held;
+}
+
 /** Up to four decimals: ERC-20 amounts are arbitrary tokens, not ETH or CST. */
 const TOKEN_AMOUNT: Intl.NumberFormatOptions = { maximumFractionDigits: 4 };
 
@@ -90,9 +109,9 @@ const DonatedERC20Table = ({ list, handleClaim, headingLevel = 3 }: DonatedERC20
       id: 'attached',
       header: t('attachedAssets.erc20.columns.attachedAmount'),
       kind: 'count',
-      value: (row) => amount(row.AmountDonatedEth),
+      value: (row) => attachedErc20Amount(row),
       cell: (row) => {
-        const value = amount(row.AmountDonatedEth);
+        const value = attachedErc20Amount(row);
         return value === null ? (
           <UnknownValue label={t('status.unavailable')} />
         ) : (
@@ -231,7 +250,7 @@ function AttachedERC20PrintFallback({ list }: { list: DonatedERC20Token[] }) {
                 {token.TokenAddr}
               </td>
               <td className="border border-foreground/15 p-2 text-center">
-                {printAmount(token.AmountDonatedEth)}
+                {printAmount(attachedErc20Amount(token))}
               </td>
               <td className="border border-foreground/15 p-2 text-center">
                 {printAmount(token.AmountClaimedEth)}

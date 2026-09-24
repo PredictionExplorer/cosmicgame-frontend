@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { useId, type ReactNode } from 'react';
 import { ArrowRight, ArrowUpRight, Check, Copy } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -10,7 +10,7 @@ import type { NftTraitEntry, RarityInfo } from '@/lib/nftMetadata';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { TOUCH_TARGET_ICON_CLASS } from '@/lib/touch-target';
-import { useClipboard } from '@/hooks/useClipboard';
+import { useCopyFeedback } from '@/hooks/useCopyFeedback';
 import { useNow } from '@/hooks/useNow';
 import { formatCount } from '@/utils/format';
 import { AddressChip } from '@/components/ui/address-chip';
@@ -31,9 +31,6 @@ export interface NFTLedgerRecord {
   Staked?: boolean;
   WasUnstaked?: boolean;
 }
-
-/** How long the copied check stays on the seed's copy button. */
-const COPIED_FEEDBACK_MS = 2_000;
 
 /** The indexer's allocation record types, for tokens whose metadata has no Allocation trait. */
 const RECORD_TYPE_LABEL_KEYS: Readonly<Record<number, string>> = {
@@ -249,27 +246,14 @@ export function NFTSeed({ seed, headingLevel = 2, className }: NFTSeedProps) {
   const Heading = headingLevel === 3 ? 'h3' : 'h2';
   const t = useTranslations('detail');
   const tCommon = useTranslations('common');
-  const { copy } = useClipboard();
+  // The check shows only when the clipboard write succeeded.
+  const { copied, copy } = useCopyFeedback();
   const headingId = useId();
-  const [copied, setCopied] = useState(false);
-  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const seedText = String(seed ?? '');
-
-  useEffect(
-    () => () => {
-      if (resetTimer.current) clearTimeout(resetTimer.current);
-    },
-    [],
-  );
 
   if (!seedText) return null;
 
-  const handleCopy = async () => {
-    await copy(seedText);
-    setCopied(true);
-    if (resetTimer.current) clearTimeout(resetTimer.current);
-    resetTimer.current = setTimeout(() => setCopied(false), COPIED_FEEDBACK_MS);
-  };
+  const handleCopy = () => void copy(seedText);
 
   return (
     <section aria-labelledby={headingId} className={className} data-testid="nft-seed">
