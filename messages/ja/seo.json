@@ -318,8 +318,8 @@
     }
   },
   "currentCycleSummary": {
-    "heading": "現在のCosmic Signatureパフォーマンス・サイクル",
-    "description": "進行中のサイクルの筆数、準備金、添付されたアセット、配分トラック、確定状況を確認できます。最新のデータは下の操作画面に表示されます。",
+    "heading": "現在のパフォーマンス・サイクル",
+    "description": "進行中のサイクルのカウントダウン、順位、配分、すべての一筆をリアルタイムで表示します。",
     "cards": {
       "gestures": "一筆の総数",
       "signatureAllocation": "シグネチャー配分",

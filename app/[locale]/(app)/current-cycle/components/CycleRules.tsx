@@ -6,19 +6,22 @@ import { Link } from '@/i18n/navigation';
 import { SectionHeader } from '@/components/ui/section-header';
 import type { DashboardInfo } from '@/services/api/types';
 import { toFiniteNumber } from '@/utils/finiteNumber';
-import { formatAmount, UNAVAILABLE_VALUE } from '@/utils/format';
+import { formatAmount, formatCount, UNAVAILABLE_VALUE } from '@/utils/format';
+
+import { CYCLE_SECTION_SCROLL_MARGIN } from './CycleSectionNav';
 
 /**
  * The rules this cycle runs on, read from the live parameters: Participation
  * CST, the CST Calibration Window, Stellar Selection and Public Goods. Four
- * short notes in the open, with the full explanation one link away.
+ * short notes in the open, with the full explanation one link away. Counts
+ * and shares are formatted for the reader's locale.
  */
 export function CycleRules({ data, headingId }: { data: DashboardInfo; headingId: string }) {
   const t = useTranslations('currentCycle');
   const locale = useLocale();
   const count = (value: unknown) => {
     const n = toFiniteNumber(value);
-    return n === null ? UNAVAILABLE_VALUE : String(n);
+    return n === null ? UNAVAILABLE_VALUE : formatCount(n, locale);
   };
   const balance = toFiniteNumber(data.CosmicGameBalanceEth);
   const charity = toFiniteNumber(data.CharityPercentage);
@@ -45,7 +48,7 @@ export function CycleRules({ data, headingId }: { data: DashboardInfo; headingId
   ];
 
   return (
-    <section aria-labelledby={headingId}>
+    <section aria-labelledby={headingId} id="rules" className={CYCLE_SECTION_SCROLL_MARGIN}>
       <SectionHeader
         headingId={headingId}
         title={t('sections.cycleRules.title')}

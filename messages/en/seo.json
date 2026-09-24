@@ -318,8 +318,8 @@
     }
   },
   "currentCycleSummary": {
-    "heading": "Current Cosmic Signature Performance Cycle",
-    "description": "Follow the active Cosmic Signature Performance Cycle: gestures, the Cycle Reserve, attached assets, allocation tracks, and finalization status. The display below updates with live protocol data.",
+    "heading": "Current Performance Cycle",
+    "description": "The clock, standings, allocations and every gesture of the cycle in progress, updated live.",
     "cards": {
       "gestures": "Total gestures",
       "signatureAllocation": "Signature Allocation",

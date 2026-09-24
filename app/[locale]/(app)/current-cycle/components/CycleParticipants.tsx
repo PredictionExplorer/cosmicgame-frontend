@@ -1,7 +1,7 @@
 'use client';
 
-import type { ComponentProps } from 'react';
-import { useTranslations } from 'next-intl';
+import { useMemo, type ComponentProps } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 
 import type { EnduranceChampion } from '@/utils';
 
@@ -11,6 +11,9 @@ import ETHSpentTable from '@/components/tables/ETHSpentTable';
 import EnduranceChampionsTable from '@/components/tables/EnduranceChampionsTable';
 import StellarSelectionHolderTable from '@/components/tables/StellarSelectionHolderTable';
 import type { DashboardInfo, GestureInfo } from '@/services/api/types';
+
+import { CYCLE_SECTION_SCROLL_MARGIN } from './CycleSectionNav';
+import { TitleWithCount } from './TitleWithCount';
 
 const VIEWS = ['stellarSelectionEntries', 'topEthSpenders', 'enduranceChampions'] as const;
 
@@ -41,6 +44,12 @@ export function CycleParticipants({
   headingId,
 }: CycleParticipantsProps) {
   const t = useTranslations('currentCycle');
+  const locale = useLocale();
+  // Unique addresses, once the gesture list has loaded.
+  const participantCount = useMemo(
+    () => (loading || error ? null : new Set(gestures.map((gesture) => gesture.BidderAddr)).size),
+    [gestures, loading, error],
+  );
   const state = {
     loading,
     error: error ? t('error.message') : undefined,
@@ -50,8 +59,17 @@ export function CycleParticipants({
   const describedBy = (view: (typeof VIEWS)[number]) => `${headingId}-${view}-note`;
 
   return (
-    <section aria-labelledby={headingId}>
-      <SectionHeader headingId={headingId} title={t('sections.participants.title')} />
+    <section aria-labelledby={headingId} id="participants" className={CYCLE_SECTION_SCROLL_MARGIN}>
+      <SectionHeader
+        headingId={headingId}
+        title={
+          <TitleWithCount
+            title={t('sections.participants.title')}
+            count={participantCount}
+            locale={locale}
+          />
+        }
+      />
       <Tabs defaultValue={VIEWS[0]}>
         <TabsList variant="underline" scroll aria-labelledby={headingId} className="min-w-full">
           {VIEWS.map((view) => (

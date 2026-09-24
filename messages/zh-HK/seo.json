@@ -318,8 +318,8 @@
     }
   },
   "currentCycleSummary": {
-    "heading": "目前 Cosmic Signature 演繹週期",
-    "description": "本頁追蹤目前 Cosmic Signature 演繹週期，包括公開落筆次數、週期儲備、已附加資產、分配軌道與收官狀態。",
+    "heading": "目前演繹週期",
+    "description": "正在進行的週期：倒數、席位、分配與每一次落筆，即時更新。",
     "cards": {
       "gestures": "落筆總次數",
       "signatureAllocation": "簽名分配",

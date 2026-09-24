@@ -4,7 +4,16 @@
     "message": "請檢查網絡連線後重試。"
   },
   "status": {
-    "notStarted": "尚未開始"
+    "notStarted": "尚未開始",
+    "heading": "週期狀態"
+  },
+  "sectionNav": {
+    "aria": "本頁內容",
+    "standings": "席位",
+    "allocations": "分配",
+    "participants": "參與者",
+    "gestures": "落筆",
+    "rules": "規則"
   },
   "hero": {
     "title": "第 {n} 個週期",
@@ -40,6 +49,7 @@
       "receives": "每位獲配者獲得",
       "recipients": "獲配者"
     },
+    "explain": "儲備如何分配",
     "amounts": {
       "ethEach": "每位 {amount} ETH",
       "fixedCst": "1,000 CST",
@@ -62,7 +72,7 @@
         "tooltip": "協議從本週期的星選資格中程序化隨機選出參與者，均分一份 ETH 分配。"
       },
       "cosmicAnchor": {
-        "name": "Cosmic Signature 錨定",
+        "name": "錨定派發",
         "tooltip": "每個週期的錨定派發，由 Cosmic Signature NFT 的錨定者按比例分得。",
         "recipientLabel": "按比例 · 全體錨定者"
       },
@@ -76,7 +86,7 @@
         "tooltip": "協議從本週期的星選資格中程序化隨機選出參與者，每位獲配表彰 CST 與 Cosmic Signature NFT。"
       },
       "randomWalkAnchor": {
-        "name": "Random Walk 錨定者",
+        "name": "錨定 NFT 星選",
         "tooltip": "Random Walk NFT 的錨定者可能獲配表彰 CST 與 Cosmic Signature NFT。"
       },
       "endurance": {

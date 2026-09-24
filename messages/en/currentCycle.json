@@ -4,7 +4,16 @@
     "message": "Check your connection and try again."
   },
   "status": {
-    "notStarted": "Not started"
+    "notStarted": "Not started",
+    "heading": "Cycle status"
+  },
+  "sectionNav": {
+    "aria": "On this page",
+    "standings": "Standings",
+    "allocations": "Allocations",
+    "participants": "Participants",
+    "gestures": "Gestures",
+    "rules": "Rules"
   },
   "hero": {
     "title": "Cycle #{n}",
@@ -40,6 +49,7 @@
       "receives": "Each recipient receives",
       "recipients": "Recipients"
     },
+    "explain": "How the reserve splits",
     "amounts": {
       "ethEach": "{amount} ETH each",
       "fixedCst": "1,000 CST",
@@ -62,7 +72,7 @@
         "tooltip": "Participants are selected at random from the cycle entries to share an allocation of ETH."
       },
       "cosmicAnchor": {
-        "name": "Cosmic Signature anchor-holders",
+        "name": "Anchor Distribution",
         "tooltip": "Anchor-holders of Cosmic Signature NFTs share the per-cycle Anchor Distribution.",
         "recipientLabel": "Proportional · all anchor-holders"
       },
@@ -76,7 +86,7 @@
         "tooltip": "Participants are selected at random from the cycle entries to receive Recognition CST and Cosmic Signature NFTs."
       },
       "randomWalkAnchor": {
-        "name": "Random Walk anchor-holders",
+        "name": "Anchored-NFT Stellar Selection",
         "tooltip": "Anchor-holders of Random Walk NFTs may receive Recognition CST and Cosmic Signature NFTs."
       },
       "endurance": {

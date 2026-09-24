@@ -4,7 +4,16 @@
     "message": "연결 상태를 확인한 뒤 다시 시도해 주세요."
   },
   "status": {
-    "notStarted": "시작 전"
+    "notStarted": "시작 전",
+    "heading": "사이클 상태"
+  },
+  "sectionNav": {
+    "aria": "이 페이지의 내용",
+    "standings": "현황",
+    "allocations": "배분",
+    "participants": "참여자",
+    "gestures": "제스처",
+    "rules": "규칙"
   },
   "hero": {
     "title": "사이클 {n}",
@@ -40,6 +49,7 @@
       "receives": "수령자별 배분",
       "recipients": "수령자"
     },
+    "explain": "준비금이 배분되는 방식",
     "amounts": {
       "ethEach": "각 {amount} ETH",
       "fixedCst": "1,000 CST",
@@ -62,7 +72,7 @@
         "tooltip": "사이클 참여 기록 가운데 무작위로 선정된 참여자가 ETH 배분을 나눠 받습니다."
       },
       "cosmicAnchor": {
-        "name": "Cosmic Signature 앵커링",
+        "name": "앵커링 지급",
         "tooltip": "Cosmic Signature NFT 앵커링 보유자가 사이클마다 앵커링 지급을 나눠 받습니다.",
         "recipientLabel": "비율에 따라 · 모든 앵커링 보유자"
       },
@@ -76,7 +86,7 @@
         "tooltip": "사이클 참여 기록 가운데 무작위로 선정된 참여자가 공로 CST와 Cosmic Signature NFT를 받습니다."
       },
       "randomWalkAnchor": {
-        "name": "Random Walk 앵커링 보유자",
+        "name": "앵커링 NFT 별빛 선정",
         "tooltip": "Random Walk NFT 앵커링 보유자는 공로 CST와 Cosmic Signature NFT를 받을 수 있습니다."
       },
       "endurance": {

@@ -4,7 +4,16 @@
     "message": "Перевірте з’єднання та спробуйте ще раз."
   },
   "status": {
-    "notStarted": "Не розпочато"
+    "notStarted": "Не розпочато",
+    "heading": "Стан циклу"
+  },
+  "sectionNav": {
+    "aria": "На цій сторінці",
+    "standings": "Позиції",
+    "allocations": "Розподіли",
+    "participants": "Учасники",
+    "gestures": "Жести",
+    "rules": "Правила"
   },
   "hero": {
     "title": "Цикл {n}",
@@ -40,6 +49,7 @@
       "receives": "Кожен отримувач отримує",
       "recipients": "Отримувачі"
     },
+    "explain": "Як розподіляється резерв",
     "amounts": {
       "ethEach": "по {amount} ETH",
       "fixedCst": "1 000 CST",
@@ -62,7 +72,7 @@
         "tooltip": "Учасників випадково відбирають серед записів циклу, щоб розділити між ними розподіл ETH."
       },
       "cosmicAnchor": {
-        "name": "Закріплення Cosmic Signature",
+        "name": "Надходження за закріплення",
         "tooltip": "Власники закріплень Cosmic Signature NFT розділяють надходження за закріплення кожного циклу.",
         "recipientLabel": "Пропорційно · усі власники закріплень"
       },
@@ -76,7 +86,7 @@
         "tooltip": "Учасників випадково відбирають серед записів циклу для отримання CST визнання та Cosmic Signature NFT."
       },
       "randomWalkAnchor": {
-        "name": "Власники закріплень Random Walk",
+        "name": "Зоряний відбір закріплених NFT",
         "tooltip": "Власники закріплень Random Walk NFT можуть отримати CST визнання та Cosmic Signature NFT."
       },
       "endurance": {
