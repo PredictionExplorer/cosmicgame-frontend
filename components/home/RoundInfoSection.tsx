@@ -82,6 +82,9 @@ export function RoundInfoSection({
     return elapsed > 0 ? formatSeconds(elapsed, locale) : '';
   }, [data, nowMs, locale]);
 
+  // The ledgers sit straight under their section titles, like the Stellar
+  // Selection and top-spender tables: the section is their one frame, so no
+  // second box or palette-blind hsl() stripe wraps them.
   return (
     <div className="space-y-16">
       {/* 1. Allocation Breakdown */}
@@ -133,12 +136,10 @@ export function RoundInfoSection({
           <SectionDivider title={t('sections.enduranceChampions.title')} className="flex-1" />
           <InfoTooltip content={t('sections.enduranceChampions.tooltip')} />
         </div>
-        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden border-l-2 border-l-[hsl(45,93%,52%)]/40">
-          <EnduranceChampionsTable
-            championList={championList}
-            lastBidderAddress={data?.LastBidderAddr ?? null}
-          />
-        </div>
+        <EnduranceChampionsTable
+          championList={championList}
+          lastBidderAddress={data?.LastBidderAddr ?? null}
+        />
       </motion.div>
 
       {/* 6. Gesture History */}
@@ -150,9 +151,7 @@ export function RoundInfoSection({
           />
           <InfoTooltip content={t('sections.gestureHistory.tooltip')} />
         </div>
-        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden border-l-2 border-l-[hsl(196,98%,54%)]/40">
-          <GestureHistory gestureHistory={curGestureList} showRound={false} />
-        </div>
+        <GestureHistory gestureHistory={curGestureList} showRound={false} />
       </motion.div>
 
       {/* 7. ETH Contributions (conditional) */}
@@ -162,9 +161,7 @@ export function RoundInfoSection({
             <SectionDivider title={t('sections.ethContributions.title')} className="flex-1" />
             <InfoTooltip content={t('sections.ethContributions.tooltip')} />
           </div>
-          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden border-l-2 border-l-[hsl(205,100%,71%)]/40">
-            <EthDonationTable list={ethDonations} showType={false} />
-          </div>
+          <EthDonationTable list={ethDonations} showType={false} />
         </motion.div>
       )}
 
