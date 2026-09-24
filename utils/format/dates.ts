@@ -208,6 +208,13 @@ export interface DateTimeOptions {
   readonly timeZone?: DateTimeZone;
   /** Reference instant (epoch ms) for `year: 'auto'`. Default `Date.now()`. */
   readonly now?: number;
+  /**
+   * Print the zone after the date-time in the locale's style ("Sep 22,
+   * 23:04 UTC-5", "9月22日 23:04（UTC-5）"), for a date that stands alone: a
+   * record page, a header figure. A table states its zone once instead
+   * (`<TimeZoneNote>`).
+   */
+  readonly showZone?: boolean;
 }
 
 /** The instant of a Unix timestamp in seconds, or `null` when it is not a real date. */
@@ -233,10 +240,15 @@ export function formatDateTime(
     year = style === 'full' ? 'always' : 'auto',
     timeZone = 'local',
     now,
+    showZone = false,
   }: DateTimeOptions = {},
 ): string {
   const date = toDate(timestamp);
   if (!date) return UNAVAILABLE_VALUE;
+  if (showZone) {
+    const plain = formatDateTime(timestamp, { locale, style, seconds, year, timeZone, now });
+    return pickByLocale(ZONE_TEMPLATES, locale)(plain, formatTimeZoneLabel(timeZone, date));
+  }
   const parts = calendarParts(date, timeZone);
   const withYear =
     year === 'always' ||

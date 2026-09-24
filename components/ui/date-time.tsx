@@ -78,6 +78,12 @@ export interface DateTimeProps extends Omit<HTMLAttributes<HTMLElement>, 'childr
    * `utc` where a page states UTC. SSR always renders UTC.
    */
   timeZone?: DateTimeZone;
+  /**
+   * Print the zone after the value ("Sep 22, 2026, 23:04:45 UTC-5"). Every
+   * date is in the reader's zone, so one that stands alone (a record page, a
+   * header figure) says which; a table says it once with `<TimeZoneNote>`.
+   */
+  showZone?: boolean;
   /** Render prop for composing the formatted value into other markup. */
   children?: (value: string) => ReactNode;
 }
@@ -95,6 +101,7 @@ export function DateTime({
   year,
   locale,
   timeZone = 'local',
+  showZone = false,
   className,
   children,
   ...rest
@@ -122,6 +129,7 @@ export function DateTime({
     year,
     timeZone: zone,
     now,
+    showZone,
   });
   const value =
     variant === 'relative' && now

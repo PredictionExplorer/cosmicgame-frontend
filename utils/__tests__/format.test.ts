@@ -537,6 +537,15 @@ describe('typographic details', () => {
     expect(formatAmount(-1, { unit: 'ETH', context: 'hero' })).toBe('-1\u00a0ETH');
   });
 
+  it('labels a standalone date with its zone in the locale style', () => {
+    const at = Date.UTC(2026, 8, 22, 23, 4, 45) / 1000;
+    const now = Date.UTC(2026, 8, 24);
+    expect(formatDateTime(at, { timeZone: 'utc', now, showZone: true })).toBe('Sep 22, 23:04 UTC');
+    expect(formatDateTime(at, { locale: 'ja', timeZone: 'utc', now, showZone: true })).toBe(
+      '9月22日 23:04（UTC）',
+    );
+  });
+
   it('pads the day only where dates stack in a column', () => {
     const march9 = Date.UTC(2024, 2, 9, 10, 0, 0) / 1000;
     const now = Date.UTC(2026, 8, 24);
