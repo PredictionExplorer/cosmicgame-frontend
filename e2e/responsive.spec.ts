@@ -87,6 +87,17 @@ test.describe('Responsive - Mobile viewport', () => {
     await expectLayoutViewportFits(page);
   });
 
+  test('a participant profile never widens the phone layout viewport', async ({ page }) => {
+    // Regression (F139): a wide child on a populated profile widened the layout viewport,
+    // so the fixed header pushed Connect off screen while scrollWidth still looked fine.
+    const response = await page.goto('/user/0xA169574D0d353E3010997A3E64846b7D1B2a63B6', {
+      waitUntil: 'networkidle',
+    });
+    expect(response?.status()).toBe(200);
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    await expectLayoutViewportFits(page);
+  });
+
   test('statistics activity keeps its charts and controls inside 375px', async ({ page }) => {
     const response = await page.goto('/statistics/activity', { waitUntil: 'networkidle' });
     expect(response?.status()).toBe(200);
