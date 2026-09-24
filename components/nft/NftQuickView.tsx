@@ -4,13 +4,13 @@ import { useMemo, useState, type KeyboardEvent } from 'react';
 import { ArrowLeft, ArrowRight, ExternalLink, ImageIcon, Play } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
-import { formatId, getAssetsUrl, getSpectralSweepUrl, getWebImageUrl } from '@/utils';
+import { formatId, getSpectralSweepUrl } from '@/utils';
 
 import type { CollectionTraits } from '@/hooks/useNftTraits';
-import type { CategoricalTraitKey } from '@/lib/nftMetadata';
+import type { CategoricalTraitKey, TraitTranslator } from '@/lib/nftMetadata';
 import { Link } from '@/i18n/navigation';
-import { cn } from '@/lib/utils';
-import NFTImage from '@/components/nft/NFTImage';
+import { ArtFrame } from '@/components/ui/art-frame';
+import { composeSignatureAlt, signatureMedia } from '@/components/nft/signatureArt';
 import {
   AllocationPill,
   HueStrip,
@@ -63,6 +63,7 @@ export function NftQuickView({
   onSelectTrait,
 }: NftQuickViewProps) {
   const t = useTranslations('traits');
+  const tDetail = useTranslations('detail');
   // The sweep is remembered per token, so moving to another Signature
   // naturally falls back to its artwork without an effect.
   const [sweepTokenId, setSweepTokenId] = useState<number | null>(null);
@@ -82,6 +83,12 @@ export function NftQuickView({
   const entry = collectionTraits?.byId.get(item?.TokenId ?? -1) ?? null;
   const rarity = collectionTraits?.rarity.byId.get(item?.TokenId ?? -1) ?? null;
   const rarityTotal = collectionTraits?.rarity.total ?? 0;
+  const media = signatureMedia(seed);
+  const alt = composeSignatureAlt(t as unknown as TraitTranslator, {
+    id,
+    name: item?.TokenName,
+    entry,
+  });
 
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     if (event.key === 'ArrowLeft' && previous) {
@@ -97,13 +104,14 @@ export function NftQuickView({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         onKeyDown={handleKeyDown}
-        className="max-h-[92vh] w-[calc(100vw-1.5rem)] max-w-5xl gap-0 overflow-y-auto border-white/[0.10] bg-[rgb(var(--cosmic-indigo-deep-rgb))] p-0 sm:rounded-2xl"
+        className="max-h-[92vh] w-[calc(100vw-1.5rem)] max-w-5xl gap-0 overflow-y-auto border-rule bg-surface-raised p-0 shadow-float sm:rounded-surface"
         data-testid="nft-quick-view"
       >
         {item ? (
           <div className="grid md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
-            <div className="flex flex-col bg-black/40 md:sticky md:top-0 md:self-start">
-              <div className="relative aspect-[3456/2234] w-full overflow-hidden bg-black">
+            <div className="flex flex-col bg-art-ground md:sticky md:top-0 md:self-start">
+              {/* Nothing is layered over the art: the hue strip sits under the plate. */}
+              <div className="relative aspect-art w-full overflow-hidden bg-art-ground">
                 {showSweep ? (
                   <video
                     key={String(seed)}
@@ -116,28 +124,24 @@ export function NftQuickView({
                     data-testid="spectral-sweep-video"
                   />
                 ) : (
-                  <NFTImage
-                    src={getWebImageUrl(seed)}
-                    fallbackSrc={getAssetsUrl(`cosmicsignature/0x${seed}.png`)}
-                    terminalFallbackSrc={null}
-                    alt={t('quickView.imageAlt', { id })}
+                  <ArtFrame
+                    sources={media ? [media.webImage, media.sourceImage] : []}
+                    alt={alt}
+                    unavailableLabel={tDetail('image.artworkUnavailable')}
+                    unavailableDetail={id}
                     sizes="(max-width: 768px) 100vw, 60vw"
-                    className="h-full w-full object-contain"
+                    className="h-full rounded-none"
                     priority
                   />
                 )}
-                <HueStrip
-                  hues={entry?.hues}
-                  size="sm"
-                  className="absolute inset-x-0 bottom-0 rounded-none"
-                />
               </div>
+              <HueStrip hues={entry?.hues} size="sm" className="rounded-none" />
               <div className="flex flex-wrap items-center gap-2 p-3">
                 {seed ? (
                   <Button
                     variant="outline"
                     size="sm"
-                    className="text-xs"
+                    className="normal-case"
                     onClick={() => setSweepTokenId(showSweep ? null : tokenId)}
                     title={t('quickView.sweepNote')}
                   >
@@ -176,8 +180,8 @@ export function NftQuickView({
 
             <div className="flex flex-col gap-4 p-5 sm:p-6">
               <DialogHeader className="space-y-2 pr-8 text-left">
-                <p className="font-mono text-xs text-muted-foreground">{id}</p>
-                <DialogTitle className="font-display text-2xl tracking-tight">
+                <p className="type-mono text-subtle">{id}</p>
+                <DialogTitle className="type-heading-2 text-foreground [overflow-wrap:anywhere]">
                   {item.TokenName && item.TokenName !== ''
                     ? item.TokenName
                     : t('quickView.title', { id })}
@@ -192,7 +196,12 @@ export function NftQuickView({
               </div>
 
               {collectionTraits === undefined ? (
-                <div className="space-y-3" aria-busy="true" aria-label={t('quickView.loading')}>
+                <div
+                  role="status"
+                  className="space-y-3"
+                  aria-busy="true"
+                  aria-label={t('quickView.loading')}
+                >
                   <Skeleton className="h-4 w-1/3" />
                   <Skeleton className="h-16 w-full" />
                   <Skeleton className="h-16 w-full" />
@@ -213,11 +222,11 @@ export function NftQuickView({
                   }
                 />
               ) : (
-                <p className="text-sm text-muted-foreground">{t('panel.unavailable')}</p>
+                <p className="type-body-sm text-muted-foreground">{t('panel.unavailable')}</p>
               )}
 
               <div className="mt-auto flex flex-wrap items-center gap-2 pt-2">
-                <Button asChild size="sm" className={cn('text-xs')}>
+                <Button asChild size="sm" className="normal-case">
                   <Link href={`/detail/${item.TokenId}`}>
                     {t('quickView.openDetail')}
                     <ExternalLink className="ml-1.5 h-3.5 w-3.5" aria-hidden />

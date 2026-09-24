@@ -253,5 +253,10 @@
     "segmentAria": "{value}: {count} NFT. Фільтрувати за цією ознакою.",
     "legendCount": "{count}",
     "loading": "Зчитування ознак колекції…"
+  },
+  "alt": {
+    "subjectNamed": "«{name}», Cosmic Signature {id}",
+    "withTraits": "{subject}: структура {structure}, палітра {palette}",
+    "withTraitsAndClass": "{subject}: структура {structure}, палітра {palette}, спектральний клас {spectralClass}"
   }
 }

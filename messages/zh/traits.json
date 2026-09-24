@@ -253,5 +253,10 @@
     "segmentAria": "{value}：{count} 枚 NFT。按此特征筛选。",
     "legendCount": "{count}",
     "loading": "正在读取作品集特征…"
+  },
+  "alt": {
+    "subjectNamed": "Cosmic Signature {id}《{name}》",
+    "withTraits": "{subject}：结构为{structure}，调色为{palette}",
+    "withTraitsAndClass": "{subject}：结构为{structure}，调色为{palette}，光谱型为 {spectralClass}"
   }
 }

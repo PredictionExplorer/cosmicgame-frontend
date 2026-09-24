@@ -253,5 +253,10 @@
     "segmentAria": "{value}：{count}点のNFT。この特性で絞り込みます。",
     "legendCount": "{count}",
     "loading": "コレクションの特性を読み取り中…"
+  },
+  "alt": {
+    "subjectNamed": "Cosmic Signature {id}「{name}」",
+    "withTraits": "{subject}：構造は{structure}、パレットは{palette}",
+    "withTraitsAndClass": "{subject}：構造は{structure}、パレットは{palette}、スペクトル型は{spectralClass}"
   }
 }

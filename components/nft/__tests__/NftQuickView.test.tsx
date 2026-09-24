@@ -13,7 +13,14 @@ import { NftQuickView } from '../NftQuickView';
 jest.mock('next/image', () => ({
   __esModule: true,
   default: (props: Record<string, unknown>) => {
-    const { fill: _f, priority: _p, unoptimized: _u, ...rest } = props;
+    const {
+      fill: _f,
+      priority: _p,
+      unoptimized: _u,
+      loader: _l,
+      fetchPriority: _fp,
+      ...rest
+    } = props;
     return <img {...rest} />;
   },
 }));
@@ -61,9 +68,14 @@ describe('NftQuickView', () => {
       />,
     );
     expect(screen.getByRole('heading', { name: 'NUMBA 1' })).toBeInTheDocument();
-    expect(screen.getByAltText('Cosmic Signature #000001 artwork')).toHaveAttribute(
-      'src',
-      expect.stringContaining('/0xa1/images/web/full.webp'),
+    // The alt text is composed from the traits, not a bare number.
+    const art = screen.getByAltText(
+      '“NUMBA 1”, Cosmic Signature #000001: Orbit Ribbons structure, Glacial Split palette, spectral class B',
+    );
+    expect(art).toHaveAttribute('src', expect.stringContaining('/0xa1/images/web/full.webp'));
+    // Nothing is layered over the art: the hue strip sits under the plate.
+    expect(screen.getByTestId('art-frame')).not.toContainElement(
+      screen.getAllByTestId('hue-strip')[0]!,
     );
     expect(screen.getAllByTestId('spectral-class-badge')[0]).toHaveTextContent('Class B');
     expect(screen.getByTestId('rarity-rank-chip')).toBeInTheDocument();
