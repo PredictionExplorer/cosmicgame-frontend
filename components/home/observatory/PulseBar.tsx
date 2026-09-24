@@ -1,6 +1,6 @@
 'use client';
 
-import { Fragment, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -13,6 +13,10 @@ import { Link } from '@/i18n/navigation';
 
 import { PHASE_TEXT_CLASS, viewForPhase } from './phaseView';
 import { ValuePending } from './ValuePending';
+
+/** A dot centred in the 1rem gutter before a fact; clipped when the fact starts a line. */
+const FACT_SEPARATOR =
+  "before:type-label before:pointer-events-none before:absolute before:inset-y-0 before:start-0 before:flex before:w-4 before:items-center before:justify-center before:text-subtle before:content-['·']";
 
 export interface PulseBarProps {
   cycleNumber?: number | null;
@@ -97,37 +101,43 @@ export function PulseBar({
       <h1 id="home-deck-title" className="type-section min-w-0 text-foreground">
         {t('deck.title')}
       </h1>
-      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 sm:col-span-2 xl:col-span-1 xl:col-start-2 xl:row-start-1 xl:mt-0">
-        <Badge shape="pill" tone="neutral" className="gap-2 text-foreground">
-          {/* Breathes only while the dashboard poll succeeds (liveFreshness). */}
-          <LiveStatus variant="dot" />
-          {cycleNumber == null
-            ? t('hero.cycleFallback')
-            : t('hero.cycleNumber', { number: String(cycleNumber) })}
-        </Badge>
-        {facts.map((fact, index) => (
-          <Fragment key={fact.key}>
-            {index > 0 && (
-              <span
-                aria-hidden
-                className={cn(
-                  'type-label text-subtle',
-                  fact.wide && 'max-sm:hidden xl:max-2xl:hidden',
-                )}
-              >
-                ·
-              </span>
-            )}
-            {/* The age also reads in the ledger; it gives way where the
-                strip shares its row with the H1. */}
-            <span className={cn(fact.wide && 'max-sm:hidden xl:max-2xl:hidden')}>{fact.node}</span>
-          </Fragment>
-        ))}
-        {youHoldLatest && (
-          <Badge tone="positive" dot size="sm" data-testid="pulse-you-latest">
-            {t('observatory.standing.positionLatest')}
-          </Badge>
-        )}
+      {/* The facts wrap as a list whose dot separators hang in a clipped
+          gutter: a dot that would start a wrapped line is cut away, so no
+          line ever ends or starts on an orphaned separator. */}
+      <div className="mt-3 min-w-0 overflow-hidden sm:col-span-2 xl:col-span-1 xl:col-start-2 xl:row-start-1 xl:mt-0">
+        <ul role="list" className="-ms-4 flex flex-wrap items-center gap-y-2">
+          <li className="ps-4">
+            <Badge shape="pill" tone="neutral" className="gap-2 text-foreground">
+              {/* Breathes only while the dashboard poll succeeds (liveFreshness). */}
+              <LiveStatus variant="dot" />
+              {cycleNumber == null
+                ? t('hero.cycleFallback')
+                : t('hero.cycleNumber', { number: String(cycleNumber) })}
+            </Badge>
+          </li>
+          {facts.map((fact, index) => (
+            <li
+              key={fact.key}
+              className={cn(
+                'relative ps-4',
+                // The first fact follows the pill with space alone.
+                index > 0 && FACT_SEPARATOR,
+                // The age also reads in the ledger; it gives way where the
+                // strip shares its row with the H1.
+                fact.wide && 'max-sm:hidden xl:max-2xl:hidden',
+              )}
+            >
+              {fact.node}
+            </li>
+          ))}
+          {youHoldLatest && (
+            <li className="ps-4">
+              <Badge tone="positive" dot size="sm" data-testid="pulse-you-latest">
+                {t('observatory.standing.positionLatest')}
+              </Badge>
+            </li>
+          )}
+        </ul>
       </div>
       <p className="type-body-sm mt-2.5 max-w-[72ch] text-muted-foreground max-sm:line-clamp-2 sm:col-span-2 xl:col-span-3 xl:mt-2 xl:max-w-none">
         {t('deck.intro')}

@@ -30,6 +30,17 @@ describe('PulseBar', () => {
     );
   });
 
+  it('lists the facts with decorative separators that never orphan at a wrap', () => {
+    render(<PulseBar {...baseProps} />);
+    const facts = screen.getByTestId('pulse-gesture-count').closest('ul');
+    expect(facts).not.toBeNull();
+    // The dots are pseudo-elements in a clipped gutter, not text nodes a
+    // wrapped line could end on (or a screen reader could read).
+    expect(facts!.textContent).not.toContain('·');
+    expect(facts!.parentElement).toHaveClass('overflow-hidden');
+    expect(within(facts!).getAllByRole('listitem').length).toBeGreaterThanOrEqual(3);
+  });
+
   it('routes newcomers to the walkthrough', () => {
     render(<PulseBar {...baseProps} />);
     expect(screen.getByRole('link', { name: /home\.deck\.newHere/ })).toHaveAttribute(
