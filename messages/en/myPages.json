@@ -233,6 +233,7 @@
       "title": "My NFTs",
       "subtitle": "Cosmic Signature NFTs in your connected wallet",
       "marketplace": "Buy or sell NFTs",
+      "anchorLink": "Anchor NFTs",
       "loadErrorTitle": "Failed to load tokens",
       "loadErrorMessage": "Failed to load Cosmic Signature NFTs.",
       "ownedTitle": "Cosmic Signature NFTs I own",

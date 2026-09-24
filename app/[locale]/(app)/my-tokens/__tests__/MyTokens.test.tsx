@@ -134,6 +134,29 @@ describe('MyTokens', () => {
     );
   });
 
+  it('offers to anchor while a Signature here has never been anchored', () => {
+    render(<MyTokens />);
+    expect(screen.getByRole('link', { name: 'myPages.tokens.page.anchorLink' })).toHaveAttribute(
+      'href',
+      '/my-anchors',
+    );
+  });
+
+  it('offers no anchoring once every Signature is anchored or was released', () => {
+    mockUseCSTTokensByUser.mockReturnValue(
+      tokensState({
+        data: [
+          { TokenId: 1, Seed: 'a1', Staked: true },
+          { TokenId: 7, Seed: 'a7', Staked: false, WasUnstaked: true },
+        ],
+      }),
+    );
+    render(<MyTokens />);
+    expect(
+      screen.queryByRole('link', { name: 'myPages.tokens.page.anchorLink' }),
+    ).not.toBeInTheDocument();
+  });
+
   it('offers NFT transfers as a secondary collapsed option', async () => {
     const user = userEvent.setup();
     render(<MyTokens />);
