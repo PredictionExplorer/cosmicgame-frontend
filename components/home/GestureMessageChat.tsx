@@ -467,8 +467,14 @@ export function GestureMessageChat({
   // cycle can still open "All activity" from an empty "Messages" view.
   const hasAnyContent = hasFeedContent || visibleEvents.length > 0;
   const noMessagesYet = view === 'messages' && messages.length === 0 && pending.length === 0;
-  const hasMoreEvents = (systemEvents?.length ?? 0) > eventLimit;
+  const knownEvents = systemEvents?.length ?? 0;
+  // Events are paged on the client and only "All activity" lists them, so in
+  // "Messages" only older messages from the server are older content: "Load
+  // older" never shows there without something to add.
+  const hasMoreEvents = view === 'all' && knownEvents > eventLimit;
   const hasOlderContent = hasMoreEvents || Boolean(pagination?.hasMore);
+  // "Messages" windows no event rows, so it counts every event on record.
+  const countedEvents = view === 'all' ? visibleEvents.length : knownEvents;
   const phoneRows = phoneVisibleRows(rows, pending.length, phoneMessages);
   const hiddenOnPhones = !isPrinting && rows.length + pending.length > phoneRows;
   const newestMessage = messages[0] ?? null;
@@ -561,6 +567,7 @@ export function GestureMessageChat({
   const loadOlder = () => {
     if (pagination?.isLoading) return;
     rememberReadingPosition();
+    // Only in "All activity", the one view that lists events.
     if (hasMoreEvents && !pagination?.error) {
       setEventWindow({ key: resetKey, limit: eventLimit + SYSTEM_EVENTS_PER_PAGE });
     }
@@ -582,10 +589,10 @@ export function GestureMessageChat({
     isLoading || error
       ? null
       : hasOlderContent
-        ? t('chat.history.showing', { messages: messages.length, events: visibleEvents.length })
+        ? t('chat.history.showing', { messages: messages.length, events: countedEvents })
         : [
             t('chat.messageCount', { count: messages.length }),
-            t('chat.eventCount', { count: visibleEvents.length }),
+            t('chat.eventCount', { count: countedEvents }),
           ].join(' · ');
 
   return (

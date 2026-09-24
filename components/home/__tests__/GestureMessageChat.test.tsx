@@ -427,6 +427,52 @@ describe('GestureMessageChat', () => {
     expect(screen.getAllByTestId('chat-system-event')).toHaveLength(50);
   });
 
+  it('offers "Load older" under Messages only when older messages can be fetched', async () => {
+    const user = userEvent.setup();
+    const onLoadMore = jest.fn().mockResolvedValue(undefined);
+    const gestures = [makeGesture({ Message: 'The only message' })];
+    const systemEvents = Array.from({ length: 120 }, (_, index) => makeEvent(index));
+    const loadOlder = () => screen.queryByRole('button', { name: 'home.chat.history.loadOlder' });
+    const { rerender } = render(
+      <GestureMessageChat gestures={gestures} systemEvents={systemEvents} resetKey="7" />,
+    );
+    // Only events are older, and Messages lists none: no dead control, and the
+    // header counts every event on record instead of reading as a window.
+    expect(loadOlder()).toBeNull();
+    expect(screen.queryByText(/home\.chat\.history\.showing/)).toBeNull();
+    expect(
+      screen.getByText(/home\.chat\.messageCount\(count=1\) · home\.chat\.eventCount\(count=120\)/),
+    ).toBeInTheDocument();
+
+    // All activity pages the events it lists.
+    await user.click(screen.getByRole('button', { name: 'home.chat.view.all' }));
+    expect(
+      screen.getByText(/home\.chat\.history\.showing\(messages=1,events=50\)/),
+    ).toBeInTheDocument();
+    expect(loadOlder()).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'home.chat.view.messages' }));
+    expect(loadOlder()).toBeNull();
+
+    // Older messages on the server: the control fetches them and leaves the
+    // event window alone.
+    rerender(
+      <GestureMessageChat
+        gestures={gestures}
+        systemEvents={systemEvents}
+        resetKey="7"
+        pagination={{ hasMore: true, isLoading: false, error: false, onLoadMore }}
+      />,
+    );
+    expect(
+      screen.getByText(/home\.chat\.history\.showing\(messages=1,events=120\)/),
+    ).toBeInTheDocument();
+    await user.click(loadOlder()!);
+    expect(onLoadMore).toHaveBeenCalledTimes(1);
+    expect(screen.getAllByTestId('chat-message')).toHaveLength(1);
+    await user.click(screen.getByRole('button', { name: 'home.chat.view.all' }));
+    expect(screen.getAllByTestId('chat-system-event')).toHaveLength(50);
+  });
+
   it('prints all known events and loaded messages without fetching older messages', async () => {
     const user = userEvent.setup();
     const onLoadMore = jest.fn().mockResolvedValue(undefined);
