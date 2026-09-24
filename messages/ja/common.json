@@ -43,16 +43,6 @@
     "gallery": "ギャラリー"
   },
   "pageHeader": {
-    "sections": {
-      "participate": "参加",
-      "collection": "コレクション",
-      "explore": "探索",
-      "records": "記録",
-      "learn": "学ぶ",
-      "trust": "信頼",
-      "account": "アカウント",
-      "admin": "管理者"
-    },
     "snapshot": "データのスナップショット：{date}",
     "lastReviewed": "最終確認：{date}",
     "lastUpdated": "最終更新：{date}",

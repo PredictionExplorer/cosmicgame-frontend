@@ -13,7 +13,8 @@ export interface SiteNavCopy {
   routeDescription: (id: SiteRouteId) => string;
   /** The compact label of a Statistics section ("Participation"). */
   routeShortLabel: (id: SiteRouteId) => string;
-  sectionTitle: (id: SiteSectionId | 'ecosystem' | 'community') => string;
+  /** A section's name; `admin` names the operator tools, which the menus do not list. */
+  sectionTitle: (id: SiteSectionId | 'admin' | 'ecosystem' | 'community') => string;
   groupLabel: (id: SiteRouteGroupId) => string;
   groupDescription: (id: SiteRouteGroupId) => string;
   outboundLabel: (id: OutboundLinkId) => string;

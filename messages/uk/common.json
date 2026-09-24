@@ -43,16 +43,6 @@
     "gallery": "Галерея"
   },
   "pageHeader": {
-    "sections": {
-      "participate": "Участь",
-      "collection": "Колекція",
-      "explore": "Огляд",
-      "records": "Записи",
-      "learn": "Навчання",
-      "trust": "Довіра",
-      "account": "Обліковий запис",
-      "admin": "Адміністрування"
-    },
     "snapshot": "Знімок даних · {date}",
     "lastReviewed": "Останній перегляд: {date}",
     "lastUpdated": "Оновлено: {date}",

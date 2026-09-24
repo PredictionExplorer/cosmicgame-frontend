@@ -43,16 +43,6 @@
     "gallery": "갤러리"
   },
   "pageHeader": {
-    "sections": {
-      "participate": "참여",
-      "collection": "컬렉션",
-      "explore": "탐색",
-      "records": "기록",
-      "learn": "학습",
-      "trust": "신뢰",
-      "account": "계정",
-      "admin": "관리자"
-    },
     "snapshot": "데이터 스냅숏: {date}",
     "lastReviewed": "최종 검토: {date}",
     "lastUpdated": "최종 업데이트: {date}",

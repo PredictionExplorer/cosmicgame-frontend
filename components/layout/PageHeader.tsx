@@ -5,12 +5,13 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { Breadcrumbs, type BreadcrumbItem } from '@/components/ui/breadcrumbs';
+import { ExplainedTerm } from '@/components/ui/explain-popover';
 import { GradientText } from '@/components/ui/gradient-text';
-import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { ScrollRail } from '@/components/ui/scroll-rail';
 import { UnknownValue } from '@/components/ui/unknown-value';
 import { HeaderLede } from '@/components/layout/HeaderLede';
 import { PAGE_SECTIONS, type PageSectionId } from '@/components/layout/pageSections';
+import { useSiteNavCopy } from '@/components/layout/siteNavCopy';
 
 export type { PageSectionId } from '@/components/layout/pageSections';
 export type PageHeaderCrumb = BreadcrumbItem;
@@ -22,17 +23,21 @@ export interface PageHeaderFigure {
   label: string;
   /**
    * The formatted figure. `null` means unknown — the read failed or the field
-   * is missing — and renders as an em dash announced as "Unavailable".
+   * is missing — and renders as an em dash with a visible "Unavailable".
    */
   value: ReactNode | null;
-  /** A one-sentence definition behind an info button. Use sparingly. */
+  /**
+   * A one-sentence definition. The label itself becomes the explanation (a
+   * dotted underline, the definition on hover, focus or tap), never an ⓘ.
+   */
   info?: string;
   /** A visible qualifier under the value. */
   caption?: ReactNode;
   /**
    * `md` keeps a long value — a date, an address — at the figure-md size on
    * wide screens too, where counts and amounts step up to figure-lg: a
-   * timestamp set at 32px outweighs the figures it dates.
+   * timestamp set at 32px outweighs the figures it dates. On phones an `md`
+   * figure takes the row's full width, after the paired figures.
    */
   size?: 'md';
 }
@@ -53,14 +58,23 @@ export type PageHeaderVariant = 'data' | 'reading';
 
 export interface PageHeaderProps {
   title: ReactNode;
-  /** The lede under the H1: clamped to three lines on phones, with a "Read more" toggle. */
+  /**
+   * The lede under the H1. On data pages a long lede is clamped to three
+   * lines on phones, with a "Read more" toggle; reading pages always show it
+   * whole (see `clampLede`).
+   */
   subtitle?: ReactNode;
   variant?: PageHeaderVariant;
   /**
+   * Clamp a long lede on phones. Defaults to true on `data` pages and false on
+   * `reading` pages, whose lede is often the page's core statement (the risk
+   * disclosure, a policy's scope).
+   */
+  clampLede?: boolean;
+  /**
    * The section the page belongs to (components/layout/pageSections). On a
    * top-level page it is the eyebrow, linked to the section hub; on a record
-   * page with `breadcrumbs` it is the first crumb after Home. A section
-   * without a hub (Records) is a plain eyebrow and no crumb.
+   * page with `breadcrumbs` it is the first crumb after Home.
    */
   section?: PageSectionId;
   /** The page is its section's hub: the eyebrow names the section without linking to itself. */
@@ -85,7 +99,11 @@ export interface PageHeaderProps {
    * read), `LiveStatus` (polling pages), `ReviewedStamp` (legal pages), a source.
    */
   meta?: ReactNode;
-  /** Related pages, as chips at the foot of the header. */
+  /**
+   * Related pages, as chips at the foot of the header from 640px. Phones
+   * leave them out, so the header stays inside its share of the first screen;
+   * the drawer and the footer reach the same pages.
+   */
   related?: readonly PageHeaderLink[];
   /** Accessible name of the related-pages nav. Defaults to "Related pages". */
   relatedLabel?: string;
@@ -169,6 +187,7 @@ export function PageHeader({
   title,
   subtitle,
   variant = 'data',
+  clampLede = variant === 'data',
   section,
   sectionHub = false,
   breadcrumbs,
@@ -187,7 +206,8 @@ export function PageHeader({
   gradientTitle = false,
 }: PageHeaderProps) {
   const t = useTranslations('common');
-  const sectionLabel = section ? t(`pageHeader.sections.${section}`) : null;
+  const copy = useSiteNavCopy();
+  const sectionLabel = section ? copy.sectionTitle(section) : null;
   const trail =
     breadcrumbs !== undefined && !sectionHub
       ? buildTrail(breadcrumbs, section, t('breadcrumbs.home'), sectionLabel)
@@ -264,6 +284,7 @@ export function PageHeader({
             <HeaderLede
               moreLabel={t('pageHeader.readMore')}
               lessLabel={t('pageHeader.readLess')}
+              clamp={clampLede}
               className={cn(
                 // 16px on phones keeps the header inside the first screen.
                 'mt-3 type-lede text-muted-foreground max-sm:text-base print:!text-foreground/85 sm:mt-4',
@@ -295,22 +316,16 @@ export function PageHeader({
       {related && related.length > 0 ? (
         <nav
           aria-label={relatedLabel ?? t('pageHeader.relatedPages')}
-          className={cn(meta ? 'mt-3 sm:mt-4' : 'mt-4 sm:mt-6')}
+          className={cn('max-sm:hidden', meta ? 'mt-4' : 'mt-6')}
         >
-          {/* One scrollable row on phones (the edge fade says it scrolls), wrapping from sm. */}
-          <ul
-            className={cn(
-              'flex gap-2 scrollbar-none max-sm:overflow-x-auto max-sm:pe-8 max-sm:[mask-image:linear-gradient(to_right,black_calc(100%-2rem),transparent)] sm:flex-wrap',
-              centered && 'sm:justify-center',
-            )}
-          >
+          <ul className={cn('flex flex-wrap gap-2', centered && 'justify-center')}>
             {related.map((link) => {
               const Icon = isExternalHref(link.href) ? ArrowUpRight : ArrowRight;
               return (
-                <li key={link.href} className="shrink-0">
+                <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="group inline-flex min-h-8 items-center gap-1.5 whitespace-nowrap rounded-pill border border-rule px-3 type-label text-muted-foreground transition-colors duration-fast hover:border-input hover:text-foreground"
+                    className="group inline-flex min-h-8 items-center gap-1.5 rounded-control border border-rule px-3 type-label text-muted-foreground no-underline transition-colors duration-fast hover:border-input hover:text-foreground pointer-coarse:min-h-11"
                   >
                     {link.label}
                     <Icon
@@ -381,11 +396,26 @@ export function PageHeaderTabs({
 }
 
 /**
+ * The layout of the figure row on phones. Full-width figures (`size: 'md'`:
+ * dates, addresses) sit under a two-column grid of the others; when the
+ * others are an odd number, which would leave a hole in that grid, every
+ * figure becomes a label-and-value row instead.
+ */
+export function figurePhoneLayout(figures: readonly PageHeaderFigure[]): 'grid' | 'rows' {
+  const paired = figures.filter((figure) => figure.size !== 'md').length;
+  return figures.length > 1 && paired % 2 === 1 ? 'rows' : 'grid';
+}
+
+/**
  * The header's figure row: label over value, one row divided by hairlines
- * from `lg`. On phones an even count is a two-column grid (2×2 for four); an
- * odd count, which would leave an empty cell, is a list of label-and-value
- * rows between hairlines. Each figure appears once per page — the page body
- * never repeats it in a second stat row.
+ * from `lg`, a grid by count from `sm`, and on phones a two-column grid or a
+ * list of label-and-value rows (see `figurePhoneLayout`).
+ *
+ * Every figure is a subgrid of three shared rows (label, value, caption), so
+ * values sit on one baseline however their labels wrap and whatever their
+ * size; in the phone rows a value that wraps under its label keeps to the end
+ * edge. Each figure appears once per page — the page body never repeats it
+ * in a second stat row.
  */
 export function PageHeaderFigures({
   figures,
@@ -396,16 +426,19 @@ export function PageHeaderFigures({
 }) {
   const t = useTranslations('common');
   const unavailable = t('status.unavailable');
-  const rows = figures.length > 1 && figures.length % 2 === 1;
+  const rows = figurePhoneLayout(figures) === 'rows';
   return (
     <dl
       data-layout={rows ? 'rows' : 'grid'}
       className={cn(
         // Phones: tighter rhythm, so the header stays near the top of the first screen.
-        'mt-4 grid gap-x-4 sm:mt-8 sm:gap-x-6 sm:gap-y-5',
-        rows ? 'grid-cols-1 max-sm:divide-y max-sm:divide-rule' : 'grid-cols-2 gap-y-3',
+        'mt-4 grid gap-x-4 gap-y-1 sm:mt-8 sm:gap-x-6',
+        rows
+          ? 'grid-cols-1 max-sm:flex max-sm:flex-col max-sm:divide-y max-sm:divide-rule'
+          : 'grid-cols-2 max-sm:-mb-3',
         FIGURE_COLUMNS[Math.min(figures.length, 4)],
-        'lg:flex lg:flex-wrap lg:gap-x-0 lg:divide-x lg:divide-rule',
+        'sm:-mb-5',
+        'lg:mb-0 lg:grid-flow-col lg:grid-cols-none lg:grid-rows-[auto_auto_auto] lg:auto-cols-[minmax(0,max-content)] lg:justify-start lg:gap-x-0 lg:divide-x lg:divide-rule',
         className,
       )}
     >
@@ -414,39 +447,48 @@ export function PageHeaderFigures({
           key={figure.id}
           data-figure={figure.id}
           className={cn(
-            'min-w-0 lg:px-8 lg:first:pl-0 lg:last:pr-0',
-            rows &&
-              'max-sm:flex max-sm:flex-wrap max-sm:items-baseline max-sm:justify-between max-sm:gap-x-4 max-sm:py-2 max-sm:first:pt-0 max-sm:last:pb-0',
+            'row-span-3 grid min-w-0 grid-rows-subgrid content-start pb-3 sm:pb-5 lg:px-8 lg:pb-0 lg:first:pl-0 lg:last:pr-0',
+            rows
+              ? 'max-sm:flex max-sm:flex-wrap max-sm:items-baseline max-sm:gap-x-4 max-sm:py-2 max-sm:first:pt-0 max-sm:last:pb-0'
+              : figure.size === 'md' && 'max-sm:order-last max-sm:col-span-2',
           )}
         >
-          <dt className="type-label text-subtle">
-            {/* The label is its own text node, so the dt reads exactly as the label. */}
-            <span>{figure.label}</span>
+          <dt className="self-end type-label text-subtle">
             {figure.info ? (
-              // The word joiner keeps the icon on the line of the label's last word.
-              <span className="whitespace-nowrap">
-                {'⁠'}
-                <InfoTooltip
-                  content={figure.info}
-                  label={figure.label}
-                  className="ml-1 -mt-px"
-                  iconClassName="size-3.5"
-                />
-              </span>
-            ) : null}
+              <ExplainedTerm
+                definition={figure.info}
+                title={figure.label}
+                announce="moreInformation"
+              >
+                {figure.label}
+              </ExplainedTerm>
+            ) : (
+              // The label is its own text node, so the dt reads exactly as the label.
+              <span>{figure.label}</span>
+            )}
           </dt>
           {/* A date may wrap in a narrow column rather than overflow it. */}
           <dd
             className={cn(
-              'mt-1 type-figure-md text-foreground [&_time]:whitespace-normal',
+              'self-baseline type-figure-md text-foreground [&_time]:whitespace-normal',
               figure.size !== 'md' && 'lg:type-figure-lg',
-              rows && 'max-sm:mt-0 max-sm:text-right',
+              rows && 'max-sm:ms-auto max-sm:text-right',
             )}
           >
-            {figure.value === null ? <UnknownValue label={unavailable} /> : figure.value}
+            {figure.value === null ? (
+              <>
+                <UnknownValue label={unavailable} />
+                {/* Seen, not heard: the dash above already announces it. */}
+                <span aria-hidden className="block type-caption text-subtle">
+                  {unavailable}
+                </span>
+              </>
+            ) : (
+              figure.value
+            )}
           </dd>
           {figure.caption ? (
-            <dd className={cn('mt-0.5 type-caption text-subtle', rows && 'max-sm:basis-full')}>
+            <dd className={cn('type-caption text-subtle', rows && 'max-sm:basis-full')}>
               {figure.caption}
             </dd>
           ) : null}

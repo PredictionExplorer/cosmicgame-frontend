@@ -160,7 +160,7 @@ type Rows<F extends (...args: never[]) => unknown> = Awaited<ReturnType<F>>;
  * next-intl test mock answers with message keys.
  */
 const COMMON = {
-  section: (id: string) => `common.pageHeader.sections.${id}`,
+  section: (id: string) => `nav.sections.${id}`,
   unavailable: 'common.status.unavailable',
   snapshot: /^common\.pageHeader\.snapshot\(date=/,
 };
@@ -432,9 +432,9 @@ describe('server-rendered page headers', () => {
   });
 
   it.each([
-    ['anchoring' as const, 'Anchor Distributions', 'records', null],
-    ['marketing' as const, 'Outreach allocations', 'records', null],
-    ['eth-contribution' as const, 'Direct ETH contributions', 'records', null],
+    ['anchoring' as const, 'Anchor Distributions', 'records', '/site-map#records'],
+    ['marketing' as const, 'Outreach allocations', 'records', '/site-map#records'],
+    ['eth-contribution' as const, 'Direct ETH contributions', 'records', '/site-map#records'],
     ['attached-nfts' as const, 'Attached NFT Contributions', 'collection', '/gallery'],
     ['named-nfts' as const, 'Named Cosmic Signature NFTs', 'collection', '/gallery'],
     ['used-rwlk-nfts' as const, 'Used RandomWalk NFTs', 'collection', '/gallery'],
@@ -445,16 +445,11 @@ describe('server-rendered page headers', () => {
 
       expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
       expect(screen.getByRole('heading', { level: 1, name: heading })).toBeInTheDocument();
-      if (hub) {
-        expect(screen.getByRole('link', { name: COMMON.section(section) })).toHaveAttribute(
-          'href',
-          hub,
-        );
-      } else {
-        // Records has no hub page: the eyebrow names it without a link.
-        expect(screen.getByText(COMMON.section(section))).not.toHaveAttribute('href');
-        expect(screen.queryByRole('link', { name: COMMON.section(section) })).toBeNull();
-      }
+      // Every section leads somewhere: Records to its part of the site map.
+      expect(screen.getByRole('link', { name: COMMON.section(section) })).toHaveAttribute(
+        'href',
+        hub,
+      );
       expect(screen.getByText(COMMON.snapshot)).toBeInTheDocument();
       // The stamp and its source are one item of the meta line, so they flow as one line.
       const source = screen.getByText(/^· Source: /);
