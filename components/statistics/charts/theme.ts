@@ -11,19 +11,28 @@
  */
 
 /**
+ * The neutral series ink: `--data-8`'s grey drawn a quarter of the way to
+ * the palette's accent. The bare grey is one cool slate in every palette,
+ * which reads as disabled beside Midnight's lavender and clashes with
+ * Ember's warm and Aurora's teal ground; the mix keeps its lightness (and
+ * contrast) and takes the palette's hue, still no gesture method's hue.
+ */
+const PALETTE_NEUTRAL = 'color-mix(in oklab, hsl(var(--data-8)) 75%, hsl(var(--primary)))';
+
+/**
  * Series colours for SVG `fill`/`stroke` and inline styles, by meaning. A
  * hue keeps one meaning per page: the activity page draws the gesture
- * methods (`GESTURE_METHOD_COLOR`: ETH violet, ETH with a RandomWalk NFT
+ * methods (`GESTURE_METHOD_COLOR`: ETH violet, ETH with a Random Walk NFT
  * sky, CST gold) beside its counts and its lead timeline, so neither of those
  * uses a method's hue.
  */
 export const SERIES_COLOR = {
-  /** Gestures counted over time, every method together: neutral, never a method's hue. */
-  gestures: 'hsl(var(--data-8))',
+  /** Gestures counted over time, every method together: the palette's neutral, never a method's hue. */
+  gestures: PALETTE_NEUTRAL,
   /** CST total supply. */
   supply: 'hsl(var(--data-1))',
   /** An ordinary lead stint on the Endurance timeline. */
-  lead: 'hsl(var(--data-8))',
+  lead: PALETTE_NEUTRAL,
   /**
    * The Endurance Champion's stint and record. Not `--track-endurance`: that
    * track shares its gold with the CST method, which the charts around the
@@ -79,6 +88,25 @@ export const TOOLTIP_PROPS = {
 
 /** Above this many points a line draws no dots at rest, only the hovered one. */
 export const DOTS_MAX_POINTS = 40;
+
+/**
+ * The widest a bar draws, in px: a few buckets would otherwise fill the plot
+ * with 330px slabs that read as a different kind of chart.
+ */
+export const MAX_BAR_SIZE = 24;
+
+/**
+ * Below this many points a chart shows its summary and its table first: one
+ * dot at the edge of a full plot reads as a broken chart, not as early data.
+ */
+export const MIN_PLOT_POINTS = 3;
+
+/**
+ * Past this many points, or on a phone, a scatter of gestures drops its
+ * joining line and draws small, lighter dots, so a dense run stays a cloud
+ * of points instead of merging into a solid band.
+ */
+export const DENSE_POINTS = 200;
 
 /**
  * A focusable mark on a timeline lane (a lead stint, an active period). The

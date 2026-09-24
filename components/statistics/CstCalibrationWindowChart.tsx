@@ -168,7 +168,7 @@ const CalibrationChartView = memo(function CalibrationChartView({
           domain={yAxis.domain}
           ticks={yAxis.ticks}
           tickFormatter={yAxis.format}
-          width={44}
+          width={yAxis.width}
         />
         <Tooltip {...TOOLTIP_PROPS} content={<WindowTooltip />} />
         <Line

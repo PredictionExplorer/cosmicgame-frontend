@@ -38,6 +38,7 @@ import { formatDateRange } from './charts/labels';
 import {
   CHART_MARGIN,
   GRID_PROPS,
+  MIN_PLOT_POINTS,
   SERIES_COLOR,
   TOOLTIP_PROPS,
   X_AXIS_PROPS,
@@ -198,7 +199,7 @@ const SupplyArea = memo(function SupplyArea({
           domain={yAxis.domain}
           ticks={yAxis.ticks}
           tickFormatter={yAxis.format}
-          width={60}
+          width={yAxis.width}
         />
         <Tooltip {...TOOLTIP_PROPS} content={<SupplyTooltip view={view} />} />
         <Area
@@ -333,6 +334,7 @@ export const CstSupplyHistory: FC<{ label: string }> = ({ label }) => {
     <ChartFigure
       label={label}
       summary={summary}
+      preferTable={points.length > 0 && points.length < MIN_PLOT_POINTS}
       controls={
         <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
           <SegmentedControl

@@ -168,7 +168,7 @@ const EnduranceLineView = memo(function EnduranceLineView({
             domain={yAxis.domain}
             ticks={yAxis.ticks}
             tickFormatter={yAxis.format}
-            width={44}
+            width={yAxis.width}
           />
           <Tooltip {...TOOLTIP_PROPS} content={<TimelineTooltip />} />
           <Area

@@ -34,6 +34,12 @@ export interface ChartFigureProps {
    * and the table switch.
    */
   state?: ReactNode;
+  /**
+   * Open on the table (the switch still shows the plot): for a series too
+   * short to plot meaningfully (`MIN_PLOT_POINTS`), where a lone dot on a
+   * full plot reads as a broken chart.
+   */
+  preferTable?: boolean;
   /** The plot. */
   children?: ReactNode;
   className?: string;
@@ -53,11 +59,14 @@ export function ChartFigure({
   note,
   table,
   state,
+  preferTable = false,
   children,
   className,
 }: ChartFigureProps) {
   const t = useTranslations('statistics');
-  const [asTable, setAsTable] = useState(false);
+  // The reader's own choice wins; until they make one, the figure follows `preferTable`.
+  const [choice, setChoice] = useState<boolean | null>(null);
+  const asTable = choice ?? preferTable;
   const canSwitch = Boolean(table) && !state;
   const showTable = canSwitch && asTable;
 
@@ -77,7 +86,7 @@ export function ChartFigure({
               variant="ghost"
               size="sm"
               aria-pressed={asTable}
-              onClick={() => setAsTable((value) => !value)}
+              onClick={() => setChoice(!asTable)}
               className="ms-auto"
             >
               <Table2 aria-hidden />
