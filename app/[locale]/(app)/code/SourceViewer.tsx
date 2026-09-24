@@ -1,13 +1,11 @@
 'use client';
 
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 import { Check, Copy, WrapText } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { useClipboard } from '@/hooks/useClipboard';
-
-const COPIED_FEEDBACK_MS = 2_000;
+import { useCopyFeedback } from '@/hooks/useCopyFeedback';
 
 /**
  * The frame around a server-rendered source file (`SourceCode`): a toolbar
@@ -29,18 +27,9 @@ export function SourceViewer({
   children: ReactNode;
 }) {
   const t = useTranslations('code');
-  const { copy } = useClipboard();
+  const { copied, copy } = useCopyFeedback();
   const [wrap, setWrap] = useState(false);
-  const [copied, setCopied] = useState(false);
   const regionRef = useRef<HTMLPreElement>(null);
-  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(
-    () => () => {
-      if (resetTimer.current) clearTimeout(resetTimer.current);
-    },
-    [],
-  );
 
   const handleCopy = async () => {
     const region = regionRef.current;
@@ -50,9 +39,6 @@ export function SourceViewer({
       .map((line) => line.textContent ?? '')
       .join('\n');
     await copy(text);
-    setCopied(true);
-    if (resetTimer.current) clearTimeout(resetTimer.current);
-    resetTimer.current = setTimeout(() => setCopied(false), COPIED_FEEDBACK_MS);
   };
 
   return (

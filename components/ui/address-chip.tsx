@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
+import type { MouseEvent, ReactNode } from 'react';
 import { Check, Copy } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -14,11 +14,8 @@ import {
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { TOUCH_TARGET_EXTENDED_CLASS } from '@/lib/touch-target';
-import { useClipboard } from '@/hooks/useClipboard';
+import { useCopyFeedback } from '@/hooks/useCopyFeedback';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
-
-/** How long the copied check stays before the copy icon returns. */
-const COPIED_FEEDBACK_MS = 2_000;
 
 /** The zero address in a transfer: a token came into being, or was consumed. */
 const ZERO_ADDRESS_LABELS = {
@@ -84,16 +81,7 @@ export function AddressChip({
   const t = useTranslations('formats');
   const tCommon = useTranslations('common');
   const contracts = useContractAddresses();
-  const { copy } = useClipboard();
-  const [copied, setCopied] = useState(false);
-  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(
-    () => () => {
-      if (resetTimer.current) clearTimeout(resetTimer.current);
-    },
-    [],
-  );
+  const { copied, copy } = useCopyFeedback();
 
   const full = checksumAddress(address);
   const isSelf = sameAddress(address, currentAddress);
@@ -117,9 +105,6 @@ export function AddressChip({
     event.preventDefault();
     event.stopPropagation();
     await copy(full);
-    setCopied(true);
-    if (resetTimer.current) clearTimeout(resetTimer.current);
-    resetTimer.current = setTimeout(() => setCopied(false), COPIED_FEEDBACK_MS);
   };
 
   let content: ReactNode;

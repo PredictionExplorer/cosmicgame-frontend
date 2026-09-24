@@ -6,7 +6,7 @@ import CodeViewer from '../CodeViewer';
 import { RenderPipeline } from '../RenderPipeline';
 import { COSMIC_SIGNATURE_CODE } from '../cosmicSignatureCode';
 
-const mockCopy = jest.fn(async (_text: string) => undefined);
+const mockCopy = jest.fn(async (_text: string) => true);
 jest.mock('@/hooks/useClipboard', () => ({
   useClipboard: () => ({ copy: mockCopy }),
 }));

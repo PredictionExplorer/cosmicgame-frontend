@@ -1,14 +1,10 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
 import { Check, Copy } from 'lucide-react';
 
-import { useClipboard } from '@/hooks/useClipboard';
+import { useCopyFeedback } from '@/hooks/useCopyFeedback';
 import { TOUCH_TARGET_EXTENDED_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
-
-/** How long the check stays before the copy icon returns. */
-const COPIED_FEEDBACK_MS = 2_000;
 
 /**
  * A literal a reader should compare character by character (a domain, a
@@ -28,30 +24,14 @@ export function CopyValue({
   copiedLabel: string;
   className?: string;
 }) {
-  const { copy } = useClipboard();
-  const [copied, setCopied] = useState(false);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(
-    () => () => {
-      if (timer.current) clearTimeout(timer.current);
-    },
-    [],
-  );
-
-  const handleCopy = async () => {
-    await copy(value);
-    setCopied(true);
-    if (timer.current) clearTimeout(timer.current);
-    timer.current = setTimeout(() => setCopied(false), COPIED_FEEDBACK_MS);
-  };
+  const { copied, copy } = useCopyFeedback();
 
   return (
     <span className={cn('inline-flex max-w-full items-center gap-1.5', className)}>
       <span className="type-mono text-foreground">{value}</span>
       <button
         type="button"
-        onClick={handleCopy}
+        onClick={() => void copy(value)}
         aria-label={copyLabel}
         data-touch-target="extended"
         className={cn(
