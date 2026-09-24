@@ -11,23 +11,13 @@ export async function generateMetadata(
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
   const { locale, round, start, end } = await params;
-  const t = await getTranslations({ locale, namespace: 'coordination' });
+  const t = await getTranslations({ locale, namespace: 'meta' });
   // The tab names the window by its cycle, as the H1 does.
-  const cycle = Number(round);
-  const valid = Number.isSafeInteger(cycle) && cycle >= 0;
-  const initial = valid && cycle === 0;
+  const initial = round === '0';
   return createPageMetadata(
     parent,
-    !valid
-      ? t('systemEvent.invalidTitle')
-      : initial
-        ? t('systemEvent.titleInitial')
-        : t('systemEvent.title', { cycle }),
-    !valid
-      ? t('systemEvent.invalidDescription')
-      : initial
-        ? t('systemEvent.ledeInitial')
-        : t('systemEvent.lede', { cycle }),
+    initial ? t('systemEvent.titleInitial') : t('systemEvent.title', { cycle: round }),
+    initial ? t('systemEvent.descriptionInitial') : t('systemEvent.description', { cycle: round }),
     undefined,
     `/system-event/${round}/${start}/${end}`,
     { index: false, locale },

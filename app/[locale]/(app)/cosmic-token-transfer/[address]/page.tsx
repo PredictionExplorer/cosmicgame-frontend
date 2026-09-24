@@ -1,10 +1,11 @@
 import type { Metadata, ResolvingMetadata } from 'next';
-import { setRequestLocale } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
+import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 import {
   readTransferHistorySeed,
-  transferHistoryMetadata,
+  transferHistoryAddress,
 } from '@/components/tokens/transferHistoryRoute';
 
 import { QuerySeed, seedsDisabled } from '../../QuerySeed';
@@ -19,7 +20,18 @@ export async function generateMetadata(
   { params }: PageProps,
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
-  return transferHistoryMetadata('cst', await params, parent);
+  const { locale, address } = await params;
+  const t = await getTranslations({ locale, namespace: 'meta' });
+  // The tab names whose history it is ("CST transfers · 0xA169…63B6"), as the H1 and
+  // the address under it do, so two addresses' tabs can be told apart.
+  return createPageMetadata(
+    parent,
+    t('cosmicTokenTransfers.title', { address: transferHistoryAddress(address) }),
+    t('cosmicTokenTransfers.description'),
+    undefined,
+    `/cosmic-token-transfer/${address}`,
+    { index: false, locale },
+  );
 }
 
 // Dynamic-param pages render on demand; revalidate keeps live protocol data

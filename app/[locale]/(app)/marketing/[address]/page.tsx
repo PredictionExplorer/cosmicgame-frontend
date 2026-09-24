@@ -14,14 +14,11 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { locale, address } = await params;
   const t = await getTranslations({ locale, namespace: 'meta' });
-  const tOutreach = await getTranslations({ locale, namespace: 'marketing' });
   // The tab names whose record it is, so two contributors' tabs differ.
-  const title = isAddress(address, { strict: false })
-    ? `${tOutreach('address.parent')} · ${formatAddress(address)}`
-    : tOutreach('address.invalidAddress.title');
+  const shown = isAddress(address, { strict: false }) ? formatAddress(address) : address;
   return createPageMetadata(
     parent,
-    title,
+    t('outreachAddress.title', { address: shown }),
     t('outreachAddress.description'),
     undefined,
     `/marketing/${address}`,

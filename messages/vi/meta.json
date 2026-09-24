@@ -155,14 +155,16 @@
     "description": "Đóng góp cho hoạt động truyền thông của Cosmic Signature và nhận phân bổ CST. Xem những người đóng góp hàng đầu cho hệ sinh thái, lịch sử phân bổ và cách tham gia."
   },
   "outreachAddress": {
-    "description": "Lịch sử phân bổ truyền thông và phân bổ CST của một người đóng góp cho hệ sinh thái Cosmic Signature. Xem hoạt động giới thiệu và đóng góp."
+    "description": "Lịch sử phân bổ truyền thông và phân bổ CST của một người đóng góp cho hệ sinh thái Cosmic Signature. Xem hoạt động giới thiệu và đóng góp.",
+    "title": "Phân bổ truyền thông · {address}"
   },
   "ethContribution": {
     "title": "Đóng góp ETH trực tiếp",
     "description": "Đóng góp ETH trực tiếp vào dự trữ chu kỳ của Cosmic Signature mà không đặt nét bút. Xem lịch sử đóng góp và lời nhắn đi kèm."
   },
   "ethContributionDetail": {
-    "description": "Chi tiết đóng góp ETH vào dự trữ chu kỳ Cosmic Signature: địa chỉ người đóng góp, số tiền, chu kỳ và lời nhắn."
+    "description": "Chi tiết đóng góp ETH vào dự trữ chu kỳ Cosmic Signature: địa chỉ người đóng góp, số tiền, chu kỳ và lời nhắn.",
+    "title": "Đóng góp #{id}"
   },
   "myStatistics": {
     "title": "Thống kê của tôi",
@@ -300,5 +302,23 @@
       "title": "Cosmic Signature có phải là x\u1ed5 s\u1ed1, s\u00f2ng b\u1ea1c hay \u0111\u1ea7u t\u01b0?",
       "description": "Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi, không phải x\u1ed5 s\u1ed1, s\u00f2ng b\u1ea1c, sản phẩm c\u1edd b\u1ea1c hay sản phẩm \u0111\u1ea7u t\u01b0."
     }
+  },
+  "cosmicTokenTransfers": {
+    "title": "Lịch sử chuyển CST · {address}",
+    "description": "CST được khắc cho địa chỉ này, CST địa chỉ này nhận và gửi, cùng CST bị tiêu thụ bởi các nét bút CST của nó."
+  },
+  "cosmicSignatureTransfers": {
+    "title": "Lịch sử chuyển giao NFT · {address}",
+    "description": "Các Cosmic Signature NFT được khắc cho địa chỉ này, cùng mọi NFT nó đã nhận hoặc gửi."
+  },
+  "ethContributionByCycle": {
+    "title": "Đóng góp của chu kỳ {cycle}",
+    "description": "Các khoản ETH đóng góp trực tiếp vào dự trữ chu kỳ trong chu kỳ {cycle}."
+  },
+  "systemEvent": {
+    "title": "Cấu hình trước chu kỳ {cycle}",
+    "description": "Các tham số giao thức mà chủ sở hữu hợp đồng đã thay đổi trước khi chu kỳ {cycle} mở, kèm giá trị mới và giao dịch của từng thay đổi.",
+    "titleInitial": "Cấu hình ban đầu",
+    "descriptionInitial": "Các tham số giao thức mà chủ sở hữu hợp đồng đã đặt trước khi chu kỳ đầu tiên mở, kèm giá trị và giao dịch của từng tham số."
   }
 }

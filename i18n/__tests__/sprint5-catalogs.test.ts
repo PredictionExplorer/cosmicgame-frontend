@@ -54,6 +54,7 @@ describe('Sprint 5 bilingual catalogs', () => {
       'userProfile',
       'userStellarSelectionEth',
       'userStellarSelectionNft',
+      'systemEvent',
     ] as const;
 
     for (const key of keys) {
