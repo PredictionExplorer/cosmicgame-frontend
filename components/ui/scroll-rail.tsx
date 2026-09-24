@@ -10,11 +10,22 @@ const ACTIVE_SELECTOR = '[data-state="active"], [aria-current="page"], [aria-sel
 /** Width of each edge fade. */
 const FADE = '1.75rem';
 
+/** Anything a keyboard can reach on its own, which then scrolls the track by focus. */
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex="-1"])';
+
 export interface ScrollRailProps extends React.HTMLAttributes<HTMLDivElement> {
   /** CSS selector for the item to keep in view. */
   activeSelector?: string;
   /** Classes for the scrolling track (gap, padding); `className` styles the outer frame. */
   trackClassName?: string;
+  /**
+   * Names the track while it scrolls and holds nothing focusable (a row of
+   * steps or figures): it then becomes a labelled region a keyboard can
+   * focus and scroll with the arrow keys. Without it the track is still
+   * focusable in that case, just unnamed.
+   */
+  label?: string;
 }
 
 /**
@@ -28,12 +39,21 @@ export interface ScrollRailProps extends React.HTMLAttributes<HTMLDivElement> {
  * scrolled into view on mount and whenever it changes, without moving the
  * page. The scrollbar is hidden; the row still scrolls by touch, trackpad,
  * shift-wheel and by moving focus through it.
+ *
+ * A row with nothing focusable in it (steps, figures) could not be scrolled
+ * from the keyboard at all, so while such a row overflows the track itself
+ * takes focus (and, given `label`, is a named region), exactly as a
+ * scrolling table container does. The arrow keys then scroll it.
  */
 export const ScrollRail = React.forwardRef<HTMLDivElement, ScrollRailProps>(
-  ({ activeSelector = ACTIVE_SELECTOR, className, trackClassName, children, ...props }, ref) => {
+  (
+    { activeSelector = ACTIVE_SELECTOR, className, trackClassName, label, children, ...props },
+    ref,
+  ) => {
     const trackRef = React.useRef<HTMLDivElement | null>(null);
     React.useImperativeHandle(ref, () => trackRef.current as HTMLDivElement, []);
     const [edges, setEdges] = React.useState({ start: false, end: false });
+    const [needsFocus, setNeedsFocus] = React.useState(false);
 
     const measure = React.useCallback(() => {
       const track = trackRef.current;
@@ -43,6 +63,7 @@ export const ScrollRail = React.forwardRef<HTMLDivElement, ScrollRailProps>(
       const offset = Math.abs(track.scrollLeft);
       const next = { start: offset > 1, end: max - offset > 1 };
       setEdges((prev) => (prev.start === next.start && prev.end === next.end ? prev : next));
+      setNeedsFocus(max > 1 && !track.querySelector(FOCUSABLE_SELECTOR));
     }, []);
 
     const revealActive = React.useCallback(
@@ -107,11 +128,15 @@ export const ScrollRail = React.forwardRef<HTMLDivElement, ScrollRailProps>(
           ref={trackRef}
           data-overflow-start={edges.start || undefined}
           data-overflow-end={edges.end || undefined}
+          {...(needsFocus
+            ? { tabIndex: 0, ...(label ? { role: 'region', 'aria-label': label } : {}) }
+            : {})}
           className={cn(
             'flex min-w-0 overflow-x-auto overscroll-x-contain scroll-smooth scrollbar-none motion-reduce:scroll-auto',
-            // The track clips anything outside it, so focus rings draw inside
-            // their item rather than half-hidden at the track's edge.
-            '[&_:focus-visible]:outline-offset-[-2px]',
+            // The track clips anything outside it (and its mask hides what
+            // lies past its box), so focus rings draw inside their item, and
+            // inside the track when the track itself takes focus.
+            '[&_:focus-visible]:outline-offset-[-2px] focus-visible:outline-offset-[-2px]',
             trackClassName,
           )}
           style={{ maskImage: mask, WebkitMaskImage: mask }}
