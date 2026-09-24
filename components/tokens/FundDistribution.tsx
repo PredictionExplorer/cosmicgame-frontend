@@ -95,7 +95,7 @@ export function FundDistribution({ data }: { data?: DistData }) {
                   <span className="text-sm font-medium text-foreground">{label}</span>
                   <InfoTooltip content={t(`funds.segments.${copyKey}.tooltip`)} label={label} />
                 </div>
-                <span className="text-sm font-medium tabular-nums text-foreground">
+                <span className="ml-auto whitespace-nowrap text-sm font-medium tabular-nums text-foreground">
                   {percent === null ? unknown : formatPercentPoints(percent, locale)}{' '}
                   <span className="text-xs text-muted-foreground">
                     (
