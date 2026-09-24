@@ -604,21 +604,42 @@
     "empty": "NFT ще немає."
   },
   "stellarSelectionEth": {
-    "invalidAddress": "Недійсна адреса",
-    "user": "Користувач",
-    "heading": "ETH зоряного відбору, розподілений цьому учаснику",
-    "retrievable": "Ви можете забрати {amount} ETH",
-    "retrieveAll": "Забрати все",
-    "empty": "ETH зоряного відбору ще немає."
+    "heading": "Зоряний відбір · ETH",
+    "lede": "ETH, який <term>зоряний відбір</term> розподілив цьому учаснику, цикл за циклом.",
+    "figures": {
+      "total": "Усього розподілено",
+      "count": "Розподіли",
+      "waiting": "Ще не забрано"
+    },
+    "tableLabel": "ETH-розподіли зоряного відбору",
+    "emptyTitle": "ETH зоряного відбору ще немає",
+    "emptyDescription": "Коли завершений цикл вибере цю адресу для розподілу ETH, розподіл з’явиться тут.",
+    "retrieve": "Забрати ETH"
   },
   "stellarSelectionNft": {
-    "invalidAddress": "Недійсна адреса",
-    "user": "Користувач",
-    "heading": "NFT зоряного відбору, розподілені цьому учаснику",
-    "loading": "Завантаження…",
-    "empty": "Розподілів NFT ще немає.",
-    "isRandomWalk": "Через RandomWalk",
-    "isAnchorHolder": "Власник закріплення"
+    "heading": "Зоряний відбір · NFT",
+    "lede": "Cosmic Signature NFT, які <term>зоряний відбір</term> розподілив цьому учаснику.",
+    "figures": {
+      "count": "NFT",
+      "cycles": "Цикли"
+    },
+    "gridLabel": "NFT зоряного відбору",
+    "unnamed": "Cosmic Signature {id}",
+    "cycle": "Цикл {cycle}",
+    "sources": {
+      "participant": "Учасник",
+      "randomWalkAnchor": "Власник закріпленого Random Walk",
+      "anchorHolder": "Власник закріплення"
+    },
+    "emptyTitle": "NFT зоряного відбору ще немає",
+    "emptyDescription": "Коли завершений цикл вибере цю адресу для Cosmic Signature NFT, він з’явиться тут."
+  },
+  "stellarSelectionPages": {
+    "invalidTitle": "Недійсна адреса",
+    "invalidDescription": "Перевірте адресу в посиланні: вона починається з 0x і має 40 шістнадцяткових символів.",
+    "participant": "Учасник",
+    "profile": "Профіль учасника",
+    "howItWorks": "Як працює зоряний відбір"
   },
   "systemEvent": {
     "titleBeforeCycle": "Системна конфігурація, встановлена перед циклом {cycle}",

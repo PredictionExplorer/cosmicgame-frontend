@@ -604,21 +604,42 @@
     "empty": "NFTはまだありません。"
   },
   "stellarSelectionEth": {
-    "invalidAddress": "無効なアドレス",
-    "user": "ユーザー",
-    "heading": "この参加者に配分された星選ETH",
-    "retrievable": "受け取れる配分は{amount} ETHです",
-    "retrieveAll": "すべて受け取る",
-    "empty": "星選ETHはまだありません。"
+    "heading": "星選・ETH",
+    "lede": "<term>星選</term>でサイクルごとにこの参加者へ配分されたETHです。",
+    "figures": {
+      "total": "累計配分",
+      "count": "配分件数",
+      "waiting": "未受け取り"
+    },
+    "tableLabel": "星選のETH配分",
+    "emptyTitle": "星選ETHはまだありません",
+    "emptyDescription": "確定したサイクルでこのアドレスがETH配分に選ばれると、ここに表示されます。",
+    "retrieve": "ETHを受け取る"
   },
   "stellarSelectionNft": {
-    "invalidAddress": "無効なアドレス",
-    "user": "ユーザー",
-    "heading": "この参加者に配分された星選NFT",
-    "loading": "読み込み中…",
-    "empty": "NFTの配分はまだありません。",
-    "isRandomWalk": "RandomWalkか",
-    "isAnchorHolder": "係留者か"
+    "heading": "星選・NFT",
+    "lede": "<term>星選</term>でこの参加者へ配分されたCosmic Signature NFTです。",
+    "figures": {
+      "count": "NFT数",
+      "cycles": "サイクル数"
+    },
+    "gridLabel": "星選のNFT",
+    "unnamed": "Cosmic Signature {id}",
+    "cycle": "サイクル{cycle}",
+    "sources": {
+      "participant": "参加者",
+      "randomWalkAnchor": "Random Walkの係留者",
+      "anchorHolder": "係留者"
+    },
+    "emptyTitle": "星選NFTはまだありません",
+    "emptyDescription": "確定したサイクルでこのアドレスがCosmic Signature NFTに選ばれると、ここに表示されます。"
+  },
+  "stellarSelectionPages": {
+    "invalidTitle": "無効なアドレス",
+    "invalidDescription": "リンクのアドレスを確認してください。アドレスは0xで始まり、16進数の文字が40個続きます。",
+    "participant": "参加者",
+    "profile": "参加者プロフィール",
+    "howItWorks": "星選の仕組み"
   },
   "systemEvent": {
     "titleBeforeCycle": "サイクル{cycle}より前に設定されたシステム構成",

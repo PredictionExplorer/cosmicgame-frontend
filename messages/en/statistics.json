@@ -604,21 +604,42 @@
     "empty": "No NFTs yet."
   },
   "stellarSelectionEth": {
-    "invalidAddress": "Invalid Address",
-    "user": "User",
-    "heading": "Stellar Selection ETH allocated to this participant",
-    "retrievable": "Your retrievable allocations are {amount} ETH",
-    "retrieveAll": "Retrieve All",
-    "empty": "No Stellar Selection ETH yet."
+    "heading": "Stellar Selection · ETH",
+    "lede": "ETH that <term>Stellar Selection</term> allocated to this participant, cycle by cycle.",
+    "figures": {
+      "total": "Total allocated",
+      "count": "Allocations",
+      "waiting": "Not yet retrieved"
+    },
+    "tableLabel": "Stellar Selection ETH allocations",
+    "emptyTitle": "No Stellar Selection ETH yet",
+    "emptyDescription": "When a finalized cycle selects this address for ETH, the allocation appears here.",
+    "retrieve": "Retrieve ETH"
   },
   "stellarSelectionNft": {
-    "invalidAddress": "Invalid Address",
-    "user": "User",
-    "heading": "Stellar Selection NFTs allocated to this participant",
-    "loading": "Loading...",
-    "empty": "No NFT allocations yet.",
-    "isRandomWalk": "Is Random Walk",
-    "isAnchorHolder": "Is Anchor-holder"
+    "heading": "Stellar Selection · NFTs",
+    "lede": "Cosmic Signature NFTs that <term>Stellar Selection</term> allocated to this participant.",
+    "figures": {
+      "count": "NFTs",
+      "cycles": "Cycles"
+    },
+    "gridLabel": "Stellar Selection NFTs",
+    "unnamed": "Cosmic Signature {id}",
+    "cycle": "Cycle {cycle}",
+    "sources": {
+      "participant": "Participant",
+      "randomWalkAnchor": "Random Walk anchor-holder",
+      "anchorHolder": "Anchor-holder"
+    },
+    "emptyTitle": "No Stellar Selection NFTs yet",
+    "emptyDescription": "When a finalized cycle selects this address for a Cosmic Signature NFT, it appears here."
+  },
+  "stellarSelectionPages": {
+    "invalidTitle": "Not a valid address",
+    "invalidDescription": "Check the address in the link: it starts with 0x and has 40 hexadecimal characters.",
+    "participant": "Participant",
+    "profile": "Participant profile",
+    "howItWorks": "How Stellar Selection works"
   },
   "systemEvent": {
     "titleBeforeCycle": "System Configuration Made Before Cycle {cycle}",

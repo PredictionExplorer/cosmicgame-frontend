@@ -1,253 +1,149 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
-import { getAddress, isAddress } from 'viem';
-import { usePublicClient } from 'wagmi';
-
-import { getExplorerUrl } from '@/utils';
+import { useMemo } from 'react';
+import { ArrowRight } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
-import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
-import { useActiveWeb3React } from '@/hooks/web3';
-import { useApiData } from '@/contexts/ApiDataContext';
-import useStellarSelectionWalletContract from '@/hooks/useStellarSelectionWalletContract';
-import { useNotification } from '@/contexts/NotificationContext';
-import { useStellarSelectionDepositsByUser } from '@/hooks/useApiQuery';
-import getErrorMessage from '@/utils/alert';
-import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
-import {
-  TablePrimary,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryContainer,
-  TablePrimaryHead,
-  TablePrimaryHeadCell,
-  TablePrimaryRow,
-} from '@/components/styled';
-import { CustomPagination } from '@/components/common/CustomPagination';
-import { Button } from '@/components/ui/button';
-import { PageHeader } from '@/components/layout/PageHeader';
-import { useParticipantTrail } from '@/components/layout/participantTrail';
+import type { PageHeaderFigure } from '@/components/layout/PageHeader';
+import { Amount } from '@/components/ui/amount';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { PageShell } from '@/components/ui/page-shell';
-import { Spinner } from '@/components/ui/spinner';
-import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
-import { formatFixed } from '@/utils/format';
+import { Skeleton } from '@/components/ui/skeleton';
+import { TxStatus } from '@/components/ui/tx-status';
+import { ChainGuard } from '@/components/wallet/NetworkGuard';
+import {
+  EthAllocationsTable,
+  type EthAllocationRow,
+} from '@/components/winnings/EthAllocationsTable';
+import {
+  InvalidParticipantState,
+  STELLAR_SELECTION_FAQ_HREF,
+  StellarSelectionHeader,
+  participantAddress,
+} from '@/components/winnings/StellarSelectionHeader';
+import { useStellarSelectionDepositsByUser } from '@/hooks/useApiQuery';
+import { useClaimAllocations } from '@/hooks/useClaimAllocations';
+import { useFormat } from '@/hooks/useFormat';
+import { useTxStageLabel } from '@/hooks/useTxStageLabel';
+import { useActiveWeb3React } from '@/hooks/web3';
+import { RetrieveIcon } from '@/lib/conceptIcons';
+import { toFiniteNumber } from '@/utils/finiteNumber';
+import { sameAddress } from '@/utils/format';
 
-interface StellarSelectionETHDeposit {
-  EvtLogId: number;
-  TxHash: string;
-  TimeStamp: number;
-  RoundNum: number;
-  Amount: number;
+/** The ETH total of rows, or `null` when an amount could not be read. */
+function totalEth(rows: readonly EthAllocationRow[]): number | null {
+  let total = 0;
+  for (const row of rows) {
+    const amount = toFiniteNumber(row.Amount);
+    if (amount === null) return null;
+    total += amount;
+  }
+  return total;
 }
 
-const StellarSelectionAllocationsRow = ({ deposit }: { deposit: StellarSelectionETHDeposit }) => {
-  const t = useTranslations('tables');
-  const locale = useLocale();
-  if (!deposit) return <TablePrimaryRow />;
-
-  const { TxHash, TimeStamp, RoundNum, Amount } = deposit;
-  return (
-    <TablePrimaryRow>
-      <TablePrimaryCell label={t('columns.date')}>
-        <a
-          className="text-inherit"
-          href={getExplorerUrl('tx', TxHash)}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <HydrationSafeDateTime timestamp={TimeStamp} locale={locale} />
-        </a>
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.cycle')} align="center">
-        <Link
-          href={`/allocation/${RoundNum}`}
-          className="text-inherit"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {RoundNum}
-        </Link>
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.amountEth')} align="right">
-        {formatFixed(Amount, 4)}
-      </TablePrimaryCell>
-    </TablePrimaryRow>
-  );
-};
-
-const StellarSelectionAllocationsTable = ({ list }: { list: StellarSelectionETHDeposit[] }) => {
-  const t = useTranslations('tables');
-  const tStatistics = useTranslations('statistics');
-  const PER_PAGE = 10;
-  const [currentPage, setCurrentPage] = useState(1);
-
-  if (list.length === 0) {
-    return <p>{tStatistics('stellarSelectionEth.empty')}</p>;
-  }
-
-  const startIndex = (currentPage - 1) * PER_PAGE;
-  const endIndex = currentPage * PER_PAGE;
-  const currentPageItems = list.slice(startIndex, endIndex);
-
-  return (
-    <>
-      <TablePrimaryContainer>
-        <TablePrimary>
-          <TablePrimaryHead>
-            <tr>
-              <TablePrimaryHeadCell align="left">{t('columns.date')}</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>{t('columns.cycle')}</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">{t('columns.amountEth')}</TablePrimaryHeadCell>
-            </tr>
-          </TablePrimaryHead>
-          <TablePrimaryBody>
-            {currentPageItems.map((deposit) => (
-              <StellarSelectionAllocationsRow key={deposit.EvtLogId} deposit={deposit} />
-            ))}
-          </TablePrimaryBody>
-        </TablePrimary>
-      </TablePrimaryContainer>
-
-      <CustomPagination
-        page={currentPage}
-        setPage={setCurrentPage}
-        totalLength={list.length}
-        perPage={PER_PAGE}
-      />
-    </>
-  );
-};
-
+/**
+ * A participant's Stellar Selection ETH: the total, how many allocations and
+ * how much is still waiting, then every allocation with its cycle and
+ * whether it was retrieved. On the connected wallet's own page, the ETH
+ * still waiting can be retrieved from here, through the same retrieval as
+ * My Allocations.
+ */
 const UserStellarSelectionETHPage = ({ address: rawAddress }: { address: string }) => {
-  const t = useTranslations('toasts');
-  const tStatistics = useTranslations('statistics');
-  const locale = useLocale();
+  const t = useTranslations('statistics');
+  const format = useFormat();
+  const stageLabel = useTxStageLabel();
+  const address = participantAddress(rawAddress);
   const { account } = useActiveWeb3React();
-  const { apiData: status, fetchData: fetchStatusData } = useApiData();
-  const stellarSelectionWalletContract = useStellarSelectionWalletContract();
-  const publicClient = usePublicClient();
-  const { setNotification } = useNotification();
 
-  const validatedAddress =
-    rawAddress && isAddress(rawAddress.toLowerCase())
-      ? getAddress(rawAddress.toLowerCase())
-      : 'Invalid Address';
+  const { data, isLoading, refetch } = useStellarSelectionDepositsByUser(address);
+  const { retrieveAllStellarSelectionETH, isClaiming, txStage } = useClaimAllocations(refetch);
 
-  const invalidAddress = !validatedAddress || validatedAddress === 'Invalid Address';
-  const participantTrail = useParticipantTrail(invalidAddress ? null : validatedAddress);
-  const [isClaiming, setIsClaiming] = useState(false);
+  const rows = useMemo(() => (data ?? []) as EthAllocationRow[], [data]);
+  const waiting = useMemo(() => rows.filter((row) => row.Claimed === false), [rows]);
+  const total = totalEth(rows);
+  const waitingTotal = totalEth(waiting);
+  const isOwnPage = sameAddress(account, address);
 
-  const {
-    data: depositsRaw,
-    isLoading: depositsLoading,
-    refetch: refetchDeposits,
-  } = useStellarSelectionDepositsByUser(invalidAddress ? null : validatedAddress);
-
-  const stellarSelectionETHToRetrieve = useMemo(
-    () => ({
-      data: [...((depositsRaw as StellarSelectionETHDeposit[] | undefined) ?? [])].sort(
-        (a, b) => b.TimeStamp - a.TimeStamp,
-      ),
-      loading: depositsLoading,
-    }),
-    [depositsRaw, depositsLoading],
-  );
-
-  const handleAllETHClaim = async () => {
-    if (!stellarSelectionWalletContract) {
-      setNotification({
-        text: t('claim.walletNotConnected'),
-        type: 'error',
-        visible: true,
-      });
-      return;
-    }
-    setIsClaiming(true);
-    try {
-      const hash = await stellarSelectionWalletContract.write.withdrawEth?.();
-      if (!hash) throw new Error('Stellar Selection ETH retrieval returned no transaction hash.');
-      const receipt = await publicClient?.waitForTransactionReceipt({ hash });
-      assertSuccessfulTransactionReceipt(receipt);
-      setNotification({
-        text: t('claim.stellarEthSuccess'),
-        type: 'success',
-        visible: true,
-      });
-      setTimeout(() => {
-        fetchStatusData();
-        refetchDeposits();
-        setIsClaiming(false);
-      }, 2000);
-    } catch (err: unknown) {
-      if (isUserRejection(err)) {
-        setNotification({
-          text: t('walletTransactionCancelled'),
-          type: 'info',
-          visible: true,
-        });
-      } else {
-        reportError(err, 'retrieve stellar selection ETH');
-        const rawMsg = getEthErrorMessage(err, t('claim.failed'), { locale });
-        const msg = getErrorMessage(rawMsg) || rawMsg;
-        setNotification({ text: msg, type: 'error', visible: true });
-      }
-      setIsClaiming(false);
-    }
-  };
-
-  if (invalidAddress) {
+  if (!address) {
     return (
       <PageShell variant="data" backdrop="signature">
-        <PageHeader
-          section="explore"
-          breadcrumbs={participantTrail}
-          title={tStatistics('stellarSelectionEth.invalidAddress')}
-        />
+        <InvalidParticipantState />
       </PageShell>
     );
   }
 
+  const pending = <Skeleton className="h-7 w-24" />;
+  const figures: PageHeaderFigure[] = [
+    {
+      id: 'total',
+      label: t('stellarSelectionEth.figures.total'),
+      value: isLoading ? pending : total === null ? null : <Amount value={total} unit="ETH" />,
+    },
+    {
+      id: 'count',
+      label: t('stellarSelectionEth.figures.count'),
+      value: isLoading ? pending : format.count(rows.length),
+    },
+    {
+      id: 'waiting',
+      label: t('stellarSelectionEth.figures.waiting'),
+      value: isLoading ? (
+        pending
+      ) : waitingTotal === null ? null : (
+        <Amount value={waitingTotal} unit="ETH" />
+      ),
+    },
+  ];
+
+  const canRetrieve = isOwnPage && waiting.length > 0;
+
   return (
     <PageShell variant="data" backdrop="signature">
-      <PageHeader
-        section="explore"
-        breadcrumbs={participantTrail}
-        title={tStatistics('stellarSelectionEth.heading')}
-      >
-        <p className="mt-5 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-sm text-muted-foreground">
-          <span>{tStatistics('stellarSelectionEth.user')}</span>
-          <span className="min-w-0 break-all font-mono">{validatedAddress}</span>
-        </p>
-      </PageHeader>
-
-      <div className="mt-8">
-        <div className="mb-4 flex flex-wrap items-center justify-end gap-4">
-          {status?.ETHRaffleToClaim > 0 && account === validatedAddress && (
-            <div className="flex flex-wrap items-center gap-4">
-              <span className="mr-4">
-                {tStatistics('stellarSelectionEth.retrievable', {
-                  amount: formatFixed(status.ETHRaffleToClaim, 6),
-                })}
-              </span>
-              <Button onClick={handleAllETHClaim} disabled={isClaiming}>
-                {isClaiming
-                  ? t('claim.retrieving')
-                  : tStatistics('stellarSelectionEth.retrieveAll')}
+      <StellarSelectionHeader
+        kind="eth"
+        address={address}
+        // An address with nothing selected yet reads from the empty state alone.
+        figures={!isLoading && rows.length === 0 ? undefined : figures}
+        actions={
+          canRetrieve ? (
+            <ChainGuard requireConnection>
+              <Button
+                variant="commit"
+                loading={isClaiming.raffleETH}
+                onClick={() =>
+                  void retrieveAllStellarSelectionETH(waiting.map((row) => row.RoundNum ?? -1))
+                }
+              >
+                <RetrieveIcon aria-hidden className="size-4" />
+                {(isClaiming.raffleETH && stageLabel(txStage)) || t('stellarSelectionEth.retrieve')}
               </Button>
-            </div>
-          )}
-        </div>
+            </ChainGuard>
+          ) : null
+        }
+      >
+        {canRetrieve ? <TxStatus stage={txStage} className="mt-4" /> : null}
+      </StellarSelectionHeader>
 
-        {stellarSelectionETHToRetrieve.loading ? (
-          <div className="flex justify-center py-8">
-            <Spinner />
-          </div>
-        ) : (
-          <StellarSelectionAllocationsTable list={stellarSelectionETHToRetrieve.data} />
-        )}
-      </div>
+      <EthAllocationsTable
+        rows={rows}
+        ariaLabel={t('stellarSelectionEth.tableLabel')}
+        showSource={false}
+        showStatus
+        loading={isLoading}
+        headingLevel={2}
+        emptyTitle={t('stellarSelectionEth.emptyTitle')}
+        emptyDescription={t('stellarSelectionEth.emptyDescription')}
+        emptyAction={
+          <Link
+            href={STELLAR_SELECTION_FAQ_HREF}
+            className={buttonVariants({ variant: 'outline', size: 'sm' })}
+          >
+            {t('stellarSelectionPages.howItWorks')}
+            <ArrowRight aria-hidden className="size-4" />
+          </Link>
+        }
+      />
     </PageShell>
   );
 };

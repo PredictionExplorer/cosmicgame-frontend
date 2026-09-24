@@ -41,6 +41,8 @@ export interface EthAllocationsTableProps {
   deadlines?: RetrievalDeadlines;
   /** Adds whether each allocation was retrieved (a wallet's whole history). */
   showStatus?: boolean;
+  /** Where each allocation came from; off where the page already says (Stellar Selection · ETH). */
+  showSource?: boolean;
   loading?: boolean;
   error?: ReactNode;
   onRetry?: () => void;
@@ -62,38 +64,41 @@ export function EthAllocationsTable({
   ariaLabel,
   deadlines,
   showStatus = false,
+  showSource = true,
   ...state
 }: EthAllocationsTableProps) {
   const t = useTranslations('myPages');
 
   const columns = useMemo<DataTableColumn<EthAllocationRow>[]>(() => {
+    const cycleColumn: DataTableColumn<EthAllocationRow> = {
+      id: 'cycle',
+      kind: 'link',
+      header: t('ethAllocations.columns.cycle'),
+      value: (row) => row.RoundNum,
+      cell: (row) =>
+        typeof row.RoundNum === 'number' ? (
+          <TableLink href={`/allocation/${row.RoundNum}`}>
+            {t('ethAllocations.cycle', { cycle: row.RoundNum })}
+          </TableLink>
+        ) : null,
+      nowrap: true,
+      sortable: true,
+    };
+    const sourceColumn: DataTableColumn<EthAllocationRow> = {
+      id: 'source',
+      kind: 'text',
+      header: t('ethAllocations.columns.source'),
+      value: (row) => {
+        const source =
+          row.RecordType === undefined ? undefined : SOURCE_BY_RECORD_TYPE[row.RecordType];
+        return source ? t(`ethAllocations.sources.${source}`) : null;
+      },
+      cell: (_row, { value }) => <Badge size="sm">{String(value)}</Badge>,
+      hideWhenEmpty: true,
+    };
     const list: DataTableColumn<EthAllocationRow>[] = [
-      {
-        id: 'cycle',
-        kind: 'link',
-        header: t('ethAllocations.columns.cycle'),
-        value: (row) => row.RoundNum,
-        cell: (row) =>
-          typeof row.RoundNum === 'number' ? (
-            <TableLink href={`/allocation/${row.RoundNum}`}>
-              {t('ethAllocations.cycle', { cycle: row.RoundNum })}
-            </TableLink>
-          ) : null,
-        nowrap: true,
-        sortable: true,
-      },
-      {
-        id: 'source',
-        kind: 'text',
-        header: t('ethAllocations.columns.source'),
-        value: (row) => {
-          const source =
-            row.RecordType === undefined ? undefined : SOURCE_BY_RECORD_TYPE[row.RecordType];
-          return source ? t(`ethAllocations.sources.${source}`) : null;
-        },
-        cell: (_row, { value }) => <Badge size="sm">{String(value)}</Badge>,
-        hideWhenEmpty: true,
-      },
+      cycleColumn,
+      ...(showSource ? [sourceColumn] : []),
       {
         id: 'allocated',
         kind: 'datetime',
@@ -143,7 +148,7 @@ export function EthAllocationsTable({
       });
     }
     return list;
-  }, [deadlines, showStatus, t]);
+  }, [deadlines, showSource, showStatus, t]);
 
   return (
     <DataTable

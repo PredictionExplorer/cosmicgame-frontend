@@ -604,21 +604,42 @@
     "empty": "暂无 NFT。"
   },
   "stellarSelectionEth": {
-    "invalidAddress": "地址无效",
-    "user": "参与者",
-    "heading": "此参与者获配的星选 ETH",
-    "retrievable": "可取回分配共 {amount} ETH",
-    "retrieveAll": "全部取回",
-    "empty": "暂无星选 ETH。"
+    "heading": "星选 · ETH",
+    "lede": "<term>星选</term>按周期分配给此参与者的 ETH。",
+    "figures": {
+      "total": "累计分配",
+      "count": "分配次数",
+      "waiting": "尚未取回"
+    },
+    "tableLabel": "星选 ETH 分配",
+    "emptyTitle": "暂无星选 ETH",
+    "emptyDescription": "当已收官的周期为此地址选出 ETH 分配时，会显示在这里。",
+    "retrieve": "取回 ETH"
   },
   "stellarSelectionNft": {
-    "invalidAddress": "地址无效",
-    "user": "参与者",
-    "heading": "此参与者获配的星选 NFT",
-    "loading": "加载中…",
-    "empty": "暂无 NFT 分配。",
-    "isRandomWalk": "来自 Random Walk",
-    "isAnchorHolder": "锚定者"
+    "heading": "星选 · NFT",
+    "lede": "<term>星选</term>分配给此参与者的 Cosmic Signature NFT。",
+    "figures": {
+      "count": "NFT 数量",
+      "cycles": "周期数"
+    },
+    "gridLabel": "星选 NFT",
+    "unnamed": "Cosmic Signature {id}",
+    "cycle": "第 {cycle} 个周期",
+    "sources": {
+      "participant": "参与者",
+      "randomWalkAnchor": "Random Walk 锚定者",
+      "anchorHolder": "锚定者"
+    },
+    "emptyTitle": "暂无星选 NFT",
+    "emptyDescription": "当已收官的周期为此地址选出 Cosmic Signature NFT 时，会显示在这里。"
+  },
+  "stellarSelectionPages": {
+    "invalidTitle": "地址无效",
+    "invalidDescription": "请检查链接中的地址：它以 0x 开头，后跟 40 个十六进制字符。",
+    "participant": "参与者",
+    "profile": "参与者统计",
+    "howItWorks": "星选如何运作"
   },
   "systemEvent": {
     "titleBeforeCycle": "第 {cycle} 个周期前的系统配置",

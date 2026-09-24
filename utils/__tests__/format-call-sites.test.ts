@@ -39,7 +39,6 @@ const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
   'app/[locale]/(app)/gesture/[id]/GesturePage.tsx': 2,
   'app/[locale]/(app)/my-anchors/MyAnchors.tsx': 1,
   'app/[locale]/(app)/page.tsx': 1,
-  'app/[locale]/(app)/user/stellar-selection-eth/[address]/UserStellarSelectionETHPage.tsx': 2,
   'components/anchoring/AnchorDistributionsTable.tsx': 2,
   'components/anchoring/AnchoredTokensTable.tsx': 1,
   'components/anchoring/CSTAnchorDistributionsByDepositTable.tsx': 3,

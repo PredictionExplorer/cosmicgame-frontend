@@ -604,21 +604,42 @@
     "empty": "아직 NFT가 없습니다."
   },
   "stellarSelectionEth": {
-    "invalidAddress": "유효하지 않은 주소",
-    "user": "사용자",
-    "heading": "이 참여자에게 배분된 별빛 선정 ETH",
-    "retrievable": "회수 가능한 배분: {amount} ETH",
-    "retrieveAll": "모두 회수",
-    "empty": "아직 별빛 선정 ETH가 없습니다."
+    "heading": "별빛 선정 · ETH",
+    "lede": "<term>별빛 선정</term>에서 사이클마다 이 참여자에게 배분된 ETH입니다.",
+    "figures": {
+      "total": "누적 배분",
+      "count": "배분 건수",
+      "waiting": "미회수"
+    },
+    "tableLabel": "별빛 선정 ETH 배분",
+    "emptyTitle": "아직 별빛 선정 ETH가 없습니다",
+    "emptyDescription": "마감된 사이클에서 이 주소가 ETH 배분에 선정되면 여기에 표시됩니다.",
+    "retrieve": "ETH 회수"
   },
   "stellarSelectionNft": {
-    "invalidAddress": "유효하지 않은 주소",
-    "user": "사용자",
-    "heading": "이 참여자에게 배분된 별빛 선정 NFT",
-    "loading": "불러오는 중…",
-    "empty": "아직 NFT 배분이 없습니다.",
-    "isRandomWalk": "RandomWalk 여부",
-    "isAnchorHolder": "앵커링 보유자 여부"
+    "heading": "별빛 선정 · NFT",
+    "lede": "<term>별빛 선정</term>에서 이 참여자에게 배분된 Cosmic Signature NFT입니다.",
+    "figures": {
+      "count": "NFT 수",
+      "cycles": "사이클 수"
+    },
+    "gridLabel": "별빛 선정 NFT",
+    "unnamed": "Cosmic Signature {id}",
+    "cycle": "사이클 {cycle}",
+    "sources": {
+      "participant": "참여자",
+      "randomWalkAnchor": "Random Walk 앵커링 보유자",
+      "anchorHolder": "앵커링 보유자"
+    },
+    "emptyTitle": "아직 별빛 선정 NFT가 없습니다",
+    "emptyDescription": "마감된 사이클에서 이 주소가 Cosmic Signature NFT에 선정되면 여기에 표시됩니다."
+  },
+  "stellarSelectionPages": {
+    "invalidTitle": "유효하지 않은 주소",
+    "invalidDescription": "링크의 주소를 확인해 주세요. 주소는 0x로 시작하며 16진수 문자 40개로 이루어집니다.",
+    "participant": "참여자",
+    "profile": "참여자 프로필",
+    "howItWorks": "별빛 선정 작동 원리"
   },
   "systemEvent": {
     "titleBeforeCycle": "사이클 {cycle} 이전에 설정된 시스템 구성",
