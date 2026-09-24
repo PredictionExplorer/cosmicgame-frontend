@@ -58,10 +58,7 @@ export function Hero({ hero }: { hero: LandingContent['hero'] }) {
             <SiteLink
               href={hero.secondaryCta.href}
               kind="internal"
-              className={cn(
-                buttonVariants({ variant: 'ghost', size: 'xl' }),
-                'text-foreground no-underline',
-              )}
+              className={cn(buttonVariants({ variant: 'quiet', size: 'xl' }), 'px-2')}
             >
               {hero.secondaryCta.label}
             </SiteLink>
