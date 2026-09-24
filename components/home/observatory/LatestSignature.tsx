@@ -102,6 +102,9 @@ export function LatestSignature({
                 sources={signatureSources(media)}
                 alt={alt}
                 sizes={sizes}
+                // The newest plate is the page's only artwork and sits in the
+                // first viewport from 1024px: load it eagerly, at high priority.
+                priority={current === 0}
                 unavailableLabel={
                   isRenderPending(imprintedAt, nowMs)
                     ? tDetail('image.rendering')

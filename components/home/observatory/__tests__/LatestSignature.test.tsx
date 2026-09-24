@@ -33,6 +33,18 @@ describe('LatestSignature', () => {
     ).toHaveAttribute('href', '/gallery');
   });
 
+  it('loads the newest plate eagerly for the first viewport, and older ones lazily', async () => {
+    const user = userEvent.setup();
+    render(<LatestSignature signatures={[token(47), token(46)]} />);
+    const newest = screen.getByRole('img', { name: 'home.latestSignature.unnamed(id=#000047)' });
+    expect(newest).toHaveAttribute('loading', 'eager');
+    expect(newest).toHaveAttribute('fetchpriority', 'high');
+
+    await user.click(screen.getByRole('button', { name: 'home.latestSignature.older' }));
+    const older = screen.getByRole('img', { name: 'home.latestSignature.unnamed(id=#000046)' });
+    expect(older).toHaveAttribute('loading', 'lazy');
+  });
+
   it('titles a named Signature by its name and keeps the number in the caption', () => {
     render(<LatestSignature signatures={[token(12, { TokenName: 'Twisted Mind' })]} />);
     expect(screen.getByText('Twisted Mind')).toBeVisible();
