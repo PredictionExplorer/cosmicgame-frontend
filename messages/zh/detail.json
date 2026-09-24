@@ -36,6 +36,7 @@
     "viewCycleDetails": "查看第 {round} 个周期详情"
   },
   "navigation": {
+    "label": "上一枚与下一枚签名",
     "previousToken": "上一枚代币",
     "nextToken": "下一枚代币"
   },
@@ -79,6 +80,7 @@
     "owner": "持有者",
     "ownerTooltip": "这枚代币的当前持有者，若经转移则可能与获配者不同。",
     "roundNumber": "第 {round} 个周期",
+    "anchoring": "锚定",
     "seed": "种子",
     "seedTooltip": "用于生成这枚代币画面与特征的唯一随机种子。",
     "copySeed": "复制种子"
@@ -90,5 +92,19 @@
   "image": {
     "defaultAlt": "NFT",
     "artworkUnavailable": "作品暂不可用"
+  },
+  "viewer": {
+    "modeLabel": "作品视图",
+    "still": "静态",
+    "motion": "动态",
+    "play": "播放动画",
+    "pause": "暂停动画",
+    "fullscreen": "全屏",
+    "zoomIn": "放大",
+    "zoomOut": "适应屏幕",
+    "zoomHint": "点按作品或按 + 键放大。",
+    "panHint": "拖动或使用方向键移动作品。按 0 键恢复为适应屏幕。",
+    "motionError": "动画无法加载。",
+    "motionLabel": "{subject} 的动画"
   }
 }

@@ -36,6 +36,7 @@
     "viewCycleDetails": "サイクル{round}の詳細を見る"
   },
   "navigation": {
+    "label": "前後のシグネチャー",
     "previousToken": "前のトークン",
     "nextToken": "次のトークン"
   },
@@ -79,6 +80,7 @@
     "owner": "所有者",
     "ownerTooltip": "このトークンの現在の保有者です。トークンが移転されていれば受領者と異なることがあります。",
     "roundNumber": "サイクル{round}",
+    "anchoring": "係留",
     "seed": "シード",
     "seedTooltip": "このトークンのアートワークと特性の生成に使われた唯一の乱数シードです。",
     "copySeed": "シードをコピー"
@@ -90,5 +92,19 @@
   "image": {
     "defaultAlt": "NFT",
     "artworkUnavailable": "アートワークを利用できません"
+  },
+  "viewer": {
+    "modeLabel": "アートワークの表示",
+    "still": "静止画",
+    "motion": "動画",
+    "play": "アニメーションを再生",
+    "pause": "アニメーションを一時停止",
+    "fullscreen": "全画面",
+    "zoomIn": "拡大",
+    "zoomOut": "画面に合わせる",
+    "zoomHint": "作品を選択するか+キーを押すと拡大します。",
+    "panHint": "ドラッグまたは矢印キーで作品を移動します。0キーで画面に合わせます。",
+    "motionError": "アニメーションを読み込めませんでした。",
+    "motionLabel": "{subject}のアニメーション"
   }
 }

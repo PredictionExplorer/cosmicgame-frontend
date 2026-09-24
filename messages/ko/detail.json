@@ -36,6 +36,7 @@
     "viewCycleDetails": "사이클 {round} 상세 보기"
   },
   "navigation": {
+    "label": "이전 및 다음 시그니처",
     "previousToken": "이전 토큰",
     "nextToken": "다음 토큰"
   },
@@ -79,6 +80,7 @@
     "owner": "소유자",
     "ownerTooltip": "이 토큰의 현재 보유자입니다. 토큰이 전송되었다면 수령자와 다를 수 있습니다.",
     "roundNumber": "사이클 {round}",
+    "anchoring": "앵커링",
     "seed": "시드",
     "seedTooltip": "이 토큰의 작품과 특성을 생성하는 데 사용된 고유한 무작위 시드입니다.",
     "copySeed": "시드 복사"
@@ -90,5 +92,19 @@
   "image": {
     "defaultAlt": "NFT",
     "artworkUnavailable": "작품을 불러올 수 없습니다"
+  },
+  "viewer": {
+    "modeLabel": "작품 보기 방식",
+    "still": "정지 화면",
+    "motion": "움직임",
+    "play": "애니메이션 재생",
+    "pause": "애니메이션 일시정지",
+    "fullscreen": "전체 화면",
+    "zoomIn": "확대",
+    "zoomOut": "화면에 맞춤",
+    "zoomHint": "작품을 선택하거나 + 키를 누르면 확대됩니다.",
+    "panHint": "드래그하거나 화살표 키로 작품을 살펴봅니다. 0 키를 누르면 화면에 맞춥니다.",
+    "motionError": "애니메이션을 불러올 수 없습니다.",
+    "motionLabel": "{subject} 애니메이션"
   }
 }

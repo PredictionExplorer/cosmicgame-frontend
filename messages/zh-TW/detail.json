@@ -36,6 +36,7 @@
     "viewCycleDetails": "檢視第 {round} 個週期詳情"
   },
   "navigation": {
+    "label": "上一枚與下一枚簽名",
     "previousToken": "上一枚代幣",
     "nextToken": "下一枚代幣"
   },
@@ -79,6 +80,7 @@
     "owner": "持有者",
     "ownerTooltip": "這枚代幣的目前持有者，若經轉移則可能與獲配者不同。",
     "roundNumber": "第 {round} 個週期",
+    "anchoring": "錨定",
     "seed": "種子",
     "seedTooltip": "用於生成這枚代幣畫面與特徵的唯一隨機種子。",
     "copySeed": "複製種子"
@@ -90,5 +92,19 @@
   "image": {
     "defaultAlt": "NFT",
     "artworkUnavailable": "作品暫不可用"
+  },
+  "viewer": {
+    "modeLabel": "作品檢視",
+    "still": "靜態",
+    "motion": "動態",
+    "play": "播放動畫",
+    "pause": "暫停動畫",
+    "fullscreen": "全螢幕",
+    "zoomIn": "放大",
+    "zoomOut": "符合視窗大小",
+    "zoomHint": "點按作品或按 + 鍵放大。",
+    "panHint": "拖曳或使用方向鍵移動作品。按 0 鍵恢復為符合視窗大小。",
+    "motionError": "動畫無法載入。",
+    "motionLabel": "{subject} 的動畫"
   }
 }

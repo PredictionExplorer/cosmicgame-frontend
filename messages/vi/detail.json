@@ -36,6 +36,7 @@
     "viewCycleDetails": "Xem chi tiết chu kỳ #{round}"
   },
   "navigation": {
+    "label": "Signature trước và sau",
     "previousToken": "Token trước",
     "nextToken": "Token sau"
   },
@@ -79,6 +80,7 @@
     "owner": "Chủ sở hữu",
     "ownerTooltip": "Người nắm giữ token này hiện tại. Có thể khác với người nhận nếu token đã được chuyển giao.",
     "roundNumber": "Chu kỳ #{round}",
+    "anchoring": "Neo giữ",
     "seed": "Seed",
     "seedTooltip": "Seed ngẫu nhiên độc nhất được dùng để tạo tác phẩm và đặc tính của token này.",
     "copySeed": "Sao chép seed"
@@ -90,5 +92,19 @@
   "image": {
     "defaultAlt": "NFT",
     "artworkUnavailable": "Tác phẩm không khả dụng"
+  },
+  "viewer": {
+    "modeLabel": "Chế độ xem tác phẩm",
+    "still": "Ảnh tĩnh",
+    "motion": "Chuyển động",
+    "play": "Phát hoạt ảnh",
+    "pause": "Tạm dừng hoạt ảnh",
+    "fullscreen": "Toàn màn hình",
+    "zoomIn": "Phóng to",
+    "zoomOut": "Vừa màn hình",
+    "zoomHint": "Chọn tác phẩm hoặc nhấn + để phóng to.",
+    "panHint": "Kéo hoặc dùng phím mũi tên để di chuyển quanh tác phẩm. Nhấn 0 để vừa màn hình.",
+    "motionError": "Không thể tải hoạt ảnh.",
+    "motionLabel": "Hoạt ảnh của {subject}"
   }
 }
