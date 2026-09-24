@@ -855,7 +855,15 @@ function HeaderCell<T>({
       {col.help ? (
         // The help button trails its label, so it always reads as part of
         // this column's header rather than floating towards the next one.
-        <span className="inline-flex max-w-full items-end gap-1.5 align-bottom">
+        // On coarse pointers its 44px box reaches 15px left of the icon; a
+        // 20px gap keeps that box off a sortable label, so a tap on the end
+        // of the label sorts instead of opening the help.
+        <span
+          className={cn(
+            'inline-flex max-w-full items-end gap-1.5 align-bottom',
+            column.sortable && 'pointer-coarse:gap-5',
+          )}
+        >
           {label}
           <InfoTooltip
             content={col.help}
