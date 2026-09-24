@@ -33,6 +33,7 @@ interface MarketingRewardsPageProps {
  */
 export default function MarketingRewardsPage({ address: rawAddress }: MarketingRewardsPageProps) {
   const t = useTranslations('marketing');
+  const tTables = useTranslations('tables');
   const locale = useLocale();
   const address = isAddress(rawAddress.toLowerCase()) ? getAddress(rawAddress.toLowerCase()) : null;
   const query = useMarketingRewardsByUser(address ?? undefined);
@@ -130,6 +131,7 @@ export default function MarketingRewardsPage({ address: rawAddress }: MarketingR
     <LedgerPage header={header} width="narrow">
       <MarketingRewardsTable
         list={rewards}
+        title={tTables('outreach.allocationsTitle')}
         loading={query.isLoading}
         error={query.isError ? t('loadError') : undefined}
         onRetry={() => void query.refetch()}

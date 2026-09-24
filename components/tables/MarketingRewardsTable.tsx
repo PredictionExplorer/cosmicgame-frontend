@@ -15,10 +15,12 @@ interface MarketingRewardsTableProps extends LedgerStateProps {
 }
 
 /**
- * One contributor's Outreach Reserve allocations under their own heading
- * ("Allocations"), each date linked to its transaction. An allocation too
- * small to show at table precision ("<0.01", a test transfer of a few base
- * units) is muted like dust in every ledger, and a note beside the row
+ * One contributor's Outreach Reserve allocations, each date linked to its
+ * transaction. The table has no heading of its own: the outreach address
+ * page passes `title` ("Allocations"), while a participant's profile shows
+ * it under its own "Outreach allocations" section heading. An allocation
+ * too small to show at table precision ("<0.01", a test transfer of a few
+ * base units) is muted like dust in every ledger, and a note beside the row
  * range says why whenever the list holds one.
  */
 const MarketingRewardsTable = ({ list, ...state }: MarketingRewardsTableProps) => {
@@ -55,7 +57,6 @@ const MarketingRewardsTable = ({ list, ...state }: MarketingRewardsTableProps) =
       data={list}
       columns={columns}
       ariaLabel={t('names.outreachAllocations')}
-      title={t('outreach.allocationsTitle')}
       getRowKey={(row) => row.EvtLogId}
       emptyTitle={t('empty.outreachAllocations')}
       initialSort={{ id: 'datetime', direction: 'desc' }}
