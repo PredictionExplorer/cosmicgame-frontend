@@ -119,7 +119,7 @@ export const howItWorksTextEn = {
       {
         title: 'Connect your wallet',
         highlights: [
-          'Press “Connect wallet” at the top of the page.',
+          'Press the connect button at the top right of the page.',
           'Use a wallet that supports Arbitrum, such as MetaMask. Arbitrum is an Ethereum Layer 2 with lower fees and faster transactions.',
           'Switch to the Arbitrum network when your wallet asks, then approve the connection.',
           'Once you are connected, your address appears in the header.',

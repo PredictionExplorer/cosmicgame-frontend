@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+
 import { findFaqItemByHash, getFaqContent } from '@/content/faq';
 import {
   getHowItWorksContent,
@@ -116,6 +119,30 @@ describe('how-it-works content', () => {
       expect(funding.link.label.trim()).not.toBe('');
       const hash = funding.link.href.slice(funding.link.href.indexOf('#'));
       expect(findFaqItemByHash(getFaqContent(locale), hash)).not.toBeNull();
+    }
+  });
+
+  it('never quotes the wallet button, whose label differs by width (D081)', () => {
+    for (const locale of routing.locales) {
+      const wallet = JSON.parse(
+        readFileSync(path.join(process.cwd(), 'messages', locale, 'wallet.json'), 'utf8'),
+      ) as { connect: { buttonShort: string } };
+      // "Connect Wallet" on desktop, "Connect" on phones: any quoted label
+      // naming the button is wrong on one of them.
+      const word = wallet.connect.buttonShort.toLowerCase();
+      const copy = JSON.stringify(getHowItWorksContent(locale));
+      for (const [open, close] of [
+        ['“', '”'],
+        ['‘', '’'],
+        ['「', '」'],
+        ['«', '»'],
+      ]) {
+        for (const [, quoted = ''] of copy.matchAll(
+          new RegExp(`${open}([^${close}]*)${close}`, 'g'),
+        )) {
+          expect(quoted.toLowerCase()).not.toContain(word);
+        }
+      }
     }
   });
 

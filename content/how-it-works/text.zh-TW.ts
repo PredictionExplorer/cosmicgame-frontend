@@ -119,7 +119,7 @@ export const howItWorksTextZhTw = {
       {
         title: '連接錢包',
         highlights: [
-          '點選頁面頂部的「連接錢包」按鈕。',
+          '點選頁面右上角的連接按鈕。',
           '使用支援 Arbitrum 的錢包，例如 MetaMask。Arbitrum 是以太坊的 Layer 2，Gas 費更低，交易更快。',
           '按提示將網路切換至 Arbitrum，並確認連線。',
           '連線完成後，錢包地址會顯示在頁面頂部。',

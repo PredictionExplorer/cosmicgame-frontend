@@ -123,7 +123,7 @@ export const howItWorksTextVi = {
       {
         title: 'Kết nối ví',
         highlights: [
-          'Nhấn nút “Kết nối ví” ở đầu trang.',
+          'Nhấn nút kết nối ở góc trên bên phải của trang.',
           'Dùng một ví hỗ trợ Arbitrum, chẳng hạn MetaMask. Arbitrum là một Layer 2 của Ethereum với phí thấp hơn và giao dịch nhanh hơn.',
           'Chuyển mạng sang Arbitrum khi ví yêu cầu, rồi chấp thuận kết nối.',
           'Sau khi kết nối, địa chỉ ví của bạn xuất hiện trên đầu trang.',
