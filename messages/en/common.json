@@ -55,9 +55,10 @@
     "updated": "Updated {age}",
     "reconnecting": "Reconnecting…",
     "delayed": "Updates delayed · last update {age}",
+    "delayedCaveat": "Updates delayed · last update {age}. The clock may have been extended since then.",
     "offline": "Offline",
     "offlineDetail": "You’re offline. Last update {age}.",
-    "clockCaveat": "The clock may have been extended since then.",
+    "offlineCaveat": "You’re offline. Last update {age}. The clock may have been extended since then.",
     "age": {
       "justNow": "just now",
       "seconds": "{count}s ago",

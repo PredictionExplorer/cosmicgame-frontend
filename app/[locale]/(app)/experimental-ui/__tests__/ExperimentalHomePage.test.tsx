@@ -198,7 +198,11 @@ jest.mock('@tanstack/react-query', () => ({
   useQueryClient: () => ({
     invalidateQueries: mockInvalidateQueries,
     setQueryData: mockSetQueryData,
-    getQueryCache: () => ({ subscribe: () => () => undefined, findAll: () => [] }),
+    getQueryCache: () => ({
+      subscribe: () => () => undefined,
+      findAll: () => [],
+      getAll: () => [],
+    }),
   }),
 }));
 

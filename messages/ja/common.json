@@ -55,9 +55,10 @@
     "updated": "{age}に更新",
     "reconnecting": "再接続中…",
     "delayed": "更新が遅れています・最終更新{age}",
+    "delayedCaveat": "更新が遅れています・最終更新{age}。その後、確定時刻が延長されている可能性があります。",
     "offline": "オフライン",
     "offlineDetail": "ネットワークに接続されていません。最終更新は{age}です。",
-    "clockCaveat": "その後、確定時刻が延長されている可能性があります。",
+    "offlineCaveat": "ネットワークに接続されていません。最終更新は{age}です。その後、確定時刻が延長されている可能性があります。",
     "age": {
       "justNow": "たった今",
       "seconds": "{count}秒前",

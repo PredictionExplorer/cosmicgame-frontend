@@ -7,6 +7,7 @@ import type { ReactNode } from 'react';
 const emptyQueryCache = {
   subscribe: () => () => undefined,
   findAll: () => [],
+  getAll: () => [],
 };
 
 module.exports = {

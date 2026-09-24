@@ -55,9 +55,10 @@
     "updated": "{age}更新",
     "reconnecting": "重新连接中…",
     "delayed": "更新延迟 · 最后更新：{age}",
+    "delayedCaveat": "更新延迟 · 最后更新：{age}。此后倒计时可能已被延长。",
     "offline": "离线",
     "offlineDetail": "网络已断开。最后更新：{age}。",
-    "clockCaveat": "此后倒计时可能已被延长。",
+    "offlineCaveat": "网络已断开。最后更新：{age}。此后倒计时可能已被延长。",
     "age": {
       "justNow": "刚刚",
       "seconds": "{count} 秒前",

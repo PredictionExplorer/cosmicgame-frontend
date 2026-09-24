@@ -55,9 +55,10 @@
     "updated": "{age}更新",
     "reconnecting": "重新連線中…",
     "delayed": "更新延遲 · 最後更新：{age}",
+    "delayedCaveat": "更新延遲 · 最後更新：{age}。此後倒數可能已被延長。",
     "offline": "離線",
     "offlineDetail": "網路連線已中斷。最後更新：{age}。",
-    "clockCaveat": "此後倒數可能已被延長。",
+    "offlineCaveat": "網路連線已中斷。最後更新：{age}。此後倒數可能已被延長。",
     "age": {
       "justNow": "剛剛",
       "seconds": "{count} 秒前",

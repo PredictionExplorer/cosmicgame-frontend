@@ -4,18 +4,19 @@ import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 import { getFreshnessAge, type LiveFreshness } from '@/lib/liveFreshness';
+import { stateTone } from '@/lib/stateTone';
 
 /*
- * State colours: `--live` / `--attention` are the palette-tuned state tokens;
- * the fallbacks match their shared defaults. Colour never carries the state
- * alone — every variant has the state as text (visible or sr-only).
+ * State colours from the palette-tuned state tokens (lib/stateTone). Colour
+ * never carries the state alone — every variant has the state as text
+ * (visible or sr-only).
  */
 const DOT_CLASS: Record<LiveFreshness, string> = {
-  live: 'bg-[hsl(var(--live,var(--positive,var(--success))))] animate-live-dot',
+  live: cn(stateTone.liveDot, 'animate-live-dot'),
   connecting: 'bg-muted-foreground/60',
-  reconnecting: 'bg-[hsl(var(--attention,40_90%_68%))]',
-  delayed: 'bg-[hsl(var(--attention,40_90%_68%))]',
-  offline: 'bg-[hsl(var(--critical,0_80%_72%))]',
+  reconnecting: stateTone.attentionDot,
+  delayed: stateTone.attentionDot,
+  offline: stateTone.criticalDot,
 };
 
 export type LiveStatusVariant = 'dot' | 'chip' | 'inline';
@@ -67,15 +68,23 @@ export function LiveStatusView({
     delayed: t('liveStatus.delayed', { age }),
     offline: t('liveStatus.offline'),
   };
+  // The clock caveat is part of one message per state, so every locale
+  // joins the two sentences with its own punctuation.
+  const caveatLabel =
+    clockCaveat && state === 'delayed'
+      ? t('liveStatus.delayedCaveat', { age })
+      : clockCaveat && state === 'offline'
+        ? t('liveStatus.offlineCaveat', { age })
+        : null;
   const visibleLabel =
-    variant === 'inline'
+    caveatLabel ??
+    (variant === 'inline'
       ? state === 'live'
         ? t('liveStatus.updated', { age })
         : state === 'offline'
           ? t('liveStatus.offlineDetail', { age })
           : stateLabel[state]
-      : stateLabel[state];
-  const showCaveat = clockCaveat && (state === 'delayed' || state === 'offline');
+      : stateLabel[state]);
 
   const dot = (
     <span
@@ -102,7 +111,6 @@ export function LiveStatusView({
       {variant !== 'dot' && (
         <span aria-hidden className="min-w-0 truncate">
           {visibleLabel}
-          {showCaveat && ` ${t('liveStatus.clockCaveat')}`}
         </span>
       )}
     </span>

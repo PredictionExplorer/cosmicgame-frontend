@@ -55,9 +55,10 @@
     "updated": "Cập nhật {age}",
     "reconnecting": "Đang kết nối lại…",
     "delayed": "Cập nhật bị chậm · lần cuối {age}",
+    "delayedCaveat": "Cập nhật bị chậm · lần cuối {age}. Từ lúc đó đồng hồ có thể đã được kéo dài.",
     "offline": "Ngoại tuyến",
     "offlineDetail": "Không có mạng. Lần cập nhật cuối {age}.",
-    "clockCaveat": "Từ lúc đó đồng hồ có thể đã được kéo dài.",
+    "offlineCaveat": "Không có mạng. Lần cập nhật cuối {age}. Từ lúc đó đồng hồ có thể đã được kéo dài.",
     "age": {
       "justNow": "vừa xong",
       "seconds": "{count} giây trước",

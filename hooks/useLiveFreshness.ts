@@ -4,6 +4,7 @@ import { useSyncExternalStore } from 'react';
 import {
   onlineManager,
   useQueryClient,
+  type Query,
   type QueryClient,
   type QueryKey,
 } from '@tanstack/react-query';
@@ -47,9 +48,44 @@ interface QueryFreshnessStore {
   getSnapshot: () => string;
 }
 
+type AnyQuery = Query<unknown, Error, unknown, QueryKey>;
+
+/**
+ * When each query last received data FROM THE NETWORK, per query client.
+ *
+ * `dataUpdatedAt` also moves on local writes — the optimistic gesture row
+ * (`setQueryData`) and the chain sync that patches the dashboard snapshot —
+ * so reading it would call the page live while every poll was failing. Only
+ * a fetch's success action (not `manual`, which is what `setQueryData`
+ * dispatches) counts here. One permanent cache subscriber per client keeps
+ * the record, so fetches that land while no indicator is mounted still count.
+ */
+const fetchSuccessByClient = new WeakMap<QueryClient, WeakMap<AnyQuery, number>>();
+
+function getFetchSuccessLog(queryClient: QueryClient): WeakMap<AnyQuery, number> {
+  const existing = fetchSuccessByClient.get(queryClient);
+  if (existing) return existing;
+
+  const log = new WeakMap<AnyQuery, number>();
+  const cache = queryClient.getQueryCache();
+  // Data already in the cache when the first indicator mounts came from a
+  // fetch (server seeds are dated 0 and optimistic writes need a gesture on
+  // a page that shows an indicator), so it seeds the record.
+  for (const query of cache.getAll() as AnyQuery[]) {
+    if (query.state.dataUpdatedAt > 0) log.set(query, query.state.dataUpdatedAt);
+  }
+  cache.subscribe((event) => {
+    if (event.type !== 'updated' || event.action.type !== 'success') return;
+    if ('manual' in event.action && event.action.manual) return;
+    log.set(event.query as AnyQuery, event.query.state.dataUpdatedAt);
+  });
+  fetchSuccessByClient.set(queryClient, log);
+  return log;
+}
+
 /**
  * A tiny external store over React Query's cache: the snapshot is a string
- * ("<last success ms>|<failed flag>") so `useSyncExternalStore` only
+ * ("<last fetch success ms>|<failed flag>") so `useSyncExternalStore` only
  * re-renders when one of the two facts actually changes.
  */
 function createQueryFreshnessStore(
@@ -58,15 +94,16 @@ function createQueryFreshnessStore(
 ): QueryFreshnessStore {
   const queryKeys = JSON.parse(keySignature) as QueryKey[];
   const cache = queryClient.getQueryCache();
+  const fetchSuccessLog = getFetchSuccessLog(queryClient);
   return {
     subscribe: (callback: () => void) => cache.subscribe(callback),
     getSnapshot: (): string => {
       let lastSuccessAtMs = 0;
       let lastAttemptFailed = false;
       for (const queryKey of queryKeys) {
-        for (const query of cache.findAll({ queryKey })) {
-          const { dataUpdatedAt, fetchFailureCount, status } = query.state;
-          lastSuccessAtMs = Math.max(lastSuccessAtMs, dataUpdatedAt);
+        for (const query of cache.findAll({ queryKey }) as AnyQuery[]) {
+          const { fetchFailureCount, status } = query.state;
+          lastSuccessAtMs = Math.max(lastSuccessAtMs, fetchSuccessLog.get(query) ?? 0);
           // React Query resets the failure count on success, so a non-zero
           // count means the latest attempt failed (retrying or given up).
           if (fetchFailureCount > 0 || status === 'error') lastAttemptFailed = true;
