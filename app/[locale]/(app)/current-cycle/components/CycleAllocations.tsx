@@ -55,9 +55,9 @@ function joinParts(parts: ReactNode[]): ReactNode {
     <Fragment key={index}>
       <span className="whitespace-nowrap">
         {part}
-        {index < last ? <span className="pl-1.5 text-subtle">·</span> : null}
+        {index < last ? <span className="px-1.5 text-subtle">·</span> : null}
       </span>
-      {index < last ? ' ' : null}
+      {index < last ? <wbr /> : null}
     </Fragment>
   ));
 }

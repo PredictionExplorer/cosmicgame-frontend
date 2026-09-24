@@ -76,7 +76,11 @@ describe('CycleAllocations', () => {
   it('ends each part of a receipt with its separator, so a wrapped line never starts with one', () => {
     render(<CycleAllocations data={data} headingId="allocations" />);
     const receipt = document.querySelector('li[data-allocation="signature"] p') as HTMLElement;
-    const parts = Array.from(receipt.children) as HTMLElement[];
+    const parts = Array.from(receipt.children).filter(
+      (child) => child.tagName === 'SPAN',
+    ) as HTMLElement[];
+    // A break opportunity between parts, never inside one.
+    expect(Array.from(receipt.children).filter((child) => child.tagName === 'WBR')).toHaveLength(3);
 
     expect(parts).toHaveLength(4);
     for (const part of parts.slice(0, -1)) expect(part.textContent).toMatch(/·$/);
