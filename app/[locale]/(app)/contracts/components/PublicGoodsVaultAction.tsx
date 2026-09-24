@@ -5,8 +5,9 @@ import { useQueryClient } from '@tanstack/react-query';
 import { SendHorizontal } from 'lucide-react';
 
 import { charityWalletAbi as CHARITY_WALLET_ABI } from '@/contracts/abis';
+import { protocolFacts } from '@/content/protocol-facts';
 
-import { formatPercent } from '@/utils/format';
+import { formatPercent, sameAddress } from '@/utils/format';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import { AddressChip } from '@/components/ui/address-chip';
 import { Amount } from '@/components/ui/amount';
@@ -36,7 +37,9 @@ export interface PublicGoodsVaultActionProps {
  * Public Goods: the vault, its beneficiary and share, the balance waiting in
  * the vault, and, only when there is a balance, the action that forwards it.
  * Anyone may call the vault's send(); it pays out to the beneficiary, never to
- * the caller, so the action is offered to every connected wallet.
+ * the caller, so the action is offered to every connected wallet. A balance
+ * that could not be read is said as such: the panel neither calls the vault
+ * empty nor offers an action it cannot vouch for.
  */
 export function PublicGoodsVaultAction({
   vaultAddress,
@@ -59,6 +62,9 @@ export function PublicGoodsVaultAction({
   const balance = vaultBalanceEth === undefined ? undefined : toFiniteNumber(vaultBalanceEth);
   const hasFunds = typeof balance === 'number' && balance > 0;
   const share = toFiniteNumber(sharePercent);
+  // Named only when it is the documented beneficiary; any other address reads as hex.
+  const { name: beneficiaryName, address: documentedBeneficiary } =
+    protocolFacts.publicGoodsBeneficiary;
 
   const forward = () =>
     tx.run({
@@ -94,7 +100,14 @@ export function PublicGoodsVaultAction({
         ) : beneficiaryAddress === null ? (
           unknown
         ) : (
-          <AddressChip address={beneficiaryAddress} variant="plain" href={false} />
+          <AddressChip
+            address={beneficiaryAddress}
+            variant="plain"
+            href={false}
+            label={
+              sameAddress(beneficiaryAddress, documentedBeneficiary) ? beneficiaryName : undefined
+            }
+          />
         ),
     },
     {
@@ -155,7 +168,14 @@ export function PublicGoodsVaultAction({
         </dl>
 
         <div className="space-y-3">
-          {balance === undefined ? null : hasFunds ? (
+          {balance === undefined ? null : balance === null ? (
+            <p
+              data-testid="vault-balance-unavailable"
+              className="type-body-sm text-muted-foreground"
+            >
+              {t('vault.balanceUnavailable')}
+            </p>
+          ) : hasFunds ? (
             <>
               <p className="type-body-sm text-muted-foreground">{t('vault.note')}</p>
               {active && account ? (

@@ -172,6 +172,7 @@
     "share": "Share of each cycle",
     "balance": "In vault now",
     "empty": "The vault is empty: nothing to forward yet.",
+    "balanceUnavailable": "The vault balance could not be read, so forwarding is not offered right now.",
     "note": "Anyone can forward the vault's balance to the beneficiary; it costs only gas."
   },
   "seo": {

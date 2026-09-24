@@ -172,6 +172,7 @@
     "share": "Tỷ lệ mỗi chu kỳ",
     "balance": "Hiện có trong kho",
     "empty": "Kho đang trống: chưa có gì để chuyển.",
+    "balanceUnavailable": "Không đọc được số dư của kho, nên hiện chưa thể chuyển.",
     "note": "Bất kỳ ai cũng có thể chuyển số dư của kho đến đơn vị thụ hưởng; chỉ tốn phí gas."
   },
   "seo": {

@@ -71,6 +71,38 @@ describe('PublicGoodsVaultAction', () => {
     expect(screen.queryByRole('button', { name: /forward/i })).not.toBeInTheDocument();
   });
 
+  // A failed dashboard read (or one without CharityBalanceEth) reaches the panel as
+  // null; it once read as "The vault is empty" beside a balance row saying "Unavailable".
+  it('never calls an unreadable balance empty, and offers no action for it', () => {
+    renderWithQuery(<PublicGoodsVaultAction {...props} vaultBalanceEth={null} />);
+    expect(screen.queryByTestId('vault-empty')).toBeNull();
+    expect(screen.getByTestId('vault-balance-unavailable')).toHaveTextContent(
+      'The vault balance could not be read, so forwarding is not offered right now.',
+    );
+    expect(document.querySelector('[data-row="balance"] dd')).toHaveTextContent(
+      'common.status.unavailable',
+    );
+    expect(screen.queryByRole('button', { name: /forward/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'wallet.connect' })).not.toBeInTheDocument();
+  });
+
+  it('names the documented beneficiary and keeps any other address as hex', () => {
+    const { unmount } = renderWithQuery(<PublicGoodsVaultAction {...props} />);
+    const named = document.querySelector('[data-row="beneficiary"] dd');
+    expect(named).toHaveTextContent('Protocol Guild');
+    expect(named?.querySelector('[title]')).toHaveAttribute(
+      'title',
+      expect.stringContaining(BENEFICIARY),
+    );
+    unmount();
+
+    const other = '0x1111111111111111111111111111111111111111';
+    renderWithQuery(<PublicGoodsVaultAction {...props} beneficiaryAddress={other} />);
+    const hex = document.querySelector('[data-row="beneficiary"] dd');
+    expect(hex).not.toHaveTextContent('Protocol Guild');
+    expect(hex).toHaveTextContent(/0x1111/);
+  });
+
   it('asks a visitor without a wallet to connect one', () => {
     mockUseActiveWeb3React.mockReturnValue({ account: undefined, active: false });
     renderWithQuery(<PublicGoodsVaultAction {...props} />);
