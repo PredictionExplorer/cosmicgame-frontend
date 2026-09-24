@@ -313,6 +313,56 @@ palette's foreground colour. It is masked to the gutters outside the content col
 (`--starfield-column`, 100rem by default: the app home's control desk), so it never sits
 behind text. There is no canvas and no motion.
 
+## Tables
+
+Every ledger is a `<DataTable>` (`@/components/ui/data-table`). It sits on the
+`ResponsiveTable*` primitives in `components/ui/responsive-table.tsx`, and
+`styles/tables.css` owns the layout. Static, server-rendered tables such as the white
+paper's use `<Table>` from `components/ui/table.tsx`, which draws the same `.cs-table`.
+
+**Column kinds.** A column declares what it holds, and the kind sets its alignment,
+wrapping, figures, renderer and first sort direction. Alignment reaches the header and
+its cells as one `data-align`, so the two cannot disagree.
+
+| Kind                                     | Align  | Renders with                          |
+| ---------------------------------------- | ------ | ------------------------------------- |
+| `text`, `link`                           | start  | text, or a same-tab `Link`            |
+| `address`                                | start  | `<AddressChip variant="plain">`       |
+| `datetime`                               | start  | `<DateTime>`, linked to its tx proof  |
+| `amount`, `count`, `percent`, `duration` | end    | the wave-1 formatters, tabular        |
+| `status`                                 | center | a status icon (the only centred kind) |
+
+`cell` replaces the renderer while the kind keeps the alignment. `value` is what sorts,
+and blank values sort last in both directions. Give `align` only to an unusual column.
+
+**Phones.** Below 40em a table with more than three columns turns each row into a record.
+The label (the column header in sentence case, 13px, `text-subtle`) sits at the start and
+the 14px value at the end. `stack` puts long text under its label. Blank cells and
+`priority: 'secondary'` columns drop out, so no empty labelled line is left behind. A
+table of three columns or fewer stays a table (`layout="compact"`).
+
+**States.** `loading` draws skeleton rows at the real row height. `error` with `onRetry`
+shows an `ErrorState` with a retry button, and an empty list shows an `EmptyState`
+(`emptyTitle`, `emptyDescription`, `emptyAction`). A table never shows a bare "No data"
+line.
+
+**Pages.** 20 rows a page, or 10 on a phone. `TablePagination` shows Previous and Next
+with the range ("1–20 of 1,140") and hides itself when everything fits on one page.
+
+**Links.** `getRowHref` makes the first column's value (or `rowLinkColumn`'s) a real
+same-tab link, and a click anywhere else on the row follows it too. `TableLink` covers
+other internal links in a cell and `TxProofLink` covers explorer proof (a new tab,
+announced). Addresses go through the `address` kind, never a hand-built explorer URL.
+
+**One frame.** A table inside a panel or section uses the section's frame. Pass
+`variant="framed"` to `ResponsiveTableContainer` only for a table that stands alone.
+
+**The connected wallet.** `isCurrentRow` marks the wallet's row with a 2px accent rule
+and a "You" tag, and the row keeps its ranked place. A line above the table gives the
+position ("#3 of 37") and a "Show my row" button that jumps to its page.
+`currentRowSummary` adds figures to that line. Never append "(You)" to the address
+text.
+
 ## Retired patterns
 
 `styles/__tests__/token-usage.test.ts` counts these in `app/` and `components/`, and the
@@ -342,6 +392,10 @@ counts may only fall. When a change removes some, lower the baseline in the same
   shim (compiled through Tailwind, to prove its layer, order and specificity), the display
   guard, the 12px floor, the CJK eyebrow reset, figure faces and numerals, display tokens
   and the content edge.
+- `styles/__tests__/tables-css.test.ts` pins the ledger layout: shared alignment, tabular
+  figures, phone records, dropped blank and secondary lines, the scroll cue and print.
+- `components/ui/data-table/__tests__/` covers column kinds, sorting, paging, states and
+  the phone layouts.
 - `lib/theme/__tests__/dataColors.test.ts` ties the chart colours to the method tokens.
 - `lib/__tests__/fonts-policy.test.ts`, `lib/__tests__/fonts.test.ts` and
   `lib/__tests__/display-font-coverage.test.ts` cover font delivery and script coverage.
