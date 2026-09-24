@@ -328,7 +328,7 @@ describe('opengraph-image routes', () => {
   );
 
   it('brand cards on both hosts show the newest Signature and regenerate hourly', async () => {
-    for (const path of [STATIC_ROUTES.appHome, STATIC_ROUTES.landingGroup, STATIC_ROUTES.about]) {
+    for (const path of [STATIC_ROUTES.appHome, STATIC_ROUTES.landingGroup]) {
       const route = load(path);
       expect(route.revalidate).toBe(3600);
       await route.default(params({ locale: 'en' }));
@@ -343,6 +343,20 @@ describe('opengraph-image routes', () => {
     expect(lastCard().element.props.domain).toBe('cosmicsignature.com');
     await load(STATIC_ROUTES.appHome).default(params({ locale: 'en' }));
     expect(lastCard().element.props.domain).toBe('app.cosmicsignature.com');
+  });
+
+  it('About shows its own title beside the Signature that opens the page', async () => {
+    const route = load(STATIC_ROUTES.about);
+    // A bundled plate, not the newest Signature: nothing to regenerate.
+    expect(route.revalidate).toBeUndefined();
+    await route.default(params({ locale: 'en' }));
+    expect(lastCard().element.props).toEqual(
+      expect.objectContaining({
+        title: 'About Cosmic Signature',
+        domain: 'cosmicsignature.com',
+        art: [expect.objectContaining({ label: 'Signature #000002 · Cycle 0' })],
+      }),
+    );
   });
 
   it('embeds the locale’s faces and uppercases eyebrows in cased scripts', async () => {

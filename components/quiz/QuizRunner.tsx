@@ -1,418 +1,753 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, BookOpen, Check, RotateCcw, Sparkles, X } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { motion } from 'framer-motion';
+import { ArrowRight, ArrowUpRight, BookOpen, Check, RotateCcw, Sparkles, X } from 'lucide-react';
 
-import type { QuizQuestion, QuizRunnerUi, QuizTier } from '@/content/quiz';
+import type { QuizRunnerUi, QuizTier } from '@/content/quiz';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { renderTemplate } from '@/components/reading/template';
 import { Link } from '@/i18n/navigation';
-import { fadeRise, scaleIn, slideInRight, useMotionVariants } from '@/lib/motion';
+import { getLocaleConfig } from '@/i18n/localeConfig';
+import { fadeRise, slideInRight, useMotionVariants } from '@/lib/motion';
 import { cn } from '@/lib/utils';
+import { revealElement, revealTop } from '@/components/reading/scrolling';
 
-interface QuizRunnerProps {
+import { RankLadder } from './RankLadder';
+import {
+  NEXT_TIER_THRESHOLD,
+  attemptStorageKey,
+  browserStorage,
+  buildAttempt,
+  clearSavedAttempt,
+  fillTemplate,
+  rankFor,
+  readSavedAttempt,
+  recordBestScore,
+  saveAttempt,
+  type QuizAttempt,
+  type QuizAttemptQuestion,
+  type QuizBestScore,
+  type QuizRankKey,
+} from './quizProgress';
+
+export interface QuizNextTier {
+  title: string;
+  href: string;
+}
+
+export interface QuizRunnerProps {
   tier: QuizTier;
   ui: QuizRunnerUi;
+  /** The active locale: it keys the saved run, whose copy is per locale. */
+  locale: string;
   hubHref: string;
+  /** Where each rank starts, formatted for the locale ("From 50%"). */
+  rankFloors: Readonly<Record<QuizRankKey, string | null>>;
+  /** The next tier, suggested from half the answers right. */
+  nextTier?: QuizNextTier;
+  /** `{correct}` and `{total}`: the reader's best result, shown under the score. */
+  bestTemplate: string;
 }
 
 type Phase = 'intro' | 'running' | 'summary';
 
-/** A question with its options in this attempt's display order. */
-interface AttemptQuestion {
-  question: QuizQuestion;
-  options: QuizQuestion['options'];
-}
-
-interface AnswerRecord {
-  questionId: string;
-  chosenOptionId: string;
-  correct: boolean;
-}
-
-function fillTemplate(template: string, values: Record<string, string | number>): string {
-  return template.replace(/\{(\w+)\}/g, (match, key: string) =>
-    key in values ? String(values[key]) : match,
-  );
-}
-
-function shuffled<T>(items: readonly T[]): T[] {
-  const result = [...items];
-  for (let index = result.length - 1; index > 0; index -= 1) {
-    const swapWith = Math.floor(Math.random() * (index + 1));
-    [result[index], result[swapWith]] = [result[swapWith]!, result[index]!];
-  }
-  return result;
-}
-
-/** Shuffles question order and each question's option order for one attempt. */
-function buildAttempt(questions: readonly QuizQuestion[]): AttemptQuestion[] {
-  return shuffled(questions).map((question) => ({
-    question,
-    options: shuffled(question.options),
-  }));
-}
-
 const OPTION_LABELS = ['A', 'B', 'C', 'D'] as const;
 
-/** Score bands for the mastery ranks, expressed as minimum correct ratio. */
-const RANK_BANDS = [
-  { threshold: 0.95, rank: 'chronoWarrior' },
-  { threshold: 0.75, rank: 'enduranceChampion' },
-  { threshold: 0.5, rank: 'participant' },
-  { threshold: 0, rank: 'observer' },
-] as const satisfies ReadonlyArray<{
-  threshold: number;
-  rank: keyof QuizRunnerUi['summary']['ranks'];
-}>;
+/** Elements that keep their own Enter and digit behaviour. */
+const INTERACTIVE_SELECTOR =
+  'a, button, input, select, textarea, summary, [role="button"], [contenteditable]:not([contenteditable="false"])';
 
-function rankFor(correct: number, total: number): keyof QuizRunnerUi['summary']['ranks'] {
-  const ratio = total === 0 ? 0 : correct / total;
-  return RANK_BANDS.find((band) => ratio >= band.threshold)?.rank ?? 'observer';
-}
-
-function trailingStreak(answers: readonly AnswerRecord[]): number {
+function trailingStreak(attempt: QuizAttempt): number {
   let streak = 0;
-  for (let index = answers.length - 1; index >= 0 && answers[index]!.correct; index -= 1) {
+  for (let index = attempt.answers.length - 1; index >= 0; index -= 1) {
+    if (!attempt.answers[index]!.correct) break;
     streak += 1;
   }
   return streak;
 }
 
-export function QuizRunner({ tier, ui, hubHref }: QuizRunnerProps) {
+function answerFor(attempt: QuizAttempt, questionId: string) {
+  return attempt.answers.find((answer) => answer.questionId === questionId);
+}
+
+/** The icon, the word for screen readers and the colours of an answered option. */
+function optionState(entry: QuizAttemptQuestion, optionId: string, chosenOptionId?: string) {
+  if (chosenOptionId === undefined) return 'open' as const;
+  if (optionId === entry.question.correctOptionId) return 'correct' as const;
+  if (optionId === chosenOptionId) return 'chosen' as const;
+  return 'other' as const;
+}
+
+/** A link that opens in a new tab, so the attempt stays where it is. */
+function ReferenceLink({
+  href,
+  children,
+  newTabNote,
+  className,
+}: {
+  href: string;
+  children: React.ReactNode;
+  newTabNote: string;
+  className?: string;
+}) {
+  return (
+    <Link
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={cn('link inline-flex min-h-6 items-start gap-1.5 type-body-sm', className)}
+    >
+      <BookOpen aria-hidden className="mt-0.5 size-4 shrink-0" />
+      <span>
+        {children}
+        <span className="sr-only"> {newTabNote}</span>
+      </span>
+      <ArrowUpRight aria-hidden className="mt-0.5 size-3.5 shrink-0 text-subtle" />
+    </Link>
+  );
+}
+
+export function QuizRunner({
+  tier,
+  ui,
+  locale,
+  hubHref,
+  rankFloors,
+  nextTier,
+  bestTemplate,
+}: QuizRunnerProps) {
   const [phase, setPhase] = useState<Phase>('intro');
-  const [attempt, setAttempt] = useState<AttemptQuestion[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState<AnswerRecord[]>([]);
+  const [attempt, setAttempt] = useState<QuizAttempt | null>(null);
+  /** A run this browser saved earlier, offered on the start card. */
+  const [saved, setSaved] = useState<QuizAttempt | null>(null);
+  const [best, setBest] = useState<QuizBestScore | null>(null);
+
+  const storageKey = attemptStorageKey(locale, tier.id);
+  const questionRef = useRef<HTMLElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const feedbackRef = useRef<HTMLDivElement>(null);
+  const summaryHeadingRef = useRef<HTMLHeadingElement>(null);
+  /** What receives focus after the next render: the new question, its feedback or the summary. */
+  const pendingFocus = useRef<'question' | 'feedback' | 'summary' | null>(null);
 
   const cardVariants = useMotionVariants(slideInRight);
-  const feedbackVariants = useMotionVariants(scaleIn);
   const summaryVariants = useMotionVariants(fadeRise);
 
   const total = tier.questions.length;
-  const current = attempt[currentIndex];
-  const currentAnswer =
-    current === undefined
-      ? undefined
-      : answers.find((answer) => answer.questionId === current.question.id);
-  const correctCount = useMemo(() => answers.filter((answer) => answer.correct).length, [answers]);
-  const streak = trailingStreak(answers);
+
+  // Saved runs are read after mount: the server render has no storage, and
+  // reading it during render would not match the HTML it sent.
+  useEffect(() => {
+    setSaved(readSavedAttempt(browserStorage('session'), storageKey, tier));
+  }, [storageKey, tier]);
+
+  // Every change to the run is remembered, so a reload or a reference link
+  // never costs the reader their place.
+  useEffect(() => {
+    if (!attempt || phase === 'intro') return;
+    saveAttempt(browserStorage('session'), storageKey, attempt);
+  }, [attempt, phase, storageKey]);
+
+  useEffect(() => {
+    const target = pendingFocus.current;
+    if (!target) return;
+    pendingFocus.current = null;
+    if (target === 'question') {
+      revealTop(questionRef.current);
+      headingRef.current?.focus({ preventScroll: true });
+    } else if (target === 'feedback') {
+      revealElement(feedbackRef.current);
+      feedbackRef.current?.focus({ preventScroll: true });
+    } else {
+      revealTop(summaryHeadingRef.current);
+      summaryHeadingRef.current?.focus({ preventScroll: true });
+    }
+  });
 
   const begin = useCallback(() => {
+    clearSavedAttempt(browserStorage('session'), storageKey);
+    setSaved(null);
     setAttempt(buildAttempt(tier.questions));
-    setAnswers([]);
-    setCurrentIndex(0);
     setPhase('running');
-  }, [tier.questions]);
+    pendingFocus.current = 'question';
+  }, [storageKey, tier.questions]);
+
+  const resume = useCallback(() => {
+    if (!saved) return;
+    setAttempt(saved);
+    setSaved(null);
+    if (saved.phase === 'summary') {
+      setBest(recordBestScore(browserStorage('local'), tier.id, scoreOf(saved)));
+      setPhase('summary');
+      pendingFocus.current = 'summary';
+    } else {
+      setPhase('running');
+      pendingFocus.current = 'question';
+    }
+  }, [saved, tier.id]);
+
+  const current = attempt ? attempt.questions[attempt.currentIndex] : undefined;
+  const currentAnswer = attempt && current ? answerFor(attempt, current.question.id) : undefined;
 
   const choose = useCallback(
     (optionId: string) => {
-      if (current === undefined || currentAnswer !== undefined) return;
-      setAnswers((previous) => [
-        ...previous,
-        {
-          questionId: current.question.id,
-          chosenOptionId: optionId,
-          correct: optionId === current.question.correctOptionId,
-        },
-      ]);
+      if (!current || currentAnswer) return;
+      setAttempt((previous) =>
+        previous
+          ? {
+              ...previous,
+              answers: [
+                ...previous.answers,
+                {
+                  questionId: current.question.id,
+                  chosenOptionId: optionId,
+                  correct: optionId === current.question.correctOptionId,
+                },
+              ],
+            }
+          : previous,
+      );
+      pendingFocus.current = 'feedback';
     },
     [current, currentAnswer],
   );
 
   const advance = useCallback(() => {
-    if (currentAnswer === undefined) return;
-    if (currentIndex + 1 >= attempt.length) {
+    if (!attempt || !currentAnswer) return;
+    if (attempt.currentIndex + 1 >= attempt.questions.length) {
+      const finished: QuizAttempt = { ...attempt, phase: 'summary' };
+      setAttempt(finished);
+      setBest(recordBestScore(browserStorage('local'), tier.id, scoreOf(finished)));
       setPhase('summary');
+      pendingFocus.current = 'summary';
     } else {
-      setCurrentIndex((index) => index + 1);
+      setAttempt({ ...attempt, currentIndex: attempt.currentIndex + 1 });
+      pendingFocus.current = 'question';
     }
-  }, [attempt.length, currentAnswer, currentIndex]);
+  }, [attempt, currentAnswer, tier.id]);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return;
-      // Navigation and form controls keep their native keyboard behavior,
+      // Links, buttons and fields keep their native keyboard behaviour,
       // including the site's skip link and the quiz's own reference links.
-      if (
-        event.target instanceof Element &&
-        event.target.closest(
-          'a, button, input, select, textarea, [role="button"], [contenteditable]:not([contenteditable="false"])',
-        )
-      ) {
-        return;
-      }
+      if (event.target instanceof Element && event.target.closest(INTERACTIVE_SELECTOR)) return;
       if (phase === 'intro' && event.key === 'Enter') {
         event.preventDefault();
-        begin();
+        if (saved) resume();
+        else begin();
         return;
       }
-      if (phase !== 'running') return;
+      if (phase !== 'running' || !current) return;
       if (event.key === 'Enter') {
         event.preventDefault();
         advance();
         return;
       }
       const digit = Number.parseInt(event.key, 10);
-      if (digit >= 1 && digit <= 4 && current !== undefined) {
-        const option = current.options[digit - 1];
-        if (option) {
-          event.preventDefault();
-          choose(option.id);
-        }
+      const option = digit >= 1 && digit <= 4 ? current.options[digit - 1] : undefined;
+      if (option) {
+        event.preventDefault();
+        choose(option.id);
       }
     }
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [advance, begin, choose, current, phase]);
+  }, [advance, begin, choose, current, phase, resume, saved]);
 
-  if (phase === 'intro') {
+  const correctCount = useMemo(
+    () => attempt?.answers.filter((answer) => answer.correct).length ?? 0,
+    [attempt],
+  );
+
+  if (phase === 'intro' || !attempt) {
     return (
-      <Card>
-        <CardContent className="flex flex-col items-start gap-5 p-6 sm:p-8">
-          <p className="type-body-md text-white/72">
-            {fillTemplate(ui.progressTemplate, { current: 1, total })}
-          </p>
-          <p className="type-body-sm text-white/55">{ui.intro.keyboardHint}</p>
-          <Button size="lg" onClick={begin} data-testid="quiz-begin">
-            {ui.intro.beginLabel}
-            <ArrowRight aria-hidden />
-          </Button>
-        </CardContent>
-      </Card>
+      <QuizStartCard
+        ui={ui}
+        rankFloors={rankFloors}
+        saved={saved}
+        total={total}
+        onBegin={begin}
+        onResume={resume}
+      />
     );
   }
 
   if (phase === 'summary') {
-    const rankKey = rankFor(correctCount, total);
-    const rank = ui.summary.ranks[rankKey];
-    const missed = attempt.filter((entry) =>
-      answers.some((answer) => answer.questionId === entry.question.id && !answer.correct),
-    );
-
     return (
-      <motion.section
-        variants={summaryVariants}
-        initial="initial"
-        animate="animate"
-        aria-labelledby="quiz-summary-heading"
-        data-testid="quiz-summary"
-      >
-        <Card>
-          <CardContent className="p-6 sm:p-8">
-            <p className="type-eyebrow text-white/50">{ui.summary.eyebrow}</p>
-            <h2 id="quiz-summary-heading" className="type-display-sm mt-3 text-white">
-              {fillTemplate(ui.summary.scoreTemplate, { correct: correctCount, total })}
-            </h2>
-            <p className="mt-4 text-sm text-white/60">
-              {ui.summary.rankLabel}
-              {': '}
-              <span className="font-semibold text-white">{rank.name}</span>
-            </p>
-            <p className="mt-2 max-w-2xl type-body-md text-white/72">{rank.line}</p>
-
-            <div className="mt-8">
-              <h3 className="text-lg font-semibold text-white">{ui.summary.studyHeading}</h3>
-              {missed.length === 0 ? (
-                <p className="mt-3 type-body-sm text-white/60">{ui.summary.noMissesNote}</p>
-              ) : (
-                <>
-                  <p className="mt-3 type-body-sm text-white/60">{ui.summary.studyIntro}</p>
-                  <ul className="mt-4 space-y-4">
-                    {missed.map((entry) => (
-                      <li
-                        key={entry.question.id}
-                        className="rounded-xl border border-white/10 bg-white/[0.03] p-4"
-                      >
-                        <p className="type-body-sm text-white/80">{entry.question.prompt}</p>
-                        <Link
-                          href={entry.question.reference.href}
-                          className="mt-2 inline-flex items-center gap-1.5 text-sm text-primary underline-offset-4 hover:underline"
-                        >
-                          <BookOpen className="h-4 w-4" aria-hidden />
-                          {entry.question.reference.label}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
-            </div>
-
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Button onClick={begin} data-testid="quiz-restart">
-                <RotateCcw aria-hidden />
-                {ui.summary.restartLabel}
-              </Button>
-              <Button variant="secondary" asChild>
-                <Link href={hubHref}>{ui.summary.hubLabel}</Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.section>
+      <motion.div variants={summaryVariants} initial="initial" animate="animate">
+        <QuizSummary
+          attempt={attempt}
+          ui={ui}
+          total={total}
+          correctCount={correctCount}
+          rankFloors={rankFloors}
+          best={best}
+          bestTemplate={bestTemplate}
+          nextTier={nextTier}
+          hubHref={hubHref}
+          headingRef={summaryHeadingRef}
+          onRestart={begin}
+        />
+      </motion.div>
     );
   }
 
-  if (current === undefined) return null;
+  if (!current) return null;
 
   const progressText = fillTemplate(ui.progressTemplate, {
-    current: currentIndex + 1,
+    current: attempt.currentIndex + 1,
     total,
   });
+  const streak = trailingStreak(attempt);
   const feedbackPool = currentAnswer?.correct ? ui.correctFeedback : ui.incorrectFeedback;
-  const feedbackText = feedbackPool[answers.length % feedbackPool.length];
+  const feedbackText = feedbackPool[attempt.answers.length % feedbackPool.length];
+  const correctIndex = current.options.findIndex(
+    (option) => option.id === current.question.correctOptionId,
+  );
+  const correctLetter = OPTION_LABELS[correctIndex] ?? '';
+  // Chinese and Japanese sentences follow one another without a space.
+  const sentenceGap = getLocaleConfig(locale).wordSpacing ? ' ' : '';
+  const isLast = attempt.currentIndex + 1 >= attempt.questions.length;
+  const questionHeadingId = `quiz-question-${current.question.id}`;
+  const feedbackHeadingId = `${questionHeadingId}-feedback`;
 
   return (
-    <section aria-label={progressText}>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="type-body-sm text-white/60" data-testid="quiz-progress">
+    <section
+      ref={questionRef}
+      aria-labelledby={questionHeadingId}
+      className="scroll-mt-[var(--sticky-offset)]"
+    >
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <p className="type-label tabular-nums text-muted-foreground" data-testid="quiz-progress">
           {progressText}
         </p>
-        {/* Constellation progress: one star per question, lit as it is answered. */}
-        <div aria-hidden className="flex max-w-full flex-wrap items-center gap-1.5">
-          {attempt.map((entry, index) => {
-            const answer = answers.find((item) => item.questionId === entry.question.id);
-            return (
-              <span
-                key={entry.question.id}
-                className={cn(
-                  'h-1.5 w-1.5 rounded-full transition-all duration-300',
-                  answer?.correct &&
-                    'bg-primary shadow-[0_0_6px_1px_rgb(var(--aurora-cyan-rgb)/0.8)]',
-                  answer !== undefined && !answer.correct && 'bg-white/30',
-                  answer === undefined && index === currentIndex && 'bg-white/70',
-                  answer === undefined && index !== currentIndex && 'bg-white/12',
+        {currentAnswer?.correct && streak >= 3 ? (
+          <p className="inline-flex items-center gap-1.5 type-label text-subtle">
+            <Sparkles aria-hidden className="size-3.5" />
+            {fillTemplate(ui.streakTemplate, { count: streak })}
+          </p>
+        ) : null}
+      </div>
+      {/* One segment per question: answered right, answered wrong, the current one, still to come. */}
+      <div aria-hidden className="mt-3 flex gap-0.5" data-testid="quiz-progress-track">
+        {attempt.questions.map((entry, index) => {
+          const answer = answerFor(attempt, entry.question.id);
+          return (
+            <span
+              key={entry.question.id}
+              className={cn(
+                'h-1 min-w-0 flex-1 first:rounded-l-pill last:rounded-r-pill',
+                answer?.correct && 'bg-primary',
+                answer && !answer.correct && 'bg-subtle',
+                !answer && index === attempt.currentIndex && 'bg-foreground',
+                !answer && index !== attempt.currentIndex && 'bg-rule',
+              )}
+            />
+          );
+        })}
+      </div>
+
+      <motion.div
+        key={current.question.id}
+        variants={cardVariants}
+        initial="initial"
+        animate="animate"
+        className="mt-6 rounded-surface border border-rule bg-surface"
+      >
+        <div className="px-4 py-5 sm:p-8">
+          <h2
+            ref={headingRef}
+            id={questionHeadingId}
+            tabIndex={-1}
+            className="type-heading-3 text-foreground"
+          >
+            {current.question.prompt}
+          </h2>
+
+          <div role="group" aria-labelledby={questionHeadingId} className="mt-6 grid gap-2.5">
+            {current.options.map((option, index) => {
+              const state = optionState(current, option.id, currentAnswer?.chosenOptionId);
+              const revealed = state !== 'open';
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => choose(option.id)}
+                  aria-disabled={revealed || undefined}
+                  data-state={state}
+                  data-testid={`quiz-option-${index + 1}`}
+                  className={cn(
+                    'flex w-full min-h-12 items-start gap-3 rounded-control border px-3 py-3 text-left transition-[background-color,border-color,color] duration-fast sm:px-4',
+                    state === 'open' &&
+                      'border-rule text-foreground hover:border-input hover:bg-surface-raised',
+                    state === 'correct' && 'border-positive bg-positive-surface text-foreground',
+                    state === 'chosen' && 'border-critical bg-critical-surface text-foreground',
+                    state === 'other' && 'border-rule-faint text-muted-foreground',
+                    revealed && 'cursor-default',
+                  )}
+                >
+                  <span
+                    aria-hidden
+                    className={cn(
+                      'inline-flex size-6 shrink-0 items-center justify-center rounded-edge border type-label',
+                      state === 'correct' && 'border-positive text-positive',
+                      state === 'chosen' && 'border-critical text-critical',
+                      (state === 'open' || state === 'other') && 'border-input text-subtle',
+                    )}
+                  >
+                    {OPTION_LABELS[index]}
+                  </span>
+                  <span className="min-w-0 flex-1 type-body-md">{option.text}</span>
+                  {state === 'correct' ? (
+                    <>
+                      <Check aria-hidden className="mt-0.5 size-4 shrink-0 text-positive" />
+                      <span className="sr-only">{`(${ui.correctAnswerLabel})`}</span>
+                    </>
+                  ) : null}
+                  {state === 'chosen' ? (
+                    <>
+                      <X aria-hidden className="mt-0.5 size-4 shrink-0 text-critical" />
+                      <span className="sr-only">{`(${ui.yourAnswerLabel})`}</span>
+                    </>
+                  ) : null}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {currentAnswer ? (
+          <div
+            ref={feedbackRef}
+            tabIndex={-1}
+            role="region"
+            aria-labelledby={feedbackHeadingId}
+            data-testid="quiz-feedback"
+            className="scroll-mt-[var(--sticky-offset)] border-t border-rule-faint"
+          >
+            <div className="px-4 pt-5 sm:px-8 sm:pt-6">
+              <p
+                id={feedbackHeadingId}
+                className="flex items-start gap-2 type-title text-foreground"
+                data-testid="quiz-feedback-status"
+              >
+                {currentAnswer.correct ? (
+                  <Check aria-hidden className="mt-0.5 size-4 shrink-0 text-positive" />
+                ) : (
+                  <X aria-hidden className="mt-0.5 size-4 shrink-0 text-critical" />
                 )}
-              />
-            );
+                <span>
+                  {feedbackText}
+                  {currentAnswer.correct
+                    ? null
+                    : `${sentenceGap}${fillTemplate(ui.correctAnswerTemplate, { letter: correctLetter })}`}
+                </span>
+              </p>
+
+              <p className="mt-5 type-label text-subtle">{ui.explanationHeading}</p>
+              <p className="mt-1 type-body-md text-muted-foreground">
+                {current.question.explanation}
+              </p>
+
+              {current.question.funFact ? (
+                <>
+                  <p className="mt-5 type-label text-subtle">{ui.funFactHeading}</p>
+                  <p className="mt-1 type-body-sm text-muted-foreground">
+                    {current.question.funFact}
+                  </p>
+                </>
+              ) : null}
+            </div>
+
+            {/* On a phone the explanation can outgrow the screen: the next step stays in reach. */}
+            <div className="sticky bottom-0 mt-5 flex flex-wrap items-center justify-between gap-x-4 gap-y-3 rounded-b-surface border-t border-rule-faint bg-surface px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:static sm:border-t-0 sm:px-8 sm:pb-6 sm:pt-0">
+              <ReferenceLink href={current.question.reference.href} newTabNote={ui.newTabNote}>
+                {fillTemplate(ui.referenceTemplate, { section: current.question.reference.label })}
+              </ReferenceLink>
+              <Button onClick={advance} data-testid="quiz-next" className="max-sm:w-full">
+                {isLast ? ui.finishLabel : ui.nextLabel}
+                <ArrowRight aria-hidden />
+              </Button>
+            </div>
+          </div>
+        ) : null}
+      </motion.div>
+    </section>
+  );
+}
+
+function scoreOf(attempt: QuizAttempt): QuizBestScore {
+  return {
+    correct: attempt.answers.filter((answer) => answer.correct).length,
+    total: attempt.questions.length,
+  };
+}
+
+interface QuizStartCardProps {
+  ui: QuizRunnerUi;
+  rankFloors: Readonly<Record<QuizRankKey, string | null>>;
+  saved: QuizAttempt | null;
+  total: number;
+  onBegin: () => void;
+  onResume: () => void;
+}
+
+/** Before the first question: the goal (the rank ladder) and the way in. */
+function QuizStartCard({ ui, rankFloors, saved, total, onBegin, onResume }: QuizStartCardProps) {
+  const savedNote = saved
+    ? saved.phase === 'summary'
+      ? fillTemplate(ui.summary.scoreTemplate, {
+          correct: saved.answers.filter((answer) => answer.correct).length,
+          total,
+        })
+      : fillTemplate(ui.progressTemplate, {
+          current: Math.min(saved.currentIndex + 1, total),
+          total,
+        })
+    : null;
+
+  return (
+    <section
+      aria-labelledby="quiz-start-ranks"
+      className="rounded-surface border border-rule bg-surface p-5 sm:p-8"
+      data-testid="quiz-start"
+    >
+      <h2 id="quiz-start-ranks" className="type-label text-subtle">
+        {ui.intro.ranksHeading}
+      </h2>
+      <RankLadder
+        ranks={ui.summary.ranks}
+        floors={rankFloors}
+        label={ui.intro.ranksHeading}
+        className="mt-3"
+      />
+
+      <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-rule-faint pt-6">
+        {saved ? (
+          <>
+            <Button
+              size="lg"
+              onClick={onResume}
+              data-testid="quiz-resume"
+              className="max-sm:w-full"
+            >
+              {ui.intro.resumeLabel}
+              <ArrowRight aria-hidden />
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={onBegin}
+              data-testid="quiz-begin"
+              className="max-sm:w-full"
+            >
+              <RotateCcw aria-hidden />
+              {ui.intro.startOverLabel}
+            </Button>
+            <p className="basis-full type-label tabular-nums text-muted-foreground sm:basis-auto">
+              {savedNote}
+            </p>
+          </>
+        ) : (
+          <Button size="lg" onClick={onBegin} data-testid="quiz-begin" className="max-sm:w-full">
+            {ui.intro.beginLabel}
+            <ArrowRight aria-hidden />
+          </Button>
+        )}
+        <p className="hidden basis-full type-caption text-subtle [@media(hover:hover)_and_(pointer:fine)]:block">
+          {ui.intro.keyboardHint}
+        </p>
+      </div>
+    </section>
+  );
+}
+
+interface QuizSummaryProps {
+  attempt: QuizAttempt;
+  ui: QuizRunnerUi;
+  total: number;
+  correctCount: number;
+  rankFloors: Readonly<Record<QuizRankKey, string | null>>;
+  best: QuizBestScore | null;
+  bestTemplate: string;
+  nextTier?: QuizNextTier;
+  hubHref: string;
+  headingRef: React.RefObject<HTMLHeadingElement | null>;
+  onRestart: () => void;
+}
+
+/** The score, the rank on the ladder, the way on, and every missed question with its answer. */
+function QuizSummary({
+  attempt,
+  ui,
+  total,
+  correctCount,
+  rankFloors,
+  best,
+  bestTemplate,
+  nextTier,
+  hubHref,
+  headingRef,
+  onRestart,
+}: QuizSummaryProps) {
+  const rankKey = rankFor(correctCount, total);
+  const rank = ui.summary.ranks[rankKey];
+  const missed = attempt.questions.filter(
+    (entry) => !answerFor(attempt, entry.question.id)?.correct,
+  );
+  const suggestNext = nextTier !== undefined && correctCount / total >= NEXT_TIER_THRESHOLD;
+  const showBest = best !== null && best.correct > correctCount;
+
+  return (
+    <section aria-labelledby="quiz-summary-heading" data-testid="quiz-summary">
+      <div className="rounded-surface border border-rule bg-surface p-5 sm:p-8">
+        <p className="type-eyebrow text-secondary">{ui.summary.eyebrow}</p>
+        <h2
+          ref={headingRef}
+          id="quiz-summary-heading"
+          tabIndex={-1}
+          className="mt-3 type-section text-foreground scroll-mt-[var(--sticky-offset)]"
+        >
+          {fillTemplate(ui.summary.scoreTemplate, { correct: correctCount, total })}
+        </h2>
+        <p className="mt-3 type-body-md text-muted-foreground">
+          {renderTemplate(ui.summary.rankTemplate, {
+            rank: <span className="font-semibold text-foreground">{rank.name}</span>,
           })}
+        </p>
+        <p className="mt-1 max-w-[var(--measure-lede)] type-body-md text-muted-foreground">
+          {rank.line}
+        </p>
+        {showBest ? (
+          <p className="mt-2 type-label tabular-nums text-subtle">
+            {fillTemplate(bestTemplate, { correct: best.correct, total: best.total })}
+          </p>
+        ) : null}
+
+        <RankLadder
+          ranks={ui.summary.ranks}
+          floors={rankFloors}
+          current={rankKey}
+          label={ui.summary.rankLabel}
+          className="mt-8"
+        />
+
+        <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-rule-faint pt-6">
+          {suggestNext ? (
+            <Button size="lg" asChild className="max-sm:w-full">
+              <Link href={nextTier.href} data-testid="quiz-next-tier">
+                {fillTemplate(ui.summary.nextTierTemplate, { tier: nextTier.title })}
+                <ArrowRight aria-hidden />
+              </Link>
+            </Button>
+          ) : null}
+          <Button
+            size="lg"
+            variant={suggestNext ? 'outline' : 'default'}
+            onClick={onRestart}
+            data-testid="quiz-restart"
+            className="max-sm:w-full"
+          >
+            <RotateCcw aria-hidden />
+            {ui.summary.restartLabel}
+          </Button>
+          <Button size="lg" variant="ghost" asChild className="max-sm:w-full">
+            <Link href={hubHref}>{ui.summary.hubLabel}</Link>
+          </Button>
         </div>
       </div>
 
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={current.question.id}
-          variants={cardVariants}
-          initial="initial"
-          animate="animate"
-          exit="exit"
-          className="mt-4"
-        >
-          <Card>
-            <CardContent className="p-6 sm:p-8">
-              <h2 className="text-xl font-semibold leading-8 tracking-tight text-white sm:text-2xl">
-                {current.question.prompt}
-              </h2>
-
-              <div role="group" aria-label={progressText} className="mt-6 space-y-3">
-                {current.options.map((option, index) => {
-                  const isChosen = currentAnswer?.chosenOptionId === option.id;
-                  const isCorrect = option.id === current.question.correctOptionId;
-                  const revealed = currentAnswer !== undefined;
-                  return (
-                    <button
-                      key={option.id}
-                      type="button"
-                      onClick={() => choose(option.id)}
-                      disabled={revealed}
-                      data-testid={`quiz-option-${index + 1}`}
-                      className={cn(
-                        'flex w-full items-start gap-3 rounded-xl border px-4 py-3 text-left transition-colors',
-                        'border-white/10 bg-white/[0.03] text-white/85',
-                        !revealed && 'hover:border-white/25 hover:bg-white/[0.06]',
-                        revealed && isCorrect && 'border-primary/60 bg-primary/10 text-white',
-                        revealed && isChosen && !isCorrect && 'border-red-400/50 bg-red-400/10',
-                        revealed && !isChosen && !isCorrect && 'opacity-55',
-                      )}
-                    >
-                      <span
-                        aria-hidden
-                        className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-white/15 font-mono text-xs text-white/60"
-                      >
-                        {OPTION_LABELS[index]}
-                      </span>
-                      <span className="type-body-md">{option.text}</span>
-                      {revealed && isCorrect ? (
-                        <Check aria-hidden className="ml-auto mt-1 h-4 w-4 shrink-0 text-primary" />
-                      ) : null}
-                      {revealed && isChosen && !isCorrect ? (
-                        <X aria-hidden className="ml-auto mt-1 h-4 w-4 shrink-0 text-red-300" />
-                      ) : null}
-                    </button>
-                  );
-                })}
-              </div>
-
-              <AnimatePresence>
-                {currentAnswer !== undefined ? (
-                  <motion.div
-                    variants={feedbackVariants}
-                    initial="initial"
-                    animate="animate"
-                    className="mt-6 rounded-xl border border-white/10 bg-white/[0.04] p-5"
-                    data-testid="quiz-feedback"
-                  >
-                    <p
-                      className={cn(
-                        'text-sm font-semibold',
-                        currentAnswer.correct ? 'text-primary' : 'text-red-300',
-                      )}
-                      role="status"
-                    >
-                      {feedbackText}
-                      {currentAnswer.correct && streak >= 3 ? (
-                        <span className="ml-2 inline-flex items-center gap-1 text-white/70">
-                          <Sparkles className="h-3.5 w-3.5" aria-hidden />
-                          {fillTemplate(ui.streakTemplate, { count: streak })}
-                        </span>
-                      ) : null}
-                    </p>
-
-                    <p className="mt-3 text-xs font-semibold uppercase tracking-[0.18em] text-white/45">
-                      {ui.explanationHeading}
-                    </p>
-                    <p className="mt-1.5 type-body-md text-white/78">
-                      {current.question.explanation}
-                    </p>
-
-                    {current.question.funFact ? (
-                      <>
-                        <p className="mt-4 text-xs font-semibold uppercase tracking-[0.18em] text-white/45">
-                          {ui.funFactHeading}
-                        </p>
-                        <p className="mt-1.5 type-body-sm text-white/65">
-                          {current.question.funFact}
-                        </p>
-                      </>
-                    ) : null}
-
-                    <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-                      <Link
-                        href={current.question.reference.href}
-                        className="inline-flex items-center gap-1.5 text-sm text-primary underline-offset-4 hover:underline"
-                      >
-                        <BookOpen className="h-4 w-4" aria-hidden />
-                        <span>
-                          {ui.referenceLabel}
-                          {': '}
-                          {current.question.reference.label}
-                        </span>
-                      </Link>
-                      <Button onClick={advance} data-testid="quiz-next">
-                        {currentIndex + 1 >= attempt.length ? ui.finishLabel : ui.nextLabel}
-                        <ArrowRight aria-hidden />
-                      </Button>
-                    </div>
-                  </motion.div>
-                ) : null}
-              </AnimatePresence>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </AnimatePresence>
+      <section aria-labelledby="quiz-review-heading" className="mt-10 sm:mt-12">
+        <h3 id="quiz-review-heading" className="type-heading-3 text-foreground">
+          {ui.summary.studyHeading}
+        </h3>
+        {missed.length === 0 ? (
+          <p className="mt-2 type-body-md text-muted-foreground">{ui.summary.noMissesNote}</p>
+        ) : (
+          <>
+            <p className="mt-2 type-body-md text-muted-foreground">{ui.summary.studyIntro}</p>
+            <ol
+              className="mt-6 divide-y divide-rule-faint border-y border-rule-faint"
+              data-testid="quiz-review"
+            >
+              {missed.map((entry) => (
+                <MissedQuestion key={entry.question.id} entry={entry} attempt={attempt} ui={ui} />
+              ))}
+            </ol>
+          </>
+        )}
+      </section>
     </section>
+  );
+}
+
+function MissedQuestion({
+  entry,
+  attempt,
+  ui,
+}: {
+  entry: QuizAttemptQuestion;
+  attempt: QuizAttempt;
+  ui: QuizRunnerUi;
+}) {
+  const chosenId = answerFor(attempt, entry.question.id)?.chosenOptionId;
+  const letterOf = (optionId: string | undefined) =>
+    OPTION_LABELS[entry.options.findIndex((option) => option.id === optionId)] ?? '';
+  const textOf = (optionId: string | undefined) =>
+    entry.options.find((option) => option.id === optionId)?.text ?? '';
+  const correctId = entry.question.correctOptionId;
+
+  return (
+    <li className="py-5 sm:py-6">
+      <p className="type-title text-foreground">{entry.question.prompt}</p>
+      <dl className="mt-3 grid gap-2">
+        {chosenId ? (
+          <div className="flex items-start gap-2.5">
+            <X aria-hidden className="mt-0.5 size-4 shrink-0 text-critical" />
+            <dt className="sr-only">{ui.yourAnswerLabel}</dt>
+            <dd className="type-body-sm text-muted-foreground">
+              <span aria-hidden className="type-label text-subtle">
+                {ui.yourAnswerLabel}
+                {' · '}
+              </span>
+              <span className="tabular-nums">{letterOf(chosenId)}.</span> {textOf(chosenId)}
+            </dd>
+          </div>
+        ) : null}
+        <div className="flex items-start gap-2.5">
+          <Check aria-hidden className="mt-0.5 size-4 shrink-0 text-positive" />
+          <dt className="sr-only">{ui.correctAnswerLabel}</dt>
+          <dd className="type-body-sm text-foreground">
+            <span aria-hidden className="type-label text-subtle">
+              {ui.correctAnswerLabel}
+              {' · '}
+            </span>
+            <span className="tabular-nums">{letterOf(correctId)}.</span> {textOf(correctId)}
+          </dd>
+        </div>
+      </dl>
+      <details className="group mt-3">
+        <summary className="inline-flex min-h-6 cursor-pointer list-none items-center gap-1 type-label text-primary [&::-webkit-details-marker]:hidden">
+          <ArrowRight
+            aria-hidden
+            className="size-3.5 transition-transform duration-fast group-open:rotate-90"
+          />
+          {ui.explanationHeading}
+        </summary>
+        <div className="mt-2 border-l-2 border-rule pl-4">
+          <p className="type-body-sm text-muted-foreground">{entry.question.explanation}</p>
+          <ReferenceLink
+            href={entry.question.reference.href}
+            newTabNote={ui.newTabNote}
+            className="mt-3"
+          >
+            {entry.question.reference.label}
+          </ReferenceLink>
+        </div>
+      </details>
+    </li>
   );
 }

@@ -12,6 +12,13 @@ import { learnTextZhTw } from './text.zh-TW';
 import type { LearnArticle, LearnContent, LearnSection } from './types';
 
 export * from './structure';
+export {
+  isLearnLinkTarget,
+  learnLinkKeys,
+  learnPlainText,
+  splitLearnLinks,
+  type LearnTextPart,
+} from './links';
 
 /** Composes the locale-independent skeleton with one locale's copy. */
 function buildLearnContent(text: LearnText): LearnContent {
@@ -24,6 +31,7 @@ function buildLearnContent(text: LearnText): LearnContent {
         title: string;
         description: string;
         h1: string;
+        cardTitle: string;
         summary: string;
         sections: readonly LearnSection[];
         relatedLabels: readonly string[];
@@ -38,6 +46,8 @@ function buildLearnContent(text: LearnText): LearnContent {
       h1: text.hub.h1,
       intro: text.hub.intro,
       breadcrumbs: text.hub.breadcrumbs,
+      groups: text.hub.groups,
+      whitePaper: text.hub.whitePaper,
       quizCta: {
         heading: text.hub.quizCta.heading,
         body: text.hub.quizCta.body,
@@ -53,9 +63,12 @@ function buildLearnContent(text: LearnText): LearnContent {
         title: articleText.title,
         description: articleText.description,
         h1: articleText.h1,
+        cardTitle: articleText.cardTitle,
         updated: article.updated,
         summary: articleText.summary,
         schemaType: article.schemaType,
+        group: article.group,
+        plate: article.plate,
         sections: articleText.sections,
         related: article.related.map((href, index) => ({
           label: articleText.relatedLabels[index]!,
@@ -98,10 +111,13 @@ export function getLearnSlugs(): string[] {
   return LEARN_STRUCTURE.articles.map((article) => article.slug);
 }
 
+export { LEARN_GROUP_IDS } from './types';
 export type {
   LearnArticle,
   LearnArticleUi,
   LearnContent,
+  LearnGroupCopy,
+  LearnGroupId,
   LearnHubContent,
   LearnRelatedLink,
   LearnSection,

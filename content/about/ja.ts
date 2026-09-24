@@ -16,18 +16,31 @@ export const aboutContentJa = {
   eyebrow: 'プロトコルの紹介',
   heading: 'Cosmic Signatureについて',
   body: {
+    lede: 'Cosmic SignatureはArbitrum上のプロシージャル・オンチェーンアート・プロトコルです。参加者がETHまたはCSTで一筆を入れるたびに、そのサイクルのシグネチャーが形づくられます。シグネチャーは、オンチェーンのデータと三体問題の物理シミュレーションから生まれる決定論的なNFT作品です。',
     paragraphs: [
-      'Cosmic SignatureはArbitrum上のプロシージャル・オンチェーンアート・プロトコルです。参加者がETHまたはCSTで一筆を入れるたびに、そのサイクルのシグネチャーが形づくられます。シグネチャーは、オンチェーンのデータと三体問題の物理シミュレーションから生まれる決定論的なNFT作品です。',
       'このプロトコルは、公開され検証可能な仕組みを軸に設計されています。Arbitrumのスマートコントラクトが一筆、サイクル、配分トラック、CST、係留、NFTの刻印を記録します。アートワークはシードから再現でき、プロジェクトはオープンソースのコード、CC0のアート、公共財の支援を重視しています。',
-      'Cosmic Signatureは、生物学におけるCOSMICがん変異データベースやCOSMIC変異シグネチャーとは関係がありません。オンチェーンアートのプロトコルとアプリです。',
     ],
+    disambiguation:
+      'Cosmic Signatureは、生物学におけるCOSMICがん変異データベースやCOSMIC変異シグネチャーとは関係がありません。オンチェーンアートのプロトコルとアプリです。',
     // lexicon-allow-start: explicit investment-product denial for crawler and compliance clarity.
     denial:
       'Cosmic Signatureは投資商品として提供されるものではありません。このプロトコルは参加、一筆、配分、係留、公共財への送付を説明するものであり、トークン価格の動きや金銭的な結果を約束するものではありません。',
     // lexicon-allow-end
   },
+  facts: {
+    license: 'CC0の作品とコード',
+    network: 'Arbitrum One',
+    publicGoodsTemplate: '各サイクル準備金の{percent}を公共財へ',
+  },
+  principlesHeading: '設計の原則',
+  clarificationsHeading: '補足',
   officialResources: {
     heading: '公式情報',
+    groups: {
+      protocol: 'プロトコル',
+      community: 'コミュニティ',
+      help: 'ヘルプと規約',
+    },
     links: [
       { id: 'app', label: 'Cosmic Signatureアプリ', href: ABOUT_RESOURCE_HREFS.app },
       {

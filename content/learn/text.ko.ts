@@ -42,13 +42,33 @@ export const learnTextKo = {
       description:
         'Cosmic Signature의 작동 원리를 알아봅니다. 퍼포먼스 사이클, 제스처, CST, 삼체 NFT 아트, Arbitrum 컨트랙트, 앵커링, 공공재, 위험 관련 안내를 다룹니다.',
     },
-    eyebrow: 'Cosmic Signature 학습 센터',
+    eyebrow: '가이드',
     h1: 'Cosmic Signature 알아보기',
     intro:
       '제스처가 쌓여 하나의 작품이 되는 과정을 알아봅니다. 퍼포먼스 사이클부터 삼체 물리로 생성되는 NFT 아트까지, Cosmic Signature의 작동 원리를 차근차근 설명합니다.',
     breadcrumbs: {
       homeLabel: 'Cosmic Signature',
       learnLabel: '학습 센터',
+    },
+    groups: {
+      start: {
+        title: '여기서 시작하기',
+        description:
+          '프로토콜이 무엇인지, 사이클이 어떻게 진행되는지, 제스처가 무엇을 하는지, 작품이 어디서 오는지 설명하는 가이드 네 편입니다.',
+      },
+      mechanics: {
+        title: '작동 원리',
+        description:
+          '프로토콜이 실행되는 체인, 컨트랙트, CST와 우주 평의회, 그리고 앵커링을 다룹니다.',
+      },
+      context: {
+        title: '배경',
+        description: '공공재, 작품을 수집하고 거래하는 곳, 그리고 프로토콜이 아닌 것을 다룹니다.',
+      },
+    },
+    whitePaper: {
+      eyebrow: '전체 참고 문서',
+      readLabel: '백서 읽기',
     },
     quizCta: {
       heading: '퀴즈로 이해한 내용을 확인해 보세요',
@@ -57,18 +77,28 @@ export const learnTextKo = {
     },
   },
   articleUi: {
-    eyebrow: 'Cosmic Signature 학습 센터',
     breadcrumbs: {
-      ariaLabel: '탐색 경로',
       homeLabel: 'Cosmic Signature',
       learnLabel: '학습 센터',
     },
-    lastUpdatedLabel: '최종 업데이트:',
-    publisherLabel: '게시자: Cosmic Signature',
+    guideTemplate: '가이드 {number}/{total}',
+    readingTimeTemplate: '읽는 데 약 {minutes}분',
+    nextGuideLabel: '다음 가이드',
+    contents: {
+      heading: '이 가이드의 내용',
+      railLabel: '이 페이지의 목차',
+      openLabel: '목차',
+      backToTopLabel: '맨 위로',
+    },
+    headingLinkTemplate: '이 절로 연결: {title}',
     relatedResourcesHeading: '관련 Cosmic Signature 자료',
+    appendixLabel: '확인하고 더 읽기',
+    verifyLinksLabel: '앱에서 확인하기',
+    appendix: answerabilitySections,
   },
   articles: {
     'what-is-cosmic-signature': {
+      cardTitle: '프로토콜이란',
       title: 'Cosmic Signature란 무엇인가요? | Cosmic Signature',
       description:
         'Cosmic Signature는 Arbitrum 위의 절차적 온체인 아트 프로토콜입니다. 퍼포먼스 사이클 동안 남긴 제스처가 결정론적 삼체 NFT 작품을 빚어냅니다.',
@@ -104,11 +134,11 @@ export const learnTextKo = {
             '소개 사이트에서는 기본 개념과 용어를, 앱에서는 현재 상태와 기록을 확인할 수 있습니다. Cosmic Signature는 생물학의 COSMIC 데이터베이스와는 별개의 온체인 아트 프로토콜입니다.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: ['Cosmic Signature 앱 열기', '자주 묻는 질문 읽기', '프로토콜 통계 보기'],
     },
     'how-the-performance-cycle-works': {
+      cardTitle: '퍼포먼스 사이클',
       title: 'Cosmic Signature 퍼포먼스 사이클의 작동 원리 | Cosmic Signature',
       description:
         'Cosmic Signature 퍼포먼스 사이클이 Arbitrum에서 보정 구간, 제스처, 마감, 배분 경로를 어떻게 운용하는지 알아봅니다.',
@@ -144,7 +174,6 @@ export const learnTextKo = {
             '사이클이 마감되면 프로토콜은 그 사이클을 실시간 상태가 아니라 역사로 다룹니다. 최종 시그니처, 수령자 기록, 배분 회수, 첨부된 NFT, 공공재 기여는 이후의 참여자가 살펴볼 수 있는 공개 아카이브의 일부가 됩니다.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: [
         '현재 퍼포먼스 사이클 보기',
@@ -153,6 +182,7 @@ export const learnTextKo = {
       ],
     },
     'how-gestures-work': {
+      cardTitle: '제스처의 작동 원리',
       title: 'Cosmic Signature에서 제스처가 작동하는 원리 | Cosmic Signature',
       description:
         'ETH 제스처, CST 제스처, 제스처 비용, 참여 CST, 그리고 제스처가 각 Cosmic Signature 퍼포먼스 사이클을 빚어내는 과정을 이해합니다.',
@@ -163,7 +193,7 @@ export const learnTextKo = {
         {
           heading: '제스처가 하는 일',
           body: [
-            `모든 제스처는 진행 중인 사이클에 참여를 기록하고, 동적 참여 CST를 각인할 수 있으며, 사이클 마감 시각을 연장하고, 최종 시그니처를 둘러싼 역사적 맥락에 기여합니다. 참여 CST는 제곱근 공식을 사용합니다: ${protocolFacts.dynamicCstRewardFormula}.`,
+            `모든 제스처는 진행 중인 사이클에 참여를 기록하고, 동적 참여 CST를 각인할 수 있으며, 사이클 마감 시각을 연장하고, 최종 시그니처를 둘러싼 역사적 맥락에 기여합니다. 참여 CST는 제곱근 공식을 사용합니다: ${protocolFacts.participationCstNotation}. 여기서 ${protocolFacts.participationCstSymbols[0]} 기호는 직전 제스처 이후 경과한 초, m은 참여 CST 배수, i는 사이클 시간 증가량입니다.`,
             `제스처 비용은 사이클 동안 변합니다. ETH 제스처와 CST 제스처는 서로 관련되지만 별개인 메커니즘을 따르며, 그 안에는 비용 경로를 참여자에게 보여 주는 보정 구간이 있습니다. CST 제스처마다 CST 보정 구간이 약 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}% 늘어나고, ETH 제스처마다 약 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}% 줄어듭니다.`,
           ],
         },
@@ -188,7 +218,6 @@ export const learnTextKo = {
             'RandomWalk NFT 첨부는 공개 맥락에 층을 하나 더합니다. 사용하지 않은 RandomWalk NFT는 제스처 비용을 한 번 낮추기 위해 첨부할 수 있고, 사용된 RandomWalk NFT는 따로 목록에 표시되므로 참여 순간이 지난 뒤에도 공개 기록을 이해할 수 있습니다.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: [
         '앱에서 제스처 남기기 또는 살펴보기',
@@ -197,6 +226,7 @@ export const learnTextKo = {
       ],
     },
     'three-body-nft-art': {
+      cardTitle: '삼체 아트',
       title: 'Cosmic Signature가 삼체 NFT 아트를 생성하는 원리 | Cosmic Signature',
       description:
         '온체인 시드와 삼체 물리로 생성되는 결정론적 Cosmic Signature NFT 작품을 기술적으로 설명합니다.',
@@ -232,7 +262,6 @@ export const learnTextKo = {
             '작품은 프로토콜의 일부입니다. 갤러리와 토큰 상세 페이지에서 작품을 감상하고, 해당 사이클과 생성 시드, 공개 메타데이터를 함께 살펴볼 수 있습니다.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: [
         'Cosmic Signature 갤러리 둘러보기',
@@ -241,6 +270,7 @@ export const learnTextKo = {
       ],
     },
     'cosmic-signature-on-arbitrum': {
+      cardTitle: 'Arbitrum 위의 프로토콜',
       title: 'Arbitrum 위의 Cosmic Signature | Cosmic Signature',
       description:
         'Cosmic Signature가 Arbitrum에서 운영되는 이유와 프로토콜이 온체인 아트를 위해 이더리움 레이어 2 인프라를 활용하는 방식을 설명합니다.',
@@ -259,7 +289,7 @@ export const learnTextKo = {
           heading: '체인 맥락을 드러내는 이유',
           body: [
             'Cosmic Signature는 앱 전반에서 Arbitrum을 명시합니다. 체인 맥락이 프로토콜 정체성의 일부이기 때문입니다. 제스처, 사이클 기록, 컨트랙트 주소, CST, NFT 소유권, 배분 회수를 독립적으로 확인하려면 모두 구체적인 네트워크 참조가 필요합니다.',
-            '컨트랙트와 통계 페이지에서 이 안내서의 설명을 실제 기록과 대조할 수 있습니다. 개념을 익힌 뒤 주소, 트랜잭션, 현재 상태를 직접 확인해 보세요.',
+            '[컨트랙트 페이지](contracts)와 [통계 페이지](statistics)에서 이 안내서의 설명을 실제 기록과 대조할 수 있습니다. 개념을 익힌 뒤 주소, 트랜잭션, 현재 상태를 직접 확인해 보세요.',
           ],
         },
         {
@@ -269,11 +299,11 @@ export const learnTextKo = {
             '공개 페이지는 지갑 없이도 열람할 수 있습니다. 참여하기 전에 Arbitrum에서 어떤 활동이 이루어지는지, 컨트랙트가 어떻게 작동하는지 살펴보세요.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: ['검증된 컨트랙트 보기', '프로토콜 통계 보기'],
     },
     'contracts-security-verification': {
+      cardTitle: '컨트랙트와 검증',
       title: 'Cosmic Signature 컨트랙트, 보안, 검증 | Cosmic Signature',
       description:
         'Arbitrum 프로토콜인 Cosmic Signature의 스마트 컨트랙트, 소스 코드, 검증, 보안 맥락을 확인합니다.',
@@ -291,7 +321,7 @@ export const learnTextKo = {
         {
           heading: '검증 자료',
           body: [
-            '검증은 여러 공개 지면에 나뉘어 있습니다. 컨트랙트 페이지는 배포 주소와 탐색기 링크를 나열하고, 소스 코드 페이지는 결정론적 렌더링 자료를 설명하며, 보안 감사 페이지는 검토 현황을 밝히고, 보안 페이지는 사용자가 공식 자료를 확인하는 방법을 안내합니다.',
+            '검증은 여러 공개 지면에 나뉘어 있습니다. [컨트랙트 페이지](contracts)는 배포 주소와 탐색기 링크를 나열하고, [소스 코드 페이지](code)는 결정론적 렌더링 자료를 설명하며, [보안 감사 페이지](audits)는 검토 현황을 밝히고, [보안 페이지](security)는 사용자가 공식 자료를 확인하는 방법을 안내합니다.',
             '이 페이지는 함께 읽어야 합니다. 맥락 없는 컨트랙트 주소는 해석하기 어렵고, 링크 없는 보안 주장은 검증하기 어렵습니다. 그래서 Cosmic Signature는 주소, 소스 참조, 위험 문구, 보안 감사 현황을 내부 링크로 연결해 둡니다.',
           ],
         },
@@ -302,11 +332,11 @@ export const learnTextKo = {
             '이런 보수적인 접근은 의도된 것입니다. 신뢰 페이지는 배포된 사실, 공개된 보고서, 정적 분석, 커뮤니티 검토, 향후 작업을 근거 없는 하나의 주장으로 뭉뚱그리지 않고 구분할 때 가장 쓸모가 있습니다.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: ['컨트랙트 주소 열기', '소스 코드 자료 열기', '자주 묻는 질문 읽기'],
     },
     'cst-token-and-cosmic-council': {
+      cardTitle: 'CST와 우주 평의회',
       title: 'CST와 우주 평의회 | Cosmic Signature',
       description: 'CST 토큰이 제스처, 프로토콜 조율, 우주 평의회와 어떻게 연결되는지 알아봅니다.',
       h1: 'CST와 우주 평의회',
@@ -335,11 +365,11 @@ export const learnTextKo = {
             '우주 평의회는 프로토콜 변경을 조율하는 기구입니다. 그 역할과 별개로, 참여에 적용되는 법적 조건과 위험은 이용약관과 위험 고지에서 확인해 주세요.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: ['제스처의 작동 원리 읽기', '앱 열기'],
     },
     'anchoring-nfts': {
+      cardTitle: 'NFT 앵커링',
       title: 'Cosmic Signature NFT 앵커링 | Cosmic Signature',
       description:
         'Cosmic Signature NFT의 앵커링, ETH 앵커링 지급, Random Walk NFT의 별빛 선정 자격이 어떻게 작동하는지 설명합니다.',
@@ -369,11 +399,11 @@ export const learnTextKo = {
             '앵커링 전에 NFT 종류와 사용 이력을 확인해 주세요. 통계, 갤러리, 현재 사이클 페이지에서 각 NFT의 상태와 역할을 비교할 수 있습니다.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: ['앵커링 도구 열기', '갤러리 둘러보기'],
     },
     'protocol-guild-public-goods': {
+      cardTitle: '공공재와 Protocol Guild',
       title: 'Cosmic Signature와 이더리움 공공재 | Cosmic Signature',
       description:
         'Cosmic Signature가 이더리움 핵심 기여자를 위한 자금 지원 메커니즘인 Protocol Guild로 공공재 배분을 전달하는 방식을 설명합니다.',
@@ -402,11 +432,11 @@ export const learnTextKo = {
             '공공재로 전달된 자금은 공개 기록에서 확인할 수 있습니다. 이 기록만으로 특정 세무상 취급이나 특별한 법적 지위가 인정되는 것은 아닙니다.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: ['공공재 기여 기록 보기', '사이클의 작동 원리 알아보기'],
     },
     'collecting-and-trading-cosmic-signature': {
+      cardTitle: '수집과 거래',
       title: 'Cosmic Signature NFT와 CST의 수집과 거래 | Cosmic Signature',
       description:
         'Cosmic Signature 자산이 거래되는 곳: 수수료 없는 Axiom Zero NFT 마켓플레이스, Arbitrum의 Uniswap CST 교환, 사이클을 다루는 Chaos Zero 예측 시장.',
@@ -442,7 +472,6 @@ export const learnTextKo = {
             '같은 주의는 CST 교환과 예측 포지션에도 적용됩니다. 토큰 주소가 공개된 CST 컨트랙트와 일치하는지 확인하고, Chaos Zero 포지션은 프로토콜이 기록한 공개 제스처 수로 결정되므로 시장의 모든 입력값을 Arbitrum에서 독립적으로 살펴볼 수 있다는 점을 기억해 주세요.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: [
         'Axiom Zero에서 Cosmic Signature 둘러보기',
@@ -454,6 +483,7 @@ export const learnTextKo = {
     },
     // lexicon-allow-start: explicit denial language for crawler and compliance clarity.
     'not-a-lottery-not-an-investment': {
+      cardTitle: '프로토콜이 아닌 것',
       title: 'Cosmic Signature는 복권이나 카지노, 투자 상품인가요? | Cosmic Signature',
       description:
         'Cosmic Signature는 절차적 온체인 아트 프로토콜이며, 복권도, 카지노도, 도박 상품도, 투자 상품도 아닙니다.',
@@ -482,7 +512,6 @@ export const learnTextKo = {
             '지갑을 연결하기 전에 안내서를 읽고, 프로토콜의 개념과 참여 조건을 확인할 수 있습니다.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: ['이용약관 읽기', '자주 묻는 질문 읽기'],
     },

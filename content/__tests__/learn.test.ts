@@ -1,10 +1,18 @@
 import {
+  LEARN_GROUP_IDS,
   getLearnArticle as getLocalizedLearnArticle,
   getLearnContent,
   getLearnSlugs,
+  isLearnLinkTarget,
   learnContentEn,
   learnContentZh,
+  learnLinkKeys,
+  learnPlainText,
+  splitLearnLinks,
 } from '@/content/learn';
+
+import { routing } from '@/i18n/routing';
+import { signaturePlate } from '@/components/reading/signaturePlates';
 
 const learnArticles = learnContentEn.articles;
 const getLearnArticle = (slug: string) => getLocalizedLearnArticle(slug, 'en');
@@ -20,10 +28,13 @@ describe('learnArticles', () => {
       expect(article.summary).toMatch(/[\u3400-\u9fff]/);
       expect(article.sections.length).toBeGreaterThanOrEqual(3);
       // Chinese has no whitespace-delimited words and is materially denser
-      // than English, so use a CJK-aware character floor instead.
-      expect(article.sections.flatMap((section) => section.body).join('').length).toBeGreaterThan(
-        400,
-      );
+      // than English, so use a CJK-aware character floor instead. The page
+      // renders the shared reference notes after every guide.
+      expect(
+        [...article.sections, ...learnContentZh.articleUi.appendix]
+          .flatMap((section) => section.body)
+          .join('').length,
+      ).toBeGreaterThan(400);
       const english = getLearnArticle(article.slug);
       expect(article.related.map((link) => link.href)).toEqual(
         english?.related.map((link) => link.href),
@@ -93,6 +104,46 @@ describe('learnArticles', () => {
   });
 });
 
+describe('learn reading path', () => {
+  it.each(routing.locales)('%s: orders the guides by stage, each with a card title', (locale) => {
+    const { articles, hub, articleUi } = getLearnContent(locale);
+    // Each stage's guides are consecutive, in the stages' order.
+    const stages = articles.map((article) => article.group);
+    expect(
+      [...stages].sort((a, b) => LEARN_GROUP_IDS.indexOf(a) - LEARN_GROUP_IDS.indexOf(b)),
+    ).toEqual(stages);
+    for (const groupId of LEARN_GROUP_IDS) {
+      expect(stages).toContain(groupId);
+      expect(hub.groups[groupId].title.trim()).not.toBe('');
+    }
+    for (const article of articles) {
+      expect(article.cardTitle.trim()).not.toBe('');
+      // A card title is short and does not repeat the brand.
+      expect(article.cardTitle).not.toContain('Cosmic Signature');
+      expect(article.cardTitle.length).toBeLessThan(article.h1.length + 12);
+      expect(signaturePlate(article.plate)).toBeDefined();
+    }
+    expect(articleUi.appendix.length).toBeGreaterThan(0);
+    expect(articleUi.guideTemplate).toContain('{number}');
+    expect(articleUi.readingTimeTemplate).toContain('{minutes}');
+  });
+
+  it.each(routing.locales)('%s: keeps the shared reference notes out of the guides', (locale) => {
+    const { articles, articleUi } = getLearnContent(locale);
+    const appendixHeadings = new Set(articleUi.appendix.map((section) => section.heading));
+    for (const article of articles) {
+      expect(article.sections.filter((section) => appendixHeadings.has(section.heading))).toEqual(
+        [],
+      );
+    }
+  });
+
+  it('gives every guide its own opening Signature', () => {
+    const plates = learnArticles.map((article) => article.plate);
+    expect(new Set(plates).size).toBe(plates.length);
+  });
+});
+
 describe('learn article contract accuracy', () => {
   function articleText(slug: string): string {
     const article = getLearnArticle(slug);
@@ -131,4 +182,63 @@ describe('learn article contract accuracy', () => {
     expect(hrefs).toContain('https://chaoszero.com');
     expect(hrefs.some((href) => href.startsWith('https://app.uniswap.org/'))).toBe(true);
   });
+});
+
+describe('inline links in guide prose', () => {
+  it('splits a paragraph into text and links, and reads it as plain text', () => {
+    const text = 'Open the [contracts page](contracts), then [nowhere](missing) and [code](code).';
+    expect(splitLearnLinks(text)).toEqual([
+      'Open the ',
+      { label: 'contracts page', target: 'contracts' },
+      ', then nowhere and ',
+      { label: 'code', target: 'code' },
+      '.',
+    ]);
+    expect(learnPlainText(text)).toBe('Open the contracts page, then nowhere and code.');
+    expect(splitLearnLinks('No links here.')).toEqual(['No links here.']);
+    expect(isLearnLinkTarget('toString')).toBe(false);
+  });
+
+  function paragraphsOf(locale: string) {
+    const { articles, articleUi } = getLearnContent(locale);
+    return [
+      ...articles.flatMap((article) =>
+        article.sections.flatMap((section, sectionIndex) =>
+          section.body.map((text, index) => ({
+            key: `${article.slug} ${sectionIndex}.${index}`,
+            text,
+          })),
+        ),
+      ),
+      ...articleUi.appendix.flatMap((section, sectionIndex) =>
+        section.body.map((text, index) => ({ key: `appendix ${sectionIndex}.${index}`, text })),
+      ),
+    ];
+  }
+
+  it('links the verification pages from the contracts guide', () => {
+    const guide = getLearnArticle('contracts-security-verification')!;
+    expect(guide.sections.flatMap((section) => section.body).flatMap(learnLinkKeys)).toEqual([
+      'contracts',
+      'code',
+      'audits',
+      'security',
+    ]);
+  });
+
+  it.each(routing.locales)(
+    '%s: links only to declared pages, the same ones as English',
+    (locale) => {
+      const english = new Map(
+        paragraphsOf('en').map(({ key, text }) => [key, learnLinkKeys(text)]),
+      );
+      for (const { key, text } of paragraphsOf(locale)) {
+        const keys = learnLinkKeys(text);
+        expect(keys.filter((target) => !isLearnLinkTarget(target))).toEqual([]);
+        expect([key, keys]).toEqual([key, english.get(key)]);
+        // No stray bracket or half-written token reaches the page.
+        expect(learnPlainText(text)).not.toMatch(/\]\(|\[[^\]]*\]\(/);
+      }
+    },
+  );
 });

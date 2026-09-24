@@ -458,6 +458,21 @@ export const whitePaperTextKo = {
             {
               kind: 'formula',
               formula: protocolFacts.dynamicCstRewardFormula,
+              notation: protocolFacts.participationCstNotation,
+              legend: [
+                {
+                  symbol: protocolFacts.participationCstSymbols[0],
+                  meaning: '직전 제스처 이후 경과한 초',
+                },
+                {
+                  symbol: protocolFacts.participationCstSymbols[1],
+                  meaning: '참여 CST 배수(컨트랙트 매개변수)',
+                },
+                {
+                  symbol: protocolFacts.participationCstSymbols[2],
+                  meaning: '현재 사이클 시간 증가량(마이크로초)',
+                },
+              ],
               caption:
                 '제스처 하나가 각인하는 참여 CST. 경과 시간은 직전 제스처부터 측정하며, 현재 사이클 시간 증가량에 맞춰 스케일을 조정합니다.',
             },
@@ -882,4 +897,55 @@ export const whitePaperTextKo = {
   },
   licenseNote:
     '이 백서는 프로젝트가 소유한 다른 모든 Cosmic Signature 자료와 마찬가지로 CC0 1.0에 따라 퍼블릭 도메인에 헌정됩니다.',
+  reading: {
+    railLabel: '이 페이지의 목차',
+    openContentsLabel: '목차',
+    backToTopLabel: '맨 위로',
+    headingLinkTemplate: '이 절로 연결: {title}',
+    formulaLabel: '공식',
+    noteLabel: '참고',
+    contractExpressionLabel: '컨트랙트의 원래 식',
+    figureTemplate: '그림 {number}',
+    readingTimeTemplate: '읽는 데 약 {minutes}분',
+    newTabNote: '(새 탭에서 열림)',
+  },
+  figures: {
+    cycle: {
+      title: '퍼포먼스 사이클의 흐름: 시작부터 다음 사이클까지',
+      caption: '시간은 출시 당시 매개변수 기준입니다. 정확한 규칙은 3절에 있습니다.',
+      steps: [
+        {
+          label: '시작',
+          detail: 'ETH 보정 구간은 첫 제스처가 나올 때까지 시작 비용을 낮춥니다.',
+        },
+        {
+          label: '제스처',
+          detail: `제스처마다 카운트다운에 시간 증가량이 더해집니다. 출시 당시에는 ${protocolFacts.initialCycleTimeIncrementHours}시간입니다.`,
+        },
+        {
+          label: '우선 마감 구간',
+          detail: `카운트다운이 끝나면 ${protocolFacts.finalGestureExclusivityHours}시간 동안 최종 제스처 참여자만 마감할 수 있습니다.`,
+        },
+        {
+          label: '공개 마감',
+          detail: '그 뒤에는 누구든 마감하고 수령자 역할을 이어받을 수 있습니다.',
+        },
+        {
+          label: '다음 사이클',
+          detail: `짧은 지연 뒤에 다음 사이클이 시작됩니다. 기본값은 ${protocolFacts.defaultNextCycleDelayMinutes}분입니다.`,
+        },
+      ],
+    },
+    allocation: {
+      title: '마감 때 사이클 준비금이 가는 곳',
+      caption:
+        '마감 시점 프로토콜 ETH 잔액에 대한 몫입니다. 나머지 약 절반은 다음 사이클로 누적됩니다.',
+    },
+    art: {
+      title: '컬렉션의 시그니처 두 점',
+      caption:
+        '각 이미지는 아래 적힌 시드로 파이프라인이 만들어 낸 결과이며, 누구나 픽셀 단위까지 다시 생성할 수 있습니다.',
+      seedLabel: '시드',
+    },
+  },
 } satisfies WhitePaperText;

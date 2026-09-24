@@ -42,13 +42,34 @@ export const learnTextJa = {
       description:
         'Cosmic Signatureの仕組みを学ぶ：パフォーマンス・サイクル、一筆、CST、三体NFTアート、Arbitrumコントラクト、係留、公共財、そしてリスクの明確化。',
     },
-    eyebrow: 'Cosmic Signatureを学ぶ',
+    eyebrow: 'ガイド',
     h1: 'Cosmic Signatureを知る',
     intro:
       '一筆を重ねることで、どのように作品が生まれるのでしょうか。パフォーマンス・サイクルから三体問題によるNFTアートの生成まで、Cosmic Signatureの仕組みを順に解説します。',
     breadcrumbs: {
       homeLabel: 'Cosmic Signature',
       learnLabel: '学ぶ',
+    },
+    groups: {
+      start: {
+        title: 'ここから始める',
+        description:
+          'プロトコルとは何か、サイクルの進み方、一筆の役割、アートの生まれ方を説明する四つのガイドです。',
+      },
+      mechanics: {
+        title: '仕組み',
+        description:
+          'プロトコルが動くチェーン、コントラクト、CSTと宇宙評議会、そして係留を扱います。',
+      },
+      context: {
+        title: '背景',
+        description:
+          '公共財、アートが収集・取引される場所、そしてプロトコルではないものを扱います。',
+      },
+    },
+    whitePaper: {
+      eyebrow: 'すべてを記したリファレンス',
+      readLabel: 'ホワイトペーパーを読む',
     },
     quizCta: {
       heading: 'プロトコルを知っていると思いますか？',
@@ -57,18 +78,28 @@ export const learnTextJa = {
     },
   },
   articleUi: {
-    eyebrow: 'Cosmic Signatureを学ぶ',
     breadcrumbs: {
-      ariaLabel: 'パンくずリスト',
       homeLabel: 'Cosmic Signature',
       learnLabel: '学ぶ',
     },
-    lastUpdatedLabel: '最終更新：',
-    publisherLabel: '公開者：Cosmic Signature',
+    guideTemplate: 'ガイド{number}/{total}',
+    readingTimeTemplate: '約{minutes}分で読めます',
+    nextGuideLabel: '次のガイド',
+    contents: {
+      heading: 'このガイドの内容',
+      railLabel: 'このページの目次',
+      openLabel: '目次',
+      backToTopLabel: 'ページの先頭へ',
+    },
+    headingLinkTemplate: 'この節へのリンク：{title}',
     relatedResourcesHeading: 'Cosmic Signatureの関連リソース',
+    appendixLabel: '確認とさらに読む',
+    verifyLinksLabel: 'アプリで確認する',
+    appendix: answerabilitySections,
   },
   articles: {
     'what-is-cosmic-signature': {
+      cardTitle: 'プロトコルとは',
       title: 'Cosmic Signatureとは？ | Cosmic Signature',
       description:
         'Cosmic Signatureは、パフォーマンス・サイクルの一筆が決定論的な三体NFTアートワークを形づくる、Arbitrum上のプロシージャル・オンチェーンアート・プロトコルです。',
@@ -104,11 +135,11 @@ export const learnTextJa = {
             '紹介サイトでは基本概念を、アプリでは現在の状態と記録を確認できます。Cosmic Signatureは、生物学のCOSMICデータベースとは別のオンチェーンアート・プロトコルです。',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: ['Cosmic Signatureアプリを開く', 'よくある質問を読む', 'プロトコル統計を見る'],
     },
     'how-the-performance-cycle-works': {
+      cardTitle: 'パフォーマンス・サイクル',
       title: 'Cosmic Signatureのパフォーマンス・サイクルの仕組み | Cosmic Signature',
       description:
         'Cosmic Signatureのパフォーマンス・サイクルがArbitrum上で調律期間、一筆、確定、配分トラックをどう使うかを学ぶ。',
@@ -144,7 +175,6 @@ export const learnTextJa = {
             'サイクルが確定すると、プロトコルはそれをライブの状態として扱うのをやめ、歴史として扱い始めます。最終シグネチャー、受領者の記録、配分の受け取り、添付されたNFT、公共財拠出は、将来の参加者が調べられる公開アーカイブの一部になります。',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: [
         '現在のパフォーマンス・サイクルを見る',
@@ -153,6 +183,7 @@ export const learnTextJa = {
       ],
     },
     'how-gestures-work': {
+      cardTitle: '一筆の仕組み',
       title: 'Cosmic Signatureにおける一筆の仕組み | Cosmic Signature',
       description:
         'ETH一筆、CST一筆、一筆の費用、参加CST、そして一筆が各Cosmic Signatureパフォーマンス・サイクルをどう形づくるかを理解する。',
@@ -163,7 +194,7 @@ export const learnTextJa = {
         {
           heading: '一筆がすること',
           body: [
-            `すべての一筆は進行中のサイクルへの参加を記録し、動的な参加CSTを刻印することがあり、サイクル確定時刻を延ばし、最終シグネチャーを取り巻く歴史的な文脈に寄与します。参加CSTは平方根の式を使います：${protocolFacts.dynamicCstRewardFormula}。`,
+            `すべての一筆は進行中のサイクルへの参加を記録し、動的な参加CSTを刻印することがあり、サイクル確定時刻を延ばし、最終シグネチャーを取り巻く歴史的な文脈に寄与します。参加CSTは平方根の式を使います：${protocolFacts.participationCstNotation}。${protocolFacts.participationCstSymbols[0]}は前の一筆からの秒数、mは参加CSTの乗数、iはサイクルの時間増分です。`,
             `一筆の費用はサイクルの中で変わります。ETH一筆とCST一筆は関連しつつも異なる仕組みを使い、参加者に費用の道筋を見せる調律期間を含みます。CST一筆はそれぞれCST調律期間を約${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%長くし、ETH一筆はそれぞれ約${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%短くします。`,
           ],
         },
@@ -188,7 +219,6 @@ export const learnTextJa = {
             'RandomWalk NFTの添付は、もう一つの公開の文脈の層を加えます。未使用のRandomWalk NFTは一度だけの一筆の費用の引き下げのために添付でき、使用済みのRandomWalk NFTは別に一覧されるので、参加の瞬間が過ぎた後も公開の記録は理解できるままです。',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: [
         'アプリで一筆を入れる、または調べる',
@@ -197,6 +227,7 @@ export const learnTextJa = {
       ],
     },
     'three-body-nft-art': {
+      cardTitle: '三体アート',
       title: 'Cosmic Signatureが三体NFTアートを生成する仕組み | Cosmic Signature',
       description:
         'オンチェーンのシードと三体物理から生成される決定論的なCosmic Signature NFTアートワークの技術的な解説。',
@@ -232,7 +263,6 @@ export const learnTextJa = {
             '作品はプロトコルの一部です。ギャラリーとトークンの詳細ページで作品を鑑賞し、対応するサイクル、生成シード、公開メタデータをたどれます。',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: [
         'Cosmic Signatureギャラリーを探索する',
@@ -241,6 +271,7 @@ export const learnTextJa = {
       ],
     },
     'cosmic-signature-on-arbitrum': {
+      cardTitle: 'Arbitrum上のプロトコル',
       title: 'Arbitrum上のCosmic Signature | Cosmic Signature',
       description:
         'Cosmic SignatureがArbitrumで動く理由と、プロトコルがオンチェーンアートのためにEthereumレイヤー2のインフラをどう使うか。',
@@ -259,7 +290,7 @@ export const learnTextJa = {
           heading: 'チェーンの文脈が見える理由',
           body: [
             'Cosmic Signatureがアプリ全体でArbitrumを明示するのは、チェーンの文脈がプロトコルのアイデンティティの一部だからです。一筆、サイクルの記録、コントラクトアドレス、CST、NFTの所有、配分の受け取りは、いずれも独立に確認するために具体的なネットワークの参照を必要とします。',
-            'コントラクトと統計のページでは、このガイドの説明を実際の記録と照らし合わせられます。概念を学んだ後に、アドレスやトランザクション、現在の状態を確認してみてください。',
+            '[コントラクトページ](contracts)と[統計ページ](statistics)では、このガイドの説明を実際の記録と照らし合わせられます。概念を学んだ後に、アドレスやトランザクション、現在の状態を確認してみてください。',
           ],
         },
         {
@@ -269,11 +300,11 @@ export const learnTextJa = {
             '公開ページはウォレットを接続せずに閲覧できます。参加する前に、Arbitrum上でどのような活動が行われ、コントラクトがどう動くかを確認できます。',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: ['検証済みコントラクトを見る', 'プロトコル統計を見る'],
     },
     'contracts-security-verification': {
+      cardTitle: 'コントラクトと検証',
       title: 'Cosmic Signatureのコントラクト、セキュリティ、検証 | Cosmic Signature',
       description:
         'Arbitrumプロトコルの、Cosmic Signatureスマートコントラクト、ソースコード、検証、セキュリティの背景。',
@@ -291,7 +322,7 @@ export const learnTextJa = {
         {
           heading: '検証の画面',
           body: [
-            '検証はいくつかの公開画面にまたがっています。コントラクトページはデプロイアドレスとエクスプローラーへのリンクを一覧し、コードページは決定論的レンダリングのリソースを説明し、監査ページはレビューの状況を述べ、セキュリティページは公式リソースをどう調べるべきかを説明します。',
+            '検証はいくつかの公開画面にまたがっています。[コントラクトページ](contracts)はデプロイアドレスとエクスプローラーへのリンクを一覧し、[コードページ](code)は決定論的レンダリングのリソースを説明し、[監査ページ](audits)はレビューの状況を述べ、[セキュリティページ](security)は公式リソースをどう調べるべきかを説明します。',
             'これらのページは合わせて読むべきです。文脈のないコントラクトアドレスは解釈しにくく、リンクのないセキュリティの主張は検証しにくいものです。だからCosmic Signatureは、アドレス、ソースへの参照、リスクの言葉、監査の状況を内部リンクで結び続けています。',
           ],
         },
@@ -302,7 +333,6 @@ export const learnTextJa = {
             'この控えめな姿勢は意図的なものです。信頼性のページが最も役立つのは、デプロイされた事実、公開された報告書、静的解析、コミュニティのレビュー、今後の作業を区別し、それらを裏付けのない一つの主張に押し込めないときです。',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: [
         'コントラクトアドレスを開く',
@@ -311,6 +341,7 @@ export const learnTextJa = {
       ],
     },
     'cst-token-and-cosmic-council': {
+      cardTitle: 'CSTと宇宙評議会',
       title: 'CSTと宇宙評議会 | Cosmic Signature',
       description: 'CSTトークンが一筆、プロトコルの調整、宇宙評議会とどう関わるかを学ぶ。',
       h1: 'CSTと宇宙評議会',
@@ -339,11 +370,11 @@ export const learnTextJa = {
             '宇宙評議会は、プロトコルの変更を調整する仕組みです。参加に関する法的条件やリスクについては、利用規約とリスク開示で別途確認してください。',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: ['一筆の仕組みを読む', 'アプリを開く'],
     },
     'anchoring-nfts': {
+      cardTitle: 'NFTの係留',
       title: 'Cosmic Signature NFTの係留 | Cosmic Signature',
       description: 'Cosmic Signature NFTの係留、ETH係留配分、Random Walk NFTの対象資格の仕組み。',
       h1: 'Cosmic Signature NFTの係留',
@@ -372,11 +403,11 @@ export const learnTextJa = {
             '係留する前に、NFTの種類と使用履歴を確認してください。統計、ギャラリー、現在のサイクルのページで、各NFTの状態と役割を比較できます。',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: ['係留ツールを開く', 'ギャラリーを探索する'],
     },
     'protocol-guild-public-goods': {
+      cardTitle: '公共財とProtocol Guild',
       title: 'Cosmic SignatureとEthereumの公共財 | Cosmic Signature',
       description:
         'Cosmic Signatureが公共財配分を、Ethereumコア貢献者の資金支援メカニズムであるProtocol Guildへどう届けるか。',
@@ -405,11 +436,11 @@ export const learnTextJa = {
             '公共財への送付は公開記録で確認できます。この記録だけで、特定の税務上の扱いや特別な法的地位が認められるわけではありません。',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: ['公共財拠出の記録を見る', 'サイクルの仕組みを学ぶ'],
     },
     'collecting-and-trading-cosmic-signature': {
+      cardTitle: '収集と取引',
       title: 'Cosmic Signature NFTとCSTの収集と取引 | Cosmic Signature',
       description:
         'Cosmic Signatureのアセットが取引される場所：手数料ゼロのAxiom Zero NFTマーケットプレイス、Arbitrum上のUniswapでのCSTスワップ、サイクルについてのChaos Zero予測市場。',
@@ -445,7 +476,6 @@ export const learnTextJa = {
             '同じ注意はCSTのスワップと予測のポジションにも当てはまります。トークンアドレスが公開されたCSTコントラクトと一致することを確認し、Chaos Zeroのポジションはプロトコルが記録する公開の筆数から決着するので、市場へのすべての入力はArbitrum上で独立に調べられることを覚えておいてください。',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: [
         'Axiom ZeroでCosmic Signatureを見る',
@@ -457,6 +487,7 @@ export const learnTextJa = {
     },
     // lexicon-allow-start: explicit denial language for crawler and compliance clarity.
     'not-a-lottery-not-an-investment': {
+      cardTitle: 'プロトコルではないもの',
       title: 'Cosmic Signatureは宝くじ、カジノ、投資ですか？ | Cosmic Signature',
       description:
         'Cosmic Signatureはプロシージャル・オンチェーンアート・プロトコルであり、宝くじ、カジノ、ギャンブル商品、投資商品ではありません。',
@@ -485,7 +516,6 @@ export const learnTextJa = {
             'ウォレットを接続する前にガイドを読み、プロトコルの仕組みと参加条件を確認できます。',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: ['利用規約を読む', 'よくある質問を読む'],
     },

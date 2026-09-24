@@ -457,6 +457,18 @@ export const whitePaperTextJa = {
             {
               kind: 'formula',
               formula: protocolFacts.dynamicCstRewardFormula,
+              notation: protocolFacts.participationCstNotation,
+              legend: [
+                { symbol: protocolFacts.participationCstSymbols[0], meaning: '前の一筆からの秒数' },
+                {
+                  symbol: protocolFacts.participationCstSymbols[1],
+                  meaning: '参加CSTの乗数（コントラクトのパラメーター）',
+                },
+                {
+                  symbol: protocolFacts.participationCstSymbols[2],
+                  meaning: '現在のサイクルの時間増分（マイクロ秒）',
+                },
+              ],
               caption:
                 '一筆が刻印する参加CST。経過時間は前の一筆から測り、現在のサイクルの時間増分に対して尺度化されます。',
             },
@@ -887,4 +899,55 @@ export const whitePaperTextJa = {
   },
   licenseNote:
     '本稿は、すべてのプロジェクト所有のCosmic Signatureの素材と同じく、CC0 1.0のもとでパブリックドメインに捧げられています。',
+  reading: {
+    railLabel: 'このページの目次',
+    openContentsLabel: '目次',
+    backToTopLabel: 'ページの先頭へ',
+    headingLinkTemplate: 'この節へのリンク：{title}',
+    formulaLabel: '式',
+    noteLabel: '注記',
+    contractExpressionLabel: 'コントラクト上の式',
+    figureTemplate: '図{number}',
+    readingTimeTemplate: '約{minutes}分で読めます',
+    newTabNote: '（新しいタブで開きます）',
+  },
+  figures: {
+    cycle: {
+      title: 'パフォーマンス・サイクルの流れ：開始から次のサイクルまで',
+      caption: '時間は開始時のパラメーターです。正確なルールは第3節にあります。',
+      steps: [
+        {
+          label: '開始',
+          detail: 'ETHの調律期間が、最初の一筆が入るまで開始時の費用を下げていきます。',
+        },
+        {
+          label: '一筆',
+          detail: `一筆ごとに、カウントダウンへ時間増分が加わります。開始時は${protocolFacts.initialCycleTimeIncrementHours}時間です。`,
+        },
+        {
+          label: '最後の一筆の優先期間',
+          detail: `カウントダウンが終わると、${protocolFacts.finalGestureExclusivityHours}時間は最後の一筆の参加者だけが確定できます。`,
+        },
+        {
+          label: '公開確定',
+          detail: 'その後は誰でも確定でき、受領者の役割を引き継ぎます。',
+        },
+        {
+          label: '次のサイクル',
+          detail: `短い遅延を経て次のサイクルが始まります。既定では${protocolFacts.defaultNextCycleDelayMinutes}分です。`,
+        },
+      ],
+    },
+    allocation: {
+      title: '確定時にサイクル準備金が向かう先',
+      caption:
+        '確定時点のプロトコルのETH残高に対する割合です。残りの約半分は次のサイクルへ持ち越されます。',
+    },
+    art: {
+      title: 'コレクションから二点のシグネチャー',
+      caption:
+        'どの画像も、下に記したシードからパイプラインが出力したものです。誰でもピクセル単位で再生成できます。',
+      seedLabel: 'シード',
+    },
+  },
 } satisfies WhitePaperText;

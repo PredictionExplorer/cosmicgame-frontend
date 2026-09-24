@@ -33,7 +33,7 @@ const publicPages: PublicPage[] = [
   {
     path: '/learn/collecting-and-trading-cosmic-signature',
     host: LANDING_HOST,
-    h1: 'Collecting and Trading Cosmic Signature',
+    h1: 'Collecting and trading Cosmic Signature',
     jsonLd: ['Article', 'BreadcrumbList'],
   },
   {
@@ -570,19 +570,23 @@ test.describe('raw HTML SEO', () => {
     }
   });
 
-  test('Learn hub and articles inherit the localized Learn image generator', async ({
-    request,
-  }) => {
+  test('the Learn hub and each guide have their own localized share card', async ({ request }) => {
     const imageUrls: string[] = [];
-    for (const path of ['/zh/learn', '/zh/learn/what-is-cosmic-signature']) {
+    for (const [path, pattern] of [
+      ['/zh/learn', /^\/zh\/learn\/opengraph-image/],
+      [
+        '/zh/learn/what-is-cosmic-signature',
+        /^\/zh\/learn\/what-is-cosmic-signature\/opengraph-image/,
+      ],
+      ['/zh/learn/how-gestures-work', /^\/zh\/learn\/how-gestures-work\/opengraph-image/],
+    ] as const) {
       const response = await request.get(path, { headers: hostHeaders(LANDING_HOST) });
       expect(response.status()).toBe(200);
       const imageUrl = extractOgImageUrl(await response.text());
-      const parsed = new URL(imageUrl);
-      expect(parsed.pathname).toMatch(/^\/zh\/learn\/opengraph-image/);
+      expect(new URL(imageUrl).pathname).toMatch(pattern);
       imageUrls.push(imageUrl);
     }
-    expect(new Set(imageUrls).size).toBe(1);
+    expect(new Set(imageUrls).size).toBe(3);
   });
 
   test('public pages have unique titles and meta descriptions', async ({ request }) => {

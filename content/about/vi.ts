@@ -16,18 +16,31 @@ export const aboutContentVi = {
   eyebrow: 'Về giao thức',
   heading: 'Về Cosmic Signature',
   body: {
+    lede: 'Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Trong mỗi chu kỳ trình diễn, người tham gia đặt nét bút bằng ETH hoặc CST, mỗi nét bút góp phần định hình Signature cuối cùng: tác phẩm NFT được tạo từ dữ liệu trên chuỗi bằng mô phỏng vật lý ba vật thể. Quy trình tất định cho phép tái tạo cùng một tác phẩm từ cùng dữ liệu ban đầu.',
     paragraphs: [
-      'Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Trong mỗi chu kỳ trình diễn, người tham gia đặt nét bút bằng ETH hoặc CST, mỗi nét bút góp phần định hình Signature cuối cùng: tác phẩm NFT được tạo từ dữ liệu trên chuỗi bằng mô phỏng vật lý ba vật thể. Quy trình tất định cho phép tái tạo cùng một tác phẩm từ cùng dữ liệu ban đầu.',
       'Các cơ chế của giao thức đều công khai và có thể kiểm tra. Hợp đồng thông minh trên Arbitrum ghi lại nét bút, chu kỳ, các luồng phân bổ, CST, neo giữ và hoạt động khắc NFT. Tác phẩm có thể tái tạo từ seed ban đầu. Dự án chú trọng mã nguồn mở, nghệ thuật theo CC0 và hỗ trợ Hàng hóa công.',
-      'Cosmic Signature không liên quan đến cơ sở dữ liệu đột biến ung thư COSMIC hay các chữ ký đột biến COSMIC trong sinh học. Đây là một giao thức và ứng dụng nghệ thuật trên chuỗi.',
     ],
+    disambiguation:
+      'Cosmic Signature không liên quan đến cơ sở dữ liệu đột biến ung thư COSMIC hay các chữ ký đột biến COSMIC trong sinh học. Đây là một giao thức và ứng dụng nghệ thuật trên chuỗi.',
     // lexicon-allow-start: explicit investment-product denial for crawler and compliance clarity.
     denial:
       'Cosmic Signature không được chào mời như một sản phẩm đầu tư. Giao thức mô tả việc tham gia, nét bút, phân bổ, neo giữ và việc chuyển tiếp hàng hóa công; giao thức không hứa hẹn về diễn biến giá token hay kết quả tài chính.',
     // lexicon-allow-end
   },
+  facts: {
+    license: 'Tác phẩm và mã nguồn CC0',
+    network: 'Arbitrum One',
+    publicGoodsTemplate: 'Hàng hóa công nhận {percent} mỗi Dự trữ chu kỳ',
+  },
+  principlesHeading: 'Nguyên tắc thiết kế',
+  clarificationsHeading: 'Làm rõ',
   officialResources: {
     heading: 'Tài nguyên chính thức',
+    groups: {
+      protocol: 'Giao thức',
+      community: 'Cộng đồng',
+      help: 'Trợ giúp và pháp lý',
+    },
     links: [
       { id: 'app', label: 'Ứng dụng Cosmic Signature', href: ABOUT_RESOURCE_HREFS.app },
       {

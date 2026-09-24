@@ -446,6 +446,18 @@ export const whitePaperTextZh = {
             {
               kind: 'formula',
               formula: protocolFacts.dynamicCstRewardFormula,
+              notation: protocolFacts.participationCstNotation,
+              legend: [
+                { symbol: protocolFacts.participationCstSymbols[0], meaning: '距上一笔的秒数' },
+                {
+                  symbol: protocolFacts.participationCstSymbols[1],
+                  meaning: '参与 CST 乘数（合约参数）',
+                },
+                {
+                  symbol: protocolFacts.participationCstSymbols[2],
+                  meaning: '当前周期时间增量（微秒）',
+                },
+              ],
               caption: '一笔落笔铭刻的参与 CST。经过时间自上一笔起算，并按当前周期时间增量归一化。',
             },
             {
@@ -867,4 +879,53 @@ export const whitePaperTextZh = {
     ],
   },
   licenseNote: '本文与 Cosmic Signature 全部项目自有材料一样，依 CC0 1.0 献入公有领域。',
+  reading: {
+    railLabel: '本页目录',
+    openContentsLabel: '目录',
+    backToTopLabel: '回到顶部',
+    headingLinkTemplate: '本节链接：{title}',
+    formulaLabel: '公式',
+    noteLabel: '说明',
+    contractExpressionLabel: '合约中的原始表达式',
+    figureTemplate: '图 {number}',
+    readingTimeTemplate: '约 {minutes} 分钟读完',
+    newTabNote: '（在新标签页中打开）',
+  },
+  figures: {
+    cycle: {
+      title: '一个演绎周期：从开场到下一周期',
+      caption: '时长为上线参数；具体规则见第 3 节。',
+      steps: [
+        {
+          label: '开场',
+          detail: 'ETH 校准窗口逐步压低开场价格，直到有人落下第一笔。',
+        },
+        {
+          label: '落笔',
+          detail: `每一笔都为倒计时加上一个时间增量，上线时为 ${protocolFacts.initialCycleTimeIncrementHours} 小时。`,
+        },
+        {
+          label: '专属收官窗口',
+          detail: `倒计时结束后的 ${protocolFacts.finalGestureExclusivityHours} 小时内，只有收官之笔参与者可以收官。`,
+        },
+        {
+          label: '公开收官',
+          detail: '此后任何人都可以收官，并接手周期受益方的角色。',
+        },
+        {
+          label: '下一周期',
+          detail: `短暂延迟后下一周期开启，默认 ${protocolFacts.defaultNextCycleDelayMinutes} 分钟。`,
+        },
+      ],
+    },
+    allocation: {
+      title: '收官时周期储备的去向',
+      caption: '份额按收官时协议的 ETH 余额计算；其余约一半滚入下一周期。',
+    },
+    art: {
+      title: '藏品中的两件签名作品',
+      caption: '每幅图像都是渲染管线按下方种子输出的结果，任何人都能逐像素重新生成。',
+      seedLabel: '种子',
+    },
+  },
 } satisfies WhitePaperText;

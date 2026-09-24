@@ -2,6 +2,12 @@ import { APP_ORIGIN } from '@/lib/hostRouting';
 
 export const ABOUT_PATH = '/about';
 
+/**
+ * The Signature that introduces the protocol, on the page and its share card:
+ * a token id in components/reading/signaturePlates.
+ */
+export const ABOUT_PLATE_TOKEN_ID = 2;
+
 export const ABOUT_RESOURCE_HREFS = {
   app: APP_ORIGIN,
   contracts: `${APP_ORIGIN}/contracts`,
@@ -29,9 +35,22 @@ export interface AboutJsonLdContent {
 }
 
 export interface AboutBodyContent {
+  /** The one-paragraph introduction beside the artwork. */
+  readonly lede: string;
   readonly paragraphs: readonly string[];
+  /** Not the COSMIC cancer database: set apart with the denial as a clarification. */
+  readonly disambiguation: string;
   readonly denial: string;
 }
+
+/** How the official resources are grouped on the page, in order. */
+export const ABOUT_RESOURCE_GROUPS = {
+  protocol: ['app', 'contracts', 'code'],
+  community: ['x', 'discord', 'github'],
+  help: ['faq', 'terms', 'privacy', 'support'],
+} as const satisfies Record<string, readonly AboutResourceId[]>;
+
+export type AboutResourceGroupId = keyof typeof ABOUT_RESOURCE_GROUPS;
 
 export interface AboutResourceLink {
   readonly id: AboutResourceId;
@@ -41,6 +60,8 @@ export interface AboutResourceLink {
 
 export interface AboutOfficialResourcesContent {
   readonly heading: string;
+  /** Headings of the resource groups. */
+  readonly groups: Readonly<Record<AboutResourceGroupId, string>>;
   readonly links: readonly AboutResourceLink[];
 }
 
@@ -51,5 +72,14 @@ export interface AboutContent {
   readonly eyebrow: string;
   readonly heading: string;
   readonly body: AboutBodyContent;
+  /** Short facts under the introduction; `{percent}` is filled from protocol facts. */
+  readonly facts: {
+    readonly license: string;
+    readonly network: string;
+    readonly publicGoodsTemplate: string;
+  };
+  /** The design properties, whose terms and text come from the white paper's introduction. */
+  readonly principlesHeading: string;
+  readonly clarificationsHeading: string;
   readonly officialResources: AboutOfficialResourcesContent;
 }

@@ -464,6 +464,21 @@ export const whitePaperTextVi = {
             {
               kind: 'formula',
               formula: protocolFacts.dynamicCstRewardFormula,
+              notation: protocolFacts.participationCstNotation,
+              legend: [
+                {
+                  symbol: protocolFacts.participationCstSymbols[0],
+                  meaning: 'số giây kể từ nét bút trước',
+                },
+                {
+                  symbol: protocolFacts.participationCstSymbols[1],
+                  meaning: 'hệ số nhân CST tham gia, một tham số của hợp đồng',
+                },
+                {
+                  symbol: protocolFacts.participationCstSymbols[2],
+                  meaning: 'mức tăng thời gian hiện tại của chu kỳ, tính bằng micro giây',
+                },
+              ],
               caption:
                 'CST tham gia được khắc bởi một nét bút. Thời gian trôi qua được đo kể từ nét bút trước và tỷ lệ theo mức tăng thời gian hiện tại của chu kỳ.',
             },
@@ -901,4 +916,56 @@ export const whitePaperTextVi = {
   },
   licenseNote:
     'Bài viết này, như mọi tài liệu thuộc dự án Cosmic Signature, được đưa vào phạm vi công cộng theo CC0 1.0.',
+  reading: {
+    railLabel: 'Trên trang này',
+    openContentsLabel: 'Mục lục',
+    backToTopLabel: 'Lên đầu trang',
+    headingLinkTemplate: 'Liên kết đến mục này: {title}',
+    formulaLabel: 'Công thức',
+    noteLabel: 'Ghi chú',
+    contractExpressionLabel: 'Biểu thức trong hợp đồng',
+    figureTemplate: 'Hình {number}',
+    readingTimeTemplate: '{minutes} phút đọc',
+    newTabNote: '(mở trong thẻ mới)',
+  },
+  figures: {
+    cycle: {
+      title: 'Một chu kỳ trình diễn, từ lúc mở đến chu kỳ tiếp theo',
+      caption: 'Thời lượng là tham số lúc ra mắt; Mục 3 nêu các quy tắc chính xác.',
+      steps: [
+        {
+          label: 'Mở chu kỳ',
+          detail:
+            'Cửa sổ hiệu chỉnh ETH hạ dần chi phí mở cho đến khi có người đặt nét bút đầu tiên.',
+        },
+        {
+          label: 'Nét bút',
+          detail: `Mỗi nét bút cộng thêm mức tăng thời gian vào đếm ngược: ${protocolFacts.initialCycleTimeIncrementHours} giờ lúc ra mắt.`,
+        },
+        {
+          label: 'Cửa sổ nét bút cuối',
+          detail: `Khi đếm ngược kết thúc, chỉ người đặt nét bút cuối cùng được hoàn tất trong ${protocolFacts.finalGestureExclusivityHours} giờ.`,
+        },
+        {
+          label: 'Hoàn tất mở',
+          detail: 'Sau đó, bất kỳ ai cũng có thể hoàn tất và nhận vai trò người nhận của chu kỳ.',
+        },
+        {
+          label: 'Chu kỳ tiếp theo',
+          detail: `Chu kỳ tiếp theo mở sau một độ trễ ngắn, mặc định ${protocolFacts.defaultNextCycleDelayMinutes} phút.`,
+        },
+      ],
+    },
+    allocation: {
+      title: 'Dự trữ chu kỳ đi đâu khi hoàn tất',
+      caption:
+        'Tỷ lệ trên số dư ETH của giao thức lúc hoàn tất. Phần còn lại, khoảng một nửa, được cộng dồn sang chu kỳ tiếp theo.',
+    },
+    art: {
+      title: 'Hai Signature trong bộ sưu tập',
+      caption:
+        'Mỗi hình là kết quả của quy trình với seed in bên dưới; bất kỳ ai cũng có thể tạo lại từng điểm ảnh.',
+      seedLabel: 'Seed',
+    },
+  },
 } satisfies WhitePaperText;
