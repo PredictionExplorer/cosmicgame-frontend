@@ -14,7 +14,8 @@ import type {
   RoundClaimSummary,
 } from '@/services/api/types';
 import { Button } from '@/components/ui/button';
-import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+import { DataTable, TableLink, type DataTableColumn } from '@/components/ui/data-table';
+import { useCycleHref } from '@/components/tables/useCycleHref';
 import {
   Dialog,
   DialogContent,
@@ -254,6 +255,8 @@ const CycleDetailDialog = ({ round, onClose }: { round: number | null; onClose: 
  */
 export const ClaimsByRoundSection = () => {
   const t = useTranslations('statistics');
+  const tTables = useTranslations('tables');
+  const cycleHref = useCycleHref();
   const [selected, setSelected] = useState<RoundClaimSummary | null>(null);
   const [exploreRound, setExploreRound] = useState<number | null>(null);
   const { data, isLoading, isError, refetch } = useClaimsByRound();
@@ -270,8 +273,15 @@ export const ClaimsByRoundSection = () => {
     return [
       {
         id: 'cycle',
+        kind: 'link',
         header: t('performance.claims.columns.cycle'),
         value: (row) => row.RoundNum,
+        // "Cycle 2", not a bare "2": a word-wide link to the cycle's record.
+        cell: (row) => (
+          <TableLink href={cycleHref(row.RoundNum)}>
+            {tTables('allocation.cycle', { cycle: row.RoundNum })}
+          </TableLink>
+        ),
         sortable: true,
         nowrap: true,
       },
@@ -330,7 +340,7 @@ export const ClaimsByRoundSection = () => {
         ),
       },
     ];
-  }, [t]);
+  }, [t, tTables, cycleHref]);
 
   return (
     <div className="space-y-6">

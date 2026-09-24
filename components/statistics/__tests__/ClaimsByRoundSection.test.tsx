@@ -12,6 +12,8 @@ const mockUseClaimDetailByRound = jest.fn();
 jest.mock('../../../hooks/useApiQuery', () => ({
   useClaimsByRound: (...args: unknown[]) => mockUseClaimsByRound(...args),
   useClaimDetailByRound: (...args: unknown[]) => mockUseClaimDetailByRound(...args),
+  // The live cycle, which a cycle link sends to /current-cycle.
+  useDashboardInfo: () => ({ data: { CurRoundNum: 13 } }),
 }));
 jest.mock('../../../hooks/useNow', () => ({ useNow: () => NOW_SEC * 1000 }));
 
@@ -78,6 +80,19 @@ describe('ClaimsByRoundSection', () => {
     expect(rows[1]).toHaveTextContent(/4\sETH · 2\sNFT/);
     expect(rows[1]).toHaveTextContent('83.3%');
     expect(rows[2]).toHaveTextContent('All retrieved');
+  });
+
+  it('links each cycle to its allocation record by name, not a bare number', () => {
+    render(<ClaimsByRoundSection />);
+    // The ledgers' shared "Cycle {cycle}" (tables namespace, rendered as its key here).
+    expect(screen.getByRole('link', { name: 'tables.allocation.cycle(cycle=12)' })).toHaveAttribute(
+      'href',
+      '/allocation/12',
+    );
+    expect(screen.getByRole('link', { name: 'tables.allocation.cycle(cycle=11)' })).toHaveAttribute(
+      'href',
+      '/allocation/11',
+    );
   });
 
   it('opens a cycle’s unretrieved assets with the time left in its window', async () => {
