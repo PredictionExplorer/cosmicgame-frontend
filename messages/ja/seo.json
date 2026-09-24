@@ -368,7 +368,7 @@
       "alt": "Cosmic Signature——ギャラリー",
       "eyebrow": "ギャラリー",
       "title": "オンチェーンのシードから生まれる三体の軌跡。",
-      "subhead": "すべてのシグネチャーは、オンチェーンのシードから始まる決定論的な三体シミュレーションをスペクトルレンダリングしたものです。同じシードなら、同じピクセル。",
+      "subhead": "どれも決定論的な三体シミュレーション。同じシードなら、同じピクセル。",
       "fact": "CC0・決定論的・再現可能"
     },
     "currentCycle": {
@@ -382,7 +382,7 @@
       "alt": "Cosmic Signature——係留",
       "eyebrow": "係留",
       "title": "シグネチャーを係留し、毎サイクルに参加する。",
-      "subhead": "係留中のCosmic Signature NFTは、サイクルごとの係留配分に比例して参加します。係留解除はいつでもできます。",
+      "subhead": "係留中のシグネチャーは、毎サイクルの係留配分に比例して参加します。",
       "fact": "CC0・いつでも係留解除・係留配分"
     },
     "faq": {
@@ -428,10 +428,13 @@
       "subhead": "すべてのパフォーマンス・サイクルにわたる一筆、配分、係留、拠出。"
     },
     "token": {
-      "alt": "Cosmic Signature #{id}、決定論的な三体のアートワーク",
-      "altWithTraits": "Cosmic Signature #{id}：構造は{structure}、パレットは{palette}",
-      "title": "シグネチャー#{id}",
-      "subhead": "オンチェーンのシードとオープンソースのレンダラーから生まれる、決定論的な三体シミュレーション。"
+      "alt": "{subject}、決定論的な三体のアートワーク",
+      "altWithTraits": "{subject}：構造は{structure}、パレットは{palette}",
+      "altSubject": "Cosmic Signature #{id}",
+      "altSubjectNamed": "Cosmic Signature #{id}「{name}」",
+      "altInCycle": "サイクル{cycle}の{subject}",
+      "title": "シグネチャー{number}",
+      "subhead": "オンチェーンのシードから、オープンソースのレンダラーが描く決定論的な三体シミュレーション。"
     }
   }
 }

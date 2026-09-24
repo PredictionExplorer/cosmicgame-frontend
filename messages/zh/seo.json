@@ -428,9 +428,12 @@
       "subhead": "汇集各演绎周期中的落笔、分配、锚定与贡献记录。"
     },
     "token": {
-      "alt": "Cosmic Signature #{id}，一件确定性三体艺术作品",
-      "altWithTraits": "Cosmic Signature #{id}：结构为{structure}，调色为{palette}",
-      "title": "签名 #{id}",
+      "alt": "{subject}，一件确定性三体艺术作品",
+      "altWithTraits": "{subject}：结构为{structure}，调色为{palette}",
+      "altSubject": "Cosmic Signature #{id}",
+      "altSubjectNamed": "Cosmic Signature #{id}《{name}》",
+      "altInCycle": "第 {cycle} 个周期的 {subject}",
+      "title": "签名 {number}",
       "subhead": "确定性三体模拟：种子源自链上，由开源渲染器渲染。"
     }
   }

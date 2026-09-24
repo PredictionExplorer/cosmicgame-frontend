@@ -368,7 +368,7 @@
       "alt": "Cosmic Signature — Gallery",
       "eyebrow": "Gallery",
       "title": "Three-body trajectories, seeded on-chain.",
-      "subhead": "Every Signature is a deterministic three-body simulation, rendered spectrally from its on-chain seed. Same seed, identical pixels.",
+      "subhead": "Every Signature is a deterministic three-body simulation, rendered spectrally. Same seed, identical pixels.",
       "fact": "CC0 · Deterministic · Reproducible"
     },
     "currentCycle": {
@@ -428,9 +428,12 @@
       "subhead": "Gestures, allocations, anchors, and contributions across every Performance Cycle."
     },
     "token": {
-      "alt": "Cosmic Signature #{id}, a deterministic three-body artwork",
-      "altWithTraits": "Cosmic Signature #{id}: {structure} structure, {palette} palette",
-      "title": "Signature #{id}",
+      "alt": "{subject}, a deterministic three-body artwork",
+      "altWithTraits": "{subject}: {structure} structure, {palette} palette",
+      "altSubject": "Cosmic Signature #{id}",
+      "altSubjectNamed": "“{name}”, Cosmic Signature #{id}",
+      "altInCycle": "{subject} from Cycle {cycle}",
+      "title": "Signature {number}",
       "subhead": "A deterministic three-body simulation, seeded on-chain and rendered by the open-source renderer."
     }
   }

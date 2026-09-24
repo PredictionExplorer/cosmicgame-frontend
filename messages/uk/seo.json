@@ -383,7 +383,7 @@
       "eyebrow": "Закріплення",
       "title": "Закріпіть Сигнатуру для кожного циклу.",
       "subhead": "Закріплені Cosmic Signature NFT пропорційно беруть участь у надходженнях за закріплення кожного циклу. Відкріпити можна будь-коли.",
-      "fact": "CC0 · Відкріплення будь-коли · Надходження за закріплення"
+      "fact": "CC0 · Відкріплення будь-коли"
     },
     "faq": {
       "alt": "Cosmic Signature — Поширені запитання",
@@ -428,9 +428,12 @@
       "subhead": "Жести, розподіли, закріплення та внески в усіх перформанс-циклах."
     },
     "token": {
-      "alt": "Cosmic Signature #{id} — детермінований твір трьох тіл",
-      "altWithTraits": "Cosmic Signature #{id}: структура {structure}, палітра {palette}",
-      "title": "Сигнатура #{id}",
+      "alt": "{subject} — детермінований твір трьох тіл",
+      "altWithTraits": "{subject}: структура {structure}, палітра {palette}",
+      "altSubject": "Cosmic Signature #{id}",
+      "altSubjectNamed": "«{name}», Cosmic Signature #{id}",
+      "altInCycle": "{subject} з циклу {cycle}",
+      "title": "Сигнатура {number}",
       "subhead": "Детермінована симуляція трьох тіл: сід — ончейн, рендеринг — у програмі з відкритим кодом."
     }
   }

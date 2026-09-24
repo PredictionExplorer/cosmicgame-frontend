@@ -428,9 +428,12 @@
       "subhead": "모든 퍼포먼스 사이클에 걸친 제스처, 배분, 앵커링, 기여 내역입니다."
     },
     "token": {
-      "alt": "Cosmic Signature #{id} — 결정론적 삼체 작품",
-      "altWithTraits": "Cosmic Signature #{id} — 구조: {structure}, 팔레트: {palette}",
-      "title": "시그니처 #{id}",
+      "alt": "{subject} — 결정론적 삼체 작품",
+      "altWithTraits": "{subject} — 구조: {structure}, 팔레트: {palette}",
+      "altSubject": "Cosmic Signature #{id}",
+      "altSubjectNamed": "Cosmic Signature #{id} “{name}”",
+      "altInCycle": "사이클 {cycle}의 {subject}",
+      "title": "시그니처 {number}",
       "subhead": "온체인 시드와 오픈 소스 렌더러로 만든 결정론적 삼체 시뮬레이션입니다."
     }
   }

@@ -1,4 +1,3 @@
-// lexicon-allow-start: backend HTTP URL paths and wire fields mirror the Go server and are a sealed contract
 import { getAPIUrl } from '@/services/api/client';
 import { getAssetsUrl } from '@/utils/urls';
 
@@ -8,6 +7,10 @@ import { loadScaledArtwork, pngDataUri } from './fetchImage';
  * Artwork for the art-led share cards: which Signature a card shows, and its
  * pixels. Every reader resolves to `null` / `[]` on any failure so a card
  * falls back to its text layout instead of failing to render.
+ *
+ * The API's paths and field names mirror the Go server and are a sealed
+ * contract: the one path the lexicon scanner flags carries a line-level
+ * `lexicon-allow-backend-type`, so the rest of the module is still scanned.
  */
 
 /** How long share-card data reads may be served from the Data Cache, in seconds. */
@@ -26,12 +29,16 @@ export const OG_FETCH_TIMEOUT_MS = 8_000;
  */
 export const OG_ARTWORK_WIDTH = 680;
 
-export interface OgArtwork {
+/** What a card says about a Signature. */
+export interface OgTokenInfo {
   tokenId: number;
   /** The owner-given name, when the token has one. */
   name: string | null;
   /** Cycle the Signature was imprinted in, when the API reports it. */
   cycle: number | null;
+}
+
+export interface OgArtwork extends OgTokenInfo {
   /** `data:image/png;base64,…` of the source render. */
   src: string;
 }
@@ -71,25 +78,34 @@ export function artworkUrl(seed: string): string {
   return getAssetsUrl(`cosmicsignature/0x${seed}.png`);
 }
 
-async function artworkFrom(record: TokenRecord | null | undefined): Promise<OgArtwork | null> {
+function tokenInfoFrom(record: TokenRecord | null | undefined): OgTokenInfo | null {
   const tokenId = asNonNegativeInteger(record?.TokenId);
-  const seed = asSeed(record?.Seed);
-  if (tokenId === null || seed === null) return null;
-  const bytes = await loadScaledArtwork(artworkUrl(seed), OG_ARTWORK_WIDTH);
-  if (!bytes) return null;
+  if (tokenId === null) return null;
   const name = typeof record?.TokenName === 'string' ? record.TokenName.trim() : '';
   return {
     tokenId,
     name: name || null,
     cycle: asNonNegativeInteger(record?.RoundNum),
-    src: pngDataUri(bytes),
   };
+}
+
+async function artworkFrom(record: TokenRecord | null | undefined): Promise<OgArtwork | null> {
+  const info = tokenInfoFrom(record);
+  const seed = asSeed(record?.Seed);
+  if (info === null || seed === null) return null;
+  const bytes = await loadScaledArtwork(artworkUrl(seed), OG_ARTWORK_WIDTH);
+  return bytes ? { ...info, src: pngDataUri(bytes) } : null;
 }
 
 async function readToken(tokenId: number): Promise<TokenRecord | null> {
   const data = await readApi(`cst/info/${tokenId}`);
   const record = data?.TokenInfo;
   return record && typeof record === 'object' ? (record as TokenRecord) : null;
+}
+
+/** One token's name and cycle, without its pixels (alt text, the text-card fallback). */
+export async function loadTokenInfo(tokenId: number): Promise<OgTokenInfo | null> {
+  return tokenInfoFrom(await readToken(tokenId));
 }
 
 /** One token's artwork. */
@@ -116,12 +132,13 @@ export async function loadCycleArtwork(cycle: number): Promise<OgArtwork | null>
   const info = data?.RoundInfo as
     | { MainPrize?: { NftTokenId?: unknown; Seed?: unknown } }
     | undefined;
-  const tokenId = asNonNegativeInteger(info?.MainPrize?.NftTokenId);
+  const signature = info?.MainPrize;
+  const tokenId = asNonNegativeInteger(signature?.NftTokenId);
   if (tokenId === null) return null;
   // The cycle record carries the seed but not the name; the token record has both.
   const token = await readToken(tokenId);
   return artworkFrom(
-    token ?? { TokenId: tokenId, Seed: info?.MainPrize?.Seed, RoundNum: cycle, TokenName: null },
+    token ?? { TokenId: tokenId, Seed: signature?.Seed, RoundNum: cycle, TokenName: null },
   );
 }
 
@@ -145,7 +162,7 @@ export interface OgGestureRecord {
 
 /** The gesture behind an event-log id (the `/gesture/[id]` route parameter). */
 export async function loadGesture(eventId: number): Promise<OgGestureRecord | null> {
-  const data = await readApi(`bid/info/${eventId}`);
+  const data = await readApi(`bid/info/${eventId}`); // lexicon-allow-backend-type
   const info = data?.BidInfo as
     | { BidPosition?: unknown; RoundNum?: unknown; BidType?: unknown }
     | undefined;
@@ -157,4 +174,3 @@ export async function loadGesture(eventId: number): Promise<OgGestureRecord | nu
     method: asNonNegativeInteger(info?.BidType),
   };
 }
-// lexicon-allow-end

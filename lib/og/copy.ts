@@ -51,6 +51,24 @@ export interface OgGestureMethods {
   cst: string;
 }
 
+/**
+ * A token card's alt text is composed from parts, each used only when it can
+ * be read: the subject (`altSubject` or, with the owner's name,
+ * `altSubjectNamed`), placed in its cycle (`altInCycle`), then described by
+ * its traits (`altWithTraits`) or generically (`alt`), both of which take
+ * `{subject}`.
+ */
+export interface OgTokenAltCopy {
+  /** `{subject}: {structure} structure, {palette} palette` */
+  altWithTraits: string;
+  /** `Cosmic Signature #{id}` */
+  altSubject: string;
+  /** `{name}, Cosmic Signature #{id}` */
+  altSubjectNamed: string;
+  /** `{subject} from Cycle {cycle}` */
+  altInCycle: string;
+}
+
 export interface OgCatalog extends Record<OgRoute, OgRouteCopy> {
   shared: {
     /** `Cycle {cycle}` */
@@ -59,6 +77,7 @@ export interface OgCatalog extends Record<OgRoute, OgRouteCopy> {
     plateCaption: string;
   };
   gesture: OgRouteCopy & { methods: OgGestureMethods };
+  token: OgRouteCopy & OgTokenAltCopy;
 }
 
 // `satisfies` compiles every locale's JSON against the catalog shape, so a

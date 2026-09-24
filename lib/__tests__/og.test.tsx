@@ -1,8 +1,15 @@
 import { isValidElement, type ReactElement, type ReactNode } from 'react';
 
+import { getLocaleConfig } from '@/i18n/localeConfig';
 import { loadGesture, loadLatestArtworks, loadTokenArtwork, type OgArtwork } from '@/lib/og/art';
-import { COSMIC_OG_SIZE, CosmicOgCard, type CosmicOgCardProps } from '@/lib/og/CosmicOgCard';
-import { getOgTypography } from '@/lib/og/fonts';
+import {
+  COSMIC_OG_SIZE,
+  CosmicOgCard,
+  planCosmicOgCard,
+  type CosmicOgCardProps,
+} from '@/lib/og/CosmicOgCard';
+import { getOgFontConfig, getOgTypography } from '@/lib/og/fonts';
+import { createOgMeasure, type OgMeasure } from '@/lib/og/measure';
 import { OG_COLORS } from '@/lib/og/palette';
 
 /**
@@ -37,6 +44,7 @@ jest.mock('@/lib/og/art', () => ({
   loadLatestArtworks: jest.fn(async () => []),
   loadParticipantArtworks: jest.fn(async () => []),
   loadTokenArtwork: jest.fn(async () => null),
+  loadTokenInfo: jest.fn(async () => null),
 }));
 
 const ART: OgArtwork = { tokenId: 47, name: null, cycle: 1, src: 'data:image/png;base64,AAAA' };
@@ -96,8 +104,22 @@ function collectImages(node: ReactNode, out: string[] = []): string[] {
   return out;
 }
 
+/** Each locale's measure, built from the faces its cards embed. */
+const measures = new Map<string, OgMeasure>();
+beforeAll(async () => {
+  for (const locale of ['en', 'uk', 'ko', 'ja']) {
+    measures.set(locale, createOgMeasure(await getOgFontConfig(locale)));
+  }
+});
+
+const forLocale = (locale: string): Partial<CosmicOgCardProps> => ({
+  typography: getOgTypography(locale),
+  measure: measures.get(locale)!,
+  ellipsis: getLocaleConfig(locale).ellipsis,
+});
+
 const base = (overrides: Partial<CosmicOgCardProps> = {}): CosmicOgCardProps => ({
-  typography: getOgTypography('en'),
+  ...(forLocale('en') as Pick<CosmicOgCardProps, 'typography' | 'measure' | 'ellipsis'>),
   markSrc: 'data:image/svg+xml;base64,MARK',
   title: 'A Headline.',
   domain: 'app.cosmicsignature.com',
@@ -146,6 +168,23 @@ describe('CosmicOgCard', () => {
     );
     expect(collectImages(strip)).toEqual(['data:image/svg+xml;base64,MARK', 'a', 'b', 'c']);
     expect(collectStrings(strip)).toEqual(expect.arrayContaining(['#000047', '#000045']));
+  });
+
+  // A participant with two Signatures used to leave the strip's right third empty.
+  it('spreads two plates across the full measure of the strip', () => {
+    const widths = (count: number) =>
+      collectStyles(
+        card(base({ art: Array.from({ length: count }, (_, index) => ({ src: `p${index}` })) })),
+      )
+        .filter((style) => style.background === OG_COLORS.plate)
+        .map((style) => style.width as number);
+    const [two, three] = [widths(2), widths(3)];
+    expect(two).toHaveLength(2);
+    expect(three).toHaveLength(3);
+    const span = (plates: number[]) => plates.reduce((sum, width) => sum + width, 0);
+    // Both rows fill the 1072px measure, less the 20px gutters between plates.
+    expect(span(two) + 20).toBeGreaterThan(1070);
+    expect(span(three) + 40).toBeGreaterThan(1070);
   });
 
   it('paints the Midnight ground and pure-black plates, never the retired gradient', () => {
@@ -199,15 +238,37 @@ describe('CosmicOgCard', () => {
     );
   });
 
-  it('keeps Korean words and Japanese phrases whole as wrapping units', () => {
-    const ko = card(
-      base({ typography: getOgTypography('ko'), title: '모든 제스처가 시그니처를 빚어냅니다.' }),
-    );
-    expect(collectStrings(ko)).toEqual(expect.arrayContaining(['모든', '제스처가', '빚어냅니다.']));
-    const ja = card(
-      base({ typography: getOgTypography('ja'), title: '三体の軌跡を、オンチェーンで描く。' }),
-    );
-    expect(collectStrings(ja)).toEqual(expect.arrayContaining(['三体の', 'オンチェーンで']));
+  // F228: every line is set by the card, a Korean word or Japanese phrase whole.
+  it('draws the laid-out lines, Korean words and Japanese phrases whole', () => {
+    const koTitle = '모든 제스처가 시그니처를 빚어냅니다.';
+    const ko = planCosmicOgCard(base({ ...forLocale('ko'), title: koTitle, art: [{ src: 'x' }] }));
+    expect(ko.stack.title.lines.length).toBeGreaterThan(1);
+    expect(ko.stack.title.lines.join(' ')).toBe(koTitle);
+    const jaTitle = '三体の軌跡を、オンチェーンで描く。';
+    const ja = planCosmicOgCard(base({ ...forLocale('ja'), title: jaTitle, art: [{ src: 'x' }] }));
+    expect(ja.stack.title.lines.join('')).toBe(jaTitle);
+    for (const line of ja.stack.title.lines) {
+      expect(line).not.toMatch(/^[\p{Script=Hiragana}、。ー]/u);
+    }
+    // A CJK title's word spaces are the script face's, drawn as gaps: Clash
+    // Display's hairline space ran 사이클 1 배분 together.
+    const koPlan = planCosmicOgCard(base({ ...forLocale('ko'), title: koTitle }));
+    expect(koPlan.stack.title.wordGap).toBeCloseTo(0.227 * koPlan.stack.title.size, 0);
+    const strings = collectStrings(card(base({ ...forLocale('ko'), title: koTitle })));
+    for (const word of koTitle.split(' ')) expect(strings).toContain(word);
+    const en = planCosmicOgCard(base({ title: 'A Headline.' }));
+    expect(en.stack.title.wordGap).toBeUndefined();
+    expect(collectStrings(card(base({ title: 'A Headline.' })))).toContain('A Headline.');
+  });
+
+  it('cuts text it cannot fit at a whole word, with the locale’s ellipsis', () => {
+    const name = 'An Owner-Given Name Far Longer Than Any Plate Label Could Ever Hold';
+    const plan = planCosmicOgCard(base({ art: [{ src: 'x', label: `${name} · Cycle 1` }] }));
+    expect(plan.layout).toBe('plate');
+    if (plan.layout !== 'plate') return;
+    expect(plan.label?.lines).toHaveLength(1);
+    expect(plan.label?.lines[0]).toMatch(/^An Owner-Given Name .*\w\.\.\.$/);
+    expect(plan.label?.width).toBeLessThanOrEqual(600);
   });
 });
 
@@ -310,8 +371,12 @@ describe('opengraph-image routes', () => {
     const route = load('../../app/[locale]/(app)/detail/[id]/opengraph-image');
     expect(route.revalidate).toBe(3600);
     await route.default(params({ locale: 'en', id: '24' }));
+    // F226: a named piece's card carries its number and cycle above the name.
     expect(lastCard().element.props).toEqual(
-      expect.objectContaining({ title: 'Twisted Mind', eyebrow: 'CYCLE 1' }),
+      expect.objectContaining({ title: 'Twisted Mind', eyebrow: '#000024 · CYCLE 1' }),
+    );
+    expect(collectStrings(card(lastCard().element.props))).toEqual(
+      expect.arrayContaining(['#000024 · CYCLE 1', 'Twisted Mind']),
     );
     const [metadata] = await route.generateImageMetadata(params({ locale: 'en', id: '24' }));
     expect(metadata?.alt).toMatch(/^Cosmic Signature #24/);

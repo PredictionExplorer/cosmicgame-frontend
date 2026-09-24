@@ -428,9 +428,12 @@
       "subhead": "彙集各演繹週期中的落筆、分配、錨定與貢獻紀錄。"
     },
     "token": {
-      "alt": "Cosmic Signature #{id}，一件確定性三體藝術作品",
-      "altWithTraits": "Cosmic Signature #{id}：結構為{structure}，調色為{palette}",
-      "title": "簽名 #{id}",
+      "alt": "{subject}，一件確定性三體藝術作品",
+      "altWithTraits": "{subject}：結構為{structure}，調色為{palette}",
+      "altSubject": "Cosmic Signature #{id}",
+      "altSubjectNamed": "Cosmic Signature #{id}《{name}》",
+      "altInCycle": "第 {cycle} 個週期的 {subject}",
+      "title": "簽名 {number}",
       "subhead": "確定性三體模擬：種子源自鏈上，由開源渲染器渲染。"
     }
   }

@@ -428,9 +428,12 @@
       "subhead": "Nét bút, phân bổ, neo giữ và đóng góp qua mọi chu kỳ trình diễn."
     },
     "token": {
-      "alt": "Cosmic Signature #{id}, tác phẩm ba vật thể tất định",
-      "altWithTraits": "Cosmic Signature #{id}: cấu trúc {structure}, bảng màu {palette}",
-      "title": "Signature #{id}",
+      "alt": "{subject}, tác phẩm ba vật thể tất định",
+      "altWithTraits": "{subject}: cấu trúc {structure}, bảng màu {palette}",
+      "altSubject": "Cosmic Signature #{id}",
+      "altSubjectNamed": "“{name}”, Cosmic Signature #{id}",
+      "altInCycle": "{subject} thuộc chu kỳ {cycle}",
+      "title": "Signature {number}",
       "subhead": "Mô phỏng ba vật thể tất định: seed lưu trên chuỗi, kết xuất bằng trình kết xuất mã nguồn mở."
     }
   }

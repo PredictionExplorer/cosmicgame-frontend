@@ -12,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { getLocaleConfig } from '../i18n/localeConfig';
 import { routing, type AppLocale } from '../i18n/routing';
 import { OG_TYPOGRAPHY, ogFontFiles, type OgFontFile } from '../lib/og/fonts';
+import { OG_DOMAINS } from '../lib/og/hosts';
 
 /** The variable TTFs of the google/fonts repository are pinned to one commit for reproducible builds. */
 export const GOOGLE_FONTS_COMMIT = 'f6b2b7e8545e086ad3f821af21895d732b6485cf';
@@ -66,8 +67,8 @@ export const OG_SUBSET_SOURCES: Readonly<Record<string, SubsetSource>> = {
 const CJK_PUNCTUATION = '，。、：；！？「」『』（）《》〈〉【】—…·・／％－～　';
 /** Typographic punctuation any locale's copy may carry (quotes, dashes, ellipsis). */
 const TYPOGRAPHIC_PUNCTUATION = '“”‘’«»—–…·';
-/** Hosts printed in the card footer. */
-const DOMAINS = 'app.cosmicsignature.com';
+/** Hosts printed in the card footer, both of them: the glyph set follows the footer. */
+const DOMAINS = Object.values(OG_DOMAINS).join('');
 
 const PRINTABLE_ASCII = Array.from({ length: 0x7f - 0x20 }, (_, index) =>
   String.fromCharCode(0x20 + index),

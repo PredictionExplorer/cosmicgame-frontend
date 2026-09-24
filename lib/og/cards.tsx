@@ -9,6 +9,7 @@ import {
   resolveTraitValueLabel,
   type TraitTranslator,
 } from '@/lib/nftMetadata';
+import { formatId } from '@/utils/format';
 import { parseCanonicalNonNegativeSafeInteger } from '@/utils/routeParams';
 
 import {
@@ -19,7 +20,8 @@ import {
   loadLatestArtworks,
   loadParticipantArtworks,
   loadTokenArtwork,
-  type OgArtwork,
+  loadTokenInfo,
+  type OgTokenInfo,
 } from './art';
 import { COSMIC_OG_SIZE, type OgPlate } from './CosmicOgCard';
 import {
@@ -32,6 +34,7 @@ import {
   type OgRouteCopy,
 } from './copy';
 import { createCosmicOgImage, type OgCardContent } from './createCosmicOgImage';
+import { OG_DOMAINS, type OgHost } from './hosts';
 
 /**
  * One builder per share-card route; the `opengraph-image.tsx` files only
@@ -39,40 +42,34 @@ import { createCosmicOgImage, type OgCardContent } from './createCosmicOgImage';
  * when the API or the media origin cannot answer.
  */
 
-export type OgHost = 'app' | 'landing';
-
-/** The public host printed on a card, whatever origin rendered it. */
-export const OG_DOMAINS: Record<OgHost, string> = {
-  app: 'app.cosmicsignature.com',
-  landing: 'cosmicsignature.com',
-};
-
 /** `generateImageMetadata` result for a card with `alt`. */
 export function ogImageMetadata(alt: string) {
   return [{ id: 'default', alt, size: COSMIC_OG_SIZE, contentType: 'image/png' }];
 }
 
-/** Zero-padded token number without the `#`: `24` → `000024`. */
-export function tokenNumber(tokenId: number): string {
-  return String(tokenId).padStart(6, '0');
-}
+type TokenIdentity = Pick<OgTokenInfo, 'tokenId' | 'name'>;
 
 /** `Twisted Mind`, or `Signature #000024` for a token without a name. */
-function artworkTitle(locale: string, artwork: Pick<OgArtwork, 'tokenId' | 'name'>): string {
+function artworkTitle(locale: string, token: TokenIdentity): string {
   return (
-    artwork.name ??
-    fillOgTemplate(getOgCopy(locale, 'token').title, { id: tokenNumber(artwork.tokenId) })
+    token.name ??
+    fillOgTemplate(getOgCopy(locale, 'token').title, { number: formatId(token.tokenId) })
   );
 }
 
-/** Wall label under a plate: `Signature #000047 · Cycle 1`. */
-function wallLabel(locale: string, artwork: OgArtwork, withCycle = true): string {
-  const name = artworkTitle(locale, artwork);
-  if (!withCycle || artwork.cycle === null) return name;
+/** `{name} · {cycle}` in the locale's own form: `#000025 · Cycle 1`. */
+function withCycle(locale: string, name: string, cycle: number | null): string {
+  if (cycle === null) return name;
   return fillOgTemplate(getOgCatalog(locale).shared.plateCaption, {
     name,
-    cycle: formatOgCycle(locale, artwork.cycle),
+    cycle: formatOgCycle(locale, cycle),
   });
+}
+
+/** Wall label under a plate: `Signature #000047 · Cycle 1`. */
+function wallLabel(locale: string, token: OgTokenInfo, showCycle = true): string {
+  const title = artworkTitle(locale, token);
+  return showCycle ? withCycle(locale, title, token.cycle) : title;
 }
 
 function textOf(copy: OgRouteCopy): Pick<OgCardContent, 'eyebrow' | 'title' | 'subhead' | 'fact'> {
@@ -113,58 +110,83 @@ export async function galleryCard(locale: string): Promise<ImageResponse> {
     eyebrow: copy.eyebrow,
     title: copy.title,
     domain: OG_DOMAINS.app,
-    art: artworks.map((artwork) => ({
-      src: artwork.src,
-      number: `#${tokenNumber(artwork.tokenId)}`,
-    })),
+    art: artworks.map((artwork) => ({ src: artwork.src, number: formatId(artwork.tokenId) })),
   });
 }
 
 /**
- * `/detail/[id]`: the piece on its plate, named, with its cycle. Without its
- * render the card still names this token, on the text layout; it never shows
- * another Signature in its place.
+ * The line above a token's title: its number and cycle when the title is the
+ * owner's name (`#000025 · Cycle 1`), or the cycle alone when the title is
+ * already the number.
+ */
+function tokenEyebrow(locale: string, token: OgTokenInfo): string | undefined {
+  if (token.name) return withCycle(locale, formatId(token.tokenId), token.cycle);
+  return token.cycle === null ? undefined : formatOgCycle(locale, token.cycle);
+}
+
+/**
+ * `/detail/[id]`: the piece on its plate, with its name, number and cycle.
+ * Without its render the card still names this token, on the text layout; it
+ * never shows another Signature in its place.
  */
 export async function tokenCard(locale: string, rawId: string): Promise<ImageResponse> {
   const copy = getOgCopy(locale, 'token');
   const tokenId = parseCanonicalNonNegativeSafeInteger(rawId);
   if (tokenId === null) return textCard(locale, 'default', 'app');
   const artwork = await loadTokenArtwork(tokenId);
+  const token = artwork ?? (await loadTokenInfo(tokenId)) ?? { tokenId, name: null, cycle: null };
   return createCosmicOgImage(locale, {
-    eyebrow: artwork?.cycle != null ? formatOgCycle(locale, artwork.cycle) : undefined,
-    title: artworkTitle(locale, artwork ?? { tokenId, name: null }),
+    eyebrow: tokenEyebrow(locale, token),
+    title: artworkTitle(locale, token),
     subhead: copy.subhead,
     domain: OG_DOMAINS.app,
     art: artwork ? [{ src: artwork.src }] : [],
   });
 }
 
-/**
- * Alt text for a token card, composed from its traits in the locale
- * (`Cosmic Signature #24: Orbit Ribbons structure, Glacial Split palette`).
- */
-export async function tokenCardAlt(locale: string, rawId: string): Promise<string> {
-  const copy = getOgCopy(locale, 'token');
-  const tokenId = parseCanonicalNonNegativeSafeInteger(rawId);
-  if (tokenId === null) return getOgCopy(locale, 'default').alt;
+/** The token's structure and palette, in the locale, when its metadata can be read. */
+async function traitLabels(
+  locale: string,
+  tokenId: number,
+): Promise<{ structure: string; palette: string } | null> {
   try {
     const metadata = await fetchNftMetadata(tokenId, {
       next: { revalidate: OG_DATA_REVALIDATE_SECONDS },
       signal: AbortSignal.timeout(OG_FETCH_TIMEOUT_MS),
     });
     const entry = metadata ? normalizeTraitEntry(metadata, tokenId) : null;
-    if (entry?.structure && entry.palette && copy.altWithTraits) {
-      const t = (await getTranslations({ locale, namespace: 'traits' })) as TraitTranslator;
-      return fillOgTemplate(copy.altWithTraits, {
-        id: tokenId,
-        structure: resolveTraitValueLabel(t, 'structure', entry.structure),
-        palette: resolveTraitValueLabel(t, 'palette', entry.palette),
-      });
-    }
+    if (!entry?.structure || !entry.palette) return null;
+    const t = (await getTranslations({ locale, namespace: 'traits' })) as TraitTranslator;
+    return {
+      structure: resolveTraitValueLabel(t, 'structure', entry.structure),
+      palette: resolveTraitValueLabel(t, 'palette', entry.palette),
+    };
   } catch {
-    // Metadata is optional for alt text; the plain form below still names the piece.
+    // Traits are optional for alt text; the plain form still names the piece.
+    return null;
   }
-  return fillOgTemplate(copy.alt, { id: tokenId });
+}
+
+/**
+ * Alt text for a token card: the name when it has one, the number, the cycle
+ * and the traits, in the locale, each part only when it can be read
+ * (`Twisted Mind, Cosmic Signature #25 from Cycle 1: Orbit Ribbons structure,
+ * Solar Mono palette`).
+ */
+export async function tokenCardAlt(locale: string, rawId: string): Promise<string> {
+  const tokenId = parseCanonicalNonNegativeSafeInteger(rawId);
+  if (tokenId === null) return getOgCopy(locale, 'default').alt;
+  const copy = getOgCatalog(locale).token;
+  const [token, traits] = await Promise.all([loadTokenInfo(tokenId), traitLabels(locale, tokenId)]);
+  let subject = token?.name
+    ? fillOgTemplate(copy.altSubjectNamed, { name: token.name, id: tokenId })
+    : fillOgTemplate(copy.altSubject, { id: tokenId });
+  if (token && token.cycle !== null) {
+    subject = fillOgTemplate(copy.altInCycle, { subject, cycle: token.cycle });
+  }
+  return traits
+    ? fillOgTemplate(copy.altWithTraits, { subject, ...traits })
+    : fillOgTemplate(copy.alt, { subject });
 }
 
 const GESTURE_METHODS: Record<number, keyof OgGestureMethods> = {
@@ -244,10 +266,7 @@ export async function participantCard(locale: string, rawAddress: string): Promi
   const art: OgPlate[] =
     artworks.length === 1
       ? [{ src: artworks[0]!.src, label: wallLabel(locale, artworks[0]!) }]
-      : artworks.map((artwork) => ({
-          src: artwork.src,
-          number: `#${tokenNumber(artwork.tokenId)}`,
-        }));
+      : artworks.map((artwork) => ({ src: artwork.src, number: formatId(artwork.tokenId) }));
   return createCosmicOgImage(locale, {
     eyebrow: copy.eyebrow,
     title: short,

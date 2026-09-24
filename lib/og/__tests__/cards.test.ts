@@ -4,10 +4,10 @@ import {
   loadLatestArtworks,
   loadParticipantArtworks,
   loadTokenArtwork,
+  loadTokenInfo,
   type OgArtwork,
 } from '@/lib/og/art';
 import {
-  OG_DOMAINS,
   allocationCard,
   allocationCardAlt,
   galleryCard,
@@ -21,9 +21,9 @@ import {
   textCard,
   tokenCard,
   tokenCardAlt,
-  tokenNumber,
 } from '@/lib/og/cards';
 import { createCosmicOgImage, type OgCardContent } from '@/lib/og/createCosmicOgImage';
+import { OG_DOMAINS } from '@/lib/og/hosts';
 import { fetchNftMetadata } from '@/lib/nftMetadata';
 
 jest.mock('@/lib/og/art', () => ({
@@ -34,6 +34,7 @@ jest.mock('@/lib/og/art', () => ({
   loadLatestArtworks: jest.fn(),
   loadParticipantArtworks: jest.fn(),
   loadTokenArtwork: jest.fn(),
+  loadTokenInfo: jest.fn(),
 }));
 
 jest.mock('@/lib/og/createCosmicOgImage', () => ({
@@ -77,14 +78,14 @@ beforeEach(() => {
   jest.clearAllMocks();
   mocked(loadLatestArtworks).mockResolvedValue([artwork()]);
   mocked(loadTokenArtwork).mockResolvedValue(artwork({ tokenId: 24 }));
+  mocked(loadTokenInfo).mockResolvedValue(null);
   mocked(loadCycleArtwork).mockResolvedValue(artwork({ tokenId: 24, name: 'Twisted Mind' }));
   mocked(loadParticipantArtworks).mockResolvedValue([]);
   mocked(loadGesture).mockResolvedValue({ position: 1139, cycle: 2, method: 2 });
 });
 
 describe('share-card builders', () => {
-  it('pads token numbers and prints the public host', () => {
-    expect(tokenNumber(24)).toBe('000024');
+  it('prints the public host', () => {
     expect(OG_DOMAINS).toEqual({ app: 'app.cosmicsignature.com', landing: 'cosmicsignature.com' });
     expect(ogImageMetadata('Alt')).toEqual([
       { id: 'default', alt: 'Alt', size: { width: 1200, height: 630 }, contentType: 'image/png' },
@@ -138,29 +139,40 @@ describe('share-card builders', () => {
   });
 
   describe('token cards', () => {
-    it('show the piece with its name and cycle', async () => {
+    // F226: a named piece is shared with its name, its number and its cycle.
+    it('show the piece with its name, number and cycle', async () => {
       mocked(loadTokenArtwork).mockResolvedValue(artwork({ tokenId: 25, name: 'Twisted Mind' }));
       await tokenCard('en', '25');
       expect(lastCard().content).toEqual(
         expect.objectContaining({
+          eyebrow: '#000025 · Cycle 1',
           title: 'Twisted Mind',
-          eyebrow: 'Cycle 1',
           art: [expect.anything()],
         }),
       );
+      await tokenCard('ja', '25');
+      expect(lastCard().content.eyebrow).toBe('#000025・サイクル1');
     });
 
-    it('name an unnamed piece by its number', async () => {
+    it('name an unnamed piece by its number, with its cycle above', async () => {
       await tokenCard('zh', '24');
-      expect(lastCard().content.title).toBe('签名 #000024');
+      expect(lastCard().content).toEqual(
+        expect.objectContaining({ eyebrow: '第 1 个周期', title: '签名 #000024' }),
+      );
     });
 
     // F226: the card must never show another Signature in this token's place.
     it('keep naming this token on the text layout when its render is unavailable', async () => {
       mocked(loadTokenArtwork).mockResolvedValue(null);
+      mocked(loadTokenInfo).mockResolvedValue({ tokenId: 24, name: 'Twisted Mind', cycle: 3 });
       await tokenCard('en', '24');
       expect(lastCard().content).toEqual(
-        expect.objectContaining({ title: 'Signature #000024', art: [] }),
+        expect.objectContaining({ eyebrow: '#000024 · Cycle 3', title: 'Twisted Mind', art: [] }),
+      );
+      mocked(loadTokenInfo).mockResolvedValue(null);
+      await tokenCard('en', '24');
+      expect(lastCard().content).toEqual(
+        expect.objectContaining({ eyebrow: undefined, title: 'Signature #000024', art: [] }),
       );
       expect(loadLatestArtworks).not.toHaveBeenCalled();
     });
@@ -171,23 +183,49 @@ describe('share-card builders', () => {
       expect(lastCard().content.title).toBe('Every Gesture Shapes the Signature.');
     });
 
-    it('compose alt text from traits in the locale, with a plain fallback', async () => {
-      mocked(fetchNftMetadata).mockResolvedValue({
+    describe('alt text', () => {
+      const traits = {
         name: 'x',
         attributes: [
           { trait_type: 'Structure', value: 'Orbit Ribbons' },
           { trait_type: 'Palette', value: 'Glacial Split' },
         ],
-        properties: { token_id: 24 },
+        properties: { token_id: 25 },
+      };
+
+      it('names the piece, its number, its cycle and its traits', async () => {
+        mocked(fetchNftMetadata).mockResolvedValue(traits);
+        mocked(loadTokenInfo).mockResolvedValue({ tokenId: 25, name: 'Twisted Mind', cycle: 1 });
+        expect(await tokenCardAlt('en', '25')).toBe(
+          '“Twisted Mind”, Cosmic Signature #25 from Cycle 1: Orbit Ribbons structure, Glacial Split palette',
+        );
+        expect(await tokenCardAlt('ja', '25')).toBe(
+          'サイクル1のCosmic Signature #25「Twisted Mind」：構造はOrbit Ribbons、パレットはGlacial Split',
+        );
+        expect(await tokenCardAlt('ko', '25')).toBe(
+          '사이클 1의 Cosmic Signature #25 “Twisted Mind” — 구조: Orbit Ribbons, 팔레트: Glacial Split',
+        );
       });
-      expect(await tokenCardAlt('en', '24')).toMatch(/^Cosmic Signature #24: .*Orbit Ribbons/);
-      mocked(fetchNftMetadata).mockRejectedValue(new Error('offline'));
-      expect(await tokenCardAlt('en', '24')).toBe(
-        'Cosmic Signature #24, a deterministic three-body artwork',
-      );
-      expect(await tokenCardAlt('en', 'abc')).toBe(
-        'Cosmic Signature — Every Gesture Shapes the Signature.',
-      );
+
+      it('leaves out each part it cannot read', async () => {
+        mocked(fetchNftMetadata).mockResolvedValue(traits);
+        mocked(loadTokenInfo).mockResolvedValue({ tokenId: 25, name: null, cycle: 1 });
+        expect(await tokenCardAlt('en', '25')).toBe(
+          'Cosmic Signature #25 from Cycle 1: Orbit Ribbons structure, Glacial Split palette',
+        );
+        mocked(fetchNftMetadata).mockRejectedValue(new Error('offline'));
+        mocked(loadTokenInfo).mockResolvedValue({ tokenId: 25, name: 'Twisted Mind', cycle: null });
+        expect(await tokenCardAlt('en', '25')).toBe(
+          '“Twisted Mind”, Cosmic Signature #25, a deterministic three-body artwork',
+        );
+        mocked(loadTokenInfo).mockResolvedValue(null);
+        expect(await tokenCardAlt('en', '24')).toBe(
+          'Cosmic Signature #24, a deterministic three-body artwork',
+        );
+        expect(await tokenCardAlt('en', 'abc')).toBe(
+          'Cosmic Signature — Every Gesture Shapes the Signature.',
+        );
+      });
     });
   });
 
