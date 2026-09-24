@@ -281,6 +281,25 @@ describe('GestureConsole', () => {
     expect(screen.queryByTestId('finalize-wait')).not.toBeInTheDocument();
   });
 
+  it('names no exclusive window while its length is unknown', () => {
+    renderConsole({
+      canGesture: false,
+      cycleTimerEnded: true,
+      finalize: {
+        canClaim: true,
+        isClaiming: false,
+        isLatestParticipant: true,
+        openToAllAtMs: null,
+        nowMs: 1_800_000,
+        onFinalize: jest.fn(),
+      },
+    });
+
+    expect(screen.getByTestId('finalize-submit')).toBeEnabled();
+    expect(screen.queryByTestId('finalize-holder-window')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('finalize-wait')).not.toBeInTheDocument();
+  });
+
   it('marks the last ten minutes of the exclusive window, then says it ended', () => {
     const finalize: ConsoleFinalize = {
       canClaim: true,

@@ -80,8 +80,12 @@ export interface ConsoleFinalize {
   isClaiming: boolean;
   /** The connected wallet made the Final Gesture (its exclusive window). */
   isLatestParticipant: boolean;
-  /** When anyone else may finalize, in epoch ms. */
-  openToAllAtMs: number;
+  /**
+   * When anyone else may finalize, in epoch ms; `null` while the contract's
+   * finalize timeout is unknown (still loading, or its read failed), so no
+   * window is claimed on a guess.
+   */
+  openToAllAtMs: number | null;
   nowMs: number;
   onFinalize: () => void;
 }
@@ -288,14 +292,14 @@ export function GestureConsole({
     </span>
   );
 
-  const finalizeWaitMs =
-    finalize && !finalize.isLatestParticipant
+  const openToAllInMs =
+    finalize && finalize.openToAllAtMs !== null
       ? Math.max(0, finalize.openToAllAtMs - finalize.nowMs)
-      : 0;
-  // The Final Gesture participant alone may finalize until the window closes.
-  const holderWindowMs = finalize?.isLatestParticipant
-    ? Math.max(0, finalize.openToAllAtMs - finalize.nowMs)
-    : 0;
+      : null;
+  const finalizeWaitMs = finalize && !finalize.isLatestParticipant ? (openToAllInMs ?? 0) : 0;
+  // The Final Gesture participant alone may finalize until the window
+  // closes; `null` while its length is unknown, so no caption is shown.
+  const holderWindowMs = finalize?.isLatestParticipant ? openToAllInMs : null;
 
   const titleClassName = 'type-heading-3 text-foreground';
 
@@ -551,7 +555,7 @@ export function GestureConsole({
                     >
                       {t('form.finalize')}
                     </Button>
-                    {finalize.isLatestParticipant ? (
+                    {holderWindowMs !== null ? (
                       <p
                         className={cn(
                           'type-caption',
