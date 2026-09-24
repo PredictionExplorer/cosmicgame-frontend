@@ -340,11 +340,12 @@ export function useTimeUntilAllocation() {
 // Tokens (CST / CT)
 // ---------------------------------------------------------------------------
 
-export function useCSTList() {
+export function useCSTList({ enabled = true }: { enabled?: boolean } = {}) {
   return useQuery<CSTTokenInfo[]>({
     queryKey: ['cstList'],
     queryFn: ({ signal }) => api.get_cst_list({ signal }),
     staleTime: 30_000,
+    enabled,
   });
 }
 

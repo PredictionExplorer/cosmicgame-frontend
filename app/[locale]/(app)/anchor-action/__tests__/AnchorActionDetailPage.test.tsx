@@ -1,55 +1,49 @@
+import userEvent from '@testing-library/user-event';
+
 import { checkA11y, render, screen } from '@/test-utils';
 
 import AnchorActionDetailPage from '../[IsRwalk]/[actionId]/AnchorActionDetailPage';
 
-const mockUseRWLKAnchorActionInfo = jest.fn();
-const mockUseCSTAnchorActionInfo = jest.fn();
+const mockRwlk = jest.fn();
+const mockCst = jest.fn();
+const mockCstInfo = jest.fn();
 
-jest.mock('../../../../../hooks/useApiQuery', () => ({
-  useRWLKAnchorActionInfo: (...args: unknown[]) => mockUseRWLKAnchorActionInfo(...args),
-  useCSTAnchorActionInfo: (...args: unknown[]) => mockUseCSTAnchorActionInfo(...args),
+jest.mock('@/hooks/useApiQuery', () => ({
+  useRWLKAnchorActionInfo: (id: number | null) => mockRwlk(id),
+  useCSTAnchorActionInfo: (id: number | null) => mockCst(id),
+  useCSTInfo: (id: number | null) => mockCstInfo(id),
 }));
 
-jest.mock('../../../../../utils', () => ({
-  getExplorerUrl: (type: string, hash: string) => `https://explorer/${type}/${hash}`,
-  getAssetsUrl: (path: string) => `/assets/${path}`,
-  getRWLKImageUrl: (id: string) => `/rwlk/${id}.png`,
-  convertTimestampToDateTime: (ts: number) => `date-${ts}`,
-}));
+const HOLDER = '0xA169574D0d353E3010997A3E64846b7D1B2a63B6';
+const idle = { data: undefined, isLoading: false, error: null, refetch: jest.fn() };
 
-jest.mock('../../../../../components/nft/NFTImage', () => ({
-  __esModule: true,
-  default: ({ src, alt = 'NFT' }: { src: string; alt?: string }) => (
-    <img data-testid="nft-image" src={src} alt={alt} />
-  ),
-}));
-
-beforeEach(() => jest.clearAllMocks());
-
-const noData = { data: null, isLoading: false, error: null };
-
-const anchorData = {
-  Stake: {
-    TokenId: 10,
-    Seed: 'abc123',
-    StakerAddr: '0xStaker',
-    TxHash: '0xStakeTx',
-    TimeStamp: 2000,
-    NumStakedNFTs: 3,
-  },
-  Unstake: {
-    EvtLogId: 0,
-    TxHash: '',
-    TimeStamp: 0,
-    NumStakedNFTs: 0,
-  },
+const anchor = {
+  EvtLogId: 18890,
+  TxHash: '0xanchor',
+  TimeStamp: 1_781_506_867,
+  ActionId: 1,
+  ActionType: 0,
+  TokenId: 9,
+  NumStakedNFTs: 33,
+  StakerAddr: HOLDER,
 };
+const noRelease = { EvtLogId: 0, TxHash: '', TimeStamp: 0, NumStakedNFTs: 0 };
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockRwlk.mockReturnValue(idle);
+  mockCst.mockReturnValue(idle);
+  mockCstInfo.mockReturnValue({
+    data: { TokenId: 9, Seed: 'abc', TokenName: '', RoundNum: 1 },
+    isLoading: false,
+  });
+});
 
 describe('AnchorActionDetailPage', () => {
-  it('renders RWLK heading when IsRwalk=1', () => {
-    mockUseRWLKAnchorActionInfo.mockReturnValue(noData);
-    mockUseCSTAnchorActionInfo.mockReturnValue(noData);
-    render(<AnchorActionDetailPage IsRwalk={1} actionId={5} />);
+  it('reads the record of the collection in the route', () => {
+    render(<AnchorActionDetailPage IsRwalk={1} actionId={33} />);
+    expect(mockRwlk).toHaveBeenCalledWith(33);
+    expect(mockCst).toHaveBeenCalledWith(null);
     expect(
       screen.getByText(
         'anchoring.anchorActionDetail.subtitle(token=anchoring.anchorActionDetail.token.labels.randomWalk)',
@@ -57,79 +51,99 @@ describe('AnchorActionDetailPage', () => {
     ).toBeInTheDocument();
   });
 
-  it('renders CST heading when IsRwalk=0', () => {
-    mockUseRWLKAnchorActionInfo.mockReturnValue(noData);
-    mockUseCSTAnchorActionInfo.mockReturnValue(noData);
-    render(<AnchorActionDetailPage IsRwalk={0} actionId={5} />);
+  it('shows the NFT, its anchor-holder, a status and a timeline for a record', () => {
+    mockCst.mockReturnValue({ ...idle, data: { Stake: anchor, Unstake: noRelease } });
+    render(<AnchorActionDetailPage IsRwalk={0} actionId={1} />);
     expect(
-      screen.getByText(
-        'anchoring.anchorActionDetail.subtitle(token=anchoring.anchorActionDetail.token.labels.cosmicSignature)',
-      ),
+      screen.getByRole('heading', {
+        level: 1,
+        name: 'anchoring.anchorActionDetail.breadcrumbs.action(id=1)',
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId('anchor-status')).toHaveTextContent('anchoring.status.anchored');
+    expect(screen.getByTestId('art-frame')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.art.signatureTitle(id=#000009)')).toBeInTheDocument();
+    expect(document.querySelector(`a[href="/user/${HOLDER}"]`)).toBeInTheDocument();
+    expect(
+      screen.getByText('anchoring.anchorActionDetail.timeline.stillAnchored'),
     ).toBeInTheDocument();
   });
 
-  it('shows loading state', () => {
-    mockUseRWLKAnchorActionInfo.mockReturnValue(noData);
-    mockUseCSTAnchorActionInfo.mockReturnValue({ data: null, isLoading: true, error: null });
-    render(<AnchorActionDetailPage IsRwalk={0} actionId={5} />);
-    expect(screen.getByText('anchoring.common.loading')).toBeInTheDocument();
+  it('leads on to the NFT’s distributions, the artwork and every anchor action', () => {
+    mockCst.mockReturnValue({ ...idle, data: { Stake: anchor, Unstake: noRelease } });
+    render(<AnchorActionDetailPage IsRwalk={0} actionId={1} />);
+    expect(
+      screen.getByRole('link', { name: 'anchoring.anchorActionDetail.next.distributions' }),
+    ).toHaveAttribute('href', `/distributions-by-token/${HOLDER}/9`);
+    expect(
+      screen.getByRole('link', { name: 'anchoring.anchorActionDetail.next.token' }),
+    ).toHaveAttribute('href', '/detail/9');
+    expect(
+      screen.getByRole('link', { name: 'anchoring.anchorActionDetail.next.allActions' }),
+    ).toHaveAttribute('href', '/statistics/anchoring');
   });
 
-  it('shows a translated fallback instead of the raw backend error', () => {
-    mockUseRWLKAnchorActionInfo.mockReturnValue(noData);
-    mockUseCSTAnchorActionInfo.mockReturnValue({
-      data: null,
-      isLoading: false,
-      error: { message: 'Fetch failed' },
+  it('marks a released anchor and shows the release', () => {
+    mockCst.mockReturnValue({
+      ...idle,
+      data: {
+        Stake: anchor,
+        Unstake: { ...anchor, EvtLogId: 20000, TxHash: '0xrelease', RewardAmountEth: 0.1562 },
+      },
     });
-    render(<AnchorActionDetailPage IsRwalk={0} actionId={5} />);
+    render(<AnchorActionDetailPage IsRwalk={0} actionId={1} />);
+    expect(screen.getByTestId('anchor-status')).toHaveTextContent('anchoring.status.released');
+    expect(screen.getByText('anchoring.anchorActionDetail.timeline.released')).toBeInTheDocument();
+  });
+
+  it('offers no distributions link for a Random Walk anchor, which receives no ETH', () => {
+    mockRwlk.mockReturnValue({
+      ...idle,
+      data: { Stake: { ...anchor, TokenId: 1826 }, Unstake: noRelease },
+    });
+    render(<AnchorActionDetailPage IsRwalk={1} actionId={33} />);
+    expect(
+      screen.queryByRole('link', { name: 'anchoring.anchorActionDetail.next.distributions' }),
+    ).not.toBeInTheDocument();
+    expect(mockCstInfo).toHaveBeenCalledWith(null);
+  });
+
+  it('holds the page shape while loading', () => {
+    mockCst.mockReturnValue({ ...idle, isLoading: true });
+    render(<AnchorActionDetailPage IsRwalk={0} actionId={1} />);
+    expect(screen.getByRole('status', { name: 'common.status.loading' })).toBeInTheDocument();
+  });
+
+  it('turns a missing record into next steps instead of a dead end', () => {
+    render(<AnchorActionDetailPage IsRwalk={0} actionId={23} />);
+    expect(
+      screen.getByRole('heading', {
+        level: 2,
+        name: 'anchoring.anchorActionDetail.empty.title(id=23)',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'anchoring.anchorActionDetail.empty.browse' }),
+    ).toHaveAttribute('href', '/anchoring');
+    expect(
+      screen.getByRole('link', { name: 'anchoring.anchorActionDetail.empty.statistics' }),
+    ).toHaveAttribute('href', '/statistics/anchoring');
+  });
+
+  it('shows a translated error with a retry instead of the raw failure', async () => {
+    const user = userEvent.setup();
+    const refetch = jest.fn();
+    mockCst.mockReturnValue({ ...idle, error: new Error('HTTP 500 Internal'), refetch });
+    render(<AnchorActionDetailPage IsRwalk={0} actionId={1} />);
     expect(screen.getByText('anchoring.anchorActionDetail.error')).toBeInTheDocument();
-    expect(screen.queryByText('Fetch failed')).not.toBeInTheDocument();
-  });
-
-  it('shows "no data" when actionInfo is null', () => {
-    mockUseRWLKAnchorActionInfo.mockReturnValue(noData);
-    mockUseCSTAnchorActionInfo.mockReturnValue(noData);
-    render(<AnchorActionDetailPage IsRwalk={0} actionId={5} />);
-    expect(screen.getByText('anchoring.anchorActionDetail.empty')).toBeInTheDocument();
-  });
-
-  it('renders anchor info when data is available (CST)', () => {
-    mockUseRWLKAnchorActionInfo.mockReturnValue(noData);
-    mockUseCSTAnchorActionInfo.mockReturnValue({
-      data: anchorData,
-      isLoading: false,
-      error: null,
-    });
-    render(<AnchorActionDetailPage IsRwalk={0} actionId={5} />);
-    expect(screen.getByText('anchoring.anchorActionDetail.anchor.title')).toBeInTheDocument();
-    expect(screen.getByText('0xStaker')).toBeInTheDocument();
-  });
-
-  it('uses RWLK hook when IsRwalk=1', () => {
-    mockUseRWLKAnchorActionInfo.mockReturnValue({
-      data: anchorData,
-      isLoading: false,
-      error: null,
-    });
-    mockUseCSTAnchorActionInfo.mockReturnValue(noData);
-    render(<AnchorActionDetailPage IsRwalk={1} actionId={7} />);
-    expect(mockUseRWLKAnchorActionInfo).toHaveBeenCalledWith(7);
-    expect(mockUseCSTAnchorActionInfo).toHaveBeenCalledWith(null);
-  });
-
-  it('uses CST hook when IsRwalk=0', () => {
-    mockUseRWLKAnchorActionInfo.mockReturnValue(noData);
-    mockUseCSTAnchorActionInfo.mockReturnValue(noData);
-    render(<AnchorActionDetailPage IsRwalk={0} actionId={7} />);
-    expect(mockUseRWLKAnchorActionInfo).toHaveBeenCalledWith(null);
-    expect(mockUseCSTAnchorActionInfo).toHaveBeenCalledWith(7);
+    expect(screen.queryByText(/HTTP 500/)).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /try again/i }));
+    expect(refetch).toHaveBeenCalled();
   });
 
   it('has no accessibility violations', async () => {
-    mockUseRWLKAnchorActionInfo.mockReturnValue(noData);
-    mockUseCSTAnchorActionInfo.mockReturnValue(noData);
-    const { container } = render(<AnchorActionDetailPage IsRwalk={0} actionId={5} />);
+    mockCst.mockReturnValue({ ...idle, data: { Stake: anchor, Unstake: noRelease } });
+    const { container } = render(<AnchorActionDetailPage IsRwalk={0} actionId={1} />);
     await checkA11y(container);
   });
 });

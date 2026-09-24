@@ -176,7 +176,7 @@ test.describe('Sprint 4 Chinese layout QA', () => {
 
       await page.goto('/zh/my-anchors');
       await expect(page.getByText('我的锚定', { exact: true }).first()).toBeVisible();
-      await expect(page.getByText('连接钱包后即可管理锚定。', { exact: true })).toBeVisible();
+      await expect(page.getByText('连接钱包，管理你的锚定', { exact: true })).toBeVisible();
       await expectNoHorizontalOverflow(page);
       await testInfo.attach(`zh-my-anchors-${viewport.name}`, {
         body: await page.screenshot({ fullPage: true }),

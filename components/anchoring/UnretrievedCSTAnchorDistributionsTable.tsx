@@ -1,323 +1,186 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
-import { Loader2 } from 'lucide-react';
-import { usePublicClient } from 'wagmi';
+'use client';
 
-import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
-import {
-  TablePrimary,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryContainer,
-  TablePrimaryHead,
-  TablePrimaryHeadCell,
-  TablePrimaryRow,
-} from '@/components/styled';
-import { CustomPagination } from '@/components/common/CustomPagination';
+import { useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
+
+import { sameAddress } from '@/utils/address';
 import { useActiveWeb3React } from '@/hooks/web3';
-import api from '@/services/api';
-import useAnchoringWalletCSTContract from '@/hooks/useAnchoringWalletCSTContract';
-import { useNotification } from '@/contexts/NotificationContext';
-import { useApiData } from '@/contexts/ApiDataContext';
-import getErrorMessage from '@/utils/alert';
-import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
-import { Button } from '@/components/ui/button';
+import { useAnchorActions } from '@/hooks/useAnchorActions';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+  useCSTAnchorDistributionsByUserByDeposit,
+  useCSTAnchorDistributionsToRetrieveByUser,
+} from '@/hooks/useApiQuery';
+import { useApiData } from '@/contexts/ApiDataContext';
+import { Amount } from '@/components/ui/amount';
+import { Button } from '@/components/ui/button';
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+import { ChainGuard } from '@/components/wallet/NetworkGuard';
 import type { CSTAnchorDistribution } from '@/services/api';
-import { assertSuccessfulTransactionReceipt, assertTransactionHash } from '@/utils/transactions';
 
-const UncollectedRewardsRow = ({ row, locale }: { row: CSTAnchorDistribution; locale: string }) => {
-  const t = useTranslations('anchoring');
+import { ReleaseConfirmDialog } from './ReleaseConfirmDialog';
+import type { AnchoringLedgerProps } from './ledgerProps';
 
-  if (!row) return <TablePrimaryRow />;
+interface UnretrievedCSTAnchorDistributionsTableProps extends Omit<
+  AnchoringLedgerProps,
+  'loading' | 'error' | 'onRetry'
+> {
+  /** The address whose unretrieved distributions to list. */
+  user: string;
+}
 
-  const {
-    DepositTimeStamp = 0,
-    DepositId,
-    YourTokensStaked,
-    NumStakedNFTs,
-    NumUnclaimedTokens,
-    DepositAmountEth,
-    YourRewardAmountEth,
-    PendingToClaimEth,
-  } = row;
+/** One row of the by-deposit anchoring read: the anchor actions a deposit pays. */
+interface DepositActions {
+  Actions?: readonly { Claimed?: boolean; Stake?: { ActionId?: number } }[];
+}
 
-  return (
-    <TablePrimaryRow>
-      <TablePrimaryCell label={t('tables.unretrievedDistributions.columns.depositDatetime')}>
-        <HydrationSafeDateTime timestamp={DepositTimeStamp} locale={locale} />
-      </TablePrimaryCell>
-      <TablePrimaryCell
-        label={t('tables.unretrievedDistributions.columns.depositId')}
-        align="center"
-      >
-        {DepositId}
-      </TablePrimaryCell>
-      <TablePrimaryCell
-        label={t('tables.unretrievedDistributions.columns.anchoredTokens')}
-        align="center"
-      >{`${YourTokensStaked} / ${NumStakedNFTs}`}</TablePrimaryCell>
-      <TablePrimaryCell
-        label={t('tables.unretrievedDistributions.columns.unretrievedTokens')}
-        align="center"
-      >
-        {NumUnclaimedTokens}
-      </TablePrimaryCell>
-      <TablePrimaryCell
-        label={t('tables.unretrievedDistributions.columns.depositAmountEth')}
-        align="center"
-      >
-        {(DepositAmountEth ?? 0).toFixed(6)}
-      </TablePrimaryCell>
-      <TablePrimaryCell
-        label={t('tables.unretrievedDistributions.columns.distributionAmountEth')}
-        align="center"
-      >
-        {(YourRewardAmountEth ?? 0).toFixed(6)}
-      </TablePrimaryCell>
-      <TablePrimaryCell
-        label={t('tables.unretrievedDistributions.columns.unretrievedAmountEth')}
-        align="center"
-      >
-        {(PendingToClaimEth ?? 0).toFixed(6)}
-      </TablePrimaryCell>
-    </TablePrimaryRow>
+/**
+ * The anchor actions still owed ETH: those in the newest deposit (which
+ * covers every NFT anchored at the time) that have not retrieved it.
+ */
+export function unretrievedActionIds(deposits: readonly unknown[] | undefined): number[] {
+  const newest = deposits?.[deposits.length - 1] as DepositActions | undefined;
+  return (newest?.Actions ?? []).flatMap((action) =>
+    !action.Claimed && typeof action.Stake?.ActionId === 'number' ? [action.Stake.ActionId] : [],
   );
-};
+}
 
-export const UnretrievedCSTAnchorDistributionsTable = ({ user }: { user: string }) => {
+/**
+ * ETH Anchor Distribution deposits an address has not retrieved yet, one row
+ * per deposit. On the connected wallet's own page it adds the total and
+ * "Release and retrieve all", which ends every anchor that is owed ETH:
+ * through ReleaseConfirmDialog, because releasing is permanent.
+ */
+export const UnretrievedCSTAnchorDistributionsTable = ({
+  user,
+  headingLevel = 3,
+  ...state
+}: UnretrievedCSTAnchorDistributionsTableProps) => {
   const t = useTranslations('anchoring');
-  const toastT = useTranslations('toasts');
-  const locale = useLocale();
   const { account } = useActiveWeb3React();
-  const {
-    apiData: status,
-    fetchData: refetchApiData,
-    unclaimedRewards: contextRewards,
-  } = useApiData();
+  const { apiData } = useApiData();
+  const { release, txStage } = useAnchorActions();
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
-  const isOwnAccount = user?.toLowerCase() === account?.toLowerCase();
+  const isOwnAccount = sameAddress(user, account);
+  const rewards = useCSTAnchorDistributionsToRetrieveByUser(user);
+  const deposits = useCSTAnchorDistributionsByUserByDeposit(isOwnAccount ? user : null);
+  const actionIds = useMemo(() => unretrievedActionIds(deposits.data), [deposits.data]);
+  const unretrievedEth = apiData?.UnretrievedAnchorDistribution ?? 0;
+  const canReleaseAll = isOwnAccount && unretrievedEth > 0 && actionIds.length > 0;
 
-  const [localList, setLocalList] = useState<CSTAnchorDistribution[] | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isUnstaking, setIsUnstaking] = useState(false);
-  const [cstWithRewards, setCstWithRewards] = useState<number[]>([]);
-  const cstAnchoringContract = useAnchoringWalletCSTContract();
-  const publicClient = usePublicClient();
-  const { setNotification } = useNotification();
+  const columns = useMemo<DataTableColumn<CSTAnchorDistribution>[]>(
+    () => [
+      {
+        id: 'datetime',
+        kind: 'datetime',
+        header: t('tables.unretrievedDistributions.columns.depositDatetime'),
+        value: (row) => row.DepositTimeStamp,
+      },
+      {
+        id: 'deposit',
+        kind: 'text',
+        header: t('tables.unretrievedDistributions.columns.depositId'),
+        value: (row) => row.DepositId,
+        nowrap: true,
+        cellClassName: 'font-mono tabular-nums',
+        priority: 'secondary',
+      },
+      {
+        id: 'anchored',
+        kind: 'text',
+        header: t('tables.unretrievedDistributions.columns.anchoredTokens'),
+        value: (row) => row.YourTokensStaked,
+        cell: (row) =>
+          t('tables.unretrievedDistributions.anchoredOfTotal', {
+            count: row.YourTokensStaked ?? 0,
+            total: row.NumStakedNFTs ?? 0,
+          }),
+        cellClassName: 'tabular-nums',
+        nowrap: true,
+      },
+      {
+        id: 'unretrievedTokens',
+        kind: 'count',
+        header: t('tables.unretrievedDistributions.columns.unretrievedTokens'),
+        value: (row) => row.NumUnclaimedTokens,
+        priority: 'secondary',
+      },
+      {
+        id: 'deposited',
+        kind: 'amount',
+        header: t('tables.unretrievedDistributions.columns.depositAmountEth'),
+        value: (row) => row.DepositAmountEth,
+        showUnit: false,
+        priority: 'secondary',
+      },
+      {
+        id: 'distribution',
+        kind: 'amount',
+        header: t('tables.unretrievedDistributions.columns.distributionAmountEth'),
+        value: (row) => row.YourRewardAmountEth,
+        showUnit: false,
+      },
+      {
+        id: 'unretrieved',
+        kind: 'amount',
+        header: t('tables.unretrievedDistributions.columns.unretrievedAmountEth'),
+        value: (row) => row.PendingToClaimEth,
+        showUnit: false,
+        sortable: true,
+      },
+    ],
+    [t],
+  );
 
-  const PER_PAGE = 5;
-  const [open, setOpen] = useState<boolean>(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-
-  const startIndex = (currentPage - 1) * PER_PAGE;
-  const endIndex = currentPage * PER_PAGE;
-
-  const fetchCstWithRewards = useCallback(async () => {
-    try {
-      const res = await api.get_staking_cst_by_user_by_deposit_rewards(user);
-      const lastEntry = res?.[res.length - 1] as
-        | { Actions?: { Claimed?: boolean; Stake: { ActionId: number } }[] }
-        | undefined;
-      const actions = lastEntry?.Actions?.filter((x) => !x.Claimed) ?? [];
-      const actionIds = actions.map((x) => x.Stake.ActionId);
-      setCstWithRewards(actionIds);
-    } catch (err) {
-      reportError(err, 'fetch CST with rewards');
-    }
-  }, [user]);
-
-  const fetchUnretrievedCstAnchorDistributions = useCallback(async () => {
-    try {
-      const res = await api.get_staking_cst_rewards_to_claim_by_user(user);
-      setLocalList(res);
-    } catch (err) {
-      reportError(err, 'fetch uncollected CST anchor distributions');
-    }
-  }, [user]);
-
-  const releaseAllCST = async () => {
-    handleClose();
-    setIsUnstaking(true);
-    try {
-      if (!cstAnchoringContract) {
-        setNotification({
-          visible: true,
-          text: toastT('wallet.connectCorrectNetwork'),
-          type: 'error',
-        });
-        return;
-      }
-      const hash = await cstAnchoringContract.write.unstakeMany?.([cstWithRewards]);
-      assertTransactionHash(hash);
-      const res = await publicClient?.waitForTransactionReceipt({ hash });
-      assertSuccessfulTransactionReceipt(res);
-      setNotification({
-        visible: true,
-        text: toastT('anchor.releasedWithDistributions', { count: cstWithRewards.length }),
-        type: 'success',
-      });
-      setTimeout(() => {
-        if (isOwnAccount) {
-          refetchApiData();
-        } else {
-          fetchUnretrievedCstAnchorDistributions();
-        }
-        fetchCstWithRewards();
-      }, 4000);
-    } catch (err: unknown) {
-      if (isUserRejection(err)) {
-        setNotification({
-          visible: true,
-          type: 'info',
-          text: toastT('walletTransactionCancelled'),
-        });
-      } else {
-        reportError(err, 'releasing Cosmic Signature NFT anchors');
-        const msg = getEthErrorMessage(err, toastT('anchor.failed'), { locale });
-        setNotification({
-          visible: true,
-          type: 'error',
-          text: getErrorMessage(msg) || msg,
-        });
-      }
-    } finally {
-      setIsUnstaking(false);
-    }
+  const releaseAll = async () => {
+    const result = await release(actionIds, false);
+    if (result.status === 'confirmed') setConfirmOpen(false);
   };
-
-  useEffect(() => {
-    if (!isOwnAccount) {
-      // The first fetcher updates local state from an async API response.
-      // Migrating to React Query is a separate refactor; this is a data-
-      // fetch effect.
-      fetchUnretrievedCstAnchorDistributions();
-    }
-    fetchCstWithRewards();
-  }, [user, isOwnAccount, fetchUnretrievedCstAnchorDistributions, fetchCstWithRewards]);
-
-  const list = isOwnAccount ? contextRewards : localList;
-
-  if (list === null) {
-    return <p className="text-muted-foreground">{t('common.loading')}</p>;
-  }
-
-  if (list.length === 0) {
-    return <p className="text-muted-foreground">{t('common.empty.distributions')}</p>;
-  }
-
-  const currentPageData = list.slice(startIndex, endIndex);
 
   return (
     <>
-      <TablePrimaryContainer>
-        <TablePrimary>
-          <TablePrimaryHead>
-            <tr>
-              <TablePrimaryHeadCell align="left">
-                {t('tables.unretrievedDistributions.columns.depositDatetime')}
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>
-                {t('tables.unretrievedDistributions.columns.depositId')}
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>
-                {t('tables.unretrievedDistributions.columns.anchoredTokens')}
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>
-                {t('tables.unretrievedDistributions.columns.unretrievedTokens')}
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>
-                {t('tables.unretrievedDistributions.columns.depositAmountEth')}
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>
-                {t('tables.unretrievedDistributions.columns.distributionAmountEth')}
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>
-                {t('tables.unretrievedDistributions.columns.unretrievedAmountEth')}
-              </TablePrimaryHeadCell>
-            </tr>
-          </TablePrimaryHead>
-
-          <TablePrimaryBody>
-            {currentPageData.map((row) => (
-              <UncollectedRewardsRow key={row.EvtLogId} row={row} locale={locale} />
-            ))}
-          </TablePrimaryBody>
-        </TablePrimary>
-      </TablePrimaryContainer>
-
-      {isOwnAccount && (status?.UnretrievedAnchorDistribution ?? 0) > 0 && (
-        <div className="flex justify-end items-center mt-4">
-          <p className="mr-4">
-            {t('tables.unretrievedDistributions.summary', {
-              amount: (status?.UnretrievedAnchorDistribution ?? 0).toFixed(6),
-            })}
-          </p>
-          <Button onClick={handleOpen} disabled={isUnstaking}>
-            {isUnstaking ? (
-              <span className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                {t('common.processing')}
-              </span>
-            ) : (
-              t('tables.unretrievedDistributions.releaseAll')
-            )}
-          </Button>
-        </div>
-      )}
-
-      <CustomPagination
-        page={currentPage}
-        setPage={setCurrentPage}
-        totalLength={list.length}
-        perPage={PER_PAGE}
+      <DataTable
+        data={rewards.data ?? []}
+        columns={columns}
+        ariaLabel={t('tables.unretrievedDistributions.label')}
+        getRowKey={(row) => row.EvtLogId}
+        loading={rewards.isLoading}
+        error={rewards.error ? t('tables.unretrievedDistributions.error') : undefined}
+        onRetry={() => void rewards.refetch()}
+        emptyTitle={t('common.empty.unretrieved.title')}
+        emptyDescription={t('common.empty.unretrieved.description')}
+        tableClassName="sm:min-w-[48rem] lg:min-w-0"
+        headingLevel={headingLevel}
+        {...state}
       />
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>{t('tables.unretrievedDistributions.dialog.title')}</DialogTitle>
-            <DialogDescription>
-              {t.rich('tables.unretrievedDistributions.dialog.description', {
-                amount: (status?.UnretrievedAnchorDistribution ?? 0).toFixed(6),
-                strong: (chunks) => <strong>{chunks}</strong>,
-                amountStrong: (chunks) => <strong>{chunks}</strong>,
-              })}
-            </DialogDescription>
-          </DialogHeader>
-          <Alert variant="warning">
-            <AlertDescription>
-              {t.rich('tables.unretrievedDistributions.dialog.warning', {
-                strong: (chunks) => <strong>{chunks}</strong>,
-              })}
-            </AlertDescription>
-          </Alert>
-          <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={handleClose}>
-              {t('common.actions.cancel')}
+      {canReleaseAll ? (
+        <div className="mt-6 flex flex-col gap-4 border-t border-rule-faint pt-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-1">
+            <p className="type-label text-subtle">{t('tables.unretrievedDistributions.summary')}</p>
+            <p className="type-figure-md text-foreground">
+              <Amount value={unretrievedEth} unit="ETH" context="card" />
+            </p>
+          </div>
+          <ChainGuard explain={false}>
+            <Button variant="destructive" onClick={() => setConfirmOpen(true)}>
+              {t('tables.unretrievedDistributions.releaseAll')}
             </Button>
-            <Button variant="destructive" onClick={releaseAllCST} disabled={isUnstaking}>
-              {isUnstaking ? (
-                <span className="flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  {t('common.processing')}
-                </span>
-              ) : (
-                t('tables.unretrievedDistributions.dialog.confirm')
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </ChainGuard>
+        </div>
+      ) : null}
+
+      {isOwnAccount ? (
+        <ReleaseConfirmDialog
+          open={confirmOpen}
+          onOpenChange={setConfirmOpen}
+          collection="cosmicSignature"
+          count={actionIds.length}
+          retrievableEth={unretrievedEth}
+          onConfirm={releaseAll}
+          stage={txStage}
+        />
+      ) : null}
     </>
   );
 };

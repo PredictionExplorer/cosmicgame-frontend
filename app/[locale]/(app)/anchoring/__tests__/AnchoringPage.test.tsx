@@ -1,281 +1,150 @@
+import type { AnchoringFlowProps } from '@/components/anchoring/AnchoringFlow';
+import { AnchoringQuestions } from '@/components/anchoring/AnchoringQuestions';
+import { AnchoringSteps } from '@/components/anchoring/AnchoringSteps';
+
 import { checkA11y, render, screen } from '@/test-utils';
 
 import AnchoringPage from '../AnchoringPage';
 
-const mockUseCSTAnchorDistributions = jest.fn();
-const mockUseGlobalRWLKAnchorImprints = jest.fn();
-const mockUseDashboardInfo = jest.fn();
-const mockUseUniqueCSTAnchorHolders = jest.fn();
-const mockUseUniqueRWLKAnchorHolders = jest.fn<unknown, unknown[]>(() => ({
-  data: [],
-  isLoading: false,
-  error: null,
+const mockQueries: Record<string, unknown> = {};
+jest.mock('@/hooks/useApiQuery', () => ({
+  useCSTAnchorDistributions: () => mockQueries.distributions,
+  useGlobalRWLKAnchorImprints: () => mockQueries.imprints,
+  useDashboardInfo: () => mockQueries.dashboard,
+  useUniqueCSTAnchorHolders: () => mockQueries.cstHolders,
+  useUniqueRWLKAnchorHolders: () => mockQueries.rwlkHolders,
 }));
 
-jest.mock('../../../../../hooks/useApiQuery', () => ({
-  useCSTAnchorDistributions: (...args: unknown[]) => mockUseCSTAnchorDistributions(...args),
-  useGlobalRWLKAnchorImprints: (...args: unknown[]) => mockUseGlobalRWLKAnchorImprints(...args),
-  useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
-  useUniqueCSTAnchorHolders: (...args: unknown[]) => mockUseUniqueCSTAnchorHolders(...args),
-  useUniqueRWLKAnchorHolders: (...args: unknown[]) => mockUseUniqueRWLKAnchorHolders(...args),
-}));
-
-jest.mock('../../../../../components/anchoring/GlobalAnchorDistributionsTable', () => ({
-  GlobalAnchorDistributionsTable: ({ list }: { list: unknown[] }) => (
-    <div data-testid="cst-table">CST rows: {list.length}</div>
-  ),
-}));
-
-jest.mock('../../../../../components/anchoring/RwalkAnchorDistributionImprintsTable', () => ({
-  RwalkAnchorDistributionImprintsTable: ({ list }: { list: unknown[] }) => (
-    <div data-testid="rwlk-table">RWLK rows: {list.length}</div>
-  ),
-}));
-
-jest.mock('../../../../../components/anchoring/AnchoringHeroStats', () => ({
-  AnchoringHeroStats: ({
-    stats,
-    loading,
-  }: {
-    stats: { label: string; value: React.ReactNode; caption?: React.ReactNode }[];
-    loading?: boolean;
-  }) => (
-    <div data-testid="anchoring-hero-stats">
-      {loading
-        ? 'Loading stats...'
-        : stats.map((s) => (
-            <span key={s.label} data-testid={`stat-${s.label}`}>
-              {s.label}: {s.value}
-              {s.caption ? <em> {s.caption}</em> : null}
-            </span>
-          ))}
-    </div>
-  ),
-}));
-
-jest.mock('../../../../../components/anchoring/HowAnchoringWorks', () => ({
-  HowAnchoringWorks: () => <div data-testid="how-anchoring-works">How Anchoring Works</div>,
-}));
-
-beforeEach(() => jest.clearAllMocks());
-
-const noError = { data: [], isLoading: false, error: null };
-
-const mockDashboard = {
-  data: {
-    MainStats: {
-      StakeStatisticsCST: { TotalTokensStaked: 100 },
-      StakeStatisticsRWalk: { TotalTokensStaked: 25 },
-    },
-    StakingAmountEth: 5.0,
+let flowProps: AnchoringFlowProps | null = null;
+jest.mock('@/components/anchoring/AnchoringFlow', () => ({
+  AnchoringFlow: (props: AnchoringFlowProps) => {
+    flowProps = props;
+    return <figure data-testid="anchoring-flow" />;
   },
-  isLoading: false,
-  error: null,
-};
+}));
+jest.mock('@/components/anchoring/GlobalAnchorDistributionsTable', () => ({
+  GlobalAnchorDistributionsTable: ({
+    list,
+    title,
+    error,
+  }: {
+    list: unknown[];
+    title: string;
+    error?: string;
+  }) => (
+    <section>
+      <h2>{title}</h2>
+      <p data-testid="distributions">{error ?? `rows: ${list.length}`}</p>
+    </section>
+  ),
+}));
+jest.mock('@/components/anchoring/RwalkAnchorDistributionImprintsTable', () => ({
+  RwalkAnchorDistributionImprintsTable: ({
+    list,
+    title,
+    pageSize,
+  }: {
+    list: unknown[];
+    title: string;
+    pageSize?: number;
+  }) => (
+    <section>
+      <h2>{title}</h2>
+      <p data-testid="imprints">
+        rows: {list.length}, page size: {pageSize}
+      </p>
+    </section>
+  ),
+}));
 
-const mockAnchorHolders = {
-  data: [
-    { StakerAddr: '0x1', TotalTokensStaked: 2 },
-    { StakerAddr: '0x2', TotalTokensStaked: 1 },
-    { StakerAddr: '0x3', TotalTokensStaked: 4 },
-  ],
-  isLoading: false,
-  error: null,
-};
+const ok = (data: unknown) => ({ data, isLoading: false, error: null, refetch: jest.fn() });
 
-const mockRwlkAnchorHolders = {
-  data: [
-    { StakerAddr: '0x2', TotalTokensStaked: 3 },
-    { StakerAddr: '0x4', TotalTokensStaked: 1 },
-    { StakerAddr: '0x5', TotalTokensStaked: 0 },
-  ],
-  isLoading: false,
-  error: null,
-};
+beforeEach(() => {
+  flowProps = null;
+  Object.assign(mockQueries, {
+    distributions: ok([{}, {}]),
+    imprints: ok([{}, {}, {}]),
+    dashboard: ok({
+      StakingAmountEth: 2,
+      MainStats: {
+        StakeStatisticsCST: { TotalTokensStaked: 4 },
+        StakeStatisticsRWalk: { TotalTokensStaked: 25 },
+      },
+    }),
+    cstHolders: ok([
+      { StakerAddr: '0x1', TotalTokensStaked: 2 },
+      { StakerAddr: '0x2', TotalTokensStaked: 1 },
+    ]),
+    rwlkHolders: ok([
+      { StakerAddr: '0x2', TotalTokensStaked: 3 },
+      { StakerAddr: '0x3', TotalTokensStaked: 0 },
+    ]),
+  });
+});
 
-function setupDefaults() {
-  mockUseCSTAnchorDistributions.mockReturnValue(noError);
-  mockUseGlobalRWLKAnchorImprints.mockReturnValue(noError);
-  mockUseDashboardInfo.mockReturnValue(mockDashboard);
-  mockUseUniqueCSTAnchorHolders.mockReturnValue(mockAnchorHolders);
-  mockUseUniqueRWLKAnchorHolders.mockReturnValue(mockRwlkAnchorHolders);
-}
+// page.tsx renders the static explanations on the server and passes them in.
+const slots = { steps: <AnchoringSteps />, questions: <AnchoringQuestions /> };
 
 describe('AnchoringPage', () => {
-  it('renders the heading', () => {
-    setupDefaults();
-    render(<AnchoringPage />);
-    expect(screen.getByText('anchoring.overview.title')).toBeInTheDocument();
+  it('explains anchoring before the ledgers: steps, the live flow and the questions', () => {
+    render(<AnchoringPage {...slots} />);
+    const headings = screen.getAllByRole('heading', { level: 2 }).map((node) => node.textContent);
+    expect(headings).toEqual([
+      'anchoring.overview.howItWorks.title',
+      'anchoring.questions.title',
+      'anchoring.ledgers.distributions.title',
+      'anchoring.ledgers.imprints.title',
+    ]);
+    expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(3);
+    expect(screen.getByTestId('anchoring-flow')).toBeInTheDocument();
   });
 
-  it('renders the stats dashboard', () => {
-    setupDefaults();
-    render(<AnchoringPage />);
-    expect(screen.getByTestId('anchoring-hero-stats')).toBeInTheDocument();
+  it('feeds the flow the live figures with one holder count for both collections', () => {
+    render(<AnchoringPage {...slots} />);
+    expect(flowProps).toMatchObject({
+      poolEth: 2,
+      anchoredCosmicSignature: 4,
+      perNft: { status: 'available', perNftEth: 0.5 },
+      anchoredRandomWalk: 25,
+      // 0x1 and 0x2 anchor now (0x2 in both collections); 0x3 released everything.
+      activeHolders: 2,
+      loading: false,
+    });
   });
 
-  it('displays stat values from dashboard data', () => {
-    setupDefaults();
-    render(<AnchoringPage />);
-    expect(screen.getByTestId('stat-anchoring.overview.stats.pool.label')).toHaveTextContent(
-      'anchoring.overview.stats.pool.label',
+  it('shows unread figures as unknown instead of zero', () => {
+    mockQueries.dashboard = { data: undefined, isLoading: false, error: new Error('x') };
+    render(<AnchoringPage {...slots} />);
+    expect(flowProps).toMatchObject({
+      poolEth: null,
+      anchoredCosmicSignature: null,
+      perNft: { status: 'unavailable' },
+      anchoredRandomWalk: null,
+    });
+  });
+
+  it('keeps each ledger’s failure to its own section', () => {
+    mockQueries.distributions = {
+      data: undefined,
+      isLoading: false,
+      error: new Error('x'),
+      refetch: jest.fn(),
+    };
+    render(<AnchoringPage {...slots} />);
+    expect(screen.getByTestId('distributions')).toHaveTextContent(
+      'anchoring.overview.errorMessage',
     );
-    expect(
-      screen.getByTestId('stat-anchoring.overview.stats.cosmicSignatureAnchored.label'),
-    ).toHaveTextContent('anchoring.overview.stats.cosmicSignatureAnchored.label');
-    expect(
-      screen.getByTestId('stat-anchoring.overview.stats.randomWalkAnchored.label'),
-    ).toHaveTextContent('anchoring.overview.stats.randomWalkAnchored.label');
-    expect(
-      screen.getByTestId('stat-anchoring.overview.stats.distributionPerNft.label'),
-    ).toHaveTextContent('anchoring.overview.stats.distributionPerNft.label');
-    expect(
-      screen.getByTestId('stat-anchoring.overview.stats.activeHolders.label'),
-    ).toHaveTextContent('anchoring.overview.stats.activeHolders.label');
+    expect(screen.getByTestId('imprints')).toHaveTextContent('rows: 3, page size: 10');
   });
 
-  it('counts active anchor-holders across both NFT kinds once each', () => {
-    setupDefaults();
-    render(<AnchoringPage />);
-    // 0x1, 0x2, 0x3 anchor Cosmic Signature NFTs; 0x2 and 0x4 RandomWalk; 0x5 released all.
-    expect(
-      screen.getByTestId('stat-anchoring.overview.stats.activeHolders.label'),
-    ).toHaveTextContent('anchoring.overview.stats.activeHolders.label: 4');
-  });
-
-  it('shows no per-NFT distribution, with a visible reason, when nothing is anchored', () => {
-    setupDefaults();
-    mockUseDashboardInfo.mockReturnValue({
-      ...mockDashboard,
-      data: {
-        ...mockDashboard.data,
-        StakingAmountEth: 0.172488,
-        MainStats: {
-          ...mockDashboard.data.MainStats,
-          StakeStatisticsCST: { TotalTokensStaked: 0 },
-        },
-      },
-    });
-    render(<AnchoringPage />);
-
-    const card = screen.getByTestId('stat-anchoring.overview.stats.distributionPerNft.label');
-    expect(card).not.toHaveTextContent('0.172488');
-    expect(card).toHaveTextContent('common.status.unavailable');
-    expect(card).toHaveTextContent('anchoring.overview.stats.distributionPerNft.noneAnchored');
-  });
-
-  it('shows unread dashboard figures as unavailable, not 0', () => {
-    setupDefaults();
-    mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: false, error: null });
-    render(<AnchoringPage />);
-
-    expect(
-      screen.getByTestId('stat-anchoring.overview.stats.cosmicSignatureAnchored.label'),
-    ).toHaveTextContent('common.status.unavailable');
-    expect(screen.getByTestId('stat-anchoring.overview.stats.pool.label')).not.toHaveTextContent(
-      '0 ETH',
-    );
-  });
-
-  it('shows stats loading state when dashboard is loading', () => {
-    mockUseCSTAnchorDistributions.mockReturnValue(noError);
-    mockUseGlobalRWLKAnchorImprints.mockReturnValue(noError);
-    mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true, error: null });
-    mockUseUniqueCSTAnchorHolders.mockReturnValue({
-      data: undefined,
-      isLoading: true,
-      error: null,
-    });
-    render(<AnchoringPage />);
-    expect(screen.getByText('Loading stats...')).toBeInTheDocument();
-  });
-
-  it('renders the how anchoring Works section', () => {
-    setupDefaults();
-    render(<AnchoringPage />);
-    expect(screen.getByTestId('how-anchoring-works')).toBeInTheDocument();
-  });
-
-  it('renders the Start Anchoring CTA link', () => {
-    setupDefaults();
-    render(<AnchoringPage />);
-    const link = screen.getByRole('link', { name: /anchoring\.overview\.cta\.title/i });
-    expect(link).toHaveAttribute('href', '/my-anchors');
-  });
-
-  it('shows skeleton loading for CST table when loading', () => {
-    mockUseCSTAnchorDistributions.mockReturnValue({
-      data: undefined,
-      isLoading: true,
-      error: null,
-    });
-    mockUseGlobalRWLKAnchorImprints.mockReturnValue(noError);
-    mockUseDashboardInfo.mockReturnValue(mockDashboard);
-    mockUseUniqueCSTAnchorHolders.mockReturnValue(mockAnchorHolders);
-    render(<AnchoringPage />);
-    expect(screen.queryByTestId('cst-table')).not.toBeInTheDocument();
-  });
-
-  it('shows a translated fallback instead of the raw CST error', () => {
-    mockUseCSTAnchorDistributions.mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      error: { message: 'CST fetch failed' },
-    });
-    mockUseGlobalRWLKAnchorImprints.mockReturnValue(noError);
-    mockUseDashboardInfo.mockReturnValue(mockDashboard);
-    mockUseUniqueCSTAnchorHolders.mockReturnValue(mockAnchorHolders);
-    render(<AnchoringPage />);
-    expect(screen.getByText('anchoring.overview.errorTitle')).toBeInTheDocument();
-    expect(screen.getByText('anchoring.overview.errorMessage')).toBeInTheDocument();
-    expect(screen.queryByText('CST fetch failed')).not.toBeInTheDocument();
-  });
-
-  it('shows a translated fallback instead of the raw RWLK error', () => {
-    mockUseCSTAnchorDistributions.mockReturnValue(noError);
-    mockUseGlobalRWLKAnchorImprints.mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      error: { message: 'RWLK fetch failed' },
-    });
-    mockUseDashboardInfo.mockReturnValue(mockDashboard);
-    mockUseUniqueCSTAnchorHolders.mockReturnValue(mockAnchorHolders);
-    render(<AnchoringPage />);
-    expect(screen.getByText('anchoring.overview.errorTitle')).toBeInTheDocument();
-    expect(screen.getByText('anchoring.overview.errorMessage')).toBeInTheDocument();
-    expect(screen.queryByText('RWLK fetch failed')).not.toBeInTheDocument();
-  });
-
-  it('renders both tables when loaded', () => {
-    mockUseCSTAnchorDistributions.mockReturnValue({
-      data: [{ id: 1 }],
-      isLoading: false,
-      error: null,
-    });
-    mockUseGlobalRWLKAnchorImprints.mockReturnValue({
-      data: [{ id: 2 }, { id: 3 }],
-      isLoading: false,
-      error: null,
-    });
-    mockUseDashboardInfo.mockReturnValue(mockDashboard);
-    mockUseUniqueCSTAnchorHolders.mockReturnValue(mockAnchorHolders);
-    render(<AnchoringPage />);
-    expect(screen.getByTestId('cst-table')).toHaveTextContent('CST rows: 1');
-    expect(screen.getByTestId('rwlk-table')).toHaveTextContent('RWLK rows: 2');
-  });
-
-  it('renders section headings', () => {
-    setupDefaults();
-    render(<AnchoringPage />);
-    expect(screen.getByText('anchoring.overview.sections.cosmicSignature')).toBeInTheDocument();
-    expect(screen.getByText('anchoring.overview.sections.randomWalk')).toBeInTheDocument();
+  it('renders the server header when one is passed', () => {
+    render(<AnchoringPage {...slots} seoSummary={<h1>Server header</h1>} />);
+    expect(screen.getByRole('heading', { level: 1, name: 'Server header' })).toBeInTheDocument();
+    expect(screen.queryByText('anchoring.overview.subtitle')).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
-    setupDefaults();
-    const { container } = render(<AnchoringPage />);
-    await checkA11y(container, {
-      rules: { 'heading-order': { enabled: false } },
-    });
+    const { container } = render(<AnchoringPage {...slots} />);
+    await checkA11y(container);
   });
 });

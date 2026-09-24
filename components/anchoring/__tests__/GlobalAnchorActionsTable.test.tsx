@@ -1,142 +1,59 @@
-import '@testing-library/jest-dom';
-import { fireEvent } from '@testing-library/react';
-
-import { convertTimestampToDateTime, shortenHex } from '@/utils';
-
-import { render, screen, checkA11y } from '@/test-utils';
-
-const mockConvertTimestampToDateTime = jest.fn();
-jest.mock('@/utils', () => {
-  const actual = jest.requireActual<typeof import('@/utils')>('@/utils');
-  return {
-    ...actual,
-    convertTimestampToDateTime: (timestamp: number, showSecond?: boolean, locale?: string) => {
-      mockConvertTimestampToDateTime(timestamp, showSecond, locale);
-      return actual.convertTimestampToDateTime(timestamp, showSecond, locale);
-    },
-  };
-});
-
-const mockPush = jest.fn();
-jest.mock('next/navigation', () => ({
-  useRouter: () => ({ push: mockPush, prefetch: jest.fn() }),
-}));
+import { checkA11y, render, screen } from '@/test-utils';
 
 import { GlobalAnchorActionsTable } from '../GlobalAnchorActionsTable';
 
-const createRow = (overrides = {}) => ({
+const HOLDER = '0x1234567890abcdef1234567890abcdef12345678';
+
+const action = (overrides = {}) => ({
   EvtLogId: 1,
   ActionId: 10,
-  TimeStamp: 1701346718,
+  TimeStamp: 1_790_207_903,
   ActionType: 0,
-  TokenId: 42,
-  StakerAddr: '0x1234567890abcdef1234567890abcdef12345678',
-  NumStakedNFTs: 5,
+  TokenId: 47,
+  StakerAddr: HOLDER,
+  NumStakedNFTs: 33,
   ...overrides,
 });
 
-beforeEach(() => jest.clearAllMocks());
-
 describe('GlobalAnchorActionsTable', () => {
-  it('renders empty state message', () => {
-    render(<GlobalAnchorActionsTable list={[]} IsRWLK={false} />);
-    expect(screen.getByText('anchoring.common.empty.actions')).toBeInTheDocument();
-  });
-
-  it('renders empty state for null list', () => {
-    render(<GlobalAnchorActionsTable list={null as unknown as never[]} IsRWLK={false} />);
-    expect(screen.getByText('anchoring.common.empty.actions')).toBeInTheDocument();
-  });
-
-  it('renders table headers', () => {
-    render(<GlobalAnchorActionsTable list={[createRow()]} IsRWLK={false} />);
-    for (const header of [
-      'anchoring.tables.globalAnchorActions.headers.anchorDatetime.desktop',
-      'anchoring.tables.globalAnchorActions.headers.actionType.desktop',
-      'anchoring.tables.globalAnchorActions.headers.tokenId.desktop',
-      'anchoring.tables.globalAnchorActions.headers.holderAddress.desktop',
-      'anchoring.tables.globalAnchorActions.headers.nftCount.desktop',
-    ]) {
-      expect(screen.getAllByText(header).length).toBeGreaterThanOrEqual(1);
-    }
-  });
-
-  it('renders compact mobile header labels for pivoted rows', () => {
-    render(<GlobalAnchorActionsTable list={[createRow()]} IsRWLK={false} />);
-    for (const label of [
-      'anchoring.tables.globalAnchorActions.headers.anchorDatetime.mobile',
-      'anchoring.tables.globalAnchorActions.headers.actionType.mobile',
-      'anchoring.tables.globalAnchorActions.headers.tokenId.mobile',
-      'anchoring.tables.globalAnchorActions.headers.holderAddress.mobile',
-      'anchoring.tables.globalAnchorActions.headers.nftCount.mobile',
-    ]) {
-      expect(screen.getAllByText(label).length).toBeGreaterThanOrEqual(1);
-    }
-  });
-
-  it('sets a medium-screen minimum width so the table can scroll instead of cramping', () => {
-    const { container } = render(<GlobalAnchorActionsTable list={[createRow()]} IsRWLK={false} />);
-    expect(container.querySelector('table')).toHaveClass('sm:min-w-[720px]');
-  });
-
-  it('renders row data correctly', () => {
-    render(<GlobalAnchorActionsTable list={[createRow()]} IsRWLK={false} />);
-    expect(
-      screen.getAllByText(convertTimestampToDateTime(1701346718)).length,
-    ).toBeGreaterThanOrEqual(1);
-    expect(document.querySelector('time[datetime="2023-11-30T12:18:38.000Z"]')).toBeInTheDocument();
-    expect(screen.getAllByText('anchoring.common.anchor').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('42').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('5').length).toBeGreaterThanOrEqual(1);
-  });
-
-  it('displays Release for ActionType 1', () => {
-    render(<GlobalAnchorActionsTable list={[createRow({ ActionType: 1 })]} IsRWLK={false} />);
-    expect(screen.getAllByText('anchoring.common.release').length).toBeGreaterThanOrEqual(1);
-  });
-
-  it('shows shortened anchorHolder address', () => {
-    const addr = '0x1234567890abcdef1234567890abcdef12345678';
-    render(<GlobalAnchorActionsTable list={[createRow({ StakerAddr: addr })]} IsRWLK={false} />);
-    const addressLink = screen.getByText(shortenHex(addr, 6)).closest('a');
-    expect(addressLink).toBeInTheDocument();
-    expect(addressLink).toHaveClass('break-all');
-    expect(addressLink).toHaveAttribute('href', `/user/${addr}`);
-  });
-
-  it('links RWLK token IDs to the RandomWalk detail site', () => {
-    render(<GlobalAnchorActionsTable list={[createRow({ TokenId: 99 })]} IsRWLK={true} />);
-    expect(screen.getByRole('link', { name: '99' })).toHaveAttribute(
+  it('lists anchors and releases with the token, the anchor-holder and the total', () => {
+    render(
+      <GlobalAnchorActionsTable
+        list={[action(), action({ EvtLogId: 2, ActionId: 11, ActionType: 1 })]}
+        IsRWLK={false}
+      />,
+    );
+    expect(screen.getByText('anchoring.common.anchor')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.common.release')).toBeInTheDocument();
+    expect(screen.getAllByRole('link', { name: '#000047' })[0]).toHaveAttribute(
       'href',
-      'https://randomwalknft.com/detail/99',
+      '/detail/47',
     );
+    expect(document.querySelector(`a[href="/user/${HOLDER}"]`)).toBeInTheDocument();
+    expect(screen.getAllByText('33')).toHaveLength(2);
   });
 
-  it('renders only first page of results (perPage=5)', () => {
-    const list = Array.from({ length: 8 }, (_, i) =>
-      createRow({ EvtLogId: i, ActionId: i, NumStakedNFTs: 100 + i }),
-    );
-    render(<GlobalAnchorActionsTable list={list} IsRWLK={false} />);
-    expect(screen.getByText('104')).toBeInTheDocument();
-    expect(screen.queryByText('105')).not.toBeInTheDocument();
+  it('explains each column and leads each row to its record', () => {
+    render(<GlobalAnchorActionsTable list={[action()]} IsRWLK />);
+    expect(
+      screen.getByRole('button', {
+        name: /explainColumn\(column=anchoring\.tables\.globalAnchorActions\.headers\.holderAddress\.desktop\)/,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'anchoring.anchorActionDetail.breadcrumbs.action(id=10)' }),
+    ).toHaveAttribute('href', '/anchor-action/1/10');
   });
 
-  it('navigates to anchor action page on row click', () => {
-    render(<GlobalAnchorActionsTable list={[createRow({ ActionId: 7 })]} IsRWLK={false} />);
-    const row = screen.getAllByText('anchoring.common.anchor')[0]!.closest('tr');
-    fireEvent.click(row!);
-    expect(mockPush).toHaveBeenCalledWith('/anchor-action/0/7');
-  });
-
-  it('uses RWLK flag in navigation', () => {
-    render(<GlobalAnchorActionsTable list={[createRow({ ActionId: 3 })]} IsRWLK={true} />);
-    const row = screen.getAllByText('anchoring.common.anchor')[0]!.closest('tr');
-    fireEvent.click(row!);
-    expect(mockPush).toHaveBeenCalledWith('/anchor-action/1/3');
+  it('explains an empty list', () => {
+    render(<GlobalAnchorActionsTable list={[]} IsRWLK={false} />);
+    expect(
+      screen.getByRole('heading', { name: 'anchoring.common.empty.actions.title' }),
+    ).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<GlobalAnchorActionsTable list={[]} IsRWLK={false} />);
+    const { container } = render(<GlobalAnchorActionsTable list={[action()]} IsRWLK={false} />);
     await checkA11y(container);
   });
 });

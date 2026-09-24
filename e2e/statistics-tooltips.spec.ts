@@ -47,9 +47,9 @@ const PARTICIPATION_TOOLTIPS = [
     expected: /contributed ETH to the protocol/,
   },
   {
-    label: 'Active Anchor-holders',
+    label: 'Active anchor-holders',
     expected:
-      /Distinct wallets that currently anchor at least one Cosmic Signature or RandomWalk NFT/,
+      /Distinct wallets that currently anchor at least one Cosmic Signature or Random Walk NFT/,
   },
 ];
 

@@ -25,6 +25,12 @@ const ANCHORING_QUERY_KEYS = [
   'stakingRewardsByUser',
   'stakingRWLKActionsByUser',
   'stakingRWLKMintsByUser',
+  // The unretrieved-distribution reads and the header's notice, which a
+  // release changes as much as the anchored lists.
+  'stakingCSTRewardsToClaim',
+  'stakingCSTRewardsCollected',
+  'stakingCSTByUserByDeposit',
+  'notifyRedBox',
 ] as const;
 
 const NOT_RUN: TxResult = { status: 'aborted' };

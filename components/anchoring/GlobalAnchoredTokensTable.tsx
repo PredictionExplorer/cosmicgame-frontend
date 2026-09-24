@@ -1,149 +1,103 @@
-import { useState, type FC } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+'use client';
 
-import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
-import { Link } from '@/i18n/navigation';
-import {
-  TablePrimary,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryContainer,
-  TablePrimaryHead,
-  TablePrimaryHeadCell,
-  TablePrimaryRow,
-} from '@/components/styled';
-import { CustomPagination } from '@/components/common/CustomPagination';
-import { AddressLink } from '@/components/common/AddressLink';
-import { TableHeaderHelp } from '@/components/tables/TableHeaderHelp';
+import { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
+
+import { DataTable, type DataTableColumn, TableLink } from '@/components/ui/data-table';
 import type { AnchoredTokenInfo } from '@/services/api';
 
-interface GlobalAnchoredTokensRowProps {
-  row: AnchoredTokenInfo;
-  IsRWLK: boolean;
-}
+import { TokenCell } from './TokenCell';
+import { anchorActionHref } from './anchorLinks';
+import type { AnchoringLedgerProps } from './ledgerProps';
 
-const GlobalAnchoredTokensRow: FC<GlobalAnchoredTokensRowProps> = ({ row, IsRWLK }) => {
-  const t = useTranslations('anchoring');
-  const locale = useLocale();
-
-  if (!row) {
-    return <TablePrimaryRow />;
-  }
-
-  return (
-    <TablePrimaryRow>
-      <TablePrimaryCell label={t('tables.globalAnchoredTokens.headers.anchorDatetime.mobile')}>
-        <HydrationSafeDateTime timestamp={row.StakeTimeStamp} locale={locale} />
-      </TablePrimaryCell>
-
-      <TablePrimaryCell
-        label={t('tables.globalAnchoredTokens.headers.actionId.mobile')}
-        align="center"
-      >
-        <Link
-          href={`/anchor-action/${IsRWLK ? 1 : 0}/${row.StakeActionId}`}
-          className="text-inherit"
-        >
-          {row.StakeActionId}
-        </Link>
-      </TablePrimaryCell>
-
-      <TablePrimaryCell
-        label={t('tables.globalAnchoredTokens.headers.tokenId.mobile')}
-        align="center"
-      >
-        {IsRWLK ? (
-          <a
-            href={`https://randomwalknft.com/detail/${row.StakedTokenId}`}
-            className="text-inherit"
-          >
-            {row.StakedTokenId}
-          </a>
-        ) : (
-          <Link href={`/detail/${row.TokenInfo?.TokenId}`} className="text-inherit">
-            {row.TokenInfo?.TokenId}
-          </Link>
-        )}
-      </TablePrimaryCell>
-
-      <TablePrimaryCell
-        label={t('tables.globalAnchoredTokens.headers.holderAddress.mobile')}
-        align="center"
-      >
-        <AddressLink address={row.UserAddr ?? ''} url={`/user/${row.UserAddr}`} />
-      </TablePrimaryCell>
-    </TablePrimaryRow>
-  );
-};
-
-interface GlobalAnchoredTokensTableProps {
+interface GlobalAnchoredTokensTableProps extends AnchoringLedgerProps {
   list: AnchoredTokenInfo[];
   IsRWLK: boolean;
 }
 
-export const GlobalAnchoredTokensTable: FC<GlobalAnchoredTokensTableProps> = ({ list, IsRWLK }) => {
+/** The token id of an anchored row: flat on Random Walk rows, nested on Cosmic Signature rows. */
+function anchoredTokenId(row: AnchoredTokenInfo, isRandomWalk: boolean): number | undefined {
+  return isRandomWalk ? row.StakedTokenId : row.TokenInfo?.TokenId;
+}
+
+/**
+ * Every NFT anchored right now in one collection, shown by its artwork: when
+ * it was anchored, the anchor action and its anchor-holder.
+ */
+export const GlobalAnchoredTokensTable = ({
+  list,
+  IsRWLK,
+  headingLevel = 3,
+  ...state
+}: GlobalAnchoredTokensTableProps) => {
   const t = useTranslations('anchoring');
-  const perPage = 5;
-  const [page, setPage] = useState(1);
-  const responsiveHeaders = [
-    {
-      desktop: t('tables.globalAnchoredTokens.headers.anchorDatetime.desktop'),
-      mobile: t('tables.globalAnchoredTokens.headers.anchorDatetime.mobile'),
-      align: 'left' as const,
-      tooltip: t('tables.globalAnchoredTokens.headers.anchorDatetime.tooltip'),
-    },
-    {
-      desktop: t('tables.globalAnchoredTokens.headers.actionId.desktop'),
-      mobile: t('tables.globalAnchoredTokens.headers.actionId.mobile'),
-      tooltip: t('tables.globalAnchoredTokens.headers.actionId.tooltip'),
-    },
-    {
-      desktop: t('tables.globalAnchoredTokens.headers.tokenId.desktop'),
-      mobile: t('tables.globalAnchoredTokens.headers.tokenId.mobile'),
-      tooltip: t('tables.globalAnchoredTokens.headers.tokenId.tooltip'),
-    },
-    {
-      desktop: t('tables.globalAnchoredTokens.headers.holderAddress.desktop'),
-      mobile: t('tables.globalAnchoredTokens.headers.holderAddress.mobile'),
-      tooltip: t('tables.globalAnchoredTokens.headers.holderAddress.tooltip'),
-    },
-  ];
+  const collection = IsRWLK ? 'randomWalk' : 'cosmicSignature';
 
-  if (list.length === 0) {
-    return <p className="text-muted-foreground">{t('common.empty.tokens')}</p>;
-  }
-
-  const startIndex = (page - 1) * perPage;
-  const endIndex = page * perPage;
-  const visibleRows = list.slice(startIndex, endIndex);
+  const columns = useMemo<DataTableColumn<AnchoredTokenInfo>[]>(
+    () => [
+      {
+        id: 'token',
+        kind: 'link',
+        header: t('tables.globalAnchoredTokens.headers.tokenId.desktop'),
+        label: t('tables.globalAnchoredTokens.headers.tokenId.mobile'),
+        help: t('tables.globalAnchoredTokens.headers.tokenId.tooltip'),
+        value: (row) => anchoredTokenId(row, IsRWLK),
+        cell: (row) => {
+          const tokenId = anchoredTokenId(row, IsRWLK);
+          return tokenId === undefined ? null : (
+            <TokenCell
+              collection={collection}
+              tokenId={tokenId}
+              seed={IsRWLK ? undefined : (row.TokenInfo?.Seed ?? null)}
+              thumbnail
+            />
+          );
+        },
+      },
+      {
+        id: 'datetime',
+        kind: 'datetime',
+        header: t('tables.globalAnchoredTokens.headers.anchorDatetime.desktop'),
+        label: t('tables.globalAnchoredTokens.headers.anchorDatetime.mobile'),
+        help: t('tables.globalAnchoredTokens.headers.anchorDatetime.tooltip'),
+        value: (row) => row.StakeTimeStamp,
+      },
+      {
+        id: 'action',
+        kind: 'link',
+        header: t('tables.globalAnchoredTokens.headers.actionId.desktop'),
+        label: t('tables.globalAnchoredTokens.headers.actionId.mobile'),
+        help: t('tables.globalAnchoredTokens.headers.actionId.tooltip'),
+        value: (row) => row.StakeActionId,
+        cell: (row) => (
+          <TableLink href={anchorActionHref(collection, row.StakeActionId)}>
+            {t('anchorActionDetail.breadcrumbs.action', { id: row.StakeActionId })}
+          </TableLink>
+        ),
+      },
+      {
+        id: 'holder',
+        kind: 'address',
+        header: t('tables.globalAnchoredTokens.headers.holderAddress.desktop'),
+        label: t('tables.globalAnchoredTokens.headers.holderAddress.mobile'),
+        help: t('tables.globalAnchoredTokens.headers.holderAddress.tooltip'),
+        value: (row) => row.UserAddr,
+      },
+    ],
+    [IsRWLK, collection, t],
+  );
 
   return (
-    <>
-      <TablePrimaryContainer>
-        <TablePrimary className="sm:min-w-[640px] lg:min-w-0">
-          <TablePrimaryHead>
-            <tr>
-              {responsiveHeaders.map((header) => (
-                <TablePrimaryHeadCell key={header.desktop} align={header.align}>
-                  <TableHeaderHelp
-                    desktop={header.desktop}
-                    mobile={header.mobile}
-                    tooltip={header.tooltip}
-                  />
-                </TablePrimaryHeadCell>
-              ))}
-            </tr>
-          </TablePrimaryHead>
-
-          <TablePrimaryBody>
-            {visibleRows.map((row) => (
-              <GlobalAnchoredTokensRow key={row.StakeEvtLogId} row={row} IsRWLK={IsRWLK} />
-            ))}
-          </TablePrimaryBody>
-        </TablePrimary>
-      </TablePrimaryContainer>
-
-      <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
-    </>
+    <DataTable
+      data={list}
+      columns={columns}
+      ariaLabel={t('tables.globalAnchoredTokens.label')}
+      getRowKey={(row) => row.StakeEvtLogId ?? row.StakeActionId}
+      emptyTitle={t('common.empty.tokens.title')}
+      emptyDescription={t('common.empty.tokens.description')}
+      tableClassName="sm:min-w-[40rem] lg:min-w-0"
+      headingLevel={headingLevel}
+      {...state}
+    />
   );
 };

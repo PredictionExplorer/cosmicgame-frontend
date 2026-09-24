@@ -32,15 +32,7 @@ const FIXED_DECIMAL_CALL = /\.toFixed\(|\bformatFixed\(/g;
 /** Remaining fixed-decimal calls per file; lower as call sites migrate. */
 const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
   'app/[locale]/(app)/cosmic-token-transfer/[address]/CosmicTokenTransfersPage.tsx': 1,
-  'app/[locale]/(app)/distributions-by-token/[address]/[tokenId]/RewardsByTokenPage.tsx': 2,
   'app/[locale]/(app)/eth-contribution/detail/[id]/EthDonationDetailPage.tsx': 1,
-  'app/[locale]/(app)/my-anchors/MyAnchors.tsx': 1,
-  'components/anchoring/AnchorDistributionsTable.tsx': 2,
-  'components/anchoring/AnchoredTokensTable.tsx': 1,
-  'components/anchoring/CSTAnchorDistributionsByDepositTable.tsx': 3,
-  'components/anchoring/GlobalAnchorDistributionsTable.tsx': 2,
-  'components/anchoring/RetrievedCSTAnchorDistributionsTable.tsx': 2,
-  'components/anchoring/UnretrievedCSTAnchorDistributionsTable.tsx': 5,
   'components/marketing/MarketingStats.tsx': 1,
   'components/marketing/TopMarketersLeaderboard.tsx': 1,
   'components/nft/traits/ChaosMeter.tsx': 1,

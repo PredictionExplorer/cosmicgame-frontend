@@ -1,116 +1,53 @@
-import '@testing-library/jest-dom';
+import { checkA11y, render, screen } from '@/test-utils';
 
-import { convertTimestampToDateTime } from '@/utils';
+import {
+  CSTAnchorDistributionsByDepositTable,
+  type CSTAnchorDistributionByDeposit,
+} from '../CSTAnchorDistributionsByDepositTable';
 
-import { render, screen, checkA11y } from '@/test-utils';
-
-const mockConvertTimestampToDateTime = jest.fn();
-jest.mock('@/utils', () => {
-  const actual = jest.requireActual<typeof import('@/utils')>('@/utils');
-  return {
-    ...actual,
-    convertTimestampToDateTime: (timestamp: number, showSecond?: boolean, locale?: string) => {
-      mockConvertTimestampToDateTime(timestamp, showSecond, locale);
-      return actual.convertTimestampToDateTime(timestamp, showSecond, locale);
-    },
-  };
-});
-
-import { CSTAnchorDistributionsByDepositTable } from '../CSTAnchorDistributionsByDepositTable';
-
-const createRow = (overrides = {}) => ({
+const deposit = (
+  overrides: Partial<CSTAnchorDistributionByDeposit> = {},
+): CSTAnchorDistributionByDeposit => ({
   EvtLogId: 1,
-  TxHash: '0xabc123def456abc123def456abc123def456abc123def456abc123def456abc1',
-  TimeStamp: 1701346718,
-  DepositRoundNum: 10,
-  DepositId: 5,
-  DepositAmountEth: 1.2345,
-  ClaimedAmountEth: 0.5678,
-  YourClaimableAmountEth: 0.1234,
+  TxHash: '0xdeposit',
+  TimeStamp: 1_786_491_506,
+  DepositRoundNum: 1,
+  DepositId: 18,
+  DepositAmountEth: 2.65478,
+  ClaimedAmountEth: 0.5,
+  YourClaimableAmountEth: 0.1562,
   FullyClaimed: false,
-  NumStakedNFTs: 3,
-  NumTokensCollected: 2,
+  NumStakedNFTs: 17,
+  NumTokensCollected: 3,
   YourTokensStaked: 1,
   ...overrides,
 });
 
-beforeEach(() => jest.clearAllMocks());
-
 describe('CSTAnchorDistributionsByDepositTable', () => {
-  it('renders empty state message', () => {
+  it('shows the deposit, what this address can retrieve and whether it is complete', () => {
+    render(<CSTAnchorDistributionsByDepositTable list={[deposit()]} />);
+    expect(screen.getByText('2.6548')).toBeInTheDocument();
+    expect(screen.getByText('0.1562')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.common.no')).toBeInTheDocument();
+    expect(screen.getByText('18')).toBeInTheDocument();
+  });
+
+  it('links the cycle and proves the deposit on the explorer', () => {
+    render(<CSTAnchorDistributionsByDepositTable list={[deposit()]} />);
+    expect(screen.getByRole('link', { name: '1' })).toHaveAttribute('href', '/allocation/1');
+    const proof = document.querySelector('a[href*="0xdeposit"]');
+    expect(proof).toHaveAttribute('target', '_blank');
+  });
+
+  it('explains an empty list', () => {
     render(<CSTAnchorDistributionsByDepositTable list={[]} />);
-    expect(screen.getByText('anchoring.common.empty.distributions')).toBeInTheDocument();
-  });
-
-  it('renders table headers', () => {
-    render(<CSTAnchorDistributionsByDepositTable list={[createRow()]} />);
-    for (const header of [
-      'anchoring.tables.distributionsByDeposit.columns.depositDatetime',
-      'anchoring.tables.distributionsByDeposit.columns.depositCycle',
-      'anchoring.tables.distributionsByDeposit.columns.depositId',
-      'anchoring.tables.distributionsByDeposit.columns.totalDepositAmount',
-      'anchoring.tables.distributionsByDeposit.columns.totalRetrievedAmount',
-      'anchoring.tables.distributionsByDeposit.columns.yourRetrievableAmount',
-      'anchoring.tables.distributionsByDeposit.columns.fullyRetrieved',
-      'anchoring.tables.distributionsByDeposit.columns.totalAnchoredNfts',
-      'anchoring.tables.distributionsByDeposit.columns.totalRetrievedTokens',
-      'anchoring.tables.distributionsByDeposit.columns.yourAnchoredTokens',
-    ]) {
-      expect(screen.getAllByText(header).length).toBeGreaterThanOrEqual(1);
-    }
-  });
-
-  it('renders row data correctly', () => {
-    render(<CSTAnchorDistributionsByDepositTable list={[createRow()]} />);
     expect(
-      screen.getAllByText(convertTimestampToDateTime(1701346718)).length,
-    ).toBeGreaterThanOrEqual(1);
-    expect(document.querySelector('time[datetime="2023-11-30T12:18:38.000Z"]')).toBeInTheDocument();
-    expect(screen.getAllByText('5').length).toBeGreaterThanOrEqual(1);
-  });
-
-  it('formats ETH amounts to 4 decimal places', () => {
-    render(
-      <CSTAnchorDistributionsByDepositTable
-        list={[
-          createRow({ DepositAmountEth: 1.5, ClaimedAmountEth: 0.1, YourClaimableAmountEth: 0.2 }),
-        ]}
-      />,
-    );
-    expect(screen.getByText('1.5000')).toBeInTheDocument();
-    expect(screen.getByText('0.1000')).toBeInTheDocument();
-    expect(screen.getByText('0.2000')).toBeInTheDocument();
-  });
-
-  it('displays FullyClaimed status', () => {
-    render(<CSTAnchorDistributionsByDepositTable list={[createRow({ FullyClaimed: true })]} />);
-    expect(screen.getAllByText('anchoring.common.yes').length).toBeGreaterThanOrEqual(1);
-  });
-
-  it('renders deposit round link', () => {
-    render(<CSTAnchorDistributionsByDepositTable list={[createRow({ DepositRoundNum: 7 })]} />);
-    const link = screen.getByText('7').closest('a');
-    expect(link).toHaveAttribute('href', '/allocation/7');
-  });
-
-  it('renders datetime as explorer link', () => {
-    const row = createRow();
-    render(<CSTAnchorDistributionsByDepositTable list={[row]} />);
-    const datetime = screen.getByText(convertTimestampToDateTime(row.TimeStamp));
-    expect(datetime.closest('a')).toHaveAttribute('target', '_blank');
-  });
-
-  it('renders only first page of results (perPage=5)', () => {
-    const list = Array.from({ length: 8 }, (_, i) =>
-      createRow({ EvtLogId: i, DepositId: 100 + i }),
-    );
-    render(<CSTAnchorDistributionsByDepositTable list={list} />);
-    expect(screen.getByText('104')).toBeInTheDocument();
-    expect(screen.queryByText('105')).not.toBeInTheDocument();
+      screen.getByRole('heading', { name: 'anchoring.common.empty.distributions.title' }),
+    ).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<CSTAnchorDistributionsByDepositTable list={[]} />);
+    const { container } = render(<CSTAnchorDistributionsByDepositTable list={[deposit()]} />);
     await checkA11y(container);
   });
 });

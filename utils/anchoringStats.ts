@@ -31,11 +31,6 @@ export function distributionPerAnchoredNft(
   return { status: 'available', perNftEth: pool / count };
 }
 
-/** Formats an available per-NFT figure: "0 ETH" for an empty pool, else six decimals. */
-export function formatPerNftEth(perNftEth: number): string {
-  return perNftEth === 0 ? '0 ETH' : `${perNftEth.toFixed(6)} ETH`;
-}
-
 /** The fields of a unique anchor-holder row that {@link countActiveAnchorHolders} reads. */
 export interface AnchorHolderRow {
   StakerAddr?: string;

@@ -36,7 +36,7 @@
       },
       "anchoring": {
         "heading": "Phân phối neo giữ",
-        "description": "Theo dõi hoạt động neo giữ Cosmic Signature NFT công khai, các bản ghi phân phối neo giữ ETH, neo giữ RandomWalk NFT và các lần khắc Tinh tuyển NFT neo giữ.",
+        "description": "Theo dõi hoạt động neo giữ Cosmic Signature NFT công khai, các bản ghi phân phối neo giữ ETH, neo giữ Random Walk NFT và các lần khắc Tinh tuyển NFT neo giữ.",
         "source": "Các API neo giữ công khai của Cosmic Signature",
         "links": {
           "statistics": "Xem thống kê neo giữ",
@@ -53,7 +53,7 @@
           },
           "stellarImprints": {
             "label": "Lượt khắc Tinh tuyển NFT neo giữ",
-            "tooltip": "Số Cosmic Signature NFT đã khắc cho các RandomWalk NFT đang neo giữ thông qua Tinh tuyển NFT neo giữ."
+            "tooltip": "Số Cosmic Signature NFT đã khắc cho các Random Walk NFT đang neo giữ thông qua Tinh tuyển NFT neo giữ."
           }
         }
       },

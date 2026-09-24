@@ -112,6 +112,7 @@ export function AnchoringSection({
         <StatisticsGroup
           title={t('anchoringPage.groups.cosmicSignature')}
           accentColor="blue"
+          headingLevel={3}
           tooltip={t('anchoringTooltips.cstGroup')}
         >
           <StatisticsItem
@@ -173,6 +174,7 @@ export function AnchoringSection({
         <StatisticsGroup
           title={t('anchoringPage.groups.randomWalk')}
           accentColor="purple"
+          headingLevel={3}
           tooltip={t('anchoringTooltips.rwlkGroup')}
         >
           <StatisticsItem

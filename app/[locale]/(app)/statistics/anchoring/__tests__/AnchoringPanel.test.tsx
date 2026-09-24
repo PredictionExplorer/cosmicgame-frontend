@@ -67,12 +67,23 @@ beforeEach(() => {
 });
 
 describe('AnchoringPanel', () => {
-  it('renders the anchoring snapshot stats from the dashboard', () => {
-    render(<AnchoringPanel />);
-    expect(screen.getByText('Cosmic Signature NFTs Anchored')).toBeInTheDocument();
-    expect(screen.getAllByText('11').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText('Random Walk NFTs Anchored')).toBeInTheDocument();
-    expect(screen.getAllByText('26').length).toBeGreaterThanOrEqual(1);
+  it('shows anchoring now as one strip of figures no collection tab repeats', () => {
+    const { container } = render(<AnchoringPanel />);
+    expect(screen.getByRole('heading', { level: 2, name: 'Anchoring now' })).toBeInTheDocument();
+    const figures = [...container.querySelectorAll('[data-figure]')].map((el) =>
+      el.getAttribute('data-figure'),
+    );
+    expect(figures).toEqual(['pool', 'perNft', 'activeHolders']);
+    // The per-collection anchored counts lead their own tab, not this strip.
+    expect(screen.queryByText('Cosmic Signature NFTs anchored')).not.toBeInTheDocument();
+    expect(screen.queryByText('Random Walk NFTs anchored')).not.toBeInTheDocument();
+  });
+
+  it('leads the strip with the pool and divides it by the anchored NFTs', () => {
+    const { container } = render(<AnchoringPanel />);
+    expect(container.querySelector('[data-figure="pool"]')).toHaveTextContent('2.5000');
+    // 2.5 ETH over 11 anchored Cosmic Signature NFTs.
+    expect(container.querySelector('[data-figure="perNft"]')).toHaveTextContent('0.2273');
   });
 
   it('counts a wallet anchoring both kinds once in Active Anchor-holders', () => {
@@ -91,10 +102,9 @@ describe('AnchoringPanel', () => {
         { StakerAddr: '0xDDD', TotalTokensStaked: 0 },
       ]),
     );
-    render(<AnchoringPanel />);
+    const { container } = render(<AnchoringPanel />);
 
-    const card = screen.getByText('Active Anchor-holders').closest('div.border');
-    expect(card?.querySelector('.stat-card-value')).toHaveTextContent(/^3$/);
+    expect(container.querySelector('[data-figure="activeHolders"] dd')).toHaveTextContent(/^3$/);
     // The per-kind counts below keep their own, per-kind label.
     expect(screen.getByText('Active Cosmic Signature NFT Anchor-holders')).toBeInTheDocument();
   });
@@ -117,17 +127,18 @@ describe('AnchoringPanel', () => {
     expect(screen.getByTestId('global-anchor-actions-table')).toHaveTextContent('1 actions');
   });
 
-  it('shows skeleton stat cards while the dashboard loads', () => {
+  it('holds the strip with skeletons while the dashboard loads', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: undefined,
       isLoading: true,
       isError: false,
       refetch: jest.fn(),
     });
-    render(<AnchoringPanel />);
-    expect(
-      screen.getAllByRole('status', { name: 'tables.skeleton.loadingStat' }).length,
-    ).toBeGreaterThan(0);
+    const { container } = render(<AnchoringPanel />);
+    for (const figure of container.querySelectorAll('[data-figure]')) {
+      expect(figure.querySelector('.animate-pulse')).toBeInTheDocument();
+    }
+    expect(container).not.toHaveTextContent('2.5000');
   });
 
   it('shows a section error with retry when anchor actions fail', async () => {
@@ -148,7 +159,7 @@ describe('AnchoringPanel', () => {
 
   it('links to the full anchor history page', () => {
     render(<AnchoringPanel />);
-    expect(screen.getByRole('link', { name: /view anchor history/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Anchor Distributions history/ })).toHaveAttribute(
       'href',
       '/anchoring',
     );
@@ -161,6 +172,7 @@ describe('AnchoringPanel', () => {
 
   it('has no accessibility violations', async () => {
     const { container } = render(<AnchoringPanel />);
+    // heading-order included: the collection overviews are h3 under the page's h2s.
     await checkA11y(container);
   });
 });

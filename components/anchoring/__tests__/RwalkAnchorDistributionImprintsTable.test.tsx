@@ -1,92 +1,104 @@
-import '@testing-library/jest-dom';
+import type { AnchorDistributionImprint } from '@/services/api';
 
-import { convertTimestampToDateTime } from '@/utils';
-
-import { render, screen, checkA11y } from '@/test-utils';
-
-const mockConvertTimestampToDateTime = jest.fn();
-jest.mock('@/utils', () => {
-  const actual = jest.requireActual<typeof import('@/utils')>('@/utils');
-  return {
-    ...actual,
-    convertTimestampToDateTime: (timestamp: number, showSecond?: boolean, locale?: string) => {
-      mockConvertTimestampToDateTime(timestamp, showSecond, locale);
-      return actual.convertTimestampToDateTime(timestamp, showSecond, locale);
-    },
-  };
-});
+import { checkA11y, render, screen } from '@/test-utils';
 
 import { RwalkAnchorDistributionImprintsTable } from '../RwalkAnchorDistributionImprintsTable';
 
-const createRow = (overrides = {}) => ({
-  EvtLogId: 1,
-  TxHash: '0xabc123def456abc123def456abc123def456abc123def456abc123def456abc1',
-  TimeStamp: 1701346718,
-  WinnerAddr: '0x1234567890abcdef1234567890abcdef12345678',
-  RoundNum: 10,
-  TokenId: 42,
+const mockUseCSTInfo = jest.fn();
+const mockUseCSTList = jest.fn();
+jest.mock('@/hooks/useApiQuery', () => ({
+  useCSTInfo: (tokenId: number | null) => mockUseCSTInfo(tokenId),
+  useCSTList: (options: { enabled?: boolean }) => mockUseCSTList(options),
+}));
+
+const RECIPIENT = '0x95d2bA09182101f577Fb21D080FD9Bc0D916011C';
+
+const imprint = (
+  overrides: Partial<AnchorDistributionImprint> = {},
+): AnchorDistributionImprint => ({
+  EvtLogId: 25991,
+  TxHash: '0ximprint',
+  TimeStamp: 1_786_491_506,
+  WinnerAddr: RECIPIENT,
+  RoundNum: 1,
+  TokenId: 38,
   ...overrides,
 });
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => {
+  mockUseCSTList.mockReturnValue({
+    data: [
+      { TokenId: 38, Seed: 'seed38' },
+      { TokenId: 39, Seed: 'seed39' },
+    ],
+    isLoading: false,
+  });
+  mockUseCSTInfo.mockImplementation((tokenId: number | null) => ({
+    data: tokenId === null ? undefined : { TokenId: tokenId, Seed: 'abc' },
+    isLoading: false,
+  }));
+});
 
 describe('RwalkAnchorDistributionImprintsTable', () => {
-  it('renders empty state message', () => {
+  it('shows each imprint by its artwork, recipient, cycle and transaction', () => {
+    render(<RwalkAnchorDistributionImprintsTable list={[imprint()]} />);
+    expect(screen.getByTestId('art-frame')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: '#000038' })).toHaveAttribute('href', '/detail/38');
+    expect(document.querySelector(`a[href="/user/${RECIPIENT}"]`)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: '1' })).toHaveAttribute('href', '/allocation/1');
+    expect(document.querySelector('a[href*="0ximprint"]')).toHaveAttribute('target', '_blank');
+  });
+
+  it('reads every thumbnail’s seed from one collection read, not a lookup per row', () => {
+    render(
+      <RwalkAnchorDistributionImprintsTable
+        list={[imprint(), imprint({ EvtLogId: 25990, TokenId: 39 })]}
+      />,
+    );
+    expect(screen.getAllByTestId('art-frame')).toHaveLength(2);
+    expect(mockUseCSTList).toHaveBeenCalledWith({ enabled: true });
+    expect(mockUseCSTInfo).not.toHaveBeenCalledWith(38);
+    expect(mockUseCSTInfo).not.toHaveBeenCalledWith(39);
+  });
+
+  it('waits for the collection read instead of looking each token up', () => {
+    mockUseCSTList.mockReturnValue({ data: undefined, isLoading: true });
+    render(<RwalkAnchorDistributionImprintsTable list={[imprint()]} />);
+    expect(screen.queryByTestId('art-frame')).not.toBeInTheDocument();
+    expect(mockUseCSTInfo).not.toHaveBeenCalledWith(38);
+  });
+
+  it('looks up a token the collection read does not have', () => {
+    render(<RwalkAnchorDistributionImprintsTable list={[imprint({ TokenId: 51 })]} />);
+    expect(mockUseCSTInfo).toHaveBeenCalledWith(51);
+  });
+
+  it('skips the collection read for an empty ledger', () => {
     render(<RwalkAnchorDistributionImprintsTable list={[]} />);
-    expect(screen.getByText('anchoring.common.empty.allocations')).toBeInTheDocument();
+    expect(mockUseCSTList).toHaveBeenCalledWith({ enabled: false });
   });
 
-  it('renders table headers', () => {
-    render(<RwalkAnchorDistributionImprintsTable list={[createRow()]} />);
-    for (const header of [
-      'anchoring.tables.randomWalkImprints.columns.datetime',
-      'anchoring.tables.randomWalkImprints.columns.recipient',
-      'anchoring.tables.randomWalkImprints.columns.cycle',
-      'anchoring.tables.randomWalkImprints.columns.tokenId',
-    ]) {
-      expect(screen.getAllByText(header).length).toBeGreaterThanOrEqual(1);
-    }
-  });
-
-  it('renders row data correctly', () => {
-    render(<RwalkAnchorDistributionImprintsTable list={[createRow()]} />);
+  it('drops the recipient column on a page about one address', () => {
+    render(<RwalkAnchorDistributionImprintsTable list={[imprint()]} showRecipient={false} />);
     expect(
-      screen.getAllByText(convertTimestampToDateTime(1701346718)).length,
-    ).toBeGreaterThanOrEqual(1);
-    expect(document.querySelector('time[datetime="2023-11-30T12:18:38.000Z"]')).toBeInTheDocument();
-    expect(screen.getAllByText('10').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('42').length).toBeGreaterThanOrEqual(1);
+      screen.queryByText('anchoring.tables.randomWalkImprints.columns.recipient'),
+    ).not.toBeInTheDocument();
   });
 
-  it('renders round link', () => {
-    render(<RwalkAnchorDistributionImprintsTable list={[createRow({ RoundNum: 7 })]} />);
-    const link = screen.getByText('7').closest('a');
-    expect(link).toHaveAttribute('href', '/allocation/7');
+  it('names the empty state after Stellar Selection imprints, not allocations', () => {
+    render(<RwalkAnchorDistributionImprintsTable list={[]} />);
+    expect(
+      screen.getByRole('heading', { name: 'anchoring.common.empty.imprints.title' }),
+    ).toBeInTheDocument();
   });
 
-  it('renders token ID link', () => {
-    render(<RwalkAnchorDistributionImprintsTable list={[createRow({ TokenId: 99 })]} />);
-    const link = screen.getByText('99').closest('a');
-    expect(link).toHaveAttribute('href', '/detail/99');
-  });
-
-  it('renders datetime as explorer link', () => {
-    const row = createRow();
-    render(<RwalkAnchorDistributionImprintsTable list={[row]} />);
-    const datetime = screen.getByText(convertTimestampToDateTime(row.TimeStamp));
-    expect(datetime.closest('a')).toHaveAttribute('target', '_blank');
-    expect(datetime.closest('a')).toHaveAttribute('rel', 'noopener noreferrer');
-  });
-
-  it('renders only first page of results (perPage=5)', () => {
-    const list = Array.from({ length: 8 }, (_, i) => createRow({ EvtLogId: i, TokenId: 100 + i }));
-    render(<RwalkAnchorDistributionImprintsTable list={list} />);
-    expect(screen.getByText('104')).toBeInTheDocument();
-    expect(screen.queryByText('105')).not.toBeInTheDocument();
+  it('takes a page-specific empty title', () => {
+    render(<RwalkAnchorDistributionImprintsTable list={[]} emptyTitle="No selections yet" />);
+    expect(screen.getByRole('heading', { name: 'No selections yet' })).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<RwalkAnchorDistributionImprintsTable list={[]} />);
+    const { container } = render(<RwalkAnchorDistributionImprintsTable list={[imprint()]} />);
     await checkA11y(container);
   });
 });

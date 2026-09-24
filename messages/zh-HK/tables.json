@@ -177,6 +177,7 @@
   },
   "pagination": {
     "label": "分頁導航",
+    "labelFor": "{table} 的分頁導航",
     "range": "第 {from} 至 {to} 項，共 {total} 項",
     "goToPage": "轉到頁碼：",
     "goToPageAria": "轉到頁碼",

@@ -1,190 +1,104 @@
-import { useState, type FC } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+'use client';
 
-import { shortenHex } from '@/utils';
+import { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 
-import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
-import { Link, useRouter } from '@/i18n/navigation';
-import { TABLE_ROW_LINK_CLASS } from '@/components/ui/responsive-table';
-import {
-  TablePrimary,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryContainer,
-  TablePrimaryHead,
-  TablePrimaryHeadCell,
-  TablePrimaryRow,
-} from '@/components/styled';
-import { CustomPagination } from '@/components/common/CustomPagination';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { TableHeaderHelp } from '@/components/tables/TableHeaderHelp';
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
 
-interface RowData {
+import { TokenCell } from './TokenCell';
+import { anchorActionHref } from './anchorLinks';
+import type { AnchoringLedgerProps } from './ledgerProps';
+
+interface GlobalAnchorAction {
   EvtLogId: string | number;
-  ActionId: string | number;
+  ActionId: number;
   TimeStamp: number;
   ActionType: number;
-  TokenId: string | number;
+  TokenId: number;
   StakerAddr: string;
   NumStakedNFTs: number;
 }
 
-interface GlobalAnchorActionsRowProps {
-  row: RowData;
+interface GlobalAnchorActionsTableProps extends AnchoringLedgerProps {
+  list: GlobalAnchorAction[];
   IsRWLK: boolean;
 }
 
-const GlobalAnchorActionsRow: FC<GlobalAnchorActionsRowProps> = ({ row, IsRWLK }) => {
+/**
+ * Every anchor and release across all anchor-holders for one collection.
+ * Headers carry the full column names with a definition; phone records use
+ * the short names. Each row leads to the action's record.
+ */
+export const GlobalAnchorActionsTable = ({
+  list,
+  IsRWLK,
+  headingLevel = 3,
+  ...state
+}: GlobalAnchorActionsTableProps) => {
   const t = useTranslations('anchoring');
-  const locale = useLocale();
-  const router = useRouter();
+  const collection = IsRWLK ? 'randomWalk' : 'cosmicSignature';
 
-  if (!row) {
-    return <TablePrimaryRow />;
-  }
-
-  const actionHref = `/anchor-action/${IsRWLK ? 1 : 0}/${row.ActionId}`;
-
-  const handleRowClick = () => {
-    router.push(actionHref);
-  };
-
-  return (
-    <TablePrimaryRow onActivate={handleRowClick}>
-      <TablePrimaryCell label={t('tables.globalAnchorActions.headers.anchorDatetime.mobile')}>
-        <Link
-          href={actionHref}
-          className={TABLE_ROW_LINK_CLASS}
-          aria-label={t('anchorActionDetail.breadcrumbs.action', { id: row.ActionId })}
-        >
-          <HydrationSafeDateTime timestamp={row.TimeStamp} locale={locale} />
-        </Link>
-      </TablePrimaryCell>
-
-      <TablePrimaryCell
-        label={t('tables.globalAnchorActions.headers.actionType.mobile')}
-        align="center"
-      >
-        {row.ActionType === 0 ? t('common.anchor') : t('common.release')}
-      </TablePrimaryCell>
-
-      <TablePrimaryCell
-        label={t('tables.globalAnchorActions.headers.tokenId.mobile')}
-        align="center"
-      >
-        {IsRWLK ? (
-          <a href={`https://randomwalknft.com/detail/${row.TokenId}`} className="text-inherit">
-            {row.TokenId}
-          </a>
-        ) : (
-          <Link href={`/detail/${row.TokenId}`} className="text-inherit">
-            {row.TokenId}
-          </Link>
-        )}
-      </TablePrimaryCell>
-
-      <TablePrimaryCell
-        label={t('tables.globalAnchorActions.headers.holderAddress.mobile')}
-        align="center"
-      >
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Link
-              href={`/user/${row.StakerAddr}`}
-              className="inline-block max-w-full break-all text-inherit font-mono"
-            >
-              {shortenHex(row.StakerAddr, 6)}
-            </Link>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>{row.StakerAddr}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TablePrimaryCell>
-
-      <TablePrimaryCell
-        label={t('tables.globalAnchorActions.headers.nftCount.mobile')}
-        align="center"
-      >
-        {row.NumStakedNFTs}
-      </TablePrimaryCell>
-    </TablePrimaryRow>
+  const columns = useMemo<DataTableColumn<GlobalAnchorAction>[]>(
+    () => [
+      {
+        id: 'datetime',
+        kind: 'datetime',
+        header: t('tables.globalAnchorActions.headers.anchorDatetime.desktop'),
+        label: t('tables.globalAnchorActions.headers.anchorDatetime.mobile'),
+        help: t('tables.globalAnchorActions.headers.anchorDatetime.tooltip'),
+        value: (row) => row.TimeStamp,
+      },
+      {
+        id: 'type',
+        kind: 'text',
+        header: t('tables.globalAnchorActions.headers.actionType.desktop'),
+        label: t('tables.globalAnchorActions.headers.actionType.mobile'),
+        help: t('tables.globalAnchorActions.headers.actionType.tooltip'),
+        value: (row) => (row.ActionType === 1 ? t('common.release') : t('common.anchor')),
+        nowrap: true,
+      },
+      {
+        id: 'token',
+        kind: 'link',
+        header: t('tables.globalAnchorActions.headers.tokenId.desktop'),
+        label: t('tables.globalAnchorActions.headers.tokenId.mobile'),
+        help: t('tables.globalAnchorActions.headers.tokenId.tooltip'),
+        value: (row) => row.TokenId,
+        cell: (row) => <TokenCell collection={collection} tokenId={row.TokenId} />,
+      },
+      {
+        id: 'holder',
+        kind: 'address',
+        header: t('tables.globalAnchorActions.headers.holderAddress.desktop'),
+        label: t('tables.globalAnchorActions.headers.holderAddress.mobile'),
+        help: t('tables.globalAnchorActions.headers.holderAddress.tooltip'),
+        value: (row) => row.StakerAddr,
+      },
+      {
+        id: 'nfts',
+        kind: 'count',
+        header: t('tables.globalAnchorActions.headers.nftCount.desktop'),
+        label: t('tables.globalAnchorActions.headers.nftCount.mobile'),
+        help: t('tables.globalAnchorActions.headers.nftCount.tooltip'),
+        value: (row) => row.NumStakedNFTs,
+      },
+    ],
+    [collection, t],
   );
-};
-
-interface GlobalAnchorActionsTableProps {
-  list: RowData[];
-  IsRWLK: boolean;
-}
-
-export const GlobalAnchorActionsTable: FC<GlobalAnchorActionsTableProps> = ({ list, IsRWLK }) => {
-  const t = useTranslations('anchoring');
-  const perPage = 5;
-  const [page, setPage] = useState(1);
-  const responsiveHeaders = [
-    {
-      desktop: t('tables.globalAnchorActions.headers.anchorDatetime.desktop'),
-      mobile: t('tables.globalAnchorActions.headers.anchorDatetime.mobile'),
-      align: 'left' as const,
-      tooltip: t('tables.globalAnchorActions.headers.anchorDatetime.tooltip'),
-    },
-    {
-      desktop: t('tables.globalAnchorActions.headers.actionType.desktop'),
-      mobile: t('tables.globalAnchorActions.headers.actionType.mobile'),
-      tooltip: t('tables.globalAnchorActions.headers.actionType.tooltip'),
-    },
-    {
-      desktop: t('tables.globalAnchorActions.headers.tokenId.desktop'),
-      mobile: t('tables.globalAnchorActions.headers.tokenId.mobile'),
-      tooltip: t('tables.globalAnchorActions.headers.tokenId.tooltip'),
-    },
-    {
-      desktop: t('tables.globalAnchorActions.headers.holderAddress.desktop'),
-      mobile: t('tables.globalAnchorActions.headers.holderAddress.mobile'),
-      tooltip: t('tables.globalAnchorActions.headers.holderAddress.tooltip'),
-    },
-    {
-      desktop: t('tables.globalAnchorActions.headers.nftCount.desktop'),
-      mobile: t('tables.globalAnchorActions.headers.nftCount.mobile'),
-      tooltip: t('tables.globalAnchorActions.headers.nftCount.tooltip'),
-    },
-  ];
-
-  if (!list || list.length === 0) {
-    return <p className="text-muted-foreground">{t('common.empty.actions')}</p>;
-  }
-
-  const startIndex = (page - 1) * perPage;
-  const endIndex = page * perPage;
-  const visibleRows = list.slice(startIndex, endIndex);
 
   return (
-    <>
-      <TablePrimaryContainer>
-        <TablePrimary className="sm:min-w-[720px] lg:min-w-0">
-          <TablePrimaryHead>
-            <tr>
-              {responsiveHeaders.map((header) => (
-                <TablePrimaryHeadCell key={header.desktop} align={header.align}>
-                  <TableHeaderHelp
-                    desktop={header.desktop}
-                    mobile={header.mobile}
-                    tooltip={header.tooltip}
-                  />
-                </TablePrimaryHeadCell>
-              ))}
-            </tr>
-          </TablePrimaryHead>
-
-          <TablePrimaryBody>
-            {visibleRows.map((row) => (
-              <GlobalAnchorActionsRow key={row.EvtLogId} row={row} IsRWLK={IsRWLK} />
-            ))}
-          </TablePrimaryBody>
-        </TablePrimary>
-      </TablePrimaryContainer>
-
-      <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
-    </>
+    <DataTable
+      data={list}
+      columns={columns}
+      ariaLabel={t('tables.globalAnchorActions.label')}
+      getRowKey={(row) => row.EvtLogId}
+      getRowHref={(row) => anchorActionHref(collection, row.ActionId)}
+      getRowLabel={(row) => t('anchorActionDetail.breadcrumbs.action', { id: row.ActionId })}
+      emptyTitle={t('common.empty.actions.title')}
+      emptyDescription={t('common.empty.actions.description')}
+      tableClassName="sm:min-w-[44rem] lg:min-w-0"
+      headingLevel={headingLevel}
+      {...state}
+    />
   );
 };

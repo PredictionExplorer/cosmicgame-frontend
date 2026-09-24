@@ -1,84 +1,129 @@
 {
   "common": {
-    "loading": "載入中…",
-    "processing": "處理中…",
-    "releasing": "解錨中…",
     "anchor": "錨定",
     "release": "解錨",
     "yes": "是",
     "no": "否",
     "empty": {
-      "actions": "暫無錨定與解錨操作。",
-      "distributions": "暫無錨定派發。",
-      "allocations": "暫無分配。",
-      "tokens": "暫無代幣。"
-    },
-    "actions": {
-      "releaseMany": "批量解錨",
-      "cancel": "取消"
-    },
-    "aria": {
-      "expandRow": "展開行",
-      "actions": "操作"
+      "actions": {
+        "title": "暫無錨定操作",
+        "description": "錨定與解錨操作在鏈上記錄後會顯示在這裏。"
+      },
+      "distributions": {
+        "title": "暫無錨定派發",
+        "description": "有 Cosmic Signature NFT 處於錨定狀態時，每個週期收官後都會在這裏新增一筆存入。"
+      },
+      "retrieved": {
+        "title": "暫無已取回的錨定派發",
+        "description": "透過解錨取回錨定派發後，會顯示在這裏。"
+      },
+      "unretrieved": {
+        "title": "沒有未取回的錨定派發",
+        "description": "該地址參與的每一筆錨定派發存入都已取回。"
+      },
+      "imprints": {
+        "title": "暫無星選銘刻",
+        "description": "週期收官時，已錨定的 Random Walk NFT 被星選後，對應的銘刻會顯示在這裏。"
+      },
+      "tokens": {
+        "title": "目前沒有已錨定的 NFT",
+        "description": "NFT 處於錨定狀態時會顯示在這裏。"
+      }
     }
+  },
+  "art": {
+    "unavailable": "作品暫不可用",
+    "signatureTitle": "Cosmic Signature {id}",
+    "randomWalkTitle": "Random Walk {id}"
+  },
+  "status": {
+    "anchored": "已錨定",
+    "released": "已解錨"
   },
   "overview": {
-    "errorTitle": "未能載入錨定數據",
-    "errorMessage": "未能載入錨定數據，請稍後再試。",
+    "errorTitle": "無法載入該記錄",
+    "errorMessage": "錨定記錄暫時無法獲取，請稍後再試。",
     "title": "錨定派發",
-    "subtitle": "查看全局錨定動態與派發記錄",
-    "intro": {
-      "description": "每個週期，協議會將週期儲備的 {percentage}% 用於 ETH 錨定派發。派發份額按每位錨定者的 Cosmic Signature NFT 錨定數量計算。錨定 Random Walk NFT 則可參與錨定 NFT 星選。",
-      "flow": "錨定流向：{percentage}%"
-    },
-    "stats": {
-      "pool": {
-        "label": "錨定派發池",
-        "tooltip": "目前分配至錨定派發池的 ETH 總額；每個週期按比例派發給 Cosmic Signature NFT 錨定者。",
-        "caption": "本週期收官時存入已錨定的 Cosmic Signature NFT。"
-      },
-      "cosmicSignatureAnchored": {
-        "label": "已錨定 Cosmic Signature NFT",
-        "tooltip": "所有錨定者目前錨定至協議的 Cosmic Signature NFT 總數。"
-      },
-      "randomWalkAnchored": {
-        "label": "已錨定 RWLK NFT",
-        "tooltip": "目前已錨定的 Random Walk NFT 總數。已錨定的 Random Walk NFT 可透過鏈上隨機選取參與錨定 NFT 星選。"
-      },
-      "distributionPerNft": {
-        "label": "每枚 NFT 派發額",
-        "tooltip": "目前每枚已錨定 Cosmic Signature NFT 對應的 ETH 錨定派發額：鏈上派發池總額除以已索引的錨定 NFT 總數。",
-        "noneAnchored": "尚未索引到已錨定的 Cosmic Signature NFT"
-      },
-      "activeHolders": {
-        "label": "活躍錨定者",
-        "tooltip": "目前至少錨定一枚 Cosmic Signature NFT 或 Random Walk NFT 的不同錢包數；同時錨定兩類 NFT 的錢包只計一次。"
-      }
-    },
-    "cta": {
-      "title": "開始錨定",
-      "description": "將 Cosmic Signature NFT 錨定後，即可按比例獲得每個週期的錨定派發。"
-    },
-    "sections": {
-      "cosmicSignature": "Cosmic Signature NFT",
-      "randomWalk": "Random Walk NFT"
+    "subtitle": "全網錨定動態與每一筆錨定派發的歷史。",
+    "start": "開始錨定",
+    "howItWorks": {
+      "title": "錨定運作原理",
+      "description": "NFT 錨定後會參與之後的每個週期，直到你將其解錨。"
     }
   },
-  "howItWorks": {
-    "title": "錨定運作原理",
-    "intro": "還不熟悉錨定？展開下方任一部分，了解更多。",
+  "steps": {
+    "anchor": {
+      "title": "錨定你的 NFT",
+      "body": "在<link>我的錨定</link>中，從錢包裏選擇 Cosmic Signature 或 Random Walk NFT。第一次操作時，錢包會先請你授權該系列的錨定合約，然後再確認錨定。"
+    },
+    "receive": {
+      "title": "每個週期獲得派發",
+      "body": "已錨定的 Cosmic Signature NFT 共享每個週期 {percentage}% 的週期儲備（ETH）。已錨定的 Random Walk NFT 參與星選，每個週期選出其中 {selections} 枚。"
+    },
+    "release": {
+      "title": "解錨即取回",
+      "body": "解錨會把 NFT 連同其累計的 ETH 一起返還到你的錢包。解錨不可撤銷：每枚 NFT 僅可錨定一次。"
+    }
+  },
+  "flow": {
+    "caption": "每個週期如何惠及已錨定的 NFT，以及目前數據",
+    "unavailable": "暫不可用",
+    "dividedBy": "除以",
+    "equals": "等於",
+    "then": "然後",
+    "cosmicSignature": {
+      "title": "Cosmic Signature NFT 共享 ETH",
+      "pool": {
+        "label": "錨定派發池",
+        "definition": "本週期為已錨定的 Cosmic Signature NFT 預留的 ETH。週期收官時存入，並按各錨定者錨定的 NFT 數量按比例派發。",
+        "caption": "當前週期儲備的 {percentage}%，於週期收官時存入"
+      },
+      "anchored": {
+        "label": "已錨定的 Cosmic Signature NFT",
+        "definition": "目前所有錨定者已錨定的 Cosmic Signature NFT 總數。"
+      },
+      "perNft": {
+        "label": "每枚已錨定 NFT",
+        "definition": "派發池除以索引器統計的已錨定 Cosmic Signature NFT 數量：若本週期此刻收官，每枚 NFT 可獲得的數額。",
+        "caption": "若本週期此刻收官",
+        "noneAnchored": "尚未索引到已錨定的 Cosmic Signature NFT"
+      }
+    },
+    "randomWalk": {
+      "title": "Random Walk NFT 參與星選",
+      "anchored": {
+        "label": "已錨定的 Random Walk NFT",
+        "definition": "目前已錨定的 Random Walk NFT。每枚都會在每次收官時參與錨定 NFT 星選。"
+      },
+      "selections": {
+        "label": "每個週期的星選",
+        "caption": "在鏈上選出；同一枚 NFT 可能被多次選中"
+      },
+      "allocation": {
+        "label": "每次星選獲得",
+        "caption": "以及一枚新銘刻的 Cosmic Signature NFT"
+      }
+    },
+    "holders": {
+      "label": "活躍錨定者",
+      "definition": "至少錨定一枚 Cosmic Signature 或 Random Walk NFT 的不同錢包數。同時錨定兩類 NFT 的錢包只計一次。"
+    }
+  },
+  "questions": {
+    "title": "關於錨定的常見問題",
+    "description": "錨定後的 NFT 會怎樣，以及解錨意味着什麼。",
     "items": {
       "whatIsAnchoring": {
         "question": "什麼是錨定？",
         "answer": "錨定是將 NFT 交由協議託管。錨定 Cosmic Signature NFT 可獲得 ETH 錨定派發；錨定 Random Walk NFT 可參與錨定 NFT 星選。你可以隨時解錨並取回 NFT，Cosmic Signature NFT 累積的 ETH 錨定派發也會一併取回。每枚 NFT 僅可錨定一次；解錨後不可再次錨定。"
       },
       "cosmicSignature": {
-        "question": "Cosmic Signature NFT 錨定",
-        "answer": "錨定 Cosmic Signature NFT 後，可從錨定派發池獲得 ETH。每個週期，週期儲備的 6% 會按 NFT 錨定數量派發給錨定者。派發自動累積，解錨時一併取回。若週期收官時沒有已錨定的 Cosmic Signature NFT，這部分份額將留在週期儲備中。"
+        "question": "Cosmic Signature NFT 錨定如何運作？",
+        "answer": "錨定 Cosmic Signature NFT 後，可從錨定派發池獲得 ETH。每個週期，週期儲備的 {percentage}% 會按 NFT 錨定數量派發給錨定者。派發自動累積，解錨時一併取回。若週期收官時沒有已錨定的 Cosmic Signature NFT，這部分份額將留在週期儲備中。"
       },
       "randomWalk": {
-        "question": "Random Walk（RWLK）NFT 錨定",
-        "answer": "錨定 Random Walk NFT 後即可參與錨定 NFT 星選。每個週期，協議會透過鏈上隨機機制選取已錨定的 Random Walk NFT，共 10 次。每次獲選後，對應的錨定者都會獲配 1,000 CST 和一枚新銘刻的 Cosmic Signature NFT；同一枚 NFT 在後續選取中仍可再次獲選。Random Walk NFT 錨定不會獲得 ETH。"
+        "question": "Random Walk NFT 錨定如何運作？",
+        "answer": "錨定 Random Walk NFT 後即可參與錨定 NFT 星選。每個週期，協議會透過鏈上隨機機制選取已錨定的 Random Walk NFT，共 {selections} 次。每次獲選後，對應的錨定者都會獲配 {cst, number} CST 和一枚新銘刻的 Cosmic Signature NFT；同一枚 NFT 在同一週期內可多次獲選。Random Walk NFT 錨定不會獲得 ETH。"
       },
       "calculation": {
         "question": "錨定派發如何計算？",
@@ -90,88 +135,138 @@
       }
     }
   },
+  "ledgers": {
+    "distributions": {
+      "title": "ETH 錨定派發",
+      "description": "每個收官的週期都會把 {percentage}% 的週期儲備存入，派發給已錨定的 Cosmic Signature NFT。展開一個週期即可查看每位錨定者的份額。"
+    },
+    "imprints": {
+      "title": "錨定 NFT 星選銘刻",
+      "description": "每個週期選出 {count} 枚已錨定的 Random Walk NFT。每次星選都會向其錨定者銘刻一枚 Cosmic Signature NFT 和 {cst, number} CST。"
+    }
+  },
+  "picker": {
+    "selectAll": "全選 {count, number} 枚",
+    "clearSelection": "清除選擇",
+    "clear": "清除",
+    "selected": "{count, plural, other {已選 # 枚}}",
+    "selectionLabel": "已選：{title}",
+    "anchorSelected": "{count, plural, other {錨定 # 枚 NFT}}",
+    "releaseSelected": "{count, plural, other {解錨 # 枚 NFT}}",
+    "approvalNote": "第一次操作時，錢包會請求兩次：先授權錨定合約持有該系列的 NFT，再確認錨定。",
+    "releaseNote": "解錨不可撤銷。錢包彈出前，你還會在下一步再次確認。",
+    "anchoredOn": "<date></date> 錨定",
+    "accrued": "已累計 {amount}",
+    "cycle": "第 {cycle} 個週期",
+    "open": "打開 {title}",
+    "settled": {
+      "anchored": "已錨定 · 更新中",
+      "released": "已解錨 · 更新中"
+    }
+  },
+  "release": {
+    "title": "{count, plural, other {解錨 # 項錨定？}}",
+    "description": {
+      "cosmicSignature": "{count, plural, other {解錨會把所選的 # 枚 NFT 返還到你的錢包，並取回它們累計的 ETH 錨定派發。}}",
+      "randomWalk": "{count, plural, other {解錨會把所選的 # 枚 NFT 返還到你的錢包，它們將退出錨定 NFT 星選。}}"
+    },
+    "tokensLabel": "將要解錨的 NFT",
+    "more": "{count, plural, other {另有 # 枚}}",
+    "eth": {
+      "label": "你將取回的 ETH",
+      "approximately": "約",
+      "unknown": "暫不可用",
+      "note": "根據已索引的存入估算，實際金額以合約支付為準。"
+    },
+    "warning": "<b>此操作不可撤銷。</b>解錨後的 NFT 永遠無法再次錨定。",
+    "keep": "保持錨定",
+    "confirm": "{count, plural, other {解錨 # 枚 NFT}}"
+  },
   "anchorActionDetail": {
     "subtitle": "{token} NFT 錨定操作",
-    "error": "未能載入錨定操作詳情，請稍後再試。",
+    "errorTitle": "無法載入該錨定操作",
+    "error": "錨定記錄暫時無法獲取，請稍後再試。",
     "breadcrumbs": {
       "action": "操作 #{id}"
     },
-    "empty": "未找到該錨定操作記錄。",
+    "empty": {
+      "title": "沒有操作 #{id} 的記錄",
+      "description": "索引器中沒有這個編號的錨定操作。它可能仍在同步中，也可能是連結有誤。",
+      "browse": "瀏覽錨定派發",
+      "statistics": "錨定統計"
+    },
     "token": {
-      "title": "代幣",
-      "randomWalkDescription": "本次操作涉及的 Random Walk NFT。",
-      "cosmicSignatureDescription": "本次操作涉及的 Cosmic Signature NFT。",
-      "actionId": "操作 ID",
-      "holderAddress": "錨定者地址",
-      "tokenId": "代幣 ID",
       "labels": {
         "randomWalk": "Random Walk",
         "cosmicSignature": "Cosmic Signature"
       }
     },
-    "anchor": {
-      "title": "錨定",
-      "description": "代幣錨定至協議的日期和時間。",
-      "datetime": "錨定時間",
-      "tokenCount": "已錨定代幣數"
+    "record": {
+      "title": "記錄",
+      "holder": "錨定者",
+      "token": "代幣"
     },
-    "release": {
-      "title": "解錨",
-      "description": "代幣解錨的日期和時間。",
-      "datetime": "解錨時間",
-      "tokenCount": "已錨定代幣數"
+    "timeline": {
+      "title": "時間線",
+      "anchored": "已錨定",
+      "anchoredCount": "此操作後錨定總數：{count, plural, other {# 枚 NFT}}",
+      "released": "已解錨",
+      "retrieved": "已取回 {amount}",
+      "stillAnchored": "仍在錨定中",
+      "stillAnchoredCosmicSignature": "正在共享每個週期的 ETH 錨定派發。",
+      "stillAnchoredRandomWalk": "正在參與每個週期的錨定 NFT 星選。"
+    },
+    "next": {
+      "title": "接下來",
+      "distributions": "該 NFT 的錨定派發",
+      "token": "查看作品",
+      "allActions": "全部錨定操作"
     }
   },
   "distributionsByToken": {
-    "title": "代幣 {tokenId} 的錨定派發明細",
-    "subtitle": "{address} 的派發記錄",
+    "title": "Cosmic Signature {id} 的錨定派發",
+    "subtitle": "該 NFT 錨定期間參與的每一筆 ETH 錨定派發存入。",
+    "label": "錨定派發存入",
+    "error": "無法載入該 NFT 的存入記錄，請稍後再試。",
+    "holder": "錨定者",
+    "figures": {
+      "deposits": "存入次數",
+      "distributed": "已派發",
+      "unretrieved": "未取回",
+      "unretrievedCaption": "解錨時取回"
+    },
     "details": {
       "anchorTitle": "錨定",
       "releaseTitle": "解錨",
       "anchoredDatetime": "錨定時間",
       "releasedDatetime": "解錨時間",
-      "anchoredNfts": "已錨定 NFT 數量",
-      "distribution": "錨定派發"
+      "anchoredNfts": "錨定總數",
+      "distribution": "已取回",
+      "action": "錨定操作",
+      "stillAnchored": "仍在錨定中：ETH 將在解錨時取回。",
+      "show": "顯示錨定",
+      "hide": "隱藏錨定"
     },
     "columns": {
-      "details": "詳情",
       "depositDatetime": "存入時間",
       "cycle": "週期",
       "depositId": "存入 ID",
-      "retrieved": "是否已取回",
+      "retrieved": "已取回",
       "distributionEth": "錨定派發（ETH）"
+    },
+    "empty": {
+      "title": "該 NFT 暫無錨定派發",
+      "description": "NFT 處於錨定狀態時，每個週期收官後都會在這裏新增一筆存入。",
+      "action": "瀏覽錨定派發"
     }
   },
   "tables": {
-    "availableTokens": {
-      "empty": "暫無可錨定代幣。",
-      "selection": {
-        "all": "全選",
-        "currentPage": "選擇目前頁",
-        "none": "取消全選"
-      },
-      "columns": {
-        "imprintDatetime": "銘刻時間",
-        "ownerAddress": "持有者地址",
-        "tokenId": "代幣 ID",
-        "tokenName": "代幣名稱",
-        "cycle": "週期",
-        "recipientAddress": "獲配者地址"
-      },
-      "actions": {
-        "anchor": "錨定",
-        "anchoring": "錨定中…",
-        "anchorMany": "批量錨定"
-      },
-      "aria": {
-        "actions": "操作"
-      }
-    },
     "globalAnchorActions": {
+      "label": "錨定與解錨操作",
       "headers": {
         "anchorDatetime": {
-          "desktop": "錨定時間",
-          "mobile": "日期時間",
+          "desktop": "日期",
+          "mobile": "日期",
           "tooltip": "錨定或解錨操作的索引時間。"
         },
         "actionType": {
@@ -180,23 +275,89 @@
           "tooltip": "此行記錄的是錨定還是解錨操作。"
         },
         "tokenId": {
-          "desktop": "代幣 ID",
-          "mobile": "代幣",
+          "desktop": "NFT",
+          "mobile": "NFT",
           "tooltip": "此錨定或解錨操作涉及的代幣。"
         },
         "holderAddress": {
-          "desktop": "錨定者地址",
+          "desktop": "錨定者",
           "mobile": "錨定者",
           "tooltip": "執行錨定或解錨操作的錢包地址。"
         },
         "nftCount": {
-          "desktop": "NFT 數量",
+          "desktop": "錨定總數",
           "mobile": "NFT",
           "tooltip": "本次操作完成後已錨定的 NFT 數量。"
         }
       }
     },
+    "globalAnchoredTokens": {
+      "label": "已錨定 NFT",
+      "headers": {
+        "tokenId": {
+          "desktop": "NFT",
+          "mobile": "NFT",
+          "tooltip": "已錨定代幣的標識符。"
+        },
+        "anchorDatetime": {
+          "desktop": "錨定時間",
+          "mobile": "錨定時間",
+          "tooltip": "代幣錨定的時間。"
+        },
+        "actionId": {
+          "desktop": "錨定操作",
+          "mobile": "操作",
+          "tooltip": "與此代幣關聯的錨定操作記錄。"
+        },
+        "holderAddress": {
+          "desktop": "錨定者",
+          "mobile": "錨定者",
+          "tooltip": "執行錨定或解錨操作的錢包地址。"
+        }
+      }
+    },
+    "globalDistributions": {
+      "label": "按週期列出的 ETH 錨定派發",
+      "showRecipients": "顯示獲配者",
+      "hideRecipients": "隱藏獲配者",
+      "recipientsError": "無法載入該週期的錨定者。",
+      "columns": {
+        "cycle": "週期",
+        "depositDatetime": "存入時間",
+        "totalAnchoredTokens": "已錨定 NFT",
+        "totalDepositedEth": "存入總額（ETH）",
+        "pendingEth": "未取回（ETH）",
+        "fullyRetrieved": "是否全部取回"
+      }
+    },
+    "randomWalkImprints": {
+      "label": "錨定 NFT 星選銘刻",
+      "columns": {
+        "tokenId": "銘刻的 NFT",
+        "recipient": "獲配者",
+        "cycle": "週期",
+        "datetime": "日期時間"
+      }
+    },
+    "anchorActions": {
+      "label": "錨定與解錨記錄",
+      "columns": {
+        "datetime": "操作時間",
+        "type": "操作類型",
+        "tokenId": "NFT",
+        "nftCount": "錨定總數"
+      }
+    },
+    "tokenDistributions": {
+      "label": "按 NFT 列出的錨定派發",
+      "columns": {
+        "tokenId": "NFT",
+        "retrievedEth": "已取回錨定派發（ETH）",
+        "retrievableEth": "待取回錨定派發（ETH）"
+      }
+    },
     "retrievedDistributions": {
+      "label": "已取回的錨定派發",
       "columns": {
         "depositDatetime": "存入時間",
         "depositId": "存入 ID",
@@ -206,150 +367,69 @@
       }
     },
     "unretrievedDistributions": {
+      "label": "未取回的錨定派發",
+      "error": "無法載入未取回的錨定派發，請稍後再試。",
+      "anchoredOfTotal": "{count, number} / {total, number}",
+      "summary": "你未取回的錨定派發",
+      "releaseAll": "全部解錨並取回",
       "columns": {
         "depositDatetime": "存入時間",
         "depositId": "存入 ID",
-        "anchoredTokens": "已錨定代幣（本錢包／總數）",
-        "unretrievedTokens": "未取回代幣",
+        "anchoredTokens": "已錨定 NFT（本地址／全部）",
+        "unretrievedTokens": "未取回的 NFT",
         "depositAmountEth": "存入金額（ETH）",
         "distributionAmountEth": "錨定派發額（ETH）",
         "unretrievedAmountEth": "未取回金額（ETH）"
-      },
-      "summary": "可取回錨定派發：{amount} ETH",
-      "releaseAll": "全部解錨並取回",
-      "dialog": {
-        "title": "解錨代幣並取回錨定派發",
-        "description": "此操作會<strong>解錨全部 Cosmic Signature NFT</strong>，並將累積的 <amountStrong>{amount} ETH</amountStrong> 錨定派發取回至錢包。",
-        "warning": "<strong>解錨後不可撤銷：</strong>這些 Cosmic Signature NFT 將無法再次錨定。",
-        "confirm": "解錨並取回"
       }
     },
     "distributionsByDeposit": {
+      "label": "按存入列出的錨定派發",
       "columns": {
         "depositDatetime": "存入時間",
         "depositCycle": "存入週期",
         "depositId": "存入 ID",
-        "totalDepositAmount": "存入總額",
-        "totalRetrievedAmount": "已取回總額",
-        "yourRetrievableAmount": "本錢包可取回金額",
+        "totalDepositAmount": "存入額（ETH）",
+        "totalRetrievedAmount": "全部已取回（ETH）",
+        "yourRetrievableAmount": "本地址可取回（ETH）",
         "fullyRetrieved": "是否全部取回",
-        "totalAnchoredNfts": "已錨定 NFT 總數",
-        "totalRetrievedTokens": "已取回代幣總數",
-        "yourAnchoredTokens": "本錢包已錨定代幣"
-      }
-    },
-    "globalDistributions": {
-      "cycleDetails": "第 {cycle} 個週期的 ETH 錨定派發",
-      "columns": {
-        "depositDatetime": "存入時間",
-        "cycle": "週期",
-        "totalAnchoredTokens": "已錨定代幣總數",
-        "totalDepositedEth": "存入總額（ETH）",
-        "fullyRetrieved": "是否全部取回",
-        "pendingEth": "待取回金額（ETH）"
-      }
-    },
-    "randomWalkImprints": {
-      "columns": {
-        "datetime": "日期時間",
-        "recipient": "獲配者",
-        "cycle": "週期",
-        "tokenId": "代幣 ID"
-      }
-    },
-    "tokenDistributions": {
-      "columns": {
-        "tokenId": "代幣 ID",
-        "retrievedEth": "已取回錨定派發（ETH）",
-        "retrievableEth": "待取回錨定派發（ETH）"
-      }
-    },
-    "anchorActions": {
-      "columns": {
-        "datetime": "操作時間",
-        "type": "操作類型",
-        "tokenId": "代幣 ID",
-        "nftCount": "NFT 數量"
-      }
-    },
-    "anchoredTokens": {
-      "selection": {
-        "all": "全選",
-        "currentPage": "選擇目前頁",
-        "none": "取消全選"
-      },
-      "columns": {
-        "image": "代幣圖像",
-        "tokenId": "代幣 ID",
-        "actionId": "錨定操作 ID",
-        "datetime": "錨定時間",
-        "accumulatedDistributions": "累積錨定派發"
-      }
-    },
-    "globalAnchoredTokens": {
-      "headers": {
-        "anchorDatetime": {
-          "desktop": "錨定時間",
-          "mobile": "日期時間",
-          "tooltip": "代幣錨定的時間。"
-        },
-        "actionId": {
-          "desktop": "操作 ID",
-          "mobile": "操作",
-          "tooltip": "與此代幣關聯的錨定操作記錄。"
-        },
-        "tokenId": {
-          "desktop": "代幣 ID",
-          "mobile": "代幣",
-          "tooltip": "已錨定代幣的標識符。"
-        },
-        "holderAddress": {
-          "desktop": "錨定者地址",
-          "mobile": "錨定者",
-          "tooltip": "執行錨定或解錨操作的錢包地址。"
-        }
+        "totalAnchoredNfts": "已錨定 NFT",
+        "totalRetrievedTokens": "已取回的 NFT",
+        "yourAnchoredTokens": "本地址已錨定"
       }
     }
   },
   "panels": {
     "shared": {
-      "anchoredTokens": "已錨定代幣",
-      "available": "可錨定代幣",
+      "anchoredTokens": "已錨定",
+      "available": "可錨定",
       "history": "錨定與解錨記錄",
-      "historyTooltip": "按時間順序排列的全部錨定與解錨交易記錄。"
+      "historyDescription": "該錢包的每一次錨定與解錨。打開任一項可查看其記錄。",
+      "anchoredEmpty": {
+        "title": "尚未錨定任何 NFT",
+        "description": "在「可錨定」中選擇 NFT 即可開始。"
+      }
     },
     "cosmicSignature": {
-      "anchoredTooltip": "目前已錨定的 Cosmic Signature NFT。ETH 錨定派發額與你錨定的 Cosmic Signature NFT 數量成正比。",
-      "availableTooltip": "錢包中可錨定的 Cosmic Signature NFT；錨定後將開始累積 ETH 錨定派發。",
-      "distributions": "錨定派發",
-      "distributionsTooltip": "每枚已錨定 Cosmic Signature NFT 對應的 ETH 錨定派發。尚未取回的派發會在解錨時一併取回。"
+      "anchoredDescription": "這些 NFT 共享每個週期的 ETH 錨定派發。解錨會連同 ETH 一起返還 NFT，並永久結束它的錨定。",
+      "availableDescription": "錢包中從未錨定過的 Cosmic Signature NFT。",
+      "availableEmpty": {
+        "title": "沒有可錨定的 Cosmic Signature NFT",
+        "description": "錢包中的 Cosmic Signature NFT 會顯示在這裏。每枚 NFT 僅可錨定一次。",
+        "action": "瀏覽畫廊"
+      },
+      "distributions": "按 NFT 列出的錨定派發",
+      "distributionsDescription": "你錨定的每枚 NFT 已取回和待取回的數額。打開任一項可查看每一筆存入。"
     },
     "randomWalk": {
-      "anchoredTooltip": "目前已錨定的 Random Walk NFT。每枚已錨定的 Random Walk NFT 都可透過鏈上隨機機制參與錨定 NFT 星選。",
-      "availableTooltip": "錢包中可錨定的 Random Walk NFT；錨定後可參與錨定 NFT 星選，但不會獲得 ETH 錨定派發。",
-      "selection": "錨定 NFT 星選",
-      "selectionTooltip": "本錢包透過錨定 NFT 星選獲得的 Cosmic Signature NFT，以及隨之分配的 CST。"
-    }
-  },
-  "lifecycle": {
-    "ariaLabel": "錨定生命週期",
-    "stages": {
-      "anchor": {
-        "label": "錨定",
-        "description": "NFT 已存入協議"
+      "anchoredDescription": "這些 NFT 參與每個週期的星選。解錨會返還 NFT，並永久結束它的錨定。",
+      "availableDescription": "錢包中從未錨定過的 Random Walk NFT。",
+      "availableEmpty": {
+        "title": "沒有可錨定的 Random Walk NFT",
+        "description": "錢包中從未錨定過的 Random Walk NFT 會顯示在這裏。"
       },
-      "active": {
-        "label": "生效中",
-        "description": "錨定派發持續累積"
-      },
-      "retrievable": {
-        "label": "可取回",
-        "description": "目前可取回"
-      },
-      "retrieved": {
-        "label": "已取回",
-        "description": "已退回錢包"
-      }
+      "selection": "星選銘刻",
+      "selectionDescription": "該錢包已錨定的 Random Walk NFT 被星選時，向其銘刻的 Cosmic Signature NFT 與 CST。",
+      "selectionEmpty": "暫無星選"
     }
   }
 }

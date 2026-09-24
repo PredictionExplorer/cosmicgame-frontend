@@ -177,6 +177,7 @@
   },
   "pagination": {
     "label": "分页导航",
+    "labelFor": "{table} 的分页导航",
     "range": "第 {from} 至 {to} 条，共 {total} 条",
     "goToPage": "转到页码：",
     "goToPageAria": "转到页码",

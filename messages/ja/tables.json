@@ -177,6 +177,7 @@
   },
   "pagination": {
     "label": "ページ送り",
+    "labelFor": "{table}のページ送り",
     "range": "{total}件中{from}～{to}件",
     "goToPage": "ページへ移動：",
     "goToPageAria": "ページへ移動",

@@ -267,9 +267,9 @@
       "activeHoldersLabel": "活跃锚定者",
       "activeHoldersTooltip": "当前至少锚定一枚 Cosmic Signature NFT 或 Random Walk NFT 的不同钱包数；同时锚定两类 NFT 的钱包只计一次。"
     },
+    "nowTitle": "当前锚定",
     "description": "已锚定 NFT 是 Cosmic Signature 的核心组成部分：Cosmic Signature NFT 共享 ETH 锚定派发；Random Walk NFT 则参与锚定 NFT 星选。",
     "historyLink": "查看锚定历史",
-    "tableDescription": "使用下方标签页，查看锚定与解锚操作、当前已锚定代币，以及构成全局锚定总数的独立钱包。",
     "tabs": {
       "cosmicSignature": "Cosmic Signature NFT",
       "randomWalk": "Random Walk NFT"

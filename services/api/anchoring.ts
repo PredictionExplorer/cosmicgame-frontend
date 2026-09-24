@@ -126,7 +126,10 @@ export function get_staking_cst_actions_info(
 ): Promise<CombinedAnchorRecordInfo | null> {
   return apiCall(async () => {
     const { data } = await apiGet(getAPIUrl(`staking/cst/actions/info/${actionId}`), opts);
-    const info = data.CombinedAnchorRecordInfo;
+    // The server's field name is part of its sealed wire format (the Random Walk
+    // twin is CombinedRWalkStakingRecordInfo). Reading a renamed field made every
+    // Cosmic Signature anchor action look missing.
+    const info = data.CombinedStakingRecordInfo;
     if (!info) return null;
     return {
       ...info,

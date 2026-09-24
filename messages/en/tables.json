@@ -177,6 +177,7 @@
   },
   "pagination": {
     "label": "pagination",
+    "labelFor": "{table} pages",
     "range": "{from}–{to} of {total}",
     "goToPage": "Go to page:",
     "goToPageAria": "go to page",

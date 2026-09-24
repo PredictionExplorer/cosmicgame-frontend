@@ -1,167 +1,112 @@
-import { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
+'use client';
 
-import { getExplorerUrl } from '@/utils';
+import { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 
-import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
-import { Link } from '@/i18n/navigation';
-import { cn } from '@/lib/utils';
-import {
-  TablePrimary,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryContainer,
-  TablePrimaryHead,
-  TablePrimaryHeadCell,
-  TablePrimaryRow,
-} from '@/components/styled';
 import { useCSTAnchorDistributionsByCycle } from '@/hooks/useApiQuery';
-import { CustomPagination } from '@/components/common/CustomPagination';
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
 import AnchoringRecipientTable from '@/components/tables/AnchoringRecipientTable';
 import type { CSTAnchorDistribution } from '@/services/api';
 
-const GlobalAnchorDistributionsRow = ({ row }: { row: CSTAnchorDistribution }) => {
+import type { AnchoringLedgerProps } from './ledgerProps';
+
+interface GlobalAnchorDistributionsTableProps extends AnchoringLedgerProps {
+  list: CSTAnchorDistribution[];
+}
+
+/** The anchor-holders who shared one cycle's deposit, loaded when the reader opens it. */
+function CycleRecipients({ cycle }: { cycle: number }) {
   const t = useTranslations('anchoring');
-  const locale = useLocale();
-  const [open, setOpen] = useState(false);
-
-  const { data: list = [] } = useCSTAnchorDistributionsByCycle(row?.RoundNum);
-
-  if (!row) {
-    return <TablePrimaryRow />;
-  }
-
+  const { data = [], isLoading, error, refetch } = useCSTAnchorDistributionsByCycle(cycle);
   return (
-    <>
-      <TablePrimaryRow className="border-b-0">
-        <TablePrimaryCell className="p-0" label={t('common.aria.expandRow')}>
-          <button
-            aria-label={t('common.aria.expandRow')}
-            className="inline-flex items-center justify-center rounded-full p-1 hover:bg-white/10 transition-colors"
-            onClick={() => setOpen(!open)}
-          >
-            {open ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
-          </button>
-        </TablePrimaryCell>
-
-        <TablePrimaryCell label={t('tables.globalDistributions.columns.depositDatetime')}>
-          <a
-            href={getExplorerUrl('tx', row.TxHash ?? '')}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-inherit"
-          >
-            <HydrationSafeDateTime timestamp={row.TimeStamp ?? 0} locale={locale} />
-          </a>
-        </TablePrimaryCell>
-
-        <TablePrimaryCell label={t('tables.globalDistributions.columns.cycle')} align="center">
-          <Link href={`/allocation/${row.RoundNum}`} className="text-inherit">
-            {row.RoundNum}
-          </Link>
-        </TablePrimaryCell>
-
-        <TablePrimaryCell
-          label={t('tables.globalDistributions.columns.totalAnchoredTokens')}
-          align="center"
-        >
-          {row.NumStakedNFTs}
-        </TablePrimaryCell>
-
-        <TablePrimaryCell
-          label={t('tables.globalDistributions.columns.totalDepositedEth')}
-          align="center"
-        >
-          {(row.TotalDepositAmountEth ?? 0).toFixed(6)}
-        </TablePrimaryCell>
-
-        <TablePrimaryCell
-          label={t('tables.globalDistributions.columns.fullyRetrieved')}
-          align="center"
-        >
-          {row.FullyClaimed ? t('common.yes') : t('common.no')}
-        </TablePrimaryCell>
-
-        <TablePrimaryCell label={t('tables.globalDistributions.columns.pendingEth')} align="right">
-          {(row.PendingToCollectEth ?? 0).toFixed(6)}
-        </TablePrimaryCell>
-      </TablePrimaryRow>
-
-      {/*
-       * Collapsed, this row holds nothing a reader could see. On desktop it
-       * still contributes the seam under the row above, but as a mobile card it
-       * would be an empty bordered block, so it is dropped there instead. The
-       * `!` is needed to outrank `.cs-table tr { display: block }`.
-       */}
-      <TablePrimaryRow className={cn('border-t-0', !open && 'max-sm:!hidden')}>
-        <TablePrimaryCell
-          className="py-0"
-          colSpan={8}
-          label={t('distributionsByToken.columns.details')}
-        >
-          {open && (
-            <div className="m-2 mb-8">
-              <h3 className="text-base font-medium mb-2">
-                {t('tables.globalDistributions.cycleDetails', { cycle: row.RoundNum })}
-              </h3>
-              <AnchoringRecipientTable list={list} />
-            </div>
-          )}
-        </TablePrimaryCell>
-      </TablePrimaryRow>
-    </>
+    <AnchoringRecipientTable
+      list={data}
+      loading={isLoading}
+      error={error ? t('tables.globalDistributions.recipientsError') : undefined}
+      onRetry={() => void refetch()}
+      headingLevel={4}
+    />
   );
-};
+}
 
-export const GlobalAnchorDistributionsTable = ({ list }: { list: CSTAnchorDistribution[] }) => {
+/**
+ * Every ETH Anchor Distribution deposit, one row per finalized cycle: when it
+ * was deposited, how many Cosmic Signature NFTs shared it, the amount and what
+ * is still unretrieved. A row expands into the anchor-holders who shared it.
+ */
+export const GlobalAnchorDistributionsTable = ({
+  list,
+  headingLevel = 2,
+  ...state
+}: GlobalAnchorDistributionsTableProps) => {
   const t = useTranslations('anchoring');
-  const perPage = 5;
-  const [page, setPage] = useState(1);
 
-  if (list.length === 0) {
-    return <p className="text-muted-foreground">{t('common.empty.distributions')}</p>;
-  }
-
-  const displayedRows = list.slice((page - 1) * perPage, page * perPage);
+  const columns = useMemo<DataTableColumn<CSTAnchorDistribution>[]>(
+    () => [
+      {
+        id: 'cycle',
+        kind: 'link',
+        header: t('tables.globalDistributions.columns.cycle'),
+        value: (row) => row.RoundNum,
+        href: (row) => `/allocation/${row.RoundNum}`,
+        sortable: true,
+      },
+      {
+        id: 'datetime',
+        kind: 'datetime',
+        header: t('tables.globalDistributions.columns.depositDatetime'),
+        value: (row) => row.TimeStamp,
+        txHash: (row) => row.TxHash,
+      },
+      {
+        id: 'anchored',
+        kind: 'count',
+        header: t('tables.globalDistributions.columns.totalAnchoredTokens'),
+        value: (row) => row.NumStakedNFTs,
+      },
+      {
+        id: 'deposited',
+        kind: 'amount',
+        header: t('tables.globalDistributions.columns.totalDepositedEth'),
+        value: (row) => row.TotalDepositAmountEth,
+        showUnit: false,
+        sortable: true,
+      },
+      {
+        id: 'pending',
+        kind: 'amount',
+        header: t('tables.globalDistributions.columns.pendingEth'),
+        value: (row) => row.PendingToCollectEth,
+        showUnit: false,
+      },
+      {
+        id: 'fullyRetrieved',
+        kind: 'text',
+        header: t('tables.globalDistributions.columns.fullyRetrieved'),
+        value: (row) => (row.FullyClaimed ? t('common.yes') : t('common.no')),
+        nowrap: true,
+        priority: 'secondary',
+      },
+    ],
+    [t],
+  );
 
   return (
-    <>
-      <TablePrimaryContainer>
-        <TablePrimary>
-          <TablePrimaryHead>
-            <tr>
-              <TablePrimaryHeadCell className="p-0" />
-              <TablePrimaryHeadCell align="left">
-                {t('tables.globalDistributions.columns.depositDatetime')}
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>
-                {t('tables.globalDistributions.columns.cycle')}
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>
-                {t('tables.globalDistributions.columns.totalAnchoredTokens')}
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>
-                {t('tables.globalDistributions.columns.totalDepositedEth')}
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>
-                {t('tables.globalDistributions.columns.fullyRetrieved')}
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">
-                {t('tables.globalDistributions.columns.pendingEth')}
-              </TablePrimaryHeadCell>
-            </tr>
-          </TablePrimaryHead>
-
-          <TablePrimaryBody>
-            {displayedRows.map((row, index) => (
-              <GlobalAnchorDistributionsRow row={row} key={(page - 1) * perPage + index} />
-            ))}
-          </TablePrimaryBody>
-        </TablePrimary>
-      </TablePrimaryContainer>
-
-      <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
-    </>
+    <DataTable
+      data={list}
+      columns={columns}
+      ariaLabel={t('tables.globalDistributions.label')}
+      getRowKey={(row) => row.EvtLogId}
+      renderDetails={(row) => <CycleRecipients cycle={row.RoundNum} />}
+      detailsLabel={(_row, expanded) =>
+        expanded
+          ? t('tables.globalDistributions.hideRecipients')
+          : t('tables.globalDistributions.showRecipients')
+      }
+      emptyTitle={t('common.empty.distributions.title')}
+      emptyDescription={t('common.empty.distributions.description')}
+      headingLevel={headingLevel}
+      {...state}
+    />
   );
 };

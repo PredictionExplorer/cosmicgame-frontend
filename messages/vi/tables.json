@@ -177,6 +177,7 @@
   },
   "pagination": {
     "label": "phân trang",
+    "labelFor": "Phân trang {table}",
     "range": "{from}–{to} trong số {total}",
     "goToPage": "Đến trang:",
     "goToPageAria": "đến trang",

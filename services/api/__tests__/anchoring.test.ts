@@ -225,7 +225,7 @@ describe('anchoring API', () => {
     it('returns flattened combined info on success', async () => {
       mockedAxios.get.mockResolvedValue({
         data: {
-          CombinedAnchorRecordInfo: {
+          CombinedStakingRecordInfo: {
             ActionId: 1,
             Stake: { TokenId: 1, Tx: TX },
             Unstake: { TokenId: 1, Tx: TX },
@@ -239,7 +239,7 @@ describe('anchoring API', () => {
     });
 
     it('returns null when info is missing', async () => {
-      mockedAxios.get.mockResolvedValue({ data: { CombinedAnchorRecordInfo: null } });
+      mockedAxios.get.mockResolvedValue({ data: { CombinedStakingRecordInfo: null } });
       expect(await get_staking_cst_actions_info(1)).toBeNull();
     });
 

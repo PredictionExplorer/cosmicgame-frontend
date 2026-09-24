@@ -1,109 +1,80 @@
-import { useState } from 'react';
+'use client';
+
+import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 
-import { Link, useRouter } from '@/i18n/navigation';
-import { TABLE_ROW_LINK_CLASS } from '@/components/ui/responsive-table';
-import {
-  TablePrimary,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryContainer,
-  TablePrimaryHead,
-  TablePrimaryHeadCell,
-  TablePrimaryRow,
-} from '@/components/styled';
-import { CustomPagination } from '@/components/common/CustomPagination';
+import { formatId } from '@/utils/format';
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
 import type { RewardsByToken } from '@/services/api';
+
+import { tokenDistributionsHref } from './anchorLinks';
+import type { AnchoringLedgerProps } from './ledgerProps';
 
 interface AnchorDistribution extends RewardsByToken {
   RewardCollectedEth?: number;
   RewardToCollectEth?: number;
 }
 
-const AnchorDistributionsRow = ({ row, address }: { row: AnchorDistribution; address: string }) => {
-  const t = useTranslations('anchoring');
-  const router = useRouter();
+interface AnchorDistributionsTableProps extends AnchoringLedgerProps {
+  list: AnchorDistribution[];
+  /** The anchor-holder, for each NFT's distribution record. */
+  address: string;
+}
 
-  if (!row) {
-    return <TablePrimaryRow />;
-  }
-
-  const distributionsHref = `/distributions-by-token/${address}/${row.TokenId}`;
-
-  const handleRowClick = () => {
-    router.push(distributionsHref);
-  };
-
-  return (
-    <TablePrimaryRow onActivate={handleRowClick}>
-      <TablePrimaryCell label={t('tables.tokenDistributions.columns.tokenId')} align="center">
-        <Link
-          href={distributionsHref}
-          className={TABLE_ROW_LINK_CLASS}
-          aria-label={t('distributionsByToken.title', { tokenId: row.TokenId })}
-        >
-          {row.TokenId}
-        </Link>
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('tables.tokenDistributions.columns.retrievedEth')} align="center">
-        {(row.RewardCollectedEth ?? 0).toFixed(6)}
-      </TablePrimaryCell>
-      <TablePrimaryCell
-        label={t('tables.tokenDistributions.columns.retrievableEth')}
-        align="center"
-      >
-        {(row.RewardToCollectEth ?? 0).toFixed(6)}
-      </TablePrimaryCell>
-    </TablePrimaryRow>
-  );
-};
-
+/**
+ * ETH Anchor Distributions per anchored Cosmic Signature NFT: what each has
+ * retrieved and what it has left to retrieve. Each row leads to the NFT's
+ * deposit-by-deposit record.
+ */
 export const AnchorDistributionsTable = ({
   list,
   address,
-}: {
-  list: AnchorDistribution[];
-  address: string;
-}) => {
+  headingLevel = 3,
+  ...state
+}: AnchorDistributionsTableProps) => {
   const t = useTranslations('anchoring');
-  const perPage = 5;
-  const [page, setPage] = useState(1);
 
-  if (!list || list.length === 0) {
-    return <p className="text-muted-foreground">{t('common.empty.distributions')}</p>;
-  }
-
-  const startIndex = (page - 1) * perPage;
-  const endIndex = page * perPage;
-  const currentData = list.slice(startIndex, endIndex);
+  const columns = useMemo<DataTableColumn<AnchorDistribution>[]>(
+    () => [
+      {
+        id: 'token',
+        kind: 'link',
+        header: t('tables.tokenDistributions.columns.tokenId'),
+        value: (row) => row.TokenId,
+        cell: (row) => <span className="font-mono tabular-nums">{formatId(row.TokenId)}</span>,
+      },
+      {
+        id: 'retrieved',
+        kind: 'amount',
+        header: t('tables.tokenDistributions.columns.retrievedEth'),
+        value: (row) => row.RewardCollectedEth,
+        showUnit: false,
+        sortable: true,
+      },
+      {
+        id: 'retrievable',
+        kind: 'amount',
+        header: t('tables.tokenDistributions.columns.retrievableEth'),
+        value: (row) => row.RewardToCollectEth,
+        showUnit: false,
+        sortable: true,
+      },
+    ],
+    [t],
+  );
 
   return (
-    <>
-      <TablePrimaryContainer>
-        <TablePrimary>
-          <TablePrimaryHead>
-            <tr>
-              <TablePrimaryHeadCell>
-                {t('tables.tokenDistributions.columns.tokenId')}
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>
-                {t('tables.tokenDistributions.columns.retrievedEth')}
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>
-                {t('tables.tokenDistributions.columns.retrievableEth')}
-              </TablePrimaryHeadCell>
-            </tr>
-          </TablePrimaryHead>
-
-          <TablePrimaryBody>
-            {currentData.map((row) => (
-              <AnchorDistributionsRow key={row.TokenId} row={row} address={address} />
-            ))}
-          </TablePrimaryBody>
-        </TablePrimary>
-      </TablePrimaryContainer>
-
-      <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
-    </>
+    <DataTable
+      data={list}
+      columns={columns}
+      ariaLabel={t('tables.tokenDistributions.label')}
+      getRowKey={(row) => row.TokenId}
+      getRowHref={(row) => tokenDistributionsHref(address, row.TokenId)}
+      getRowLabel={(row) => t('distributionsByToken.title', { id: formatId(row.TokenId) })}
+      emptyTitle={t('common.empty.distributions.title')}
+      emptyDescription={t('common.empty.distributions.description')}
+      headingLevel={headingLevel}
+      {...state}
+    />
   );
 };

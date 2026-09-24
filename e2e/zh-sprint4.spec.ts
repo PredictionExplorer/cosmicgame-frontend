@@ -114,7 +114,7 @@ test.describe('zh Sprint 4 — transactions and holdings routes', () => {
       page.getByRole('heading', { level: 1, name: `操作 #${SPRINT4_MOCK_ACTION_ID}` }),
     ).toBeVisible();
     await expect(page.getByText('Cosmic Signature NFT 锚定操作', { exact: true })).toBeVisible();
-    await expect(page.getByText('锚定时间', { exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: '时间线' })).toBeVisible();
   });
 
   test('/zh/my-allocations renders its disconnected-wallet Chinese shell', async ({ page }) => {
@@ -126,9 +126,8 @@ test.describe('zh Sprint 4 — transactions and holdings routes', () => {
 
   test('/zh/my-anchors renders its disconnected-wallet Chinese shell', async ({ page }) => {
     await openZhRoute(page, '/zh/my-anchors', '我的锚定 · Cosmic Signature');
-    await expect(page.getByText('我的锚定', { exact: true }).first()).toBeVisible();
-    await expect(page.getByText('未连接钱包', { exact: true })).toBeVisible();
-    await expect(page.getByText('连接钱包后即可管理锚定。', { exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: '我的锚定' })).toBeVisible();
+    await expect(page.getByText('连接钱包，管理你的锚定', { exact: true })).toBeVisible();
   });
 
   test('/zh/my-statistics renders localized personal statistics metadata', async ({ page }) => {
@@ -188,7 +187,7 @@ test.describe('zh Sprint 4 — transactions and holdings routes', () => {
     await expect(
       page.getByRole('heading', {
         level: 1,
-        name: `代币 ${SPRINT4_MOCK_TOKEN_ID} 的锚定派发明细`,
+        name: `Cosmic Signature #${String(SPRINT4_MOCK_TOKEN_ID).padStart(6, '0')} 的锚定派发`,
       }),
     ).toBeVisible();
     await expect(page.getByText('锚定派发（ETH）', { exact: true }).first()).toBeVisible();

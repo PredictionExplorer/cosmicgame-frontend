@@ -5,8 +5,8 @@ import { ART_WIDTH, type ArtRendition, type ArtSource } from '@/components/ui/ar
 /*
  * A Signature's published media, derived from its seed alone. A leaf module
  * with no hooks and no catalogs, so a page that only shows the art (the home,
- * How it works) does not pull the traits catalog in with the alt-text hook;
- * `signatureArt` re-exports it beside the alt-text helpers.
+ * How it works, the anchoring plates) does not pull the traits catalog in with
+ * the alt-text hook; `signatureArt` re-exports it beside the alt-text helpers.
  */
 
 /** Pixel width of the published `thumb_card.webp` thumbnail. */

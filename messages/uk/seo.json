@@ -36,7 +36,7 @@
       },
       "anchoring": {
         "heading": "Надходження за закріплення",
-        "description": "Відстежуйте публічні закріплення Cosmic Signature NFT, записи надходжень за закріплення в ETH, закріплення RandomWalk NFT і закарбування за зоряним відбором закріплених NFT.",
+        "description": "Відстежуйте публічні закріплення Cosmic Signature NFT, записи надходжень за закріплення в ETH, закріплення Random Walk NFT і закарбування за зоряним відбором закріплених NFT.",
         "source": "Публічні API закріплень Cosmic Signature",
         "links": {
           "statistics": "Переглянути статистику закріплень",
@@ -53,7 +53,7 @@
           },
           "stellarImprints": {
             "label": "Закарбовано через зоряний відбір закріплених NFT",
-            "tooltip": "Cosmic Signature NFT, закарбовані для закріплених RandomWalk NFT через зоряний відбір закріплених NFT."
+            "tooltip": "Cosmic Signature NFT, закарбовані для закріплених Random Walk NFT через зоряний відбір закріплених NFT."
           }
         }
       },

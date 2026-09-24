@@ -744,6 +744,7 @@ export function DataTable<T>({
           total={sorted.length}
           onPageChange={goToPage}
           caption={hasDatetime ? <TimeZoneNote /> : undefined}
+          label={t('pagination.labelFor', { table: ariaLabel })}
         />
       ) : null}
     </div>
