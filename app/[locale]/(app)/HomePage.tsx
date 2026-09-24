@@ -619,13 +619,15 @@ const HomePage = ({
   );
 
   // The dock steps aside while the in-page form is on screen, so it never
-  // covers or duplicates it; from tablets up it also waits until the desk
-  // itself has scrolled away. Until the observers report, it stays aside, so
-  // the server HTML never paints a dock over the desk. jsdom has no
-  // IntersectionObserver.
+  // covers or duplicates it; from 1024px, where the form sits beside the
+  // standings, it also waits until the desk itself has scrolled away. Below
+  // that the desk is one long column, so the dock returns as soon as the
+  // form has scrolled out of view. Until the observers report, it stays
+  // aside, so the server HTML never paints a dock over the desk. jsdom has
+  // no IntersectionObserver.
   const [formInView, setFormInView] = useState(true);
   const [deskInView, setDeskInView] = useState(true);
-  const isTabletUp = useMediaQuery('(min-width: 48rem)');
+  const isDesktop = useMediaQuery('(min-width: 64rem)');
   useEffect(() => {
     if (typeof IntersectionObserver === 'undefined') return undefined;
     const form = document.getElementById('make-gesture');
@@ -648,7 +650,7 @@ const HomePage = ({
       deskObserver.disconnect();
     };
   }, [showPanel]);
-  const dockAside = formInView || (isTabletUp && deskInView);
+  const dockAside = formInView || (isDesktop && deskInView);
 
   // The source-aligned clock discovers milestones even between Gestures.
   // A 30-second bucket keeps this larger timeline out of the one-second

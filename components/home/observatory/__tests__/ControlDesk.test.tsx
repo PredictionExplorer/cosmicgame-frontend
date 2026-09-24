@@ -15,7 +15,7 @@ const regions = {
 };
 
 describe('ControlDesk', () => {
-  it('keeps the desk in desktop reading order: cycle column, standings, then the form', () => {
+  it('keeps the DOM in the order a phone reads it: clock, form, standing, standings, Calibration, art', () => {
     render(<ControlDesk {...regions} />);
 
     const grid = screen.getByTestId('control-desk-grid');
@@ -25,24 +25,54 @@ describe('ControlDesk', () => {
     expect(order).toEqual([
       'control-desk-cycle',
       'control-desk-clock',
-      'control-desk-calibration',
-      'control-desk-standings',
       'control-desk-gesture',
       'control-desk-standing',
+      'control-desk-standings',
+      'control-desk-calibration',
       'control-desk-art',
     ]);
-    // Row 1: the Cycle column (5 of 12) beside the standings (7 of 12).
-    expect(screen.getByTestId('control-desk-cycle')).toHaveClass('lg:col-span-5', 'lg:row-start-1');
-    expect(screen.getByTestId('control-desk-standings')).toHaveClass('lg:col-span-7');
+    // No visual reordering anywhere: what is drawn is what is read and tabbed.
+    for (const cell of grid.children) {
+      expect(cell.className).not.toMatch(/(?:^|\s)(?:[a-z-]+:)*order-/);
+    }
+    // The Cycle column's frame is decoration only.
+    const frame = screen.getByTestId('control-desk-cycle');
+    expect(frame).toHaveAttribute('aria-hidden');
+    expect(frame).toBeEmptyDOMElement();
+  });
+
+  it('places each cell explicitly from 1024px', () => {
+    render(<ControlDesk {...regions} />);
+    // Row 1: the Cycle column (5 of 12: clock over Calibration) beside the standings (7 of 12).
+    expect(screen.getByTestId('control-desk-cycle')).toHaveClass(
+      'lg:col-span-5',
+      'lg:col-start-1',
+      'lg:row-start-1',
+      'lg:row-span-2',
+    );
+    expect(screen.getByTestId('control-desk-clock')).toHaveClass(
+      'lg:col-start-1',
+      'lg:row-start-1',
+    );
+    expect(screen.getByTestId('control-desk-calibration')).toHaveClass(
+      'lg:col-start-1',
+      'lg:row-start-2',
+    );
+    expect(screen.getByTestId('control-desk-standings')).toHaveClass(
+      'lg:col-span-7',
+      'lg:col-start-6',
+      'lg:row-span-2',
+    );
     // Row 2: the form (8 of 12), and beside it the art over the wallet's standing.
     expect(screen.getByTestId('control-desk-gesture')).toHaveClass(
       'lg:col-span-8',
+      'lg:row-start-3',
       'lg:row-span-2',
     );
-    expect(screen.getByTestId('control-desk-art')).toHaveClass('lg:col-start-9', 'lg:row-start-2');
+    expect(screen.getByTestId('control-desk-art')).toHaveClass('lg:col-start-9', 'lg:row-start-3');
     expect(screen.getByTestId('control-desk-standing')).toHaveClass(
       'lg:col-start-9',
-      'lg:row-start-3',
+      'lg:row-start-4',
     );
   });
 
@@ -63,32 +93,26 @@ describe('ControlDesk', () => {
 
   it("gives the art the form's place between cycles", () => {
     render(<ControlDesk {...regions} gestureConsole={undefined} />);
-    expect(screen.getByTestId('control-desk-art')).toHaveClass('lg:col-span-7', 'lg:row-start-2');
+    expect(screen.getByTestId('control-desk-art')).toHaveClass('lg:col-span-7', 'lg:row-start-3');
     expect(screen.getByTestId('control-desk-standing')).toHaveClass(
       'lg:col-span-5',
-      'lg:row-start-2',
+      'lg:row-start-3',
     );
   });
 
-  it('keeps tablets in one column and moves the form under the clock on phones', () => {
+  it('keeps phones and tablets in one column', () => {
     render(<ControlDesk {...regions} />);
     // No two-column split before 1024px.
     expect(screen.getByTestId('control-desk-grid').className).not.toMatch(
       /(?:^|\s)(?:md|sm):grid-cols/,
     );
-    expect(screen.getByTestId('control-desk-clock')).toHaveClass('max-md:order-1');
-    expect(screen.getByTestId('control-desk-gesture')).toHaveClass('max-md:order-2');
-    expect(screen.getByTestId('control-desk-standing')).toHaveClass('max-md:order-3');
-    expect(screen.getByTestId('control-desk-standings')).toHaveClass('max-md:order-4');
-    expect(screen.getByTestId('control-desk-calibration')).toHaveClass('max-md:order-5');
-    expect(screen.getByTestId('control-desk-art')).toHaveClass('max-md:order-6');
   });
 
   it('frames each region once: no bordered box inside a bordered box', () => {
     render(<ControlDesk {...regions} />);
-    const cycle = screen.getByTestId('control-desk-cycle');
-    // The Cycle column is the frame from 1024px; its parts drop theirs there.
-    expect(cycle).toHaveClass('lg:border');
+    // The Cycle column's frame is drawn from 1024px; the clock and the
+    // Calibration Window drop their own frames there.
+    expect(screen.getByTestId('control-desk-cycle')).toHaveClass('lg:block', 'border');
     expect(screen.getByTestId('control-desk-clock')).toHaveClass('lg:border-0');
     expect(screen.getByTestId('control-desk-calibration')).toHaveClass('lg:border-0');
     // The form is the page's one quiet surface: a fill, no border.
