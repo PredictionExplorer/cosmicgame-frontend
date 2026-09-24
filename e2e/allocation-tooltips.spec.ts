@@ -38,8 +38,12 @@ const ALLOCATION_DETAIL_TOOLTIPS = [
     expected: /received at least one allocation this cycle/,
   },
   {
+    label: 'Cycle recipients',
+    expected: /Chrono-Warrior: held the Endurance Champion position/,
+  },
+  {
     label: 'Allocation distribution',
-    expected: /How the ETH distributed this cycle splits across allocation tracks/,
+    expected: /Each track's share of the Cycle Reserve when this cycle was finalized/,
   },
   {
     label: 'Cycle statistics',
@@ -51,8 +55,9 @@ const ALLOCATION_DETAIL_TOOLTIPS = [
   },
 ];
 
+/** The distribution legend's track names explain themselves. */
 const ALLOCATION_DETAIL_TERMS = [
-  { label: 'Chrono-Warrior', expected: /Endurance Champion/ },
+  { label: 'Chrono-Warrior', expected: /ETH allocation to the Chrono-Warrior/ },
   { label: 'Public Goods', expected: /Public Goods Beneficiary/ },
 ];
 
@@ -78,16 +83,19 @@ test.describe('/allocation tooltips', () => {
     await expectTermTooltips(page, ALLOCATION_LIST_TERMS);
   });
 
-  test('opens allocation list recipient tooltip from the Radix replacement for title=', async ({
-    page,
-  }) => {
+  test('gives each ledger recipient its full address and the way to its page', async ({ page }) => {
     await page.goto('/allocation', { waitUntil: 'networkidle' });
     await page.emulateMedia({ reducedMotion: 'reduce' });
 
-    const recipient = page.locator('main span.font-mono').filter({ hasText: /^0x/i }).first();
+    // The one address display (AddressChip): the short checksummed address, the full address
+    // on hover, and the recipient's page one click away, on every screen size.
+    const ledger = page.getByRole('table', { name: 'Finalized cycles' });
+    const recipient = ledger.getByRole('link', { name: /^0x[0-9a-fA-F]{4}…/ }).first();
     await recipient.scrollIntoViewIfNeeded();
-    await recipient.hover();
-    await expect(page.getByRole('tooltip', { name: /^0x[a-fA-F0-9]{40}$/ })).toBeVisible();
+    await expect(recipient).toBeVisible();
+    await expect(recipient).toHaveAttribute('title', /^0x[a-fA-F0-9]{40}$/);
+    const full = await recipient.getAttribute('title');
+    await expect(recipient).toHaveAttribute('href', `/user/${full}`);
   });
 
   test('opens representative allocation detail tooltips', async ({ page }) => {
