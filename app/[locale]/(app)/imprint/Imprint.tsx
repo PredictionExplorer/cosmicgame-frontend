@@ -12,10 +12,9 @@ import { protocolFacts } from '@/content/protocol-facts';
 import { activeChain } from '@/config/chains';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { Link } from '@/i18n/navigation';
-import { cn } from '@/lib/utils';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Amount } from '@/components/ui/amount';
-import { Badge } from '@/components/ui/badge';
+import { ArtTag, WallLabel } from '@/components/ui/art-frame';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { PageShell } from '@/components/ui/page-shell';
 import { SectionHeader } from '@/components/ui/section-header';
@@ -245,18 +244,20 @@ const Imprint = ({ seoSummary }: { seoSummary?: ReactNode }) => {
                       tokenId={tokenId}
                       alt={t('page.tokenAlt', { id: formatId(tokenId) })}
                     />
-                    <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-                      <span className="type-mono text-foreground">{formatId(tokenId)}</span>
-                      <Badge size="sm" tone={used ? 'neutral' : 'positive'}>
-                        {used ? t('page.owned.used') : t('page.owned.unused')}
-                      </Badge>
-                    </div>
+                    {/* The section heading names the collection: the label is the number. */}
+                    <WallLabel
+                      className="mt-3"
+                      title={<span className="font-mono tabular-nums">{formatId(tokenId)}</span>}
+                      tags={
+                        <ArtTag tone={used ? 'neutral' : 'positive'}>
+                          {used ? t('page.owned.used') : t('page.owned.unused')}
+                        </ArtTag>
+                      }
+                    />
                     {used ? null : (
                       <Link
                         href={gestureWithRandomWalkHref(tokenId)}
-                        className={cn(
-                          'link mt-2 inline-flex min-h-6 items-center gap-1 type-body-sm',
-                        )}
+                        className="link mt-2 inline-flex min-h-6 items-center gap-1 type-body-sm"
                       >
                         {t('page.owned.use')}
                         <ArrowRight aria-hidden className="size-3.5" />

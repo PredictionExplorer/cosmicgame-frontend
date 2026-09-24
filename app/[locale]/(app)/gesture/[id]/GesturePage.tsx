@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
+import { GESTURE_METHOD_BG_CLASS, type GestureMethod } from '@/lib/theme/dataColors';
 import { cn } from '@/lib/utils';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { AddressChip } from '@/components/ui/address-chip';
@@ -16,7 +17,7 @@ import { DateTime } from '@/components/ui/date-time';
 import { EmptyState } from '@/components/ui/empty-state';
 import { LinkifiedText } from '@/components/ui/linkified-text';
 import { PageShell } from '@/components/ui/page-shell';
-import { PendingPlate } from '@/components/ui/art-frame';
+import { MEDIA_PLATE_CLASS, PendingPlate } from '@/components/ui/art-frame';
 import { SkeletonDetailRows } from '@/components/ui/skeleton';
 import { TxExplorerLink } from '@/components/ui/tx-status';
 import { UnknownValue } from '@/components/ui/unknown-value';
@@ -39,12 +40,6 @@ import { useGestureNeighbours } from './gestureNeighbours';
 
 /** The API's numeric gesture types (GestureMethodTag). */
 const CST_GESTURE = 2;
-
-const METHOD_DOT: Readonly<Record<'eth' | 'ethRandomWalk' | 'cst', string>> = {
-  eth: 'bg-method-eth',
-  ethRandomWalk: 'bg-method-eth-rwlk',
-  cst: 'bg-method-cst',
-};
 
 /**
  * The first real amount among the API's aliases for one field: a positive
@@ -229,7 +224,7 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
   const cost = gestureCost(gestureInfo);
   const reward = participationCst(gestureInfo);
   const rwlkId = (gestureInfo.RWalkNFTId ?? -1) >= 0 ? (gestureInfo.RWalkNFTId as number) : null;
-  const method =
+  const method: GestureMethod =
     resolveGestureType(gestureInfo) === CST_GESTURE
       ? 'cst'
       : rwlkId !== null
@@ -245,7 +240,7 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
   const methodBadge = (
     <Badge
       data-testid="gesture-method"
-      icon={<span className={cn('block size-1.5 rounded-full', METHOD_DOT[method])} />}
+      icon={<span className={cn('block size-1.5 rounded-full', GESTURE_METHOD_BG_CLASS[method])} />}
     >
       {t(`method.${method}`)}
       {rwlkId !== null ? <span className="font-mono tabular-nums">{formatId(rwlkId)}</span> : null}
@@ -413,7 +408,7 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
               </h2>
               <div className="grid gap-8 sm:grid-cols-[minmax(0,15rem)_minmax(0,1fr)]">
                 {/* The media keeps its own ratio: the well does not stretch to the list beside it. */}
-                <div className="self-start overflow-hidden rounded-edge bg-art-ground">
+                <div className={cn(MEDIA_PLATE_CLASS, 'self-start')}>
                   {nftMetadata.isLoading ? (
                     <PendingPlate variant="media" busy />
                   ) : (
@@ -424,7 +419,6 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
                         metadataText(tokenURI?.name) ??
                         `${t('sections.nft.title')} ${gestureInfo.NFTDonationTokenId}`
                       }
-                      className="bg-contain"
                     />
                   )}
                 </div>

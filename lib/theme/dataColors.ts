@@ -17,6 +17,13 @@ export const GESTURE_METHOD_COLOR = {
 
 export type GestureMethod = keyof typeof GESTURE_METHOD_COLOR;
 
+/** The same series as background utilities, for a method's dot or swatch in markup. */
+export const GESTURE_METHOD_BG_CLASS: Readonly<Record<GestureMethod, string>> = {
+  eth: 'bg-method-eth',
+  ethRandomWalk: 'bg-method-eth-rwlk',
+  cst: 'bg-method-cst',
+};
+
 /** The API's numeric `GestureType`: 0 ETH, 1 ETH with a RandomWalk NFT, 2 CST. */
 const METHOD_BY_GESTURE_TYPE: Readonly<Partial<Record<number, GestureMethod>>> = {
   0: 'eth',

@@ -2,9 +2,9 @@
 
 import { useTranslations } from 'next-intl';
 
-import { cn } from '@/lib/utils';
+import { SiteLink } from '@/components/layout/SiteLink';
 import { AddressChip } from '@/components/ui/address-chip';
-import { PendingPlate } from '@/components/ui/art-frame';
+import { MEDIA_PLATE_CLASS, PendingPlate, WallLabel } from '@/components/ui/art-frame';
 import NFTImage from '@/components/nft/NFTImage';
 import {
   getAttachedNftTokenId,
@@ -13,18 +13,12 @@ import {
 import { useAttachedNftMetadata } from '@/components/attachments/useAttachedNftMetadata';
 import type { AttachedNFT } from '@/services/api/types';
 
-/** The plate's black ground and its 1px edge, drawn above the image. */
-const PLATE_CLASS = cn(
-  'relative block overflow-hidden rounded-edge bg-art-ground',
-  "after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:content-['']",
-  'after:shadow-[var(--art-edge)] after:transition-shadow after:duration-fast',
-);
-
 /**
- * One NFT attached to the cycle: its image on the black art ground at its
- * own ratio, linking to the NFT (its project page, OpenSea or the explorer),
- * and a wall label below with its name, token number and who attached it.
- * Nothing is drawn over the image.
+ * One NFT attached to the cycle: its image on the media plate at its own
+ * ratio, and a wall label below with its name, token number, who attached it
+ * and where to see it ("View on OpenSea ↗", a new tab). Nothing is drawn over
+ * the image. The plate is a pointer shortcut to the same page; keyboard and
+ * screen-reader users reach it once, through the named link in the label.
  */
 export function AttachedNftPlate({ nft }: { nft: AttachedNFT }) {
   const t = useTranslations('currentCycle');
@@ -73,30 +67,41 @@ export function AttachedNftPlate({ nft }: { nft: AttachedNFT }) {
           href={link.href}
           target="_blank"
           rel="noopener noreferrer"
-          className={cn(PLATE_CLASS, 'hover:after:shadow-[var(--art-edge-active)]')}
+          tabIndex={-1}
+          aria-hidden
+          className={MEDIA_PLATE_CLASS}
         >
           {image}
         </a>
       ) : (
-        <div className={PLATE_CLASS}>{image}</div>
+        <div className={MEDIA_PLATE_CLASS}>{image}</div>
       )}
-      <figcaption className="mt-3 min-w-0">
-        <p className="truncate type-title text-foreground" title={title}>
-          {title}
-        </p>
-        <p className="mt-0.5 flex flex-wrap items-center gap-x-1.5 type-caption text-subtle">
-          {name && tokenId ? (
+      <WallLabel
+        as="figcaption"
+        className="mt-3"
+        title={title}
+        meta={[
+          name && tokenId ? (
             <span className="type-mono">{t('showcase.facts.tokenIdValue', { id: tokenId })}</span>
-          ) : null}
-          {nft.DonorAddr ? (
+          ) : null,
+          nft.DonorAddr ? (
             <span className="inline-flex min-w-0 items-center gap-1">
-              {name && tokenId ? <span aria-hidden>·</span> : null}
               {t('showcase.facts.attachedBy')}
               <AddressChip address={nft.DonorAddr} variant="plain" showCopy={false} />
             </span>
-          ) : null}
-        </p>
-      </figcaption>
+          ) : null,
+        ]}
+      >
+        {link.href ? (
+          <SiteLink
+            kind="external"
+            href={link.href}
+            className="link-quiet inline-flex min-h-6 w-fit items-center gap-1 type-caption"
+          >
+            {link.label}
+          </SiteLink>
+        ) : null}
+      </WallLabel>
     </figure>
   );
 }

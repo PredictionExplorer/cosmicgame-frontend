@@ -6,14 +6,13 @@ import { protocolFacts } from '@/content/protocol-facts';
 
 import { ALLOCATION_TRACK_IDS, type AllocationTrackId } from '@/config/allocationTracks';
 import { Link } from '@/i18n/navigation';
+import { GESTURE_METHOD_BG_CLASS, type GestureMethod } from '@/lib/theme/dataColors';
 import { cn } from '@/lib/utils';
 import { ArtFrame, WallLabel } from '@/components/ui/art-frame';
 import { ExplainedTerm } from '@/components/ui/explain-popover';
 import { SectionHeader } from '@/components/ui/section-header';
 import { signatureMedia, signatureSources } from '@/components/nft/signatureArt';
 import { formatId } from '@/utils/format/ids';
-
-type GestureMethod = 'eth' | 'eth-rwlk' | 'cst';
 
 /**
  * One arrangement of the drawing, in its own coordinate space. The numbered
@@ -57,7 +56,7 @@ const WIDE: DrawingLayout = {
     { x: 104, method: 'eth' },
     { x: 158, method: 'eth' },
     { x: 196, method: 'cst' },
-    { x: 262, method: 'eth-rwlk' },
+    { x: 262, method: 'ethRandomWalk' },
     { x: 318, method: 'cst' },
     { x: 356, method: 'eth' },
     { x: 418, method: 'cst' },
@@ -87,7 +86,7 @@ const COMPACT: DrawingLayout = {
   gestures: [
     { x: 62, method: 'eth' },
     { x: 104, method: 'cst' },
-    { x: 146, method: 'eth-rwlk' },
+    { x: 146, method: 'ethRandomWalk' },
     { x: 190, method: 'cst' },
   ],
   earlierEnds: [230, 260],
@@ -122,15 +121,15 @@ const TRACK_FILL: Readonly<Record<AllocationTrackId, string>> = {
 
 const METHOD_FILL: Readonly<Record<GestureMethod, string>> = {
   eth: 'fill-method-eth',
-  'eth-rwlk': 'fill-method-eth-rwlk',
+  ethRandomWalk: 'fill-method-eth-rwlk',
   cst: 'fill-method-cst',
 };
 
 /** The legend: the payment methods, named by their tickers in every locale. */
-const METHOD_LEGEND: ReadonlyArray<{ method: GestureMethod; label: string; dot: string }> = [
-  { method: 'eth', label: 'ETH', dot: 'bg-method-eth' },
-  { method: 'eth-rwlk', label: 'ETH + RWLK', dot: 'bg-method-eth-rwlk' },
-  { method: 'cst', label: 'CST', dot: 'bg-method-cst' },
+const METHOD_LEGEND: ReadonlyArray<{ method: GestureMethod; label: string }> = [
+  { method: 'eth', label: 'ETH' },
+  { method: 'ethRandomWalk', label: 'ETH + RWLK' },
+  { method: 'cst', label: 'CST' },
 ];
 
 /** The reserve split as segments of the allocation bar (x and width in drawing units). */
@@ -384,7 +383,7 @@ export function CycleTimeline({
         >
           {METHOD_LEGEND.map((entry) => (
             <li key={entry.method} className="inline-flex items-center gap-1.5">
-              <span className={cn('size-2 rounded-pill', entry.dot)} />
+              <span className={cn('size-2 rounded-pill', GESTURE_METHOD_BG_CLASS[entry.method])} />
               {entry.label}
             </li>
           ))}

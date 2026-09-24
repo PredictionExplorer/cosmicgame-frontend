@@ -1,12 +1,18 @@
 import { getRWLKImageUrl } from '@/utils';
 
 import { cn } from '@/lib/utils';
+import { SiteLink } from '@/components/layout/SiteLink';
+import { MEDIA_PLATE_CLASS } from '@/components/ui/art-frame';
 
 import NFTImage from './NFTImage';
 
+/** The token's own page on the Random Walk NFT site. */
+export const randomWalkTokenUrl = (tokenId: number) =>
+  `https://www.randomwalknft.com/detail/${tokenId}`;
+
 export interface RandomWalkPlateProps {
   tokenId: number;
-  /** The image's alt text, which also names the link ("RandomWalk NFT #004242"). */
+  /** The image's alt text, which also names the link ("Random Walk NFT #004242"). */
   alt: string;
   /** Responsive size hint for the thumbnail. */
   sizes?: string;
@@ -14,10 +20,11 @@ export interface RandomWalkPlateProps {
 }
 
 /**
- * A RandomWalk NFT on the black art ground at its own 16:9 ratio, linking to
- * its page on randomwalknft.com. Nothing is drawn over the image: the token
- * number and any state belong in the caption the caller sets below the plate.
- * The thumbnail URL follows from the id alone, so the plate needs no read.
+ * A Random Walk NFT on the media plate at its own 16:9 ratio, linking to its
+ * page on randomwalknft.com in a new tab (screen readers hear that it opens
+ * one). Nothing is drawn over the image: the token number and any state
+ * belong in the WallLabel the caller sets below the plate. The thumbnail URL
+ * follows from the id alone, so the plate needs no read.
  */
 export function RandomWalkPlate({
   tokenId,
@@ -27,16 +34,11 @@ export function RandomWalkPlate({
 }: RandomWalkPlateProps) {
   const file = String(tokenId).padStart(6, '0');
   return (
-    <a
-      href={`https://www.randomwalknft.com/detail/${tokenId}`}
-      className={cn(
-        // The plate's 1px edge sits above the image (an inset shadow would
-        // paint under it) and strengthens on hover, as on every art plate.
-        'relative block overflow-hidden rounded-edge bg-art-ground',
-        "after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:content-['']",
-        'after:shadow-[var(--art-edge)] after:transition-shadow after:duration-fast hover:after:shadow-[var(--art-edge-active)]',
-        className,
-      )}
+    <SiteLink
+      kind="external"
+      href={randomWalkTokenUrl(tokenId)}
+      externalIcon={false}
+      className={cn(MEDIA_PLATE_CLASS, className)}
     >
       <NFTImage
         src={getRWLKImageUrl(file, 'black_thumb.jpg')}
@@ -45,6 +47,6 @@ export function RandomWalkPlate({
         sizes={sizes}
         density="compact"
       />
-    </a>
+    </SiteLink>
   );
 }

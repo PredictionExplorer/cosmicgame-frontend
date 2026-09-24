@@ -39,10 +39,17 @@ describe('AttachedNftPlate', () => {
 
     expect(screen.getByText('Rexy #3114', { selector: 'p' })).toBeInTheDocument();
     expect(screen.getByTestId('nft-image')).toHaveAttribute('src', 'https://example.org/3114.png');
-    expect(screen.getByRole('link', { name: 'Attached NFT Rexy #3114' })).toHaveAttribute(
-      'href',
-      'https://example.org/rexy/3114',
-    );
+    // One named link out of the app: where it goes, and that it opens a new tab.
+    const external = screen
+      .getAllByRole('link')
+      .filter((link) => link.getAttribute('target') === '_blank');
+    expect(external).toHaveLength(1);
+    expect(external[0]).toHaveAccessibleName('View NFT nav.link.newTab');
+    expect(external[0]).toHaveAttribute('href', 'https://example.org/rexy/3114');
+    // The plate goes to the same page for pointers, out of the tab order.
+    const plate = container.querySelector('a[aria-hidden="true"]');
+    expect(plate).toHaveAttribute('href', 'https://example.org/rexy/3114');
+    expect(plate).toHaveAttribute('tabindex', '-1');
     expect(container).toHaveTextContent('currentCycle.showcase.facts.attachedBy');
     await checkA11y(container);
   });
@@ -56,5 +63,17 @@ describe('AttachedNftPlate', () => {
     ).toBeInTheDocument();
     expect(screen.getByTestId('pending-plate')).toHaveAttribute('aria-busy', 'true');
     expect(screen.queryByTestId('nft-image')).not.toBeInTheDocument();
+  });
+
+  it('names an OpenSea link by its destination when the metadata has no project page', () => {
+    mockMetadata.mockReturnValue({
+      isLoading: false,
+      data: { name: 'Rexy #3114', image: 'https://example.org/3114.png' },
+    });
+    render(<AttachedNftPlate nft={nft} />);
+
+    const link = screen.getByRole('link', { name: /View on OpenSea/ });
+    expect(link).toHaveAccessibleName('View on OpenSea nav.link.newTab');
+    expect(link.getAttribute('href')).toMatch(/^https:\/\/(testnets\.)?opensea\.io\/assets\//);
   });
 });
