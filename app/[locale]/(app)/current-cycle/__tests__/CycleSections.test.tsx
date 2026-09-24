@@ -73,6 +73,40 @@ describe('CycleAllocations', () => {
     expect(row('ethStellar')).not.toHaveTextContent('0%');
   });
 
+  it('ends each part of a receipt with its separator, so a wrapped line never starts with one', () => {
+    render(<CycleAllocations data={data} headingId="allocations" />);
+    const receipt = document.querySelector('li[data-allocation="signature"] p') as HTMLElement;
+    const parts = Array.from(receipt.children) as HTMLElement[];
+
+    expect(parts).toHaveLength(4);
+    for (const part of parts.slice(0, -1)) expect(part.textContent).toMatch(/·$/);
+    expect(parts.at(-1)?.textContent).not.toContain('·');
+    for (const part of parts) expect(part.textContent).not.toMatch(/^·/);
+  });
+
+  it('leaves the Public Goods definition out rather than print an unknown share', () => {
+    const { unmount } = render(<CycleAllocations data={data} headingId="allocations" />);
+    expect(
+      within(row('publicGoods'))
+        .getByText('currentCycle.allocations.cards.publicGoods.name')
+        .closest('[role="button"]'),
+    ).not.toBeNull();
+    unmount();
+
+    render(
+      <CycleAllocations
+        data={{ ...data, CharityPercentage: undefined } as DashboardInfo}
+        headingId="allocations"
+      />,
+    );
+    expect(document.body).not.toHaveTextContent('percent=—');
+    expect(
+      within(row('publicGoods'))
+        .getByText('currentCycle.allocations.cards.publicGoods.name')
+        .closest('[role="button"]'),
+    ).toBeNull();
+  });
+
   it('gives phones one short record per allocation instead of four labelled lines', () => {
     render(<CycleAllocations data={data} headingId="allocations" />);
     const record = (key: string) =>

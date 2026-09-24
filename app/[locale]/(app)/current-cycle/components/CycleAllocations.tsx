@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { Fragment, type ReactNode } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { ALLOCATION_TRACK_COLORS, type AllocationTrackId } from '@/config/allocationTracks';
@@ -45,13 +45,20 @@ interface AllocationRow {
   recipients: ReactNode;
 }
 
-/** "a · b · c", each part kept whole. */
+/**
+ * "a · b · c", each part kept whole. The separator ends the part before it,
+ * so a wrapped line starts with a part, never with a dot.
+ */
 function joinParts(parts: ReactNode[]): ReactNode {
+  const last = parts.length - 1;
   return parts.map((part, index) => (
-    <span key={index} className="whitespace-nowrap">
-      {index > 0 ? <span className="px-1.5 text-subtle">·</span> : null}
-      {part}
-    </span>
+    <Fragment key={index}>
+      <span className="whitespace-nowrap">
+        {part}
+        {index < last ? <span className="pl-1.5 text-subtle">·</span> : null}
+      </span>
+      {index < last ? ' ' : null}
+    </Fragment>
   ));
 }
 
@@ -82,6 +89,7 @@ export function CycleAllocations({ data, headingId }: { data: DashboardInfo; hea
 
   const cst = t('allocations.amounts.fixedCst');
   const nft = t('allocations.amounts.nft');
+  const publicGoodsPercent = toFiniteNumber(data.CharityPercentage);
   const stellarEthRecipients = toFiniteNumber(data.NumRaffleEthWinnersBidding);
   const stellarEth = toFiniteNumber(data.RaffleAmountEth);
   const stellarEthEach =
@@ -138,9 +146,11 @@ export function CycleAllocations({ data, headingId }: { data: DashboardInfo; hea
       key: 'publicGoods',
       track: 'publicGoods',
       name: card('publicGoods', 'name'),
-      definition: card('publicGoods', 'tooltip', {
-        percent: String(toFiniteNumber(data.CharityPercentage) ?? '—'),
-      }),
+      // The definition states the live share; without it, the sentence is left out.
+      definition:
+        publicGoodsPercent === null
+          ? undefined
+          : card('publicGoods', 'tooltip', { percent: String(publicGoodsPercent) }),
       receives: eth(tracks.get('publicGoods')?.eth),
       recipients: t('allocations.cards.publicGoods.recipientLabel'),
     },
