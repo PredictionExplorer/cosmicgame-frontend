@@ -42,13 +42,12 @@ export const learnTextUk = {
       description:
         'Як працює Cosmic Signature: перформанс-цикли, жести, CST, NFT-мистецтво трьох тіл, контракти на Arbitrum, закріплення, суспільні блага та роз’яснення ризиків.',
     },
-    eyebrow: 'Посібники',
     h1: 'Дізнайтеся, як працює Cosmic Signature',
     intro:
       'Посібники про Cosmic Signature: перформанс-цикли, жести та NFT-мистецтво трьох тіл, яке створюється з даних на Arbitrum.',
     breadcrumbs: {
       homeLabel: 'Cosmic Signature',
-      learnLabel: 'Навчальний центр',
+      learnLabel: 'Навчання',
     },
     groups: {
       start: {
@@ -80,7 +79,7 @@ export const learnTextUk = {
   articleUi: {
     breadcrumbs: {
       homeLabel: 'Cosmic Signature',
-      learnLabel: 'Навчальний центр',
+      learnLabel: 'Навчання',
     },
     guideTemplate: 'Посібник {number} з {total}',
     readingTimeTemplate: '{minutes} хв читання',

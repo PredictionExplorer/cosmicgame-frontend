@@ -31,6 +31,7 @@ export const quizTextUk = {
       startOverLabel: 'Почати спочатку',
       ranksHeading: 'Рівні',
       rankFromTemplate: 'Від {percent}',
+      rankBelowTemplate: 'Менше {percent}',
     },
     progressTemplate: 'Запитання {current} з {total}',
     correctFeedback: [

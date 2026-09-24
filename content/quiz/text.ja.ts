@@ -31,6 +31,7 @@ export const quizTextJa = {
       startOverLabel: '最初からやり直す',
       ranksHeading: '到達点',
       rankFromTemplate: '{percent}以上',
+      rankBelowTemplate: '{percent}未満',
     },
     progressTemplate: '{total}問中{current}問目',
     correctFeedback: [

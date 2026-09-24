@@ -31,6 +31,7 @@ export const quizTextKo = {
       startOverLabel: '처음부터 다시 풀기',
       ranksHeading: '등급',
       rankFromTemplate: '{percent} 이상',
+      rankBelowTemplate: '{percent} 미만',
     },
     progressTemplate: '{total}문항 중 {current}번째',
     correctFeedback: [

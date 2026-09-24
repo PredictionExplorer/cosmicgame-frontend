@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
+import { axe } from 'jest-axe';
 
 import { getQuizContent, quizContentEn } from '@/content/quiz';
 import type { QuizTier } from '@/content/quiz';
@@ -280,6 +281,27 @@ describe('<QuizRunner />', () => {
 
     fireEvent.click(screen.getByTestId('quiz-restart'));
     expect(screen.getByTestId('quiz-progress')).toHaveTextContent('Question 1 of 2');
+  });
+
+  it('keeps the review a valid definition list: each group holds only a term and its value', async () => {
+    begin();
+    fireEvent.click(screen.getByText('First distractor one'));
+    fireEvent.click(screen.getByTestId('quiz-next'));
+    fireEvent.click(screen.getByText('Second distractor one'));
+    fireEvent.click(screen.getByTestId('quiz-next'));
+
+    const review = screen.getByTestId('quiz-review');
+    const groups = review.querySelectorAll('dl > div');
+    expect(groups.length).toBeGreaterThan(0);
+    for (const group of groups) {
+      expect([...group.children].map((child) => child.tagName)).toEqual(['DT', 'DD']);
+    }
+    // The terms are visible and carry the mark.
+    expect(within(review).getAllByText(ui.yourAnswerLabel)[0]?.closest('dt')).not.toBeNull();
+    const results = await axe(review, {
+      runOnly: { type: 'rule', values: ['definition-list', 'dlitem'] },
+    });
+    expect(results).toHaveNoViolations();
   });
 
   it('does not suggest the next tier below half right', () => {

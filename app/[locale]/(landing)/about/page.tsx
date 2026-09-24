@@ -19,7 +19,6 @@ import {
   ABOUT_PLATE_TOKEN_ID,
   ABOUT_RESOURCE_GROUPS,
   getAboutContent,
-  type AboutResourceGroupId,
   type AboutResourceId,
 } from '@/content/about';
 import { getLearnContent } from '@/content/learn';
@@ -48,6 +47,12 @@ interface PageProps {
 }
 
 const ABOUT_PLATE = SIGNATURE_PLATES[ABOUT_PLATE_TOKEN_ID];
+
+/** The resources this page lists: the protocol's own, then the support address. */
+const ABOUT_PAGE_RESOURCES: readonly AboutResourceId[] = [
+  ...ABOUT_RESOURCE_GROUPS.protocol,
+  'support',
+];
 
 const RESOURCE_ICONS: Readonly<Record<AboutResourceId, LucideIcon>> = {
   app: AppWindow,
@@ -90,6 +95,7 @@ export default async function AboutPage({ params }: PageProps) {
   const content = getAboutContent(locale);
   const traits = await getTranslations({ locale, namespace: 'traits' });
   const detail = await getTranslations({ locale, namespace: 'detail' });
+  const nav = await getTranslations({ locale, namespace: 'nav' });
   const inLanguage = jsonLdInLanguage(locale);
   const pageUrl = localeHref(LANDING_ORIGIN, content.metadata.path, locale);
   const aboutJsonLd = {
@@ -125,7 +131,7 @@ export default async function AboutPage({ params }: PageProps) {
 
       <header className="grid items-center gap-10 border-b border-rule pb-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,36rem)] lg:gap-16 lg:pb-16">
         <div className="min-w-0">
-          <p className="type-eyebrow text-secondary">{content.eyebrow}</p>
+          <p className="type-eyebrow text-subtle">{content.eyebrow}</p>
           <h1 className="mt-3 type-display-md text-foreground sm:mt-4">{content.heading}</h1>
           <p className="mt-5 type-lede text-muted-foreground max-sm:text-base">
             {content.body.lede}
@@ -158,21 +164,27 @@ export default async function AboutPage({ params }: PageProps) {
         />
       </header>
 
-      <div className="mt-12 space-y-5 lg:mt-16">
-        {content.body.paragraphs.map((paragraph) => (
-          <p key={paragraph} className={PROSE_CLASS}>
-            {paragraph}
-          </p>
-        ))}
-      </div>
-
+      {/* The body opens the Principles it introduces, instead of standing alone
+          at half the row's width between the header and the section. */}
       {principles.length > 0 ? (
-        <section aria-labelledby="about-principles" className="mt-16 lg:mt-20">
-          <SectionHeader headingId="about-principles" title={content.principlesHeading} />
-          <ol className="mt-6 grid gap-8 md:grid-cols-3 md:gap-10">
+        <section aria-labelledby="about-principles" className="mt-12 lg:mt-16">
+          <SectionHeader
+            headingId="about-principles"
+            title={content.principlesHeading}
+            description={
+              <span className="block space-y-3">
+                {content.body.paragraphs.map((paragraph) => (
+                  <span key={paragraph} className="block">
+                    {paragraph}
+                  </span>
+                ))}
+              </span>
+            }
+          />
+          <ol className="mt-8 grid gap-8 md:grid-cols-3 md:gap-10">
             {principles.map((principle, index) => (
               <li key={principle.term} className="border-t border-rule pt-5">
-                <p aria-hidden className="type-mono text-subtle">
+                <p aria-hidden className="type-label tabular-nums text-subtle">
                   {String(index + 1).padStart(2, '0')}
                 </p>
                 <h3 className="mt-3 type-heading-3 text-foreground">
@@ -190,69 +202,72 @@ export default async function AboutPage({ params }: PageProps) {
             <ArrowRight aria-hidden className="size-3.5" />
           </Link>
         </section>
-      ) : null}
+      ) : (
+        <div className="mt-12 space-y-5 lg:mt-16">
+          {content.body.paragraphs.map((paragraph) => (
+            <p key={paragraph} className={PROSE_CLASS}>
+              {paragraph}
+            </p>
+          ))}
+        </div>
+      )}
 
       <Callout label={content.clarificationsHeading} className="mt-16 lg:mt-20">
-        <p>{content.body.disambiguation}</p>
-        <p className="mt-2">{content.body.denial}</p>
+        {/* The COSMIC disambiguation sits in the footer of every landing page, just below. */}
+        <p>{content.body.denial}</p>
       </Callout>
 
       <section aria-labelledby="about-resources" className="mt-16 lg:mt-20">
         <SectionHeader headingId="about-resources" title={content.officialResources.heading} />
-        <div className="mt-6 grid gap-10 md:grid-cols-3 md:gap-10">
-          {(Object.keys(ABOUT_RESOURCE_GROUPS) as AboutResourceGroupId[]).map((groupId) => (
-            <div key={groupId} className="min-w-0">
-              <h3 className="type-label text-subtle">
-                {content.officialResources.groups[groupId]}
-              </h3>
-              <ul className="mt-3 divide-y divide-rule-faint border-y border-rule-faint">
-                {ABOUT_RESOURCE_GROUPS[groupId].map((id) => {
-                  const link = linksById.get(id);
-                  if (!link) return null;
-                  const Icon = RESOURCE_ICONS[id];
-                  const rowClass =
-                    'group flex min-h-12 items-center gap-3 py-2.5 type-body-sm text-foreground transition-colors duration-fast hover:text-primary';
-                  const icon = (
-                    <Icon
+        {/* The protocol's own resources and a way to write in; community and
+            legal links live in the footer right below. */}
+        <ul className="mt-6 grid border-t border-rule-faint sm:grid-cols-2 sm:gap-x-10">
+          {ABOUT_PAGE_RESOURCES.map((id) => {
+            const link = linksById.get(id);
+            if (!link) return null;
+            const Icon = RESOURCE_ICONS[id];
+            // The app's front door takes the one shared name, "Open the app".
+            const label = id === 'app' ? nav('cta.openApp') : link.label;
+            const rowClass =
+              'group flex min-h-12 items-center gap-3 py-2.5 type-body-sm text-foreground transition-colors duration-fast hover:text-primary';
+            const icon = (
+              <Icon
+                aria-hidden
+                className="size-4 shrink-0 text-subtle transition-colors group-hover:text-primary"
+              />
+            );
+            if (link.href.startsWith('mailto:')) {
+              return (
+                <li key={id} className="border-b border-rule-faint">
+                  <a href={link.href} className={rowClass}>
+                    {icon}
+                    <span className="min-w-0 [overflow-wrap:anywhere]">{label}</span>
+                  </a>
+                </li>
+              );
+            }
+            const target = landingLink(link.href, locale);
+            return (
+              <li key={id} className="border-b border-rule-faint">
+                <SiteLink
+                  href={target.href}
+                  kind={target.kind}
+                  className={rowClass}
+                  externalIconClassName="ml-auto"
+                >
+                  {icon}
+                  <span className="min-w-0">{label}</span>
+                  {target.kind === 'external' ? null : (
+                    <ArrowRight
                       aria-hidden
-                      className="size-4 shrink-0 text-subtle transition-colors group-hover:text-primary"
+                      className="ml-auto size-3.5 shrink-0 text-subtle transition-colors group-hover:text-primary"
                     />
-                  );
-                  if (link.href.startsWith('mailto:')) {
-                    return (
-                      <li key={id}>
-                        <a href={link.href} className={rowClass}>
-                          {icon}
-                          <span className="min-w-0 [overflow-wrap:anywhere]">{link.label}</span>
-                        </a>
-                      </li>
-                    );
-                  }
-                  const target = landingLink(link.href, locale);
-                  return (
-                    <li key={id}>
-                      <SiteLink
-                        href={target.href}
-                        kind={target.kind}
-                        className={rowClass}
-                        externalIconClassName="ml-auto"
-                      >
-                        {icon}
-                        <span className="min-w-0">{link.label}</span>
-                        {target.kind === 'external' ? null : (
-                          <ArrowRight
-                            aria-hidden
-                            className="ml-auto size-3.5 shrink-0 text-subtle transition-colors group-hover:text-primary"
-                          />
-                        )}
-                      </SiteLink>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          ))}
-        </div>
+                  )}
+                </SiteLink>
+              </li>
+            );
+          })}
+        </ul>
       </section>
     </ReadingMain>
   );

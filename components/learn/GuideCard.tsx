@@ -38,8 +38,8 @@ export interface GuideCardProps {
   number: number;
   title: string;
   description: string;
-  /** "4 min read". */
-  readingTime: string;
+  /** "4 min read", or `null` for a guide too short for the figure to help. */
+  readingTime: string | null;
   /** The card title's heading level in the page outline. */
   titleAs?: 'h3' | 'p';
   className?: string;
@@ -68,7 +68,7 @@ export function GuideCard({
       )}
     >
       <span className="flex items-center justify-between gap-4">
-        <span aria-hidden className="type-mono text-subtle">
+        <span aria-hidden className="type-label tabular-nums text-subtle">
           {String(number).padStart(2, '0')}
         </span>
         <Icon
@@ -79,7 +79,7 @@ export function GuideCard({
       <Title className="mt-5 type-heading-3 text-foreground">{title}</Title>
       <span className="mt-2 flex-1 type-body-sm text-muted-foreground">{description}</span>
       <span className="mt-5 flex items-center justify-between gap-4 border-t border-rule-faint pt-4 type-caption tabular-nums text-subtle">
-        {readingTime}
+        <span>{readingTime}</span>
         <ArrowRight
           aria-hidden
           className="size-4 text-subtle transition-[color,transform] duration-fast group-hover:text-primary motion-safe:group-hover:translate-x-0.5"

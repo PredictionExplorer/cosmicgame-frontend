@@ -87,6 +87,8 @@ export interface QuizRunnerUi {
     readonly ranksHeading: string;
     /** `{percent}` placeholder: the share of correct answers a rank starts at. */
     readonly rankFromTemplate: string;
+    /** `{percent}` placeholder: where the first rank ends (the next rank's start). */
+    readonly rankBelowTemplate: string;
   };
   /** `{current}` and `{total}` placeholders. */
   readonly progressTemplate: string;

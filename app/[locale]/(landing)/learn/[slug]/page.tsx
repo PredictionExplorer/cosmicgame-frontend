@@ -7,7 +7,6 @@ import { getLearnArticle, getLearnContent, getLearnSlugs } from '@/content/learn
 import { WHITE_PAPER_PATH, getWhitePaperContent } from '@/content/white-paper';
 
 import { getSiteRoute, resolveRouteHref, type SiteRouteId } from '@/config/siteNav';
-import { SITE_ROUTE_ICONS } from '@/config/siteNavIcons';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { SiteLink } from '@/components/layout/SiteLink';
 import { GUIDE_ICONS } from '@/components/learn/GuideCard';
@@ -35,7 +34,6 @@ interface PageProps {
 
 const TITLE_ID = 'guide-title';
 const ARTICLE_ID = 'guide-body';
-const PLATE_ID = 'guide-plate';
 
 /** The app pages where a reader checks what a guide says. */
 const VERIFY_ROUTES: readonly SiteRouteId[] = ['faq', 'contracts', 'statistics', 'riskDisclosures'];
@@ -127,6 +125,50 @@ export default async function LearnArticlePage({ params }: PageProps) {
     mainEntityOfPage: url,
   };
 
+  // The guide's Signature, rendered beside the header from lg and after the
+  // first section below it (only one of the two is displayed).
+  const plateView = plate
+    ? (width: string) => (
+        <SignaturePlate
+          art={plate}
+          href={localizeCrossHostHref(`${APP_ORIGIN}/detail/${plate.tokenId}`, locale)}
+          sizes={width === '100vw' ? '100vw' : `(min-width: 1024px) ${width}, 100vw`}
+          copy={{
+            alt: traits('quickView.title', { id: plateId }),
+            title: traits('quickView.title', { id: plateId }),
+            cycle: formatOgCycle(locale, plate.cycle),
+            unavailable: detail('image.artworkUnavailable'),
+          }}
+        />
+      )
+    : null;
+
+  // One list of the pages to read or check this guide against: the guide's
+  // own related links, then the app's reference pages it does not already
+  // name, each destination once. The app's front door takes the shared
+  // "Open the app" name.
+  const resources: { href: string; kind: ReturnType<typeof landingLink>['kind']; label: string }[] =
+    [];
+  const seen = new Set<string>();
+  const addResource = (target: ReturnType<typeof landingLink>, label: string) => {
+    const key = target.href.replace(/\/+$/, '');
+    if (seen.has(key)) return;
+    seen.add(key);
+    resources.push({ href: target.href, kind: target.kind, label });
+  };
+  for (const link of article.related) {
+    addResource(
+      landingLink(link.href, locale),
+      link.href === APP_ORIGIN ? nav('cta.openApp') : link.label,
+    );
+  }
+  for (const routeId of VERIFY_ROUTES) {
+    addResource(
+      resolveRouteHref(getSiteRoute(routeId), 'landing', locale),
+      nav(`routes.${routeId}.label`),
+    );
+  }
+
   const entries = article.sections.map((section, sectionIndex) => ({
     id: sectionId(sectionIndex),
     label: section.heading,
@@ -148,31 +190,41 @@ export default async function LearnArticlePage({ params }: PageProps) {
         ]}
       />
 
-      <PageHeader
-        variant="reading"
-        breadcrumbs={[{ label: articleUi.breadcrumbs.learnLabel, href: '/learn' }]}
-        title={article.h1}
-        titleId={TITLE_ID}
-        subtitle={article.summary}
-        meta={
-          <>
-            <span className="tabular-nums">
-              {fillTemplate(articleUi.guideTemplate, {
-                number: index + 1,
-                total: articles.length,
-              })}
-            </span>
-            <span className="tabular-nums">
-              {fillTemplate(articleUi.readingTimeTemplate, { minutes })}
-            </span>
-            <time dateTime={article.updated}>
-              {common('pageHeader.lastUpdated', {
-                date: formatYyyymmddLabel(article.updated.replaceAll('-', ''), locale),
-              })}
-            </time>
-          </>
-        }
-      />
+      {/*
+       * From lg the guide's Signature hangs beside the header, where the
+       * header left its right side empty, so the contents rail and the first
+       * section start in the first screen. On phones and tablets it follows
+       * the first section instead of pushing the text below the fold.
+       */}
+      <div className="mb-8 border-b border-rule sm:mb-10 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:items-end lg:gap-12 xl:gap-16">
+        <PageHeader
+          variant="reading"
+          breadcrumbs={[{ label: articleUi.breadcrumbs.learnLabel, href: '/learn' }]}
+          title={article.h1}
+          titleId={TITLE_ID}
+          subtitle={article.summary}
+          className="mb-0 border-b-0 sm:mb-0"
+          meta={
+            <>
+              <span className="tabular-nums">
+                {fillTemplate(articleUi.guideTemplate, {
+                  number: index + 1,
+                  total: articles.length,
+                })}
+              </span>
+              <span className="tabular-nums">
+                {fillTemplate(articleUi.readingTimeTemplate, { minutes })}
+              </span>
+              <time dateTime={article.updated}>
+                {common('pageHeader.lastUpdated', {
+                  date: formatYyyymmddLabel(article.updated.replaceAll('-', ''), locale),
+                })}
+              </time>
+            </>
+          }
+        />
+        {plateView ? <div className="hidden pb-10 lg:block">{plateView('26rem')}</div> : null}
+      </div>
 
       <div className="lg:grid lg:grid-cols-[minmax(0,14rem)_minmax(0,1fr)] lg:gap-12 xl:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] xl:gap-16">
         <div>
@@ -181,28 +233,11 @@ export default async function LearnArticlePage({ params }: PageProps) {
             copy={articleUi.contents}
             articleId={ARTICLE_ID}
             topId={TITLE_ID}
-            anchorId={PLATE_ID}
+            anchorId={TITLE_ID}
           />
         </div>
 
         <div className="min-w-0">
-          {plate ? (
-            <div id={PLATE_ID} className="max-w-[46rem]">
-              <SignaturePlate
-                art={plate}
-                priority
-                href={localizeCrossHostHref(`${APP_ORIGIN}/detail/${plate.tokenId}`, locale)}
-                sizes="(min-width: 1024px) 46rem, 100vw"
-                copy={{
-                  alt: traits('quickView.title', { id: plateId }),
-                  title: traits('quickView.title', { id: plateId }),
-                  cycle: formatOgCycle(locale, plate.cycle),
-                  unavailable: detail('image.artworkUnavailable'),
-                }}
-              />
-            </div>
-          ) : null}
-
           <article id={ARTICLE_ID} aria-labelledby={TITLE_ID} className="min-w-0 max-w-[46rem]">
             {article.sections.map((section, sectionIndex) => {
               const id = sectionId(sectionIndex);
@@ -235,10 +270,67 @@ export default async function LearnArticlePage({ params }: PageProps) {
                       </p>
                     ))}
                   </div>
+                  {sectionIndex === 0 && plateView ? (
+                    <div className="mt-10 lg:hidden">{plateView('100vw')}</div>
+                  ) : null}
                 </section>
               );
             })}
           </article>
+
+          {/*
+           * The guide's own appendix comes right after the text, under one
+           * heading, with one list of the pages to check it against; the path
+           * onward (the next guide, then the quiz) closes the page.
+           */}
+          <aside
+            aria-labelledby="guide-appendix"
+            className="mt-16 max-w-[46rem] border-t border-rule pt-10 lg:mt-20"
+          >
+            <h2 id="guide-appendix" className="sr-only">
+              {articleUi.appendixLabel}
+            </h2>
+            <div className="space-y-7">
+              {articleUi.appendix.map((section) => (
+                <div key={section.heading}>
+                  <h3 className="type-title text-foreground">{section.heading}</h3>
+                  <div className="mt-2 space-y-2">
+                    {section.body.map((paragraph) => (
+                      <p key={paragraph} className="type-body-sm text-muted-foreground">
+                        <GuideText text={paragraph} locale={locale} />
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <nav aria-labelledby="guide-resources" className="mt-10">
+              <p id="guide-resources" className="type-label text-subtle">
+                {articleUi.relatedResourcesHeading}
+              </p>
+              <ul className="mt-3 grid border-t border-rule-faint sm:grid-cols-2 sm:gap-x-8">
+                {resources.map((resource) => (
+                  <li key={resource.href} className="border-b border-rule-faint">
+                    <SiteLink
+                      href={resource.href}
+                      kind={resource.kind}
+                      className="group flex min-h-11 items-center justify-between gap-3 py-2.5 type-body-sm text-foreground hover:text-primary"
+                      externalIconClassName="ml-auto"
+                    >
+                      <span className="min-w-0">{resource.label}</span>
+                      {resource.kind === 'external' ? null : (
+                        <ArrowRight
+                          aria-hidden
+                          className="size-3.5 shrink-0 text-subtle transition-colors group-hover:text-primary"
+                        />
+                      )}
+                    </SiteLink>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </aside>
 
           <nav aria-label={next.label} className="mt-16 max-w-[46rem] lg:mt-20">
             <Link
@@ -247,9 +339,9 @@ export default async function LearnArticlePage({ params }: PageProps) {
             >
               <span className="min-w-0 flex-1">
                 <span className="flex flex-wrap items-center gap-x-3 gap-y-1 type-label text-subtle">
-                  <span className="text-secondary">{next.label}</span>
+                  <span>{next.label}</span>
                   {next.number ? (
-                    <span aria-hidden className="type-mono">
+                    <span aria-hidden className="tabular-nums">
                       {next.number}
                     </span>
                   ) : null}
@@ -271,87 +363,6 @@ export default async function LearnArticlePage({ params }: PageProps) {
             linkLabel={hub.quizCta.linkLabel}
             href={hub.quizCta.href}
           />
-
-          <aside
-            aria-label={articleUi.appendixLabel}
-            className="mt-14 grid gap-10 lg:mt-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,18rem)] lg:gap-14"
-          >
-            <div className="max-w-[var(--measure-prose)] space-y-7">
-              {articleUi.appendix.map((section) => (
-                <div key={section.heading}>
-                  <h2 className="type-title text-foreground">{section.heading}</h2>
-                  <div className="mt-2 space-y-2">
-                    {section.body.map((paragraph) => (
-                      <p key={paragraph} className="type-body-sm text-muted-foreground">
-                        <GuideText text={paragraph} locale={locale} />
-                      </p>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="space-y-8">
-              <div>
-                <h2 className="type-label text-subtle">{articleUi.relatedResourcesHeading}</h2>
-                <ul className="mt-3 divide-y divide-rule-faint border-y border-rule-faint">
-                  {article.related.map((link) => {
-                    const target = landingLink(link.href, locale);
-                    return (
-                      <li key={link.href}>
-                        <SiteLink
-                          href={target.href}
-                          kind={target.kind}
-                          className="group flex min-h-11 items-center justify-between gap-3 py-2.5 type-body-sm text-foreground hover:text-primary"
-                          externalIconClassName="ml-auto"
-                        >
-                          <span className="min-w-0">{link.label}</span>
-                          {target.kind === 'external' ? null : (
-                            <ArrowRight
-                              aria-hidden
-                              className="size-3.5 shrink-0 text-subtle transition-colors group-hover:text-primary"
-                            />
-                          )}
-                        </SiteLink>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-              <div>
-                <h2 className="type-label text-subtle">{articleUi.verifyLinksLabel}</h2>
-                <ul className="mt-3 divide-y divide-rule-faint border-y border-rule-faint">
-                  {VERIFY_ROUTES.map((routeId) => {
-                    const route = getSiteRoute(routeId);
-                    const target = resolveRouteHref(route, 'landing', locale);
-                    const Icon = SITE_ROUTE_ICONS[routeId];
-                    return (
-                      <li key={routeId}>
-                        <SiteLink
-                          href={target.href}
-                          kind={target.kind}
-                          className="group flex min-h-11 items-center gap-3 py-2.5 type-body-sm text-foreground hover:text-primary"
-                          externalIconClassName="ml-auto"
-                        >
-                          <Icon
-                            aria-hidden
-                            className="size-4 shrink-0 text-subtle transition-colors group-hover:text-primary"
-                          />
-                          <span className="min-w-0">{nav(`routes.${routeId}.label`)}</span>
-                          {target.kind === 'external' ? null : (
-                            <ArrowRight
-                              aria-hidden
-                              className="ml-auto size-3.5 shrink-0 text-subtle transition-colors group-hover:text-primary"
-                            />
-                          )}
-                        </SiteLink>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            </div>
-          </aside>
         </div>
       </div>
     </ReadingMain>

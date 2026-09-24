@@ -42,7 +42,6 @@ export const learnTextJa = {
       description:
         'Cosmic Signatureの仕組みを学ぶ：パフォーマンス・サイクル、一筆、CST、三体NFTアート、Arbitrumコントラクト、係留、公共財、そしてリスクの明確化。',
     },
-    eyebrow: 'ガイド',
     h1: 'Cosmic Signatureを知る',
     intro:
       '一筆を重ねることで、どのように作品が生まれるのでしょうか。パフォーマンス・サイクルから三体問題によるNFTアートの生成まで、Cosmic Signatureの仕組みを順に解説します。',

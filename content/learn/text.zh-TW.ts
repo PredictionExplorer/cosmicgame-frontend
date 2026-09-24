@@ -22,13 +22,12 @@ export const learnTextZhTw = {
       description:
         '了解 Cosmic Signature 的運作原理：演繹週期、落筆、CST、三體 NFT 藝術、Arbitrum 合約、錨定、公共財與風險釋疑。',
     },
-    eyebrow: '指南',
     h1: '了解 Cosmic Signature',
     intro:
       '這裡彙集了一組簡明指南，帶你讀懂 Cosmic Signature。這套程序化鏈上藝術協議運作於 Arbitrum；參與者在演繹週期中落筆，共同塑造確定性的三體 NFT 藝術。',
     breadcrumbs: {
       homeLabel: 'Cosmic Signature',
-      learnLabel: '學習中心',
+      learnLabel: '學習',
     },
     groups: {
       start: {
@@ -57,7 +56,7 @@ export const learnTextZhTw = {
   articleUi: {
     breadcrumbs: {
       homeLabel: 'Cosmic Signature',
-      learnLabel: '學習中心',
+      learnLabel: '學習',
     },
     guideTemplate: '第 {number} 篇，共 {total} 篇',
     readingTimeTemplate: '約 {minutes} 分鐘讀完',

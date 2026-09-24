@@ -42,13 +42,12 @@ export const learnTextKo = {
       description:
         'Cosmic Signature의 작동 원리를 알아봅니다. 퍼포먼스 사이클, 제스처, CST, 삼체 NFT 아트, Arbitrum 컨트랙트, 앵커링, 공공재, 위험 관련 안내를 다룹니다.',
     },
-    eyebrow: '가이드',
     h1: 'Cosmic Signature 알아보기',
     intro:
       '제스처가 쌓여 하나의 작품이 되는 과정을 알아봅니다. 퍼포먼스 사이클부터 삼체 물리로 생성되는 NFT 아트까지, Cosmic Signature의 작동 원리를 차근차근 설명합니다.',
     breadcrumbs: {
       homeLabel: 'Cosmic Signature',
-      learnLabel: '학습 센터',
+      learnLabel: '학습',
     },
     groups: {
       start: {
@@ -79,7 +78,7 @@ export const learnTextKo = {
   articleUi: {
     breadcrumbs: {
       homeLabel: 'Cosmic Signature',
-      learnLabel: '학습 센터',
+      learnLabel: '학습',
     },
     guideTemplate: '가이드 {number}/{total}',
     readingTimeTemplate: '읽는 데 약 {minutes}분',

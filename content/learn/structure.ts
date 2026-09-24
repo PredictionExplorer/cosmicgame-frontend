@@ -203,7 +203,6 @@ export type LearnText = {
       readonly title: string;
       readonly description: string;
     };
-    readonly eyebrow: string;
     readonly h1: string;
     readonly intro: string;
     readonly breadcrumbs: {

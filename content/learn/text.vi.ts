@@ -47,13 +47,12 @@ export const learnTextVi = {
       description:
         'Tìm hiểu cách Cosmic Signature hoạt động: chu kỳ trình diễn, nét bút, CST, nghệ thuật NFT ba vật thể, hợp đồng Arbitrum, neo giữ, hàng hóa công và giải đáp về rủi ro.',
     },
-    eyebrow: 'Hướng dẫn',
     h1: 'Tìm hiểu Cosmic Signature',
     intro:
       'Tìm hiểu Cosmic Signature qua các hướng dẫn về chu kỳ trình diễn, nét bút và nghệ thuật NFT ba vật thể được tạo từ dữ liệu trên Arbitrum.',
     breadcrumbs: {
       homeLabel: 'Cosmic Signature',
-      learnLabel: 'Học',
+      learnLabel: 'Tìm hiểu',
     },
     groups: {
       start: {
@@ -85,7 +84,7 @@ export const learnTextVi = {
   articleUi: {
     breadcrumbs: {
       homeLabel: 'Cosmic Signature',
-      learnLabel: 'Học',
+      learnLabel: 'Tìm hiểu',
     },
     guideTemplate: 'Hướng dẫn {number}/{total}',
     readingTimeTemplate: '{minutes} phút đọc',

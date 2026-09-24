@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import type { Metadata } from 'next';
 import { ArrowRight, Download } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
@@ -29,6 +30,9 @@ interface PageProps {
 
 /** The Signature beside the white paper card. */
 const WHITE_PAPER_PLATE = SIGNATURE_PLATES[23];
+
+/** A card names its reading time only when it tells a reader something (not "1 min read"). */
+const MIN_MINUTES_SHOWN = 3;
 
 /** Grid columns by the number of guides in a stage, so a stage never leaves a hole. */
 const STAGE_COLUMNS: Record<number, string> = {
@@ -68,53 +72,7 @@ export default async function LearnIndexPage({ params }: PageProps) {
         )}
       />
 
-      <PageHeader variant="reading" eyebrow={hub.eyebrow} title={hub.h1} subtitle={hub.intro} />
-
-      <section
-        aria-labelledby="learn-white-paper"
-        className="grid items-center gap-8 rounded-surface border border-rule bg-surface p-5 sm:p-8 md:grid-cols-[minmax(0,1fr)_minmax(0,17rem)] lg:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] lg:gap-12"
-      >
-        <div className="min-w-0">
-          <p className="type-eyebrow text-secondary">{hub.whitePaper.eyebrow}</p>
-          <h2 id="learn-white-paper" className="mt-3 type-heading-1 text-foreground">
-            {whitePaper.breadcrumbLabel}
-          </h2>
-          <p className="mt-3 max-w-[var(--measure-lede)] type-body-lg text-muted-foreground">
-            {whitePaper.hero.subtitle}
-          </p>
-          <p className="mt-3 type-label tabular-nums text-subtle">
-            {whitePaper.hero.versionLabel} · {whitePaper.hero.dateLabel} · PDF
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Link
-              href={WHITE_PAPER_PATH}
-              className={cn(buttonVariants({ size: 'lg' }), 'max-sm:w-full')}
-            >
-              {hub.whitePaper.readLabel}
-              <ArrowRight aria-hidden />
-            </Link>
-            <a
-              href={whitePaper.hero.downloadHref}
-              download
-              className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), 'max-sm:w-full')}
-            >
-              <Download aria-hidden />
-              {whitePaper.hero.downloadLabel}
-            </a>
-          </div>
-        </div>
-        <SignaturePlate
-          art={WHITE_PAPER_PLATE}
-          href={localizeCrossHostHref(`${APP_ORIGIN}/detail/${WHITE_PAPER_PLATE.tokenId}`, locale)}
-          sizes="(min-width: 1024px) 28rem, (min-width: 768px) 17rem, 100vw"
-          copy={{
-            alt: traits('quickView.title', { id: plateId }),
-            title: traits('quickView.title', { id: plateId }),
-            cycle: formatOgCycle(locale, WHITE_PAPER_PLATE.cycle),
-            unavailable: detail('image.artworkUnavailable'),
-          }}
-        />
-      </section>
+      <PageHeader variant="reading" title={hub.h1} subtitle={hub.intro} />
 
       {LEARN_GROUP_IDS.map((groupId, groupIndex) => {
         const guides = articles
@@ -123,38 +81,98 @@ export default async function LearnIndexPage({ params }: PageProps) {
         const group = hub.groups[groupId];
         const headingId = `learn-stage-${groupId}`;
         return (
-          <section
-            key={groupId}
-            aria-labelledby={headingId}
-            className={cn('mt-16 sm:mt-20', groupIndex === 0 && 'mt-14 sm:mt-16')}
-          >
-            <SectionHeader
-              headingId={headingId}
-              eyebrow={String(groupIndex + 1).padStart(2, '0')}
-              title={group.title}
-              description={group.description}
-            />
-            <ol
-              className={cn(
-                'mt-6 grid gap-4 sm:grid-cols-2 sm:gap-5',
-                STAGE_COLUMNS[guides.length] ?? 'lg:grid-cols-4',
-              )}
+          <Fragment key={groupId}>
+            <section
+              aria-labelledby={headingId}
+              className={cn('mt-16 sm:mt-20', groupIndex === 0 && 'mt-14 sm:mt-16')}
             >
-              {guides.map(({ article, number }) => (
-                <li key={article.slug} className="min-w-0">
-                  <GuideCard
-                    slug={article.slug}
-                    number={number}
-                    title={article.cardTitle}
-                    description={article.description}
-                    readingTime={fillTemplate(articleUi.readingTimeTemplate, {
-                      minutes: guideMinutes(article, locale),
-                    })}
-                  />
-                </li>
-              ))}
-            </ol>
-          </section>
+              <SectionHeader
+                headingId={headingId}
+                eyebrow={String(groupIndex + 1).padStart(2, '0')}
+                title={group.title}
+                description={group.description}
+              />
+              <ol
+                className={cn(
+                  'mt-6 grid gap-4 sm:grid-cols-2 sm:gap-5',
+                  STAGE_COLUMNS[guides.length] ?? 'lg:grid-cols-4',
+                )}
+              >
+                {guides.map(({ article, number }) => (
+                  <li key={article.slug} className="min-w-0">
+                    <GuideCard
+                      slug={article.slug}
+                      number={number}
+                      title={article.cardTitle}
+                      description={article.description}
+                      readingTime={
+                        guideMinutes(article, locale) >= MIN_MINUTES_SHOWN
+                          ? fillTemplate(articleUi.readingTimeTemplate, {
+                              minutes: guideMinutes(article, locale),
+                            })
+                          : null
+                      }
+                    />
+                  </li>
+                ))}
+              </ol>
+            </section>
+            {/* The full reference follows the first guides, so a guide leads the page. */}
+            {groupIndex === 0 ? (
+              <section
+                aria-labelledby="learn-white-paper"
+                className="mt-14 grid items-center gap-6 rounded-surface border border-rule bg-surface p-5 sm:mt-16 sm:p-7 md:grid-cols-[minmax(0,1fr)_minmax(0,15rem)] lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:gap-12"
+              >
+                <div className="min-w-0">
+                  <p className="type-eyebrow text-subtle">{hub.whitePaper.eyebrow}</p>
+                  <h2 id="learn-white-paper" className="mt-3 type-heading-2 text-foreground">
+                    {whitePaper.breadcrumbLabel}
+                  </h2>
+                  <p className="mt-3 max-w-[var(--measure-lede)] type-body-md text-muted-foreground">
+                    {whitePaper.hero.subtitle}
+                  </p>
+                  <p className="mt-3 type-label tabular-nums text-subtle">
+                    {whitePaper.hero.versionLabel} · {whitePaper.hero.dateLabel} · PDF
+                  </p>
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    <Link
+                      href={WHITE_PAPER_PATH}
+                      className={cn(buttonVariants({ size: 'lg' }), 'max-sm:w-full')}
+                    >
+                      {hub.whitePaper.readLabel}
+                      <ArrowRight aria-hidden />
+                    </Link>
+                    <a
+                      href={whitePaper.hero.downloadHref}
+                      download
+                      className={cn(
+                        buttonVariants({ variant: 'outline', size: 'lg' }),
+                        'max-sm:w-full',
+                      )}
+                    >
+                      <Download aria-hidden />
+                      {whitePaper.hero.downloadLabel}
+                    </a>
+                  </div>
+                </div>
+                <SignaturePlate
+                  className="max-md:max-w-[22rem]"
+                  art={WHITE_PAPER_PLATE}
+                  href={localizeCrossHostHref(
+                    `${APP_ORIGIN}/detail/${WHITE_PAPER_PLATE.tokenId}`,
+                    locale,
+                  )}
+                  sizes="(min-width: 1024px) 22rem, (min-width: 768px) 15rem, 100vw"
+                  copy={{
+                    alt: traits('quickView.title', { id: plateId }),
+                    title: traits('quickView.title', { id: plateId }),
+                    cycle: formatOgCycle(locale, WHITE_PAPER_PLATE.cycle),
+                    unavailable: detail('image.artworkUnavailable'),
+                  }}
+                />
+              </section>
+            ) : null}
+          </Fragment>
         );
       })}
 

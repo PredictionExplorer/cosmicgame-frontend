@@ -9,6 +9,7 @@ import {
   isQuizTierId,
   type QuizRunnerUi,
 } from '@/content/quiz';
+import { getLearnContent } from '@/content/learn';
 
 import { PageHeader } from '@/components/layout/PageHeader';
 import { DifficultyMeter } from '@/components/quiz/DifficultyMeter';
@@ -58,18 +59,26 @@ export async function generateMetadata(
   );
 }
 
-/** Where each rank starts, for the ladder: "From 50%", and nothing for the first rank. */
-function rankFloors(ui: QuizRunnerUi, locale: string): Record<QuizRankKey, string | null> {
+/**
+ * Where each rank starts, for the ladder ("From 50%"), and where the first
+ * one ends ("Below 50%"), so every step of the ladder carries its range.
+ */
+function rankFloors(ui: QuizRunnerUi, locale: string): Record<QuizRankKey, string> {
+  const lowestFloor = Math.min(
+    ...RANK_BANDS.filter(({ threshold }) => threshold > 0).map(({ threshold }) => threshold),
+  );
   return Object.fromEntries(
     RANK_BANDS.map(({ rank, threshold }) => [
       rank,
       threshold === 0
-        ? null
+        ? fillTemplate(ui.intro.rankBelowTemplate, {
+            percent: formatPercent(lowestFloor * 100, locale),
+          })
         : fillTemplate(ui.intro.rankFromTemplate, {
             percent: formatPercent(threshold * 100, locale),
           }),
     ]),
-  ) as Record<QuizRankKey, string | null>;
+  ) as Record<QuizRankKey, string>;
 }
 
 export default async function QuizTierPage({ params }: PageProps) {
@@ -78,6 +87,7 @@ export default async function QuizTierPage({ params }: PageProps) {
   if (!isQuizTierId(tierParam)) notFound();
 
   const { hub, ui, tiers } = getQuizContent(locale);
+  const learnLabel = getLearnContent(locale).hub.breadcrumbs.learnLabel;
   const tierIndex = tiers.findIndex((candidate) => candidate.id === tierParam);
   const tier = tiers[tierIndex];
   if (!tier) notFound();
@@ -108,6 +118,7 @@ export default async function QuizTierPage({ params }: PageProps) {
           breadcrumbJsonLd(
             [
               { name: hub.breadcrumbs.homeLabel, path: '/' },
+              { name: learnLabel, path: '/learn' },
               { name: hub.breadcrumbs.quizLabel, path: QUIZ_PATH },
               { name: tier.title, path: `${QUIZ_PATH}/${tier.id}` },
             ],
@@ -117,38 +128,44 @@ export default async function QuizTierPage({ params }: PageProps) {
         ]}
       />
 
-      <div className="mx-auto max-w-[46rem]">
-        <PageHeader
-          variant="reading"
-          breadcrumbs={[{ label: hub.breadcrumbs.quizLabel, href: QUIZ_PATH }]}
-          title={tier.title}
-          subtitle={tier.description}
-          meta={
-            <>
-              <span className="tabular-nums">
-                {fillTemplate(hub.questionCountTemplate, {
-                  count: formatCount(questionCount, locale),
+      {/* The header keeps the site's content edge, like every reading page;
+          only the runner holds to the reading measure. */}
+      <PageHeader
+        variant="reading"
+        breadcrumbs={[
+          { label: learnLabel, href: '/learn' },
+          { label: hub.breadcrumbs.quizLabel, href: QUIZ_PATH },
+        ]}
+        eyebrow={hub.eyebrow}
+        title={tier.title}
+        subtitle={tier.description}
+        meta={
+          <>
+            <span className="tabular-nums">
+              {fillTemplate(hub.questionCountTemplate, {
+                count: formatCount(questionCount, locale),
+              })}
+            </span>
+            <span className="tabular-nums">
+              {fillTemplate(hub.durationTemplate, {
+                minutes: estimatedMinutes(questionCount),
+              })}
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <DifficultyMeter
+                level={tierIndex + 1}
+                max={tiers.length}
+                label={fillTemplate(hub.difficultyTemplate, {
+                  level: tierIndex + 1,
+                  max: tiers.length,
                 })}
-              </span>
-              <span className="tabular-nums">
-                {fillTemplate(hub.durationTemplate, {
-                  minutes: estimatedMinutes(questionCount),
-                })}
-              </span>
-              <span className="inline-flex items-center gap-2">
-                <DifficultyMeter
-                  level={tierIndex + 1}
-                  max={tiers.length}
-                  label={fillTemplate(hub.difficultyTemplate, {
-                    level: tierIndex + 1,
-                    max: tiers.length,
-                  })}
-                />
-              </span>
-            </>
-          }
-        />
+              />
+            </span>
+          </>
+        }
+      />
 
+      <div className="max-w-[46rem]">
         <QuizRunner
           tier={tier}
           ui={ui}

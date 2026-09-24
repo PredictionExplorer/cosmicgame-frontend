@@ -42,7 +42,6 @@ function buildLearnContent(text: LearnText): LearnContent {
   return {
     hub: {
       meta: text.hub.meta,
-      eyebrow: text.hub.eyebrow,
       h1: text.hub.h1,
       intro: text.hub.intro,
       breadcrumbs: text.hub.breadcrumbs,

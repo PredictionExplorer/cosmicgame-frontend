@@ -42,7 +42,6 @@ export const learnTextEn = {
       description:
         'Learn how Cosmic Signature works: Performance Cycles, gestures, CST, three-body NFT art, Arbitrum contracts, anchoring, public goods, and risk clarifications.',
     },
-    eyebrow: 'Guides',
     h1: 'Learn Cosmic Signature',
     intro:
       'Explore how Cosmic Signature works, from your first gesture to the three-body physics behind each artwork. These guides explain Performance Cycles, protocol rules, and the records you can inspect on Arbitrum.',

@@ -31,6 +31,7 @@ export const quizTextVi = {
       startOverLabel: 'Làm lại từ đầu',
       ranksHeading: 'Cấp bậc',
       rankFromTemplate: 'Từ {percent}',
+      rankBelowTemplate: 'Dưới {percent}',
     },
     progressTemplate: 'Câu {current} trên {total}',
     correctFeedback: [
