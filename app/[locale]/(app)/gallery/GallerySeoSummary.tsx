@@ -67,38 +67,38 @@ export async function GallerySeoSummary({ actions }: { actions?: ReactNode } = {
       titleId="gallery-heading"
       subtitle={t('gallerySummary.description')}
       actions={actions}
-      className="mb-6 pb-6 sm:mb-6 sm:pb-7"
-      meta={
-        <>
-          <GalleryFacts
-            unavailable={tCommon('status.unavailable')}
-            facts={[
-              {
-                id: 'imprinted',
-                label: t('gallerySummary.cards.imprinted'),
-                value: count(stats?.NumCSTokenMints),
-              },
-              {
-                id: 'anchored',
-                label: t('gallerySummary.cards.anchored'),
-                value: count(stats?.StakeStatisticsCST?.TotalTokensStaked),
-              },
-              {
-                id: 'named',
-                label: t('gallerySummary.cards.named'),
-                value: count(stats?.TotalNamedTokens),
-              },
-              {
-                // Cycles are numbered from 0, so the current one's number is how many have finalized.
-                id: 'cycles',
-                label: t('gallerySummary.cards.cycles'),
-                value: count(dashboard.data?.CurRoundNum),
-              },
-            ]}
-          />
-          {dashboard.data ? <SnapshotStamp at={dashboard.at} /> : null}
-        </>
-      }
-    />
+      className="mb-5 pb-5 sm:mb-5 sm:pb-6"
+    >
+      {/* Closer to the lede than the header's meta line: one short label. */}
+      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 type-caption text-subtle sm:mt-4">
+        <GalleryFacts
+          unavailable={tCommon('status.unavailable')}
+          facts={[
+            {
+              id: 'imprinted',
+              label: t('gallerySummary.cards.imprinted'),
+              value: count(stats?.NumCSTokenMints),
+            },
+            {
+              id: 'anchored',
+              label: t('gallerySummary.cards.anchored'),
+              value: count(stats?.StakeStatisticsCST?.TotalTokensStaked),
+            },
+            {
+              id: 'named',
+              label: t('gallerySummary.cards.named'),
+              value: count(stats?.TotalNamedTokens),
+            },
+            {
+              // Cycles are numbered from 0, so the current one's number is how many have finalized.
+              id: 'cycles',
+              label: t('gallerySummary.cards.cycles'),
+              value: count(dashboard.data?.CurRoundNum),
+            },
+          ]}
+        />
+        {dashboard.data ? <SnapshotStamp at={dashboard.at} /> : null}
+      </div>
+    </PageHeader>
   );
 }

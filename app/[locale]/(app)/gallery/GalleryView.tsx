@@ -374,7 +374,7 @@ export function GalleryView({ search, snapshotCount = null }: GalleryViewProps) 
             total={collectionSize}
             filtered={filtered}
             onClearAll={onClearAll}
-            className="mt-4"
+            className="mt-3"
             chips={
               <GalleryActiveFilters
                 status={query.status}
@@ -408,7 +408,7 @@ export function GalleryView({ search, snapshotCount = null }: GalleryViewProps) 
             ref={resultsRef}
             id={GALLERY_RESULTS_ID}
             aria-label={t('results.regionLabel')}
-            className="mt-6 scroll-mt-[calc(var(--sticky-offset)+4.5rem)] max-lg:scroll-mt-[var(--sticky-offset)]"
+            className="mt-5 scroll-mt-[calc(var(--sticky-offset)+4.5rem)] max-lg:scroll-mt-[var(--sticky-offset)]"
           >
             <GalleryGrid
               items={visibleItems}
