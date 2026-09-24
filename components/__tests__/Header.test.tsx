@@ -178,6 +178,19 @@ describe('Header', () => {
     expect(kbd).toHaveAttribute('aria-hidden', 'true');
   });
 
+  it('keeps the shortcut hint out of the search button text, so its name contains all of it', () => {
+    render(<Header />);
+    const kbd = screen.getByTestId('search-shortcut');
+    // The keys are generated content: the button's text is its visible label
+    // alone, and that label is part of the accessible name (WCAG 2.5.3).
+    expect(kbd).toBeEmptyDOMElement();
+    expect(kbd.getAttribute('data-keys')).toMatch(/K$/);
+    const button = kbd.closest('button')!;
+    expect(button).toHaveAccessibleName('nav.search.triggerLabel');
+    expect(button).toHaveTextContent('nav.search.trigger');
+    expect(button).toHaveAttribute('aria-keyshortcuts', 'Meta+K Control+K');
+  });
+
   it.each([
     ['/current-cycle', 'nav.menus.explore'],
     ['/allocation-finalized', 'nav.menus.explore'],
@@ -306,11 +319,11 @@ describe('Header', () => {
     expect(learn).toHaveAttribute('aria-expanded', 'false');
   });
 
-  it('names the current language on its control', () => {
+  it('names the current language on its control, with the short name it shows', () => {
     render(<Header />);
     expect(
       within(screen.getByRole('banner')).getByRole('button', {
-        name: 'common.languageSwitcher.current(language=English)',
+        name: 'common.languageSwitcher.currentShort(language=English,short=EN)',
       }),
     ).toBeInTheDocument();
   });

@@ -5,7 +5,8 @@
   },
   "languageSwitcher": {
     "label": "Language",
-    "current": "Language: {language}"
+    "current": "Language: {language}",
+    "currentShort": "Language: {language} ({short})"
   },
   "themeSwitcher": {
     "label": "Color scheme",

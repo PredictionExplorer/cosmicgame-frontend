@@ -5,7 +5,8 @@
   },
   "languageSwitcher": {
     "label": "Мова",
-    "current": "Мова: {language}"
+    "current": "Мова: {language}",
+    "currentShort": "Мова: {language} ({short})"
   },
   "themeSwitcher": {
     "label": "Кольорова схема",

@@ -55,7 +55,8 @@ interface LanguageSwitcherProps {
    * full name from there. `drawer`: a full-width row for a drawer's
    * preferences. Every variant opens the same radio menu, where choosing a
    * language is an explicit action (never a change of context on input), and
-   * every trigger is named "Language: <current language>".
+   * every trigger is named "Language: <current language>" (the responsive
+   * one adds the short name it shows: "Language: English (EN)").
    */
   variant?: LanguageSwitcherVariant;
 }
@@ -75,10 +76,15 @@ export function LanguageSwitcher({ className, variant = 'pill' }: LanguageSwitch
   const label = t('languageSwitcher.label');
   const current = LOCALE_LABELS[locale as AppLocale] ?? locale;
   const short = pickByLocale(LOCALE_SHORT_LABELS, locale);
-  // The visible name (full or short) is the current language's, so the
-  // trigger's name carries it too (WCAG 2.5.3), and screen readers hear
-  // which language is active.
+  // The visible name is the current language's, so the trigger's name
+  // carries it too (WCAG 2.5.3), and screen readers hear which language is
+  // active. The responsive trigger can show the short form ("UK", "简中"), so
+  // its name holds both forms whenever they differ.
   const triggerName = t('languageSwitcher.current', { language: current });
+  const responsiveName =
+    short === current
+      ? triggerName
+      : t('languageSwitcher.currentShort', { language: current, short });
 
   const switchTo = (next: string) => {
     if (next === locale || !routing.locales.includes(next as AppLocale)) return;
@@ -121,7 +127,7 @@ export function LanguageSwitcher({ className, variant = 'pill' }: LanguageSwitch
       <Button
         variant="ghost"
         size="icon"
-        aria-label={triggerName}
+        aria-label={responsiveName}
         className={cn(
           TRIGGER_CLASS,
           'size-11 shrink-0 gap-1.5 text-xs font-medium sm:size-10 xl:w-auto xl:pl-3 xl:pr-2.5',

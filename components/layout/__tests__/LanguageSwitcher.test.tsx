@@ -23,8 +23,11 @@ jest.mock('next/navigation', () => ({
   usePathname: () => '/gallery',
 }));
 
-/** Every trigger is named "Language: <current language>". */
-const TRIGGER = { name: /^common\.languageSwitcher\.current\(/ };
+/**
+ * Every trigger is named "Language: <current language>"; the responsive one
+ * adds the short name it shows at mid widths.
+ */
+const TRIGGER = { name: /^common\.languageSwitcher\.current(Short)?\(/ };
 
 describe('LanguageSwitcher', () => {
   beforeEach(() => {
@@ -112,12 +115,37 @@ describe('LanguageSwitcher', () => {
       render(<LanguageSwitcher variant="responsive" />);
       const trigger = screen.getByRole('button', TRIGGER);
       expect(trigger).toHaveAccessibleName(
-        `common.languageSwitcher.current(${LOCALE_LABELS['zh-TW']})`,
+        `common.languageSwitcher.currentShort(${LOCALE_LABELS['zh-TW']},${LOCALE_SHORT_LABELS['zh-TW']})`,
       );
       const short = within(trigger).getByText(LOCALE_SHORT_LABELS['zh-TW']);
       expect(short).toHaveClass('hidden', 'xl:inline', '2xl:hidden');
       expect(short).toHaveAttribute('lang', 'zh-TW');
       expect(within(trigger).getByText(LOCALE_LABELS['zh-TW'])).toHaveClass('2xl:inline');
+    });
+
+    it.each(routing.locales)(
+      'puts both visible forms of the name in the accessible name (%s, WCAG 2.5.3)',
+      (locale) => {
+        mockLocale = locale;
+        render(<LanguageSwitcher variant="responsive" />);
+        const trigger = screen.getByRole('button', TRIGGER);
+        const name = trigger.getAttribute('aria-label') ?? '';
+        // Whichever label the width shows (the short one from 1280px, the full
+        // one from 1536px) is part of the name, so voice control can say it.
+        for (const span of trigger.querySelectorAll('span[lang]')) {
+          expect(name).toContain(span.textContent);
+        }
+        expect(name).toContain(LOCALE_SHORT_LABELS[locale]);
+        expect(name).toContain(LOCALE_LABELS[locale]);
+      },
+    );
+
+    it('names a language whose short form is its full name once', () => {
+      mockLocale = 'ja';
+      render(<LanguageSwitcher variant="responsive" />);
+      expect(screen.getByRole('button', TRIGGER)).toHaveAccessibleName(
+        `common.languageSwitcher.current(${LOCALE_LABELS.ja})`,
+      );
     });
 
     it('gives the two Traditional Chinese editions different short names', () => {

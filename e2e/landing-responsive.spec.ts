@@ -211,7 +211,8 @@ test.describe('Landing responsive regressions', () => {
         return;
       }
 
-      const languages = page.getByRole('button', { name: 'Language: English', exact: true });
+      // "(EN)" is added where the header shows the short name (1280–1535px).
+      const languages = page.getByRole('button', { name: /^Language: English( \(EN\))?$/ });
       await languages.focus();
       await page.keyboard.press('Enter');
       const menu = page.getByRole('menu');

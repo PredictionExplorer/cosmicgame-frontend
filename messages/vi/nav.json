@@ -254,7 +254,7 @@
   },
   "search": {
     "trigger": "Tìm kiếm",
-    "triggerLabel": "Tìm trang và bản ghi",
+    "triggerLabel": "Tìm kiếm trang và bản ghi",
     "title": "Tìm kiếm trên Cosmic Signature",
     "placeholder": "Tìm trang, hoặc dán địa chỉ, token, chu kỳ hay ID nét bút",
     "placeholderShort": "Tìm trang, địa chỉ, ID",

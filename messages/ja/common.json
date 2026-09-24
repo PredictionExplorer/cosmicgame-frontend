@@ -5,7 +5,8 @@
   },
   "languageSwitcher": {
     "label": "言語",
-    "current": "言語：{language}"
+    "current": "言語：{language}",
+    "currentShort": "言語：{language}（{short}）"
   },
   "themeSwitcher": {
     "label": "カラーテーマ",

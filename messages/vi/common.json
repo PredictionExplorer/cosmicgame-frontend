@@ -5,7 +5,8 @@
   },
   "languageSwitcher": {
     "label": "Ngôn ngữ",
-    "current": "Ngôn ngữ: {language}"
+    "current": "Ngôn ngữ: {language}",
+    "currentShort": "Ngôn ngữ: {language} ({short})"
   },
   "themeSwitcher": {
     "label": "Bảng màu",

@@ -5,7 +5,8 @@
   },
   "languageSwitcher": {
     "label": "언어",
-    "current": "언어: {language}"
+    "current": "언어: {language}",
+    "currentShort": "언어: {language} ({short})"
   },
   "themeSwitcher": {
     "label": "색상 테마",

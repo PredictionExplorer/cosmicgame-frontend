@@ -5,7 +5,8 @@
   },
   "languageSwitcher": {
     "label": "语言",
-    "current": "语言：{language}"
+    "current": "语言：{language}",
+    "currentShort": "语言：{language}，简称{short}"
   },
   "themeSwitcher": {
     "label": "配色",

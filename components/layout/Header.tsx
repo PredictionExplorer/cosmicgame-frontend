@@ -58,17 +58,19 @@ function SearchTrigger({ onOpen }: { onOpen: () => void }) {
       <span className="hidden text-sm xl:inline">{t('search.trigger')}</span>
       {/* The glyph is known only on the client ("⌘K" or "Ctrl K"). The key cap
           is always rendered at a width that fits either, invisible until
-          then, so the pill does not grow after hydration. */}
+          then, so the pill does not grow after hydration. It is a hint, not
+          part of the label: drawn as generated content, so the button's
+          text is "Search" alone, inside its name (WCAG 2.5.3), and
+          aria-keyshortcuts announces the keys. */}
       <kbd
         aria-hidden
         data-testid="search-shortcut"
+        data-keys={shortcut ?? '⌘K'}
         className={cn(
-          'type-caption ml-3 hidden h-6 min-w-12 items-center justify-center rounded-edge border border-rule px-1.5 font-sans text-subtle xl:inline-flex',
+          'type-caption ml-3 hidden h-6 min-w-12 items-center justify-center rounded-edge border border-rule px-1.5 font-sans text-subtle after:content-[attr(data-keys)] xl:inline-flex',
           !shortcut && 'invisible',
         )}
-      >
-        {shortcut ?? '⌘K'}
-      </kbd>
+      />
     </button>
   );
 }
