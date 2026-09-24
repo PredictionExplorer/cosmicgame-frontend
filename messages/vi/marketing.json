@@ -47,6 +47,7 @@
     "emailCopied": "Đã sao chép địa chỉ email"
   },
   "address": {
+    "parent": "Phân bổ truyền thông",
     "title": "Phân bổ truyền thông đã nhận",
     "lede": "CST địa chỉ này đã nhận từ Dự trữ truyền thông.",
     "profile": "Hồ sơ người tham gia",

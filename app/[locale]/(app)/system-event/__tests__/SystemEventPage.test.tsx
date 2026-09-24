@@ -126,9 +126,10 @@ describe('SystemEventPage', () => {
     render(<SystemEventPage round={1} start={100} end={200} />);
     const links = screen.getAllByRole('link', { name: /All coordination changes/ });
     expect(links[0]).toHaveAttribute('href', '/coordination-changes');
-    expect(
-      screen.getByRole('link', { name: 'nav.routes.coordinationChanges.label' }),
-    ).toHaveAttribute('href', '/coordination-changes');
+    expect(screen.getByRole('link', { name: 'Coordination changes' })).toHaveAttribute(
+      'href',
+      '/coordination-changes',
+    );
   });
 
   describe('a failed read', () => {

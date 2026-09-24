@@ -8,7 +8,6 @@ import { Link } from '@/i18n/navigation';
 import { formatCount } from '@/utils/format';
 import { reportError } from '@/utils/errors';
 import { useSystemEvents } from '@/hooks/useApiQuery';
-import { useSiteNavCopy } from '@/components/layout/siteNavCopy';
 import { LedgerPage } from '@/components/ledger/LedgerPage';
 import { PageHeader, type PageHeaderFigure } from '@/components/layout/PageHeader';
 import { AdminEventsTable, type AdminEventRow } from '@/components/tables/AdminEventsTable';
@@ -50,7 +49,6 @@ const SystemEventPage = (props: SystemEventPageProps) => {
   const { round, start, end } = props;
   const t = useTranslations('coordination');
   const tTables = useTranslations('tables');
-  const nav = useSiteNavCopy();
   const locale = useLocale();
   const valid = isValidWindow(props);
   const { data, isLoading, error, refetch } = useSystemEvents(valid ? start : -1, valid ? end : -1);
@@ -59,7 +57,8 @@ const SystemEventPage = (props: SystemEventPageProps) => {
     if (error) reportError(error, 'fetch system events');
   }, [error]);
 
-  const trail = [{ label: nav.routeLabel('coordinationChanges'), href: '/coordination-changes' }];
+  // The ledger's own title, so the trail reads as the page it leads back to.
+  const trail = [{ label: t('page.title'), href: '/coordination-changes' }];
   const allChanges = (
     <Link
       href="/coordination-changes"

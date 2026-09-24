@@ -47,6 +47,7 @@
     "emailCopied": "邮箱地址已复制"
   },
   "address": {
+    "parent": "推广分配",
     "title": "获得的推广分配",
     "lede": "此地址从推广储备获得的 CST。",
     "profile": "参与者主页",

@@ -46,7 +46,7 @@ describe('ChangedParameters', () => {
     mockUseSystemModelist.mockReturnValue({ data: null, isLoading: false });
     mockUseSystemEvents.mockReturnValue({ data: [], isLoading: false });
     render(<ChangedParameters />);
-    expect(screen.getByText('Coordination Changes')).toBeInTheDocument();
+    expect(screen.getByText('Coordination changes')).toBeInTheDocument();
   });
 
   it('renders events table without a connected wallet', () => {

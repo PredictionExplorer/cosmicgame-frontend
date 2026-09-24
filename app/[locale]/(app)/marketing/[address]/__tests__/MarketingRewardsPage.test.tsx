@@ -48,9 +48,10 @@ describe('MarketingRewardsPage', () => {
     expect(
       screen.getByText('CST this address has received from the Outreach Reserve.'),
     ).toBeVisible();
-    expect(
-      screen.getByRole('link', { name: 'nav.routes.outreachAllocations.label' }),
-    ).toHaveAttribute('href', '/marketing');
+    expect(screen.getByRole('link', { name: 'Outreach allocations' })).toHaveAttribute(
+      'href',
+      '/marketing',
+    );
     expect(screen.getByRole('link', { name: 'Participant profile' })).toHaveAttribute(
       'href',
       expect.stringMatching(/^\/user\/0x[0-9a-fA-F]{40}$/),

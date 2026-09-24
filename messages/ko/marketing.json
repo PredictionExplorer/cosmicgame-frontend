@@ -47,6 +47,7 @@
     "emailCopied": "이메일 주소를 복사했습니다"
   },
   "address": {
+    "parent": "홍보 배분",
     "title": "받은 홍보 배분",
     "lede": "이 주소가 홍보 준비금에서 받은 CST입니다.",
     "profile": "참여자 프로필",

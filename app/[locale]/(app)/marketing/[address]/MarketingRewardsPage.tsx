@@ -36,14 +36,13 @@ interface MarketingRewardsPageProps {
  */
 export default function MarketingRewardsPage({ address: rawAddress }: MarketingRewardsPageProps) {
   const t = useTranslations('marketing');
-  const tNav = useTranslations('nav');
   const locale = useLocale();
   const address = isAddress(rawAddress.toLowerCase()) ? getAddress(rawAddress.toLowerCase()) : null;
   const query = useMarketingRewardsByUser(address ?? undefined);
   const rewards = query.data ?? NO_REWARDS;
   const summary = useMemo(() => summarizeOutreachAllocations(rewards), [rewards]);
 
-  const trail = [{ label: tNav('routes.outreachAllocations.label'), href: '/marketing' }];
+  const trail = [{ label: t('address.parent'), href: '/marketing' }];
 
   // While the list loads a figure is a skeleton; when it fails, the header's
   // unavailable dash (`null`). With no allocations there are no dates to show.

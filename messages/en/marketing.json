@@ -47,6 +47,7 @@
     "emailCopied": "Email address copied"
   },
   "address": {
+    "parent": "Outreach allocations",
     "title": "Outreach allocations received",
     "lede": "CST this address has received from the Outreach Reserve.",
     "profile": "Participant profile",

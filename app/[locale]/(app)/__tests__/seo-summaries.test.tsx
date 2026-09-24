@@ -404,8 +404,8 @@ describe('server-rendered page headers', () => {
 
   it.each([
     ['anchoring' as const, 'Anchor Distributions', 'records', null],
-    ['marketing' as const, 'Outreach Allocations', 'records', null],
-    ['eth-contribution' as const, 'Direct ETH Contributions', 'records', null],
+    ['marketing' as const, 'Outreach allocations', 'records', null],
+    ['eth-contribution' as const, 'Direct ETH contributions', 'records', null],
     ['attached-nfts' as const, 'Attached NFT Contributions', 'collection', '/gallery'],
     ['named-nfts' as const, 'Named Cosmic Signature NFTs', 'collection', '/gallery'],
     ['used-rwlk-nfts' as const, 'Used RandomWalk NFTs', 'collection', '/gallery'],
