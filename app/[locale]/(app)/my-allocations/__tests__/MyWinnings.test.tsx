@@ -203,6 +203,28 @@ describe('MyWinnings', () => {
     expect(screen.queryByTestId('retrieval-summary')).not.toBeInTheDocument();
   });
 
+  it('shows the error state, never "nothing to retrieve", when the attached-token read fails', () => {
+    withItems({ deposits: [], nfts: [] });
+    mockUseDonationsERC20ByUser.mockReturnValue(
+      query(undefined, { isError: true, refetch: mockRefetchERC20 }),
+    );
+    render(<MyWinnings />);
+    expect(screen.getByText('myPages.allocations.loadErrorTitle')).toBeInTheDocument();
+    expect(screen.queryByText('myPages.allocations.nothing.title')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('retrieve-everything')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /try again/i }));
+    expect(mockRefetchERC20).toHaveBeenCalledTimes(1);
+  });
+
+  it('never offers "Retrieve everything" without the tokens when only the token read fails', () => {
+    mockUseDonationsERC20ByUser.mockReturnValue(
+      query(undefined, { isError: true, refetch: mockRefetchERC20 }),
+    );
+    render(<MyWinnings />);
+    expect(screen.queryByTestId('retrieval-summary')).not.toBeInTheDocument();
+    expect(mockRetrieveEverything).not.toHaveBeenCalled();
+  });
+
   it('leads with what is ready: the ETH total, the NFT and token counts', () => {
     render(<MyWinnings />);
     const summary = screen.getByTestId('retrieval-summary');

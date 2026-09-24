@@ -74,6 +74,7 @@ export default function MyWinnings() {
   const {
     data: tokensRaw,
     isLoading: loadingTokens,
+    isError: tokensError,
     refetch: refetchTokens,
   } = useDonationsERC20ByUser(account);
 
@@ -172,7 +173,10 @@ export default function MyWinnings() {
     />
   );
 
-  if (nftError || depositsError) {
+  // Any list that could not be read makes every total below a guess: a token read that failed
+  // would show "0 attached tokens", leave them out of "Retrieve everything" and could even say
+  // there is nothing to retrieve, while after the deadline anyone may take them.
+  if (nftError || depositsError || tokensError) {
     return (
       <PageShell variant="data" backdrop="signature">
         {header}
