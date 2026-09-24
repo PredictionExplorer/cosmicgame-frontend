@@ -69,8 +69,20 @@ function LatestGestureProgress({
     );
   }
 
+  // The holder is extending the record: a bar measured against their own
+  // record would read "100% · 11d of 11d". One line says what is happening.
+  if (latest.isExtendingEnduranceRecord) {
+    return (
+      <p
+        data-testid="latest-participant-remaining"
+        className={cn('type-caption text-positive', compact ? 'px-2.5 py-1.5' : 'mt-3 px-3 py-2')}
+      >
+        {t('specialAllocation.extendingRecord')}
+      </p>
+    );
+  }
+
   const progress = Math.floor(latest.progressToEnduranceChampion);
-  const isComplete = latest.isExtendingEnduranceRecord;
   const remainingCopy = latest.isCurrentEnduranceChampion
     ? t('specialAllocation.needsToExtend', {
         duration: formatSeconds(latest.secondsUntilEnduranceChampion, locale),
@@ -87,11 +99,8 @@ function LatestGestureProgress({
       )}
     >
       <div className="flex items-center justify-between gap-3">
-        <span
-          data-testid="latest-participant-remaining"
-          className={cn('text-xs', isComplete ? 'text-emerald-300' : 'text-muted-foreground')}
-        >
-          {isComplete ? t('specialAllocation.extendingRecord') : remainingCopy}
+        <span data-testid="latest-participant-remaining" className="text-xs text-muted-foreground">
+          {remainingCopy}
         </span>
         <span className="shrink-0 font-mono text-xs tabular-nums text-primary">{progress}%</span>
       </div>
@@ -108,7 +117,7 @@ function LatestGestureProgress({
           style={{ width: `${latest.progressToEnduranceChampion}%` }}
         />
       </div>
-      {!dashboard && (
+      {!dashboard && latest.durationToBeat > 0 && (
         <p className="mt-1 text-[10px] text-muted-foreground">
           {t('specialAllocation.progressAmounts', {
             current: formatSeconds(latest.holdDuration, locale),

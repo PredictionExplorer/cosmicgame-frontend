@@ -571,6 +571,38 @@ describe('SpecialAllocationRecipients', () => {
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
+  it('shows an empty Chrono-Warrior card as its empty line only (no 0s reign, no record chip)', () => {
+    mockUseChampions.mockReturnValue({
+      ...baseChampions,
+      chrono: {
+        ...baseChampions.chrono,
+        address: null,
+        duration: 0,
+        lockedDuration: 0,
+        isLive: true,
+      },
+    });
+
+    render(<SpecialAllocationRecipients />);
+
+    const chronoCard = screen.getByTestId('special-allocation-card-chrono-warrior');
+    expect(chronoCard).toHaveTextContent('tables.specialAllocation.noChronoRecord');
+    expect(chronoCard).not.toHaveTextContent('tables.specialAllocation.recordStanding');
+    expect(chronoCard).not.toHaveTextContent('tables.specialAllocation.growingNow');
+    expect(chronoCard).not.toHaveTextContent('tables.specialAllocation.championReign');
+  });
+
+  it('says the holder is extending the record instead of a 100% bar against their own record', () => {
+    render(<SpecialAllocationRecipients latestGesture={makeLatestGesture()} />);
+
+    const latestCard = screen.getByTestId('special-allocation-card-latest-participant');
+    expect(screen.getByTestId('latest-participant-remaining')).toHaveTextContent(
+      'tables.specialAllocation.extendingRecord',
+    );
+    expect(latestCard.querySelector('[role="progressbar"]')).toBeNull();
+    expect(latestCard).not.toHaveTextContent('tables.specialAllocation.progressAmounts');
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(<SpecialAllocationRecipients />);
     await checkA11y(container);

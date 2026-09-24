@@ -340,12 +340,16 @@ export const SpecialAllocationRecipients = ({
       title: t('specialAllocation.chronoWarrior'),
       tooltip: t('specialAllocation.chronoTooltip'),
       address: champions.chrono.address,
-      duration: champions.chrono.duration,
+      // With no Chrono-Warrior yet the card is only its empty line: no "0s"
+      // reign and no "Record standing" chip for a record that does not exist.
+      duration: champions.chrono.address ? champions.chrono.duration : undefined,
       durationLabel: t('specialAllocation.championReign'),
-      isLive: champions.chrono.isLive,
-      statusText: champions.chrono.isLive
-        ? t('specialAllocation.growingNow')
-        : t('specialAllocation.recordStanding'),
+      isLive: champions.chrono.address ? champions.chrono.isLive : undefined,
+      statusText: !champions.chrono.address
+        ? undefined
+        : champions.chrono.isLive
+          ? t('specialAllocation.growingNow')
+          : t('specialAllocation.recordStanding'),
       emptyText: t('specialAllocation.noChronoRecord'),
       accent: 'primary',
       extra: (
