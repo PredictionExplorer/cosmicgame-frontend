@@ -256,8 +256,8 @@
     "snapshot": {
       "cosmicSignatureLabel": "係留中のCosmic Signature NFT",
       "cosmicSignatureTooltip": "プロトコルに現在係留され、係留配分を分け合っているCosmic Signature NFTの総数。",
-      "randomWalkLabel": "係留中のRandomWalk NFT",
-      "randomWalkTooltip": "現在係留され、係留NFT星選の対象となっているRandomWalk NFTの総数。",
+      "randomWalkLabel": "係留中のRandom Walk NFT",
+      "randomWalkTooltip": "現在係留され、係留NFT星選の対象となっているRandom Walk NFTの総数。",
       "poolLabel": "係留配分プール",
       "poolTooltip": "Cosmic Signature NFTの係留者のために係留配分プールに現在配分されているETH。",
       "poolCaption": "このサイクルの確定時に積み立てられます。以前の積立分でまだ受け取られていないものは「未受け取り」に表示されます。",
@@ -265,11 +265,11 @@
       "perNftTooltip": "係留中のCosmic Signature NFT 1点あたりの現在のETH係留配分：オンチェーンのプールを、インデックス済みの係留NFT総数で割った値。",
       "perNftNoneAnchored": "係留中のCosmic Signature NFTはまだインデックスされていません",
       "activeHoldersLabel": "活動中の係留者",
-      "activeHoldersTooltip": "Cosmic Signature NFTまたはRandomWalk NFTを少なくとも1点現在係留している異なるウォレットの数です。両方を係留しているウォレットは1つとして数えます。"
+      "activeHoldersTooltip": "Cosmic Signature NFTまたはRandom Walk NFTを少なくとも1点現在係留している異なるウォレットの数です。両方を係留しているウォレットは1つとして数えます。"
     },
-    "description": "係留されたNFTはCosmic Signatureの中核です。Cosmic Signature NFTはETHの係留配分を分け合い、RandomWalk NFTは係留NFT星選に参加します。",
+    "nowTitle": "現在の係留",
+    "description": "係留されたNFTはCosmic Signatureの中核です。Cosmic Signature NFTはETHの係留配分を分け合い、Random Walk NFTは係留NFT星選に参加します。",
     "historyLink": "係留の履歴を見る",
-    "tableDescription": "下のタブで、係留 / 解除の操作、現在係留中のトークン、そして係留の全体合計を支えるユニークなウォレットを調べられます。",
     "tabs": {
       "cosmicSignature": "Cosmic Signature NFT",
       "randomWalk": "RandomWalk NFT"

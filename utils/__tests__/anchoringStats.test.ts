@@ -1,8 +1,4 @@
-import {
-  countActiveAnchorHolders,
-  distributionPerAnchoredNft,
-  formatPerNftEth,
-} from '../anchoringStats';
+import { countActiveAnchorHolders, distributionPerAnchoredNft } from '../anchoringStats';
 
 describe('distributionPerAnchoredNft', () => {
   it('divides the pool by the anchored count', () => {
@@ -26,13 +22,6 @@ describe('distributionPerAnchoredNft', () => {
     [-1, 10],
   ])('reports pool %p and count %p as unavailable', (pool, count) => {
     expect(distributionPerAnchoredNft(pool, count)).toEqual({ status: 'unavailable' });
-  });
-});
-
-describe('formatPerNftEth', () => {
-  it('formats the figure', () => {
-    expect(formatPerNftEth(0.5)).toBe('0.500000 ETH');
-    expect(formatPerNftEth(0)).toBe('0 ETH');
   });
 });
 

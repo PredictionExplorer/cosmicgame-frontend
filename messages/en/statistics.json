@@ -254,22 +254,22 @@
   },
   "anchoringPage": {
     "snapshot": {
-      "cosmicSignatureLabel": "Cosmic Signature NFTs Anchored",
+      "cosmicSignatureLabel": "Cosmic Signature NFTs anchored",
       "cosmicSignatureTooltip": "Total number of Cosmic Signature NFTs currently anchored in the protocol and sharing Anchor Distributions.",
-      "randomWalkLabel": "Random Walk NFTs Anchored",
+      "randomWalkLabel": "Random Walk NFTs anchored",
       "randomWalkTooltip": "Total number of Random Walk NFTs currently anchored and eligible for Anchored-NFT Stellar Selection.",
-      "poolLabel": "Anchor Distribution Pool",
+      "poolLabel": "Anchor Distribution pool",
       "poolTooltip": "ETH currently allocated to the Anchor Distribution pool for Cosmic Signature NFT anchor-holders.",
       "poolCaption": "Deposited when this cycle finalizes; earlier deposits not yet retrieved show as Unretrieved.",
       "perNftLabel": "Distribution per Cosmic Signature NFT",
       "perNftTooltip": "Current ETH Anchor Distribution per anchored Cosmic Signature NFT: on-chain pool divided by the indexed total of anchored NFTs.",
       "perNftNoneAnchored": "No anchored Cosmic Signature NFTs indexed yet",
-      "activeHoldersLabel": "Active Anchor-holders",
-      "activeHoldersTooltip": "Distinct wallets that currently anchor at least one Cosmic Signature or RandomWalk NFT. A wallet anchoring both kinds counts once."
+      "activeHoldersLabel": "Active anchor-holders",
+      "activeHoldersTooltip": "Distinct wallets that currently anchor at least one Cosmic Signature or Random Walk NFT. A wallet anchoring both kinds counts once."
     },
+    "nowTitle": "Anchoring now",
     "description": "Anchored NFTs are a core part of Cosmic Signature: Cosmic Signature NFTs share ETH Anchor Distributions, while Random Walk NFTs participate in Anchored-NFT Stellar Selection.",
-    "historyLink": "View anchor history",
-    "tableDescription": "Use the tabs below to inspect anchor/release actions, currently anchored tokens, and the unique wallets behind the global anchoring totals.",
+    "historyLink": "Anchor Distributions history",
     "tabs": {
       "cosmicSignature": "Cosmic Signature NFT",
       "randomWalk": "Random Walk NFT"

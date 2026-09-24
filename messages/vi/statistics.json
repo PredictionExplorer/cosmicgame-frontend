@@ -256,8 +256,8 @@
     "snapshot": {
       "cosmicSignatureLabel": "Cosmic Signature NFT đang neo giữ",
       "cosmicSignatureTooltip": "Tổng số Cosmic Signature NFT hiện đang neo giữ trong giao thức và chia sẻ phân phối neo giữ.",
-      "randomWalkLabel": "RandomWalk NFT đang neo giữ",
-      "randomWalkTooltip": "Tổng số RandomWalk NFT hiện đang neo giữ và thuộc diện Tinh tuyển NFT neo giữ.",
+      "randomWalkLabel": "Random Walk NFT đang neo giữ",
+      "randomWalkTooltip": "Tổng số Random Walk NFT hiện đang neo giữ và thuộc diện Tinh tuyển NFT neo giữ.",
       "poolLabel": "Quỹ phân phối neo giữ",
       "poolTooltip": "ETH hiện được phân bổ vào quỹ phân phối neo giữ cho những người neo giữ Cosmic Signature NFT.",
       "poolCaption": "Được nạp khi chu kỳ này hoàn tất; các đợt nạp trước chưa nhận về hiển thị ở mục “Chưa nhận về”.",
@@ -265,11 +265,11 @@
       "perNftTooltip": "Phân phối neo giữ ETH hiện tại trên mỗi Cosmic Signature NFT đang neo giữ: quỹ trên chuỗi chia cho tổng số NFT neo giữ đã lập chỉ mục.",
       "perNftNoneAnchored": "Chưa lập chỉ mục Cosmic Signature NFT nào đang neo giữ",
       "activeHoldersLabel": "Người neo giữ đang hoạt động",
-      "activeHoldersTooltip": "Số ví khác nhau hiện neo giữ ít nhất một Cosmic Signature NFT hoặc RandomWalk NFT. Ví neo giữ cả hai loại chỉ được tính một lần."
+      "activeHoldersTooltip": "Số ví khác nhau hiện neo giữ ít nhất một Cosmic Signature NFT hoặc Random Walk NFT. Ví neo giữ cả hai loại chỉ được tính một lần."
     },
-    "description": "NFT đang neo giữ là phần cốt lõi của Cosmic Signature: Cosmic Signature NFT chia sẻ phân phối neo giữ ETH, còn RandomWalk NFT tham gia Tinh tuyển NFT neo giữ.",
+    "nowTitle": "Neo giữ hiện tại",
+    "description": "NFT đang neo giữ là phần cốt lõi của Cosmic Signature: Cosmic Signature NFT chia sẻ phân phối neo giữ ETH, còn Random Walk NFT tham gia Tinh tuyển NFT neo giữ.",
     "historyLink": "Xem lịch sử neo giữ",
-    "tableDescription": "Dùng các thẻ bên dưới để xem thao tác neo giữ/gỡ neo, token đang neo giữ và những ví riêng biệt phía sau các tổng số neo giữ toàn cầu.",
     "tabs": {
       "cosmicSignature": "Cosmic Signature NFT",
       "randomWalk": "RandomWalk NFT"
