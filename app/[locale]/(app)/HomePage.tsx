@@ -943,6 +943,8 @@ const HomePage = ({
       <Sheet open={gestureSheetOpen} onOpenChange={setGestureSheetOpen}>
         <SheetContent
           side="bottom"
+          // The panel speaks for itself; there is no separate description.
+          aria-describedby={undefined}
           className="max-h-[88dvh] overflow-y-auto rounded-t-surface border-rule bg-surface-raised px-4 pb-0 pt-5 md:hidden"
         >
           <SheetTitle className="sr-only">{t('observatory.panel.sheetTitle')}</SheetTitle>
