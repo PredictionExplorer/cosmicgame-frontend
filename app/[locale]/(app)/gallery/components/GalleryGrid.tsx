@@ -8,11 +8,8 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { SkeletonTable } from '@/components/ui/skeleton';
-import {
-  SIGNATURE_GRID_CLASS,
-  SignatureCard,
-  SignatureGridSkeleton,
-} from '@/components/nft/SignatureCard';
+import { SignatureCard } from '@/components/nft/SignatureCard';
+import { SIGNATURE_GRID_CLASS, SignatureGridSkeleton } from '@/components/nft/SignatureGrid';
 
 import type { ViewMode } from '../galleryQuery';
 

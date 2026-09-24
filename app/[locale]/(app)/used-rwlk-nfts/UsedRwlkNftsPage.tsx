@@ -20,7 +20,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
 import { PageShell } from '@/components/ui/page-shell';
 import { TablePagination } from '@/components/ui/pagination';
-import { SIGNATURE_GRID_CLASS, SignatureGridSkeleton } from '@/components/nft/SignatureCard';
+import { SIGNATURE_GRID_CLASS, SignatureGridSkeleton } from '@/components/nft/SignatureGrid';
 import { cn } from '@/lib/utils';
 
 /** One RandomWalk NFT a gesture used. */

@@ -1,3 +1,4 @@
+import { formatAddress } from '@/utils/format';
 import AttachedNFTDistributionTable from '@/components/attachments/AttachedNFTDistributionTable';
 
 import { render, screen, checkA11y } from '@/test-utils';
@@ -21,8 +22,16 @@ describe('AttachedNFTDistributionTable', () => {
       },
     ];
     render(<AttachedNFTDistributionTable list={mockData} />);
-    expect(screen.getByText(mockData[0]!.ContractAddr)).toBeInTheDocument();
-    expect(screen.getByText(mockData[0]!.NumDonatedTokens)).toBeInTheDocument();
+    // The contract reads short and links to the explorer with its full address.
+    const contract = screen.getByRole('link', {
+      name: new RegExp(formatAddress(mockData[0]!.ContractAddr)),
+    });
+    expect(contract.getAttribute('href')).toContain(mockData[0]!.ContractAddr);
+    expect(screen.getByText('39')).toBeInTheDocument();
+    // Most first.
+    const rows = screen.getAllByRole('row').slice(1);
+    expect(rows[0]).toHaveTextContent('39');
+    expect(rows[1]).toHaveTextContent('6');
   });
 
   it('has no accessibility violations', async () => {

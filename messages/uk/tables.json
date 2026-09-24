@@ -32,8 +32,7 @@
   },
   "attachedAssets": {
     "actions": {
-      "claim": "Забрати",
-      "claiming": "Забираємо…"
+      "claim": "Забрати"
     },
     "status": {
       "yes": "Так",

@@ -6,7 +6,8 @@ import type { CollectionTraits } from '@/hooks/useNftTraits';
 import { cn } from '@/lib/utils';
 import { TablePagination } from '@/components/ui/pagination';
 
-import { SIGNATURE_GRID_CLASS, SignatureCard, SignatureGridSkeleton } from './SignatureCard';
+import { SignatureCard } from './SignatureCard';
+import { SIGNATURE_GRID_CLASS, SignatureGridSkeleton } from './SignatureGrid';
 
 /** One Signature on a wall. */
 export interface SignatureWallItem {

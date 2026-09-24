@@ -3,7 +3,8 @@ import { normalizeTraitEntry, parseCosmicSignatureMetadata } from '@/lib/nftMeta
 
 import { checkA11y, fireEvent, render, screen, within } from '@/test-utils';
 
-import { SignatureCard, SignatureGridSkeleton, signatureCardSources } from '../SignatureCard';
+import { SignatureCard, signatureCardSources } from '../SignatureCard';
+import { SignatureGridSkeleton } from '../SignatureGrid';
 
 jest.mock('next/image', () => ({
   __esModule: true,

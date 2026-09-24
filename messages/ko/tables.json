@@ -32,8 +32,7 @@
   },
   "attachedAssets": {
     "actions": {
-      "claim": "회수",
-      "claiming": "회수 중…"
+      "claim": "회수"
     },
     "status": {
       "yes": "예",

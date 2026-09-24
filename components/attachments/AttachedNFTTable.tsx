@@ -58,6 +58,7 @@ function AttachedNftThumb({ nft }: { nft: NFTRecord }) {
         src={metadata?.image}
         fallbackSrc={metadata?.imageFallback}
         alt={t('attachedAssets.nft.imageAlt', { id: getAttachedNftTokenId(nft) ?? '' })}
+        unavailableLabel={t('attachedAssets.nft.imageUnavailable')}
         density="compact"
         sizes="(max-width: 639px) 10rem, 64px"
         className="aspect-square h-full w-full bg-transparent object-contain"

@@ -32,8 +32,7 @@
   },
   "attachedAssets": {
     "actions": {
-      "claim": "受け取る",
-      "claiming": "受け取り中…"
+      "claim": "受け取る"
     },
     "status": {
       "yes": "はい",

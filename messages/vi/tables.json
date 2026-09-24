@@ -32,8 +32,7 @@
   },
   "attachedAssets": {
     "actions": {
-      "claim": "Nhận về",
-      "claiming": "Đang nhận về…"
+      "claim": "Nhận về"
     },
     "status": {
       "yes": "Có",
