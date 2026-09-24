@@ -594,7 +594,7 @@ export function GesturePanel({
                       <>
                         <span aria-hidden className="hidden font-normal @[24rem]/commit:inline">
                           ·
-                        </span>
+                        </span>{' '}
                         <span className="text-sm font-medium tabular-nums @[24rem]/commit:text-base @[24rem]/commit:font-semibold">
                           {submit.cost}
                         </span>
