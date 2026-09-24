@@ -42,11 +42,13 @@ export interface ChronoChallengeState {
 export interface LatestGestureState {
   address: string | null;
   /**
-   * Whether the hold figures below are measured against a real clock. Before
-   * hydration the shared ticker reads 0, so the hold, the seconds to the
-   * Endurance record and the progress are unknown: render a pending value,
-   * never a confident "0s" or "0%". `deriveChampionsState` always sets it;
-   * a hand-built state that omits it reads as known.
+   * Whether the hold figures below are measured: a real clock and a known
+   * time of the Last Gesture. Before hydration the shared ticker reads 0, and
+   * while the Last Gesture's transaction is still indexing its time is null;
+   * either way the hold, the seconds to the Endurance record and the
+   * progress are unknown, so render a pending value, never a confident "0s"
+   * or a "record forming" caption. `deriveChampionsState` always sets it; a
+   * hand-built state that omits it reads as known.
    */
   isTimeKnown?: boolean;
   holdDuration: number;
@@ -139,16 +141,24 @@ export function deriveChampionsState({
   latestParticipantEvidence,
 }: DeriveChampionsStateArgs): ChampionsState {
   const nowSec = Math.floor(nowMs / 1000);
-  const isTimeKnown = Number.isFinite(nowMs) && nowMs > 0;
+  const clockKnown = Number.isFinite(nowMs) && nowMs > 0;
   const enduranceAddress = cleanAddress(data?.EnduranceChampionAddress);
   const chronoAddress = cleanAddress(data?.ChronoWarriorAddress);
   const latestGestureAddress = latestParticipantEvidence
     ? cleanAddress(latestParticipantEvidence.address)
     : cleanAddress(data?.LastBidderAddress);
   const lastCstAddress = cleanAddress(data?.LastCstBidderAddress);
+  // Fresh evidence names the participant; its time may still be indexing.
+  // The snapshot's time then stands in only when it is about the same
+  // participant, never someone else's older gesture.
+  const snapshotGestureTime = nonNegativeSeconds(data?.LastBidderLastBidTime);
   const latestGestureTime = latestParticipantEvidence
-    ? nonNegativeSeconds(latestParticipantEvidence.timestamp)
-    : nonNegativeSeconds(data?.LastBidderLastBidTime);
+    ? nonNegativeSeconds(latestParticipantEvidence.timestamp) ||
+      (sameAddress(latestGestureAddress, cleanAddress(data?.LastBidderAddress))
+        ? snapshotGestureTime
+        : 0)
+    : snapshotGestureTime;
+  const isTimeKnown = clockKnown && (!latestGestureAddress || latestGestureTime > 0);
 
   const enduranceLockedDuration = nonNegativeSeconds(data?.EnduranceChampionDuration);
   const chronoLockedDuration = nonNegativeSeconds(data?.ChronoWarriorDuration);
