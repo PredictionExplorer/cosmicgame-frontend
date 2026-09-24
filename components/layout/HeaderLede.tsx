@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 
+import { TOUCH_TARGET_EXTENDED_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
 
 export interface HeaderLedeProps {
@@ -49,7 +50,12 @@ export function HeaderLede({ children, moreLabel, lessLabel, className }: Header
           aria-controls={id}
           aria-expanded={expanded}
           onClick={() => setExpanded((value) => !value)}
-          className="mt-1 inline-flex min-h-6 items-center type-label text-primary underline-offset-4 hover:underline sm:hidden"
+          // A 44px hit area around a one-line control, without making the line taller.
+          data-touch-target="extended"
+          className={cn(
+            'mt-1 inline-flex min-h-6 items-center type-label text-primary underline-offset-4 hover:underline sm:hidden',
+            TOUCH_TARGET_EXTENDED_CLASS,
+          )}
         >
           {expanded ? lessLabel : moreLabel}
         </button>
