@@ -40,6 +40,9 @@ describe('SectionShell', () => {
     const toggle = screen.getByRole('button', { name: 'Gesture spikes' });
     expect(toggle.closest('h2')).not.toBeNull();
     expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    // One heading line is 29px on a phone: a band above and below makes it a 44px target.
+    expect(toggle).toHaveAttribute('data-touch-target', 'extended');
+    expect(toggle.className).toContain('after:-inset-y-2');
     expect(screen.getByText('One sentence.')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Act' })).toBeInTheDocument();
 

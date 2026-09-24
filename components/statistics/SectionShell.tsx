@@ -6,6 +6,15 @@ import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 
+/**
+ * The fold toggle is the section title, one heading line tall (29px on a
+ * phone): below `sm` a transparent band 8px above and below lifts its hit
+ * area past 44px across its whole width, without moving the layout. The
+ * attribute tells the tap-target audit to measure the band.
+ */
+const TOGGLE_HIT_AREA_CLASS =
+  "relative after:absolute after:inset-x-0 after:-inset-y-2 after:content-[''] sm:after:hidden";
+
 export interface SectionShellProps {
   title: string;
   /** One explanation for the whole section, beside its title. */
@@ -107,7 +116,11 @@ export function SectionShell({
                   aria-expanded={open}
                   aria-controls={panelId}
                   onClick={toggle}
-                  className="group inline-flex max-w-full items-start gap-2.5 rounded-edge text-left"
+                  data-touch-target="extended"
+                  className={cn(
+                    'group inline-flex max-w-full items-start gap-2.5 rounded-edge text-left',
+                    TOGGLE_HIT_AREA_CLASS,
+                  )}
                 >
                   <span className="min-w-0">{title}</span>
                   <span className="mt-[0.3em] inline-flex shrink-0 items-center gap-1 text-subtle group-hover:text-foreground">

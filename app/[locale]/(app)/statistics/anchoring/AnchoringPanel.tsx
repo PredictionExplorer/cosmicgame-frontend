@@ -7,6 +7,8 @@ import { useTranslations } from 'next-intl';
 import { countActiveAnchorHolders, distributionPerAnchoredNft } from '@/utils/anchoringStats';
 import { useFormat } from '@/hooks/useFormat';
 import { Link } from '@/i18n/navigation';
+import { cn } from '@/lib/utils';
+import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import {
   useCSTAnchorActions,
   useDashboardInfo,
@@ -117,7 +119,13 @@ const AnchoringPanel = () => {
           title={t('anchoringPage.nowTitle')}
           description={t('anchoringPage.description')}
           actions={
-            <Link href="/anchoring" className="link inline-flex items-center gap-1.5 type-body-sm">
+            <Link
+              href="/anchoring"
+              className={cn(
+                'link inline-flex items-center gap-1.5 type-body-sm',
+                TOUCH_TARGET_TEXT_LINK_CLASS,
+              )}
+            >
               {t('anchoringPage.historyLink')}
               <ArrowRight aria-hidden className="size-4" />
             </Link>
