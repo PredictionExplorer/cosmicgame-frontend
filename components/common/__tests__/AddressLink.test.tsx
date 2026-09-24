@@ -1,7 +1,10 @@
 import '@testing-library/jest-dom';
 
+import userEvent from '@testing-library/user-event';
+
 import { TEST_MARKETING_WALLET } from '@/test-utils/contractAddressesFixture';
 
+import { checksumAddress } from '@/utils/format';
 import { AddressLink } from '@/components/common/AddressLink';
 
 import { checkA11y, render, screen } from '@/test-utils';
@@ -21,6 +24,29 @@ describe('AddressLink', () => {
     expect(links).toHaveLength(1);
     expect(links[0]).toHaveTextContent('0x1234…\u20605678');
     expect(links[0]).toHaveAttribute('href', url);
+  });
+
+  /** The short form is all the cell shows; the whole checksummed address is one focus or hover away. */
+  async function expectFullAddressTooltip() {
+    const full = checksumAddress(address);
+    expect(full).toMatch(/^0x[0-9a-fA-F]{40}$/);
+    expect(full).not.toBe(address);
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(full);
+  }
+
+  it('shows the full checksummed address in a tooltip on keyboard focus', async () => {
+    const user = userEvent.setup();
+    render(<AddressLink address={address} url={url} />);
+    await user.tab();
+    expect(screen.getByRole('link')).toHaveFocus();
+    await expectFullAddressTooltip();
+  });
+
+  it('shows the full checksummed address in a tooltip on hover', async () => {
+    const user = userEvent.setup();
+    render(<AddressLink address={address} url={url} />);
+    await user.hover(screen.getByRole('link'));
+    await expectFullAddressTooltip();
   });
 
   it('never wraps mid-hex and keeps the monospaced address face', () => {
