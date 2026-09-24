@@ -109,7 +109,6 @@ export function CosmicSignatureNftTransferForm({
   const [pendingTransfer, setPendingTransfer] = useState<ValidTransfer | null>(null);
 
   const config = useConfig();
-
   const { ensureCorrectChain } = useRequireChain();
   const publicClient = usePublicClient({ chainId: activeChain.id });
   const queryClient = useQueryClient();
@@ -237,10 +236,15 @@ export function CosmicSignatureNftTransferForm({
   const executeTransfer = async (validTransfer: ValidTransfer) => {
     if (!normalizedSource || !contractAddrs.cosmicSignature) return;
 
-    // A wallet on another chain is asked to switch first (wagmi's writeContract
-    // would throw a chain mismatch instead).
-    if (!(await ensureCorrectChain())) return;
+    // Busy first: the wallet's switch prompt can stay open for a while, and a
+    // second click must not send a second request (-32002). A wallet on
+    // another chain is asked to switch before the write (wagmi's
+    // writeContract would throw a chain mismatch instead).
     setSubmitting(true);
+    if (!(await ensureCorrectChain())) {
+      setSubmitting(false);
+      return;
+    }
     setTxHashes([]);
     setProgress({
       total: validTransfer.tokenIds.length,

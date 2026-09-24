@@ -245,6 +245,25 @@ describe('CstTransferForm', () => {
     expect(mockWriteContract).not.toHaveBeenCalled();
   });
 
+  it('stays busy while the wallet shows its switch prompt, so a second click sends nothing', async () => {
+    let answerSwitch!: (switched: boolean) => void;
+    mockEnsureCorrectChain.mockImplementationOnce(
+      () => new Promise<boolean>((resolve) => (answerSwitch = resolve)),
+    );
+    await renderReadyForm();
+    fillTransferForm('12.5');
+
+    submitTransferForm();
+    const button = screen.getByRole('button', { name: 'myPages.transferCst.form.sendAria' });
+    await waitFor(() => expect(button).toBeDisabled());
+    fireEvent.click(button);
+    expect(mockEnsureCorrectChain).toHaveBeenCalledTimes(1);
+
+    answerSwitch(false);
+    await waitFor(() => expect(button).not.toBeDisabled());
+    expect(mockWriteContract).not.toHaveBeenCalled();
+  });
+
   it('calls standard ERC-20 transfer, waits for receipt, and invalidates related queries', async () => {
     await renderReadyForm();
     fillTransferForm('12.5');

@@ -68,10 +68,15 @@ export function PublicGoodsVaultAction({
       return;
     }
 
-    // A wallet on another chain is asked to switch first (wagmi's writeContract
-    // would throw a chain mismatch instead).
-    if (!(await ensureCorrectChain())) return;
+    // Busy first: the wallet's switch prompt can stay open for a while, and a
+    // second click must not send a second request (-32002). A wallet on
+    // another chain is asked to switch before the write (wagmi's
+    // writeContract would throw a chain mismatch instead).
     setSubmitting(true);
+    if (!(await ensureCorrectChain())) {
+      setSubmitting(false);
+      return;
+    }
     try {
       const hash = await writeContract(config, {
         address: vaultAddress as `0x${string}`,
