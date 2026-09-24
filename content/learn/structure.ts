@@ -3,7 +3,7 @@ import { CHAOS_ZERO_PREDICTIONS_URL } from '@/config/predictions';
 import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 import { APP_ORIGIN, LANDING_ORIGIN } from '@/lib/hostRouting';
 
-import type { LearnArticleUi, LearnSection } from './types';
+import type { LearnArticleUi, LearnGroupCopy, LearnGroupId, LearnSection } from './types';
 
 /**
  * The locale-independent skeleton of the learn hub.
@@ -24,6 +24,13 @@ interface LearnArticleStructure {
   readonly slug: string;
   readonly schemaType: 'Article' | 'TechArticle';
   readonly updated: string;
+  /**
+   * The guide's stage on the reading path. Articles are listed in reading
+   * order, so each stage's guides are consecutive.
+   */
+  readonly group: LearnGroupId;
+  /** The Signature that opens the guide: a token id in components/reading/signaturePlates. */
+  readonly plate: number;
   /** Related-resource link targets; labels come from the text modules. */
   readonly related: readonly string[];
 }
@@ -37,18 +44,24 @@ export const LEARN_STRUCTURE = {
       slug: 'what-is-cosmic-signature',
       schemaType: 'Article',
       updated: '2026-06-24',
+      group: 'start',
+      plate: 13,
       related: [APP_ORIGIN, appLink('/faq'), appLink('/statistics')],
     },
     {
       slug: 'how-the-performance-cycle-works',
       schemaType: 'TechArticle',
       updated: '2026-06-24',
+      group: 'start',
+      plate: 22,
       related: [appLink('/current-cycle'), appLink('/allocation'), appLink('/faq')],
     },
     {
       slug: 'how-gestures-work',
       schemaType: 'Article',
       updated: '2026-06-24',
+      group: 'start',
+      plate: 14,
       related: [
         APP_ORIGIN,
         `${LANDING_ORIGIN}/learn/how-the-performance-cycle-works`,
@@ -59,36 +72,48 @@ export const LEARN_STRUCTURE = {
       slug: 'three-body-nft-art',
       schemaType: 'TechArticle',
       updated: '2026-06-24',
+      group: 'start',
+      plate: 3,
       related: [appLink('/gallery'), appLink('/code'), appLink('/contracts')],
     },
     {
       slug: 'cosmic-signature-on-arbitrum',
       schemaType: 'Article',
       updated: '2026-06-24',
+      group: 'mechanics',
+      plate: 33,
       related: [appLink('/contracts'), appLink('/statistics')],
     },
     {
       slug: 'contracts-security-verification',
       schemaType: 'TechArticle',
       updated: '2026-06-24',
+      group: 'mechanics',
+      plate: 7,
       related: [appLink('/contracts'), appLink('/code'), appLink('/faq')],
     },
     {
       slug: 'cst-token-and-cosmic-council',
       schemaType: 'Article',
       updated: '2026-06-24',
+      group: 'mechanics',
+      plate: 11,
       related: [`${LANDING_ORIGIN}/learn/how-gestures-work`, APP_ORIGIN],
     },
     {
       slug: 'anchoring-nfts',
       schemaType: 'Article',
       updated: '2026-05-25',
+      group: 'mechanics',
+      plate: 39,
       related: [appLink('/anchoring'), appLink('/gallery')],
     },
     {
       slug: 'protocol-guild-public-goods',
       schemaType: 'Article',
       updated: '2026-05-25',
+      group: 'context',
+      plate: 40,
       related: [
         appLink('/public-goods-contributions-cg'),
         `${LANDING_ORIGIN}/learn/how-the-performance-cycle-works`,
@@ -98,6 +123,8 @@ export const LEARN_STRUCTURE = {
       slug: 'collecting-and-trading-cosmic-signature',
       schemaType: 'Article',
       updated: '2026-07-06',
+      group: 'context',
+      plate: 25,
       related: [
         COSMIC_SIGNATURE_MARKETPLACE_URL,
         CHAOS_ZERO_PREDICTIONS_URL,
@@ -111,6 +138,8 @@ export const LEARN_STRUCTURE = {
       slug: 'not-a-lottery-not-an-investment',
       schemaType: 'Article',
       updated: '2026-05-25',
+      group: 'context',
+      plate: 9,
       related: [appLink('/terms'), appLink('/faq')],
     },
     // lexicon-allow-end
@@ -135,11 +164,13 @@ type LearnArticleText<Article extends LearnArticleStructureItem> = {
   readonly title: string;
   readonly description: string;
   readonly h1: string;
+  /** A short title for the hub's cards, without the brand name. */
+  readonly cardTitle: string;
   readonly summary: string;
   /**
    * Sections stay fully in the text modules because their count legitimately
-   * differs per locale (the English answerability appendix is longer than the
-   * Chinese one).
+   * differs per locale. The reference notes every guide shares live in
+   * `articleUi.appendix`.
    */
   readonly sections: readonly LearnSection[];
   /** Labels for the skeleton's related links, in the same order. */
@@ -162,6 +193,11 @@ export type LearnText = {
     readonly breadcrumbs: {
       readonly homeLabel: string;
       readonly learnLabel: string;
+    };
+    readonly groups: Readonly<Record<LearnGroupId, LearnGroupCopy>>;
+    readonly whitePaper: {
+      readonly eyebrow: string;
+      readonly readLabel: string;
     };
     readonly quizCta: {
       readonly heading: string;

@@ -28,6 +28,8 @@ interface ContentsListProps {
 /** The numbered list of sections both the rail and the sheet draw. */
 function ContentsList({ entries, activeId, expand, onNavigate, depth = 0 }: ContentsListProps) {
   const branch = branchOf(entries, activeId);
+  // A numbered list keeps a number column, so an unnumbered entry (References) still aligns.
+  const numbered = entries.some((entry) => entry.number);
   return (
     <ol className={cn(depth === 0 ? 'space-y-px' : 'mb-1.5 mt-px space-y-px')}>
       {entries.map((entry) => {
@@ -50,7 +52,7 @@ function ContentsList({ entries, activeId, expand, onNavigate, depth = 0 }: Cont
                     : 'text-muted-foreground hover:text-foreground',
               )}
             >
-              {depth === 0 ? (
+              {depth === 0 && numbered ? (
                 <span aria-hidden className="w-5 shrink-0 tabular-nums text-subtle">
                   {entry.number}
                 </span>

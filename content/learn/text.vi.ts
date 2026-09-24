@@ -47,13 +47,34 @@ export const learnTextVi = {
       description:
         'Tìm hiểu cách Cosmic Signature hoạt động: chu kỳ trình diễn, nét bút, CST, nghệ thuật NFT ba vật thể, hợp đồng Arbitrum, neo giữ, hàng hóa công và giải đáp về rủi ro.',
     },
-    eyebrow: 'Học cùng Cosmic Signature',
+    eyebrow: 'Hướng dẫn',
     h1: 'Tìm hiểu Cosmic Signature',
     intro:
       'Tìm hiểu Cosmic Signature qua các hướng dẫn về chu kỳ trình diễn, nét bút và nghệ thuật NFT ba vật thể được tạo từ dữ liệu trên Arbitrum.',
     breadcrumbs: {
       homeLabel: 'Cosmic Signature',
       learnLabel: 'Học',
+    },
+    groups: {
+      start: {
+        title: 'Bắt đầu từ đây',
+        description:
+          'Bốn hướng dẫn về giao thức là gì, một chu kỳ diễn ra thế nào, nét bút làm gì và tác phẩm đến từ đâu.',
+      },
+      mechanics: {
+        title: 'Cách vận hành',
+        description:
+          'Chuỗi khối mà giao thức chạy trên đó, các hợp đồng, CST và Hội đồng Vũ trụ, cùng neo giữ.',
+      },
+      context: {
+        title: 'Bối cảnh',
+        description:
+          'Hàng hóa công, nơi sưu tầm và giao dịch tác phẩm, và những gì giao thức không phải.',
+      },
+    },
+    whitePaper: {
+      eyebrow: 'Tài liệu tham chiếu đầy đủ',
+      readLabel: 'Đọc sách trắng',
     },
     quizCta: {
       heading: 'Kiểm tra kiến thức về giao thức',
@@ -62,18 +83,28 @@ export const learnTextVi = {
     },
   },
   articleUi: {
-    eyebrow: 'Học cùng Cosmic Signature',
     breadcrumbs: {
-      ariaLabel: 'Đường dẫn điều hướng',
       homeLabel: 'Cosmic Signature',
       learnLabel: 'Học',
     },
-    lastUpdatedLabel: 'Cập nhật lần cuối:',
-    publisherLabel: 'Công bố bởi Cosmic Signature',
+    guideTemplate: 'Hướng dẫn {number}/{total}',
+    readingTimeTemplate: '{minutes} phút đọc',
+    nextGuideLabel: 'Hướng dẫn tiếp theo',
+    contents: {
+      heading: 'Trong hướng dẫn này',
+      railLabel: 'Trên trang này',
+      openLabel: 'Mục lục',
+      backToTopLabel: 'Lên đầu trang',
+    },
+    headingLinkTemplate: 'Liên kết đến mục này: {title}',
     relatedResourcesHeading: 'Tài nguyên Cosmic Signature liên quan',
+    appendixLabel: 'Kiểm chứng và đọc thêm',
+    verifyLinksLabel: 'Kiểm tra trên ứng dụng',
+    appendix: answerabilitySections,
   },
   articles: {
     'what-is-cosmic-signature': {
+      cardTitle: 'Giao thức là gì',
       title: 'Cosmic Signature là gì? | Cosmic Signature',
       description:
         'Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum, nơi các nét bút của chu kỳ trình diễn định hình tác phẩm NFT ba vật thể tất định.',
@@ -109,7 +140,6 @@ export const learnTextVi = {
             'Trang giới thiệu giải thích thuật ngữ và cơ chế; ứng dụng cung cấp dữ liệu hiện tại. Đọc cả hai giúp bạn hiểu giao thức và kiểm tra cách các quy tắc được thực thi.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: [
         'Mở ứng dụng Cosmic Signature',
@@ -118,6 +148,7 @@ export const learnTextVi = {
       ],
     },
     'how-the-performance-cycle-works': {
+      cardTitle: 'Chu kỳ trình diễn',
       title: 'Chu kỳ trình diễn Cosmic Signature hoạt động như thế nào | Cosmic Signature',
       description:
         'Tìm hiểu cách các chu kỳ trình diễn Cosmic Signature dùng cửa sổ hiệu chỉnh, nét bút, hoàn tất và các luồng phân bổ trên Arbitrum.',
@@ -153,7 +184,6 @@ export const learnTextVi = {
             'Khi một chu kỳ hoàn tất, giao thức ngừng coi nó là trạng thái trực tiếp và bắt đầu coi nó là lịch sử. Signature cuối cùng, bản ghi người nhận, các lần nhận về phân bổ, NFT đính kèm và đóng góp hàng hóa công trở thành một phần của kho lưu trữ công khai mà những người tham gia tương lai có thể kiểm tra.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: [
         'Xem chu kỳ trình diễn hiện tại',
@@ -162,6 +192,7 @@ export const learnTextVi = {
       ],
     },
     'how-gestures-work': {
+      cardTitle: 'Nét bút vận hành thế nào',
       title: 'Nét bút vận hành thế nào trong Cosmic Signature | Cosmic Signature',
       description:
         'Hiểu về nét bút ETH, nét bút CST, chi phí nét bút, CST tham gia và cách nét bút định hình mỗi chu kỳ trình diễn Cosmic Signature.',
@@ -172,7 +203,7 @@ export const learnTextVi = {
         {
           heading: 'Một nét bút làm gì',
           body: [
-            `Mỗi nét bút ghi nhận sự tham gia vào chu kỳ đang diễn ra, có thể khắc CST tham gia động, kéo dài thời điểm hoàn tất chu kỳ và góp vào bối cảnh lịch sử xoay quanh Signature cuối cùng. CST tham gia dùng công thức căn bậc hai: ${protocolFacts.dynamicCstRewardFormula}.`,
+            `Mỗi nét bút ghi nhận sự tham gia vào chu kỳ đang diễn ra, có thể khắc CST tham gia động, kéo dài thời điểm hoàn tất chu kỳ và góp vào bối cảnh lịch sử xoay quanh Signature cuối cùng. CST tham gia dùng công thức căn bậc hai: ${protocolFacts.participationCstNotation}, trong đó Δt là số giây kể từ nét bút trước, m là hệ số nhân CST tham gia và i là mức tăng thời gian của chu kỳ.`,
             `Chi phí nét bút thay đổi trong suốt chu kỳ. Nét bút ETH và nét bút CST dùng các cơ chế liên quan nhưng riêng biệt, bao gồm các cửa sổ hiệu chỉnh giúp người tham gia thấy rõ đường đi của chi phí. Mỗi nét bút CST kéo dài cửa sổ hiệu chỉnh CST khoảng ${cstWindowIncrease}%; mỗi nét bút ETH rút ngắn nó khoảng ${cstWindowDecrease}%.`,
           ],
         },
@@ -197,7 +228,6 @@ export const learnTextVi = {
             'Đính kèm RandomWalk NFT thêm một lớp bối cảnh công khai khác. Một RandomWalk NFT chưa sử dụng có thể được đính kèm để giảm chi phí nét bút một lần, và các RandomWalk NFT đã sử dụng được liệt kê riêng để bản ghi công khai vẫn dễ hiểu sau khi thời điểm tham gia đã qua.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: [
         'Đặt hoặc xem nét bút trong ứng dụng',
@@ -206,6 +236,7 @@ export const learnTextVi = {
       ],
     },
     'three-body-nft-art': {
+      cardTitle: 'Nghệ thuật ba vật thể',
       title: 'Cosmic Signature tạo ra nghệ thuật NFT ba vật thể như thế nào | Cosmic Signature',
       description:
         'Giải thích kỹ thuật về tác phẩm Cosmic Signature NFT tất định được tạo từ seed trên chuỗi và vật lý ba vật thể.',
@@ -241,7 +272,6 @@ export const learnTextVi = {
             'Tác phẩm gắn liền với chu kỳ đã tạo ra nó. Từ trang token, bạn có thể xem seed, đặc tính, lịch sử chu kỳ và mã nguồn dùng để tái tạo hình ảnh.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: [
         'Khám phá phòng trưng bày Cosmic Signature',
@@ -250,6 +280,7 @@ export const learnTextVi = {
       ],
     },
     'cosmic-signature-on-arbitrum': {
+      cardTitle: 'Giao thức trên Arbitrum',
       title: 'Cosmic Signature trên Arbitrum | Cosmic Signature',
       description:
         'Vì sao Cosmic Signature chạy trên Arbitrum và cách giao thức dùng hạ tầng Layer 2 của Ethereum cho nghệ thuật trên chuỗi.',
@@ -278,11 +309,11 @@ export const learnTextVi = {
             'Bạn có thể xem các trang này mà không cần ví để tìm hiểu hoạt động của giao thức và kiểm tra những dữ liệu do hợp đồng ghi nhận.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: ['Xem các hợp đồng đã xác minh', 'Xem thống kê giao thức'],
     },
     'contracts-security-verification': {
+      cardTitle: 'Hợp đồng và xác minh',
       title: 'Hợp đồng, bảo mật và xác minh của Cosmic Signature | Cosmic Signature',
       description:
         'Tra cứu hợp đồng thông minh, mã nguồn, xác minh và bối cảnh bảo mật của giao thức Cosmic Signature trên Arbitrum.',
@@ -311,11 +342,11 @@ export const learnTextVi = {
             'Cách tiếp cận thận trọng này là có chủ đích. Các trang tin cậy hữu ích nhất khi chúng phân biệt thông tin đã triển khai, báo cáo đã công bố, phân tích tĩnh, rà soát cộng đồng và công việc tương lai, thay vì gộp tất cả thành một tuyên bố không có cơ sở.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: ['Mở địa chỉ hợp đồng', 'Mở tài nguyên mã nguồn', 'Đọc câu hỏi thường gặp'],
     },
     'cst-token-and-cosmic-council': {
+      cardTitle: 'CST và Hội đồng Vũ trụ',
       title: 'CST và Hội đồng Vũ trụ | Cosmic Signature',
       description:
         'Tìm hiểu token CST liên hệ thế nào với nét bút, điều phối giao thức và Hội đồng Vũ trụ.',
@@ -345,11 +376,11 @@ export const learnTextVi = {
             'Hội đồng Vũ trụ là cơ chế điều phối của Cosmic Signature. Để hiểu phạm vi quyền hạn hiện tại và các giới hạn liên quan, hãy đọc thêm thông tin hợp đồng, điều khoản và công bố rủi ro.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: ['Đọc cách nét bút vận hành', 'Mở ứng dụng'],
     },
     'anchoring-nfts': {
+      cardTitle: 'Neo giữ NFT',
       title: 'Neo giữ Cosmic Signature NFT | Cosmic Signature',
       description:
         'Cách neo giữ vận hành với Cosmic Signature NFT, phân phối neo giữ ETH và diện Tinh tuyển của Random Walk NFT.',
@@ -379,11 +410,11 @@ export const learnTextVi = {
             'Trước khi neo giữ, hãy kiểm tra loại NFT và trạng thái của token. Trang thống kê, phòng trưng bày và chu kỳ hiện tại cung cấp thông tin để đối chiếu.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: ['Mở công cụ neo giữ', 'Khám phá phòng trưng bày'],
     },
     'protocol-guild-public-goods': {
+      cardTitle: 'Hàng hóa công và Protocol Guild',
       title: 'Cosmic Signature và hàng hóa công của Ethereum | Cosmic Signature',
       description:
         'Cách Cosmic Signature chuyển một phần phân bổ hàng hóa công đến Protocol Guild, cơ chế tài trợ cho những người đóng góp cốt lõi cho Ethereum.',
@@ -412,11 +443,11 @@ export const learnTextVi = {
             'Các bản ghi cho thấy số ETH đã chuyển và địa chỉ nhận. Chúng không tự xác lập cách xử lý thuế hay địa vị pháp lý đặc biệt; hãy đọc thêm điều khoản và công bố rủi ro.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: ['Xem bản ghi đóng góp hàng hóa công', 'Tìm hiểu cách chu kỳ vận hành'],
     },
     'collecting-and-trading-cosmic-signature': {
+      cardTitle: 'Sưu tầm và giao dịch',
       title: 'Sưu tầm và giao dịch Cosmic Signature NFT và CST | Cosmic Signature',
       description:
         'Nơi các tài sản Cosmic Signature được giao dịch: sàn NFT không thu phí Axiom Zero, hoán đổi CST trên Uniswap tại Arbitrum và thị trường dự đoán Chaos Zero cho các chu kỳ.',
@@ -452,7 +483,6 @@ export const learnTextVi = {
             'Sự thận trọng tương tự áp dụng cho hoán đổi CST và vị thế dự đoán: kiểm tra địa chỉ token khớp với hợp đồng CST đã công bố, và nhớ rằng vị thế trên Chaos Zero được giải quyết từ số nét bút công khai do giao thức ghi lại, nên mọi đầu vào của thị trường đều có thể kiểm tra độc lập trên Arbitrum.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: [
         'Duyệt Cosmic Signature trên Axiom Zero',
@@ -464,6 +494,7 @@ export const learnTextVi = {
     },
     // lexicon-allow-start: explicit denial language for crawler and compliance clarity.
     'not-a-lottery-not-an-investment': {
+      cardTitle: 'Những gì giao thức không phải',
       title: 'Cosmic Signature có phải là xổ số, sòng bạc hay đầu tư? | Cosmic Signature',
       description:
         'Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi, không phải xổ số, sòng bạc, sản phẩm cờ bạc hay sản phẩm đầu tư.',
@@ -492,7 +523,6 @@ export const learnTextVi = {
             'Bạn có thể đọc các giải thích và công bố rủi ro mà không cần kết nối ví. Hãy xem kỹ trước khi ký giao dịch.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: ['Đọc Điều khoản dịch vụ', 'Đọc câu hỏi thường gặp'],
     },

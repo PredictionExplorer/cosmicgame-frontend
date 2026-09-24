@@ -33,7 +33,7 @@ const publicPages: PublicPage[] = [
   {
     path: '/learn/collecting-and-trading-cosmic-signature',
     host: LANDING_HOST,
-    h1: 'Collecting and Trading Cosmic Signature',
+    h1: 'Collecting and trading Cosmic Signature',
     jsonLd: ['Article', 'BreadcrumbList'],
   },
   {

@@ -42,13 +42,34 @@ export const learnTextUk = {
       description:
         'Як працює Cosmic Signature: перформанс-цикли, жести, CST, NFT-мистецтво трьох тіл, контракти на Arbitrum, закріплення, суспільні блага та роз’яснення ризиків.',
     },
-    eyebrow: 'Навчальний центр Cosmic Signature',
+    eyebrow: 'Посібники',
     h1: 'Дізнайтеся, як працює Cosmic Signature',
     intro:
       'Посібники про Cosmic Signature: перформанс-цикли, жести та NFT-мистецтво трьох тіл, яке створюється з даних на Arbitrum.',
     breadcrumbs: {
       homeLabel: 'Cosmic Signature',
       learnLabel: 'Навчальний центр',
+    },
+    groups: {
+      start: {
+        title: 'Почніть тут',
+        description:
+          'Чотири посібники про те, що таке протокол, як минає цикл, що робить жест і звідки береться мистецтво.',
+      },
+      mechanics: {
+        title: 'Як це працює',
+        description:
+          'Мережа, у якій працює протокол, його контракти, CST і Космічна Рада, а також закріплення.',
+      },
+      context: {
+        title: 'Контекст',
+        description:
+          'Суспільні блага, місця, де колекціонують і продають мистецтво, і те, чим протокол не є.',
+      },
+    },
+    whitePaper: {
+      eyebrow: 'Повний опис',
+      readLabel: 'Читати Білу книгу',
     },
     quizCta: {
       heading: 'Перевірте знання протоколу',
@@ -57,18 +78,28 @@ export const learnTextUk = {
     },
   },
   articleUi: {
-    eyebrow: 'Навчальний центр Cosmic Signature',
     breadcrumbs: {
-      ariaLabel: 'Навігаційний ланцюжок',
       homeLabel: 'Cosmic Signature',
       learnLabel: 'Навчальний центр',
     },
-    lastUpdatedLabel: 'Останнє оновлення:',
-    publisherLabel: 'Опубліковано Cosmic Signature',
+    guideTemplate: 'Посібник {number} з {total}',
+    readingTimeTemplate: '{minutes} хв читання',
+    nextGuideLabel: 'Наступний посібник',
+    contents: {
+      heading: 'У цьому посібнику',
+      railLabel: 'На цій сторінці',
+      openLabel: 'Зміст',
+      backToTopLabel: 'Угору',
+    },
+    headingLinkTemplate: 'Посилання на цей розділ: {title}',
     relatedResourcesHeading: 'Пов’язані ресурси Cosmic Signature',
+    appendixLabel: 'Перевірка й додаткове читання',
+    verifyLinksLabel: 'Перевірте в застосунку',
+    appendix: answerabilitySections,
   },
   articles: {
     'what-is-cosmic-signature': {
+      cardTitle: 'Що таке протокол',
       title: 'Що таке Cosmic Signature? | Cosmic Signature',
       description:
         'Cosmic Signature — процедурний протокол ончейн-мистецтва на Arbitrum, де жести перформанс-циклу формують детерміновані NFT-твори на основі задачі трьох тіл.',
@@ -104,7 +135,6 @@ export const learnTextUk = {
             'На сайті проєкту зібрано пояснення термінів і механізмів, а в застосунку — поточні дані. Разом вони дають змогу зрозуміти правила та перевірити їх виконання.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: [
         'Відкрити застосунок Cosmic Signature',
@@ -113,6 +143,7 @@ export const learnTextUk = {
       ],
     },
     'how-the-performance-cycle-works': {
+      cardTitle: 'Перформанс-цикл',
       title: 'Як працює перформанс-цикл Cosmic Signature | Cosmic Signature',
       description:
         'Дізнайтеся, як перформанс-цикли Cosmic Signature на Arbitrum поєднують вікна калібрування, жести, завершення та напрями розподілу.',
@@ -148,7 +179,6 @@ export const learnTextUk = {
             'Коли цикл завершується, протокол перестає трактувати його як поточний стан і починає трактувати як історію. Фінальна Сигнатура, записи про отримувачів, забрані розподіли, долучені NFT і внески у суспільні блага стають частиною публічного архіву, який можуть вивчати майбутні учасники.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: [
         'Переглянути поточний перформанс-цикл',
@@ -157,6 +187,7 @@ export const learnTextUk = {
       ],
     },
     'how-gestures-work': {
+      cardTitle: 'Як працюють жести',
       title: 'Як працюють жести в Cosmic Signature | Cosmic Signature',
       description:
         'Розберіться в ETH-жестах, CST-жестах, вартості жесту, CST участі й у тому, як жести формують кожен перформанс-цикл Cosmic Signature.',
@@ -167,7 +198,7 @@ export const learnTextUk = {
         {
           heading: 'Що робить жест',
           body: [
-            `Кожен жест записує участь в активному циклі, може закарбувати динамічні CST участі, відсуває час завершення циклу й додає історичного контексту навколо фінальної Сигнатури. CST участі обчислюються за формулою з квадратним коренем: ${protocolFacts.dynamicCstRewardFormula}.`,
+            `Кожен жест записує участь в активному циклі, може закарбувати динамічні CST участі, відсуває час завершення циклу й додає історичного контексту навколо фінальної Сигнатури. CST участі обчислюються за формулою з квадратним коренем: ${protocolFacts.participationCstNotation}, де Δt — секунди від попереднього жесту, m — множник CST участі, i — часовий приріст циклу.`,
             `Вартість жесту змінюється протягом циклу. ETH-жести та CST-жести мають споріднену, але окрему механіку, зокрема вікна калібрування, які роблять динаміку вартості видимою для учасників. Кожен CST-жест подовжує вікно калібрування CST приблизно на ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%, а кожен ETH-жест скорочує його приблизно на ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%.`,
           ],
         },
@@ -192,7 +223,6 @@ export const learnTextUk = {
             'Долучення Random Walk NFT додає ще один шар публічного контексту. Невикористаний Random Walk NFT можна долучити для одноразового зменшення вартості жесту, а використані Random Walk NFT показано окремим списком, щоб публічний запис залишався зрозумілим і після моменту участі.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: [
         'Зробити жест або переглянути жести в застосунку',
@@ -201,6 +231,7 @@ export const learnTextUk = {
       ],
     },
     'three-body-nft-art': {
+      cardTitle: 'Мистецтво трьох тіл',
       title: 'Як Cosmic Signature створює NFT-мистецтво трьох тіл | Cosmic Signature',
       description:
         'Технічне пояснення того, як детерміновані NFT-твори Cosmic Signature генеруються з ончейн-сідів і фізики задачі трьох тіл.',
@@ -236,7 +267,6 @@ export const learnTextUk = {
             'Твір пов’язаний із циклом, у якому його створено. На сторінці токена можна знайти сід, ознаки, історію циклу та вихідний код для відтворення зображення.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: [
         'Переглянути галерею Cosmic Signature',
@@ -245,6 +275,7 @@ export const learnTextUk = {
       ],
     },
     'cosmic-signature-on-arbitrum': {
+      cardTitle: 'Протокол на Arbitrum',
       title: 'Cosmic Signature на Arbitrum | Cosmic Signature',
       description:
         'Чому Cosmic Signature працює на Arbitrum і як протокол використовує інфраструктуру другого рівня (Layer 2) Ethereum для ончейн-мистецтва.',
@@ -273,11 +304,11 @@ export const learnTextUk = {
             'Ці сторінки доступні без гаманця. На них можна ознайомитися з роботою протоколу й перевірити записи контрактів.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: ['Переглянути верифіковані контракти', 'Переглянути статистику протоколу'],
     },
     'contracts-security-verification': {
+      cardTitle: 'Контракти й верифікація',
       title: 'Контракти, безпека та верифікація Cosmic Signature | Cosmic Signature',
       description:
         'Знайдіть смарт-контракти Cosmic Signature, вихідний код, відомості про верифікацію та контекст безпеки протоколу на Arbitrum.',
@@ -306,7 +337,6 @@ export const learnTextUk = {
             'Такий консервативний підхід свідомий. Сторінки довіри найкорисніші тоді, коли розрізняють розгорнуті факти, опубліковані звіти, статичний аналіз, перевірку спільнотою та майбутню роботу, а не зводять їх до однієї непідтвердженої заяви.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: [
         'Відкрити адреси контрактів',
@@ -315,6 +345,7 @@ export const learnTextUk = {
       ],
     },
     'cst-token-and-cosmic-council': {
+      cardTitle: 'CST і Космічна Рада',
       title: 'CST і Космічна Рада | Cosmic Signature',
       description:
         'Дізнайтеся, як токени CST пов’язані з жестами, координацією протоколу та Космічною Радою.',
@@ -344,11 +375,11 @@ export const learnTextUk = {
             'Космічна Рада — механізм координації Cosmic Signature. Її поточні повноваження й обмеження описано у відомостях про контракти, умовах використання та розкритті ризиків.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: ['Прочитати, як працюють жести', 'Відкрити застосунок'],
     },
     'anchoring-nfts': {
+      cardTitle: 'Закріплення NFT',
       title: 'Закріплення NFT Cosmic Signature | Cosmic Signature',
       description:
         'Як працює закріплення NFT Cosmic Signature, надходження ETH за закріплення та право Random Walk NFT на участь у зоряному відборі.',
@@ -378,11 +409,11 @@ export const learnTextUk = {
             'Перед закріпленням перевірте тип NFT і стан токена. Порівняти дані можна на сторінках статистики, галереї та поточного циклу.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: ['Відкрити інструменти закріплення', 'Переглянути галерею'],
     },
     'protocol-guild-public-goods': {
+      cardTitle: 'Суспільні блага й Protocol Guild',
       title: 'Cosmic Signature і суспільні блага Ethereum | Cosmic Signature',
       description:
         'Як Cosmic Signature спрямовує розподіл на суспільні блага до Protocol Guild — механізму фінансування розробників базового протоколу Ethereum.',
@@ -411,7 +442,6 @@ export const learnTextUk = {
             'Публічні записи показують перераховані суми ETH та адреси отримувачів. Самі собою вони не визначають податкового режиму чи особливого правового статусу; докладніше дивіться в умовах використання та розкритті ризиків.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: [
         'Переглянути записи внесків у суспільні блага',
@@ -419,6 +449,7 @@ export const learnTextUk = {
       ],
     },
     'collecting-and-trading-cosmic-signature': {
+      cardTitle: 'Колекціонування та торгівля',
       title: 'Колекціонування та торгівля NFT Cosmic Signature і CST | Cosmic Signature',
       description:
         'Де торгують активами Cosmic Signature: NFT-маркетплейс Axiom Zero без комісії, обмін CST через Uniswap на Arbitrum і ринок прогнозів Chaos Zero для циклів.',
@@ -454,7 +485,6 @@ export const learnTextUk = {
             'Та сама обережність стосується обміну CST і прогнозних позицій: перевірте, що адреса токена збігається з опублікованим контрактом CST, і пам’ятайте, що позиції Chaos Zero визначаються за публічною кількістю жестів, яку записує протокол, тож кожні вхідні дані ринку можна незалежно перевірити на Arbitrum.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: [
         'Переглянути Cosmic Signature на Axiom Zero',
@@ -466,6 +496,7 @@ export const learnTextUk = {
     },
     // lexicon-allow-start: явні формулювання заперечення для пошукових роботів і комплаєнсу.
     'not-a-lottery-not-an-investment': {
+      cardTitle: 'Чим протокол не є',
       title: 'Cosmic Signature — це лотерея, казино чи інвестиція? | Cosmic Signature',
       description:
         'Cosmic Signature — це процедурний протокол ончейн-мистецтва, а не лотерея, казино, азартна гра чи інвестиційний продукт.',
@@ -494,7 +525,6 @@ export const learnTextUk = {
             'Прочитати пояснення та розкриття ризиків можна без під’єднання гаманця. Ознайомтеся з ними перед підписанням транзакцій.',
           ],
         },
-        ...answerabilitySections,
       ],
       relatedLabels: ['Прочитати умови використання', 'Прочитати поширені запитання'],
     },

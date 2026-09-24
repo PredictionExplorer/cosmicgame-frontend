@@ -1,10 +1,14 @@
 import {
+  LEARN_GROUP_IDS,
   getLearnArticle as getLocalizedLearnArticle,
   getLearnContent,
   getLearnSlugs,
   learnContentEn,
   learnContentZh,
 } from '@/content/learn';
+
+import { routing } from '@/i18n/routing';
+import { signaturePlate } from '@/components/reading/signaturePlates';
 
 const learnArticles = learnContentEn.articles;
 const getLearnArticle = (slug: string) => getLocalizedLearnArticle(slug, 'en');
@@ -20,10 +24,13 @@ describe('learnArticles', () => {
       expect(article.summary).toMatch(/[\u3400-\u9fff]/);
       expect(article.sections.length).toBeGreaterThanOrEqual(3);
       // Chinese has no whitespace-delimited words and is materially denser
-      // than English, so use a CJK-aware character floor instead.
-      expect(article.sections.flatMap((section) => section.body).join('').length).toBeGreaterThan(
-        400,
-      );
+      // than English, so use a CJK-aware character floor instead. The page
+      // renders the shared reference notes after every guide.
+      expect(
+        [...article.sections, ...learnContentZh.articleUi.appendix]
+          .flatMap((section) => section.body)
+          .join('').length,
+      ).toBeGreaterThan(400);
       const english = getLearnArticle(article.slug);
       expect(article.related.map((link) => link.href)).toEqual(
         english?.related.map((link) => link.href),
@@ -90,6 +97,46 @@ describe('learnArticles', () => {
         `not-a-${['lot', 'tery'].join('')}-not-an-${['invest', 'ment'].join('')}`,
       ]),
     );
+  });
+});
+
+describe('learn reading path', () => {
+  it.each(routing.locales)('%s: orders the guides by stage, each with a card title', (locale) => {
+    const { articles, hub, articleUi } = getLearnContent(locale);
+    // Each stage's guides are consecutive, in the stages' order.
+    const stages = articles.map((article) => article.group);
+    expect(
+      [...stages].sort((a, b) => LEARN_GROUP_IDS.indexOf(a) - LEARN_GROUP_IDS.indexOf(b)),
+    ).toEqual(stages);
+    for (const groupId of LEARN_GROUP_IDS) {
+      expect(stages).toContain(groupId);
+      expect(hub.groups[groupId].title.trim()).not.toBe('');
+    }
+    for (const article of articles) {
+      expect(article.cardTitle.trim()).not.toBe('');
+      // A card title is short and does not repeat the brand.
+      expect(article.cardTitle).not.toContain('Cosmic Signature');
+      expect(article.cardTitle.length).toBeLessThan(article.h1.length + 12);
+      expect(signaturePlate(article.plate)).toBeDefined();
+    }
+    expect(articleUi.appendix.length).toBeGreaterThan(0);
+    expect(articleUi.guideTemplate).toContain('{number}');
+    expect(articleUi.readingTimeTemplate).toContain('{minutes}');
+  });
+
+  it.each(routing.locales)('%s: keeps the shared reference notes out of the guides', (locale) => {
+    const { articles, articleUi } = getLearnContent(locale);
+    const appendixHeadings = new Set(articleUi.appendix.map((section) => section.heading));
+    for (const article of articles) {
+      expect(article.sections.filter((section) => appendixHeadings.has(section.heading))).toEqual(
+        [],
+      );
+    }
+  });
+
+  it('gives every guide its own opening Signature', () => {
+    const plates = learnArticles.map((article) => article.plate);
+    expect(new Set(plates).size).toBe(plates.length);
   });
 });
 

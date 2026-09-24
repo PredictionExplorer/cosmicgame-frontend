@@ -38,6 +38,15 @@ export const SIGNATURE_PLATES = {
 
 export type SignaturePlateId = keyof typeof SIGNATURE_PLATES;
 
+const PLATES_BY_ID: ReadonlyMap<number, SignaturePlateArt> = new Map(
+  Object.values(SIGNATURE_PLATES).map((art) => [art.tokenId, art]),
+);
+
+/** The bundled plate of a token, when there is one (content refers to plates by token id). */
+export function signaturePlate(tokenId: number): SignaturePlateArt | undefined {
+  return PLATES_BY_ID.get(tokenId);
+}
+
 /** The seed as printed on a wall label: its first and last characters. */
 export function shortSeed(seed: string): string {
   // The word joiner after the ellipsis keeps the two halves on one line.
