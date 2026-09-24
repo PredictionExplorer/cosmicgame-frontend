@@ -260,7 +260,6 @@ function HeaderPanel({
   const itemRef = useRef<HTMLLIElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
-  const [shift, setShift] = useState(0);
 
   const close = useCallback(
     (returnFocus: boolean) => {
@@ -270,16 +269,17 @@ function HeaderPanel({
     [onOpenChange],
   );
 
-  // Opens under its button, pulled left when it would cross the viewport's edge.
+  // Opens under its button, pulled left when it would cross the viewport's
+  // edge: a layout measurement applied straight to the panel before paint.
+  // Measured from the item and the panel's width, which no transform changes,
+  // so the shift left from the last opening does not skew it.
   useLayoutEffect(() => {
-    if (!open) {
-      setShift(0);
-      return;
-    }
     const node = panelRef.current;
-    if (!node) return;
-    const overflow = node.getBoundingClientRect().right - (window.innerWidth - VIEWPORT_MARGIN_PX);
-    setShift(overflow > 0 ? -overflow : 0);
+    const item = itemRef.current;
+    if (!open || !node || !item) return;
+    const right = item.getBoundingClientRect().left + node.offsetWidth;
+    const overflow = right - (window.innerWidth - VIEWPORT_MARGIN_PX);
+    node.style.transform = overflow > 0 ? `translateX(${-overflow}px)` : '';
   }, [open]);
 
   // A press anywhere outside the item closes it.
@@ -345,7 +345,6 @@ function HeaderPanel({
         ref={panelRef}
         id={panelId}
         hidden={!open}
-        style={shift ? { transform: `translateX(${shift}px)` } : undefined}
         className="absolute left-0 top-full z-50 w-[min(42rem,calc(100vw-2rem))] rounded-surface border border-rule bg-popover p-2 text-popover-foreground shadow-float"
       >
         {/* The links render only while open: the footer and the site map are
@@ -464,12 +463,12 @@ export function HeaderNavigation({
 }: HeaderNavigationProps) {
   const t = useTranslations('nav');
   const pathname = usePathname();
-  const [openPanel, setOpenPanel] = useState<HeaderPanelItem['id'] | null>(null);
-
-  // Any navigation closes the open panel.
-  useEffect(() => {
-    setOpenPanel(null);
-  }, [pathname]);
+  // The open panel belongs to the page it was opened on, so any navigation
+  // closes it.
+  const [opened, setOpened] = useState<{ id: HeaderPanelItem['id']; pathname: string } | null>(
+    null,
+  );
+  const openPanel = opened?.pathname === pathname ? opened.id : null;
 
   return (
     <nav aria-label={t('primaryLabel')} className={cn('relative h-full', className)}>
@@ -493,7 +492,7 @@ export function HeaderNavigation({
               panel={item}
               location={location}
               open={openPanel === item.id}
-              onOpenChange={(open) => setOpenPanel(open ? item.id : null)}
+              onOpenChange={(open) => setOpened(open ? { id: item.id, pathname } : null)}
               onOpenSearch={onOpenSearch}
             />
           ),

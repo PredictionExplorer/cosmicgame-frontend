@@ -218,24 +218,24 @@ function usePaletteGroups(query: string): PaletteGroup[] {
  */
 function useResultAnnouncement(query: string, count: number): string {
   const t = useTranslations('nav');
-  const [announcement, setAnnouncement] = useState('');
+  const trimmed = query.trim();
+  const [announced, setAnnounced] = useState<{ query: string; text: string } | null>(null);
   useEffect(() => {
-    if (!query.trim()) {
-      setAnnouncement('');
-      return undefined;
-    }
+    if (!trimmed) return undefined;
     const timer = window.setTimeout(
       () =>
-        setAnnouncement(
-          count > 0
-            ? t('search.resultCount', { count })
-            : t('search.empty', { query: query.trim() }),
-        ),
+        setAnnounced({
+          query: trimmed,
+          text:
+            count > 0 ? t('search.resultCount', { count }) : t('search.empty', { query: trimmed }),
+        }),
       ANNOUNCE_DELAY_MS,
     );
     return () => window.clearTimeout(timer);
-  }, [count, query, t]);
-  return announcement;
+  }, [count, trimmed, t]);
+  // Only the announcement for the query on screen; a new query clears the
+  // region until typing pauses again.
+  return trimmed && announced?.query === trimmed ? announced.text : '';
 }
 
 /**
