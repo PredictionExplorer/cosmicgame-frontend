@@ -267,7 +267,7 @@ describe('share-card builders', () => {
     const address = '0xa169574d0d353e3010997a3e64846b7d1b2a63b6';
 
     it('checksum and shorten the address with the locale’s ellipsis', () => {
-      expect(shortAddress('en', address)).toBe('0xA169...63B6');
+      expect(shortAddress('en', address)).toBe('0xA169…63B6');
       expect(shortAddress('ja', address)).toBe('0xA169…63B6');
       expect(shortAddress('en', 'nope')).toBeNull();
       expect(participantCardAlt('en', address)).toBe(
@@ -279,7 +279,7 @@ describe('share-card builders', () => {
     it('set the address in the mono face, with the Signatures they hold', async () => {
       await participantCard('en', address);
       expect(lastCard().content).toEqual(
-        expect.objectContaining({ title: '0xA169...63B6', monoTitle: true, art: [] }),
+        expect.objectContaining({ title: '0xA169…63B6', monoTitle: true, art: [] }),
       );
       mocked(loadParticipantArtworks).mockResolvedValue([artwork()]);
       await participantCard('en', address);

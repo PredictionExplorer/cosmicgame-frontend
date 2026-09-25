@@ -2,7 +2,7 @@
   "timer": {
     "cycle": {
       "current": "the current cycle",
-      "numbered": "Cycle #{number}",
+      "numbered": "Cycle {number}",
       "generic": "Performance Cycle"
     },
     "phases": {

@@ -270,7 +270,7 @@ describe('AllocationInfoPage', () => {
       mockUseRoundInfo.mockReturnValue({ data: undefined, isLoading: true });
       render(<AllocationInfoPage roundNum={1} />);
       expect(
-        screen.getByRole('heading', { level: 1, name: 'allocation.formats.cycleHash(cycle=1)' }),
+        screen.getByRole('heading', { level: 1, name: 'allocation.formats.cycle(cycle=1)' }),
       ).toBeInTheDocument();
       expect(
         screen.getByRole('status', { name: 'allocation.details.loading' }),
@@ -299,7 +299,7 @@ describe('AllocationInfoPage', () => {
     it('names the cycle, links the trail and states when it was finalized', () => {
       renderCycle();
       expect(
-        screen.getByRole('heading', { level: 1, name: 'allocation.formats.cycleHash(cycle=1)' }),
+        screen.getByRole('heading', { level: 1, name: 'allocation.formats.cycle(cycle=1)' }),
       ).toBeInTheDocument();
       expect(
         screen.getByRole('link', { name: 'allocation.details.breadcrumbs.recipients' }),

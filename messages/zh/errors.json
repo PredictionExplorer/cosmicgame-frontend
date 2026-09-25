@@ -1,9 +1,7 @@
 {
   "generic": "操作未完成，请重试。",
-  "networkOffline": "网络已断开，请重新连接后继续。",
   "walletNotConnected": "连接 Web3 钱包后即可落笔。",
   "insufficientEth": "钱包中的 ETH 不足，无法落笔。",
-  "cycleClosed": "本周期已收官，下一演绎周期即将开启。",
   "state": {
     "title": "出错了",
     "retry": "重试"
@@ -37,7 +35,6 @@
     "missing": "缺失或无效的变量：",
     "resolution": "请在 shell 或 .env 文件中设置这些变量，然后重启开发服务器。"
   },
-  "apiFailure": "服务未响应，请稍后重试。",
   "unexpected": "发生意外错误，请重试。",
   "notFound": {
     "code": "错误 404",

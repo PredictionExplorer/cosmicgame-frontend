@@ -54,7 +54,7 @@
   "steps": {
     "anchor": {
       "title": "Anchor your NFTs",
-      "body": "On <link>My Anchors</link>, choose Cosmic Signature or Random Walk NFTs from your wallet. The first time, your wallet asks you to approve the anchoring contract for that collection, then to anchor."
+      "body": "On <link>My anchors</link>, choose Cosmic Signature or Random Walk NFTs from your wallet. The first time, your wallet asks you to approve the anchoring contract for that collection, then to anchor."
     },
     "receive": {
       "title": "Receive every cycle",
@@ -157,7 +157,7 @@
     "releaseNote": "Releasing is permanent. You confirm on the next screen before your wallet opens.",
     "anchoredOn": "Anchored <date></date>",
     "accrued": "{amount} accrued",
-    "cycle": "Cycle #{cycle}",
+    "cycle": "Cycle {cycle}",
     "open": "Open {title}",
     "settled": {
       "anchored": "Anchored · updating",

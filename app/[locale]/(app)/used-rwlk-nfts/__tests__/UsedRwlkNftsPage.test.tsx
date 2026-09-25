@@ -81,7 +81,7 @@ describe('UsedRwlkNftsPage', () => {
     const tokenLink = within(card).getByRole('link', { name: /RandomWalk NFT #000215/ });
     expect(tokenLink).toHaveAttribute('href', 'https://www.randomwalknft.com/detail/215');
     expect(tokenLink).toHaveAttribute('target', '_blank');
-    expect(within(card).getByRole('link', { name: 'Cycle #1' })).toHaveAttribute(
+    expect(within(card).getByRole('link', { name: 'Cycle 1' })).toHaveAttribute(
       'href',
       '/allocation/1',
     );

@@ -125,7 +125,7 @@ describe('UserStellarSelectionNFTPage', () => {
     });
     render(<UserStellarSelectionNFTPage address={ADDRESS} />);
     expect(
-      screen.getByRole('heading', { level: 2, name: "Couldn't load the Stellar Selection NFTs" }),
+      screen.getByRole('heading', { level: 2, name: 'Couldn’t load the Stellar Selection NFTs' }),
     ).toBeInTheDocument();
     expect(screen.queryByText('No Stellar Selection NFTs yet')).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: /try again/i }));
@@ -149,7 +149,7 @@ describe('UserStellarSelectionNFTPage', () => {
       refetch: jest.fn(),
     });
     render(<UserStellarSelectionNFTPage address={ADDRESS} />);
-    expect(screen.getAllByText("The artwork couldn't be loaded")).toHaveLength(1);
+    expect(screen.getAllByText('The artwork couldn’t be loaded')).toHaveLength(1);
   });
 
   it('explains an address that is not an address', () => {

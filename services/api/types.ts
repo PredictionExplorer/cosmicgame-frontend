@@ -111,11 +111,6 @@ export interface DashboardInfo {
   PrizeClaimTs: number;
   TsRoundStart: number;
   LastBidderAddr: string;
-  /**
-   * Participation CST a gesture made now would imprint, in CST (wire `TokenReward`). A CST
-   * amount, not a cost: never format it as ETH. Absent when the backend could not read it.
-   */
-  ParticipationCstReward?: number;
   StakingAmountEth: number;
   CurRoundPrizeTime?: number;
   MainStats: MainStats;

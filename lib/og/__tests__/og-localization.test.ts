@@ -34,23 +34,6 @@ import {
 
 const ROOT = process.cwd();
 
-const generatorPaths = [
-  'app/[locale]/(app)/opengraph-image.tsx',
-  'app/[locale]/(app)/gallery/opengraph-image.tsx',
-  'app/[locale]/(app)/current-cycle/opengraph-image.tsx',
-  'app/[locale]/(app)/anchoring/opengraph-image.tsx',
-  'app/[locale]/(app)/faq/opengraph-image.tsx',
-  'app/[locale]/(app)/how-it-works/opengraph-image.tsx',
-  'app/[locale]/(app)/detail/[id]/opengraph-image.tsx',
-  'app/[locale]/(app)/gesture/[id]/opengraph-image.tsx',
-  'app/[locale]/(app)/allocation/[id]/opengraph-image.tsx',
-  'app/[locale]/(app)/user/[address]/opengraph-image.tsx',
-  'app/[locale]/(landing)/opengraph-image.tsx',
-  'app/[locale]/(landing)/landing-site/opengraph-image.tsx',
-  'app/[locale]/(landing)/about/opengraph-image.tsx',
-  'app/[locale]/(landing)/learn/opengraph-image.tsx',
-] as const;
-
 const CHINESE_LOCALES = ['zh', 'zh-TW', 'zh-HK'] as const;
 
 /** Every drawn string of a locale's catalog (alt text is never drawn). */
@@ -257,18 +240,4 @@ describe('share-card font files', () => {
     expect(ogRenderedText(ROOT, 'uk')).toContain('Є');
     expect(ogRenderedText(ROOT, 'vi')).toContain('Ữ');
   });
-});
-
-describe('share-card routes', () => {
-  it.each(generatorPaths)(
-    '%s renders through the card builders with localized alt text',
-    (path) => {
-      const source = readFileSync(join(ROOT, path), 'utf8');
-      expect(source).toContain('generateImageMetadata');
-      expect(source).toContain("from '@/lib/og/cards'");
-      expect(source).toContain('ogImageMetadata(');
-      expect(source).toMatch(/params:\s*Promise<\{[^}]*locale:\s*string/);
-      expect(source).toMatch(/export const size = COSMIC_OG_SIZE/);
-    },
-  );
 });

@@ -299,7 +299,7 @@ function FinalizedSignature({
             // The finalization moment is the spec sheet's "Finalized" row, not repeated here.
             meta={[
               name ? <span className="type-mono">{id}</span> : null,
-              t('formats.cycleHash', { cycle: allocation.RoundNum }),
+              t('formats.cycle', { cycle: allocation.RoundNum }),
             ]}
           />
         ) : null}
@@ -512,7 +512,7 @@ function FinalizedCycleIndex() {
                     seed={round.TokenSeed ?? signatures.get(round.TokenId)?.seed}
                     artState={round.TokenSeed === undefined ? signatures.state : 'ready'}
                     href={`/allocation/${round.RoundNum}`}
-                    title={t('formats.cycleHash', { cycle: round.RoundNum })}
+                    title={t('formats.cycle', { cycle: round.RoundNum })}
                     meta={[
                       <Amount key="eth" value={round.AmountEth} unit="ETH" />,
                       round.TimeStamp ? <DateTime key="date" timestamp={round.TimeStamp} /> : null,

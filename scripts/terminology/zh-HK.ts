@@ -94,7 +94,8 @@ export const ZH_HK_TERMINOLOGY_RULES: readonly TerminologyRule[] = [
   {
     concept: 'Learn (was Learn Hub)',
     canonical: '學習',
-    variants: ['學習樞紐'],
+    // The retired canonical stays banned so it cannot drift back in.
+    variants: ['學習樞紐', '學習中心'],
   },
   {
     concept: 'Site Map',

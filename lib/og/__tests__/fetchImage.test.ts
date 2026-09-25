@@ -27,6 +27,13 @@ beforeAll(async () => {
       response.writeHead(200, { 'Content-Type': 'image/png' }).end(render);
     } else if (path === '/moved.png') {
       response.writeHead(302, { Location: '/art.png' }).end();
+    } else if (path === '/to-ftp.png') {
+      response.writeHead(302, { Location: 'ftp://127.0.0.1/art.png' }).end();
+    } else if (path === '/to-nowhere.png') {
+      // Not a URL: `new URL('http://[')` throws.
+      response.writeHead(302, { Location: 'http://[' }).end();
+    } else if (path === '/loop.png') {
+      response.writeHead(302, { Location: '/loop.png' }).end();
     } else if (path === '/page.html') {
       response.writeHead(200, { 'Content-Type': 'text/html' }).end('<html></html>');
     } else if (path === '/slow.png') {
@@ -56,6 +63,29 @@ describe('artwork downloads for share cards', () => {
     await expect(fetchPng('not a url')).resolves.toBeNull();
     await expect(fetchPng('file:///etc/hosts')).resolves.toBeNull();
     await expect(fetchPng(`${origin}/slow.png`, { timeoutMs: 100 })).resolves.toBeNull();
+  });
+
+  // Regression (V137): a redirect to a non-http scheme threw inside the
+  // request's promise and, when its timer fired, again outside it (an
+  // uncaught exception); an unparsable Location threw in the response
+  // handler. Every such answer is a failure that resolves null, at once.
+  it('resolves null for redirects it must not or cannot follow', async () => {
+    const timeoutMs = 300;
+    const started = Date.now();
+    await expect(fetchPng(`${origin}/to-ftp.png`, { timeoutMs })).resolves.toBeNull();
+    await expect(fetchPng(`${origin}/to-nowhere.png`, { timeoutMs })).resolves.toBeNull();
+    await expect(fetchPng(`${origin}/loop.png`, { timeoutMs })).resolves.toBeNull();
+    expect(Date.now() - started).toBeLessThan(timeoutMs);
+    // Outlive every timer the requests armed: none may fire into a request
+    // that was never created.
+    await new Promise((resolve) => setTimeout(resolve, timeoutMs + 100));
+  });
+
+  it('never keeps a failed render in the memo', async () => {
+    const before = hits.get('/to-ftp.png') ?? 0;
+    await expect(loadScaledArtwork(`${origin}/to-ftp.png`, 680)).resolves.toBeNull();
+    await expect(loadScaledArtwork(`${origin}/to-ftp.png`, 680)).resolves.toBeNull();
+    expect(hits.get('/to-ftp.png')).toBe(before + 2);
   });
 
   // Regression: next/og rasterizes through librsvg, which rejects an SVG over

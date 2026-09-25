@@ -10,17 +10,18 @@ import { useFormat } from '@/hooks/useFormat';
 export interface SelectionShareProps {
   share: SelectionShareFigures;
   cycle: number;
-  /** Stellar Selections drawn at finalization, when the dashboard carries them. */
+  /** Stellar Selections made at finalization, when the dashboard carries them. */
   ethSelections: number | null;
   nftSelections: number | null;
 }
 
 /**
- * An address's place in this cycle's Stellar Selection pool, as the plain
+ * An address's share of this cycle's Stellar Selection entries, as the plain
  * count it comes from and its linear share: "291 of 1,135 gestures · 25.6%".
  * The bar is static and scaled to the share, never to a compounded chance
  * of selection (lib/selectionStanding.ts). The caption says how many
- * selections are drawn, with replacement, one entry per gesture.
+ * selections are made, one entry per gesture, each entry selectable more than
+ * once.
  */
 export function SelectionShare({
   share,

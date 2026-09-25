@@ -63,16 +63,7 @@
       "title": "地址無效",
       "description": "連結中需要完整地址：0x 加 40 位字母和數字。",
       "action": "全部推廣分配"
-    },
-    "smallNote": "灰色數額為少於 {amount} 的分配，按目前精度無法完整顯示。"
-  },
-  "transferForm": {
-    "title": "撥付推廣 CST",
-    "description": "調用推廣儲備合約的 `payReward` 函數；目前連接的錢包必須屬於現任財務執行人。",
-    "reserveLabel": "推廣儲備",
-    "ownerLabel": "所有者",
-    "treasurerLabel": "財務執行人",
-    "historyLink": "查看推廣儲備轉帳記錄"
+    }
   },
   "learnHow": "了解參與方式",
   "loadError": "無法載入推廣分配記錄。"

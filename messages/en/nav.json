@@ -29,7 +29,7 @@
       "description": "Make a gesture in the live cycle"
     },
     "currentCycle": {
-      "label": "Current Cycle",
+      "label": "Current cycle",
       "description": "The live cycle in full: every gesture and standing"
     },
     "imprint": {
@@ -45,7 +45,7 @@
       "description": "Signatures their owners have named"
     },
     "attachedNfts": {
-      "label": "Attached NFT Contributions",
+      "label": "Attached NFT contributions",
       "description": "NFTs attached to gestures across cycles"
     },
     "usedRwlkNfts": {
@@ -57,32 +57,32 @@
       "description": "Protocol-wide figures and records"
     },
     "statisticsParticipation": {
-      "label": "Participation Statistics",
+      "label": "Participation statistics",
       "short": "Participation",
       "description": "Participants and gestures over time"
     },
     "statisticsTokens": {
-      "label": "Token Distribution Statistics",
+      "label": "Token distribution statistics",
       "short": "Tokens",
       "description": "CST and NFT supply and holders"
     },
     "statisticsAnchoring": {
-      "label": "Anchoring Statistics",
+      "label": "Anchoring statistics",
       "short": "Anchoring",
       "description": "Anchoring totals and history"
     },
     "statisticsActivity": {
-      "label": "Gesture Activity Statistics",
+      "label": "Gesture activity statistics",
       "short": "Activity",
       "description": "When gestures happen, cycle by cycle"
     },
     "statisticsPerformance": {
-      "label": "Participant Outcomes",
+      "label": "Participant outcomes",
       "short": "Outcomes",
       "description": "Spent and received, retrievals by cycle"
     },
     "allocationRecipients": {
-      "label": "Allocation Recipients",
+      "label": "Allocation recipients",
       "description": "Where each cycle’s reserves went"
     },
     "anchorDistributions": {
@@ -90,38 +90,38 @@
       "description": "Anchored NFTs and their distributions"
     },
     "outreachAllocations": {
-      "label": "Outreach Allocations",
+      "label": "Outreach allocations",
       "description": "CST allocated from the Outreach Reserve"
     },
     "publicGoodsProtocol": {
-      "label": "Protocol Public Goods Contributions",
+      "label": "Protocol Public Goods contributions",
       "short": "Protocol",
       "description": "The Public Goods Allocation of every cycle"
     },
     "publicGoodsVoluntary": {
-      "label": "Voluntary Public Goods Contributions",
+      "label": "Voluntary Public Goods contributions",
       "short": "Voluntary",
       "description": "Contributions sent straight to the Public Goods Vault"
     },
     "publicGoodsRetrievals": {
-      "label": "Public Goods Retrievals",
+      "label": "Public Goods retrievals",
       "short": "Retrievals",
       "description": "Funds forwarded from the Public Goods Vault"
     },
     "ethContributions": {
-      "label": "Direct ETH Contributions",
+      "label": "Direct ETH contributions",
       "description": "ETH contributed directly, with its notes"
     },
     "coordinationChanges": {
-      "label": "Coordination Changes",
+      "label": "Coordination changes",
       "description": "Every change to the protocol’s parameters"
     },
     "retrievedAllocations": {
-      "label": "Finalized Allocations",
+      "label": "Finalized allocations",
       "description": "Allocation records across finalized cycles"
     },
     "howItWorks": {
-      "label": "How It Works",
+      "label": "How it works",
       "description": "The cycle mechanics, step by step"
     },
     "faq": {
@@ -133,7 +133,7 @@
       "description": "Guides to the protocol, the art and taking part"
     },
     "whitePaper": {
-      "label": "White Paper",
+      "label": "White paper",
       "description": "The complete protocol reference"
     },
     "quiz": {
@@ -146,7 +146,7 @@
       "description": "The story behind the protocol"
     },
     "projectSite": {
-      "label": "Project Site",
+      "label": "Project site",
       "description": "The art, the story and the protocol at a glance"
     },
     "security": {
@@ -162,11 +162,11 @@
       "description": "Verified contract addresses on Arbitrum"
     },
     "sourceCode": {
-      "label": "Source Code",
+      "label": "Source code",
       "description": "The rendering pipeline and contract source"
     },
     "riskDisclosures": {
-      "label": "Risk Disclosures",
+      "label": "Risk disclosures",
       "description": "What to understand before you take part"
     },
     "terms": {
@@ -178,15 +178,15 @@
       "description": "Wallet data, analytics and on-chain transparency"
     },
     "siteMap": {
-      "label": "Site Map",
+      "label": "Site map",
       "description": "Every page, grouped by section"
     },
     "myStatistics": {
-      "label": "My Statistics",
+      "label": "My statistics",
       "description": "Your gestures, allocations and anchors"
     },
     "myAllocations": {
-      "label": "My Allocations",
+      "label": "My allocations",
       "description": "Allocations waiting for you to retrieve"
     },
     "myNfts": {
@@ -194,11 +194,11 @@
       "description": "The Signatures in your wallet"
     },
     "myAnchors": {
-      "label": "My Anchors",
+      "label": "My anchors",
       "description": "Anchor NFTs and retrieve their distributions"
     },
     "allocationHistory": {
-      "label": "My Allocation History",
+      "label": "My allocation history",
       "description": "Every allocation made to your wallet"
     },
     "transferCst": {
@@ -265,7 +265,7 @@
     "results": {
       "address": "Participant {address}",
       "token": "Signature {id}",
-      "cycle": "Cycle #{cycle}",
+      "cycle": "Cycle {cycle}",
       "gesture": "Gesture ID {id}",
       "transaction": "Transaction on {explorer}"
     },

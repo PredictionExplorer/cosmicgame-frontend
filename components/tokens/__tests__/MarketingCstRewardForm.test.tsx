@@ -297,7 +297,7 @@ describe('MarketingCstRewardForm', () => {
     renderForm();
     // One retry first (useReserveBalance), so allow for its delay.
     expect(
-      await screen.findByText("The reserve's CST balance could not be read.", undefined, {
+      await screen.findByText('The reserve’s CST balance could not be read.', undefined, {
         timeout: 4_000,
       }),
     ).toBeInTheDocument();

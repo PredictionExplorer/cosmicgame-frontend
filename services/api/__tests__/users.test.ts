@@ -13,6 +13,7 @@ import {
   get_unique_rwalk_stakers,
   get_unique_both_stakers,
 } from '@/services/api/users';
+import { reportError } from '@/utils/errors';
 
 jest.mock('axios', () => {
   const actual = jest.requireActual<typeof import('axios')>('axios');
@@ -254,16 +255,46 @@ describe('users API', () => {
 
       expect(recipient?.AllocationsCount).toBe(39);
       expect(recipient?.PrizesSum).toBe(3.5397);
+      expect(reportError).not.toHaveBeenCalled();
     });
 
-    it('leaves a missing count undefined rather than inventing one', async () => {
+    // Regression (V140): the schema required PrizesCount while the mapper also accepted
+    // AllocationsCount, so a renamed field reported a mismatch on every read.
+    it('accepts a row that already names the count AllocationsCount', async () => {
       mockedAxios.get.mockResolvedValue({
-        data: { UniqueWinners: [{ WinnerAid: 1, WinnerAddr: '0x1' }] },
+        data: {
+          UniqueWinners: [
+            {
+              WinnerAid: 980,
+              WinnerAddr: '0x7406',
+              AllocationsCount: 12,
+              MaxWinAmountEth: 0,
+              PrizesSum: 1,
+            },
+          ],
+        },
+      });
+
+      const [recipient] = await get_unique_winners();
+
+      expect(recipient?.AllocationsCount).toBe(12);
+      expect(reportError).not.toHaveBeenCalled();
+    });
+
+    it('leaves a missing count undefined rather than inventing one, and reports it', async () => {
+      mockedAxios.get.mockResolvedValue({
+        data: {
+          UniqueWinners: [{ WinnerAid: 1, WinnerAddr: '0x1', MaxWinAmountEth: 0, PrizesSum: 0 }],
+        },
       });
 
       const [recipient] = await get_unique_winners();
 
       expect(recipient?.AllocationsCount).toBeUndefined();
+      expect(reportError).toHaveBeenCalledWith(
+        expect.objectContaining({ message: expect.stringContaining('uniqueWinners') }),
+        'schema:uniqueWinners',
+      );
     });
 
     it('returns empty array on 400 response', async () => {

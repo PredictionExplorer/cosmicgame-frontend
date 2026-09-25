@@ -6,18 +6,11 @@
     "minutes": "PHÚT",
     "seconds": "GIÂY"
   },
-  "countdownLong": {
-    "days": "Ngày",
-    "hours": "Giờ",
-    "minutes": "Phút",
-    "seconds": "Giây"
-  },
   "durationCompact": {
-    "days": "ng",
-    "hours": "g",
-    "minutes": "ph",
-    "seconds": "s",
-    "leftPattern": "còn {duration}"
+    "days": " ngày",
+    "hours": " giờ",
+    "minutes": " phút",
+    "seconds": " giây"
   },
   "address": {
     "zero": "Địa chỉ 0",

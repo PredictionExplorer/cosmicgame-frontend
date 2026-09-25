@@ -2,7 +2,7 @@
   "page": {
     "historyTitle": "Contribution history",
     "historyEmpty": "Contributions made with the form appear here, with any note they carry.",
-    "historyError": "The contribution history couldn't be loaded.",
+    "historyError": "The contribution history couldn’t be loaded.",
     "jumpToForm": "Contribute ETH"
   },
   "form": {
@@ -36,21 +36,21 @@
       "cycle": "Cycle",
       "date": "Date"
     },
-    "noteTitle": "Contributor's note",
+    "noteTitle": "Contributor’s note",
     "noteCaption": "Written by the contributor and stored on-chain with the contribution.",
-    "noteRawCaption": "Shown exactly as stored: this note isn't in the form's usual format.",
+    "noteRawCaption": "Shown exactly as stored: this note isn’t in the form’s usual format.",
     "opensInNewTab": "Opens in a new tab",
     "recordTitle": "Record",
     "transactionLabel": "Transaction",
     "cycleLink": "All contributions in Cycle #{cycle}",
     "recordLabel": "Record id",
     "recordValue": "#{id}",
-    "invalidIdTitle": "This link doesn't point to a contribution",
+    "invalidIdTitle": "This link doesn’t point to a contribution",
     "invalidIdDescription": "Contribution ids are whole numbers, like 7.",
     "notFoundTitle": "There is no contribution #{id}",
-    "notFoundDescription": "Only contributions made with a note have a record page. Find the one you're after in the full list.",
+    "notFoundDescription": "Only contributions made with a note have a record page. Find the one you’re after in the full list.",
     "backToAll": "All contributions",
-    "loadError": "This contribution couldn't be loaded.",
+    "loadError": "This contribution couldn’t be loaded.",
     "notFoundHeading": "Contribution not found"
   },
   "cycle": {
@@ -69,9 +69,9 @@
     "cycleLabel": "Cycle #{cycle}",
     "viewAllocation": "Cycle #{cycle} allocation",
     "viewLive": "The live cycle",
-    "emptyDescription": "Contributions sent while Cycle #{cycle} is active appear here.",
-    "loadError": "The contributions of this cycle couldn't be loaded.",
-    "invalidTitle": "This link doesn't point to a cycle",
+    "emptyDescription": "Contributions sent while Cycle {cycle} is active appear here.",
+    "loadError": "The contributions of this cycle couldn’t be loaded.",
+    "invalidTitle": "This link doesn’t point to a cycle",
     "invalidDescription": "Cycle numbers are whole numbers from 0, like 3.",
     "emptyDescriptionPast": "No direct ETH contributions were made during Cycle #{cycle}."
   }

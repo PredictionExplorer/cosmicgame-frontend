@@ -5,9 +5,7 @@ const EXPERIMENT_PATH = '/experimental-ui?uxScenario=live-mid-cycle';
 async function openExperiment(page: Page, path = EXPERIMENT_PATH): Promise<void> {
   await page.goto(path, { waitUntil: 'domcontentloaded' });
   await expect(page.getByText('UX scenario: live-mid-cycle')).toBeVisible({ timeout: 20_000 });
-  await expect(
-    page.getByRole('heading', { level: 1, name: 'The Cosmic Signature Observatory' }),
-  ).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Observatory art view' })).toBeVisible();
 }
 
 test.describe('experimental UI', () => {
@@ -23,6 +21,8 @@ test.describe('experimental UI', () => {
     await expect(deck.getByTestId('home-deck-board')).toBeVisible();
     await expect(page.getByTestId('home-deck-chat')).toBeVisible();
     await expect(page.getByTestId('experimental-ui-return')).toHaveAttribute('href', '/');
+    await expect(page.getByTestId('experimental-ui-preview')).toBeVisible();
+    await expect(page.getByTestId('experimental-ui-feedback')).toHaveAttribute('target', '_blank');
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
       'content',
       /noindex,\s*follow/,
@@ -186,7 +186,7 @@ test.describe('experimental UI', () => {
     expect(positions.scrollWidth).toBeLessThanOrEqual(positions.clientWidth + 1);
 
     // Phones: the lede reads in full, the newcomer's link follows it as text,
-    // then the bell and "Return" share one row at one height.
+    // then the bell and "Back to the Observatory" share one row at one height.
     const header = page.getByTestId('home-deck-header');
     await expect(header.getByTestId('experimental-ui-new-here')).toBeVisible();
     await expect(header.getByRole('navigation')).toBeHidden();
@@ -277,9 +277,9 @@ test.describe('experimental UI', () => {
     });
 
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
-    await expect(
-      page.getByRole('heading', { level: 1, name: 'Cosmic Signature 观测台' }),
-    ).toBeVisible({ timeout: 20_000 });
-    await expect(page.getByRole('link', { name: '返回当前界面' })).toHaveAttribute('href', '/zh');
+    await expect(page.getByRole('heading', { level: 1, name: '观测台艺术视图' })).toBeVisible({
+      timeout: 20_000,
+    });
+    await expect(page.getByRole('link', { name: '返回观测台' })).toHaveAttribute('href', '/zh');
   });
 });

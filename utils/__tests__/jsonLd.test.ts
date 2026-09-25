@@ -401,7 +401,7 @@ describe('JSON-LD generators', () => {
     it('describes the running cycle as a dated virtual Event', () => {
       expect(result['@context']).toBe('https://schema.org');
       expect(result['@type']).toBe('Event');
-      expect(result.name).toBe('Cosmic Signature Performance Cycle #3');
+      expect(result.name).toBe('Cosmic Signature Performance Cycle 3');
       expect(result.startDate).toBe('2023-11-14T22:13:20.000Z');
       expect(result.eventAttendanceMode).toBe('https://schema.org/OnlineEventAttendanceMode');
       expect(result.location).toEqual({

@@ -139,8 +139,9 @@ export function get_unique_bidders(opts?: ApiRequestOptions): Promise<Participan
 
 /**
  * Maps a `statistics/unique/winners` row onto {@link Recipient}. The wire still names the
- * allocation count `PrizesCount`; the UI reads `AllocationsCount`. A missing count stays
- * undefined so the table shows it as unknown instead of a blank cell.
+ * allocation count `PrizesCount`; the UI reads `AllocationsCount`, and a row that already
+ * carries it keeps it (`RecipientSchema` accepts either). A missing count stays undefined
+ * so the table shows it as unknown instead of a blank cell.
  */
 function toRecipient(row: Record<string, unknown>): Recipient {
   const count = row.AllocationsCount ?? row.PrizesCount;

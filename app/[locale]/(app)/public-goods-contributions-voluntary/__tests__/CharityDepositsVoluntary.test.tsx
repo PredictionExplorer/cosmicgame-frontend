@@ -52,7 +52,7 @@ describe('CharityDepositsVoluntary', () => {
     mockUseCharityVoluntary.mockReturnValue({ data: [], isLoading: false });
     render(<CharityDepositsVoluntary header={HEADER} />);
     expect(within(screen.getByTestId('deposit-table')).getByRole('heading')).toHaveTextContent(
-      'Contribution records',
+      'Contributions',
     );
   });
 
@@ -94,6 +94,26 @@ describe('CharityDepositsVoluntary', () => {
       'href',
       expect.stringContaining('0x6666666666666666666666666666666666666666'),
     );
+  });
+
+  // V332: the page told readers to send ETH without naming the one network
+  // the vault exists on, and showed a shortened address on phones.
+  it('names the network three times and shows the whole address', () => {
+    mockUseCharityVoluntary.mockReturnValue({ data: [], isLoading: false });
+    render(<CharityDepositsVoluntary header={HEADER} />);
+    const section = screen.getByRole('region', { name: 'Contribute to the vault' });
+    expect(
+      within(section).getByText(/^Send ETH on Arbitrum Sepolia straight to/),
+    ).toBeInTheDocument();
+    expect(within(section).getByText('Network')).toBeInTheDocument();
+    expect(within(section).getByText('Arbitrum Sepolia')).toBeInTheDocument();
+    expect(within(section).getByText(/^Send only on Arbitrum Sepolia\./)).toBeInTheDocument();
+    expect(
+      within(section).getByText('0x6666666666666666666666666666666666666666'),
+    ).toBeInTheDocument();
+    expect(
+      within(section).getByRole('form', { name: 'publicGoods.contribute.form.label' }),
+    ).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

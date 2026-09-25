@@ -11,7 +11,10 @@ describe('HeroSection', () => {
     render(<HeroSection hero={hero} />);
     const heading = screen.getByRole('heading', { level: 1 });
     expect(heading).toHaveTextContent(/^How Cosmic Signature works$/);
-    expect(heading.childNodes).toHaveLength(1);
+    // One string: no markup but the span that holds the brand on one line (V425).
+    expect([...heading.querySelectorAll('*')].map((node) => node.textContent)).toEqual([
+      'Cosmic Signature',
+    ]);
     expect(heading).toHaveClass('type-display-md');
     expect(heading).toHaveAttribute('id', 'hero-heading');
   });

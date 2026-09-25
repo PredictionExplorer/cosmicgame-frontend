@@ -55,6 +55,7 @@ export {
 } from './format/dates';
 export {
   formatDuration,
+  formatDurationParts,
   formatDurationTick,
   formatHoursTick,
   formatSeconds,

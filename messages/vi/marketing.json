@@ -63,16 +63,7 @@
       "title": "Địa chỉ không hợp lệ",
       "description": "Liên kết cần một địa chỉ đầy đủ: 0x và 40 chữ cái, chữ số theo sau.",
       "action": "Tất cả phân bổ truyền thông"
-    },
-    "smallNote": "Các số in mờ là phân bổ dưới {amount}, quá nhỏ để hiển thị ở độ chính xác này."
-  },
-  "transferForm": {
-    "title": "Chi CST phân bổ",
-    "description": "Chuyển CST từ Dự trữ truyền thông. Ví đang kết nối phải là ví thủ quỹ hiện tại.",
-    "reserveLabel": "Dự trữ truyền thông",
-    "ownerLabel": "Chủ sở hữu",
-    "treasurerLabel": "Thủ quỹ",
-    "historyLink": "Xem các lần chuyển của Dự trữ truyền thông"
+    }
   },
   "learnHow": "Tìm hiểu cách thức",
   "loadError": "Không tải được các khoản phân bổ truyền thông."

@@ -56,10 +56,10 @@
     "cycle": "Cycle",
     "recipient": "Recipient",
     "owner": "Owner",
-    "roundNumber": "Cycle #{round}",
+    "roundNumber": "Cycle {round}",
     "anchoring": "Anchoring",
     "seed": "Seed",
-    "seedTooltip": "The unique random seed used to generate this token's artwork and traits.",
+    "seedTooltip": "The unique random seed used to generate this token’s artwork and traits.",
     "copySeed": "Copy seed"
   },
   "image": {

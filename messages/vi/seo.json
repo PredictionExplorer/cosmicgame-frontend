@@ -58,7 +58,7 @@
       },
       "marketing": {
         "heading": "Phân bổ truyền thông",
-        "description": "Xem lịch sử phân bổ truyền thông của Cosmic Signature và các đợt phân phối CST cho những người đóng góp giúp mọi người khám phá giao thức.",
+        "description": "CST được gửi từ Dự trữ truyền thông đến những người giúp mọi người khám phá Cosmic Signature, mỗi lần phân bổ kèm giao dịch của nó.",
         "source": "API truyền thông của Cosmic Signature",
         "links": {
           "faq": "Đọc câu hỏi thường gặp",
@@ -67,13 +67,13 @@
         },
         "cards": {
           "records": {
-            "label": "Bản ghi phân bổ truyền thông"
+            "label": "Lượt phân bổ"
           },
           "allocatedCst": {
-            "label": "Tổng CST phân bổ truyền thông"
+            "label": "CST đã phân bổ"
           },
           "contributors": {
-            "label": "Người đóng góp truyền thông riêng biệt"
+            "label": "Người đóng góp"
           }
         }
       },
@@ -109,13 +109,13 @@
         },
         "cards": {
           "records": {
-            "label": "Bản ghi đóng góp trực tiếp"
+            "label": "Lượt đóng góp"
           },
           "totalEth": {
-            "label": "Tổng đóng góp ETH trực tiếp"
+            "label": "ETH đã đóng góp"
           },
           "contributors": {
-            "label": "Người đóng góp riêng biệt"
+            "label": "Người đóng góp"
           }
         }
       },
@@ -207,7 +207,7 @@
       },
       "coordination-changes": {
         "heading": "Thay đổi điều phối",
-        "description": "Mọi thay đổi mà chủ sở hữu hợp đồng đã thực hiện với các tham số giao thức kể từ khi chế độ hiện tại bắt đầu.",
+        "description": "Các thay đổi mà chủ sở hữu hợp đồng đã thực hiện với tham số giao thức, kèm giao dịch của từng thay đổi. Cho đến khi từ bỏ quyền sở hữu, chủ sở hữu vẫn có thể thay đổi tiếp.",
         "source": "API sự kiện hệ thống của Cosmic Signature",
         "links": {
           "security": "Đọc tổng quan bảo mật",
@@ -216,7 +216,7 @@
         },
         "cards": {
           "records": {
-            "label": "Bản ghi thay đổi điều phối"
+            "label": "Lượt thay đổi"
           },
           "latest": {
             "label": "Thay đổi gần nhất"
@@ -224,13 +224,14 @@
           "owner": {
             "label": "Chủ sở hữu hợp đồng",
             "tooltip": "Chỉ địa chỉ này mới có thể thay đổi các tham số. Khi quyền sở hữu bị từ bỏ, chủ sở hữu trở thành địa chỉ 0 và không ai thay đổi được nữa.",
-            "renounced": "Đã từ bỏ quyền sở hữu"
+            "renounced": "Đã từ bỏ quyền sở hữu",
+            "active": "Có thể thay đổi tham số"
           }
         }
       },
       "public-goods-contributions-cg": {
         "heading": "Đóng góp Hàng hóa công của giao thức",
-        "description": "Theo dõi các khoản chuyển hàng hóa công tự động của Cosmic Signature từ các chu kỳ giao thức đến Kho Hàng hóa công và đơn vị thụ hưởng đã cấu hình — hiện là Protocol Guild.",
+        "description": "7% Dự trữ chu kỳ của mỗi chu kỳ đã hoàn tất được chuyển vào Kho Hàng hóa công cho đơn vị thụ hưởng của kho, hiện là Protocol Guild, tổ chức tài trợ cho những người đóng góp cốt lõi cho Ethereum.",
         "source": "API Hàng hóa công của Cosmic Signature",
         "links": {
           "learn": "Tìm hiểu về hàng hóa công",
@@ -273,7 +274,7 @@
       },
       "public-goods-retrievals": {
         "heading": "Nhận về Hàng hóa công",
-        "description": "Xem các lần nhận về từ Kho Hàng hóa công của Cosmic Signature, nơi dự trữ chu kỳ chuyển hỗ trợ đến đơn vị thụ hưởng hàng hóa công đã cấu hình — hiện là Protocol Guild.",
+        "description": "Mọi lần chuyển từ Kho Hàng hóa công đến đơn vị thụ hưởng của kho, hiện là Protocol Guild. Ai cũng có thể thực hiện, và ETH chỉ đến đơn vị thụ hưởng.",
         "source": "API Hàng hóa công của Cosmic Signature",
         "links": {
           "learn": "Tìm hiểu về hàng hóa công",

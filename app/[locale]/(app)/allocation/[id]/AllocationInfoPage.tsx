@@ -288,7 +288,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
   };
 
   const breadcrumbs = [{ label: t('details.breadcrumbs.recipients'), href: '/allocation' }];
-  const title = t('formats.cycleHash', { cycle: roundNum });
+  const title = t('formats.cycle', { cycle: roundNum });
 
   const recipientsLink = [{ href: '/allocation', label: t('details.breadcrumbs.recipients') }];
 

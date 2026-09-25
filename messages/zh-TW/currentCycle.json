@@ -109,7 +109,7 @@
     },
     "stellarSelectionEntries": {
       "title": "星選資格",
-      "tooltip": "每次落筆都會在本週期的星選池中計入一次；週期確定時，每次星選都從整個池中選取，同一筆落筆可再次獲選。下表列出每位參與者在池中的佔比。"
+      "tooltip": "每次落筆都會在本週期的星選池中計入一次；週期收官時，每次星選都從整個池中選取，同一筆落筆可再次獲選。下表列出每位參與者在池中的佔比。"
     },
     "topEthSpenders": {
       "title": "ETH 支出排行",
@@ -163,7 +163,7 @@
     "summary": {
       "assetsIncluded": "包含資產",
       "cycle": "週期",
-      "cycleValue": "#{cycle}",
+      "cycleValue": "{cycle}",
       "recipientRule": "獲配規則",
       "recipientRuleValue": "收官之筆"
     },

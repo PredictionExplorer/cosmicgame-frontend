@@ -10,5 +10,6 @@ module.exports = {
   getConnectorClient: jest.fn(async () => undefined),
   switchChain: jest.fn(async () => undefined),
   writeContract: jest.fn(async () => '0x'),
+  sendTransaction: jest.fn(async () => '0x'),
   waitForTransactionReceipt: jest.fn(async () => ({ status: 'success' })),
 };

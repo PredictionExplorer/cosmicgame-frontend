@@ -114,7 +114,7 @@ describe('EthDonations', () => {
     });
     renderPage();
 
-    fireEvent.click(screen.getByRole('button', { name: /couldn't be loaded/ }));
+    fireEvent.click(screen.getByRole('button', { name: /couldn’t be loaded/ }));
     expect(mockRefetch).toHaveBeenCalledTimes(1);
   });
 

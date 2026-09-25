@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { act, renderHook } from '@testing-library/react';
 import { toast } from 'sonner';
-import { getConnectorClient, writeContract } from '@wagmi/core';
+import { getConnectorClient, sendTransaction, writeContract } from '@wagmi/core';
 import { getChainId } from 'viem/actions';
 // The real encoder (the `viem` entry is a jest mock).
 import { encodeErrorResult } from 'viem/utils';
@@ -71,6 +71,7 @@ const mockToast = toast as unknown as Record<
   jest.Mock
 >;
 const mockWriteContract = writeContract as jest.Mock;
+const mockSendTransaction = sendTransaction as jest.Mock;
 const mockGetConnectorClient = getConnectorClient as jest.Mock;
 const mockGetChainId = getChainId as jest.Mock;
 const mockReportError = reportError as jest.Mock;
@@ -139,6 +140,22 @@ describe('useTxFlow — lifecycle', () => {
     );
     expect(hook.result.current.stage).toEqual({ status: 'confirmed', hash: '0xhash' });
     expect(hook.result.current.isBusy).toBe(false);
+  });
+
+  // V332: the Public Goods Vault takes plain ETH through its receive().
+  it('sends plain ETH on the app chain through the same lifecycle', async () => {
+    mockSendTransaction.mockResolvedValue('0xsend');
+    const { result } = await run(
+      baseOptions({ write: (ctx) => ctx.sendTransaction({ to: '0xVault', value: 5n }) }),
+    );
+
+    expect(result).toMatchObject({ status: 'confirmed', hash: '0xsend' });
+    expect(mockSendTransaction).toHaveBeenCalledWith(mockConfig, {
+      to: '0xVault',
+      value: 5n,
+      chainId: APP_CHAIN,
+    });
+    expect(mockWriteContract).not.toHaveBeenCalled();
   });
 
   it('builds the success copy from the receipt and runs onConfirmed first', async () => {

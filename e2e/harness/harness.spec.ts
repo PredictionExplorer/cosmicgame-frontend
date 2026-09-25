@@ -272,9 +272,12 @@ test('browser phase controls switch repeatedly and reflow inactive desktop state
   await expect(page.getByTestId('cycle-clock')).toHaveAttribute('data-phase', 'opening-soon', {
     timeout: 90_000,
   });
-  await expect(page.getByTestId('home-deck-header')).toContainText(`#${openingSoon.cycle.index}`, {
-    timeout: 90_000,
-  });
+  await expect(page.getByTestId('home-deck-header')).toContainText(
+    `Cycle ${openingSoon.cycle.index}`,
+    {
+      timeout: 90_000,
+    },
+  );
   await expect(page.getByTestId('control-desk-gesture')).toHaveCount(0);
   await expect(page.getByTestId('clock-finalize')).toHaveCount(0);
   await expect(page.getByTestId('latest-participant-intel')).toHaveAttribute('data-empty', 'true');

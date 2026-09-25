@@ -100,7 +100,7 @@ Cosmic Signature 与 COSMIC 癌症突变数据库及生物学中的 COSMIC 突�
 - [中文主页](https://cosmicsignature.com/zh)：协议与链上艺术概览
 - [关于](https://cosmicsignature.com/zh/about)：协议主体、官方链接与名称辨析
 - [白皮书](https://cosmicsignature.com/zh/white-paper)：协议机制与设计的完整说明（中英双语，附 PDF）
-- [学习中心](https://cosmicsignature.com/zh/learn)：演绎周期、三体艺术、锚定与公共物品说明
+- [学习](https://cosmicsignature.com/zh/learn)：演绎周期、三体艺术、锚定与公共物品说明
 - [中文应用](https://app.cosmicsignature.com/zh)：当前周期与落笔界面
 - [画廊](https://app.cosmicsignature.com/zh/gallery)：浏览已铭刻的 Cosmic Signature NFT
 - [运作原理](https://app.cosmicsignature.com/zh/how-it-works)：完整协议机制
@@ -140,7 +140,7 @@ Cosmic Signature 與 COSMIC 癌症突變資料庫及生物學中的 COSMIC 突�
 - [台灣繁體中文首頁](https://cosmicsignature.com/zh-TW)：協議與鏈上藝術概覽
 - [關於](https://cosmicsignature.com/zh-TW/about)：協議主體、官方連結與名稱辨析
 - [白皮書](https://cosmicsignature.com/zh-TW/white-paper)：協議機制與設計的完整說明（台灣繁體中文與英文雙語，附 PDF）
-- [學習中心](https://cosmicsignature.com/zh-TW/learn)：演繹週期、三體藝術、錨定與公共財說明
+- [學習](https://cosmicsignature.com/zh-TW/learn)：演繹週期、三體藝術、錨定與公共財說明
 - [台灣繁體中文應用程式](https://app.cosmicsignature.com/zh-TW)：目前週期與落筆介面
 - [畫廊](https://app.cosmicsignature.com/zh-TW/gallery)：瀏覽已銘刻的 Cosmic Signature NFT
 - [運作原理](https://app.cosmicsignature.com/zh-TW/how-it-works)：完整協議機制
@@ -180,7 +180,7 @@ Cosmic Signature 與 COSMIC 癌症突變數據庫及生物學中的 COSMIC 突�
 - [香港繁體中文主頁](https://cosmicsignature.com/zh-HK)：協議與鏈上藝術概覽
 - [關於](https://cosmicsignature.com/zh-HK/about)：協議主體、官方連結與名稱辨析
 - [白皮書](https://cosmicsignature.com/zh-HK/white-paper)：協議機制與設計的完整說明（香港繁體中文與英文雙語，附 PDF）
-- [學習中心](https://cosmicsignature.com/zh-HK/learn)：演繹週期、三體藝術、錨定與公共物品說明
+- [學習](https://cosmicsignature.com/zh-HK/learn)：演繹週期、三體藝術、錨定與公共物品說明
 - [香港繁體中文應用程式](https://app.cosmicsignature.com/zh-HK)：目前週期與落筆介面
 - [畫廊](https://app.cosmicsignature.com/zh-HK/gallery)：瀏覽已銘刻的 Cosmic Signature NFT
 - [運作原理](https://app.cosmicsignature.com/zh-HK/how-it-works)：完整協議機制
@@ -220,7 +220,7 @@ Cosmic Signature не пов’язаний із базою даних мута�
 - [Головна сторінка](https://cosmicsignature.com/uk): огляд протоколу й ончейн-мистецтва
 - [Про проєкт](https://cosmicsignature.com/uk/about): опис протоколу, офіційні посилання та пояснення назви
 - [Біла книга](https://cosmicsignature.com/uk/white-paper): повний опис механіки та дизайну протоколу (з PDF)
-- [Навчальний центр](https://cosmicsignature.com/uk/learn): перформанс-цикли, мистецтво трьох тіл, закріплення та суспільні блага
+- [Навчання](https://cosmicsignature.com/uk/learn): перформанс-цикли, мистецтво трьох тіл, закріплення та суспільні блага
 - [Застосунок](https://app.cosmicsignature.com/uk): поточний цикл та інтерфейс жестів
 - [Галерея](https://app.cosmicsignature.com/uk/gallery): перегляд закарбованих Cosmic Signature NFT
 - [Як це працює](https://app.cosmicsignature.com/uk/how-it-works): повна механіка протоколу
@@ -260,7 +260,7 @@ Cosmic Signature는 COSMIC 암 돌연변이 데이터베이스나 생물학의 C
 - [한국어 홈](https://cosmicsignature.com/ko): 프로토콜과 온체인 아트 개요
 - [소개](https://cosmicsignature.com/ko/about): 프로토콜 소개, 공식 링크, 같은 이름의 다른 서비스와의 구분
 - [백서](https://cosmicsignature.com/ko/white-paper): 프로토콜 메커니즘과 설계의 전체 설명 (한국어와 영어, PDF 포함)
-- [학습 센터](https://cosmicsignature.com/ko/learn): 퍼포먼스 사이클, 삼체 아트, 앵커링, 공공재 설명
+- [학습](https://cosmicsignature.com/ko/learn): 퍼포먼스 사이클, 삼체 아트, 앵커링, 공공재 설명
 - [한국어 앱](https://app.cosmicsignature.com/ko): 현재 사이클과 제스처 인터페이스
 - [갤러리](https://app.cosmicsignature.com/ko/gallery): 각인된 Cosmic Signature NFT 둘러보기
 - [작동 원리](https://app.cosmicsignature.com/ko/how-it-works): 전체 프로토콜 메커니즘
@@ -300,7 +300,7 @@ Cosmic Signatureは、COSMICがん変異データベースや生物学のCOSMIC�
 - [日本語ホーム](https://cosmicsignature.com/ja): プロトコルとオンチェーンアートの概要
 - [概要](https://cosmicsignature.com/ja/about): プロトコルの概要、公式リンク、同名のサービスとの区別
 - [ホワイトペーパー](https://cosmicsignature.com/ja/white-paper): プロトコルの仕組みと設計の完全な説明（日本語と英語、PDFあり）
-- [学習ハブ](https://cosmicsignature.com/ja/learn): パフォーマンス・サイクル、三体アート、係留、公共財の解説
+- [学ぶ](https://cosmicsignature.com/ja/learn): パフォーマンス・サイクル、三体アート、係留、公共財の解説
 - [日本語アプリ](https://app.cosmicsignature.com/ja): 現在のサイクルと一筆のインターフェース
 - [ギャラリー](https://app.cosmicsignature.com/ja/gallery): 刻印されたCosmic Signature NFTを見る
 - [仕組み](https://app.cosmicsignature.com/ja/how-it-works): プロトコルの仕組みの全体
@@ -340,7 +340,7 @@ Cosmic Signature không liên quan đến cơ sở dữ liệu đột biến ung
 - [Trang chủ tiếng Việt](https://cosmicsignature.com/vi): Tổng quan về giao thức và nghệ thuật trên chuỗi
 - [Về Cosmic Signature](https://cosmicsignature.com/vi/about): Giới thiệu giao thức, liên kết chính thức và phân biệt với các dịch vụ trùng tên
 - [Sách trắng](https://cosmicsignature.com/vi/white-paper): Mô tả đầy đủ về cơ chế và thiết kế của giao thức (tiếng Việt và tiếng Anh, có bản PDF)
-- [Trung tâm học tập](https://cosmicsignature.com/vi/learn): Giải thích về chu kỳ trình diễn, nghệ thuật ba vật thể, neo giữ và Hàng hóa công
+- [Tìm hiểu](https://cosmicsignature.com/vi/learn): Giải thích về chu kỳ trình diễn, nghệ thuật ba vật thể, neo giữ và Hàng hóa công
 - [Ứng dụng tiếng Việt](https://app.cosmicsignature.com/vi): Giao diện chu kỳ hiện tại và nét bút
 - [Phòng trưng bày](https://app.cosmicsignature.com/vi/gallery): Xem các Cosmic Signature NFT đã khắc
 - [Cách hoạt động](https://app.cosmicsignature.com/vi/how-it-works): Toàn bộ cơ chế của giao thức

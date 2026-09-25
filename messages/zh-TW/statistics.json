@@ -205,10 +205,6 @@
       "label": "協議貢獻",
       "tooltip": "透過 Cosmic Signature 協議傳送的已索引公共財貢獻交易數量。"
     },
-    "protocolContributionsSum": {
-      "label": "協議貢獻總額",
-      "tooltip": "透過 Cosmic Signature 協議已索引公共財貢獻交易傳送的 ETH 總額。"
-    },
     "voluntaryContributions": {
       "label": "自願貢獻",
       "tooltip": "社群成員在週期必需流轉之外自願貢獻的 ETH。"
@@ -263,9 +259,7 @@
     "cstTotalAnchorDistributions": "向 Cosmic Signature NFT 錨定者配發的 ETH 總額。",
     "cstUnretrievedAnchorDistributions": "已分配但尚未由 Cosmic Signature NFT 錨定者取回的錨定配發。",
     "rwlkActiveAnchorHolders": "目前至少錨定一枚 Random Walk NFT 的錢包。",
-    "rwlkTotalTokensImprinted": "透過錨定 NFT 星選，為 Random Walk NFT 錨定者銘刻的 Cosmic Signature NFT 與配套 CST 總量。",
-    "cstGroup": "Cosmic Signature NFT 錨定會在目前已錨定的 Cosmic Signature NFT 之間分配 ETH 錨定配發。",
-    "rwlkGroup": "錨定 Random Walk NFT 可獲得錨定 NFT 星選資格。"
+    "rwlkTotalTokensImprinted": "透過錨定 NFT 星選，為 Random Walk NFT 錨定者銘刻的 Cosmic Signature NFT 與配套 CST 總量。"
   },
   "activity": {
     "heading": "落筆活動",
@@ -383,7 +377,7 @@
     "leaderboard": {
       "description": "所有週期中，每位達到所選落筆次數的參與者在落筆上的支出，以及以 ETH 分配形式獲配的金額。數值以 ETH 計；CST 支出以及 NFT 與 CST 分配顯示在其下方。",
       "minimumGestures": "最低落筆次數",
-      "loadErrorTitle": "未能載入參與者表現榜",
+      "loadErrorTitle": "未能載入支出與獲配資料",
       "loadErrorMessage": "統計服務暫未回應，請稍後再試。",
       "empty": "暫無符合篩選條件的參與者。",
       "columns": {
@@ -392,7 +386,6 @@
         "gestures": "落筆次數",
         "spent": "支出（ETH）",
         "received": "獲配（ETH）",
-        "net": "淨值（ETH）",
         "allocations": "分配"
       }
     },
@@ -411,7 +404,6 @@
       },
       "allClaimed": "已全部取回",
       "unclaimedCount": "{count} 項未取回",
-      "viewUnclaimed": "檢視未取回資產",
       "cycleDetails": "第 {cycle} 個週期詳情",
       "dialog": {
         "unclaimedTitle": "第 {cycle} 個週期的未取回資產",
@@ -442,9 +434,6 @@
       "participants": "落筆 {min} 次以上的參與者",
       "spent": "落筆支出的 ETH",
       "received": "以分配獲配的 ETH",
-      "receivedMore": "獲配 ETH 多於支出",
-      "ofParticipants": "{whole} 位中的 {part} 位",
-      "netHelp": "以分配獲配的 ETH 減去落筆支出的 ETH，不含 CST。",
       "cyclesHelp": "該參與者參與的週期中，至少獲配一次分配的週期數。",
       "cycles": "{whole, number} 個週期中的 {part} 個"
     }
@@ -467,7 +456,6 @@
     },
     "spikes": {
       "count": "峰值（{count}）",
-      "groupAria": "已檢測的落筆峰值",
       "previousAria": "上一個峰值",
       "nextAria": "下一個峰值",
       "summary": "峰值 {peak} 次/小時 · 區間共 {total} 次 · {date}",
@@ -477,7 +465,6 @@
       "loadErrorMessage": "未能取得峰值檢測資料。",
       "empty": "索引歷史中未檢測到落筆峰值。",
       "noneRecent": "近期沒有峰值，此處顯示有紀錄以來最近的一次。",
-      "selectEarlier": "選擇上方峰值編號，可回看更早的活動突增時段。",
       "emptyWindow": "所選峰值區間內暫無小時資料。",
       "optionAria": "{date} 的峰值，每小時最多 {peak} 次"
     },
@@ -485,7 +472,6 @@
       "description": "展示前 {count} 位參與者的活躍時段（至少 2 次落筆，且相鄰落筆間隔不超過 6 小時）。每個條形代表一段活躍區間。",
       "participant": "參與者",
       "ariaLabel": "{address}：{count, number} 次落筆，時間從 {start} 至 {end}",
-      "tooltipSummary": "{count} 次落筆 · 持續 {minutes} 分鐘",
       "loadErrorTitle": "未能載入活躍時段",
       "loadErrorMessage": "未能取得活躍參與者時間線。",
       "empty": "活躍參與者中暫無符合條件的落筆時段。",
@@ -519,7 +505,6 @@
       "enduranceRecord": "堅守紀錄",
       "enduranceChampionRecord": "堅守冠軍紀錄",
       "chronoRecord": "時之勇士紀錄",
-      "leadHeldBy": "領先者",
       "legendEndurance": "堅守冠軍（單次領先時長最長）",
       "legendChrono": "時之勇士（在位時間最長）",
       "legendLead": "保持領先",
@@ -528,7 +513,6 @@
       "enduranceChampionAbbr": "堅",
       "chronoWarrior": "時之勇士",
       "chronoWarriorAbbr": "時",
-      "newRecord": "刷新紀錄",
       "roleEndurance": "（堅守冠軍）",
       "roleNewRecord": "（刷新紀錄）",
       "stintAria": "{address} · 保持領先 {duration} · 週期開始後 {from} → {to}{role}",
@@ -721,15 +705,12 @@
     "errorMessage": "暫時無法讀取該地址的分配，請稍後重試。"
   },
   "systemEvent": {
-    "titleBeforeCycle": "第 {cycle} 個週期前的系統配置",
-    "titleBeforeDeployment": "部署前的系統配置",
     "range": "事件日誌範圍 {start}～{end}",
     "breadcrumbs": {
       "coordination": "協調變更"
     },
     "loading": "載入中…",
     "loadError": "未能載入系統事件",
-    "explainEvent": "說明「{event}」事件",
     "adminEvents": {
       "undefined": "未定義。",
       "publicGoodsPercentage": "分配至公共財金庫的資金比例已變更。",
@@ -786,62 +767,6 @@
     "viewContract": "檢視合約",
     "detailsUnavailable": "NFT 詳情暫不可用",
     "contractUnavailable": "合約暫不可用"
-  },
-  "publicDataSummaries": {
-    "common": {
-      "lastUpdated": "更新時間：{date}。資料來源：{source}。",
-      "relatedPagesAria": "{heading}相關頁面",
-      "unavailable": "暫不可用"
-    },
-    "attachedNfts": {
-      "eyebrow": "已附加 NFT 貢獻 · Arbitrum",
-      "heading": "已附加 NFT 貢獻",
-      "description": "瀏覽隨 Cosmic Signature 落筆附加的 NFT。週期收官後，這些 ERC-721 代幣會轉給簽名分配獲配者。",
-      "source": "Cosmic Signature 公共已附加 NFT API",
-      "cards": {
-        "records": "已附加 NFT 紀錄",
-        "contracts": "獨立 NFT 合約",
-        "contributors": "貢獻者錢包"
-      },
-      "links": {
-        "gallery": "瀏覽 Cosmic Signature 畫廊",
-        "cycle": "檢視目前演繹週期",
-        "learn": "了解附加資產如何進入週期分配"
-      }
-    },
-    "namedNfts": {
-      "eyebrow": "已命名 NFT · Arbitrum",
-      "heading": "已命名 Cosmic Signature NFT",
-      "description": "瀏覽由持有者命名的 Cosmic Signature NFT，了解代幣身份、畫廊展示與鏈上系列歷史。",
-      "source": "Cosmic Signature 公共代幣 API",
-      "cards": {
-        "named": "已命名 Cosmic Signature NFT",
-        "owners": "目前持有者",
-        "collection": "系列"
-      },
-      "links": {
-        "gallery": "瀏覽完整畫廊",
-        "learn": "了解作品原理",
-        "code": "檢視渲染原始碼"
-      }
-    },
-    "usedRwlkNfts": {
-      "eyebrow": "Random Walk NFT 使用紀錄 · Arbitrum",
-      "heading": "已使用的 Random Walk NFT",
-      "description": "檢視已隨 ETH 落筆附加，並用過一次性落筆價格優惠的 Random Walk NFT。",
-      "source": "Cosmic Signature 公共 Random Walk 使用紀錄 API",
-      "cards": {
-        "used": "已使用 Random Walk NFT",
-        "discount": "一次性優惠",
-        "scope": "使用範圍",
-        "scopeValue": "每枚 NFT 可用於一筆落筆"
-      },
-      "links": {
-        "imprint": "銘刻 Random Walk NFT",
-        "learn": "了解落筆機制",
-        "cycle": "檢視目前週期數據"
-      }
-    }
   },
   "routeError": {
     "title": "未能載入統計頁面",

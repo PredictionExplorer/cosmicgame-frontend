@@ -162,7 +162,6 @@
     "rarest": "最も希少な特性",
     "share": "{total}点中{count}点が共有",
     "shareShort": "{count}/{total}",
-    "scoreLabel": "希少度スコア",
     "unavailable": "まだランク付けされていません"
   },
   "facets": {

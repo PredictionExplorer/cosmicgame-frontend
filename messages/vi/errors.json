@@ -1,9 +1,7 @@
 {
   "generic": "Đã xảy ra lỗi. Vui lòng thử lại.",
-  "networkOffline": "Không có mạng. Kết nối lại để tiếp tục.",
   "walletNotConnected": "Kết nối ví Web3 để đặt nét bút.",
   "insufficientEth": "Ví không đủ ETH cho nét bút này.",
-  "cycleClosed": "Chu kỳ này đã đóng. Chu kỳ trình diễn tiếp theo sẽ sớm mở.",
   "state": {
     "title": "Đã xảy ra lỗi",
     "retry": "Thử lại"
@@ -37,7 +35,6 @@
     "missing": "Thiếu hoặc không hợp lệ:",
     "resolution": "Hãy thiết lập chúng trong shell hoặc trong tệp .env, rồi khởi động lại máy chủ phát triển."
   },
-  "apiFailure": "Dịch vụ không phản hồi. Hãy thử lại sau ít phút.",
   "unexpected": "Đã xảy ra lỗi ngoài dự kiến. Vui lòng thử lại.",
   "notFound": {
     "code": "Lỗi 404",

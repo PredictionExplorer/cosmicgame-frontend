@@ -44,17 +44,20 @@ test.describe('Gallery page', () => {
     if (!(await named.isVisible())) test.skip(true, 'The status filter lives in the sheet here');
     await named.click();
     await expect(page).toHaveURL(/[?&]show=named(&|$)/);
-    const firstCard = page.getByTestId('signature-card').first().getByRole('link');
-    if (await firstCard.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await firstCard.click();
-      await expect(page).toHaveURL(/detail/);
-      await page.goBack();
-      await expect(page).toHaveURL(/[?&]show=named(&|$)/);
-      await expect(page.getByRole('radio', { name: 'Named' }).first()).toHaveAttribute(
-        'aria-checked',
-        'true',
-      );
-    }
+    // Leave through the header, not a card: the live backend decides whether
+    // any Signature is named, and the Back check must run either way.
+    await page
+      .getByRole('banner')
+      .getByRole('navigation', { name: 'Primary' })
+      .getByRole('link', { name: 'Observatory' })
+      .click();
+    await expect(page).not.toHaveURL(/\/gallery/);
+    await page.goBack();
+    await expect(page).toHaveURL(/[?&]show=named(&|$)/);
+    await expect(page.getByRole('radio', { name: 'Named' }).first()).toHaveAttribute(
+      'aria-checked',
+      'true',
+    );
   });
 
   test('pagination moves to the next page', async ({ page }) => {

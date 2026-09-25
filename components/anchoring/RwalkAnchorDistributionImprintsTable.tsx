@@ -29,7 +29,7 @@ interface RwalkAnchorDistributionImprintsTableProps extends AnchoringLedgerProps
  * imprinted to the anchor-holder of a selected Random Walk NFT, shown by its
  * artwork, with the recipient, the cycle and the transaction. On a phone each
  * record is one media object: the art at the start, its number and a caption
- * line ("Cycle #1 · Aug 11") beside it, then the recipient.
+ * line ("Cycle 1 · Aug 11") beside it, then the recipient.
  */
 export const RwalkAnchorDistributionImprintsTable = ({
   list,
@@ -90,7 +90,7 @@ export const RwalkAnchorDistributionImprintsTable = ({
         kind: 'link',
         header: t('tables.randomWalkImprints.columns.cycle'),
         value: (row) => row.RoundNum,
-        // "Cycle #1", not a bare "1": a word-sized link, as every other ledger names a cycle.
+        // "Cycle 1", not a bare "1": a word-sized link, as every other ledger names a cycle.
         cell: cycleLink,
         nowrap: true,
         // On a phone the token's caption carries the cycle and the date.

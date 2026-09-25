@@ -58,7 +58,7 @@
       },
       "marketing": {
         "heading": "広報配分",
-        "description": "Cosmic Signatureを広める活動に携わる貢献者への、広報配分とCSTの配分履歴を確認できます。",
+        "description": "Cosmic Signatureを広める人たちへ広報準備金から送られたCSTです。各配分にはそのトランザクションが付いています。",
         "source": "Cosmic Signature広報API",
         "links": {
           "faq": "よくある質問を読む",
@@ -67,13 +67,13 @@
         },
         "cards": {
           "records": {
-            "label": "広報配分の記録"
+            "label": "配分の記録"
           },
           "allocatedCst": {
-            "label": "広報配分CSTの総量"
+            "label": "配分されたCST"
           },
           "contributors": {
-            "label": "ユニーク広報貢献者"
+            "label": "貢献者"
           }
         }
       },
@@ -109,13 +109,13 @@
         },
         "cards": {
           "records": {
-            "label": "直接拠出の記録"
+            "label": "拠出の記録"
           },
           "totalEth": {
-            "label": "直接ETH拠出の総額"
+            "label": "拠出されたETH"
           },
           "contributors": {
-            "label": "ユニーク拠出者"
+            "label": "拠出者"
           }
         }
       },
@@ -207,7 +207,7 @@
       },
       "coordination-changes": {
         "heading": "調整の変更履歴",
-        "description": "現在のモードが始まってからコントラクト所有者がプロトコルのパラメーターに加えたすべての変更です。",
+        "description": "コントラクト所有者がプロトコルのパラメーターに加えた変更と、それぞれのトランザクションです。所有権を放棄するまで、所有者は変更を続けられます。",
         "source": "Cosmic SignatureシステムイベントAPI",
         "links": {
           "security": "セキュリティの概要を読む",
@@ -216,7 +216,7 @@
         },
         "cards": {
           "records": {
-            "label": "調整変更の記録"
+            "label": "変更の記録"
           },
           "latest": {
             "label": "直近の変更"
@@ -224,13 +224,14 @@
           "owner": {
             "label": "コントラクト所有者",
             "tooltip": "これらのパラメーターを変更できるのはこのアドレスだけです。所有権が放棄されると所有者はゼロアドレスになり、以後は変更できません。",
-            "renounced": "所有権放棄済み"
+            "renounced": "所有権放棄済み",
+            "active": "パラメーターを変更可能"
           }
         }
       },
       "public-goods-contributions-cg": {
         "heading": "プロトコルの公共財拠出",
-        "description": "プロトコルのサイクルから公共財金庫と、設定された受け手——現在はProtocol Guild——へのCosmic Signatureの自動公共財送付を追う。",
+        "description": "確定した各サイクルのサイクル準備金の7%が公共財金庫に入り、その受け手のために保管されます。現在の受け手は、Ethereumのコア貢献者を支援するProtocol Guildです。",
         "source": "Cosmic Signature公共財API",
         "links": {
           "learn": "公共財について学ぶ",
@@ -273,7 +274,7 @@
       },
       "public-goods-retrievals": {
         "heading": "公共財の受け取り",
-        "description": "公共財金庫から、設定されている受け手への送付履歴を確認できます。現在の受け手はProtocol Guildです。",
+        "description": "公共財金庫からその受け手（現在はProtocol Guild）への送付の記録です。誰でも送付を実行できますが、ETHは必ず受け手に届きます。",
         "source": "Cosmic Signature公共財API",
         "links": {
           "learn": "公共財について学ぶ",

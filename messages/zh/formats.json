@@ -6,18 +6,11 @@
     "minutes": "分",
     "seconds": "秒"
   },
-  "countdownLong": {
-    "days": "天",
-    "hours": "小时",
-    "minutes": "分",
-    "seconds": "秒"
-  },
   "durationCompact": {
     "days": "天",
     "hours": "小时",
     "minutes": "分",
-    "seconds": "秒",
-    "leftPattern": "剩余{duration}"
+    "seconds": "秒"
   },
   "address": {
     "zero": "零地址",

@@ -77,7 +77,7 @@ describe('getLocaleConfig', () => {
     expect(en.jsonLdInLanguage).toBe('en');
     expect(en.wordSpacing).toBe(true);
     expect(en.weekStartsMonday).toBe(false);
-    expect(en.ellipsis).toBe('...');
+    expect(en.ellipsis).toBe('…');
     expect(en.lowercaseMidSentence).toBe(true);
     // Raw provider text is a debugging aid, off unless NEXT_PUBLIC_DEBUG_PROVIDER_ERRORS=1.
     expect(en.showRawProviderErrors).toBe(false);

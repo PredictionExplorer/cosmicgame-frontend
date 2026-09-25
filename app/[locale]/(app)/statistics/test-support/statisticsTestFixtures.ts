@@ -10,7 +10,6 @@ export function createDashboardInfo(overrides: Partial<DashboardInfo> = {}): Das
     TsRoundStart: 1_700_000_000,
     LastBidderAddr: '0x1111111111111111111111111111111111111111',
     CurBidPriceEth: 0.01,
-    ParticipationCstReward: 185.6693,
     StakingAmountEth: 2.5,
     CosmicGameBalanceEth: 36.1595,
     CharityBalanceEth: 0.5,

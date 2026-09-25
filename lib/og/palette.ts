@@ -15,6 +15,8 @@ export const MIDNIGHT_TOKENS = {
   surfaceDeep: '240 29% 3%',
   foreground: '250 38% 97%',
   mutedForeground: '247 14% 75%',
+  /** The third text tier (`--subtle-foreground`): eyebrows, wall labels and the footer. */
+  subtleForeground: '247 12% 62%',
   primary: '254 100% 92%',
   border: '246 14% 19%',
   glowPrimary: '245 70% 65%',
@@ -22,14 +24,6 @@ export const MIDNIGHT_TOKENS = {
 } as const;
 
 export type MidnightToken = keyof typeof MIDNIGHT_TOKENS;
-
-/**
- * Third text tier of the calibrated palette (the `--subtle-foreground`
- * token the design direction adds for Midnight): 6.6:1 on the ground, for
- * eyebrows, wall labels and the footer. Kept here until the stylesheet
- * carries it; it is not part of the themes.css parity check.
- */
-export const MIDNIGHT_SUBTLE_FOREGROUND = '247 12% 62%';
 
 interface Hsl {
   hue: number;
@@ -94,7 +88,7 @@ export const OG_COLORS = {
   plate: ART_PLATE,
   text: hslTripletToHex(MIDNIGHT_TOKENS.foreground),
   muted: hslTripletToHex(MIDNIGHT_TOKENS.mutedForeground),
-  subtle: hslTripletToHex(MIDNIGHT_SUBTLE_FOREGROUND),
+  subtle: hslTripletToHex(MIDNIGHT_TOKENS.subtleForeground),
   mark: hslTripletToHex(MIDNIGHT_TOKENS.primary),
   rule: hslTripletToHex(MIDNIGHT_TOKENS.border),
 } as const;

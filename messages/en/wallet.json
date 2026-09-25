@@ -4,7 +4,7 @@
     "buttonShort": "Connect",
     "opening": "Opening the wallet list…",
     "restoring": "Restoring your wallet connection…",
-    "disclaimer": "By connecting a wallet, you agree to the <terms>Terms of Service</terms> and acknowledge the <risk>Risk Disclosures</risk>. Gestures happen on {network} and need ETH there for the Gesture Cost and network fees."
+    "disclaimer": "By connecting a wallet, you agree to the <terms>Terms of Service</terms> and acknowledge the <risk>Risk disclosures</risk>. Gestures happen on {network} and need ETH there for the Gesture Cost and network fees."
   },
   "groups": {
     "popular": "Popular",
@@ -28,7 +28,7 @@
     "retrieveReady": "Ready to retrieve",
     "retrieveAmount": "{amount} ready to retrieve",
     "addCstToMetaMask": "Add CST to MetaMask",
-    "addingCstToMetaMask": "Adding CST to MetaMask...",
+    "addingCstToMetaMask": "Adding CST to MetaMask…",
     "viewOnExplorer": "View on {explorer}",
     "switchWallet": "Switch wallet",
     "disconnect": "Disconnect"
@@ -50,7 +50,7 @@
     "allocations": {
       "title": "Connect a wallet to see your allocations",
       "description": "Your retrievable ETH, Anchor Distributions, and attached NFTs and tokens appear here once you connect.",
-      "publicLink": "Browse all Allocation Recipients"
+      "publicLink": "Browse all allocation recipients"
     },
     "anchors": {
       "title": "Connect a wallet to manage your anchors",
@@ -70,7 +70,7 @@
     "history": {
       "title": "Connect a wallet to see your allocation history",
       "description": "Every allocation made to your wallet, in every Performance Cycle, appears here once you connect.",
-      "publicLink": "Browse all Allocation Recipients"
+      "publicLink": "Browse all allocation recipients"
     },
     "transferCst": {
       "title": "Connect a wallet to send CST",

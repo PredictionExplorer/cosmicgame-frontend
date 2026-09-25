@@ -10,7 +10,7 @@ import { CurrentCycleTitle } from './CurrentCycleTitle';
 
 /**
  * The /current-cycle page header, rendered on the server: the page's name as
- * the eyebrow, the cycle itself as the H1 ("Cycle #2"), a one-sentence lede
+ * the eyebrow, the cycle itself as the H1 ("Cycle 2"), a one-sentence lede
  * and the cycle's live figures (gestures, Signature Allocation, opening time
  * with its zone). The figures read the same polled dashboard query as the
  * page body and start from this request's server read, so the server HTML

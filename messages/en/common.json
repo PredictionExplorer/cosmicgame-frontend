@@ -49,14 +49,14 @@
     "readLess": "Show less",
     "crumbs": {
       "participants": "Participants",
-      "allocationRecipients": "Allocation Recipients",
-      "cycle": "Cycle #{cycle}"
+      "allocationRecipients": "Allocation recipients",
+      "cycle": "Cycle {cycle}"
     }
   },
   "status": {
     "loading": "Loading",
     "loadingEllipsis": "Loading…",
-    "loadingDots": "Loading...",
+    "loadingDots": "Loading…",
     "unavailable": "Unavailable"
   },
   "liveStatus": {

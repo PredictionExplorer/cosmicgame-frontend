@@ -15,6 +15,7 @@ import {
   formatDateTime,
   formatDateTimeTitle,
   formatDuration,
+  formatDurationParts,
   formatNumber,
   formatPercent,
   formatRelativeTime,
@@ -391,7 +392,7 @@ describe('formatDuration', () => {
       uk: '1д~1год~1хв~1с',
       ko: '1일~1시간~1분~1초',
       ja: '1日1時間1分1秒',
-      vi: '1ng~1g~1ph~1s',
+      vi: '1~ngày~1~giờ~1~phút~1~giây',
     });
   });
 
@@ -404,7 +405,7 @@ describe('formatDuration', () => {
       uk: '6д~22:03:44',
       ko: '6일~22:03:44',
       ja: '6日22:03:44',
-      vi: '6ng~22:03:44',
+      vi: '6~ngày~22:03:44',
     });
     expect(formatDuration(3_725, { style: 'clock' })).toBe('01:02:05');
     expect(formatDuration(-5, { style: 'clock' })).toBe('00:00:00');
@@ -423,6 +424,24 @@ describe('formatDuration', () => {
   it('truncates to the leading units for tight readouts', () => {
     expect(formatDuration(90061, { maxUnits: 2 })).toBe(nb('1d~1h'));
     expect(formatDuration(3_661, { maxUnits: 1 })).toBe('1h');
+  });
+
+  it('returns the unit groups unjoined, for a renderer that wraps between them', () => {
+    expect(formatDurationParts(90061)).toEqual(['1d', '1h', '1m', '1s']);
+    expect(formatDurationParts(90061, { maxUnits: 2 })).toEqual(['1d', '1h']);
+    expect(formatDurationParts(597824, { style: 'clock', locale: 'vi' })).toEqual([
+      `6${NBSP}ngày`,
+      '22:03:44',
+    ]);
+    expect(formatDurationParts(3_725, { style: 'clock' })).toEqual(['01:02:05']);
+    expect(formatDurationParts(Number.NaN)).toEqual([UNAVAILABLE_VALUE]);
+    for (const locale of routing.locales) {
+      expect(
+        formatDurationParts(90061, { locale }).join(
+          getLocaleConfig(locale).wordSpacing ? NBSP : '',
+        ),
+      ).toBe(formatDuration(90061, { locale }));
+    }
   });
 
   it('keeps the legacy formatSeconds contract for existing callers', () => {

@@ -1,23 +1,14 @@
 {
-  "gestureSubmitted": "Đã gửi nét bút. Đang chờ xác nhận.",
-  "gestureConfirmed": "Nét bút đã được xác nhận. Chu kỳ tiếp tục.",
   "allocationRetrieved": "Đã nhận về phân bổ vào ví của bạn.",
-  "anchorSet": "NFT đã được neo giữ với giao thức.",
-  "anchorReleased": "Đã gỡ neo.",
   "cycleFinalized": "Chu kỳ đã hoàn tất. Các phân bổ đã được phân phối.",
   "walletTransactionCancelled": "Giao dịch chưa được gửi — bạn đã hủy trong ví.",
-  "unexpectedError": "Đã xảy ra lỗi ngoài dự kiến. Vui lòng thử lại.",
   "generic": {
-    "unexpectedError": "Đã xảy ra lỗi ngoài dự kiến. Vui lòng thử lại.",
-    "rpcFailure": "Không thể hoàn thành giao dịch. Hãy kiểm tra ví và kết nối mạng, rồi thử lại.",
-    "receiptFailure": "Giao dịch đã được gửi nhưng chưa thể xác nhận. Hãy kiểm tra trạng thái trong ví hoặc trên trình khám phá khối trước khi thử lại.",
-    "transactionFailed": "Giao dịch thất bại. Vui lòng thử lại."
+    "rpcFailure": "Không thể hoàn thành giao dịch. Hãy kiểm tra ví và kết nối mạng, rồi thử lại."
   },
   "wallet": {
     "connect": "Vui lòng kết nối ví.",
     "connectCorrectNetwork": "Vui lòng kết nối ví và đảm bảo bạn đang ở đúng mạng.",
-    "notReady": "Ví chưa sẵn sàng. Hãy kết nối lại và thử lại.",
-    "stillConnecting": "Ví vẫn đang kết nối. Vui lòng thử lại sau ít phút."
+    "notReady": "Ví chưa sẵn sàng. Hãy kết nối lại và thử lại."
   },
   "watchAsset": {
     "metaMaskRequired": "Kết nối MetaMask để thêm tài sản này.",
@@ -122,12 +113,10 @@
       "nameClearFailed": "Đã xảy ra lỗi khi xóa tên token. Vui lòng thử lại."
     },
     "marketingCst": {
-      "reserveUnavailable": "Ví Dự trữ truyền thông không khả dụng.",
       "treasurerRequired": "Kết nối ví thủ quỹ hiện tại của Dự trữ truyền thông trước khi chi CST phân bổ.",
       "confirmed": "Đã xác nhận chuyển CST phân bổ truyền thông.",
       "failed": "Không thể chi CST phân bổ. Vui lòng thử lại.",
-      "pay": "Chi CST phân bổ",
-      "payAmount": "Gửi {amount}"
+      "pay": "Chi CST phân bổ"
     }
   },
   "contribution": {

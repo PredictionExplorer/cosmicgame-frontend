@@ -233,7 +233,7 @@ test.describe('home gesture chat', () => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
     const chat = page.locator('[data-testid="gesture-message-chat"]:visible').first();
-    await expect(chat.getByText('Cycle #7 · 2 messages')).toBeVisible();
+    await expect(chat.getByText('Cycle 7 · 2 messages')).toBeVisible();
     await chat.scrollIntoViewIfNeeded();
 
     await expect(chat).toBeVisible();
@@ -552,7 +552,7 @@ test.describe('home gesture chat', () => {
     const chat = page.locator('[data-testid="gesture-message-chat"]:visible').first();
     const scroll = chat.getByTestId('gesture-message-chat-scroll');
     const heading = chat.getByRole('heading', { name: 'Gesture Chat' });
-    await expect(chat.getByText('Cycle #7 · 12 messages')).toBeVisible();
+    await expect(chat.getByText('Cycle 7 · 12 messages')).toBeVisible();
     await chat.scrollIntoViewIfNeeded();
     const oldest = chat.getByText(/Scrollable message 12:/);
 
@@ -613,7 +613,7 @@ test.describe('home gesture chat', () => {
     const guide = page.getByTestId('cycle-phase-guide');
     const cycleDetails = page.locator('[data-testid="cycle-details-link-card"]:visible').first();
     const artwork = page.locator('[data-testid="latest-signature"]:visible').first();
-    await expect(chat.getByText('Cycle #7 · 2 messages')).toBeVisible();
+    await expect(chat.getByText('Cycle 7 · 2 messages')).toBeVisible();
     await expect(chat).toBeVisible();
     await expect(latest).toBeVisible();
     await expect(chrono).toBeVisible();

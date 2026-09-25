@@ -1,23 +1,14 @@
 {
-  "gestureSubmitted": "제스처가 제출되었습니다. 확인을 기다리는 중…",
-  "gestureConfirmed": "제스처가 확인되었습니다. 사이클이 이어집니다.",
   "allocationRetrieved": "배분이 지갑으로 회수되었습니다.",
-  "anchorSet": "NFT가 프로토콜에 앵커링되었습니다.",
-  "anchorReleased": "앵커링이 해제되었습니다.",
   "cycleFinalized": "사이클이 마감되었습니다. 배분이 완료되었습니다.",
   "walletTransactionCancelled": "지갑에서 취소되어 트랜잭션이 전송되지 않았습니다.",
-  "unexpectedError": "예기치 않은 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.",
   "generic": {
-    "unexpectedError": "예기치 않은 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.",
-    "rpcFailure": "트랜잭션을 완료할 수 없습니다. 지갑과 네트워크 연결을 확인한 뒤 다시 시도해 주세요.",
-    "receiptFailure": "트랜잭션은 전송되었지만 확인되지 않았습니다. 다시 시도하기 전에 지갑이나 블록 탐색기에서 상태를 확인해 주세요.",
-    "transactionFailed": "트랜잭션이 실패했습니다. 잠시 후 다시 시도해 주세요."
+    "rpcFailure": "트랜잭션을 완료할 수 없습니다. 지갑과 네트워크 연결을 확인한 뒤 다시 시도해 주세요."
   },
   "wallet": {
     "connect": "지갑을 연결해 주세요.",
     "connectCorrectNetwork": "지갑을 연결하고 올바른 네트워크인지 확인해 주세요.",
-    "notReady": "지갑이 준비되지 않았습니다. 다시 연결한 뒤 시도해 주세요.",
-    "stillConnecting": "지갑을 연결하는 중입니다. 잠시 후 다시 시도해 주세요."
+    "notReady": "지갑이 준비되지 않았습니다. 다시 연결한 뒤 시도해 주세요."
   },
   "watchAsset": {
     "metaMaskRequired": "이 자산을 추가하려면 MetaMask를 연결해 주세요.",
@@ -122,12 +113,10 @@
       "nameClearFailed": "토큰 이름을 삭제하는 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
     },
     "marketingCst": {
-      "reserveUnavailable": "홍보 준비금 지갑을 사용할 수 없습니다.",
       "treasurerRequired": "CST 홍보 배분을 보내려면 현재 재무 담당자 지갑을 연결해 주세요.",
       "confirmed": "CST 홍보 배분 전송이 확인되었습니다.",
       "failed": "CST 홍보 배분을 보내지 못했습니다. 잠시 후 다시 시도해 주세요.",
-      "pay": "CST 홍보 배분 보내기",
-      "payAmount": "{amount} 보내기"
+      "pay": "CST 홍보 배분 보내기"
     }
   },
   "contribution": {

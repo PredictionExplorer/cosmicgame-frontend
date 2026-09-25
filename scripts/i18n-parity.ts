@@ -34,6 +34,7 @@ import {
   strictProblems,
   type Messages,
 } from './i18n-parity-core';
+import { sourceTokens, unreferencedKeys } from './i18n-unused-keys-core';
 
 const MESSAGES_DIR = resolve(process.cwd(), 'messages');
 const DEFAULT_LOCALE = routing.defaultLocale;
@@ -97,20 +98,27 @@ console.log(
   `i18n parity — comparing ${TRANSLATED_LOCALES.join(', ') || '(no locales)'} against ${DEFAULT_LOCALE}\n`,
 );
 
-// The source catalog must itself be well-formed ICU with complete plurals.
+// The source catalog must itself be well-formed ICU with complete plurals,
+// and every key must be one some code can reach (./i18n-unused-keys-core.ts).
+const tokens = sourceTokens(process.cwd());
 for (const namespaceFile of enNamespaces) {
   const namespace = namespaceFile.replace(/\.json$/, '');
+  const source = readNamespace(DEFAULT_LOCALE, namespaceFile);
   const report = checkSourceNamespace(
     namespace,
-    readNamespace(DEFAULT_LOCALE, namespaceFile),
+    source,
     getLocaleConfig(DEFAULT_LOCALE).intlLocale,
   );
   const problems = [
+    ...unreferencedKeys(namespace, source, tokens).map(
+      (key) => `unused: ${key} (no code spells every segment; delete it in every locale)`,
+    ),
     ...report.empty.map((key) => `empty: ${key}`),
     ...report.invalidValues.map((key) => `not a string: ${key}`),
     ...report.syntaxErrors,
     ...report.pluralGaps,
     ...report.unitSpacing,
+    ...report.typography,
   ];
   if (problems.length) {
     console.log(`  ${DEFAULT_LOCALE}/${namespace}: ${problems.length} source problem(s)`);

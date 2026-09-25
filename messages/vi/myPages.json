@@ -106,10 +106,10 @@
       "entry": "{title} · {count, plural, other {chu kỳ {cycles}}}"
     },
     "selection": {
-      "title": "Nhóm Tinh tuyển · chu kỳ {cycle}",
+      "title": "Tỷ lệ Tinh tuyển · chu kỳ {cycle}",
       "share": "{mine} trong {total} nét bút",
-      "caption": "Khi chu kỳ được chốt, {eth} lượt chọn ETH và {nft} lượt chọn NFT được thực hiện trong toàn bộ nét bút của chu kỳ này, có hoàn lại. Mỗi nét bút được tính một lần.",
-      "captionGeneric": "Khi chu kỳ được chốt, Tinh tuyển được thực hiện trong toàn bộ nét bút của chu kỳ này, có hoàn lại. Mỗi nét bút được tính một lần."
+      "caption": "Khi chu kỳ hoàn tất, {eth} lượt chọn ETH và {nft} lượt chọn NFT được thực hiện trong toàn bộ nét bút của chu kỳ này, có hoàn lại. Mỗi nét bút được tính một lần.",
+      "captionGeneric": "Khi chu kỳ hoàn tất, Tinh tuyển được thực hiện trong toàn bộ nét bút của chu kỳ này, có hoàn lại. Mỗi nét bút được tính một lần."
     },
     "overview": {
       "title": "Tổng quan",

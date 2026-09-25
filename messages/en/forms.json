@@ -7,18 +7,18 @@
       "errors": {
         "required": "Enter the address to send to.",
         "invalid": "An address is 0x followed by 40 letters and digits.",
-        "checksum": "This address has a typo: its capital letters don't match its checksum.",
-        "zero": "The zero address can't receive tokens.",
-        "self": "That's the wallet you're sending from."
+        "checksum": "This address has a typo: its capital letters don’t match its checksum.",
+        "zero": "The zero address can’t receive tokens.",
+        "self": "That’s the wallet you’re sending from."
       },
       "check": {
         "checking": "Checking this address on {network}…",
-        "failed": "Couldn't check this address on {network}.",
+        "failed": "Couldn’t check this address on {network}.",
         "checked": "Checked on {network}.",
         "active": "{count, plural, one {Active on {network}: # transaction sent.} other {Active on {network}: # transactions sent.}}",
         "fresh": "New address: it has never sent a transaction on {network}.",
         "contract": "This address is a contract, which may not be able to move tokens on.",
-        "protocol": "This is the {name} contract, which doesn't take tokens sent to it directly."
+        "protocol": "This is the {name} contract, which doesn’t take tokens sent to it directly."
       }
     },
     "amount": {
@@ -32,16 +32,16 @@
         "format": "Enter a number, like {example}.",
         "precision": "Use at most {decimals} decimal places.",
         "zero": "Enter an amount greater than 0.",
-        "exceedsBalance": "That's more than the {amount} available."
+        "exceedsBalance": "That’s more than the {amount} available."
       }
     },
     "review": {
       "title": "Review",
       "sending": "You send",
       "to": "To",
-      "final": "Transfers are final: tokens sent to a wrong address can't be recovered.",
-      "acknowledge": "I've checked this address and want to send to it.",
-      "acknowledgeRequired": "Confirm that you've checked the address to continue.",
+      "final": "Transfers are final: tokens sent to a wrong address can’t be recovered.",
+      "acknowledge": "I’ve checked this address and want to send to it.",
+      "acknowledgeRequired": "Confirm that you’ve checked the address to continue.",
       "checking": "Checking the address…"
     }
   }

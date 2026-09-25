@@ -1,7 +1,6 @@
 {
   "formats": {
     "cycle": "Chu kỳ {cycle}",
-    "cycleHash": "Chu kỳ {cycle}",
     "cosmicSignatureToken": "Cosmic Signature #{token}"
   },
   "recipients": {
@@ -173,7 +172,6 @@
     "links": {
       "viewCycle": "Xem chu kỳ {cycle}",
       "myAllocations": "Phân bổ của tôi",
-      "allRecipients": "Người nhận phân bổ",
       "allCycles": "Tất cả chu kỳ"
     },
     "result": {

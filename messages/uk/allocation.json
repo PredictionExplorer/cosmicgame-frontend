@@ -1,7 +1,6 @@
 {
   "formats": {
     "cycle": "Цикл {cycle}",
-    "cycleHash": "Цикл {cycle}",
     "cosmicSignatureToken": "Cosmic Signature #{token}"
   },
   "recipients": {
@@ -173,7 +172,6 @@
     "links": {
       "viewCycle": "Переглянути цикл {cycle}",
       "myAllocations": "Мої розподіли",
-      "allRecipients": "Отримувачі розподілів",
       "allCycles": "Усі цикли"
     },
     "result": {

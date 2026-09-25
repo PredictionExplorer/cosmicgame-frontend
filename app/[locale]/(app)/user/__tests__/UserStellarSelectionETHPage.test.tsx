@@ -123,7 +123,7 @@ describe('UserStellarSelectionETHPage', () => {
       refetch: mockRefetch,
     });
     render(<UserStellarSelectionETHPage address={ADDRESS} />);
-    expect(screen.getByText("Couldn't load the Stellar Selection ETH")).toBeInTheDocument();
+    expect(screen.getByText('Couldn’t load the Stellar Selection ETH')).toBeInTheDocument();
     expect(screen.queryByText('No Stellar Selection ETH yet')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Retrieve ETH/ })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /try again/i }));

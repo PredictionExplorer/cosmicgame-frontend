@@ -6,18 +6,11 @@
     "minutes": "분",
     "seconds": "초"
   },
-  "countdownLong": {
-    "days": "일",
-    "hours": "시간",
-    "minutes": "분",
-    "seconds": "초"
-  },
   "durationCompact": {
     "days": "일",
     "hours": "시간",
     "minutes": "분",
-    "seconds": "초",
-    "leftPattern": "{duration} 남음"
+    "seconds": "초"
   },
   "address": {
     "zero": "제로 주소",

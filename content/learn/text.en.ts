@@ -436,7 +436,7 @@ export const learnTextEn = {
           heading: 'Why Public Goods are part of the protocol',
           body: [
             'Public-goods forwarding is a protocol-level allocation track rather than an occasional marketing statement. A portion of the Cycle Reserve is directed to a public-goods beneficiary, currently Protocol Guild, according to the rules surfaced in the app.',
-            'The Public Goods pages show contributions, funds forwarded from the vault, and the recipient address. These records make the path from cycle participation to Ethereum infrastructure support visible.',
+            'The Public Goods pages show contributions, funds forwarded from the vault, and the beneficiary’s address. These records make the path from cycle participation to Ethereum infrastructure support visible.',
           ],
         },
         {

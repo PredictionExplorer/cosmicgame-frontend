@@ -98,7 +98,7 @@ export default async function Page({ params }: PageProps) {
           breadcrumbJsonLd(
             [
               { name: 'Cosmic Signature', path: '/' },
-              { name: experiment('deck.experimentalUi'), path: '/experimental-ui' },
+              { name: experiment('deck.artViewTitle'), path: '/experimental-ui' },
             ],
             localizedOrigin,
           ),

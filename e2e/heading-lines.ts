@@ -53,3 +53,45 @@ export async function expectNoStrandedHeadingPunctuation(page: Page, where: stri
     `heading lines that start with a closing mark on ${where}`,
   ).toEqual([]);
 }
+
+/**
+ * H1s that split the brand across lines ("Cosmic / Signatureの仕組み"). From
+ * 360px every heading tier has room for "Cosmic Signature" on one line, so
+ * the brand must never wrap there (components/ui/site-name-text.tsx).
+ */
+function readSplitBrandHeadings(page: Page): Promise<string[]> {
+  return page.evaluate(() => {
+    const BRAND = 'Cosmic Signature';
+    const split: string[] = [];
+    for (const heading of document.querySelectorAll<HTMLElement>('h1')) {
+      if (heading.offsetParent === null) continue;
+      const text = heading.textContent ?? '';
+      const at = text.indexOf(BRAND);
+      if (at === -1) continue;
+      // The tops of the brand's first and last glyph boxes.
+      const tops: number[] = [];
+      const walker = document.createTreeWalker(heading, NodeFilter.SHOW_TEXT);
+      const range = document.createRange();
+      let offset = 0;
+      for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+        const data = node.textContent ?? '';
+        for (const target of [at, at + BRAND.length - 1]) {
+          if (target < offset || target >= offset + data.length) continue;
+          range.setStart(node, target - offset);
+          range.setEnd(node, target - offset + 1);
+          const box = range.getClientRects()[0];
+          if (box) tops.push(box.top);
+        }
+        offset += data.length;
+      }
+      if (tops.length === 2 && Math.abs(tops[0]! - tops[1]!) > 4) split.push(text);
+    }
+    return split;
+  });
+}
+
+/** Fails when a visible H1 wraps "Cosmic Signature" onto two lines. */
+export async function expectBrandHeldWhole(page: Page, where: string): Promise<void> {
+  await page.evaluate(() => document.fonts.ready);
+  expect(await readSplitBrandHeadings(page), `H1s that split the brand on ${where}`).toEqual([]);
+}

@@ -1,5 +1,5 @@
 {
-  "loadError": "The Public Goods records couldn't be loaded.",
+  "loadError": "The Public Goods records couldn’t be loaded.",
   "vault": {
     "description": "Each finalized cycle moves the Public Goods share of its Cycle Reserve into the vault, where it waits until it is retrieved for {beneficiary}.",
     "due": "Due from this cycle",
@@ -8,11 +8,23 @@
     "retrieved": "Retrieved so far"
   },
   "ledger": {
-    "contributions": "Contribution records",
-    "retrievals": "Retrieval records"
+    "contributions": "Contributions",
+    "retrievals": "Retrievals"
   },
   "contribute": {
     "title": "Contribute to the vault",
-    "description": "Send ETH straight to the Public Goods Vault. It waits there with the protocol’s share until it is retrieved for {beneficiary}."
+    "description": "Send ETH on {network} straight to the Public Goods Vault. It waits there with the protocol’s share until it is retrieved for {beneficiary}.",
+    "networkWarning": "Send only on {network}. ETH sent to this address on any other network does not reach the vault.",
+    "network": "Network",
+    "form": {
+      "label": "Contribute ETH to the Public Goods Vault",
+      "amountHint": "Any amount above 0, sent from a wallet on {network}.",
+      "connectHint": "Connect a wallet on {network} to contribute.",
+      "summary": "{amount} goes to the Public Goods Vault for {beneficiary}.",
+      "submit": "Contribute ETH",
+      "submitAmount": "Contribute {amount}",
+      "confirmed": "{amount} ETH contribution to the Public Goods Vault confirmed.",
+      "failed": "The contribution didn’t go through. Check your wallet and try again."
+    }
   }
 }

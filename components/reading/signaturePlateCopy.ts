@@ -9,7 +9,7 @@ import type { SignaturePlateArt } from './signaturePlates';
  * The wall label of a bundled Signature on a reading page, by the rule every
  * art surface follows (components/ui/signature-label): the title
  * "Signature #000013" (the number set in mono by SignaturePlate), then
- * "Cycle #0". One artwork is named the same way on both hosts; the alt text
+ * "Cycle 0". One artwork is named the same way on both hosts; the alt text
  * keeps the full "Cosmic Signature #000013".
  */
 export async function getSignaturePlateCopy(

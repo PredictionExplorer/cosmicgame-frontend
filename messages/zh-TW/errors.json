@@ -1,9 +1,7 @@
 {
   "generic": "操作未完成，請重試。",
-  "networkOffline": "網路連線已中斷，請重新連線後繼續。",
   "walletNotConnected": "連接 Web3 錢包後即可落筆。",
   "insufficientEth": "錢包中的 ETH 不足，無法落筆。",
-  "cycleClosed": "本週期已收官，下一演繹週期即將開啟。",
   "state": {
     "title": "發生錯誤",
     "retry": "重試"
@@ -37,7 +35,6 @@
     "missing": "缺少或無效的變數：",
     "resolution": "請在 shell 或 .env 檔案中設定這些變數，然後重啟開發伺服器。"
   },
-  "apiFailure": "服務未回應，請稍後再試。",
   "unexpected": "發生未預期的錯誤，請重試。",
   "notFound": {
     "code": "錯誤 404",

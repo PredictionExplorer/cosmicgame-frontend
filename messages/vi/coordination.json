@@ -2,7 +2,7 @@
   "page": {
     "title": "Thay đổi điều phối",
     "subtitle": "Lịch sử thay đổi tham số giao thức và các sự kiện quản trị",
-    "description": "Chủ sở hữu hợp đồng có thể điều chỉnh tham số của Cosmic Signature trong các cửa sổ kích hoạt chu kỳ. Nhật ký ghi lại từng thay đổi, từ mức tăng chi phí nét bút và thời gian cộng thêm đến thiết lập phân phối neo giữ. Khi chủ sở hữu từ bỏ quyền sở hữu, mọi tham số sẽ cố định vĩnh viễn.",
+    "description": "Tham số chỉ có thể thay đổi trong các cửa sổ kích hoạt chu kỳ: mức tăng chi phí nét bút, thời gian cộng thêm, thiết lập phân phối neo giữ và các tham số khác.",
     "loadError": "Không tải được các thay đổi điều phối."
   },
   "systemEvent": {

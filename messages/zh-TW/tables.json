@@ -88,7 +88,6 @@
   "columns": {
     "cycle": "週期",
     "cycleNumber": "週期編號",
-    "cycleHash": "週期編號",
     "round": "週期",
     "participant": "參與者",
     "recipient": "獲配者",
@@ -101,7 +100,6 @@
     "allocationsReceived": "獲配次數（全部類型）",
     "maxAllocationEth": "最高簽名分配（ETH）",
     "allocationsSumEth": "獲配 ETH",
-    "anchorActionId": "錨定操作 ID",
     "anchorHolder": "錨定者",
     "holder": "持有者",
     "numberOfNfts": "NFT 數量",
@@ -137,7 +135,6 @@
     "maxGestureEth": "最高 ETH 落筆",
     "numberOfContributions": "貢獻次數",
     "totalContributedEth": "貢獻總額（ETH）",
-    "expirationDate": "到期時間",
     "started": "開始時間",
     "ended": "結束時間",
     "actions": "操作",
@@ -281,7 +278,7 @@
     "removed": "代幣名稱已移除。"
   },
   "stellarSelection": {
-    "draws": "週期確定時，協議會從本池中選取 {eth} 次 ETH 星選與 {nft} 次 NFT 星選。"
+    "draws": "週期收官時，協議會從本池中選取 {eth} 次 ETH 星選與 {nft} 次 NFT 星選。"
   },
   "recipientHistory": {
     "sources": {
@@ -320,52 +317,25 @@
     }
   },
   "specialAllocation": {
-    "liveGrowing": "即時增長",
-    "recordStanding": "紀錄保持中",
     "firstRecordForming": "首個堅守紀錄正在形成",
-    "needsToExtend": "再保持 {duration} 即可延長紀錄",
-    "needsToBecomeChampion": "再保持 {duration} 即可成為堅守冠軍",
     "extendingRecord": "正在延長堅守冠軍紀錄",
     "progressAria": "成為堅守冠軍的進度",
     "lastGesture": "最新落筆",
     "gestureDetailsSyncing": "最新一筆的詳情正在由索引器同步。",
     "gestureDetailsUnavailable": "最新一筆的交易詳情暫時無法取得。",
-    "amountPaid": "支付金額",
     "method": "方式",
     "gestureTime": "落筆時間",
     "attachedAssets": "附加資產",
-    "mayCloseIn": "可能收官",
-    "mayCloseValue": "若本次堅守超過現有紀錄，距收官還需 {duration}",
     "growingNow": "正在增長",
-    "activeEnduranceChallenge": "目前堅守進程",
-    "canExtendIn": "距延長紀錄還需",
-    "canOvertakeIn": "距超越紀錄還需",
-    "waitingToExtend": "等待延長時之勇士紀錄",
-    "waitingToOvertake": "等待超越時之勇士紀錄",
     "heading": "目前特別分配人選",
     "sectionAria": "目前特別分配人選",
     "latestParticipant": "最新參與者",
     "latestTooltip": "最新落筆者正在累積堅守時段。連續保持這一位置的時長超過目前堅守冠軍紀錄後，即可取得領先。",
-    "currentHold": "目前堅守",
-    "noLatestGesture": "暫無最新落筆",
     "enduranceChampion": "堅守冠軍",
-    "enduranceTooltip": "處於最新落筆者位置時長最長的參與者。只有仍是最新落筆者，計時才會繼續增長。",
-    "enduranceWindow": "堅守時段",
-    "noEnduranceRecord": "暫無堅守紀錄",
-    "enduranceNote": "按單次連續處於最新落筆者位置的最長時長計算，各時段不累計。",
     "chronoWarrior": "時之勇士",
-    "chronoWarriorPrint": "時之勇士",
-    "chronoTooltip": "連續擔任堅守冠軍時長最長的參與者將獲配週期儲備的 8%、1,000 CST 和一枚 Cosmic Signature NFT。",
-    "championReign": "冠軍在位時長",
-    "noChronoRecord": "暫無時之勇士紀錄",
     "finalCstGesture": "CST 收官之筆",
-    "finalCstTooltip": "完成本週期 CST 收官之筆的參與者將獲得一次表彰 CST 銘刻（1,000 CST），並獲配一枚 Cosmic Signature NFT。",
-    "awaitingCstGesture": "等待首筆 CST 落筆",
     "finalCstNote": "只有 CST 落筆會更新此人選；ETH 和 Random Walk 落筆不會更新。",
-    "headingHelp": "這些參與者目前可能在週期收官時獲得特別分配。每次新落筆都可能改變目前人選。",
-    "printCurrentHold": "目前堅守：{duration}",
-    "printWindow": "時段：{duration}",
-    "printReign": "在位：{duration}"
+    "headingHelp": "這些參與者目前可能在週期收官時獲得特別分配。每次新落筆都可能改變目前人選。"
   },
   "systemModes": {
     "viewEvent": "參數變更紀錄"
@@ -384,9 +354,7 @@
     "cstBalance": "餘額（CST）",
     "contractAddress": "合約地址",
     "numberOfNfts": "NFT 數量",
-    "namedNftTokenId": "代幣 ID",
-    "isRandomWalk": "來自 Random Walk",
-    "isAnchorHolder": "錨定者"
+    "isRandomWalk": "來自 Random Walk"
   },
   "statisticsTooltips": {
     "maxAllocationEth": "此獲配者因寫下收官之筆而獲得的最高一筆簽名分配；從未獲得則顯示短橫線。時之勇士與星選的 ETH 只計入獲配 ETH。",

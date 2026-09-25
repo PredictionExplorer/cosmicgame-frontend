@@ -29,20 +29,20 @@ export function outcomeTotals(list: readonly OutcomeEntry[]) {
     (acc, entry) => ({
       spent: acc.spent + (entry.TotalEthSpentEth ?? 0),
       received: acc.received + (entry.EthWonEth ?? 0),
-      receivedMore: acc.receivedMore + (entry.EthWonEth > entry.TotalEthSpentEth ? 1 : 0),
     }),
-    { spent: 0, received: 0, receivedMore: 0 },
+    { spent: 0, received: 0 },
   );
 }
 
 /**
- * What each participant spent on gestures and what came back to them as ETH
- * allocations, side by side and in neutral ink: no gain/loss colours, no
- * rank. The strip above totals the same columns, and says how many received
- * more ETH than they spent. Listed by gestures; gestures, spent, received and
- * allocations sort from their headers. The difference and the cycles with an
- * allocation do not: a table sorted by either would be a board of who came
- * out ahead, and a position number beside it a ranking.
+ * What each participant spent on gestures and what came back to them as
+ * allocations, side by side and in neutral ink. There is deliberately no
+ * difference between the two: a signed net column, a "received more than
+ * spent" count or a sort by either would turn the page into a profit-and-loss
+ * board (and the ETH-only difference misread every CST gesture as free).
+ * Listed by gestures; gestures, spent, received and allocations sort from
+ * their headers. Cycles with an allocation do not: sorted, it would be a
+ * ranking.
  */
 export const ParticipantOutcomesSection = () => {
   const t = useTranslations('statistics');
@@ -61,14 +61,6 @@ export const ParticipantOutcomesSection = () => {
     },
     { id: 'spent', label: t('performance.outcomes.spent'), value: eth(totals.spent) },
     { id: 'received', label: t('performance.outcomes.received'), value: eth(totals.received) },
-    {
-      id: 'receivedMore',
-      label: t('performance.outcomes.receivedMore'),
-      value: t('performance.outcomes.ofParticipants', {
-        part: format.count(totals.receivedMore),
-        whole: format.count(list.length),
-      }),
-    },
   ];
 
   const columns = useMemo<DataTableColumn<OutcomeEntry>[]>(
@@ -96,7 +88,7 @@ export const ParticipantOutcomesSection = () => {
         sortable: true,
         cell: (row) => (
           <span className="inline-flex flex-col items-end">
-            {/* Table precision, as Received and Net beside it: zero reads "0.0000". */}
+            {/* Table precision, as Received beside it: zero reads "0.0000". */}
             <span>
               {format.amount(row.TotalEthSpentEth, {
                 unit: 'ETH',
@@ -120,25 +112,6 @@ export const ParticipantOutcomesSection = () => {
         header: t('performance.leaderboard.columns.received'),
         value: (row) => row.EthWonEth,
         sortable: true,
-      },
-      {
-        id: 'net',
-        kind: 'amount',
-        unit: 'ETH',
-        showUnit: false,
-        header: t('performance.leaderboard.columns.net'),
-        help: t('performance.outcomes.netHelp'),
-        value: (row) => row.NetPlEth,
-        // Spent and received sit side by side above it on a phone; the difference stays on wider screens.
-        priority: 'secondary',
-        // Signed by the formatter, in the same ink as every other figure.
-        cell: (row) =>
-          format.amount(row.NetPlEth, {
-            unit: 'ETH',
-            context: 'table',
-            withUnit: false,
-            signDisplay: 'exceptZero',
-          }),
       },
       {
         // A count of cycles ("1 of 2 cycles"), never a percentage: no rate to compare by.

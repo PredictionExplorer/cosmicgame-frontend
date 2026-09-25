@@ -148,7 +148,7 @@ describe('app home page (server shell)', () => {
       .map((script) => JSON.parse(script.textContent ?? '{}') as Record<string, unknown>)
       .find((data) => data['@type'] === 'Event');
     expect(eventBlock).toBeDefined();
-    expect(eventBlock?.name).toBe('Cosmic Signature Performance Cycle #9');
+    expect(eventBlock?.name).toBe('Cosmic Signature Performance Cycle 9');
     expect(eventBlock?.startDate).toBe('2023-11-14T22:13:20.000Z');
   });
 

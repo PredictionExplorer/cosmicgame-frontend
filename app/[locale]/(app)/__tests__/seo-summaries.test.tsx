@@ -489,7 +489,7 @@ describe('server-rendered page headers', () => {
     ['anchoring' as const, 'Anchor Distributions', 'records', '/site-map#records'],
     ['marketing' as const, 'Outreach allocations', 'records', '/site-map#records'],
     ['eth-contribution' as const, 'Direct ETH contributions', 'records', '/site-map#records'],
-    ['attached-nfts' as const, 'Attached NFT Contributions', 'collection', '/gallery'],
+    ['attached-nfts' as const, 'Attached NFT contributions', 'collection', '/gallery'],
     ['named-nfts' as const, 'Named Cosmic Signature NFTs', 'collection', '/gallery'],
     ['used-rwlk-nfts' as const, 'Used Random Walk NFTs', 'collection', '/gallery'],
   ])(

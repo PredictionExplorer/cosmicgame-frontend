@@ -44,7 +44,7 @@ const readGesture = cache(
 );
 
 /**
- * "Gesture #1135 · Cycle #2" once the record names its place, "Gesture record
+ * "Gesture #1135 · Cycle 2" once the record names its place, "Gesture record
  * 29434" until then, and the page's own "Invalid gesture ID" for an id that
  * is not a whole number.
  */

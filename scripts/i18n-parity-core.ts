@@ -186,6 +186,29 @@ export function unitSpacingProblems(message: string): readonly string[] {
   return [...found];
 }
 
+/**
+ * A straight apostrophe inside or at the end of a word ("don't", "bodies'"),
+ * where the typographic one (U+2019) belongs. A quote before `{` (ICU's
+ * escape) or at the start of a word is left alone.
+ */
+const STRAIGHT_APOSTROPHE = /\p{L}'(?:\p{L}|(?=[\s.,;:!?)]|$))/gu;
+
+/**
+ * Typography the source (English) catalog is written in: the ellipsis as one
+ * character (U+2026), matching every translated locale and
+ * `getLocaleConfig('en').ellipsis`, and the typographic apostrophe (U+2019).
+ * Returns one line per defect, naming the offending text.
+ */
+export function sourceTypographyProblems(message: string): readonly string[] {
+  const problems: string[] = [];
+  if (message.includes('...')) problems.push('"..." should be the ellipsis "…" (U+2026)');
+  const apostrophes = [...new Set(Array.from(message.matchAll(STRAIGHT_APOSTROPHE), ([m]) => m))];
+  for (const join of apostrophes) {
+    problems.push(`"${join}" should use the apostrophe "’" (U+2019)`);
+  }
+  return problems;
+}
+
 const pluralCategoryCache = new Map<string, readonly string[]>();
 
 /** CLDR plural categories a locale's catalogs must cover. */
@@ -457,12 +480,16 @@ export function checkSourceNamespace(
 ): Pick<
   NamespaceReport,
   'namespace' | 'empty' | 'invalidValues' | 'syntaxErrors' | 'pluralGaps' | 'unitSpacing'
-> {
+> & {
+  /** `key: defect` for three-dot ellipses and straight apostrophes (see `sourceTypographyProblems`). */
+  readonly typography: readonly string[];
+} {
   const empty: string[] = [];
   const invalidValues: string[] = [];
   const syntaxErrors: string[] = [];
   const pluralGaps: string[] = [];
   const unitSpacing: string[] = [];
+  const typography: string[] = [];
   for (const [key, value] of flattenMessages(source)) {
     if (typeof value !== 'string') {
       invalidValues.push(key);
@@ -472,6 +499,7 @@ export function checkSourceNamespace(
       empty.push(key);
       continue;
     }
+    for (const problem of sourceTypographyProblems(value)) typography.push(`${key}: ${problem}`);
     let signature: IcuSignature;
     try {
       signature = icuSignature(value);
@@ -490,5 +518,5 @@ export function checkSourceNamespace(
       unitSpacing.push(`${key}: "${join}" needs a no-break space (U+00A0) before the unit`);
     }
   }
-  return { namespace, empty, invalidValues, syntaxErrors, pluralGaps, unitSpacing };
+  return { namespace, empty, invalidValues, syntaxErrors, pluralGaps, unitSpacing, typography };
 }

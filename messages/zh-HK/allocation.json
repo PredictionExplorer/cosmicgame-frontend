@@ -1,7 +1,6 @@
 {
   "formats": {
     "cycle": "第 {cycle} 個週期",
-    "cycleHash": "第 {cycle} 個週期",
     "cosmicSignatureToken": "Cosmic Signature #{token}"
   },
   "recipients": {
@@ -173,7 +172,6 @@
     "links": {
       "viewCycle": "查看第 {cycle} 個週期",
       "myAllocations": "我的分配",
-      "allRecipients": "分配名錄",
       "allCycles": "全部週期"
     },
     "result": {

@@ -52,7 +52,7 @@ test.describe('Allocation pages', () => {
     const response = await page.goto('/allocation-finalized?cycle=42', { waitUntil: 'load' });
     expect(response?.status()).toBe(200);
     // The record's title is in the server HTML, before any read resolves.
-    await expect(page.getByRole('heading', { level: 1, name: /Cycle #42/ })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: /Cycle 42\b/ })).toBeVisible();
     await expect(page.getByTestId('finalized-signature')).toBeVisible();
     await page.waitForTimeout(1_500);
 

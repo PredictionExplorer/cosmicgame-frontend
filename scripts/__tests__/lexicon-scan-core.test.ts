@@ -77,6 +77,19 @@ describe('DEFAULT_BANNED_TERMS', () => {
     expect(DEFAULT_BANNED_TERMS).toContain('tax-deductible');
   });
 
+  // V308: "selections are drawn from this pool" read as a lottery draw, yet
+  // "draws a line" and "the drawing" are ordinary words in code and copy.
+  it('bans "draw" only in its lottery sense', () => {
+    const pattern = buildBannedPattern(DEFAULT_BANNED_TERMS);
+    const hits = (text: string) => text.match(pattern) ?? [];
+    expect(hits('Selections are drawn from this pool.')).toEqual(['drawn from']);
+    expect(hits('Three entries are drawn at random.')).toEqual(['drawn at random']);
+    expect(hits('The same address can be drawn more than once.')).toEqual(['drawn more than once']);
+    expect(hits('draws a line with no fill')).toEqual([]);
+    expect(hits('keeps the drawing out of the accessibility tree')).toEqual([]);
+    expect(hits('the link is drawn as the table')).toEqual([]);
+  });
+
   it('has no duplicate entries', () => {
     expect(new Set(DEFAULT_BANNED_TERMS).size).toBe(DEFAULT_BANNED_TERMS.length);
   });

@@ -149,7 +149,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/experimental-ui',
     host: 'app',
     cluster: 'core',
-    expectedText: 'Cosmic Signature 观测台',
+    expectedText: '观测台艺术视图',
   },
   {
     id: 'current-cycle',

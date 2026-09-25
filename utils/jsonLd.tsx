@@ -391,7 +391,7 @@ export function liveCycleJsonLd({
     '@context': 'https://schema.org',
     '@type': 'Event',
     '@id': `${APP_URL}/#live-cycle`,
-    name: `${SITE_NAME} Performance Cycle #${cycleNumber}`,
+    name: `${SITE_NAME} Performance Cycle ${cycleNumber}`,
     description: PROTOCOL_DESCRIPTION,
     startDate: new Date(startTsSeconds * 1000).toISOString(),
     eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',

@@ -67,7 +67,7 @@ test.describe('Runtime error detection', () => {
     const response = await page.goto('/', { waitUntil: 'domcontentloaded' });
 
     expect(response?.status()).toBe(200);
-    await expect(page.locator('text=/Cycle #/').first()).toBeVisible({ timeout: 15000 });
+    await expect(page.locator('text=/Cycle \\d+/').first()).toBeVisible({ timeout: 15000 });
     await expect(page.locator('body')).not.toHaveText('Internal Server Error');
   });
 

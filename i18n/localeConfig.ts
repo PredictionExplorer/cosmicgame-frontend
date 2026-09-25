@@ -79,7 +79,7 @@ const LOCALE_CONFIG: LocaleRecord<LocaleConfig> = {
     textDirection: 'ltr',
     wordSpacing: true,
     weekStartsMonday: false,
-    ellipsis: '...',
+    ellipsis: '…',
     lowercaseMidSentence: true,
     showRawProviderErrors: DEBUG_PROVIDER_ERRORS,
   },

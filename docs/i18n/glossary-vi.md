@@ -75,6 +75,7 @@ is **đặt nét bút** ("to place a stroke"); the classifier is the noun itself
 | ETH gesture / CST gesture          | nét bút ETH / nét bút CST   |
 | Gesture with ETH (button)          | Đặt nét bút bằng ETH        |
 | Gesture Cost                       | chi phí nét bút             |
+| Gesture method (not thanh toán)    | cách đặt nét bút            |
 | Final Gesture                      | nét bút cuối cùng           |
 | Last Gesture (most recent)         | nét bút gần nhất            |
 | Your cycle standing (personal)     | Vị thế của bạn trong chu kỳ |
@@ -282,6 +283,7 @@ công**. Capitalized as a proper name.
 | ----------------------------------- | ------------------------------------ |
 | Public Goods                        | Hàng hóa công                        |
 | Public Goods Vault                  | Kho Hàng hóa công                    |
+| Public Goods Beneficiary            | đơn vị thụ hưởng Hàng hóa công       |
 | Protocol Public Goods contributions | đóng góp Hàng hóa công của giao thức |
 | voluntary contributions             | đóng góp tự nguyện                   |
 

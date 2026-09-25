@@ -58,7 +58,7 @@
       },
       "marketing": {
         "heading": "推廣分配",
-        "description": "查看 Cosmic Signature 推廣分配歷史，以及向幫助更多人了解協議的生態貢獻者發放的 CST。",
+        "description": "推廣儲備發放給幫助更多人了解 Cosmic Signature 的貢獻者的 CST，每筆分配都附有交易記錄。",
         "source": "Cosmic Signature 推廣 API",
         "links": {
           "faq": "閱讀常見問題",
@@ -67,13 +67,13 @@
         },
         "cards": {
           "records": {
-            "label": "推廣分配記錄"
+            "label": "分配記錄"
           },
           "allocatedCst": {
-            "label": "推廣分配 CST 總量"
+            "label": "已分配 CST"
           },
           "contributors": {
-            "label": "獨立推廣貢獻者"
+            "label": "貢獻者"
           }
         }
       },
@@ -109,13 +109,13 @@
         },
         "cards": {
           "records": {
-            "label": "直接貢獻記錄"
+            "label": "貢獻記錄"
           },
           "totalEth": {
-            "label": "直接貢獻 ETH 總額"
+            "label": "貢獻 ETH"
           },
           "contributors": {
-            "label": "獨立貢獻者"
+            "label": "貢獻者"
           }
         }
       },
@@ -207,7 +207,7 @@
       },
       "coordination-changes": {
         "heading": "協調變更",
-        "description": "自目前模式開始以來，合約所有者對協議參數作出的每一項變更。",
+        "description": "合約所有者對協議參數作出的變更，每項都附有交易記錄。在放棄所有權之前，所有者仍可繼續變更。",
         "source": "Cosmic Signature 系統事件 API",
         "links": {
           "security": "閱讀安全概覽",
@@ -216,7 +216,7 @@
         },
         "cards": {
           "records": {
-            "label": "協調變更記錄"
+            "label": "變更記錄"
           },
           "latest": {
             "label": "最近變更"
@@ -224,13 +224,14 @@
           "owner": {
             "label": "合約所有者",
             "tooltip": "只有該地址可以變更這些參數。放棄所有權後，所有者會變為零地址，這些參數將無法再變更。",
-            "renounced": "已放棄"
+            "renounced": "已放棄",
+            "active": "可變更參數"
           }
         }
       },
       "public-goods-contributions-cg": {
         "heading": "協議公共物品資助",
-        "description": "追蹤 Cosmic Signature 各週期自動轉入公共物品金庫、併發往其目前受益方 Protocol Guild 的資金。",
+        "description": "每個收官週期的週期儲備中有 7% 進入公共物品金庫，供其受益方取回：目前為資助以太坊核心貢獻者的 Protocol Guild。",
         "source": "Cosmic Signature 公共物品 API",
         "links": {
           "learn": "了解公共物品機制",
@@ -273,7 +274,7 @@
       },
       "public-goods-retrievals": {
         "heading": "公共物品取回",
-        "description": "查看 Cosmic Signature 公共物品金庫的取回記錄；週期儲備會由此轉向目前配置的公共物品受益方 Protocol Guild。",
+        "description": "公共物品金庫向其受益方（目前為 Protocol Guild）的每一筆轉撥。任何人都可以發起，ETH 只會轉給受益方。",
         "source": "Cosmic Signature 公共物品 API",
         "links": {
           "learn": "了解公共物品機制",

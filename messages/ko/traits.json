@@ -162,7 +162,6 @@
     "rarest": "가장 희귀한 특성",
     "share": "{total}개 중 {count}개가 공유",
     "shareShort": "{count}/{total}",
-    "scoreLabel": "희귀도 점수",
     "unavailable": "아직 순위 없음"
   },
   "facets": {

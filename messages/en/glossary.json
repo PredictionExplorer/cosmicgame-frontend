@@ -22,7 +22,7 @@
     },
     "cycleReserve": {
       "term": "Cycle Reserve",
-      "short": "The ETH held for the current Cycle. ETH gestures and contributions add to it, and the allocations draw from it at finalization.",
+      "short": "The ETH held for the current Cycle. ETH gestures and contributions add to it, and the allocations are paid from it at finalization.",
       "long": "Each allocation track receives a fixed share when the Cycle finalizes: the Signature Allocation, Stellar Selection, Anchor Distributions, the Chrono-Warrior, Public Goods and the Compounding Cycle Reserve that opens the next Cycle."
     },
     "signatureAllocation": {

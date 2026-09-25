@@ -63,16 +63,7 @@
       "title": "地址无效",
       "description": "链接中需要完整地址：0x 加 40 位字母和数字。",
       "action": "全部推广分配"
-    },
-    "smallNote": "灰色数额为少于 {amount} 的分配，按当前精度无法完整显示。"
-  },
-  "transferForm": {
-    "title": "拨付推广 CST",
-    "description": "调用推广储备合约的 `payReward` 函数；当前连接的钱包必须属于现任财务执行人。",
-    "reserveLabel": "推广储备",
-    "ownerLabel": "所有者",
-    "treasurerLabel": "财务执行人",
-    "historyLink": "查看推广储备转账记录"
+    }
   },
   "learnHow": "了解参与方式",
   "loadError": "无法加载推广分配记录。"

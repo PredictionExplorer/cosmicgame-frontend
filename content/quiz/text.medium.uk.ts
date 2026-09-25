@@ -83,7 +83,7 @@ export const mediumQuestionsTextUk = {
       c: 'Нічого — дві валюти незалежні.',
       d: 'Вікно скидається до початкової тривалості.',
     },
-    explanation: `Тривалість вікна змінюється залежно від активності, створюючи зворотний зв’язок між двома способами оплати: кожен ETH-жест скорочує її приблизно на ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%, кожен CST-жест подовжує приблизно на ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%. Інтенсивна активність в ETH пришвидшує спад CST, а інтенсивна активність у CST знову його сповільнює — підштовхуючи кожен цикл до збалансованого поєднання.`,
+    explanation: `Тривалість вікна змінюється залежно від активності, створюючи зворотний зв’язок між двома видами жестів: кожен ETH-жест скорочує її приблизно на ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%, кожен CST-жест подовжує приблизно на ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%. Інтенсивна активність в ETH пришвидшує спад CST, а інтенсивна активність у CST знову його сповільнює — підштовхуючи кожен цикл до збалансованого поєднання.`,
     referenceLabel: 'Біла книга §4.3 — CST-жести',
   },
   'participation-cst-timing': {

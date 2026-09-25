@@ -37,7 +37,7 @@
     },
     "publicGoods": {
       "name": "Public Goods Vault",
-      "description": "Receives the Public Goods Allocation from each cycle's Cycle Reserve"
+      "description": "Receives the Public Goods Allocation from each cycle’s Cycle Reserve"
     },
     "outreach": {
       "name": "Outreach Reserve",
@@ -166,19 +166,19 @@
       "anchorTooltip": "Number of Random Walk NFT anchor-holders randomly selected to receive Cosmic Signature NFTs each cycle"
     },
     "cstComplete": "The window has run its full length, so the CST Gesture Cost stays at its floor until the next CST gesture restarts it.",
-    "ethClosed": "The cycle's first gesture closed this window; the ETH Gesture Cost now steps up with each gesture.",
-    "ethComplete": "The window has run its full length, so the ETH Gesture Cost stays at its floor until the cycle's first gesture."
+    "ethClosed": "The cycle’s first gesture closed this window; the ETH Gesture Cost now steps up with each gesture.",
+    "ethComplete": "The window has run its full length, so the ETH Gesture Cost stays at its floor until the cycle’s first gesture."
   },
   "vault": {
     "title": "Public Goods",
     "description": "Each cycle sends its Public Goods share to the vault, which forwards it to the Public Goods Beneficiary.",
-    "tooltip": "Calls the Public Goods Vault send() function to forward the vault's ETH balance to the configured Protocol Guild beneficiary.",
+    "tooltip": "Calls the Public Goods Vault send() function to forward the vault’s ETH balance to the configured Protocol Guild beneficiary.",
     "vaultAddress": "Vault",
     "share": "Share of each cycle",
     "balance": "In vault now",
     "empty": "The vault is empty: nothing to forward yet.",
     "balanceUnavailable": "The vault balance could not be read, so forwarding is not offered right now.",
-    "note": "Anyone can forward the vault's balance to the beneficiary; it costs only gas."
+    "note": "Anyone can forward the vault’s balance to the beneficiary; it costs only gas."
   },
   "seo": {
     "heading": "Cosmic Signature contracts",

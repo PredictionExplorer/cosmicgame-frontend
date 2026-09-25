@@ -139,7 +139,7 @@ describe('experimental UI metadata', () => {
   it('is self-canonical and excluded from search indexes', async () => {
     const metadata = await generateMetadata(englishProps, resolvingMetadata());
 
-    expect(documentTitleOf(metadata)).toBe('Experimental UI · Cosmic Signature');
+    expect(documentTitleOf(metadata)).toBe('Observatory art view · Cosmic Signature');
     expect(metadata.robots).toEqual(
       expect.objectContaining({
         index: false,
@@ -155,7 +155,7 @@ describe('experimental UI metadata', () => {
       resolvingMetadata(),
     );
 
-    expect(documentTitleOf(metadata)).toBe('实验界面 · Cosmic Signature');
+    expect(documentTitleOf(metadata)).toBe('观测台艺术视图 · Cosmic Signature');
     expect(String(metadata.alternates?.canonical)).toMatch(/\/zh\/experimental-ui$/);
   });
 });

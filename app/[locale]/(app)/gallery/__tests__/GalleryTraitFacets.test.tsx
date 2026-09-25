@@ -351,7 +351,7 @@ describe('GalleryCollectionDna', () => {
       <GalleryCollectionDna collectionTraits={undefined} selected={{}} onSelect={noop} />,
     );
     expect(
-      screen.getByRole('status', { name: "Reading the collection's traits…" }),
+      screen.getByRole('status', { name: 'Reading the collection’s traits…' }),
     ).toHaveAttribute('aria-busy', 'true');
     rerender(<GalleryCollectionDna collectionTraits={null} selected={{}} onSelect={noop} />);
     expect(screen.queryByTestId('collection-dna')).not.toBeInTheDocument();

@@ -49,7 +49,7 @@
       "columns": {
         "datetime": "Thời điểm",
         "contributorAddress": "Địa chỉ người đóng góp",
-        "round": "Chu kỳ #",
+        "round": "Chu kỳ",
         "tokenAddress": "Địa chỉ token",
         "tokenId": "Mã token",
         "tokenImage": "Hình token",
@@ -61,7 +61,7 @@
       "empty": "Chưa có token ERC20 đính kèm.",
       "columns": {
         "datetime": "Thời điểm",
-        "cycle": "Chu kỳ #",
+        "cycle": "Chu kỳ",
         "tokenAddress": "Địa chỉ token",
         "attachedAmount": "Số lượng đính kèm",
         "retrievedAmount": "Số lượng đã nhận về",
@@ -88,7 +88,6 @@
   "columns": {
     "cycle": "Chu kỳ",
     "cycleNumber": "Số chu kỳ",
-    "cycleHash": "Chu kỳ #",
     "round": "Chu kỳ",
     "participant": "Người tham gia",
     "recipient": "Người nhận",
@@ -101,7 +100,6 @@
     "allocationsReceived": "Phân bổ (mọi loại)",
     "maxAllocationEth": "Phân bổ Signature lớn nhất (ETH)",
     "allocationsSumEth": "ETH đã nhận",
-    "anchorActionId": "Mã thao tác neo giữ",
     "anchorHolder": "Người neo giữ",
     "holder": "Người giữ",
     "numberOfNfts": "Số NFT",
@@ -137,7 +135,6 @@
     "maxGestureEth": "Nét bút lớn nhất (ETH)",
     "numberOfContributions": "Số lần đóng góp",
     "totalContributedEth": "Tổng số tiền đã đóng góp (ETH)",
-    "expirationDate": "Ngày hết hạn",
     "started": "Bắt đầu",
     "ended": "Kết thúc",
     "actions": "Thao tác",
@@ -281,7 +278,7 @@
     "removed": "Tên token đã bị xóa."
   },
   "stellarSelection": {
-    "draws": "Khi chu kỳ được chốt, {eth} lượt chọn ETH và {nft} lượt chọn NFT được thực hiện trong nhóm này."
+    "draws": "Khi chu kỳ hoàn tất, {eth} lượt chọn ETH và {nft} lượt chọn NFT được thực hiện trong nhóm này."
   },
   "recipientHistory": {
     "sources": {
@@ -320,52 +317,25 @@
     }
   },
   "specialAllocation": {
-    "liveGrowing": "Trực tiếp - đang tăng",
-    "recordStanding": "Kỷ lục đang giữ",
     "firstRecordForming": "Kỷ lục bền bỉ đầu tiên đang hình thành",
-    "needsToExtend": "Cần thêm {duration} để nối dài kỷ lục",
-    "needsToBecomeChampion": "Cần thêm {duration} để trở thành Quán quân Bền bỉ",
     "extendingRecord": "Đang nối dài kỷ lục Quán quân Bền bỉ",
     "progressAria": "Tiến độ đến Quán quân Bền bỉ",
     "lastGesture": "Nét bút gần nhất",
     "gestureDetailsSyncing": "Đang cập nhật chi tiết nét bút gần nhất.",
     "gestureDetailsUnavailable": "Chi tiết giao dịch của nét bút gần nhất tạm thời không khả dụng.",
-    "amountPaid": "Số tiền đã trả",
     "method": "Phương thức",
     "gestureTime": "Thời điểm nét bút",
     "attachedAssets": "Tài sản đính kèm",
-    "mayCloseIn": "Có thể khép lại sau",
-    "mayCloseValue": "{duration} nếu lần giữ mới nhất vượt kỷ lục Bền bỉ",
     "growingNow": "Đang tăng",
-    "activeEnduranceChallenge": "Thử thách Bền bỉ đang diễn ra",
-    "canExtendIn": "Có thể nối dài sau",
-    "canOvertakeIn": "Có thể vượt lên sau",
-    "waitingToExtend": "Đang chờ nối dài kỷ lục Chiến binh Thời gian",
-    "waitingToOvertake": "Đang chờ vượt kỷ lục Chiến binh Thời gian",
     "heading": "Người dẫn đầu phân bổ đặc biệt",
     "sectionAria": "Người dẫn đầu phân bổ đặc biệt",
     "latestParticipant": "Người tham gia gần nhất",
     "latestTooltip": "Thời gian dẫn đầu của người đặt nét bút gần nhất đang tăng. Để trở thành Quán quân Bền bỉ, khoảng dẫn đầu này phải dài hơn kỷ lục hiện tại.",
-    "currentHold": "Đang giữ",
-    "noLatestGesture": "Chưa có nét bút gần nhất",
     "enduranceChampion": "Quán quân Bền bỉ",
-    "enduranceTooltip": "Người tham gia có khoảng giữ vị trí nét bút gần nhất liên tục dài nhất. Bộ đếm chỉ tăng khi người đó vẫn là người đặt nét bút gần nhất.",
-    "enduranceWindow": "Khoảng bền bỉ",
-    "noEnduranceRecord": "Chưa có kỷ lục bền bỉ",
-    "enduranceNote": "Khoảng đơn lẻ dài nhất giữ vị trí người tham gia gần nhất, không phải thời gian tích lũy.",
     "chronoWarrior": "Chiến binh Thời gian",
-    "chronoWarriorPrint": "Chiến binh Thời gian",
-    "chronoTooltip": "Người tham gia giữ vị trí Quán quân Bền bỉ trong khoảng liên tục dài nhất. Nhận 8% Dự trữ chu kỳ, 1.000 CST và một Cosmic Signature NFT.",
-    "championReign": "Thời gian giữ vị trí Quán quân",
-    "noChronoRecord": "Chưa có kỷ lục Chiến binh Thời gian",
     "finalCstGesture": "Nét bút CST cuối cùng",
-    "finalCstTooltip": "Người tham gia đặt nét bút CST cuối cùng của chu kỳ nhận 1.000 CST ghi nhận và một Cosmic Signature NFT.",
-    "awaitingCstGesture": "Đang chờ nét bút CST đầu tiên",
     "finalCstNote": "Chỉ nét bút CST cập nhật vai trò này; nét bút ETH và Random Walk thì không.",
-    "headingHelp": "Những người tham gia này hiện đủ điều kiện nhận các phân bổ đặc biệt khi chu kỳ hoàn tất. Người giữ vai trò có thể thay đổi sau mỗi nét bút mới.",
-    "printCurrentHold": "Đang giữ: {duration}",
-    "printWindow": "Khoảng: {duration}",
-    "printReign": "Thời gian giữ vị trí: {duration}"
+    "headingHelp": "Những người tham gia này hiện đủ điều kiện nhận các phân bổ đặc biệt khi chu kỳ hoàn tất. Người giữ vai trò có thể thay đổi sau mỗi nét bút mới."
   },
   "systemModes": {
     "viewEvent": "thay đổi tham số"
@@ -384,9 +354,7 @@
     "cstBalance": "Số dư (CST)",
     "contractAddress": "Địa chỉ hợp đồng",
     "numberOfNfts": "Số NFT",
-    "namedNftTokenId": "Mã token",
-    "isRandomWalk": "Là Random Walk",
-    "isAnchorHolder": "Là người neo giữ"
+    "isRandomWalk": "Là Random Walk"
   },
   "statisticsTooltips": {
     "maxAllocationEth": "Phân bổ Signature lớn nhất người nhận này nhận được nhờ đặt nét bút cuối cùng; hiển thị dấu gạch nếu chưa từng nhận. ETH Chiến binh Thời gian và Tinh tuyển chỉ được tính vào ETH đã nhận.",

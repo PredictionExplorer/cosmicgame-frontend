@@ -10,8 +10,8 @@
     "descriptionWithReserve": "Cosmic SignatureはArbitrum上のプロシージャル・オンチェーンアート・プロトコルです。パフォーマンス・サイクルの間に一筆を入れると、確定時に{reserve}のサイクル準備金がProtocol Guildを含む配分トラックへ配られます。"
   },
   "experimentalUi": {
-    "title": "実験的なUI",
-    "description": "同じライブのプロトコルデータと操作を備えた、Cosmic Signatureの実験的なサイクルインターフェースを試す。"
+    "title": "観測所のアートビュー",
+    "description": "アートを主役にしたCosmic Signature観測所のプレビューです。同じライブのサイクルデータと操作を備えています。"
   },
   "gallery": {
     "title": "ギャラリー：決定論的な三体NFTアート",

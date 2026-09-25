@@ -40,7 +40,6 @@ describe('DashboardInfoSchema', () => {
     PrizeClaimTs: 1_700_000_000,
     TsRoundStart: 1_699_000_000,
     LastBidderAddr: '0xabc',
-    ParticipationCstReward: 165.02,
     StakingAmountEth: 0.5,
     NumRaffleNFTWinnersBidding: 3,
     NumRaffleNFTWinnersStakingRWalk: 2,
@@ -138,7 +137,8 @@ describe('DashboardInfoSchema', () => {
     if (parsed.success) {
       expect(parsed.data.CurPrizeAmountEth).toBe(12.34);
       expect(parsed.data.CurBidPriceEth).toBe(0.056);
-      expect(parsed.data.ParticipationCstReward).toBeCloseTo(0.1);
+      // A CST amount in wei: passed through as the wire sent it, never as ETH.
+      expect((parsed.data as Record<string, unknown>).TokenReward).toBe('100000000000000000');
       expect(parsed.data).not.toHaveProperty('GestureCostEth');
     }
   });

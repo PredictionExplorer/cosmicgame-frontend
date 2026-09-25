@@ -10,8 +10,8 @@
     "descriptionWithReserve": "Cosmic Signature 是 Arbitrum 上的程序化鏈上藝術協議。在演繹週期中落筆；週期收官後，{reserve} 的週期儲備將沿各條分配軌道發放，其中一條通向 Protocol Guild。"
   },
   "experimentalUi": {
-    "title": "實驗介面",
-    "description": "透過同一套即時協議數據與操作，體驗另一種 Cosmic Signature 週期介面。"
+    "title": "觀測台藝術視圖",
+    "description": "Cosmic Signature 觀測台的預覽版，以藝術為先，使用同樣的即時週期數據與操作。"
   },
   "gallery": {
     "title": "畫廊：確定性三體 NFT 藝術",

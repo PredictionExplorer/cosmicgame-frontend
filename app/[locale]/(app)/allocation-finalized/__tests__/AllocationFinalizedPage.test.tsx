@@ -207,7 +207,7 @@ describe('AllocationFinalizedPage', () => {
     roundInfo(ALLOCATION);
     render(<Page />);
     const caption = screen.getByTestId('finalized-signature').querySelector('figcaption');
-    expect(caption).toHaveTextContent('allocation.formats.cycleHash(cycle=5)');
+    expect(caption).toHaveTextContent('allocation.formats.cycle(cycle=5)');
     expect(caption?.querySelector('time')).toBeNull();
   });
 
@@ -288,10 +288,9 @@ describe('AllocationFinalizedPage', () => {
     render(<Page seoSummary={<h1>Summary</h1>} />);
     expect(screen.getByRole('heading', { level: 1, name: 'Summary' })).toBeInTheDocument();
     const cards = screen.getAllByRole('figure');
-    expect(within(cards[0]!).getByRole('link', { name: /cycleHash\(cycle=1\)/ })).toHaveAttribute(
-      'href',
-      '/allocation/1',
-    );
+    expect(
+      within(cards[0]!).getByRole('link', { name: /formats\.cycle\(cycle=1\)/ }),
+    ).toHaveAttribute('href', '/allocation/1');
     expect(mockUseRoundInfo).toHaveBeenCalledWith(-1);
   });
 

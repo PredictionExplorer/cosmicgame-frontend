@@ -122,7 +122,6 @@ export const DashboardInfoSchema = z
     PrizeClaimTs: z.number(),
     TsRoundStart: z.number(),
     LastBidderAddr: AddressSchema,
-    ParticipationCstReward: z.number().optional(),
     StakingAmountEth: z.number(),
     MainStats: MainStatsSchema,
     ContractAddrs: ContractAddressesSchema.optional(),
@@ -401,16 +400,26 @@ export const ParticipantSchema = z
   })
   .loose();
 
-/** Raw `statistics/unique/winners` row; `get_unique_winners` maps `PrizesCount` to `AllocationsCount`. */
+/**
+ * Raw `statistics/unique/winners` row. The count is the wire's `PrizesCount`, or
+ * `AllocationsCount` once the backend renames it: `get_unique_winners` reads either (the
+ * same contract as `toRecipient`). A row with neither is a contract break worth
+ * reporting; the table still renders it, with the count unknown.
+ */
 export const RecipientSchema = z
   .object({
     WinnerAid: IdSchema,
     WinnerAddr: AddressSchema,
-    PrizesCount: z.number(),
+    PrizesCount: z.number().optional(),
+    AllocationsCount: z.number().optional(),
     MaxWinAmountEth: z.number(),
     PrizesSum: z.number(),
   })
-  .loose();
+  .loose()
+  .refine((row) => row.PrizesCount !== undefined || row.AllocationsCount !== undefined, {
+    message: 'expected PrizesCount or AllocationsCount',
+    path: ['PrizesCount'],
+  });
 
 export const UniqueEthDonorSchema = z
   .object({

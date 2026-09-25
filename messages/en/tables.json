@@ -73,7 +73,7 @@
   },
   "loading": "Loading…",
   "status": {
-    "loading": "Loading...",
+    "loading": "Loading…",
     "live": "Live",
     "youBadge": "You",
     "yes": "Yes",
@@ -88,7 +88,6 @@
   "columns": {
     "cycle": "Cycle",
     "cycleNumber": "Cycle",
-    "cycleHash": "Cycle #",
     "round": "Cycle",
     "participant": "Participant",
     "recipient": "Recipient",
@@ -101,7 +100,6 @@
     "allocationsReceived": "Allocations (all kinds)",
     "maxAllocationEth": "Largest Signature Allocation (ETH)",
     "allocationsSumEth": "ETH received",
-    "anchorActionId": "Anchor action ID",
     "anchorHolder": "Anchor-holder",
     "holder": "Holder",
     "numberOfNfts": "NFTs",
@@ -137,13 +135,12 @@
     "maxGestureEth": "Largest gesture (ETH)",
     "numberOfContributions": "Contributions",
     "totalContributedEth": "Total contributed (ETH)",
-    "expirationDate": "Expiration date",
     "started": "Started",
     "ended": "Ended",
     "actions": "Actions",
     "selected": "Selected",
     "gesturesThisCycle": "Gestures this cycle",
-    "shareOfPool": "Share of pool"
+    "shareOfPool": "Share of entries"
   },
   "names": {
     "participants": "Unique participants",
@@ -237,7 +234,7 @@
     "empty": "No Cosmic Signature NFTs were anchored when this cycle finalized. Its Anchor Distribution remained in the Cycle Reserve."
   },
   "publicGoods": {
-    "voluntaryEmpty": "Contributions sent straight to the Public Goods Vault appear here. The vault holds them for its configured Public Goods recipient."
+    "voluntaryEmpty": "Contributions sent straight to the Public Goods Vault appear here. The vault holds them for its beneficiary, currently Protocol Guild."
   },
   "outreach": {
     "allocationsTitle": "Allocations",
@@ -281,7 +278,7 @@
     "removed": "Token name was removed."
   },
   "stellarSelection": {
-    "draws": "At finalization, {eth} ETH and {nft} NFT selections are drawn from this pool."
+    "draws": "At finalization, {eth} ETH and {nft} NFT Stellar Selections are made from these entries."
   },
   "recipientHistory": {
     "sources": {
@@ -320,52 +317,25 @@
     }
   },
   "specialAllocation": {
-    "liveGrowing": "Live - growing",
-    "recordStanding": "Record standing",
     "firstRecordForming": "First endurance record forming",
-    "needsToExtend": "Needs {duration} more to extend record",
-    "needsToBecomeChampion": "Needs {duration} more to become Endurance Champion",
     "extendingRecord": "Extending Endurance Champion record",
     "progressAria": "Progress toward Endurance Champion",
     "lastGesture": "Last Gesture",
     "gestureDetailsSyncing": "Last Gesture details are syncing from the indexer.",
     "gestureDetailsUnavailable": "Last Gesture transaction details are temporarily unavailable.",
-    "amountPaid": "Amount paid",
     "method": "Method",
     "gestureTime": "Gesture time",
     "attachedAssets": "Attached assets",
-    "mayCloseIn": "May close in",
-    "mayCloseValue": "{duration} if the current hold exceeds the Endurance Champion record",
     "growingNow": "Growing now",
-    "activeEnduranceChallenge": "Active Endurance Challenge",
-    "canExtendIn": "Can extend in",
-    "canOvertakeIn": "Can overtake in",
-    "waitingToExtend": "Waiting to extend the Chrono record",
-    "waitingToOvertake": "Waiting to overtake the Chrono record",
     "heading": "Special Allocation Leaders",
     "sectionAria": "Special allocation leaders",
     "latestParticipant": "Latest Participant",
     "latestTooltip": "The latest gesture maker is building an endurance window. They must hold the position longer than the current Endurance Champion window to take the lead.",
-    "currentHold": "Current hold",
-    "noLatestGesture": "No latest gesture yet",
     "enduranceChampion": "Endurance Champion",
-    "enduranceTooltip": "The participant with the longest single continuous period as the latest gesture maker. Their timer grows only while they remain in that position.",
-    "enduranceWindow": "Endurance window",
-    "noEnduranceRecord": "No endurance record yet",
-    "enduranceNote": "Measured by the longest single period as the latest gesture maker; separate periods are not added together.",
     "chronoWarrior": "Chrono-Warrior",
-    "chronoWarriorPrint": "Chrono-Warrior",
-    "chronoTooltip": "The participant who held the Endurance Champion position for the longest continuous reign. Receives 8% of the Cycle Reserve, 1,000 CST, and a Cosmic Signature NFT.",
-    "championReign": "Champion reign",
-    "noChronoRecord": "No Chrono-Warrior record yet",
     "finalCstGesture": "Final CST Gesture",
-    "finalCstTooltip": "The participant who made the last CST gesture of the cycle receives a Recognition CST imprint of 1,000 CST and a Cosmic Signature NFT.",
-    "awaitingCstGesture": "Awaiting first CST gesture",
     "finalCstNote": "Only CST gestures update this role; ETH and Random Walk gestures do not.",
-    "headingHelp": "These participants are currently in line to receive special allocations when the cycle finalizes. Positions can change with every new gesture.",
-    "printCurrentHold": "Current hold: {duration}",
-    "printWindow": "Window: {duration}",
-    "printReign": "Reign: {duration}"
+    "headingHelp": "These participants are currently in line to receive special allocations when the cycle finalizes. Positions can change with every new gesture."
   },
   "systemModes": {
     "viewEvent": "parameter changes"
@@ -384,9 +354,7 @@
     "cstBalance": "Balance (CST)",
     "contractAddress": "Contract address",
     "numberOfNfts": "NFTs",
-    "namedNftTokenId": "Token ID",
-    "isRandomWalk": "Is Random Walk",
-    "isAnchorHolder": "Is Anchor-holder"
+    "isRandomWalk": "Is Random Walk"
   },
   "statisticsTooltips": {
     "maxAllocationEth": "Largest Signature Allocation this recipient received for making a Final Gesture; a dash if it never received one. Chrono-Warrior and Stellar Selection ETH count only toward the ETH received.",

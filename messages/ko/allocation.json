@@ -1,7 +1,6 @@
 {
   "formats": {
     "cycle": "사이클 {cycle}",
-    "cycleHash": "사이클 {cycle}",
     "cosmicSignatureToken": "Cosmic Signature #{token}"
   },
   "recipients": {
@@ -173,7 +172,6 @@
     "links": {
       "viewCycle": "사이클 {cycle} 보기",
       "myAllocations": "내 배분",
-      "allRecipients": "배분 수령자",
       "allCycles": "전체 사이클"
     },
     "result": {

@@ -113,7 +113,7 @@ const publicPages: PublicPage[] = [
     jsonLd: ['WebPage', 'BreadcrumbList'],
   },
   { path: '/anchoring', host: APP_HOST, h1: 'Anchor Distributions' },
-  { path: '/allocation', host: APP_HOST, h1: 'Allocation Recipients' },
+  { path: '/allocation', host: APP_HOST, h1: 'Allocation recipients' },
   {
     path: '/contracts',
     host: APP_HOST,
@@ -492,7 +492,7 @@ test.describe('raw HTML SEO', () => {
     const cases = [
       {
         path: '/allocation/42',
-        title: 'Cycle #42 Allocation Information · Cosmic Signature',
+        title: 'Cycle 42 Allocation Information · Cosmic Signature',
         canonical: `https://${APP_HOST}/allocation/42`,
       },
       {

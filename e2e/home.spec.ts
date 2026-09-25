@@ -72,7 +72,7 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     const clock = page.getByRole('region', { name: 'Cycle Finalization Time' });
     await ensureVisible(clock);
     await expect(clock).toBeVisible();
-    await expect(page.getByTestId('home-deck-header').getByText(/Cycle #\d+/)).toBeVisible();
+    await expect(page.getByTestId('home-deck-header').getByText(/Cycle \d+/)).toBeVisible();
     // Where the cycle is now, beside the chat.
     const guide = page.getByRole('region', { name: 'How this cycle works' });
     await ensureVisible(guide);
@@ -335,7 +335,7 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
         .click();
       const drawer = page.getByRole('dialog', { name: 'Navigation' });
       await drawer.locator('summary', { hasText: /^Learn$/ }).click();
-      projectSite = drawer.getByRole('link', { name: 'Project Site' });
+      projectSite = drawer.getByRole('link', { name: 'Project site' });
     } else {
       // On desktop it closes the Learn panel's first column.
       const learn = page
@@ -344,7 +344,7 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
       await learn.click();
       projectSite = page
         .locator(`[id="${await learn.getAttribute('aria-controls')}"]`)
-        .getByRole('link', { name: /^Project Site/ });
+        .getByRole('link', { name: /^Project site/ });
     }
     await expect(projectSite).toBeVisible();
     await expect(projectSite).toHaveAttribute('href', landingHome);

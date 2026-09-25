@@ -144,7 +144,7 @@ describe('MarketingRewardsPage', () => {
       query({ data: undefined, isError: true, refetch }),
     );
     render(<MarketingRewardsPage address={VALID_ADDRESS} />);
-    expect(screen.getByText("The outreach allocations couldn't be loaded.")).toBeVisible();
+    expect(screen.getByText('The outreach allocations couldn’t be loaded.')).toBeVisible();
     fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
     expect(refetch).toHaveBeenCalledTimes(1);
   });

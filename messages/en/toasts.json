@@ -1,23 +1,14 @@
 {
-  "gestureSubmitted": "Gesture submitted. Waiting for confirmation.",
-  "gestureConfirmed": "Gesture confirmed. The cycle continues.",
   "allocationRetrieved": "Allocation retrieved to your wallet.",
-  "anchorSet": "NFT anchored to the protocol.",
-  "anchorReleased": "Anchor released.",
   "cycleFinalized": "Cycle finalized. Allocations distributed.",
   "walletTransactionCancelled": "Transaction not sent — you cancelled it in your wallet.",
-  "unexpectedError": "Unexpected error. Please try again.",
   "generic": {
-    "unexpectedError": "Unexpected error. Please try again.",
-    "rpcFailure": "The transaction could not be completed. Check your wallet and network connection, then try again.",
-    "receiptFailure": "The transaction was sent but could not be confirmed. Check its status in your wallet or a block explorer before trying again.",
-    "transactionFailed": "Transaction failed. Please try again."
+    "rpcFailure": "The transaction could not be completed. Check your wallet and network connection, then try again."
   },
   "wallet": {
     "connect": "Please connect your wallet.",
     "connectCorrectNetwork": "Please connect your wallet and ensure you are on the correct network.",
-    "notReady": "Your wallet is not ready. Reconnect and try again.",
-    "stillConnecting": "Wallet is still connecting. Please try again in a moment."
+    "notReady": "Your wallet is not ready. Reconnect and try again."
   },
   "watchAsset": {
     "metaMaskRequired": "Connect MetaMask to add this asset.",
@@ -40,7 +31,7 @@
     "confirmed": "Gesture recorded. Cycle Finalization Time extended.",
     "validation": {
       "notNftOwner": "This NFT does not belong to your connected wallet.",
-      "tokenDecimalsWarning": "Token doesn't implement decimals(); assuming 18 decimal places.",
+      "tokenDecimalsWarning": "Token doesn’t implement decimals(); assuming 18 decimal places.",
       "invalidContractAddress": "Enter a valid contract address.",
       "notErc721": "The attached NFT must use an ERC-721 contract.",
       "notErc20": "The attached token must use an ERC-20 contract.",
@@ -86,7 +77,7 @@
   },
   "finalize": {
     "roundDidNotAdvance": "The finalization transaction succeeded, but the cycle has not advanced. Please refresh the page.",
-    "metadataUpdating": "Cycle finalized on-chain. Token metadata may still be updating — check My Allocations or refresh later.",
+    "metadataUpdating": "Cycle finalized on-chain. Token metadata may still be updating — check My allocations or refresh later.",
     "failed": "Unable to finalize the cycle. Check your wallet and network connection, then try again.",
     "contractErrors": {
       "mainPrizeEarlyClaim": "Not enough time has elapsed to retrieve the Signature Allocation.",
@@ -96,13 +87,13 @@
   },
   "claim": {
     "walletNotConnected": "Please connect your wallet and ensure you are on the correct network.",
-    "failed": "Retrieve didn't go through. Check your wallet and network, then try again.",
+    "failed": "Retrieve didn’t go through. Check your wallet and network, then try again.",
     "stellarEthSuccess": "Stellar Selection ETH retrieved to your wallet.",
     "nftSuccess": "Attached NFT retrieved to your wallet.",
     "nftsSuccess": "{count, plural, one {# attached NFT retrieved to your wallet.} other {# attached NFTs retrieved to your wallet.}}",
     "tokenSuccess": "Attached ERC-20 token retrieved to your wallet.",
     "tokensSuccess": "{count, plural, one {# attached ERC-20 token retrieved to your wallet.} other {# attached ERC-20 tokens retrieved to your wallet.}}",
-    "retrieving": "Retrieving..."
+    "retrieving": "Retrieving…"
   },
   "transfer": {
     "cst": {
@@ -115,23 +106,21 @@
       "selectOne": "Select at least one transferable NFT.",
       "confirmed": "{count, plural, one {NFT transfer confirmed.} other {# NFT transfers confirmed.}}",
       "detailTransferConfirmed": "NFT transfer confirmed.",
-      "failedToken": "NFT {tokenId} wasn't sent. Check your wallet and try again.",
+      "failedToken": "NFT {tokenId} wasn’t sent. Check your wallet and try again.",
       "nameSet": "Token name updated.",
       "nameCleared": "Token name cleared.",
       "nameSetFailed": "An error occurred while setting the token name. Please try again.",
       "nameClearFailed": "An error occurred while clearing the token name. Please try again."
     },
     "marketingCst": {
-      "reserveUnavailable": "Outreach Reserve wallet is not available.",
       "treasurerRequired": "Connect the Outreach Reserve treasurer wallet to send CST allocations.",
       "confirmed": "Outreach Reserve CST allocation confirmed.",
       "failed": "Unable to send the CST allocation. Please try again.",
-      "pay": "Send CST allocation",
-      "payAmount": "Send {amount}"
+      "pay": "Send CST allocation"
     }
   },
   "contribution": {
-    "contractUnavailable": "The protocol contract isn't available yet. Refresh the page and try again.",
+    "contractUnavailable": "The protocol contract isn’t available yet. Refresh the page and try again.",
     "formSubmitted": "{amount} ETH contribution confirmed.",
     "formSubmittedWithInfo": "{amount} ETH contribution and accompanying information confirmed.",
     "formFailed": "ETH contribution failed, please check your input and try again.",
@@ -140,7 +129,7 @@
       "connectWallet": "Connect your wallet to forward Public Goods Vault funds.",
       "forwarded": "Public Goods funds were forwarded to Protocol Guild.",
       "failed": "Unable to forward Public Goods Vault funds.",
-      "forwarding": "Forwarding...",
+      "forwarding": "Forwarding…",
       "forward": "Forward to Protocol Guild",
       "nothing": "Nothing to Forward"
     }
@@ -148,8 +137,8 @@
   "imprint": {
     "contractUnavailable": "The Random Walk NFT contract is unavailable. Connect your wallet on the correct network and try again.",
     "confirmed": "Random Walk NFT imprint confirmed.",
-    "failed": "Imprint didn't go through. Check your wallet and network, then try again.",
-    "imprinting": "Imprinting..."
+    "failed": "Imprint didn’t go through. Check your wallet and network, then try again.",
+    "imprinting": "Imprinting…"
   },
   "regionLabel": "Notifications",
   "close": "Close notification",
@@ -186,7 +175,7 @@
     },
     "confirmedRefresh": "Confirmed on-chain. Refresh the page if it hasn’t updated yet.",
     "error": {
-      "insufficientFunds": "Your wallet doesn't have enough ETH on {network} for this transaction and its network fee.",
+      "insufficientFunds": "Your wallet doesn’t have enough ETH on {network} for this transaction and its network fee.",
       "wrongNetwork": "Your wallet is on another network. Switch to {network} and try again.",
       "walletNotConnected": "Connect your wallet, then try again.",
       "walletBusy": "Your wallet already has a request open. Finish or close it there, then try again.",

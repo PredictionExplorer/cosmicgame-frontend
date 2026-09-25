@@ -205,10 +205,6 @@
       "label": "Внески через протокол",
       "tooltip": "Кількість проіндексованих транзакцій внесків у суспільні блага, надісланих через протокол Cosmic Signature."
     },
-    "protocolContributionsSum": {
-      "label": "Сума внесків через протокол",
-      "tooltip": "Загальна сума ETH, внесена через проіндексовані транзакції внесків у суспільні блага протоколу Cosmic Signature."
-    },
     "voluntaryContributions": {
       "label": "Добровільні внески",
       "tooltip": "Внески ETH, які учасники спільноти зробили добровільно, поза обов’язковими потоками циклу."
@@ -263,9 +259,7 @@
     "cstTotalAnchorDistributions": "Загальна сума ETH, передана як надходження за закріплення власникам закріплень Cosmic Signature NFT.",
     "cstUnretrievedAnchorDistributions": "Надходження за закріплення, нараховані, але ще не забрані власниками закріплень Cosmic Signature NFT.",
     "rwlkActiveAnchorHolders": "Гаманці, що зараз мають щонайменше один закріплений Random Walk NFT.",
-    "rwlkTotalTokensImprinted": "Загальна кількість Cosmic Signature NFT і супровідних CST, закарбованих для власників закріплень Random Walk NFT через зоряний відбір закріплених NFT.",
-    "cstGroup": "Закріплення Cosmic Signature NFT розділяє надходження за закріплення в ETH між зараз закріпленими Cosmic Signature NFT.",
-    "rwlkGroup": "Закріплення Random Walk NFT дає право на розподіли зоряного відбору закріплених NFT."
+    "rwlkTotalTokensImprinted": "Загальна кількість Cosmic Signature NFT і супровідних CST, закарбованих для власників закріплень Random Walk NFT через зоряний відбір закріплених NFT."
   },
   "activity": {
     "heading": "Активність жестів",
@@ -383,7 +377,7 @@
     "leaderboard": {
       "description": "Скільки кожен учасник із вибраною мінімальною кількістю жестів витратив на жести і скільки отримав у розподілах ETH за всі цикли. Суми вказано в ETH; витрачені CST і розподіли NFT та CST наведено під ними.",
       "minimumGestures": "Мін. жестів",
-      "loadErrorTitle": "Не вдалося завантажити таблицю лідерів",
+      "loadErrorTitle": "Не вдалося завантажити витрати й отримане",
       "loadErrorMessage": "Сервіс статистики не відповідає. Спробуйте ще раз за хвилину.",
       "empty": "Жоден учасник ще не відповідає цьому фільтру.",
       "columns": {
@@ -392,7 +386,6 @@
         "gestures": "Жести",
         "spent": "Витрачено (ETH)",
         "received": "Отримано (ETH)",
-        "net": "Чистий (ETH)",
         "allocations": "Розподіли"
       }
     },
@@ -411,7 +404,6 @@
       },
       "allClaimed": "Усе забрано",
       "unclaimedCount": "Не забрано: {count}",
-      "viewUnclaimed": "Переглянути незабрані активи",
       "cycleDetails": "Подробиці циклу {cycle}",
       "dialog": {
         "unclaimedTitle": "Незабрані активи — Цикл {cycle}",
@@ -442,9 +434,6 @@
       "participants": "Учасники з {min}+ жестами",
       "spent": "ETH, витрачений на жести",
       "received": "ETH, отриманий у розподілах",
-      "receivedMore": "Отримали більше ETH, ніж витратили",
-      "ofParticipants": "{part} з {whole}",
-      "netHelp": "ETH, отриманий у розподілах, мінус ETH, витрачений на жести. CST не враховано.",
       "cyclesHelp": "Скільки з циклів, у яких брав участь цей учасник, принесли йому принаймні один розподіл.",
       "cycles": "{part} з {whole, plural, one {# циклу} few {# циклів} many {# циклів} other {# циклу}}"
     }
@@ -467,7 +456,6 @@
     },
     "spikes": {
       "count": "Сплески ({count})",
-      "groupAria": "Виявлені сплески жестів",
       "previousAria": "Попередній сплеск",
       "nextAria": "Наступний сплеск",
       "summary": "Пік {peak} жестів/год · усього у сплеску {total} · {date}",
@@ -477,7 +465,6 @@
       "loadErrorMessage": "Не вдалося отримати дані виявлення сплесків.",
       "empty": "У проіндексованій історії сплесків жестів не виявлено.",
       "noneRecent": "Останнім часом сплесків немає; показано останній зафіксований.",
-      "selectEarlier": "Оберіть номер сплеску вище, щоб перейти в минуле й розглянути попередні сплески активності.",
       "emptyWindow": "Для обраного вікна сплеску немає погодинних інтервалів.",
       "optionAria": "Сплеск {date}, пік {peak} за годину"
     },
@@ -485,7 +472,6 @@
       "description": "Періоди активності {count, plural, one {# найактивнішого учасника} few {# найактивніших учасників} many {# найактивніших учасників} other {# найактивнішого учасника}} (щонайменше 2 жести з проміжком не більше 6 годин між сусідніми жестами). Кожна смуга — один сплеск активності.",
       "participant": "Учасник",
       "ariaLabel": "{address}: {count, plural, one {# жест} few {# жести} many {# жестів} other {# жесту}} з {start} до {end}",
-      "tooltipSummary": "{count, plural, one {# жест} few {# жести} many {# жестів} other {# жесту}} · тривалість {minutes} хв",
       "loadErrorTitle": "Не вдалося завантажити періоди активності",
       "loadErrorMessage": "Не вдалося отримати хронологію активності найактивніших учасників.",
       "empty": "Для найактивніших учасників періодів активності не знайдено.",
@@ -519,7 +505,6 @@
       "enduranceRecord": "Рекорд витривалості",
       "enduranceChampionRecord": "Рекорд Чемпіона витривалості",
       "chronoRecord": "Рекорд Воїна часу",
-      "leadHeldBy": "Лідерство утримує",
       "legendEndurance": "Чемпіон витривалості (найдовше окреме утримання)",
       "legendChrono": "Воїн часу (найдовше лідерство)",
       "legendLead": "Утримання лідерства",
@@ -528,7 +513,6 @@
       "enduranceChampionAbbr": "ЧВ",
       "chronoWarrior": "Воїн часу",
       "chronoWarriorAbbr": "ВЧ",
-      "newRecord": "новий рекорд",
       "roleEndurance": " (Чемпіон витривалості)",
       "roleNewRecord": " (новий рекорд)",
       "stintAria": "{address} • утримання {duration} • {from} → {to} від початку циклу{role}",
@@ -721,15 +705,12 @@
     "errorMessage": "Не вдалося прочитати розподіли цієї адреси. Спробуйте ще раз за мить."
   },
   "systemEvent": {
-    "titleBeforeCycle": "Системна конфігурація, встановлена перед циклом {cycle}",
-    "titleBeforeDeployment": "Системна конфігурація, встановлена перед розгортанням",
     "range": "Діапазон журналу подій: {start}–{end}",
     "breadcrumbs": {
       "coordination": "Зміни координації"
     },
     "loading": "Завантаження…",
     "loadError": "Не вдалося завантажити системні події",
-    "explainEvent": "Пояснити подію «{event}»",
     "adminEvents": {
       "undefined": "Не визначено",
       "publicGoodsPercentage": "Змінено відсоток на суспільні блага.",
@@ -786,62 +767,6 @@
     "viewContract": "Переглянути контракт",
     "detailsUnavailable": "Подробиці NFT недоступні",
     "contractUnavailable": "Контракт недоступний"
-  },
-  "publicDataSummaries": {
-    "common": {
-      "lastUpdated": "Оновлено: {date}. Джерело: {source}.",
-      "relatedPagesAria": "Пов’язані сторінки: {heading}",
-      "unavailable": "Недоступно"
-    },
-    "attachedNfts": {
-      "eyebrow": "Долучені NFT · Arbitrum",
-      "heading": "Долучені NFT від спільноти",
-      "description": "Перегляньте NFT, долучені до жестів Cosmic Signature. Коли цикл завершується, долучені токени ERC-721 переходять до учасника, який отримує розподіл Сигнатури.",
-      "source": "Публічні API долучених NFT Cosmic Signature",
-      "cards": {
-        "records": "Записи долучених NFT",
-        "contracts": "Унікальні контракти NFT",
-        "contributors": "Гаманці учасників"
-      },
-      "links": {
-        "gallery": "Переглянути галерею Cosmic Signature",
-        "cycle": "Переглянути поточний перформанс-цикл",
-        "learn": "Дізнатися, як долучені активи вписуються в цикл"
-      }
-    },
-    "namedNfts": {
-      "eyebrow": "Іменовані NFT · Arbitrum",
-      "heading": "Іменовані Cosmic Signature NFT",
-      "description": "Cosmic Signature NFT, яким власники надали імена. Перегляньте твори, відомості про токени та ончейн-історію власників.",
-      "source": "Публічні API токенів Cosmic Signature",
-      "cards": {
-        "named": "Іменовані Cosmic Signature NFT",
-        "owners": "Поточні власники",
-        "collection": "Колекція"
-      },
-      "links": {
-        "gallery": "Переглянути всю галерею",
-        "learn": "Дізнатися про мистецтво",
-        "code": "Переглянути вихідний код рендерингу"
-      }
-    },
-    "usedRwlkNfts": {
-      "eyebrow": "Використання Random Walk NFT · Arbitrum",
-      "heading": "Використані Random Walk NFT",
-      "description": "Перегляньте Random Walk NFT, які вже долучено до ETH-жестів для одноразового зменшення вартості жесту.",
-      "source": "Публічні API використання Random Walk Cosmic Signature",
-      "cards": {
-        "used": "Використані Random Walk NFT",
-        "discount": "Одноразова знижка",
-        "scope": "Межі використання",
-        "scopeValue": "Один жест на NFT"
-      },
-      "links": {
-        "imprint": "Закарбувати Random Walk NFT",
-        "learn": "Дізнатися, як працюють жести",
-        "cycle": "Переглянути дані поточного циклу"
-      }
-    }
   },
   "routeError": {
     "title": "Не вдалося завантажити статистику",

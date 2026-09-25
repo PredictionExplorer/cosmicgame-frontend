@@ -43,7 +43,7 @@ const ALLOCATION_DETAIL_TOOLTIPS = [
   },
   {
     label: 'Allocation distribution',
-    expected: /Each track's share of the Cycle Reserve when this cycle was finalized/,
+    expected: /Each track’s share of the Cycle Reserve when this cycle was finalized/,
   },
   {
     label: 'Cycle statistics',

@@ -1,23 +1,14 @@
 {
-  "gestureSubmitted": "一筆を送信しました。確認を待っています。",
-  "gestureConfirmed": "一筆が確認されました。サイクルは続きます。",
   "allocationRetrieved": "配分をウォレットに受け取りました。",
-  "anchorSet": "NFTをプロトコルに係留しました。",
-  "anchorReleased": "係留を解除しました。",
   "cycleFinalized": "サイクルが確定しました。配分が配られました。",
   "walletTransactionCancelled": "トランザクションは送信されませんでした。ウォレットでキャンセルされました。",
-  "unexpectedError": "予期しないエラーです。もう一度お試しください。",
   "generic": {
-    "unexpectedError": "予期しないエラーです。もう一度お試しください。",
-    "rpcFailure": "トランザクションを完了できませんでした。ウォレットとネットワーク接続を確認してから、もう一度お試しください。",
-    "receiptFailure": "トランザクションは送信されましたが、確認できませんでした。もう一度試す前に、ウォレットまたはブロックエクスプローラーで状態を確認してください。",
-    "transactionFailed": "トランザクションが失敗しました。もう一度お試しください。"
+    "rpcFailure": "トランザクションを完了できませんでした。ウォレットとネットワーク接続を確認してから、もう一度お試しください。"
   },
   "wallet": {
     "connect": "ウォレットを接続してください。",
     "connectCorrectNetwork": "ウォレットを接続し、正しいネットワークに接続していることを確認してください。",
-    "notReady": "ウォレットの準備ができていません。再接続してからもう一度お試しください。",
-    "stillConnecting": "ウォレットはまだ接続中です。しばらくしてからもう一度お試しください。"
+    "notReady": "ウォレットの準備ができていません。再接続してからもう一度お試しください。"
   },
   "watchAsset": {
     "metaMaskRequired": "このアセットを追加するにはMetaMaskを接続してください。",
@@ -122,12 +113,10 @@
       "nameClearFailed": "トークン名のクリア中にエラーが発生しました。もう一度お試しください。"
     },
     "marketingCst": {
-      "reserveUnavailable": "広報準備金のウォレットを利用できません。",
       "treasurerRequired": "CST広報配分を送付するには、現在の広報ウォレットの財務担当者を接続してください。",
       "confirmed": "CST広報配分が確認されました。",
       "failed": "CST広報配分を送付できませんでした。もう一度お試しください。",
-      "pay": "CST広報配分を送付",
-      "payAmount": "{amount}を送る"
+      "pay": "CST広報配分を送付"
     }
   },
   "contribution": {
