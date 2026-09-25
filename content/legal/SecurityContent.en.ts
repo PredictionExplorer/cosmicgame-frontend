@@ -27,6 +27,47 @@ export const securityCopyEn: SecurityCopy = {
     copyLabel: 'Copy {value}',
     copiedLabel: 'Copied',
   },
+  controls: {
+    heading: 'Owner controls and upgrades',
+    paragraph:
+      'The Cosmic Signature Protocol contract has an owner: one account that can change some of its parameters and upgrade its code, within the limits below. Every change is recorded on-chain and listed under <coordination>coordination changes</coordination>.',
+    ownerLabel: 'Owner',
+    ownerUnavailable:
+      'The owner could not be read just now. The contract’s owner() function on Arbiscan returns it.',
+    account: {
+      singleKey: 'A single-key wallet (an externally owned account), not a multisig or a timelock.',
+      contract: 'A smart-contract account, such as a multisig or a timelock.',
+      renounced:
+        'Ownership has been renounced: no account can change the parameters or upgrade the code.',
+    },
+    rows: [
+      {
+        term: 'Between cycles',
+        detail:
+          'The owner can change protocol parameters, such as the time each gesture adds or the allocation-track percentages.',
+      },
+      {
+        term: 'During a cycle',
+        detail:
+          'The core parameters are locked from the moment a cycle activates, before its first gesture, until that cycle finalizes.',
+      },
+      {
+        term: 'At any time',
+        detail:
+          'The owner can postpone a cycle’s activation until its first gesture arrives, change the delay before the next cycle, and manage the peripheral contracts: the Public Goods Beneficiary, the NFT metadata links and the Allocations Wallet retrieval timeout.',
+      },
+      {
+        term: 'Upgrades',
+        detail:
+          'The protocol runs behind a UUPS proxy, so its address never changes. The owner can point it at new code between cycles only; the code in use is the publicly verified V2 implementation listed above.',
+      },
+      {
+        term: 'Cosmic Council',
+        detail:
+          'Ownership is planned to move to the Cosmic Council once the protocol is stable. From then on, parameters change only through Coordination Proposals that clear the Coordination Quorum.',
+      },
+    ],
+  },
   model: {
     heading: 'Security model',
     paragraph:
@@ -41,10 +82,28 @@ export const securityCopyEn: SecurityCopy = {
   },
   report: {
     heading: 'Report a vulnerability',
-    paragraphs: [
-      'If you find a vulnerability in the contracts, the app or this website, email <support>support@cosmicsignature.com</support> with “Security” in the subject. Describe what you found, how to reproduce it and what it affects.',
-      'Please give the team time to reply and fix the issue before you disclose it publicly, and do not test an exploit against the live contracts or another participant’s funds. The same contact is published in the site’s <securityTxt>security.txt</securityTxt> file.',
+    lead: 'If you find a vulnerability in the Cosmic Signature contracts, the app or this website, email <support>support@cosmicsignature.com</support> with “Security” in the subject. A useful report says:',
+    include: [
+      'What you found, and which contract, page or address it affects.',
+      'How to reproduce it, step by step.',
+      'What it would let someone do, and to whose funds.',
+      'How the team can reach you.',
     ],
+    scopeHeading: 'Scope',
+    scope: [
+      {
+        term: 'In scope',
+        detail:
+          'The contracts under <securityOfficial>Official addresses</securityOfficial>, app.cosmicsignature.com and cosmicsignature.com.',
+      },
+      {
+        term: 'Not in scope',
+        detail:
+          'Services Cosmic Signature does not run, such as wallets, marketplaces, bridges and the Arbitrum network itself. Report those to their own teams.',
+      },
+    ],
+    closing:
+      'Please give the team time to reply and fix the issue before you disclose it publicly, and do not test an exploit against the live contracts or another participant’s funds. The same contact is published in the site’s <securityTxt>security.txt</securityTxt> file.',
   },
   verify: {
     heading: 'Verify it yourself',

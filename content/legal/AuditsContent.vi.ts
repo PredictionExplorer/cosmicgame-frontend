@@ -23,7 +23,7 @@ export const auditsCopyVi: AuditsCopy = {
       informational: 'Thông tin',
     },
     reportCta: 'Đọc báo cáo của Hacken',
-    repositoryCta: 'Xem các hợp đồng được kiểm toán',
+    repositoryCta: 'Xem kho mã hợp đồng',
   },
   audit: {
     heading: 'Kiểm toán độc lập bởi Hacken',

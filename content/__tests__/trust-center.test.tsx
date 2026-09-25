@@ -19,7 +19,7 @@ import {
 import { PrivacyContent, privacyCopyForDeployment } from '@/content/legal/PrivacyContent';
 import { activePrivacyServices, activePrivacyStorage } from '@/content/legal/privacyInventory';
 import { RiskContent } from '@/content/legal/RiskContent';
-import { SecurityContent } from '@/content/legal/SecurityContent';
+import { SecurityContent, type ProtocolOwner } from '@/content/legal/SecurityContent';
 import { TermsContent } from '@/content/legal/TermsContent';
 import { TRUST_CENTER_TABS, TRUST_DOCUMENT_DATES } from '@/content/legal/trustCenter';
 import { protocolFacts } from '@/content/protocol-facts';
@@ -56,16 +56,26 @@ function contractNamesFor(locale: string): Record<OfficialContractId, string> {
   ) as Record<OfficialContractId, string>;
 }
 
-/** Every Trust Center page, rendered from a locale's copy. */
-const PAGES = {
-  security: (locale: string) => (
+/** A single-key owner, as the chain reported it when this was written. */
+const OWNER_ADDRESS = checksumAddress('0x14c82ce4e5713e88c9462680e9c02bf4a3089871');
+const OWNER: ProtocolOwner = { status: 'account', address: OWNER_ADDRESS, kind: 'singleKey' };
+
+function securityPage(locale: string, owner: ProtocolOwner = OWNER) {
+  return (
     <SecurityContent
       copy={getSecurityCopy(locale)}
       locale={locale}
       labels={labelsFor(locale)}
       contractNames={contractNamesFor(locale)}
+      implementationNote="The current implementation behind the Cosmic Signature Protocol proxy contract"
+      owner={owner}
     />
-  ),
+  );
+}
+
+/** Every Trust Center page, rendered from a locale's copy. */
+const PAGES = {
+  security: (locale: string) => securityPage(locale),
   audits: (locale: string) => (
     <AuditsContent copy={getAuditsCopy(locale)} locale={locale} labels={labelsFor(locale)} />
   ),
@@ -209,7 +219,7 @@ describe('Security', () => {
     expect(handle.className).toMatch(/min-h-6/);
   });
 
-  it('says where to report a vulnerability', () => {
+  it('says where to report a vulnerability, what a report needs and what is in scope', () => {
     render(PAGES.security('en'));
     expect(screen.getByRole('link', { name: 'support@cosmicsignature.com' })).toHaveAttribute(
       'href',
@@ -219,6 +229,69 @@ describe('Security', () => {
       'href',
       '/.well-known/security.txt',
     );
+    const report = document.getElementById('report') as HTMLElement;
+    expect(within(report).getAllByRole('listitem')).toHaveLength(4);
+    expect(within(report).getByRole('heading', { level: 3, name: 'Scope' })).toBeInTheDocument();
+    expect(within(report).getByText('In scope')).toBeInTheDocument();
+    expect(within(report).getByText('Not in scope')).toBeInTheDocument();
+    expect(within(report).getByRole('link', { name: 'Official addresses' })).toHaveAttribute(
+      'href',
+      '/security#official',
+    );
+  });
+
+  it('says who controls the protocol, what it can change and how it upgrades', () => {
+    render(PAGES.security('en'));
+    const controls = document.getElementById('controls') as HTMLElement;
+    // Second, right after the official addresses.
+    expect(controls.previousElementSibling?.id).toBe('official');
+    expect(
+      within(controls).getByRole('heading', { level: 2, name: 'Owner controls and upgrades' }),
+    ).toBeInTheDocument();
+    // The owner in full, with its explorer page and the kind of account it is.
+    expect(within(controls).getByTitle(OWNER_ADDRESS)).toHaveTextContent(OWNER_ADDRESS);
+    expect(within(controls).getByText(/^A single-key wallet/)).toBeInTheDocument();
+    expect(within(controls).getByRole('link', { name: /Arbiscan/ })).toHaveAttribute(
+      'href',
+      expect.stringContaining(OWNER_ADDRESS),
+    );
+    for (const term of ['Between cycles', 'During a cycle', 'At any time', 'Upgrades']) {
+      expect(within(controls).getByText(term)).toBeInTheDocument();
+    }
+    expect(within(controls).getByText(/UUPS proxy/)).toBeInTheDocument();
+    expect(within(controls).getByRole('link', { name: 'coordination changes' })).toHaveAttribute(
+      'href',
+      '/coordination-changes',
+    );
+    // The implementation row says what it is.
+    expect(
+      screen.getByText(
+        'The current implementation behind the Cosmic Signature Protocol proxy contract',
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it('points at the contract on the explorer when the owner cannot be read', () => {
+    render(securityPage('en', { status: 'unavailable' }));
+    const controls = document.getElementById('controls') as HTMLElement;
+    expect(within(controls).getByText(/The owner could not be read/)).toBeInTheDocument();
+    expect(within(controls).getByRole('link', { name: /Arbiscan/ })).toHaveAttribute(
+      'href',
+      expect.stringContaining(protocolFacts.contractAddresses.proxy),
+    );
+  });
+
+  it('says so when ownership has been renounced', () => {
+    render(securityPage('en', { status: 'renounced' }));
+    expect(screen.getByText(/Ownership has been renounced/)).toBeInTheDocument();
+  });
+
+  it.each(routing.locales)('%s: describes the same owner controls as English', (locale) => {
+    const copy = getSecurityCopy(locale);
+    const en = getSecurityCopy('en');
+    expect(copy.controls.rows).toHaveLength(en.controls.rows.length);
+    expect(copy.report.include).toHaveLength(en.report.include.length);
+    expect(copy.report.scope).toHaveLength(en.report.scope.length);
   });
 });
 

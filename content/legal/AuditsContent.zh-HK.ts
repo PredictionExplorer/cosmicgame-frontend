@@ -23,7 +23,7 @@ export const auditsCopyZhHk: AuditsCopy = {
       informational: '提示',
     },
     reportCta: '閱讀 Hacken 審計報告',
-    repositoryCta: '瀏覽受審計的合約',
+    repositoryCta: '瀏覽合約儲存庫',
   },
   audit: {
     heading: 'Hacken 獨立審計',

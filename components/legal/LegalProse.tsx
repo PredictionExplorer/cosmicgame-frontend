@@ -158,9 +158,10 @@ export interface LegalLedgerRow {
 
 /**
  * A spec-sheet ledger under a small heading: the term on the left, its
- * detail on the right (stacked on phones), rows between hairlines. For
+ * detail on the right (stacked on phones), each row under a hairline. For
  * values a reader checks, such as addresses and handles. `note` says once,
- * under the heading and before the rows, what the whole list proves.
+ * under the heading and before the rows, what the whole list proves. The
+ * list ends open: a section's own rule below never doubles a closing one.
  */
 export function LegalLedger({
   heading,
@@ -175,11 +176,11 @@ export function LegalLedger({
 }) {
   return (
     <div className={className}>
-      {heading ? <h3 className="type-title text-foreground">{heading}</h3> : null}
+      {heading ? <h3 className="type-heading-3 text-foreground">{heading}</h3> : null}
       {note ? <div className={heading ? 'mt-2' : undefined}>{note}</div> : null}
       <dl
         className={cn(
-          'divide-y divide-rule-faint border-y border-rule-faint',
+          'divide-y divide-rule-faint border-t border-rule-faint',
           heading || note ? 'mt-3' : undefined,
         )}
       >
@@ -217,27 +218,29 @@ export function LegalResourceList({
   locale: string;
 }) {
   return (
-    <ul className="divide-y divide-rule-faint border-y border-rule-faint">
+    <ul className="divide-y divide-rule-faint border-t border-rule-faint">
       {resources.map(({ link, label, description }) => {
         const external = LEGAL_LINKS[link].kind === 'external';
         const Arrow = external ? ArrowUpRight : ArrowRight;
         return (
-          <li key={`${link}-${label}`} className="py-3.5">
+          <li key={`${link}-${label}`}>
             <LegalLink
               id={link}
               locale={locale}
               externalIcon={false}
-              className="group inline-flex min-h-6 items-center gap-1.5 type-title text-foreground transition-colors duration-[var(--duration-fast)] hover:text-primary"
+              className="group focus-ring-inset flex min-h-14 flex-col justify-center gap-1 py-3.5 no-underline"
             >
-              {label}
-              <Arrow
-                aria-hidden
-                className="size-4 shrink-0 text-subtle transition-colors duration-[var(--duration-fast)] group-hover:text-primary"
-              />
+              <span className="inline-flex items-center gap-1.5 type-title text-foreground transition-colors duration-[var(--duration-fast)] group-hover:text-primary">
+                {label}
+                <Arrow
+                  aria-hidden
+                  className="size-4 shrink-0 text-subtle transition-[color,transform] duration-[var(--duration-fast)] group-hover:text-primary motion-safe:group-hover:translate-x-0.5"
+                />
+              </span>
+              {description ? (
+                <span className="type-body-sm text-muted-foreground">{description}</span>
+              ) : null}
             </LegalLink>
-            {description ? (
-              <p className="mt-1 type-body-sm text-muted-foreground">{description}</p>
-            ) : null}
           </li>
         );
       })}

@@ -23,14 +23,14 @@ export const auditsCopyEn: AuditsCopy = {
       informational: 'Informational',
     },
     reportCta: 'Read the Hacken report',
-    repositoryCta: 'Browse the audited contracts',
+    repositoryCta: 'Browse the contracts repository',
   },
   audit: {
     heading: 'Independent audit by Hacken',
     paragraphs: [
       'In late 2025, Hacken carried out an independent security review of the Cosmic Signature smart contracts. The engagement covered the production contracts in the public repository: the core protocol that runs each cycle, the CST token, both NFT collections, the anchoring wallets, and the wallet and system management contracts that support them. Hacken published the final report in January 2026.',
       'The report lists each finding with its severity and its status; the summary above counts them. None is critical or high severity, and most describe design tradeoffs the team reviewed and accepted.',
-      'Alongside the manual review, Hacken fuzz-tested the system’s invariants, properties such as the rule that the ETH the protocol holds always equals deposits minus withdrawals. Every invariant held.',
+      'Alongside the manual review, Hacken fuzz-tested the system’s invariants, properties such as the rule that the ETH the protocol holds always equals what came in minus what went out. Every invariant held.',
     ],
   },
   analysis: {

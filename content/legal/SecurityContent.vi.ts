@@ -27,6 +27,48 @@ export const securityCopyVi: SecurityCopy = {
     copyLabel: 'Sao chép {value}',
     copiedLabel: 'Đã sao chép',
   },
+  controls: {
+    heading: 'Quyền của chủ sở hữu và nâng cấp',
+    paragraph:
+      'Hợp đồng Giao thức Cosmic Signature có một chủ sở hữu: một tài khoản có thể thay đổi một số tham số và nâng cấp mã của hợp đồng, trong các giới hạn dưới đây. Mọi thay đổi đều được ghi trên chuỗi và liệt kê trong <coordination>Thay đổi điều phối</coordination>.',
+    ownerLabel: 'Chủ sở hữu',
+    ownerUnavailable:
+      'Hiện chưa đọc được chủ sở hữu. Hàm owner() của hợp đồng trên Arbiscan trả về địa chỉ này.',
+    account: {
+      singleKey:
+        'Một ví dùng một khóa duy nhất (tài khoản sở hữu bên ngoài), không phải ví đa chữ ký hay khóa thời gian.',
+      contract: 'Một tài khoản hợp đồng thông minh, chẳng hạn ví đa chữ ký hoặc khóa thời gian.',
+      renounced:
+        'Quyền sở hữu đã được từ bỏ: không tài khoản nào có thể thay đổi tham số hay nâng cấp mã.',
+    },
+    rows: [
+      {
+        term: 'Giữa các chu kỳ',
+        detail:
+          'Chủ sở hữu có thể thay đổi tham số giao thức, như thời gian mỗi nét bút cộng thêm hay tỷ lệ các luồng phân bổ.',
+      },
+      {
+        term: 'Trong một chu kỳ',
+        detail:
+          'Các tham số cốt lõi bị khóa từ lúc một chu kỳ kích hoạt, trước nét bút đầu tiên của nó, cho đến khi chu kỳ đó hoàn tất.',
+      },
+      {
+        term: 'Bất cứ lúc nào',
+        detail:
+          'Chủ sở hữu có thể lùi thời điểm kích hoạt chu kỳ cho đến khi có nét bút đầu tiên, thay đổi độ trễ trước chu kỳ tiếp theo và quản lý các hợp đồng ngoại vi: Đơn vị thụ hưởng Hàng hóa công, liên kết siêu dữ liệu NFT và thời hạn nhận về của Ví phân bổ.',
+      },
+      {
+        term: 'Nâng cấp',
+        detail:
+          'Giao thức chạy sau một proxy UUPS nên địa chỉ không bao giờ đổi. Chủ sở hữu chỉ có thể trỏ nó tới mã mới giữa các chu kỳ; mã đang dùng là bản triển khai V2 đã được xác minh công khai, liệt kê ở trên.',
+      },
+      {
+        term: 'Hội đồng Vũ trụ',
+        detail:
+          'Quyền sở hữu dự kiến được chuyển giao cho Hội đồng Vũ trụ khi giao thức ổn định. Từ đó, tham số chỉ thay đổi qua các đề xuất điều phối giao thức đạt túc số điều phối.',
+      },
+    ],
+  },
   model: {
     heading: 'Mô hình bảo mật',
     paragraph:
@@ -41,10 +83,28 @@ export const securityCopyVi: SecurityCopy = {
   },
   report: {
     heading: 'Báo cáo lỗ hổng',
-    paragraphs: [
-      'Nếu bạn phát hiện lỗ hổng trong hợp đồng, ứng dụng hoặc trang web này, hãy gửi email đến <support>support@cosmicsignature.com</support> với tiêu đề có chữ “Security”. Hãy mô tả điều bạn phát hiện, cách tái hiện và phạm vi ảnh hưởng.',
-      'Hãy cho nhóm thời gian phản hồi và khắc phục trước khi công bố, và đừng thử lợi dụng lỗ hổng trên hợp đồng đang chạy hay tiền của người tham gia khác. Cùng thông tin liên hệ này có trong tệp <securityTxt>security.txt</securityTxt> của trang web.',
+    lead: 'Nếu bạn phát hiện lỗ hổng trong hợp đồng Cosmic Signature, ứng dụng hoặc trang web này, hãy gửi email đến <support>support@cosmicsignature.com</support> với tiêu đề có chữ “Security”. Một báo cáo hữu ích cho biết:',
+    include: [
+      'Bạn phát hiện điều gì, và nó ảnh hưởng đến hợp đồng, trang hay địa chỉ nào.',
+      'Cách tái hiện, từng bước.',
+      'Nó cho phép người khác làm gì, và với tiền của ai.',
+      'Cách nhóm có thể liên hệ với bạn.',
     ],
+    scopeHeading: 'Phạm vi',
+    scope: [
+      {
+        term: 'Trong phạm vi',
+        detail:
+          'Các hợp đồng trong mục <securityOfficial>Địa chỉ chính thức</securityOfficial>, app.cosmicsignature.com và cosmicsignature.com.',
+      },
+      {
+        term: 'Ngoài phạm vi',
+        detail:
+          'Các dịch vụ Cosmic Signature không vận hành, như ví, sàn NFT, cầu nối và chính mạng Arbitrum. Hãy báo cho đội ngũ của các dịch vụ đó.',
+      },
+    ],
+    closing:
+      'Hãy cho nhóm thời gian phản hồi và khắc phục trước khi công bố, và đừng thử lợi dụng lỗ hổng trên hợp đồng đang chạy hay tiền của người tham gia khác. Cùng thông tin liên hệ này có trong tệp <securityTxt>security.txt</securityTxt> của trang web.',
   },
   verify: {
     heading: 'Tự kiểm chứng',

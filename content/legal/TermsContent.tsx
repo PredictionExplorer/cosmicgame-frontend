@@ -103,7 +103,7 @@ function AllocationTracks({
 
   return (
     <div>
-      <h3 id="allocations-tracks-title" className="type-title text-foreground">
+      <h3 id="allocations-tracks-title" className="type-heading-3 text-foreground">
         {copy.title}
       </h3>
       <dl

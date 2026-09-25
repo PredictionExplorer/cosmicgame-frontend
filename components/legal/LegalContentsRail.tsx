@@ -80,7 +80,7 @@ export function LegalContentsRail({
   return (
     <nav aria-labelledby="legal-contents-rail-title" className="hidden lg:block">
       <div className="sticky top-[calc(var(--sticky-offset)+1.5rem)]">
-        <p id="legal-contents-rail-title" className="type-eyebrow text-subtle">
+        <p id="legal-contents-rail-title" className="type-label text-muted-foreground">
           {title}
         </p>
         <ol className="mt-4 border-s border-rule">

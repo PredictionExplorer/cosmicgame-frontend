@@ -23,7 +23,7 @@ export const auditsCopyJa: AuditsCopy = {
       informational: '情報',
     },
     reportCta: 'Hackenの報告書を読む',
-    repositoryCta: '監査対象のコントラクトを見る',
+    repositoryCta: 'コントラクトのリポジトリを見る',
   },
   audit: {
     heading: 'Hackenによる独立監査',

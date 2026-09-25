@@ -10,9 +10,14 @@ import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage, webPageJsonLd } from '@/utils/jsonLd';
 import { createPageMetadata } from '@/utils/seo';
 
+import { readProtocolOwner } from './protocolOwner';
+
 interface PageProps {
   params: Promise<{ locale: string }>;
 }
+
+/** The owner is read from the chain; five minutes keeps it current without a read per visit. */
+export const revalidate = 300;
 
 export async function generateMetadata(
   { params }: PageProps,
@@ -33,11 +38,12 @@ export async function generateMetadata(
 export default async function SecurityPage({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const [t, legal, contracts, labels] = await Promise.all([
+  const [t, legal, contracts, labels, owner] = await Promise.all([
     getTranslations({ locale, namespace: 'meta' }),
     getTranslations({ locale, namespace: 'legal' }),
     getTranslations({ locale, namespace: 'contracts' }),
     getLegalDocumentLabels(locale),
+    readProtocolOwner(),
   ]);
   const contractNames = Object.fromEntries(
     OFFICIAL_CONTRACTS.map(({ id }) => [id, contracts(`entries.${id}.name`)]),
@@ -75,6 +81,8 @@ export default async function SecurityPage({ params }: PageProps) {
         locale={locale}
         labels={labels}
         contractNames={contractNames}
+        implementationNote={contracts('entries.implementation.description')}
+        owner={owner}
       />
     </>
   );
