@@ -19,7 +19,8 @@
     "trigger": "공유",
     "copyVideoLink": "영상 링크 복사",
     "copyImageLink": "이미지 링크 복사",
-    "copyPageLink": "페이지 링크 복사"
+    "copyPageLink": "페이지 링크 복사",
+    "copyFailed": "링크를 복사하지 못했습니다"
   },
   "actions": {
     "buyOrSellNfts": "NFT 구매 또는 판매"

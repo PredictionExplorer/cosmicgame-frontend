@@ -35,13 +35,22 @@ describe('NFTShareMenu', () => {
     });
   });
 
-  it('confirms nothing when the copy failed', async () => {
+  it('never confirms a copy that failed, and says it failed', async () => {
     mockCopy.mockResolvedValue(false);
     render(<NFTShareMenu imageUrl="https://media/0xabc.png" />);
     openMenu();
     fireEvent.click(await screen.findByRole('menuitem', { name: 'detail.share.copyImageLink' }));
     await waitFor(() => expect(mockCopy).toHaveBeenCalled());
-    expect(mockSetNotification).not.toHaveBeenCalled();
+    await waitFor(() =>
+      expect(mockSetNotification).toHaveBeenCalledWith({
+        text: 'detail.share.copyFailed',
+        type: 'error',
+        visible: true,
+      }),
+    );
+    expect(mockSetNotification).not.toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'success' }),
+    );
   });
 
   it('copies the page link', async () => {

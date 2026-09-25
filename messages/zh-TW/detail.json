@@ -19,7 +19,8 @@
     "trigger": "分享",
     "copyVideoLink": "複製影片連結",
     "copyImageLink": "複製圖片連結",
-    "copyPageLink": "複製頁面連結"
+    "copyPageLink": "複製頁面連結",
+    "copyFailed": "無法複製連結"
   },
   "actions": {
     "buyOrSellNfts": "買賣 NFT"

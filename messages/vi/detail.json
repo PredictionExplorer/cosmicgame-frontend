@@ -19,7 +19,8 @@
     "trigger": "Chia sẻ",
     "copyVideoLink": "Sao chép liên kết video",
     "copyImageLink": "Sao chép liên kết hình ảnh",
-    "copyPageLink": "Sao chép liên kết trang"
+    "copyPageLink": "Sao chép liên kết trang",
+    "copyFailed": "Không sao chép được liên kết"
   },
   "actions": {
     "buyOrSellNfts": "Mua hoặc bán NFT"

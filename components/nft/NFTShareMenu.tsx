@@ -24,7 +24,7 @@ export interface NFTShareMenuProps {
 
 /**
  * NFTShareMenu — copy the page, image or animation link, with a short
- * "Copied" confirmation.
+ * "Copied" confirmation, or an error when the browser refused the copy.
  */
 export function NFTShareMenu({ imageUrl, videoUrl, className }: NFTShareMenuProps) {
   const t = useTranslations('detail');
@@ -33,9 +33,13 @@ export function NFTShareMenu({ imageUrl, videoUrl, className }: NFTShareMenuProp
   const { setNotification } = useNotification();
 
   const copyLink = async (url: string) => {
-    // Confirm only a copy that happened (useClipboard resolves false when every route failed).
-    if (!(await copy(url))) return;
-    setNotification({ text: tCommon('actions.copied'), type: 'success', visible: true });
+    // Confirm only a copy that happened (useClipboard resolves false when every route failed),
+    // and say so when it did not, as the cycle record's share button does.
+    if (await copy(url)) {
+      setNotification({ text: tCommon('actions.copied'), type: 'success', visible: true });
+    } else {
+      setNotification({ text: t('share.copyFailed'), type: 'error', visible: true });
+    }
   };
 
   return (
