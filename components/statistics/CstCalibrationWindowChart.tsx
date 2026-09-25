@@ -1,15 +1,7 @@
 'use client';
 
 import { memo, useMemo, type FC } from 'react';
-import {
-  ComposedChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
+import { ComposedChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { formatAddress, formatHoursTick, formatSeconds } from '@/utils/format';
@@ -27,6 +19,7 @@ import { ErrorState } from '@/components/ui/error-state';
 import { SkeletonChart } from '@/components/ui/skeleton';
 
 import { ChartFigure } from './charts/ChartFigure';
+import { ChartPlot } from './charts/ChartPlot';
 import { ChartLegend } from './charts/ChartLegend';
 import type { ReadoutItem } from './charts/ChartReadout';
 import { ChartTooltipCard } from './charts/ChartTooltipCard';
@@ -153,7 +146,7 @@ const CalibrationChartView = memo(function CalibrationChartView({
   const xAxis = useElapsedHoursAxis(points[points.length - 1]?.hoursIntoRound ?? 0);
   const yAxis = useDurationAxis(minSeconds, maxSeconds);
   return (
-    <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
+    <ChartPlot height={CHART_HEIGHT}>
       <ComposedChart data={points} margin={CHART_MARGIN}>
         <CartesianGrid {...GRID_PROPS} />
         <XAxis
@@ -183,7 +176,7 @@ const CalibrationChartView = memo(function CalibrationChartView({
           isAnimationActive={false}
         />
       </ComposedChart>
-    </ResponsiveContainer>
+    </ChartPlot>
   );
 });
 

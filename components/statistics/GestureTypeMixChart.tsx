@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useMemo, useState, type FC } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { formatUnixTsLabel } from '@/utils/format';
@@ -15,6 +15,7 @@ import { SkeletonChart } from '@/components/ui/skeleton';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 
 import { ChartFigure } from './charts/ChartFigure';
+import { ChartPlot } from './charts/ChartPlot';
 import type { ReadoutItem } from './charts/ChartReadout';
 import { ChartTooltipCard } from './charts/ChartTooltipCard';
 import { useCountAxis, useTimeAxis } from './charts/axes';
@@ -169,7 +170,7 @@ const MixBars = memo(function MixBars({
   );
   const lastMethod = GESTURE_METHODS[GESTURE_METHODS.length - 1];
   return (
-    <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
+    <ChartPlot height={CHART_HEIGHT}>
       <BarChart
         data={plotted}
         margin={{ ...CHART_MARGIN, top: cap === null ? CHART_MARGIN.top : CLIPPED_LABEL_ROOM }}
@@ -208,7 +209,7 @@ const MixBars = memo(function MixBars({
           />
         ))}
       </BarChart>
-    </ResponsiveContainer>
+    </ChartPlot>
   );
 });
 

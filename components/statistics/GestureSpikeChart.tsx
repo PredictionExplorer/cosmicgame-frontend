@@ -1,16 +1,7 @@
 'use client';
 
 import { useMemo, useState, type FC } from 'react';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  ReferenceArea,
-} from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceArea } from 'recharts';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { formatUnixTsLabel } from '@/utils/format';
@@ -32,6 +23,7 @@ import { SkeletonChart } from '@/components/ui/skeleton';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 
 import { ChartFigure } from './charts/ChartFigure';
+import { ChartPlot } from './charts/ChartPlot';
 import type { ReadoutItem } from './charts/ChartReadout';
 import { ChartTooltipCard } from './charts/ChartTooltipCard';
 import { formatMonthDay, formatMonthDayHour } from './charts/labels';
@@ -256,7 +248,7 @@ export const GestureSpikeChart: FC<GestureSpikeChartProps> = ({ enabled = true, 
       table={<DataTable data={points} columns={columns} ariaLabel={label} />}
     >
       <div data-testid="gesture-spike-chart">
-        <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
+        <ChartPlot height={CHART_HEIGHT}>
           <BarChart data={points} margin={CHART_MARGIN} barCategoryGap="12%">
             <CartesianGrid {...GRID_PROPS} />
             <XAxis
@@ -291,7 +283,7 @@ export const GestureSpikeChart: FC<GestureSpikeChartProps> = ({ enabled = true, 
               isAnimationActive={false}
             />
           </BarChart>
-        </ResponsiveContainer>
+        </ChartPlot>
       </div>
     </ChartFigure>
   );

@@ -1,15 +1,7 @@
 'use client';
 
 import { memo, useId, useMemo, useState, type FC } from 'react';
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import { Area, AreaChart, CartesianGrid, Tooltip, XAxis, YAxis } from 'recharts';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { formatAmount, formatUnixTsLabel, supplyHistoryBootstrapRange } from '@/utils/format';
@@ -30,6 +22,7 @@ import { SkeletonChart } from '@/components/ui/skeleton';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 
 import { ChartFigure } from './charts/ChartFigure';
+import { ChartPlot } from './charts/ChartPlot';
 import type { ReadoutItem } from './charts/ChartReadout';
 import { UtcTime } from './charts/UtcTime';
 import { ChartTooltipCard } from './charts/ChartTooltipCard';
@@ -177,7 +170,7 @@ const SupplyArea = memo(function SupplyArea({
   const fromZero = yAxis.domain[0] <= 0;
 
   return (
-    <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
+    <ChartPlot height={CHART_HEIGHT}>
       <AreaChart data={points} margin={CHART_MARGIN}>
         <defs>
           <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
@@ -214,7 +207,7 @@ const SupplyArea = memo(function SupplyArea({
           isAnimationActive={false}
         />
       </AreaChart>
-    </ResponsiveContainer>
+    </ChartPlot>
   );
 });
 

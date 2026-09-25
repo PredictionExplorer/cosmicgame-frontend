@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState, type FC } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { formatUnixTsLabel } from '@/utils/format';
@@ -18,6 +18,7 @@ import { SkeletonChart } from '@/components/ui/skeleton';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 
 import { ChartFigure } from './charts/ChartFigure';
+import { ChartPlot } from './charts/ChartPlot';
 import type { ReadoutItem } from './charts/ChartReadout';
 import { ChartTooltipCard } from './charts/ChartTooltipCard';
 import { formatDateRange } from './charts/labels';
@@ -262,7 +263,7 @@ export const GestureFrequencyChart: FC<GestureFrequencyChartProps> = ({
       }
     >
       <div data-testid="gesture-frequency-chart">
-        <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
+        <ChartPlot height={CHART_HEIGHT}>
           <BarChart data={points} margin={CHART_MARGIN} barCategoryGap="12%">
             <CartesianGrid {...GRID_PROPS} />
             <XAxis
@@ -290,7 +291,7 @@ export const GestureFrequencyChart: FC<GestureFrequencyChartProps> = ({
               isAnimationActive={false}
             />
           </BarChart>
-        </ResponsiveContainer>
+        </ChartPlot>
       </div>
     </ChartFigure>
   );

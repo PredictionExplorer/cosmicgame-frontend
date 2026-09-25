@@ -1,16 +1,7 @@
 'use client';
 
 import { memo, useMemo, type FC } from 'react';
-import {
-  Area,
-  ComposedChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
+import { Area, ComposedChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { useLocale, useTranslations } from 'next-intl';
 
 import {
@@ -38,6 +29,7 @@ import { ErrorState } from '@/components/ui/error-state';
 import { SkeletonChart } from '@/components/ui/skeleton';
 
 import { ChartFigure } from './charts/ChartFigure';
+import { ChartPlot } from './charts/ChartPlot';
 import { UtcTime } from './charts/UtcTime';
 import { ChartLegend } from './charts/ChartLegend';
 import type { ReadoutItem } from './charts/ChartReadout';
@@ -188,7 +180,7 @@ const CostChartView = memo(function CostChartView({ series }: { series: CstGestu
 
   return (
     <div className="space-y-1">
-      <ResponsiveContainer width="100%" height={PRICE_HEIGHT}>
+      <ChartPlot height={PRICE_HEIGHT}>
         <ComposedChart data={series.points} margin={CHART_MARGIN} syncId={SYNC_ID}>
           <CartesianGrid {...GRID_PROPS} />
           {/* The time labels sit under the clock panel; this axis draws only the rule. */}
@@ -220,8 +212,8 @@ const CostChartView = memo(function CostChartView({ series }: { series: CstGestu
             isAnimationActive={false}
           />
         </ComposedChart>
-      </ResponsiveContainer>
-      <ResponsiveContainer width="100%" height={CLOCK_HEIGHT}>
+      </ChartPlot>
+      <ChartPlot height={CLOCK_HEIGHT}>
         <ComposedChart data={series.points} margin={{ ...CHART_MARGIN, top: 4 }} syncId={SYNC_ID}>
           <CartesianGrid {...GRID_PROPS} />
           <XAxis {...xAxisProps} />
@@ -246,7 +238,7 @@ const CostChartView = memo(function CostChartView({ series }: { series: CstGestu
             isAnimationActive={false}
           />
         </ComposedChart>
-      </ResponsiveContainer>
+      </ChartPlot>
     </div>
   );
 });

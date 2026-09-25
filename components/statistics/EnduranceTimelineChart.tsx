@@ -1,16 +1,7 @@
 'use client';
 
 import { memo, useId, useMemo, useState, type FC } from 'react';
-import {
-  ComposedChart,
-  Area,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
+import { ComposedChart, Area, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
@@ -32,6 +23,7 @@ import { ErrorState } from '@/components/ui/error-state';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import { ChartFigure } from './charts/ChartFigure';
+import { ChartPlot } from './charts/ChartPlot';
 import { ChartLegend, LegendSwatch } from './charts/ChartLegend';
 import type { ReadoutItem } from './charts/ChartReadout';
 import { ChartTooltipCard } from './charts/ChartTooltipCard';
@@ -179,7 +171,7 @@ const EnduranceLineView = memo(function EnduranceLineView({
 
   return (
     <div className="space-y-4">
-      <ResponsiveContainer width="100%" height={LINE_CHART_HEIGHT}>
+      <ChartPlot height={LINE_CHART_HEIGHT}>
         <ComposedChart data={points} margin={CHART_MARGIN}>
           <CartesianGrid {...GRID_PROPS} />
           <XAxis
@@ -225,7 +217,7 @@ const EnduranceLineView = memo(function EnduranceLineView({
             isAnimationActive={false}
           />
         </ComposedChart>
-      </ResponsiveContainer>
+      </ChartPlot>
       <ChartLegend
         items={[
           { key: 'lead', label: t('charts.endurance.currentLeadWindow'), color: SERIES_COLOR.lead },

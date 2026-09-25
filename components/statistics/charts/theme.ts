@@ -69,10 +69,23 @@ export const Y_AXIS_PROPS = {
   tickMargin: 6,
 } as const;
 
-/** Shared CartesianGrid props: horizontal hairlines only. */
+/** No vertical grid lines: the grid draws the horizontal hairlines only. */
+const NO_VERTICAL_LINES = (): number[] => [];
+
+/**
+ * Shared CartesianGrid props: horizontal hairlines only.
+ *
+ * `vertical: false` hides the vertical lines, but recharts (3.8) still works
+ * out where they would go: its default generator lays out a tick for every
+ * x value and measures each label in a hidden span, one forced page layout
+ * per label. On /statistics/activity that was some 700 layouts of the whole
+ * page, a single 9 s task (39 s on a 4× throttled phone). An empty
+ * generator skips the work the grid never draws.
+ */
 export const GRID_PROPS = {
   stroke: 'var(--rule-faint)',
   vertical: false,
+  verticalCoordinatesGenerator: NO_VERTICAL_LINES,
 } as const;
 
 /** Room around the plot; the axes' own widths hold their labels. */

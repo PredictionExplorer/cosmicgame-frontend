@@ -65,6 +65,13 @@ class MockIntersectionObserver {
 (global as unknown as { IntersectionObserver: unknown }).IntersectionObserver =
   MockIntersectionObserver;
 
+// Charts lay out their plots only once they near the screen (ChartPlot). The
+// observer above never reports an element in view, so unit tests render every
+// plot at once; hooks/__tests__/useNearViewport.test.tsx covers the gate.
+jest.mock('@/hooks/useNearViewport', () => ({
+  useNearViewport: () => [true, () => undefined],
+}));
+
 // Fail tests on unexpected console.error / console.warn. Known third-party
 // warnings that we cannot fix are allowlisted and silently skipped. Any NEW
 // warning that doesn't match the allowlist throws, failing the test
