@@ -561,7 +561,9 @@
       "alt": "Cosmic Signatureのアートワーク{id}——決定論的な三体ジェネラティブアート",
       "pairingNote": "オンチェーンに刻印された決定論的な三体アート。すべてのシグネチャーには1,000 CSTが添えられています。",
       "title": "Cosmic Signature {id}",
-      "titleNamed": "「{name}」"
+      "titleNamed": "「{name}」",
+      "watchDrawing": "描かれる過程を見る",
+      "showFinished": "完成した作品を表示"
     },
     "personal": {
       "title": "このサイクルでの位置",

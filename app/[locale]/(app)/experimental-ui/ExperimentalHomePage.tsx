@@ -286,18 +286,14 @@ const ExperimentalHomePage = ({
 
   // ── Featured artwork ────────────────────────────────────────────────
   // The server picks the first artwork so its URL is in the prerendered
-  // HTML. While the generation reel plays, the reel (not the timer) decides
-  // when to move on; the viewer's pause holds both.
+  // HTML. The stills rotate on a timer; it holds while the viewer watches a
+  // Signature take shape, and the viewer's pause holds both.
   const imprintedTokenCount = dashboardData?.MainStats.NumCSTokenMints ?? 0;
   const { paused: artPaused, setPaused: setArtPaused } = useArtMotionPreference();
   const [reelActive, setReelActive] = useState(false);
   const [artAdvance, setArtAdvance] = useState(0);
   // Consecutive tokens whose files all failed; a loaded artwork resets it.
   const unavailableSkipsRef = useRef(0);
-  const handleReelEnded = useCallback(() => {
-    unavailableSkipsRef.current = 0;
-    setArtAdvance((n) => n + 1);
-  }, []);
   const handleArtStatus = useCallback((_tokenId: number, status: ArtStatus) => {
     if (status === 'loaded') unavailableSkipsRef.current = 0;
     if (status !== 'unavailable' || unavailableSkipsRef.current >= MAX_UNAVAILABLE_SKIPS) return;
@@ -312,7 +308,7 @@ const ExperimentalHomePage = ({
     initialIndex: initialBannerToken?.id ?? null,
     advanceSignal: artAdvance,
   });
-  const { data: bannerCSTInfo, isError: bannerCSTError } = useCSTInfo(
+  const { data: bannerCSTInfo } = useCSTInfo(
     bannerTokenId,
     bannerTokenId != null && bannerTokenId === initialBannerToken?.id
       ? initialBannerToken.info
@@ -334,19 +330,6 @@ const ExperimentalHomePage = ({
       heldBannerToken ??
       (initialBannerToken ? toStageToken(initialBannerToken.id, initialBannerToken.info) : null),
     [resolvedBannerToken, heldBannerToken, initialBannerToken],
-  );
-  // The reel cannot finish a clip it never got a seed for: skip that token.
-  useEffect(() => {
-    if (reelActive && bannerCSTError) setArtAdvance((n) => n + 1);
-  }, [reelActive, bannerCSTError, bannerTokenId]);
-  const nextBannerTokenId =
-    bannerTokenId != null && imprintedTokenCount > 1
-      ? (bannerTokenId + 1) % imprintedTokenCount
-      : null;
-  const { data: nextBannerCSTInfo } = useCSTInfo(nextBannerTokenId);
-  const nextBannerToken = useMemo(
-    () => (nextBannerTokenId != null ? toStageToken(nextBannerTokenId, nextBannerCSTInfo) : null),
-    [nextBannerTokenId, nextBannerCSTInfo],
   );
 
   // ── Cycle state ──────────────────────────────────────────────────────
@@ -830,11 +813,9 @@ const ExperimentalHomePage = ({
           >
             <MemoStageArtwork
               token={bannerToken}
-              nextToken={nextBannerToken}
               rotates={imprintedTokenCount > 1}
               paused={artPaused}
               onPausedChange={setArtPaused}
-              onReelEnded={handleReelEnded}
               onReelActiveChange={setReelActive}
               onArtStatus={handleArtStatus}
               className="lg:col-span-7 lg:row-start-1"

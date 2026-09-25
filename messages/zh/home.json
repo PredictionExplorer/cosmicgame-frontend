@@ -561,7 +561,9 @@
       "alt": "Cosmic Signature 艺术作品 {id} —— 确定性三体生成艺术",
       "pairingNote": "确定性三体艺术，铭刻于链上。每枚签名作品都配有 1,000 CST。",
       "title": "Cosmic Signature {id}",
-      "titleNamed": "《{name}》"
+      "titleNamed": "《{name}》",
+      "watchDrawing": "观看成形过程",
+      "showFinished": "显示完成的作品"
     },
     "personal": {
       "title": "你在本周期的位置",

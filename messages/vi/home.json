@@ -561,7 +561,9 @@
       "alt": "Tác phẩm Cosmic Signature {id} — nghệ thuật tạo sinh ba vật thể tất định",
       "pairingNote": "Nghệ thuật ba vật thể tất định, khắc trên chuỗi. Mỗi Signature đi cùng 1.000 CST.",
       "title": "Cosmic Signature {id}",
-      "titleNamed": "“{name}”"
+      "titleNamed": "“{name}”",
+      "watchDrawing": "Xem tác phẩm thành hình",
+      "showFinished": "Hiện tác phẩm hoàn chỉnh"
     },
     "personal": {
       "title": "Vị thế của bạn trong chu kỳ",

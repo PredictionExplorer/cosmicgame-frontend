@@ -561,7 +561,9 @@
       "alt": "Cosmic Signature artwork {id} — deterministic three-body generative art",
       "pairingNote": "Deterministic three-body art, imprinted on-chain. Every Signature is paired with 1,000 CST.",
       "title": "Cosmic Signature {id}",
-      "titleNamed": "“{name}”"
+      "titleNamed": "“{name}”",
+      "watchDrawing": "Watch it take shape",
+      "showFinished": "Show the finished work"
     },
     "personal": {
       "title": "Your cycle standing",
