@@ -62,7 +62,7 @@ describe('MarketingRewards', () => {
     const refetch = jest.fn();
     mockUseMarketingRewards.mockReturnValue(query({ isError: true, refetch }));
     render(<MarketingRewards />);
-    expect(screen.getAllByText("The outreach allocations couldn't be loaded.")).toHaveLength(1);
+    expect(screen.getAllByText('The outreach allocations couldn’t be loaded.')).toHaveLength(1);
     fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
     expect(refetch).toHaveBeenCalledTimes(1);
   });

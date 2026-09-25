@@ -15,7 +15,7 @@
       "receive": {
         "title": "Receive CST",
         "description": "The allocation arrives as CST in your wallet.",
-        "detail": "It is sent on-chain once your outreach is verified, and its size reflects the outreach's impact."
+        "detail": "It is sent on-chain once your outreach is verified, and its size reflects the outreach’s impact."
       }
     },
     "description": "Three steps, from telling people about Cosmic Signature to CST in your wallet."
@@ -75,5 +75,5 @@
     "historyLink": "View Outreach Reserve transfers"
   },
   "learnHow": "Learn how",
-  "loadError": "The outreach allocations couldn't be loaded."
+  "loadError": "The outreach allocations couldn’t be loaded."
 }

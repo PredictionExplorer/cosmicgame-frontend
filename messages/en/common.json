@@ -56,7 +56,7 @@
   "status": {
     "loading": "Loading",
     "loadingEllipsis": "Loading…",
-    "loadingDots": "Loading...",
+    "loadingDots": "Loading…",
     "unavailable": "Unavailable"
   },
   "liveStatus": {

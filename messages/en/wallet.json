@@ -28,7 +28,7 @@
     "retrieveReady": "Ready to retrieve",
     "retrieveAmount": "{amount} ready to retrieve",
     "addCstToMetaMask": "Add CST to MetaMask",
-    "addingCstToMetaMask": "Adding CST to MetaMask...",
+    "addingCstToMetaMask": "Adding CST to MetaMask…",
     "viewOnExplorer": "View on {explorer}",
     "switchWallet": "Switch wallet",
     "disconnect": "Disconnect"

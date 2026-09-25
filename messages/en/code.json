@@ -18,12 +18,12 @@
   },
   "pipeline": {
     "heading": "From seed to image",
-    "description": "How the code below turns an NFT's seed into its artwork, step by step.",
+    "description": "How the code below turns an NFT’s seed into its artwork, step by step.",
     "galleryLink": "See the images in the gallery",
     "steps": {
       "seed": {
         "label": "Seed",
-        "description": "The NFT's seed, recorded on-chain when it is imprinted."
+        "description": "The NFT’s seed, recorded on-chain when it is imprinted."
       },
       "stream": {
         "label": "SHA3-256 random stream",
@@ -31,11 +31,11 @@
       },
       "simulation": {
         "label": "Three-body simulation",
-        "description": "Takes three bodies' masses, positions and velocities from the stream and computes their orbits."
+        "description": "Takes three bodies’ masses, positions and velocities from the stream and computes their orbits."
       },
       "renderer": {
         "label": "Spectral renderer",
-        "description": "Traces each body's path in a color that drifts across the spectrum."
+        "description": "Traces each body’s path in a color that drifts across the spectrum."
       },
       "image": {
         "label": "Cosmic Signature NFT image",

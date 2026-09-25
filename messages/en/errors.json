@@ -32,8 +32,8 @@
     "retry": "Reload"
   },
   "environment": {
-    "title": "Can't run because environment variables aren't set.",
-    "description": "We can't assume any defaults for networks or API URLs — that is prone to bugs.",
+    "title": "Can’t run because environment variables aren’t set.",
+    "description": "We can’t assume any defaults for networks or API URLs — that is prone to bugs.",
     "missing": "Missing or invalid:",
     "resolution": "Set them in your shell or in a .env file, then restart the dev server."
   },

@@ -35,6 +35,7 @@ describe('source catalogs', () => {
     expect(report.syntaxErrors).toEqual([]);
     expect(report.pluralGaps).toEqual([]);
     expect(report.unitSpacing).toEqual([]);
+    expect(report.typography).toEqual([]);
     expect(report.empty).toEqual([]);
     expect(report.invalidValues).toEqual([]);
   });

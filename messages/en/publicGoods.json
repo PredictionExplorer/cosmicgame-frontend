@@ -1,5 +1,5 @@
 {
-  "loadError": "The Public Goods records couldn't be loaded.",
+  "loadError": "The Public Goods records couldn’t be loaded.",
   "vault": {
     "description": "Each finalized cycle moves the Public Goods share of its Cycle Reserve into the vault, where it waits until it is retrieved for {beneficiary}.",
     "due": "Due from this cycle",

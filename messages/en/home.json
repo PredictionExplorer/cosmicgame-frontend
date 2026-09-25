@@ -1,7 +1,7 @@
 {
   "error": {
     "title": "Live cycle data unavailable",
-    "message": "We couldn't reach the protocol data service, so the current cycle can't be shown. Try again in a moment."
+    "message": "We couldn’t reach the protocol data service, so the current cycle can’t be shown. Try again in a moment."
   },
   "hero": {
     "cycleFallback": "The cycle",
@@ -16,7 +16,7 @@
       "waitingFirstGesture": {
         "badge": "Open for first gesture",
         "headline": "{cycleLabel} is open",
-        "body": "Make the first gesture to start the finalization clock and begin shaping this cycle's Signature.",
+        "body": "Make the first gesture to start the finalization clock and begin shaping this cycle’s Signature.",
         "cta": "Make the first gesture"
       },
       "confirming": {
@@ -371,7 +371,7 @@
         "cst": "Gesture with CST"
       }
     },
-    "processing": "Processing...",
+    "processing": "Processing…",
     "finalGestureMade": "You made the final gesture for this cycle. When the timer ends, use Finalize Cycle below.",
     "finalize": "Finalize cycle",
     "finalizeAvailableIn": "available in",
@@ -700,7 +700,7 @@
       "waitingNothing": "Nothing",
       "waitingNfts": "{count, plural, one {# NFT} other {# NFTs}}",
       "retrieveHint": "Retrieve it on My Allocations",
-      "connectBody": "Connect a wallet to see where you stand, how many of this cycle's gestures are yours and anything waiting to retrieve.",
+      "connectBody": "Connect a wallet to see where you stand, how many of this cycle’s gestures are yours and anything waiting to retrieve.",
       "spent": "You spent this cycle",
       "landed": "Your gesture landed. You hold the Last Gesture."
     }
@@ -711,7 +711,7 @@
   },
   "publicGoods": {
     "eyebrow": "Public Goods",
-    "heading": "Funding Ethereum's core contributors.",
+    "heading": "Funding Ethereum’s core contributors.",
     "stats": {
       "vault": "In vault now",
       "vaultTooltip": "ETH currently held in the Public Goods Vault before retrieval.",

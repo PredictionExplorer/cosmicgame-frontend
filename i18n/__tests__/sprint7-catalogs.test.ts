@@ -43,7 +43,7 @@ describe('Sprint 7 focused catalogs', () => {
   it('pins the reviewed English rendering', () => {
     expect(enEthContribution.form.title).toBe('Contribute ETH');
     expect(enEthContribution.form.submitAmount).toBe('Contribute {amount}');
-    expect(enPublicGoods.loadError).toBe("The Public Goods records couldn't be loaded.");
+    expect(enPublicGoods.loadError).toBe('The Public Goods records couldn’t be loaded.');
     expect(enMarketing.cta.contact).toBe('Email the outreach team');
     expect(enCoordination.page.title).toBe('Coordination changes');
     expect(enAdmin.settings.title).toBe('Contract settings');

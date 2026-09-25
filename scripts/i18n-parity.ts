@@ -111,6 +111,7 @@ for (const namespaceFile of enNamespaces) {
     ...report.syntaxErrors,
     ...report.pluralGaps,
     ...report.unitSpacing,
+    ...report.typography,
   ];
   if (problems.length) {
     console.log(`  ${DEFAULT_LOCALE}/${namespace}: ${problems.length} source problem(s)`);

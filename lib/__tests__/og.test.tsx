@@ -273,7 +273,7 @@ describe('CosmicOgCard', () => {
     expect(plan.layout).toBe('plate');
     if (plan.layout !== 'plate') return;
     expect(plan.label?.lines).toHaveLength(1);
-    expect(plan.label?.lines[0]).toMatch(/^An Owner-Given Name .*\w\.\.\.$/);
+    expect(plan.label?.lines[0]).toMatch(/^An Owner-Given Name .*\w…$/);
     expect(plan.label?.width).toBeLessThanOrEqual(600);
   });
 });
@@ -418,7 +418,7 @@ describe('opengraph-image routes', () => {
       params({ locale: 'en', address: '0x7406B34d25A9B7841CAC133E3173919e0af6Bc6c' }),
     );
     expect(lastCard().element.props).toEqual(
-      expect.objectContaining({ title: '0x7406...Bc6c', monoTitle: true }),
+      expect.objectContaining({ title: '0x7406…Bc6c', monoTitle: true }),
     );
   });
 });

@@ -6,7 +6,7 @@
   "allocations": {
     "title": "My Allocations",
     "subtitle": "What the protocol has set aside for this wallet, and one place to retrieve it all.",
-    "loadErrorTitle": "Couldn't load your allocations",
+    "loadErrorTitle": "Couldn’t load your allocations",
     "loadErrorMessage": "Your pending allocations could not be loaded. Try again in a moment.",
     "summary": {
       "title": "Ready to retrieve",
@@ -255,7 +255,7 @@
       "from": "Sending from",
       "history": "Your CST transfers",
       "title": "Before you send",
-      "final": "Transfers are final. CST sent to a wrong address can't be recovered.",
+      "final": "Transfers are final. CST sent to a wrong address can’t be recovered.",
       "network": "Send only to an address that can hold tokens on {network}.",
       "paste": "Copy the address from the receiving wallet rather than typing it."
     }
@@ -315,7 +315,7 @@
     "switcherLabel": "Transfers of this address",
     "artUnavailable": "Artwork unavailable",
     "viewOnExplorer": "View on {explorer}",
-    "error": "The transfers of this address couldn't be loaded.",
+    "error": "The transfers of this address couldn’t be loaded.",
     "count": "{count, plural, one {# transfer} other {# transfers}}",
     "activity": {
       "imprinted": "Imprinted",

@@ -157,8 +157,8 @@
     "rank": "#{rank}",
     "rankLabel": "Rarity rank",
     "rankOf": "Rank {rank} of {total}",
-    "tooltip": "Rarity rank {rank} of {total}: how uncommon this Signature's traits are across the collection. Rarest trait: {trait}.",
-    "tooltipNoTrait": "Rarity rank {rank} of {total}: how uncommon this Signature's traits are across the collection.",
+    "tooltip": "Rarity rank {rank} of {total}: how uncommon this Signature’s traits are across the collection. Rarest trait: {trait}.",
+    "tooltipNoTrait": "Rarity rank {rank} of {total}: how uncommon this Signature’s traits are across the collection.",
     "rarest": "Rarest trait",
     "share": "{count} of {total} share this",
     "shareShort": "{count}/{total}",
@@ -242,7 +242,7 @@
     "title": "Collection DNA",
     "subtitle": "How the collection splits across its defining traits. Select a trait to narrow the gallery.",
     "segmentAria": "{value}: {count} NFTs. Filter by this trait.",
-    "loading": "Reading the collection's traits…"
+    "loading": "Reading the collection’s traits…"
   },
   "alt": {
     "subjectNamed": "“{name}”, Cosmic Signature {id}",

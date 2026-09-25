@@ -79,7 +79,7 @@ describe('CharityCGDeposits', () => {
     withDeposits(undefined, { isError: true });
     render(<CharityCGDeposits header={HEADER} />);
     fireEvent.click(
-      screen.getByRole('button', { name: "The Public Goods records couldn't be loaded." }),
+      screen.getByRole('button', { name: 'The Public Goods records couldn’t be loaded.' }),
     );
     expect(mockRefetch).toHaveBeenCalledTimes(1);
   });

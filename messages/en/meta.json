@@ -83,7 +83,7 @@
   },
   "audits": {
     "title": "Audits: Verification and Contract Review",
-    "description": "Hacken's independent audit of the Cosmic Signature contracts at a glance: findings by severity, fuzzed invariants and the full report, with the formal verification specs in the repository."
+    "description": "Hacken’s independent audit of the Cosmic Signature contracts at a glance: findings by severity, fuzzed invariants and the full report, with the formal verification specs in the repository."
   },
   "code": {
     "title": "Source Code: CC0 On-Chain Art Protocol",

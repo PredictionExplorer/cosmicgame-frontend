@@ -225,6 +225,7 @@ describe('checkSourceNamespace', () => {
       syntaxErrors: [],
       pluralGaps: [],
       unitSpacing: [],
+      typography: [],
     });
     expect(
       checkSourceNamespace('n', { bad: '{n, plural, other {#}}', broken: '{' }, 'en-US'),
@@ -235,6 +236,7 @@ describe('checkSourceNamespace', () => {
       syntaxErrors: [expect.stringMatching(/^broken: /)],
       pluralGaps: ['bad: {n, plural} lacks one'],
       unitSpacing: [],
+      typography: [],
     });
   });
 
@@ -248,7 +250,28 @@ describe('checkSourceNamespace', () => {
       syntaxErrors: [],
       pluralGaps: [],
       unitSpacing: [],
+      typography: [],
     });
+  });
+
+  // V143 / V348: English mixed "Loading..." with "Search questions…" and
+  // "couldn't" with "couldn’t"; the source now uses one form of each.
+  it('holds the source to the ellipsis and the typographic apostrophe', () => {
+    const report = checkSourceNamespace(
+      'n',
+      {
+        dots: 'Loading...',
+        contraction: "The records couldn't be loaded.",
+        possessive: "Takes three bodies' masses.",
+        fine: "Loading… The records couldn’t be loaded. Type '{' to open.",
+      },
+      'en-US',
+    );
+    expect(report.typography).toEqual([
+      'dots: "..." should be the ellipsis "…" (U+2026)',
+      'contraction: "n\'t" should use the apostrophe "’" (U+2019)',
+      'possessive: "s\'" should use the apostrophe "’" (U+2019)',
+    ]);
   });
 
   it('holds the source to no-break number–unit joins as well', () => {

@@ -149,7 +149,7 @@ describe('UserStellarSelectionNFTPage', () => {
       refetch: jest.fn(),
     });
     render(<UserStellarSelectionNFTPage address={ADDRESS} />);
-    expect(screen.getAllByText("The artwork couldn't be loaded")).toHaveLength(1);
+    expect(screen.getAllByText('The artwork couldn’t be loaded')).toHaveLength(1);
   });
 
   it('explains an address that is not an address', () => {
