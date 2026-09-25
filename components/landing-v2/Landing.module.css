@@ -244,6 +244,39 @@ html:is(:lang(zh), :lang(ja)) .headline {
   opacity: 1;
 }
 
+/* The plate and, while the animation runs, its progress hairline below it. */
+.animationStage {
+  position: relative;
+}
+
+/*
+ * Set in the gap above the wall label, so it appears and goes without moving
+ * anything: the sparse opening frames of the animation read as progress.
+ */
+.animationProgress {
+  position: absolute;
+  inset-inline: 0;
+  top: calc(100% + 0.375rem);
+  height: 1px;
+  overflow: hidden;
+  background: var(--rule-faint);
+}
+
+.animationProgress::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: hsl(var(--muted-foreground));
+  transform: scaleX(var(--progress, 0));
+  transform-origin: left center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .animationProgress::after {
+    transition: transform var(--duration-base) linear;
+  }
+}
+
 /* ── The Art ──────────────────────────────────────────────────────────── */
 
 .artLayout {

@@ -5,8 +5,9 @@ import {
   resetLandingShowcaseCache,
   useLandingShowcaseTokens,
 } from '@/components/landing-v2/useLandingShowcaseTokens';
-import { showcaseArtworks, showcaseSources, shortSeed } from '@/components/landing-v2/showcase-art';
+import { showcaseArtworks, showcaseSources } from '@/components/landing-v2/showcase-art';
 import { FEATURED_LANDING_ART } from '@/components/landing-v2/featured-art';
+import { SIGNATURE_PLATES } from '@/components/reading/signaturePlates';
 
 function respond(body: unknown, ok = true) {
   (global.fetch as jest.Mock).mockResolvedValue({ ok, json: async () => body });
@@ -98,7 +99,8 @@ describe('showcase art helpers', () => {
     expect(artworks.map((art) => art.TokenId)).toEqual([23, 24, 50]);
     // The featured piece takes the collection's live name and anchoring state.
     expect(artworks[0]).toMatchObject({ TokenName: 'Named', Staked: true });
-    expect(artworks[2]!.Seed).toBe('ABC');
+    // One seed normalisation everywhere (utils/urls bareSeed): no prefix, lower case.
+    expect(artworks[2]!.Seed).toBe('abc');
   });
 
   it('serves a featured piece from its bundled preview and others through the published files', () => {
@@ -114,8 +116,14 @@ describe('showcase art helpers', () => {
     expect(source).toEqual(expect.stringContaining('/cosmicsignature/0xabc.png'));
   });
 
-  it('shortens a seed for a caption', () => {
-    expect(shortSeed(`0x${FEATURED_LANDING_ART[1].Seed}`)).toBe('5084a873…4dfc33ad');
-    expect(shortSeed('abc')).toBe('abc');
+  it('takes the featured Signatures from the bundled plates, the one record of them', () => {
+    expect(FEATURED_LANDING_ART.map((art) => art.TokenId)).toEqual([23, 24]);
+    expect(FEATURED_LANDING_ART[1]).toEqual({
+      TokenId: 24,
+      Seed: SIGNATURE_PLATES[24].seed,
+      RoundNum: 1,
+      ImprintedAt: 1_786_491_506,
+      imageSrc: '/images/landing/signature-24.webp',
+    });
   });
 });

@@ -70,6 +70,8 @@
     "resumeRotation": "继续作品轮换",
     "playAnimation": "播放动画",
     "pauseAnimation": "暂停动画",
+    "resumeAnimation": "继续播放动画",
+    "replayAnimation": "重新播放",
     "unavailable": "作品暂不可用",
     "untitled": "签名作品 {tokenLabel}"
   }

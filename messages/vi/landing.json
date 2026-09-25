@@ -70,6 +70,8 @@
     "resumeRotation": "Tiếp tục chuyển tác phẩm",
     "playAnimation": "Phát hoạt ảnh",
     "pauseAnimation": "Tạm dừng hoạt ảnh",
+    "resumeAnimation": "Tiếp tục hoạt ảnh",
+    "replayAnimation": "Phát lại",
     "unavailable": "Tác phẩm không khả dụng",
     "untitled": "Signature {tokenLabel}"
   }
