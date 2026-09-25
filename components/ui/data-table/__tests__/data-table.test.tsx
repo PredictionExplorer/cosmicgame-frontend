@@ -362,13 +362,35 @@ describe('DataTable states', () => {
     render(
       <DataTable
         ariaLabel="Holders"
-        data={rows}
+        data={[]}
         columns={columns}
         error="The list could not be loaded."
         onRetry={onRetry}
       />,
     );
     expect(screen.getByText('The list could not be loaded.')).toBeInTheDocument();
+    expect(screen.queryByRole('table')).toBeNull();
+    await user.click(screen.getByRole('button', { name: /Try again/ }));
+    expect(onRetry).toHaveBeenCalled();
+  });
+
+  // Regression: React Query keeps the cached rows when a background refetch fails, and
+  // the whole ledger the reader was looking at was swapped for the error panel.
+  it('keeps the loaded rows when a refresh fails, with the error and retry above them', async () => {
+    const user = userEvent.setup();
+    const onRetry = jest.fn();
+    render(
+      <DataTable
+        ariaLabel="Holders"
+        data={rows}
+        columns={columns}
+        error="The list could not be refreshed."
+        onRetry={onRetry}
+      />,
+    );
+    expect(screen.getByRole('table')).toBeInTheDocument();
+    expect(screen.getAllByRole('row').length).toBeGreaterThan(1);
+    expect(screen.getByText('The list could not be refreshed.')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /Try again/ }));
     expect(onRetry).toHaveBeenCalled();
   });

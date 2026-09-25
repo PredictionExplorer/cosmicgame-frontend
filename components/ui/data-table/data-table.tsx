@@ -584,7 +584,10 @@ export function DataTable<T>({
       </div>
     ) : null;
 
-  if (error) {
+  // A failed read with nothing loaded replaces the table. A failed refresh (a
+  // poll, or a revisit's refetch, while the cache still holds rows) keeps the
+  // rows the reader is looking at and says so in one line above them.
+  if (error && data.length === 0) {
     return (
       <div ref={wrapperRef} className={className}>
         {header}
@@ -626,6 +629,16 @@ export function DataTable<T>({
     >
       {header}
       {notice}
+      {error ? (
+        <ErrorState
+          variant="inline"
+          title={errorTitle}
+          message={error}
+          onRetry={onRetry}
+          headingLevel={stateHeadingLevel}
+          className="mb-4"
+        />
+      ) : null}
       {toolbar}
 
       {currentRow !== undefined && !showSkeleton ? (
