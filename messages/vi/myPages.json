@@ -76,7 +76,8 @@
       },
       "participant": "Người tham gia",
       "loadErrorTitle": "Không tải được thống kê của địa chỉ này",
-      "loadErrorMessage": "Dịch vụ thống kê không phản hồi. Hãy thử lại sau ít phút."
+      "loadErrorMessage": "Dịch vụ thống kê không phản hồi. Hãy thử lại sau ít phút.",
+      "sectionLoadErrorTitle": "Phần này chưa tải được"
     },
     "figures": {
       "gestures": {

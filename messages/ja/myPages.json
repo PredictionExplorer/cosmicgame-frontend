@@ -76,7 +76,8 @@
       },
       "participant": "参加者",
       "loadErrorTitle": "このアドレスの統計を読み込めませんでした",
-      "loadErrorMessage": "統計サービスから応答がありませんでした。しばらくしてからもう一度お試しください。"
+      "loadErrorMessage": "統計サービスから応答がありませんでした。しばらくしてからもう一度お試しください。",
+      "sectionLoadErrorTitle": "このセクションを読み込めませんでした"
     },
     "figures": {
       "gestures": {

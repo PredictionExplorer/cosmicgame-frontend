@@ -1,4 +1,4 @@
-import { render, screen, checkA11y, within } from '@/test-utils';
+import { fireEvent, render, screen, checkA11y, within } from '@/test-utils';
 
 import UserStatisticsView from '../UserStatisticsView';
 
@@ -12,6 +12,7 @@ const mockUseUserBalance = jest.fn();
 const mockUseCSTTokensByUser = jest.fn();
 const mockUseMarketingRewardsByUser = jest.fn();
 const mockMarketingRewardsTable = jest.fn();
+const mockUseDepositDistributions = jest.fn();
 
 jest.mock('../../hooks/useApiQuery', () => ({
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
@@ -24,7 +25,8 @@ jest.mock('../../hooks/useApiQuery', () => ({
   useMarketingRewardsByUser: (...args: unknown[]) => mockUseMarketingRewardsByUser(...args),
   useAnchorDistributionsByUser: () => list,
   useCSTAnchorDistributionsRetrievedByUser: () => list,
-  useCSTAnchorDistributionsByUserByDeposit: () => list,
+  useCSTAnchorDistributionsByUserByDeposit: (...args: unknown[]) =>
+    mockUseDepositDistributions(...args),
   useRWLKAnchorImprintsByUser: () => list,
   useClaimedDonatedNFTByUser: () => list,
   useUnclaimedDonatedNFTByUser: () => list,
@@ -132,11 +134,13 @@ beforeEach(() => {
   });
   mockUseCSTTokensByUser.mockReturnValue(list);
   mockUseMarketingRewardsByUser.mockReturnValue(list);
+  mockUseDepositDistributions.mockReturnValue(list);
 });
 
 describe('UserStatisticsView', () => {
   it('shows the invalid-address header', () => {
-    render(<UserStatisticsView address="Invalid Address" isOwnProfile={false} />);
+    // The route passes null when its URL does not hold an address.
+    render(<UserStatisticsView address={null} isOwnProfile={false} />);
     expect(
       screen.getByRole('heading', { level: 1, name: 'myPages.statistics.page.invalidAddress' }),
     ).toBeInTheDocument();
@@ -204,6 +208,21 @@ describe('UserStatisticsView', () => {
     expect(
       screen.getByRole('heading', { level: 2, name: 'myPages.statistics.page.sections.artworks' }),
     ).toBeInTheDocument();
+  });
+
+  it('says an anchoring read failed, with a retry, never "no anchoring"', () => {
+    const refetch = jest.fn();
+    mockUseDepositDistributions.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      refetch,
+    });
+    render(<UserStatisticsView address={ADDRESS} isOwnProfile={false} />);
+    expect(screen.queryByTestId('user-anchoring-section')).not.toBeInTheDocument();
+    expect(screen.getByText('myPages.statistics.page.sectionLoadErrorTitle')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /try again|retry/i }));
+    expect(refetch).toHaveBeenCalledTimes(1);
   });
 
   it('holds the header at its loaded height while the reads arrive', () => {

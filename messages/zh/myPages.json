@@ -76,7 +76,8 @@
       },
       "participant": "参与者",
       "loadErrorTitle": "无法加载此地址的统计",
-      "loadErrorMessage": "统计服务暂未响应，请稍后重试。"
+      "loadErrorMessage": "统计服务暂未响应，请稍后重试。",
+      "sectionLoadErrorTitle": "此部分未能加载"
     },
     "figures": {
       "gestures": {

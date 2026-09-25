@@ -76,7 +76,8 @@
       },
       "participant": "Participant",
       "loadErrorTitle": "Statistics for this address could not be loaded",
-      "loadErrorMessage": "The statistics service did not respond. Try again in a moment."
+      "loadErrorMessage": "The statistics service did not respond. Try again in a moment.",
+      "sectionLoadErrorTitle": "This section did not load"
     },
     "figures": {
       "gestures": {

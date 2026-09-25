@@ -69,6 +69,11 @@ interface UserStatisticsViewProps {
   isOwnProfile: boolean;
 }
 
+/** Reads again every query of a section that failed; the ones that answered stay as they are. */
+function refetchFailed(queries: readonly { isError: boolean; refetch: () => Promise<unknown> }[]) {
+  for (const query of queries) if (query.isError) void query.refetch();
+}
+
 /** Wei balance string → whole tokens, or null when it cannot be read. */
 function tokenBalance(wei: string | undefined): number | null {
   try {
@@ -116,24 +121,24 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
   const marketingQuery = useMarketingRewardsByUser(address);
   const cstTokensQuery = useCSTTokensByUser(address);
   const anchorDistributionsQuery = useAnchorDistributionsByUser(address);
-  const { data: collectedCstStakingRewardsRaw = [] } =
-    useCSTAnchorDistributionsRetrievedByUser(address);
-  const { data: cstStakingRewardsByDepositRaw = [] } =
-    useCSTAnchorDistributionsByUserByDeposit(address);
-  const { data: rwlkImprints = [] } = useRWLKAnchorImprintsByUser(address);
+  const retrievedDistributionsQuery = useCSTAnchorDistributionsRetrievedByUser(address);
+  const distributionsByDepositQuery = useCSTAnchorDistributionsByUserByDeposit(address);
+  const rwlkImprintsQuery = useRWLKAnchorImprintsByUser(address);
   const claimedNFTsQuery = useClaimedDonatedNFTByUser(address);
   const unclaimedNFTsQuery = useUnclaimedDonatedNFTByUser(address);
   const erc20Query = useDonationsERC20ByUser(address);
 
-  const { data: cstAnchorActions = [], isLoading: loadingCSTActions } = cstAnchorActionsQuery;
-  const { data: rwlkAnchorActions = [], isLoading: loadingRWLKActions } = rwlkAnchorActionsQuery;
+  const { data: cstAnchorActions = [] } = cstAnchorActionsQuery;
+  const { data: rwlkAnchorActions = [] } = rwlkAnchorActionsQuery;
   const { data: marketingRewardsRaw = [], isLoading: loadingMarketing } = marketingQuery;
   const { data: cstListRaw = [], isLoading: loadingCST } = cstTokensQuery;
-  const { data: cstStakingRewardsRaw = [], isLoading: loadingStakingRewards } =
-    anchorDistributionsQuery;
+  const { data: cstStakingRewardsRaw = [] } = anchorDistributionsQuery;
   const { data: claimedNFTsRaw = [], isLoading: loadingClaimedNFTs } = claimedNFTsQuery;
   const { data: unclaimedNFTsRaw = [], isLoading: loadingUnclaimedNFTs } = unclaimedNFTsQuery;
   const { data: erc20Raw = [], isLoading: loadingERC20 } = erc20Query;
+  const { data: collectedCstStakingRewardsRaw = [] } = retrievedDistributionsQuery;
+  const { data: cstStakingRewardsByDepositRaw = [] } = distributionsByDepositQuery;
+  const { data: rwlkImprints = [] } = rwlkImprintsQuery;
 
   const userInfoRaw = userInfoQuery.data;
   const gestureHistory = useMemo(() => userInfoRaw?.Gestures ?? [], [userInfoRaw]);
@@ -237,13 +242,24 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
   }
 
   const headerLoading = userInfoQuery.isLoading || claimsQuery.isLoading || loadingBalance;
+  // Every read behind the anchoring section: it shows once all of them have answered, and
+  // says so (with a retry) when one failed, rather than reading the failure as "never anchored".
+  const anchoringQueries = [
+    cstAnchorActionsQuery,
+    rwlkAnchorActionsQuery,
+    anchorDistributionsQuery,
+    retrievedDistributionsQuery,
+    distributionsByDepositQuery,
+    rwlkImprintsQuery,
+  ];
+  const anchoringLoading = anchoringQueries.some((query) => query.isLoading);
+  const anchoringFailed = anchoringQueries.some((query) => query.isError);
+  const attachedNftQueries = [unclaimedNFTsQuery, claimedNFTsQuery];
   const anyLoading =
     userInfoQuery.isLoading ||
     claimsQuery.isLoading ||
     loadingCST ||
-    loadingCSTActions ||
-    loadingRWLKActions ||
-    loadingStakingRewards ||
+    anchoringLoading ||
     loadingMarketing ||
     loadingClaimedNFTs ||
     loadingUnclaimedNFTs ||
@@ -268,12 +284,9 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
     userInfoQuery,
     claimsQuery,
     cstTokensQuery,
-    cstAnchorActionsQuery,
-    rwlkAnchorActionsQuery,
-    anchorDistributionsQuery,
+    ...anchoringQueries,
     marketingQuery,
-    claimedNFTsQuery,
-    unclaimedNFTsQuery,
+    ...attachedNftQueries,
     erc20Query,
   ].some((query) => query.isError);
   const allEmpty = !anyLoading && !hasActivity && !anyFailed;
@@ -333,6 +346,8 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
               tokens={cstListRaw ?? []}
               anchored={anchoredArtworks(anchoredTokens)}
               loading={loadingCST}
+              error={cstTokensQuery.isError}
+              onRetry={() => void cstTokensQuery.refetch()}
             />
           </SectionShell>
 
@@ -365,12 +380,17 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
             />
           </SectionShell>
 
-          <SectionShell
-            title={t('statistics.page.sections.anchoring')}
-            busy={loadingCSTActions || loadingRWLKActions || loadingStakingRewards}
-          >
-            {loadingCSTActions || loadingRWLKActions || loadingStakingRewards ? (
+          <SectionShell title={t('statistics.page.sections.anchoring')} busy={anchoringLoading}>
+            {anchoringLoading ? (
               <SkeletonTable rows={4} columns={4} />
+            ) : anchoringFailed ? (
+              <ErrorState
+                headingLevel={3}
+                variant="inline"
+                title={t('statistics.page.sectionLoadErrorTitle')}
+                message={t('statistics.page.loadErrorMessage')}
+                onRetry={() => refetchFailed(anchoringQueries)}
+              />
             ) : (
               <UserAnchoringSection
                 address={address}
@@ -398,6 +418,10 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
               donatedERC20={donatedERC20List}
               loadingNFTs={loadingUnclaimedNFTs || loadingClaimedNFTs}
               loadingERC20={loadingERC20}
+              nftsError={attachedNftQueries.some((query) => query.isError)}
+              onRetryNFTs={() => refetchFailed(attachedNftQueries)}
+              erc20Error={erc20Query.isError}
+              onRetryERC20={() => void erc20Query.refetch()}
               canClaim={canClaim}
               isClaiming={isClaiming.donatedNFT}
               claimingDonatedNFTs={claimingDonatedNFTs}

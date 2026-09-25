@@ -1,4 +1,4 @@
-import { render, screen, checkA11y } from '@/test-utils';
+import { fireEvent, render, screen, checkA11y } from '@/test-utils';
 
 import { DonatedAssetsSection, type DonatedAssetsSectionProps } from '../DonatedAssetsSection';
 
@@ -141,6 +141,43 @@ describe('DonatedAssetsSection', () => {
     } as unknown as DonatedAssetsSectionProps['unclaimedNFTs'][0];
     render(<DonatedAssetsSection {...defaultProps} unclaimedNFTs={[nft]} />);
     expect(screen.getByTestId('attached-nft-table')).toHaveTextContent('nfts: 1');
+  });
+
+  it('says a failed NFT read failed, with a retry, and hides Retrieve all', () => {
+    const onRetryNFTs = jest.fn();
+    const nft = {
+      Index: 0,
+      RecordId: '1',
+    } as unknown as DonatedAssetsSectionProps['unclaimedNFTs'][0];
+    render(
+      <DonatedAssetsSection
+        {...defaultProps}
+        unclaimedNFTs={[nft]}
+        nftsError
+        onRetryNFTs={onRetryNFTs}
+      />,
+    );
+    expect(
+      screen.queryByText('myPages.statistics.donatedAssets.nfts.emptyTitle'),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('myPages.statistics.donatedAssets.nfts.claimAll'),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText('myPages.statistics.page.sectionLoadErrorTitle')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /try again|retry/i }));
+    expect(onRetryNFTs).toHaveBeenCalledTimes(1);
+  });
+
+  it('says a failed ERC-20 read failed instead of "no tokens"', () => {
+    render(<DonatedAssetsSection {...defaultProps} erc20Error onRetryERC20={noop} />);
+    expect(
+      screen.queryByText('myPages.statistics.donatedAssets.erc20.emptyTitle'),
+    ).not.toBeInTheDocument();
+    // The NFT list answered, so it keeps its own (empty) state.
+    expect(
+      screen.getByText('myPages.statistics.donatedAssets.nfts.emptyTitle'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('myPages.statistics.page.sectionLoadErrorTitle')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

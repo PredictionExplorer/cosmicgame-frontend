@@ -9,6 +9,7 @@ import { ChainGuard } from '@/components/wallet/NetworkGuard';
 import { Badge } from '@/components/ui/badge';
 import { SkeletonTable } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import AttachedNFTTable from '@/components/attachments/AttachedNFTTable';
 import AttachedERC20Table from '@/components/attachments/AttachedERC20Table';
@@ -22,6 +23,16 @@ export interface DonatedAssetsSectionProps {
   donatedERC20: DonatedERC20Token[];
   loadingNFTs: boolean;
   loadingERC20: boolean;
+  /**
+   * A read of the attached NFTs (either list) failed: the ledger says so with
+   * a retry, never "nothing attached", which would also hide the retrieve
+   * action on the address's own page.
+   */
+  nftsError?: boolean;
+  onRetryNFTs?: () => void;
+  /** The attached ERC-20 read failed. */
+  erc20Error?: boolean;
+  onRetryERC20?: () => void;
   canClaim: boolean;
   isClaiming: boolean;
   claimingDonatedNFTs: number[];
@@ -78,6 +89,10 @@ export function DonatedAssetsSection({
   donatedERC20,
   loadingNFTs,
   loadingERC20,
+  nftsError = false,
+  onRetryNFTs,
+  erc20Error = false,
+  onRetryERC20,
   canClaim,
   isClaiming,
   claimingDonatedNFTs,
@@ -101,7 +116,7 @@ export function DonatedAssetsSection({
             : null
         }
         action={
-          unclaimedNFTs.length > 0 && canClaim ? (
+          unclaimedNFTs.length > 0 && canClaim && !nftsError ? (
             // On another network the action becomes "Switch to …" before anything is sent.
             <ChainGuard explain={false}>
               <Button onClick={onClaimAllNFTs} loading={isClaiming} size="sm">
@@ -113,6 +128,14 @@ export function DonatedAssetsSection({
       >
         {loadingNFTs ? (
           <SkeletonTable rows={3} columns={4} />
+        ) : nftsError ? (
+          <ErrorState
+            headingLevel={4}
+            variant="inline"
+            title={t('statistics.page.sectionLoadErrorTitle')}
+            message={t('statistics.page.loadErrorMessage')}
+            onRetry={onRetryNFTs}
+          />
         ) : allNFTs.length === 0 ? (
           <EmptyState
             headingLevel={4}
@@ -139,7 +162,7 @@ export function DonatedAssetsSection({
             : null
         }
         action={
-          unclaimedERC20Count > 0 && canClaim ? (
+          unclaimedERC20Count > 0 && canClaim && !erc20Error ? (
             <ChainGuard explain={false}>
               <Button onClick={onClaimAllERC20} size="sm">
                 {t('statistics.donatedAssets.erc20.claimAll')}
@@ -150,6 +173,14 @@ export function DonatedAssetsSection({
       >
         {loadingERC20 ? (
           <SkeletonTable rows={3} columns={4} />
+        ) : erc20Error ? (
+          <ErrorState
+            headingLevel={4}
+            variant="inline"
+            title={t('statistics.page.sectionLoadErrorTitle')}
+            message={t('statistics.page.loadErrorMessage')}
+            onRetry={onRetryERC20}
+          />
         ) : donatedERC20.length === 0 ? (
           <EmptyState
             headingLevel={4}

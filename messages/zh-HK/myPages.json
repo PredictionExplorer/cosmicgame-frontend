@@ -76,7 +76,8 @@
       },
       "participant": "參與者",
       "loadErrorTitle": "無法載入此地址的統計",
-      "loadErrorMessage": "統計服務暫未回應，請稍後再試。"
+      "loadErrorMessage": "統計服務暫未回應，請稍後再試。",
+      "sectionLoadErrorTitle": "此部分未能載入"
     },
     "figures": {
       "gestures": {
