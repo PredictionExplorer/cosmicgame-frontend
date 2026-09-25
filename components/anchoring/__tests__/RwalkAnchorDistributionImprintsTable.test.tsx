@@ -7,6 +7,8 @@ import { RwalkAnchorDistributionImprintsTable } from '../RwalkAnchorDistribution
 const mockUseCSTInfo = jest.fn();
 const mockUseCSTList = jest.fn();
 jest.mock('@/hooks/useApiQuery', () => ({
+  // The live cycle behind every cycle link (useCycleHref).
+  useDashboardInfo: () => ({ data: { CurRoundNum: 99 } }),
   useCSTInfo: (tokenId: number | null) => mockUseCSTInfo(tokenId),
   useCSTList: (options: { enabled?: boolean }) => mockUseCSTList(options),
 }));
@@ -53,7 +55,7 @@ describe('RwalkAnchorDistributionImprintsTable', () => {
     expect(document.querySelector(`a[href="/user/${RECIPIENT}"]`)).toBeInTheDocument();
     // A cycle reads as a word-sized link, never a bare "1".
     expect(
-      screen.getAllByRole('link', { name: 'common.pageHeader.crumbs.cycle(cycle=1)' })[0],
+      screen.getAllByRole('link', { name: 'tables.allocation.cycle(cycle=1)' })[0],
     ).toHaveAttribute('href', '/allocation/1');
     expect(document.querySelector('a[href*="0ximprint"]')).toHaveAttribute('target', '_blank');
   });

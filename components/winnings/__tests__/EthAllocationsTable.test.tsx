@@ -39,7 +39,7 @@ describe('EthAllocationsTable', () => {
 
     const [first, second] = bodyRows();
     expect(
-      within(first!).getByRole('link', { name: /ethAllocations\.cycle\(cycle=3\)/ }),
+      within(first!).getByRole('link', { name: /tables\.allocation\.cycle\(cycle=3\)/ }),
     ).toHaveAttribute('href', '/allocation/3');
     expect(first).toHaveTextContent('myPages.ethAllocations.sources.chronoWarrior');
     expect(second).toHaveTextContent('myPages.ethAllocations.sources.stellarSelection');
@@ -78,8 +78,8 @@ describe('EthAllocationsTable', () => {
   it('marks what was retrieved when the status column is on', () => {
     render(<EthAllocationsTable rows={rows} ariaLabel="ETH allocations" showStatus />);
     const [retrieved, waiting] = bodyRows();
-    expect(retrieved).toHaveTextContent('myPages.ethAllocations.status.retrieved');
-    expect(waiting).toHaveTextContent('myPages.ethAllocations.status.waiting');
+    expect(retrieved).toHaveTextContent('tables.recipientHistory.retrieved');
+    expect(waiting).toHaveTextContent('tables.recipientHistory.readyToRetrieve');
   });
 
   it('renders the designed empty state instead of an empty table', () => {

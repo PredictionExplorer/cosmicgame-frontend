@@ -18,7 +18,10 @@ function openMenu() {
 }
 
 describe('NFTShareMenu', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockCopy.mockResolvedValue(true);
+  });
 
   it('copies the image link and confirms it', async () => {
     render(<NFTShareMenu imageUrl="https://media/0xabc.png" videoUrl="https://media/0xabc.mp4" />);
@@ -33,11 +36,12 @@ describe('NFTShareMenu', () => {
   });
 
   // useClipboard resolves false when the browser refused the write.
-  it('never confirms a copy that failed', async () => {
+  it('never confirms a copy that failed, and says it failed', async () => {
     mockCopy.mockResolvedValueOnce(false);
     render(<NFTShareMenu imageUrl="https://media/0xabc.png" />);
     openMenu();
     fireEvent.click(await screen.findByRole('menuitem', { name: 'detail.share.copyImageLink' }));
+    await waitFor(() => expect(mockCopy).toHaveBeenCalled());
     await waitFor(() =>
       expect(mockSetNotification).toHaveBeenCalledWith({
         text: 'detail.share.copyFailed',
@@ -46,7 +50,7 @@ describe('NFTShareMenu', () => {
       }),
     );
     expect(mockSetNotification).not.toHaveBeenCalledWith(
-      expect.objectContaining({ text: 'common.actions.copied' }),
+      expect.objectContaining({ type: 'success' }),
     );
   });
 

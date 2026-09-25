@@ -46,9 +46,14 @@ async function expectZhLabelTooltip(page: Page, label: string, expected: RegExp)
 }
 
 /** A word that explains itself (Term, ExplainedTerm): the word is the trigger. */
-async function expectZhTermTooltip(page: Page, label: string, expected: RegExp): Promise<void> {
+async function expectZhTermTooltip(
+  page: Page,
+  label: string,
+  expected: RegExp,
+  scope: Page | Locator = page,
+): Promise<void> {
   await dismissOpenTooltips(page);
-  const trigger = page.getByRole('button', { name: label, exact: true }).first();
+  const trigger = scope.getByRole('button', { name: label, exact: true }).first();
   await trigger.scrollIntoViewIfNeeded();
   await openTooltip(trigger);
   await expectTooltipFullyVisible(page, expected);
@@ -86,7 +91,8 @@ test.describe('zh Sprint 4 — transactions and holdings routes', () => {
       page.getByRole('heading', { level: 1, name: `第 ${SPRINT4_MOCK_CYCLE} 个周期` }),
     ).toBeVisible();
     await expect(page.getByRole('heading', { name: '周期获配者' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: '周期统计' })).toBeVisible();
+    // The story first (recipients, split and facts), then every allocation record.
+    await expect(page.getByRole('heading', { name: '本周期全部分配' })).toBeVisible();
   });
 
   test('/zh/allocation-finalized renders localized retrieval details and metadata', async ({
@@ -127,7 +133,9 @@ test.describe('zh Sprint 4 — transactions and holdings routes', () => {
     await expect(
       page.getByRole('heading', { level: 1, name: `锚定操作 #${SPRINT4_MOCK_ACTION_ID}` }),
     ).toBeVisible();
-    await expect(page.getByText('Cosmic Signature NFT 锚定操作', { exact: true })).toBeVisible();
+    // The status sits under the H1; the record names the holder and the transaction.
+    await expect(page.getByRole('heading', { level: 2, name: '记录' })).toBeVisible();
+    await expect(page.getByText('交易', { exact: true })).toBeVisible();
     await expect(page.getByRole('heading', { level: 2, name: '时间线' })).toBeVisible();
   });
 
@@ -226,15 +234,20 @@ test.describe('zh Sprint 4 — transactions and holdings routes', () => {
       }),
     ).toBeVisible();
     await expect(page.getByText('锚定派发（ETH）', { exact: true }).first()).toBeVisible();
+    // Where its anchor stands, said once beside the plate.
+    await expect(page.getByText('仍在锚定中', { exact: true })).toBeVisible();
   });
 
   test('opens representative Chinese allocation tooltips', async ({ page }) => {
     await openZhRoute(page, '/zh/allocation', '分配名录 · Cosmic Signature');
     // The triggers answer only once the page has hydrated, as in the English tooltip specs.
     await page.waitForLoadState('networkidle');
-    await expectZhLabelTooltip(page, '周期储备分配', /ETH 储备如何沿协议各条轨道分配/);
-    // A split legend entry explains itself: the track's name is the trigger.
-    await expectZhTermTooltip(page, '签名分配', /完成收官之笔的参与者取回/);
+    // The split is a constant, explained in one sentence under its heading, after the ledger.
+    const split = page.getByRole('region', { name: '周期储备分配' });
+    await expect(split.getByText('ETH 储备如何沿协议各条轨道分配', { exact: false })).toBeVisible();
+    // A split legend entry explains itself: the track's name is the trigger (the ledger's
+    // column headers, above it, name the same tracks).
+    await expectZhTermTooltip(page, '签名分配', /完成收官之笔的参与者取回/, split);
   });
 
   test('opens representative Chinese anchoring tooltips', async ({ page }) => {
@@ -253,16 +266,49 @@ test.describe('zh Sprint 4 — transactions and holdings routes', () => {
     );
   });
 
-  test('shows an end-user-visible Chinese Sonner toast', async ({ page }) => {
+  test('shows an end-user-visible Chinese Sonner toast', async ({ page, context }) => {
+    // Without a share sheet, the button copies the page link and says so only once it did.
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, 'share', { value: undefined, configurable: true });
+    });
+    await openZhRoute(
+      page,
+      `/zh/allocation/${SPRINT4_MOCK_CYCLE}`,
+      `第 ${SPRINT4_MOCK_CYCLE} 个周期分配详情 · Cosmic Signature`,
+    );
+    await page.getByRole('button', { name: '复制链接' }).click();
+    await expect(
+      page.locator('[data-sonner-toast]').filter({ hasText: '链接已复制' }),
+    ).toBeVisible();
+  });
+
+  test('shares a cycle through the system share sheet where there is one', async ({ page }) => {
+    await page.addInitScript(() => {
+      const shared: ShareData[] = [];
+      Object.defineProperty(window, '__shared', { value: shared });
+      Object.defineProperty(navigator, 'share', {
+        value: async (data: ShareData) => {
+          shared.push(data);
+        },
+        configurable: true,
+      });
+    });
     await openZhRoute(
       page,
       `/zh/allocation/${SPRINT4_MOCK_CYCLE}`,
       `第 ${SPRINT4_MOCK_CYCLE} 个周期分配详情 · Cosmic Signature`,
     );
     await page.getByRole('button', { name: '分享周期摘要' }).click();
-    await expect(
-      page.locator('[data-sonner-toast]').filter({ hasText: '周期摘要已复制到剪贴板' }),
-    ).toBeVisible();
+    await expect
+      .poll(() =>
+        page.evaluate(() => (window as unknown as { __shared: ShareData[] }).__shared.length),
+      )
+      .toBe(1);
+    const [shared] = await page.evaluate(
+      () => (window as unknown as { __shared: ShareData[] }).__shared,
+    );
+    expect(shared?.url).toContain(`/zh/allocation/${SPRINT4_MOCK_CYCLE}`);
   });
 });
 

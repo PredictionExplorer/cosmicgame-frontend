@@ -8,6 +8,10 @@
     "subtitle": "What the protocol has set aside for this wallet, and one place to retrieve it all.",
     "loadErrorTitle": "Couldn’t load your allocations",
     "loadErrorMessage": "Your pending allocations could not be loaded. Try again in a moment.",
+    "anchorLoadError": {
+      "title": "Your Anchor Distributions could not be loaded",
+      "message": "The Anchor Distributions held for this wallet are temporarily unavailable. Try again in a moment."
+    },
     "summary": {
       "title": "Ready to retrieve",
       "description": "One transaction retrieves the ETH, attached NFTs and attached tokens held for this wallet.",
@@ -17,7 +21,7 @@
       "anchor": "Anchor Distributions",
       "cycles": "{count, plural, one {From # cycle} other {From # cycles}}",
       "anchorCaption": "Retrieved separately below",
-      "retrieveEverything": "Retrieve everything",
+      "retrieveEverything": "Retrieve ETH, NFTs and tokens",
       "retrieveBy": "Retrieve by <date></date>. After that, anyone can retrieve it.",
       "expired": "The deadline passed on <date></date>. You can still retrieve these until someone else does.",
       "success": "Everything is retrieved to your wallet."
@@ -34,7 +38,13 @@
       "nfts": "Attached NFTs",
       "erc20": "Attached ERC-20 tokens"
     },
-    "retrieveAll": "Retrieve all"
+    "retrieveAll": "Retrieve all",
+    "lookup": {
+      "label": "Look up any address",
+      "hint": "Allocations are public: see what any address has received.",
+      "submit": "Look up",
+      "invalid": "Enter a full address: 0x followed by 40 hexadecimal characters (0–9, a–f)."
+    }
   },
   "anchors": {
     "title": "My anchors",

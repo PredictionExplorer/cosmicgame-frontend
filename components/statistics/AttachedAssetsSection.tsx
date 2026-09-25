@@ -149,7 +149,7 @@ export function AttachedAssetsSection({ currentRoundNum }: AttachedAssetsSection
               onRetry={() => erc20Query.refetch()}
             />
           ) : (
-            <AttachedERC20Table list={erc20Tokens} handleClaim={null} />
+            <AttachedERC20Table list={erc20Tokens} />
           )}
         </TabsContent>
       </Tabs>

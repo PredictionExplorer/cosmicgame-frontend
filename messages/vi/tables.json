@@ -214,6 +214,7 @@
     "columns": {
       "finalized": "Hoàn tất lúc",
       "signature": "Phân bổ Signature",
+      "signatureRecipient": "Người nhận phân bổ Signature",
       "signatureEth": "Phân bổ Signature (ETH)",
       "chrono": "Chiến binh Thời gian",
       "chronoEth": "Chiến binh Thời gian (ETH)",

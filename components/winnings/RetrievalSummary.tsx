@@ -22,8 +22,12 @@ import { deadlineState, type RetrievalPlan } from '@/utils/allocationRetrieval';
 export interface RetrievalSummaryProps {
   /** What one transaction would retrieve; `null` while the lists load. */
   plan: RetrievalPlan | null;
-  /** Unretrieved Anchor Distribution ETH (retrieved from its own section), or `null` if unknown. */
-  anchorAmount: number | null;
+  /**
+   * Unretrieved Anchor Distribution ETH (retrieved from its own section):
+   * `undefined` while it loads (a skeleton), `null` when it could not be read
+   * (the unknown dash), never a confident 0 on a guess.
+   */
+  anchorAmount: number | null | undefined;
   /** The next retrieval deadline among the items, in Unix seconds. */
   deadline: number | null;
   /** The one-transaction retrieval is running. */
@@ -37,10 +41,10 @@ export interface RetrievalSummaryProps {
 /**
  * The top of My Allocations: what is ready to retrieve (ETH, attached NFTs,
  * attached tokens and Anchor Distributions) in one figure row, the next
- * deadline, and the page's one commit action, "Retrieve everything", which
- * retrieves the ETH and attached assets in a single transaction. Anchor
- * Distributions are paid by the anchoring contract, so they keep their own
- * section below.
+ * deadline, and the page's one commit action, which retrieves the ETH and
+ * attached assets in a single transaction and says so ("Retrieve ETH, NFTs
+ * and tokens"). Anchor Distributions are paid by the anchoring contract, so
+ * their figure says they are retrieved separately, in their own section.
  */
 export function RetrievalSummary({
   plan,
@@ -89,9 +93,13 @@ export function RetrievalSummary({
       id: 'anchor',
       label: t('allocations.summary.anchor'),
       value:
-        anchorAmount === null ? null : <Amount value={anchorAmount} unit="ETH" context="hero" />,
+        anchorAmount === undefined ? (
+          pending('w-28')
+        ) : anchorAmount === null ? null : (
+          <Amount value={anchorAmount} unit="ETH" context="hero" />
+        ),
       caption:
-        anchorAmount !== null && anchorAmount > 0 ? (
+        typeof anchorAmount === 'number' && anchorAmount > 0 ? (
           <a href="#anchors" className="link-quiet">
             {t('allocations.summary.anchorCaption')}
           </a>

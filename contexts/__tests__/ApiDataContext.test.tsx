@@ -66,6 +66,72 @@ const wrapper = ({ children }: { children: ReactNode }) => (
 );
 
 describe('ApiDataContext', () => {
+  describe('unretrievedAnchorEth', () => {
+    it('is unknown while the notice loads, never the initial 0', () => {
+      mockUseNotifyRedBox.mockReturnValue({ isLoading: true, refetch: mockRefetchRedBox });
+      const { result } = renderHook(() => useApiData(), { wrapper });
+      expect(result.current.unretrievedAnchorEth).toBeUndefined();
+    });
+
+    it('is the notice figure, read straight from the notice', () => {
+      mockUseNotifyRedBox.mockReturnValue({
+        data: { UnretrievedAnchorDistribution: 0.25 },
+        refetch: mockRefetchRedBox,
+      });
+      mockUseCSTAnchorDistributionsToRetrieveByUser.mockReturnValue({
+        data: [],
+        refetch: mockRefetchRewards,
+      });
+      const { result } = renderHook(() => useApiData(), { wrapper });
+      expect(result.current.unretrievedAnchorEth).toBe(0.25);
+    });
+
+    it('is 0 for a wallet the indexer has not seen yet, never unknown', () => {
+      // notify_red_box maps the production `Winnings: []` answer to a notice of zeros.
+      mockUseNotifyRedBox.mockReturnValue({
+        data: {
+          ETHRaffleToClaim: 0,
+          ETHRaffleToClaimWei: 0,
+          NumDonatedNFTToClaim: 0,
+          UnretrievedAnchorDistribution: 0,
+        },
+        refetch: mockRefetchRedBox,
+      });
+      mockUseCSTAnchorDistributionsToRetrieveByUser.mockReturnValue({
+        data: [],
+        refetch: mockRefetchRewards,
+      });
+      const { result } = renderHook(() => useApiData(), { wrapper });
+      expect(result.current.unretrievedAnchorEth).toBe(0);
+    });
+
+    it('is null when the read returned no notice at all', () => {
+      mockUseNotifyRedBox.mockReturnValue({ data: null, refetch: mockRefetchRedBox });
+      mockUseCSTAnchorDistributionsToRetrieveByUser.mockReturnValue({
+        data: [],
+        refetch: mockRefetchRewards,
+      });
+      const { result } = renderHook(() => useApiData(), { wrapper });
+      expect(result.current.unretrievedAnchorEth).toBeNull();
+    });
+
+    it('is null when the notice or the reward list could not be read, and retries both', () => {
+      mockUseCSTAnchorDistributionsToRetrieveByUser.mockReturnValue({
+        isError: true,
+        refetch: mockRefetchRewards,
+      });
+      mockUseNotifyRedBox.mockReturnValue({
+        data: { UnretrievedAnchorDistribution: 0 },
+        refetch: mockRefetchRedBox,
+      });
+      const { result } = renderHook(() => useApiData(), { wrapper });
+      expect(result.current.unretrievedAnchorEth).toBeNull();
+      act(() => result.current.retryAnchorRead());
+      expect(mockRefetchRedBox).toHaveBeenCalled();
+      expect(mockRefetchRewards).toHaveBeenCalled();
+    });
+  });
+
   it('provides default apiData values', () => {
     const { result } = renderHook(() => useApiData(), { wrapper });
     expect(result.current.apiData).toEqual({

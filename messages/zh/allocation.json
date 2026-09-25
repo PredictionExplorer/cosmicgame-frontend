@@ -10,12 +10,12 @@
       "scope": "仅显示已收官周期记录",
       "scopeTooltip": "本页仅汇总周期 API 中已收官的演绎周期；待收官周期及不属于这些周期的分配取回记录不计入统计。"
     },
-    "intro": "周期收官后，写下收官之笔的参与者会取回签名分配——{percentage}% 的周期储备、1,000 CST 与一枚专属 Cosmic Signature NFT。其他分配则通过时之勇士、星选、锚定派发、公共物品与滚动储备等轨道流转。",
     "reserveSplit": {
       "label": "周期储备分配",
       "tooltip": "这些百分比表示周期收官后，ETH 储备如何沿协议各条轨道分配。"
     },
-    "ledgerTitle": "已收官周期"
+    "ledgerTitle": "已收官周期",
+    "loadError": "已收官的周期暂时无法加载，请稍后重试。"
   },
   "details": {
     "navigation": {
@@ -27,12 +27,10 @@
       "recipient": "获配者"
     },
     "share": {
-      "summary": "Cosmic Signature · 第 {cycle} 个周期\n签名分配：{amount} ETH\n获配者：{recipient}\n落笔次数：{gestures}\n{url}",
-      "success": "周期摘要已复制到剪贴板"
-    },
-    "invalid": {
-      "title": "周期编号无效",
-      "help": "周期编号必须为正整数。"
+      "summary": "Cosmic Signature · 第 {cycle} 个周期\n签名分配：{amount} ETH\n获配者：{recipient}\n落笔次数：{gestures}",
+      "copyLink": "复制链接",
+      "linkCopied": "链接已复制",
+      "failed": "无法复制链接"
     },
     "error": {
       "title": "无法加载该周期",
@@ -73,8 +71,6 @@
       "total": "本周期共发放 {amount} ETH"
     },
     "statistics": {
-      "title": "周期统计",
-      "tooltip": "汇总本周期活动与分配流向的关键指标。",
       "cards": {
         "signatureEth": {
           "label": "签名分配（ETH）",
@@ -98,7 +94,7 @@
           "tooltip": "本周期内拥有已锚定 NFT 的独立地址数量。"
         },
         "totalContributed": {
-          "label": "ETH 贡献",
+          "label": "直接贡献",
           "tooltip": "本周期来自社区的直接 ETH 贡献。"
         }
       }
@@ -113,17 +109,19 @@
       "tabs": {
         "gestures": "落笔历史",
         "endurance": "坚守冠军",
-        "stellar": "星选",
         "anchoring": "锚定派发",
         "contributions": "贡献"
       },
       "empty": {
         "gestures": "本周期暂无落笔记录。",
         "endurance": "本周期暂无坚守冠军数据。",
-        "stellar": "本周期暂无星选获配者。",
         "anchoring": "本周期暂无锚定派发。",
         "nfts": "本周期没有随落笔附加的 NFT。",
         "erc20": "本周期没有随落笔附加的 ERC-20 代币。"
+      },
+      "error": {
+        "title": "无法加载此列表",
+        "message": "列表暂时无法获取，请稍后重试。"
       },
       "contributions": {
         "nfts": "已附加 NFT",
@@ -135,6 +133,10 @@
   },
   "art": {
     "failed": "无法加载作品"
+  },
+  "split": {
+    "label": "{label}：{items}",
+    "item": "{track} {share}"
   },
   "missingCycle": {
     "open": {
@@ -172,16 +174,16 @@
     "links": {
       "viewCycle": "查看第 {cycle} 个周期",
       "myAllocations": "我的分配",
-      "allCycles": "全部周期"
+      "allCycles": "全部周期",
+      "cycles": "其他周期"
     },
     "result": {
       "title": "第 {cycle} 个周期的签名分配",
       "successTitle": "恭喜！你获得了第 {cycle} 个周期的签名分配",
       "lede": "周期收官时，写下收官之笔的参与者获得的签名分配。",
+      "allocation": "分配",
       "successLede": "你写下了第 {cycle} 个周期的收官之笔。ETH、CST 和这枚 Cosmic Signature 已在你的钱包中。",
       "componentsTitle": "分配包含的内容",
-      "eth": "ETH",
-      "cst": "CST",
       "nft": "Cosmic Signature NFT",
       "attached": "已附加 NFT",
       "recipient": "获配者",

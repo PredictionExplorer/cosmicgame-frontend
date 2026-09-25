@@ -54,7 +54,8 @@
   "steps": {
     "anchor": {
       "title": "锚定你的 NFT",
-      "body": "在<link>我的锚定</link>中，从钱包里选择 Cosmic Signature 或 Random Walk NFT。第一次操作时，钱包会先请你授权该系列的锚定合约，然后再确认锚定。"
+      "body": "在<link>我的锚定</link>中，从钱包里选择 Cosmic Signature 或 Random Walk NFT。第一次操作时，钱包会先请你授权该系列的锚定合约，然后再确认锚定。",
+      "bodyHere": "连接钱包，然后选择要锚定的 Cosmic Signature 或 Random Walk NFT。第一次操作时，钱包会先请你授权该系列的锚定合约，然后再确认锚定。"
     },
     "receive": {
       "title": "每个周期获得派发",
@@ -142,7 +143,8 @@
     },
     "imprints": {
       "title": "锚定 NFT 星选铭刻",
-      "description": "每个周期选出 {count} 枚已锚定的 Random Walk NFT。每次星选都会向其锚定者铭刻一枚 Cosmic Signature NFT 和 {cst, number} CST。"
+      "description": "每个周期选出 {count} 枚已锚定的 Random Walk NFT。每次星选都会向其锚定者铭刻一枚 Cosmic Signature NFT 和 {cst, number} CST。",
+      "selections": "{count, plural, other {# 次星选}}"
     }
   },
   "picker": {
@@ -159,6 +161,10 @@
     "accrued": "已累计 {amount}",
     "cycle": "第 {cycle} 个周期",
     "open": "打开 {title}",
+    "loadError": {
+      "title": "无法加载这些 NFT",
+      "message": "列表暂时无法获取，请稍后重试。"
+    },
     "settled": {
       "anchored": "已锚定 · 更新中",
       "released": "已解锚 · 更新中"
@@ -184,7 +190,6 @@
   },
   "anchorActionDetail": {
     "title": "锚定操作 #{id}",
-    "subtitle": "{token} NFT 锚定操作",
     "errorTitle": "无法加载该锚定操作",
     "error": "锚定记录暂时无法获取，请稍后重试。",
     "breadcrumbs": {
@@ -196,16 +201,10 @@
       "browse": "浏览锚定派发",
       "statistics": "锚定统计"
     },
-    "token": {
-      "labels": {
-        "randomWalk": "Random Walk",
-        "cosmicSignature": "Cosmic Signature"
-      }
-    },
     "record": {
       "title": "记录",
       "holder": "锚定者",
-      "token": "代币"
+      "transaction": "交易"
     },
     "timeline": {
       "title": "时间线",
@@ -237,16 +236,14 @@
       "unretrievedCaption": "解锚时取回"
     },
     "details": {
-      "anchorTitle": "锚定",
-      "releaseTitle": "解锚",
       "anchoredDatetime": "锚定时间",
       "releasedDatetime": "解锚时间",
-      "anchoredNfts": "锚定总数",
       "distribution": "已取回",
-      "action": "锚定操作",
-      "stillAnchored": "仍在锚定中：ETH 将在解锚时取回。",
-      "show": "显示锚定",
-      "hide": "隐藏锚定"
+      "action": "锚定操作"
+    },
+    "anchor": {
+      "status": "状态",
+      "notAnchored": "此地址未锚定该 NFT"
     },
     "columns": {
       "depositDatetime": "存入时间",
@@ -258,7 +255,8 @@
     "empty": {
       "title": "该 NFT 暂无锚定派发",
       "description": "NFT 处于锚定状态时，每个周期收官后都会在这里新增一笔存入。",
-      "action": "浏览锚定派发"
+      "action": "浏览锚定派发",
+      "viewAction": "查看锚定操作 #{id}"
     }
   },
   "tables": {
@@ -317,8 +315,7 @@
         "depositDatetime": "存入时间",
         "totalAnchoredTokens": "已锚定 NFT",
         "totalDepositedEth": "存入总额（ETH）",
-        "pendingEth": "未取回（ETH）",
-        "fullyRetrieved": "是否全部取回"
+        "pendingEth": "未取回（ETH）"
       }
     },
     "randomWalkImprints": {

@@ -7,8 +7,6 @@ import { getExplorerUrl } from '@/utils/urls';
 import { formatAddress, formatCount, formatNumber } from '@/utils/format';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import type { DonatedERC20Token } from '@/services/api/types';
-import { getDonatedErc20RawClaimAmount } from '@/utils/donatedErc20';
-import { Button } from '@/components/ui/button';
 import {
   DataTable,
   ExternalTableLink,
@@ -25,8 +23,6 @@ export type { DonatedERC20Token };
 
 interface DonatedERC20TableProps {
   list: DonatedERC20Token[];
-  /** Retrieves one token; shows a Retrieve action on rows not yet retrieved. */
-  handleClaim: ((roundNum: number, tokenAddr: string, amount: string) => void) | null;
   /** Table heading level when the table stands under a section heading. */
   headingLevel?: 2 | 3 | 4;
 }
@@ -52,12 +48,12 @@ function TokenCell({ address }: { address: string }) {
 }
 
 /**
- * The ERC-20 tokens attached to gestures, as a ledger: when, which cycle,
- * the token, how much was attached and retrieved, and by whom. With
- * `handleClaim` (the Recipient's own allocations) a row not yet retrieved
- * offers Retrieve.
+ * The ERC-20 tokens attached to gestures, as a read-only ledger: when, which
+ * cycle, the token, how much was attached and retrieved, and by whom.
+ * Retrieving happens in the one retrieval ledger for attached tokens,
+ * `AttachedTokenRetrievalTable` (components/winnings), never here.
  */
-const DonatedERC20Table = ({ list, handleClaim, headingLevel = 3 }: DonatedERC20TableProps) => {
+const DonatedERC20Table = ({ list, headingLevel = 3 }: DonatedERC20TableProps) => {
   const t = useTranslations('tables');
   const locale = useLocale();
   const amount = toFiniteNumber;
@@ -140,28 +136,6 @@ const DonatedERC20Table = ({ list, handleClaim, headingLevel = 3 }: DonatedERC20
         ),
     },
   ];
-
-  if (handleClaim) {
-    columns.push({
-      id: 'retrieve',
-      header: <span className="sr-only">{t('attachedAssets.aria.actions')}</span>,
-      label: '',
-      align: 'end',
-      cell: (row) =>
-        row.Claimed ? null : (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() =>
-              handleClaim(row.RoundNum, row.TokenAddr, getDonatedErc20RawClaimAmount(row))
-            }
-            data-testid="Claim Button"
-          >
-            {t('attachedAssets.actions.claim')}
-          </Button>
-        ),
-    });
-  }
 
   return (
     <>

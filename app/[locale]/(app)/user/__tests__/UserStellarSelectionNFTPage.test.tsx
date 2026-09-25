@@ -11,6 +11,10 @@ jest.mock('../../../../../hooks/useApiQuery', () => ({
   useStellarSelectionNFTAllocationsByUser: (...args: unknown[]) =>
     mockUseStellarSelectionNFTAllocationsByUser(...args),
   useCSTList: () => mockUseCSTList(),
+  // The live cycle behind the cycle links, and the empty state's reads.
+  useDashboardInfo: () => ({ data: undefined, isLoading: false }),
+  useUserInfo: () => ({ data: undefined, isLoading: false }),
+  useStellarSelectionDepositsByUser: () => ({ data: undefined, isLoading: false }),
 }));
 
 const mockUseCSTList = jest.fn();

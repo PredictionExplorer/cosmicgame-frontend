@@ -67,7 +67,7 @@ export function AttachedTokensSection({
       />
     </>
   );
-  const erc20Panel = <AttachedERC20Table list={erc20Tokens} handleClaim={null} />;
+  const erc20Panel = <AttachedERC20Table list={erc20Tokens} />;
 
   return (
     <section aria-labelledby={headingId} id="attached-assets" className="scroll-mt-24">

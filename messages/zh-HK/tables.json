@@ -214,6 +214,7 @@
     "columns": {
       "finalized": "收官時間",
       "signature": "簽名分配",
+      "signatureRecipient": "簽名分配獲配者",
       "signatureEth": "簽名分配（ETH）",
       "chrono": "時之勇士",
       "chronoEth": "時之勇士（ETH）",

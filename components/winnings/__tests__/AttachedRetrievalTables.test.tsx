@@ -39,7 +39,7 @@ describe('AttachedNftRetrievalTable', () => {
     );
     const row = screen.getAllByRole('row')[1]!;
     expect(within(row).getByText('Sky Study')).toBeInTheDocument();
-    expect(within(row).getByRole('link', { name: /ethAllocations\.cycle/ })).toHaveAttribute(
+    expect(within(row).getByRole('link', { name: /tables\.allocation\.cycle/ })).toHaveAttribute(
       'href',
       '/allocation/1',
     );
@@ -76,8 +76,8 @@ describe('one ledger for a whole history', () => {
       screen.getByRole('columnheader', { name: 'myPages.ethAllocations.columns.status' }),
     ).toBeInTheDocument();
     const [, waiting, retrieved] = screen.getAllByRole('row');
-    expect(waiting).toHaveTextContent('myPages.ethAllocations.status.waiting');
-    expect(retrieved).toHaveTextContent('myPages.ethAllocations.status.retrieved');
+    expect(waiting).toHaveTextContent('tables.recipientHistory.readyToRetrieve');
+    expect(retrieved).toHaveTextContent('tables.recipientHistory.retrieved');
   });
 
   it('shows a retrieved token by the amount attached, with no action', () => {
@@ -90,7 +90,7 @@ describe('one ledger for a whole history', () => {
     );
     const row = screen.getAllByRole('row')[1]!;
     expect(row).toHaveTextContent('40 ARB');
-    expect(row).toHaveTextContent('myPages.ethAllocations.status.retrieved');
+    expect(row).toHaveTextContent('tables.recipientHistory.retrieved');
     expect(within(row).queryByRole('button')).not.toBeInTheDocument();
   });
 

@@ -15,7 +15,13 @@ describe('AllocationSplitBar', () => {
       />,
     );
     const bar = screen.getByRole('img', { name: /Cycle 1 split/ });
-    expect(bar).toHaveAccessibleName('Cycle 1 split: Signature Allocation 60%, Chrono-Warrior 40%');
+    // Worded by the catalog, and joined as the locale lists things (Intl.ListFormat), so no
+    // ASCII comma lands between CJK words.
+    const items = new Intl.ListFormat('en-US', { type: 'conjunction', style: 'long' }).format([
+      'allocation.split.item(track=Signature Allocation,share=60%)',
+      'allocation.split.item(track=Chrono-Warrior,share=40%)',
+    ]);
+    expect(bar).toHaveAccessibleName(`allocation.split.label(label=Cycle 1 split,items=${items})`);
     const drawn = bar.querySelectorAll('[data-track]');
     expect(drawn).toHaveLength(2);
     expect((drawn[0] as HTMLElement).style.flexGrow).toBe('60');

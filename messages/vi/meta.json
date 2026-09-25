@@ -123,7 +123,7 @@
   },
   "allocationInfo": {
     "titleFor": "Thông tin phân bổ chu kỳ {id}",
-    "descriptionFor": "Thông tin phân bổ chi tiết của chu kỳ Cosmic Signature #{id} — chi tiết người nhận, phân phối phân bổ Signature, kết quả Tinh tuyển và phân bổ NFT đính kèm."
+    "descriptionFor": "Thông tin phân bổ chi tiết của chu kỳ {id} của Cosmic Signature — chi tiết người nhận, phân phối phân bổ Signature, kết quả Tinh tuyển và phân bổ NFT đính kèm."
   },
   "anchorAction": {
     "description": "Chi tiết về một thao tác neo giữ cụ thể trong Cosmic Signature — loại token, số lượng đã neo giữ và trạng thái nhận về phân phối."

@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { useFormat } from '@/hooks/useFormat';
+import { isAnchorable } from '@/utils/anchoringStats';
 import type { TxResult } from '@/hooks/useTxFlow';
 import type { TxStage } from '@/lib/txStage';
 import type { AnchorAction, AnchoredTokenInfo, CSTTokenInfo, RewardsByToken } from '@/services/api';
@@ -15,6 +16,7 @@ import AnchorActionsTable from './AnchorActionsTable';
 import { AnchoredOn } from './AnchoredOn';
 import { AnchorDistributionsTable } from './AnchorDistributionsTable';
 import { AnchorTokenGrid, type AnchorGridItem } from './AnchorTokenGrid';
+import { SECTION_READY, type SectionRead } from './sectionRead';
 
 /** The grid ids of this panel, which own the page's one wallet flow in turn. */
 export const CST_GRIDS = { anchored: 'cst-anchored', available: 'cst-available' } as const;
@@ -22,6 +24,12 @@ export const CST_GRIDS = { anchored: 'cst-anchored', available: 'cst-available' 
 export interface CSTAnchoringPanelProps {
   account: string;
   anchoredTokens: readonly AnchoredTokenInfo[];
+  /**
+   * The wallet's Cosmic Signature NFTs as the indexer lists them, anchored
+   * ones included: only those that can be anchored (`isAnchorable`) are
+   * offered, so "Select all" never puts an anchored or released NFT into a
+   * batch the contract would revert.
+   */
   availableTokens: readonly CSTTokenInfo[];
   /**
    * The wallet's per-NFT Anchor Distributions summary; `null` while it loads
@@ -36,6 +44,14 @@ export interface CSTAnchoringPanelProps {
   distributionsError?: boolean;
   onRetryDistributions?: () => void;
   actions: AnchorAction[];
+  /** The wallet's anchored NFTs. */
+  anchoredRead?: SectionRead;
+  /** The wallet's NFTs (the anchorable ones are offered). */
+  availableRead?: SectionRead;
+  /** The Anchor Distributions summary (its failure is `distributionsError`). */
+  distributionsLoading?: boolean;
+  /** The wallet's anchor and release history. */
+  historyRead?: SectionRead;
   /** Anchors token ids; resolves with the transaction's outcome. */
   onAnchor: (tokenIds: number[]) => Promise<TxResult>;
   /** Releases anchor action ids; resolves with the transaction's outcome. */
@@ -43,7 +59,6 @@ export interface CSTAnchoringPanelProps {
   /** The stage of a grid's own transaction (idle for a grid that did not start it). */
   stageFor: (gridId: string) => TxStage;
   walletBusy: boolean;
-  loading?: boolean;
 }
 
 /**
@@ -59,14 +74,18 @@ export function CSTAnchoringPanel({
   distributionsError = false,
   onRetryDistributions,
   actions,
+  anchoredRead = SECTION_READY,
+  availableRead = SECTION_READY,
+  distributionsLoading = false,
+  historyRead = SECTION_READY,
   onAnchor,
   onRelease,
   stageFor,
   walletBusy,
-  loading = false,
 }: CSTAnchoringPanelProps) {
   const t = useTranslations('anchoring');
   const tCommon = useTranslations('common');
+  const tTables = useTranslations('tables');
   const format = useFormat();
 
   const accruedByToken = useMemo(
@@ -113,16 +132,18 @@ export function CSTAnchoringPanel({
 
   const availableItems = useMemo<AnchorGridItem[]>(
     () =>
-      availableTokens.map((token) => ({
+      availableTokens.filter(isAnchorable).map((token) => ({
         key: token.TokenId,
         tokenId: token.TokenId,
         seed: token.Seed ?? null,
         name: token.TokenName ?? null,
         meta: [
-          typeof token.RoundNum === 'number' ? t('picker.cycle', { cycle: token.RoundNum }) : null,
+          typeof token.RoundNum === 'number'
+            ? tTables('allocation.cycle', { cycle: token.RoundNum })
+            : null,
         ],
       })),
-    [availableTokens, t],
+    [availableTokens, tTables],
   );
 
   return (
@@ -139,7 +160,9 @@ export function CSTAnchoringPanel({
         onCommit={onRelease}
         stage={stageFor(CST_GRIDS.anchored)}
         walletBusy={walletBusy}
-        loading={loading}
+        loading={anchoredRead.loading}
+        failed={anchoredRead.failed}
+        onRetry={anchoredRead.onRetry}
       />
 
       <AnchorTokenGrid
@@ -159,7 +182,9 @@ export function CSTAnchoringPanel({
         onCommit={onAnchor}
         stage={stageFor(CST_GRIDS.available)}
         walletBusy={walletBusy}
-        loading={loading}
+        loading={availableRead.loading}
+        failed={availableRead.failed}
+        onRetry={availableRead.onRetry}
       />
 
       <section aria-labelledby="cst-distributions-heading">
@@ -171,7 +196,7 @@ export function CSTAnchoringPanel({
         <AnchorDistributionsTable
           list={[...(anchorDistributions ?? [])]}
           address={account}
-          loading={loading}
+          loading={distributionsLoading}
           error={distributionsError ? t('overview.errorMessage') : undefined}
           errorTitle={t('overview.errorTitle')}
           onRetry={onRetryDistributions}
@@ -184,7 +209,14 @@ export function CSTAnchoringPanel({
           title={t('panels.shared.history')}
           description={t('panels.shared.historyDescription')}
         />
-        <AnchorActionsTable list={actions} IsRwalk={false} loading={loading} />
+        <AnchorActionsTable
+          list={actions}
+          IsRwalk={false}
+          loading={historyRead.loading}
+          error={historyRead.failed ? t('overview.errorMessage') : undefined}
+          errorTitle={t('overview.errorTitle')}
+          onRetry={historyRead.onRetry}
+        />
       </section>
     </div>
   );

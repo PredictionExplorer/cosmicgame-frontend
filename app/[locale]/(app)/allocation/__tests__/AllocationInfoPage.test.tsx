@@ -1,4 +1,5 @@
 import userEvent from '@testing-library/user-event';
+import { toast } from 'sonner';
 
 import { ApiReadError } from '@/services/api/readError';
 
@@ -13,6 +14,7 @@ const mockUseCSTAnchorDistributionsByCycle = jest.fn();
 const mockUseDonationsERC20ByRound = jest.fn();
 const mockUseRoundList = jest.fn();
 const mockUseCSTList = jest.fn();
+const mockUseDashboardInfo = jest.fn();
 
 jest.mock('../../../../../hooks/useApiQuery', () => ({
   useRoundInfo: (...args: unknown[]) => mockUseRoundInfo(...args),
@@ -23,6 +25,8 @@ jest.mock('../../../../../hooks/useApiQuery', () => ({
   useDonationsERC20ByRound: (...args: unknown[]) => mockUseDonationsERC20ByRound(...args),
   useRoundList: (...args: unknown[]) => mockUseRoundList(...args),
   useCSTList: (...args: unknown[]) => mockUseCSTList(...args),
+  // The live cycle (useLiveCycle, useCycleHref); unread here, so the cycle list stands in.
+  useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
 }));
 
 const mockCopy = jest.fn();
@@ -127,6 +131,8 @@ const defaultRoundList = [{ RoundNum: 0 }, { RoundNum: 1 }, { RoundNum: 2 }, { R
 
 beforeEach(() => {
   jest.clearAllMocks();
+  mockCopy.mockResolvedValue(true);
+  mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: false });
   mockUseRoundInfo.mockReturnValue({ data: undefined, isLoading: false });
   mockUseGestureListByCycle.mockReturnValue({ data: [], isLoading: false });
   mockUseDonationsNFTByRound.mockReturnValue({ data: [], isLoading: false });
@@ -163,16 +169,6 @@ const figure = (container: HTMLElement, id: string) =>
 
 describe('AllocationInfoPage', () => {
   describe('states', () => {
-    it('explains a cycle number that is not one, with the way back to the recipients', () => {
-      render(<AllocationInfoPage roundNum={-1} />);
-      expect(
-        screen.getByRole('heading', { level: 1, name: 'allocation.details.invalid.title' }),
-      ).toBeInTheDocument();
-      expect(
-        screen.getAllByRole('link', { name: 'allocation.details.breadcrumbs.recipients' })[0],
-      ).toHaveAttribute('href', '/allocation');
-    });
-
     /** What the API answers for a cycle it holds no record of: HTTP 400 "record not found". */
     function answerNoRecord() {
       const refetch = jest.fn();
@@ -201,7 +197,7 @@ describe('AllocationInfoPage', () => {
       ).toHaveAttribute('href', '/current-cycle');
       expect(
         screen.getByRole('link', {
-          name: 'allocation.details.navigation.previousAria, allocation.formats.cycle(cycle=3)',
+          name: 'allocation.details.navigation.previousAria(cycle=allocation.formats.cycle(cycle=3))',
         }),
       ).toHaveAttribute('href', '/allocation/3');
       expect(screen.queryByText('allocation.details.error.title')).not.toBeInTheDocument();
@@ -221,6 +217,19 @@ describe('AllocationInfoPage', () => {
         screen.getByText('allocation.missingCycle.notStarted.body(cycle=99,live=4)'),
       ).toBeInTheDocument();
       expect(screen.getByTestId('current-cycle-link')).toHaveAttribute('href', '/current-cycle');
+    });
+
+    it('takes the live cycle from the chain’s count before the indexer’s list', () => {
+      answerNoRecord();
+      // The indexer lists cycles 0–3, but the chain has already finalized Cycle 4.
+      mockUseDashboardInfo.mockReturnValue({ data: { CurRoundNum: 5 }, isLoading: false });
+      render(<AllocationInfoPage roundNum={4} />);
+      expect(
+        screen.getByRole('heading', {
+          level: 1,
+          name: 'allocation.missingCycle.unknown.title(cycle=4)',
+        }),
+      ).toBeInTheDocument();
     });
 
     it('says only that there is no record yet while the cycle list is unknown', () => {
@@ -342,17 +351,79 @@ describe('AllocationInfoPage', () => {
       ).toBeNull();
     });
 
-    it('copies a formatted cycle summary', async () => {
-      renderCycle();
-      await userEvent.click(screen.getByTestId('share-round-button'));
-      expect(mockCopy).toHaveBeenCalledWith(
-        expect.stringContaining('allocation.details.share.summary(cycle=1,amount=1.5'),
-      );
-      expect(mockCopy.mock.calls[0]![0]).toContain('gestures=1,141');
+    describe('sharing', () => {
+      const original = navigator.share;
+      afterEach(() => {
+        Object.defineProperty(navigator, 'share', { value: original, configurable: true });
+      });
+
+      it('opens the share sheet with the cycle, a short summary and the link', async () => {
+        const share = jest.fn().mockResolvedValue(undefined);
+        Object.defineProperty(navigator, 'share', { value: share, configurable: true });
+        renderCycle();
+        await userEvent.click(screen.getByTestId('share-round-button'));
+        expect(share).toHaveBeenCalledWith({
+          title: 'allocation.formats.cycle(cycle=1)',
+          text: expect.stringContaining('allocation.details.share.summary(cycle=1,amount=1.5'),
+          url: window.location.href,
+        });
+        expect(share.mock.calls[0]![0].text).toContain('gestures=1,141');
+        expect(mockCopy).not.toHaveBeenCalled();
+      });
+
+      it('copies the link where there is no share sheet, and says so on its button', async () => {
+        Object.defineProperty(navigator, 'share', { value: undefined, configurable: true });
+        renderCycle();
+        const button = screen.getByTestId('share-round-button');
+        expect(button).toHaveTextContent('allocation.details.share.copyLink');
+        await userEvent.click(button);
+        expect(mockCopy).toHaveBeenCalledWith(window.location.href);
+        expect(toast.success).toHaveBeenCalledWith('allocation.details.share.linkCopied');
+      });
+
+      it('never confirms a copy that did not happen', async () => {
+        Object.defineProperty(navigator, 'share', { value: undefined, configurable: true });
+        mockCopy.mockResolvedValue(false);
+        renderCycle();
+        await userEvent.click(screen.getByTestId('share-round-button'));
+        expect(toast.success).not.toHaveBeenCalled();
+        expect(toast.error).toHaveBeenCalledWith('allocation.details.share.failed');
+      });
     });
   });
 
   describe('recipient art', () => {
+    it('draws every plate from the server’s seeds, without reading the collection', () => {
+      withCycle();
+      render(
+        <AllocationInfoPage
+          roundNum={1}
+          roleSeeds={{
+            '42': { seed: 'aa' },
+            '15': { seed: 'bb' },
+            '10': { seed: 'cc' },
+            '11': { seed: 'dd' },
+          }}
+        />,
+      );
+      expect(mockUseCSTList).toHaveBeenCalled();
+      for (const [options] of mockUseCSTList.mock.calls) {
+        expect(options).toEqual({ enabled: false });
+      }
+      expect(screen.queryAllByTestId('pending-plate')).toHaveLength(0);
+    });
+
+    it('reads the collection only for a plate the server had no seed for', () => {
+      withCycle();
+      render(
+        <AllocationInfoPage
+          roundNum={1}
+          roleSeeds={{ '42': { seed: 'aa' }, '15': { seed: 'bb' } }}
+        />,
+      );
+      expect(mockUseCSTList).toHaveBeenLastCalledWith({ enabled: true });
+    });
+
     it('holds busy plates, never "Artwork unavailable", while the collection index loads', () => {
       mockUseCSTList.mockReturnValue({ data: undefined, isLoading: true, isError: false });
       renderCycle();
@@ -435,21 +506,40 @@ describe('AllocationInfoPage', () => {
       expect(next).toHaveTextContent(/~58\.3/);
     });
 
-    it('shows no ETH figure the split already carries (no public goods, anchor or stellar card)', () => {
+    it('keeps the cycle’s other facts with the split, one heading fewer', () => {
       const { container } = renderCycle();
-      const statistics = screen.getByRole('region', {
-        name: 'allocation.details.statistics.title',
+      const distribution = screen.getByRole('region', {
+        name: 'allocation.details.distribution.title',
       });
-      expect(within(statistics).queryByText(/publicGoods|stellar/i)).toBeNull();
+      expect(figure(distribution, 'attachedNfts')).toHaveTextContent('3');
+      expect(figure(distribution, 'anchoredTokens')).toHaveTextContent('100');
       expect(figure(container, 'distributed')).toBeNull();
       expect(
         screen.getByText(/allocation\.details\.distribution\.total\(amount=2\.5/),
       ).toBeInTheDocument();
-      expect(figure(container, 'attachedNfts')).toHaveTextContent('3');
-      expect(figure(container, 'anchoredTokens')).toHaveTextContent('100');
-      expect(
-        within(figure(container, 'totalContributed') as HTMLElement).getByRole('link'),
-      ).toHaveAttribute('href', '/eth-contribution/round/1');
+      expect(screen.queryByRole('heading', { name: /details\.statistics\.title/ })).toBeNull();
+    });
+
+    it('prints the direct contributions as ETH with its unit, linked as a record', () => {
+      const { container } = renderCycle();
+      const contributed = figure(container, 'totalContributed') as HTMLElement;
+      expect(contributed).toHaveTextContent(/20\.0000.ETH/);
+      const link = within(contributed).getByRole('link');
+      expect(link).toHaveAttribute('href', '/eth-contribution/round/1');
+      expect(link).toHaveClass('link-entity');
+    });
+
+    it('reads the anchor-holders as unknown, never 0, when their list could not be read', () => {
+      mockUseCSTAnchorDistributionsByCycle.mockReturnValue({
+        data: undefined,
+        isLoading: false,
+        isError: true,
+        refetch: jest.fn(),
+      });
+      const { container } = renderCycle();
+      expect(figure(container, 'uniqueAnchorHolders')).toHaveTextContent(
+        'common.status.unavailable',
+      );
     });
 
     it('lists every allocation record, grouped by recipient', () => {
@@ -463,16 +553,34 @@ describe('AllocationInfoPage', () => {
       renderCycle();
       expect(screen.getByTestId('gesture-history-table')).toHaveTextContent('gestures: 1');
       expect(
-        screen.getByRole('tab', { name: /allocation\.details\.data\.tabs\.stellar/ }),
-      ).toHaveTextContent('1');
+        screen.getByRole('tab', { name: /allocation\.details\.data\.tabs\.endurance/ }),
+      ).toBeInTheDocument();
     });
 
-    it('shows the Stellar Selection records of the ledger in their tab', async () => {
+    it('lists the Stellar Selection records once, in the grouped ledger, not again in a tab', () => {
       renderCycle();
-      await userEvent.click(
-        screen.getByRole('tab', { name: /allocation\.details\.data\.tabs\.stellar/ }),
-      );
-      expect(screen.getByTestId('stellar-selection-ledger-table')).toHaveTextContent('records: 1');
+      expect(screen.queryByRole('tab', { name: /tabs\.stellar/ })).toBeNull();
+      expect(screen.getByTestId('cycle-allocation-ledger-table')).toHaveTextContent('records: 3');
+    });
+
+    it('shows a tab whose list failed as an error with a retry, never as "no gestures"', async () => {
+      const refetch = jest.fn();
+      withCycle();
+      mockUseGestureListByCycle.mockReturnValue({
+        data: undefined,
+        isLoading: false,
+        isError: true,
+        refetch,
+      });
+      render(<AllocationInfoPage roundNum={1} />);
+      expect(screen.queryByText('allocation.details.data.empty.gestures')).toBeNull();
+      expect(screen.getByText('allocation.details.data.error.title')).toBeInTheDocument();
+      // No count on a tab whose list is unknown.
+      expect(
+        screen.getByRole('tab', { name: 'allocation.details.data.tabs.gestures' }).textContent,
+      ).toBe('allocation.details.data.tabs.gestures');
+      await userEvent.click(screen.getByRole('button', { name: /try again/i }));
+      expect(refetch).toHaveBeenCalledTimes(1);
     });
 
     it('shows designed empty states for tabs with nothing in them', async () => {

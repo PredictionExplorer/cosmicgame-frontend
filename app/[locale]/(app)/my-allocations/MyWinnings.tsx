@@ -13,12 +13,12 @@ import { ErrorState } from '@/components/ui/error-state';
 import { PageShell } from '@/components/ui/page-shell';
 import { SectionHeader } from '@/components/ui/section-header';
 import { WalletRequiredState } from '@/components/wallet/WalletRequiredState';
+import { AddressLookup } from '@/components/winnings/AddressLookup';
 import { UnretrievedCSTAnchorDistributionsTable } from '@/components/anchoring/UnretrievedCSTAnchorDistributionsTable';
 import {
   AttachedNftRetrievalTable,
   AttachedTokenRetrievalTable,
   type AttachedNftRetrievalRow,
-  type AttachedTokenRetrievalRow,
 } from '@/components/winnings/AttachedRetrievalTables';
 import {
   EthAllocationsTable,
@@ -38,7 +38,6 @@ import { useNow } from '@/hooks/useNow';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { AllocationIcon } from '@/lib/conceptIcons';
 import { getDonatedErc20RawClaimAmount } from '@/utils/donatedErc20';
-import { toFiniteNumber } from '@/utils/finiteNumber';
 import type { DonatedERC20Token } from '@/services/api/types';
 
 /** The sections a retrieve can start from; the summary owns the status line only for its own run. */
@@ -57,7 +56,7 @@ export default function MyWinnings() {
   const tWallet = useTranslations('wallet');
   const nav = useSiteNavCopy();
   const { account } = useActiveWeb3React();
-  const { apiData: status, unclaimedRewards } = useApiData();
+  const { unretrievedAnchorEth: anchorAmount, unclaimedRewards, retryAnchorRead } = useApiData();
 
   const {
     data: nftsRaw,
@@ -110,10 +109,7 @@ export default function MyWinnings() {
     [nftsRaw],
   );
   const tokens = useMemo(() => (tokensRaw ?? []) as DonatedERC20Token[], [tokensRaw]);
-  const openTokens = useMemo(
-    () => tokens.filter((token) => !token.Claimed) as AttachedTokenRetrievalRow[],
-    [tokens],
-  );
+  const openTokens = useMemo(() => tokens.filter((token) => !token.Claimed), [tokens]);
 
   const loading = loadingDeposits || loadingNfts || loadingTokens;
   const plan = useMemo(
@@ -129,8 +125,12 @@ export default function MyWinnings() {
       )
     : null;
 
-  const anchorAmount = toFiniteNumber(status?.UnretrievedAnchorDistribution);
-  const hasAnchorDistributions = (anchorAmount ?? 0) > 0 || unclaimedRewards.length > 0;
+  // The Anchor Distribution read: `undefined` while it loads, `null` when it failed. Unknown is
+  // never "nothing waiting": a failed read keeps its section, with a retry.
+  const anchorKnown = anchorAmount !== undefined && anchorAmount !== null;
+  const anchorFailed = anchorAmount === null;
+  const hasAnchorDistributions =
+    anchorFailed || (anchorAmount ?? 0) > 0 || unclaimedRewards.length > 0;
 
   const runFromSection = (action: () => Promise<void>) => {
     setOrigin('section');
@@ -151,12 +151,19 @@ export default function MyWinnings() {
   if (!account) {
     return (
       <PageShell variant="data" backdrop="signature">
-        <PageHeader section="account" title={t('allocations.title')} />
+        <PageHeader
+          section="account"
+          title={t('allocations.title')}
+          subtitle={t('allocations.subtitle')}
+        />
         <WalletRequiredState
           title={tWallet('required.allocations.title')}
           description={tWallet('required.allocations.description')}
           publicLink={{ href: '/allocation', label: tWallet('required.allocations.publicLink') }}
-        />
+        >
+          {/* Allocations are public: without a wallet, any address can still be looked up. */}
+          <AddressLookup className="mt-8" />
+        </WalletRequiredState>
       </PageShell>
     );
   }
@@ -190,7 +197,10 @@ export default function MyWinnings() {
     );
   }
 
-  const nothingWaiting = plan !== null && plan.isEmpty && !hasAnchorDistributions;
+  const nothingWaiting = plan !== null && plan.isEmpty && anchorKnown && !hasAnchorDistributions;
+  // Until the anchor read settles, an empty plan could still be "nothing waiting": the summary
+  // holds its skeletons rather than show zeros that may switch to the empty page.
+  const summaryPlan = plan?.isEmpty && anchorAmount === undefined ? null : plan;
   const retrieveAllLabel = t('allocations.retrieveAll');
 
   return (
@@ -217,7 +227,7 @@ export default function MyWinnings() {
       ) : (
         <div className="space-y-[var(--block-gap)]">
           <RetrievalSummary
-            plan={plan}
+            plan={summaryPlan}
             anchorAmount={anchorAmount}
             deadline={deadline}
             busy={isClaiming.everything}
@@ -265,7 +275,17 @@ export default function MyWinnings() {
                 title={t('allocations.sections.anchors')}
                 description={t('allocations.sections.anchorsDescription')}
               />
-              <UnretrievedCSTAnchorDistributionsTable user={account} />
+              {anchorFailed ? (
+                <ErrorState
+                  variant="panel"
+                  headingLevel={3}
+                  title={t('allocations.anchorLoadError.title')}
+                  message={t('allocations.anchorLoadError.message')}
+                  onRetry={retryAnchorRead}
+                />
+              ) : (
+                <UnretrievedCSTAnchorDistributionsTable user={account} />
+              )}
             </section>
           ) : null}
 

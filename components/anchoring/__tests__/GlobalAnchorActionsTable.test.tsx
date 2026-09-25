@@ -24,8 +24,10 @@ describe('GlobalAnchorActionsTable', () => {
         IsRWLK={false}
       />,
     );
-    expect(screen.getByText('anchoring.common.anchor')).toBeInTheDocument();
-    expect(screen.getByText('anchoring.common.release')).toBeInTheDocument();
+    // Only the exception carries a tag: an anchor is what nearly every row records.
+    expect(screen.queryByText('anchoring.common.anchor')).not.toBeInTheDocument();
+    // The release's tag sits beside its action link: once in the column, once in the phone caption.
+    expect(screen.getAllByText('anchoring.common.release')).toHaveLength(2);
     expect(screen.getAllByRole('link', { name: '#000047' })[0]).toHaveAttribute(
       'href',
       '/detail/47',
@@ -36,9 +38,12 @@ describe('GlobalAnchorActionsTable', () => {
 
   it('says where each link goes: the action to its record, the date to its transaction', () => {
     render(<GlobalAnchorActionsTable list={[action()]} IsRWLK />);
-    expect(
-      screen.getByRole('link', { name: 'anchoring.anchorActionDetail.breadcrumbs.action(id=10)' }),
-    ).toHaveAttribute('href', '/anchor-action/1/10');
+    // The action link is in its column and in the phone caption (each shown at its own width).
+    const actionLinks = screen.getAllByRole('link', {
+      name: 'anchoring.anchorActionDetail.breadcrumbs.action(id=10)',
+    });
+    expect(actionLinks).toHaveLength(2);
+    for (const link of actionLinks) expect(link).toHaveAttribute('href', '/anchor-action/1/10');
     const proof = document.querySelector('a[href*="0xactiontx"]');
     expect(proof).toHaveAttribute('target', '_blank');
     expect(proof?.closest('td')).toHaveAttribute(
@@ -54,6 +59,18 @@ describe('GlobalAnchorActionsTable', () => {
     expect(explanations[0]).toHaveAccessibleName(
       /explainColumn\(column=anchoring\.tables\.globalAnchorActions\.headers\.nftCount\.desktop\)/,
     );
+  });
+
+  it('keeps its many links quiet and heads each phone record with the artwork', () => {
+    render(<GlobalAnchorActionsTable list={[action()]} IsRWLK={false} />);
+    const table = screen.getByRole('table');
+    expect(table).toHaveAttribute('data-links', 'quiet');
+    expect(table).toHaveAttribute('data-layout', 'cards');
+    // NFT, action, date, holder, running total: the action and the date move into the NFT's
+    // phone caption, so a phone record reads the NFT, then its holder.
+    expect(
+      screen.getAllByRole('columnheader').map((header) => header.getAttribute('data-priority')),
+    ).toEqual(['primary', 'secondary', 'secondary', 'primary', 'secondary']);
   });
 
   it('explains an empty list', () => {

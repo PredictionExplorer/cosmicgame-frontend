@@ -4,7 +4,8 @@ import { useMemo, type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { Badge } from '@/components/ui/badge';
-import { DataTable, TableLink, type DataTableColumn } from '@/components/ui/data-table';
+import { DataTable, TableTag, type DataTableColumn } from '@/components/ui/data-table';
+import { useCycleCell } from '@/components/tables/useCycleCell';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 
 import { RetrievalDeadline } from './RetrievalDeadline';
@@ -72,6 +73,8 @@ export function EthAllocationsTable({
   ...state
 }: EthAllocationsTableProps) {
   const t = useTranslations('myPages');
+  const tTables = useTranslations('tables');
+  const cycleCell = useCycleCell();
 
   const columns = useMemo<DataTableColumn<EthAllocationRow>[]>(() => {
     const cycleColumn: DataTableColumn<EthAllocationRow> = {
@@ -79,12 +82,7 @@ export function EthAllocationsTable({
       kind: 'link',
       header: t('ethAllocations.columns.cycle'),
       value: (row) => row.RoundNum,
-      cell: (row) =>
-        typeof row.RoundNum === 'number' ? (
-          <TableLink href={`/allocation/${row.RoundNum}`}>
-            {t('ethAllocations.cycle', { cycle: row.RoundNum })}
-          </TableLink>
-        ) : null,
+      cell: (row) => (typeof row.RoundNum === 'number' ? cycleCell(row.RoundNum) : null),
       nowrap: true,
       sortable: true,
     };
@@ -140,19 +138,19 @@ export function EthAllocationsTable({
         kind: 'text',
         header: t('ethAllocations.columns.status'),
         value: (row) => (row.Claimed === undefined ? null : row.Claimed ? 1 : 0),
+        // As every allocation ledger marks it: the row that needs action carries the accent
+        // tag; a finished one reads quietly.
         cell: (row) =>
           row.Claimed ? (
-            <Badge size="sm" tone="positive" dot>
-              {t('ethAllocations.status.retrieved')}
-            </Badge>
+            <span className="text-subtle">{tTables('recipientHistory.retrieved')}</span>
           ) : (
-            <Badge size="sm">{t('ethAllocations.status.waiting')}</Badge>
+            <TableTag tone="accent">{tTables('recipientHistory.readyToRetrieve')}</TableTag>
           ),
         whenBlank: 'unknown',
       });
     }
     return list;
-  }, [deadlines, showSource, showStatus, t]);
+  }, [cycleCell, deadlines, showSource, showStatus, t, tTables]);
 
   return (
     <DataTable

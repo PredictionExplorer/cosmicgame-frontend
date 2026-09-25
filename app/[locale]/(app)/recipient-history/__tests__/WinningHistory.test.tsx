@@ -75,18 +75,16 @@ describe('WinningHistory', () => {
     ).toHaveAttribute('href', '/allocation');
   });
 
-  it('asks to connect and says what the page shows, once', () => {
+  it('keeps the page’s lede and asks to connect, saying what connecting adds', () => {
     mockUseActiveWeb3React.mockReturnValue({ account: null });
     history({});
     render(<WinningHistory />);
+    // The header reads the same before and after connecting.
+    expect(screen.getByText(/cycle by cycle/)).toBeInTheDocument();
     expect(
       screen.getByRole('heading', { name: 'wallet.required.history.title' }),
     ).toBeInTheDocument();
     expect(screen.getByText('wallet.required.history.description')).toBeInTheDocument();
-    // The connected view's intro is not repeated above the prompt, and no stub lede stands
-    // in for it: the prompt alone says what the page shows.
-    expect(screen.queryByText(/cycle by cycle/)).not.toBeInTheDocument();
-    expect(document.querySelector('header p.type-lede')).toBeNull();
   });
 
   it('shows loading state', () => {

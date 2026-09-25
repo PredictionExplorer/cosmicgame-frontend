@@ -3,18 +3,14 @@
 import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 
-import {
-  DataTable,
-  TableLink,
-  TxProofLink,
-  type DataTableColumn,
-} from '@/components/ui/data-table';
+import { DataTable, TxProofLink, type DataTableColumn } from '@/components/ui/data-table';
 import { DateTime } from '@/components/ui/date-time';
+import { useCycleCell } from '@/components/tables/useCycleCell';
+import { useSignatureIndex } from '@/components/winnings/useSignatureIndex';
 import type { AnchorDistributionImprint } from '@/services/api';
 
 import { TokenCell } from './TokenCell';
 import type { AnchoringLedgerProps } from './ledgerProps';
-import { useSignatureSeeds } from './useSignatureSeeds';
 
 interface RwalkAnchorDistributionImprintsTableProps extends AnchoringLedgerProps {
   list: AnchorDistributionImprint[];
@@ -39,16 +35,14 @@ export const RwalkAnchorDistributionImprintsTable = ({
   ...state
 }: RwalkAnchorDistributionImprintsTableProps) => {
   const t = useTranslations('anchoring');
-  const tCommon = useTranslations('common');
+  const cycleCell = useCycleCell();
   // The rows carry no seed: one collection read serves every thumbnail.
-  const { pending: seedsPending, seedFor } = useSignatureSeeds(list.length > 0);
+  const signatures = useSignatureIndex({ enabled: list.length > 0 });
+  const seedsPending = signatures.state === 'loading';
+  const { seedFor } = signatures;
 
   const columns = useMemo<DataTableColumn<AnchorDistributionImprint>[]>(() => {
-    const cycleLink = (row: AnchorDistributionImprint) => (
-      <TableLink href={`/allocation/${row.RoundNum}`}>
-        {tCommon('pageHeader.crumbs.cycle', { cycle: row.RoundNum })}
-      </TableLink>
-    );
+    const cycleLink = (row: AnchorDistributionImprint) => cycleCell(row.RoundNum);
     return [
       {
         id: 'token',
@@ -90,7 +84,6 @@ export const RwalkAnchorDistributionImprintsTable = ({
         kind: 'link',
         header: t('tables.randomWalkImprints.columns.cycle'),
         value: (row) => row.RoundNum,
-        // "Cycle 1", not a bare "1": a word-sized link, as every other ledger names a cycle.
         cell: cycleLink,
         nowrap: true,
         // On a phone the token's caption carries the cycle and the date.
@@ -105,7 +98,7 @@ export const RwalkAnchorDistributionImprintsTable = ({
         priority: 'secondary',
       } satisfies DataTableColumn<AnchorDistributionImprint>,
     ].filter((column) => column !== null);
-  }, [seedFor, seedsPending, showRecipient, t, tCommon]);
+  }, [cycleCell, seedFor, seedsPending, showRecipient, t]);
 
   return (
     <DataTable
@@ -117,6 +110,8 @@ export const RwalkAnchorDistributionImprintsTable = ({
       emptyDescription={t('common.empty.imprints.description')}
       headingLevel={headingLevel}
       layout="cards"
+      // Three links a row (the NFT, the cycle and the proof): ink until hover.
+      links="quiet"
       {...state}
     />
   );

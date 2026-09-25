@@ -20,15 +20,19 @@ import { useRoundList } from '@/hooks/useApiQuery';
  *
  * `seoSummary` is the server-rendered page header, the page's only header: it
  * carries the cycle, recipient, ETH and gesture totals, so the body does not
- * repeat them. The body shows the protocol's split once, as one proportional
- * bar in the track colours every chart of the split uses, then every
- * finalized cycle in one ledger.
+ * repeat them. The ledger of finalized cycles, each shown by its Signature,
+ * comes first, since it is what a visitor comes back for; the protocol's
+ * split, a constant, follows once: one proportional bar in the track colours
+ * every chart of the split uses, one sentence, and a legend whose terms
+ * explain themselves.
  */
 const AllocationRecipientsPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('allocation');
   const tContracts = useTranslations('contracts');
   const tCommon = useTranslations('common');
-  const { data: rawPrizeClaims = [], isLoading: loading } = useRoundList();
+  const { data: rawPrizeClaims = [], isLoading: loading, isError, refetch } = useRoundList();
+  // A failed read with nothing to show is an error, never "no finalized cycles".
+  const failed = isError && rawPrizeClaims.length === 0;
 
   const segments = useMemo(
     () =>
@@ -64,18 +68,23 @@ const AllocationRecipientsPage = ({ seoSummary }: { seoSummary?: ReactNode }) =>
         />
       )}
 
+      <AllocationTable
+        list={allocationFinalizations}
+        loading={loading}
+        error={failed ? t('recipients.loadError') : undefined}
+        onRetry={() => void refetch()}
+        title={t('recipients.ledgerTitle')}
+        showArt
+      />
+
       <section
         aria-labelledby="reserve-split"
-        className="mb-[var(--block-gap)] grid gap-x-12 gap-y-8 lg:grid-cols-12"
+        className="mt-[var(--block-gap)] grid gap-x-12 gap-y-8 border-t border-rule-faint pt-[var(--block-gap)] lg:grid-cols-12"
       >
         <SectionHeader
           headingId="reserve-split"
           title={t('recipients.reserveSplit.label')}
-          info={{
-            content: t('recipients.reserveSplit.tooltip'),
-            label: t('recipients.reserveSplit.label'),
-          }}
-          description={t('recipients.intro', { percentage: protocolFacts.mainEthPercentage })}
+          description={t('recipients.reserveSplit.tooltip')}
           className="mb-0 lg:col-span-5 sm:mb-0"
         />
         <AllocationSplitBar
@@ -85,13 +94,6 @@ const AllocationRecipientsPage = ({ seoSummary }: { seoSummary?: ReactNode }) =>
           className="lg:col-span-7 lg:pt-2"
         />
       </section>
-
-      <AllocationTable
-        list={allocationFinalizations}
-        loading={loading}
-        title={t('recipients.ledgerTitle')}
-        className="mb-10"
-      />
     </PageShell>
   );
 };

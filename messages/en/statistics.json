@@ -295,8 +295,8 @@
       "randomWalk": "RWLK anchoring overview"
     },
     "stats": {
-      "activeHoldersCosmicSignature": "Active Cosmic Signature NFT anchor-holders",
-      "activeHoldersRandomWalk": "Active Random Walk NFT anchor-holders",
+      "activeHoldersCosmicSignature": "Active Cosmic Signature NFT anchor‑holders",
+      "activeHoldersRandomWalk": "Active Random Walk NFT anchor‑holders",
       "distributionDeposits": "Number of Anchor Distribution deposits",
       "totalDistributions": "Total Anchor Distributions",
       "tokensImprinted": "Cosmic Signature NFTs imprinted",

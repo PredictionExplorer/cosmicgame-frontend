@@ -25,6 +25,12 @@ export interface WalletRequiredStateProps {
   visual?: ReactNode;
   /** Heading level for the title; the page H1 sits above, so h2 by default. */
   headingLevel?: 'h2' | 'h3';
+  /**
+   * `page` (the default) replaces the page's content, centred in a narrow
+   * column; `panel` fills the region it is placed in (beside the figures that
+   * give a reason to connect), at the compact state padding.
+   */
+  variant?: 'page' | 'panel';
   /** Extra content under the actions (a Uniswap link on the CST pages…). */
   children?: ReactNode;
   className?: string;
@@ -69,6 +75,7 @@ export function WalletRequiredState({
   publicLink,
   visual,
   headingLevel = 'h2',
+  variant = 'page',
   children,
   className,
 }: WalletRequiredStateProps) {
@@ -80,16 +87,16 @@ export function WalletRequiredState({
     <section
       aria-label={title}
       data-testid="wallet-required-state"
-      className={cn('mx-auto max-w-xl', className)}
+      className={cn(variant === 'page' && 'mx-auto max-w-xl', className)}
     >
       <EmptyState
-        variant="page"
+        variant={variant}
         headingLevel={headingLevel === 'h3' ? 3 : 2}
         icon={<Wallet />}
         visual={visual}
         title={title}
         description={description}
-        className="py-14 sm:py-16"
+        className={variant === 'page' ? 'py-14 sm:py-16' : 'px-6 py-10 sm:py-12'}
         action={
           <div className="flex flex-col items-center">
             {restoring ? (

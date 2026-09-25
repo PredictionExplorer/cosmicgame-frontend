@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+import { useCycleCell } from '@/components/tables/useCycleCell';
 import type { CSTAnchorDistribution } from '@/services/api';
 
 import type { AnchoringLedgerProps } from './ledgerProps';
@@ -19,6 +20,7 @@ export const RetrievedCSTAnchorDistributionsTable = ({
   ...state
 }: RetrievedCSTAnchorDistributionsTableProps) => {
   const t = useTranslations('anchoring');
+  const cycleCell = useCycleCell();
 
   const columns = useMemo<DataTableColumn<CSTAnchorDistribution>[]>(
     () => [
@@ -42,7 +44,8 @@ export const RetrievedCSTAnchorDistributionsTable = ({
         kind: 'link',
         header: t('tables.retrievedDistributions.columns.cycle'),
         value: (row) => row.RoundNum,
-        href: (row) => `/allocation/${row.RoundNum}`,
+        cell: (row) => cycleCell(row.RoundNum),
+        nowrap: true,
       },
       {
         id: 'deposited',
@@ -60,7 +63,7 @@ export const RetrievedCSTAnchorDistributionsTable = ({
         sortable: true,
       },
     ],
-    [t],
+    [cycleCell, t],
   );
 
   return (

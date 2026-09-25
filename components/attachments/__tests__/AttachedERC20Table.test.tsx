@@ -1,4 +1,4 @@
-import { checkA11y, fireEvent, render, screen, within } from '@/test-utils';
+import { checkA11y, render, screen, within } from '@/test-utils';
 
 import DonatedERC20Table from '../AttachedERC20Table';
 import { attachedErc20Amount } from '../attachedErc20Amount';
@@ -76,12 +76,12 @@ describe('attachedErc20Amount', () => {
 
 describe('DonatedERC20Table', () => {
   it('says there is nothing attached instead of an empty ledger', () => {
-    render(<DonatedERC20Table list={[]} handleClaim={null} />);
+    render(<DonatedERC20Table list={[]} />);
     expect(screen.getByText('tables.attachedAssets.erc20.empty')).toBeInTheDocument();
   });
 
   it('labels every column', () => {
-    render(<DonatedERC20Table list={[createToken()]} handleClaim={null} />);
+    render(<DonatedERC20Table list={[createToken()]} />);
     for (const header of [
       'tables.attachedAssets.erc20.columns.datetime',
       'tables.attachedAssets.erc20.columns.cycle',
@@ -96,7 +96,7 @@ describe('DonatedERC20Table', () => {
   });
 
   it('names the token by its symbol, linked to its contract, and formats the amounts', () => {
-    render(<DonatedERC20Table list={[createToken({ AmountEth: 5.25 })]} handleClaim={null} />);
+    render(<DonatedERC20Table list={[createToken({ AmountEth: 5.25 })]} />);
     expect(within(table()).getByRole('link', { name: /GLXY/ })).toHaveAttribute(
       'href',
       expect.stringContaining(TOKEN),
@@ -112,17 +112,12 @@ describe('DonatedERC20Table', () => {
 
   it('falls back to the short contract address without a symbol', () => {
     mockMetadata.mockReturnValue({ data: null });
-    render(<DonatedERC20Table list={[createToken()]} handleClaim={null} />);
+    render(<DonatedERC20Table list={[createToken()]} />);
     expect(within(table()).getByRole('link', { name: /0x1111/ })).toBeInTheDocument();
   });
 
   it('shows an unknown amount as unavailable, never as 0', () => {
-    render(
-      <DonatedERC20Table
-        list={[createToken({ AmountDonatedEth: undefined })]}
-        handleClaim={null}
-      />,
-    );
+    render(<DonatedERC20Table list={[createToken({ AmountDonatedEth: undefined })]} />);
     expect(within(table()).getAllByText('tables.status.unavailable').length).toBeGreaterThan(0);
   });
 
@@ -137,7 +132,6 @@ describe('DonatedERC20Table', () => {
             Claimed: true,
           }),
         ]}
-        handleClaim={null}
       />,
     );
     // Attached and retrieved both read 2,000.
@@ -145,74 +139,30 @@ describe('DonatedERC20Table', () => {
   });
 
   it('marks a retrieved token', () => {
-    render(<DonatedERC20Table list={[createToken({ Claimed: true })]} handleClaim={null} />);
+    render(<DonatedERC20Table list={[createToken({ Claimed: true })]} />);
     expect(within(table()).getByText('tables.attachedAssets.status.yes')).toBeInTheDocument();
   });
 
-  it('offers Retrieve only with a handler and only for tokens not yet retrieved', () => {
-    const { rerender } = render(<DonatedERC20Table list={[createToken()]} handleClaim={null} />);
+  it('is read-only: retrieving lives in the winnings retrieval ledger', () => {
+    render(<DonatedERC20Table list={[createToken()]} />);
     expect(screen.queryByTestId('Claim Button')).not.toBeInTheDocument();
-    rerender(<DonatedERC20Table list={[createToken()]} handleClaim={jest.fn()} />);
-    expect(screen.getByTestId('Claim Button')).toHaveTextContent(
-      'tables.attachedAssets.actions.claim',
-    );
-    rerender(<DonatedERC20Table list={[createToken({ Claimed: true })]} handleClaim={jest.fn()} />);
-    expect(screen.queryByTestId('Claim Button')).not.toBeInTheDocument();
-  });
-
-  it('passes the raw claim amount, not the display amount, to handleClaim', () => {
-    const handleClaim = jest.fn();
-    render(
-      <DonatedERC20Table
-        list={[
-          createToken({
-            RoundNum: 7,
-            DonateClaimDiff: '1999999999999999994000',
-            DonateClaimDiffEth: '2000',
-          }),
-        ]}
-        handleClaim={handleClaim}
-      />,
-    );
-    fireEvent.click(screen.getByTestId('Claim Button'));
-    expect(handleClaim).toHaveBeenCalledWith(7, TOKEN, '1999999999999999994000');
-  });
-
-  it('falls back to raw Amount when DonateClaimDiff is missing', () => {
-    const handleClaim = jest.fn();
-    render(
-      <DonatedERC20Table
-        list={[
-          createToken({
-            Amount: '42000000000000000000',
-            DonateClaimDiff: undefined,
-            DonateClaimDiffEth: '42',
-          }),
-        ]}
-        handleClaim={handleClaim}
-      />,
-    );
-    fireEvent.click(screen.getByTestId('Claim Button'));
-    expect(handleClaim).toHaveBeenCalledWith(1, TOKEN, '42000000000000000000');
   });
 
   it('pages a long list', () => {
     const list = Array.from({ length: 25 }, (_, i) =>
       createToken({ EvtLogId: i + 1, RoundNum: i + 1 }),
     );
-    render(<DonatedERC20Table list={list} handleClaim={null} />);
+    render(<DonatedERC20Table list={list} />);
     expect(screen.getByRole('button', { name: 'tables.pagination.next' })).toBeInTheDocument();
   });
 
   it('includes a print-only PDF fallback in the DOM', () => {
-    const { container } = render(<DonatedERC20Table list={[createToken()]} handleClaim={null} />);
+    const { container } = render(<DonatedERC20Table list={[createToken()]} />);
     expect(container.querySelector('[data-attached-erc20-print]')).toBeTruthy();
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(
-      <DonatedERC20Table list={[createToken()]} handleClaim={jest.fn()} />,
-    );
+    const { container } = render(<DonatedERC20Table list={[createToken()]} />);
     await checkA11y(container);
   });
 });

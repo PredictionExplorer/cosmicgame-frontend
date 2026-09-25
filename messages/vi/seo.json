@@ -32,7 +32,7 @@
       },
       "anchoring": {
         "heading": "Phân phối neo giữ",
-        "description": "Mọi lượt neo giữ NFT, mọi khoản phân phối neo giữ ETH và mọi lượt khắc Tinh tuyển, đúng như được ghi trên chuỗi.",
+        "description": "Mọi khoản phân phối neo giữ ETH và mọi lượt khắc từ Tinh tuyển NFT neo giữ, đúng như được ghi trên chuỗi, cùng cách neo giữ hoạt động.",
         "links": {
           "statistics": "Xem thống kê neo giữ",
           "learn": "Tìm hiểu về neo giữ",

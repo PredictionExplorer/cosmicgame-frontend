@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
 import { buttonVariants } from '@/components/ui/button';
+import { useDashboardLiveCycle } from '@/components/tables/useCycleHref';
 import { useRoundList } from '@/hooks/useApiQuery';
 
 /**
@@ -22,15 +23,20 @@ export function missingCycleState(cycle: number, liveCycle: number | null): Miss
 }
 
 /**
- * The cycle open now: the one after the newest finalized cycle (`0` before
- * any is finalized), or `null` while the cycle list has not been read.
+ * The cycle open now, the same one every cycle link uses: the dashboard's
+ * `CurRoundNum` (`useDashboardLiveCycle`). Only while the dashboard is
+ * unavailable does the cycle list stand in (the one after its newest
+ * finalized cycle, `0` before any is finalized), since the indexer's list can
+ * lag the chain right after a finalization. `null` while neither is known.
  */
 export function useLiveCycle(): number | null {
+  const fromDashboard = useDashboardLiveCycle();
   const { data } = useRoundList();
   return useMemo(() => {
+    if (fromDashboard !== null) return fromDashboard;
     if (!data) return null;
     return data.reduce((last, cycle) => Math.max(last, cycle.RoundNum ?? -1), -1) + 1;
-  }, [data]);
+  }, [data, fromDashboard]);
 }
 
 export interface MissingCycle {

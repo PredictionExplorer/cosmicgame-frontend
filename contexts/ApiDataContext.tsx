@@ -5,6 +5,7 @@ import api from '@/services/api';
 import type { CSTAnchorDistribution } from '@/services/api/types';
 import { useNotifyRedBox, useCSTAnchorDistributionsToRetrieveByUser } from '@/hooks/useApiQuery';
 import { reportError } from '@/utils/errors';
+import { toFiniteNumber } from '@/utils/finiteNumber';
 
 import { ApiDataContext, initialApiData, useApiData, type ApiData } from './accountDataContexts';
 import { useAnchoredToken } from './AnchoredTokenContext';
@@ -27,11 +28,13 @@ export const ApiDataProvider = ({ children }: ApiDataProviderProps) => {
     data: redBoxData,
     refetch: refetchRedBox,
     isLoading: redBoxLoading,
+    isError: redBoxFailed,
   } = useNotifyRedBox(account);
   const {
     data: rewardsData,
     refetch: refetchRewards,
     isLoading: rewardsLoading,
+    isError: rewardsFailed,
   } = useCSTAnchorDistributionsToRetrieveByUser(account);
 
   const unclaimedRewards = useMemo(() => rewardsData ?? [], [rewardsData]);
@@ -144,10 +147,32 @@ export const ApiDataProvider = ({ children }: ApiDataProviderProps) => {
   }, [refetchRedBox, refetchRewards]);
 
   const isLoading = redBoxLoading || rewardsLoading;
+  const anchorReadFailed =
+    (redBoxFailed && redBoxData === undefined) ||
+    (rewardsFailed && rewardsData === undefined) ||
+    redBoxData === null;
+  const unretrievedAnchorEth = anchorReadFailed
+    ? null
+    : isLoading || redBoxData === undefined
+      ? undefined
+      : toFiniteNumber(redBoxData.UnretrievedAnchorDistribution);
+  const retryAnchorRead = useCallback(() => {
+    void refetchRedBox();
+    void refetchRewards();
+  }, [refetchRedBox, refetchRewards]);
 
   return (
     <ApiDataContext.Provider
-      value={{ apiData, setApiData, fetchData, unclaimedRewards, error, isLoading }}
+      value={{
+        apiData,
+        setApiData,
+        fetchData,
+        unclaimedRewards,
+        error,
+        isLoading,
+        unretrievedAnchorEth,
+        retryAnchorRead,
+      }}
     >
       {children}
     </ApiDataContext.Provider>

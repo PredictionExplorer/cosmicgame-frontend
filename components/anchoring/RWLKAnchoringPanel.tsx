@@ -12,21 +12,28 @@ import AnchorActionsTable from './AnchorActionsTable';
 import { AnchoredOn } from './AnchoredOn';
 import { AnchorTokenGrid, type AnchorGridItem } from './AnchorTokenGrid';
 import { RwalkAnchorDistributionImprintsTable } from './RwalkAnchorDistributionImprintsTable';
+import { SECTION_READY, type SectionRead } from './sectionRead';
 
 /** The grid ids of this panel, which own the page's one wallet flow in turn. */
 export const RWLK_GRIDS = { anchored: 'rwlk-anchored', available: 'rwlk-available' } as const;
 
 export interface RWLKAnchoringPanelProps {
   anchoredTokens: readonly AnchoredTokenInfo[];
-  /** Random Walk NFTs in the wallet that have never been anchored; `null` while they load. */
+  /**
+   * Random Walk NFTs in the wallet that can still be anchored (never anchored
+   * by anyone, as the contract's `usedNfts` records); `null` while they load.
+   */
   availableTokenIds: readonly number[] | null;
   imprints: AnchorDistributionImprint[];
   actions: AnchorAction[];
+  anchoredRead?: SectionRead;
+  availableRead?: SectionRead;
+  imprintsRead?: SectionRead;
+  historyRead?: SectionRead;
   onAnchor: (tokenIds: number[]) => Promise<TxResult>;
   onRelease: (actionIds: number[]) => Promise<TxResult>;
   stageFor: (gridId: string) => TxStage;
   walletBusy: boolean;
-  loading?: boolean;
 }
 
 /**
@@ -39,11 +46,14 @@ export function RWLKAnchoringPanel({
   availableTokenIds,
   imprints,
   actions,
+  anchoredRead = SECTION_READY,
+  availableRead = SECTION_READY,
+  imprintsRead = SECTION_READY,
+  historyRead = SECTION_READY,
   onAnchor,
   onRelease,
   stageFor,
   walletBusy,
-  loading = false,
 }: RWLKAnchoringPanelProps) {
   const t = useTranslations('anchoring');
 
@@ -78,7 +88,9 @@ export function RWLKAnchoringPanel({
         onCommit={onRelease}
         stage={stageFor(RWLK_GRIDS.anchored)}
         walletBusy={walletBusy}
-        loading={loading}
+        loading={anchoredRead.loading}
+        failed={anchoredRead.failed}
+        onRetry={anchoredRead.onRetry}
       />
 
       <AnchorTokenGrid
@@ -93,7 +105,9 @@ export function RWLKAnchoringPanel({
         onCommit={onAnchor}
         stage={stageFor(RWLK_GRIDS.available)}
         walletBusy={walletBusy}
-        loading={loading || availableTokenIds === null}
+        loading={!availableRead.failed && (availableRead.loading || availableTokenIds === null)}
+        failed={availableRead.failed}
+        onRetry={availableRead.onRetry}
       />
 
       <section aria-labelledby="rwlk-imprints-heading">
@@ -105,7 +119,10 @@ export function RWLKAnchoringPanel({
         <RwalkAnchorDistributionImprintsTable
           list={imprints}
           showRecipient={false}
-          loading={loading}
+          loading={imprintsRead.loading}
+          error={imprintsRead.failed ? t('overview.errorMessage') : undefined}
+          errorTitle={t('overview.errorTitle')}
+          onRetry={imprintsRead.onRetry}
           emptyTitle={t('panels.randomWalk.selectionEmpty')}
         />
       </section>
@@ -116,7 +133,14 @@ export function RWLKAnchoringPanel({
           title={t('panels.shared.history')}
           description={t('panels.shared.historyDescription')}
         />
-        <AnchorActionsTable list={actions} IsRwalk loading={loading} />
+        <AnchorActionsTable
+          list={actions}
+          IsRwalk
+          loading={historyRead.loading}
+          error={historyRead.failed ? t('overview.errorMessage') : undefined}
+          errorTitle={t('overview.errorTitle')}
+          onRetry={historyRead.onRetry}
+        />
       </section>
     </div>
   );

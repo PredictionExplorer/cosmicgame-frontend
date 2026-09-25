@@ -91,6 +91,30 @@ describe('ReleaseConfirmDialog', () => {
     expect(within(dialog).getByRole('status')).toBeInTheDocument();
   });
 
+  it('focuses "Keep anchored" first, so Enter never releases by accident', () => {
+    const { dialog } = renderDialog();
+    expect(within(dialog).getByRole('button', { name: 'anchoring.release.keep' })).toHaveFocus();
+  });
+
+  it('cannot be dismissed while the release runs, so nobody thinks they cancelled it', async () => {
+    const user = userEvent.setup();
+    const { dialog, onOpenChange } = renderDialog({
+      stage: { status: 'awaiting-signature', step: 1, total: 1 },
+    });
+    expect(within(dialog).getByRole('button', { name: 'anchoring.release.keep' })).toBeDisabled();
+    expect(within(dialog).getByRole('button', { name: 'common.actions.close' })).toBeDisabled();
+    await user.keyboard('{Escape}');
+    expect(onOpenChange).not.toHaveBeenCalled();
+    expect(screen.getByTestId('release-confirm-dialog')).toBeInTheDocument();
+  });
+
+  it('closes on Escape before anything is sent', async () => {
+    const user = userEvent.setup();
+    const { onOpenChange } = renderDialog();
+    await user.keyboard('{Escape}');
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
   it('has no accessibility violations', async () => {
     const { dialog } = renderDialog();
     await checkA11y(dialog);

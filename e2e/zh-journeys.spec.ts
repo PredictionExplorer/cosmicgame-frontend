@@ -150,11 +150,20 @@ test.describe('Sprint 8 deterministic Chinese journeys', () => {
     await expect(page.getByRole('button', { name: '转出 CST' })).toHaveCount(0);
   });
 
-  test('renders a localized success toast through a safe mocked flow', async ({ page }) => {
+  test('renders a localized success toast through a safe mocked flow', async ({
+    page,
+    context,
+  }) => {
+    // Without a share sheet the cycle's share button copies its link, and confirms only a copy
+    // that happened.
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, 'share', { value: undefined, configurable: true });
+    });
     await page.goto(`/zh/allocation/${cycle}`, { waitUntil: 'domcontentloaded' });
-    await page.getByRole('button', { name: '分享周期摘要' }).click();
+    await page.getByRole('button', { name: '复制链接' }).click();
     await expect(
-      page.locator('[data-sonner-toast]').filter({ hasText: '周期摘要已复制到剪贴板' }),
+      page.locator('[data-sonner-toast]').filter({ hasText: '链接已复制' }),
     ).toBeVisible();
   });
 

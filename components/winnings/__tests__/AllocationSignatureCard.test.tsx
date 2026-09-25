@@ -1,11 +1,11 @@
 import { checkA11y, render, screen } from '@/test-utils';
 
-import { SignatureCard } from '../SignatureCard';
+import { AllocationSignatureCard } from '../AllocationSignatureCard';
 
-describe('SignatureCard', () => {
+describe('AllocationSignatureCard', () => {
   it('leads to the token from its title, the plate being a pointer shortcut only', () => {
     const { container } = render(
-      <SignatureCard
+      <AllocationSignatureCard
         tokenId={24}
         seed="5084a8"
         title="Orbit Study"
@@ -27,7 +27,7 @@ describe('SignatureCard', () => {
 
   it('keeps a role title as plain text and can lead elsewhere', () => {
     render(
-      <SignatureCard
+      <AllocationSignatureCard
         tokenId={27}
         seed={undefined}
         title="Chrono-Warrior"
@@ -48,7 +48,7 @@ describe('SignatureCard', () => {
     // Regression: on /allocation/1 a role whose amounts wrapped on a phone
     // pushed its Recipient line below its neighbour's.
     const { container, rerender } = render(
-      <SignatureCard
+      <AllocationSignatureCard
         tokenId={27}
         seed="5084a8"
         title="Chrono-Warrior"
@@ -58,7 +58,7 @@ describe('SignatureCard', () => {
         subgrid
       >
         <p>Recipient</p>
-      </SignatureCard>,
+      </AllocationSignatureCard>,
     );
     const figure = container.querySelector('figure');
     expect(figure).toHaveClass('row-span-4', 'grid-rows-subgrid');
@@ -69,7 +69,7 @@ describe('SignatureCard', () => {
     expect(container.querySelector('figcaption')).toHaveClass('grid-cols-1');
 
     rerender(
-      <SignatureCard
+      <AllocationSignatureCard
         tokenId={27}
         seed="5084a8"
         title="Chrono-Warrior"
@@ -82,7 +82,7 @@ describe('SignatureCard', () => {
 
   it('holds a busy plate with no "unavailable" caption while the seed is on its way', () => {
     render(
-      <SignatureCard
+      <AllocationSignatureCard
         tokenId={24}
         seed={undefined}
         artState="loading"
@@ -99,7 +99,7 @@ describe('SignatureCard', () => {
 
   it('draws the bare plate, not "unavailable", when the seeds could not be read', () => {
     render(
-      <SignatureCard
+      <AllocationSignatureCard
         tokenId={24}
         seed={undefined}
         artState="failed"
@@ -114,7 +114,7 @@ describe('SignatureCard', () => {
 
   it('has no accessibility violations', async () => {
     const { container } = render(
-      <SignatureCard
+      <AllocationSignatureCard
         tokenId={24}
         seed="5084a8"
         title="Cosmic Signature #000024"

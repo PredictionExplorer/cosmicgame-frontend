@@ -41,6 +41,7 @@ export const UniqueAnchorHoldersRWLKTable = ({
         header: t('uniqueAnchorHolders.anchors'),
         value: (row) => row.NumStakeActions,
         sortable: true,
+        priority: 'secondary',
       },
       {
         id: 'releases',
@@ -48,6 +49,7 @@ export const UniqueAnchorHoldersRWLKTable = ({
         header: t('uniqueAnchorHolders.releases'),
         value: (row) => row.NumUnstakeActions,
         sortable: true,
+        priority: 'secondary',
       },
       {
         id: 'anchored',
@@ -76,6 +78,8 @@ export const UniqueAnchorHoldersRWLKTable = ({
       getRowKey={(row) => row.StakerAid}
       emptyTitle={t('empty.anchorHolders')}
       initialSort={{ id: 'anchored', direction: 'desc' }}
+      // The ledgers above it keep their links quiet: one calm register for the page.
+      links="quiet"
       {...state}
     />
   );

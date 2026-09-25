@@ -8,6 +8,10 @@
     "subtitle": "协议为此钱包预留的全部分配，都可以在这里一并取回。",
     "loadErrorTitle": "未能加载分配",
     "loadErrorMessage": "未能加载待取回分配数据，请稍后重试。",
+    "anchorLoadError": {
+      "title": "无法加载你的锚定派发",
+      "message": "此钱包的锚定派发暂时无法获取，请稍后重试。"
+    },
     "summary": {
       "title": "可取回",
       "description": "一笔交易即可取回为此钱包保留的 ETH、已附加 NFT 和已附加代币。",
@@ -17,7 +21,7 @@
       "anchor": "锚定派发",
       "cycles": "{count, plural, other {来自 # 个周期}}",
       "anchorCaption": "在下方单独取回",
-      "retrieveEverything": "一次全部取回",
+      "retrieveEverything": "取回 ETH、NFT 和代币",
       "retrieveBy": "请在 <date></date> 前取回，之后任何人都可以取回。",
       "expired": "取回期限已于 <date></date> 截止。在其他人取回之前，你仍可取回。",
       "success": "已全部取回到你的钱包。"
@@ -34,7 +38,13 @@
       "nfts": "已附加 NFT",
       "erc20": "已附加 ERC-20 代币"
     },
-    "retrieveAll": "全部取回"
+    "retrieveAll": "全部取回",
+    "lookup": {
+      "label": "查询任意地址",
+      "hint": "分配记录是公开的：可查看任意地址获得的分配。",
+      "submit": "查询",
+      "invalid": "请输入完整地址：0x 后跟 40 个十六进制字符（0～9、a～f）。"
+    }
   },
   "anchors": {
     "title": "我的锚定",

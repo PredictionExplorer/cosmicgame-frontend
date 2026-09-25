@@ -54,7 +54,8 @@
   "steps": {
     "anchor": {
       "title": "NFT 앵커링",
-      "body": "<link>내 앵커링</link>에서 지갑에 있는 Cosmic Signature 또는 Random Walk NFT를 선택합니다. 처음에는 지갑이 해당 컬렉션의 앵커링 컨트랙트 승인을 먼저 요청하고, 그다음 앵커링을 요청합니다."
+      "body": "<link>내 앵커링</link>에서 지갑에 있는 Cosmic Signature 또는 Random Walk NFT를 선택합니다. 처음에는 지갑이 해당 컬렉션의 앵커링 컨트랙트 승인을 먼저 요청하고, 그다음 앵커링을 요청합니다.",
+      "bodyHere": "지갑을 연결한 다음 앵커링할 Cosmic Signature 또는 Random Walk NFT를 선택합니다. 처음에는 지갑이 해당 컬렉션의 앵커링 컨트랙트 승인을 먼저 요청하고, 그다음 앵커링을 요청합니다."
     },
     "receive": {
       "title": "매 사이클 지급",
@@ -142,7 +143,8 @@
     },
     "imprints": {
       "title": "앵커링 NFT 별빛 선정 각인",
-      "description": "매 사이클 앵커링된 Random Walk NFT 중 {count}개가 선정됩니다. 선정 1건마다 해당 앵커링 보유자에게 Cosmic Signature NFT 1개와 {cst, number} CST가 각인됩니다."
+      "description": "매 사이클 앵커링된 Random Walk NFT 중 {count}개가 선정됩니다. 선정 1건마다 해당 앵커링 보유자에게 Cosmic Signature NFT 1개와 {cst, number} CST가 각인됩니다.",
+      "selections": "{count, plural, other {별빛 선정 #회}}"
     }
   },
   "picker": {
@@ -159,6 +161,10 @@
     "accrued": "적립 {amount}",
     "cycle": "사이클 {cycle}",
     "open": "{title} 열기",
+    "loadError": {
+      "title": "이 NFT 목록을 불러오지 못했습니다",
+      "message": "목록을 일시적으로 불러올 수 없습니다. 잠시 후 다시 시도해 주세요."
+    },
     "settled": {
       "anchored": "앵커링됨 · 업데이트 중",
       "released": "해제됨 · 업데이트 중"
@@ -184,7 +190,6 @@
   },
   "anchorActionDetail": {
     "title": "앵커링 작업 #{id}",
-    "subtitle": "{token} NFT 앵커링 작업",
     "errorTitle": "이 앵커링 작업을 불러오지 못했습니다",
     "error": "앵커링 기록을 일시적으로 불러올 수 없습니다. 잠시 후 다시 시도해 주세요.",
     "breadcrumbs": {
@@ -196,16 +201,10 @@
       "browse": "앵커링 지급 둘러보기",
       "statistics": "앵커링 통계"
     },
-    "token": {
-      "labels": {
-        "randomWalk": "Random Walk",
-        "cosmicSignature": "Cosmic Signature"
-      }
-    },
     "record": {
       "title": "기록",
       "holder": "앵커링 보유자",
-      "token": "토큰"
+      "transaction": "트랜잭션"
     },
     "timeline": {
       "title": "타임라인",
@@ -237,16 +236,14 @@
       "unretrievedCaption": "앵커링을 해제할 때 회수됩니다"
     },
     "details": {
-      "anchorTitle": "앵커링",
-      "releaseTitle": "해제",
       "anchoredDatetime": "앵커링 일시",
       "releasedDatetime": "해제 일시",
-      "anchoredNfts": "전체 앵커링 수",
       "distribution": "회수 금액",
-      "action": "앵커링 작업",
-      "stillAnchored": "앵커링 유지 중입니다. ETH는 해제할 때 회수됩니다.",
-      "show": "앵커링 보기",
-      "hide": "앵커링 숨기기"
+      "action": "앵커링 작업"
+    },
+    "anchor": {
+      "status": "상태",
+      "notAnchored": "이 주소는 이 NFT를 앵커링하지 않았습니다"
     },
     "columns": {
       "depositDatetime": "적립 일시",
@@ -258,7 +255,8 @@
     "empty": {
       "title": "이 NFT의 앵커링 지급이 아직 없습니다",
       "description": "NFT가 앵커링되어 있는 동안 사이클이 마감될 때마다 적립 내역이 여기에 추가됩니다.",
-      "action": "앵커링 지급 둘러보기"
+      "action": "앵커링 지급 둘러보기",
+      "viewAction": "앵커링 작업 #{id} 보기"
     }
   },
   "tables": {
@@ -317,8 +315,7 @@
         "depositDatetime": "적립 일시",
         "totalAnchoredTokens": "앵커링된 NFT",
         "totalDepositedEth": "총 적립(ETH)",
-        "pendingEth": "미회수(ETH)",
-        "fullyRetrieved": "전액 회수 여부"
+        "pendingEth": "미회수(ETH)"
       }
     },
     "randomWalkImprints": {

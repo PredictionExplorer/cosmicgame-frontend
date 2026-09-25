@@ -86,4 +86,25 @@ describe('AnchoringHeaderCount', () => {
     expect(screen.getByText('common.status.unavailable')).toBeVisible();
     expect(document.body).not.toHaveTextContent(/\d/);
   });
+
+  it('shows the count the server read, with no browser read behind it', () => {
+    // The lists stay loading: a count that waited on them would be a skeleton.
+    const { container } = render(<AnchoringHeaderCount metric="actions" serverCount={89} />);
+    expect(container).toHaveTextContent(/^89$/);
+    expect(container.querySelector('.animate-pulse')).toBeNull();
+  });
+
+  it('reads the list in the browser when the server read failed', () => {
+    reads.deposits = { data: rows(3), isLoading: false };
+    render(<AnchoringHeaderCount metric="ethDeposits" serverCount={null} />);
+    expect(screen.getByText('3')).toBeInTheDocument();
+  });
+
+  it('links a count to the page that lists its records', () => {
+    render(<AnchoringHeaderCount metric="actions" serverCount={89} href="/statistics/anchoring" />);
+    expect(screen.getByRole('link', { name: '89' })).toHaveAttribute(
+      'href',
+      '/statistics/anchoring',
+    );
+  });
 });

@@ -31,7 +31,7 @@ const DISCONNECTED: AccountData = {
  */
 const SYNCING: AccountData = {
   anchored: { ...DISCONNECTED_ANCHORED_TOKENS, isLoading: true },
-  api: { ...DISCONNECTED_API_DATA, isLoading: true },
+  api: { ...DISCONNECTED_API_DATA, isLoading: true, unretrievedAnchorEth: undefined },
 };
 
 /** The wallet's reads (anchored NFTs, retrieval status), loaded while a wallet is connected. */

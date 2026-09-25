@@ -1,6 +1,9 @@
 'use client';
 
+import { useLocale, useTranslations } from 'next-intl';
+
 import { ALLOCATION_TRACK_COLORS, type AllocationTrackId } from '@/config/allocationTracks';
+import { getLocaleConfig } from '@/i18n/localeConfig';
 import { Amount } from '@/components/ui/amount';
 import { ExplainedTerm } from '@/components/ui/explain-popover';
 import { UnknownValue } from '@/components/ui/unknown-value';
@@ -40,7 +43,10 @@ interface AllocationSplitBarProps {
  * known, and its share, "~" on the approximate remainder. The landing's
  * AllocationBar is the same split drawn tall with its figures inside. The
  * bar itself is one image with a text alternative; the legend carries the
- * numbers, so nothing depends on colour or hover.
+ * numbers, so nothing depends on colour or hover. The alternative is worded
+ * by the catalog and joined as the locale lists things (`Intl.ListFormat`),
+ * so Chinese and Japanese read with their own punctuation, never ASCII
+ * commas between CJK words. Pages using it load the `allocation` namespace.
  */
 export function AllocationSplitBar({
   segments,
@@ -48,6 +54,8 @@ export function AllocationSplitBar({
   unavailableLabel,
   className,
 }: AllocationSplitBarProps) {
+  const t = useTranslations('allocation');
+  const locale = useLocale();
   const format = useFormat();
   const drawn = segments.filter((segment) => (segment.percent ?? 0) > 0);
   const showAmounts = segments.some((segment) => segment.amount !== undefined);
@@ -57,13 +65,23 @@ export function AllocationSplitBar({
       ? null
       : `${segment.approximate ? '~' : ''}${format.percent(segment.percent)}`;
 
+  const items = new Intl.ListFormat(getLocaleConfig(locale).intlLocale, {
+    type: 'conjunction',
+    style: 'long',
+  }).format(
+    segments.map((segment) =>
+      t('split.item', {
+        track: segment.label,
+        share: percentText(segment) ?? unavailableLabel,
+      }),
+    ),
+  );
+
   return (
     <div className={cn('min-w-0', className)} data-testid="allocation-split">
       <div
         role="img"
-        aria-label={`${label}: ${segments
-          .map((segment) => `${segment.label} ${percentText(segment) ?? unavailableLabel}`)
-          .join(', ')}`}
+        aria-label={t('split.label', { label, items })}
         className="flex h-2.5 w-full gap-0.5"
       >
         {drawn.map((segment) => (

@@ -71,7 +71,8 @@ export function useWalletAccount(): WalletAccountState {
 
   const copyAddress = useCallback(async () => {
     if (!address) return;
-    await copy(address);
+    // Confirm only a copy that happened (useClipboard resolves false when every route failed).
+    if (!(await copy(address))) return;
     setCopied(true);
     if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
     copiedTimerRef.current = setTimeout(() => setCopied(false), COPIED_FEEDBACK_MS);

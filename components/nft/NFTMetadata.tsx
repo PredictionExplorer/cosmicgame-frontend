@@ -10,6 +10,7 @@ import type { NftTraitEntry, RarityInfo } from '@/lib/nftMetadata';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { useNow } from '@/hooks/useNow';
+import { isAnchorable } from '@/utils/anchoringStats';
 import { formatCount } from '@/utils/format';
 import { RecordRow } from '@/components/detail-page/RecordRow';
 import { AddressChip } from '@/components/ui/address-chip';
@@ -94,7 +95,7 @@ export function NFTSpecList({ nft, entry, rarity, rarityTotal = 0, className }: 
       ? t(recordTypeKey)
       : null;
 
-  const anchoringEligible = nft != null && !nft.Staked && !nft.WasUnstaked;
+  const anchoringEligible = isAnchorable(nft);
 
   return (
     <dl

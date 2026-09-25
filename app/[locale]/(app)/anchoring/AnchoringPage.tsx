@@ -15,29 +15,37 @@ import {
   useUniqueRWLKAnchorHolders,
 } from '@/hooks/useApiQuery';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { DataTableWidth } from '@/components/ui/data-table';
 import { PageShell } from '@/components/ui/page-shell';
 import { SectionHeader } from '@/components/ui/section-header';
 import { AnchoringFlow } from '@/components/anchoring/AnchoringFlow';
 import { GlobalAnchorDistributionsTable } from '@/components/anchoring/GlobalAnchorDistributionsTable';
-import { RwalkAnchorDistributionImprintsTable } from '@/components/anchoring/RwalkAnchorDistributionImprintsTable';
+import { SelectionImprintGallery } from '@/components/anchoring/SelectionImprintGallery';
 
 interface AnchoringPageProps {
   /** The server-rendered header; the plain PageHeader stands in without one. */
   seoSummary?: ReactNode;
   /** "How anchoring works" steps, rendered on the server (static copy, no client JS). */
   steps: ReactNode;
-  /** The question list under the flow, rendered on the server with its own spacing. */
+  /** The question list, rendered on the server with its own spacing. */
   questions: ReactNode;
+  /**
+   * The header's related pages again, as a list at the end of the page on
+   * phones, where the header hides its chips: rendered on the server.
+   */
+  related?: ReactNode;
 }
 
 /**
- * The anchoring hub. A newcomer learns what anchoring is, what an anchored
- * NFT receives (the live figures of both lanes) and how to start; the two
- * public ledgers follow: every ETH Anchor Distribution deposit and every
- * Anchored-NFT Stellar Selection imprint. The static explanations arrive as
- * server-rendered slots; this client part only reads the live figures.
+ * The Anchor Distributions records: the page a Records link leads to, so
+ * the records lead. Every ETH Anchor Distribution deposit, then the
+ * Anchored-NFT Stellar Selection imprints hung as the Signatures they are,
+ * both at one width; then how anchoring works (the steps and the live
+ * figures of both lanes) and the questions a newcomer asks. The static
+ * explanations arrive as server-rendered slots; this client part only reads
+ * the live figures and the two ledgers, which the route seeds.
  */
-const AnchoringPage = ({ seoSummary, steps, questions }: AnchoringPageProps) => {
+const AnchoringPage = ({ seoSummary, steps, questions, related }: AnchoringPageProps) => {
   const t = useTranslations('anchoring');
   const distributions = useCSTAnchorDistributions();
   const imprints = useGlobalRWLKAnchorImprints();
@@ -63,9 +71,35 @@ const AnchoringPage = ({ seoSummary, steps, questions }: AnchoringPageProps) => 
         />
       )}
 
+      {/* Both ledgers run the column's full width, so they share one right edge. */}
+      <DataTableWidth value="fill">
+        <GlobalAnchorDistributionsTable
+          list={distributions.data ?? []}
+          loading={distributions.isLoading}
+          error={
+            distributions.error && !distributions.data ? t('overview.errorMessage') : undefined
+          }
+          errorTitle={t('overview.errorTitle')}
+          onRetry={() => void distributions.refetch()}
+          title={t('ledgers.distributions.title')}
+          description={t('ledgers.distributions.description', ledgerValues)}
+        />
+      </DataTableWidth>
+
+      <SelectionImprintGallery
+        className="mt-[var(--block-gap)] sm:mt-20"
+        list={imprints.data ?? []}
+        loading={imprints.isLoading}
+        error={imprints.error && !imprints.data ? t('overview.errorMessage') : undefined}
+        errorTitle={t('overview.errorTitle')}
+        onRetry={() => void imprints.refetch()}
+        title={t('ledgers.imprints.title')}
+        description={t('ledgers.imprints.description', ledgerValues)}
+      />
+
       <section
         aria-labelledby="anchoring-how-heading"
-        className="grid gap-x-12 gap-y-8 lg:grid-cols-12"
+        className="mt-[var(--block-gap)] grid gap-x-12 gap-y-8 border-t border-rule-faint pt-[var(--block-gap)] sm:mt-20 lg:grid-cols-12"
       >
         <div className="lg:col-span-5">
           <SectionHeader
@@ -91,29 +125,7 @@ const AnchoringPage = ({ seoSummary, steps, questions }: AnchoringPageProps) => 
 
       {questions}
 
-      <GlobalAnchorDistributionsTable
-        className="mt-[var(--block-gap)] sm:mt-20"
-        list={distributions.data ?? []}
-        loading={distributions.isLoading}
-        error={distributions.error ? t('overview.errorMessage') : undefined}
-        errorTitle={t('overview.errorTitle')}
-        onRetry={() => void distributions.refetch()}
-        title={t('ledgers.distributions.title')}
-        description={t('ledgers.distributions.description', ledgerValues)}
-      />
-
-      <RwalkAnchorDistributionImprintsTable
-        className="mt-[var(--block-gap)] sm:mt-20"
-        list={imprints.data ?? []}
-        loading={imprints.isLoading}
-        error={imprints.error ? t('overview.errorMessage') : undefined}
-        errorTitle={t('overview.errorTitle')}
-        onRetry={() => void imprints.refetch()}
-        title={t('ledgers.imprints.title')}
-        description={t('ledgers.imprints.description', ledgerValues)}
-        headingLevel={2}
-        pageSize={10}
-      />
+      {related}
     </PageShell>
   );
 };

@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+import { useCycleCell } from '@/components/tables/useCycleCell';
 
 export interface CSTAnchorDistributionByDeposit {
   EvtLogId: number;
@@ -37,6 +38,7 @@ export const CSTAnchorDistributionsByDepositTable = ({
   ...state
 }: CSTAnchorDistributionsByDepositTableProps) => {
   const t = useTranslations('anchoring');
+  const cycleCell = useCycleCell();
 
   const columns = useMemo<DataTableColumn<CSTAnchorDistributionByDeposit>[]>(
     () => [
@@ -52,7 +54,8 @@ export const CSTAnchorDistributionsByDepositTable = ({
         kind: 'link',
         header: t('tables.distributionsByDeposit.columns.depositCycle'),
         value: (row) => row.DepositRoundNum,
-        href: (row) => `/allocation/${row.DepositRoundNum}`,
+        cell: (row) => cycleCell(row.DepositRoundNum),
+        nowrap: true,
       },
       {
         id: 'deposit',
@@ -113,7 +116,7 @@ export const CSTAnchorDistributionsByDepositTable = ({
         value: (row) => row.YourTokensStaked,
       },
     ],
-    [t],
+    [cycleCell, t],
   );
 
   return (

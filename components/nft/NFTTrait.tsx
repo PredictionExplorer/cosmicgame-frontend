@@ -4,6 +4,7 @@ import { useMemo, useEffect, useCallback, useId, useRef, type ReactNode } from '
 import { useTranslations } from 'next-intl';
 import { getAddress, isAddress } from 'viem';
 
+import { isAnchorable } from '@/utils/anchoringStats';
 import { formatId, sameAddress } from '@/utils/format';
 import { cn } from '@/lib/utils';
 import { useCollectionTraits, useNftMetadata } from '@/hooks/useNftTraits';
@@ -288,8 +289,8 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
               owner={owner}
               currentName={currentName ?? ''}
               totalNamedTokens={dashboard?.MainStats?.TotalNamedTokens ?? null}
-              // The ledger's own rule: never anchored, not anchored now.
-              anchoringEligible={!nft?.Staked && !nft?.WasUnstaked}
+              // The anchoring rule: not anchored now, and never released.
+              anchoringEligible={isAnchorable(nft)}
               onAnchored={() =>
                 // The indexer records the anchor a moment after the receipt.
                 scheduleNameRefetch(() => {

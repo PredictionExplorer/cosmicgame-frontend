@@ -114,6 +114,11 @@ export function AnchoredMark({ className }: { className?: string }) {
 
 export interface SignatureWallLabelProps extends SignatureLabelFacts {
   anchored?: boolean;
+  /**
+   * Where the title leads (the Signature's page) when the plate beside it is
+   * a pointer shortcut kept out of the tab order, so the title is the link.
+   */
+  titleHref?: string;
   /** `figcaption` inside a `<figure>` that holds the plate. */
   as?: 'figcaption' | 'div';
   titleAs?: 'h1' | 'h2' | 'h3' | 'p';
@@ -125,6 +130,7 @@ export interface SignatureWallLabelProps extends SignatureLabelFacts {
 /** A Signature's wall label: WallLabel with its title, caption and anchor composed by the rule. */
 export function SignatureWallLabel({
   anchored = false,
+  titleHref,
   as,
   titleAs,
   children,
@@ -132,7 +138,13 @@ export function SignatureWallLabel({
   ...facts
 }: SignatureWallLabelProps) {
   const label = useSignatureLabel();
-  const title = label.title(facts);
+  const title = titleHref ? (
+    <Link href={titleHref} className="link-quiet">
+      {label.title(facts)}
+    </Link>
+  ) : (
+    label.title(facts)
+  );
   return (
     <WallLabel
       as={as}

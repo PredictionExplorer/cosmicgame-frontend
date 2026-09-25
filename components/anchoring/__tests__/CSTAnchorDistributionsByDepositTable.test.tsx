@@ -5,6 +5,11 @@ import {
   type CSTAnchorDistributionByDeposit,
 } from '../CSTAnchorDistributionsByDepositTable';
 
+jest.mock('@/hooks/useApiQuery', () => ({
+  // The live cycle behind every cycle link (useCycleHref).
+  useDashboardInfo: () => ({ data: { CurRoundNum: 99 } }),
+}));
+
 const deposit = (
   overrides: Partial<CSTAnchorDistributionByDeposit> = {},
 ): CSTAnchorDistributionByDeposit => ({
@@ -34,7 +39,10 @@ describe('CSTAnchorDistributionsByDepositTable', () => {
 
   it('links the cycle and proves the deposit on the explorer', () => {
     render(<CSTAnchorDistributionsByDepositTable list={[deposit()]} />);
-    expect(screen.getByRole('link', { name: '1' })).toHaveAttribute('href', '/allocation/1');
+    expect(screen.getByRole('link', { name: 'tables.allocation.cycle(cycle=1)' })).toHaveAttribute(
+      'href',
+      '/allocation/1',
+    );
     const proof = document.querySelector('a[href*="0xdeposit"]');
     expect(proof).toHaveAttribute('target', '_blank');
   });

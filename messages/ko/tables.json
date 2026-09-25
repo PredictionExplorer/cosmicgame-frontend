@@ -214,6 +214,7 @@
     "columns": {
       "finalized": "마감 시각",
       "signature": "시그니처 배분",
+      "signatureRecipient": "시그니처 배분 수령자",
       "signatureEth": "시그니처 배분(ETH)",
       "chrono": "시간의 전사",
       "chronoEth": "시간의 전사(ETH)",

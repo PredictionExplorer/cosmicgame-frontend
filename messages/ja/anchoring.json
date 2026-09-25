@@ -54,7 +54,8 @@
   "steps": {
     "anchor": {
       "title": "NFTを係留する",
-      "body": "<link>自分の係留</link>で、ウォレットにあるCosmic SignatureまたはRandom Walk NFTを選びます。初回は、ウォレットがまずそのコレクションの係留コントラクトの承認を求め、次に係留の確認を求めます。"
+      "body": "<link>自分の係留</link>で、ウォレットにあるCosmic SignatureまたはRandom Walk NFTを選びます。初回は、ウォレットがまずそのコレクションの係留コントラクトの承認を求め、次に係留の確認を求めます。",
+      "bodyHere": "ウォレットを接続し、係留するCosmic SignatureまたはRandom Walk NFTを選びます。初回は、ウォレットがまずそのコレクションの係留コントラクトの承認を求め、次に係留の確認を求めます。"
     },
     "receive": {
       "title": "毎サイクル受け取る",
@@ -142,7 +143,8 @@
     },
     "imprints": {
       "title": "係留NFT星選の刻印",
-      "description": "毎サイクル、係留中のRandom Walk NFTから{count}件が選ばれます。選ばれるたびに、その係留者へ{cst, number} CSTと新しいCosmic Signature NFTが刻印されます。"
+      "description": "毎サイクル、係留中のRandom Walk NFTから{count}件が選ばれます。選ばれるたびに、その係留者へ{cst, number} CSTと新しいCosmic Signature NFTが刻印されます。",
+      "selections": "{count, plural, other {星選#件}}"
     }
   },
   "picker": {
@@ -159,6 +161,10 @@
     "accrued": "{amount}を積立済み",
     "cycle": "サイクル{cycle}",
     "open": "{title}を開く",
+    "loadError": {
+      "title": "これらのNFTを読み込めませんでした",
+      "message": "一覧を一時的に取得できません。しばらくしてからもう一度お試しください。"
+    },
     "settled": {
       "anchored": "係留済み・更新中",
       "released": "解除済み・更新中"
@@ -184,7 +190,6 @@
   },
   "anchorActionDetail": {
     "title": "係留操作 #{id}",
-    "subtitle": "{token} NFTの係留操作",
     "errorTitle": "この係留操作を読み込めませんでした",
     "error": "係留の記録を一時的に取得できません。しばらくしてからもう一度お試しください。",
     "breadcrumbs": {
@@ -196,16 +201,10 @@
       "browse": "係留配分を見る",
       "statistics": "係留統計"
     },
-    "token": {
-      "labels": {
-        "randomWalk": "Random Walk",
-        "cosmicSignature": "Cosmic Signature"
-      }
-    },
     "record": {
       "title": "記録",
       "holder": "係留者",
-      "token": "トークン"
+      "transaction": "トランザクション"
     },
     "timeline": {
       "title": "タイムライン",
@@ -237,16 +236,14 @@
       "unretrievedCaption": "係留の解除時に受け取ります"
     },
     "details": {
-      "anchorTitle": "係留",
-      "releaseTitle": "解除",
       "anchoredDatetime": "係留日時",
       "releasedDatetime": "解除日時",
-      "anchoredNfts": "全体の係留数",
       "distribution": "受け取り額",
-      "action": "係留操作",
-      "stillAnchored": "係留中です。ETHは解除時に受け取ります。",
-      "show": "係留を表示",
-      "hide": "係留を隠す"
+      "action": "係留操作"
+    },
+    "anchor": {
+      "status": "状態",
+      "notAnchored": "このアドレスはこのNFTを係留していません"
     },
     "columns": {
       "depositDatetime": "積立日時",
@@ -258,7 +255,8 @@
     "empty": {
       "title": "このNFTの係留配分はまだありません",
       "description": "NFTが係留されている間、サイクルが確定するたびにここへ積立が追加されます。",
-      "action": "係留配分を見る"
+      "action": "係留配分を見る",
+      "viewAction": "係留操作#{id}を見る"
     }
   },
   "tables": {
@@ -317,8 +315,7 @@
         "depositDatetime": "積立日時",
         "totalAnchoredTokens": "係留中のNFT",
         "totalDepositedEth": "積立総額（ETH）",
-        "pendingEth": "未受け取り（ETH）",
-        "fullyRetrieved": "すべて受け取り済み"
+        "pendingEth": "未受け取り（ETH）"
       }
     },
     "randomWalkImprints": {

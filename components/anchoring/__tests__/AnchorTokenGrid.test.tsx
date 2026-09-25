@@ -222,6 +222,17 @@ describe('AnchorTokenGrid', () => {
     expect(screen.getByRole('link', { name: 'Browse' })).toBeInTheDocument();
   });
 
+  it('says a failed read failed, with a retry, instead of an empty wallet', async () => {
+    const onRetry = jest.fn();
+    renderGrid({ failed: true, onRetry });
+    expect(screen.getByText('anchoring.picker.loadError.title')).toBeInTheDocument();
+    expect(screen.queryByText('Nothing here')).not.toBeInTheDocument();
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /selectAll/ })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: /try again/i }));
+    expect(onRetry).toHaveBeenCalledTimes(1);
+  });
+
   it('shows plate skeletons while loading', () => {
     renderGrid({ loading: true });
     expect(screen.getByRole('status', { name: 'common.status.loading' })).toBeInTheDocument();

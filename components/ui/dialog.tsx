@@ -52,10 +52,17 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
  * content (it still paints in the top-right corner).
  */
 
+interface DialogContentProps extends React.ComponentPropsWithoutRef<
+  typeof DialogPrimitive.Content
+> {
+  /** Disables the corner close control, while the dialog must not be dismissed. */
+  closeDisabled?: boolean;
+}
+
 const DialogContent = React.forwardRef<
   React.ComponentRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+  DialogContentProps
+>(({ className, children, closeDisabled = false, ...props }, ref) => (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
@@ -66,7 +73,7 @@ const DialogContent = React.forwardRef<
       )}
       {...props}
     >
-      <DialogPrimitive.Close className={OVERLAY_CLOSE_CLASS}>
+      <DialogPrimitive.Close className={OVERLAY_CLOSE_CLASS} disabled={closeDisabled}>
         <X aria-hidden className="size-4" />
         <DialogCloseLabel />
       </DialogPrimitive.Close>

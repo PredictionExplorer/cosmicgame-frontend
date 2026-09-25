@@ -4,7 +4,7 @@ import { formatAddress } from '@/utils';
 
 import AttachedNFTTable from '@/components/attachments/AttachedNFTTable';
 
-import { render, screen, waitFor, fireEvent, within, checkA11y } from '@/test-utils';
+import { render, screen, waitFor, within, checkA11y } from '@/test-utils';
 
 const mockUseAttachedNftMetadata = jest.fn(() => ({
   data: undefined as { image?: string; external_url?: string } | undefined,
@@ -27,7 +27,7 @@ describe('AttachedNFTTable', () => {
   });
 
   test('with no records', () => {
-    render(<AttachedNFTTable list={[]} claimingTokens={[]} />);
+    render(<AttachedNFTTable list={[]} />);
     expect(screen.getByText('tables.attachedAssets.nft.empty')).toBeInTheDocument();
   });
 
@@ -59,7 +59,7 @@ describe('AttachedNFTTable', () => {
         DonorAddr: '0x90F79bf6EB2c4f870365E785982E1f101E93b906',
       },
     ];
-    render(<AttachedNFTTable list={mockData} handleClaim={jest.fn()} claimingTokens={[]} />);
+    render(<AttachedNFTTable list={mockData} />);
     const interactive = within(screen.getAllByRole('table')[0]!);
     for (const header of [
       'tables.attachedAssets.nft.columns.datetime',
@@ -88,10 +88,6 @@ describe('AttachedNFTTable', () => {
         expect(decoded).toEqual(mockImageUrl);
       }
     });
-
-    expect(screen.getByTestId('Claim Button')).toHaveTextContent(
-      'tables.attachedAssets.actions.claim',
-    );
   });
 
   test('renders the localized unavailable-image state', () => {
@@ -109,7 +105,6 @@ describe('AttachedNFTTable', () => {
             Index: 0,
           },
         ]}
-        claimingTokens={[]}
       />,
     );
 
@@ -139,7 +134,6 @@ describe('AttachedNFTTable', () => {
             Index: 0,
           },
         ]}
-        claimingTokens={[]}
       />,
     );
 
@@ -176,7 +170,7 @@ describe('AttachedNFTTable', () => {
         DonorAddr: '0x90F79bf6EB2c4f870365E785982E1f101E93b906',
       },
     ];
-    render(<AttachedNFTTable list={mockData} handleClaim={jest.fn()} claimingTokens={[]} />);
+    render(<AttachedNFTTable list={mockData} />);
 
     await waitFor(() => {
       const links = screen.getAllByRole('link');
@@ -188,104 +182,16 @@ describe('AttachedNFTTable', () => {
     });
   });
 
-  test('Claim button click calls handleClaim with token index', async () => {
-    const mockHandleClaim = jest.fn();
-    const mockImageUrl = 'https://example.com/nft-image.png';
-    mockUseAttachedNftMetadata.mockReturnValue({
-      data: { image: mockImageUrl, external_url: 'https://example.com' },
-      isLoading: false,
-      isError: false,
-    });
-
-    const mockData = [
-      {
-        RecordId: '45',
-        EvtId: 0,
-        BlockNum: 71474,
-        TimeStamp: 1694659504,
-        DateTime: '2023-09-14T02:45:04Z',
-        TxId: 2509,
-        TxHash: '0xb9166d0e8449d5b63993e221ae888a0a1e57cd258cd45871bb133723a0488486',
-        RoundNum: 23,
-        Index: 0,
-        TokenAddr: '0x3Aa5ebB10DC797CAC828524e59A333d0A371443c',
-        NFTTokenId: 13000081,
-        NFTTokenURI: 'https://token.artblocks.io/13000081',
-        WinnerIndex: 44,
-        WinnerAid: 10,
-        WinnerAddr: '',
-        DonorAddr: '0x90F79bf6EB2c4f870365E785982E1f101E93b906',
-      },
-    ];
-
-    render(<AttachedNFTTable list={mockData} handleClaim={mockHandleClaim} claimingTokens={[]} />);
-
-    await waitFor(() => {
-      expect(screen.getByTestId('Claim Button')).toBeInTheDocument();
-    });
-
-    fireEvent.click(screen.getByTestId('Claim Button'));
-    expect(mockHandleClaim).toHaveBeenCalledWith(0);
-  });
-
-  test('does not render Claim button for already claimed NFT assets', () => {
-    const mockData = [
-      {
-        RecordId: '45',
-        EvtId: 0,
-        BlockNum: 71474,
-        TimeStamp: 1694659504,
-        DateTime: '2023-09-14T02:45:04Z',
-        TxId: 2509,
-        TxHash: '0xb9166d0e8449d5b63993e221ae888a0a1e57cd258cd45871bb133723a0488486',
-        RoundNum: 23,
-        Index: 17,
-        TokenAddr: '0x3Aa5ebB10DC797CAC828524e59A333d0A371443c',
-        NFTTokenId: 13000081,
-        NFTTokenURI: 'https://token.artblocks.io/13000081',
-        WinnerIndex: 44,
-        WinnerAid: 10,
-        WinnerAddr: '0x90F79bf6EB2c4f870365E785982E1f101E93b906',
-        DonorAddr: '0x90F79bf6EB2c4f870365E785982E1f101E93b906',
-      },
-    ];
-
-    render(<AttachedNFTTable list={mockData} handleClaim={jest.fn()} claimingTokens={[]} />);
+  test('is read-only: retrieving lives in the winnings retrieval ledger', () => {
+    render(<AttachedNFTTable list={[]} />);
     expect(screen.queryByTestId('Claim Button')).not.toBeInTheDocument();
-  });
-
-  test('disables Claim button while its asset index is pending', () => {
-    const mockData = [
-      {
-        RecordId: '45',
-        EvtId: 0,
-        BlockNum: 71474,
-        TimeStamp: 1694659504,
-        DateTime: '2023-09-14T02:45:04Z',
-        TxId: 2509,
-        TxHash: '0xb9166d0e8449d5b63993e221ae888a0a1e57cd258cd45871bb133723a0488486',
-        RoundNum: 23,
-        Index: 17,
-        TokenAddr: '0x3Aa5ebB10DC797CAC828524e59A333d0A371443c',
-        NFTTokenId: 13000081,
-        NFTTokenURI: 'https://token.artblocks.io/13000081',
-        WinnerIndex: 44,
-        WinnerAid: 10,
-        WinnerAddr: '',
-        DonorAddr: '0x90F79bf6EB2c4f870365E785982E1f101E93b906',
-      },
-    ];
-
-    render(<AttachedNFTTable list={mockData} handleClaim={jest.fn()} claimingTokens={[17]} />);
-    // A pending retrieval keeps its label and focus beside a spinner, and ignores presses.
-    const button = screen.getByTestId('Claim Button');
-    expect(button).toHaveAttribute('aria-busy', 'true');
-    expect(button).toHaveAttribute('aria-disabled', 'true');
-    expect(button).toHaveTextContent('tables.attachedAssets.actions.claim');
+    expect(
+      screen.queryByRole('button', { name: 'tables.attachedAssets.actions.claim' }),
+    ).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<AttachedNFTTable list={[]} claimingTokens={[]} />);
+    const { container } = render(<AttachedNFTTable list={[]} />);
     await checkA11y(container);
   });
 });

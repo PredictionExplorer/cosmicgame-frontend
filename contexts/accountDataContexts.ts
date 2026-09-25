@@ -18,6 +18,12 @@ export interface AnchoredTokenContextValue {
   fetchData: () => Promise<void>;
   error: string | null;
   isLoading: boolean;
+  /**
+   * A collection's list could not be read (and nothing was read before): its
+   * empty array is then unknown, not "nothing anchored".
+   */
+  cstFailed: boolean;
+  rwlkFailed: boolean;
 }
 
 export const AnchoredTokenContext = createContext<AnchoredTokenContextValue | undefined>(undefined);
@@ -54,6 +60,18 @@ export interface ApiDataContextValue {
   unclaimedRewards: CSTAnchorDistribution[];
   error: string | null;
   isLoading: boolean;
+  /**
+   * The wallet's unretrieved Anchor Distribution ETH, straight from its read
+   * rather than from `apiData` (which holds 0 until processing finishes):
+   * `undefined` while the notice or the reward list is loading, `null` when
+   * either could not be read (a failed request, no notice in the payload, or a
+   * notice without the figure), so a page never shows a confident 0 or says
+   * "nothing waiting" on a guess. A wallet the indexer has not seen yet gets a
+   * notice of zeros from `notify_red_box`, so it reads as 0, not as unknown.
+   */
+  unretrievedAnchorEth: number | null | undefined;
+  /** Reads the notice and the reward list again. */
+  retryAnchorRead: () => void;
 }
 
 export const ApiDataContext = createContext<ApiDataContextValue | undefined>(undefined);
@@ -75,6 +93,8 @@ export const DISCONNECTED_ANCHORED_TOKENS: AnchoredTokenContextValue = {
   fetchData: noop,
   error: null,
   isLoading: false,
+  cstFailed: false,
+  rwlkFailed: false,
 };
 
 /** No wallet connected: the empty retrieval status. */
@@ -85,4 +105,6 @@ export const DISCONNECTED_API_DATA: ApiDataContextValue = {
   unclaimedRewards: [],
   error: null,
   isLoading: false,
+  unretrievedAnchorEth: 0,
+  retryAnchorRead: () => {},
 };

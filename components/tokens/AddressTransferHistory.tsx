@@ -12,7 +12,7 @@ import { formatAmount, formatCount } from '@/utils/format';
 import { getExplorerUrl } from '@/utils/urls';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { useCSTTransfers, useCTTransfers } from '@/hooks/useApiQuery';
-import { useSignatureSeeds } from '@/components/anchoring/useSignatureSeeds';
+import { useSignatureIndex } from '@/components/winnings/useSignatureIndex';
 import { LedgerPage } from '@/components/ledger/LedgerPage';
 import { PageHeader, PageHeaderTabs, type PageHeaderFigure } from '@/components/layout/PageHeader';
 import { useParticipantTrail } from '@/components/layout/participantTrail';
@@ -159,9 +159,11 @@ export function AddressTransferHistory({
   const query = asset === 'cst' ? cst : nft;
   // The NFT rows are artworks but carry no seed: one collection read (the
   // gallery's) draws every row's plate.
-  const { pending: seedsPending, seedFor } = useSignatureSeeds(
-    asset === 'nft' && (nft.data?.length ?? 0) > 0,
-  );
+  const signatures = useSignatureIndex({
+    enabled: asset === 'nft' && (nft.data?.length ?? 0) > 0,
+  });
+  const seedsPending = signatures.state === 'loading';
+  const { seedFor } = signatures;
 
   const entries = useMemo<TransferEntry[]>(() => {
     if (!address) return [];

@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, type ReactNode } from 'react';
+import { useId, useMemo, type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { AttachedAssetsIcon } from '@/lib/conceptIcons';
@@ -10,10 +10,14 @@ import { Badge } from '@/components/ui/badge';
 import { SkeletonTable } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
-import AttachedNFTTable from '@/components/attachments/AttachedNFTTable';
-import AttachedERC20Table from '@/components/attachments/AttachedERC20Table';
 import type { NFTRecord } from '@/components/attachments/AttachedNFTTable';
 import type { DonatedERC20Token } from '@/components/attachments/AttachedERC20Table';
+import {
+  AttachedNftRetrievalTable,
+  AttachedTokenRetrievalTable,
+  type AttachedNftRetrievalRow,
+} from '@/components/winnings/AttachedRetrievalTables';
+import { getDonatedErc20RawClaimAmount } from '@/utils/donatedErc20';
 
 /** Props for the donated assets section. */
 export interface DonatedAssetsSectionProps {
@@ -70,7 +74,9 @@ function AssetLedger({
 /**
  * Attached NFTs and ERC-20 tokens allocated to the address, each with the
  * number still to retrieve and, on your own profile, the action that
- * retrieves them all.
+ * retrieves them all. The ledgers are the one retrieval ledger per asset
+ * kind (components/winnings), the same My Allocations uses: each row says
+ * whether it was retrieved and, on your own profile, retrieves on its own.
  */
 export function DonatedAssetsSection({
   unclaimedNFTs,
@@ -87,7 +93,13 @@ export function DonatedAssetsSection({
   onClaimAllERC20,
 }: DonatedAssetsSectionProps) {
   const t = useTranslations('myPages');
-  const allNFTs = [...unclaimedNFTs, ...claimedNFTs];
+  const nftRows = useMemo<AttachedNftRetrievalRow[]>(
+    () => [
+      ...unclaimedNFTs.map((nft) => ({ ...nft, Claimed: false })),
+      ...claimedNFTs.map((nft) => ({ ...nft, Claimed: true })),
+    ],
+    [claimedNFTs, unclaimedNFTs],
+  );
   const unclaimedERC20Count = donatedERC20.filter((x) => !x.Claimed).length;
 
   return (
@@ -113,7 +125,7 @@ export function DonatedAssetsSection({
       >
         {loadingNFTs ? (
           <SkeletonTable rows={3} columns={4} />
-        ) : allNFTs.length === 0 ? (
+        ) : nftRows.length === 0 ? (
           <EmptyState
             headingLevel={4}
             variant="inline"
@@ -122,10 +134,12 @@ export function DonatedAssetsSection({
             description={t('statistics.donatedAssets.nfts.emptyDescription')}
           />
         ) : (
-          <AttachedNFTTable
-            list={allNFTs}
-            handleClaim={canClaim ? onClaimNFT : undefined}
-            claimingTokens={claimingDonatedNFTs}
+          <AttachedNftRetrievalTable
+            rows={nftRows}
+            ariaLabel={t('statistics.donatedAssets.nfts.title')}
+            headingLevel={4}
+            onRetrieve={canClaim ? onClaimNFT : undefined}
+            retrieving={claimingDonatedNFTs}
           />
         )}
       </AssetLedger>
@@ -159,9 +173,16 @@ export function DonatedAssetsSection({
             description={t('statistics.donatedAssets.erc20.emptyDescription')}
           />
         ) : (
-          <AttachedERC20Table
-            list={donatedERC20}
-            handleClaim={canClaim ? (onClaimERC20 ?? null) : null}
+          <AttachedTokenRetrievalTable
+            rows={donatedERC20}
+            ariaLabel={t('statistics.donatedAssets.erc20.title')}
+            headingLevel={4}
+            onRetrieve={
+              canClaim && onClaimERC20
+                ? (row) =>
+                    onClaimERC20(row.RoundNum, row.TokenAddr, getDonatedErc20RawClaimAmount(row))
+                : undefined
+            }
           />
         )}
       </AssetLedger>

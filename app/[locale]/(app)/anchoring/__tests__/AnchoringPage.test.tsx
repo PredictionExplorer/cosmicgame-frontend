@@ -38,21 +38,19 @@ jest.mock('@/components/anchoring/GlobalAnchorDistributionsTable', () => ({
     </section>
   ),
 }));
-jest.mock('@/components/anchoring/RwalkAnchorDistributionImprintsTable', () => ({
-  RwalkAnchorDistributionImprintsTable: ({
+jest.mock('@/components/anchoring/SelectionImprintGallery', () => ({
+  SelectionImprintGallery: ({
     list,
     title,
-    pageSize,
+    error,
   }: {
     list: unknown[];
     title: string;
-    pageSize?: number;
+    error?: string;
   }) => (
     <section>
       <h2>{title}</h2>
-      <p data-testid="imprints">
-        rows: {list.length}, page size: {pageSize}
-      </p>
+      <p data-testid="imprints">{error ?? `imprints: ${list.length}`}</p>
     </section>
   ),
 }));
@@ -86,17 +84,22 @@ beforeEach(() => {
 const slots = { steps: <AnchoringSteps />, questions: <AnchoringQuestions /> };
 
 describe('AnchoringPage', () => {
-  it('explains anchoring before the ledgers: steps, the live flow and the questions', () => {
+  it('leads with the records, then explains anchoring: steps, the live flow and the questions', () => {
     render(<AnchoringPage {...slots} />);
     const headings = screen.getAllByRole('heading', { level: 2 }).map((node) => node.textContent);
     expect(headings).toEqual([
-      'anchoring.overview.howItWorks.title',
-      'anchoring.questions.title',
       'anchoring.ledgers.distributions.title',
       'anchoring.ledgers.imprints.title',
+      'anchoring.overview.howItWorks.title',
+      'anchoring.questions.title',
     ]);
     expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(3);
     expect(screen.getByTestId('anchoring-flow')).toBeInTheDocument();
+  });
+
+  it('ends with the related pages it is given (the header hides its chips on phones)', () => {
+    render(<AnchoringPage {...slots} related={<nav aria-label="Related">links</nav>} />);
+    expect(screen.getByRole('navigation', { name: 'Related' })).toBeInTheDocument();
   });
 
   it('feeds the flow the live figures with one holder count for both collections', () => {
@@ -134,7 +137,18 @@ describe('AnchoringPage', () => {
     expect(screen.getByTestId('distributions')).toHaveTextContent(
       'anchoring.overview.errorMessage',
     );
-    expect(screen.getByTestId('imprints')).toHaveTextContent('rows: 3, page size: 10');
+    expect(screen.getByTestId('imprints')).toHaveTextContent('imprints: 3');
+  });
+
+  it('keeps imprints it already holds when a refetch fails', () => {
+    mockQueries.imprints = {
+      data: [{}, {}, {}],
+      isLoading: false,
+      error: new Error('x'),
+      refetch: jest.fn(),
+    };
+    render(<AnchoringPage {...slots} />);
+    expect(screen.getByTestId('imprints')).toHaveTextContent('imprints: 3');
   });
 
   it('renders the server header when one is passed', () => {

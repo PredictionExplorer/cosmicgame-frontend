@@ -4,6 +4,11 @@ import { checkA11y, render, screen } from '@/test-utils';
 
 import { RetrievedCSTAnchorDistributionsTable } from '../RetrievedCSTAnchorDistributionsTable';
 
+jest.mock('@/hooks/useApiQuery', () => ({
+  // The live cycle behind every cycle link (useCycleHref).
+  useDashboardInfo: () => ({ data: { CurRoundNum: 99 } }),
+}));
+
 const row = (overrides: Partial<CSTAnchorDistribution> = {}): CSTAnchorDistribution => ({
   EvtLogId: 1,
   RoundNum: 2,
@@ -24,7 +29,10 @@ describe('RetrievedCSTAnchorDistributionsTable', () => {
     expect(
       screen.getByText('anchoring.tables.retrievedDistributions.columns.cycle'),
     ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: '2' })).toHaveAttribute('href', '/allocation/2');
+    expect(screen.getByRole('link', { name: 'tables.allocation.cycle(cycle=2)' })).toHaveAttribute(
+      'href',
+      '/allocation/2',
+    );
     expect(screen.getByText('0.2500')).toBeInTheDocument();
     expect(screen.getByText('1.5000')).toBeInTheDocument();
   });

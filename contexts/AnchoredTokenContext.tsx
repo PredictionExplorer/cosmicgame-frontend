@@ -45,6 +45,9 @@ export const AnchoredTokenProvider = ({ children }: AnchoredTokenProviderProps) 
       : String(queryError)
     : null;
 
+  const cstFailed = Boolean(cstError) && cstData === undefined;
+  const rwlkFailed = Boolean(rwlkError) && rwlkData === undefined;
+
   const fetchData = useMemo(
     () => async () => {
       await Promise.all([refetchCST(), refetchRWLK()]);
@@ -53,7 +56,9 @@ export const AnchoredTokenProvider = ({ children }: AnchoredTokenProviderProps) 
   );
 
   return (
-    <AnchoredTokenContext.Provider value={{ cstokens, rwlktokens, fetchData, error, isLoading }}>
+    <AnchoredTokenContext.Provider
+      value={{ cstokens, rwlktokens, fetchData, error, isLoading, cstFailed, rwlkFailed }}
+    >
       {children}
     </AnchoredTokenContext.Provider>
   );
