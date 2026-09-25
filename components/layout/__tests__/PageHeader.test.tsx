@@ -1,6 +1,11 @@
 import '@testing-library/jest-dom';
 
-import { PageHeader, PageHeaderFigures, PageHeaderTabs } from '@/components/layout/PageHeader';
+import {
+  PageHeader,
+  PageHeaderFacts,
+  PageHeaderFigures,
+  PageHeaderTabs,
+} from '@/components/layout/PageHeader';
 import { PAGE_SECTIONS } from '@/components/layout/pageSections';
 
 import { render, screen, within, checkA11y } from '@/test-utils';
@@ -482,6 +487,21 @@ describe('PageHeader', () => {
     );
     // The header keeps its own foot and bottom rule.
     expect(screen.getByRole('banner')).toHaveClass('pb-6', 'border-b');
+  });
+
+  it('sets a facts line under the lede, before the related pages', () => {
+    render(
+      <PageHeader
+        section="collection"
+        title="Named NFTs"
+        subtitle="Signatures their owners have named."
+        facts={<PageHeaderFacts facts={[{ id: 'named', label: 'Named NFTs', value: '3' }]} />}
+        related={[{ href: '/gallery', label: 'Gallery' }]}
+      />,
+    );
+    const facts = screen.getByTestId('page-header-facts');
+    const related = screen.getByRole('navigation', { name: 'common.pageHeader.relatedPages' });
+    expect(facts.compareDocumentPosition(related) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('gives the H1 an id for aria-labelledby', () => {

@@ -115,6 +115,12 @@ export interface PageHeaderProps {
   /** The summary figures, as one compact row (a two-column grid on phones). */
   figures?: readonly PageHeaderFigure[];
   /**
+   * The page's facts as one quiet line (`PageHeaderFacts`) in place of the
+   * figure row, where the page's headline is its art: under the lede, before
+   * the related pages.
+   */
+  facts?: ReactNode;
+  /**
    * The meta line under the figures: `SnapshotStamp` (when server data was
    * read), `LiveStatus` (polling pages), `ReviewedStamp` (legal pages), a source.
    */
@@ -206,6 +212,7 @@ export function PageHeader({
   breadcrumbs,
   eyebrow,
   figures,
+  facts,
   meta,
   related,
   relatedLabel,
@@ -323,6 +330,7 @@ export function PageHeader({
       </div>
 
       {figures && figures.length > 0 ? <PageHeaderFigures figures={figures} /> : null}
+      {facts}
 
       {meta ? (
         <div
@@ -572,8 +580,9 @@ export interface PageHeaderFact {
 /**
  * A page's facts as one quiet wall-label line under the lede ("Named NFTs 3 ·
  * Current owners 2") instead of a row of large figures: on the collection
- * pages the art is the headline, and a figure row pushed it down. Render it
- * as the header's children, with the snapshot stamp beside it.
+ * pages the art is the headline, and a figure row pushed it down. Pass it as
+ * the header's `facts` (or its children, on a header with no related pages),
+ * with the snapshot stamp beside it.
  */
 export function PageHeaderFacts({
   facts,

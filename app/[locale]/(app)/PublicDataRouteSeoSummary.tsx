@@ -642,25 +642,26 @@ export async function PublicDataRouteSeoSummary({
         subtitle={t(`${prefix}.description`)}
         actions={actions}
         tabs={tabs}
+        facts={
+          <PageHeaderFacts
+            facts={figures.map((figure) => ({
+              id: figure.key,
+              label: t(`${prefix}.cards.${figure.key}.label`),
+              value: figure.value === NONE_YET ? noneYet : figure.value,
+            }))}
+            meta={
+              snapshot || note ? (
+                <>
+                  {snapshot}
+                  {note}
+                </>
+              ) : undefined
+            }
+          />
+        }
         related={related}
         relatedLabel={relatedLabel}
-      >
-        <PageHeaderFacts
-          facts={figures.map((figure) => ({
-            id: figure.key,
-            label: t(`${prefix}.cards.${figure.key}.label`),
-            value: figure.value === NONE_YET ? noneYet : figure.value,
-          }))}
-          meta={
-            snapshot || note ? (
-              <>
-                {snapshot}
-                {note}
-              </>
-            ) : undefined
-          }
-        />
-      </PageHeader>
+      />
     );
   }
 
