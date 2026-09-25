@@ -134,10 +134,6 @@
   "art": {
     "failed": "作品を読み込めませんでした"
   },
-  "split": {
-    "label": "{label}：{items}",
-    "item": "{track}{share}"
-  },
   "missingCycle": {
     "open": {
       "title": "サイクル{cycle}は進行中です",

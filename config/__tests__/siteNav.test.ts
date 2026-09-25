@@ -154,6 +154,8 @@ describe('locateSitePath', () => {
     ['/allocation/3', 'allocationRecipients', false, 'records'],
     ['/allocation-finalized', 'retrievedAllocations', true, 'records'],
     ['/anchor-action/1/2', 'anchorDistributions', false, 'records'],
+    // One NFT's distributions for one anchor-holder: a record under Anchor Distributions.
+    ['/distributions-by-token/0x1/9', 'anchorDistributions', false, 'records'],
     ['/marketing/0xabc', 'outreachAllocations', false, 'records'],
     ['/source-code', 'sourceCode', false, 'trust'],
     ['/my-tokens', 'myNfts', true, 'account'],

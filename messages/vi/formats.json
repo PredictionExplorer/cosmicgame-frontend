@@ -33,5 +33,9 @@
   },
   "dateTime": {
     "timeZone": "Múi giờ: {zone}"
+  },
+  "allocationSplit": {
+    "label": "{label}: {items}",
+    "item": "{track} {share}"
   }
 }

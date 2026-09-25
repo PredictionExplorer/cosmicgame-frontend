@@ -134,10 +134,6 @@
   "art": {
     "failed": "Не вдалося завантажити твори"
   },
-  "split": {
-    "label": "{label}: {items}",
-    "item": "{track} {share}"
-  },
   "missingCycle": {
     "open": {
       "title": "Цикл {cycle} ще триває",

@@ -134,10 +134,6 @@
   "art": {
     "failed": "작품을 불러오지 못했습니다"
   },
-  "split": {
-    "label": "{label}: {items}",
-    "item": "{track} {share}"
-  },
   "missingCycle": {
     "open": {
       "title": "사이클 {cycle} 진행 중",

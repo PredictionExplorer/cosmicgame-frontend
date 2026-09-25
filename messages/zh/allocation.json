@@ -134,10 +134,6 @@
   "art": {
     "failed": "无法加载作品"
   },
-  "split": {
-    "label": "{label}：{items}",
-    "item": "{track} {share}"
-  },
   "missingCycle": {
     "open": {
       "title": "第 {cycle} 个周期仍在进行",

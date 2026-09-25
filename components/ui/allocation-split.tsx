@@ -46,7 +46,8 @@ interface AllocationSplitBarProps {
  * numbers, so nothing depends on colour or hover. The alternative is worded
  * by the catalog and joined as the locale lists things (`Intl.ListFormat`),
  * so Chinese and Japanese read with their own punctuation, never ASCII
- * commas between CJK words. Pages using it load the `allocation` namespace.
+ * commas between CJK words. Its words live in the `formats` namespace, which
+ * every app page loads, so any page can draw the split.
  */
 export function AllocationSplitBar({
   segments,
@@ -54,7 +55,7 @@ export function AllocationSplitBar({
   unavailableLabel,
   className,
 }: AllocationSplitBarProps) {
-  const t = useTranslations('allocation');
+  const t = useTranslations('formats');
   const locale = useLocale();
   const format = useFormat();
   const drawn = segments.filter((segment) => (segment.percent ?? 0) > 0);
@@ -70,7 +71,7 @@ export function AllocationSplitBar({
     style: 'long',
   }).format(
     segments.map((segment) =>
-      t('split.item', {
+      t('allocationSplit.item', {
         track: segment.label,
         share: percentText(segment) ?? unavailableLabel,
       }),
@@ -81,7 +82,7 @@ export function AllocationSplitBar({
     <div className={cn('min-w-0', className)} data-testid="allocation-split">
       <div
         role="img"
-        aria-label={t('split.label', { label, items })}
+        aria-label={t('allocationSplit.label', { label, items })}
         className="flex h-2.5 w-full gap-0.5"
       >
         {drawn.map((segment) => (

@@ -122,7 +122,8 @@ const ROUTE_DEFINITIONS = {
     host: 'app',
     path: '/anchoring',
     section: 'records',
-    owns: ['/anchor-action'],
+    // An anchor action, and one NFT's distributions for one anchor-holder.
+    owns: ['/anchor-action', '/distributions-by-token'],
     footer: true,
   },
   outreachAllocations: { host: 'app', path: '/marketing', section: 'records', footer: true },
@@ -246,13 +247,7 @@ export const SITE_ROUTE_GROUPS: Record<SiteRouteGroupId, readonly SiteRouteId[]>
  * where the visitor is.
  */
 const SECTION_PATH_PREFIXES: Partial<Record<SiteSectionId, readonly string[]>> = {
-  explore: [
-    '/user',
-    '/gesture',
-    '/cosmic-token-transfer',
-    '/cosmic-signature-transfer',
-    '/distributions-by-token',
-  ],
+  explore: ['/user', '/gesture', '/cosmic-token-transfer', '/cosmic-signature-transfer'],
 };
 
 function pathMatches(pathname: string, prefix: string): boolean {

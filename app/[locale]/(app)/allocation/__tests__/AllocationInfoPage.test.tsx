@@ -197,7 +197,8 @@ describe('AllocationInfoPage', () => {
       ).toHaveAttribute('href', '/current-cycle');
       expect(
         screen.getByRole('link', {
-          name: 'allocation.details.navigation.previousAria(cycle=allocation.formats.cycle(cycle=3))',
+          // The shared RecordPager: the direction, then the neighbour's own name.
+          name: 'allocation.details.navigation.previousAria, allocation.formats.cycle(cycle=3)',
         }),
       ).toHaveAttribute('href', '/allocation/3');
       expect(screen.queryByText('allocation.details.error.title')).not.toBeInTheDocument();

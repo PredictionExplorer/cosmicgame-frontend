@@ -33,5 +33,9 @@
   },
   "dateTime": {
     "timeZone": "Часовий пояс: {zone}"
+  },
+  "allocationSplit": {
+    "label": "{label}: {items}",
+    "item": "{track} {share}"
   }
 }

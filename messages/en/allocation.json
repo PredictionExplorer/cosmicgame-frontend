@@ -27,7 +27,7 @@
       "recipient": "Recipient"
     },
     "share": {
-      "summary": "Cycle {cycle} — Cosmic Signature\nSignature Allocation: {amount} ETH\nRecipient: {recipient}\nGestures: {gestures}",
+      "summary": "Cycle {cycle} — Cosmic Signature\nSignature Allocation: {amount} ETH\nRecipient: {recipient}\nGestures: {gestures}",
       "copyLink": "Copy link",
       "linkCopied": "Link copied",
       "failed": "The link could not be copied"
@@ -133,10 +133,6 @@
   },
   "art": {
     "failed": "The artwork couldn’t be loaded"
-  },
-  "split": {
-    "label": "{label}: {items}",
-    "item": "{track} {share}"
   },
   "missingCycle": {
     "open": {

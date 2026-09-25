@@ -189,8 +189,12 @@ describe('RewardsByTokenPage', () => {
 
   it('names an unnamed token once in its wall label, a named one with its number', () => {
     const { unmount } = render(<RewardsByTokenPage address={HOLDER} tokenId={45} />);
-    // The shared wall label reads "Signature #000045": the number is not repeated.
-    expect(screen.getByText('common.signature.untitled(id=#000045)')).toHaveClass('sr-only');
+    // The shared wall label reads "Signature #000045", and its title is the way to the
+    // Signature (the plate beside it is a pointer shortcut): the number is not repeated.
+    // (jsdom spaces the mono number inside the computed name.)
+    expect(
+      screen.getByRole('link', { name: /^common\.signature\.untitled\(id=\s?#000045\s?\)$/ }),
+    ).toHaveAttribute('href', '/detail/45');
     expect(screen.getAllByText('#000045')).toHaveLength(1);
     expect(screen.getByText('#000045')).toHaveClass('type-mono-inline');
     unmount();

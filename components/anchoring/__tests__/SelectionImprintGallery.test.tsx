@@ -119,7 +119,7 @@ describe('SelectionImprintGallery', () => {
       <SelectionImprintGallery title="Imprints" list={[]} loading />,
     );
     expect(screen.getByRole('status')).toBeInTheDocument();
-    expect(container.querySelector('.animate-pulse')).not.toBeNull();
+    expect(container.querySelector('[data-slot="skeleton"]')).not.toBeNull();
     rerender(<SelectionImprintGallery title="Imprints" list={[]} />);
     expect(
       screen.getByRole('heading', { name: 'anchoring.common.empty.imprints.title' }),

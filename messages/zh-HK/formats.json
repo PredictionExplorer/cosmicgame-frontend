@@ -33,5 +33,9 @@
   },
   "dateTime": {
     "timeZone": "時區：{zone}"
+  },
+  "allocationSplit": {
+    "label": "{label}：{items}",
+    "item": "{track} {share}"
   }
 }

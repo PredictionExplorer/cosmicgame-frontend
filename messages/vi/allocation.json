@@ -134,10 +134,6 @@
   "art": {
     "failed": "Không tải được tác phẩm"
   },
-  "split": {
-    "label": "{label}: {items}",
-    "item": "{track} {share}"
-  },
   "missingCycle": {
     "open": {
       "title": "Chu kỳ {cycle} vẫn đang diễn ra",

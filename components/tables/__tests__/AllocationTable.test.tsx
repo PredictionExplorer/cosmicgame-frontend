@@ -129,7 +129,8 @@ describe('AllocationTable', () => {
     expect(cell('tables.columns.cycle')).toHaveAttribute('data-phone', 'title');
     for (const label of [
       'tables.allocation.columns.finalized',
-      'tables.columns.recipient',
+      // The one recipient a row names: the Signature Allocation's.
+      'tables.allocation.columns.signatureRecipient',
       'tables.allocation.columns.signatureEth',
       'tables.allocation.gestures',
     ]) {
