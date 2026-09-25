@@ -5,7 +5,8 @@ import type { BidSpike } from '@/services/api/types';
 
 import { checkA11y, render, screen, within } from '@/test-utils';
 
-import { GestureSpikeChart, defaultSpikeIndex } from '../GestureSpikeChart';
+import { defaultSpikeIndex, spikeSearchRange, spikeViewRange } from '../charts/activityRanges';
+import { GestureSpikeChart } from '../GestureSpikeChart';
 
 const mockUseBidTimeBounds = jest.fn();
 const mockUseBiddingActivity = jest.fn();
@@ -62,6 +63,21 @@ describe('defaultSpikeIndex', () => {
 });
 
 describe('GestureSpikeChart', () => {
+  // The keys the page's server read seeds (activityRanges): the same ranges, so they are found.
+  it('asks for the ranges the page seeds for its spikes and the hours around one', () => {
+    render(<GestureSpikeChart label="Spikes" />);
+    const search = spikeSearchRange({ firstTs: AUG_12 - 86_400, lastTs: NOW_SEC });
+    expect(mockUseBiddingActivity).toHaveBeenCalledWith(
+      search.initTs,
+      search.finTs,
+      search.intervalSecs,
+      true,
+    );
+    const opened = spikes[defaultSpikeIndex(spikes, -1)!]!;
+    const view = spikeViewRange(opened);
+    expect(mockUseBidFrequency).toHaveBeenCalledWith(view.initTs, view.finTs, HOUR, true);
+  });
+
   it('opens on the latest spike when none is recent, never on an empty frame', () => {
     render(<GestureSpikeChart label="Gesture spikes" />);
     expect(screen.getByRole('radio', { checked: true })).toHaveAccessibleName(

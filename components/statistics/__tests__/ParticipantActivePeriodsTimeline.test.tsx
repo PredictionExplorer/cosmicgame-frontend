@@ -6,6 +6,7 @@ import type { BidderActivePeriod, TopBidderInfo } from '@/services/api/types';
 import { act, checkA11y, render, screen, within } from '@/test-utils';
 
 import { ParticipantActivePeriodsTimeline } from '../ParticipantActivePeriodsTimeline';
+import { ACTIVE_PERIODS_TOP_N, activePeriodsRange } from '../charts/activityRanges';
 
 const mockUseBidTimeBounds = jest.fn();
 const mockUseTopBidderActivePeriods = jest.fn();
@@ -52,6 +53,18 @@ beforeEach(() => {
 });
 
 describe('ParticipantActivePeriodsTimeline', () => {
+  // The key the page's server read seeds (activityRanges): the same range, so it is found.
+  it('asks for the range the page seeds', () => {
+    render(<ParticipantActivePeriodsTimeline label="Top 20 participant active periods" />);
+    const { initTs, finTs } = activePeriodsRange({ firstTs: START, lastTs: END });
+    expect(mockUseTopBidderActivePeriods).toHaveBeenCalledWith(
+      ACTIVE_PERIODS_TOP_N,
+      initTs,
+      finTs,
+      true,
+    );
+  });
+
   it('reads out the most active participant and the longest period', () => {
     render(<ParticipantActivePeriodsTimeline label="Top 20 participant active periods" />);
     const figure = screen.getByRole('figure', { name: 'Top 20 participant active periods' });

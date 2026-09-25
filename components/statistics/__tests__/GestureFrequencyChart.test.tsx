@@ -1,11 +1,12 @@
 // lexicon-allow-start: analytics fixtures mirror sealed backend wire names
 import userEvent from '@testing-library/user-event';
 
-import type { BidFrequencyBucket } from '@/services/api/types';
+import type { BidFrequencyBucket, DashboardInfo } from '@/services/api/types';
 
 import { checkA11y, render, screen, within } from '@/test-utils';
 
 import { GestureFrequencyChart } from '../GestureFrequencyChart';
+import { frequencyRange } from '../charts/activityRanges';
 
 const mockUseBidTimeBounds = jest.fn();
 const mockUseBidFrequency = jest.fn();
@@ -46,6 +47,16 @@ beforeEach(() => {
 });
 
 describe('GestureFrequencyChart', () => {
+  // The key the page's server read seeds (activityRanges): the same range, so it is found.
+  it('asks for the range the page seeds for its daily view', () => {
+    render(<GestureFrequencyChart label="Frequency" />);
+    const { initTs, finTs, intervalSecs } = frequencyRange(
+      { firstTs: NOW_SEC - 30 * DAY, lastTs: NOW_SEC },
+      'day',
+    );
+    expect(mockUseBidFrequency).toHaveBeenCalledWith(initTs, finTs, intervalSecs, true);
+  });
+
   it('reads out the total and the busiest day above one bar per bucket', () => {
     render(<GestureFrequencyChart label="Gesture frequency over time" />);
     const figure = screen.getByRole('figure', { name: 'Gesture frequency over time' });
@@ -60,6 +71,20 @@ describe('GestureFrequencyChart', () => {
     expect(screen.getByTestId('bar-chart')).toHaveAttribute('data-point-count', '2');
     // The opening hour's exclusion stays stated under the chart, in two lines at most.
     expect(screen.getByText(/first hour is left out/i)).toBeInTheDocument();
+  });
+
+  // The server's dashboard fills the every-gesture total in the first HTML; it once arrived
+  // after hydration and pushed the plot 77px down (CLS 0.13 on a phone).
+  it('reads the every-gesture total from the server’s dashboard until its own arrives', () => {
+    mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true, isError: false });
+    render(
+      <GestureFrequencyChart
+        label="Frequency"
+        initialDashboard={{ MainStats: { TotalBids: 3_186 } } as unknown as DashboardInfo}
+      />,
+    );
+    const figure = screen.getByRole('figure', { name: 'Frequency' });
+    expect(readoutOf(figure)).toContainEqual(['All gestures', '3,186']);
   });
 
   it('asks for buckets only once the time bounds have settled', () => {

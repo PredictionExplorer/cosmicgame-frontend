@@ -7,7 +7,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { formatUnixTsLabel } from '@/utils/format';
 // lexicon-allow-start: the hook and wire type mirror the backend route statistics/bidding/frequency
 import { useBidFrequency as useFrequencyQuery, useDashboardInfo } from '@/hooks/useApiQuery';
-import type { BidFrequencyBucket as FrequencyBucket } from '@/services/api/types';
+import type { BidFrequencyBucket as FrequencyBucket, DashboardInfo } from '@/services/api/types';
 // lexicon-allow-end
 import { useFormat } from '@/hooks/useFormat';
 import { toFiniteNumber } from '@/utils/finiteNumber';
@@ -17,6 +17,7 @@ import { ErrorState } from '@/components/ui/error-state';
 import { SkeletonChart } from '@/components/ui/skeleton';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 
+import { frequencyRange } from './charts/activityRanges';
 import { ChartFigure } from './charts/ChartFigure';
 import { ChartPlot } from './charts/ChartPlot';
 import type { ReadoutItem } from './charts/ChartReadout';
@@ -35,10 +36,6 @@ import {
 import { useGestureTimeBounds } from './charts/useGestureTimeBounds';
 
 const CHART_HEIGHT = 300;
-const DAY_SECS = 86_400;
-const HOUR_SECS = 3_600;
-/** How far back each interval looks: a year of days, a week of hours. */
-const LOOKBACK: Record<IntervalOption, number> = { day: 365 * DAY_SECS, hour: 7 * DAY_SECS };
 
 type IntervalOption = 'day' | 'hour';
 
@@ -94,6 +91,12 @@ type GestureFrequencyChartProps = {
   enabled?: boolean;
   /** Names the figure (the section's title). */
   label: string;
+  /**
+   * The dashboard as the server read it, for the readout's every-gesture
+   * total in the first HTML, until the browser's own read replaces it: without
+   * it the total arrived after hydration and pushed the plot down.
+   */
+  initialDashboard?: DashboardInfo | null;
 };
 
 /**
@@ -108,21 +111,14 @@ type GestureFrequencyChartProps = {
 export const GestureFrequencyChart: FC<GestureFrequencyChartProps> = ({
   enabled = true,
   label,
+  initialDashboard,
 }) => {
   const t = useTranslations('statistics');
   const locale = useLocale();
   const format = useFormat();
   const [interval, setInterval] = useState<IntervalOption>('day');
   const bounds = useGestureTimeBounds(enabled);
-  const intervalSecs = interval === 'hour' ? HOUR_SECS : DAY_SECS;
-
-  const { initTs, finTs } = useMemo(() => {
-    const start = Math.max(bounds.firstTs, bounds.lastTs - LOOKBACK[interval]);
-    return {
-      initTs: Math.floor(start / intervalSecs) * intervalSecs,
-      finTs: bounds.lastTs + intervalSecs,
-    };
-  }, [bounds.firstTs, bounds.lastTs, interval, intervalSecs]);
+  const { initTs, finTs, intervalSecs } = frequencyRange(bounds, interval);
 
   const { data, isLoading, isError, refetch } = useFrequencyQuery(
     initTs,
@@ -133,12 +129,13 @@ export const GestureFrequencyChart: FC<GestureFrequencyChartProps> = ({
   // Every gesture ever made, first hours included, so the chart's total (which leaves them
   // out) reads beside the one the statistics hub shows, instead of contradicting it.
   const dashboard = useDashboardInfo();
+  const dashboardData = dashboard.data ?? initialDashboard ?? undefined;
   const allGestures = toFiniteNumber(
-    (dashboard.data?.MainStats as { TotalBids?: unknown } | undefined)?.TotalBids,
+    (dashboardData?.MainStats as { TotalBids?: unknown } | undefined)?.TotalBids,
   );
   // Only the daily view reaches back to the first gesture; a week of hours is not comparable.
   const coversAll = interval === 'day' && initTs <= bounds.firstTs;
-  const showAll = coversAll && !dashboard.isError;
+  const showAll = coversAll && !(dashboard.isError && !dashboardData);
 
   const points = useMemo(() => toChartPoints(data ?? []), [data]);
   // The range a reader is told is the one with gestures in it, not the query's padded end.

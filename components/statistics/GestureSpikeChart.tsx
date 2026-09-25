@@ -10,10 +10,7 @@ import {
   useBiddingActivity as useSpikesQuery,
   useBidFrequency as useFrequencyQuery,
 } from '@/hooks/useApiQuery';
-import type {
-  BidFrequencyBucket as FrequencyBucket,
-  BidSpike as GestureSpike,
-} from '@/services/api/types';
+import type { BidFrequencyBucket as FrequencyBucket } from '@/services/api/types';
 // lexicon-allow-end
 import { useFormat } from '@/hooks/useFormat';
 import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
@@ -22,6 +19,13 @@ import { ErrorState } from '@/components/ui/error-state';
 import { SkeletonChart } from '@/components/ui/skeleton';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 
+import {
+  HOUR_SECS,
+  alignHour,
+  defaultSpikeIndex,
+  spikeSearchRange,
+  spikeViewRange,
+} from './charts/activityRanges';
 import { ChartFigure } from './charts/ChartFigure';
 import { ChartPlot } from './charts/ChartPlot';
 import type { ReadoutItem } from './charts/ChartReadout';
@@ -39,37 +43,9 @@ import {
 import { useGestureTimeBounds } from './charts/useGestureTimeBounds';
 
 const CHART_HEIGHT = 280;
-const HOUR = 3_600;
-const VIEW_PADDING_SECS = 12 * HOUR;
-const LOOKBACK_SECS = 365 * 86_400;
+const HOUR = HOUR_SECS;
 
 type ChartPoint = { bucketTs: number; gestures: number };
-
-const alignHour = (ts: number): number => Math.floor(ts / HOUR) * HOUR;
-
-function spikeViewRange(spike: GestureSpike): { initTs: number; finTs: number } {
-  return {
-    initTs: alignHour(spike.StartTs - VIEW_PADDING_SECS),
-    finTs: alignHour(spike.EndTs + VIEW_PADDING_SECS) + HOUR,
-  };
-}
-
-/**
- * The spike a reader lands on: the recent one when the backend flags one,
- * else the latest by start time (the array order is not guaranteed).
- */
-export function defaultSpikeIndex(
-  spikes: readonly GestureSpike[],
-  recentIndex: number,
-): number | null {
-  if (spikes.length === 0) return null;
-  if (recentIndex >= 0 && recentIndex < spikes.length) return recentIndex;
-  let latest = 0;
-  spikes.forEach((spike, index) => {
-    if (spike.StartTs > spikes[latest]!.StartTs) latest = index;
-  });
-  return latest;
-}
 
 function SpikeTooltip({
   active,
@@ -115,13 +91,12 @@ export const GestureSpikeChart: FC<GestureSpikeChartProps> = ({ enabled = true, 
   const locale = useLocale();
   const format = useFormat();
   const bounds = useGestureTimeBounds(enabled);
-  const initTs = Math.max(bounds.firstTs, bounds.lastTs - LOOKBACK_SECS);
-  const finTs = bounds.lastTs + HOUR;
+  const { initTs, finTs, intervalSecs } = spikeSearchRange(bounds);
 
   const { data, isLoading, isError, refetch } = useSpikesQuery(
     initTs,
     finTs,
-    HOUR,
+    intervalSecs,
     enabled && bounds.settled,
   );
 

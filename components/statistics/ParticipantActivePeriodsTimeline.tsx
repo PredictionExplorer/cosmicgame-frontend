@@ -19,6 +19,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
 import { SkeletonTable } from '@/components/ui/skeleton';
 
+import { ACTIVE_PERIODS_TOP_N, activePeriodsRange } from './charts/activityRanges';
 import { ChartFigure } from './charts/ChartFigure';
 import type { ReadoutItem } from './charts/ChartReadout';
 import { UtcTime } from './charts/UtcTime';
@@ -33,8 +34,6 @@ import { SummaryAddress, useCoarsePointer, useTimelineReadout } from './charts/t
 import { useGestureTimeBounds } from './charts/useGestureTimeBounds';
 import { useRovingStints } from './charts/useRovingStints';
 
-/** How many participants the chart ranks. */
-export const ACTIVE_PERIODS_TOP_N = 20;
 /** The thinnest a period may draw, so a one-hour burst in a year still shows. */
 const MIN_BAR_PERCENT = 0.3;
 
@@ -83,8 +82,7 @@ export const ParticipantActivePeriodsTimeline: FC<ParticipantActivePeriodsTimeli
   const locale = useLocale();
   const format = useFormat();
   const bounds = useGestureTimeBounds(enabled);
-  const initTs = bounds.firstTs;
-  const finTs = bounds.lastTs + 3_600;
+  const { initTs, finTs } = activePeriodsRange(bounds);
 
   const { data, isLoading, isError, refetch } = useActivePeriodsQuery(
     ACTIVE_PERIODS_TOP_N,

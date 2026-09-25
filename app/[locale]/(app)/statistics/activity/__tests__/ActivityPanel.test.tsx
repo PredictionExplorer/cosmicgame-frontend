@@ -40,7 +40,6 @@ jest.mock('../../../../../../components/statistics/GestureSpikeChart', () => ({
   GestureSpikeChart: () => <div data-testid="gesture-spike-chart" />,
 }));
 jest.mock('../../../../../../components/statistics/ParticipantActivePeriodsTimeline', () => ({
-  ACTIVE_PERIODS_TOP_N: 20,
   ParticipantActivePeriodsTimeline: () => <div data-testid="active-periods-timeline" />,
 }));
 jest.mock('../../../../../../components/statistics/GestureTypeMixChart', () => ({

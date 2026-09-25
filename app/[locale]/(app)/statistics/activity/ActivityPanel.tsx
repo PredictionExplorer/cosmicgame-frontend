@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { useDashboardInfo, useSystemModelist } from '@/hooks/useApiQuery';
 import { useHydrated } from '@/hooks/useHydrated';
+import type { DashboardInfo } from '@/services/api/types';
 import { StatsSection } from '@/components/statistics/StatsSection';
 import { SectionShell } from '@/components/statistics/SectionShell';
 import { DefinitionsDisclosure } from '@/components/statistics/DefinitionsDisclosure';
@@ -14,10 +15,8 @@ import { CycleScopeControl } from '@/components/statistics/CycleScopeControl';
 import { useCycleScope } from '@/components/statistics/useCycleScope';
 import { GestureFrequencyChart } from '@/components/statistics/GestureFrequencyChart';
 import { GestureSpikeChart } from '@/components/statistics/GestureSpikeChart';
-import {
-  ACTIVE_PERIODS_TOP_N,
-  ParticipantActivePeriodsTimeline,
-} from '@/components/statistics/ParticipantActivePeriodsTimeline';
+import { ParticipantActivePeriodsTimeline } from '@/components/statistics/ParticipantActivePeriodsTimeline';
+import { ACTIVE_PERIODS_TOP_N } from '@/components/statistics/charts/activityRanges';
 import { EnduranceTimelineSkeleton } from '@/components/statistics/EnduranceTimelineSkeleton';
 import { ChartFigureSkeleton } from '@/components/statistics/charts/ChartFigureSkeleton';
 import { SystemModesTable, type EventRow } from '@/components/tables/SystemModesTable';
@@ -57,7 +56,7 @@ const CstGestureCostChart = dynamic(() => import('@/components/statistics/CstGes
  * with a retry. The live cycle is read only after hydration, so the first
  * client render matches the server's skeleton.
  */
-const ActivityPanel = () => {
+const ActivityPanel = ({ initialDashboard }: { initialDashboard?: DashboardInfo | null }) => {
   const t = useTranslations('statistics');
   const hydrated = useHydrated();
   const dashboardQuery = useDashboardInfo(undefined, { poll: false });
@@ -72,7 +71,7 @@ const ActivityPanel = () => {
   return (
     <div className="space-y-12 sm:space-y-16" data-testid="activity-panel">
       <StatsSection title={title('frequency')}>
-        <GestureFrequencyChart label={title('frequency')} />
+        <GestureFrequencyChart label={title('frequency')} initialDashboard={initialDashboard} />
       </StatsSection>
 
       <StatsSection title={title('spikes')}>
