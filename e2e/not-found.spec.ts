@@ -35,3 +35,38 @@ for (const { host, path, headers } of [
     expect(Math.max(red, green, blue), background).toBeLessThan(48);
   });
 }
+
+/**
+ * With script the 404 hydrates in place: one document load, and the display
+ * and text faces stay loaded after a scroll. A phone capture of the old 404
+ * lost its fonts after the first scroll, the sign of a second document load
+ * or a dropped font-face on the not-found boundary.
+ */
+test.describe('with script', () => {
+  test.use({ javaScriptEnabled: true, viewport: { width: 390, height: 844 } });
+
+  test('keeps one document and its fonts after hydration and a scroll', async ({ page }) => {
+    const response = await page.goto('/quality-assurance-route-not-found');
+    expect(response?.status()).toBe(404);
+    await page.evaluate(() => document.fonts.ready);
+    await page.mouse.wheel(0, 2400);
+    await page.waitForTimeout(500);
+
+    const state = await page.evaluate(() => {
+      const firstFamily = (element: Element) =>
+        getComputedStyle(element).fontFamily.split(',')[0]!.trim().replace(/['"]/g, '');
+      const loaded = (family: string) =>
+        [...document.fonts].some(
+          (face) => face.family.replace(/['"]/g, '') === family && face.status === 'loaded',
+        );
+      const heading = document.querySelector('h1')!;
+      return {
+        documents: performance.getEntriesByType('navigation').length,
+        display: loaded(firstFamily(heading)),
+        text: loaded(firstFamily(document.body)),
+        scrolled: window.scrollY > 0,
+      };
+    });
+    expect(state).toEqual({ documents: 1, display: true, text: true, scrolled: true });
+  });
+});
