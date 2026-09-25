@@ -546,6 +546,9 @@ Catalogs carry the text exactly as it renders; nothing transforms case. In Engli
   Gesture Chat, Cycle Finalization Time, Cycle Reserve, Calibration Window, Signature
   Allocation, Stellar Selection, Endurance Champion, Chrono-Warrior, the Last Gesture
   (the role: "You hold the Last Gesture"), the Final CST Gesture.
+- **Beneficiary** names the Public Goods Vault's payee (currently Protocol Guild);
+  **recipient** is the coined term for someone who receives an allocation, so it never
+  names the vault's payee.
 - **Random Walk NFT** is two words in every locale; `RandomWalk` is only the contract's
   name (`contracts.entries.*.name`, `formats.address.known.randomWalk`).
 

@@ -8,8 +8,8 @@
     "retrieved": "Retrieved so far"
   },
   "ledger": {
-    "contributions": "Contribution records",
-    "retrievals": "Retrieval records"
+    "contributions": "Contributions",
+    "retrievals": "Retrievals"
   },
   "contribute": {
     "title": "Contribute to the vault",

@@ -475,7 +475,8 @@ async function getRouteFigures(
         figures: [
           { key: 'records', value: rows && count(rows.length) },
           { key: 'latest', value: latestDate(rows), size: 'md' },
-          // Who can still change the parameters: the page's key trust fact.
+          // Who can still change the parameters: the page's key trust fact,
+          // said as a status either way, never left to the tooltip.
           {
             key: 'owner',
             value:
@@ -484,12 +485,17 @@ async function getRouteFigures(
                   {copy('cards.owner.renounced')}
                 </Badge>
               ) : (
-                <AddressChip
-                  address={owner.data}
-                  variant="plain"
-                  showCopy={false}
-                  className="type-figure-md"
-                />
+                <span className="inline-flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                  <AddressChip
+                    address={owner.data}
+                    variant="plain"
+                    showCopy={false}
+                    className="type-figure-md"
+                  />
+                  <Badge tone="attention" dot>
+                    {copy('cards.owner.active')}
+                  </Badge>
+                </span>
               ),
             hasTooltip: true,
             size: 'md',

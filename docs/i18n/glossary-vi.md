@@ -282,6 +282,7 @@ công**. Capitalized as a proper name.
 | ----------------------------------- | ------------------------------------ |
 | Public Goods                        | Hàng hóa công                        |
 | Public Goods Vault                  | Kho Hàng hóa công                    |
+| Public Goods Beneficiary            | đơn vị thụ hưởng Hàng hóa công       |
 | Protocol Public Goods contributions | đóng góp Hàng hóa công của giao thức |
 | voluntary contributions             | đóng góp tự nguyện                   |
 

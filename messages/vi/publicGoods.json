@@ -8,8 +8,8 @@
     "retrieved": "Đã nhận về tổng cộng"
   },
   "ledger": {
-    "contributions": "Bản ghi đóng góp",
-    "retrievals": "Bản ghi nhận về"
+    "contributions": "Các khoản đóng góp",
+    "retrievals": "Các lần nhận về"
   },
   "contribute": {
     "title": "Đóng góp vào kho",

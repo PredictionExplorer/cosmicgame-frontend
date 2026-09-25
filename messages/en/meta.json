@@ -146,11 +146,11 @@
   },
   "publicGoodsRetrievals": {
     "title": "Public Goods Retrievals",
-    "description": "Funds forwarded from the Cosmic Signature Public Goods Vault to its configured Public Goods recipient."
+    "description": "Funds forwarded from the Cosmic Signature Public Goods Vault to its configured Public Goods beneficiary."
   },
   "publicGoodsVoluntary": {
     "title": "Voluntary Public Goods Contributions",
-    "description": "Voluntary contributions from the Cosmic Signature community to the Public Goods Vault for its configured recipient."
+    "description": "Voluntary contributions from the Cosmic Signature community to the Public Goods Vault for its configured beneficiary."
   },
   "allocationRetrieved": {
     "title": "Finalized Allocations",

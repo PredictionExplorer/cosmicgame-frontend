@@ -266,6 +266,7 @@ never 寄付 / 寄附 / 募金 (banned). The vault is the **公共財金庫**.
 | ----------------------------------- | ---------------------- |
 | Public Goods                        | 公共財                 |
 | Public Goods Vault                  | 公共財金庫             |
+| Public Goods Beneficiary            | 公共財の受け手         |
 | Protocol Public Goods contributions | プロトコルの公共財拠出 |
 | voluntary contributions             | 自発的な公共財拠出     |
 

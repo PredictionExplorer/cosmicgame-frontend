@@ -240,7 +240,7 @@
     "empty": "No Cosmic Signature NFTs were anchored when this cycle finalized. Its Anchor Distribution remained in the Cycle Reserve."
   },
   "publicGoods": {
-    "voluntaryEmpty": "Contributions sent straight to the Public Goods Vault appear here. The vault holds them for its configured Public Goods recipient."
+    "voluntaryEmpty": "Contributions sent straight to the Public Goods Vault appear here. The vault holds them for its beneficiary, currently Protocol Guild."
   },
   "outreach": {
     "allocationsTitle": "Allocations",

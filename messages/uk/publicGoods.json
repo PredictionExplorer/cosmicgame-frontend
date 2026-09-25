@@ -8,8 +8,8 @@
     "retrieved": "Забрано загалом"
   },
   "ledger": {
-    "contributions": "Записи внесків",
-    "retrievals": "Записи забраних коштів"
+    "contributions": "Внески",
+    "retrievals": "Забрані кошти"
   },
   "contribute": {
     "title": "Внесок до сховища",

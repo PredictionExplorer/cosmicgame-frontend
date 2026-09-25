@@ -58,7 +58,7 @@
       },
       "marketing": {
         "heading": "Outreach allocations",
-        "description": "Review Cosmic Signature outreach allocation history and CST distributions for ecosystem contributors who help people discover the protocol.",
+        "description": "CST sent from the Outreach Reserve to people who help others discover Cosmic Signature, each allocation with its transaction.",
         "source": "Cosmic Signature outreach API",
         "links": {
           "faq": "Read the FAQ",
@@ -67,13 +67,13 @@
         },
         "cards": {
           "records": {
-            "label": "Outreach allocation records"
+            "label": "Allocations"
           },
           "allocatedCst": {
-            "label": "Outreach CST allocated"
+            "label": "CST allocated"
           },
           "contributors": {
-            "label": "Unique outreach contributors"
+            "label": "Contributors"
           }
         }
       },
@@ -109,13 +109,13 @@
         },
         "cards": {
           "records": {
-            "label": "Direct contribution records"
+            "label": "Contributions"
           },
           "totalEth": {
-            "label": "Total direct ETH contributions"
+            "label": "ETH contributed"
           },
           "contributors": {
-            "label": "Unique contributors"
+            "label": "Contributors"
           }
         }
       },
@@ -207,7 +207,7 @@
       },
       "coordination-changes": {
         "heading": "Coordination changes",
-        "description": "Every change the contract owner has made to protocol parameters since the current mode began.",
+        "description": "Changes the contract owner has made to protocol parameters, each with its transaction. Until ownership is renounced, the owner can make more.",
         "source": "Cosmic Signature system-event API",
         "links": {
           "security": "Read the security overview",
@@ -216,7 +216,7 @@
         },
         "cards": {
           "records": {
-            "label": "Coordination change records"
+            "label": "Changes"
           },
           "latest": {
             "label": "Latest change"
@@ -224,13 +224,14 @@
           "owner": {
             "label": "Contract owner",
             "tooltip": "Only this address can change these parameters. Once ownership is renounced, the owner is the zero address and nothing can change them again.",
-            "renounced": "Renounced"
+            "renounced": "Renounced",
+            "active": "Can change parameters"
           }
         }
       },
       "public-goods-contributions-cg": {
         "heading": "Protocol Public Goods contributions",
-        "description": "Track automatic Cosmic Signature Public Goods forwards from protocol cycles to the Public Goods Vault and its configured beneficiary — currently Protocol Guild.",
+        "description": "7% of every finalized cycle’s Cycle Reserve goes to the Public Goods Vault for its beneficiary: currently Protocol Guild, which funds Ethereum core contributors.",
         "source": "Cosmic Signature Public Goods API",
         "links": {
           "learn": "Learn about public goods",
@@ -273,7 +274,7 @@
       },
       "public-goods-retrievals": {
         "heading": "Public Goods retrievals",
-        "description": "Review retrievals from the Cosmic Signature Public Goods Vault, where cycle reserves forward support to the configured Public Goods beneficiary — currently Protocol Guild.",
+        "description": "Every transfer from the Public Goods Vault to its beneficiary, currently Protocol Guild. Anyone can start one, and the ETH only ever goes to the beneficiary.",
         "source": "Cosmic Signature Public Goods API",
         "links": {
           "learn": "Learn about public goods",

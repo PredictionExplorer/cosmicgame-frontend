@@ -58,7 +58,7 @@
       },
       "marketing": {
         "heading": "홍보 배분",
-        "description": "프로토콜을 널리 알리는 데 힘을 보탠 생태계 기여자를 위한 Cosmic Signature 홍보 배분 내역과 CST 배분 현황을 확인할 수 있습니다.",
+        "description": "Cosmic Signature를 널리 알리는 기여자에게 홍보 준비금에서 보낸 CST입니다. 배분마다 해당 트랜잭션이 함께 표시됩니다.",
         "source": "Cosmic Signature 홍보 API",
         "links": {
           "faq": "자주 묻는 질문 읽기",
@@ -67,13 +67,13 @@
         },
         "cards": {
           "records": {
-            "label": "홍보 배분 기록"
+            "label": "배분 기록"
           },
           "allocatedCst": {
-            "label": "홍보 배분 CST 총량"
+            "label": "배분된 CST"
           },
           "contributors": {
-            "label": "고유 홍보 기여자"
+            "label": "기여자"
           }
         }
       },
@@ -109,13 +109,13 @@
         },
         "cards": {
           "records": {
-            "label": "직접 기여 기록"
+            "label": "기여 기록"
           },
           "totalEth": {
-            "label": "직접 ETH 기여 총액"
+            "label": "기여된 ETH"
           },
           "contributors": {
-            "label": "고유 기여자"
+            "label": "기여자"
           }
         }
       },
@@ -207,7 +207,7 @@
       },
       "coordination-changes": {
         "heading": "조율 변경 내역",
-        "description": "현재 모드가 시작된 이후 컨트랙트 소유자가 프로토콜 매개변수에 적용한 모든 변경 사항입니다.",
+        "description": "컨트랙트 소유자가 프로토콜 매개변수에 적용한 변경 사항과 각 트랜잭션입니다. 소유권을 포기하기 전까지 소유자는 계속 변경할 수 있습니다.",
         "source": "Cosmic Signature 시스템 이벤트 API",
         "links": {
           "security": "보안 개요 읽기",
@@ -216,7 +216,7 @@
         },
         "cards": {
           "records": {
-            "label": "조율 변경 기록"
+            "label": "변경 기록"
           },
           "latest": {
             "label": "최근 변경"
@@ -224,13 +224,14 @@
           "owner": {
             "label": "컨트랙트 소유자",
             "tooltip": "이 주소만 매개변수를 변경할 수 있습니다. 소유권을 포기하면 소유자가 영(0) 주소가 되어 더 이상 변경할 수 없습니다.",
-            "renounced": "소유권 포기됨"
+            "renounced": "소유권 포기됨",
+            "active": "매개변수 변경 가능"
           }
         }
       },
       "public-goods-contributions-cg": {
         "heading": "프로토콜 공공재 기여",
-        "description": "프로토콜 사이클에서 공공재 금고와 지정된 수령처(현재 Protocol Guild)로 자동 전달되는 Cosmic Signature 공공재 기여를 추적할 수 있습니다.",
+        "description": "마감된 사이클마다 사이클 준비금의 7%가 공공재 금고로 들어가 공공재 수령처 앞으로 보관됩니다. 현재 수령처는 이더리움 핵심 기여자를 지원하는 Protocol Guild입니다.",
         "source": "Cosmic Signature 공공재 API",
         "links": {
           "learn": "공공재 알아보기",
@@ -273,7 +274,7 @@
       },
       "public-goods-retrievals": {
         "heading": "공공재 회수",
-        "description": "사이클 준비금이 지정된 공공재 수령처(현재 Protocol Guild)로 전달되는 Cosmic Signature 공공재 금고의 회수 내역을 확인할 수 있습니다.",
+        "description": "공공재 금고에서 공공재 수령처(현재 Protocol Guild)로 보낸 모든 전달 내역입니다. 누구나 전달을 실행할 수 있으며, ETH는 항상 수령처로만 갑니다.",
         "source": "Cosmic Signature 공공재 API",
         "links": {
           "learn": "공공재 알아보기",

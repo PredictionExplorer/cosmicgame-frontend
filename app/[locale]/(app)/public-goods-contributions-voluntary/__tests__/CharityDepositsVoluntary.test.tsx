@@ -52,7 +52,7 @@ describe('CharityDepositsVoluntary', () => {
     mockUseCharityVoluntary.mockReturnValue({ data: [], isLoading: false });
     render(<CharityDepositsVoluntary header={HEADER} />);
     expect(within(screen.getByTestId('deposit-table')).getByRole('heading')).toHaveTextContent(
-      'Contribution records',
+      'Contributions',
     );
   });
 

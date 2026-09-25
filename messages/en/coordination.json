@@ -2,7 +2,7 @@
   "page": {
     "title": "Coordination changes",
     "subtitle": "History of protocol parameter changes and admin events",
-    "description": "The contract owner can adjust protocol parameters during cycle activation windows. This log records those changes, including Gesture Cost increases, time extensions, and Anchor Distribution settings. Once the owner renounces ownership, these parameters can no longer be changed.",
+    "description": "Parameters change only during cycle activation windows: Gesture Cost increases, time extensions, Anchor Distribution settings and others.",
     "loadError": "The coordination changes could not be loaded."
   },
   "systemEvent": {
