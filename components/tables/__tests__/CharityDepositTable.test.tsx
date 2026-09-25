@@ -38,10 +38,12 @@ describe('CharityDepositTable', () => {
     expect(datetime.closest('a')).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
-  it('renders round number as a link', () => {
+  it('names the cycle, never a bare number, and links it to its record', () => {
     render(<CharityDepositTable list={[createDonation({ RoundNum: 5 })]} />);
-    const roundLink = screen.getByText('5');
-    expect(roundLink.closest('a')).toHaveAttribute('href', '/allocation/5');
+    expect(screen.getByRole('link', { name: 'tables.allocation.cycle(cycle=5)' })).toHaveAttribute(
+      'href',
+      '/allocation/5',
+    );
   });
 
   it('drops the cycle column when no contribution has a cycle', () => {

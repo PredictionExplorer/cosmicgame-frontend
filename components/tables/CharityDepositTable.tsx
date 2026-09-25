@@ -3,8 +3,9 @@
 import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 
-import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+import { DataTable, TableLink, type DataTableColumn } from '@/components/ui/data-table';
 import type { LedgerStateProps } from '@/components/tables/ledger-props';
+import { useCycleHref } from '@/components/tables/useCycleHref';
 
 export interface PublicGoodsContributionEntry {
   EvtLogId: number;
@@ -37,6 +38,7 @@ export const CharityDepositTable = ({
   ...state
 }: CharityDepositTableProps) => {
   const t = useTranslations('tables');
+  const cycleHref = useCycleHref();
 
   const columns = useMemo<DataTableColumn<PublicGoodsContributionEntry>[]>(() => {
     const all: (DataTableColumn<PublicGoodsContributionEntry> | false)[] = [
@@ -55,7 +57,14 @@ export const CharityDepositTable = ({
         kind: 'link',
         header: t('columns.cycle'),
         value: (row) => (row.RoundNum >= 0 ? row.RoundNum : null),
-        href: (row) => (row.RoundNum >= 0 ? `/allocation/${row.RoundNum}` : null),
+        // "Cycle 2", not a bare "2": a word-wide target that says where it leads.
+        cell: (row) =>
+          row.RoundNum >= 0 ? (
+            <TableLink href={cycleHref(row.RoundNum)}>
+              {t('allocation.cycle', { cycle: row.RoundNum })}
+            </TableLink>
+          ) : null,
+        nowrap: true,
         hideWhenEmpty: true,
       },
       showContributor && {
@@ -77,7 +86,7 @@ export const CharityDepositTable = ({
     return all.filter((column): column is DataTableColumn<PublicGoodsContributionEntry> =>
       Boolean(column),
     );
-  }, [t, showContributor]);
+  }, [t, showContributor, cycleHref]);
 
   return (
     <DataTable
