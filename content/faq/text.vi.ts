@@ -1,5 +1,7 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { formatCount, formatNumber } from '@/utils/format/numbers';
+
 import type { FAQText } from './structure';
 
 const ELAPSED_VI: Record<
@@ -16,12 +18,16 @@ const ELAPSED_VI: Record<
 /** Vietnamese decimal mark for a protocol figure quoted in English notation ("1.73"). */
 const viDecimal = (value: string): string => value.replace('.', ',');
 
-const cstAmount = protocolFacts.specialAllocationCst.toLocaleString('vi-VN');
-const outreachCst = protocolFacts.outreachReserveCst.toLocaleString('vi-VN');
-const cstWindowDecrease =
-  protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture.toLocaleString('vi-VN');
-const cstWindowIncrease =
-  protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture.toLocaleString('vi-VN');
+const cstAmount = formatCount(protocolFacts.specialAllocationCst, 'vi');
+const outreachCst = formatCount(protocolFacts.outreachReserveCst, 'vi');
+const cstWindowDecrease = formatNumber(
+  protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture,
+  'vi',
+);
+const cstWindowIncrease = formatNumber(
+  protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture,
+  'vi',
+);
 
 /** Vietnamese FAQ copy, keyed by the skeleton in structure.ts. */
 export const faqTextVi = {
@@ -70,8 +76,7 @@ export const faqTextVi = {
     items: {
       'what-is-the-main-allocation': {
         question: 'Phân bổ Signature là gì?',
-        answer:
-          'Phân bổ Signature thuộc về người tham gia đặt nét bút cuối cùng của một chu kỳ. Nó bao gồm một Cosmic Signature NFT, 1.000 CST ghi nhận và 25% Dự trữ chu kỳ bằng ETH, cộng với mọi token hoặc NFT được đính kèm vào nét bút của người tham gia trong chu kỳ.',
+        answer: `Phân bổ Signature thuộc về người hoàn tất chu kỳ. Trong ${protocolFacts.finalGestureExclusivityHours} giờ đầu sau thời điểm hoàn tất chu kỳ, chỉ người đặt nét bút cuối cùng được hoàn tất; sau đó bất kỳ ai cũng có thể hoàn tất. Phân bổ bao gồm một Cosmic Signature NFT, ${cstAmount} CST ghi nhận và ${protocolFacts.mainEthPercentage}% Dự trữ chu kỳ bằng ETH, cộng với mọi token hoặc NFT được đính kèm vào nét bút của người tham gia trong chu kỳ.`,
       },
       'what-rewards-per-bid': {
         question: 'Tôi nhận được gì cho mỗi nét bút?',

@@ -1,6 +1,16 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { formatCount } from '@/utils/format/numbers';
+
 import type { FAQText } from './structure';
+
+/**
+ * Protocol amounts in this locale's number style (grouping from
+ * `i18n/localeConfig.ts` through the format layer, never an Intl tag typed
+ * into a copy module).
+ */
+const cst = formatCount(protocolFacts.specialAllocationCst, 'uk');
+const outreachCst = formatCount(protocolFacts.outreachReserveCst, 'uk');
 
 /** protocolFacts stores the example gaps as English strings; render them in Ukrainian. */
 const ELAPSED_UK: Record<
@@ -61,8 +71,7 @@ export const faqTextUk = {
     items: {
       'what-is-the-main-allocation': {
         question: 'Що таке розподіл Сигнатури?',
-        answer:
-          'Розподіл Сигнатури отримує учасник, який зробив завершальний жест циклу. Він включає один Cosmic Signature NFT, закарбування 1 000 CST визнання та 25% резерву циклу в ETH, а також усі токени чи NFT, долучені до жестів учасників протягом циклу.',
+        answer: `Розподіл Сигнатури отримує той, хто завершить цикл. Перші ${protocolFacts.finalGestureExclusivityHours} годин після настання часу завершення циклу це може зробити лише учасник, який зробив завершальний жест; потім — будь-хто. Розподіл включає один Cosmic Signature NFT, закарбування ${cst} CST визнання та ${protocolFacts.mainEthPercentage}% резерву циклу в ETH, а також усі токени чи NFT, долучені до жестів учасників протягом циклу.`,
       },
       'what-rewards-per-bid': {
         question: 'Що я отримую за кожний жест?',
@@ -70,7 +79,7 @@ export const faqTextUk = {
       },
       'how-does-the-stellarSelection-work': {
         question: 'Як працює зоряний відбір?',
-        answer: `Кожен жест додає один запис до зоряного відбору. Наприкінці кожного циклу смарт-контракт випадково відбирає записи з пулу: ${protocolFacts.ethStellarSelectionRecipients} відібрані записи ділять між собою ${protocolFacts.stellarSelectionEthPercentage}% резерву циклу в ETH, ${protocolFacts.nftStellarSelectionRecipients} відібраних записів отримують по ${protocolFacts.specialAllocationCst.toLocaleString('uk-UA')} CST і Cosmic Signature NFT кожен, а ще ${protocolFacts.anchoredRwlkNftSelectionRecipients} відборів серед закріплених Random Walk NFT також приносять по ${protocolFacts.specialAllocationCst.toLocaleString('uk-UA')} CST і Cosmic Signature NFT. Відбір здійснюється з поверненням, тому та сама адреса може бути відібрана кілька разів за цикл. Що більше жестів ви робите, то частіше вас відбирають.`,
+        answer: `Кожен жест додає один запис до зоряного відбору. Наприкінці кожного циклу смарт-контракт випадково відбирає записи з пулу: ${protocolFacts.ethStellarSelectionRecipients} відібрані записи ділять між собою ${protocolFacts.stellarSelectionEthPercentage}% резерву циклу в ETH, ${protocolFacts.nftStellarSelectionRecipients} відібраних записів отримують по ${cst} CST і Cosmic Signature NFT кожен, а ще ${protocolFacts.anchoredRwlkNftSelectionRecipients} відборів серед закріплених Random Walk NFT також приносять по ${cst} CST і Cosmic Signature NFT. Відбір здійснюється з поверненням, тому та сама адреса може бути відібрана кілька разів за цикл. Що більше жестів ви робите, то частіше вас відбирають.`,
       },
       'how-random-selection-works': {
         question: 'Як здійснюється випадковий відбір?',
@@ -79,7 +88,7 @@ export const faqTextUk = {
       },
       'how-do-i-claim-my-allocation': {
         question: 'Як забрати розподіл, якщо я отримувач?',
-        answer: `Отримувачі забирають розподіли через застосунок і контракти протоколу. Автор завершального жесту має ${protocolFacts.finalGestureExclusivityHours} годин ексклюзивного часу після настання часу завершення циклу, щоб завершити цикл і забрати розподіл Сигнатури.\n\nПотім відкривається вікно відкритого завершення: завершити цикл може будь-хто, і смарт-контракт вважає бенефіціаром циклу того, хто це зробив, — він отримує весь розподіл Сигнатури (частку ETH, закарбування ${protocolFacts.specialAllocationCst.toLocaleString('uk-UA')} CST, Cosmic Signature NFT і пріоритет на долучені активи).\n\nДругорядні ETH-розподіли та розподіли долучених токенів чи NFT зберігаються в ескроу гаманця розподілів з окремим строком на забирання, який за замовчуванням становить ${protocolFacts.secondaryRetrievalTimeoutWeeks} тижнів; коли він спливає, контракти дозволяють будь-кому забрати незабраний розподіл собі. Не відкладайте забирання.`,
+        answer: `Отримувачі забирають розподіли через застосунок і контракти протоколу. Автор завершального жесту має ${protocolFacts.finalGestureExclusivityHours} годин ексклюзивного часу після настання часу завершення циклу, щоб завершити цикл і забрати розподіл Сигнатури.\n\nПотім відкривається вікно відкритого завершення: завершити цикл може будь-хто, і смарт-контракт вважає бенефіціаром циклу того, хто це зробив, — він отримує весь розподіл Сигнатури (частку ETH, закарбування ${cst} CST, Cosmic Signature NFT і пріоритет на долучені активи).\n\nДругорядні ETH-розподіли та розподіли долучених токенів чи NFT зберігаються в ескроу гаманця розподілів з окремим строком на забирання, який за замовчуванням становить ${protocolFacts.secondaryRetrievalTimeoutWeeks} тижнів; коли він спливає, контракти дозволяють будь-кому забрати незабраний розподіл собі. Не відкладайте забирання.`,
       },
       'how-does-anchoring-work': {
         question: 'Як працює закріплення?',
@@ -87,11 +96,11 @@ export const faqTextUk = {
       },
       'what-are-marketing-rewards': {
         question: 'Що таке резерв просування?',
-        answer: `Ви можете отримувати токени CST (ERC-20) за допомогу в просуванні протоколу. Резерв просування закарбовує ${protocolFacts.outreachReserveCst.toLocaleString('uk-UA')} CST за цикл і передає їх тим, хто розвиває екосистему. Щоб дізнатися подробиці, зверніться до розпорядника резерву просування через Discord.`,
+        answer: `Ви можете отримувати токени CST (ERC-20) за допомогу в просуванні протоколу. Резерв просування закарбовує ${outreachCst} CST за цикл і передає їх тим, хто розвиває екосистему. Щоб дізнатися подробиці, зверніться до розпорядника резерву просування через Discord.`,
       },
       'how-many-nfts-minted': {
         question: 'Скільки Cosmic Signature NFT закарбовується за цикл?',
-        answer: `У переважній більшості циклів закарбовується ${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFT: один для отримувача розподілу Сигнатури, один для отримувача завершального CST-жесту, один для Чемпіона витривалості, один для Воїна часу, ${protocolFacts.nftStellarSelectionRecipients} для отримувачів зоряного відбору NFT і ${protocolFacts.anchoredRwlkNftSelectionRecipients} для власників закріплень Random Walk NFT, відібраних через зоряний відбір закріплених NFT. Кожен із цих ${protocolFacts.typicalNftsPerCycle} NFT-розподілів також включає ${protocolFacts.specialAllocationCst.toLocaleString('uk-UA')} CST. Якщо в циклі не було CST-жестів або закріплених Random Walk NFT, відповідні закарбування в цьому циклі пропускаються.`,
+        answer: `У переважній більшості циклів закарбовується ${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFT: один для отримувача розподілу Сигнатури, один для отримувача завершального CST-жесту, один для Чемпіона витривалості, один для Воїна часу, ${protocolFacts.nftStellarSelectionRecipients} для отримувачів зоряного відбору NFT і ${protocolFacts.anchoredRwlkNftSelectionRecipients} для власників закріплень Random Walk NFT, відібраних через зоряний відбір закріплених NFT. Кожен із цих ${protocolFacts.typicalNftsPerCycle} NFT-розподілів також включає ${cst} CST. Якщо в циклі не було CST-жестів або закріплених Random Walk NFT, відповідні закарбування в цьому циклі пропускаються.`,
       },
       'what-happens-to-remaining-eth': {
         question: 'Що відбувається з рештою ETH у резерві циклу?',
@@ -137,7 +146,7 @@ export const faqTextUk = {
       },
       'what-is-open-finalization-window': {
         question: 'Що таке вікно відкритого завершення?',
-        answer: `Коли відлік до завершення циклу спливає, автор завершального жесту має ${protocolFacts.finalGestureExclusivityHours} годин ексклюзивного часу, щоб завершити цикл. Якщо протягом вікна ексклюзивності цього не зроблено, викликати транзакцію завершення може будь-хто — і смарт-контракт робить бенефіціаром циклу того, хто її виконав. Він отримує повний розподіл Сигнатури (частку ETH, ${protocolFacts.specialAllocationCst.toLocaleString('uk-UA')} CST, Cosmic Signature NFT і пріоритет на долучені активи), тому авторові завершального жесту варто завершити цикл до кінця вікна. Відкрите завершення підтримує рух протоколу, навіть якщо автор завершального жесту зникає.`,
+        answer: `Коли відлік до завершення циклу спливає, автор завершального жесту має ${protocolFacts.finalGestureExclusivityHours} годин ексклюзивного часу, щоб завершити цикл. Якщо протягом вікна ексклюзивності цього не зроблено, викликати транзакцію завершення може будь-хто — і смарт-контракт робить бенефіціаром циклу того, хто її виконав. Він отримує повний розподіл Сигнатури (частку ETH, ${cst} CST, Cosmic Signature NFT і пріоритет на долучені активи), тому авторові завершального жесту варто завершити цикл до кінця вікна. Відкрите завершення підтримує рух протоколу, навіть якщо автор завершального жесту зникає.`,
       },
       'what-is-endurance-champion': {
         question: 'Хто такий Чемпіон витривалості?',
@@ -151,7 +160,7 @@ export const faqTextUk = {
       },
       'what-is-chrono-warrior': {
         question: 'Хто такий Воїн часу?',
-        answer: `Учасник, який найдовше безперервно утримував позицію Чемпіона витривалості. Якщо Чемпіон витривалості — це автор останнього жесту з найдовшим безперервним лідерством, то Воїн часу — це Чемпіон витривалості з найдовшим безперервним лідерством. Коли цикл завершується, Воїн часу отримує ${protocolFacts.chronoWarriorEthPercentage}% резерву циклу в ETH, ${protocolFacts.specialAllocationCst.toLocaleString('uk-UA')} CST і один Cosmic Signature NFT.`,
+        answer: `Учасник, який найдовше безперервно утримував позицію Чемпіона витривалості. Якщо Чемпіон витривалості — це автор останнього жесту з найдовшим безперервним лідерством, то Воїн часу — це Чемпіон витривалості з найдовшим безперервним лідерством. Коли цикл завершується, Воїн часу отримує ${protocolFacts.chronoWarriorEthPercentage}% резерву циклу в ETH, ${cst} CST і один Cosmic Signature NFT.`,
       },
       'does-time-per-bid-stay-same': {
         question: 'Чи час, який додає кожен жест, завжди однаковий?',

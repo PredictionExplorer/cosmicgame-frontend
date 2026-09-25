@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+
 import {
   faqContentEn,
   findFaqItemByHash,
@@ -7,8 +10,10 @@ import {
   getTotalFaqQuestionCount,
   type FAQCategory,
 } from '@/content/faq';
+import { protocolFacts } from '@/content/protocol-facts';
 import faqMessagesEn from '@/messages/en/faq.json';
 
+import { formatCount } from '@/utils/format/numbers';
 import { routing } from '@/i18n/routing';
 
 const faqCategories: readonly FAQCategory[] = faqContentEn.categories;
@@ -44,6 +49,36 @@ describe('FAQ answer paragraphs (V235)', () => {
           findFaqItemById(getFaqContent('en'), id)!.item.answer.split('\n\n').length,
         );
       }
+    }
+  });
+});
+
+describe('FAQ Signature Allocation answer (V226)', () => {
+  it('gives the allocation to whoever finalizes, with the Final Gesture window, in every locale', () => {
+    const english = findFaqItemById(getFaqContent('en'), 'what-is-the-main-allocation')!.item
+      .answer;
+    expect(english).toMatch(/^The Signature Allocation goes to whoever finalizes the cycle\./);
+    expect(english).not.toMatch(/received by the participant who made the Final Gesture/);
+
+    for (const locale of routing.locales) {
+      const { answer } = findFaqItemById(
+        getFaqContent(locale),
+        'what-is-the-main-allocation',
+      )!.item;
+      // The exclusive window, the share and the CST come from the facts, not typed copy.
+      expect(answer).toContain(String(protocolFacts.finalGestureExclusivityHours));
+      expect(answer).toContain(`${protocolFacts.mainEthPercentage}%`);
+      expect(answer).toContain(formatCount(protocolFacts.specialAllocationCst, locale));
+    }
+  });
+
+  it('formats every protocol amount through the locale layer, never a typed Intl tag', () => {
+    for (const locale of routing.locales) {
+      const source = readFileSync(
+        path.join(process.cwd(), `content/faq/text.${locale}.ts`),
+        'utf8',
+      );
+      expect(source).not.toMatch(/\.toLocaleString\(/);
     }
   });
 });

@@ -1,8 +1,11 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { formatCount } from '@/utils/format/numbers';
+
 import type { FAQText } from './structure';
 
-const cst = protocolFacts.specialAllocationCst.toLocaleString();
+const cst = formatCount(protocolFacts.specialAllocationCst, 'ja');
+const outreachCst = formatCount(protocolFacts.outreachReserveCst, 'ja');
 
 const ELAPSED_JA: Record<
   (typeof protocolFacts.dynamicCstRewardExamples)[number]['elapsed'],
@@ -62,8 +65,7 @@ export const faqTextJa = {
     items: {
       'what-is-the-main-allocation': {
         question: 'シグネチャー配分とは何ですか？',
-        answer:
-          'シグネチャー配分は、サイクルで最後の一筆を入れた参加者が受け取ります。Cosmic Signature NFT 1点、1,000 CSTの功労CST、サイクル準備金の25%のETH、そしてサイクル中に参加者の一筆に添付されたトークンやNFTが含まれます。',
+        answer: `シグネチャー配分は、サイクルを確定した参加者が受け取ります。サイクル確定時刻を過ぎてから${protocolFacts.finalGestureExclusivityHours}時間は、最後の一筆を入れた参加者だけが確定でき、その後は誰でも確定できます。Cosmic Signature NFT 1点、${cst} CSTの功労CST、サイクル準備金の${protocolFacts.mainEthPercentage}%のETH、そしてサイクル中に参加者の一筆に添付されたトークンやNFTが含まれます。`,
       },
       'what-rewards-per-bid': {
         question: '一筆ごとに何を受け取れますか？',
@@ -88,7 +90,7 @@ export const faqTextJa = {
       },
       'what-are-marketing-rewards': {
         question: '広報準備金とは何ですか？',
-        answer: `プロトコルを広める手助けをすると、CSTトークン（ERC-20）を受け取れます。広報準備金はサイクルごとに${protocolFacts.outreachReserveCst.toLocaleString()} CSTを刻印し、エコシステムの貢献者へ配ります。案内が必要な場合は、Discordで広報の管理者に連絡してください。`,
+        answer: `プロトコルを広める手助けをすると、CSTトークン（ERC-20）を受け取れます。広報準備金はサイクルごとに${outreachCst} CSTを刻印し、エコシステムの貢献者へ配ります。案内が必要な場合は、Discordで広報の管理者に連絡してください。`,
       },
       'how-many-nfts-minted': {
         question: '各サイクルで刻印されるCosmic Signature NFTはいくつですか？',
