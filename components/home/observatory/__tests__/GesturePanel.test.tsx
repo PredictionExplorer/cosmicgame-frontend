@@ -388,6 +388,30 @@ describe('GesturePanel', () => {
     expect(screen.getByTestId('panel-cst-metric-net')).toHaveTextContent('+87.50 CST');
   });
 
+  it('shows the dashboard’s Participation CST, marked approximate, until the live preview lands', () => {
+    const { rerender } = render(
+      <GesturePanel
+        {...baseProps}
+        data={makeData({ ParticipationCstReward: 141.2 })}
+        form={makeForm({ gestureCstRewardAmount: null, gestureCstRewardAmountMin: null })}
+      />,
+    );
+    const reward = () => screen.getByTestId('panel-cst-metric-reward');
+    expect(reward().textContent).toContain(`≈${NBSP}141.20${NBSP}CST`);
+    // The minimum the transaction accepts waits for the live read.
+    expect(screen.getByTestId('panel-cst-min-accepted')).not.toHaveTextContent(/\d/);
+
+    rerender(
+      <GesturePanel
+        {...baseProps}
+        data={makeData({ ParticipationCstReward: 141.2 })}
+        form={makeForm({ gestureCstRewardAmount: 140.5 })}
+      />,
+    );
+    expect(reward()).toHaveTextContent('140.50 CST');
+    expect(reward()).not.toHaveTextContent('≈');
+  });
+
   it('keeps figures pending, not zero, while the reward loads', () => {
     render(<GesturePanel {...baseProps} form={makeForm({ isCstRewardLoading: true })} />);
     expect(screen.getByTestId('panel-cst-metric-reward')).not.toHaveTextContent(/\d/);

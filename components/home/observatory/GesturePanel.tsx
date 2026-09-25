@@ -343,6 +343,19 @@ export function GesturePanel({
   // between "141" and "141.01" and the column's decimals line up.
   const cstAmount = (value: number | null) =>
     value == null ? missingValue : <Amount value={value} unit="CST" context="table" />;
+  // Until the contract's live preview arrives, the dashboard's own reading
+  // (already in the server HTML) stands in, marked approximate like the
+  // method prices, so the first paint shows a figure rather than a skeleton.
+  const seededCstReward = toFiniteNumber(data?.ParticipationCstReward);
+  const cstRewardValue = (live: number | null) =>
+    live == null && !cstRewardReadFailed && seededCstReward != null ? (
+      <span data-approximate className="whitespace-nowrap">
+        {'≈ '}
+        <Amount value={seededCstReward} unit="CST" context="table" />
+      </span>
+    ) : (
+      cstAmount(live)
+    );
 
   if (!loading && !isRoundActive) return null;
 
@@ -426,7 +439,7 @@ export function GesturePanel({
                     {t('form.reward.rewardLabel')}
                   </ExplainedTerm>
                 }
-                value={cstAmount(isCstRewardLoading ? null : gestureCstRewardAmount)}
+                value={cstRewardValue(isCstRewardLoading ? null : gestureCstRewardAmount)}
               />
               <SpecRow
                 testId="panel-cst-metric-cost"
@@ -453,7 +466,7 @@ export function GesturePanel({
                   {t('form.reward.previewTitle')}
                 </ExplainedTerm>
               }
-              value={cstAmount(isCstRewardLoading ? null : gestureCstRewardAmount)}
+              value={cstRewardValue(isCstRewardLoading ? null : gestureCstRewardAmount)}
             />
           )}
           <SpecRow
