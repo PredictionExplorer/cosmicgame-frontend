@@ -17,6 +17,12 @@ jest.mock('../../(embed)/embed/endurance/[round]/EmbedEnduranceChart', () => ({
   __esModule: true,
   default: () => null,
 }));
+// The embed's metadata asks the live dashboard whether its cycle has opened;
+// unread here, as when the read fails, it names the chart.
+jest.mock('../publicDataReads', () => ({
+  ...jest.requireActual<typeof import('../publicDataReads')>('../publicDataReads'),
+  readDashboard: async () => ({ data: null, at: 0 }),
+}));
 
 jest.mock('../transfer-cst/TransferCstPage', () => ({
   __esModule: true,

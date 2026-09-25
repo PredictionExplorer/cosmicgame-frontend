@@ -5,24 +5,39 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { readDashboard } from '@/app/[locale]/(app)/publicDataReads';
 import { seedsDisabled } from '@/app/[locale]/(app)/QuerySeed';
 
+import { capCacheWindow } from '@/lib/cacheWindow';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import { parseCanonicalNonNegativeSafeInteger } from '@/utils/routeParams';
 import { createMetadata } from '@/utils/seo';
 
+import { EmbedCycleNotStarted } from './EmbedCycleNotStarted';
 import EmbedEnduranceChart from './EmbedEnduranceChart';
 import { readLeadLaneCount } from './leadLaneCount';
 
 /**
  * The cycle in the URL; anything but a canonical cycle number ("abc", "-1",
- * "01") is not a page. A cycle that has not opened yet is not one either,
- * which only the live dashboard knows: the chart decides that in the browser
- * rather than caching a 404 for a cycle that opens a minute later.
+ * "01") is not a page.
  */
 function cycleOrNotFound(round: string): number {
   const cycle = parseCanonicalNonNegativeSafeInteger(round);
   if (cycle === null) notFound();
   return cycle;
 }
+
+/**
+ * The live cycle by the server's dashboard read, once per render (metadata
+ * and page share it); undefined when it failed, and under the e2e harness,
+ * whose browser mocks the API (the same rule as QuerySeed).
+ */
+async function readLiveCycle(): Promise<number | undefined> {
+  if (seedsDisabled()) return undefined;
+  const dashboard = await readDashboard();
+  return toFiniteNumber(dashboard.data?.CurRoundNum) ?? undefined;
+}
+
+/** A cycle past the live one has not opened, which only the live dashboard knows. */
+const notStarted = (cycle: number, liveCycle: number | undefined): liveCycle is number =>
+  liveCycle !== undefined && cycle > liveCycle;
 
 export async function generateMetadata({
   params,
@@ -31,16 +46,29 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale, round } = await params;
   const cycle = cycleOrNotFound(round);
-  const t = await getTranslations({ locale, namespace: 'meta' });
-  const tStatistics = await getTranslations({ locale, namespace: 'statistics' });
-  const metadata = createMetadata(
-    // The tab names the chart and its cycle, as the page's H1 does.
-    tStatistics('embed.title', { cycle }),
-    t('embedEndurance.description'),
-    undefined,
-    `/embed/endurance/${round}`,
-    { index: false, locale },
-  );
+  const [t, tStatistics, tAllocation, liveCycle] = await Promise.all([
+    getTranslations({ locale, namespace: 'meta' }),
+    getTranslations({ locale, namespace: 'statistics' }),
+    getTranslations({ locale, namespace: 'allocation' }),
+    readLiveCycle(),
+  ]);
+  const metadata = notStarted(cycle, liveCycle)
+    ? // The tab says what the window says of a cycle that has not opened.
+      createMetadata(
+        tAllocation('missingCycle.notStarted.title', { cycle }),
+        tAllocation('missingCycle.notStarted.body', { cycle, live: liveCycle }),
+        undefined,
+        `/embed/endurance/${round}`,
+        { index: false, locale },
+      )
+    : createMetadata(
+        // The tab names the chart and its cycle, as the page's H1 does.
+        tStatistics('embed.title', { cycle }),
+        t('embedEndurance.description'),
+        undefined,
+        `/embed/endurance/${round}`,
+        { index: false, locale },
+      );
 
   return {
     ...metadata,
@@ -61,7 +89,9 @@ export async function generateMetadata({
  * server render per cycle and locale, not one per visitor. The chart itself
  * reads the cycle's gestures in the browser; the cached HTML carries only the
  * live cycle (for the badge) and the lane count (for the skeleton's height),
- * and the browser's own dashboard read corrects a badge that went stale.
+ * and the browser's own dashboard read corrects a badge that went stale. A
+ * cycle that has not opened, and a render whose dashboard read failed, are
+ * kept a minute (`lib/cacheWindow`).
  */
 export function generateStaticParams() {
   return [];
@@ -81,8 +111,12 @@ export default async function Page({
   // nothing is read here (the same rule as QuerySeed).
   if (seedsDisabled()) return <EmbedEnduranceChart roundNum={cycle} />;
 
-  const dashboard = await readDashboard();
-  const liveCycle = toFiniteNumber(dashboard.data?.CurRoundNum) ?? undefined;
+  const liveCycle = await readLiveCycle();
+  if (notStarted(cycle, liveCycle)) {
+    await capCacheWindow('pending');
+    return <EmbedCycleNotStarted locale={locale} cycle={cycle} liveCycle={liveCycle} />;
+  }
+  if (liveCycle === undefined) await capCacheWindow('pending');
   const lanes = await readLeadLaneCount(cycle, liveCycle);
   // The embed layout serializes the chart's namespaces (EMBED_NAMESPACES).
   return <EmbedEnduranceChart roundNum={cycle} seedLiveCycle={liveCycle} expectedLanes={lanes} />;
