@@ -131,7 +131,7 @@ function SiteMapSection({
 interface RouteEntry {
   readonly route: SiteRoute;
   /** The pages filed under this one (a Statistics section under Statistics). */
-  readonly children: readonly SiteRoute[];
+  readonly pages: readonly SiteRoute[];
 }
 
 /** A section's routes as the menus nest them: each top-level page with its own pages under it. */
@@ -139,7 +139,7 @@ export function routeTree(routes: readonly SiteRoute[]): RouteEntry[] {
   const ids = new Set(routes.map((route) => route.id));
   return routes
     .filter((route) => !route.parent || !ids.has(route.parent))
-    .map((route) => ({ route, children: routes.filter((child) => child.parent === route.id) }));
+    .map((route) => ({ route, pages: routes.filter((page) => page.parent === route.id) }));
 }
 
 function RouteLink({ route, nested = false }: { route: SiteRoute; nested?: boolean }) {
@@ -171,15 +171,15 @@ function RouteLink({ route, nested = false }: { route: SiteRoute; nested?: boole
  * the desktop shows is also what a screen reader announces. On phones a
  * destination with pages under it takes the full row.
  */
-function RouteRow({ route, children }: RouteEntry) {
+function RouteRow({ route, pages }: RouteEntry) {
   return (
-    <li className={cn('min-w-0', children.length > 0 && 'col-span-2')}>
+    <li className={cn('min-w-0', pages.length > 0 && 'col-span-2')}>
       <RouteLink route={route} />
-      {children.length > 0 ? (
+      {pages.length > 0 ? (
         <ul className={NESTED_ROWS_CLASS}>
-          {children.map((child) => (
-            <li key={child.id} className="min-w-0">
-              <RouteLink route={child} nested />
+          {pages.map((page) => (
+            <li key={page.id} className="min-w-0">
+              <RouteLink route={page} nested />
             </li>
           ))}
         </ul>

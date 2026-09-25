@@ -160,7 +160,7 @@ describe('SiteMapPage', () => {
     for (const section of SITE_SECTION_IDS) {
       const routes = routesInSection(section);
       const tree = routeTree(routes);
-      const flattened = tree.flatMap((entry) => [entry.route, ...entry.children]);
+      const flattened = tree.flatMap((entry) => [entry.route, ...entry.pages]);
       expect(flattened.map((route) => route.id).sort()).toEqual(
         routes.map((route) => route.id).sort(),
       );
