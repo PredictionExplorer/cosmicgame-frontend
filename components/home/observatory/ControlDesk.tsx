@@ -200,9 +200,17 @@ export function DeskDisclosure({
         <span className="min-w-0 flex-1">
           <span className="type-heading-3 block text-foreground">{title}</span>
           <span className="type-body-sm mt-0.5 block text-muted-foreground">{description}</span>
+          {/* On phones the figure takes a line of its own under the words,
+              so the title keeps the row's width. */}
+          {figure ? (
+            <span className="mt-1 flex items-baseline gap-2 sm:hidden">{figure}</span>
+          ) : null}
         </span>
         {figure ? (
-          <span data-testid={testId ? `${testId}-figure` : undefined} className="shrink-0 text-end">
+          <span
+            data-testid={testId ? `${testId}-figure` : undefined}
+            className="flex shrink-0 flex-col items-end max-sm:hidden"
+          >
             {figure}
           </span>
         ) : null}
@@ -251,11 +259,9 @@ export function AllocationsDisclosure({
               value={reserveEth}
               unit="ETH"
               context="card"
-              className="type-figure-sm block text-foreground"
+              className="type-figure-sm text-foreground"
             />
-            <span className="type-caption block text-subtle">
-              {tGlossary('terms.cycleReserve.term')}
-            </span>
+            <span className="type-caption text-subtle">{tGlossary('terms.cycleReserve.term')}</span>
           </>
         ) : undefined
       }

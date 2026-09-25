@@ -1,3 +1,5 @@
+import { protocolFacts } from '@/content/protocol-facts';
+
 import { render, screen, within, checkA11y } from '@/test-utils';
 
 import { AllocationLedger } from '../AllocationLedger';
@@ -89,6 +91,22 @@ describe('AllocationLedger', () => {
   it('omits the next-cycle amount when the live percentage set is incomplete', () => {
     render(<AllocationLedger data={makeData({ RafflePercentage: undefined })} />);
     expect(screen.queryByTestId('ledger-track-next-cycle')).not.toBeInTheDocument();
+  });
+
+  it('never tells anyone Public Goods receive 0% while the share is unknown', () => {
+    const { rerender } = render(<AllocationLedger data={null} />);
+    const info = () =>
+      within(screen.getByTestId('ledger-track-public-goods')).getByRole('button', {
+        name: /home\.allocation\.cards\.publicGoods\.name/,
+      });
+    // The documented share until the dashboard reports the live one.
+    expect(info()).toHaveAccessibleDescription(
+      `home.allocation.cards.publicGoods.tooltip(percent=${protocolFacts.publicGoodsPercentage})`,
+    );
+    rerender(<AllocationLedger data={makeData({ CharityPercentage: 9 })} />);
+    expect(info()).toHaveAccessibleDescription(
+      'home.allocation.cards.publicGoods.tooltip(percent=9)',
+    );
   });
 
   it('reads amounts as pending, never as 0 ETH, before the dashboard arrives', () => {

@@ -9,14 +9,14 @@ export type PhaseTone = 'neutral' | 'live' | 'attention' | 'positive';
 
 /**
  * Per-phase treatment for the cycle clock and its satellites (the header
- * strip and the action dock). Message keys resolve under `home.chrono.phase.*`,
- * the single source of phase copy.
+ * strip, the action dock, the announcer and the cycle page). Message keys
+ * resolve under `home.chrono.phase.*`, the single source of phase copy. Which
+ * phases replace the figures with a word is the clock's own decision (a
+ * countdown runs only before the cycle opens and while it counts down).
  */
 export interface PhaseView {
   /** Message key segment under `home.chrono.phase.*`. */
   messageKey: string;
-  /** Whether this phase shows a word at the clock's size instead of a countdown. */
-  hasDisplayText: boolean;
   tone: PhaseTone;
 }
 
@@ -29,23 +29,19 @@ export const PHASE_TEXT_CLASS: Record<PhaseTone, string> = {
 };
 
 const VIEWS: Record<CyclePhase, PhaseView> = {
-  loading: { messageKey: 'loading', hasDisplayText: true, tone: 'neutral' },
-  unavailable: { messageKey: 'unavailable', hasDisplayText: true, tone: 'neutral' },
-  'opening-soon': { messageKey: 'openingSoon', hasDisplayText: false, tone: 'neutral' },
-  'waiting-first-gesture': {
-    messageKey: 'waitingFirstGesture',
-    hasDisplayText: true,
-    tone: 'live',
-  },
-  live: { messageKey: 'live', hasDisplayText: false, tone: 'live' },
-  approach: { messageKey: 'approach', hasDisplayText: false, tone: 'live' },
+  loading: { messageKey: 'loading', tone: 'neutral' },
+  unavailable: { messageKey: 'unavailable', tone: 'neutral' },
+  'opening-soon': { messageKey: 'openingSoon', tone: 'neutral' },
+  'waiting-first-gesture': { messageKey: 'waitingFirstGesture', tone: 'live' },
+  live: { messageKey: 'live', tone: 'live' },
+  approach: { messageKey: 'approach', tone: 'live' },
   // One urgency cue: the phase word turns to --attention; the figures keep
   // their size and colour.
-  'final-hour': { messageKey: 'finalHour', hasDisplayText: false, tone: 'attention' },
-  'final-ten': { messageKey: 'finalTen', hasDisplayText: false, tone: 'attention' },
-  'final-minute': { messageKey: 'finalMinute', hasDisplayText: false, tone: 'attention' },
-  confirming: { messageKey: 'confirming', hasDisplayText: true, tone: 'neutral' },
-  'ready-to-finalize': { messageKey: 'readyToFinalize', hasDisplayText: true, tone: 'positive' },
+  'final-hour': { messageKey: 'finalHour', tone: 'attention' },
+  'final-ten': { messageKey: 'finalTen', tone: 'attention' },
+  'final-minute': { messageKey: 'finalMinute', tone: 'attention' },
+  confirming: { messageKey: 'confirming', tone: 'neutral' },
+  'ready-to-finalize': { messageKey: 'readyToFinalize', tone: 'positive' },
 };
 
 export function viewForPhase(phase: CyclePhase): PhaseView {

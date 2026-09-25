@@ -38,6 +38,19 @@ export interface LiveStatusViewProps {
    * stamp on a page whose one breathing dot is elsewhere (the Cycle pill).
    */
   still?: boolean;
+  /**
+   * Render nothing while the data is live or still connecting: a region's
+   * own stamp that appears only when something is wrong ("Reconnecting",
+   * "Updates delayed", "Offline"), on a page whose one page-level indicator
+   * says the rest. Four "Updated just now" stamps in a row are noise.
+   */
+  quietWhenFresh?: boolean;
+  /**
+   * Own the polite live region that speaks state changes (default true).
+   * Pass false on a secondary stamp, so one change is announced once, by the
+   * page's primary indicator, instead of once per region.
+   */
+  announce?: boolean;
   className?: string;
 }
 
@@ -62,10 +75,13 @@ export function LiveStatusView({
   variant = 'chip',
   clockCaveat = false,
   still = false,
+  quietWhenFresh = false,
+  announce = true,
   className,
 }: LiveStatusViewProps) {
   const t = useTranslations('common');
   const age = useAgeLabel(ageMs);
+  if (quietWhenFresh && (state === 'live' || state === 'connecting')) return null;
 
   const stateLabel: Record<LiveFreshness, string> = {
     connecting: t('liveStatus.connecting'),
@@ -114,7 +130,12 @@ export function LiveStatusView({
       )}
     >
       {dot}
-      <span role="status" aria-live="polite" className="sr-only">
+      {/* A silent stamp still says its state in words to a reader who reaches it. */}
+      <span
+        role={announce ? 'status' : undefined}
+        aria-live={announce ? 'polite' : undefined}
+        className="sr-only"
+      >
         {state === 'delayed' ? t('liveStatus.delayedShort') : t(`liveStatus.${state}`)}
       </span>
       {variant !== 'dot' && (

@@ -45,7 +45,8 @@ describe('CycleStanding', () => {
     render(<CycleStanding {...baseProps} isLatest holdSeconds={3 * 3600 + 16 * 60} />);
     const position = screen.getByTestId('personal-standing');
     expect(position).toHaveTextContent('home.observatory.standing.positionLatest');
-    expect(position).toHaveTextContent('home.deck.personal.heldFor(duration=3h 16m)');
+    // A growing hold reads as a clock, like every ticking duration on the desk.
+    expect(position).toHaveTextContent('home.deck.personal.heldFor(duration=03:16:00)');
   });
 
   it('says only this wallet can finalize during its exclusive window, and leads there', async () => {

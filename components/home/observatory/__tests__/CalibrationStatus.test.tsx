@@ -24,12 +24,30 @@ describe('CalibrationStatus', () => {
     render(<CalibrationStatus {...makeProps()} />);
 
     const window = screen.getByRole('region', { name: 'home.calibration.cstTitle' });
-    expect(within(window).getByTestId('calibration-cost-now')).toHaveTextContent('20 CST');
+    expect(within(window).getByTestId('calibration-cost-now')).toHaveTextContent(
+      'home.calibration.costNow20 CST',
+    );
+    // A countdown reads as a clock, like every countdown on the desk.
     expect(within(window).getByTestId('calibration-floor-in')).toHaveTextContent(
-      'home.calibration.floorIn(duration=45m)',
+      'home.calibration.floorIn(duration=00:45:00)',
     );
     // The floor is named at the end of the track.
     expect(within(window).getByText('home.calibration.floor')).toBeVisible();
+  });
+
+  it('stands the cost now over the dot that marks now, never at the line’s origin', () => {
+    render(<CalibrationStatus {...makeProps()} />);
+    // A quarter of the window has passed: the figure follows the dot, kept on the track.
+    const figure = screen.getByTestId('calibration-cost-now');
+    expect(figure.style.left).toBe('25%');
+    expect(figure.style.transform).toBe('translateX(-25%)');
+  });
+
+  it('keeps the region heading plain, like every other heading on the desk', () => {
+    render(<CalibrationStatus {...makeProps()} />);
+    const heading = screen.getByRole('heading', { name: 'home.calibration.cstTitle' });
+    // No concept glyph before it; the only icon beside it is the ⓘ.
+    expect(heading.previousElementSibling).toBeNull();
   });
 
   it('draws the window as a descending price track with an accessible reading', () => {
@@ -41,10 +59,10 @@ describe('CalibrationStatus', () => {
     expect(track).toHaveAttribute('aria-valuenow', '25');
     expect(track).toHaveAttribute(
       'aria-valuetext',
-      '20\u00a0CST · home.calibration.reachesFloorIn(duration=45m)',
+      '20\u00a0CST · home.calibration.reachesFloorIn(duration=00:45:00)',
     );
-    // A 24px sparkline in the foreground ink, not a warning-coloured bar.
-    expect(track).toHaveClass('h-6', 'text-foreground');
+    // A 36px sparkline in the foreground ink, not a warning-coloured bar.
+    expect(track).toHaveClass('h-9', 'text-foreground');
     // The floor is named where the line ends: bottom right.
     expect(screen.getByTestId('calibration-floor')).toHaveClass('self-end');
   });
@@ -64,7 +82,7 @@ describe('CalibrationStatus', () => {
     expect(within(window).getByTestId('calibration-cost-now')).toHaveTextContent('0.1 ETH');
     expect(within(window).getByRole('progressbar')).toHaveAttribute('aria-valuenow', '50');
     expect(within(window).getByTestId('calibration-floor-in')).toHaveTextContent(
-      'home.calibration.windowEndsIn(duration=15m)',
+      'home.calibration.windowEndsIn(duration=00:15:00)',
     );
     // The ETH window's floor is not zero, so none is named.
     expect(within(window).queryByText('home.calibration.floor')).not.toBeInTheDocument();
@@ -148,7 +166,7 @@ describe('CalibrationStatus', () => {
       />,
     );
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0');
-    expect(screen.getByTestId('calibration-floor-in')).toHaveTextContent('duration=30m');
+    expect(screen.getByTestId('calibration-floor-in')).toHaveTextContent('duration=00:30:00');
   });
 
   it('supports older snapshots that predate explicit timing availability', () => {

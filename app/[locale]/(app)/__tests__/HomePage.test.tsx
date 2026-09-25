@@ -824,7 +824,8 @@ describe('HomePage', () => {
     const challenge = within(chrono).getByTestId('chrono-active-challenge');
     expect(challenge).toHaveTextContent(/challenge\.reign\s*00:20:00/);
     expect(challenge).toHaveTextContent(/challenge\.passesIn\s*00:10:01/);
-    expect(chrono).toHaveTextContent('30m');
+    // The record itself reads as a clock too, like every duration in the ledger.
+    expect(chrono).toHaveTextContent('00:30:00');
     // The holder is named once, on the Endurance row, not again here.
     expect(within(challenge).queryByRole('link')).not.toBeInTheDocument();
     expect(chrono).toHaveTextContent('0.8000 ETH');
@@ -1650,6 +1651,12 @@ describe('HomePage', () => {
         .getAllByTestId('chat-system-event')
         .some((event) => event.dataset.kind === 'enduranceRecord'),
     ).toBe(true);
+    // The feed reveals what it holds first, then fetches older history.
+    let showMore = within(chat).queryByRole('button', { name: 'home.chat.history.showMore' });
+    while (showMore) {
+      await user.click(showMore);
+      showMore = within(chat).queryByRole('button', { name: 'home.chat.history.showMore' });
+    }
     await user.click(within(chat).getByRole('button', { name: 'home.chat.history.loadOlder' }));
     expect(mockLoadOlder).toHaveBeenCalledTimes(1);
   });

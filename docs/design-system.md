@@ -332,15 +332,30 @@ maintenance banner, page tops) derives from that one value. The other tokens are
 `components/home/observatory/ControlDesk.tsx` on the app home). A region that continues
 the one above it in the same column opens on `--rule-faint`. Only the one control group a
 view exists for keeps a surface (the gesture form: `bg-surface`, no border). Disclosures
-read as a list of hairline rows (`DeskDisclosure`), never as boxed accordions. Every region
-heading on one page uses one style (`type-heading-3`).
+read as a list of hairline rows (`DeskDisclosure`: a glyph, the title, one line on what
+opens and, where there is one, a live figure), never as boxed accordions. Every region
+heading on one page uses one style (`type-heading-3`), with no leading glyph. A region's
+freshness stamp (`<LiveStatus quietWhenFresh announce={false}>`) appears only when its
+data stops updating; the page's one primary indicator says the rest and is the only one
+that announces.
+
+**Reading order.** A grid that places cells explicitly still reads in DOM order, so the
+DOM follows the widest layout's reading order column by column, and focus never moves
+up within a column (`ControlDesk` puts the form beside the Cycle column from 1024px, so
+its commit action is in the first viewport from 1280×720 up).
 
 **Ticking figures.** A line that carries a live figure has a fixed shape: the label wraps,
 the figure sits in its own column and never does, and a countdown reads as a clock
-(`<Duration variant="clock">`, "8d 06:56:51") whose width holds while it ticks. Lines
-stacked together share that one format, so a growing hold under a countdown reads as a
-clock too ("1d 01:12:05" over "8d 00:24:38") and the digits align. A `flex-wrap` row of
-ticking values re-wraps as the digits change and moves everything below it.
+(`<Duration variant="clock">`, "8d 06:56:51") whose width holds while it ticks. One
+quantity has one format: every duration figure on a live surface reads as a clock,
+whether it counts down (the clock, the dock, the Calibration Window's "in 06:34:39"),
+grows (a hold) or stands as a record in the same column ("9d 01:36:42" under "Time
+held"), so stacked values align and nobody converts "02:49:48" into "2h 49m" in their
+head. Words ("7h 25m") are for durations inside prose: explanations, tooltips and
+sentences. Every countdown rounds the same way, whole seconds up
+(`countdownSeconds` in `components/home/observatory/countdown.ts`), so two readings of
+one deadline never differ by a second. A `flex-wrap` row of ticking values re-wraps as
+the digits change and moves everything below it.
 
 **Targets.** Every text link is at least 24px tall at every width
 (`TOUCH_TARGET_TEXT_LINK_CLASS`, `lib/touch-target.ts`): WCAG 2.5.8 covers a mouse as much

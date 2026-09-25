@@ -122,7 +122,9 @@ export function CycleStanding({
           ? tHome('chrono.phase.confirming.label')
           : holdSeconds == null
             ? undefined
-            : tHome('deck.personal.heldFor', { duration: format.duration(holdSeconds) }),
+            : tHome('deck.personal.heldFor', {
+                duration: format.duration(holdSeconds, { style: 'clock' }),
+              }),
       };
     }
     if (moment?.kind === 'taken') {

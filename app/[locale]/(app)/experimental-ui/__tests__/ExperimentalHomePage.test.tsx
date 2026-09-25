@@ -742,7 +742,7 @@ describe('ExperimentalHomePage', () => {
     expect(mockChampions).toHaveBeenLastCalledWith(null, expect.anything(), true, sampledAtMs);
     const latest = screen.getByTestId('latest-participant-intel');
     // The hold as of the sampled instant, never a pending or a false "0s".
-    expect(latest).toHaveTextContent('2h 21m 9s');
+    expect(latest).toHaveTextContent('02:21:09');
     // (7h 3m 11s + 1s) − 2h 21m 9s, read as a clock beside its fixed label.
     const countdown = within(latest).getByTestId('latest-endurance-countdown');
     expect(countdown).toHaveTextContent('home.observatory.ledger.passesRecordIn');

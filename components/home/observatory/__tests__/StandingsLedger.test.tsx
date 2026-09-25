@@ -119,7 +119,8 @@ describe('StandingsLedger', () => {
       `/user/${CHRONO}`,
     );
     expect(within(chrono).queryByRole('link', { name: /0x2222/ })).not.toBeInTheDocument();
-    expect(visibleText(chrono)).toContain('2h');
+    // Every duration in the ledger reads as a clock, records included.
+    expect(visibleText(chrono)).toContain('02:00:00');
     expect(visibleText(chrono)).toContain('2.5835');
     expect(visibleText(screen.getByTestId('control-desk-endurance'))).toContain(
       'home.observatory.standings.cstPlusNft',
@@ -287,17 +288,38 @@ describe('StandingsLedger', () => {
   it('names the Signature Allocation in the Last Gesture row until a page gives its figure', () => {
     const { rerender } = render(<StandingsLedger {...baseProps} />);
     const latestRow = () => screen.getByTestId('latest-participant-intel');
-    // The home: its clock already shows the figure, so the row names it.
+    // Without a figure the row names the allocation.
     expect(visibleText(latestRow())).toContain('home.observatory.clock.reserveLabel');
     expect(visibleText(latestRow())).not.toContain('8.0735');
 
-    // The cycle page: a figure like the other rows', captioned with its name.
+    // The home and the cycle page: a figure like the other rows', captioned with its name.
     rerender(<StandingsLedger {...baseProps} signatureEth={8.0735} />);
     expect(visibleText(latestRow())).toContain('8.0735');
     expect(visibleText(latestRow())).toContain('home.observatory.clock.reserveLabel');
 
     rerender(<StandingsLedger {...baseProps} signatureEth={null} />);
-    expect(within(latestRow()).getByText('common.status.unavailable')).toBeInTheDocument();
+    expect(within(latestRow()).getAllByText('common.status.unavailable').length).toBeGreaterThan(0);
+  });
+
+  it('puts the allocation on the role’s line in a narrow ledger, heard once in the list', () => {
+    render(<StandingsLedger {...baseProps} />);
+    const chrono = screen.getByTestId('chrono-role-summary');
+    const [roleLine] = within(chrono).getAllByText('2.5835', { exact: false });
+    // The copy beside the role is for sight only, and only below 30rem.
+    const visual = roleLine!.closest('[aria-hidden]');
+    expect(visual).toHaveClass('@[30rem]/ledger:hidden');
+    // The labelled one lives in the list, visible from 30rem.
+    const field = within(chrono).getByText(
+      'home.observatory.ledger.columns.allocation',
+    ).parentElement!;
+    expect(field).toHaveClass('sr-only', '@[30rem]/ledger:not-sr-only');
+  });
+
+  it('keeps the role names quiet: underlined on hover and focus only', () => {
+    render(<StandingsLedger {...baseProps} />);
+    for (const term of document.querySelectorAll('[data-term]')) {
+      expect(term.className).toContain('[text-decoration-color:transparent]');
+    }
   });
 
   it('sits one level deeper, introduced by a line, inside the cycle page', () => {
