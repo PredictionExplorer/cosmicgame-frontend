@@ -72,6 +72,7 @@ jest.mock('../../../../../components/anchoring/UnretrievedCSTAnchorDistributions
 const envelope = (fields: Record<string, unknown>) => ({
   data: { ...fields, UserAddr: NEW_WALLET, UserAid: 0, error: '', status: 1 },
 });
+// lexicon-allow-start: backend HTTP URL paths mirror the Go server routes and are a sealed contract
 const NEW_WALLET_PAYLOADS: [route: string, fields: Record<string, unknown>][] = [
   ['user/notif_red_box/', { Winnings: [] }],
   ['staking/cst/rewards/to_claim/by_user/', { UnclaimedEthDeposits: [] }],
@@ -79,6 +80,7 @@ const NEW_WALLET_PAYLOADS: [route: string, fields: Record<string, unknown>][] = 
   ['prizes/eth/unclaimed/by_user/', { UnclaimedDeposits: [] }],
   ['donations/erc20/by_user/', { DonatedPrizesERC20ByWinner: [] }],
 ];
+// lexicon-allow-end
 
 beforeEach(() => {
   mockedGet.mockReset();
