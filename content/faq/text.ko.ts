@@ -79,11 +79,11 @@ export const faqTextKo = {
       },
       'how-do-i-claim-my-allocation': {
         question: '수령자가 되면 배분을 어떻게 회수하나요?',
-        answer: `수령자는 앱과 프로토콜 컨트랙트를 통해 배분을 회수합니다. 최종 제스처 참여자는 사이클 마감 시각이 지난 뒤 ${protocolFacts.finalGestureExclusivityHours}시간 동안 단독으로 사이클을 마감하고 시그니처 배분을 회수할 수 있습니다. 그 뒤에는 공개 마감 구간이 시작됩니다. 누구나 사이클을 마감할 수 있고, 스마트 컨트랙트는 마감을 실행한 사람을 사이클 수령자로 취급합니다. 즉 마감 실행자가 시그니처 배분 전체(ETH 몫, ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST 각인, Cosmic Signature NFT, 첨부 자산 우선권)를 받습니다. 2차 ETH 배분과 첨부 토큰 또는 첨부 NFT 배분은 배분 지갑 에스크로에 보관되며, 별도의 회수 기한이 적용됩니다. 기본값은 ${protocolFacts.secondaryRetrievalTimeoutWeeks}주이며, 기한이 지나면 누구든 미회수 배분을 자기 몫으로 회수할 수 있습니다. 배분은 서둘러 회수해 주세요.`,
+        answer: `수령자는 앱과 프로토콜 컨트랙트를 통해 배분을 회수합니다. 최종 제스처 참여자는 사이클 마감 시각이 지난 뒤 ${protocolFacts.finalGestureExclusivityHours}시간 동안 단독으로 사이클을 마감하고 시그니처 배분을 회수할 수 있습니다.\n\n그 뒤에는 공개 마감 구간이 시작됩니다. 누구나 사이클을 마감할 수 있고, 스마트 컨트랙트는 마감을 실행한 사람을 사이클 수령자로 취급합니다. 즉 마감 실행자가 시그니처 배분 전체(ETH 몫, ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST 각인, Cosmic Signature NFT, 첨부 자산 우선권)를 받습니다.\n\n2차 ETH 배분과 첨부 토큰 또는 첨부 NFT 배분은 배분 지갑 에스크로에 보관되며, 별도의 회수 기한이 적용됩니다. 기본값은 ${protocolFacts.secondaryRetrievalTimeoutWeeks}주이며, 기한이 지나면 누구든 미회수 배분을 자기 몫으로 회수할 수 있습니다. 배분은 서둘러 회수해 주세요.`,
       },
       'how-does-anchoring-work': {
         question: '앵커링은 어떻게 작동하나요?',
-        answer: `Cosmic Signature NFT를 프로토콜에 앵커링하면 ETH 앵커링 지급을 받을 수 있습니다. 마감되는 사이클마다 사이클 준비금의 ${protocolFacts.anchorDistributionPercentage}%가 앵커링된 Cosmic Signature NFT에 균등하게 나뉘고, 쌓인 ETH는 앵커링을 해제할 때 지급됩니다. Random Walk NFT도 앵커링할 수 있지만, 이는 앵커링 NFT 별빛 선정 자격을 얻기 위한 것입니다. 선정된 앵커링 보유자는 ETH가 아니라 CST와 Cosmic Signature NFT를 받습니다. 알아 두어야 할 규칙이 두 가지 있습니다. 모든 NFT는 단 한 번만 앵커링할 수 있으며(앵커링을 해제한 NFT는 다시 앵커링할 수 없습니다), 사이클이 마감될 때 앵커링된 Cosmic Signature NFT가 하나도 없으면 그 사이클의 ${protocolFacts.anchorDistributionPercentage}%는 사이클 준비금에 그대로 남습니다. CST(ERC-20)는 앵커링할 수 없습니다. 앵커링 관리는 계정 메뉴의 내 앵커링 페이지에서 할 수 있습니다.`,
+        answer: `Cosmic Signature NFT를 프로토콜에 앵커링하면 ETH 앵커링 지급을 받을 수 있습니다. 마감되는 사이클마다 사이클 준비금의 ${protocolFacts.anchorDistributionPercentage}%가 앵커링된 Cosmic Signature NFT에 균등하게 나뉘고, 쌓인 ETH는 앵커링을 해제할 때 지급됩니다.\n\nRandom Walk NFT도 앵커링할 수 있지만, 이는 앵커링 NFT 별빛 선정 자격을 얻기 위한 것입니다. 선정된 앵커링 보유자는 ETH가 아니라 CST와 Cosmic Signature NFT를 받습니다.\n\n알아 두어야 할 규칙이 두 가지 있습니다. 모든 NFT는 단 한 번만 앵커링할 수 있으며(앵커링을 해제한 NFT는 다시 앵커링할 수 없습니다), 사이클이 마감될 때 앵커링된 Cosmic Signature NFT가 하나도 없으면 그 사이클의 ${protocolFacts.anchorDistributionPercentage}%는 사이클 준비금에 그대로 남습니다. CST(ERC-20)는 앵커링할 수 없습니다. 앵커링 관리는 계정 메뉴의 내 앵커링 페이지에서 할 수 있습니다.`,
       },
       'what-are-marketing-rewards': {
         question: '홍보 준비금이란 무엇인가요?',
@@ -124,7 +124,7 @@ export const faqTextKo = {
       },
       'how-is-participation-cst-calculated': {
         question: '참여 CST는 어떻게 계산되나요?',
-        answer: `참여 CST는 이전 제스처 이후 흐른 시간에 제곱근 공식을 적용해 계산합니다: ${protocolFacts.dynamicCstRewardFormula}. 제곱근을 쓰는 이유는 긴 공백을 더 크게 반영하되, 양이 끝없이 선형으로 늘어나지는 않게 하기 위해서입니다. 출시 매개변수(시간 증가량 정확히 1시간) 기준의 예시는 대략 다음과 같습니다: ${protocolFacts.dynamicCstRewardExamples.map((example) => `${ELAPSED_KO[example.elapsed]}에 ${example.cst} CST`).join(', ')}. 시간 증가량은 사이클이 마감될 때마다 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% 늘어나므로, 실제 양은 시간이 지날수록 이 예시보다 조금씩 낮아집니다. 제스처가 반영되는 순간의 정확한 양은 앱의 실시간 미리 보기와 컨트랙트가 기준입니다.`,
+        answer: `참여 CST는 이전 제스처 이후 흐른 시간에 제곱근 공식을 적용해 계산합니다: ${protocolFacts.dynamicCstRewardFormula}. 제곱근을 쓰는 이유는 긴 공백을 더 크게 반영하되, 양이 끝없이 선형으로 늘어나지는 않게 하기 위해서입니다.\n\n출시 매개변수(시간 증가량 정확히 1시간) 기준의 예시는 대략 다음과 같습니다: ${protocolFacts.dynamicCstRewardExamples.map((example) => `${ELAPSED_KO[example.elapsed]}에 ${example.cst} CST`).join(', ')}. 시간 증가량은 사이클이 마감될 때마다 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% 늘어나므로, 실제 양은 시간이 지날수록 이 예시보다 조금씩 낮아집니다. 제스처가 반영되는 순간의 정확한 양은 앱의 실시간 미리 보기와 컨트랙트가 기준입니다.`,
       },
       'why-minimum-cst-reward-protection': {
         question: '최소 참여 CST 보호란 무엇인가요?',
@@ -317,7 +317,7 @@ export const faqTextKo = {
       'team-controls': {
         question: '팀은 프로토콜에 어떤 권한을 갖고 있나요?',
         answer:
-          '초기에는 팀이 제스처당 시간 증가량이나 배분 경로 비율 같은 프로토콜의 일부 매개변수를 조정할 수 있습니다. 이 권한은 스마트 컨트랙트의 ‘Ownable’ 패턴으로 구현되며 사이클 사이의 구간으로 한정됩니다. 다음 사이클이 활성화되면(첫 제스처 전에 이루어집니다) 핵심 프로토콜 매개변수는 그 사이클이 마감될 때까지 잠깁니다. 이 잠금과 별개로 몇 가지 제한된 권한은 남아 있습니다. 소유자는 첫 제스처가 오기 전까지 사이클 활성화를 미룰 수 있고, 다음 사이클 전의 지연 시간을 언제든 조정할 수 있으며, 주변 컨트랙트(공공재 금고 수령처, NFT 메타데이터 URI, 배분 지갑 회수 기한)를 언제든 관리할 수 있습니다. 프로토콜 컨트랙트는 소유자가 업그레이드(UUPS)할 수도 있지만 사이클 사이에만 가능하며, 현재 배포된 구현은 공개 검증된 V2입니다.',
+          '초기에는 팀이 제스처당 시간 증가량이나 배분 경로 비율 같은 프로토콜의 일부 매개변수를 조정할 수 있습니다. 이 권한은 스마트 컨트랙트의 ‘Ownable’ 패턴으로 구현되며 사이클 사이의 구간으로 한정됩니다. 다음 사이클이 활성화되면(첫 제스처 전에 이루어집니다) 핵심 프로토콜 매개변수는 그 사이클이 마감될 때까지 잠깁니다.\n\n이 잠금과 별개로 몇 가지 제한된 권한은 남아 있습니다. 소유자는 첫 제스처가 오기 전까지 사이클 활성화를 미룰 수 있고, 다음 사이클 전의 지연 시간을 언제든 조정할 수 있으며, 주변 컨트랙트(공공재 금고 수령처, NFT 메타데이터 URI, 배분 지갑 회수 기한)를 언제든 관리할 수 있습니다.\n\n프로토콜 컨트랙트는 소유자가 업그레이드(UUPS)할 수도 있지만 사이클 사이에만 가능하며, 현재 배포된 구현은 공개 검증된 V2입니다.',
       },
       'will-team-always-have-control': {
         question: '팀이 프로토콜 매개변수 권한을 계속 갖게 되나요?',

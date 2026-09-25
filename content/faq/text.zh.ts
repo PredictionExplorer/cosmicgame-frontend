@@ -79,11 +79,11 @@ export const faqTextZh = {
       },
       'how-do-i-claim-my-allocation': {
         question: '成为获配者后，如何取回分配？',
-        answer: `获配者可通过应用与协议合约取回分配。周期收官倒计时结束后，收官之笔参与者享有 ${protocolFacts.finalGestureExclusivityHours} 小时的专属时间，可完成周期收官并取回签名分配。此后进入公开收官窗口：任何人都可发起收官交易，智能合约会把实际完成收官的人视为周期受益方——收官者将获得整份签名分配，包括 ETH 份额、${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 铭刻、Cosmic Signature NFT，以及对已附加资产的优先权。次级 ETH、已附加代币与已附加 NFT 会由分配钱包托管，并采用另一项取回超时设置，当前默认为 ${protocolFacts.secondaryRetrievalTimeoutWeeks} 周；超时后，合约允许任何人为自己取回仍未取回的分配。请及时处理。`,
+        answer: `获配者可通过应用与协议合约取回分配。周期收官倒计时结束后，收官之笔参与者享有 ${protocolFacts.finalGestureExclusivityHours} 小时的专属时间，可完成周期收官并取回签名分配。\n\n此后进入公开收官窗口：任何人都可发起收官交易，智能合约会把实际完成收官的人视为周期受益方——收官者将获得整份签名分配，包括 ETH 份额、${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 铭刻、Cosmic Signature NFT，以及对已附加资产的优先权。\n\n次级 ETH、已附加代币与已附加 NFT 会由分配钱包托管，并采用另一项取回超时设置，当前默认为 ${protocolFacts.secondaryRetrievalTimeoutWeeks} 周；超时后，合约允许任何人为自己取回仍未取回的分配。请及时处理。`,
       },
       'how-does-anchoring-work': {
         question: '锚定如何运作？',
-        answer: `Cosmic Signature NFT 可锚定至协议，以获得 ETH 锚定派发：每个已收官周期会划出周期储备的 ${protocolFacts.anchorDistributionPercentage}%，按当时已锚定的 Cosmic Signature NFT 数量平均分配；累积的 ETH 会在解锚时派发。Random Walk NFT 也可以锚定，但只用于取得锚定 NFT 星选资格——被选中的锚定者会获得 CST 与 Cosmic Signature NFT，而不是 ETH。还需注意两条规则：每枚 NFT 永远只能锚定一次（解锚后不可再次锚定）；若周期收官时没有任何 Cosmic Signature NFT 处于锚定状态，该周期的 ${protocolFacts.anchorDistributionPercentage}% 会留在周期储备中。CST（ERC-20）不能锚定。可从账户菜单进入"我的锚定"页面管理锚定。`,
+        answer: `Cosmic Signature NFT 可锚定至协议，以获得 ETH 锚定派发：每个已收官周期会划出周期储备的 ${protocolFacts.anchorDistributionPercentage}%，按当时已锚定的 Cosmic Signature NFT 数量平均分配；累积的 ETH 会在解锚时派发。\n\nRandom Walk NFT 也可以锚定，但只用于取得锚定 NFT 星选资格——被选中的锚定者会获得 CST 与 Cosmic Signature NFT，而不是 ETH。\n\n还需注意两条规则：每枚 NFT 永远只能锚定一次（解锚后不可再次锚定）；若周期收官时没有任何 Cosmic Signature NFT 处于锚定状态，该周期的 ${protocolFacts.anchorDistributionPercentage}% 会留在周期储备中。CST（ERC-20）不能锚定。可从账户菜单进入"我的锚定"页面管理锚定。`,
       },
       'what-are-marketing-rewards': {
         question: '什么是推广储备？',
@@ -124,7 +124,7 @@ export const faqTextZh = {
       },
       'how-is-participation-cst-calculated': {
         question: '参与 CST 如何计算？',
-        answer: `参与 CST 按距上一笔落笔的时间，以平方根公式计算：${protocolFacts.dynamicCstRewardFormula}。采用平方根，是为了让较长的静默期获得更多 CST，同时避免数量永远线性增长。按协议上线时恰为 1 小时的时间增量计算，示例约为：${protocolFacts.dynamicCstRewardExamples.map((example) => `${ELAPSED_ZH[example.elapsed]}后为 ${example.cst} CST`).join('、')}。每个周期收官后，时间增量会增长 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%，因此实时数量会随时间逐渐略低于这些示例。落笔实际成交时，应以应用中的实时预览和合约计算为准。`,
+        answer: `参与 CST 按距上一笔落笔的时间，以平方根公式计算：${protocolFacts.dynamicCstRewardFormula}。采用平方根，是为了让较长的静默期获得更多 CST，同时避免数量永远线性增长。\n\n按协议上线时恰为 1 小时的时间增量计算，示例约为：${protocolFacts.dynamicCstRewardExamples.map((example) => `${ELAPSED_ZH[example.elapsed]}后为 ${example.cst} CST`).join('、')}。每个周期收官后，时间增量会增长 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%，因此实时数量会随时间逐渐略低于这些示例。落笔实际成交时，应以应用中的实时预览和合约计算为准。`,
       },
       'why-minimum-cst-reward-protection': {
         question: '什么是最低 CST 铭刻保护？',
@@ -317,7 +317,7 @@ export const faqTextZh = {
       'team-controls': {
         question: '团队对协议拥有哪些控制权限？',
         answer:
-          '初期，团队可以调整部分协议参数，例如落笔时间增量或分配轨道比例。这些权限通过智能合约的 Ownable 模式实现，并限定在周期间窗口：下一个周期一旦启用（启用发生在首笔落笔之前），核心协议参数便会锁定，直至该周期收官。锁定期间仍保留少量范围更窄的权限：所有者可把周期启用推迟至首笔落笔到来，也可随时调整下一周期前的延迟，并随时管理外围合约（公共物品金库受益方、NFT 元数据 URI 与分配钱包取回期限）。协议合约还可由所有者通过 UUPS 升级，但只能在周期间进行；当前部署的是已公开验证的 V2 实现。',
+          '初期，团队可以调整部分协议参数，例如落笔时间增量或分配轨道比例。这些权限通过智能合约的 Ownable 模式实现，并限定在周期间窗口：下一个周期一旦启用（启用发生在首笔落笔之前），核心协议参数便会锁定，直至该周期收官。\n\n锁定期间仍保留少量范围更窄的权限：所有者可把周期启用推迟至首笔落笔到来，也可随时调整下一周期前的延迟，并随时管理外围合约（公共物品金库受益方、NFT 元数据 URI 与分配钱包取回期限）。\n\n协议合约还可由所有者通过 UUPS 升级，但只能在周期间进行；当前部署的是已公开验证的 V2 实现。',
       },
       'will-team-always-have-control': {
         question: '团队会一直控制协议参数吗？',

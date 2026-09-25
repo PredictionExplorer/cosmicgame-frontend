@@ -7,6 +7,7 @@ import { render, screen, checkA11y, waitFor } from '@/test-utils';
 
 import { FAQCategorySection } from '../components/FAQCategory';
 import {
+  answerParagraphs,
   enrichAnswer,
   foldForMatch,
   highlightMatches,
@@ -259,6 +260,35 @@ describe('FAQCategorySection', () => {
     expect(copy).toHaveTextContent('Copied');
   });
 
+  it('sets a long answer as paragraphs, explaining each term once per answer (V235)', () => {
+    const category: FAQCategory = {
+      ...mockCategory,
+      items: [
+        {
+          id: 'long',
+          question: 'How does a Calibration Window work?',
+          answer:
+            'A Calibration Window descends the cost.\n\nEvery Calibration Window ends at its floor.',
+        },
+      ],
+    };
+    renderFAQCategory({ category, expandedItems: ['long'] });
+    const paragraphs = body('long')!.querySelectorAll('p.type-prose');
+    expect(paragraphs).toHaveLength(2);
+    expect(body('long')!.querySelectorAll('[data-term="calibrationWindow"]')).toHaveLength(1);
+  });
+
+  it('marks a search match inside any paragraph', () => {
+    const category: FAQCategory = {
+      ...mockCategory,
+      items: [{ id: 'long', question: 'Q?', answer: 'First part.\n\nThe floor is zero.' }],
+    };
+    renderFAQCategory({ category, searchQuery: 'floor' });
+    expect(
+      body('long')!.querySelectorAll('p.type-prose')[1]!.querySelector('mark'),
+    ).toHaveTextContent('floor');
+  });
+
   it('keeps legacy ids for deep links', () => {
     renderFAQCategory();
     expect(document.getElementById('q1')).toBeInTheDocument();
@@ -268,6 +298,13 @@ describe('FAQCategorySection', () => {
   it('has no accessibility violations', async () => {
     const { container } = renderFAQCategory({ expandedItems: ['q1'] });
     await checkA11y(container);
+  });
+});
+
+describe('answerParagraphs', () => {
+  it('splits on blank lines and drops empty ones', () => {
+    expect(answerParagraphs('One.\n\nTwo.\n\n\nThree.')).toEqual(['One.', 'Two.', 'Three.']);
+    expect(answerParagraphs('Only one.')).toEqual(['Only one.']);
   });
 });
 

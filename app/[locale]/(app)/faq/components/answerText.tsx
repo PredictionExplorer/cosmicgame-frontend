@@ -136,15 +136,30 @@ function termPattern(term: string): string {
 }
 
 /**
+ * An answer's paragraphs. The copy marks a paragraph break with a blank line
+ * ("\n\n"), so a long, procedural answer reads as short paragraphs while
+ * search, JSON-LD and the numeric guards still see one string.
+ */
+export function answerParagraphs(answer: string): string[] {
+  return answer
+    .split(/\n{2,}/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
+}
+
+/**
  * An answer as a reader sees it: each explained term marked once, at its
  * first use, as a dotted-underline trigger that opens its definition
  * (glossary terms through `<Term>`, so the FAQ and the glossary never
- * disagree), and contract identifiers (`code`) set as code.
+ * disagree), and contract identifiers (`code`) set as code. Pass the same
+ * `seen` set to every paragraph of one answer, so a term is marked once per
+ * answer, not once per paragraph.
  */
 export function enrichAnswer(
   text: string,
   terms: readonly AnswerTerm[],
   code: readonly string[] = [],
+  seen: Set<string> = new Set(),
 ): ReactNode[] {
   const codeParts = code.filter(Boolean);
   const segments = codeParts.length
@@ -157,7 +172,6 @@ export function enrichAnswer(
   const pattern = sorted.length
     ? new RegExp(`(${sorted.map(({ term }) => termPattern(term)).join('|')})`, 'giu')
     : null;
-  const seen = new Set<string>();
 
   return segments.flatMap((segment, segmentIndex) => {
     if (codeParts.includes(segment)) {

@@ -20,6 +20,7 @@ import { PhrasedText } from '@/components/ui/phrased-text';
 import {
   EXPLAINED_AD_HOC_KEYS,
   EXPLAINED_GLOSSARY_IDS,
+  answerParagraphs,
   enrichAnswer,
   highlightMatches,
   matchesQuery,
@@ -29,6 +30,34 @@ import { FAQ_SCROLL_MARGIN_CLASS } from './scrollMargin';
 
 /** Contract identifiers the answers quote, set as code. */
 const ANSWER_CODE = [protocolFacts.dynamicCstRewardFormula];
+
+/**
+ * An answer in its paragraphs, at the reading measure: with the search's
+ * matches marked while searching, otherwise with its terms explained in
+ * place (each once per answer) and contract identifiers set as code.
+ */
+function AnswerBody({
+  answer,
+  searchQuery,
+  terms,
+}: {
+  answer: string;
+  searchQuery: string;
+  terms: readonly AnswerTerm[];
+}) {
+  const seen = new Set<string>();
+  return (
+    <div className="space-y-4">
+      {answerParagraphs(answer).map((paragraph, index) => (
+        <p key={index} className="type-prose text-muted-foreground">
+          {searchQuery
+            ? highlightMatches(paragraph, searchQuery)
+            : enrichAnswer(paragraph, terms, ANSWER_CODE, seen)}
+        </p>
+      ))}
+    </div>
+  );
+}
 
 interface FAQCategoryProps {
   category: FAQCategoryType;
@@ -178,11 +207,11 @@ export const FAQCategorySection = forwardRef<HTMLElement, FAQCategoryProps>(
                   </span>
                 </AccordionTrigger>
                 <AccordionContent hiddenUntilFound={!open} className="pb-6">
-                  <p className="type-prose text-muted-foreground">
-                    {searching
-                      ? highlightMatches(item.answer, searchQuery)
-                      : enrichAnswer(item.answer, terms, ANSWER_CODE)}
-                  </p>
+                  <AnswerBody
+                    answer={item.answer}
+                    searchQuery={searching ? searchQuery : ''}
+                    terms={terms}
+                  />
                   {/* Named after its question, so a list of buttons tells the links apart. */}
                   <button
                     type="button"

@@ -3,10 +3,13 @@ import {
   findFaqItemByHash,
   findFaqItemById,
   getAllFaqItems,
+  getFaqContent,
   getTotalFaqQuestionCount,
   type FAQCategory,
 } from '@/content/faq';
 import faqMessagesEn from '@/messages/en/faq.json';
+
+import { routing } from '@/i18n/routing';
 
 const faqCategories: readonly FAQCategory[] = faqContentEn.categories;
 const popularQuestionIds = faqContentEn.popularQuestionIds;
@@ -23,6 +26,27 @@ const EXPECTED_CATEGORY_IDS = [
   'arbitrum-and-technical',
   'trust-and-governance',
 ] as const;
+
+describe('FAQ answer paragraphs (V235)', () => {
+  it('breaks the longest procedural answers into paragraphs in every locale', () => {
+    for (const locale of routing.locales) {
+      const content = getFaqContent(locale);
+      for (const id of [
+        'team-controls',
+        'how-do-i-claim-my-allocation',
+        'how-does-anchoring-work',
+        'how-is-participation-cst-calculated',
+      ]) {
+        const answer = findFaqItemById(content, id)!.item.answer;
+        expect(answer).toMatch(/\S\n\n\S/);
+        // Same paragraph count in every locale: the breaks sit at the same sentences.
+        expect(answer.split('\n\n')).toHaveLength(
+          findFaqItemById(getFaqContent('en'), id)!.item.answer.split('\n\n').length,
+        );
+      }
+    }
+  });
+});
 
 describe('faq-data', () => {
   describe('data integrity', () => {

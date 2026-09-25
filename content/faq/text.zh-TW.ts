@@ -79,11 +79,11 @@ export const faqTextZhTw = {
       },
       'how-do-i-claim-my-allocation': {
         question: '成為獲配者後，如何取回分配？',
-        answer: `獲配者可透過應用程式與協議合約取回分配。週期收官倒數結束後，收官之筆參與者享有 ${protocolFacts.finalGestureExclusivityHours} 小時的專屬時間，可完成週期收官並取回簽名分配。此後進入公開收官窗口：任何人都可發起收官交易，智慧合約會把實際完成收官的人視為週期受益方——收官者將獲得整份簽名分配，包括 ETH 份額、${protocolFacts.specialAllocationCst.toLocaleString('zh-TW')} CST 銘刻、Cosmic Signature NFT，以及對已附加資產的優先權。次級 ETH、已附加代幣與已附加 NFT 會由分配錢包託管，並採用另一項取回超時設定，目前預設為 ${protocolFacts.secondaryRetrievalTimeoutWeeks} 週；超時後，合約允許任何人為自己取回仍未取回的分配。請及時處理。`,
+        answer: `獲配者可透過應用程式與協議合約取回分配。週期收官倒數結束後，收官之筆參與者享有 ${protocolFacts.finalGestureExclusivityHours} 小時的專屬時間，可完成週期收官並取回簽名分配。\n\n此後進入公開收官窗口：任何人都可發起收官交易，智慧合約會把實際完成收官的人視為週期受益方——收官者將獲得整份簽名分配，包括 ETH 份額、${protocolFacts.specialAllocationCst.toLocaleString('zh-TW')} CST 銘刻、Cosmic Signature NFT，以及對已附加資產的優先權。\n\n次級 ETH、已附加代幣與已附加 NFT 會由分配錢包託管，並採用另一項取回超時設定，目前預設為 ${protocolFacts.secondaryRetrievalTimeoutWeeks} 週；超時後，合約允許任何人為自己取回仍未取回的分配。請及時處理。`,
       },
       'how-does-anchoring-work': {
         question: '錨定如何運作？',
-        answer: `Cosmic Signature NFT 可錨定至協議，以獲得 ETH 錨定配發：每個已收官週期會劃出週期儲備的 ${protocolFacts.anchorDistributionPercentage}%，按當時已錨定的 Cosmic Signature NFT 數量平均分配；累積的 ETH 會在解錨時配發。Random Walk NFT 也可以錨定，但只用於取得錨定 NFT 星選資格——被選中的錨定者會獲得 CST 與 Cosmic Signature NFT，而不是 ETH。還需注意兩條規則：每枚 NFT 永遠只能錨定一次（解錨後不可再次錨定）；若週期收官時沒有任何 Cosmic Signature NFT 處於錨定狀態，該週期的 ${protocolFacts.anchorDistributionPercentage}% 會留在週期儲備中。CST（ERC-20）不能錨定。可從帳戶選單進入「我的錨定」頁面管理錨定。`,
+        answer: `Cosmic Signature NFT 可錨定至協議，以獲得 ETH 錨定配發：每個已收官週期會劃出週期儲備的 ${protocolFacts.anchorDistributionPercentage}%，按當時已錨定的 Cosmic Signature NFT 數量平均分配；累積的 ETH 會在解錨時配發。\n\nRandom Walk NFT 也可以錨定，但只用於取得錨定 NFT 星選資格——被選中的錨定者會獲得 CST 與 Cosmic Signature NFT，而不是 ETH。\n\n還需注意兩條規則：每枚 NFT 永遠只能錨定一次（解錨後不可再次錨定）；若週期收官時沒有任何 Cosmic Signature NFT 處於錨定狀態，該週期的 ${protocolFacts.anchorDistributionPercentage}% 會留在週期儲備中。CST（ERC-20）不能錨定。可從帳戶選單進入「我的錨定」頁面管理錨定。`,
       },
       'what-are-marketing-rewards': {
         question: '什麼是推廣儲備？',
@@ -124,7 +124,7 @@ export const faqTextZhTw = {
       },
       'how-is-participation-cst-calculated': {
         question: '參與 CST 如何計算？',
-        answer: `參與 CST 按距上一筆落筆的時間，以平方根公式計算：${protocolFacts.dynamicCstRewardFormula}。採用平方根，是為了讓較長的靜默期獲得更多 CST，同時避免數量永遠線性增長。按協議上線時恰為 1 小時的時間增量計算，示例約為：${protocolFacts.dynamicCstRewardExamples.map((example) => `${ELAPSED_ZH_TW[example.elapsed]}後為 ${example.cst} CST`).join('、')}。每個週期收官後，時間增量會增長 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%，因此即時數量會隨時間逐漸略低於這些示例。落筆實際成交時，應以應用程式中的即時預覽和合約計算為準。`,
+        answer: `參與 CST 按距上一筆落筆的時間，以平方根公式計算：${protocolFacts.dynamicCstRewardFormula}。採用平方根，是為了讓較長的靜默期獲得更多 CST，同時避免數量永遠線性增長。\n\n按協議上線時恰為 1 小時的時間增量計算，示例約為：${protocolFacts.dynamicCstRewardExamples.map((example) => `${ELAPSED_ZH_TW[example.elapsed]}後為 ${example.cst} CST`).join('、')}。每個週期收官後，時間增量會增長 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%，因此即時數量會隨時間逐漸略低於這些示例。落筆實際成交時，應以應用程式中的即時預覽和合約計算為準。`,
       },
       'why-minimum-cst-reward-protection': {
         question: '什麼是最低 CST 銘刻保護？',
@@ -317,7 +317,7 @@ export const faqTextZhTw = {
       'team-controls': {
         question: '團隊對協議擁有哪些控制權限？',
         answer:
-          '初期，團隊可以調整部分協議參數，例如落筆時間增量或分配軌道比例。這些權限透過智慧合約的 Ownable 模式實現，並限定在週期間窗口：下一個週期一旦啟用（啟用發生在首筆落筆之前），核心協議參數便會鎖定，直至該週期收官。鎖定期間仍保留少量範圍更窄的權限：所有者可把週期啟用推遲至首筆落筆到來，也可隨時調整下一週期前的延遲，並隨時管理外圍合約（公共財金庫受益方、NFT 後設資料 URI 與分配錢包取回期限）。協議合約還可由所有者透過 UUPS 升級，但只能在週期間進行；目前部署的是已公開驗證的 V2 實現。',
+          '初期，團隊可以調整部分協議參數，例如落筆時間增量或分配軌道比例。這些權限透過智慧合約的 Ownable 模式實現，並限定在週期間窗口：下一個週期一旦啟用（啟用發生在首筆落筆之前），核心協議參數便會鎖定，直至該週期收官。\n\n鎖定期間仍保留少量範圍更窄的權限：所有者可把週期啟用推遲至首筆落筆到來，也可隨時調整下一週期前的延遲，並隨時管理外圍合約（公共財金庫受益方、NFT 後設資料 URI 與分配錢包取回期限）。\n\n協議合約還可由所有者透過 UUPS 升級，但只能在週期間進行；目前部署的是已公開驗證的 V2 實現。',
       },
       'will-team-always-have-control': {
         question: '團隊會一直控制協議參數嗎？',
