@@ -37,7 +37,7 @@
   },
   "shared": {
     "noDataTitle": "No data yet",
-    "sectionLoadErrorTitle": "Failed to load {title}",
+    "sectionLoadErrorTitle": "This section did not load",
     "serviceError": "The statistics service did not respond. Try again in a moment.",
     "definitions": "Definitions",
     "listMissingTitle": "This list did not load",
@@ -75,9 +75,11 @@
       "open": "Open the current cycle",
       "opened": "Opened",
       "rhythmLabel": "Gestures per UTC day, last {days, plural, one {# day} other {# days}}",
+      "rhythmCycleLabel": "Gestures per UTC day this cycle, its first hour not counted",
       "rhythmSummary": "Total: {total}. Busiest day: {date} ({peak}).",
       "rhythmEmpty": "No gestures in this period.",
       "rhythmUnavailable": "Daily gesture counts are unavailable right now.",
+      "todaySoFar": "Today, so far",
       "splitTitle": "Where the Cycle Reserve goes",
       "splitDescription": "When the cycle finalizes, the Cycle Reserve is split between the allocation tracks below. What remains carries into the next cycle."
     },
@@ -183,7 +185,7 @@
     },
     "cosmicSignatureNftHolders": {
       "label": "Cosmic Signature NFT holders",
-      "tooltip": "Unique wallet addresses currently holding at least one Cosmic Signature NFT."
+      "tooltip": "Addresses that hold at least one Cosmic Signature NFT or have one anchored. The Anchoring Wallet is not counted: its NFTs count with their anchor-holders."
     },
     "cstErc20Holders": {
       "label": "CST (ERC-20) holders",
@@ -198,7 +200,7 @@
       "tooltip": "ETH allocated to the Public Goods Beneficiary and still reflected in indexed protocol balances."
     },
     "totalContributedEth": {
-      "label": "Total contributed ETH",
+      "label": "Direct ETH contributions",
       "tooltip": "Total ETH contributed to the protocol across all indexed cycles."
     },
     "protocolContributions": {
@@ -240,7 +242,7 @@
     "attachedAssets": "ERC-721 and ERC-20 assets attached to gestures, viewable for all cycles or only the current Performance Cycle.",
     "gestureTypeDistribution": "How a cycle’s gestures split between ETH, ETH with a Random Walk NFT and CST, counted per window. A window far busier than the rest, such as a cycle’s opening, is cut at the top of the axis and labelled with its true count.",
     "attachedTokenDistribution": "Contracts and token counts for ERC-721 assets attached to gestures.",
-    "cosmicSignatureTokenDistribution": "Current owner distribution for Cosmic Signature NFT ERC-721 tokens.",
+    "cosmicSignatureTokenDistribution": "Who owns the Cosmic Signature NFTs now: each address’s NFTs in its wallet and the ones it has anchored, which the Anchoring Wallet holds for it.",
     "cstBalanceDistribution": "Current wallet distribution for CST ERC-20 balances.",
     "cstTotalSupply": "Historical CST ERC-20 supply changes, including imprints and consumption over time.",
     "cycleActivations": "System event windows that show when protocol cycles or modes became active and ended.",
@@ -354,6 +356,12 @@
       "share": "Share of supply",
       "shareHelp": "This balance as a share of the total CST supply."
     },
+    "nftHolders": {
+      "inWallet": "In wallet",
+      "anchored": "Anchored",
+      "total": "Total",
+      "custodyNotice": "{count, plural, one {# anchored NFT is} other {# anchored NFTs are}} held by the Anchoring Wallet for their anchor-holders and counted here with each anchor-holder."
+    },
     "attachedContracts": "{count, plural, one {# ERC-721 contract} other {# ERC-721 contracts}}"
   },
   "attachedAssets": {
@@ -407,7 +415,8 @@
       "allClaimed": "All retrieved",
       "unclaimedCount": "{count} unretrieved",
       "viewUnclaimed": "View unretrieved assets",
-      "cycleDetails": "Cycle {cycle} details",
+      "showRetrievals": "Show retrievals",
+      "hideRetrievals": "Hide retrievals",
       "dialog": {
         "unclaimedTitle": "Unretrieved assets — Cycle {cycle}",
         "expired": "The retrieval window has closed. Anyone can now retrieve these assets for themselves.",
@@ -415,7 +424,6 @@
         "asset": "Asset",
         "recipient": "Recipient",
         "detail": "Detail",
-        "exploreDescription": "View retrieval transactions, the time taken by each recipient, and the tokens attached during this cycle.",
         "claimTransactions": "Retrieval transactions",
         "noClaims": "No retrievals recorded for this cycle.",
         "claimedAfter": "Retrieved after",
@@ -429,8 +437,8 @@
       },
       "assets": {
         "eth": "ETH",
-        "nft": "Attached NFT",
-        "erc20": "Attached ERC-20"
+        "nftItem": "Attached NFT {contract} #{id}",
+        "erc20Item": "Attached ERC-20 {contract}: {amount}"
       }
     },
     "outcomes": {
@@ -442,6 +450,12 @@
       "netHelp": "ETH received in allocations minus ETH spent on gestures. CST is not included.",
       "cyclesHelp": "How many of the cycles this participant took part in brought them at least one allocation.",
       "cycles": "{part} of {whole, plural, one {# cycle} other {# cycles}}"
+    },
+    "kinds": {
+      "eth": "{count, plural, one {# ETH allocation} other {# ETH allocations}}",
+      "nft": "{count, plural, one {# NFT} other {# NFTs}}",
+      "erc20": "{count, plural, one {# ERC-20 allocation} other {# ERC-20 allocations}}",
+      "cst": "{count, plural, one {# CST allocation} other {# CST allocations}}"
     }
   },
   "charts": {
@@ -616,9 +630,7 @@
       "rangeDays": "{days, plural, one {# day} other {# days}}",
       "rangeYear": "Past year",
       "rangeAll": "All time",
-      "legend": "Total supply, CST",
-      "gestureNumber": "Gesture",
-      "summary": "Total supply on {date}: {supply}. Over {range}, {imprinted} imprinted and {burned} burned."
+      "gestureNumber": "Gesture"
     },
     "viewTable": "View as table",
     "mix": {

@@ -1,9 +1,8 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
-import { getLocaleConfig } from '@/i18n/localeConfig';
 import { ErrorState } from '@/components/ui/error-state';
 import { EmptyState } from '@/components/ui/empty-state';
 import { SkeletonTable } from '@/components/ui/skeleton';
@@ -67,12 +66,8 @@ export function StatsSection({
   ...shell
 }: StatsSectionProps) {
   const t = useTranslations('statistics');
-  const locale = useLocale();
   const pageSize = useTablePageSize();
   const stateHeading = ((shell.headingLevel ?? 2) + 1) as 3 | 4;
-  const midSentenceTitle = getLocaleConfig(locale).lowercaseMidSentence
-    ? shell.title.toLowerCase()
-    : shell.title;
 
   let body: ReactNode = children;
   if (isLoading) {
@@ -83,7 +78,9 @@ export function StatsSection({
     body = (
       <ErrorState
         headingLevel={stateHeading}
-        title={errorTitle ?? t('shared.sectionLoadErrorTitle', { title: midSentenceTitle })}
+        // Under the section's own heading, so it needs no title, and never recases one
+        // ("cosmic signature nft (erc-721)").
+        title={errorTitle ?? t('shared.sectionLoadErrorTitle')}
         message={t('shared.serviceError')}
         onRetry={onRetry}
       />

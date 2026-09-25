@@ -37,7 +37,7 @@
   },
   "shared": {
     "noDataTitle": "Даних поки немає",
-    "sectionLoadErrorTitle": "Не вдалося завантажити розділ «{title}»",
+    "sectionLoadErrorTitle": "Розділ не завантажився",
     "serviceError": "Сервіс статистики не відповідає. Спробуйте ще раз за хвилину.",
     "definitions": "Визначення",
     "listMissingTitle": "Список не завантажився",
@@ -75,9 +75,11 @@
       "open": "Відкрити поточний цикл",
       "opened": "Розпочато",
       "rhythmLabel": "Жести за день (UTC), останні {days, plural, one {# день} few {# дні} many {# днів} other {# дня}}",
+      "rhythmCycleLabel": "Жести за день (UTC) у цьому циклі, без його першої години",
       "rhythmSummary": "Разом: {total}. Найактивніший день: {date} ({peak}).",
       "rhythmEmpty": "За цей період жестів не було.",
       "rhythmUnavailable": "Щоденна кількість жестів зараз недоступна.",
+      "todaySoFar": "Сьогодні, поки що",
       "splitTitle": "Куди йде резерв циклу",
       "splitDescription": "Коли цикл завершується, резерв циклу ділиться між напрямами розподілу нижче. Решта переходить у наступний цикл."
     },
@@ -183,7 +185,7 @@
     },
     "cosmicSignatureNftHolders": {
       "label": "Власники Cosmic Signature NFT",
-      "tooltip": "Унікальні адреси гаманців, які зараз володіють щонайменше одним Cosmic Signature NFT."
+      "tooltip": "Адреси, що володіють щонайменше одним Cosmic Signature NFT або закріпили його. Гаманець закріплення не враховано: його NFT зараховано власникам закріплення."
     },
     "cstErc20Holders": {
       "label": "Власники CST (ERC-20)",
@@ -198,7 +200,7 @@
       "tooltip": "ETH, спрямований бенефіціару суспільних благ і досі відображений у проіндексованих балансах протоколу."
     },
     "totalContributedEth": {
-      "label": "Усього внесено ETH",
+      "label": "Прямі внески ETH",
       "tooltip": "Загальна сума ETH, внесена до протоколу за всі проіндексовані цикли."
     },
     "protocolContributions": {
@@ -240,7 +242,7 @@
     "attachedAssets": "Активи ERC-721 та ERC-20, долучені до жестів; можна переглянути за всі цикли або лише за поточний перформанс-цикл.",
     "gestureTypeDistribution": "Як жести циклу розподіляються між ETH, ETH із Random Walk NFT і CST, з підрахунком за вікнами. Вікно, набагато активніше за решту (наприклад, відкриття циклу), обрізано на верху осі й підписано справжньою кількістю.",
     "attachedTokenDistribution": "Контракти та кількість токенів для активів ERC-721, долучених до жестів.",
-    "cosmicSignatureTokenDistribution": "Поточна структура власників токенів Cosmic Signature NFT (ERC-721).",
+    "cosmicSignatureTokenDistribution": "Кому зараз належать Cosmic Signature NFT: NFT у гаманці кожної адреси та закріплені нею, які за неї зберігає гаманець закріплення.",
     "cstBalanceDistribution": "Поточна структура балансів CST (ERC-20) за гаманцями.",
     "cstTotalSupply": "Історичні зміни пропозиції CST (ERC-20), включно із закарбуваннями та витратами в часі.",
     "cycleActivations": "Вікна системних подій, що показують, коли цикли або режими протоколу ставали активними й завершувалися.",
@@ -354,6 +356,12 @@
       "share": "Частка пропозиції",
       "shareHelp": "Цей баланс як частка загальної пропозиції CST."
     },
+    "nftHolders": {
+      "inWallet": "У гаманці",
+      "anchored": "Закріплено",
+      "total": "Разом",
+      "custodyNotice": "{count, plural, one {# закріплений NFT зберігається} few {# закріплені NFT зберігаються} many {# закріплених NFT зберігаються} other {# закріпленого NFT зберігається}} у гаманці закріплення; тут їх зараховано власникам закріплення."
+    },
     "attachedContracts": "{count, plural, one {# контракт ERC-721} few {# контракти ERC-721} many {# контрактів ERC-721} other {# контракту ERC-721}}"
   },
   "attachedAssets": {
@@ -407,7 +415,8 @@
       "allClaimed": "Усе забрано",
       "unclaimedCount": "Не забрано: {count}",
       "viewUnclaimed": "Переглянути незабрані активи",
-      "cycleDetails": "Подробиці циклу {cycle}",
+      "showRetrievals": "Показати забирання",
+      "hideRetrievals": "Сховати забирання",
       "dialog": {
         "unclaimedTitle": "Незабрані активи — Цикл {cycle}",
         "expired": "Строк отримання минув. Тепер будь-хто може забрати решту активів собі.",
@@ -415,7 +424,6 @@
         "asset": "Актив",
         "recipient": "Отримувач",
         "detail": "Подробиці",
-        "exploreDescription": "Транзакції забирання з часом, який знадобився кожному отримувачу, і токени, долучені в цьому циклі.",
         "claimTransactions": "Транзакції забирання",
         "noClaims": "У цьому циклі забирань не зафіксовано.",
         "claimedAfter": "Забрано через",
@@ -429,8 +437,8 @@
       },
       "assets": {
         "eth": "ETH",
-        "nft": "Долучений NFT",
-        "erc20": "Долучений ERC-20"
+        "nftItem": "Долучений NFT {contract} #{id}",
+        "erc20Item": "Долучений ERC-20 {contract}: {amount}"
       }
     },
     "outcomes": {
@@ -442,6 +450,12 @@
       "netHelp": "ETH, отриманий у розподілах, мінус ETH, витрачений на жести. CST не враховано.",
       "cyclesHelp": "Скільки з циклів, у яких брав участь цей учасник, принесли йому принаймні один розподіл.",
       "cycles": "{part} з {whole, plural, one {# циклу} few {# циклів} many {# циклів} other {# циклу}}"
+    },
+    "kinds": {
+      "eth": "{count, plural, one {# розподіл ETH} few {# розподіли ETH} many {# розподілів ETH} other {# розподілу ETH}}",
+      "nft": "{count, number} NFT",
+      "erc20": "{count, plural, one {# розподіл ERC-20} few {# розподіли ERC-20} many {# розподілів ERC-20} other {# розподілу ERC-20}}",
+      "cst": "{count, plural, one {# розподіл CST} few {# розподіли CST} many {# розподілів CST} other {# розподілу CST}}"
     }
   },
   "charts": {
@@ -616,9 +630,7 @@
       "rangeDays": "{days, plural, one {# день} few {# дні} many {# днів} other {# дня}}",
       "rangeYear": "Рік",
       "rangeAll": "Увесь час",
-      "legend": "Загальна пропозиція, CST",
-      "gestureNumber": "Жест №",
-      "summary": "Загальна пропозиція на {date}: {supply}. За період {range} закарбовано {imprinted}, витрачено {burned}."
+      "gestureNumber": "Жест №"
     },
     "viewTable": "Показати таблицею",
     "mix": {

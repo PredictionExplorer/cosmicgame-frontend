@@ -29,13 +29,15 @@ describe('StatisticsGroup and StatisticsItem', () => {
     expect(screen.getByRole('heading', { level: 4, name: 'Overview' })).toBeInTheDocument();
   });
 
-  it('links a figure to the ledger behind it', () => {
+  it('links a figure to the ledger behind it, named by its label and its figure', () => {
     render(
       <StatisticsGroup title="Public Goods">
         <StatisticsItem title="Protocol contributions" value="4.826 ETH" href="/public-goods" />
       </StatisticsGroup>,
     );
-    expect(screen.getByRole('link', { name: '4.826 ETH' })).toHaveAttribute(
+    // V118: a list of the page's links reads "Protocol contributions 4.826 ETH", not a bare
+    // number, and the name still starts with nothing the reader cannot see (WCAG 2.5.3).
+    expect(screen.getByRole('link', { name: 'Protocol contributions 4.826 ETH' })).toHaveAttribute(
       'href',
       '/public-goods',
     );

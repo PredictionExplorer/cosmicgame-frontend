@@ -183,7 +183,7 @@ describe('ActivityPanel', () => {
     });
     render(<ActivityPanel />);
     await user.click(screen.getByRole('button', { name: 'Cycle activations' }));
-    expect(screen.getByText(/failed to load cycle activations/i)).toBeInTheDocument();
+    expect(screen.getByText('This section did not load')).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /try again/i }));
     expect(refetch).toHaveBeenCalled();
@@ -223,7 +223,7 @@ describe('ActivityPanel', () => {
     const section = screen
       .getByRole('heading', { name: 'One cycle in detail' })
       .closest('section')!;
-    expect(within(section).getByText(/failed to load one cycle in detail/i)).toBeInTheDocument();
+    expect(within(section).getByText('This section did not load')).toBeInTheDocument();
     for (const id of CYCLE_CHARTS) expect(screen.queryByTestId(id)).not.toBeInTheDocument();
     expect(within(section).queryByRole('combobox')).not.toBeInTheDocument();
 

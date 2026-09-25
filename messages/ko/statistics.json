@@ -37,7 +37,7 @@
   },
   "shared": {
     "noDataTitle": "아직 데이터 없음",
-    "sectionLoadErrorTitle": "{title} 데이터를 불러오지 못했습니다",
+    "sectionLoadErrorTitle": "이 섹션을 불러오지 못했습니다",
     "serviceError": "통계 서비스가 응답하지 않았습니다. 잠시 후 다시 시도해 주세요.",
     "definitions": "용어 설명",
     "listMissingTitle": "목록을 불러오지 못했습니다",
@@ -75,9 +75,11 @@
       "open": "현재 사이클 열기",
       "opened": "시작 시각",
       "rhythmLabel": "일별 제스처(UTC 기준), 최근 {days, number}일",
+      "rhythmCycleLabel": "이번 사이클 일별 제스처(UTC 기준, 첫 1시간 제외)",
       "rhythmSummary": "합계 {total}회. 가장 활발한 날: {date} ({peak}회).",
       "rhythmEmpty": "이 기간에는 제스처가 없습니다.",
       "rhythmUnavailable": "지금은 일별 제스처 횟수를 불러올 수 없습니다.",
+      "todaySoFar": "오늘(진행 중)",
       "splitTitle": "사이클 준비금 배분",
       "splitDescription": "사이클이 마감되면 사이클 준비금이 아래 배분 경로로 나뉩니다. 남은 금액은 다음 사이클로 이어집니다."
     },
@@ -183,7 +185,7 @@
     },
     "cosmicSignatureNftHolders": {
       "label": "Cosmic Signature NFT 보유자",
-      "tooltip": "현재 Cosmic Signature NFT를 한 개 이상 보유한 고유 지갑 주소입니다."
+      "tooltip": "Cosmic Signature NFT를 한 개 이상 보유하거나 앵커링한 주소입니다. 앵커링 지갑은 포함하지 않으며, 그 안의 NFT는 각 앵커링 보유자에게 포함됩니다."
     },
     "cstErc20Holders": {
       "label": "CST(ERC-20) 보유자",
@@ -198,7 +200,7 @@
       "tooltip": "공공재 수령처에 배분되었지만 인덱싱된 프로토콜 잔액에 아직 반영되어 있는 ETH입니다."
     },
     "totalContributedEth": {
-      "label": "총 기여 ETH",
+      "label": "직접 ETH 기여",
       "tooltip": "인덱싱된 모든 사이클에 걸쳐 프로토콜에 기여된 ETH 총액입니다."
     },
     "protocolContributions": {
@@ -240,7 +242,7 @@
     "attachedAssets": "제스처에 첨부된 ERC-721 및 ERC-20 자산입니다. 전체 사이클 기준 또는 현재 퍼포먼스 사이클 기준으로 볼 수 있습니다.",
     "gestureTypeDistribution": "사이클의 제스처가 ETH, ETH + Random Walk NFT, CST 사이에 어떻게 나뉘는지 구간별로 센 값입니다. 사이클 시작처럼 다른 구간보다 훨씬 활발한 구간은 축 위쪽에서 잘리고 실제 개수가 표시됩니다.",
     "attachedTokenDistribution": "제스처에 첨부된 ERC-721 자산의 컨트랙트와 토큰 수를 보여 줍니다.",
-    "cosmicSignatureTokenDistribution": "Cosmic Signature NFT(ERC-721) 토큰의 현재 소유자 분포입니다.",
+    "cosmicSignatureTokenDistribution": "현재 Cosmic Signature NFT의 소유 현황입니다. 각 주소의 지갑에 있는 NFT와, 그 주소가 앵커링해 앵커링 지갑이 대신 보관하는 NFT를 함께 보여 줍니다.",
     "cstBalanceDistribution": "CST ERC-20 잔액의 현재 지갑별 분포입니다.",
     "cstTotalSupply": "시간에 따른 각인과 소모를 포함한 CST ERC-20 공급량 변화 내역입니다.",
     "cycleActivations": "프로토콜 사이클이나 모드가 언제 활성화되고 종료되었는지 보여 주는 시스템 이벤트 구간입니다.",
@@ -354,6 +356,12 @@
       "share": "공급량 비중",
       "shareHelp": "이 잔액이 CST 총 공급량에서 차지하는 비중입니다."
     },
+    "nftHolders": {
+      "inWallet": "지갑 보유",
+      "anchored": "앵커링",
+      "total": "합계",
+      "custodyNotice": "앵커링 지갑이 앵커링 보유자를 대신해 보관 중인 NFT {count, number}개는 여기서 각 앵커링 보유자에게 포함됩니다."
+    },
     "attachedContracts": "ERC-721 컨트랙트 {count, number}개"
   },
   "attachedAssets": {
@@ -407,7 +415,8 @@
       "allClaimed": "모두 회수됨",
       "unclaimedCount": "미회수 {count}건",
       "viewUnclaimed": "미회수 자산 보기",
-      "cycleDetails": "사이클 {cycle} 상세 정보",
+      "showRetrievals": "회수 내역 보기",
+      "hideRetrievals": "회수 내역 접기",
       "dialog": {
         "unclaimedTitle": "미회수 자산: 사이클 {cycle}",
         "expired": "회수 기간이 종료되었습니다. 이제 누구나 이 자산을 회수할 수 있습니다.",
@@ -415,7 +424,6 @@
         "asset": "자산",
         "recipient": "수령자",
         "detail": "상세",
-        "exploreDescription": "수령자별 회수 소요 시간이 표시된 회수 트랜잭션과 이번 사이클에 첨부된 토큰입니다.",
         "claimTransactions": "회수 트랜잭션",
         "noClaims": "이 사이클에는 기록된 회수가 없습니다.",
         "claimedAfter": "회수 소요 시간",
@@ -429,8 +437,8 @@
       },
       "assets": {
         "eth": "ETH",
-        "nft": "첨부된 NFT",
-        "erc20": "첨부된 ERC-20"
+        "nftItem": "첨부된 NFT {contract} #{id}",
+        "erc20Item": "첨부된 ERC-20 {contract}: {amount}"
       }
     },
     "outcomes": {
@@ -442,6 +450,12 @@
       "netHelp": "배분으로 받은 ETH에서 제스처에 지출한 ETH를 뺀 값입니다. CST는 포함하지 않습니다.",
       "cyclesHelp": "이 참여자가 참여한 사이클 중 배분을 한 번 이상 받은 사이클의 수입니다.",
       "cycles": "사이클 {whole, number}개 중 {part}개"
+    },
+    "kinds": {
+      "eth": "ETH 배분 {count, number}건",
+      "nft": "NFT {count, number}개",
+      "erc20": "ERC-20 배분 {count, number}건",
+      "cst": "CST 배분 {count, number}건"
     }
   },
   "charts": {
@@ -616,9 +630,7 @@
       "rangeDays": "{days, number}일",
       "rangeYear": "최근 1년",
       "rangeAll": "전체",
-      "legend": "총 공급량 (CST)",
-      "gestureNumber": "제스처 번호",
-      "summary": "{date} 총 공급량: {supply}. {range} 기간 각인 {imprinted}, 소모 {burned}."
+      "gestureNumber": "제스처 번호"
     },
     "viewTable": "표로 보기",
     "mix": {

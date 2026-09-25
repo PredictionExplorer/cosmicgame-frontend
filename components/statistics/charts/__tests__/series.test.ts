@@ -1,4 +1,9 @@
-import { dailySeries } from '@/app/[locale]/(app)/statistics/CycleRhythm';
+import {
+  RHYTHM_DAYS,
+  RHYTHM_MAX_DAYS,
+  dailySeries,
+  rhythmSpan,
+} from '@/app/[locale]/(app)/statistics/CycleRhythm';
 
 import {
   bucketGestureMix,
@@ -101,6 +106,20 @@ describe('cycle rhythm', () => {
       { day: T0 - DAY, count: 3 },
       { day: T0, count: 6 },
     ]);
+  });
+
+  it('spans the live cycle from its opening day, not a rolling 30 days', () => {
+    // V309: under "Cycle 2 so far" the strip showed the last 30 days and missed the opening.
+    expect(rhythmSpan(T0 + 12 * HOUR, T0 - 45 * DAY + HOUR)).toEqual({
+      days: 46,
+      sinceOpening: true,
+    });
+    expect(rhythmSpan(T0 + 12 * HOUR, T0 + HOUR)).toEqual({ days: 1, sinceOpening: true });
+  });
+
+  it('keeps a long cycle to its latest days, and falls back when the opening is unknown', () => {
+    expect(rhythmSpan(T0, T0 - 200 * DAY)).toEqual({ days: RHYTHM_MAX_DAYS, sinceOpening: false });
+    expect(rhythmSpan(T0, null)).toEqual({ days: RHYTHM_DAYS, sinceOpening: false });
   });
 });
 

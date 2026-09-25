@@ -95,7 +95,7 @@ describe('ParticipationPanel', () => {
       refetch,
     });
     render(<ParticipationPanel />);
-    expect(screen.getByText(/failed to load unique recipients/i)).toBeInTheDocument();
+    expect(screen.getByText('This section did not load')).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /try again/i }));
     expect(refetch).toHaveBeenCalled();

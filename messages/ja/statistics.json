@@ -37,7 +37,7 @@
   },
   "shared": {
     "noDataTitle": "データはまだありません",
-    "sectionLoadErrorTitle": "{title}を読み込めませんでした",
+    "sectionLoadErrorTitle": "このセクションを読み込めませんでした",
     "serviceError": "統計サービスから応答がありませんでした。しばらくしてからもう一度お試しください。",
     "definitions": "用語の説明",
     "listMissingTitle": "一覧を読み込めませんでした",
@@ -75,9 +75,11 @@
       "open": "現在のサイクルを開く",
       "opened": "開始日時",
       "rhythmLabel": "日ごとの一筆（UTC基準、直近{days, number}日）",
+      "rhythmCycleLabel": "このサイクルの日ごとの一筆（UTC基準、最初の1時間を除く）",
       "rhythmSummary": "合計{total}筆。最も活発な日：{date}（{peak}筆）。",
       "rhythmEmpty": "この期間の一筆はありません。",
       "rhythmUnavailable": "現在、日ごとの一筆の件数を取得できません。",
+      "todaySoFar": "今日（途中）",
       "splitTitle": "サイクル準備金の行き先",
       "splitDescription": "サイクルが確定すると、サイクル準備金は以下の配分トラックに分かれます。残りは次のサイクルに引き継がれます。"
     },
@@ -183,7 +185,7 @@
     },
     "cosmicSignatureNftHolders": {
       "label": "Cosmic Signature NFT保有者",
-      "tooltip": "Cosmic Signature NFTを少なくとも1点現在保有しているユニークなウォレットアドレス。"
+      "tooltip": "Cosmic Signature NFTを少なくとも1点保有しているか係留しているアドレスです。係留ウォレットは数えず、その中のNFTは各係留者の分として数えます。"
     },
     "cstErc20Holders": {
       "label": "CST（ERC-20）保有者",
@@ -198,7 +200,7 @@
       "tooltip": "公共財の受け手に配分され、インデックス済みのプロトコル残高にまだ反映されているETH。"
     },
     "totalContributedEth": {
-      "label": "拠出されたETHの総額",
+      "label": "直接ETH拠出",
       "tooltip": "インデックス済みのすべてのサイクルにわたってプロトコルへ拠出されたETHの総額。"
     },
     "protocolContributions": {
@@ -240,7 +242,7 @@
     "attachedAssets": "一筆に添付されたERC-721とERC-20のアセット。すべてのサイクル、または現在のパフォーマンス・サイクルだけを表示できます。",
     "gestureTypeDistribution": "サイクルの一筆がETH、ETH + Random Walk NFT、CSTにどう分かれたかを、期間ごとに数えたものです。サイクルの開始直後のように他より極端に多い期間は、軸の上端で切り、実際の数を添えています。",
     "attachedTokenDistribution": "一筆に添付されたERC-721アセットのコントラクトとトークン数。",
-    "cosmicSignatureTokenDistribution": "Cosmic Signature NFT（ERC-721）トークンの現在の所有者分布。",
+    "cosmicSignatureTokenDistribution": "Cosmic Signature NFTの現在の所有状況です。各アドレスのウォレット内のNFTと、そのアドレスが係留して係留ウォレットが代わりに保管しているNFTを示します。",
     "cstBalanceDistribution": "CST（ERC-20）残高の現在のウォレット分布。",
     "cstTotalSupply": "刻印と消費を含む、CST（ERC-20）供給量の時間推移。",
     "cycleActivations": "プロトコルのサイクルやモードが有効になり、終了した時期を示すシステムイベントの期間。",
@@ -354,6 +356,12 @@
       "share": "供給量に占める割合",
       "shareHelp": "この残高がCST総供給量に占める割合です。"
     },
+    "nftHolders": {
+      "inWallet": "ウォレット内",
+      "anchored": "係留中",
+      "total": "合計",
+      "custodyNotice": "係留ウォレットが係留者に代わって保管しているNFT{count, number}点は、ここでは各係留者の分として数えています。"
+    },
     "attachedContracts": "ERC-721コントラクト{count, number}件"
   },
   "attachedAssets": {
@@ -407,7 +415,8 @@
       "allClaimed": "すべて受け取り済み",
       "unclaimedCount": "未受け取り{count}件",
       "viewUnclaimed": "未受け取りのアセットを見る",
-      "cycleDetails": "サイクル{cycle}の詳細",
+      "showRetrievals": "受け取りを表示",
+      "hideRetrievals": "受け取りを閉じる",
       "dialog": {
         "unclaimedTitle": "未受け取りのアセット——サイクル{cycle}",
         "expired": "受け取り期間は終了しました。これらのアセットは誰でも取得できます。",
@@ -415,7 +424,6 @@
         "asset": "アセット",
         "recipient": "受領者",
         "detail": "詳細",
-        "exploreDescription": "受領者ごとの受け取りトランザクション、受け取りまでの時間、このサイクルに添付されたトークンを確認できます。",
         "claimTransactions": "受け取りトランザクション",
         "noClaims": "このサイクルに記録された受け取りはありません。",
         "claimedAfter": "受け取りまでの時間",
@@ -429,8 +437,8 @@
       },
       "assets": {
         "eth": "ETH",
-        "nft": "添付されたNFT",
-        "erc20": "添付されたERC-20"
+        "nftItem": "添付されたNFT（{contract} #{id}）",
+        "erc20Item": "添付されたERC-20（{contract}）：{amount}"
       }
     },
     "outcomes": {
@@ -442,6 +450,12 @@
       "netHelp": "配分で受け取ったETHから、一筆に支払ったETHを引いた額です。CSTは含みません。",
       "cyclesHelp": "この参加者が参加したサイクルのうち、少なくとも一つの配分を受け取ったサイクルの数です。",
       "cycles": "{whole, number}サイクル中{part}"
+    },
+    "kinds": {
+      "eth": "ETH配分{count, number}件",
+      "nft": "NFT{count, number}点",
+      "erc20": "ERC-20配分{count, number}件",
+      "cst": "CST配分{count, number}件"
     }
   },
   "charts": {
@@ -616,9 +630,7 @@
       "rangeDays": "{days, number}日",
       "rangeYear": "直近1年",
       "rangeAll": "全期間",
-      "legend": "総供給量（CST）",
-      "gestureNumber": "一筆の番号",
-      "summary": "{date}時点の総供給量は{supply}です。{range}の期間に{imprinted}が刻印され、{burned}が焼却されました。"
+      "gestureNumber": "一筆の番号"
     },
     "viewTable": "表で表示",
     "mix": {

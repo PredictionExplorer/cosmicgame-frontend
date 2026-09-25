@@ -186,9 +186,10 @@ const StatisticsHubPanel = () => {
   const main = data.MainStats;
   const unknown = <UnknownValue label={tCommon('status.unavailable')} />;
   const figures = sectionFigures(data, cstSupply, t, unknown, format.locale);
+  // Spec-sheet figures sit in a column, so ETH keeps its 4 digits for zero too ("0.0000 ETH").
   const eth = (value: unknown) => {
     const numeric = toFiniteNumber(value);
-    return numeric === null ? unknown : <Amount value={numeric} unit="ETH" />;
+    return numeric === null ? unknown : <Amount value={numeric} unit="ETH" context="table" />;
   };
   const cst = (value: unknown) => {
     const numeric = toFiniteNumber(value);
@@ -198,6 +199,12 @@ const StatisticsHubPanel = () => {
     const numeric = toFiniteNumber(value);
     return numeric === null ? unknown : format.count(numeric);
   };
+  /**
+   * The ledger behind a figure, only when there is something in it: a zero or
+   * unread figure gets no arrow, so none promises records that are not there.
+   */
+  const ledger = (href: string, value: unknown) =>
+    (toFiniteNumber(value) ?? 0) > 0 ? href : undefined;
   /** A caption that counts records ("8 transactions"), only when the count was read. */
   const countCaption = (key: string, value: unknown) => {
     const numeric = toFiniteNumber(value);
@@ -245,7 +252,7 @@ const StatisticsHubPanel = () => {
               value={cst(data.CurRoundStats?.TotalCstInBidsEth)}
             />
           </dl>
-          <CycleRhythm />
+          <CycleRhythm openedTs={opened && opened > 0 ? opened : null} />
         </div>
         <div className="mt-10 border-t border-rule-faint pt-8">
           <h3 className="type-title text-foreground">{t('hub.cycle.splitTitle')}</h3>
@@ -298,13 +305,19 @@ const StatisticsHubPanel = () => {
             <StatisticsItem
               title={t('anchoringPage.stats.totalDistributions')}
               value={eth(main.StakeStatisticsCST?.TotalRewardEth)}
-              href="/anchoring"
+              href={ledger('/anchoring', main.StakeStatisticsCST?.TotalRewardEth)}
             />
             <StatisticsItem
               title={metric('outreachCstAllocated')}
               value={cst(main.TotalMktRewardsEth)}
               caption={countCaption('hub.outreachTransactions', main.NumMktRewards)}
-              href="/marketing"
+              href={ledger('/marketing', main.NumMktRewards)}
+            />
+            {/* ETH contributed straight to the protocol feeds the Cycle Reserve, not Public Goods. */}
+            <StatisticsItem
+              title={metric('totalContributedEth')}
+              value={eth(main.TotalEthDonatedAmountEth)}
+              href={ledger('/eth-contribution', main.TotalEthDonatedAmountEth)}
             />
           </StatisticsGroup>
 
@@ -321,12 +334,12 @@ const StatisticsHubPanel = () => {
             <StatisticsItem
               title={metric('randomWalkNftsUsed')}
               value={count(data.NumRwalkTokensUsed)}
-              href="/used-rwlk-nfts"
+              href={ledger('/used-rwlk-nfts', data.NumRwalkTokensUsed)}
             />
             <StatisticsItem
               title={metric('namedTokens')}
               value={count(main.TotalNamedTokens)}
-              href="/named-nfts"
+              href={ledger('/named-nfts', main.TotalNamedTokens)}
             />
           </StatisticsGroup>
 
@@ -339,29 +352,24 @@ const StatisticsHubPanel = () => {
               title={metric('protocolContributions')}
               value={eth(main.SumCosmicGameDonationsEth)}
               caption={countCaption('hub.contributionCount', main.NumCosmicGameDonations)}
-              href="/public-goods-contributions-cg"
+              href={ledger('/public-goods-contributions-cg', main.NumCosmicGameDonations)}
             />
             <StatisticsItem
               title={metric('voluntaryContributions')}
               value={eth(data.SumVoluntaryDonationsEth)}
               caption={countCaption('hub.contributionCount', data.NumVoluntaryDonations)}
-              href="/public-goods-contributions-voluntary"
+              href={ledger('/public-goods-contributions-voluntary', data.NumVoluntaryDonations)}
             />
             <StatisticsItem
               title={metric('totalPublicGoodsRetrieved')}
               value={eth(main.SumWithdrawals)}
               caption={countCaption('hub.retrievalCount', main.NumWithdrawals)}
-              href="/public-goods-retrievals"
-            />
-            <StatisticsItem
-              title={metric('totalContributedEth')}
-              value={eth(main.TotalEthDonatedAmountEth)}
-              href="/eth-contribution"
+              href={ledger('/public-goods-retrievals', main.NumWithdrawals)}
             />
             <StatisticsItem
               title={metric('attachedNfts')}
               value={count(data.NumDonatedNFTs)}
-              href="/attached-nfts"
+              href={ledger('/attached-nfts', data.NumDonatedNFTs)}
             />
           </StatisticsGroup>
         </div>
@@ -382,6 +390,7 @@ const StatisticsHubPanel = () => {
             },
             ...[
               'outreachCstAllocated',
+              'totalContributedEth',
               'totalSupplyErc20',
               'totalCstConsumed',
               'cstGestures',
@@ -391,7 +400,6 @@ const StatisticsHubPanel = () => {
               'protocolContributions',
               'voluntaryContributions',
               'totalPublicGoodsRetrieved',
-              'totalContributedEth',
               'attachedNfts',
             ].map(definition),
           ]}

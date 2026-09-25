@@ -28,19 +28,43 @@ function nftKey(nft: AttachedNFTRecord, index: number): string {
 }
 
 export interface AttachedAssetsSectionProps {
-  /** Current Performance Cycle number (used for the current-cycle scope). */
-  currentRoundNum: number;
+  /** The live Performance Cycle (the current-cycle scope), or null while it is unknown. */
+  currentCycle: number | null;
+  /** The dashboard that names the live cycle is still loading. */
+  cycleLoading: boolean;
+  /** The dashboard read failed, so the live cycle is unknown. */
+  cycleFailed: boolean;
+  onRetryCycle: () => void;
 }
 
 /**
  * Assets attached to gestures: an ERC-721 grid that can be scoped to all
  * cycles or the current one, and the current cycle's attached ERC-20 tokens,
- * one underline tab each.
+ * one underline tab each. What depends on the live cycle waits for it: a
+ * skeleton while the dashboard loads, an error with a retry when it failed,
+ * never an empty "nothing attached" for a cycle that was not read.
  */
-export function AttachedAssetsSection({ currentRoundNum }: AttachedAssetsSectionProps) {
+export function AttachedAssetsSection({
+  currentCycle,
+  cycleLoading,
+  cycleFailed,
+  onRetryCycle,
+}: AttachedAssetsSectionProps) {
   const t = useTranslations('statistics');
   const nftQuery = useDonationsNFTList();
-  const erc20Query = useDonationsERC20ByRound(currentRoundNum);
+  const erc20Query = useDonationsERC20ByRound(currentCycle ?? -1);
+  const cycleUnknown = currentCycle === null;
+  const cycleState =
+    cycleUnknown && (cycleLoading || !cycleFailed) ? (
+      <SkeletonTable rows={4} columns={4} />
+    ) : cycleUnknown ? (
+      <ErrorState
+        headingLevel={3}
+        title={t('shared.sectionLoadErrorTitle')}
+        message={t('shared.serviceError')}
+        onRetry={onRetryCycle}
+      />
+    ) : null;
 
   const [nftScope, setNftScope] = useState<NftScope>('all');
   const [page, setPage] = useState(1);
@@ -48,8 +72,8 @@ export function AttachedAssetsSection({ currentRoundNum }: AttachedAssetsSection
   const allNfts = useMemo(() => (nftQuery.data ?? []) as AttachedNFTRecord[], [nftQuery.data]);
   const visibleNfts = useMemo(
     () =>
-      nftScope === 'current' ? allNfts.filter((nft) => nft.RoundNum === currentRoundNum) : allNfts,
-    [allNfts, nftScope, currentRoundNum],
+      nftScope === 'current' ? allNfts.filter((nft) => nft.RoundNum === currentCycle) : allNfts,
+    [allNfts, nftScope, currentCycle],
   );
 
   // Clamp instead of state-sync so scope switches and data refreshes can
@@ -66,10 +90,7 @@ export function AttachedAssetsSection({ currentRoundNum }: AttachedAssetsSection
   };
 
   return (
-    <StatsSection
-      title={t('tokens.sections.attachedAssets')}
-      tooltip={t('sectionTooltips.attachedAssets')}
-    >
+    <StatsSection title={t('tokens.sections.attachedAssets')}>
       <Tabs defaultValue="nfts">
         <TabsList variant="underline" scroll className="min-w-full">
           <TabsTrigger value="nfts">{t('attachedAssets.nftTab')}</TabsTrigger>
@@ -87,7 +108,9 @@ export function AttachedAssetsSection({ currentRoundNum }: AttachedAssetsSection
               { value: 'current', label: t('attachedAssets.scopeCurrent') },
             ]}
           />
-          {nftQuery.isLoading ? (
+          {nftScope === 'current' && cycleState ? (
+            cycleState
+          ) : nftQuery.isLoading ? (
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
               {Array.from({ length: 6 }).map((_, i) => (
                 <SkeletonNFTCard key={i} announce={i === 0} />
@@ -139,7 +162,9 @@ export function AttachedAssetsSection({ currentRoundNum }: AttachedAssetsSection
           <p className="max-w-[var(--measure-lede)] type-body-sm text-muted-foreground">
             {t('attachedAssets.erc20Description')}
           </p>
-          {erc20Query.isLoading ? (
+          {cycleState ? (
+            cycleState
+          ) : erc20Query.isLoading ? (
             <SkeletonTable rows={4} columns={4} />
           ) : erc20Query.isError ? (
             <ErrorState

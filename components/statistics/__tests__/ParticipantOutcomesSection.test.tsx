@@ -53,10 +53,26 @@ describe('ParticipantOutcomesSection', () => {
   });
 
   it('totals spending beside what came back, and who received more', () => {
-    render(<ParticipantOutcomesSection />);
-    expect(screen.getByText(/^7(\.0+)? ETH$/)).toBeInTheDocument();
-    expect(screen.getByText(/^6(\.0+)? ETH$/)).toBeInTheDocument();
+    const { container } = render(<ParticipantOutcomesSection />);
+    // V311: amounts as every figure strip draws them, the unit muted in its own span.
+    const amounts = [...container.querySelectorAll('[data-figure] data')].map((el) =>
+      el.textContent?.replace(/\s/g, ' '),
+    );
+    expect(amounts).toEqual([
+      expect.stringMatching(/^7\.0000 ETH$/),
+      expect.stringMatching(/^6\.0000 ETH$/),
+    ]);
+    for (const unit of container.querySelectorAll('[data-figure] data > span')) {
+      expect(unit).toHaveClass('text-muted-foreground');
+    }
     expect(screen.getByText('1 of 3')).toBeInTheDocument();
+  });
+
+  it('lets the section stack set the space under its figure strip', () => {
+    // V299: the header's margins, reused in a section, set the figures on the table below.
+    const { container } = render(<ParticipantOutcomesSection />);
+    const strip = container.querySelector('dl[data-layout]')!;
+    expect(strip.parentElement).toHaveClass('flow-root');
   });
 
   it('prints net figures signed and in the same ink, with no P&L sorts', () => {
@@ -90,9 +106,9 @@ describe('ParticipantOutcomesSection', () => {
     expect(within(table).getAllByText('1 of 2 cycles')).toHaveLength(2);
     expect(within(table).getAllByText('0 of 2 cycles')).toHaveLength(1);
     expect(within(table).queryByText(/%$/)).toBeNull();
-    // The unit keeps its count on its line (a no-break space); the dot is visual only.
+    // V106: counts of allocations in words, each on its line; the dot is visual only.
     const nft = within(table).getAllByText((_, el) => el?.textContent === '1\u00a0NFT')[0]!;
-    expect(nft.parentElement!.textContent).toBe('1\u00a0NFT · 1\u00a0CST');
+    expect(nft.parentElement!.textContent).toBe('1\u00a0NFT · 1\u00a0CST allocation');
   });
 
   it('prints a zero spend at the table precision of the figures beside it', () => {

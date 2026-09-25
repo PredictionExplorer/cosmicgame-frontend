@@ -10,6 +10,7 @@ import {
   useUniqueRecipients,
 } from '@/hooks/useApiQuery';
 import { useHydrated } from '@/hooks/useHydrated';
+import { DefinitionsDisclosure } from '@/components/statistics/DefinitionsDisclosure';
 import { StatsSection } from '@/components/statistics/StatsSection';
 import {
   UniqueParticipantsTable,
@@ -26,7 +27,8 @@ import { dashboardCount } from '../dashboardCounts';
 /**
  * The participation ledgers: every participant by gesture count, every
  * allocation recipient, every ETH contributor. The header above carries the
- * four counts, so the body is the lists themselves, one section each. Those
+ * four counts, so the body is the lists themselves, one section each, and
+ * what each list counts is in one Definitions disclosure at the end. Those
  * counts size each list's skeleton to the table it becomes, and an empty
  * list the header counts rows for reads as one that did not load.
  */
@@ -55,7 +57,6 @@ const ParticipationPanel = () => {
     <div data-testid="participation-panel" className="space-y-12 sm:space-y-16">
       <StatsSection
         title={t('participation.sections.participants')}
-        tooltip={t('sectionTooltips.uniqueParticipants')}
         isLoading={participantsQuery.isLoading}
         isError={participantsQuery.isError}
         onRetry={() => participantsQuery.refetch()}
@@ -69,7 +70,6 @@ const ParticipationPanel = () => {
 
       <StatsSection
         title={t('participation.sections.recipients')}
-        tooltip={t('sectionTooltips.uniqueRecipients')}
         isLoading={recipientsQuery.isLoading}
         isError={recipientsQuery.isError}
         onRetry={() => recipientsQuery.refetch()}
@@ -83,7 +83,6 @@ const ParticipationPanel = () => {
 
       <StatsSection
         title={t('participation.sections.contributors')}
-        tooltip={t('sectionTooltips.uniqueEthContributors')}
         isLoading={donorsQuery.isLoading}
         isError={donorsQuery.isError}
         onRetry={() => donorsQuery.refetch()}
@@ -94,6 +93,25 @@ const ParticipationPanel = () => {
       >
         <UniqueEthDonorsTable list={uniqueDonors} />
       </StatsSection>
+
+      <DefinitionsDisclosure
+        className="border-t border-rule pt-8 sm:pt-10"
+        label={t('shared.definitions')}
+        items={[
+          {
+            term: t('participation.sections.participants'),
+            definition: t('sectionTooltips.uniqueParticipants'),
+          },
+          {
+            term: t('participation.sections.recipients'),
+            definition: t('sectionTooltips.uniqueRecipients'),
+          },
+          {
+            term: t('participation.sections.contributors'),
+            definition: t('sectionTooltips.uniqueEthContributors'),
+          },
+        ]}
+      />
     </div>
   );
 };

@@ -37,7 +37,7 @@
   },
   "shared": {
     "noDataTitle": "Chưa có dữ liệu",
-    "sectionLoadErrorTitle": "Không tải được {title}",
+    "sectionLoadErrorTitle": "Phần này chưa tải được",
     "serviceError": "Dịch vụ thống kê không phản hồi. Hãy thử lại sau ít phút.",
     "definitions": "Định nghĩa",
     "listMissingTitle": "Danh sách chưa tải được",
@@ -75,9 +75,11 @@
       "open": "Mở chu kỳ hiện tại",
       "opened": "Bắt đầu lúc",
       "rhythmLabel": "Nét bút mỗi ngày (theo UTC), {days, number} ngày gần nhất",
+      "rhythmCycleLabel": "Nét bút mỗi ngày (theo UTC) trong chu kỳ này, không tính giờ đầu",
       "rhythmSummary": "Tổng cộng: {total}. Ngày sôi động nhất: {date} ({peak}).",
       "rhythmEmpty": "Không có nét bút nào trong khoảng thời gian này.",
       "rhythmUnavailable": "Hiện chưa thể tải số nét bút theo ngày.",
+      "todaySoFar": "Hôm nay, đến lúc này",
       "splitTitle": "Dự trữ chu kỳ đi về đâu",
       "splitDescription": "Khi chu kỳ hoàn tất, Dự trữ chu kỳ được chia theo các luồng phân bổ dưới đây. Phần còn lại chuyển sang chu kỳ kế tiếp."
     },
@@ -183,7 +185,7 @@
     },
     "cosmicSignatureNftHolders": {
       "label": "Người nắm giữ Cosmic Signature NFT",
-      "tooltip": "Các địa chỉ ví riêng biệt hiện đang nắm giữ ít nhất một Cosmic Signature NFT."
+      "tooltip": "Các địa chỉ đang nắm giữ hoặc đã neo ít nhất một Cosmic Signature NFT. Ví neo giữ không được tính: NFT trong đó được tính cho người neo giữ của chúng."
     },
     "cstErc20Holders": {
       "label": "Người nắm giữ CST (ERC-20)",
@@ -198,7 +200,7 @@
       "tooltip": "ETH đã phân bổ cho đơn vị thụ hưởng Hàng hóa công và vẫn được phản ánh trong số dư giao thức đã lập chỉ mục."
     },
     "totalContributedEth": {
-      "label": "Tổng ETH đã đóng góp",
+      "label": "Đóng góp ETH trực tiếp",
       "tooltip": "Tổng ETH đã đóng góp cho giao thức qua mọi chu kỳ được lập chỉ mục."
     },
     "protocolContributions": {
@@ -240,7 +242,7 @@
     "attachedAssets": "Các tài sản ERC-721 và ERC-20 đính kèm vào nét bút, có thể xem cho mọi chu kỳ hoặc chỉ chu kỳ trình diễn hiện tại.",
     "gestureTypeDistribution": "Cách các nét bút của một chu kỳ chia giữa ETH, ETH + Random Walk NFT và CST, đếm theo từng khoảng. Khoảng đông hơn hẳn phần còn lại, như lúc mở chu kỳ, được cắt ở đỉnh trục và ghi số thực.",
     "attachedTokenDistribution": "Hợp đồng và số token của các tài sản ERC-721 đính kèm vào nét bút.",
-    "cosmicSignatureTokenDistribution": "Phân bố chủ sở hữu hiện tại của các token ERC-721 Cosmic Signature NFT.",
+    "cosmicSignatureTokenDistribution": "Ai đang sở hữu Cosmic Signature NFT: NFT trong ví của mỗi địa chỉ và NFT địa chỉ đó đã neo, do Ví neo giữ giữ hộ.",
     "cstBalanceDistribution": "Phân bố ví hiện tại theo số dư CST ERC-20.",
     "cstTotalSupply": "Thay đổi nguồn cung CST ERC-20 theo lịch sử, gồm các lần khắc và tiêu thụ theo thời gian.",
     "cycleActivations": "Các cửa sổ sự kiện hệ thống cho biết khi nào các chu kỳ hoặc chế độ của giao thức bắt đầu và kết thúc.",
@@ -354,6 +356,12 @@
       "share": "Tỷ lệ trên tổng cung",
       "shareHelp": "Số dư này tính theo tỷ lệ trên tổng cung CST."
     },
+    "nftHolders": {
+      "inWallet": "Trong ví",
+      "anchored": "Đang neo giữ",
+      "total": "Tổng",
+      "custodyNotice": "Ví neo giữ đang giữ {count, number} NFT đã neo thay cho người neo giữ; ở đây mỗi NFT được tính cho người neo giữ của nó."
+    },
     "attachedContracts": "{count, number} hợp đồng ERC-721"
   },
   "attachedAssets": {
@@ -407,7 +415,8 @@
       "allClaimed": "Đã nhận về tất cả",
       "unclaimedCount": "{count} chưa nhận về",
       "viewUnclaimed": "Xem tài sản chưa nhận về",
-      "cycleDetails": "Chi tiết chu kỳ {cycle}",
+      "showRetrievals": "Xem lượt nhận về",
+      "hideRetrievals": "Ẩn lượt nhận về",
       "dialog": {
         "unclaimedTitle": "Tài sản chưa nhận về — Chu kỳ {cycle}",
         "expired": "Thời hạn nhận về đã qua. Bất kỳ ai cũng có thể nhận về các tài sản còn lại cho mình.",
@@ -415,7 +424,6 @@
         "asset": "Tài sản",
         "recipient": "Người nhận",
         "detail": "Chi tiết",
-        "exploreDescription": "Các giao dịch nhận về cùng thời gian mỗi người nhận đã mất, và các token đính kèm trong chu kỳ này.",
         "claimTransactions": "Giao dịch nhận về",
         "noClaims": "Không có lần nhận về nào được ghi nhận cho chu kỳ này.",
         "claimedAfter": "Nhận về sau",
@@ -429,8 +437,8 @@
       },
       "assets": {
         "eth": "ETH",
-        "nft": "NFT đính kèm",
-        "erc20": "ERC-20 đính kèm"
+        "nftItem": "NFT đính kèm {contract} #{id}",
+        "erc20Item": "ERC-20 đính kèm {contract}: {amount}"
       }
     },
     "outcomes": {
@@ -442,6 +450,12 @@
       "netHelp": "ETH nhận qua phân bổ trừ ETH đã chi cho nét bút. Không tính CST.",
       "cyclesHelp": "Số chu kỳ người này tham gia mà có nhận ít nhất một phân bổ.",
       "cycles": "{part} trên {whole, number} chu kỳ"
+    },
+    "kinds": {
+      "eth": "{count, number} phân bổ ETH",
+      "nft": "{count, number} NFT",
+      "erc20": "{count, number} phân bổ ERC-20",
+      "cst": "{count, number} phân bổ CST"
     }
   },
   "charts": {
@@ -616,9 +630,7 @@
       "rangeDays": "{days, number} ngày",
       "rangeYear": "1 năm qua",
       "rangeAll": "Toàn bộ",
-      "legend": "Tổng cung (CST)",
-      "gestureNumber": "Nét bút số",
-      "summary": "Tổng cung ngày {date}: {supply}. Trong {range}, đã khắc {imprinted} và đốt {burned}."
+      "gestureNumber": "Nét bút số"
     },
     "viewTable": "Xem dạng bảng",
     "mix": {

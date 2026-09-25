@@ -24,7 +24,7 @@ describe('SectionShell', () => {
     expect(screen.getByText('Chart body')).toBeVisible();
   });
 
-  it('folds a collapsible section away from its H2 button', async () => {
+  it('folds a collapsible section away behind a disclosure row', async () => {
     const user = userEvent.setup();
     render(
       <SectionShell
@@ -40,9 +40,12 @@ describe('SectionShell', () => {
     const toggle = screen.getByRole('button', { name: 'Gesture spikes' });
     expect(toggle.closest('h2')).not.toBeNull();
     expect(toggle).toHaveAttribute('aria-expanded', 'true');
-    // One heading line is 29px on a phone: on touch its own box grows to a
-    // 44px target and hands the space back (touch-hit-area), so nothing moves.
-    expect(toggle).toHaveClass('touch-hit-area');
+    // V310: a disclosure row in the text face, not a button in the display face, and the
+    // button's ::after spans the whole 44px row, so every part of the row takes the press.
+    expect(toggle.closest('h2')).toHaveClass('type-title');
+    expect(toggle.closest('h2')).not.toHaveClass('type-section');
+    expect(toggle).toHaveClass('after:absolute', 'after:inset-0');
+    expect(toggle.closest('.min-h-11')).not.toBeNull();
     expect(screen.getByText('One sentence.')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Act' })).toBeInTheDocument();
 
@@ -117,7 +120,11 @@ describe('StatsSection', () => {
         <p>Table content</p>
       </StatsSection>,
     );
-    expect(screen.getByRole('heading', { level: 3 })).toHaveTextContent(/unique participants/i);
+    // V110: under the section's own heading, never "Failed to load unique participants"
+    // with the title recased mid-sentence ("cosmic signature nft (erc-721)").
+    expect(screen.getByRole('heading', { level: 3 })).toHaveTextContent(
+      'This section did not load',
+    );
     await user.click(screen.getByRole('button', { name: /try again|retry/i }));
     expect(onRetry).toHaveBeenCalledTimes(1);
   });

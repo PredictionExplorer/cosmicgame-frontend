@@ -37,7 +37,7 @@
   },
   "shared": {
     "noDataTitle": "暫無資料",
-    "sectionLoadErrorTitle": "未能載入{title}",
+    "sectionLoadErrorTitle": "此區塊未能載入",
     "serviceError": "統計服務暫未回應，請稍後再試。",
     "definitions": "術語說明",
     "listMissingTitle": "此清單未能載入",
@@ -75,9 +75,11 @@
       "open": "前往目前週期",
       "opened": "開啟時間",
       "rhythmLabel": "每日落筆（按 UTC 日），近 {days, number} 天",
+      "rhythmCycleLabel": "本週期每日落筆（按 UTC 日，不含首小時）",
       "rhythmSummary": "合計 {total} 次。最活躍的一天：{date}（{peak} 次）。",
       "rhythmEmpty": "這段時間沒有落筆。",
       "rhythmUnavailable": "暫時無法取得每日落筆次數。",
+      "todaySoFar": "今天（進行中）",
       "splitTitle": "週期儲備的去向",
       "splitDescription": "週期收官時，週期儲備按下列分配軌道拆分，餘下部分滾入下一個週期。"
     },
@@ -183,7 +185,7 @@
     },
     "cosmicSignatureNftHolders": {
       "label": "Cosmic Signature NFT 持有者",
-      "tooltip": "目前至少持有一枚 Cosmic Signature NFT 的獨立錢包地址。"
+      "tooltip": "持有或已錨定至少一個 Cosmic Signature NFT 的地址。錨定錢包不計入：其中的 NFT 計入各自的錨定者。"
     },
     "cstErc20Holders": {
       "label": "CST（ERC-20）持有者",
@@ -198,7 +200,7 @@
       "tooltip": "已分配至公共財受益方，且仍反映在協議索引餘額中的 ETH。"
     },
     "totalContributedEth": {
-      "label": "ETH 貢獻總額",
+      "label": "直接 ETH 貢獻",
       "tooltip": "所有已索引週期中向協議貢獻的 ETH 總額。"
     },
     "protocolContributions": {
@@ -240,7 +242,7 @@
     "attachedAssets": "隨落筆附加的 ERC-721 與 ERC-20 資產，可檢視所有週期或僅目前演繹週期。",
     "gestureTypeDistribution": "某個週期的落筆在 ETH、ETH 搭配 Random Walk NFT 與 CST 之間的分佈，按時間窗口計數。遠比其他時段繁忙的窗口（例如週期開局）會在座標軸頂端截斷，並標出實際數量。",
     "attachedTokenDistribution": "隨落筆附加的 ERC-721 資產合約與代幣數量。",
-    "cosmicSignatureTokenDistribution": "Cosmic Signature NFT（ERC-721）目前的持有者分佈。",
+    "cosmicSignatureTokenDistribution": "Cosmic Signature NFT 目前的歸屬：每個地址錢包中的 NFT，以及其已錨定、由錨定錢包代為持有的 NFT。",
     "cstBalanceDistribution": "CST（ERC-20）目前的錢包餘額分佈。",
     "cstTotalSupply": "CST（ERC-20）總供應量的歷史變化，包括銘刻與消耗。",
     "cycleActivations": "系統事件時間窗口，展示協議週期或模式的啟用與結束時間。",
@@ -354,6 +356,12 @@
       "share": "佔供應量",
       "shareHelp": "該餘額佔 CST 總供應量的比例。"
     },
+    "nftHolders": {
+      "inWallet": "錢包中",
+      "anchored": "已錨定",
+      "total": "合計",
+      "custodyNotice": "錨定錢包代錨定者持有 {count, number} 個已錨定的 NFT，此處計入各自的錨定者名下。"
+    },
     "attachedContracts": "{count, number} 個 ERC-721 合約"
   },
   "attachedAssets": {
@@ -407,7 +415,8 @@
       "allClaimed": "已全部取回",
       "unclaimedCount": "{count} 項未取回",
       "viewUnclaimed": "檢視未取回資產",
-      "cycleDetails": "第 {cycle} 個週期詳情",
+      "showRetrievals": "檢視取回紀錄",
+      "hideRetrievals": "收合取回紀錄",
       "dialog": {
         "unclaimedTitle": "第 {cycle} 個週期的未取回資產",
         "expired": "取回窗口已結束，現在任何人都可執行超時取回。",
@@ -415,7 +424,6 @@
         "asset": "資產",
         "recipient": "獲配者",
         "detail": "詳情",
-        "exploreDescription": "檢視取回交易、每位獲配者的處理時長，以及本週期附加的代幣。",
         "claimTransactions": "取回交易",
         "noClaims": "本週期暫無取回紀錄。",
         "claimedAfter": "取回耗時",
@@ -429,8 +437,8 @@
       },
       "assets": {
         "eth": "ETH",
-        "nft": "已附加 NFT",
-        "erc20": "已附加 ERC-20"
+        "nftItem": "已附加 NFT {contract} #{id}",
+        "erc20Item": "已附加 ERC-20 {contract}：{amount}"
       }
     },
     "outcomes": {
@@ -442,6 +450,12 @@
       "netHelp": "以分配獲配的 ETH 減去落筆支出的 ETH，不含 CST。",
       "cyclesHelp": "該參與者參與的週期中，至少獲配一次分配的週期數。",
       "cycles": "{whole, number} 個週期中的 {part} 個"
+    },
+    "kinds": {
+      "eth": "{count, number} 項 ETH 分配",
+      "nft": "{count, number} 個 NFT",
+      "erc20": "{count, number} 項 ERC-20 分配",
+      "cst": "{count, number} 項 CST 分配"
     }
   },
   "charts": {
@@ -616,9 +630,7 @@
       "rangeDays": "{days, number} 天",
       "rangeYear": "近一年",
       "rangeAll": "全部",
-      "legend": "總供應量（CST）",
-      "gestureNumber": "落筆序號",
-      "summary": "{date} 總供應量：{supply}。{range} 期間銘刻 {imprinted}，消耗 {burned}。"
+      "gestureNumber": "落筆序號"
     },
     "viewTable": "以表格檢視",
     "mix": {

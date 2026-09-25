@@ -17,6 +17,7 @@ const mockUseCTBalancesDistribution = jest.fn();
 const mockUseCTStatistics = jest.fn();
 const mockUseDonationsNFTList = jest.fn();
 const mockUseDonationsERC20ByRound = jest.fn();
+const mockUseUniqueCSTAnchorHolders = jest.fn();
 
 jest.mock('../../../../../../hooks/useApiQuery', () => ({
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
@@ -25,12 +26,7 @@ jest.mock('../../../../../../hooks/useApiQuery', () => ({
   useCTStatistics: (...args: unknown[]) => mockUseCTStatistics(...args),
   useDonationsNFTList: (...args: unknown[]) => mockUseDonationsNFTList(...args),
   useDonationsERC20ByRound: (...args: unknown[]) => mockUseDonationsERC20ByRound(...args),
-}));
-
-jest.mock('../../../../../../components/tokens/CSTokenDistributionTable', () => ({
-  CSTokenDistributionTable: ({ list }: { list: unknown[] }) => (
-    <div data-testid="cs-token-distribution-table">{list.length} holders</div>
-  ),
+  useUniqueCSTAnchorHolders: (...args: unknown[]) => mockUseUniqueCSTAnchorHolders(...args),
 }));
 jest.mock('../../../../../../components/statistics/CstSupplyHistory', () => ({
   CstSupplyHistory: () => <div data-testid="cst-supply-history" />,
@@ -62,11 +58,31 @@ const nfts = [
   { RecordId: 3, RoundNum: 3, DonorAddr: '0xd3', TokenAddr: '0xt3', TokenId: 30 },
 ];
 
+/** The Anchoring Wallet: it holds anchored NFTs for their anchor-holders. */
+const CUSTODY = '0xc0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0';
+const HOLDER = '0x1111111111111111111111111111111111111111';
+const ANCHORER = '0xa169574d0d353e3010997a3e64846b7d1b2a63b6';
+
 beforeEach(() => {
   jest.clearAllMocks();
-  mockUseDashboardInfo.mockReturnValue(okQuery(createDashboardInfo()));
+  mockUseDashboardInfo.mockReturnValue(
+    okQuery(
+      createDashboardInfo({
+        ContractAddrs: { StakingWalletCSTAddr: CUSTODY } as never,
+      }),
+    ),
+  );
   mockUseCSTDistribution.mockReturnValue(
-    okQuery([{ OwnerAddr: '0x1', OwnerAid: '1', NumTokens: 11 }]),
+    okQuery([
+      { OwnerAddr: HOLDER, OwnerAid: '1', NumTokens: 11 },
+      { OwnerAddr: CUSTODY, OwnerAid: '2', NumTokens: 33 },
+    ]),
+  );
+  mockUseUniqueCSTAnchorHolders.mockReturnValue(
+    okQuery([
+      { StakerAddr: ANCHORER, TotalTokensStaked: 30 },
+      { StakerAddr: HOLDER, TotalTokensStaked: 3 },
+    ]),
   );
   mockUseCTBalancesDistribution.mockReturnValue(
     okQuery([
@@ -82,8 +98,26 @@ beforeEach(() => {
 describe('TokensPanel', () => {
   it('renders the distribution sections with data', () => {
     render(<TokensPanel />);
-    expect(screen.getByTestId('cs-token-distribution-table')).toHaveTextContent('1 holders');
+    expect(
+      screen.getByRole('table', { name: 'Cosmic Signature NFT (ERC-721)' }),
+    ).toBeInTheDocument();
     expect(screen.getByTestId('cst-supply-history')).toBeInTheDocument();
+  });
+
+  it('credits anchored NFTs to their anchor-holders and keeps the Anchoring Wallet out', () => {
+    // V304: the wallet holding 33 anchored NFTs was listed (and counted) as a holder.
+    render(<TokensPanel />);
+    const ledger = screen.getByRole('table', { name: 'Cosmic Signature NFT (ERC-721)' });
+    const rows = within(ledger).getAllByRole('row').slice(1);
+    expect(rows).toHaveLength(2);
+    expect(rows[0]).toHaveTextContent(/0xA169/i);
+    expect(rows[0]).toHaveTextContent('30');
+    expect(rows[1]).toHaveTextContent('14');
+    expect(within(ledger).queryByText(/0xc0c0/i)).toBeNull();
+    // (The jest intl mock leaves the ICU plural unformatted.)
+    expect(
+      screen.getByText(/held by the Anchoring Wallet for their anchor-holders/),
+    ).toBeInTheDocument();
   });
 
   it('lists every CST holder once, with its share of the supply, and says how many there are', () => {
@@ -117,11 +151,32 @@ describe('TokensPanel', () => {
       refetch,
     });
     render(<TokensPanel />);
-    expect(
-      screen.getByText(/failed to load cosmic signature nft \(erc-721\)/i),
-    ).toBeInTheDocument();
+    // V110: the section's own heading names it; the error never recases its title.
+    expect(screen.getByText('This section did not load')).toBeInTheDocument();
+    expect(screen.queryByText(/cosmic signature nft \(erc-721\)/)).toBeNull();
 
     await user.click(screen.getByRole('button', { name: /try again/i }));
+    expect(refetch).toHaveBeenCalled();
+  });
+
+  it('says the attached token distribution did not load, never that there are no contracts', async () => {
+    // V111: a failed dashboard read gave an empty list and the "no contracts" state.
+    const user = userEvent.setup();
+    const refetch = jest.fn();
+    mockUseDashboardInfo.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      refetch,
+    });
+    render(<TokensPanel />);
+    await user.click(screen.getByRole('button', { name: 'Attached token distribution' }));
+    const section = screen
+      .getByRole('button', { name: 'Attached token distribution' })
+      .closest('section')!;
+    expect(within(section).getByText('This section did not load')).toBeInTheDocument();
+    expect(within(section).queryByText(/no contracts/i)).toBeNull();
+    await user.click(within(section).getByRole('button', { name: /try again/i }));
     expect(refetch).toHaveBeenCalled();
   });
 
