@@ -36,7 +36,8 @@ test('gesture info names its Random Walk NFT as a link, with no image to break',
   await page.goto('/current-cycle');
   const walk = page.getByRole('link', { name: /Random Walk #987654/ });
   await walk.scrollIntoViewIfNeeded({ timeout: 15_000 });
-  await expect(walk).toHaveAttribute('href', 'https://randomwalknft.com/detail/987654');
+  // The one Random Walk host every link uses (utils/urls randomWalkTokenUrl).
+  await expect(walk).toHaveAttribute('href', 'https://www.randomwalknft.com/detail/987654');
 
   const history = page.locator('table').filter({ has: walk });
   await expect(history.locator('img')).toHaveCount(0);
