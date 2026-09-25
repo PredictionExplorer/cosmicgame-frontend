@@ -26,12 +26,8 @@ describe('CharityDepositTable', () => {
     render(<CharityDepositTable list={[createDonation()]} />);
     expect(screen.getAllByText('tables.columns.datetime').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('tables.columns.cycle').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('tables.columns.contributorAddress').length).toBeGreaterThanOrEqual(
-      1,
-    );
-    expect(
-      screen.getAllByText('tables.columns.contributionAmountEth').length,
-    ).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.contributor').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.amountEth').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders datetime as explorer link', () => {

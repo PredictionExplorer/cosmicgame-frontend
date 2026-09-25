@@ -38,17 +38,17 @@ jest.mock('../../../../../components/tables/RecipientHistoryTable', () => {
   const STELLAR = new Set([10, 11, 12, 13, 14, 18]);
   return {
     __esModule: true,
-    default: ({ winningHistory }: { winningHistory: { RecordType?: number }[] }) => {
+    default: ({ allocationRecords }: { allocationRecords: { RecordType?: number }[] }) => {
       const stellarOnly =
-        winningHistory.length > 0 &&
-        winningHistory.every((entry) => STELLAR.has(entry.RecordType ?? -1));
+        allocationRecords.length > 0 &&
+        allocationRecords.every((entry) => STELLAR.has(entry.RecordType ?? -1));
       return (
         <div
           data-testid={
             stellarOnly ? 'stellar-selection-ledger-table' : 'cycle-allocation-ledger-table'
           }
         >
-          records: {winningHistory.length}
+          records: {allocationRecords.length}
         </div>
       );
     },

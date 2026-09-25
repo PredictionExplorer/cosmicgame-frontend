@@ -94,8 +94,8 @@ export function CycleParticipants({
             {view === 'stellarSelectionEntries' ? (
               <StellarSelectionHolderTable
                 list={gestures}
-                numRaffleEthWinner={data.NumRaffleEthWinnersBidding}
-                numRaffleNFTWinner={data.NumRaffleNFTWinnersBidding}
+                stellarEthSelections={data.NumRaffleEthWinnersBidding}
+                stellarNftSelections={data.NumRaffleNFTWinnersBidding}
                 {...state}
               />
             ) : view === 'topEthSpenders' ? (

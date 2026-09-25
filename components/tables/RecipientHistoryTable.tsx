@@ -146,6 +146,18 @@ function RetrievalStatus({ record }: { record: WinningHistoryEntry }) {
   );
 }
 
+/**
+ * A record's stable identity, whatever order the table shows it in: its
+ * event, transaction, kind, place among the cycle's selections and token.
+ * (Its position in the list changes with every sort, and a key built on it
+ * remounted every row.)
+ */
+export function allocationRecordKey(record: WinningHistoryEntry): string {
+  return [record.EvtLogId, record.TxHash, record.RecordType, record.WinnerIndex, record.TokenId]
+    .map((part) => part ?? '')
+    .join('-');
+}
+
 function Recipient({ address }: { address: string | undefined }) {
   const t = useTranslations('tables');
   if (isWallet(address)) return <AddressChip address={address} variant="plain" showCopy={false} />;
@@ -184,53 +196,6 @@ function groupByRecipient(records: readonly WinningHistoryEntry[]): RecipientGro
   for (const group of groups.values()) group.eth = sumAllocatedEth(group.records);
   // The largest ETH allocation leads, which puts the Signature Allocation first.
   return [...groups.values()].sort((a, b) => b.eth - a.eth || b.cst - a.cst);
-}
-
-/**
- * "3.5397 ETH  9,000 CST  9 NFTs": what a recipient received in the cycle,
- * one figure per kind. A single NFT is named and linked ("NFT #24"); several
- * are counted, and their numbers are in the expanded records, so a row
- * never wraps into a ragged run of links. The items are spaced rather than
- * joined by separators, so a narrow cell wraps without a line that starts
- * on a dot.
- */
-function GroupSummary({ group }: { group: RecipientGroup }) {
-  const t = useTranslations('tables');
-  const parts: { key: string; node: ReactNode }[] = [];
-  if (group.eth > 0) {
-    parts.push({
-      key: 'eth',
-      node: <Amount value={group.eth} unit="ETH" context="table" unitClassName="text-subtle" />,
-    });
-  }
-  if (group.cst > 0) {
-    parts.push({
-      key: 'cst',
-      node: <Amount value={group.cst} unit="CST" context="card" unitClassName="text-subtle" />,
-    });
-  }
-  const [onlyNft] = group.nfts;
-  if (group.nfts.length === 1 && onlyNft) {
-    parts.push({ key: 'nft', node: <AllocationAsset record={onlyNft} /> });
-  } else if (group.nfts.length > 1) {
-    parts.push({
-      key: 'nfts',
-      node: (
-        <span className="tabular-nums text-foreground">
-          {t('recipientHistory.nftCount', { count: group.nfts.length })}
-        </span>
-      ),
-    });
-  }
-  return (
-    <span className="inline-flex flex-wrap items-baseline justify-end gap-x-3 gap-y-1">
-      {parts.map((part) => (
-        <span key={part.key} className="whitespace-nowrap">
-          {part.node}
-        </span>
-      ))}
-    </span>
-  );
 }
 
 /** Totals across the history: ETH, CST and NFTs received, and the cycles they came from. */
@@ -275,18 +240,20 @@ function HistorySummary({ records }: { records: readonly WinningHistoryEntry[] }
 }
 
 interface RecipientHistoryTableProps extends LedgerStateProps {
-  winningHistory: WinningHistoryEntry[];
+  /** The allocation records to list. */
+  allocationRecords: WinningHistoryEntry[];
   /** Mark each record retrieved or ready to retrieve, with a Retrieve link (your own history). */
   showClaimedStatus?: boolean;
   /** Show the recipient of each record. Default `true`. */
-  showWinnerAddr?: boolean;
+  showRecipient?: boolean;
   /** Show each record's cycle. Default `true`. */
   showRoundColumn?: boolean;
   /** Rows per page. Default: the table default (20, or 10 as phone records). */
   perPage?: number;
   /**
-   * `recipient`: one row per recipient with what they received and from
-   * which allocations, expanding to the individual records (a cycle's ledger).
+   * `recipient`: one row per recipient with what they received (ETH, CST
+   * and NFTs, each in its own aligned column) and from which allocations,
+   * expanding to the individual records (a cycle's ledger).
    */
   groupBy?: 'recipient';
   /** Totals above the table: ETH, CST and NFTs received, and cycles. */
@@ -299,9 +266,9 @@ interface RecipientHistoryTableProps extends LedgerStateProps {
  * for your own history, whether it is retrieved yet.
  */
 export default function RecipientHistoryTable({
-  winningHistory,
+  allocationRecords,
   showClaimedStatus = false,
-  showWinnerAddr = true,
+  showRecipient = true,
   showRoundColumn = true,
   perPage,
   groupBy,
@@ -310,7 +277,7 @@ export default function RecipientHistoryTable({
 }: RecipientHistoryTableProps) {
   const t = useTranslations('tables');
   const cycleHref = useCycleHref();
-  const records = useMemo(() => winningHistory ?? [], [winningHistory]);
+  const records = useMemo(() => allocationRecords ?? [], [allocationRecords]);
   const sourceLabel = (recordType: number) => {
     const source = ALLOCATION_SOURCE_BY_RECORD_TYPE[recordType];
     return source ? t(`recipientHistory.sources.${source}`) : t('status.unknown');
@@ -328,6 +295,8 @@ export default function RecipientHistoryTable({
         header: t('columns.source'),
         value: (record) => label(record.RecordType),
         cell: (record) => <span className="text-foreground">{label(record.RecordType)}</span>,
+        // A phone record opens on the allocation it is ("Signature Allocation").
+        phone: 'title',
       },
       {
         id: 'datetime',
@@ -337,7 +306,7 @@ export default function RecipientHistoryTable({
         txHash: (record) => record.TxHash,
         sortable: true,
       },
-      showWinnerAddr && {
+      showRecipient && {
         id: 'recipient',
         kind: 'address',
         header: t('columns.recipient'),
@@ -403,21 +372,28 @@ export default function RecipientHistoryTable({
       },
     ];
     return all.filter((column): column is DataTableColumn<WinningHistoryEntry> => Boolean(column));
-  }, [t, showWinnerAddr, showRoundColumn, showClaimedStatus, cycleHref]);
+  }, [t, showRecipient, showRoundColumn, showClaimedStatus, cycleHref]);
 
   const groups = useMemo(
     () => (groupBy === 'recipient' ? groupByRecipient(records) : []),
     [groupBy, records],
   );
 
-  const groupColumns = useMemo<DataTableColumn<RecipientGroup>[]>(
-    () => [
+  // What each recipient received sits in three aligned columns under one
+  // "Received" heading, one unit each, so the ETH, the CST and the NFT
+  // counts can each be read down and compared; a recipient who got none of
+  // a unit leaves its cell blank (and its phone record drops the line).
+  // Every NFT is a count here; the expanded records name and link each one.
+  const groupColumns = useMemo<DataTableColumn<RecipientGroup>[]>(() => {
+    const received = t('columns.received');
+    return [
       {
         id: 'recipient',
         kind: 'address',
         header: t('columns.recipient'),
         value: (group) => group.address,
         cell: (group) => <Recipient address={group.address} />,
+        phone: 'title',
       },
       {
         id: 'sources',
@@ -438,16 +414,40 @@ export default function RecipientHistoryTable({
         ),
       },
       {
-        id: 'received',
+        id: 'eth',
         kind: 'amount',
-        header: t('columns.received'),
-        value: (group) => group.eth,
-        cell: (group) => <GroupSummary group={group} />,
+        group: received,
+        header: t('recipientHistory.received.eth'),
+        label: t('recipientHistory.totals.eth'),
+        value: (group) => (group.eth > 0 ? group.eth : null),
+        showUnit: false,
+        whenBlank: 'empty',
         sortable: true,
       },
-    ],
-    [t],
-  );
+      {
+        id: 'cst',
+        kind: 'amount',
+        unit: 'CST',
+        group: received,
+        header: t('recipientHistory.received.cst'),
+        label: t('recipientHistory.totals.cst'),
+        value: (group) => (group.cst > 0 ? group.cst : null),
+        showUnit: false,
+        whenBlank: 'empty',
+        sortable: true,
+      },
+      {
+        id: 'nfts',
+        kind: 'count',
+        group: received,
+        header: t('recipientHistory.received.nfts'),
+        label: t('recipientHistory.totals.nfts'),
+        value: (group) => (group.nfts.length > 0 ? group.nfts.length : null),
+        whenBlank: 'empty',
+        sortable: true,
+      },
+    ];
+  }, [t]);
 
   const summary = showSummary && records.length > 0 ? <HistorySummary records={records} /> : null;
 
@@ -462,14 +462,18 @@ export default function RecipientHistoryTable({
           getRowKey={(group) => group.address.toLowerCase() || 'unknown'}
           emptyTitle={t('empty.history')}
           pageSize={perPage}
+          // The ledger arrives largest ETH first (the Signature Allocation
+          // leads); saying so puts the arrow on that header, and a first
+          // click turns the order around.
+          initialSort={{ id: 'eth', direction: 'desc' }}
           layout="cards"
-          // The sources and the summary each keep one line on a wide screen.
+          // The sources keep one line on a wide screen.
           width="fill"
           renderDetails={(group) => (
             <ul className="divide-y divide-rule-faint">
-              {group.records.map((record, index) => (
+              {group.records.map((record) => (
                 <li
-                  key={`${record.TxHash}-${record.RecordType}-${index}`}
+                  key={allocationRecordKey(record)}
                   className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-2 type-body-sm"
                 >
                   <span className="text-muted-foreground">{sourceLabel(record.RecordType)}</span>
@@ -505,9 +509,7 @@ export default function RecipientHistoryTable({
         data={records}
         columns={recordColumns}
         ariaLabel={t('names.allocationRecords')}
-        getRowKey={(record, index) =>
-          `${record.TxHash ?? record.RecordType}-${record.RecordType}-${record.WinnerIndex ?? index}-${index}`
-        }
+        getRowKey={allocationRecordKey}
         emptyTitle={t('empty.history')}
         pageSize={perPage}
         layout="cards"

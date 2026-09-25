@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { usePublicClient } from 'wagmi';
 import { formatUnits } from 'viem';
 import { useLocale, useTranslations } from 'next-intl';
@@ -98,40 +99,37 @@ type Erc20Meta =
   | { status: 'ready'; symbol: string; decimals: number }
   | { status: 'failed' };
 
-/** Reads an attached ERC-20's symbol and decimals from its contract. */
+/**
+ * Reads an attached ERC-20's symbol and decimals from its contract, once per
+ * token and chain for the session: every gesture that attaches the same
+ * token, on any page of any ledger, shares the one read.
+ */
 function useErc20Meta(tokenAddr: string | undefined): Erc20Meta {
   const publicClient = usePublicClient();
-  const [meta, setMeta] = useState<Erc20Meta>({ status: 'pending' });
+  const query = useQuery({
+    queryKey: ['erc20Meta', publicClient?.chain?.id ?? null, tokenAddr?.toLowerCase() ?? null],
+    enabled: Boolean(tokenAddr && publicClient),
+    // A token's symbol and decimals never change.
+    staleTime: Number.POSITIVE_INFINITY,
+    gcTime: Number.POSITIVE_INFINITY,
+    retry: false,
+    queryFn: async () => {
+      if (!tokenAddr || !publicClient) throw new Error('No token to read');
+      const read = { address: tokenAddr as `0x${string}`, abi: ERC20_ABI } as const;
+      const [symbol, decimals] = await Promise.all([
+        publicClient.readContract({ ...read, functionName: 'symbol' }),
+        publicClient.readContract({ ...read, functionName: 'decimals' }),
+      ]);
+      const parsed = Number(decimals);
+      return { symbol: String(symbol), decimals: Number.isFinite(parsed) ? parsed : 18 };
+    },
+  });
 
-  useEffect(() => {
-    if (!tokenAddr || !publicClient) return;
-    let cancelled = false;
-    const read = { address: tokenAddr as `0x${string}`, abi: ERC20_ABI } as const;
-    Promise.all([
-      publicClient.readContract({ ...read, functionName: 'symbol' }),
-      publicClient.readContract({ ...read, functionName: 'decimals' }),
-    ])
-      .then(([symbol, decimals]) => {
-        if (cancelled) return;
-        const parsed = Number(decimals);
-        setMeta({
-          status: 'ready',
-          symbol: String(symbol),
-          decimals: Number.isFinite(parsed) ? parsed : 18,
-        });
-      })
-      .catch(() => {
-        // A missing or non-standard ERC-20 is shown by its address, with
-        // the amount read at the usual 18 decimals.
-        if (!cancelled) setMeta({ status: 'failed' });
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [tokenAddr, publicClient]);
-
-  // Without a client there is nothing to read: show the address instead.
-  return publicClient ? meta : { status: 'failed' };
+  // Without a client there is nothing to read, and a missing or
+  // non-standard ERC-20 is shown by its address, with the amount read at
+  // the usual 18 decimals.
+  if (!tokenAddr || !publicClient || query.isError) return { status: 'failed' };
+  return query.data ? { status: 'ready', ...query.data } : { status: 'pending' };
 }
 
 /** An attached ERC-20: its amount in the token's own decimals and its symbol, linked to the token. */
@@ -238,18 +236,10 @@ const GestureHistoryTable = ({
     [bannedGestures],
   );
 
-  // How long each gesture stayed the latest one: until the next gesture in
-  // the list (which is newest first). The newest holds until the cycle ends,
-  // or is still holding while it runs.
-  const holds = useMemo(() => {
-    const byId = new Map<number, number | null>();
-    gestureHistory.forEach((gesture, index) => {
-      const next = gestureHistory[index - 1];
-      const until = next ? next.TimeStamp : heldUntil;
-      byId.set(gesture.EvtLogId, until == null ? null : Math.max(0, until - gesture.TimeStamp));
-    });
-    return byId;
-  }, [gestureHistory, heldUntil]);
+  const holds = useMemo(
+    () => holdDurations(gestureHistory, heldUntil),
+    [gestureHistory, heldUntil],
+  );
 
   const columns = useMemo<DataTableColumn<GestureHistory>[]>(() => {
     const cost = (gesture: GestureHistory) =>
@@ -265,6 +255,8 @@ const GestureHistoryTable = ({
         value: (gesture) => gesture.TimeStamp,
         seconds: true,
         sortable: true,
+        // A phone record opens on when the gesture was made, with its method.
+        phone: 'title',
       },
       showParticipant && {
         id: 'participant',
@@ -369,6 +361,9 @@ const GestureHistoryTable = ({
       columns={phoneColumns}
       ariaLabel={t('gestureHistory.tableLabel')}
       getRowKey={(gesture) => gesture.EvtLogId}
+      // The list arrives newest first: the date header says so, and a first
+      // click turns it around.
+      initialSort={{ id: 'datetime', direction: 'desc' }}
       getRowHref={(gesture) => `/gesture/${gesture.EvtLogId}`}
       // The date names the link; the words after it say which gesture it
       // opens, by the number that page shows in its title.
@@ -378,10 +373,35 @@ const GestureHistoryTable = ({
           : ''
       }
       emptyTitle={t('empty.gestures')}
+      // Every row carries its date, participant and cycle as links: they
+      // underline on hover and focus only, leaving the figures to be read.
+      links="quiet"
       {...state}
     />
   );
 };
+
+/**
+ * How long each gesture stayed the latest one, by `EvtLogId`: until the next
+ * gesture of the list in time, whatever order the list arrives in. The
+ * newest holds until `heldUntil` (a finished cycle's end), or is still
+ * holding (`null`) while the cycle runs.
+ */
+export function holdDurations(
+  gestures: readonly Pick<GestureHistory, 'EvtLogId' | 'TimeStamp'>[],
+  heldUntil: number | null,
+): Map<number, number | null> {
+  const newestFirst = [...gestures].sort(
+    (a, b) => b.TimeStamp - a.TimeStamp || b.EvtLogId - a.EvtLogId,
+  );
+  const byId = new Map<number, number | null>();
+  newestFirst.forEach((gesture, index) => {
+    const next = newestFirst[index - 1];
+    const until = next ? next.TimeStamp : heldUntil;
+    byId.set(gesture.EvtLogId, until == null ? null : Math.max(0, until - gesture.TimeStamp));
+  });
+  return byId;
+}
 
 /**
  * On a phone a gesture reads as lines rather than a spec sheet: its method

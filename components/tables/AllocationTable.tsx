@@ -19,6 +19,11 @@ interface AllocationTableProps extends LedgerStateProps {
  * and NFTs. The ETH and NFT columns sit under one group heading each, so a
  * sub-header needs neither the unit nor the shared word and stays on one or
  * two lines. Each row leads to that cycle's allocation page.
+ *
+ * On a phone each cycle is a short record under its name: when it was
+ * finalized, the recipient, the Signature Allocation and the gestures. The
+ * per-track breakdown is the cycle page's to show, one tap away, so the
+ * index is not a stack of eleven-line forms.
  */
 export const AllocationTable = ({ list, ...state }: AllocationTableProps) => {
   const t = useTranslations('tables');
@@ -35,6 +40,7 @@ export const AllocationTable = ({ list, ...state }: AllocationTableProps) => {
         cell: (cycle) => t('allocation.cycle', { cycle: cycle.RoundNum }),
         nowrap: true,
         sortable: true,
+        phone: 'title',
       },
       {
         id: 'finalized',
@@ -72,6 +78,7 @@ export const AllocationTable = ({ list, ...state }: AllocationTableProps) => {
         value: (cycle) => toFiniteNumber(cycle.ChronoWarriorAmountEth),
         showUnit: false,
         hideWhenEmpty: true,
+        priority: 'secondary',
       },
       {
         id: 'stellar',
@@ -81,6 +88,7 @@ export const AllocationTable = ({ list, ...state }: AllocationTableProps) => {
         label: t('allocation.columns.stellarEth'),
         value: (cycle) => toFiniteNumber(cycle.RoundStats?.TotalRaffleEthDepositsEth),
         showUnit: false,
+        priority: 'secondary',
       },
       {
         id: 'anchor',
@@ -90,6 +98,7 @@ export const AllocationTable = ({ list, ...state }: AllocationTableProps) => {
         label: t('allocation.columns.anchorEth'),
         value: (cycle) => toFiniteNumber(cycle.StakingDepositAmountEth),
         showUnit: false,
+        priority: 'secondary',
       },
       {
         id: 'publicGoods',
@@ -99,6 +108,7 @@ export const AllocationTable = ({ list, ...state }: AllocationTableProps) => {
         label: t('allocation.columns.publicGoodsEth'),
         value: (cycle) => toFiniteNumber(cycle.CharityAmountETH),
         showUnit: false,
+        priority: 'secondary',
       },
       {
         id: 'gestures',
@@ -114,6 +124,7 @@ export const AllocationTable = ({ list, ...state }: AllocationTableProps) => {
         header: t('allocation.columns.attached'),
         label: t('allocation.columns.nftsAttached'),
         value: (cycle) => toFiniteNumber(cycle.RoundStats?.TotalDonatedNFTs),
+        priority: 'secondary',
       },
       {
         id: 'stellarNfts',
@@ -122,6 +133,7 @@ export const AllocationTable = ({ list, ...state }: AllocationTableProps) => {
         header: t('allocation.columns.stellar'),
         label: t('allocation.columns.nftsViaStellar'),
         value: (cycle) => toFiniteNumber(cycle.RoundStats?.TotalRaffleNFTs),
+        priority: 'secondary',
       },
     ];
   }, [t]);
@@ -135,6 +147,9 @@ export const AllocationTable = ({ list, ...state }: AllocationTableProps) => {
       getRowHref={(cycle) => `/allocation/${cycle.RoundNum}`}
       emptyTitle={t('empty.recipientCyclesTitle')}
       emptyDescription={t('empty.recipientCyclesDescription')}
+      // Each row carries three links (the cycle, its proof, the recipient)
+      // over columns of figures: they underline on hover and focus only.
+      links="quiet"
       tableClassName="md:min-w-[64rem]"
       {...state}
     />

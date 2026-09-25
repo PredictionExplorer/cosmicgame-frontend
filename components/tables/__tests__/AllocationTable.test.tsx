@@ -116,11 +116,38 @@ describe('AllocationTable', () => {
         'tables.allocation.columns.nftsViaStellar',
       ]),
     );
-    // Attached NFTs stay on a phone: the record has room for them.
-    const attached = container.querySelector(
-      'tbody td[data-label="tables.allocation.columns.nftsAttached"]',
-    );
-    expect(attached).toHaveAttribute('data-priority', 'primary');
+  });
+
+  // Regression: a phone showed every column as its own line, eleven per
+  // cycle, so the index read as a stack of forms.
+  it('keeps a phone record to the cycle and its essentials, the breakdown one tap away', () => {
+    const { container } = render(<AllocationTable list={[createAllocation()]} loading={false} />);
+    const cell = (label: string) =>
+      container.querySelector(`tbody tr:first-child td[data-label="${label}"]`);
+
+    // The cycle opens the record, unlabelled.
+    expect(cell('tables.columns.cycle')).toHaveAttribute('data-phone', 'title');
+    for (const label of [
+      'tables.allocation.columns.finalized',
+      'tables.columns.recipient',
+      'tables.allocation.columns.signatureEth',
+      'tables.allocation.gestures',
+    ]) {
+      expect(cell(label)).toHaveAttribute('data-priority', 'primary');
+    }
+    // The per-track breakdown is the cycle page's to show.
+    for (const label of [
+      'tables.allocation.columns.chronoEth',
+      'tables.allocation.columns.stellarEth',
+      'tables.allocation.columns.anchorEth',
+      'tables.allocation.columns.publicGoodsEth',
+      'tables.allocation.columns.nftsAttached',
+      'tables.allocation.columns.nftsViaStellar',
+    ]) {
+      expect(cell(label)).toHaveAttribute('data-priority', 'secondary');
+    }
+    // Three links a row: they underline on hover and focus only.
+    expect(screen.getByRole('table')).toHaveAttribute('data-links', 'quiet');
   });
 
   it('shows each track amount without a repeated unit, and counts grouped', () => {

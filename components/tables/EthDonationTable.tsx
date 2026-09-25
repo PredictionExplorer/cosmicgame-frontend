@@ -55,11 +55,13 @@ const EthDonationTable = ({
         kind: 'datetime',
         header: t('columns.datetime'),
         value: (row) => row.TimeStamp,
-        // The detail page carries the transaction link for rows that have one;
-        // a second link in the same cell would nest inside the row link.
-        txHash: (row) => (hasDetail(row) ? null : row.TxHash),
+        // A row with a detail page links its date there instead (DataTable
+        // drops a kind's own link inside the row link); the page carries
+        // the transaction.
+        txHash: (row) => row.TxHash,
         year: 'always',
         sortable: true,
+        phone: 'title',
       },
       showType && {
         id: 'note',
@@ -108,7 +110,7 @@ const EthDonationTable = ({
       },
     ];
     return all.filter((column): column is DataTableColumn<EthDonation> => Boolean(column));
-  }, [t, showType, showCycle, hasDetail]);
+  }, [t, showType, showCycle]);
 
   return (
     <DataTable

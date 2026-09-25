@@ -18,9 +18,15 @@ jest.mock('../../../../../hooks/useApiQuery', () => ({
 
 jest.mock('../../../../../components/tables/RecipientHistoryTable', () => ({
   __esModule: true,
-  default: ({ winningHistory, loading }: { winningHistory: unknown[]; loading?: boolean }) => (
+  default: ({
+    allocationRecords,
+    loading,
+  }: {
+    allocationRecords: unknown[];
+    loading?: boolean;
+  }) => (
     <div data-testid="history-table" data-loading={loading ? 'true' : undefined}>
-      rows: {winningHistory.length}
+      rows: {allocationRecords.length}
     </div>
   ),
 }));

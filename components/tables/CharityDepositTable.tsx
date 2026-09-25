@@ -17,6 +17,13 @@ export interface PublicGoodsContributionEntry {
 
 interface CharityDepositTableProps extends LedgerStateProps {
   list: PublicGoodsContributionEntry[];
+  /**
+   * Show who contributed. The protocol's own ledger hides it: every row
+   * there is the protocol forwarding a cycle's share, which the section
+   * already says, and a column repeating it adds a line to every phone
+   * record. Default `true`.
+   */
+  showContributor?: boolean;
 }
 
 /**
@@ -24,11 +31,15 @@ interface CharityDepositTableProps extends LedgerStateProps {
  * transaction, and the protocol's own contract reads by name. Voluntary
  * contributions carry no cycle, so that column appears only when a row has one.
  */
-export const CharityDepositTable = ({ list, ...state }: CharityDepositTableProps) => {
+export const CharityDepositTable = ({
+  list,
+  showContributor = true,
+  ...state
+}: CharityDepositTableProps) => {
   const t = useTranslations('tables');
 
-  const columns = useMemo<DataTableColumn<PublicGoodsContributionEntry>[]>(
-    () => [
+  const columns = useMemo<DataTableColumn<PublicGoodsContributionEntry>[]>(() => {
+    const all: (DataTableColumn<PublicGoodsContributionEntry> | false)[] = [
       {
         id: 'datetime',
         kind: 'datetime',
@@ -37,6 +48,7 @@ export const CharityDepositTable = ({ list, ...state }: CharityDepositTableProps
         txHash: (row) => row.TxHash,
         year: 'always',
         sortable: true,
+        phone: 'title',
       },
       {
         id: 'cycle',
@@ -46,24 +58,26 @@ export const CharityDepositTable = ({ list, ...state }: CharityDepositTableProps
         href: (row) => (row.RoundNum >= 0 ? `/allocation/${row.RoundNum}` : null),
         hideWhenEmpty: true,
       },
-      {
+      showContributor && {
         id: 'contributor',
         kind: 'address',
-        header: t('columns.contributorAddress'),
-        label: t('columns.contributor'),
+        // The header names who, not the form: a protocol contract reads by name.
+        header: t('columns.contributor'),
         value: (row) => row.DonorAddr,
       },
       {
         id: 'amount',
         kind: 'amount',
-        header: t('columns.contributionAmountEth'),
+        header: t('columns.amountEth'),
         value: (row) => row.AmountEth,
         showUnit: false,
         sortable: true,
       },
-    ],
-    [t],
-  );
+    ];
+    return all.filter((column): column is DataTableColumn<PublicGoodsContributionEntry> =>
+      Boolean(column),
+    );
+  }, [t, showContributor]);
 
   return (
     <DataTable

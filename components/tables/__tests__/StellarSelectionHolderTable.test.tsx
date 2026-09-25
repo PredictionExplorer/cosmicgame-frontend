@@ -45,8 +45,8 @@ describe('StellarSelectionHolderTable', () => {
     render(
       <StellarSelectionHolderTable
         list={[createGesture()]}
-        numRaffleEthWinner={3}
-        numRaffleNFTWinner={10}
+        stellarEthSelections={3}
+        stellarNftSelections={10}
       />,
     );
     const headers = screen.getAllByRole('columnheader').map((header) => header.textContent);
@@ -67,7 +67,11 @@ describe('StellarSelectionHolderTable', () => {
       createGesture({ BidderAddr: '0x' + '2'.repeat(40) }),
     ];
     render(
-      <StellarSelectionHolderTable list={list} numRaffleEthWinner={3} numRaffleNFTWinner={10} />,
+      <StellarSelectionHolderTable
+        list={list}
+        stellarEthSelections={3}
+        stellarNftSelections={10}
+      />,
     );
     // 3 of 4 gestures is 75% of the pool (compounded over 10 draws it would
     // read 100.0%); 1 of 4 is 25%.
@@ -80,8 +84,8 @@ describe('StellarSelectionHolderTable', () => {
     render(
       <StellarSelectionHolderTable
         list={[createGesture()]}
-        numRaffleEthWinner={3}
-        numRaffleNFTWinner={10}
+        stellarEthSelections={3}
+        stellarNftSelections={10}
       />,
     );
     expect(screen.getByText('tables.stellarSelection.draws(eth=3,nft=10)')).toBeInTheDocument();
@@ -95,7 +99,7 @@ describe('StellarSelectionHolderTable', () => {
       createGesture({ BidderAddr: '0x' + 'A'.repeat(40) }),
     ];
     const { container } = render(
-      <StellarSelectionHolderTable list={list} numRaffleEthWinner={1} numRaffleNFTWinner={1} />,
+      <StellarSelectionHolderTable list={list} stellarEthSelections={1} stellarNftSelections={1} />,
     );
     const rows = container.querySelectorAll('tbody tr');
     expect(rows[0]).not.toHaveAttribute('data-current');
@@ -111,7 +115,7 @@ describe('StellarSelectionHolderTable', () => {
       createGesture({ BidderAddr: '0x' + '1'.repeat(40) }),
     ];
     render(
-      <StellarSelectionHolderTable list={list} numRaffleEthWinner={1} numRaffleNFTWinner={1} />,
+      <StellarSelectionHolderTable list={list} stellarEthSelections={1} stellarNftSelections={1} />,
     );
     expect(screen.getAllByText('3').length).toBeGreaterThanOrEqual(1);
   });

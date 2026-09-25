@@ -60,6 +60,7 @@ const EnduranceChampionsTable = ({
         header: t('columns.userAddress'),
         label: t('columns.participant'),
         value: (row) => row.participant,
+        phone: 'title',
         cell: (row) => (
           <span className="inline-flex max-w-full flex-wrap items-center gap-x-2 gap-y-1">
             <AddressChip address={row.participant} variant="plain" showCopy={false} />
@@ -90,7 +91,9 @@ const EnduranceChampionsTable = ({
       data={championList ?? []}
       columns={columns}
       ariaLabel={t('names.enduranceChampions')}
-      getRowKey={(row, index) => `${row.participant}-${index}`}
+      // One entry per participant: the address is the row's stable identity
+      // (a key with the row's position remounted every row on each sort).
+      getRowKey={(row) => row.participant.toLowerCase()}
       initialSort={{ id: 'championTime', direction: 'desc' }}
       // Two durations ("9d 1h 36m 4s") beside an address do not fit a phone
       // row: each participant reads as a record.

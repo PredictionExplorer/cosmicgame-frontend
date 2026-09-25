@@ -24,6 +24,7 @@ export const UniqueEthDonorsTable = ({ list, ...state }: UniqueEthDonorsTablePro
         kind: 'address',
         header: t('columns.contributor'),
         value: (row) => row.DonorAddr,
+        phone: 'title',
       },
       {
         id: 'contributions',
