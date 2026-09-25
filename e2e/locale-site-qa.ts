@@ -197,11 +197,17 @@ async function expectLocaleTypography(
     const visible = (element: HTMLElement) =>
       element.offsetParent !== null && script.test(element.innerText);
     const headings = [...document.querySelectorAll<HTMLElement>('h1, h2, h3')].filter(visible);
+    // An element set in a display style itself: a class token such as
+    // `type-display-sm` or `sm:type-heading-1`, not a wrapper whose
+    // `[&_h1]:type-heading-1` styles a descendant (the wrapper is body text).
+    const displayClass = /^(?:[a-z0-9-]+:)*type-(?:display|heading-[12])(?![\w-])/;
     const displayElements = [
       ...document.querySelectorAll<HTMLElement>(
         '[class*="type-display"], [class*="type-heading-1"], [class*="type-heading-2"]',
       ),
-    ].filter(visible);
+    ]
+      .filter((element) => [...element.classList].some((token) => displayClass.test(token)))
+      .filter(visible);
     // The leading family of each stack is what actually renders the text.
     const leadingFamily = (element: HTMLElement) =>
       getComputedStyle(element).fontFamily.split(',')[0]?.trim() ?? '';
