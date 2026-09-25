@@ -1,6 +1,7 @@
 import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 
+import { getAboutContent } from '@/content/about';
 import { getAllFaqItems, getFaqContent } from '@/content/faq';
 import { getHowItWorksContent } from '@/content/how-it-works';
 import { getLandingContent } from '@/content/landing';
@@ -14,6 +15,7 @@ import {
 } from '@/content/legal';
 import { protocolFacts } from '@/content/protocol-facts';
 import { getQuizContent } from '@/content/quiz';
+import { getWhitePaperContent } from '@/content/white-paper';
 import { DURATION_NOUNS, type DurationNouns } from '@/test-utils/locale-expectations';
 
 import { getLocaleConfig } from '@/i18n/localeConfig';
@@ -83,6 +85,10 @@ const sources: CopySource[] = [
     { name: `privacy-${locale}`, locale, text: JSON.stringify(getPrivacyCopy(locale)) },
     { name: `audits-${locale}`, locale, text: JSON.stringify(getAuditsCopy(locale)) },
     { name: `security-${locale}`, locale, text: JSON.stringify(getSecurityCopy(locale)) },
+    // The white paper states more percentages, durations and CST amounts than
+    // any other page, and About carries the Public Goods template.
+    { name: `white-paper-${locale}`, locale, text: JSON.stringify(getWhitePaperContent(locale)) },
+    { name: `about-${locale}`, locale, text: JSON.stringify(getAboutContent(locale)) },
   ]),
   { name: 'llms.txt', text: readPublicFile('llms.txt') },
   { name: 'llms-full.txt', text: readPublicFile('llms-full.txt') },
