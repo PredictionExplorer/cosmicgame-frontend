@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, type ReactNode } from 'react';
+import { useId, useRef, type ReactNode } from 'react';
 import type { CountdownRenderProps } from 'react-countdown';
 import { ArrowRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -111,6 +111,9 @@ export function ActionDock({
   const t = useTranslations('home');
   const stageLabel = useTxStageLabel();
   const describedById = useId();
+  // Keyboard focus never lands under the dock, on any page that mounts it.
+  const dockRef = useRef<HTMLDivElement>(null);
+  useFocusClearOfDock(dockRef);
 
   const cycleState = getCycleState({
     data,
@@ -130,7 +133,6 @@ export function ActionDock({
   const reserveEth = toFiniteNumber(data?.PrizeAmountEth ?? data?.CurPrizeAmountEth);
   const isHolder = sameAddress(account, data?.LastBidderAddr);
   const rendered = !loading && isRoundActive;
-  useFocusClearOfDock(rendered && stepAside !== true);
 
   if (!rendered) return null;
 
@@ -175,6 +177,7 @@ export function ActionDock({
 
   return (
     <div
+      ref={dockRef}
       data-action-dock
       data-state={hidden ? 'aside' : hiddenFromLg ? 'unmeasured' : 'shown'}
       className={cn(

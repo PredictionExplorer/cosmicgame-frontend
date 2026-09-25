@@ -219,6 +219,31 @@ describe('ActionDock', () => {
     expect(screen.getByTestId('dock-open-sheet')).toBeInTheDocument();
   });
 
+  it('lifts a keyboard-focused control of the page out from under itself', () => {
+    // The dock carries the fix itself, so every page that mounts it gets it
+    // (WCAG 2.4.11): a control already in the viewport but under the dock
+    // receives focus without the browser scrolling.
+    const scrollBy = jest.spyOn(window, 'scrollBy').mockImplementation(() => undefined);
+    render(
+      <>
+        <a href="/allocation/6">standings link</a>
+        <ActionDock {...baseProps} />
+      </>,
+    );
+    const layer = document.querySelector<HTMLElement>('[data-action-dock]')!;
+    const link = screen.getByRole('link', { name: 'standings link' });
+    const rect = (top: number, bottom: number) =>
+      ({ top, bottom, height: bottom - top, left: 0, right: 390, width: 390 }) as DOMRect;
+    jest.spyOn(layer, 'getBoundingClientRect').mockReturnValue(rect(763, 827));
+    jest.spyOn(link, 'getBoundingClientRect').mockReturnValue(rect(790, 814));
+    jest.spyOn(link, 'matches').mockImplementation((selector) => selector === ':focus-visible');
+
+    link.focus();
+
+    expect(scrollBy).toHaveBeenCalledWith({ top: 814 + 12 - 763, behavior: 'instant' });
+    scrollBy.mockRestore();
+  });
+
   it('renders nothing between cycles', () => {
     const { container } = render(
       <ActionDock {...baseProps} activationTime={Math.floor(NOW / 1000) + 3600} />,
