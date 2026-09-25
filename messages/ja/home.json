@@ -612,12 +612,6 @@
       "calendarTitle": "Cosmic Signatureサイクル{number}が始まります",
       "calendarBody": "次のパフォーマンス・サイクルで一筆を入れられるようになります。最初の一筆が確定までの時計を動かします。",
       "calendarCta": "開始をカレンダーに追加",
-      "unitLabels": {
-        "days": "日",
-        "hours": "時間",
-        "minutes": "分",
-        "seconds": "秒"
-      },
       "state": {
         "ready": "確定できます",
         "confirming": "確認中"

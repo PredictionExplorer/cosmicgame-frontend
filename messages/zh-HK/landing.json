@@ -46,12 +46,6 @@
     "liveClock": "即時週期時鐘",
     "cycleClock": "週期時鐘",
     "gestureCount": "{count, number} 次落筆",
-    "units": {
-      "days": "天",
-      "hours": "小時",
-      "minutes": "分",
-      "seconds": "秒"
-    },
     "duration": {
       "days": "{count, plural, other {# 天}}",
       "hours": "{count, plural, other {# 小時}}",

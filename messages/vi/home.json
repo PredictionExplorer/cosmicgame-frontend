@@ -612,12 +612,6 @@
       "calendarTitle": "Chu kỳ Cosmic Signature #{number} mở",
       "calendarBody": "Chu kỳ trình diễn tiếp theo mở cho nét bút. Nét bút đầu tiên khởi động đếm ngược hoàn tất.",
       "calendarCta": "Thêm thời điểm mở vào lịch của bạn",
-      "unitLabels": {
-        "days": "ngày",
-        "hours": "giờ",
-        "minutes": "phút",
-        "seconds": "giây"
-      },
       "state": {
         "ready": "Sẵn sàng hoàn tất",
         "confirming": "Đang xác nhận"

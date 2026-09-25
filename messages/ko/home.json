@@ -612,12 +612,6 @@
       "calendarTitle": "Cosmic Signature 사이클 {number} 시작",
       "calendarBody": "다음 퍼포먼스 사이클이 제스처를 받기 시작합니다. 첫 제스처가 마감 카운트다운을 시작합니다.",
       "calendarCta": "시작 시각을 캘린더에 추가",
-      "unitLabels": {
-        "days": "일",
-        "hours": "시간",
-        "minutes": "분",
-        "seconds": "초"
-      },
       "state": {
         "ready": "마감 준비 완료",
         "confirming": "확인 중"

@@ -1,10 +1,4 @@
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
-
 import { act, render, screen, waitFor } from '@testing-library/react';
-import { parse, TYPE } from '@formatjs/icu-messageformat-parser';
-
-import { routing } from '@/i18n/routing';
 
 import {
   fetchLandingCurrentTimeSec,
@@ -71,7 +65,7 @@ describe('<EventHorizonCountdown />', () => {
   it('shows the live Cycle Finalization Time as type, with the gesture count', async () => {
     render(<EventHorizonCountdown />);
 
-    await waitFor(() => expect(clockValues()).toEqual(['00', '02', '01', '05']));
+    await waitFor(() => expect(clockValues()).toEqual(['02', '01', '05']));
     expect(
       screen.getByRole('heading', { name: /landing\.timer\.phases\.approach\.title/ }),
     ).toBeInTheDocument();
@@ -89,7 +83,7 @@ describe('<EventHorizonCountdown />', () => {
     jest.useFakeTimers({ doNotFake: ['Date'] });
     render(<EventHorizonCountdown />);
 
-    await waitFor(() => expect(clockValues()).toEqual(['00', '02', '01', '05']));
+    await waitFor(() => expect(clockValues()).toEqual(['02', '01', '05']));
     const timer = screen.getByRole('timer');
     expect(timer).toHaveAttribute('aria-live', 'off');
     expect(screen.getByTestId('countdown-units')).toHaveAttribute('aria-hidden', 'true');
@@ -100,14 +94,14 @@ describe('<EventHorizonCountdown />', () => {
       jest.advanceTimersByTime(1_000);
     });
 
-    expect(clockValues()).toEqual(['00', '02', '01', '04']);
+    expect(clockValues()).toEqual(['02', '01', '04']);
     expect(timer).toHaveAccessibleName(/landing\.timer\.duration\.seconds\(count=4\)/);
   });
 
   it('never discards its last good reading when a poll fails', async () => {
     jest.useFakeTimers({ doNotFake: ['Date'] });
     render(<EventHorizonCountdown />);
-    await waitFor(() => expect(clockValues()).toEqual(['00', '02', '01', '05']));
+    await waitFor(() => expect(clockValues()).toEqual(['02', '01', '05']));
 
     // The next poll loses every read.
     mockFetchFinalization.mockResolvedValue(null);
@@ -122,7 +116,7 @@ describe('<EventHorizonCountdown />', () => {
       expect(screen.getByTestId('event-horizon-countdown')).toHaveAttribute('data-fresh', 'false'),
     );
     // Still counting from the last reading, and saying the reading is not fresh.
-    expect(clockValues()).toEqual(['00', '02', '00', '53']);
+    expect(clockValues()).toEqual(['02', '00', '53']);
     expect(
       screen.getByRole('heading', { name: /landing\.timer\.phases\.approach\.title/ }),
     ).toBeInTheDocument();
@@ -197,13 +191,13 @@ describe('<EventHorizonCountdown />', () => {
   it('captions each figure with its fixed unit label, as the app clock does', async () => {
     render(<EventHorizonCountdown />);
 
-    await waitFor(() => expect(clockValues()).toEqual(['00', '02', '01', '05']));
+    await waitFor(() => expect(clockValues()).toEqual(['02', '01', '05']));
     const units = screen.getByTestId('countdown-units');
     // A column label, never pluralized for the value: it does not change
     // word or width as the digits tick (the timer's name spells them out).
-    expect(units).toHaveTextContent('landing.timer.units.hours');
-    expect(units).toHaveTextContent('landing.timer.units.minutes');
-    expect(units).toHaveTextContent('landing.timer.units.seconds');
+    expect(units).toHaveTextContent('hours');
+    expect(units).toHaveTextContent('minutes');
+    expect(units).toHaveTextContent('seconds');
     expect(units.textContent).not.toMatch(/count=/);
   });
 
@@ -223,35 +217,5 @@ describe('<EventHorizonCountdown />', () => {
   it('calls itself live only once the page runs', async () => {
     render(<EventHorizonCountdown />);
     await waitFor(() => expect(screen.getByText('landing.timer.liveClock')).toBeInTheDocument());
-  });
-});
-
-describe('landing clock unit captions', () => {
-  const read = (locale: string, namespace: string) =>
-    JSON.parse(
-      readFileSync(resolve(process.cwd(), 'messages', locale, `${namespace}.json`), 'utf8'),
-    ) as Record<string, Record<string, unknown>>;
-  const units = ['days', 'hours', 'minutes', 'seconds'] as const;
-  const landingUnits = (locale: string) =>
-    (read(locale, 'landing').timer as { units: Record<string, string> }).units;
-
-  it.each(routing.locales)(
-    '%s shares the app clock captions, so the hosts cannot drift',
-    (locale) => {
-      const home = (
-        read(locale, 'home').observatory as { clock: { unitLabels: Record<string, string> } }
-      ).clock.unitLabels;
-      expect(landingUnits(locale)).toEqual(home);
-    },
-  );
-
-  it.each(routing.locales)('%s captions each unit with one fixed word', (locale) => {
-    for (const unit of units) {
-      const [element, ...rest] = parse(landingUnits(locale)[unit]!);
-      // Plain text: a plural caption would flip word and width as a group
-      // passes 1 ("01 hour" beside "02 hours").
-      expect(rest).toEqual([]);
-      expect(element?.type).toBe(TYPE.literal);
-    }
   });
 });

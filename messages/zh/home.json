@@ -612,12 +612,6 @@
       "calendarTitle": "Cosmic Signature 第 {number} 个周期开启",
       "calendarBody": "下一演绎周期即将开放落笔。第一笔会启动收官倒计时。",
       "calendarCta": "把开启时间加入日历",
-      "unitLabels": {
-        "days": "天",
-        "hours": "小时",
-        "minutes": "分",
-        "seconds": "秒"
-      },
       "state": {
         "ready": "已可收官",
         "confirming": "确认中"

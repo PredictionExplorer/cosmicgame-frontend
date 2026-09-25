@@ -46,12 +46,6 @@
     "liveClock": "Đồng hồ chu kỳ trực tiếp",
     "cycleClock": "Đồng hồ chu kỳ",
     "gestureCount": "{count, plural, other {# nét bút}}",
-    "units": {
-      "days": "ngày",
-      "hours": "giờ",
-      "minutes": "phút",
-      "seconds": "giây"
-    },
     "duration": {
       "days": "{count, plural, other {# ngày}}",
       "hours": "{count, plural, other {# giờ}}",

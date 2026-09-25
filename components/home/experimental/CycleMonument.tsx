@@ -1,11 +1,13 @@
 'use client';
 
 import { useId, type ReactNode } from 'react';
-import type { CountdownRenderProps } from 'react-countdown';
 import { CalendarPlus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
-import { SmoothCountdown } from '@/components/common/SmoothCountdown';
+import {
+  SmoothCountdown,
+  type LocalizedCountdownRenderProps,
+} from '@/components/common/SmoothCountdown';
 import { Amount } from '@/components/ui/amount';
 import { Badge } from '@/components/ui/badge';
 import { ExplainedTerm } from '@/components/ui/explain-popover';
@@ -65,7 +67,9 @@ function ClockFigures({
   minutes,
   seconds,
   dayUnit,
-}: Pick<CountdownRenderProps, 'days' | 'hours' | 'minutes' | 'seconds'> & { dayUnit: string }) {
+}: Pick<LocalizedCountdownRenderProps, 'days' | 'hours' | 'minutes' | 'seconds'> & {
+  dayUnit: string;
+}) {
   return (
     <span className="inline-flex flex-wrap items-baseline gap-x-[0.3em] whitespace-nowrap type-figure-xl text-foreground">
       {days > 0 ? (
@@ -135,7 +139,7 @@ export function CycleMonument({
     attachedERC20Count,
   );
 
-  const renderClock = ({ days, hours, minutes, seconds }: CountdownRenderProps) => (
+  const renderClock = ({ days, hours, minutes, seconds }: LocalizedCountdownRenderProps) => (
     <ClockFigures days={days} hours={hours} minutes={minutes} seconds={seconds} dayUnit={dayUnit} />
   );
 

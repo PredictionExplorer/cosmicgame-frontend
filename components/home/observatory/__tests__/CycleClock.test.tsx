@@ -60,29 +60,26 @@ describe('CycleClock', () => {
     expect(within(clock).getByRole('timer')).toBeInTheDocument();
 
     // Days, hours, minutes and seconds: two digits each, a fixed caption each
-    // that never changes word or width as the digits tick.
+    // (the one clock catalog the landing shares) that never changes word or
+    // width as the digits tick.
     const figures = screen.getByTestId('clock-figures');
     expect(within(figures).getByText('02')).toBeInTheDocument();
-    expect(within(figures).getByText('home.observatory.clock.unitLabels.days')).toBeInTheDocument();
-    expect(
-      within(figures).getByText('home.observatory.clock.unitLabels.seconds'),
-    ).toBeInTheDocument();
+    expect(within(figures).getByText('days')).toBeInTheDocument();
+    expect(within(figures).getByText('seconds')).toBeInTheDocument();
     expect(figures.textContent).not.toMatch(/count=/);
     // No tiles, ring or glow behind the figures.
     expect(figures.innerHTML).not.toMatch(/rounded-full|blur|animate-/);
-    // Regression: tailwind-merge dropped leading-none when the size class
-    // followed it, so the digits set at 1.5 line height and row 1 outgrew
-    // the 1280x720 first viewport.
-    expect(figures).toHaveClass('leading-none');
+    // The shared figure tier sets the digits solid (line-height 1), so row 1
+    // never outgrows the 1280x720 first viewport.
+    expect(figures).toHaveClass('type-figure-xl');
+    expect(figures).toHaveAttribute('data-size', 'desk');
   });
 
   it('drops the day group, not the figure size, once less than a day remains', () => {
     render(<CycleClock {...baseProps} allocationTime={Date.now() + 5 * 60_000} />);
     const figures = screen.getByTestId('clock-figures');
-    expect(within(figures).queryByText(/unitLabels\.days/)).not.toBeInTheDocument();
-    expect(
-      within(figures).getByText('home.observatory.clock.unitLabels.hours'),
-    ).toBeInTheDocument();
+    expect(within(figures).queryByText('days')).not.toBeInTheDocument();
+    expect(within(figures).getByText('hours')).toBeInTheDocument();
   });
 
   it('ships a tick script after the figures in the server HTML, so the clock never sits frozen', () => {

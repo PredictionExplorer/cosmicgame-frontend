@@ -1,11 +1,11 @@
 'use client';
 
 import { useId, type ReactNode } from 'react';
-import type { CountdownRenderProps } from 'react-countdown';
 import { ArrowRight } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { SmoothCountdown } from '@/components/common/SmoothCountdown';
+import { CountdownFigures, countdownGroups } from '@/components/ui/countdown-figures';
 import { Amount } from '@/components/ui/amount';
 import { Button } from '@/components/ui/button';
 import { Duration } from '@/components/ui/duration';
@@ -55,16 +55,6 @@ export interface ActionDockProps {
   className?: string;
 }
 
-function renderDockClock({ total }: CountdownRenderProps) {
-  return (
-    <Duration
-      seconds={Math.ceil(total / 1000)}
-      variant="clock"
-      className="type-figure-sm text-foreground"
-    />
-  );
-}
-
 /**
  * The one persistent quick action: a single glass line with the clock, the
  * Signature Allocation (or the wallet's own position when it changes) and one
@@ -97,6 +87,7 @@ export function ActionDock({
   className,
 }: ActionDockProps) {
   const t = useTranslations('home');
+  const locale = useLocale();
   const stageLabel = useTxStageLabel();
   const describedById = useId();
 
@@ -185,7 +176,21 @@ export function ActionDock({
               <SmoothCountdown
                 date={targetMs}
                 initialNowMs={now}
-                renderer={renderDockClock}
+                renderer={(parts) => (
+                  // The Cycle clock's one-line form: the same padded,
+                  // colon-separated groups as the clock above it, so the two
+                  // never show one number in two shapes. The figures are
+                  // decorative; the spelled-out time is for screen readers.
+                  <>
+                    <CountdownFigures
+                      groups={countdownGroups(parts, locale)}
+                      size="inline"
+                      align="start"
+                      data-testid="dock-clock"
+                    />
+                    <Duration seconds={Math.ceil(parts.total / 1000)} className="sr-only" />
+                  </>
+                )}
                 intervalMs={1000}
               />
             </span>

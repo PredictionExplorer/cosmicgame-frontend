@@ -341,7 +341,7 @@ migration:
 | `formatSeconds` → `1d 2h 30m 45s`                                | Locale unit map; zh: `3天5小时12分45秒` (compact contexts), see style guide §5         |
 | `formatEthValue`/`formatCSTValue` unit suffixes                  | Units stay `ETH`/`CST` in all locales (glossary: keep-in-English)                      |
 | `components/ui/date-picker.tsx` weekday labels `Su…Sa`           | zh: `日 一 二 三 四 五 六`; week starts Monday for zh                                  |
-| `react-countdown` renderers                                      | Localized unit labels via `formats.json`                                               |
+| Cycle clock unit captions                                        | One typed catalog, `clockUnitLabels` (`utils/format/durations.ts`), on both hosts      |
 
 That migration kept English output byte-identical. The formatting layer (§4.1) then
 changed English on purpose, to one standard for every locale: a number and its unit

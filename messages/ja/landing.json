@@ -46,12 +46,6 @@
     "liveClock": "ライブのサイクル時計",
     "cycleClock": "サイクルの時計",
     "gestureCount": "{count, plural, other {#筆}}",
-    "units": {
-      "days": "日",
-      "hours": "時間",
-      "minutes": "分",
-      "seconds": "秒"
-    },
     "duration": {
       "days": "{count, plural, other {#日}}",
       "hours": "{count, plural, other {#時間}}",

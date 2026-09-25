@@ -612,12 +612,6 @@
       "calendarTitle": "Cosmic Signature Cycle #{number} opens",
       "calendarBody": "The next Performance Cycle opens for gestures. The first gesture starts the finalization clock.",
       "calendarCta": "Add the opening to your calendar",
-      "unitLabels": {
-        "days": "days",
-        "hours": "hours",
-        "minutes": "minutes",
-        "seconds": "seconds"
-      },
       "state": {
         "ready": "Ready to finalize",
         "confirming": "Confirming"

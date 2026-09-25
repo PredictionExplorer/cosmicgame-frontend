@@ -71,7 +71,7 @@ describe('SmoothCountdown', () => {
     expect(screen.getByTestId('tenths')).toHaveTextContent('12.9');
   });
 
-  it("hands the renderer the locale's unit words", () => {
+  it("hands the renderer the Cycle clock's unit captions in the locale", () => {
     render(
       <SmoothCountdown
         date={90_000}
@@ -79,9 +79,30 @@ describe('SmoothCountdown', () => {
       />,
     );
 
-    expect(
-      screen.getByText('formats.countdown.minutes formats.countdown.seconds'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('minutes seconds')).toBeInTheDocument();
+  });
+
+  it('hands the renderer only the parts: no stand-ins for a library it never ran', () => {
+    const received: Record<string, unknown>[] = [];
+    render(
+      <SmoothCountdown
+        date={90_000}
+        renderer={(props) => {
+          received.push(props as unknown as Record<string, unknown>);
+          return null;
+        }}
+      />,
+    );
+    expect(Object.keys(received[0]!).sort()).toEqual([
+      'completed',
+      'days',
+      'hours',
+      'milliseconds',
+      'minutes',
+      'seconds',
+      'total',
+      'unitLabels',
+    ]);
   });
 
   it('renders an epoch deadline against the serialized clock before hydration', () => {
