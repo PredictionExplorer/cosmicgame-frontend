@@ -149,6 +149,13 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
+    // A Signature's files are named by its seed, so their pixels never
+    // change: keep the optimizer's 1200 and 1920px renditions of the art (the
+    // detail page's LCP image among them) for a month instead of re-encoding
+    // them from the 3456px original every 4 hours, the default. The only
+    // other optimized inputs are static files in public/, which take a new
+    // name when their content changes.
+    minimumCacheTTL: 2_678_400,
     remotePatterns: [
       // Rotated API origins (the media servers actually used by the app).
       ...apiOriginRemotePatterns(),
@@ -199,6 +206,18 @@ const nextConfig: NextConfig = {
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
           { key: 'Cross-Origin-Opener-Policy', value: 'unsafe-none' },
+        ],
+      },
+      {
+        // Static images in public/ (brand marks, landing and learn figures):
+        // a day in the browser, then served from cache while it revalidates.
+        // Their names carry no hash, so this stays short of immutable.
+        source: '/images/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400, stale-while-revalidate=604800',
+          },
         ],
       },
     ];
