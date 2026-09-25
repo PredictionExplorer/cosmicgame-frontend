@@ -4,6 +4,8 @@ import { ArrowRight, ArrowUpRight, Link2Off, SearchX } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
+import { cn } from '@/lib/utils';
+import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import { formatAddress, formatCount } from '@/utils/format';
 import { useDonationsWithInfoById } from '@/hooks/useApiQuery';
 import { parseContributionNote } from '@/components/contributions/contributionNote';
@@ -207,7 +209,11 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
         <SectionHeader headingId="contribution-record" title={t('recordTitle')} />
         <dl className="divide-y divide-rule-faint border-y border-rule-faint">
           <RecordRow label={t('transactionLabel')}>
-            <TxProofLink hash={data.TxHash} className="type-hash">
+            {/* A flex item in the row, so it is measured as a control: 24px tall (WCAG 2.5.8). */}
+            <TxProofLink
+              hash={data.TxHash}
+              className={cn('type-hash', TOUCH_TARGET_TEXT_LINK_CLASS)}
+            >
               {formatAddress(data.TxHash)}
             </TxProofLink>
           </RecordRow>
