@@ -161,6 +161,8 @@ describe('useTxFlow — lifecycle', () => {
     expect(mockSendTransaction).toHaveBeenCalledWith(mockConfig, {
       to: PUBLIC_GOODS_VAULT,
       value: 5n,
+      // Pinned to the account the flow started with, like every write.
+      account: '0xUser',
       chainId: APP_CHAIN,
     });
     expect(mockWriteContract).not.toHaveBeenCalled();

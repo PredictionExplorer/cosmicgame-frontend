@@ -104,7 +104,6 @@
     },
     "nft": {
       "contractUnavailable": "Адреса контракту Cosmic Signature NFT ще недоступна.",
-      "selectOne": "Виберіть принаймні один NFT, доступний для передачі.",
       "confirmed": "{count, plural, one {Передачу NFT підтверджено.} few {# передачі NFT підтверджено.} many {# передач NFT підтверджено.} other {# передачі NFT підтверджено.}}",
       "detailTransferConfirmed": "Передачу NFT підтверджено.",
       "failedToken": "NFT {tokenId} не надіслано. Перевірте гаманець і спробуйте ще раз.",

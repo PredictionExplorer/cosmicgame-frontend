@@ -1,7 +1,11 @@
 import { LEARN_STRUCTURE } from '@/content/learn/structure';
 import { QUIZ_TIER_IDS } from '@/content/quiz/types';
 
-import { parseCanonicalNonNegativeSafeInteger, parseTokenId } from '@/utils/routeParams';
+import {
+  parseCanonicalNonNegativeSafeInteger,
+  parseGestureId,
+  parseTokenId,
+} from '@/utils/routeParams';
 
 const LEARN_SLUGS: ReadonlySet<string> = new Set(
   LEARN_STRUCTURE.articles.map((article) => article.slug),
@@ -16,6 +20,7 @@ const QUIZ_TIERS: ReadonlySet<string> = new Set(QUIZ_TIER_IDS);
  */
 const PARAM_ROUTES: readonly { prefix: string; serves: (param: string) => boolean }[] = [
   { prefix: '/detail', serves: (id) => parseTokenId(id) !== null },
+  { prefix: '/gesture', serves: (id) => parseGestureId(id) !== null },
   { prefix: '/allocation', serves: (id) => parseCanonicalNonNegativeSafeInteger(id) !== null },
   {
     prefix: '/embed/endurance',

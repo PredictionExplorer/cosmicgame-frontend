@@ -184,10 +184,8 @@
       "floorEstimate": "Мінімальна ціна ~{price} {currency}",
       "floorTooltip": "Оцінка мінімальної ціни колекції, а не вартості саме цього токена.",
       "metadataUnavailable": "Метадані недоступні. Долучений NFT усе одно є частиною розподілу цього циклу.",
-      "openSea": "OpenSea",
       "explorer": "Оглядач",
       "links": {
-        "project": "Переглянути NFT",
         "opensea": "Переглянути на OpenSea",
         "explorer": "Переглянути контракт"
       }

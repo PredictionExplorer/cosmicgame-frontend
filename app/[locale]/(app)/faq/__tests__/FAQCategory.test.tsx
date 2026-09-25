@@ -294,7 +294,8 @@ describe('FAQCategorySection', () => {
     const writeText = jest.fn();
     Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
     renderFAQCategory({ expandedItems: ['q1'] });
-    const button = () => screen.getAllByRole('button', { name: 'Copy link to this question' })[0]!;
+    const button = () =>
+      screen.getByRole('button', { name: 'Copy link to “What is a Calibration Window?”' });
 
     writeText.mockRejectedValueOnce(new Error('denied'));
     const execCommand = jest.fn().mockReturnValue(false);

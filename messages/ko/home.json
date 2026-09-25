@@ -682,16 +682,6 @@
     },
     "projected": "이번 사이클 예상"
   },
-  "latestNfts": {
-    "title": "최신 NFT",
-    "previousAria": "이전 최신 NFT",
-    "nextAria": "다음 최신 NFT",
-    "empty": {
-      "title": "아직 각인된 Cosmic Signature NFT가 없습니다.",
-      "body": "퍼포먼스 사이클이 마감되고 새로운 결정론적 삼체 작품이 만들어지면 갤러리가 채워집니다.",
-      "cta": "갤러리 열기"
-    }
-  },
   "rwlkGrid": {
     "searchPlaceholder": "NFT ID 입력",
     "searchAria": "ID로 Random Walk NFT 검색",

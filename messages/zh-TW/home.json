@@ -682,16 +682,6 @@
     },
     "projected": "本週期預估"
   },
-  "latestNfts": {
-    "title": "最新 NFT",
-    "previousAria": "上一組最新 NFT",
-    "nextAria": "下一組最新 NFT",
-    "empty": {
-      "title": "尚未銘刻任何 Cosmic Signature NFT。",
-      "body": "隨著演繹週期陸續收官，新的確定性三體作品不斷誕生，畫廊也會逐漸充盈。",
-      "cta": "前往畫廊"
-    }
-  },
   "rwlkGrid": {
     "searchPlaceholder": "輸入 NFT ID",
     "searchAria": "依 ID 搜尋 Random Walk NFT",

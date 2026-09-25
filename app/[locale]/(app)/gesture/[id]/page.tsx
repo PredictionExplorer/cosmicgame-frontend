@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import api from '@/services/api';
 import { isRecordNotFound } from '@/services/api/readError';
 import type { GestureInfo } from '@/services/api/types';
+import { parseGestureId } from '@/utils/routeParams';
 import { createMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
@@ -12,7 +13,6 @@ import { DashboardQuerySeed, QuerySeed, seedsDisabled } from '../../QuerySeed';
 import { readDashboard } from '../../publicDataReads';
 
 import GesturePage from './GesturePage';
-import { parseGestureId } from './gestureId';
 
 interface PageProps {
   params: Promise<{ locale: string; id: string }>;

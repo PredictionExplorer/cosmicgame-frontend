@@ -1,8 +1,8 @@
 {
   "notFound": {
-    "title": "This Signature hasn't been imprinted yet",
-    "titleInvalid": "This link doesn't lead to a Signature",
-    "description": "Signatures are numbered in the order they're imprinted.",
+    "title": "This Signature hasn’t been imprinted yet",
+    "titleInvalid": "This link doesn’t lead to a Signature",
+    "description": "Signatures are numbered in the order they’re imprinted.",
     "newest": "The newest is #{id}.",
     "newestLink": "See the newest Signature"
   },

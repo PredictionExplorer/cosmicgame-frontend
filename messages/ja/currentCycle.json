@@ -184,10 +184,8 @@
       "floorEstimate": "フロア 約{price} {currency}",
       "floorTooltip": "コレクションのフロア価格の目安であり、この特定のトークンの評価額ではありません。",
       "metadataUnavailable": "メタデータを利用できません。添付されたNFTはこのサイクルの配分に含まれたままです。",
-      "openSea": "OpenSea",
       "explorer": "エクスプローラー",
       "links": {
-        "project": "NFTを見る",
         "opensea": "OpenSeaで見る",
         "explorer": "コントラクトを見る"
       }

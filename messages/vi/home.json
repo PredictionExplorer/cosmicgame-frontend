@@ -682,16 +682,6 @@
     },
     "projected": "Dự kiến chu kỳ này"
   },
-  "latestNfts": {
-    "title": "NFT mới nhất",
-    "previousAria": "NFT mới nhất trước đó",
-    "nextAria": "NFT mới nhất tiếp theo",
-    "empty": {
-      "title": "Chưa có Cosmic Signature NFT nào được khắc.",
-      "body": "Phòng trưng bày sẽ đầy dần khi các chu kỳ trình diễn hoàn tất và những tác phẩm ba vật thể tất định mới được tạo ra.",
-      "cta": "Mở phòng trưng bày"
-    }
-  },
   "rwlkGrid": {
     "searchPlaceholder": "Nhập mã NFT",
     "searchAria": "Tìm Random Walk NFT theo mã",

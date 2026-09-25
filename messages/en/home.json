@@ -682,16 +682,6 @@
     },
     "projected": "Projected this cycle"
   },
-  "latestNfts": {
-    "title": "Latest NFTs",
-    "previousAria": "Previous latest NFTs",
-    "nextAria": "Next latest NFTs",
-    "empty": {
-      "title": "No Cosmic Signature NFTs have been imprinted yet.",
-      "body": "The gallery will fill as Performance Cycles finalize and new deterministic three-body artworks are created.",
-      "cta": "Open the gallery"
-    }
-  },
   "rwlkGrid": {
     "searchPlaceholder": "Enter NFT ID",
     "searchAria": "Find a Random Walk NFT by ID",

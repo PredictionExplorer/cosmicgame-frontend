@@ -184,10 +184,8 @@
       "floorEstimate": "Giá sàn ~{price} {currency}",
       "floorTooltip": "Ước tính giá sàn của bộ sưu tập, không phải định giá cho token cụ thể này.",
       "metadataUnavailable": "Siêu dữ liệu không khả dụng. NFT đính kèm vẫn thuộc phân bổ của chu kỳ này.",
-      "openSea": "OpenSea",
       "explorer": "Trình khám phá",
       "links": {
-        "project": "Xem NFT",
         "opensea": "Xem trên OpenSea",
         "explorer": "Xem hợp đồng"
       }

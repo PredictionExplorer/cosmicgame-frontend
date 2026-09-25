@@ -1,4 +1,4 @@
-import { parseCanonicalNonNegativeSafeInteger, parseTokenId } from '../routeParams';
+import { parseCanonicalNonNegativeSafeInteger, parseGestureId, parseTokenId } from '../routeParams';
 
 describe('parseCanonicalNonNegativeSafeInteger', () => {
   it.each([
@@ -38,5 +38,19 @@ describe('parseTokenId', () => {
 
   it.each(['not-a-token', '-1', '1.5', '', '1e3', '99999999999999999999'])('refuses %p', (id) => {
     expect(parseTokenId(id)).toBeNull();
+  });
+});
+
+describe('parseGestureId', () => {
+  it.each([
+    ['0', 0],
+    ['29434', 29434],
+  ])('reads %s as %d', (id, expected) => {
+    expect(parseGestureId(id)).toBe(expected);
+  });
+
+  // "12abc" is an invalid id, never gesture 12.
+  it.each(['12abc', 'abc', '-3', '1.5', '', '99999999999999999999'])('refuses %p', (id) => {
+    expect(parseGestureId(id)).toBeNull();
   });
 });

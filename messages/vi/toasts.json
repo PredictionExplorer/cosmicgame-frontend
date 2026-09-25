@@ -104,7 +104,6 @@
     },
     "nft": {
       "contractUnavailable": "Địa chỉ hợp đồng Cosmic Signature NFT chưa có sẵn.",
-      "selectOne": "Chọn ít nhất một NFT có thể chuyển giao.",
       "confirmed": "{count, plural, other {Đã xác nhận # lần chuyển giao NFT.}}",
       "detailTransferConfirmed": "Đã xác nhận chuyển giao NFT.",
       "failedToken": "Chưa gửi được NFT {tokenId}. Hãy kiểm tra ví rồi thử lại.",

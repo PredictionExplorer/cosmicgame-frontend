@@ -18,6 +18,7 @@ for (const { host, path, lang, headers } of [
   { host: 'app', path: '/ja/quality-assurance-route-not-found', lang: 'ja', headers: {} },
   { host: 'app', path: '/zh/detail/abc', lang: 'zh', headers: {} },
   { host: 'app', path: '/allocation/01', lang: 'en', headers: {} },
+  { host: 'app', path: '/gesture/12abc', lang: 'en', headers: {} },
   {
     host: 'landing',
     path: '/quality-assurance-route-not-found',

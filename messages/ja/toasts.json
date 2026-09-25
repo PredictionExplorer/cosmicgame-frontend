@@ -104,7 +104,6 @@
     },
     "nft": {
       "contractUnavailable": "Cosmic Signature NFTコントラクトのアドレスはまだ利用できません。",
-      "selectOne": "移転できるNFTを少なくとも1点選んでください。",
       "confirmed": "{count, plural, other {#件のNFT移転が確認されました。}}",
       "detailTransferConfirmed": "NFTの移転が確認されました。",
       "failedToken": "NFT {tokenId}を送れませんでした。ウォレットを確認して、もう一度お試しください。",

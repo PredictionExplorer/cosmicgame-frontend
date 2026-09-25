@@ -128,8 +128,8 @@ test.describe('Gesture detail page', () => {
     expect(reads).toBe(1);
   });
 
-  // The route layout turns a malformed id away before the loading boundary
-  // streams, so it is a real 404 rather than a 200 "Invalid" page.
+  // A malformed id is turned away before routing (proxy.ts, as /detail/abc
+  // is), so it is the server-rendered 404 rather than a 200 "Invalid" page.
   test('an id that is not a whole number is a real 404, never a nearby gesture', async ({
     page,
   }) => {

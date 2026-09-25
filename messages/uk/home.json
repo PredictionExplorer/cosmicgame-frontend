@@ -682,16 +682,6 @@
     },
     "projected": "Прогноз на цей цикл"
   },
-  "latestNfts": {
-    "title": "Останні NFT",
-    "previousAria": "Попередні NFT",
-    "nextAria": "Наступні NFT",
-    "empty": {
-      "title": "Cosmic Signature NFT ще не закарбовано.",
-      "body": "Галерея наповнюватиметься, коли завершуватимуться перформанс-цикли й з’являтимуться нові детерміновані твори задачі трьох тіл.",
-      "cta": "Відкрити галерею"
-    }
-  },
   "rwlkGrid": {
     "searchPlaceholder": "Введіть ID NFT",
     "searchAria": "Знайти Random Walk NFT за ID",

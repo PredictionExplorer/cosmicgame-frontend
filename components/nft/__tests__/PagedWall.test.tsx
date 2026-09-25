@@ -55,7 +55,7 @@ describe('PagedWall', () => {
     const scrollIntoView = jest.fn();
     Element.prototype.scrollIntoView = scrollIntoView;
     render(wall());
-    fireEvent.click(screen.getByRole('button', { name: 'tables.pagination.nextAria' }));
+    fireEvent.click(screen.getByRole('button', { name: 'tables.pagination.next' }));
     expect(screen.getAllByTestId('work').map((work) => work.textContent)).toEqual(['#3', '#4']);
     expect(scrollIntoView).toHaveBeenCalledWith({ block: 'start' });
   });
@@ -64,7 +64,7 @@ describe('PagedWall', () => {
     const onPageChange = jest.fn();
     render(wall({ page: 7, onPageChange }));
     expect(screen.getAllByTestId('work').map((work) => work.textContent)).toEqual(['#5']);
-    fireEvent.click(screen.getByRole('button', { name: 'tables.pagination.previousAria' }));
+    fireEvent.click(screen.getByRole('button', { name: 'tables.pagination.previous' }));
     expect(onPageChange).toHaveBeenCalledWith(2);
   });
 

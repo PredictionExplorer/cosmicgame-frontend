@@ -184,10 +184,8 @@
       "floorEstimate": "Floor ~{price} {currency}",
       "floorTooltip": "Collection floor estimate, not an appraisal of this specific token.",
       "metadataUnavailable": "Metadata unavailable. The attached NFT is still part of this cycle allocation.",
-      "openSea": "OpenSea",
       "explorer": "Explorer",
       "links": {
-        "project": "View NFT",
         "opensea": "View on OpenSea",
         "explorer": "View contract"
       }

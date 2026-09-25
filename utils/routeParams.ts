@@ -20,3 +20,13 @@ export function parseTokenId(raw: string): number | null {
   const tokenId = Number(raw);
   return Number.isSafeInteger(tokenId) ? tokenId : null;
 }
+
+/**
+ * A gesture's event-log id from the URL (`/gesture/29434`): a whole, safe,
+ * non-negative number, else null ("12abc" is not gesture 12).
+ */
+export function parseGestureId(raw: string): number | null {
+  if (!/^\d+$/.test(raw)) return null;
+  const value = Number(raw);
+  return Number.isSafeInteger(value) ? value : null;
+}

@@ -104,7 +104,6 @@
     },
     "nft": {
       "contractUnavailable": "Cosmic Signature NFT contract address is not available yet.",
-      "selectOne": "Select at least one transferable NFT.",
       "confirmed": "{count, plural, one {NFT transfer confirmed.} other {# NFT transfers confirmed.}}",
       "detailTransferConfirmed": "NFT transfer confirmed.",
       "failedToken": "NFT {tokenId} wasn’t sent. Check your wallet and try again.",

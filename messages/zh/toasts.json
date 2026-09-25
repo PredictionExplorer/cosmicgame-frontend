@@ -104,7 +104,6 @@
     },
     "nft": {
       "contractUnavailable": "Cosmic Signature NFT 合约地址暂不可用。",
-      "selectOne": "请至少选择一枚可转移的 NFT。",
       "confirmed": "{count, number} 笔 NFT 转移已确认。",
       "detailTransferConfirmed": "NFT 转移已确认。",
       "failedToken": "NFT {tokenId} 未能发送，请检查钱包后重试。",

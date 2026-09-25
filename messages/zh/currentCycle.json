@@ -184,10 +184,8 @@
       "floorEstimate": "地板价约 {price} {currency}",
       "floorTooltip": "此为系列地板价估计，并非对这枚代币的估值。",
       "metadataUnavailable": "元数据暂不可用。这枚已附加 NFT 仍计入本周期分配。",
-      "openSea": "OpenSea",
       "explorer": "区块浏览器",
       "links": {
-        "project": "查看 NFT",
         "opensea": "在 OpenSea 上查看",
         "explorer": "查看合约"
       }

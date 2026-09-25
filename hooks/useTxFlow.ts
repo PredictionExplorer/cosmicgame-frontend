@@ -390,10 +390,11 @@ export function useTxFlow(): UseTxFlowResult {
         ));
       const ctx: TxContext = {
         account: address,
-        // Signed by the account the flow started with: arguments built from
-        // ctx.account (transferFrom(ctx.account, …)) never go out under
-        // another account the wallet switched to meanwhile; wagmi refuses
-        // instead (ConnectorAccountNotFoundError → wallet-not-connected).
+        // Writes and sends are signed by the account the flow started with:
+        // arguments built from ctx.account (transferFrom(ctx.account, …)) and
+        // the simulation run as it never go out under another account the
+        // wallet switched to meanwhile; wagmi refuses instead
+        // (ConnectorAccountNotFoundError → wallet-not-connected).
         writeContract: async (request) => {
           if (!publicClient) throw new TxClientUnavailableError();
           const call = request as unknown as WriteCall;
@@ -409,7 +410,12 @@ export function useTxFlow(): UseTxFlowResult {
           if (!publicClient) throw new TxClientUnavailableError();
           assertTrustedTarget(to, await trusted(publicClient));
           await simulateSend(publicClient, { to, value }, address);
-          return sendTransaction(config, { to, value, chainId: activeChain.id });
+          return sendTransaction(config, {
+            to,
+            value,
+            account: address,
+            chainId: activeChain.id,
+          });
         },
       };
 

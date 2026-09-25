@@ -43,11 +43,13 @@ describe('GestureCosts', () => {
     }
   });
 
-  // Regions, not cards: the rows sit on the page ground under a hairline.
+  // Regions, not cards: the rows sit on the page ground between the page's
+  // hairlines, the same ruled fact list as "Good to know".
   it('lays the costs on the page ground, not in a card', () => {
     render(<GestureCosts costs={costs} />);
     const list = screen.getAllByRole('term')[0]!.closest('dl')!;
-    expect(list.parentElement).toHaveClass('border-t', 'border-rule-faint');
+    expect(list).toHaveClass('border-y', 'border-rule', 'divide-y', 'divide-rule-faint');
+    expect(list.parentElement).toBe(screen.getByTestId('gesture-costs'));
     expect(screen.getByTestId('gesture-costs').querySelector('.bg-surface')).toBeNull();
   });
 
