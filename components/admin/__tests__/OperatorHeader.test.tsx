@@ -123,7 +123,9 @@ describe('OperatorWalletStatus', () => {
     mockClientReady = false;
     const { rerender } = render(<OperatorWalletStatus />);
     expect(screen.queryByText('No on-chain role')).not.toBeInTheDocument();
-    expect(screen.getByTestId('operator-wallet').querySelector('.animate-pulse')).not.toBeNull();
+    expect(
+      screen.getByTestId('operator-wallet').querySelector('[data-slot="skeleton"]'),
+    ).not.toBeNull();
     expect(mockReadContract).not.toHaveBeenCalled();
 
     mockClientReady = true;

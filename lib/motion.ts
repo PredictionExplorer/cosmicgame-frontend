@@ -4,31 +4,34 @@ import type { Easing, Transition, Variants } from 'framer-motion';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 const outExpo: Easing = [0.16, 1, 0.3, 1];
+const gallery: Easing = [0.2, 0, 0, 1];
 const outSoft: Easing = [0.25, 0.46, 0.45, 0.94];
 const inOutSoft: Easing = [0.4, 0, 0.2, 1];
-const spring: Easing = [0.68, -0.55, 0.265, 1.55];
 
+/**
+ * The motion scale for framer-motion, in seconds: the same values as the
+ * `--duration-*` and `--ease-*` tokens in styles/tokens.css, so CSS and JS
+ * motion share one scale (lib/__tests__/motion.test.tsx parses the CSS and
+ * fails on drift). `page` is the ceiling; there are no springs.
+ */
 export const motionTokens = {
   duration: {
     instant: 0.08,
     fast: 0.15,
-    base: 0.3,
-    slow: 0.5,
-    page: 0.7,
+    base: 0.24,
+    slow: 0.4,
+    page: 0.56,
+    settle: 0.9,
   },
-  ease: { outExpo, outSoft, inOutSoft, spring },
+  ease: { outExpo, gallery, outSoft, inOutSoft },
   offset: {
     rise: 8,
     slide: 16,
     scaleFrom: 0.96,
   },
-  stagger: {
-    children: 0.04,
-    sections: 0.08,
-  },
 };
 
-const { duration, ease, offset, stagger } = motionTokens;
+const { duration, ease, offset } = motionTokens;
 
 /** The default transition: `base` duration on the `outExpo` curve. */
 export const baseTransition: Transition = {
@@ -40,31 +43,6 @@ export const fadeRise: Variants = {
   initial: { opacity: 0, y: offset.rise },
   animate: { opacity: 1, y: 0, transition: { duration: duration.base, ease: ease.outExpo } },
   exit: { opacity: 0, y: offset.rise, transition: { duration: duration.fast, ease: ease.outSoft } },
-};
-
-/**
- * Transform-only entrance for above-the-fold content.
- *
- * `fadeRise` server-renders its target at `opacity: 0`, which hides the
- * element until the whole bundle downloads, hydrates, and animates — on
- * mobile that pushed the Largest Contentful Paint out by seconds, because
- * the LCP element (hero text) could not paint until JavaScript ran. A pure
- * translateY entrance paints immediately in the server HTML (slightly
- * offset), so LCP lands at first paint while navigation still feels alive.
- *
- * Use for anything that can be the LCP element or sits in the first
- * viewport; keep `fadeRise` for below-the-fold and in-viewport reveals.
- */
-export const riseIn: Variants = {
-  initial: { y: offset.rise },
-  animate: { y: 0, transition: { duration: duration.base, ease: ease.outExpo } },
-  exit: { y: offset.rise, transition: { duration: duration.fast, ease: ease.outSoft } },
-};
-
-export const fadeRiseStagger: Variants = {
-  initial: {},
-  animate: { transition: { staggerChildren: stagger.children, delayChildren: 0.05 } },
-  exit: { transition: { staggerChildren: stagger.children / 2, staggerDirection: -1 } },
 };
 
 export const slideInRight: Variants = {
@@ -85,12 +63,6 @@ const REDUCED: Variants = {
   exit: { opacity: 0, transition: { duration: 0 } },
 };
 
-const REDUCED_STAGGER: Variants = {
-  initial: {},
-  animate: { transition: { staggerChildren: 0 } },
-  exit: {},
-};
-
 /**
  * Returns the given variants, or an immediately visible fallback when the user
  * prefers reduced motion. Prefer this over raw variants in interactive
@@ -98,9 +70,7 @@ const REDUCED_STAGGER: Variants = {
  */
 export function useMotionVariants(variants: Variants): Variants {
   const reduced = usePrefersReducedMotion();
-  if (!reduced) return variants;
-  if (variants === fadeRiseStagger) return REDUCED_STAGGER;
-  return REDUCED;
+  return reduced ? REDUCED : variants;
 }
 
 /**

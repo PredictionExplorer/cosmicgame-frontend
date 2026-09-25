@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useRef } from 'react';
 
-import { useAttentionPreferences } from '@/hooks/useAttentionPreferences';
+import {
+  getNotificationPermission,
+  markNotificationsUnsupported,
+  useAttentionPreferences,
+} from '@/hooks/useAttentionPreferences';
 
 interface UseAllocationNotificationOptions {
   /** Cycle Finalization Time (epoch ms); 0 while unknown. */
@@ -62,8 +66,17 @@ export function useAllocationNotification({
   const hasCopy = Boolean(notificationTitle && notificationBody);
 
   const sendNotification = useCallback((title: string, options: NotificationOptions) => {
-    if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
-    const notification = new Notification(title, options);
+    if (getNotificationPermission() !== 'granted') return;
+    let notification: Notification;
+    try {
+      notification = new Notification(title, options);
+    } catch {
+      // A browser that exposes Notification but only shows one from a
+      // service worker (the Android browsers) throws "Illegal constructor".
+      // Nothing can be shown here: turn the alert off and stop offering it.
+      markNotificationsUnsupported();
+      return;
+    }
     notification.onclick = () => {
       window.focus();
       notification.close();

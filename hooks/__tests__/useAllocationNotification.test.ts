@@ -2,6 +2,8 @@ import { renderHook, act } from '@testing-library/react';
 
 import {
   ATTENTION_STORAGE_KEY,
+  getNotificationPermission,
+  readAttentionPreferences,
   resetAttentionPreferencesForTest,
   updateAttentionPreferences,
 } from '../useAttentionPreferences';
@@ -336,5 +338,55 @@ describe('useAllocationNotification', () => {
       jest.advanceTimersByTime(1_000);
     });
     expect(mockNotification).toHaveBeenCalledTimes(1);
+  });
+
+  it('turns the alert off, uncaught-error free, where the browser refuses to construct one', () => {
+    // Chrome for Android: Notification exists and permission can be granted,
+    // but the constructor throws unless a service worker shows it.
+    setupNotificationMock('granted');
+    const illegal = jest.fn(() => {
+      throw new TypeError('Illegal constructor. Use ServiceWorkerRegistration.showNotification()');
+    });
+    Object.assign(illegal, { permission: 'granted', requestPermission: jest.fn() });
+    Object.defineProperty(window, 'Notification', {
+      value: illegal,
+      writable: true,
+      configurable: true,
+    });
+    enableAlert(5);
+    renderHook(() =>
+      useAllocationNotification({
+        allocationTime: Date.now() + 3 * 60_000,
+        notificationTitle: WARNING_TITLE,
+        notificationBody: 'body',
+      }),
+    );
+
+    expect(() =>
+      act(() => {
+        jest.advanceTimersByTime(2_000);
+      }),
+    ).not.toThrow();
+    expect(illegal).toHaveBeenCalledTimes(1);
+    expect(readAttentionPreferences().finalizationAlert).toBe(false);
+    // The menu reads the alert as unavailable from then on.
+    expect(getNotificationPermission()).toBe('unsupported');
+  });
+});
+
+describe('getNotificationPermission', () => {
+  const realUserAgent = navigator.userAgent;
+  afterEach(() => {
+    Object.defineProperty(navigator, 'userAgent', { value: realUserAgent, configurable: true });
+  });
+
+  it('reads Android browsers as unsupported: they only notify from a service worker', () => {
+    setupNotificationMock('default');
+    expect(getNotificationPermission()).toBe('default');
+    Object.defineProperty(navigator, 'userAgent', {
+      value: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 Chrome/128.0 Mobile',
+      configurable: true,
+    });
+    expect(getNotificationPermission()).toBe('unsupported');
   });
 });

@@ -72,7 +72,7 @@ describe('AnchoringFlow', () => {
   it('holds the layout with skeletons while the figures load', () => {
     const { container } = renderFlow({ loading: true });
     expect(container).not.toHaveTextContent('1.9376');
-    expect(container.querySelectorAll('.animate-pulse').length).toBeGreaterThan(0);
+    expect(container.querySelectorAll('[data-slot="skeleton"]').length).toBeGreaterThan(0);
   });
 
   it('has no accessibility violations', async () => {

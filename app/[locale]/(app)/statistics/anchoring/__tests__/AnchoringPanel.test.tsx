@@ -155,11 +155,13 @@ describe('AnchoringPanel', () => {
     render(<AnchoringPanel />);
     const strip = screen.getByRole('region', { name: 'Anchoring now' });
     for (const id of ['anchoredCosmicSignature', 'anchoredRandomWalk']) {
-      expect(strip.querySelector(`[data-figure="${id}"] .animate-pulse`)).toBeInTheDocument();
+      expect(
+        strip.querySelector(`[data-figure="${id}"] [data-slot="skeleton"]`),
+      ).toBeInTheDocument();
     }
     // The collection overviews below wait too, instead of reading 0.
     const overview = screen.getByRole('tabpanel', { name: 'Cosmic Signature NFT' });
-    expect(overview.querySelector('dl .animate-pulse')).toBeInTheDocument();
+    expect(overview.querySelector('dl [data-slot="skeleton"]')).toBeInTheDocument();
     expect(overview.querySelector('dl')).not.toHaveTextContent(/\d/);
   });
 

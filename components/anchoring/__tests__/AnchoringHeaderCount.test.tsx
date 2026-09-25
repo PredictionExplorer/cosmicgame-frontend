@@ -77,7 +77,7 @@ describe('AnchoringHeaderCount', () => {
   it('holds a skeleton while a list is on its way, never a dash', () => {
     const { container } = render(<AnchoringHeaderCount metric="ethDeposits" />);
     expect(container).not.toHaveTextContent('—');
-    expect(container.querySelector('span.animate-pulse')).not.toBeNull();
+    expect(container.querySelector('span[data-slot="skeleton"]')).not.toBeNull();
   });
 
   it('says Unavailable in words when the browser could not read the list either', () => {

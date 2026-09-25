@@ -8,7 +8,7 @@ import {
   SkeletonArtPlate,
   SkeletonDetailRows,
   SkeletonPageHeader,
-  SkeletonStatGrid,
+  SkeletonFigures,
   SkeletonTable,
 } from '@/components/ui/skeleton';
 
@@ -108,7 +108,7 @@ export function LedgerPageSkeleton({
       <LoadingRegion className={cn('mx-auto', width)}>
         <SkeletonPageHeader />
         {figures > 0 ? (
-          <SkeletonStatGrid announce={false} count={figures} className="mb-10" />
+          <SkeletonFigures announce={false} count={figures} className="mb-10" />
         ) : null}
         {summaryRows > 0 ? <SkeletonSectionCard rows={summaryRows} /> : null}
         <div className={cn(panel, 'p-2 sm:p-3', body === 'narrow' && 'max-w-3xl')}>
@@ -126,7 +126,7 @@ export function ProfileSkeleton() {
       <LoadingRegion>
         <SkeletonPageHeader breadcrumb={false} className="mb-6" />
         <Skeleton className="mb-10 h-7 w-56 rounded-control" />
-        <SkeletonStatGrid announce={false} count={6} className="lg:grid-cols-3" />
+        <SkeletonFigures announce={false} count={6} className="lg:grid-cols-3" />
         <div aria-hidden className={cn(panel, 'mt-8 p-5')}>
           <Skeleton shine={false} className="h-3.5 w-36" />
           <div className="mt-5 grid grid-cols-1 gap-8 md:grid-cols-3">
