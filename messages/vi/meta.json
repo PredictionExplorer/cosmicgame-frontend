@@ -217,9 +217,10 @@
     "description": "Xem toàn bộ lịch sử phân bổ của bạn trong Cosmic Signature, gồm phân bổ Signature, phân phối ETH Tinh tuyển, Cosmic Signature NFT và phân phối neo giữ."
   },
   "userProfile": {
-    "title": "Thông tin người dùng {address}",
+    "title": "Thông tin người tham gia {address}",
     "description": "Nét bút, phân bổ và neo giữ của người tham gia {address}.",
-    "invalidAddress": "Địa chỉ không hợp lệ"
+    "invalidAddress": "Địa chỉ không hợp lệ",
+    "invalidDescription": "Địa chỉ trong liên kết này không phải là địa chỉ Ethereum hợp lệ."
   },
   "admin": {
     "title": "Kiểm duyệt lời nhắn",

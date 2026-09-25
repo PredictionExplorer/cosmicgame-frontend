@@ -106,9 +106,19 @@ describe('EmbedEnduranceChart', () => {
     mockUseDashboardInfo.mockReturnValue(dashboard({ data: { CurRoundNum: 3 } }));
     render(<EmbedEnduranceChart roundNum={1} />);
     expect(screen.getByTestId('endurance-chart')).toHaveAttribute('data-new-window-links', 'true');
-    expect(screen.getByRole('link', { name: /opens in a new window/ })).toHaveAttribute(
-      'target',
-      '_blank',
+    const links = screen.getAllByRole('link', { name: /opens in a new window/ });
+    expect(links.length).toBeGreaterThanOrEqual(2);
+    for (const link of links) expect(link).toHaveAttribute('target', '_blank');
+  });
+
+  it('says whose chart it is: the lockup leads to the Observatory', () => {
+    mockUseDashboardInfo.mockReturnValue(dashboard({ data: { CurRoundNum: 3 } }));
+    render(<EmbedEnduranceChart roundNum={1} />);
+    const lockup = screen.getByRole('link', { name: /^Cosmic Signature/ });
+    expect(lockup).toHaveAttribute('href', '/');
+    expect(lockup).toHaveAttribute('target', '_blank');
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'Endurance & Chrono timeline · Cycle 1',
     );
   });
 

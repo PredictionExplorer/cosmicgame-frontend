@@ -14,16 +14,29 @@ import { SectionShell } from '@/components/statistics/SectionShell';
 import type { GestureSummary } from './profileSummary';
 import type { UserProfileInfo } from './types';
 
+/** A count split by the two kinds of NFT that can be anchored. */
+export interface CountByKind {
+  cosmicSignature: number;
+  randomWalk: number;
+}
+
 export interface ProfileOverviewProps {
+  /** The section's anchor id, for the profile's contents. */
+  id?: string;
   address: string;
   userInfo: UserProfileInfo;
   gestures: GestureSummary;
   /** Unix seconds of the most recent gesture. */
   latestGestureTs: number | null;
-  /** Cosmic Signature and RandomWalk NFTs anchored now. */
-  anchoredNow: number;
-  /** Anchor and release actions for both kinds. */
-  anchorActions: number;
+  /**
+   * Cosmic Signature NFTs the address holds or has anchored now (the plates of
+   * its NFT section), or null while that read is pending or failed.
+   */
+  heldOrAnchored: number | null;
+  /** NFTs anchored now, by kind. */
+  anchoredNow: CountByKind;
+  /** Anchor and release actions, by kind. */
+  anchorActions: CountByKind;
   /** ETH Anchor Distributions, retrieved and not. */
   anchorDistributionsEth: number;
 }
@@ -32,13 +45,19 @@ export interface ProfileOverviewProps {
  * "At a glance": the figures behind a participant's history that the header
  * does not already show, in four spec sheets (gestures, Stellar Selection,
  * Cosmic Signature NFTs, anchoring) with one Definitions disclosure. Every
- * figure appears once on the page.
+ * figure appears once on the page, and says what it counts: an anchoring
+ * total names its split between the two kinds of NFT (the anchoring section
+ * below shows one kind per tab), and "Received" says how many are held or
+ * anchored now (the plates below). A figure links to its ledger only when
+ * there is something in it.
  */
 export function ProfileOverview({
+  id,
   address,
   userInfo,
   gestures,
   latestGestureTs,
+  heldOrAnchored,
   anchoredNow,
   anchorActions,
   anchorDistributionsEth,
@@ -51,7 +70,7 @@ export function ProfileOverview({
     (userInfo.SumRaffleEthWinnings ?? 0) + (userInfo.SumRaffleEthWithdrawal ?? 0);
 
   return (
-    <SectionShell title={o('title')}>
+    <SectionShell id={id} title={o('title')}>
       <div className="grid gap-x-10 gap-y-10 sm:grid-cols-2 xl:grid-cols-4">
         <StatisticsGroup title={o('gestures.title')}>
           <StatisticsItem
@@ -89,7 +108,7 @@ export function ProfileOverview({
           <StatisticsItem
             title={o('stellarSelection.ethAllocated')}
             value={<Amount value={stellarEthTotal} unit="ETH" />}
-            href={`/user/stellar-selection-eth/${address}`}
+            href={stellarEthTotal > 0 ? `/user/stellar-selection-eth/${address}` : undefined}
           />
           <StatisticsItem
             title={o('stellarSelection.ethRetrieved')}
@@ -98,7 +117,11 @@ export function ProfileOverview({
           <StatisticsItem
             title={o('stellarSelection.nfts')}
             value={format.count(userInfo.RaffleNFTsCount ?? 0)}
-            href={`/user/stellar-selection-nft/${address}`}
+            href={
+              (userInfo.RaffleNFTsCount ?? 0) > 0
+                ? `/user/stellar-selection-nft/${address}`
+                : undefined
+            }
           />
         </StatisticsGroup>
 
@@ -106,6 +129,11 @@ export function ProfileOverview({
           <StatisticsItem
             title={o('nfts.received')}
             value={format.count(userInfo.TotalCSTokensWon ?? 0)}
+            caption={
+              heldOrAnchored === null
+                ? undefined
+                : t('statistics.overview.nfts.heldOrAnchored', { count: heldOrAnchored })
+            }
           />
           <StatisticsItem
             title={o('nfts.toRetrieve')}
@@ -114,13 +142,25 @@ export function ProfileOverview({
           <StatisticsItem
             title={o('nfts.transfers')}
             value={format.count(userInfo.CosmicSignatureNumTransfers ?? 0)}
-            href={`/cosmic-signature-transfer/${address}`}
+            href={
+              (userInfo.CosmicSignatureNumTransfers ?? 0) > 0
+                ? `/cosmic-signature-transfer/${address}`
+                : undefined
+            }
           />
         </StatisticsGroup>
 
         <StatisticsGroup title={o('anchoring.title')}>
-          <StatisticsItem title={o('anchoring.anchoredNow')} value={format.count(anchoredNow)} />
-          <StatisticsItem title={o('anchoring.actions')} value={format.count(anchorActions)} />
+          <StatisticsItem
+            title={o('anchoring.anchoredNow')}
+            value={format.count(anchoredNow.cosmicSignature + anchoredNow.randomWalk)}
+            caption={t('statistics.overview.anchoring.byKind', { ...anchoredNow })}
+          />
+          <StatisticsItem
+            title={o('anchoring.actions')}
+            value={format.count(anchorActions.cosmicSignature + anchorActions.randomWalk)}
+            caption={t('statistics.overview.anchoring.byKind', { ...anchorActions })}
+          />
           <StatisticsItem
             title={o('anchoring.distributions')}
             value={<Amount value={anchorDistributionsEth} unit="ETH" />}

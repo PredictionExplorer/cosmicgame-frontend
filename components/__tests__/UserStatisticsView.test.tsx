@@ -1,4 +1,4 @@
-import { render, screen, checkA11y, within } from '@/test-utils';
+import { fireEvent, render, screen, checkA11y, within } from '@/test-utils';
 
 import UserStatisticsView from '../UserStatisticsView';
 
@@ -12,6 +12,9 @@ const mockUseUserBalance = jest.fn();
 const mockUseCSTTokensByUser = jest.fn();
 const mockUseMarketingRewardsByUser = jest.fn();
 const mockMarketingRewardsTable = jest.fn();
+const mockUseDepositDistributions = jest.fn();
+const mockUseCSTAnchorActionsByUser = jest.fn();
+const mockUseUnclaimedDonatedNFTByUser = jest.fn();
 
 jest.mock('../../hooks/useApiQuery', () => ({
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
@@ -19,15 +22,16 @@ jest.mock('../../hooks/useApiQuery', () => ({
   useUserInfo: (...args: unknown[]) => mockUseUserInfo(...args),
   useUserBalance: (...args: unknown[]) => mockUseUserBalance(...args),
   useCSTTokensByUser: (...args: unknown[]) => mockUseCSTTokensByUser(...args),
-  useCSTAnchorActionsByUser: () => list,
+  useCSTAnchorActionsByUser: (...args: unknown[]) => mockUseCSTAnchorActionsByUser(...args),
   useRWLKAnchorActionsByUser: () => list,
   useMarketingRewardsByUser: (...args: unknown[]) => mockUseMarketingRewardsByUser(...args),
   useAnchorDistributionsByUser: () => list,
   useCSTAnchorDistributionsRetrievedByUser: () => list,
-  useCSTAnchorDistributionsByUserByDeposit: () => list,
+  useCSTAnchorDistributionsByUserByDeposit: (...args: unknown[]) =>
+    mockUseDepositDistributions(...args),
   useRWLKAnchorImprintsByUser: () => list,
   useClaimedDonatedNFTByUser: () => list,
-  useUnclaimedDonatedNFTByUser: () => list,
+  useUnclaimedDonatedNFTByUser: (...args: unknown[]) => mockUseUnclaimedDonatedNFTByUser(...args),
   useDonationsERC20ByUser: () => list,
 }));
 
@@ -132,11 +136,31 @@ beforeEach(() => {
   });
   mockUseCSTTokensByUser.mockReturnValue(list);
   mockUseMarketingRewardsByUser.mockReturnValue(list);
+  mockUseDepositDistributions.mockReturnValue(list);
+  mockUseCSTAnchorActionsByUser.mockReturnValue(list);
+  mockUseUnclaimedDonatedNFTByUser.mockReturnValue(list);
 });
+
+/** One held Signature, one anchor action and one attached NFT to retrieve: every section has rows. */
+function withEverySection() {
+  mockUseCSTTokensByUser.mockReturnValue({
+    data: [{ TokenId: 7, Seed: 'seed7', RoundNum: 1 }],
+    isLoading: false,
+  });
+  mockUseCSTAnchorActionsByUser.mockReturnValue({
+    data: [{ ActionType: 0, TokenId: 7, TimeStamp: 100, ActionId: 1 }],
+    isLoading: false,
+  });
+  mockUseUnclaimedDonatedNFTByUser.mockReturnValue({
+    data: [{ Index: 0, RecordId: 1, TokenId: 1, TokenAddr: '0xabc', RoundNum: 1 }],
+    isLoading: false,
+  });
+}
 
 describe('UserStatisticsView', () => {
   it('shows the invalid-address header', () => {
-    render(<UserStatisticsView address="Invalid Address" isOwnProfile={false} />);
+    // The route passes null when its URL does not hold an address.
+    render(<UserStatisticsView address={null} isOwnProfile={false} />);
     expect(
       screen.getByRole('heading', { level: 1, name: 'myPages.statistics.page.invalidAddress' }),
     ).toBeInTheDocument();
@@ -168,14 +192,21 @@ describe('UserStatisticsView', () => {
   it('keeps allocations, anchoring and attached assets for an address without a profile record', () => {
     // Regression: a recipient who never made a gesture (no UserInfo) saw its allocation
     // figures in the header above "No activity yet", with every section and Retrieve hidden.
+    withEverySection();
     mockUseUserInfo.mockReturnValue({
       ...defaultHookReturn,
       data: { UserInfo: null, Gestures: [], CurrentlyStakedTokens: [] },
     });
     render(<UserStatisticsView address={ADDRESS} isOwnProfile={false} />);
     expect(screen.queryByText('myPages.statistics.page.emptyTitle')).not.toBeInTheDocument();
+    // No gestures: that section drops out rather than saying so.
+    expect(
+      screen.queryByRole('heading', {
+        level: 2,
+        name: 'myPages.statistics.page.sections.gestureHistory',
+      }),
+    ).not.toBeInTheDocument();
     for (const key of [
-      'page.sections.gestureHistory',
       'page.sections.recipientHistory',
       'page.sections.anchoring',
       'page.sections.claimableAssets',
@@ -204,6 +235,21 @@ describe('UserStatisticsView', () => {
     expect(
       screen.getByRole('heading', { level: 2, name: 'myPages.statistics.page.sections.artworks' }),
     ).toBeInTheDocument();
+  });
+
+  it('says an anchoring read failed, with a retry, never "no anchoring"', () => {
+    const refetch = jest.fn();
+    mockUseDepositDistributions.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      refetch,
+    });
+    render(<UserStatisticsView address={ADDRESS} isOwnProfile={false} />);
+    expect(screen.queryByTestId('user-anchoring-section')).not.toBeInTheDocument();
+    expect(screen.getByText('myPages.statistics.page.sectionLoadErrorTitle')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /try again|retry/i }));
+    expect(refetch).toHaveBeenCalledTimes(1);
   });
 
   it('holds the header at its loaded height while the reads arrive', () => {
@@ -278,6 +324,7 @@ describe('UserStatisticsView', () => {
   });
 
   it('renders the sections as H2s', () => {
+    withEverySection();
     render(<UserStatisticsView address={ADDRESS} isOwnProfile={false} />);
     for (const key of [
       'overview.title',
@@ -292,6 +339,43 @@ describe('UserStatisticsView', () => {
       ).toBeInTheDocument();
     }
     expect(screen.getByTestId('gesture-history-table')).toBeInTheDocument();
+    expect(screen.getByTestId('profile-artworks')).toBeInTheDocument();
+  });
+
+  it('links each section from a contents rail that states the time zone once', () => {
+    withEverySection();
+    render(<UserStatisticsView address={ADDRESS} isOwnProfile={false} />);
+    const nav = screen.getByRole('navigation', { name: 'myPages.statistics.page.nav.label' });
+    const links = within(nav).getAllByRole('link');
+    expect(links.map((link) => link.getAttribute('href'))).toEqual([
+      '#profile-overview',
+      '#profile-nfts',
+      '#profile-gestures',
+      '#profile-allocations',
+      '#profile-anchoring',
+      '#profile-attached',
+    ]);
+    for (const link of links) {
+      expect(document.getElementById(link.getAttribute('href')!.slice(1))).toBeInTheDocument();
+    }
+    expect(within(nav).getByText(/formats\.dateTime\.timeZone|Time zone/)).toBeInTheDocument();
+  });
+
+  it('drops a section with nothing in it, and its link, once its reads answered', () => {
+    render(<UserStatisticsView address={ADDRESS} isOwnProfile={false} />);
+    const nav = screen.getByRole('navigation', { name: 'myPages.statistics.page.nav.label' });
+    const hrefs = within(nav)
+      .getAllByRole('link')
+      .map((link) => link.getAttribute('href'));
+    expect(hrefs).not.toContain('#profile-nfts');
+    expect(hrefs).not.toContain('#profile-attached');
+    expect(screen.queryByTestId('profile-artworks')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('attached-assets-section')).not.toBeInTheDocument();
+  });
+
+  it('keeps a section whose read failed, to say so', () => {
+    mockUseCSTTokensByUser.mockReturnValue({ data: undefined, isLoading: false, isError: true });
+    render(<UserStatisticsView address={ADDRESS} isOwnProfile={false} />);
     expect(screen.getByTestId('profile-artworks')).toBeInTheDocument();
   });
 

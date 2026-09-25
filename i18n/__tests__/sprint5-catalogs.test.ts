@@ -25,7 +25,7 @@ describe('Sprint 5 bilingual catalogs', () => {
     expect(enStatistics.metrics.activePerformanceCycle.label).toBe('Active Performance Cycle');
     expect(enStatistics.metrics.contractBalance.label).toBe('Contract balance');
     expect(enStatistics.metrics.cosmicSignatureNftsImprinted.shortLabel).toBe('NFTs imprinted');
-    expect(enStatistics.sectionTooltips.enduranceTimeline).toContain('The widest bar');
+    expect(enStatistics.charts.endurance.description).toContain('The Endurance Champion has');
     expect(enTables.statisticsTooltips.allocationsSumEth).toContain('Allocations (all kinds)');
   });
 

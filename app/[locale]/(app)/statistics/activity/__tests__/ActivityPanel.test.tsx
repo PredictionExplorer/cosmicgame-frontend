@@ -33,14 +33,15 @@ const cycleChart = (testId: string) => {
   return CycleChart;
 };
 
-jest.mock('../../../../../../components/statistics/BidFrequencyChart', () => ({
-  BidFrequencyChart: () => <div data-testid="gesture-frequency-chart" />,
+jest.mock('../../../../../../components/statistics/GestureFrequencyChart', () => ({
+  GestureFrequencyChart: () => <div data-testid="gesture-frequency-chart" />,
 }));
-jest.mock('../../../../../../components/statistics/LastBidSpikeChart', () => ({
-  LastBidSpikeChart: () => <div data-testid="gesture-spike-chart" />,
+jest.mock('../../../../../../components/statistics/GestureSpikeChart', () => ({
+  GestureSpikeChart: () => <div data-testid="gesture-spike-chart" />,
 }));
-jest.mock('../../../../../../components/statistics/BidderActivePeriodsTimeline', () => ({
-  BidderActivePeriodsTimeline: () => <div data-testid="active-periods-timeline" />,
+jest.mock('../../../../../../components/statistics/ParticipantActivePeriodsTimeline', () => ({
+  ACTIVE_PERIODS_TOP_N: 20,
+  ParticipantActivePeriodsTimeline: () => <div data-testid="active-periods-timeline" />,
 }));
 jest.mock('../../../../../../components/statistics/GestureTypeMixChart', () => ({
   GestureTypeMixChart: (props: CycleChartProps) => cycleChart('gesture-type-mix-chart')(props),
@@ -125,10 +126,34 @@ describe('ActivityPanel', () => {
     const section = screen
       .getByRole('heading', { name: 'Endurance & Chrono timeline' })
       .closest('section')!;
-    expect(within(section).getByRole('link', { name: /open in a new window/i })).toHaveAttribute(
-      'href',
-      '/embed/endurance/3',
-    );
+    const link = within(section).getByRole('link', { name: /^open in a new window/i });
+    expect(link).toHaveAttribute('href', '/embed/endurance/3');
+    expect(link).toHaveAttribute('target', '_blank');
+    // V119: a screen reader hears that it opens a new window, as the embed's own links say.
+    expect(link).toHaveAccessibleName('Open in a new window (opens in a new window)');
+  });
+
+  it('explains the page once, in a Definitions disclosure, not with an ⓘ per heading', async () => {
+    const user = userEvent.setup();
+    render(<ActivityPanel />);
+    // V300: no section heading carries an explanation button of its own.
+    expect(screen.queryByRole('button', { name: /^More information about/ })).toBeNull();
+    const summary = screen.getByText('Definitions');
+    await user.click(summary);
+    const definitions = summary.closest('details')!;
+    const terms = [...definitions.querySelectorAll('dt')].map((term) => term.textContent);
+    expect(terms).toEqual([
+      'Gesture frequency over time',
+      'Gesture spikes',
+      'Top 20 participant active periods',
+      'Gesture type distribution',
+      'Endurance & Chrono timeline',
+      'CST Calibration Window timeline',
+      'CST gesture cost over time',
+      'Cycle activations',
+    ]);
+    expect(within(definitions).getByText(/first hour after each cycle opens/)).toBeInTheDocument();
+    expect(within(definitions).getByText(/System event windows/)).toBeInTheDocument();
   });
 
   it('keeps cycle activations collapsed and unmounted by default (lazy)', () => {
@@ -158,7 +183,7 @@ describe('ActivityPanel', () => {
     });
     render(<ActivityPanel />);
     await user.click(screen.getByRole('button', { name: 'Cycle activations' }));
-    expect(screen.getByText(/failed to load cycle activations/i)).toBeInTheDocument();
+    expect(screen.getByText('This section did not load')).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /try again/i }));
     expect(refetch).toHaveBeenCalled();
@@ -198,7 +223,7 @@ describe('ActivityPanel', () => {
     const section = screen
       .getByRole('heading', { name: 'One cycle in detail' })
       .closest('section')!;
-    expect(within(section).getByText(/failed to load one cycle in detail/i)).toBeInTheDocument();
+    expect(within(section).getByText('This section did not load')).toBeInTheDocument();
     for (const id of CYCLE_CHARTS) expect(screen.queryByTestId(id)).not.toBeInTheDocument();
     expect(within(section).queryByRole('combobox')).not.toBeInTheDocument();
 

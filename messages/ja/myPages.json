@@ -86,7 +86,18 @@
       },
       "participant": "参加者",
       "loadErrorTitle": "このアドレスの統計を読み込めませんでした",
-      "loadErrorMessage": "統計サービスから応答がありませんでした。しばらくしてからもう一度お試しください。"
+      "loadErrorMessage": "統計サービスから応答がありませんでした。しばらくしてからもう一度お試しください。",
+      "sectionLoadErrorTitle": "このセクションを読み込めませんでした",
+      "nav": {
+        "label": "プロフィールの目次",
+        "overview": "概要",
+        "nfts": "NFT",
+        "gestures": "一筆",
+        "allocations": "受け取った配分",
+        "anchoring": "係留",
+        "outreach": "広報配分",
+        "attached": "添付されたアセット"
+      }
     },
     "figures": {
       "gestures": {
@@ -140,13 +151,15 @@
         "title": "Cosmic Signature NFT",
         "received": "受け取ったNFT",
         "toRetrieve": "未受け取りの添付NFT",
-        "transfers": "移転"
+        "transfers": "移転",
+        "heldOrAnchored": "現在保有または係留中{count, number}点"
       },
       "anchoring": {
         "title": "係留",
         "anchoredNow": "係留中",
         "actions": "係留 / 解除の操作",
-        "distributions": "係留配分"
+        "distributions": "係留配分",
+        "byKind": "Cosmic Signature {cosmicSignature, number}・Random Walk {randomWalk, number}"
       },
       "definitions": {
         "label": "定義",
@@ -207,11 +220,12 @@
       "sections": {
         "actions": "係留 / 解除の操作",
         "distributionsByToken": "トークン別の係留配分",
-        "distributionsByDeposit": "積立別の係留配分",
-        "retrievedDistributions": "受け取り済みの係留配分",
-        "unretrievedDistributions": "未受け取りの係留配分",
         "anchoredNftSelection": "係留NFT星選"
-      }
+      },
+      "showDeposits": "積立を表示",
+      "hideDeposits": "積立を隠す",
+      "depositsHeader": "積立",
+      "nothingRetrieved": "まだ受け取った係留配分はありません。NFTの係留配分は、係留の解除時に受け取ります。"
     },
     "donatedAssets": {
       "nfts": {
@@ -230,6 +244,13 @@
         "emptyTitle": "添付されたトークンはありません",
         "emptyDescription": "このアドレスに配分された添付ERC20トークンはまだありません。"
       }
+    },
+    "viewAddress": {
+      "label": "任意のアドレスを見る",
+      "hint": "参加者の統計は公開されています。ウォレットを接続せずに、どのアドレスでも見られます。",
+      "placeholder": "0x…",
+      "submit": "表示",
+      "invalid": "完全なアドレス（0xに続く40文字の英数字）を入力してください。"
     }
   },
   "tokens": {

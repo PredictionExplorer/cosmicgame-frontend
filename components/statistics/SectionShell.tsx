@@ -17,9 +17,9 @@ export interface SectionShellProps {
   /** The heading's level in the page outline: 2 under the page's H1 (default), 3 inside a section. */
   headingLevel?: 2 | 3;
   /**
-   * Whether the title is a disclosure button that folds the section away.
-   * Off by default: a section a reader should see stays a plain heading.
-   * Defaults to on for a section that starts collapsed (`defaultOpen={false}`).
+   * Whether the section folds away behind a disclosure row. Off by default:
+   * a section a reader should see stays a plain heading. Defaults to on for
+   * a section that starts collapsed (`defaultOpen={false}`).
    */
   collapsible?: boolean;
   /** Start collapsed with `false` (makes the section collapsible). */
@@ -32,7 +32,7 @@ export interface SectionShellProps {
    */
   collapsedSummary?: ReactNode;
   /**
-   * The visible verbs beside a collapsible title's chevron. Visual only: the
+   * The visible verbs beside a collapsible row's chevron. Visual only: the
    * button's name stays the title and `aria-expanded` carries the state.
    */
   toggleLabels?: { show: string; hide: string };
@@ -44,15 +44,20 @@ export interface SectionShellProps {
   children: ReactNode;
 }
 
+const SECTION_CLASS = 'min-w-0 scroll-mt-[calc(var(--sticky-offset)+3.5rem)] border-t border-rule';
+
 /**
- * SectionShell — one section of a data page: an H2 in `type-section` (the
- * button folding the section away when it is `collapsible`, as a heavy
- * section that starts closed is), one explanation beside it, optional
- * actions on the right, and the body. No box: sections are divided
- * by one `--rule` and space, and the table or chart inside is the only frame
- * (docs/design-system.md → "Captions, not cards"). Carries no copy of its
- * own, so any page can use it; `StatsSection` adds the statistics pages'
- * loading, error and empty states.
+ * SectionShell — one section of a data page: an H2 in `type-section`, one
+ * explanation beside it, optional actions on the right, and the body. No
+ * box: sections are divided by one `--rule` and space, and the table or
+ * chart inside is the only frame (docs/design-system.md → "Captions, not
+ * cards"). A section that folds away (`collapsible`, as a heavy one that
+ * starts closed is) is a disclosure row instead, drawn like the Definitions
+ * disclosure: its title in `type-title`, what it holds under it while it is
+ * closed, and "Show" with a chevron at the row's end; the whole row takes
+ * the press. Clash stays for titles that do nothing when pressed. Carries
+ * no copy of its own, so any page can use it; `StatsSection` adds the
+ * statistics pages' loading, error and empty states.
  */
 export function SectionShell({
   title,
@@ -81,15 +86,70 @@ export function SectionShell({
     setHasOpened(true);
   };
 
+  const panel = (
+    <div id={panelId} hidden={!open} className="mt-6 min-w-0 sm:mt-8">
+      {!lazy || hasOpened ? children : null}
+    </div>
+  );
+
+  if (collapsible) {
+    return (
+      <section
+        id={id}
+        aria-labelledby={headingId}
+        aria-busy={busy || undefined}
+        className={cn(SECTION_CLASS, 'pt-4 first:border-t-0 first:pt-0 sm:pt-5', className)}
+      >
+        {/* The button's ::after spans the row, so its summary and chevron take the press too. */}
+        <div className="group relative flex min-h-11 items-center justify-between gap-x-6 rounded-edge focus-ring-within">
+          <div className="min-w-0">
+            <Heading id={headingId} className="type-title text-foreground">
+              <button
+                type="button"
+                aria-expanded={open}
+                aria-controls={panelId}
+                onClick={toggle}
+                className="text-left focus-ring-none after:absolute after:inset-0 after:content-['']"
+              >
+                {title}
+              </button>
+            </Heading>
+            {collapsedSummary && !open ? (
+              <p className="mt-0.5 type-body-sm text-muted-foreground">{collapsedSummary}</p>
+            ) : null}
+          </div>
+          <span
+            aria-hidden
+            className="inline-flex shrink-0 items-center gap-1.5 type-label text-subtle transition-colors duration-fast group-hover:text-foreground"
+          >
+            {toggleLabels ? (open ? toggleLabels.hide : toggleLabels.show) : null}
+            <ChevronDown
+              className={cn(
+                'size-4 transition-transform duration-base motion-reduce:transition-none',
+                open && 'rotate-180',
+              )}
+            />
+          </span>
+        </div>
+        {open && description ? (
+          <p className="mt-2 max-w-[var(--measure-lede)] type-body-sm text-muted-foreground">
+            {description}
+          </p>
+        ) : null}
+        {open && actions ? (
+          <div className="mt-3 flex min-w-0 max-w-full flex-wrap items-center gap-2">{actions}</div>
+        ) : null}
+        {panel}
+      </section>
+    );
+  }
+
   return (
     <section
       id={id}
       aria-labelledby={headingId}
       aria-busy={busy || undefined}
-      className={cn(
-        'min-w-0 scroll-mt-[calc(var(--sticky-offset)+3.5rem)] border-t border-rule pt-8 first:border-t-0 first:pt-0 sm:pt-10',
-        className,
-      )}
+      className={cn(SECTION_CLASS, 'pt-8 first:border-t-0 first:pt-0 sm:pt-10', className)}
     >
       <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
         <div className="min-w-0 flex-1">
@@ -101,30 +161,7 @@ export function SectionShell({
                 headingLevel === 2 ? 'type-section' : 'type-heading-3',
               )}
             >
-              {collapsible ? (
-                <button
-                  type="button"
-                  aria-expanded={open}
-                  aria-controls={panelId}
-                  onClick={toggle}
-                  className="group inline-flex max-w-full touch-hit-area items-start gap-2.5 rounded-edge text-left"
-                >
-                  <span className="min-w-0">{title}</span>
-                  <span className="mt-[0.3em] inline-flex shrink-0 items-center gap-1 text-subtle group-hover:text-foreground">
-                    <ChevronDown
-                      aria-hidden
-                      className="size-5 transition-transform duration-base group-aria-expanded:rotate-180 motion-reduce:transition-none"
-                    />
-                    {toggleLabels ? (
-                      <span aria-hidden className="type-label">
-                        {open ? toggleLabels.hide : toggleLabels.show}
-                      </span>
-                    ) : null}
-                  </span>
-                </button>
-              ) : (
-                title
-              )}
+              {title}
             </Heading>
             {tooltip ? (
               <InfoTooltip content={tooltip} label={title} className="mt-[0.35em] shrink-0" />
@@ -135,18 +172,13 @@ export function SectionShell({
               {description}
             </p>
           ) : null}
-          {collapsedSummary && !open ? (
-            <p className="mt-2 type-body-sm text-muted-foreground">{collapsedSummary}</p>
-          ) : null}
         </div>
-        {actions && open ? (
+        {actions ? (
           // Never wider than the row: on a phone the actions take their own line and wrap inside it.
           <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2">{actions}</div>
         ) : null}
       </div>
-      <div id={panelId} hidden={!open} className="mt-6 min-w-0 sm:mt-8">
-        {!lazy || hasOpened ? children : null}
-      </div>
+      {panel}
     </section>
   );
 }

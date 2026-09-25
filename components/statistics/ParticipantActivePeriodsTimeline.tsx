@@ -1,24 +1,27 @@
 'use client';
 
-// lexicon-allow-start: internal analytics identifiers mirror backend wire names
 import { useMemo, type FC } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
-import { formatAddress, formatUnixTsLabel } from '@/utils/format';
+import { formatAddress, formatDuration, formatUnixTsLabel } from '@/utils/format';
 import { Link } from '@/i18n/navigation';
-import { useTopBidderActivePeriods, useBidTimeBounds } from '@/hooks/useApiQuery';
+// lexicon-allow-start: the hook and wire types mirror the backend route statistics/bidding/top_bidders
+import { useTopBidderActivePeriods as useActivePeriodsQuery } from '@/hooks/useApiQuery';
+import type {
+  BidderActivePeriod as ActivePeriod,
+  TopBidderInfo as TopParticipant,
+} from '@/services/api/types';
+// lexicon-allow-end
 import { useFormat } from '@/hooks/useFormat';
-import { useNow } from '@/hooks/useNow';
-import type { BidderActivePeriod, TopBidderInfo } from '@/services/api/types';
 import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
 import { SkeletonTable } from '@/components/ui/skeleton';
 
 import { ChartFigure } from './charts/ChartFigure';
+import type { ReadoutItem } from './charts/ChartReadout';
 import { UtcTime } from './charts/UtcTime';
-import { formatDateRange } from './charts/labels';
 import { useTimeAxis } from './charts/axes';
 import {
   SERIES_COLOR,
@@ -27,15 +30,17 @@ import {
   timelineMarkStyle,
 } from './charts/theme';
 import { SummaryAddress, useCoarsePointer, useTimelineReadout } from './charts/timeline';
+import { useGestureTimeBounds } from './charts/useGestureTimeBounds';
 import { useRovingStints } from './charts/useRovingStints';
 
-const TOP_N = 20;
+/** How many participants the chart ranks. */
+export const ACTIVE_PERIODS_TOP_N = 20;
 /** The thinnest a period may draw, so a one-hour burst in a year still shows. */
 const MIN_BAR_PERCENT = 0.3;
 
 type Lane = {
-  participant: TopBidderInfo;
-  periods: BidderActivePeriod[];
+  participant: TopParticipant;
+  periods: ActivePeriod[];
 };
 
 type TableRow = {
@@ -56,7 +61,7 @@ const percent = (value: number): string => `${Math.max(0, Math.min(100, value * 
  */
 const LANE_GRID = 'grid grid-cols-1 gap-x-3 sm:grid-cols-[minmax(7.5rem,11rem)_minmax(0,1fr)]';
 
-type BidderActivePeriodsTimelineProps = {
+type ParticipantActivePeriodsTimelineProps = {
   enabled?: boolean;
   /** Names the figure (the section's title). */
   label: string;
@@ -70,27 +75,22 @@ type BidderActivePeriodsTimelineProps = {
  * the arrow keys step through a lane's periods and between lanes, and the
  * hovered, tapped or focused period reads out below the plot.
  */
-export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> = ({
+export const ParticipantActivePeriodsTimeline: FC<ParticipantActivePeriodsTimelineProps> = ({
   enabled = true,
   label,
 }) => {
   const t = useTranslations('statistics');
   const locale = useLocale();
   const format = useFormat();
-  const { data: bounds } = useBidTimeBounds(enabled);
-  const nowSec = Math.floor(useNow(60_000) / 1000);
+  const bounds = useGestureTimeBounds(enabled);
+  const initTs = bounds.firstTs;
+  const finTs = bounds.lastTs + 3_600;
 
-  const { initTs, finTs } = useMemo(() => {
-    const maxTs = bounds?.MaxTs && bounds.MaxTs > 0 ? bounds.MaxTs : nowSec;
-    const minTs = bounds?.MinTs && bounds.MinTs > 0 ? bounds.MinTs : maxTs - 365 * 86_400;
-    return { initTs: minTs, finTs: maxTs + 3_600 };
-  }, [bounds, nowSec]);
-
-  const { data, isLoading, isError, refetch } = useTopBidderActivePeriods(
-    TOP_N,
+  const { data, isLoading, isError, refetch } = useActivePeriodsQuery(
+    ACTIVE_PERIODS_TOP_N,
     initTs,
     finTs,
-    enabled && initTs > 0,
+    enabled && bounds.settled,
   );
 
   const lanes = useMemo((): Lane[] => {
@@ -105,7 +105,7 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
 
   const counts = useMemo(() => lanes.map((lane) => lane.periods.length), [lanes]);
   const roving = useRovingStints(counts);
-  const readout = useTimelineReadout<BidderActivePeriod>();
+  const readout = useTimelineReadout<ActivePeriod>();
   const coarse = useCoarsePointer();
   const axis = useTimeAxis(initTs, finTs);
   const range = Math.max(1, finTs - initTs);
@@ -166,7 +166,7 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
     [locale, t],
   );
 
-  const periodLabel = (period: BidderActivePeriod) =>
+  const periodLabel = (period: ActivePeriod) =>
     t('charts.activePeriods.ariaLabel', {
       address: formatAddress(period.BidderAddr),
       count: period.NumBids,
@@ -175,7 +175,40 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
     });
 
   const leader = lanes[0]?.participant;
-  const state = isLoading ? (
+  // The longest run of any lane, and whose it was.
+  const longest = lanes
+    .flatMap((lane) => lane.periods)
+    .reduce<ActivePeriod | null>(
+      (best, period) => ((period.DurationSecs ?? 0) > (best?.DurationSecs ?? -1) ? period : best),
+      null,
+    );
+  const loading = !bounds.settled || isLoading;
+  const figures: ReadoutItem[] | undefined = loading
+    ? [
+        { id: 'leader', label: t('charts.activePeriods.mostGestures'), value: null, caption: null },
+        { id: 'longest', label: t('charts.activePeriods.longest'), value: null, caption: null },
+      ]
+    : leader
+      ? [
+          {
+            id: 'leader',
+            label: t('charts.activePeriods.mostGestures'),
+            value: format.count(leader.NumBids),
+            caption: <SummaryAddress address={leader.BidderAddr} />,
+          },
+          ...(longest
+            ? [
+                {
+                  id: 'longest',
+                  label: t('charts.activePeriods.longest'),
+                  value: formatDuration(longest.DurationSecs ?? 0, { locale, maxUnits: 2 }),
+                  caption: <SummaryAddress address={longest.BidderAddr} />,
+                },
+              ]
+            : []),
+        ]
+      : undefined;
+  const state = loading ? (
     <SkeletonTable rows={8} columns={2} />
   ) : isError ? (
     <ErrorState
@@ -191,22 +224,13 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
   return (
     <ChartFigure
       label={label}
-      summary={
-        leader
-          ? t.rich('charts.activePeriods.summary', {
-              count: lanes.length,
-              range: formatDateRange(initTs, finTs, locale),
-              leader: formatAddress(leader.BidderAddr),
-              gestures: format.count(leader.NumBids),
-              who: () => <SummaryAddress address={leader.BidderAddr} />,
-            })
-          : undefined
-      }
+      readout={isError ? undefined : figures}
       state={state}
-      note={t('charts.activePeriods.description', { count: TOP_N })}
+      loading={loading}
+      note={t('charts.activePeriods.note')}
       table={<DataTable data={tableRows} columns={columns} ariaLabel={label} />}
     >
-      <div data-testid="bidder-active-periods-timeline" className="min-w-0">
+      <div data-testid="participant-active-periods-timeline" className="min-w-0">
         {/* One grid for the axis and every lane, so they cannot drift apart. */}
         <div className={LANE_GRID}>
           <div className="hidden border-b border-rule pb-2 type-caption text-subtle sm:block">
@@ -330,4 +354,3 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
     </ChartFigure>
   );
 };
-// lexicon-allow-end

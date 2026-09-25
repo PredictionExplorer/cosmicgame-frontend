@@ -61,6 +61,14 @@ const erc20Tokens = [
   } as unknown as DonatedERC20Token,
 ];
 
+/** The live cycle as the tokens page hands it over once the dashboard answered. */
+const LIVE = {
+  currentCycle: CURRENT_CYCLE,
+  cycleLoading: false,
+  cycleFailed: false,
+  onRetryCycle: jest.fn(),
+};
+
 function okQuery<T>(data: T) {
   return { data, isLoading: false, isError: false, refetch: jest.fn() };
 }
@@ -91,9 +99,46 @@ beforeEach(() => {
   mockUseDonationsERC20ByRound.mockReturnValue(okQuery(erc20Tokens));
 });
 
+describe('AttachedAssetsSection before the live cycle is known', () => {
+  it('holds the ERC-20 tab on a skeleton while the dashboard loads, never an empty table', async () => {
+    // V111: the old -1 placeholder disabled the query, which then read as "nothing attached".
+    const user = userEvent.setup();
+    render(
+      <AttachedAssetsSection
+        currentCycle={null}
+        cycleLoading
+        cycleFailed={false}
+        onRetryCycle={jest.fn()}
+      />,
+    );
+    await openErc20Tab(user);
+    expect(screen.getByRole('status')).toBeInTheDocument();
+    expect(mockUseDonationsERC20ByRound).toHaveBeenCalledWith(-1);
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+  });
+
+  it('says the cycle could not be read, with a retry, when the dashboard failed', async () => {
+    const user = userEvent.setup();
+    const retry = jest.fn();
+    render(
+      <AttachedAssetsSection
+        currentCycle={null}
+        cycleLoading={false}
+        cycleFailed
+        onRetryCycle={retry}
+      />,
+    );
+    await user.click(screen.getByRole('radio', { name: /current/i }));
+    expect(screen.getByText('This section did not load')).toBeInTheDocument();
+    expect(nftCards()).toHaveLength(0);
+    await user.click(screen.getByRole('button', { name: /try again|retry/i }));
+    expect(retry).toHaveBeenCalled();
+  });
+});
+
 describe('AttachedAssetsSection NFT scope', () => {
   it('opens on the NFT tab showing every cycle', () => {
-    render(<AttachedAssetsSection currentRoundNum={CURRENT_CYCLE} />);
+    render(<AttachedAssetsSection {...LIVE} />);
 
     expect(screen.getByRole('tab', { name: 'NFTs (ERC-721)' })).toHaveAttribute(
       'aria-selected',
@@ -105,7 +150,7 @@ describe('AttachedAssetsSection NFT scope', () => {
 
   it('narrows the grid to the current cycle when the scope changes', async () => {
     const user = userEvent.setup();
-    render(<AttachedAssetsSection currentRoundNum={CURRENT_CYCLE} />);
+    render(<AttachedAssetsSection {...LIVE} />);
 
     expect(nftCards()).toHaveLength(12);
 
@@ -117,7 +162,7 @@ describe('AttachedAssetsSection NFT scope', () => {
 
   it('returns to the first page when the scope changes', async () => {
     const user = userEvent.setup();
-    render(<AttachedAssetsSection currentRoundNum={CURRENT_CYCLE} />);
+    render(<AttachedAssetsSection {...LIVE} />);
 
     await goToPage(user, '2');
     expect(nftCards()).toHaveLength(3);
@@ -129,7 +174,7 @@ describe('AttachedAssetsSection NFT scope', () => {
   });
 
   it('groups the scope options as one radio group', () => {
-    render(<AttachedAssetsSection currentRoundNum={CURRENT_CYCLE} />);
+    render(<AttachedAssetsSection {...LIVE} />);
 
     const group = screen.getByRole('radiogroup', { name: 'Attached NFT scope' });
     expect(within(group).getAllByRole('radio')).toHaveLength(2);
@@ -139,7 +184,7 @@ describe('AttachedAssetsSection NFT scope', () => {
 describe('AttachedAssetsSection NFT paging', () => {
   it('pages the grid twelve at a time', async () => {
     const user = userEvent.setup();
-    render(<AttachedAssetsSection currentRoundNum={CURRENT_CYCLE} />);
+    render(<AttachedAssetsSection {...LIVE} />);
 
     expect(nftCards()).toHaveLength(12);
 
@@ -153,13 +198,13 @@ describe('AttachedAssetsSection NFT paging', () => {
     // Without the clamp the pager would sit past the last page and the grid
     // would render empty after a poll returned fewer records.
     const user = userEvent.setup();
-    const { rerender } = render(<AttachedAssetsSection currentRoundNum={CURRENT_CYCLE} />);
+    const { rerender } = render(<AttachedAssetsSection {...LIVE} />);
 
     await goToPage(user, '2');
     expect(screen.getByText('NFT 13')).toBeInTheDocument();
 
     mockUseDonationsNFTList.mockReturnValue(okQuery(allNfts.slice(0, 4)));
-    rerender(<AttachedAssetsSection currentRoundNum={CURRENT_CYCLE} />);
+    rerender(<AttachedAssetsSection {...LIVE} />);
 
     expect(nftCards()).toHaveLength(4);
     expect(screen.getByText('NFT 1')).toBeInTheDocument();
@@ -167,7 +212,7 @@ describe('AttachedAssetsSection NFT paging', () => {
 
   it('drops the pager when everything fits on one page', async () => {
     const user = userEvent.setup();
-    render(<AttachedAssetsSection currentRoundNum={CURRENT_CYCLE} />);
+    render(<AttachedAssetsSection {...LIVE} />);
 
     await user.click(screen.getByRole('radio', { name: 'Current cycle' }));
 
@@ -180,7 +225,7 @@ describe('AttachedAssetsSection NFT paging', () => {
 describe('AttachedAssetsSection NFT states', () => {
   it('explains that no NFTs have ever been attached', () => {
     mockUseDonationsNFTList.mockReturnValue(okQuery([]));
-    render(<AttachedAssetsSection currentRoundNum={CURRENT_CYCLE} />);
+    render(<AttachedAssetsSection {...LIVE} />);
 
     expect(screen.getByText('No NFTs have been attached yet')).toBeInTheDocument();
     expect(screen.getByText('Attached NFTs from all cycles will appear here.')).toBeInTheDocument();
@@ -190,7 +235,7 @@ describe('AttachedAssetsSection NFT states', () => {
   it('switches to the current-cycle wording when that scope is empty', async () => {
     const user = userEvent.setup();
     mockUseDonationsNFTList.mockReturnValue(okQuery([nft(1, 1)]));
-    render(<AttachedAssetsSection currentRoundNum={CURRENT_CYCLE} />);
+    render(<AttachedAssetsSection {...LIVE} />);
 
     await user.click(screen.getByRole('radio', { name: 'Current cycle' }));
 
@@ -211,7 +256,7 @@ describe('AttachedAssetsSection NFT states', () => {
         { RoundNum: 1, TokenAddr: '0xsame', NFTTokenId: 2 },
       ] as unknown as AttachedNFT[]),
     );
-    render(<AttachedAssetsSection currentRoundNum={CURRENT_CYCLE} />);
+    render(<AttachedAssetsSection {...LIVE} />);
 
     expect(nftCards()).toHaveLength(2);
     expect(screen.getByText('NFT token-1')).toBeInTheDocument();
@@ -225,7 +270,7 @@ describe('AttachedAssetsSection NFT states', () => {
       isError: false,
       refetch: jest.fn(),
     });
-    render(<AttachedAssetsSection currentRoundNum={CURRENT_CYCLE} />);
+    render(<AttachedAssetsSection {...LIVE} />);
 
     expect(nftCards()).toHaveLength(0);
     expect(screen.queryByText('No NFTs have been attached yet')).not.toBeInTheDocument();
@@ -240,7 +285,7 @@ describe('AttachedAssetsSection NFT states', () => {
       isError: true,
       refetch,
     });
-    render(<AttachedAssetsSection currentRoundNum={CURRENT_CYCLE} />);
+    render(<AttachedAssetsSection {...LIVE} />);
 
     expect(screen.getByText('Failed to load attached NFTs')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /try again/i }));
@@ -251,14 +296,14 @@ describe('AttachedAssetsSection NFT states', () => {
 
 describe('AttachedAssetsSection ERC-20 tab', () => {
   it('requests the tokens attached during the current cycle', () => {
-    render(<AttachedAssetsSection currentRoundNum={CURRENT_CYCLE} />);
+    render(<AttachedAssetsSection {...LIVE} />);
 
     expect(mockUseDonationsERC20ByRound).toHaveBeenCalledWith(CURRENT_CYCLE);
   });
 
   it('lists the attached tokens once the tab is opened', async () => {
     const user = userEvent.setup();
-    render(<AttachedAssetsSection currentRoundNum={CURRENT_CYCLE} />);
+    render(<AttachedAssetsSection {...LIVE} />);
 
     await openErc20Tab(user);
 
@@ -277,7 +322,7 @@ describe('AttachedAssetsSection ERC-20 tab', () => {
       isError: false,
       refetch: jest.fn(),
     });
-    render(<AttachedAssetsSection currentRoundNum={CURRENT_CYCLE} />);
+    render(<AttachedAssetsSection {...LIVE} />);
 
     await openErc20Tab(user);
 
@@ -288,7 +333,7 @@ describe('AttachedAssetsSection ERC-20 tab', () => {
   it('shows the table empty state when nothing was attached this cycle', async () => {
     const user = userEvent.setup();
     mockUseDonationsERC20ByRound.mockReturnValue(okQuery([]));
-    render(<AttachedAssetsSection currentRoundNum={CURRENT_CYCLE} />);
+    render(<AttachedAssetsSection {...LIVE} />);
 
     await openErc20Tab(user);
 
@@ -304,7 +349,7 @@ describe('AttachedAssetsSection ERC-20 tab', () => {
       isError: true,
       refetch,
     });
-    render(<AttachedAssetsSection currentRoundNum={CURRENT_CYCLE} />);
+    render(<AttachedAssetsSection {...LIVE} />);
 
     await openErc20Tab(user);
 
@@ -316,7 +361,7 @@ describe('AttachedAssetsSection ERC-20 tab', () => {
 
   it('keeps the NFT tab state independent of the ERC-20 tab', async () => {
     const user = userEvent.setup();
-    render(<AttachedAssetsSection currentRoundNum={CURRENT_CYCLE} />);
+    render(<AttachedAssetsSection {...LIVE} />);
 
     await user.click(screen.getByRole('radio', { name: 'Current cycle' }));
     await openErc20Tab(user);
@@ -329,7 +374,7 @@ describe('AttachedAssetsSection ERC-20 tab', () => {
 
 describe('AttachedAssetsSection accessibility', () => {
   it('has no violations with data', async () => {
-    const { container } = render(<AttachedAssetsSection currentRoundNum={CURRENT_CYCLE} />);
+    const { container } = render(<AttachedAssetsSection {...LIVE} />);
 
     await checkA11y(container);
   });
@@ -337,14 +382,14 @@ describe('AttachedAssetsSection accessibility', () => {
   it('has no violations when empty', async () => {
     mockUseDonationsNFTList.mockReturnValue(okQuery([]));
     mockUseDonationsERC20ByRound.mockReturnValue(okQuery([]));
-    const { container } = render(<AttachedAssetsSection currentRoundNum={CURRENT_CYCLE} />);
+    const { container } = render(<AttachedAssetsSection {...LIVE} />);
 
     await checkA11y(container);
   });
 
   it('has no violations on the ERC-20 tab', async () => {
     const user = userEvent.setup();
-    const { container } = render(<AttachedAssetsSection currentRoundNum={CURRENT_CYCLE} />);
+    const { container } = render(<AttachedAssetsSection {...LIVE} />);
 
     await openErc20Tab(user);
 

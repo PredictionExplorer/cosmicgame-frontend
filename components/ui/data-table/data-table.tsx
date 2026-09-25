@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { TOUCH_TARGET_EXTENDED_CLASS } from '@/lib/touch-target';
 import { formatCount, type AmountUnit } from '@/utils/format';
 import { Link, useRouter } from '@/i18n/navigation';
-import { TimeZoneNote } from '@/components/ui/date-time';
+import { TimeZoneNote, useTimeZoneStated } from '@/components/ui/date-time';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
@@ -608,7 +608,10 @@ export function DataTable<T>({
   const currentPage = currentIndex >= 0 && paginate ? Math.floor(currentIndex / pageSize) + 1 : 1;
 
   const linkColumnId = rowLinkColumn ?? visible[0]?.column.id;
-  const hasDatetime = timeZoneNote && visible.some((col) => col.kind === 'datetime');
+  // A table can leave its zone note out (`timeZoneNote={false}`), and a page may state the
+  // zone once for every table on it (`<TimeZoneStated>`).
+  const zoneStated = useTimeZoneStated();
+  const hasDatetime = timeZoneNote && !zoneStated && visible.some((col) => col.kind === 'datetime');
   const cellPadding = density === 'compact' ? 'py-2.5' : 'py-3';
   // An empty or error state's title sits one level under the table's own
   // heading, or takes the table's place in the outline when it has none.

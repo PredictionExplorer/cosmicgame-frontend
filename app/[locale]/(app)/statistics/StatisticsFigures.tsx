@@ -7,13 +7,13 @@ import { toFiniteNumber } from '@/utils/finiteNumber';
 import { useFormat } from '@/hooks/useFormat';
 import { useHydrated } from '@/hooks/useHydrated';
 import {
-  useCSTDistribution,
   useCTBalancesDistribution,
   useCTStatistics,
   useDashboardInfo,
   useUniqueCSTAnchorHolders,
   useUniqueRWLKAnchorHolders,
 } from '@/hooks/useApiQuery';
+import { useNftOwnership } from '@/components/statistics/useNftOwnership';
 import { Amount } from '@/components/ui/amount';
 import { Skeleton } from '@/components/ui/skeleton';
 import { UnknownValue } from '@/components/ui/unknown-value';
@@ -91,14 +91,18 @@ export function ActiveAnchorHoldersFigure() {
   );
 }
 
-/** Wallets holding at least one Cosmic Signature NFT. */
+/**
+ * Addresses that hold or have anchored at least one Cosmic Signature NFT: the
+ * Anchoring Wallet is custody, not a holder, so the count matches the ledger
+ * below it and every address's profile.
+ */
 export function NftHoldersFigure() {
   const hydrated = useHydrated();
-  const { data, isLoading: queryLoading, isError } = useCSTDistribution();
-  const isLoading = !hydrated || queryLoading;
+  const ownership = useNftOwnership();
+  const isLoading = !hydrated || ownership.isLoading;
   return (
     <FigureValue
-      value={isLoading ? undefined : isError || !data ? null : data.length}
+      value={isLoading ? undefined : (ownership.data?.holders.length ?? null)}
       loading={isLoading}
     />
   );

@@ -58,6 +58,20 @@ describe('ProfileArtworks', () => {
     expect(links[1]!.querySelector('[data-testid="anchored-mark"]')).toBeNull();
   });
 
+  it('says a failed read failed, with a retry, never "no NFTs"', () => {
+    const onRetry = jest.fn();
+    render(<ProfileArtworks tokens={[]} loading={false} error onRetry={onRetry} />);
+    expect(screen.queryByText('myPages.statistics.artworks.emptyTitle')).not.toBeInTheDocument();
+    expect(screen.getByText('myPages.statistics.page.sectionLoadErrorTitle')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /try again|retry/i }));
+    expect(onRetry).toHaveBeenCalledTimes(1);
+  });
+
+  it('spans one plate across a phone column instead of half of it', () => {
+    const { container } = render(<ProfileArtworks tokens={[token(1)]} loading={false} />);
+    expect(container.querySelector('ul')).toHaveClass('grid-cols-1');
+  });
+
   it('explains an empty collection', () => {
     render(<ProfileArtworks tokens={[]} loading={false} />);
     expect(screen.getByText('myPages.statistics.artworks.emptyTitle')).toBeInTheDocument();

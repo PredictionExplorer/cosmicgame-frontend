@@ -217,9 +217,10 @@
     "description": "시그니처 배분, ETH 별빛 선정 배분, Cosmic Signature NFT, 앵커링 지급을 포함한 Cosmic Signature 전체 배분 내역을 확인할 수 있습니다."
   },
   "userProfile": {
-    "title": "사용자 {address} 정보",
+    "title": "참여자 {address} 정보",
     "description": "참여자 {address}의 제스처, 배분, 앵커링 내역입니다.",
-    "invalidAddress": "잘못된 주소"
+    "invalidAddress": "잘못된 주소",
+    "invalidDescription": "이 링크의 주소는 올바른 이더리움 주소가 아닙니다."
   },
   "admin": {
     "title": "제스처 메시지 관리",

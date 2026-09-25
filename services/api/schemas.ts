@@ -607,19 +607,6 @@ export const BidFrequencyBucketSchema = z
   })
   .loose();
 
-export const BidTypeRatioBucketSchema = z
-  .object({
-    BucketTs: z.number(),
-    EthBids: z.number(),
-    RwalkBids: z.number(),
-    CstBids: z.number(),
-    TotalBids: z.number(),
-    EthPct: z.number(),
-    RwalkPct: z.number(),
-    CstPct: z.number(),
-  })
-  .loose();
-
 export const BidSpikeSchema = z
   .object({
     Index: z.number(),

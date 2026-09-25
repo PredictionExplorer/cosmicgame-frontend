@@ -86,7 +86,18 @@
       },
       "participant": "Учасник",
       "loadErrorTitle": "Не вдалося завантажити статистику цієї адреси",
-      "loadErrorMessage": "Сервіс статистики не відповідає. Спробуйте ще раз за хвилину."
+      "loadErrorMessage": "Сервіс статистики не відповідає. Спробуйте ще раз за хвилину.",
+      "sectionLoadErrorTitle": "Розділ не завантажився",
+      "nav": {
+        "label": "Зміст профілю",
+        "overview": "Огляд",
+        "nfts": "NFT",
+        "gestures": "Жести",
+        "allocations": "Розподіли",
+        "anchoring": "Закріплення",
+        "outreach": "Просування",
+        "attached": "Долучені активи"
+      }
     },
     "figures": {
       "gestures": {
@@ -140,13 +151,15 @@
         "title": "Cosmic Signature NFT",
         "received": "Отримано",
         "toRetrieve": "Долучені NFT, які можна забрати",
-        "transfers": "Передачі"
+        "transfers": "Передачі",
+        "heldOrAnchored": "Зараз у власності або закріплено: {count, number}"
       },
       "anchoring": {
         "title": "Закріплення",
         "anchoredNow": "Закріплено зараз",
         "actions": "Дії закріплення та відкріплення",
-        "distributions": "Надходження за закріплення"
+        "distributions": "Надходження за закріплення",
+        "byKind": "Cosmic Signature {cosmicSignature, number} · Random Walk {randomWalk, number}"
       },
       "definitions": {
         "label": "Визначення",
@@ -207,11 +220,12 @@
       "sections": {
         "actions": "Дії закріплення та відкріплення",
         "distributionsByToken": "Надходження за закріплення за токенами",
-        "distributionsByDeposit": "Надходження за закріплення за депозитами",
-        "retrievedDistributions": "Забрані надходження за закріплення",
-        "unretrievedDistributions": "Незабрані надходження за закріплення",
         "anchoredNftSelection": "Зоряний відбір закріплених NFT"
-      }
+      },
+      "showDeposits": "Показати депозити",
+      "hideDeposits": "Сховати депозити",
+      "depositsHeader": "Депозити",
+      "nothingRetrieved": "Ще нічого не забрано: надходження за закріплення NFT забирається під час його відкріплення."
     },
     "donatedAssets": {
       "nfts": {
@@ -230,6 +244,13 @@
         "emptyTitle": "Долучених токенів немає",
         "emptyDescription": "Цій адресі ще не розподілено долучених токенів ERC-20."
       }
+    },
+    "viewAddress": {
+      "label": "Переглянути будь-яку адресу",
+      "hint": "Статистика учасників відкрита: переглядайте будь-яку адресу без під’єднання гаманця.",
+      "placeholder": "0x…",
+      "submit": "Переглянути",
+      "invalid": "Введіть повну адресу: 0x і 40 літер та цифр."
     }
   },
   "tokens": {

@@ -8,7 +8,8 @@ import type { RoiLeaderboardEntry as OutcomeEntry } from '@/services/api/types';
 // lexicon-allow-start: the hook name mirrors the backend route statistics/leaderboard/roi
 import { useRoiLeaderboard as useOutcomesQuery } from '@/hooks/useApiQuery';
 // lexicon-allow-end
-import { PageHeaderFigures, type PageHeaderFigure } from '@/components/layout/PageHeader';
+import type { PageHeaderFigure } from '@/components/layout/PageHeader';
+import { Amount } from '@/components/ui/amount';
 import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
@@ -16,6 +17,7 @@ import { SkeletonTable } from '@/components/ui/skeleton';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 
 import { CountBreakdown } from './CountBreakdown';
+import { FigureStrip } from './FigureStrip';
 
 /** The backend's order key for "most gestures first"; the table re-sorts client-side. */
 const GESTURE_ORDER = 'bids'; // lexicon-allow-backend-type
@@ -51,7 +53,8 @@ export const ParticipantOutcomesSection = () => {
   const { data, isLoading, isError, refetch } = useOutcomesQuery(GESTURE_ORDER, minGestures);
   const list = useMemo(() => data ?? [], [data]);
   const totals = useMemo(() => outcomeTotals(list), [list]);
-  const eth = (value: number) => format.amount(value, { unit: 'ETH' });
+  // As every other figure strip draws an amount: the unit muted, joined by a no-break space.
+  const eth = (value: number) => <Amount value={value} unit="ETH" />;
 
   const figures: PageHeaderFigure[] = [
     {
@@ -141,8 +144,16 @@ export const ParticipantOutcomesSection = () => {
               <CountBreakdown
                 className="type-caption text-muted-foreground"
                 parts={[
-                  { key: 'nft', count: row.NftPrizesCount, unit: 'NFT' },
-                  { key: 'cst', count: row.CstPrizesCount, unit: 'CST' },
+                  {
+                    key: 'nft',
+                    count: row.NftPrizesCount,
+                    text: t('performance.kinds.nft', { count: row.NftPrizesCount }),
+                  },
+                  {
+                    key: 'cst',
+                    count: row.CstPrizesCount,
+                    text: t('performance.kinds.cst', { count: row.CstPrizesCount }),
+                  },
                 ]}
               />
             </span>
@@ -181,7 +192,7 @@ export const ParticipantOutcomesSection = () => {
         <EmptyState headingLevel={3} variant="inline" title={t('performance.leaderboard.empty')} />
       ) : (
         <>
-          <PageHeaderFigures figures={figures} className="mt-0 sm:mt-0" />
+          <FigureStrip figures={figures} />
           <DataTable
             data={list}
             columns={columns}

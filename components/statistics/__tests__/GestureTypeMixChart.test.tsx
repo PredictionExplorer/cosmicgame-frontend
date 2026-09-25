@@ -1,5 +1,7 @@
 import userEvent from '@testing-library/user-event';
 
+import { lastChartData } from '@/test-utils/recharts';
+
 import { checkA11y, render, screen, within } from '@/test-utils';
 
 import { GestureTypeMixChart } from '../GestureTypeMixChart';
@@ -37,12 +39,37 @@ beforeEach(() => {
 });
 
 describe('GestureTypeMixChart', () => {
-  it('reads the cycle’s method mix in counts and shares', () => {
+  it('reads out the cycle’s method mix in counts and shares, each with its colour', () => {
     render(<GestureTypeMixChart round={2} isLive label="Gesture type distribution" />);
     const figure = screen.getByRole('figure', { name: 'Gesture type distribution' });
-    expect(figure).toHaveTextContent(
-      /Gestures this cycle: 4\. ETH 2 \(50%\), ETH with Random Walk NFT 1 \(25%\), CST 1 \(25%\)\./,
+    const figures = [...figure.querySelectorAll('figcaption dl > div')].map((item) =>
+      [...item.querySelectorAll('dt, dd')].map((cell) => cell.textContent),
     );
+    expect(figures).toEqual([
+      ['Gestures', '4'],
+      ['ETH', '2', '50%'],
+      ['ETH with Random Walk NFT', '1', '25%'],
+      ['CST', '1', '25%'],
+    ]);
+  });
+
+  it('counts the live cycle’s gestures made since the last whole hour', () => {
+    // V107: at 20:35 the gesture at 20:10 is in the bars, as it is in the readout.
+    const late = T0 + 20 * HOUR + 10 * 60;
+    mockUseGestureListByCycle.mockReturnValue(
+      ok([...gestures, { TimeStamp: late, GestureType: 2 }]),
+    );
+    mockUseCurrentTime.mockReturnValue(ok(T0 + 20 * HOUR + 35 * 60));
+    render(<GestureTypeMixChart round={2} isLive label="Mix" />);
+    const bars = lastChartData<{ total: number }>();
+    expect(bars.reduce((sum, bar) => sum + bar.total, 0)).toBe(5);
+    expect(bars.at(-1)!.total).toBe(1);
+  });
+
+  it('waits for a finalized cycle’s end before drawing it', () => {
+    mockUseRoundInfo.mockReturnValue({ data: undefined, isLoading: true, isError: false });
+    render(<GestureTypeMixChart round={1} isLive={false} label="Mix" />);
+    expect(screen.queryByTestId('bar-chart')).not.toBeInTheDocument();
   });
 
   it('stacks counts per window, hourly for a young cycle, empty windows included', () => {
@@ -78,10 +105,24 @@ describe('GestureTypeMixChart', () => {
     expect(rows).toHaveLength(4);
   });
 
-  it('says so when the cycle has no gestures yet', () => {
+  it('says so when the cycle has no gestures yet, in words for any cycle', () => {
     mockUseGestureListByCycle.mockReturnValue(ok([]));
     render(<GestureTypeMixChart round={2} isLive label="Mix" />);
-    expect(screen.getByText('No gesture activity in the current cycle yet.')).toBeInTheDocument();
+    // V115: the chart follows the page's cycle picker, so never "the current cycle".
+    expect(screen.getByText('No gestures in this cycle yet.')).toBeInTheDocument();
+  });
+
+  it('names the cycle it could not read without calling it the current one', () => {
+    mockUseGestureListByCycle.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      refetch: jest.fn(),
+    });
+    render(<GestureTypeMixChart round={1} isLive={false} label="Mix" />);
+    expect(
+      screen.getByText('Could not fetch the gesture history for this cycle.'),
+    ).toBeInTheDocument();
   });
 
   it('has no axe violations', async () => {

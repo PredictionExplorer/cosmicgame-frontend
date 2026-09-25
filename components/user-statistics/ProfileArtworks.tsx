@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 
+import { cn } from '@/lib/utils';
 import { formatId } from '@/utils/format/ids';
 import { Link } from '@/i18n/navigation';
 import type { CSTTokenInfo } from '@/services/api';
@@ -10,6 +11,7 @@ import { signatureMedia, signatureSources, useSignatureAlt } from '@/components/
 import { ArtFrame } from '@/components/ui/art-frame';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
 import { SignatureWallLabel } from '@/components/ui/signature-label';
 import { SkeletonNFTCard } from '@/components/ui/skeleton';
 
@@ -24,6 +26,9 @@ export interface ProfileArtworksProps {
   /** The NFTs it has anchored, which the anchoring wallet holds for it. */
   anchored?: readonly AnchoredArtwork[];
   loading: boolean;
+  /** The held NFTs could not be read: say so with a retry, never "no NFTs". */
+  error?: boolean;
+  onRetry?: () => void;
 }
 
 interface Plate {
@@ -42,7 +47,13 @@ interface Plate {
  * holds).
  * Newest first; the first two rows show until "Show all".
  */
-export function ProfileArtworks({ tokens, anchored = [], loading }: ProfileArtworksProps) {
+export function ProfileArtworks({
+  tokens,
+  anchored = [],
+  loading,
+  error = false,
+  onRetry,
+}: ProfileArtworksProps) {
   const t = useTranslations('myPages');
   const tDetail = useTranslations('detail');
   const signatureAlt = useSignatureAlt();
@@ -55,6 +66,18 @@ export function ProfileArtworks({ tokens, anchored = [], loading }: ProfileArtwo
           <SkeletonNFTCard key={i} announce={i === 0} />
         ))}
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <ErrorState
+        headingLevel={3}
+        variant="inline"
+        title={t('statistics.page.sectionLoadErrorTitle')}
+        message={t('statistics.page.loadErrorMessage')}
+        onRetry={onRetry}
+      />
     );
   }
 
@@ -82,7 +105,13 @@ export function ProfileArtworks({ tokens, anchored = [], loading }: ProfileArtwo
 
   return (
     <div>
-      <ul className="grid grid-cols-2 gap-x-5 gap-y-8 md:grid-cols-3 xl:grid-cols-4">
+      {/* One plate spans a phone's column instead of sitting at half width beside nothing. */}
+      <ul
+        className={cn(
+          'grid gap-x-5 gap-y-8 md:grid-cols-3 xl:grid-cols-4',
+          ordered.length === 1 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-2',
+        )}
+      >
         {visible.map((token) => {
           const id = formatId(token.TokenId);
           const name = token.TokenName?.trim() || null;
@@ -97,7 +126,11 @@ export function ProfileArtworks({ tokens, anchored = [], loading }: ProfileArtwo
                   <ArtFrame
                     sources={signatureSources(media)}
                     alt={signatureAlt({ id, name })}
-                    sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 20rem"
+                    sizes={
+                      ordered.length === 1
+                        ? '(max-width: 640px) 100vw, (max-width: 1280px) 33vw, 20rem'
+                        : '(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 20rem'
+                    }
                     unavailableLabel={tDetail('image.artworkUnavailable')}
                     unavailableDetail={id}
                     density="compact"

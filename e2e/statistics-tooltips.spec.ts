@@ -77,14 +77,19 @@ test.describe('/statistics tooltips', () => {
     );
   });
 
-  test('explains a section once, beside its title', async ({ page }) => {
+  test('explains each section once, in the page’s Definitions disclosure', async ({ page }) => {
     await page.goto('/statistics/activity', { waitUntil: 'networkidle' });
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    // The explanation sits beside the H2 (which folds the section), not inside it.
-    const trigger = page.getByRole('button', { name: 'More information about Cycle activations' });
-    await trigger.scrollIntoViewIfNeeded();
-    await openTooltip(trigger);
-    await expectTooltipFullyVisible(page, /System event windows that show when protocol cycles/);
+    // No info icon on every heading: the sections are explained in one place at the page's end.
+    await expect(
+      page.getByRole('button', { name: 'More information about Cycle activations' }),
+    ).toHaveCount(0);
+    const definitions = page.locator('details').filter({ hasText: 'Definitions' }).last();
+    await definitions.scrollIntoViewIfNeeded();
+    await definitions.locator('summary').click();
+    await expect(
+      definitions.getByText(/System event windows that show when protocol cycles/),
+    ).toBeVisible();
   });
 
   test('opens a representative table header tooltip', async ({ page }, testInfo) => {

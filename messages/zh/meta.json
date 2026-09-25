@@ -129,7 +129,8 @@
   "userProfile": {
     "title": "参与者 {address} 的信息",
     "description": "参与者 {address} 的落笔、分配与锚定。",
-    "invalidAddress": "无效地址"
+    "invalidAddress": "无效地址",
+    "invalidDescription": "此链接中的地址不是有效的以太坊地址。"
   },
   "userStellarSelectionEth": {
     "title": "星选 ETH",

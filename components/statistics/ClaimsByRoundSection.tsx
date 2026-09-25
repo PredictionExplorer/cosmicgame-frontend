@@ -27,22 +27,28 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
 import { SkeletonTable } from '@/components/ui/skeleton';
 
-import { CountBreakdown, type CountPart } from './CountBreakdown';
+import { CountBreakdown } from './CountBreakdown';
 
 type AssetType = ClaimUnclaimedItem['AssetType'];
 
-/** What a claimable asset is, in words and figures: "0.25 ETH", "NFT 0x12…34 #5". */
+/**
+ * What a retrievable asset is, in words and figures, each in its locale's own
+ * order: "2.50 ETH", "Attached NFT 0x12…34 #5", "Attached ERC-20 0x12…34: 1.5".
+ */
 function useAssetText() {
   const t = useTranslations('statistics');
   const format = useFormat();
   return useCallback(
     (asset: { AssetType: AssetType; AmountEth: number; TokenAddr: string; TokenId: number }) => {
       if (asset.AssetType === 'ETH') return format.amount(asset.AmountEth, { unit: 'ETH' });
+      const contract = formatAddress(asset.TokenAddr);
       if (asset.AssetType === 'ERC721') {
-        return `${t('performance.claims.assets.nft')} ${formatAddress(asset.TokenAddr)} #${asset.TokenId}`;
+        return t('performance.claims.assets.nftItem', { contract, id: asset.TokenId });
       }
-      const amount = format.number(asset.AmountEth, { maximumFractionDigits: 4 });
-      return `${t('performance.claims.assets.erc20')} ${amount} · ${formatAddress(asset.TokenAddr)}`;
+      return t('performance.claims.assets.erc20Item', {
+        contract,
+        amount: format.number(asset.AmountEth, { maximumFractionDigits: 4 }),
+      });
     },
     [format, t],
   );
@@ -52,6 +58,16 @@ function useAssetText() {
 export function retrievedShare(cycle: Pick<RoundClaimSummary, 'TotalAwarded' | 'TotalUnclaimed'>) {
   if (!(cycle.TotalAwarded > 0)) return null;
   return Math.min(1, Math.max(0, (cycle.TotalAwarded - cycle.TotalUnclaimed) / cycle.TotalAwarded));
+}
+
+/**
+ * The latest non-null value: what a closing dialog keeps showing while it
+ * animates out, after its subject has been cleared.
+ */
+function useLastShown<T>(value: T | null): T | null {
+  const [last, setLast] = useState<T | null>(value);
+  if (value !== null && value !== last) setLast(value);
+  return value ?? last;
 }
 
 /** A dialog header that reads left to right and keeps clear of the close button in its corner. */
@@ -69,6 +85,8 @@ const UnretrievedDialog = ({
   const t = useTranslations('statistics');
   const format = useFormat();
   const assetText = useAssetText();
+  // Kept through the closing animation, so the dialog does not empty as it fades.
+  const shown = useLastShown(cycle);
   const columns = useMemo<DataTableColumn<ClaimUnclaimedItem>[]>(
     () => [
       {
@@ -89,18 +107,18 @@ const UnretrievedDialog = ({
   return (
     <Dialog open={!!cycle} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-xl">
-        {cycle ? (
+        {shown ? (
           <>
             <DialogHeader className={DIALOG_HEADER_CLASS}>
               <DialogTitle>
-                {t('performance.claims.dialog.unclaimedTitle', { cycle: cycle.RoundNum })}
+                {t('performance.claims.dialog.unclaimedTitle', { cycle: shown.RoundNum })}
               </DialogTitle>
               <DialogDescription>
-                {cycle.Expired
+                {shown.Expired
                   ? t('performance.claims.dialog.expired')
                   : t('performance.claims.dialog.closesIn', {
                       duration: formatSeconds(
-                        Math.max(0, cycle.ClaimWindowTimeout - nowSec),
+                        Math.max(0, shown.ClaimWindowTimeout - nowSec),
                         format.locale,
                       ),
                     })}
@@ -108,9 +126,9 @@ const UnretrievedDialog = ({
             </DialogHeader>
             <div className="max-h-[60vh] overflow-auto">
               <DataTable
-                data={cycle.UnclaimedItems}
+                data={shown.UnclaimedItems}
                 columns={columns}
-                ariaLabel={t('performance.claims.dialog.unclaimedTitle', { cycle: cycle.RoundNum })}
+                ariaLabel={t('performance.claims.dialog.unclaimedTitle', { cycle: shown.RoundNum })}
                 getRowKey={(row, index) =>
                   `${row.AssetType}-${row.TokenAddr}-${row.TokenId}-${row.RecipientAddr}-${index}`
                 }
@@ -123,11 +141,15 @@ const UnretrievedDialog = ({
   );
 };
 
-/** One cycle in detail: its retrieval transactions (with how long each took) and the tokens attached during it. */
-const CycleDetailDialog = ({ round, onClose }: { round: number | null; onClose: () => void }) => {
+/**
+ * One cycle's retrievals, under its row: the retrieval transactions (with how
+ * long each took) and the tokens attached during the cycle. A read that
+ * fails says so with a retry; it never reads as "no retrievals".
+ */
+function CycleRetrievals({ round }: { round: number }) {
   const t = useTranslations('statistics');
   const assetText = useAssetText();
-  const { data, isLoading } = useClaimDetailByRound(round);
+  const { data, isLoading, isError, refetch } = useClaimDetailByRound(round);
   const claims: ClaimTxn[] = data?.ClaimTransactions ?? [];
   const attached: AttachedToken[] = data?.AttachedTokens ?? [];
 
@@ -193,83 +215,81 @@ const CycleDetailDialog = ({ round, onClose }: { round: number | null; onClose: 
     [assetText, t],
   );
 
+  if (isLoading) return <SkeletonTable rows={3} columns={4} />;
+  if (isError) {
+    return (
+      <ErrorState
+        variant="inline"
+        headingLevel={3}
+        title={t('performance.claims.loadErrorTitle')}
+        message={t('performance.claims.loadErrorMessage')}
+        onRetry={() => refetch()}
+      />
+    );
+  }
+
   return (
-    <Dialog open={round != null} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-4xl">
-        <DialogHeader className={DIALOG_HEADER_CLASS}>
-          {/* The title repeats the button that opened it ("Cycle 12 details"). */}
-          <DialogTitle>{t('performance.claims.cycleDetails', { cycle: round ?? 0 })}</DialogTitle>
-          <DialogDescription>{t('performance.claims.dialog.exploreDescription')}</DialogDescription>
-        </DialogHeader>
-        {isLoading ? (
-          <SkeletonTable rows={4} columns={4} />
+    <div className="space-y-6 py-2">
+      <section className="space-y-3">
+        <h3 className="type-label text-foreground">
+          {t('performance.claims.dialog.claimTransactions')}
+        </h3>
+        {claims.length === 0 ? (
+          <p className="type-body-sm text-muted-foreground">
+            {t('performance.claims.dialog.noClaims')}
+          </p>
         ) : (
-          <div className="max-h-[65vh] space-y-8 overflow-auto">
-            <section>
-              <h3 className="mb-3 type-title text-foreground">
-                {t('performance.claims.dialog.claimTransactions')}
-              </h3>
-              {claims.length === 0 ? (
-                <p className="type-body-sm text-muted-foreground">
-                  {t('performance.claims.dialog.noClaims')}
-                </p>
-              ) : (
-                <DataTable
-                  data={claims}
-                  columns={claimColumns}
-                  ariaLabel={t('performance.claims.dialog.claimTransactions')}
-                  initialSort={{ id: 'when', direction: 'desc' }}
-                />
-              )}
-            </section>
-            <section>
-              <h3 className="mb-3 type-title text-foreground">
-                {t('performance.claims.dialog.attachedTokens')}
-              </h3>
-              {attached.length === 0 ? (
-                <p className="type-body-sm text-muted-foreground">
-                  {t('performance.claims.dialog.noAttached')}
-                </p>
-              ) : (
-                <DataTable
-                  data={attached}
-                  columns={attachedColumns}
-                  ariaLabel={t('performance.claims.dialog.attachedTokens')}
-                  initialSort={{ id: 'when', direction: 'desc' }}
-                />
-              )}
-            </section>
-          </div>
+          <DataTable
+            data={claims}
+            columns={claimColumns}
+            ariaLabel={t('performance.claims.dialog.claimTransactions')}
+            initialSort={{ id: 'when', direction: 'desc' }}
+            density="compact"
+          />
         )}
-      </DialogContent>
-    </Dialog>
+      </section>
+      <section className="space-y-3">
+        <h3 className="type-label text-foreground">
+          {t('performance.claims.dialog.attachedTokens')}
+        </h3>
+        {attached.length === 0 ? (
+          <p className="type-body-sm text-muted-foreground">
+            {t('performance.claims.dialog.noAttached')}
+          </p>
+        ) : (
+          <DataTable
+            data={attached}
+            columns={attachedColumns}
+            ariaLabel={t('performance.claims.dialog.attachedTokens')}
+            initialSort={{ id: 'when', direction: 'desc' }}
+            density="compact"
+          />
+        )}
+      </section>
+    </div>
   );
-};
+}
 
 /**
  * What each finalized cycle left to retrieve (secondary ETH, attached NFTs
  * and ERC-20 tokens), how much of it has been retrieved and how quickly, in
- * neutral figures; a cycle with assets still waiting opens their list, and
- * every cycle opens its retrieval transactions.
+ * neutral figures. The cycle is the row's one link (its allocation record);
+ * a cycle with assets still waiting opens their list, and every row unfolds
+ * its retrieval transactions in place. Counts of allocations are counted in
+ * words ("4 ETH allocations"), never beside a ticker as if they were amounts.
  */
 export const ClaimsByRoundSection = () => {
   const t = useTranslations('statistics');
   const tTables = useTranslations('tables');
   const cycleHref = useCycleHref();
   const [selected, setSelected] = useState<RoundClaimSummary | null>(null);
-  const [exploreRound, setExploreRound] = useState<number | null>(null);
   const { data, isLoading, isError, refetch } = useClaimsByRound();
   const list = useMemo(() => data ?? [], [data]);
   // Ticks every 30s so the "window closes in …" countdown never goes stale.
   const nowSec = Math.floor(useNow(30_000) / 1000);
 
-  const columns = useMemo<DataTableColumn<RoundClaimSummary>[]>(() => {
-    const awarded = (row: RoundClaimSummary): CountPart[] => [
-      { key: 'eth', count: row.EthAwarded, unit: 'ETH' },
-      { key: 'nft', count: row.NftAwarded, unit: 'NFT' },
-      { key: 'erc20', count: row.Erc20Awarded, unit: 'ERC-20' },
-    ];
-    return [
+  const columns = useMemo<DataTableColumn<RoundClaimSummary>[]>(
+    () => [
       {
         id: 'cycle',
         kind: 'link',
@@ -289,7 +309,27 @@ export const ClaimsByRoundSection = () => {
         header: t('performance.claims.columns.awarded'),
         value: (row) => row.EthAwarded + row.NftAwarded + row.Erc20Awarded || null,
         whenBlank: 'empty',
-        cell: (row) => <CountBreakdown parts={awarded(row)} />,
+        cell: (row) => (
+          <CountBreakdown
+            parts={[
+              {
+                key: 'eth',
+                count: row.EthAwarded,
+                text: t('performance.kinds.eth', { count: row.EthAwarded }),
+              },
+              {
+                key: 'nft',
+                count: row.NftAwarded,
+                text: t('performance.kinds.nft', { count: row.NftAwarded }),
+              },
+              {
+                key: 'erc20',
+                count: row.Erc20Awarded,
+                text: t('performance.kinds.erc20', { count: row.Erc20Awarded }),
+              },
+            ]}
+          />
+        ),
       },
       {
         id: 'retrieved',
@@ -322,20 +362,9 @@ export const ClaimsByRoundSection = () => {
         whenBlank: 'empty',
         sortable: true,
       },
-      {
-        id: 'details',
-        header: t('performance.claims.columns.details'),
-        align: 'right',
-        cell: (row) => (
-          // The visible words name the cycle ("Cycle 12 details"), so every
-          // row's button says what it opens without an aria-label.
-          <Button variant="ghost" size="sm" onClick={() => setExploreRound(row.RoundNum)}>
-            {t('performance.claims.cycleDetails', { cycle: row.RoundNum })}
-          </Button>
-        ),
-      },
-    ];
-  }, [t, tTables, cycleHref]);
+    ],
+    [t, tTables, cycleHref],
+  );
 
   return (
     <div className="space-y-6">
@@ -360,10 +389,16 @@ export const ClaimsByRoundSection = () => {
           ariaLabel={t('performance.claimsTitle')}
           initialSort={{ id: 'cycle', direction: 'desc' }}
           getRowKey={(row) => String(row.RoundNum)}
+          renderDetails={(row) => <CycleRetrievals round={row.RoundNum} />}
+          detailsLabel={(_row, expanded) =>
+            expanded
+              ? t('performance.claims.hideRetrievals')
+              : t('performance.claims.showRetrievals')
+          }
+          detailsHeader={t('performance.claims.columns.details')}
         />
       )}
       <UnretrievedDialog cycle={selected} nowSec={nowSec} onClose={() => setSelected(null)} />
-      <CycleDetailDialog round={exploreRound} onClose={() => setExploreRound(null)} />
     </div>
   );
 };

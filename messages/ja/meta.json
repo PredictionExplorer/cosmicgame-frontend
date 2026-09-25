@@ -217,9 +217,10 @@
     "description": "シグネチャー配分、ETH星選の配分、Cosmic Signature NFT、係留配分を含む、Cosmic Signatureでの配分の完全な履歴を見る。"
   },
   "userProfile": {
-    "title": "ユーザー{address}の情報",
+    "title": "参加者{address}の情報",
     "description": "参加者{address}の一筆、配分、係留の記録です。",
-    "invalidAddress": "無効なアドレス"
+    "invalidAddress": "無効なアドレス",
+    "invalidDescription": "このリンクのアドレスは有効なEthereumアドレスではありません。"
   },
   "admin": {
     "title": "一筆のメッセージ管理",

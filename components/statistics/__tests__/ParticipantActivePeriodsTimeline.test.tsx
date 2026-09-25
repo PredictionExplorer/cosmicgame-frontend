@@ -5,7 +5,7 @@ import type { BidderActivePeriod, TopBidderInfo } from '@/services/api/types';
 
 import { act, checkA11y, render, screen, within } from '@/test-utils';
 
-import { BidderActivePeriodsTimeline } from '../BidderActivePeriodsTimeline';
+import { ParticipantActivePeriodsTimeline } from '../ParticipantActivePeriodsTimeline';
 
 const mockUseBidTimeBounds = jest.fn();
 const mockUseTopBidderActivePeriods = jest.fn();
@@ -14,7 +14,6 @@ jest.mock('../../../hooks/useApiQuery', () => ({
   useBidTimeBounds: (...args: unknown[]) => mockUseBidTimeBounds(...args),
   useTopBidderActivePeriods: (...args: unknown[]) => mockUseTopBidderActivePeriods(...args),
 }));
-jest.mock('../../../hooks/useNow', () => ({ useNow: () => END * 1000 }));
 
 const DAY = 86_400;
 const START = Date.UTC(2026, 4, 8) / 1000;
@@ -52,15 +51,21 @@ beforeEach(() => {
   mockUseTopBidderActivePeriods.mockReturnValue(ok({ TopBidders: top, ActivePeriods: periods }));
 });
 
-describe('BidderActivePeriodsTimeline', () => {
-  it('summarizes the range and the most active participant', () => {
-    render(<BidderActivePeriodsTimeline label="Top 20 participant active periods" />);
+describe('ParticipantActivePeriodsTimeline', () => {
+  it('reads out the most active participant and the longest period', () => {
+    render(<ParticipantActivePeriodsTimeline label="Top 20 participant active periods" />);
     const figure = screen.getByRole('figure', { name: 'Top 20 participant active periods' });
-    expect(figure).toHaveTextContent(/2026\. Most gestures: 0x1Ec1….*\(810\)\./);
+    const figures = [...figure.querySelectorAll('figcaption dl > div')].map((item) =>
+      [...item.querySelectorAll('dt, dd')].map((cell) => cell.textContent),
+    );
+    expect(figures).toEqual([
+      ['Most gestures', '810', '0x1Ec1…\u2060E990'],
+      ['Longest period', '1h', '0x1Ec1…\u2060E990'],
+    ]);
   });
 
   it('draws every lane on one axis spanning the whole range, the latest period included', () => {
-    render(<BidderActivePeriodsTimeline label="Active periods" />);
+    render(<ParticipantActivePeriodsTimeline label="Active periods" />);
     const lanes = within(screen.getByRole('group', { name: 'Active periods' })).getAllByRole(
       'group',
     );
@@ -82,7 +87,7 @@ describe('BidderActivePeriodsTimeline', () => {
         ActivePeriods: periods,
       }),
     );
-    render(<BidderActivePeriodsTimeline label="Active periods" />);
+    render(<ParticipantActivePeriodsTimeline label="Active periods" />);
     const lanes = within(screen.getByRole('group', { name: 'Active periods' })).getAllByRole(
       'group',
     );
@@ -92,7 +97,7 @@ describe('BidderActivePeriodsTimeline', () => {
 
   it('pins a tapped period in the readout, since a finger has no hover', async () => {
     const user = userEvent.setup();
-    const { container } = render(<BidderActivePeriodsTimeline label="Active periods" />);
+    const { container } = render(<ParticipantActivePeriodsTimeline label="Active periods" />);
     const group = screen.getByRole('group', { name: 'Active periods' });
     const mark = within(group).getAllByRole('img')[1]!;
     await user.click(mark);
@@ -102,7 +107,7 @@ describe('BidderActivePeriodsTimeline', () => {
   });
 
   it('puts the address above its lane on a phone, so the plot spans the width', () => {
-    render(<BidderActivePeriodsTimeline label="Active periods" />);
+    render(<ParticipantActivePeriodsTimeline label="Active periods" />);
     const lane = within(screen.getByRole('group', { name: 'Active periods' })).getAllByRole(
       'group',
     )[0]!;
@@ -112,7 +117,7 @@ describe('BidderActivePeriodsTimeline', () => {
 
   it('keeps one tab stop and steps through periods with the arrow keys', async () => {
     const user = userEvent.setup();
-    const { container } = render(<BidderActivePeriodsTimeline label="Active periods" />);
+    const { container } = render(<ParticipantActivePeriodsTimeline label="Active periods" />);
     const bars = screen.getAllByRole('img');
     expect(bars.filter((bar) => bar.tabIndex === 0)).toHaveLength(1);
     const readout = container.querySelector('[aria-live="polite"]')!;
@@ -128,7 +133,7 @@ describe('BidderActivePeriodsTimeline', () => {
 
   it('leaves the arrow keys alone on a lane address link', async () => {
     const user = userEvent.setup();
-    render(<BidderActivePeriodsTimeline label="Active periods" />);
+    render(<ParticipantActivePeriodsTimeline label="Active periods" />);
     const group = screen.getByRole('group', { name: 'Active periods' });
     expect(group).not.toHaveClass('focus-ring-within');
     const link = within(group).getAllByRole('link')[0]!;
@@ -140,7 +145,7 @@ describe('BidderActivePeriodsTimeline', () => {
   });
 
   it('draws a focused period ring outside the period and tints its lane', () => {
-    render(<BidderActivePeriodsTimeline label="Active periods" />);
+    render(<ParticipantActivePeriodsTimeline label="Active periods" />);
     for (const bar of screen.getAllByRole('img')) {
       expect(bar).toHaveClass('focus-visible:outline-solid', 'focus-visible:z-10');
       expect(bar.parentElement).not.toHaveClass('overflow-hidden');
@@ -155,7 +160,7 @@ describe('BidderActivePeriodsTimeline', () => {
 
   it('lists the lanes as a table on request', async () => {
     const user = userEvent.setup();
-    render(<BidderActivePeriodsTimeline label="Active periods" />);
+    render(<ParticipantActivePeriodsTimeline label="Active periods" />);
     await user.click(screen.getByRole('button', { name: 'View as table' }));
     const table = screen.getByRole('table', { name: 'Active periods' });
     expect(within(table).getByText('810')).toBeInTheDocument();
@@ -164,14 +169,14 @@ describe('BidderActivePeriodsTimeline', () => {
 
   it('says so when no participant has an active period', () => {
     mockUseTopBidderActivePeriods.mockReturnValue(ok({ TopBidders: [], ActivePeriods: [] }));
-    render(<BidderActivePeriodsTimeline label="Active periods" />);
+    render(<ParticipantActivePeriodsTimeline label="Active periods" />);
     expect(
       screen.getByText('No active gesture periods found for top participants.'),
     ).toBeInTheDocument();
   });
 
   it('has no axe violations', async () => {
-    const { container } = render(<BidderActivePeriodsTimeline label="Active periods" />);
+    const { container } = render(<ParticipantActivePeriodsTimeline label="Active periods" />);
     await checkA11y(container);
   });
 });

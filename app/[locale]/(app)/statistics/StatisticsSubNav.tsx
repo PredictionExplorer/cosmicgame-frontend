@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { useStickyClearance } from '@/hooks/useStickyClearance';
@@ -8,42 +7,10 @@ import { usePathname } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { SiteLink } from '@/components/layout/SiteLink';
 import { ScrollRail } from '@/components/ui/scroll-rail';
+import { useStuck } from '@/components/statistics/useStuck';
 import { tabsListVariants, tabsTriggerVariants } from '@/components/ui/tabs';
 
 import { ALL_STATISTICS_SECTIONS, isCurrentSection } from './statistics-sections';
-
-/**
- * Whether a sticky element is stuck under its `top` offset: a sentinel just
- * above it has scrolled under the fixed header. Drives the glass band, which
- * only appears once the bar floats over content.
- */
-function useStuck() {
-  const sentinelRef = useRef<HTMLDivElement>(null);
-  const stickyRef = useRef<HTMLElement>(null);
-  const [stuck, setStuck] = useState(false);
-
-  useEffect(() => {
-    const sentinel = sentinelRef.current;
-    const sticky = stickyRef.current;
-    if (!sentinel || !sticky || typeof IntersectionObserver === 'undefined') return;
-    // The resolved `top` of a sticky element is in pixels.
-    const top = Math.ceil(parseFloat(getComputedStyle(sticky).top) || 0);
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry) return;
-        // Stuck once the sentinel has scrolled up past the offset, not while it sits below the
-        // fold. (Some observer shims report no box; treat that as not scrolled past.)
-        const sentinelTop = entry.boundingClientRect?.top ?? Number.POSITIVE_INFINITY;
-        setStuck(!entry.isIntersecting && sentinelTop <= top);
-      },
-      { rootMargin: `-${top}px 0px 0px 0px`, threshold: 0 },
-    );
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, []);
-
-  return { sentinelRef, stickyRef, stuck };
-}
 
 /**
  * The statistics pages' sub-navigation: underline tabs set on the page
@@ -58,7 +25,7 @@ function useStuck() {
 export function StatisticsSubNav() {
   const pathname = usePathname();
   const t = useTranslations('statistics');
-  const { sentinelRef, stickyRef, stuck } = useStuck();
+  const { sentinelRef, stickyRef, stuck } = useStuck<HTMLElement>();
   // Focus scrolled into view stops below the bar, not under it.
   useStickyClearance(stickyRef);
 

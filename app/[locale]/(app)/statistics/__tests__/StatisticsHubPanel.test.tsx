@@ -160,9 +160,39 @@ describe('StatisticsHubPanel', () => {
     expect(screen.queryByText('1254')).not.toBeInTheDocument();
   });
 
-  it('links a figure to the ledger it counts', () => {
+  it('links a figure to the ledger it counts, named by its label', () => {
     render(<StatisticsHubPanel />);
-    expect(screen.getByRole('link', { name: /^5\b/ })).toHaveAttribute('href', '/named-nfts');
+    expect(screen.getByRole('link', { name: `${metrics.namedTokens.label} 5` })).toHaveAttribute(
+      'href',
+      '/named-nfts',
+    );
+  });
+
+  it('gives a zero figure no arrow into an empty ledger', () => {
+    // V312: "Voluntary contributions 0 ETH →" led to an empty page.
+    mockDashboard({
+      data: createDashboardInfo({ NumVoluntaryDonations: 0, SumVoluntaryDonationsEth: 0 }),
+    });
+    render(<StatisticsHubPanel />);
+    // The spec sheet's row, not the Definitions entry of the same name.
+    const row = screen.getAllByText(metrics.voluntaryContributions.label, { selector: 'dt' })[0]!
+      .parentElement!;
+    expect(within(row).queryByRole('link')).toBeNull();
+    // Zero keeps the ETH column's four digits.
+    expect(row).toHaveTextContent(/0\.0000\sETH/);
+  });
+
+  it('files direct ETH contributions with the allocation economy, not with Public Goods', () => {
+    // V309: 30 ETH sat under Public Goods beside "Voluntary contributions 0 ETH".
+    render(<StatisticsHubPanel />);
+    const allocation = screen
+      .getByRole('heading', { name: groups.allocationEconomy.label })
+      .closest('div')!.parentElement!;
+    expect(within(allocation).getByText(metrics.totalContributedEth.label)).toBeInTheDocument();
+    const publicGoods = screen
+      .getByRole('heading', { name: groups.publicGoods.label })
+      .closest('div')!.parentElement!;
+    expect(within(publicGoods).queryByText(metrics.totalContributedEth.label)).toBeNull();
   });
 
   it('shows an unread figure as unavailable, never as 0', () => {

@@ -77,7 +77,9 @@ describe('ClaimsByRoundSection', () => {
     render(<ClaimsByRoundSection />);
     const rows = within(screen.getByRole('table')).getAllByRole('row');
     expect(rows[1]).toHaveTextContent('12');
-    expect(rows[1]).toHaveTextContent(/4\sETH · 2\sNFT/);
+    // V106: EthAwarded and NftAwarded are counts of allocations, never "4 ETH" as if an amount.
+    expect(rows[1]).toHaveTextContent(/4\sETH allocations · 2\sNFTs/);
+    expect(rows[1]).not.toHaveTextContent(/4\sETH ·/);
     expect(rows[1]).toHaveTextContent('83.3%');
     expect(rows[2]).toHaveTextContent('All retrieved');
   });
@@ -104,18 +106,61 @@ describe('ClaimsByRoundSection', () => {
     expect(within(dialog).getByText(/^2\.50* ETH$/)).toBeInTheDocument();
   });
 
-  it('opens a cycle’s retrieval transactions, noting a retrieval by someone else', async () => {
+  it('unfolds a cycle’s retrieval transactions under its row, noting a retrieval by someone else', async () => {
     const user = userEvent.setup();
     render(<ClaimsByRoundSection />);
-    // Each row's details button names its cycle in its visible words, and
-    // the dialog it opens carries the same title.
-    const button = screen.getByRole('button', { name: 'Cycle 12 details' });
-    expect(button).not.toHaveAttribute('aria-label');
-    await user.click(button);
+    // V311: the cycle is the row's one link; its retrievals unfold in place rather than a
+    // second "Cycle 12 details" control naming the same cycle.
+    expect(screen.queryByRole('button', { name: /Cycle 12 details/ })).toBeNull();
+    const [toggle] = screen.getAllByRole('button', { name: 'Show retrievals' });
+    await user.click(toggle!);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
     expect(mockUseClaimDetailByRound).toHaveBeenLastCalledWith(12);
-    const dialog = screen.getByRole('dialog', { name: 'Cycle 12 details' });
-    expect(within(dialog).getByText(/Retrieved after the deadline by 0x2222/)).toBeInTheDocument();
-    expect(within(dialog).getByText('No tokens attached this cycle.')).toBeInTheDocument();
+    const details = document.getElementById(toggle!.getAttribute('aria-controls')!)!;
+    expect(within(details).getByText(/Retrieved after the deadline by 0x2222/)).toBeInTheDocument();
+    expect(within(details).getByText('No tokens attached this cycle.')).toBeInTheDocument();
+  });
+
+  it('says a cycle’s retrievals did not load, with a retry, never that there were none', async () => {
+    // V111: a failed read read as "No retrievals recorded for this cycle".
+    const user = userEvent.setup();
+    const refetch = jest.fn();
+    mockUseClaimDetailByRound.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      refetch,
+    });
+    render(<ClaimsByRoundSection />);
+    await user.click(screen.getAllByRole('button', { name: 'Show retrievals' })[0]!);
+    expect(screen.queryByText('No retrievals recorded for this cycle.')).toBeNull();
+    expect(screen.getByText('Failed to load allocation retrievals')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /try again|retry/i }));
+    expect(refetch).toHaveBeenCalled();
+  });
+
+  it('names an attached asset in the locale’s words, not glued in code', async () => {
+    // V117: "Attached ERC-20 {amount} · {address}" was built in code with one separator.
+    const user = userEvent.setup();
+    mockUseClaimDetailByRound.mockReturnValue(
+      ok({
+        ...detail,
+        AttachedTokens: [
+          {
+            AssetType: 'ERC20',
+            ContributorAddr: RECIPIENT,
+            TokenAddr: SWEEPER,
+            TokenId: -1,
+            AmountEth: 1.5,
+            Ts: NOW_SEC - 60,
+            TxHash: '0xdef',
+          },
+        ],
+      }),
+    );
+    render(<ClaimsByRoundSection />);
+    await user.click(screen.getAllByRole('button', { name: 'Show retrievals' })[0]!);
+    expect(screen.getByText(/^Attached ERC-20 0x2222….*: 1\.5$/)).toBeInTheDocument();
   });
 
   it('says when nothing retrievable has been allocated', () => {

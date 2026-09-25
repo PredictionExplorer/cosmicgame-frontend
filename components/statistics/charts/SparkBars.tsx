@@ -9,6 +9,11 @@ export interface SparkBarsProps {
   color: string;
   /** Height in px. The width follows the container. */
   height?: number;
+  /**
+   * The last bucket is still filling (today): drawn as an outline over a
+   * faint fill, so a partial day reads as partial rather than as a drop.
+   */
+  partialLast?: boolean;
   className?: string;
 }
 
@@ -18,7 +23,14 @@ export interface SparkBarsProps {
  * chart library; the caller states the reading in words beside it (and in
  * `label`), because a sparkline alone is not an answer.
  */
-export function SparkBars({ values, label, color, height = 56, className }: SparkBarsProps) {
+export function SparkBars({
+  values,
+  label,
+  color,
+  height = 56,
+  partialLast = false,
+  className,
+}: SparkBarsProps) {
   const max = Math.max(0, ...values);
   const count = values.length;
   const gap = count > 40 ? 0.15 : 0.25;
@@ -42,6 +54,8 @@ export function SparkBars({ values, label, color, height = 56, className }: Spar
       />
       {values.map((value, index) => {
         const barHeight = max > 0 ? Math.max(value > 0 ? 1.5 : 0, (value / max) * (height - 2)) : 0;
+        const last = index === count - 1;
+        const partial = last && partialLast;
         return (
           <rect
             key={index}
@@ -50,7 +64,12 @@ export function SparkBars({ values, label, color, height = 56, className }: Spar
             width={1 - gap}
             height={barHeight}
             fill={color}
-            opacity={index === count - 1 ? 1 : 0.72}
+            fillOpacity={partial ? 0.25 : last ? 1 : 0.72}
+            stroke={partial ? color : undefined}
+            strokeWidth={partial ? 1 : undefined}
+            strokeDasharray={partial ? '2 2' : undefined}
+            vectorEffect={partial ? 'non-scaling-stroke' : undefined}
+            data-partial={partial || undefined}
           />
         );
       })}

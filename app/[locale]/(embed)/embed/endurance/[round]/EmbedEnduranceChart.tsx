@@ -12,6 +12,7 @@ import EnduranceTimelineChart, {
   EnduranceTimelineSkeleton,
 } from '@/components/statistics/EnduranceTimelineChart';
 import { ChartLinksOpenNewWindow } from '@/components/statistics/charts/timeline';
+import { Wordmark } from '@/components/layout/Wordmark';
 import { Badge } from '@/components/ui/badge';
 import { ErrorState } from '@/components/ui/error-state';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -25,10 +26,11 @@ interface EmbedEnduranceChartProps {
 }
 
 /**
- * The Endurance timeline of one cycle in a window of its own (opened from
- * the activity page, or shared). It says what it is: an H1 with the cycle,
- * whether the cycle is live or final, and a link back to the full activity
- * page in Cosmic Signature. It fills the window's width, so maximizing the
+ * The Endurance & Chrono timeline of one cycle in a window of its own
+ * (opened from the activity page, or shared). It says whose it is and what
+ * it is: the Cosmic Signature lockup (to the Observatory), an H1 named as
+ * the section it comes from with the cycle, whether the cycle is live or
+ * final, and a link back to the full activity page. It fills the window's width, so maximizing the
  * window widens the chart, and it draws every lane: the window scrolls, never
  * a box inside it. Every link opens a new window, so the embed stays itself.
  *
@@ -65,8 +67,33 @@ const EmbedEnduranceChart: FC<EmbedEnduranceChartProps> = ({
       tabIndex={-1}
       className="min-h-screen w-full bg-background px-4 py-5 sm:px-8 sm:py-7"
     >
-      <header className="mb-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b border-rule pb-4">
-        <div className="flex flex-wrap items-center gap-3">
+      <header className="mb-6 border-b border-rule pb-4">
+        {/* Whose chart this is, for a reader who meets the window on its own: the lockup
+            leads to the Observatory, the source link to the chart's own section. */}
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
+          <Link
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-11 items-center rounded-control no-underline sm:min-h-8"
+          >
+            {/* The mark alone on a phone, so the source link shares its row; the name stays
+                the link's name. */}
+            <Wordmark size="sm" nameClassName="max-sm:sr-only" />
+            <span className="sr-only"> {t('embed.opensNewWindow')}</span>
+          </Link>
+          <Link
+            href={`/statistics/activity?cycle=${roundNum}#cycle`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="link-quiet group inline-flex min-h-11 items-center gap-1.5 type-label text-muted-foreground hover:text-foreground sm:min-h-8"
+          >
+            {t('embed.source')}
+            <ArrowUpRight aria-hidden className="size-3.5 text-subtle" />
+            <span className="sr-only"> {t('embed.opensNewWindow')}</span>
+          </Link>
+        </div>
+        <div className="mt-4 flex flex-wrap items-center gap-3">
           <h1 className="type-heading-3 text-foreground">{title}</h1>
           {!known ? (
             // Holds the badge's place while the dashboard says whether the cycle is live.
@@ -79,16 +106,6 @@ const EmbedEnduranceChart: FC<EmbedEnduranceChartProps> = ({
             <Badge>{t('embed.final')}</Badge>
           )}
         </div>
-        <Link
-          href={`/statistics/activity?cycle=${roundNum}#cycle`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="link-quiet group inline-flex min-h-11 items-center gap-1.5 type-label text-muted-foreground hover:text-foreground sm:min-h-8"
-        >
-          {t('embed.source')}
-          <ArrowUpRight aria-hidden className="size-3.5 text-subtle" />
-          <span className="sr-only"> {t('embed.opensNewWindow')}</span>
-        </Link>
       </header>
       {known ? (
         // Its participants open in a new window, like the source link above.

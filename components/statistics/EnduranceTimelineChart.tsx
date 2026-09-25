@@ -23,18 +23,17 @@ import {
   type EnduranceStint,
   type EnduranceTimelinePoint,
 } from '@/utils/endurance';
-import { useGestureListByCycle, useRoundInfo, useCurrentTime } from '@/hooks/useApiQuery';
-import { useHydrated } from '@/hooks/useHydrated';
-import { useNow } from '@/hooks/useNow';
+import { useGestureListByCycle } from '@/hooks/useApiQuery';
+import { useFormat } from '@/hooks/useFormat';
 import { Button } from '@/components/ui/button';
 import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
-import { Skeleton, SkeletonChart } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import { ChartFigure } from './charts/ChartFigure';
-import { ChartLegend } from './charts/ChartLegend';
+import { ChartLegend, LegendSwatch } from './charts/ChartLegend';
+import type { ReadoutItem } from './charts/ChartReadout';
 import { ChartTooltipCard } from './charts/ChartTooltipCard';
 import { useDurationAxis, useElapsedHoursAxis } from './charts/axes';
 import {
@@ -55,7 +54,11 @@ import {
   useCoarsePointer,
   useTimelineReadout,
 } from './charts/timeline';
+import { useCycleClock } from './charts/useCycleClock';
 import { useRovingStints } from './charts/useRovingStints';
+import { ENDURANCE_LANE_GRID, EnduranceGanttSkeleton } from './EnduranceTimelineSkeleton';
+
+export { EnduranceTimelineSkeleton } from './EnduranceTimelineSkeleton';
 
 const LINE_CHART_HEIGHT = 320;
 /**
@@ -70,13 +73,7 @@ const pct = (v: number): string => `${Math.max(0, Math.min(100, v * 100))}%`;
 const EMBED_TABLE_ADDRESS =
   'font-mono no-underline [color:inherit] transition-colors hover:text-primary focus-visible:text-primary';
 
-/**
- * The lane grid. From `sm` the address sits in a column beside its lane; on a
- * phone it takes its own line above the lane, so the plot spans the width.
- * The end padding keeps a focused stint's ring clear of the frame's edge.
- */
-const LANE_GRID =
-  'grid grid-cols-1 gap-y-1 gap-x-3 pe-1 sm:grid-cols-[minmax(6.5rem,10rem)_minmax(0,1fr)] sm:gap-y-0';
+const LANE_GRID = ENDURANCE_LANE_GRID;
 
 /** A stint's colour: the champion's record hold, the Chrono-Warrior's lane, or an ordinary lead. */
 function stintColor(stint: EnduranceStint, lane: EnduranceLane): string {
@@ -85,21 +82,41 @@ function stintColor(stint: EnduranceStint, lane: EnduranceLane): string {
   return SERIES_COLOR.lead;
 }
 
-/**
- * A lane's role, as a short visible abbreviation with its full name for
- * assistive technology (an `abbr` with a sr-only expansion, never a bare
- * `aria-label` on a span).
- */
-function RoleTag({ abbr, name, color }: { abbr: string; name: string; color: string }) {
+/** A lane's title, spelled out beside the legend's swatch for it. */
+function RoleTag({ name, color }: { name: string; color: string }) {
   return (
-    <span className="inline-flex shrink-0 items-center gap-1 rounded-edge border border-rule px-1 type-caption leading-4 text-muted-foreground">
-      <span aria-hidden className="size-1.5 rounded-pill" style={{ backgroundColor: color }} />
-      <abbr title={name} className="no-underline" aria-hidden>
-        {abbr}
-      </abbr>
-      <span className="sr-only">{name}</span>
+    <span className="inline-flex items-center gap-1.5 type-caption text-muted-foreground">
+      <LegendSwatch color={color} className="size-2" />
+      {name}
     </span>
   );
+}
+
+/**
+ * Runs of a lane's stints close enough to read as one hold (a gap under this
+ * share of the cycle, a few pixels on a wide screen): drawn as one band under
+ * the stints, so a participant who kept retaking the lead reads as a stretch
+ * of dominance rather than a barcode. The stints stay the marks a reader
+ * points at and steps through.
+ */
+const RUN_GAP_SHARE = 0.004;
+
+/** The bands behind a lane's stints, as [start, end] in hours; single stints are left out. */
+export function stintRuns(stints: readonly EnduranceStint[], durHours: number): [number, number][] {
+  const sorted = [...stints].sort((a, b) => a.startHours - b.startHours);
+  const gap = durHours * RUN_GAP_SHARE;
+  const runs: { start: number; end: number; count: number }[] = [];
+  for (const stint of sorted) {
+    const end = stint.startHours + stint.durationHours;
+    const last = runs[runs.length - 1];
+    if (last && stint.startHours - last.end <= gap) {
+      last.end = Math.max(last.end, end);
+      last.count += 1;
+    } else {
+      runs.push({ start: stint.startHours, end, count: 1 });
+    }
+  }
+  return runs.filter((run) => run.count > 1).map((run) => [run.start, run.end]);
 }
 
 function TimelineTooltip({
@@ -231,6 +248,26 @@ const EnduranceLineView = memo(function EnduranceLineView({
 });
 
 /**
+ * The Endurance record's label, pinned over its stint in the champion's lane:
+ * the chart's point stays readable however thin the stint draws. Starts at
+ * the stint, or ends at it near the lane's right end. Seen, not heard: the
+ * readout above the chart and the stint's own label already say it.
+ */
+function RecordCallout({ at, width, text }: { at: number; width: number; text: string }) {
+  const nearEnd = at > 0.6;
+  return (
+    <span
+      aria-hidden
+      className="pointer-events-none absolute bottom-full mb-1 flex items-center gap-1.5 whitespace-nowrap type-caption text-foreground"
+      style={nearEnd ? { right: pct(Math.max(0, 1 - at - width)) } : { left: pct(Math.max(0, at)) }}
+    >
+      <LegendSwatch color={SERIES_COLOR.endurance} className="size-2" />
+      {text}
+    </span>
+  );
+}
+
+/**
  * Who held the lead, and for how long: a lane per address on one time axis
  * (a shared grid, so the axis and the lanes cannot drift apart at any
  * width), each bar a hold from one gesture to the next. One tab stop; the
@@ -342,17 +379,15 @@ const EnduranceGanttView = memo(function EnduranceGanttView({
                 {formatAddress(lane.address)}
               </span>
               {lane.isEnduranceChampion || lane.isChronoWarrior ? (
-                <span className="flex flex-wrap gap-1">
+                <span className="flex flex-wrap gap-x-3 gap-y-0.5">
                   {lane.isEnduranceChampion ? (
                     <RoleTag
-                      abbr={t('charts.endurance.enduranceChampionAbbr')}
                       name={t('charts.endurance.enduranceChampion')}
                       color={SERIES_COLOR.endurance}
                     />
                   ) : null}
                   {lane.isChronoWarrior ? (
                     <RoleTag
-                      abbr={t('charts.endurance.chronoWarriorAbbr')}
                       name={t('charts.endurance.chronoWarrior')}
                       color={SERIES_COLOR.chrono}
                     />
@@ -360,8 +395,14 @@ const EnduranceGanttView = memo(function EnduranceGanttView({
                 </span>
               ) : null}
             </div>
-            {/* No clipping: a focused stint draws its ring outside itself. */}
-            <div className="relative min-h-6 self-center rounded-edge bg-surface-sunken">
+            {/* No clipping: a focused stint draws its ring outside itself. The champion's lane
+                keeps a line above its track for the record's callout. */}
+            <div
+              className={cn(
+                'relative min-h-6 self-center rounded-edge bg-surface-sunken',
+                lane.isEnduranceChampion && 'mt-6',
+              )}
+            >
               {axis.ticks.slice(1).map((tick) => (
                 <span
                   key={tick}
@@ -370,6 +411,30 @@ const EnduranceGanttView = memo(function EnduranceGanttView({
                   style={{ left: pct(tick / durHours) }}
                 />
               ))}
+              {stintRuns(lane.stints, durHours).map(([start, end]) => (
+                <span
+                  key={start}
+                  aria-hidden
+                  className="absolute inset-y-1.5 rounded-edge opacity-40"
+                  style={{
+                    left: pct(start / durHours),
+                    width: pct((end - start) / durHours),
+                    backgroundColor: lane.isChronoWarrior ? SERIES_COLOR.chrono : SERIES_COLOR.lead,
+                  }}
+                />
+              ))}
+              {lane.stints.map((stint) =>
+                stint.isEnduranceChampion ? (
+                  <RecordCallout
+                    key="record"
+                    at={stint.startHours / durHours}
+                    width={stint.durationHours / durHours}
+                    text={t('charts.endurance.recordCallout', {
+                      duration: formatSeconds(stint.durationSeconds, locale),
+                    })}
+                  />
+                ) : null,
+              )}
               {lane.stints.map((stint, item) => {
                 const ringRecord = stint.isRecord && !stint.isEnduranceChampion;
                 const active = readout.active?.stint === stint;
@@ -386,7 +451,12 @@ const EnduranceGanttView = memo(function EnduranceGanttView({
                     className={cn(
                       TIMELINE_MARK_CLASS,
                       'inset-y-1 rounded-edge transition-opacity duration-fast',
-                      ringRecord ? '[--mark-min:3px]' : '[--mark-min:2px]',
+                      // The record is the chart's point: never thinner than a finger's worth of ink.
+                      stint.isEnduranceChampion
+                        ? 'z-[1] [--mark-min:6px]'
+                        : ringRecord
+                          ? '[--mark-min:3px]'
+                          : '[--mark-min:2px]',
                       active || stint.isEnduranceChampion ? 'opacity-100' : 'opacity-75',
                     )}
                     style={{
@@ -438,76 +508,32 @@ const EnduranceGanttView = memo(function EnduranceGanttView({
   );
 });
 
-/**
- * The Gantt's shape while the cycle's gestures load, `lanes` lanes tall, so
- * the frame does not jump when the real lanes arrive.
- */
-function EnduranceGanttSkeleton({ lanes }: { lanes: number }) {
-  const t = useTranslations('common');
-  return (
-    <div role="status" aria-label={t('status.loading')} className="space-y-3">
-      <div className="flex flex-wrap gap-x-4 gap-y-2">
-        {[28, 24, 16, 20].map((width) => (
-          <Skeleton key={width} className="h-4" style={{ width: `${width}%` }} />
-        ))}
-      </div>
-      <div className={cn(LANE_GRID, 'border-b border-rule pb-2')}>
-        <span className="hidden sm:block" />
-        <span className="h-4" />
-      </div>
-      <div>
-        {Array.from({ length: lanes }).map((_, lane) => (
-          <div key={lane} className={cn(LANE_GRID, 'border-b border-rule-faint py-1.5')}>
-            <Skeleton className="my-0.5 h-4 w-28 self-center" />
-            <div className="relative min-h-6 rounded-edge bg-surface-sunken">
-              <Skeleton
-                className="absolute inset-y-1"
-                style={{ left: `${(lane * 17) % 55}%`, width: `${12 + ((lane * 29) % 40)}%` }}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="min-h-5" />
-    </div>
-  );
-}
-
-/** Two lines of the figure's caption, held while the reading loads. */
-function SummaryPlaceholder() {
-  return (
-    <span aria-hidden className="block">
-      {['w-3/4', 'w-2/3'].map((width) => (
-        <span key={width} className="flex h-[1lh] items-center">
-          <Skeleton as="span" className={cn('block h-3', width)} />
-        </span>
-      ))}
-    </span>
-  );
-}
-
-/**
- * The whole figure before anything is known (the embed, before the dashboard
- * names the live cycle): the caption's two lines, the view switch, `lanes`
- * lanes and the method note, in the finished figure's order and spacing.
- */
-export function EnduranceTimelineSkeleton({ lanes = 8 }: { lanes?: number }) {
+/** The readout's figures (the two titles and the lanes), empty while the cycle loads. */
+function useEnduranceReadout(gantt: EnduranceGantt | null): ReadoutItem[] {
   const t = useTranslations('statistics');
-  return (
-    <div className="min-w-0 space-y-4">
-      <div className="max-w-[var(--measure-prose)] type-body-md">
-        <SummaryPlaceholder />
-      </div>
-      <div aria-hidden className="flex flex-wrap items-center gap-x-6 gap-y-3">
-        <Skeleton className="h-10 w-44 rounded-control" />
-        <Skeleton className="ms-auto h-8 w-32 rounded-control" />
-      </div>
-      <EnduranceGanttSkeleton lanes={Math.max(1, lanes)} />
-      <p className="max-w-[var(--measure-prose)] type-caption text-subtle">
-        {t('charts.endurance.description')}
-      </p>
-    </div>
-  );
+  const locale = useLocale();
+  const format = useFormat();
+  return [
+    {
+      id: 'endurance',
+      label: t('charts.endurance.enduranceChampion'),
+      value: gantt ? formatSeconds(gantt.enduranceChampionStintSeconds, locale) : null,
+      caption: gantt ? <SummaryAddress address={gantt.enduranceChampionAddress} /> : null,
+      swatch: { color: SERIES_COLOR.endurance },
+    },
+    {
+      id: 'chrono',
+      label: t('charts.endurance.chronoWarrior'),
+      value: gantt ? formatSeconds(gantt.chronoWarriorSeconds, locale) : null,
+      caption: gantt ? <SummaryAddress address={gantt.chronoWarriorAddress} /> : null,
+      swatch: { color: SERIES_COLOR.chrono },
+    },
+    {
+      id: 'lanes',
+      label: t('charts.endurance.leaders'),
+      value: gantt ? format.count(gantt.lanes.length) : null,
+    },
+  ];
 }
 
 type LaneRow = {
@@ -550,31 +576,22 @@ const EnduranceTimelineChart: FC<EnduranceTimelineChartProps> = ({
   expectedLanes,
 }) => {
   const t = useTranslations('statistics');
-  const locale = useLocale();
-  const hydrated = useHydrated();
   const newWindowLinks = useChartLinksOpenNewWindow();
   const hasRound = round >= 0;
   const { data: gestures, isLoading, isError, refetch } = useGestureListByCycle(round, 'asc');
   const [view, setView] = useState<'gantt' | 'lines'>('gantt');
 
-  // Finalized rounds end at their claim timestamp; the live round stays open at "now".
-  const { data: roundInfo } = useRoundInfo(hasRound && !isLive ? round : -1);
-  const { data: serverNow } = useCurrentTime();
-  const clientNow = Math.floor(useNow(60_000) / 1000);
-  // "Now" is known only in the browser: until hydration the server's render is kept.
-  const nowSec = !hydrated ? 0 : serverNow && serverNow > 0 ? serverNow : clientNow;
-  const roundEndTs = !isLive && roundInfo?.TimeStamp ? roundInfo.TimeStamp : 0;
-  // Only the live round depends on "now"; quantize to whole minutes so the
-  // chart redraws at most once a minute, never on the 12s poll tick.
-  const nowForCalc = isLive ? Math.floor(nowSec / 60) * 60 : 0;
-
+  // A finalized cycle ends at its finalization, the live one at "now" (whole minutes).
+  // Nothing is drawn before that end is known: without it the last holder's stint, which
+  // can be the record, would be missing, and the readout would name the wrong champion.
+  const clock = useCycleClock(round, isLive);
   const gantt = useMemo(
-    () => getEnduranceGantt(gestures ?? [], roundEndTs, nowForCalc),
-    [gestures, roundEndTs, nowForCalc],
+    () => getEnduranceGantt(gestures ?? [], clock.endTs, clock.nowTs),
+    [gestures, clock.endTs, clock.nowTs],
   );
   const timeline = useMemo(
-    () => getEnduranceTimeline(gestures ?? [], roundEndTs, nowForCalc),
-    [gestures, roundEndTs, nowForCalc],
+    () => getEnduranceTimeline(gestures ?? [], clock.endTs, clock.nowTs),
+    [gestures, clock.endTs, clock.nowTs],
   );
 
   const rows = useMemo<LaneRow[]>(
@@ -632,21 +649,40 @@ const EnduranceTimelineChart: FC<EnduranceTimelineChartProps> = ({
     [newWindowLinks, t],
   );
 
-  const loading = hasRound && isLoading;
+  // A cycle without a gesture had no lead, whatever its end: saying so needs no clock.
+  const noGestures = hasRound && !isLoading && !isError && (gestures?.length ?? 0) === 0;
+  const loading = hasRound && !noGestures && (isLoading || clock.status === 'loading');
+  const ready = hasRound && !loading && !isError && clock.status === 'ready';
+  const readout = useEnduranceReadout(ready && gantt.lanes.length > 0 ? gantt : null);
   const state = !hasRound ? (
     <EmptyState headingLevel={4} variant="inline" title={t('charts.endurance.selectCycle')} />
+  ) : noGestures ? (
+    <EmptyState headingLevel={4} variant="inline" title={t('charts.endurance.empty')} />
   ) : loading ? (
-    expectedLanes !== undefined && expectedLanes > 0 ? (
-      <EnduranceGanttSkeleton lanes={expectedLanes} />
-    ) : (
-      <SkeletonChart height={LINE_CHART_HEIGHT} bars={18} />
-    )
+    // As many lanes as the server counted (or a page's worth), at most the lanes shown.
+    <EnduranceGanttSkeleton
+      lanes={Math.max(
+        1,
+        Math.min(
+          expectedLanes && expectedLanes > 0 ? expectedLanes : DEFAULT_LANE_LIMIT,
+          laneLimit ?? Number.POSITIVE_INFINITY,
+        ),
+      )}
+    />
   ) : isError ? (
     <ErrorState
       headingLevel={4}
       title={t('charts.endurance.loadErrorTitle')}
       message={t('charts.endurance.loadErrorMessage')}
       onRetry={() => refetch()}
+    />
+  ) : clock.status === 'error' ? (
+    // The cycle's end could not be read: its last stint is unknown, so nothing is drawn.
+    <ErrorState
+      headingLevel={4}
+      title={t('charts.endurance.loadErrorTitle')}
+      message={t('shared.serviceError')}
+      onRetry={clock.retry}
     />
   ) : gantt.lanes.length === 0 ? (
     <EmptyState headingLevel={4} variant="inline" title={t('charts.endurance.empty')} />
@@ -657,30 +693,10 @@ const EnduranceTimelineChart: FC<EnduranceTimelineChartProps> = ({
     <Tabs value={view} onValueChange={(next) => setView(next as 'gantt' | 'lines')}>
       <ChartFigure
         label={label}
-        summary={
-          gantt.lanes.length > 0 ? (
-            <>
-              <span className="block">
-                {t.rich('charts.endurance.championSummary', {
-                  address: formatAddress(gantt.enduranceChampionAddress),
-                  duration: formatSeconds(gantt.enduranceChampionStintSeconds, locale),
-                  who: () => <SummaryAddress address={gantt.enduranceChampionAddress} />,
-                })}
-              </span>
-              <span className="block">
-                {t.rich('charts.endurance.chronoSummary', {
-                  address: formatAddress(gantt.chronoWarriorAddress),
-                  duration: formatSeconds(gantt.chronoWarriorSeconds, locale),
-                  who: () => <SummaryAddress address={gantt.chronoWarriorAddress} />,
-                })}
-              </span>
-            </>
-          ) : loading ? (
-            <SummaryPlaceholder />
-          ) : undefined
-        }
+        readout={loading || (ready && gantt.lanes.length > 0) ? readout : undefined}
         state={state}
-        note={t('charts.endurance.description')}
+        loading={loading}
+        note={t('charts.endurance.note')}
         controls={
           <TabsList aria-label={t('charts.endurance.viewLabel')}>
             <TabsTrigger value="gantt">{t('charts.endurance.gantt')}</TabsTrigger>

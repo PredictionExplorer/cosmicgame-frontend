@@ -86,7 +86,18 @@
       },
       "participant": "Participant",
       "loadErrorTitle": "Statistics for this address could not be loaded",
-      "loadErrorMessage": "The statistics service did not respond. Try again in a moment."
+      "loadErrorMessage": "The statistics service did not respond. Try again in a moment.",
+      "sectionLoadErrorTitle": "This section did not load",
+      "nav": {
+        "label": "Profile contents",
+        "overview": "Overview",
+        "nfts": "NFTs",
+        "gestures": "Gestures",
+        "allocations": "Allocations",
+        "anchoring": "Anchoring",
+        "outreach": "Outreach",
+        "attached": "Attached assets"
+      }
     },
     "figures": {
       "gestures": {
@@ -140,13 +151,15 @@
         "title": "Cosmic Signature NFTs",
         "received": "Received",
         "toRetrieve": "Attached NFTs to retrieve",
-        "transfers": "Transfers"
+        "transfers": "Transfers",
+        "heldOrAnchored": "{count, number} held or anchored now"
       },
       "anchoring": {
         "title": "Anchoring",
         "anchoredNow": "Anchored now",
         "actions": "Anchor and release actions",
-        "distributions": "Anchor Distributions"
+        "distributions": "Anchor Distributions",
+        "byKind": "{cosmicSignature, number} Cosmic Signature · {randomWalk, number} Random Walk"
       },
       "definitions": {
         "label": "Definitions",
@@ -207,11 +220,12 @@
       "sections": {
         "actions": "Anchor and release actions",
         "distributionsByToken": "Anchor Distributions by NFT",
-        "distributionsByDeposit": "Anchor Distributions by deposit",
-        "retrievedDistributions": "Retrieved Anchor Distributions",
-        "unretrievedDistributions": "Anchor Distributions to retrieve",
         "anchoredNftSelection": "Anchored-NFT Stellar Selection"
-      }
+      },
+      "showDeposits": "Show deposits",
+      "hideDeposits": "Hide deposits",
+      "depositsHeader": "Deposits",
+      "nothingRetrieved": "Nothing retrieved yet: an NFT’s Anchor Distributions are retrieved when its anchor is released."
     },
     "donatedAssets": {
       "nfts": {
@@ -230,6 +244,13 @@
         "emptyTitle": "No attached tokens",
         "emptyDescription": "No attached ERC-20 tokens have been allocated to this address yet."
       }
+    },
+    "viewAddress": {
+      "label": "View any address",
+      "hint": "Participant statistics are public: see any address without connecting a wallet.",
+      "placeholder": "0x…",
+      "submit": "View",
+      "invalid": "Enter a full address: 0x followed by 40 letters and digits."
     }
   },
   "tokens": {

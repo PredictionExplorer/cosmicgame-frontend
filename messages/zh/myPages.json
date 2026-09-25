@@ -86,7 +86,18 @@
       },
       "participant": "参与者",
       "loadErrorTitle": "无法加载此地址的统计",
-      "loadErrorMessage": "统计服务暂未响应，请稍后重试。"
+      "loadErrorMessage": "统计服务暂未响应，请稍后重试。",
+      "sectionLoadErrorTitle": "此部分未能加载",
+      "nav": {
+        "label": "个人资料目录",
+        "overview": "概览",
+        "nfts": "NFT",
+        "gestures": "落笔",
+        "allocations": "获配记录",
+        "anchoring": "锚定",
+        "outreach": "推广分配",
+        "attached": "已附加资产"
+      }
     },
     "figures": {
       "gestures": {
@@ -140,13 +151,15 @@
         "title": "Cosmic Signature NFT",
         "received": "收到",
         "toRetrieve": "待取回的已附加 NFT",
-        "transfers": "转移"
+        "transfers": "转移",
+        "heldOrAnchored": "当前持有或锚定 {count, number} 枚"
       },
       "anchoring": {
         "title": "锚定",
         "anchoredNow": "当前锚定",
         "actions": "锚定与解锚操作",
-        "distributions": "锚定派发"
+        "distributions": "锚定派发",
+        "byKind": "Cosmic Signature {cosmicSignature, number} · Random Walk {randomWalk, number}"
       },
       "definitions": {
         "label": "定义",
@@ -207,11 +220,12 @@
       "sections": {
         "actions": "锚定与解锚操作",
         "distributionsByToken": "按代币查看锚定派发",
-        "distributionsByDeposit": "按存入查看锚定派发",
-        "retrievedDistributions": "已取回锚定派发",
-        "unretrievedDistributions": "未取回锚定派发",
         "anchoredNftSelection": "锚定 NFT 星选"
-      }
+      },
+      "showDeposits": "显示存入记录",
+      "hideDeposits": "隐藏存入记录",
+      "depositsHeader": "存入记录",
+      "nothingRetrieved": "尚未取回任何锚定派发：NFT 解锚时取回其锚定派发。"
     },
     "donatedAssets": {
       "nfts": {
@@ -230,6 +244,13 @@
         "emptyTitle": "暂无已附加代币",
         "emptyDescription": "尚无已附加 ERC-20 代币分配给此地址。"
       }
+    },
+    "viewAddress": {
+      "label": "查看任意地址",
+      "hint": "参与者统计是公开的：无需连接钱包即可查看任何地址。",
+      "placeholder": "0x…",
+      "submit": "查看",
+      "invalid": "请输入完整地址：0x 加 40 位字母和数字。"
     }
   },
   "tokens": {

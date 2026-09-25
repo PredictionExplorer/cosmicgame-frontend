@@ -30,8 +30,8 @@ import { SkeletonChart } from '@/components/ui/skeleton';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 
 import { ChartFigure } from './charts/ChartFigure';
+import type { ReadoutItem } from './charts/ChartReadout';
 import { UtcTime } from './charts/UtcTime';
-import { ChartLegend } from './charts/ChartLegend';
 import { ChartTooltipCard } from './charts/ChartTooltipCard';
 import { useLinearAxis, useTimeAxis } from './charts/axes';
 import { formatDateRange } from './charts/labels';
@@ -134,14 +134,14 @@ function SupplyTooltip({
   if (!point) return null;
   const cst = (value: number) => formatAmount(value, { unit: 'CST', locale });
   const when = formatUnixTsLabel(point.ts, view === 'gesture', locale);
+  // By gesture, the title is the gesture and its moment is a row of its own: two
+  // translated strings are never glued with one language's separator.
+  const byGesture = view === 'gesture';
   return (
     <ChartTooltipCard
-      title={
-        view === 'gesture'
-          ? `${t('charts.supply.gesture', { number: point.gesture ?? 0 })} · ${when}`
-          : when
-      }
+      title={byGesture ? t('charts.supply.gesture', { number: point.gesture ?? 0 }) : when}
       rows={[
+        ...(byGesture ? [{ key: 'when', label: t('charts.cstCost.when'), value: when }] : []),
         {
           key: 'supply',
           label: t('charts.supply.totalSupply'),
@@ -220,10 +220,10 @@ const SupplyArea = memo(function SupplyArea({
 
 /**
  * CST total supply over time: one line (filled only when its axis starts at
- * zero), by day or after every gesture,
- * over the last 30 or 90 days, the last year or all time. The summary states
- * the supply at the end of the range and what was imprinted and burned in
- * it; the table view lists the same points.
+ * zero), by day or after every gesture, over the last 30 or 90 days, the
+ * last year or all time. The readout gives the supply at the end of the
+ * range (its swatch keys the line) and what was imprinted and burned in it;
+ * the table view lists the same points.
  */
 export const CstSupplyHistory: FC<{ label: string }> = ({ label }) => {
   const t = useTranslations('statistics');
@@ -299,19 +299,35 @@ export const CstSupplyHistory: FC<{ label: string }> = ({ label }) => {
 
   const last = points[points.length - 1];
   const first = points[0];
-  const summary =
-    first && last
-      ? t('charts.supply.summary', {
-          supply: cst(last.supply),
-          // The same calendar style as the range beside it.
-          date: formatDateRange(last.ts, last.ts, locale),
-          range: formatDateRange(first.ts, last.ts, locale),
-          imprinted: cst(points.reduce((sum, p) => sum + p.imprinted, 0)),
-          burned: cst(points.reduce((sum, p) => sum + p.burned, 0)),
-        })
+  const loading = query.isLoading;
+  // The same calendar style for the day and the range.
+  const period = first && last ? formatDateRange(first.ts, last.ts, locale) : null;
+  const readout: ReadoutItem[] | undefined =
+    loading || (first && last)
+      ? [
+          {
+            id: 'supply',
+            label: t('charts.supply.totalSupply'),
+            value: last && !loading ? cst(last.supply) : null,
+            caption: last && !loading ? formatDateRange(last.ts, last.ts, locale) : null,
+            swatch: { color: COLOR, shape: 'line' },
+          },
+          {
+            id: 'imprinted',
+            label: t('charts.supply.imprint'),
+            value: loading ? null : cst(points.reduce((sum, p) => sum + p.imprinted, 0)),
+            caption: loading ? null : period,
+          },
+          {
+            id: 'burned',
+            label: t('charts.supply.consume'),
+            value: loading ? null : cst(points.reduce((sum, p) => sum + p.burned, 0)),
+            caption: loading ? null : period,
+          },
+        ]
       : undefined;
 
-  const state = query.isLoading ? (
+  const state = loading ? (
     <SkeletonChart height={CHART_HEIGHT} bars={24} />
   ) : query.isError ? (
     <ErrorState
@@ -333,7 +349,8 @@ export const CstSupplyHistory: FC<{ label: string }> = ({ label }) => {
   return (
     <ChartFigure
       label={label}
-      summary={summary}
+      readout={query.isError ? undefined : readout}
+      loading={loading}
       preferTable={points.length > 0 && points.length < MIN_PLOT_POINTS}
       controls={
         <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
@@ -361,11 +378,6 @@ export const CstSupplyHistory: FC<{ label: string }> = ({ label }) => {
             }))}
           />
         </div>
-      }
-      legend={
-        <ChartLegend
-          items={[{ key: 'supply', label: t('charts.supply.legend'), color: COLOR, shape: 'line' }]}
-        />
       }
       state={state}
       table={

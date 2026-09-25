@@ -290,8 +290,13 @@ test.describe('zh Sprint 5 — statistics, tables, and formatting', () => {
     await expect(page.getByText(/^(2026年)?1月1日 11:34 UTC$/)).toBeVisible();
 
     await openZhRoute(page, '/zh/statistics/tokens', '代币分布统计 · Cosmic Signature');
-    // The supply summary dates the reading in the zh calendar style.
-    await expect(page.getByText(/^2026年1月1日 总供应量：1,000\sCST。/)).toBeVisible();
+    // The supply readout dates its figure in the zh calendar style, under the figure.
+    const supply = page
+      .getByRole('term')
+      .filter({ hasText: /^总供应量$/ })
+      .first();
+    await expect(supply.locator('xpath=following-sibling::dd[1]')).toHaveText(/^1,000\sCST$/);
+    await expect(supply.locator('xpath=following-sibling::dd[2]')).toHaveText('2026年1月1日');
 
     await openZhRoute(
       page,

@@ -176,7 +176,7 @@ describe('AnchoringSection', () => {
         cstAnchorActions={dataState([], { isError: true, onRetry })}
       />,
     );
-    expect(screen.getByText(/failed to load anchor \/ release actions/i)).toBeInTheDocument();
+    expect(screen.getByText('This section did not load')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /try again/i }));
     expect(onRetry).toHaveBeenCalled();
   });

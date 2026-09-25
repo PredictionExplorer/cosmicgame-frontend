@@ -54,6 +54,14 @@ const gestures = [
 
 const ethOnly = [gestures[0]!] as GestureInfo[];
 
+/** A chart's readout as [label, figure, caption] rows, every space read as a plain one. */
+const readoutOf = (figure: Element) =>
+  [...figure.querySelectorAll('figcaption dl > div')].map((item) =>
+    [...item.querySelectorAll('dt, dd')].map((cell) =>
+      (cell.textContent ?? '').replace(/\s/g, ' '),
+    ),
+  );
+
 const ok = <T,>(data: T) => ({ data, isLoading: false, isError: false, refetch: jest.fn() });
 
 beforeEach(() => {
@@ -68,13 +76,17 @@ describe('decadeTicks', () => {
 });
 
 describe('CstGestureCostView', () => {
-  it('plots one point per CST gesture and reads the cycle in one sentence', () => {
+  it('plots cost and clock as two panels on one time axis, and reads the cycle out', () => {
     render(<CstGestureCostView gestures={gestures} label="CST cost" />);
-    expect(screen.getByTestId('composed-chart')).toHaveAttribute('data-point-count', '3');
-    const figure = screen.getByRole('figure', { name: 'CST cost' });
-    expect(figure).toHaveTextContent(
-      /consumed 3,650(\.00)? CST\. The highest cost was 3,500(\.00)? CST/,
-    );
+    // V301: the clock has its own panel under the cost, not a second scale on the same plot.
+    const panels = screen.getAllByTestId('composed-chart');
+    expect(panels).toHaveLength(2);
+    for (const panel of panels) expect(panel).toHaveAttribute('data-point-count', '3');
+    expect(readoutOf(screen.getByRole('figure', { name: 'CST cost' }))).toEqual([
+      ['CST gestures', '3'],
+      ['CST consumed', expect.stringMatching(/^3,650(\.00)? CST$/)],
+      ['Highest cost', expect.stringMatching(/^3,500(\.00)? CST$/), expect.any(String)],
+    ]);
   });
 
   it('says when the highest cost came as a duration, not an axis tick', () => {
@@ -83,17 +95,20 @@ describe('CstGestureCostView', () => {
       index === 3 ? { ...gesture, TimeStamp: T0 + 10.5 * 86_400 } : gesture,
     ) as GestureInfo[];
     render(<CstGestureCostView gestures={late} label="CST cost" />);
-    expect(screen.getByRole('figure', { name: 'CST cost' })).toHaveTextContent(
-      /3,500(\.00)? CST, 10d 12h into the cycle\./,
-    );
+    const highest = readoutOf(screen.getByRole('figure', { name: 'CST cost' })).at(-1)!;
+    expect(highest[2]).toBe('10d 12h into cycle');
   });
 
-  it('draws a hollow dot for a gesture that cost nothing', () => {
+  it('draws a free gesture as an open ring, at least 4px across like every dot', () => {
     const { container } = render(<CstGestureCostView gestures={gestures} label="CST cost" />);
-    const fills = Array.from(container.querySelectorAll('circle')).map((c) =>
-      c.getAttribute('fill'),
-    );
-    expect(fills).toEqual(['hsl(var(--method-cst))', 'none', 'hsl(var(--method-cst))']);
+    const dots = Array.from(container.querySelectorAll('circle'));
+    expect(dots.map((c) => c.getAttribute('fill'))).toEqual([
+      'hsl(var(--method-cst))',
+      'hsl(var(--background))',
+      'hsl(var(--method-cst))',
+    ]);
+    expect(dots[1]).toHaveAttribute('stroke-width', '1.5');
+    for (const dot of dots) expect(Number(dot.getAttribute('r'))).toBeGreaterThanOrEqual(2);
   });
 
   it('labels the price axis in decades and the clock axis in whole units', () => {
@@ -105,9 +120,10 @@ describe('CstGestureCostView', () => {
     }
   });
 
-  it('keys the clock as a dashed reference line in the legend', () => {
+  it('keys the paid dots, the free rings and the clock in the legend', () => {
     render(<CstGestureCostView gestures={gestures} label="CST cost" />);
     expect(screen.getByText('CST paid per gesture')).toBeInTheDocument();
+    expect(screen.getByText('Free gesture')).toBeInTheDocument();
     expect(screen.getByText('Clock remaining before gesture')).toBeInTheDocument();
   });
 
@@ -134,14 +150,14 @@ describe('CstGestureCostView', () => {
     const toggle = screen.getByRole('button', { name: 'View as table' });
     expect(toggle).toHaveAttribute('aria-pressed', 'true');
     await user.click(toggle);
-    expect(screen.getByTestId('composed-chart')).toBeInTheDocument();
+    expect(screen.getAllByTestId('composed-chart')).toHaveLength(2);
   });
 
-  it('draws small, light dots on a phone, where a joined run merges into a band', () => {
+  it('draws smaller dots on a phone, where a joined run merges into a band', () => {
     // jsdom has no matchMedia: the chart takes the narrow screen.
     const { container } = render(<CstGestureCostView gestures={gestures} label="CST cost" />);
     for (const dot of container.querySelectorAll('circle')) {
-      expect(dot).toHaveAttribute('r', '1.25');
+      expect(dot).toHaveAttribute('r', '2');
     }
   });
 
@@ -156,7 +172,7 @@ describe('CstGestureCostView', () => {
     try {
       const { container } = render(<CstGestureCostView gestures={gestures} label="CST cost" />);
       for (const dot of container.querySelectorAll('circle')) {
-        expect(dot).toHaveAttribute('r', '2.25');
+        expect(dot).toHaveAttribute('r', '3');
       }
     } finally {
       delete (window as { matchMedia?: unknown }).matchMedia;

@@ -86,7 +86,18 @@
       },
       "participant": "參與者",
       "loadErrorTitle": "無法載入此地址的統計",
-      "loadErrorMessage": "統計服務暫未回應，請稍後再試。"
+      "loadErrorMessage": "統計服務暫未回應，請稍後再試。",
+      "sectionLoadErrorTitle": "此區塊未能載入",
+      "nav": {
+        "label": "個人資料目錄",
+        "overview": "概覽",
+        "nfts": "NFT",
+        "gestures": "落筆",
+        "allocations": "獲配紀錄",
+        "anchoring": "錨定",
+        "outreach": "推廣分配",
+        "attached": "已附加資產"
+      }
     },
     "figures": {
       "gestures": {
@@ -140,13 +151,15 @@
         "title": "Cosmic Signature NFT",
         "received": "收到",
         "toRetrieve": "待取回的已附加 NFT",
-        "transfers": "轉移"
+        "transfers": "轉移",
+        "heldOrAnchored": "目前持有或錨定 {count, number} 枚"
       },
       "anchoring": {
         "title": "錨定",
         "anchoredNow": "目前錨定",
         "actions": "錨定與解錨操作",
-        "distributions": "錨定配發"
+        "distributions": "錨定配發",
+        "byKind": "Cosmic Signature {cosmicSignature, number} · Random Walk {randomWalk, number}"
       },
       "definitions": {
         "label": "定義",
@@ -207,11 +220,12 @@
       "sections": {
         "actions": "錨定與解錨操作",
         "distributionsByToken": "按代幣檢視錨定配發",
-        "distributionsByDeposit": "按存入檢視錨定配發",
-        "retrievedDistributions": "已取回錨定配發",
-        "unretrievedDistributions": "未取回錨定配發",
         "anchoredNftSelection": "錨定 NFT 星選"
-      }
+      },
+      "showDeposits": "顯示存入紀錄",
+      "hideDeposits": "隱藏存入紀錄",
+      "depositsHeader": "存入紀錄",
+      "nothingRetrieved": "尚未取回任何錨定配發：NFT 解錨時取回其錨定配發。"
     },
     "donatedAssets": {
       "nfts": {
@@ -230,6 +244,13 @@
         "emptyTitle": "暫無已附加代幣",
         "emptyDescription": "尚無已附加 ERC-20 代幣分配給此地址。"
       }
+    },
+    "viewAddress": {
+      "label": "查看任一地址",
+      "hint": "參與者統計是公開的：無需連接錢包即可查看任何地址。",
+      "placeholder": "0x…",
+      "submit": "查看",
+      "invalid": "請輸入完整地址：0x 加 40 位字母和數字。"
     }
   },
   "tokens": {

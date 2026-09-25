@@ -86,7 +86,18 @@
       },
       "participant": "Người tham gia",
       "loadErrorTitle": "Không tải được thống kê của địa chỉ này",
-      "loadErrorMessage": "Dịch vụ thống kê không phản hồi. Hãy thử lại sau ít phút."
+      "loadErrorMessage": "Dịch vụ thống kê không phản hồi. Hãy thử lại sau ít phút.",
+      "sectionLoadErrorTitle": "Phần này chưa tải được",
+      "nav": {
+        "label": "Mục lục hồ sơ",
+        "overview": "Tổng quan",
+        "nfts": "NFT",
+        "gestures": "Nét bút",
+        "allocations": "Phân bổ",
+        "anchoring": "Neo giữ",
+        "outreach": "Truyền thông",
+        "attached": "Tài sản đính kèm"
+      }
     },
     "figures": {
       "gestures": {
@@ -140,13 +151,15 @@
         "title": "Cosmic Signature NFT",
         "received": "Đã nhận",
         "toRetrieve": "NFT đính kèm chưa nhận về",
-        "transfers": "Chuyển giao"
+        "transfers": "Chuyển giao",
+        "heldOrAnchored": "Đang nắm giữ hoặc neo giữ: {count, number}"
       },
       "anchoring": {
         "title": "Neo giữ",
         "anchoredNow": "Đang neo giữ",
         "actions": "Thao tác neo giữ và gỡ neo",
-        "distributions": "Phân phối neo giữ"
+        "distributions": "Phân phối neo giữ",
+        "byKind": "{cosmicSignature, number} Cosmic Signature · {randomWalk, number} Random Walk"
       },
       "definitions": {
         "label": "Định nghĩa",
@@ -207,11 +220,12 @@
       "sections": {
         "actions": "Thao tác neo giữ / gỡ neo",
         "distributionsByToken": "Phân phối neo giữ theo token",
-        "distributionsByDeposit": "Phân phối neo giữ theo khoản nạp",
-        "retrievedDistributions": "Phân phối neo giữ đã nhận về",
-        "unretrievedDistributions": "Phân phối neo giữ chưa nhận về",
         "anchoredNftSelection": "Tinh tuyển NFT neo giữ"
-      }
+      },
+      "showDeposits": "Hiện các đợt nạp",
+      "hideDeposits": "Ẩn các đợt nạp",
+      "depositsHeader": "Đợt nạp",
+      "nothingRetrieved": "Chưa nhận về khoản nào: phân phối neo giữ của một NFT được nhận về khi gỡ neo."
     },
     "donatedAssets": {
       "nfts": {
@@ -230,6 +244,13 @@
         "emptyTitle": "Không có token đính kèm",
         "emptyDescription": "Chưa có token ERC20 đính kèm nào được phân bổ cho địa chỉ này."
       }
+    },
+    "viewAddress": {
+      "label": "Xem một địa chỉ bất kỳ",
+      "hint": "Thống kê của người tham gia là công khai: bạn có thể xem bất kỳ địa chỉ nào mà không cần kết nối ví.",
+      "placeholder": "0x…",
+      "submit": "Xem",
+      "invalid": "Hãy nhập địa chỉ đầy đủ: 0x và 40 chữ cái, chữ số theo sau."
     }
   },
   "tokens": {
