@@ -5,7 +5,10 @@ import type { BidderActivePeriod, TopBidderInfo } from '@/services/api/types';
 
 import { act, checkA11y, render, screen, within } from '@/test-utils';
 
-import { ParticipantActivePeriodsTimeline } from '../ParticipantActivePeriodsTimeline';
+import {
+  PHONE_LANE_LIMIT,
+  ParticipantActivePeriodsTimeline,
+} from '../ParticipantActivePeriodsTimeline';
 import { ACTIVE_PERIODS_TOP_N, activePeriodsRange } from '../charts/activityRanges';
 
 const mockUseBidTimeBounds = jest.fn();
@@ -191,6 +194,91 @@ describe('ParticipantActivePeriodsTimeline', () => {
   it('has no axe violations', async () => {
     const { container } = render(<ParticipantActivePeriodsTimeline label="Active periods" />);
     await checkA11y(container);
+  });
+});
+
+describe('ParticipantActivePeriodsTimeline on a phone', () => {
+  // Twelve participants, one period each: four past the phone's limit.
+  const many: TopBidderInfo[] = Array.from({ length: 12 }, (_, index) => ({
+    BidderAid: index + 1,
+    BidderAddr: `0x${String(index + 1).padStart(40, '0')}`,
+    NumBids: 100 - index,
+  }));
+  const manyPeriods = many.map((participant, index) =>
+    period(participant.BidderAid, participant.BidderAddr, 10 + index * 5, 3),
+  );
+  const lanes = () =>
+    within(screen.getByRole('group', { name: 'Active periods' })).getAllByRole('group');
+  const folded = () => lanes().filter((lane) => lane.classList.contains('max-sm:hidden'));
+  const viewport = (width: number) => {
+    window.matchMedia = jest.fn((query: string) => ({
+      matches: query === '(min-width: 640px)' && width >= 640,
+      media: query,
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+    })) as unknown as typeof window.matchMedia;
+  };
+
+  beforeEach(() => {
+    mockUseTopBidderActivePeriods.mockReturnValue(
+      ok({ TopBidders: many, ActivePeriods: manyPeriods }),
+    );
+  });
+  afterEach(() => {
+    // jsdom has no matchMedia of its own.
+    delete (window as { matchMedia?: unknown }).matchMedia;
+  });
+
+  it('shows the top lanes and folds the rest behind "Show all", in CSS alone', async () => {
+    const user = userEvent.setup();
+    render(<ParticipantActivePeriodsTimeline label="Active periods" />);
+    expect(PHONE_LANE_LIMIT).toBe(8);
+    // Every lane is in the HTML; only the phone's layout hides the last four.
+    expect(lanes()).toHaveLength(12);
+    expect(folded()).toEqual(lanes().slice(PHONE_LANE_LIMIT));
+    const toggle = screen.getByRole('button', { name: 'Show all 12' });
+    expect(toggle).toHaveClass('sm:hidden');
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(toggle).toHaveAttribute(
+      'aria-controls',
+      screen.getByRole('group', { name: 'Active periods' }).id,
+    );
+
+    await user.click(toggle);
+    expect(folded()).toEqual([]);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(toggle).toHaveTextContent('Show the top 8');
+  });
+
+  it('keeps the arrow keys on the lanes a phone shows until they are unfolded', async () => {
+    const user = userEvent.setup();
+    render(<ParticipantActivePeriodsTimeline label="Active periods" />);
+    const bars = screen.getAllByRole('img');
+    act(() => bars[PHONE_LANE_LIMIT - 1]!.focus());
+    await user.keyboard('{ArrowDown}');
+    expect(bars[PHONE_LANE_LIMIT - 1]).toHaveFocus();
+
+    await user.click(screen.getByRole('button', { name: 'Show all 12' }));
+    act(() => bars[PHONE_LANE_LIMIT - 1]!.focus());
+    await user.keyboard('{ArrowDown}');
+    expect(bars[PHONE_LANE_LIMIT]).toHaveFocus();
+  });
+
+  it('lets the arrow keys reach every lane from the sm breakpoint, where none is folded', async () => {
+    viewport(1440);
+    const user = userEvent.setup();
+    render(<ParticipantActivePeriodsTimeline label="Active periods" />);
+    const bars = screen.getAllByRole('img');
+    act(() => bars[PHONE_LANE_LIMIT - 1]!.focus());
+    await user.keyboard('{ArrowDown}');
+    expect(bars[PHONE_LANE_LIMIT]).toHaveFocus();
+  });
+
+  it('offers no fold when the lanes fit', () => {
+    mockUseTopBidderActivePeriods.mockReturnValue(ok({ TopBidders: top, ActivePeriods: periods }));
+    render(<ParticipantActivePeriodsTimeline label="Active periods" />);
+    expect(screen.queryByRole('button', { name: /Show all/ })).toBeNull();
+    expect(folded()).toEqual([]);
   });
 });
 // lexicon-allow-end

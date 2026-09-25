@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, type FC } from 'react';
+import { useId, useMemo, useState, type FC } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
@@ -14,6 +14,8 @@ import type {
 } from '@/services/api/types';
 // lexicon-allow-end
 import { useFormat } from '@/hooks/useFormat';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { Button } from '@/components/ui/button';
 import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
@@ -36,6 +38,13 @@ import { useRovingStints } from './charts/useRovingStints';
 
 /** The thinnest a period may draw, so a one-hour burst in a year still shows. */
 const MIN_BAR_PERCENT = 0.3;
+
+/**
+ * Lanes a phone shows before "Show all": there each lane takes its own
+ * address line, and twenty of them ran about 1,300px of plot, most of it the
+ * quieter participants' few marks.
+ */
+export const PHONE_LANE_LIMIT = 8;
 
 type Lane = {
   participant: TopParticipant;
@@ -72,7 +81,10 @@ type ParticipantActivePeriodsTimelineProps = {
  * every width: a lane per participant, ranked by gestures, every bar in the
  * gestures series colour so rank, not hue, identifies a lane. One tab stop:
  * the arrow keys step through a lane's periods and between lanes, and the
- * hovered, tapped or focused period reads out below the plot.
+ * hovered, tapped or focused period reads out below the plot. A phone shows
+ * the top `PHONE_LANE_LIMIT` lanes and folds the rest behind "Show all" (in
+ * CSS, so the server's HTML is the same at every width); the arrow keys skip
+ * the folded lanes.
  */
 export const ParticipantActivePeriodsTimeline: FC<ParticipantActivePeriodsTimelineProps> = ({
   enabled = true,
@@ -101,7 +113,15 @@ export const ParticipantActivePeriodsTimeline: FC<ParticipantActivePeriodsTimeli
     }));
   }, [data?.TopBidders, data?.ActivePeriods]);
 
-  const counts = useMemo(() => lanes.map((lane) => lane.periods.length), [lanes]);
+  const [showAll, setShowAll] = useState(false);
+  const lanesId = useId();
+  const wide = useMediaQuery('(min-width: 640px)');
+  const folds = lanes.length > PHONE_LANE_LIMIT;
+  const folded = folds && !showAll && !wide;
+  const counts = useMemo(
+    () => lanes.map((lane, row) => (folded && row >= PHONE_LANE_LIMIT ? 0 : lane.periods.length)),
+    [lanes, folded],
+  );
   const roving = useRovingStints(counts);
   const readout = useTimelineReadout<ActivePeriod>();
   const coarse = useCoarsePointer();
@@ -255,6 +275,7 @@ export const ParticipantActivePeriodsTimeline: FC<ParticipantActivePeriodsTimeli
         </div>
 
         <div
+          id={lanesId}
           role="group"
           aria-label={label}
           onKeyDown={roving.onKeyDown}
@@ -274,6 +295,7 @@ export const ParticipantActivePeriodsTimeline: FC<ParticipantActivePeriodsTimeli
                 LANE_GRID,
                 'border-b border-rule-faint pt-1.5 transition-colors duration-fast sm:pt-0',
                 TIMELINE_LANE_FOCUS_CLASS,
+                !showAll && row >= PHONE_LANE_LIMIT && 'max-sm:hidden',
               )}
             >
               {/* A phone reads rank, address and count on one line above the lane. */}
@@ -342,6 +364,22 @@ export const ParticipantActivePeriodsTimeline: FC<ParticipantActivePeriodsTimeli
             </div>
           ))}
         </div>
+
+        {folds ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="mt-2 sm:hidden"
+            aria-expanded={showAll}
+            aria-controls={lanesId}
+            onClick={() => setShowAll((value) => !value)}
+          >
+            {showAll
+              ? t('charts.endurance.showFewerLanes', { count: PHONE_LANE_LIMIT })
+              : t('charts.endurance.showAllLanes', { count: lanes.length })}
+          </Button>
+        ) : null}
 
         <p aria-live="polite" className="mt-3 min-h-5 type-body-sm text-muted-foreground">
           {readout.active
