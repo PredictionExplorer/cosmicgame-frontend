@@ -191,11 +191,11 @@
         "detail": "The first gesture starts the finalization clock."
       },
       "open": {
-        "label": "Open Cycle",
+        "label": "Live",
         "detail": "Each gesture takes the latest position and can extend the clock."
       },
       "finalWindow": {
-        "label": "Final Window",
+        "label": "Final window",
         "detail": "The clock nears zero. A new gesture can still extend it."
       },
       "finalization": {
