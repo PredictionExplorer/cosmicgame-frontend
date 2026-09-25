@@ -584,6 +584,14 @@ describe('AllocationInfoPage', () => {
       expect(refetch).toHaveBeenCalledTimes(1);
     });
 
+    // A tab with no badge beside tabs with one read as still loading (V276).
+    it('counts an empty tab as a quiet zero', () => {
+      renderCycle();
+      const tab = screen.getByRole('tab', { name: /allocation\.details\.data\.tabs\.anchoring/ });
+      const badge = within(tab).getByText('0');
+      expect(badge).toHaveClass('text-subtle');
+    });
+
     it('shows designed empty states for tabs with nothing in them', async () => {
       renderCycle();
       await userEvent.click(

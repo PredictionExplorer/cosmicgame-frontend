@@ -95,14 +95,18 @@ function unread<T>(read: TabRead<T>): boolean {
   return read.isError && read.data === undefined;
 }
 
-/** A tab's count, a short skeleton while it loads, and nothing when its list could not be read. */
+/**
+ * A tab's count: a short skeleton while it loads, a quiet "0" for an empty
+ * list (a tab with no badge beside tabs with one reads as still loading),
+ * and nothing when its list could not be read.
+ */
 function TabCount({ count, loading }: { count: number | null; loading: boolean }) {
   const format = useFormat();
   // A span: it sits inside the tab's button.
   if (loading) return <Skeleton as="span" className="ml-2 inline-block h-4 w-6" />;
-  if (count === null || count === 0) return null;
+  if (count === null) return null;
   return (
-    <Badge size="sm" className="ml-2 tabular-nums">
+    <Badge size="sm" className={cn('ml-2 tabular-nums', count === 0 && 'text-subtle')}>
       {format.count(count)}
     </Badge>
   );
