@@ -3,7 +3,13 @@ import { cache } from 'react';
 import type { ServerTimingSample } from '@/utils/time';
 import { LATEST_SIGNATURES_LIMIT } from '@/lib/latestSignatures';
 
-import { flattenGestureArray, flattenTx, flattenTxArray, getAPIUrl } from './client';
+import {
+  SERVER_READ_TIMEOUT_MS,
+  flattenGestureArray,
+  flattenTx,
+  flattenTxArray,
+  getAPIUrl,
+} from './client';
 import { normalizeDashboardWire } from './rounds';
 import {
   DashboardInfoSchema,
@@ -25,8 +31,9 @@ import type { CSTTokenInfo, DashboardInfo, GestureInfo, SpecialRecipients } from
  * Client-side React Query takes over for live updates immediately after
  * hydration, so seeds only need to be fresh enough for the first paint.
  *
- * Every helper resolves to `null` on failure: a missing seed must degrade to
- * the client-side loading path, never fail the prerender. Helpers are
+ * Every helper resolves to `null` on failure, a read that takes longer than
+ * `SERVER_READ_TIMEOUT_MS` included: a missing seed must degrade to the
+ * client-side loading path, never fail or hold up the prerender. Helpers are
  * wrapped in React `cache()` so `generateMetadata` and the page body share
  * one upstream request per render.
  */
@@ -99,6 +106,7 @@ async function fetchApiJson(path: string, revalidateSeconds: number): Promise<un
     const response = await fetch(getAPIUrl(path), {
       headers: { Accept: 'application/json' },
       next: { revalidate: revalidateSeconds },
+      signal: AbortSignal.timeout(SERVER_READ_TIMEOUT_MS),
     });
     if (!response.ok) return null;
     return (await response.json()) as unknown;

@@ -1,6 +1,6 @@
 import { cache } from 'react';
 
-import { getAPIUrl } from '@/services/api/client';
+import { SERVER_READ_TIMEOUT_MS, getAPIUrl } from '@/services/api/client';
 import type { CSTTokenInfo } from '@/services/api/types';
 
 import { seedsDisabled } from '../../QuerySeed';
@@ -27,10 +27,10 @@ async function saysRecordNotFound(response: Response): Promise<boolean> {
  *
  * Resolves `null` when the API says it holds no such token (a 404, or a 400
  * whose body says "record not found"), so the route answers a real 404;
- * `undefined` when the read failed for any other reason or was skipped, and
- * the page then loads the record itself. Under the e2e harness the browser
- * mocks the API, so the server reads nothing and never turns a fixture token
- * away.
+ * `undefined` when the read failed for any other reason, took longer than
+ * `SERVER_READ_TIMEOUT_MS`, or was skipped, and the page then loads the
+ * record itself. Under the e2e harness the browser mocks the API, so the
+ * server reads nothing and never turns a fixture token away.
  */
 export const loadTokenInfo = cache(
   async (tokenId: number): Promise<CSTTokenInfo | null | undefined> => {
@@ -39,6 +39,7 @@ export const loadTokenInfo = cache(
       const response = await fetch(getAPIUrl(`cst/info/${tokenId}`), {
         headers: { Accept: 'application/json' },
         next: { revalidate: 300 },
+        signal: AbortSignal.timeout(SERVER_READ_TIMEOUT_MS),
       });
       if (response.status === 404) return null;
       if (response.status === 400) return (await saysRecordNotFound(response)) ? null : undefined;

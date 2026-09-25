@@ -380,6 +380,14 @@ describe('apiGet', () => {
 
     expect(adapter.mock.calls[0]?.[0]?.signal).toBeUndefined();
   });
+
+  // The server bound (client.server.test.ts) is for renders: a reader in the
+  // browser waits on a loading state, so its reads keep the 15 s default.
+  it('leaves a browser read on the default timeout', async () => {
+    await apiGet('/api/cosmicgame/test', undefined, { adapter });
+
+    expect(adapter.mock.calls[0]?.[0]).toMatchObject({ timeout: 15_000 });
+  });
 });
 
 describe('apiPost', () => {

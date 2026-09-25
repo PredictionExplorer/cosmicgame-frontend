@@ -13,7 +13,7 @@ import {
   type CosmicSignatureMetadata,
   type TraitTranslator,
 } from '@/lib/nftMetadata';
-import { flattenTx } from '@/services/api/client';
+import { SERVER_READ_TIMEOUT_MS, flattenTx } from '@/services/api/client';
 import type { CSTTokenInfo } from '@/services/api/types';
 import { createMetadata } from '@/utils/seo';
 import { JsonLd, nftProductJsonLd, breadcrumbJsonLd } from '@/utils/jsonLd';
@@ -45,13 +45,17 @@ function tokenImageUrl(seed: string | number | undefined): string {
 /**
  * The token's metadata document (traits, palette, simulation), read once per
  * render for the JSON-LD and the client's first paint. `null` when the media
- * origin has no document for the id, `undefined` on transport errors — the
- * client then loads it itself; neither ever fails the prerender.
+ * origin has no document for the id, `undefined` on transport errors or
+ * after `SERVER_READ_TIMEOUT_MS` — the client then loads it itself; neither
+ * ever fails or holds up the prerender.
  */
 const loadTokenMetadata = cache(
   async (tokenId: number): Promise<CosmicSignatureMetadata | null | undefined> => {
     try {
-      return await fetchNftMetadata(tokenId, { next: { revalidate: 300 } });
+      return await fetchNftMetadata(tokenId, {
+        next: { revalidate: 300 },
+        signal: AbortSignal.timeout(SERVER_READ_TIMEOUT_MS),
+      });
     } catch {
       return undefined;
     }

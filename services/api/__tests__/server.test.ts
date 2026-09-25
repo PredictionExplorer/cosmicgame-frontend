@@ -92,6 +92,21 @@ describe('home intelligence server seeds', () => {
     await expect(getCurrentSpecialRecipientsSeed()).resolves.toBeNull();
   });
 
+  // A slow API must not hold the ISR render up: every seed read carries the
+  // server read deadline, and one that runs out is a missing seed.
+  it('bounds every seed read by the server read timeout', async () => {
+    fetchMock.mockResolvedValue(response({}));
+    await getCurrentSpecialRecipientsSeed();
+
+    const init = fetchMock.mock.calls[0]?.[1] as RequestInit;
+    expect(init.signal).toBeInstanceOf(AbortSignal);
+  });
+
+  it('reads a timed-out seed as missing', async () => {
+    fetchMock.mockRejectedValue(new DOMException('The operation timed out.', 'TimeoutError'));
+    await expect(getLatestGestureSeed(7)).resolves.toBeNull();
+  });
+
   it('fetches a coherent chain-clock sample for first paint', async () => {
     fetchMock
       .mockResolvedValueOnce(response({ CurRoundPrizeTime: 1_700_000_600 }))

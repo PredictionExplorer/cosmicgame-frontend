@@ -188,6 +188,16 @@ axios.interceptors.response.use(
 // Individual calls can still override via a per-request `timeout` config.
 axios.defaults.timeout = 15_000;
 
+/**
+ * How long one API request made on the server (a render, its metadata, a
+ * route handler) may take. The API answers in about a quarter second; a read
+ * still waiting after 2.5 s fails like any other, so a page rendered for the
+ * cache shows its honest loading, empty or error state instead of hanging.
+ * A server that times out is marked down and the read tried once on the
+ * next, so a server read takes at most twice this. Browsers keep 15 s.
+ */
+export const SERVER_READ_TIMEOUT_MS = 2_500;
+
 if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
   const configured =
     apiBaseUrls.length > 0 ? apiBaseUrls : [(process.env.NEXT_PUBLIC_API_URL || '').trim()];
@@ -255,7 +265,8 @@ export type ApiListRequestOptions = ApiPageWindow & ApiRequestOptions;
 
 /**
  * Issues a GET against the shared axios instance, attaching the caller's abort
- * signal when there is one.
+ * signal when there is one. On the server a request without its own timeout
+ * gets {@link SERVER_READ_TIMEOUT_MS}.
  *
  * The config argument is omitted entirely when there is nothing to send, so the
  * request shape stays `axios.get(url)` for callers that pass no options.
@@ -267,6 +278,9 @@ export function apiGet(
 ): Promise<AxiosResponse> {
   const merged: AxiosRequestConfig = { ...config };
   if (opts?.signal) merged.signal = opts.signal;
+  if (merged.timeout === undefined && typeof window === 'undefined') {
+    merged.timeout = SERVER_READ_TIMEOUT_MS;
+  }
   return Object.keys(merged).length > 0 ? axios.get(url, merged) : axios.get(url);
 }
 
