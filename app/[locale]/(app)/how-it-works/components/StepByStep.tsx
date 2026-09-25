@@ -67,12 +67,11 @@ export function StepByStep({ stepByStep }: { stepByStep: HowItWorksContent['step
         className="mt-8 border-t border-rule pt-4 type-body-md text-muted-foreground lg:col-span-4 lg:row-start-2 lg:mt-0 lg:self-start"
       >
         {stepByStep.funding.text}{' '}
-        <Link
-          href={stepByStep.funding.link.href}
-          className="link inline-flex min-h-6 items-center gap-1.5 whitespace-nowrap"
-        >
+        {/* Inline, so a long label (Korean, Ukrainian) wraps with the sentence at 320px
+            instead of running past the column; the arrow follows its last word. */}
+        <Link href={stepByStep.funding.link.href} className="link">
           {stepByStep.funding.link.label}
-          <ArrowRight aria-hidden className="size-3.5" />
+          <ArrowRight aria-hidden className="ms-1.5 inline-block size-3.5 align-middle" />
         </Link>
       </p>
     </section>
