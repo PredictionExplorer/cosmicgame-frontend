@@ -655,8 +655,8 @@
     "emptyDescription": "Жодному Cosmic Signature NFT ще не дали ім’я.",
     "galleryLink": "Переглянути їх у галереї",
     "card": {
-      "namedOn": "Названо",
-      "namedBy": "Назву дав"
+      "namedOn": "Іменовано",
+      "namedBy": "Хто дав ім’я"
     }
   },
   "attachedNfts": {
