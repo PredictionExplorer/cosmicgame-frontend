@@ -80,6 +80,19 @@ describe('white paper cross-references', () => {
     expect(referenceText('第3節')).toBe('第3節');
   });
 
+  it('never wraps a reference link, even in a script that sets no spaces (V193)', () => {
+    render(
+      <p>
+        {withReferences(
+          '正確なルールは第3.1節にあります。',
+          'ja',
+          referenceTargets(getWhitePaperContent('ja')),
+        )}
+      </p>,
+    );
+    expect(screen.getByRole('link', { name: '第3.1節' })).toHaveClass('whitespace-nowrap');
+  });
+
   it('links the paper from another page by its path', () => {
     render(<p>{withReferences('Section 7.1 has the formula.', 'en', targets, '/white-paper')}</p>);
     expect(screen.getByRole('link', { name: 'Section\u00a07.1' })).toHaveAttribute(

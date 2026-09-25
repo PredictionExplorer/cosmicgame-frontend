@@ -87,11 +87,15 @@ export function splitReferences(
  * A reference as a link's text: each number kept on the line of the word
  * before it and the measure word after it ("Section 11.3", "第 5.2 节",
  * "Sections 3 through 5"), so the link never breaks between them and never
- * reads as two links.
+ * reads as two links. Scripts that set no spaces (第3.1節) may break between
+ * any two characters, so the link itself also never wraps (REFERENCE_CLASS).
  */
 export function referenceText(text: string): string {
   return text.replace(/\s(?=\d)|(?<=\d)\s/gu, '\u00a0');
 }
+
+/** A reference link is one unbreakable phrase, in every script. */
+const REFERENCE_CLASS = 'link whitespace-nowrap';
 
 /**
  * Renders text with its cross-references as links: to the sections of this
@@ -111,11 +115,11 @@ export function withReferences(
     const key = `${index}-${part.id}`;
     const label = referenceText(part.text);
     return paperPath ? (
-      <Link key={key} href={`${paperPath}#${part.id}`} className="link">
+      <Link key={key} href={`${paperPath}#${part.id}`} className={REFERENCE_CLASS}>
         {label}
       </Link>
     ) : (
-      <a key={key} href={`#${part.id}`} className="link">
+      <a key={key} href={`#${part.id}`} className={REFERENCE_CLASS}>
         {label}
       </a>
     );
