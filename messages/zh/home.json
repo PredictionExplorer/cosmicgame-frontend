@@ -701,7 +701,6 @@
       "waitingNothing": "无",
       "waitingNfts": "{count, plural, other {# 个 NFT}}",
       "retrieveHint": "在“我的分配”中取回",
-      "connectBody": "连接钱包后，可查看你的位置、本周期你写下了多少笔，以及待取回的分配。",
       "spent": "你本周期已花费",
       "landed": "你的落笔已确认，最新一笔由你写下。"
     }
@@ -747,6 +746,7 @@
     "allocationsTitle": "周期储备如何分配",
     "allocationsDescription": "查看全部分配，包括星选与公共物品。",
     "storyTitle": "周期背后的艺术",
+    "storyDescription": "落笔如何塑造签名、CST 记录的内容，以及分配如何资助公共物品。",
     "methods": {
       "eth": "用 ETH 支付当前落笔价格。",
       "cst": "使用钱包中已有的 CST。实时价格会随时间变化。",

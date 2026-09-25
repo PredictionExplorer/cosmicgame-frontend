@@ -701,7 +701,6 @@
       "waitingNothing": "無",
       "waitingNfts": "{count, plural, other {# 個 NFT}}",
       "retrieveHint": "在「我的分配」中取回",
-      "connectBody": "連接錢包後，可查看你的位置、本週期你寫下了多少筆，以及待取回的分配。",
       "spent": "你本週期已花費",
       "landed": "你的落筆已確認，最新一筆由你寫下。"
     }
@@ -747,6 +746,7 @@
     "allocationsTitle": "週期儲備如何分配",
     "allocationsDescription": "查看全部分配，包括星選與公共物品。",
     "storyTitle": "週期背後的藝術",
+    "storyDescription": "落筆如何塑造簽名、CST 記錄的內容，以及分配如何資助公共物品。",
     "methods": {
       "eth": "用 ETH 支付目前落筆價格。",
       "cst": "使用錢包中已有的 CST。即時價格會隨時間變化。",

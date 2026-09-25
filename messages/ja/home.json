@@ -701,7 +701,6 @@
       "waitingNothing": "なし",
       "waitingNfts": "{count, plural, other {#点のNFT}}",
       "retrieveHint": "「自分の配分」で受け取れます",
-      "connectBody": "ウォレットを接続すると、現在の位置、このサイクルで入れた一筆の数、受け取り待ちの配分を確認できます。",
       "spent": "このサイクルで使った額",
       "landed": "一筆が確定しました。最新の一筆を保持しています。"
     }
@@ -747,6 +746,7 @@
     "allocationsTitle": "サイクルの準備金の行き先",
     "allocationsDescription": "星選と公共財を含むすべての配分を確認できます。",
     "storyTitle": "サイクルから生まれるアート",
+    "storyDescription": "一筆がシグネチャーを形づくる仕組み、CSTが記録するもの、配分が公共財を支える流れを紹介します。",
     "methods": {
       "eth": "現在の一筆の費用をETHで支払います。",
       "cst": "ウォレット内のCSTを使います。現在のコストは時間とともに変わります。",

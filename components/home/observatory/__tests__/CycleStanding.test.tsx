@@ -2,7 +2,7 @@ import userEvent from '@testing-library/user-event';
 
 import { render, screen, within, checkA11y } from '@/test-utils';
 
-import { CycleStanding, CycleStandingPreview, type CycleStandingProps } from '../CycleStanding';
+import { CycleStanding, type CycleStandingProps } from '../CycleStanding';
 
 const TAKER = '0x6cA7000000000000000000000000000000003FFa';
 const NOW = 1_790_000_000_000;
@@ -171,16 +171,6 @@ describe('CycleStanding', () => {
     expect(screen.getByTestId('personal-gesture-count')).toHaveTextContent(
       'home.observatory.standing.updating',
     );
-  });
-
-  it('says in one sentence what connecting adds, with no column of empty dashes', () => {
-    render(<CycleStandingPreview />);
-    const preview = screen.getByTestId('cycle-standing-preview');
-    expect(preview).toHaveTextContent('home.observatory.standing.connectBody');
-    expect(preview).not.toHaveTextContent('—');
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'home.observatory.standing.title' }),
-    ).toBeVisible();
   });
 
   it('has no accessibility violations', async () => {

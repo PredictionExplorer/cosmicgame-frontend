@@ -701,7 +701,6 @@
       "waitingNothing": "Nothing",
       "waitingNfts": "{count, plural, one {# NFT} other {# NFTs}}",
       "retrieveHint": "Retrieve it on My Allocations",
-      "connectBody": "Connect a wallet to see where you stand, how many of this cycle's gestures are yours and anything waiting to retrieve.",
       "spent": "You spent this cycle",
       "landed": "Your gesture landed. You hold the Last Gesture."
     }
@@ -747,6 +746,7 @@
     "allocationsTitle": "Where the cycle reserve goes",
     "allocationsDescription": "See every allocation, including Stellar Selection and public goods.",
     "storyTitle": "The art behind the cycle",
+    "storyDescription": "How gestures shape the Signature, what CST records and how allocations fund public goods.",
     "methods": {
       "eth": "Pay the current Gesture Cost in ETH.",
       "cst": "Use CST already in your wallet. The live cost changes over time.",

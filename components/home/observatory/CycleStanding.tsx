@@ -67,29 +67,8 @@ function Pending() {
 }
 
 /**
- * The standing's place before a wallet connects: one sentence on what it
- * will show, under the latest Signature, so the visitor knows what
- * connecting adds without a column of empty dashes.
- */
-export function CycleStandingPreview({ className }: { className?: string }) {
-  const t = useTranslations('home.observatory.standing');
-  return (
-    <section
-      aria-labelledby="cycle-standing-title"
-      data-testid="cycle-standing-preview"
-      className={cn('min-w-0', className)}
-    >
-      <h2 id="cycle-standing-title" className="type-heading-3 text-foreground">
-        {t('title')}
-      </h2>
-      <p className="type-body-sm mt-2 text-muted-foreground">{t('connectBody')}</p>
-    </section>
-  );
-}
-
-/**
  * The connected wallet's cycle standing, beside the gesture form (under the
- * latest Signature from 1024px, right after the form on phones): where it
+ * Calibration Window from 1024px, right after the form on phones): where it
  * stands (phase-aware, including its exclusive finalization window), how many
  * of this cycle's Gestures are its own, and whether anything waits to be
  * retrieved. Every figure is read, never assumed: while a read loads it shows

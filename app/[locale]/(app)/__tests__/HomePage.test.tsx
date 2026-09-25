@@ -1116,7 +1116,8 @@ describe('HomePage', () => {
     rerender(<HomePage />);
     expect(screen.queryByTestId('cycle-standing')).not.toBeInTheDocument();
     expect(screen.queryByTestId('personal-spent')).not.toBeInTheDocument();
-    expect(screen.getByTestId('cycle-standing-preview')).toBeInTheDocument();
+    // No placeholder region: the form's own connect action says what connecting adds.
+    expect(screen.queryByTestId('control-desk-standing')).not.toBeInTheDocument();
   });
 
   it('never reports a confident zero while the wallet history is unknown', () => {
@@ -2005,6 +2006,90 @@ describe('HomePage', () => {
     } finally {
       if (original) Object.defineProperty(window, 'IntersectionObserver', original);
       else Reflect.deleteProperty(window, 'IntersectionObserver');
+    }
+  });
+
+  it('shows the dock from the first paint on phones, before any observer reports', () => {
+    // No observer yet: the state of the server HTML and the first paint.
+    const original = Object.getOwnPropertyDescriptor(window, 'IntersectionObserver');
+    Object.defineProperty(window, 'IntersectionObserver', {
+      configurable: true,
+      writable: true,
+      value: undefined,
+    });
+    try {
+      mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+      render(<HomePage />);
+      const layer = screen.getByTestId('action-dock').parentElement!;
+      expect(layer).toHaveAttribute('data-state', 'unmeasured');
+      expect(layer).not.toHaveAttribute('aria-hidden');
+      // From 1024px, where the form's action is in the first viewport, it waits.
+      expect(layer).toHaveClass('lg:invisible');
+    } finally {
+      if (original) Object.defineProperty(window, 'IntersectionObserver', original);
+      else Reflect.deleteProperty(window, 'IntersectionObserver');
+    }
+  });
+
+  it('closes the sheet when the viewport grows past 768px and returns to the in-page form', async () => {
+    const user = userEvent.setup();
+    const WIDE = '(min-width: 48rem)';
+    const listeners = new Set<(event: { matches: boolean }) => void>();
+    let wide = false;
+    const originalMatchMedia = Object.getOwnPropertyDescriptor(window, 'matchMedia');
+    const scrollIntoView = jest.fn();
+    const originalScroll = Object.getOwnPropertyDescriptor(
+      window.HTMLElement.prototype,
+      'scrollIntoView',
+    );
+    Object.defineProperty(window.HTMLElement.prototype, 'scrollIntoView', {
+      configurable: true,
+      writable: true,
+      value: scrollIntoView,
+    });
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      writable: true,
+      value: jest.fn((query: string) => ({
+        get matches() {
+          return query === WIDE && wide;
+        },
+        media: query,
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+        addEventListener: (_type: string, callback: (event: { matches: boolean }) => void) => {
+          if (query === WIDE) listeners.add(callback);
+        },
+        removeEventListener: (_type: string, callback: (event: { matches: boolean }) => void) => {
+          listeners.delete(callback);
+        },
+        dispatchEvent: jest.fn(),
+      })),
+    });
+    try {
+      mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+      render(<HomePage />);
+      await user.click(screen.getByTestId('dock-open-sheet'));
+      expect(screen.getAllByTestId('gesture-panel')).toHaveLength(2);
+
+      // The phone turns to landscape: the sheet (and its overlay) goes.
+      act(() => {
+        wide = true;
+        listeners.forEach((callback) => callback({ matches: true }));
+      });
+
+      await waitFor(() => expect(screen.getAllByTestId('gesture-panel')).toHaveLength(1));
+      expect(document.querySelector('[role="dialog"]')).toBeNull();
+      await waitFor(() => expect(document.getElementById('make-gesture')).toHaveFocus());
+    } finally {
+      if (originalMatchMedia) Object.defineProperty(window, 'matchMedia', originalMatchMedia);
+      else Reflect.deleteProperty(window, 'matchMedia');
+      if (originalScroll) {
+        Object.defineProperty(window.HTMLElement.prototype, 'scrollIntoView', originalScroll);
+      } else {
+        Reflect.deleteProperty(window.HTMLElement.prototype, 'scrollIntoView');
+      }
     }
   });
 

@@ -17,12 +17,14 @@ import { ChainGuard } from '@/components/wallet/NetworkGuard';
 import { Link } from '@/i18n/navigation';
 import { buildCalendarInviteDataUri } from '@/lib/calendarInvite';
 import { getCycleState } from '@/lib/cycleState';
+import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { TOUCH_TARGET_HEIGHT_CLASS, TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
 import type { DashboardInfo } from '@/services/api';
 import { formatAmount, sameAddress } from '@/utils/format';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 
+import { countdownSeconds, countdownUnits, type CountdownUnits } from './countdown';
 import { PHASE_TEXT_CLASS, viewForPhase } from './phaseView';
 import { ValuePending } from './ValuePending';
 
@@ -82,7 +84,7 @@ interface ClockGroup {
  * spoken reading comes from the timer's own label), so a caption never
  * changes word or width as the digits tick.
  */
-function clockGroups({ days, hours, minutes, seconds }: CountdownRenderProps): ClockGroup[] {
+function clockGroups({ days, hours, minutes, seconds }: CountdownUnits): ClockGroup[] {
   const groups: ClockGroup[] = [
     { id: 'hours', value: hours },
     { id: 'minutes', value: minutes },
@@ -99,17 +101,20 @@ function clockGroups({ days, hours, minutes, seconds }: CountdownRenderProps): C
  * runs where it stands (right after the figures), recomputes each group from
  * the deadline every second, and stops once the figures say they are
  * hydrated. It exists only in the server HTML: a client-side render never
- * creates it, since React ticks from the first frame.
+ * creates it, since React ticks from the first frame. It rounds like
+ * `countdownSeconds` (whole seconds, up), so React takes over on the same
+ * reading.
  */
-export const PREHYDRATION_TICK = `(function(){var s=document.currentScript,e=s&&s.previousElementSibling;if(!e)return;var t=Number(e.getAttribute('data-deadline'));if(!(t>0))return;var i=0;function k(){if(e.hasAttribute('data-hydrated')){clearInterval(i);return}var r=Math.max(0,t-Date.now()),v={days:Math.floor(r/864e5),hours:Math.floor(r%864e5/36e5),minutes:Math.floor(r%36e5/6e4),seconds:Math.floor(r%6e4/1e3)},n=e.querySelectorAll('[data-unit]');for(var j=0;j<n.length;j++){var u=n[j].getAttribute('data-unit');if(u in v)n[j].textContent=String(v[u]).padStart(2,'0')}if(r<=0)clearInterval(i)}i=setInterval(k,1000);k()})();`;
+export const PREHYDRATION_TICK = `(function(){var s=document.currentScript,e=s&&s.previousElementSibling;if(!e)return;var t=Number(e.getAttribute('data-deadline'));if(!(t>0))return;var i=0;function k(){if(e.hasAttribute('data-hydrated')){clearInterval(i);return}var r=Math.max(0,Math.ceil((t-Date.now())/1e3)),v={days:Math.floor(r/86400),hours:Math.floor(r%86400/3600),minutes:Math.floor(r%3600/60),seconds:r%60},n=e.querySelectorAll('[data-unit]');for(var j=0;j<n.length;j++){var u=n[j].getAttribute('data-unit');if(u in v)n[j].textContent=String(v[u]).padStart(2,'0')}if(r<=0)clearInterval(i)}i=setInterval(k,1000);k()})();`;
 
 /**
  * The clock as type: tabular Inter figures with hairline colons and a
  * localized caption unit under each group. No tiles, rings or glows.
  */
-function ClockFigures({ deadlineMs, ...props }: CountdownRenderProps & { deadlineMs: number }) {
+function ClockFigures({ deadlineMs, total }: CountdownRenderProps & { deadlineMs: number }) {
   const t = useTranslations('home.observatory.clock.unitLabels');
-  const groups = clockGroups(props);
+  // The same rounding as the dock's clock, so the two never read a second apart.
+  const groups = clockGroups(countdownUnits(total));
   const hydrated = useHydrated();
 
   return (
@@ -148,7 +153,7 @@ function ClockFigures({ deadlineMs, ...props }: CountdownRenderProps & { deadlin
 function renderWindowCountdown({ total }: CountdownRenderProps) {
   return (
     <Duration
-      seconds={Math.ceil(total / 1000)}
+      seconds={countdownSeconds(total)}
       variant="clock"
       className="type-figure-sm text-foreground"
     />
@@ -417,7 +422,8 @@ export function CycleClock({
                   number: String(data?.CurRoundNum ?? ''),
                 }),
                 description: t('observatory.clock.calendarBody'),
-                url: 'https://app.cosmicsignature.com/',
+                // The home in the viewer's own language, on this build's app host.
+                url: localeHref(APP_ORIGIN, '/', locale),
                 startSeconds: cycleState.activationTime ?? 0,
               })}
               download={`cosmic-cycle-${data?.CurRoundNum ?? 'next'}-opening.ics`}

@@ -20,7 +20,7 @@ import { CyclePhaseGuide, PHASE_GUIDE_LINK_CLASS } from '@/components/home/Cycle
 import { GestureMessageChat } from '@/components/home/GestureMessageChat';
 import { readRandomWalkLink } from '@/components/home/gestureInput';
 import { deriveFeedSystemEvents } from '@/components/home/deck/feedSystemEvents';
-import { ActionDock } from '@/components/home/observatory/ActionDock';
+import { ActionDock, type ActionDockPlacement } from '@/components/home/observatory/ActionDock';
 import { AllocationLedger } from '@/components/home/observatory/AllocationLedger';
 import {
   AllocationsDisclosure,
@@ -30,7 +30,7 @@ import {
 import { HomeStory } from '@/components/home/observatory/HomeStory';
 import { CycleClock } from '@/components/home/observatory/CycleClock';
 import { CalibrationStatus } from '@/components/home/observatory/CalibrationStatus';
-import { CycleStanding, CycleStandingPreview } from '@/components/home/observatory/CycleStanding';
+import { CycleStanding } from '@/components/home/observatory/CycleStanding';
 import { GesturePanel } from '@/components/home/observatory/GesturePanel';
 import { LatestSignature } from '@/components/home/observatory/LatestSignature';
 import { PulseBar } from '@/components/home/observatory/PulseBar';
@@ -78,6 +78,7 @@ import { resolveLatestGesture, type LatestParticipantEvidence } from '@/lib/late
 import { fetchEndgameChainSample, type EndgameChainSample } from '@/lib/rpcRace';
 import { cn } from '@/lib/utils';
 import { getStableClientTargetTime, type ServerTimingSample } from '@/utils/time';
+import { toFiniteNumber } from '@/utils/finiteNumber';
 import { sameAddress } from '@/utils/format';
 import {
   UX_SCENARIO_DEMO_ACCOUNT,
@@ -105,6 +106,15 @@ const SHEET_SUCCESS_CLOSE_MS = 1_600;
 
 /** Where the page lists the NFTs and tokens attached to this cycle's Gestures. */
 const ATTACHED_ASSETS_ID = 'home-attached-assets';
+
+/**
+ * The latest Signature's rendered width: edge to edge on phones, the one
+ * column on tablets, then its desk cell from 1024px (5 of 12 columns beside
+ * the standings, 7 of 12 in the form's place between cycles, at the 80rem
+ * content edge), so the browser picks a sharp rendition.
+ */
+const ART_SIZES_BESIDE_STANDINGS = '(max-width: 639px) 100vw, (max-width: 1023px) 90vw, 33rem';
+const ART_SIZES_BETWEEN_CYCLES = '(max-width: 639px) 100vw, (max-width: 1023px) 90vw, 46rem';
 
 export function resolveHomeNow(
   tickingNow: number,
@@ -401,8 +411,18 @@ const HomePage = ({
     usePendingChatMessages(chatGestures);
 
   // Mobile bottom sheet: hosts the same gesture panel, opened from the dock,
-  // so phones can act from anywhere on the page.
+  // so phones can act from anywhere on the page. It exists below 768px only:
+  // a phone turned to landscape (or a window widened) past that closes it,
+  // and focus moves to the in-page form, which holds the same draft and
+  // transaction stage. Otherwise its overlay, focus trap and scroll lock
+  // would stay over the page with the sheet itself hidden.
   const [gestureSheetOpen, setGestureSheetOpen] = useState(false);
+  const tabletUp = useMediaQuery('(min-width: 48rem)');
+  const sheetClosedByWidthRef = useRef(false);
+  if (gestureSheetOpen && tabletUp) {
+    sheetClosedByWidthRef.current = true;
+    setGestureSheetOpen(false);
+  }
   const sheetCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(
     () => () => {
@@ -559,6 +579,9 @@ const HomePage = ({
   });
 
   const trackAmounts = useMemo(() => deriveAllocationTrackAmounts(data), [data]);
+  // Read, never assumed: null while the dashboard has not reported them.
+  const signatureEth = toFiniteNumber(data?.PrizeAmountEth ?? data?.CurPrizeAmountEth);
+  const reserveEth = toFiniteNumber(data?.CosmicGameBalanceEth);
 
   // The wallet's place in this cycle: its own moment when the Last Gesture
   // changes hands, what it has spent, and what waits to be retrieved.
@@ -602,6 +625,16 @@ const HomePage = ({
     [scrollToElement],
   );
   const scrollToClock = useCallback(() => scrollToElement('cycle-clock'), [scrollToElement]);
+  const handleSheetCloseAutoFocus = useCallback(
+    (event: Event) => {
+      if (!sheetClosedByWidthRef.current) return;
+      sheetClosedByWidthRef.current = false;
+      // The dock button that opened the sheet is gone at this width.
+      event.preventDefault();
+      scrollToGesturePanel();
+    },
+    [scrollToGesturePanel],
+  );
 
   // Method switches reset any picked RandomWalk token so a stale token can't
   // ride along silently.
@@ -614,20 +647,18 @@ const HomePage = ({
   );
 
   // The dock is the way to act while the form's own action is off screen,
-  // and it never duplicates that action. Below 1024px it therefore stays
-  // until the form's action row (the commit or connect button) is on screen:
-  // a phone that opens on the clock has an action in its first viewport even
-  // though the form's heading already shows at the bottom edge. It also
+  // and it never duplicates that action: at every width it stays until the
+  // form's action row (the commit or connect button) is on screen, and it
   // steps aside while someone works in the form on screen (focus inside
-  // it), so it never lies over the field being filled. From 1024px, where
-  // the dock would lie over the form's own method selector, it steps aside
-  // while any of the form is on screen. Until the observers report it stays
-  // aside, so the server HTML never paints a dock over the desk; jsdom has
-  // no IntersectionObserver.
-  const [formInView, setFormInView] = useState(true);
-  const [actionInView, setActionInView] = useState(true);
+  // it), so it never lies over the field being filled. The desk puts the
+  // form at the top of the right column from 1024px, so the dock only ever
+  // appears once the whole form has scrolled away. Before the observers
+  // report (the server HTML, the first paint, jsdom) the dock is shown below
+  // 1024px, where the action starts below the first viewport, and kept
+  // aside from 1024px, where it is in it.
+  const [formInView, setFormInView] = useState(false);
+  const [actionInView, setActionInView] = useState<boolean | null>(null);
   const [formFocused, setFormFocused] = useState(false);
-  const isDesktop = useMediaQuery('(min-width: 64rem)');
   useEffect(() => {
     if (typeof IntersectionObserver === 'undefined') return undefined;
     const form = document.getElementById('make-gesture');
@@ -666,8 +697,11 @@ const HomePage = ({
       form.removeEventListener('focusout', handleFocusOut);
     };
   }, [showPanel, loading]);
-  const dockAside =
-    gestureSheetOpen || (isDesktop ? formInView : actionInView || (formFocused && formInView));
+  const dockPlacement: ActionDockPlacement = gestureSheetOpen
+    ? true
+    : actionInView === null
+      ? 'from-lg'
+      : actionInView || (formFocused && formInView);
 
   // The source-aligned clock discovers milestones even between Gestures.
   // A 30-second bucket keeps this larger timeline out of the one-second
@@ -720,6 +754,8 @@ const HomePage = ({
   const holdSeconds =
     champions.latestGesture.isTimeKnown === false ? null : champions.latestGesture.holdDuration;
   const exclusiveWindowOpen = claimWait > now;
+  // Only a connected wallet has a standing to show: without one, the form's
+  // own connect action already says what connecting adds.
   const standing = account ? (
     <CycleStanding
       isLatest={position.isLatest}
@@ -736,9 +772,7 @@ const HomePage = ({
       retrieve={retrieve}
       onGoToFinalize={scrollToClock}
     />
-  ) : (
-    <CycleStandingPreview />
-  );
+  ) : undefined;
 
   // Without the dashboard read there is no cycle number, countdown, or
   // allocation pool — rendering the page would show an idle cycle that does
@@ -827,6 +861,8 @@ const HomePage = ({
               showLastGesture={showLastGesture}
               account={account}
               chronoEth={data ? trackAmounts.chronoEth : null}
+              // The Last Gesture's figure, like every other role's.
+              signatureEth={signatureEth}
               moment={position.moment}
             />
           }
@@ -855,11 +891,11 @@ const HomePage = ({
             ) : undefined
           }
           standing={standing}
-          standingOnPhones={!!account}
           art={
             <MemoLatestSignature
               signatures={latestSignatures.signatures}
               loading={latestSignatures.isLoading}
+              sizes={showPanel ? ART_SIZES_BESIDE_STANDINGS : ART_SIZES_BETWEEN_CYCLES}
             />
           }
         />
@@ -870,7 +906,7 @@ const HomePage = ({
             Both open on a hairline, like the desk above. */}
         <div
           data-testid="home-feed-layout"
-          className="mt-10 grid min-w-0 gap-y-7 lg:grid-cols-12 lg:items-stretch lg:gap-x-6"
+          className="mt-10 grid min-w-0 gap-y-7 lg:grid-cols-12 lg:items-start lg:gap-x-6"
         >
           <div data-testid="home-feed-column" className="min-w-0 lg:col-span-7">
             <MemoGestureMessageChat
@@ -887,7 +923,6 @@ const HomePage = ({
               onJoinCta={!loading && isRoundActive ? handleJoinChatCta : undefined}
               systemEvents={feedSystemEvents}
               pendingMessages={pendingMessages}
-              className="lg:h-full print:h-auto"
             />
           </div>
           <CyclePhaseGuide
@@ -939,7 +974,7 @@ const HomePage = ({
         )}
 
         {/* The page's two disclosures read as one list of hairline rows. */}
-        <AllocationsDisclosure className="mt-10">
+        <AllocationsDisclosure className="mt-10" reserveEth={reserveEth}>
           <AllocationLedger data={data} />
         </AllocationsDisclosure>
         <HomeStory />
@@ -948,7 +983,7 @@ const HomePage = ({
       {/* The one persistent quick-action surface: routes to the gesture
           panel (bottom sheet on phones, scroll from tablets up). */}
       <ActionDock
-        stepAside={dockAside}
+        stepAside={dockPlacement}
         data={data}
         loading={loading}
         allocationTime={allocationTime}
@@ -976,7 +1011,8 @@ const HomePage = ({
           side="bottom"
           // The panel speaks for itself; there is no separate description.
           aria-describedby={undefined}
-          className="max-h-[88dvh] overflow-y-auto rounded-t-surface border-rule bg-surface-raised px-4 pb-0 pt-5 md:hidden"
+          onCloseAutoFocus={handleSheetCloseAutoFocus}
+          className="max-h-[88dvh] overflow-y-auto rounded-t-surface border-rule bg-surface-raised px-4 pb-0 pt-5"
         >
           <SheetTitle className="sr-only">{t('observatory.panel.sheetTitle')}</SheetTitle>
           <GesturePanel
