@@ -3,6 +3,8 @@ import { useTranslations } from 'next-intl';
 import { PendingPlate } from '@/components/ui/art-frame';
 import { Skeleton } from '@/components/ui/skeleton';
 
+import { DETAIL_GRID_CLASS } from './detailLayout';
+
 /**
  * The provenance ledger's rows (cycle, imprinted, allocation, recipient,
  * owner, rarity, anchoring), with the two that carry a caption line
@@ -38,7 +40,7 @@ export function NFTDetailSkeleton() {
       data-testid="nft-detail-skeleton"
     >
       <span className="sr-only">{t('status.loadingEllipsis')}</span>
-      <div className="grid items-start gap-x-10 gap-y-8 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,20rem)] xl:grid-cols-[minmax(0,1fr)_minmax(18rem,22rem)] xl:gap-x-16">
+      <div className={DETAIL_GRID_CLASS}>
         <div className="flex flex-col gap-3 max-sm:-mx-[var(--gutter)]">
           <PendingPlate busy className="max-sm:rounded-none" />
           <div className="flex items-center gap-2 max-sm:px-[var(--gutter)]">

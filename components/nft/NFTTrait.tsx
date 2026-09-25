@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { getAddress, isAddress } from 'viem';
 
 import { formatId, sameAddress } from '@/utils/format';
+import { cn } from '@/lib/utils';
 import { useCollectionTraits, useNftMetadata } from '@/hooks/useNftTraits';
 import { normalizeTraitEntry, type CosmicSignatureMetadata } from '@/lib/nftMetadata';
 import { useRouter } from '@/i18n/navigation';
@@ -23,6 +24,7 @@ import { useMetaMaskWatchAsset } from '@/hooks/useMetaMaskWatchAsset';
 import { useNow } from '@/hooks/useNow';
 import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
 
+import { DETAIL_GRID_CLASS } from './detailLayout';
 import { NFTSeed } from './NFTMetadata';
 import { NFTOwnerActions } from './NFTOwnerActions';
 import { NFTDetailSkeleton } from './NFTDetailSkeleton';
@@ -241,11 +243,7 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
 
   return (
     <div className="site-container">
-      <section
-        aria-labelledby={titleId}
-        className="grid items-start gap-x-10 gap-y-8 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,20rem)] xl:grid-cols-[minmax(0,1fr)_minmax(18rem,22rem)] xl:gap-x-16"
-        data-testid="hero-section"
-      >
+      <section aria-labelledby={titleId} className={DETAIL_GRID_CLASS} data-testid="hero-section">
         <SignatureViewer
           media={media}
           alt={alt}
@@ -275,11 +273,7 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
             actions={
               <>
                 <NFTShareMenu imageUrl={media?.sourceImage} videoUrl={media?.video} />
-                <NftMarketplaceButton
-                  variant="card"
-                  label={t('actions.buyOrSellNfts')}
-                  className="h-11 border-input bg-transparent px-3 text-sm font-medium normal-case text-foreground hover:bg-surface sm:h-9"
-                />
+                <NftMarketplaceButton variant="action" />
               </>
             }
           />
@@ -316,30 +310,36 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
         </div>
       </section>
 
-      {/* The traits and the seed they all derive from, verification data first. */}
-      <section className="mt-16" data-testid="traits-section">
-        <NftTraitPanel
-          tokenId={tokenId}
-          metadata={metadata}
-          entry={traitEntry}
-          isError={metadataError}
-          onRetry={() => void refetchMetadata()}
-          collectionTraits={collectionTraits}
-          lead={<NFTSeed seed={nft?.Seed} headingLevel={3} />}
-        />
-      </section>
+      {/* Under the art, on its track: the traits and the seed they all
+          derive from (verification data first), then the histories, their
+          edges on the plate's edges. */}
+      <div className={cn(DETAIL_GRID_CLASS, 'mt-16')}>
+        <div className="min-w-0">
+          <section data-testid="traits-section">
+            <NftTraitPanel
+              tokenId={tokenId}
+              metadata={metadata}
+              entry={traitEntry}
+              isError={metadataError}
+              onRetry={() => void refetchMetadata()}
+              collectionTraits={collectionTraits}
+              lead={<NFTSeed seed={nft?.Seed} headingLevel={3} />}
+            />
+          </section>
 
-      {nameHistory.length > 0 && (
-        <DetailSection title={t('sections.nameHistory')}>
-          <NameHistoryTable list={nameHistory} />
-        </DetailSection>
-      )}
+          {nameHistory.length > 0 && (
+            <DetailSection title={t('sections.nameHistory')}>
+              <NameHistoryTable list={nameHistory} />
+            </DetailSection>
+          )}
 
-      {transferHistory.length > 0 && !transferHistory[0]?.TransferType && (
-        <DetailSection title={t('sections.ownershipHistory')}>
-          <TransferHistoryTable list={transferHistory} />
-        </DetailSection>
-      )}
+          {transferHistory.length > 0 && !transferHistory[0]?.TransferType && (
+            <DetailSection title={t('sections.ownershipHistory')}>
+              <TransferHistoryTable list={transferHistory} />
+            </DetailSection>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

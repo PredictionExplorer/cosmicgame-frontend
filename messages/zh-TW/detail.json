@@ -26,9 +26,6 @@
     "copyPageLink": "複製頁面連結",
     "copyFailed": "無法複製連結。"
   },
-  "actions": {
-    "buyOrSellNfts": "買賣 NFT"
-  },
   "navigation": {
     "label": "上一枚與下一枚簽名"
   },

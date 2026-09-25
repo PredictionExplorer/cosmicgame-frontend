@@ -1,14 +1,18 @@
 'use client';
 
 import type { AnchorHTMLAttributes } from 'react';
-import { Store } from 'lucide-react';
+import { ArrowUpRight, Store } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
-type NftMarketplaceButtonVariant = 'default' | 'secondary' | 'compact' | 'menu' | 'card';
+/**
+ * `action`: the Signature page's action row, the outline button beside Share
+ * (44px on a phone, 36px from `sm`), with the page-header label.
+ */
+type NftMarketplaceButtonVariant = 'default' | 'secondary' | 'compact' | 'menu' | 'card' | 'action';
 
 interface NftMarketplaceButtonProps extends Omit<
   AnchorHTMLAttributes<HTMLAnchorElement>,
@@ -24,6 +28,7 @@ const LABEL_KEYS: Record<NftMarketplaceButtonVariant, string> = {
   compact: 'ecosystem.axiomZero.shortLabel',
   menu: 'ecosystem.axiomZero.menuLabel',
   card: 'ecosystem.axiomZero.shortLabel',
+  action: 'ecosystem.axiomZero.defaultLabel',
 };
 
 const buttonClasses: Record<Exclude<NftMarketplaceButtonVariant, 'menu'>, string> = {
@@ -31,6 +36,7 @@ const buttonClasses: Record<Exclude<NftMarketplaceButtonVariant, 'menu'>, string
   secondary: 'h-11 px-5 border-primary/35 bg-primary/[0.06]',
   compact: 'h-9 rounded-full px-3.5 text-xs',
   card: 'h-8 rounded-md px-2.5 text-xs',
+  action: 'px-3 font-medium',
 };
 
 export function NftMarketplaceButton({
@@ -63,12 +69,13 @@ export function NftMarketplaceButton({
     );
   }
 
-  const buttonVariant = variant === 'default' ? 'default' : 'secondary';
+  const buttonVariant =
+    variant === 'default' ? 'default' : variant === 'action' ? 'outline' : 'secondary';
 
   return (
     <Button
       asChild
-      size={variant === 'card' || variant === 'compact' ? 'sm' : 'lg'}
+      size={variant === 'card' || variant === 'compact' || variant === 'action' ? 'sm' : 'lg'}
       variant={buttonVariant}
       className={cn(buttonClasses[variant], className)}
     >
@@ -80,7 +87,8 @@ export function NftMarketplaceButton({
         {...props}
       >
         {text}
-        <Store className="h-4 w-4" aria-hidden />
+        {/* The site's mark for a link that leaves it (it opens a new tab). */}
+        <ArrowUpRight className="size-4 text-subtle" aria-hidden />
       </a>
     </Button>
   );

@@ -1,22 +1,21 @@
 'use client';
 
 import { useId, type ReactNode } from 'react';
-import { Check, Copy, ExternalLink } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { useCopyFeedback } from '@/hooks/useCopyFeedback';
 import type { CollectionTraits } from '@/hooks/useNftTraits';
 import type { CosmicSignatureMetadata, NftTraitEntry } from '@/lib/nftMetadata';
 import { cn } from '@/lib/utils';
-import { TOUCH_TARGET_ICON_CLASS } from '@/lib/touch-target';
 import { toIntlLocale } from '@/utils/format';
 import { Button } from '@/components/ui/button';
+import { CopyButton } from '@/components/ui/copy-button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-import { TRAIT_GRID_CLASS, TRAIT_GRID_FILL_ROW_CLASS, TRAIT_TILE_CLASS } from './layout';
+import { TRAIT_LEDGER_CLASS, TRAIT_ROW_CLASS } from './layout';
 import { RarityRankChip } from './RarityRankChip';
-import { TraitSheet } from './TraitSheet';
+import { TraitLedgerRow, TraitSheet } from './TraitSheet';
 import { hueColor } from './palette';
 import { useTraitLabels } from './useTraitLabels';
 
@@ -36,6 +35,7 @@ export interface NftTraitPanelProps {
   className?: string;
 }
 
+/** A page-added fact in the trait ledger (the same row as a trait). */
 function Fact({
   label,
   children,
@@ -46,10 +46,9 @@ function Fact({
   wide?: boolean;
 }) {
   return (
-    <div className={cn(TRAIT_TILE_CLASS, wide && 'col-span-2')}>
-      <dt className="mb-1 type-label text-subtle">{label}</dt>
-      <dd className="type-body-sm text-foreground">{children}</dd>
-    </div>
+    <TraitLedgerRow label={label} wide={wide}>
+      {children}
+    </TraitLedgerRow>
   );
 }
 
@@ -62,27 +61,11 @@ function HashValue({
   copyLabel: string;
   copiedLabel: string;
 }) {
-  // A failed write (no permission, insecure context) leaves the copy icon.
-  const { copied, copy } = useCopyFeedback();
-  const handleCopy = () => void copy(value);
+  // The shared copy button: a refused write never shows the check.
   return (
     <span className="flex items-start gap-2">
       <code className="min-w-0 flex-1 type-hash text-muted-foreground">{value}</code>
-      <button
-        type="button"
-        onClick={handleCopy}
-        aria-label={copied ? copiedLabel : copyLabel}
-        className={cn(
-          'shrink-0 rounded-control p-1.5 text-subtle transition-colors hover:bg-surface hover:text-foreground',
-          TOUCH_TARGET_ICON_CLASS,
-        )}
-      >
-        {copied ? (
-          <Check className="h-3.5 w-3.5 text-positive" aria-hidden />
-        ) : (
-          <Copy className="h-3.5 w-3.5" aria-hidden />
-        )}
-      </button>
+      <CopyButton value={value} label={copyLabel} copiedLabel={copiedLabel} className="mt-px" />
     </span>
   );
 }
@@ -130,11 +113,19 @@ export function NftTraitPanel({
   let body: ReactNode;
   if (metadata === undefined && !isError) {
     body = (
-      <div role="status" className="space-y-4" aria-busy="true" aria-label={t('panel.loading')}>
+      <div role="status" className="space-y-6" aria-busy="true" aria-label={t('panel.loading')}>
         <Skeleton className="h-9 w-72" />
-        <div className={TRAIT_GRID_CLASS}>
+        {/* The ledger's own rows, so the tabs' content lands where it waited. */}
+        <div className={TRAIT_LEDGER_CLASS}>
           {Array.from({ length: 8 }, (_, i) => (
-            <Skeleton key={i} className="h-[4.5rem] w-full rounded-control" />
+            <div key={i} className={TRAIT_ROW_CLASS}>
+              <p className="type-label">
+                <Skeleton as="span" className="inline-block h-3 w-20 align-middle" />
+              </p>
+              <p className="type-body-sm">
+                <Skeleton as="span" className="inline-block h-3 w-2/3 align-middle" />
+              </p>
+            </div>
           ))}
         </div>
       </div>
@@ -192,139 +183,145 @@ export function NftTraitPanel({
           <span aria-hidden className="w-4 shrink-0 sm:hidden" />
         </TabsList>
 
-        <TabsContent value="composition" className="mt-6 space-y-2 sm:space-y-3">
+        <TabsContent value="composition" className="mt-6">
           <TraitSheet
             entry={entry}
             facets={facets}
             total={rarityTotal}
             groups={['composition']}
             hideHeadings
+            extraRows={
+              <>
+                {typeof palette?.dominant_wavelength_nm === 'number' ? (
+                  <Fact label={t('panel.dominantWavelength')}>
+                    {t('panel.nanometres', { value: number(palette.dominant_wavelength_nm, 0) })}
+                  </Fact>
+                ) : null}
+                {typeof palette?.dispersion_deg === 'number' ? (
+                  <Fact label={t('panel.hueDispersion')}>
+                    {t('panel.degrees', { value: number(palette.dispersion_deg, 1) })}
+                  </Fact>
+                ) : null}
+                {typeof generation?.finishes?.halation_strength === 'number' ? (
+                  <Fact label={t('panel.halation')}>
+                    {number(generation.finishes.halation_strength, 2)}
+                  </Fact>
+                ) : null}
+              </>
+            }
           />
-          <dl className={cn(TRAIT_GRID_CLASS, TRAIT_GRID_FILL_ROW_CLASS)}>
-            {typeof palette?.dominant_wavelength_nm === 'number' ? (
-              <Fact label={t('panel.dominantWavelength')}>
-                {t('panel.nanometres', { value: number(palette.dominant_wavelength_nm, 0) })}
-              </Fact>
-            ) : null}
-            {typeof palette?.dispersion_deg === 'number' ? (
-              <Fact label={t('panel.hueDispersion')}>
-                {t('panel.degrees', { value: number(palette.dispersion_deg, 1) })}
-              </Fact>
-            ) : null}
-            {typeof generation?.finishes?.halation_strength === 'number' ? (
-              <Fact label={t('panel.halation')}>
-                {number(generation.finishes.halation_strength, 2)}
-              </Fact>
-            ) : null}
-          </dl>
         </TabsContent>
 
-        <TabsContent value="physics" className="mt-6 space-y-2 sm:space-y-3">
+        <TabsContent value="physics" className="mt-6">
           <TraitSheet
             entry={entry}
             facets={facets}
             total={rarityTotal}
             groups={['physics']}
             hideHeadings
-          />
-          <dl className={TRAIT_GRID_CLASS}>
-            {masses.length > 0 ? (
-              <Fact label={t('panel.masses')} wide>
-                <ul className="space-y-1.5">
-                  {masses.map((mass, index) => (
-                    <li key={index} className="flex items-center gap-3">
-                      <span
-                        role="img"
-                        aria-label={t('panel.massAria', {
-                          index: index + 1,
-                          value: number(mass, 1),
+            extraRows={
+              <>
+                {masses.length > 0 ? (
+                  <Fact label={t('panel.masses')} wide>
+                    <ul className="space-y-1.5">
+                      {masses.map((mass, index) => (
+                        <li key={index} className="flex items-center gap-3">
+                          <span
+                            role="img"
+                            aria-label={t('panel.massAria', {
+                              index: index + 1,
+                              value: number(mass, 1),
+                            })}
+                            className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-rule-faint"
+                          >
+                            <span
+                              aria-hidden
+                              className="absolute inset-y-0 left-0 rounded-full"
+                              style={{
+                                width: `${maxMass > 0 ? ((mass / maxMass) * 100).toFixed(1) : 0}%`,
+                                backgroundColor:
+                                  entry.hues?.[index] !== undefined
+                                    ? hueColor(entry.hues[index]!)
+                                    : 'rgb(var(--aurora-cyan-rgb))',
+                              }}
+                            />
+                          </span>
+                          <span
+                            aria-hidden
+                            className="w-16 shrink-0 text-right type-caption tabular-nums text-muted-foreground"
+                          >
+                            {number(mass, 1)}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </Fact>
+                ) : null}
+                {simulation?.closest_approach?.pair &&
+                typeof simulation.closest_approach.distance === 'number' ? (
+                  <Fact label={t('panel.closestApproach')}>
+                    {t('panel.closestApproachValue', {
+                      a: (simulation.closest_approach.pair[0] ?? 0) + 1,
+                      b: (simulation.closest_approach.pair[1] ?? 0) + 1,
+                      distance: number(simulation.closest_approach.distance, 2),
+                    })}
+                  </Fact>
+                ) : null}
+                {typeof simulation?.total_energy === 'number' ? (
+                  <Fact label={t('panel.totalEnergy')}>
+                    <span className="tabular-nums">{number(simulation.total_energy, 1)}</span>
+                  </Fact>
+                ) : null}
+                {typeof simulation?.angular_momentum === 'number' ? (
+                  <Fact label={t('panel.angularMomentum')}>
+                    <span className="tabular-nums">{number(simulation.angular_momentum, 1)}</span>
+                  </Fact>
+                ) : null}
+                {typeof simulation?.equilateralness === 'number' ? (
+                  <Fact label={t('panel.equilateralness')}>
+                    <span className="tabular-nums">{number(simulation.equilateralness, 3)}</span>
+                  </Fact>
+                ) : null}
+                {simulation?.integrator ? (
+                  <Fact label={t('panel.integrator')}>
+                    <span className="font-mono">{simulation.integrator}</span>
+                    {typeof simulation.steps === 'number' ? (
+                      <span className="ml-2 type-caption text-subtle">
+                        {t('panel.steps', { steps: number(simulation.steps, 0) })}
+                      </span>
+                    ) : null}
+                  </Fact>
+                ) : null}
+                {typeof simulation?.fate?.ejection_step === 'number' ? (
+                  <Fact label={typeLabel('fate')}>
+                    {t('panel.ejectionStep', { step: number(simulation.fate.ejection_step, 0) })}
+                    {typeof simulation.fate.horizon_steps === 'number' ? (
+                      <span className="ml-2 type-caption text-subtle">
+                        {t('panel.horizonSteps', {
+                          steps: number(simulation.fate.horizon_steps, 0),
                         })}
-                        className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-rule-faint"
-                      >
-                        <span
-                          aria-hidden
-                          className="absolute inset-y-0 left-0 rounded-full"
-                          style={{
-                            width: `${maxMass > 0 ? ((mass / maxMass) * 100).toFixed(1) : 0}%`,
-                            backgroundColor:
-                              entry.hues?.[index] !== undefined
-                                ? hueColor(entry.hues[index]!)
-                                : 'rgb(var(--aurora-cyan-rgb))',
-                          }}
-                        />
                       </span>
-                      <span
-                        aria-hidden
-                        className="w-16 shrink-0 text-right type-caption tabular-nums text-muted-foreground"
-                      >
-                        {number(mass, 1)}
+                    ) : null}
+                  </Fact>
+                ) : null}
+                {simulation?.braid?.word ? (
+                  <Fact label={t('panel.braid')} wide>
+                    <code className="block type-hash text-muted-foreground">
+                      {simulation.braid.word}
+                    </code>
+                    {typeof simulation.braid.crossings === 'number' ? (
+                      <span className="mt-1 block type-caption text-subtle">
+                        {t('panel.braidCrossings', { count: simulation.braid.crossings })}
                       </span>
-                    </li>
-                  ))}
-                </ul>
-              </Fact>
-            ) : null}
-            {simulation?.closest_approach?.pair &&
-            typeof simulation.closest_approach.distance === 'number' ? (
-              <Fact label={t('panel.closestApproach')}>
-                {t('panel.closestApproachValue', {
-                  a: (simulation.closest_approach.pair[0] ?? 0) + 1,
-                  b: (simulation.closest_approach.pair[1] ?? 0) + 1,
-                  distance: number(simulation.closest_approach.distance, 2),
-                })}
-              </Fact>
-            ) : null}
-            {typeof simulation?.total_energy === 'number' ? (
-              <Fact label={t('panel.totalEnergy')}>
-                <span className="tabular-nums">{number(simulation.total_energy, 1)}</span>
-              </Fact>
-            ) : null}
-            {typeof simulation?.angular_momentum === 'number' ? (
-              <Fact label={t('panel.angularMomentum')}>
-                <span className="tabular-nums">{number(simulation.angular_momentum, 1)}</span>
-              </Fact>
-            ) : null}
-            {typeof simulation?.equilateralness === 'number' ? (
-              <Fact label={t('panel.equilateralness')}>
-                <span className="tabular-nums">{number(simulation.equilateralness, 3)}</span>
-              </Fact>
-            ) : null}
-            {simulation?.integrator ? (
-              <Fact label={t('panel.integrator')}>
-                <span className="font-mono">{simulation.integrator}</span>
-                {typeof simulation.steps === 'number' ? (
-                  <span className="ml-2 type-caption text-subtle">
-                    {t('panel.steps', { steps: number(simulation.steps, 0) })}
-                  </span>
+                    ) : null}
+                  </Fact>
                 ) : null}
-              </Fact>
-            ) : null}
-            {typeof simulation?.fate?.ejection_step === 'number' ? (
-              <Fact label={typeLabel('fate')}>
-                {t('panel.ejectionStep', { step: number(simulation.fate.ejection_step, 0) })}
-                {typeof simulation.fate.horizon_steps === 'number' ? (
-                  <span className="ml-2 type-caption text-subtle">
-                    {t('panel.horizonSteps', { steps: number(simulation.fate.horizon_steps, 0) })}
-                  </span>
-                ) : null}
-              </Fact>
-            ) : null}
-            {simulation?.braid?.word ? (
-              <Fact label={t('panel.braid')} wide>
-                <code className="block type-hash text-muted-foreground">
-                  {simulation.braid.word}
-                </code>
-                {typeof simulation.braid.crossings === 'number' ? (
-                  <span className="mt-1 block type-caption text-subtle">
-                    {t('panel.braidCrossings', { count: simulation.braid.crossings })}
-                  </span>
-                ) : null}
-              </Fact>
-            ) : null}
-          </dl>
+              </>
+            }
+          />
         </TabsContent>
 
-        <TabsContent value="provenance" className="mt-6 space-y-2 sm:space-y-3">
+        <TabsContent value="provenance" className="mt-6 space-y-4">
           {rarity ? (
             <div className="flex flex-wrap items-center gap-2">
               <RarityRankChip rarity={rarity} total={rarityTotal} size="md" verbose />
@@ -336,59 +333,63 @@ export function NftTraitPanel({
             total={rarityTotal}
             groups={['provenance']}
             hideHeadings
+            extraRows={
+              <>
+                {metadata.metadata_version ? (
+                  <Fact label={t('panel.metadataVersion')}>
+                    <span className="font-mono">{metadata.metadata_version}</span>
+                  </Fact>
+                ) : null}
+                {metadata.image_details ? (
+                  <Fact label={t('panel.image')} wide>
+                    <span className="mb-1 block type-caption text-subtle">
+                      {metadata.image_details.width && metadata.image_details.height
+                        ? t('panel.dimensions', {
+                            width: metadata.image_details.width,
+                            height: metadata.image_details.height,
+                          })
+                        : null}
+                      {metadata.image_details.format
+                        ? ` · ${metadata.image_details.format.toUpperCase()}`
+                        : ''}
+                    </span>
+                    {metadata.image_details.sha256 ? (
+                      <HashValue
+                        value={metadata.image_details.sha256}
+                        copyLabel={t('panel.copyHash')}
+                        copiedLabel={t('panel.copied')}
+                      />
+                    ) : null}
+                  </Fact>
+                ) : null}
+                {metadata.animation_details ? (
+                  <Fact label={t('panel.animation')} wide>
+                    <span className="mb-1 block type-caption text-subtle">
+                      {metadata.animation_details.width && metadata.animation_details.height
+                        ? t('panel.dimensions', {
+                            width: metadata.animation_details.width,
+                            height: metadata.animation_details.height,
+                          })
+                        : null}
+                      {typeof metadata.animation_details.duration_seconds === 'number'
+                        ? ` · ${t('panel.duration', { seconds: metadata.animation_details.duration_seconds })}`
+                        : ''}
+                      {metadata.animation_details.codec
+                        ? ` · ${metadata.animation_details.codec}`
+                        : ''}
+                    </span>
+                    {metadata.animation_details.sha256 ? (
+                      <HashValue
+                        value={metadata.animation_details.sha256}
+                        copyLabel={t('panel.copyHash')}
+                        copiedLabel={t('panel.copied')}
+                      />
+                    ) : null}
+                  </Fact>
+                ) : null}
+              </>
+            }
           />
-          <dl className={TRAIT_GRID_CLASS}>
-            {metadata.metadata_version ? (
-              <Fact label={t('panel.metadataVersion')}>
-                <span className="font-mono">{metadata.metadata_version}</span>
-              </Fact>
-            ) : null}
-            {metadata.image_details ? (
-              <Fact label={t('panel.image')} wide>
-                <span className="mb-1 block type-caption text-subtle">
-                  {metadata.image_details.width && metadata.image_details.height
-                    ? t('panel.dimensions', {
-                        width: metadata.image_details.width,
-                        height: metadata.image_details.height,
-                      })
-                    : null}
-                  {metadata.image_details.format
-                    ? ` · ${metadata.image_details.format.toUpperCase()}`
-                    : ''}
-                </span>
-                {metadata.image_details.sha256 ? (
-                  <HashValue
-                    value={metadata.image_details.sha256}
-                    copyLabel={t('panel.copyHash')}
-                    copiedLabel={t('panel.copied')}
-                  />
-                ) : null}
-              </Fact>
-            ) : null}
-            {metadata.animation_details ? (
-              <Fact label={t('panel.animation')} wide>
-                <span className="mb-1 block type-caption text-subtle">
-                  {metadata.animation_details.width && metadata.animation_details.height
-                    ? t('panel.dimensions', {
-                        width: metadata.animation_details.width,
-                        height: metadata.animation_details.height,
-                      })
-                    : null}
-                  {typeof metadata.animation_details.duration_seconds === 'number'
-                    ? ` · ${t('panel.duration', { seconds: metadata.animation_details.duration_seconds })}`
-                    : ''}
-                  {metadata.animation_details.codec ? ` · ${metadata.animation_details.codec}` : ''}
-                </span>
-                {metadata.animation_details.sha256 ? (
-                  <HashValue
-                    value={metadata.animation_details.sha256}
-                    copyLabel={t('panel.copyHash')}
-                    copiedLabel={t('panel.copied')}
-                  />
-                ) : null}
-              </Fact>
-            ) : null}
-          </dl>
         </TabsContent>
 
         {media ? (

@@ -26,9 +26,6 @@
     "copyPageLink": "페이지 링크 복사",
     "copyFailed": "링크를 복사하지 못했습니다."
   },
-  "actions": {
-    "buyOrSellNfts": "NFT 구매 또는 판매"
-  },
   "navigation": {
     "label": "이전 및 다음 시그니처"
   },

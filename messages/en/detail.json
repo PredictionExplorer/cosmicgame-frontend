@@ -26,9 +26,6 @@
     "copyPageLink": "Copy Page Link",
     "copyFailed": "The link could not be copied."
   },
-  "actions": {
-    "buyOrSellNfts": "Buy or sell NFTs"
-  },
   "navigation": {
     "label": "Previous and next Signatures"
   },
