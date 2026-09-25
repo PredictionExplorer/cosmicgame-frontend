@@ -42,7 +42,9 @@ export function ThemeSwitcher({ className }: { className?: string }) {
           aria-label={t('themeSwitcher.label')}
           title={t('themeSwitcher.label')}
           className={cn(
-            'h-11 w-11 shrink-0 rounded-full border border-foreground/12 bg-foreground/5 text-secondary shadow-[inset_0_1px_0_rgb(255_255_255/0.05)] hover:border-primary/40 hover:bg-primary/10 hover:text-primary data-[state=open]:border-primary/40 data-[state=open]:bg-primary/10 sm:h-10 sm:w-10',
+            // The header's one control shape (rounded-control, the sunken
+            // field with the 3:1 edge), as search and the language menu.
+            'h-11 w-11 shrink-0 rounded-control border border-input bg-surface-sunken text-muted-foreground hover:border-foreground/40 hover:bg-muted hover:text-foreground data-[state=open]:border-foreground/40 data-[state=open]:bg-muted data-[state=open]:text-foreground sm:h-10 sm:w-10',
             className,
           )}
         >

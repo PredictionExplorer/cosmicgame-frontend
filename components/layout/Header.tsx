@@ -52,7 +52,7 @@ function SearchTrigger({ onOpen }: { onOpen: () => void }) {
       onClick={onOpen}
       aria-label={t('search.triggerLabel')}
       aria-keyshortcuts="Meta+K Control+K"
-      className="hidden size-10 shrink-0 items-center justify-center gap-2 rounded-pill border border-input bg-surface-sunken text-muted-foreground transition-colors duration-150 hover:border-foreground/40 hover:bg-muted hover:text-foreground sm:inline-flex xl:w-auto xl:justify-start xl:pl-3 xl:pr-2"
+      className="hidden size-10 shrink-0 items-center justify-center gap-2 rounded-control border border-input bg-surface-sunken text-muted-foreground transition-colors duration-150 hover:border-foreground/40 hover:bg-muted hover:text-foreground sm:inline-flex xl:w-auto xl:justify-start xl:pl-3 xl:pr-2"
     >
       <Search aria-hidden className="size-4 shrink-0" />
       <span className="hidden text-sm xl:inline">{t('search.trigger')}</span>
