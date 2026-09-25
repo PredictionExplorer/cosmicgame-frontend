@@ -36,10 +36,15 @@ jest.mock('next-intl/middleware', () => ({
   },
 }));
 
-function run(path: string, cookie?: string) {
-  const headers = new Headers({ host: 'app.cosmicsignature.com' });
+function run(path: string, { cookie, host = 'app.cosmicsignature.com' } = {} as RunOptions) {
+  const headers = new Headers({ host });
   if (cookie) headers.set('cookie', cookie);
-  return middleware(new NextRequest(`https://app.cosmicsignature.com${path}`, { headers }));
+  return middleware(new NextRequest(`https://${host}${path}`, { headers }));
+}
+
+interface RunOptions {
+  cookie?: string;
+  host?: string;
 }
 
 const rewriteOf = (response: Response) => {
@@ -47,7 +52,7 @@ const rewriteOf = (response: Response) => {
   return target ? new URL(target).pathname : null;
 };
 
-describe('proxy: an id page with an id it turns away', () => {
+describe('proxy: a page asked for a parameter it does not serve', () => {
   it.each([
     ['/detail/abc', 'en'],
     ['/zh/detail/abc', 'zh'],
@@ -62,6 +67,17 @@ describe('proxy: an id page with an id it turns away', () => {
     expect(response.headers.get('link')).toBeNull();
   });
 
+  // Prerendered with dynamicParams = false, which would log an internal
+  // NoFallbackError for every unknown slug if the request reached routing.
+  it.each([
+    ['/learn/no-such-guide', 'en'],
+    ['/ja/quiz/expert', 'ja'],
+  ])('answers the landing’s %s with the global 404 in %s', (path, locale) => {
+    const response = run(path, { host: 'cosmicsignature.com' });
+    expect(rewriteOf(response)).toBe(`/${locale}/_not-found`);
+    expect(response.headers.get('link')).toBeNull();
+  });
+
   it('leaves a well-formed id to its page', () => {
     expect(rewriteOf(run('/detail/25'))).toBe('/en/detail/25');
     const prefixed = run('/zh/allocation/12');
@@ -70,7 +86,7 @@ describe('proxy: an id page with an id it turns away', () => {
   });
 
   it('lets the redirect to the preferred locale happen first', () => {
-    const response = run('/detail/abc', 'NEXT_LOCALE=ja');
+    const response = run('/detail/abc', { cookie: 'NEXT_LOCALE=ja' });
     expect(response.status).toBe(307);
     expect(new URL(response.headers.get('location')!).pathname).toBe('/ja/detail/abc');
   });

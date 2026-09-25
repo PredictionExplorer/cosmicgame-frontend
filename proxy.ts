@@ -14,7 +14,7 @@ import {
   normalizeHost,
   splitLocalePrefix,
 } from '@/lib/hostRouting';
-import { UNMATCHED_INTERNAL_PATH, hasMalformedRouteId } from '@/lib/idRoutes';
+import { UNMATCHED_INTERNAL_PATH, isRejectedParamPath } from '@/lib/paramRoutes';
 
 export const config = {
   matcher: [
@@ -147,11 +147,11 @@ export default function middleware(req: NextRequest) {
 
   const response = withoutLocaleCookieWrites(intlMiddleware(req));
 
-  // An id page with an id it would turn away (/detail/abc) is the global 404
-  // too: the page's own notFound() would arrive as Next.js's bare error
-  // shell, blank without script. The rewrite keeps next-intl's request
-  // headers (the resolved locale) and the visitor's URL.
-  if (!isRedirect(response) && hasMalformedRouteId(publicPath)) {
+  // A page asked for a parameter it does not serve (/detail/abc,
+  // /learn/no-such-guide) is the global 404 too, answered before routing
+  // (lib/paramRoutes.ts). The rewrite keeps next-intl's request headers (the
+  // resolved locale) and the visitor's URL.
+  if (!isRedirect(response) && isRejectedParamPath(publicPath)) {
     const target = req.nextUrl.clone();
     target.pathname = `/${locale ?? routing.defaultLocale}${UNMATCHED_INTERNAL_PATH}`;
     const notFound = NextResponse.rewrite(target, { headers: response.headers });

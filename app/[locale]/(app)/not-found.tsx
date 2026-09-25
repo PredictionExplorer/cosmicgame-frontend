@@ -3,7 +3,7 @@
 // arrives as Next.js's bare error shell, which the client fills with this
 // page once the bundle runs, so everything that can be answered before
 // routing is: app/global-not-found.tsx renders unknown URLs, and ids a page
-// would turn away (/detail/abc, lib/idRoutes.ts), on the server.
+// would turn away (/detail/abc, lib/paramRoutes.ts), on the server.
 import { NotFoundView } from '@/components/layout/NotFoundView';
 import { PageShell } from '@/components/ui/page-shell';
 

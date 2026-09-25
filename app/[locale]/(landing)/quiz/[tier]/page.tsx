@@ -35,9 +35,10 @@ export function generateStaticParams() {
   return QUIZ_TIER_IDS.map((tier) => ({ tier }));
 }
 
-// Every tier is prerendered; any other tier matches no route, so
-// app/global-not-found.tsx answers it with the landing chrome, rendered on
-// the server like any page.
+// Every tier is prerendered. proxy.ts answers any other tier before routing
+// (lib/paramRoutes.ts) with app/global-not-found.tsx, the landing chrome
+// rendered on the server; this is the backstop, which Next.js reaches only
+// by logging an internal NoFallbackError.
 export const dynamicParams = false;
 
 export async function generateMetadata(
