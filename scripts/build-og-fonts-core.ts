@@ -9,6 +9,7 @@ import { readFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { readingCardTexts } from '../app/[locale]/(landing)/readingCardCopy';
 import { getLocaleConfig } from '../i18n/localeConfig';
 import { routing, type AppLocale } from '../i18n/routing';
 import { OG_TYPOGRAPHY, ogFontFiles, type OgFontFile } from '../lib/og/fonts';
@@ -88,10 +89,12 @@ function collectStrings(value: unknown, out: string[], key = ''): void {
 
 /**
  * Every distinct character a locale's cards can draw: its `seo.json` og copy
- * (without alt text), the uppercase eyebrows of cased scripts — cased with
- * the same `toLocaleUpperCase` the card applies, so no capital is missing
- * from the face that sets the word — printable ASCII for dynamic values, the
- * footer host, and the punctuation the card may emit.
+ * (without alt text), the reading pages' cards (a Learn guide, the white
+ * paper, the quiz, About: app/[locale]/(landing)/readingCardCopy.ts), the
+ * uppercase eyebrows of cased scripts — cased with the same
+ * `toLocaleUpperCase` the card applies, so no capital is missing from the
+ * face that sets the word — printable ASCII for dynamic values, the footer
+ * host, and the punctuation the card may emit.
  */
 export function ogRenderedText(root: string, locale: AppLocale): string {
   const seo = JSON.parse(readFileSync(join(root, 'messages', locale, 'seo.json'), 'utf8')) as {
@@ -99,6 +102,7 @@ export function ogRenderedText(root: string, locale: AppLocale): string {
   };
   const strings: string[] = [];
   collectStrings(seo.og, strings);
+  strings.push(...readingCardTexts(locale));
   const { cjk } = OG_TYPOGRAPHY[locale];
   const intl = getLocaleConfig(locale).intlLocale;
   const cased = cjk ? [] : strings.map((text) => text.toLocaleUpperCase(intl));

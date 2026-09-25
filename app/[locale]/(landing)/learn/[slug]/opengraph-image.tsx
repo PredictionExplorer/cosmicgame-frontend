@@ -16,7 +16,7 @@ interface ImageProps {
 
 export async function generateImageMetadata({ params }: ImageProps) {
   const { locale, slug } = await params;
-  return ogImageMetadata(learnArticleCardAlt(locale, slug));
+  return ogImageMetadata(await learnArticleCardAlt(locale, slug));
 }
 
 export default async function Image({ params }: ImageProps) {

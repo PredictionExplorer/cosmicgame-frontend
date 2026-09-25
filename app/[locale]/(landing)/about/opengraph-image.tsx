@@ -1,9 +1,8 @@
-import { ABOUT_PLATE_TOKEN_ID, getAboutContent } from '@/content/about';
-
 import { COSMIC_OG_SIZE } from '@/lib/og/CosmicOgCard';
 import { ogImageMetadata } from '@/lib/og/cards';
 
-import { readingShareCard } from '../readingCard';
+import { readingCardAlt, readingShareCard } from '../readingCard';
+import { aboutReadingCard } from '../readingCardCopy';
 
 /**
  * About's own card: its title beside the Signature that opens the page, so
@@ -19,11 +18,10 @@ interface ImageProps {
 
 export async function generateImageMetadata({ params }: ImageProps) {
   const { locale } = await params;
-  return ogImageMetadata(getAboutContent(locale).heading);
+  return ogImageMetadata(await readingCardAlt(locale, aboutReadingCard(locale)));
 }
 
 export default async function Image({ params }: ImageProps) {
   const { locale } = await params;
-  const { eyebrow, heading } = getAboutContent(locale);
-  return readingShareCard(locale, { eyebrow, title: heading }, ABOUT_PLATE_TOKEN_ID);
+  return readingShareCard(locale, aboutReadingCard(locale));
 }

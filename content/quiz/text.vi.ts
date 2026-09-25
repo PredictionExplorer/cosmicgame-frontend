@@ -6,7 +6,8 @@ import { mediumQuestionsTextVi } from './text.medium.vi';
 /** Vietnamese quiz copy, keyed by the skeleton in structure.ts. */
 export const quizTextVi = {
   hub: {
-    eyebrow: 'Trắc nghiệm kiến thức',
+    // The short form (as in the breadcrumb): the share card sets it on one line.
+    eyebrow: 'Trắc nghiệm',
     h1: 'Bạn hiểu Cosmic Signature đến đâu?',
     intro:
       'Một trăm câu hỏi ở ba cấp độ, dựa trên sách trắng: chu kỳ, nét bút, phân bổ, quy trình tạo tác phẩm và các trường hợp đặc biệt. Mỗi đáp án có lời giải thích cùng liên kết đến phần tương ứng để bạn tìm hiểu thêm.',

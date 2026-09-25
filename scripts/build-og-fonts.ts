@@ -9,13 +9,15 @@
  *
  * Glyph set per file: every character the cards of the locales that embed it
  * can draw — their `messages/<locale>/seo.json` og copy without alt text, the
+ * reading pages' card copy (app/[locale]/(landing)/readingCardCopy.ts), the
  * uppercase eyebrows of cased scripts, printable ASCII, the footer host and
  * the card's punctuation (./build-og-fonts-core.ts) — restricted to what the
  * source covers. Sources are the variable TTFs of the google/fonts repository
  * at a pinned commit, instanced at the registry's axis values and subset with
  * harfbuzz (subset-font), so a rebuild is reproducible byte for byte. The run
  * fails when any locale's stacks would leave a character uncovered. Rerun
- * after changing any `seo.json` og copy.
+ * after changing any `seo.json` og copy or a reading page's title, eyebrow or
+ * guide template (the Learn, white paper, quiz and About content modules).
  */
 
 /* eslint-disable no-console -- CLI output; runs via npm scripts, never ships to the browser. */
