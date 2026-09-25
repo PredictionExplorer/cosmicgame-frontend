@@ -84,8 +84,7 @@ export const learnTextKo = {
     readingTimeTemplate: '읽는 데 약 {minutes}분',
     nextGuideLabel: '다음 가이드',
     contents: {
-      heading: '이 가이드의 내용',
-      railLabel: '이 페이지의 목차',
+      railLabel: '이 페이지의 내용',
       openLabel: '목차',
       backToTopLabel: '맨 위로',
     },

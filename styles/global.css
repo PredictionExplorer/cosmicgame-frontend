@@ -779,6 +779,23 @@ body:has([data-maintenance-banner]) .home-control-shell {
 }
 
 /*
+ * The reading template from `lg`: the contents rail at --rail-w, then the
+ * text, --rail-gap apart (a third more from `xl`). Below `lg` the rail
+ * gives way to the page's in-flow contents, so this is one column.
+ */
+@utility reading-grid {
+  @media (width >= 64rem) {
+    display: grid;
+    grid-template-columns: minmax(0, var(--rail-w)) minmax(0, 1fr);
+    column-gap: var(--rail-gap);
+  }
+
+  @media (width >= 80rem) {
+    column-gap: calc(var(--rail-gap) * 4 / 3);
+  }
+}
+
+/*
  * Glass: the sticky header, the mobile dock, sheets and menus only. Visitors
  * who ask for less transparency get the opaque page colour instead.
  */

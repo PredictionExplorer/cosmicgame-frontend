@@ -85,7 +85,6 @@ export const learnTextEn = {
     readingTimeTemplate: '{minutes} min read',
     nextGuideLabel: 'Next guide',
     contents: {
-      heading: 'In this guide',
       railLabel: 'On this page',
       openLabel: 'Contents',
       backToTopLabel: 'Back to top',

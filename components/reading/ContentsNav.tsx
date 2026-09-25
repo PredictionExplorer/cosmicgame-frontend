@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 import { ArrowUp, ListTree } from 'lucide-react';
 
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -96,6 +96,7 @@ interface RailProps {
  */
 function ContentsRail({ entries, copy, position, topId, footer }: RailProps) {
   const { activeId, progress } = position;
+  const labelId = useId();
   const scrollerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -114,11 +115,13 @@ function ContentsRail({ entries, copy, position, topId, footer }: RailProps) {
 
   return (
     <nav
-      aria-label={copy.railLabel}
+      aria-labelledby={labelId}
       className="sticky top-[var(--sticky-offset)] hidden max-h-[calc(100dvh-var(--sticky-offset)-1.5rem)] flex-col lg:flex"
       data-testid="contents-rail"
     >
-      <p className="type-eyebrow text-subtle">{copy.heading}</p>
+      <p id={labelId} className="type-eyebrow text-subtle">
+        {copy.railLabel}
+      </p>
       <div
         ref={scrollerRef}
         className="relative mt-4 min-h-0 flex-1 overflow-y-auto overscroll-contain scrollbar-none"
@@ -232,7 +235,7 @@ function ContentsSheet({ entries, copy, position }: SheetProps) {
           className="flex max-h-[85dvh] flex-col gap-0 rounded-t-surface border-t border-rule bg-background p-0"
         >
           <div className="border-b border-rule-faint px-5 pb-3 pt-5 pr-16">
-            <SheetTitle className="type-eyebrow text-subtle">{copy.heading}</SheetTitle>
+            <SheetTitle className="type-eyebrow text-subtle">{copy.railLabel}</SheetTitle>
           </div>
           <nav
             aria-label={copy.railLabel}

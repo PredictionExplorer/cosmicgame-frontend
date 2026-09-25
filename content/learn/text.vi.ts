@@ -90,7 +90,6 @@ export const learnTextVi = {
     readingTimeTemplate: '{minutes} phút đọc',
     nextGuideLabel: 'Hướng dẫn tiếp theo',
     contents: {
-      heading: 'Trong hướng dẫn này',
       railLabel: 'Trên trang này',
       openLabel: 'Mục lục',
       backToTopLabel: 'Lên đầu trang',

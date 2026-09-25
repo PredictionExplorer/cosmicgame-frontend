@@ -35,6 +35,7 @@ import { SIGNATURE_PLATES } from '@/components/reading/signaturePlates';
 import { fillTemplate } from '@/components/reading/template';
 import { Badge } from '@/components/ui/badge';
 import { SectionHeader } from '@/components/ui/section-header';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { Link } from '@/i18n/navigation';
 import { APP_ORIGIN, LANDING_ORIGIN, localeHref, localizeCrossHostHref } from '@/lib/hostRouting';
 import { formatPercent } from '@/utils/format/numbers';
@@ -126,13 +127,15 @@ export default async function AboutPage({ params }: PageProps) {
         ]}
       />
 
-      <header className="grid items-center gap-10 border-b border-rule pb-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,36rem)] lg:gap-16 lg:pb-16">
-        <div className="min-w-0">
-          <p className="type-eyebrow text-subtle">{content.eyebrow}</p>
-          <h1 className="mt-3 type-display-md text-foreground sm:mt-4">{content.heading}</h1>
-          <p className="mt-5 type-lede text-muted-foreground max-sm:text-base">
-            {content.body.lede}
-          </p>
+      {/* The reading header every long page uses, top-aligned beside its Signature. */}
+      <div className="grid items-start gap-10 border-b border-rule pb-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,36rem)] lg:gap-16 lg:pb-16">
+        <PageHeader
+          variant="reading"
+          eyebrow={content.eyebrow}
+          title={content.heading}
+          subtitle={content.body.lede}
+          className="mb-0 border-b-0 pb-0 sm:mb-0 sm:pb-0"
+        >
           <ul className="mt-6 flex flex-wrap gap-2">
             {[
               content.facts.license,
@@ -146,7 +149,7 @@ export default async function AboutPage({ params }: PageProps) {
               </li>
             ))}
           </ul>
-        </div>
+        </PageHeader>
         <SignaturePlate
           art={ABOUT_PLATE}
           priority
@@ -154,7 +157,7 @@ export default async function AboutPage({ params }: PageProps) {
           sizes="(min-width: 1024px) 36rem, 100vw"
           copy={plateCopy(ABOUT_PLATE)}
         />
-      </header>
+      </div>
 
       {/* The body opens the Principles it introduces, instead of standing alone
           at half the row's width between the header and the section. */}

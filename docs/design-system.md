@@ -351,6 +351,15 @@ maintenance banner, page tops) derives from that one value. The other tokens are
 characters of 17px Inter; `ch` is the width of a zero and ran 81–91 characters) and
 `--measure-lede` (34em, about 65 characters of the 18px lede).
 
+**Reading template.** Every long read with a contents rail (the Trust Center, the FAQ,
+the white paper, a Learn guide) lays out with `reading-grid`: from `lg` the rail at
+`--rail-w` (14rem) and the text `--rail-gap` (3rem, 4rem from `xl`) after it, so the text
+starts at the same x on every reading page. The rail's label is the same words everywhere
+("On this page", `legal.document.contents` in each locale), visible and naming its
+landmark. A header that hangs art beside it (a Learn guide, About) is top-aligned, so the
+trail or eyebrow and the H1 sit where every other page puts them, and About's header is a
+`PageHeader` like the rest.
+
 **Regions, not cards.** A page's regions sit on the page ground, each opening on one
 `--rule` hairline over its heading (`DESK_REGION` in
 `components/home/observatory/ControlDesk.tsx` on the app home). A region that continues

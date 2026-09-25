@@ -105,6 +105,13 @@
   /* A long document's one column (the Trust Center): every rule, ledger, table
    * and callout ends on this edge; paragraphs keep --measure-prose inside it. */
   --measure-document: 52rem;
+  /*
+   * A long read's contents rail (the Trust Center, the FAQ, the white paper,
+   * a Learn guide): one width and one gap, so the text edge sits at the same
+   * x on every reading page (the `reading-grid` utility).
+   */
+  --rail-w: 14rem;
+  --rail-gap: 3rem;
 
   /*
    * Elevation. Depth is only for things that actually float (popovers,

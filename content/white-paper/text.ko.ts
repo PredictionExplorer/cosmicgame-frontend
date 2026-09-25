@@ -898,7 +898,7 @@ export const whitePaperTextKo = {
   licenseNote:
     '이 백서는 프로젝트가 소유한 다른 모든 Cosmic Signature 자료와 마찬가지로 CC0 1.0에 따라 퍼블릭 도메인에 헌정됩니다.',
   reading: {
-    railLabel: '이 페이지의 목차',
+    railLabel: '이 페이지의 내용',
     openContentsLabel: '목차',
     backToTopLabel: '맨 위로',
     headingLinkTemplate: '이 절로 연결: {title}',
