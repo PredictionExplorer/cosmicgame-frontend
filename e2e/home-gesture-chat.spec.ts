@@ -90,7 +90,9 @@ async function expectDeskFocusOrderReadsDown(page: Page) {
             .trim()
             .slice(0, 40),
           column: rect.left >= form.left - 1 ? 'right' : 'left',
-          top: rect.top + window.scrollY,
+          // The middle of the control: controls of different heights on one
+          // line (an ⓘ beside a 44px menu button) read as one line.
+          middle: rect.top + rect.height / 2 + window.scrollY,
         };
       });
   });
@@ -99,9 +101,9 @@ async function expectDeskFocusOrderReadsDown(page: Page) {
     const inColumn = stops.filter((stop) => stop.column === column);
     for (let index = 1; index < inColumn.length; index += 1) {
       expect(
-        inColumn[index]!.top,
+        inColumn[index]!.middle,
         `${column} column: "${inColumn[index]!.name}" after "${inColumn[index - 1]!.name}"`,
-      ).toBeGreaterThanOrEqual(inColumn[index - 1]!.top - 2);
+      ).toBeGreaterThanOrEqual(inColumn[index - 1]!.middle - 12);
     }
   }
 }
@@ -329,7 +331,8 @@ test.describe('home gesture chat', () => {
     // is named once, on the Endurance row, and the record once, as the
     // Chrono-Warrior's time held.
     const chrono = page.getByTestId('chrono-role-summary');
-    await expect(chrono).toContainText(/30m/);
+    // Every duration in the ledger reads as a clock, the record included.
+    await expect(chrono).toContainText(/00:30:00/);
     const challenge = chrono.getByTestId('chrono-active-challenge');
     await expect(challenge).toBeVisible();
     // The reign keeps growing while the page is open, so the time left ticks
