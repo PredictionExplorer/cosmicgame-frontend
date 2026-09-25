@@ -63,8 +63,10 @@ export function ContentsList({
               )}
             >
               {depth === 0 && numbered ? (
+                // The space keeps "3. Allocations" one phrase when the entry is
+                // copied or read as text; the gap draws it.
                 <span aria-hidden className="min-w-5 shrink-0 tabular-nums text-subtle">
-                  {entry.number}
+                  {entry.number ? `${entry.number} ` : null}
                 </span>
               ) : null}
               <span className="min-w-0">
