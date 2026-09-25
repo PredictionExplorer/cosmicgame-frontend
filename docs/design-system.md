@@ -340,7 +340,12 @@ the figure sits in its own column and never does, and a countdown reads as a clo
 (`<Duration variant="clock">`, "8d 06:56:51") whose width holds while it ticks. Lines
 stacked together share that one format, so a growing hold under a countdown reads as a
 clock too ("1d 01:12:05" over "8d 00:24:38") and the digits align. A `flex-wrap` row of
-ticking values re-wraps as the digits change and moves everything below it.
+ticking values re-wraps as the digits change and moves everything below it. A duration
+wider than its whole column (Vietnamese writes the unit words, "9 ngày 1 giờ 36 phút 42
+giây") breaks between unit groups, never inside one: `<Duration>` marks the break points,
+a nowrap container (every data-table duration column) keeps one line, and a countdown
+breaks only where it opts in with `wrap` (the /current-cycle hero puts the clock under
+the day count).
 
 **Targets.** Every text link is at least 24px tall at every width
 (`TOUCH_TARGET_TEXT_LINK_CLASS`, `lib/touch-target.ts`): WCAG 2.5.8 covers a mouse as much
@@ -542,6 +547,9 @@ Catalogs carry the text exactly as it renders; nothing transforms case. In Engli
 - **Common nouns stay lower case** after the start of a sentence: gesture, cycle,
   allocation, recipient. "a new gesture", "ETH and CST gestures", "Cycle 12" (a
   numbered cycle is a name, like "Chapter 12").
+- **A cycle is its number**, in every locale ("Cycle 12", "Chu kỳ 12", "第 12 个周期");
+  `#` marks an identifier (Signature #000025, Gesture #1135), never a cycle.
+  `i18n/__tests__/cycle-numbering.test.ts` enforces it.
 - **Named quantities, reserves, windows and roles keep their capitals**: Gesture Cost,
   Gesture Chat, Cycle Finalization Time, Cycle Reserve, Calibration Window, Signature
   Allocation, Stellar Selection, Endurance Champion, Chrono-Warrior, the Last Gesture
