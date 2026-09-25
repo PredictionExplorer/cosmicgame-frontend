@@ -7,14 +7,15 @@ import { SectionHeader } from '@/components/ui/section-header';
 
 /**
  * What a gesture costs, right after what it can lead to: the spend is not
- * returned, the ETH cost steps up, gas is separate. One quiet panel of
- * label-and-fact rows, closed by a plain caution and the risk disclosures.
+ * returned, the ETH cost steps up, gas is separate. A region of hairline
+ * label-and-fact rows on the page ground (regions, not cards), closed by a
+ * plain caution and the risk disclosures.
  */
 export function GestureCosts({ costs }: { costs: HowItWorksContent['costs'] }) {
   return (
     <section aria-labelledby="costs-heading" data-testid="gesture-costs">
       <SectionHeader headingId="costs-heading" title={costs.heading} description={costs.subhead} />
-      <div className="rounded-surface bg-surface px-5 py-2 sm:px-8 sm:py-3">
+      <div className="border-t border-rule-faint">
         <dl className="divide-y divide-rule-faint">
           {costs.items.map((item) => (
             <div
