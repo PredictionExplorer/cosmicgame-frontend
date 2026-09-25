@@ -23,8 +23,8 @@ describe('NFTNeighbourNav', () => {
     render(<NFTNeighbourNav tokenId={25} total={48} />);
     const nav = screen.getByRole('navigation', { name: 'detail.navigation.label' });
     expect(nav).toBeInTheDocument();
-    const previous = screen.getByRole('link', { name: 'Previous Signature #000024' });
-    const next = screen.getByRole('link', { name: 'Next Signature #000026' });
+    const previous = screen.getByRole('link', { name: 'Previous Signature, #000024' });
+    const next = screen.getByRole('link', { name: 'Next Signature, #000026' });
     expect(previous).toHaveAttribute('href', '/detail/24');
     expect(next).toHaveAttribute('href', '/detail/26');
   });

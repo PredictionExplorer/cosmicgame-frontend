@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, type ReactNode } from 'react';
-import { ChevronLeft, ChevronRight, Share2 } from 'lucide-react';
+import { Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -21,7 +21,7 @@ import { AddressChip } from '@/components/ui/address-chip';
 import { Amount } from '@/components/ui/amount';
 import { PendingPlate, WallLabelMeta } from '@/components/ui/art-frame';
 import { Badge } from '@/components/ui/badge';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { DateTime } from '@/components/ui/date-time';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
@@ -41,6 +41,7 @@ import RecipientHistoryTable, {
   type WinningHistoryEntry,
 } from '@/components/tables/RecipientHistoryTable';
 import { AllocationSplitBar, type AllocationSplitSegment } from '@/components/ui/allocation-split';
+import { RecordPager } from '@/components/ui/record-pager';
 import {
   cycleReserveSplit,
   type DistributedTrackId,
@@ -147,28 +148,22 @@ function TabCount({ count, loading }: { count: number; loading: boolean }) {
   );
 }
 
-/** Previous and next cycle, labelled on every screen size. */
+/** Previous and next cycle, labelled on every screen size (the shared RecordPager). */
 function CycleNavigation({ cycle, lastCycle }: { cycle: number; lastCycle: number }) {
   const t = useTranslations('allocation');
-  const link = (target: number, direction: 'previous' | 'next') => {
-    const label = t('formats.cycle', { cycle: target });
-    return (
-      <Link
-        href={`/allocation/${target}`}
-        aria-label={`${t(`details.navigation.${direction}Aria`)}, ${label}`}
-        className={buttonVariants({ variant: 'outline', size: 'sm' })}
-      >
-        {direction === 'previous' ? <ChevronLeft aria-hidden className="size-4" /> : null}
-        {label}
-        {direction === 'next' ? <ChevronRight aria-hidden className="size-4" /> : null}
-      </Link>
-    );
-  };
+  const target = (to: number) => ({
+    href: `/allocation/${to}`,
+    label: t('formats.cycle', { cycle: to }),
+  });
   return (
-    <div className="flex items-center gap-2" data-testid="round-navigation">
-      {cycle > 0 ? link(cycle - 1, 'previous') : null}
-      {cycle < lastCycle ? link(cycle + 1, 'next') : null}
-    </div>
+    <RecordPager
+      data-testid="round-navigation"
+      label={t('details.navigation.label')}
+      previousLabel={t('details.navigation.previousAria')}
+      nextLabel={t('details.navigation.nextAria')}
+      previous={cycle > 0 ? target(cycle - 1) : null}
+      next={cycle < lastCycle ? target(cycle + 1) : null}
+    />
   );
 }
 

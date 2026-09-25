@@ -20,6 +20,7 @@
   },
   "details": {
     "navigation": {
+      "label": "前後のサイクル",
       "previousAria": "前のサイクル",
       "nextAria": "次のサイクル"
     },

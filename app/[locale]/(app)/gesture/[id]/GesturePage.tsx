@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-react';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
@@ -24,6 +24,7 @@ import { MEDIA_PLATE_CLASS, PendingPlate } from '@/components/ui/art-frame';
 import { SkeletonDetailRows } from '@/components/ui/skeleton';
 import { TxExplorerLink } from '@/components/ui/tx-status';
 import { UnknownValue } from '@/components/ui/unknown-value';
+import { RecordPager } from '@/components/ui/record-pager';
 import { RandomWalkPlate } from '@/components/nft/RandomWalkPlate';
 import NFTImage from '@/components/nft/NFTImage';
 import { useAttachedNftMetadata } from '@/components/attachments/useAttachedNftMetadata';
@@ -329,40 +330,28 @@ const GesturePage = ({
     </Badge>
   );
 
-  const stepLink = (direction: 'previous' | 'next') => {
+  // The neighbours named as their own pages name them ("Gesture #1134"), with
+  // their direction spoken: the one record pager every record page uses.
+  const stepTarget = (direction: 'previous' | 'next') => {
     const target = neighbours[direction];
-    if (!target) return null;
-    return (
-      <Link
-        href={`/gesture/${target.id}`}
-        rel={direction === 'previous' ? 'prev' : 'next'}
-        // Phones: equal halves side by side, or equal full-width rows once
-        // the labels no longer fit two to a line (vi at 320px).
-        className={cn(
-          buttonVariants({ variant: 'outline', size: 'sm' }),
-          'max-sm:grow max-sm:basis-40',
-        )}
-      >
-        {direction === 'previous' ? <ArrowLeft aria-hidden /> : null}
-        <span>
-          {t(`nav.${direction}`)}
-          <span className="sr-only">
-            {' '}
-            {t('header.title', { position: String(target.position) })}
-          </span>
-        </span>
-        {direction === 'next' ? <ArrowRight aria-hidden /> : null}
-      </Link>
-    );
+    return target
+      ? {
+          href: `/gesture/${target.id}`,
+          label: t('header.title', { position: String(target.position) }),
+        }
+      : null;
   };
   const hasSteps = !!(neighbours.previous || neighbours.next);
-  const stepNav = (className: string) =>
-    hasSteps ? (
-      <nav aria-label={t('nav.aria')} className={cn('flex flex-wrap gap-2', className)}>
-        {stepLink('previous')}
-        {stepLink('next')}
-      </nav>
-    ) : null;
+  const stepNav = (className: string) => (
+    <RecordPager
+      label={t('nav.aria')}
+      previousLabel={t('nav.previous')}
+      nextLabel={t('nav.next')}
+      previous={stepTarget('previous')}
+      next={stepTarget('next')}
+      className={className}
+    />
+  );
   const nftMetadataRows = (
     [
       ['collectionName', t('nftPreview.collectionName'), tokenURI?.collection_name],

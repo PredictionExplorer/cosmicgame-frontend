@@ -20,6 +20,7 @@
   },
   "details": {
     "navigation": {
+      "label": "相鄰週期",
       "previousAria": "上一週期",
       "nextAria": "下一週期"
     },

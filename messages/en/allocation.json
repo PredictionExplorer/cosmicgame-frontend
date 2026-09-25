@@ -20,6 +20,7 @@
   },
   "details": {
     "navigation": {
+      "label": "Neighbouring cycles",
       "previousAria": "Previous cycle",
       "nextAria": "Next cycle"
     },

@@ -20,6 +20,7 @@
   },
   "details": {
     "navigation": {
+      "label": "相邻周期",
       "previousAria": "上一周期",
       "nextAria": "下一周期"
     },

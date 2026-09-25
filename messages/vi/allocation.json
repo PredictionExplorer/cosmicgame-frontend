@@ -20,6 +20,7 @@
   },
   "details": {
     "navigation": {
+      "label": "Các chu kỳ liền kề",
       "previousAria": "Chu kỳ trước",
       "nextAria": "Chu kỳ sau"
     },
