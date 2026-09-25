@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { Easing, Transition, Variants } from 'framer-motion';
+import type { Easing, Variants } from 'framer-motion';
 
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
@@ -32,12 +32,6 @@ export const motionTokens = {
 };
 
 const { duration, ease, offset } = motionTokens;
-
-/** The default transition: `base` duration on the `outExpo` curve. */
-export const baseTransition: Transition = {
-  duration: duration.base,
-  ease: ease.outExpo,
-};
 
 export const fadeRise: Variants = {
   initial: { opacity: 0, y: offset.rise },

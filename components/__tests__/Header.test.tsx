@@ -428,6 +428,17 @@ describe('Header drawer', () => {
     expect(screen.queryByTestId('wallet-menu-trigger')).toBeNull();
   });
 
+  // Regression: the header's Connect is a quiet 36px outline, so a page's own
+  // main action stays the one filled button in view, and its touch pad keeps
+  // the 44px target.
+  it('draws the connect button as a quiet outline with a full touch target', () => {
+    render(<Header />);
+    const connect = screen.getByTestId('connect-wallet-button');
+    expect(connect).toHaveClass('border-input', 'bg-transparent', 'h-9', 'min-h-9');
+    expect(connect).not.toHaveClass('bg-primary');
+    expect(connect).toHaveAttribute('data-touch-target', 'extended');
+  });
+
   it('swaps the connect button for the wallet pill once a wallet is connected', () => {
     mockAccount = '0x1234567890abcdef1234567890abcdef12345678';
     render(<Header />);
