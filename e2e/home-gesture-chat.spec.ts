@@ -404,13 +404,20 @@ test.describe('home gesture chat', () => {
     );
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-    await expect(page.getByTestId('latest-participant-gesture-details')).toBeVisible();
-    await expect(page.getByTestId('latest-participant-gesture-syncing')).toContainText(
+    // The dashboard names the Last Gesture's holder before the gesture list
+    // has the Gesture: the row keeps the holder, says its details are
+    // syncing, and never borrows another Gesture's details meanwhile. (The
+    // server-rendered page shows the live cycle's Last Gesture until the
+    // mocked reads land, so only the settled row is evidence.)
+    const latest = page.getByTestId('latest-participant-intel');
+    await expect(latest.getByTestId('latest-participant-gesture-syncing')).toContainText(
       'Last Gesture details are syncing from the indexer.',
     );
-    await expect(page.getByTestId('latest-participant-intel')).not.toContainText(
-      'Older message from a gesture',
-    );
+    await expect(
+      latest.locator('a[href="/user/0x3333333333333333333333333333333333333333"]'),
+    ).toBeVisible();
+    await expect(latest.getByTestId('latest-participant-gesture-details')).toHaveCount(0);
+    await expect(latest).not.toContainText('Older message from a gesture');
   });
 
   for (const viewport of DESKTOP_VIEWPORTS) {
