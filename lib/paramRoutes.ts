@@ -99,3 +99,20 @@ export function isRejectedParamPath(publicPath: string): boolean {
   }
   return false;
 }
+
+/**
+ * The one URL of a page asked for under another spelling of its parameter:
+ * a Signature's number zero-padded, as the site prints it (`/detail/025` is
+ * `/detail/25`). Null when the locale-stripped public path is already that
+ * URL or names no such page. proxy.ts redirects to it before routing: raised
+ * inside the page's on-demand ISR render, the redirect would reach the
+ * browser with its Location header twice whenever the render is not cached
+ * yet (Next.js 16 appends the render's own headers to the response again).
+ */
+export function canonicalParamPath(publicPath: string): string | null {
+  const match = /^\/detail\/(\d+)$/.exec(publicPath);
+  if (!match) return null;
+  const tokenId = parseTokenId(match[1]!);
+  if (tokenId === null || String(tokenId) === match[1]) return null;
+  return `/detail/${tokenId}`;
+}

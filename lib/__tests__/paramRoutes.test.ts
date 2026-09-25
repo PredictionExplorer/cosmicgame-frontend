@@ -1,7 +1,7 @@
 import { generateStaticParams as learnParams } from '@/app/[locale]/(landing)/learn/[slug]/page';
 import { generateStaticParams as quizParams } from '@/app/[locale]/(landing)/quiz/[tier]/page';
 
-import { isRejectedParamPath } from '@/lib/paramRoutes';
+import { canonicalParamPath, isRejectedParamPath } from '@/lib/paramRoutes';
 
 // The real address checks (the shared viem mock is lenient).
 jest.mock('viem', () => jest.requireActual('viem'));
@@ -96,5 +96,30 @@ describe('isRejectedParamPath', () => {
         expect(isRejectedParamPath(`/distributions-by-token/${address}/${tokenId}`)).toBe(!served);
       }
     }
+  });
+});
+
+describe('canonicalParamPath', () => {
+  it.each([
+    ['/detail/025', '/detail/25'],
+    ['/detail/0001', '/detail/1'],
+    ['/detail/00', '/detail/0'],
+  ])('gives the zero-padded Signature %s its one URL, %s', (path, canonical) => {
+    expect(canonicalParamPath(path)).toBe(canonical);
+    // The URL it moves to is one the route serves, and canonical itself.
+    expect(isRejectedParamPath(canonical)).toBe(false);
+    expect(canonicalParamPath(canonical)).toBeNull();
+  });
+
+  it.each([
+    '/detail/25',
+    '/detail/0',
+    '/detail/abc',
+    '/detail/025/opengraph-image',
+    '/gesture/025',
+    '/allocation/01',
+    '/detail/99999999999999999999',
+  ])('leaves %s to routing', (path) => {
+    expect(canonicalParamPath(path)).toBeNull();
   });
 });

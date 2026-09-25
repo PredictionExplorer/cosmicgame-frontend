@@ -93,3 +93,26 @@ describe('proxy: a page asked for a parameter it does not serve', () => {
     expect(new URL(response.headers.get('location')!).pathname).toBe('/ja/detail/abc');
   });
 });
+
+// Raised inside the page's cached render, the redirect's Location header
+// reached the browser twice whenever the render was not cached yet.
+describe('proxy: a Signature asked for by its zero-padded number', () => {
+  it.each([
+    ['/detail/0001', '/detail/1'],
+    ['/zh/detail/0001', '/zh/detail/1'],
+    ['/en/detail/025', '/detail/25'],
+  ])('moves %s to %s before routing, keeping the query', (path, target) => {
+    const response = run(`${path}?ref=share`);
+    expect(response.status).toBe(308);
+    expect(response.headers.getSetCookie()).toEqual([]);
+    const location = new URL(response.headers.get('location')!);
+    expect(location.pathname).toBe(target);
+    expect(location.search).toBe('?ref=share');
+  });
+
+  it('lets the redirect to the preferred locale happen first', () => {
+    const response = run('/detail/025', { cookie: 'NEXT_LOCALE=ja' });
+    expect(response.status).toBe(307);
+    expect(new URL(response.headers.get('location')!).pathname).toBe('/ja/detail/025');
+  });
+});

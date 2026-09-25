@@ -14,7 +14,11 @@ import {
   normalizeHost,
   splitLocalePrefix,
 } from '@/lib/hostRouting';
-import { UNMATCHED_INTERNAL_PATH, isRejectedParamPath } from '@/lib/paramRoutes';
+import {
+  UNMATCHED_INTERNAL_PATH,
+  canonicalParamPath,
+  isRejectedParamPath,
+} from '@/lib/paramRoutes';
 
 export const config = {
   matcher: [
@@ -146,6 +150,15 @@ export default function middleware(req: NextRequest) {
   }
 
   const response = withoutLocaleCookieWrites(intlMiddleware(req));
+
+  // One URL per record: `/detail/025` moves to `/detail/25` here, before the
+  // page's cached render could raise the redirect (lib/paramRoutes.ts).
+  const canonical = isRedirect(response) ? null : canonicalParamPath(publicPath);
+  if (canonical) {
+    const target = req.nextUrl.clone();
+    target.pathname = `${prefix}${canonical}`;
+    return NextResponse.redirect(target, 308);
+  }
 
   // A page asked for a parameter it does not serve (/detail/abc,
   // /learn/no-such-guide) is the global 404 too, answered before routing
