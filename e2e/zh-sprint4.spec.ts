@@ -127,7 +127,9 @@ test.describe('zh Sprint 4 — transactions and holdings routes', () => {
     await expect(
       page.getByRole('heading', { level: 1, name: `锚定操作 #${SPRINT4_MOCK_ACTION_ID}` }),
     ).toBeVisible();
-    await expect(page.getByText('Cosmic Signature NFT 锚定操作', { exact: true })).toBeVisible();
+    // The status sits under the H1; the record names the holder and the transaction.
+    await expect(page.getByRole('heading', { level: 2, name: '记录' })).toBeVisible();
+    await expect(page.getByText('交易', { exact: true })).toBeVisible();
     await expect(page.getByRole('heading', { level: 2, name: '时间线' })).toBeVisible();
   });
 
@@ -226,6 +228,8 @@ test.describe('zh Sprint 4 — transactions and holdings routes', () => {
       }),
     ).toBeVisible();
     await expect(page.getByText('锚定派发（ETH）', { exact: true }).first()).toBeVisible();
+    // Where its anchor stands, said once beside the plate.
+    await expect(page.getByText('仍在锚定中', { exact: true })).toBeVisible();
   });
 
   test('opens representative Chinese allocation tooltips', async ({ page }) => {

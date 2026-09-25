@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { ArrowRight, ArrowUpRight, SearchX } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
-import { formatId } from '@/utils/format';
+import { formatAddress, formatId } from '@/utils/format';
 import { useCSTInfo, useCSTAnchorActionInfo, useRWLKAnchorActionInfo } from '@/hooks/useApiQuery';
 import { Link } from '@/i18n/navigation';
 import type { AnchorAction } from '@/services/api/types';
@@ -13,9 +13,11 @@ import { AddressChip } from '@/components/ui/address-chip';
 import { WallLabel } from '@/components/ui/art-frame';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
+import { TxProofLink } from '@/components/ui/data-table';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
 import { PageShell } from '@/components/ui/page-shell';
+import { SpecList, SpecRow } from '@/components/ui/spec-list';
 import { useSignatureAlt } from '@/components/nft/signatureArt';
 import { AnchorTimeline } from '@/components/anchoring/AnchorTimeline';
 import { TokenPlate } from '@/components/anchoring/TokenPlate';
@@ -34,10 +36,11 @@ function isReleased(release: AnchorAction | null | undefined): release is Anchor
 }
 
 /**
- * The public record of one anchor action: the NFT on its plate, who anchored
- * it, its timeline (anchored, then released or still anchored) and where to
- * go next. A missing record says why it may be missing and leads back to the
- * anchoring ledgers.
+ * The public record of one anchor action: its status under the title, the
+ * NFT on its plate (the wall label names the collection), who anchored it
+ * and the transaction, its timeline (anchored, then released or still
+ * anchored) and where to go next. A missing record says why it may be
+ * missing and leads back to the anchoring ledgers.
  */
 function AnchorActionDetailPage({ IsRwalk, actionId }: { IsRwalk: number; actionId: number }) {
   const t = useTranslations('anchoring');
@@ -51,7 +54,6 @@ function AnchorActionDetailPage({ IsRwalk, actionId }: { IsRwalk: number; action
   const release = query.data?.Unstake ?? null;
   const released = isReleased(release);
 
-  const collectionName = t(`anchorActionDetail.token.labels.${collection}`);
   const status = anchor ? (
     <Badge tone={released ? 'neutral' : 'positive'} dot={!released} data-testid="anchor-status">
       {released ? t('status.released') : t('status.anchored')}
@@ -90,10 +92,10 @@ function AnchorActionDetailPage({ IsRwalk, actionId }: { IsRwalk: number; action
       <PageHeader
         section="records"
         breadcrumbs={[{ label: t('overview.title'), href: '/anchoring' }]}
-        // "Anchor action #23": the title stands alone, without the trail.
+        // "Anchor action #23": the title stands alone, without the trail; its status sits
+        // directly under it, one line, instead of a lede that repeated the title in words.
         title={t('anchorActionDetail.title', { id: actionId })}
-        subtitle={t('anchorActionDetail.subtitle', { token: collectionName })}
-        meta={status}
+        identity={status}
       />
       {body}
     </PageShell>
@@ -113,7 +115,7 @@ function AnchorActionBody({
   const tTables = useTranslations('tables');
   const signatureAlt = useSignatureAlt();
   const isRwalk = collection === 'randomWalk';
-  const { TokenId, StakerAddr } = anchor;
+  const { TokenId, StakerAddr, TxHash } = anchor;
   // The action record carries no seed or name; the token's own record does.
   const token = useCSTInfo(isRwalk ? null : TokenId);
   const name = isRwalk ? null : (token.data?.TokenName ?? null);
@@ -174,29 +176,19 @@ function AnchorActionBody({
           <h2 id="anchor-action-record" className="type-heading-3 text-foreground">
             {t('anchorActionDetail.record.title')}
           </h2>
-          <dl className="mt-3 divide-y divide-rule-faint border-y border-rule-faint">
-            <SpecRow label={t('anchorActionDetail.record.holder')}>
+          {/* The token is the plate's wall label; the record holds who anchored it and the proof. */}
+          <SpecList density="dense" className="mt-3">
+            <SpecRow density="dense" label={t('anchorActionDetail.record.holder')}>
               <AddressChip address={StakerAddr} variant="plain" />
             </SpecRow>
-            <SpecRow label={t('anchorActionDetail.record.token')}>
-              {isRwalk ? (
-                <a
-                  href={tokenHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="link font-mono tabular-nums"
-                >
-                  {tokenId}
-                  <ArrowUpRight aria-hidden className="ms-0.5 inline size-3.5 align-[-0.125em]" />
-                  <span className="sr-only">{tTables('links.newTab')}</span>
-                </a>
-              ) : (
-                <Link href={tokenHref} className="link font-mono tabular-nums">
-                  {tokenId}
-                </Link>
-              )}
-            </SpecRow>
-          </dl>
+            {TxHash ? (
+              <SpecRow density="dense" label={t('anchorActionDetail.record.transaction')}>
+                <TxProofLink hash={TxHash} className="type-hash">
+                  {formatAddress(TxHash)}
+                </TxProofLink>
+              </SpecRow>
+            ) : null}
+          </SpecList>
         </section>
 
         <section aria-labelledby="anchor-action-timeline">
@@ -236,16 +228,6 @@ function AnchorActionBody({
           </ul>
         </nav>
       </div>
-    </div>
-  );
-}
-
-/** A label and its value on one line of the record's spec sheet. */
-function SpecRow({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="flex min-h-12 flex-wrap items-center justify-between gap-x-6 gap-y-1 py-2.5">
-      <dt className="type-label text-subtle">{label}</dt>
-      <dd className="min-w-0 type-body-sm text-foreground">{children}</dd>
     </div>
   );
 }

@@ -190,7 +190,6 @@
   },
   "anchorActionDetail": {
     "title": "锚定操作 #{id}",
-    "subtitle": "{token} NFT 锚定操作",
     "errorTitle": "无法加载该锚定操作",
     "error": "锚定记录暂时无法获取，请稍后重试。",
     "breadcrumbs": {
@@ -202,16 +201,10 @@
       "browse": "浏览锚定派发",
       "statistics": "锚定统计"
     },
-    "token": {
-      "labels": {
-        "randomWalk": "Random Walk",
-        "cosmicSignature": "Cosmic Signature"
-      }
-    },
     "record": {
       "title": "记录",
       "holder": "锚定者",
-      "token": "代币"
+      "transaction": "交易"
     },
     "timeline": {
       "title": "时间线",
@@ -243,16 +236,14 @@
       "unretrievedCaption": "解锚时取回"
     },
     "details": {
-      "anchorTitle": "锚定",
-      "releaseTitle": "解锚",
       "anchoredDatetime": "锚定时间",
       "releasedDatetime": "解锚时间",
-      "anchoredNfts": "锚定总数",
       "distribution": "已取回",
-      "action": "锚定操作",
-      "stillAnchored": "仍在锚定中：ETH 将在解锚时取回。",
-      "show": "显示锚定",
-      "hide": "隐藏锚定"
+      "action": "锚定操作"
+    },
+    "anchor": {
+      "status": "状态",
+      "notAnchored": "此地址未锚定该 NFT"
     },
     "columns": {
       "depositDatetime": "存入时间",
@@ -264,7 +255,8 @@
     "empty": {
       "title": "该 NFT 暂无锚定派发",
       "description": "NFT 处于锚定状态时，每个周期收官后都会在这里新增一笔存入。",
-      "action": "浏览锚定派发"
+      "action": "浏览锚定派发",
+      "viewAction": "查看锚定操作 #{id}"
     }
   },
   "tables": {

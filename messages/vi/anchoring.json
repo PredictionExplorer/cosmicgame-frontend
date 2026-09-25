@@ -159,7 +159,7 @@
     "releaseNote": "Gỡ neo không thể hoàn tác. Bạn sẽ xác nhận ở màn hình tiếp theo trước khi ví mở ra.",
     "anchoredOn": "Neo giữ <date></date>",
     "accrued": "Đã tích lũy {amount}",
-    "cycle": "Chu kỳ #{cycle}",
+    "cycle": "Chu kỳ {cycle}",
     "open": "Mở {title}",
     "loadError": {
       "title": "Không tải được các NFT này",
@@ -190,7 +190,6 @@
   },
   "anchorActionDetail": {
     "title": "Thao tác neo giữ #{id}",
-    "subtitle": "Thao tác neo giữ cho {token} NFT",
     "errorTitle": "Không tải được thao tác neo giữ này",
     "error": "Dữ liệu neo giữ tạm thời không khả dụng. Hãy thử lại sau giây lát.",
     "breadcrumbs": {
@@ -202,16 +201,10 @@
       "browse": "Xem phân phối neo giữ",
       "statistics": "Thống kê neo giữ"
     },
-    "token": {
-      "labels": {
-        "randomWalk": "Random Walk",
-        "cosmicSignature": "Cosmic Signature"
-      }
-    },
     "record": {
       "title": "Bản ghi",
       "holder": "Người neo giữ",
-      "token": "Token"
+      "transaction": "Giao dịch"
     },
     "timeline": {
       "title": "Dòng thời gian",
@@ -243,16 +236,14 @@
       "unretrievedCaption": "Nhận về khi gỡ neo"
     },
     "details": {
-      "anchorTitle": "Neo giữ",
-      "releaseTitle": "Gỡ neo",
       "anchoredDatetime": "Thời điểm neo giữ",
       "releasedDatetime": "Thời điểm gỡ neo",
-      "anchoredNfts": "Tổng đang neo giữ",
       "distribution": "Đã nhận về",
-      "action": "Thao tác neo giữ",
-      "stillAnchored": "Vẫn đang neo giữ: ETH sẽ được nhận về khi gỡ neo.",
-      "show": "Hiện neo giữ",
-      "hide": "Ẩn neo giữ"
+      "action": "Thao tác neo giữ"
+    },
+    "anchor": {
+      "status": "Trạng thái",
+      "notAnchored": "Địa chỉ này chưa neo giữ NFT này"
     },
     "columns": {
       "depositDatetime": "Thời điểm nạp",
@@ -264,7 +255,8 @@
     "empty": {
       "title": "NFT này chưa có phân phối neo giữ nào",
       "description": "Mỗi lần một chu kỳ hoàn tất trong lúc NFT được neo giữ, một khoản nạp sẽ xuất hiện ở đây.",
-      "action": "Xem phân phối neo giữ"
+      "action": "Xem phân phối neo giữ",
+      "viewAction": "Xem thao tác neo giữ #{id}"
     }
   },
   "tables": {

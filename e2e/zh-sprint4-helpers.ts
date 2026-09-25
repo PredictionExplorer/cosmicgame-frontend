@@ -243,6 +243,13 @@ export async function mockSprint4Api(page: Page): Promise<void> {
       await route.fulfill({ json: rewardsByToken });
       return;
     }
+    // The anchor-holder's actions: where the token's anchor stands.
+    if (path.includes('/staking/cst/actions/by_user/')) {
+      await route.fulfill({
+        json: { StakingCSTActions: [anchorAction.CombinedStakingRecordInfo.Stake] },
+      });
+      return;
+    }
 
     // Connected-wallet providers used by the transfer-form browser checks.
     if (path.includes('/user/balances/')) {

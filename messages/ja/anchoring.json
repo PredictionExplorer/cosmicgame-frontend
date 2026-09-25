@@ -190,7 +190,6 @@
   },
   "anchorActionDetail": {
     "title": "係留操作 #{id}",
-    "subtitle": "{token} NFTの係留操作",
     "errorTitle": "この係留操作を読み込めませんでした",
     "error": "係留の記録を一時的に取得できません。しばらくしてからもう一度お試しください。",
     "breadcrumbs": {
@@ -202,16 +201,10 @@
       "browse": "係留配分を見る",
       "statistics": "係留統計"
     },
-    "token": {
-      "labels": {
-        "randomWalk": "Random Walk",
-        "cosmicSignature": "Cosmic Signature"
-      }
-    },
     "record": {
       "title": "記録",
       "holder": "係留者",
-      "token": "トークン"
+      "transaction": "トランザクション"
     },
     "timeline": {
       "title": "タイムライン",
@@ -243,16 +236,14 @@
       "unretrievedCaption": "係留の解除時に受け取ります"
     },
     "details": {
-      "anchorTitle": "係留",
-      "releaseTitle": "解除",
       "anchoredDatetime": "係留日時",
       "releasedDatetime": "解除日時",
-      "anchoredNfts": "全体の係留数",
       "distribution": "受け取り額",
-      "action": "係留操作",
-      "stillAnchored": "係留中です。ETHは解除時に受け取ります。",
-      "show": "係留を表示",
-      "hide": "係留を隠す"
+      "action": "係留操作"
+    },
+    "anchor": {
+      "status": "状態",
+      "notAnchored": "このアドレスはこのNFTを係留していません"
     },
     "columns": {
       "depositDatetime": "積立日時",
@@ -264,7 +255,8 @@
     "empty": {
       "title": "このNFTの係留配分はまだありません",
       "description": "NFTが係留されている間、サイクルが確定するたびにここへ積立が追加されます。",
-      "action": "係留配分を見る"
+      "action": "係留配分を見る",
+      "viewAction": "係留操作#{id}を見る"
     }
   },
   "tables": {

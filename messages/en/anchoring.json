@@ -159,7 +159,7 @@
     "releaseNote": "Releasing is permanent. You confirm on the next screen before your wallet opens.",
     "anchoredOn": "Anchored <date></date>",
     "accrued": "{amount} accrued",
-    "cycle": "Cycle #{cycle}",
+    "cycle": "Cycle {cycle}",
     "open": "Open {title}",
     "loadError": {
       "title": "These NFTs could not be loaded",
@@ -190,7 +190,6 @@
   },
   "anchorActionDetail": {
     "title": "Anchor action #{id}",
-    "subtitle": "{token} NFT anchor action",
     "errorTitle": "This anchor action could not be loaded",
     "error": "The anchoring records are temporarily unavailable. Try again in a moment.",
     "breadcrumbs": {
@@ -202,16 +201,10 @@
       "browse": "Browse Anchor Distributions",
       "statistics": "Anchoring statistics"
     },
-    "token": {
-      "labels": {
-        "randomWalk": "Random Walk",
-        "cosmicSignature": "Cosmic Signature"
-      }
-    },
     "record": {
       "title": "Record",
       "holder": "Anchor-holder",
-      "token": "Token"
+      "transaction": "Transaction"
     },
     "timeline": {
       "title": "Timeline",
@@ -243,16 +236,14 @@
       "unretrievedCaption": "Retrieved when the anchor is released"
     },
     "details": {
-      "anchorTitle": "Anchor",
-      "releaseTitle": "Release",
       "anchoredDatetime": "Anchored",
       "releasedDatetime": "Released",
-      "anchoredNfts": "Anchored in total",
       "distribution": "Retrieved",
-      "action": "Anchor action",
-      "stillAnchored": "Still anchored: the ETH is retrieved when the anchor is released.",
-      "show": "Show anchor",
-      "hide": "Hide anchor"
+      "action": "Anchor action"
+    },
+    "anchor": {
+      "status": "Status",
+      "notAnchored": "Not anchored by this address"
     },
     "columns": {
       "depositDatetime": "Deposited",
@@ -264,7 +255,8 @@
     "empty": {
       "title": "No Anchor Distributions for this NFT yet",
       "description": "A deposit appears here each time a cycle finalizes while the NFT is anchored.",
-      "action": "Browse Anchor Distributions"
+      "action": "Browse Anchor Distributions",
+      "viewAction": "View anchor action #{id}"
     }
   },
   "tables": {

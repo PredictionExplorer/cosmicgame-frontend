@@ -1,10 +1,14 @@
-import { get_staking_rewards_by_user_by_token_details } from '@/services/api/anchoring';
+import {
+  get_staking_cst_actions_by_user,
+  get_staking_rewards_by_user_by_token_details,
+} from '@/services/api/anchoring';
 import { get_cst_info } from '@/services/api/tokens';
 
 import { readTokenDistributionSeeds } from '../[address]/[tokenId]/tokenDistributionReads';
 
 jest.mock('@/services/api/anchoring', () => ({
   get_staking_rewards_by_user_by_token_details: jest.fn(),
+  get_staking_cst_actions_by_user: jest.fn(),
 }));
 jest.mock('@/services/api/tokens', () => ({ get_cst_info: jest.fn() }));
 // The real checksum (the shared viem mock returns addresses unchanged).
@@ -14,6 +18,9 @@ const mockDetails = get_staking_rewards_by_user_by_token_details as jest.MockedF
   typeof get_staking_rewards_by_user_by_token_details
 >;
 const mockCstInfo = get_cst_info as jest.MockedFunction<typeof get_cst_info>;
+const mockActions = get_staking_cst_actions_by_user as jest.MockedFunction<
+  typeof get_staking_cst_actions_by_user
+>;
 
 const HOLDER = '0x7406B34d25A9B7841CAC133E3173919e0af6Bc6c';
 
@@ -25,6 +32,7 @@ describe('readTokenDistributionSeeds', () => {
     mockCstInfo.mockResolvedValue({ TokenId: 47, RoundNum: 2 } as Awaited<
       ReturnType<typeof get_cst_info>
     >);
+    mockActions.mockResolvedValue([]);
   });
   afterAll(() => {
     if (previous === undefined) delete process.env.PLAYWRIGHT;
@@ -36,6 +44,8 @@ describe('readTokenDistributionSeeds', () => {
     const seeds = await readTokenDistributionSeeds(HOLDER, 47);
     expect(seeds).toEqual([
       { queryKey: ['stakingRewardsByUserByToken', HOLDER, 47], data: {}, at: expect.any(Number) },
+      // Where the NFT's anchor stands, among the anchor-holder's actions.
+      { queryKey: ['stakingCSTActionsByUser', HOLDER], data: [], at: expect.any(Number) },
       {
         queryKey: ['cstInfo', 47],
         data: { TokenId: 47, RoundNum: 2 },
@@ -54,6 +64,7 @@ describe('readTokenDistributionSeeds', () => {
     mockDetails.mockResolvedValue({});
     const seeds = await readTokenDistributionSeeds(HOLDER.toLowerCase(), 47);
     expect(mockDetails).toHaveBeenCalledWith(HOLDER, 47);
+    expect(mockActions).toHaveBeenCalledWith(HOLDER);
     expect(seeds[0]).toMatchObject({ queryKey: ['stakingRewardsByUserByToken', HOLDER, 47] });
   });
 
@@ -62,6 +73,7 @@ describe('readTokenDistributionSeeds', () => {
       await expect(readTokenDistributionSeeds(raw, 47)).resolves.toEqual([]);
     }
     expect(mockDetails).not.toHaveBeenCalled();
+    expect(mockActions).not.toHaveBeenCalled();
   });
 
   it('reads nothing for a token id that is not one, or under the e2e harness', async () => {

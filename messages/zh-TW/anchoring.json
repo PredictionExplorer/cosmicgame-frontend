@@ -190,7 +190,6 @@
   },
   "anchorActionDetail": {
     "title": "錨定操作 #{id}",
-    "subtitle": "{token} NFT 錨定操作",
     "errorTitle": "無法載入該錨定操作",
     "error": "錨定紀錄暫時無法取得，請稍後再試。",
     "breadcrumbs": {
@@ -202,16 +201,10 @@
       "browse": "瀏覽錨定配發",
       "statistics": "錨定統計"
     },
-    "token": {
-      "labels": {
-        "randomWalk": "Random Walk",
-        "cosmicSignature": "Cosmic Signature"
-      }
-    },
     "record": {
       "title": "紀錄",
       "holder": "錨定者",
-      "token": "代幣"
+      "transaction": "交易"
     },
     "timeline": {
       "title": "時間軸",
@@ -243,16 +236,14 @@
       "unretrievedCaption": "解錨時取回"
     },
     "details": {
-      "anchorTitle": "錨定",
-      "releaseTitle": "解錨",
       "anchoredDatetime": "錨定時間",
       "releasedDatetime": "解錨時間",
-      "anchoredNfts": "錨定總數",
       "distribution": "已取回",
-      "action": "錨定操作",
-      "stillAnchored": "仍在錨定中：ETH 將在解錨時取回。",
-      "show": "顯示錨定",
-      "hide": "隱藏錨定"
+      "action": "錨定操作"
+    },
+    "anchor": {
+      "status": "狀態",
+      "notAnchored": "此地址未錨定這枚 NFT"
     },
     "columns": {
       "depositDatetime": "存入時間",
@@ -264,7 +255,8 @@
     "empty": {
       "title": "該 NFT 暫無錨定配發",
       "description": "NFT 處於錨定狀態時，每個週期收官後都會在這裡新增一筆存入。",
-      "action": "瀏覽錨定配發"
+      "action": "瀏覽錨定配發",
+      "viewAction": "檢視錨定操作 #{id}"
     }
   },
   "tables": {

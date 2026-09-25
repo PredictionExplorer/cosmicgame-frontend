@@ -44,11 +44,19 @@ describe('AnchorActionDetailPage', () => {
     render(<AnchorActionDetailPage IsRwalk={1} actionId={33} />);
     expect(mockRwlk).toHaveBeenCalledWith(33);
     expect(mockCst).toHaveBeenCalledWith(null);
+  });
+
+  it('says its status right under the title, and records the holder and the transaction', () => {
+    mockCst.mockReturnValue({ ...idle, data: { Stake: anchor, Unstake: noRelease } });
+    render(<AnchorActionDetailPage IsRwalk={0} actionId={1} />);
+    // One line under the H1, no lede repeating the title in words.
     expect(
-      screen.getByText(
-        'anchoring.anchorActionDetail.subtitle(token=anchoring.anchorActionDetail.token.labels.randomWalk)',
-      ),
-    ).toBeInTheDocument();
+      screen.getByTestId('anchor-status').closest('[data-slot="page-header-identity"]'),
+    ).not.toBeNull();
+    expect(screen.getByText('anchoring.anchorActionDetail.record.transaction')).toBeInTheDocument();
+    expect(document.querySelector('a[href*="0xanchor"]')).toHaveAttribute('target', '_blank');
+    // The plate's wall label names the token: the record does not repeat it.
+    expect(screen.queryByText('anchoring.anchorActionDetail.record.token')).toBeNull();
   });
 
   it('shows the NFT, its anchor-holder, a status and a timeline for a record', () => {
