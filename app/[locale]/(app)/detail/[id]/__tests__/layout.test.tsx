@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation';
 
 import TokenLayout from '../layout';
-import { parseTokenId } from '../tokenId';
 
 jest.mock('next/navigation', () => ({
   notFound: jest.fn(() => {
@@ -10,20 +9,6 @@ jest.mock('next/navigation', () => ({
 }));
 
 const render = (id: string) => TokenLayout({ children: 'page', params: Promise.resolve({ id }) });
-
-describe('parseTokenId', () => {
-  it.each([
-    ['0', 0],
-    ['25', 25],
-    ['000025', 25],
-  ])('reads %s as %d', (id, expected) => {
-    expect(parseTokenId(id)).toBe(expected);
-  });
-
-  it.each(['not-a-token', '-1', '1.5', '', '1e3', '99999999999999999999'])('refuses %p', (id) => {
-    expect(parseTokenId(id)).toBeNull();
-  });
-});
 
 describe('token route layout', () => {
   afterEach(() => jest.clearAllMocks());

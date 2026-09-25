@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { notFound } from 'next/navigation';
 
-import { parseTokenId } from './tokenId';
+import { parseTokenId } from '@/utils/routeParams';
 
 interface TokenLayoutProps {
   children: ReactNode;

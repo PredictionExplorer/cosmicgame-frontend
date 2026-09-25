@@ -1,4 +1,4 @@
-import { parseCanonicalNonNegativeSafeInteger } from '../routeParams';
+import { parseCanonicalNonNegativeSafeInteger, parseTokenId } from '../routeParams';
 
 describe('parseCanonicalNonNegativeSafeInteger', () => {
   it.each([
@@ -24,5 +24,19 @@ describe('parseCanonicalNonNegativeSafeInteger', () => {
     String(Number.MAX_SAFE_INTEGER + 1),
   ])('rejects non-canonical or unsafe cycle ID %j', (raw) => {
     expect(parseCanonicalNonNegativeSafeInteger(raw)).toBeNull();
+  });
+});
+
+describe('parseTokenId', () => {
+  it.each([
+    ['0', 0],
+    ['25', 25],
+    ['000025', 25],
+  ])('reads %s as %d', (id, expected) => {
+    expect(parseTokenId(id)).toBe(expected);
+  });
+
+  it.each(['not-a-token', '-1', '1.5', '', '1e3', '99999999999999999999'])('refuses %p', (id) => {
+    expect(parseTokenId(id)).toBeNull();
   });
 });

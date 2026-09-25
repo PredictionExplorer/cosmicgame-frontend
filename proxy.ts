@@ -14,6 +14,7 @@ import {
   normalizeHost,
   splitLocalePrefix,
 } from '@/lib/hostRouting';
+import { UNMATCHED_INTERNAL_PATH, hasMalformedRouteId } from '@/lib/idRoutes';
 
 export const config = {
   matcher: [
@@ -145,6 +146,19 @@ export default function middleware(req: NextRequest) {
   }
 
   const response = withoutLocaleCookieWrites(intlMiddleware(req));
+
+  // An id page with an id it would turn away (/detail/abc) is the global 404
+  // too: the page's own notFound() would arrive as Next.js's bare error
+  // shell, blank without script. The rewrite keeps next-intl's request
+  // headers (the resolved locale) and the visitor's URL.
+  if (!isRedirect(response) && hasMalformedRouteId(publicPath)) {
+    const target = req.nextUrl.clone();
+    target.pathname = `/${locale ?? routing.defaultLocale}${UNMATCHED_INTERNAL_PATH}`;
+    const notFound = NextResponse.rewrite(target, { headers: response.headers });
+    notFound.headers.delete('link');
+    return notFound;
+  }
+
   // A path no page starts with is a 404 (app/global-not-found.tsx): it has no
   // editions in other languages to advertise.
   if (!isKnownPublicPath(publicPath)) response.headers.delete('link');

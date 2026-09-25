@@ -5,22 +5,38 @@ import { expect, test } from '@playwright/test';
  * document rendered on the server: styled, dark from the first paint and
  * complete without script. It once arrived as an empty error shell with no
  * stylesheet, a white page until the app bundle hydrated, and nothing at all
- * for readers without script, crawlers and link unfurlers.
+ * for readers without script, crawlers and link unfurlers. An id page with
+ * an id it turns away (/detail/abc) gets the same 404 from proxy.ts, since
+ * the page's own notFound() would arrive as that empty shell.
  */
 const LANDING_HEADERS = { 'X-Forwarded-Host': 'cosmicsignature.com' };
 
 test.use({ javaScriptEnabled: false });
 
-for (const { host, path, headers } of [
-  { host: 'app', path: '/quality-assurance-route-not-found', headers: {} },
-  { host: 'app', path: '/ja/quality-assurance-route-not-found', headers: {} },
-  { host: 'landing', path: '/quality-assurance-route-not-found', headers: LANDING_HEADERS },
-  { host: 'landing', path: '/learn/quality-assurance-not-found', headers: LANDING_HEADERS },
+for (const { host, path, lang, headers } of [
+  { host: 'app', path: '/quality-assurance-route-not-found', lang: 'en', headers: {} },
+  { host: 'app', path: '/ja/quality-assurance-route-not-found', lang: 'ja', headers: {} },
+  { host: 'app', path: '/zh/detail/abc', lang: 'zh', headers: {} },
+  { host: 'app', path: '/allocation/01', lang: 'en', headers: {} },
+  {
+    host: 'landing',
+    path: '/quality-assurance-route-not-found',
+    lang: 'en',
+    headers: LANDING_HEADERS,
+  },
+  {
+    host: 'landing',
+    path: '/learn/quality-assurance-not-found',
+    lang: 'en',
+    headers: LANDING_HEADERS,
+  },
 ]) {
   test(`${host} ${path} renders the designed 404 without script`, async ({ context, page }) => {
     await context.setExtraHTTPHeaders(headers);
     const response = await page.goto(path);
     expect(response?.status()).toBe(404);
+    expect(new URL(page.url()).pathname).toBe(path);
+    await expect(page.locator('html')).toHaveAttribute('lang', lang);
 
     const main = page.getByRole('main');
     await expect(main.getByRole('heading', { level: 1 })).toBeVisible();
@@ -68,5 +84,13 @@ test.describe('with script', () => {
       };
     });
     expect(state).toEqual({ documents: 1, display: true, text: true, scrolled: true });
+  });
+
+  test('keeps the address of a malformed id page once it hydrates', async ({ page }) => {
+    const response = await page.goto('/zh/detail/abc');
+    expect(response?.status()).toBe(404);
+    await expect(page.getByRole('main').getByRole('heading', { level: 1 })).toBeVisible();
+    await page.waitForLoadState('networkidle');
+    expect(new URL(page.url()).pathname).toBe('/zh/detail/abc');
   });
 });

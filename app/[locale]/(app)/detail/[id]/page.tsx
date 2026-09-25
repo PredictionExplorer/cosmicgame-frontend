@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { formatId, getAssetsUrl, logoImgUrl } from '@/utils';
+import { formatId, getAssetsUrl, logoImgUrl, parseTokenId } from '@/utils';
 
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import {
@@ -21,7 +21,6 @@ import { PageMessages } from '@/components/i18n/PageMessages';
 import { signatureTitle } from '@/components/nft/nftName';
 
 import DetailPage from './DetailPage';
-import { parseTokenId } from './tokenId';
 
 /**
  * ISR (was force-dynamic): token metadata is immutable once imprinted, so a

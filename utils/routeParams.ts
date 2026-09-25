@@ -9,3 +9,14 @@ export function parseCanonicalNonNegativeSafeInteger(raw: string): number | null
   const value = Number(raw);
   return Number.isSafeInteger(value) ? value : null;
 }
+
+/**
+ * A token id from the URL (`/detail/25`, `/detail/000025`): a whole, safe,
+ * non-negative number, else null. Leading zeroes are allowed, because the
+ * site prints token ids zero-padded.
+ */
+export function parseTokenId(raw: string): number | null {
+  if (!/^\d+$/.test(raw)) return null;
+  const tokenId = Number(raw);
+  return Number.isSafeInteger(tokenId) ? tokenId : null;
+}

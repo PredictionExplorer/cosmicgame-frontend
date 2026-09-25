@@ -1,8 +1,9 @@
-// The app's 404 for a route segment that calls notFound() (an id that is
-// not a token, a cycle that does not parse). An unknown URL never reaches
-// it: app/global-not-found.tsx renders those on the server. A segment's
-// notFound() in a dynamic render arrives as Next.js's bare error shell,
-// which the client fills with this page once the bundle runs.
+// The app's 404 for a route segment that calls notFound() once it has read
+// its data (a token the API has no record of). A segment's notFound()
+// arrives as Next.js's bare error shell, which the client fills with this
+// page once the bundle runs, so everything that can be answered before
+// routing is: app/global-not-found.tsx renders unknown URLs, and ids a page
+// would turn away (/detail/abc, lib/idRoutes.ts), on the server.
 import { NotFoundView } from '@/components/layout/NotFoundView';
 import { PageShell } from '@/components/ui/page-shell';
 
