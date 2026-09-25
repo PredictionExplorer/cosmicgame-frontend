@@ -1,0 +1,34 @@
+{
+  "en": {
+    "pdf": "/white-paper/cosmic-signature-white-paper-v1.0.pdf",
+    "sourceSha256": "50838076821c36c422daf71985b2ca46a4803af7025fd1ca12b25cca0fb3203e"
+  },
+  "zh": {
+    "pdf": "/white-paper/cosmic-signature-white-paper-v1.0-zh.pdf",
+    "sourceSha256": "c4ad608e3f7b652f859f883fab85fce717b266fe4a945a8349416957166b7ffb"
+  },
+  "zh-TW": {
+    "pdf": "/white-paper/cosmic-signature-white-paper-v1.0-zh-TW.pdf",
+    "sourceSha256": "7d31ece3af6cafc2220d4d97de0146755e0f2e808ad3601f076e874b832d6fcd"
+  },
+  "zh-HK": {
+    "pdf": "/white-paper/cosmic-signature-white-paper-v1.0-zh-HK.pdf",
+    "sourceSha256": "b57ff6b9b27fecac23ef5d1841d8c6bcde84a22aab2966a8763b7014d778a5c1"
+  },
+  "uk": {
+    "pdf": "/white-paper/cosmic-signature-white-paper-v1.0-uk.pdf",
+    "sourceSha256": "d4d45272f2e06834abb56ca4f35f0dc955dd6d10d3e75fdf06de271a334d6d06"
+  },
+  "ko": {
+    "pdf": "/white-paper/cosmic-signature-white-paper-v1.0-ko.pdf",
+    "sourceSha256": "dfbc2eb772ef4460eb1c78ad99c53b0cc1994ee35180a2425c04d4c5b8d04966"
+  },
+  "ja": {
+    "pdf": "/white-paper/cosmic-signature-white-paper-v1.0-ja.pdf",
+    "sourceSha256": "c6f0fca55a96606d2e4ff4062e7cb8041c4dc018fb94ef673db2de5b90505c1a"
+  },
+  "vi": {
+    "pdf": "/white-paper/cosmic-signature-white-paper-v1.0-vi.pdf",
+    "sourceSha256": "04419719f121c4281c365d715d631fa60a2cccc8a64182407b0386bccc2a8007"
+  }
+}
