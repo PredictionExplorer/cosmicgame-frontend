@@ -1,5 +1,6 @@
 import { render } from '@testing-library/react';
 
+import { cssTimeToMs } from '@/components/layout/RouteEntrance';
 import { resetDocumentEntranceForTesting } from '@/lib/motion';
 
 import AppTemplate from '../template';
@@ -109,5 +110,16 @@ describe.each([
       </Template>,
     );
     expect(animate).not.toHaveBeenCalled();
+  });
+});
+
+describe('cssTimeToMs', () => {
+  it('reads the motion tokens in either unit, as authored or minified', () => {
+    expect(cssTimeToMs('560ms')).toBe(560);
+    expect(cssTimeToMs(' 0.56s ')).toBe(560);
+    expect(cssTimeToMs('.56s')).toBe(560);
+    expect(cssTimeToMs('')).toBeNull();
+    expect(cssTimeToMs('fast')).toBeNull();
+    expect(cssTimeToMs('0ms')).toBeNull();
   });
 });

@@ -4,13 +4,24 @@ import { useLayoutEffect, useRef, type ReactNode } from 'react';
 
 import { useIsInitialDocumentLoad } from '@/lib/motion';
 
+/**
+ * A CSS time in milliseconds ("560ms", or "0.56s" once the stylesheet is
+ * minified), or null when it is not one.
+ */
+export function cssTimeToMs(value: string): number | null {
+  const match = /^(-?[\d.]+)(ms|s)$/.exec(value.trim());
+  if (!match) return null;
+  const amount = Number.parseFloat(match[1]!);
+  if (!Number.isFinite(amount) || amount <= 0) return null;
+  return match[2] === 's' ? amount * 1000 : amount;
+}
+
 /** The page entrance's timing, from the motion tokens (styles/tokens.css). */
 function entranceTiming(element: HTMLElement): KeyframeAnimationOptions {
   const styles = getComputedStyle(element);
-  const duration = Number.parseFloat(styles.getPropertyValue('--duration-page'));
   const easing = styles.getPropertyValue('--ease-out-expo').trim();
   return {
-    duration: Number.isFinite(duration) && duration > 0 ? duration : 560,
+    duration: cssTimeToMs(styles.getPropertyValue('--duration-page')) ?? 560,
     easing: easing || 'cubic-bezier(0.16, 1, 0.3, 1)',
   };
 }
