@@ -23,7 +23,6 @@ import {
   formatZonedDateTimeParts,
   isZeroAddress,
   sameAddress,
-  shortenHex,
   toIsoDateTime,
   toIsoDuration,
   type AmountContext,
@@ -475,12 +474,6 @@ describe('addresses', () => {
     expect(formatAddress('vitalik.eth')).toBe('vitalik.eth');
     expect(formatAddress('')).toBe('');
     expect(formatAddress(undefined)).toBe('');
-  });
-
-  it('routes the legacy shortenHex through the one standard, whatever length is passed', () => {
-    expect(shortenHex(lower, 6)).toBe(formatAddress(lower));
-    expect(shortenHex(lower, 8)).toBe(formatAddress(lower));
-    expect(shortenHex(lower)).toBe(formatAddress(lower));
   });
 
   it('recognizes the zero address and compares addresses case-insensitively', () => {

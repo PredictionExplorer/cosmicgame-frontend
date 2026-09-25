@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 
-import { shortenHex } from '@/utils';
+import { formatAddress } from '@/utils';
 
 import { checkA11y, render, screen } from '@/test-utils';
 
@@ -53,8 +53,8 @@ describe('AnchoringRecipientTable', () => {
   it('renders shortened anchorHolder address with link', () => {
     const addr = '0x1234567890abcdef1234567890abcdef12345678';
     render(<AnchoringRecipientTable list={[createRecipient({ StakerAddr: addr })]} />);
-    expect(screen.getByText(shortenHex(addr, 6))).toBeInTheDocument();
-    const addrLink = screen.getByText(shortenHex(addr, 6)).closest('a');
+    expect(screen.getByText(formatAddress(addr))).toBeInTheDocument();
+    const addrLink = screen.getByText(formatAddress(addr)).closest('a');
     expect(addrLink).toHaveAttribute('href', `/user/${addr}`);
   });
 

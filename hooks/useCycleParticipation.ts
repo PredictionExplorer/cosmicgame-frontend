@@ -3,10 +3,9 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
-import api from '@/services/api';
 import type { GestureInfo, UserInfoWithLists } from '@/services/api';
 import { useApiData } from '@/contexts/ApiDataContext';
-import { useNotifyRedBox } from '@/hooks/useApiQuery';
+import { useNotifyRedBox, userInfoQueryOptions } from '@/hooks/useApiQuery';
 import { summarizePendingRetrievals } from '@/lib/pendingRetrievals';
 import { getCstGestureCost, getEthGestureCost, resolveGestureType } from '@/utils/gesturePayment';
 
@@ -50,10 +49,10 @@ export function useCycleParticipation(
   account: string | null | undefined,
   cycle: number | null | undefined,
 ): CycleParticipation & { refetch: () => void } {
+  // The same `user/info` entry `useUserInfo` polls: where both mount, the
+  // profile's poll refreshes this too; alone, it is read once per wallet.
   const query = useQuery<UserInfoWithLists | null>({
-    queryKey: ['userInfo', account],
-    queryFn: ({ signal }) => api.get_user_info(account!, { signal }),
-    enabled: !!account,
+    ...userInfoQueryOptions(account),
     staleTime: 5 * 60_000,
     refetchOnWindowFocus: false,
   });

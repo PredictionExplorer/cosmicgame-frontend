@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 
-import { shortenHex } from '@/utils';
+import { formatAddress } from '@/utils';
 import {
   TEST_STAKING_CST_LABEL,
   TEST_STAKING_RWALK_LABEL,
@@ -117,7 +117,7 @@ describe('TransferHistoryTable', () => {
   it('shows shortened hex for regular addresses', () => {
     const addr = '0x1111111111111111111111111111111111111111';
     render(<TransferHistoryTable list={[createRecord({ FromAddr: addr })]} />);
-    expect(screen.getByText(shortenHex(addr, 6))).toBeInTheDocument();
+    expect(screen.getByText(formatAddress(addr))).toBeInTheDocument();
   });
 
   it('renders From and To as links to user pages', () => {

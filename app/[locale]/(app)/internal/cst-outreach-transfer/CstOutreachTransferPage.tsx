@@ -12,7 +12,7 @@ import { SkeletonDetailRows } from '@/components/ui/skeleton';
 import { WalletRequiredState } from '@/components/wallet/WalletRequiredState';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { useActiveWeb3React } from '@/hooks/web3';
-import { sameAddress } from '@/utils/address';
+import { sameAddress } from '@/utils/format';
 
 /**
  * The outreach transfer tool, below the operator header. It asks for a

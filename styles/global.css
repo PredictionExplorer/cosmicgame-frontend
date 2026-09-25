@@ -755,29 +755,6 @@ body:has([data-maintenance-banner]) .home-control-shell {
   initial-value: 0;
 }
 
-.cm-scroller::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
-}
-
-.cm-scroller::-webkit-scrollbar-track {
-  border-radius: 200px;
-  background: hsl(var(--card));
-}
-
-.cm-scroller::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted-foreground) / 0.45);
-  border-radius: 200px;
-}
-
-.cm-scroller::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--secondary));
-}
-
-.cm-scroller::-webkit-scrollbar-corner {
-  display: none;
-}
-
 /*
  * Horizontal pill scrollers (FAQ categories, statistics sub-nav) rely on this
  * to hide the scrollbar. It was referenced but never defined, so those rows
@@ -1009,40 +986,6 @@ body:has([data-maintenance-banner]) .home-control-shell {
   mask-composite: intersect;
 }
 
-@keyframes pulse-glow {
-  0%,
-  100% {
-    opacity: 1;
-    box-shadow: 0 0 8px hsl(var(--primary) / 0.3);
-  }
-  50% {
-    opacity: 0.85;
-    box-shadow: 0 0 20px hsl(var(--primary) / 0.5);
-  }
-}
-
-@keyframes gradient-shift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-@keyframes urgency-pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.6;
-  }
-}
-
 /* A live dot breathes; it never grows. */
 @keyframes live-dot {
   0%,
@@ -1051,18 +994,6 @@ body:has([data-maintenance-banner]) .home-control-shell {
   }
   50% {
     opacity: 0.35;
-  }
-}
-
-@keyframes live-flash {
-  0% {
-    box-shadow: 0 0 0 0 hsl(var(--primary) / 0.42);
-  }
-  70% {
-    box-shadow: 0 0 0 10px hsl(var(--primary) / 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 hsl(var(--primary) / 0);
   }
 }
 
@@ -1075,25 +1006,8 @@ body:has([data-maintenance-banner]) .home-control-shell {
   }
 }
 
-.animate-pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
-}
-
-.animate-gradient-shift {
-  background-size: 200% 200%;
-  animation: gradient-shift 4s ease infinite;
-}
-
-.animate-urgency-pulse {
-  animation: urgency-pulse 1s ease-in-out infinite;
-}
-
 .animate-live-dot {
   animation: live-dot 2.4s ease-in-out infinite;
-}
-
-.animate-live-flash {
-  animation: live-flash var(--duration-settle) ease-out 1;
 }
 
 .animate-shimmer {
@@ -1326,23 +1240,12 @@ body:has([data-maintenance-banner]) .home-control-shell {
   }
 
   /*
-   * Gradient borders use masks; print engines often composite them as opaque and cover text.
-   * Stat cards fall back to a normal border (see StatCard print:border on featured).
+   * Gradient borders use masks; print engines often composite them as opaque and cover text,
+   * so a Surface prints with its plain border.
    */
   .gradient-border-card::before,
   .gradient-border-card-accent::before {
     display: none !important;
-  }
-
-  /*
-   * bg-clip-text + text-transparent often prints as blank; StatCard also forces solid text via utilities.
-   */
-  .bg-clip-text.text-transparent {
-    color: hsl(var(--foreground)) !important;
-    -webkit-text-fill-color: hsl(var(--foreground)) !important;
-    background-image: none !important;
-    -webkit-background-clip: border-box !important;
-    background-clip: border-box !important;
   }
 
   /*
@@ -1353,103 +1256,6 @@ body:has([data-maintenance-banner]) .home-control-shell {
     opacity: 1 !important;
     transform: none !important;
     visibility: visible !important;
-  }
-
-  /*
-   * My Statistics hero: ensure stat values render as ink (featured uses text-white on screen).
-   * Activity overview: keep the card visible; do not force transform:none on all descendants —
-   * Chrome print can collapse flex text when every nested node is reset that way.
-   */
-  [data-testid='hero-stats'],
-  [data-testid='hero-stats'] > div {
-    opacity: 1 !important;
-    transform: none !important;
-    visibility: visible !important;
-  }
-
-  [data-testid='hero-stats'] .stat-card-value {
-    color: hsl(var(--foreground)) !important;
-    -webkit-text-fill-color: hsl(var(--foreground)) !important;
-    background-image: none !important;
-    -webkit-background-clip: border-box !important;
-    background-clip: border-box !important;
-    opacity: 1 !important;
-  }
-
-  [data-testid='activity-summary'] {
-    opacity: 1 !important;
-    transform: none !important;
-    visibility: visible !important;
-    overflow: visible !important;
-    max-height: none !important;
-  }
-
-  /*
-   * Activity Overview (My Statistics): Skia PDF often drops text that sits under
-   * backdrop-filter + overflow-hidden on the Card, or mis-lays out sm:divide-x grids.
-   */
-  [data-testid='activity-summary'] .activity-overview-card {
-    overflow: visible !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    box-shadow: none !important;
-    background-color: hsl(var(--background)) !important;
-    background-image: none !important;
-    color: hsl(var(--foreground)) !important;
-  }
-
-  [data-testid='activity-summary'] .activity-overview-grid {
-    display: block !important;
-    width: 100% !important;
-  }
-
-  [data-testid='activity-summary'] .activity-overview-grid > .activity-overview-group {
-    display: block !important;
-    width: 100% !important;
-    border-left: none !important;
-    padding-left: 0 !important;
-    margin-left: 0 !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    color: hsl(var(--foreground)) !important;
-  }
-
-  [data-testid='activity-summary'] .activity-overview-heading,
-  [data-testid='activity-summary'] .activity-overview-group-title,
-  [data-testid='activity-summary'] .activity-overview-label {
-    color: hsl(var(--foreground)) !important;
-    -webkit-text-fill-color: hsl(var(--foreground)) !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-  }
-
-  [data-testid='activity-summary'] .activity-stat-value {
-    color: hsl(var(--foreground)) !important;
-    -webkit-text-fill-color: hsl(var(--foreground)) !important;
-    opacity: 1 !important;
-  }
-
-  /* Special Prize Leaders: mask-free borders only; force legible text in Skia PDF */
-  [data-special-prize-leaders] {
-    position: relative;
-    z-index: 2;
-    display: block !important;
-    width: 100% !important;
-    height: auto !important;
-    max-height: none !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    overflow: visible !important;
-    break-inside: auto;
-    page-break-inside: auto;
-  }
-
-  [data-special-prize-leaders] h3,
-  [data-special-prize-leaders] a,
-  [data-special-prize-leaders] .font-mono {
-    color: hsl(var(--foreground)) !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
   }
 
   /* Content area was spaced for a fixed header; tighten for flowed header */
@@ -1468,11 +1274,7 @@ body:has([data-maintenance-banner]) .home-control-shell {
   html {
     scroll-behavior: auto;
   }
-  .animate-pulse-glow,
-  .animate-gradient-shift,
-  .animate-urgency-pulse,
   .animate-live-dot,
-  .animate-live-flash,
   .animate-shimmer {
     animation: none;
   }

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { useWalletAccount, type WalletAccountState } from '@/hooks/useWalletAccount';
 import { cn } from '@/lib/utils';
-import { shortenHex } from '@/utils/format';
+import { formatAddress } from '@/utils/format';
 
 import { SwitchNetworkButton } from './NetworkGuard';
 
@@ -49,7 +49,7 @@ function AddressRow({ account }: { account: WalletAccountState }) {
           <p className="text-xs text-muted-foreground">{account.walletName}</p>
         )}
         <p className="truncate font-mono text-sm text-foreground" title={account.address}>
-          {shortenHex(account.address, 6)}
+          {formatAddress(account.address)}
         </p>
       </div>
       <Button

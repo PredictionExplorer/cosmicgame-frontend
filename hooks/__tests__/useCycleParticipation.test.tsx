@@ -17,7 +17,11 @@ jest.mock('@/services/api', () => ({
   __esModule: true,
   default: { get_user_info: jest.fn() },
 }));
-jest.mock('../useApiQuery', () => ({ useNotifyRedBox: jest.fn() }));
+jest.mock('../useApiQuery', () => ({
+  useNotifyRedBox: jest.fn(),
+  // The real options factory: the hook shares its key and fetcher.
+  userInfoQueryOptions: jest.requireActual('../useApiQuery').userInfoQueryOptions,
+}));
 let mockClaimableActionIds: unknown[] | undefined = [{ DepositId: 1, StakeActionId: 2 }];
 jest.mock('@/contexts/ApiDataContext', () => ({
   useApiData: () => ({ apiData: { claimableActionIds: mockClaimableActionIds } }),

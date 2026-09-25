@@ -68,7 +68,6 @@ export {
   formatAddress,
   isZeroAddress,
   sameAddress,
-  shortenHex,
   type AddressFormatOptions,
   type KnownAddressKey,
 } from './format/addresses';

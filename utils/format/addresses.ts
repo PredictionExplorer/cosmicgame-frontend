@@ -88,18 +88,6 @@ export function formatAddress(
 }
 
 /**
- * Shortens a hex string (an address or a hash) for display. Delegates to
- * `formatAddress`, so every caller shows the one standard form
- * ("0x1Ec1…E990"); the second argument is ignored and kept only so existing
- * call sites compile.
- *
- * @deprecated Use `<AddressChip>` for addresses in UI, or `formatAddress`.
- */
-export function shortenHex(hex: string, _legacyLength?: number): string {
-  return formatAddress(hex);
-}
-
-/**
  * The catalog label of each protocol contract: `formats` `address.known.<key>`.
  * The keys and names match the /contracts page (`contracts.entries.<key>.name`)
  * in every locale, pinned by utils/__tests__/format-known-addresses.test.ts.

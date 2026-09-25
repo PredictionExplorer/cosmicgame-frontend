@@ -1,5 +1,5 @@
 import {
-  shortenHex,
+  formatAddress,
   formatId,
   formatSeconds,
   getExplorerUrl,
@@ -8,28 +8,20 @@ import {
   getEnduranceChampions,
 } from '@/utils/index';
 
-describe('shortenHex', () => {
+describe('formatAddress through the utils entry', () => {
   it('shortens a standard Ethereum address to the checksummed 0x + 4 … 4 form', () => {
     const addr = '0x1234567890abcdef1234567890abcdef12345678';
-    expect(shortenHex(addr, 4)).toBe('0x1234…\u20605678');
+    expect(formatAddress(addr)).toBe('0x1234…\u20605678');
   });
 
-  it('ignores the legacy length so every address reads the same', () => {
-    const addr = '0x1234567890abcdef1234567890abcdef12345678';
-    expect(shortenHex(addr, 6)).toBe('0x1234…\u20605678');
-  });
-
-  it('returns empty string for falsy input', () => {
-    expect(shortenHex('', 4)).toBe('');
-  });
-
-  it('returns empty string for null-like inputs', () => {
-    expect(shortenHex(null as unknown as string, 4)).toBe('');
-    expect(shortenHex(undefined as unknown as string, 4)).toBe('');
+  it('returns an empty string for empty input', () => {
+    expect(formatAddress('')).toBe('');
+    expect(formatAddress(null)).toBe('');
+    expect(formatAddress(undefined)).toBe('');
   });
 
   it('returns strings too short to shorten unchanged', () => {
-    expect(shortenHex('0x12', 4)).toBe('0x12');
+    expect(formatAddress('0x12')).toBe('0x12');
   });
 });
 

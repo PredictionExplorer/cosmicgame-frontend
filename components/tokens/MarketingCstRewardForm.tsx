@@ -14,7 +14,7 @@ import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { useNotify } from '@/hooks/useNotify';
 import { useTxFlow, useTxStageLabel } from '@/hooks/useTxFlow';
 import { Link } from '@/i18n/navigation';
-import { sameAddress } from '@/utils/address';
+import { sameAddress } from '@/utils/format';
 import { reportError } from '@/utils/errors';
 import { formatAmountParts, NBSP } from '@/utils/format';
 import { getLocaleConfig } from '@/i18n/localeConfig';

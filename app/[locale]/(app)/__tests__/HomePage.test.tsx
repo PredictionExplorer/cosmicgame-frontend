@@ -1,6 +1,6 @@
 import userEvent from '@testing-library/user-event';
 
-import { shortenHex } from '@/utils';
+import { formatAddress } from '@/utils';
 
 import { resetUxScenarioForTest } from '@/lib/uxCycleScenarios';
 
@@ -1781,7 +1781,7 @@ describe('HomePage', () => {
 
       expect(eventsOfKind('enduranceGrowing')).toHaveLength(2);
       const newEndurance = eventsOfKind('enduranceGrowing')[0]!;
-      expect(newEndurance).toHaveTextContent(`address=${shortenHex(secondAddress, 4)}`);
+      expect(newEndurance).toHaveTextContent(`address=${formatAddress(secondAddress)}`);
       expect(newEndurance.querySelector('time')).toHaveAttribute(
         'dateTime',
         new Date((cycleStart + 201) * 1000).toISOString(),
@@ -1792,7 +1792,7 @@ describe('HomePage', () => {
 
       expect(eventsOfKind('chronoLead')).toHaveLength(2);
       const newChrono = eventsOfKind('chronoLead')[0]!;
-      expect(newChrono).toHaveTextContent(`address=${shortenHex(secondAddress, 4)}`);
+      expect(newChrono).toHaveTextContent(`address=${formatAddress(secondAddress)}`);
       expect(newChrono.querySelector('time')).toHaveAttribute(
         'dateTime',
         new Date((cycleStart + 401) * 1000).toISOString(),

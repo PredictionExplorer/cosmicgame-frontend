@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 
-import { shortenHex } from '@/utils';
+import { formatAddress } from '@/utils';
 
 import { UniqueAnchorHoldersCSTTable } from '@/components/tables/UniqueAnchorHoldersCSTTable';
 
@@ -111,7 +111,7 @@ describe('UniqueAnchorHoldersCSTTable', () => {
   it('renders shortened address with link', () => {
     const addr = '0x1234567890abcdef1234567890abcdef12345678';
     render(<UniqueAnchorHoldersCSTTable list={[createAnchorHolder({ StakerAddr: addr })]} />);
-    expect(screen.getByText(shortenHex(addr, 6))).toBeInTheDocument();
+    expect(screen.getByText(formatAddress(addr))).toBeInTheDocument();
     const links = screen.getAllByRole('link');
     const userLink = links.find((l) => l.getAttribute('href')?.startsWith('/user/'));
     expect(userLink).toHaveAttribute('href', `/user/${addr}`);

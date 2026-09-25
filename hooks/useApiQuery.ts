@@ -997,11 +997,23 @@ export function useDonationsERC20ByUser(address: string | null | undefined) {
 // Users & Statistics
 // ---------------------------------------------------------------------------
 
+/**
+ * The one definition of a wallet's `user/info` read (key, fetcher, gate), so
+ * every hook that reads it shares one cache entry and cannot drift. Callers
+ * override only how often it refreshes.
+ */
+export function userInfoQueryOptions(address: string | null | undefined) {
+  return {
+    queryKey: ['userInfo', address] as const,
+    queryFn: ({ signal }: { signal: AbortSignal }): Promise<UserInfoWithLists | null> =>
+      api.get_user_info(address!, { signal }),
+    enabled: !!address,
+  };
+}
+
 export function useUserInfo(address: string | null | undefined) {
   return useQuery<UserInfoWithLists | null>({
-    queryKey: ['userInfo', address],
-    queryFn: ({ signal }) => api.get_user_info(address!, { signal }),
-    enabled: !!address,
+    ...userInfoQueryOptions(address),
     staleTime: 30_000,
     refetchInterval: 30_000,
     refetchIntervalInBackground: false,

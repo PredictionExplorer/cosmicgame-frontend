@@ -2,7 +2,7 @@
 
 import '@testing-library/jest-dom';
 
-import { shortenHex } from '@/utils';
+import { formatAddress } from '@/utils';
 
 import GestureHistoryTable from '@/components/tables/GestureHistoryTable';
 
@@ -43,7 +43,7 @@ describe('GestureHistoryTable', () => {
     // The date with seconds, in UTC (as on the server).
     expect(screen.getByText('Nov 30, 2023, 12:18:38')).toBeInTheDocument();
     expect(document.querySelector('time[datetime="2023-11-30T12:18:38.000Z"]')).toBeInTheDocument();
-    expect(screen.getByText(shortenHex(mockData[0]!.BidderAddr, 6))).toBeInTheDocument();
+    expect(screen.getByText(formatAddress(mockData[0]!.BidderAddr))).toBeInTheDocument();
     // The cost reads at the ledger precision with its unit, never "Ξ".
     expect(screen.getByText('0.1004').textContent).toBe('0.1004\u00a0ETH');
     // The cycle reads "Cycle 4" and links to its allocation page (the live

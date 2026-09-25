@@ -183,8 +183,8 @@ The type utilities never set a colour. Pair a label, caption or eyebrow with `te
 | `type-heading-3`               | 18–20px        | 1.3  | 600    | Inter | Headings inside a panel or card                                                                                                                                                         |
 | `type-title`                   | 16px           | 1.4  | 600    | Inter | Panel, card and dialog titles                                                                                                                                                           |
 | `type-body-lg`                 | 18px           | 1.6  | 400    | Inter | Lead paragraphs                                                                                                                                                                         |
-| `type-lede`                    | 18px, max 60ch | 1.55 | 400    | Inter | The one-sentence page lede under an H1                                                                                                                                                  |
-| `type-prose`                   | 17px, max 66ch | 1.65 | 400    | Inter | Long-form prose (1.7 for uk and vi; 16px/1.85, 40em for CJK)                                                                                                                            |
+| `type-lede`                    | 18px, max 34em | 1.55 | 400    | Inter | The one-sentence page lede under an H1                                                                                                                                                  |
+| `type-prose`                   | 17px, max 36em | 1.65 | 400    | Inter | Long-form prose (1.7 for uk and vi; 16px/1.85, 40em for CJK)                                                                                                                            |
 | `type-body-md`                 | 16px           | 1.55 | 400    | Inter | Body                                                                                                                                                                                    |
 | `type-body-sm`                 | 14px           | 1.5  | 400    | Inter | Dense body                                                                                                                                                                              |
 | `type-label`                   | 13px           | 18px | 500    | Inter | Field, figure and ledger-header labels. Sentence case, no tracking                                                                                                                      |
@@ -324,12 +324,15 @@ land on the scale.
 | `--radius-surface` | `rounded-surface` | 12px  | Cards, dialogs, sheets, link cards                   |
 | `--radius-pill`    | `rounded-pill`    | full  | The live status pill, segmented control track        |
 
-`--radius-field` and `--radius-button` alias `control`, and `--radius-card` and
-`--radius-hero` alias `surface`.
+The retired names (`--radius-field`, `--radius-button`, `--radius-card`, `--radius-hero`)
+are gone; use the four above.
 
-**Elevation.** `--elevation-float` (`shadow-float`) is for things that actually float:
-popovers, dialogs, sheets and the dock. Page content gets no shadow and no glow.
-`--elevation-1` to `--elevation-4` remain for existing call sites.
+**Elevation.** `--elevation-float` (`shadow-float`) is the one elevation, for things that
+actually float: popovers, dialogs, sheets, toasts and the dock. Page content gets no shadow
+and no glow; the old four-step scale and the glow utilities are gone. Toasts
+(`components/ui/app-toaster`) hand the palette to sonner through its variables: the raised
+surface, the rule hairline, and a 40% state edge plus a state-coloured icon in the
+palette's own positive, critical, attention or primary.
 
 **Glass.** `--glass-fill` and `--glass-blur`, through the `glass` utility, are only for the
 sticky header, the mobile dock, sheets and menus. Visitors who prefer reduced transparency
@@ -344,8 +347,9 @@ a page's H1 starts on the header's edge at every width, which
 from `sm`), and everything pinned under it (`--sticky-offset`, sticky sub-navigation, the
 maintenance banner, page tops) derives from that one value. The other tokens are `--section-gap`
 (landing and long-form sections), `--block-gap` (data-page blocks), `--stack-gap`,
-`--row-h` (48px ledger rows), `--row-h-dense` (44px), `--measure-prose` (66ch) and
-`--measure-lede` (60ch).
+`--row-h` (48px ledger rows), `--row-h-dense` (44px), `--measure-prose` (36em, about 66
+characters of 17px Inter; `ch` is the width of a zero and ran 81–91 characters) and
+`--measure-lede` (34em, about 65 characters of the 18px lede).
 
 **Regions, not cards.** A page's regions sit on the page ground, each opening on one
 `--rule` hairline over its heading (`DESK_REGION` in
@@ -355,12 +359,20 @@ view exists for keeps a surface (the gesture form: `bg-surface`, no border). Dis
 read as a list of hairline rows (`DeskDisclosure`), never as boxed accordions. Every region
 heading on one page uses one style (`type-heading-3`).
 
+**The Cycle clock.** The Cycle Finalization Time has one presentation on both hosts:
+`CountdownFigures` (`components/ui/countdown-figures`), padded groups built by
+`countdownGroups` (DD:HH:MM:SS while days remain, then HH:MM:SS, so the width never
+jumps within a phase) with captions from the one unit catalog (`clockUnitLabels`). `size`
+`hero` is the landing's band, `desk` a column (the app home, /current-cycle), `inline` the
+dock's one-line form: the same groups, no captions. Never render the Cycle clock as a
+`Duration` string.
+
 **Ticking figures.** A line that carries a live figure has a fixed shape: the label wraps,
-the figure sits in its own column and never does, and a countdown reads as a clock
-(`<Duration variant="clock">`, "8d 06:56:51") whose width holds while it ticks. Lines
-stacked together share that one format, so a growing hold under a countdown reads as a
-clock too ("1d 01:12:05" over "8d 00:24:38") and the digits align. A `flex-wrap` row of
-ticking values re-wraps as the digits change and moves everything below it.
+the figure sits in its own column and never does, and its width holds while it ticks
+(`<Duration variant="clock">` for any other running time, "8d 06:56:51"). Lines stacked
+together share that one format, so a growing hold under a countdown reads as a clock too
+("1d 01:12:05" over "8d 00:24:38") and the digits align. A `flex-wrap` row of ticking
+values re-wraps as the digits change and moves everything below it.
 
 **Targets.** Every text link is at least 24px tall at every width
 (`TOUCH_TARGET_TEXT_LINK_CLASS`, `lib/touch-target.ts`): WCAG 2.5.8 covers a mouse as much
@@ -369,8 +381,10 @@ as a finger. The 44px helpers stay phone-only.
 **Motion.** `duration-instant` (80ms), `duration-fast` (150ms), `duration-base` (240ms),
 `duration-slow` (400ms), `duration-page` (560ms) and `duration-settle` (900ms, a changed
 live value washing back to foreground). The easings are `ease-out-expo` and
-`ease-gallery`. There are no springs: `--ease-spring` is an alias of `ease-out-expo`. A
-live dot fades in and out over 2.4s and never grows.
+`ease-gallery`. There are no springs and no overshoot. A live dot fades in and out over
+2.4s and never grows. Framer Motion reads the same values from `motionTokens`
+(`lib/motion.ts`), which a test parses against `styles/tokens.css`, so a page entrance
+never runs longer than `duration-page`.
 
 **Overlay motion.** Dialogs, sheets, menus, popovers, tooltips and the explanation card
 enter and leave through `animate-in` / `animate-out` with the modifiers `fade-in-*`,
@@ -387,7 +401,11 @@ Keyboard focus is a 2px solid outline in the palette's `--ring` colour, offset 2
 element (`styles/focus-ring.css`). It survives `shadow-*` utilities and forced-colors mode,
 where it becomes a `Highlight` outline that no utility can remove. Menu and option items,
 and focusable children of an `overflow-hidden` container, draw the ring just inside
-themselves.
+themselves. Forced colours also reset the backgrounds and inset shadows that draw a
+selected tab or segment, a pressed or checked option and the current page, so each of
+those states (`data-state="active"`, `aria-selected`, `aria-pressed`, `aria-checked`,
+`aria-current`) gets a 2px `Highlight` outline drawn inside it; the focus outline still
+wins while the element has keyboard focus.
 
 - `focus-ring-inset`: draw the ring inside the element.
 - `focus-ring-within`: ring a container while something inside it has keyboard focus.
@@ -662,19 +680,19 @@ banks, hand-coins, heart-handshakes, clovers, card suits) under every lucide ali
 
 ### Layout and surfaces
 
-| Primitive    | Import                      | Use                                                                                                                                                                                                                                                                                                                                                                                  |
-| ------------ | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `Container`  | `components/ui/container`   | The content edge. `size="site"` (the default: `site-container`, the header's and footer's edge), `wide` (90rem, the app-home desk only), `reading` (one prose measure). Legacy fixed sizes remain, deprecated. Never hand-roll `max-w-7xl px-*` on a section.                                                                                                                        |
-| `PageShell`  | `components/ui/page-shell`  | The page's `<main>` and backdrop.                                                                                                                                                                                                                                                                                                                                                    |
-| `Surface`    | `components/ui/surface`     | `plain`, `quiet` (a fill, no border: the one control group), `outlined` (the default: one hairline on a faint surface), `raised` (floating layers). Old variants are aliases on the token ladder. At most one bordered level per region.                                                                                                                                             |
-| `ScrollRail` | `components/ui/scroll-rail` | One row that scrolls sideways with edge fades only while there is more that way, keeping the current item (`data-state="active"`, `aria-current="page"`, `aria-selected`) in view. For tabs, sub-navigation and chip rows. A row with nothing focusable in it (steps, figures) makes its track focusable while it overflows, a region named by `label`, so the arrow keys scroll it. |
+| Primitive    | Import                      | Use                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ------------ | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `Container`  | `components/ui/container`   | The content edge. `size="site"` (the default: `site-container`, the header's and footer's edge), `wide` (90rem, the app-home desk only), `reading` (one prose measure). Legacy fixed sizes remain, deprecated. Never hand-roll `max-w-7xl px-*` on a section.                                                                                                                                                                                                                                                                                                                                                |
+| `PageShell`  | `components/ui/page-shell`  | The page's `<main>` and backdrop.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `Surface`    | `components/ui/surface`     | `plain`, `quiet` (a fill, no border: the one control group), `outlined` (the default: one hairline on a faint surface), `raised` (floating layers). Old variants are aliases on the token ladder. At most one bordered level per region.                                                                                                                                                                                                                                                                                                                                                                     |
+| `ScrollRail` | `components/ui/scroll-rail` | One row that scrolls sideways with edge fades only while there is more that way, keeping the current item (`data-state="active"`, `aria-current="page"`, `aria-selected`) in view. For tabs, sub-navigation and chip rows. The row never shrinks to the rail (an underline row's hairline and a segmented track span every item), items snap to their start beside the fade, and revealing the current item never leaves a cut label at the start. A row with nothing focusable in it (steps, figures) makes its track focusable while it overflows, a region named by `label`, so the arrow keys scroll it. |
 
 ### Navigation within a page
 
-| Primitive                                 | Import               | Use                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| ----------------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `Tabs`                                    | `components/ui/tabs` | `TabsList variant`: `segmented` (the default: views of one thing, a sunken track with no border; the selected segment is raised with a hairline edge and draws no primary rule, so it never competes with an underline row above it), `underline` (page sub-navigation), `pills` (short sets and filters); `scroll` puts the row on a `ScrollRail`, at least the rail's width so an underline row's rule spans the column. Pick the variant rather than reshaping a list with classes. Radix keeps arrow keys, Home, End and one tab stop. |
-| `tabsListVariants`, `tabsTriggerVariants` | `components/ui/tabs` | The same look for link-based sub-navigation: mark the current link `aria-current="page"`.                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Primitive                                 | Import               | Use                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ----------------------------------------- | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Tabs`                                    | `components/ui/tabs` | `TabsList variant`: `segmented` (the default: views of one thing, a sunken track with no border; the selected segment is raised and edged by `--input`, the 3:1 control boundary, since the fill step alone is 1.1–1.3:1; it draws no primary rule, so it never competes with an underline row above it), `underline` (page sub-navigation), `pills` (short sets and filters); `scroll` puts the row on a `ScrollRail`, at least the rail's width so an underline row's rule spans the column. Pick the variant rather than reshaping a list with classes. Radix keeps arrow keys, Home, End and one tab stop. |
+| `tabsListVariants`, `tabsTriggerVariants` | `components/ui/tabs` | The same look for link-based sub-navigation: mark the current link `aria-current="page"`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 
 ### Forms
 
@@ -688,13 +706,13 @@ banks, hand-coins, heart-handshakes, clovers, card suits) under every lucide ali
 
 ### Loading, empty and error
 
-| Primitive      | Import                         | Use                                                                                                                                                                                                                                                                                                                                                                       |
-| -------------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Skeletons      | `components/ui/skeleton`       | Placeholders in the shape and at the height of what they replace: `SkeletonTable` (ledger rows plus the phone card layout), `SkeletonDetailRows`, `SkeletonStatGrid`, `SkeletonStatCard`, `SkeletonPageHeader`, `SkeletonArtPlate`, `SkeletonChart`, `SkeletonNFTCard`, `SkeletonText`. Each announces once; pass `announce={false}` inside a skeleton that already does. |
-| Page skeletons | `components/ui/page-skeletons` | Route-level `loading.tsx` bodies for record pages: `RecordDetailSkeleton`, `LedgerPageSkeleton`, `ProfileSkeleton`, `CycleAllocationSkeleton`, `SkeletonSectionCard`. A Signature's page uses its own `NFTDetailSkeleton` (`components/nft`).                                                                                                                             |
-| `EmptyState`   | `components/ui/empty-state`    | Nothing here yet, and what would fill it. `variant` `page`, `panel` (the default) or `inline`; `headingLevel` 2–4.                                                                                                                                                                                                                                                        |
-| `ErrorState`   | `components/ui/error-state`    | Something could not be read or done, with a retry. Same variants; status colour on the icon tile only.                                                                                                                                                                                                                                                                    |
-| `UnknownValue` | `components/ui/unknown-value`  | A figure that could not be read: a dash with a screen-reader label, never `0`.                                                                                                                                                                                                                                                                                            |
+| Primitive      | Import                         | Use                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| -------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Skeletons      | `components/ui/skeleton`       | Placeholders in the shape and at the height of what they replace: `SkeletonTable` (ledger rows plus the phone card layout), `SkeletonDetailRows`, `SkeletonFigures`, `SkeletonPageHeader`, `SkeletonArtPlate`, `SkeletonChart`, `SkeletonNFTCard`, `SkeletonText`. Each speaks once: its label is visually hidden text inside a `role="status"` region (a live region never reads an `aria-label`); pass `announce={false}` inside a skeleton that already does. Bars shimmer one way (no pulse) and carry `data-slot="skeleton"`. |
+| Page skeletons | `components/ui/page-skeletons` | Route-level `loading.tsx` bodies for record pages: `RecordDetailSkeleton`, `LedgerPageSkeleton`, `ProfileSkeleton`, `CycleAllocationSkeleton`, `SkeletonSectionCard`. A Signature's page uses its own `NFTDetailSkeleton` (`components/nft`).                                                                                                                                                                                                                                                                                      |
+| `EmptyState`   | `components/ui/empty-state`    | Nothing here yet, and what would fill it. `variant` `page`, `panel` (the default) or `inline`; `headingLevel` 2–4.                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `ErrorState`   | `components/ui/error-state`    | Something could not be read or done, with a retry. Same variants; status colour on the icon tile only.                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `UnknownValue` | `components/ui/unknown-value`  | A figure that could not be read: a dash with a screen-reader label, never `0`.                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 
 ### Overlays
 
@@ -707,7 +725,11 @@ banks, hand-coins, heart-handshakes, clovers, card suits) under every lucide ali
 
 `Amount`, `DateTime`, `Duration`, `AddressChip`, `LiveStatus`, `TxStatus`,
 `ResponsiveTable` and `Pagination` are documented with the formatting layer and the
-transaction kit; see `docs/` and each module's header. Three rules to know:
+transaction kit; see `docs/` and each module's header. Four rules to know:
+
+- **One freshness voice.** `LiveStatus` speaks its state changes through a polite status
+  region only where it is the page's primary stamp: `announce` defaults to `!still`, so a
+  page with four stamps says "Reconnecting" once, not four times.
 
 - **Dates.** Every record is dated in UTC, the block explorers' convention, on the
   server and in the browser alike, so a date never rewrites itself after load (it once
