@@ -64,13 +64,13 @@
   "addresses": {
     "title": "合約地址",
     "description": "Cosmic Signature 在 Arbitrum One 上的全部合約。可複製地址，或在 Arbiscan 上核對地址、在 Sourcify 上核對源代碼。",
-    "explorer": "Arbiscan",
-    "sourcify": "Sourcify",
-    "verified": "附有 Sourcify 連結的地址均在 Sourcify 上完全相符，核對日期：{date}。"
+    "verified": "附有 Sourcify 連結的地址均在 Sourcify 上完全相符，核對日期：{date}。",
+    "markets": "市場",
+    "reported": "索引服務報告的地址為 {address}，該地址尚未驗證。"
   },
   "funds": {
     "title": "分配軌道",
-    "description": "週期儲備會沿簽名分配、時之勇士、星選、公共物品、錨定派發與滾動儲備等軌道流轉。",
+    "description": "週期儲備會沿簽名分配、時之勇士、星選、錨定派發與公共物品等軌道流轉，其餘作為滾動儲備結轉至下一週期。",
     "chartAria": "分配軌道條形圖",
     "segments": {
       "signature": {
@@ -151,10 +151,7 @@
     },
     "ceiling": "起始價格",
     "cstDurationTooltip": "CST 校準窗口目前儲存在鏈上的時長。每筆 CST 落筆會使其延長約 {increase}%，每筆 ETH 落筆會使其縮短約 {decrease}%。",
-    "cstElapsedTooltip": "目前 CST 校準窗口已經過的時間。",
     "cstCeilingTooltip": "目前所示 CST 校準窗口的起始落筆價格。價格會在即時儲存的窗口時長內線性下降。",
-    "ethDurationTooltip": "ETH 校準窗口的總時長；落筆價格會在此期間逐步下降。",
-    "ethElapsedTooltip": "目前 ETH 校準窗口已經過的時間。",
     "publicGoodsAddress": "公共物品受益方",
     "publicGoodsAddressTooltip": "目前從公共物品金庫合約接收公共物品分配的鏈上地址。",
     "selection": {
@@ -182,7 +179,6 @@
   },
   "seo": {
     "heading": "Cosmic Signature 合約",
-    "description": "查閱 Cosmic Signature 在 Arbitrum 上的合約地址，並透過源代碼與鏈上記錄驗證協議。",
-    "partialFallback": "暫時無法取得最新合約地址。下方顯示協議資料中已驗證的代理合約與實現合約地址。"
+    "partialFallback": "即時數據暫時無法取得。下方地址來自已驗證的清單。"
   }
 }

@@ -5,52 +5,37 @@ import { useLocale, useTranslations } from 'next-intl';
 import {
   ALLOCATION_TRACK_COLORS,
   ALLOCATION_TRACK_COPY_KEYS,
-  withNextCycleShare,
-  type AllocationTrackShare,
+  allocationSharesFromDashboard,
+  type DashboardTrackShares,
 } from '@/config/allocationTracks';
 import { cn } from '@/lib/utils';
-import { toFiniteNumber } from '@/utils/finiteNumber';
 import { formatPercent } from '@/utils/format';
 import { ExplainedTerm } from '@/components/ui/explain-popover';
 import { SectionHeader } from '@/components/ui/section-header';
 import { Skeleton } from '@/components/ui/skeleton';
 import { UnknownValue } from '@/components/ui/unknown-value';
 
-interface FundDistributionProps {
-  prizePercentage?: number;
-  chronoWarriorPercentage?: number;
-  stellarSelectionPercentage?: number;
-  stakingPercentage?: number;
-  charityPercentage?: number;
+interface AllocationTracksSectionProps {
+  /** The dashboard read (its track percentages); missing while it loads or after it fails. */
+  data?: DashboardTrackShares | null;
   loading?: boolean;
 }
 
 /**
- * The Cycle Reserve split. Each segment is drawn against the whole reserve (100%), and the
- * remainder that carries into the next cycle is its own segment, so a 25% track fills a
- * quarter of the bar rather than half of it. The legend below the bar carries every figure
- * as text, each track's name explaining itself; the bar only draws the proportions.
+ * The /contracts "Allocation tracks" section: the Cycle Reserve split as a bar
+ * and a legend. Each segment is drawn against the whole reserve (100%), and the
+ * remainder that carries into the next cycle is its own segment, so a 25% track
+ * fills a quarter of the bar rather than half of it. The legend below the bar
+ * carries every figure as text, each track's name explaining itself; the bar
+ * only draws the proportions. The shares come from the one clamped mapping
+ * (`allocationSharesFromDashboard`) every chart of the split reads.
  */
-export function FundDistribution({
-  prizePercentage,
-  chronoWarriorPercentage,
-  stellarSelectionPercentage,
-  stakingPercentage,
-  charityPercentage,
-  loading = false,
-}: FundDistributionProps) {
+export function AllocationTracksSection({ data, loading = false }: AllocationTracksSectionProps) {
   const t = useTranslations('contracts');
   const tCommon = useTranslations('common');
   const locale = useLocale();
 
-  const shares: AllocationTrackShare[] = withNextCycleShare([
-    { id: 'signature', percent: toFiniteNumber(prizePercentage) },
-    { id: 'chrono', percent: toFiniteNumber(chronoWarriorPercentage) },
-    { id: 'stellar', percent: toFiniteNumber(stellarSelectionPercentage) },
-    { id: 'anchor', percent: toFiniteNumber(stakingPercentage) },
-    { id: 'publicGoods', percent: toFiniteNumber(charityPercentage) },
-  ]);
-  const segments = shares.map((share) => ({
+  const segments = allocationSharesFromDashboard(data).map((share) => ({
     ...share,
     label: t(`funds.segments.${ALLOCATION_TRACK_COPY_KEYS[share.id]}.label`),
     tooltip: t(`funds.segments.${ALLOCATION_TRACK_COPY_KEYS[share.id]}.tooltip`),
@@ -88,7 +73,7 @@ export function FundDistribution({
                   key={segment.id}
                   data-testid={`fund-segment-${segment.id}`}
                   className={cn('h-full first:rounded-s-pill last:rounded-e-pill', segment.color)}
-                  style={{ width: `${Math.min(100, segment.percent)}%` }}
+                  style={{ width: `${segment.percent}%` }}
                 />
               ),
             )}

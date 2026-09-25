@@ -3,22 +3,16 @@
 import type { ReactNode } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import {
-  buildContracts,
-  CONTRACT_ENTRY_IDS,
-  type ContractEntryCopy,
-} from '@/app/[locale]/(app)/contracts/contractAddressData';
+import { buildContracts, contractEntryCopy } from '@/content/legal/contractRegistry';
 
 import {
   ALLOCATION_TRACK_COPY_KEYS,
-  withNextCycleShare,
-  type AllocationTrackShare,
+  allocationSharesFromDashboard,
 } from '@/config/allocationTracks';
 import {
   ContractEvidence,
   formatSourcifyChecked,
   SourcifyCheckedNote,
-  type ContractEvidenceLabels,
 } from '@/components/legal/ContractEvidence';
 import { AddressChip } from '@/components/ui/address-chip';
 import { Badge } from '@/components/ui/badge';
@@ -50,28 +44,6 @@ interface ParameterRow {
   label: string;
   /** `null`: the dashboard reported the field but it could not be read. */
   value: ReactNode | null;
-}
-
-/**
- * The Cycle Reserve's split as the dashboard reports it, every track in the
- * order and with the names /contracts uses, completed with the remainder
- * carried to the next cycle, so the shares add up to 100% (`null`: a share
- * that could not be read).
- */
-export function allocationShares(data: {
-  PrizePercentage?: unknown;
-  ChronoWarriorPercentage?: unknown;
-  RafflePercentage?: unknown;
-  StakingPercentage?: unknown;
-  CharityPercentage?: unknown;
-}): AllocationTrackShare[] {
-  return withNextCycleShare([
-    { id: 'signature', percent: toFiniteNumber(data.PrizePercentage) },
-    { id: 'chrono', percent: toFiniteNumber(data.ChronoWarriorPercentage) },
-    { id: 'stellar', percent: toFiniteNumber(data.RafflePercentage) },
-    { id: 'anchor', percent: toFiniteNumber(data.StakingPercentage) },
-    { id: 'publicGoods', percent: toFiniteNumber(data.CharityPercentage) },
-  ]);
 }
 
 /**
@@ -200,7 +172,7 @@ export default function AdminSettingsPage() {
   const groups: Record<ParameterGroup, ParameterRow[]> = {
     // Every track /contracts draws, Chrono-Warrior and the remainder carried
     // to the next cycle included, so the shares read as the whole split.
-    shares: allocationShares(data).map((share) => ({
+    shares: allocationSharesFromDashboard(data).map((share) => ({
       key: `share-${share.id}`,
       label: tContracts(`funds.segments.${ALLOCATION_TRACK_COPY_KEYS[share.id]}.label`),
       value: percent(share.percent),
@@ -263,20 +235,6 @@ export default function AdminSettingsPage() {
     ],
   };
 
-  const contractCopy = Object.fromEntries(
-    CONTRACT_ENTRY_IDS.map((id) => [
-      id,
-      {
-        name: tContracts(`entries.${id}.name`),
-        description: tContracts(`entries.${id}.description`),
-      },
-    ]),
-  ) as ContractEntryCopy;
-  const evidence: ContractEvidenceLabels = {
-    explorer: tContracts('addresses.explorer'),
-    sourcify: tContracts('addresses.sourcify'),
-  };
-
   return (
     <div className="space-y-14 sm:space-y-16">
       <section aria-labelledby="settings-contracts-heading">
@@ -291,7 +249,7 @@ export default function AdminSettingsPage() {
           className="-mt-2 mb-5 max-w-2xl"
         />
         <dl className="border-t border-rule-faint">
-          {buildContracts(data.ContractAddrs, contractCopy).map((contract) => (
+          {buildContracts(data.ContractAddrs, contractEntryCopy(tContracts)).map((contract) => (
             <SheetRow key={contract.id} id={contract.id} label={contract.name} wide>
               <AddressChip
                 address={contract.address}
@@ -301,7 +259,7 @@ export default function AdminSettingsPage() {
                 href={false}
                 className="type-hash whitespace-normal text-foreground"
               />
-              <ContractEvidence address={contract.address} labels={evidence} />
+              <ContractEvidence address={contract.address} />
             </SheetRow>
           ))}
         </dl>

@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl';
 
 import { protocolFacts } from '@/content/protocol-facts';
 
-import { EXPLORER_NAME } from '@/lib/chainGuard';
 import { useCharityVoluntary } from '@/hooks/useApiQuery';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { ContractEvidence } from '@/components/legal/ContractEvidence';
@@ -48,10 +47,7 @@ function ContributeToVault() {
               display="responsive"
               className="type-hash text-foreground"
             />
-            <ContractEvidence
-              address={charity}
-              labels={{ explorer: EXPLORER_NAME, sourcify: 'Sourcify' }}
-            />
+            <ContractEvidence address={charity} />
           </dd>
         </dl>
       ) : null}

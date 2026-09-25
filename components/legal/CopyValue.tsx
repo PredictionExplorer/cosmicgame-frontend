@@ -13,11 +13,17 @@ import { cn } from '@/lib/utils';
  */
 export function CopyValue({
   value,
+  display,
   copyLabel,
   copiedLabel,
   className,
 }: {
   value: string;
+  /**
+   * What to show instead of the whole value (a middle-truncated identifier);
+   * the whole value is its title and what the button copies.
+   */
+  display?: string;
   /** The button's name, e.g. "Copy app.cosmicsignature.com". */
   copyLabel: string;
   /** Announced once the value is on the clipboard. */
@@ -28,7 +34,9 @@ export function CopyValue({
 
   return (
     <span className={cn('inline-flex max-w-full items-center gap-1.5', className)}>
-      <span className="type-mono text-foreground">{value}</span>
+      <span className="type-mono text-foreground" title={display ? value : undefined}>
+        {display ?? value}
+      </span>
       <button
         type="button"
         onClick={() => void copy(value)}

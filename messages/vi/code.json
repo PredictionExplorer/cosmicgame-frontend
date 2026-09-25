@@ -14,7 +14,8 @@
     "wrap": "Ngắt dòng",
     "ipfs": "IPFS",
     "github": "GitHub",
-    "cid": "Mã định danh nội dung IPFS"
+    "cid": "Mã định danh nội dung IPFS",
+    "copyCid": "Sao chép mã định danh IPFS"
   },
   "pipeline": {
     "heading": "Từ seed đến hình ảnh",
@@ -44,8 +45,7 @@
     }
   },
   "seo": {
-    "heading": "Mã nguồn Cosmic Signature",
-    "description": "Khám phá mã nguồn giao diện, backend Go, hợp đồng thông minh và công cụ tạo hình ảnh của Cosmic Signature. Trình xem bên dưới cho thấy cách seed trên chuỗi trở thành tác phẩm NFT có thể tái tạo."
+    "heading": "Mã nguồn Cosmic Signature"
   },
   "repositories": {
     "heading": "Kho mã nguồn dự án",
@@ -67,5 +67,9 @@
         "description": "Mô phỏng ba vật thể và bộ kết xuất viết bằng Rust để tạo hình ảnh và video Cosmic Signature."
       }
     }
+  },
+  "page": {
+    "lede": "Mã nguồn của mọi phần trong Cosmic Signature, cùng chương trình biến mỗi seed thành tác phẩm.",
+    "license": "Giấy phép: CC0 1.0"
   }
 }

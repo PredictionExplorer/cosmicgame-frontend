@@ -64,13 +64,13 @@
   "addresses": {
     "title": "컨트랙트 주소",
     "description": "Arbitrum One의 모든 Cosmic Signature 컨트랙트입니다. 주소를 복사하거나 Arbiscan에서 주소를, Sourcify에서 소스 코드를 확인할 수 있습니다.",
-    "explorer": "Arbiscan",
-    "sourcify": "Sourcify",
-    "verified": "Sourcify 링크가 있는 주소는 모두 Sourcify에서 완전 일치합니다. 확인일: {date}."
+    "verified": "Sourcify 링크가 있는 주소는 모두 Sourcify에서 완전 일치합니다. 확인일: {date}.",
+    "markets": "마켓",
+    "reported": "인덱서가 보고한 다음 주소는 검증되지 않았습니다: {address}"
   },
   "funds": {
     "title": "배분 경로",
-    "description": "사이클 준비금은 시그니처 배분, 시간의 전사, 별빛 선정, 공공재, 앵커링 지급, 누적 준비금의 배분 경로로 나뉩니다.",
+    "description": "사이클 준비금은 시그니처 배분, 시간의 전사, 별빛 선정, 앵커링 지급, 공공재의 배분 경로로 나뉘고, 나머지는 누적 준비금으로 다음 사이클에 이월됩니다.",
     "chartAria": "배분 경로 막대 차트",
     "segments": {
       "signature": {
@@ -151,10 +151,7 @@
     },
     "ceiling": "시작 비용",
     "cstDurationTooltip": "현재 저장된 CST 보정 구간의 지속 시간입니다. CST 제스처는 이를 약 {increase}% 늘리고, ETH 제스처는 약 {decrease}% 줄입니다.",
-    "cstElapsedTooltip": "현재 CST 보정 구간에서 이미 지난 시간입니다.",
     "cstCeilingTooltip": "현재 표시된 CST 보정 구간의 시작 제스처 비용입니다. 비용은 저장된 지속 시간에 걸쳐 선형으로 내려갑니다.",
-    "ethDurationTooltip": "제스처 비용이 시간에 따라 내려가는 ETH 보정 구간의 전체 지속 시간입니다.",
-    "ethElapsedTooltip": "현재 ETH 보정 구간에서 이미 지난 시간입니다.",
     "publicGoodsAddress": "공공재 수령처",
     "publicGoodsAddressTooltip": "공공재 금고 컨트랙트에서 공공재 배분을 현재 받고 있는 온체인 주소입니다.",
     "selection": {
@@ -182,7 +179,6 @@
   },
   "seo": {
     "heading": "Cosmic Signature 컨트랙트",
-    "description": "Cosmic Signature의 공개 Arbitrum 컨트랙트 주소를 확인할 수 있습니다. 앱에 표시된 내용을 온체인 기록과 대조해 검증하는 데 활용할 수 있습니다.",
-    "partialFallback": "현재 컨트랙트 주소 데이터를 불러올 수 없어, 프로젝트에 등록된 프로토콜 프록시와 구현 컨트랙트 주소를 표시합니다."
+    "partialFallback": "지금은 실시간 수치를 불러올 수 없습니다. 아래 주소는 검증된 목록입니다."
   }
 }

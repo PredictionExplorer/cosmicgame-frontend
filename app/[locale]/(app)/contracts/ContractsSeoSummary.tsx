@@ -10,13 +10,13 @@ import { readDashboard } from '../publicDataReads';
 
 /**
  * The /contracts page header, rendered on the server: the Trust Center's
- * reading header (H1, lede, the network the addresses live on) with its tabs,
- * so the contracts sit beside the security page, the audits and the source
- * code as one Trust Center. The address list itself is
- * rendered by the route from this request's dashboard read
- * (`ContractAddressList`), so every address is in the server HTML, with the
- * verified fallback addresses when the read fails. The header does not list
- * the addresses a second time.
+ * reading header (the tab's name as the H1, one reader-facing lede, the
+ * network the addresses live on) with its tabs, so the contracts sit beside
+ * the security page, the audits and the source code as one Trust Center.
+ * The branded name stays in the document title and JSON-LD. The address
+ * list itself (`ContractAddressList`) is the verified set, in the server
+ * HTML whatever the indexer answers; when the indexer is down the meta line
+ * says only that the live figures are missing.
  */
 export async function ContractsSeoSummary() {
   const locale = await getLocale();
@@ -29,9 +29,9 @@ export async function ContractsSeoSummary() {
     <PageHeader
       variant="reading"
       section="trust"
-      title={t('seo.heading')}
+      title={tabs.contracts}
       titleId="contracts-heading"
-      subtitle={t('seo.description')}
+      subtitle={t('addresses.description')}
       meta={
         <>
           <span className="text-muted-foreground">{networkConfig.chainName}</span>

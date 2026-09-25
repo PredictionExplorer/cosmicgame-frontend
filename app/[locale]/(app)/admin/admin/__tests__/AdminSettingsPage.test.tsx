@@ -1,8 +1,10 @@
 import { formatDuration } from '@/utils/format';
+import { allocationSharesFromDashboard as allocationShares } from '@/config/allocationTracks';
 
 import { checkA11y, render, screen, within } from '@/test-utils';
 
-import AdminSettingsPage, { allocationShares } from '../AdminSettingsPage';
+
+import AdminSettingsPage from '../AdminSettingsPage';
 
 const mockUseDashboardInfo = jest.fn();
 const mockRefetch = jest.fn();

@@ -519,7 +519,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/contracts',
     host: 'app',
     cluster: 'trust',
-    expectedText: 'Cosmic Signature 合约',
+    expectedText: '核心合约',
   },
   {
     id: 'code',
@@ -528,7 +528,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/code',
     host: 'app',
     cluster: 'trust',
-    expectedText: 'Cosmic Signature 源代码',
+    expectedText: '代码查看器',
   },
   {
     id: 'source-code-alias',
@@ -537,7 +537,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/source-code',
     host: 'app',
     cluster: 'trust',
-    expectedText: 'Cosmic Signature 源代码',
+    expectedText: '代码查看器',
     redirectsTo: '/code',
   },
 

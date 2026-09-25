@@ -64,13 +64,13 @@
   "addresses": {
     "title": "Địa chỉ hợp đồng",
     "description": "Mọi hợp đồng Cosmic Signature trên Arbitrum One. Sao chép địa chỉ, hoặc kiểm tra địa chỉ trên Arbiscan và mã nguồn trên Sourcify.",
-    "explorer": "Arbiscan",
-    "sourcify": "Sourcify",
-    "verified": "Mọi địa chỉ có liên kết Sourcify đều khớp chính xác trên đó, kiểm tra ngày {date}."
+    "verified": "Mọi địa chỉ có liên kết Sourcify đều khớp chính xác trên đó, kiểm tra ngày {date}.",
+    "markets": "Thị trường",
+    "reported": "Bộ lập chỉ mục báo cáo địa chỉ {address}, địa chỉ này chưa được xác minh."
   },
   "funds": {
     "title": "Các luồng phân bổ",
-    "description": "Cách Dự trữ chu kỳ được phân phối qua các luồng phân bổ: phân bổ Signature, Chiến binh Thời gian, Tinh tuyển, Hàng hóa công, phân phối neo giữ và Dự trữ tích lũy.",
+    "description": "Cách Dự trữ chu kỳ được phân phối qua các luồng phân bổ: phân bổ Signature, Chiến binh Thời gian, Tinh tuyển, phân phối neo giữ và Hàng hóa công; phần còn lại chuyển sang chu kỳ tiếp theo thành Dự trữ tích lũy.",
     "chartAria": "Biểu đồ cột các luồng phân bổ",
     "segments": {
       "signature": {
@@ -151,10 +151,7 @@
     },
     "ceiling": "Chi phí khởi điểm",
     "cstDurationTooltip": "Thời lượng hiện tại của cửa sổ hiệu chỉnh CST. Nét bút CST kéo dài cửa sổ khoảng {increase}%; nét bút ETH rút ngắn khoảng {decrease}%.",
-    "cstElapsedTooltip": "Thời gian đã trôi qua trong cửa sổ hiệu chỉnh CST hiện tại",
     "cstCeilingTooltip": "Chi phí nét bút khởi điểm của cửa sổ hiệu chỉnh CST đang hiển thị. Chi phí giảm tuyến tính trong suốt thời lượng đang được lưu.",
-    "ethDurationTooltip": "Tổng thời lượng của cửa sổ hiệu chỉnh ETH, trong đó chi phí nét bút giảm dần theo thời gian",
-    "ethElapsedTooltip": "Thời gian đã trôi qua trong cửa sổ hiệu chỉnh ETH hiện tại",
     "publicGoodsAddress": "Đơn vị thụ hưởng Hàng hóa công",
     "publicGoodsAddressTooltip": "Địa chỉ trên chuỗi hiện đang nhận phần phân bổ Hàng hóa công từ hợp đồng Kho Hàng hóa công",
     "selection": {
@@ -182,7 +179,6 @@
   },
   "seo": {
     "heading": "Hợp đồng Cosmic Signature",
-    "description": "Tra cứu địa chỉ hợp đồng Cosmic Signature trên Arbitrum để kiểm tra mã nguồn, cấu hình và các giao dịch trên chuỗi.",
-    "partialFallback": "Chưa tải được danh sách địa chỉ hiện tại. Bên dưới là địa chỉ proxy và hợp đồng triển khai đã xác minh, được lưu trong cấu hình giao thức."
+    "partialFallback": "Hiện chưa lấy được số liệu trực tiếp. Các địa chỉ bên dưới lấy từ danh sách đã xác minh."
   }
 }

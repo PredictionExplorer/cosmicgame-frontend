@@ -8,6 +8,7 @@ import {
 } from '@/content/legal/officialAddresses';
 
 import { SiteLink } from '@/components/layout/SiteLink';
+import { EXPLORER_NAME } from '@/lib/chainGuard';
 import { cn } from '@/lib/utils';
 import { toIntlLocale } from '@/utils/format';
 import { getExplorerUrl } from '@/utils/urls';
@@ -17,6 +18,13 @@ export interface ContractEvidenceLabels {
   explorer: string;
   sourcify: string;
 }
+
+/**
+ * The two sources by their own names: the network's explorer ("Arbiscan" on
+ * Arbitrum One, the configured one elsewhere) and Sourcify. Neither is
+ * translated, so no catalog carries them.
+ */
+const DEFAULT_LABELS: ContractEvidenceLabels = { explorer: EXPLORER_NAME, sourcify: 'Sourcify' };
 
 const SOURCE_LINK_CLASS =
   'link-quiet inline-flex min-h-6 items-center gap-1 text-muted-foreground transition-colors duration-[var(--duration-fast)] hover:text-foreground';
@@ -30,11 +38,11 @@ const SOURCE_LINK_CLASS =
  */
 export function ContractEvidence({
   address,
-  labels,
+  labels = DEFAULT_LABELS,
   className,
 }: {
   address: string;
-  labels: ContractEvidenceLabels;
+  labels?: ContractEvidenceLabels;
   className?: string;
 }) {
   return (

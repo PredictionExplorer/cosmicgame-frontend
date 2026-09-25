@@ -14,7 +14,8 @@
     "wrap": "Wrap lines",
     "ipfs": "IPFS",
     "github": "GitHub",
-    "cid": "IPFS content identifier"
+    "cid": "IPFS content identifier",
+    "copyCid": "Copy the IPFS identifier"
   },
   "pipeline": {
     "heading": "From seed to image",
@@ -44,8 +45,7 @@
     }
   },
   "seo": {
-    "heading": "Cosmic Signature source code",
-    "description": "Explore the frontend, Go backend, smart contracts, and image generation source code for Cosmic Signature. Use the viewer below to inspect how on-chain seeds become reproducible NFT artwork."
+    "heading": "Cosmic Signature source code"
   },
   "repositories": {
     "heading": "Project repositories",
@@ -67,5 +67,9 @@
         "description": "The Rust three-body simulation and renderer for Cosmic Signature images and videos."
       }
     }
+  },
+  "page": {
+    "lede": "The source of every part of Cosmic Signature, and the program that turns each seed into its artwork.",
+    "license": "License: CC0 1.0"
   }
 }
