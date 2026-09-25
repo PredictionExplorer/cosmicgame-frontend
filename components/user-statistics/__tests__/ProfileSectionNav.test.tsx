@@ -32,6 +32,15 @@ describe('ProfileSectionNav', () => {
     expect(within(nav).getByText(/timeZone|Time zone/)).toBeInTheDocument();
   });
 
+  // Regression: the row zeroed the underline tabs' gap, and the triggers carry no padding, so
+  // a phone read "GesturesAllocationsAnchoring" as one word.
+  it('keeps the underline row’s gap between its links', () => {
+    render(<ProfileSectionNav label="Profile contents" sections={SECTIONS} />);
+    const list = screen.getByRole('navigation', { name: 'Profile contents' }).querySelector('ul');
+    expect(list).toHaveClass('gap-x-6');
+    expect(list?.className).not.toMatch(/(^|\s)(sm:)?gap-\d/);
+  });
+
   it('jumps to a section and marks it as the one being read', async () => {
     render(<ProfileSectionNav label="Profile contents" sections={SECTIONS} />);
     const link = screen.getByRole('link', { name: 'Anchoring' });
