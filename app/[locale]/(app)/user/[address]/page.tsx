@@ -40,7 +40,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
  * No profile renders at build time: each one renders on its first visit and
  * is then served from the cache, refreshed every five minutes. The page shell
  * reads nothing on the server (the profile's ledgers load in the browser), so
- * the cached HTML never holds stale figures.
+ * the cached HTML never holds stale figures, and it is the profile's own
+ * loading state (its header, contents rail and body placeholders).
+ *
+ * The route has no loading boundary: a `loading.tsx` gets no params, so any
+ * translated copy in it reads the locale from the request headers, and a
+ * route rendered on demand for the cache cannot read headers (every profile
+ * answered 500). See `isrLoadingBoundaries.test.ts`.
  */
 export function generateStaticParams() {
   return [];
