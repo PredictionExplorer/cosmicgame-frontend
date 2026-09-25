@@ -411,8 +411,24 @@ export function PageHeaderTabs({
 }
 
 /**
+ * Whether a label reads on one line in a third of a phone's row (about
+ * 110px of 13px type): 14 Latin letters, or 7 CJK characters, which set about
+ * twice as wide.
+ */
+function fitsStripColumn(label: string): boolean {
+  let width = 0;
+  for (const char of label)
+    width += /[\u1100-\u11ff\u2e80-\ua4cf\uac00-\ud7af\uf900-\ufaff\uff00-\uffef]/.test(char)
+      ? 2
+      : 1;
+  return width <= 14;
+}
+
+/**
  * The layout of the figure row on phones:
- * - `strip`: three compact figures (short counts) side by side.
+ * - `strip`: three compact figures (short counts) side by side, when every
+ *   label fits its column on one line; a longer label would break into
+ *   three lines there, so the figures take rows instead.
  * - `grid`: two columns; figures with `size: 'md'` (dates, addresses) sit
  *   under the paired others, across the full width, or side by side when
  *   there are two of them.
@@ -420,7 +436,12 @@ export function PageHeaderTabs({
  *   hole in the grid, every figure becomes a label-and-value row instead.
  */
 export function figurePhoneLayout(figures: readonly PageHeaderFigure[]): 'grid' | 'rows' | 'strip' {
-  if (figures.length === 3 && figures.every((figure) => figure.compact)) return 'strip';
+  if (
+    figures.length === 3 &&
+    figures.every((figure) => figure.compact && fitsStripColumn(figure.label))
+  ) {
+    return 'strip';
+  }
   const paired = figures.filter((figure) => figure.size !== 'md').length;
   return figures.length > 1 && paired % 2 === 1 ? 'rows' : 'grid';
 }

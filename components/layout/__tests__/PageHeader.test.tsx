@@ -301,6 +301,24 @@ describe('PageHeader', () => {
         <PageHeader title="Ledger" figures={[figure('a'), figure('b'), figure('total', false)]} />,
       );
       expect(document.querySelector('dl')).toHaveAttribute('data-layout', 'rows');
+
+      // A label too long for a third of the row would wrap to three lines: rows.
+      rerender(
+        <PageHeader
+          title="Anchoring"
+          figures={[figure('a'), figure('b'), { ...figure('c'), label: 'Active anchor-holders' }]}
+        />,
+      );
+      expect(document.querySelector('dl')).toHaveAttribute('data-layout', 'rows');
+
+      // Seven CJK characters still fit; they set about twice as wide as Latin letters.
+      rerender(
+        <PageHeader
+          title="锚定"
+          figures={[figure('a'), figure('b'), { ...figure('c'), label: '已锚定的NFT' }]}
+        />,
+      );
+      expect(document.querySelector('dl')).toHaveAttribute('data-layout', 'strip');
     });
 
     it('lists an odd count as rows on phones, so no grid cell is left empty', () => {
