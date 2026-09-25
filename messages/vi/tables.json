@@ -272,7 +272,11 @@
     "tableLabel": "Lịch sử nét bút",
     "viewGesture": "Nét bút #{position}",
     "attached": "Đính kèm",
-    "randomWalkToken": "Random Walk {id}"
+    "randomWalkToken": "Random Walk {id}",
+    "messagesHeld": {
+      "title": "Tạm giữ lời nhắn",
+      "description": "Không tải được danh sách lời nhắn đã ẩn, nên lời nhắn sẽ chưa hiển thị cho đến khi tải xong."
+    }
   },
   "nameHistory": {
     "removed": "Tên token đã bị xóa."

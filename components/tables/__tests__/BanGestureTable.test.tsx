@@ -40,7 +40,7 @@ jest.mock('../../../services/api', () => ({
     ban_bid: (...args: unknown[]) => mockBanGesture(...args),
     unban_gesture: (...args: unknown[]) => mockUnbanGesture(...args),
     // The moderation view reads the hidden list strictly.
-    get_banned_bids_required: (...args: unknown[]) => mockGetBannedGestures(...args),
+    get_banned_bids: (...args: unknown[]) => mockGetBannedGestures(...args),
   },
 }));
 jest.mock('../../../utils/errors', () => ({

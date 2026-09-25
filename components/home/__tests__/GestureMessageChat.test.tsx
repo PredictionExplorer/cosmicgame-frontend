@@ -178,6 +178,66 @@ describe('GestureMessageChat', () => {
     expect(screen.getByText('Hidden')).toBeInTheDocument();
   });
 
+  it('holds messages back while the hidden list loads, in the feed’s loading shape', () => {
+    // Regression: messages showed while the list that hides them was still
+    // loading, and stayed shown when it failed (the read failed open).
+    mockUseBannedGestures.mockReturnValue({ data: undefined, isError: false });
+    render(<GestureMessageChat gestures={[makeGesture({ EvtLogId: 2, Message: 'Hidden' })]} />);
+    expect(screen.queryByText('Hidden')).not.toBeInTheDocument();
+    expect(screen.getByTestId('chat-loading')).toBeInTheDocument();
+  });
+
+  it('holds messages back behind a notice with a retry when the hidden list fails', async () => {
+    const user = userEvent.setup();
+    const refetch = jest.fn();
+    mockUseBannedGestures.mockReturnValue({ data: undefined, isError: true, refetch });
+    render(
+      <GestureMessageChat
+        gestures={[makeGesture({ EvtLogId: 2, Message: 'Hidden' })]}
+        systemEvents={[makeEvent(10)]}
+        onJoinCta={jest.fn()}
+      />,
+    );
+
+    expect(screen.queryByText('Hidden')).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 3, name: 'home.chat.messagesHeld.title' }),
+    ).toBeInTheDocument();
+    // Never "no messages yet", an empty chat, or a count of zero messages.
+    expect(screen.queryByTestId('chat-no-messages')).not.toBeInTheDocument();
+    expect(screen.queryByText(/home\.chat\.empty\.title/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/home\.chat\.messageCount/)).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'home.chat.history.retry' }));
+    expect(refetch).toHaveBeenCalledTimes(1);
+
+    // The chat is not blank: the cycle's events still read under All activity.
+    await user.click(screen.getByRole('button', { name: 'home.chat.view.all' }));
+    expect(screen.getByTestId('chat-system-event')).toBeInTheDocument();
+  });
+
+  it('holds nothing back where no gesture carries a message', () => {
+    mockUseBannedGestures.mockReturnValue({ data: undefined, isError: true, refetch: jest.fn() });
+    render(<GestureMessageChat gestures={[makeGesture({ EvtLogId: 2, Message: '' })]} />);
+    expect(screen.queryByText('home.chat.messagesHeld.title')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('chat-loading')).not.toBeInTheDocument();
+  });
+
+  it('keeps a hidden list already read in force when a refresh of it fails', () => {
+    mockUseBannedGestures.mockReturnValue({ data: [{ bid_id: 2 }], isError: true });
+    render(
+      <GestureMessageChat
+        gestures={[
+          makeGesture({ EvtLogId: 2, Message: 'Hidden' }),
+          makeGesture({ EvtLogId: 3, Message: 'Shown' }),
+        ]}
+      />,
+    );
+    expect(screen.queryByText('Hidden')).not.toBeInTheDocument();
+    expect(screen.getByText('Shown')).toBeInTheDocument();
+    expect(screen.queryByText('home.chat.messagesHeld.title')).not.toBeInTheDocument();
+  });
+
   it('lists messages only under Messages, and every event under All activity', async () => {
     const user = userEvent.setup();
     render(

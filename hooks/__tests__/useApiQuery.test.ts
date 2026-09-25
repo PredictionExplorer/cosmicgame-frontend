@@ -515,6 +515,11 @@ describe('useApiQuery hooks', () => {
       renderHook(() => useBannedGestures());
       expect(getOptions().staleTime).toBe(30_000);
     });
+
+    it('reads nothing where the server already moderated the messages', () => {
+      renderHook(() => useBannedGestures({ enabled: false }));
+      expect(getOptions().enabled).toBe(false);
+    });
   });
 
   describe('useGestureEthCost', () => {

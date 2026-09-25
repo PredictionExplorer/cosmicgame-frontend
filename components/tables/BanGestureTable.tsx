@@ -80,9 +80,8 @@ const MODERATION_SKELETON_ROWS = 8;
 /** The public ledgers' hidden list (`useBannedGestures`). */
 const PUBLIC_HIDDEN_KEY = ['bannedBids'] as const;
 /**
- * The moderation view's own read of the same list, strict where the public
- * one is lenient, under the public key so that one invalidation refreshes
- * both.
+ * The moderation view's own read of the same list, under the public key so
+ * that one invalidation refreshes both.
  */
 const MODERATION_HIDDEN_KEY = [...PUBLIC_HIDDEN_KEY, 'moderation'] as const;
 
@@ -98,7 +97,7 @@ function useHiddenGestures() {
   const queryClient = useQueryClient();
   const query = useQuery<BannedGesture[]>({
     queryKey: MODERATION_HIDDEN_KEY,
-    queryFn: ({ signal }) => api.get_banned_bids_required({ signal }),
+    queryFn: ({ signal }) => api.get_banned_bids({ signal }),
     staleTime: 30_000,
   });
   const ids = useMemo(() => new Set((query.data ?? []).map((entry) => entry.bid_id)), [query.data]);

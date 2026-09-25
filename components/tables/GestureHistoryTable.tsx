@@ -21,6 +21,7 @@ import {
   type PhoneRecordContent,
 } from '@/components/ui/data-table';
 import { Duration } from '@/components/ui/duration';
+import { ErrorState } from '@/components/ui/error-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ClampedText } from '@/components/tables/ClampedText';
 import {
@@ -30,7 +31,7 @@ import {
 } from '@/components/tables/GestureMethodTag';
 import type { LedgerStateProps } from '@/components/tables/ledger-props';
 import { useCycleHref } from '@/components/tables/useCycleHref';
-import { useBannedGestures } from '@/hooks/useApiQuery';
+import { mayShowMessage, useGestureModeration } from '@/hooks/useGestureModeration';
 import { useNow } from '@/hooks/useNow';
 import { DateTime } from '@/components/ui/date-time';
 
@@ -252,13 +253,9 @@ const GestureHistoryTable = ({
   ...state
 }: GestureHistoryTableProps) => {
   const t = useTranslations('tables');
-  const { data: bannedGestures } = useBannedGestures();
+  // Messages wait for the list of hidden ones, and stay back if it fails.
+  const moderation = useGestureModeration();
   const cycleHref = useCycleHref();
-
-  const banned = useMemo(
-    () => new Set((bannedGestures ?? []).map((entry: { bid_id: number }) => entry.bid_id)),
-    [bannedGestures],
-  );
 
   const holds = useMemo(
     () => holdDurations(gestureHistory, heldUntil),
@@ -359,16 +356,25 @@ const GestureHistoryTable = ({
         id: 'message',
         kind: 'text',
         header: t('columns.message'),
-        value: (gesture) =>
-          !banned.has(gesture.EvtLogId) && gesture.Message ? gesture.Message : null,
-        cell: (_gesture, { value }) =>
-          value ? <ClampedText text={String(value)} className="sm:max-w-[22rem]" /> : null,
+        value: (gesture) => {
+          if (!gesture.Message) return null;
+          // A placeholder while the hidden list loads: the text itself waits.
+          if (moderation.status === 'pending') return gesture.EvtLogId;
+          return mayShowMessage(moderation, gesture.EvtLogId) ? gesture.Message : null;
+        },
+        cell: (_gesture, { value }) => {
+          if (value == null) return null;
+          if (moderation.status === 'pending') {
+            return <Skeleton className="inline-block h-3.5 w-40 max-w-full align-middle" />;
+          }
+          return <ClampedText text={String(value)} className="sm:max-w-[22rem]" />;
+        },
         hideWhenEmpty: true,
         stack: true,
       },
     ];
     return all.filter((column): column is DataTableColumn<GestureHistory> => Boolean(column));
-  }, [t, showRound, showParticipant, showHold, holds, banned, cycleHref]);
+  }, [t, showRound, showParticipant, showHold, holds, moderation, cycleHref]);
 
   const phoneRecord = useCallback(
     (gesture: GestureHistory): PhoneRecordContent => {
@@ -420,11 +426,30 @@ const GestureHistoryTable = ({
     [t, showRound, showParticipant, showHold, spansCycles, holds, cycleHref],
   );
 
+  // Its heading sits where the table's own states would: under the table's
+  // title, or at the table's level when it has none.
+  const level = state.headingLevel ?? 2;
+  const noticeLevel = state.title ? (Math.min(level + 1, 4) as 3 | 4) : level;
+
   return (
     <DataTable
       data={gestureHistory}
       columns={columns}
       phoneRecord={phoneRecord}
+      notice={
+        // Only where a message is waiting: a list with none has nothing held back.
+        moderation.status === 'failed' && gestureHistory.some((gesture) => gesture.Message) ? (
+          <ErrorState
+            variant="inline"
+            tone="warning"
+            title={t('gestureHistory.messagesHeld.title')}
+            message={t('gestureHistory.messagesHeld.description')}
+            onRetry={moderation.retry}
+            headingLevel={noticeLevel}
+            className="mb-4"
+          />
+        ) : undefined
+      }
       ariaLabel={t('gestureHistory.tableLabel')}
       getRowKey={(gesture) => gesture.EvtLogId}
       // The list arrives newest first: the date header says so, and a first

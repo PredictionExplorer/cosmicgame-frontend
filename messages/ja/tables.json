@@ -272,7 +272,11 @@
     "tableLabel": "一筆の履歴",
     "viewGesture": "一筆#{position}",
     "attached": "添付",
-    "randomWalkToken": "Random Walk {id}"
+    "randomWalkToken": "Random Walk {id}",
+    "messagesHeld": {
+      "title": "メッセージの表示を保留しています",
+      "description": "非表示のメッセージの一覧を読み込めませんでした。読み込めるまでメッセージは表示しません。"
+    }
   },
   "nameHistory": {
     "removed": "トークン名が削除されました。"

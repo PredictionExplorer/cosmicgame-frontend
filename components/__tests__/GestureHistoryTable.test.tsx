@@ -11,6 +11,17 @@ import GestureHistoryTable, { holdDurations } from '@/components/tables/GestureH
 
 import { render, screen, checkA11y, within } from '@/test-utils';
 
+/** The hidden-message list: read, and hiding nothing, unless a test says otherwise. */
+const mockUseBannedGestures = jest.fn();
+jest.mock('@/hooks/useApiQuery', () => ({
+  ...jest.requireActual('@/hooks/useApiQuery'),
+  useBannedGestures: () => mockUseBannedGestures(),
+}));
+
+beforeEach(() => {
+  mockUseBannedGestures.mockReturnValue({ data: [], isError: false, refetch: jest.fn() });
+});
+
 describe('GestureHistoryTable', () => {
   test('with no records', () => {
     render(<GestureHistoryTable gestureHistory={[]} />);
@@ -383,6 +394,75 @@ describe('GestureHistoryTable', () => {
       within(line2).getByRole('link', { name: 'tables.allocation.cycle(cycle=3)' }),
     ).toHaveAttribute('href', '/allocation/3');
     expect(line2).not.toHaveClass('justify-end');
+  });
+
+  describe('moderation', () => {
+    const withMessage = (id: number, message: string) => ({
+      EvtLogId: id,
+      TimeStamp: 1701346718 - id,
+      BidderAddr: '0x555eced709352759Ed0f1317dfC0a5FEf1310e60',
+      GestureType: 0,
+      EthPriceEth: 0.1,
+      Message: message,
+    });
+
+    test('leaves out the message of a gesture moderation hid', () => {
+      mockUseBannedGestures.mockReturnValue({ data: [{ bid_id: 2 }], isError: false });
+      render(
+        <GestureHistoryTable
+          gestureHistory={[withMessage(2, 'Hidden'), withMessage(3, 'Shown')]}
+          showRound={false}
+        />,
+      );
+      expect(screen.queryByText('Hidden')).not.toBeInTheDocument();
+      expect(screen.getByText('Shown')).toBeInTheDocument();
+    });
+
+    test('holds every message back while the hidden list loads', () => {
+      // Regression: the ledger showed every message until the list that
+      // hides some of them arrived, and kept showing them when it failed.
+      mockUseBannedGestures.mockReturnValue({ data: undefined, isError: false });
+      const { container } = render(
+        <GestureHistoryTable gestureHistory={[withMessage(2, 'Hidden')]} showRound={false} />,
+      );
+      expect(screen.queryByText('Hidden')).not.toBeInTheDocument();
+      // The column keeps its place with a placeholder, so nothing jumps.
+      const cell = container.querySelector('td[data-label="tables.columns.message"]');
+      expect(cell?.querySelector('[data-slot="skeleton"]')).toBeInTheDocument();
+    });
+
+    test('holds every message back, with a notice and a retry, when the hidden list fails', async () => {
+      const user = userEvent.setup();
+      const refetch = jest.fn();
+      mockUseBannedGestures.mockReturnValue({ data: undefined, isError: true, refetch });
+      render(
+        <GestureHistoryTable
+          gestureHistory={[withMessage(2, 'Hidden')]}
+          showRound={false}
+          headingLevel={3}
+        />,
+      );
+
+      expect(screen.queryByText('Hidden')).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('columnheader', { name: 'tables.columns.message' }),
+      ).not.toBeInTheDocument();
+      // The gestures themselves still read; only their messages wait.
+      expect(screen.getAllByRole('row')).toHaveLength(2);
+      expect(
+        screen.getByRole('heading', { level: 3, name: 'tables.gestureHistory.messagesHeld.title' }),
+      ).toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: 'Try again' }));
+      expect(refetch).toHaveBeenCalledTimes(1);
+    });
+
+    test('says nothing is held back where no gesture carries a message', () => {
+      mockUseBannedGestures.mockReturnValue({ data: undefined, isError: true, refetch: jest.fn() });
+      render(<GestureHistoryTable gestureHistory={[withMessage(2, '')]} showRound={false} />);
+      expect(
+        screen.queryByText('tables.gestureHistory.messagesHeld.title'),
+      ).not.toBeInTheDocument();
+    });
   });
 
   // Regression: each hold was measured to the row before it in the list, so

@@ -272,7 +272,11 @@
     "tableLabel": "落筆歷史",
     "viewGesture": "落筆 #{position}",
     "attached": "附加",
-    "randomWalkToken": "Random Walk {id}"
+    "randomWalkToken": "Random Walk {id}",
+    "messagesHeld": {
+      "title": "留言暫不顯示",
+      "description": "無法載入已隱藏留言的清單，載入完成前不顯示留言。"
+    }
   },
   "nameHistory": {
     "removed": "代幣名稱已移除。"

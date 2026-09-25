@@ -23,6 +23,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DateTime } from '@/components/ui/date-time';
 import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { LinkifiedText } from '@/components/ui/linkified-text';
 import { LiveStatus } from '@/components/ui/live-status';
@@ -31,7 +32,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { tabsListVariants, tabsTriggerVariants } from '@/components/ui/tabs';
 import { TxExplorerLink } from '@/components/ui/tx-status';
 import type { GestureFeedSystemEvent } from '@/components/home/deck/feedSystemEvents';
-import { useBannedGestures } from '@/hooks/useApiQuery';
+import { mayShowMessage, useGestureModeration } from '@/hooks/useGestureModeration';
 import { useLivePulse } from '@/hooks/useLivePulse';
 import { TOUCH_TARGET_EXTENDED_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
@@ -168,14 +169,14 @@ type FeedRow =
 
 function getGestureChatMessages(
   gestures: GestureInfo[],
-  bannedGestureIds: Set<number>,
+  mayShow: (gestureId: number) => boolean,
 ): GestureChatMessage[] {
   return gestures
     .map((gesture) => ({
       gesture,
       message: typeof gesture.Message === 'string' ? gesture.Message.trim() : '',
     }))
-    .filter(({ gesture, message }) => message.length > 0 && !bannedGestureIds.has(gesture.EvtLogId))
+    .filter(({ gesture, message }) => message.length > 0 && mayShow(gesture.EvtLogId))
     .sort((a, b) => {
       const timeDiff = (b.gesture.TimeStamp ?? 0) - (a.gesture.TimeStamp ?? 0);
       return timeDiff !== 0 ? timeDiff : (b.gesture.EvtLogId ?? 0) - (a.gesture.EvtLogId ?? 0);
@@ -444,7 +445,7 @@ export function GestureMessageChat({
   systemEvents,
   pendingMessages,
   pagination,
-  isLoading = false,
+  isLoading: historyLoading = false,
   error = false,
   onRetry,
   resetKey,
@@ -454,14 +455,19 @@ export function GestureMessageChat({
   const t = useTranslations('home');
   const titleId = useId();
   const methodTag = useMethodTag();
-  const { data: bannedGestures } = useBannedGestures();
-  const bannedGestureIds = useMemo(
-    () => new Set(serverModerated ? [] : (bannedGestures ?? []).map((gesture) => gesture.bid_id)),
-    [bannedGestures, serverModerated],
+  // Moderation fails closed: messages wait for the list of hidden ones (the
+  // feed keeps its loading shape), and if it cannot be read they stay back
+  // behind a notice with a retry, while the cycle's events still show.
+  // Only a message that is waiting holds anything up.
+  const moderation = useGestureModeration({ enabled: !serverModerated });
+  const carriesMessage = gestures.some(
+    (gesture) => typeof gesture.Message === 'string' && gesture.Message.trim() !== '',
   );
+  const isLoading = historyLoading || (carriesMessage && moderation.status === 'pending');
+  const messagesHeld = carriesMessage && moderation.status === 'failed';
   const messages = useMemo(
-    () => getGestureChatMessages(gestures, bannedGestureIds),
-    [gestures, bannedGestureIds],
+    () => getGestureChatMessages(gestures, (id) => mayShowMessage(moderation, id)),
+    [gestures, moderation],
   );
   const [view, setView] = useState<ChatView>('messages');
   const [eventWindow, setEventWindow] = useState({ key: resetKey, limit: SYSTEM_EVENTS_PER_PAGE });
@@ -501,6 +507,7 @@ export function GestureMessageChat({
     !!onJoinCta &&
     !isLoading &&
     !error &&
+    !messagesHeld &&
     hasFeedContent &&
     !noMessagesYet &&
     !hasHiddenRows &&
@@ -539,8 +546,9 @@ export function GestureMessageChat({
     cycleNumber != null
       ? t('chat.cycleNumber', { number: String(cycleNumber) })
       : t('chat.currentCycle');
+  // Held-back messages are not "0 messages": the line says nothing then.
   const counts =
-    isLoading || error
+    isLoading || error || messagesHeld
       ? null
       : hasOlderContent
         ? t('chat.history.showing', { messages: messages.length, events: countedEvents })
@@ -642,7 +650,20 @@ export function GestureMessageChat({
           </div>
         ) : null}
 
-        {!isLoading && !error && hasAnyContent && noMessagesYet ? (
+        {!isLoading && !error && messagesHeld && moderation.status === 'failed' ? (
+          <ErrorState
+            variant="inline"
+            tone="warning"
+            title={t('chat.messagesHeld.title')}
+            message={t('chat.messagesHeld.description')}
+            onRetry={moderation.retry}
+            retryLabel={t('chat.history.retry')}
+            headingLevel={3}
+            className="border-b border-rule-faint py-4 print:hidden"
+          />
+        ) : null}
+
+        {!isLoading && !error && !messagesHeld && hasAnyContent && noMessagesYet ? (
           <div
             data-testid="chat-no-messages"
             className={cn(
@@ -689,7 +710,7 @@ export function GestureMessageChat({
               </li>
             ))}
           </ol>
-        ) : !isLoading && !error && !hasAnyContent ? (
+        ) : !isLoading && !error && !messagesHeld && !hasAnyContent ? (
           <EmptyState
             variant="inline"
             headingLevel={3}

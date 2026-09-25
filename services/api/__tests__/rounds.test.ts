@@ -16,7 +16,6 @@ import {
   get_prize_deposits_list,
   get_prize_deposits_by_round,
   get_banned_bids,
-  get_banned_bids_required,
   ban_bid,
   unban_gesture,
   get_bid_eth_price,
@@ -706,48 +705,26 @@ describe('rounds API', () => {
   });
 
   describe('get_banned_bids', () => {
-    it('returns banned gestures from the main API', async () => {
-      const gestures = [{ BidId: 1, UserAddr: '0x1' }];
-      mockedAxios.get.mockResolvedValue({ data: gestures });
-
-      const result = await get_banned_bids();
-
-      expect(result).toEqual(gestures);
-      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/get_banned_bids/));
-    });
-
-    it('returns empty array on 400 response', async () => {
-      mockedAxios.get.mockRejectedValue(make400());
-      expect(await get_banned_bids()).toEqual([]);
-    });
-
-    it('returns empty array on 403 response', async () => {
-      mockedAxios.get.mockRejectedValue(make403());
-      expect(await get_banned_bids()).toEqual([]);
-    });
-
-    it('throws on network error', async () => {
-      mockedAxios.get.mockRejectedValue(new Error('fail'));
-      await expect(get_banned_bids()).rejects.toThrow('Network response was not OK');
-    });
-  });
-
-  describe('get_banned_bids_required', () => {
-    it('returns the hidden list from the same route', async () => {
+    it('returns the hidden list from the main API', async () => {
       const gestures = [{ bid_id: 1 }];
       mockedAxios.get.mockResolvedValue({ data: gestures });
 
-      expect(await get_banned_bids_required()).toEqual(gestures);
+      expect(await get_banned_bids()).toEqual(gestures);
       expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/get_banned_bids/));
     });
 
-    // The moderation view must never read a refused list as "nothing hidden".
+    // Moderation fails closed: a refused or failed read is never "nothing hidden".
     it.each([
       ['400', make400],
       ['403', make403],
     ])('rejects on a %s response instead of resolving empty', async (_status, make) => {
       mockedAxios.get.mockRejectedValue(make());
-      await expect(get_banned_bids_required()).rejects.toThrow();
+      await expect(get_banned_bids()).rejects.toThrow();
+    });
+
+    it('rejects on a network error', async () => {
+      mockedAxios.get.mockRejectedValue(new Error('fail'));
+      await expect(get_banned_bids()).rejects.toThrow();
     });
   });
 

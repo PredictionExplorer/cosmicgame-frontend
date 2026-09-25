@@ -431,6 +431,10 @@
   },
   "chat": {
     "title": "落笔留言板",
+    "messagesHeld": {
+      "title": "留言暂不显示",
+      "description": "未能加载已隐藏留言的列表，加载完成前不显示留言。"
+    },
     "joinTooltip": "想在这里留言？落笔时附上一句话即可。随落笔提交的留言都会显示在这里。",
     "currentCycle": "当前周期",
     "cycleNumber": "第 {number} 个周期",

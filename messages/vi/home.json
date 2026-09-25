@@ -431,6 +431,10 @@
   },
   "chat": {
     "title": "Trò chuyện nét bút",
+    "messagesHeld": {
+      "title": "Tạm giữ lời nhắn",
+      "description": "Không tải được danh sách lời nhắn đã ẩn, nên lời nhắn sẽ chưa hiển thị cho đến khi tải xong."
+    },
     "joinTooltip": "Muốn tham gia trò chuyện? Hãy đặt một nét bút và để lại lời nhắn tùy chọn. Lời nhắn đính kèm nét bút sẽ xuất hiện ở đây.",
     "currentCycle": "Chu kỳ hiện tại",
     "cycleNumber": "Chu kỳ {number}",

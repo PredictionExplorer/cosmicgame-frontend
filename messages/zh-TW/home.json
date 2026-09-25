@@ -431,6 +431,10 @@
   },
   "chat": {
     "title": "落筆留言板",
+    "messagesHeld": {
+      "title": "留言暫不顯示",
+      "description": "無法載入已隱藏留言的清單，載入完成前不顯示留言。"
+    },
     "joinTooltip": "想在這裡留言？落筆時附上一句話即可。隨落筆提交的留言都會顯示在這裡。",
     "currentCycle": "目前週期",
     "cycleNumber": "第 {number} 個週期",

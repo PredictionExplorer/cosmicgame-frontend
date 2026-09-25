@@ -225,23 +225,12 @@ export function get_prize_deposits_by_round(
 }
 
 /**
- * Fetches the list of administratively banned gestures (Cosmic Game / Go API).
- * Optional read: the route is admin-gated and answers 403 to ordinary clients.
+ * The gestures whose messages moderation has hidden (Cosmic Game / Go API),
+ * a public route. Read strictly: a refused or failed read rejects instead of
+ * resolving to an empty list, which would show every hidden message as
+ * visible, in the public ledgers and chat and in the moderation view alike.
  */
 export function get_banned_bids(opts?: ApiRequestOptions): Promise<BannedGesture[]> {
-  return apiCall(async () => {
-    const { data } = await apiGet(getAPIUrl('get_banned_bids'), opts);
-    return data as BannedGesture[];
-  }, []);
-}
-
-/**
- * The same hidden list, read strictly for the moderation view: a refused or
- * failed read rejects instead of resolving to an empty list, because there
- * an empty list would show every hidden message as visible, with a Hide
- * button beside it.
- */
-export function get_banned_bids_required(opts?: ApiRequestOptions): Promise<BannedGesture[]> {
   return apiCallRequired(async () => {
     const { data } = await apiGet(getAPIUrl('get_banned_bids'), opts);
     return data as BannedGesture[];

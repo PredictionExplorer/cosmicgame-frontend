@@ -309,11 +309,18 @@ export function useAllocationDepositsByCycle(round: number) {
   });
 }
 
-export function useBannedGestures() {
+/**
+ * The gestures whose messages moderation has hidden. The read is strict (a
+ * failed read is an error, never an empty list), so read it through
+ * `useGestureModeration`, which holds messages back until the list is known.
+ * `enabled: false` where the messages arrive already moderated.
+ */
+export function useBannedGestures({ enabled = true }: { enabled?: boolean } = {}) {
   return useQuery<BannedGesture[]>({
     queryKey: ['bannedBids'],
     queryFn: ({ signal }) => api.get_banned_bids({ signal }),
     staleTime: 30_000,
+    enabled,
   });
 }
 

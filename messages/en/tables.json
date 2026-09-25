@@ -272,7 +272,11 @@
     "tableLabel": "Gesture history",
     "viewGesture": "Gesture #{position}",
     "attached": "Attached",
-    "randomWalkToken": "Random Walk {id}"
+    "randomWalkToken": "Random Walk {id}",
+    "messagesHeld": {
+      "title": "Messages held back",
+      "description": "The list of hidden messages didn’t load, so no message shows until it does."
+    }
   },
   "nameHistory": {
     "removed": "Token name was removed."

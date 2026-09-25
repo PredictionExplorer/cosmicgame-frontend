@@ -431,6 +431,10 @@
   },
   "chat": {
     "title": "Gesture Chat",
+    "messagesHeld": {
+      "title": "Messages held back",
+      "description": "The list of hidden messages didn’t load, so no message shows until it does."
+    },
     "joinTooltip": "Want to join the chat? Make a gesture and leave an optional message. Messages attached to gestures appear here.",
     "currentCycle": "Current cycle",
     "cycleNumber": "Cycle {number}",

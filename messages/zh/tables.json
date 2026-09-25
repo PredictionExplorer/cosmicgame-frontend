@@ -272,7 +272,11 @@
     "tableLabel": "落笔历史",
     "viewGesture": "落笔 #{position}",
     "attached": "附加",
-    "randomWalkToken": "Random Walk {id}"
+    "randomWalkToken": "Random Walk {id}",
+    "messagesHeld": {
+      "title": "留言暂不显示",
+      "description": "未能加载已隐藏留言的列表，加载完成前不显示留言。"
+    }
   },
   "nameHistory": {
     "removed": "代币名称已移除。"

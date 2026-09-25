@@ -272,7 +272,11 @@
     "tableLabel": "Історія жестів",
     "viewGesture": "Жест #{position}",
     "attached": "Долучено",
-    "randomWalkToken": "Random Walk {id}"
+    "randomWalkToken": "Random Walk {id}",
+    "messagesHeld": {
+      "title": "Повідомлення притримано",
+      "description": "Не вдалося завантажити список прихованих повідомлень, тому повідомлення не показуються, доки він не завантажиться."
+    }
   },
   "nameHistory": {
     "removed": "Ім’я токена видалено."

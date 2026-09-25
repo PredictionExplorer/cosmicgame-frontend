@@ -21,9 +21,9 @@
  *                         staking/cst/rewards/to_claim/by_user/…
  *                         prizes/eth/unclaimed/by_user/…
  *                         donations/nft/unclaimed/by_user/…
- *                       and the moderation view's hidden list, where an
- *                       empty list would show every hidden message as
- *                       visible (get_banned_bids_required):
+ *                       and the hidden-message list, where an empty list
+ *                       would show every hidden message as visible, so
+ *                       every reader holds messages back until it loads:
  *                         get_banned_bids
  *
  *   apiCallEmptyOn404   404 means "nothing yet"; everything else rejects.
@@ -37,8 +37,7 @@
  *
  *   apiCall             Lenient: 400/403/404 resolve to the fallback. The long
  *                       tail of secondary tables, badges, and admin-gated
- *                       routes (get_banned_bids answers 403 to ordinary
- *                       clients) where an empty result is a truthful answer.
+ *                       routes where an empty result is a truthful answer.
  *
  * A read that rejects does so with an `ApiReadError` (./readError) carrying the
  * HTTP status, so a page can tell a record the server does not hold
