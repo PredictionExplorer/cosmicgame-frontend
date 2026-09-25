@@ -5,7 +5,9 @@
     "due": "Належить із цього циклу",
     "dueCaption": "{percent} Резерву циклу на цей момент",
     "inVault": "Зараз у сховищі",
-    "retrieved": "Забрано загалом"
+    "retrieved": "Забрано загалом",
+    "beneficiaryNote": "<guild>Protocol Guild</guild> — колективний механізм фінансування розробників ядра Ethereum.",
+    "forwardNote": "Будь-хто може переслати залишок сховища до Protocol Guild; це коштує лише газ."
   },
   "ledger": {
     "contributions": "Записи внесків",

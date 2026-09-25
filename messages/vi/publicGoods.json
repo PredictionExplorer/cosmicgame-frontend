@@ -5,7 +5,9 @@
     "due": "Phần của chu kỳ này",
     "dueCaption": "{percent} Dự trữ chu kỳ tính đến lúc này",
     "inVault": "Hiện có trong kho",
-    "retrieved": "Đã nhận về tổng cộng"
+    "retrieved": "Đã nhận về tổng cộng",
+    "beneficiaryNote": "<guild>Protocol Guild</guild> là cơ chế tài trợ tập thể cho những người đóng góp cốt lõi cho Ethereum.",
+    "forwardNote": "Bất kỳ ai cũng có thể chuyển số dư của kho đến Protocol Guild; chỉ tốn phí gas."
   },
   "ledger": {
     "contributions": "Bản ghi đóng góp",

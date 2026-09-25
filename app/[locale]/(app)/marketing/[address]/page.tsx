@@ -6,7 +6,10 @@ import { formatAddress } from '@/utils/format';
 import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
+import { QuerySeed } from '../../QuerySeed';
+
 import MarketingRewardsPage from './MarketingRewardsPage';
+import { readOutreachAddressSeeds } from './outreachAddressSeed';
 
 export async function generateMetadata(
   { params }: { params: Promise<{ locale: string; address: string }> },
@@ -37,9 +40,13 @@ export default async function Page({
 }) {
   const { locale, address } = await params;
   setRequestLocale(locale);
+  // The allocations and the ranking in the HTML: no skeletons, no layout shift.
+  const seeds = await readOutreachAddressSeeds(address);
   return (
     <PageMessages namespaces={['marketing', 'tables']}>
-      <MarketingRewardsPage address={address} />
+      <QuerySeed seeds={seeds}>
+        <MarketingRewardsPage address={address} />
+      </QuerySeed>
     </PageMessages>
   );
 }

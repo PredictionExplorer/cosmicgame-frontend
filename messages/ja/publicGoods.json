@@ -5,7 +5,9 @@
     "due": "このサイクルからの繰入予定",
     "dueCaption": "現時点のサイクル準備金の{percent}",
     "inVault": "現在の金庫残高",
-    "retrieved": "受け取り済みの累計"
+    "retrieved": "受け取り済みの累計",
+    "beneficiaryNote": "<guild>Protocol Guild</guild>は、Ethereumのコア貢献者を支える共同の資金支援の仕組みです。",
+    "forwardNote": "誰でも金庫の残高をProtocol Guildへ送ることができ、かかるのはガス代だけです。"
   },
   "ledger": {
     "contributions": "拠出の記録",

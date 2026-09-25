@@ -5,7 +5,9 @@
     "due": "本週期應轉入",
     "dueCaption": "目前週期儲備的 {percent}",
     "inVault": "金庫現存",
-    "retrieved": "累計已取回"
+    "retrieved": "累計已取回",
+    "beneficiaryNote": "<guild>Protocol Guild</guild> 是資助以太坊核心貢獻者的集體機制。",
+    "forwardNote": "任何人都可以把金庫餘額轉撥給 Protocol Guild，只需支付 Gas 費。"
   },
   "ledger": {
     "contributions": "資助紀錄",

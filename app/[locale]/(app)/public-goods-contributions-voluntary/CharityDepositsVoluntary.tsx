@@ -7,13 +7,12 @@ import { protocolFacts } from '@/content/protocol-facts';
 
 import { useCharityVoluntary } from '@/hooks/useApiQuery';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
-import { ContractEvidence } from '@/components/legal/ContractEvidence';
+import { VaultAddressRow } from '@/components/donations/VaultAddressRow';
 import { LedgerPage } from '@/components/ledger/LedgerPage';
 import {
   CharityDepositTable,
   type PublicGoodsContributionEntry,
 } from '@/components/tables/CharityDepositTable';
-import { AddressChip } from '@/components/ui/address-chip';
 import { SectionHeader } from '@/components/ui/section-header';
 
 /**
@@ -22,7 +21,6 @@ import { SectionHeader } from '@/components/ui/section-header';
  */
 function ContributeToVault() {
   const t = useTranslations('publicGoods');
-  const tFormats = useTranslations('formats');
   const { charity } = useContractAddresses();
   const headingId = useId();
 
@@ -35,22 +33,7 @@ function ContributeToVault() {
           beneficiary: protocolFacts.publicGoodsBeneficiary.name,
         })}
       />
-      {charity ? (
-        <dl className="flex flex-col gap-1.5 border-y border-rule-faint py-4 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-x-6">
-          <dt className="type-label text-subtle">{tFormats('address.known.publicGoods')}</dt>
-          <dd className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-1">
-            <AddressChip
-              address={charity}
-              variant="plain"
-              label={false}
-              href={false}
-              display="responsive"
-              className="type-hash text-foreground"
-            />
-            <ContractEvidence address={charity} />
-          </dd>
-        </dl>
-      ) : null}
+      {charity ? <VaultAddressRow address={charity} /> : null}
     </section>
   );
 }

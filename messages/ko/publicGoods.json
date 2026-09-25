@@ -5,7 +5,9 @@
     "due": "이번 사이클 적립분",
     "dueCaption": "현재 사이클 준비금의 {percent}",
     "inVault": "현재 금고 보관",
-    "retrieved": "누적 회수액"
+    "retrieved": "누적 회수액",
+    "beneficiaryNote": "<guild>Protocol Guild</guild>는 이더리움 핵심 프로토콜 기여자를 지원하는 공동 자금 지원 체계입니다.",
+    "forwardNote": "누구나 금고 잔액을 Protocol Guild로 전달할 수 있으며, 가스비만 듭니다."
   },
   "ledger": {
     "contributions": "기여 기록",

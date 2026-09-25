@@ -5,9 +5,13 @@ import { render, screen, checkA11y, fireEvent, within } from '@/test-utils';
 import MarketingRewardsPage from '../MarketingRewardsPage';
 
 const mockUseMarketingRewardsByUser = jest.fn();
+const mockUseMarketingRewards = jest.fn(() => ({
+  data: undefined as MarketingReward[] | undefined,
+}));
 
 jest.mock('@/hooks/useApiQuery', () => ({
   useMarketingRewardsByUser: (...args: unknown[]) => mockUseMarketingRewardsByUser(...args),
+  useMarketingRewards: () => mockUseMarketingRewards(),
 }));
 
 const VALID_ADDRESS = '0x1234567890abcdef1234567890abcdef12345678';
@@ -36,7 +40,10 @@ const figure = (label: string) => {
   return term.closest('div') as HTMLElement;
 };
 
-beforeEach(() => mockUseMarketingRewardsByUser.mockReset());
+beforeEach(() => {
+  mockUseMarketingRewardsByUser.mockReset();
+  mockUseMarketingRewards.mockReturnValue({ data: undefined });
+});
 
 describe('MarketingRewardsPage', () => {
   it('opens with an identity header under the Outreach Reserve', () => {
@@ -77,8 +84,8 @@ describe('MarketingRewardsPage', () => {
     render(<MarketingRewardsPage address={VALID_ADDRESS} />);
     expect(screen.queryByText('First allocation')).not.toBeInTheDocument();
     expect(screen.queryByText('Latest allocation')).not.toBeInTheDocument();
-    expect(figure('Allocated')).toHaveTextContent('2023');
-    expect(figure('Allocated').querySelector('dd')).not.toHaveClass('lg:type-figure-lg');
+    expect(figure('Allocated on')).toHaveTextContent('2023');
+    expect(figure('Allocated on').querySelector('dd')).not.toHaveClass('lg:type-figure-lg');
   });
 
   it('mutes and explains allocations too small to show, only when there are some', () => {
@@ -164,6 +171,21 @@ describe('MarketingRewardsPage', () => {
       'href',
       '/marketing',
     );
+  });
+
+  it('says where the contributor stands among all outreach contributors', () => {
+    const other = '0x9999999999999999999999999999999999999999';
+    mockUseMarketingRewardsByUser.mockReturnValue(query({ data: [reward(1, 50, 1_786_000_000)] }));
+    mockUseMarketingRewards.mockReturnValue({
+      data: [
+        reward(1, 50, 1_786_000_000),
+        { ...reward(2, 150, 1_786_000_100), MarketerAddr: other },
+      ],
+    });
+    render(<MarketingRewardsPage address={VALID_ADDRESS} />);
+    const rank = figure('Rank');
+    expect(rank).toHaveTextContent('2 of 2');
+    expect(rank).toHaveTextContent('25.0% of all outreach CST');
   });
 
   it('has no accessibility violations', async () => {
