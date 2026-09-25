@@ -7,15 +7,15 @@ import NFTImage from '@/components/nft/NFTImage';
 import { useAttachedErc20Metadata } from '@/components/attachments/useAttachedErc20Metadata';
 import { useAttachedNftMetadata } from '@/components/attachments/useAttachedNftMetadata';
 import { PendingPlate } from '@/components/ui/art-frame';
-import { Badge } from '@/components/ui/badge';
 import { UnknownValue } from '@/components/ui/unknown-value';
 import { Button } from '@/components/ui/button';
 import {
   DataTable,
   ExternalTableLink,
-  TableLink,
+  TableTag,
   type DataTableColumn,
 } from '@/components/ui/data-table';
+import { useCycleCell } from '@/components/tables/useCycleCell';
 import { useFormat } from '@/hooks/useFormat';
 import type { DonatedErc20ClaimAmountSource } from '@/utils/donatedErc20';
 import { formatAddress, NBSP } from '@/utils/format';
@@ -162,9 +162,9 @@ function actionHeader(
 }
 
 /**
- * The last cell of a row: "Retrieved" once it is, else the row's own
- * "Retrieve" where the viewer may retrieve (their own wallet), else "Not
- * retrieved".
+ * The last cell of a row, as every allocation ledger marks it: "Retrieved",
+ * quietly, once it is; else the row's own "Retrieve" where the viewer may
+ * retrieve (their own wallet), else the accent "Ready to retrieve" tag.
  */
 function RetrievalAction({
   claimed,
@@ -174,15 +174,9 @@ function RetrievalAction({
   /** The row's retrieve button, or `null` on someone else's wallet. */
   action: ReactNode;
 }) {
-  const t = useTranslations('myPages');
-  if (claimed) {
-    return (
-      <Badge size="sm" tone="positive" dot>
-        {t('ethAllocations.status.retrieved')}
-      </Badge>
-    );
-  }
-  return action ?? <Badge size="sm">{t('ethAllocations.status.waiting')}</Badge>;
+  const t = useTranslations('tables');
+  if (claimed) return <span className="text-subtle">{t('recipientHistory.retrieved')}</span>;
+  return action ?? <TableTag tone="accent">{t('recipientHistory.readyToRetrieve')}</TableTag>;
 }
 
 /**
@@ -206,6 +200,7 @@ export function AttachedNftRetrievalTable({
   retrieving?: readonly number[];
 }) {
   const t = useTranslations('myPages');
+  const cycleCell = useCycleCell();
   const columns = useMemo<DataTableColumn<AttachedNftRetrievalRow>[]>(
     () => [
       {
@@ -220,11 +215,7 @@ export function AttachedNftRetrievalTable({
         kind: 'link',
         header: t('attached.columns.cycle'),
         value: (row) => row.RoundNum,
-        cell: (row) => (
-          <TableLink href={`/allocation/${row.RoundNum}`}>
-            {t('ethAllocations.cycle', { cycle: row.RoundNum })}
-          </TableLink>
-        ),
+        cell: (row) => cycleCell(row.RoundNum),
         nowrap: true,
       },
       {
@@ -268,7 +259,7 @@ export function AttachedNftRetrievalTable({
         ),
       },
     ],
-    [onRetrieve, retrieving, t],
+    [cycleCell, onRetrieve, retrieving, t],
   );
   return (
     <DataTable
@@ -300,6 +291,7 @@ export function AttachedTokenRetrievalTable({
   retrieving?: readonly string[];
 }) {
   const t = useTranslations('myPages');
+  const cycleCell = useCycleCell();
   const columns = useMemo<DataTableColumn<AttachedTokenRetrievalRow>[]>(
     () => [
       {
@@ -313,11 +305,7 @@ export function AttachedTokenRetrievalTable({
         kind: 'link',
         header: t('attached.columns.cycle'),
         value: (row) => row.RoundNum,
-        cell: (row) => (
-          <TableLink href={`/allocation/${row.RoundNum}`}>
-            {t('ethAllocations.cycle', { cycle: row.RoundNum })}
-          </TableLink>
-        ),
+        cell: (row) => cycleCell(row.RoundNum),
         nowrap: true,
       },
       {
@@ -351,7 +339,7 @@ export function AttachedTokenRetrievalTable({
         ),
       },
     ],
-    [onRetrieve, retrieving, t],
+    [cycleCell, onRetrieve, retrieving, t],
   );
   return (
     <DataTable

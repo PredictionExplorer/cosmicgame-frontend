@@ -9,7 +9,7 @@ import { ArtFrame, PendingPlate, WallLabel } from '@/components/ui/art-frame';
 
 import type { SignatureArtState } from './useSignatureIndex';
 
-export interface SignatureCardProps {
+export interface AllocationSignatureCardProps {
   tokenId: number;
   /** The token's seed; without one the plate shows the designed unavailable state. */
   seed: string | number | null | undefined;
@@ -56,12 +56,15 @@ export interface SignatureCardProps {
 
 /**
  * A Signature on its black plate with a wall label under it: the one way an
- * allocation page shows a token. The plate and the title lead to the same
+ * allocation page shows a token (a cycle's recipients, a finalized cycle, a
+ * participant's Stellar Selection NFTs). Its title is a role or a cycle, not
+ * the token's traits: the gallery's wall card is `SignatureCard`
+ * (components/nft), a different card with a different job. The plate and the title lead to the same
  * place (the token's page unless `href` says otherwise); the plate is a
  * pointer shortcut only (out of the tab order and hidden from screen
  * readers), so each card is one stop. Nothing is drawn over the art.
  */
-export function SignatureCard({
+export function AllocationSignatureCard({
   tokenId,
   seed,
   artState = 'ready',
@@ -78,7 +81,7 @@ export function SignatureCard({
   priority = false,
   subgrid = false,
   className,
-}: SignatureCardProps) {
+}: AllocationSignatureCardProps) {
   return (
     <figure
       className={cn(

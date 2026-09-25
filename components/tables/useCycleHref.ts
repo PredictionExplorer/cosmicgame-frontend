@@ -18,12 +18,20 @@ export function cycleHref(cycle: number, liveCycle: number | null | undefined): 
 }
 
 /**
- * `cycleHref` bound to the live cycle from the shared dashboard read. A
- * ledger reads it once rather than polling; a live page on the same screen
- * keeps the shared read fresh.
+ * The cycle open now, as the chain counts it: the shared dashboard read's
+ * `CurRoundNum`, `null` until it is read. The one definition of the live
+ * cycle: cycle links, and the pages that say whether a cycle is still open
+ * (`useLiveCycle` in components/winnings/missingCycle), read it. A ledger
+ * reads it once rather than polling; a live page on the same screen keeps
+ * the shared read fresh.
  */
-export function useCycleHref(): (cycle: number) => string {
+export function useDashboardLiveCycle(): number | null {
   const { data } = useDashboardInfo(undefined, { poll: false });
-  const liveCycle = typeof data?.CurRoundNum === 'number' ? data.CurRoundNum : null;
+  return typeof data?.CurRoundNum === 'number' ? data.CurRoundNum : null;
+}
+
+/** `cycleHref` bound to the live cycle (`useDashboardLiveCycle`). */
+export function useCycleHref(): (cycle: number) => string {
+  const liveCycle = useDashboardLiveCycle();
   return useCallback((cycle: number) => cycleHref(cycle, liveCycle), [liveCycle]);
 }

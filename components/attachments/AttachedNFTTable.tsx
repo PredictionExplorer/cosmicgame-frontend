@@ -5,7 +5,6 @@ import { useLocale, useTranslations } from 'next-intl';
 import { getExplorerUrl } from '@/utils/urls';
 import { formatAddress, formatCount } from '@/utils/format';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 import {
   DataTable,
   ExternalTableLink,
@@ -38,10 +37,6 @@ export interface NFTRecord {
 
 interface DonatedNFTTableProps {
   list: NFTRecord[];
-  /** Retrieves one NFT by its index; shows a Retrieve action on rows not yet retrieved. */
-  handleClaim?: (tokenIndex: number) => void | Promise<void>;
-  /** Indexes whose retrieval is in flight. */
-  claimingTokens: number[];
   /** Table heading level when the table stands under a section heading. */
   headingLevel?: 2 | 3 | 4;
 }
@@ -115,20 +110,16 @@ function AttachedNftToken({ nft }: { nft: NFTRecord }) {
 }
 
 /**
- * The NFTs attached to gestures, as a ledger: each piece's image, name and
- * collection, who attached it, the cycle and the proof. With `handleClaim`
- * (the Recipient's own allocations) a row not yet retrieved offers Retrieve.
+ * The NFTs attached to gestures, as a read-only ledger: each piece's image,
+ * name and collection, who attached it, the cycle and the proof. Retrieving
+ * happens in the one retrieval ledger for attached NFTs,
+ * `AttachedNftRetrievalTable` (components/winnings), never here.
  */
-const DonatedNFTTable = ({
-  list,
-  handleClaim,
-  claimingTokens,
-  headingLevel,
-}: DonatedNFTTableProps) => {
+const DonatedNFTTable = ({ list, headingLevel }: DonatedNFTTableProps) => {
   const t = useTranslations('tables');
   const locale = useLocale();
 
-  const columns: DataTableColumn<NFTRecord>[] = [
+  const columns: readonly DataTableColumn<NFTRecord>[] = [
     {
       // A phone record draws the picture beside the name (the token cell).
       id: 'image',
@@ -187,27 +178,6 @@ const DonatedNFTTable = ({
       txHash: (row) => row.TxHash,
     },
   ];
-
-  if (handleClaim) {
-    columns.push({
-      id: 'retrieve',
-      header: <span className="sr-only">{t('attachedAssets.aria.actions')}</span>,
-      label: '',
-      align: 'end',
-      cell: (row) =>
-        row.WinnerAddr ? null : (
-          <Button
-            variant="outline"
-            size="sm"
-            loading={claimingTokens.includes(row.Index)}
-            onClick={() => void handleClaim(row.Index)}
-            data-testid="Claim Button"
-          >
-            {t('attachedAssets.actions.claim')}
-          </Button>
-        ),
-    });
-  }
 
   return (
     <>

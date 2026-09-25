@@ -1,17 +1,35 @@
-import { render, screen, checkA11y } from '@/test-utils';
+import { fireEvent, render, screen, checkA11y } from '@/test-utils';
 
 import { DonatedAssetsSection, type DonatedAssetsSectionProps } from '../DonatedAssetsSection';
 
-jest.mock('../../attachments/AttachedNFTTable', () => ({
-  __esModule: true,
-  default: ({ list }: { list: unknown[] }) => (
-    <div data-testid="attached-nft-table">nfts: {list.length}</div>
+// The one retrieval ledger per asset kind, shared with My Allocations.
+jest.mock('../../winnings/AttachedRetrievalTables', () => ({
+  AttachedNftRetrievalTable: ({
+    rows,
+    onRetrieve,
+  }: {
+    rows: { Index: number; Claimed?: boolean }[];
+    onRetrieve?: (index: number) => void;
+  }) => (
+    <div data-testid="attached-nft-table" data-can-retrieve={Boolean(onRetrieve)}>
+      nfts: {rows.length}, retrieved: {rows.filter((row) => row.Claimed).length}
+    </div>
   ),
-}));
-jest.mock('../../attachments/AttachedERC20Table', () => ({
-  __esModule: true,
-  default: ({ list }: { list: unknown[] }) => (
-    <div data-testid="attached-erc20-table">tokens: {list.length}</div>
+  AttachedTokenRetrievalTable: ({
+    rows,
+    onRetrieve,
+  }: {
+    rows: unknown[];
+    onRetrieve?: (row: unknown) => void;
+  }) => (
+    <div data-testid="attached-erc20-table">
+      tokens: {rows.length}
+      {onRetrieve ? (
+        <button type="button" onClick={() => onRetrieve(rows[0])}>
+          retrieve first token
+        </button>
+      ) : null}
+    </div>
   ),
 }));
 
@@ -134,13 +152,43 @@ describe('DonatedAssetsSection', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('renders tables with combined NFT data', () => {
-    const nft = {
-      Index: 0,
-      RecordId: '1',
-    } as unknown as DonatedAssetsSectionProps['unclaimedNFTs'][0];
-    render(<DonatedAssetsSection {...defaultProps} unclaimedNFTs={[nft]} />);
-    expect(screen.getByTestId('attached-nft-table')).toHaveTextContent('nfts: 1');
+  it('lists retrieved and waiting NFTs in the one retrieval ledger', () => {
+    const nft = (Index: number) =>
+      ({
+        Index,
+        RecordId: String(Index),
+      }) as unknown as DonatedAssetsSectionProps['unclaimedNFTs'][0];
+    render(
+      <DonatedAssetsSection {...defaultProps} unclaimedNFTs={[nft(0)]} claimedNFTs={[nft(1)]} />,
+    );
+    expect(screen.getByTestId('attached-nft-table')).toHaveTextContent('nfts: 2, retrieved: 1');
+    expect(screen.getByTestId('attached-nft-table')).toHaveAttribute('data-can-retrieve', 'true');
+  });
+
+  it('retrieves a token with its raw amount, and only on the owner’s profile', () => {
+    const onClaimERC20 = jest.fn();
+    const token = {
+      RoundNum: 7,
+      TokenAddr: '0xabc',
+      DonateClaimDiff: '1999999999999999994000',
+      DonateClaimDiffEth: '2000',
+      Claimed: false,
+    } as unknown as DonatedAssetsSectionProps['donatedERC20'][0];
+    const { rerender } = render(
+      <DonatedAssetsSection {...defaultProps} donatedERC20={[token]} onClaimERC20={onClaimERC20} />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'retrieve first token' }));
+    expect(onClaimERC20).toHaveBeenCalledWith(7, '0xabc', '1999999999999999994000');
+
+    rerender(
+      <DonatedAssetsSection
+        {...defaultProps}
+        donatedERC20={[token]}
+        onClaimERC20={onClaimERC20}
+        canClaim={false}
+      />,
+    );
+    expect(screen.queryByRole('button', { name: 'retrieve first token' })).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

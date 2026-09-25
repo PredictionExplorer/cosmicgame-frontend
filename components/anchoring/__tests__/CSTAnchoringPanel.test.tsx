@@ -112,7 +112,7 @@ describe('CSTAnchoringPanel', () => {
         key: 47,
         tokenId: 47,
         seed: 'seed47',
-        meta: ['anchoring.picker.cycle(cycle=2)'],
+        meta: ['tables.allocation.cycle(cycle=2)'],
       }),
     ]);
   });

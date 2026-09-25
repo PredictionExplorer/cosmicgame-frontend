@@ -85,6 +85,7 @@ export function CSTAnchoringPanel({
 }: CSTAnchoringPanelProps) {
   const t = useTranslations('anchoring');
   const tCommon = useTranslations('common');
+  const tTables = useTranslations('tables');
   const format = useFormat();
 
   const accruedByToken = useMemo(
@@ -137,10 +138,12 @@ export function CSTAnchoringPanel({
         seed: token.Seed ?? null,
         name: token.TokenName ?? null,
         meta: [
-          typeof token.RoundNum === 'number' ? t('picker.cycle', { cycle: token.RoundNum }) : null,
+          typeof token.RoundNum === 'number'
+            ? tTables('allocation.cycle', { cycle: token.RoundNum })
+            : null,
         ],
       })),
-    [availableTokens, t],
+    [availableTokens, tTables],
   );
 
   return (
