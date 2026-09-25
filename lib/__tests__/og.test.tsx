@@ -1,6 +1,12 @@
+import { readdirSync } from 'node:fs';
+import { join, relative } from 'node:path';
+
 import { isValidElement, type ReactElement, type ReactNode } from 'react';
 
+import { uncoveredBy } from '@/scripts/og-font-coverage';
+
 import { getLocaleConfig } from '@/i18n/localeConfig';
+import { routing } from '@/i18n/routing';
 import { loadGesture, loadLatestArtworks, loadTokenArtwork, type OgArtwork } from '@/lib/og/art';
 import {
   COSMIC_OG_SIZE,
@@ -8,7 +14,7 @@ import {
   planCosmicOgCard,
   type CosmicOgCardProps,
 } from '@/lib/og/CosmicOgCard';
-import { getOgFontConfig, getOgTypography } from '@/lib/og/fonts';
+import { OG_SHARED_FONTS, getOgFontConfig, getOgTypography } from '@/lib/og/fonts';
 import { createOgMeasure, type OgMeasure } from '@/lib/og/measure';
 import { OG_COLORS } from '@/lib/og/palette';
 
@@ -414,5 +420,91 @@ describe('opengraph-image routes', () => {
     expect(lastCard().element.props).toEqual(
       expect.objectContaining({ title: '0x7406...Bc6c', monoTitle: true }),
     );
+  });
+});
+
+/**
+ * Every `opengraph-image.tsx` under app/, found on disk, so a card route added
+ * later is covered without editing a list here.
+ */
+function ogRoutePaths(dir = join(process.cwd(), 'app')): string[] {
+  return readdirSync(dir, { withFileTypes: true })
+    .flatMap((entry) => {
+      const path = join(dir, entry.name);
+      if (entry.isDirectory()) return entry.name === '__tests__' ? [] : ogRoutePaths(path);
+      return entry.name === 'opengraph-image.tsx' ? [path] : [];
+    })
+    .sort();
+}
+
+/** A value for each dynamic segment a card route can have. */
+const SAMPLE_PARAMS: Record<string, string> = {
+  id: '24',
+  address: '0x7406B34d25A9B7841CAC133E3173919e0af6Bc6c',
+  slug: 'how-gestures-work',
+};
+
+function paramsFor(path: string, locale: string): Record<string, string> {
+  const values: Record<string, string> = { locale };
+  for (const [, name = ''] of relative(process.cwd(), path).matchAll(/\[(\w+)\]/g)) {
+    if (name === 'locale') continue;
+    const value = SAMPLE_PARAMS[name];
+    if (value === undefined) throw new Error(`No sample value for [${name}] in ${path}`);
+    values[name] = value;
+  }
+  return values;
+}
+
+describe('every opengraph-image route', () => {
+  const paths = ogRoutePaths();
+
+  it('finds the card routes of both hosts on disk', () => {
+    const routes = paths.map((path) => relative(process.cwd(), path));
+    expect(routes).toEqual(
+      expect.arrayContaining([
+        'app/[locale]/(app)/opengraph-image.tsx',
+        'app/[locale]/(landing)/opengraph-image.tsx',
+        'app/[locale]/(landing)/learn/[slug]/opengraph-image.tsx',
+        'app/[locale]/(landing)/white-paper/opengraph-image.tsx',
+        'app/[locale]/(landing)/quiz/opengraph-image.tsx',
+      ]),
+    );
+  });
+
+  // Renders each card as it ships (the builders run for real; only the
+  // rasterizer and the network are stubbed) and checks every drawn string
+  // against the faces the card embeds, so a route whose copy falls back to
+  // a face the card does not carry fails here, not in a share preview.
+  it.each(
+    paths.flatMap((path) =>
+      routing.locales.map((locale) => [relative(process.cwd(), path), locale] as const),
+    ),
+  )('%s draws a 1200×630 card in %s faces', async (path, locale) => {
+    const route = require(join(process.cwd(), path)) as RouteModule;
+    expect(route.size).toEqual(COSMIC_OG_SIZE);
+    expect(route.contentType).toBe('image/png');
+
+    const [metadata] = await route.generateImageMetadata(params(paramsFor(path, locale)));
+    expect(metadata).toEqual(
+      expect.objectContaining({ id: 'default', size: COSMIC_OG_SIZE, contentType: 'image/png' }),
+    );
+    expect(metadata?.alt.trim()).not.toBe('');
+
+    await route.default(params(paramsFor(path, locale)));
+    const { element, options } = lastCard();
+    expect(options).toEqual(expect.objectContaining(COSMIC_OG_SIZE));
+    const { typography, title, eyebrow, subhead, fact, domain, art } = element.props;
+    expect(title.trim()).not.toBe('');
+    expect(uncoveredBy([...typography.display, ...OG_SHARED_FONTS], title)).toEqual([]);
+    const body = [
+      eyebrow,
+      subhead,
+      fact,
+      domain,
+      ...(art ?? []).flatMap((plate) => [plate.label, plate.number]),
+    ]
+      .filter((text): text is string => typeof text === 'string')
+      .join('');
+    expect(uncoveredBy([...typography.body, ...OG_SHARED_FONTS], body)).toEqual([]);
   });
 });

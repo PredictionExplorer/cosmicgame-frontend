@@ -44,17 +44,18 @@ test.describe('Gallery page', () => {
     if (!(await named.isVisible())) test.skip(true, 'The status filter lives in the sheet here');
     await named.click();
     await expect(page).toHaveURL(/[?&]show=named(&|$)/);
+    // The mocked API always has named Signatures: a filter that stops
+    // rendering cards must fail here, not skip the Back check.
     const firstCard = page.getByTestId('signature-card').first().getByRole('link');
-    if (await firstCard.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await firstCard.click();
-      await expect(page).toHaveURL(/detail/);
-      await page.goBack();
-      await expect(page).toHaveURL(/[?&]show=named(&|$)/);
-      await expect(page.getByRole('radio', { name: 'Named' }).first()).toHaveAttribute(
-        'aria-checked',
-        'true',
-      );
-    }
+    await expect(firstCard).toBeVisible();
+    await firstCard.click();
+    await expect(page).toHaveURL(/detail/);
+    await page.goBack();
+    await expect(page).toHaveURL(/[?&]show=named(&|$)/);
+    await expect(page.getByRole('radio', { name: 'Named' }).first()).toHaveAttribute(
+      'aria-checked',
+      'true',
+    );
   });
 
   test('pagination moves to the next page', async ({ page }) => {
