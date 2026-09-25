@@ -5,9 +5,12 @@ import path from 'node:path';
 import {
   DEFAULT_BUDGET_KB,
   DEFAULT_LANDING_BUDGET_KB,
+  DEFAULT_READING_BUDGET_KB,
+  READING_ROUTES,
   computeGzipKb,
   evaluateBudget,
   getHomeJsFiles,
+  getRouteJsFilesFromStats,
   pickHomeAssets,
   pickTurbopackRouteAssets,
   readManifest,
@@ -229,9 +232,44 @@ describe('bundle budget core', () => {
 
   it('keeps the ratcheted budgets — raising one deserves a design conversation', () => {
     // Measured after the RES-100 work: app home ~610 KB (wallet stack now
-    // lazy); landing ~253 KB once the three.js hero was removed.
+    // lazy); landing ~253 KB once the three.js hero was removed; reading
+    // pages ~360 KB once the wallet reads and framer-motion left the shell.
     expect(DEFAULT_BUDGET_KB).toBe(640);
     expect(DEFAULT_LANDING_BUDGET_KB).toBe(270);
+    expect(DEFAULT_READING_BUDGET_KB).toBe(380);
+  });
+
+  describe('getRouteJsFilesFromStats', () => {
+    it('reads a route’s first-load chunks from the build diagnostics', () => {
+      const nextDir = path.join(tempDir, '.next');
+      mkdirSync(path.join(nextDir, 'diagnostics'), { recursive: true });
+      writeFileSync(
+        path.join(nextDir, 'diagnostics', 'route-bundle-stats.json'),
+        JSON.stringify([
+          {
+            route: '/[locale]/terms',
+            firstLoadUncompressedJsBytes: 10,
+            firstLoadChunkPaths: ['.next/static/chunks/a.js', '.next/static/chunks/b.css'],
+          },
+        ]),
+      );
+      expect(getRouteJsFilesFromStats(nextDir, '/[locale]/terms')).toEqual([
+        path.join(tempDir, '.next', 'static', 'chunks', 'a.js'),
+      ]);
+      expect(() => getRouteJsFilesFromStats(nextDir, '/[locale]/privacy')).toThrow(
+        /No bundle stats/,
+      );
+    });
+
+    it('asks for a build when the diagnostics are missing', () => {
+      expect(() => getRouteJsFilesFromStats(tempDir, '/[locale]/terms')).toThrow(
+        /production build/,
+      );
+    });
+
+    it('holds only real reading pages to the reading budget', () => {
+      for (const route of READING_ROUTES) expect(route).toMatch(/^\/\[locale\]\/[a-z-]+$/);
+    });
   });
 
   describe('directory fallback', () => {

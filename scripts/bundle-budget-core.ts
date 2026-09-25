@@ -24,6 +24,53 @@ export const DEFAULT_BUDGET_KB = 640;
  */
 export const DEFAULT_LANDING_BUDGET_KB = 270;
 
+/**
+ * Reading-page client payload budget: the app's legal and trust pages, How
+ * It Works and the site map, which read no wallet and draw no chart. Each
+ * once shipped ~540 KB gzip, as much as the dApp; measured at ~360 KB once
+ * the wallet reads, the command palette, the chain polling and
+ * framer-motion's runtime left the shell and the route templates. The budget
+ * keeps ~20 KB of headroom, so pulling any of them back into every page
+ * fails CI.
+ */
+export const DEFAULT_READING_BUDGET_KB = 380;
+
+/** The reading pages the reading budget holds, as route-bundle-stats names them. */
+export const READING_ROUTES = [
+  '/[locale]/terms',
+  '/[locale]/privacy',
+  '/[locale]/security',
+  '/[locale]/audits',
+  '/[locale]/code',
+  '/[locale]/risk-disclosures',
+  '/[locale]/how-it-works',
+  '/[locale]/site-map',
+] as const;
+
+interface RouteBundleStats {
+  route: string;
+  /** Chunk paths relative to the project root (`.next/static/chunks/…`). */
+  firstLoadChunkPaths: string[];
+}
+
+/**
+ * A route's first-load JS chunks from the build's own diagnostics
+ * (`.next/diagnostics/route-bundle-stats.json`), as absolute paths.
+ */
+export function getRouteJsFilesFromStats(nextDir: string, route: string): string[] {
+  const statsPath = path.join(nextDir, 'diagnostics', 'route-bundle-stats.json');
+  if (!existsSync(statsPath)) {
+    throw new Error('Could not find route-bundle-stats.json. Run a production build first.');
+  }
+  const stats = JSON.parse(readFileSync(statsPath, 'utf8')) as RouteBundleStats[];
+  const entry = stats.find((candidate) => candidate.route === route);
+  if (entry == null) throw new Error(`No bundle stats for ${route}.`);
+  const projectRoot = path.dirname(nextDir);
+  return entry.firstLoadChunkPaths
+    .filter((chunk) => chunk.endsWith('.js'))
+    .map((chunk) => path.resolve(projectRoot, chunk));
+}
+
 export type BuildManifest = {
   pages?: Record<string, string[]>;
   polyfillFiles?: string[];
