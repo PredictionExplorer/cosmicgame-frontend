@@ -24,7 +24,7 @@ export async function generateMetadata(
   const { locale } = await params;
   const { cycle } = parseFinalizedSearch(await searchParams);
   if (cycle !== null) {
-    // A cycle's record is titled like its H1 ("Cycle #1 Signature Allocation"); every record
+    // A cycle's record is titled like its H1 ("Cycle 1 Signature Allocation"); every record
     // names the index as its canonical page, since the index leads to all of them.
     const t = await getTranslations({ locale, namespace: 'allocation' });
     return createPageMetadata(
