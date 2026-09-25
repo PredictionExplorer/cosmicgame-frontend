@@ -4,6 +4,7 @@ import { useId } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import {
+  MAX_COLLISION_BUFFER_PERCENT,
   clampCollisionBufferPercent,
   ethGestureSendAmount,
   formatEthQuote,
@@ -247,7 +248,7 @@ export function GestureAdvancedFields({
               suffix="%"
               value={gestureCostPlus}
               min={0}
-              max={50}
+              max={MAX_COLLISION_BUFFER_PERCENT}
               onChange={(e) => setBidPricePlus(clampCollisionBufferPercent(e.target.value))}
               className="w-24"
             />

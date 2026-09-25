@@ -509,12 +509,16 @@ const ExperimentalHomePage = ({
   // Deep link from the RandomWalk collection (?randomwalk=1&tokenId=N), read
   // in an effect: the search-params hook would force this statically
   // generated route into client-side rendering.
+  // Only a whole token number preselects: a missing id is not token #0, and
+  // text is not NaN. The console still checks it against the wallet's own
+  // unused NFTs before it offers the Gesture.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get('randomwalk')) {
-      setRwlkId(Number(params.get('tokenId')));
-      setBidType('RandomWalk');
-    }
+    if (!params.get('randomwalk')) return;
+    setBidType('RandomWalk');
+    const raw = params.get('tokenId')?.trim();
+    const tokenId = raw ? Number(raw) : Number.NaN;
+    if (Number.isSafeInteger(tokenId) && tokenId >= 0) setRwlkId(tokenId);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once, on arrival
   }, []);
 

@@ -977,6 +977,21 @@ describe('ExperimentalHomePage', () => {
     expect(mockGestureForm.setBidType).toHaveBeenCalledWith('RandomWalk');
   });
 
+  it.each([
+    ['no token id', '/experimental-ui?randomwalk=1'],
+    ['an empty token id', '/experimental-ui?randomwalk=1&tokenId='],
+    ['text', '/experimental-ui?randomwalk=1&tokenId=abc'],
+    ['a fraction', '/experimental-ui?randomwalk=1&tokenId=4.5'],
+    ['a negative id', '/experimental-ui?randomwalk=1&tokenId=-3'],
+  ])('opens the RandomWalk method without preselecting from %s', (_case, url) => {
+    window.history.pushState({}, '', url);
+    renderPage();
+
+    expect(mockGestureForm.setBidType).toHaveBeenCalledWith('RandomWalk');
+    // Not token #0, not NaN: the viewer picks from the wallet's own list.
+    expect(mockGestureForm.setRwlkId).not.toHaveBeenCalled();
+  });
+
   it('remembers the viewer’s pause of the artwork', async () => {
     mockUseCSTInfo.mockReturnValue({ data: { Seed: 'abc', TokenName: '', RoundNum: 1 } });
     renderPage({
