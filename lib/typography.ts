@@ -28,9 +28,11 @@ export const typography = {
   figureLg: 'type-figure-lg',
   figureMd: 'type-figure-md',
   figureSm: 'type-figure-sm',
-  figureDisplay: 'type-figure-display',
+  formula: 'type-formula',
+  formulaSymbol: 'type-formula-symbol',
   hash: 'type-hash',
   mono: 'type-mono',
+  monoInline: 'type-mono-inline',
   monoMd: 'type-mono-md',
   monoSm: 'type-mono-sm',
 } as const;

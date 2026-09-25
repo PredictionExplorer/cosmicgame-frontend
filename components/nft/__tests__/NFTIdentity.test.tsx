@@ -22,8 +22,8 @@ describe('NFTIdentity', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Twisted Mind' })).toBeInTheDocument();
     const meta = screen.getByText('#000025').closest('p')!;
     expect(meta).toHaveTextContent('#000025·Orbit Ribbons·Glacial Split');
-    // The number is set like the rest of the label, not in the code face.
-    expect(screen.getByText('#000025')).toHaveClass('tabular-nums');
+    // Token numbers are identifiers: the mono face, as on every wall label.
+    expect(screen.getByText('#000025')).toHaveClass('type-mono');
     // The unlabelled hue strip belongs to the Palette tile, not the label.
     expect(screen.queryByTestId('hue-strip')).toBeNull();
     expect(screen.getByTestId('nft-spec-list')).toBeInTheDocument();
@@ -42,9 +42,8 @@ describe('NFTIdentity', () => {
 
   it('gives an unnamed Signature a graceful title without repeating its number', () => {
     render(<NFTIdentity tokenId={7} name={null} nft={nft} entry={entry} />);
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Cosmic Signature #000007' }),
-    ).toBeInTheDocument();
+    const heading = screen.getByRole('heading', { level: 1 });
+    expect(heading).toHaveTextContent('common.signature.untitled(id=#000007)');
     const breadcrumb = screen.getByRole('navigation', { name: 'common.accessibility.breadcrumb' });
     expect(
       within(breadcrumb).getByRole('link', { name: 'common.breadcrumbs.gallery' }),

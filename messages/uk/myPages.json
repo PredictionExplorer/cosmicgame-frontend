@@ -152,8 +152,7 @@
       "emptyTitle": "Немає Cosmic Signature NFT",
       "emptyDescription": "Тут з’являться Cosmic Signature NFT, які належать цій адресі.",
       "showAll": "Показати всі ({count})",
-      "showFewer": "Показати менше",
-      "anchoredTag": "Закріплено"
+      "showFewer": "Показати менше"
     },
     "quickActions": {
       "anchor": {

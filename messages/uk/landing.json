@@ -64,7 +64,6 @@
     "resumeRotation": "Відновити зміну творів",
     "playAnimation": "Відтворити анімацію",
     "pauseAnimation": "Призупинити анімацію",
-    "unavailable": "Твір недоступний",
-    "untitled": "Сигнатура {tokenLabel}"
+    "unavailable": "Твір недоступний"
   }
 }

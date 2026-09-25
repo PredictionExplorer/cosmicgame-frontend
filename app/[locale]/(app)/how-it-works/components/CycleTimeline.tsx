@@ -12,8 +12,9 @@ import {
 import { Link } from '@/i18n/navigation';
 import { GESTURE_METHOD_BG_CLASS, type GestureMethod } from '@/lib/theme/dataColors';
 import { cn } from '@/lib/utils';
-import { ArtFrame, WallLabel } from '@/components/ui/art-frame';
+import { ArtFrame } from '@/components/ui/art-frame';
 import { SectionHeader } from '@/components/ui/section-header';
+import { SignatureWallLabel } from '@/components/ui/signature-label';
 import { signatureMedia, signatureSources } from '@/components/nft/signatureMedia';
 import { formatPercent } from '@/utils/format';
 import { formatId } from '@/utils/format/ids';
@@ -471,15 +472,15 @@ export function CycleTimeline({
         <figure className="lg:col-span-7">
           <ArtFrame
             sources={signatureSources(media)}
-            alt={`${payoff.caption} · Cosmic Signature ${formatId(payoff.sample.tokenId)}`}
+            alt={`Cosmic Signature ${formatId(payoff.sample.tokenId)}`}
             sizes="(min-width: 1024px) 45vw, 100vw"
             unavailableLabel={unavailableLabel}
           />
-          <WallLabel
+          <SignatureWallLabel
             as="figcaption"
             className="mt-3"
-            title={payoff.caption}
-            meta={[`Cosmic Signature ${formatId(payoff.sample.tokenId)}`]}
+            tokenId={payoff.sample.tokenId}
+            cycle={payoff.sample.cycle}
           />
         </figure>
         <div className="lg:col-span-5">

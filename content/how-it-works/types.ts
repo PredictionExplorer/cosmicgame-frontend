@@ -33,7 +33,7 @@ export interface HowItWorksHeroContent {
   readonly secondaryCta: HowItWorksLink;
 }
 
-/** A real, finalized Cosmic Signature shown as the cycle's payoff. */
+/** A real, finalized Cosmic Signature shown as the cycle's payoff, captioned by the shared wall label. */
 export interface HowItWorksArtSample {
   readonly tokenId: number;
   readonly cycle: number;
@@ -43,8 +43,6 @@ export interface HowItWorksArtSample {
 export interface HowItWorksPayoffContent {
   readonly heading: string;
   readonly body: string;
-  /** The wall label, with the cycle number filled in. */
-  readonly caption: string;
   readonly link: HowItWorksLink;
   readonly sample: HowItWorksArtSample;
 }

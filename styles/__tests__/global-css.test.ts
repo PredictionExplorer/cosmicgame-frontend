@@ -323,6 +323,28 @@ describe('Korean display punctuation', () => {
   });
 });
 
+describe('Latin display figures', () => {
+  it('sets every digit in a Clash heading in Inter, never in Clash', () => {
+    // Regression: "Cycle #12" and "Signature #000025" as H1s set their zeros in
+    // Clash's round figure, which reads as O.
+    const name = globalCss.indexOf("font-family: 'CS Display Figures'");
+    expect(name).toBeGreaterThan(-1);
+    const face = globalCss.slice(
+      globalCss.lastIndexOf('@font-face', name),
+      globalCss.indexOf('}', name),
+    );
+    expect(face).toContain('unicode-range: U+0023, U+0030-0039');
+    const url = face.match(/url\('([^']+)'\) format\('woff2'\)/)?.[1];
+    expect(existsSync(resolve(STYLES, '..', 'public', url!.slice(1)))).toBe(true);
+    const root = globalCss.slice(globalCss.indexOf('--display-font-stack:'));
+    const stack = root.slice(0, root.indexOf(';'));
+    expect(stack.indexOf("'CS Display Figures'")).toBeGreaterThan(-1);
+    expect(stack.indexOf("'CS Display Figures'")).toBeLessThan(
+      stack.indexOf('var(--font-clash-display)'),
+    );
+  });
+});
+
 describe('CJK display digits', () => {
   it('sets digits in CJK headings in the CJK face, never in Clash', () => {
     // Regression: "第 2 个周期" and "サイクル2の現況" set the digit in Clash's wide

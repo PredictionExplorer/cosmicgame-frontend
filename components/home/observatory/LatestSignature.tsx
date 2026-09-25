@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { ArtFrame, PendingPlate, WallLabel, WallLabelMeta } from '@/components/ui/art-frame';
 import { Button } from '@/components/ui/button';
 import { DateTime } from '@/components/ui/date-time';
+import { useSignatureLabel } from '@/components/ui/signature-label';
 import { isRenderPending, signatureMedia, signatureSources } from '@/components/nft/signatureMedia';
 import { useNow } from '@/hooks/useNow';
 import { Link } from '@/i18n/navigation';
@@ -32,8 +33,9 @@ const DEFAULT_SIZES = '(max-width: 639px) 100vw, (max-width: 1023px) 90vw, 26rem
 
 /**
  * The art on the Observatory: the newest imprinted Signature on its black
- * plate at the native ratio, captioned by its wall label (name, token number,
- * the cycle that imprinted it, and when), with a quiet way to step back
+ * plate at the native ratio, captioned by its wall label (the one rule in
+ * `components/ui/signature-label`: name, token number, the cycle that
+ * imprinted it, and when), with a quiet way to step back
  * through the latest imprints. Nothing overlays the art; the whole plate is
  * the link to its page. On phones the plate runs edge to edge.
  */
@@ -45,6 +47,7 @@ export function LatestSignature({
 }: LatestSignatureProps) {
   const t = useTranslations('home.latestSignature');
   const tDetail = useTranslations('detail');
+  const label = useSignatureLabel();
   const headingId = useId();
   const nowMs = useNow(60_000);
   const [index, setIndex] = useState(0);
@@ -61,7 +64,7 @@ export function LatestSignature({
   const id = token ? formatId(token.TokenId) : null;
   const name = token?.TokenName?.trim() || null;
   const media = signatureMedia(token?.Seed);
-  const title = token && id ? (name ?? t('unnamed', { id })) : null;
+  const title = token ? label.text({ tokenId: token.TokenId, name }) : null;
   const alt = token && id ? (name ? t('named', { name, id }) : t('unnamed', { id })) : '';
   const imprintedAt = token?.TimeStamp ?? token?.MintTimeStamp ?? null;
   const position = count > 1 ? t('position', { index: current + 1, count }) : null;
@@ -126,7 +129,7 @@ export function LatestSignature({
         {token && title && id && (
           <figcaption className="mt-3 min-w-0">
             <div className="flex min-w-0 items-center justify-between gap-3">
-              <WallLabel title={title} />
+              <WallLabel title={label.title({ tokenId: token.TokenId, name })} />
               {count > 1 && (
                 <div
                   className="-me-2.5 flex shrink-0 items-center"
@@ -163,19 +166,14 @@ export function LatestSignature({
             {/* The number leads only when a name took the title line. */}
             <WallLabelMeta
               className="mt-0.5"
-              items={[
-                name ? (
-                  <span key="id" className="type-mono">
-                    {id}
-                  </span>
-                ) : null,
-                token.RoundNum != null
-                  ? t('imprintedIn', { number: String(token.RoundNum) })
-                  : null,
-                imprintedAt ? (
+              items={label.meta({
+                tokenId: token.TokenId,
+                name,
+                cycle: token.RoundNum,
+                date: imprintedAt ? (
                   <DateTime key="at" timestamp={imprintedAt} variant="relative" />
                 ) : null,
-              ]}
+              })}
             />
           </figcaption>
         )}

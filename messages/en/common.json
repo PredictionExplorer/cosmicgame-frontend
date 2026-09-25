@@ -113,5 +113,10 @@
     "copied": "Link copied",
     "warning": "Never enter your wallet seed phrase or private keys on an external site.",
     "open": "Open link"
+  },
+  "signature": {
+    "untitled": "Signature {id}",
+    "cycle": "Cycle #{n}",
+    "anchored": "Anchored"
   }
 }

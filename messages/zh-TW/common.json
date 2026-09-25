@@ -113,5 +113,10 @@
     "copied": "已複製連結",
     "warning": "切勿在外部網站輸入錢包助記詞或私鑰。",
     "open": "開啟連結"
+  },
+  "signature": {
+    "untitled": "簽名作品 {id}",
+    "cycle": "第 {n} 個週期",
+    "anchored": "已錨定"
   }
 }

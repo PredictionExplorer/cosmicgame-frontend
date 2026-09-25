@@ -1150,7 +1150,7 @@ describe('HomePage', () => {
     const art = screen.getByTestId('latest-signature');
     expect(screen.getByTestId('control-desk-art')).toContainElement(art);
     expect(within(art).getByTestId('latest-signature-link')).toHaveAttribute('href', '/detail/47');
-    expect(within(art).getByText('home.latestSignature.imprintedIn(number=6)')).toBeVisible();
+    expect(within(art).getByText('common.signature.cycle(n=6)')).toBeVisible();
     expect(
       within(art).getByRole('link', { name: /home\.latestSignature\.gallery/ }),
     ).toHaveAttribute('href', '/gallery');

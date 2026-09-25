@@ -702,8 +702,6 @@
       "cycles": "Cycles"
     },
     "gridLabel": "Stellar Selection NFTs",
-    "unnamed": "Cosmic Signature {id}",
-    "cycle": "Cycle #{cycle}",
     "sources": {
       "participant": "Participant",
       "randomWalk": "Random Walk",

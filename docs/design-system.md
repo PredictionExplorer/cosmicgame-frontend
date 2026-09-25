@@ -120,6 +120,23 @@ and `fill`, inline styles), import the colour from `lib/theme/dataColors.ts`:
 the image inside with `object-fit: contain`. Nothing overlays, crops, dims or tints the
 artwork.
 
+**Wall labels.** Every Signature is captioned by one rule, on both hosts, through
+`components/ui/signature-label` (`SignatureWallLabel`, or `useSignatureLabel()` where a
+card lays out its own lines):
+
+- Title: the token's name, or "Signature #000023": the localized noun
+  (`common.signature.untitled`) with the number in JetBrains Mono. Never a bare number,
+  never "Cosmic Signature" (the collection name stays in alt text, metadata and
+  structured data), and never the number in Inter or Clash.
+- Caption, in one order: the number (only when a name took the title), the cycle
+  ("Cycle #1", `common.signature.cycle`), structure, palette, then a date. `WallLabelMeta`
+  joins them with middle dots.
+- Anchored: `AnchoredMark`, one quiet anchor after the title, named for screen readers and
+  titled for a pointer. Never a text tag.
+
+A detail page's H1 is the same title; at display size its number is set by the display
+figures (below).
+
 **Sizes.** The media server publishes a 640px thumbnail and the 3456px original only.
 `signatureMedia` adds image-optimizer renditions at 1200 and 1920px between them
 (`withOptimizedRenditions` in `lib/artRenditions`, built with next/image's
@@ -144,8 +161,11 @@ Four roles, three families plus one mono:
 - **Figures**: Inter with tabular, lining numerals. There is no slashed zero: the Inter
   subsets next/font serves from Google carry only the calt, ccmp, dnom, frac, locl, numr,
   pnum and tnum features, so `slashed-zero` would promise a glyph that never renders.
-  Inter's narrow oval zero does not read as O; Clash's round one does, so a figure
-  that could be misread ("01") is set in `type-figure-*`, never in Clash.
+  Inter's narrow oval zero does not read as O; Clash's round one does, so Clash never
+  sets a digit: a figure is set in `type-figure-*`, and a number inside display type
+  ("Cycle #12", "Signature #000025") takes its digits and "#" from 'CS Display Figures',
+  a 6 KB Inter cut first in the Latin display stack (`styles/global.css`). The CJK stacks
+  have their own digit cut; uk and vi set headings in Onest.
 - **Identifiers**: JetBrains Mono, only for addresses, hashes, seeds and token numbers.
 
 The type utilities never set a colour. Pair a label, caption or eyebrow with `text-subtle`
@@ -174,9 +194,9 @@ The type utilities never set a colour. Pair a label, caption or eyebrow with `te
 | `type-figure-lg`               | 32px           | 1.1  | 500    | Inter | Figure strips                                                                                                                                                                           |
 | `type-figure-md`               | 20px           | 1.3  | 500    | Inter | Inline readouts                                                                                                                                                                         |
 | `type-figure-sm`               | 14px           | 1.4  | 500    | Inter | Ledger cells                                                                                                                                                                            |
-| `type-figure-display`          | 40–56px        | 1    | 500    | Clash | A static hero figure that never ticks                                                                                                                                                   |
 | `type-hash`                    | 13px           | 1.45 | 400    | Mono  | Addresses, hashes and seeds. May break anywhere                                                                                                                                         |
 | `type-mono`                    | 13px           | 1.45 | 400    | Mono  | Token numbers and short ids. Never breaks                                                                                                                                               |
+| `type-mono-inline`             | 15/16 of line  | —    | 400    | Mono  | An identifier inside a line of other text ("Signature #000023"): level with Inter, never breaks                                                                                         |
 | `type-mono-md`, `type-mono-sm` | 14px, 12px     | —    | 500    | Mono  | Legacy. New code uses `type-hash` or `type-mono`                                                                                                                                        |
 
 Nothing a reader needs renders below 12px. Put units in `type-caption text-subtle` and

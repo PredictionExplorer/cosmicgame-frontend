@@ -108,7 +108,6 @@ export const howItWorksTextEn = {
   payoff: {
     heading: 'Every cycle ends in a Signature',
     body: 'Every gesture shapes the cycle’s artwork. When the cycle finalizes, its Signature is imprinted as a Cosmic Signature NFT and goes to the Final Gesture participant with the Signature Allocation.',
-    caption: 'The Signature of Cycle {cycle}',
     linkLabel: 'View this Signature',
   },
   stepByStep: {

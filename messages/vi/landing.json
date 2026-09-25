@@ -64,7 +64,6 @@
     "resumeRotation": "Tiếp tục chuyển tác phẩm",
     "playAnimation": "Phát hoạt ảnh",
     "pauseAnimation": "Tạm dừng hoạt ảnh",
-    "unavailable": "Tác phẩm không khả dụng",
-    "untitled": "Signature {tokenLabel}"
+    "unavailable": "Tác phẩm không khả dụng"
   }
 }

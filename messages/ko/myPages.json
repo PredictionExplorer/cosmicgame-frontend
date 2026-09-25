@@ -152,8 +152,7 @@
       "emptyTitle": "보유한 Cosmic Signature NFT가 없습니다",
       "emptyDescription": "이 주소가 보유한 Cosmic Signature NFT가 여기에 표시됩니다.",
       "showAll": "전체 {count}개 보기",
-      "showFewer": "접기",
-      "anchoredTag": "앵커링됨"
+      "showFewer": "접기"
     },
     "quickActions": {
       "anchor": {

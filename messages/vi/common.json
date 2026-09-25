@@ -113,5 +113,10 @@
     "copied": "Đã sao chép liên kết",
     "warning": "Không bao giờ nhập cụm từ khôi phục hay khóa riêng của ví trên một trang web bên ngoài.",
     "open": "Mở liên kết"
+  },
+  "signature": {
+    "untitled": "Signature {id}",
+    "cycle": "Chu kỳ {n}",
+    "anchored": "Đang neo giữ"
   }
 }

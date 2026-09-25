@@ -68,10 +68,10 @@ describe('UserStellarSelectionNFTPage', () => {
 
     const cards = screen.getAllByRole('figure');
     expect(cards).toHaveLength(2);
-    // The newest is token 43, unnamed: it reads by its number.
-    expect(
-      within(cards[0]!).getByRole('link', { name: 'Cosmic Signature #000043' }),
-    ).toHaveAttribute('href', '/detail/43');
+    // The newest is token 43, unnamed: the shared wall label reads "Signature #000043".
+    const unnamed = within(cards[0]!).getByText('#000043').closest('a')!;
+    expect(unnamed).toHaveTextContent('common.signature.untitled(id=#000043)');
+    expect(unnamed).toHaveAttribute('href', '/detail/43');
     // Two short tags, so neither wraps into a box that fills a phone column.
     expect(cards[0]).toHaveTextContent('Anchor-holder');
     expect(cards[0]).toHaveTextContent('Random Walk');

@@ -152,8 +152,7 @@
       "emptyTitle": "Không nắm giữ Cosmic Signature NFT nào",
       "emptyDescription": "Cosmic Signature NFT mà địa chỉ này nắm giữ sẽ hiển thị ở đây.",
       "showAll": "Hiện tất cả {count}",
-      "showFewer": "Thu gọn",
-      "anchoredTag": "Đang neo giữ"
+      "showFewer": "Thu gọn"
     },
     "quickActions": {
       "anchor": {

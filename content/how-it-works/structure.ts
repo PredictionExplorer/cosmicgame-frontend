@@ -92,8 +92,6 @@ export type HowItWorksText = {
   readonly payoff: {
     readonly heading: string;
     readonly body: string;
-    /** The artwork's wall label; `{cycle}` is replaced with the sample's cycle number. */
-    readonly caption: string;
     readonly linkLabel: string;
   };
   readonly stepByStep: Omit<HowItWorksStepByStepContent, 'funding'> & {

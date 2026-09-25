@@ -19,10 +19,14 @@ const entry = normalizeTraitEntry(parseCosmicSignatureMetadata(TOKEN_1_METADATA_
 const link = () => screen.getByRole('link');
 
 describe('SignatureCard', () => {
-  it('titles an unnamed Signature by its number and captions its structure and palette', () => {
+  it('titles an unnamed Signature "Signature #…" and captions its structure and palette', () => {
     render(<SignatureCard tokenId={1} seed="a1" entry={entry} sizes="400px" />);
     const card = screen.getByTestId('signature-card');
-    expect(within(card).getByText('#000001')).toBeInTheDocument();
+    // The wall-label rule: the localized noun, the number in the identifier face.
+    expect(within(card).getByText('#000001')).toHaveClass('type-mono-inline');
+    expect(within(card).getByText('#000001').parentElement).toHaveTextContent(
+      'common.signature.untitled(id=#000001)',
+    );
     // The space before the dot does not break: a wrapped caption ends a line with it.
     expect(card.textContent).toMatch(/Orbit Ribbons\u00a0· \S/);
   });
@@ -46,7 +50,7 @@ describe('SignatureCard', () => {
       <SignatureCard tokenId={25} seed="a1" name="Twisted Mind" entry={entry} sizes="400px" />,
     );
     expect(screen.getByText('Twisted Mind')).toBeInTheDocument();
-    expect(screen.getByText('#000025')).toHaveClass('tabular-nums');
+    expect(screen.getByText('#000025')).toHaveClass('type-mono');
   });
 
   it('is one link to the detail page, named by the alt text composed from the traits', () => {

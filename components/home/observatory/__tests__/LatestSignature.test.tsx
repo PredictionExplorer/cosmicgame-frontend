@@ -24,10 +24,13 @@ describe('LatestSignature', () => {
     expect(link).toHaveAttribute('href', '/detail/47');
     // The plate is the art itself: nothing is layered over it.
     expect(within(link).getByTestId('art-frame').children).toHaveLength(2);
-    expect(within(section).getByText('home.latestSignature.unnamed(id=#000047)')).toBeVisible();
-    // An unnamed Signature's title already carries its number.
-    expect(within(section).queryByText('#000047')).not.toBeInTheDocument();
-    expect(within(section).getByText('home.latestSignature.imprintedIn(number=1)')).toBeVisible();
+    // The wall-label rule: "Signature #000047", the number in the identifier face.
+    const number = within(section).getByText('#000047');
+    expect(number).toHaveClass('type-mono-inline');
+    expect(number.parentElement).toHaveTextContent('common.signature.untitled(id=#000047)');
+    // An unnamed Signature's title already carries its number: it is not repeated.
+    expect(within(section).getAllByText(/#000047/)).toHaveLength(1);
+    expect(within(section).getByText('common.signature.cycle(n=1)')).toBeVisible();
     expect(
       within(section).getByRole('link', { name: /home\.latestSignature\.gallery/ }),
     ).toHaveAttribute('href', '/gallery');
@@ -66,7 +69,7 @@ describe('LatestSignature', () => {
     await user.click(older);
     expect(screen.getByTestId('latest-signature-link')).toHaveAttribute('href', '/detail/46');
     expect(screen.getByRole('status')).toHaveTextContent(
-      'home.latestSignature.unnamed(id=#000046), home.latestSignature.position(index=2,count=3)',
+      'common.signature.untitled(id=#000046), home.latestSignature.position(index=2,count=3)',
     );
 
     await user.click(older);

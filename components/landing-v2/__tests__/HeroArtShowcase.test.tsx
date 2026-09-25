@@ -126,10 +126,10 @@ describe('<HeroArtShowcase />', () => {
     const caption = screen.getByTestId('hero-art-showcase').querySelector('figcaption')!;
     // An unnamed token takes the unnamed form, "Signature #000023", with the
     // number in the identifier face; the meta line does not repeat it.
-    expect(caption).toHaveTextContent('landing.artwork.untitled(tokenLabel=#000023)');
+    expect(caption).toHaveTextContent('common.signature.untitled(id=#000023)');
     expect(caption.textContent?.match(/#000023/g)).toHaveLength(1);
-    expect(within(caption).getByText('#000023')).toHaveClass('font-mono');
-    expect(caption).toHaveTextContent('landing.timer.cycle.numbered(number=0)');
+    expect(within(caption).getByText('#000023')).toHaveClass('type-mono-inline');
+    expect(caption).toHaveTextContent('common.signature.cycle(n=0)');
     expect(within(caption).getByText('Jun 2026')).toHaveAttribute(
       'dateTime',
       '2026-06-15T07:00:02.000Z',
@@ -242,7 +242,7 @@ describe('<HeroArtShowcase />', () => {
       .querySelector('[aria-live="polite"]') as HTMLElement;
     expect(region).toBeEmptyDOMElement();
     next();
-    expect(region).toHaveTextContent('landing.artwork.untitled(tokenLabel=#000024)');
+    expect(region).toHaveTextContent('common.signature.untitled(id=#000024)');
   });
 
   it('titles a named Signature by its name', () => {

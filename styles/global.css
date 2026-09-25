@@ -188,11 +188,14 @@
   /* Text face: Inter, then the CJK stack. */
   --body-font-stack: var(--font-inter), Inter, var(--cjk-font-stack), sans-serif;
   /*
-   * Display face for Latin-script locales. CJK glyphs fall through to the
-   * CJK stack per glyph; Cyrillic and Vietnamese replace the whole stack below.
+   * Display face for Latin-script locales. Digits and "#" come from Inter
+   * ('CS Display Figures'), so Clash's round zero never sets a number; CJK
+   * glyphs fall through to the CJK stack per glyph; Cyrillic and Vietnamese
+   * replace the whole stack below.
    */
   --display-font-stack:
-    var(--font-clash-display), 'ClashDisplay-Variable', var(--cjk-font-stack), sans-serif;
+    'CS Display Figures', var(--font-clash-display), 'ClashDisplay-Variable', var(--cjk-font-stack),
+    sans-serif;
   /*
    * Identifiers. A named web mono first (lib/fonts.ts), then the platform
    * monos, then the CJK stack so Han, kana and Hangul inside an identifier
@@ -284,6 +287,25 @@
     url('/fonts/noto-sans-kr/NotoSansKR-punctuation.ttf') format('truetype');
   font-weight: 100 900;
   unicode-range: U+0021, U+002C, U+002E, U+003A, U+003F;
+}
+
+/*
+ * Display figures. Clash Display's zero is a circle that reads as O, so a
+ * number in a heading ("Cycle #12", "Signature #000025", "Anchor
+ * Distributions for Cosmic Signature #000045") mistook itself for letters
+ * and set the one figure policy aside: every number is Inter (docs/design-
+ * system.md → Typography). This alias, first in the Latin display stack,
+ * sets only 0-9 and "#" in Inter 500 and leaves every word in Clash. A 6 KB
+ * self-hosted cut of the checked-in assets/fonts/Inter-500.subset.ttf (SIL
+ * OFL), loaded only where a Latin display heading shows a digit. The CJK
+ * stacks take their own digits below; uk and vi set headings in Onest.
+ */
+@font-face {
+  font-family: 'CS Display Figures';
+  src: url('/fonts/display-figures/Inter-figures.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+  unicode-range: U+0023, U+0030-0039;
 }
 
 /*

@@ -702,8 +702,6 @@
       "cycles": "周期数"
     },
     "gridLabel": "星选 NFT",
-    "unnamed": "Cosmic Signature {id}",
-    "cycle": "第 {cycle} 个周期",
     "sources": {
       "participant": "参与者",
       "randomWalk": "Random Walk",

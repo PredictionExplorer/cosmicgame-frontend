@@ -273,12 +273,13 @@ describe('NFTTrait', () => {
     );
   });
 
-  it('titles an unnamed token "Cosmic Signature #000005" at full contrast', () => {
+  it('titles an unnamed token "Signature #000005" at full contrast', () => {
     withDashboard();
     withNft({ TokenName: '' });
     mockUseNameHistory.mockReturnValue({ data: [], isLoading: false, refetch: jest.fn() });
     render(<NFTTrait tokenId={5} />);
-    const title = screen.getByRole('heading', { level: 1, name: 'Cosmic Signature #000005' });
+    const title = screen.getByRole('heading', { level: 1 });
+    expect(title).toHaveTextContent('common.signature.untitled(id=#000005)');
     expect(title.className).not.toMatch(/muted-foreground\/|text-subtle/);
     expect(screen.queryByText('detail.hero.unnamedToken')).not.toBeInTheDocument();
   });
