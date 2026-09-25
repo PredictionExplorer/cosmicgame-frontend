@@ -100,7 +100,7 @@
       },
       "eth-contribution": {
         "heading": "直接 ETH 贡献",
-        "description": "直接转入周期储备的 ETH，附每位贡献者的留言与所属周期。",
+        "description": "直接转入周期储备的 ETH，按周期与贡献者列出；附留言的贡献另有独立记录页。",
         "source": "Cosmic Signature 贡献 API",
         "links": {
           "reserve": "周期储备如何分配",
@@ -109,13 +109,13 @@
         },
         "cards": {
           "records": {
-            "label": "直接贡献记录"
+            "label": "贡献笔数"
           },
           "totalEth": {
-            "label": "直接贡献 ETH 总额"
+            "label": "贡献总额"
           },
           "contributors": {
-            "label": "独立贡献者"
+            "label": "贡献者"
           }
         }
       },

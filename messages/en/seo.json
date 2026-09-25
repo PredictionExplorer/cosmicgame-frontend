@@ -100,7 +100,7 @@
       },
       "eth-contribution": {
         "heading": "Direct ETH contributions",
-        "description": "ETH sent straight to the Cycle Reserve, with each contributor’s note and cycle.",
+        "description": "ETH sent straight to the Cycle Reserve, by cycle and contributor. A contribution made with a note has its own record page.",
         "source": "Cosmic Signature contribution API",
         "links": {
           "reserve": "How the Cycle Reserve is split",
@@ -109,13 +109,13 @@
         },
         "cards": {
           "records": {
-            "label": "Direct contribution records"
+            "label": "Contributions"
           },
           "totalEth": {
-            "label": "Total direct ETH contributions"
+            "label": "Total contributed"
           },
           "contributors": {
-            "label": "Unique contributors"
+            "label": "Contributors"
           }
         }
       },

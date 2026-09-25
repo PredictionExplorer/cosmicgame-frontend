@@ -33,13 +33,9 @@
     "title": "Thiết lập hợp đồng",
     "subtitle": "Địa chỉ hợp đồng và tham số của giao thức theo báo cáo của bảng điều khiển. Chỉ xem: chỉ chủ sở hữu giao thức mới thay đổi được các giá trị này, trên chuỗi.",
     "loadError": "Không tải được thiết lập hợp đồng.",
-    "notReported": "API bảng điều khiển không cung cấp",
     "contractsDescription": "Mọi hợp đồng của giao thức, kèm địa chỉ trên Arbiscan và, nếu đã xác minh, mã nguồn trên Sourcify.",
     "groups": {
       "contracts": "Hợp đồng",
-      "shares": "Tỷ lệ phân bổ",
-      "selection": "Tinh tuyển",
-      "timing": "Thời gian",
       "cost": "Chi phí nét bút"
     },
     "values": {
@@ -51,9 +47,7 @@
     },
     "fields": {
       "timeIncrease": "Mức tăng thời gian tăng thêm mỗi chu kỳ",
-      "initialGestureCostFraction": "Tỷ lệ chi phí nét bút ban đầu",
       "activationTime": "Thời điểm kích hoạt",
-      "gestureRatio": "Tỷ lệ nét bút ETH so với CST",
       "calibrationWindowLength": "Độ dài cửa sổ hiệu chỉnh CST khi mở chu kỳ"
     }
   },

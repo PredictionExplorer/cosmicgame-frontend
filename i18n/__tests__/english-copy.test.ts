@@ -63,8 +63,6 @@ const CAPITALISED_GESTURE_ALLOWLIST = new Set([
   'seo:og.default.title',
   // The ETH Calibration Window that closes at the first gesture.
   'home:calibration.firstGestureTitle',
-  // Rewritten by parallel changes.
-  'admin:settings.fields.gestureRatio',
 ]);
 
 /** A capitalised common-noun gesture: not the role or a named quantity. */

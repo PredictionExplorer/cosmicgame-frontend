@@ -100,7 +100,7 @@
       },
       "eth-contribution": {
         "heading": "直接ETH拠出",
-        "description": "サイクル準備金へ直接送られたETHを、拠出者のメモと対象サイクルとともに確認できます。",
+        "description": "サイクル準備金へ直接送られたETHを、サイクルと拠出者ごとに確認できます。メモ付きの拠出には個別の記録ページがあります。",
         "source": "Cosmic Signature拠出API",
         "links": {
           "reserve": "サイクル準備金の配分のしくみ",
@@ -109,13 +109,13 @@
         },
         "cards": {
           "records": {
-            "label": "直接拠出の記録"
+            "label": "拠出件数"
           },
           "totalEth": {
-            "label": "直接ETH拠出の総額"
+            "label": "拠出総額"
           },
           "contributors": {
-            "label": "ユニーク拠出者"
+            "label": "拠出者"
           }
         }
       },

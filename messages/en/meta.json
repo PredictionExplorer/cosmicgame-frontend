@@ -87,7 +87,7 @@
   },
   "code": {
     "title": "Source Code: CC0 On-Chain Art Protocol",
-    "description": "Explore the Cosmic Signature source code, rendering pipeline, contract repository, verification workflow, and CC0 public-domain license."
+    "description": "Explore the Cosmic Signature source code, its rendering pipeline, the project repositories and the CC0 public-domain license."
   },
   "tokenDetail": {
     "titleFor": "Cosmic Signature #{id}",
@@ -166,7 +166,7 @@
   },
   "ethContribution": {
     "title": "Direct ETH Contributions",
-    "description": "Contribute ETH directly to the Cosmic Signature Cycle Reserve and view the complete contribution history, with each contributor’s cycle and note."
+    "description": "Contribute ETH directly to the Cosmic Signature Cycle Reserve and view the complete contribution history by cycle and contributor."
   },
   "ethContributionDetail": {
     "title": "Contribution #{id}",

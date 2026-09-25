@@ -33,13 +33,9 @@
     "title": "合约设置",
     "subtitle": "控制面板所报告的协议合约地址与参数。只读：只有协议所有者能在链上更改这些数值。",
     "loadError": "未能加载合约设置。",
-    "notReported": "控制面板 API 未提供",
     "contractsDescription": "每个协议合约，附 Arbiscan 上的地址；已验证的合约另附 Sourcify 上的源代码。",
     "groups": {
       "contracts": "合约",
-      "shares": "分配比例",
-      "selection": "星选",
-      "timing": "时间参数",
       "cost": "落笔价格"
     },
     "values": {
@@ -51,9 +47,7 @@
     },
     "fields": {
       "timeIncrease": "时间增量的每周期增幅",
-      "initialGestureCostFraction": "初始落笔价格比例",
       "activationTime": "启用时间",
-      "gestureRatio": "ETH 与 CST 落笔比率",
       "calibrationWindowLength": "周期开启时 CST 校准窗口时长"
     }
   },

@@ -33,13 +33,9 @@
     "title": "Contract settings",
     "subtitle": "The protocol's contract addresses and parameters as the dashboard reports them. Read-only: only the protocol owner changes these values, on-chain.",
     "loadError": "The contract settings could not be loaded.",
-    "notReported": "Not reported by the dashboard API",
     "contractsDescription": "Every protocol contract, with its address on Arbiscan and, where verified, its source on Sourcify.",
     "groups": {
       "contracts": "Contracts",
-      "shares": "Allocation shares",
-      "selection": "Stellar Selection",
-      "timing": "Timing",
       "cost": "Gesture Cost"
     },
     "values": {
@@ -51,9 +47,7 @@
     },
     "fields": {
       "timeIncrease": "Time increment growth per cycle",
-      "initialGestureCostFraction": "Initial Gesture Cost fraction",
       "activationTime": "Activation time",
-      "gestureRatio": "ETH to CST Gesture ratio",
       "calibrationWindowLength": "Cycle start CST Calibration Window length"
     }
   },

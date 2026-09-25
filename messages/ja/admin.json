@@ -33,13 +33,9 @@
     "title": "コントラクト設定",
     "subtitle": "ダッシュボードが報告するプロトコルのコントラクトアドレスとパラメーターです。閲覧のみで、これらの値はプロトコル所有者だけがオンチェーンで変更できます。",
     "loadError": "コントラクト設定を読み込めませんでした。",
-    "notReported": "ダッシュボードAPIでは提供されていません",
     "contractsDescription": "すべてのプロトコルコントラクトと、Arbiscanのアドレス、検証済みの場合はSourcifyのソースコードです。",
     "groups": {
       "contracts": "コントラクト",
-      "shares": "配分の割合",
-      "selection": "星選",
-      "timing": "時間",
       "cost": "一筆の費用"
     },
     "values": {
@@ -51,9 +47,7 @@
     },
     "fields": {
       "timeIncrease": "サイクルごとの時間増分の増加率",
-      "initialGestureCostFraction": "初期一筆の費用の比率",
       "activationTime": "有効化時刻",
-      "gestureRatio": "ETHとCSTの一筆の比率",
       "calibrationWindowLength": "サイクル開始時のCST調律期間の長さ"
     }
   },

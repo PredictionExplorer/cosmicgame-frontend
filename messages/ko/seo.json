@@ -100,7 +100,7 @@
       },
       "eth-contribution": {
         "heading": "직접 ETH 기여",
-        "description": "사이클 준비금에 직접 보낸 ETH를 기여자의 메모, 해당 사이클과 함께 보여 줍니다.",
+        "description": "사이클 준비금에 직접 보낸 ETH를 사이클과 기여자별로 보여 줍니다. 메모를 남긴 기여는 별도의 기록 페이지가 있습니다.",
         "source": "Cosmic Signature 기여 API",
         "links": {
           "reserve": "사이클 준비금 배분 방식",
@@ -109,13 +109,13 @@
         },
         "cards": {
           "records": {
-            "label": "직접 기여 기록"
+            "label": "기여 수"
           },
           "totalEth": {
-            "label": "직접 ETH 기여 총액"
+            "label": "총 기여액"
           },
           "contributors": {
-            "label": "고유 기여자"
+            "label": "기여자"
           }
         }
       },
