@@ -34,9 +34,11 @@ export interface AnchoringStatisticsRead {
  * the six lists its ledgers show (both collections' actions, anchored NFTs
  * and anchor-holders), so the figures and the ledgers are in the first HTML
  * instead of seven client reads after hydration. A failed read seeds nothing
- * and the browser reads it; nothing is seeded under the e2e harness.
+ * and the browser reads it; nothing is read or seeded under the e2e harness.
  */
 export const readAnchoringStatistics = cache(async (): Promise<AnchoringStatisticsRead> => {
+  // The harness mocks the API in the browser: the server reads nothing it would not seed.
+  if (seedsDisabled()) return { dashboard: { data: null, at: Date.now() }, seeds: [], at: null };
   const [dashboard, cstActions, rwlkActions, cstTokens, rwlkTokens, cstHolders, rwlkHolders] =
     await Promise.all([
       readDashboard(),
@@ -59,10 +61,8 @@ export const readAnchoringStatistics = cache(async (): Promise<AnchoringStatisti
     (read) => read.data !== null,
   );
   return {
-    dashboard: seedsDisabled() ? { data: null, at: dashboard.at } : dashboard,
-    seeds: seedsDisabled()
-      ? []
-      : lists.map(([key, read]) => ({ queryKey: [key], data: read.data, at: read.at })),
+    dashboard,
+    seeds: lists.map(([key, read]) => ({ queryKey: [key], data: read.data, at: read.at })),
     at: resolved.length > 0 ? Math.max(...resolved.map((read) => read.at)) : null,
   };
 });

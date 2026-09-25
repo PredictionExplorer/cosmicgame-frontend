@@ -59,16 +59,22 @@ test.describe('/statistics tooltips', () => {
     await expectAllLabelTooltips(page, PARTICIPATION_TOOLTIPS);
   });
 
-  test('explains the anchoring figures in one Definitions disclosure', async ({ page }) => {
+  test('explains each anchoring figure by its own label', async ({ page }) => {
     await page.goto('/statistics/anchoring', { waitUntil: 'networkidle' });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.getByRole('tab', { name: 'Random Walk NFT' }).click();
     const panel = page.getByRole('tabpanel', { name: 'Random Walk NFT' });
-    const definitions = panel.locator('details').filter({ hasText: 'Definitions' }).first();
-    await definitions.scrollIntoViewIfNeeded();
-    await definitions.locator('summary').click();
-    await expect(
-      definitions.getByText(/imprinted for Random Walk NFT anchor-holders through Anchored-NFT/),
-    ).toBeVisible();
+    // One definition mechanism: the label is the explained term (no Definitions disclosure).
+    await expect(panel.locator('details')).toHaveCount(0);
+    const trigger = panel.getByRole('button', {
+      name: 'More information about Cosmic Signature NFTs imprinted',
+    });
+    await trigger.scrollIntoViewIfNeeded();
+    await openTooltip(trigger);
+    await expectTooltipFullyVisible(
+      page,
+      /imprinted for Random Walk NFT anchor-holders through Anchored-NFT/,
+    );
   });
 
   test('explains a section once, beside its title', async ({ page }) => {

@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 
 import {
   dismissOpenTooltips,
@@ -56,10 +56,11 @@ const ALLOCATION_DETAIL_TERMS = [
 async function expectTermTooltips(
   page: Page,
   terms: readonly { label: string; expected: RegExp }[],
+  scope: Page | Locator = page,
 ): Promise<void> {
   for (const { label, expected } of terms) {
     await dismissOpenTooltips(page);
-    const trigger = page.getByRole('button', { name: label, exact: true }).first();
+    const trigger = scope.getByRole('button', { name: label, exact: true }).first();
     await trigger.scrollIntoViewIfNeeded();
     await openTooltip(trigger);
     await expectTooltipFullyVisible(page, expected);
@@ -72,10 +73,13 @@ test.describe('/allocation tooltips', () => {
     await page.goto('/allocation', { waitUntil: 'networkidle' });
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await expectAllLabelTooltips(page, ALLOCATION_LIST_TOOLTIPS);
-    await expectTermTooltips(page, ALLOCATION_LIST_TERMS);
+    // The ledger leads (its column headers name the same tracks), so the terms are read in
+    // the split's own legend, after it.
+    const split = page.getByRole('region', { name: 'Cycle reserve split' });
+    await expectTermTooltips(page, ALLOCATION_LIST_TERMS, split);
     // The split is a constant: one sentence under its heading, after the ledger.
     await expect(
-      page.getByText('ETH reserve is allocated across protocol tracks', { exact: false }),
+      split.getByText('ETH reserve is allocated across protocol tracks', { exact: false }),
     ).toBeVisible();
   });
 

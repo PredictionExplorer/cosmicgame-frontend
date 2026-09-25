@@ -86,5 +86,8 @@ describe('readAnchoringStatistics', () => {
     const read = await readAnchoringStatistics();
     expect(read.seeds).toEqual([]);
     expect(read.dashboard.data).toBeNull();
+    expect(read.at).toBeNull();
+    expect(readDashboard).not.toHaveBeenCalled();
+    expect(get_staked_cst_tokens).not.toHaveBeenCalled();
   });
 });
