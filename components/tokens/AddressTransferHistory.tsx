@@ -143,8 +143,8 @@ function TransferPhoneRecord({
         <ActivityCell activity={activity} />
         <span className="shrink-0 font-medium text-foreground">{moved}</span>
       </span>
-      {/* The second tier: its links keep the line's ink until hovered. */}
-      <span className="flex flex-wrap items-baseline gap-x-2 type-body-sm font-normal text-muted-foreground [&_a]:text-muted-foreground">
+      {/* The second tier: its links keep the line's ink until hovered, each a 24px target. */}
+      <span className="flex flex-wrap items-baseline gap-x-2 type-body-sm font-normal text-muted-foreground [&_a]:inline-block [&_a]:min-h-6 [&_a]:leading-6 [&_a]:text-muted-foreground">
         {counterparty ? (
           <>
             {counterparty}
