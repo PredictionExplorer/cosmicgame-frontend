@@ -15,6 +15,8 @@ export interface RankLadderProps {
   current?: QuizRankKey;
   /** Accessible name of the list. */
   label: string;
+  /** `row`: four steps across (the start card, the summary). `column`: the side panel. */
+  orientation?: 'row' | 'column';
   className?: string;
 }
 
@@ -23,12 +25,23 @@ export interface RankLadderProps {
  * answers it starts at. The start card shows the goal; the summary marks the
  * rank the attempt reached with a primary rule on it and every step below.
  */
-export function RankLadder({ ranks, floors, current, label, className }: RankLadderProps) {
+export function RankLadder({
+  ranks,
+  floors,
+  current,
+  label,
+  orientation = 'row',
+  className,
+}: RankLadderProps) {
   const reached = current ? ASCENDING_RANKS.indexOf(current) : -1;
+  const column = orientation === 'column';
   return (
     <ol
       aria-label={label}
-      className={cn('grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4', className)}
+      className={cn(
+        column ? 'grid gap-1' : 'grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4',
+        className,
+      )}
     >
       {ASCENDING_RANKS.map((rank, index) => {
         const isReached = index <= reached;
@@ -37,7 +50,11 @@ export function RankLadder({ ranks, floors, current, label, className }: RankLad
           <li
             key={rank}
             aria-current={isCurrent ? 'step' : undefined}
-            className={cn('min-w-0 border-t-2 pt-3', isReached ? 'border-primary' : 'border-rule')}
+            className={cn(
+              'min-w-0',
+              column ? 'border-l-2 py-2 pl-4' : 'border-t-2 pt-3',
+              isReached ? 'border-primary' : 'border-rule',
+            )}
           >
             <p
               className={cn(

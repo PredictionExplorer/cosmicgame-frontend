@@ -38,7 +38,10 @@ export interface QuizQuestion {
 
 export interface QuizTier {
   readonly id: QuizTierId;
+  /** The tier's short name ("Basic"): hub cards, breadcrumbs, "Continue to {tier}". */
   readonly title: string;
+  /** The tier page's H1, which says what the tier covers ("Basic: the fundamentals"). */
+  readonly heading: string;
   /** One line on the hub card. */
   readonly tagline: string;
   /** Longer copy on the tier page hero. */
@@ -119,10 +122,10 @@ export interface QuizRunnerUi {
     /** `{rank}` placeholder: the rank reached ("Your standing: {rank}"). */
     readonly rankTemplate: string;
     readonly ranks: {
-      readonly observer: QuizMasteryRank;
-      readonly participant: QuizMasteryRank;
-      readonly enduranceChampion: QuizMasteryRank;
-      readonly chronoWarrior: QuizMasteryRank;
+      readonly reader: QuizMasteryRank;
+      readonly student: QuizMasteryRank;
+      readonly scholar: QuizMasteryRank;
+      readonly cartographer: QuizMasteryRank;
     };
     readonly studyHeading: string;
     readonly studyIntro: string;

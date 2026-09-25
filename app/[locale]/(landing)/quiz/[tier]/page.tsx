@@ -13,6 +13,7 @@ import { getLearnContent } from '@/content/learn';
 
 import { notFoundMetadata } from '@/components/layout/notFoundMetadata';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { MetaItems } from '@/components/reading/MetaItems';
 import { DifficultyMeter } from '@/components/quiz/DifficultyMeter';
 import { QuizRunner } from '@/components/quiz/QuizRunner';
 import {
@@ -130,7 +131,7 @@ export default async function QuizTierPage({ params }: PageProps) {
       />
 
       {/* The header keeps the site's content edge, like every reading page;
-          only the runner holds to the reading measure. */}
+          the runner holds to the reading measure with its rank panel beside it. */}
       <PageHeader
         variant="reading"
         host="landing"
@@ -138,36 +139,39 @@ export default async function QuizTierPage({ params }: PageProps) {
           { label: learnLabel, href: '/learn' },
           { label: hub.breadcrumbs.quizLabel, href: QUIZ_PATH },
         ]}
-        eyebrow={hub.eyebrow}
-        title={tier.title}
+        title={tier.heading}
         subtitle={tier.description}
         meta={
-          <>
-            <span className="tabular-nums">
-              {fillTemplate(hub.questionCountTemplate, {
-                count: formatCount(questionCount, locale),
-              })}
-            </span>
-            <span className="tabular-nums">
-              {fillTemplate(hub.durationTemplate, {
-                minutes: estimatedMinutes(questionCount),
-              })}
-            </span>
-            <span className="inline-flex items-center gap-2">
-              <DifficultyMeter
-                level={tierIndex + 1}
-                max={tiers.length}
-                label={fillTemplate(hub.difficultyTemplate, {
-                  level: tierIndex + 1,
-                  max: tiers.length,
-                })}
-              />
-            </span>
-          </>
+          <span className="inline-flex flex-wrap items-center gap-x-2.5 gap-y-1">
+            <MetaItems
+              items={[
+                <span key="count" className="tabular-nums">
+                  {fillTemplate(hub.questionCountTemplate, {
+                    count: formatCount(questionCount, locale),
+                  })}
+                </span>,
+                <span key="duration" className="tabular-nums">
+                  {fillTemplate(hub.durationTemplate, {
+                    minutes: estimatedMinutes(questionCount),
+                  })}
+                </span>,
+                <span key="difficulty" className="inline-flex items-center gap-2">
+                  <DifficultyMeter
+                    level={tierIndex + 1}
+                    max={tiers.length}
+                    label={fillTemplate(hub.difficultyTemplate, {
+                      level: tierIndex + 1,
+                      max: tiers.length,
+                    })}
+                  />
+                </span>,
+              ]}
+            />
+          </span>
         }
       />
 
-      <div className="max-w-[46rem]">
+      <div>
         <QuizRunner
           tier={tier}
           ui={ui}

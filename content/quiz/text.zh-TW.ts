@@ -62,20 +62,20 @@ export const quizTextZhTw = {
       rankLabel: '理解程度',
       rankTemplate: '理解程度：{rank}',
       ranks: {
-        observer: {
-          name: '觀察者',
+        reader: {
+          name: '讀者',
           line: '可以從白皮書的協議概覽開始，再逐步了解各項機制。',
         },
-        participant: {
-          name: '參與者',
+        student: {
+          name: '學生',
           line: '已掌握不少基礎概念，接下來可以多留意特殊情況。',
         },
-        enduranceChampion: {
-          name: '堅守冠軍',
+        scholar: {
+          name: '學者',
           line: '對協議機制已有扎實理解，可透過參考章節補齊細節。',
         },
-        chronoWarrior: {
-          name: '時之勇士',
+        cartographer: {
+          name: '製圖師',
           line: '對協議已有全面理解，也可以再讀參考章節，核對細節。',
         },
       },
@@ -90,6 +90,7 @@ export const quizTextZhTw = {
   tiers: {
     basic: {
       title: '基礎',
+      heading: '基礎：核心概念',
       tagline: '協議的輪廓：週期、落筆、分配與藝術。',
       description:
         '二十五道基礎題——什麼是落筆、週期如何落幕、ETH 流向哪裡、作品為何是確定性的。初來乍到，從這裡開始。',
@@ -97,6 +98,7 @@ export const quizTextZhTw = {
     },
     medium: {
       title: '進階',
+      heading: '進階：運轉中的機制',
       tagline: '運轉中的機制：校準窗口、堅守軌道、議會規則。',
       description:
         '二十五道進階題——價格曲線、CST 回饋迴路、堅守冠軍與時之勇士之辨、星選算術與議會參數。適合看過一兩個週期的讀者。',
@@ -104,6 +106,7 @@ export const quizTextZhTw = {
     },
     hard: {
       title: '高階',
+      heading: '高階：邊界情形與推演',
       tagline: '邊界情形與推演：惡意錢包、升級歷史、渲染管線。',
       description:
         '五十道高階題，獻給細心的讀者——到期後的語義、拒收 ETH 的合約、V2 為何改了五處、V3 重新定價了什麼、隨機性如何構造，以及一台 Yoshida 積分器在藝術專案裡做什麼。',

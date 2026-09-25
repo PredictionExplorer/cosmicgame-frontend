@@ -168,12 +168,12 @@ describe('quiz progress', () => {
   });
 
   it('ranks by the share of correct answers', () => {
-    expect(rankFor(0, 25)).toBe('observer');
-    expect(rankFor(12, 25)).toBe('observer');
-    expect(rankFor(13, 25)).toBe('participant');
-    expect(rankFor(19, 25)).toBe('enduranceChampion');
-    expect(rankFor(24, 25)).toBe('chronoWarrior');
-    expect(rankFor(0, 0)).toBe('observer');
+    expect(rankFor(0, 25)).toBe('reader');
+    expect(rankFor(12, 25)).toBe('reader');
+    expect(rankFor(13, 25)).toBe('student');
+    expect(rankFor(19, 25)).toBe('scholar');
+    expect(rankFor(24, 25)).toBe('cartographer');
+    expect(rankFor(0, 0)).toBe('reader');
   });
 
   it('estimates the time a tier takes', () => {

@@ -49,6 +49,7 @@ jest.mock('framer-motion', () => {
 const tier: QuizTier = {
   id: 'basic',
   title: 'Basic',
+  heading: 'Basic: the fundamentals',
   tagline: 'Stub tagline',
   description: 'Stub description',
   questions: [
@@ -90,10 +91,10 @@ const props: QuizRunnerProps = {
   locale: 'en',
   hubHref: '/quiz',
   rankFloors: {
-    observer: null,
-    participant: 'From 50%',
-    enduranceChampion: 'From 75%',
-    chronoWarrior: 'From 95%',
+    reader: null,
+    student: 'From 50%',
+    scholar: 'From 75%',
+    cartographer: 'From 95%',
   },
   bestTemplate: quizContentEn.hub.bestTemplate,
   nextTier: { title: 'Medium', href: '/quiz/medium' },
@@ -217,7 +218,7 @@ describe('<QuizRunner />', () => {
     fireEvent.click(screen.getByTestId('quiz-option-2'));
     fireEvent.click(screen.getByTestId('quiz-next'));
     expect(screen.getByTestId('quiz-summary')).toHaveTextContent(
-      `到達点：${ja.summary.ranks.participant.name}`,
+      `到達点：${ja.summary.ranks.student.name}`,
     );
   });
 
@@ -254,7 +255,7 @@ describe('<QuizRunner />', () => {
     fireEvent.keyDown(window, { key: 'Enter' });
     const summary = screen.getByTestId('quiz-summary');
     expect(summary).toHaveTextContent('1 of 2 correct');
-    expect(summary).toHaveTextContent(ui.summary.ranks.participant.name);
+    expect(summary).toHaveTextContent(ui.summary.ranks.student.name);
     expect(screen.getByRole('heading', { level: 2, name: '1 of 2 correct' })).toHaveFocus();
 
     // The review shows the pick, the correct answer and the explanation.
