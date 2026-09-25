@@ -2,10 +2,11 @@
 /**
  * Regenerates the checked-in font subsets the share cards embed
  * (lib/og/fonts.ts): Inter and JetBrains Mono for every locale, Onest for
- * Ukrainian and Vietnamese titles, and the regional Noto Sans CJK cuts.
+ * Ukrainian and Vietnamese titles, and the regional Noto Sans CJK cuts; then
+ * the web fonts cut from them for the site's display aliases (WEB_FONT_CUTS).
  *
- *   npm run og:fonts                          # every subset
- *   npm run og:fonts -- Inter-400.subset.ttf  # selected files
+ *   npm run og:fonts                          # every subset and web cut
+ *   npm run og:fonts -- Inter-400.subset.ttf  # selected files, and their cuts
  *
  * Glyph set per file: every character the cards of the locales that embed it
  * can draw — their `messages/<locale>/seo.json` og copy without alt text, the
@@ -30,6 +31,7 @@ import {
   OG_SUBSET_SOURCES,
   sourceRegistryProblems,
   subsetGlyphText,
+  WEB_FONT_CUTS,
   type FontSource,
 } from './build-og-fonts-core';
 import { fontCodePoints, uncoveredCharacters } from './font-cmap';
@@ -78,6 +80,18 @@ async function build(file: string): Promise<void> {
   );
 }
 
+/** Cuts a display alias's web font from the checked-in subset it names. */
+async function cut(target: string): Promise<void> {
+  const { from, glyphs } = WEB_FONT_CUTS[target]!;
+  const source = readFileSync(join(OUTPUT_DIR, from));
+  const missing = uncoveredCharacters(source, glyphs);
+  if (missing.length > 0)
+    throw new Error(`${from} lacks glyphs for ${target}: ${missing.join(' ')}`);
+  const woff2 = await subsetFont(source, glyphs, { targetFormat: 'woff2' });
+  writeFileSync(join(ROOT, target), woff2);
+  console.log(`write ${target}  ${woff2.byteLength.toLocaleString('en-US')} bytes, from ${from}`);
+}
+
 async function main(): Promise<void> {
   const problems = sourceRegistryProblems();
   if (problems.length > 0) throw new Error(problems.join('\n'));
@@ -88,7 +102,11 @@ async function main(): Promise<void> {
     if (!files.includes(file))
       throw new Error(`${file} is not a subset; known: ${files.join(', ')}`);
   }
-  for (const file of requested.length > 0 ? requested : files) await build(file);
+  const built = requested.length > 0 ? requested : files;
+  for (const file of built) await build(file);
+  for (const target of Object.keys(WEB_FONT_CUTS)) {
+    if (built.includes(WEB_FONT_CUTS[target]!.from)) await cut(target);
+  }
 
   const gaps = ogCoverageProblems(ROOT);
   if (gaps.length > 0) {

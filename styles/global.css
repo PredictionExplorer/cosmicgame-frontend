@@ -297,8 +297,9 @@
  * system.md → Typography). This alias, first in the Latin display stack,
  * sets only 0-9 and "#" in Inter 500 and leaves every word in Clash. A 6 KB
  * self-hosted cut of the checked-in assets/fonts/Inter-500.subset.ttf (SIL
- * OFL), loaded only where a Latin display heading shows a digit. The CJK
- * stacks take their own digits below; uk and vi set headings in Onest.
+ * OFL; `npm run og:fonts` rebuilds it, WEB_FONT_CUTS), loaded only where a
+ * Latin display heading shows a digit. The CJK stacks take their own digits
+ * below; uk and vi set headings in Onest.
  */
 @font-face {
   font-family: 'CS Display Figures';
@@ -316,8 +317,8 @@
  * sets only 0-9 in Noto Sans CJK (its Latin digits are one design across the
  * regional cuts); Latin words (Cosmic Signature, ETH) keep Clash. A 3 KB
  * self-hosted cut of the checked-in share-card subset
- * assets/fonts/NotoSansSC-700.subset.ttf (SIL OFL), loaded only where a
- * CJK heading shows a digit.
+ * assets/fonts/NotoSansSC-700.subset.ttf (SIL OFL; `npm run og:fonts`
+ * rebuilds it), loaded only where a CJK heading shows a digit.
  */
 @font-face {
   font-family: 'CS CJK Display Digits';

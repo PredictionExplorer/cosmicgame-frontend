@@ -63,6 +63,33 @@ export const OG_SUBSET_SOURCES: Readonly<Record<string, SubsetSource>> = {
   'NotoSansJP-400.subset.ttf': noto('JP', 400),
 };
 
+/** A web font the site serves, cut from one of the checked-in subsets above. */
+export interface WebFontCut {
+  /** The subset in assets/fonts it is cut from. */
+  readonly from: string;
+  /** Every character it sets: the `unicode-range` of its `@font-face` (styles/global.css). */
+  readonly glyphs: string;
+}
+
+/**
+ * The display aliases' web fonts, by path from the repository root: each is
+ * cut from a share-card subset, so `npm run og:fonts` rebuilds it whenever
+ * its source changes and the two never drift. WOFF2, cut with the same
+ * harfbuzz (subset-font), byte for byte reproducible.
+ */
+export const WEB_FONT_CUTS: Readonly<Record<string, WebFontCut>> = {
+  // Inter's digits and "#" in Latin display headings (Clash's zero reads as O).
+  'public/fonts/display-figures/Inter-figures.woff2': {
+    from: 'Inter-500.subset.ttf',
+    glyphs: '#0123456789',
+  },
+  // One set of digits in Chinese, Japanese and Korean display headings.
+  'public/fonts/noto-sans-cjk/NotoSansCJK-digits.woff2': {
+    from: 'NotoSansSC-700.subset.ttf',
+    glyphs: '0123456789',
+  },
+};
+
 /** Punctuation the card layout may render around CJK copy. */
 const CJK_PUNCTUATION = '，。、：；！？「」『』（）《》〈〉【】—…·・／％－～　';
 /** Typographic punctuation any locale's copy may carry (quotes, dashes, ellipsis). */
