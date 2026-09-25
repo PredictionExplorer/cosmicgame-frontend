@@ -142,6 +142,15 @@ const TITLE_CLASS: Record<PageHeaderVariant, string> = {
   reading: 'type-display-md',
 };
 
+/**
+ * The lede lines a header with tabs reserves from `lg`: a Trust Center lede
+ * runs to three lines, a data page's to two.
+ */
+const TABBED_LEDE_CLASS: Record<PageHeaderVariant, string> = {
+  data: 'lg:min-h-[2lh]',
+  reading: 'lg:min-h-[3lh]',
+};
+
 /** Grid columns of the figure row from `sm` to `lg`, by figure count. */
 const FIGURE_COLUMNS: Record<number, string> = {
   1: 'sm:grid-cols-1',
@@ -227,7 +236,9 @@ export function PageHeader({
     eyebrow ??
     (!trail && sectionLabel && !eyebrowEchoesTitle ? (
       sectionHub || !hub ? (
-        sectionLabel
+        // The same 24px slot as the linked eyebrow, so a hub and its sibling
+        // pages put their H1 and tab row on the same line.
+        <span className="inline-flex min-h-6 items-center">{sectionLabel}</span>
       ) : (
         <Link
           href={hub}
@@ -296,6 +307,9 @@ export function PageHeader({
               className={cn(
                 // 16px on phones keeps the header inside the first screen.
                 'mt-3 type-lede text-muted-foreground max-sm:text-base print:!text-foreground/85 sm:mt-4',
+                // Sibling pages under tabs reserve their family's usual lede on wide
+                // screens, so a shorter one does not lift the tab row just used.
+                tabs && TABBED_LEDE_CLASS[variant],
                 centered && 'mx-auto',
               )}
             >
@@ -313,7 +327,9 @@ export function PageHeader({
       {meta ? (
         <div
           className={cn(
-            'mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 type-caption text-subtle sm:mt-6',
+            // One 24px row whatever it holds (a text stamp or a link), so sibling
+            // pages with tabs keep their tab row on one line.
+            'mt-3 flex min-h-6 flex-wrap items-center gap-x-4 gap-y-1 type-caption text-subtle sm:mt-6',
             centered && 'justify-center',
           )}
         >
