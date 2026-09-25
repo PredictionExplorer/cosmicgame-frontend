@@ -131,13 +131,15 @@
         "title": "Cosmic Signature NFT",
         "received": "收到",
         "toRetrieve": "待取回的已附加 NFT",
-        "transfers": "轉移"
+        "transfers": "轉移",
+        "heldOrAnchored": "目前持有或錨定 {count, number} 枚"
       },
       "anchoring": {
         "title": "錨定",
         "anchoredNow": "目前錨定",
         "actions": "錨定與解錨操作",
-        "distributions": "錨定派發"
+        "distributions": "錨定派發",
+        "byKind": "Cosmic Signature {cosmicSignature, number} · Random Walk {randomWalk, number}"
       },
       "definitions": {
         "label": "定義",

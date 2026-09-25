@@ -212,12 +212,23 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
     [cstAnchorDistributions],
   );
   const rwlkStats = userInfo?.StakingStatisticsRWalk;
-  const anchoredNow =
-    (userInfoRaw?.CurrentlyStakedTokens?.length ?? 0) + (rwlkStats?.TotalTokensStaked ?? 0);
-  const anchorActions =
-    cstAnchorActions.length +
-    (rwlkStats?.TotalNumStakeActions ?? 0) +
-    (rwlkStats?.TotalNumUnstakeActions ?? 0);
+  const anchoredNow = {
+    cosmicSignature: userInfoRaw?.CurrentlyStakedTokens?.length ?? 0,
+    randomWalk: rwlkStats?.TotalTokensStaked ?? 0,
+  };
+  const anchorActions = {
+    cosmicSignature: cstAnchorActions.length,
+    randomWalk: (rwlkStats?.TotalNumStakeActions ?? 0) + (rwlkStats?.TotalNumUnstakeActions ?? 0),
+  };
+  const anchoredPlates = anchoredArtworks(userInfoRaw?.CurrentlyStakedTokens ?? []);
+  // The plates of the NFT section: held, plus anchored through the anchoring wallet.
+  const heldOrAnchored =
+    loadingCST || cstTokensQuery.isError
+      ? null
+      : new Set([
+          ...(cstListRaw ?? []).map((token) => token.TokenId),
+          ...anchoredPlates.map((token) => token.TokenId),
+        ]).size;
 
   const handleAllDonatedNFTsClaim = () => {
     claimAllDonatedNFTs(unclaimedDonatedNFTsList.map((item: { Index: number }) => item.Index));
@@ -278,7 +289,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
     anchoredTokens.length > 0 ||
     cstAnchorActions.length > 0 ||
     rwlkAnchorActions.length > 0 ||
-    anchorActions > 0 ||
+    anchorActions.randomWalk > 0 ||
     cstAnchorDistributions.length > 0 ||
     marketingRewards.length > 0 ||
     claimedDonatedNFTsList.length > 0 ||
@@ -341,6 +352,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
               userInfo={userInfo}
               gestures={gestureSummary}
               latestGestureTs={latestGestureTs}
+              heldOrAnchored={heldOrAnchored}
               anchoredNow={anchoredNow}
               anchorActions={anchorActions}
               anchorDistributionsEth={totalAnchorDistributionEth}
@@ -350,7 +362,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
           <SectionShell title={t('statistics.page.sections.artworks')}>
             <ProfileArtworks
               tokens={cstListRaw ?? []}
-              anchored={anchoredArtworks(anchoredTokens)}
+              anchored={anchoredPlates}
               loading={loadingCST}
               error={cstTokensQuery.isError}
               onRetry={() => void cstTokensQuery.refetch()}

@@ -131,13 +131,15 @@
         "title": "Cosmic Signature NFT",
         "received": "Отримано",
         "toRetrieve": "Долучені NFT, які можна забрати",
-        "transfers": "Передачі"
+        "transfers": "Передачі",
+        "heldOrAnchored": "Зараз у власності або закріплено: {count, number}"
       },
       "anchoring": {
         "title": "Закріплення",
         "anchoredNow": "Закріплено зараз",
         "actions": "Дії закріплення та відкріплення",
-        "distributions": "Надходження за закріплення"
+        "distributions": "Надходження за закріплення",
+        "byKind": "Cosmic Signature {cosmicSignature, number} · Random Walk {randomWalk, number}"
       },
       "definitions": {
         "label": "Визначення",

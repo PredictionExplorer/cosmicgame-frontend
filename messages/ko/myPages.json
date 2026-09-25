@@ -131,13 +131,15 @@
         "title": "Cosmic Signature NFT",
         "received": "받은 NFT",
         "toRetrieve": "회수할 첨부 NFT",
-        "transfers": "전송"
+        "transfers": "전송",
+        "heldOrAnchored": "현재 보유 또는 앵커링 {count, number}개"
       },
       "anchoring": {
         "title": "앵커링",
         "anchoredNow": "현재 앵커링",
         "actions": "앵커링 / 해제 작업",
-        "distributions": "앵커링 지급"
+        "distributions": "앵커링 지급",
+        "byKind": "Cosmic Signature {cosmicSignature, number} · Random Walk {randomWalk, number}"
       },
       "definitions": {
         "label": "정의",

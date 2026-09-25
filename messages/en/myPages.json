@@ -131,13 +131,15 @@
         "title": "Cosmic Signature NFTs",
         "received": "Received",
         "toRetrieve": "Attached NFTs to retrieve",
-        "transfers": "Transfers"
+        "transfers": "Transfers",
+        "heldOrAnchored": "{count, number} held or anchored now"
       },
       "anchoring": {
         "title": "Anchoring",
         "anchoredNow": "Anchored now",
         "actions": "Anchor and release actions",
-        "distributions": "Anchor Distributions"
+        "distributions": "Anchor Distributions",
+        "byKind": "{cosmicSignature, number} Cosmic Signature · {randomWalk, number} Random Walk"
       },
       "definitions": {
         "label": "Definitions",

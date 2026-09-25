@@ -131,13 +131,15 @@
         "title": "Cosmic Signature NFT",
         "received": "受け取ったNFT",
         "toRetrieve": "未受け取りの添付NFT",
-        "transfers": "移転"
+        "transfers": "移転",
+        "heldOrAnchored": "現在保有または係留中{count, number}点"
       },
       "anchoring": {
         "title": "係留",
         "anchoredNow": "係留中",
         "actions": "係留 / 解除の操作",
-        "distributions": "係留配分"
+        "distributions": "係留配分",
+        "byKind": "Cosmic Signature {cosmicSignature, number}・Random Walk {randomWalk, number}"
       },
       "definitions": {
         "label": "定義",

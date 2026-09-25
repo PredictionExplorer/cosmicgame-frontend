@@ -131,13 +131,15 @@
         "title": "Cosmic Signature NFT",
         "received": "Đã nhận",
         "toRetrieve": "NFT đính kèm chưa nhận về",
-        "transfers": "Chuyển giao"
+        "transfers": "Chuyển giao",
+        "heldOrAnchored": "Đang nắm giữ hoặc neo giữ: {count, number}"
       },
       "anchoring": {
         "title": "Neo giữ",
         "anchoredNow": "Đang neo giữ",
         "actions": "Thao tác neo giữ và gỡ neo",
-        "distributions": "Phân phối neo giữ"
+        "distributions": "Phân phối neo giữ",
+        "byKind": "{cosmicSignature, number} Cosmic Signature · {randomWalk, number} Random Walk"
       },
       "definitions": {
         "label": "Định nghĩa",
