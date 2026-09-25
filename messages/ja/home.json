@@ -527,7 +527,6 @@
   },
   "deck": {
     "title": "Cosmic Signature観測所",
-    "intro": "ETHまたはCSTで一筆を入れると最新の参加者になります。時計がゼロになると、最新の参加者がサイクルを確定してシグネチャー配分を受け取れます。",
     "newHere": "初めてですか？仕組みを見る",
     "howItWorks": "仕組みを見る",
     "experimentalUi": "実験的なUI",

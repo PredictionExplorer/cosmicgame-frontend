@@ -80,6 +80,7 @@ import { headerRootMargin } from '@/lib/headerOffset';
 import { resolveLatestGesture, type LatestParticipantEvidence } from '@/lib/latestGesture';
 import { fetchEndgameChainSample, type EndgameChainSample } from '@/lib/rpcRace';
 import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
+import { cn } from '@/lib/utils';
 import {
   UX_SCENARIO_DEMO_ACCOUNT,
   simulateUxScenarioGesture,
@@ -725,7 +726,13 @@ const ExperimentalHomePage = ({
 
   return (
     <>
-      <PageShell variant="data" backdrop="hero" className="max-w-none px-0 sm:px-0">
+      {/* The page starts high, as the Observatory does: one header row, then
+          the art. */}
+      <PageShell
+        variant="data"
+        backdrop="hero"
+        className="max-w-none px-0 pt-[calc(var(--header-height)+1.25rem)] max-sm:pt-[calc(var(--header-height)+1rem)] sm:px-0"
+      >
         <Container>
           {uxScenario && (
             <p
@@ -748,21 +755,26 @@ const ExperimentalHomePage = ({
               }
               title={t('deck.title')}
               titleId="home-deck-title"
-              subtitle={t('deck.intro')}
-              // Two sentences: a "Read more" line would hide just one line.
-              clampLede={false}
+              // One row, as on the Observatory: no standing lede. While
+              // Gestures run, the clock's status, the console and the phase
+              // guide say how to take part; the art starts high on every
+              // screen.
               actions={
-                // Phones: the newcomer's link reads straight after the lede,
-                // then the two controls share a row. They are one control
-                // family: one height (44px on phones, 36px from sm), the
-                // control radius and the outline edge.
-                <div className="flex flex-col items-start gap-4 max-sm:-mt-2 sm:flex-row sm:items-center sm:gap-2">
+                // The route to the walkthrough, then the two controls on one
+                // row. They are one control family: one height (44px on
+                // phones, 36px from sm), the control radius and the outline
+                // edge.
+                <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-5">
                   <Link
                     href="/how-it-works"
                     data-testid="experimental-ui-new-here"
-                    className={`${TOUCH_TARGET_TEXT_LINK_CLASS} link inline-flex items-center gap-1.5 type-body-sm sm:hidden`}
+                    className={cn(
+                      TOUCH_TARGET_TEXT_LINK_CLASS,
+                      'link-quiet inline-flex items-center gap-1.5 type-label text-primary',
+                    )}
                   >
-                    {t('deck.newHere')}
+                    <span className="lg:hidden">{t('deck.newHere')}</span>
+                    <span className="max-lg:hidden">{t('deck.howItWorks')}</span>
                     <ArrowRight aria-hidden className="size-3.5 shrink-0" />
                   </Link>
                   <div className="flex max-w-full items-center gap-2">
@@ -785,16 +797,21 @@ const ExperimentalHomePage = ({
                   </div>
                 </div>
               }
-              // From sm the related link sits in the header's own row.
-              related={[{ href: '/how-it-works', label: t('deck.newHere') }]}
-              className="mb-8 pb-6 max-sm:[&>nav]:hidden sm:mb-10 sm:pb-8"
+              // A compact H1 lets the art lead; the header ends one rule
+              // above the plate.
+              className="mb-6 pb-5 sm:mb-6 sm:pb-4 [&_h1]:type-heading-1"
             />
           </div>
 
+          {/* From 1024px the art and the standings share the left column and
+              the monument takes the right one across both rows. The first row
+              is the art's own height and the second takes the rest, so the
+              standings keep the grid's gap under the art whatever the height
+              of the console beside them. */}
           <div
             id="deck"
             data-testid="home-deck-layout"
-            className="grid scroll-mt-24 grid-cols-1 gap-x-10 gap-y-12 lg:grid-cols-12 xl:gap-x-14"
+            className="grid scroll-mt-24 grid-cols-1 gap-x-10 gap-y-12 lg:grid-cols-12 lg:grid-rows-[auto_1fr] xl:gap-x-14"
           >
             <MemoStageArtwork
               token={bannerToken}
@@ -840,7 +857,10 @@ const ExperimentalHomePage = ({
               </CycleMonument>
             </div>
 
-            <div data-testid="home-deck-board" className="min-w-0 lg:col-span-7 lg:row-start-2">
+            <div
+              data-testid="home-deck-board"
+              className="min-w-0 lg:col-span-7 lg:row-start-2 lg:self-start"
+            >
               {/* The one standings ledger of the app, as on the Observatory. */}
               <StandingsLedger
                 champions={champions}

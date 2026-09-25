@@ -361,13 +361,24 @@ describe('ExperimentalHomePage', () => {
     ).toBeInTheDocument();
     expect(within(header).getByText('home.hero.cycleNumber(number=5)')).toBeInTheDocument();
     expect(within(header).getByTestId('experimental-ui-return')).toHaveAttribute('href', '/');
-    // One link in the phone action row, one in the related row from sm; CSS
-    // shows exactly one of them at every width.
-    const newHere = within(header).getAllByRole('link', { name: /home\.deck\.newHere/ });
-    expect(newHere).toHaveLength(2);
-    newHere.forEach((link) => expect(link).toHaveAttribute('href', '/how-it-works'));
-    expect(within(header).getByTestId('experimental-ui-new-here')).toHaveClass('sm:hidden');
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+  });
+
+  it('keeps the header to one row above the art: no standing lede, one route to the walkthrough', () => {
+    renderPage();
+
+    const header = screen.getByTestId('home-deck-header');
+    // The art leads: no two-sentence lede and no related-pages row push it down.
+    expect(header.querySelector('header p.type-lede')).toBeNull();
+    expect(within(header).queryByRole('navigation')).not.toBeInTheDocument();
+    // One link, shorter from 1024px, where it shares the row with the H1.
+    const route = within(header).getByTestId('experimental-ui-new-here');
+    expect(within(header).getAllByRole('link', { name: /home\.deck\.newHere/ })).toEqual([route]);
+    expect(route).toHaveAttribute('href', '/how-it-works');
+    expect(within(route).getByText('home.deck.newHere')).toHaveClass('lg:hidden');
+    expect(within(route).getByText('home.deck.howItWorks')).toHaveClass('max-lg:hidden');
+    // A compact H1 lets the plate start high.
+    expect(header.querySelector('header')).toHaveClass('[&_h1]:type-heading-1');
   });
 
   it('draws the bell in the same control shape as "Return to current UI"', () => {
