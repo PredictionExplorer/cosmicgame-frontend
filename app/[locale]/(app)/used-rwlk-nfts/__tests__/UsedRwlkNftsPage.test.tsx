@@ -105,7 +105,7 @@ describe('UsedRwlkNftsPage', () => {
     const cards = screen.getAllByTestId('used-rwlk-nft');
     expect(cards).toHaveLength(12);
     expect(within(cards[0]!).getByAltText('RandomWalk NFT #000013')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'tables.pagination.nextAria' }));
+    fireEvent.click(screen.getByRole('button', { name: 'tables.pagination.next' }));
     expect(screen.getAllByTestId('used-rwlk-nft')).toHaveLength(2);
   });
 

@@ -177,9 +177,7 @@
     "goToPage": "ページへ移動：",
     "goToPageAria": "ページへ移動",
     "previous": "前へ",
-    "previousAria": "前のページへ",
     "next": "次へ",
-    "nextAria": "次のページへ",
     "morePages": "その他のページ"
   },
   "currentRow": {

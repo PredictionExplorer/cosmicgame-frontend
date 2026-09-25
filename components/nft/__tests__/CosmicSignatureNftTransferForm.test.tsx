@@ -214,7 +214,7 @@ describe('CosmicSignatureNftTransferForm', () => {
     );
 
     expect(screen.getAllByTestId(/^nft-row-/)).toHaveLength(8);
-    fireEvent.click(screen.getByRole('button', { name: 'tables.pagination.nextAria' }));
+    fireEvent.click(screen.getByRole('button', { name: 'tables.pagination.next' }));
     expect(screen.getAllByTestId(/^nft-row-/)).toHaveLength(2);
     expect(screen.getByText('Piece 10')).toBeInTheDocument();
   });

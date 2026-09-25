@@ -177,9 +177,7 @@
     "goToPage": "Go to page:",
     "goToPageAria": "go to page",
     "previous": "Previous",
-    "previousAria": "Go to previous page",
     "next": "Next",
-    "nextAria": "Go to next page",
     "morePages": "More pages"
   },
   "currentRow": {

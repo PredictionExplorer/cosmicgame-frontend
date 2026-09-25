@@ -177,9 +177,7 @@
     "goToPage": "轉到頁碼：",
     "goToPageAria": "轉到頁碼",
     "previous": "上一頁",
-    "previousAria": "轉到上一頁",
     "next": "下一頁",
-    "nextAria": "轉到下一頁",
     "morePages": "更多頁面"
   },
   "currentRow": {

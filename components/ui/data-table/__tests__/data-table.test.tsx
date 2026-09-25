@@ -260,7 +260,7 @@ describe('DataTable pages', () => {
     expect(bodyRows()).toHaveLength(20);
     expect(screen.getByText('tables.pagination.range(from=1,to=20,total=25)')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'tables.pagination.nextAria' }));
+    await user.click(screen.getByRole('button', { name: 'tables.pagination.next' }));
     expect(bodyRows()).toHaveLength(5);
   });
 
@@ -280,7 +280,7 @@ describe('DataTable pages', () => {
         resetPageKey="a"
       />,
     );
-    await user.click(screen.getByRole('button', { name: 'tables.pagination.nextAria' }));
+    await user.click(screen.getByRole('button', { name: 'tables.pagination.next' }));
     expect(bodyRows()).toHaveLength(5);
 
     rerender(

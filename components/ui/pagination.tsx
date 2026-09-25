@@ -60,43 +60,6 @@ const PaginationLink = ({ className, isActive, size = 'icon', ...props }: Pagina
 );
 PaginationLink.displayName = 'PaginationLink';
 
-const PaginationPrevious = ({
-  className,
-  ...props
-}: React.ComponentProps<typeof PaginationLink>) => {
-  const t = useTranslations('tables');
-
-  return (
-    <PaginationLink
-      aria-label={t('pagination.previousAria')}
-      size="default"
-      className={cn('gap-1 pl-2.5', className)}
-      {...props}
-    >
-      <ChevronLeft className="h-4 w-4" aria-hidden />
-      <span>{t('pagination.previous')}</span>
-    </PaginationLink>
-  );
-};
-PaginationPrevious.displayName = 'PaginationPrevious';
-
-const PaginationNext = ({ className, ...props }: React.ComponentProps<typeof PaginationLink>) => {
-  const t = useTranslations('tables');
-
-  return (
-    <PaginationLink
-      aria-label={t('pagination.nextAria')}
-      size="default"
-      className={cn('gap-1 pr-2.5', className)}
-      {...props}
-    >
-      <span>{t('pagination.next')}</span>
-      <ChevronRight className="h-4 w-4" aria-hidden />
-    </PaginationLink>
-  );
-};
-PaginationNext.displayName = 'PaginationNext';
-
 const PaginationEllipsis = ({ className, ...props }: React.ComponentProps<'span'>) => {
   const t = useTranslations('tables');
 
@@ -132,8 +95,31 @@ export function visiblePages(current: number, total: number): (number | 'ellipsi
   return pages;
 }
 
-/** From this many pages, a "Go to page" field joins the buttons (from `sm` up). */
+/**
+ * A stable React key for each entry of {@link visiblePages}: the page number
+ * itself, and `ellipsis-start` / `ellipsis-end` for the gaps. Keys that held
+ * the entry's position changed whenever the window moved (page 5 was the
+ * fifth entry on page 4 and the fourth on page 5), so React remounted the
+ * button a keyboard user had just pressed and focus fell to the page.
+ */
+export function pageItemKey(
+  item: number | 'ellipsis',
+  index: number,
+  items: readonly (number | 'ellipsis')[],
+): string {
+  if (item !== 'ellipsis') return String(item);
+  return items.indexOf('ellipsis') === index ? 'ellipsis-start' : 'ellipsis-end';
+}
+
+/** From this many pages, a "Go to page" field joins the page buttons (from `sm` up). */
 const GO_TO_PAGE_THRESHOLD = 30;
+
+/**
+ * From this many pages, a phone, which shows no page numbers, offers the
+ * field beside Previous and Next, so the end of a 115-page log is one entry
+ * away rather than 114 presses.
+ */
+const PHONE_GO_TO_PAGE_THRESHOLD = 5;
 
 /**
  * "Go to page": a number the reader types and then commits with Enter or by
@@ -145,10 +131,12 @@ function GoToPage({
   current,
   pageCount,
   onGo,
+  className,
 }: {
   current: number;
   pageCount: number;
   onGo: (page: number) => void;
+  className?: string;
 }) {
   const t = useTranslations('tables');
   const [draft, setDraft] = React.useState<string | null>(null);
@@ -161,7 +149,9 @@ function GoToPage({
   };
 
   return (
-    <label className="hidden items-center gap-2 whitespace-nowrap type-caption text-subtle sm:flex">
+    <label
+      className={cn('items-center gap-2 whitespace-nowrap type-caption text-subtle', className)}
+    >
       {t('pagination.goToPage')}
       <Input
         type="number"
@@ -183,6 +173,50 @@ function GoToPage({
         }}
       />
     </label>
+  );
+}
+
+/**
+ * Previous or Next. At the first or last page the button stays where it is
+ * and keeps keyboard focus: it is `aria-disabled` and ignores presses rather
+ * than natively `disabled`, which would drop a reader who has just paged
+ * onto the last page to the top of the document. Its name is its visible
+ * word (visually hidden on a phone, where only the chevron shows), so a
+ * voice-control user can say what they see (WCAG 2.5.3).
+ */
+function StepButton({
+  direction,
+  unavailable,
+  onStep,
+}: {
+  direction: 'previous' | 'next';
+  unavailable: boolean;
+  onStep: () => void;
+}) {
+  const t = useTranslations('tables');
+  const Chevron = direction === 'previous' ? ChevronLeft : ChevronRight;
+  const icon = <Chevron className="h-4 w-4" aria-hidden />;
+  const word = <span className="max-sm:sr-only">{t(`pagination.${direction}`)}</span>;
+  return (
+    <PaginationLink
+      size="default"
+      aria-disabled={unavailable || undefined}
+      onClick={(event) => {
+        if (unavailable) {
+          event.preventDefault();
+          return;
+        }
+        onStep();
+      }}
+      className={cn(
+        'gap-1 px-2.5 max-sm:size-11 max-sm:px-0',
+        'aria-disabled:cursor-default aria-disabled:opacity-40 aria-disabled:hover:bg-transparent aria-disabled:hover:text-muted-foreground motion-safe:aria-disabled:active:scale-100',
+      )}
+    >
+      {direction === 'previous' ? icon : null}
+      {word}
+      {direction === 'next' ? icon : null}
+    </PaginationLink>
   );
 }
 
@@ -208,8 +242,13 @@ export interface TablePaginationProps {
 
 /**
  * Pagination for a ledger: the row range ("1–20 of 1,140"), Previous and
- * Next, and the page numbers from `sm` up. It renders nothing when every row
- * fits on one page, so a short table carries no dead "1" button.
+ * Next, the page numbers from `sm` up, and a "Go to page" field for a long
+ * ledger (on a phone, from a handful of pages). It renders nothing when
+ * every row fits on one page, so a short table carries no dead "1" button.
+ *
+ * Keyboard focus never falls out of it: the page buttons are keyed by page,
+ * so the one just pressed stays mounted as the window of numbers moves, and
+ * Previous and Next stay focusable at the ends.
  */
 export function TablePagination({
   page,
@@ -244,6 +283,15 @@ export function TablePagination({
     if (target !== current) setAnnouncement(rangeOf(target));
     onPageChange(target);
   };
+  const items = paged ? visiblePages(current, pageCount) : [];
+  // A wide screen offers the field only for a long ledger; a phone, which
+  // shows no page numbers, from a handful of pages.
+  const goToPageClass =
+    pageCount >= GO_TO_PAGE_THRESHOLD
+      ? 'flex'
+      : pageCount >= PHONE_GO_TO_PAGE_THRESHOLD
+        ? 'flex sm:hidden'
+        : null;
 
   return (
     <div
@@ -266,23 +314,20 @@ export function TablePagination({
       ) : null}
 
       {paged ? (
-        <div className="flex items-center gap-x-4">
+        // `ms-auto`: when a long caption pushes the controls onto a line of
+        // their own, they keep to the end edge instead of drifting left.
+        <div className="ms-auto flex flex-wrap items-center justify-end gap-x-4 gap-y-2">
           <Pagination className="mx-0 w-auto" {...(label ? { 'aria-label': label } : {})}>
             <PaginationContent>
               <PaginationItem>
-                <PaginationLink
-                  aria-label={t('pagination.previousAria')}
-                  size="default"
-                  disabled={current === 1}
-                  onClick={() => goTo(current - 1)}
-                  className="gap-1 px-2.5 max-sm:size-11 max-sm:px-0 disabled:pointer-events-none disabled:opacity-40"
-                >
-                  <ChevronLeft className="h-4 w-4" aria-hidden />
-                  <span className="max-sm:sr-only">{t('pagination.previous')}</span>
-                </PaginationLink>
+                <StepButton
+                  direction="previous"
+                  unavailable={current === 1}
+                  onStep={() => goTo(current - 1)}
+                />
               </PaginationItem>
-              {visiblePages(current, pageCount).map((item, index) => (
-                <PaginationItem key={`${item}-${index}`} className="max-sm:hidden">
+              {items.map((item, index) => (
+                <PaginationItem key={pageItemKey(item, index, items)} className="max-sm:hidden">
                   {item === 'ellipsis' ? (
                     <PaginationEllipsis />
                   ) : (
@@ -293,22 +338,22 @@ export function TablePagination({
                 </PaginationItem>
               ))}
               <PaginationItem>
-                <PaginationLink
-                  aria-label={t('pagination.nextAria')}
-                  size="default"
-                  disabled={current === pageCount}
-                  onClick={() => goTo(current + 1)}
-                  className="gap-1 px-2.5 max-sm:size-11 max-sm:px-0 disabled:pointer-events-none disabled:opacity-40"
-                >
-                  <span className="max-sm:sr-only">{t('pagination.next')}</span>
-                  <ChevronRight className="h-4 w-4" aria-hidden />
-                </PaginationLink>
+                <StepButton
+                  direction="next"
+                  unavailable={current === pageCount}
+                  onStep={() => goTo(current + 1)}
+                />
               </PaginationItem>
             </PaginationContent>
           </Pagination>
 
-          {pageCount >= GO_TO_PAGE_THRESHOLD ? (
-            <GoToPage current={current} pageCount={pageCount} onGo={goTo} />
+          {goToPageClass ? (
+            <GoToPage
+              current={current}
+              pageCount={pageCount}
+              onGo={goTo}
+              className={goToPageClass}
+            />
           ) : null}
         </div>
       ) : null}
@@ -316,12 +361,4 @@ export function TablePagination({
   );
 }
 
-export {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-};
+export { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink };

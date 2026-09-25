@@ -14,6 +14,8 @@ import {
   PaginationItem,
   PaginationLink,
   PaginationEllipsis,
+  pageItemKey,
+  visiblePages,
 } from '@/components/ui/pagination';
 
 import RandomWalkNFT from './RandomWalkNFT';
@@ -40,18 +42,6 @@ function gridClass(compact: boolean): string {
       ? 'gap-3 @min-[30rem]/rwlk:grid-cols-3 @min-[48rem]/rwlk:grid-cols-4 @min-[64rem]/rwlk:grid-cols-6'
       : 'gap-8 md:grid-cols-3',
   );
-}
-
-function getPaginationRange(current: number, total: number): (number | 'ellipsis')[] {
-  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
-  const pages: (number | 'ellipsis')[] = [1];
-  if (current > 3) pages.push('ellipsis');
-  for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
-    pages.push(i);
-  }
-  if (current < total - 2) pages.push('ellipsis');
-  if (total > 1) pages.push(total);
-  return pages;
 }
 
 /**
@@ -182,13 +172,13 @@ const PaginationRWLKGrid: FC<PaginationRWLKGridProps> = ({
             <div className="mt-6">
               <Pagination>
                 <PaginationContent>
-                  {getPaginationRange(currentPage, totalPages).map((item, idx) =>
+                  {visiblePages(currentPage, totalPages).map((item, idx, items) =>
                     item === 'ellipsis' ? (
-                      <PaginationItem key={`ellipsis-${idx}`}>
+                      <PaginationItem key={pageItemKey(item, idx, items)}>
                         <PaginationEllipsis />
                       </PaginationItem>
                     ) : (
-                      <PaginationItem key={item}>
+                      <PaginationItem key={pageItemKey(item, idx, items)}>
                         <PaginationLink
                           isActive={item === currentPage}
                           onClick={() => setCurrentPage(item)}
