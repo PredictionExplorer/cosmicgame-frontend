@@ -121,6 +121,13 @@ async function openMessageEditor(panel: Locator) {
   }).toPass();
 }
 
+/** Folds the message editor back behind its toggle, as the form loads. */
+async function closeMessageEditor(panel: Locator) {
+  const toggle = panel.getByTestId('gesture-message-toggle');
+  if ((await toggle.getAttribute('aria-expanded')) === 'true') await toggle.click();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+}
+
 /** The expanded editor can extend the form, but every control must remain reachable. */
 async function expectCommentFormReachable(page: Page) {
   const panel = page.locator('[data-testid="gesture-panel"][data-variant="card"]');
@@ -422,6 +429,8 @@ test.describe('home gesture chat', () => {
       await expect(page.getByTestId('allocation-ledger')).toBeHidden();
       await expect(page.getByTestId('control-desk-calibration').getByRole('region')).toHaveCount(1);
       await expectCommentFormReachable(page);
+      // The editor, opened above, may extend the form; choosing CST must not.
+      await closeMessageEditor(page.locator('[data-testid="gesture-panel"][data-variant="card"]'));
       if (viewport.width === 1280 || viewport.width === 1440) {
         const screenshotPath = testInfo.outputPath(`home-dashboard-${viewport.width}.png`);
         await page.screenshot({ path: screenshotPath, fullPage: true, animations: 'disabled' });
