@@ -340,9 +340,12 @@ data stops updating; the page's one primary indicator says the rest and is the o
 that announces.
 
 **Reading order.** A grid that places cells explicitly still reads in DOM order, so the
-DOM follows the widest layout's reading order column by column, and focus never moves
-up within a column (`ControlDesk` puts the form beside the Cycle column from 1024px, so
-its commit action is in the first viewport from 1280×720 up).
+DOM follows the widest layout's reading order and focus never moves up within a column.
+One DOM order serves every width, so a cell may be read after its neighbour in the other
+column when that is the order a phone needs: `ControlDesk` puts the form beside the Cycle
+column from 1024px (its commit action is in the first viewport from 1280×720 up), and the
+wallet's standing, which reports the Gesture made in that form, is read after the form
+although it sits in the Cycle column beside it.
 
 **Ticking figures.** A line that carries a live figure has a fixed shape: the label wraps,
 the figure sits in its own column and never does, and a countdown reads as a clock

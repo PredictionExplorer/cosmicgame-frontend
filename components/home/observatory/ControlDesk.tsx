@@ -38,6 +38,8 @@ export const DESK_REGION = 'border-t border-rule pt-4';
 const DESK_RIGHT = 'lg:col-span-7 lg:col-start-6 lg:row-span-3 lg:row-start-1 lg:self-start';
 /** Row 2's wide cell from 1024px. */
 const DESK_ROW_2_WIDE = 'lg:col-span-7 lg:col-start-1 lg:row-start-4';
+/** Row 2 whole from 1024px: the standings between cycles, when the art has moved up beside the clock. */
+const DESK_ROW_2_FULL = 'lg:col-span-12 lg:col-start-1 lg:row-start-4';
 /** Row 2's narrow cell from 1024px. */
 const DESK_ROW_2_NARROW = 'lg:col-span-5 lg:col-start-8 lg:row-start-4';
 
@@ -49,14 +51,20 @@ const DESK_ROW_2_NARROW = 'lg:col-span-5 lg:col-start-8 lg:row-start-4';
  * CST, the gesture form, the wallet's standing, the standings and the latest
  * Signature. Below 1024px, tablets included, the desk is that one column.
  *
- * From 1024px it reads column by column, and focus never moves up within a
- * column. Row 1 puts the Cycle column (5 of 12: the clock, the Calibration
- * Window under it on a fainter hairline, then the wallet's standing) beside
- * the gesture form (7 of 12), the page's one quiet surface, so the commit
- * action is in the first viewport from 1280×720 up. Row 2 puts the
- * Standings Ledger (7 of 12) beside the latest Signature on its plate (5 of
- * 12). Between cycles, with no form, the art takes the form's place and the
- * standings follow it in row 2.
+ * From 1024px, row 1 puts the Cycle column (5 of 12: the clock, the
+ * Calibration Window under it on a fainter hairline, then the wallet's
+ * standing) beside the gesture form (7 of 12), the page's one quiet surface,
+ * so the commit action is in the first viewport from 1280×720 up. Row 2 puts
+ * the Standings Ledger (7 of 12) beside the latest Signature on its plate (5
+ * of 12). Between cycles, with no form, the art takes the form's place and
+ * the standings take all of row 2, so no cell is left empty beside them.
+ *
+ * Focus never moves up within a column. It reads the clock and the
+ * Calibration Window, crosses to the form, then comes back to the Cycle
+ * column for the wallet's standing, which sits beside the form rather than
+ * after its end. That is deliberate: the standing reports the Gesture made in
+ * the form, and with one DOM order for every width a strict column order
+ * would put the wallet's standing between the price and the form on phones.
  */
 export const ControlDesk = forwardRef<HTMLDivElement, ControlDeskProps>(
   ({ header, clock, calibration, standings, gestureConsole, standing, art, className }, ref) => {
@@ -66,7 +74,7 @@ export const ControlDesk = forwardRef<HTMLDivElement, ControlDeskProps>(
       <div
         key="standings"
         data-testid="control-desk-standings"
-        className={cn('min-w-0', DESK_REGION, DESK_ROW_2_WIDE)}
+        className={cn('min-w-0', DESK_REGION, hasForm ? DESK_ROW_2_WIDE : DESK_ROW_2_FULL)}
       >
         {standings}
       </div>
@@ -144,7 +152,7 @@ export const ControlDesk = forwardRef<HTMLDivElement, ControlDeskProps>(
               </div>
             )}
             {/* With a form the standings lead row 2 beside the art; between
-                cycles the art leads the right column and the standings follow. */}
+                cycles the art leads the right column and the standings fill row 2. */}
             {hasForm ? [standingsCell, artCell] : [artCell, standingsCell]}
           </div>
         </div>

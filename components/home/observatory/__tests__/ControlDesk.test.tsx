@@ -106,7 +106,7 @@ describe('ControlDesk', () => {
     }
   });
 
-  it("gives the art the form's place between cycles, the standings following it", () => {
+  it("gives the art the form's place between cycles, the standings filling row 2", () => {
     render(<ControlDesk {...regions} gestureConsole={undefined} />);
     expect(screen.queryByTestId('control-desk-gesture')).not.toBeInTheDocument();
     expect(cellOrder()).toEqual([
@@ -119,8 +119,9 @@ describe('ControlDesk', () => {
     expect(placement('control-desk-art')).toEqual(
       expect.arrayContaining(['lg:col-span-7', 'lg:col-start-6', 'lg:row-start-1']),
     );
+    // The whole row: no empty cell is left beside the standings.
     expect(placement('control-desk-standings')).toEqual(
-      expect.arrayContaining(['lg:col-start-1', 'lg:row-start-4']),
+      expect.arrayContaining(['lg:col-span-12', 'lg:col-start-1', 'lg:row-start-4']),
     );
   });
 

@@ -61,10 +61,11 @@ async function expectDecisionDashboardInViewport(page: Page) {
 }
 
 /**
- * The desk reads in DOM order, column by column: within each column of the
- * two-column desk, keyboard focus never moves up (WCAG 1.3.2, 2.4.3). A stop
- * belongs to the column its desk cell starts in, so a link at the far edge
- * of the wide standings cell still reads with the standings.
+ * The desk reads in DOM order: within each column of the two-column desk,
+ * keyboard focus never moves up (WCAG 1.3.2, 2.4.3). Focus may cross back to
+ * the other column (the wallet's standing is read after the form beside it).
+ * A stop belongs to the column its desk cell starts in, so a link at the far
+ * edge of the wide standings cell still reads with the standings.
  */
 async function expectDeskFocusOrderReadsDown(page: Page) {
   const stops = await page.getByTestId('control-desk-grid').evaluate((grid) => {
@@ -697,5 +698,34 @@ test.describe('home gesture chat', () => {
     expect(Math.abs(box!.y - guideBox!.y)).toBeLessThanOrEqual(1);
     expect(box!.x).toBeLessThan(viewport!.width / 2);
     expect(box!.width).toBeGreaterThan(320);
+  });
+
+  test("gives the art the form's place between cycles and the standings the whole row under it", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== 'Desktop Chrome', 'The two-column desk starts at 1024px.');
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/?uxScenario=opening-soon', { waitUntil: 'domcontentloaded' });
+
+    const grid = page.getByTestId('control-desk-grid');
+    await expect(grid).toHaveAttribute('data-layout', 'between-cycles');
+    const [gridBox, clockBox, artBox, standingsBox] = await Promise.all([
+      grid.boundingBox(),
+      page.getByTestId('control-desk-clock').boundingBox(),
+      page.getByTestId('control-desk-art').boundingBox(),
+      page.getByTestId('control-desk-standings').boundingBox(),
+    ]);
+    for (const box of [gridBox, clockBox, artBox, standingsBox]) expect(box).not.toBeNull();
+
+    // The art beside the Cycle column, out to the desk's right edge.
+    expect(clockBox!.x + clockBox!.width).toBeLessThanOrEqual(artBox!.x);
+    expect(Math.abs(artBox!.y - clockBox!.y)).toBeLessThanOrEqual(1);
+    expect(Math.abs(artBox!.x + artBox!.width - (gridBox!.x + gridBox!.width))).toBeLessThanOrEqual(
+      1,
+    );
+    // The standings under it across the whole desk, so no empty cell sits beside them.
+    expect(standingsBox!.y).toBeGreaterThanOrEqual(artBox!.y + artBox!.height - 1);
+    expect(Math.abs(standingsBox!.x - gridBox!.x)).toBeLessThanOrEqual(1);
+    expect(Math.abs(standingsBox!.width - gridBox!.width)).toBeLessThanOrEqual(1);
   });
 });
