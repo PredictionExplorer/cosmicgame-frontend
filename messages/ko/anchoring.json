@@ -13,10 +13,6 @@
         "title": "아직 앵커링 지급이 없습니다",
         "description": "Cosmic Signature NFT가 앵커링되어 있는 동안 사이클이 마감될 때마다 적립 내역이 여기에 추가됩니다."
       },
-      "retrieved": {
-        "title": "아직 회수한 지급액이 없습니다",
-        "description": "앵커링을 해제해 회수한 앵커링 지급이 여기에 표시됩니다."
-      },
       "unretrieved": {
         "title": "미회수 앵커링 지급이 없습니다",
         "description": "이 주소가 참여한 모든 앵커링 지급 적립분을 회수했습니다."
@@ -344,16 +340,6 @@
         "retrievableEth": "회수 가능(ETH)"
       }
     },
-    "retrievedDistributions": {
-      "label": "회수한 앵커링 지급",
-      "columns": {
-        "depositDatetime": "적립 일시",
-        "depositId": "적립 ID",
-        "cycle": "사이클",
-        "depositAmountEth": "적립 금액(ETH)",
-        "retrievedAmountEth": "회수 금액(ETH)"
-      }
-    },
     "unretrievedDistributions": {
       "label": "미회수 앵커링 지급",
       "error": "미회수 앵커링 지급을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
@@ -371,18 +357,9 @@
       }
     },
     "distributionsByDeposit": {
-      "label": "적립별 앵커링 지급",
       "columns": {
-        "depositDatetime": "적립 일시",
-        "depositCycle": "적립 사이클",
-        "depositId": "적립 ID",
         "totalDepositAmount": "적립 금액(ETH)",
-        "totalRetrievedAmount": "전체 회수(ETH)",
-        "yourRetrievableAmount": "이 주소의 회수 가능액(ETH)",
-        "fullyRetrieved": "전액 회수 여부",
-        "totalAnchoredNfts": "앵커링된 NFT",
-        "totalRetrievedTokens": "회수된 NFT",
-        "yourAnchoredTokens": "이 주소의 앵커링"
+        "totalAnchoredNfts": "앵커링된 NFT"
       }
     }
   },

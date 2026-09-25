@@ -13,10 +13,6 @@
         "title": "No Anchor Distributions yet",
         "description": "A deposit appears here each time a cycle finalizes while Cosmic Signature NFTs are anchored."
       },
-      "retrieved": {
-        "title": "Nothing retrieved yet",
-        "description": "Anchor Distributions appear here once they are retrieved by releasing an anchor."
-      },
       "unretrieved": {
         "title": "No unretrieved Anchor Distributions",
         "description": "Every Anchor Distribution deposit this address shares in has been retrieved."
@@ -344,16 +340,6 @@
         "retrievableEth": "To retrieve (ETH)"
       }
     },
-    "retrievedDistributions": {
-      "label": "Retrieved Anchor Distributions",
-      "columns": {
-        "depositDatetime": "Deposited",
-        "depositId": "Deposit ID",
-        "cycle": "Cycle",
-        "depositAmountEth": "Deposit (ETH)",
-        "retrievedAmountEth": "Retrieved amount (ETH)"
-      }
-    },
     "unretrievedDistributions": {
       "label": "Unretrieved Anchor Distributions",
       "error": "The unretrieved Anchor Distributions could not be loaded. Try again in a moment.",
@@ -371,18 +357,9 @@
       }
     },
     "distributionsByDeposit": {
-      "label": "Anchor Distributions by deposit",
       "columns": {
-        "depositDatetime": "Deposited",
-        "depositCycle": "Cycle",
-        "depositId": "Deposit ID",
         "totalDepositAmount": "Deposit (ETH)",
-        "totalRetrievedAmount": "Retrieved by all (ETH)",
-        "yourRetrievableAmount": "Retrievable by this address (ETH)",
-        "fullyRetrieved": "Fully retrieved",
-        "totalAnchoredNfts": "Anchored NFTs",
-        "totalRetrievedTokens": "NFTs retrieved",
-        "yourAnchoredTokens": "Anchored by this address"
+        "totalAnchoredNfts": "Anchored NFTs"
       }
     }
   },

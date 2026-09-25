@@ -13,10 +13,6 @@
         "title": "まだ係留配分はありません",
         "description": "Cosmic Signature NFTが係留されている間、サイクルが確定するたびにここへ積立が追加されます。"
       },
-      "retrieved": {
-        "title": "まだ受け取った配分はありません",
-        "description": "係留を解除して受け取った係留配分が、ここに表示されます。"
-      },
       "unretrieved": {
         "title": "未受け取りの係留配分はありません",
         "description": "このアドレスが参加している係留配分の積立は、すべて受け取り済みです。"
@@ -344,16 +340,6 @@
         "retrievableEth": "受け取れる額（ETH）"
       }
     },
-    "retrievedDistributions": {
-      "label": "受け取り済みの係留配分",
-      "columns": {
-        "depositDatetime": "積立日時",
-        "depositId": "積立ID",
-        "cycle": "サイクル",
-        "depositAmountEth": "積立額（ETH）",
-        "retrievedAmountEth": "受け取り額（ETH）"
-      }
-    },
     "unretrievedDistributions": {
       "label": "未受け取りの係留配分",
       "error": "未受け取りの係留配分を読み込めませんでした。しばらくしてからもう一度お試しください。",
@@ -371,18 +357,9 @@
       }
     },
     "distributionsByDeposit": {
-      "label": "積立別の係留配分",
       "columns": {
-        "depositDatetime": "積立日時",
-        "depositCycle": "積立サイクル",
-        "depositId": "積立ID",
         "totalDepositAmount": "積立額（ETH）",
-        "totalRetrievedAmount": "全体の受け取り額（ETH）",
-        "yourRetrievableAmount": "このアドレスが受け取れる額（ETH）",
-        "fullyRetrieved": "すべて受け取り済み",
-        "totalAnchoredNfts": "係留中のNFT",
-        "totalRetrievedTokens": "受け取り済みのNFT",
-        "yourAnchoredTokens": "このアドレスの係留数"
+        "totalAnchoredNfts": "係留中のNFT"
       }
     }
   },

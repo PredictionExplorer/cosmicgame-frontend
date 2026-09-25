@@ -13,10 +13,6 @@
         "title": "Надходжень за закріплення ще немає",
         "description": "Депозит з’являється тут щоразу, коли завершується цикл, поки Cosmic Signature NFT закріплені."
       },
-      "retrieved": {
-        "title": "Ще нічого не забрано",
-        "description": "Надходження за закріплення з’являться тут, коли їх буде забрано через відкріплення."
-      },
       "unretrieved": {
         "title": "Незабраних надходжень немає",
         "description": "Усі депозити надходжень за закріплення, у яких бере участь ця адреса, забрано."
@@ -344,16 +340,6 @@
         "retrievableEth": "Можна забрати (ETH)"
       }
     },
-    "retrievedDistributions": {
-      "label": "Забрані надходження за закріплення",
-      "columns": {
-        "depositDatetime": "Внесено",
-        "depositId": "ID депозиту",
-        "cycle": "Цикл",
-        "depositAmountEth": "Депозит (ETH)",
-        "retrievedAmountEth": "Забрано (ETH)"
-      }
-    },
     "unretrievedDistributions": {
       "label": "Незабрані надходження за закріплення",
       "error": "Не вдалося завантажити незабрані надходження за закріплення. Спробуйте ще раз за мить.",
@@ -371,18 +357,9 @@
       }
     },
     "distributionsByDeposit": {
-      "label": "Надходження за закріплення за депозитами",
       "columns": {
-        "depositDatetime": "Внесено",
-        "depositCycle": "Цикл",
-        "depositId": "ID депозиту",
         "totalDepositAmount": "Депозит (ETH)",
-        "totalRetrievedAmount": "Забрано всіма (ETH)",
-        "yourRetrievableAmount": "Ця адреса може забрати (ETH)",
-        "fullyRetrieved": "Забрано повністю",
-        "totalAnchoredNfts": "Закріплені NFT",
-        "totalRetrievedTokens": "Забрані NFT",
-        "yourAnchoredTokens": "Закріплено цією адресою"
+        "totalAnchoredNfts": "Закріплені NFT"
       }
     }
   },

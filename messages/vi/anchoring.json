@@ -13,10 +13,6 @@
         "title": "Chưa có phân phối neo giữ nào",
         "description": "Mỗi lần một chu kỳ hoàn tất trong lúc có Cosmic Signature NFT đang neo giữ, một khoản nạp sẽ xuất hiện ở đây."
       },
-      "retrieved": {
-        "title": "Chưa nhận về khoản nào",
-        "description": "Các phân phối neo giữ đã nhận về khi gỡ neo sẽ hiện ở đây."
-      },
       "unretrieved": {
         "title": "Không có phân phối neo giữ chưa nhận về",
         "description": "Mọi khoản nạp phân phối neo giữ mà địa chỉ này tham gia đều đã được nhận về."
@@ -344,16 +340,6 @@
         "retrievableEth": "Có thể nhận về (ETH)"
       }
     },
-    "retrievedDistributions": {
-      "label": "Phân phối neo giữ đã nhận về",
-      "columns": {
-        "depositDatetime": "Thời điểm nạp",
-        "depositId": "Mã khoản nạp",
-        "cycle": "Chu kỳ",
-        "depositAmountEth": "Số tiền nạp (ETH)",
-        "retrievedAmountEth": "Số tiền đã nhận về (ETH)"
-      }
-    },
     "unretrievedDistributions": {
       "label": "Phân phối neo giữ chưa nhận về",
       "error": "Không tải được phân phối neo giữ chưa nhận về. Hãy thử lại sau giây lát.",
@@ -371,18 +357,9 @@
       }
     },
     "distributionsByDeposit": {
-      "label": "Phân phối neo giữ theo khoản nạp",
       "columns": {
-        "depositDatetime": "Thời điểm nạp",
-        "depositCycle": "Chu kỳ nạp",
-        "depositId": "Mã khoản nạp",
         "totalDepositAmount": "Khoản nạp (ETH)",
-        "totalRetrievedAmount": "Tất cả đã nhận về (ETH)",
-        "yourRetrievableAmount": "Địa chỉ này có thể nhận về (ETH)",
-        "fullyRetrieved": "Đã nhận về toàn bộ",
-        "totalAnchoredNfts": "NFT đang neo giữ",
-        "totalRetrievedTokens": "NFT đã nhận về",
-        "yourAnchoredTokens": "Địa chỉ này đang neo giữ"
+        "totalAnchoredNfts": "NFT đang neo giữ"
       }
     }
   },

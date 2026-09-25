@@ -13,10 +13,6 @@
         "title": "暫無錨定派發",
         "description": "有 Cosmic Signature NFT 處於錨定狀態時，每個週期收官後都會在這裏新增一筆存入。"
       },
-      "retrieved": {
-        "title": "暫無已取回的錨定派發",
-        "description": "透過解錨取回錨定派發後，會顯示在這裏。"
-      },
       "unretrieved": {
         "title": "沒有未取回的錨定派發",
         "description": "該地址參與的每一筆錨定派發存入都已取回。"
@@ -344,16 +340,6 @@
         "retrievableEth": "待取回錨定派發（ETH）"
       }
     },
-    "retrievedDistributions": {
-      "label": "已取回的錨定派發",
-      "columns": {
-        "depositDatetime": "存入時間",
-        "depositId": "存入 ID",
-        "cycle": "週期",
-        "depositAmountEth": "存入金額（ETH）",
-        "retrievedAmountEth": "已取回金額（ETH）"
-      }
-    },
     "unretrievedDistributions": {
       "label": "未取回的錨定派發",
       "error": "無法載入未取回的錨定派發，請稍後再試。",
@@ -371,18 +357,9 @@
       }
     },
     "distributionsByDeposit": {
-      "label": "按存入列出的錨定派發",
       "columns": {
-        "depositDatetime": "存入時間",
-        "depositCycle": "存入週期",
-        "depositId": "存入 ID",
         "totalDepositAmount": "存入額（ETH）",
-        "totalRetrievedAmount": "全部已取回（ETH）",
-        "yourRetrievableAmount": "本地址可取回（ETH）",
-        "fullyRetrieved": "是否全部取回",
-        "totalAnchoredNfts": "已錨定 NFT",
-        "totalRetrievedTokens": "已取回的 NFT",
-        "yourAnchoredTokens": "本地址已錨定"
+        "totalAnchoredNfts": "已錨定 NFT"
       }
     }
   },
