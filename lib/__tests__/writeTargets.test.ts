@@ -4,6 +4,7 @@ import {
   PINNED_GAME_PROXY,
   PROTOCOL_ADDRESS_GETTERS,
   TRUSTED_ADDRESSES_TTL_MS,
+  assertTrustedTarget,
   assertTrustedWrite,
   clearTrustedAddressCache,
   gameRootFor,
@@ -104,6 +105,22 @@ describe('readTrustedAddresses', () => {
     await expect(readTrustedAddresses(client().reader, 421614, '')).rejects.toMatchObject({
       name: 'ProtocolAddressesUnavailableError',
     });
+  });
+});
+
+describe('assertTrustedTarget', () => {
+  const trusted = new Set([API_GAME, ALLOCATIONS_WALLET.toLowerCase()]);
+
+  it('passes a plain send to a protocol contract, in any letter case', () => {
+    expect(() => assertTrustedTarget(ALLOCATIONS_WALLET, trusted)).not.toThrow();
+  });
+
+  it('refuses a send to any other address, or to something that is not one', () => {
+    for (const address of [OUTSIDER, '', 'vault', '0x0000000000000000000000000000000000000000']) {
+      expect(() => assertTrustedTarget(address, trusted)).toThrow(
+        expect.objectContaining({ name: 'UntrustedContractError', role: 'target' }),
+      );
+    }
   });
 });
 

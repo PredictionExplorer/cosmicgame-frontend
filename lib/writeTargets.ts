@@ -180,6 +180,18 @@ export interface WriteTargetRequest {
 }
 
 /**
+ * Throws {@link UntrustedContractError} unless the address is one of the
+ * protocol's contracts: the target of a write, or the recipient of a plain
+ * ETH send (the Public Goods Vault's `receive()`).
+ */
+export function assertTrustedTarget(address: string, trusted: ReadonlySet<string>): void {
+  const target = normalize(address);
+  if (!target || !trusted.has(target)) {
+    throw new UntrustedContractError(address, 'target');
+  }
+}
+
+/**
  * Throws {@link UntrustedContractError} unless the write targets a protocol
  * contract, or is an approval whose spender or operator is one.
  */
@@ -194,8 +206,5 @@ export function assertTrustedWrite(
     }
     return;
   }
-  const target = normalize(request.address);
-  if (!target || !trusted.has(target)) {
-    throw new UntrustedContractError(request.address, 'target');
-  }
+  assertTrustedTarget(request.address, trusted);
 }

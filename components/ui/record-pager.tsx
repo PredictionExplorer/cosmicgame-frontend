@@ -8,7 +8,7 @@ import { buttonVariants } from '@/components/ui/button';
 /** A neighbouring record: where it is, and its name as its own page gives it. */
 export interface RecordPagerTarget {
   href: string;
-  /** "Cycle #0", "Gesture #1134", "#000024": the neighbour's formatted id. */
+  /** "Cycle 0", "Gesture #1134", "#000024": the neighbour's formatted id. */
   label: ReactNode;
 }
 
@@ -39,7 +39,7 @@ const LINK_CLASS = cn(
  * RecordPager — stepping to the neighbouring record, one way on every record
  * page (a cycle's allocations, a gesture, a Signature): two outline buttons
  * with the arrow on their outer side, each labelled by the neighbour's own
- * name and announced with its direction ("Previous cycle, Cycle #0"). Real
+ * name and announced with its direction ("Previous cycle, Cycle 0"). Real
  * links (`rel` prev and next), so they prefetch, open in a new tab and show
  * their target. Chevrons are for carousels, not for records. Server-safe.
  */

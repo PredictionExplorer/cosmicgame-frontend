@@ -40,9 +40,7 @@ test.describe('Statistics hub', () => {
   });
 
   test('opens on the live cycle and where its reserve goes', async ({ page }) => {
-    await expect(
-      page.getByRole('heading', { level: 2, name: /^Cycle #\d+ so far$/ }),
-    ).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: /^Cycle \d+ so far$/ })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Open the current cycle' })).toHaveAttribute(
       'href',
       '/current-cycle',

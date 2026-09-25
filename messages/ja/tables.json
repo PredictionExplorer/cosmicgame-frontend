@@ -194,7 +194,6 @@
   "skeleton": {
     "loadingText": "テキストを読み込み中",
     "loadingStat": "統計を読み込み中",
-    "loadingRow": "行を読み込み中",
     "loadingRows": "行を読み込み中",
     "loadingNft": "NFTを読み込み中"
   },

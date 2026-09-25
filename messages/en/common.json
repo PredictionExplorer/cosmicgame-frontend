@@ -116,7 +116,7 @@
   },
   "signature": {
     "untitled": "Signature {id}",
-    "cycle": "Cycle #{n}",
+    "cycle": "Cycle {n}",
     "anchored": "Anchored"
   }
 }

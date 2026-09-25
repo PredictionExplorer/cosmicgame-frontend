@@ -37,16 +37,19 @@ const mockSwitchChainAsync = jest.fn();
 const mockWaitForReceipt = jest.fn();
 const mockReadContract = jest.fn();
 const mockSimulateContract = jest.fn();
+const mockCall = jest.fn();
 let mockHasPublicClient = true;
 
 /** The game the dashboard names, and what it names on-chain. */
 const GAME = '0x00000000000000000000000000000000000000a1';
 const ALLOCATIONS_WALLET = '0x00000000000000000000000000000000000000b2';
 const ANCHORING_WALLET = '0x00000000000000000000000000000000000000c3';
+const PUBLIC_GOODS_VAULT = '0x00000000000000000000000000000000000000d4';
 const OUTSIDER = '0x00000000000000000000000000000000000000ee';
 const ON_CHAIN: Record<string, string> = {
   prizesWallet: ALLOCATIONS_WALLET,
   stakingWalletCosmicSignatureNft: ANCHORING_WALLET,
+  charityAddress: PUBLIC_GOODS_VAULT,
 };
 
 jest.mock('wagmi', () => ({
@@ -58,6 +61,7 @@ jest.mock('wagmi', () => ({
           waitForTransactionReceipt: mockWaitForReceipt,
           readContract: mockReadContract,
           simulateContract: mockSimulateContract,
+          call: mockCall,
         }
       : undefined,
   useSwitchChain: () => ({ mutateAsync: mockSwitchChainAsync }),
@@ -102,6 +106,7 @@ beforeEach(() => {
       ON_CHAIN[functionName] ?? '0x0000000000000000000000000000000000000000',
   );
   mockSimulateContract.mockResolvedValue({ result: undefined });
+  mockCall.mockResolvedValue({ data: undefined });
   mockWriteContract.mockResolvedValue('0xhash');
   mockWaitForReceipt.mockImplementation(async ({ hash }: { hash: string }) => ({
     status: 'success',
@@ -146,12 +151,14 @@ describe('useTxFlow — lifecycle', () => {
   it('sends plain ETH on the app chain through the same lifecycle', async () => {
     mockSendTransaction.mockResolvedValue('0xsend');
     const { result } = await run(
-      baseOptions({ write: (ctx) => ctx.sendTransaction({ to: '0xVault', value: 5n }) }),
+      baseOptions({
+        write: (ctx) => ctx.sendTransaction({ to: PUBLIC_GOODS_VAULT, value: 5n }),
+      }),
     );
 
     expect(result).toMatchObject({ status: 'confirmed', hash: '0xsend' });
     expect(mockSendTransaction).toHaveBeenCalledWith(mockConfig, {
-      to: '0xVault',
+      to: PUBLIC_GOODS_VAULT,
       value: 5n,
       chainId: APP_CHAIN,
     });
@@ -621,6 +628,25 @@ describe('useTxFlow — write targets', () => {
     );
     expect(result.status).toBe('confirmed');
   });
+
+  // Regression: the vault's address comes from the dashboard API, so a plain
+  // send is held to the same on-chain list as a contract write.
+  it('refuses to send ETH to an address the game does not name, before any prompt', async () => {
+    const { result } = await run(
+      baseOptions({ write: (ctx) => ctx.sendTransaction({ to: OUTSIDER, value: 5n }) }),
+    );
+
+    expect(result).toMatchObject({ status: 'failed', error: { kind: 'untrusted-contract' } });
+    expect(mockReadContract).toHaveBeenCalledWith(
+      expect.objectContaining({ address: GAME, functionName: 'charityAddress' }),
+    );
+    expect(mockCall).not.toHaveBeenCalled();
+    expect(mockSendTransaction).not.toHaveBeenCalled();
+    expect(mockToast.error).toHaveBeenCalledWith(
+      'toasts.tx.error.untrustedContract',
+      expect.anything(),
+    );
+  });
 });
 
 describe('useTxFlow — simulation', () => {
@@ -687,6 +713,39 @@ describe('useTxFlow — simulation', () => {
     const { result } = await run(baseOptions());
     expect(result).toMatchObject({ status: 'failed', error: { kind: 'insufficient-funds' } });
     expect(mockWriteContract).not.toHaveBeenCalled();
+  });
+
+  it('simulates a plain ETH send from the connected account before the wallet prompt', async () => {
+    mockSendTransaction.mockResolvedValue('0xsend');
+    await run(
+      baseOptions({
+        write: (ctx) => ctx.sendTransaction({ to: PUBLIC_GOODS_VAULT, value: 5n }),
+      }),
+    );
+
+    expect(mockCall).toHaveBeenCalledWith({
+      to: PUBLIC_GOODS_VAULT,
+      value: 5n,
+      account: '0xUser',
+    });
+    expect(mockCall.mock.invocationCallOrder[0]).toBeLessThan(
+      mockSendTransaction.mock.invocationCallOrder[0]!,
+    );
+  });
+
+  it('stops a plain ETH send the wallet cannot pay for', async () => {
+    mockCall.mockRejectedValue({
+      name: 'InsufficientFundsError',
+      message: 'insufficient funds for gas * price + value',
+    });
+    const { result } = await run(
+      baseOptions({
+        write: (ctx) => ctx.sendTransaction({ to: PUBLIC_GOODS_VAULT, value: 5n }),
+      }),
+    );
+
+    expect(result).toMatchObject({ status: 'failed', error: { kind: 'insufficient-funds' } });
+    expect(mockSendTransaction).not.toHaveBeenCalled();
   });
 
   it('lets the wallet decide when the simulation itself cannot run', async () => {

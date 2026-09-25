@@ -98,7 +98,7 @@ describe('share-card builders', () => {
       expect.objectContaining({
         title: 'Every Gesture Shapes the Signature.',
         domain: 'cosmicsignature.com',
-        art: [{ src: 'data:image/png;base64,AAAA', label: 'Signature #000047 · Cycle #1' }],
+        art: [{ src: 'data:image/png;base64,AAAA', label: 'Signature #000047 · Cycle 1' }],
       }),
     );
     await latestArtworkCard('ja', 'default', 'app');
@@ -145,7 +145,7 @@ describe('share-card builders', () => {
       await tokenCard('en', '25');
       expect(lastCard().content).toEqual(
         expect.objectContaining({
-          eyebrow: '#000025 · Cycle #1',
+          eyebrow: '#000025 · Cycle 1',
           title: 'Twisted Mind',
           art: [expect.anything()],
         }),
@@ -167,7 +167,7 @@ describe('share-card builders', () => {
       mocked(loadTokenInfo).mockResolvedValue({ tokenId: 24, name: 'Twisted Mind', cycle: 3 });
       await tokenCard('en', '24');
       expect(lastCard().content).toEqual(
-        expect.objectContaining({ eyebrow: '#000024 · Cycle #3', title: 'Twisted Mind', art: [] }),
+        expect.objectContaining({ eyebrow: '#000024 · Cycle 3', title: 'Twisted Mind', art: [] }),
       );
       mocked(loadTokenInfo).mockResolvedValue(null);
       await tokenCard('en', '24');
@@ -197,7 +197,7 @@ describe('share-card builders', () => {
         mocked(fetchNftMetadata).mockResolvedValue(traits);
         mocked(loadTokenInfo).mockResolvedValue({ tokenId: 25, name: 'Twisted Mind', cycle: 1 });
         expect(await tokenCardAlt('en', '25')).toBe(
-          '“Twisted Mind”, Cosmic Signature #25 from Cycle #1: Orbit Ribbons structure, Glacial Split palette',
+          '“Twisted Mind”, Cosmic Signature #25 from Cycle 1: Orbit Ribbons structure, Glacial Split palette',
         );
         expect(await tokenCardAlt('ja', '25')).toBe(
           'サイクル1のCosmic Signature #25「Twisted Mind」：構造はOrbit Ribbons、パレットはGlacial Split',
@@ -211,7 +211,7 @@ describe('share-card builders', () => {
         mocked(fetchNftMetadata).mockResolvedValue(traits);
         mocked(loadTokenInfo).mockResolvedValue({ tokenId: 25, name: null, cycle: 1 });
         expect(await tokenCardAlt('en', '25')).toBe(
-          'Cosmic Signature #25 from Cycle #1: Orbit Ribbons structure, Glacial Split palette',
+          'Cosmic Signature #25 from Cycle 1: Orbit Ribbons structure, Glacial Split palette',
         );
         mocked(fetchNftMetadata).mockRejectedValue(new Error('offline'));
         mocked(loadTokenInfo).mockResolvedValue({ tokenId: 25, name: 'Twisted Mind', cycle: null });
@@ -233,11 +233,9 @@ describe('share-card builders', () => {
   it('puts the gesture’s position and cycle in the headline and its method above', async () => {
     await gestureCard('en', '29447');
     expect(lastCard().content).toEqual(
-      expect.objectContaining({ title: 'Gesture #1139 · Cycle #2', eyebrow: 'CST gesture' }),
+      expect.objectContaining({ title: 'Gesture #1139 · Cycle 2', eyebrow: 'CST gesture' }),
     );
-    expect(await gestureCardAlt('en', '29447')).toBe(
-      'Cosmic Signature — Gesture #1139 in Cycle #2',
-    );
+    expect(await gestureCardAlt('en', '29447')).toBe('Cosmic Signature — Gesture #1139 in Cycle 2');
     mocked(loadGesture).mockResolvedValue(null);
     await gestureCard('ko', '29447');
     expect(lastCard().content).toEqual(
@@ -250,11 +248,11 @@ describe('share-card builders', () => {
     await allocationCard('en', '1');
     expect(lastCard().content).toEqual(
       expect.objectContaining({
-        title: 'Cycle #1 allocations',
+        title: 'Cycle 1 allocations',
         art: [{ src: 'data:image/png;base64,AAAA', label: 'Twisted Mind' }],
       }),
     );
-    expect(allocationCardAlt('en', '1')).toBe('Cosmic Signature — Cycle #1 allocations');
+    expect(allocationCardAlt('en', '1')).toBe('Cosmic Signature — Cycle 1 allocations');
     expect(allocationCardAlt('en', '-1')).toBe('Cosmic Signature — Allocation Distribution');
     mocked(loadCycleArtwork).mockResolvedValue(null);
     await allocationCard('zh-HK', '2');
@@ -284,7 +282,7 @@ describe('share-card builders', () => {
       mocked(loadParticipantArtworks).mockResolvedValue([artwork()]);
       await participantCard('en', address);
       expect(lastCard().content.art).toEqual([
-        { src: 'data:image/png;base64,AAAA', label: 'Signature #000047 · Cycle #1' },
+        { src: 'data:image/png;base64,AAAA', label: 'Signature #000047 · Cycle 1' },
       ]);
       mocked(loadParticipantArtworks).mockResolvedValue([artwork(), artwork({ tokenId: 3 })]);
       await participantCard('en', address);

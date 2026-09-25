@@ -38,7 +38,12 @@ import {
   type TxErrorInfo,
 } from '@/lib/txErrors';
 import { IDLE_TX_STAGE, isTxBusy, type TxStage } from '@/lib/txStage';
-import { assertTrustedWrite, readTrustedAddresses, type ContractReader } from '@/lib/writeTargets';
+import {
+  assertTrustedTarget,
+  assertTrustedWrite,
+  readTrustedAddresses,
+  type ContractReader,
+} from '@/lib/writeTargets';
 import {
   contractErrorNameOf,
   getContractErrorDescriptor,
@@ -78,8 +83,8 @@ export interface TxContext {
   /** The connected account the flow started with. */
   account: Address;
   /**
-   * Sends a contract write on the protocol's chain, and is the only way a
-   * flow writes. Before the wallet prompt it
+   * Sends a contract write on the protocol's chain. With `sendTransaction`,
+   * it is the only way a flow transacts. Before the wallet prompt it
    *
    * 1. checks the target (or, for an approval, the spender) against the
    *    protocol's contracts read on-chain from the game proxy
@@ -102,8 +107,11 @@ export interface TxContext {
   ) => Promise<Hash>;
   /**
    * Sends plain ETH, with no calldata, on the protocol's chain: a payment to
-   * a contract's `receive()` (the Public Goods Vault). The signer is resolved
-   * when this runs, as for `writeContract`.
+   * a contract's `receive()` (the Public Goods Vault). Guarded as
+   * `writeContract` is: the recipient must be one of the protocol's
+   * contracts read on-chain (the vault's address comes from the dashboard
+   * API, which is not trusted for writes), and the send is simulated before
+   * the wallet prompt. The signer is resolved when this runs.
    */
   sendTransaction: (request: { to: Address; value: bigint }) => Promise<Hash>;
 }
@@ -205,36 +213,62 @@ interface WriteCall {
   value?: bigint;
 }
 
+/** A plain ETH send: no calldata, so it lands in the target's `receive()`. */
+interface SendCall {
+  to: Address;
+  value: bigint;
+}
+
 interface SimulatingClient {
   simulateContract: (args: WriteCall & { account: Address }) => Promise<unknown>;
+  call: (args: SendCall & { account: Address }) => Promise<unknown>;
 }
 
 /**
- * Runs the call as `eth_call` from the connected account before the wallet
- * prompt. A revert (with its custom error) or a balance that cannot cover the
- * value stops the flow here, so nothing is signed. Gas and fee fields are
- * left out on purpose: with a fee set, a node charges its whole call gas cap
- * against the balance and would refuse a wallet that can afford the real
- * transaction. When the simulation itself cannot run (the RPC is down or
- * rate limited), the write goes on and the wallet's own estimate decides.
+ * Runs a transaction as `eth_call` from the connected account before the
+ * wallet prompt. A revert (with its custom error) or a balance that cannot
+ * cover the value stops the flow here, so nothing is signed. Gas and fee
+ * fields are left out on purpose: with a fee set, a node charges its whole
+ * call gas cap against the balance and would refuse a wallet that can afford
+ * the real transaction. When the simulation itself cannot run (the RPC is
+ * down or rate limited), the transaction goes on and the wallet's own
+ * estimate decides.
  */
-async function simulateWrite(client: unknown, call: WriteCall, account: Address): Promise<void> {
-  const simulator = client as Partial<SimulatingClient>;
-  if (typeof simulator.simulateContract !== 'function') return;
+async function simulate(dryRun: (() => Promise<unknown>) | null): Promise<void> {
+  if (!dryRun) return;
   try {
-    await simulator.simulateContract({
-      address: call.address,
-      abi: call.abi,
-      functionName: call.functionName,
-      ...(call.args ? { args: call.args } : {}),
-      ...(call.value !== undefined ? { value: call.value } : {}),
-      account,
-    });
+    await dryRun();
   } catch (err) {
     const { kind } = classifyTxError(err);
     if (kind === 'would-revert' || kind === 'insufficient-funds') throw err;
     reportErrorThrottled(err, 'tx-simulate');
   }
+}
+
+/** Simulates a contract write (see {@link simulate}). */
+function simulateWrite(client: unknown, call: WriteCall, account: Address): Promise<void> {
+  const simulator = client as Partial<SimulatingClient>;
+  const simulateContract = simulator.simulateContract?.bind(simulator);
+  return simulate(
+    simulateContract
+      ? () =>
+          simulateContract({
+            address: call.address,
+            abi: call.abi,
+            functionName: call.functionName,
+            ...(call.args ? { args: call.args } : {}),
+            ...(call.value !== undefined ? { value: call.value } : {}),
+            account,
+          })
+      : null,
+  );
+}
+
+/** Simulates a plain ETH send (see {@link simulate}). */
+function simulateSend(client: unknown, send: SendCall, account: Address): Promise<void> {
+  const simulator = client as Partial<SimulatingClient>;
+  const call = simulator.call?.bind(simulator);
+  return simulate(call ? () => call({ to: send.to, value: send.value, account }) : null);
 }
 
 /* ────────────────────────────────────────────────────────────────── */
@@ -347,25 +381,31 @@ export function useTxFlow(): UseTxFlowResult {
       // followed, never an earlier approval that already confirmed.
       let currentHash: Hash | undefined;
       let trustedTargets: Promise<ReadonlySet<string>> | null = null;
+      // The protocol's contracts, read on-chain once per run.
+      const trusted = (client: NonNullable<typeof publicClient>) =>
+        (trustedTargets ??= readTrustedAddresses(
+          client as unknown as ContractReader,
+          activeChain.id,
+          apiGameAddress,
+        ));
       const ctx: TxContext = {
         account: address,
         writeContract: async (request) => {
           if (!publicClient) throw new TxClientUnavailableError();
           const call = request as unknown as WriteCall;
-          trustedTargets ??= readTrustedAddresses(
-            publicClient as unknown as ContractReader,
-            activeChain.id,
-            apiGameAddress,
-          );
-          assertTrustedWrite(call, await trustedTargets);
+          assertTrustedWrite(call, await trusted(publicClient));
           await simulateWrite(publicClient, call, address);
           return writeContract(config, {
             ...request,
             chainId: activeChain.id,
           } as unknown as WriteContractParameters);
         },
-        sendTransaction: ({ to, value }) =>
-          sendTransaction(config, { to, value, chainId: activeChain.id }),
+        sendTransaction: async ({ to, value }) => {
+          if (!publicClient) throw new TxClientUnavailableError();
+          assertTrustedTarget(to, await trusted(publicClient));
+          await simulateSend(publicClient, { to, value }, address);
+          return sendTransaction(config, { to, value, chainId: activeChain.id });
+        },
       };
 
       const waitForReceipt = async (

@@ -194,7 +194,6 @@
   "skeleton": {
     "loadingText": "正在加载文本",
     "loadingStat": "正在加载统计数据",
-    "loadingRow": "正在加载表格行",
     "loadingRows": "正在加载表格行",
     "loadingNft": "正在加载 NFT"
   },

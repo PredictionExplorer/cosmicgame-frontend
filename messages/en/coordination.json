@@ -6,9 +6,9 @@
     "loadError": "The coordination changes could not be loaded."
   },
   "systemEvent": {
-    "title": "Configuration before Cycle #{cycle}",
+    "title": "Configuration before Cycle {cycle}",
     "titleInitial": "Initial configuration",
-    "lede": "The protocol parameters the contract owner changed before Cycle #{cycle} opened, each with its new value and transaction.",
+    "lede": "The protocol parameters the contract owner changed before Cycle {cycle} opened, each with its new value and transaction.",
     "ledeInitial": "The protocol parameters the contract owner set before the first cycle opened, each with its value and transaction.",
     "figures": {
       "changes": "Changes",
@@ -18,7 +18,7 @@
     },
     "allChanges": "All coordination changes",
     "loadError": "The configuration changes could not be loaded.",
-    "emptyDescription": "The contract owner changed no settings before Cycle #{cycle} opened.",
+    "emptyDescription": "The contract owner changed no settings before Cycle {cycle} opened.",
     "invalidTitle": "This configuration window does not exist",
     "invalidDescription": "The cycle or event range in the link is not valid.",
     "emptyDescriptionInitial": "The contract owner changed no settings before the first cycle opened."

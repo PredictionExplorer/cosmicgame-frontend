@@ -150,7 +150,7 @@ describe('CosmicOgCard', () => {
   });
 
   it('lays out text, plate and strip cards by how many artworks it has', () => {
-    const plate = { src: 'data:image/png;base64,ART', label: 'Signature #000047 · Cycle #1' };
+    const plate = { src: 'data:image/png;base64,ART', label: 'Signature #000047 · Cycle 1' };
     const text = card(base({ eyebrow: 'FAQ', subhead: 'Sub.', fact: 'CC0 · Open source' }));
     expect(collectStrings(text)).toEqual(
       expect.arrayContaining(['FAQ', 'A Headline.', 'Sub.', 'CC0 · Open source']),
@@ -159,7 +159,7 @@ describe('CosmicOgCard', () => {
 
     const single = card(base({ art: [plate], fact: 'Not drawn' }));
     expect(collectImages(single)).toContain('data:image/png;base64,ART');
-    expect(collectStrings(single)).toContain('Signature #000047 · Cycle #1');
+    expect(collectStrings(single)).toContain('Signature #000047 · Cycle 1');
     expect(collectStrings(single)).not.toContain('Not drawn');
 
     const strip = card(
@@ -269,7 +269,7 @@ describe('CosmicOgCard', () => {
 
   it('cuts text it cannot fit at a whole word, with the locale’s ellipsis', () => {
     const name = 'An Owner-Given Name Far Longer Than Any Plate Label Could Ever Hold';
-    const plan = planCosmicOgCard(base({ art: [{ src: 'x', label: `${name} · Cycle #1` }] }));
+    const plan = planCosmicOgCard(base({ art: [{ src: 'x', label: `${name} · Cycle 1` }] }));
     expect(plan.layout).toBe('plate');
     if (plan.layout !== 'plate') return;
     expect(plan.label?.lines).toHaveLength(1);
@@ -341,7 +341,7 @@ describe('opengraph-image routes', () => {
       expect(lastCard().element.props).toEqual(
         expect.objectContaining({
           title: 'Every Gesture Shapes the Signature.',
-          art: [expect.objectContaining({ label: 'Signature #000047 · Cycle #1' })],
+          art: [expect.objectContaining({ label: 'Signature #000047 · Cycle 1' })],
         }),
       );
     }
@@ -360,7 +360,7 @@ describe('opengraph-image routes', () => {
       expect.objectContaining({
         title: 'About Cosmic Signature',
         domain: 'cosmicsignature.com',
-        art: [expect.objectContaining({ label: 'Signature #000002 · Cycle #0' })],
+        art: [expect.objectContaining({ label: 'Signature #000002 · Cycle 0' })],
       }),
     );
   });
@@ -393,10 +393,10 @@ describe('opengraph-image routes', () => {
     await route.default(params({ locale: 'en', id: '24' }));
     // F226: a named piece's card carries its number and cycle above the name.
     expect(lastCard().element.props).toEqual(
-      expect.objectContaining({ title: 'Twisted Mind', eyebrow: '#000024 · CYCLE #1' }),
+      expect.objectContaining({ title: 'Twisted Mind', eyebrow: '#000024 · CYCLE 1' }),
     );
     expect(collectStrings(card(lastCard().element.props))).toEqual(
-      expect.arrayContaining(['#000024 · CYCLE #1', 'Twisted Mind']),
+      expect.arrayContaining(['#000024 · CYCLE 1', 'Twisted Mind']),
     );
     const [metadata] = await route.generateImageMetadata(params({ locale: 'en', id: '24' }));
     expect(metadata?.alt).toMatch(/^Cosmic Signature #24/);
@@ -413,7 +413,7 @@ describe('opengraph-image routes', () => {
     await load('../../app/[locale]/(app)/allocation/[id]/opengraph-image').default(
       params({ locale: 'en', id: '7' }),
     );
-    expect(lastCard().element.props.title).toBe('Cycle #7 allocations');
+    expect(lastCard().element.props.title).toBe('Cycle 7 allocations');
     await load('../../app/[locale]/(app)/user/[address]/opengraph-image').default(
       params({ locale: 'en', address: '0x7406B34d25A9B7841CAC133E3173919e0af6Bc6c' }),
     );

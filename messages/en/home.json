@@ -84,7 +84,7 @@
         "signature": "Signature",
         "publicGoods": "Public Goods"
       },
-      "previousAllocations": "Cycle #{number} allocations"
+      "previousAllocations": "Cycle {number} allocations"
     }
   },
   "notifications": {

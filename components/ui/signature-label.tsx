@@ -16,7 +16,7 @@ import { withMonoId } from '@/components/ui/mono-id';
  *   `common.signature.untitled`) with the number in the identifier face,
  *   never Inter figures or Clash.
  * - Caption, in one fixed order: the number (only when a name took the
- *   title, so it never shows twice), the cycle ("Cycle #1"), structure,
+ *   title, so it never shows twice), the cycle ("Cycle 1"), structure,
  *   palette, then an optional date.
  * - Anchored: one quiet anchor after the title, named for screen readers and
  *   titled for a pointer, never a text tag.

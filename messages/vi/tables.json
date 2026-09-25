@@ -194,7 +194,6 @@
   "skeleton": {
     "loadingText": "Đang tải văn bản",
     "loadingStat": "Đang tải số liệu",
-    "loadingRow": "Đang tải hàng",
     "loadingRows": "Đang tải các hàng",
     "loadingNft": "Đang tải NFT"
   },

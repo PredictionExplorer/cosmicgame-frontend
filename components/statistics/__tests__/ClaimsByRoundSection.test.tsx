@@ -109,11 +109,11 @@ describe('ClaimsByRoundSection', () => {
     render(<ClaimsByRoundSection />);
     // Each row's details button names its cycle in its visible words, and
     // the dialog it opens carries the same title.
-    const button = screen.getByRole('button', { name: 'Cycle #12 details' });
+    const button = screen.getByRole('button', { name: 'Cycle 12 details' });
     expect(button).not.toHaveAttribute('aria-label');
     await user.click(button);
     expect(mockUseClaimDetailByRound).toHaveBeenLastCalledWith(12);
-    const dialog = screen.getByRole('dialog', { name: 'Cycle #12 details' });
+    const dialog = screen.getByRole('dialog', { name: 'Cycle 12 details' });
     expect(within(dialog).getByText(/Retrieved after the deadline by 0x2222/)).toBeInTheDocument();
     expect(within(dialog).getByText('No tokens attached this cycle.')).toBeInTheDocument();
   });

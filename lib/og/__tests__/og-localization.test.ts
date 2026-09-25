@@ -101,7 +101,7 @@ describe('localized share-card copy', () => {
   it('fills templates and cycles per locale', () => {
     expect(
       fillOgTemplate(getOgCatalog('en').gesture.titleWithValue!, { position: 1139, cycle: 2 }),
-    ).toBe('Gesture #1139 · Cycle #2');
+    ).toBe('Gesture #1139 · Cycle 2');
     expect(fillOgTemplate('{a} and {missing}', { a: 1 })).toBe('1 and {missing}');
     expect(formatOgCycle('zh', 7)).toBe('第 7 个周期');
     expect(formatOgCycle('zh-TW', 7)).toBe('第 7 個週期');

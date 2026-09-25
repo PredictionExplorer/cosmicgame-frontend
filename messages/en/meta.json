@@ -112,8 +112,8 @@
     "description": "Imprint a Random Walk NFT on Cosmic Signature. Each unused Random Walk NFT can be attached to one ETH gesture for a 50% ETH Gesture Cost discount."
   },
   "systemEvent": {
-    "title": "Configuration before Cycle #{cycle}",
-    "description": "The protocol parameters the contract owner changed before Cycle #{cycle} opened, each with its new value and transaction.",
+    "title": "Configuration before Cycle {cycle}",
+    "description": "The protocol parameters the contract owner changed before Cycle {cycle} opened, each with its new value and transaction.",
     "titleInitial": "Initial configuration",
     "descriptionInitial": "The protocol parameters the contract owner set before the first cycle opened, each with its value and transaction."
   },
@@ -173,8 +173,8 @@
     "description": "Details of a specific ETH contribution to the Cosmic Signature Cycle Reserve — contributor address, amount, cycle, and optional note."
   },
   "ethContributionByCycle": {
-    "title": "Cycle #{cycle} contributions",
-    "description": "Direct ETH contributions to the Cycle Reserve during Cycle #{cycle}."
+    "title": "Cycle {cycle} contributions",
+    "description": "Direct ETH contributions to the Cycle Reserve during Cycle {cycle}."
   },
   "myStatistics": {
     "title": "My statistics",

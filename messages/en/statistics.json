@@ -71,7 +71,7 @@
       "gesturesCaption": "{count, plural, one {# gesture} other {# gestures}} this cycle"
     },
     "cycle": {
-      "title": "Cycle #{cycle} so far",
+      "title": "Cycle {cycle} so far",
       "open": "Open the current cycle",
       "opened": "Opened",
       "rhythmLabel": "Gestures per UTC day, last {days, plural, one {# day} other {# days}}",
@@ -406,7 +406,7 @@
       "unclaimedCount": "{count} unretrieved",
       "cycleDetails": "Cycle {cycle} details",
       "dialog": {
-        "unclaimedTitle": "Unretrieved assets — Cycle #{cycle}",
+        "unclaimedTitle": "Unretrieved assets — Cycle {cycle}",
         "expired": "The retrieval window has closed. Anyone can now retrieve these assets for themselves.",
         "closesIn": "Retrieval window closes in {duration}.",
         "asset": "Asset",
@@ -547,8 +547,8 @@
       "nextCycleAria": "Next cycle",
       "liveCycle": "Live cycle",
       "jumpLive": "Jump to live",
-      "option": "Cycle #{cycle}",
-      "optionLive": "Cycle #{cycle} (live)"
+      "option": "Cycle {cycle}",
+      "optionLive": "Cycle {cycle} (live)"
     },
     "cstWindow": {
       "timeIntoCycle": "Time into cycle",
@@ -617,7 +617,7 @@
     }
   },
   "embed": {
-    "title": "Endurance timeline · Cycle #{cycle}",
+    "title": "Endurance timeline · Cycle {cycle}",
     "final": "Final",
     "source": "Open in Cosmic Signature",
     "opensNewWindow": "(opens in a new window)"

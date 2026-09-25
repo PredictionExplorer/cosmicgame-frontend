@@ -194,7 +194,6 @@
   "skeleton": {
     "loadingText": "텍스트 불러오는 중",
     "loadingStat": "통계 불러오는 중",
-    "loadingRow": "행 불러오는 중",
     "loadingRows": "여러 행 불러오는 중",
     "loadingNft": "NFT 불러오는 중"
   },
