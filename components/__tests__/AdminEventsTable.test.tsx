@@ -1,7 +1,5 @@
 import '@testing-library/jest-dom';
 
-import { convertTimestampToDateTime } from '@/utils';
-
 import { render, screen, checkA11y } from '@/test-utils';
 
 // eslint-disable-next-line import/order
@@ -29,9 +27,7 @@ describe('AdminEventsTable', () => {
 
     render(<AdminEventsTable list={mockData} />);
 
-    expect(
-      screen.getByText(convertTimestampToDateTime(mockData[0]!.TimeStamp)),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Nov 30, 2023, 12:18')).toBeInTheDocument();
     // The event is presented as a readable description, with its percentage.
     expect(screen.getByText('Public Goods percentage changed')).toBeInTheDocument();
     expect(screen.getByText('25%')).toBeInTheDocument();

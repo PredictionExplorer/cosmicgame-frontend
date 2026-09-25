@@ -162,15 +162,6 @@ export function toIsoDuration(totalSeconds: number | null | undefined): string |
 export const formatSeconds = (seconds: number, locale: string = 'en'): string =>
   seconds < 0 ? ' ' : formatDuration(seconds, { locale });
 
-/**
- * Time elapsed since a Unix timestamp as a compact duration ("1d 2h 30m
- * 45s"), or an empty string for a timestamp in the future.
- */
-export const calculateTimeDiff = (timestamp: number, locale: string = 'en'): string => {
-  const seconds = Math.floor(Date.now() / 1000) - timestamp;
-  return seconds < 0 ? '' : formatDuration(seconds, { locale });
-};
-
 /** One decimal at most, in the locale's number style ("1.5", vi "1,5"). */
 const tickNumber = (value: number, locale: string): string =>
   formatNumber(value, locale, { maximumFractionDigits: 1 });

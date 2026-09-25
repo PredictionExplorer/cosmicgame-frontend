@@ -1,23 +1,9 @@
 import '@testing-library/jest-dom';
 
-import { convertTimestampToDateTime } from '@/utils';
-
 import MarketingRewardsTable from '@/components/tables/MarketingRewardsTable';
 import type { MarketingReward } from '@/services/api/types';
 
 import { render, screen, checkA11y } from '@/test-utils';
-
-const mockConvertTimestampToDateTime = jest.fn();
-jest.mock('@/utils', () => {
-  const actual = jest.requireActual<typeof import('@/utils')>('@/utils');
-  return {
-    ...actual,
-    convertTimestampToDateTime: (timestamp: number, showSecond?: boolean, locale?: string) => {
-      mockConvertTimestampToDateTime(timestamp, showSecond, locale);
-      return actual.convertTimestampToDateTime(timestamp, showSecond, locale);
-    },
-  };
-});
 
 const createReward = (overrides: Partial<MarketingReward> = {}): MarketingReward => ({
   EvtLogId: 1,
@@ -48,7 +34,7 @@ describe('MarketingRewardsTable', () => {
   it('renders datetime as link', () => {
     const reward = createReward();
     render(<MarketingRewardsTable list={[reward]} />);
-    expect(screen.getByText(convertTimestampToDateTime(reward.TimeStamp))).toBeInTheDocument();
+    expect(screen.getByText('Nov 30, 2023, 12:18')).toBeInTheDocument();
     expect(
       document.querySelector(`time[datetime="${new Date(reward.TimeStamp * 1000).toISOString()}"]`),
     ).toBeInTheDocument();
@@ -62,7 +48,7 @@ describe('MarketingRewardsTable', () => {
   it('sets target="_blank" on datetime link', () => {
     const reward = createReward();
     render(<MarketingRewardsTable list={[reward]} />);
-    const link = screen.getByText(convertTimestampToDateTime(reward.TimeStamp));
+    const link = screen.getByText('Nov 30, 2023, 12:18');
     expect(link.closest('a')).toHaveAttribute('target', '_blank');
   });
 

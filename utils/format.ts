@@ -22,8 +22,6 @@ import { formatUnits } from 'viem';
 
 import { getLocaleConfig } from '@/i18n/localeConfig';
 
-import { UNAVAILABLE_VALUE, formatNumber } from './format/numbers';
-
 export {
   NBSP,
   UNAVAILABLE_VALUE,
@@ -41,13 +39,11 @@ export {
   type PercentOptions,
 } from './format/numbers';
 export {
-  convertTimestampToDateTime,
   formatDateTime,
   formatDateTimeTitle,
   formatRelativeTime,
   formatTimeZoneLabel,
   formatUnixTsLabel,
-  formatUtcDateTimeStamp,
   formatYyyymmddLabel,
   formatZonedDateTimeParts,
   toIsoDateTime,
@@ -58,7 +54,6 @@ export {
   type ZonedDateTimeParts,
 } from './format/dates';
 export {
-  calculateTimeDiff,
   formatDuration,
   formatDurationTick,
   formatHoursTick,
@@ -82,29 +77,6 @@ type BigNumberish = bigint | string | number;
 
 /** Maps app locale codes to stable Intl locales. */
 export const toIntlLocale = (locale: string = 'en'): string => getLocaleConfig(locale).intlLocale;
-
-/**
- * Locale-aware grouped number (Chinese data displays keep Western grouping).
- * Delegates to `formatNumber`; prefer `formatCount` for counts.
- */
-export const formatGroupedNumber = (
-  value: number,
-  locale: string = 'en',
-  options?: Intl.NumberFormatOptions,
-): string => formatNumber(value, locale, options);
-
-/**
- * `toFixed` that cannot throw. Finite input is byte-identical to
- * `value.toFixed(digits)`; null/undefined/NaN/Infinity render `fallback`.
- * A machine value (contract input, form state); displayed amounts go
- * through `formatAmount`, which groups digits and follows the locale.
- */
-export const formatFixed = (
-  value: number | null | undefined,
-  digits: number,
-  fallback: string = UNAVAILABLE_VALUE,
-): string =>
-  typeof value === 'number' && Number.isFinite(value) ? value.toFixed(digits) : fallback;
 
 /**
  * Converts a wei amount to an ETH `number` without the precision loss of

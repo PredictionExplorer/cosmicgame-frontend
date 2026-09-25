@@ -1,7 +1,6 @@
 import {
   shortenHex,
   formatId,
-  convertTimestampToDateTime,
   formatSeconds,
   getExplorerUrl,
   getAssetsUrl,
@@ -41,21 +40,6 @@ describe('formatId', () => {
 
   it('pads larger numbers', () => {
     expect(formatId(123456)).toBe('#123456');
-  });
-});
-
-describe('convertTimestampToDateTime', () => {
-  it('converts a Unix timestamp to a date string, with the year of a past year', () => {
-    // 1609459200 = 2021-01-01 00:00 UTC; output varies by timezone (e.g. Jan 01 or Dec 31)
-    const result = convertTimestampToDateTime(1609459200);
-    expect(result).toMatch(/^[A-Za-z]{3} \d{2}, 202[01], \d{2}:\d{2}$/);
-  });
-
-  it('includes seconds when flag is set', () => {
-    const withSeconds = convertTimestampToDateTime(1609459200, true);
-    const without = convertTimestampToDateTime(1609459200, false);
-    expect(withSeconds).toMatch(/^[A-Za-z]{3} \d{2}, 202[01], \d{2}:\d{2}:\d{2}$/);
-    expect(without).toMatch(/^[A-Za-z]{3} \d{2}, 202[01], \d{2}:\d{2}$/);
   });
 });
 

@@ -115,9 +115,8 @@ function metadataText(value: unknown): string | null {
 }
 
 /**
- * A citable instant: the full date in the reader's zone, as every other
- * page prints it, with that zone named beside it (UTC through hydration, so
- * the server HTML never guesses). The age and the full date stay on hover.
+ * A citable instant: the full date in UTC, as every record prints it, with
+ * the zone named beside it. The reader's own time and the age are on hover.
  */
 function RecordTime({ timestamp }: { timestamp: number | null | undefined }) {
   const zone = useTimeZoneLabel();
@@ -201,7 +200,18 @@ function RecordRow({ label, children }: { label: string; children: ReactNode }) 
  * HTML. A read that fails offers a retry; a record that does not exist
  * says so and points to the current cycle.
  */
-const GesturePage = ({ gestureId }: { gestureId: number }) => {
+const GesturePage = ({
+  gestureId,
+  serverLiveCycle = null,
+}: {
+  gestureId: number;
+  /**
+   * The live cycle as the server read it for this request. The shell's
+   * dashboard query takes the seed only after hydration, so without it the
+   * server HTML drew a bare trail that re-routed itself once the page loaded.
+   */
+  serverLiveCycle?: number | null;
+}) => {
   const t = useTranslations('gesture');
   const tCommon = useTranslations('common');
   const locale = useLocale();
@@ -250,14 +260,15 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
   const position = gestureInfo?.BidPosition;
   const hasPosition = typeof position === 'number' && position > 0;
   const cycle = gestureInfo?.RoundNum;
+  const liveCycle = dashboard?.CurRoundNum ?? serverLiveCycle ?? undefined;
   const { section, trail } = gestureTrail(
     cycle,
-    dashboardFailed ? null : dashboard?.CurRoundNum,
+    dashboardFailed ? null : liveCycle,
     dashboardFailed,
     (key, values) => tCommon(key, values),
   );
   const cycleHref =
-    typeof cycle === 'number' && !dashboardFailed && dashboard?.CurRoundNum === cycle
+    typeof cycle === 'number' && !dashboardFailed && liveCycle === cycle
       ? '/current-cycle#gesture-history'
       : `/allocation/${cycle}`;
   // A position is an ordinal, not a quantity: no digit grouping ("#1141", "record 29434").

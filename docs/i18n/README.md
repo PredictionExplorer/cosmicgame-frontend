@@ -311,10 +311,14 @@ compile**. `index.ts` composes skeleton + text into the public content shape (ex
 unchanged) and resolves the locale through a `LocaleRecord` registry — see
 `content/faq/` for the reference implementation.
 
-Legal and trust pages (Terms, Privacy, Risk Disclosures, Security, Audits) share one
-renderer each (`TermsContent.tsx`, `PrivacyContent.tsx`, `TrustPageContent.tsx`) plus
-per-locale copy objects (`*.en.ts` / `*.zh.ts`), resolved via `content/legal/index.ts`.
-No JSX is duplicated per locale.
+Legal and trust pages (Security, Audits, Risk Disclosures, Terms, Privacy) have one
+renderer each (`SecurityContent.tsx`, `AuditsContent.tsx`, `RiskContent.tsx`,
+`TermsContent.tsx`, `PrivacyContent.tsx`) over the shared `components/legal/LegalDocument`
+template, plus per-locale copy objects (`*.en.ts` / `*.zh.ts`), resolved via
+`content/legal/index.ts`. A link inside legal copy is a tag naming an entry of
+`LEGAL_LINKS` (`content/legal/links.ts`), rendered by `components/legal/RichText`; an
+unknown tag keeps its words and the legal-copy test rejects it. No JSX is duplicated per
+locale.
 
 **Fallback policy:** `i18n/request.ts` deep-merges each translated locale's messages over
 the `en` catalog, so a missing key renders English — never a raw key path. Long-form content has **no
@@ -380,16 +384,17 @@ Every displayed number, amount, date, duration and address goes through
   the short form never wraps even without `whitespace-nowrap`. Tests that pin a short
   address write it as `'0x1234…\u20605678'`; copy buttons copy the full address.
 - **Dates:** the compact form adds the year when it is not the current one; `<DateTime>`
-  renders `<time dateTime title>` with UTC through hydration and the reader's zone after
-  it, the full date, zone (as a UTC offset) and age on hover. State the zone once per
-  table with `<TimeZoneNote>`.
+  renders `<time dateTime title>` in UTC on the server and in the browser alike (a record
+  never rewrites itself after load), with the full date, the reader's own time (as a UTC
+  offset) and the age on hover. State the zone once per table with `<TimeZoneNote>`.
+  Vietnamese numeric dates are padded DD/MM(/YYYY), so a column lines up.
 - Token amounts in messages are passed as strings from `formatAmount`; counts are passed
   as numbers and formatted by the message (`{count, number}` or `#`).
 - **Locale is never defaulted where it can be forgotten:** the legacy helpers
   `formatEthValue`, `formatCSTValue` and `formatTableAmount` require it, and `<Amount>`,
   `<DateTime>`, `<Duration>` and the hydration-safe date helpers fall back to
   `useLocale()`, never to `'en'`.
-- **Guards:** `format-call-sites.test.ts` ratchets raw `toFixed`/`formatFixed` and private
+- **Guards:** `format-call-sites.test.ts` ratchets raw `toFixed` and private
   amount formatters (each baseline entry must equal the file's current count, so it only
   goes down); `format-known-addresses.test.ts` pins `formats.address.known.*` to the
   /contracts names; `format-landing-entry.test.ts` keeps the landing on leaf modules

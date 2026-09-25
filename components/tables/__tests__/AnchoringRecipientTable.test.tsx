@@ -1,20 +1,8 @@
 import '@testing-library/jest-dom';
 
-import { convertTimestampToDateTime, shortenHex } from '@/utils';
+import { shortenHex } from '@/utils';
 
 import { checkA11y, render, screen } from '@/test-utils';
-
-const mockConvertTimestampToDateTime = jest.fn();
-jest.mock('@/utils', () => {
-  const actual = jest.requireActual<typeof import('@/utils')>('@/utils');
-  return {
-    ...actual,
-    convertTimestampToDateTime: (timestamp: number, showSecond?: boolean, locale?: string) => {
-      mockConvertTimestampToDateTime(timestamp, showSecond, locale);
-      return actual.convertTimestampToDateTime(timestamp, showSecond, locale);
-    },
-  };
-});
 
 // eslint-disable-next-line import/order
 import AnchoringRecipientTable from '@/components/tables/AnchoringRecipientTable';
@@ -52,7 +40,7 @@ describe('AnchoringRecipientTable', () => {
   it('renders datetime as explorer link', () => {
     const recipient = createRecipient();
     render(<AnchoringRecipientTable list={[recipient]} />);
-    const datetime = screen.getByText(convertTimestampToDateTime(recipient.TimeStamp));
+    const datetime = screen.getByText('Nov 30, 2023, 12:18');
     expect(datetime.closest('a')).toHaveAttribute('target', '_blank');
     expect(datetime.closest('a')).toHaveAttribute('rel', 'noopener noreferrer');
     expect(

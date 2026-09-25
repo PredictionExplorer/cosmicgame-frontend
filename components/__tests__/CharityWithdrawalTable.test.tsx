@@ -1,7 +1,6 @@
 import '@testing-library/jest-dom';
 
 import { protocolFacts } from '@/content/protocol-facts';
-import { convertTimestampToDateTime } from '@/utils';
 
 import CharityWithdrawalTable from '@/components/tables/CharityWithdrawalTable';
 
@@ -27,9 +26,7 @@ describe('CharityWithdrawalTable', () => {
       },
     ];
     render(<CharityWithdrawalTable list={mockData} />);
-    expect(
-      screen.getByText(convertTimestampToDateTime(mockData[0]!.TimeStamp)),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Nov 30, 2023, 12:18')).toBeInTheDocument();
     expect(screen.getByText('0x555e…\u20600e60')).toBeInTheDocument();
     // ETH reads at the ledger precision, with the exact value on hover.
     const amount = screen.getByText('0.1004');

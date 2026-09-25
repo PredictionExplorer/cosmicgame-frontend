@@ -1,7 +1,5 @@
 import '@testing-library/jest-dom';
 
-import { convertTimestampToDateTime } from '@/utils';
-
 import { GlobalMarketingRewardsTable } from '@/components/tables/GlobalMarketingRewardsTable';
 
 import { checkA11y, render, screen } from '@/test-utils';
@@ -33,7 +31,7 @@ describe('GlobalMarketingRewardsTable', () => {
   it('renders datetime from TxHash as explorer link', () => {
     const reward = createReward();
     render(<GlobalMarketingRewardsTable list={[reward]} />);
-    const datetime = screen.getByText(convertTimestampToDateTime(reward.TimeStamp));
+    const datetime = screen.getByText('Nov 30, 2023, 12:18');
     expect(datetime.closest('a')).toHaveAttribute('target', '_blank');
     expect(datetime.closest('a')).toHaveAttribute('rel', 'noopener noreferrer');
   });

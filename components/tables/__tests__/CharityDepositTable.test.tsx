@@ -1,7 +1,5 @@
 import '@testing-library/jest-dom';
 
-import { convertTimestampToDateTime } from '@/utils';
-
 import { CharityDepositTable } from '@/components/tables/CharityDepositTable';
 
 import { checkA11y, render, screen } from '@/test-utils';
@@ -37,7 +35,7 @@ describe('CharityDepositTable', () => {
   it('renders datetime as explorer link', () => {
     const donation = createDonation();
     render(<CharityDepositTable list={[donation]} />);
-    const datetime = screen.getByText(convertTimestampToDateTime(donation.TimeStamp));
+    const datetime = screen.getByText('Nov 30, 2023, 12:18');
     expect(datetime.closest('a')).toHaveAttribute('target', '_blank');
     expect(datetime.closest('a')).toHaveAttribute('rel', 'noopener noreferrer');
   });

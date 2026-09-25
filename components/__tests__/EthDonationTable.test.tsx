@@ -1,7 +1,5 @@
 import '@testing-library/jest-dom';
 
-import { convertTimestampToDateTime } from '@/utils';
-
 import { render, screen, checkA11y } from '@/test-utils';
 
 jest.mock('next/navigation', () => ({
@@ -41,7 +39,7 @@ describe('EthDonationTable', () => {
   it('renders datetime from data', () => {
     const donation = createDonation();
     render(<EthDonationTable list={[donation]} />);
-    expect(screen.getByText(convertTimestampToDateTime(donation.TimeStamp))).toBeInTheDocument();
+    expect(screen.getByText('Nov 30, 2023, 12:18')).toBeInTheDocument();
   });
 
   it('names the cycle as "Cycle 5", linked to that cycle’s contributions', () => {
@@ -115,7 +113,7 @@ describe('EthDonationTable', () => {
   it('renders TxHash datetime as a link to explorer', () => {
     const donation = createDonation();
     render(<EthDonationTable list={[donation]} />);
-    const datetimeLink = screen.getByText(convertTimestampToDateTime(donation.TimeStamp));
+    const datetimeLink = screen.getByText('Nov 30, 2023, 12:18');
     expect(datetimeLink.closest('a')).toHaveAttribute('target', '_blank');
     expect(datetimeLink.closest('a')).toHaveAttribute('rel', 'noopener noreferrer');
   });

@@ -72,9 +72,9 @@ function SectionEntry({ section, figure }: { section: StatisticsSectionDef; figu
 }
 
 /**
- * A moment in the reader's zone, as every other page prints it (the same
- * opening reads the same here and on the current cycle), with the zone named
- * inline so the figure never needs a caption: "Aug 11, 19:38 UTC-5".
+ * A moment in UTC, as every other page prints it (the same opening reads the
+ * same here and on the current cycle), with the zone named inline so the
+ * figure never needs a caption: "Aug 12, 00:38 UTC".
  */
 function LocalMoment({ timestamp }: { timestamp: number }) {
   const zone = useTimeZoneLabel();

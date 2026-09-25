@@ -14,9 +14,9 @@ import { UNAVAILABLE_VALUE } from './numbers';
  * - title (hover): `full` plus the zone, "Sep 22, 2026, 23:04:45 UTC+3".
  *
  * Each locale keeps its documented template (style-guide-*.md §5). Rendered
- * through `<DateTime>` (components/ui/date-time.tsx), which renders UTC on the
- * server and the reader's local time after hydration inside
- * `<time dateTime title>`.
+ * through `<DateTime>` (components/ui/date-time.tsx), which prints every
+ * record in UTC on the server and in the browser alike inside
+ * `<time dateTime title>`, with the reader's own time on hover.
  *
  * Import from `@/utils/format` (the public entry), not from this module.
  */
@@ -102,22 +102,53 @@ function calendarParts(date: Date, timeZone: DateTimeZone): CalendarParts {
 }
 
 /**
+ * One `Intl.DateTimeFormat` per locale and option set, built once:
+ * construction is the expensive part, and a ledger formats two dates per
+ * cell on every poll (the value and its hover title), as numbers.ts caches
+ * its number formatters.
+ */
+const dateFormatters = new Map<string, Intl.DateTimeFormat>();
+
+function dateFormatter(
+  intlLocale: string,
+  kind: string,
+  options: Intl.DateTimeFormatOptions,
+): Intl.DateTimeFormat {
+  const key = `${intlLocale}|${kind}`;
+  let formatter = dateFormatters.get(key);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat(intlLocale, { ...options, timeZone: 'UTC' });
+    dateFormatters.set(key, formatter);
+  }
+  return formatter;
+}
+
+/** Each locale's twelve abbreviated months, computed once. */
+const shortMonthLabels = new Map<string, readonly string[]>();
+
+/**
  * Locale-abbreviated month through Intl, so a locale never needs a
  * hand-kept month array. `en` keeps its historical array.
  */
-const shortMonthLabel = (locale: string, monthIndex: number): string =>
-  new Intl.DateTimeFormat(getLocaleConfig(locale).intlLocale, {
-    month: 'short',
-    timeZone: 'UTC',
-  }).format(new Date(Date.UTC(2000, monthIndex, 1)));
+const shortMonthLabel = (locale: string, monthIndex: number): string => {
+  const intlLocale = getLocaleConfig(locale).intlLocale;
+  let labels = shortMonthLabels.get(intlLocale);
+  if (!labels) {
+    const formatter = dateFormatter(intlLocale, 'month-short', { month: 'short' });
+    labels = Array.from({ length: 12 }, (_, month) =>
+      formatter.format(new Date(Date.UTC(2000, month, 1))),
+    );
+    shortMonthLabels.set(intlLocale, labels);
+  }
+  return labels[monthIndex] ?? '';
+};
 
 /** `DD.MM.YYYY`, the numeric short date of Ukrainian (and most of Europe). */
 const numericDate = (locale: string, year: number, monthIndex: number, day: number): string =>
-  new Intl.DateTimeFormat(getLocaleConfig(locale).intlLocale, {
+  dateFormatter(getLocaleConfig(locale).intlLocale, 'numeric-2-digit', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
-    timeZone: 'UTC',
   }).format(new Date(Date.UTC(year, monthIndex, day)));
 
 /**
@@ -125,11 +156,10 @@ const numericDate = (locale: string, year: number, monthIndex: number, day: numb
  * for ko-KR: year first, unpadded, a dot and a space after each part).
  */
 const koreanNumericDate = (year: number, monthIndex: number, day: number): string =>
-  new Intl.DateTimeFormat(getLocaleConfig('ko').intlLocale, {
+  dateFormatter(getLocaleConfig('ko').intlLocale, 'numeric', {
     day: 'numeric',
     month: 'numeric',
     year: 'numeric',
-    timeZone: 'UTC',
   }).format(new Date(Date.UTC(year, monthIndex, day)));
 
 interface DateTimeTemplateInput extends CalendarParts {
@@ -172,10 +202,13 @@ const DATE_TIME_TEMPLATES: LocaleRecord<(input: DateTimeTemplateInput) => string
       input,
     )}`,
   ja: hanDateTime,
-  // "5/1, 12:34" / "5/1/2025, 12:34": Vietnamese writes numeric day/month
-  // dates (style-guide-vi §5); CLDR's standalone "Tháng 1" reads wrong mid-string.
+  // "05/01, 12:34" / "05/01/2025, 12:34": Vietnamese writes numeric
+  // DD/MM/YYYY dates (style-guide-vi §5), padded like the chart labels, so a
+  // column of dates lines up; CLDR's standalone "Tháng 1" reads wrong mid-string.
   vi: (input) =>
-    `${input.day}/${input.monthIndex + 1}${input.withYear ? `/${input.year}` : ''}, ${clock(input)}`,
+    `${pad2(input.day)}/${pad2(input.monthIndex + 1)}${
+      input.withYear ? `/${input.year}` : ''
+    }, ${clock(input)}`,
 };
 
 /**
@@ -204,7 +237,7 @@ export interface DateTimeOptions {
   readonly seconds?: boolean;
   /** `auto` (default) shows the year only when it differs from `now`'s; `full` always shows it. */
   readonly year?: 'auto' | 'always' | 'never';
-  /** Default `local`. Server snapshots pass `utc`. */
+  /** Default `local`; `<DateTime>` passes `utc`, the zone of every record. */
   readonly timeZone?: DateTimeZone;
   /** Reference instant (epoch ms) for `year: 'auto'`. Default `Date.now()`. */
   readonly now?: number;
@@ -370,25 +403,6 @@ export function formatRelativeTime(
   return getRelativeTime(timestamp, Math.floor(now / 1000), locale);
 }
 
-/**
- * Converts a Unix timestamp to the compact locale date-time: `en`
- * "Jan 01, 12:34", `zh` "1月1日 12:34", `uk` "1 січ., 12:34", `vi`
- * "1/1, 12:34", each with the year added when it is not the current year.
- * Browser-local time by default; pass `utc` only for deterministic server
- * snapshots — hydration-safe UI uses `<DateTime>` / `useHydrationSafeDateTime`.
- *
- * @deprecated No production code calls this any more; it survives only
- * because table tests build their expected text with it. Use
- * `formatDateTime(timestamp, { locale, seconds, timeZone })`, or `<DateTime>`
- * in markup.
- */
-export const convertTimestampToDateTime = (
-  timestamp: number,
-  showSecond: boolean = false,
-  locale: string = 'en',
-  timeZone: TimestampTimeZone = 'local',
-): string => formatDateTime(timestamp, { locale, seconds: showSecond, timeZone });
-
 const hanCalendarDate = (year: number, monthIndex: number, day: number): string =>
   `${year}/${monthIndex + 1}/${day}`;
 
@@ -441,38 +455,6 @@ const UTC_DATETIME_LABEL_FORMATS: LocaleRecord<
   vi: (year, monthIndex, day, hh, mm) =>
     `${numericDate('vi', year, monthIndex, day)} ${hh}:${mm} UTC`,
 };
-
-const utcStamp =
-  (format: (year: number, monthIndex: number, day: number, hh: string, mm: string) => string) =>
-  (date: Date): string =>
-    format(
-      date.getUTCFullYear(),
-      date.getUTCMonth(),
-      date.getUTCDate(),
-      pad2(date.getUTCHours()),
-      pad2(date.getUTCMinutes()),
-    );
-
-const UTC_STAMP_FORMATS: LocaleRecord<(date: Date) => string> = {
-  en: (date) => `${date.toISOString().replace('T', ' ').slice(0, 16)} UTC`,
-  zh: utcStamp(hanUtcDateTime),
-  'zh-TW': utcStamp(hanUtcDateTime),
-  'zh-HK': utcStamp(hanUtcDateTime),
-  uk: utcStamp(UTC_DATETIME_LABEL_FORMATS.uk),
-  ko: utcStamp(UTC_DATETIME_LABEL_FORMATS.ko),
-  ja: utcStamp(hanUtcDateTime),
-  vi: utcStamp(UTC_DATETIME_LABEL_FORMATS.vi),
-};
-
-/**
- * "Data updated at" stamp for SEO summaries: `en` keeps the ISO-style
- * "2026-08-28 08:13 UTC"; every Chinese locale renders
- * "2026年8月28日 08:13（UTC）"; `uk` renders "28.08.2026 08:13 UTC"; `ko`
- * renders "2026. 8. 28. 08:13 UTC"; `vi` renders "28/08/2026 08:13 UTC".
- */
-export function formatUtcDateTimeStamp(date: Date, locale: string = 'en'): string {
-  return pickByLocale(UTC_STAMP_FORMATS, locale)(date);
-}
 
 /** Formats a Unix timestamp (seconds) for chart axis / tooltip labels, in UTC. */
 export function formatUnixTsLabel(ts: number, withTime = false, locale: string = 'en'): string {
