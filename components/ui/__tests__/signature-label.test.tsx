@@ -13,6 +13,11 @@ describe('SignatureWallLabel', () => {
     expect(screen.getByText('common.signature.cycle(n=1)')).toBeInTheDocument();
   });
 
+  it('keeps the noun of a full wall label visible at every width', () => {
+    render(<SignatureWallLabel tokenId={23} />);
+    expect(screen.getByText('#000023').parentElement!.querySelector('.max-sm\\:hidden')).toBeNull();
+  });
+
   it('captions a named Signature in one fixed order: number, cycle, structure, palette, date', () => {
     render(
       <SignatureWallLabel

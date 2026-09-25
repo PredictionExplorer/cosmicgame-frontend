@@ -31,6 +31,18 @@ describe('SignatureCard', () => {
     expect(card.textContent).toMatch(/Orbit Ribbons\u00a0· \S/);
   });
 
+  it("keeps a phone's two-across title to the number alone (regression)", () => {
+    // "Signature #000047" wrapped to two lines beside the anchor at 390px, and
+    // every card wrapped at 320px: below sm the noun hides and the number stays.
+    render(<SignatureCard tokenId={47} seed="a1" entry={entry} anchored sizes="400px" />);
+    const number = screen.getByText('#000047');
+    expect(number).not.toHaveClass('max-sm:hidden');
+    const noun = screen.getByText('common.signature.untitled(id=');
+    expect(noun).toHaveClass('max-sm:hidden');
+    // The whole title is still one text for tests and the alt text beside it.
+    expect(number.parentElement).toHaveTextContent('common.signature.untitled(id=#000047)');
+  });
+
   it('says "Rendering" for a fresh imprint without art, as its own page does', () => {
     const imprintedAt = Math.floor(Date.now() / 1000) - 5 * 60;
     render(<SignatureCard tokenId={420} imprintedAt={imprintedAt} sizes="400px" />);

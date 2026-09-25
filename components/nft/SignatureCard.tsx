@@ -69,9 +69,10 @@ export function signatureCardSources(
  * SignatureCard — one Signature on a wall: the art on its black plate at the
  * native ratio with nothing over it, and a quiet wall label under it, by the
  * one rule every art surface follows (`components/ui/signature-label`): the
- * title is the token's name, or "Signature #000047" with the number in mono;
- * the caption carries the number (for a named token), then structure and palette from
- * `sm` (a phone's two-across label keeps to the name and number). The whole
+ * title is the token's name, or "Signature #000047" with the number in mono
+ * (the number alone below `sm`, so a phone's two-across titles keep to one
+ * line); the caption carries the number (for a named token), then structure
+ * and palette from `sm` (a phone's label keeps to the name and number). The whole
  * card is one link to the detail page, named by the plate's alt text (composed
  * from the traits); the visible label repeats part of it, so it is hidden
  * from assistive technology rather than read twice.
@@ -136,7 +137,7 @@ export function SignatureCard({
                   'decoration-rule underline-offset-4 group-hover:underline',
                 )}
               >
-                {label.title({ tokenId, name: trimmedName })}
+                {label.title({ tokenId, name: trimmedName }, { compact: true })}
               </p>
               {traitsLoading ? (
                 <>

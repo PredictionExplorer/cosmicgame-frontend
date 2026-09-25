@@ -25,6 +25,9 @@ import { withMonoId } from '@/components/ui/mono-id';
  * component (how-it-works) and in a client one (the gallery, the landing).
  */
 
+/** The noun around an unnamed Signature's number in a compact title: shown from `sm`. */
+const COMPACT_NOUN_CLASS = 'max-sm:hidden';
+
 /** What a Signature's label can say. */
 export interface SignatureLabelFacts {
   tokenId: number;
@@ -66,9 +69,22 @@ export function useSignatureLabel() {
     /** The title as plain text, for alt text, announcements and accessible names. */
     text: (facts: Pick<SignatureLabelFacts, 'tokenId' | 'name'>): string =>
       nameOf(facts) ?? untitled(facts.tokenId),
-    /** Line 1: the name, or "Signature #000023" with the number in mono. */
-    title: (facts: Pick<SignatureLabelFacts, 'tokenId' | 'name'>): ReactNode =>
-      nameOf(facts) ?? withMonoId(untitled(facts.tokenId), formatId(facts.tokenId)),
+    /**
+     * Line 1: the name, or "Signature #000023" with the number in mono.
+     * `compact` is for a phone's two-across wall: below `sm` an unnamed
+     * Signature's title is its number alone, so every title keeps to one line
+     * beside the status slot; the noun stays in the text for assistive technology.
+     */
+    title: (
+      facts: Pick<SignatureLabelFacts, 'tokenId' | 'name'>,
+      { compact = false }: { compact?: boolean } = {},
+    ): ReactNode =>
+      nameOf(facts) ??
+      withMonoId(
+        untitled(facts.tokenId),
+        formatId(facts.tokenId),
+        compact ? COMPACT_NOUN_CLASS : undefined,
+      ),
     /** Line 2, for WallLabelMeta: the facts in their fixed order. */
     meta: (facts: SignatureLabelFacts): ReactNode[] => [
       nameOf(facts) ? <SignatureNumber key="id" tokenId={facts.tokenId} /> : null,
