@@ -293,7 +293,7 @@ Cosmic Signature 与 COSMIC 癌症突变数据库及生物学中的 COSMIC 突�
 
 - **中文主页**：https://cosmicsignature.com/zh
 - **关于**：https://cosmicsignature.com/zh/about
-- **学习中心**：https://cosmicsignature.com/zh/learn
+- **学习**：https://cosmicsignature.com/zh/learn
 - **什么是 Cosmic Signature**：https://cosmicsignature.com/zh/learn/what-is-cosmic-signature
 - **三体 NFT 艺术**：https://cosmicsignature.com/zh/learn/three-body-nft-art
 - **公共物品机制**：https://cosmicsignature.com/zh/learn/protocol-guild-public-goods
@@ -397,7 +397,7 @@ Cosmic Signature 與 COSMIC 癌症突變資料庫及生物學中的 COSMIC 突�
 
 - **台灣繁體中文首頁**：https://cosmicsignature.com/zh-TW
 - **關於**：https://cosmicsignature.com/zh-TW/about
-- **學習中心**：https://cosmicsignature.com/zh-TW/learn
+- **學習**：https://cosmicsignature.com/zh-TW/learn
 - **什麼是 Cosmic Signature**：https://cosmicsignature.com/zh-TW/learn/what-is-cosmic-signature
 - **三體 NFT 藝術**：https://cosmicsignature.com/zh-TW/learn/three-body-nft-art
 - **公共財機制**：https://cosmicsignature.com/zh-TW/learn/protocol-guild-public-goods
@@ -501,7 +501,7 @@ Cosmic Signature 與 COSMIC 癌症突變數據庫及生物學中的 COSMIC 突�
 
 - **香港繁體中文主頁**：https://cosmicsignature.com/zh-HK
 - **關於**：https://cosmicsignature.com/zh-HK/about
-- **學習中心**：https://cosmicsignature.com/zh-HK/learn
+- **學習**：https://cosmicsignature.com/zh-HK/learn
 - **什麼是 Cosmic Signature**：https://cosmicsignature.com/zh-HK/learn/what-is-cosmic-signature
 - **三體 NFT 藝術**：https://cosmicsignature.com/zh-HK/learn/three-body-nft-art
 - **公共物品機制**：https://cosmicsignature.com/zh-HK/learn/protocol-guild-public-goods
@@ -605,7 +605,7 @@ Cosmic Signature не пов’язаний із базою даних мута�
 
 - **Головна сторінка**: https://cosmicsignature.com/uk
 - **Про проєкт**: https://cosmicsignature.com/uk/about
-- **Навчальний центр**: https://cosmicsignature.com/uk/learn
+- **Навчання**: https://cosmicsignature.com/uk/learn
 - **Що таке Cosmic Signature**: https://cosmicsignature.com/uk/learn/what-is-cosmic-signature
 - **NFT-мистецтво трьох тіл**: https://cosmicsignature.com/uk/learn/three-body-nft-art
 - **Механізм суспільних благ**: https://cosmicsignature.com/uk/learn/protocol-guild-public-goods
@@ -709,7 +709,7 @@ Cosmic Signature는 COSMIC 암 돌연변이 데이터베이스나 생물학의 C
 
 - **홈**: https://cosmicsignature.com/ko
 - **소개**: https://cosmicsignature.com/ko/about
-- **학습 센터**: https://cosmicsignature.com/ko/learn
+- **학습**: https://cosmicsignature.com/ko/learn
 - **Cosmic Signature란 무엇인가요?**: https://cosmicsignature.com/ko/learn/what-is-cosmic-signature
 - **삼체 NFT 아트**: https://cosmicsignature.com/ko/learn/three-body-nft-art
 - **공공재 메커니즘**: https://cosmicsignature.com/ko/learn/protocol-guild-public-goods
@@ -813,7 +813,7 @@ Cosmic Signatureは、COSMICがん変異データベースや生物学のCOSMIC�
 
 - **ホーム**: https://cosmicsignature.com/ja
 - **概要**: https://cosmicsignature.com/ja/about
-- **学習ハブ**: https://cosmicsignature.com/ja/learn
+- **学ぶ**: https://cosmicsignature.com/ja/learn
 - **Cosmic Signatureとは？**: https://cosmicsignature.com/ja/learn/what-is-cosmic-signature
 - **三体NFTアート**: https://cosmicsignature.com/ja/learn/three-body-nft-art
 - **公共財の仕組み**: https://cosmicsignature.com/ja/learn/protocol-guild-public-goods
@@ -917,7 +917,7 @@ Cosmic Signature không liên quan đến cơ sở dữ liệu đột biến ung
 
 - **Trang chủ**: https://cosmicsignature.com/vi
 - **Về Cosmic Signature**: https://cosmicsignature.com/vi/about
-- **Trung tâm học tập**: https://cosmicsignature.com/vi/learn
+- **Tìm hiểu**: https://cosmicsignature.com/vi/learn
 - **Cosmic Signature là gì?**: https://cosmicsignature.com/vi/learn/what-is-cosmic-signature
 - **Nghệ thuật NFT ba vật thể**: https://cosmicsignature.com/vi/learn/three-body-nft-art
 - **Cơ chế Hàng hóa công**: https://cosmicsignature.com/vi/learn/protocol-guild-public-goods

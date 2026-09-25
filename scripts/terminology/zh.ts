@@ -89,7 +89,8 @@ export const ZH_TERMINOLOGY_RULES: readonly TerminologyRule[] = [
   {
     concept: 'Learn (was Learn Hub)',
     canonical: '学习',
-    variants: ['学习枢纽'],
+    // The retired canonical stays banned so it cannot drift back in.
+    variants: ['学习枢纽', '学习中心'],
   },
   {
     concept: 'Site Map',

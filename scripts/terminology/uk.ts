@@ -123,7 +123,8 @@ export const UK_TERMINOLOGY_RULES: readonly TerminologyRule[] = [
   {
     concept: 'Learn (was Learn Hub)',
     canonical: 'навчання',
-    variants: ['освітній хаб', 'навчальний хаб', 'хаб знань'],
+    // The retired canonical stays banned so it cannot drift back in.
+    variants: ['освітній хаб', 'навчальний хаб', 'хаб знань', 'навчальний центр'],
   },
   {
     concept: 'Site Map',
