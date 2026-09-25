@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Expand, Film, ImageIcon, Pause, Play } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { Button } from '@/components/ui/button';
 import { ART_PLATE_CLASS, ArtFrame, type ArtStatus } from '@/components/ui/art-frame';
+import { SegmentedControl } from '@/components/ui/segmented-control';
 
 import { ArtLightbox } from './ArtLightbox';
 import { signatureSources, type SignatureMedia } from './signatureArt';
@@ -259,25 +260,23 @@ export function SignatureViewer({
       >
         <div className="flex items-center gap-2 max-sm:w-full">
           {showModes ? (
-            <div
-              role="group"
-              aria-label={t('viewer.modeLabel')}
-              className="inline-flex shrink-0 items-center rounded-control border border-rule bg-surface-sunken p-0.5"
-            >
-              <ModeOption
-                selected={!showMotion}
-                onSelect={() => selectMode('still')}
-                icon={<ImageIcon aria-hidden />}
-                label={t('viewer.still')}
-              />
-              <ModeOption
-                selected={showMotion}
-                disabled={!motionAvailable}
-                onSelect={() => selectMode('motion')}
-                icon={<Film aria-hidden />}
-                label={t('viewer.motion')}
-              />
-            </div>
+            // The system's one segmented control, as on the gallery's filters.
+            <SegmentedControl<ArtMode>
+              label={t('viewer.modeLabel')}
+              hideLabel
+              value={showMotion ? 'motion' : 'still'}
+              onValueChange={selectMode}
+              className="shrink-0"
+              options={[
+                { value: 'still', label: t('viewer.still'), icon: <ImageIcon aria-hidden /> },
+                {
+                  value: 'motion',
+                  label: t('viewer.motion'),
+                  icon: <Film aria-hidden />,
+                  disabled: !motionAvailable,
+                },
+              ]}
+            />
           ) : null}
           {showMotion ? (
             <Button
@@ -325,35 +324,5 @@ export function SignatureViewer({
         />
       ) : null}
     </div>
-  );
-}
-
-interface ModeOptionProps {
-  selected: boolean;
-  disabled?: boolean;
-  onSelect: () => void;
-  icon: ReactNode;
-  label: string;
-}
-
-/** One segment of the Still / In motion control. */
-function ModeOption({ selected, disabled = false, onSelect, icon, label }: ModeOptionProps) {
-  return (
-    <button
-      type="button"
-      aria-pressed={selected}
-      disabled={disabled}
-      onClick={onSelect}
-      className={cn(
-        'inline-flex h-11 items-center gap-1.5 rounded-[calc(var(--radius-control)-2px)] px-3 type-label transition-colors duration-[var(--duration-fast)] sm:h-8',
-        '[&_svg]:size-4 [&_svg]:shrink-0 disabled:cursor-not-allowed disabled:opacity-50',
-        selected
-          ? 'bg-surface-raised text-foreground shadow-[inset_0_-2px_0_hsl(var(--primary))]'
-          : 'text-muted-foreground hover:text-foreground',
-      )}
-    >
-      {icon}
-      {label}
-    </button>
   );
 }

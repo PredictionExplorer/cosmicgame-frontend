@@ -75,6 +75,27 @@ describe('SegmentedControl', () => {
     expect(group).not.toHaveClass('flex-wrap');
   });
 
+  it('draws an icon before a label and keeps an unavailable option out of reach', async () => {
+    const user = userEvent.setup();
+    const onChange = jest.fn();
+    render(
+      <SegmentedControl
+        label="View"
+        value="still"
+        onValueChange={onChange}
+        options={[
+          { value: 'still', label: 'Still', icon: <svg data-testid="still-icon" aria-hidden /> },
+          { value: 'motion', label: 'In motion', disabled: true },
+        ]}
+      />,
+    );
+    expect(screen.getByTestId('still-icon')).toBeInTheDocument();
+    const motion = screen.getByRole('radio', { name: 'In motion' });
+    expect(motion).toBeDisabled();
+    await user.click(motion);
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
   it('has no axe violations', async () => {
     const { container } = render(<Harness />);
     await checkA11y(container);

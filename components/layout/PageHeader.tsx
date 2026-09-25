@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { Breadcrumbs, type BreadcrumbItem } from '@/components/ui/breadcrumbs';
 import { ExplainedTerm } from '@/components/ui/explain-popover';
 import { ScrollRail } from '@/components/ui/scroll-rail';
+import { tabsTriggerVariants } from '@/components/ui/tabs-variants';
 import { UnknownValue } from '@/components/ui/unknown-value';
 import { HeaderLede } from '@/components/layout/HeaderLede';
 import { PAGE_SECTIONS, type PageSectionId } from '@/components/layout/pageSections';
@@ -387,17 +388,16 @@ export function PageHeaderTabs({
   return (
     <nav aria-label={label} className="-mb-px">
       <ScrollRail>
-        <ul className="flex gap-6">
+        {/* The system's one underline row (tabs.tsx), as every sibling-page row. */}
+        <ul className="flex gap-x-6 text-muted-foreground">
           {items.map((item) => (
             <li key={item.href} className="shrink-0">
               <Link
                 href={item.href}
                 aria-current={item.current ? 'page' : undefined}
                 className={cn(
-                  'focus-ring-inset inline-flex min-h-11 items-center whitespace-nowrap border-b-2 type-label transition-colors duration-[var(--duration-fast)]',
-                  item.current
-                    ? 'border-primary text-foreground'
-                    : 'border-transparent text-muted-foreground hover:border-rule hover:text-foreground',
+                  tabsTriggerVariants({ variant: 'underline', scroll: true }),
+                  'focus-ring-inset no-underline',
                 )}
               >
                 {item.label}

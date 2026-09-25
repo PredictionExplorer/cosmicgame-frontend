@@ -44,9 +44,10 @@ function renderViewer(overrides: Partial<Parameters<typeof SignatureViewer>[0]> 
   );
 }
 
+/** A segment of the Still / In motion control: the shared SegmentedControl's radios. */
 function modeButton(name: RegExp) {
-  return within(screen.getByRole('group', { name: 'detail.viewer.modeLabel' })).getByRole(
-    'button',
+  return within(screen.getByRole('radiogroup', { name: 'detail.viewer.modeLabel' })).getByRole(
+    'radio',
     { name },
   );
 }
@@ -56,8 +57,8 @@ describe('SignatureViewer', () => {
     renderViewer();
     const art = screen.getByAltText('“Twisted Mind”, Cosmic Signature #000025');
     expect(art).toHaveAttribute('loading', 'eager');
-    expect(modeButton(/detail.viewer.still/)).toHaveAttribute('aria-pressed', 'true');
-    expect(modeButton(/detail.viewer.motion/)).toHaveAttribute('aria-pressed', 'false');
+    expect(modeButton(/detail.viewer.still/)).toBeChecked();
+    expect(modeButton(/detail.viewer.motion/)).not.toBeChecked();
     expect(screen.queryByTestId('signature-motion')).not.toBeInTheDocument();
   });
 

@@ -7,6 +7,8 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
+  SEGMENT_SELECTED_CLASS,
+  tabsListVariants,
   tabsTriggerVariants,
 } from '@/components/ui/tabs';
 
@@ -111,5 +113,22 @@ describe('ScrollRail', () => {
       jest.useRealTimers();
       HTMLElement.prototype.scrollBy = original;
     }
+  });
+});
+
+describe('one selected look and one underline row', () => {
+  it('applies the exported segment selection exactly as the segmented variant does', () => {
+    const segmented = tabsTriggerVariants({ variant: 'segmented' });
+    for (const token of SEGMENT_SELECTED_CLASS.split(' ')) {
+      expect(segmented).toContain(`data-[state=active]:${token}`);
+      expect(segmented).toContain(`aria-[current=page]:${token}`);
+    }
+    // A segment never draws the --primary rule an underline row uses.
+    expect(SEGMENT_SELECTED_CLASS).not.toMatch(/primary/);
+  });
+
+  it('sets underline tabs flush on the content edge, 1.5rem apart', () => {
+    expect(tabsListVariants({ variant: 'underline' })).toContain('gap-x-6');
+    expect(tabsTriggerVariants({ variant: 'underline' })).toContain('px-0');
   });
 });
