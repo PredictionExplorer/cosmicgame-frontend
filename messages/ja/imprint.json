@@ -5,8 +5,7 @@
   },
   "page": {
     "title": "Random Walk NFTの刻印",
-    "subtitle": "Random Walk NFTを保有すると、ETH一筆の費用が50%引き下げられます",
-    "description": "各Random Walk NFTはこの割引に一度だけ使えるので、最大の効果が出る瞬間を選んでください。この一筆への添付は、係留NFT星選の対象となるためのRandom Walk NFTの係留とは別のものです。",
+    "subtitle": "Random Walk NFTを1つ添えると、ETH一筆1回の費用が50%下がります。ここで刻印し、選んだ一筆に添えられます。",
     "currentCost": "現在の刻印費用",
     "costBreakdown": "コントラクト上の費用{base} ETHに、確定前に費用が上がっても刻印が成功するよう{percent}%を上乗せしています。",
     "submit": "今すぐ刻印",
@@ -17,9 +16,21 @@
     "why": {
       "title": "刻印で得られるもの"
     },
-    "compare": {
-      "label": "Random Walk NFTを添えたETH一筆の費用",
-      "caption": "現在のETH一筆の費用から{percent}%割引。各NFTにつき一度だけです。"
+    "benefits": {
+      "gesture": {
+        "title": "ETH一筆1回の費用が半額に",
+        "label": "現在の費用でETH一筆1回あたりの節約額",
+        "caption": "現在のETH一筆の費用{cost} ETHの半分です。各Random Walk NFTにつき一度、選んだ一筆で使えます。"
+      },
+      "anchoring": {
+        "title": "係留NFT星選",
+        "body": "係留したRandom Walk NFTは係留NFT星選の対象になります。サイクルが確定するたびに係留中のRandom Walk NFTから{count, number}件が選ばれ、それぞれの保有者が{cst} CSTとCosmic Signature NFTを受け取ります。一筆に使ったNFTも係留できます。",
+        "link": "係留の仕組みを見る"
+      }
+    },
+    "latest": {
+      "meta": "最新の刻印",
+      "earlierAria": "直前の刻印"
     },
     "success": {
       "eyebrow": "刻印完了",
@@ -32,6 +43,8 @@
       "used": "使用済み",
       "unused": "未使用",
       "use": "一筆に使う",
+      "checking": "確認中",
+      "unknownNote": "現在これらのRandom Walk NFTが使用済みかどうかを確認できないため、まだ一筆への使用は案内していません。",
       "empty": "このウォレットにはまだRandom Walk NFTがありません。",
       "error": "このウォレットのRandom Walk NFTを読み込めませんでした。"
     }

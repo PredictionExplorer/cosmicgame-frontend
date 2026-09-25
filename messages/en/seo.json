@@ -79,7 +79,7 @@
       },
       "imprint": {
         "heading": "Imprint Random Walk NFT",
-        "description": "Imprint Random Walk NFTs for Cosmic Signature participation. Each unused Random Walk NFT can be attached to one ETH gesture for a 50% Gesture Cost reduction.",
+        "description": "A Random Walk NFT takes 50% off the cost of one ETH gesture. Imprint one here, then attach it to the gesture you choose.",
         "source": "Random Walk NFT contract and Cosmic Signature public APIs",
         "links": {
           "cycle": "Open the active Performance Cycle",
@@ -89,9 +89,6 @@
         "cards": {
           "imprinted": {
             "label": "Random Walk NFTs imprinted"
-          },
-          "discount": {
-            "label": "Random Walk discount"
           },
           "used": {
             "label": "Random Walk NFTs used"

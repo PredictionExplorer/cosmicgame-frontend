@@ -7,7 +7,9 @@ import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
 import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
+import { readRandomWalkImprinted } from '../publicDataReads';
 
+import { IMPRINT_HEADER_CLASS } from './heroClasses';
 import Imprint from './Imprint';
 
 interface PageProps {
@@ -30,9 +32,11 @@ export const revalidate = 300;
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const [meta, imprint] = await Promise.all([
+  // The header reads the same count (React cache), and the hero's plate shows its newest token.
+  const [meta, imprint, imprinted] = await Promise.all([
     getTranslations({ locale, namespace: 'meta' }),
     getTranslations({ locale, namespace: 'imprint' }),
+    readRandomWalkImprinted(),
   ]);
   const description = meta('mint.description');
   const inLanguage = jsonLdInLanguage(locale);
@@ -58,7 +62,12 @@ export default async function Page({ params }: PageProps) {
             ),
           ]}
         />
-        <Imprint seoSummary={<PublicDataRouteSeoSummary route="imprint" />} />
+        <Imprint
+          seoSummary={
+            <PublicDataRouteSeoSummary route="imprint" className={IMPRINT_HEADER_CLASS} />
+          }
+          latestSeed={imprinted.data}
+        />
       </>
     </PageMessages>
   );

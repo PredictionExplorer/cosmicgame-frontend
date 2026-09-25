@@ -604,17 +604,18 @@ describe('server-rendered page headers', () => {
 
       // Read from the Random Walk contract.
       expect(figureValue('imprinted')).toHaveTextContent(/^4,115$/);
-      expect(figureValue('discount')).toHaveTextContent(
-        `${protocolFacts.randomWalkDiscountPercentage}%`,
-      );
       expect(figureValue('used')).toHaveTextContent(/^3$/);
       // The imprint cost is the panel's figure, shown once where it is paid;
-      // the gesture cost and the live cycle belong to the gesture form.
-      for (const id of ['imprintCost', 'cost', 'cycle']) {
+      // the gesture cost and the live cycle belong to the gesture form. The
+      // constant reduction is stated once, in the lede, not as a figure (V231).
+      for (const id of ['imprintCost', 'cost', 'cycle', 'discount']) {
         expect(document.querySelector(`[data-figure="${id}"]`)).toBeNull();
       }
-      // Three short figures: one row on phones.
-      expect(document.querySelector('dl')).toHaveAttribute('data-layout', 'strip');
+      expect(
+        screen.getByText(new RegExp(`${protocolFacts.randomWalkDiscountPercentage}%`)),
+      ).toBeInTheDocument();
+      // Two figures: one row of two on phones.
+      expect(document.querySelector('dl')).toHaveAttribute('data-layout', 'grid');
       // The source names where the figures come from: the chain and the API.
       expect(
         screen.getByText(new RegExp(seoMessages.publicData.routes.imprint.source)),

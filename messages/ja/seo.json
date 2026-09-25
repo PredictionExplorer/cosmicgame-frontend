@@ -79,7 +79,7 @@
       },
       "imprint": {
         "heading": "Random Walk NFTの刻印",
-        "description": "Cosmic Signatureに参加するためにRandom Walk NFTを刻印します。未使用のRandom Walk NFTはそれぞれ1回のETH一筆に添付でき、一筆の費用が50%引き下げられます。",
+        "description": "Random Walk NFTを1つ添えると、ETH一筆1回の費用が50%下がります。ここで刻印し、選んだ一筆に添えられます。",
         "source": "Random Walk NFTコントラクトとCosmic Signature公開API",
         "links": {
           "cycle": "進行中のパフォーマンス・サイクルを開く",
@@ -89,9 +89,6 @@
         "cards": {
           "imprinted": {
             "label": "刻印済みのRandom Walk NFT"
-          },
-          "discount": {
-            "label": "Random Walk割引"
           },
           "used": {
             "label": "使用済みのRandom Walk NFT"

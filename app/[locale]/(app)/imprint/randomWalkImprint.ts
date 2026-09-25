@@ -1,12 +1,17 @@
 'use client';
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { decodeEventLog, zeroAddress, type Log } from 'viem';
+import { decodeEventLog, isAddress, zeroAddress, type Log } from 'viem';
+import { usePublicClient } from 'wagmi';
 
-import { randomWalkNftAbi } from '@/contracts/generated';
+import { cosmicGameAbi, randomWalkNftAbi } from '@/contracts/generated';
 
+import { activeChain } from '@/config/chains';
+import { useContractAddresses } from '@/contexts/ContractAddressesContext';
+import { useUsedRWLKNFTs } from '@/hooks/useApiQuery';
 import useRWLKNFTContract from '@/hooks/useRWLKNFTContract';
 import { sameAddress } from '@/utils/format';
+import { toFiniteNumber } from '@/utils/finiteNumber';
 
 /** Imprint cost query: it rises after every imprint, so it refreshes on its own. */
 const COST_REFRESH_MS = 30_000;
@@ -72,6 +77,99 @@ export function useImprintCost() {
     },
   });
   return { costWei: query.data ?? null, isError: query.isError && query.data === undefined };
+}
+
+/** The query key of the collection's next token id, for refreshing after an imprint. */
+export const nextRandomWalkKey = ['rwlkNextTokenId'] as const;
+
+/**
+ * The newest Random Walk NFT's id: the collection's next id less one (ids
+ * start at 0). `seed` is the server's reading of the next id, so the plate
+ * is in the first HTML; the client keeps it fresh. `null` while nothing has
+ * been read, or when the collection is empty.
+ */
+export function useLatestRandomWalk(seed: number | null) {
+  const contract = useRWLKNFTContract();
+  const query = useQuery({
+    queryKey: nextRandomWalkKey,
+    enabled: !!contract,
+    refetchInterval: COST_REFRESH_MS,
+    queryFn: async () => {
+      const next = await contract?.read.nextTokenId?.();
+      const value = toFiniteNumber(next);
+      if (value === null) throw new Error('Random Walk next token id read returned no value');
+      return value;
+    },
+  });
+  const next = query.data ?? seed;
+  return {
+    latest: next !== null && next > 0 ? next - 1 : null,
+    isError: query.isError && next === null,
+  };
+}
+
+/** Whether a Random Walk NFT has reduced a gesture yet. */
+export type RandomWalkUse = 'used' | 'unused' | 'unknown';
+
+/**
+ * One token's use. The game contract's own record (`usedRandomWalkNfts`) is
+ * the authority; the indexer's list can lag behind a recent gesture, so it
+ * can only say "used" (a use never reverts), never "unused". Without a
+ * chain reading the answer is `unknown`, and the page offers no gesture.
+ */
+export function randomWalkUse(
+  tokenId: number,
+  onChain: ReadonlyMap<number, boolean> | null,
+  indexedUsed: ReadonlySet<number> | null,
+): RandomWalkUse {
+  const recorded = onChain?.get(tokenId);
+  if (recorded !== undefined) return recorded ? 'used' : 'unused';
+  return indexedUsed?.has(tokenId) ? 'used' : 'unknown';
+}
+
+/**
+ * The use of each of an account's Random Walk NFTs: read from the game
+ * contract in one multicall, with the indexer's list as a second source for
+ * "used". `checking` while the contract read is in flight; once it has
+ * failed, tokens the indexer does not list stay `unknown`.
+ */
+export function useRandomWalkUse(tokenIds: readonly number[] | null) {
+  const publicClient = usePublicClient({ chainId: activeChain.id });
+  const { cosmicGame } = useContractAddresses();
+  const indexed = useUsedRWLKNFTs();
+  const game = cosmicGame && isAddress(cosmicGame) ? cosmicGame : null;
+  const enabled = !!publicClient && !!game && !!tokenIds && tokenIds.length > 0;
+  const onChain = useQuery({
+    queryKey: ['rwlkUsedOnChain', game, tokenIds?.join(',') ?? ''],
+    enabled,
+    staleTime: 30_000,
+    queryFn: async () => {
+      const ids = tokenIds ?? [];
+      const results = await publicClient!.multicall({
+        allowFailure: true,
+        contracts: ids.map((id) => ({
+          address: game!,
+          abi: cosmicGameAbi,
+          functionName: 'usedRandomWalkNfts' as const,
+          args: [BigInt(id)] as const,
+        })),
+      });
+      const used = new Map<number, boolean>();
+      results.forEach((result, index) => {
+        if (result.status === 'success') used.set(ids[index]!, result.result !== 0n);
+      });
+      return used;
+    },
+  });
+  const indexedUsed = indexed.data
+    ? new Set(indexed.data.map((entry) => Number(entry.RWalkTokenId)))
+    : null;
+  const chain = onChain.data ?? null;
+  return {
+    useOf: (tokenId: number) => randomWalkUse(tokenId, chain, indexedUsed),
+    /** The contract read is still on its way. */
+    checking: enabled && onChain.isPending,
+  };
 }
 
 /** The query key of an account's Random Walk NFTs, for refreshing after an imprint. */

@@ -79,7 +79,7 @@
       },
       "imprint": {
         "heading": "Random Walk NFT 각인",
-        "description": "Cosmic Signature 참여를 위해 Random Walk NFT를 각인합니다. 사용하지 않은 Random Walk NFT는 ETH 제스처 하나에 첨부해 제스처 비용을 50% 낮출 수 있습니다.",
+        "description": "Random Walk NFT 하나로 ETH 제스처 한 번의 비용이 50% 낮아집니다. 여기에서 각인한 뒤 원하는 제스처에 첨부할 수 있습니다.",
         "source": "Random Walk NFT 컨트랙트 및 Cosmic Signature 공개 API",
         "links": {
           "cycle": "진행 중인 퍼포먼스 사이클 열기",
@@ -89,9 +89,6 @@
         "cards": {
           "imprinted": {
             "label": "각인된 Random Walk NFT"
-          },
-          "discount": {
-            "label": "Random Walk 할인"
           },
           "used": {
             "label": "사용된 Random Walk NFT"

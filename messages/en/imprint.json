@@ -5,8 +5,7 @@
   },
   "page": {
     "title": "Imprint Random Walk NFT",
-    "subtitle": "Own a Random Walk NFT and receive a 50% reduction in ETH Gesture Cost",
-    "description": "Each Random Walk NFT gives this reduction once, so you choose the moment. This one-time use is separate from anchoring Random Walk NFTs for Anchored-NFT Stellar Selection eligibility.",
+    "subtitle": "A Random Walk NFT takes 50% off the cost of one ETH gesture. Imprint one here, then attach it to the gesture you choose.",
     "currentCost": "Current imprint cost",
     "costBreakdown": "Contract cost {base} ETH, plus a {percent}% buffer so the imprint still succeeds if the cost rises before it confirms.",
     "submit": "Imprint now",
@@ -17,9 +16,21 @@
     "why": {
       "title": "What an imprint gives you"
     },
-    "compare": {
-      "label": "ETH Gesture Cost with a Random Walk NFT",
-      "caption": "{percent}% off the current ETH Gesture Cost, once per NFT."
+    "benefits": {
+      "gesture": {
+        "title": "Half off one ETH gesture",
+        "label": "Saved on one ETH gesture at today’s cost",
+        "caption": "Half of today’s ETH Gesture Cost of {cost} ETH. Each Random Walk NFT gives this once, in the gesture you choose."
+      },
+      "anchoring": {
+        "title": "Anchored-NFT Stellar Selection",
+        "body": "Anchored, a Random Walk NFT takes part in the Anchored-NFT Stellar Selection: at every finalization, {count, plural, one {# anchored Random Walk NFT is} other {# anchored Random Walk NFTs are}} selected, and each one’s holder receives {cst} CST and a Cosmic Signature NFT. Using an NFT in a gesture does not stop it from being anchored.",
+        "link": "See how anchoring works"
+      }
+    },
+    "latest": {
+      "meta": "Latest imprint",
+      "earlierAria": "Imprinted just before"
     },
     "success": {
       "eyebrow": "Imprinted",
@@ -32,6 +43,8 @@
       "used": "Used",
       "unused": "Unused",
       "use": "Use in a gesture",
+      "checking": "Checking",
+      "unknownNote": "Whether these Random Walk NFTs were used could not be checked right now, so none is offered for a gesture yet.",
       "empty": "This wallet holds no Random Walk NFTs yet.",
       "error": "The Random Walk NFTs in this wallet could not be read."
     }
