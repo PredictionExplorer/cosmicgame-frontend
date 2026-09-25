@@ -649,11 +649,15 @@ const EnduranceTimelineChart: FC<EnduranceTimelineChartProps> = ({
     [newWindowLinks, t],
   );
 
-  const loading = hasRound && (isLoading || clock.status === 'loading');
+  // A cycle without a gesture had no lead, whatever its end: saying so needs no clock.
+  const noGestures = hasRound && !isLoading && !isError && (gestures?.length ?? 0) === 0;
+  const loading = hasRound && !noGestures && (isLoading || clock.status === 'loading');
   const ready = hasRound && !loading && !isError && clock.status === 'ready';
   const readout = useEnduranceReadout(ready && gantt.lanes.length > 0 ? gantt : null);
   const state = !hasRound ? (
     <EmptyState headingLevel={4} variant="inline" title={t('charts.endurance.selectCycle')} />
+  ) : noGestures ? (
+    <EmptyState headingLevel={4} variant="inline" title={t('charts.endurance.empty')} />
   ) : loading ? (
     // As many lanes as the server counted (or a page's worth), at most the lanes shown.
     <EnduranceGanttSkeleton

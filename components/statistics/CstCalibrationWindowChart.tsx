@@ -374,7 +374,9 @@ const CstCalibrationWindowChart: FC<CstCalibrationWindowChartProps> = ({
       <EmptyState headingLevel={4} variant="inline" title={t('charts.cstWindow.selectCycle')} />
     );
   }
-  if (isError || clock.status === 'error') {
+  // A cycle without a gesture has nothing to draw, whatever its end: that needs no clock.
+  const noGestures = !isLoading && !isError && (gestures?.length ?? 0) === 0;
+  if (isError || (clock.status === 'error' && !noGestures)) {
     return (
       <ErrorState
         headingLevel={4}
@@ -391,7 +393,7 @@ const CstCalibrationWindowChart: FC<CstCalibrationWindowChartProps> = ({
       endTs={clock.endTs}
       nowTs={clock.nowTs}
       label={label}
-      loading={isLoading || clock.status === 'loading'}
+      loading={!noGestures && (isLoading || clock.status === 'loading')}
     />
   );
 };

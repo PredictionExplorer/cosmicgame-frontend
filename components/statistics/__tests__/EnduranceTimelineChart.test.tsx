@@ -292,6 +292,20 @@ describe('EnduranceTimelineChart', () => {
     expect(screen.getByText('No lead activity in this cycle yet.')).toBeInTheDocument();
   });
 
+  it('says a finalized cycle without gestures had no lead, without waiting on its end', () => {
+    // Regression: the empty embed of a past cycle showed an error when its end could not be
+    // read, although a cycle without gestures has no lead whenever it ended.
+    mockUseGestureListByCycle.mockReturnValue(ok([]));
+    mockUseRoundInfo.mockReturnValue({ data: undefined, isLoading: false, isError: true });
+    const { rerender } = render(
+      <EnduranceTimelineChart round={7} isLive={false} label="Endurance" />,
+    );
+    expect(screen.getByText('No lead activity in this cycle yet.')).toBeInTheDocument();
+    mockUseRoundInfo.mockReturnValue({ data: undefined, isLoading: true, isError: false });
+    rerender(<EnduranceTimelineChart round={7} isLive={false} label="Endurance" />);
+    expect(screen.getByText('No lead activity in this cycle yet.')).toBeInTheDocument();
+  });
+
   it('has no axe violations', async () => {
     const { container } = render(<EnduranceTimelineChart round={2} isLive label="Endurance" />);
     await checkA11y(container);

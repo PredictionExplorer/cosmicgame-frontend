@@ -182,6 +182,16 @@ describe('CstCalibrationWindowChart', () => {
     expect(screen.getByRole('figure', { name: 'Window' })).toHaveTextContent(/at finalization/);
   });
 
+  it('says a cycle without gestures has no window data, without waiting on its end', () => {
+    mockUseGestureListByCycle.mockReturnValue(ok([]));
+    mockUseRoundInfo.mockReturnValue({ data: undefined, isLoading: false, isError: true });
+    render(<CstCalibrationWindowChart round={7} isLive={false} label="Window" />);
+    expect(
+      screen.queryByText('Failed to load Calibration Window timeline'),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText(/No per-gesture Calibration Window data/)).toBeInTheDocument();
+  });
+
   it('waits for a finalized cycle’s end, and offers a retry when it cannot be read', async () => {
     const user = userEvent.setup();
     mockUseRoundInfo.mockReturnValue({ data: undefined, isLoading: true, isError: false });
