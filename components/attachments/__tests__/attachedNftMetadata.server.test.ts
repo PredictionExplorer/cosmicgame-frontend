@@ -5,9 +5,9 @@ import { ContractFunctionExecutionError, ContractFunctionRevertedError, erc721Ab
 
 import { IPFS_GATEWAYS } from '../attachedNftMetadata';
 import {
+  MAX_CACHED_IMAGE_BYTES,
   MAX_IMAGE_BYTES,
   assertPublicHost,
-  capStream,
   displayContractName,
   fetchAttachedNftImage,
   fetchPublicHttps,
@@ -16,6 +16,7 @@ import {
   isPublicAddress,
   isPublicHttpsUrl,
   readAttachedNftContractName,
+  readAttachedNftMetadataDocument,
   resolveAttachedNftDisplay,
   withSameOriginImage,
 } from '../attachedNftMetadata.server';
@@ -35,6 +36,7 @@ beforeEach(() => {
   // Every name resolves to a public address unless a test says otherwise.
   mockLookup.mockReset().mockResolvedValue([{ address: '93.184.215.14', family: 4 }]);
   mockReadContract.mockReset().mockRejectedValue(new Error('no chain in tests'));
+  mockDataCache.clear();
 });
 
 const mockRecords = jest.fn();
@@ -43,8 +45,22 @@ jest.mock('../../../services/api/donations', () => ({
   get_donations_nft_list: () => mockRecords(),
 }));
 // lexicon-allow-end
+/**
+ * `unstable_cache` as Next runs it: an entry per key and arguments, stored
+ * as JSON, and nothing stored when the callback throws.
+ */
+const mockDataCache = new Map<string, string>();
 jest.mock('next/cache', () => ({
-  unstable_cache: <T extends (...args: never[]) => unknown>(fn: T) => fn,
+  unstable_cache:
+    <A extends unknown[], R>(fn: (...args: A) => Promise<R>, keyParts: string[] = []) =>
+    async (...args: A): Promise<R> => {
+      const key = JSON.stringify([keyParts, args]);
+      const hit = mockDataCache.get(key);
+      if (hit !== undefined) return JSON.parse(hit) as R;
+      const result = await fn(...args);
+      if (result !== undefined) mockDataCache.set(key, JSON.stringify(result));
+      return result;
+    },
 }));
 
 const CONTRACT = '0x17f4BAa9D35Ee54fFbCb2608e20786473c7aa49f';
@@ -57,8 +73,51 @@ function jsonResponse(body: unknown, status = 200) {
   });
 }
 
-function imageResponse(type: string, status = 200) {
-  return new Response(new Uint8Array([1, 2, 3]), { status, headers: { 'Content-Type': type } });
+function imageResponse(type: string, status = 200, bytes = new Uint8Array([1, 2, 3])) {
+  return new Response(bytes, { status, headers: { 'Content-Type': type } });
+}
+
+/**
+ * A `fetch` whose response behaves like one Next's data cache stores: the
+ * body is teed and one copy is read to its end for the cache, whatever the
+ * caller does with the other. The upstream stops only when the request's
+ * signal is aborted (it gives out after 64 MB, so a regression fails the
+ * test instead of hanging the run).
+ */
+function cachingFetchOfEndlessBody(contentType: string, chunkBytes = 1024 * 1024) {
+  const state = { pulled: 0, signals: [] as AbortSignal[] };
+  const fetchMock = jest.fn((_url: string, init: RequestInit = {}) => {
+    const signal = init.signal ?? undefined;
+    if (signal) state.signals.push(signal);
+    const upstream = new ReadableStream<Uint8Array>({
+      async pull(controller) {
+        await new Promise((resolve) => setImmediate(resolve));
+        if (signal?.aborted) {
+          controller.error(signal.reason);
+          return;
+        }
+        if (state.pulled >= 64 * 1024 * 1024) {
+          controller.close();
+          return;
+        }
+        state.pulled += chunkBytes;
+        controller.enqueue(new Uint8Array(chunkBytes));
+      },
+    });
+    const [cacheCopy, body] = upstream.tee();
+    void new Response(cacheCopy).arrayBuffer().catch(() => {});
+    return Promise.resolve(
+      new Response(body, { status: 200, headers: { 'Content-Type': contentType } }),
+    );
+  });
+  return { fetchMock, state };
+}
+
+/** Whether the upstream stays still once the reader has given up. */
+async function expectUpstreamStopped(state: { pulled: number }) {
+  const pulledAtStop = state.pulled;
+  await new Promise((resolve) => setTimeout(resolve, 30));
+  expect(state.pulled).toBe(pulledAtStop);
 }
 
 describe('isPublicHttpsUrl', () => {
@@ -202,6 +261,14 @@ describe('fetchPublicHttps', () => {
     expect(global.fetch).not.toHaveBeenCalled();
   });
 
+  it('never reads through the fetch data cache, whatever the caller asks', async () => {
+    global.fetch = jest.fn().mockResolvedValue(jsonResponse({ name: 'GBC' }));
+    await fetchPublicHttps('https://art.example.com/1.json', { next: { revalidate: 60 } });
+    const [, init] = (global.fetch as jest.Mock).mock.calls[0] as [string, RequestInit];
+    expect(init).toMatchObject({ cache: 'no-store', redirect: 'manual' });
+    expect(init).not.toHaveProperty('next');
+  });
+
   it('checks the address of every redirect hop', async () => {
     global.fetch = jest
       .fn()
@@ -211,32 +278,6 @@ describe('fetchPublicHttps', () => {
       .mockResolvedValueOnce([{ address: '169.254.169.254', family: 4 }]);
     await expect(fetchPublicHttps('https://art.example.com/1.json')).rejects.toThrow('non-public');
     expect(global.fetch).toHaveBeenCalledTimes(1);
-  });
-});
-
-describe('capStream', () => {
-  function streamOf(chunks: number[]) {
-    return new ReadableStream<Uint8Array>({
-      start(controller) {
-        for (const size of chunks) controller.enqueue(new Uint8Array(size));
-        controller.close();
-      },
-    });
-  }
-
-  it('passes a body within the cap through whole', async () => {
-    const onEnd = jest.fn();
-    const bytes = await new Response(capStream(streamOf([4, 4]), 8, onEnd)).arrayBuffer();
-    expect(bytes.byteLength).toBe(8);
-    expect(onEnd).toHaveBeenCalledWith(true);
-  });
-
-  it('cuts a body off once it passes the cap, declared length or not', async () => {
-    const onEnd = jest.fn();
-    await expect(
-      new Response(capStream(streamOf([4, 4, 4]), 8, onEnd)).arrayBuffer(),
-    ).rejects.toThrow();
-    expect(onEnd).toHaveBeenCalledWith(false);
   });
 });
 
@@ -270,6 +311,7 @@ describe('readAttachedNftContractName', () => {
       ),
     );
     await expect(readAttachedNftContractName(CONTRACT)).resolves.toBeUndefined();
+    mockDataCache.clear();
     mockReadContract.mockRejectedValue(new Error('network'));
     await expect(readAttachedNftContractName(CONTRACT)).resolves.toBeUndefined();
   });
@@ -336,7 +378,7 @@ describe('resolveAttachedNftDisplay', () => {
     global.fetch = originalFetch;
   });
 
-  it('reads the document through the data cache and serves its image from our origin', async () => {
+  it('reads the document and serves its image from our origin', async () => {
     mockReadContract.mockResolvedValue('Blueberry Club');
     global.fetch = jest.fn().mockImplementation((url: string) =>
       url.startsWith(GATEWAY)
@@ -369,7 +411,7 @@ describe('resolveAttachedNftDisplay', () => {
     });
     expect(global.fetch).toHaveBeenCalledWith(
       `${GATEWAY}bafy-doc/4035`,
-      expect.objectContaining({ next: { revalidate: 86_400 } }),
+      expect.objectContaining({ cache: 'no-store' }),
     );
   });
 
@@ -386,6 +428,47 @@ describe('resolveAttachedNftDisplay', () => {
   });
 });
 
+describe('readAttachedNftMetadataDocument', () => {
+  const originalFetch = global.fetch;
+
+  afterEach(() => {
+    global.fetch = originalFetch;
+  });
+
+  it('keeps the normalized document, not the upstream body', async () => {
+    global.fetch = jest.fn().mockResolvedValue(jsonResponse({ name: 'GBC #1', junk: 'x' }));
+    await expect(
+      readAttachedNftMetadataDocument('https://art.example.com/1.json'),
+    ).resolves.toEqual({ name: 'GBC #1' });
+    await readAttachedNftMetadataDocument('https://art.example.com/1.json');
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect([...mockDataCache.values()].join()).not.toContain('junk');
+  });
+
+  it('never keeps a failed read', async () => {
+    global.fetch = jest.fn().mockRejectedValueOnce(new Error('gateway down'));
+    await expect(
+      readAttachedNftMetadataDocument('https://art.example.com/2.json'),
+    ).resolves.toBeNull();
+    (global.fetch as jest.Mock).mockResolvedValue(jsonResponse({ name: 'GBC #2' }));
+    await expect(
+      readAttachedNftMetadataDocument('https://art.example.com/2.json'),
+    ).resolves.toMatchObject({ name: 'GBC #2' });
+  });
+
+  it('aborts an endless document at the cap, even when a cache keeps a copy', async () => {
+    const { fetchMock, state } = cachingFetchOfEndlessBody('application/json', 64 * 1024);
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    await expect(
+      readAttachedNftMetadataDocument('https://art.example.com/endless.json'),
+    ).resolves.toBeNull();
+    expect(state.signals).toHaveLength(1);
+    expect(state.signals[0]!.aborted).toBe(true);
+    await expectUpstreamStopped(state);
+  });
+});
+
 describe('fetchAttachedNftImage', () => {
   const originalFetch = global.fetch;
 
@@ -393,7 +476,7 @@ describe('fetchAttachedNftImage', () => {
     global.fetch = originalFetch;
   });
 
-  it('streams the first raster image a gateway serves', async () => {
+  it('serves the first raster image a gateway answers with', async () => {
     global.fetch = jest
       .fn()
       .mockImplementation((url: string) =>
@@ -406,12 +489,50 @@ describe('fetchAttachedNftImage', () => {
 
     const image = await fetchAttachedNftImage(`${GATEWAY}bafy/1.png`);
     expect(image?.contentType).toBe('image/png');
+    expect(Array.from(image!.bytes)).toEqual([1, 2, 3]);
     expect(global.fetch).toHaveBeenCalledTimes(IPFS_GATEWAYS.length);
-    // Kept in the data cache: the optimizer's next width reuses the bytes.
     expect(global.fetch).toHaveBeenCalledWith(
       `${IPFS_GATEWAYS[1]}bafy/1.png`,
-      expect.objectContaining({ next: { revalidate: 604_800 } }),
+      expect.objectContaining({ cache: 'no-store' }),
     );
+  });
+
+  it('aborts every request once it is done, the refused ones at once', async () => {
+    const signals: AbortSignal[] = [];
+    global.fetch = jest.fn().mockImplementation((url: string, init: RequestInit) => {
+      signals.push(init.signal!);
+      return Promise.resolve(
+        url.startsWith(IPFS_GATEWAYS[1])
+          ? imageResponse('image/png')
+          : imageResponse('text/plain', 429),
+      );
+    });
+
+    await fetchAttachedNftImage(`${GATEWAY}bafy/1.png`);
+    expect(signals).toHaveLength(IPFS_GATEWAYS.length);
+    expect(signals.every((signal) => signal.aborted)).toBe(true);
+  });
+
+  it('keeps a small image in the data cache, so the next width is served at once', async () => {
+    global.fetch = jest.fn().mockImplementation(() => Promise.resolve(imageResponse('image/png')));
+    await fetchAttachedNftImage('https://art.example.com/1.png');
+    const again = await fetchAttachedNftImage('https://art.example.com/1.png');
+    expect(Array.from(again!.bytes)).toEqual([1, 2, 3]);
+    expect(again?.contentType).toBe('image/png');
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('serves an image too large for a cache entry without caching it', async () => {
+    const large = new Uint8Array(MAX_CACHED_IMAGE_BYTES + 1);
+    global.fetch = jest
+      .fn()
+      .mockImplementation(() => Promise.resolve(imageResponse('image/png', 200, large)));
+    const first = await fetchAttachedNftImage('https://art.example.com/large.png');
+    const second = await fetchAttachedNftImage('https://art.example.com/large.png');
+    expect(first?.bytes.byteLength).toBe(large.byteLength);
+    expect(second?.bytes.byteLength).toBe(large.byteLength);
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+    expect(mockDataCache.size).toBe(0);
   });
 
   it('refuses SVG, which could run script on our origin', async () => {
@@ -419,24 +540,14 @@ describe('fetchAttachedNftImage', () => {
     await expect(fetchAttachedNftImage('https://art.example.com/1.svg')).resolves.toBeNull();
   });
 
-  it('stops a body without a declared length at the size cap', async () => {
-    let sent = 0;
-    const endless = new ReadableStream<Uint8Array>({
-      pull(controller) {
-        const chunk = new Uint8Array(1024 * 1024);
-        sent += chunk.byteLength;
-        controller.enqueue(chunk);
-      },
-    });
-    global.fetch = jest
-      .fn()
-      .mockResolvedValue(
-        new Response(endless, { status: 200, headers: { 'Content-Type': 'image/png' } }),
-      );
+  it('aborts an endless body at the size cap, even when a cache keeps a copy', async () => {
+    const { fetchMock, state } = cachingFetchOfEndlessBody('image/png');
+    global.fetch = fetchMock as unknown as typeof fetch;
 
-    const image = await fetchAttachedNftImage('https://art.example.com/1.png');
-    expect(image).not.toBeNull();
-    await expect(new Response(image!.body).arrayBuffer()).rejects.toThrow();
-    expect(sent).toBeLessThanOrEqual(MAX_IMAGE_BYTES + 2 * 1024 * 1024);
+    await expect(fetchAttachedNftImage('https://art.example.com/1.png')).resolves.toBeNull();
+    expect(state.signals).toHaveLength(1);
+    expect(state.signals[0]!.aborted).toBe(true);
+    expect(state.pulled).toBeLessThanOrEqual(MAX_IMAGE_BYTES + 2 * 1024 * 1024);
+    await expectUpstreamStopped(state);
   });
 });

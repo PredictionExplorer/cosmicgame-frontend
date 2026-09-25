@@ -66,29 +66,23 @@ export class ResponseTooLargeError extends Error {
   }
 }
 
-/**
- * The body of `response` as text, read chunk by chunk and abandoned as soon
- * as it passes `maxBytes`, whether or not the server declared a length.
- */
-export async function readCappedText(response: Response, maxBytes: number): Promise<string> {
+/** Refuses a response whose declared length is already over the cap, before reading it. */
+function assertDeclaredLength(response: Response, maxBytes: number): void {
   const declared = Number(response.headers?.get('content-length') ?? Number.NaN);
   if (Number.isFinite(declared) && declared > maxBytes) {
     void response.body?.cancel().catch(() => {});
     throw new ResponseTooLargeError(maxBytes);
   }
-  const body = response.body;
-  if (!body) {
-    // Only environments without body streams take this path.
-    const text = await response.text();
-    if (new TextEncoder().encode(text).byteLength > maxBytes) {
-      throw new ResponseTooLargeError(maxBytes);
-    }
-    return text;
-  }
+}
+
+/** A stream read to its end, abandoned as soon as it passes `maxBytes`. */
+async function readCappedStream(
+  body: ReadableStream<Uint8Array>,
+  maxBytes: number,
+): Promise<Uint8Array<ArrayBuffer>> {
   const reader = body.getReader();
-  const decoder = new TextDecoder();
+  const chunks: Uint8Array[] = [];
   let received = 0;
-  let text = '';
   for (;;) {
     const { done, value } = await reader.read();
     if (done) break;
@@ -97,9 +91,48 @@ export async function readCappedText(response: Response, maxBytes: number): Prom
       void reader.cancel().catch(() => {});
       throw new ResponseTooLargeError(maxBytes);
     }
-    text += decoder.decode(value, { stream: true });
+    chunks.push(value);
   }
-  return text + decoder.decode();
+  const bytes = new Uint8Array(received);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return bytes;
+}
+
+/**
+ * The body of `response` as bytes, read chunk by chunk and abandoned as soon
+ * as it passes `maxBytes`, whether or not the server declared a length.
+ * Abandoning the body does not end the request: whoever made it aborts it.
+ */
+export async function readCappedBytes(
+  response: Response,
+  maxBytes: number,
+): Promise<Uint8Array<ArrayBuffer>> {
+  assertDeclaredLength(response, maxBytes);
+  if (!response.body) {
+    // Only environments without body streams take this path.
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    if (bytes.byteLength > maxBytes) throw new ResponseTooLargeError(maxBytes);
+    return bytes;
+  }
+  return readCappedStream(response.body, maxBytes);
+}
+
+/** The body of `response` as text, under the same cap as `readCappedBytes`. */
+export async function readCappedText(response: Response, maxBytes: number): Promise<string> {
+  assertDeclaredLength(response, maxBytes);
+  if (!response.body) {
+    // Only environments without body streams take this path.
+    const text = await response.text();
+    if (new TextEncoder().encode(text).byteLength > maxBytes) {
+      throw new ResponseTooLargeError(maxBytes);
+    }
+    return text;
+  }
+  return new TextDecoder().decode(await readCappedStream(response.body, maxBytes));
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -190,33 +223,35 @@ export function metadataUrlCandidates(uri: string): string[] {
   return httpUrl ? [httpUrl] : [];
 }
 
-/** Extra `fetch` options for a metadata read (the server passes its cache policy). */
-export type MetadataFetchInit = Omit<RequestInit, 'signal' | 'headers'> & {
-  next?: { revalidate?: number | false };
-};
-
 /** A `fetch` stand-in: the server passes one that checks every redirect hop. */
 export type MetadataFetcher = (url: string, init: RequestInit) => Promise<Response>;
 
+/**
+ * One candidate's document. The request ends with this call, whatever the
+ * outcome: the deadline covers the whole body, and every exit aborts the
+ * request, because giving up on a body does not stop a fetcher that keeps
+ * its own copy (Next's data cache tees every body it caches) from reading
+ * the rest of an oversized or endless document. `stop` aborts it early,
+ * when another candidate has already answered.
+ */
 async function fetchMetadataFromUrl(
   url: string,
-  init: MetadataFetchInit | undefined,
   timeoutMs: number,
   fetcher: MetadataFetcher,
+  stop?: AbortSignal,
 ): Promise<AttachedNftMetadata> {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const abort = () => controller.abort();
+  const timer = setTimeout(abort, timeoutMs);
+  stop?.addEventListener('abort', abort, { once: true });
   try {
     const response = await fetcher(url, {
-      ...init,
       headers: { Accept: 'application/json' },
       signal: controller.signal,
     });
     if (!response.ok) {
-      void response.body?.cancel().catch(() => {});
       throw new Error(`Failed to fetch NFT metadata (${response.status})`);
     }
-    // The timer stays armed until the whole body is read (see `finally`).
     const data: unknown = JSON.parse(await readCappedText(response, MAX_METADATA_BYTES));
     const normalized = normalizeAttachedNftMetadata(data, url);
     if (!normalized) {
@@ -225,12 +260,12 @@ async function fetchMetadataFromUrl(
     return normalized;
   } finally {
     clearTimeout(timer);
+    stop?.removeEventListener('abort', abort);
+    abort();
   }
 }
 
 export interface FetchAttachedNftMetadataOptions {
-  /** `fetch` options for every candidate (the server's data-cache policy). */
-  init?: MetadataFetchInit;
   /** Skips candidates that fail this check (the server's public-host guard). */
   allowUrl?: (url: string) => boolean;
   /** Reads each candidate (default: the global `fetch`). */
@@ -239,14 +274,14 @@ export interface FetchAttachedNftMetadataOptions {
 }
 
 /**
- * Reads a metadata URI: an `ipfs://` URI races every gateway and the first
- * usable document wins; an http(s) URI is read as is. Resolves to null for a
- * scheme it cannot read and rejects when every candidate failed.
+ * Reads a metadata URI: an `ipfs://` URI races every gateway, the first
+ * usable document wins and the other requests are aborted; an http(s) URI
+ * is read as is. Resolves to null for a scheme it cannot read and rejects
+ * when every candidate failed.
  */
 export async function fetchAttachedNftMetadata(
   uri: string,
   {
-    init,
     allowUrl,
     fetcher = (url, requestInit) => fetch(url, requestInit),
     timeoutMs = METADATA_FETCH_TIMEOUT_MS,
@@ -254,16 +289,20 @@ export async function fetchAttachedNftMetadata(
 ): Promise<AttachedNftMetadata | null> {
   const candidates = metadataUrlCandidates(uri).filter((url) => !allowUrl || allowUrl(url));
   if (candidates.length === 0) return null;
-  const read = (url: string) => fetchMetadataFromUrl(url, init, timeoutMs, fetcher);
-  if (candidates.length === 1) return read(candidates[0]!);
+  if (candidates.length === 1) return fetchMetadataFromUrl(candidates[0]!, timeoutMs, fetcher);
 
+  const race = new AbortController();
   try {
-    return await Promise.any(candidates.map(read));
+    return await Promise.any(
+      candidates.map((url) => fetchMetadataFromUrl(url, timeoutMs, fetcher, race.signal)),
+    );
   } catch (error) {
     if (error instanceof AggregateError && error.errors.length > 0) {
       throw error.errors[0];
     }
     throw error;
+  } finally {
+    race.abort();
   }
 }
 

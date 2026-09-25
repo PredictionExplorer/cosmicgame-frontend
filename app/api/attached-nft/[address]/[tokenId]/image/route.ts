@@ -23,10 +23,10 @@ function miss(status: 400 | 404 | 502) {
 
 /**
  * GET /api/attached-nft/<contract>/<tokenId>/image — the image of an NFT
- * attached to a gesture, streamed from the first public source that serves
- * it. `<NFTImage>` requests it through the Next image optimizer, so the
- * browser downloads a resized copy from our origin instead of the original
- * from a slow public IPFS gateway.
+ * attached to a gesture, from the first public source that serves it (see
+ * `fetchAttachedNftImage`). `<NFTImage>` requests it through the Next image
+ * optimizer, so the browser downloads a resized copy from our origin instead
+ * of the original from a slow public IPFS gateway.
  */
 export async function GET(_request: Request, { params }: RouteParams) {
   const { address, tokenId: rawTokenId } = await params;
@@ -48,10 +48,11 @@ export async function GET(_request: Request, { params }: RouteParams) {
 
   const headers = new Headers({
     'Content-Type': image.contentType,
+    'Content-Length': String(image.bytes.byteLength),
     'Cache-Control': IMAGE_CACHE,
     // Third-party bytes on our origin: never sniffed, never run.
     'Content-Security-Policy': "default-src 'none'; sandbox",
     'X-Content-Type-Options': 'nosniff',
   });
-  return new Response(image.body, { headers });
+  return new Response(image.bytes, { headers });
 }

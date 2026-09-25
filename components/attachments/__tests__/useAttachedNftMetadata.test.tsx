@@ -183,20 +183,16 @@ describe('fetchAttachedNftMetadata', () => {
     expect(declared.text).not.toHaveBeenCalled();
   });
 
-  it('passes fetch options through and skips candidates the guard refuses', async () => {
+  it('skips candidates the guard refuses', async () => {
     (global.fetch as jest.Mock).mockResolvedValue(mockJsonResponse({ name: 'Guarded' }));
 
     await expect(
       fetchAttachedNftMetadata('ipfs://bafy/1', {
-        init: { next: { revalidate: 60 } },
         allowUrl: (url) => url.startsWith(GATEWAY),
       }),
     ).resolves.toMatchObject({ name: 'Guarded' });
     expect(global.fetch).toHaveBeenCalledTimes(1);
-    expect(global.fetch).toHaveBeenCalledWith(
-      `${GATEWAY}bafy/1`,
-      expect.objectContaining({ next: { revalidate: 60 } }),
-    );
+    expect(global.fetch).toHaveBeenCalledWith(`${GATEWAY}bafy/1`, expect.anything());
   });
 
   it('returns null for unusable metadata uri without fetching', async () => {
