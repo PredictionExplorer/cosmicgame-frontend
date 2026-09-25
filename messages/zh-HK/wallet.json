@@ -25,6 +25,7 @@
     "heading": "帳戶",
     "menuLabel": "{address} 的帳戶選單",
     "menuLabelWithAlert": "{address} 的帳戶選單，有可取回的分配",
+    "menuLabelWrongNetwork": "{menu}，網絡不符",
     "retrieveReady": "可取回",
     "retrieveAmount": "{amount} 可取回",
     "addCstToMetaMask": "將 CST 添加至 MetaMask",

@@ -13,26 +13,34 @@ import { wagmiConfig } from '@/config/wagmi';
 import { networkConfig, getEnvValidation } from '@/config/networks';
 import ErrorBoundary from '@/components/layout/ErrorBoundary';
 import Header from '@/components/layout/Header';
+import { LiveGameDataRefreshGate } from '@/components/layout/LiveGameDataRefresh';
 import { AppToaster } from '@/components/ui/app-toaster';
 import { SkipLink } from '@/components/ui/skip-link';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { AnchoredTokenProvider } from '@/contexts/AnchoredTokenContext';
+import { AccountDataProvider } from '@/contexts/AccountDataProvider';
 import { SystemModeProvider } from '@/contexts/SystemModeContext';
-import { ApiDataProvider } from '@/contexts/ApiDataContext';
 import { ContractAddressesProvider } from '@/contexts/ContractAddressesContext';
 import { NotificationProvider } from '@/contexts/NotificationContext';
 import { WalletUiProvider } from '@/contexts/WalletUiContext';
-import { useLiveGameDataRefresh } from '@/hooks/useLiveGameDataRefresh';
 import { installGlobalErrorHandlers } from '@/utils/globalErrorHandlers';
 import { getClientBuildInfo } from '@/lib/buildInfo';
 import { makeQueryClient } from '@/lib/queryClient';
 import { baseTransition } from '@/lib/motion';
 import { getApiBase, getApiOrigin, getRpcUrl } from '@/lib/serverRotation';
 
-// NOTE: RainbowKit (provider, modal, stylesheet) is intentionally NOT
-// imported here. It lives behind WalletUiProvider's dynamic import so the
-// wallet-modal chunk downloads only on connect intent — most sessions never
-// connect, and this was the largest chunk in the app-home bundle.
+// NOTE: what every app page downloads is kept to the wallet connection
+// (wagmi with the injected connector) and the query client. Everything else
+// loads when a page needs it:
+//   - RainbowKit (provider, modal, stylesheet): on connect intent, behind
+//     WalletUiProvider's dynamic import;
+//   - the connected wallet's reads (API client, schemas, contract hooks):
+//     while a wallet is connected (AccountDataProvider, the header's account);
+//   - the contract addresses: when a component asks for one
+//     (ContractAddressesProvider);
+//   - the chain-event refresh (RPC client, ABI): once the page observes live
+//     data (LiveGameDataRefreshGate);
+//   - the command palette: on idle, or when opened.
+// The legal pages, the FAQ and the site map download none of these.
 
 // Viem's `call()` dynamically imports CCIP helpers on revert paths; that async chunk
 // can fail after deploys or HMR and surfaces as a misleading contract read error.
@@ -46,11 +54,6 @@ const harnessUiEnabled =
 const HarnessPanel = harnessUiEnabled
   ? dynamic(() => import('@/components/dev/HarnessPanel'), { ssr: false })
   : null;
-
-function LiveGameDataRefresh() {
-  useLiveGameDataRefresh();
-  return null;
-}
 
 const envValidation = getEnvValidation();
 
@@ -165,7 +168,7 @@ export function Providers({
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <ContractAddressesProvider>
-          <LiveGameDataRefresh />
+          <LiveGameDataRefreshGate />
           <WalletUiProvider>
             {/* Framer Motion defaults for the app host: honour the OS "reduce
                 motion" setting (transforms and layout animations are skipped;
@@ -174,24 +177,22 @@ export function Providers({
             <MotionConfig reducedMotion="user" transition={baseTransition}>
               <ErrorBoundary>
                 <CookiesProvider>
-                  <AnchoredTokenProvider>
+                  <AccountDataProvider>
                     <SystemModeProvider>
-                      <ApiDataProvider>
-                        <NotificationProvider>
-                          <TooltipProvider delayDuration={200} skipDelayDuration={300}>
-                            <div className="site-shell flex min-h-screen flex-col">
-                              <SkipLink />
-                              <Header />
-                              <div className="min-w-0 flex-1">
-                                <ErrorBoundary>{children}</ErrorBoundary>
-                              </div>
-                              {footer}
+                      <NotificationProvider>
+                        <TooltipProvider delayDuration={200} skipDelayDuration={300}>
+                          <div className="site-shell flex min-h-screen flex-col">
+                            <SkipLink />
+                            <Header />
+                            <div className="min-w-0 flex-1">
+                              <ErrorBoundary>{children}</ErrorBoundary>
                             </div>
-                          </TooltipProvider>
-                        </NotificationProvider>
-                      </ApiDataProvider>
+                            {footer}
+                          </div>
+                        </TooltipProvider>
+                      </NotificationProvider>
                     </SystemModeProvider>
-                  </AnchoredTokenProvider>
+                  </AccountDataProvider>
                 </CookiesProvider>
               </ErrorBoundary>
             </MotionConfig>

@@ -30,7 +30,6 @@ import { AddCstToMetaMaskButton } from '@/components/common/AddCstToMetaMaskButt
 import { NavRowContent } from '@/components/layout/NavRow';
 import { SiteLink } from '@/components/layout/SiteLink';
 import { useSiteNavCopy } from '@/components/layout/useSiteNav';
-import { ConnectWalletAction } from '@/components/wallet/ConnectWalletAction';
 import { WrongNetworkBadge } from '@/components/wallet/NetworkGuard';
 import {
   WalletAccountMenuItems,
@@ -38,6 +37,7 @@ import {
   WalletNetworkMenuItems,
 } from '@/components/wallet/WalletAccountPanel';
 import { useWalletAccount } from '@/hooks/useWalletAccount';
+import { useWalletNetwork } from '@/hooks/useWalletNetwork';
 import { useActiveWeb3React } from '@/hooks/web3';
 
 /** A figure the header could not read is `null` and renders as unavailable, never as 0. */
@@ -54,15 +54,7 @@ interface AnchoredTokenCount {
   rwalk?: number;
 }
 
-export type ConnectWalletPresentation = 'menu' | 'sheet' | 'responsive';
-
 interface ConnectWalletButtonProps {
-  /**
-   * How a connected wallet opens its account: a dropdown `menu`, a bottom
-   * `sheet` for phones, or `responsive` (sheet under 768px, menu above,
-   * chosen by CSS so the first paint is right at every width).
-   */
-  presentation?: ConnectWalletPresentation;
   className?: string;
   loading: boolean;
   balance: Balance;
@@ -71,13 +63,6 @@ interface ConnectWalletButtonProps {
   hasUnclaimedRewards?: boolean;
   /** The ETH part of it, shown on the My Allocations row. */
   retrievableEth?: number | null;
-  /** Applies the experimental liquid-glass material without changing other routes. */
-  liquid?: boolean;
-  /**
-   * Shorten the connect label to "Connect" where the header is tightest:
-   * under 640px, and from 1024px until the wide layout at 1280px.
-   */
-  compactInHeader?: boolean;
 }
 
 interface AccountDetailsProps {
@@ -415,7 +400,6 @@ interface WalletPillProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   address: string;
   hasUnclaimedRewards: boolean;
   withChevron: boolean;
-  liquid: boolean;
   testId: string;
   /**
    * Visibility of the wrong-network badge: it shows only where the header's
@@ -424,27 +408,33 @@ interface WalletPillProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   badgeClassName?: string;
 }
 
-/** The connected wallet's trigger. Forwards ref and props for Radix `asChild`. */
+/**
+ * The connected wallet's trigger. Forwards ref and props for Radix `asChild`.
+ *
+ * Its name says what the pill shows: the address, and the states marked on
+ * it. The wrong-network badge is the only header signal for that state from
+ * 1024px (and under 360px), and a button's `aria-label` replaces its content,
+ * so the badge's own words would never be read: the state is in the name.
+ */
 const WalletPill = forwardRef<HTMLButtonElement, WalletPillProps>(function WalletPill(
-  { address, hasUnclaimedRewards, withChevron, liquid, className, testId, badgeClassName, ...rest },
+  { address, hasUnclaimedRewards, withChevron, className, testId, badgeClassName, ...rest },
   ref,
 ) {
   const t = useTranslations('wallet');
+  const { isWrongChain } = useWalletNetwork();
   const short = formatAddress(address);
+  const name = hasUnclaimedRewards
+    ? t('account.menuLabelWithAlert', { address: short })
+    : t('account.menuLabel', { address: short });
   return (
     <button
       ref={ref}
       type="button"
       data-testid={testId}
-      aria-label={
-        hasUnclaimedRewards
-          ? t('account.menuLabelWithAlert', { address: short })
-          : t('account.menuLabel', { address: short })
-      }
+      aria-label={isWrongChain ? t('account.menuLabelWrongNetwork', { menu: name }) : name}
       {...rest}
       className={cn(
         'relative inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-pill border border-input bg-surface-sunken px-3 text-sm text-foreground transition-colors duration-150 hover:border-foreground/40 hover:bg-muted data-[state=open]:border-primary/50 data-[state=open]:bg-muted md:min-h-10',
-        liquid && 'liquid-glass-control',
         className,
       )}
     >
@@ -466,47 +456,24 @@ const WalletPill = forwardRef<HTMLButtonElement, WalletPillProps>(function Walle
 });
 
 /**
- * The header wallet control. Disconnected, it is the shared connect button.
- * Connected, the pill opens the account: the address, the network, the
- * account pages (grouped, with the retrieve signal in words), balances,
- * wallet actions and Switch wallet / Disconnect. A dropdown menu from
- * 768px, a bottom sheet on phones.
+ * The connected wallet's header control: the pill opens the account (the
+ * address, the network, the account pages grouped with the retrieve signal
+ * in words, balances, wallet actions and Switch wallet / Disconnect). A
+ * dropdown menu from 768px, a bottom sheet on phones. The header renders it
+ * (through HeaderAccount, loaded on demand) only while a wallet is
+ * connected; disconnected, the header shows its own connect button.
  */
 const ConnectWalletButton = ({
-  presentation = 'responsive',
   className,
   loading,
   balance,
   stakedTokenCount,
   hasUnclaimedRewards = false,
   retrievableEth = null,
-  liquid = false,
-  compactInHeader = false,
 }: ConnectWalletButtonProps) => {
-  const t = useTranslations('wallet');
   const { account } = useActiveWeb3React();
-  const mode: ConnectWalletPresentation = presentation;
 
-  if (!account) {
-    return (
-      // The wallet modal UI is a lazy chunk that mounts on demand; hover and
-      // focus warm it, so the click still feels instant.
-      <div className="ml-auto">
-        <ConnectWalletAction
-          showIcon={false}
-          label={
-            compactInHeader ? (
-              <>
-                <span className="sm:hidden lg:inline xl:hidden">{t('connect.buttonShort')}</span>
-                <span className="hidden sm:inline lg:hidden xl:inline">{t('connect.button')}</span>
-              </>
-            ) : undefined
-          }
-          className={cn('min-h-11 sm:min-h-10', liquid && 'liquid-glass-cta', className)}
-        />
-      </div>
-    );
-  }
+  if (!account) return null;
 
   const details: AccountDetailsProps = {
     loading,
@@ -525,10 +492,9 @@ const ConnectWalletButton = ({
             address={account}
             hasUnclaimedRewards={hasUnclaimedRewards}
             withChevron={false}
-            liquid={liquid}
             testId="wallet-account-trigger"
             badgeClassName="min-[360px]:hidden"
-            className={cn(mode === 'responsive' && 'md:hidden', className)}
+            className={cn('md:hidden', className)}
           />
         </SheetTrigger>
       }
@@ -543,18 +509,17 @@ const ConnectWalletButton = ({
             address={account}
             hasUnclaimedRewards={hasUnclaimedRewards}
             withChevron
-            liquid={liquid}
             testId="wallet-menu-trigger"
-            badgeClassName={mode === 'responsive' ? 'hidden lg:inline-flex' : undefined}
-            className={cn(mode === 'responsive' && 'hidden md:inline-flex', className)}
+            badgeClassName="hidden lg:inline-flex"
+            className={cn('hidden md:inline-flex', className)}
           />
         </DropdownMenuTrigger>
       }
     />
   );
 
-  if (mode === 'sheet') return sheet;
-  if (mode === 'menu') return menu;
+  // Both render; CSS picks one (a sheet under 768px, the menu above), so the
+  // first paint is right at every width.
   return (
     <>
       {sheet}

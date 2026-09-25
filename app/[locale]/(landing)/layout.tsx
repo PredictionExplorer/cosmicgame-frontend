@@ -20,6 +20,7 @@ import { RootDocument } from '../../root-document';
 import { createRootMetadata, rootViewport, openGraphLocale } from '../../root-metadata';
 
 import { LandingChrome } from './landing-chrome';
+import { LandingShell } from './landing-shell';
 
 interface LayoutProps {
   children: ReactNode;
@@ -101,7 +102,9 @@ export default async function LandingRootLayout({ children, params }: LayoutProp
         />
       }
     >
-      <LandingChrome locale={locale}>{children}</LandingChrome>
+      <LandingChrome locale={locale} shell={LandingShell}>
+        {children}
+      </LandingChrome>
     </RootDocument>
   );
 }

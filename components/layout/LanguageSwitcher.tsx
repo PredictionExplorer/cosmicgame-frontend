@@ -18,20 +18,21 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-export type LanguageSwitcherVariant = 'pill' | 'compact' | 'responsive' | 'drawer';
+export type LanguageSwitcherVariant = 'responsive' | 'drawer';
 
 /**
  * Each language's short name for a narrow trigger, in its own script: a code
- * for alphabetic languages, the usual short form for the others. The two
- * Traditional Chinese editions name their region, so neither reads as the
- * other's.
+ * for the Latin-script languages, the usual short form for the others.
+ * Ukrainian is "УКР", in Cyrillic: beside a globe, "UK" reads as the United
+ * Kingdom. The two Traditional Chinese editions name their region, so
+ * neither reads as the other's.
  */
 export const LOCALE_SHORT_LABELS: LocaleRecord<string> = {
   en: 'EN',
   zh: '简中',
   'zh-TW': '繁中（台）',
   'zh-HK': '繁中（港）',
-  uk: 'UK',
+  uk: 'УКР',
   ko: '한국어',
   ja: '日本語',
   vi: 'VI',
@@ -49,16 +50,14 @@ const TRIGGER_CLASS =
 interface LanguageSwitcherProps {
   className?: string;
   /**
-   * `pill` (default): globe, the current language in its own name, and a
-   * chevron. `compact`: the globe alone, for narrow headers. `responsive`:
-   * the globe alone below 1280px, the short name (EN, 日本語) to 1536px, the
-   * full name from there. `drawer`: a full-width row for a drawer's
-   * preferences. Every variant opens the same radio menu, where choosing a
-   * language is an explicit action (never a change of context on input), and
-   * every trigger is named "Language: <current language>" (the responsive
-   * one adds the short name it shows: "Language: English (EN)").
+   * `responsive` (the headers): the globe alone below 1280px, the short name
+   * (EN, 日本語) to 1536px, the full name from there. `drawer`: a full-width
+   * row for a drawer's preferences. Both open the same radio menu, where
+   * choosing a language is an explicit action (never a change of context on
+   * input), and both triggers are named "Language: <current language>" (the
+   * responsive one adds the short name it shows: "Language: English (EN)").
    */
-  variant?: LanguageSwitcherVariant;
+  variant: LanguageSwitcherVariant;
 }
 
 /**
@@ -68,7 +67,7 @@ interface LanguageSwitcherProps {
  * Option labels are never translated — each language is listed in itself,
  * tagged with its own `lang` so screen readers switch voices per option.
  */
-export function LanguageSwitcher({ className, variant = 'pill' }: LanguageSwitcherProps) {
+export function LanguageSwitcher({ className, variant }: LanguageSwitcherProps) {
   const t = useTranslations('common');
   const locale = useLocale();
   const router = useRouter();
@@ -95,34 +94,6 @@ export function LanguageSwitcher({ className, variant = 'pill' }: LanguageSwitch
   };
 
   const trigger = {
-    pill: (
-      <Button
-        variant="ghost"
-        size="sm"
-        aria-label={triggerName}
-        className={cn(
-          TRIGGER_CLASS,
-          'h-11 gap-2 pl-3 pr-2.5 text-xs font-medium sm:h-9',
-          className,
-        )}
-      >
-        <Globe className="shrink-0 text-secondary" aria-hidden />
-        <span lang={locale} className={cn('max-w-[9rem] truncate', NAME_CLASS)}>
-          {current}
-        </span>
-        <ChevronDown className="size-3.5 shrink-0 text-subtle" aria-hidden />
-      </Button>
-    ),
-    compact: (
-      <Button
-        variant="ghost"
-        size="icon"
-        aria-label={triggerName}
-        className={cn(TRIGGER_CLASS, 'size-11 shrink-0 sm:size-10', className)}
-      >
-        <Globe className="shrink-0 text-secondary" aria-hidden />
-      </Button>
-    ),
     responsive: (
       <Button
         variant="ghost"

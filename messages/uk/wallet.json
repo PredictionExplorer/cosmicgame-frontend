@@ -25,6 +25,7 @@
     "heading": "Обліковий запис",
     "menuLabel": "Меню облікового запису {address}",
     "menuLabelWithAlert": "Меню облікового запису {address}. Є розподіли, які можна забрати",
+    "menuLabelWrongNetwork": "{menu}. Інша мережа",
     "retrieveReady": "Можна забрати",
     "retrieveAmount": "{amount} можна забрати",
     "addCstToMetaMask": "Додати CST у MetaMask",

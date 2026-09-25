@@ -19,6 +19,7 @@ import { createRootMetadata, rootViewport, openGraphLocale } from '../../root-me
 
 import { AppChrome } from './app-chrome';
 import { webManifestPath } from './manifest.webmanifest/build-manifest';
+import { Providers } from './providers';
 
 // NOTE: '@rainbow-me/rainbowkit/styles.css' is intentionally imported
 // inside providers.tsx (not here) so the landing route group never ships
@@ -108,7 +109,9 @@ export default async function AppRootLayout({ children, params }: LayoutProps) {
         />
       }
     >
-      <AppChrome locale={locale}>{children}</AppChrome>
+      <AppChrome locale={locale} shell={Providers}>
+        {children}
+      </AppChrome>
     </RootDocument>
   );
 }

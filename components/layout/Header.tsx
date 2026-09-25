@@ -1,25 +1,21 @@
 'use client';
 
-import { useCallback, useState } from 'react';
-import { Menu, Search } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
+import { Menu, Search, Wallet } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
-import { Link, usePathname } from '@/i18n/navigation';
+import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
-import ConnectWalletButton from '@/components/common/ConnectWalletButton';
 import { ThemeSwitcher } from '@/components/theme/ThemeSwitcher';
-import { WrongNetworkChip } from '@/components/wallet/NetworkGuard';
+import { ConnectWalletAction } from '@/components/wallet/ConnectWalletAction';
 import { useSystemMode } from '@/contexts/SystemModeContext';
+import { useActiveWeb3React } from '@/hooks/web3';
 
-import {
-  CommandPalette,
-  useCommandPaletteShortcut,
-  useCommandShortcutLabel,
-} from './CommandPalette';
+import { useCommandPaletteShortcut, useCommandShortcut } from './commandShortcut';
 import { HeaderNavigation } from './HeaderNavigation';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { SiteDrawer } from './SiteDrawer';
-import { useAccountSummary } from './useAccountSummary';
 import { useSiteLocation } from './useSiteNav';
 import { Wordmark } from './Wordmark';
 
@@ -43,15 +39,67 @@ function MaintenanceBanner({ mode }: { mode: number }) {
   );
 }
 
+/**
+ * The palette (its list, search and record jumps) loads on demand: once the
+ * page is idle, so the first ⌘K is instant, and never on the critical path.
+ */
+const loadCommandPalette = () => import('./CommandPalette');
+const CommandPalette = dynamic(() => loadCommandPalette().then((module) => module.CommandPalette), {
+  ssr: false,
+});
+
+/**
+ * The connected wallet (balances, the account menu, the network chip) loads
+ * while a wallet is connected; until its chunk arrives the pill's outline
+ * holds its place, so nothing in the header moves.
+ */
+const HeaderAccount = dynamic(() => import('./HeaderAccount'), {
+  ssr: false,
+  loading: () => (
+    <span
+      aria-hidden
+      data-testid="wallet-pill-placeholder"
+      className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-pill border border-input bg-surface-sunken md:min-h-10"
+    >
+      <Wallet className="size-4 text-subtle" />
+    </span>
+  ),
+});
+
+/**
+ * The connect button, shortened to "Connect" where the header is tightest:
+ * under 640px, and from 1024px until the wide layout at 1280px. The wallet
+ * list is a lazy chunk that mounts on demand; hover and focus warm it, so
+ * the click still feels instant.
+ */
+function HeaderConnect() {
+  const t = useTranslations('wallet');
+  return (
+    <div className="ml-auto min-w-0">
+      <ConnectWalletAction
+        showIcon={false}
+        label={
+          <>
+            <span className="sm:hidden lg:inline xl:hidden">{t('connect.buttonShort')}</span>
+            <span className="hidden sm:inline lg:hidden xl:inline">{t('connect.button')}</span>
+          </>
+        }
+        className="min-h-11 whitespace-nowrap sm:min-h-10"
+      />
+    </div>
+  );
+}
+
 function SearchTrigger({ onOpen }: { onOpen: () => void }) {
   const t = useTranslations('nav');
-  const shortcut = useCommandShortcutLabel();
+  const shortcut = useCommandShortcut();
   return (
     <button
       type="button"
       onClick={onOpen}
       aria-label={t('search.triggerLabel')}
-      aria-keyshortcuts="Meta+K Control+K"
+      aria-keyshortcuts={shortcut?.keys}
+      data-site-search-trigger
       className="hidden size-10 shrink-0 items-center justify-center gap-2 rounded-pill border border-input bg-surface-sunken text-muted-foreground transition-colors duration-150 hover:border-foreground/40 hover:bg-muted hover:text-foreground sm:inline-flex xl:w-auto xl:justify-start xl:pl-3 xl:pr-2"
     >
       <Search aria-hidden className="size-4 shrink-0" />
@@ -61,11 +109,11 @@ function SearchTrigger({ onOpen }: { onOpen: () => void }) {
           then, so the pill does not grow after hydration. It is a hint, not
           part of the label: drawn as generated content, so the button's
           text is "Search" alone, inside its name (WCAG 2.5.3), and
-          aria-keyshortcuts announces the keys. */}
+          aria-keyshortcuts announces the platform's own chord. */}
       <kbd
         aria-hidden
         data-testid="search-shortcut"
-        data-keys={shortcut ?? '⌘K'}
+        data-keys={shortcut?.label ?? '⌘K'}
         className={cn(
           'type-caption ml-3 hidden h-6 min-w-12 items-center justify-center rounded-edge border border-rule px-1.5 font-sans text-subtle after:content-[attr(data-keys)] xl:inline-flex',
           !shortcut && 'invisible',
@@ -88,18 +136,32 @@ function SearchTrigger({ onOpen }: { onOpen: () => void }) {
 const Header = () => {
   const t = useTranslations('nav');
   const walletT = useTranslations('wallet');
-  const pathname = usePathname();
-  const experimentalUi = pathname === '/experimental-ui';
   const location = useSiteLocation();
-  const summary = useAccountSummary();
+  const { account } = useActiveWeb3React();
+  const [retrievable, setRetrievable] = useState(false);
+  const hasRetrievable = !!account && retrievable;
   const systemMode = useSystemMode()?.data ?? 0;
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const openSearch = useCallback(() => setSearchOpen(true), []);
+  // The palette mounts on the first request and stays mounted after it.
+  const [searchRequested, setSearchRequested] = useState(false);
+  const openSearch = useCallback(() => {
+    setSearchRequested(true);
+    setSearchOpen(true);
+  }, []);
   useCommandPaletteShortcut(openSearch);
+  useEffect(() => {
+    const warm = () => void loadCommandPalette().catch(() => undefined);
+    if (typeof window.requestIdleCallback !== 'function') {
+      const timer = window.setTimeout(warm, 2000);
+      return () => window.clearTimeout(timer);
+    }
+    const idle = window.requestIdleCallback(warm, { timeout: 4000 });
+    return () => window.cancelIdleCallback(idle);
+  }, []);
 
-  const retrieveBadge = summary.hasRetrievable ? (
+  const retrieveBadge = hasRetrievable ? (
     <span className="ml-auto inline-flex items-center gap-1.5">
       <span aria-hidden className="size-2 rounded-full bg-positive" />
       <span className="sr-only">{walletT('account.retrieveReady')}</span>
@@ -121,7 +183,6 @@ const Header = () => {
         <HeaderNavigation
           location={location}
           onOpenSearch={openSearch}
-          liquid={experimentalUi}
           className="hidden lg:block"
         />
 
@@ -129,43 +190,25 @@ const Header = () => {
           <SearchTrigger onOpen={openSearch} />
           <div className="hidden items-center gap-2 sm:flex">
             <ThemeSwitcher />
-            <LanguageSwitcher
-              variant="responsive"
-              className={cn(experimentalUi && 'liquid-glass-control')}
-            />
+            <LanguageSwitcher variant="responsive" />
           </div>
-          {/* From 1024px the wallet pill carries the wrong-network badge. */}
-          <div className="lg:hidden">
-            <WrongNetworkChip />
-          </div>
-          <div className="min-w-0">
-            <ConnectWalletButton
-              presentation="responsive"
-              balance={summary.balance}
-              loading={summary.loading}
-              stakedTokenCount={summary.anchored}
-              hasUnclaimedRewards={summary.hasRetrievable}
-              retrievableEth={summary.retrievableEth}
-              liquid={experimentalUi}
-              compactInHeader
-              className="whitespace-nowrap"
-            />
-          </div>
+          {account ? <HeaderAccount onRetrievableChange={setRetrievable} /> : <HeaderConnect />}
           <SiteDrawer
             open={drawerOpen}
             onOpenChange={setDrawerOpen}
             location={location}
             onOpenSearch={openSearch}
-            showAccount={!!summary.account}
+            showAccount={!!account}
             badges={retrieveBadge ? { myAllocations: retrieveBadge } : undefined}
             trigger={
               <button
                 type="button"
-                aria-label={summary.hasRetrievable ? t('menuLabelWithAlert') : t('menuLabel')}
+                data-site-menu-trigger
+                aria-label={hasRetrievable ? t('menuLabelWithAlert') : t('menuLabel')}
                 className="relative -mr-2 inline-flex size-11 shrink-0 items-center justify-center rounded-control text-foreground transition-colors duration-150 hover:bg-muted lg:hidden"
               >
                 <Menu aria-hidden className="size-5" />
-                {summary.hasRetrievable ? (
+                {hasRetrievable ? (
                   <span
                     aria-hidden
                     className="absolute right-2 top-2 size-2 rounded-full bg-positive ring-2 ring-background"
@@ -176,7 +219,7 @@ const Header = () => {
           />
         </div>
       </div>
-      <CommandPalette open={searchOpen} onOpenChange={setSearchOpen} />
+      {searchRequested ? <CommandPalette open={searchOpen} onOpenChange={setSearchOpen} /> : null}
     </header>
   );
 };

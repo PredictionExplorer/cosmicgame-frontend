@@ -30,21 +30,15 @@ jest.mock('sonner', () => ({
 
 jest.mock('../../../../config/wagmi', () => ({ wagmiConfig: {} }));
 
-jest.mock('../../../../contexts/AnchoredTokenContext', () => ({
-  AnchoredTokenProvider: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="staked-token-provider">{children}</div>
+jest.mock('../../../../contexts/AccountDataProvider', () => ({
+  AccountDataProvider: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="account-data-provider">{children}</div>
   ),
 }));
 
 jest.mock('../../../../contexts/SystemModeContext', () => ({
   SystemModeProvider: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="system-mode-provider">{children}</div>
-  ),
-}));
-
-jest.mock('../../../../contexts/ApiDataContext', () => ({
-  ApiDataProvider: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="api-data-provider">{children}</div>
   ),
 }));
 
@@ -220,14 +214,12 @@ describe('Providers', () => {
       </Providers>,
     );
 
-    const anchoredToken = screen.getByTestId('staked-token-provider');
+    const accountData = screen.getByTestId('account-data-provider');
     const systemMode = screen.getByTestId('system-mode-provider');
-    const apiData = screen.getByTestId('api-data-provider');
     const notification = screen.getByTestId('notification-provider');
 
-    expect(anchoredToken).toContainElement(systemMode);
-    expect(systemMode).toContainElement(apiData);
-    expect(apiData).toContainElement(notification);
+    expect(accountData).toContainElement(systemMode);
+    expect(systemMode).toContainElement(notification);
     expect(notification).toContainElement(screen.getByTestId('child'));
   });
 

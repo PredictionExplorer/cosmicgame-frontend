@@ -438,8 +438,6 @@ interface HeaderNavigationProps {
   location: SiteLocation;
   onOpenSearch: () => void;
   className?: string;
-  /** The experimental route's liquid-glass material. */
-  liquid?: boolean;
 }
 
 /**
@@ -455,12 +453,7 @@ interface HeaderNavigationProps {
  * column, and Escape closes and returns to the button. One panel is open at
  * a time; a press outside, moving focus away or a navigation closes it.
  */
-export function HeaderNavigation({
-  location,
-  onOpenSearch,
-  className,
-  liquid,
-}: HeaderNavigationProps) {
+export function HeaderNavigation({ location, onOpenSearch, className }: HeaderNavigationProps) {
   const t = useTranslations('nav');
   const pathname = usePathname();
   // The open panel belongs to the page it was opened on, so any navigation
@@ -472,17 +465,7 @@ export function HeaderNavigation({
 
   return (
     <nav aria-label={t('primaryLabel')} className={cn('relative h-full', className)}>
-      {/* The experimental route's glass pill is drawn behind the items, centred
-          on the header, so the items keep the header's full height and the
-          current mark still sits on the header's bottom rule. */}
-      {liquid ? (
-        <span
-          aria-hidden
-          data-testid="header-nav-pill"
-          className="liquid-glass-control liquid-glass-static pointer-events-none absolute inset-x-0 top-1/2 h-11 -translate-y-1/2 rounded-pill"
-        />
-      ) : null}
-      <ul className={cn('relative flex h-full items-stretch gap-0.5', liquid && 'px-1.5')}>
+      <ul className="relative flex h-full items-stretch gap-0.5">
         {APP_HEADER_NAV.map((item) =>
           item.kind === 'link' ? (
             <HeaderLink key={item.route} item={item} location={location} />

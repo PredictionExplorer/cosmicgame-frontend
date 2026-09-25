@@ -64,4 +64,27 @@ describe('SiteLink', () => {
     expect(ref.current).toBe(screen.getByTestId('faq'));
     expect(screen.getByTestId('faq')).toHaveAttribute('aria-current', 'page');
   });
+
+  it.each(['external', 'crossHost'] as const)(
+    'passes focus and pointer handlers through on %s links (Radix menu items rely on them)',
+    (kind) => {
+      const onFocus = jest.fn();
+      const onPointerEnter = jest.fn();
+      render(
+        <SiteLink
+          href="https://example.org"
+          kind={kind}
+          onFocus={onFocus}
+          onPointerEnter={onPointerEnter}
+        >
+          Out
+        </SiteLink>,
+      );
+      const link = screen.getByRole('link', { name: /Out/ });
+      fireEvent.focus(link);
+      fireEvent.pointerEnter(link);
+      expect(onFocus).toHaveBeenCalledTimes(1);
+      expect(onPointerEnter).toHaveBeenCalledTimes(1);
+    },
+  );
 });

@@ -12,6 +12,7 @@ import { APP_ORIGIN, LANDING_ORIGIN, isLandingHost } from '@/lib/hostRouting';
 import { AppChrome } from './[locale]/(app)/app-chrome';
 import { webManifestPath } from './[locale]/(app)/manifest.webmanifest/build-manifest';
 import { LandingChrome } from './[locale]/(landing)/landing-chrome';
+import { AppShell, LandingShell } from './not-found-shells';
 import { RootDocument } from './root-document';
 import { createRootMetadata, rootViewport } from './root-metadata';
 
@@ -66,7 +67,9 @@ export async function generateMetadata(): Promise<Metadata> {
  * the host's own chrome: the app header and footer on app.cosmicsignature.com,
  * the landing header and footer (and no wallet stack) on
  * cosmicsignature.com. Rendered on the server like any page, so the 404
- * arrives styled and complete, script or no script.
+ * arrives styled and complete, script or no script. Next.js ships this file's
+ * client references with every route, so each host's shell comes in behind
+ * a dynamic import (app/not-found-shells.tsx) and downloads only here.
  */
 export default async function GlobalNotFound() {
   const [locale, host] = await Promise.all([requestLocale(), requestHost()]);
@@ -75,13 +78,13 @@ export default async function GlobalNotFound() {
   return (
     <RootDocument locale={locale}>
       {host === 'landing' ? (
-        <LandingChrome locale={locale}>
+        <LandingChrome locale={locale} shell={LandingShell}>
           <main id="main" tabIndex={-1} className="site-container relative">
             <NotFoundView host="landing" />
           </main>
         </LandingChrome>
       ) : (
-        <AppChrome locale={locale}>
+        <AppChrome locale={locale} shell={AppShell}>
           <PageShell variant="data" backdrop="subtle">
             <NotFoundView host="app" />
           </PageShell>
