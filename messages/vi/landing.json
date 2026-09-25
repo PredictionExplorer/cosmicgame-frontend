@@ -60,7 +60,6 @@
     },
     "currentCycle": "Mở chu kỳ hiện tại",
     "noscript": "Đồng hồ trực tiếp cần JavaScript. Ứng dụng luôn hiển thị chu kỳ hiện tại.",
-    "countdownAria": "{label}: {duration}",
     "durationSeparator": ", "
   },
   "artwork": {

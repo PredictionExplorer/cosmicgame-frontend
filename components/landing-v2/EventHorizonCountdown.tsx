@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useId, useRef, useState, useSyncExternalStore } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -16,6 +16,7 @@ import { LiveStatusView } from '@/components/ui/live-status-view';
 import {
   getLandingCycleTimerSnapshot,
   mergeLandingCyclePoll,
+  type ClockShard,
   type LandingCyclePoll,
   type LandingCycleReading,
   type LandingCycleTimerSnapshot,
@@ -174,6 +175,18 @@ function phaseCopyKey(phase: LandingCycleTimerSnapshot['phase']): PhaseCopyKey {
   }
 }
 
+/**
+ * The units a listener hears: the non-zero ones, to the minute, so the spoken
+ * duration changes once a minute rather than every second ("2 hours,
+ * 1 minute"). Under a minute it counts the seconds.
+ */
+export function spokenShards(shards: readonly ClockShard[]): readonly ClockShard[] {
+  const nonZero = shards.filter((shard) => shard.value > 0);
+  const toTheMinute = nonZero.filter((shard) => shard.unit !== 'seconds');
+  if (toTheMinute.length > 0) return toTheMinute;
+  return nonZero.length > 0 ? nonZero : shards.slice(-1);
+}
+
 /** Phases whose readout is a sentence instead of figures. */
 const STATEMENT_PHASES: ReadonlySet<PhaseCopyKey> = new Set([
   'waitingFirstGesture',
@@ -201,6 +214,7 @@ export function EventHorizonCountdown() {
   const timerT = useTranslations('landing.timer');
   const navT = useTranslations('nav');
   const hydrated = useHydrated();
+  const titleId = useId();
   const { reading, nowMs, online } = useLandingCycleReading();
 
   const snapshot = getLandingCycleTimerSnapshot({
@@ -234,20 +248,19 @@ export function EventHorizonCountdown() {
     copyKey === 'ready' || copyKey === 'confirming' ? timerT(`phases.${copyKey}.state`) : null;
 
   // The same fixed column labels as the app's clock: a caption never changes
-  // word or width as the digits tick; the timer's name spells the value out.
+  // word or width as the digits tick. The figures are hidden from assistive
+  // technology; the timer is named by the heading and reads as text, the
+  // duration spelled out to the minute.
   const groups: CountdownGroup[] = snapshot.shards.map((shard) => ({
     id: shard.unit,
     value: shard.value,
     label: timerT(`units.${shard.unit}`),
   }));
-  const timerLabel = showCountdown
-    ? timerT('countdownAria', {
-        label: title,
-        duration: snapshot.shards
-          .map((shard) => timerT(`duration.${shard.unit}`, { count: shard.value }))
-          .join(timerT('durationSeparator')),
-      })
-    : title;
+  const spokenDuration = showCountdown
+    ? spokenShards(snapshot.shards)
+        .map((shard) => timerT(`duration.${shard.unit}`, { count: shard.value }))
+        .join(timerT('durationSeparator'))
+    : null;
 
   const app = resolveRouteHref(getSiteRoute('observatory'), 'landing', locale);
   const currentCycle = resolveRouteHref(getSiteRoute('currentCycle'), 'landing', locale);
@@ -266,7 +279,12 @@ export function EventHorizonCountdown() {
           <p className="type-eyebrow text-subtle">
             {hydrated && !unavailable ? timerT('liveClock') : timerT('cycleClock')}
           </p>
-          <h2 className={cn('type-heading-1', styles.title, loading && styles.pending)}>{title}</h2>
+          <h2
+            id={titleId}
+            className={cn('type-heading-1', styles.title, loading && styles.pending)}
+          >
+            {title}
+          </h2>
           {gestureCount !== null && gestureCount > 0 ? (
             <p className={cn('type-body-sm text-muted-foreground', styles.fact)}>
               {timerT('gestureCount', { count: gestureCount })}
@@ -275,7 +293,8 @@ export function EventHorizonCountdown() {
         </div>
 
         <div className={styles.readout}>
-          <div role="timer" aria-live="off" aria-label={timerLabel} className={styles.timer}>
+          <div role="timer" aria-live="off" aria-labelledby={titleId} className={styles.timer}>
+            {spokenDuration ? <span className="sr-only">{spokenDuration}</span> : null}
             {showCountdown || loading ? (
               <CountdownFigures
                 groups={groups}

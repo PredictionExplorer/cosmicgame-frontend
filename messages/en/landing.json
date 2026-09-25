@@ -60,7 +60,6 @@
     },
     "currentCycle": "Open the current cycle",
     "noscript": "The live clock needs JavaScript. The app always shows the current cycle.",
-    "countdownAria": "{label}: {duration}",
     "durationSeparator": ", "
   },
   "artwork": {

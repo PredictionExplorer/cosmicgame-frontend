@@ -62,17 +62,20 @@ const sheetVariants = cva(
 interface SheetContentProps
   extends
     React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
-    VariantProps<typeof sheetVariants> {}
+    VariantProps<typeof sheetVariants> {
+  /** Places the close button, e.g. centred on a sheet's own header row. */
+  closeClassName?: string;
+}
 
 const SheetContent = React.forwardRef<
   React.ComponentRef<typeof SheetPrimitive.Content>,
   SheetContentProps
->(({ side = 'right', className, children, ...props }, ref) => (
+>(({ side = 'right', className, closeClassName, children, ...props }, ref) => (
   <SheetPortal>
     <SheetOverlay />
     <SheetPrimitive.Content ref={ref} className={cn(sheetVariants({ side }), className)} {...props}>
       {/* First in the DOM so focus order matches the corner it paints in. */}
-      <SheetPrimitive.Close className={OVERLAY_CLOSE_CLASS}>
+      <SheetPrimitive.Close className={cn(OVERLAY_CLOSE_CLASS, closeClassName)}>
         <X aria-hidden className="size-4" />
         <SheetCloseLabel />
       </SheetPrimitive.Close>

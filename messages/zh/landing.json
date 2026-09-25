@@ -60,7 +60,6 @@
     },
     "currentCycle": "查看当前周期",
     "noscript": "实时时钟需要启用 JavaScript。应用中始终显示当前周期。",
-    "countdownAria": "{label}：{duration}",
     "durationSeparator": "，"
   },
   "artwork": {

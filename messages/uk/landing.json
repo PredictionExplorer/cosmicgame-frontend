@@ -60,7 +60,6 @@
     },
     "currentCycle": "Відкрити поточний цикл",
     "noscript": "Для годинника наживо потрібен JavaScript. У застосунку поточний цикл завжди актуальний.",
-    "countdownAria": "{label}: {duration}",
     "durationSeparator": ", "
   },
   "artwork": {

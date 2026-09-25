@@ -232,6 +232,10 @@ export function LandingHeader({ sections }: LandingHeaderProps) {
                 jumpToSection(section);
               }}
               className="flex w-[min(20rem,100vw)] flex-col gap-0 border-l border-rule bg-background p-0"
+              // The close button takes the menu button's place: centred on the
+              // header row, at the page gutter (44px target on phones; 24px
+              // with a 4px bleed from sm).
+              closeClassName="max-sm:top-[calc((var(--header-height)-2.75rem)/2)] max-sm:right-[calc(var(--gutter)-0.5rem)] sm:top-[calc(var(--header-height)/2-0.5rem)] sm:right-[calc(var(--gutter)+0.375rem)]"
             >
               <SheetTitle className="sr-only">{t('drawerTitle')}</SheetTitle>
               <div className="flex h-[var(--header-height)] items-center border-b border-rule-faint pl-4 pr-16">

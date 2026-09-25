@@ -60,7 +60,6 @@
     },
     "currentCycle": "현재 사이클 열기",
     "noscript": "실시간 시계를 보려면 JavaScript가 필요합니다. 앱에는 현재 사이클이 항상 표시됩니다.",
-    "countdownAria": "{label}: {duration}",
     "durationSeparator": " "
   },
   "artwork": {

@@ -60,7 +60,6 @@
     },
     "currentCycle": "查看目前週期",
     "noscript": "即時時鐘需要啟用 JavaScript。應用程式會一直顯示目前週期。",
-    "countdownAria": "{label}：{duration}",
     "durationSeparator": "，"
   },
   "artwork": {
