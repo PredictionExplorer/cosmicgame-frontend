@@ -262,7 +262,7 @@
   "nftTransfer": {
     "pickerTitle": "Виберіть NFT для передачі",
     "pickerSummary": "Вибрано {selected} з {total} NFT, доступних для передачі.",
-    "selectAll": "Вибрати всі доступні",
+    "selectAll": "Вибрати всі",
     "selectAria": "Вибрати NFT {id}",
     "statusLabels": {
       "anchored": "Закріплено — відкріпіть перед передачею",

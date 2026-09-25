@@ -52,7 +52,9 @@ export function NftSendBar({
         <Button type="button" variant="ghost" size="sm" onClick={onCancel} className="sm:hidden">
           {tCommon('actions.cancel')}
         </Button>
-        <div className="col-span-2 flex items-center gap-2 max-sm:[&>*]:flex-1">
+        {/* On a phone the two actions share the row; a long label wraps
+            inside its button rather than being cut. */}
+        <div className="col-span-2 flex items-center gap-2 max-sm:[&>*]:h-auto max-sm:[&>*]:min-w-0 max-sm:[&>*]:flex-1 max-sm:[&>*]:whitespace-normal max-sm:[&>*]:py-2">
           <Button
             type="button"
             variant="ghost"

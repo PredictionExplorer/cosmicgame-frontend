@@ -262,7 +262,7 @@
   "nftTransfer": {
     "pickerTitle": "选择要转移的 NFT",
     "pickerSummary": "可转移 {total} 枚，已选择 {selected} 枚。",
-    "selectAll": "选择全部可转移项",
+    "selectAll": "全选",
     "selectAria": "选择 NFT {id}",
     "statusLabels": {
       "anchored": "已锚定，请先解锚再转移",

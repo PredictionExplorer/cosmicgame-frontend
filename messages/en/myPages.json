@@ -262,7 +262,7 @@
   "nftTransfer": {
     "pickerTitle": "Choose NFTs to transfer",
     "pickerSummary": "{selected} selected of {total} transferable NFTs.",
-    "selectAll": "Select all transferable",
+    "selectAll": "Select all",
     "selectAria": "Select NFT {id}",
     "statusLabels": {
       "anchored": "Anchored: release it to send",

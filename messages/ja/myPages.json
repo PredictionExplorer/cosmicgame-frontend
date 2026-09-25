@@ -262,7 +262,7 @@
   "nftTransfer": {
     "pickerTitle": "移転するNFTを選ぶ",
     "pickerSummary": "移転できる{total}点のうち{selected}点を選択中。",
-    "selectAll": "移転できるものをすべて選択",
+    "selectAll": "すべて選択",
     "selectAria": "NFT {id}を選択",
     "statusLabels": {
       "anchored": "係留中——移転する前に解除してください",

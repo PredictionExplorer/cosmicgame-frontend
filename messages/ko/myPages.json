@@ -262,7 +262,7 @@
   "nftTransfer": {
     "pickerTitle": "전송할 NFT 선택",
     "pickerSummary": "전송 가능한 NFT {total}개 중 {selected}개 선택됨",
-    "selectAll": "전송 가능한 NFT 모두 선택",
+    "selectAll": "모두 선택",
     "selectAria": "NFT {id} 선택",
     "statusLabels": {
       "anchored": "앵커링됨 · 전송 전 해제 필요",
