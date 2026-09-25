@@ -492,7 +492,7 @@ describe('server-rendered page headers', () => {
     ['named-nfts' as const, 'Named Cosmic Signature NFTs', 'collection', '/gallery'],
     ['used-rwlk-nfts' as const, 'Used Random Walk NFTs', 'collection', '/gallery'],
   ])(
-    'renders %s as one header: H1, section eyebrow, snapshot and source',
+    'renders %s as one header: H1, section eyebrow and snapshot',
     async (route, heading, section, hub) => {
       render(await PublicDataRouteSeoSummary({ route }));
 
@@ -504,9 +504,13 @@ describe('server-rendered page headers', () => {
         hub,
       );
       expect(screen.getByText(COMMON.snapshot)).toBeInTheDocument();
-      // The stamp and its source are one item of the meta line, so they flow as one line.
-      const source = screen.getByText(/^· Source: /);
-      expect(source).toContainElement(screen.getByText(COMMON.snapshot));
+      // The meta line dates the figures; it names no API ("Source: … APIs").
+      expect(screen.queryByText(/Source: /)).not.toBeInTheDocument();
+      // A collection page's facts sit on one quiet line: its headline is the art.
+      if (section === 'collection') {
+        expect(screen.getByTestId('page-header-facts')).toBeInTheDocument();
+        expect(document.querySelector('dl[data-layout]')).toBeNull();
+      }
       // The eyebrow names the section, never the H1 with "· Arbitrum".
       expect(screen.queryByText(/· Arbitrum/)).not.toBeInTheDocument();
     },
@@ -615,10 +619,6 @@ describe('server-rendered page headers', () => {
       }
       // Three short figures: one row on phones.
       expect(document.querySelector('dl')).toHaveAttribute('data-layout', 'strip');
-      // The source names where the figures come from: the chain and the API.
-      expect(
-        screen.getByText(new RegExp(seoMessages.publicData.routes.imprint.source)),
-      ).toBeInTheDocument();
     });
 
     it('shows the imprinted count as unavailable when the chain read fails, never as zero', async () => {
@@ -766,9 +766,13 @@ describe('server-rendered page headers', () => {
       expect(figureValue('beneficiary')).not.toHaveTextContent('None yet');
     });
 
-    it('lets the empty voluntary ledger lead instead of three zeros', async () => {
+    it('keeps the figure row on the empty voluntary ledger, so the tab row stays put', async () => {
+      // The three Public Goods tabs share one header shape; an empty ledger
+      // once dropped its figures and moved the tab row up by about 120px.
       render(await PublicDataRouteSeoSummary({ route: 'public-goods-contributions-voluntary' }));
-      expect(document.querySelector('[data-figure]')).toBeNull();
+      expect(figureValue('records')).toHaveTextContent(/^0$/);
+      expect(figureValue('totalEth')).toHaveTextContent(/^0\sETH$/);
+      expect(figureValue('contributors')).toHaveTextContent(/^0$/);
       expect(screen.getByText(COMMON.snapshot)).toBeInTheDocument();
     });
 
@@ -788,6 +792,18 @@ describe('server-rendered page headers', () => {
       expect(hrefs).not.toContain('/public-goods-contributions-voluntary');
       const guild = within(related).getByRole('link', { name: /Protocol Guild/ });
       expect(guild).toHaveAttribute('target', '_blank');
+      // The vault link lands on the vault's own section, not the top of /contracts.
+      expect(hrefs).toContain('/contracts#public-goods-heading');
+    });
+
+    it('leads outreach readers to the Outreach Reserve answer, not a generic page', async () => {
+      render(await PublicDataRouteSeoSummary({ route: 'marketing' }));
+      const related = screen.getByRole('navigation', { name: /related pages/ });
+      const hrefs = within(related)
+        .getAllByRole('link')
+        .map((link) => link.getAttribute('href'));
+      expect(hrefs).toContain('/faq#what-are-marketing-rewards');
+      expect(hrefs).not.toContain('/site-map');
     });
 
     it('dates the latest record with its year, as the ledger below does', async () => {
@@ -838,7 +854,8 @@ describe('server-rendered page headers', () => {
 
       expect(figureValue('named')).toHaveTextContent('2');
       expect(document.querySelector('[data-figure="owners"]')).toBeNull();
-      expect(figureValue('imprinted')).toHaveTextContent('240');
+      // Only facts about named NFTs: the collection's size is the gallery's.
+      expect(document.querySelector('[data-figure="imprinted"]')).toBeNull();
     });
 
     it('counts the owners the names endpoint does return', async () => {
@@ -945,7 +962,6 @@ describe('server-rendered page headers', () => {
       'href',
       '/statistics',
     );
-    expect(screen.getByText(/^· 数据来源：/)).toBeInTheDocument();
     expect(screen.queryByText(/initial HTML for search engines/i)).not.toBeInTheDocument();
   });
 

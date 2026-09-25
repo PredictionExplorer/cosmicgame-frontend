@@ -2,14 +2,12 @@
   "publicData": {
     "common": {
       "none": "None yet",
-      "source": "Source: {source}",
       "relatedPagesAria": "{heading} related pages"
     },
     "routes": {
       "allocation": {
         "heading": "Allocation Recipients",
         "description": "Browse public Cosmic Signature allocation history across finalized Performance Cycles, including Signature Allocations, Stellar Selection, Anchor Distributions, and public-goods flows.",
-        "source": "Cosmic Signature public cycle data",
         "links": {
           "statistics": "View protocol statistics",
           "learn": "Learn how cycles finalize",
@@ -35,7 +33,6 @@
       "anchoring": {
         "heading": "Anchor Distributions",
         "description": "Every anchored NFT, every ETH Anchor Distribution and every Stellar Selection imprint, as recorded on-chain.",
-        "source": "Cosmic Signature public anchoring APIs",
         "links": {
           "statistics": "View anchoring statistics",
           "learn": "Learn about anchoring",
@@ -59,11 +56,9 @@
       "marketing": {
         "heading": "Outreach allocations",
         "description": "Review Cosmic Signature outreach allocation history and CST distributions for ecosystem contributors who help people discover the protocol.",
-        "source": "Cosmic Signature outreach API",
         "links": {
-          "faq": "Read the FAQ",
-          "statistics": "View protocol statistics",
-          "siteMap": "Browse public pages"
+          "faq": "How the Outreach Reserve works",
+          "statistics": "View protocol statistics"
         },
         "cards": {
           "records": {
@@ -80,7 +75,6 @@
       "imprint": {
         "heading": "Imprint Random Walk NFT",
         "description": "Imprint Random Walk NFTs for Cosmic Signature participation. Each unused Random Walk NFT can be attached to one ETH gesture for a 50% Gesture Cost reduction.",
-        "source": "Random Walk NFT contract and Cosmic Signature public APIs",
         "links": {
           "cycle": "Open the active Performance Cycle",
           "learn": "Learn how gestures work",
@@ -101,7 +95,6 @@
       "eth-contribution": {
         "heading": "Direct ETH contributions",
         "description": "ETH sent straight to the Cycle Reserve, with each contributor’s note and cycle.",
-        "source": "Cosmic Signature contribution API",
         "links": {
           "reserve": "How the Cycle Reserve is split",
           "protocol": "Where the Public Goods share goes",
@@ -122,7 +115,6 @@
       "attached-nfts": {
         "heading": "Attached NFT Contributions",
         "description": "Browse NFTs attached to Cosmic Signature gestures. Attached ERC-721 tokens forward to the participant who receives the Signature Allocation when a cycle finalizes.",
-        "source": "Cosmic Signature public attached NFT APIs",
         "links": {
           "gallery": "Explore Cosmic Signature gallery",
           "cycle": "View the current Performance Cycle",
@@ -143,7 +135,6 @@
       "allocation-finalized": {
         "heading": "Finalized Allocations",
         "description": "What each finalized cycle allocated, from its Signature Allocation to every Stellar Selection and Anchor Distribution record.",
-        "source": "Cosmic Signature public allocation retrieval APIs",
         "links": {
           "myAllocations": "Retrieve your allocations",
           "statistics": "View aggregate statistics",
@@ -166,7 +157,6 @@
       "named-nfts": {
         "heading": "Named Cosmic Signature NFTs",
         "description": "Browse Cosmic Signature NFTs that owners have given custom names, connecting token identity, gallery discovery, and on-chain collection history.",
-        "source": "Cosmic Signature public token APIs",
         "links": {
           "gallery": "Explore the full gallery",
           "learn": "Learn about the art",
@@ -178,16 +168,12 @@
           },
           "owners": {
             "label": "Current owners"
-          },
-          "imprinted": {
-            "label": "Imprinted NFTs"
           }
         }
       },
       "used-rwlk-nfts": {
         "heading": "Used Random Walk NFTs",
         "description": "Review Random Walk NFTs that have already been attached to ETH gestures for their one-time Gesture Cost reduction.",
-        "source": "Cosmic Signature public Random Walk usage APIs",
         "links": {
           "imprint": "Imprint Random Walk NFTs",
           "learn": "Learn how gestures work",
@@ -208,7 +194,6 @@
       "coordination-changes": {
         "heading": "Coordination changes",
         "description": "Every change the contract owner has made to protocol parameters since the current mode began.",
-        "source": "Cosmic Signature system-event API",
         "links": {
           "security": "Read the security overview",
           "audits": "Review audits and verification",
@@ -231,10 +216,8 @@
       "public-goods-contributions-cg": {
         "heading": "Protocol Public Goods contributions",
         "description": "Track automatic Cosmic Signature Public Goods forwards from protocol cycles to the Public Goods Vault and its configured beneficiary — currently Protocol Guild.",
-        "source": "Cosmic Signature Public Goods API",
         "links": {
           "learn": "Learn about public goods",
-          "statistics": "View Public Goods statistics",
           "contracts": "Review the vault contract"
         },
         "cards": {
@@ -253,7 +236,6 @@
       "public-goods-contributions-voluntary": {
         "heading": "Voluntary Public Goods contributions",
         "description": "ETH that anyone sends straight to the Public Goods Vault, for its beneficiary, currently Protocol Guild.",
-        "source": "Cosmic Signature Public Goods API",
         "links": {
           "direct": "View direct ETH contributions",
           "learn": "Learn about public goods",
@@ -274,11 +256,10 @@
       "public-goods-retrievals": {
         "heading": "Public Goods retrievals",
         "description": "Review retrievals from the Cosmic Signature Public Goods Vault, where cycle reserves forward support to the configured Public Goods beneficiary — currently Protocol Guild.",
-        "source": "Cosmic Signature Public Goods API",
         "links": {
           "learn": "Learn about public goods",
           "protocolGuild": "Visit Protocol Guild",
-          "contracts": "Review public contract addresses"
+          "contracts": "Review the vault contract"
         },
         "cards": {
           "records": {

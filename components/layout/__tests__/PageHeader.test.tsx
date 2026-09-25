@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 
-import { PageHeader } from '@/components/layout/PageHeader';
+import { PageHeader, PageHeaderFigures } from '@/components/layout/PageHeader';
 import { PAGE_SECTIONS } from '@/components/layout/pageSections';
 
 import { render, screen, within, checkA11y } from '@/test-utils';
@@ -398,7 +398,9 @@ describe('PageHeader', () => {
     );
   });
 
-  it('keeps related pages off phones and draws them on the control radius', () => {
+  it('keeps related pages on phones, as quiet links rather than bordered chips', () => {
+    // Phones once dropped the header's only route to sibling pages; the links
+    // now stay on one row that scrolls sideways there.
     render(
       <PageHeader
         title="Allocation"
@@ -406,10 +408,41 @@ describe('PageHeader', () => {
         relatedLabel="Related"
       />,
     );
-    expect(screen.getByRole('navigation', { name: 'Related' })).toHaveClass('max-sm:hidden');
-    const chip = screen.getByRole('link', { name: 'Statistics' });
-    expect(chip).toHaveClass('rounded-control', 'pointer-coarse:min-h-11');
-    expect(chip).not.toHaveClass('rounded-pill');
+    const related = screen.getByRole('navigation', { name: 'Related' });
+    expect(related).not.toHaveClass('max-sm:hidden');
+    expect(related.closest('.max-sm\\:hidden')).toBeNull();
+    // The visible label repeats the nav's own name, so it is not read twice.
+    expect(within(related).getByText('common.pageHeader.relatedPages')).toHaveAttribute(
+      'aria-hidden',
+      'true',
+    );
+    const link = screen.getByRole('link', { name: 'Statistics' });
+    expect(link).toHaveClass('link-quiet', 'pointer-coarse:min-h-11', 'whitespace-nowrap');
+    expect(link).not.toHaveClass('border');
+  });
+
+  it('keeps the lede at its own size on phones, never under the body text', () => {
+    render(<PageHeader title="Security" variant="reading" subtitle="The thesis." />);
+    const lede = screen.getByText('The thesis.');
+    expect(lede).toHaveClass('type-lede');
+    expect(lede.className).not.toMatch(/max-sm:text-/);
+  });
+
+  it('gives a date figure its own phone row beside another wide figure', () => {
+    render(
+      <PageHeaderFigures
+        figures={[
+          { id: 'records', label: 'Retrievals', value: '2' },
+          { id: 'total', label: 'ETH retrieved', value: '4.8 ETH' },
+          { id: 'latest', label: 'Latest', value: 'Aug 11, 2026, 19:34', size: 'md', date: true },
+          { id: 'beneficiary', label: 'Beneficiary', value: 'Protocol Guild', size: 'md' },
+        ]}
+      />,
+    );
+    const latest = document.querySelector('[data-figure="latest"]');
+    const beneficiary = document.querySelector('[data-figure="beneficiary"]');
+    expect(latest).toHaveClass('max-sm:col-span-2');
+    expect(beneficiary).toHaveClass('max-sm:col-span-2');
   });
 
   it('never clamps the lede of a reading page', () => {

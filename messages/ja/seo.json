@@ -2,14 +2,12 @@
   "publicData": {
     "common": {
       "none": "まだなし",
-      "source": "データソース：{source}",
       "relatedPagesAria": "{heading}の関連ページ"
     },
     "routes": {
       "allocation": {
         "heading": "配分の受領者",
         "description": "確定したサイクルの配分履歴を確認できます。シグネチャー配分、星選、係留配分、公共財への送付をまとめています。",
-        "source": "Cosmic Signature公開サイクルAPI",
         "links": {
           "statistics": "プロトコル統計を見る",
           "learn": "サイクルが確定する仕組みを学ぶ",
@@ -35,7 +33,6 @@
       "anchoring": {
         "heading": "係留配分",
         "description": "オンチェーンに記録された、すべてのNFT係留、ETH係留配分、星選による刻印を確認できます。",
-        "source": "Cosmic Signature公開係留API",
         "links": {
           "statistics": "係留統計を見る",
           "learn": "係留について学ぶ",
@@ -59,11 +56,9 @@
       "marketing": {
         "heading": "広報配分",
         "description": "Cosmic Signatureを広める活動に携わる貢献者への、広報配分とCSTの配分履歴を確認できます。",
-        "source": "Cosmic Signature広報API",
         "links": {
-          "faq": "よくある質問を読む",
-          "statistics": "プロトコル統計を見る",
-          "siteMap": "公開ページを一覧する"
+          "faq": "広報準備金の仕組み",
+          "statistics": "プロトコル統計を見る"
         },
         "cards": {
           "records": {
@@ -80,7 +75,6 @@
       "imprint": {
         "heading": "Random Walk NFTの刻印",
         "description": "Cosmic Signatureに参加するためにRandom Walk NFTを刻印します。未使用のRandom Walk NFTはそれぞれ1回のETH一筆に添付でき、一筆の費用が50%引き下げられます。",
-        "source": "Random Walk NFTコントラクトとCosmic Signature公開API",
         "links": {
           "cycle": "進行中のパフォーマンス・サイクルを開く",
           "learn": "一筆の仕組みを学ぶ",
@@ -101,7 +95,6 @@
       "eth-contribution": {
         "heading": "直接ETH拠出",
         "description": "サイクル準備金へ直接送られたETHを、拠出者のメモと対象サイクルとともに確認できます。",
-        "source": "Cosmic Signature拠出API",
         "links": {
           "reserve": "サイクル準備金の配分のしくみ",
           "protocol": "公共財の取り分の行き先",
@@ -122,7 +115,6 @@
       "attached-nfts": {
         "heading": "添付されたNFT拠出",
         "description": "Cosmic Signatureの一筆に添付されたNFTを見る。添付されたERC-721トークンは、サイクルが確定するとシグネチャー配分を受け取る参加者へ送られます。",
-        "source": "Cosmic Signature公開添付NFT API",
         "links": {
           "gallery": "Cosmic Signatureギャラリーを探索する",
           "cycle": "現在のパフォーマンス・サイクルを見る",
@@ -143,7 +135,6 @@
       "allocation-finalized": {
         "heading": "確定した配分",
         "description": "確定した各サイクルの配分を、シグネチャー配分から星選と係留配分のすべての記録まで確認できます。",
-        "source": "Cosmic Signature公開配分受け取りAPI",
         "links": {
           "myAllocations": "自分の配分を受け取る",
           "statistics": "集計統計を見る",
@@ -166,7 +157,6 @@
       "named-nfts": {
         "heading": "名前付きCosmic Signature NFT",
         "description": "所有者が名前を付けたCosmic Signature NFTを紹介します。作品を見つけ、オンチェーンに記録された来歴をたどれます。",
-        "source": "Cosmic Signature公開トークンAPI",
         "links": {
           "gallery": "ギャラリー全体を探索する",
           "learn": "アートについて学ぶ",
@@ -178,16 +168,12 @@
           },
           "owners": {
             "label": "現在の所有者"
-          },
-          "imprinted": {
-            "label": "刻印されたNFT"
           }
         }
       },
       "used-rwlk-nfts": {
         "heading": "使用済みのRandom Walk NFT",
         "description": "ETH一筆の割引に使用済みのRandom Walk NFTを確認できます。割引に使えるのは、各NFTにつき一度だけです。",
-        "source": "Cosmic Signature公開Random Walk使用API",
         "links": {
           "imprint": "Random Walk NFTを刻印する",
           "learn": "一筆の仕組みを学ぶ",
@@ -208,7 +194,6 @@
       "coordination-changes": {
         "heading": "調整の変更履歴",
         "description": "現在のモードが始まってからコントラクト所有者がプロトコルのパラメーターに加えたすべての変更です。",
-        "source": "Cosmic SignatureシステムイベントAPI",
         "links": {
           "security": "セキュリティの概要を読む",
           "audits": "監査と検証を確認する",
@@ -231,10 +216,8 @@
       "public-goods-contributions-cg": {
         "heading": "プロトコルの公共財拠出",
         "description": "プロトコルのサイクルから公共財金庫と、設定された受け手——現在はProtocol Guild——へのCosmic Signatureの自動公共財送付を追う。",
-        "source": "Cosmic Signature公共財API",
         "links": {
           "learn": "公共財について学ぶ",
-          "statistics": "公共財の統計を見る",
           "contracts": "金庫のコントラクトを確認する"
         },
         "cards": {
@@ -253,7 +236,6 @@
       "public-goods-contributions-voluntary": {
         "heading": "自発的な公共財拠出",
         "description": "誰でも公共財金庫へ直接送れるETHで、設定された受け手——現在はProtocol Guild——に届けられます。",
-        "source": "Cosmic Signature公共財API",
         "links": {
           "direct": "直接ETH拠出を見る",
           "learn": "公共財について学ぶ",
@@ -274,11 +256,10 @@
       "public-goods-retrievals": {
         "heading": "公共財の受け取り",
         "description": "公共財金庫から、設定されている受け手への送付履歴を確認できます。現在の受け手はProtocol Guildです。",
-        "source": "Cosmic Signature公共財API",
         "links": {
           "learn": "公共財について学ぶ",
           "protocolGuild": "Protocol Guildを見る",
-          "contracts": "公開コントラクトアドレスを確認する"
+          "contracts": "金庫のコントラクトを確認する"
         },
         "cards": {
           "records": {

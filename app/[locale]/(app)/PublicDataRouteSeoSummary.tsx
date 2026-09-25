@@ -5,7 +5,7 @@ import { isAddress, zeroAddress } from 'viem';
 import { protocolFacts } from '@/content/protocol-facts';
 
 import { OUTBOUND_LINKS } from '@/config/siteNav';
-import { PageHeader, type PageHeaderFigure } from '@/components/layout/PageHeader';
+import { PageHeader, PageHeaderFacts, type PageHeaderFigure } from '@/components/layout/PageHeader';
 import type { PageSectionId } from '@/components/layout/pageSections';
 import { SnapshotStamp } from '@/components/layout/SnapshotStamp';
 import { AnchoringHeaderCount } from '@/components/anchoring/AnchoringHeaderCount';
@@ -68,6 +68,9 @@ interface RouteDefinition {
 /** The Learn guide to Public Goods and Protocol Guild. */
 const PUBLIC_GOODS_GUIDE = `${LANDING_ORIGIN}/learn/protocol-guild-public-goods`;
 
+/** The Public Goods Vault's section on /contracts: its balance, beneficiary and share. */
+const PUBLIC_GOODS_VAULT = '/contracts#public-goods-heading';
+
 /** Protocol Guild's own site, the Public Goods Vault's beneficiary. */
 const PROTOCOL_GUILD_URL = OUTBOUND_LINKS.find((link) => link.id === 'protocolGuild')!.href;
 
@@ -91,9 +94,9 @@ const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
   marketing: {
     section: 'records',
     links: [
-      { href: '/faq', key: 'faq' },
+      // The FAQ answer about the Outreach Reserve itself, not the FAQ's top.
+      { href: '/faq#what-are-marketing-rewards', key: 'faq' },
       { href: '/statistics', key: 'statistics' },
-      { href: '/site-map', key: 'siteMap' },
     ],
   },
   imprint: {
@@ -157,13 +160,13 @@ const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
     ],
   },
   // The three Public Goods ledgers link each other through their tabs, so
-  // their related pages go where the tabs do not.
+  // their related pages go where the tabs do not: the guide, and the vault
+  // itself on /contracts (its section, not the top of the page).
   'public-goods-contributions-cg': {
     section: 'records',
     links: [
       { href: PUBLIC_GOODS_GUIDE, key: 'learn' },
-      { href: '/statistics', key: 'statistics' },
-      { href: '/contracts', key: 'contracts' },
+      { href: PUBLIC_GOODS_VAULT, key: 'contracts' },
     ],
   },
   'public-goods-contributions-voluntary': {
@@ -179,10 +182,18 @@ const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
     links: [
       { href: PUBLIC_GOODS_GUIDE, key: 'learn' },
       { href: PROTOCOL_GUILD_URL, key: 'protocolGuild' },
-      { href: '/contracts', key: 'contracts' },
+      { href: PUBLIC_GOODS_VAULT, key: 'contracts' },
     ],
   },
 };
+
+/** The section a public data route's header names (checked against the taxonomy in tests). */
+export function publicDataRouteSection(route: SeoSummaryRoute): PageSectionId {
+  return routeDefinitions[route].section;
+}
+
+/** Every public data route. */
+export const PUBLIC_DATA_ROUTES = Object.keys(routeDefinitions) as SeoSummaryRoute[];
 
 /**
  * The value of a figure read from a list that may be empty: `NONE_YET` when the
@@ -201,6 +212,8 @@ interface FigureSpec {
   size?: 'md';
   /** A short count: three of them share one phone row (see `PageHeaderFigure.compact`). */
   compact?: boolean;
+  /** A date and time: its own phone row (see `PageHeaderFigure.date`). */
+  date?: boolean;
 }
 
 interface RouteFigures {
@@ -431,21 +444,20 @@ async function getRouteFigures(
       };
     }
     case 'named-nfts': {
-      const [named, dashboard] = await Promise.all([readNamedNfts(), readDashboard()]);
+      const named = await readNamedNfts();
       const rows = named.data;
-      const imprinted = toFiniteNumber(dashboard.data?.MainStats?.NumCSTokenMints);
       const owners = rows?.map((row) => row.CurOwnerAddr || row.OwnerAddr) ?? [];
       // The names endpoint may omit owners. Rows without any owner field say nothing
       // about ownership: counting them would print "0 owners" beside 3 named NFTs.
       const ownersKnown = rows !== null && (rows.length === 0 || owners.some(Boolean));
+      // Only facts about named NFTs: the collection's size is the gallery's.
       return {
-        reads: [named, dashboard],
+        reads: [named],
         figures: [
           { key: 'named', value: rows && count(rows.length) },
           ...(rows === null || ownersKnown
             ? [{ key: 'owners', value: rows && count(countDistinctAddresses(owners)) }]
             : []),
-          { key: 'imprinted', value: imprinted === null ? null : count(imprinted) },
         ],
       };
     }
@@ -474,7 +486,7 @@ async function getRouteFigures(
         reads: [events, owner],
         figures: [
           { key: 'records', value: rows && count(rows.length) },
-          { key: 'latest', value: latestDate(rows), size: 'md' },
+          { key: 'latest', value: latestDate(rows), size: 'md', date: true },
           // Who can still change the parameters: the page's key trust fact.
           {
             key: 'owner',
@@ -510,15 +522,15 @@ async function getRouteFigures(
         figures: [
           { key: 'records', value: rows && count(rows.length) },
           { key: 'share', value: formatPercent(share, locale), hasTooltip: true },
-          { key: 'latest', value: latestDate(rows), size: 'md' },
+          { key: 'latest', value: latestDate(rows), size: 'md', date: true },
         ],
       };
     }
     case 'public-goods-contributions-voluntary': {
       const deposits = await readVoluntaryPublicGoods();
       const rows = deposits.data;
-      // With no contribution yet, three zeros would only repeat the empty state below.
-      if (rows !== null && rows.length === 0) return { reads: [deposits], figures: [] };
+      // With no contribution yet the row reads 0 · 0 ETH · 0: the three Public
+      // Goods tabs keep one header shape, so the tab row never jumps.
       return {
         reads: [deposits],
         figures: [
@@ -547,7 +559,7 @@ async function getRouteFigures(
         figures: [
           { key: 'records', value: rows && count(rows.length) },
           { key: 'totalEth', value: rows && eth(sumAmountEth(rows)) },
-          { key: 'latest', value: latestDate(rows), size: 'md' },
+          { key: 'latest', value: latestDate(rows), size: 'md', date: true },
           {
             key: 'beneficiary',
             value:
@@ -591,9 +603,10 @@ export interface PublicDataRouteSeoSummaryProps {
 
 /**
  * The page header of a public data route, rendered on the server: section
- * eyebrow, H1, lede, the route's figures read from the public API, a snapshot
- * stamp dated by those reads, and related pages. It is the page's only
- * header — client pages render it first and add no header of their own.
+ * eyebrow, H1, lede, the route's figures read from the public API (a quiet
+ * facts line on the collection pages), a snapshot stamp dated by those
+ * reads, and related pages. It is the page's only header — client pages
+ * render it first and add no header of their own.
  */
 export async function PublicDataRouteSeoSummary({
   route,
@@ -608,21 +621,58 @@ export async function PublicDataRouteSeoSummary({
   const heading = t(`${prefix}.heading`);
   const { figures, reads } = await getRouteFigures(route, locale, (key) => t(`${prefix}.${key}`));
   const readAt = snapshotTime(reads);
+  const related = definition.links.map((link) => ({
+    href: localizeCrossHostHref(link.href, locale),
+    label: t(`${prefix}.links.${link.key}`),
+  }));
+  const relatedLabel = t('publicData.common.relatedPagesAria', { heading });
+
+  const snapshot = readAt !== null ? <SnapshotStamp at={readAt} /> : null;
+  const noneYet = <span className="text-muted-foreground">{t('publicData.common.none')}</span>;
+
+  // A collection page's headline is its art: its facts sit on one quiet line
+  // under the lede, as on the gallery, instead of a row of large figures.
+  if (definition.section === 'collection') {
+    return (
+      <PageHeader
+        section={definition.section}
+        title={heading}
+        titleId={`${route}-heading`}
+        subtitle={t(`${prefix}.description`)}
+        actions={actions}
+        tabs={tabs}
+        related={related}
+        relatedLabel={relatedLabel}
+      >
+        <PageHeaderFacts
+          facts={figures.map((figure) => ({
+            id: figure.key,
+            label: t(`${prefix}.cards.${figure.key}.label`),
+            value: figure.value === NONE_YET ? noneYet : figure.value,
+          }))}
+          meta={
+            snapshot || note ? (
+              <>
+                {snapshot}
+                {note}
+              </>
+            ) : undefined
+          }
+        />
+      </PageHeader>
+    );
+  }
 
   const headerFigures: PageHeaderFigure[] = figures.map((figure) => {
     const label = t(`${prefix}.cards.${figure.key}.label`);
     return {
       id: figure.key,
       label,
-      value:
-        figure.value === NONE_YET ? (
-          <span className="text-muted-foreground">{t('publicData.common.none')}</span>
-        ) : (
-          figure.value
-        ),
+      value: figure.value === NONE_YET ? noneYet : figure.value,
       info: figure.hasTooltip ? t(`${prefix}.cards.${figure.key}.tooltip`) : undefined,
       size: figure.size,
       compact: figure.compact,
+      date: figure.date,
     };
   });
 
@@ -636,25 +686,15 @@ export async function PublicDataRouteSeoSummary({
       actions={actions}
       tabs={tabs}
       meta={
-        readAt !== null || note ? (
+        snapshot || note ? (
           <>
-            {readAt !== null ? (
-              // One item, so the stamp and its source flow as one line of text.
-              <span>
-                <SnapshotStamp at={readAt} />
-                {' · '}
-                {t('publicData.common.source', { source: t(`${prefix}.source`) })}
-              </span>
-            ) : null}
+            {snapshot}
             {note}
           </>
         ) : undefined
       }
-      related={definition.links.map((link) => ({
-        href: localizeCrossHostHref(link.href, locale),
-        label: t(`${prefix}.links.${link.key}`),
-      }))}
-      relatedLabel={t('publicData.common.relatedPagesAria', { heading })}
+      related={related}
+      relatedLabel={relatedLabel}
     />
   );
 }

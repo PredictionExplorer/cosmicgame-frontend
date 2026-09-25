@@ -2,14 +2,12 @@
   "publicData": {
     "common": {
       "none": "暫無",
-      "source": "數據來源：{source}",
       "relatedPagesAria": "{heading}相關頁面"
     },
     "routes": {
       "allocation": {
         "heading": "分配名錄",
         "description": "瀏覽 Cosmic Signature 已收官演繹週期的公開分配歷史，包括簽名分配、星選、錨定派發與公共物品資金流。",
-        "source": "Cosmic Signature 公開週期 API",
         "links": {
           "statistics": "查看協議統計",
           "learn": "了解週期如何收官",
@@ -35,7 +33,6 @@
       "anchoring": {
         "heading": "錨定派發",
         "description": "鏈上可查的每一次錨定、每一筆 ETH 錨定派發與每一次星選銘刻。",
-        "source": "Cosmic Signature 公開錨定 API",
         "links": {
           "statistics": "查看錨定統計",
           "learn": "了解錨定機制",
@@ -59,11 +56,9 @@
       "marketing": {
         "heading": "推廣分配",
         "description": "查看 Cosmic Signature 推廣分配歷史，以及向幫助更多人了解協議的生態貢獻者發放的 CST。",
-        "source": "Cosmic Signature 推廣 API",
         "links": {
-          "faq": "閱讀常見問題",
-          "statistics": "查看協議統計",
-          "siteMap": "瀏覽公開頁面"
+          "faq": "推廣儲備如何運作",
+          "statistics": "查看協議統計"
         },
         "cards": {
           "records": {
@@ -80,7 +75,6 @@
       "imprint": {
         "heading": "銘刻 Random Walk NFT",
         "description": "銘刻 Random Walk NFT，以參與 Cosmic Signature。每枚尚未使用的 Random Walk NFT 都可附加至一筆 ETH 落筆，使落筆價格降低 50%。",
-        "source": "Random Walk NFT 合約與 Cosmic Signature 公開 API",
         "links": {
           "cycle": "打開目前演繹週期",
           "learn": "了解落筆機制",
@@ -101,7 +95,6 @@
       "eth-contribution": {
         "heading": "直接 ETH 貢獻",
         "description": "直接轉入週期儲備的 ETH，附每位貢獻者的留言與所屬週期。",
-        "source": "Cosmic Signature 貢獻 API",
         "links": {
           "reserve": "週期儲備如何分配",
           "protocol": "公共物品份額的去向",
@@ -122,7 +115,6 @@
       "attached-nfts": {
         "heading": "已附加 NFT 貢獻",
         "description": "瀏覽隨 Cosmic Signature 落筆附加的 NFT。週期收官時，已附加的 ERC-721 代幣會轉給簽名分配獲配者。",
-        "source": "Cosmic Signature 公開已附加 NFT API",
         "links": {
           "gallery": "瀏覽 Cosmic Signature 畫廊",
           "cycle": "查看目前演繹週期",
@@ -143,7 +135,6 @@
       "allocation-finalized": {
         "heading": "已收官的分配",
         "description": "每個已收官週期的分配情況，由簽名分配到每一項星選與錨定派發記錄。",
-        "source": "Cosmic Signature 公開分配取回 API",
         "links": {
           "myAllocations": "取回你的分配",
           "statistics": "查看彙總統計",
@@ -166,7 +157,6 @@
       "named-nfts": {
         "heading": "已命名 Cosmic Signature NFT",
         "description": "瀏覽由持有者自定義名稱的 Cosmic Signature NFT，串聯代幣身份、畫廊發現與鏈上系列歷史。",
-        "source": "Cosmic Signature 公開代幣 API",
         "links": {
           "gallery": "瀏覽完整畫廊",
           "learn": "了解作品生成方式",
@@ -178,16 +168,12 @@
           },
           "owners": {
             "label": "目前持有者"
-          },
-          "imprinted": {
-            "label": "已銘刻 NFT"
           }
         }
       },
       "used-rwlk-nfts": {
         "heading": "已使用的 Random Walk NFT",
         "description": "查看已經附加至 ETH 落筆、並用掉一次性落筆價格減免資格的 Random Walk NFT。",
-        "source": "Cosmic Signature 公開 Random Walk 使用 API",
         "links": {
           "imprint": "銘刻 Random Walk NFT",
           "learn": "了解落筆機制",
@@ -208,7 +194,6 @@
       "coordination-changes": {
         "heading": "協調變更",
         "description": "自目前模式開始以來，合約所有者對協議參數作出的每一項變更。",
-        "source": "Cosmic Signature 系統事件 API",
         "links": {
           "security": "閱讀安全概覽",
           "audits": "查閱審計與驗證",
@@ -231,10 +216,8 @@
       "public-goods-contributions-cg": {
         "heading": "協議公共物品資助",
         "description": "追蹤 Cosmic Signature 各週期自動轉入公共物品金庫、併發往其目前受益方 Protocol Guild 的資金。",
-        "source": "Cosmic Signature 公共物品 API",
         "links": {
           "learn": "了解公共物品機制",
-          "statistics": "查看公共物品統計",
           "contracts": "查看金庫合約"
         },
         "cards": {
@@ -253,7 +236,6 @@
       "public-goods-contributions-voluntary": {
         "heading": "自願公共物品資助",
         "description": "任何人直接轉入公共物品金庫的 ETH，交由其受益方，目前為 Protocol Guild。",
-        "source": "Cosmic Signature 公共物品 API",
         "links": {
           "direct": "查看直接 ETH 貢獻",
           "learn": "了解公共物品機制",
@@ -274,11 +256,10 @@
       "public-goods-retrievals": {
         "heading": "公共物品取回",
         "description": "查看 Cosmic Signature 公共物品金庫的取回記錄；週期儲備會由此轉向目前配置的公共物品受益方 Protocol Guild。",
-        "source": "Cosmic Signature 公共物品 API",
         "links": {
           "learn": "了解公共物品機制",
           "protocolGuild": "瀏覽 Protocol Guild",
-          "contracts": "查閱公開合約地址"
+          "contracts": "查看金庫合約"
         },
         "cards": {
           "records": {

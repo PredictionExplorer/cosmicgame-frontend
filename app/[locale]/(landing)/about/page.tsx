@@ -130,9 +130,7 @@ export default async function AboutPage({ params }: PageProps) {
         <div className="min-w-0">
           <p className="type-eyebrow text-subtle">{content.eyebrow}</p>
           <h1 className="mt-3 type-display-md text-foreground sm:mt-4">{content.heading}</h1>
-          <p className="mt-5 type-lede text-muted-foreground max-sm:text-base">
-            {content.body.lede}
-          </p>
+          <p className="mt-5 type-lede text-muted-foreground">{content.body.lede}</p>
           <ul className="mt-6 flex flex-wrap gap-2">
             {[
               content.facts.license,
