@@ -67,11 +67,19 @@ describe('EthDonationTable', () => {
         showType={true}
       />,
     );
-    expect(screen.getByRole('columnheader', { name: 'tables.columns.note' })).toBeInTheDocument();
+    const headers = screen.getAllByRole('columnheader').map((header) => header.textContent);
+    // Last, after when, which cycle, who and how much.
+    expect(headers.at(-1)).toBe('tables.columns.note');
     expect(screen.getByText('tables.ethContribution.withNote')).toBeInTheDocument();
-    // No note reads as a dash that says "None", not a sentence per row.
-    expect(screen.getByText('tables.status.none')).toBeInTheDocument();
+    // No note leaves the cell blank (a phone record drops the line), not a dash per row.
+    expect(screen.queryByText('tables.status.none')).not.toBeInTheDocument();
     expect(screen.queryByText(/ethContribution\.(simple|withInfo)/)).not.toBeInTheDocument();
+  });
+
+  // Every current contribution was plain, so the column was a line of dashes.
+  it('drops the Note column when no contribution on the page has a note (regression)', () => {
+    render(<EthDonationTable list={[createDonation({ RecordType: 0 })]} showType={true} />);
+    expect(screen.queryByRole('columnheader', { name: 'tables.columns.note' })).toBeNull();
   });
 
   it('names a contribution’s record link by its date, then the record it opens', () => {

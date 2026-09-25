@@ -1,29 +1,18 @@
 'use client';
 
-import { useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 import { Check, Copy, WrapText } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { useCopyFeedback } from '@/hooks/useCopyFeedback';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
-/** Below `sm` (40rem), where lines wrap unless the reader turns wrapping off. */
+/**
+ * Below `sm` (40rem), where lines wrap unless the reader turns wrapping off.
+ * `false` on the server and without `matchMedia`, where CSS decides.
+ */
 const PHONE_QUERY = '(max-width: 39.999rem)';
-
-function subscribePhone(onChange: () => void) {
-  const query = window.matchMedia(PHONE_QUERY);
-  query.addEventListener('change', onChange);
-  return () => query.removeEventListener('change', onChange);
-}
-
-/** Whether the viewport is a phone's; `false` on the server, where CSS decides. */
-function usePhoneWidth(): boolean {
-  return useSyncExternalStore(
-    subscribePhone,
-    () => window.matchMedia(PHONE_QUERY).matches,
-    () => false,
-  );
-}
 
 /**
  * The frame around a server-rendered source file (`SourceCode`): a toolbar
@@ -50,7 +39,7 @@ export function SourceViewer({
   const { copied, copy } = useCopyFeedback();
   // `null`: the reader has not chosen, so phones wrap and wider screens scroll.
   const [wrapChoice, setWrapChoice] = useState<boolean | null>(null);
-  const phone = usePhoneWidth();
+  const phone = useMediaQuery(PHONE_QUERY);
   const wrap = wrapChoice ?? phone;
   const regionRef = useRef<HTMLPreElement>(null);
 
