@@ -70,7 +70,6 @@
   "rail": {
     "position": "{total}件中{position}番目の一筆",
     "positionLive": "これまでの{total}件中{position}番目の一筆",
-    "liveNote": "このサイクルはまだ進行中です。シグネチャーはサイクルの確定時に刻印されます。",
-    "signature": "サイクル{cycle}のシグネチャー"
+    "liveNote": "このサイクルはまだ進行中です。シグネチャーはサイクルの確定時に刻印されます。"
   }
 }

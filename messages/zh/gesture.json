@@ -70,7 +70,6 @@
   "rail": {
     "position": "第 {position} 次落笔，共 {total} 次",
     "positionLive": "第 {position} 次落笔，目前共 {total} 次",
-    "liveNote": "本周期仍在进行，它的签名将在周期收官时铭刻。",
-    "signature": "第 {cycle} 个周期的签名"
+    "liveNote": "本周期仍在进行，它的签名将在周期收官时铭刻。"
   }
 }

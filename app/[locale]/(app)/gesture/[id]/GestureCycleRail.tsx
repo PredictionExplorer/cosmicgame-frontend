@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { ArtFrame, WallLabel } from '@/components/ui/art-frame';
+import { useSignatureLabel } from '@/components/ui/signature-label';
 import { signatureMedia, signatureSources } from '@/components/nft/signatureMedia';
 import { useFormat } from '@/hooks/useFormat';
 import { formatId } from '@/utils/format/ids';
@@ -55,7 +56,9 @@ export function GestureCycleRail({
     () => signatureSources(signatureMedia(signature?.seed)),
     [signature?.seed],
   );
-  const signatureTitle = t('rail.signature', { cycle: format.count(cycle) });
+  // The one wall label every Signature carries: "Signature #000024", then its cycle.
+  const label = useSignatureLabel();
+  const signatureFacts = signature ? { tokenId: signature.tokenId, cycle } : null;
 
   return (
     <aside aria-labelledby={headingId} className={cn('min-w-0', className)}>
@@ -67,7 +70,8 @@ export function GestureCycleRail({
         <div className="mt-4" data-testid="gesture-position">
           <p className="type-body-md text-muted-foreground">
             {t(live ? 'rail.positionLive' : 'rail.position', {
-              position: format.count(position),
+              // A position is an ordinal, as in the H1 ("#1135"): no digit grouping.
+              position: String(position),
               total: format.count(total),
             })}
           </p>
@@ -85,7 +89,7 @@ export function GestureCycleRail({
         </div>
       ) : null}
 
-      {signature && signature.tokenId >= 0 && sources.length > 0 ? (
+      {signature && signatureFacts && signature.tokenId >= 0 && sources.length > 0 ? (
         <figure className="mt-8" data-testid="gesture-cycle-signature">
           {/* The plate repeats the title's link for the pointer; the title is the one tab stop. */}
           <Link href={`/detail/${signature.tokenId}`} tabIndex={-1} aria-hidden className="block">
@@ -102,10 +106,10 @@ export function GestureCycleRail({
             className="mt-3"
             title={
               <Link href={`/detail/${signature.tokenId}`} className="link-quiet">
-                {signatureTitle}
+                {label.title(signatureFacts)}
               </Link>
             }
-            meta={[`Cosmic Signature ${formatId(signature.tokenId)}`]}
+            meta={label.meta(signatureFacts)}
           />
         </figure>
       ) : live ? (

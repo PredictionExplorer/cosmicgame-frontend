@@ -70,7 +70,6 @@
   "rail": {
     "position": "전체 {total}개 중 {position}번째 제스처",
     "positionLive": "지금까지 {total}개 중 {position}번째 제스처",
-    "liveNote": "이 사이클은 아직 진행 중입니다. 시그니처는 사이클이 마감될 때 각인됩니다.",
-    "signature": "사이클 {cycle}의 시그니처"
+    "liveNote": "이 사이클은 아직 진행 중입니다. 시그니처는 사이클이 마감될 때 각인됩니다."
   }
 }

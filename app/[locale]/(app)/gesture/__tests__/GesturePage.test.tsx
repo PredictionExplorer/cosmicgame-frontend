@@ -267,8 +267,8 @@ describe('GesturePage', () => {
     expect(figure(container, 'cost')).toHaveTextContent('0.10211');
     expect(figure(container, 'cost')).toHaveTextContent('ETH');
     expect(figure(container, 'participationCst')).toHaveTextContent('100');
-    // Held until the next gesture, in the page's one grammar for elapsed times (V224, V239).
-    expect(figure(container, 'held')?.querySelector('dd time')).toHaveTextContent('1h 52m 48s');
+    // Held until the next gesture, as a clock like every duration figure (V201, V239).
+    expect(figure(container, 'held')?.querySelector('dd time')).toHaveTextContent('01:52:48');
     // No bare cycle number as a headline figure: the trail and the cycle column name it.
     expect(figure(container, 'cycle')).toBeNull();
   });
@@ -301,17 +301,19 @@ describe('GesturePage', () => {
     const { container } = renderGesture();
     expect(mockUseRoundInfo).toHaveBeenLastCalledWith(5);
     // The cycle's latest gesture held until the cycle finalized.
-    expect(figure(container, 'held')?.querySelector('dd time')).toHaveTextContent('1m 30s');
+    expect(figure(container, 'held')?.querySelector('dd time')).toHaveTextContent('00:01:30');
     const rail = screen.getByRole('complementary', {
       name: 'common.pageHeader.crumbs.cycle(cycle=5)',
     });
     expect(within(rail).getByTestId('gesture-position')).toHaveTextContent(
       'gesture.rail.position(position=7,total=1,141)',
     );
-    expect(within(rail).getByRole('link', { name: /gesture\.rail\.signature/ })).toHaveAttribute(
-      'href',
-      '/detail/24',
-    );
+    // The cycle's Signature carries the one wall label: its number, then its cycle.
+    const signature = within(rail).getByTestId('gesture-cycle-signature');
+    expect(
+      within(signature).getByRole('link', { name: /common\.signature\.untitled/ }),
+    ).toHaveAttribute('href', '/detail/24');
+    expect(signature).toHaveTextContent('common.signature.cycle(n=5)');
     expect(within(rail).getByRole('link', { name: /gesture\.nav\.all/ })).toHaveAttribute(
       'href',
       '/allocation/5',
@@ -325,8 +327,9 @@ describe('GesturePage', () => {
       settled: true,
     });
     renderGesture();
+    // A duration inside a sentence reads in words, not as a clock.
     expect(screen.getByTestId('clock-extension')).toHaveTextContent(
-      'gesture.rows.clockExtended(duration=1h 01m 12s)',
+      'gesture.rows.clockExtended(duration=1h 1m 12s)',
     );
   });
 

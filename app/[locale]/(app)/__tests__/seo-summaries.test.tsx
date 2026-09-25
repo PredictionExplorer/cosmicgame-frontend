@@ -622,9 +622,8 @@ describe('server-rendered page headers', () => {
       expect(
         screen.getByText(new RegExp(`${protocolFacts.randomWalkDiscountPercentage}%`)),
       ).toBeInTheDocument();
-      // Labels too long for half a phone's row ("Random Walk NFTs imprinted"):
-      // label-and-value rows, never a label broken over three lines.
-      expect(document.querySelector('dl')).toHaveAttribute('data-layout', 'rows');
+      // Two figures: one row of two on phones.
+      expect(document.querySelector('dl')).toHaveAttribute('data-layout', 'grid');
     });
 
     it('shows the imprinted count as unavailable when the chain read fails, never as zero', async () => {

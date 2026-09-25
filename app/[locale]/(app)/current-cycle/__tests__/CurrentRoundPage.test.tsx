@@ -204,12 +204,12 @@ describe('CurrentRoundPage', () => {
     ).toBeTruthy();
   });
 
-  it('reads how long the cycle has run in the page’s grammar for elapsed times (V224)', () => {
+  it('reads how long the cycle has run as a clock, like every duration figure (V201, V224)', () => {
     setupLoaded();
     const { container } = render(<CurrentRoundPage />);
-    // Two hours in, as "2h 00m 00s", not a truncated "2h".
+    // Two hours in, as "02:00:00", never a truncated "2h".
     expect(container.querySelector('[data-figure="running"] dd')?.textContent).toMatch(
-      /^2h\s0\dm\s\d\ds$/,
+      /^02:00:\d\d$/,
     );
   });
 

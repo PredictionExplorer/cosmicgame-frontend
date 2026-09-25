@@ -70,7 +70,6 @@
   "rail": {
     "position": "Nét bút thứ {position} trên {total}",
     "positionLive": "Nét bút thứ {position} trên {total} tính đến nay",
-    "liveNote": "Chu kỳ này vẫn đang diễn ra. Signature của chu kỳ được khắc khi chu kỳ hoàn tất.",
-    "signature": "Signature của chu kỳ {cycle}"
+    "liveNote": "Chu kỳ này vẫn đang diễn ra. Signature của chu kỳ được khắc khi chu kỳ hoàn tất."
   }
 }
