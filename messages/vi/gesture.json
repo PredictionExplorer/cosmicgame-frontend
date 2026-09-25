@@ -53,7 +53,7 @@
     "aria": "Các nét bút liền kề",
     "previous": "Nét bút trước",
     "next": "Nét bút sau",
-    "all": "Mọi nét bút trong chu kỳ #{cycle}"
+    "all": "Mọi nét bút trong chu kỳ {cycle}"
   },
   "nftPreview": {
     "collectionName": "Tên bộ sưu tập",

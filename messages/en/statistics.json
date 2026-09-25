@@ -71,7 +71,7 @@
       "gesturesCaption": "{count, plural, one {# gesture} other {# gestures}} this cycle"
     },
     "cycle": {
-      "title": "Cycle {cycle} so far",
+      "title": "Cycle #{cycle} so far",
       "open": "Open the current cycle",
       "opened": "Opened",
       "rhythmLabel": "Gestures per UTC day, last {days, plural, one {# day} other {# days}}",
@@ -412,9 +412,9 @@
       "allClaimed": "All retrieved",
       "unclaimedCount": "{count} unretrieved",
       "viewUnclaimed": "View unretrieved assets",
-      "cycleDetails": "Cycle {cycle} details",
+      "cycleDetails": "Cycle #{cycle} details",
       "dialog": {
-        "unclaimedTitle": "Unretrieved assets — Cycle {cycle}",
+        "unclaimedTitle": "Unretrieved assets — Cycle #{cycle}",
         "expired": "The retrieval window has closed. Anyone can now retrieve these assets for themselves.",
         "closesIn": "Retrieval window closes in {duration}.",
         "asset": "Asset",
@@ -563,8 +563,8 @@
       "nextCycleAria": "Next cycle",
       "liveCycle": "Live cycle",
       "jumpLive": "Jump to live",
-      "option": "Cycle {cycle}",
-      "optionLive": "Cycle {cycle} (live)"
+      "option": "Cycle #{cycle}",
+      "optionLive": "Cycle #{cycle} (live)"
     },
     "cstWindow": {
       "timeIntoCycle": "Time into cycle",
@@ -633,7 +633,7 @@
     }
   },
   "embed": {
-    "title": "Endurance timeline · Cycle {cycle}",
+    "title": "Endurance timeline · Cycle #{cycle}",
     "final": "Final",
     "source": "Open in Cosmic Signature",
     "opensNewWindow": "(opens in a new window)"
@@ -703,7 +703,7 @@
     },
     "gridLabel": "Stellar Selection NFTs",
     "unnamed": "Cosmic Signature {id}",
-    "cycle": "Cycle {cycle}",
+    "cycle": "Cycle #{cycle}",
     "sources": {
       "participant": "Participant",
       "randomWalk": "Random Walk",
@@ -723,7 +723,7 @@
     "errorMessage": "The allocations of this address couldn't be read. Try again in a moment."
   },
   "systemEvent": {
-    "titleBeforeCycle": "System Configuration Made Before Cycle {cycle}",
+    "titleBeforeCycle": "System Configuration Made Before Cycle #{cycle}",
     "titleBeforeDeployment": "System Configuration Made Before Deployment",
     "range": "Event log range {start}–{end}",
     "breadcrumbs": {

@@ -345,7 +345,7 @@
   },
   "og": {
     "shared": {
-      "cycle": "Cycle {cycle}",
+      "cycle": "Cycle #{cycle}",
       "plateCaption": "{name} · {cycle}"
     },
     "default": {
@@ -391,10 +391,10 @@
     },
     "gesture": {
       "alt": "Cosmic Signature — Gesture",
-      "altWithValue": "Cosmic Signature — Gesture #{position} in Cycle {cycle}",
+      "altWithValue": "Cosmic Signature — Gesture #{position} in Cycle #{cycle}",
       "eyebrow": "Gesture",
       "title": "An imprint on the Signature.",
-      "titleWithValue": "Gesture #{position} · Cycle {cycle}",
+      "titleWithValue": "Gesture #{position} · Cycle #{cycle}",
       "subhead": "Each gesture extends the cycle, shapes its Signature, and can imprint Participation CST.",
       "methods": {
         "eth": "ETH gesture",
@@ -404,10 +404,10 @@
     },
     "allocation": {
       "alt": "Cosmic Signature — Allocation Distribution",
-      "altWithValue": "Cosmic Signature — Cycle {cycle} allocations",
+      "altWithValue": "Cosmic Signature — Cycle #{cycle} allocations",
       "eyebrow": "Allocation",
       "title": "Allocation Distribution",
-      "titleWithValue": "Cycle {cycle} allocations",
+      "titleWithValue": "Cycle #{cycle} allocations",
       "subhead": "How the Cycle Reserve was distributed across more than ten allocation tracks."
     },
     "participant": {
@@ -422,7 +422,7 @@
       "altWithTraits": "{subject}: {structure} structure, {palette} palette",
       "altSubject": "Cosmic Signature #{id}",
       "altSubjectNamed": "“{name}”, Cosmic Signature #{id}",
-      "altInCycle": "{subject} from Cycle {cycle}",
+      "altInCycle": "{subject} from Cycle #{cycle}",
       "title": "Signature {number}",
       "subhead": "A deterministic three-body simulation, seeded on-chain and rendered by the open-source renderer."
     }

@@ -89,7 +89,7 @@
         "publicGoods": "Public Goods",
         "publicGoodsFallback": "10+ tracks"
       },
-      "previousAllocations": "Cycle {number} allocations"
+      "previousAllocations": "Cycle #{number} allocations"
     }
   },
   "notifications": {
@@ -221,7 +221,7 @@
     }
   },
   "status": {
-    "opensAt": "Cycle {cycle} opens at {dateTime}",
+    "opensAt": "Cycle #{cycle} opens at {dateTime}",
     "finalizesIn": "Cycle finalizes in",
     "finalizesInTooltip": "When this timer hits zero, the participant holding the Last Gesture may finalize the cycle and receive the Signature Allocation. Each new gesture extends the timer.",
     "readyToFinalize": "Cycle ready to finalize",
@@ -258,7 +258,7 @@
       "nftStellar": "NFT Stellar Selection"
     },
     "openCycle": {
-      "cycleNumber": "Cycle {cycle}",
+      "cycleNumber": "Cycle #{cycle}",
       "title": "Open the cycle",
       "body": "The Calibration Window for the first ETH gesture is open. Make your gesture."
     }

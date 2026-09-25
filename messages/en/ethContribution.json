@@ -55,7 +55,7 @@
   },
   "cycle": {
     "invalidNumber": "Invalid cycle number",
-    "title": "Cycle {cycle} contributions",
+    "title": "Cycle #{cycle} contributions",
     "breadcrumbContributions": "Direct ETH contributions",
     "lede": "Direct ETH contributions to the Cycle Reserve during cycle {cycle}.",
     "figures": {
@@ -66,8 +66,8 @@
     "otherCycles": "Other cycles",
     "previous": "Previous cycle",
     "next": "Next cycle",
-    "cycleLabel": "Cycle {cycle}",
-    "viewAllocation": "Cycle {cycle} allocation",
+    "cycleLabel": "Cycle #{cycle}",
+    "viewAllocation": "Cycle #{cycle} allocation",
     "viewLive": "The live cycle",
     "emptyDescription": "Contributions sent while cycle {cycle} is active appear here.",
     "loadError": "The contributions of this cycle couldn't be loaded.",

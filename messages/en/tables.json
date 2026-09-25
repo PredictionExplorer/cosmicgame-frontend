@@ -213,7 +213,7 @@
     "empty": "No configuration changes"
   },
   "allocation": {
-    "cycle": "Cycle {cycle}",
+    "cycle": "Cycle #{cycle}",
     "gestures": "Gestures",
     "listAria": "Allocation recipients by cycle",
     "groups": {

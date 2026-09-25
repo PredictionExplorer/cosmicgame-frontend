@@ -1,7 +1,7 @@
 {
   "shared": {
     "unavailable": "Unavailable",
-    "cycleNumber": "Cycle {cycle}"
+    "cycleNumber": "Cycle #{cycle}"
   },
   "allocations": {
     "title": "My Allocations",
@@ -103,10 +103,10 @@
       "enduranceChampion": "Endurance Champion",
       "chronoWarrior": "Chrono-Warrior",
       "finalCstGesture": "Final CST Gesture",
-      "entry": "{title} · {count, plural, one {Cycle {cycles}} other {Cycles {cycles}}}"
+      "entry": "{title} · {count, plural, one {Cycle '#'{cycles}} other {Cycles {cycles}}}"
     },
     "selection": {
-      "title": "Stellar Selection pool · Cycle {cycle}",
+      "title": "Stellar Selection pool · Cycle #{cycle}",
       "share": "{mine} of {total} gestures",
       "caption": "At finalization, {eth} ETH and {nft} NFT selections are drawn from all of this cycle’s gestures, with replacement. Each gesture counts once.",
       "captionGeneric": "At finalization, Stellar Selections are drawn from all of this cycle’s gestures, with replacement. Each gesture counts once."
@@ -269,7 +269,7 @@
     "clear": "Clear selection",
     "listAria": "Cosmic Signature NFTs",
     "selectAria": "Select NFT {id}",
-    "cycle": "Cycle {cycle}",
+    "cycle": "Cycle #{cycle}",
     "cycleUnavailable": "Cycle data not available",
     "statusLabels": {
       "anchored": "Anchored: release it to send",
@@ -351,7 +351,7 @@
       "deadline": "Retrieve by",
       "status": "Status"
     },
-    "cycle": "Cycle {cycle}",
+    "cycle": "Cycle #{cycle}",
     "sources": {
       "stellarSelection": "Stellar Selection",
       "chronoWarrior": "Chrono-Warrior"

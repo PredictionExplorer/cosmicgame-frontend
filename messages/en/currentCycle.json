@@ -24,7 +24,7 @@
       "makeGesture": "Make a gesture"
     },
     "countdown": {
-      "opensAt": "Cycle {n} opens at {date}"
+      "opensAt": "Cycle #{n} opens at {date}"
     }
   },
   "stats": {

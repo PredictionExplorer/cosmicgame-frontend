@@ -265,7 +265,7 @@
     "results": {
       "address": "Người tham gia {address}",
       "token": "Signature {id}",
-      "cycle": "Chu kỳ #{cycle}",
+      "cycle": "Chu kỳ {cycle}",
       "gesture": "Nét bút có ID {id}",
       "transaction": "Giao dịch trên {explorer}"
     },

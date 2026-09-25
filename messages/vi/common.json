@@ -50,7 +50,7 @@
     "crumbs": {
       "participants": "Người tham gia",
       "allocationRecipients": "Người nhận phân bổ",
-      "cycle": "Chu kỳ #{cycle}"
+      "cycle": "Chu kỳ {cycle}"
     }
   },
   "status": {

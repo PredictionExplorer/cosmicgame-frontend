@@ -663,7 +663,7 @@
     "emptyTitle": "Chưa có NFT đính kèm nào",
     "emptyDescription": "Các NFT đính kèm vào nét bút sẽ hiện ở đây. Mỗi NFT được chuyển cho người nhận phân bổ Signature của chu kỳ khi chu kỳ hoàn tất.",
     "card": {
-      "cycle": "Chu kỳ #{cycle}",
+      "cycle": "Chu kỳ {cycle}",
       "attachedBy": "Đính kèm bởi"
     }
   },
@@ -676,7 +676,7 @@
     "emptyTitle": "Chưa có RandomWalk NFT nào được sử dụng",
     "emptyDescription": "RandomWalk NFT sẽ hiện ở đây khi một nét bút ETH dùng nó để giảm chi phí nét bút một lần.",
     "card": {
-      "cycle": "Chu kỳ #{cycle}",
+      "cycle": "Chu kỳ {cycle}",
       "usedBy": "Người tham gia"
     }
   },

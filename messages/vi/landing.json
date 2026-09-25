@@ -2,7 +2,7 @@
   "timer": {
     "cycle": {
       "current": "chu kỳ hiện tại",
-      "numbered": "Chu kỳ #{number}",
+      "numbered": "Chu kỳ {number}",
       "generic": "Chu kỳ trình diễn"
     },
     "phases": {

@@ -1,6 +1,6 @@
 {
   "formats": {
-    "cycle": "Cycle {cycle}",
+    "cycle": "Cycle #{cycle}",
     "cycleHash": "Cycle #{cycle}",
     "cosmicSignatureToken": "Cosmic Signature #{token}"
   },

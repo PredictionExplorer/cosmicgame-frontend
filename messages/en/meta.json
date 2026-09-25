@@ -173,7 +173,7 @@
     "description": "Details of a specific ETH contribution to the Cosmic Signature Cycle Reserve — contributor address, amount, cycle, and optional note."
   },
   "ethContributionByCycle": {
-    "title": "Cycle {cycle} contributions",
+    "title": "Cycle #{cycle} contributions",
     "description": "Direct ETH contributions to the Cycle Reserve during cycle {cycle}."
   },
   "myStatistics": {
