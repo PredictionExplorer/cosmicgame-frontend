@@ -16,7 +16,6 @@ import {
   AttachedNftRetrievalTable,
   AttachedTokenRetrievalTable,
   type AttachedNftRetrievalRow,
-  type AttachedTokenRetrievalRow,
 } from '@/components/winnings/AttachedRetrievalTables';
 import { getDonatedErc20RawClaimAmount } from '@/utils/donatedErc20';
 
@@ -175,7 +174,7 @@ export function DonatedAssetsSection({
           />
         ) : (
           <AttachedTokenRetrievalTable
-            rows={donatedERC20 as AttachedTokenRetrievalRow[]}
+            rows={donatedERC20}
             ariaLabel={t('statistics.donatedAssets.erc20.title')}
             headingLevel={4}
             onRetrieve={

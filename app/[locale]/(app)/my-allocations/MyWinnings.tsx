@@ -19,7 +19,6 @@ import {
   AttachedNftRetrievalTable,
   AttachedTokenRetrievalTable,
   type AttachedNftRetrievalRow,
-  type AttachedTokenRetrievalRow,
 } from '@/components/winnings/AttachedRetrievalTables';
 import {
   EthAllocationsTable,
@@ -110,10 +109,7 @@ export default function MyWinnings() {
     [nftsRaw],
   );
   const tokens = useMemo(() => (tokensRaw ?? []) as DonatedERC20Token[], [tokensRaw]);
-  const openTokens = useMemo(
-    () => tokens.filter((token) => !token.Claimed) as AttachedTokenRetrievalRow[],
-    [tokens],
-  );
+  const openTokens = useMemo(() => tokens.filter((token) => !token.Claimed), [tokens]);
 
   const loading = loadingDeposits || loadingNfts || loadingTokens;
   const plan = useMemo(
