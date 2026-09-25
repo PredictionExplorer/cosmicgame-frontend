@@ -53,7 +53,7 @@
     "aria": "Neighbouring gestures",
     "previous": "Previous gesture",
     "next": "Next gesture",
-    "all": "All gestures in Cycle #{cycle}"
+    "all": "All gestures in Cycle {cycle}"
   },
   "nftPreview": {
     "collectionName": "Collection name",

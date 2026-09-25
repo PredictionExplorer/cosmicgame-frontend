@@ -59,7 +59,7 @@
     "cycle": "Chu kỳ",
     "recipient": "Người nhận",
     "owner": "Chủ sở hữu",
-    "roundNumber": "Chu kỳ #{round}",
+    "roundNumber": "Chu kỳ {round}",
     "anchoring": "Neo giữ",
     "seed": "Seed",
     "seedTooltip": "Seed ngẫu nhiên độc nhất được dùng để tạo tác phẩm và đặc tính của token này.",

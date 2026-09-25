@@ -155,7 +155,7 @@ test.describe('Header', () => {
       'aria-selected',
       'true',
     );
-    await expect(dialog.getByRole('option', { name: /^Cycle #25\b/ })).toBeVisible();
+    await expect(dialog.getByRole('option', { name: /^Cycle 25\b/ })).toBeVisible();
     await page.keyboard.press('Enter');
     await page.waitForURL('**/detail/25');
   });

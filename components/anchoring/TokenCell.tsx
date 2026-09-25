@@ -21,7 +21,7 @@ export interface TokenCellProps {
   thumbnail?: boolean;
   /**
    * A line under the number, beside the artwork, on a phone only: the facts the record's
-   * other columns hold on a wide screen ("Cycle #1 · Aug 11"), so a phone record reads as one
+   * other columns hold on a wide screen ("Cycle 1 · Aug 11"), so a phone record reads as one
    * media object instead of a stack of label rows. Only with `thumbnail`; the columns it
    * repeats are `priority: 'secondary'`.
    */

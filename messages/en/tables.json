@@ -88,7 +88,6 @@
   "columns": {
     "cycle": "Cycle",
     "cycleNumber": "Cycle",
-    "cycleHash": "Cycle #",
     "round": "Cycle",
     "participant": "Participant",
     "recipient": "Recipient",

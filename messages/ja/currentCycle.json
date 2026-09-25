@@ -163,7 +163,7 @@
     "summary": {
       "assetsIncluded": "含まれるアセット",
       "cycle": "サイクル",
-      "cycleValue": "#{cycle}",
+      "cycleValue": "{cycle}",
       "recipientRule": "受領者のルール",
       "recipientRuleValue": "最後の一筆"
     },

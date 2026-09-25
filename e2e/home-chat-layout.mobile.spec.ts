@@ -14,7 +14,7 @@ async function openChat(page: Page, messageCount = 12) {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   const chat = page.getByTestId('gesture-message-chat');
   await expect(
-    chat.getByText(new RegExp(`Cycle #7 · (Latest )?${Math.min(messageCount, 50)} messages`)),
+    chat.getByText(new RegExp(`Cycle 7 · (Latest )?${Math.min(messageCount, 50)} messages`)),
   ).toBeVisible();
   await page.evaluate(() => document.fonts.ready);
   return chat;

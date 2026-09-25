@@ -88,7 +88,6 @@
   "columns": {
     "cycle": "周期",
     "cycleNumber": "周期编号",
-    "cycleHash": "周期编号",
     "round": "周期",
     "participant": "参与者",
     "recipient": "获配者",

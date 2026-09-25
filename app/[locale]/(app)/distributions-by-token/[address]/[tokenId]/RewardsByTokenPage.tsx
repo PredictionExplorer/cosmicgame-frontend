@@ -120,7 +120,7 @@ function RewardsByTokenPage({ address, tokenId }: { address: string; tokenId: nu
         kind: 'link',
         header: t('distributionsByToken.columns.cycle'),
         value: (row) => row.RoundNum,
-        // "Cycle #1", not a bare "1": a word-sized link, as every other ledger names a cycle.
+        // "Cycle 1", not a bare "1": a word-sized link, as every other ledger names a cycle.
         cell: (row) => (
           <TableLink href={`/allocation/${row.RoundNum}`}>
             {tCommon('pageHeader.crumbs.cycle', { cycle: row.RoundNum })}

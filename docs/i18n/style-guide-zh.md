@@ -154,7 +154,7 @@ prose too:
 | Percent                    | 7%                       | 7%                                                                       |
 | ETH/CST amounts            | 0.0500 ETH               | 0.0500 ETH (unit stays Latin, space kept)                                |
 | Wallet addresses           | 0x1234....abcd           | unchanged                                                                |
-| Ordinal cycle              | Cycle #12                | 第 12 个周期                                                             |
+| Ordinal cycle              | Cycle 12                 | 第 12 个周期                                                             |
 
 Compact duration (1天2小时30分45秒) intentionally omits CJK–Latin spaces — it is a
 single timer token and spacing would shatter it; this is the sanctioned exception to §4.2.

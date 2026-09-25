@@ -45,7 +45,7 @@ describe('gesture/[id] metadata (D080)', () => {
   it('names the gesture by its place and cycle, read once on the server', async () => {
     mockGestureRead.mockResolvedValue({ BidPosition: 1135, RoundNum: 2 });
     const metadata = await generateMetadata(props('29434'));
-    expect(documentTitleOf(metadata)).toBe('Gesture #1135 · Cycle #2 · Cosmic Signature');
+    expect(documentTitleOf(metadata)).toBe('Gesture #1135 · Cycle 2 · Cosmic Signature');
     expect(mockGestureRead).toHaveBeenCalledWith(29434);
   });
 

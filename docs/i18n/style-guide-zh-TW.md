@@ -82,7 +82,7 @@ no pronoun spam, no 當……時 monotony). Taiwan-specific:
 | Week start (calendar UI) | Sunday                | 週日 — Taiwan calendars start on Sunday (`weekStartsMonday: false`) |
 | Number grouping          | 1,000,000             | 1,000,000 in data; prose may say 一百萬                             |
 | Large numbers in prose   | 100,000 orbits        | 十萬條候選軌道                                                      |
-| Ordinal cycle            | Cycle #12             | 第 12 個週期                                                        |
+| Ordinal cycle            | Cycle 12              | 第 12 個週期                                                        |
 | Nanometre                | 380–700 nm            | 380 至 700 奈米                                                     |
 
 Taiwan everyday usage favours the 12-hour clock (下午 2:05); the site keeps 24-hour

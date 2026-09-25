@@ -265,7 +265,7 @@
     "results": {
       "address": "Participant {address}",
       "token": "Signature {id}",
-      "cycle": "Cycle #{cycle}",
+      "cycle": "Cycle {cycle}",
       "gesture": "Gesture ID {id}",
       "transaction": "Transaction on {explorer}"
     },

@@ -88,7 +88,6 @@
   "columns": {
     "cycle": "사이클",
     "cycleNumber": "사이클 번호",
-    "cycleHash": "사이클",
     "round": "사이클",
     "participant": "참여자",
     "recipient": "수령자",

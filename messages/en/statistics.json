@@ -647,7 +647,7 @@
     "emptyTitle": "No attached NFTs yet",
     "emptyDescription": "NFTs attached to gestures appear here. Each goes to the cycle’s Signature Allocation Recipient when the cycle finalizes.",
     "card": {
-      "cycle": "Cycle #{cycle}",
+      "cycle": "Cycle {cycle}",
       "attachedBy": "Attached by"
     }
   },
@@ -660,7 +660,7 @@
     "emptyTitle": "No RandomWalk NFTs used yet",
     "emptyDescription": "A RandomWalk NFT appears here once an ETH gesture uses it for its one-time Gesture Cost reduction.",
     "card": {
-      "cycle": "Cycle #{cycle}",
+      "cycle": "Cycle {cycle}",
       "usedBy": "Used by"
     }
   },

@@ -72,7 +72,7 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     const clock = page.getByRole('region', { name: 'Cycle Finalization Time' });
     await ensureVisible(clock);
     await expect(clock).toBeVisible();
-    await expect(page.getByTestId('home-deck-header').getByText(/Cycle #\d+/)).toBeVisible();
+    await expect(page.getByTestId('home-deck-header').getByText(/Cycle \d+/)).toBeVisible();
     // Where the cycle is now, beside the chat.
     const guide = page.getByRole('region', { name: 'How this cycle works' });
     await ensureVisible(guide);

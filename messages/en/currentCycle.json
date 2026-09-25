@@ -16,7 +16,7 @@
     "rules": "Rules"
   },
   "hero": {
-    "title": "Cycle #{n}",
+    "title": "Cycle {n}",
     "cta": {
       "viewHomeClock": "View the home clock",
       "finalizeCycle": "Finalize the cycle",
@@ -151,9 +151,9 @@
     "heading": "Assets attached to this cycle",
     "cycleFallback": "current",
     "description": {
-      "nftOnly": "Assets the community attaches travel with the Signature Allocation. The Final Gesture participant receives {nftCount, plural, one {the attached NFT} other {all {nftCount} attached NFTs}} when Cycle #{cycle} finalizes.",
-      "erc20Only": "Assets the community attaches travel with the Signature Allocation. The Final Gesture participant receives {erc20Count, plural, one {the attached ERC-20 token deposit} other {all {erc20Count} attached ERC-20 token deposits}} when Cycle #{cycle} finalizes.",
-      "mixed": "Assets the community attaches travel with the Signature Allocation. The Final Gesture participant receives {nftCount, plural, one {the attached NFT} other {all {nftCount} attached NFTs}} and {erc20Count, plural, one {the attached ERC-20 token deposit} other {all {erc20Count} attached ERC-20 token deposits}} when Cycle #{cycle} finalizes."
+      "nftOnly": "Assets the community attaches travel with the Signature Allocation. The Final Gesture participant receives {nftCount, plural, one {the attached NFT} other {all {nftCount} attached NFTs}} when Cycle {cycle} finalizes.",
+      "erc20Only": "Assets the community attaches travel with the Signature Allocation. The Final Gesture participant receives {erc20Count, plural, one {the attached ERC-20 token deposit} other {all {erc20Count} attached ERC-20 token deposits}} when Cycle {cycle} finalizes.",
+      "mixed": "Assets the community attaches travel with the Signature Allocation. The Final Gesture participant receives {nftCount, plural, one {the attached NFT} other {all {nftCount} attached NFTs}} and {erc20Count, plural, one {the attached ERC-20 token deposit} other {all {erc20Count} attached ERC-20 token deposits}} when Cycle {cycle} finalizes."
     },
     "bonusReceipt": {
       "nftOnly": "{nftCount, plural, one {{nftCount} ERC-721 token} other {{nftCount} ERC-721 tokens}}",
@@ -163,7 +163,7 @@
     "summary": {
       "assetsIncluded": "Assets included",
       "cycle": "Cycle",
-      "cycleValue": "#{cycle}",
+      "cycleValue": "{cycle}",
       "recipientRule": "Recipient rule",
       "recipientRuleValue": "Final Gesture"
     },

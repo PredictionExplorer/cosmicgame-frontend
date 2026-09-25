@@ -88,7 +88,6 @@
   "columns": {
     "cycle": "週期",
     "cycleNumber": "週期編號",
-    "cycleHash": "週期編號",
     "round": "週期",
     "participant": "參與者",
     "recipient": "獲配者",

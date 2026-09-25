@@ -50,7 +50,7 @@
     "crumbs": {
       "participants": "Participants",
       "allocationRecipients": "Allocation recipients",
-      "cycle": "Cycle #{cycle}"
+      "cycle": "Cycle {cycle}"
     }
   },
   "status": {

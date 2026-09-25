@@ -96,7 +96,7 @@
   },
   "gestureDetail": {
     "title": "Thông tin nét bút",
-    "titleFor": "Nét bút #{position} · Chu kỳ #{cycle}",
+    "titleFor": "Nét bút #{position} · Chu kỳ {cycle}",
     "titleForId": "Bản ghi nét bút {id}",
     "description": "Xem thông tin chi tiết về nét bút gồm dấu thời gian, địa chỉ người tham gia, chi phí nét bút và bối cảnh chu kỳ của giao thức Cosmic Signature."
   },
@@ -122,7 +122,7 @@
     "description": "Chi tiết đầy đủ về chu kỳ trình diễn đang diễn ra: lịch sử nét bút, bảng xếp hạng, đóng góp đính kèm và phân phối phân bổ."
   },
   "allocationInfo": {
-    "titleFor": "Thông tin phân bổ chu kỳ #{id}",
+    "titleFor": "Thông tin phân bổ chu kỳ {id}",
     "descriptionFor": "Thông tin phân bổ chi tiết của chu kỳ Cosmic Signature #{id} — chi tiết người nhận, phân phối phân bổ Signature, kết quả Tinh tuyển và phân bổ NFT đính kèm."
   },
   "anchorAction": {

@@ -9,7 +9,7 @@ import type { SignaturePlateArt } from './signaturePlates';
  * The wall label of a bundled Signature on a reading page, by the rule the
  * home page's plates follow (components/landing-v2/signatureLabel): the
  * title "Signature #000013" (the number set in mono by SignaturePlate), then
- * "Cycle #0". One artwork is named the same way everywhere on the landing
+ * "Cycle 0". One artwork is named the same way everywhere on the landing
  * host; the alt text keeps the full "Cosmic Signature #000013".
  */
 export async function getSignaturePlateCopy(

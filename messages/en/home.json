@@ -5,7 +5,7 @@
   },
   "hero": {
     "cycleFallback": "The cycle",
-    "cycleNumber": "Cycle #{number}",
+    "cycleNumber": "Cycle {number}",
     "phase": {
       "openingSoon": {
         "badge": "Opening soon",
@@ -432,7 +432,7 @@
     "title": "Gesture Chat",
     "joinTooltip": "Want to join the chat? Make a gesture and leave an optional message. Messages attached to gestures appear here.",
     "currentCycle": "Current cycle",
-    "cycleNumber": "Cycle #{number}",
+    "cycleNumber": "Cycle {number}",
     "messageCount": "{count, plural, =0 {No messages yet} one {# message} other {# messages}}",
     "messageAria": "Gesture message from {address}",
     "openPositionAria": "Open gesture position {position}",
@@ -461,8 +461,8 @@
       "messagesFirst": "No messages yet this cycle. A message travels with a gesture."
     },
     "system": {
-      "cycleStart": "Cycle #{number} began. The first gesture started the finalization clock.",
-      "cycleOpen": "Cycle #{number} opened. The first ETH gesture can start the clock.",
+      "cycleStart": "Cycle {number} began. The first gesture started the finalization clock.",
+      "cycleOpen": "Cycle {number} opened. The first ETH gesture can start the clock.",
       "enduranceGrowing": "{address} started growing the Endurance record after a continuous hold of {duration}.",
       "enduranceRecord": "{address} ended a record-setting hold of {duration}. The Endurance record stands until a longer hold replaces it.",
       "chronoLead": "{address} started growing the Chrono-Warrior record with a continuous Endurance reign of {duration}.",
@@ -475,7 +475,7 @@
       "clockExtended": "{address} extended the finalization clock by {duration} during the closing window.",
       "clockReopened": "{address} made a gesture after the clock reached zero and added {duration} to the expired deadline.",
       "finalizationAvailable": "The finalization clock reached zero. {address} can finalize; gestures remain open until confirmation.",
-      "cycleFinalized": "Cycle #{number} finalized. The allocation recipients are now settled."
+      "cycleFinalized": "Cycle {number} finalized. The allocation recipients are now settled."
     },
     "pending": {
       "aria": "Your message, confirmed on-chain and indexing",
@@ -506,7 +506,7 @@
         "withErc20": "+ 1,000 CST · 1 Cosmic Signature NFT · {erc20Count, plural, one {# attached token deposit} other {# attached token deposits}}",
         "withBoth": "+ 1,000 CST · 1 Cosmic Signature NFT · {nftCount, plural, one {# attached NFT} other {# attached NFTs}} · {erc20Count, plural, one {# attached token deposit} other {# attached token deposits}}"
       },
-      "calendarTitle": "Cosmic Signature Cycle #{number} opens",
+      "calendarTitle": "Cosmic Signature Cycle {number} opens",
       "calendarBody": "The next Performance Cycle opens for gestures. The first gesture starts the finalization clock.",
       "calendarCta": "Add the opening to your calendar"
     },
@@ -573,7 +573,7 @@
       "reserveExtraNft": "1 Cosmic Signature NFT",
       "reserveAttached": "{count, plural, one {# attached asset} other {# attached assets}}",
       "reserveUsd": "≈ {amount} USD",
-      "calendarTitle": "Cosmic Signature Cycle #{number} opens",
+      "calendarTitle": "Cosmic Signature Cycle {number} opens",
       "calendarBody": "The next Performance Cycle opens for gestures. The first gesture starts the finalization clock.",
       "calendarCta": "Add the opening to your calendar",
       "unitLabels": {
@@ -719,7 +719,7 @@
     "gallery": "Gallery",
     "unnamed": "Cosmic Signature {id}",
     "named": "“{name}”, Cosmic Signature {id}",
-    "imprintedIn": "Imprinted in Cycle #{number}",
+    "imprintedIn": "Imprinted in Cycle {number}",
     "position": "{index} of {count}",
     "newer": "Newer Signature",
     "older": "Older Signature",

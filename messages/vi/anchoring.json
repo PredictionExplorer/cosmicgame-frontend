@@ -157,7 +157,7 @@
     "releaseNote": "Gỡ neo không thể hoàn tác. Bạn sẽ xác nhận ở màn hình tiếp theo trước khi ví mở ra.",
     "anchoredOn": "Neo giữ <date></date>",
     "accrued": "Đã tích lũy {amount}",
-    "cycle": "Chu kỳ #{cycle}",
+    "cycle": "Chu kỳ {cycle}",
     "open": "Mở {title}",
     "settled": {
       "anchored": "Đã neo giữ · đang cập nhật",

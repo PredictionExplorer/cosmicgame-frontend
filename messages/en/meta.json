@@ -96,7 +96,7 @@
   },
   "gestureDetail": {
     "title": "Gesture Information",
-    "titleFor": "Gesture #{position} · Cycle #{cycle}",
+    "titleFor": "Gesture #{position} · Cycle {cycle}",
     "titleForId": "Gesture record {id}",
     "description": "View detailed gesture information including timestamp, participant address, gesture cost, and cycle context for the Cosmic Signature protocol."
   },
@@ -122,8 +122,8 @@
     "description": "Full details for the active Performance Cycle: gesture history, leaderboards, attached contributions, and allocation distribution."
   },
   "allocationInfo": {
-    "titleFor": "Cycle #{id} Allocation Information",
-    "descriptionFor": "Detailed allocation information for Cosmic Signature cycle #{id} — recipient details, Signature Allocation distribution, Stellar Selection results, and attached NFT allocations."
+    "titleFor": "Cycle {id} Allocation Information",
+    "descriptionFor": "Detailed allocation information for Cosmic Signature cycle {id} — recipient details, Signature Allocation distribution, Stellar Selection results, and attached NFT allocations."
   },
   "anchorAction": {
     "description": "Details of a specific anchor action in Cosmic Signature — token type, anchored amounts, and distribution retrieval status."

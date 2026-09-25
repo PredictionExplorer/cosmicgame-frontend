@@ -1,7 +1,6 @@
 {
   "formats": {
     "cycle": "Cycle {cycle}",
-    "cycleHash": "Cycle #{cycle}",
     "cosmicSignatureToken": "Cosmic Signature #{token}"
   },
   "recipients": {
@@ -27,7 +26,7 @@
       "recipient": "Recipient"
     },
     "share": {
-      "summary": "Cycle #{cycle} — Cosmic Signature\nSignature Allocation: {amount} ETH\nRecipient: {recipient}\nGestures: {gestures}\n{url}",
+      "summary": "Cycle {cycle} — Cosmic Signature\nSignature Allocation: {amount} ETH\nRecipient: {recipient}\nGestures: {gestures}\n{url}",
       "success": "Cycle summary copied to clipboard"
     },
     "invalid": {
@@ -36,7 +35,7 @@
     },
     "error": {
       "title": "Couldn’t load this cycle",
-      "message": "Cycle #{cycle} data failed to load. Try again, or go back to the recipients list."
+      "message": "Cycle {cycle} data failed to load. Try again, or go back to the recipients list."
     },
     "breadcrumbs": {
       "recipients": "Allocation recipients"
@@ -138,15 +137,15 @@
   },
   "missingCycle": {
     "open": {
-      "title": "Cycle #{cycle} is still open",
+      "title": "Cycle {cycle} is still open",
       "body": "Its allocation record appears here once the cycle is finalized."
     },
     "notStarted": {
-      "title": "Cycle #{cycle} hasn’t started",
-      "body": "Cycles run one at a time, and Cycle #{live} is the one open now."
+      "title": "Cycle {cycle} hasn’t started",
+      "body": "Cycles run one at a time, and Cycle {live} is the one open now."
     },
     "unknown": {
-      "title": "No record of Cycle #{cycle} yet",
+      "title": "No record of Cycle {cycle} yet",
       "body": "The cycle may still be open, or its record is still being indexed."
     },
     "currentCycle": "Follow the current cycle"
@@ -166,19 +165,19 @@
       "status": "Loading the finalized cycle"
     },
     "pending": {
-      "successTitle": "Cycle #{cycle} is finalized",
+      "successTitle": "Cycle {cycle} is finalized",
       "successBody": "Your finalization is on-chain. Its record appears here as soon as it is indexed; this page updates by itself."
     },
     "links": {
-      "viewCycle": "View Cycle #{cycle}",
+      "viewCycle": "View Cycle {cycle}",
       "myAllocations": "My allocations",
       "allCycles": "All cycles"
     },
     "result": {
-      "title": "Cycle #{cycle} Signature Allocation",
-      "successTitle": "Congratulations! The Cycle #{cycle} Signature Allocation is yours",
+      "title": "Cycle {cycle} Signature Allocation",
+      "successTitle": "Congratulations! The Cycle {cycle} Signature Allocation is yours",
       "lede": "What the participant who made the Final Gesture received when the cycle was finalized.",
-      "successLede": "You made the Final Gesture of Cycle #{cycle}. The ETH, the CST and this Signature are now in your wallet.",
+      "successLede": "You made the Final Gesture of Cycle {cycle}. The ETH, the CST and this Signature are now in your wallet.",
       "componentsTitle": "What the allocation holds",
       "eth": "ETH",
       "cst": "CST",

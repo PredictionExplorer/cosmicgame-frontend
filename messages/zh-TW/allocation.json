@@ -1,7 +1,6 @@
 {
   "formats": {
     "cycle": "第 {cycle} 個週期",
-    "cycleHash": "第 {cycle} 個週期",
     "cosmicSignatureToken": "Cosmic Signature #{token}"
   },
   "recipients": {

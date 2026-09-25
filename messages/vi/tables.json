@@ -49,7 +49,7 @@
       "columns": {
         "datetime": "Thời điểm",
         "contributorAddress": "Địa chỉ người đóng góp",
-        "round": "Chu kỳ #",
+        "round": "Chu kỳ",
         "tokenAddress": "Địa chỉ token",
         "tokenId": "Mã token",
         "tokenImage": "Hình token",
@@ -61,7 +61,7 @@
       "empty": "Chưa có token ERC20 đính kèm.",
       "columns": {
         "datetime": "Thời điểm",
-        "cycle": "Chu kỳ #",
+        "cycle": "Chu kỳ",
         "tokenAddress": "Địa chỉ token",
         "attachedAmount": "Số lượng đính kèm",
         "retrievedAmount": "Số lượng đã nhận về",
@@ -88,7 +88,6 @@
   "columns": {
     "cycle": "Chu kỳ",
     "cycleNumber": "Số chu kỳ",
-    "cycleHash": "Chu kỳ #",
     "round": "Chu kỳ",
     "participant": "Người tham gia",
     "recipient": "Người nhận",
