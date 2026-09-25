@@ -405,7 +405,7 @@ describe('PageHeader', () => {
 
   it('keeps related pages on phones, as quiet links rather than bordered chips', () => {
     // Phones once dropped the header's only route to sibling pages; the links
-    // now stay on one row that scrolls sideways there.
+    // now wrap there, every one in view, and the visible label steps aside.
     render(
       <PageHeader
         title="Allocation"
@@ -416,13 +416,14 @@ describe('PageHeader', () => {
     const related = screen.getByRole('navigation', { name: 'Related' });
     expect(related).not.toHaveClass('max-sm:hidden');
     expect(related.closest('.max-sm\\:hidden')).toBeNull();
-    // The visible label repeats the nav's own name, so it is not read twice.
-    expect(within(related).getByText('common.pageHeader.relatedPages')).toHaveAttribute(
-      'aria-hidden',
-      'true',
-    );
+    // The visible label repeats the nav's own name, so it is not read twice,
+    // and gives its room to the links on phones.
+    const label = within(related).getByText('common.pageHeader.relatedPages');
+    expect(label).toHaveAttribute('aria-hidden', 'true');
+    expect(label).toHaveClass('max-sm:hidden');
+    expect(within(related).getByRole('list')).toHaveClass('flex-wrap');
     const link = screen.getByRole('link', { name: 'Statistics' });
-    expect(link).toHaveClass('link-quiet', 'pointer-coarse:min-h-11', 'whitespace-nowrap');
+    expect(link).toHaveClass('link-quiet', 'pointer-coarse:min-h-11', 'sm:whitespace-nowrap');
     expect(link).not.toHaveClass('border');
   });
 

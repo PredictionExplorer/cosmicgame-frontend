@@ -127,8 +127,9 @@ export interface PageHeaderProps {
   meta?: ReactNode;
   /**
    * Related pages: one quiet line of links at the foot of the header,
-   * labelled "Related pages". On phones it is a single row that scrolls
-   * sideways, so the onward paths stay there without growing the header.
+   * labelled "Related pages". The links wrap, so every onward path shows at
+   * every width; on phones the visible label gives its room to the links
+   * (the nav keeps its name for screen readers).
    */
   related?: readonly PageHeaderLink[];
   /** Accessible name of the related-pages nav. Defaults to "Related pages". */
@@ -352,37 +353,37 @@ export function PageHeader({
             centered && 'justify-center',
           )}
         >
-          {/* Seen, not heard: the nav's own name already says it. */}
-          <span aria-hidden className="type-label shrink-0 text-subtle">
+          {/* Seen, not heard: the nav's own name already says it. On phones
+              the links need the room more than the label does. */}
+          <span aria-hidden className="type-label shrink-0 text-subtle max-sm:hidden">
             {t('pageHeader.relatedPages')}
           </span>
-          {/* One row that scrolls on phones, so the pages stay reachable there too. */}
-          <ScrollRail className="min-w-0" trackClassName="py-0.5">
-            <ul className="flex gap-x-5 sm:flex-wrap sm:gap-y-1">
-              {related.map((link) => {
-                // Third-party pages open in a new tab and carry its arrow; the
-                // other Cosmic Signature host stays in this tab, like a page here.
-                const kind = classifyHref(link.href, 'app');
-                const Icon = kind === 'external' ? ArrowUpRight : ArrowRight;
-                return (
-                  <li key={link.href} className="shrink-0">
-                    <SiteLink
-                      href={link.href}
-                      kind={kind}
-                      externalIcon={false}
-                      className="link-quiet group inline-flex min-h-8 items-center gap-1 whitespace-nowrap type-label text-muted-foreground transition-colors duration-fast hover:text-foreground pointer-coarse:min-h-11"
-                    >
-                      {link.label}
-                      <Icon
-                        aria-hidden
-                        className="size-3.5 shrink-0 text-subtle transition-colors duration-fast group-hover:text-foreground rtl:-scale-x-100"
-                      />
-                    </SiteLink>
-                  </li>
-                );
-              })}
-            </ul>
-          </ScrollRail>
+          <ul
+            className={cn('flex min-w-0 flex-wrap gap-x-5 gap-y-1', centered && 'justify-center')}
+          >
+            {related.map((link) => {
+              // Third-party pages open in a new tab and carry its arrow; the
+              // other Cosmic Signature host stays in this tab, like a page here.
+              const kind = classifyHref(link.href, 'app');
+              const Icon = kind === 'external' ? ArrowUpRight : ArrowRight;
+              return (
+                <li key={link.href} className="max-w-full">
+                  <SiteLink
+                    href={link.href}
+                    kind={kind}
+                    externalIcon={false}
+                    className="link-quiet group inline-flex min-h-8 items-center gap-1 type-label text-muted-foreground transition-colors duration-fast hover:text-foreground sm:whitespace-nowrap pointer-coarse:min-h-11"
+                  >
+                    {link.label}
+                    <Icon
+                      aria-hidden
+                      className="size-3.5 shrink-0 text-subtle transition-colors duration-fast group-hover:text-foreground rtl:-scale-x-100"
+                    />
+                  </SiteLink>
+                </li>
+              );
+            })}
+          </ul>
         </nav>
       ) : null}
 
