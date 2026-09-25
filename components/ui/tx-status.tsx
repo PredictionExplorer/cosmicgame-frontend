@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { AlertCircle, Check, CircleSlash, ExternalLink, Loader2 } from 'lucide-react';
+import { AlertCircle, ArrowUpRight, Check, CircleSlash, Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { useTxStageLabel } from '@/hooks/useTxStageLabel';
@@ -26,7 +26,7 @@ export function TxExplorerLink({ hash, label, className }: TxExplorerLinkProps) 
       className={cn('link inline-flex items-center gap-1 font-medium', className)}
     >
       {label}
-      <ExternalLink className="h-3.5 w-3.5 shrink-0" aria-hidden />
+      <ArrowUpRight className="size-3.5 shrink-0 text-subtle" aria-hidden />
     </a>
   );
 }

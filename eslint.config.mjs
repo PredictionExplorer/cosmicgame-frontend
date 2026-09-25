@@ -112,6 +112,14 @@ const config = [
               message:
                 'Auction, lottery, prize and game imagery is off-lexicon (AGENTS.md). Use the concept icon from @/lib/conceptIcons.',
             },
+            // One external-link glyph (docs/design-system.md → Links).
+            {
+              group: ['lucide-react'],
+              importNamePattern:
+                '^(?:Lucide)?(?:ExternalLink|SquareArrowOutUpRight|SquareArrowUpRight)(?:Icon)?$',
+              message:
+                'An outbound link carries ArrowUpRight (size-3.5, text-subtle), as SiteLink draws it: one external-link icon.',
+            },
           ],
         },
       ],

@@ -280,6 +280,10 @@ A link inside running text must not rely on hue alone.
   links.
 - `link-quiet`: underline on hover and focus only. For link lists and navigation that
   already read as links by position.
+- An outbound link (a new tab: the explorer, the marketplace, GitHub) carries one glyph,
+  `ArrowUpRight` at `size-3.5` in `text-subtle`, and the spoken "(opens in a new tab)", as
+  `SiteLink kind="external"` draws them. ESLint rejects `ExternalLink` and its square
+  variants.
 - Unstyled `<a>` elements inside `p`, `li`, `dd`, `figcaption`, `blockquote` and `td` get
   the `link` style automatically.
 - `link-entity`: a link to a record (a cycle, a token, a profile) set as a value on a

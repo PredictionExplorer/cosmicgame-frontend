@@ -1,6 +1,6 @@
 'use client';
 
-import { AlertTriangle, Check, Copy, ExternalLink, LogOut, Repeat } from 'lucide-react';
+import { AlertTriangle, ArrowUpRight, Check, Copy, LogOut, Repeat } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { Button } from '@/components/ui/button';
@@ -98,7 +98,7 @@ export function WalletAccountPanel({ className }: { className?: string }) {
               rel="noopener noreferrer"
               className="flex min-h-11 items-center gap-2.5 rounded-md px-2 text-sm text-foreground transition-colors hover:bg-muted sm:min-h-9"
             >
-              <ExternalLink className="h-4 w-4 text-muted-foreground" aria-hidden />
+              <ArrowUpRight className="size-4 text-muted-foreground" aria-hidden />
               {t('account.viewOnExplorer', { explorer: account.explorerName })}
             </a>
           )}
@@ -170,7 +170,7 @@ export function WalletAccountMenuItems() {
       {account.explorerUrl && (
         <DropdownMenuItem asChild className="cursor-pointer gap-2.5 px-2">
           <a href={account.explorerUrl} target="_blank" rel="noopener noreferrer">
-            <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" aria-hidden />
+            <ArrowUpRight className="size-3.5 text-subtle" aria-hidden />
             {t('account.viewOnExplorer', { explorer: account.explorerName })}
           </a>
         </DropdownMenuItem>

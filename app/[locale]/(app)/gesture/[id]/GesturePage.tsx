@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { ArrowLeft, ArrowRight, ExternalLink } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
@@ -163,7 +163,7 @@ function TransactionHash({ hash }: { hash: string }) {
           TOUCH_TARGET_EXTENDED_CLASS,
         )}
       >
-        <ExternalLink aria-hidden className="size-3.5" />
+        <ArrowUpRight aria-hidden className="size-3.5 text-subtle" />
       </a>
     </span>
   );
