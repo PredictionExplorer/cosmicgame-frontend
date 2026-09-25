@@ -518,10 +518,13 @@ export function GesturePanel({
             className="group inline-flex min-h-11 items-center gap-2 rounded-control text-start text-sm font-medium text-foreground sm:min-h-9"
           >
             <PenLine className="size-4 shrink-0 text-subtle" aria-hidden />
-            <span>
-              {t('form.message.add')}{' '}
-              {/* The hint moves to its own line whole rather than breaking inside. */}
-              <span className="type-caption font-normal whitespace-nowrap text-subtle">
+            {/* The hint moves to its own line whole rather than breaking
+                inside, and breaks only where a whole line is too narrow. A
+                wrapping row, not a no-wrap span: WebKit keeps a no-wrap
+                inline on the line it overflows. */}
+            <span className="flex min-w-0 flex-wrap items-baseline gap-x-1">
+              <span>{t('form.message.add')}</span>{' '}
+              <span className="type-caption font-normal text-subtle">
                 {t('form.advanced.messageOptionalHint', { maxLength: String(messageMaxBytes) })}
               </span>
             </span>

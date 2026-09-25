@@ -489,6 +489,7 @@
       "showing": "Latest {messages, plural, one {# message} other {# messages}} and {events, plural, one {# cycle event} other {# cycle events}}",
       "showMore": "Show more"
     },
+    "invite": "A message travels with a gesture.",
     "empty": {
       "title": "No messages or events yet",
       "description": "Messages and cycle milestones will appear here, newest first.",

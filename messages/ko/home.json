@@ -489,6 +489,7 @@
       "showing": "최근 메시지 {messages, plural, other {#개}}, 사이클 이벤트 {events, plural, other {#개}}",
       "showMore": "더 보기"
     },
+    "invite": "메시지는 제스처와 함께 전송됩니다.",
     "empty": {
       "title": "아직 메시지나 이벤트가 없습니다",
       "description": "메시지와 사이클의 주요 이벤트가 최신순으로 여기에 표시됩니다.",

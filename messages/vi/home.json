@@ -489,6 +489,7 @@
       "showing": "{messages, plural, other {# lời nhắn}} và {events, plural, other {# sự kiện chu kỳ}} gần nhất",
       "showMore": "Xem thêm"
     },
+    "invite": "Lời nhắn được gửi cùng nét bút.",
     "empty": {
       "title": "Chưa có lời nhắn hay sự kiện",
       "description": "Lời nhắn và các cột mốc của chu kỳ sẽ xuất hiện ở đây, mới nhất trước.",

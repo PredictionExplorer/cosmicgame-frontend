@@ -489,6 +489,7 @@
       "showing": "最近 {messages, plural, other {# 條留言}}和 {events, plural, other {# 項週期事件}}",
       "showMore": "顯示更多"
     },
+    "invite": "留言隨落筆一同上鏈。",
     "empty": {
       "title": "暫無留言或事件",
       "description": "留言和週期重要事件會顯示在這裏，最新的排在最前。",

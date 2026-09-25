@@ -489,6 +489,7 @@
       "showing": "最新のメッセージ{messages, plural, other {#件}}とサイクルのイベント{events, plural, other {#件}}",
       "showMore": "さらに表示"
     },
+    "invite": "メッセージは一筆と一緒に送られます。",
     "empty": {
       "title": "メッセージやイベントはまだありません",
       "description": "メッセージとサイクルの節目が、新しいものから順にここに表示されます。",

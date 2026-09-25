@@ -312,6 +312,30 @@ describe('GestureMessageChat', () => {
     expect(screen.queryByTestId('chat-no-messages')).not.toBeInTheDocument();
   });
 
+  it('closes a history read to its end on the message invite, and only while the cycle takes gestures', async () => {
+    const user = userEvent.setup();
+    const onJoinCta = jest.fn();
+    const few = [makeGesture({ EvtLogId: 1, Message: 'only one' })];
+    const { rerender } = render(<GestureMessageChat gestures={few} onJoinCta={onJoinCta} />);
+    const invite = screen.getByTestId('chat-invite');
+    expect(invite).toHaveTextContent('home.chat.invite');
+    await user.click(within(invite).getByRole('button', { name: 'home.form.message.add' }));
+    expect(onJoinCta).toHaveBeenCalledTimes(1);
+
+    // Between cycles there is nothing to add a message to.
+    rerender(<GestureMessageChat gestures={few} />);
+    expect(screen.queryByTestId('chat-invite')).not.toBeInTheDocument();
+
+    // More history waits: "Show more" closes the feed, not the invite.
+    const many = Array.from({ length: 8 }, (_, index) =>
+      makeGesture({ EvtLogId: index + 1, TimeStamp: 1_700_000_000 + index, Message: `m${index}` }),
+    );
+    rerender(<GestureMessageChat gestures={many} onJoinCta={onJoinCta} />);
+    expect(screen.queryByTestId('chat-invite')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'home.chat.history.showMore' }));
+    expect(screen.getByTestId('chat-invite')).toBeVisible();
+  });
+
   it('shows loading and a first-read failure without presenting either as an empty chat', async () => {
     const user = userEvent.setup();
     const onRetry = jest.fn();

@@ -62,7 +62,9 @@ async function expectDecisionDashboardInViewport(page: Page) {
 
 /**
  * The desk reads in DOM order, column by column: within each column of the
- * two-column desk, keyboard focus never moves up (WCAG 1.3.2, 2.4.3).
+ * two-column desk, keyboard focus never moves up (WCAG 1.3.2, 2.4.3). A stop
+ * belongs to the column its desk cell starts in, so a link at the far edge
+ * of the wide standings cell still reads with the standings.
  */
 async function expectDeskFocusOrderReadsDown(page: Page) {
   const stops = await page.getByTestId('control-desk-grid').evaluate((grid) => {
@@ -85,11 +87,12 @@ async function expectDeskFocusOrderReadsDown(page: Page) {
       })
       .map((element) => {
         const rect = element.getBoundingClientRect();
+        const cell = element.closest('[data-testid="control-desk-grid"] > *') ?? element;
         return {
           name: (element.getAttribute('aria-label') ?? element.textContent ?? '')
             .trim()
             .slice(0, 40),
-          column: rect.left >= form.left - 1 ? 'right' : 'left',
+          column: cell.getBoundingClientRect().left >= form.left - 1 ? 'right' : 'left',
           // The middle of the control: controls of different heights on one
           // line (an ⓘ beside a 44px menu button) read as one line.
           middle: rect.top + rect.height / 2 + window.scrollY,

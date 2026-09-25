@@ -6,6 +6,7 @@ import {
   CircleCheck,
   Clock3,
   MessageCircle,
+  PenLine,
   Radio,
   Sparkles,
   TimerReset,
@@ -87,7 +88,11 @@ interface GestureMessageChatProps {
   className?: string;
   /** Changes when a Gesture lands: the newest message settles in. */
   pulseKey?: number;
-  /** When provided, the empty state offers a "Make a Gesture" call to action. */
+  /**
+   * While the cycle takes Gestures: the empty states offer "Make a gesture",
+   * and a history read to its end closes on "Add a message", where a
+   * composer would sit.
+   */
   onJoinCta?: () => void;
   /** Derived cycle moments interleaved with participant messages by timestamp. */
   systemEvents?: GestureFeedSystemEvent[];
@@ -490,6 +495,17 @@ export function GestureMessageChat({
   const shownRows = visibleFeedRows(rows, pending.length, visibleMessages);
   const hasHiddenRows = !isPrinting && rows.length + pending.length > shownRows;
   const newestMessage = messages[0] ?? null;
+  // A history read to its end closes where a composer would sit: messages
+  // ride on Gestures, so the invite opens the form's message editor.
+  const showInvite =
+    !!onJoinCta &&
+    !isLoading &&
+    !error &&
+    hasFeedContent &&
+    !noMessagesYet &&
+    !hasHiddenRows &&
+    !hasOlderContent &&
+    !pagination?.error;
   const isSettling = useLivePulse(pulseKey);
 
   // Printing renders known history only; it never starts a network request.
@@ -689,6 +705,21 @@ export function GestureMessageChat({
             }
             className="py-10"
           />
+        ) : null}
+
+        {showInvite ? (
+          <div
+            data-testid="chat-invite"
+            className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-rule-faint py-4 print:hidden"
+          >
+            <p className="type-body-sm flex min-w-0 items-center gap-2 text-muted-foreground">
+              <PenLine className="size-4 shrink-0 text-subtle" aria-hidden />
+              {t('chat.invite')}
+            </p>
+            <Button variant="secondary" size="sm" onClick={onJoinCta}>
+              {t('form.message.add')}
+            </Button>
+          </div>
         ) : null}
 
         {!isLoading && !error && (hasHiddenRows || hasOlderContent || pagination?.error) ? (
