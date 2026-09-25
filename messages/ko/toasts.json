@@ -40,6 +40,7 @@
     "confirmed": "제스처가 기록되었습니다. 사이클 마감 시각이 연장되었습니다.",
     "validation": {
       "notNftOwner": "이 토큰의 소유자가 아닙니다.",
+      "chooseRandomWalkNft": "이 지갑에서 사용하지 않은 Random Walk NFT를 선택하십시오.",
       "tokenDecimalsWarning": "토큰이 decimals()를 구현하지 않아 18자리로 간주합니다.",
       "invalidContractAddress": "입력한 주소는 올바른 컨트랙트 주소가 아닙니다.",
       "notErc721": "첨부한 NFT 컨트랙트가 ERC-721 토큰 컨트랙트가 아닙니다.",

@@ -40,6 +40,7 @@
     "confirmed": "Gesture recorded. Cycle Finalization Time extended.",
     "validation": {
       "notNftOwner": "This NFT does not belong to your connected wallet.",
+      "chooseRandomWalkNft": "Choose one of this wallet’s unused Random Walk NFTs.",
       "tokenDecimalsWarning": "Token doesn't implement decimals(); assuming 18 decimal places.",
       "invalidContractAddress": "Enter a valid contract address.",
       "notErc721": "The attached NFT must use an ERC-721 contract.",

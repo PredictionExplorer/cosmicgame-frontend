@@ -1434,6 +1434,86 @@ describe('useGestureForm Random Walk token', () => {
     expect(mockWagmiWriteContract).not.toHaveBeenCalled();
   });
 
+  it("asks for one of the wallet's unused tokens when none is chosen", async () => {
+    const { result } = renderHook(() => useGestureForm());
+    await waitFor(() => expect(result.current.rwlknftIds).toEqual([3, 1]));
+    act(() => result.current.setBidType('RandomWalk'));
+
+    const ok = await result.current.onGesture();
+
+    expect(ok).toBe(false);
+    expect(mockNotify).toHaveBeenCalledWith(
+      'error',
+      'toasts.gesture.validation.chooseRandomWalkNft',
+    );
+    expect(mockNotify).not.toHaveBeenCalledWith(
+      'error',
+      'toasts.gesture.contractErrors.usedRandomWalkNft',
+    );
+    expect(mockWagmiWriteContract).not.toHaveBeenCalled();
+  });
+
+  describe("with a token the wallet's list has not confirmed", () => {
+    // The list is still being read, so the token (a deep link, say) is kept
+    // and only the chain can say what is wrong with it.
+    const submitUnlistedToken = async () => {
+      mockRWLKContract.read.walletOfOwner.mockReturnValue(new Promise(() => undefined));
+      const { result } = renderHook(() => useGestureForm());
+      act(() => {
+        result.current.setBidType('RandomWalk');
+        result.current.setRwlkId(7);
+      });
+      expect(result.current.rwlkListStatus).toBe('loading');
+      return result.current.onGesture();
+    };
+
+    it("names another wallet's token as not owned, not as used", async () => {
+      mockReadContract.mockImplementation(async ({ functionName }: { functionName: string }) => {
+        if (functionName === 'ownerOf') return '0xSomeoneElse';
+        if (functionName === 'usedRandomWalkNfts') return 0n;
+        return true;
+      });
+
+      expect(await submitUnlistedToken()).toBe(false);
+      expect(mockNotify).toHaveBeenCalledWith(
+        'error',
+        'toasts.gesture.contractErrors.callerIsNotNftOwner',
+      );
+      expect(mockNotify).not.toHaveBeenCalledWith(
+        'error',
+        'toasts.gesture.contractErrors.usedRandomWalkNft',
+      );
+      expect(mockWagmiWriteContract).not.toHaveBeenCalled();
+    });
+
+    it('lets the chain vouch for a token it confirms as owned and unused', async () => {
+      mockReadContract.mockImplementation(async ({ functionName }: { functionName: string }) => {
+        if (functionName === 'ownerOf') return '0xUser';
+        if (functionName === 'usedRandomWalkNfts') return 0n;
+        return true;
+      });
+
+      expect(await submitUnlistedToken()).toBe(true);
+      expect(firstWriteArgs()[0]).toBe(7n);
+    });
+
+    it('asks for a listed token when the chain cannot be read', async () => {
+      mockReadContract.mockImplementation(async ({ functionName }: { functionName: string }) => {
+        if (functionName === 'ownerOf' || functionName === 'usedRandomWalkNfts') {
+          throw new Error('RPC unavailable');
+        }
+        return true;
+      });
+
+      expect(await submitUnlistedToken()).toBe(false);
+      expect(mockNotify).toHaveBeenCalledWith(
+        'error',
+        'toasts.gesture.validation.chooseRandomWalkNft',
+      );
+      expect(mockWagmiWriteContract).not.toHaveBeenCalled();
+    });
+  });
+
   it('never sends a token with a plain ETH Gesture', async () => {
     const { result } = renderHook(() => useGestureForm());
     await waitFor(() => expect(result.current.rwlknftIds).toEqual([3, 1]));

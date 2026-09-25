@@ -573,12 +573,14 @@ export function useGestureForm({ firstGesture = false }: UseGestureFormOptions =
    * The Random Walk NFT still belongs to this wallet and was never used for
    * a Gesture, read from the chain right before the wallet prompt: a token
    * transferred or used since the list was read would otherwise revert with
-   * CallerIsNotNftOwner or UsedRandomWalkNft. A read that fails leaves the
-   * decision to the contract, as the list check already passed.
+   * CallerIsNotNftOwner or UsedRandomWalkNft. A refusal names its cause:
+   * another owner, a used token, or, when no token is chosen or the chain
+   * cannot be read and the wallet's list does not confirm the token, a
+   * request to choose one of the wallet's unused NFTs.
    */
   const ensureRandomWalkTokenUsable = async (tokenId: number): Promise<boolean> => {
-    if (!isUsableRandomWalkToken(tokenId, rwlkListStatus, rwlknftIds)) {
-      notify('error', t('gesture.contractErrors.usedRandomWalkNft'));
+    if (tokenId < 0) {
+      notify('error', t('gesture.validation.chooseRandomWalkNft'));
       return false;
     }
     const [owner, used] = await Promise.all([
@@ -611,6 +613,14 @@ export function useGestureForm({ firstGesture = false }: UseGestureFormOptions =
     }
     if (typeof used === 'bigint' && used !== 0n) {
       notify('error', t('gesture.contractErrors.usedRandomWalkNft'));
+      return false;
+    }
+    // Both reads answered: the chain has the last word. Otherwise the list
+    // read for this wallet must vouch for the token, and a read that fails
+    // for a listed token leaves the decision to the contract.
+    if (typeof owner === 'string' && typeof used === 'bigint') return true;
+    if (!isUsableRandomWalkToken(tokenId, rwlkListStatus, rwlknftIds)) {
+      notify('error', t('gesture.validation.chooseRandomWalkNft'));
       return false;
     }
     return true;

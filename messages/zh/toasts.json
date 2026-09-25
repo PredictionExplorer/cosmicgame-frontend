@@ -40,6 +40,7 @@
     "confirmed": "落笔已记录，周期收官时间已延长。",
     "validation": {
       "notNftOwner": "当前钱包并未持有这枚 NFT。",
+      "chooseRandomWalkNft": "请选择此钱包中一枚未使用过的 Random Walk NFT。",
       "tokenDecimalsWarning": "此代币未实现 decimals()；将按 18 位小数处理。",
       "invalidContractAddress": "请输入有效的合约地址。",
       "notErc721": "所选合约不符合 ERC-721 标准。",

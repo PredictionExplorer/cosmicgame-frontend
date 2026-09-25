@@ -40,6 +40,7 @@
     "confirmed": "一筆が記録されました。サイクル確定時刻が延長されました。",
     "validation": {
       "notNftOwner": "このトークンの所有者ではありません。",
+      "chooseRandomWalkNft": "このウォレットにある未使用のRandom Walk NFTを選択してください。",
       "tokenDecimalsWarning": "トークンがdecimals()を実装していないため、小数点以下18桁と仮定します。",
       "invalidContractAddress": "指定されたアドレスは有効なコントラクトアドレスではありません。",
       "notErc721": "添付されたNFTコントラクトはERC721トークンコントラクトではありません。",
