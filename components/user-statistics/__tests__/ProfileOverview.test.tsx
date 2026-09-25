@@ -44,6 +44,22 @@ describe('ProfileOverview', () => {
     }
   });
 
+  it('reads out the largest ETH gesture', () => {
+    render(<ProfileOverview {...props()} />);
+    expect(row('myPages.statistics.overview.gestures.largest')).toHaveTextContent('0.1000 ETH');
+  });
+
+  // The API writes -1e-18 for an address whose gestures were all CST; the row read
+  // ">-0.0001 ETH" for it.
+  it.each([-1e-18, 0, undefined])('says a participant with no ETH gesture has none (%s)', (max) => {
+    render(
+      <ProfileOverview {...props({ userInfo: { ...props().userInfo, MaxBidAmount: max } })} />,
+    );
+    const largest = row('myPages.statistics.overview.gestures.largest');
+    expect(largest).not.toHaveTextContent('ETH');
+    expect(largest).toHaveTextContent('tables.status.none');
+  });
+
   it('says how many received NFTs are held or anchored now, once that read answered', () => {
     const { rerender } = render(<ProfileOverview {...props()} />);
     expect(row('myPages.statistics.overview.nfts.received')).toHaveTextContent(

@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 
 import { useFormat } from '@/hooks/useFormat';
+import { toFiniteNumber } from '@/utils/finiteNumber';
 import { Amount } from '@/components/ui/amount';
 import { DateTime } from '@/components/ui/date-time';
 import { UnknownValue } from '@/components/ui/unknown-value';
@@ -65,7 +66,11 @@ export function ProfileOverview({
   const t = useTranslations('myPages');
   const tCommon = useTranslations('common');
   const format = useFormat();
+  const tTables = useTranslations('tables');
   const o = (key: string) => t(`statistics.overview.${key}`);
+  // The API writes -1e-18 for an address whose gestures were all CST: no ETH gesture, so no
+  // largest one, never ">-0.0001 ETH".
+  const largestEthGesture = toFiniteNumber(userInfo.MaxBidAmount);
   const stellarEthTotal =
     (userInfo.SumRaffleEthWinnings ?? 0) + (userInfo.SumRaffleEthWithdrawal ?? 0);
 
@@ -75,7 +80,13 @@ export function ProfileOverview({
         <StatisticsGroup title={o('gestures.title')}>
           <StatisticsItem
             title={o('gestures.largest')}
-            value={<Amount value={userInfo.MaxBidAmount ?? 0} unit="ETH" />}
+            value={
+              largestEthGesture !== null && largestEthGesture > 0 ? (
+                <Amount value={largestEthGesture} unit="ETH" />
+              ) : (
+                <UnknownValue label={tTables('status.none')} />
+              )
+            }
           />
           <StatisticsItem
             title={o('gestures.firstCycle')}
