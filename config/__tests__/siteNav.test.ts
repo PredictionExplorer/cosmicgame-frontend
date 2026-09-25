@@ -23,7 +23,6 @@ import {
   getSiteRoute,
   locateSitePath,
   resolveRouteHref,
-  routesInSection,
   siteHostLabel,
 } from '../siteNav';
 import {
@@ -263,12 +262,26 @@ describe('surfaces', () => {
     expect(LEGAL_ROUTE_IDS).toEqual(['terms', 'privacy', 'riskDisclosures']);
   });
 
-  it('lists the account pages in taxonomy order', () => {
-    expect(ACCOUNT_ROUTE_IDS).toEqual(routesInSection('account').map((route) => route.id));
+  it('keeps the wallet’s own pages to the wallet menu and the drawer', () => {
+    // A disconnected visitor has nothing on them: the public footers and the
+    // header's panels never link them.
     expect(ACCOUNT_ROUTE_IDS).toContain('transferCst');
+    const headerRoutes = new Set(appHeaderRouteIds());
+    for (const id of ACCOUNT_ROUTE_IDS) {
+      expect(getSiteRoute(id).footer).toBeFalsy();
+      expect(headerRoutes.has(id)).toBe(false);
+    }
   });
 
-  it('suggests real destinations on the 404 page', () => {
-    for (const id of NOT_FOUND_ROUTE_IDS) expect(getSiteRoute(id)).toBeDefined();
+  it('suggests public app pages on the 404, beside (not repeating) its two buttons', () => {
+    for (const id of NOT_FOUND_ROUTE_IDS) {
+      const route = getSiteRoute(id);
+      expect(route.host).toBe('app');
+      expect(route.section).not.toBe('account');
+      // Every suggestion is also a server-rendered footer link.
+      expect(route.footer).toBe(true);
+    }
+    expect(NOT_FOUND_ROUTE_IDS).not.toContain('observatory');
+    expect(NOT_FOUND_ROUTE_IDS).not.toContain('gallery');
   });
 });

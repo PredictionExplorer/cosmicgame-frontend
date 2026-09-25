@@ -150,6 +150,8 @@ const ROUTE_DEFINITIONS = {
     host: 'app',
     path: '/coordination-changes',
     section: 'records',
+    // A system event is one of these parameter changes, opened from its ledger.
+    owns: ['/system-event'],
     footer: true,
   },
   retrievedAllocations: { host: 'app', path: '/allocation-finalized', section: 'records' },
@@ -174,7 +176,8 @@ const ROUTE_DEFINITIONS = {
     owns: ['/source-code'],
     footer: true,
   },
-  riskDisclosures: { host: 'app', path: '/risk-disclosures', section: 'trust', footer: true },
+  // In both footers' legal row with the Terms and Privacy, not again in the Trust column.
+  riskDisclosures: { host: 'app', path: '/risk-disclosures', section: 'trust' },
   terms: { host: 'app', path: '/terms', section: 'trust' },
   privacy: { host: 'app', path: '/privacy', section: 'trust' },
   siteMap: { host: 'app', path: '/site-map', section: 'trust', footer: true },
@@ -248,7 +251,6 @@ const SECTION_PATH_PREFIXES: Partial<Record<SiteSectionId, readonly string[]>> =
     '/gesture',
     '/cosmic-token-transfer',
     '/cosmic-signature-transfer',
-    '/system-event',
     '/distributions-by-token',
   ],
 };
