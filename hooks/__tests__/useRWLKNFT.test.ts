@@ -1,5 +1,7 @@
 import { renderHook } from '@testing-library/react';
 
+import { getRWLKImageUrl } from '@/utils/urls';
+
 import { useRWLKNFT } from '../useRWLKNFT';
 
 const mockUseTokenInfo = jest
@@ -10,9 +12,8 @@ jest.mock('../useApiQuery', () => ({
   useTokenInfo: (...args: unknown[]) => mockUseTokenInfo(...args),
 }));
 
-jest.mock('../../utils', () => ({
-  getRWLKImageUrl: (fileName: string, suffix: string) => `https://cdn/${fileName}/${suffix}`,
-}));
+// The real URL builder: the hook names each file by the zero-padded id.
+const rw = (fileName: string, variant: string) => getRWLKImageUrl(fileName, variant);
 
 beforeEach(() => jest.clearAllMocks());
 
@@ -41,14 +42,14 @@ describe('useRWLKNFT', () => {
       name: 'MyNFT',
       owner: '0xOwner',
       seed: '0xSeed',
-      white_image: 'https://cdn/000042/white.png',
-      white_image_thumb: 'https://cdn/000042/white_thumb.jpg',
-      white_single_video: 'https://cdn/000042/white_single.mp4',
-      white_triple_video: 'https://cdn/000042/white_triple.mp4',
-      black_image: 'https://cdn/000042/black.png',
-      black_image_thumb: 'https://cdn/000042/black_thumb.jpg',
-      black_single_video: 'https://cdn/000042/black_single.mp4',
-      black_triple_video: 'https://cdn/000042/black_triple.mp4',
+      white_image: rw('000042', 'white.png'),
+      white_image_thumb: rw('000042', 'white_thumb.jpg'),
+      white_single_video: rw('000042', 'white_single.mp4'),
+      white_triple_video: rw('000042', 'white_triple.mp4'),
+      black_image: rw('000042', 'black.png'),
+      black_image_thumb: rw('000042', 'black_thumb.jpg'),
+      black_single_video: rw('000042', 'black_single.mp4'),
+      black_triple_video: rw('000042', 'black_triple.mp4'),
     });
   });
 
@@ -78,7 +79,7 @@ describe('useRWLKNFT', () => {
       error: null,
     });
     const { result } = renderHook(() => useRWLKNFT(7));
-    expect(result.current?.white_image).toBe('https://cdn/000007/white.png');
+    expect(result.current?.white_image).toBe(rw('000007', 'white.png'));
   });
 
   it('handles tokenId 0 as a valid falsy number', () => {
@@ -91,7 +92,7 @@ describe('useRWLKNFT', () => {
 
     expect(result.current).not.toBeNull();
     expect(result.current?.id).toBe(0);
-    expect(result.current?.white_image).toBe('https://cdn/000000/white.png');
+    expect(result.current?.white_image).toBe(rw('000000', 'white.png'));
   });
 
   it('handles large tokenId beyond 6 digits', () => {
@@ -102,7 +103,7 @@ describe('useRWLKNFT', () => {
     });
     const { result } = renderHook(() => useRWLKNFT(1234567));
     expect(result.current?.id).toBe(1234567);
-    expect(result.current?.white_image).toBe('https://cdn/1234567/white.png');
+    expect(result.current?.white_image).toBe(rw('1234567', 'white.png'));
   });
 
   it('handles string tokenId', () => {
@@ -113,7 +114,7 @@ describe('useRWLKNFT', () => {
     });
     const { result } = renderHook(() => useRWLKNFT('123'));
     expect(result.current?.id).toBe(123);
-    expect(result.current?.white_image).toBe('https://cdn/000123/white.png');
+    expect(result.current?.white_image).toBe(rw('000123', 'white.png'));
   });
 
   it('defaults name and owner to empty strings when null', () => {
