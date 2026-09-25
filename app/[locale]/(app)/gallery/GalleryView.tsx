@@ -426,7 +426,10 @@ export function GalleryView({ search, snapshotCount = null }: GalleryViewProps) 
             total={collectionSize}
             filtered={filtered}
             onClearAll={onClearAll}
-            className="mt-3"
+            // On a phone the count captions the plates: it sits close to the
+            // toolbar and to them, so the first row starts in the top half of
+            // the first screen.
+            className="mt-2 sm:mt-3"
             chips={
               <GalleryActiveFilters
                 status={query.status}
@@ -460,7 +463,7 @@ export function GalleryView({ search, snapshotCount = null }: GalleryViewProps) 
             ref={resultsRef}
             id={GALLERY_RESULTS_ID}
             aria-label={t('results.regionLabel')}
-            className="mt-5 scroll-mt-[calc(var(--sticky-offset)+4.5rem)] max-lg:scroll-mt-[var(--sticky-offset)]"
+            className="mt-3 scroll-mt-[calc(var(--sticky-offset)+4.5rem)] max-lg:scroll-mt-[var(--sticky-offset)] sm:mt-5"
           >
             <GalleryGrid
               items={visibleItems}

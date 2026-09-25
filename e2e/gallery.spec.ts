@@ -89,8 +89,9 @@ test.describe('Gallery page', () => {
 test.describe('Gallery on a phone', () => {
   test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
 
-  // The art arrives almost at once: a one-line lede and fact row, and no
-  // marketplace button, put the first plates in the top half of the screen.
+  // The art arrives almost at once: a one-sentence lede, a one-line fact row,
+  // no marketplace button and a caption-sized result count put the first
+  // plates in the top half of the screen.
   test('starts the first row of plates in the top half of the first screen', async ({ page }) => {
     await page.goto('/gallery', { waitUntil: 'networkidle' });
     const firstPlate = page.getByTestId('signature-card').first();

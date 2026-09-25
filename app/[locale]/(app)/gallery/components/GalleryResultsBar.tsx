@@ -28,6 +28,8 @@ export const GALLERY_RESULT_COUNT_ID = 'gallery-result-count';
  * The line between the toolbar and the grid: how many Signatures the view
  * shows (announced politely as filters change), the active filter chips and
  * "Clear all". "Clear all" removes itself, so it hands focus to the count.
+ * On a phone the count alone is a 24px caption over the plates; once filters
+ * apply, the chips and "Clear all" set the row's height.
  */
 export function GalleryResultsBar({
   count,
@@ -60,7 +62,7 @@ export function GalleryResultsBar({
         role="status"
         aria-live="polite"
         tabIndex={-1}
-        className="inline-flex min-h-8 items-center rounded-edge type-label tabular-nums text-muted-foreground"
+        className="inline-flex min-h-6 items-center rounded-edge type-label tabular-nums text-muted-foreground sm:min-h-8"
         data-testid="gallery-result-count"
       >
         {count === null
